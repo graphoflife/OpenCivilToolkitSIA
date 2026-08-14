@@ -130,7 +130,7 @@ class TestApiAbbildung(unittest.TestCase):
         k = api.katalog()
         self.assertEqual(len(k["betonsorten"]), 9)
         self.assertEqual(len(k["stahlsorten"]), 5)
-        self.assertEqual(len(k["erfuellungsarten"]), 3)
+        self.assertEqual(len(k["erfuellungsarten"]), 4)
         self.assertTrue(any(v["berechnet"] for v in k["kennwerte"]["beton"]))
         self.assertTrue(any(v["aus_sorte"] for v in k["kennwerte"]["beton"]))
 

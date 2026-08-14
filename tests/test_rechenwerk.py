@@ -585,21 +585,21 @@ class TestProzedur(unittest.TestCase):
 
 class TestNachweis(unittest.TestCase):
     def test_urteil_wird_gesammelt(self):
-        d_ausn = WertDef("n.ausnutzung", r"\eta", EINHEITSLOS, "Ausnutzungsgrad", stellen=3)
+        d_ausn = WertDef("n.grad", r"\alpha_{eff}", EINHEITSLOS, "Erfüllungsgrad", stellen=2)
         d_m_ed = WertDef("n.M_Ed", "M_{Ed}", KNM, "Bemessungsmoment", stellen=1)
         d_m_rd = WertDef("n.M_Rd", "M_{Rd}", KNM, "Momentenwiderstand", stellen=1)
 
         class Biegenachweis(Nachweis):
             def pruefe(self, e, p):
                 m_ed, m_rd = e.g("M_Ed"), e.g("M_Rd")
-                ausnutzung = m_ed / m_rd
-                erfuellt = ausnutzung <= Groesse(1.0, EINHEITSLOS)
-                p.formel(d_ausn.belegen(ausnutzung), r"\frac{@M_Ed}{@M_Rd}", e)
-                return {d_ausn.id: ausnutzung}, [
+                grad = m_rd / m_ed
+                erfuellt = grad >= Groesse(1.0, EINHEITSLOS)
+                p.formel(d_ausn.belegen(grad), r"\frac{@M_Rd}{@M_Ed}", e)
+                return {d_ausn.id: grad}, [
                     NachweisUrteil(
                         name="Biegewiderstand",
                         erfuellt=erfuellt,
-                        ausnutzung=ausnutzung,
+                        erfuellungsgrad=grad,
                         einwirkung=e["M_Ed"],
                         widerstand=e["M_Rd"],
                     )
@@ -620,7 +620,6 @@ class TestNachweis(unittest.TestCase):
 
         self.assertEqual(len(loesung.urteile), 1)
         self.assertTrue(loesung.alle_nachweise_erfuellt)
-        self.assertAlmostEqual(loesung.urteile[0].ausnutzung.si, 0.8)
         self.assertAlmostEqual(loesung.urteile[0].erfuellungsgrad.si, 1.25)
 
         werk.setze(d_m_ed.id, Groesse(200, KNM))

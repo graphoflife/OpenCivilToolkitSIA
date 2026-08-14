@@ -172,7 +172,7 @@ def _nachweise_tex(loesung: Loesung) -> List[str]:
         r"\section{Zusammenstellung der Nachweise}",
         r"\begin{longtable}{lrl}",
         r"\toprule",
-        r"Nachweis & Ausnutzung $\eta$ & Ergebnis \\",
+        r"Nachweis & Erfüllungsgrad $\alpha_{eff}$ & Ergebnis \\",
         r"\midrule",
         r"\endhead",
     ]
@@ -183,7 +183,7 @@ def _nachweise_tex(loesung: Loesung) -> List[str]:
             else r"\textcolor{red}{\textbf{nicht erfüllt}}"
         )
         zeilen.append(
-            f"{text_latex(urteil.name)} & {urteil.ausnutzung.formatiert(3)} & {ergebnis} \\\\"
+            f"{text_latex(urteil.name)} & {urteil.erfuellungsgrad.formatiert(2)} & {ergebnis} \\\\"
         )
     zeilen += [r"\bottomrule", r"\end{longtable}"]
 

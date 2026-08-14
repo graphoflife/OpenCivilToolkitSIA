@@ -460,28 +460,24 @@ class NachweisUrteil:
     """
     Ergebnis eines Nachweises.
 
-    ``ausnutzung`` ist das Verhaeltnis Einwirkung/Widerstand: <= 1 bedeutet
-    erfuellt. ``erfuellungsgrad`` ist der Kehrwert-Blickwinkel -- um welchen
-    Faktor die Einwirkung noch wachsen duerfte.
+    ``erfuellungsgrad`` ist das Verhaeltnis Widerstand/Einwirkung: um welchen
+    Faktor die Einwirkung noch wachsen duerfte. Werte ab 1 bedeuten erfuellt.
+
+    Bewusst nur diese eine Kennzahl -- die Ausnutzung als Kehrwert waere
+    dieselbe Aussage in anderer Richtung und muesste an jeder Stelle mitgepflegt
+    und mitgelesen werden.
     """
 
     name: str
     erfuellt: bool
-    ausnutzung: Groesse
+    erfuellungsgrad: Groesse
     begruendung: str = ""
     einwirkung: Optional[Wert] = None
     widerstand: Optional[Wert] = None
 
-    @property
-    def erfuellungsgrad(self) -> Optional[Groesse]:
-        n = self.ausnutzung.si
-        if n == 0.0:
-            return None
-        return Groesse(1.0 / n, EINHEITSLOS)
-
     def __str__(self) -> str:
         urteil = "erfüllt" if self.erfuellt else "NICHT erfüllt"
-        return f"{self.name}: {urteil} (Ausnutzung {self.ausnutzung.formatiert(3)})"
+        return f"{self.name}: {urteil} (Erfüllungsgrad {self.erfuellungsgrad.formatiert(2)})"
 
 
 class Nachweis(Berechnung):

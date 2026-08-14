@@ -160,12 +160,21 @@ function herleitung(loesung) {
 }
 
 function nachweise(loesung) {
-  if (!loesung.urteile?.length) {
+  const alle = (loesung.urteile || []).filter(gehoertZurAuswahl);
+  if (!alle.length) {
     return el('div.blatt', {}, [
       leerzustand('Keine Nachweise gerechnet.',
-        'Einer Platte Schnittgrössen zuweisen und "Rechnen" drücken.'),
+        'Einer Platte Einwirkungen zuweisen und "Rechnen" drücken.'),
       lueckenBanner(loesung),
     ]);
+  }
+
+  // Nach Platte gruppieren: jede Platte bekommt ihre eigene Tabelle.
+  const nachPlatte = new Map();
+  for (const u of alle) {
+    const schluessel = plattenNameZu(u, loesung) || 'Sonstige';
+    if (!nachPlatte.has(schluessel)) nachPlatte.set(schluessel, []);
+    nachPlatte.get(schluessel).push(u);
   }
 
   const zelle = (u, seite) => {
@@ -176,41 +185,56 @@ function nachweise(loesung) {
     return inhalt;
   };
 
-  return el('div.blatt', {}, [
-    el('div.b-titel', { text: 'Nachweise' }),
-    el('div.tabelle-huelle', {}, [
-      el('table.nachweis-tabelle', {}, [
-        el('thead', {}, [el('tr', {}, [
-          el('th', { text: 'Nachweis' }),
-          el('th', { text: 'Widerstand' }),
-          el('th', { text: 'Einwirkung' }),
-          el('th', { text: 'Erfüllungsgrad' }),
-          el('th', { text: '' }),
-        ])]),
-        el('tbody', {}, loesung.urteile.map((u) => el('tr', {
-          class: u.erfuellt ? 'ist-gut' : 'ist-schlecht',
-          title: u.begruendung || '',
-        }, [
-          el('td', { text: u.name }),
-          zelle(u, 'widerstand'),
-          zelle(u, 'einwirkung'),
-          el('td.zahl.grad', { text: u.erfuellungsgrad ?? '\u221e' }),
-          el('td', {}, [el('span', {
-            class: u.erfuellt ? 'marke-gut' : 'marke-schlecht',
-            text: u.erfuellt ? 'erfüllt' : 'nicht erfüllt',
-          })]),
-        ]))),
+  return el('div', {}, [...nachPlatte.entries()].map(([platte, urteile]) =>
+    el('div.blatt', {}, [
+      el('div.b-titel', { text: `Nachweise – ${platte}` }),
+      el('div.tabelle-huelle', {}, [
+        el('table.nachweis-tabelle', {}, [
+          el('thead', {}, [el('tr', {}, [
+            el('th', { text: 'Nachweis' }),
+            el('th', { text: 'Widerstand' }),
+            el('th', { text: 'Einwirkung' }),
+            el('th', {}, [span(String.raw`\alpha_{eff}`)]),
+            el('th', { text: '' }),
+          ])]),
+          el('tbody', {}, urteile.map((u) => el('tr', {
+            class: u.erfuellt ? 'ist-gut' : 'ist-schlecht',
+            title: u.begruendung || '',
+          }, [
+            el('td', { text: u.name }),
+            zelle(u, 'widerstand'),
+            zelle(u, 'einwirkung'),
+            el('td.zahl.grad', { text: u.erfuellungsgrad ?? '\u221e' }),
+            el('td', {}, [el('span', {
+              class: u.erfuellt ? 'marke-gut' : 'marke-schlecht',
+              text: u.erfuellt ? 'erfüllt' : 'nicht erfüllt',
+            })]),
+          ]))),
+        ]),
       ]),
-    ]),
-    el('p.b-text', {
-      text: loesung.alle_nachweise_erfuellt
-        ? 'Sämtliche Nachweise sind erfüllt.'
-        : 'Mindestens ein Nachweis ist nicht erfüllt.',
-    }),
-    lueckenBanner(loesung),
-  ]);
+    ])).concat([lueckenBanner(loesung)].filter(Boolean)));
 }
 
+/** Zu welcher Platte ein Urteil gehört -- über die Zuordnung der Lösung. */
+function plattenNameZu(urteil, loesung) {
+  const qs = loesung.zuordnung?.querschnitte || {};
+  for (const eintrag of Object.values(qs)) {
+    // Die Urteilsnamen tragen die Richtung, die Zuordnung den Plattennamen.
+    if (Object.keys(eintrag.nachweise || {}).some((r) =>
+      urteil.name.includes(` ${r} –`))) return eintrag.name;
+  }
+  return Object.values(qs)[0]?.name || '';
+}
+
+/** Filtert auf den links gewählten Bestandteil, wenn "Aktuelle Seite" aktiv ist. */
+function gehoertZurAuswahl(urteil) {
+  if (zustand.umfang !== 'seite') return true;
+  const wahl = zustand.auswahl;
+  if (!wahl) return true;
+  if (wahl.art !== 'querschnitt') return false;   // Materialien haben keine Nachweise
+  const name = zustand.projekt.querschnitte.find((q) => q.kennung === wahl.kennung)?.name;
+  return !!name && (zustand.loesung?.zuordnung?.querschnitte?.[wahl.kennung]?.name === name);
+}
 
 function diagrammSicht(loesung) {
   const linien = loesung.linien || {};
@@ -237,95 +261,46 @@ function diagrammSicht(loesung) {
 }
 
 
-function werteSicht(loesung) {
-  const eintraege = Object.values(loesung.werte || {});
+function werteSicht(loesung, beiZielwahl) {
+  let eintraege = Object.values(loesung.werte || {});
   if (!eintraege.length) return leerzustand('Noch keine Werte bestimmt.');
+  if (zustand.umfang === 'seite' && zustand.auswahl) {
+    const raum = raumDerAuswahl();
+    if (raum) eintraege = eintraege.filter((w) => w.id.startsWith(`${raum}.`));
+  }
   eintraege.sort((a, b) => a.id.localeCompare(b.id, 'de'));
 
-  return el('div.blatt', {}, [
-    el('div.b-titel', { text: `Werte (${eintraege.length})` }),
-    el('div.tabelle-huelle', {}, [
-      el('table.werteliste', {}, [
-        el('thead', {}, [
-          el('tr', {}, [
-            el('th', { text: 'Bezeichnung' }),
-            el('th', { text: 'Symbol' }),
-            el('th', { text: 'Wert', style: { textAlign: 'right' } }),
-            el('th', { text: 'Einheit' }),
-            el('th', { text: 'Herkunft' }),
-          ]),
-        ]),
-        el('tbody', {}, eintraege.map((w) => {
-          const symbol = el('td');
-          setzen(w.symbol, symbol, { displayMode: false });
-          return el('tr', {
-            class: zustand.hervorgehoben.has(w.id) ? 'ist-hervorgehoben' : '',
-            title: w.referenz || '',
-          }, [
-            el('td', {}, [
-              el('div', { text: w.beschreibung || w.kurzname }),
-              el('div.kennung', { text: w.id }),
-            ]),
-            symbol,
-            el('td.zahl', { text: w.wert }),
-            el('td', { text: w.einheit }),
-            el('td', {}, [
-              el('span', {
-                class: `quelle-marke quelle-${w.quelle}`,
-                text: w.quelle_text,
-              }),
-            ]),
-          ]);
-        })),
-      ]),
-    ]),
-  ]);
-}
-
-function zieleSicht(loesung, beiZielwahl) {
-  const liste = zustand.zieleListe;
-  if (!liste) return leerzustand('Ziele werden geladen …');
-  if (!liste.length) return leerzustand('Keine berechenbaren Ziele vorhanden.');
-
+  // Nur Werte, die aus einer Berechnung stammen, taugen als Ziel -- eine
+  // Eingabe zurückzuverfolgen hätte keinen Inhalt.
+  const waehlbar = eintraege.filter((w) => w.quelle === 'berechnet');
   const gewaehlt = zustand.gewaehlteZiele;
-  const alleIds = liste.map((z) => z.id);
-
-  const setzeAuswahl = (ids) => {
-    aendern({ gewaehlteZiele: new Set(ids) }, 'zielauswahl');
-  };
+  const setzeAuswahl = (ids) => aendern({ gewaehlteZiele: new Set(ids) }, 'zielauswahl');
   const umschalten = (id) => {
     const neu = new Set(gewaehlt);
     if (neu.has(id)) neu.delete(id); else neu.add(id);
     setzeAuswahl(neu);
   };
 
-  const nachRaum = new Map();
-  for (const ziel of liste) {
-    if (!nachRaum.has(ziel.namensraum)) nachRaum.set(ziel.namensraum, []);
-    nachRaum.get(ziel.namensraum).push(ziel);
-  }
-
   const leiste = el('div.ziel-leiste', {}, [
     el('input', {
       type: 'checkbox',
-      checked: gewaehlt.size === alleIds.length && alleIds.length > 0,
-      indeterminate: gewaehlt.size > 0 && gewaehlt.size < alleIds.length,
-      title: 'Alle oder keine',
-      on: { change: (e) => setzeAuswahl(e.target.checked ? alleIds : []) },
+      checked: gewaehlt.size > 0 && gewaehlt.size === waehlbar.length,
+      indeterminate: gewaehlt.size > 0 && gewaehlt.size < waehlbar.length,
+      title: 'Alle berechneten Werte an- oder abwählen',
+      on: { change: (e) => setzeAuswahl(e.target.checked ? waehlbar.map((w) => w.id) : []) },
     }),
     el('span', {}, [
       el('span.anzahl', { text: String(gewaehlt.size) }),
-      ` von ${alleIds.length} Zielen gewählt`,
+      ` von ${waehlbar.length} berechneten Werten als Ziel gewählt`,
     ]),
     el('span', { style: { marginLeft: 'auto' } }),
     el('button.knopf.knopf-haupt', {
-      text: 'Gewählte rechnen',
+      text: 'Gewählte zurückverfolgen',
       disabled: gewaehlt.size === 0,
       on: { click: () => beiZielwahl([...gewaehlt]) },
     }),
     el('button.knopf', {
       text: 'Alles rechnen',
-      title: 'Alle Nachweise, wie beim Knopf oben',
       on: { click: () => beiZielwahl(null) },
     }),
   ]);
@@ -333,10 +308,10 @@ function zieleSicht(loesung, beiZielwahl) {
   const kette = zustand.verfolgtesZiel && loesung?.ketten?.[zustand.verfolgtesZiel];
 
   return el('div.blatt', {}, [
-    el('div.b-titel', { text: 'Ziel wählen' }),
+    el('div.b-titel', { text: `Werte (${eintraege.length})` }),
     el('p.b-text', {
-      text: 'Werte anhaken und rechnen lassen: der Rechenkern löst rückwärts auf, '
-          + 'rechnet nur das Nötige und benennt, was fehlt.',
+      text: 'Berechnete Werte lassen sich anhaken und zurückverfolgen: der Kern '
+          + 'löst rückwärts auf und rechnet nur, was dafür nötig ist.',
     }),
     leiste,
     kette
@@ -346,76 +321,78 @@ function zieleSicht(loesung, beiZielwahl) {
         el('ol.kettenliste', {}, kette.berechnungen.map((b) => el('li', { text: b }))),
       ])
       : null,
-
-    ...[...nachRaum.entries()].map(([raum, ziele]) => {
-      const alleImRaum = ziele.every((z) => gewaehlt.has(z.id));
-      return el('div', {}, [
-        el('div.zielgruppe-kopf', {}, [
-          el('input', {
-            type: 'checkbox', checked: alleImRaum,
-            title: 'Diese Gruppe an- oder abwählen',
-            on: {
-              change: (e) => {
-                const neu = new Set(gewaehlt);
-                for (const z of ziele) {
-                  if (e.target.checked) neu.add(z.id); else neu.delete(z.id);
-                }
-                setzeAuswahl(neu);
-              },
-            },
-          }),
-          el('span', { text: raum }),
-        ]),
-        ...ziele.map((ziel) => {
-          const symbol = el('span');
-          setzen(ziel.symbol, symbol, { displayMode: false });
-          const wert = loesung?.werte?.[ziel.id];
-          return el('div.zielzeile', {
-            class: gewaehlt.has(ziel.id) ? 'ist-gewaehlt' : '',
-            title: ziel.referenz || '',
-            on: { click: () => umschalten(ziel.id) },
+    el('div.tabelle-huelle', {}, [
+      el('table.werteliste', {}, [
+        el('thead', {}, [el('tr', {}, [
+          el('th', { text: '' }),
+          el('th', { text: 'Bezeichnung' }),
+          el('th', { text: 'Symbol' }),
+          el('th', { text: 'Wert', style: { textAlign: 'right' } }),
+          el('th', { text: 'Einheit' }),
+          el('th', { text: 'Herkunft' }),
+        ])]),
+        el('tbody', {}, eintraege.map((w) => {
+          const symbol = el('td');
+          setzen(w.symbol, symbol, { displayMode: false });
+          const istWaehlbar = w.quelle === 'berechnet';
+          return el('tr', {
+            class: [
+              zustand.hervorgehoben.has(w.id) ? 'ist-hervorgehoben' : '',
+              gewaehlt.has(w.id) ? 'ist-gewaehlt' : '',
+            ].join(' '),
+            title: w.referenz || '',
           }, [
-            el('input', {
-              type: 'checkbox', checked: gewaehlt.has(ziel.id),
-              on: { click: (e) => { e.stopPropagation(); umschalten(ziel.id); } },
-            }),
-            symbol,
-            el('div', {}, [
-              el('div.beschreibung', { text: ziel.beschreibung || ziel.id }),
-              el('div.kennung', { text: ziel.id }),
+            el('td', {}, [istWaehlbar
+              ? el('input', {
+                type: 'checkbox', checked: gewaehlt.has(w.id),
+                title: 'Als Rechenziel wählen',
+                on: { change: () => umschalten(w.id) },
+              })
+              : el('span', { text: '', title: 'Eingabe – nicht zurückverfolgbar' })]),
+            el('td', {}, [
+              el('div', { text: w.beschreibung || w.kurzname }),
+              el('div.kennung', { text: w.id }),
             ]),
-            el('span', {
-              text: wert ? `${wert.wert} ${wert.einheit}` : '—',
-              style: {
-                fontVariantNumeric: 'tabular-nums',
-                color: wert ? '' : 'var(--schrift-zart)',
-              },
-            }),
+            symbol,
+            el('td.zahl', { text: w.wert }),
+            el('td', { text: w.einheit }),
+            el('td', {}, [el('span', {
+              class: `quelle-marke quelle-${w.quelle}`, text: w.quelle_text,
+            })]),
           ]);
-        }),
-      ]);
-    }),
+        })),
+      ]),
+    ]),
   ]);
 }
 
+/** Namensraum des links gewählten Bestandteils, für den Seitenfilter. */
+function raumDerAuswahl() {
+  const wahl = zustand.auswahl;
+  if (!wahl) return null;
+  if (wahl.art === 'material') {
+    const m = zustand.projekt.materialien.find((x) => x.kennung === wahl.kennung);
+    return m ? `${m.art}.${m.kennung}` : null;
+  }
+  return `querschnitt.${wahl.kennung}`;
+}
 
 // ===========================================================================
 
 export function berichtZeichnen(behaelter, beiZielwahl) {
   const loesung = zustand.loesung;
 
-  if (!loesung && zustand.reiter !== 'ziele') {
+  if (!loesung) {
     return ersetzen(behaelter, leerzustand(
       'Noch nichts gerechnet.',
       'Oben auf "Rechnen" klicken.'));
   }
 
   const sichten = {
-    herleitung: () => herleitung(loesung),
     nachweise: () => nachweise(loesung),
     diagramm: () => diagrammSicht(loesung),
-    werte: () => werteSicht(loesung),
-    ziele: () => zieleSicht(loesung, beiZielwahl),
+    herleitung: () => herleitung(loesung),
+    werte: () => werteSicht(loesung, beiZielwahl),
   };
-  return ersetzen(behaelter, (sichten[zustand.reiter] || sichten.herleitung)());
+  return ersetzen(behaelter, (sichten[zustand.reiter] || sichten.nachweise)());
 }

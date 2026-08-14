@@ -36,6 +36,25 @@ _SYMBOL = re.compile(r"^(?P<basis>.+?)(?:_\{(?P<tief_lang>[^{}]*)\}|_(?P<tief_ku
                      r"(?P<hoch>\^\{.*\}|\^.)?$")
 
 
+#: Zeichen, die in ``\text{...}`` maskiert werden muessen.
+_TEXT_MASKE = {
+    "\\": r"\textbackslash{}", "_": r"\_", "&": r"\&", "%": r"\%",
+    "$": r"\$", "#": r"\#", "{": r"\{", "}": r"\}",
+    "^": r"\textasciicircum{}", "~": r"\textasciitilde{}",
+}
+
+
+def text_maskieren(text: str) -> str:
+    """
+    Maskiert Sonderzeichen fuer die Verwendung in ``\\text{...}``.
+
+    Ein Materialname wie ``C12/15_1`` enthaelt einen Unterstrich. Unmaskiert ist
+    das auch im Textmodus ein Tiefstellungsbefehl: KaTeX bricht ab, und die
+    Oberflaeche zeigt dann den rohen LaTeX-Quelltext statt der Formel.
+    """
+    return "".join(_TEXT_MASKE.get(z, z) for z in text)
+
+
 def mit_index(symbol: str, index: str) -> str:
     """
     Haengt einen Materialindex an ein Symbol an.
@@ -53,8 +72,7 @@ def mit_index(symbol: str, index: str) -> str:
     """
     if not index:
         return symbol
-    sicher = index.replace("\\", "").replace("{", "").replace("}", "")
-    zusatz = rf"\text{{{sicher}}}"
+    zusatz = rf"\text{{{text_maskieren(index)}}}"
 
     treffer = _SYMBOL.match(symbol)
     if not treffer:

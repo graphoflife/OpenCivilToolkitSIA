@@ -58,12 +58,15 @@
   <section class="tafel tafel-rechts" id="tafel-bericht">
     <div class="tafel-kopf">
       <h2>Berechnung</h2>
+      <span class="schalter" id="umfang" title="Alles zeigen oder nur den links gewählten Bestandteil">
+        <button class="schalter-halb ist-an" data-umfang="gesamt">Gesamt</button>
+        <button class="schalter-halb" data-umfang="seite">Aktuelle Seite</button>
+      </span>
       <div class="reiter" id="reiter">
-        <button class="reiter-knopf ist-aktiv" data-reiter="herleitung">Herleitung</button>
-        <button class="reiter-knopf" data-reiter="nachweise">Nachweise</button>
+        <button class="reiter-knopf ist-aktiv" data-reiter="nachweise">Nachweise</button>
         <button class="reiter-knopf" data-reiter="diagramm">Diagramme</button>
+        <button class="reiter-knopf" data-reiter="herleitung">Herleitung</button>
         <button class="reiter-knopf" data-reiter="werte">Werte</button>
-        <button class="reiter-knopf" data-reiter="ziele">Ziel wählen</button>
       </div>
     </div>
     <div class="tafel-inhalt" id="bericht"></div>

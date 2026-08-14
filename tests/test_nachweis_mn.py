@@ -434,15 +434,14 @@ class TestErfuellungsgrad(unittest.TestCase):
     def test_kleines_moment_ist_erfuellt(self):
         nachweis, loesung = self._pruefe([Schnittgroessen("Feld", M_Ed=Groesse(100, KNM))])
         self.assertTrue(loesung.alle_nachweise_erfuellt)
-        eta = loesung.groesse(nachweis.d_ausnutzung["Feld"].id).in_einheit(EINHEITSLOS)
-        self.assertGreater(eta, 0.5)
-        self.assertLess(eta, 1.0)
+        grad = loesung.groesse(nachweis.d_ausnutzung["Feld"].id).in_einheit(EINHEITSLOS)
+        self.assertGreater(grad, 1.0)   # Erfüllungsgrad, nicht Ausnutzung
 
     def test_zu_grosses_moment_ist_nicht_erfuellt(self):
         nachweis, loesung = self._pruefe([Schnittgroessen("Feld", M_Ed=Groesse(400, KNM))])
         self.assertFalse(loesung.alle_nachweise_erfuellt)
-        eta = loesung.groesse(nachweis.d_ausnutzung["Feld"].id).in_einheit(EINHEITSLOS)
-        self.assertGreater(eta, 1.0)
+        grad = loesung.groesse(nachweis.d_ausnutzung["Feld"].id).in_einheit(EINHEITSLOS)
+        self.assertLess(grad, 1.0)
 
     def test_mehrere_kombinationen_gleichzeitig(self):
         kombinationen = [
@@ -456,9 +455,10 @@ class TestErfuellungsgrad(unittest.TestCase):
             k.name: loesung.groesse(nachweis.d_ausnutzung[k.name].id).in_einheit(EINHEITSLOS)
             for k in kombinationen
         }
-        # Druck erhöht den Momentenwiderstand, Zug verringert ihn.
-        self.assertLess(eta["Feld_mit_Druck"], eta["Feld"])
-        self.assertGreater(eta["Feld_mit_Zug"], eta["Feld"])
+        # Druck erhöht den Momentenwiderstand, Zug verringert ihn -- beim
+        # Erfüllungsgrad also genau umgekehrt zur früheren Ausnutzung.
+        self.assertGreater(eta["Feld_mit_Druck"], eta["Feld"])
+        self.assertLess(eta["Feld_mit_Zug"], eta["Feld"])
 
     def test_alle_drei_massstaebe_liefern_ein_ergebnis(self):
         kombinationen = [
@@ -471,18 +471,39 @@ class TestErfuellungsgrad(unittest.TestCase):
         ]
         nachweis, loesung = self._pruefe(kombinationen)
         for k in kombinationen:
-            eta = loesung.groesse(nachweis.d_ausnutzung[k.name].id).in_einheit(EINHEITSLOS)
+            grad = loesung.groesse(nachweis.d_ausnutzung[k.name].id).in_einheit(EINHEITSLOS)
             with self.subTest(art=k.art):
-                self.assertGreater(eta, 0.0)
-                self.assertLess(eta, 1.0)
+                self.assertGreater(grad, 1.0)
         # Derselbe Punkt liegt drin -- unabhängig vom Massstab.
         self.assertTrue(loesung.alle_nachweise_erfuellt)
 
-    def test_normalkraft_konstant_ist_der_standard(self):
+    def test_automatisch_ist_der_standard(self):
+        """Der ungünstigere der beiden Massstäbe wird selbst gefunden."""
         self.assertIs(
             Schnittgroessen("x", M_Ed=Groesse(1, KNM)).art,
-            Erfuellungsart.NORMALKRAFT_KONSTANT,
+            Erfuellungsart.AUTOMATISCH,
         )
+
+    def test_automatik_nimmt_den_kleineren_erfuellungsgrad(self):
+        platte_ = einfache_platte()
+        werk = Rechenwerk(); platte_.ins_rechenwerk(werk)
+        auto = BiegungNormalkraft(
+            platte_, [Schnittgroessen("K", M_Ed=Groesse(100, KNM),
+                                      N_Ed=Groesse(-500, KN))], Richtung.X)
+        werk.registriere(auto)
+        werk.loese(auto.d_ausnutzung["K"].id)
+        gewaehlt = auto.auswertungen[0]
+
+        einzeln = []
+        for art in (Erfuellungsart.NORMALKRAFT_KONSTANT, Erfuellungsart.MOMENT_KONSTANT):
+            w2 = Rechenwerk(); platte_.ins_rechenwerk(w2)
+            n2 = BiegungNormalkraft(
+                platte_, [Schnittgroessen("K", M_Ed=Groesse(100, KNM),
+                                          N_Ed=Groesse(-500, KN), art=art)], Richtung.X)
+            w2.registriere(n2)
+            w2.loese(n2.d_ausnutzung["K"].id)
+            einzeln.append(n2.auswertungen[0].erfuellungsgrad)
+        self.assertAlmostEqual(gewaehlt.erfuellungsgrad, min(einzeln), places=6)
 
     def test_begruendung_nennt_den_widerstand(self):
         nachweis, loesung = self._pruefe([Schnittgroessen("Feld", M_Ed=Groesse(100, KNM))])

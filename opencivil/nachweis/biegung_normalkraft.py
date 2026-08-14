@@ -73,6 +73,11 @@ from opencivil.querschnitt.werkstoffgesetz import (
 class Erfuellungsart(str, Enum):
     """Massstab, in dem der Abstand zur Resistenzlinie gemessen wird."""
 
+    AUTOMATISCH = "automatisch"
+    """Beide Massstaebe rechnen und den ungünstigeren nehmen -- den mit dem
+    kleineren Erfuellungsgrad. Der Regelfall: welcher Weg zur Grenze der kurze
+    ist, haengt von der Lage des Punktes ab und nicht von einer Vorwahl."""
+
     NORMALKRAFT_KONSTANT = "N_konstant"
     """Bei festgehaltener Normalkraft waagrecht bis zur Momentengrenze.
     Der Regelfall: die Normalkraft ist meist vorgegeben, aufnehmen muss der
@@ -91,6 +96,7 @@ class Erfuellungsart(str, Enum):
     @property
     def beschriftung(self) -> str:
         return {
+            Erfuellungsart.AUTOMATISCH: "automatisch (ungünstigerer)",
             Erfuellungsart.NORMALKRAFT_KONSTANT: "Normalkraft konstant",
             Erfuellungsart.MOMENT_KONSTANT: "Moment konstant",
             Erfuellungsart.NAECHSTER_PUNKT: "kürzester Abstand",
@@ -104,7 +110,7 @@ class Schnittgroessen:
     name: str
     M_Ed: Groesse
     N_Ed: Groesse = field(default_factory=lambda: Groesse(0, KN))
-    art: Erfuellungsart = Erfuellungsart.NORMALKRAFT_KONSTANT
+    art: Erfuellungsart = Erfuellungsart.AUTOMATISCH
 
     @property
     def kennung(self) -> str:
@@ -132,7 +138,9 @@ class Auswertung:
 
     schnittgroessen: Schnittgroessen
     innerhalb: bool
-    ausnutzung: float
+    erfuellungsgrad: float
+    """Widerstand/Einwirkung -- ab 1 erfuellt. Unendlich, wenn nichts einwirkt."""
+
     widerstand: Optional[Tuple[float, float]]
     """Der massgebende Punkt auf der Linie als (N, M) in N bzw. Nm."""
 
@@ -147,12 +155,8 @@ class Auswertung:
     rd: float = 0.0
     """Widerstand in derselben Groesse, in SI."""
 
-    @property
-    def erfuellungsgrad(self) -> float:
-        """Kehrwert der Ausnutzung: um welchen Faktor die Einwirkung wachsen darf."""
-        if self.ausnutzung <= 0:
-            return float("inf")
-        return 1.0 / self.ausnutzung
+    massstab: Erfuellungsart = Erfuellungsart.NORMALKRAFT_KONSTANT
+    """Welcher Massstab tatsaechlich gegriffen hat."""
 
 
 # ===========================================================================
@@ -303,10 +307,10 @@ class BiegungNormalkraft(Nachweis):
         basis = f"{querschnitt.id}.nachweis.mn.{r}"
         self.d_ausnutzung: Dict[str, WertDef] = {
             k.name: WertDef(
-                id=f"{basis}.{k.kennung}.ausnutzung",
-                symbol=rf"\eta_{{{r},{k.kennung}}}",
+                id=f"{basis}.{k.kennung}.erfuellungsgrad",
+                symbol=rf"\alpha_{{eff,{r},{k.kennung}}}",
                 einheit=EINHEITSLOS,
-                beschreibung=f"Ausnutzungsgrad {richtung.beschriftung} – {k.name}",
+                beschreibung=f"Erfüllungsgrad {richtung.beschriftung} – {k.name}",
                 referenz="SIA 262:2025, 4.1.4",
                 stellen=3,
             )
@@ -325,6 +329,14 @@ class BiegungNormalkraft(Nachweis):
             "M_Rd_min": WertDef(f"{basis}.M_Rd_min", f"M_{{Rd,{r}}}^{{-}}", KNM,
                                 f"Grösster negativer Momentenwiderstand ({richtung.beschriftung})",
                                 stellen=1),
+            # Wird vom Querkraftnachweis gebraucht -- darum eine eigene Ausgabe
+            # und keine im Nachweis versteckte Zwischengrösse.
+            "M_Rd_N0_pos": WertDef(f"{basis}.M_Rd_N0_pos", f"M_{{Rd,{r}}}(N=0)^{{+}}", KNM,
+                                   f"Momentenwiderstand bei N = 0, positiv ({richtung.beschriftung})",
+                                   stellen=1),
+            "M_Rd_N0_neg": WertDef(f"{basis}.M_Rd_N0_neg", f"M_{{Rd,{r}}}(N=0)^{{-}}", KNM,
+                                   f"Momentenwiderstand bei N = 0, negativ ({richtung.beschriftung})",
+                                   stellen=1),
         }
 
         bezuege = [
@@ -490,11 +502,14 @@ class BiegungNormalkraft(Nachweis):
         ])
         self._protokoll_linie(p)
 
+        bei_null = _schnitte_bei_N(self.linie, 0.0)
         eckwerte = {
             "N_Rd_zug": max(pt.N for pt in self.linie),
             "N_Rd_druck": min(pt.N for pt in self.linie),
             "M_Rd_max": max(pt.M for pt in self.linie),
             "M_Rd_min": min(pt.M for pt in self.linie),
+            "M_Rd_N0_pos": max([m for m in bei_null if m >= 0] or [0.0]),
+            "M_Rd_N0_neg": min([m for m in bei_null if m <= 0] or [0.0]),
         }
         # Achtung: die Eckwerte liegen in SI-Basis vor (N bzw. Nm), darum
         # aus_si() -- Groesse(x, KN) wuerde x als Kilonewton lesen.
@@ -525,13 +540,13 @@ class BiegungNormalkraft(Nachweis):
             self.auswertungen.append(auswertung)
             self._protokoll_kombination(p, auswertung)
             ergebnis[self.d_ausnutzung[kombination.name].id] = Groesse(
-                auswertung.ausnutzung, EINHEITSLOS
+                min(auswertung.erfuellungsgrad, 1e9), EINHEITSLOS
             )
             urteile.append(
                 NachweisUrteil(
                     name=f"M-N-Nachweis {self.richtung.value} – {kombination.name}",
                     erfuellt=auswertung.innerhalb,
-                    ausnutzung=Groesse(auswertung.ausnutzung, EINHEITSLOS),
+                    erfuellungsgrad=Groesse(auswertung.erfuellungsgrad, EINHEITSLOS),
                     begruendung=auswertung.begruendung,
                     einwirkung=self._als_wert(auswertung, "Ed"),
                     widerstand=self._als_wert(auswertung, "Rd"),
@@ -550,9 +565,22 @@ class BiegungNormalkraft(Nachweis):
         ist_moment = auswertung.groesse == "M"
         einheit = KNM if ist_moment else KN
         zahl = auswertung.ed if seite == "Ed" else auswertung.rd
+        r = self.richtung.value
+
+        # Der Widerstand gilt nur unter der festgehaltenen Gegengroesse -- das
+        # gehoert ins Symbol, sonst liest sich M_Rd wie ein fester Kennwert.
+        symbol = f"{auswertung.groesse}_{{{seite},{r}}}"
+        if seite == "Rd":
+            if ist_moment:
+                fest = Groesse.aus_si(auswertung.schnittgroessen.N_Ed.si, KN)
+                symbol = rf"M_{{Rd,{r}}}(N_{{Ed}} = {fest.formatiert(1)}\,\mathrm{{kN}})"
+            else:
+                fest = Groesse.aus_si(auswertung.schnittgroessen.M_Ed.si, KNM)
+                symbol = rf"N_{{Rd,{r}}}(M_{{Ed}} = {fest.formatiert(1)}\,\mathrm{{kNm}})"
+
         definition = WertDef(
             id=f"{self.id}.{auswertung.schnittgroessen.kennung}.{auswertung.groesse}_{seite}",
-            symbol=f"{auswertung.groesse}_{{{seite},{self.richtung.value}}}",
+            symbol=symbol,
             einheit=einheit,
             beschreibung=("Einwirkung" if seite == "Ed" else "Widerstand"),
             stellen=1,
@@ -562,65 +590,91 @@ class BiegungNormalkraft(Nachweis):
     def _auswerten(
         self, kombination: Schnittgroessen, eckwerte: Mapping[str, float]
     ) -> Auswertung:
-        N_Ed = kombination.N_Ed.si
-        M_Ed = kombination.M_Ed.si
+        """
+        Bestimmt den Erfuellungsgrad einer Kombination.
+
+        Bei ``AUTOMATISCH`` werden beide Massstaebe gerechnet und der
+        unguenstigere genommen -- der mit dem kleineren Erfuellungsgrad. Welcher
+        Weg zur Grenze der kurze ist, haengt von der Lage des Punktes ab; eine
+        feste Vorwahl koennte die massgebende Richtung verfehlen.
+        """
+        N_Ed, M_Ed = kombination.N_Ed.si, kombination.M_Ed.si
         innerhalb = _punkt_innerhalb(N_Ed, M_Ed, self.linie)
 
-        if kombination.art is Erfuellungsart.NORMALKRAFT_KONSTANT:
-            momente = _schnitte_bei_N(self.linie, N_Ed)
-            if not momente:
-                return Auswertung(
-                    kombination, innerhalb, float("inf"), None,
-                    "Die Normalkraft liegt ausserhalb des aufnehmbaren Bereichs – "
-                    "bei dieser Normalkraft gibt es keinen Momentenwiderstand.",
-                    groesse="M", ed=M_Ed, rd=0.0,
-                )
-            # Massgebend ist die Momentengrenze auf der Seite, auf der das
-            # Bemessungsmoment liegt.
-            M_Rd = max(momente) if M_Ed >= 0 else min(momente)
-            ausnutzung = float("inf") if M_Rd == 0 else abs(M_Ed) / abs(M_Rd)
-            return Auswertung(
-                kombination, innerhalb, ausnutzung, (N_Ed, M_Rd),
-                f"Bei festgehaltenem N_Ed = {_kn(N_Ed)} kN beträgt der "
-                f"Momentenwiderstand M_Rd = {_knm(M_Rd)} kNm.",
-                groesse="M", ed=M_Ed, rd=M_Rd,
-            )
+        if kombination.art is Erfuellungsart.NAECHSTER_PUNKT:
+            return self._naechster(kombination, eckwerte, innerhalb)
 
-        if kombination.art is Erfuellungsart.MOMENT_KONSTANT:
-            kraefte = _schnitte_bei_M(self.linie, M_Ed)
-            if not kraefte:
-                return Auswertung(
-                    kombination, innerhalb, float("inf"), None,
-                    "Das Moment liegt ausserhalb des aufnehmbaren Bereichs.",
-                    groesse="N", ed=N_Ed, rd=0.0,
-                )
-            N_Rd = max(kraefte) if N_Ed >= 0 else min(kraefte)
-            ausnutzung = float("inf") if N_Rd == 0 else abs(N_Ed) / abs(N_Rd)
-            return Auswertung(
-                kombination, innerhalb, ausnutzung, (N_Rd, M_Ed),
-                f"Bei festgehaltenem M_Ed = {_knm(M_Ed)} kNm beträgt der "
-                f"Normalkraftwiderstand N_Rd = {_kn(N_Rd)} kN.",
-                groesse="N", ed=N_Ed, rd=N_Rd,
-            )
+        kandidaten = []
+        if kombination.art in (Erfuellungsart.AUTOMATISCH,
+                               Erfuellungsart.NORMALKRAFT_KONSTANT):
+            kandidaten.append(self._bei_n_konstant(kombination, innerhalb))
+        if kombination.art in (Erfuellungsart.AUTOMATISCH,
+                               Erfuellungsart.MOMENT_KONSTANT):
+            kandidaten.append(self._bei_m_konstant(kombination, innerhalb))
 
-        # Kuerzester Abstand -- im normierten Diagramm gemessen, sonst haenge
-        # das Ergebnis davon ab, ob man in kN oder in N rechnet.
+        brauchbar = [k for k in kandidaten if k is not None]
+        if not brauchbar:
+            return Auswertung(
+                kombination, innerhalb, 0.0, None,
+                "Weder bei festgehaltener Normalkraft noch bei festgehaltenem "
+                "Moment gibt es einen Widerstand – die Einwirkung liegt ganz "
+                "ausserhalb des aufnehmbaren Bereichs.",
+                massstab=kombination.art)
+        return min(brauchbar, key=lambda a: a.erfuellungsgrad)
+
+    def _bei_n_konstant(
+        self, kombination: Schnittgroessen, innerhalb: bool
+    ) -> Optional[Auswertung]:
+        """Bei festgehaltener Normalkraft waagrecht bis zur Momentengrenze."""
+        N_Ed, M_Ed = kombination.N_Ed.si, kombination.M_Ed.si
+        momente = _schnitte_bei_N(self.linie, N_Ed)
+        if not momente:
+            return None
+        M_Rd = max(momente) if M_Ed >= 0 else min(momente)
+        grad = float("inf") if M_Ed == 0 else abs(M_Rd) / abs(M_Ed)
+        return Auswertung(
+            kombination, innerhalb, grad, (N_Ed, M_Rd),
+            f"Bei festgehaltenem N_Ed = {_kn(N_Ed)} kN beträgt der "
+            f"Momentenwiderstand M_Rd = {_knm(M_Rd)} kNm.",
+            groesse="M", ed=M_Ed, rd=M_Rd,
+            massstab=Erfuellungsart.NORMALKRAFT_KONSTANT)
+
+    def _bei_m_konstant(
+        self, kombination: Schnittgroessen, innerhalb: bool
+    ) -> Optional[Auswertung]:
+        """Bei festgehaltenem Moment senkrecht bis zur Normalkraftgrenze."""
+        N_Ed, M_Ed = kombination.N_Ed.si, kombination.M_Ed.si
+        kraefte = _schnitte_bei_M(self.linie, M_Ed)
+        if not kraefte:
+            return None
+        N_Rd = max(kraefte) if N_Ed >= 0 else min(kraefte)
+        grad = float("inf") if N_Ed == 0 else abs(N_Rd) / abs(N_Ed)
+        return Auswertung(
+            kombination, innerhalb, grad, (N_Rd, M_Ed),
+            f"Bei festgehaltenem M_Ed = {_knm(M_Ed)} kNm beträgt der "
+            f"Normalkraftwiderstand N_Rd = {_kn(N_Rd)} kN.",
+            groesse="N", ed=N_Ed, rd=N_Rd,
+            massstab=Erfuellungsart.MOMENT_KONSTANT)
+
+    def _naechster(
+        self, kombination: Schnittgroessen, eckwerte: Mapping[str, float],
+        innerhalb: bool,
+    ) -> Auswertung:
+        """Kuerzester Abstand, im auf die Eckwerte normierten Diagramm."""
+        N_Ed, M_Ed = kombination.N_Ed.si, kombination.M_Ed.si
         N_ref = max(abs(eckwerte["N_Rd_zug"]), abs(eckwerte["N_Rd_druck"])) or 1.0
         M_ref = max(abs(eckwerte["M_Rd_max"]), abs(eckwerte["M_Rd_min"])) or 1.0
         abstand, stelle = _naechster_punkt(N_Ed, M_Ed, self.linie, N_ref, M_ref)
         laenge = math.hypot(N_Ed / N_ref, M_Ed / M_ref)
-        # Ausnutzung als Verhaeltnis der Abstaende vom Ursprung: innen ist der
-        # Rand weiter weg als der Punkt, aussen naeher.
         rand = laenge + abstand if innerhalb else laenge - abstand
-        ausnutzung = float("inf") if rand <= 0 else laenge / rand
+        grad = float("inf") if laenge == 0 else max(rand, 0.0) / laenge
         return Auswertung(
-            kombination, innerhalb, ausnutzung, stelle,
+            kombination, innerhalb, grad, stelle,
             f"Kürzester Abstand zur Resistenzlinie im normierten Diagramm: "
-            f"{abstand:.3f} (Bezug N_ref = {_kn(N_ref)} kN, M_ref = {_knm(M_ref)} kNm). "
-            f"Nächster Punkt der Linie: N = {_kn(stelle[0])} kN, "
+            f"{abstand:.3f}. Nächster Punkt: N = {_kn(stelle[0])} kN, "
             f"M = {_knm(stelle[1])} kNm.",
             groesse="M", ed=M_Ed, rd=stelle[1],
-        )
+            massstab=Erfuellungsart.NAECHSTER_PUNKT)
 
     # -- Mitschrift ---------------------------------------------------------
 
@@ -701,16 +755,17 @@ class BiegungNormalkraft(Nachweis):
             rf"N_{{Ed}} = {k.N_Ed.als_latex(1, KN)}",
             titel="Einwirkung",
         )
-        p.text(f"Massstab für den Erfüllungsgrad: {k.art.beschriftung}.")
+        p.text(f"Massgebender Massstab: {auswertung.massstab.beschriftung}.")
         p.text(auswertung.begruendung)
         zustand = r"\text{erfüllt}" if auswertung.innerhalb else r"\text{NICHT erfüllt}"
         wert = (
-            r"\infty" if math.isinf(auswertung.ausnutzung)
-            else f"{auswertung.ausnutzung:.3f}"
+            r"\infty" if math.isinf(auswertung.erfuellungsgrad)
+            else f"{auswertung.erfuellungsgrad:.2f}"
         )
         p.gleichung(
-            rf"\eta = {wert} \quad \Rightarrow \quad {zustand}",
-            titel="Ausnutzungsgrad",
+            rf"\alpha_{{eff}} = \frac{{R_d}}{{E_d}} = {wert} "
+            rf"\quad \Rightarrow \quad {zustand}",
+            titel="Erfüllungsgrad",
         )
 
 

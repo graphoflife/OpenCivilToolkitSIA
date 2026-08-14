@@ -76,15 +76,6 @@ function spaeterRechnen() {
   rechenUhr = setTimeout(() => rechnen({ stillschweigend: true }), 450);
 }
 
-async function zieleLaden() {
-  try {
-    const antwort = await api.ziele(zustand.projekt);
-    aendern({ zieleListe: antwort.ziele }, 'ziele');
-  } catch (fehler) {
-    melden(fehler.message, true);
-  }
-}
-
 // ===========================================================================
 // Kopfleiste
 // ===========================================================================
@@ -182,13 +173,13 @@ function allesZeichnen(anlass) {
   for (const k of knoten.reiterKnoepfe) {
     k.classList.toggle('ist-aktiv', k.dataset.reiter === zustand.reiter);
   }
+  for (const k of document.querySelectorAll('#umfang .schalter-halb')) {
+    k.classList.toggle('ist-an', k.dataset.umfang === zustand.umfang);
+  }
 
   // Eingaben geändert -> neu rechnen. Nicht bei blossem Blättern und nicht,
   // während schon gerechnet wird.
   if (anlass === 'projekt') spaeterRechnen();
-  // Die Zielliste hängt an der Projektbeschreibung -- nach einer Änderung
-  // ist sie veraltet und wird beim nächsten Öffnen neu geholt.
-  if (anlass === 'projekt') zustand.zieleListe = null;
 }
 
 // ===========================================================================
@@ -225,10 +216,10 @@ async function starten() {
   });
 
   for (const k of knoten.reiterKnoepfe) {
-    k.addEventListener('click', () => {
-      aendern({ reiter: k.dataset.reiter }, 'reiter');
-      if (k.dataset.reiter === 'ziele' && !zustand.zieleListe) zieleLaden();
-    });
+    k.addEventListener('click', () => aendern({ reiter: k.dataset.reiter }, 'reiter'));
+  }
+  for (const k of document.querySelectorAll('#umfang .schalter-halb')) {
+    k.addEventListener('click', () => aendern({ umfang: k.dataset.umfang }, 'umfang'));
   }
 
   griffeEinrichten();

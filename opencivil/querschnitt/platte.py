@@ -278,6 +278,12 @@ class Plattenquerschnitt:
     lagen: List[Bewehrungslage] = field(default_factory=list)
     ueberdeckung_unten: Groesse = field(default_factory=lambda: Groesse(30, MM))
     ueberdeckung_oben: Groesse = field(default_factory=lambda: Groesse(30, MM))
+    d_max: Groesse = field(default_factory=lambda: Groesse(32, MM))
+    """Grösstkorndurchmesser -- geht in den Querkraftwiderstand ein."""
+
+    einlagenhoehe: Groesse = field(default_factory=lambda: Groesse(0, MM))
+    """Höhe einer Einlage; verringert den Hebelarm d_v, wenn h/6 < e < d."""
+
     praefix: Optional[str] = None
 
     definitionen: Dict[str, WertDef] = field(default_factory=dict, init=False)
@@ -368,8 +374,13 @@ class Plattenquerschnitt:
         d_b = self._def("b", "b", MM, "Betrachtete Breite", 0)
         d_cu = self._def("c_nom_unten", "c_{nom,u}", MM, "Überdeckung unten", 0)
         d_co = self._def("c_nom_oben", "c_{nom,o}", MM, "Überdeckung oben", 0)
+        d_dmax = self._def("D_max", "D_{max}", MM, "Grösstkorndurchmesser", 0)
+        d_einl = self._def("einlagenhoehe", "e_{Einlage}", MM, "Höhe der Einlage", 0)
 
         self.berechnungen += [
+            Vorgabe(id=f"{self.id}.D_max", ausgabe=d_dmax, groesse=self.d_max),
+            Vorgabe(id=f"{self.id}.einlagenhoehe", ausgabe=d_einl,
+                    groesse=self.einlagenhoehe),
             Vorgabe(id=f"{self.id}.h", ausgabe=d_h, groesse=self.h),
             Vorgabe(id=f"{self.id}.b", ausgabe=d_b, groesse=self.b),
             Vorgabe(id=f"{self.id}.c_nom_unten", ausgabe=d_cu, groesse=self.ueberdeckung_unten),

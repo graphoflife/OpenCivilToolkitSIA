@@ -83,12 +83,16 @@ export function querschnittZeichnen(eintrag, werte) {
           cx: px, cy: y(z), r,
           fill: farbe.x, opacity: bew.art === 'zulage' ? 0.55 : 1,
         }));
-      } else {
-        svg.append(svgEl('rect', {
-          x: px - r * 1.6, y: y(z) - r, width: r * 3.2, height: r * 2, rx: r,
-          fill: farbe.y, opacity: bew.art === 'zulage' ? 0.55 : 1,
-        }));
       }
+    }
+    if (bew.richtung === 'y') {
+      // In der Schnittebene laufende Stäbe: eine durchgezogene Linie über die
+      // ganze Breite, halbdurchsichtig, damit sie die x-Eisen nicht verdeckt.
+      svg.append(svgEl('line', {
+        x1: x(0), y1: y(z), x2: x(b), y2: y(z),
+        stroke: farbe.y, 'stroke-width': Math.max(r * 2, 2),
+        'stroke-linecap': 'round', opacity: bew.art === 'zulage' ? 0.45 : 0.7,
+      }));
     }
     const beschriftung = svgEl('text', {
       x: BREITE - RAND.rechts + 10, y: y(z) + 4,
@@ -135,7 +139,9 @@ export function querschnittZeichnen(eintrag, werte) {
     svg,
     el('div.mn-legende', {}, [
       el('span', {}, [el('i', { style: { background: farbe.x } }), 'x-Richtung (angeschnitten)']),
-      el('span', {}, [el('i', { style: { background: farbe.y, borderRadius: '2px' } }), 'y-Richtung (in der Schnittebene)']),
+      el('span', {}, [el('i', {
+        style: { background: farbe.y, borderRadius: '1px', height: '3px', opacity: '.7' },
+      }), 'y-Richtung (durchgezogen, in der Schnittebene)']),
       el('span', { text: 'blasser = Zulage' }),
     ]),
   ]);

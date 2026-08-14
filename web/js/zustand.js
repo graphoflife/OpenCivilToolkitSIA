@@ -21,7 +21,9 @@ export const zustand = {
   /** Was links ausgewählt ist: {art: 'material'|'querschnitt', kennung}. */
   auswahl: null,
   /** Welcher Reiter rechts offen ist. */
-  reiter: 'herleitung',
+  reiter: 'nachweise',
+  /** 'gesamt' oder 'seite' -- ob nur der gewählte Bestandteil gezeigt wird. */
+  umfang: 'gesamt',
   /** Wert-IDs, die hervorgehoben werden (Rückverfolgung eines Ziels). */
   hervorgehoben: new Set(),
   /** Für welches Ziel die Rückverfolgung gerade gilt. */

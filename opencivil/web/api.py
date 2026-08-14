@@ -221,14 +221,9 @@ def loesung_dict(
             {
                 "name": u.name,
                 "erfuellt": u.erfuellt,
-                "ausnutzung": u.ausnutzung.formatiert(3),
-                "ausnutzung_zahl": u.ausnutzung.si,
-                # Angezeigt wird der Erfuellungsgrad: um welchen Faktor die
-                # Einwirkung noch wachsen duerfte. >= 1 heisst erfuellt.
-                "erfuellungsgrad": (
-                    u.erfuellungsgrad.formatiert(2) if u.erfuellungsgrad else "\u221e"),
-                "erfuellungsgrad_zahl": (
-                    u.erfuellungsgrad.si if u.erfuellungsgrad else None),
+                # Einzige Kennzahl: Widerstand/Einwirkung, ab 1 erfuellt.
+                "erfuellungsgrad": u.erfuellungsgrad.formatiert(2),
+                "erfuellungsgrad_zahl": u.erfuellungsgrad.si,
                 "begruendung": u.begruendung,
                 "einwirkung": wert_dict(u.einwirkung) if u.einwirkung else None,
                 "widerstand": wert_dict(u.widerstand) if u.widerstand else None,
@@ -273,9 +268,10 @@ def _linie_dict(nachweis) -> dict:
                 "art": a.schnittgroessen.art.value,
                 "art_text": a.schnittgroessen.art.beschriftung,
                 "innerhalb": a.innerhalb,
-                "ausnutzung": a.ausnutzung,
                 "erfuellungsgrad": a.erfuellungsgrad,
                 "groesse": a.groesse,
+                "massstab": a.massstab.value,
+                "massstab_text": a.massstab.beschriftung,
                 "widerstand": (
                     {"N": a.widerstand[0] / 1e3, "M": a.widerstand[1] / 1e3}
                     if a.widerstand

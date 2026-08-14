@@ -28,7 +28,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
-from opencivil.core.einheiten import KN, KNM, MM, Groesse
+from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM, Groesse
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.material.basis import Baustoff
 from opencivil.material.beton import BETONSORTEN, beton
@@ -36,6 +36,7 @@ from opencivil.material.betonstahl import STAHLSORTEN, betonstahl
 from opencivil.nachweis.biegung_normalkraft import (
     BiegungNormalkraft, Erfuellungsart, Schnittgroessen,
 )
+from opencivil.nachweis.querkraft import Querkraft, Querkraftfall
 from opencivil.querschnitt.platte import (
     LAGENZAHL, Bewehrungslage, Bewehrungsposten, Plattenquerschnitt, Richtung,
 )
@@ -203,7 +204,10 @@ class KombinationEintrag:
     name: str
     M_Ed: float = 0.0
     N_Ed: float = 0.0
-    art: str = Erfuellungsart.NORMALKRAFT_KONSTANT.value
+    V_Ed: float = 0.0
+    """Querkraft in kN/m -- für den Querkraftnachweis."""
+
+    art: str = Erfuellungsart.AUTOMATISCH.value
     richtung: str = BEIDE_RICHTUNGEN
     """``x``, ``y`` oder ``beide``.
 
@@ -218,7 +222,7 @@ class KombinationEintrag:
 
     def als_dict(self) -> dict:
         return {"name": self.name, "M_Ed": self.M_Ed, "N_Ed": self.N_Ed,
-                "art": self.art, "richtung": self.richtung}
+                "V_Ed": self.V_Ed, "art": self.art, "richtung": self.richtung}
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "KombinationEintrag":
@@ -226,7 +230,8 @@ class KombinationEintrag:
             name=str(d["name"]),
             M_Ed=float(d.get("M_Ed") or 0.0),
             N_Ed=float(d.get("N_Ed") or 0.0),
-            art=str(d.get("art") or Erfuellungsart.NORMALKRAFT_KONSTANT.value),
+            V_Ed=float(d.get("V_Ed") or 0.0),
+            art=str(d.get("art") or Erfuellungsart.AUTOMATISCH.value),
             richtung=str(d.get("richtung") or BEIDE_RICHTUNGEN),
         )
 
@@ -279,6 +284,12 @@ class QuerschnittEintrag:
     b: float = 1000.0
     ueberdeckung_unten: float = 30.0
     ueberdeckung_oben: float = 30.0
+    d_max: float = 32.0
+    """Grösstkorndurchmesser in mm."""
+
+    einlagenhoehe: float = 0.0
+    """Höhe einer Einlage in mm."""
+
     lagen: List[LageEintrag] = field(default_factory=list)
     """Genau vier, Index 0 = 1. Lage (unterste)."""
 
@@ -307,6 +318,8 @@ class QuerschnittEintrag:
             "h": self.h, "b": self.b,
             "ueberdeckung_unten": self.ueberdeckung_unten,
             "ueberdeckung_oben": self.ueberdeckung_oben,
+            "d_max": self.d_max,
+            "einlagenhoehe": self.einlagenhoehe,
             "richtung_lage1": self.richtung_lage1,
             "richtung_lage4": self.richtung_lage4,
             "lagen": [l.als_dict() for l in self.lagen],
@@ -326,6 +339,8 @@ class QuerschnittEintrag:
             b=float(d.get("b") or 1000.0),
             ueberdeckung_unten=float(d.get("ueberdeckung_unten") or 30.0),
             ueberdeckung_oben=float(d.get("ueberdeckung_oben") or 30.0),
+            d_max=float(d.get("d_max") or 32.0),
+            einlagenhoehe=float(d.get("einlagenhoehe") or 0.0),
             richtung_lage1=str(d.get("richtung_lage1") or "x"),
             richtung_lage4=str(d.get("richtung_lage4") or "x"),
             lagen=[LageEintrag.aus_dict(x) for x in (lagen or [])],
@@ -349,24 +364,33 @@ class Aufbau:
     nachweise: Dict[str, BiegungNormalkraft] = field(default_factory=dict)
     """Schluessel ist ``<querschnitt>.<richtung>``, weil je Richtung geprueft wird."""
 
+    querkraft: Dict[str, Querkraft] = field(default_factory=dict)
     warnungen: List[str] = field(default_factory=list)
 
     def alle_nachweisziele(self) -> List[str]:
-        return [d.id for n in self.nachweise.values() for d in n.d_ausnutzung.values()]
+        return ([d.id for n in self.nachweise.values() for d in n.d_ausnutzung.values()]
+                + [d.id for q in self.querkraft.values() for d in q.d_grad.values()])
 
     def eckwertziele(self) -> List[str]:
         return [d.id for n in self.nachweise.values() for d in n.d_eckwerte.values()]
 
     def materialziele(self) -> List[str]:
         """
-        Saemtliche Kennwerte aller Materialien.
+        Saemtliche Kennwerte aller Materialien -- Beton zuerst, dann Betonstahl.
 
         Gehoert zum Regellauf: ein Material, das noch keine Platte verwendet,
         waere sonst nie Ziel und bliebe ungerechnet -- im Editor staenden dann
         leere Felder, obwohl die Sorte alles hergibt.
+
+        Die Reihenfolge bestimmt zugleich den Aufbau der Herleitung: der Loeser
+        arbeitet die Ziele der Reihe nach ab, und das Protokoll folgt ihm. So
+        stehen im Bericht erst die Baustoffe und dann die Bauteile.
         """
-        return [d.id for stoff in self.baustoffe.values()
-                for d in stoff.definitionen.values()]
+        nach_art = {"beton": [], "betonstahl": []}
+        for stoff in self.baustoffe.values():
+            nach_art.setdefault(stoff.art.value, []).extend(
+                d.id for d in stoff.definitionen.values())
+        return nach_art["beton"] + nach_art["betonstahl"]
 
 
 # ===========================================================================
@@ -503,6 +527,19 @@ class Projekt:
                 werk.registriere(nachweis)
                 aufbau.nachweise[f"{eintrag.kennung}.{richtung.value}"] = nachweis
 
+                mit_querkraft = [k for k in passend if k.V_Ed]
+                if mit_querkraft:
+                    querkraft = Querkraft(
+                        querschnitt,
+                        [Querkraftfall(name=k.name,
+                                       V_Ed=Groesse(k.V_Ed, KN_PRO_M),
+                                       M_Ed=Groesse(k.M_Ed, KNM),
+                                       N_Ed=Groesse(k.N_Ed, KN))
+                         for k in mit_querkraft],
+                        richtung, nachweis)
+                    werk.registriere(querkraft)
+                    aufbau.querkraft[f"{eintrag.kennung}.{richtung.value}"] = querkraft
+
         for baustoff in aufbau.baustoffe.values():
             baustoff.ins_rechenwerk(werk)
 
@@ -563,6 +600,8 @@ class Projekt:
             lagen=lagen,
             ueberdeckung_unten=Groesse(eintrag.ueberdeckung_unten, MM),
             ueberdeckung_oben=Groesse(eintrag.ueberdeckung_oben, MM),
+            d_max=Groesse(eintrag.d_max, MM),
+            einlagenhoehe=Groesse(eintrag.einlagenhoehe, MM),
             praefix=f"querschnitt.{eintrag.kennung}",
         )
 

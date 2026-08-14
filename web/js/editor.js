@@ -361,52 +361,49 @@ function ueberdeckungsBlock(querschnitt, welche) {
   ]);
 }
 
-function kombinationZeile(querschnitt, index) {
+/**
+ * Eine Einwirkung auf einer Zeile:
+ *
+ *     [Name] M_Ed [.] N_Ed [.] V_Ed [.] [x|y|beide] [×]
+ *
+ * Der Massstab fehlt bewusst: der Kern rechnet beide und nimmt den
+ * ungünstigeren -- welcher das war, steht beim Nachweis.
+ */
+function einwirkungZeile(querschnitt, index) {
   const k = querschnitt.kombinationen[index];
   const aendern = (veraenderer) => projektAendern((p) => {
     veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung).kombinationen[index]);
   });
 
-  return el('div.kombination', {}, [
-    el('div.lage-kopf', {}, [
-      el('input', {
-        type: 'text', value: k.name,
-        style: { border: 'none', background: 'transparent', fontWeight: '700', padding: '0' },
-        on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
-      }),
-      el('button.knopf.knopf-zart.knopf-gefahr', {
-        text: '×', title: 'Kombination entfernen',
-        on: {
-          click: () => projektAendern((p) => {
-            p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
-              .kombinationen.splice(index, 1);
-          }),
-        },
-      }),
-    ]),
-    el('div.posten-reihe', {}, [
-      feld('M_Ed', zahlfeld({
-        wert: k.M_Ed, schritt: 10,
-        beiAenderung: (v) => aendern((x) => { x.M_Ed = v ?? 0; }),
-      }), 'kNm'),
-      feld('N_Ed', zahlfeld({
-        wert: k.N_Ed, schritt: 10, titel: 'Zug positiv, Druck negativ',
-        beiAenderung: (v) => aendern((x) => { x.N_Ed = v ?? 0; }),
-      }), 'kN'),
-    ]),
-    feld('Tragrichtung', auswahl({
-      werte: (zustand.katalog.richtungen || []).map((r) => ({
-        wert: r.wert, beschriftung: r.beschriftung,
-      })),
-      gewaehlt: k.richtung || 'beide',
-      titel: 'In welcher Richtung diese Schnittgrössen nachgewiesen werden',
-      beiAenderung: (v) => aendern((x) => { x.richtung = v; }),
-    })),
-    feld('Massstab', auswahl({
-      werte: zustand.katalog.erfuellungsarten.map((a) => ({ wert: a.wert, beschriftung: a.beschriftung })),
-      gewaehlt: k.art,
-      beiAenderung: (v) => aendern((x) => { x.art = v; }),
-    })),
+  const zahl = (feld, titel, schritt = 10) => zahlfeld({
+    wert: k[feld], schritt, titel,
+    beiAenderung: (v) => aendern((x) => { x[feld] = v ?? 0; }),
+  });
+
+  return el('div.einwirkung', {}, [
+    el('input.ew-name', {
+      type: 'text', value: k.name, title: 'Bezeichnung der Einwirkung',
+      on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
+    }),
+    zahl('M_Ed', 'Bemessungsmoment in kNm'),
+    zahl('N_Ed', 'Normalkraft in kN – Zug positiv, Druck negativ'),
+    zahl('V_Ed', 'Querkraft in kN/m – 0 heisst: kein Querkraftnachweis'),
+    el('select.ew-richtung', {
+      title: 'In welcher Tragrichtung nachgewiesen wird',
+      on: { change: (e) => aendern((x) => { x.richtung = e.target.value; }) },
+    }, (zustand.katalog.richtungen || []).map((r) => el('option', {
+      value: r.wert, text: r.wert, title: r.beschriftung,
+      selected: (k.richtung || 'beide') === r.wert,
+    }))),
+    el('button.knopf.knopf-zart.knopf-gefahr', {
+      text: '×', title: 'Einwirkung entfernen',
+      on: {
+        click: () => projektAendern((p) => {
+          p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
+            .kombinationen.splice(index, 1);
+        }),
+      },
+    }),
   ]);
 }
 
@@ -417,65 +414,92 @@ function plattenEditor(querschnitt) {
   });
 
   return [
-    el('div.feldgruppe', {}, [
-      el('h3', { text: 'Platte' }),
-      feld('Bezeichnung', el('input', {
-        type: 'text', value: querschnitt.name,
-        on: { change: (e) => aendern((q) => { q.name = e.target.value; }) },
-      })),
-      feld('Beton', auswahl({
-        werte: betone.map((b) => ({ wert: b.kennung, beschriftung: b.name || b.sorte })),
-        gewaehlt: querschnitt.beton,
-        beiAenderung: (v) => aendern((q) => { q.beton = v; }),
-      })),
-      feld('Dicke h', zahlfeld({
-        wert: querschnitt.h, schritt: 10, min: 10,
-        beiAenderung: (v) => aendern((q) => { q.h = v ?? 300; }),
-      }), 'mm'),
-      feld('Breite b', zahlfeld({
-        wert: querschnitt.b, schritt: 100, min: 10,
-        titel: 'Mit b = 1000 mm gelten alle Schnittgrössen pro Laufmeter.',
-        beiAenderung: (v) => aendern((q) => { q.b = v ?? 1000; }),
-      }), 'mm'),
+    // Platte und Bewehrung stehen nebeneinander -- beides gehört zur Geometrie
+    // und wird beim Bemessen gemeinsam gelesen.
+    el('div.zweispaltig', {}, [
+      el('div.feldgruppe', {}, [
+        el('h3', { text: 'Platte' }),
+        feld('Bezeichnung', el('input', {
+          type: 'text', value: querschnitt.name,
+          on: { change: (e) => aendern((q) => { q.name = e.target.value; }) },
+        })),
+        feld('Beton', auswahl({
+          werte: betone.map((b) => ({ wert: b.kennung, beschriftung: b.name || b.sorte })),
+          gewaehlt: querschnitt.beton,
+          beiAenderung: (v) => aendern((q) => { q.beton = v; }),
+        })),
+        feld('Dicke h', zahlfeld({
+          wert: querschnitt.h, schritt: 10, min: 10,
+          beiAenderung: (v) => aendern((q) => { q.h = v ?? 300; }),
+        }), 'mm'),
+        feld('Breite b', zahlfeld({
+          wert: querschnitt.b, schritt: 100, min: 10,
+          titel: 'Mit b = 1000 mm gelten alle Schnittgrössen pro Laufmeter.',
+          beiAenderung: (v) => aendern((q) => { q.b = v ?? 1000; }),
+        }), 'mm'),
+        feld('Grösstkorn D_max', zahlfeld({
+          wert: querschnitt.d_max, schritt: 4, min: 1,
+          titel: 'Geht in den Querkraftwiderstand ein',
+          beiAenderung: (v) => aendern((q) => { q.d_max = v ?? 32; }),
+        }), 'mm'),
+        feld('Einlagenhöhe', zahlfeld({
+          wert: querschnitt.einlagenhoehe, schritt: 5, min: 0,
+          titel: 'Verringert d_v, sofern h/6 < e < d',
+          beiAenderung: (v) => aendern((q) => { q.einlagenhoehe = v ?? 0; }),
+        }), 'mm'),
+      ]),
+
+      el('div.feldgruppe', {}, [
+        el('h3', {}, [el('span', { text: 'Bewehrung' }),
+          el('span', { text: 'von unten nach oben' })]),
+        ueberdeckungsBlock(querschnitt, 'oben'),
+        lagenBlock(querschnitt, 4),
+        lagenBlock(querschnitt, 3),
+        lagenBlock(querschnitt, 2),
+        lagenBlock(querschnitt, 1),
+        ueberdeckungsBlock(querschnitt, 'unten'),
+      ]),
     ]),
 
     el('div.feldgruppe', {}, [
-      el('h3', {}, [el('span', { text: 'Bewehrung' }),
-        el('span', { text: 'von unten nach oben' })]),
-      // Die Maske ist gestapelt wie der Querschnitt: oben die 4. Lage,
-      // unten die 1. -- so steht auf dem Bildschirm, was im Bauteil liegt.
-      ueberdeckungsBlock(querschnitt, 'oben'),
-      lagenBlock(querschnitt, 4),
-      lagenBlock(querschnitt, 3),
-      lagenBlock(querschnitt, 2),
-      lagenBlock(querschnitt, 1),
-      ueberdeckungsBlock(querschnitt, 'unten'),
-    ]),
-
-    el('div.feldgruppe', {}, [
-      el('h3', {}, [
-        el('span', { text: 'Schnittgrössen' }),
-        el('button.knopf.knopf-zart', {
-          text: '+ Kombination',
-          on: {
-            click: () => aendern((q) => q.kombinationen.push({
-              name: `Kombination ${q.kombinationen.length + 1}`,
-              M_Ed: 100, N_Ed: 0, art: 'N_konstant', richtung: 'x',
-            })),
-          },
+      el('h3', { text: 'Nachweise' }),
+      el('div.unterkapitel', {}, [
+        el('div.unterkapitel-kopf', {}, [
+          el('span', { text: 'Einwirkungen' }),
+          el('button.knopf.knopf-zart', {
+            text: '+ Einwirkung',
+            on: {
+              click: () => aendern((q) => q.kombinationen.push({
+                name: `Fall ${q.kombinationen.length + 1}`,
+                M_Ed: 100, N_Ed: 0, V_Ed: 0,
+                art: 'automatisch', richtung: 'x',
+              })),
+            },
+          }),
+        ]),
+        querschnitt.kombinationen.length
+          ? el('div.einwirkung.ist-kopf', {}, [
+            el('span', { text: 'Bezeichnung' }),
+            el('span', { text: 'M_Ed [kNm]' }),
+            el('span', { text: 'N_Ed [kN]' }),
+            el('span', { text: 'V_Ed [kN/m]' }),
+            el('span', { text: 'Ri.' }),
+            el('span'),
+          ])
+          : null,
+        ...(querschnitt.kombinationen.length
+          ? querschnitt.kombinationen.map((_, i) => einwirkungZeile(querschnitt, i))
+          : [el('div.leer', { text: 'Ohne Einwirkung kein Nachweis.' })]),
+        el('p', {
+          text: 'V_Ed = 0 bedeutet: kein Querkraftnachweis. Der Massstab für den '
+              + 'Erfüllungsgrad wird selbst gewählt – gerechnet werden beide, '
+              + 'gezeigt der ungünstigere.',
+          style: { fontSize: '11.5px', color: 'var(--schrift-zart)', margin: '6px 0 0' },
         }),
       ]),
-      el('p', {
-        text: 'Je Kombination wählbar, in welcher Tragrichtung sie nachgewiesen wird.',
-        style: { fontSize: '12px', color: 'var(--schrift-zart)', margin: '0 0 8px' },
-      }),
-      ...(querschnitt.kombinationen.length
-        ? querschnitt.kombinationen.map((_, i) => kombinationZeile(querschnitt, i))
-        : [el('div.leer', { text: 'Ohne Schnittgrössen kein Nachweis.' })]),
     ]),
   ];
 }
-
 // ===========================================================================
 
 export function editorZeichnen(behaelter, titelKnoten, hinweisKnoten) {
