@@ -233,7 +233,7 @@ def _exponent_text(exponent: Any) -> str:
 
 EINHEITSLOS = Einheit("-", DIMENSIONSLOS, 1.0, latex="")
 PROZENT = Einheit("%", DIMENSIONSLOS, 0.01, latex=r"\%")
-PROMILLE = Einheit("promille", DIMENSIONSLOS, 0.001, latex=r"\text{\textperthousand}")
+PROMILLE = Einheit("promille", DIMENSIONSLOS, 0.001, latex="\\text{‰}")
 
 # Laenge
 M = Einheit("m", LAENGE, 1.0)

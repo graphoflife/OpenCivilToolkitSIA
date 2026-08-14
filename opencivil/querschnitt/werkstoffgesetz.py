@@ -70,9 +70,12 @@ class Betongesetz:
         if eps >= 0.0:
             return 0.0  # Beton reisst, kein Zug
         betrag = -eps
-        if betrag > self.eps_c2d:
-            return 0.0  # ueber der Bruchdehnung -- tritt im Sweep nicht auf
         if betrag > self.eps_c1d:
+            # Oberhalb der Bruchdehnung wird das Plateau fortgesetzt statt auf
+            # null zu fallen. Der Dehnungsfaecher der Interaktionsrechnung haelt
+            # jede Faser innerhalb von eps_c2d, sodass dieser Fall gar nicht
+            # eintritt; eine Sprungstelle waere aber fuer jede numerische
+            # Auswertung verheerend, darum bleibt die Funktion hier stetig.
             return -self.f_cd
         eta = betrag / self.eps_c1d
         nenner = 1.0 + (self.k_sigma - 2.0) * eta

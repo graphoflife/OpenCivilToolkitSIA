@@ -195,6 +195,44 @@ class TestResistenzlinie(unittest.TestCase):
     def test_linie_ist_geschlossen(self):
         self.assertGreater(len(self.nachweis.linie), 100)
 
+    def test_linie_schneidet_sich_nicht_selbst(self):
+        """
+        Eine Resistenzlinie ist der Rand eines zusammenhängenden Bereichs. Kreuzt
+        sie sich, stimmt weder der Punkt-in-Linie-Test noch die Schnittsuche --
+        und beides trägt jedes Urteil dieses Nachweises.
+        """
+        punkte = [(p.M, p.N) for p in self.nachweis.linie]
+        anzahl = len(punkte)
+
+        def richtung(p, q, r):
+            return (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1])
+
+        def kreuzt(a, b, c, d):
+            return ((richtung(a, b, c) > 0) != (richtung(a, b, d) > 0)
+                    and (richtung(c, d, a) > 0) != (richtung(c, d, b) > 0))
+
+        for i in range(anzahl):
+            for j in range(i + 2, anzahl):
+                if i == 0 and j == anzahl - 1:
+                    continue  # gemeinsamer Ringschluss
+                with self.subTest(i=i, j=j):
+                    self.assertFalse(
+                        kreuzt(punkte[i], punkte[(i + 1) % anzahl],
+                               punkte[j], punkte[(j + 1) % anzahl]),
+                        f"Segment {i} ({self.nachweis.linie[i].abschnitt}) kreuzt "
+                        f"{j} ({self.nachweis.linie[j].abschnitt})")
+
+    def test_keine_faser_ueberschreitet_die_bruchdehnung(self):
+        for p in self.nachweis.linie:
+            self.assertGreaterEqual(min(p.eps_oben, p.eps_unten), -0.0035 - 1e-12)
+
+    def test_keine_doppelten_punkte(self):
+        linie = self.nachweis.linie
+        for i in range(len(linie)):
+            a, b = linie[i], linie[(i + 1) % len(linie)]
+            with self.subTest(i=i):
+                self.assertGreater(abs(a.N - b.N) + abs(a.M - b.M), 0.0)
+
     def test_groesste_zugkraft_ist_summe_der_fliesskraefte(self):
         a_s = math.pi * 18**2 / 4 * (1000 / 150) * 1e-6  # m^2
         f_yd = 500 / 1.15 * 1e6
@@ -202,12 +240,36 @@ class TestResistenzlinie(unittest.TestCase):
             self.eck("N_Rd_zug").in_einheit(KN), a_s * f_yd / 1e3, delta=1.0
         )
 
-    def test_groesste_druckkraft(self):
+    def test_gleichmaessiger_druck(self):
+        """
+        Bei reinem Druck ist eps_c1d massgebend, nicht eps_c2d -- und bei
+        eps_c1d = 2.0 ‰ fliesst der Stahl noch nicht (eps_yd = 2.17 ‰).
+        Anzusetzen ist also E_s * eps_c1d = 400 N/mm^2, nicht f_yd = 435.
+        """
         a_s = math.pi * 18**2 / 4 * (1000 / 150) * 1e-6
-        f_cd = 20e6
-        f_yd_druck = 500 / 1.15 * 1e6
-        erwartet = -(f_cd * (1.0 * 0.3 - a_s) + a_s * f_yd_druck) / 1e3
-        self.assertAlmostEqual(self.eck("N_Rd_druck").in_einheit(KN), erwartet, delta=2.0)
+        sigma_s = 200e9 * 0.002
+        erwartet = -(20e6 * (1.0 * 0.3 - a_s) + a_s * sigma_s) / 1e3
+
+        gleichmaessig = [
+            p for p in self.nachweis.linie if abs(p.eps_oben - p.eps_unten) < 1e-9
+        ]
+        druckpunkt = min(gleichmaessig, key=lambda p: p.N)
+        self.assertAlmostEqual(druckpunkt.eps_oben * 1000, -2.0, places=6)
+        self.assertAlmostEqual(druckpunkt.N / 1e3, erwartet, delta=0.5)
+
+    def test_groesste_druckkraft_liegt_leicht_neben_dem_reinen_druck(self):
+        """
+        Der Grösstwert der Druckkraft tritt nicht bei gleichmässiger Stauchung
+        auf: eine leicht geneigte Ebene staucht die untere Bewehrung über
+        eps_yd hinaus, sodass sie mit f_yd statt mit E_s*eps mitträgt.
+        """
+        extrem = min(self.nachweis.linie, key=lambda p: p.N)
+        gleichmaessig = min(
+            (p for p in self.nachweis.linie if abs(p.eps_oben - p.eps_unten) < 1e-9),
+            key=lambda p: p.N)
+        self.assertLess(extrem.N, gleichmaessig.N)
+        self.assertGreater(extrem.N, gleichmaessig.N * 1.02)
+        self.assertNotAlmostEqual(extrem.eps_oben, extrem.eps_unten, places=6)
 
     def test_biegewiderstand_bei_n_null_deckt_sich_mit_handrechnung(self):
         """

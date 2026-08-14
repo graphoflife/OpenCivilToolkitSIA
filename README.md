@@ -9,15 +9,18 @@ auseinanderlaufen.
 
 ## Stand
 
-Das Backend läuft für sich allein, ohne Fremdpakete und ohne Oberfläche.
-
 ```bash
-python3 demo_material.py     # Materialkennwerte, Rückverfolgung, Überschreiben
-python3 demo_nachweis.py     # Querschnitt, M-N-Nachweis, Bericht
+python3 start_ui.py          # Oberfläche auf http://127.0.0.1:8080
+python3 demo_material.py     # Backend allein: Kennwerte, Rückverfolgung, Überschreiben
+python3 demo_nachweis.py     # Backend allein: Querschnitt, M-N-Nachweis, Bericht
 python3 -m unittest discover -s tests -t .
 ```
 
-Fertig und getestet (157 Tests):
+Weder der Rechenkern noch der Server noch die Oberfläche brauchen ein
+Fremdpaket. Es genügt ein `python3`; KaTeX liegt unter `web/vendor/` bei, damit
+die Formeln auch ohne Internet erscheinen.
+
+Fertig und getestet (188 Tests):
 
 | Baustein | Inhalt |
 |---|---|
@@ -31,6 +34,38 @@ Fertig und getestet (157 Tests):
 | `querschnitt/` | Plattenquerschnitt, Lagenaufbau, Werkstoffgesetze |
 | `nachweis/` | Biegung mit Normalkraft über die M-N-Interaktion |
 | `bericht/` | Konsole und LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) |
+| `projekt.py` | speicherbare Projektbeschreibung, baut daraus ein Rechenwerk |
+| `web/` | JSON-Schnittstelle und Server (nur Standardbibliothek) |
+| `web/js/` | Oberfläche in reinem JavaScript, ohne Bauschritt |
+
+## Oberfläche
+
+Drei Tafeln: links die Bestandteile des Projekts, in der Mitte die Eingaben zum
+ausgewählten Bestandteil, rechts das Ergebnis.
+
+Die Oberfläche rechnet nichts. Sie schickt die Projektbeschreibung an den Kern
+und stellt dar, was zurückkommt -- fertige Zahlen und fertige LaTeX-Zeichen­ketten.
+Deshalb kann am Bildschirm gar nichts anderes stehen als im Bericht.
+
+**Rechte Tafel:**
+
+* *Herleitung* -- die Mitschrift, Formel für Formel, mit Normstelle
+* *Nachweise* -- Urteile und Ausnutzungsgrade
+* *M-N-Diagramm* -- die Resistenzlinie mit den Bemessungspunkten; die
+  gestrichelte Strecke zeigt den Weg, in dem der Erfüllungsgrad gemessen wurde
+* *Werte* -- alle Grössen mit ihrer Herkunft (Eingabe, Vorgabe, berechnet,
+  überschrieben)
+* *Ziel wählen* -- einen Wert anklicken; der Kern löst rückwärts auf, rechnet
+  nur das Nötige und zeigt die Kette der erforderlichen Schritte
+
+**Formel nach Word:** jede Formel hat zwei Knöpfe. *Word* legt sie als MathML in
+die Zwischenablage -- Word fügt daraus eine richtige, weiter bearbeitbare
+Gleichung ein, kein Bild. *TeX* legt den LaTeX-Quelltext ab, für Overleaf oder
+den Formeleditor von Word 365.
+
+**Überschreiben:** bei jedem gerechneten Kennwert steht ein Haken. Wird er
+gesetzt, gilt der eingetippte Wert, und der ganze Zweig dahinter entfällt --
+sichtbar daran, dass die zugehörigen Formeln aus der Herleitung verschwinden.
 
 ## Die vier tragenden Entscheide
 
@@ -124,15 +159,15 @@ Test. Nur *wie weit* er entfernt ist, hängt vom gewählten Massstab ab:
 
 ## Noch offen
 
-* **Oberfläche** in JavaScript, als reiner Leser der Backend-Ausgaben.
-  KaTeX erzeugt neben HTML auch MathML – der Kopierknopf legt dieses in die
-  Zwischenablage, dann fügt Word die Formel als bearbeitbare Gleichung ein.
-  `bericht.latex_dokument.formeln_sammeln()` liefert die Liste dafür.
 * **PDF**: sobald `tectonic`, `latexmk` oder `pdflatex` installiert ist, wird
   automatisch übersetzt. Bis dahin steht das `.tex` bereit (Overleaf-tauglich).
 * **Weitere Nachweise**: Querkraft, Mindestbewehrung, Rissbegrenzung,
   Rotationskapazität, Knicken.
 * **Zulagen und schiefe Lagen** im Lagenaufbau (die alte Fassung konnte das).
+* **Querschnittszeichnung** in der Oberfläche.
+* **Schmale Fenster**: die drei Tafeln stehen fest nebeneinander; unter etwa
+  900 px wird es eng. Für ein Werkzeug am Arbeitsplatz verschmerzbar, aber
+  offen.
 * **Normwerte prüfen**: die Sortentabellen in `material/beton.py` und
   `material/betonstahl.py` sind aus der Vorgängerfassung übernommen und vor dem
   produktiven Einsatz gegen die gedruckte Norm abzugleichen.

@@ -6,19 +6,30 @@ Baut die M-N-Interaktionslinie eines Querschnitts punktweise aus Dehnungsebenen
 auf und prueft dagegen beliebig viele Schnittgroessenkombinationen.
 
 WIE DIE RESISTENZLINIE ENTSTEHT:
-Alle zulaessigen Dehnungsebenen bilden einen Faecher zwischen zwei Grenzen --
-dem Erreichen der Stahlgrenzdehnung auf der Zugseite und dem Erreichen der
-Betonbruchdehnung auf der Druckseite. Der Faecher wird in vier Abschnitten
-abgefahren:
+Alle zulaessigen Dehnungsebenen bilden einen Faecher. Welche Grenze ihn
+begrenzt, wechselt unterwegs dreimal -- entsprechend wird er in drei
+Abschnitten je Momentenvorzeichen abgefahren:
 
     1a  Drehung um die unterste Lage bei eps_ud; die Oberkante geht von Zug
-        bis auf -eps_c2d                                (Zug unten, M > 0)
-    1b  Drehung um die Oberkante bei -eps_c2d; die unterste Lage geht von
-        eps_ud bis -eps_c2d                             (bis reiner Druck)
-    2a/2b  dasselbe spiegelbildlich mit Zug oben        (M < 0)
+        bis auf -eps_c2d. Massgebend ist der Stahl.
+    1b  Drehung um die Oberkante bei -eps_c2d; die Unterkante geht bis auf
+        null. Massgebend ist die gedrueckte Randfaser.
+    1c  Drehung um den Punkt C; die Unterkante geht bis auf -eps_c1d.
+        Der Querschnitt ist ganz gedrueckt, massgebend ist eps_c1d.
+    2a/2b/2c  dasselbe spiegelbildlich mit Zug oben     (M < 0)
 
-Anfang (gleichmaessiger Zug) und Ende (gleichmaessiger Druck) sind beiden
-Faechern gemeinsam, sodass sich eine geschlossene Linie ergibt.
+Der Punkt C liegt bei z_C = h * (1 - eps_c1d / eps_c2d) ab dem gedrueckten Rand
+und traegt die Dehnung -eps_c1d. Er ist noetig, weil beim vollstaendig
+gedrueckten Querschnitt nicht mehr die Randfaser massgebend ist: reiner Druck
+endet bei gleichmaessig -eps_c1d, nicht bei -eps_c2d. Ohne diesen Abschnitt
+liefe die Linie an beiden Enden ueber die wahre Grenze hinaus und schnitte sich
+selbst -- womit Punkt-in-Linie-Test und Schnittsuche und damit jedes Urteil
+unbrauchbar waeren.
+
+Anfang (gleichmaessiger Zug bei eps_ud) und Ende (gleichmaessiger Druck bei
+eps_c1d) sind beiden Faechern gemeinsam, sodass sich eine geschlossene Linie
+ergibt. Deckungsgleiche Punkte -- solange alles fliesst, aendern N und M sich
+nicht -- werden anschliessend zusammengefasst.
 
 Zu jeder Dehnungsebene werden N und M durch Integration ueber den Querschnitt
 bestimmt: der Beton als Faserintegration nach der Parabel-Rechteck-Beziehung,
@@ -169,6 +180,38 @@ def _schnitte_bei_M(linie: Sequence[Linienpunkt], M: float) -> List[float]:
     return treffer
 
 
+def _ohne_wiederholungen(
+    linie: Sequence[Linienpunkt], toleranz: float = 1e-7
+) -> List[Linienpunkt]:
+    """
+    Entfernt aufeinanderfolgende Punkte, die auf dieselbe Stelle fallen.
+
+    Solange saemtliche Bewehrung fliesst und der Beton gerissen ist, aendert
+    eine Drehung der Dehnungsebene nichts an N und M -- am reinen Zug entstehen
+    so dutzende deckungsgleiche Punkte, und an der Nahtstelle der beiden Faecher
+    liegt der Punkt des reinen Drucks doppelt vor. Fuer die Geometrie sind das
+    entartete Segmente: Punkt-in-Polygon und Schnittsuche stolpern darueber, und
+    gezeichnet ergeben sie Nullflaechen.
+    """
+    if not linie:
+        return []
+    bezug_n = max(abs(p.N) for p in linie) or 1.0
+    bezug_m = max(abs(p.M) for p in linie) or 1.0
+
+    def verschieden(a: Linienpunkt, b: Linienpunkt) -> bool:
+        return (abs(a.N - b.N) / bezug_n > toleranz
+                or abs(a.M - b.M) / bezug_m > toleranz)
+
+    gefiltert = [linie[0]]
+    for punkt in linie[1:]:
+        if verschieden(punkt, gefiltert[-1]):
+            gefiltert.append(punkt)
+    # Auch der Ringschluss darf nicht doppelt sein.
+    while len(gefiltert) > 2 and not verschieden(gefiltert[-1], gefiltert[0]):
+        gefiltert.pop()
+    return gefiltert
+
+
 def _naechster_punkt(
     N: float, M: float, linie: Sequence[Linienpunkt], N_ref: float, M_ref: float
 ) -> Tuple[float, Tuple[float, float]]:
@@ -216,9 +259,13 @@ class BiegungNormalkraft(Nachweis):
         querschnitt: Plattenquerschnitt,
         kombinationen: Sequence[Schnittgroessen],
         *,
-        schritte: int = 40,
+        schritte: int = 80,
         fasern: int = 200,
     ) -> None:
+        # 80 Schritte je Abschnitt kosten rund 16 ms. Die Eckwerte sind schon bei
+        # 40 Schritten auf fuenf Stellen auskonvergiert; die feinere Teilung
+        # dient allein der Zeichnung, weil die Linie nahe dem reinen Druck
+        # schnell laeuft und sonst sichtbar eckig wuerde.
         if not kombinationen:
             raise ValueError("Der Nachweis braucht mindestens eine Kombination.")
         self.querschnitt = querschnitt
@@ -326,7 +373,7 @@ class BiegungNormalkraft(Nachweis):
         return N, M
 
     def _faecher(
-        self, h: float, lagen, eps_c2d: float
+        self, h: float, lagen, beton: Betongesetz
     ) -> List[Tuple[str, Dehnungsebene]]:
         """
         Baut die Folge der Dehnungsebenen -- die eigentliche Prozedur.
@@ -334,6 +381,7 @@ class BiegungNormalkraft(Nachweis):
         Beide Faecher laufen von gleichmaessigem Zug bis zu gleichmaessigem
         Druck; zusammengesetzt ergeben sie die geschlossene Resistenzlinie.
         """
+        eps_c1d, eps_c2d = beton.eps_c1d, beton.eps_c2d
         beton_grenze = -eps_c2d
         z_unten = max(z for _, z, _, _ in lagen)
         z_oben = min(z for _, z, _, _ in lagen)
@@ -346,23 +394,42 @@ class BiegungNormalkraft(Nachweis):
             marke: str,
             eps_fest: float, z_fest: float,
             eps_von: float, eps_bis: float, z_lauf: float,
-        ) -> None:
-            for i in range(self.schritte + 1):
+            ab: int = 0,
+        ) -> Dehnungsebene:
+            for i in range(ab, self.schritte + 1):
                 anteil = i / self.schritte
                 eps_lauf = eps_von + (eps_bis - eps_von) * anteil
                 ebenen.append((
                     marke,
                     Dehnungsebene.durch_zwei_punkte(eps_fest, z_fest, eps_lauf, z_lauf, h),
                 ))
+            return ebenen[-1][1]
+
+        # Drehpunkt C: sobald die Nulllinie den Querschnitt verlassen hat, ist
+        # nicht mehr die Randfaser massgebend. Fuer den vollstaendig gedrueckten
+        # Querschnitt gilt die Stauchung eps_c1d, und alle Ebenen dieses
+        # Abschnitts laufen durch den Punkt
+        #     z_C = h * (1 - eps_c1d / eps_c2d)   ab dem gedrueckten Rand
+        # mit der Dehnung -eps_c1d. Der reine Druck endet folglich bei
+        # gleichmaessig -eps_c1d, nicht bei -eps_c2d.
+        #
+        # Ohne diesen dritten Abschnitt lief die Linie an beiden Enden ueber die
+        # wahre Grenze hinaus und schnitt sich selbst.
+        anteil_c = 1.0 - eps_c1d / eps_c2d
+        z_c_oben = h * anteil_c          # von der Oberkante, wenn oben gedrueckt
+        z_c_unten = h * (1.0 - anteil_c)  # von der Oberkante, wenn unten gedrueckt
 
         # Faecher 1 -- Zug unten, positives Moment
-        strecke("1a", eps_ud_unten, z_unten, eps_ud_unten, beton_grenze, 0.0)
-        strecke("1b", beton_grenze, 0.0, eps_ud_unten, beton_grenze, z_unten)
-        # Faecher 2 -- Zug oben, negatives Moment (rueckwaerts angehaengt)
-        rueck: List[Tuple[str, Dehnungsebene]] = []
+        ende_1a = strecke("1a", eps_ud_unten, z_unten, eps_ud_unten, beton_grenze, 0.0)
+        strecke("1b", beton_grenze, 0.0, ende_1a.eps_unten, 0.0, h, ab=1)
+        strecke("1c", -eps_c1d, z_c_oben, 0.0, -eps_c1d, h, ab=1)
+
+        # Faecher 2 -- Zug oben, negatives Moment; rueckwaerts angehaengt, damit
+        # eine geschlossene Linie entsteht.
         merker = len(ebenen)
-        strecke("2a", eps_ud_oben, z_oben, eps_ud_oben, beton_grenze, h)
-        strecke("2b", beton_grenze, h, eps_ud_oben, beton_grenze, z_oben)
+        ende_2a = strecke("2a", eps_ud_oben, z_oben, eps_ud_oben, beton_grenze, h)
+        strecke("2b", beton_grenze, h, ende_2a.eps_oben, 0.0, 0.0, ab=1)
+        strecke("2c", -eps_c1d, z_c_unten, 0.0, -eps_c1d, 0.0, ab=1)
         rueck = ebenen[merker:]
         del ebenen[merker:]
         ebenen.extend(reversed(rueck))
@@ -380,8 +447,8 @@ class BiegungNormalkraft(Nachweis):
 
         self._protokoll_ansatz(p, beton, lagen, e)
 
-        ebenen = self._faecher(h, lagen, beton.eps_c2d)
-        self.linie = [
+        ebenen = self._faecher(h, lagen, beton)
+        self.linie = _ohne_wiederholungen([
             Linienpunkt(
                 *self._schnittgroessen(ebene, beton, lagen, h, b),
                 eps_oben=ebene.eps_oben,
@@ -389,7 +456,7 @@ class BiegungNormalkraft(Nachweis):
                 abschnitt=marke,
             )
             for marke, ebene in ebenen
-        ]
+        ])
         self._protokoll_linie(p)
 
         eckwerte = {
@@ -560,8 +627,8 @@ class BiegungNormalkraft(Nachweis):
                 ])
             vorher = punkt.abschnitt
         p.tabelle(
-            kopf=[r"\text{Abschn.}", r"\varepsilon_{oben}\ [\text{\textperthousand}]",
-                  r"\varepsilon_{unten}\ [\text{\textperthousand}]",
+            kopf=[r"\text{Abschn.}", r"\varepsilon_{oben}\ [\text{‰}]",
+                  r"\varepsilon_{unten}\ [\text{‰}]",
                   r"N\ [\mathrm{kN}]", r"M\ [\mathrm{kNm}]"],
             zeilen=zeilen,
             titel="Stützstellen des Dehnungsfächers",
