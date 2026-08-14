@@ -316,6 +316,21 @@ class BiegungNormalkraft(Nachweis):
             )
             for k in self.kombinationen
         }
+        # Momentenwiderstand bei der tatsaechlich wirkenden Normalkraft, je
+        # Kombination. Der Querkraftnachweis braucht genau diesen Wert -- bei
+        # Druck liegt er deutlich ueber dem bei N = 0.
+        self.d_m_rd: Dict[str, WertDef] = {
+            k.name: WertDef(
+                id=f"{basis}.{k.kennung}.M_Rd_bei_N_Ed",
+                symbol=rf"M_{{Rd,{r}}}(N_{{Ed}})_{{{k.kennung}}}",
+                einheit=KNM,
+                beschreibung=(f"Momentenwiderstand bei N_Ed "
+                              f"({richtung.beschriftung}) – {k.name}"),
+                referenz="SIA 262:2025, 4.1.4",
+                stellen=1,
+            )
+            for k in self.kombinationen
+        }
         self.d_eckwerte = {
             "N_Rd_zug": WertDef(f"{basis}.N_Rd_zug", f"N_{{Rd,{r}}}^{{+}}", KN,
                                 f"Grösste aufnehmbare Zugkraft ({richtung.beschriftung})",
@@ -364,7 +379,8 @@ class BiegungNormalkraft(Nachweis):
 
         super().__init__(
             basis,
-            ausgaben=list(self.d_ausnutzung.values()) + list(self.d_eckwerte.values()),
+            ausgaben=(list(self.d_ausnutzung.values()) + list(self.d_eckwerte.values())
+                      + list(self.d_m_rd.values())),
             bezuege=bezuege,
             titel=f"M-N-Nachweis {richtung.beschriftung} – {querschnitt.name}",
             referenz="SIA 262:2025, 4.1.4",
@@ -542,6 +558,11 @@ class BiegungNormalkraft(Nachweis):
             ergebnis[self.d_ausnutzung[kombination.name].id] = Groesse(
                 min(auswertung.erfuellungsgrad, 1e9), EINHEITSLOS
             )
+            # Unabhaengig vom gewaehlten Massstab: der Momentenwiderstand bei
+            # dieser Normalkraft, denn der Querkraftnachweis rechnet damit.
+            bei_n = self._bei_n_konstant(kombination, auswertung.innerhalb)
+            ergebnis[self.d_m_rd[kombination.name].id] = Groesse.aus_si(
+                abs(bei_n.rd) if bei_n else 0.0, KNM)
             urteile.append(
                 NachweisUrteil(
                     name=f"M-N-Nachweis {self.richtung.value} – {kombination.name}",

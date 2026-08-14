@@ -246,9 +246,103 @@ def loesung_dict(
             for kennung, nachweis in aufbau.nachweise.items()
             if nachweis.linie
         }
+        ergebnis["werkstoffgesetze"] = werkstoffgesetze(aufbau, loesung)
         ergebnis["warnungen"] = list(aufbau.warnungen)
         ergebnis["zuordnung"] = zuordnung(aufbau)
     return ergebnis
+
+
+def werkstoffgesetze(aufbau: Aufbau, loesung: Loesung) -> dict:
+    """
+    Punktfolgen der Spannungs-Dehnungs-Beziehungen, je Material.
+
+    Gerechnet wird mit denselben Gesetzen wie im Nachweis -- die Kurve zeigt
+    also genau das, was der Querschnittsintegration zugrunde liegt, und nicht
+    eine zweite, nachgebaute Fassung.
+
+    Vorzeichen wie im ganzen Werkzeug: Zug positiv. Der Beton liegt damit im
+    dritten Quadranten, der Stahl spannt sich ueber beide.
+    """
+    ergebnis: Dict[str, dict] = {}
+
+    for kennung, stoff in aufbau.baustoffe.items():
+        def wert(kurzname: str) -> Optional[float]:
+            eintrag = loesung.werte.get(stoff.definitionen[kurzname].id)
+            return eintrag.groesse.si if eintrag else None
+
+        try:
+            if stoff.art.value == "beton":
+                eintrag = _betonkurve(stoff, wert)
+            else:
+                eintrag = _stahlkurve(stoff, wert)
+        except (KeyError, TypeError):
+            continue  # Kennwerte noch nicht gerechnet
+        if eintrag:
+            eintrag["name"] = stoff.name
+            eintrag["art"] = stoff.art.value
+            ergebnis[kennung] = eintrag
+    return ergebnis
+
+
+def _betonkurve(stoff, wert, schritte: int = 80) -> Optional[dict]:
+    """Parabel-Rechteck-Beziehung, von null bis zur Bruchdehnung."""
+    from opencivil.querschnitt.werkstoffgesetz import Betongesetz
+
+    f_cd, eps_c1d = wert("f_cd"), wert("eps_c1d")
+    eps_c2d, k_sigma = wert("eps_c2d"), wert("k_sigma")
+    if None in (f_cd, eps_c1d, eps_c2d, k_sigma):
+        return None
+
+    gesetz = Betongesetz(f_cd=abs(f_cd), eps_c1d=abs(eps_c1d),
+                         eps_c2d=abs(eps_c2d), k_sigma=k_sigma)
+    punkte = []
+    for i in range(schritte + 1):
+        eps = -abs(eps_c2d) * i / schritte
+        punkte.append({"eps": eps * 1e3, "sigma": gesetz.spannung(eps) / 1e6})
+    return {
+        "punkte": punkte,
+        "x_titel": "ε [‰]",
+        "y_titel": "σ [N/mm²]",
+        "titel": "Beton – Parabel-Rechteck-Beziehung",
+        "referenz": "SIA 262:2025, 4.2.1.6",
+        "marken": [
+            {"eps": -abs(eps_c1d) * 1e3, "sigma": -abs(f_cd) / 1e6, "text": "ε_c1d"},
+            {"eps": -abs(eps_c2d) * 1e3, "sigma": -abs(f_cd) / 1e6, "text": "ε_c2d"},
+        ],
+    }
+
+
+def _stahlkurve(stoff, wert) -> Optional[dict]:
+    """
+    Bilineare Beziehung ohne Verfestigung.
+
+    Fuenf Eckpunkte genuegen -- dazwischen ist sie gerade, und mehr Punkte
+    wuerden nur vortaeuschen, dass etwas gekruemmt waere.
+    """
+    E_s, f_yd = wert("E_s"), wert("f_yd")
+    f_yd_druck, eps_ud = wert("f_yd_druck"), wert("eps_ud")
+    if None in (E_s, f_yd, f_yd_druck, eps_ud):
+        return None
+
+    eps_yd, eps_yd_druck = f_yd / E_s, abs(f_yd_druck) / E_s
+    ecken = [
+        (-abs(eps_ud), -abs(f_yd_druck)),
+        (-eps_yd_druck, -abs(f_yd_druck)),
+        (0.0, 0.0),
+        (eps_yd, f_yd),
+        (abs(eps_ud), f_yd),
+    ]
+    return {
+        "punkte": [{"eps": e * 1e3, "sigma": s / 1e6} for e, s in ecken],
+        "x_titel": "ε [‰]",
+        "y_titel": "σ [N/mm²]",
+        "titel": "Betonstahl – bilineare Beziehung",
+        "referenz": "SIA 262:2025, 4.2.2.4",
+        "marken": [
+            {"eps": eps_yd * 1e3, "sigma": f_yd / 1e6, "text": "ε_yd"},
+            {"eps": abs(eps_ud) * 1e3, "sigma": f_yd / 1e6, "text": "ε_ud"},
+        ],
+    }
 
 
 def _linie_dict(nachweis) -> dict:

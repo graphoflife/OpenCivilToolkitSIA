@@ -12,7 +12,7 @@ ANSATZ::
     k_d   = 1 / (1 + eps_v * d * k_g)
     k_g   = 48 / (16 + D_max * min[1.0; (60/f_ck)^2])
     m_Dd  = |N_Ed| * h / 6                      Dekompressionsmoment
-    eps_v = f_yd * (m_Ed - m_Dd) / (E_s * (m_Rd(N_Ed = 0) - m_Dd))
+    eps_v = f_yd * (m_Ed - m_Dd) / (E_s * (m_Rd(N_Ed) - m_Dd))
 
     d_v = d - Einlagenhoehe,  falls  h/6 < Einlagenhoehe < d
     d_v = d                   sonst
@@ -75,6 +75,9 @@ class Querkraftergebnis:
     k_d: float = 0.0
     eps_v: float = 0.0
     m_Dd: float = 0.0
+    m_Rd: float = 0.0
+    """Momentenwiderstand bei der wirkenden Normalkraft, in Nm."""
+
     v_Rd: float = 0.0
     """in N/m."""
 
@@ -143,12 +146,14 @@ class Querkraft(Nachweis):
         bezuege += [
             Eingabebezug("f_yd", stahl.id_von("f_yd")),
             Eingabebezug("E_s", stahl.id_von("E_s")),
-            # Der Momentenwiderstand bei N = 0 kommt aus dem M-N-Nachweis. Als
-            # Eingang statt als mitgegebene Zahl, damit die Abhaengigkeit im
-            # Graphen steht und die Rueckverfolgung sie zeigt.
-            Eingabebezug("m_Rd_N0_pos", mn_nachweis.d_eckwerte["M_Rd_N0_pos"].id),
-            Eingabebezug("m_Rd_N0_neg", mn_nachweis.d_eckwerte["M_Rd_N0_neg"].id),
         ]
+        # Der Momentenwiderstand bei der wirkenden Normalkraft kommt aus dem
+        # M-N-Nachweis -- je Fall einer. Als Eingang statt als mitgegebene Zahl,
+        # damit die Abhaengigkeit im Graphen steht und die Rueckverfolgung sie
+        # zeigt.
+        for f in self.faelle:
+            bezuege.append(Eingabebezug(
+                f"m_Rd_{f.kennung}", mn_nachweis.d_m_rd[f.name].id))
 
         super().__init__(
             basis,
@@ -176,7 +181,7 @@ class Querkraft(Nachweis):
         f_yd = e.g("f_yd").si
         E_s = e.g("E_s").si
         einlage = e.g("einlagenhoehe").si
-        m_rd_null = {True: abs(e.g("m_Rd_N0_pos").si), False: abs(e.g("m_Rd_N0_neg").si)}
+        m_rd = {f.name: abs(e.g(f"m_Rd_{f.kennung}").si) for f in self.faelle}
 
         self._protokoll_ansatz(p, e)
 
@@ -200,7 +205,8 @@ class Querkraft(Nachweis):
         zeilen: List[List[str]] = []
 
         for fall in self.faelle:
-            erg = self._einen_fall(fall, h, tau_cd, f_yd, E_s, einlage, k_g, m_rd_null)
+            erg = self._einen_fall(fall, h, tau_cd, f_yd, E_s, einlage, k_g,
+                                   m_rd[fall.name])
             self.ergebnisse.append(erg)
 
             ergebnis[self.d_v_rd[fall.name].id] = Groesse.aus_si(erg.v_Rd, KN_PRO_M)
@@ -237,7 +243,7 @@ class Querkraft(Nachweis):
     def _einen_fall(
         self, fall: Querkraftfall, h: float, tau_cd: Groesse,
         f_yd: float, E_s: float, einlage: float, k_g: float,
-        m_rd_null: Mapping[bool, float],
+        m_Rd: float,
     ) -> Querkraftergebnis:
         erg = Querkraftergebnis(fall=fall)
         M_Ed, N_Ed, V_Ed = fall.M_Ed.si, fall.N_Ed.si, fall.V_Ed.si
@@ -256,11 +262,28 @@ class Querkraft(Nachweis):
             return erg
 
         erg.m_Dd = abs(N_Ed) * h / 6.0
-        nenner = m_rd_null[M_Ed >= 0] - erg.m_Dd
-        if nenner <= 0:
+        erg.m_Rd = m_Rd
+        zaehler = abs(M_Ed) - erg.m_Dd
+        nenner = m_Rd - erg.m_Dd
+
+        if zaehler <= 0.0:
+            # Das Moment bleibt unter dem Dekompressionsmoment: der Querschnitt
+            # ist ungerissen, eps_v = 0 und k_d damit am groessten.
             erg.eps_v = 0.0
+        elif nenner <= 0.0:
+            # Der Widerstand liegt nicht ueber dem Dekompressionsmoment -- die
+            # Formel gibt dann nichts her. Auf einen Querkraftwiderstand ist
+            # hier nicht zu zaehlen; der M-N-Nachweis zeigt das Versagen ohnehin.
+            erg.v_Rd = 0.0
+            erg.erfuellungsgrad = 0.0
+            erg.erfuellt = False
+            erg.begruendung = (
+                f"m_Rd(N_Ed) = {m_Rd / 1e3:.1f} kNm liegt nicht über dem "
+                f"Dekompressionsmoment m_Dd = {erg.m_Dd / 1e3:.1f} kNm. "
+                f"Der Querkraftwiderstand ist so nicht bestimmbar.")
+            return erg
         else:
-            erg.eps_v = max(f_yd * (abs(M_Ed) - erg.m_Dd) / (E_s * nenner), 0.0)
+            erg.eps_v = f_yd * zaehler / (E_s * nenner)
 
         # k_d ist empirisch: d geht in Millimeter ein.
         erg.k_d = 1.0 / (1.0 + erg.eps_v * (erg.d * 1e3) * k_g)
@@ -300,5 +323,5 @@ class Querkraft(Nachweis):
         p.gleichung(
             r"m_{Dd} = \frac{|N_{Ed}| \cdot h}{6} \qquad "
             r"\varepsilon_v = \frac{f_{yd} \cdot (m_{Ed} - m_{Dd})}"
-            r"{E_s \cdot \left(m_{Rd}(N_{Ed}=0) - m_{Dd}\right)}",
+            r"{E_s \cdot \left(m_{Rd}(N_{Ed}) - m_{Dd}\right)}",
             titel="Dekompressionsmoment und Dehnung")

@@ -15,7 +15,7 @@
 
 import { el, ersetzen, leerzustand, melden } from './dom.js';
 import { kopiereFuerWord, kopiereLatex, setzen, span } from './mathe.js';
-import { diagrammZeichnen, querschnittZeichnen } from './diagramm.js';
+import { diagrammZeichnen, kurveZeichnen, querschnittZeichnen } from './diagramm.js';
 import { aendern, zustand } from './zustand.js';
 
 // ===========================================================================
@@ -239,27 +239,50 @@ function gehoertZurAuswahl(urteil) {
 function diagrammSicht(loesung) {
   const linien = loesung.linien || {};
   const querschnitte = loesung.zuordnung?.querschnitte || {};
-  const kennungen = Object.keys(querschnitte);
-  if (!kennungen.length) return leerzustand('Noch keine Platte gerechnet.');
+  const gesetze = loesung.werkstoffgesetze || {};
+  const blaetter = [];
 
-  return el('div', {}, kennungen.map((kennung) => {
-    const eintrag = querschnitte[kennung];
+  // -- Werkstoffgesetze ---------------------------------------------------
+  for (const [kennung, gesetz] of Object.entries(gesetze)) {
+    if (zustand.umfang === 'seite' && zustand.auswahl
+        && !(zustand.auswahl.art === 'material' && zustand.auswahl.kennung === kennung)) {
+      continue;
+    }
+    blaetter.push(el('div.blatt', {}, [
+      el('div.b-titel', { text: `${gesetz.titel} – ${gesetz.name}` }),
+      gesetz.referenz
+        ? el('p.b-text', {
+          text: gesetz.referenz,
+          style: { fontSize: '12px', color: 'var(--schrift-zart)', margin: '0 0 6px' },
+        })
+        : null,
+      kurveZeichnen(gesetz),
+    ]));
+  }
+
+  // -- Querschnitt und Interaktionslinien ---------------------------------
+  for (const [kennung, eintrag] of Object.entries(querschnitte)) {
+    if (zustand.umfang === 'seite' && zustand.auswahl
+        && !(zustand.auswahl.art === 'querschnitt' && zustand.auswahl.kennung === kennung)) {
+      continue;
+    }
     const eigene = Object.entries(linien)
       .filter(([schluessel]) => schluessel.split('.')[0] === kennung);
-
-    return el('div.blatt', {}, [
+    blaetter.push(el('div.blatt', {}, [
       el('div.b-titel', { text: `Querschnitt – ${eintrag.name}` }),
       querschnittZeichnen(eintrag, loesung.werte || {}),
-      ...eigene.flatMap(([schluessel, linie]) => [
+      ...eigene.flatMap(([, linie]) => [
         el('div.b-titel', {
-          text: `M-N-Interaktionsdiagramm – ${linie.richtung}-Richtung`,
+          text: `M-N-Interaktionsdiagramm – ${eintrag.name}, ${linie.richtung}-Richtung`,
         }),
         diagrammZeichnen(linie),
       ]),
-    ]);
-  }));
-}
+    ]));
+  }
 
+  if (!blaetter.length) return leerzustand('Noch nichts zu zeichnen.');
+  return el('div', {}, blaetter);
+}
 
 function werteSicht(loesung, beiZielwahl) {
   let eintraege = Object.values(loesung.werte || {});

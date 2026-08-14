@@ -287,3 +287,127 @@ export function diagrammZeichnen(linie) {
     ]),
   ]);
 }
+
+/**
+ * Zeichnet eine Spannungs-Dehnungs-Beziehung.
+ *
+ * Die Punktfolge kommt fertig aus dem Rechenkern und stammt aus demselben
+ * Werkstoffgesetz, das auch die Querschnittsintegration verwendet -- die Kurve
+ * zeigt also, womit tatsächlich gerechnet wurde, und nicht eine nachgebaute
+ * Fassung.
+ *
+ * Vorzeichen wie überall: Zug positiv. Der Beton liegt damit im dritten
+ * Quadranten, der Stahl spannt sich über beide. Die Achsen laufen deshalb
+ * durch den Nullpunkt.
+ */
+export function kurveZeichnen(gesetz) {
+  const punkte = gesetz.punkte || [];
+  if (!punkte.length) return el('div.leer', { text: 'Keine Kurve vorhanden.' });
+
+  const BREITE = 560;
+  const HOEHE = 360;
+  const RAND = { oben: 18, rechts: 22, unten: 40, links: 68 };
+  const zBreite = BREITE - RAND.links - RAND.rechts;
+  const zHoehe = HOEHE - RAND.oben - RAND.unten;
+
+  const eps = punkte.map((p) => p.eps);
+  const sig = punkte.map((p) => p.sigma);
+  // Der Nullpunkt gehört immer ins Bild, sonst hängt die Kurve im Nichts.
+  const spanne = (werte, luft = 0.08) => {
+    const min = Math.min(0, ...werte);
+    const max = Math.max(0, ...werte);
+    const d = (max - min) || 1;
+    return [min - d * luft, max + d * luft];
+  };
+  const [xMin, xMax] = spanne(eps);
+  const [yMin, yMax] = spanne(sig);
+
+  const x = (v) => RAND.links + ((v - xMin) / (xMax - xMin)) * zBreite;
+  const y = (v) => RAND.oben + (1 - (v - yMin) / (yMax - yMin)) * zHoehe;
+
+  const svg = svgEl('svg', {
+    class: 'mn', viewBox: `0 0 ${BREITE} ${HOEHE}`, xmlns: NR,
+    role: 'img', 'aria-label': gesetz.titel,
+  });
+
+  // Gitter
+  const xs = schrittweite(xMax - xMin, 6);
+  const ys = schrittweite(yMax - yMin, 6);
+  for (let v = Math.ceil(xMin / xs) * xs; v <= xMax; v += xs) {
+    svg.append(svgEl('line', {
+      x1: x(v), y1: RAND.oben, x2: x(v), y2: HOEHE - RAND.unten,
+      stroke: '#e6e9ee', 'stroke-width': 1,
+    }));
+    const t = svgEl('text', {
+      x: x(v), y: HOEHE - RAND.unten + 15, 'text-anchor': 'middle',
+      'font-size': 10.5, fill: '#5c6773',
+    });
+    t.textContent = Number(v.toFixed(2));
+    svg.append(t);
+  }
+  for (let v = Math.ceil(yMin / ys) * ys; v <= yMax; v += ys) {
+    svg.append(svgEl('line', {
+      x1: RAND.links, y1: y(v), x2: BREITE - RAND.rechts, y2: y(v),
+      stroke: '#e6e9ee', 'stroke-width': 1,
+    }));
+    const t = svgEl('text', {
+      x: RAND.links - 7, y: y(v) + 4, 'text-anchor': 'end',
+      'font-size': 10.5, fill: '#5c6773',
+    });
+    t.textContent = Math.round(v);
+    svg.append(t);
+  }
+
+  // Nullachsen
+  for (const [a, b, c, d] of [
+    [RAND.links, y(0), BREITE - RAND.rechts, y(0)],
+    [x(0), RAND.oben, x(0), HOEHE - RAND.unten],
+  ]) {
+    svg.append(svgEl('line', {
+      x1: a, y1: b, x2: c, y2: d, stroke: '#b4becd', 'stroke-width': 1.4,
+    }));
+  }
+
+  // Kurve
+  svg.append(svgEl('polyline', {
+    points: punkte.map((p) => `${x(p.eps).toFixed(2)},${y(p.sigma).toFixed(2)}`).join(' '),
+    fill: 'none', stroke: '#1f6feb', 'stroke-width': 2.2,
+    'stroke-linejoin': 'round', 'stroke-linecap': 'round',
+  }));
+
+  // Marken für die Grenzdehnungen
+  for (const marke of gesetz.marken || []) {
+    svg.append(svgEl('line', {
+      x1: x(marke.eps), y1: y(0), x2: x(marke.eps), y2: y(marke.sigma),
+      stroke: '#8895a8', 'stroke-width': 1, 'stroke-dasharray': '3 3',
+    }));
+    svg.append(svgEl('circle', {
+      cx: x(marke.eps), cy: y(marke.sigma), r: 3.2,
+      fill: '#fff', stroke: '#1f6feb', 'stroke-width': 1.6,
+    }));
+    const t = svgEl('text', {
+      x: x(marke.eps), y: y(marke.sigma) + (marke.sigma < 0 ? 15 : -8),
+      'text-anchor': 'middle', 'font-size': 10.5, fill: '#0d4ba8', 'font-weight': 600,
+    });
+    t.textContent = marke.text;
+    svg.append(t);
+  }
+
+  // Achsenbeschriftung
+  const xt = svgEl('text', {
+    x: RAND.links + zBreite / 2, y: HOEHE - 6, 'text-anchor': 'middle',
+    'font-size': 11.5, fill: '#16202c', 'font-weight': 600,
+  });
+  xt.textContent = gesetz.x_titel;
+  svg.append(xt);
+
+  const yt = svgEl('text', {
+    x: 14, y: RAND.oben + zHoehe / 2, 'text-anchor': 'middle',
+    'font-size': 11.5, fill: '#16202c', 'font-weight': 600,
+    transform: `rotate(-90 14 ${RAND.oben + zHoehe / 2})`,
+  });
+  yt.textContent = gesetz.y_titel;
+  svg.append(yt);
+
+  return el('div.diagramm-huelle', {}, [svg]);
+}

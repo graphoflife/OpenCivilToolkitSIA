@@ -50,6 +50,48 @@ class TestQuerkraft(unittest.TestCase):
         self.assertFalse(erg.erfuellt)
         self.assertIn("Zugkraft", erg.begruendung)
 
+    def test_m_rd_wird_bei_der_wirkenden_normalkraft_genommen(self):
+        """
+        In eps_v gehört m_Rd(N_Ed), nicht m_Rd(0). Bei Druck liegt der
+        Momentenwiderstand höher, eps_v also tiefer und v_Rd höher --
+        m_Rd(0) anzusetzen wäre auf der falschen Seite konservativ und
+        zudem schlicht eine andere Grösse.
+        """
+        projekt = projekt_mit_querkraft()
+        projekt.querschnitte[0].kombinationen[0].N_Ed = -300.0
+        aufbau, _ = urteile(projekt)
+        erg = aufbau.querkraft["q1.x"].ergebnisse[0]
+
+        # Der angesetzte Widerstand ist der bei N_Ed, nicht der bei N = 0.
+        nachweis = aufbau.nachweise["q1.x"]
+        loesung = aufbau.werk.loese(
+            nachweis.d_m_rd[erg.fall.name].id,
+            nachweis.d_eckwerte["M_Rd_N0_pos"].id)
+        bei_n_ed = loesung.groesse(nachweis.d_m_rd[erg.fall.name].id).in_einheit(KNM)
+        bei_null = loesung.groesse(nachweis.d_eckwerte["M_Rd_N0_pos"].id).in_einheit(KNM)
+
+        self.assertGreater(bei_n_ed, bei_null)          # Druck hebt den Widerstand
+        self.assertAlmostEqual(erg.m_Rd / 1e3, bei_n_ed, places=3)
+        self.assertNotAlmostEqual(erg.m_Rd / 1e3, bei_null, places=1)
+
+    def test_dekompressionsmoment(self):
+        """m_Dd = |N_Ed| * h / 6 -- bei 300 kN und h = 300 mm also 15 kNm."""
+        projekt = projekt_mit_querkraft()
+        projekt.querschnitte[0].kombinationen[0].N_Ed = -300.0
+        aufbau, _ = urteile(projekt)
+        self.assertAlmostEqual(
+            aufbau.querkraft["q1.x"].ergebnisse[0].m_Dd / 1e3, 15.0, places=6)
+
+    def test_moment_unter_dekompression_gibt_vollen_widerstand(self):
+        """Bleibt m_Ed unter m_Dd, ist der Querschnitt ungerissen: eps_v = 0."""
+        projekt = projekt_mit_querkraft()
+        k = projekt.querschnitte[0].kombinationen[0]
+        k.M_Ed, k.N_Ed = 5.0, -2000.0      # m_Dd = 100 kNm > m_Ed
+        aufbau, _ = urteile(projekt)
+        erg = aufbau.querkraft["q1.x"].ergebnisse[0]
+        self.assertEqual(erg.eps_v, 0.0)
+        self.assertAlmostEqual(erg.k_d, 1.0, places=9)
+
     def test_druck_erhoeht_den_widerstand(self):
         """Das Dekompressionsmoment senkt eps_v und hebt damit k_d."""
         ohne = projekt_mit_querkraft()
