@@ -1,0 +1,38 @@
+@gemini: ignore these, they are just for me...
+
+no priorities:
+
+Konstruktive Machbarkeit, mit abständen zwischen Eisen, PlattenDicke, maximale Menge Eisen, Kollisonen Eisen
+
+Winkel der Lagen  einstellbar
+Konstruktive informationen, Bewehrungsgehalt, Distanzhalter
+
+Sanity Checks, sind alle gezogenen Eisen nicht in der Druckzone.
+
+
+
+
+Genaue Querschnittsanalyse und auch in m n diagramm anzeigen
+
+mindestbewehrung nachweis
+
+Rissbegrenzung (normalkraft, biegung) anforderungen_an_rissbreiten
+
+Steifigkeiten gebrauchstauglichkeit, quasi momenten Krümmungsdiagram bei verschiedenen Normalkräften
+
+
+NachweisEnum.rotations_kapazitaet,
+
+Knicken
+
+Schubnachweise (Mit und ohne Bügel/querkraftbewehrung) (Spielt mit Alpha zwischen range einstellbar 35° und 45°)
+
+automatische_grundbewehrung = True
+automatische_grundbewehrung_ohne_kräfte = False
+
+automatische_bewehrung_mit_kräfte = False
+ausschliesslich_grundbewehrung_anstelle_von_zulagen = False
+
+automatische_schubbewehrung = False
+
+Sämtliche Nachweise

@@ -1,0 +1,221 @@
+{
+  "settings": {
+    "code": "SIA"
+  },
+  "activeApp": "plates",
+  "materials": [
+    {
+      "id": "id_f08zfm0xg",
+      "name": "C25/30",
+      "index": "C25/30",
+      "type": "concrete",
+      "grade": "C25/30",
+      "properties": {
+        "f_ck": 25,
+        "f_ctm": 2.6,
+        "gamma_c": 1.5,
+        "eps_c1d": 0.002,
+        "eps_c2d": 0.0035,
+        "simplified": true,
+        "tau_cd": null,
+        "tau_cd_overridden": false,
+        "f_cm": null,
+        "f_cm_overridden": false,
+        "k_e": null,
+        "k_e_overridden": false,
+        "gamma_cE": null,
+        "gamma_cE_overridden": false,
+        "E_cm": null,
+        "E_cm_overridden": false,
+        "E_cd": null,
+        "E_cd_overridden": false,
+        "eta_fc": null,
+        "eta_fc_overridden": false,
+        "f_cd": null,
+        "f_cd_overridden": false,
+        "k_sigma": null,
+        "k_sigma_overridden": false
+      },
+      "is_default": true,
+      "is_sia": true,
+      "description": "Material definiert nach SIA Norm"
+    },
+    {
+      "id": "id_89onnxizn",
+      "name": "B500B",
+      "index": "B500B",
+      "type": "steel",
+      "grade": "B500B",
+      "properties": {
+        "f_yk": 500,
+        "f_yk_minus": 500,
+        "E_s": 200000,
+        "gamma_s": 1.15,
+        "eps_uk": 5,
+        "eps_ud": 4.5,
+        "f_yd": null,
+        "f_yd_overridden": false,
+        "f_yd_minus": null,
+        "f_yd_minus_overridden": false
+      },
+      "is_default": true,
+      "is_sia": true,
+      "description": "Material definiert nach SIA Norm"
+    }
+  ],
+  "plates": [
+    {
+      "id": "f2b1a611-cef5-4ec7-baa0-7aabad33b36f",
+      "name": "Platte 1",
+      "is_plate_1m": false,
+      "h_mm": 300,
+      "b_mm": 1000,
+      "concrete_id": "id_f08zfm0xg",
+      "D_max": 32,
+      "cover_top": 25,
+      "cover_bottom": 25,
+      "optimal_einlegen_bottom": true,
+      "optimal_einlegen_top": false,
+      "shear": {
+        "active": false,
+        "diam": 10,
+        "spacing": 150,
+        "legs": 2
+      },
+      "top_layers": [
+        {
+          "main_dir": "x",
+          "pos_mode": "standard",
+          "clear_dist": 0,
+          "steel_id": "id_89onnxizn",
+          "x": {
+            "active": true,
+            "diam": 12,
+            "type": "spacing",
+            "spacing": 150,
+            "count": 0
+          },
+          "y": {
+            "active": false,
+            "diam": 0,
+            "type": "spacing",
+            "spacing": 150,
+            "count": 0
+          }
+        },
+        {
+          "main_dir": "y",
+          "pos_mode": "standard",
+          "clear_dist": 0,
+          "steel_id": "id_89onnxizn",
+          "x": {
+            "active": true,
+            "diam": 0,
+            "type": "spacing",
+            "spacing": 0,
+            "count": 0
+          },
+          "y": {
+            "active": false,
+            "diam": 12,
+            "type": "spacing",
+            "spacing": 150,
+            "count": 0
+          }
+        }
+      ],
+      "bottom_layers": [
+        {
+          "main_dir": "y",
+          "pos_mode": "standard",
+          "clear_dist": 0,
+          "steel_id": "id_89onnxizn",
+          "x": {
+            "active": true,
+            "diam": 0,
+            "type": "spacing",
+            "spacing": 0,
+            "count": 0
+          },
+          "y": {
+            "active": false,
+            "diam": 30,
+            "type": "spacing",
+            "spacing": 225,
+            "count": 0
+          }
+        },
+        {
+          "main_dir": "x",
+          "pos_mode": "standard",
+          "clear_dist": 0,
+          "steel_id": "id_89onnxizn",
+          "x": {
+            "active": true,
+            "diam": 12,
+            "type": "spacing",
+            "spacing": 150,
+            "count": 0
+          },
+          "y": {
+            "active": false,
+            "diam": 0,
+            "type": "spacing",
+            "spacing": 150,
+            "count": 0
+          }
+        }
+      ],
+      "geom_title_inactive": true,
+      "geom_beton_inactive": false,
+      "geom_dmax_inactive": true,
+      "h_inactive": false,
+      "b_inactive": false,
+      "c_nom_top_inactive": false,
+      "c_nom_bottom_inactive": false,
+      "querschnitt_inactive": true,
+      "rebar_title_inactive": true,
+      "rebar_steel_grade_inactive": false,
+      "rebar_L1_x_bot_inactive": false,
+      "d_x_bot_1_inactive": false,
+      "cap_title_x_inactive": true,
+      "x_x_bot_inactive": false,
+      "M_Rd_x_bot_inactive": false,
+      "N_Rd_h2_x_bot_inactive": false,
+      "M_Rd_h2_x_bot_inactive": false,
+      "N_Rd_plus_x_inactive": false,
+      "N_Rd_minus_x_inactive": false,
+      "mn_chart_x_inactive": false,
+      "rebar_L2_x_top_inactive": false,
+      "d_x_top_2_inactive": false,
+      "x_x_top_inactive": false,
+      "M_Rd_x_top_inactive": false,
+      "N_Rd_h2_x_top_inactive": false,
+      "M_Rd_h2_x_top_inactive": false,
+      "rebar_L3_x_top_inactive": false,
+      "rebar_L2_x_bot_inactive": false,
+      "d_x_bot_2_inactive": false,
+      "d_x_top_3_inactive": false,
+      "rebar_L1_y_bot_inactive": true,
+      "d_y_bot_1_inactive": true,
+      "cap_title_y_inactive": true,
+      "x_y_bot_inactive": true,
+      "M_Rd_y_bot_inactive": true,
+      "N_Rd_h2_y_bot_inactive": true,
+      "M_Rd_h2_y_bot_inactive": true,
+      "N_Rd_plus_y_inactive": true,
+      "N_Rd_minus_y_inactive": true,
+      "mn_chart_y_inactive": true,
+      "rebar_L4_x_top_inactive": false,
+      "d_x_top_4_inactive": false,
+      "rebar_L3_y_top_inactive": true,
+      "d_y_top_3_inactive": true,
+      "x_y_top_inactive": true,
+      "M_Rd_y_top_inactive": true,
+      "N_Rd_h2_y_top_inactive": true,
+      "M_Rd_h2_y_top_inactive": true
+    }
+  ],
+  "crosssection": [],
+  "stripmethod": []
+}

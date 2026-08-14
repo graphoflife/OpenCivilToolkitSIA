@@ -1,0 +1,515 @@
+"""
+opencivil/core/berechnung.py -- Berechnungen als Objekte.
+
+VERANTWORTUNG:
+Jeder Rechenschritt ist ein Objekt, das weiss, welche Werte es braucht, welche
+es liefert, wie gerechnet wird und wie das Ergebnis aufzuschreiben ist.
+
+DREI AUSPRAEGUNGEN:
+* :class:`Formel`   -- ein Einzeiler: eine Ausgabe, eine analytische Formel.
+* :class:`Prozedur` -- ein ganzer Ablauf: mehrere Ausgaben, Iterationen,
+  Fallunterscheidungen; schreibt ihren Ablauf selbst ins Protokoll.
+* :class:`Nachweis` -- ein Vergleich von Einwirkung und Widerstand mit Urteil
+  und Ausnutzungsgrad.
+
+VARIANTEN -- WELCHE FORMEL GILT?
+Oft haengt es von den vorhandenen Eingaben ab, welche Formel anzuwenden ist.
+Dafuer duerfen mehrere Berechnungen denselben Wert liefern. Der Loeser waehlt
+unter ihnen in zwei Stufen:
+
+1. *Verfuegbarkeit* -- sind alle Pflichteingaben ueberhaupt beschaffbar?
+2. *Anwendbarkeit*  -- :meth:`Berechnung.anwendbar` darf zusaetzlich von den
+   tatsaechlichen Zahlenwerten abhaengen (z.B. "nur fuer f_ck <= 50 N/mm^2").
+
+Die Begruendung der Wahl landet im Protokoll -- der Leser sieht, warum gerade
+diese Formel gegriffen hat.
+
+FEHLER WERDEN NICHT VERSCHLUCKT.
+Im alten Code fing der Wertzugriff jede Ausnahme ab, warnte und lieferte einen
+veralteten Wert zurueck -- eine defekte Formel ergab damit eine plausible
+falsche Zahl. Hier fuehrt jeder Rechenfehler zu einem :class:`BerechnungsFehler`
+mit Angabe der schuldigen Berechnung; die urspruengliche Ausnahme bleibt als
+Ursache erhalten.
+"""
+
+from __future__ import annotations
+
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, Iterator, Mapping, Optional, Sequence, Tuple, Union
+
+from opencivil.core.einheiten import EINHEITSLOS, EmpirischesErgebnis, Groesse
+from opencivil.core.protokoll import Protokoll
+from opencivil.core.wert import Quelle, Wert, WertDef
+
+
+class BerechnungsFehler(Exception):
+    """Eine Berechnung ist gescheitert. Die Ursache bleibt angehaengt."""
+
+    def __init__(self, berechnung_id: str, meldung: str) -> None:
+        self.berechnung_id = berechnung_id
+        super().__init__(f"Berechnung '{berechnung_id}': {meldung}")
+
+
+# ===========================================================================
+# Eingaben
+# ===========================================================================
+
+
+@dataclass(frozen=True)
+class Eingabebezug:
+    """Bindet einen lokalen Formelnamen an eine globale Wert-ID."""
+
+    name: str
+    """Kurzer Name in Formel und Vorlage, z.B. ``f_ck``."""
+
+    wert_id: str
+    """Globale ID des Wertes, z.B. ``beton.C30_37.f_ck``."""
+
+    optional: bool = False
+    """Wenn True, darf der Wert fehlen; die Berechnung prueft mit ``hat()``."""
+
+
+class Eingaben(Mapping[str, Wert]):
+    """
+    Die aufgeloesten Eingaben einer Berechnung, unter ihren lokalen Namen.
+
+    Ist selbst eine ``Mapping``, damit sie direkt an die LaTeX-Hilfen
+    weitergereicht werden kann.
+    """
+
+    def __init__(self, werte: Mapping[str, Wert]) -> None:
+        self._werte: Dict[str, Wert] = dict(werte)
+
+    # -- Mapping ------------------------------------------------------------
+
+    def __getitem__(self, name: str) -> Wert:
+        try:
+            return self._werte[name]
+        except KeyError:
+            raise KeyError(
+                f"Eingabe '{name}' wurde nicht deklariert. Vorhanden: {sorted(self._werte)}."
+            ) from None
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self._werte)
+
+    def __len__(self) -> int:
+        return len(self._werte)
+
+    # -- Bequemer Zugriff ---------------------------------------------------
+
+    def hat(self, name: str) -> bool:
+        """Prueft, ob eine optionale Eingabe vorliegt."""
+        return name in self._werte
+
+    def g(self, name: str) -> Groesse:
+        """Nur die Groesse -- die Kurzform fuers Rechnen."""
+        return self[name].groesse
+
+    def groessen(self) -> Dict[str, Groesse]:
+        """Alle Eingaben als ``name -> Groesse``, passend fuer ``funktion(**...)``."""
+        return {name: wert.groesse for name, wert in self._werte.items()}
+
+    def teilmenge(self, *namen: str) -> "Eingaben":
+        """Auswahl einzelner Eingaben -- praktisch fuer LaTeX-Vorlagen."""
+        return Eingaben({n: self._werte[n] for n in namen if n in self._werte})
+
+    def __repr__(self) -> str:
+        return f"Eingaben({', '.join(sorted(self._werte))})"
+
+
+# ===========================================================================
+# Berechnung
+# ===========================================================================
+
+
+class Berechnung(ABC):
+    """
+    Basisklasse aller Rechenschritte.
+
+    Unterklassen implementieren :meth:`rechne`. Aufgerufen wird immer
+    :meth:`ausfuehren`, das die Ergebnisse prueft und in :class:`Wert` verpackt.
+    """
+
+    def __init__(
+        self,
+        id: str,
+        *,
+        ausgaben: Sequence[WertDef],
+        bezuege: Sequence[Eingabebezug] = (),
+        titel: str = "",
+        referenz: str = "",
+        prioritaet: int = 0,
+        begruendung: str = "",
+    ) -> None:
+        if not ausgaben:
+            raise ValueError(f"Berechnung '{id}' liefert keine Ausgaben.")
+        self.id = id
+        self.ausgaben: Tuple[WertDef, ...] = tuple(ausgaben)
+        self.bezuege: Tuple[Eingabebezug, ...] = tuple(bezuege)
+        self.titel = titel or (ausgaben[0].beschreibung if ausgaben else id)
+        self.referenz = referenz or (ausgaben[0].referenz if ausgaben else "")
+        self.prioritaet = prioritaet
+        """Hoehere Prioritaet wird bei mehreren moeglichen Varianten bevorzugt."""
+        self.begruendung = begruendung
+        """Warum es diese Variante gibt -- erscheint im Protokoll."""
+
+        namen = [b.name for b in self.bezuege]
+        doppelt = {n for n in namen if namen.count(n) > 1}
+        if doppelt:
+            raise ValueError(f"Berechnung '{id}': doppelte Eingabenamen {sorted(doppelt)}.")
+
+    # -- Deklaration --------------------------------------------------------
+
+    @property
+    def ausgabe_ids(self) -> Tuple[str, ...]:
+        return tuple(a.id for a in self.ausgaben)
+
+    @property
+    def pflicht_eingaben(self) -> Tuple[str, ...]:
+        """Wert-IDs, ohne die nicht gerechnet werden kann."""
+        return tuple(b.wert_id for b in self.bezuege if not b.optional)
+
+    @property
+    def optionale_eingaben(self) -> Tuple[str, ...]:
+        return tuple(b.wert_id for b in self.bezuege if b.optional)
+
+    @property
+    def alle_eingaben(self) -> Tuple[str, ...]:
+        return tuple(b.wert_id for b in self.bezuege)
+
+    def ausgabe_def(self, wert_id: str) -> WertDef:
+        for a in self.ausgaben:
+            if a.id == wert_id:
+                return a
+        raise KeyError(f"Berechnung '{self.id}' liefert '{wert_id}' nicht.")
+
+    @property
+    def ausgabe_quelle(self) -> Quelle:
+        """
+        Als was die Ergebnisse gelten sollen.
+
+        Normalfall ist ``BERECHNET``. :class:`Vorgabe` setzt das auf ``VORGABE``,
+        damit im Bericht erkennbar bleibt, dass hier nichts hergeleitet wurde.
+        """
+        return Quelle.BERECHNET
+
+    # -- Variantenwahl ------------------------------------------------------
+
+    def anwendbar(self, eingaben: Eingaben) -> Tuple[bool, str]:
+        """
+        Darf diese Variante mit diesen Werten verwendet werden?
+
+        Standardmaessig ja. Ueberschreiben, wenn die Gueltigkeit vom Zahlenwert
+        abhaengt, z.B.::
+
+            def anwendbar(self, e):
+                if e.g("f_ck") > Groesse(50, MPA):
+                    return False, "gilt nur bis C50/60"
+                return True, "f_ck liegt im Gueltigkeitsbereich"
+
+        :return: (anwendbar, Begruendung fuers Protokoll)
+        """
+        return True, self.begruendung
+
+    # -- Rechnen ------------------------------------------------------------
+
+    @abstractmethod
+    def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
+        """
+        Fuehrt die Rechnung aus und schreibt sie ins Protokoll.
+
+        :param e: aufgeloeste Eingaben unter ihren lokalen Namen
+        :param p: Mitschrift -- hier wird die Herleitung festgehalten
+        :return: ``{Wert-ID: Groesse}`` fuer jede deklarierte Ausgabe
+        """
+
+    def ausfuehren(self, e: Eingaben, p: Protokoll) -> Dict[str, Wert]:
+        """
+        Ruft :meth:`rechne` auf und prueft dessen Ergebnis.
+
+        Verpackt jede Groesse in einen :class:`Wert` mit der deklarierten
+        Definition -- dabei wird auch die Dimension geprueft.
+        """
+        try:
+            roh = self.rechne(e, p)
+        except BerechnungsFehler:
+            raise
+        except Exception as exc:
+            raise BerechnungsFehler(self.id, f"{type(exc).__name__}: {exc}") from exc
+
+        if not isinstance(roh, Mapping):
+            raise BerechnungsFehler(
+                self.id, f"rechne() muss ein Mapping liefern, erhalten: {type(roh).__name__}."
+            )
+
+        erwartet = set(self.ausgabe_ids)
+        geliefert = set(roh)
+        if fehlend := erwartet - geliefert:
+            raise BerechnungsFehler(self.id, f"Ausgaben fehlen: {sorted(fehlend)}.")
+        if unerwartet := geliefert - erwartet:
+            raise BerechnungsFehler(
+                self.id, f"Nicht deklarierte Ausgaben geliefert: {sorted(unerwartet)}."
+            )
+
+        ergebnis: Dict[str, Wert] = {}
+        for wert_id, groesse in roh.items():
+            if not isinstance(groesse, Groesse):
+                raise BerechnungsFehler(
+                    self.id,
+                    f"Ausgabe '{wert_id}' ist keine Groesse, sondern "
+                    f"{type(groesse).__name__}. Bitte mit Einheit zurueckgeben.",
+                )
+            definition = self.ausgabe_def(wert_id)
+            try:
+                ergebnis[wert_id] = definition.belegen(
+                    groesse.als(definition.einheit)
+                    if groesse.dimension == definition.einheit.dimension
+                    else groesse,
+                    quelle=self.ausgabe_quelle,
+                    herkunft=self.id,
+                )
+            except Exception as exc:
+                raise BerechnungsFehler(self.id, f"Ausgabe '{wert_id}': {exc}") from exc
+        return ergebnis
+
+    def __repr__(self) -> str:
+        return f"{type(self).__name__}({self.id!r} -> {list(self.ausgabe_ids)})"
+
+
+# ===========================================================================
+# Formel -- der Einzeiler
+# ===========================================================================
+
+#: Eine Rechenfunktion bekommt die Eingaben als Groessen unter ihren lokalen
+#: Namen und liefert eine Groesse -- oder ein EmpirischesErgebnis, wenn die
+#: Normformel dimensionell inhomogen ist.
+FormelFunktion = Callable[..., Union[Groesse, EmpirischesErgebnis]]
+
+
+class Formel(Berechnung):
+    """
+    Eine Ausgabe, eine analytische Formel.
+
+    Die Vorlage wird nur *analytisch* geschrieben; die Fassung mit Zahlen und
+    Einheiten entsteht daraus automatisch::
+
+        Formel(
+            id="beton.C30_37.f_cd",
+            ausgabe=f_cd_def,
+            eingaben={"eta_fc": "beton.C30_37.eta_fc",
+                      "f_ck":   "beton.C30_37.f_ck",
+                      "gamma_c":"beton.C30_37.gamma_c"},
+            vorlage=r"\\frac{@eta_fc \\cdot @f_ck}{@gamma_c}",
+            funktion=lambda eta_fc, f_ck, gamma_c: eta_fc * f_ck / gamma_c,
+        )
+
+    ergibt im Bericht::
+
+        f_{cd} = \\frac{\\eta_{fc} \\cdot f_{ck}}{\\gamma_c}
+               = \\frac{0.933 \\cdot 30\\,\\mathrm{N/mm^2}}{1.5}
+               = 18.7\\,\\mathrm{N/mm^2}
+    """
+
+    def __init__(
+        self,
+        id: str,
+        *,
+        ausgabe: WertDef,
+        funktion: FormelFunktion,
+        vorlage: Optional[str] = None,
+        eingaben: Optional[Mapping[str, str]] = None,
+        optionale_eingaben: Optional[Mapping[str, str]] = None,
+        titel: str = "",
+        referenz: str = "",
+        prioritaet: int = 0,
+        begruendung: str = "",
+        bedingung: Optional[Callable[[Eingaben], Tuple[bool, str]]] = None,
+    ) -> None:
+        bezuege = [Eingabebezug(name, wid) for name, wid in (eingaben or {}).items()]
+        bezuege += [
+            Eingabebezug(name, wid, optional=True)
+            for name, wid in (optionale_eingaben or {}).items()
+        ]
+        super().__init__(
+            id,
+            ausgaben=[ausgabe],
+            bezuege=bezuege,
+            titel=titel,
+            referenz=referenz or ausgabe.referenz,
+            prioritaet=prioritaet,
+            begruendung=begruendung,
+        )
+        self.ausgabe = ausgabe
+        self.funktion = funktion
+        self.vorlage = vorlage
+        self._bedingung = bedingung
+
+    def anwendbar(self, eingaben: Eingaben) -> Tuple[bool, str]:
+        if self._bedingung is None:
+            return True, self.begruendung
+        return self._bedingung(eingaben)
+
+    def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
+        roh = self.funktion(**e.groessen())
+
+        annahme: str = ""
+        if isinstance(roh, EmpirischesErgebnis):
+            annahme = roh.annahmen_text()
+            groesse = roh.wert
+        elif isinstance(roh, Groesse):
+            groesse = roh
+        else:
+            raise BerechnungsFehler(
+                self.id,
+                f"funktion() muss eine Groesse liefern, erhalten: {type(roh).__name__}.",
+            )
+
+        wert = self.ausgabe.belegen(groesse, Quelle.BERECHNET, herkunft=self.id)
+        if self.vorlage:
+            # Nur die in der Vorlage benutzten Eingaben werden eingesetzt --
+            # optionale, die diesmal fehlen, stoeren so nicht.
+            p.formel(wert, self.vorlage, e, titel=self.titel, referenz=self.referenz)
+        else:
+            p.wert(wert, titel=self.titel, referenz=self.referenz)
+        if annahme:
+            p.annahme(annahme)
+        # Die Begruendung schreibt der Loeser -- er weiss als einziger, ob es
+        # ueberhaupt eine Variante zu waehlen gab.
+        return {self.ausgabe.id: groesse}
+
+
+class Vorgabe(Berechnung):
+    """
+    Liefert einen festen Wert ohne Herleitung -- Normvorgabe oder Vorlagenwert.
+
+    Erlaubt es, auch Konstanten (Teilsicherheitsbeiwerte, Tabellenwerte) als
+    ordentliche Knoten im Rechengraph zu fuehren, statt sie im Code zu
+    verstecken. Der Benutzer kann sie damit ueberall gleich ueberschreiben.
+    """
+
+    def __init__(
+        self,
+        id: str,
+        *,
+        ausgabe: WertDef,
+        groesse: Groesse,
+        quelle: Quelle = Quelle.VORGABE,
+        titel: str = "",
+        referenz: str = "",
+        begruendung: str = "",
+    ) -> None:
+        super().__init__(
+            id,
+            ausgaben=[ausgabe],
+            titel=titel,
+            referenz=referenz or ausgabe.referenz,
+            begruendung=begruendung,
+        )
+        self.ausgabe = ausgabe
+        self.groesse = groesse
+        self.quelle = quelle
+
+    @property
+    def ausgabe_quelle(self) -> Quelle:
+        return self.quelle
+
+    def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
+        wert = self.ausgabe.belegen(self.groesse, self.quelle, herkunft=self.id)
+        p.wert(wert, titel=self.titel, referenz=self.referenz)
+        return {self.ausgabe.id: self.groesse}
+
+
+# ===========================================================================
+# Prozedur -- der ganze Ablauf
+# ===========================================================================
+
+
+class Prozedur(Berechnung):
+    """
+    Ein mehrstufiger Ablauf: Iterationen, Fallunterscheidungen, mehrere Ausgaben.
+
+    Unterklassen implementieren :meth:`rechne` und schreiben dabei ihren Ablauf
+    ins Protokoll -- Ansatz, Startwerte, Zwischenschritte (gerne als Tabelle),
+    Abbruchkriterium, Ergebnis. Der Leser muss die Rechnung von Hand
+    nachvollziehen koennen; nur das Endergebnis auszugeben genuegt nicht.
+
+    Beispielgeruest::
+
+        class Nulllinienlage(Prozedur):
+            def rechne(self, e, p):
+                p.text("Die Nulllinie wird iterativ aus dem Kraeftegleichgewicht bestimmt.")
+                zeilen = []
+                for schritt in range(...):
+                    ...
+                    zeilen.append([str(schritt), x.als_latex(1), fehler.als_latex(2)])
+                p.tabelle(["i", "x", "\\\\Delta F"], zeilen, titel="Iterationsverlauf")
+                p.formel(...)
+                return {...}
+    """
+
+
+# ===========================================================================
+# Nachweis
+# ===========================================================================
+
+
+@dataclass(frozen=True)
+class NachweisUrteil:
+    """
+    Ergebnis eines Nachweises.
+
+    ``ausnutzung`` ist das Verhaeltnis Einwirkung/Widerstand: <= 1 bedeutet
+    erfuellt. ``erfuellungsgrad`` ist der Kehrwert-Blickwinkel -- um welchen
+    Faktor die Einwirkung noch wachsen duerfte.
+    """
+
+    name: str
+    erfuellt: bool
+    ausnutzung: Groesse
+    begruendung: str = ""
+    einwirkung: Optional[Wert] = None
+    widerstand: Optional[Wert] = None
+
+    @property
+    def erfuellungsgrad(self) -> Optional[Groesse]:
+        n = self.ausnutzung.si
+        if n == 0.0:
+            return None
+        return Groesse(1.0 / n, EINHEITSLOS)
+
+    def __str__(self) -> str:
+        urteil = "erfüllt" if self.erfuellt else "NICHT erfüllt"
+        return f"{self.name}: {urteil} (Ausnutzung {self.ausnutzung.formatiert(3)})"
+
+
+class Nachweis(Berechnung):
+    """
+    Vergleicht Einwirkung und Widerstand und faellt ein Urteil.
+
+    Unterklassen implementieren :meth:`pruefe` statt :meth:`rechne`. Die
+    Urteile werden gesammelt und stehen nach dem Lauf unter :attr:`urteile`
+    zur Verfuegung -- der Bericht kann daraus die Nachweistabelle bauen.
+    """
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.urteile: list[NachweisUrteil] = []
+
+    @abstractmethod
+    def pruefe(self, e: Eingaben, p: Protokoll) -> Tuple[Mapping[str, Groesse], Sequence[NachweisUrteil]]:
+        """
+        Fuehrt den Nachweis und liefert Ausgabewerte samt Urteilen.
+
+        :return: (``{Wert-ID: Groesse}``, Liste der Urteile)
+        """
+
+    def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
+        groessen, urteile = self.pruefe(e, p)
+        self.urteile = list(urteile)
+        return groessen
+
+    @property
+    def alle_erfuellt(self) -> bool:
+        return all(u.erfuellt for u in self.urteile)

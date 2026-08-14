@@ -1,0 +1,1068 @@
+/* ==========================================================================
+   OpenCivilToolkit Design System (Premium Dark Mode)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* Color Palette (Harmonious slate/indigo theme - High Contrast) */
+  --color-bg-base: #1e293b;
+  /* Lighter background (Slate 800) */
+  --color-bg-panel: #0e1726;
+  /* Slightly brighter panels (Custom Slate) */
+  --color-bg-header: #020617;
+  /* Very dark header (Slate 950) */
+  --color-bg-card: #334155;
+  /* Lighter color for cards and buttons (Slate 700) */
+  --color-bg-input: #404f67;
+  /* Brighter than panel (Slate-ish 750) */
+  --color-bg-input-focus: #2b3a54;
+  /* Even brighter for focus */
+  --color-bg-input-disabled: #2c384d;
+
+  /* Separately controllable background colors for specific UI elements */
+  --color-bg-material-btn: #202d41;
+  --color-bg-material-btn-hover: #28374e;
+  --color-bg-report-card: #202d41;
+  --color-bg-report-card-hover: #28374e;
+
+  --color-primary: #3b82f6;
+  --color-primary-hover: #60a5fa;
+  --color-primary-glow: rgba(59, 130, 246, 0.2);
+
+  --color-accent: #10b981;
+  --color-accent-hover: #34d399;
+
+  --color-danger: #ef4444;
+  --color-danger-hover: #f87171;
+
+  --color-text: #ffffff;
+  --color-text-muted: #cbd5e1;
+  --color-text-highlight: #60a5fa;
+
+  --color-border: #334155;
+  --color-border-hover: #475569;
+  --color-focus-ring: rgba(59, 130, 246, 0.4);
+
+  /* Layout Widths (Dynamic variables set by JS resizer) */
+  --left-width: 260px;
+  --right-width: 460px;
+
+  /* Font Families */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-text-size-adjust: none !important;
+  text-size-adjust: none !important;
+}
+
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   Header / Top-Bar
+   ========================================================================== */
+
+.top-bar {
+  background-color: var(--color-bg-header);
+  border-bottom: 1px solid var(--color-border);
+  height: 60px;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 10;
+}
+
+.header-logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  display: flex;
+  align-items: center;
+  user-select: none;
+}
+
+.logo-prefix {
+  color: var(--color-text);
+}
+
+.logo-suffix {
+  color: var(--color-primary);
+}
+
+/* App Navigation Tabs */
+.app-nav {
+  display: flex;
+  gap: 8px;
+  height: 100%;
+  align-items: center;
+}
+
+.nav-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 48px;
+  border-radius: 8px;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.nav-btn svg {
+  transition: transform var(--transition-normal);
+}
+
+.nav-btn:hover {
+  background-color: var(--color-bg-card);
+  color: var(--color-text);
+}
+
+.nav-btn:hover svg {
+  transform: translateY(-2px);
+}
+
+.nav-btn.active {
+  background-color: var(--color-primary-glow);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.nav-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 3px;
+  background-color: var(--color-primary);
+  border-radius: 4px 4px 0 0;
+}
+
+.nav-btn-tooltip {
+  position: absolute;
+  top: 55px;
+  background: #000000;
+  color: #ffffff;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+  z-index: 100;
+}
+
+.nav-btn:hover .nav-btn-tooltip {
+  opacity: 1;
+}
+
+/* Header Controls */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  background-color: rgba(255, 255, 255, 0.03);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--color-border);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-text-muted);
+  transition: background-color var(--transition-fast);
+}
+
+.status-indicator.saved .status-dot {
+  background-color: var(--color-accent);
+}
+
+.status-indicator.unsaved .status-dot {
+  background-color: #f59e0b;
+  /* Amber */
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+  user-select: none;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.btn-secondary {
+  background-color: var(--color-bg-card);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.btn-secondary:hover {
+  border-color: var(--color-border-hover);
+  background-color: var(--color-bg-base);
+}
+
+.btn-secondary.active {
+  background-color: var(--color-primary-glow);
+  border-color: var(--color-primary);
+  color: var(--color-text-highlight);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.btn-danger {
+  background-color: var(--color-danger);
+  color: #ffffff;
+}
+
+.btn-danger:hover {
+  background-color: var(--color-danger-hover);
+}
+
+.btn-icon-only {
+  background-color: var(--color-bg-card);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 6px;
+}
+
+.btn-icon-only:hover {
+  color: var(--color-text);
+  border-color: var(--color-border-hover);
+}
+
+.btn-icon-only.btn-danger:hover {
+  background-color: var(--color-danger);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+/* ==========================================================================
+   Layout Resizer Columns
+   ========================================================================== */
+
+.app-layout {
+  display: grid;
+  grid-template-columns: var(--left-width) 6px 1fr 6px var(--right-width);
+  height: calc(100vh - 60px);
+  position: relative;
+  background-color: var(--color-bg-base);
+}
+
+.panel {
+  background-color: var(--color-bg-panel);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Scrollbars styling */
+.panel::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.panel::-webkit-scrollbar-track {
+  background: var(--color-bg-panel);
+}
+
+.panel::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 3px;
+}
+
+.panel::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+/* Resizer handle bar */
+.resizer {
+  background-color: var(--color-border);
+  cursor: col-resize;
+  position: relative;
+  transition: background-color var(--transition-fast);
+  z-index: 5;
+}
+
+.resizer:hover,
+.resizer.dragging {
+  background-color: var(--color-primary);
+}
+
+.resizer::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 30px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 1px;
+}
+
+.resizer:hover::after,
+.resizer.dragging::after {
+  background-color: #ffffff;
+}
+
+/* ==========================================================================
+   Common Panel Layouts
+   ========================================================================== */
+
+.panel-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 57px;
+}
+
+.panel-header h2,
+.panel-header h3 {
+  font-size: 1.05rem;
+}
+
+.panel-content {
+  padding: 20px;
+  flex-grow: 1;
+}
+
+/* ==========================================================================
+   Left Panel: Sidebar Instance list
+   ========================================================================== */
+
+.instances-list {
+  list-style: none;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.instance-item {
+  background-color: var(--color-bg-material-btn);
+  border: 1px solid var(--color-border);
+  padding: 12px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.instance-item:hover {
+  background-color: var(--color-bg-material-btn-hover);
+  border-color: var(--color-border-hover);
+}
+
+.instance-item.active {
+  background-color: var(--color-primary-glow);
+  border-color: var(--color-primary);
+}
+
+.instance-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow: hidden;
+  flex-grow: 1;
+}
+
+.instance-name {
+  font-weight: 500;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #ffffff;
+}
+
+.instance-meta {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.instance-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.instance-item:hover .instance-actions {
+  opacity: 1;
+}
+
+.instance-item.active .instance-actions {
+  opacity: 1;
+}
+
+.btn-item-action {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.btn-item-action:hover {
+  background-color: var(--color-bg-card);
+  color: var(--color-text);
+}
+
+.btn-item-action.delete:hover {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--color-danger);
+}
+
+/* ==========================================================================
+   Middle Panel: Form & Editor
+   ========================================================================== */
+
+.editor-card {
+  background-color: var(--color-bg-panel);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.editor-group {
+  background-color: rgba(255, 255, 255, 0.015);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.group-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 6px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.form-row>.form-field {
+  flex: 1;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-field label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+/* Custom styled inputs */
+.input-control {
+  background-color: var(--color-bg-input);
+  border: 1px solid var(--color-border);
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  transition: all var(--transition-fast);
+  width: 100%;
+}
+
+.input-control:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-focus-ring);
+  background-color: var(--color-bg-input-focus);
+}
+
+.input-control:disabled {
+  background-color: var(--color-bg-input-disabled);
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+  cursor: not-allowed;
+}
+
+/* Custom Unit input indicator wrapper */
+.input-with-unit {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-unit .input-control {
+  padding-right: 48px;
+}
+
+.input-unit-label {
+  position: absolute;
+  right: 12px;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  pointer-events: none;
+  font-family: var(--font-mono);
+}
+
+/* Override toggle */
+.override-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.override-checkbox {
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Right Panel: LaTeX Report rendering (Overleaf-style document)
+   ========================================================================== */
+
+.report-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: var(--color-bg-panel);
+  border-bottom: 1px solid var(--color-border);
+  gap: 8px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  flex-shrink: 0;
+}
+
+.report-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* ── Paper container: the Overleaf "page" ─────────────────────────── */
+.report-paper {
+  padding: 28px 24px 40px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: 999999px;
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+  font-size: 0.85rem;
+  line-height: 1.15;
+  /* Subtle paper feel */
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.018) 0%,
+    rgba(255, 255, 255, 0.008) 100%
+  );
+}
+
+/* ── Individual report line (equation or text) ────────────────────── */
+.report-line {
+  position: relative;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.12s ease;
+  max-height: 999999px;
+}
+
+.report-line:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* ── Report line: drawing variant ─────────────────────────────────── */
+.report-line-drawing {
+  padding: 8px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.report-line-drawing:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+/* ── Title row (description + references) ─────────────────────────── */
+.report-line-title {
+  font-size: 0.73rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1px;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.8;
+  transition: opacity 0.12s ease;
+}
+
+.report-line:hover .report-line-title {
+  opacity: 1;
+}
+
+.report-line-desc {
+  font-style: italic;
+  color: rgba(203, 213, 225, 0.85);
+}
+
+.report-line-ref {
+  font-size: 0.65rem;
+  color: rgba(148, 163, 184, 0.7);
+  font-weight: normal;
+  font-style: normal;
+}
+
+.report-line-hint {
+  color: rgba(251, 191, 36, 0.8);
+}
+
+/* ── Equation content area ────────────────────────────────────────── */
+.report-line-content {
+  overflow-x: auto;
+  padding: 2px 0;
+  font-size: 0.92rem;
+  max-height: 999999px;
+  -webkit-text-size-adjust: none !important;
+  text-size-adjust: none !important;
+}
+
+.report-line-content * {
+  max-height: 999999px !important;
+  -webkit-text-size-adjust: none !important;
+  text-size-adjust: none !important;
+}
+
+/* Hide scrollbars inside KaTeX outputs */
+.report-line-content::-webkit-scrollbar {
+  height: 3px;
+}
+
+.report-line-content::-webkit-scrollbar-thumb {
+  background: rgba(55, 65, 81, 0.5);
+  border-radius: 2px;
+}
+
+/* ── Drawing content area ─────────────────────────────────────────── */
+.report-line-drawing-content {
+  width: 100%;
+}
+
+.report-line-drawing-content > svg {
+  background-color: #0d1324;
+  border-radius: 6px;
+  width: 100%;
+  height: auto;
+  border: 1px solid rgba(51, 65, 85, 0.6);
+}
+
+/* ── Floating action buttons (appear on hover) ────────────────────── */
+.report-line-actions {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  pointer-events: none;
+}
+
+.report-line:hover .report-line-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.report-action-btn {
+  background-color: rgba(30, 41, 59, 0.9);
+  color: var(--color-text-muted);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.12s ease;
+  backdrop-filter: blur(4px);
+}
+
+.report-action-btn:hover {
+  color: #ffffff;
+  border-color: var(--color-primary);
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+/* ── Kleine Buttons für den Bericht-Header ────────────────────────── */
+.btn-sm {
+  padding: 4px 10px !important;
+  font-size: 0.78rem !important;
+  height: auto !important;
+}
+
+/* ── Inactive line (dimmed, dashed indicator) ─────────────────────── */
+.inactive-line {
+  opacity: 0.35;
+}
+
+.inactive-line:hover {
+  opacity: 0.75;
+}
+
+/* ── Separator line between logical sections ──────────────────────── */
+.report-separator {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(148, 163, 184, 0.15) 20%,
+    rgba(148, 163, 184, 0.15) 80%,
+    transparent 100%
+  );
+  margin: 8px 0;
+}
+
+/* ── Section Title ────────────────────────────────────────────────── */
+.report-separator-title {
+  margin-top: 24px;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.report-separator-title h4 {
+  font-size: 1.05rem;
+  color: var(--color-text);
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+/* ── Legacy compatibility: keep old class names working ───────────── */
+.norm-reference {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  font-weight: normal;
+}
+
+.status-badge {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-override {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--color-danger);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.equation-rendered {
+  overflow-x: auto;
+  padding: 2px 0;
+  font-size: 0.92rem;
+  max-height: 999999px;
+  -webkit-text-size-adjust: none !important;
+  text-size-adjust: none !important;
+}
+
+.drawing-rendered {
+  width: 100%;
+}
+
+.equation-rendered * {
+  max-height: 999999px !important;
+  -webkit-text-size-adjust: none !important;
+  text-size-adjust: none !important;
+}
+
+/* Hide scrollbars inside KaTeX outputs */
+.equation-rendered::-webkit-scrollbar {
+  height: 4px;
+}
+
+.equation-rendered::-webkit-scrollbar-thumb {
+  background: #374151;
+}
+
+/* ==========================================================================
+   Modals & Popups
+   ========================================================================== */
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+}
+
+.modal-backdrop.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-container {
+  background-color: var(--color-bg-panel);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  width: 450px;
+  max-width: 90%;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  transform: translateY(20px);
+  transition: transform var(--transition-normal);
+}
+
+.modal-backdrop.active .modal-container {
+  transform: translateY(0);
+}
+
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Option grid inside Modal */
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.option-btn {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--color-border);
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  color: #ffffff;
+  font-weight: 500;
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.option-btn:hover {
+  background-color: var(--color-primary-glow);
+  border-color: var(--color-primary);
+}
+
+.option-btn.active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* ==========================================================================
+   Utilities / Empty States
+   ========================================================================== */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 40px;
+  color: var(--color-text-muted);
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  color: var(--color-text-muted);
+  opacity: 0.3;
+}
+
+.empty-state h2 {
+  font-size: 1.25rem;
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  font-size: 0.9rem;
+  max-width: 320px;
+  line-height: 1.5;
+}
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #1e293b;
+  border: 1px solid var(--color-primary);
+  color: #ffffff;
+  padding: 12px 18px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all var(--transition-normal);
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Dropdown/Select Option elements dark mode styling */
+select.input-control {
+  background-color: var(--color-bg-card);
+  color: #ffffff;
+}
+
+select.input-control option {
+  background-color: var(--color-bg-panel);
+  color: #ffffff;
+}
+
+/* Explicitly disable browser text-inflation / font-boosting on math equations */
+.katex,
+.katex * {
+  -webkit-text-size-adjust: none !important;
+  text-size-adjust: none !important;
+  max-height: 999999px !important;
+}
+
+/* Force KaTeX text blocks to use the application's premium sans-serif font */
+.katex .text,
+.katex .mtext {
+  font-family: var(--font-sans) !important;
+  font-size: 0.9em !important;
+}
