@@ -36,6 +36,7 @@ from opencivil.bericht.latex_dokument import schreibe
 from opencivil.core.rechenwerk import RechenwerkFehler
 from opencivil.projekt import Projekt, ProjektFehler
 from opencivil.web import api
+from opencivil.web.api import endlich
 
 WURZEL = Path(__file__).resolve().parents[2]
 WEB_ORDNER = WURZEL / "web"
@@ -181,7 +182,12 @@ class Handler(BaseHTTPRequestHandler):
     # -- Antworten ----------------------------------------------------------
 
     def _json(self, daten: Any, status: int = 200) -> None:
-        rumpf = json.dumps(daten, ensure_ascii=False).encode("utf-8")
+        # allow_nan=False ist Absicht: json.dumps schriebe sonst Infinity und NaN,
+        # was Python zwar liest, JSON.parse im Browser aber ablehnt -- die Antwort
+        # kam mit Status 200 an und war trotzdem unbrauchbar. Lieber hier laut
+        # scheitern als dort stumm. endlich() räumt die Fälle vorher weg.
+        rumpf = json.dumps(
+            endlich(daten), ensure_ascii=False, allow_nan=False).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(rumpf)))

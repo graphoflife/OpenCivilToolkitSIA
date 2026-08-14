@@ -13,6 +13,7 @@ erfinden, sonst laufen Bericht und Bildschirm auseinander.
 
 from __future__ import annotations
 
+import math
 from typing import Any, Dict, List, Optional, Sequence
 
 from opencivil.core.einheiten import KN, KNM
@@ -25,7 +26,28 @@ from opencivil.core.wert import Wert
 from opencivil.material.beton import BETON_VORLAGEN, BETONSORTEN
 from opencivil.material.betonstahl import STAHLSORTEN, STAHL_VORLAGEN
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
-from opencivil.projekt import Aufbau
+from opencivil.projekt import BEIDE_RICHTUNGEN, Aufbau
+
+
+def endlich(daten: Any) -> Any:
+    """
+    Ersetzt unendliche und undefinierte Zahlen durch ``None``.
+
+    ``json.dumps`` schreibt dafuer sonst ``Infinity`` bzw. ``NaN`` -- eine
+    Erweiterung, die Python selbst wieder liest, ``JSON.parse`` im Browser aber
+    ablehnt. Die Antwort kaeme mit Status 200 an und waere dennoch unbrauchbar.
+
+    Solche Werte entstehen ganz regulaer: ein Erfuellungsgrad ist unendlich,
+    wenn die Einwirkung null ist. In JSON wird daraus ``null``, und die
+    Oberflaeche zeigt dafuer das Unendlichkeitszeichen.
+    """
+    if isinstance(daten, float):
+        return daten if math.isfinite(daten) else None
+    if isinstance(daten, dict):
+        return {k: endlich(v) for k, v in daten.items()}
+    if isinstance(daten, (list, tuple)):
+        return [endlich(v) for v in daten]
+    return daten
 
 
 # ===========================================================================
@@ -56,6 +78,11 @@ def katalog() -> dict:
         },
         "erfuellungsarten": [
             {"wert": a.value, "beschriftung": a.beschriftung} for a in Erfuellungsart
+        ],
+        "richtungen": [
+            {"wert": "x", "beschriftung": "nur x-Richtung"},
+            {"wert": "y", "beschriftung": "nur y-Richtung"},
+            {"wert": BEIDE_RICHTUNGEN, "beschriftung": "beide Richtungen"},
         ],
     }
 

@@ -150,7 +150,7 @@ function platteAnlegen() {
       ueberdeckung_unten: 30, ueberdeckung_oben: 30,
       richtung_lage1: 'x', richtung_lage4: 'x',
       lagen: [lage(16), lage(12), lage(12), lage(12)],
-      kombinationen: [{ name: 'Feld', M_Ed: 100, N_Ed: 0, art: 'N_konstant' }],
+      kombinationen: [{ name: 'Feld', M_Ed: 100, N_Ed: 0, art: 'N_konstant', richtung: 'x' }],
     });
   });
   aendern({ auswahl: { art: 'querschnitt', kennung } }, 'auswahl');

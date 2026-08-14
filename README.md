@@ -20,7 +20,7 @@ Weder der Rechenkern noch der Server noch die Oberfläche brauchen ein
 Fremdpaket. Es genügt ein `python3`; KaTeX liegt unter `web/vendor/` bei, damit
 die Formeln auch ohne Internet erscheinen.
 
-Fertig und getestet (188 Tests):
+Fertig und getestet (211 Tests):
 
 | Baustein | Inhalt |
 |---|---|
@@ -152,6 +152,12 @@ Test. Nur *wie weit* er entfernt ist, hängt vom gewählten Massstab ab:
 | `NORMALKRAFT_KONSTANT` *(Standard)* | waagrecht bis zur Momentengrenze, `η = \|M_Ed\| / \|M_Rd\|` |
 | `MOMENT_KONSTANT` | senkrecht bis zur Normalkraftgrenze, `η = \|N_Ed\| / \|N_Rd\|` |
 | `NAECHSTER_PUNKT` | kürzester Abstand im auf die Eckwerte normierten Diagramm |
+
+Je Kombination ist ausserdem wählbar, in welcher **Tragrichtung** sie
+nachgewiesen wird -- `x`, `y` oder `beide`. In der Regel gehört eine
+Schnittgrösse zu einer Richtung, denn M_Ed,x und M_Ed,y sind verschiedene
+Zahlen. Beschreibungen ohne dieses Feld gelten für beide Richtungen, damit beim
+Laden älterer Projekte kein Nachweis stillschweigend wegfällt.
 
 > Bei `MOMENT_KONSTANT` fällt η klein aus, wenn der Fall vom Moment beherrscht
 > wird – die Reserve wird dann in einer Richtung gemessen, in der viel Luft ist.

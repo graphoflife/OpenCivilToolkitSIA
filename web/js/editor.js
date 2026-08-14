@@ -378,6 +378,14 @@ function kombinationZeile(querschnitt, index) {
         beiAenderung: (v) => aendern((x) => { x.N_Ed = v ?? 0; }),
       }), 'kN'),
     ]),
+    feld('Tragrichtung', auswahl({
+      werte: (zustand.katalog.richtungen || []).map((r) => ({
+        wert: r.wert, beschriftung: r.beschriftung,
+      })),
+      gewaehlt: k.richtung || 'beide',
+      titel: 'In welcher Richtung diese Schnittgrössen nachgewiesen werden',
+      beiAenderung: (v) => aendern((x) => { x.richtung = v; }),
+    })),
     feld('Massstab', auswahl({
       werte: zustand.katalog.erfuellungsarten.map((a) => ({ wert: a.wert, beschriftung: a.beschriftung })),
       gewaehlt: k.art,
@@ -436,14 +444,13 @@ function plattenEditor(querschnitt) {
           on: {
             click: () => aendern((q) => q.kombinationen.push({
               name: `Kombination ${q.kombinationen.length + 1}`,
-              M_Ed: 100, N_Ed: 0, art: 'N_konstant',
+              M_Ed: 100, N_Ed: 0, art: 'N_konstant', richtung: 'x',
             })),
           },
         }),
       ]),
       el('p', {
-        text: 'Jede Kombination wird in beiden Tragrichtungen geprüft, in denen '
-            + 'Bewehrung liegt.',
+        text: 'Je Kombination wählbar, in welcher Tragrichtung sie nachgewiesen wird.',
         style: { fontSize: '12px', color: 'var(--schrift-zart)', margin: '0 0 8px' },
       }),
       ...(querschnitt.kombinationen.length

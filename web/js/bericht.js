@@ -194,7 +194,7 @@ function nachweise(loesung) {
           el('td', { text: u.name }),
           zelle(u, 'widerstand'),
           zelle(u, 'einwirkung'),
-          el('td.zahl.grad', { text: u.erfuellungsgrad }),
+          el('td.zahl.grad', { text: u.erfuellungsgrad ?? '\u221e' }),
           el('td', {}, [el('span', {
             class: u.erfuellt ? 'marke-gut' : 'marke-schlecht',
             text: u.erfuellt ? 'erfüllt' : 'nicht erfüllt',

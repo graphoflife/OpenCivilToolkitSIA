@@ -10,6 +10,7 @@ from opencivil.projekt import (
     KombinationEintrag, LageEintrag, MaterialEintrag, PostenEintrag, Projekt,
     ProjektFehler, QuerschnittEintrag,
 )
+from opencivil.querschnitt.platte import Richtung
 from opencivil.web import api, server
 
 
@@ -336,3 +337,87 @@ class TestAltesFormat(unittest.TestCase):
     def test_rechnet_durch(self):
         aufbau = Projekt.aus_dict(self.ALT).aufbauen()
         self.assertTrue(aufbau.werk.loese(*aufbau.alle_nachweisziele()).vollstaendig)
+
+
+class TestNachweisrichtung(unittest.TestCase):
+    """Je Kombination wählbar, in welcher Tragrichtung sie gilt."""
+
+    def projekt_mit(self, *richtungen: str) -> Projekt:
+        projekt = Projekt.beispiel()
+        for eintrag, richtung in zip(projekt.querschnitte[0].kombinationen, richtungen):
+            eintrag.richtung = richtung
+        return projekt
+
+    def test_nur_x(self):
+        projekt = self.projekt_mit("x", "x", "x")
+        loesung = self._loesen(projekt)
+        self.assertTrue(all("Nachweis x" in u.name for u in loesung.urteile))
+        self.assertEqual(len(loesung.urteile), 3)
+
+    def test_getrennt_je_richtung(self):
+        projekt = self.projekt_mit("x", "x", "y")
+        namen = [u.name for u in self._loesen(projekt).urteile]
+        self.assertEqual(sum("Nachweis x" in n for n in namen), 2)
+        self.assertEqual(sum("Nachweis y" in n for n in namen), 1)
+
+    def test_beide_ist_die_vorgabe_alter_beschreibungen(self):
+        """Ohne das Feld darf kein Nachweis stillschweigend wegfallen."""
+        eintrag = KombinationEintrag.aus_dict({"name": "Feld", "M_Ed": 100.0})
+        self.assertEqual(eintrag.richtung, "beide")
+        self.assertTrue(eintrag.gilt_fuer(Richtung.X))
+        self.assertTrue(eintrag.gilt_fuer(Richtung.Y))
+
+    def test_richtung_ueberlebt_das_speichern(self):
+        projekt = self.projekt_mit("y", "x", "beide")
+        kopie = Projekt.aus_dict(json.loads(json.dumps(projekt.als_dict())))
+        self.assertEqual([k.richtung for k in kopie.querschnitte[0].kombinationen],
+                         ["y", "x", "beide"])
+
+    def test_richtung_ohne_kombination_gibt_eine_warnung(self):
+        aufbau = self.projekt_mit("x", "x", "x").aufbauen()
+        self.assertEqual(sorted(aufbau.nachweise), ["q1.x"])
+        self.assertTrue(any("y-Richtung" in w for w in aufbau.warnungen))
+
+    def _loesen(self, projekt: Projekt):
+        aufbau = projekt.aufbauen()
+        return aufbau.werk.loese(*aufbau.alle_nachweisziele())
+
+
+class TestJsonTauglich(unittest.TestCase):
+    """
+    json.dumps schreibt fuer unendliche Werte ``Infinity`` -- gueltiges Python,
+    aber kein gueltiges JSON. Im Browser scheiterte JSON.parse, und die Antwort
+    kam mit Status 200 an: "unlesbare Antwort (200)".
+    """
+
+    def test_endlich_ersetzt_unendlich(self):
+        roh = {"a": float("inf"), "b": float("-inf"), "c": float("nan"),
+               "d": [1.0, float("inf")], "e": {"f": float("nan")}, "g": "text", "h": 3}
+        sauber = api.endlich(roh)
+        self.assertIsNone(sauber["a"])
+        self.assertIsNone(sauber["b"])
+        self.assertIsNone(sauber["c"])
+        self.assertEqual(sauber["d"], [1.0, None])
+        self.assertIsNone(sauber["e"]["f"])
+        self.assertEqual(sauber["g"], "text")
+        self.assertEqual(sauber["h"], 3)
+
+    def test_moment_konstant_liefert_gueltiges_json(self):
+        """Genau der gemeldete Fall: 'Moment konstant' mit N_Ed = 0."""
+        projekt = Projekt.beispiel()
+        for k in projekt.querschnitte[0].kombinationen:
+            k.art = "M_konstant"
+            k.N_Ed = 0.0
+        antwort = server.rechnen({"projekt": projekt.als_dict()})
+        text = json.dumps(api.endlich(antwort), allow_nan=False)  # wirft bei Infinity
+        self.assertNotIn("Infinity", text)
+        self.assertNotIn("NaN", text)
+
+    def test_jede_antwort_ist_ohne_sonderwerte(self):
+        for art in ("N_konstant", "M_konstant", "naechster_Punkt"):
+            with self.subTest(art=art):
+                projekt = Projekt.beispiel()
+                for k in projekt.querschnitte[0].kombinationen:
+                    k.art, k.N_Ed, k.M_Ed = art, 0.0, 0.0
+                antwort = server.rechnen({"projekt": projekt.als_dict()})
+                json.dumps(api.endlich(antwort), allow_nan=False)

@@ -192,6 +192,10 @@ class LageEintrag:
         )
 
 
+#: Wahl der Tragrichtung einer Schnittgroessenkombination.
+BEIDE_RICHTUNGEN = "beide"
+
+
 @dataclass
 class KombinationEintrag:
     """Eine zu pruefende Schnittgroessenkombination."""
@@ -200,9 +204,21 @@ class KombinationEintrag:
     M_Ed: float = 0.0
     N_Ed: float = 0.0
     art: str = Erfuellungsart.NORMALKRAFT_KONSTANT.value
+    richtung: str = BEIDE_RICHTUNGEN
+    """``x``, ``y`` oder ``beide``.
+
+    In der Regel gehoert eine Schnittgroesse zu einer Tragrichtung -- M_Ed,x
+    und M_Ed,y sind verschiedene Zahlen. ``beide`` prueft dieselben Werte in
+    beiden Richtungen und ist die Vorgabe fuer Beschreibungen aus der Zeit vor
+    dieser Wahlmoeglichkeit, damit dort kein Nachweis stillschweigend wegfaellt.
+    """
+
+    def gilt_fuer(self, richtung: Richtung) -> bool:
+        return self.richtung in (BEIDE_RICHTUNGEN, richtung.value)
 
     def als_dict(self) -> dict:
-        return {"name": self.name, "M_Ed": self.M_Ed, "N_Ed": self.N_Ed, "art": self.art}
+        return {"name": self.name, "M_Ed": self.M_Ed, "N_Ed": self.N_Ed,
+                "art": self.art, "richtung": self.richtung}
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "KombinationEintrag":
@@ -211,6 +227,7 @@ class KombinationEintrag:
             M_Ed=float(d.get("M_Ed") or 0.0),
             N_Ed=float(d.get("N_Ed") or 0.0),
             art=str(d.get("art") or Erfuellungsart.NORMALKRAFT_KONSTANT.value),
+            richtung=str(d.get("richtung") or BEIDE_RICHTUNGEN),
         )
 
 
@@ -464,9 +481,15 @@ class Projekt:
                     f"also kein Nachweis möglich.")
                 continue
 
-            kombinationen = [self._kombination(k) for k in eintrag.kombinationen]
             for richtung in querschnitt.richtungen_mit_bewehrung:
-                nachweis = BiegungNormalkraft(querschnitt, kombinationen, richtung)
+                passend = [k for k in eintrag.kombinationen if k.gilt_fuer(richtung)]
+                if not passend:
+                    aufbau.warnungen.append(
+                        f"Platte '{eintrag.name}': für {richtung.beschriftung} ist "
+                        f"keine Schnittgrössenkombination angegeben.")
+                    continue
+                nachweis = BiegungNormalkraft(
+                    querschnitt, [self._kombination(k) for k in passend], richtung)
                 werk.registriere(nachweis)
                 aufbau.nachweise[f"{eintrag.kennung}.{richtung.value}"] = nachweis
 
