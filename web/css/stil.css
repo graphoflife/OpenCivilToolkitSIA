@@ -253,36 +253,56 @@ input[readonly], input:disabled, select:disabled {
 .kennwert .bezeichnung small { color: var(--schrift-zart); }
 .kennwert .einheit { font-size: 11.5px; color: var(--schrift-zart); }
 
-/* Lagen */
+/* Lagen -- knapp gehalten: vier Lagen mit je zwei Posten müssen ohne Scrollen
+   nebeneinander lesbar sein. */
 .lage {
   border: 1px solid var(--rand); border-left: 4px solid var(--rand-stark);
-  border-radius: var(--radius); padding: 9px; margin-bottom: 7px; background: var(--flaeche);
+  border-radius: var(--radius); padding: 6px 8px; margin-bottom: 5px; background: var(--flaeche);
 }
 .lage-x { border-left-color: var(--blau); }
 .lage-y { border-left-color: var(--stahl); }
 .lage.ist-leer { opacity: .62; background: var(--flaeche-2); }
 .lage-kopf {
-  display: flex; align-items: center; gap: 8px; margin-bottom: 7px;
-  font-size: 12.5px; font-weight: 700; color: var(--schrift-matt);
+  display: flex; align-items: center; gap: 7px; margin-bottom: 4px;
+  font-size: 12px; font-weight: 700; color: var(--schrift-matt);
 }
 .lage-kopf .richtung {
-  font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 9px;
-  background: var(--blau-hell); color: var(--blau-tief);
+  font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 9px;
+  background: var(--blau-hell); color: var(--blau-tief); text-transform: uppercase;
 }
 .lage-y .lage-kopf .richtung { background: #fbeadf; color: var(--stahl); }
-.lage-kopf .fest { font-size: 10.5px; font-weight: 400; color: var(--schrift-zart); }
 
-.posten { margin: 5px 0 0; padding: 6px 8px; border-radius: 5px; background: var(--flaeche-2); }
-.posten > .posten-titel {
-  font-size: 11.5px; font-weight: 700; color: var(--schrift-matt);
-  text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px;
+/* Zweistellungs-Schalter x|y */
+.schalter { display: inline-flex; border: 1px solid var(--rand-stark);
+            border-radius: 9px; overflow: hidden; }
+.schalter-halb {
+  border: none; background: var(--flaeche); color: var(--schrift-zart);
+  padding: 1px 9px; font-size: 11px; font-weight: 700; cursor: pointer;
+  text-transform: uppercase;
 }
-.posten-reihe { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.schalter-halb:hover { background: var(--flaeche-2); }
+.schalter-halb.ist-an { background: var(--blau); color: #fff; }
+.lage-y .schalter-halb.ist-an { background: var(--stahl); }
+
+/* Ein Posten auf einer Zeile: Name ⌀ [d] @ [s] mm [Umschalter] */
+.postenzeile {
+  display: grid;
+  grid-template-columns: 52px 12px 64px 12px 64px 26px 1fr;
+  gap: 5px; align-items: center; margin-top: 3px;
+}
+.postenzeile.ist-leer { opacity: .55; }
+.postenzeile .postenname { font-size: 11.5px; font-weight: 600; color: var(--schrift-matt); }
+.postenzeile .zeichen { font-size: 12px; color: var(--schrift-zart); text-align: center; }
+.postenzeile .einheit { font-size: 11px; color: var(--schrift-zart); }
+.postenzeile input[type="number"] { padding: 3px 5px; text-align: right; }
+.postenzeile .umschalter { justify-self: start; font-size: 10.5px; padding: 2px 6px;
+                           border: 1px solid var(--rand); border-radius: 4px; }
 
 .ueberdeckung {
-  padding: 7px 9px; margin: 6px 0; border-radius: var(--radius);
+  padding: 4px 9px; margin: 5px 0; border-radius: var(--radius);
   background: var(--flaeche-2); border: 1px dashed var(--rand-stark);
 }
+.ueberdeckung .feld { margin-bottom: 0; }
 
 .kombination { border: 1px solid var(--rand); border-left: 4px solid var(--blau); border-radius: var(--radius); padding: 9px; margin-bottom: 7px; }
 

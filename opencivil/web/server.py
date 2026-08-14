@@ -90,7 +90,8 @@ def rechnen(rumpf: Dict[str, Any]) -> dict:
 
     ziele = list(rumpf.get("ziele") or [])
     if not ziele:
-        ziele = aufbau.alle_nachweisziele() + aufbau.eckwertziele()
+        ziele = (aufbau.alle_nachweisziele() + aufbau.eckwertziele()
+                 + aufbau.materialziele())
     if not ziele:
         # Kein Nachweis vorhanden -- dann wenigstens alle Materialkennwerte.
         loesung = aufbau.werk.loese_alles()

@@ -233,43 +233,53 @@ function sorteAendern(material, neu, vorlagen) {
 // Platte
 // ===========================================================================
 
-function postenBlock(querschnitt, nummer, welcher, beschriftung) {
-  const lage = querschnitt.lagen[nummer - 1];
-  const posten = lage[welcher];
+/**
+ * Ein Bewehrungsposten auf einer Zeile:
+ *
+ *     Grund   ⌀ [18] @ [150] mm   [Teilung|Anzahl]
+ *
+ * Der letzte Schalter legt fest, ob die mittlere Zahl eine Teilung oder eine
+ * Stabzahl ist -- das Trennzeichen wechselt mit (`@` bzw. `×`).
+ */
+function postenZeile(querschnitt, nummer, welcher, beschriftung) {
+  const posten = querschnitt.lagen[nummer - 1][welcher];
   const ueberAbstand = posten.abstand !== null && posten.abstand !== undefined;
+  const leer = !(posten.durchmesser > 0);
 
   const aendern = (veraenderer) => projektAendern((p) => {
     veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
       .lagen[nummer - 1][welcher]);
   });
 
-  return el('div.posten', {}, [
-    el('div.posten-titel', { text: beschriftung }),
-    el('div.posten-reihe', {}, [
-      feld('⌀', zahlfeld({
-        wert: posten.durchmesser, schritt: 2, min: 0,
-        titel: '0 = nicht vorhanden',
-        beiAenderung: (v) => aendern((x) => { x.durchmesser = v ?? 0; }),
-      }), 'mm'),
-      ueberAbstand
-        ? feld('Teilung s', zahlfeld({
-          wert: posten.abstand, schritt: 25, min: 1,
-          beiAenderung: (v) => aendern((x) => { x.abstand = v ?? 150; }),
-        }), 'mm')
-        : feld('Anzahl n', zahlfeld({
-          wert: posten.anzahl, schritt: 1, min: 1,
-          beiAenderung: (v) => aendern((x) => { x.anzahl = v ?? 1; }),
-        }), 'Stk'),
-    ]),
-    feld('Angabe über', auswahl({
-      werte: [{ wert: 'abstand', beschriftung: 'Teilung' },
-        { wert: 'anzahl', beschriftung: 'Stabzahl' }],
-      gewaehlt: ueberAbstand ? 'abstand' : 'anzahl',
-      beiAenderung: (v) => aendern((x) => {
-        if (v === 'abstand') { x.abstand = x.abstand || 150; x.anzahl = null; }
-        else { x.anzahl = x.anzahl || 5; x.abstand = null; }
+  return el('div.postenzeile', { class: leer ? 'ist-leer' : '' }, [
+    el('span.postenname', { text: beschriftung }),
+    el('span.zeichen', { text: '⌀' }),
+    zahlfeld({
+      wert: posten.durchmesser || null, schritt: 2, min: 0,
+      titel: 'Stabdurchmesser in mm – leer oder 0 bedeutet: keine Bewehrung',
+      beiAenderung: (v) => aendern((x) => { x.durchmesser = v ?? 0; }),
+    }),
+    el('span.zeichen', { text: ueberAbstand ? '@' : '×' }),
+    ueberAbstand
+      ? zahlfeld({
+        wert: posten.abstand, schritt: 25, min: 1, titel: 'Teilung in mm',
+        beiAenderung: (v) => aendern((x) => { x.abstand = v ?? 150; }),
+      })
+      : zahlfeld({
+        wert: posten.anzahl, schritt: 1, min: 1, titel: 'Stabzahl auf der Breite b',
+        beiAenderung: (v) => aendern((x) => { x.anzahl = v ?? 1; }),
       }),
-    })),
+    el('span.einheit', { text: ueberAbstand ? 'mm' : 'Stk' }),
+    el('button.knopf.knopf-zart.umschalter', {
+      text: ueberAbstand ? 'Teilung' : 'Anzahl',
+      title: 'Zwischen Teilung und Stabzahl wechseln',
+      on: {
+        click: () => aendern((x) => {
+          if (ueberAbstand) { x.anzahl = x.anzahl || 5; x.abstand = null; }
+          else { x.abstand = x.abstand || 150; x.anzahl = null; }
+        }),
+      },
+    }),
   ]);
 }
 
@@ -285,22 +295,11 @@ function lagenBlock(querschnitt, nummer) {
     el('div.lage-kopf', {}, [
       el('span', { text: `${nummer}. Lage` }),
       waehlbar
-        ? el('select', {
-          style: { width: 'auto', padding: '1px 6px', fontSize: '11px' },
-          title: `Die ${partner}. Lage bekommt zwingend die Gegenrichtung`,
-          on: {
-            change: (e) => projektAendern((p) => {
-              const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
-              if (nummer === 1) q.richtung_lage1 = e.target.value;
-              else q.richtung_lage4 = e.target.value;
-            }),
-          },
-        }, [
-          el('option', { value: 'x', text: 'x-Richtung', selected: richtung === 'x' }),
-          el('option', { value: 'y', text: 'y-Richtung', selected: richtung === 'y' }),
-        ])
-        : el('span.richtung', { text: `${richtung}-Richtung` }),
-      waehlbar ? null : el('span.fest', { text: `folgt aus der ${partner}. Lage` }),
+        ? richtungsSchalter(querschnitt, nummer, richtung, partner)
+        : el('span.richtung', {
+          text: richtung,
+          title: `Gegenrichtung zur ${partner}. Lage – dort einstellbar`,
+        }),
       el('span', { style: { marginLeft: 'auto' } }),
       el('select', {
         style: { width: 'auto', padding: '1px 6px', fontSize: '11px' },
@@ -315,9 +314,26 @@ function lagenBlock(querschnitt, nummer) {
         value: s.kennung, text: s.name || s.sorte, selected: lage.stahl === s.kennung,
       }))),
     ]),
-    postenBlock(querschnitt, nummer, 'grund', 'Grundbewehrung'),
-    postenBlock(querschnitt, nummer, 'zulage', 'Zulage'),
+    postenZeile(querschnitt, nummer, 'grund', 'Grund'),
+    postenZeile(querschnitt, nummer, 'zulage', 'Zulage'),
   ]);
+}
+
+/** Zweistellungs-Schalter x|y. Die Partnerlage folgt zwingend der Gegenrichtung. */
+function richtungsSchalter(querschnitt, nummer, richtung, partner) {
+  const setzen = (wert) => projektAendern((p) => {
+    const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
+    if (nummer === 1) q.richtung_lage1 = wert;
+    else q.richtung_lage4 = wert;
+  });
+
+  return el('span.schalter', {
+    title: `Tragrichtung der ${nummer}. Lage – die ${partner}. bekommt die Gegenrichtung`,
+  }, ['x', 'y'].map((wert) => el('button.schalter-halb', {
+    text: wert,
+    class: richtung === wert ? 'ist-an' : '',
+    on: { click: () => { if (richtung !== wert) setzen(wert); } },
+  })));
 }
 
 function richtungVon(querschnitt, nummer) {

@@ -373,10 +373,14 @@ class TestNachweisrichtung(unittest.TestCase):
         self.assertEqual([k.richtung for k in kopie.querschnitte[0].kombinationen],
                          ["y", "x", "beide"])
 
-    def test_richtung_ohne_kombination_gibt_eine_warnung(self):
+    def test_richtung_ohne_kombination_bleibt_stumm(self):
+        """
+        Keine Kombination für eine Richtung ist eine Entscheidung des Benutzers,
+        kein Mangel -- dafür gibt es keine Warnung.
+        """
         aufbau = self.projekt_mit("x", "x", "x").aufbauen()
         self.assertEqual(sorted(aufbau.nachweise), ["q1.x"])
-        self.assertTrue(any("y-Richtung" in w for w in aufbau.warnungen))
+        self.assertEqual(aufbau.warnungen, [])
 
     def _loesen(self, projekt: Projekt):
         aufbau = projekt.aufbauen()
@@ -421,3 +425,31 @@ class TestJsonTauglich(unittest.TestCase):
                     k.art, k.N_Ed, k.M_Ed = art, 0.0, 0.0
                 antwort = server.rechnen({"projekt": projekt.als_dict()})
                 json.dumps(api.endlich(antwort), allow_nan=False)
+
+
+class TestUnbenutztesMaterial(unittest.TestCase):
+    """
+    Ein Material, das noch keine Platte verwendet, muss trotzdem gerechnet
+    werden -- sonst stünden im Editor leere Felder, obwohl die Sorte alles
+    hergibt.
+    """
+
+    def test_unbenutzter_beton_wird_gerechnet(self):
+        projekt = Projekt.beispiel()
+        projekt.materialien.append(MaterialEintrag("b2", "beton", "C12/15", "C12/15"))
+        antwort = server.rechnen({"projekt": projekt.als_dict()})
+        eigene = [k for k in antwort["werte"] if k.startswith("beton.b2.")]
+        self.assertGreaterEqual(len(eigene), 12)
+        self.assertIn("beton.b2.f_cd", antwort["werte"])
+
+    def test_unbenutzter_stahl_wird_gerechnet(self):
+        projekt = Projekt.beispiel()
+        projekt.materialien.append(MaterialEintrag("s2", "betonstahl", "B700B", "B700B"))
+        antwort = server.rechnen({"projekt": projekt.als_dict()})
+        self.assertIn("betonstahl.s2.f_yd", antwort["werte"])
+
+    def test_materialziele_umfassen_alle_kennwerte(self):
+        aufbau = Projekt.beispiel().aufbauen()
+        ziele = aufbau.materialziele()
+        self.assertIn("beton.b1.f_cd", ziele)
+        self.assertIn("betonstahl.s1.f_yd", ziele)

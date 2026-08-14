@@ -357,6 +357,17 @@ class Aufbau:
     def eckwertziele(self) -> List[str]:
         return [d.id for n in self.nachweise.values() for d in n.d_eckwerte.values()]
 
+    def materialziele(self) -> List[str]:
+        """
+        Saemtliche Kennwerte aller Materialien.
+
+        Gehoert zum Regellauf: ein Material, das noch keine Platte verwendet,
+        waere sonst nie Ziel und bliebe ungerechnet -- im Editor staenden dann
+        leere Felder, obwohl die Sorte alles hergibt.
+        """
+        return [d.id for stoff in self.baustoffe.values()
+                for d in stoff.definitionen.values()]
+
 
 # ===========================================================================
 # Projekt
@@ -484,9 +495,8 @@ class Projekt:
             for richtung in querschnitt.richtungen_mit_bewehrung:
                 passend = [k for k in eintrag.kombinationen if k.gilt_fuer(richtung)]
                 if not passend:
-                    aufbau.warnungen.append(
-                        f"Platte '{eintrag.name}': für {richtung.beschriftung} ist "
-                        f"keine Schnittgrössenkombination angegeben.")
+                    # Keine Kombination fuer diese Richtung ist eine Entscheidung
+                    # des Benutzers, kein Mangel -- also auch keine Warnung.
                     continue
                 nachweis = BiegungNormalkraft(
                     querschnitt, [self._kombination(k) for k in passend], richtung)
