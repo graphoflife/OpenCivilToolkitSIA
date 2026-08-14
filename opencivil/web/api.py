@@ -196,7 +196,15 @@ def loesung_dict(
                 "erfuellt": u.erfuellt,
                 "ausnutzung": u.ausnutzung.formatiert(3),
                 "ausnutzung_zahl": u.ausnutzung.si,
+                # Angezeigt wird der Erfuellungsgrad: um welchen Faktor die
+                # Einwirkung noch wachsen duerfte. >= 1 heisst erfuellt.
+                "erfuellungsgrad": (
+                    u.erfuellungsgrad.formatiert(2) if u.erfuellungsgrad else "\u221e"),
+                "erfuellungsgrad_zahl": (
+                    u.erfuellungsgrad.si if u.erfuellungsgrad else None),
                 "begruendung": u.begruendung,
+                "einwirkung": wert_dict(u.einwirkung) if u.einwirkung else None,
+                "widerstand": wert_dict(u.widerstand) if u.widerstand else None,
             }
             for u in loesung.urteile
         ],
@@ -224,6 +232,8 @@ def loesung_dict(
 def _linie_dict(nachweis) -> dict:
     """Die M-N-Interaktionslinie zum Zeichnen -- in kN und kNm."""
     return {
+        "richtung": nachweis.richtung.value,
+        "querschnitt": nachweis.querschnitt.name,
         "punkte": [
             {"N": p.N / 1e3, "M": p.M / 1e3, "abschnitt": p.abschnitt}
             for p in nachweis.linie
@@ -237,6 +247,8 @@ def _linie_dict(nachweis) -> dict:
                 "art_text": a.schnittgroessen.art.beschriftung,
                 "innerhalb": a.innerhalb,
                 "ausnutzung": a.ausnutzung,
+                "erfuellungsgrad": a.erfuellungsgrad,
+                "groesse": a.groesse,
                 "widerstand": (
                     {"N": a.widerstand[0] / 1e3, "M": a.widerstand[1] / 1e3}
                     if a.widerstand
@@ -272,22 +284,26 @@ def zuordnung(aufbau: Aufbau) -> dict:
                     kurzname: definition.id
                     for kurzname, definition in qs.definitionen.items()
                 },
-                "nachweisziele": (
-                    {
-                        name: d.id
-                        for name, d in aufbau.nachweise[kennung].d_ausnutzung.items()
+                "nachweise": {
+                    schluessel.split(".", 1)[1]: {
+                        "ziele": {n: d.id for n, d in nw.d_ausnutzung.items()},
+                        "eckwerte": {n: d.id for n, d in nw.d_eckwerte.items()},
                     }
-                    if kennung in aufbau.nachweise
-                    else {}
-                ),
-                "eckwerte": (
+                    for schluessel, nw in aufbau.nachweise.items()
+                    if schluessel.split(".", 1)[0] == kennung
+                },
+                "bewehrung": [
                     {
-                        name: d.id
-                        for name, d in aufbau.nachweise[kennung].d_eckwerte.items()
+                        "lage": lage.nummer,
+                        "art": art.value,
+                        "richtung": lage.richtung.value,
+                        "stahl": lage.stahl.name if lage.stahl else "",
+                        "menge": posten.menge_text(),
+                        "a_s_id": as_id,
+                        "z_id": z_id,
                     }
-                    if kennung in aufbau.nachweise
-                    else {}
-                ),
+                    for lage, art, posten, as_id, z_id in qs.posten_ids
+                ],
             }
             for kennung, qs in aufbau.querschnitte.items()
         },

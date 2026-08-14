@@ -18,39 +18,57 @@ from opencivil.material.betonstahl import betonstahl
 from opencivil.nachweis.biegung_normalkraft import (
     BiegungNormalkraft, Erfuellungsart, Schnittgroessen, _schnitte_bei_N,
 )
-from opencivil.querschnitt.platte import Bewehrungslage, Plattenquerschnitt, Seite
+from opencivil.querschnitt.platte import (
+    Bewehrungslage, Bewehrungsposten, Plattenquerschnitt, Postenart, Richtung,
+)
 from opencivil.querschnitt.werkstoffgesetz import Betongesetz, Dehnungsebene, Stahlgesetz
 
 
-def einfache_platte(**abweichungen) -> Plattenquerschnitt:
-    """h = 300 mm, b = 1 m, C30/37, unten ⌀18@150 aus B500B."""
+def posten(phi: float, s: float = 150.0) -> Bewehrungsposten:
+    return Bewehrungsposten(durchmesser=Groesse(phi, MM), abstand=Groesse(s, MM))
+
+
+def leer() -> Bewehrungsposten:
+    return Bewehrungsposten()
+
+
+def lage(nummer: int, richtung: Richtung, phi: float = 0.0, zulage: float = 0.0,
+         s: float = 150.0) -> Bewehrungslage:
+    return Bewehrungslage(
+        nummer=nummer, richtung=richtung, stahl=betonstahl("B500B"),
+        grund=posten(phi, s) if phi else leer(),
+        zulage=posten(zulage, s) if zulage else leer(),
+    )
+
+
+def platte(lagen, **abweichungen) -> Plattenquerschnitt:
+    """h = 300 mm, b = 1 m, C30/37."""
     vorgaben = dict(
-        name="Decke",
-        h=Groesse(300, MM),
-        b=Groesse(1000, MM),
-        beton=beton("C30/37"),
-        lagen_unten=[
-            Bewehrungslage(Groesse(18, MM), betonstahl("B500B"), abstand=Groesse(150, MM))
-        ],
-        ueberdeckung_unten=Groesse(30, MM),
-        ueberdeckung_oben=Groesse(30, MM),
+        name="Decke", h=Groesse(300, MM), b=Groesse(1000, MM), beton=beton("C30/37"),
+        lagen=lagen, ueberdeckung_unten=Groesse(30, MM), ueberdeckung_oben=Groesse(30, MM),
     )
     vorgaben.update(abweichungen)
     return Plattenquerschnitt(**vorgaben)
 
 
+def einfache_platte() -> Plattenquerschnitt:
+    """Nur die 1. Lage bewehrt: ⌀18@150 in x-Richtung."""
+    return platte([
+        lage(1, Richtung.X, phi=18.0),
+        lage(2, Richtung.Y),
+        lage(3, Richtung.Y),
+        lage(4, Richtung.X),
+    ])
+
+
 def symmetrische_platte() -> Plattenquerschnitt:
-    stahl = betonstahl("B500B")
-    return Plattenquerschnitt(
-        name="Symmetrisch",
-        h=Groesse(300, MM),
-        b=Groesse(1000, MM),
-        beton=beton("C30/37"),
-        lagen_unten=[Bewehrungslage(Groesse(16, MM), stahl, abstand=Groesse(150, MM))],
-        lagen_oben=[Bewehrungslage(Groesse(16, MM), stahl, abstand=Groesse(150, MM))],
-        ueberdeckung_unten=Groesse(30, MM),
-        ueberdeckung_oben=Groesse(30, MM),
-    )
+    """1. und 4. Lage gleich, beide x -- ergibt eine punktsymmetrische Linie."""
+    return platte([
+        lage(1, Richtung.X, phi=16.0),
+        lage(2, Richtung.Y),
+        lage(3, Richtung.Y),
+        lage(4, Richtung.X, phi=16.0),
+    ])
 
 
 # ---------------------------------------------------------------------------
@@ -106,13 +124,13 @@ class TestQuerschnitt(unittest.TestCase):
         self.platte.ins_rechenwerk(self.werk)
 
     def test_bewehrungsflaeche(self):
-        wid = self.platte.id_von("lage.u1.a_s")
+        wid = self.platte.id_von("lage.1g.a_s")
         a_s = self.werk.loese(wid).groesse(wid)
         erwartet = math.pi * 18**2 / 4 * (1000 / 150)
         self.assertAlmostEqual(a_s.in_einheit(MM2), erwartet, places=3)
 
     def test_statische_hoehe(self):
-        wid = self.platte.id_von("lage.u1.z")
+        wid = self.platte.id_von("lage.1g.z")
         z = self.werk.loese(wid).groesse(wid)
         # z ab Oberkante: h - (c + phi/2) = 300 - (30 + 9)
         self.assertAlmostEqual(z.in_einheit(MM), 261.0)
@@ -121,50 +139,121 @@ class TestQuerschnitt(unittest.TestCase):
         platte = symmetrische_platte()
         werk = Rechenwerk()
         platte.ins_rechenwerk(werk)
-        loesung = werk.loese(platte.id_von("lage.o1.z"), platte.id_von("lage.u1.z"))
-        self.assertAlmostEqual(loesung.groesse(platte.id_von("lage.o1.z")).in_einheit(MM), 38.0)
-        self.assertAlmostEqual(loesung.groesse(platte.id_von("lage.u1.z")).in_einheit(MM), 262.0)
+        loesung = werk.loese(platte.id_von("lage.4g.z"), platte.id_von("lage.1g.z"))
+        self.assertAlmostEqual(loesung.groesse(platte.id_von("lage.4g.z")).in_einheit(MM), 38.0)
+        self.assertAlmostEqual(loesung.groesse(platte.id_von("lage.1g.z")).in_einheit(MM), 262.0)
 
     def test_lagenstapelung(self):
-        """Zwei Lagen unten: die zweite liegt um phi_1 weiter innen."""
-        stahl = betonstahl("B500B")
-        platte = einfache_platte(lagen_unten=[
-            Bewehrungslage(Groesse(20, MM), stahl, abstand=Groesse(150, MM)),
-            Bewehrungslage(Groesse(16, MM), stahl, abstand=Groesse(150, MM)),
+        """Die 2. Lage liegt um den grössten Durchmesser der 1. weiter innen."""
+        qs = platte([
+            lage(1, Richtung.X, phi=20.0),
+            lage(2, Richtung.Y, phi=16.0),
+            lage(3, Richtung.X),
+            lage(4, Richtung.Y),
         ])
         werk = Rechenwerk()
-        platte.ins_rechenwerk(werk)
-        loesung = werk.loese(platte.id_von("lage.u1.z"), platte.id_von("lage.u2.z"))
-        self.assertAlmostEqual(loesung.groesse(platte.id_von("lage.u1.z")).in_einheit(MM), 260.0)
-        # Randabstand 2. Lage = 30 + 20 + 8 = 58 -> z = 242
-        self.assertAlmostEqual(loesung.groesse(platte.id_von("lage.u2.z")).in_einheit(MM), 242.0)
+        qs.ins_rechenwerk(werk)
+        loesung = werk.loese(qs.id_von("lage.1g.z"), qs.id_von("lage.2g.z"))
+        # 1. Lage: 30 + 20/2 = 40 -> z = 260
+        self.assertAlmostEqual(loesung.groesse(qs.id_von("lage.1g.z")).in_einheit(MM), 260.0)
+        # 2. Lage: 30 + 20 + 16/2 = 58 -> z = 242
+        self.assertAlmostEqual(loesung.groesse(qs.id_von("lage.2g.z")).in_einheit(MM), 242.0)
+
+    def test_zulage_liegt_auf_derselben_huelle(self):
+        """
+        Grundbewehrung und Zulage einer Lage berühren dieselbe Hüllebene und
+        sind je um ihren eigenen Halbmesser eingerückt.
+        """
+        qs = platte([
+            lage(1, Richtung.X, phi=20.0, zulage=12.0),
+            lage(2, Richtung.Y), lage(3, Richtung.X), lage(4, Richtung.Y),
+        ])
+        werk = Rechenwerk()
+        qs.ins_rechenwerk(werk)
+        loesung = werk.loese(qs.id_von("lage.1g.z"), qs.id_von("lage.1z.z"))
+        self.assertAlmostEqual(
+            loesung.groesse(qs.id_von("lage.1g.z")).in_einheit(MM), 300 - (30 + 10))
+        self.assertAlmostEqual(
+            loesung.groesse(qs.id_von("lage.1z.z")).in_einheit(MM), 300 - (30 + 6))
+
+    def test_zulage_zaehlt_zur_flaeche(self):
+        qs = platte([
+            lage(1, Richtung.X, phi=18.0, zulage=12.0),
+            lage(2, Richtung.Y), lage(3, Richtung.X), lage(4, Richtung.Y),
+        ])
+        werk = Rechenwerk()
+        qs.ins_rechenwerk(werk)
+        loesung = werk.loese(qs.id_von("lage.1g.a_s"), qs.id_von("lage.1z.a_s"))
+        self.assertAlmostEqual(
+            loesung.groesse(qs.id_von("lage.1z.a_s")).in_einheit(MM2),
+            math.pi * 12**2 / 4 * (1000 / 150), places=3)
 
     def test_stabzahl_statt_abstand(self):
-        platte = einfache_platte(lagen_unten=[
-            Bewehrungslage(Groesse(18, MM), betonstahl("B500B"), anzahl=7)
+        qs = platte([
+            Bewehrungslage(1, Richtung.X, betonstahl("B500B"),
+                           grund=Bewehrungsposten(Groesse(18, MM), anzahl=7)),
+            lage(2, Richtung.Y), lage(3, Richtung.X), lage(4, Richtung.Y),
         ])
         werk = Rechenwerk()
-        platte.ins_rechenwerk(werk)
-        wid = platte.id_von("lage.u1.a_s")
+        qs.ins_rechenwerk(werk)
+        wid = qs.id_von("lage.1g.a_s")
         self.assertAlmostEqual(
-            werk.loese(wid).groesse(wid).in_einheit(MM2), math.pi * 18**2 / 4 * 7, places=3
-        )
-
-    def test_abstand_und_anzahl_zugleich_verboten(self):
-        with self.assertRaises(ValueError):
-            Bewehrungslage(
-                Groesse(18, MM), betonstahl("B500B"),
-                abstand=Groesse(150, MM), anzahl=7,
-            )
+            werk.loese(wid).groesse(wid).in_einheit(MM2), math.pi * 18**2 / 4 * 7, places=3)
 
     def test_ohne_bewehrung_verboten(self):
         with self.assertRaises(ValueError):
-            einfache_platte(lagen_unten=[])
+            platte([lage(n, Richtung.X if n in (1, 4) else Richtung.Y) for n in range(1, 5)])
+
+    def test_gekoppelte_richtungen_erzwungen(self):
+        """Die 1. und die 2. Lage müssen entgegengesetzte Richtungen haben."""
+        with self.assertRaises(ValueError) as ctx:
+            platte([
+                lage(1, Richtung.X, phi=16.0),
+                lage(2, Richtung.X, phi=16.0),   # falsch: gleiche Richtung
+                lage(3, Richtung.Y), lage(4, Richtung.X),
+            ])
+        self.assertIn("entgegengesetzte", str(ctx.exception))
+
+    def test_falsche_lagenzahl_verboten(self):
+        with self.assertRaises(ValueError):
+            platte([lage(1, Richtung.X, phi=16.0), lage(2, Richtung.Y)])
+
+    def test_richtungen_trennen_die_bewehrung(self):
+        qs = platte([
+            lage(1, Richtung.X, phi=18.0),
+            lage(2, Richtung.Y, phi=12.0),
+            lage(3, Richtung.Y), lage(4, Richtung.X),
+        ])
+        self.assertEqual(len(qs.posten_in_richtung(Richtung.X)), 1)
+        self.assertEqual(len(qs.posten_in_richtung(Richtung.Y)), 1)
+        self.assertEqual(qs.richtungen_mit_bewehrung, [Richtung.X, Richtung.Y])
+
+    def test_querbewehrung_traegt_nicht_zum_moment_bei(self):
+        """
+        Eine Lage in y-Richtung darf den Widerstand um x nicht erhöhen -- sonst
+        wäre die Bemessung auf der unsicheren Seite.
+        """
+        def m_rd(qs) -> float:
+            werk = Rechenwerk()
+            qs.ins_rechenwerk(werk)
+            nachweis = BiegungNormalkraft(
+                qs, [Schnittgroessen("F", M_Ed=Groesse(1, KNM))], Richtung.X)
+            werk.registriere(nachweis)
+            werk.loese(nachweis.d_eckwerte["M_Rd_max"].id)
+            return max(_schnitte_bei_N(nachweis.linie, 0.0))
+
+        ohne = m_rd(platte([
+            lage(1, Richtung.X, phi=18.0), lage(2, Richtung.Y),
+            lage(3, Richtung.Y), lage(4, Richtung.X)]))
+        mit_quer = m_rd(platte([
+            lage(1, Richtung.X, phi=18.0), lage(2, Richtung.Y, phi=20.0),
+            lage(3, Richtung.Y), lage(4, Richtung.X)]))
+        self.assertAlmostEqual(ohne, mit_quer, places=6)
 
     def test_lagenaufbau_wird_protokolliert(self):
         from opencivil.core.protokoll import TabellenBlock
 
-        loesung = self.werk.loese(self.platte.id_von("lage.u1.z"))
+        loesung = self.werk.loese(self.platte.id_von("lage.1g.z"))
         tabellen = [
             b for b in loesung.protokoll.alle_bloecke() if isinstance(b, TabellenBlock)
         ]
@@ -182,6 +271,7 @@ class TestResistenzlinie(unittest.TestCase):
         self.nachweis = BiegungNormalkraft(
             self.platte,
             [Schnittgroessen("Feld", M_Ed=Groesse(100, KNM))],
+            Richtung.X,
         )
         self.werk.registriere(self.nachweis)
         self.loesung = self.werk.loese(
@@ -319,7 +409,7 @@ class TestSymmetrisch(unittest.TestCase):
         self.werk = Rechenwerk()
         self.platte.ins_rechenwerk(self.werk)
         self.nachweis = BiegungNormalkraft(
-            self.platte, [Schnittgroessen("Feld", M_Ed=Groesse(50, KNM))]
+            self.platte, [Schnittgroessen("Feld", M_Ed=Groesse(50, KNM))], Richtung.X
         )
         self.werk.registriere(self.nachweis)
         self.loesung = self.werk.loese(self.nachweis.d_eckwerte["M_Rd_max"].id)
@@ -336,7 +426,7 @@ class TestErfuellungsgrad(unittest.TestCase):
         platte = einfache_platte()
         werk = Rechenwerk()
         platte.ins_rechenwerk(werk)
-        nachweis = BiegungNormalkraft(platte, kombinationen)
+        nachweis = BiegungNormalkraft(platte, kombinationen, Richtung.X)
         werk.registriere(nachweis)
         loesung = werk.loese(*[d.id for d in nachweis.d_ausnutzung.values()])
         return nachweis, loesung
@@ -407,7 +497,7 @@ class TestErfuellungsgrad(unittest.TestCase):
     def test_ohne_kombination_verboten(self):
         platte = einfache_platte()
         with self.assertRaises(ValueError):
-            BiegungNormalkraft(platte, [])
+            BiegungNormalkraft(platte, [], Richtung.X)
 
 
 class TestRueckverfolgungNachweis(unittest.TestCase):
@@ -416,7 +506,7 @@ class TestRueckverfolgungNachweis(unittest.TestCase):
         werk = Rechenwerk()
         platte.ins_rechenwerk(werk)
         nachweis = BiegungNormalkraft(
-            platte, [Schnittgroessen("Feld", M_Ed=Groesse(100, KNM))]
+            platte, [Schnittgroessen("Feld", M_Ed=Groesse(100, KNM))], Richtung.X
         )
         werk.registriere(nachweis)
         ziel = nachweis.d_ausnutzung["Feld"].id
@@ -427,8 +517,8 @@ class TestRueckverfolgungNachweis(unittest.TestCase):
             platte.beton.id_von("f_cd"),
             platte.beton.id_von("f_ck"),
             platte.beton.id_von("k_sigma"),
-            platte.id_von("lage.u1.a_s"),
-            platte.id_von("lage.u1.z"),
+            platte.id_von("lage.1g.a_s"),
+            platte.id_von("lage.1g.z"),
             platte.id_von("h"),
         ):
             self.assertIn(erwartet, benoetigt)
@@ -439,7 +529,7 @@ class TestRueckverfolgungNachweis(unittest.TestCase):
         werk = Rechenwerk()
         platte.ins_rechenwerk(werk)
         nachweis = BiegungNormalkraft(
-            platte, [Schnittgroessen("Feld", M_Ed=Groesse(100, KNM))]
+            platte, [Schnittgroessen("Feld", M_Ed=Groesse(100, KNM))], Richtung.X
         )
         werk.registriere(nachweis)
         # k_sigma braucht E_cd; dessen Kette wird gekappt.

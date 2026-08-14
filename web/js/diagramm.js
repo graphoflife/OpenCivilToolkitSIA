@@ -34,6 +34,113 @@ function schrittweite(spanne, zielAnzahl = 8) {
   return gewaehlt * groesse;
 }
 
+/**
+ * Zeichnet den Plattenquerschnitt mit seinen vier Bewehrungslagen.
+ *
+ * Gezeigt wird ein Schnitt senkrecht zur x-Achse: Stäbe in x-Richtung sind
+ * angeschnitten (Kreise), Stäbe in y-Richtung laufen in der Schnittebene
+ * (Balken). Sämtliche Höhenlagen stammen aus der Lösung -- hier wird nichts
+ * nachgerechnet.
+ */
+export function querschnittZeichnen(eintrag, werte) {
+  const zahl = (id) => (werte[id] ? werte[id].zahl : null);
+  const h = zahl(eintrag.werte.h);
+  const b = zahl(eintrag.werte.b);
+  if (!h || !b) return el('div.leer', { text: 'Geometrie noch nicht gerechnet.' });
+
+  const BREITE = 640;
+  const RAND = { oben: 26, unten: 40, links: 62, rechts: 130 };
+  const zeichenBreite = BREITE - RAND.links - RAND.rechts;
+  // Massstab so, dass die Platte gut sichtbar bleibt, ohne die Höhe zu verzerren.
+  const massstab = zeichenBreite / b;
+  const zeichenHoehe = h * massstab;
+  const HOEHE = zeichenHoehe + RAND.oben + RAND.unten;
+
+  const x = (mm) => RAND.links + mm * massstab;
+  const y = (mm) => RAND.oben + mm * massstab;
+
+  const svg = svgEl('svg', {
+    class: 'qs', viewBox: `0 0 ${BREITE} ${HOEHE}`, xmlns: NR,
+    role: 'img', 'aria-label': 'Plattenquerschnitt',
+  });
+
+  svg.append(svgEl('rect', {
+    x: x(0), y: y(0), width: b * massstab, height: zeichenHoehe,
+    fill: '#eceff4', stroke: '#7b8794', 'stroke-width': 1.6,
+  }));
+
+  const farbe = { x: '#1f6feb', y: '#b8622a' };
+  for (const bew of eintrag.bewehrung) {
+    const z = zahl(bew.z_id);
+    const phi = zahl(eintrag.werte[`lage.${bew.lage}${bew.art === 'grund' ? 'g' : 'z'}.phi`]);
+    if (z === null) continue;
+    const r = Math.max((phi || 12) * massstab / 2, 2.2);
+    const anzahl = 9;
+    for (let i = 0; i < anzahl; i++) {
+      const px = x(b * (i + 0.5) / anzahl);
+      if (bew.richtung === 'x') {
+        svg.append(svgEl('circle', {
+          cx: px, cy: y(z), r,
+          fill: farbe.x, opacity: bew.art === 'zulage' ? 0.55 : 1,
+        }));
+      } else {
+        svg.append(svgEl('rect', {
+          x: px - r * 1.6, y: y(z) - r, width: r * 3.2, height: r * 2, rx: r,
+          fill: farbe.y, opacity: bew.art === 'zulage' ? 0.55 : 1,
+        }));
+      }
+    }
+    const beschriftung = svgEl('text', {
+      x: BREITE - RAND.rechts + 10, y: y(z) + 4,
+      'font-size': 10.5, fill: farbe[bew.richtung],
+    });
+    beschriftung.textContent =
+      `${bew.lage}. ${bew.art === 'grund' ? 'Grund' : 'Zulage'} ${bew.menge} (${bew.richtung})`;
+    svg.append(beschriftung);
+  }
+
+  // Höhenmass links
+  svg.append(svgEl('line', {
+    x1: RAND.links - 16, y1: y(0), x2: RAND.links - 16, y2: y(h),
+    stroke: '#56657a', 'stroke-width': 1,
+  }));
+  for (const [wert, text] of [[0, 'OK'], [h, 'UK']]) {
+    svg.append(svgEl('line', {
+      x1: RAND.links - 21, y1: y(wert), x2: RAND.links - 11, y2: y(wert),
+      stroke: '#56657a', 'stroke-width': 1,
+    }));
+    const m = svgEl('text', {
+      x: RAND.links - 25, y: y(wert) + 4, 'text-anchor': 'end',
+      'font-size': 10.5, fill: '#56657a',
+    });
+    m.textContent = text;
+    svg.append(m);
+  }
+  const masstext = svgEl('text', {
+    x: 14, y: RAND.oben + zeichenHoehe / 2, 'font-size': 11, fill: '#16202c',
+    'font-weight': 600, 'text-anchor': 'middle',
+    transform: `rotate(-90 14 ${RAND.oben + zeichenHoehe / 2})`,
+  });
+  masstext.textContent = `h = ${h.toFixed(0)} mm`;
+  svg.append(masstext);
+
+  const breitentext = svgEl('text', {
+    x: RAND.links + (b * massstab) / 2, y: HOEHE - 12,
+    'text-anchor': 'middle', 'font-size': 11, fill: '#16202c', 'font-weight': 600,
+  });
+  breitentext.textContent = `b = ${b.toFixed(0)} mm`;
+  svg.append(breitentext);
+
+  return el('div.diagramm-huelle', {}, [
+    svg,
+    el('div.mn-legende', {}, [
+      el('span', {}, [el('i', { style: { background: farbe.x } }), 'x-Richtung (angeschnitten)']),
+      el('span', {}, [el('i', { style: { background: farbe.y, borderRadius: '2px' } }), 'y-Richtung (in der Schnittebene)']),
+      el('span', { text: 'blasser = Zulage' }),
+    ]),
+  ]);
+}
+
 export function diagrammZeichnen(linie) {
   const punkte = linie.punkte;
   if (!punkte?.length) return el('div.leer', { text: 'Keine Resistenzlinie vorhanden.' });

@@ -1,44 +1,97 @@
 /**
  * baum.js -- Linke Tafel: die Bestandteile des Projekts.
  *
- * Materialien und Querschnitte anlegen, auswählen und löschen. Beim Löschen
- * eines Materials wird geprüft, ob ein Querschnitt es noch braucht -- sonst
- * wäre die Projektbeschreibung anschliessend widersprüchlich, und der
- * Rechenkern müsste einen Fehler melden, den die Oberfläche hätte verhindern
- * können.
+ * Gliederung::
+ *
+ *     Materialien
+ *         Beton
+ *         Betonstahl
+ *     Stahlbeton-Platten
+ *
+ * Jedes Kapitel lässt sich zuklappen; die Werkzeuge sitzen rechts in der
+ * Kapitelleiste. Beim Löschen eines Materials wird geprüft, ob eine Platte es
+ * noch braucht -- sonst wäre die Beschreibung anschliessend widersprüchlich,
+ * und der Rechenkern müsste einen Fehler melden, den die Oberfläche hätte
+ * verhindern können.
  */
 
-import { el, ersetzen, leerzustand, melden } from './dom.js';
-import {
-  aendern, freieKennung, projektAendern, zustand,
-} from './zustand.js';
+import { el, ersetzen, melden } from './dom.js';
+import { aendern, freieKennung, projektAendern, umschalten, zustand } from './zustand.js';
 
-function eintrag({ kennung, name, art, punktklasse, aktiv, beiWahl, beiLoeschen }) {
+const SINNBILD = {
+  materialien: '▣',   // ▣
+  beton: '■',         // ■
+  betonstahl: '≡',    // ≡
+  platten: '▬',       // ▬
+};
+
+// ===========================================================================
+// Bausteine
+// ===========================================================================
+
+function kapitel({ schluessel, titel, klasse, anzahl, werkzeuge, kinder, oben }) {
+  const zu = !zustand.offen.has(schluessel);
+  return el('div.baum-gruppe', {}, [
+    el('div.baum-kopf', {
+      class: `${klasse || ''} ${zu ? 'ist-zu' : ''} ${oben ? 'baum-kopf-oben' : ''}`,
+      on: { click: () => umschalten(schluessel) },
+    }, [
+      el('span.pfeil', { text: '▼' }),
+      el('span.titel', { text: titel }),
+      anzahl !== undefined ? el('span.zaehler', { text: String(anzahl) }) : null,
+      el('span.sinnbild', { text: SINNBILD[schluessel] || '' }),
+      werkzeuge ? el('span.werkzeuge', {
+        on: { click: (e) => e.stopPropagation() },
+      }, [].concat(werkzeuge)) : null,
+    ]),
+    zu ? null : el('div.baum-koerper', {}, kinder),
+  ]);
+}
+
+function eintrag(m, art) {
+  const aktiv = zustand.auswahl?.art === art && zustand.auswahl.kennung === m.kennung;
+  const istMaterial = art === 'material';
   return el('div.baum-eintrag', {
-    class: aktiv ? 'ist-aktiv' : '',
-    on: { click: beiWahl },
+    class: `${aktiv ? 'ist-aktiv' : ''} baum-eintrag-${
+      istMaterial ? (m.art === 'beton' ? 'beton' : 'stahl') : 'platte'}`,
+    on: { click: () => aendern({ auswahl: { art, kennung: m.kennung } }, 'auswahl') },
   }, [
-    el(`span.punkt.${punktklasse}`),
-    el('span.name', { text: name || kennung, title: name || kennung }),
-    el('span.art', { text: art }),
+    el('span.name', {
+      text: istMaterial ? (m.name || m.sorte) : m.name,
+      title: istMaterial ? (m.name || m.sorte) : m.name,
+    }),
+    istMaterial && m.eigenstaendig ? el('span.eigen', { text: 'eigen' }) : null,
+    istMaterial && !m.eigenstaendig
+      ? el('span.schloss', { text: '\u{1F512}', title: 'Normsorte – Kennwerte gesperrt' })
+      : null,
+    el('span.art', { text: istMaterial ? m.sorte : `${m.h}×${m.b} mm` }),
     el('button.knopf.knopf-zart.knopf-gefahr', {
-      text: '×',
-      title: 'Entfernen',
+      text: '×', title: 'Entfernen',
       on: {
-        click: (e) => { e.stopPropagation(); beiLoeschen(); },
+        click: (e) => {
+          e.stopPropagation();
+          istMaterial ? materialLoeschen(m) : platteLoeschen(m);
+        },
       },
     }),
   ]);
 }
 
+function leerzeile(text) {
+  return el('div', {
+    text, style: { padding: '5px 10px', color: 'var(--schrift-zart)', fontSize: '12.5px' },
+  });
+}
+
+// ===========================================================================
+// Aktionen
+// ===========================================================================
+
 function materialLoeschen(material) {
   const benutztVon = zustand.projekt.querschnitte.filter((q) =>
-    q.beton === material.kennung
-    || [...q.lagen_unten, ...q.lagen_oben].some((l) => l.stahl === material.kennung));
-
+    q.beton === material.kennung || q.lagen.some((l) => l.stahl === material.kennung));
   if (benutztVon.length) {
-    melden(
-      `"${material.name || material.kennung}" wird noch verwendet von: `
+    melden(`„${material.name || material.sorte}" wird noch verwendet von: `
       + benutztVon.map((q) => q.name).join(', '), true);
     return;
   }
@@ -48,27 +101,34 @@ function materialLoeschen(material) {
   if (zustand.auswahl?.kennung === material.kennung) aendern({ auswahl: null }, 'auswahl');
 }
 
-function querschnittLoeschen(querschnitt) {
+function platteLoeschen(platte) {
   projektAendern((p) => {
-    p.querschnitte = p.querschnitte.filter((q) => q.kennung !== querschnitt.kennung);
+    p.querschnitte = p.querschnitte.filter((q) => q.kennung !== platte.kennung);
   });
-  if (zustand.auswahl?.kennung === querschnitt.kennung) aendern({ auswahl: null }, 'auswahl');
+  if (zustand.auswahl?.kennung === platte.kennung) aendern({ auswahl: null }, 'auswahl');
 }
 
 function materialAnlegen(art) {
   const kennung = freieKennung(art === 'beton' ? 'b' : 's');
-  const sorte = art === 'beton'
-    ? (zustand.katalog?.betonsorten?.[4]?.sorte || 'C30/37')
-    : (zustand.katalog?.stahlsorten?.[1]?.sorte || 'B500B');
+  const liste = art === 'beton' ? zustand.katalog?.betonsorten : zustand.katalog?.stahlsorten;
+  const vergeben = new Set(zustand.projekt.materialien.map((m) => m.name || m.sorte));
+  // Eine Normsorte darf es nur einmal geben -- der Name ist ihre Kennzeichnung.
+  const frei = (liste || []).find((s) => !vergeben.has(s.sorte));
+  if (!frei) {
+    melden('Alle Normsorten dieser Art sind bereits angelegt. Zum Abwandeln ein '
+      + 'bestehendes Material öffnen und „Material modifizieren" wählen.', true);
+    return;
+  }
   projektAendern((p) => {
     p.materialien.push({
-      kennung, art, sorte, name: sorte, abweichungen: {}, ueberschreibungen: {},
+      kennung, art, sorte: frei.sorte, name: frei.sorte,
+      eigenstaendig: false, abweichungen: {}, ueberschreibungen: {},
     });
   });
   aendern({ auswahl: { art: 'material', kennung } }, 'auswahl');
 }
 
-function querschnittAnlegen() {
+function platteAnlegen() {
   const beton = zustand.projekt.materialien.find((m) => m.art === 'beton');
   const stahl = zustand.projekt.materialien.find((m) => m.art === 'betonstahl');
   if (!beton || !stahl) {
@@ -76,63 +136,81 @@ function querschnittAnlegen() {
     return;
   }
   const kennung = freieKennung('q');
+  const lage = (phi) => ({
+    stahl: stahl.kennung,
+    grund: { durchmesser: phi, abstand: 150, anzahl: null },
+    zulage: { durchmesser: 0, abstand: null, anzahl: null },
+  });
   projektAendern((p) => {
     p.querschnitte.push({
       kennung,
-      name: `Querschnitt ${p.querschnitte.length + 1}`,
+      name: `Platte ${p.querschnitte.length + 1}`,
       beton: beton.kennung,
       h: 300, b: 1000,
       ueberdeckung_unten: 30, ueberdeckung_oben: 30,
-      lagen_unten: [{ durchmesser: 16, stahl: stahl.kennung, abstand: 150, anzahl: null, lichter_abstand: 0 }],
-      lagen_oben: [],
+      richtung_lage1: 'x', richtung_lage4: 'x',
+      lagen: [lage(16), lage(12), lage(12), lage(12)],
       kombinationen: [{ name: 'Feld', M_Ed: 100, N_Ed: 0, art: 'N_konstant' }],
     });
   });
   aendern({ auswahl: { art: 'querschnitt', kennung } }, 'auswahl');
 }
 
-function gruppe(titel, knopf, kinder) {
-  return el('div.baum-gruppe', {}, [
-    el('div.baum-kopf', {}, [el('span', { text: titel }), knopf]),
-    ...(kinder.length ? kinder : [el('div.leer', { text: '—', style: { padding: '6px 2px', textAlign: 'left' } })]),
-  ]);
-}
+// ===========================================================================
 
 export function baumZeichnen(behaelter) {
   const p = zustand.projekt;
-  if (!p) return ersetzen(behaelter, leerzustand('Projekt wird geladen …'));
+  if (!p) return ersetzen(behaelter, el('div.leer', { text: 'Projekt wird geladen …' }));
 
   const betone = p.materialien.filter((m) => m.art === 'beton');
   const staehle = p.materialien.filter((m) => m.art === 'betonstahl');
 
-  const machEintrag = (m) => eintrag({
-    kennung: m.kennung,
-    name: m.name || m.sorte,
-    art: m.sorte,
-    punktklasse: m.art === 'beton' ? 'punkt-beton' : 'punkt-stahl',
-    aktiv: zustand.auswahl?.art === 'material' && zustand.auswahl.kennung === m.kennung,
-    beiWahl: () => aendern({ auswahl: { art: 'material', kennung: m.kennung } }, 'auswahl'),
-    beiLoeschen: () => materialLoeschen(m),
+  const knopf = (text, titel, tun) => el('button.knopf.knopf-zart', {
+    text, title: titel, on: { click: tun },
   });
 
-  ersetzen(behaelter,
-    gruppe('Beton',
-      el('button.knopf.knopf-zart', { text: '+ Beton', on: { click: () => materialAnlegen('beton') } }),
-      betone.map(machEintrag)),
+  const materialien = kapitel({
+    schluessel: 'materialien',
+    titel: 'Materialien',
+    anzahl: p.materialien.length,
+    oben: true,
+    kinder: [
+      el('div.baum-unter', {}, [
+        kapitel({
+          schluessel: 'beton',
+          titel: 'Beton',
+          klasse: 'baum-kopf-beton',
+          anzahl: betone.length,
+          werkzeuge: knopf('+', 'Beton hinzufügen', () => materialAnlegen('beton')),
+          kinder: betone.length
+            ? betone.map((m) => eintrag(m, 'material'))
+            : [leerzeile('kein Beton')],
+        }),
+        kapitel({
+          schluessel: 'betonstahl',
+          titel: 'Betonstahl',
+          klasse: 'baum-kopf-stahl',
+          anzahl: staehle.length,
+          werkzeuge: knopf('+', 'Betonstahl hinzufügen', () => materialAnlegen('betonstahl')),
+          kinder: staehle.length
+            ? staehle.map((m) => eintrag(m, 'material'))
+            : [leerzeile('kein Betonstahl')],
+        }),
+      ]),
+    ],
+  });
 
-    gruppe('Betonstahl',
-      el('button.knopf.knopf-zart', { text: '+ Stahl', on: { click: () => materialAnlegen('betonstahl') } }),
-      staehle.map(machEintrag)),
+  const platten = kapitel({
+    schluessel: 'platten',
+    titel: 'Stahlbeton-Platten',
+    klasse: 'baum-kopf-platte',
+    anzahl: p.querschnitte.length,
+    oben: true,
+    werkzeuge: knopf('+', 'Platte hinzufügen', platteAnlegen),
+    kinder: p.querschnitte.length
+      ? p.querschnitte.map((q) => eintrag(q, 'querschnitt'))
+      : [leerzeile('keine Platte')],
+  });
 
-    gruppe('Querschnitte',
-      el('button.knopf.knopf-zart', { text: '+ Querschnitt', on: { click: querschnittAnlegen } }),
-      p.querschnitte.map((q) => eintrag({
-        kennung: q.kennung,
-        name: q.name,
-        art: `${q.h}×${q.b} mm`,
-        punktklasse: 'punkt-qs',
-        aktiv: zustand.auswahl?.art === 'querschnitt' && zustand.auswahl.kennung === q.kennung,
-        beiWahl: () => aendern({ auswahl: { art: 'querschnitt', kennung: q.kennung } }, 'auswahl'),
-        beiLoeschen: () => querschnittLoeschen(q),
-      }))));
+  ersetzen(behaelter, materialien, platten);
 }

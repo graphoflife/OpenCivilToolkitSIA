@@ -28,7 +28,19 @@ export const zustand = {
   verfolgtesZiel: null,
   rechnetGerade: false,
   ungespeichert: false,
+  /** Aufgeklappte Kapitel im Baum. */
+  offen: new Set(['materialien', 'beton', 'betonstahl', 'platten']),
+  /** Angehakte Ziele im Reiter "Ziel wählen". */
+  gewaehlteZiele: new Set(),
+  zieleListe: null,
 };
+
+/** Klappt ein Kapitel auf oder zu. */
+export function umschalten(kapitel) {
+  if (zustand.offen.has(kapitel)) zustand.offen.delete(kapitel);
+  else zustand.offen.add(kapitel);
+  aendern({}, 'baum');
+}
 
 export function horchen(rueckruf) {
   zuhoerer.add(rueckruf);

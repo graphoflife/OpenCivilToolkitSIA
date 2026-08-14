@@ -64,7 +64,7 @@ from opencivil.core.berechnung import (
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, MM, Groesse
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
-from opencivil.querschnitt.platte import Plattenquerschnitt, Seite
+from opencivil.querschnitt.platte import Plattenquerschnitt, Richtung
 from opencivil.querschnitt.werkstoffgesetz import (
     Betongesetz, Dehnungsebene, Stahlgesetz,
 )
@@ -137,6 +137,22 @@ class Auswertung:
     """Der massgebende Punkt auf der Linie als (N, M) in N bzw. Nm."""
 
     begruendung: str = ""
+
+    groesse: str = "M"
+    """Welche Grösse verglichen wird -- 'M' oder 'N'. Haengt vom Massstab ab."""
+
+    ed: float = 0.0
+    """Einwirkung in der verglichenen Groesse, in SI (N bzw. Nm)."""
+
+    rd: float = 0.0
+    """Widerstand in derselben Groesse, in SI."""
+
+    @property
+    def erfuellungsgrad(self) -> float:
+        """Kehrwert der Ausnutzung: um welchen Faktor die Einwirkung wachsen darf."""
+        if self.ausnutzung <= 0:
+            return float("inf")
+        return 1.0 / self.ausnutzung
 
 
 # ===========================================================================
@@ -258,6 +274,7 @@ class BiegungNormalkraft(Nachweis):
         self,
         querschnitt: Plattenquerschnitt,
         kombinationen: Sequence[Schnittgroessen],
+        richtung: Richtung = Richtung.X,
         *,
         schritte: int = 80,
         fasern: int = 200,
@@ -268,34 +285,46 @@ class BiegungNormalkraft(Nachweis):
         # schnell laeuft und sonst sichtbar eckig wuerde.
         if not kombinationen:
             raise ValueError("Der Nachweis braucht mindestens eine Kombination.")
+        self.posten = querschnitt.posten_in_richtung(richtung)
+        if not self.posten:
+            raise ValueError(
+                f"Querschnitt '{querschnitt.name}': in {richtung.beschriftung} liegt "
+                f"keine Bewehrung, ein Nachweis ist dort nicht möglich."
+            )
         self.querschnitt = querschnitt
+        self.richtung = richtung
         self.kombinationen = list(kombinationen)
         self.schritte = schritte
         self.fasern = fasern
         self.linie: List[Linienpunkt] = []
         self.auswertungen: List[Auswertung] = []
 
-        basis = f"{querschnitt.id}.nachweis.mn"
+        r = richtung.value
+        basis = f"{querschnitt.id}.nachweis.mn.{r}"
         self.d_ausnutzung: Dict[str, WertDef] = {
             k.name: WertDef(
                 id=f"{basis}.{k.kennung}.ausnutzung",
-                symbol=rf"\eta_{{{k.kennung}}}",
+                symbol=rf"\eta_{{{r},{k.kennung}}}",
                 einheit=EINHEITSLOS,
-                beschreibung=f"Ausnutzungsgrad – {k.name}",
+                beschreibung=f"Ausnutzungsgrad {richtung.beschriftung} – {k.name}",
                 referenz="SIA 262:2025, 4.1.4",
                 stellen=3,
             )
             for k in self.kombinationen
         }
         self.d_eckwerte = {
-            "N_Rd_zug": WertDef(f"{basis}.N_Rd_zug", "N_{Rd}^{+}", KN,
-                                "Grösste aufnehmbare Zugkraft", stellen=1),
-            "N_Rd_druck": WertDef(f"{basis}.N_Rd_druck", "N_{Rd}^{-}", KN,
-                                  "Grösste aufnehmbare Druckkraft", stellen=1),
-            "M_Rd_max": WertDef(f"{basis}.M_Rd_max", "M_{Rd}^{+}", KNM,
-                                "Grösster positiver Momentenwiderstand", stellen=1),
-            "M_Rd_min": WertDef(f"{basis}.M_Rd_min", "M_{Rd}^{-}", KNM,
-                                "Grösster negativer Momentenwiderstand", stellen=1),
+            "N_Rd_zug": WertDef(f"{basis}.N_Rd_zug", f"N_{{Rd,{r}}}^{{+}}", KN,
+                                f"Grösste aufnehmbare Zugkraft ({richtung.beschriftung})",
+                                stellen=1),
+            "N_Rd_druck": WertDef(f"{basis}.N_Rd_druck", f"N_{{Rd,{r}}}^{{-}}", KN,
+                                  f"Grösste aufnehmbare Druckkraft ({richtung.beschriftung})",
+                                  stellen=1),
+            "M_Rd_max": WertDef(f"{basis}.M_Rd_max", f"M_{{Rd,{r}}}^{{+}}", KNM,
+                                f"Grösster positiver Momentenwiderstand ({richtung.beschriftung})",
+                                stellen=1),
+            "M_Rd_min": WertDef(f"{basis}.M_Rd_min", f"M_{{Rd,{r}}}^{{-}}", KNM,
+                                f"Grösster negativer Momentenwiderstand ({richtung.beschriftung})",
+                                stellen=1),
         }
 
         bezuege = [
@@ -306,13 +335,15 @@ class BiegungNormalkraft(Nachweis):
             Eingabebezug("eps_c2d", querschnitt.beton.id_von("eps_c2d")),
             Eingabebezug("k_sigma", querschnitt.beton.id_von("k_sigma")),
         ]
-        for seite, nummer, lage, as_id, z_id in querschnitt.lagen_ids:
-            marke = f"{seite.kuerzel}{nummer}"
+        # Nur die Bewehrung dieser Richtung geht ein -- Querbewehrung traegt
+        # nichts zum Momentenwiderstand um diese Achse bei.
+        for lage, art, _, as_id, z_id in self.posten:
+            marke = f"{lage.nummer}{art.kuerzel}"
             bezuege += [
                 Eingabebezug(f"a_s_{marke}", as_id),
                 Eingabebezug(f"z_{marke}", z_id),
             ]
-        for stahl in querschnitt.staehle:
+        for stahl in {l.stahl.id: l.stahl for l, _, _, _, _ in self.posten}.values():
             kurz = _kennung(stahl.id)
             for kennwert in ("E_s", "f_yd", "f_yd_druck", "eps_ud"):
                 bezuege.append(
@@ -320,19 +351,19 @@ class BiegungNormalkraft(Nachweis):
                 )
 
         super().__init__(
-            f"{basis}",
+            basis,
             ausgaben=list(self.d_ausnutzung.values()) + list(self.d_eckwerte.values()),
             bezuege=bezuege,
-            titel=f"Biegung und Normalkraft – {querschnitt.name}",
+            titel=f"M-N-Nachweis {richtung.beschriftung} – {querschnitt.name}",
             referenz="SIA 262:2025, 4.1.4",
         )
 
     # -- Querschnittswerte --------------------------------------------------
 
     def _lagen(self, e: Eingaben) -> List[Tuple[float, float, Stahlgesetz, str]]:
-        """Je Lage: (Fläche in m^2, z in m, Stahlgesetz, Beschriftung)."""
+        """Je Bewehrungsposten dieser Richtung: (Fläche m^2, z m, Gesetz, Text)."""
         gesetze: Dict[str, Stahlgesetz] = {}
-        for stahl in self.querschnitt.staehle:
+        for stahl in {l.stahl.id: l.stahl for l, _, _, _, _ in self.posten}.values():
             kurz = _kennung(stahl.id)
             gesetze[stahl.id] = Stahlgesetz.aus_werten({
                 kennwert: e[f"{kennwert}__{kurz}"]
@@ -340,13 +371,13 @@ class BiegungNormalkraft(Nachweis):
             })
 
         lagen = []
-        for seite, nummer, lage, _, _ in self.querschnitt.lagen_ids:
-            marke = f"{seite.kuerzel}{nummer}"
+        for lage, art, _, _, _ in self.posten:
+            marke = f"{lage.nummer}{art.kuerzel}"
             lagen.append((
                 e.g(f"a_s_{marke}").si,
                 e.g(f"z_{marke}").si,
                 gesetze[lage.stahl.id],
-                lage.beschriftung(nummer, seite),
+                f"{lage.nummer}. Lage {art.beschriftung}",
             ))
         return lagen
 
@@ -498,13 +529,35 @@ class BiegungNormalkraft(Nachweis):
             )
             urteile.append(
                 NachweisUrteil(
-                    name=f"Biegung und Normalkraft – {kombination.name}",
+                    name=f"M-N-Nachweis {self.richtung.value} – {kombination.name}",
                     erfuellt=auswertung.innerhalb,
                     ausnutzung=Groesse(auswertung.ausnutzung, EINHEITSLOS),
                     begruendung=auswertung.begruendung,
+                    einwirkung=self._als_wert(auswertung, "Ed"),
+                    widerstand=self._als_wert(auswertung, "Rd"),
                 )
             )
         return ergebnis, urteile
+
+    def _als_wert(self, auswertung: Auswertung, seite: str):
+        """
+        Verpackt Einwirkung bzw. Widerstand als darstellbaren Wert.
+
+        Welche Groesse verglichen wird, haengt vom Massstab ab -- bei
+        'Normalkraft konstant' das Moment, bei 'Moment konstant' die Normalkraft.
+        Das Urteil traegt deshalb Symbol und Einheit selbst mit sich.
+        """
+        ist_moment = auswertung.groesse == "M"
+        einheit = KNM if ist_moment else KN
+        zahl = auswertung.ed if seite == "Ed" else auswertung.rd
+        definition = WertDef(
+            id=f"{self.id}.{auswertung.schnittgroessen.kennung}.{auswertung.groesse}_{seite}",
+            symbol=f"{auswertung.groesse}_{{{seite},{self.richtung.value}}}",
+            einheit=einheit,
+            beschreibung=("Einwirkung" if seite == "Ed" else "Widerstand"),
+            stellen=1,
+        )
+        return definition.belegen(Groesse.aus_si(zahl, einheit))
 
     def _auswerten(
         self, kombination: Schnittgroessen, eckwerte: Mapping[str, float]
@@ -520,6 +573,7 @@ class BiegungNormalkraft(Nachweis):
                     kombination, innerhalb, float("inf"), None,
                     "Die Normalkraft liegt ausserhalb des aufnehmbaren Bereichs – "
                     "bei dieser Normalkraft gibt es keinen Momentenwiderstand.",
+                    groesse="M", ed=M_Ed, rd=0.0,
                 )
             # Massgebend ist die Momentengrenze auf der Seite, auf der das
             # Bemessungsmoment liegt.
@@ -529,6 +583,7 @@ class BiegungNormalkraft(Nachweis):
                 kombination, innerhalb, ausnutzung, (N_Ed, M_Rd),
                 f"Bei festgehaltenem N_Ed = {_kn(N_Ed)} kN beträgt der "
                 f"Momentenwiderstand M_Rd = {_knm(M_Rd)} kNm.",
+                groesse="M", ed=M_Ed, rd=M_Rd,
             )
 
         if kombination.art is Erfuellungsart.MOMENT_KONSTANT:
@@ -537,6 +592,7 @@ class BiegungNormalkraft(Nachweis):
                 return Auswertung(
                     kombination, innerhalb, float("inf"), None,
                     "Das Moment liegt ausserhalb des aufnehmbaren Bereichs.",
+                    groesse="N", ed=N_Ed, rd=0.0,
                 )
             N_Rd = max(kraefte) if N_Ed >= 0 else min(kraefte)
             ausnutzung = float("inf") if N_Rd == 0 else abs(N_Ed) / abs(N_Rd)
@@ -544,6 +600,7 @@ class BiegungNormalkraft(Nachweis):
                 kombination, innerhalb, ausnutzung, (N_Rd, M_Ed),
                 f"Bei festgehaltenem M_Ed = {_knm(M_Ed)} kNm beträgt der "
                 f"Normalkraftwiderstand N_Rd = {_kn(N_Rd)} kN.",
+                groesse="N", ed=N_Ed, rd=N_Rd,
             )
 
         # Kuerzester Abstand -- im normierten Diagramm gemessen, sonst haenge
@@ -562,6 +619,7 @@ class BiegungNormalkraft(Nachweis):
             f"{abstand:.3f} (Bezug N_ref = {_kn(N_ref)} kN, M_ref = {_knm(M_ref)} kNm). "
             f"Nächster Punkt der Linie: N = {_kn(stelle[0])} kN, "
             f"M = {_knm(stelle[1])} kNm.",
+            groesse="M", ed=M_Ed, rd=stelle[1],
         )
 
     # -- Mitschrift ---------------------------------------------------------

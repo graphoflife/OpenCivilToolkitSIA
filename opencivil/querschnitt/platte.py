@@ -1,30 +1,35 @@
 """
-opencivil/querschnitt/platte.py -- Plattenquerschnitt mit Bewehrungslagen.
+opencivil/querschnitt/platte.py -- Stahlbeton-Plattenquerschnitt.
 
 VERANTWORTUNG:
-Beschreibt die Geometrie eines Plattenquerschnitts und erzeugt daraus die
-Berechnungen fuer Bewehrungsquerschnitte und statische Hoehen.
+Beschreibt die Geometrie einer Platte und erzeugt daraus die Berechnungen fuer
+Bewehrungsquerschnitte und statische Hoehen.
 
-VORZEICHEN UND ACHSEN:
+AUFBAU -- VIER LAGEN:
+Eine Platte hat vier Bewehrungslagen, von unten nach oben durchgezaehlt::
+
+    Überdeckung oben
+        4. Lage      Richtung waehlbar
+        3. Lage      Gegenrichtung zur 4. Lage
+        ---- Plattenmitte ----
+        2. Lage      Gegenrichtung zur 1. Lage
+        1. Lage      Richtung waehlbar
+    Überdeckung unten
+
+Jede Lage besteht aus einer **Grundbewehrung** und einer optionalen **Zulage**.
+Beide liegen auf derselben Hoehe -- sie beruehren dieselbe Huellebene und sind
+je um ihren eigenen Halbmesser eingerueckt. Die Huelle fuer die naechste Lage
+richtet sich nach dem groesseren der beiden Durchmesser.
+
+X UND Y SIND GETRENNTE TRAGRICHTUNGEN:
+Bewehrung in y-Richtung traegt nichts zum Momentenwiderstand um die x-Achse bei.
+Deshalb liefert :meth:`Plattenquerschnitt.lagen_in_richtung` die Lagen je
+Richtung, und der Nachweis wird je Richtung eigens gefuehrt.
+
+Z-ACHSE:
 ``z`` wird von der Oberkante nach unten gemessen, 0 <= z <= h. Die statische
-Hoehe einer Lage ist ihr ``z``, also der Abstand ihres Schwerpunkts von der
-Oberkante. Damit gilt fuer alle Lagen -- oben wie unten -- dieselbe Rechnung,
-und die Interaktionsrechnung braucht keine Sonderfaelle.
-
-LAGENAUFBAU:
-Die Lagen werden von der jeweiligen Aussenseite nach innen aufgezaehlt. Der
-Randabstand einer Lage ergibt sich aus der Ueberdeckung, den davor liegenden
-Stabdurchmessern und den lichten Abstaenden. Das ist eine echte Abfolge und
-darum eine :class:`Prozedur` -- ihr Ablauf erscheint im Bericht als Tabelle,
-statt als undurchsichtige Zahl.
-
-EIGENSTAENDIG NUTZBAR::
-
-    platte = Plattenquerschnitt(
-        name="Decke", h=Groesse(300, MM), b=Groesse(1000, MM), beton=c30,
-        lagen_unten=[Bewehrungslage(Groesse(18, MM), b500b, abstand=Groesse(150, MM))],
-    )
-    platte.ins_rechenwerk(werk)
+Hoehe einer Bewehrung ist ihr ``z``. Damit gilt fuer alle Lagen dieselbe
+Rechnung, und die Interaktionsrechnung braucht keine Sonderfaelle.
 """
 
 from __future__ import annotations
@@ -32,7 +37,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Dict, Iterator, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
     Berechnung, Eingabebezug, Eingaben, Formel, Prozedur, Vorgabe,
@@ -42,80 +47,141 @@ from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
 from opencivil.material.basis import Baustoff
 
+#: Anzahl Lagen einer Platte. Bewusst fest -- eine Platte hat unten und oben je
+#: eine Haupt- und eine Querlage, mehr braucht es nicht, weniger waere ein
+#: Sonderfall mit leeren Lagen.
+LAGENZAHL = 4
 
-class Seite(str, Enum):
-    """Welcher Querschnittsrand -- bestimmt, von wo aus gestapelt wird."""
 
-    UNTEN = "unten"
-    OBEN = "oben"
+class Richtung(str, Enum):
+    """Tragrichtung einer Bewehrungslage."""
+
+    X = "x"
+    Y = "y"
 
     def __str__(self) -> str:
         return self.value
 
     @property
-    def kuerzel(self) -> str:
-        return "u" if self is Seite.UNTEN else "o"
+    def gegenrichtung(self) -> "Richtung":
+        return Richtung.Y if self is Richtung.X else Richtung.X
 
     @property
     def beschriftung(self) -> str:
-        return "unten" if self is Seite.UNTEN else "oben"
+        return "x-Richtung" if self is Richtung.X else "y-Richtung"
+
+
+class Postenart(str, Enum):
+    """Grundbewehrung oder Zulage innerhalb einer Lage."""
+
+    GRUND = "grund"
+    ZULAGE = "zulage"
+
+    def __str__(self) -> str:
+        return self.value
+
+    @property
+    def beschriftung(self) -> str:
+        return "Grundbewehrung" if self is Postenart.GRUND else "Zulage"
+
+    @property
+    def kuerzel(self) -> str:
+        return "g" if self is Postenart.GRUND else "z"
 
 
 # ===========================================================================
-# Bewehrungslage
+# Bewehrung
 # ===========================================================================
 
 
 @dataclass
-class Bewehrungslage:
+class Bewehrungsposten:
     """
-    Eine Lage gleicher Staebe.
+    Ein Satz gleicher Staebe innerhalb einer Lage.
 
-    Die Menge wird entweder ueber den Stababstand (Regelfall bei Platten) oder
-    ueber die Stabzahl angegeben -- genau eines von beiden.
+    Die Menge wird entweder ueber die Teilung (Regelfall bei Platten) oder ueber
+    die Stabzahl angegeben. Ein Durchmesser von null bedeutet: nicht vorhanden.
     """
 
-    durchmesser: Groesse
-    stahl: Baustoff
+    durchmesser: Groesse = field(default_factory=lambda: Groesse(0, MM))
     abstand: Optional[Groesse] = None
-    """Stababstand s. Die Bewehrung wird dann auf die Breite b bezogen."""
-
     anzahl: Optional[float] = None
-    """Stabzahl auf der Breite b."""
 
-    lichter_abstand: Groesse = field(default_factory=lambda: Groesse(0, MM))
-    """Lichter Abstand zur davorliegenden Lage."""
-
-    bezeichnung: str = ""
-
-    def __post_init__(self) -> None:
-        if (self.abstand is None) == (self.anzahl is None):
-            raise ValueError(
-                "Bewehrungslage: genau eines von 'abstand' oder 'anzahl' angeben."
-            )
+    @property
+    def vorhanden(self) -> bool:
         if self.durchmesser.si <= 0:
-            raise ValueError("Bewehrungslage: der Durchmesser muss positiv sein.")
+            return False
+        if self.abstand is not None:
+            return self.abstand.si > 0
+        return bool(self.anzahl and self.anzahl > 0)
 
     @property
     def ueber_abstand(self) -> bool:
         return self.abstand is not None
 
     def flaeche(self, b: Groesse) -> Groesse:
-        """Bewehrungsquerschnitt der Lage, bezogen auf die Breite ``b``."""
-        einzelflaeche = math.pi * self.durchmesser * self.durchmesser / 4.0
+        """Bewehrungsquerschnitt, bezogen auf die Breite ``b``."""
+        if not self.vorhanden:
+            return Groesse(0, MM2)
+        einzeln = math.pi * self.durchmesser * self.durchmesser / 4.0
         if self.ueber_abstand:
-            return einzelflaeche * (b / self.abstand)
-        return einzelflaeche * self.anzahl
+            return einzeln * (b / self.abstand)
+        return einzeln * float(self.anzahl)
 
-    def beschriftung(self, nummer: int, seite: Seite) -> str:
-        if self.bezeichnung:
-            return self.bezeichnung
-        menge = (
-            f"⌀{self.durchmesser.formatiert(0)}@{self.abstand.formatiert(0)}"
-            if self.ueber_abstand
-            else f"{self.anzahl:g}⌀{self.durchmesser.formatiert(0)}"
-        )
-        return f"Lage {nummer} {seite.beschriftung} ({menge})"
+    def menge_text(self) -> str:
+        if not self.vorhanden:
+            return "—"
+        if self.ueber_abstand:
+            return f"⌀{self.durchmesser.formatiert(0)}@{self.abstand.formatiert(0)}"
+        return f"{self.anzahl:g}⌀{self.durchmesser.formatiert(0)}"
+
+
+@dataclass
+class Bewehrungslage:
+    """Eine der vier Lagen, bestehend aus Grundbewehrung und Zulage."""
+
+    nummer: int
+    """1 = unterste Lage, 4 = oberste."""
+
+    richtung: Richtung
+    stahl: Baustoff
+    grund: Bewehrungsposten = field(default_factory=Bewehrungsposten)
+    zulage: Bewehrungsposten = field(default_factory=Bewehrungsposten)
+
+    def __post_init__(self) -> None:
+        if not 1 <= self.nummer <= LAGENZAHL:
+            raise ValueError(f"Lagennummer {self.nummer} liegt ausserhalb 1..{LAGENZAHL}.")
+
+    @property
+    def von_unten(self) -> bool:
+        """Lagen 1 und 2 werden von der Unterkante aus gestapelt."""
+        return self.nummer <= 2
+
+    @property
+    def stapelrang(self) -> int:
+        """0 = aussen (direkt auf der Überdeckung), 1 = darüber."""
+        return self.nummer - 1 if self.von_unten else LAGENZAHL - self.nummer
+
+    @property
+    def vorhanden(self) -> bool:
+        return self.grund.vorhanden or self.zulage.vorhanden
+
+    @property
+    def groesster_durchmesser(self) -> Groesse:
+        vorhandene = [p.durchmesser for p in self.posten() if p.vorhanden]
+        return max(vorhandene) if vorhandene else Groesse(0, MM)
+
+    def posten(self) -> Iterator[Bewehrungsposten]:
+        yield self.grund
+        yield self.zulage
+
+    def benannte_posten(self) -> Iterator[Tuple[Postenart, Bewehrungsposten]]:
+        yield Postenart.GRUND, self.grund
+        yield Postenart.ZULAGE, self.zulage
+
+    def beschriftung(self) -> str:
+        seite = "unten" if self.von_unten else "oben"
+        return f"{self.nummer}. Lage ({seite}, {self.richtung.beschriftung})"
 
 
 # ===========================================================================
@@ -125,11 +191,11 @@ class Bewehrungslage:
 
 class Lagenaufbau(Prozedur):
     """
-    Bestimmt die statischen Hoehen aller Lagen aus Ueberdeckung und Stapelung.
+    Bestimmt die statischen Hoehen aller Bewehrungsposten.
 
-    Ausgabe ist fuer jede Lage ihr ``z`` -- der Abstand des Stabschwerpunkts von
-    der Oberkante. Der Ablauf wird als Tabelle mitgeschrieben, damit jede Zahl
-    von Hand nachgerechnet werden kann.
+    Ausgabe ist je Posten sein ``z`` -- der Abstand des Stabschwerpunkts von der
+    Oberkante. Der Ablauf wird als Tabelle mitgeschrieben, damit jede Zahl von
+    Hand nachgerechnet werden kann.
     """
 
     def __init__(
@@ -138,50 +204,55 @@ class Lagenaufbau(Prozedur):
         *,
         ausgaben: Sequence[WertDef],
         bezuege: Sequence[Eingabebezug],
-        lagen: Sequence[Tuple[Seite, int, Bewehrungslage, WertDef]],
+        posten: Sequence[Tuple[Bewehrungslage, Postenart, Bewehrungsposten, WertDef]],
         titel: str = "Lagenaufbau",
     ) -> None:
         super().__init__(id, ausgaben=ausgaben, bezuege=bezuege, titel=titel,
                          referenz="SIA 262:2025, 5.2.2")
-        self.lagen = list(lagen)
+        self.posten = list(posten)
 
     def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
         h = e.g("h")
         p.text(
-            "Die Lagen werden je Seite von aussen nach innen gestapelt. Der "
-            "Randabstand einer Lage ist die Überdeckung zuzüglich der davor "
-            "liegenden Stabdurchmesser und lichten Abstände, zuzüglich des "
-            "halben eigenen Durchmessers. Die statische Höhe z wird von der "
-            "Oberkante nach unten gemessen."
+            "Die Lagen werden je Seite von aussen nach innen gestapelt. Die Hülle "
+            "einer Lage beginnt bei der Überdeckung und wächst um den grössten "
+            "Durchmesser der davorliegenden Lage. Grundbewehrung und Zulage einer "
+            "Lage liegen auf derselben Hülle und sind je um ihren eigenen "
+            "Halbmesser eingerückt. z wird von der Oberkante nach unten gemessen."
         )
+
+        # Huellen je Seite, von aussen nach innen. Jede Lage kommt nur einmal
+        # vor, auch wenn sie zwei Posten traegt -- nach Nummer entdoppelt, weil
+        # Bewehrungslage als veraenderliche Datenklasse nicht hashbar ist.
+        huelle = {True: e.g("c_nom_unten"), False: e.g("c_nom_oben")}
+        lagen_nach_nummer = {l.nummer: l for l, _, _, _ in self.posten}
+        raender: Dict[Tuple[bool, int], Groesse] = {}
+        for lage in sorted(lagen_nach_nummer.values(),
+                           key=lambda l: (not l.von_unten, l.stapelrang)):
+            schluessel = (lage.von_unten, lage.stapelrang)
+            raender[schluessel] = huelle[lage.von_unten]
+            huelle[lage.von_unten] = huelle[lage.von_unten] + lage.groesster_durchmesser
 
         ergebnis: Dict[str, Groesse] = {}
         zeilen: List[List[str]] = []
-        huelle = {
-            Seite.UNTEN: e.g("c_nom_unten"),
-            Seite.OBEN: e.g("c_nom_oben"),
-        }
-
-        for seite, nummer, lage, wertdef in self.lagen:
-            rand = huelle[seite] + lage.lichter_abstand + lage.durchmesser / 2.0
-            # Von der Oberkante gemessen: untere Lagen von h aus zurueckrechnen.
-            z = rand if seite is Seite.OBEN else h - rand
-            huelle[seite] = huelle[seite] + lage.lichter_abstand + lage.durchmesser
-
+        for lage, art, posten, wertdef in self.posten:
+            rand = raender[(lage.von_unten, lage.stapelrang)] + posten.durchmesser / 2.0
+            z = h - rand if lage.von_unten else rand
             ergebnis[wertdef.id] = z
             zeilen.append([
-                lage.beschriftung(nummer, seite),
-                lage.durchmesser.formatiert(0, MM),
+                rf"\text{{{lage.nummer}. Lage {art.beschriftung}}}",
+                rf"\text{{{lage.richtung.value}}}",
+                posten.durchmesser.formatiert(0, MM),
                 rand.formatiert(1, MM),
                 z.formatiert(1, MM),
             ])
 
         p.tabelle(
-            kopf=[r"\text{Lage}", r"\varnothing\ [\mathrm{mm}]",
+            kopf=[r"\text{Bewehrung}", r"\text{Richtung}", r"\varnothing\ [\mathrm{mm}]",
                   r"\text{Randabstand}\ [\mathrm{mm}]", r"z\ [\mathrm{mm}]"],
             zeilen=zeilen,
             titel="Randabstände und statische Höhen",
-            ausrichtung="lrrr",
+            ausrichtung="llrrr",
         )
         return ergebnis
 
@@ -194,7 +265,7 @@ class Lagenaufbau(Prozedur):
 @dataclass
 class Plattenquerschnitt:
     """
-    Rechteckiger Plattenquerschnitt mit Bewehrung oben und unten.
+    Stahlbeton-Platte mit vier Bewehrungslagen.
 
     ``b`` ist die betrachtete Breite; bei Platten ueblicherweise 1 m, dann sind
     alle Schnittgroessen Werte pro Laufmeter.
@@ -204,25 +275,42 @@ class Plattenquerschnitt:
     h: Groesse
     b: Groesse
     beton: Baustoff
-    lagen_unten: List[Bewehrungslage] = field(default_factory=list)
-    lagen_oben: List[Bewehrungslage] = field(default_factory=list)
+    lagen: List[Bewehrungslage] = field(default_factory=list)
     ueberdeckung_unten: Groesse = field(default_factory=lambda: Groesse(30, MM))
     ueberdeckung_oben: Groesse = field(default_factory=lambda: Groesse(30, MM))
     praefix: Optional[str] = None
 
-    # Wird in __post_init__ aufgebaut.
     definitionen: Dict[str, WertDef] = field(default_factory=dict, init=False)
     berechnungen: List[Berechnung] = field(default_factory=list, init=False)
-    lagen_ids: List[Tuple[Seite, int, Bewehrungslage, str, str]] = field(
+    posten_ids: List[Tuple[Bewehrungslage, Postenart, Bewehrungsposten, str, str]] = field(
         default_factory=list, init=False
     )
-    """Je Lage: (Seite, Nummer, Lage, ID der Fläche, ID der statischen Höhe)."""
+    """Je vorhandenem Posten: (Lage, Art, Posten, ID der Fläche, ID von z)."""
 
     def __post_init__(self) -> None:
-        if not self.lagen_unten and not self.lagen_oben:
+        if len(self.lagen) != LAGENZAHL:
             raise ValueError(
-                f"Querschnitt '{self.name}': ohne Bewehrungslage lässt sich "
-                f"kein Widerstand bestimmen."
+                f"Querschnitt '{self.name}': es müssen genau {LAGENZAHL} Lagen "
+                f"angegeben werden, erhalten: {len(self.lagen)}."
+            )
+        for erwartet, lage in enumerate(self.lagen, start=1):
+            if lage.nummer != erwartet:
+                raise ValueError(
+                    f"Querschnitt '{self.name}': die Lagen müssen von 1 bis "
+                    f"{LAGENZAHL} durchnummeriert sein."
+                )
+        # Die Richtungen der Paare (1,2) und (3,4) muessen entgegengesetzt sein.
+        for unten, oben in ((0, 1), (3, 2)):
+            if self.lagen[unten].richtung is self.lagen[oben].richtung:
+                raise ValueError(
+                    f"Querschnitt '{self.name}': die {self.lagen[unten].nummer}. und "
+                    f"die {self.lagen[oben].nummer}. Lage müssen entgegengesetzte "
+                    f"Richtungen haben."
+                )
+        if not any(l.vorhanden for l in self.lagen):
+            raise ValueError(
+                f"Querschnitt '{self.name}': ohne Bewehrung lässt sich kein "
+                f"Widerstand bestimmen."
             )
         self.id = self.praefix or f"querschnitt.{_kennung(self.name)}"
         self._aufbauen()
@@ -237,24 +325,29 @@ class Plattenquerschnitt:
             )
         return self.definitionen[kurzname].id
 
+    def lagen_in_richtung(self, richtung: Richtung) -> List[Bewehrungslage]:
+        return [l for l in self.lagen if l.richtung is richtung and l.vorhanden]
+
+    def posten_in_richtung(
+        self, richtung: Richtung
+    ) -> List[Tuple[Bewehrungslage, Postenart, Bewehrungsposten, str, str]]:
+        return [e for e in self.posten_ids if e[0].richtung is richtung]
+
     @property
-    def alle_lagen(self) -> List[Tuple[Seite, int, Bewehrungslage]]:
-        return [(s, n, l) for s, n, l, _, _ in self.lagen_ids]
+    def richtungen_mit_bewehrung(self) -> List[Richtung]:
+        return [r for r in Richtung if self.posten_in_richtung(r)]
 
     @property
     def staehle(self) -> List[Baustoff]:
-        """Alle vorkommenden Betonstaehle, ohne Wiederholung."""
         gesehen: Dict[str, Baustoff] = {}
-        for _, _, lage, _, _ in self.lagen_ids:
+        for lage, _, _, _, _ in self.posten_ids:
             gesehen.setdefault(lage.stahl.id, lage.stahl)
         return list(gesehen.values())
 
     def ins_rechenwerk(self, werk) -> "Plattenquerschnitt":
-        """Meldet Beton, Staehle und die Querschnittsberechnungen an."""
         self.beton.ins_rechenwerk(werk)
         for stahl in self.staehle:
-            if not any(b.id.startswith(stahl.id + ".") for b in werk.berechnungen):
-                stahl.ins_rechenwerk(werk)
+            stahl.ins_rechenwerk(werk)
         werk.definiere(*self.definitionen.values())
         werk.registriere(*self.berechnungen)
         return self
@@ -264,19 +357,14 @@ class Plattenquerschnitt:
     def _def(self, kurzname: str, symbol: str, einheit, beschreibung: str,
              stellen: int = 1, referenz: str = "") -> WertDef:
         d = WertDef(
-            id=f"{self.id}.{kurzname}",
-            symbol=symbol,
-            einheit=einheit,
-            beschreibung=beschreibung,
-            referenz=referenz,
-            stellen=stellen,
+            id=f"{self.id}.{kurzname}", symbol=symbol, einheit=einheit,
+            beschreibung=beschreibung, referenz=referenz, stellen=stellen,
         )
         self.definitionen[kurzname] = d
         return d
 
     def _aufbauen(self) -> None:
-        # -- Geometrie ------------------------------------------------------
-        d_h = self._def("h", "h", MM, "Querschnittshöhe", 0)
+        d_h = self._def("h", "h", MM, "Plattendicke", 0)
         d_b = self._def("b", "b", MM, "Betrachtete Breite", 0)
         d_cu = self._def("c_nom_unten", "c_{nom,u}", MM, "Überdeckung unten", 0)
         d_co = self._def("c_nom_oben", "c_{nom,o}", MM, "Überdeckung oben", 0)
@@ -288,38 +376,38 @@ class Plattenquerschnitt:
             Vorgabe(id=f"{self.id}.c_nom_oben", ausgabe=d_co, groesse=self.ueberdeckung_oben),
         ]
 
-        # -- Lagen ----------------------------------------------------------
         aufbau_ausgaben: List[WertDef] = []
-        aufbau_lagen: List[Tuple[Seite, int, Bewehrungslage, WertDef]] = []
+        aufbau_posten: List[Tuple[Bewehrungslage, Postenart, Bewehrungsposten, WertDef]] = []
 
-        for seite, lagen in ((Seite.UNTEN, self.lagen_unten), (Seite.OBEN, self.lagen_oben)):
-            for i, lage in enumerate(lagen, start=1):
-                marke = f"{seite.kuerzel}{i}"
-                index = f"{seite.kuerzel},{i}"
+        for lage in self.lagen:
+            for art, posten in lage.benannte_posten():
+                if not posten.vorhanden:
+                    continue
+                marke = f"{lage.nummer}{art.kuerzel}"
+                index = f"{lage.richtung.value},{lage.nummer}"
+                if art is Postenart.ZULAGE:
+                    index += ",z"
 
                 d_phi = self._def(
                     f"lage.{marke}.phi", rf"\varnothing_{{{index}}}", MM,
-                    f"Stabdurchmesser {lage.beschriftung(i, seite)}", 0,
-                )
+                    f"Stabdurchmesser {lage.nummer}. Lage {art.beschriftung}", 0)
                 self.berechnungen.append(
                     Vorgabe(id=f"{self.id}.lage.{marke}.phi", ausgabe=d_phi,
-                            groesse=lage.durchmesser)
-                )
+                            groesse=posten.durchmesser))
 
                 d_as = self._def(
                     f"lage.{marke}.a_s", f"a_{{s,{index}}}", MM2,
-                    f"Bewehrungsquerschnitt {lage.beschriftung(i, seite)}", 0,
-                    referenz="SIA 262:2025, 5.5.2",
-                )
-                self.berechnungen.append(self._flaechen_formel(marke, index, lage, d_as, d_phi, d_b))
+                    f"Bewehrungsquerschnitt {lage.nummer}. Lage {art.beschriftung}", 0,
+                    referenz="SIA 262:2025, 5.5.2")
+                self.berechnungen.append(
+                    self._flaechen_formel(marke, index, posten, d_as, d_phi, d_b))
 
                 d_z = self._def(
                     f"lage.{marke}.z", f"z_{{{index}}}", MM,
-                    f"Statische Höhe {lage.beschriftung(i, seite)} (ab Oberkante)", 1,
-                )
+                    f"Statische Höhe {lage.nummer}. Lage {art.beschriftung} (ab Oberkante)", 1)
                 aufbau_ausgaben.append(d_z)
-                aufbau_lagen.append((seite, i, lage, d_z))
-                self.lagen_ids.append((seite, i, lage, d_as.id, d_z.id))
+                aufbau_posten.append((lage, art, posten, d_z))
+                self.posten_ids.append((lage, art, posten, d_as.id, d_z.id))
 
         self.berechnungen.append(
             Lagenaufbau(
@@ -330,23 +418,18 @@ class Plattenquerschnitt:
                     Eingabebezug("c_nom_unten", d_cu.id),
                     Eingabebezug("c_nom_oben", d_co.id),
                 ],
-                lagen=aufbau_lagen,
-            )
-        )
+                posten=aufbau_posten,
+            ))
 
     def _flaechen_formel(
-        self, marke: str, index: str, lage: Bewehrungslage,
+        self, marke: str, index: str, posten: Bewehrungsposten,
         d_as: WertDef, d_phi: WertDef, d_b: WertDef,
     ) -> Formel:
-        """Bewehrungsquerschnitt -- ueber Stababstand oder ueber Stabzahl."""
-        if lage.ueber_abstand:
-            d_s = self._def(
-                f"lage.{marke}.s", f"s_{{{index}}}", MM,
-                f"Stababstand Lage {index}", 0,
-            )
+        if posten.ueber_abstand:
+            d_s = self._def(f"lage.{marke}.s", f"s_{{{index}}}", MM,
+                            f"Stababstand Lage {index}", 0)
             self.berechnungen.append(
-                Vorgabe(id=f"{self.id}.lage.{marke}.s", ausgabe=d_s, groesse=lage.abstand)
-            )
+                Vorgabe(id=f"{self.id}.lage.{marke}.s", ausgabe=d_s, groesse=posten.abstand))
             return Formel(
                 id=f"{self.id}.lage.{marke}.a_s",
                 ausgabe=d_as,
@@ -354,19 +437,18 @@ class Plattenquerschnitt:
                 vorlage=r"\frac{\pi \cdot @phi^{2}}{4} \cdot \frac{@b}{@s}",
                 funktion=lambda phi, s, b: math.pi * phi * phi / 4.0 * (b / s),
             )
+        anzahl = float(posten.anzahl)
         return Formel(
             id=f"{self.id}.lage.{marke}.a_s",
             ausgabe=d_as,
             eingaben={"phi": d_phi.id},
-            vorlage=rf"\frac{{\pi \cdot @phi^{{2}}}}{{4}} \cdot {lage.anzahl:g}",
-            funktion=lambda phi: math.pi * phi * phi / 4.0 * lage.anzahl,
+            vorlage=rf"\frac{{\pi \cdot @phi^{{2}}}}{{4}} \cdot {anzahl:g}",
+            funktion=lambda phi: math.pi * phi * phi / 4.0 * anzahl,
         )
 
     def __repr__(self) -> str:
-        return (
-            f"Plattenquerschnitt({self.name!r}, h={self.h}, b={self.b}, "
-            f"{len(self.lagen_ids)} Lagen)"
-        )
+        return (f"Plattenquerschnitt({self.name!r}, h={self.h}, b={self.b}, "
+                f"{len(self.posten_ids)} Bewehrungsposten)")
 
 
 def _kennung(text: str) -> str:

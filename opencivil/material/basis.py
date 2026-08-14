@@ -21,6 +21,7 @@ und im Bericht steht der Wert als 'vom Benutzer überschrieben'.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple, Union
@@ -28,6 +29,45 @@ from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple, Uni
 from opencivil.core.berechnung import Berechnung, Formel, FormelFunktion, Vorgabe
 from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
 from opencivil.core.wert import Quelle, WertDef
+
+
+#: Symbol mit optionalem Index und optionalem Hochgestellten, z.B. ``f_{yk}^{-}``.
+_SYMBOL = re.compile(r"^(?P<basis>.+?)(?:_\{(?P<tief_lang>[^{}]*)\}|_(?P<tief_kurz>[^{}_^]))?"
+                     r"(?P<hoch>\^\{.*\}|\^.)?$")
+
+
+def mit_index(symbol: str, index: str) -> str:
+    """
+    Haengt einen Materialindex an ein Symbol an.
+
+    Sind mehrere Betone oder Staehle im Spiel, traegt sonst jeder dasselbe
+    Symbol: im Bericht staenden dann mehrere gleich aussehende Gleichungen mit
+    verschiedenen Zahlen. Mit Index wird daraus ``f_{yd,\\text{B500B}}``.
+
+    Ein vorhandener Tiefindex wird erweitert, ein Hochgestelltes bleibt aussen::
+
+        f_{yd}        -> f_{yd,\\text{B500B}}
+        E_s           -> E_{s,\\text{B500B}}
+        \\gamma_s      -> \\gamma_{s,\\text{B500B}}
+        f_{yk}^{-}    -> f_{yk,\\text{B500B}}^{-}
+    """
+    if not index:
+        return symbol
+    sicher = index.replace("\\", "").replace("{", "").replace("}", "")
+    zusatz = rf"\text{{{sicher}}}"
+
+    treffer = _SYMBOL.match(symbol)
+    if not treffer:
+        return rf"{symbol}_{{{zusatz}}}"
+
+    basis = treffer.group("basis")
+    tief = treffer.group("tief_lang")
+    if tief is None:
+        tief = treffer.group("tief_kurz")
+    hoch = treffer.group("hoch") or ""
+
+    neuer_tief = f"{tief},{zusatz}" if tief else zusatz
+    return f"{basis}_{{{neuer_tief}}}{hoch}"
 
 
 class Baustoffart(str, Enum):
@@ -84,10 +124,10 @@ class KennwertVorlage:
     def ist_festwert(self) -> bool:
         return self.festwert is not None and self.funktion is None
 
-    def definition(self, praefix: str) -> WertDef:
+    def definition(self, praefix: str, symbol_index: str = "") -> WertDef:
         return WertDef(
             id=f"{praefix}.{self.kurzname}",
-            symbol=self.symbol,
+            symbol=mit_index(self.symbol, symbol_index),
             einheit=self.einheit,
             beschreibung=self.beschreibung,
             referenz=self.referenz,
@@ -154,10 +194,20 @@ class Baustoff:
         Die Sortenwerte werden als :class:`Vorgabe`-Berechnungen registriert und
         nicht als gesetzte Eingaben -- so bleiben sie normale Knoten im Graphen
         und der Benutzer kann sie mit ``werk.setze(...)`` ueberschreiben.
+
+        Mehrfaches Anmelden ist ausdruecklich erlaubt und wirkungslos: derselbe
+        Beton wird von jedem Querschnitt gebraucht, der ihn verwendet, und keiner
+        von ihnen kann wissen, ob ein anderer ihn schon angemeldet hat.
         """
+        if self.ist_angemeldet(werk):
+            return self
         werk.definiere(*self.definitionen.values())
         werk.registriere(*self.berechnungen)
         return self
+
+    def ist_angemeldet(self, werk) -> bool:
+        """Prueft, ob dieser Baustoff im Rechenwerk schon bekannt ist."""
+        return bool(self.berechnungen) and werk.kennt_berechnung(self.berechnungen[0].id)
 
     def __repr__(self) -> str:
         return f"Baustoff({self.name!r}, {len(self.berechnungen)} Berechnungen)"
@@ -176,6 +226,7 @@ def erzeuge(
     vorlagen: Sequence[KennwertVorlage],
     werte: Mapping[str, Groesse],
     praefix: Optional[str] = None,
+    symbol_index: str = "",
 ) -> Baustoff:
     """
     Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
@@ -184,7 +235,7 @@ def erzeuge(
                   (typischerweise aus der Sortentabelle).
     """
     namensraum = praefix or f"{art.value}.{_kennung(sorte or name)}"
-    definitionen = {v.kurzname: v.definition(namensraum) for v in vorlagen}
+    definitionen = {v.kurzname: v.definition(namensraum, symbol_index) for v in vorlagen}
     berechnungen: List[Berechnung] = []
     eingabewerte: Dict[str, Groesse] = {}
 

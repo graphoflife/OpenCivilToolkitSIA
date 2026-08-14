@@ -7,8 +7,8 @@ from pathlib import Path
 
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, N_PRO_MM2, Groesse
 from opencivil.projekt import (
-    KombinationEintrag, LageEintrag, MaterialEintrag, Projekt, ProjektFehler,
-    QuerschnittEintrag,
+    KombinationEintrag, LageEintrag, MaterialEintrag, PostenEintrag, Projekt,
+    ProjektFehler, QuerschnittEintrag,
 )
 from opencivil.web import api, server
 
@@ -18,10 +18,10 @@ class TestProjektBeschreibung(unittest.TestCase):
         aufbau = Projekt.beispiel().aufbauen()
         self.assertEqual(len(aufbau.baustoffe), 2)
         self.assertEqual(len(aufbau.querschnitte), 1)
-        self.assertEqual(len(aufbau.nachweise), 1)
+        self.assertEqual(sorted(aufbau.nachweise), ["q1.x", "q1.y"])
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         self.assertTrue(loesung.vollstaendig)
-        self.assertEqual(len(loesung.urteile), 3)
+        self.assertEqual(len(loesung.urteile), 6)
 
     def test_hin_und_zurueck(self):
         original = Projekt.beispiel()
@@ -37,7 +37,7 @@ class TestProjektBeschreibung(unittest.TestCase):
     def test_abweichung_wird_in_der_anzeigeeinheit_gelesen(self):
         """Die Beschreibung enthält blanke Zahlen -- die Einheit kommt aus der Definition."""
         projekt = Projekt.beispiel()
-        projekt.material("b1").abweichungen["f_ck"] = 45.0
+        projekt.material_loesen("b1").abweichungen["f_ck"] = 45.0
         aufbau = projekt.aufbauen()
         c = aufbau.baustoffe["b1"]
         wid = c.id_von("f_ck")
@@ -46,7 +46,7 @@ class TestProjektBeschreibung(unittest.TestCase):
 
     def test_ueberschreibung_kappt_den_zweig(self):
         projekt = Projekt.beispiel()
-        projekt.material("b1").ueberschreibungen["f_cd"] = 12.0
+        projekt.material_loesen("b1").ueberschreibungen["f_cd"] = 12.0
         aufbau = projekt.aufbauen()
         c = aufbau.baustoffe["b1"]
         loesung = aufbau.werk.loese(c.id_von("f_cd"))
@@ -58,8 +58,9 @@ class TestProjektBeschreibung(unittest.TestCase):
         projekt = Projekt(
             name="zwei",
             materialien=[
-                MaterialEintrag("b1", "beton", "C30/37", "A"),
-                MaterialEintrag("b2", "beton", "C30/37", "B", abweichungen={"f_ck": 40.0}),
+                MaterialEintrag("b1", "beton", "C30/37", "C30/37"),
+                MaterialEintrag("b2", "beton", "C30/37", "C30/37_1",
+                                eigenstaendig=True, abweichungen={"f_ck": 40.0}),
             ])
         aufbau = projekt.aufbauen()
         werk = aufbau.werk
@@ -77,14 +78,14 @@ class TestProjektBeschreibung(unittest.TestCase):
         self.assertIn("b1", str(ctx.exception))
 
     def test_unbekannte_sorte_wird_benannt(self):
-        projekt = Projekt(materialien=[MaterialEintrag("b1", "beton", "C99/100")])
+        projekt = Projekt(materialien=[MaterialEintrag("b1", "beton", "C99/100", "C99/100")])
         with self.assertRaises(ProjektFehler) as ctx:
             projekt.aufbauen()
         self.assertIn("C99/100", str(ctx.exception))
 
     def test_querschnitt_ohne_bewehrung(self):
         projekt = Projekt(
-            materialien=[MaterialEintrag("b1", "beton", "C30/37")],
+            materialien=[MaterialEintrag("b1", "beton", "C30/37", "C30/37")],
             querschnitte=[QuerschnittEintrag("q1", "leer", "b1")])
         with self.assertRaises(ProjektFehler):
             projekt.aufbauen()
@@ -92,23 +93,25 @@ class TestProjektBeschreibung(unittest.TestCase):
     def test_ohne_kombination_gibt_es_eine_warnung_statt_eines_fehlers(self):
         projekt = Projekt(
             materialien=[
-                MaterialEintrag("b1", "beton", "C30/37"),
-                MaterialEintrag("s1", "betonstahl", "B500B"),
+                MaterialEintrag("b1", "beton", "C30/37", "C30/37"),
+                MaterialEintrag("s1", "betonstahl", "B500B", "B500B"),
             ],
             querschnitte=[QuerschnittEintrag(
                 "q1", "ohne Lasten", "b1",
-                lagen_unten=[LageEintrag(16.0, "s1", abstand=150.0)])])
+                lagen=[LageEintrag(stahl="s1",
+                                   grund=PostenEintrag(durchmesser=16.0, abstand=150.0))])])
         aufbau = projekt.aufbauen()
         self.assertTrue(aufbau.warnungen)
         self.assertEqual(aufbau.nachweise, {})
 
     def test_stabzahl_statt_abstand(self):
         projekt = Projekt.beispiel()
-        lage = projekt.querschnitt("q1").lagen_unten[0]
-        lage.abstand, lage.anzahl = None, 7.0
+        grund = projekt.querschnitt("q1").lagen[0].grund
+        grund.abstand, grund.anzahl = None, 7.0
         aufbau = projekt.aufbauen()
-        self.assertIsNone(aufbau.querschnitte["q1"].lagen_unten[0].abstand)
-        self.assertEqual(aufbau.querschnitte["q1"].lagen_unten[0].anzahl, 7.0)
+        posten = aufbau.querschnitte["q1"].lagen[0].grund
+        self.assertIsNone(posten.abstand)
+        self.assertEqual(posten.anzahl, 7.0)
 
     def test_freie_kennung(self):
         projekt = Projekt.beispiel()
@@ -155,7 +158,7 @@ class TestApiAbbildung(unittest.TestCase):
 
     def test_linie_wird_mitgeliefert(self):
         d = api.loesung_dict(self.loesung, self.aufbau, self.ziele)
-        linie = d["linien"]["q1"]
+        linie = d["linien"]["q1.x"]
         self.assertGreater(len(linie["punkte"]), 100)
         self.assertEqual(len(linie["kombinationen"]), 3)
         self.assertIn("art_text", linie["kombinationen"][0])
@@ -175,7 +178,7 @@ class TestServerEndpunkte(unittest.TestCase):
     def test_rechnen(self):
         antwort = server.rechnen(self.rumpf())
         self.assertTrue(antwort["vollstaendig"])
-        self.assertEqual(len(antwort["urteile"]), 3)
+        self.assertEqual(len(antwort["urteile"]), 6)
         self.assertTrue(antwort["alle_nachweise_erfuellt"])
 
     def test_rechnen_mit_einzelziel(self):
@@ -230,3 +233,106 @@ class TestServerEndpunkte(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestMaterialsperre(unittest.TestCase):
+    """Nur die unveränderte Normsorte darf die Sortenbezeichnung tragen."""
+
+    def test_normsorte_darf_nicht_abweichen(self):
+        projekt = Projekt.beispiel()
+        projekt.material("b1").abweichungen["f_ck"] = 45.0
+        with self.assertRaises(ProjektFehler) as ctx:
+            projekt.aufbauen()
+        self.assertIn("Normsorte", str(ctx.exception))
+
+    def test_normsorte_darf_nicht_umbenannt_werden(self):
+        projekt = Projekt.beispiel()
+        projekt.material("b1").name = "Mein Beton"
+        with self.assertRaises(ProjektFehler):
+            projekt.aufbauen()
+
+    def test_loesen_vergibt_eigenen_namen(self):
+        projekt = Projekt.beispiel()
+        eintrag = projekt.material_loesen("b1")
+        self.assertTrue(eintrag.eigenstaendig)
+        self.assertEqual(eintrag.name, "C30/37_1")
+        eintrag.abweichungen["f_ck"] = 45.0
+        projekt.aufbauen()  # jetzt erlaubt
+
+    def test_loesen_weicht_belegten_namen_aus(self):
+        projekt = Projekt.beispiel()
+        projekt.materialien.append(
+            MaterialEintrag("b2", "beton", "C30/37", "C30/37_1", eigenstaendig=True))
+        self.assertEqual(projekt.material_loesen("b1").name, "C30/37_2")
+
+    def test_doppelte_namen_verboten(self):
+        projekt = Projekt.beispiel()
+        projekt.materialien.append(MaterialEintrag("b2", "beton", "C30/37", "C30/37"))
+        with self.assertRaises(ProjektFehler) as ctx:
+            projekt.aufbauen()
+        self.assertIn("zweimal vergeben", str(ctx.exception))
+
+    def test_mehrere_materialien_bekommen_indizierte_symbole(self):
+        """Sonst stünden im Bericht zwei gleich aussehende Gleichungen."""
+        projekt = Projekt.beispiel()
+        projekt.materialien.append(
+            MaterialEintrag("b2", "beton", "C50/60", "C50/60"))
+        aufbau = projekt.aufbauen()
+        self.assertIn("C30/37", aufbau.baustoffe["b1"].definition("f_cd").symbol)
+        self.assertIn("C50/60", aufbau.baustoffe["b2"].definition("f_cd").symbol)
+
+    def test_einzelnes_material_bleibt_ohne_index(self):
+        aufbau = Projekt.beispiel().aufbauen()
+        self.assertEqual(aufbau.baustoffe["b1"].definition("f_cd").symbol, "f_{cd}")
+
+
+class TestMehrfachverwendung(unittest.TestCase):
+    def test_zwei_platten_mit_demselben_beton(self):
+        """
+        Früher scheiterte das ganze Projekt: der Beton wurde von jeder Platte
+        erneut angemeldet und das Rechenwerk lehnte die Doppelung ab.
+        """
+        projekt = Projekt.beispiel()
+        zweite = QuerschnittEintrag.aus_dict(projekt.querschnitte[0].als_dict())
+        zweite.kennung, zweite.name = "q2", "Zweite Platte"
+        projekt.querschnitte.append(zweite)
+        aufbau = projekt.aufbauen()
+        self.assertEqual(sorted(aufbau.nachweise), ["q1.x", "q1.y", "q2.x", "q2.y"])
+        self.assertTrue(aufbau.werk.loese(*aufbau.alle_nachweisziele()).vollstaendig)
+
+
+class TestAltesFormat(unittest.TestCase):
+    """Eine vor dem Vier-Lagen-Modell gespeicherte Datei muss weiter aufgehen."""
+
+    ALT = {
+        "name": "Alt",
+        "materialien": [
+            {"kennung": "b1", "art": "beton", "sorte": "C30/37", "name": "C30/37"},
+            {"kennung": "s1", "art": "betonstahl", "sorte": "B500B", "name": "B500B"},
+        ],
+        "querschnitte": [{
+            "kennung": "q1", "name": "Decke", "beton": "b1", "h": 300.0, "b": 1000.0,
+            "ueberdeckung_unten": 30.0, "ueberdeckung_oben": 30.0,
+            "lagen_unten": [
+                {"durchmesser": 18.0, "stahl": "s1", "abstand": 150.0, "anzahl": None},
+                {"durchmesser": 12.0, "stahl": "s1", "abstand": 150.0, "anzahl": None},
+            ],
+            "lagen_oben": [
+                {"durchmesser": 12.0, "stahl": "s1", "abstand": 150.0, "anzahl": None},
+            ],
+            "kombinationen": [{"name": "Feld", "M_Ed": 100.0, "N_Ed": 0.0, "art": "N_konstant"}],
+        }],
+    }
+
+    def test_wird_umgerechnet(self):
+        projekt = Projekt.aus_dict(self.ALT)
+        lagen = projekt.querschnitte[0].lagen
+        self.assertEqual(len(lagen), 4)
+        self.assertEqual(lagen[0].grund.durchmesser, 18.0)   # lagen_unten[0] -> 1. Lage
+        self.assertEqual(lagen[1].grund.durchmesser, 12.0)   # lagen_unten[1] -> 2. Lage
+        self.assertFalse(lagen[2].vorhanden)                 # es gab keine zweite obere
+        self.assertEqual(lagen[3].grund.durchmesser, 12.0)   # lagen_oben[0] -> 4. Lage
+
+    def test_rechnet_durch(self):
+        aufbau = Projekt.aus_dict(self.ALT).aufbauen()
+        self.assertTrue(aufbau.werk.loese(*aufbau.alle_nachweisziele()).vollstaendig)

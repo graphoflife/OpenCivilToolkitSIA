@@ -1,19 +1,23 @@
 /**
  * editor.js -- Mittlere Tafel: Eingaben zum ausgewählten Bestandteil.
  *
- * ZWEI ARTEN VON KENNWERTEN:
- * Was aus der Sortentabelle oder als Normvorgabe kommt, ist unmittelbar
- * änderbar -- es landet in `abweichungen`. Was gerechnet wird, steht
- * schreibgeschützt da, bis man es ausdrücklich überschreibt; dann landet es in
- * `ueberschreibungen`, und der Rechenkern überspringt die zugehörige
- * Berechnung samt allem, was nur für sie gebraucht wurde.
+ * NORMSORTE ODER EIGENES MATERIAL:
+ * Eine unveränderte Normsorte ist gesperrt -- kein Feld lässt sich anfassen.
+ * Wer abweichen will, drückt „Material modifizieren"; das Material bekommt
+ * dann einen eigenen Namen (C30/37_1) und wird änderbar. So kann keine
+ * abgewandelte Festigkeit unter einer Normbezeichnung im Bericht landen.
+ *
+ * BEWEHRUNG:
+ * Vier Lagen, von unten nach oben. Die Eingabemaske ist genauso gestapelt --
+ * die 1. Lage steht unten, direkt über der unteren Überdeckung. Jede Lage hat
+ * eine Grundbewehrung und eine Zulage. Die Richtung der 1. und der 4. Lage ist
+ * wählbar; die 2. und die 3. bekommen zwingend die Gegenrichtung.
  *
  * Angezeigt wird immer der Wert aus der letzten Lösung, nie ein in der
- * Oberfläche nachgerechneter. Solange noch nicht gerechnet wurde, steht dort
- * ein Strich -- lieber nichts als eine Zahl, für die niemand geradesteht.
+ * Oberfläche nachgerechneter.
  */
 
-import { auswahl, el, ersetzen, leerzustand, zahlfeld } from './dom.js';
+import { auswahl, el, ersetzen, melden, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
 import {
   gewaehltesMaterial, gewaehlterQuerschnitt, kennwertId, projektAendern, zustand,
@@ -21,7 +25,6 @@ import {
 
 const ART_TEXT = { beton: 'Beton', betonstahl: 'Betonstahl' };
 
-/** Der gerechnete Wert zu einer Wert-ID, oder null. */
 function gerechnet(id) {
   return zustand.loesung?.werte?.[id] || null;
 }
@@ -39,24 +42,24 @@ function feld(beschriftung, eingabe, einheit) {
 // ===========================================================================
 
 function kennwertZeile(material, vorlage) {
-  const id = kennwertId(material, vorlage.kurzname);
-  const wert = gerechnet(id);
+  const gesperrt = !material.eigenstaendig;
+  const wert = gerechnet(kennwertId(material, vorlage.kurzname));
   const istUeberschrieben = vorlage.kurzname in material.ueberschreibungen;
   const istAbweichend = vorlage.kurzname in material.abweichungen;
 
-  // Anzuzeigende Zahl: was der Benutzer gesetzt hat, sonst das Rechenergebnis.
   let anzeige = null;
   if (istUeberschrieben) anzeige = material.ueberschreibungen[vorlage.kurzname];
   else if (istAbweichend) anzeige = material.abweichungen[vorlage.kurzname];
   else if (wert) anzeige = Number(wert.zahl.toFixed(vorlage.stellen));
 
-  const schreibbar = !vorlage.berechnet || istUeberschrieben;
+  const schreibbar = !gesperrt && (!vorlage.berechnet || istUeberschrieben);
 
   const eingabe = zahlfeld({
     wert: anzeige,
     schritt: vorlage.stellen >= 3 ? 0.001 : (vorlage.stellen >= 1 ? 0.1 : 1),
     readonly: !schreibbar,
-    titel: schreibbar ? '' : 'Wird gerechnet. Zum Ändern links überschreiben.',
+    titel: gesperrt ? 'Normsorte – erst modifizieren, dann änderbar'
+      : (vorlage.berechnet && !istUeberschrieben ? 'Wird gerechnet. Haken setzen zum Überschreiben.' : ''),
     beiAenderung: (neu) => projektAendern((p) => {
       const m = p.materialien.find((x) => x.kennung === material.kennung);
       const topf = vorlage.berechnet ? m.ueberschreibungen : m.abweichungen;
@@ -65,33 +68,27 @@ function kennwertZeile(material, vorlage) {
     }),
   });
 
-  // Nur gerechnete Kennwerte bekommen den Überschreiben-Schalter.
   const schalter = vorlage.berechnet
     ? el('input', {
-      type: 'checkbox',
-      checked: istUeberschrieben,
-      title: 'Von Hand überschreiben',
+      type: 'checkbox', checked: istUeberschrieben, disabled: gesperrt,
+      title: gesperrt ? 'Normsorte – erst modifizieren' : 'Von Hand überschreiben',
       on: {
         change: (e) => projektAendern((p) => {
           const m = p.materialien.find((x) => x.kennung === material.kennung);
-          if (e.target.checked) {
-            m.ueberschreibungen[vorlage.kurzname] = anzeige ?? 0;
-          } else {
-            delete m.ueberschreibungen[vorlage.kurzname];
-          }
+          if (e.target.checked) m.ueberschreibungen[vorlage.kurzname] = anzeige ?? 0;
+          else delete m.ueberschreibungen[vorlage.kurzname];
         }),
       },
     })
     : el('span');
 
-  const zuruecksetzen = (istAbweichend && !vorlage.berechnet)
+  const zuruecksetzen = (istAbweichend && !vorlage.berechnet && !gesperrt)
     ? el('button.knopf.knopf-zart', {
-      text: '↺',
-      title: 'Auf den Sorten- bzw. Normwert zurücksetzen',
+      text: '↺', title: 'Auf den Sorten- bzw. Normwert zurücksetzen',
       on: {
         click: () => projektAendern((p) => {
-          const m = p.materialien.find((x) => x.kennung === material.kennung);
-          delete m.abweichungen[vorlage.kurzname];
+          delete p.materialien.find((x) => x.kennung === material.kennung)
+            .abweichungen[vorlage.kurzname];
         }),
       },
     })
@@ -102,11 +99,7 @@ function kennwertZeile(material, vorlage) {
     title: [vorlage.beschreibung, vorlage.referenz].filter(Boolean).join(' — '),
   }, [
     schalter,
-    el('span.bezeichnung', {}, [
-      span(vorlage.symbol),
-      ' ',
-      el('small', { text: vorlage.beschreibung }),
-    ]),
+    el('span.bezeichnung', {}, [span(vorlage.symbol), ' ', el('small', { text: vorlage.beschreibung })]),
     eingabe,
     el('span.einheit', { text: vorlage.einheit === '-' ? '' : vorlage.einheit }),
     zuruecksetzen,
@@ -115,48 +108,54 @@ function kennwertZeile(material, vorlage) {
 
 function materialEditor(material) {
   const sorten = material.art === 'beton'
-    ? zustand.katalog.betonsorten
-    : zustand.katalog.stahlsorten;
+    ? zustand.katalog.betonsorten : zustand.katalog.stahlsorten;
   const vorlagen = zustand.katalog.kennwerte[material.art] || [];
-
-  const grundlagen = vorlagen.filter((v) => !v.berechnet);
-  const abgeleitete = vorlagen.filter((v) => v.berechnet);
-
+  const gesperrt = !material.eigenstaendig;
   const anzahlUeberschrieben = Object.keys(material.ueberschreibungen).length;
 
+  const kopf = gesperrt
+    ? el('div.gesperrt-hinweis', {}, [
+      el('div', { style: { flex: '1 1 220px' } }, [
+        el('b', { text: `Normsorte ${material.sorte}` }),
+        'Sämtliche Kennwerte stammen aus der Norm und sind gesperrt. Nur so darf '
+        + 'diese Bezeichnung im Bericht stehen.',
+      ]),
+      el('button.knopf', {
+        text: 'Material modifizieren',
+        title: 'Macht daraus ein eigenständiges Material mit eigenem Namen',
+        on: { click: () => materialLoesen(material) },
+      }),
+    ])
+    : el('div.gesperrt-hinweis', {
+      style: { background: 'var(--warn-hell)', borderColor: 'var(--warn)' },
+    }, [
+      el('div', { style: { flex: '1 1 220px' } }, [
+        el('b', { text: 'Eigenständiges Material' }),
+        `Abgeleitet von ${material.sorte}. Die Kennwerte sind änderbar und `
+        + 'entsprechen nicht mehr zwingend der Norm.',
+      ]),
+    ]);
+
   return [
+    kopf,
     el('div.feldgruppe', {}, [
       el('h3', { text: 'Material' }),
       feld('Bezeichnung', el('input', {
-        type: 'text',
-        value: material.name,
-        on: {
-          change: (e) => projektAendern((p) => {
-            p.materialien.find((x) => x.kennung === material.kennung).name = e.target.value;
-          }),
-        },
+        type: 'text', value: material.name, disabled: gesperrt,
+        title: gesperrt ? 'Eine Normsorte trägt zwingend ihre Sortenbezeichnung' : '',
+        on: { change: (e) => nameAendern(material, e.target.value, e.target) },
       })),
       feld('Sorte', auswahl({
         werte: sorten.map((s) => ({ wert: s.sorte, beschriftung: s.sorte })),
         gewaehlt: material.sorte,
-        beiAenderung: (neu) => projektAendern((p) => {
-          const m = p.materialien.find((x) => x.kennung === material.kennung);
-          m.sorte = neu;
-          // Sortenabhängige Abweichungen verlieren mit der Sorte ihren Sinn.
-          for (const v of vorlagen.filter((x) => x.aus_sorte)) delete m.abweichungen[v.kurzname];
-        }),
+        beiAenderung: (neu) => sorteAendern(material, neu, vorlagen),
       })),
     ]),
 
     el('div.feldgruppe', {}, [
-      el('h3', {}, [
-        el('span', { text: 'Grundwerte' }),
-        el('span', {
-          text: 'aus Sortentabelle und Norm',
-          style: { fontWeight: '400', textTransform: 'none', letterSpacing: '0' },
-        }),
-      ]),
-      ...grundlagen.map((v) => kennwertZeile(material, v)),
+      el('h3', {}, [el('span', { text: 'Grundwerte' }),
+        el('span', { text: 'aus Sortentabelle und Norm' })]),
+      ...vorlagen.filter((v) => !v.berechnet).map((v) => kennwertZeile(material, v)),
     ]),
 
     el('div.feldgruppe', {}, [
@@ -164,131 +163,185 @@ function materialEditor(material) {
         el('span', { text: 'Abgeleitete Kennwerte' }),
         anzahlUeberschrieben
           ? el('button.knopf.knopf-zart', {
-            text: `${anzahlUeberschrieben} überschrieben — alle zurücksetzen`,
+            text: `${anzahlUeberschrieben} überschrieben — zurücksetzen`,
             on: {
               click: () => projektAendern((p) => {
                 p.materialien.find((x) => x.kennung === material.kennung).ueberschreibungen = {};
               }),
             },
           })
-          : el('span', {
-            text: 'Haken setzen zum Überschreiben',
-            style: { fontWeight: '400', textTransform: 'none', letterSpacing: '0' },
-          }),
+          : el('span', { text: gesperrt ? 'gesperrt' : 'Haken setzen zum Überschreiben' }),
       ]),
-      ...abgeleitete.map((v) => kennwertZeile(material, v)),
+      ...vorlagen.filter((v) => v.berechnet).map((v) => kennwertZeile(material, v)),
     ]),
   ];
 }
 
+/** Macht aus einer Normsorte ein eigenständiges Material mit eigenem Namen. */
+function materialLoesen(material) {
+  const vergeben = new Set(zustand.projekt.materialien
+    .filter((m) => m.kennung !== material.kennung).map((m) => m.name || m.sorte));
+  // Hochzählen an der Sorte, nicht am schon abgeleiteten Namen -- sonst
+  // entstünde bei Belegung C30/37_1_1 statt C30/37_2.
+  let i = 1;
+  while (vergeben.has(`${material.sorte}_${i}`)) i += 1;
+  const name = `${material.sorte}_${i}`;
+
+  projektAendern((p) => {
+    const m = p.materialien.find((x) => x.kennung === material.kennung);
+    m.eigenstaendig = true;
+    m.name = name;
+  });
+  melden(`Material ist jetzt eigenständig und heisst „${name}".`);
+}
+
+function nameAendern(material, wunsch, feldKnoten) {
+  const name = wunsch.trim();
+  const vergeben = zustand.projekt.materialien
+    .some((m) => m.kennung !== material.kennung && (m.name || m.sorte) === name);
+  if (!name || vergeben) {
+    melden(vergeben
+      ? `Der Name „${name}" ist schon vergeben. Materialnamen müssen eindeutig sein.`
+      : 'Der Name darf nicht leer sein.', true);
+    feldKnoten.value = material.name;
+    return;
+  }
+  projektAendern((p) => {
+    p.materialien.find((x) => x.kennung === material.kennung).name = name;
+  });
+}
+
+function sorteAendern(material, neu, vorlagen) {
+  // Bei einer Normsorte wandert der Name mit -- er *ist* die Sorte.
+  if (!material.eigenstaendig) {
+    const vergeben = zustand.projekt.materialien
+      .some((m) => m.kennung !== material.kennung && (m.name || m.sorte) === neu);
+    if (vergeben) {
+      melden(`Die Normsorte „${neu}" ist bereits angelegt.`, true);
+      return;
+    }
+  }
+  projektAendern((p) => {
+    const m = p.materialien.find((x) => x.kennung === material.kennung);
+    m.sorte = neu;
+    if (!m.eigenstaendig) m.name = neu;
+    for (const v of vorlagen.filter((x) => x.aus_sorte)) delete m.abweichungen[v.kurzname];
+  });
+}
+
 // ===========================================================================
-// Querschnitt
+// Platte
 // ===========================================================================
 
-function lageZeile(querschnitt, seite, index) {
-  const liste = seite === 'unten' ? querschnitt.lagen_unten : querschnitt.lagen_oben;
-  const lage = liste[index];
-  const staehle = zustand.projekt.materialien.filter((m) => m.art === 'betonstahl');
+function postenBlock(querschnitt, nummer, welcher, beschriftung) {
+  const lage = querschnitt.lagen[nummer - 1];
+  const posten = lage[welcher];
+  const ueberAbstand = posten.abstand !== null && posten.abstand !== undefined;
 
   const aendern = (veraenderer) => projektAendern((p) => {
-    const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
-    veraenderer((seite === 'unten' ? q.lagen_unten : q.lagen_oben)[index]);
+    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
+      .lagen[nummer - 1][welcher]);
   });
 
-  const ueberAbstand = lage.abstand !== null && lage.abstand !== undefined;
-
-  return el('div.lage', {}, [
-    el('div.lage-kopf', {}, [
-      el('span', { text: `${index + 1}. Lage ${seite}` }),
-      el('div.reihe', {}, [
-        index > 0 ? el('button.knopf.knopf-zart', {
-          text: '↑', title: 'Weiter nach aussen',
-          on: {
-            click: () => projektAendern((p) => {
-              const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
-              const l = seite === 'unten' ? q.lagen_unten : q.lagen_oben;
-              [l[index - 1], l[index]] = [l[index], l[index - 1]];
-            }),
-          },
-        }) : null,
-        el('button.knopf.knopf-zart.knopf-gefahr', {
-          text: '×', title: 'Lage entfernen',
-          on: {
-            click: () => projektAendern((p) => {
-              const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
-              (seite === 'unten' ? q.lagen_unten : q.lagen_oben).splice(index, 1);
-            }),
-          },
-        }),
-      ]),
-    ]),
-
-    el('div.lage-reihe', {}, [
+  return el('div.posten', {}, [
+    el('div.posten-titel', { text: beschriftung }),
+    el('div.posten-reihe', {}, [
       feld('⌀', zahlfeld({
-        wert: lage.durchmesser, schritt: 2, min: 1,
-        beiAenderung: (v) => aendern((l) => { l.durchmesser = v ?? 1; }),
+        wert: posten.durchmesser, schritt: 2, min: 0,
+        titel: '0 = nicht vorhanden',
+        beiAenderung: (v) => aendern((x) => { x.durchmesser = v ?? 0; }),
       }), 'mm'),
-      feld('Stahl', auswahl({
-        werte: staehle.map((s) => ({ wert: s.kennung, beschriftung: s.name || s.sorte })),
-        gewaehlt: lage.stahl,
-        beiAenderung: (v) => aendern((l) => { l.stahl = v; }),
-      })),
-    ]),
-
-    el('div.lage-reihe', {}, [
-      feld('Angabe', auswahl({
-        werte: [
-          { wert: 'abstand', beschriftung: 'Stababstand' },
-          { wert: 'anzahl', beschriftung: 'Stabzahl' },
-        ],
-        gewaehlt: ueberAbstand ? 'abstand' : 'anzahl',
-        beiAenderung: (v) => aendern((l) => {
-          if (v === 'abstand') { l.abstand = l.abstand || 150; l.anzahl = null; }
-          else { l.anzahl = l.anzahl || 5; l.abstand = null; }
-        }),
-      })),
       ueberAbstand
-        ? feld('s', zahlfeld({
-          wert: lage.abstand, schritt: 25, min: 1,
-          beiAenderung: (v) => aendern((l) => { l.abstand = v ?? 150; }),
+        ? feld('Teilung s', zahlfeld({
+          wert: posten.abstand, schritt: 25, min: 1,
+          beiAenderung: (v) => aendern((x) => { x.abstand = v ?? 150; }),
         }), 'mm')
-        : feld('n', zahlfeld({
-          wert: lage.anzahl, schritt: 1, min: 1,
-          beiAenderung: (v) => aendern((l) => { l.anzahl = v ?? 1; }),
+        : feld('Anzahl n', zahlfeld({
+          wert: posten.anzahl, schritt: 1, min: 1,
+          beiAenderung: (v) => aendern((x) => { x.anzahl = v ?? 1; }),
         }), 'Stk'),
     ]),
-
-    feld('Lichter Abstand zur vorigen Lage', zahlfeld({
-      wert: lage.lichter_abstand, schritt: 5, min: 0,
-      beiAenderung: (v) => aendern((l) => { l.lichter_abstand = v ?? 0; }),
-    }), 'mm'),
+    feld('Angabe über', auswahl({
+      werte: [{ wert: 'abstand', beschriftung: 'Teilung' },
+        { wert: 'anzahl', beschriftung: 'Stabzahl' }],
+      gewaehlt: ueberAbstand ? 'abstand' : 'anzahl',
+      beiAenderung: (v) => aendern((x) => {
+        if (v === 'abstand') { x.abstand = x.abstand || 150; x.anzahl = null; }
+        else { x.anzahl = x.anzahl || 5; x.abstand = null; }
+      }),
+    })),
   ]);
 }
 
-function lagenGruppe(querschnitt, seite) {
-  const liste = seite === 'unten' ? querschnitt.lagen_unten : querschnitt.lagen_oben;
+function lagenBlock(querschnitt, nummer) {
+  const lage = querschnitt.lagen[nummer - 1];
   const staehle = zustand.projekt.materialien.filter((m) => m.art === 'betonstahl');
+  const waehlbar = nummer === 1 || nummer === 4;
+  const richtung = richtungVon(querschnitt, nummer);
+  const partner = { 1: 2, 2: 1, 3: 4, 4: 3 }[nummer];
+  const leer = !(lage.grund.durchmesser > 0 || lage.zulage.durchmesser > 0);
 
-  return el('div.feldgruppe', {}, [
-    el('h3', {}, [
-      el('span', { text: `Bewehrung ${seite}` }),
-      el('button.knopf.knopf-zart', {
-        text: '+ Lage',
-        disabled: !staehle.length,
+  return el('div.lage', { class: `lage-${richtung} ${leer ? 'ist-leer' : ''}` }, [
+    el('div.lage-kopf', {}, [
+      el('span', { text: `${nummer}. Lage` }),
+      waehlbar
+        ? el('select', {
+          style: { width: 'auto', padding: '1px 6px', fontSize: '11px' },
+          title: `Die ${partner}. Lage bekommt zwingend die Gegenrichtung`,
+          on: {
+            change: (e) => projektAendern((p) => {
+              const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
+              if (nummer === 1) q.richtung_lage1 = e.target.value;
+              else q.richtung_lage4 = e.target.value;
+            }),
+          },
+        }, [
+          el('option', { value: 'x', text: 'x-Richtung', selected: richtung === 'x' }),
+          el('option', { value: 'y', text: 'y-Richtung', selected: richtung === 'y' }),
+        ])
+        : el('span.richtung', { text: `${richtung}-Richtung` }),
+      waehlbar ? null : el('span.fest', { text: `folgt aus der ${partner}. Lage` }),
+      el('span', { style: { marginLeft: 'auto' } }),
+      el('select', {
+        style: { width: 'auto', padding: '1px 6px', fontSize: '11px' },
+        title: 'Betonstahl dieser Lage',
         on: {
-          click: () => projektAendern((p) => {
-            const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
-            (seite === 'unten' ? q.lagen_unten : q.lagen_oben).push({
-              durchmesser: 12, stahl: staehle[0].kennung,
-              abstand: 150, anzahl: null, lichter_abstand: 0,
-            });
+          change: (e) => projektAendern((p) => {
+            p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
+              .lagen[nummer - 1].stahl = e.target.value;
           }),
         },
-      }),
+      }, staehle.map((s) => el('option', {
+        value: s.kennung, text: s.name || s.sorte, selected: lage.stahl === s.kennung,
+      }))),
     ]),
-    ...(liste.length
-      ? liste.map((_, i) => lageZeile(querschnitt, seite, i))
-      : [el('div.leer', { text: 'keine Lage', style: { padding: '8px', textAlign: 'left' } })]),
+    postenBlock(querschnitt, nummer, 'grund', 'Grundbewehrung'),
+    postenBlock(querschnitt, nummer, 'zulage', 'Zulage'),
+  ]);
+}
+
+function richtungVon(querschnitt, nummer) {
+  const gegen = (r) => (r === 'x' ? 'y' : 'x');
+  return {
+    1: querschnitt.richtung_lage1,
+    2: gegen(querschnitt.richtung_lage1),
+    3: gegen(querschnitt.richtung_lage4),
+    4: querschnitt.richtung_lage4,
+  }[nummer];
+}
+
+function ueberdeckungsBlock(querschnitt, welche) {
+  const unten = welche === 'unten';
+  const aendern = (v) => projektAendern((p) => {
+    const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
+    if (unten) q.ueberdeckung_unten = v ?? 30;
+    else q.ueberdeckung_oben = v ?? 30;
+  });
+  return el('div.ueberdeckung', {}, [
+    feld(`Überdeckung ${welche}`, zahlfeld({
+      wert: unten ? querschnitt.ueberdeckung_unten : querschnitt.ueberdeckung_oben,
+      schritt: 5, min: 0, beiAenderung: aendern,
+    }), 'mm'),
   ]);
 }
 
@@ -302,7 +355,7 @@ function kombinationZeile(querschnitt, index) {
     el('div.lage-kopf', {}, [
       el('input', {
         type: 'text', value: k.name,
-        style: { border: 'none', background: 'transparent', fontWeight: '600', padding: '0' },
+        style: { border: 'none', background: 'transparent', fontWeight: '700', padding: '0' },
         on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
       }),
       el('button.knopf.knopf-zart.knopf-gefahr', {
@@ -315,28 +368,25 @@ function kombinationZeile(querschnitt, index) {
         },
       }),
     ]),
-    el('div.lage-reihe', {}, [
+    el('div.posten-reihe', {}, [
       feld('M_Ed', zahlfeld({
         wert: k.M_Ed, schritt: 10,
         beiAenderung: (v) => aendern((x) => { x.M_Ed = v ?? 0; }),
       }), 'kNm'),
       feld('N_Ed', zahlfeld({
-        wert: k.N_Ed, schritt: 10,
-        titel: 'Zug positiv, Druck negativ',
+        wert: k.N_Ed, schritt: 10, titel: 'Zug positiv, Druck negativ',
         beiAenderung: (v) => aendern((x) => { x.N_Ed = v ?? 0; }),
       }), 'kN'),
     ]),
     feld('Massstab', auswahl({
-      werte: zustand.katalog.erfuellungsarten.map((a) => ({
-        wert: a.wert, beschriftung: a.beschriftung,
-      })),
+      werte: zustand.katalog.erfuellungsarten.map((a) => ({ wert: a.wert, beschriftung: a.beschriftung })),
       gewaehlt: k.art,
       beiAenderung: (v) => aendern((x) => { x.art = v; }),
     })),
   ]);
 }
 
-function querschnittEditor(querschnitt) {
+function plattenEditor(querschnitt) {
   const betone = zustand.projekt.materialien.filter((m) => m.art === 'beton');
   const aendern = (veraenderer) => projektAendern((p) => {
     veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
@@ -344,7 +394,7 @@ function querschnittEditor(querschnitt) {
 
   return [
     el('div.feldgruppe', {}, [
-      el('h3', { text: 'Querschnitt' }),
+      el('h3', { text: 'Platte' }),
       feld('Bezeichnung', el('input', {
         type: 'text', value: querschnitt.name,
         on: { change: (e) => aendern((q) => { q.name = e.target.value; }) },
@@ -354,7 +404,7 @@ function querschnittEditor(querschnitt) {
         gewaehlt: querschnitt.beton,
         beiAenderung: (v) => aendern((q) => { q.beton = v; }),
       })),
-      feld('Höhe h', zahlfeld({
+      feld('Dicke h', zahlfeld({
         wert: querschnitt.h, schritt: 10, min: 10,
         beiAenderung: (v) => aendern((q) => { q.h = v ?? 300; }),
       }), 'mm'),
@@ -363,18 +413,20 @@ function querschnittEditor(querschnitt) {
         titel: 'Mit b = 1000 mm gelten alle Schnittgrössen pro Laufmeter.',
         beiAenderung: (v) => aendern((q) => { q.b = v ?? 1000; }),
       }), 'mm'),
-      feld('Überdeckung unten', zahlfeld({
-        wert: querschnitt.ueberdeckung_unten, schritt: 5, min: 0,
-        beiAenderung: (v) => aendern((q) => { q.ueberdeckung_unten = v ?? 30; }),
-      }), 'mm'),
-      feld('Überdeckung oben', zahlfeld({
-        wert: querschnitt.ueberdeckung_oben, schritt: 5, min: 0,
-        beiAenderung: (v) => aendern((q) => { q.ueberdeckung_oben = v ?? 30; }),
-      }), 'mm'),
     ]),
 
-    lagenGruppe(querschnitt, 'unten'),
-    lagenGruppe(querschnitt, 'oben'),
+    el('div.feldgruppe', {}, [
+      el('h3', {}, [el('span', { text: 'Bewehrung' }),
+        el('span', { text: 'von unten nach oben' })]),
+      // Die Maske ist gestapelt wie der Querschnitt: oben die 4. Lage,
+      // unten die 1. -- so steht auf dem Bildschirm, was im Bauteil liegt.
+      ueberdeckungsBlock(querschnitt, 'oben'),
+      lagenBlock(querschnitt, 4),
+      lagenBlock(querschnitt, 3),
+      lagenBlock(querschnitt, 2),
+      lagenBlock(querschnitt, 1),
+      ueberdeckungsBlock(querschnitt, 'unten'),
+    ]),
 
     el('div.feldgruppe', {}, [
       el('h3', {}, [
@@ -389,12 +441,14 @@ function querschnittEditor(querschnitt) {
           },
         }),
       ]),
+      el('p', {
+        text: 'Jede Kombination wird in beiden Tragrichtungen geprüft, in denen '
+            + 'Bewehrung liegt.',
+        style: { fontSize: '12px', color: 'var(--schrift-zart)', margin: '0 0 8px' },
+      }),
       ...(querschnitt.kombinationen.length
         ? querschnitt.kombinationen.map((_, i) => kombinationZeile(querschnitt, i))
-        : [el('div.leer', {
-          text: 'Ohne Schnittgrössen kein Nachweis.',
-          style: { padding: '8px', textAlign: 'left' },
-        })]),
+        : [el('div.leer', { text: 'Ohne Schnittgrössen kein Nachweis.' })]),
     ]),
   ];
 }
@@ -407,17 +461,19 @@ export function editorZeichnen(behaelter, titelKnoten, hinweisKnoten) {
 
   if (material) {
     titelKnoten.textContent = material.name || material.sorte;
-    hinweisKnoten.textContent = ART_TEXT[material.art] || '';
+    hinweisKnoten.textContent = `${ART_TEXT[material.art] || ''}`
+      + (material.eigenstaendig ? ' · eigenständig' : ' · Normsorte');
     return ersetzen(behaelter, ...materialEditor(material));
   }
   if (querschnitt) {
     titelKnoten.textContent = querschnitt.name;
-    hinweisKnoten.textContent = 'Plattenquerschnitt';
-    return ersetzen(behaelter, ...querschnittEditor(querschnitt));
+    hinweisKnoten.textContent = 'Stahlbeton-Platte';
+    return ersetzen(behaelter, ...plattenEditor(querschnitt));
   }
   titelKnoten.textContent = 'Eingaben';
   hinweisKnoten.textContent = '';
-  return ersetzen(behaelter, leerzustand(
-    'Links einen Bestandteil auswählen.',
-    'Oder mit "+ Beton" und "+ Stahl" ein neues Material anlegen.'));
+  return ersetzen(behaelter, el('div.leer', {}, [
+    el('p', { text: 'Links einen Bestandteil auswählen.' }),
+    el('p', { text: 'Materialien und Platten legst du über das + im Kapitelkopf an.' }),
+  ]));
 }

@@ -243,6 +243,7 @@ def beton(
     name: Optional[str] = None,
     praefix: Optional[str] = None,
     abweichungen: Optional[Mapping[str, Groesse]] = None,
+    symbol_index: str = "",
 ) -> Baustoff:
     """
     Erzeugt einen Beton aus der Sortentabelle.
@@ -271,6 +272,7 @@ def beton(
         vorlagen=BETON_VORLAGEN,
         werte=werte,
         praefix=praefix,
+        symbol_index=symbol_index,
     )
 
 

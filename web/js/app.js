@@ -175,7 +175,8 @@ function griffeEinrichten() {
 function allesZeichnen(anlass) {
   baumZeichnen(knoten.baum);
   editorZeichnen(knoten.editor, knoten.editorTitel, knoten.editorHinweis);
-  berichtZeichnen(knoten.bericht, (ziel) => rechnen({ ziele: [ziel] }));
+  // Der Reiter 'Ziel wählen' liefert eine Liste (oder null für 'alles').
+  berichtZeichnen(knoten.bericht, (ziele) => rechnen({ ziele }));
 
   knoten.btnSpeichern.textContent = zustand.ungespeichert ? 'Speichern •' : 'Speichern';
   for (const k of knoten.reiterKnoepfe) {
@@ -185,6 +186,9 @@ function allesZeichnen(anlass) {
   // Eingaben geändert -> neu rechnen. Nicht bei blossem Blättern und nicht,
   // während schon gerechnet wird.
   if (anlass === 'projekt') spaeterRechnen();
+  // Die Zielliste hängt an der Projektbeschreibung -- nach einer Änderung
+  // ist sie veraltet und wird beim nächsten Öffnen neu geholt.
+  if (anlass === 'projekt') zustand.zieleListe = null;
 }
 
 // ===========================================================================

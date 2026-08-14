@@ -162,6 +162,7 @@ def betonstahl(
     name: Optional[str] = None,
     praefix: Optional[str] = None,
     abweichungen: Optional[Mapping[str, Groesse]] = None,
+    symbol_index: str = "",
 ) -> Baustoff:
     """
     Erzeugt einen Betonstahl aus der Sortentabelle.
@@ -188,6 +189,7 @@ def betonstahl(
         vorlagen=STAHL_VORLAGEN,
         werte=werte,
         praefix=praefix,
+        symbol_index=symbol_index,
     )
 
 

@@ -208,12 +208,18 @@ class Rechenwerk:
             self._definitionen[d.id] = d
         return self
 
+    def kennt_berechnung(self, berechnung_id: str) -> bool:
+        return berechnung_id in self._berechnungen
+
     def registriere(self, *berechnungen: Berechnung) -> "Rechenwerk":
         """
         Nimmt Berechnungen auf.
 
         Mehrere Berechnungen duerfen denselben Wert liefern -- das sind die
-        Varianten, unter denen der Loeser spaeter waehlt.
+        Varianten, unter denen der Loeser spaeter waehlt. Dieselbe Berechnung
+        zweimal anzumelden ist dagegen ein Aufbaufehler und wird gemeldet;
+        wer nicht weiss, ob schon angemeldet wurde, fragt vorher mit
+        :meth:`kennt_berechnung`.
         """
         for b in berechnungen:
             if b.id in self._berechnungen:
