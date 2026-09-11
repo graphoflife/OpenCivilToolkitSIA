@@ -227,14 +227,25 @@ function fokusMerken() {
   const tafel = tafeln().find((t) => t?.contains(aktiv));
   if (!tafel) return null;
 
+  // selectionStart wirft bei manchen Eingabearten (Zahlenfeldern etwa) statt
+  // null zu liefern -- deshalb abgesichert.
+  let von = null;
+  let bis = null;
+  try {
+    von = aktiv.selectionStart;
+    bis = aktiv.selectionEnd;
+  } catch {
+    /* diese Feldart kennt keine Schreibmarke */
+  }
+
   return {
     tafel,
     stelle: [...tafel.querySelectorAll(BEDIENBAR)].indexOf(aktiv),
     art: aktiv.type,
     titel: aktiv.title,
     wert: aktiv.value,
-    von: aktiv.selectionStart,
-    bis: aktiv.selectionEnd,
+    von,
+    bis,
   };
 }
 
@@ -254,21 +265,75 @@ function fokusZurueck(merkmal) {
 }
 
 /**
+ * Elemente, an denen sich die Ansicht festhalten kann.
+ *
+ * Überschriften, Absätze, Formeln, Tabellentitel -- alles, was eine Stelle im
+ * Bericht benennt und sich beim Neuzeichnen wiedererkennen lässt.
+ */
+const ANKER = '.b-titel, .b-text, .gleichung, .tabelle-titel, .hinweis, .kennwert, .feld';
+
+/**
+ * Merkt sich, welcher Inhalt gerade oben in der Tafel steht.
+ *
+ * Die blosse Scrollposition genügt nicht: die Herleitung wird beim Ändern
+ * einer Zahl länger oder kürzer -- eine Eingabe liess sie um über 600 Bildpunkte
+ * schrumpfen. Bei gleicher Scrollposition steht dann anderer Inhalt da, und
+ * genau das sieht aus wie ein Sprung. Festgehalten wird deshalb nicht die
+ * Position, sondern der Inhalt.
+ */
+function ankerMerken(tafel) {
+  if (!tafel || tafel.scrollTop <= 0) return null;
+  const oben = tafel.getBoundingClientRect().top;
+  const gezaehlt = new Map();
+
+  for (const k of tafel.querySelectorAll(ANKER)) {
+    const schluessel = (k.textContent || '').trim().slice(0, 80);
+    const nummer = gezaehlt.get(schluessel) || 0;
+    gezaehlt.set(schluessel, nummer + 1);
+    if (!schluessel) continue;
+    const versatz = k.getBoundingClientRect().top - oben;
+    // Der erste, der nicht schon oben hinausgeschoben ist.
+    if (versatz >= 0) return { schluessel, nummer, versatz };
+  }
+  return null;
+}
+
+function ankerZurueck(tafel, anker) {
+  if (!anker) return false;
+  const oben = tafel.getBoundingClientRect().top;
+  let nummer = 0;
+
+  for (const k of tafel.querySelectorAll(ANKER)) {
+    if ((k.textContent || '').trim().slice(0, 80) !== anker.schluessel) continue;
+    if (nummer++ !== anker.nummer) continue;
+    tafel.scrollTop += (k.getBoundingClientRect().top - oben) - anker.versatz;
+    return true;
+  }
+  return false;
+}
+
+/**
  * Zeichnet neu, ohne die Ansicht zu verwerfen.
  *
- * Jede Eingabe baut die Tafeln komplett neu auf. Dabei fallen die
- * Scrollposition und der Fokus weg -- die Seite sprang bei jedem Enter nach
- * oben. Hier wird beides um das Neuzeichnen herumgerettet.
+ * Jede Eingabe baut die Tafeln komplett neu auf. Dabei fallen Scrollposition
+ * und Fokus weg, und die Länge des Inhalts ändert sich obendrein. Hier wird
+ * beides um das Neuzeichnen herumgerettet: zuerst über den Anker, und wo
+ * keiner wiederzufinden ist, wenigstens über die alte Scrollposition.
  */
 function ohneSprung(zeichnen) {
-  const stand = tafeln().map((t) => t?.scrollTop ?? 0);
+  const vorher = tafeln().map((t) => ({
+    tafel: t, stand: t?.scrollTop ?? 0, anker: ankerMerken(t),
+  }));
   const merkmal = fokusMerken();
 
   zeichnen();
 
-  tafeln().forEach((t, i) => {
-    if (t && t.scrollTop !== stand[i]) t.scrollTop = stand[i];
-  });
+  for (const { tafel, stand, anker } of vorher) {
+    if (!tafel) continue;
+    if (!ankerZurueck(tafel, anker) && tafel.scrollTop !== stand) {
+      tafel.scrollTop = stand;
+    }
+  }
   fokusZurueck(merkmal);
 }
 

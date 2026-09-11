@@ -16,7 +16,7 @@ from __future__ import annotations
 import math
 from typing import Any, Dict, List, Optional, Sequence
 
-from opencivil.core.einheiten import KN, KNM
+from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, MM
 from opencivil.core.protokoll import (
     Block, GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, TextBlock,
     TitelBlock, UnterprotokollBlock,
@@ -456,6 +456,9 @@ def zuordnung(aufbau: Aufbau) -> dict:
                     for schluessel, nw in aufbau.nachweise.items()
                     if schluessel.split(".", 1)[0] == kennung
                 },
+                # Durchmesser, Teilung und Stabzahl als Zahlen, nicht nur als
+                # Text: das Querschnittsbild soll die tatsaechliche Teilung
+                # zeichnen und nicht eine erfundene Stabzahl.
                 "bewehrung": [
                     {
                         "lage": lage.nummer,
@@ -463,6 +466,11 @@ def zuordnung(aufbau: Aufbau) -> dict:
                         "richtung": lage.richtung.value,
                         "stahl": lage.stahl.name if lage.stahl else "",
                         "menge": posten.menge_text(),
+                        "phi": posten.durchmesser.in_einheit(MM),
+                        "abstand": (posten.abstand.in_einheit(MM)
+                                    if posten.abstand is not None else None),
+                        "anzahl": (posten.anzahl.in_einheit(EINHEITSLOS)
+                                   if posten.anzahl is not None else None),
                         "a_s_id": as_id,
                         "z_id": z_id,
                     }

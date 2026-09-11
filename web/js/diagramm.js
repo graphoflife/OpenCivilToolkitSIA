@@ -65,6 +65,57 @@ export function beschriftungenEntzerren(zettel, abstand, oben, unten) {
   return sortiert;
 }
 
+/**
+ * Wo die Stäbe eines Postens über die Breite liegen, in Millimetern.
+ *
+ * Mit Teilung `s` ergibt sich die Stabzahl aus `b / s` -- gezeichnet wird also
+ * die eingegebene Teilung und nicht eine erfundene Anzahl. Die Stäbe werden
+ * anschliessend gleichmässig über `b` verteilt, damit das Bild bei einer
+ * Teilung, die nicht glatt aufgeht, nicht einseitig ausfranst.
+ *
+ * `versatz` verschiebt die ganze Reihe um einen Anteil der Teilung. Damit
+ * kommt die Zulage zwischen die Grundstäbe, so wie sie auch eingelegt wird.
+ */
+export function stabstellen(breite, bewehrung, versatz = 0) {
+  const teilung = bewehrung.abstand;
+  const anzahl = teilung > 0
+    ? Math.max(1, Math.round(breite / teilung))
+    : Math.max(1, Math.round(bewehrung.anzahl || 0));
+  if (!Number.isFinite(anzahl) || anzahl < 1) return [];
+
+  const schritt = breite / anzahl;
+  const stellen = [];
+  for (let i = 0; i < anzahl; i++) {
+    const mm = (i + 0.5 + versatz) * schritt;
+    // Was über den Rand hinausrutscht, wandert an den Anfang -- die Anzahl
+    // bleibt so richtig, und die Reihe bleibt gleichmässig.
+    stellen.push(((mm % breite) + breite) % breite);
+  }
+  return stellen.sort((a, b) => a - b);
+}
+
+/**
+ * Rückt einen Stab zur Seite, bis er keinen schon gezeichneten mehr berührt.
+ *
+ * Bei gleicher Teilung genügt der halbe Versatz aus `stabstellen`. Sind die
+ * Teilungen von Grund und Zulage verschieden, treffen sich einzelne Stäbe
+ * trotzdem -- dann wird hier nachgeholfen. Das verschiebt die Zeichnung um
+ * wenige Zehntelmillimeter und ist allemal besser als zwei Kreise, die
+ * übereinander liegen und wie einer aussehen.
+ */
+export function ausweichen(px, py, r, gesetzt, luft = 1.0) {
+  let stelle = px;
+  for (let versuch = 0; versuch < 12; versuch++) {
+    const stoerer = gesetzt.find((g) =>
+      Math.abs(g.y - py) < g.r + r
+      && Math.abs(g.x - stelle) < g.r + r + luft);
+    if (!stoerer) break;
+    const noetig = stoerer.r + r + luft;
+    stelle = stelle >= stoerer.x ? stoerer.x + noetig : stoerer.x - noetig;
+  }
+  return stelle;
+}
+
 /** Sucht einen runden Schrittabstand für die Achsenteilung. */
 function schrittweite(spanne, zielAnzahl = 8) {
   const roh = spanne / zielAnzahl;
@@ -111,22 +162,27 @@ export function querschnittZeichnen(eintrag, werte) {
 
   const farbe = { x: '#1f6feb', y: '#b8622a' };
   const zettel = [];
+  const gesetzt = [];   // schon gezeichnete Stäbe, für die Überlappungsprüfung
+
   for (const bew of eintrag.bewehrung) {
     const z = zahl(bew.z_id);
-    const phi = zahl(eintrag.werte[`lage.${bew.lage}${bew.art === 'grund' ? 'g' : 'z'}.phi`]);
     if (z === null) continue;
-    const r = Math.max((phi || 12) * massstab / 2, 2.2);
-    const anzahl = 9;
-    for (let i = 0; i < anzahl; i++) {
-      const px = x(b * (i + 0.5) / anzahl);
-      if (bew.richtung === 'x') {
+    const r = Math.max((bew.phi || 12) * massstab / 2, 2.2);
+
+    // Grund und Zulage einer Lage werden nebeneinander eingelegt, nicht
+    // übereinander: die Zulage kommt um eine halbe Teilung versetzt.
+    const versatz = bew.art === 'zulage' ? 0.5 : 0.0;
+
+    if (bew.richtung === 'x') {
+      for (const mm of stabstellen(b, bew, versatz)) {
+        const px = ausweichen(x(mm), y(z), r, gesetzt);
+        gesetzt.push({ x: px, y: y(z), r });
         svg.append(svgEl('circle', {
           cx: px, cy: y(z), r,
           fill: farbe.x, opacity: bew.art === 'zulage' ? 0.55 : 1,
         }));
       }
-    }
-    if (bew.richtung === 'y') {
+    } else {
       // In der Schnittebene laufende Stäbe: eine durchgezogene Linie über die
       // ganze Breite, halbdurchsichtig, damit sie die x-Eisen nicht verdeckt.
       svg.append(svgEl('line', {
@@ -135,6 +191,7 @@ export function querschnittZeichnen(eintrag, werte) {
         'stroke-linecap': 'round', opacity: bew.art === 'zulage' ? 0.45 : 0.7,
       }));
     }
+
     zettel.push({
       soll: y(z),
       anker: y(z),
