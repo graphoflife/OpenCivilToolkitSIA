@@ -190,13 +190,28 @@ class Bewehrungslage:
 # ===========================================================================
 
 
+@dataclass(frozen=True)
+class Postenbezug:
+    """Ein Bewehrungsposten samt der Werte, die der Lagenaufbau fuer ihn liefert."""
+
+    lage: Bewehrungslage
+    art: Postenart
+    posten: Bewehrungsposten
+    marke: str
+    """Kurzform fuer die Eingabenamen, z.B. ``1g``."""
+
+    d_def: WertDef
+    as_def: WertDef
+
+
 class Lagenaufbau(Prozedur):
     """
-    Bestimmt die statischen Hoehen aller Bewehrungsposten.
+    Bestimmt statische Hoehe und Bewehrungsquerschnitt aller Posten.
 
-    Ausgabe ist je Posten sein ``z`` -- der Abstand des Stabschwerpunkts von der
-    Oberkante. Der Ablauf wird als Tabelle mitgeschrieben, damit jede Zahl von
-    Hand nachgerechnet werden kann.
+    Beides in einem Zug und in einer Tabelle. Frueher stand fuer jeden Posten
+    eine eigene Flaechenformel in der Herleitung -- fuenf Lagen ergaben fuenf
+    gleich aussehende Bloecke, in denen sich nur die Zahlen unterschieden. Die
+    Formel steht jetzt einmal da, die Ergebnisse stehen in der Tabelle.
     """
 
     def __init__(
@@ -205,28 +220,47 @@ class Lagenaufbau(Prozedur):
         *,
         ausgaben: Sequence[WertDef],
         bezuege: Sequence[Eingabebezug],
-        posten: Sequence[Tuple[Bewehrungslage, Postenart, Bewehrungsposten, WertDef]],
-        titel: str = "Lagenaufbau",
+        posten: Sequence["Postenbezug"],
+        titel: str = "Bewehrungslagen",
+        abschnitt: str = "",
     ) -> None:
         super().__init__(id, ausgaben=ausgaben, bezuege=bezuege, titel=titel,
-                         referenz="SIA 262:2025, 5.2.2")
+                         referenz="SIA 262:2025, 5.2.2", abschnitt=abschnitt)
         self.posten = list(posten)
 
     def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
         h = e.g("h")
+        b = e.g("b")
         p.text(
             "Die Lagen werden je Seite von aussen nach innen gestapelt. Die Hülle "
             "einer Lage beginnt bei der Überdeckung und wächst um den grössten "
             "Durchmesser der davorliegenden Lage. Grundbewehrung und Zulage einer "
             "Lage liegen auf derselben Hülle und sind je um ihren eigenen "
-            "Halbmesser eingerückt. z wird von der Oberkante nach unten gemessen."
+            "Halbmesser eingerückt. d wird von der gezogenen Randfaser aus "
+            "gemessen, hier von der Oberkante nach unten."
         )
+
+        ueber_abstand = any(q.posten.ueber_abstand for q in self.posten)
+        ueber_anzahl = any(not q.posten.ueber_abstand for q in self.posten)
+        # Nur wenn alle Posten dieselbe Art der Mengenangabe verwenden, darf die
+        # Grösse in die Kopfzeile. Sonst muss sie in jeder Zelle stehen.
+        einheitlich = not (ueber_abstand and ueber_anzahl)
+        if ueber_abstand:
+            p.gleichung(
+                r"A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}",
+                titel="Bewehrungsquerschnitt je Laufmeter",
+                referenz="SIA 262:2025, 5.5.2")
+        if ueber_anzahl:
+            p.gleichung(
+                r"A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot n",
+                titel="Bewehrungsquerschnitt aus der Stabzahl",
+                referenz="SIA 262:2025, 5.5.2")
 
         # Huellen je Seite, von aussen nach innen. Jede Lage kommt nur einmal
         # vor, auch wenn sie zwei Posten traegt -- nach Nummer entdoppelt, weil
         # Bewehrungslage als veraenderliche Datenklasse nicht hashbar ist.
         huelle = {True: e.g("c_nom_unten"), False: e.g("c_nom_oben")}
-        lagen_nach_nummer = {l.nummer: l for l, _, _, _ in self.posten}
+        lagen_nach_nummer = {q.lage.nummer: q.lage for q in self.posten}
         raender: Dict[Tuple[bool, int], Groesse] = {}
         for lage in sorted(lagen_nach_nummer.values(),
                            key=lambda l: (not l.von_unten, l.stapelrang)):
@@ -236,24 +270,52 @@ class Lagenaufbau(Prozedur):
 
         ergebnis: Dict[str, Groesse] = {}
         zeilen: List[List[str]] = []
-        for lage, art, posten, wertdef in self.posten:
-            rand = raender[(lage.von_unten, lage.stapelrang)] + posten.durchmesser / 2.0
-            z = h - rand if lage.von_unten else rand
-            ergebnis[wertdef.id] = z
+        for q in self.posten:
+            phi = e.g(f"phi_{q.marke}")
+            rand = raender[(q.lage.von_unten, q.lage.stapelrang)] + phi / 2.0
+            d = h - rand if q.lage.von_unten else rand
+
+            if q.posten.ueber_abstand:
+                s = e.g(f"s_{q.marke}")
+                a_s = Groesse.aus_si(
+                    math.pi * phi.si * phi.si / 4.0 * (b.si / s.si), MM2)
+                # Bei gemischter Angabe muss in jeder Zelle stehen, um welche
+                # Grösse es geht -- sonst liest man 150 und 7 in derselben
+                # Spalte und weiss nicht, was gemeint ist.
+                menge = s.formatiert(0, MM) if einheitlich else rf"s = {s.als_latex(0, MM)}"
+            else:
+                anzahl = float(q.posten.anzahl)
+                a_s = Groesse.aus_si(math.pi * phi.si * phi.si / 4.0 * anzahl, MM2)
+                menge = f"{anzahl:g}" if einheitlich else f"n = {anzahl:g}"
+
+            ergebnis[q.d_def.id] = d
+            ergebnis[q.as_def.id] = a_s
             zeilen.append([
-                als_text(f"{lage.nummer}. Lage {art.beschriftung}"),
-                als_text(lage.richtung.value),
-                posten.durchmesser.formatiert(0, MM),
+                als_text(f"{q.lage.nummer}. Lage {q.art.beschriftung}"),
+                als_text(q.lage.richtung.value),
+                als_text(q.lage.stahl.name if q.lage.stahl else "–"),
+                phi.formatiert(0, MM),
+                menge,
                 rand.formatiert(1, MM),
-                z.formatiert(1, MM),
+                d.formatiert(1, MM),
+                a_s.formatiert(0, MM2),
             ])
 
+        if not einheitlich:
+            mengenkopf = r"\text{Menge}"
+        elif ueber_abstand:
+            mengenkopf = r"s\ [\mathrm{mm}]"
+        else:
+            mengenkopf = r"n"
+
         p.tabelle(
-            kopf=[r"\text{Bewehrung}", r"\text{Richtung}", r"\varnothing\ [\mathrm{mm}]",
-                  r"\text{Randabstand}\ [\mathrm{mm}]", r"z\ [\mathrm{mm}]"],
+            kopf=[r"\text{Bewehrung}", r"\text{Richtung}", r"\text{Stahl}",
+                  r"\varnothing\ [\mathrm{mm}]", mengenkopf,
+                  r"\text{Randabstand}\ [\mathrm{mm}]",
+                  r"d\ [\mathrm{mm}]", r"A_s\ [\mathrm{mm}^2]"],
             zeilen=zeilen,
-            titel="Randabstände und statische Höhen",
-            ausrichtung="llrrr",
+            titel="Randabstände, statische Höhen und Bewehrungsquerschnitte",
+            ausrichtung="lllrrrrr",
         )
         return ergebnis
 
@@ -370,6 +432,11 @@ class Plattenquerschnitt:
         self.definitionen[kurzname] = d
         return d
 
+    @property
+    def abschnitt(self) -> str:
+        """Ueberschrift, unter der die ganze Platte in der Herleitung steht."""
+        return f"Plattenanalyse: {self.name}"
+
     def _aufbauen(self) -> None:
         d_h = self._def("h", "h", MM, "Plattendicke", 0)
         d_b = self._def("b", "b", MM, "Betrachtete Breite", 0)
@@ -378,85 +445,76 @@ class Plattenquerschnitt:
         d_dmax = self._def("D_max", "D_{max}", MM, "Grösstkorndurchmesser", 0)
         d_einl = self._def("einlagenhoehe", "e_{Einlage}", MM, "Höhe der Einlage", 0)
 
+        abschnitt = self.abschnitt
         self.berechnungen += [
-            Vorgabe(id=f"{self.id}.D_max", ausgabe=d_dmax, groesse=self.d_max),
+            Vorgabe(id=f"{self.id}.D_max", ausgabe=d_dmax, groesse=self.d_max,
+                    abschnitt=abschnitt),
             Vorgabe(id=f"{self.id}.einlagenhoehe", ausgabe=d_einl,
-                    groesse=self.einlagenhoehe),
-            Vorgabe(id=f"{self.id}.h", ausgabe=d_h, groesse=self.h),
-            Vorgabe(id=f"{self.id}.b", ausgabe=d_b, groesse=self.b),
-            Vorgabe(id=f"{self.id}.c_nom_unten", ausgabe=d_cu, groesse=self.ueberdeckung_unten),
-            Vorgabe(id=f"{self.id}.c_nom_oben", ausgabe=d_co, groesse=self.ueberdeckung_oben),
+                    groesse=self.einlagenhoehe, abschnitt=abschnitt),
+            Vorgabe(id=f"{self.id}.h", ausgabe=d_h, groesse=self.h, abschnitt=abschnitt),
+            Vorgabe(id=f"{self.id}.b", ausgabe=d_b, groesse=self.b, abschnitt=abschnitt),
+            Vorgabe(id=f"{self.id}.c_nom_unten", ausgabe=d_cu,
+                    groesse=self.ueberdeckung_unten, abschnitt=abschnitt),
+            Vorgabe(id=f"{self.id}.c_nom_oben", ausgabe=d_co,
+                    groesse=self.ueberdeckung_oben, abschnitt=abschnitt),
         ]
 
         aufbau_ausgaben: List[WertDef] = []
-        aufbau_posten: List[Tuple[Bewehrungslage, Postenart, Bewehrungsposten, WertDef]] = []
+        aufbau_posten: List[Postenbezug] = []
+        aufbau_bezuege = [
+            Eingabebezug("h", d_h.id),
+            Eingabebezug("b", d_b.id),
+            Eingabebezug("c_nom_unten", d_cu.id),
+            Eingabebezug("c_nom_oben", d_co.id),
+        ]
 
         for lage in self.lagen:
             for art, posten in lage.benannte_posten():
                 if not posten.vorhanden:
                     continue
                 marke = f"{lage.nummer}{art.kuerzel}"
-                index = f"{lage.richtung.value},{lage.nummer}"
-                if art is Postenart.ZULAGE:
-                    index += ",z"
+                # Lage, Richtung, Art -- in dieser Reihenfolge, und immer alle
+                # drei. Damit ist jedes Symbol eindeutig, auch wenn zwei Lagen
+                # dieselbe Richtung tragen.
+                index = f"{lage.nummer},{lage.richtung.value},{art.kuerzel}"
+                bezeichnung = f"{lage.nummer}. Lage {art.beschriftung}"
 
                 d_phi = self._def(
                     f"lage.{marke}.phi", rf"\varnothing_{{{index}}}", MM,
-                    f"Stabdurchmesser {lage.nummer}. Lage {art.beschriftung}", 0)
+                    f"Stabdurchmesser {bezeichnung}", 0)
                 self.berechnungen.append(
                     Vorgabe(id=f"{self.id}.lage.{marke}.phi", ausgabe=d_phi,
-                            groesse=posten.durchmesser))
+                            groesse=posten.durchmesser, abschnitt=abschnitt))
+                aufbau_bezuege.append(Eingabebezug(f"phi_{marke}", d_phi.id))
+
+                if posten.ueber_abstand:
+                    d_s = self._def(f"lage.{marke}.s", f"s_{{{index}}}", MM,
+                                    f"Teilung {bezeichnung}", 0)
+                    self.berechnungen.append(
+                        Vorgabe(id=f"{self.id}.lage.{marke}.s", ausgabe=d_s,
+                                groesse=posten.abstand, abschnitt=abschnitt))
+                    aufbau_bezuege.append(Eingabebezug(f"s_{marke}", d_s.id))
 
                 d_as = self._def(
-                    f"lage.{marke}.a_s", f"a_{{s,{index}}}", MM2,
-                    f"Bewehrungsquerschnitt {lage.nummer}. Lage {art.beschriftung}", 0,
+                    f"lage.{marke}.a_s", f"A_{{s,{index}}}", MM2,
+                    f"Bewehrungsquerschnitt {bezeichnung}", 0,
                     referenz="SIA 262:2025, 5.5.2")
-                self.berechnungen.append(
-                    self._flaechen_formel(marke, index, posten, d_as, d_phi, d_b))
+                d_d = self._def(
+                    f"lage.{marke}.z", f"d_{{{index}}}", MM,
+                    f"Statische Höhe {bezeichnung} (ab Oberkante)", 1)
 
-                d_z = self._def(
-                    f"lage.{marke}.z", f"z_{{{index}}}", MM,
-                    f"Statische Höhe {lage.nummer}. Lage {art.beschriftung} (ab Oberkante)", 1)
-                aufbau_ausgaben.append(d_z)
-                aufbau_posten.append((lage, art, posten, d_z))
-                self.posten_ids.append((lage, art, posten, d_as.id, d_z.id))
+                aufbau_ausgaben += [d_d, d_as]
+                aufbau_posten.append(Postenbezug(lage, art, posten, marke, d_d, d_as))
+                self.posten_ids.append((lage, art, posten, d_as.id, d_d.id))
 
         self.berechnungen.append(
             Lagenaufbau(
                 id=f"{self.id}.lagenaufbau",
                 ausgaben=aufbau_ausgaben,
-                bezuege=[
-                    Eingabebezug("h", d_h.id),
-                    Eingabebezug("c_nom_unten", d_cu.id),
-                    Eingabebezug("c_nom_oben", d_co.id),
-                ],
+                bezuege=aufbau_bezuege,
                 posten=aufbau_posten,
+                abschnitt=abschnitt,
             ))
-
-    def _flaechen_formel(
-        self, marke: str, index: str, posten: Bewehrungsposten,
-        d_as: WertDef, d_phi: WertDef, d_b: WertDef,
-    ) -> Formel:
-        if posten.ueber_abstand:
-            d_s = self._def(f"lage.{marke}.s", f"s_{{{index}}}", MM,
-                            f"Stababstand Lage {index}", 0)
-            self.berechnungen.append(
-                Vorgabe(id=f"{self.id}.lage.{marke}.s", ausgabe=d_s, groesse=posten.abstand))
-            return Formel(
-                id=f"{self.id}.lage.{marke}.a_s",
-                ausgabe=d_as,
-                eingaben={"phi": d_phi.id, "s": d_s.id, "b": d_b.id},
-                vorlage=r"\frac{\pi \cdot @phi^{2}}{4} \cdot \frac{@b}{@s}",
-                funktion=lambda phi, s, b: math.pi * phi * phi / 4.0 * (b / s),
-            )
-        anzahl = float(posten.anzahl)
-        return Formel(
-            id=f"{self.id}.lage.{marke}.a_s",
-            ausgabe=d_as,
-            eingaben={"phi": d_phi.id},
-            vorlage=rf"\frac{{\pi \cdot @phi^{{2}}}}{{4}} \cdot {anzahl:g}",
-            funktion=lambda phi: math.pi * phi * phi / 4.0 * anzahl,
-        )
 
     def __repr__(self) -> str:
         return (f"Plattenquerschnitt({self.name!r}, h={self.h}, b={self.b}, "

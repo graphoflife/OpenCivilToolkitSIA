@@ -142,12 +142,23 @@ class Berechnung(ABC):
         referenz: str = "",
         prioritaet: int = 0,
         begruendung: str = "",
+        abschnitt: str = "",
     ) -> None:
         if not ausgaben:
             raise ValueError(f"Berechnung '{id}' liefert keine Ausgaben.")
         self.id = id
         self.ausgaben: Tuple[WertDef, ...] = tuple(ausgaben)
         self.bezuege: Tuple[Eingabebezug, ...] = tuple(bezuege)
+        self.abschnitt = abschnitt
+        """
+        Ueberschrift, unter die diese Berechnung gehoert.
+
+        Der Loeser setzt sie, sobald die erste Berechnung eines Abschnitts an
+        die Reihe kommt. Sie hier zu hinterlegen statt sie irgendwo von Hand zu
+        schreiben ist der einzige verlaessliche Weg: welche Berechnung eines
+        Bauteils zuerst laeuft, entscheidet die Abhaengigkeitsfolge und nicht
+        die Reihenfolge im Quelltext.
+        """
         self.titel = titel or (ausgaben[0].beschreibung if ausgaben else id)
         self.referenz = referenz or (ausgaben[0].referenz if ausgaben else "")
         self.prioritaet = prioritaet
@@ -325,6 +336,7 @@ class Formel(Berechnung):
         referenz: str = "",
         prioritaet: int = 0,
         begruendung: str = "",
+        abschnitt: str = "",
         bedingung: Optional[Callable[[Eingaben], Tuple[bool, str]]] = None,
     ) -> None:
         bezuege = [Eingabebezug(name, wid) for name, wid in (eingaben or {}).items()]
@@ -340,6 +352,7 @@ class Formel(Berechnung):
             referenz=referenz or ausgabe.referenz,
             prioritaet=prioritaet,
             begruendung=begruendung,
+            abschnitt=abschnitt,
         )
         self.ausgabe = ausgabe
         self.funktion = funktion
@@ -400,6 +413,7 @@ class Vorgabe(Berechnung):
         titel: str = "",
         referenz: str = "",
         begruendung: str = "",
+        abschnitt: str = "",
     ) -> None:
         super().__init__(
             id,
@@ -407,6 +421,7 @@ class Vorgabe(Berechnung):
             titel=titel,
             referenz=referenz or ausgabe.referenz,
             begruendung=begruendung,
+            abschnitt=abschnitt,
         )
         self.ausgabe = ausgabe
         self.groesse = groesse

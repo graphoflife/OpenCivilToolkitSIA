@@ -350,6 +350,8 @@ class _Lauf:
         self._stapel: List[str] = []
         self._gescheitert: Dict[str, NichtBerechenbar] = {}
         self._ziele: List[str] = []
+        self._abschnitt = ""
+        """Welche Ueberschrift zuletzt gesetzt wurde -- siehe ausfuehren()."""
 
     # -- Kern ---------------------------------------------------------------
 
@@ -459,6 +461,15 @@ class _Lauf:
         echte_wahl: bool,
     ) -> None:
         protokoll = self.loesung.protokoll
+
+        # Ueberschrift setzen, sobald der Abschnitt wechselt. Welche Berechnung
+        # eines Bauteils zuerst laeuft, entscheidet die Abhaengigkeitsfolge --
+        # deshalb traegt jede ihren Abschnitt selbst, statt dass irgendwo eine
+        # Reihenfolge angenommen wird.
+        if berechnung.abschnitt and berechnung.abschnitt != self._abschnitt:
+            protokoll.titel(berechnung.abschnitt)
+            self._abschnitt = berechnung.abschnitt
+
         ergebnisse = berechnung.ausfuehren(eingaben, protokoll)
 
         # Erst rechnen, dann begruenden. Andersherum stand der Hinweis vor der

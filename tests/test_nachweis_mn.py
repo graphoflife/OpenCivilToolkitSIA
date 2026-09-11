@@ -591,7 +591,7 @@ class TestErfuellungsgrad(unittest.TestCase):
         bester = max(nachweis.handlinie, key=lambda punkt: punkt.M)
         self.assertAlmostEqual(bester.N, 0.0, places=6)
         self.assertEqual(
-            1, sum(1 for q in nachweis.handlinie if q.name == "x = h/2"),
+            1, sum(1 for q in nachweis.handlinie if q.name.startswith("x = h/2")),
             "nur die negative Seite darf den Eckpunkt behalten")
 
     def test_alle_drei_massstaebe_liefern_ein_ergebnis(self):

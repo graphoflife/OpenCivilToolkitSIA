@@ -56,8 +56,8 @@ BLOCKANTEIL = 0.85
 
 
 @dataclass(frozen=True)
-class Lage:
-    """Die zu einer Seite zusammengefasste Bewehrung."""
+class Posten:
+    """Ein einzelner Bewehrungsposten, so wie er in die Handrechnung eingeht."""
 
     a_s: float
     """Querschnittsflaeche in m^2, fuer die betrachtete Breite b."""
@@ -72,6 +72,26 @@ class Lage:
     """Elastizitaetsmodul in Pa."""
 
     text: str = ""
+    index: str = ""
+    """Index des Symbols, z.B. ``1,x,g``."""
+
+    von_unten: bool = True
+
+
+@dataclass(frozen=True)
+class Lage:
+    """Die zu einer Seite zusammengefasste Bewehrung."""
+
+    a_s: float
+    z: float
+    f_yd: float
+    E_s: float
+    text: str = ""
+    index: str = ""
+    """Index der zusammengefassten Lage, z.B. ``1,x``."""
+
+    teile: Tuple[Posten, ...] = ()
+    """Die Posten, aus denen sie entstanden ist -- fuer die Mitschrift."""
 
 
 @dataclass(frozen=True)
@@ -79,7 +99,12 @@ class Eckpunkt:
     """Ein von Hand nachrechenbarer Punkt der Resistenzlinie."""
 
     kennung: str
+    symbol: str
+    """LaTeX -- so steht der Punkt in der Mitschrift."""
+
     name: str
+    """Klartext -- fuer Kurzhinweise im Diagramm."""
+
     N: float
     """Normalkraft in N (Zug positiv)."""
 
@@ -164,16 +189,21 @@ class Handrechnung:
     def _ansatz(self, p: Protokoll) -> None:
         p.titel(f"Resistenzlinie aus Handrechnung – {self.richtung}")
         p.text(
-            "Die Druckzone wird als Spannungsblock der Höhe 0.85·x mit "
-            "durchgehend f_cd angesetzt. Gedrückter Stahl bleibt durchgehend "
-            "unberücksichtigt – das liegt auf der sicheren Seite und erspart "
-            "die Frage, ob er fliesst. Die Bewehrung ist je Seite zu einer "
-            "Lage zusammengefasst. Das Moment bezieht sich auf die halbe "
+            "Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f_cd; "
+            "gedrückter Stahl bleibt unberücksichtigt. Die Bewehrung ist je Seite "
+            "zu einer Lage zusammengefasst, das Moment bezieht sich auf die halbe "
             "Querschnittshöhe."
         )
+
+        # Wo eine Seite aus mehreren Posten besteht, muss dastehen, wie ihr
+        # Schwerpunkt entsteht -- sonst faellt d aus dem Nichts.
+        for lage in (self.unten, self.oben):
+            if len(lage.teile) > 1:
+                self._schwerpunkt(p, lage)
+
         p.tabelle(
             kopf=[r"\text{Seite}", r"A_s\ [\mathrm{mm}^2]",
-                  r"z\ [\mathrm{mm}]", r"f_{yd}\ [\mathrm{N/mm^2}]"],
+                  r"d\ [\mathrm{mm}]", r"f_{yd}\ [\mathrm{N/mm^2}]"],
             zeilen=[
                 [als_text(lage.text), f"{lage.a_s * 1e6:.0f}",
                  f"{lage.z * 1e3:.1f}", f"{lage.f_yd / 1e6:.0f}"]
@@ -181,6 +211,34 @@ class Handrechnung:
             ],
             titel="Zusammengefasste Bewehrung",
             ausrichtung="lrrr",
+        )
+
+    def _schwerpunkt(self, p: Protokoll, lage: Lage) -> None:
+        """Schreibt, wie sich d einer aus mehreren Posten bestehenden Lage ergibt."""
+        zaehler = " + ".join(
+            rf"A_{{s,{t.index}}} \cdot f_{{yd}} \cdot d_{{{t.index}}}" for t in lage.teile)
+        nenner = " + ".join(
+            rf"A_{{s,{t.index}}} \cdot f_{{yd}}" for t in lage.teile)
+        zaehler_zahl = " + ".join(
+            rf"{t.a_s * 1e6:.0f} \cdot {t.f_yd / 1e6:.0f} \cdot {t.z * 1e3:.1f}"
+            for t in lage.teile)
+        nenner_zahl = " + ".join(
+            rf"{t.a_s * 1e6:.0f} \cdot {t.f_yd / 1e6:.0f}" for t in lage.teile)
+
+        p.gleichung(
+            rf"d_{{{lage.index}}} = \frac{{{zaehler}}}{{{nenner}}}"
+            "\n= "
+            rf"\frac{{{zaehler_zahl}}}{{{nenner_zahl}}}"
+            rf" = {lage.z * 1e3:.1f}\,\mathrm{{mm}}",
+            titel=f"Statische Höhe der zusammengefassten Lage – {lage.text}",
+        )
+        p.gleichung(
+            rf"A_{{s,{lage.index}}} = "
+            + " + ".join(rf"A_{{s,{t.index}}}" for t in lage.teile)
+            + " = "
+            + " + ".join(f"{t.a_s * 1e6:.0f}" for t in lage.teile)
+            + rf" = {lage.a_s * 1e6:.0f}\,\mathrm{{mm}}^{{2}}",
+            titel="Bewehrungsquerschnitt der zusammengefassten Lage",
         )
 
     def _groesste_druckkraft(self, p: Protokoll) -> Eckpunkt:
@@ -198,8 +256,8 @@ class Handrechnung:
             },
             titel="Gleichmässiger Druck, ohne Bewehrung",
         )
-        p.text("Zum zugehörigen Moment: M_Rd = 0, da die Spannung gleichmässig ist.")
-        return Eckpunkt("druck", "grösste Druckkraft", N, 0.0)
+        p.gleichung(r"M_{Rd}(N_{Rd}^{-}) = 0", titel="Zugehöriges Moment")
+        return Eckpunkt("druck", r"N_{Rd}^{-}", "grösste Druckkraft", N, 0.0)
 
     def _groesste_zugkraft(self, p: Protokoll) -> Eckpunkt:
         """
@@ -216,10 +274,10 @@ class Handrechnung:
 
         p.titel("Grösste Zugkraft", ebene=3)
         eingaben = {
-            "A_s": self._flaeche("As_u", "A_s", u.a_s),
-            "A_s2": self._flaeche("As_o", "A_s'", o.a_s),
+            "A_s": self._flaeche("As_u", f"A_{{s,{u.index}}}", u.a_s),
+            "A_s2": self._flaeche("As_o", f"A_{{s,{o.index}}}", o.a_s),
             "f_yd": self._spannung("fyd_u", "f_{yd}", u.f_yd),
-            "f_yd2": self._spannung("fyd_o", "f_{yd}'", o.f_yd),
+            "f_yd2": self._spannung("fyd_o", "f_{yd}", o.f_yd),
         }
         p.formel(
             self._kraft("N_Rd_zug", "N_{Rd}^{+}", N, "Grösste aufnehmbare Zugkraft"),
@@ -234,19 +292,13 @@ class Handrechnung:
             r"+ @A_s2 \cdot @f_yd2 \cdot \left(@d2 - \tfrac{@h}{2}\right)",
             {
                 **eingaben,
-                "d": self._laenge("z_u", "d", u.z),
-                "d2": self._laenge("z_o", "d'", o.z),
+                "d": self._laenge("z_u", f"d_{{{u.index}}}", u.z),
+                "d2": self._laenge("z_o", f"d_{{{o.index}}}", o.z),
                 "h": self._laenge("h", "h", self.h),
             },
             titel="Kräfte mal Hebelarm um die halbe Höhe",
         )
-        p.text(
-            "Beide Lagen stehen unter Zug, ihre Hebelarme haben aber "
-            "entgegengesetzte Vorzeichen. Bei symmetrischer Bewehrung hebt sich "
-            "das Moment deshalb auf – die Zugspitze liegt dann auf der Achse "
-            "M = 0. Für beide Momentenvorzeichen gilt derselbe Punkt."
-        )
-        return Eckpunkt("zug", "grösste Zugkraft", N, M)
+        return Eckpunkt("zug", r"N_{Rd}^{+}", "grösste Zugkraft", N, M)
 
     def _seite(self, p: Protokoll, *, positiv: bool) -> List[Eckpunkt]:
         """Die beiden Punkte eines Momentenvorzeichens."""
@@ -273,9 +325,14 @@ class Handrechnung:
         x = zug.a_s * zug.f_yd / (BLOCKANTEIL * self.b * self.f_cd)
         M = zug.a_s * zug.f_yd * (d - BLOCKANTEIL * x / 2.0)
 
-        w_x = self._laenge(f"x_{marke}", "x", x, "Höhe der Druckzone")
+        hoch = "+" if vz > 0 else "-"
+        # Bei negativem Moment traegt die Formel selbst das Minus. Sonst stuende
+        # eine Gleichung da, deren rechte Seite nicht ihr eigenes Ergebnis ist.
+        minus = "" if vz > 0 else "-"
+
+        w_x = self._laenge(f"x_{marke}", f"x^{{{hoch}}}", x, "Höhe der Druckzone")
         eingaben = {
-            "A_s": self._flaeche(f"As_{marke}", "A_s", zug.a_s),
+            "A_s": self._flaeche(f"As_{marke}", f"A_{{s,{zug.index}}}", zug.a_s),
             "f_yd": self._spannung(f"fyd_{marke}", "f_{yd}", zug.f_yd),
             "b": self._laenge("b", "b", self.b),
             "f_cd": self._spannung("f_cd", "f_{cd}", self.f_cd),
@@ -287,14 +344,16 @@ class Handrechnung:
             titel="Druckzonenhöhe aus dem Kräftegleichgewicht",
         )
         p.formel(
-            self._moment(f"M_Rd_N0_{marke}", "M_{Rd}(N=0)", vz * M,
-                         "Momentenwiderstand bei N = 0"),
-            rf"@A_s \cdot @f_yd \cdot \left(@d - \frac{{{BLOCKANTEIL} \cdot @x}}{{2}}\right)",
-            {**eingaben, "d": self._laenge(f"d_{marke}", "d", d), "x": w_x},
+            self._moment(f"M_Rd_N0_{marke}", rf"M_{{Rd}}(N_{{Ed}}=0)^{{{hoch}}}",
+                         vz * M, "Momentenwiderstand bei N_Ed = 0"),
+            rf"{minus}@A_s \cdot @f_yd \cdot "
+            rf"\left(@d - \frac{{{BLOCKANTEIL} \cdot @x}}{{2}}\right)",
+            {**eingaben,
+             "d": self._laenge(f"d_{marke}", f"d_{{{zug.index}}}", d), "x": w_x},
             titel="Momentenwiderstand bei reiner Biegung",
         )
-        return Eckpunkt(f"n0_{marke}", f"M_Rd(N=0) {'+' if vz > 0 else '−'}",
-                        0.0, vz * M)
+        return Eckpunkt(f"n0_{marke}", rf"M_{{Rd}}(N_{{Ed}}=0)^{{{hoch}}}",
+                        f"M_Rd(N_Ed=0) {hoch}", 0.0, vz * M)
 
     def _halbe_hoehe(self, p: Protokoll, zug: Lage, d: float,
                      vz: float, marke: str) -> Optional[Eckpunkt]:
@@ -321,7 +380,10 @@ class Handrechnung:
         eps_s = (d - x) * chi
         eps_yd = zug.f_yd / zug.E_s
 
-        w_x = self._laenge(f"xh_{marke}", "x", x, "Druckzonenhöhe")
+        hoch = "+" if vz > 0 else "-"
+        minus = "" if vz > 0 else "-"
+
+        w_x = self._laenge(f"xh_{marke}", f"x^{{{hoch}}}", x, "Druckzonenhöhe")
         p.formel(
             w_x,
             r"\frac{@h}{2}",
@@ -329,12 +391,12 @@ class Handrechnung:
             titel="Nulllinie auf halber Höhe: x = h/2",
         )
         p.formel(
-            self._w(f"eps_s_{marke}", r"\varepsilon_s",
+            self._w(f"eps_s_{marke}", rf"\varepsilon_s^{{{hoch}}}",
                     Groesse.aus_si(eps_s, PROMILLE), 2,
                     "Dehnung der Zugbewehrung"),
             r"\left(@d - @x\right) \cdot \frac{@eps_c2d}{@x}",
             {
-                "d": self._laenge(f"d_{marke}", "d", d),
+                "d": self._laenge(f"d_{marke}", f"d_{{{zug.index}}}", d),
                 "x": w_x,
                 "eps_c2d": self._w("eps_c2d", r"\varepsilon_{c2d}",
                                    Groesse.aus_si(self.eps_c2d, PROMILLE), 2),
@@ -350,7 +412,8 @@ class Handrechnung:
                 f"reinen Druck zum Punkt bei N = 0."
             )
             return Eckpunkt(
-                f"halb_{marke}", "x = h/2", N, vz * M,
+                f"halb_{marke}", rf"M_{{Rd}}(x=\tfrac{{h}}{{2}})^{{{hoch}}}",
+                f"x = h/2 {hoch}", N, vz * M,
                 gueltig=False,
                 hinweis=f"ε_s = {eps_s * 1e3:.2f} ‰ < ε_yd = {eps_yd * 1e3:.2f} ‰")
 
@@ -363,44 +426,43 @@ class Handrechnung:
             "f_cd": self._spannung("f_cd", "f_{cd}", self.f_cd),
             "b": self._laenge("b", "b", self.b),
             "x": w_x,
-            "A_s": self._flaeche(f"As_{marke}", "A_s", zug.a_s),
+            "A_s": self._flaeche(f"As_{marke}", f"A_{{s,{zug.index}}}", zug.a_s),
             "f_sd": self._spannung(f"fsd_{marke}", "f_{sd}", zug.f_yd),
         }
         p.formel(
-            self._kraft(f"N_halb_{marke}", "N_{Rd}", N, "Normalkraft in diesem Punkt"),
+            self._kraft(f"N_halb_{marke}", rf"N_{{Rd}}^{{{hoch}}}", N,
+                        "Normalkraft in diesem Punkt"),
             rf"-@f_cd \cdot @b \cdot {BLOCKANTEIL} \cdot @x + @A_s \cdot @f_sd",
             eingaben,
             titel="Kräftegleichgewicht",
         )
         p.formel(
-            self._moment(f"M_halb_{marke}", "M_{Rd}", vz * M,
+            self._moment(f"M_halb_{marke}", rf"M_{{Rd}}^{{{hoch}}}", vz * M,
                          "Moment in diesem Punkt"),
-            rf"@f_cd \cdot @b \cdot {BLOCKANTEIL} \cdot @x \cdot "
+            rf"{minus}\left[@f_cd \cdot @b \cdot {BLOCKANTEIL} \cdot @x \cdot "
             rf"\left(\tfrac{{@h}}{{2}} - \tfrac{{{BLOCKANTEIL} \cdot @x}}{{2}}\right) "
-            rf"+ @A_s \cdot @f_sd \cdot \left(@d - \tfrac{{@h}}{{2}}\right)",
+            rf"+ @A_s \cdot @f_sd \cdot \left(@d - \tfrac{{@h}}{{2}}\right)\right]",
             {
                 **eingaben,
                 "h": self._laenge("h", "h", self.h),
-                "d": self._laenge(f"d_{marke}", "d", d),
+                "d": self._laenge(f"d_{marke}", f"d_{{{zug.index}}}", d),
             },
             titel="Momentengleichgewicht um die halbe Höhe",
         )
-        return Eckpunkt(f"halb_{marke}", "x = h/2", N, vz * M)
+        return Eckpunkt(f"halb_{marke}", rf"M_{{Rd}}(x=\tfrac{{h}}{{2}})^{{{hoch}}}",
+                        f"x = h/2 {hoch}", N, vz * M)
 
     def _uebersicht(self, p: Protokoll, punkte: List[Eckpunkt]) -> None:
         p.tabelle(
             kopf=[r"\text{Eckpunkt}", r"N\ [\mathrm{kN}]", r"M\ [\mathrm{kNm}]"],
             zeilen=[
-                [als_text(q.name), f"{q.N / 1e3:.1f}", f"{q.M / 1e3:.1f}"]
+                [q.symbol, f"{q.N / 1e3:.1f}", f"{q.M / 1e3:.1f}"]
                 for q in punkte
             ],
             titel="Eckpunkte der Resistenzlinie aus Handrechnung",
             ausrichtung="lrr",
         )
-        p.text(
-            "Zwischen diesen Punkten wird geradlinig verbunden. Alle weiteren "
-            "Widerstände folgen durch lineare Interpolation auf diesem Polygon."
-        )
+
 
 
 def lagen_zusammenfassen(posten) -> Dict[str, Lage]:

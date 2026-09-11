@@ -16,7 +16,7 @@ from __future__ import annotations
 import math
 from typing import Any, Dict, List, Optional, Sequence
 
-from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, MM
+from opencivil.core.einheiten import KN, KNM, MM
 from opencivil.core.protokoll import (
     Block, GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, TextBlock,
     TitelBlock, UnterprotokollBlock,
@@ -469,8 +469,9 @@ def zuordnung(aufbau: Aufbau) -> dict:
                         "phi": posten.durchmesser.in_einheit(MM),
                         "abstand": (posten.abstand.in_einheit(MM)
                                     if posten.abstand is not None else None),
-                        "anzahl": (posten.anzahl.in_einheit(EINHEITSLOS)
-                                   if posten.anzahl is not None else None),
+                        # anzahl ist eine blanke Zahl, keine Groesse -- Staebe
+                        # haben keine Einheit.
+                        "anzahl": posten.anzahl,
                         "a_s_id": as_id,
                         "z_id": z_id,
                     }

@@ -366,8 +366,9 @@ function ueberdeckungsBlock(querschnitt, welche) {
  *
  *     [Name] M_Ed [.] N_Ed [.] V_Ed [.] [x|y|beide] [×]
  *
- * Der Massstab fehlt bewusst: der Kern rechnet beide und nimmt den
- * ungünstigeren -- welcher das war, steht beim Nachweis.
+ * Der Massstab fehlt bewusst: der Kern misst waagrecht, ausser nahe den
+ * Spitzen der Resistenzlinie -- dort senkrecht. Welcher Weg gegriffen hat,
+ * steht beim Nachweis.
  */
 function einwirkungZeile(querschnitt, index) {
   const k = querschnitt.kombinationen[index];
@@ -491,9 +492,10 @@ function plattenEditor(querschnitt) {
           ? querschnitt.kombinationen.map((_, i) => einwirkungZeile(querschnitt, i))
           : [el('div.leer', { text: 'Ohne Einwirkung kein Nachweis.' })]),
         el('p', {
-          text: 'V_Ed = 0 bedeutet: kein Querkraftnachweis. Der Massstab für den '
-              + 'Erfüllungsgrad wird selbst gewählt – gerechnet werden beide, '
-              + 'gezeigt der ungünstigere.',
+          text: 'V_Ed = 0 bedeutet: kein Querkraftnachweis. Der Erfüllungsgrad '
+              + 'wird am Momentenwiderstand bei festgehaltener Normalkraft '
+              + 'gemessen; nahe den Spitzen der Resistenzlinie stattdessen am '
+              + 'Normalkraftwiderstand bei festgehaltenem Moment.',
           style: { fontSize: '11.5px', color: 'var(--schrift-zart)', margin: '6px 0 0' },
         }),
       ]),
