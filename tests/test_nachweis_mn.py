@@ -469,8 +469,8 @@ class TestSymmetrisch(unittest.TestCase):
 
 
 class TestErfuellungsgrad(unittest.TestCase):
-    def _pruefe(self, kombinationen):
-        platte = einfache_platte()
+    def _pruefe(self, kombinationen, querschnitt=None):
+        platte = querschnitt if querschnitt is not None else einfache_platte()
         werk = Rechenwerk()
         platte.ins_rechenwerk(werk)
         nachweis = BiegungNormalkraft(platte, kombinationen, Richtung.X)
@@ -502,39 +502,58 @@ class TestErfuellungsgrad(unittest.TestCase):
             k.name: loesung.groesse(nachweis.d_ausnutzung[k.name].id).in_einheit(EINHEITSLOS)
             for k in kombinationen
         }
-        # Zug verringert den Momentenwiderstand -- auf beiden Linien.
+        # Zug verringert den Momentenwiderstand, Druck erhöht ihn -- der Bauch
+        # des Interaktionsdiagramms. Siehe test_handrechnung_hat_einen_bauch.
         self.assertLess(eta["Feld_mit_Zug"], eta["Feld"])
-        # Druck ebenfalls, sobald der Eckpunkt 0.85x = h/2 wegfällt: dann läuft
-        # das Polygon geradlinig vom reinen Druck zum Punkt bei N = 0 und hat
-        # keinen Bauch mehr. Siehe test_handrechnung_verliert_den_bauch.
-        self.assertLess(eta["Feld_mit_Druck"], eta["Feld"])
+        self.assertGreater(eta["Feld_mit_Druck"], eta["Feld"])
 
-    def test_handrechnung_verliert_den_bauch(self):
+    def test_handrechnung_hat_einen_bauch(self):
         """
-        Die Handrechnung ist auf der Druckseite deutlich konservativer.
+        Auch das Polygon zeigt den Bauch unter Druck.
 
-        Die genaue Linie hat unter Druck einen Bauch: eine Normaldruckkraft
-        vergrössert den Momentenwiderstand, bis die Druckzone zu gross wird.
-        Das Polygon aus der Handrechnung kann das nur abbilden, wenn der
-        Eckpunkt bei 0.85x = h/2 gültig ist -- also wenn die Zugbewehrung dort
-        noch fliesst. Bei dieser dünnen Platte tut sie das nicht, der Eckpunkt
-        entfällt, und das Polygon läuft geradlinig zum reinen Druck.
+        Eine Normaldruckkraft vergrössert den Momentenwiderstand, bis die
+        Druckzone zu gross wird. Beim Polygon kommt das vom Eckpunkt bei
+        x = h/2; der gilt, solange die Zugbewehrung dort noch fliesst.
 
-        Das ist kein Fehler, sondern der Preis der Nachvollziehbarkeit. Der
-        Test hält ihn fest, damit die Abweichung nicht eines Tages als Bug
-        gilt oder unbemerkt verschwindet.
+        Beide Höchstwerte liegen nahe beieinander. Auf welcher Seite die
+        Handrechnung landet, ist nicht festgelegt und soll es auch nicht sein:
+        sie vernachlässigt den gedrückten Stahl (das drückt), setzt dafür aber
+        einen Spannungsblock der Höhe 0.85x an, dessen Resultierende etwas über
+        der Parabel-Rechteck-Beziehung liegt (das hebt). Welcher Einfluss
+        überwiegt, hängt vom Querschnitt ab.
         """
         nachweis, _ = self._pruefe(
             [Schnittgroessen("Druck", M_Ed=Groesse(100, KNM), N_Ed=Groesse(-200, KN))])
 
         genau = max(nachweis.linie, key=lambda punkt: punkt.M)
-        self.assertLess(genau.N, 0.0, "die genaue Linie hat ihren Bauch unter Druck")
-
         hand = max(nachweis.handlinie, key=lambda punkt: punkt.M)
-        self.assertAlmostEqual(hand.N, 0.0, places=6,
-                               msg="ohne gültigen Eckpunkt liegt das Maximum bei N = 0")
-        self.assertLess(max(p.M for p in nachweis.handlinie),
-                        max(p.M for p in nachweis.linie))
+        self.assertLess(genau.N, 0.0, "die genaue Linie hat ihren Bauch unter Druck")
+        self.assertLess(hand.N, 0.0, "das Polygon auch")
+        self.assertAlmostEqual(hand.M / genau.M, 1.0, delta=0.10)
+
+    def test_eckpunkt_faellt_weg_wenn_die_bewehrung_nicht_fliesst(self):
+        """
+        Ohne Fliessen bei x = h/2 wäre f_sd = f_yd zu günstig angesetzt.
+
+        Erzwungen mit einer sehr grossen unteren Überdeckung: dann liegt die
+        untere Bewehrung nahe der Nulllinie und dehnt sich kaum. Für das
+        positive Moment muss der Eckpunkt wegfallen, statt mit einer Spannung
+        zu rechnen, die der Stahl nicht erreicht.
+        """
+        querschnitt = platte(
+            [lage(1, Richtung.X, phi=18.0), lage(2, Richtung.Y),
+             lage(3, Richtung.Y), lage(4, Richtung.X, phi=12.0)],
+            ueberdeckung_unten=Groesse(130, MM))
+        nachweis, _ = self._pruefe(
+            [Schnittgroessen("Feld", M_Ed=Groesse(40, KNM))], querschnitt=querschnitt)
+
+        # Auf der Druckseite darf kein Bauch mehr entstehen: der Höchstwert des
+        # positiven Moments liegt wieder bei N = 0.
+        bester = max(nachweis.handlinie, key=lambda punkt: punkt.M)
+        self.assertAlmostEqual(bester.N, 0.0, places=6)
+        self.assertEqual(
+            1, sum(1 for q in nachweis.handlinie if q.name == "x = h/2"),
+            "nur die negative Seite darf den Eckpunkt behalten")
 
     def test_alle_drei_massstaebe_liefern_ein_ergebnis(self):
         kombinationen = [

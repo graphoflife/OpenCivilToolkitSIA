@@ -31,7 +31,12 @@ DIE VIER PUNKTE (je Momentenvorzeichen, ausser wo vermerkt):
     1  M_Rd bei N = 0      x aus dem Kraeftegleichgewicht, dann M aus dem Hebelarm
     2  groesste Zugkraft   alles fliesst auf Zug; nur ein Punkt fuer beide Vorzeichen
     3  groesste Druckkraft reiner Beton, ohne Stahl; M = 0
-    4  Punkt mit 0.85x = h/2   Druckzone bis zur halben Hoehe
+    4  Punkt mit x = h/2   Nulllinie auf halber Hoehe, Block bis 0.85*h/2
+
+Punkt 4 liegt knapp unterhalb des Balancepunkts und gibt dem Polygon den Bauch,
+den die genaue Linie unter Druck hat. Er gilt nur, wenn die Zugbewehrung dort
+noch fliesst; sonst faellt er weg und das Polygon laeuft geradlinig vom reinen
+Druck zu M_Rd(N = 0).
 """
 
 from __future__ import annotations
@@ -293,14 +298,18 @@ class Handrechnung:
     def _halbe_hoehe(self, p: Protokoll, zug: Lage, d: float,
                      vz: float, marke: str) -> Optional[Eckpunkt]:
         """
-        Der Punkt, bei dem der Spannungsblock bis zur halben Hoehe reicht.
+        Der Punkt mit der Nulllinie auf halber Hoehe: ``x = h/2``.
+
+        Der Spannungsblock reicht damit bis ``0.85 * h/2``. Dieser Punkt liegt
+        knapp unterhalb des Balancepunkts und gibt dem Polygon den Bauch, den
+        die genaue Linie unter Druck hat.
 
         Gilt nur, solange die Zugbewehrung dabei noch fliesst. Tut sie es nicht,
         waere ``f_sd = f_yd`` zu guenstig angesetzt, und der Punkt faellt weg --
         das Polygon laeuft dann geradlinig vom reinen Druck zum Punkt bei N = 0.
         """
-        x = self.h / (2.0 * BLOCKANTEIL)
-        block = BLOCKANTEIL * x                      # = h/2
+        x = self.h / 2.0
+        block = BLOCKANTEIL * x
         D = self.f_cd * self.b * block               # Betondruckkraft, Betrag
         N = -D + zug.a_s * zug.f_yd
         M = D * (self.h / 2 - block / 2) + zug.a_s * zug.f_yd * (d - self.h / 2)
@@ -314,9 +323,9 @@ class Handrechnung:
         w_x = self._laenge(f"xh_{marke}", "x", x, "Druckzonenhöhe")
         p.formel(
             w_x,
-            rf"\frac{{@h}}{{2 \cdot {BLOCKANTEIL}}}",
+            r"\frac{@h}{2}",
             {"h": self._laenge("h", "h", self.h)},
-            titel=f"Druckzone bis zur halben Höhe: {BLOCKANTEIL}·x = h/2",
+            titel="Nulllinie auf halber Höhe: x = h/2",
         )
         p.formel(
             self._w(f"eps_s_{marke}", r"\varepsilon_s",
@@ -340,7 +349,7 @@ class Handrechnung:
                 f"reinen Druck zum Punkt bei N = 0."
             )
             return Eckpunkt(
-                f"halb_{marke}", "0.85x = h/2", N, vz * M,
+                f"halb_{marke}", "x = h/2", N, vz * M,
                 gueltig=False,
                 hinweis=f"ε_s = {eps_s * 1e3:.2f} ‰ < ε_yd = {eps_yd * 1e3:.2f} ‰")
 
@@ -375,7 +384,7 @@ class Handrechnung:
             },
             titel="Momentengleichgewicht um die halbe Höhe",
         )
-        return Eckpunkt(f"halb_{marke}", "0.85x = h/2", N, vz * M)
+        return Eckpunkt(f"halb_{marke}", "x = h/2", N, vz * M)
 
     def _uebersicht(self, p: Protokoll, punkte: List[Eckpunkt]) -> None:
         p.tabelle(
