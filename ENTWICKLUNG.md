@@ -43,6 +43,112 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-11 · Alles nachrechenbar, und der Bericht bekommt Abschnitte
+
+**Anlass:** Durchsicht der ganzen Herleitung. Dabei kamen vier echte Fehler
+zum Vorschein, und der Querkraftnachweis stellte sich als die einzige Stelle
+heraus, an der eine Zahl nicht nachzurechnen war.
+
+### Vier Fehler, die beim Lesen auffielen
+
+| Fehler | Ursache |
+| --- | --- |
+| `M_Rd = 754·435·(264 − …) = −83.9` | Das Minus stand nur im Ergebnis, nicht in der Formel. Die geschriebene Gleichung stimmte nicht mit ihrem eigenen Resultat überein. |
+| `π · 18 mm²/4` | Das Quadrat band an die Einheit statt an den Wert. |
+| `− −1484.6` | Doppeltes Minus in der Interpolation. |
+| `\text{M\_Rd(N=0) −}` | Eckpunktnamen als roher Text statt gesetzt. |
+
+Der erste ist der schlimmste: eine Gleichung, die ihr eigenes Ergebnis nicht
+liefert, ist schlechter als gar keine.
+
+### Querkraft
+
+Die Herleitung zeigte nur den Ansatz und eine Ergebnistabelle. Jetzt steht je
+Kombination die vollständige Rechnung da — Einwirkung, statische Höhe,
+wirksame Höhe, Dekompressionsmoment, Dehnung, `k_d`, Widerstand,
+Erfüllungsgrad — jede Zeile analytisch **und** mit eingesetzten Zahlen.
+
+Je Fall ein eigener Abschnitt, weil der Widerstand über `m_Ed` und `N_Ed` von
+der Einwirkung abhängt. Ausgewiesen als `v_Rd(M_Ed = …, N_Ed = …)`; ein
+blosses `v_Rd` läse sich wie ein Kennwert des Querschnitts, und das ist es
+nicht.
+
+Zwei Formeln berichtigt: `k_g = max(1.20; …)` — der Riegel fehlte — und
+`m_Dd = |min(N_Ed; 0)|·h/6`, denn nur Druck entlastet.
+
+**Zur Stellenzahl:** die Faktoren stehen mit vier Stellen da, damit die Zeile
+beim Nachrechnen aufgeht: `0.8124 · 1.0954 · 264.0 = 234.93` gegen `234.95`
+wahr. Mit zwei Stellen wäre `0.81 · 1.1 · 264 = 235.2` herausgekommen — eine
+Zeile, die ihr eigenes Ergebnis verfehlt, ist genau das Problem von oben.
+
+### Abschnitte im Bericht
+
+Jede Berechnung trägt jetzt ihren Abschnitt (`Beton: C30/37`,
+`Plattenanalyse: Decke über EG`); der Löser setzt die Überschrift, sobald die
+erste Berechnung eines Abschnitts drankommt.
+
+Von Hand ginge das nicht: **welche Berechnung eines Bauteils zuerst läuft,
+entscheidet die Abhängigkeitsfolge**, nicht die Reihenfolge im Quelltext. Eine
+Überschrift irgendwo hinzuschreiben hiesse, eine Reihenfolge anzunehmen, die
+der Löser jederzeit ändern darf.
+
+Der Nebeneffekt ist der eigentliche Gewinn: die Oberfläche kann die Herleitung
+jetzt auf den gewählten Bestandteil zuschneiden. Über die Titelebene allein
+ginge das nicht — Zwischenüberschriften stehen auf derselben. Deshalb markiert
+der Kern, welcher Titel einen Abschnitt eröffnet.
+
+### Lagentabelle statt fünf gleicher Formeln
+
+Für jeden Bewehrungsposten stand eine eigene Flächenformel in der Herleitung —
+fünf Lagen ergaben fünf gleich aussehende Blöcke, in denen sich nur die Zahlen
+unterschieden. Die Formel steht jetzt einmal, die Ergebnisse in der Tabelle,
+ergänzt um Teilung, Stahlsorte und Fläche.
+
+Dafür rechnet `Lagenaufbau` jetzt auch die Flächen. Das ist die richtige
+Zuständigkeit: eine Prozedur, die den Lagenaufbau bestimmt, kennt ohnehin alle
+Durchmesser und Teilungen.
+
+Ist die Menge gemischt angegeben, steht `s = 150` bzw. `n = 7` in der Zelle;
+sind alle gleich, steht die Grösse in der Kopfzeile.
+
+### Günstige und ungünstige Lage
+
+Je Lage wählbar, wie Grundbewehrung und Zulage zueinander liegen:
+
+* **günstig** — beide auf derselben Hülle, je um ihren eigenen Halbmesser
+  eingerückt; die *äusseren* Kanten fluchten
+* **ungünstig** (Vorgabe) — die *inneren* Kanten fluchten, der dünnere Stab
+  rückt zur Plattenmitte und verliert Hebelarm
+
+Die Vorgabe ist ungünstig, weil sich auf der Baustelle nicht steuern lässt,
+welche Kante fluchtet.
+
+**Eine Regel für alle vier Lagen.** Die Vorgabe lautete „gleiche Oberkante bei
+Lage 1 und 2, gleiche Unterkante bei 3 und 4" — das klingt nach zwei Fällen,
+ist aber einer: von der Plattenmitte aus gesehen fluchtet beide Male die
+*innere* Kante. `rand = Hülle + ⌀_max − ⌀/2`, fertig. Ein Sonderfall weniger.
+
+Wirkung am Beispiel: die Zulage der 1. Lage sitzt bei 258 statt 264 mm, und
+der Querkraftnachweis rechnet mit `d = 261` statt `264` mm — massgebend ist
+jetzt die Grundbewehrung.
+
+### Zwei Angaben für die Ausführung
+
+Unter jeder Tabelle der Zusammenfassung stehen Bewehrungsmass
+(`A_s,tot · 7850 / (b·h)`, Beispiel 138.7 kg/m³) und Distanzhalterhöhe (OK der
+inneren unteren bis UK der inneren oberen Lage, Beispiel 182 mm). Beide kommen
+aus dem Kern und stehen damit auch in der Herleitung — in der Oberfläche
+gerechnet wären sie die einzigen Zahlen ohne Herleitung gewesen.
+
+### Eigene Pfeilknöpfe
+
+Teilung springt auf Vielfache von 25, Durchmesser durch die lieferbare Reihe
+(6 8 10 12 14 16 18 20 22 26 **30** 34 40), Stabzahl in Einerschritten. Das
+Drehfeld des Browsers kann nur gleichmässige Schritte — die Reihe der
+Durchmesser ist aber keine. Deshalb eigene Knöpfe.
+
+---
+
 ## 2026-09-11 · Nachgewiesen wird, was von Hand nachrechenbar ist
 
 **Anlass:** Die M-N-Interaktionslinie entstand aus hunderten Faserintegrationen.
