@@ -28,6 +28,7 @@ from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple, Uni
 
 from opencivil.core.berechnung import Berechnung, Formel, FormelFunktion, Vorgabe
 from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
+from opencivil.core.latex import text_latex
 from opencivil.core.wert import Quelle, WertDef
 
 
@@ -36,23 +37,9 @@ _SYMBOL = re.compile(r"^(?P<basis>.+?)(?:_\{(?P<tief_lang>[^{}]*)\}|_(?P<tief_ku
                      r"(?P<hoch>\^\{.*\}|\^.)?$")
 
 
-#: Zeichen, die in ``\text{...}`` maskiert werden muessen.
-_TEXT_MASKE = {
-    "\\": r"\textbackslash{}", "_": r"\_", "&": r"\&", "%": r"\%",
-    "$": r"\$", "#": r"\#", "{": r"\{", "}": r"\}",
-    "^": r"\textasciicircum{}", "~": r"\textasciitilde{}",
-}
-
-
-def text_maskieren(text: str) -> str:
-    """
-    Maskiert Sonderzeichen fuer die Verwendung in ``\\text{...}``.
-
-    Ein Materialname wie ``C12/15_1`` enthaelt einen Unterstrich. Unmaskiert ist
-    das auch im Textmodus ein Tiefstellungsbefehl: KaTeX bricht ab, und die
-    Oberflaeche zeigt dann den rohen LaTeX-Quelltext statt der Formel.
-    """
-    return "".join(_TEXT_MASKE.get(z, z) for z in text)
+#: Maskierung fuer ``\text{...}``. Liegt in core.latex, weil es nichts mit
+#: Baustoffen zu tun hat -- der Name bleibt hier als gewohnter Zugang stehen.
+text_maskieren = text_latex
 
 
 def mit_index(symbol: str, index: str) -> str:

@@ -45,6 +45,7 @@ from opencivil.core.berechnung import (
 from opencivil.core.einheiten import (
     EINHEITSLOS, KN_PRO_M, KNM, MM, N_PRO_MM2, Groesse, empirisch,
 )
+from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
 from opencivil.querschnitt.platte import Plattenquerschnitt, Richtung
@@ -228,7 +229,7 @@ class Querkraft(Nachweis):
             ))
 
             zeilen.append([
-                rf"\text{{{fall.name}}}",
+                als_text(fall.name),
                 f"{erg.d * 1e3:.0f}", f"{erg.d_v * 1e3:.0f}",
                 f"{erg.eps_v * 1e3:.3f}", f"{erg.k_d:.3f}",
                 f"{erg.v_Rd / 1e3:.1f}",

@@ -491,10 +491,15 @@ class TestErfuellungsgrad(unittest.TestCase):
         self.assertLess(grad, 1.0)
 
     def test_mehrere_kombinationen_gleichzeitig(self):
+        # Alle drei mit demselben Massstab, sonst vergleicht man Momenten- mit
+        # Normalkraftwiderständen -- zwei verschiedene Grössen.
+        waagrecht = Erfuellungsart.NORMALKRAFT_KONSTANT
         kombinationen = [
-            Schnittgroessen("Feld", M_Ed=Groesse(100, KNM)),
-            Schnittgroessen("Feld_mit_Druck", M_Ed=Groesse(100, KNM), N_Ed=Groesse(-200, KN)),
-            Schnittgroessen("Feld_mit_Zug", M_Ed=Groesse(100, KNM), N_Ed=Groesse(200, KN)),
+            Schnittgroessen("Feld", M_Ed=Groesse(100, KNM), art=waagrecht),
+            Schnittgroessen("Feld_mit_Druck", M_Ed=Groesse(100, KNM),
+                            N_Ed=Groesse(-200, KN), art=waagrecht),
+            Schnittgroessen("Feld_mit_Zug", M_Ed=Groesse(100, KNM),
+                            N_Ed=Groesse(200, KN), art=waagrecht),
         ]
         nachweis, loesung = self._pruefe(kombinationen)
         self.assertEqual(len(loesung.urteile), 3)
@@ -506,6 +511,40 @@ class TestErfuellungsgrad(unittest.TestCase):
         # des Interaktionsdiagramms. Siehe test_handrechnung_hat_einen_bauch.
         self.assertLess(eta["Feld_mit_Zug"], eta["Feld"])
         self.assertGreater(eta["Feld_mit_Druck"], eta["Feld"])
+
+    def test_senkrecht_wird_nahe_den_spitzen_gemessen(self):
+        """
+        Nahe den Spitzen läuft die Linie fast waagrecht.
+
+        Dort taugt der Momentenwiderstand bei festgehaltener Normalkraft nicht
+        mehr als Mass: eine kleine Änderung von N_Ed wirft ihn weit herum.
+        Gemessen wird dann senkrecht, also über den Normalkraftwiderstand.
+
+        Die Schwellen sind verschieden, weil die Linie nicht symmetrisch ist.
+        """
+        nachweis, _ = self._pruefe([Schnittgroessen("x", M_Ed=Groesse(100, KNM))])
+        N_zug = max(p.N for p in nachweis.handlinie)
+        N_druck = min(p.N for p in nachweis.handlinie)
+        eckwerte = {"N_Rd_zug": N_zug, "N_Rd_druck": N_druck}
+
+        waagrecht = Erfuellungsart.NORMALKRAFT_KONSTANT
+        senkrecht = Erfuellungsart.MOMENT_KONSTANT
+
+        faelle = [
+            (0.0, waagrecht, "reine Biegung"),
+            (N_zug * 0.20, waagrecht, "wenig Zug"),
+            (N_zug * 0.30, senkrecht, "viel Zug"),
+            (N_druck * 0.50, waagrecht, "wenig Druck"),
+            (N_druck * 0.70, senkrecht, "viel Druck"),
+        ]
+        for N_Ed, erwartet, was in faelle:
+            with self.subTest(fall=was):
+                self.assertIs(nachweis._massstab(N_Ed, eckwerte), erwartet)
+
+    def test_schwellen_stehen_als_benannte_groessen_da(self):
+        """Zahlen wie 0.25 gehören nicht mitten in eine Bedingung."""
+        self.assertAlmostEqual(BiegungNormalkraft.SCHWELLE_ZUG, 0.25)
+        self.assertAlmostEqual(BiegungNormalkraft.SCHWELLE_DRUCK, 0.60)
 
     def test_handrechnung_hat_einen_bauch(self):
         """

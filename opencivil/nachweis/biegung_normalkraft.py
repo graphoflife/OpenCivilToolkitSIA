@@ -76,6 +76,7 @@ from opencivil.core.berechnung import (
     Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, MM, Groesse
+from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
 from opencivil.nachweis import linie as geo
@@ -530,6 +531,12 @@ class BiegungNormalkraft(Nachweis):
         )
         return definition.belegen(Groesse.aus_si(zahl, einheit))
 
+    #: Ab welchem Anteil der Grenznormalkraft senkrecht gemessen wird.
+    #: Bewusst verschieden: die Linie ist nicht symmetrisch, auf der Druckseite
+    #: bleibt sie laenger brauchbar waagrecht als auf der Zugseite.
+    SCHWELLE_ZUG = 0.25
+    SCHWELLE_DRUCK = 0.6
+
     def _massstab(
         self, N_Ed: float, eckwerte: Mapping[str, float]
     ) -> Erfuellungsart:
@@ -540,19 +547,15 @@ class BiegungNormalkraft(Nachweis):
         Regelfall. Nahe den beiden Spitzen der Linie taugt er aber nicht mehr:
         dort laeuft die Grenze fast waagrecht, und eine kleine Aenderung der
         Normalkraft wirft den Momentenwiderstand weit herum. Dann wird senkrecht
-        gemessen.
-
-        Die Schwellen sind bewusst verschieden: auf Zug die halbe Zugkraft, auf
-        Druck drei Viertel der Druckkraft. Die Linie ist nicht symmetrisch --
-        auf der Druckseite bleibt sie viel laenger brauchbar waagrecht.
+        gemessen -- der Normalkraftwiderstand bei festgehaltenem Moment.
 
         Diese Wahl erscheint **nicht** in der Mitschrift. Sie ist kein
         Rechenschritt, sondern die Festlegung, in welcher Richtung gemessen
         wird; was dann gerechnet wird, steht vollstaendig da.
         """
-        if N_Ed > 0.0 and abs(N_Ed) > abs(eckwerte["N_Rd_zug"]) / 2.0:
+        if N_Ed > 0.0 and abs(N_Ed) > abs(eckwerte["N_Rd_zug"]) * self.SCHWELLE_ZUG:
             return Erfuellungsart.MOMENT_KONSTANT
-        if N_Ed < 0.0 and abs(N_Ed) > abs(eckwerte["N_Rd_druck"]) * 3.0 / 4.0:
+        if N_Ed < 0.0 and abs(N_Ed) > abs(eckwerte["N_Rd_druck"]) * self.SCHWELLE_DRUCK:
             return Erfuellungsart.MOMENT_KONSTANT
         return Erfuellungsart.NORMALKRAFT_KONSTANT
 
@@ -686,7 +689,7 @@ class BiegungNormalkraft(Nachweis):
             kopf=[r"\text{Lage}", r"a_s\ [\mathrm{mm}^2]", r"z\ [\mathrm{mm}]",
                   r"f_{yd}\ [\mathrm{N/mm^2}]"],
             zeilen=[
-                [rf"\text{{{beschriftung}}}",
+                [als_text(beschriftung),
                  f"{a_s * 1e6:.0f}", f"{z * 1e3:.1f}", f"{stahl.f_yd / 1e6:.0f}"]
                 for a_s, z, stahl, beschriftung in lagen
             ],
@@ -734,7 +737,7 @@ class BiegungNormalkraft(Nachweis):
         p.tabelle(
             kopf=[r"\text{Eckwert}", r"\text{Symbol}", r"\text{Wert}"],
             zeilen=[
-                [rf"\text{{{beschreibung}}}", symbol,
+                [als_text(beschreibung), symbol,
                  ergebnis[self.d_eckwerte[schluessel].id].als_latex(1)]
                 for schluessel, symbol, beschreibung in (
                     ("N_Rd_zug", "N_{Rd}^{+}", "grösste Zugkraft"),
@@ -819,8 +822,8 @@ class BiegungNormalkraft(Nachweis):
         p.tabelle(
             kopf=[r"\text{Punkt}", rf"{lauf}\ [{e_lauf}]", rf"{ziel}\ [{e_ziel}]"],
             zeilen=[
-                [rf"\text{{{a.name}}}", f"{lauf_a / 1e3:.1f}", f"{ziel_a / 1e3:.1f}"],
-                [rf"\text{{{b.name}}}", f"{lauf_b / 1e3:.1f}", f"{ziel_b / 1e3:.1f}"],
+                [als_text(a.name), f"{lauf_a / 1e3:.1f}", f"{ziel_a / 1e3:.1f}"],
+                [als_text(b.name), f"{lauf_b / 1e3:.1f}", f"{ziel_b / 1e3:.1f}"],
             ],
             titel="Stützpunkte der Interpolation",
             ausrichtung="lrr",

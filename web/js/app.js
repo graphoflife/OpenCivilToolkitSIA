@@ -204,11 +204,81 @@ function griffeEinrichten() {
 // Zeichnen
 // ===========================================================================
 
+/** Die drei scrollbaren Tafeln. */
+function tafeln() {
+  return [knoten.baum, knoten.editor, knoten.bericht];
+}
+
+/**
+ * Merkt sich, welches Bedienelement den Fokus hat -- und woran man es wiedererkennt.
+ *
+ * Beim Neuzeichnen wird der Knoten weggeworfen und ein gleich aussehender
+ * gebaut. Eine Kennung tragen die Felder nicht, also wird über die Stelle in
+ * der Reihenfolge gesucht und anschliessend geprüft, ob dort wirklich dasselbe
+ * Feld steht. Stimmt eines der Merkmale nicht -- etwa weil eine Zeile
+ * dazugekommen ist --, bleibt der Fokus lieber weg, als im falschen Zahlenfeld
+ * zu landen.
+ */
+const BEDIENBAR = 'input, select, textarea';
+
+function fokusMerken() {
+  const aktiv = document.activeElement;
+  if (!aktiv || !aktiv.matches?.(BEDIENBAR)) return null;
+  const tafel = tafeln().find((t) => t?.contains(aktiv));
+  if (!tafel) return null;
+
+  return {
+    tafel,
+    stelle: [...tafel.querySelectorAll(BEDIENBAR)].indexOf(aktiv),
+    art: aktiv.type,
+    titel: aktiv.title,
+    wert: aktiv.value,
+    von: aktiv.selectionStart,
+    bis: aktiv.selectionEnd,
+  };
+}
+
+function fokusZurueck(merkmal) {
+  if (!merkmal || merkmal.stelle < 0) return;
+  const feld = [...merkmal.tafel.querySelectorAll(BEDIENBAR)][merkmal.stelle];
+  if (!feld || feld.type !== merkmal.art || feld.title !== merkmal.titel
+      || feld.value !== merkmal.wert) return;
+
+  feld.focus({ preventScroll: true });
+  // Zahlenfelder erlauben selectionStart nur bei manchen Eingabearten.
+  try {
+    if (merkmal.von !== null) feld.setSelectionRange(merkmal.von, merkmal.bis);
+  } catch {
+    /* nicht alle Feldarten können das -- dann eben ohne Schreibmarke */
+  }
+}
+
+/**
+ * Zeichnet neu, ohne die Ansicht zu verwerfen.
+ *
+ * Jede Eingabe baut die Tafeln komplett neu auf. Dabei fallen die
+ * Scrollposition und der Fokus weg -- die Seite sprang bei jedem Enter nach
+ * oben. Hier wird beides um das Neuzeichnen herumgerettet.
+ */
+function ohneSprung(zeichnen) {
+  const stand = tafeln().map((t) => t?.scrollTop ?? 0);
+  const merkmal = fokusMerken();
+
+  zeichnen();
+
+  tafeln().forEach((t, i) => {
+    if (t && t.scrollTop !== stand[i]) t.scrollTop = stand[i];
+  });
+  fokusZurueck(merkmal);
+}
+
 function allesZeichnen(anlass) {
-  baumZeichnen(knoten.baum);
-  editorZeichnen(knoten.editor, knoten.editorTitel, knoten.editorHinweis);
-  // Der Reiter 'Ziel wählen' liefert eine Liste (oder null für 'alles').
-  berichtZeichnen(knoten.bericht, (ziele) => rechnen({ ziele }));
+  ohneSprung(() => {
+    baumZeichnen(knoten.baum);
+    editorZeichnen(knoten.editor, knoten.editorTitel, knoten.editorHinweis);
+    // Der Reiter 'Ziel wählen' liefert eine Liste (oder null für 'alles').
+    berichtZeichnen(knoten.bericht, (ziele) => rechnen({ ziele }));
+  });
 
   knoten.btnSpeichern.textContent = zustand.ungespeichert ? 'Speichern •' : 'Speichern';
   for (const k of knoten.reiterKnoepfe) {

@@ -43,6 +43,7 @@ from opencivil.core.berechnung import (
     Berechnung, Eingabebezug, Eingaben, Formel, Prozedur, Vorgabe,
 )
 from opencivil.core.einheiten import EINHEITSLOS, MM, MM2, Groesse
+from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
 from opencivil.material.basis import Baustoff
@@ -240,8 +241,8 @@ class Lagenaufbau(Prozedur):
             z = h - rand if lage.von_unten else rand
             ergebnis[wertdef.id] = z
             zeilen.append([
-                rf"\text{{{lage.nummer}. Lage {art.beschriftung}}}",
-                rf"\text{{{lage.richtung.value}}}",
+                als_text(f"{lage.nummer}. Lage {art.beschriftung}"),
+                als_text(lage.richtung.value),
                 posten.durchmesser.formatiert(0, MM),
                 rand.formatiert(1, MM),
                 z.formatiert(1, MM),

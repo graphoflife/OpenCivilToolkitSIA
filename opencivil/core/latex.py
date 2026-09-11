@@ -45,6 +45,8 @@ _SONDERZEICHEN = {
     "$": r"\$",
     "#": r"\#",
     "_": r"\_",
+    "^": r"\textasciicircum{}",
+    "~": r"\textasciitilde{}",
     "{": r"\{",
     "}": r"\}",
     "~": r"\textasciitilde{}",
@@ -67,7 +69,15 @@ def text_latex(text: str) -> str:
 
 
 def als_text(text: str) -> str:
-    """Verpackt deutschen Klartext fuer die Mathematikumgebung."""
+    """
+    Verpackt deutschen Klartext fuer die Mathematikumgebung.
+
+    **Immer hierdurch**, nie ``\\text{...}`` von Hand um eine Zeichenkette
+    legen, die nicht buchstabiert im Quelltext steht. Namen kommen aus dem
+    Projekt oder aus einer Berechnung und enthalten Zeichen wie ``_``, die auch
+    im Textmodus Befehle sind: ``M_Rd(N=0)`` bringt KaTeX zum Abbruch, und
+    dann steht im Bericht der rohe Quelltext statt der Beschriftung.
+    """
     return rf"\text{{{text_latex(text)}}}"
 
 

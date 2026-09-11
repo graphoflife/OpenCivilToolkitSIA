@@ -1,5 +1,6 @@
 """Tests fuer die Berichtsausgabe (Konsole und LaTeX)."""
 
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -131,6 +132,75 @@ class TestFormelnSammeln(unittest.TestCase):
         f_cd = next(f for f in formeln_sammeln(loesung) if f.wert_id == c30.id_von("f_cd"))
         self.assertEqual(f_cd.referenz, "SIA 262:2025, 2.4.2.3")
         self.assertIn(r"\frac", f_cd.latex)
+
+
+class TestTextMaskierung(unittest.TestCase):
+    r"""
+    Nichts Unmaskiertes in ``\text{...}``.
+
+    Namen kommen aus dem Projekt oder aus einer Berechnung: ``C12/15_1``,
+    ``M_Rd(N=0) +``. Der Unterstrich ist auch im Textmodus ein
+    Tiefstellungsbefehl -- KaTeX bricht ab, und die Oberfläche zeigt dann den
+    rohen Quelltext statt der Beschriftung. Genau das ist zweimal passiert,
+    darum dieser Wächter über der ganzen Mitschrift.
+    """
+
+    #: Zeichen, die in \text{...} maskiert sein müssen.
+    HEIKEL = "_^&%$#"
+
+    def unmaskierte_stellen(self, latex: str):
+        """Alle \\text{...}-Inhalte mit unmaskierten Sonderzeichen."""
+        treffer = []
+        for inhalt in re.findall(r"\\text\{([^{}]*)\}", latex):
+            # Ein Zeichen gilt als maskiert, wenn unmittelbar davor ein
+            # Rückwärtsstrich steht.
+            for i, zeichen in enumerate(inhalt):
+                if zeichen in self.HEIKEL and (i == 0 or inhalt[i - 1] != "\\"):
+                    treffer.append(inhalt)
+                    break
+        return treffer
+
+    def test_erkennt_den_fehler_ueberhaupt(self):
+        """Der Wächter muss anschlagen, sonst prüft er nichts."""
+        self.assertTrue(self.unmaskierte_stellen(r"\text{M_Rd(N=0)}"))
+        self.assertFalse(self.unmaskierte_stellen(r"\text{M\_Rd(N=0)}"))
+        self.assertFalse(self.unmaskierte_stellen(r"\text{grösste Zugkraft}"))
+
+    def test_die_ganze_mitschrift_ist_sauber(self):
+        from opencivil.core.protokoll import GleichungBlock, TabellenBlock
+        from opencivil.projekt import Projekt
+
+        aufbau = Projekt.beispiel().aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+
+        for block in loesung.protokoll.alle_bloecke():
+            if isinstance(block, GleichungBlock):
+                stuecke = [block.latex]
+            elif isinstance(block, TabellenBlock):
+                stuecke = list(block.kopf) + [z for zeile in block.zeilen for z in zeile]
+            else:
+                continue
+            for stueck in stuecke:
+                schlecht = self.unmaskierte_stellen(stueck)
+                self.assertEqual(
+                    [], schlecht,
+                    f"unmaskiert in \\text{{...}}: {schlecht} – bitte als_text() "
+                    f"verwenden statt \\text{{}} von Hand")
+
+    def test_als_text_maskiert(self):
+        from opencivil.core.latex import als_text
+
+        self.assertEqual(als_text("M_Rd(N=0) +"), r"\text{M\_Rd(N=0) +}")
+        self.assertEqual(als_text("C12/15_1"), r"\text{C12/15\_1}")
+        # Umlaute bleiben stehen -- der Bericht ist UTF-8.
+        self.assertEqual(als_text("grösste Zugkraft"), r"\text{grösste Zugkraft}")
+
+    def test_text_maskieren_ist_dieselbe_funktion(self):
+        """Zwei Maskierungen nebeneinander wären zwei Stellen zum Auseinanderlaufen."""
+        from opencivil.core.latex import text_latex
+        from opencivil.material.basis import text_maskieren
+
+        self.assertIs(text_maskieren, text_latex)
 
 
 if __name__ == "__main__":

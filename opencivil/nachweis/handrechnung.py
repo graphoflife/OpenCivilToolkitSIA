@@ -47,6 +47,7 @@ from typing import Dict, List, Optional
 from opencivil.core.einheiten import (
     EINHEITSLOS, KN, KNM, MM, MM2, N_PRO_MM2, PROMILLE, Groesse,
 )
+from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import Wert, WertDef
 
@@ -174,7 +175,7 @@ class Handrechnung:
             kopf=[r"\text{Seite}", r"A_s\ [\mathrm{mm}^2]",
                   r"z\ [\mathrm{mm}]", r"f_{yd}\ [\mathrm{N/mm^2}]"],
             zeilen=[
-                [rf"\text{{{lage.text}}}", f"{lage.a_s * 1e6:.0f}",
+                [als_text(lage.text), f"{lage.a_s * 1e6:.0f}",
                  f"{lage.z * 1e3:.1f}", f"{lage.f_yd / 1e6:.0f}"]
                 for lage in (self.unten, self.oben)
             ],
@@ -390,7 +391,7 @@ class Handrechnung:
         p.tabelle(
             kopf=[r"\text{Eckpunkt}", r"N\ [\mathrm{kN}]", r"M\ [\mathrm{kNm}]"],
             zeilen=[
-                [rf"\text{{{q.name}}}", f"{q.N / 1e3:.1f}", f"{q.M / 1e3:.1f}"]
+                [als_text(q.name), f"{q.N / 1e3:.1f}", f"{q.M / 1e3:.1f}"]
                 for q in punkte
             ],
             titel="Eckpunkte der Resistenzlinie aus Handrechnung",
