@@ -43,6 +43,93 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-11 · Drei Befunde aus dem Code-Review
+
+Eine strenge Durchsicht des eigenen Arbeitsstands. Alle drei Befunde waren
+derselbe Fehler in drei Gewändern: **ein Begriff, mehrfach kodiert**.
+
+### 1. Die Achse war vier Schreibweisen
+
+Ob waagrecht (Momentenwiderstand bei festgehaltener Normalkraft) oder senkrecht
+gemessen wird, stand vierfach da:
+
+| Ort | Schreibweise |
+| --- | --- |
+| `linie.py` | zwei Funktionspaare `..._bei_N` / `..._bei_M` |
+| `linie.py` | `positiv: bool` |
+| `Auswertung` | `groesse: str` = `"M"` \| `"N"` |
+| `Erfuellungsart` | `NORMALKRAFT_KONSTANT` \| `MOMENT_KONSTANT` |
+
+Abgefragt an sechs Stellen. Wer eine dritte Messart hinzufügt, muss vier
+Notationen treffen; eine vergessene ist stumm falsch.
+
+Jetzt gibt es `linie.Achse` — sie kennt ihren Feldnamen (zugleich der Feldname
+eines Punktes, daher kommt `von()` ohne Fallunterscheidung aus), ihre Einheit,
+ihre Gegenachse und ihr Wort. Letzteres ausgeschrieben, weil die deutsche
+Fugenform sich nicht anhängen lässt: *Momentenwiderstand*, nicht
+*Momentswiderstand* — das hat prompt ein Test gefangen.
+
+Der eigentliche Zug war, **die Einwirkung als Punkt derselben Ebene zu lesen**.
+Damit wird aus zwei gespiegelten Methoden eine:
+
+```python
+ed = geo.Stelle(N=..., M=...)
+fest = achse.gegen.von(ed)      # was festgehalten wird
+gesucht = achse.von(ed)         # was verglichen wird
+```
+
+Netto 55 Zeilen weniger. Nebenbei fiel der doppelte Minus (`− −6000.0`) weg —
+an *einer* Stelle statt zwei, weil es die zweite nicht mehr gibt.
+
+### 2. Die präzise Linie sass in der falschen Klasse
+
+Seit das Urteil über die Handrechnung fällt, ist die aus Dehnungsebenen
+aufgebaute Linie kein Teil des Nachweises mehr — sie wird gerechnet, nicht
+hergeleitet. Sie sass trotzdem mitten in `BiegungNormalkraft`:
+Faserintegration, Fächeraufbau, `Linienpunkt`, 90 Zeilen stillgelegte
+Mitschrift. Vier Zuständigkeiten in einer Klasse.
+
+Alles nach `dehnungsfaecher.py`. Der Nachweis hängt nur noch an einer Zeile:
+
+```python
+self.linie = dehnungsfaecher.aufbauen(h=…, b=…, lagen=…, beton=…)
+```
+
+844 → 600 Zeilen, und die Klasse handelt von einer Sache. Der stillgelegte
+Block bleibt vollständig, jetzt aber neben dem Code, zu dem er gehört.
+
+### 3. Fünf Filter für eine Frage
+
+„Gehört das zum gewählten Bestandteil?" wurde in `bericht.js` fünfmal gefragt,
+jede Sicht mit einem anderen Schlüssel — und nur eine benutzte
+`raumDerAuswahl()`, den kanonischen Weg, den es längst gab.
+
+Schlimmer: die Herleitung verglich über **Anzeigetexte**. Die Oberfläche baute
+`Plattenanalyse: Decke über EG` nach und verglich es mit dem Titel. Das bräche,
+sobald jemand eine Überschrift umformuliert, und zwar stumm.
+
+Jetzt trägt der Abschnitt seinen Namensraum mit (`Abschnitt(titel, raum)` —
+Titel für den Leser, Raum für die Oberfläche), und alle fünf Sichten fragen
+`imRaum(eingrenzung(), id)`.
+
+### Kleineres aus derselben Durchsicht
+
+* `querkraft.py` hatte **zwei** `_statische_hoehe` mit gleichem Rumpf, eine
+  davon unbenutzt; die Lagentiefen wurden über `self._tiefen` zwischen Methoden
+  geschmuggelt. Jetzt eine freie Funktion und ein Parameter.
+* `SCHWELLE_ZUG` / `SCHWELLE_DRUCK` standen mitten im Klassenkörper.
+
+### Was die Durchsicht über die Arbeitsweise sagt
+
+Alle drei Befunde entstanden beim *Hinzufügen*: jedes Mal war die zweite
+Kodierung eines Begriffs billiger als das Zusammenführen. Das ist der Normalfall
+und kein Versehen — aber es heisst, dass eine Durchsicht nach jeder grösseren
+Runde nötig ist, nicht irgendwann.
+
+Der Manifest-Wächter hat die neue Datei sofort gemeldet. Genau dafür ist er da.
+
+---
+
 ## 2026-09-11 · Alles nachrechenbar, und der Bericht bekommt Abschnitte
 
 **Anlass:** Durchsicht der ganzen Herleitung. Dabei kamen vier echte Fehler

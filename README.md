@@ -56,7 +56,10 @@ Fertig und getestet (264 Tests):
 | `core/rechenwerk` | Rückwärtsauflösung, Variantenwahl, fehlende Eingaben, Zyklen |
 | `material/` | Beton und Betonstahl nach SIA 262:2025 |
 | `querschnitt/` | Plattenquerschnitt, Lagenaufbau, Werkstoffgesetze |
-| `nachweis/` | Biegung mit Normalkraft über die M-N-Interaktion, Querkraft |
+| `nachweis/linie` | Geometrie einer M-N-Linie, `Achse` als Wert |
+| `nachweis/handrechnung` | die von Hand nachrechenbaren Eckpunkte |
+| `nachweis/dehnungsfaecher` | die präzise Linie -- nur für das Diagramm |
+| `nachweis/` | M-N-Nachweis und Querkraft |
 | `bericht/` | Konsole und LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) |
 | `projekt.py` | speicherbare Projektbeschreibung, baut daraus ein Rechenwerk |
 | `web/dienst.py` | der Rechendienst, unabhängig vom Transportweg |
