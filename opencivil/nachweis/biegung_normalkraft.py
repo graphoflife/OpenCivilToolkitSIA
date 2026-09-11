@@ -15,39 +15,8 @@ ZWEI LINIEN, EINE DAVON MASSGEBEND:
   Faserintegrationen, die niemand mit dem Taschenrechner nachvollzieht. Wer
   sie herleiten liesse, lieferte Zeilen zum Glauben statt zum Pruefen.
 
-Die Mitschrift dafuer ist erhalten, aber stillgelegt -- siehe den Block
-"STILLGELEGT" weiter unten.
-
-WIE DIE PRAEZISE RESISTENZLINIE ENTSTEHT:
-Alle zulaessigen Dehnungsebenen bilden einen Faecher. Welche Grenze ihn
-begrenzt, wechselt unterwegs dreimal -- entsprechend wird er in drei
-Abschnitten je Momentenvorzeichen abgefahren:
-
-    1a  Drehung um die unterste Lage bei eps_ud; die Oberkante geht von Zug
-        bis auf -eps_c2d. Massgebend ist der Stahl.
-    1b  Drehung um die Oberkante bei -eps_c2d; die Unterkante geht bis auf
-        null. Massgebend ist die gedrueckte Randfaser.
-    1c  Drehung um den Punkt C; die Unterkante geht bis auf -eps_c1d.
-        Der Querschnitt ist ganz gedrueckt, massgebend ist eps_c1d.
-    2a/2b/2c  dasselbe spiegelbildlich mit Zug oben     (M < 0)
-
-Der Punkt C liegt bei z_C = h * (1 - eps_c1d / eps_c2d) ab dem gedrueckten Rand
-und traegt die Dehnung -eps_c1d. Er ist noetig, weil beim vollstaendig
-gedrueckten Querschnitt nicht mehr die Randfaser massgebend ist: reiner Druck
-endet bei gleichmaessig -eps_c1d, nicht bei -eps_c2d. Ohne diesen Abschnitt
-liefe die Linie an beiden Enden ueber die wahre Grenze hinaus und schnitte sich
-selbst -- womit Punkt-in-Linie-Test und Schnittsuche und damit jedes Urteil
-unbrauchbar waeren.
-
-Anfang (gleichmaessiger Zug bei eps_ud) und Ende (gleichmaessiger Druck bei
-eps_c1d) sind beiden Faechern gemeinsam, sodass sich eine geschlossene Linie
-ergibt. Deckungsgleiche Punkte -- solange alles fliesst, aendern N und M sich
-nicht -- werden anschliessend zusammengefasst.
-
-Zu jeder Dehnungsebene werden N und M durch Integration ueber den Querschnitt
-bestimmt: der Beton als Faserintegration nach der Parabel-Rechteck-Beziehung,
-die Bewehrung lagenweise nach der bilinearen Beziehung. Die von der Bewehrung
-verdraengte Betonflaeche wird abgezogen.
+Wie sie entsteht und warum die Mitschrift dafuer stillgelegt ist, steht in
+:mod:`opencivil.nachweis.dehnungsfaecher`.
 
 VORZEICHEN:
     N > 0   Zug
@@ -79,14 +48,12 @@ from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, MM, Groesse
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
-from opencivil.nachweis import linie as geo
+from opencivil.nachweis import dehnungsfaecher, linie as geo
 from opencivil.nachweis.handrechnung import (
     Eckpunkt, Handrechnung, lagen_zusammenfassen,
 )
 from opencivil.querschnitt.platte import Plattenquerschnitt, Richtung
-from opencivil.querschnitt.werkstoffgesetz import (
-    Betongesetz, Dehnungsebene, Stahlgesetz,
-)
+from opencivil.querschnitt.werkstoffgesetz import Betongesetz
 
 
 class Erfuellungsart(str, Enum):
@@ -135,21 +102,6 @@ class Schnittgroessen:
         return "".join(z if z.isalnum() else "_" for z in self.name)
 
 
-@dataclass(frozen=True)
-class Linienpunkt:
-    """Ein Punkt der Resistenzlinie samt der Dehnungsebene, die ihn erzeugt."""
-
-    N: float
-    """Normalkraft in N (Zug positiv)."""
-
-    M: float
-    """Moment in Nm (Zug unten positiv)."""
-
-    eps_oben: float
-    eps_unten: float
-    abschnitt: str = ""
-
-
 @dataclass
 class Auswertung:
     """Ergebnis der Prüfung einer Kombination."""
@@ -191,6 +143,12 @@ ACHSE_ZU: Dict[Erfuellungsart, geo.Achse] = {
 MASSSTAB: Dict[str, Erfuellungsart] = {
     a.name: m for m, a in ACHSE_ZU.items()
 }
+
+#: Ab welchem Anteil der Grenznormalkraft senkrecht gemessen wird. Bewusst
+#: verschieden: die Linie ist nicht symmetrisch, auf der Druckseite bleibt sie
+#: laenger brauchbar waagrecht als auf der Zugseite.
+SCHWELLE_ZUG = 0.25
+SCHWELLE_DRUCK = 0.6
 
 
 # ===========================================================================
@@ -321,137 +279,19 @@ class BiegungNormalkraft(Nachweis):
 
     # -- Querschnittswerte --------------------------------------------------
 
-    def _lagen(self, e: Eingaben) -> List[Tuple[float, float, Stahlgesetz, str]]:
-        """Je Bewehrungsposten dieser Richtung: (Fläche m^2, z m, Gesetz, Text)."""
-        gesetze: Dict[str, Stahlgesetz] = {}
-        for stahl in {l.stahl.id: l.stahl for l, _, _, _, _ in self.posten}.values():
-            kurz = _kennung(stahl.id)
-            gesetze[stahl.id] = Stahlgesetz.aus_werten({
-                kennwert: e[f"{kennwert}__{kurz}"]
-                for kennwert in ("E_s", "f_yd", "f_yd_druck", "eps_ud")
-            })
-
-        lagen = []
-        for lage, art, _, _, _ in self.posten:
-            marke = f"{lage.nummer}{art.kuerzel}"
-            lagen.append((
-                e.g(f"a_s_{marke}").si,
-                e.g(f"z_{marke}").si,
-                gesetze[lage.stahl.id],
-                f"{lage.nummer}. Lage {art.beschriftung}",
-            ))
-        return lagen
-
-    def _schnittgroessen(
-        self, ebene: Dehnungsebene, beton: Betongesetz, lagen, h: float, b: float
-    ) -> Tuple[float, float]:
-        """Integriert N und M zu einer Dehnungsebene. Rueckgabe in N und Nm."""
-        N = 0.0
-        M = 0.0
-        dz = h / self.fasern
-        flaeche = b * dz
-        for k in range(self.fasern):
-            z = (k + 0.5) * dz
-            kraft = beton.spannung(ebene.bei(z)) * flaeche
-            N += kraft
-            M += kraft * (z - h / 2.0)
-
-        for a_s, z, stahl, _ in lagen:
-            # Die vom Stahl verdraengte Betonflaeche wieder abziehen.
-            eps = ebene.bei(z)
-            kraft = (stahl.spannung(eps) - beton.spannung(eps)) * a_s
-            N += kraft
-            M += kraft * (z - h / 2.0)
-        return N, M
-
-    def _faecher(
-        self, h: float, lagen, beton: Betongesetz
-    ) -> List[Tuple[str, Dehnungsebene]]:
-        """
-        Baut die Folge der Dehnungsebenen -- die eigentliche Prozedur.
-
-        Beide Faecher laufen von gleichmaessigem Zug bis zu gleichmaessigem
-        Druck; zusammengesetzt ergeben sie die geschlossene Resistenzlinie.
-        """
-        eps_c1d, eps_c2d = beton.eps_c1d, beton.eps_c2d
-        beton_grenze = -eps_c2d
-        z_unten = max(z for _, z, _, _ in lagen)
-        z_oben = min(z for _, z, _, _ in lagen)
-        eps_ud_unten = min(s.eps_ud for _, z, s, _ in lagen if z == z_unten)
-        eps_ud_oben = min(s.eps_ud for _, z, s, _ in lagen if z == z_oben)
-
-        ebenen: List[Tuple[str, Dehnungsebene]] = []
-
-        def strecke(
-            marke: str,
-            eps_fest: float, z_fest: float,
-            eps_von: float, eps_bis: float, z_lauf: float,
-            ab: int = 0,
-        ) -> Dehnungsebene:
-            for i in range(ab, self.schritte + 1):
-                anteil = i / self.schritte
-                eps_lauf = eps_von + (eps_bis - eps_von) * anteil
-                ebenen.append((
-                    marke,
-                    Dehnungsebene.durch_zwei_punkte(eps_fest, z_fest, eps_lauf, z_lauf, h),
-                ))
-            return ebenen[-1][1]
-
-        # Drehpunkt C: sobald die Nulllinie den Querschnitt verlassen hat, ist
-        # nicht mehr die Randfaser massgebend. Fuer den vollstaendig gedrueckten
-        # Querschnitt gilt die Stauchung eps_c1d, und alle Ebenen dieses
-        # Abschnitts laufen durch den Punkt
-        #     z_C = h * (1 - eps_c1d / eps_c2d)   ab dem gedrueckten Rand
-        # mit der Dehnung -eps_c1d. Der reine Druck endet folglich bei
-        # gleichmaessig -eps_c1d, nicht bei -eps_c2d.
-        #
-        # Ohne diesen dritten Abschnitt lief die Linie an beiden Enden ueber die
-        # wahre Grenze hinaus und schnitt sich selbst.
-        anteil_c = 1.0 - eps_c1d / eps_c2d
-        z_c_oben = h * anteil_c          # von der Oberkante, wenn oben gedrueckt
-        z_c_unten = h * (1.0 - anteil_c)  # von der Oberkante, wenn unten gedrueckt
-
-        # Faecher 1 -- Zug unten, positives Moment
-        ende_1a = strecke("1a", eps_ud_unten, z_unten, eps_ud_unten, beton_grenze, 0.0)
-        strecke("1b", beton_grenze, 0.0, ende_1a.eps_unten, 0.0, h, ab=1)
-        strecke("1c", -eps_c1d, z_c_oben, 0.0, -eps_c1d, h, ab=1)
-
-        # Faecher 2 -- Zug oben, negatives Moment; rueckwaerts angehaengt, damit
-        # eine geschlossene Linie entsteht.
-        merker = len(ebenen)
-        ende_2a = strecke("2a", eps_ud_oben, z_oben, eps_ud_oben, beton_grenze, h)
-        strecke("2b", beton_grenze, h, ende_2a.eps_oben, 0.0, 0.0, ab=1)
-        strecke("2c", -eps_c1d, z_c_unten, 0.0, -eps_c1d, 0.0, ab=1)
-        rueck = ebenen[merker:]
-        del ebenen[merker:]
-        ebenen.extend(reversed(rueck))
-        return ebenen
-
-    # -- Nachweis -----------------------------------------------------------
-
     def pruefe(self, e: Eingaben, p: Protokoll):
         h = e.g("h").si
         b = e.g("b").si
         beton = Betongesetz.aus_werten({
             k: e[k] for k in ("f_cd", "eps_c1d", "eps_c2d", "k_sigma")
         })
-        lagen = self._lagen(e)
+        lagen = dehnungsfaecher.lagen_aus_eingaben(self.posten, e)
 
-        # -- Die genaue Linie: nur fuer das Diagramm, ohne Mitschrift --------
-        # Sie entsteht aus hunderten Faserintegrationen und liesse sich von Hand
-        # nicht nachrechnen. Sie herzuleiten hiesse, dem Leser Zeilen vorzusetzen,
-        # die er nur glauben kann. Sie steht im Diagramm zum Vergleich -- das
-        # Urteil faellt ueber die Handrechnung darunter.
-        ebenen = self._faecher(h, lagen, beton)
-        self.linie = geo.ohne_wiederholungen([
-            Linienpunkt(
-                *self._schnittgroessen(ebene, beton, lagen, h, b),
-                eps_oben=ebene.eps_oben,
-                eps_unten=ebene.eps_unten,
-                abschnitt=marke,
-            )
-            for marke, ebene in ebenen
-        ])
+        # Die genaue Linie: nur fuer das Diagramm, ohne Mitschrift. Sie steht
+        # zum Vergleich daneben -- das Urteil faellt ueber die Handrechnung.
+        self.linie = dehnungsfaecher.aufbauen(
+            h=h, b=b, lagen=lagen, beton=beton,
+            schritte=self.schritte, fasern=self.fasern)
 
         # -- Die Handrechnung: das, wogegen nachgewiesen wird ----------------
         # Die Zugehoerigkeit zur unteren oder oberen Lage kommt aus dem Modell
@@ -542,12 +382,6 @@ class BiegungNormalkraft(Nachweis):
         )
         return definition.belegen(Groesse.aus_si(zahl, einheit))
 
-    #: Ab welchem Anteil der Grenznormalkraft senkrecht gemessen wird.
-    #: Bewusst verschieden: die Linie ist nicht symmetrisch, auf der Druckseite
-    #: bleibt sie laenger brauchbar waagrecht als auf der Zugseite.
-    SCHWELLE_ZUG = 0.25
-    SCHWELLE_DRUCK = 0.6
-
     def _massstab(
         self, N_Ed: float, eckwerte: Mapping[str, float]
     ) -> Erfuellungsart:
@@ -564,9 +398,9 @@ class BiegungNormalkraft(Nachweis):
         Rechenschritt, sondern die Festlegung, in welcher Richtung gemessen
         wird; was dann gerechnet wird, steht vollstaendig da.
         """
-        if N_Ed > 0.0 and abs(N_Ed) > abs(eckwerte["N_Rd_zug"]) * self.SCHWELLE_ZUG:
+        if N_Ed > 0.0 and abs(N_Ed) > abs(eckwerte["N_Rd_zug"]) * SCHWELLE_ZUG:
             return Erfuellungsart.MOMENT_KONSTANT
-        if N_Ed < 0.0 and abs(N_Ed) > abs(eckwerte["N_Rd_druck"]) * self.SCHWELLE_DRUCK:
+        if N_Ed < 0.0 and abs(N_Ed) > abs(eckwerte["N_Rd_druck"]) * SCHWELLE_DRUCK:
             return Erfuellungsart.MOMENT_KONSTANT
         return Erfuellungsart.NORMALKRAFT_KONSTANT
 
@@ -654,107 +488,6 @@ class BiegungNormalkraft(Nachweis):
 
     # -- Mitschrift ---------------------------------------------------------
 
-    # =======================================================================
-    # STILLGELEGT -- die Herleitung der genauen Linie
-    #
-    # Die folgenden drei Methoden schreiben den Dehnungsebenen-Ansatz, die
-    # Stuetzstellen des Faechers und die Eckwerte der genauen Linie. Sie werden
-    # derzeit von niemandem aufgerufen: die genaue Linie dient nur noch dem
-    # Vergleich im Diagramm, hergeleitet wird die Handrechnung.
-    #
-    # Sie bleiben vollstaendig stehen, weil der Inhalt spaeter wieder gebraucht
-    # wird. Wer sie reaktiviert, ruft sie in pruefe() auf -- gerechnet wird die
-    # genaue Linie ohnehin weiter, es fehlt allein die Mitschrift.
-    # =======================================================================
-
-    def _protokoll_ansatz(self, p: Protokoll, beton: Betongesetz, lagen, e: Eingaben) -> None:
-        p.titel("Ansatz")
-        p.text(
-            "Der Querschnitt bleibt eben (Bernoulli). Zu jeder zulässigen "
-            "Dehnungsebene werden Normalkraft und Moment durch Integration über "
-            "die Querschnittshöhe bestimmt. Zug ist positiv, das Moment bezieht "
-            "sich auf die halbe Querschnittshöhe."
-        )
-        p.gleichung(beton.latex(), titel="Beton – Parabel-Rechteck-Beziehung",
-                    referenz="SIA 262:2025, 4.2.1.6")
-        p.gleichung(lagen[0][2].latex(), titel="Betonstahl – bilineare Beziehung",
-                    referenz="SIA 262:2025, 4.2.2.4")
-        p.gleichung(
-            r"N = \int_A \sigma\,\mathrm{d}A \qquad "
-            r"M = \int_A \sigma \cdot \left(z - \tfrac{h}{2}\right)\,\mathrm{d}A",
-            titel="Schnittgrössen aus der Spannungsverteilung",
-        )
-        p.text(
-            f"Der Beton wird in {self.fasern} Fasern über die Höhe integriert, "
-            f"die Bewehrung lagenweise. Die von der Bewehrung verdrängte "
-            f"Betonfläche wird abgezogen."
-        )
-        p.tabelle(
-            kopf=[r"\text{Lage}", r"a_s\ [\mathrm{mm}^2]", r"z\ [\mathrm{mm}]",
-                  r"f_{yd}\ [\mathrm{N/mm^2}]"],
-            zeilen=[
-                [als_text(beschriftung),
-                 f"{a_s * 1e6:.0f}", f"{z * 1e3:.1f}", f"{stahl.f_yd / 1e6:.0f}"]
-                for a_s, z, stahl, beschriftung in lagen
-            ],
-            titel="Berücksichtigte Bewehrungslagen",
-            ausrichtung="lrrr",
-        )
-
-    def _protokoll_linie(self, p: Protokoll) -> None:
-        p.titel("Aufbau der Resistenzlinie")
-        p.text(
-            f"Der Dehnungsfächer wird in vier Abschnitten mit je "
-            f"{self.schritte} Schritten abgefahren; das ergibt "
-            f"{len(self.linie)} Punkte. Ausgewiesen ist jeder Abschnittsanfang "
-            f"und jedes Abschnittsende."
-        )
-        zeilen = []
-        vorher = None
-        for i, punkt in enumerate(self.linie):
-            grenze = (
-                vorher is None
-                or punkt.abschnitt != vorher
-                or i == len(self.linie) - 1
-                or self.linie[i + 1].abschnitt != punkt.abschnitt
-            )
-            if grenze:
-                zeilen.append([
-                    punkt.abschnitt,
-                    f"{punkt.eps_oben * 1000:.2f}",
-                    f"{punkt.eps_unten * 1000:.2f}",
-                    f"{punkt.N / 1e3:.1f}",
-                    f"{punkt.M / 1e3:.1f}",
-                ])
-            vorher = punkt.abschnitt
-        p.tabelle(
-            kopf=[r"\text{Abschn.}", r"\varepsilon_{oben}\ [\text{‰}]",
-                  r"\varepsilon_{unten}\ [\text{‰}]",
-                  r"N\ [\mathrm{kN}]", r"M\ [\mathrm{kNm}]"],
-            zeilen=zeilen,
-            titel="Stützstellen des Dehnungsfächers",
-            ausrichtung="lrrrr",
-        )
-
-    def _protokoll_eckwerte(self, p: Protokoll, ergebnis: Mapping[str, Groesse]) -> None:
-        """Eckwerte der genauen Linie. Stillgelegt, siehe Block oben."""
-        p.tabelle(
-            kopf=[r"\text{Eckwert}", r"\text{Symbol}", r"\text{Wert}"],
-            zeilen=[
-                [als_text(beschreibung), symbol,
-                 ergebnis[self.d_eckwerte[schluessel].id].als_latex(1)]
-                for schluessel, symbol, beschreibung in (
-                    ("N_Rd_zug", "N_{Rd}^{+}", "grösste Zugkraft"),
-                    ("N_Rd_druck", "N_{Rd}^{-}", "grösste Druckkraft"),
-                    ("M_Rd_max", "M_{Rd}^{+}", "grösstes Moment"),
-                    ("M_Rd_min", "M_{Rd}^{-}", "kleinstes Moment"),
-                )
-            ],
-            titel="Eckwerte der Resistenzlinie",
-            ausrichtung="lcr",
-        )
-
-    # ================= Ende des stillgelegten Blocks =======================
 
     def _protokoll_kombination(self, p: Protokoll, auswertung: Auswertung) -> None:
         k = auswertung.schnittgroessen

@@ -53,6 +53,16 @@ from opencivil.querschnitt.platte import Plattenquerschnitt, Richtung
 K_G_MINDEST = 1.20
 
 
+def _statische_hoehe(tiefen: Sequence[float], h: float, moment_positiv: bool) -> float:
+    """
+    Statische Hoehe der gezogenen Bewehrung, in m ab der gedrueckten Kante.
+
+    Bei positivem Moment liegt der Zug unten: gemessen wird von der Oberkante
+    zur untersten Lage. Bei negativem Moment umgekehrt.
+    """
+    return max(tiefen) if moment_positiv else h - min(tiefen)
+
+
 @dataclass(frozen=True)
 class Querkraftfall:
     """Eine zu pruefende Kombination fuer den Querkraftnachweis."""
@@ -168,16 +178,6 @@ class Querkraft(Nachweis):
 
     # -- Rechnen ------------------------------------------------------------
 
-    def _statische_hoehe(self, e: Eingaben, h: float, moment_positiv: bool) -> float:
-        """
-        Statische Hoehe der gezogenen Bewehrung, in m ab der gedrueckten Kante.
-
-        Bei positivem Moment liegt der Zug unten: gemessen wird von der
-        Oberkante zur untersten Lage. Bei negativem Moment umgekehrt.
-        """
-        tiefen = [e.g(f"z_{l.nummer}{a.kuerzel}").si for l, a, _, _, _ in self.posten]
-        return max(tiefen) if moment_positiv else h - min(tiefen)
-
     def pruefe(self, e: Eingaben, p: Protokoll):
         h = e.g("h").si
         tau_cd = e.g("tau_cd")
@@ -185,6 +185,7 @@ class Querkraft(Nachweis):
         E_s = e.g("E_s").si
         einlage = e.g("einlagenhoehe").si
         m_rd = {f.name: abs(e.g(f"m_Rd_{f.kennung}").si) for f in self.faelle}
+        tiefen = [e.g(f"z_{l.nummer}{a.kuerzel}").si for l, a, _, _, _ in self.posten]
 
         self._protokoll_ansatz(p, e)
 
@@ -217,7 +218,7 @@ class Querkraft(Nachweis):
 
         for fall in self.faelle:
             erg = self._einen_fall(fall, h, tau_cd, f_yd, E_s, einlage, k_g,
-                                   m_rd[fall.name])
+                                   m_rd[fall.name], tiefen)
             self.ergebnisse.append(erg)
             self._protokoll_fall(p, erg, h, tau_cd, f_yd, E_s, einlage, k_g)
 
@@ -256,12 +257,12 @@ class Querkraft(Nachweis):
     def _einen_fall(
         self, fall: Querkraftfall, h: float, tau_cd: Groesse,
         f_yd: float, E_s: float, einlage: float, k_g: float,
-        m_Rd: float,
+        m_Rd: float, tiefen: Sequence[float],
     ) -> Querkraftergebnis:
         erg = Querkraftergebnis(fall=fall)
         M_Ed, N_Ed, V_Ed = fall.M_Ed.si, fall.N_Ed.si, fall.V_Ed.si
 
-        erg.d = self._statische_hoehe_aus(h, M_Ed >= 0)
+        erg.d = _statische_hoehe(tiefen, h, M_Ed >= 0)
         erg.d_v = erg.d - einlage if (h / 6.0 < einlage < erg.d) else erg.d
 
         if N_Ed > 0:
@@ -312,14 +313,6 @@ class Querkraft(Nachweis):
             f"= {erg.v_Rd / 1e3:.1f} kN/m.")
         return erg
 
-    def _statische_hoehe_aus(self, h: float, moment_positiv: bool) -> float:
-        tiefen = self._tiefen
-        return max(tiefen) if moment_positiv else h - min(tiefen)
-
-    def rechne(self, e: Eingaben, p: Protokoll):
-        # Die Lagentiefen werden mehrfach gebraucht; einmal einsammeln.
-        self._tiefen = [e.g(f"z_{l.nummer}{a.kuerzel}").si for l, a, _, _, _ in self.posten]
-        return super().rechne(e, p)
 
     # -- Mitschrift ---------------------------------------------------------
 

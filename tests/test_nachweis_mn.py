@@ -565,8 +565,11 @@ class TestErfuellungsgrad(unittest.TestCase):
 
     def test_schwellen_stehen_als_benannte_groessen_da(self):
         """Zahlen wie 0.25 gehören nicht mitten in eine Bedingung."""
-        self.assertAlmostEqual(BiegungNormalkraft.SCHWELLE_ZUG, 0.25)
-        self.assertAlmostEqual(BiegungNormalkraft.SCHWELLE_DRUCK, 0.60)
+        from opencivil.nachweis.biegung_normalkraft import (
+            SCHWELLE_DRUCK, SCHWELLE_ZUG,
+        )
+        self.assertAlmostEqual(SCHWELLE_ZUG, 0.25)
+        self.assertAlmostEqual(SCHWELLE_DRUCK, 0.60)
 
     def test_handrechnung_hat_einen_bauch(self):
         """
