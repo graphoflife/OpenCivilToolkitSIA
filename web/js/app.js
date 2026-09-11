@@ -9,12 +9,17 @@
  * gedrückte Taste ein vollständiger Nachweis samt Interaktionslinie.
  */
 
-import { api, ApiFehler } from './api.js';
+import { api, kernBereitstellen, KernFehler } from './api.js';
+import {
+  ablageEinrichten, aendern, horchen, projektAendern, zustand,
+} from './zustand.js';
+import {
+  alsDateiSichern, ausDateiLaden, imBrowserAblegen, projektHolen,
+} from './ablage.js';
 import { el, melden } from './dom.js';
 import { baumZeichnen } from './baum.js';
 import { berichtZeichnen } from './bericht.js';
 import { editorZeichnen } from './editor.js';
-import { aendern, horchen, zustand } from './zustand.js';
 
 const knoten = {};
 let rechenUhr = null;
@@ -62,7 +67,7 @@ async function rechnen({ ziele = null, stillschweigend = false } = {}) {
   } catch (fehler) {
     zustandsanzeige('Fehler', 'ist-fehler');
     melden(fehler.message, true);
-    if (fehler instanceof ApiFehler && fehler.spur) console.error(fehler.spur);
+    if (fehler instanceof KernFehler && fehler.spur) console.error(fehler.spur);
   } finally {
     aendern({ rechnetGerade: false }, 'rechnen-ende');
     knoten.btnRechnen.disabled = false;
@@ -80,11 +85,44 @@ function spaeterRechnen() {
 // Kopfleiste
 // ===========================================================================
 
-async function speichern() {
+/**
+ * Legt das Projekt als .json auf die Platte.
+ *
+ * Im Browser liegt es ohnehin schon -- nach jeder Änderung. Dieser Knopf ist
+ * für das, was der Browser nicht kann: eine Datei, die man weitergeben,
+ * ablegen und in ein Jahr wieder öffnen kann.
+ */
+function speichern() {
   try {
-    await api.projektSichern(zustand.projekt);
+    const name = alsDateiSichern(zustand.projekt);
     aendern({ ungespeichert: false }, 'gespeichert');
-    melden('Projekt gespeichert.');
+    melden(`${name} gespeichert.`);
+  } catch (fehler) {
+    melden(fehler.message, true);
+  }
+}
+
+async function oeffnen() {
+  try {
+    const projekt = await ausDateiLaden();
+    if (projekt === null) return;  // abgebrochen
+
+    knoten.projektname.value = projekt.name;
+    // Kommt aus einer Datei, liegt also bereits auf der Platte.
+    imBrowserAblegen(projekt, true);
+    aendern({
+      projekt,
+      ungespeichert: false,
+      auswahl: null,
+      loesung: null,
+      ziele: [],
+      hervorgehoben: new Set(),
+      verfolgtesZiel: null,
+      gewaehlteZiele: new Set(),
+      zieleListe: null,
+    }, 'start');
+    melden(`Projekt «${projekt.name}» geöffnet.`);
+    await rechnen();
   } catch (fehler) {
     melden(fehler.message, true);
   }
@@ -100,9 +138,12 @@ async function berichtErzeugen() {
   zustandsanzeige('erzeuge Bericht …');
   try {
     const antwort = await api.bericht(zustand.projekt, zustand.ziele);
-    const meldung = antwort.pdf_pfad
-      ? `PDF erzeugt mit ${antwort.maschine}: ${antwort.pdf_pfad}`
-      : `LaTeX geschrieben: ${antwort.tex_pfad}\n(${antwort.meldung})`;
+
+    // Das .tex ist auf beiden Wegen dasselbe. Nur der Server kann es zusätzlich
+    // ablegen und übersetzen -- im Browser gibt es keine TeX-Maschine.
+    let meldung = 'Das LaTeX steht bereit. In Overleaf einfügen oder herunterladen.';
+    if (antwort.pdf_pfad) meldung = `PDF erzeugt mit ${antwort.maschine}: ${antwort.pdf_pfad}`;
+    else if (antwort.tex_pfad) meldung = `LaTeX geschrieben: ${antwort.tex_pfad}\n(${antwort.meldung})`;
 
     dialogZeigen('Bericht', el('div', {}, [
       el('p', { text: meldung, style: { whiteSpace: 'pre-wrap' } }),
@@ -118,7 +159,7 @@ async function berichtErzeugen() {
         }),
         el('a.knopf', {
           text: '.tex herunterladen',
-          download: `${zustand.projekt.name || 'bericht'}.tex`,
+          download: `${antwort.dateiname || 'bericht'}.tex`,
           href: URL.createObjectURL(new Blob([antwort.tex], { type: 'application/x-tex' })),
         }),
       ]),
@@ -186,6 +227,17 @@ function allesZeichnen(anlass) {
 // Start
 // ===========================================================================
 
+/** Die Startanzeige, solange Python noch lädt. */
+function ladeanzeige(text) {
+  const schirm = document.getElementById('ladeschirm');
+  if (!schirm) return;
+  if (text === '') {
+    schirm.remove();
+    return;
+  }
+  document.getElementById('ladetext').textContent = text;
+}
+
 async function starten() {
   Object.assign(knoten, {
     baum: document.getElementById('baum'),
@@ -195,8 +247,10 @@ async function starten() {
     bericht: document.getElementById('bericht'),
     projektname: document.getElementById('projektname'),
     zustandsanzeige: document.getElementById('zustandsanzeige'),
+    kernanzeige: document.getElementById('kernanzeige'),
     btnRechnen: document.getElementById('btn-rechnen'),
     btnSpeichern: document.getElementById('btn-speichern'),
+    btnOeffnen: document.getElementById('btn-oeffnen'),
     btnBericht: document.getElementById('btn-bericht'),
     dialog: document.getElementById('dialog'),
     dialogTitel: document.getElementById('dialog-titel'),
@@ -206,13 +260,13 @@ async function starten() {
 
   knoten.btnRechnen.addEventListener('click', () => rechnen());
   knoten.btnSpeichern.addEventListener('click', speichern);
+  knoten.btnOeffnen.addEventListener('click', oeffnen);
   knoten.btnBericht.addEventListener('click', berichtErzeugen);
   document.getElementById('dialog-schliessen')
     .addEventListener('click', () => knoten.dialog.close());
 
   knoten.projektname.addEventListener('change', (e) => {
-    zustand.projekt.name = e.target.value;
-    aendern({ ungespeichert: true }, 'name');
+    projektAendern((p) => { p.name = e.target.value; }, 'name');
   });
 
   for (const k of knoten.reiterKnoepfe) {
@@ -223,16 +277,29 @@ async function starten() {
   }
 
   griffeEinrichten();
+  ablageEinrichten(imBrowserAblegen);
   horchen(allesZeichnen);
 
   try {
-    const [katalog, projekt] = await Promise.all([api.katalog(), api.projektLaden()]);
-    knoten.projektname.value = projekt.name;
-    aendern({ katalog, projekt }, 'start');
+    // Erst den Kern -- ohne ihn lässt sich nicht einmal die Beschreibung prüfen.
+    const kern = await kernBereitstellen(ladeanzeige);
+    knoten.kernanzeige.textContent = kern.beschriftung;
+
+    const [katalog, abgelegt] = await Promise.all([api.katalog(), projektHolen()]);
+    if (abgelegt.hinweis) melden(abgelegt.hinweis, true);
+
+    knoten.projektname.value = abgelegt.projekt.name;
+    aendern({
+      katalog,
+      projekt: abgelegt.projekt,
+      ungespeichert: !abgelegt.gesichert,
+    }, 'start');
     await rechnen();
   } catch (fehler) {
-    zustandsanzeige('Kern nicht erreichbar', 'ist-fehler');
+    ladeanzeige('');
+    zustandsanzeige('Kern nicht bereit', 'ist-fehler');
     melden(fehler.message, true);
+    if (fehler instanceof KernFehler && fehler.spur) console.error(fehler.spur);
   }
 }
 

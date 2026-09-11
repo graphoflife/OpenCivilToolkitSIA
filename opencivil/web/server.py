@@ -124,9 +124,12 @@ def aufloesen(pfad: str) -> Path | None:
     ziel = (WURZEL / Path(*teile)).resolve()
     # Guertel und Hosenträger: auch nach dem Aufloesen von Verknuepfungen muss
     # die Datei noch unterhalb der Wurzel liegen.
-    if not ziel.is_relative_to(WURZEL.resolve()) or not ziel.is_file():
+    if not ziel.is_relative_to(WURZEL.resolve()):
         return None
-    return ziel
+    if ziel.is_dir():
+        # /web/ meint /web/index.html -- so haelt es auch GitHub Pages.
+        ziel = ziel / "index.html"
+    return ziel if ziel.is_file() else None
 
 
 # ===========================================================================

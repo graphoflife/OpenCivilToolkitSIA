@@ -493,3 +493,49 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 
 .reihe { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .abstand-oben { margin-top: 14px; }
+
+/* ------------------------------------------------------------ Ladeschirm -- */
+/* Liegt über allem, bis der Rechenkern antwortet. Pyodide bringt beim ersten
+   Aufruf rund 13 MB mit -- ohne Anzeige sähe das nach einer toten Seite aus. */
+
+.ladeschirm {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; padding: 24px; text-align: center;
+  background: var(--blau-leiste); color: #c8d6ea;
+}
+.lade-marke { font-size: 22px; font-weight: 600; color: #fff; }
+.lade-marke span { color: #6ea8fe; }
+.lade-marke em { color: #ff8a7a; font-style: normal; font-weight: 800; }
+
+.lade-balken {
+  width: min(320px, 70vw); height: 3px; border-radius: 2px; overflow: hidden;
+  background: rgba(255,255,255,.15);
+}
+.lade-balken i {
+  display: block; width: 40%; height: 100%; background: #6ea8fe;
+  animation: lade-lauf 1.25s ease-in-out infinite;
+}
+@keyframes lade-lauf {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+/* Wer bewegte Bilder abgestellt hat, bekommt einen ruhigen Balken. */
+@media (prefers-reduced-motion: reduce) {
+  .lade-balken i { animation: none; width: 100%; opacity: .5; }
+}
+
+.ladeschirm p { margin: 0; font-size: 13px; }
+.lade-fussnote { max-width: 44ch; color: #8ea3bf; font-size: 12px; line-height: 1.5; }
+
+/* ------------------------------------------------------------- Fussnote -- */
+/* Steht ausserhalb des Rasters, damit die Höhenrechnung der Tafeln bleibt. */
+
+.fussleiste {
+  position: fixed; left: 10px; bottom: 6px; z-index: 4;
+  pointer-events: none;
+}
+.kernanzeige {
+  font-size: 11px; color: var(--schrift-zart); letter-spacing: .1px;
+  background: rgba(255,255,255,.8); padding: 1px 6px; border-radius: 4px;
+}

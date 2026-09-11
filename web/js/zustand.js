@@ -50,6 +50,19 @@ export function horchen(rueckruf) {
 }
 
 /**
+ * Was nach jeder Eingabeänderung mit der Beschreibung geschehen soll.
+ *
+ * Eingehängt wird von `app.js` das Ablegen im Browser. Hier steht nur der
+ * Haken, damit dieser Baustein nichts von der Ablage wissen muss -- und damit
+ * es genau eine Stelle gibt, an der eine Änderung vorbeikommt.
+ */
+let ablegen = () => {};
+
+export function ablageEinrichten(rueckruf) {
+  ablegen = rueckruf;
+}
+
+/**
  * Ändert den Zustand und benachrichtigt alle Zuhörer.
  * @param {Object} teil    zu übernehmende Felder
  * @param {string} anlass  kurze Kennzeichnung, damit Ansichten selektiv neu bauen können
@@ -59,9 +72,16 @@ export function aendern(teil, anlass = 'allgemein') {
   for (const rueckruf of zuhoerer) rueckruf(anlass);
 }
 
-/** Ändert die Projektbeschreibung und merkt sich, dass ungespeichert ist. */
+/**
+ * Ändert die Projektbeschreibung.
+ *
+ * Der einzige Weg, auf dem sich Eingaben ändern -- deshalb steht hier auch das
+ * Ablegen im Browser. `ungespeichert` heisst: seit der letzten Datei auf der
+ * Platte hat sich etwas getan. Im Browser liegt es da längst.
+ */
 export function projektAendern(veraenderer, anlass = 'projekt') {
   veraenderer(zustand.projekt);
+  ablegen(zustand.projekt);
   aendern({ ungespeichert: true }, anlass);
 }
 

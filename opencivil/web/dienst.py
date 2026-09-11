@@ -78,6 +78,10 @@ def beispiel(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     return Projekt.beispiel().als_dict()
 
 
+#: Woran eine Projektdatei zu erkennen ist. Mindestens eines davon muss da sein.
+KENNFELDER = ("name", "materialien", "querschnitte")
+
+
 def pruefen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
     Prueft eine Projektbeschreibung und gibt sie aufgeraeumt zurueck.
@@ -87,8 +91,23 @@ def pruefen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     Datei aus einer aelteren Fassung, greifen hier die Wandlung des alten
     Formats und die Pruefungen aus :mod:`opencivil.projekt` -- nicht eine
     zweite, nachgebaute Pruefung in JavaScript.
+
+    Die Vorpruefung auf :data:`KENNFELDER` ist noetig, weil
+    ``Projekt.aus_dict`` mit Absicht nachsichtig ist: es nimmt jedes ``dict``
+    und macht daraus notfalls ein leeres Projekt. Beim Laden einer Beschreibung
+    ist das richtig -- beim Oeffnen einer Datei waere es verheerend. Wer eine
+    beliebige JSON-Datei erwischt, bekaeme sonst wortlos ein leeres Projekt
+    und haette seine Arbeit verloren.
     """
-    projekt = _projekt(rumpf)
+    roh = rumpf.get("projekt")
+    if not isinstance(roh, Mapping):
+        raise DienstFehler(400, "Die Beschreibung muss ein JSON-Objekt sein.")
+    if not any(feld in roh for feld in KENNFELDER):
+        raise DienstFehler(400, (
+            "Das sieht nicht nach einem Projekt aus – keines der Felder "
+            + ", ".join(KENNFELDER) + " ist vorhanden."))
+
+    projekt = Projekt.aus_dict(roh)
     projekt.pruefen()
     return {"projekt": projekt.als_dict()}
 

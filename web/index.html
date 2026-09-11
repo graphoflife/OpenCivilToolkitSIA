@@ -11,6 +11,21 @@
 </head>
 <body>
 
+<!--
+  Der Ladeschirm steht im HTML und nicht im JavaScript: Pyodide braucht ein
+  paar Sekunden, und die will niemand vor einer leeren Seite verbringen.
+  app.js nimmt ihn weg, sobald der Kern antwortet.
+-->
+<div id="ladeschirm" class="ladeschirm">
+  <div class="lade-marke">Open<span>CivilToolkit</span><em>SIA</em></div>
+  <div class="lade-balken"><i></i></div>
+  <p id="ladetext">Rechenkern wird gesucht …</p>
+  <p class="lade-fussnote">
+    Die Berechnung läuft in Python, im Browser. Beim ersten Aufruf lädt dafür
+    einmalig die Python-Laufzeit; danach liegt sie im Zwischenspeicher.
+  </p>
+</div>
+
 <header class="kopfleiste">
   <div class="marke">Open<span>CivilToolkit</span><em>SIA</em></div>
 
@@ -20,8 +35,12 @@
     <button id="btn-rechnen" class="knopf knopf-haupt" title="Alle Nachweise rechnen">
       Rechnen
     </button>
-    <button id="btn-speichern" class="knopf" title="Projekt auf dem Rechner speichern">
+    <button id="btn-speichern" class="knopf"
+            title="Projekt als .json-Datei herunterladen (im Browser liegt es ohnehin)">
       Speichern
+    </button>
+    <button id="btn-oeffnen" class="knopf" title="Projekt aus einer .json-Datei laden">
+      Öffnen
     </button>
     <button id="btn-bericht" class="knopf" title="LaTeX-Dokument erzeugen">
       Bericht
@@ -73,6 +92,10 @@
   </section>
 
 </main>
+
+<footer class="fussleiste">
+  <span id="kernanzeige" class="kernanzeige" title="Wo gerechnet wird"></span>
+</footer>
 
 <div id="melder" class="melder" aria-live="polite"></div>
 

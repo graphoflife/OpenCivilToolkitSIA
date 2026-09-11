@@ -233,6 +233,24 @@ class TestDienst(unittest.TestCase):
         antwort = dienst.bearbeite("pruefen", {"projekt": kaputt})
         self.assertEqual(antwort.status, 400)
 
+    def test_pruefen_weist_fremde_dateien_ab(self):
+        """
+        Projekt.aus_dict ist mit Absicht nachsichtig und macht aus jedem dict
+        notfalls ein leeres Projekt. Beim Öffnen einer Datei wäre das fatal:
+        eine beliebige JSON-Datei würde die Arbeit wortlos durch nichts
+        ersetzen.
+        """
+        for fremd in ({}, {"foo": 1}, {"einkaufsliste": ["Brot"]}, [1, 2, 3], "text", None):
+            with self.subTest(fremd=fremd):
+                antwort = dienst.bearbeite("pruefen", {"projekt": fremd})
+                self.assertEqual(antwort.status, 400)
+
+    def test_pruefen_nimmt_auch_unvollstaendiges(self):
+        """Ein Projekt ohne Querschnitte ist erlaubt -- man fängt ja irgendwo an."""
+        antwort = dienst.bearbeite("pruefen", {"projekt": {"name": "Leer"}})
+        self.assertEqual(antwort.status, 200)
+        self.assertEqual(antwort.daten["projekt"]["name"], "Leer")
+
     def test_fehler_bringt_den_dienst_nicht_um(self):
         """Auch Unerwartetes kommt als Antwort zurueck, nicht als Ausnahme."""
         antwort = dienst.bearbeite("rechnen", {"projekt": {"materialien": "kein Feld"}})
