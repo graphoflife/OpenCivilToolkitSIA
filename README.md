@@ -7,20 +7,44 @@ liefert, wie gerechnet wird und wie das Ergebnis aufzuschreiben ist. Aus dieser
 einen Quelle entstehen Zahlenwert *und* LaTeX-Herleitung – sie können nicht
 auseinanderlaufen.
 
-## Stand
+## Im Browser, ohne Installation
+
+**<https://graphoflife.github.io/OpenCivilToolkitSIA/>**
+
+Dort rechnet **Python**, nicht JavaScript: die Seite startet Pyodide und lädt
+genau die `.py`-Dateien aus `opencivil/`, die auf dem Rechner auch laufen. Keine
+Formel ist in JavaScript nachgebaut — das wäre ein zweiter Rechenweg, der
+irgendwann vom ersten abweicht, und dann wüsste niemand mehr, welcher stimmt.
+
+Der erste Aufruf lädt einmalig ≈13 MB Python-Laufzeit; danach liegt sie im
+Zwischenspeicher des Browsers. Ein Durchgang des Beispielprojekts braucht
+anschliessend 73 ms — gegenüber 57 ms in CPython.
+
+## Auf dem eigenen Rechner
 
 ```bash
 python3 start_ui.py          # Oberfläche auf http://127.0.0.1:8080
-python3 demo_material.py     # Backend allein: Kennwerte, Rückverfolgung, Überschreiben
-python3 demo_nachweis.py     # Backend allein: Querschnitt, M-N-Nachweis, Bericht
+python3 demo_material.py     # Kern allein: Kennwerte, Rückverfolgung, Überschreiben
+python3 demo_nachweis.py     # Kern allein: Querschnitt, M-N-Nachweis, Bericht
 python3 -m unittest discover -s tests -t .
 ```
 
-Weder der Rechenkern noch der Server noch die Oberfläche brauchen ein
-Fremdpaket. Es genügt ein `python3`; KaTeX liegt unter `web/vendor/` bei, damit
-die Formeln auch ohne Internet erscheinen.
+Der lokale Server startet ohne Ladezeit und kann den Bericht mit einer
+TeX-Maschine zu PDF übersetzen. Sonst ist er dasselbe: beide Wege rufen
+`opencivil/web/dienst.py` auf. Welcher gerade gilt, steht unten links im Fenster.
 
-Fertig und getestet (211 Tests):
+Kein Fremdpaket, nirgends — es genügt ein `python3`. KaTeX und Pyodide liegen
+unter `web/vendor/` bei, damit die Seite ohne fremden Dienst auskommt.
+
+## Speichern
+
+Jede Eingabe liegt sofort im Browser; ein geschlossenes Fenster kostet nichts.
+*Speichern* legt das Projekt als `.json` auf die Platte, *Öffnen* liest es
+zurück. Gelesen wird die Datei im Kern, mit denselben Prüfungen wie alles andere.
+
+## Stand
+
+Fertig und getestet (243 Tests):
 
 | Baustein | Inhalt |
 |---|---|
@@ -32,11 +56,16 @@ Fertig und getestet (211 Tests):
 | `core/rechenwerk` | Rückwärtsauflösung, Variantenwahl, fehlende Eingaben, Zyklen |
 | `material/` | Beton und Betonstahl nach SIA 262:2025 |
 | `querschnitt/` | Plattenquerschnitt, Lagenaufbau, Werkstoffgesetze |
-| `nachweis/` | Biegung mit Normalkraft über die M-N-Interaktion |
+| `nachweis/` | Biegung mit Normalkraft über die M-N-Interaktion, Querkraft |
 | `bericht/` | Konsole und LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) |
 | `projekt.py` | speicherbare Projektbeschreibung, baut daraus ein Rechenwerk |
-| `web/` | JSON-Schnittstelle und Server (nur Standardbibliothek) |
+| `web/dienst.py` | der Rechendienst, unabhängig vom Transportweg |
+| `web/server.py` | HTTP-Hülle darum (nur Standardbibliothek) |
+| `web/js/kern.js` | Pyodide-Hülle darum, für die Seite ohne Server |
 | `web/js/` | Oberfläche in reinem JavaScript, ohne Bauschritt |
+
+Wie das zusammenhängt und warum es so gebaut ist, steht in
+[ENTWICKLUNG.md](ENTWICKLUNG.md).
 
 ## Oberfläche
 
@@ -49,14 +78,14 @@ Deshalb kann am Bildschirm gar nichts anderes stehen als im Bericht.
 
 **Rechte Tafel:**
 
+* *Nachweise* -- Widerstand, Einwirkung und Erfüllungsgrad je Kombination
+* *Diagramme* -- Plattenquerschnitt, M-N-Resistenzlinie mit den
+  Bemessungspunkten (die gestrichelte Strecke zeigt den Weg, in dem der
+  Erfüllungsgrad gemessen wurde) und die Spannungs-Dehnungs-Beziehungen
 * *Herleitung* -- die Mitschrift, Formel für Formel, mit Normstelle
-* *Nachweise* -- Urteile und Ausnutzungsgrade
-* *M-N-Diagramm* -- die Resistenzlinie mit den Bemessungspunkten; die
-  gestrichelte Strecke zeigt den Weg, in dem der Erfüllungsgrad gemessen wurde
 * *Werte* -- alle Grössen mit ihrer Herkunft (Eingabe, Vorgabe, berechnet,
-  überschrieben)
-* *Ziel wählen* -- einen Wert anklicken; der Kern löst rückwärts auf, rechnet
-  nur das Nötige und zeigt die Kette der erforderlichen Schritte
+  überschrieben); dort lässt sich auch ein Ziel wählen: der Kern löst rückwärts
+  auf, rechnet nur das Nötige und zeigt die Kette der erforderlichen Schritte
 
 **Formel nach Word:** jede Formel hat zwei Knöpfe. *Word* legt sie als MathML in
 die Zwischenablage -- Word fügt daraus eine richtige, weiter bearbeitbare
