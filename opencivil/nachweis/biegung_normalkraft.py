@@ -2,10 +2,23 @@
 opencivil/nachweis/biegung_normalkraft.py -- Nachweis für Biegung mit Normalkraft.
 
 VERANTWORTUNG:
-Baut die M-N-Interaktionslinie eines Querschnitts punktweise aus Dehnungsebenen
-auf und prueft dagegen beliebig viele Schnittgroessenkombinationen.
+Prueft beliebig viele Schnittgroessenkombinationen gegen die M-N-Interaktion
+eines Querschnitts.
 
-WIE DIE RESISTENZLINIE ENTSTEHT:
+ZWEI LINIEN, EINE DAVON MASSGEBEND:
+* **Resistenzlinie aus Handrechnung** -- das Polygon aus wenigen Eckpunkten in
+  :mod:`opencivil.nachweis.handrechnung`. Dagegen wird nachgewiesen, und ihre
+  Herleitung steht vollstaendig in der Mitschrift.
+* **Praezise Resistenzlinie** -- die punktweise aus Dehnungsebenen aufgebaute
+  Linie, unten beschrieben. Sie wird weiterhin gerechnet und im Diagramm
+  gezeigt, aber **nicht mehr hergeleitet**: sie entsteht aus hunderten
+  Faserintegrationen, die niemand mit dem Taschenrechner nachvollzieht. Wer
+  sie herleiten liesse, lieferte Zeilen zum Glauben statt zum Pruefen.
+
+Die Mitschrift dafuer ist erhalten, aber stillgelegt -- siehe den Block
+"STILLGELEGT" weiter unten.
+
+WIE DIE PRAEZISE RESISTENZLINIE ENTSTEHT:
 Alle zulaessigen Dehnungsebenen bilden einen Faecher. Welche Grenze ihn
 begrenzt, wechselt unterwegs dreimal -- entsprechend wird er in drei
 Abschnitten je Momentenvorzeichen abgefahren:
@@ -46,9 +59,10 @@ N und M gelten fuer die betrachtete Breite ``b``. Mit ``b = 1 m`` sind es also
 unmittelbar die Werte pro Laufmeter.
 
 ERFUELLUNGSGRAD:
-Ob ein Punkt liegt drin oder nicht, entscheidet immer derselbe Test (Punkt in
-geschlossener Linie). Nur *wie weit* er von der Linie entfernt ist, haengt vom
-gewaehlten Massstab ab -- siehe :class:`Erfuellungsart`.
+Ob ein Punkt drin liegt oder nicht, entscheidet immer derselbe Test (Punkt in
+geschlossener Linie), angewandt auf das Polygon der Handrechnung. Nur *wie
+weit* er von der Linie entfernt ist, haengt vom gewaehlten Massstab ab --
+siehe :class:`Erfuellungsart` und :meth:`BiegungNormalkraft._massstab`.
 """
 
 from __future__ import annotations
@@ -78,9 +92,8 @@ class Erfuellungsart(str, Enum):
     """Massstab, in dem der Abstand zur Resistenzlinie gemessen wird."""
 
     AUTOMATISCH = "automatisch"
-    """Beide Massstaebe rechnen und den ungünstigeren nehmen -- den mit dem
-    kleineren Erfuellungsgrad. Der Regelfall: welcher Weg zur Grenze der kurze
-    ist, haengt von der Lage des Punktes ab und nicht von einer Vorwahl."""
+    """Waagrecht, ausser nahe den Spitzen der Linie -- siehe
+    :meth:`BiegungNormalkraft._massstab`. Der Regelfall."""
 
     NORMALKRAFT_KONSTANT = "N_konstant"
     """Bei festgehaltener Normalkraft waagrecht bis zur Momentengrenze.
@@ -100,7 +113,7 @@ class Erfuellungsart(str, Enum):
     @property
     def beschriftung(self) -> str:
         return {
-            Erfuellungsart.AUTOMATISCH: "automatisch (ungünstigerer)",
+            Erfuellungsart.AUTOMATISCH: "automatisch",
             Erfuellungsart.NORMALKRAFT_KONSTANT: "Normalkraft konstant",
             Erfuellungsart.MOMENT_KONSTANT: "Moment konstant",
             Erfuellungsart.NAECHSTER_PUNKT: "kürzester Abstand",
@@ -176,9 +189,9 @@ class BiegungNormalkraft(Nachweis):
     """
     Nachweis der Biege- und Normalkrafttragfaehigkeit über die M-N-Interaktion.
 
-    Erzeugt für jede Kombination einen Ausnutzungsgrad und ein Urteil und legt
-    die berechnete Resistenzlinie unter :attr:`linie` ab, damit die Oberfläche
-    sie zeichnen kann.
+    Erzeugt für jede Kombination einen Erfüllungsgrad und ein Urteil. Gemessen
+    wird gegen das Polygon aus der Handrechnung (:attr:`handlinie`); die genaue
+    Linie (:attr:`linie`) wird mitgerechnet und steht im Diagramm daneben.
     """
 
     def __init__(

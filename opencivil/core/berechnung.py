@@ -10,7 +10,7 @@ DREI AUSPRAEGUNGEN:
 * :class:`Prozedur` -- ein ganzer Ablauf: mehrere Ausgaben, Iterationen,
   Fallunterscheidungen; schreibt ihren Ablauf selbst ins Protokoll.
 * :class:`Nachweis` -- ein Vergleich von Einwirkung und Widerstand mit Urteil
-  und Ausnutzungsgrad.
+  und Erfuellungsgrad.
 
 VARIANTEN -- WELCHE FORMEL GILT?
 Oft haengt es von den vorhandenen Eingaben ab, welche Formel anzuwenden ist.

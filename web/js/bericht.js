@@ -3,7 +3,7 @@
  *
  * Fünf Sichten auf dieselbe Lösung:
  *   Herleitung  die Mitschrift des Rechenkerns, Formel für Formel
- *   Nachweise   Urteile und Ausnutzungsgrade
+ *   Nachweise   Urteile und Erfüllungsgrade
  *   Diagramm    die M-N-Interaktionslinie
  *   Werte       alle bestimmten Grössen mit ihrer Herkunft
  *   Ziel wählen einen Wert anfordern und zurückverfolgen, was dafür nötig ist

@@ -43,6 +43,106 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-11 · Nachgewiesen wird, was von Hand nachrechenbar ist
+
+**Anlass:** Die M-N-Interaktionslinie entstand aus hunderten Faserintegrationen.
+Genau — aber niemand kann sie nachrechnen. Wer das Ergebnis prüfen will, kann es
+nur glauben. Für ein Werkzeug, dessen ganzer Zweck „keine Black Box" ist, war
+das der wunde Punkt.
+
+### Jetzt zwei Linien
+
+| | genau | Handrechnung |
+| --- | --- | --- |
+| Entsteht aus | Dehnungsebenen, 332 Punkte | 6 Eckpunkte |
+| Beton | Parabel-Rechteck, 200 Fasern | Spannungsblock 0.85·x |
+| Gedrückter Stahl | mitgerechnet | **vernachlässigt** |
+| In der Herleitung | nein | ja, Formel für Formel |
+| Im Diagramm | dünn gestrichelt, grau | gefüllt, kräftig |
+| **Urteil** | — | **massgebend** |
+
+Die genaue Linie wird weiterhin gerechnet. Sie steht als Vergleich daneben, und
+zwar bewusst zurückhaltend gezeichnet: sie ist nicht das Ergebnis, sie ist der
+Massstab dafür, wie viel die Vereinfachung kostet.
+
+### Die sechs Eckpunkte
+
+Je Momentenvorzeichen zwei, dazu zwei gemeinsame:
+
+1. **M_Rd bei N = 0** — `x = A_s·f_yd / (0.85·b·f_cd)`, dann
+   `M_Rd = A_s·f_yd·(d − 0.85x/2)`
+2. **grösste Zugkraft** — beide Lagen fliessen. *Ein* Punkt für beide
+   Vorzeichen, nicht zwei: der Dehnungszustand ist eindeutig, also auch das
+   Moment. Bei symmetrischer Bewehrung hebt es sich auf.
+3. **grösste Druckkraft** — `N = −b·h·f_cd`, ohne Stahl, `M = 0`
+4. **x = h/2** — Nulllinie auf halber Höhe. Gilt nur, wenn die Zugbewehrung
+   dort noch fliesst; sonst fällt der Punkt weg und das Polygon läuft
+   geradlinig zum reinen Druck.
+
+Punkt 4 gibt dem Polygon den Bauch, den die genaue Linie unter Druck hat.
+Beispielplatte x-Richtung: N = −1485 kN, M = 339.2 kNm; genaue Linie −1959 kN,
+374.6 kNm.
+
+**Eine Lesart, die geklärt werden musste:** die Vorgabe lautete „0.85·x = h/2".
+Wörtlich gelesen wäre x = h/1.7 = 176.5 mm — dann scheitert aber das
+mitgegebene Fliesskriterium bei jedem realistischen Plattenquerschnitt
+(ε_s = 1.70 ‰ < ε_yd = 2.17 ‰; erfüllt erst ab d/h > 0.95). Das Kriterium wäre
+damit sinnlos gewesen. Gemeint war x = h/2, und dann geht es auf:
+ε_s = 2.61 ‰ > 2.17 ‰.
+
+**Und eine Vorzeichenfrage:** `M = A_s·f_yd·(d − h/2) − A_s'·f_yd·(d' − h/2)`
+stimmt nur, wenn d' von der *Zug*randfaser aus gemessen wird. Misst man d' wie
+üblich von der gedrückten Randfaser, muss dort ein Plus stehen — sonst zeigte
+ein symmetrischer Querschnitt unter reinem Zug ein Moment, was nicht sein kann.
+Umgesetzt ist die Summe der Kräfte mal Hebelarm um die halbe Höhe; das ist
+dieselbe Formel, nur mit durchgehend einer Konvention.
+
+### Die Massstabswahl
+
+Vorher: beide Richtungen rechnen, die ungünstigere nehmen. Jetzt eine feste
+Regel — waagrecht (M_Rd bei festgehaltenem N_Ed), ausser nahe den Spitzen:
+
+* Zug mit |N_Ed| > N_Rd⁺/2 → senkrecht
+* Druck mit |N_Ed| > 3/4·|N_Rd⁻| → senkrecht
+
+Die verschiedenen Schwellen sind kein Versehen: die Linie ist nicht symmetrisch,
+auf der Druckseite bleibt sie viel länger brauchbar waagrecht.
+
+Diese Wahl erscheint **nicht** in der Mitschrift. Sie ist kein Rechenschritt,
+sondern die Festlegung, in welcher Richtung gemessen wird. Was dann gerechnet
+wird — die lineare Interpolation zwischen zwei Eckpunkten — steht vollständig
+da, mit Stützpunkten.
+
+### Was dabei auffiel
+
+**Die Handrechnung liegt nicht durchgehend auf der sicheren Seite.** Sie
+vernachlässigt den gedrückten Stahl (das drückt den Widerstand), setzt aber
+einen Block der Höhe 0.85·x an, dessen Resultierende über der
+Parabel-Rechteck-Beziehung liegt (das hebt ihn). Welcher Einfluss überwiegt,
+hängt vom Querschnitt ab. Bei der einfachen Testplatte liegt das Polygon 0.15 %
+*über* der genauen Linie. Der Test prüft deshalb eine Toleranz und keine
+Richtung.
+
+**Ein Gruppierungsfehler, der still gewesen wäre:** Grundbewehrung und Zulage
+einer Lage liegen auf leicht verschiedenen Höhen, weil ihre Durchmesser
+verschieden sind. Wer die Bewehrung nach z gruppiert, bekommt drei Gruppen
+statt zwei und verliert eine davon — im Beispiel 1696 mm² von 2450 mm².
+Gruppiert wird nach der Lagenzugehörigkeit aus dem Modell.
+
+### Nebenbei
+
+* Liniengeometrie nach `linie.py` herausgezogen. Beide Linien werden auf
+  dieselbe Art ausgewertet; läge die Geometrie bei einer von beiden, müsste die
+  andere sie einbinden (Ring) oder nachbauen (Drift).
+* Betondiagramm zeigt zusätzlich den Spannungsblock in grün, umschaltbar — man
+  sieht, was man beim Handrechnen aufgibt.
+* Bewehrungsbeschriftungen im Querschnittsbild werden auseinandergeschoben,
+  mit Anschlussstrich auf die wahre Höhe.
+* Das kleine α des Erfüllungsgrads wurde von `text-transform: uppercase` zu
+  einem grossen Α gemacht. KaTeX ist davon jetzt ausgenommen.
+
+---
+
 ## 2026-09-11 · Die Seite läuft ohne Server
 
 **Anlass:** Die veröffentlichte Seite sollte funktionieren, ohne dass irgendwo

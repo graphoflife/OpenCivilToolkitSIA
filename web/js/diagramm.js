@@ -327,10 +327,11 @@ export function diagrammZeichnen(linie) {
       fill: farbe, stroke: '#fff', 'stroke-width': 2,
     });
     const titel = svgEl('title');
+    const grad = Number.isFinite(k.erfuellungsgrad) ? k.erfuellungsgrad.toFixed(3) : '∞';
     titel.textContent =
       `${k.name}\nM_Ed = ${k.M_Ed.toFixed(1)} kNm, N_Ed = ${k.N_Ed.toFixed(1)} kN`
-      + `\nAusnutzung ${Number.isFinite(k.ausnutzung) ? k.ausnutzung.toFixed(3) : '∞'}`
-      + ` (${k.art_text})\n${k.innerhalb ? 'erfüllt' : 'NICHT erfüllt'}`;
+      + `\nErfüllungsgrad α_eff = ${grad} (${k.massstab_text})`
+      + `\n${k.innerhalb ? 'erfüllt' : 'NICHT erfüllt'}`;
     punkt.append(titel);
     svg.append(punkt);
 
