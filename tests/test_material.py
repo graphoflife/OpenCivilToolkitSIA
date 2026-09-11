@@ -65,11 +65,35 @@ class TestBeton(unittest.TestCase):
         erwartet = (10000 * 38 ** (1 / 3)) / (400 * 20.0)
         self.assertAlmostEqual(self.w("k_sigma").in_einheit(EINHEITSLOS), erwartet, places=6)
 
-    def test_empirische_annahme_wird_vermerkt(self):
+    def test_empirische_annahme_steht_nicht_im_bericht(self):
+        """
+        Die Einheitenannahme wird erzwungen, aber nicht mehr ausgeschrieben.
+
+        Woher die Formel stammt, sagt die Normreferenz an der Gleichung; der
+        Zusatz "eingesetzt werden f_ck in N/mm^2 ..." wiederholte das bloss in
+        Worten und stand in jeder zweiten Zeile.
+        """
         loesung = self.werk.loese(self.c30.id_von("tau_cd"))
         texte = [b.text for b in loesung.protokoll.alle_bloecke() if hasattr(b, "text")]
-        self.assertTrue(any("Empirische Formel" in t for t in texte))
-        self.assertTrue(any("N/mm^2" in t for t in texte))
+        self.assertFalse(any("Empirische Formel" in t for t in texte))
+
+    def test_empirische_annahme_wird_trotzdem_gefuehrt(self):
+        """
+        Der Mechanismus bleibt: jede Einheit muss weiterhin benannt werden.
+
+        Nur die Ausgabe im Bericht entfällt. Wer die Annahme braucht -- etwa für
+        eine spätere Prüfliste --, bekommt sie über annahmen_text().
+        """
+        from opencivil.core.einheiten import EINHEITSLOS, empirisch
+
+        ergebnis = empirisch(
+            lambda f_ck, gamma_c: 0.3 * f_ck ** 0.5 / gamma_c,
+            ergebnis=N_PRO_MM2,
+            f_ck=(Groesse(30, N_PRO_MM2), N_PRO_MM2),
+            gamma_c=(Groesse(1.5, EINHEITSLOS), EINHEITSLOS),
+        )
+        self.assertIn("f_ck in N/mm^2", ergebnis.annahmen_text())
+        self.assertAlmostEqual(ergebnis.wert.in_einheit(N_PRO_MM2), 0.3 * 30 ** 0.5 / 1.5)
 
     def test_alle_sorten_rechnen_durch(self):
         for sorte in BETONSORTEN:

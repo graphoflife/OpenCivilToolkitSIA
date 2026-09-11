@@ -626,5 +626,51 @@ class TestNachweis(unittest.TestCase):
         self.assertFalse(werk.loese(d_ausn.id).alle_nachweise_erfuellt)
 
 
+class TestHinweisReihenfolge(unittest.TestCase):
+    """
+    Ein Hinweis gehört hinter seine eigene Gleichung, nicht davor.
+
+    Davor stand er unmittelbar unter der vorherigen Gleichung und las sich wie
+    deren Begründung. So ist der "Regelwert für übliche Gesteinskörnung" von
+    k_e unter den Teilsicherheitsbeiwert für den Elastizitätsmodul geraten --
+    ein Hinweis am falschen Wert ist schlimmer als gar keiner.
+    """
+
+    def bloecke(self):
+        from opencivil.core.protokoll import HinweisBlock
+
+        erst = WertDef("a.erst", "a", EINHEITSLOS, "Erster Wert")
+        zweit = WertDef("a.zweit", "b", EINHEITSLOS, "Zweiter Wert")
+
+        werk = Rechenwerk()
+        werk.registriere(Vorgabe(id="a.erst", ausgabe=erst,
+                                 groesse=Groesse(1, EINHEITSLOS)))
+        werk.registriere(Vorgabe(id="a.zweit", ausgabe=zweit,
+                                 groesse=Groesse(2, EINHEITSLOS),
+                                 begruendung="Gehört zum zweiten Wert."))
+        loesung = werk.loese(erst.id, zweit.id)
+        return [
+            b for b in loesung.protokoll.alle_bloecke()
+            if isinstance(b, (GleichungBlock, HinweisBlock))
+        ]
+
+    def test_hinweis_folgt_der_eigenen_gleichung(self):
+        from opencivil.core.protokoll import HinweisBlock
+
+        bloecke = self.bloecke()
+        stelle = next(i for i, b in enumerate(bloecke) if isinstance(b, HinweisBlock))
+        davor = bloecke[stelle - 1]
+
+        self.assertIsInstance(davor, GleichungBlock)
+        self.assertEqual(davor.wert_id, "a.zweit",
+                         "der Hinweis steht unter der falschen Gleichung")
+
+    def test_ohne_begruendung_kein_hinweis(self):
+        from opencivil.core.protokoll import HinweisBlock
+
+        self.assertEqual(
+            1, sum(1 for b in self.bloecke() if isinstance(b, HinweisBlock)))
+
+
 if __name__ == "__main__":
     unittest.main()

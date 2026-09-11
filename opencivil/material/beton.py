@@ -10,7 +10,7 @@ ZU DEN EMPIRISCHEN FORMELN:
 ``tau_cd`` und ``E_cm`` sind dimensionell inhomogen -- die Norm setzt dort
 stillschweigend voraus, dass in N/mm^2 gerechnet wird. Sie laufen deshalb ueber
 :func:`opencivil.core.einheiten.empirisch`, das diese Voraussetzung erzwingt und
-im Bericht als Annahme ausweist. Alle uebrigen Formeln sind einheitenrein und
+die Einheitenkonvention erzwingt. Alle uebrigen Formeln sind einheitenrein und
 werden ganz normal gerechnet.
 
 EIGENSTAENDIG NUTZBAR::
@@ -113,7 +113,6 @@ BETON_VORLAGEN: tuple[KennwertVorlage, ...] = (
         referenz="SIA 262:2025, 2.4.2.6",
         stellen=2,
         festwert=Groesse(1.5, EINHEITSLOS),
-        begruendung="Ständige und vorübergehende Bemessungssituation.",
     ),
     KennwertVorlage(
         kurzname="gamma_cE",
@@ -130,7 +129,6 @@ BETON_VORLAGEN: tuple[KennwertVorlage, ...] = (
         referenz="SIA 262:2025, 3.1.2.3.3",
         stellen=0,
         festwert=Groesse(10000, EINHEITSLOS),
-        begruendung="Regelwert für übliche Gesteinskörnung.",
     ),
     KennwertVorlage(
         kurzname="eps_c1d",

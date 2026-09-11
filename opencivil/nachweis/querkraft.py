@@ -28,9 +28,8 @@ Querkraftbewehrung ist auf einen Querkraftwiderstand dann nicht zu zaehlen.
 EINHEITEN:
 Die Formeln der Norm sind dimensionell inhomogen -- ``d`` und ``D_max`` gehen
 in Millimeter ein, ``f_ck`` in N/mm^2. Sie laufen deshalb ueber
-:func:`opencivil.core.einheiten.empirisch`, das diese Voraussetzung erzwingt
-und im Bericht als Annahme ausweist. ``v_Rd`` ergibt sich in N/mm, also kN/m --
-eine Querkraft je Laufmeter.
+:func:`opencivil.core.einheiten.empirisch`, das diese Voraussetzung erzwingt.
+``v_Rd`` ergibt sich in N/mm, also kN/m -- eine Querkraft je Laufmeter.
 """
 
 from __future__ import annotations
@@ -198,7 +197,6 @@ class Querkraft(Nachweis):
             r"\left(\frac{60}{f_{ck}}\right)^{2}\right]}"
             rf" = {k_g:.3f}",
             titel="Beiwert der Gesteinskörnung", referenz="SIA 262:2025, 4.3.3.2.1")
-        p.annahme(k_g_erg.annahmen_text())
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []

@@ -44,7 +44,7 @@ zurück. Gelesen wird die Datei im Kern, mit denselben Prüfungen wie alles ande
 
 ## Stand
 
-Fertig und getestet (243 Tests):
+Fertig und getestet (260 Tests):
 
 | Baustein | Inhalt |
 |---|---|
@@ -105,7 +105,8 @@ wird alles in SI-Basis gehalten, die Anzeige-Einheit ist reine Darstellung.
 Dimensionell inhomogene Normformeln – etwa `tau_cd = 0.3·√f_ck / gamma_c` –
 laufen über `empirisch()`. Dort muss man angeben, in welcher Einheit jeder Wert
 einzusetzen ist und welche Einheit das Resultat trägt. Die stillschweigende
-Konvention der Norm wird damit sichtbar und erscheint im Bericht als Annahme.
+Konvention der Norm steht damit im Code statt in jemandes Kopf. Im Bericht
+erscheint sie nicht -- dort sagt die Normreferenz an der Gleichung, woher sie kommt.
 
 **2. Die Formel steht einmal da.**
 Von Hand geschrieben wird nur die *analytische* Form mit `@name`-Platzhaltern.

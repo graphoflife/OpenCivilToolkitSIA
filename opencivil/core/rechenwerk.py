@@ -459,14 +459,18 @@ class _Lauf:
         echte_wahl: bool,
     ) -> None:
         protokoll = self.loesung.protokoll
+        ergebnisse = berechnung.ausfuehren(eingaben, protokoll)
+
+        # Erst rechnen, dann begruenden. Andersherum stand der Hinweis vor der
+        # eigenen Gleichung und damit unmittelbar unter der vorherigen -- er las
+        # sich dann wie deren Begruendung. Genau so ist der Regelwert der
+        # Gesteinskoernung unter den Teilsicherheitsbeiwert geraten.
         if grund:
             # Von einer 'gewählten Variante' nur sprechen, wo es wirklich etwas
             # zu waehlen gab -- sonst ist der Zusatz bloss Rauschen.
             protokoll.hinweis(
                 f"Gewählte Variante '{berechnung.id}': {grund}" if echte_wahl else grund
             )
-
-        ergebnisse = berechnung.ausfuehren(eingaben, protokoll)
 
         eingang_ids = tuple(w.id for w in eingaben.values())
         for wert_id, wert in ergebnisse.items():

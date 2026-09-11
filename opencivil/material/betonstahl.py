@@ -112,7 +112,6 @@ STAHL_VORLAGEN: tuple[KennwertVorlage, ...] = (
         referenz="SIA 262:2025, 2.4.2.6",
         stellen=2,
         festwert=Groesse(1.15, EINHEITSLOS),
-        begruendung="Ständige und vorübergehende Bemessungssituation.",
     ),
     # -- Abgeleitete Kennwerte ---------------------------------------------
     KennwertVorlage(

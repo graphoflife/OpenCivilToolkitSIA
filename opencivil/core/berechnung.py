@@ -354,9 +354,12 @@ class Formel(Berechnung):
     def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
         roh = self.funktion(**e.groessen())
 
-        annahme: str = ""
+        # Die Einheitenannahme einer empirischen Formel wird weiterhin erzwungen
+        # und geprueft -- nur nicht mehr in den Bericht geschrieben. Wo die
+        # Formel herkommt, sagt die Normreferenz an der Gleichung; der Zusatz
+        # wiederholte das bloss in Worten. Der Text bleibt ueber
+        # EmpirischesErgebnis.annahmen_text() erreichbar.
         if isinstance(roh, EmpirischesErgebnis):
-            annahme = roh.annahmen_text()
             groesse = roh.wert
         elif isinstance(roh, Groesse):
             groesse = roh
@@ -373,8 +376,6 @@ class Formel(Berechnung):
             p.formel(wert, self.vorlage, e, titel=self.titel, referenz=self.referenz)
         else:
             p.wert(wert, titel=self.titel, referenz=self.referenz)
-        if annahme:
-            p.annahme(annahme)
         # Die Begruendung schreibt der Loeser -- er weiss als einziger, ob es
         # ueberhaupt eine Variante zu waehlen gab.
         return {self.ausgabe.id: groesse}
