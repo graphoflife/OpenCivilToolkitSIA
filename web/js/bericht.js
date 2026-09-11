@@ -132,37 +132,19 @@ function lueckenBanner(loesung) {
 // ===========================================================================
 
 /**
- * Wie der Abschnitt des links gewählten Bestandteils überschrieben ist.
+ * Schneidet die Mitschrift auf einen Namensraum zu.
  *
- * Muss zu dem passen, was der Kern setzt -- `Plattenanalyse: …` für Platten,
- * `Beton: …` bzw. `Betonstahl: …` für Baustoffe.
+ * Die Blöcke liegen flach hintereinander; ein Abschnitt reicht von seinem Titel
+ * bis zum nächsten. Welcher Titel einen eröffnet und zu welchem Bestandteil er
+ * gehört, sagt der Kern selbst mit `raum` -- ein Vergleich über Anzeigetexte
+ * bräche, sobald jemand eine Überschrift umformuliert, und zwar stumm.
  */
-function abschnittDerAuswahl(loesung) {
-  const wahl = zustand.auswahl;
-  if (!wahl) return null;
-
-  if (wahl.art === 'querschnitt') {
-    const name = loesung.zuordnung?.querschnitte?.[wahl.kennung]?.name;
-    return name ? `Plattenanalyse: ${name}` : null;
-  }
-  const stoff = zustand.projekt?.materialien?.find((m) => m.kennung === wahl.kennung);
-  if (!stoff) return null;
-  return `${stoff.art === 'beton' ? 'Beton' : 'Betonstahl'}: ${stoff.name}`;
-}
-
-/**
- * Schneidet die Mitschrift auf einen Abschnitt zu.
- *
- * Die Blöcke liegen flach hintereinander; ein Abschnitt reicht von seinem
- * Titel bis zum nächsten Abschnittstitel. Welcher Titel einen Abschnitt
- * eröffnet, sagt der Kern selbst (`abschnitt: true`) -- über die Ebene liesse
- * es sich nicht entscheiden, Zwischenüberschriften stehen auf derselben.
- */
-function nurAbschnitt(bloecke, name) {
+function nurAbschnitt(bloecke, raum) {
+  if (!raum) return bloecke;
   const gewaehlt = [];
   let drin = false;
   for (const block of bloecke) {
-    if (block.art === 'titel' && block.abschnitt) drin = block.text === name;
+    if (block.art === 'titel' && block.raum) drin = imRaum(raum, block.raum);
     if (drin) gewaehlt.push(block);
   }
   return gewaehlt;
@@ -172,17 +154,14 @@ function herleitung(loesung) {
   if (!loesung.protokoll?.length) {
     return leerzustand('Noch nichts gerechnet.', 'Oben auf "Rechnen" klicken.');
   }
-  let bloecke = loesung.protokoll;
-  if (zustand.umfang === 'seite') {
-    const name = abschnittDerAuswahl(loesung);
-    if (!name) {
-      return leerzustand('Nichts ausgewählt.',
-        'Links einen Bestandteil wählen – oder oben auf "Gesamt" umschalten.');
-    }
-    bloecke = nurAbschnitt(loesung.protokoll, name);
-    if (!bloecke.length) {
-      return leerzustand(`Für «${name}» wurde nichts gerechnet.`);
-    }
+  const raum = eingrenzung();
+  if (zustand.umfang === 'seite' && !raum) {
+    return leerzustand('Nichts ausgewählt.',
+      'Links einen Bestandteil wählen – oder oben auf "Gesamt" umschalten.');
+  }
+  const bloecke = nurAbschnitt(loesung.protokoll, raum);
+  if (!bloecke.length) {
+    return leerzustand('Für diesen Bestandteil wurde nichts gerechnet.');
   }
 
   const verfolgt = zustand.verfolgtesZiel;
@@ -219,16 +198,14 @@ function herleitung(loesung) {
  */
 function zusammenfassung(loesung) {
   const querschnitte = loesung.zuordnung?.querschnitte || {};
-  const wahl = zustand.auswahl;
-  const nurEine = zustand.umfang === 'seite';
+  const raum = eingrenzung();
 
-  if (nurEine && wahl && wahl.art !== 'querschnitt') {
+  const gezeigt = Object.entries(querschnitte).filter(
+    ([, eintrag]) => imRaum(raum, eintrag.namensraum));
+  if (raum && !gezeigt.length) {
     return leerzustand('Kein Querschnitt gewählt.',
       'Links eine Platte wählen – oder oben auf "Gesamt" umschalten.');
   }
-
-  const gezeigt = Object.entries(querschnitte).filter(
-    ([kennung]) => !nurEine || !wahl || wahl.kennung === kennung);
   if (!gezeigt.length) {
     return el('div.blatt', {}, [
       leerzustand('Kein Querschnitt vorhanden.'),
@@ -319,6 +296,7 @@ function plattenKennungZu(urteil, loesung) {
 }
 
 function diagrammSicht(loesung) {
+  const raum = eingrenzung();
   const linien = loesung.linien || {};
   const querschnitte = loesung.zuordnung?.querschnitte || {};
   const gesetze = loesung.werkstoffgesetze || {};
@@ -326,10 +304,7 @@ function diagrammSicht(loesung) {
 
   // -- Werkstoffgesetze ---------------------------------------------------
   for (const [kennung, gesetz] of Object.entries(gesetze)) {
-    if (zustand.umfang === 'seite' && zustand.auswahl
-        && !(zustand.auswahl.art === 'material' && zustand.auswahl.kennung === kennung)) {
-      continue;
-    }
+    if (!imRaum(raum, `${gesetz.art}.${kennung}`)) continue;
     blaetter.push(el('div.blatt', {}, [
       el('div.b-titel', { text: `${gesetz.titel} – ${gesetz.name}` }),
       gesetz.referenz
@@ -347,10 +322,7 @@ function diagrammSicht(loesung) {
 
   // -- Querschnitt und Interaktionslinien ---------------------------------
   for (const [kennung, eintrag] of Object.entries(querschnitte)) {
-    if (zustand.umfang === 'seite' && zustand.auswahl
-        && !(zustand.auswahl.art === 'querschnitt' && zustand.auswahl.kennung === kennung)) {
-      continue;
-    }
+    if (!imRaum(raum, eintrag.namensraum)) continue;
     const eigene = Object.entries(linien)
       .filter(([schluessel]) => schluessel.split('.')[0] === kennung);
     blaetter.push(el('div.blatt', {}, [
@@ -372,10 +344,8 @@ function diagrammSicht(loesung) {
 function werteSicht(loesung, beiZielwahl) {
   let eintraege = Object.values(loesung.werte || {});
   if (!eintraege.length) return leerzustand('Noch keine Werte bestimmt.');
-  if (zustand.umfang === 'seite' && zustand.auswahl) {
-    const raum = raumDerAuswahl();
-    if (raum) eintraege = eintraege.filter((w) => w.id.startsWith(`${raum}.`));
-  }
+  const raum = eingrenzung();
+  if (raum) eintraege = eintraege.filter((w) => imRaum(raum, w.id));
   eintraege.sort((a, b) => a.id.localeCompare(b.id, 'de'));
 
   // Nur Werte, die aus einer Berechnung stammen, taugen als Ziel -- eine
@@ -475,6 +445,10 @@ function werteSicht(loesung, beiZielwahl) {
 }
 
 /** Namensraum des links gewählten Bestandteils, für den Seitenfilter. */
+/**
+ * Der Namensraum des links gewählten Bestandteils -- `beton.b1`,
+ * `querschnitt.q1`. Null, wenn nichts gewählt ist.
+ */
 function raumDerAuswahl() {
   const wahl = zustand.auswahl;
   if (!wahl) return null;
@@ -483,6 +457,24 @@ function raumDerAuswahl() {
     return m ? `${m.art}.${m.kennung}` : null;
   }
   return `querschnitt.${wahl.kennung}`;
+}
+
+/**
+ * Auf welchen Namensraum die Ansicht eingegrenzt ist -- null heisst: alles.
+ *
+ * Die eine Stelle, an der «Gesamt / Aktuelle Seite» gelesen wird. Vorher stand
+ * dieselbe Frage fünfmal da, jede Sicht mit einem anderen Schlüssel: einmal
+ * über den Abschnittstitel, einmal über die Querschnittskennung, zweimal über
+ * `auswahl.art` und einmal über den Namensraum. Ein sechster Bestandteil hätte
+ * fünf Stellen gebraucht.
+ */
+function eingrenzung() {
+  return zustand.umfang === 'seite' ? raumDerAuswahl() : null;
+}
+
+/** Gehört etwas mit diesem Namensraum in die Ansicht? */
+function imRaum(raum, id) {
+  return !raum || id === raum || id.startsWith(`${raum}.`);
 }
 
 // ===========================================================================

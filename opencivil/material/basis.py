@@ -29,6 +29,7 @@ from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple, Uni
 from opencivil.core.berechnung import Berechnung, Formel, FormelFunktion, Vorgabe
 from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
 from opencivil.core.latex import text_latex
+from opencivil.core.protokoll import Abschnitt
 from opencivil.core.wert import Quelle, WertDef
 
 
@@ -243,7 +244,7 @@ def erzeuge(
     definitionen = {v.kurzname: v.definition(namensraum, symbol_index) for v in vorlagen}
     berechnungen: List[Berechnung] = []
     eingabewerte: Dict[str, Groesse] = {}
-    abschnitt = f"{art.beschriftung}: {name}"
+    abschnitt = Abschnitt(f"{art.beschriftung}: {name}", namensraum)
 
     for vorlage in vorlagen:
         ausgabe = definitionen[vorlage.kurzname]

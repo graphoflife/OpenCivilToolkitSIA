@@ -466,9 +466,10 @@ class _Lauf:
         # eines Bauteils zuerst laeuft, entscheidet die Abhaengigkeitsfolge --
         # deshalb traegt jede ihren Abschnitt selbst, statt dass irgendwo eine
         # Reihenfolge angenommen wird.
-        if berechnung.abschnitt and berechnung.abschnitt != self._abschnitt:
-            protokoll.titel(berechnung.abschnitt, abschnitt=True)
-            self._abschnitt = berechnung.abschnitt
+        abschnitt = berechnung.abschnitt
+        if abschnitt is not None and abschnitt.raum != self._abschnitt:
+            protokoll.titel(abschnitt.titel, raum=abschnitt.raum)
+            self._abschnitt = abschnitt.raum
 
         ergebnisse = berechnung.ausfuehren(eingaben, protokoll)
 

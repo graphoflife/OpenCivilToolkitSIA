@@ -44,7 +44,7 @@ from opencivil.core.berechnung import (
 )
 from opencivil.core.einheiten import EINHEITSLOS, KG_PRO_M3, MM, MM2, Groesse
 from opencivil.core.latex import als_text
-from opencivil.core.protokoll import Protokoll
+from opencivil.core.protokoll import Abschnitt, Protokoll
 from opencivil.core.wert import WertDef
 from opencivil.material.basis import Baustoff
 
@@ -243,7 +243,7 @@ class Lagenaufbau(Prozedur):
         d_bewehrungsmass: WertDef,
         d_distanzhalter: WertDef,
         titel: str = "Bewehrungslagen",
-        abschnitt: str = "",
+        abschnitt: Optional[Abschnitt] = None,
     ) -> None:
         super().__init__(id, ausgaben=ausgaben, bezuege=bezuege, titel=titel,
                          referenz="SIA 262:2025, 5.2.2", abschnitt=abschnitt)
@@ -542,9 +542,9 @@ class Plattenquerschnitt:
         return d
 
     @property
-    def abschnitt(self) -> str:
+    def abschnitt(self) -> Abschnitt:
         """Ueberschrift, unter der die ganze Platte in der Herleitung steht."""
-        return f"Plattenanalyse: {self.name}"
+        return Abschnitt(f"Plattenanalyse: {self.name}", self.id)
 
     def _aufbauen(self) -> None:
         d_h = self._def("h", "h", MM, "Plattendicke", 0)

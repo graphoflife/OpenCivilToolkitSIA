@@ -39,7 +39,7 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Iterator, Mapping, Optional, Sequence, Tuple, Union
 
 from opencivil.core.einheiten import EINHEITSLOS, EmpirischesErgebnis, Groesse
-from opencivil.core.protokoll import Protokoll
+from opencivil.core.protokoll import Abschnitt, Protokoll
 from opencivil.core.wert import Quelle, Wert, WertDef
 
 
@@ -142,7 +142,7 @@ class Berechnung(ABC):
         referenz: str = "",
         prioritaet: int = 0,
         begruendung: str = "",
-        abschnitt: str = "",
+        abschnitt: Optional[Abschnitt] = None,
     ) -> None:
         if not ausgaben:
             raise ValueError(f"Berechnung '{id}' liefert keine Ausgaben.")
@@ -336,7 +336,7 @@ class Formel(Berechnung):
         referenz: str = "",
         prioritaet: int = 0,
         begruendung: str = "",
-        abschnitt: str = "",
+        abschnitt: Optional[Abschnitt] = None,
         bedingung: Optional[Callable[[Eingaben], Tuple[bool, str]]] = None,
     ) -> None:
         bezuege = [Eingabebezug(name, wid) for name, wid in (eingaben or {}).items()]
@@ -413,7 +413,7 @@ class Vorgabe(Berechnung):
         titel: str = "",
         referenz: str = "",
         begruendung: str = "",
-        abschnitt: str = "",
+        abschnitt: Optional[Abschnitt] = None,
     ) -> None:
         super().__init__(
             id,

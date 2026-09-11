@@ -57,12 +57,38 @@ class Block:
     """Basis aller Protokollbausteine."""
 
 
+@dataclass(frozen=True)
+class Abschnitt:
+    """
+    Ueberschrift eines Bauteils oder Baustoffs samt seinem Namensraum.
+
+    Beides gehoert zusammen: der Titel ist fuer den Leser, der Namensraum fuer
+    die Oberflaeche, die danach filtert.
+    """
+
+    titel: str
+    raum: str
+
+
 @dataclass
 class TitelBlock(Block):
     text: str
     ebene: int = 2
 
-    abschnitt: bool = False
+    raum: str = ""
+    """
+    Namensraum des Abschnitts, den dieser Titel eroeffnet -- leer, wenn er
+    keinen eroeffnet.
+
+    Die Oberflaeche grenzt die Herleitung damit auf den gewaehlten Bestandteil
+    ein. Ueber den Anzeigetext ginge das auch, aber ein Vergleich ueber
+    Beschriftungen ist immer eine Falle: er bricht, sobald jemand den Text
+    aendert, und er bricht stumm.
+    """
+
+    @property
+    def abschnitt(self) -> bool:
+        return bool(self.raum)
     """
     Eroeffnet dieser Titel einen ganzen Abschnitt (ein Bauteil, ein Baustoff)?
 
@@ -148,8 +174,8 @@ class Protokoll:
         self.bloecke.append(block)
         return block
 
-    def titel(self, text: str, ebene: int = 2, abschnitt: bool = False) -> None:
-        self._anfuegen(TitelBlock(text=text, ebene=ebene, abschnitt=abschnitt))
+    def titel(self, text: str, ebene: int = 2, raum: str = "") -> None:
+        self._anfuegen(TitelBlock(text=text, ebene=ebene, raum=raum))
 
     def text(self, text: str) -> None:
         self._anfuegen(TextBlock(text=text))
