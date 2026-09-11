@@ -202,42 +202,54 @@ export function querschnittZeichnen(eintrag, werte) {
   // wem sie ausweichen muss.
   const gesetzt = [];
 
-  for (const bew of eintrag.bewehrung) {
+  // Zwei Durchgänge: erst die längs laufenden y-Stäbe, dann die angeschnittenen
+  // x-Stäbe darüber. So bleiben die Kreise sichtbar, ohne dass die y-Stäbe
+  // durchscheinend gezeichnet werden müssten -- halbdurchsichtig liess sich
+  // ihre Dicke nicht mehr ablesen.
+  const laengs = eintrag.bewehrung.filter((bew) => bew.richtung === 'y');
+  const quer = eintrag.bewehrung.filter((bew) => bew.richtung !== 'y');
+
+  for (const bew of laengs) {
     const z = zahl(bew.z_id);
     if (z === null) continue;
-    const r = Math.max((bew.phi || 12) * massstab / 2, 2.2);
+    const dicke = (bew.phi || 12) * massstab;
+    // Als Rechteck und nicht als Linie mit runden Enden: die Kappen ragten um
+    // einen halben Durchmesser über den Beton hinaus, und genau so weit war
+    // der Stab dann zu lang.
+    svg.append(svgEl('rect', {
+      x: x(0), y: y(z) - dicke / 2, width: b * massstab, height: Math.max(dicke, 1.6),
+      fill: farbe.y, opacity: bew.art === 'zulage' ? 0.6 : 0.85,
+    }));
+    zettel.push({
+      soll: y(z), anker: y(z), farbe: farbe.y,
+      text: `${bew.lage}. ${bew.art === 'grund' ? 'Grund' : 'Zulage'} `
+          + `${bew.menge} (${bew.richtung})`,
+    });
+  }
 
-    if (bew.richtung === 'x') {
-      const stellen = stabstellen(b, bew);
-      // Nur Stäbe auf praktisch gleicher Höhe kommen sich ins Gehege.
-      const hindernisse = gesetzt
-        .filter((g) => Math.abs(g.y - y(z)) < g.r + r)
-        .map((g) => g.mm);
-      const versatz = besterVersatz(
-        stellen, hindernisse, spielraum(b, stellen, (bew.phi || 12) / 2));
+  for (const bew of quer) {
+    const z = zahl(bew.z_id);
+    if (z === null) continue;
+    const r = Math.max((bew.phi || 12) * massstab / 2, 1.4);
+    const stellen = stabstellen(b, bew);
+    // Nur Stäbe auf praktisch gleicher Höhe kommen sich ins Gehege.
+    const hindernisse = gesetzt
+      .filter((g) => Math.abs(g.y - y(z)) < g.r + r)
+      .map((g) => g.mm);
+    const versatz = besterVersatz(
+      stellen, hindernisse, spielraum(b, stellen, (bew.phi || 12) / 2));
 
-      for (const mm of stellen) {
-        const stelle = mm + versatz;
-        gesetzt.push({ mm: stelle, y: y(z), r });
-        svg.append(svgEl('circle', {
-          cx: x(stelle), cy: y(z), r,
-          fill: farbe.x, opacity: bew.art === 'zulage' ? 0.55 : 1,
-        }));
-      }
-    } else {
-      // In der Schnittebene laufende Stäbe: eine durchgezogene Linie über die
-      // ganze Breite, halbdurchsichtig, damit sie die x-Eisen nicht verdeckt.
-      svg.append(svgEl('line', {
-        x1: x(0), y1: y(z), x2: x(b), y2: y(z),
-        stroke: farbe.y, 'stroke-width': Math.max(r * 2, 2),
-        'stroke-linecap': 'round', opacity: bew.art === 'zulage' ? 0.45 : 0.7,
+    for (const mm of stellen) {
+      const stelle = mm + versatz;
+      gesetzt.push({ mm: stelle, y: y(z), r });
+      svg.append(svgEl('circle', {
+        cx: x(stelle), cy: y(z), r,
+        fill: farbe.x, stroke: '#fff', 'stroke-width': 0.6,
+        opacity: bew.art === 'zulage' ? 0.75 : 1,
       }));
     }
-
     zettel.push({
-      soll: y(z),
-      anker: y(z),
-      farbe: farbe[bew.richtung],
+      soll: y(z), anker: y(z), farbe: farbe.x,
       text: `${bew.lage}. ${bew.art === 'grund' ? 'Grund' : 'Zulage'} `
           + `${bew.menge} (${bew.richtung})`,
     });
