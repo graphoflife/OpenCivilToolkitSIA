@@ -256,7 +256,10 @@ function diagrammSicht(loesung) {
           style: { fontSize: '12px', color: 'var(--schrift-zart)', margin: '0 0 6px' },
         })
         : null,
-      kurveZeichnen(gesetz),
+      kurveZeichnen(gesetz, {
+        zeigeVereinfacht: zustand.zeigeVereinfacht,
+        beiUmschalten: (an) => aendern({ zeigeVereinfacht: an }, 'diagramm'),
+      }),
     ]));
   }
 

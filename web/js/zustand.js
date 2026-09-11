@@ -24,6 +24,8 @@ export const zustand = {
   reiter: 'nachweise',
   /** 'gesamt' oder 'seite' -- ob nur der gewählte Bestandteil gezeigt wird. */
   umfang: 'gesamt',
+  /** Ob im Betondiagramm der vereinfachte Spannungsblock mitgezeichnet wird. */
+  zeigeVereinfacht: true,
   /** Wert-IDs, die hervorgehoben werden (Rückverfolgung eines Ziels). */
   hervorgehoben: new Set(),
   /** Für welches Ziel die Rückverfolgung gerade gilt. */

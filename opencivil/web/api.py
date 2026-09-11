@@ -284,6 +284,13 @@ def werkstoffgesetze(aufbau: Aufbau, loesung: Loesung) -> dict:
     return ergebnis
 
 
+#: Anteil der Druckzonenhoehe, ueber den der Spannungsblock wirkt. Daraus folgt
+#: der Knick des vereinfachten Verlaufs bei (1 - 0.85) * eps_c2d: bei linearem
+#: Dehnungsverlauf mit eps_c2d an der Randfaser herrscht in der Tiefe 0.85x
+#: gerade die Dehnung 0.15 * eps_c2d.
+BLOCKANTEIL = 0.85
+
+
 def _betonkurve(stoff, wert, schritte: int = 80) -> Optional[dict]:
     """Parabel-Rechteck-Beziehung, von null bis zur Bruchdehnung."""
     from opencivil.querschnitt.werkstoffgesetz import Betongesetz
@@ -299,6 +306,7 @@ def _betonkurve(stoff, wert, schritte: int = 80) -> Optional[dict]:
     for i in range(schritte + 1):
         eps = -abs(eps_c2d) * i / schritte
         punkte.append({"eps": eps * 1e3, "sigma": gesetz.spannung(eps) / 1e6})
+
     return {
         "punkte": punkte,
         "x_titel": "ε [‰]",
@@ -309,6 +317,34 @@ def _betonkurve(stoff, wert, schritte: int = 80) -> Optional[dict]:
             {"eps": -abs(eps_c1d) * 1e3, "sigma": -abs(f_cd) / 1e6, "text": "ε_c1d"},
             {"eps": -abs(eps_c2d) * 1e3, "sigma": -abs(f_cd) / 1e6, "text": "ε_c2d"},
         ],
+        "vereinfacht": _spannungsblock(abs(f_cd), abs(eps_c2d)),
+    }
+
+
+def _spannungsblock(f_cd: float, eps_c2d: float) -> dict:
+    """
+    Der vereinfachte, rechteckige Spannungsverlauf.
+
+    Unterhalb von ``(1 - 0.85) * eps_c2d`` wird keine Spannung angesetzt,
+    darueber durchgehend ``f_cd``. Das ist dieselbe Vereinfachung, die auch der
+    Handrechnung zugrunde liegt -- dort als Druckzone der Hoehe ``0.85 x``.
+    Beide Bilder gehoeren zusammen, und genau deshalb steht die Stufe hier neben
+    der Parabel: man sieht, was man aufgibt, wenn man von Hand rechnet.
+    """
+    eps_knick = (1.0 - BLOCKANTEIL) * eps_c2d
+    ecken = [
+        (0.0, 0.0),
+        (-eps_knick, 0.0),
+        (-eps_knick, -f_cd),
+        (-eps_c2d, -f_cd),
+    ]
+    return {
+        "punkte": [{"eps": e * 1e3, "sigma": s / 1e6} for e, s in ecken],
+        "titel": "vereinfacht (Spannungsblock)",
+        "beschreibung": (
+            f"σ = 0 bis {1 - BLOCKANTEIL:.2f}·ε_c2d, darüber f_cd. "
+            f"Entspricht der Druckzone {BLOCKANTEIL}·x der Handrechnung."
+        ),
     }
 
 

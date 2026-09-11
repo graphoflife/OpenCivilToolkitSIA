@@ -17,12 +17,49 @@ const BREITE = 720;
 const HOEHE = 520;
 const RAND = { oben: 22, rechts: 22, unten: 46, links: 74 };
 
+/** Farbe des vereinfachten Verlaufs -- grün, wie verlangt. */
+const GRUEN = '#16794a';
+
 function svgEl(name, attribute = {}) {
   const knoten = document.createElementNS(NR, name);
   for (const [k, v] of Object.entries(attribute)) {
     if (v !== null && v !== undefined) knoten.setAttribute(k, String(v));
   }
   return knoten;
+}
+
+/**
+ * Schiebt Beschriftungen so weit auseinander, dass sie sich nicht überdecken.
+ *
+ * Vier Bewehrungslagen liegen nahe beieinander, teils in derselben Höhe
+ * (Grundbewehrung und Zulage) -- ohne Entzerrung liegen die Zettel übereinander
+ * und sind unlesbar.
+ *
+ * Zuerst wird von oben nach unten aufgeschoben, danach, falls unten der Platz
+ * ausgeht, alles gemeinsam so weit angehoben, wie es noch reicht. Damit bleibt
+ * die Reihenfolge erhalten, und das ist wichtiger als die genaue Höhe: welche
+ * Lage gemeint ist, zeigt ohnehin der Anschlussstrich.
+ *
+ * @param {Array<{soll: number}>} zettel  zu platzierende Beschriftungen
+ * @param {number} abstand                kleinster Abstand in Bildpunkten
+ */
+export function beschriftungenEntzerren(zettel, abstand, oben, unten) {
+  const sortiert = [...zettel].sort((a, b) => a.soll - b.soll);
+
+  let letzte = -Infinity;
+  for (const z of sortiert) {
+    z.y = Math.max(z.soll, letzte + abstand, oben);
+    letzte = z.y;
+  }
+
+  const ueberstand = letzte - unten;
+  if (ueberstand > 0) {
+    // Nach oben zurückschieben, aber nur so weit, wie oben Platz bleibt.
+    const luft = sortiert[0].y - oben;
+    const schub = Math.min(ueberstand, Math.max(luft, 0));
+    for (const z of sortiert) z.y -= schub;
+  }
+  return sortiert;
 }
 
 /** Sucht einen runden Schrittabstand für die Achsenteilung. */
@@ -48,8 +85,8 @@ export function querschnittZeichnen(eintrag, werte) {
   const b = zahl(eintrag.werte.b);
   if (!h || !b) return el('div.leer', { text: 'Geometrie noch nicht gerechnet.' });
 
-  const BREITE = 640;
-  const RAND = { oben: 26, unten: 40, links: 62, rechts: 130 };
+  const BREITE = 660;
+  const RAND = { oben: 26, unten: 40, links: 62, rechts: 168 };
   const zeichenBreite = BREITE - RAND.links - RAND.rechts;
   // Massstab so, dass die Platte gut sichtbar bleibt, ohne die Höhe zu verzerren.
   const massstab = zeichenBreite / b;
@@ -70,6 +107,7 @@ export function querschnittZeichnen(eintrag, werte) {
   }));
 
   const farbe = { x: '#1f6feb', y: '#b8622a' };
+  const zettel = [];
   for (const bew of eintrag.bewehrung) {
     const z = zahl(bew.z_id);
     const phi = zahl(eintrag.werte[`lage.${bew.lage}${bew.art === 'grund' ? 'g' : 'z'}.phi`]);
@@ -94,12 +132,30 @@ export function querschnittZeichnen(eintrag, werte) {
         'stroke-linecap': 'round', opacity: bew.art === 'zulage' ? 0.45 : 0.7,
       }));
     }
-    const beschriftung = svgEl('text', {
-      x: BREITE - RAND.rechts + 10, y: y(z) + 4,
-      'font-size': 10.5, fill: farbe[bew.richtung],
+    zettel.push({
+      soll: y(z),
+      anker: y(z),
+      farbe: farbe[bew.richtung],
+      text: `${bew.lage}. ${bew.art === 'grund' ? 'Grund' : 'Zulage'} `
+          + `${bew.menge} (${bew.richtung})`,
     });
-    beschriftung.textContent =
-      `${bew.lage}. ${bew.art === 'grund' ? 'Grund' : 'Zulage'} ${bew.menge} (${bew.richtung})`;
+  }
+
+  for (const z of beschriftungenEntzerren(zettel, 13, RAND.oben, HOEHE - RAND.unten)) {
+    const links = BREITE - RAND.rechts + 10;
+    // Hat der Zettel ausweichen müssen, zeigt ein Strich auf die wahre Höhe --
+    // sonst stünde die Beschriftung auf einer Lage, zu der sie nicht gehört.
+    if (Math.abs(z.y - z.anker) > 0.5) {
+      svg.append(svgEl('polyline', {
+        points: `${x(b) + 3},${z.anker} ${links - 6},${z.anker} `
+              + `${links - 3},${z.y} ${links - 1},${z.y}`,
+        fill: 'none', stroke: z.farbe, 'stroke-width': 0.8, opacity: 0.5,
+      }));
+    }
+    const beschriftung = svgEl('text', {
+      x: links, y: z.y + 3.5, 'font-size': 10.5, fill: z.farbe,
+    });
+    beschriftung.textContent = z.text;
     svg.append(beschriftung);
   }
 
@@ -300,7 +356,7 @@ export function diagrammZeichnen(linie) {
  * Quadranten, der Stahl spannt sich über beide. Die Achsen laufen deshalb
  * durch den Nullpunkt.
  */
-export function kurveZeichnen(gesetz) {
+export function kurveZeichnen(gesetz, { zeigeVereinfacht = true, beiUmschalten } = {}) {
   const punkte = gesetz.punkte || [];
   if (!punkte.length) return el('div.leer', { text: 'Keine Kurve vorhanden.' });
 
@@ -375,6 +431,16 @@ export function kurveZeichnen(gesetz) {
     'stroke-linejoin': 'round', 'stroke-linecap': 'round',
   }));
 
+  // Vereinfachter Verlauf (Spannungsblock), sofern der Kern einen liefert.
+  if (gesetz.vereinfacht && zeigeVereinfacht) {
+    svg.append(svgEl('polyline', {
+      points: gesetz.vereinfacht.punkte
+        .map((p) => `${x(p.eps).toFixed(2)},${y(p.sigma).toFixed(2)}`).join(' '),
+      fill: 'none', stroke: GRUEN, 'stroke-width': 2,
+      'stroke-linejoin': 'miter', 'stroke-linecap': 'butt',
+    }));
+  }
+
   // Marken für die Grenzdehnungen
   for (const marke of gesetz.marken || []) {
     svg.append(svgEl('line', {
@@ -409,5 +475,31 @@ export function kurveZeichnen(gesetz) {
   yt.textContent = gesetz.y_titel;
   svg.append(yt);
 
-  return el('div.diagramm-huelle', {}, [svg]);
+  if (!gesetz.vereinfacht) return el('div.diagramm-huelle', {}, [svg]);
+
+  const schalter = el('label.kurvenschalter', {
+    title: gesetz.vereinfacht.beschreibung || '',
+  }, [
+    el('input', {
+      type: 'checkbox',
+      checked: zeigeVereinfacht,
+      on: { change: (e) => beiUmschalten?.(e.target.checked) },
+    }),
+    el('i', { style: { background: GRUEN } }),
+    el('span', { text: gesetz.vereinfacht.titel }),
+  ]);
+
+  return el('div.diagramm-huelle', {}, [
+    svg,
+    el('div.mn-legende', {}, [
+      el('span', {}, [el('i', { style: { background: '#1f6feb' } }), gesetz.titel]),
+      schalter,
+      zeigeVereinfacht && gesetz.vereinfacht.beschreibung
+        ? el('span', {
+          text: gesetz.vereinfacht.beschreibung,
+          style: { color: 'var(--schrift-zart)' },
+        })
+        : null,
+    ]),
+  ]);
 }

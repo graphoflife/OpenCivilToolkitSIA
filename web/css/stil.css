@@ -539,3 +539,16 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   font-size: 11px; color: var(--schrift-zart); letter-spacing: .1px;
   background: rgba(255,255,255,.8); padding: 1px 6px; border-radius: 4px;
 }
+
+/* ------------------------------------------------ Kurven und Diagramme -- */
+
+/* KaTeX vom Versalsatz ausnehmen. text-transform macht aus dem kleinen Alpha
+   des Erfüllungsgrads sonst ein grosses -- und damit ein anderes Zeichen. */
+.nachweis-tabelle th .katex,
+.zielgruppe-kopf .katex { text-transform: none; }
+
+.kurvenschalter {
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  user-select: none;
+}
+.kurvenschalter input { margin: 0; accent-color: var(--gut); cursor: pointer; }
