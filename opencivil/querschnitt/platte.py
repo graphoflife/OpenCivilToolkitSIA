@@ -152,6 +152,22 @@ class Bewehrungslage:
     grund: Bewehrungsposten = field(default_factory=Bewehrungsposten)
     zulage: Bewehrungsposten = field(default_factory=Bewehrungsposten)
 
+    unguenstig: bool = True
+    """
+    Wie Grundbewehrung und Zulage innerhalb der Lage liegen.
+
+    ``False`` (guenstig): beide beruehren dieselbe Huellebene und sind je um
+    ihren eigenen Halbmesser eingerueckt -- die **aeusseren** Kanten fluchten.
+    Das ist die guenstigste Anordnung; der duennere Stab bekommt den groessten
+    Hebelarm.
+
+    ``True`` (unguenstig, Vorgabe): die **inneren** Kanten fluchten, der
+    duennere Stab wird also zur Plattenmitte hin geschoben. Bei den unteren
+    Lagen heisst das: gleiche Oberkante; bei den oberen: gleiche Unterkante.
+    Massgebend ist je der dickere Stab. Auf der Baustelle laesst sich nicht
+    steuern, welche Kante fluchtet -- deshalb ist das die Vorgabe.
+    """
+
     def __post_init__(self) -> None:
         if not 1 <= self.nummer <= LAGENZAHL:
             raise ValueError(f"Lagennummer {self.nummer} liegt ausserhalb 1..{LAGENZAHL}.")
@@ -241,10 +257,16 @@ class Lagenaufbau(Prozedur):
         p.text(
             "Die Lagen werden je Seite von aussen nach innen gestapelt. Die Hülle "
             "einer Lage beginnt bei der Überdeckung und wächst um den grössten "
-            "Durchmesser der davorliegenden Lage. Grundbewehrung und Zulage einer "
-            "Lage liegen auf derselben Hülle und sind je um ihren eigenen "
-            "Halbmesser eingerückt. d wird von der gezogenen Randfaser aus "
-            "gemessen, hier von der Oberkante nach unten."
+            "Durchmesser der davorliegenden Lage. d wird von der gezogenen "
+            "Randfaser aus gemessen, hier von der Oberkante nach unten."
+        )
+        p.text(
+            "Innerhalb einer Lage ist wählbar, wie Grundbewehrung und Zulage "
+            "zueinander liegen. Bei «günstig» berühren beide dieselbe Hülle und "
+            "sind je um ihren eigenen Halbmesser eingerückt – die äusseren "
+            "Kanten fluchten. Bei «ungünstig» fluchten die inneren Kanten: der "
+            "dünnere Stab rückt zur Plattenmitte und verliert Hebelarm. "
+            "Massgebend ist dann der dickere Stab."
         )
 
         ueber_abstand = any(q.posten.ueber_abstand for q in self.posten)
@@ -275,13 +297,27 @@ class Lagenaufbau(Prozedur):
             raender[schluessel] = huelle[lage.von_unten]
             huelle[lage.von_unten] = huelle[lage.von_unten] + lage.groesster_durchmesser
 
+        # Der dickste Stab je Lage bestimmt, wo die innere Kante liegt.
+        dickster: Dict[int, Groesse] = {}
+        for q in self.posten:
+            phi = e.g(f"phi_{q.marke}")
+            vorher = dickster.get(q.lage.nummer)
+            if vorher is None or phi.si > vorher.si:
+                dickster[q.lage.nummer] = phi
+
         ergebnis: Dict[str, Groesse] = {}
         zeilen: List[List[str]] = []
         #: Je Lagennummer die Ober- und Unterkante des Stahls, in m ab Oberkante.
         kanten: Dict[int, Tuple[float, float]] = {}
         for q in self.posten:
             phi = e.g(f"phi_{q.marke}")
-            rand = raender[(q.lage.von_unten, q.lage.stapelrang)] + phi / 2.0
+            huellebene = raender[(q.lage.von_unten, q.lage.stapelrang)]
+            if q.lage.unguenstig:
+                # Innere Kanten fluchten: der dünnere Stab rückt zur Mitte.
+                rand = huellebene + dickster[q.lage.nummer] - phi / 2.0
+            else:
+                # Äussere Kanten fluchten, jeder um seinen eigenen Halbmesser.
+                rand = huellebene + phi / 2.0
             d = h - rand if q.lage.von_unten else rand
 
             oben, unten = d.si - phi.si / 2.0, d.si + phi.si / 2.0

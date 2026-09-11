@@ -176,13 +176,17 @@ class LageEintrag:
     grund: PostenEintrag = field(default_factory=PostenEintrag)
     zulage: PostenEintrag = field(default_factory=lambda: PostenEintrag(durchmesser=0.0))
 
+    unguenstig: bool = True
+    """Ob die inneren Kanten von Grundbewehrung und Zulage fluchten -- siehe
+    :class:`opencivil.querschnitt.platte.Bewehrungslage`."""
+
     @property
     def vorhanden(self) -> bool:
         return self.grund.vorhanden or self.zulage.vorhanden
 
     def als_dict(self) -> dict:
         return {"stahl": self.stahl, "grund": self.grund.als_dict(),
-                "zulage": self.zulage.als_dict()}
+                "zulage": self.zulage.als_dict(), "unguenstig": self.unguenstig}
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "LageEintrag":
@@ -190,6 +194,10 @@ class LageEintrag:
             stahl=str(d.get("stahl", "")),
             grund=PostenEintrag.aus_dict(d.get("grund") or {}),
             zulage=PostenEintrag.aus_dict(d.get("zulage") or {"durchmesser": 0.0}),
+            # Alte Beschreibungen kennen das Feld nicht. Die unguenstige Lage
+            # ist die Vorgabe -- auf der Baustelle laesst sich nicht steuern,
+            # welche Kante fluchtet.
+            unguenstig=bool(d.get("unguenstig", True)),
         )
 
 
@@ -585,6 +593,7 @@ class Projekt:
                     s for s in baustoffe.values() if s.art.value == "betonstahl"), None),
                 grund=lage.grund.als_posten(),
                 zulage=lage.zulage.als_posten(),
+                unguenstig=lage.unguenstig,
             ))
 
         if not any(l.vorhanden for l in lagen):

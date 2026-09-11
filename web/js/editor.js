@@ -324,6 +324,45 @@ function lagenBlock(querschnitt, nummer) {
     ]),
     postenZeile(querschnitt, nummer, 'grund', 'Grund'),
     postenZeile(querschnitt, nummer, 'zulage', 'Zulage'),
+    lageSchalter(querschnitt, nummer, lage),
+  ]);
+}
+
+/**
+ * Zweistellungs-Schalter für die Lage von Grundbewehrung und Zulage zueinander.
+ *
+ * Nur sichtbar, wenn die Lage überhaupt zwei Posten hat -- bei einer einzelnen
+ * Bewehrung gibt es nichts zueinander zu legen.
+ */
+function lageSchalter(querschnitt, nummer, lage) {
+  if (!(lage.grund?.durchmesser > 0 && lage.zulage?.durchmesser > 0)) return null;
+
+  const setzen = (unguenstig) => projektAendern((p) => {
+    p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
+      .lagen[nummer - 1].unguenstig = unguenstig;
+  });
+  const ist = lage.unguenstig !== false;
+  const untere = nummer <= 2;
+
+  return el('div.lagegunst', {}, [
+    el('span.schalter.schalter-gunst', {
+      title: untere
+        ? 'Ungünstig: gleiche Oberkante, der dünnere Stab rückt nach oben. '
+          + 'Günstig: gleiche Unterkante, jeder um seinen Halbmesser eingerückt.'
+        : 'Ungünstig: gleiche Unterkante, der dünnere Stab rückt nach unten. '
+          + 'Günstig: gleiche Oberkante, jeder um seinen Halbmesser eingerückt.',
+    }, [
+      el('button.schalter-halb', {
+        text: 'ungünstig',
+        class: ist ? 'ist-an' : '',
+        on: { click: () => { if (!ist) setzen(true); } },
+      }),
+      el('button.schalter-halb', {
+        text: 'günstig',
+        class: ist ? '' : 'ist-an',
+        on: { click: () => { if (ist) setzen(false); } },
+      }),
+    ]),
   ]);
 }
 

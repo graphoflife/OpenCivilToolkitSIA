@@ -160,22 +160,44 @@ class TestQuerschnitt(unittest.TestCase):
         # 2. Lage: 30 + 20 + 16/2 = 58 -> z = 242
         self.assertAlmostEqual(loesung.groesse(qs.id_von("lage.2g.z")).in_einheit(MM), 242.0)
 
-    def test_zulage_liegt_auf_derselben_huelle(self):
-        """
-        Grundbewehrung und Zulage einer Lage berühren dieselbe Hüllebene und
-        sind je um ihren eigenen Halbmesser eingerückt.
-        """
-        qs = platte([
+    def _lage_mit_zulage(self, unguenstig: bool):
+        """1. Lage: Grund ⌀20 und Zulage ⌀12, Überdeckung 30 mm."""
+        lagen = [
             lage(1, Richtung.X, phi=20.0, zulage=12.0),
             lage(2, Richtung.Y), lage(3, Richtung.X), lage(4, Richtung.Y),
-        ])
+        ]
+        lagen[0].unguenstig = unguenstig
+        qs = platte(lagen)
         werk = Rechenwerk()
         qs.ins_rechenwerk(werk)
         loesung = werk.loese(qs.id_von("lage.1g.z"), qs.id_von("lage.1z.z"))
-        self.assertAlmostEqual(
-            loesung.groesse(qs.id_von("lage.1g.z")).in_einheit(MM), 300 - (30 + 10))
-        self.assertAlmostEqual(
-            loesung.groesse(qs.id_von("lage.1z.z")).in_einheit(MM), 300 - (30 + 6))
+        return (loesung.groesse(qs.id_von("lage.1g.z")).in_einheit(MM),
+                loesung.groesse(qs.id_von("lage.1z.z")).in_einheit(MM))
+
+    def test_guenstige_lage_laesst_die_aeusseren_kanten_fluchten(self):
+        """
+        Beide berühren dieselbe Hüllebene, je um ihren eigenen Halbmesser
+        eingerückt. Die Zulage liegt damit weiter aussen und hat mehr Hebelarm.
+        """
+        grund, zulage = self._lage_mit_zulage(unguenstig=False)
+        self.assertAlmostEqual(grund, 300 - (30 + 10))
+        self.assertAlmostEqual(zulage, 300 - (30 + 6))
+
+    def test_unguenstige_lage_laesst_die_inneren_kanten_fluchten(self):
+        """
+        Der dünnere Stab rückt zur Plattenmitte, bis seine innere Kante mit
+        der des dickeren fluchtet. Das ist die Vorgabe: auf der Baustelle
+        lässt sich nicht steuern, welche Kante fluchtet.
+        """
+        grund, zulage = self._lage_mit_zulage(unguenstig=True)
+        self.assertAlmostEqual(grund, 300 - (30 + 10))
+        # Zulage: Rand = 30 + 20 - 6 = 44  ->  d = 256
+        self.assertAlmostEqual(zulage, 300 - (30 + 20 - 6))
+        # Innere Kanten auf gleicher Höhe -- das ist die Aussage.
+        self.assertAlmostEqual(grund - 20 / 2, zulage - 12 / 2)
+
+    def test_unguenstig_ist_die_vorgabe(self):
+        self.assertTrue(lage(1, Richtung.X, phi=20.0, zulage=12.0).unguenstig)
 
     def test_zulage_zaehlt_zur_flaeche(self):
         qs = platte([
