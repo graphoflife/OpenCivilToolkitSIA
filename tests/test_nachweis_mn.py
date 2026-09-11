@@ -18,7 +18,7 @@ from opencivil.material.betonstahl import betonstahl
 from opencivil.nachweis.biegung_normalkraft import (
     BiegungNormalkraft, Erfuellungsart, Schnittgroessen,
 )
-from opencivil.nachweis.linie import schnitte_bei_N
+from opencivil.nachweis.linie import MOMENT, schnitte
 from opencivil.querschnitt.platte import (
     Bewehrungslage, Bewehrungsposten, Plattenquerschnitt, Postenart, Richtung,
 )
@@ -263,7 +263,7 @@ class TestQuerschnitt(unittest.TestCase):
                 qs, [Schnittgroessen("F", M_Ed=Groesse(1, KNM))], Richtung.X)
             werk.registriere(nachweis)
             werk.loese(nachweis.d_eckwerte["M_Rd_max"].id)
-            return max(schnitte_bei_N(nachweis.linie, 0.0))
+            return max(schnitte(nachweis.linie, MOMENT, 0.0))
 
         ohne = m_rd(platte([
             lage(1, Richtung.X, phi=18.0), lage(2, Richtung.Y),
@@ -393,12 +393,12 @@ class TestResistenzlinie(unittest.TestCase):
             x_eff = 737e3 / (20 * 1000)       = 36.9 mm
             M_Rd  = 737 * (261 - 36.9/2)      ≈ 179 kNm
         """
-        momente = schnitte_bei_N(self.nachweis.linie, 0.0)
+        momente = schnitte(self.nachweis.linie, MOMENT, 0.0)
         m_rd = max(momente) / 1e3
         self.assertAlmostEqual(m_rd, 179.0, delta=8.0)
 
     def test_nur_untere_bewehrung_gibt_bei_n_null_kaum_negatives_moment(self):
-        momente = schnitte_bei_N(self.nachweis.linie, 0.0)
+        momente = schnitte(self.nachweis.linie, MOMENT, 0.0)
         self.assertLess(abs(min(momente)) / 1e3, 20.0)
 
     def test_groesstes_moment_liegt_beim_balancepunkt(self):
@@ -410,7 +410,7 @@ class TestResistenzlinie(unittest.TestCase):
         """
         bester = max(self.nachweis.linie, key=lambda punkt: punkt.M)
         self.assertLess(bester.N, 0.0)
-        m_bei_null = max(schnitte_bei_N(self.nachweis.linie, 0.0))
+        m_bei_null = max(schnitte(self.nachweis.linie, MOMENT, 0.0))
         self.assertGreater(bester.M, m_bei_null)
 
     def test_protokoll_zeigt_die_handrechnung(self):

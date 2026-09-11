@@ -114,8 +114,8 @@ class TestQuerkraft(unittest.TestCase):
         # Und der Wert stimmt mit der Interpolation auf dem Polygon überein --
         # der Querkraftnachweis rechnet damit auf derselben Linie wie der
         # M-N-Nachweis, nicht auf einer eigenen.
-        from opencivil.nachweis.linie import schnitte_bei_N
-        erwartet = max(schnitte_bei_N(nachweis.handlinie, -300e3))
+        from opencivil.nachweis.linie import MOMENT, schnitte
+        erwartet = max(schnitte(nachweis.handlinie, MOMENT, -300e3))
         self.assertAlmostEqual(erg.m_Rd, erwartet, delta=1.0)
 
     def test_dekompressionsmoment(self):

@@ -411,7 +411,7 @@ def _linie_dict(nachweis) -> dict:
                 "art_text": a.schnittgroessen.art.beschriftung,
                 "innerhalb": a.innerhalb,
                 "erfuellungsgrad": a.erfuellungsgrad,
-                "groesse": a.groesse,
+                "groesse": a.achse.name,
                 "massstab": a.massstab.value,
                 "massstab_text": a.massstab.beschriftung,
                 "widerstand": (

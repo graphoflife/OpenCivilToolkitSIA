@@ -2,17 +2,25 @@
 opencivil/nachweis/linie.py -- Geometrie einer geschlossenen M-N-Linie.
 
 VERANTWORTUNG:
-Punkt-in-Linie, Schnitte mit einer Waagrechten oder Senkrechten, kuerzester
-Abstand. Reine Geometrie -- von Beton, Stahl und Norm weiss dieser Baustein
-nichts.
+Punkt-in-Linie, Schnitte mit einer Geraden, kuerzester Abstand. Reine
+Geometrie -- von Beton, Stahl und Norm weiss dieser Baustein nichts.
 
 WARUM EIGENSTAENDIG:
 Es gibt zwei Resistenzlinien: die punktweise aus Dehnungsebenen aufgebaute
-(:mod:`opencivil.nachweis.biegung_normalkraft`) und das Polygon aus der
+(:mod:`opencivil.nachweis.dehnungsfaecher`) und das Polygon aus der
 Handrechnung (:mod:`opencivil.nachweis.handrechnung`). Beide werden auf genau
 dieselbe Art ausgewertet. Laege die Geometrie bei einer der beiden, muesste die
 andere sie entweder einbinden -- was einen Ring ergaebe -- oder nachbauen. Das
 zweite waere der Anfang vom Auseinanderlaufen.
+
+DIE ACHSE IST EIN WERT:
+Ob ein Widerstand bei festgehaltener Normalkraft (waagrecht) oder bei
+festgehaltenem Moment (senkrecht) gesucht wird, steckt in :class:`Achse`.
+Vorher stand dieselbe Unterscheidung vierfach da -- als Funktionspaar
+``..._bei_N``/``..._bei_M``, als ``positiv``-Schalter, als Zeichenkette ``"M"``
+und als Enum-Mitglied -- und wurde an sechs Stellen abgefragt. Jetzt gibt es
+sie einmal, und die Funktionen hier kennen nur noch *eine* Achse und ihre
+Gegenachse.
 
 VORZEICHEN:
     N > 0   Zug
@@ -24,7 +32,10 @@ Punkte, deren letzter mit dem ersten verbunden gedacht wird.
 from __future__ import annotations
 
 import math
-from typing import List, Protocol, Sequence, Tuple
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Protocol, Sequence, Tuple
+
+from opencivil.core.einheiten import KN, KNM, Einheit
 
 
 class Punkt(Protocol):
@@ -32,6 +43,52 @@ class Punkt(Protocol):
 
     N: float
     M: float
+
+
+@dataclass(frozen=True)
+class Stelle:
+    """Ein schlichter Punkt der M-N-Ebene -- etwa eine Einwirkung."""
+
+    N: float
+    M: float
+
+
+@dataclass(frozen=True)
+class Achse:
+    """
+    Eine der beiden Achsen der M-N-Ebene, samt allem, was sie unterscheidet.
+
+    ``name`` ist zugleich der Feldname eines :class:`Punkt` -- damit kommt
+    :meth:`von` ohne Fallunterscheidung aus.
+    """
+
+    name: str
+    """``"M"`` oder ``"N"``."""
+
+    gegen_name: str
+    einheit: Einheit
+    beschriftung: str
+
+    widerstand: str
+    """Ausgeschrieben, weil die Fugenform sich nicht anhaengen laesst:
+    "Momentenwiderstand", nicht "Momentswiderstand"."""
+
+    def von(self, punkt: Punkt) -> float:
+        """Der Wert dieses Punktes auf dieser Achse."""
+        return getattr(punkt, self.name)
+
+    @property
+    def gegen(self) -> "Achse":
+        """Die andere Achse -- die bei einem Schnitt festgehalten wird."""
+        return ACHSEN[self.gegen_name]
+
+
+MOMENT = Achse("M", "N", KNM, "Moment", "Momentenwiderstand")
+NORMALKRAFT = Achse("N", "M", KN, "Normalkraft", "Normalkraftwiderstand")
+
+#: Nachschlagewerk fuer :attr:`Achse.gegen`. Nach den Konstanten gefuellt,
+#: weil eine eingefrorene Datenklasse sich nicht selbst referenzieren kann.
+ACHSEN: Dict[str, Achse] = {"M": MOMENT, "N": NORMALKRAFT}
 
 
 def innerhalb(N: float, M: float, linie: Sequence[Punkt]) -> bool:
@@ -48,60 +105,42 @@ def innerhalb(N: float, M: float, linie: Sequence[Punkt]) -> bool:
     return innen
 
 
-def schnitte_bei_N(linie: Sequence[Punkt], N: float) -> List[float]:
-    """Alle Momente, bei denen die Linie die Waagrechte N = const schneidet."""
-    treffer: List[float] = []
-    anzahl = len(linie)
-    for i in range(anzahl):
-        a, b = linie[i], linie[(i + 1) % anzahl]
-        if (a.N > N) != (b.N > N) and b.N != a.N:
-            treffer.append(a.M + (N - a.N) * (b.M - a.M) / (b.N - a.N))
-    return treffer
-
-
-def schnitte_bei_M(linie: Sequence[Punkt], M: float) -> List[float]:
-    """Alle Normalkraefte, bei denen die Linie die Senkrechte M = const schneidet."""
-    treffer: List[float] = []
-    anzahl = len(linie)
-    for i in range(anzahl):
-        a, b = linie[i], linie[(i + 1) % anzahl]
-        if (a.M > M) != (b.M > M) and b.M != a.M:
-            treffer.append(a.N + (M - a.M) * (b.N - a.N) / (b.M - a.M))
-    return treffer
-
-
-def kante_bei_N(linie: Sequence[Punkt], N: float, positiv: bool
-                ) -> Tuple[float, Punkt, Punkt] | None:
+def _schnittpunkte(linie: Sequence[Punkt], achse: Achse, fest: float):
     """
-    Wie :func:`schnitte_bei_N`, gibt aber die Kante mit zurueck.
+    Alle Kanten, die die Gerade ``achse.gegen = fest`` schneiden.
 
-    Gebraucht fuer die Mitschrift: dort soll stehen, *zwischen welchen beiden
-    Eckpunkten* interpoliert wurde, nicht bloss das Ergebnis. Sonst waere die
-    Zahl wieder nicht von Hand nachvollziehbar -- und genau darum geht es hier.
+    Liefert Tripel ``(Wert auf achse, Punkt a, Punkt b)``. Die einzige Stelle,
+    an der ueber die Linie gelaufen wird -- alles Weitere waehlt daraus aus.
     """
-    bester = None
+    lauf = achse.gegen
     anzahl = len(linie)
     for i in range(anzahl):
         a, b = linie[i], linie[(i + 1) % anzahl]
-        if (a.N > N) != (b.N > N) and b.N != a.N:
-            M = a.M + (N - a.N) * (b.M - a.M) / (b.N - a.N)
-            if bester is None or (M > bester[0] if positiv else M < bester[0]):
-                bester = (M, a, b)
-    return bester
+        la, lb = lauf.von(a), lauf.von(b)
+        if (la > fest) != (lb > fest) and lb != la:
+            ga, gb = achse.von(a), achse.von(b)
+            yield ga + (fest - la) * (gb - ga) / (lb - la), a, b
 
 
-def kante_bei_M(linie: Sequence[Punkt], M: float, positiv: bool
-                ) -> Tuple[float, Punkt, Punkt] | None:
-    """Dasselbe fuer die Senkrechte M = const."""
-    bester = None
-    anzahl = len(linie)
-    for i in range(anzahl):
-        a, b = linie[i], linie[(i + 1) % anzahl]
-        if (a.M > M) != (b.M > M) and b.M != a.M:
-            N = a.N + (M - a.M) * (b.N - a.N) / (b.M - a.M)
-            if bester is None or (N > bester[0] if positiv else N < bester[0]):
-                bester = (N, a, b)
-    return bester
+def schnitte(linie: Sequence[Punkt], achse: Achse, fest: float) -> List[float]:
+    """Alle Werte auf ``achse``, bei denen ``achse.gegen = fest`` die Linie trifft."""
+    return [wert for wert, _, _ in _schnittpunkte(linie, achse, fest)]
+
+
+def kante(
+    linie: Sequence[Punkt], achse: Achse, fest: float, positiv: bool
+) -> Optional[Tuple[float, Punkt, Punkt]]:
+    """
+    Der aeusserste Schnittpunkt -- mit den beiden Eckpunkten, zwischen denen er liegt.
+
+    Die Eckpunkte braucht die Mitschrift: dort soll stehen, *zwischen welchen
+    beiden* interpoliert wurde, nicht bloss das Ergebnis. Sonst waere die Zahl
+    wieder nicht von Hand nachvollziehbar -- und genau darum geht es hier.
+    """
+    treffer = list(_schnittpunkte(linie, achse, fest))
+    if not treffer:
+        return None
+    return max(treffer, key=lambda t: t[0]) if positiv else min(treffer, key=lambda t: t[0])
 
 
 def ohne_wiederholungen(linie: Sequence, toleranz: float = 1e-7) -> List:

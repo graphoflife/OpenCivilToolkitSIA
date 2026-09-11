@@ -164,8 +164,8 @@ class Auswertung:
 
     begruendung: str = ""
 
-    groesse: str = "M"
-    """Welche Grösse verglichen wird -- 'M' oder 'N'. Haengt vom Massstab ab."""
+    achse: geo.Achse = geo.MOMENT
+    """Auf welcher Achse verglichen wird. Haengt vom Massstab ab."""
 
     ed: float = 0.0
     """Einwirkung in der verglichenen Groesse, in SI (N bzw. Nm)."""
@@ -179,6 +179,18 @@ class Auswertung:
     kante: Optional[Tuple["Eckpunkt", "Eckpunkt"]] = None
     """Zwischen welchen beiden Eckpunkten interpoliert wurde -- fuer die
     Mitschrift, damit dort nicht bloss das Ergebnis steht."""
+
+
+#: Welche Achse ein Massstab sucht. Die einzige Stelle, an der die beiden
+#: Begriffe zusammenkommen -- Erfuellungsart ist fuer die Oberflaeche da,
+#: Achse fuer die Geometrie.
+ACHSE_ZU: Dict[Erfuellungsart, geo.Achse] = {
+    Erfuellungsart.NORMALKRAFT_KONSTANT: geo.MOMENT,
+    Erfuellungsart.MOMENT_KONSTANT: geo.NORMALKRAFT,
+}
+MASSSTAB: Dict[str, Erfuellungsart] = {
+    a.name: m for m, a in ACHSE_ZU.items()
+}
 
 
 # ===========================================================================
@@ -456,7 +468,7 @@ class BiegungNormalkraft(Nachweis):
         )
         self.handlinie = self.handrechnung.rechnen(p)
 
-        bei_null = geo.schnitte_bei_N(self.handlinie, 0.0)
+        bei_null = geo.schnitte(self.handlinie, geo.MOMENT, 0.0)
         eckwerte = {
             "N_Rd_zug": max(pt.N for pt in self.handlinie),
             "N_Rd_druck": min(pt.N for pt in self.handlinie),
@@ -483,7 +495,7 @@ class BiegungNormalkraft(Nachweis):
             )
             # Unabhaengig vom gewaehlten Massstab: der Momentenwiderstand bei
             # dieser Normalkraft, denn der Querkraftnachweis rechnet damit.
-            bei_n = self._bei_n_konstant(kombination, auswertung.innerhalb)
+            bei_n = self._messen(kombination, geo.MOMENT, auswertung.innerhalb)
             ergebnis[self.d_m_rd[kombination.name].id] = Groesse.aus_si(
                 abs(bei_n.rd) if bei_n else 0.0, KNM)
             urteile.append(
@@ -506,24 +518,23 @@ class BiegungNormalkraft(Nachweis):
         'Normalkraft konstant' das Moment, bei 'Moment konstant' die Normalkraft.
         Das Urteil traegt deshalb Symbol und Einheit selbst mit sich.
         """
-        ist_moment = auswertung.groesse == "M"
-        einheit = KNM if ist_moment else KN
+        achse = auswertung.achse
+        einheit = achse.einheit
         zahl = auswertung.ed if seite == "Ed" else auswertung.rd
         r = self.richtung.value
 
         # Der Widerstand gilt nur unter der festgehaltenen Gegengroesse -- das
         # gehoert ins Symbol, sonst liest sich M_Rd wie ein fester Kennwert.
-        symbol = f"{auswertung.groesse}_{{{seite},{r}}}"
+        symbol = f"{achse.name}_{{{seite},{r}}}"
         if seite == "Rd":
-            if ist_moment:
-                fest = Groesse.aus_si(auswertung.schnittgroessen.N_Ed.si, KN)
-                symbol = rf"M_{{Rd,{r}}}(N_{{Ed}} = {fest.formatiert(1)}\,\mathrm{{kN}})"
-            else:
-                fest = Groesse.aus_si(auswertung.schnittgroessen.M_Ed.si, KNM)
-                symbol = rf"N_{{Rd,{r}}}(M_{{Ed}} = {fest.formatiert(1)}\,\mathrm{{kNm}})"
+            ed = geo.Stelle(N=auswertung.schnittgroessen.N_Ed.si,
+                            M=auswertung.schnittgroessen.M_Ed.si)
+            fest = Groesse.aus_si(achse.gegen.von(ed), achse.gegen.einheit)
+            symbol = (rf"{achse.name}_{{Rd,{r}}}({achse.gegen.name}_{{Ed}} = "
+                      rf"{fest.als_latex(1)})")
 
         definition = WertDef(
-            id=f"{self.id}.{auswertung.schnittgroessen.kennung}.{auswertung.groesse}_{seite}",
+            id=f"{self.id}.{auswertung.schnittgroessen.kennung}.{achse.name}_{seite}",
             symbol=symbol,
             einheit=einheit,
             beschreibung=("Einwirkung" if seite == "Ed" else "Widerstand"),
@@ -578,11 +589,8 @@ class BiegungNormalkraft(Nachweis):
 
         if art is Erfuellungsart.NAECHSTER_PUNKT:
             return self._naechster(kombination, eckwerte, innerhalb)
-        if art is Erfuellungsart.MOMENT_KONSTANT:
-            ergebnis = self._bei_m_konstant(kombination, innerhalb)
-        else:
-            ergebnis = self._bei_n_konstant(kombination, innerhalb)
 
+        ergebnis = self._messen(kombination, ACHSE_ZU[art], innerhalb)
         if ergebnis is None:
             return Auswertung(
                 kombination, innerhalb, 0.0, None,
@@ -591,40 +599,36 @@ class BiegungNormalkraft(Nachweis):
                 massstab=art)
         return ergebnis
 
-    def _bei_n_konstant(
-        self, kombination: Schnittgroessen, innerhalb: bool
+    def _messen(
+        self, kombination: Schnittgroessen, achse: geo.Achse, innerhalb: bool
     ) -> Optional[Auswertung]:
-        """Bei festgehaltener Normalkraft waagrecht bis zur Momentengrenze."""
-        N_Ed, M_Ed = kombination.N_Ed.si, kombination.M_Ed.si
-        kante = geo.kante_bei_N(self.handlinie, N_Ed, positiv=M_Ed >= 0)
-        if kante is None:
-            return None
-        M_Rd, a, b = kante
-        grad = float("inf") if M_Ed == 0 else abs(M_Rd) / abs(M_Ed)
-        return Auswertung(
-            kombination, innerhalb, grad, (N_Ed, M_Rd),
-            f"Bei festgehaltenem N_Ed = {_kn(N_Ed)} kN beträgt der "
-            f"Momentenwiderstand M_Rd = {_knm(M_Rd)} kNm.",
-            groesse="M", ed=M_Ed, rd=M_Rd,
-            massstab=Erfuellungsart.NORMALKRAFT_KONSTANT,
-            kante=(a, b))
+        """
+        Widerstand auf einer Achse, bei festgehaltener Gegenachse.
 
-    def _bei_m_konstant(
-        self, kombination: Schnittgroessen, innerhalb: bool
-    ) -> Optional[Auswertung]:
-        """Bei festgehaltenem Moment senkrecht bis zur Normalkraftgrenze."""
-        N_Ed, M_Ed = kombination.N_Ed.si, kombination.M_Ed.si
-        kante = geo.kante_bei_M(self.handlinie, M_Ed, positiv=N_Ed >= 0)
-        if kante is None:
+        Waagrecht und senkrecht sind derselbe Vorgang mit vertauschten Achsen --
+        deshalb eine Methode. Die Einwirkung wird dafuer als Punkt derselben
+        Ebene gelesen; damit fallen die Sonderfaelle weg.
+        """
+        ed = geo.Stelle(N=kombination.N_Ed.si, M=kombination.M_Ed.si)
+        fest = achse.gegen.von(ed)
+        gesucht = achse.von(ed)
+
+        treffer = geo.kante(self.handlinie, achse, fest, positiv=gesucht >= 0)
+        if treffer is None:
             return None
-        N_Rd, a, b = kante
-        grad = float("inf") if N_Ed == 0 else abs(N_Rd) / abs(N_Ed)
+        rd, a, b = treffer
+
+        grad = float("inf") if gesucht == 0 else abs(rd) / abs(gesucht)
         return Auswertung(
-            kombination, innerhalb, grad, (N_Rd, M_Ed),
-            f"Bei festgehaltenem M_Ed = {_knm(M_Ed)} kNm beträgt der "
-            f"Normalkraftwiderstand N_Rd = {_kn(N_Rd)} kN.",
-            groesse="N", ed=N_Ed, rd=N_Rd,
-            massstab=Erfuellungsart.MOMENT_KONSTANT,
+            kombination, innerhalb, grad,
+            widerstand=(ed.N, rd) if achse is geo.MOMENT else (rd, ed.M),
+            begruendung=(
+                f"Bei festgehaltenem {achse.gegen.name}_Ed = "
+                f"{_in(fest, achse.gegen)} beträgt der "
+                f"{achse.widerstand} {achse.name}_Rd = "
+                f"{_in(rd, achse)}."),
+            achse=achse, ed=gesucht, rd=rd,
+            massstab=MASSSTAB[achse.name],
             kante=(a, b))
 
     def _naechster(
@@ -645,7 +649,7 @@ class BiegungNormalkraft(Nachweis):
             f"Kürzester Abstand zur Resistenzlinie im normierten Diagramm: "
             f"{abstand:.3f}. Nächster Punkt: N = {_kn(stelle[0])} kN, "
             f"M = {_knm(stelle[1])} kNm.",
-            groesse="M", ed=M_Ed, rd=stelle[1],
+            achse=geo.MOMENT, ed=M_Ed, rd=stelle[1],
             massstab=Erfuellungsart.NAECHSTER_PUNKT)
 
     # -- Mitschrift ---------------------------------------------------------
@@ -767,7 +771,7 @@ class BiegungNormalkraft(Nachweis):
             r"\infty" if math.isinf(auswertung.erfuellungsgrad)
             else f"{auswertung.erfuellungsgrad:.2f}"
         )
-        gross = auswertung.groesse
+        gross = auswertung.achse.name
         p.gleichung(
             rf"\alpha_{{eff}} = \frac{{{gross}_{{Rd}}}}{{{gross}_{{Ed}}}} "
             rf"= \frac{{{abs(auswertung.rd) / 1e3:.1f}}}{{{abs(auswertung.ed) / 1e3:.1f}}} "
@@ -792,38 +796,35 @@ class BiegungNormalkraft(Nachweis):
             return
 
         a, b = auswertung.kante
-        ist_moment = auswertung.groesse == "M"
-        # Waagrecht wird ueber N interpoliert, senkrecht ueber M.
-        lauf_a, lauf_b = (a.N, b.N) if ist_moment else (a.M, b.M)
-        ziel_a, ziel_b = (a.M, b.M) if ist_moment else (a.N, b.N)
-        stelle = auswertung.schnittgroessen.N_Ed.si if ist_moment \
-            else auswertung.schnittgroessen.M_Ed.si
+        ziel = auswertung.achse          # was gesucht wird
+        lauf = ziel.gegen                # was dabei festgehalten bleibt
+        ed = geo.Stelle(N=auswertung.schnittgroessen.N_Ed.si,
+                        M=auswertung.schnittgroessen.M_Ed.si)
+        fest = lauf.von(ed)
 
-        lauf, ziel = ("N", "M") if ist_moment else ("M", "N")
-        e_lauf = r"\mathrm{kN}" if ist_moment else r"\mathrm{kNm}"
-        e_ziel = r"\mathrm{kNm}" if ist_moment else r"\mathrm{kN}"
+        e_lauf = rf"\mathrm{{{lauf.einheit.name}}}"
+        e_ziel = rf"\mathrm{{{ziel.einheit.name}}}"
 
-        p.text(
-            f"Der Bemessungspunkt liegt zwischen den Eckpunkten "
-            f"«{a.name}» und «{b.name}». Dazwischen verläuft die Linie "
-            f"geradlinig, der Widerstand folgt also durch lineare Interpolation."
-        )
         p.gleichung(
-            rf"{ziel}_{{Rd}} = {ziel}_1 + \frac{{{lauf}_{{Ed}} - {lauf}_1}}"
-            rf"{{{lauf}_2 - {lauf}_1}} \cdot \left({ziel}_2 - {ziel}_1\right)"
+            rf"{ziel.name}_{{Rd}} = {ziel.name}_1 + "
+            rf"\frac{{{lauf.name}_{{Ed}} - {lauf.name}_1}}"
+            rf"{{{lauf.name}_2 - {lauf.name}_1}} \cdot "
+            rf"\left({ziel.name}_2 - {ziel.name}_1\right)"
             "\n= "
-            rf"{ziel_a / 1e3:.1f} + \frac{{{stelle / 1e3:.1f} - {lauf_a / 1e3:.1f}}}"
-            rf"{{{lauf_b / 1e3:.1f} - {lauf_a / 1e3:.1f}}} \cdot "
-            rf"\left({ziel_b / 1e3:.1f} - {ziel_a / 1e3:.1f}\right)"
-            rf" = {auswertung.rd / 1e3:.1f}\,{e_ziel}",
-            titel=(f"Widerstand bei festgehaltenem {lauf}_Ed = "
-                   f"{stelle / 1e3:.1f} {'kN' if ist_moment else 'kNm'}"),
+            rf"{_k(ziel.von(a))} + "
+            rf"\frac{{{_k(fest)} - {_klammer(lauf.von(a))}}}"
+            rf"{{{_k(lauf.von(b))} - {_klammer(lauf.von(a))}}} \cdot "
+            rf"\left({_k(ziel.von(b))} - {_klammer(ziel.von(a))}\right)"
+            rf" = {_k(auswertung.rd)}\,{e_ziel}",
+            titel=(f"Widerstand bei festgehaltenem {lauf.name}_Ed = "
+                   f"{_k(fest)} {lauf.einheit.name}"),
         )
         p.tabelle(
-            kopf=[r"\text{Punkt}", rf"{lauf}\ [{e_lauf}]", rf"{ziel}\ [{e_ziel}]"],
+            kopf=[r"\text{Punkt}", rf"{lauf.name}\ [{e_lauf}]",
+                  rf"{ziel.name}\ [{e_ziel}]"],
             zeilen=[
-                [als_text(a.name), f"{lauf_a / 1e3:.1f}", f"{ziel_a / 1e3:.1f}"],
-                [als_text(b.name), f"{lauf_b / 1e3:.1f}", f"{ziel_b / 1e3:.1f}"],
+                [q.symbol, _k(lauf.von(q)), _k(ziel.von(q))]
+                for q in (a, b)
             ],
             titel="Stützpunkte der Interpolation",
             ausrichtung="lrr",
@@ -832,6 +833,28 @@ class BiegungNormalkraft(Nachweis):
 
 def _kennung(text: str) -> str:
     return "".join(z if z.isalnum() else "_" for z in text)
+
+
+def _k(si_wert: float) -> str:
+    """Ein SI-Wert in Kilo-Einheiten, eine Nachkommastelle."""
+    return f"{si_wert / 1e3:.1f}"
+
+
+def _klammer(si_wert: float) -> str:
+    """
+    Wie :func:`_k`, aber negative Werte in Klammern.
+
+    Steht ein negativer Wert hinter einem Minuszeichen, ergaebe sich sonst
+    ``100.0 - -6000.0``. Mit Klammern liest es sich als das, was es ist.
+    """
+    text = _k(si_wert)
+    return f"\\left({text}\\right)" if si_wert < 0 else text
+
+
+def _in(si_wert: float, achse: geo.Achse) -> str:
+    """Ein SI-Wert in der Einheit seiner Achse, mit Einheitenzeichen."""
+    g = Groesse.aus_si(si_wert, achse.einheit)
+    return f"{g.formatiert(1)} {achse.einheit.name}"
 
 
 def _kn(si_wert: float) -> str:
