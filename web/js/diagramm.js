@@ -20,6 +20,9 @@ const RAND = { oben: 22, rechts: 22, unten: 46, links: 74 };
 /** Farbe des vereinfachten Verlaufs -- grün, wie verlangt. */
 const GRUEN = '#16794a';
 
+/** Die genaue Resistenzlinie: zurückhaltend, sie ist nur Vergleich. */
+const GENAU = '#8895a8';
+
 function svgEl(name, attribute = {}) {
   const knoten = document.createElementNS(NR, name);
   for (const [k, v] of Object.entries(attribute)) {
@@ -205,10 +208,11 @@ export function querschnittZeichnen(eintrag, werte) {
 
 export function diagrammZeichnen(linie) {
   const punkte = linie.punkte;
+  const hand = linie.handpunkte || [];
   if (!punkte?.length) return el('div.leer', { text: 'Keine Resistenzlinie vorhanden.' });
 
-  const alleM = punkte.map((p) => p.M);
-  const alleN = punkte.map((p) => p.N);
+  const alleM = [...punkte, ...hand].map((p) => p.M);
+  const alleN = [...punkte, ...hand].map((p) => p.N);
   for (const k of linie.kombinationen) { alleM.push(k.M_Ed); alleN.push(k.N_Ed); }
 
   const spielraum = 0.08;
@@ -275,12 +279,33 @@ export function diagrammZeichnen(linie) {
     }));
   }
 
-  // -- Resistenzlinie ------------------------------------------------------
+  // -- Die beiden Resistenzlinien ------------------------------------------
+  // Die genaue Linie ist nur Vergleich: dünn, ohne Füllung. Gefüllt und kräftig
+  // ist das Polygon aus der Handrechnung -- das ist die Linie, gegen die
+  // nachgewiesen wird, und sie soll den Blick auf sich ziehen.
   svg.append(svgEl('polygon', {
     points: punkte.map((p) => `${x(p.M).toFixed(2)},${y(p.N).toFixed(2)}`).join(' '),
-    fill: 'rgba(31,95,168,.07)', stroke: '#1f5fa8', 'stroke-width': 2,
-    'stroke-linejoin': 'round',
+    fill: 'none', stroke: GENAU, 'stroke-width': 1.3,
+    'stroke-dasharray': '6 3', 'stroke-linejoin': 'round', opacity: 0.8,
   }));
+
+  if (hand.length) {
+    svg.append(svgEl('polygon', {
+      points: hand.map((p) => `${x(p.M).toFixed(2)},${y(p.N).toFixed(2)}`).join(' '),
+      fill: 'rgba(31,95,168,.07)', stroke: '#1f5fa8', 'stroke-width': 2,
+      'stroke-linejoin': 'round',
+    }));
+    for (const p of hand) {
+      const ecke = svgEl('circle', {
+        cx: x(p.M), cy: y(p.N), r: 3, fill: '#1f5fa8',
+        stroke: '#fff', 'stroke-width': 1.2,
+      });
+      const t = svgEl('title');
+      t.textContent = `${p.name}\nM = ${p.M.toFixed(1)} kNm, N = ${p.N.toFixed(1)} kN`;
+      ecke.append(t);
+      svg.append(ecke);
+    }
+  }
 
   // -- Bemessungspunkte ----------------------------------------------------
   for (const k of linie.kombinationen) {
@@ -336,7 +361,11 @@ export function diagrammZeichnen(linie) {
   return el('div.diagramm-huelle', {}, [
     svg,
     el('div.mn-legende', {}, [
-      el('span', {}, [el('i', { style: { background: '#1f5fa8' } }), 'Resistenzlinie']),
+      el('span', {}, [el('i', { style: { background: '#1f5fa8' } }),
+        'Resistenzlinie aus Handrechnung (massgebend)']),
+      el('span', {}, [el('i', {
+        style: { background: GENAU, height: '3px', borderRadius: '1px' },
+      }), 'Präzise Resistenzlinie (nur Vergleich)']),
       el('span', {}, [el('i', { style: { background: '#1a7f45' } }), 'erfüllt']),
       el('span', {}, [el('i', { style: { background: '#b3261e' } }), 'nicht erfüllt']),
       el('span', { text: '– – –  gemessener Weg zur Linie' }),

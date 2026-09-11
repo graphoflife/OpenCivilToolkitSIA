@@ -18,6 +18,8 @@
     "opencivil/material/betonstahl.py",
     "opencivil/nachweis/__init__.py",
     "opencivil/nachweis/biegung_normalkraft.py",
+    "opencivil/nachweis/handrechnung.py",
+    "opencivil/nachweis/linie.py",
     "opencivil/nachweis/querkraft.py",
     "opencivil/projekt.py",
     "opencivil/querschnitt/__init__.py",

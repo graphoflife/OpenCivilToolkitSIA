@@ -52,17 +52,20 @@ class TestQuerkraft(unittest.TestCase):
 
     def test_m_rd_wird_bei_der_wirkenden_normalkraft_genommen(self):
         """
-        In eps_v gehört m_Rd(N_Ed), nicht m_Rd(0). Bei Druck liegt der
-        Momentenwiderstand höher, eps_v also tiefer und v_Rd höher --
-        m_Rd(0) anzusetzen wäre auf der falschen Seite konservativ und
-        zudem schlicht eine andere Grösse.
+        In eps_v gehört m_Rd(N_Ed), nicht m_Rd(0) -- es ist schlicht eine
+        andere Grösse.
+
+        Geprüft wird genau das: der angesetzte Widerstand ist der bei der
+        wirkenden Normalkraft. In welche Richtung er dabei vom Wert bei N = 0
+        abweicht, hängt von der Form der Resistenzlinie ab und ist hier nicht
+        die Aussage -- auf dem Polygon der Handrechnung senkt Druck ihn,
+        auf der genauen Linie hebt er ihn.
         """
         projekt = projekt_mit_querkraft()
         projekt.querschnitte[0].kombinationen[0].N_Ed = -300.0
         aufbau, _ = urteile(projekt)
         erg = aufbau.querkraft["q1.x"].ergebnisse[0]
 
-        # Der angesetzte Widerstand ist der bei N_Ed, nicht der bei N = 0.
         nachweis = aufbau.nachweise["q1.x"]
         loesung = aufbau.werk.loese(
             nachweis.d_m_rd[erg.fall.name].id,
@@ -70,9 +73,15 @@ class TestQuerkraft(unittest.TestCase):
         bei_n_ed = loesung.groesse(nachweis.d_m_rd[erg.fall.name].id).in_einheit(KNM)
         bei_null = loesung.groesse(nachweis.d_eckwerte["M_Rd_N0_pos"].id).in_einheit(KNM)
 
-        self.assertGreater(bei_n_ed, bei_null)          # Druck hebt den Widerstand
         self.assertAlmostEqual(erg.m_Rd / 1e3, bei_n_ed, places=3)
         self.assertNotAlmostEqual(erg.m_Rd / 1e3, bei_null, places=1)
+
+        # Und der Wert stimmt mit der Interpolation auf dem Polygon überein --
+        # der Querkraftnachweis rechnet damit auf derselben Linie wie der
+        # M-N-Nachweis, nicht auf einer eigenen.
+        from opencivil.nachweis.linie import schnitte_bei_N
+        erwartet = max(schnitte_bei_N(nachweis.handlinie, -300e3))
+        self.assertAlmostEqual(erg.m_Rd, erwartet, delta=1.0)
 
     def test_dekompressionsmoment(self):
         """m_Dd = |N_Ed| * h / 6 -- bei 300 kN und h = 300 mm also 15 kNm."""

@@ -382,13 +382,24 @@ def _stahlkurve(stoff, wert) -> Optional[dict]:
 
 
 def _linie_dict(nachweis) -> dict:
-    """Die M-N-Interaktionslinie zum Zeichnen -- in kN und kNm."""
+    """
+    Die M-N-Interaktionslinien zum Zeichnen -- in kN und kNm.
+
+    Zwei Linien: die genaue aus Dehnungsebenen (``punkte``) und das Polygon aus
+    der Handrechnung (``handpunkte``). Nachgewiesen wird gegen das Polygon; die
+    genaue Linie steht daneben, damit man sieht, wie viel die Vereinfachung
+    kostet.
+    """
     return {
         "richtung": nachweis.richtung.value,
         "querschnitt": nachweis.querschnitt.name,
         "punkte": [
             {"N": p.N / 1e3, "M": p.M / 1e3, "abschnitt": p.abschnitt}
             for p in nachweis.linie
+        ],
+        "handpunkte": [
+            {"N": p.N / 1e3, "M": p.M / 1e3, "name": p.name}
+            for p in getattr(nachweis, "handlinie", [])
         ],
         "kombinationen": [
             {

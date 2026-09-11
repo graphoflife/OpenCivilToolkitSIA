@@ -16,8 +16,9 @@ from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.material.beton import beton
 from opencivil.material.betonstahl import betonstahl
 from opencivil.nachweis.biegung_normalkraft import (
-    BiegungNormalkraft, Erfuellungsart, Schnittgroessen, _schnitte_bei_N,
+    BiegungNormalkraft, Erfuellungsart, Schnittgroessen,
 )
+from opencivil.nachweis.linie import schnitte_bei_N
 from opencivil.querschnitt.platte import (
     Bewehrungslage, Bewehrungsposten, Plattenquerschnitt, Postenart, Richtung,
 )
@@ -240,7 +241,7 @@ class TestQuerschnitt(unittest.TestCase):
                 qs, [Schnittgroessen("F", M_Ed=Groesse(1, KNM))], Richtung.X)
             werk.registriere(nachweis)
             werk.loese(nachweis.d_eckwerte["M_Rd_max"].id)
-            return max(_schnitte_bei_N(nachweis.linie, 0.0))
+            return max(schnitte_bei_N(nachweis.linie, 0.0))
 
         ohne = m_rd(platte([
             lage(1, Richtung.X, phi=18.0), lage(2, Richtung.Y),
@@ -370,12 +371,12 @@ class TestResistenzlinie(unittest.TestCase):
             x_eff = 737e3 / (20 * 1000)       = 36.9 mm
             M_Rd  = 737 * (261 - 36.9/2)      ≈ 179 kNm
         """
-        momente = _schnitte_bei_N(self.nachweis.linie, 0.0)
+        momente = schnitte_bei_N(self.nachweis.linie, 0.0)
         m_rd = max(momente) / 1e3
         self.assertAlmostEqual(m_rd, 179.0, delta=8.0)
 
     def test_nur_untere_bewehrung_gibt_bei_n_null_kaum_negatives_moment(self):
-        momente = _schnitte_bei_N(self.nachweis.linie, 0.0)
+        momente = schnitte_bei_N(self.nachweis.linie, 0.0)
         self.assertLess(abs(min(momente)) / 1e3, 20.0)
 
     def test_groesstes_moment_liegt_beim_balancepunkt(self):
@@ -387,20 +388,66 @@ class TestResistenzlinie(unittest.TestCase):
         """
         bester = max(self.nachweis.linie, key=lambda punkt: punkt.M)
         self.assertLess(bester.N, 0.0)
-        m_bei_null = max(_schnitte_bei_N(self.nachweis.linie, 0.0))
+        m_bei_null = max(schnitte_bei_N(self.nachweis.linie, 0.0))
         self.assertGreater(bester.M, m_bei_null)
 
-    def test_protokoll_zeigt_den_ablauf(self):
+    def test_protokoll_zeigt_die_handrechnung(self):
+        """
+        Hergeleitet wird die Handrechnung, nicht die genaue Linie.
+
+        Die genaue Linie entsteht aus hunderten Faserintegrationen; sie in die
+        Mitschrift zu schreiben hiesse, Zeilen zu liefern, die niemand
+        nachrechnen kann. Sie steht nur noch zum Vergleich im Diagramm.
+        """
         from opencivil.core.protokoll import GleichungBlock, TabellenBlock
 
         bloecke = list(self.loesung.protokoll.alle_bloecke())
         titel = [b.titel for b in bloecke if isinstance(b, TabellenBlock)]
-        self.assertIn("Stützstellen des Dehnungsfächers", titel)
-        self.assertIn("Berücksichtigte Bewehrungslagen", titel)
-        self.assertIn("Eckwerte der Resistenzlinie", titel)
+        self.assertIn("Zusammengefasste Bewehrung", titel)
+        self.assertIn("Eckpunkte der Resistenzlinie aus Handrechnung", titel)
+
+        # Die Herleitung der genauen Linie ist stillgelegt.
+        self.assertNotIn("Stützstellen des Dehnungsfächers", titel)
         gleichungen = [b.latex for b in bloecke if isinstance(b, GleichungBlock)]
-        self.assertTrue(any(r"\sigma_c" in g for g in gleichungen))
-        self.assertTrue(any(r"\int_A" in g for g in gleichungen))
+        self.assertFalse(any(r"\int_A" in g for g in gleichungen),
+                         "die Faserintegration gehört nicht mehr in die Mitschrift")
+
+    def test_protokoll_zeigt_die_formeln_der_eckpunkte(self):
+        """Jeder Eckpunkt muss mit seiner Formel dastehen, nicht nur als Zahl."""
+        from opencivil.core.protokoll import GleichungBlock
+
+        titel = [b.titel for b in self.loesung.protokoll.alle_bloecke()
+                 if isinstance(b, GleichungBlock)]
+        for erwartet in (
+            "Gleichmässiger Druck, ohne Bewehrung",
+            "Beide Lagen fliessen auf Zug",
+            "Druckzonenhöhe aus dem Kräftegleichgewicht",
+            "Momentenwiderstand bei reiner Biegung",
+        ):
+            with self.subTest(titel=erwartet):
+                self.assertIn(erwartet, titel)
+
+    def test_protokoll_zeigt_die_interpolation(self):
+        """Der Widerstand darf nicht vom Himmel fallen."""
+        from opencivil.core.protokoll import GleichungBlock, TabellenBlock
+
+        bloecke = list(self.loesung.protokoll.alle_bloecke())
+        self.assertIn("Stützpunkte der Interpolation",
+                      [b.titel for b in bloecke if isinstance(b, TabellenBlock)])
+        self.assertTrue(any(
+            isinstance(b, GleichungBlock) and "Widerstand bei festgehaltenem" in b.titel
+            for b in bloecke))
+
+    def test_der_massstab_steht_nicht_in_der_mitschrift(self):
+        """
+        Ob waagrecht oder senkrecht gemessen wird, ist eine Festlegung und
+        kein Rechenschritt -- sie gehört nicht in die Herleitung.
+        """
+        from opencivil.core.protokoll import TextBlock
+
+        texte = " ".join(b.text for b in self.loesung.protokoll.alle_bloecke()
+                         if isinstance(b, TextBlock))
+        self.assertNotIn("Massgebender Massstab", texte)
 
 
 class TestSymmetrisch(unittest.TestCase):
@@ -455,10 +502,39 @@ class TestErfuellungsgrad(unittest.TestCase):
             k.name: loesung.groesse(nachweis.d_ausnutzung[k.name].id).in_einheit(EINHEITSLOS)
             for k in kombinationen
         }
-        # Druck erhöht den Momentenwiderstand, Zug verringert ihn -- beim
-        # Erfüllungsgrad also genau umgekehrt zur früheren Ausnutzung.
-        self.assertGreater(eta["Feld_mit_Druck"], eta["Feld"])
+        # Zug verringert den Momentenwiderstand -- auf beiden Linien.
         self.assertLess(eta["Feld_mit_Zug"], eta["Feld"])
+        # Druck ebenfalls, sobald der Eckpunkt 0.85x = h/2 wegfällt: dann läuft
+        # das Polygon geradlinig vom reinen Druck zum Punkt bei N = 0 und hat
+        # keinen Bauch mehr. Siehe test_handrechnung_verliert_den_bauch.
+        self.assertLess(eta["Feld_mit_Druck"], eta["Feld"])
+
+    def test_handrechnung_verliert_den_bauch(self):
+        """
+        Die Handrechnung ist auf der Druckseite deutlich konservativer.
+
+        Die genaue Linie hat unter Druck einen Bauch: eine Normaldruckkraft
+        vergrössert den Momentenwiderstand, bis die Druckzone zu gross wird.
+        Das Polygon aus der Handrechnung kann das nur abbilden, wenn der
+        Eckpunkt bei 0.85x = h/2 gültig ist -- also wenn die Zugbewehrung dort
+        noch fliesst. Bei dieser dünnen Platte tut sie das nicht, der Eckpunkt
+        entfällt, und das Polygon läuft geradlinig zum reinen Druck.
+
+        Das ist kein Fehler, sondern der Preis der Nachvollziehbarkeit. Der
+        Test hält ihn fest, damit die Abweichung nicht eines Tages als Bug
+        gilt oder unbemerkt verschwindet.
+        """
+        nachweis, _ = self._pruefe(
+            [Schnittgroessen("Druck", M_Ed=Groesse(100, KNM), N_Ed=Groesse(-200, KN))])
+
+        genau = max(nachweis.linie, key=lambda punkt: punkt.M)
+        self.assertLess(genau.N, 0.0, "die genaue Linie hat ihren Bauch unter Druck")
+
+        hand = max(nachweis.handlinie, key=lambda punkt: punkt.M)
+        self.assertAlmostEqual(hand.N, 0.0, places=6,
+                               msg="ohne gültigen Eckpunkt liegt das Maximum bei N = 0")
+        self.assertLess(max(p.M for p in nachweis.handlinie),
+                        max(p.M for p in nachweis.linie))
 
     def test_alle_drei_massstaebe_liefern_ein_ergebnis(self):
         kombinationen = [
