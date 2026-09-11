@@ -29,6 +29,109 @@ class TestProjektBeschreibung(unittest.TestCase):
         kopie = Projekt.aus_dict(json.loads(json.dumps(original.als_dict())))
         self.assertEqual(kopie.als_dict(), original.als_dict())
 
+
+class TestVollstaendigeAblage(unittest.TestCase):
+    """
+    Die .json-Datei muss das *ganze* Projekt enthalten.
+
+    Sie ist das einzige, was der Benutzer in der Hand hat: im Browser abgelegt,
+    heruntergeladen, weitergegeben, in einem Jahr wieder geöffnet. Fehlt darin
+    ein Feld, ist die Arbeit daran still verloren -- und zwar erst beim
+    Öffnen, lange nachdem man es hätte merken können.
+    """
+
+    def test_kein_feld_faellt_beim_speichern_unter_den_tisch(self):
+        """
+        Jedes Feld der Beschreibungsklassen muss in als_dict() auftauchen.
+
+        Das ist der Wächter gegen den wahrscheinlichsten Fehler: jemand hängt
+        ein Feld an eine dataclass und vergisst als_dict/aus_dict. Ohne diesen
+        Test bliebe das bis zum ersten verlorenen Projekt unbemerkt.
+        """
+        import dataclasses
+
+        beispiele = {
+            MaterialEintrag: MaterialEintrag("b1", "beton", "C30/37", "C30/37"),
+            PostenEintrag: PostenEintrag(durchmesser=16.0, abstand=150.0),
+            LageEintrag: LageEintrag(stahl="s1"),
+            KombinationEintrag: KombinationEintrag("Feld", M_Ed=100.0),
+            QuerschnittEintrag: QuerschnittEintrag("q1", "Platte", "b1"),
+        }
+        for klasse, beispiel in beispiele.items():
+            with self.subTest(klasse=klasse.__name__):
+                felder = {f.name for f in dataclasses.fields(klasse)}
+                gespeichert = set(beispiel.als_dict())
+                self.assertEqual(
+                    felder - gespeichert, set(),
+                    f"{klasse.__name__}: diese Felder überleben das Speichern nicht")
+
+    def test_ganzes_projekt_ueberlebt_die_datei(self):
+        """Zwei Materialien, zwei Platten, nichts auf den Vorgabewerten."""
+        projekt = Projekt(
+            name="Mehrteilig",
+            materialien=[
+                MaterialEintrag("b1", "beton", "C30/37", "C30/37"),
+                MaterialEintrag("b2", "beton", "C25/30", "C25/30_1",
+                                eigenstaendig=True,
+                                abweichungen={"f_ck": 27.0},
+                                ueberschreibungen={"f_cd": 15.0}),
+                MaterialEintrag("s1", "betonstahl", "B500B", "B500B"),
+                MaterialEintrag("s2", "betonstahl", "B700B", "B700B"),
+            ],
+            querschnitte=[
+                QuerschnittEintrag(
+                    "q1", "Decke", "b1", h=280.0, b=1000.0,
+                    ueberdeckung_unten=25.0, ueberdeckung_oben=35.0,
+                    d_max=16.0, einlagenhoehe=40.0,
+                    richtung_lage1="y", richtung_lage4="y",
+                    lagen=[
+                        LageEintrag(
+                            stahl="s1",
+                            grund=PostenEintrag(durchmesser=20.0, abstand=125.0),
+                            zulage=PostenEintrag(durchmesser=14.0, anzahl=6.0)),
+                        LageEintrag(stahl="s2",
+                                    grund=PostenEintrag(durchmesser=12.0, abstand=200.0)),
+                        LageEintrag(stahl="s1"),
+                        LageEintrag(stahl="s2",
+                                    grund=PostenEintrag(durchmesser=10.0, abstand=150.0)),
+                    ],
+                    kombinationen=[
+                        KombinationEintrag("Feld", 120.0, -50.0, 80.0,
+                                           art="M_konstant", richtung="x"),
+                        KombinationEintrag("Stütze", -90.0, 0.0, 140.0,
+                                           art="naechster_Punkt", richtung="y"),
+                    ]),
+                QuerschnittEintrag(
+                    "q2", "Wand", "b2", h=200.0, b=1000.0,
+                    lagen=[LageEintrag(stahl="s2",
+                                       grund=PostenEintrag(durchmesser=10.0, abstand=100.0))],
+                    kombinationen=[KombinationEintrag("Wind", 30.0, -400.0)]),
+            ])
+
+        # Genau der Weg der echten Datei: nach JSON und zurück.
+        text = json.dumps(projekt.als_dict(), ensure_ascii=False, indent=2)
+        kopie = Projekt.aus_dict(json.loads(text))
+
+        self.assertEqual(kopie.als_dict(), projekt.als_dict())
+        self.assertEqual(len(kopie.materialien), 4)
+        self.assertEqual(len(kopie.querschnitte), 2)
+        # Stichproben an Stellen, die leicht verloren gingen:
+        self.assertEqual(kopie.material("b2").ueberschreibungen, {"f_cd": 15.0})
+        self.assertEqual(kopie.querschnitt("q1").einlagenhoehe, 40.0)
+        self.assertEqual(kopie.querschnitt("q1").richtung_lage1, "y")
+        self.assertEqual(kopie.querschnitt("q1").lagen[0].zulage.anzahl, 6.0)
+        self.assertEqual(kopie.querschnitt("q1").kombinationen[1].art, "naechster_Punkt")
+        self.assertEqual(kopie.querschnitt("q1").kombinationen[0].V_Ed, 80.0)
+        self.assertEqual(kopie.querschnitt("q2").lagen[0].stahl, "s2")
+
+    def test_die_datei_geht_auch_durch_den_dienst(self):
+        """Was gespeichert wurde, muss der Kern beim Öffnen wieder annehmen."""
+        projekt = Projekt.beispiel()
+        aus_datei = json.loads(json.dumps(projekt.als_dict()))
+        antwort = dienst.bearbeite("pruefen", {"projekt": aus_datei})
+        self.assertEqual(antwort.status, 200)
+        self.assertEqual(antwort.daten["projekt"], projekt.als_dict())
+
     def test_speichern_und_laden(self):
         with tempfile.TemporaryDirectory() as ordner:
             pfad = Path(ordner) / "unter" / "projekt.json"
