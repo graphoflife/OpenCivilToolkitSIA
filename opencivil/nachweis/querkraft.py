@@ -42,12 +42,15 @@ from opencivil.core.berechnung import (
     Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
 )
 from opencivil.core.einheiten import (
-    EINHEITSLOS, KN_PRO_M, KNM, MM, N_PRO_MM2, Groesse, empirisch,
+    EINHEITSLOS, KN, KN_PRO_M, KNM, MM, N_PRO_MM2, Groesse, empirisch,
 )
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
 from opencivil.querschnitt.platte import Plattenquerschnitt, Richtung
+
+#: Unterer Riegel fuer den Beiwert der Gesteinskoernung.
+K_G_MINDEST = 1.20
 
 
 @dataclass(frozen=True)
@@ -185,28 +188,38 @@ class Querkraft(Nachweis):
 
         self._protokoll_ansatz(p, e)
 
+        D_max = e.g("D_max")
+        f_ck = e.g("f_ck")
         k_g_erg = empirisch(
-            lambda D_max, f_ck: 48.0 / (16.0 + D_max * min(1.0, (60.0 / f_ck) ** 2)),
+            lambda D_max, f_ck: max(
+                K_G_MINDEST, 48.0 / (16.0 + D_max * min(1.0, (60.0 / f_ck) ** 2))),
             ergebnis=EINHEITSLOS,
-            D_max=(e.g("D_max"), MM),
-            f_ck=(e.g("f_ck"), N_PRO_MM2),
+            D_max=(D_max, MM),
+            f_ck=(f_ck, N_PRO_MM2),
         )
         k_g = k_g_erg.wert.si
+        roh = 48.0 / (16.0 + D_max.in_einheit(MM)
+                      * min(1.0, (60.0 / f_ck.in_einheit(N_PRO_MM2)) ** 2))
         p.gleichung(
-            r"k_g = \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ "
-            r"\left(\frac{60}{f_{ck}}\right)^{2}\right]}"
-            rf" = {k_g:.3f}",
+            rf"k_g = \max\left[{K_G_MINDEST:.2f};\ \frac{{48}}"
+            rf"{{16 + D_{{max}} \cdot \min\left[1.0;\ "
+            rf"\left(\frac{{60}}{{f_{{ck}}}}\right)^{{2}}\right]}}\right]"
+            "\n= "
+            rf"\max\left[{K_G_MINDEST:.2f};\ \frac{{48}}"
+            rf"{{16 + {D_max.formatiert(0, MM)} \cdot \min\left[1.0;\ "
+            rf"\left(\frac{{60}}{{{f_ck.formatiert(0, N_PRO_MM2)}}}\right)^{{2}}\right]}}\right]"
+            rf" = \max\left[{K_G_MINDEST:.2f};\ {roh:.3f}\right] = {k_g:.3f}",
             titel="Beiwert der Gesteinskörnung", referenz="SIA 262:2025, 4.3.3.2.1")
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
         self.ergebnisse = []
-        zeilen: List[List[str]] = []
 
         for fall in self.faelle:
             erg = self._einen_fall(fall, h, tau_cd, f_yd, E_s, einlage, k_g,
                                    m_rd[fall.name])
             self.ergebnisse.append(erg)
+            self._protokoll_fall(p, erg, h, tau_cd, f_yd, E_s, einlage, k_g)
 
             ergebnis[self.d_v_rd[fall.name].id] = Groesse.aus_si(erg.v_Rd, KN_PRO_M)
             ergebnis[self.d_grad[fall.name].id] = Groesse(
@@ -222,22 +235,23 @@ class Querkraft(Nachweis):
                     einheit=KN_PRO_M, beschreibung="Einwirkung", stellen=1,
                 ).belegen(fall.V_Ed.als(KN_PRO_M) if fall.V_Ed.dimension == KN_PRO_M.dimension
                           else Groesse.aus_si(fall.V_Ed.si, KN_PRO_M)),
-                widerstand=self.d_v_rd[fall.name].belegen(
-                    Groesse.aus_si(erg.v_Rd, KN_PRO_M)),
+                # Der Widerstand gilt nur unter genau dieser Einwirkung -- das
+                # gehoert ins Symbol, sonst liest sich v_Rd wie ein Kennwert des
+                # Querschnitts.
+                widerstand=WertDef(
+                    id=self.d_v_rd[fall.name].id,
+                    symbol=self._widerstandssymbol(fall),
+                    einheit=KN_PRO_M, beschreibung="Widerstand", stellen=1,
+                ).belegen(Groesse.aus_si(erg.v_Rd, KN_PRO_M)),
             ))
 
-            zeilen.append([
-                als_text(fall.name),
-                f"{erg.d * 1e3:.0f}", f"{erg.d_v * 1e3:.0f}",
-                f"{erg.eps_v * 1e3:.3f}", f"{erg.k_d:.3f}",
-                f"{erg.v_Rd / 1e3:.1f}",
-            ])
-
-        p.tabelle(
-            kopf=[r"\text{Fall}", r"d\ [\mathrm{mm}]", r"d_v\ [\mathrm{mm}]",
-                  r"\varepsilon_v\ [\text{‰}]", r"k_d", r"v_{Rd}\ [\mathrm{kN/m}]"],
-            zeilen=zeilen, titel="Querkraftwiderstand je Fall", ausrichtung="lrrrrr")
         return ergebnis, urteile
+
+    def _widerstandssymbol(self, fall: Querkraftfall) -> str:
+        """``v_Rd(M_Ed = 100 kNm, N_Ed = -300 kN)`` -- der Widerstand ist bedingt."""
+        r = self.richtung.value
+        return (rf"v_{{Rd,{r}}}(M_{{Ed}} = {fall.M_Ed.als_latex(1, KNM)},\ "
+                rf"N_{{Ed}} = {fall.N_Ed.als_latex(1, KN)})")
 
     def _einen_fall(
         self, fall: Querkraftfall, h: float, tau_cd: Groesse,
@@ -260,7 +274,9 @@ class Querkraft(Nachweis):
                 f"Querkraftbewehrung wird v_Rd = 0 gesetzt.")
             return erg
 
-        erg.m_Dd = abs(N_Ed) * h / 6.0
+        # Nur Druck entlastet. Eine Zugkraft hat hier nichts zu suchen -- und
+        # kommt ohnehin nicht bis hierher, siehe oben.
+        erg.m_Dd = abs(min(N_Ed, 0.0)) * h / 6.0
         erg.m_Rd = m_Rd
         zaehler = abs(M_Ed) - erg.m_Dd
         nenner = m_Rd - erg.m_Dd
@@ -320,7 +336,109 @@ class Querkraft(Nachweis):
             r"k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g}",
             titel="Ansatz", referenz="SIA 262:2025, 4.3.3.2.1")
         p.gleichung(
-            r"m_{Dd} = \frac{|N_{Ed}| \cdot h}{6} \qquad "
+            r"m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} \qquad "
             r"\varepsilon_v = \frac{f_{yd} \cdot (m_{Ed} - m_{Dd})}"
             r"{E_s \cdot \left(m_{Rd}(N_{Ed}) - m_{Dd}\right)}",
             titel="Dekompressionsmoment und Dehnung")
+        p.text(
+            "Nur eine Normaldruckkraft entlastet; eine Zugkraft bleibt beim "
+            "Dekompressionsmoment unberücksichtigt. Da der Widerstand über "
+            "m_Ed und N_Ed von der Einwirkung abhängt, wird er für jede "
+            "Kombination einzeln bestimmt."
+        )
+
+    def _protokoll_fall(
+        self, p: Protokoll, erg: Querkraftergebnis, h: float, tau_cd: Groesse,
+        f_yd: float, E_s: float, einlage: float, k_g: float,
+    ) -> None:
+        """
+        Die vollstaendige Rechnung eines Falls, mit Zahlen in jeder Zeile.
+
+        Frueher stand hier nur der Ansatz und eine Ergebnistabelle -- damit war
+        der Querkraftwiderstand die einzige Zahl im ganzen Werkzeug, die man
+        nicht nachrechnen konnte.
+        """
+        fall = erg.fall
+        r = self.richtung.value
+        M_Ed, N_Ed = fall.M_Ed.si, fall.N_Ed.si
+
+        p.titel(f"Querkraftnachweis – {fall.name}", ebene=3)
+        p.gleichung(
+            rf"V_{{Ed}} = {fall.V_Ed.als_latex(1, KN_PRO_M)} \qquad "
+            rf"M_{{Ed}} = {fall.M_Ed.als_latex(1, KNM)} \qquad "
+            rf"N_{{Ed}} = {fall.N_Ed.als_latex(1, KN)}",
+            titel="Einwirkung")
+
+        if N_Ed > 0:
+            p.text(erg.begruendung)
+            return
+
+        seite = "unten" if M_Ed >= 0 else "oben"
+        p.gleichung(
+            rf"d = {erg.d * 1e3:.1f}\,\mathrm{{mm}}"
+            rf"\qquad \text{{(Zug {seite})}}",
+            titel="Statische Höhe der gezogenen Bewehrung")
+
+        if erg.d_v < erg.d:
+            p.gleichung(
+                rf"d_v = d - e_{{Einlage}} = {erg.d * 1e3:.1f}\,\mathrm{{mm}} - "
+                rf"{einlage * 1e3:.1f}\,\mathrm{{mm}} = {erg.d_v * 1e3:.1f}\,\mathrm{{mm}}",
+                titel="Wirksame Höhe, um die Einlage vermindert")
+        else:
+            p.gleichung(
+                rf"d_v = d = {erg.d_v * 1e3:.1f}\,\mathrm{{mm}}",
+                titel="Wirksame Höhe (Einlage nicht massgebend)")
+
+        p.gleichung(
+            r"m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6}"
+            rf" = \frac{{\left|{min(N_Ed, 0.0) / 1e3:.1f}\right| \cdot "
+            rf"{h * 1e3:.0f}\,\mathrm{{mm}}}}{{6}}"
+            rf" = {erg.m_Dd / 1e3:.1f}\,\mathrm{{kNm/m}}",
+            titel="Dekompressionsmoment")
+
+        if erg.v_Rd == 0.0 and erg.begruendung:
+            p.text(erg.begruendung)
+            return
+
+        if erg.eps_v == 0.0:
+            p.text(
+                f"m_Ed = {abs(M_Ed) / 1e3:.1f} kNm/m liegt nicht über "
+                f"m_Dd = {erg.m_Dd / 1e3:.1f} kNm/m – der Querschnitt bleibt "
+                f"ungerissen, ε_v = 0.")
+        else:
+            p.gleichung(
+                r"\varepsilon_v = \frac{f_{yd} \cdot (m_{Ed} - m_{Dd})}"
+                r"{E_s \cdot \left(m_{Rd}(N_{Ed}) - m_{Dd}\right)}"
+                "\n= "
+                rf"\frac{{{f_yd / 1e6:.0f} \cdot \left({abs(M_Ed) / 1e3:.1f} - "
+                rf"{erg.m_Dd / 1e3:.1f}\right)}}"
+                rf"{{{E_s / 1e6:.0f} \cdot \left({erg.m_Rd / 1e3:.1f} - "
+                rf"{erg.m_Dd / 1e3:.1f}\right)}}"
+                rf" = {erg.eps_v * 1e3:.3f}\,\text{{‰}}",
+                titel="Dehnung auf halber Höhe")
+
+        p.gleichung(
+            r"k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g}"
+            rf" = \frac{{1}}{{1 + {erg.eps_v * 1e3:.4f} \cdot 10^{{-3}} \cdot "
+            rf"{erg.d * 1e3:.1f} \cdot {k_g:.3f}}} = {erg.k_d:.4f}",
+            titel="Beiwert für die statische Höhe")
+
+        p.gleichung(
+            rf"{self._widerstandssymbol(fall)} = k_d \cdot \tau_{{cd}} \cdot d_v"
+            "\n= "
+            rf"{erg.k_d:.4f} \cdot {tau_cd.in_einheit(N_PRO_MM2):.4f}\,"
+            rf"\mathrm{{N}}/\mathrm{{mm}}^{{2}} \cdot {erg.d_v * 1e3:.1f}\,\mathrm{{mm}}"
+            rf" = {erg.v_Rd / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}}",
+            titel="Querkraftwiderstand", referenz="SIA 262:2025, 4.3.3.2.1")
+
+        zustand = r"\text{erfüllt}" if erg.erfuellt else r"\text{NICHT erfüllt}"
+        grad = (r"\infty" if math.isinf(erg.erfuellungsgrad)
+                else f"{erg.erfuellungsgrad:.2f}")
+        p.gleichung(
+            rf"\alpha_{{eff,V,{r}}} = \frac{{v_{{Rd}}}}{{V_{{Ed}}}} = "
+            rf"\frac{{{erg.v_Rd / 1e3:.1f}}}{{{abs(fall.V_Ed.si) / 1e3:.1f}}} = {grad}"
+            rf" \quad \Rightarrow \quad {zustand}"
+            if fall.V_Ed.si else
+            rf"\alpha_{{eff,V,{r}}} = \frac{{v_{{Rd}}}}{{V_{{Ed}}}} = {grad}"
+            rf" \quad \Rightarrow \quad {zustand}",
+            titel="Erfüllungsgrad")

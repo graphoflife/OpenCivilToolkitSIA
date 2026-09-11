@@ -26,20 +26,54 @@ def urteile(projekt: Projekt):
 class TestQuerkraft(unittest.TestCase):
     def test_handrechnung(self):
         """
-        Feld, x-Richtung, M_Ed = 100 kNm, N_Ed = 0:
+        Feld, x-Richtung, M_Ed = 100 kNm/m, N_Ed = 0, von Hand nachgerechnet:
 
             d     = 264 mm            (Zulage ⌀12 auf der Hülle der 1. Lage)
-            k_g   = 48/(16+32*1)      = 1.0
-            eps_v = 434.8*100/(200000*252.4)  = 0.861 ‰
-            k_d   = 1/(1+0.861e-3*264*1.0)    = 0.815
-            tau_cd= 0.3*sqrt(30)/1.5          = 1.095 N/mm^2
-            v_Rd  = 0.815*1.095*264           = 236 kN/m
+            k_g   = max(1.20; 48/(16+32·1))   = 1.200   ← der Riegel greift
+            m_Rd  = 250.7 kNm/m       (Handrechnung bei N_Ed = 0)
+            eps_v = 434.8·100/(200000·250.7)  = 0.867 ‰
+            k_d   = 1/(1+0.867e-3·264·1.200)  = 0.7845
+            tau_cd= 0.3·sqrt(30)/1.5          = 1.095 N/mm²
+            v_Rd  = 0.7845·1.095·264          = 226.9 kN/m
         """
         aufbau, gefunden = urteile(projekt_mit_querkraft())
         erg = aufbau.querkraft["q1.x"].ergebnisse[0]
         self.assertAlmostEqual(erg.d * 1e3, 264.0, places=6)
-        self.assertAlmostEqual(erg.k_d, 0.815, places=2)
-        self.assertAlmostEqual(erg.v_Rd / 1e3, 235.6, delta=1.0)
+        self.assertAlmostEqual(erg.eps_v * 1e3, 0.867, places=3)
+        self.assertAlmostEqual(erg.k_d, 0.7845, places=4)
+        self.assertAlmostEqual(erg.v_Rd / 1e3, 226.9, delta=0.2)
+
+    def test_k_g_hat_einen_unteren_riegel(self):
+        """
+        k_g = max(1.20; 48/(16 + D_max · …)).
+
+        Ohne den Riegel ergäbe D_max = 32 mm bei C30/37 genau 1.0; der Riegel
+        hebt das auf 1.20 und senkt damit k_d -- er liegt auf der sicheren
+        Seite.
+        """
+        from opencivil.nachweis.querkraft import K_G_MINDEST
+
+        aufbau, _ = urteile(projekt_mit_querkraft())
+        nachweis = aufbau.querkraft["q1.x"]
+        # Der Beiwert steckt in k_d; rückgerechnet muss er den Riegel treffen.
+        erg = nachweis.ergebnisse[0]
+        k_g = (1.0 / erg.k_d - 1.0) / (erg.eps_v * erg.d * 1e3)
+        self.assertAlmostEqual(k_g, K_G_MINDEST, places=6)
+        self.assertAlmostEqual(K_G_MINDEST, 1.20)
+
+    def test_zug_zaehlt_beim_dekompressionsmoment_nicht(self):
+        """
+        m_Dd = |min(N_Ed; 0)| · h/6 -- eine Zugkraft entlastet nicht.
+
+        Geprüft an der Formel selbst, weil eine Normalzugkraft den
+        Querkraftnachweis ohnehin ausschliesst und m_Dd dann gar nicht mehr
+        gebraucht wird.
+        """
+        h = 0.3
+        fuer = lambda N: abs(min(N, 0.0)) * h / 6.0
+        self.assertAlmostEqual(fuer(-300e3), 300e3 * 0.3 / 6)   # Druck zählt
+        self.assertEqual(fuer(+300e3), 0.0)                      # Zug nicht
+        self.assertEqual(fuer(0.0), 0.0)
 
     def test_zugkraft_schliesst_den_widerstand_aus(self):
         projekt = projekt_mit_querkraft()
