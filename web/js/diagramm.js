@@ -68,52 +68,88 @@ export function beschriftungenEntzerren(zettel, abstand, oben, unten) {
 /**
  * Wo die Stäbe eines Postens über die Breite liegen, in Millimetern.
  *
- * Mit Teilung `s` ergibt sich die Stabzahl aus `b / s` -- gezeichnet wird also
- * die eingegebene Teilung und nicht eine erfundene Anzahl. Die Stäbe werden
- * anschliessend gleichmässig über `b` verteilt, damit das Bild bei einer
- * Teilung, die nicht glatt aufgeht, nicht einseitig ausfranst.
+ * Gezeichnet wird die **echte Teilung**: der Abstand zwischen zwei Stäben im
+ * Bild ist derselbe, der eingegeben wurde. Eine Zulage mit ⌀12@250 steht damit
+ * sichtbar weiter auseinander als eine Grundbewehrung mit ⌀16@150.
  *
- * `versatz` verschiebt die ganze Reihe um einen Anteil der Teilung. Damit
- * kommt die Zulage zwischen die Grundstäbe, so wie sie auch eingelegt wird.
+ * Das war einmal anders gelöst -- die Stäbe wurden gleichmässig über `b`
+ * verteilt. Dann sahen 150 und 140 gleich aus, weil beide auf dieselbe Stabzahl
+ * führten und die Zeichnung nur die Zahl kannte, nicht den Abstand.
+ *
+ * Die Reihe wird in der Breite mittig gesetzt, damit sie nicht einseitig
+ * ausfranst, wenn die Teilung nicht glatt aufgeht.
+ *
+ * `zwischen` setzt die Reihe in die Lücken der anderen: einen Stab weniger,
+ * dadurch rückt sie um eine halbe Teilung ein. So wird die Zulage auch wirklich
+ * eingelegt. Der Preis ist ein gezeichneter Stab weniger als `b / s` -- in
+ * einem Schnittbild ist das verschmerzbar, und die genaue Menge steht ohnehin
+ * als Text daneben.
  */
-export function stabstellen(breite, bewehrung, versatz = 0) {
-  const teilung = bewehrung.abstand;
-  const anzahl = teilung > 0
-    ? Math.max(1, Math.round(breite / teilung))
-    : Math.max(1, Math.round(bewehrung.anzahl || 0));
-  if (!Number.isFinite(anzahl) || anzahl < 1) return [];
+export function stabstellen(breite, bewehrung) {
+  const teilung = bewehrung.abstand > 0
+    ? bewehrung.abstand
+    : breite / Math.max(1, Math.round(bewehrung.anzahl || 0));
+  if (!(teilung > 0) || !Number.isFinite(teilung)) return [];
 
-  const schritt = breite / anzahl;
-  const stellen = [];
-  for (let i = 0; i < anzahl; i++) {
-    const mm = (i + 0.5 + versatz) * schritt;
-    // Was über den Rand hinausrutscht, wandert an den Anfang -- die Anzahl
-    // bleibt so richtig, und die Reihe bleibt gleichmässig.
-    stellen.push(((mm % breite) + breite) % breite);
-  }
-  return stellen.sort((a, b) => a - b);
+  const anzahl = Math.max(1, Math.round(breite / teilung));
+  const spanne = (anzahl - 1) * teilung;
+  const anfang = (breite - spanne) / 2;
+  return Array.from({ length: anzahl }, (_, i) => anfang + i * teilung);
 }
 
 /**
- * Rückt einen Stab zur Seite, bis er keinen schon gezeichneten mehr berührt.
+ * Verschiebt eine ganze Stabreihe so, dass sie den vorhandenen am besten ausweicht.
  *
- * Bei gleicher Teilung genügt der halbe Versatz aus `stabstellen`. Sind die
- * Teilungen von Grund und Zulage verschieden, treffen sich einzelne Stäbe
- * trotzdem -- dann wird hier nachgeholfen. Das verschiebt die Zeichnung um
- * wenige Zehntelmillimeter und ist allemal besser als zwei Kreise, die
- * übereinander liegen und wie einer aussehen.
+ * Die Reihe wird **als Ganzes** gerückt, nie einzelne Stäbe. Das ist der
+ * Unterschied, auf den es ankommt: einzeln zu rücken hielte zwar alle Kreise
+ * auseinander, verböge aber die Teilung -- eine Zulage mit ⌀12@250 sähe dann
+ * aus wie ⌀12@267. Die Teilung ist aber genau das, was man im Bild ablesen
+ * können soll.
+ *
+ * Gesucht wird der Versatz mit dem grössten Abstand zum nächsten vorhandenen
+ * Stab, innerhalb dessen, was der Rand hergibt. Bei gleicher Teilung kommt
+ * dabei von selbst die halbe Teilung heraus -- die Zulage landet in den Lücken,
+ * so wie sie auch eingelegt wird.
+ *
+ * @param {number[]} stellen      Sollstellen der neuen Reihe, in mm
+ * @param {number[]} vorhanden    Stellen der schon gezeichneten Reihen, in mm
+ * @param {number}   spielraum    wie weit die Reihe höchstens rücken darf, in mm
  */
-export function ausweichen(px, py, r, gesetzt, luft = 1.0) {
-  let stelle = px;
-  for (let versuch = 0; versuch < 12; versuch++) {
-    const stoerer = gesetzt.find((g) =>
-      Math.abs(g.y - py) < g.r + r
-      && Math.abs(g.x - stelle) < g.r + r + luft);
-    if (!stoerer) break;
-    const noetig = stoerer.r + r + luft;
-    stelle = stelle >= stoerer.x ? stoerer.x + noetig : stoerer.x - noetig;
+export function besterVersatz(stellen, vorhanden, spielraum, schritte = 48) {
+  if (!stellen.length || !vorhanden.length || spielraum <= 0) return 0;
+
+  const abstandBei = (versatz) => Math.min(...stellen.map((s) =>
+    Math.min(...vorhanden.map((v) => Math.abs(s + versatz - v)))));
+
+  let bester = 0;
+  let weiteste = abstandBei(0);
+  for (let i = 1; i <= schritte; i++) {
+    for (const richtung of [1, -1]) {
+      const versatz = richtung * spielraum * (i / schritte);
+      const abstand = abstandBei(versatz);
+      if (abstand > weiteste + 1e-9) {
+        weiteste = abstand;
+        bester = versatz;
+      }
+    }
   }
-  return stelle;
+  return bester;
+}
+
+/**
+ * Wie weit eine Reihe rücken darf, ohne aus dem Querschnitt zu laufen.
+ *
+ * Höchstens eine halbe Teilung -- weiter zu rücken brächte nichts, weil sich
+ * das Bild dann wiederholt.
+ */
+export function spielraum(breite, stellen, randabstand) {
+  if (stellen.length === 0) return 0;
+  const links = stellen[0] - randabstand;
+  const rechts = breite - randabstand - stellen[stellen.length - 1];
+  const halbeTeilung = stellen.length > 1
+    ? (stellen[1] - stellen[0]) / 2
+    : breite / 2;
+  return Math.max(0, Math.min(links, rechts, halbeTeilung));
 }
 
 /** Sucht einen runden Schrittabstand für die Achsenteilung. */
@@ -162,23 +198,29 @@ export function querschnittZeichnen(eintrag, werte) {
 
   const farbe = { x: '#1f6feb', y: '#b8622a' };
   const zettel = [];
-  const gesetzt = [];   // schon gezeichnete Stäbe, für die Überlappungsprüfung
+  // Schon gezeichnete Stäbe, in Millimetern -- damit die nächste Reihe weiss,
+  // wem sie ausweichen muss.
+  const gesetzt = [];
 
   for (const bew of eintrag.bewehrung) {
     const z = zahl(bew.z_id);
     if (z === null) continue;
     const r = Math.max((bew.phi || 12) * massstab / 2, 2.2);
 
-    // Grund und Zulage einer Lage werden nebeneinander eingelegt, nicht
-    // übereinander: die Zulage kommt um eine halbe Teilung versetzt.
-    const versatz = bew.art === 'zulage' ? 0.5 : 0.0;
-
     if (bew.richtung === 'x') {
-      for (const mm of stabstellen(b, bew, versatz)) {
-        const px = ausweichen(x(mm), y(z), r, gesetzt);
-        gesetzt.push({ x: px, y: y(z), r });
+      const stellen = stabstellen(b, bew);
+      // Nur Stäbe auf praktisch gleicher Höhe kommen sich ins Gehege.
+      const hindernisse = gesetzt
+        .filter((g) => Math.abs(g.y - y(z)) < g.r + r)
+        .map((g) => g.mm);
+      const versatz = besterVersatz(
+        stellen, hindernisse, spielraum(b, stellen, (bew.phi || 12) / 2));
+
+      for (const mm of stellen) {
+        const stelle = mm + versatz;
+        gesetzt.push({ mm: stelle, y: y(z), r });
         svg.append(svgEl('circle', {
-          cx: px, cy: y(z), r,
+          cx: x(stelle), cy: y(z), r,
           fill: farbe.x, opacity: bew.art === 'zulage' ? 0.55 : 1,
         }));
       }
