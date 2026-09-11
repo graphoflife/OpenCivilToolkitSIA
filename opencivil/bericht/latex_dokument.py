@@ -249,27 +249,18 @@ def finde_tex_maschine() -> Optional[tuple[str, Sequence[str]]]:
     return None
 
 
-def schreibe(
-    loesung: Loesung,
-    pfad: str | Path,
-    *,
-    titel: str = "Berechnung",
-    untertitel: str = "",
-    pdf: bool = True,
-) -> Ausgabeergebnis:
+def uebersetze(tex_pfad: str | Path) -> Ausgabeergebnis:
     """
-    Schreibt das ``.tex`` und uebersetzt es, wenn moeglich, zu PDF.
+    Uebersetzt ein vorhandenes ``.tex`` zu PDF, sofern eine Maschine da ist.
 
     Fehlt jede TeX-Maschine, ist das kein Fehler: das ``.tex`` steht dann
     trotzdem bereit und die Meldung sagt, was fehlt.
+
+    Eigener Schritt, weil das Bauen des Dokuments ueberall laeuft, das
+    Uebersetzen aber einen Unterprozess braucht -- und den gibt es im Browser
+    nicht. Dort endet der Weg beim ``.tex``.
     """
-    tex_pfad = Path(pfad).with_suffix(".tex")
-    tex_pfad.parent.mkdir(parents=True, exist_ok=True)
-    tex_pfad.write_text(als_tex(loesung, titel, untertitel), encoding="utf-8")
-
-    if not pdf:
-        return Ausgabeergebnis(tex_pfad=tex_pfad, meldung="PDF war nicht verlangt.")
-
+    tex_pfad = Path(tex_pfad)
     maschine = finde_tex_maschine()
     if maschine is None:
         return Ausgabeergebnis(
@@ -303,6 +294,24 @@ def schreibe(
         maschine=name,
         meldung=f"{name} lieferte kein PDF: {letzte[-1] if letzte else 'keine Ausgabe'}",
     )
+
+
+def schreibe(
+    loesung: Loesung,
+    pfad: str | Path,
+    *,
+    titel: str = "Berechnung",
+    untertitel: str = "",
+    pdf: bool = True,
+) -> Ausgabeergebnis:
+    """Schreibt das ``.tex`` und uebersetzt es, wenn moeglich, zu PDF."""
+    tex_pfad = Path(pfad).with_suffix(".tex")
+    tex_pfad.parent.mkdir(parents=True, exist_ok=True)
+    tex_pfad.write_text(als_tex(loesung, titel, untertitel), encoding="utf-8")
+
+    if not pdf:
+        return Ausgabeergebnis(tex_pfad=tex_pfad, meldung="PDF war nicht verlangt.")
+    return uebersetze(tex_pfad)
 
 
 # ===========================================================================

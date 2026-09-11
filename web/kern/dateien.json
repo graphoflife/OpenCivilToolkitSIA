@@ -1,0 +1,32 @@
+{
+  "hinweis": "Erzeugt von opencivil/web/bruecke.py. Nicht von Hand ändern -- stattdessen 'python3 -m opencivil.web.bruecke' laufen lassen.",
+  "dateien": [
+    "opencivil/__init__.py",
+    "opencivil/bericht/__init__.py",
+    "opencivil/bericht/konsole.py",
+    "opencivil/bericht/latex_dokument.py",
+    "opencivil/core/__init__.py",
+    "opencivil/core/berechnung.py",
+    "opencivil/core/einheiten.py",
+    "opencivil/core/latex.py",
+    "opencivil/core/protokoll.py",
+    "opencivil/core/rechenwerk.py",
+    "opencivil/core/wert.py",
+    "opencivil/material/__init__.py",
+    "opencivil/material/basis.py",
+    "opencivil/material/beton.py",
+    "opencivil/material/betonstahl.py",
+    "opencivil/nachweis/__init__.py",
+    "opencivil/nachweis/biegung_normalkraft.py",
+    "opencivil/nachweis/querkraft.py",
+    "opencivil/projekt.py",
+    "opencivil/querschnitt/__init__.py",
+    "opencivil/querschnitt/platte.py",
+    "opencivil/querschnitt/werkstoffgesetz.py",
+    "opencivil/web/__init__.py",
+    "opencivil/web/api.py",
+    "opencivil/web/bruecke.py",
+    "opencivil/web/dienst.py",
+    "opencivil/web/server.py"
+  ]
+}

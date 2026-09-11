@@ -11,7 +11,7 @@ from opencivil.projekt import (
     ProjektFehler, QuerschnittEintrag,
 )
 from opencivil.querschnitt.platte import Richtung
-from opencivil.web import api, server
+from opencivil.web import api, bruecke, dienst, server
 
 
 class TestProjektBeschreibung(unittest.TestCase):
@@ -170,70 +170,183 @@ class TestApiAbbildung(unittest.TestCase):
             d["zuordnung"]["materialien"]["b1"]["kennwerte"]["f_cd"], "beton.b1.f_cd")
 
 
-class TestServerEndpunkte(unittest.TestCase):
-    """Die Endpunktfunktionen ohne laufenden Server."""
+class TestDienst(unittest.TestCase):
+    """Der Rechendienst -- ohne Server, ohne Browser, ohne Dateisystem."""
 
     def rumpf(self, **zusatz):
         return {"projekt": Projekt.beispiel().als_dict(), **zusatz}
 
     def test_rechnen(self):
-        antwort = server.rechnen(self.rumpf())
-        self.assertTrue(antwort["vollstaendig"])
-        self.assertEqual(len(antwort["urteile"]), 6)
-        self.assertTrue(antwort["alle_nachweise_erfuellt"])
+        antwort = dienst.bearbeite("rechnen", self.rumpf())
+        self.assertEqual(antwort.status, 200)
+        self.assertTrue(antwort.daten["vollstaendig"])
+        self.assertEqual(len(antwort.daten["urteile"]), 6)
+        self.assertTrue(antwort.daten["alle_nachweise_erfuellt"])
 
     def test_rechnen_mit_einzelziel(self):
-        antwort = server.rechnen(self.rumpf(ziele=["beton.b1.f_cd"]))
-        self.assertEqual(set(antwort["werte"]), {
+        antwort = dienst.bearbeite("rechnen", self.rumpf(ziele=["beton.b1.f_cd"]))
+        self.assertEqual(set(antwort.daten["werte"]), {
             "beton.b1.eta_fc", "beton.b1.f_ck", "beton.b1.f_cd", "beton.b1.gamma_c",
         })
-        self.assertEqual(antwort["ketten"]["beton.b1.f_cd"]["berechnungen"][-1], "beton.b1.f_cd")
+        self.assertEqual(
+            antwort.daten["ketten"]["beton.b1.f_cd"]["berechnungen"][-1], "beton.b1.f_cd")
 
     def test_unbekanntes_ziel(self):
-        with self.assertRaises(server.ApiFehler) as ctx:
-            server.rechnen(self.rumpf(ziele=["gibt.es.nicht"]))
-        self.assertEqual(ctx.exception.status, 400)
+        antwort = dienst.bearbeite("rechnen", self.rumpf(ziele=["gibt.es.nicht"]))
+        self.assertEqual(antwort.status, 400)
+        self.assertIn("gibt.es.nicht", antwort.daten["fehler"])
+
+    def test_unbekannte_anfrage(self):
+        antwort = dienst.bearbeite("gibtesnicht", {})
+        self.assertEqual(antwort.status, 404)
+        # Die Meldung soll weiterhelfen, nicht bloss abweisen.
+        self.assertIn("rechnen", antwort.daten["fehler"])
 
     def test_ziele_auflisten(self):
-        antwort = server.ziele_auflisten(self.rumpf())
-        ids = {z["id"] for z in antwort["ziele"]}
+        antwort = dienst.bearbeite("ziele", self.rumpf())
+        ids = {z["id"] for z in antwort.daten["ziele"]}
         self.assertIn("beton.b1.f_cd", ids)
         self.assertIn("betonstahl.s1.f_yd", ids)
-        self.assertTrue(all("symbol" in z for z in antwort["ziele"]))
+        self.assertTrue(all("symbol" in z for z in antwort.daten["ziele"]))
 
     def test_alles_rechnen(self):
-        antwort = server.alles_rechnen(self.rumpf())
-        self.assertGreater(len(antwort["werte"]), 30)
+        antwort = dienst.bearbeite("alles", self.rumpf())
+        self.assertGreater(len(antwort.daten["werte"]), 30)
 
-    def test_bericht(self):
-        antwort = server.bericht(self.rumpf(pdf=False))
-        self.assertIn(r"\documentclass", antwort["tex"])
-        self.assertTrue(Path(antwort["tex_pfad"]).exists())
+    def test_katalog_und_beispiel_brauchen_keinen_rumpf(self):
+        self.assertIn("betonsorten", dienst.bearbeite("katalog").daten)
+        self.assertTrue(dienst.bearbeite("beispiel").daten["materialien"])
 
-    def test_projekt_speichern_und_laden(self):
-        alt = server.PROJEKT_DATEI
+    def test_bericht_schreibt_nichts(self):
+        antwort = dienst.bearbeite("bericht", self.rumpf())
+        self.assertIn(r"\documentclass", antwort.daten["tex"])
+        # Kein Pfad in der Antwort: der Dienst fasst die Platte nicht an.
+        self.assertNotIn("tex_pfad", antwort.daten)
+
+    def test_pruefen_reicht_das_projekt_aufgeraeumt_zurueck(self):
+        antwort = dienst.bearbeite("pruefen", self.rumpf())
+        self.assertEqual(antwort.daten["projekt"], Projekt.beispiel().als_dict())
+
+    def test_pruefen_meldet_kaputte_beschreibung(self):
+        kaputt = Projekt.beispiel().als_dict()
+        kaputt["materialien"][0]["name"] = kaputt["materialien"][1]["name"]
+        antwort = dienst.bearbeite("pruefen", {"projekt": kaputt})
+        self.assertEqual(antwort.status, 400)
+
+    def test_fehler_bringt_den_dienst_nicht_um(self):
+        """Auch Unerwartetes kommt als Antwort zurueck, nicht als Ausnahme."""
+        antwort = dienst.bearbeite("rechnen", {"projekt": {"materialien": "kein Feld"}})
+        self.assertGreaterEqual(antwort.status, 400)
+        self.assertIn("fehler", antwort.daten)
+
+
+class TestDienstUeberJson(unittest.TestCase):
+    """Der Weg, den die Bruecke im Browser nimmt."""
+
+    def test_umschlag(self):
+        roh = dienst.bearbeite_json(
+            "rechnen", json.dumps({"projekt": Projekt.beispiel().als_dict()}))
+        umschlag = json.loads(roh)
+        self.assertEqual(umschlag["status"], 200)
+        self.assertTrue(umschlag["daten"]["vollstaendig"])
+
+    def test_kaputtes_json(self):
+        umschlag = json.loads(dienst.bearbeite_json("rechnen", "{nicht json"))
+        self.assertEqual(umschlag["status"], 400)
+
+    def test_rumpf_muss_ein_objekt_sein(self):
+        umschlag = json.loads(dienst.bearbeite_json("rechnen", "[1, 2, 3]"))
+        self.assertEqual(umschlag["status"], 400)
+
+    def test_kein_rumpf(self):
+        umschlag = json.loads(dienst.bearbeite_json("katalog"))
+        self.assertEqual(umschlag["status"], 200)
+
+    def test_json_bleibt_lesbar_fuer_den_browser(self):
+        """
+        Unendliche Werte kommen in Nachweisen vor (Erfüllungsgrad ohne
+        Einwirkung). json.dumps schriebe dafür ``Infinity`` -- gültiges Python,
+        ungültiges JSON, und JSON.parse im Browser bricht ab.
+        """
+        roh = dienst.bearbeite_json(
+            "rechnen", json.dumps({"projekt": Projekt.beispiel().als_dict()}))
+        self.assertNotIn("Infinity", roh)
+        self.assertNotIn("NaN", roh)
+
+
+class TestServerHuelle(unittest.TestCase):
+    """Was der Server über den Dienst hinaus beisteuert."""
+
+    def test_ohne_pdf_bleibt_die_platte_unberuehrt(self):
+        antwort = server.bericht_mit_pdf(
+            {"projekt": Projekt.beispiel().als_dict(), "pdf": False})
+        self.assertIn(r"\documentclass", antwort.daten["tex"])
+        self.assertNotIn("tex_pfad", antwort.daten)
+
+    def test_mit_pdf_wird_das_tex_abgelegt(self):
+        alt = server.AUSGABE_ORDNER
         try:
             with tempfile.TemporaryDirectory() as ordner:
-                server.PROJEKT_DATEI = Path(ordner) / "projekt.json"
-                eigen = Projekt.beispiel()
-                eigen.name = "Eigener Name"
-                server.projekt_speichern(eigen.als_dict())
-                self.assertEqual(server.projekt_laden().name, "Eigener Name")
+                server.AUSGABE_ORDNER = Path(ordner)
+                antwort = server.bericht_mit_pdf(
+                    {"projekt": Projekt.beispiel().als_dict()})
+                abgelegt = Path(antwort.daten["tex_pfad"])
+                self.assertTrue(abgelegt.is_file())
+                # Auf der Platte steht genau das, was auch der Browser bekäme.
+                self.assertEqual(
+                    abgelegt.read_text(encoding="utf-8"), antwort.daten["tex"])
         finally:
-            server.PROJEKT_DATEI = alt
+            server.AUSGABE_ORDNER = alt
 
-    def test_ohne_datei_kommt_das_beispiel(self):
-        alt = server.PROJEKT_DATEI
-        try:
-            with tempfile.TemporaryDirectory() as ordner:
-                server.PROJEKT_DATEI = Path(ordner) / "gibt-es-nicht.json"
-                self.assertTrue(server.projekt_laden().materialien)
-        finally:
-            server.PROJEKT_DATEI = alt
+    def test_statische_pfade_bleiben_im_projekt(self):
+        for pfad in ("/../../etc/passwd", "/daten/projekt.json", "/.git/config",
+                     "/gibtesnicht", "/tests/test_projekt_web.py",
+                     "/web/../daten/projekt.json"):
+            with self.subTest(pfad=pfad):
+                self.assertIsNone(server.aufloesen(pfad))
+
+        for pfad in ("/", "/index.html", "/web/index.html",
+                     "/opencivil/projekt.py", "/opencivil/web/dienst.py"):
+            with self.subTest(pfad=pfad):
+                self.assertIsNotNone(server.aufloesen(pfad))
+
+    def test_der_kern_ist_ueber_das_netz_erreichbar(self):
+        """
+        Die Brücke im Browser lädt den Rechenkern als ``.py``-Dateien nach.
+        Läge ``opencivil/`` nicht im ausgelieferten Baum, bliebe die Seite
+        stumm -- lokal wie auf GitHub Pages.
+        """
+        self.assertIn("opencivil", server.OEFFENTLICH)
+        for datei in bruecke.kerndateien():
+            with self.subTest(datei=datei):
+                self.assertIsNotNone(server.aufloesen("/" + datei))
 
 
-if __name__ == "__main__":
-    unittest.main()
+class TestBruecke(unittest.TestCase):
+    """Das Manifest, aus dem der Browser den Rechenkern zusammenliest."""
+
+    def test_manifest_ist_auf_dem_stand_der_quellen(self):
+        self.assertTrue(
+            bruecke.stimmt_ueberein(),
+            "web/kern/dateien.json passt nicht mehr zu den Dateien unter "
+            "opencivil/. Bitte 'python3 -m opencivil.web.bruecke' laufen lassen -- "
+            "sonst lädt die Seite einen veralteten Kern.")
+
+    def test_der_dienst_ist_im_manifest(self):
+        dateien = bruecke.kerndateien()
+        self.assertIn("opencivil/web/dienst.py", dateien)
+        self.assertIn("opencivil/projekt.py", dateien)
+
+    def test_kein_zwischenstand_im_manifest(self):
+        self.assertFalse(
+            [d for d in bruecke.kerndateien() if "__pycache__" in d])
+
+    def test_schreiben_ist_wiederholbar(self):
+        """Zweimal geschrieben ergibt zeichengleich dasselbe -- sonst rauscht das Diff."""
+        with tempfile.TemporaryDirectory() as ordner:
+            a = bruecke.schreiben(Path(ordner) / "a.json").read_text(encoding="utf-8")
+            b = bruecke.schreiben(Path(ordner) / "b.json").read_text(encoding="utf-8")
+        self.assertEqual(a, b)
 
 
 class TestMaterialsperre(unittest.TestCase):
@@ -412,8 +525,11 @@ class TestJsonTauglich(unittest.TestCase):
         for k in projekt.querschnitte[0].kombinationen:
             k.art = "M_konstant"
             k.N_Ed = 0.0
-        antwort = server.rechnen({"projekt": projekt.als_dict()})
-        text = json.dumps(api.endlich(antwort), allow_nan=False)  # wirft bei Infinity
+        # Über bearbeite_json, also über genau den Weg, den der Browser nimmt:
+        # nach_json wirft bei Infinity, statt es stumm durchzulassen.
+        text = dienst.bearbeite_json(
+            "rechnen", json.dumps({"projekt": projekt.als_dict()}))
+        self.assertEqual(json.loads(text)["status"], 200)
         self.assertNotIn("Infinity", text)
         self.assertNotIn("NaN", text)
 
@@ -423,8 +539,9 @@ class TestJsonTauglich(unittest.TestCase):
                 projekt = Projekt.beispiel()
                 for k in projekt.querschnitte[0].kombinationen:
                     k.art, k.N_Ed, k.M_Ed = art, 0.0, 0.0
-                antwort = server.rechnen({"projekt": projekt.als_dict()})
-                json.dumps(api.endlich(antwort), allow_nan=False)
+                umschlag = json.loads(dienst.bearbeite_json(
+                    "rechnen", json.dumps({"projekt": projekt.als_dict()})))
+                self.assertEqual(umschlag["status"], 200)
 
 
 class TestUnbenutztesMaterial(unittest.TestCase):
@@ -437,19 +554,23 @@ class TestUnbenutztesMaterial(unittest.TestCase):
     def test_unbenutzter_beton_wird_gerechnet(self):
         projekt = Projekt.beispiel()
         projekt.materialien.append(MaterialEintrag("b2", "beton", "C12/15", "C12/15"))
-        antwort = server.rechnen({"projekt": projekt.als_dict()})
-        eigene = [k for k in antwort["werte"] if k.startswith("beton.b2.")]
+        werte = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()}).daten["werte"]
+        eigene = [k for k in werte if k.startswith("beton.b2.")]
         self.assertGreaterEqual(len(eigene), 12)
-        self.assertIn("beton.b2.f_cd", antwort["werte"])
+        self.assertIn("beton.b2.f_cd", werte)
 
     def test_unbenutzter_stahl_wird_gerechnet(self):
         projekt = Projekt.beispiel()
         projekt.materialien.append(MaterialEintrag("s2", "betonstahl", "B700B", "B700B"))
-        antwort = server.rechnen({"projekt": projekt.als_dict()})
-        self.assertIn("betonstahl.s2.f_yd", antwort["werte"])
+        werte = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()}).daten["werte"]
+        self.assertIn("betonstahl.s2.f_yd", werte)
 
     def test_materialziele_umfassen_alle_kennwerte(self):
         aufbau = Projekt.beispiel().aufbauen()
         ziele = aufbau.materialziele()
         self.assertIn("beton.b1.f_cd", ziele)
         self.assertIn("betonstahl.s1.f_yd", ziele)
+
+
+if __name__ == "__main__":
+    unittest.main()

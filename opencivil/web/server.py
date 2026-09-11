@@ -2,18 +2,31 @@
 opencivil/web/server.py -- Schlanker HTTP-Server fuer die Oberflaeche.
 
 VERANTWORTUNG:
-Stellt die Dateien der Oberflaeche bereit und bietet eine JSON-Schnittstelle zum
-Rechenkern. Mehr nicht -- gerechnet wird ausschliesslich im Kern, der von diesem
-Baustein nichts weiss.
+Liefert die Dateien der Oberflaeche aus und reicht Anfragen an
+:mod:`opencivil.web.dienst` weiter. Mehr nicht -- gerechnet wird ausschliesslich
+dort, und zwar von demselben Code, der im Browser unter Pyodide laeuft.
 
 Bewusst nur mit der Standardbibliothek gebaut. Der Rechenkern kommt ohne
 Fremdpakete aus; das soll auch fuer den Server gelten, damit das ganze Werkzeug
 mit einem blossen ``python3`` laeuft.
 
+WARUM ES IHN NEBEN DER BROWSERFASSUNG NOCH GIBT:
+Zwei Dinge kann nur er. Erstens startet die Oberflaeche sofort, statt erst
+einige Sekunden auf Pyodide zu warten. Zweitens kann er den Bericht mit einer
+richtigen TeX-Maschine zu PDF uebersetzen -- im Browser bleibt es beim ``.tex``.
+
+WURZEL DES DOKUMENTBAUMS:
+Ausgeliefert wird vom Projektverzeichnis aus, nicht von ``web/``. Das ist
+Absicht: auf GitHub Pages liegt das Repo genauso im Netz, und die Bruecke im
+Browser holt sich die ``.py``-Dateien unter ``/opencivil/…``. Waere die Wurzel
+hier eine andere, haetten die Adressen auf beiden Wegen verschiedene Tiefe --
+und genau solche Unterschiede faellt einem erst auf der veroeffentlichten Seite
+auf die Fuesse.
+
 SICHERHEIT:
 Der Server bindet sich nur an 127.0.0.1. Er ist ein Arbeitsgeraet fuer den
-eigenen Rechner, nicht fuer ein Netz. Statische Dateien werden gegen
-Pfadausbrueche geprueft.
+eigenen Rechner, nicht fuer ein Netz. Ausgeliefert werden nur die in
+:data:`OEFFENTLICH` genannten Ordner, und Pfadausbrueche sind geprueft.
 
 AUFRUF::
 
@@ -29,148 +42,91 @@ import mimetypes
 import traceback
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Any
 from urllib.parse import urlparse
 
-from opencivil.bericht.latex_dokument import schreibe
-from opencivil.core.rechenwerk import RechenwerkFehler
-from opencivil.projekt import Projekt, ProjektFehler
-from opencivil.web import api
-from opencivil.web.api import endlich
+from opencivil.bericht.latex_dokument import finde_tex_maschine, uebersetze
+from opencivil.web import dienst
 
 WURZEL = Path(__file__).resolve().parents[2]
-WEB_ORDNER = WURZEL / "web"
-PROJEKT_DATEI = WURZEL / "daten" / "projekt.json"
 AUSGABE_ORDNER = WURZEL / "ausgabe"
 
+#: Was aus dem Projektverzeichnis ins Netz darf. ``opencivil`` muss dabei sein:
+#: die Bruecke im Browser laedt von dort die Quelldateien des Rechenkerns.
+OEFFENTLICH = ("web", "opencivil")
+
+#: Einzelne Dateien im Wurzelverzeichnis, die ebenfalls ausgeliefert werden.
+OEFFENTLICHE_DATEIEN = ("index.html", "favicon.ico")
+
+# application/wasm ist nicht bloss Kosmetik: ohne diesen Typ verweigert
+# WebAssembly.instantiateStreaming den Dienst und Pyodide faellt auf einen
+# langsameren Weg zurueck.
 mimetypes.add_type("application/javascript", ".js")
+mimetypes.add_type("application/javascript", ".mjs")
+mimetypes.add_type("application/wasm", ".wasm")
 mimetypes.add_type("font/woff2", ".woff2")
-
-
-class ApiFehler(Exception):
-    """Fehler mit vorgegebenem HTTP-Status."""
-
-    def __init__(self, status: int, meldung: str) -> None:
-        self.status = status
-        super().__init__(meldung)
+mimetypes.add_type("text/x-python; charset=utf-8", ".py")
 
 
 # ===========================================================================
-# Fachliche Endpunkte
+# Was nur der Server kann: PDF
 # ===========================================================================
 
 
-def projekt_laden() -> Projekt:
-    """Laedt das gespeicherte Projekt, sonst das Beispiel."""
-    if PROJEKT_DATEI.exists():
-        try:
-            return Projekt.laden(PROJEKT_DATEI)
-        except Exception as exc:
-            raise ApiFehler(
-                500, f"Die gespeicherte Projektdatei ist unlesbar: {exc}"
-            ) from exc
-    return Projekt.beispiel()
-
-
-def projekt_speichern(rumpf: Dict[str, Any]) -> dict:
-    projekt = Projekt.aus_dict(rumpf)
-    projekt.speichern(PROJEKT_DATEI)
-    return {"gespeichert": str(PROJEKT_DATEI), "projekt": projekt.als_dict()}
-
-
-def rechnen(rumpf: Dict[str, Any]) -> dict:
+def bericht_mit_pdf(rumpf: dict) -> dienst.Antwort:
     """
-    Rechnet ein Projekt durch.
+    Der Bericht des Dienstes, zusaetzlich auf die Platte gelegt und uebersetzt.
 
-    Ohne ``ziele`` werden alle Nachweise gerechnet. Mit ``ziele`` genau diese --
-    dann loest das Rechenwerk rueckwaerts auf und meldet, was fehlt.
+    Das ``.tex`` stammt unveraendert aus :func:`opencivil.web.dienst.bericht` --
+    hier kommt nur dazu, was ein Browser nicht kann.
     """
-    projekt = Projekt.aus_dict(rumpf.get("projekt") or {})
-    aufbau = projekt.aufbauen()
+    antwort = dienst.bearbeite("bericht", rumpf)
+    if antwort.ist_fehler or not rumpf.get("pdf", True):
+        return antwort
 
-    ziele = list(rumpf.get("ziele") or [])
-    if not ziele:
-        # Reihenfolge bestimmt den Aufbau der Herleitung: Baustoffe zuerst,
-        # dann die Bauteile.
-        ziele = (aufbau.materialziele() + aufbau.eckwertziele()
-                 + aufbau.alle_nachweisziele())
-    if not ziele:
-        # Kein Nachweis vorhanden -- dann wenigstens alle Materialkennwerte.
-        loesung = aufbau.werk.loese_alles()
-        return api.loesung_dict(loesung, aufbau, ())
+    pfad = (AUSGABE_ORDNER / antwort.daten["dateiname"]).with_suffix(".tex")
+    pfad.parent.mkdir(parents=True, exist_ok=True)
+    pfad.write_text(antwort.daten["tex"], encoding="utf-8")
 
-    unbekannt = [z for z in ziele if aufbau.werk.definition(z) is None]
-    if unbekannt:
-        raise ApiFehler(400, f"Unbekannte Ziele: {', '.join(unbekannt)}")
-
-    loesung = aufbau.werk.loese(*ziele)
-    return api.loesung_dict(loesung, aufbau, ziele)
-
-
-def alles_rechnen(rumpf: Dict[str, Any]) -> dict:
-    """Rechnet alles, was sich aus den vorhandenen Eingaben ergibt."""
-    projekt = Projekt.aus_dict(rumpf.get("projekt") or {})
-    aufbau = projekt.aufbauen()
-    return api.loesung_dict(aufbau.werk.loese_alles(), aufbau, ())
-
-
-def ziele_auflisten(rumpf: Dict[str, Any]) -> dict:
-    """Alle Werte, die als Rechenziel gewaehlt werden koennen."""
-    projekt = Projekt.aus_dict(rumpf.get("projekt") or {})
-    aufbau = projekt.aufbauen()
-    eintraege = []
-    for wert_id in aufbau.werk.moegliche_ziele():
-        definition = aufbau.werk.definition(wert_id)
-        if definition is None:
-            continue
-        eintraege.append({
-            "id": wert_id,
-            "symbol": definition.symbol,
-            "beschreibung": definition.beschreibung,
-            "einheit": (
-                definition.einheit.name
-                if definition.einheit.name not in ("", "-") else ""
-            ),
-            "referenz": definition.referenz,
-            "namensraum": definition.namensraum,
-        })
-    return {"ziele": eintraege, "zuordnung": api.zuordnung(aufbau)}
-
-
-def bericht(rumpf: Dict[str, Any]) -> dict:
-    """Schreibt das LaTeX-Dokument und uebersetzt es, wenn moeglich."""
-    projekt = Projekt.aus_dict(rumpf.get("projekt") or {})
-    aufbau = projekt.aufbauen()
-    ziele = list(rumpf.get("ziele") or []) or (
-        aufbau.alle_nachweisziele() + aufbau.eckwertziele()
-    )
-    loesung = aufbau.werk.loese(*ziele) if ziele else aufbau.werk.loese_alles()
-
-    name = "".join(z if z.isalnum() or z in "-_" else "_" for z in projekt.name) or "bericht"
-    ergebnis = schreibe(
-        loesung,
-        AUSGABE_ORDNER / name,
-        titel=projekt.name,
-        untertitel="OpenCivilToolkitSIA – Berechnung nach SIA 262:2025",
-        pdf=bool(rumpf.get("pdf", True)),
-    )
-    return {
-        "tex_pfad": str(ergebnis.tex_pfad),
-        "tex": ergebnis.tex_pfad.read_text(encoding="utf-8"),
+    ergebnis = uebersetze(pfad)
+    return dienst.Antwort({
+        **antwort.daten,
+        "tex_pfad": str(pfad),
         "pdf_pfad": str(ergebnis.pdf_pfad) if ergebnis.hat_pdf else "",
         "maschine": ergebnis.maschine,
         "meldung": ergebnis.meldung,
-    }
+    })
 
 
-#: Endpunkt -> (Methode, Funktion). ``None`` als Funktion = Sonderbehandlung.
-ENDPUNKTE: Dict[Tuple[str, str], Callable[[Dict[str, Any]], dict]] = {
-    ("POST", "/api/rechnen"): rechnen,
-    ("POST", "/api/alles"): alles_rechnen,
-    ("POST", "/api/ziele"): ziele_auflisten,
-    ("POST", "/api/bericht"): bericht,
-    ("PUT", "/api/projekt"): projekt_speichern,
-}
+# ===========================================================================
+# Statische Dateien
+# ===========================================================================
+
+
+def aufloesen(pfad: str) -> Path | None:
+    """
+    Wandelt eine Adresse in eine Datei -- oder ``None``, wenn sie nicht darf.
+
+    Erlaubt ist nur, was in :data:`OEFFENTLICH` und
+    :data:`OEFFENTLICHE_DATEIEN` steht. Alles andere im Projektverzeichnis --
+    ``daten/``, ``.git/``, ``tests/`` -- bleibt draussen, auch wenn der Server
+    ohnehin nur auf 127.0.0.1 horcht.
+    """
+    teile = [t for t in pfad.split("/") if t not in ("", ".")]
+    if not teile:
+        teile = ["index.html"]
+    if ".." in teile:
+        return None
+    if teile[0] not in OEFFENTLICH and not (
+            len(teile) == 1 and teile[0] in OEFFENTLICHE_DATEIEN):
+        return None
+
+    ziel = (WURZEL / Path(*teile)).resolve()
+    # Guertel und Hosenträger: auch nach dem Aufloesen von Verknuepfungen muss
+    # die Datei noch unterhalb der Wurzel liegen.
+    if not ziel.is_relative_to(WURZEL.resolve()) or not ziel.is_file():
+        return None
+    return ziel
 
 
 # ===========================================================================
@@ -185,18 +141,16 @@ class Handler(BaseHTTPRequestHandler):
     # -- Antworten ----------------------------------------------------------
 
     def _json(self, daten: Any, status: int = 200) -> None:
-        # allow_nan=False ist Absicht: json.dumps schriebe sonst Infinity und NaN,
-        # was Python zwar liest, JSON.parse im Browser aber ablehnt -- die Antwort
-        # kam mit Status 200 an und war trotzdem unbrauchbar. Lieber hier laut
-        # scheitern als dort stumm. endlich() räumt die Fälle vorher weg.
-        rumpf = json.dumps(
-            endlich(daten), ensure_ascii=False, allow_nan=False).encode("utf-8")
+        rumpf = dienst.nach_json(daten).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(rumpf)))
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(rumpf)
+
+    def _antwort(self, antwort: dienst.Antwort) -> None:
+        self._json(antwort.daten, antwort.status)
 
     def _fehler(self, status: int, meldung: str, spur: str = "") -> None:
         self._json({"fehler": meldung, "spur": spur}, status)
@@ -206,50 +160,39 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:  # noqa: N802
         pfad = urlparse(self.path).path
         try:
-            if pfad == "/api/katalog":
-                return self._json(api.katalog())
-            if pfad == "/api/projekt":
-                return self._json(projekt_laden().als_dict())
+            if pfad.startswith("/api/"):
+                # Ohne Rumpf -- taugt fuer katalog und beispiel.
+                return self._antwort(dienst.bearbeite(pfad[len("/api/"):]))
             return self._statisch(pfad)
-        except ApiFehler as exc:
-            return self._fehler(exc.status, str(exc))
         except Exception as exc:  # pragma: no cover -- Notnagel
             return self._fehler(500, str(exc), traceback.format_exc())
 
-    def do_PUT(self) -> None:  # noqa: N802
-        self._mit_rumpf("PUT")
-
     def do_POST(self) -> None:  # noqa: N802
-        self._mit_rumpf("POST")
-
-    def _mit_rumpf(self, methode: str) -> None:
         pfad = urlparse(self.path).path
-        funktion = ENDPUNKTE.get((methode, pfad))
-        if funktion is None:
-            return self._fehler(404, f"Unbekannter Endpunkt: {methode} {pfad}")
+        if not pfad.startswith("/api/"):
+            return self._fehler(404, f"Unbekannter Endpunkt: POST {pfad}")
+        name = pfad[len("/api/"):]
+
         try:
             laenge = int(self.headers.get("Content-Length") or 0)
             roh = self.rfile.read(laenge) if laenge else b"{}"
             rumpf = json.loads(roh.decode("utf-8") or "{}")
-            return self._json(funktion(rumpf))
-        except json.JSONDecodeError as exc:
+        except (ValueError, UnicodeDecodeError) as exc:
             return self._fehler(400, f"Ungültiges JSON: {exc}")
-        except (ProjektFehler, RechenwerkFehler) as exc:
-            # Erwartbare Bedienfehler -- ohne Stapelspur, dafuer mit klarer Meldung.
-            return self._fehler(400, str(exc))
-        except ApiFehler as exc:
-            return self._fehler(exc.status, str(exc))
-        except Exception as exc:
-            return self._fehler(500, f"{type(exc).__name__}: {exc}", traceback.format_exc())
+
+        try:
+            if name == "bericht":
+                return self._antwort(bericht_mit_pdf(rumpf))
+            return self._antwort(dienst.bearbeite(name, rumpf))
+        except Exception as exc:  # pragma: no cover -- Notnagel
+            return self._fehler(
+                500, f"{type(exc).__name__}: {exc}", traceback.format_exc())
 
     # -- Statische Dateien --------------------------------------------------
 
     def _statisch(self, pfad: str) -> None:
-        if pfad in ("/", ""):
-            pfad = "/index.html"
-        ziel = (WEB_ORDNER / pfad.lstrip("/")).resolve()
-        # Pfadausbruch verhindern.
-        if not str(ziel).startswith(str(WEB_ORDNER.resolve())) or not ziel.is_file():
+        ziel = aufloesen(pfad)
+        if ziel is None:
             return self._fehler(404, f"Nicht gefunden: {pfad}")
 
         inhalt = ziel.read_bytes()
@@ -257,8 +200,12 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", art or "application/octet-stream")
         self.send_header("Content-Length", str(len(inhalt)))
-        # Die Oberflaeche wird beim Entwickeln laufend geaendert -- nicht zwischenspeichern.
-        self.send_header("Cache-Control", "no-cache" if ziel.suffix != ".woff2" else "max-age=86400")
+        # Beim Entwickeln aendert sich die Oberflaeche laufend, also nicht
+        # zwischenspeichern. Ausgenommen ist, was sich nie aendert: Schriften
+        # und die Pyodide-Dateien -- 13 MB bei jedem Neuladen waeren laestig.
+        unveraenderlich = ziel.suffix == ".woff2" or "vendor/pyodide" in ziel.as_posix()
+        self.send_header(
+            "Cache-Control", "max-age=86400" if unveraenderlich else "no-cache")
         self.end_headers()
         self.wfile.write(inhalt)
 
@@ -269,10 +216,13 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def starten(port: int = 8080, adresse: str = "127.0.0.1") -> None:
-    if not WEB_ORDNER.is_dir():
-        raise SystemExit(f"Der Ordner der Oberfläche fehlt: {WEB_ORDNER}")
+    if not (WURZEL / "web").is_dir():
+        raise SystemExit(f"Der Ordner der Oberfläche fehlt: {WURZEL / 'web'}")
+
     server = ThreadingHTTPServer((adresse, port), Handler)
     print(f"OpenCivilToolkitSIA – Oberfläche läuft auf http://{adresse}:{port}")
+    if finde_tex_maschine() is None:
+        print("Hinweis: keine TeX-Maschine gefunden, der Bericht bleibt beim .tex.")
     print("Beenden mit Strg+C.")
     try:
         server.serve_forever()
