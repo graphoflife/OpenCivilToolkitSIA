@@ -52,20 +52,88 @@ export function ersetzen(knoten, ...kinder) {
   return knoten;
 }
 
-/** Zahlenfeld mit einheitlichem Verhalten. */
-export function zahlfeld({ wert, schritt = 1, min, max, beiAenderung, titel, readonly }) {
-  return el('input', {
+/**
+ * Nächster Wert in einer Richtung -- entweder aus einer Stufenliste oder in
+ * gleichmässigen Schritten.
+ *
+ * Bei Stufen wird der nächste Listeneintrag genommen, bei gleichmässigen
+ * Schritten das nächste Vielfache. Ein Wert zwischen zwei Stufen rastet also
+ * beim ersten Druck ein, statt die Zwischenlage mitzuschleppen.
+ */
+export function naechsteStufe(wert, richtung, { stufen, schritt = 1 } = {}) {
+  const jetzt = Number.isFinite(wert) ? wert : 0;
+
+  if (stufen?.length) {
+    const sortiert = [...stufen].sort((a, b) => a - b);
+    const naechster = richtung > 0
+      ? sortiert.find((s) => s > jetzt + 1e-9)
+      : [...sortiert].reverse().find((s) => s < jetzt - 1e-9);
+    return naechster ?? (richtung > 0 ? sortiert.at(-1) : sortiert[0]);
+  }
+
+  // Auf das nächste Vielfache von `schritt` einrasten.
+  const stufe = richtung > 0
+    ? Math.floor(jetzt / schritt + 1e-9) + 1
+    : Math.ceil(jetzt / schritt - 1e-9) - 1;
+  return Math.max(0, stufe * schritt);
+}
+
+/**
+ * Zahlenfeld mit einheitlichem Verhalten.
+ *
+ * Die Pfeile sind eigene Knöpfe statt des Browser-Drehfelds, weil das nur
+ * gleichmässige Schritte kann. Durchmesser springen aber von 22 auf 26 und
+ * von 30 auf 34 -- eine Liste, kein Raster.
+ *
+ * @param {number[]} [stufen]  erlaubte Werte; sonst wird `schritt` verwendet
+ */
+export function zahlfeld({
+  wert, schritt = 1, stufen, min, max, beiAenderung, titel, readonly,
+}) {
+  const melden = (neu) => beiAenderung(neu);
+
+  const feld = el('input', {
     type: 'number',
     value: wert ?? '',
-    step: schritt,
+    step: 'any',
     min, max, title: titel, readOnly: !!readonly,
     on: {
       change: (e) => {
         const roh = e.target.value.trim();
-        beiAenderung(roh === '' ? null : Number(roh));
+        melden(roh === '' ? null : Number(roh));
+      },
+      keydown: (e) => {
+        if (readonly || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown')) return;
+        e.preventDefault();
+        ruecken(e.key === 'ArrowUp' ? 1 : -1);
       },
     },
   });
+
+  const ruecken = (richtung) => {
+    if (readonly) return;
+    const jetzt = feld.value.trim() === '' ? null : Number(feld.value);
+    let neu = naechsteStufe(jetzt ?? 0, richtung, { stufen, schritt });
+    if (min !== undefined && min !== null) neu = Math.max(neu, min);
+    if (max !== undefined && max !== null) neu = Math.min(neu, max);
+    feld.value = String(neu);
+    melden(neu);
+  };
+
+  if (readonly) return feld;
+
+  const pfeil = (zeichen, richtung, beschriftung) => el('button.zahlpfeil', {
+    text: zeichen, type: 'button', tabIndex: -1, title: beschriftung,
+    on: { click: (e) => { e.preventDefault(); ruecken(richtung); } },
+  });
+
+  return el('div.zahlfeld', {}, [
+    feld,
+    el('div.zahlpfeile', {}, [
+      pfeil('▴', 1, 'grösser'),
+      pfeil('▾', -1, 'kleiner'),
+    ]),
+  ]);
 }
 
 export function auswahl({ werte, gewaehlt, beiAenderung, titel }) {

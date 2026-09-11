@@ -467,7 +467,7 @@ class _Lauf:
         # deshalb traegt jede ihren Abschnitt selbst, statt dass irgendwo eine
         # Reihenfolge angenommen wird.
         if berechnung.abschnitt and berechnung.abschnitt != self._abschnitt:
-            protokoll.titel(berechnung.abschnitt)
+            protokoll.titel(berechnung.abschnitt, abschnitt=True)
             self._abschnitt = berechnung.abschnitt
 
         ergebnisse = berechnung.ausfuehren(eingaben, protokoll)

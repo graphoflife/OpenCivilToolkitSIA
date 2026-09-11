@@ -3,7 +3,7 @@
  *
  * Fünf Sichten auf dieselbe Lösung:
  *   Herleitung  die Mitschrift des Rechenkerns, Formel für Formel
- *   Nachweise   Urteile und Erfüllungsgrade
+ *   Zusammenfassung  je Platte eine Tabelle mit Urteilen und Erfüllungsgraden
  *   Diagramm    die M-N-Interaktionslinie
  *   Werte       alle bestimmten Grössen mit ihrer Herkunft
  *   Ziel wählen einen Wert anfordern und zurückverfolgen, was dafür nötig ist
@@ -131,10 +131,60 @@ function lueckenBanner(loesung) {
 // Sichten
 // ===========================================================================
 
+/**
+ * Wie der Abschnitt des links gewählten Bestandteils überschrieben ist.
+ *
+ * Muss zu dem passen, was der Kern setzt -- `Plattenanalyse: …` für Platten,
+ * `Beton: …` bzw. `Betonstahl: …` für Baustoffe.
+ */
+function abschnittDerAuswahl(loesung) {
+  const wahl = zustand.auswahl;
+  if (!wahl) return null;
+
+  if (wahl.art === 'querschnitt') {
+    const name = loesung.zuordnung?.querschnitte?.[wahl.kennung]?.name;
+    return name ? `Plattenanalyse: ${name}` : null;
+  }
+  const stoff = zustand.projekt?.materialien?.find((m) => m.kennung === wahl.kennung);
+  if (!stoff) return null;
+  return `${stoff.art === 'beton' ? 'Beton' : 'Betonstahl'}: ${stoff.name}`;
+}
+
+/**
+ * Schneidet die Mitschrift auf einen Abschnitt zu.
+ *
+ * Die Blöcke liegen flach hintereinander; ein Abschnitt reicht von seinem
+ * Titel bis zum nächsten Abschnittstitel. Welcher Titel einen Abschnitt
+ * eröffnet, sagt der Kern selbst (`abschnitt: true`) -- über die Ebene liesse
+ * es sich nicht entscheiden, Zwischenüberschriften stehen auf derselben.
+ */
+function nurAbschnitt(bloecke, name) {
+  const gewaehlt = [];
+  let drin = false;
+  for (const block of bloecke) {
+    if (block.art === 'titel' && block.abschnitt) drin = block.text === name;
+    if (drin) gewaehlt.push(block);
+  }
+  return gewaehlt;
+}
+
 function herleitung(loesung) {
   if (!loesung.protokoll?.length) {
     return leerzustand('Noch nichts gerechnet.', 'Oben auf "Rechnen" klicken.');
   }
+  let bloecke = loesung.protokoll;
+  if (zustand.umfang === 'seite') {
+    const name = abschnittDerAuswahl(loesung);
+    if (!name) {
+      return leerzustand('Nichts ausgewählt.',
+        'Links einen Bestandteil wählen – oder oben auf "Gesamt" umschalten.');
+    }
+    bloecke = nurAbschnitt(loesung.protokoll, name);
+    if (!bloecke.length) {
+      return leerzustand(`Für «${name}» wurde nichts gerechnet.`);
+    }
+  }
+
   const verfolgt = zustand.verfolgtesZiel;
   return el('div.blatt', {}, [
     verfolgt
@@ -154,27 +204,36 @@ function herleitung(loesung) {
     ...(loesung.warnungen || []).map((w) => el('div.hinweis.hinweis-warnung', {}, [
       el('b', { text: 'Warnung: ' }), w,
     ])),
-    ...bloeckeZeichnen(loesung.protokoll),
+    ...bloeckeZeichnen(bloecke),
     lueckenBanner(loesung),
   ]);
 }
 
-function nachweise(loesung) {
-  const alle = (loesung.urteile || []).filter(gehoertZurAuswahl);
-  if (!alle.length) {
-    return el('div.blatt', {}, [
-      leerzustand('Keine Nachweise gerechnet.',
-        'Einer Platte Einwirkungen zuweisen und "Rechnen" drücken.'),
-      lueckenBanner(loesung),
-    ]);
+/**
+ * Die Zusammenfassung: je Plattenquerschnitt eine Tabelle.
+ *
+ * Welche Platten erscheinen, steuert der Schalter *Gesamt / Aktuelle Seite*.
+ * Ist ein Material gewählt und "Aktuelle Seite" aktiv, bleibt sie leer -- ein
+ * Baustoff hat keine Nachweise, und eine willkürlich herausgegriffene Platte
+ * zu zeigen wäre irreführend.
+ */
+function zusammenfassung(loesung) {
+  const querschnitte = loesung.zuordnung?.querschnitte || {};
+  const wahl = zustand.auswahl;
+  const nurEine = zustand.umfang === 'seite';
+
+  if (nurEine && wahl && wahl.art !== 'querschnitt') {
+    return leerzustand('Kein Querschnitt gewählt.',
+      'Links eine Platte wählen – oder oben auf "Gesamt" umschalten.');
   }
 
-  // Nach Platte gruppieren: jede Platte bekommt ihre eigene Tabelle.
-  const nachPlatte = new Map();
-  for (const u of alle) {
-    const schluessel = plattenNameZu(u, loesung) || 'Sonstige';
-    if (!nachPlatte.has(schluessel)) nachPlatte.set(schluessel, []);
-    nachPlatte.get(schluessel).push(u);
+  const gezeigt = Object.entries(querschnitte).filter(
+    ([kennung]) => !nurEine || !wahl || wahl.kennung === kennung);
+  if (!gezeigt.length) {
+    return el('div.blatt', {}, [
+      leerzustand('Kein Querschnitt vorhanden.'),
+      lueckenBanner(loesung),
+    ]);
   }
 
   const zelle = (u, seite) => {
@@ -185,55 +244,78 @@ function nachweise(loesung) {
     return inhalt;
   };
 
-  return el('div', {}, [...nachPlatte.entries()].map(([platte, urteile]) =>
-    el('div.blatt', {}, [
-      el('div.b-titel', { text: `Nachweise – ${platte}` }),
-      el('div.tabelle-huelle', {}, [
-        el('table.nachweis-tabelle', {}, [
-          el('thead', {}, [el('tr', {}, [
-            el('th', { text: 'Nachweis' }),
-            el('th', { text: 'Widerstand' }),
-            el('th', { text: 'Einwirkung' }),
-            el('th', {}, [span(String.raw`\alpha_{eff}`)]),
-            el('th', { text: '' }),
-          ])]),
-          el('tbody', {}, urteile.map((u) => el('tr', {
-            class: u.erfuellt ? 'ist-gut' : 'ist-schlecht',
-            title: u.begruendung || '',
-          }, [
-            el('td', { text: u.name }),
-            zelle(u, 'widerstand'),
-            zelle(u, 'einwirkung'),
-            el('td.zahl.grad', { text: u.erfuellungsgrad ?? '\u221e' }),
-            el('td', {}, [el('span', {
-              class: u.erfuellt ? 'marke-gut' : 'marke-schlecht',
-              text: u.erfuellt ? 'erfüllt' : 'nicht erfüllt',
-            })]),
-          ]))),
-        ]),
-      ]),
-    ])).concat([lueckenBanner(loesung)].filter(Boolean)));
+  const blaetter = gezeigt.map(([kennung, eintrag]) => {
+    const urteile = (loesung.urteile || []).filter(
+      (u) => plattenKennungZu(u, loesung) === kennung);
+
+    return el('div.blatt', {}, [
+      el('div.b-titel', { text: `Zusammenfassung – ${eintrag.name}` }),
+      urteile.length
+        ? el('div.tabelle-huelle', {}, [
+          el('table.nachweis-tabelle', {}, [
+            el('thead', {}, [el('tr', {}, [
+              el('th', { text: 'Nachweis' }),
+              el('th', { text: 'Widerstand' }),
+              el('th', { text: 'Einwirkung' }),
+              el('th', {}, [span(String.raw`\alpha_{eff}`)]),
+              el('th', { text: '' }),
+            ])]),
+            el('tbody', {}, urteile.map((u) => el('tr', {
+              class: u.erfuellt ? 'ist-gut' : 'ist-schlecht',
+              title: u.begruendung || '',
+            }, [
+              el('td', { text: u.name }),
+              zelle(u, 'widerstand'),
+              zelle(u, 'einwirkung'),
+              el('td.zahl.grad', { text: u.erfuellungsgrad ?? '\u221e' }),
+              el('td', {}, [el('span', {
+                class: u.erfuellt ? 'marke-gut' : 'marke-schlecht',
+                text: u.erfuellt ? 'erfüllt' : 'nicht erfüllt',
+              })]),
+            ]))),
+          ]),
+        ])
+        : el('div.leer', { text: 'Für diese Platte wurde kein Nachweis gerechnet.' }),
+      plattenkennzahlen(eintrag, loesung),
+    ]);
+  });
+
+  return el('div', {}, blaetter.concat([lueckenBanner(loesung)].filter(Boolean)));
+}
+
+/**
+ * Die beiden Angaben zur Ausführung unter der Tabelle.
+ *
+ * Beide kommen fertig aus dem Kern -- hier wird nichts gerechnet, auch nicht
+ * "nur schnell" das Bewehrungsmass aus den Flächen.
+ */
+function plattenkennzahlen(eintrag, loesung) {
+  const zeigen = [
+    ['Bewehrungsmass', eintrag.werte?.bewehrungsmass, 'Stahldichte 7850 kg/m³'],
+    ['Höhe der Distanzhalter', eintrag.werte?.distanzhalter,
+      'OK innere untere Lage bis UK innere obere Lage'],
+  ];
+  const zeilen = zeigen
+    .map(([beschriftung, id, erklaerung]) => [beschriftung, loesung.werte?.[id], erklaerung])
+    .filter(([, wert]) => wert);
+  if (!zeilen.length) return null;
+
+  return el('div.kennzahlen', {}, zeilen.map(([beschriftung, wert, erklaerung]) =>
+    el('div.kennzahl', { title: erklaerung }, [
+      el('span.kennzahl-name', { text: beschriftung }),
+      el('span.kennzahl-wert', { text: `${wert.wert} ${wert.einheit}` }),
+    ])));
 }
 
 /** Zu welcher Platte ein Urteil gehört -- über die Zuordnung der Lösung. */
-function plattenNameZu(urteil, loesung) {
+function plattenKennungZu(urteil, loesung) {
   const qs = loesung.zuordnung?.querschnitte || {};
-  for (const eintrag of Object.values(qs)) {
+  for (const [kennung, eintrag] of Object.entries(qs)) {
     // Die Urteilsnamen tragen die Richtung, die Zuordnung den Plattennamen.
     if (Object.keys(eintrag.nachweise || {}).some((r) =>
-      urteil.name.includes(` ${r} –`))) return eintrag.name;
+      urteil.name.includes(` ${r} –`))) return kennung;
   }
-  return Object.values(qs)[0]?.name || '';
-}
-
-/** Filtert auf den links gewählten Bestandteil, wenn "Aktuelle Seite" aktiv ist. */
-function gehoertZurAuswahl(urteil) {
-  if (zustand.umfang !== 'seite') return true;
-  const wahl = zustand.auswahl;
-  if (!wahl) return true;
-  if (wahl.art !== 'querschnitt') return false;   // Materialien haben keine Nachweise
-  const name = zustand.projekt.querschnitte.find((q) => q.kennung === wahl.kennung)?.name;
-  return !!name && (zustand.loesung?.zuordnung?.querschnitte?.[wahl.kennung]?.name === name);
+  return Object.keys(qs)[0] || '';
 }
 
 function diagrammSicht(loesung) {
@@ -415,7 +497,7 @@ export function berichtZeichnen(behaelter, beiZielwahl) {
   }
 
   const sichten = {
-    nachweise: () => nachweise(loesung),
+    nachweise: () => zusammenfassung(loesung),
     diagramm: () => diagrammSicht(loesung),
     herleitung: () => herleitung(loesung),
     werte: () => werteSicht(loesung, beiZielwahl),

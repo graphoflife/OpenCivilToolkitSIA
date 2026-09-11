@@ -127,7 +127,8 @@ def wert_dict(wert: Wert) -> dict:
 def block_dict(block: Block) -> Optional[dict]:
     """Bildet einen Protokollbaustein ab. None fuer Unbekanntes."""
     if isinstance(block, TitelBlock):
-        return {"art": "titel", "text": block.text, "ebene": block.ebene}
+        return {"art": "titel", "text": block.text, "ebene": block.ebene,
+                "abschnitt": block.abschnitt}
     if isinstance(block, TextBlock):
         return {"art": "text", "text": block.text}
     if isinstance(block, GleichungBlock):

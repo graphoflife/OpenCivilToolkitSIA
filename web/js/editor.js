@@ -18,6 +18,14 @@
  */
 
 import { auswahl, el, ersetzen, melden, zahlfeld } from './dom.js';
+
+/**
+ * Lieferbare Stabdurchmesser in mm.
+ *
+ * Oberhalb von 22 mm wird die Reihe grober -- deshalb eine Liste und kein
+ * gleichmässiger Schritt.
+ */
+const DURCHMESSER = [6, 8, 10, 12, 14, 16, 18, 20, 22, 26, 30, 34, 40];
 import { span } from './mathe.js';
 import {
   gewaehltesMaterial, gewaehlterQuerschnitt, kennwertId, projektAendern, zustand,
@@ -255,14 +263,14 @@ function postenZeile(querschnitt, nummer, welcher, beschriftung) {
     el('span.postenname', { text: beschriftung }),
     el('span.zeichen', { text: '⌀' }),
     zahlfeld({
-      wert: posten.durchmesser || null, schritt: 2, min: 0,
+      wert: posten.durchmesser || null, stufen: DURCHMESSER, min: 0,
       titel: 'Stabdurchmesser in mm – leer oder 0 bedeutet: keine Bewehrung',
       beiAenderung: (v) => aendern((x) => { x.durchmesser = v ?? 0; }),
     }),
     el('span.zeichen', { text: ueberAbstand ? '@' : '×' }),
     ueberAbstand
       ? zahlfeld({
-        wert: posten.abstand, schritt: 25, min: 1, titel: 'Teilung in mm',
+        wert: posten.abstand, schritt: 25, min: 25, titel: 'Teilung in mm',
         beiAenderung: (v) => aendern((x) => { x.abstand = v ?? 150; }),
       })
       : zahlfeld({
@@ -466,7 +474,7 @@ function plattenEditor(querschnitt) {
       el('h3', { text: 'Nachweise' }),
       el('div.unterkapitel', {}, [
         el('div.unterkapitel-kopf', {}, [
-          el('span', { text: 'Einwirkungen' }),
+          el('span', { text: 'Tragsicherheitsnachweise' }),
           el('button.knopf.knopf-zart', {
             text: '+ Einwirkung',
             on: {

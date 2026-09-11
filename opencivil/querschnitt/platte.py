@@ -42,7 +42,7 @@ from typing import Dict, Iterator, List, Mapping, Optional, Sequence, Tuple
 from opencivil.core.berechnung import (
     Berechnung, Eingabebezug, Eingaben, Formel, Prozedur, Vorgabe,
 )
-from opencivil.core.einheiten import EINHEITSLOS, MM, MM2, Groesse
+from opencivil.core.einheiten import EINHEITSLOS, KG_PRO_M3, MM, MM2, Groesse
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
@@ -52,6 +52,9 @@ from opencivil.material.basis import Baustoff
 #: eine Haupt- und eine Querlage, mehr braucht es nicht, weniger waere ein
 #: Sonderfall mit leeren Lagen.
 LAGENZAHL = 4
+
+#: Rohdichte von Betonstahl, fuer das Bewehrungsmass.
+STAHLDICHTE = 7850.0
 
 
 class Richtung(str, Enum):
@@ -221,12 +224,16 @@ class Lagenaufbau(Prozedur):
         ausgaben: Sequence[WertDef],
         bezuege: Sequence[Eingabebezug],
         posten: Sequence["Postenbezug"],
+        d_bewehrungsmass: WertDef,
+        d_distanzhalter: WertDef,
         titel: str = "Bewehrungslagen",
         abschnitt: str = "",
     ) -> None:
         super().__init__(id, ausgaben=ausgaben, bezuege=bezuege, titel=titel,
                          referenz="SIA 262:2025, 5.2.2", abschnitt=abschnitt)
         self.posten = list(posten)
+        self.d_bewehrungsmass = d_bewehrungsmass
+        self.d_distanzhalter = d_distanzhalter
 
     def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
         h = e.g("h")
@@ -270,10 +277,18 @@ class Lagenaufbau(Prozedur):
 
         ergebnis: Dict[str, Groesse] = {}
         zeilen: List[List[str]] = []
+        #: Je Lagennummer die Ober- und Unterkante des Stahls, in m ab Oberkante.
+        kanten: Dict[int, Tuple[float, float]] = {}
         for q in self.posten:
             phi = e.g(f"phi_{q.marke}")
             rand = raender[(q.lage.von_unten, q.lage.stapelrang)] + phi / 2.0
             d = h - rand if q.lage.von_unten else rand
+
+            oben, unten = d.si - phi.si / 2.0, d.si + phi.si / 2.0
+            vorher = kanten.get(q.lage.nummer)
+            kanten[q.lage.nummer] = (
+                (min(oben, vorher[0]), max(unten, vorher[1])) if vorher
+                else (oben, unten))
 
             if q.posten.ueber_abstand:
                 s = e.g(f"s_{q.marke}")
@@ -301,6 +316,8 @@ class Lagenaufbau(Prozedur):
                 a_s.formatiert(0, MM2),
             ])
 
+        ergebnis.update(self._kennzahlen(p, e, h, b, ergebnis, kanten))
+
         if not einheitlich:
             mengenkopf = r"\text{Menge}"
         elif ueber_abstand:
@@ -317,6 +334,62 @@ class Lagenaufbau(Prozedur):
             titel="Randabstände, statische Höhen und Bewehrungsquerschnitte",
             ausrichtung="lllrrrrr",
         )
+        return ergebnis
+
+    def _kennzahlen(
+        self, p: Protokoll, e: Eingaben, h: Groesse, b: Groesse,
+        flaechen: Mapping[str, Groesse], kanten: Mapping[int, Tuple[float, float]],
+    ) -> Dict[str, Groesse]:
+        """
+        Bewehrungsmass und Hoehe der Distanzhalter.
+
+        Beides sind Angaben fuer die Ausfuehrung, keine Nachweisgroessen -- sie
+        gehoeren aber in den Kern und nicht in die Oberflaeche, damit sie in der
+        Herleitung stehen und sich zurueckverfolgen lassen.
+        """
+        ergebnis: Dict[str, Groesse] = {}
+
+        a_s_gesamt = sum(
+            (flaechen[q.as_def.id].si for q in self.posten), 0.0)
+        # Stahlvolumen je Betonvolumen: A_s * L * rho / (b * L * h) -- die Laenge
+        # kuerzt sich heraus.
+        mass = a_s_gesamt * STAHLDICHTE / (b.si * h.si)
+        ergebnis[self.d_bewehrungsmass.id] = Groesse(mass, KG_PRO_M3)
+        p.formel(
+            self.d_bewehrungsmass.belegen(Groesse(mass, KG_PRO_M3)),
+            rf"\frac{{@A_s \cdot {STAHLDICHTE:g}\,\mathrm{{kg}}/\mathrm{{m}}^{{3}}}}"
+            rf"{{@b \cdot @h}}",
+            {
+                "A_s": WertDef(f"{self.id}.A_s_gesamt", "A_{s,tot}", MM2,
+                               "Bewehrungsquerschnitt gesamt", 0
+                               ).belegen(Groesse.aus_si(a_s_gesamt, MM2)),
+                "b": WertDef(f"{self.id}._b", "b", MM, "Breite", 0).belegen(b),
+                "h": WertDef(f"{self.id}._h", "h", MM, "Dicke", 0).belegen(h),
+            },
+            titel="Bewehrungsmass je Kubikmeter Beton",
+        )
+
+        # Die Distanzhalter stehen zwischen der innersten unteren und der
+        # innersten oberen Lage. Fehlt die innere, gilt die aeussere.
+        unten = kanten.get(2) or kanten.get(1)
+        oben = kanten.get(3) or kanten.get(4)
+        if unten is None or oben is None:
+            # Eine deklarierte Ausgabe muss immer entstehen, sonst bricht der
+            # Loeser ab. Ohne Bewehrung auf beiden Seiten gibt es nichts
+            # abzustuetzen -- null ist hier die richtige Antwort, nicht "fehlt".
+            ergebnis[self.d_distanzhalter.id] = Groesse(0, MM)
+            p.text(
+                "Es liegt nur auf einer Seite Bewehrung – Distanzhalter "
+                "zwischen unterer und oberer Lage gibt es keine.")
+            return ergebnis
+
+        hoehe = unten[0] - oben[1]
+        ergebnis[self.d_distanzhalter.id] = Groesse.aus_si(hoehe, MM)
+        p.gleichung(
+            r"h_{Dist} = \text{OK innere untere Lage} - \text{UK innere obere Lage}"
+            rf" = {unten[0] * 1e3:.1f}\,\mathrm{{mm}} - {oben[1] * 1e3:.1f}\,\mathrm{{mm}}"
+            rf" = {hoehe * 1e3:.1f}\,\mathrm{{mm}}",
+            titel="Höhe der Distanzhalter")
         return ergebnis
 
 
@@ -459,7 +532,14 @@ class Plattenquerschnitt:
                     groesse=self.ueberdeckung_oben, abschnitt=abschnitt),
         ]
 
-        aufbau_ausgaben: List[WertDef] = []
+        self.d_bewehrungsmass = self._def(
+            "bewehrungsmass", r"\mu_s", KG_PRO_M3,
+            "Bewehrungsmass je Kubikmeter Beton", 0)
+        self.d_distanzhalter = self._def(
+            "distanzhalter", "h_{Dist}", MM,
+            "Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage)", 1)
+
+        aufbau_ausgaben: List[WertDef] = [self.d_bewehrungsmass, self.d_distanzhalter]
         aufbau_posten: List[Postenbezug] = []
         aufbau_bezuege = [
             Eingabebezug("h", d_h.id),
@@ -513,6 +593,8 @@ class Plattenquerschnitt:
                 ausgaben=aufbau_ausgaben,
                 bezuege=aufbau_bezuege,
                 posten=aufbau_posten,
+                d_bewehrungsmass=self.d_bewehrungsmass,
+                d_distanzhalter=self.d_distanzhalter,
                 abschnitt=abschnitt,
             ))
 

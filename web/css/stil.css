@@ -552,3 +552,35 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   user-select: none;
 }
 .kurvenschalter input { margin: 0; accent-color: var(--gut); cursor: pointer; }
+
+/* ------------------------------------------------------------- Zahlfeld -- */
+/* Eigene Pfeile statt des Browser-Drehfelds: das kann nur gleichmässige
+   Schritte, Durchmesser springen aber von 22 auf 26. */
+
+.zahlfeld { position: relative; display: flex; }
+.zahlfeld > input { width: 100%; padding-right: 16px; }
+.zahlfeld > input::-webkit-outer-spin-button,
+.zahlfeld > input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.zahlfeld > input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+
+.zahlpfeile {
+  position: absolute; right: 1px; top: 1px; bottom: 1px; width: 14px;
+  display: flex; flex-direction: column;
+}
+.zahlpfeil {
+  flex: 1; padding: 0; border: none; background: transparent; cursor: pointer;
+  font-size: 8px; line-height: 1; color: var(--schrift-zart);
+  display: flex; align-items: center; justify-content: center;
+}
+.zahlpfeil:hover { color: var(--blau); background: var(--blau-hell); }
+
+/* ---------------------------------------------------- Kennzahlen je Platte -- */
+
+.kennzahlen {
+  display: flex; flex-wrap: wrap; gap: 8px 22px;
+  margin: 10px 0 0; padding-top: 9px;
+  border-top: 1px solid var(--rand);
+}
+.kennzahl { display: flex; align-items: baseline; gap: 7px; font-size: 12.5px; }
+.kennzahl-name { color: var(--schrift-matt); }
+.kennzahl-wert { font-weight: 600; }

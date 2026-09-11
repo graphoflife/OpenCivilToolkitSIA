@@ -62,6 +62,15 @@ class TitelBlock(Block):
     text: str
     ebene: int = 2
 
+    abschnitt: bool = False
+    """
+    Eroeffnet dieser Titel einen ganzen Abschnitt (ein Bauteil, ein Baustoff)?
+
+    Die Oberflaeche braucht das, um die Herleitung auf den gewaehlten
+    Bestandteil einzugrenzen. Ueber die Ebene allein liesse sich das nicht
+    entscheiden -- Zwischenueberschriften stehen auf derselben.
+    """
+
 
 @dataclass
 class TextBlock(Block):
@@ -139,8 +148,8 @@ class Protokoll:
         self.bloecke.append(block)
         return block
 
-    def titel(self, text: str, ebene: int = 2) -> None:
-        self._anfuegen(TitelBlock(text=text, ebene=ebene))
+    def titel(self, text: str, ebene: int = 2, abschnitt: bool = False) -> None:
+        self._anfuegen(TitelBlock(text=text, ebene=ebene, abschnitt=abschnitt))
 
     def text(self, text: str) -> None:
         self._anfuegen(TextBlock(text=text))
