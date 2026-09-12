@@ -752,24 +752,31 @@ export function querkraftkurveZeichnen(kurve) {
   zug((p) => !p.plastisch, false);
   zug((p) => p.plastisch, true);
 
-  // -- Höchster und kleinster Widerstand anschreiben -----------------------
-  const hoechst = punkte.reduce((a, b) => (b.v_Rd > a.v_Rd ? b : a));
-  const kleinst = punkte.reduce((a, b) => (b.v_Rd < a.v_Rd ? b : a));
-  for (const [p, text, oben] of [
-    [hoechst, `max v_Rd = ${hoechst.v_Rd.toFixed(1)} kN/m`, true],
-    [kleinst, `min v_Rd = ${kleinst.v_Rd.toFixed(1)} kN/m`, false],
-  ]) {
+  // -- Die drei Marken -----------------------------------------------------
+  // Der Höchstwert (Moment null), der letzte Wert vor dem Fliessen und die
+  // Waagrechte danach. Die beiden letzten stehen beieinander und benennen den
+  // Sprung, um den es hier geht.
+  const elastisch = punkte.filter((p) => !p.plastisch);
+  const plastisch = punkte.filter((p) => p.plastisch);
+  const marken = [
+    [punkte.reduce((a, b) => (b.v_Rd > a.v_Rd ? b : a)), 'max v_Rd', true],
+    [elastisch.at(-1), 'v_Rd bei M_Ed = m_Rd', true],
+    [plastisch[0], 'v_Rd nach Fliessbeginn', false],
+  ];
+  for (const [p, name, oben] of marken) {
+    if (!p) continue;
     svg.append(svgEl('circle', {
       cx: x(p.M_Ed), cy: y(p.v_Rd), r: 4,
       fill: '#fff', stroke: '#1f5fa8', 'stroke-width': 2,
     }));
+    const rechts = x(p.M_Ed) > BREITE * 0.62;
     const t = svgEl('text', {
-      x: Math.min(x(p.M_Ed) + 8, BREITE - RAND.rechts - 4),
+      x: x(p.M_Ed) + (rechts ? -8 : 8),
       y: y(p.v_Rd) + (oben ? -9 : 17),
-      'text-anchor': x(p.M_Ed) > BREITE * 0.7 ? 'end' : 'start',
+      'text-anchor': rechts ? 'end' : 'start',
       'font-size': 11, 'font-weight': 600, fill: '#1f5fa8',
     });
-    t.textContent = text;
+    t.textContent = `${name} = ${p.v_Rd.toFixed(1)} kN/m`;
     svg.append(t);
   }
 

@@ -55,7 +55,8 @@ from opencivil.querschnitt.platte import Plattenquerschnitt, Richtung
 #: Unterer Riegel fuer den Beiwert der Gesteinskoernung.
 K_G_MINDEST = 1.20
 
-#: Aufschlag auf die Fliessdehnung, sobald ``m_Ed`` den Widerstand ueberschreitet.
+#: Vielfaches der Fliessdehnung, sobald ``m_Ed`` den Widerstand ueberschreitet.
+#: ``eps_v = PLASTISCH * f_yd / E_s`` -- fest, nicht vom Moment abhaengig.
 PLASTISCH = 1.5
 
 #: Stuetzstellen der M_Ed-v_Rd-Kurve.
@@ -63,6 +64,10 @@ KURVENPUNKTE = 50
 
 #: Wie weit die Kurve ueber ``m_Rd`` hinaus gezeichnet wird, in Nm.
 KURVENZUGABE = 20e3
+
+#: Abstand der beiden Stellen, zwischen denen der Sprung bei ``m_Rd`` liegt,
+#: in Nm. Nur damit der Absatz senkrecht gezeichnet wird -- 1 mNm.
+SPRUNGSCHRITT = 1e-3
 
 
 @dataclass(frozen=True)
@@ -127,10 +132,10 @@ def widerstand(
     * ``|m_Ed| <= m_Dd`` -- der Querschnitt bleibt ungerissen, ``eps_v = 0``
       und ``k_d`` damit am groessten.
     * ``|m_Ed| <= m_Rd`` -- der Regelfall der Norm.
-    * ``|m_Ed| >  m_Rd`` -- die Bewehrung fliesst. Die Dehnung waechst dann
-      nicht mehr nach der elastischen Beziehung; angesetzt wird
-      ``eps_v = 1.5 * f_yd/E_s * |m_Ed|/m_Rd``. Der Widerstand faellt damit
-      sprunghaft, und genau das soll die Kurve zeigen.
+    * ``|m_Ed| >  m_Rd`` -- die Bewehrung fliesst. Die Dehnung folgt dann nicht
+      mehr dem Moment, sondern ist **fest**: ``eps_v = 1.5 * f_yd/E_s``. Der
+      Widerstand faellt an dieser Stelle sprunghaft und bleibt danach
+      unveraendert -- in der Kurve eine Waagrechte.
     """
     m_Dd = abs(min(N_Ed, 0.0)) * h / 6.0
     zaehler = abs(M_Ed) - m_Dd
@@ -146,7 +151,7 @@ def widerstand(
                    f"Dekompressionsmoment m_Dd = {m_Dd / 1e3:.1f} kNm. "
                    f"Der Querkraftwiderstand ist so nicht bestimmbar."))
     elif abs(M_Ed) > m_Rd:
-        eps_v = PLASTISCH * (f_yd / E_s) * abs(M_Ed) / m_Rd
+        eps_v = PLASTISCH * f_yd / E_s
         plastisch = True
     else:
         eps_v = f_yd * zaehler / (E_s * nenner)
@@ -425,9 +430,17 @@ class Querkraft(Nachweis):
 
         d, d_v = self.beiwerte.hoehen(moment_positiv)
         bis = m_Rd + KURVENZUGABE
+
+        # Die fuenfzig Stellen liegen gleichmaessig, treffen ``m_Rd`` aber nur
+        # zufaellig. Beide Seiten des Sprungs kommen darum eigens dazu: sonst
+        # zeigte die Marke «v_Rd bei M_Ed = m_Rd» den Wert des Nachbarpunkts,
+        # und der Absatz waere schraeg statt senkrecht.
+        stellen = sorted(
+            {bis * i / (KURVENPUNKTE - 1) for i in range(KURVENPUNKTE)}
+            | {m_Rd, m_Rd + SPRUNGSCHRITT})
+
         punkte = []
-        for i in range(KURVENPUNKTE):
-            M_Ed = bis * i / (KURVENPUNKTE - 1)
+        for M_Ed in stellen:
             p = widerstand(
                 M_Ed=M_Ed, N_Ed=N_Ed, h=self.beiwerte.h, d=d, d_v=d_v,
                 tau_cd=self.beiwerte.tau_cd, f_yd=self.beiwerte.f_yd,

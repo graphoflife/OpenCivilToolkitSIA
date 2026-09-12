@@ -65,15 +65,22 @@ Bemessungspunkt direkt nach und vergleicht ihn mit dem Urteil.
 ### Jenseits von m_Rd
 
 Der eigentliche Grund, 20 kNm weiterzuzeichnen. Dort fliesst die Bewehrung,
-die elastische Beziehung gilt nicht mehr, und angesetzt wird
+die elastische Beziehung gilt nicht mehr, und die Dehnung folgt nicht mehr dem
+Moment, sondern ist **fest**:
 
 ```
-ε_v = 1.5 · f_yd/E_s · |m_Ed| / m_Rd
+ε_v = 1.5 · f_yd/E_s          (konstant)
 ```
 
-Im Beispiel fällt der Widerstand an der Stelle von 170.6 auf 140.4 kN/m — ein
-Sprung von 18 %. Gezeichnet wird der Ast gestrichelt, damit der Knick nicht
-wie ein Rechenfehler aussieht.
+Der Widerstand fällt damit einmal und läuft danach waagrecht. Im Beispiel von
+170.1 auf 141.4 kN/m — ein Sprung von 17 %. Gezeichnet wird der Ast
+gestrichelt, damit der Absatz nicht wie ein Rechenfehler aussieht.
+
+Angeschrieben sind drei Stellen: der Höchstwert bei M_Ed = 0, der Wert genau
+bei M_Ed = m_Rd und die Waagrechte danach. Die mittlere brauchte eine eigene
+Stützstelle: die fünfzig gleichmässigen treffen m_Rd nur zufällig, und die
+Marke hätte sonst den Wert des Nachbarpunkts gezeigt (170.6 statt 170.1) --
+und der Absatz wäre schräg statt senkrecht.
 
 ### Die Normalkraft gehört unter das Diagramm
 

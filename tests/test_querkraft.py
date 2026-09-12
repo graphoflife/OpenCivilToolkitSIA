@@ -265,12 +265,23 @@ class TestQuerkraftkurve(unittest.TestCase):
         return a
 
     def test_fuenfzig_punkte_von_null_bis_m_rd_plus_zwanzig(self):
+        """
+        Fünfzig gleichmässige Stützstellen, dazu die beiden Seiten des Sprungs
+        bei m_Rd -- ohne die stünde an der Marke der Wert des Nachbarpunkts.
+        """
         from opencivil.nachweis.querkraft import KURVENPUNKTE, KURVENZUGABE
 
         kurve = self.aufbau().querkraft["q1.x"].kurve(0.0, moment_positiv=True)
-        self.assertEqual(len(kurve["punkte"]), KURVENPUNKTE)
+        self.assertEqual(len(kurve["punkte"]), KURVENPUNKTE + 2)
         self.assertAlmostEqual(kurve["punkte"][0][0], 0.0)
         self.assertAlmostEqual(kurve["punkte"][-1][0], kurve["m_Rd"] + KURVENZUGABE)
+
+    def test_der_sprung_liegt_genau_auf_m_rd(self):
+        kurve = self.aufbau().querkraft["q1.x"].kurve(0.0, moment_positiv=True)
+        letzter_elastisch = [M for M, _, p in kurve["punkte"] if not p][-1]
+        erster_plastisch = [M for M, _, p in kurve["punkte"] if p][0]
+        self.assertAlmostEqual(letzter_elastisch, kurve["m_Rd"], places=9)
+        self.assertAlmostEqual(erster_plastisch, kurve["m_Rd"], places=2)
 
     def test_die_kurve_trifft_den_nachweis(self):
         """
@@ -292,8 +303,9 @@ class TestQuerkraftkurve(unittest.TestCase):
 
     def test_jenseits_des_widerstands_faellt_die_kurve(self):
         """
-        Über m_Rd fliesst die Bewehrung: eps_v springt, k_d sinkt. Genau
-        dieser Knick ist der Grund, 20 kNm weiter zu zeichnen.
+        Über m_Rd fliesst die Bewehrung: eps_v springt auf 1.5·f_yd/E_s und
+        bleibt dort. Der Widerstand fällt einmal und läuft dann waagrecht --
+        genau dieser Knick ist der Grund, 20 kNm weiter zu zeichnen.
         """
         kurve = self.aufbau().querkraft["q1.x"].kurve(0.0, moment_positiv=True)
         elastisch = [v for _, v, plastisch in kurve["punkte"] if not plastisch]
@@ -301,8 +313,26 @@ class TestQuerkraftkurve(unittest.TestCase):
 
         self.assertTrue(plastisch, "kein plastischer Ast gezeichnet")
         self.assertLess(max(plastisch), min(elastisch))
-        # Und innerhalb jedes Astes fällt der Widerstand mit wachsendem Moment.
+        # Im elastischen Ast fällt der Widerstand mit wachsendem Moment.
         self.assertEqual(elastisch, sorted(elastisch, reverse=True))
+        # Im plastischen ist er fest -- eps_v hängt dort nicht mehr am Moment.
+        for v in plastisch:
+            self.assertAlmostEqual(v, plastisch[0], places=6)
+
+    def test_der_plastische_wert_folgt_der_fliessdehnung(self):
+        """eps_v = 1.5 · f_yd/E_s, von Hand nachgerechnet."""
+        from opencivil.nachweis.querkraft import PLASTISCH
+
+        qk = self.aufbau().querkraft["q1.x"]
+        kurve = qk.kurve(0.0, moment_positiv=True)
+        d, d_v = qk.beiwerte.hoehen(True)
+
+        eps_v = PLASTISCH * qk.beiwerte.f_yd / qk.beiwerte.E_s
+        k_d = 1.0 / (1.0 + eps_v * d * 1e3 * qk.beiwerte.k_g)
+        erwartet = k_d * (qk.beiwerte.tau_cd / 1e6) * d_v * 1e3 * 1e3
+
+        plastisch = [v for _, v, p in kurve["punkte"] if p]
+        self.assertAlmostEqual(plastisch[0], erwartet, places=6)
 
     def test_ohne_moment_ist_der_widerstand_am_groessten(self):
         kurve = self.aufbau().querkraft["q1.x"].kurve(0.0, moment_positiv=True)
