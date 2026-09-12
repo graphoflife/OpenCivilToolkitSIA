@@ -466,8 +466,11 @@ class _Lauf:
         # eines Bauteils zuerst laeuft, entscheidet die Abhaengigkeitsfolge --
         # deshalb traegt jede ihren Abschnitt selbst, statt dass irgendwo eine
         # Reihenfolge angenommen wird.
+        # Eine stumme Berechnung schreibt nichts, also eroeffnet sie auch keinen
+        # Abschnitt -- sonst stuende eine Ueberschrift ohne alles darunter.
         abschnitt = berechnung.abschnitt
-        if abschnitt is not None and abschnitt.raum != self._abschnitt:
+        if (abschnitt is not None and abschnitt.raum != self._abschnitt
+                and not getattr(berechnung, "stumm", False)):
             protokoll.titel(abschnitt.titel, raum=abschnitt.raum)
             self._abschnitt = abschnitt.raum
 

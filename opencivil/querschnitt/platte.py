@@ -570,10 +570,13 @@ class Plattenquerschnitt:
 
         abschnitt = self.abschnitt
         self.berechnungen += [
+            # Grösstkorn und Einlagenhöhe gehen nur in den Querkraftnachweis
+            # ein und stehen darum dort, bei den Grössen, die sie erklären --
+            # nicht verwaist am Anfang der Plattenanalyse.
             Vorgabe(id=f"{self.id}.D_max", ausgabe=d_dmax, groesse=self.d_max,
-                    abschnitt=abschnitt),
+                    abschnitt=abschnitt, stumm=True),
             Vorgabe(id=f"{self.id}.einlagenhoehe", ausgabe=d_einl,
-                    groesse=self.einlagenhoehe, abschnitt=abschnitt),
+                    groesse=self.einlagenhoehe, abschnitt=abschnitt, stumm=True),
             Vorgabe(id=f"{self.id}.h", ausgabe=d_h, groesse=self.h, abschnitt=abschnitt),
             Vorgabe(id=f"{self.id}.b", ausgabe=d_b, groesse=self.b, abschnitt=abschnitt),
             Vorgabe(id=f"{self.id}.c_nom_unten", ausgabe=d_cu,
@@ -606,12 +609,17 @@ class Plattenquerschnitt:
                 index = posten_index(lage, art)
                 bezeichnung = f"{lage.nummer}. Lage {art.beschriftung}"
 
+                # Durchmesser und Teilung stehen in der Lagentabelle, Spalte
+                # für Spalte. Ein eigener Block je Posten gäbe bei vier Lagen
+                # bis zu sechzehn Zeilen der Form 's = 150 mm' -- dieselben
+                # Zahlen ein zweites Mal, nur schlechter zu vergleichen.
                 d_phi = self._def(
                     f"lage.{marke}.phi", rf"\varnothing_{{{index}}}", MM,
                     f"Stabdurchmesser {bezeichnung}", 0)
                 self.berechnungen.append(
                     Vorgabe(id=f"{self.id}.lage.{marke}.phi", ausgabe=d_phi,
-                            groesse=posten.durchmesser, abschnitt=abschnitt))
+                            groesse=posten.durchmesser, abschnitt=abschnitt,
+                            stumm=True))
                 aufbau_bezuege.append(Eingabebezug(f"phi_{marke}", d_phi.id))
 
                 if posten.ueber_abstand:
@@ -619,7 +627,8 @@ class Plattenquerschnitt:
                                     f"Teilung {bezeichnung}", 0)
                     self.berechnungen.append(
                         Vorgabe(id=f"{self.id}.lage.{marke}.s", ausgabe=d_s,
-                                groesse=posten.abstand, abschnitt=abschnitt))
+                                groesse=posten.abstand, abschnitt=abschnitt,
+                                stumm=True))
                     aufbau_bezuege.append(Eingabebezug(f"s_{marke}", d_s.id))
 
                 d_as = self._def(

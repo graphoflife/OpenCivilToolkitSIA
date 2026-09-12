@@ -481,6 +481,19 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   display: flex; align-items: center; justify-content: space-between;
   padding: 12px 16px; background: var(--blau-leiste); color: #fff;
 }
+/* Eigener Knopf statt .knopf: der Dialogkopf setzt color auf #fff, und .knopf
+   bringt eine helle Fläche mit. Die Aufschrift war damit weiss auf weiss. */
+.dialog-schliessen {
+  flex: none; width: 26px; height: 26px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; line-height: 1;
+  border: 1px solid rgba(255,255,255,.3); border-radius: 5px;
+  background: rgba(255,255,255,.12); color: #fff; cursor: pointer;
+  transition: background .12s, border-color .12s;
+}
+.dialog-schliessen:hover { background: rgba(255,255,255,.28); border-color: #fff; }
+.dialog-schliessen:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+
 .dialog-inhalt { padding: 16px; overflow: auto; max-height: calc(84vh - 58px); }
 .dialog-inhalt pre {
   background: var(--flaeche-2); border: 1px solid var(--rand); border-radius: 5px;
@@ -557,14 +570,22 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 /* Eigene Pfeile statt des Browser-Drehfelds: das kann nur gleichmässige
    Schritte, Durchmesser springen aber von 22 auf 26. */
 
-.zahlfeld { position: relative; display: flex; }
-.zahlfeld > input { width: 100%; padding-right: 16px; }
+/* Die Pfeilspur ist einmal deklariert; das Feld hält seinen Text davor frei.
+   Vorher stand die Aussparung als feste Zahl im Eingabefeld -- und wurde von
+   `.postenzeile input[type=number]` überschrieben, weil das spezifischer ist.
+   Die Ziffern liefen dann unter die Pfeile. Darum trägt die Regel jetzt
+   dieselbe Form wie die überschreibende und steht nach ihr. */
+.zahlfeld { --pfeilspur: 15px; position: relative; display: flex; }
+.zahlfeld > input[type=number] {
+  width: 100%;
+  padding-right: calc(var(--pfeilspur) + 6px);
+  -moz-appearance: textfield; appearance: textfield;
+}
 .zahlfeld > input::-webkit-outer-spin-button,
 .zahlfeld > input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.zahlfeld > input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 
 .zahlpfeile {
-  position: absolute; right: 1px; top: 1px; bottom: 1px; width: 14px;
+  position: absolute; right: 1px; top: 1px; bottom: 1px; width: var(--pfeilspur);
   display: flex; flex-direction: column;
 }
 .zahlpfeil {

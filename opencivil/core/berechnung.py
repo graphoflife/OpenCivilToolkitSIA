@@ -414,6 +414,7 @@ class Vorgabe(Berechnung):
         referenz: str = "",
         begruendung: str = "",
         abschnitt: Optional[Abschnitt] = None,
+        stumm: bool = False,
     ) -> None:
         super().__init__(
             id,
@@ -427,13 +428,26 @@ class Vorgabe(Berechnung):
         self.groesse = groesse
         self.quelle = quelle
 
+        self.stumm = stumm
+        """
+        Schreibt keinen eigenen Block in die Mitschrift.
+
+        Der Wert bleibt ein vollwertiger Knoten im Rechengraph -- er steht in
+        der Werteliste und laesst sich ueberschreiben wie jeder andere. Nur
+        seine eigene Zeile faellt weg, weil er anderswo schon dasteht: die
+        Stabdurchmesser in der Lagentabelle, das Groesstkorn beim
+        Querkraftnachweis, der ihn braucht. Vierzehn Zeilen der Form
+        ``∅ = 12 mm`` untereinander sind keine Herleitung.
+        """
+
     @property
     def ausgabe_quelle(self) -> Quelle:
         return self.quelle
 
     def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
         wert = self.ausgabe.belegen(self.groesse, self.quelle, herkunft=self.id)
-        p.wert(wert, titel=self.titel, referenz=self.referenz)
+        if not self.stumm:
+            p.wert(wert, titel=self.titel, referenz=self.referenz)
         return {self.ausgabe.id: self.groesse}
 
 

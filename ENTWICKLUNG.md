@@ -43,6 +43,84 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-12 · Sieben Meldungen
+
+### Zug schliesst den Querkraftnachweis nicht mehr aus
+
+Bei einer Normalzugkraft wurde `v_Rd = 0` gesetzt. Nötig war das nie: das
+Dekompressionsmoment ist über `min(N_Ed; 0)` definiert und wird bei Zug von
+selbst null — entlastend wirkt nur Druck. Der Sonderfall stand also neben einer
+Formel, die dasselbe schon sagte, und übertönte sie. Weg damit; der Nachweis
+läuft durch, und der kleinere Momentenwiderstand bei Zug senkt `v_Rd` ohnehin.
+
+Der Test dazu ging vorher über die Formel statt über den Nachweis, weil der
+Sonderfall verhinderte, dass sie je erreicht wurde. Jetzt prüft er den Weg.
+
+### Eine Vorgabe darf schweigen
+
+Vierzehn Zeilen der Form `∅ = 12 mm` und `s = 150 mm` standen untereinander in
+der Herleitung — dieselben Zahlen wie in der Lagentabelle, nur schlechter zu
+vergleichen. `Vorgabe(stumm=True)` schreibt keinen eigenen Block, bleibt aber
+ein vollwertiger Knoten im Rechengraph: in der Werteliste, überschreibbar,
+rückverfolgbar.
+
+Dasselbe für Grösstkorn und Einlagenhöhe — die stehen jetzt beim
+Querkraftnachweis, der sie als einziger braucht, statt verwaist zwischen
+Plattendicke und Bewehrung.
+
+Der Solver setzt für eine stumme Berechnung auch keine Abschnittsüberschrift;
+sonst stünde ein Titel ohne alles darunter.
+
+### Die Nachweise erbten ihren Abschnitt vom Zufall
+
+Beim Aufräumen aufgefallen: weder `BiegungNormalkraft` noch `Querkraft` gab
+einen `abschnitt` an. Beide schrieben ihre Überschrift einfach dorthin, wo sie
+gerade landeten — und das entscheidet die Abhängigkeitsfolge. In einer
+Reihenfolge stand der Querkraftnachweis der Platte unter **Beton: C30/37**.
+Jetzt trägt jeder Nachweis den Abschnitt seiner Platte.
+
+### Feste Stellenzahl in den Tabellenspalten
+
+`205` neben `224.5`, `1.6` neben `0.99` — die Kommas fluchteten nicht.
+`formatiert()` streicht nachlaufende Nullen, und das bleibt so: im Fliesstext
+ist es richtig. Die Tabelle bekommt daneben die Rohzahl und die Stellenzahl und
+setzt sie selbst. In einer Spalte steht immer dieselbe Grösse, also passt auch
+immer dieselbe Stellenzahl.
+
+### Die Griffe zwischen den Tafeln
+
+Der linke Griff zog nur `--breite-links` nach. Die mittlere Tafel behielt ihre
+Pixelbreite und rutschte mit, also ging die Änderung zu Lasten der rechten —
+die als `1fr` schlicht den Rest bekommt. Wer die rechte schmaler wollte, musste
+am linken Griff ziehen.
+
+Jetzt nimmt jeder Griff der einen Tafel, was er der anderen gibt; die dritte
+bleibt, wo sie ist. Die Breiten werden gemessen statt gerechnet — zwischen den
+Tafeln liegen noch die Griffe selbst, und die rechte hat gar keine Variable.
+
+### Ziffern unter den Pfeilen
+
+`.zahlfeld > input` hielt rechts 16 px frei, `.postenzeile input[type=number]`
+setzte `padding: 3px 5px` — und gewann, weil ein Attributselektor spezifischer
+ist. Die Ziffern liefen unter die Pfeile. Die Spurbreite steht jetzt einmal als
+`--pfeilspur`, und die Regel hat dieselbe Form wie die überschreibende.
+
+### Pfeiltasten hielten bei null
+
+`naechsteStufe` hatte ein `Math.max(0, …)` eingebaut. Für Durchmesser und
+Teilung stimmt das, für ein Moment nicht. Die Grenze sagt jetzt jedes Feld für
+sich über `min` — die Schnittgrössen ohne, die Baustoffkennwerte mit.
+
+### Nebenbei
+
+Der Schliessen-Knopf des Berichtsdialogs war weiss auf weiss: der Dialogkopf
+setzt `color: #fff`, und `.knopf` bringt eine helle Fläche mit. Jetzt ein ×
+mit eigenem Stil. Und die Seite hat ein Zeichen — `web/favicon.svg`, OCT in
+Weiss und dem Blau der Wortmarke. Gezeichnet, nicht gesetzt: ein `<text>` im
+Favicon hinge davon ab, welche Schrift der Browser gerade findet.
+
+---
+
 ## 2026-09-12 · Durchsicht der laufenden Seite
 
 Vier Befunde, drei davon im Kern.

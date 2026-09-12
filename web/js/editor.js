@@ -65,6 +65,9 @@ function kennwertZeile(material, vorlage) {
   const eingabe = zahlfeld({
     wert: anzeige,
     schritt: vorlage.stellen >= 3 ? 0.001 : (vorlage.stellen >= 1 ? 0.1 : 1),
+    // Ein Baustoffkennwert ist nie negativ. Die Schnittgrössen daneben schon,
+    // darum sagt es jedes Feld für sich und nicht die Pfeillogik für alle.
+    min: 0,
     readonly: !schreibbar,
     titel: gesperrt ? 'Normsorte – erst modifizieren, dann änderbar'
       : (vorlage.berechnet && !istUeberschrieben ? 'Wird gerechnet. Haken setzen zum Überschreiben.' : ''),

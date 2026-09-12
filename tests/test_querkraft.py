@@ -66,28 +66,35 @@ class TestQuerkraft(unittest.TestCase):
         self.assertAlmostEqual(k_g, K_G_MINDEST, places=6)
         self.assertAlmostEqual(K_G_MINDEST, 1.20)
 
-    def test_zug_zaehlt_beim_dekompressionsmoment_nicht(self):
-        """
-        m_Dd = |min(N_Ed; 0)| · h/6 -- eine Zugkraft entlastet nicht.
-
-        Geprüft an der Formel selbst, weil eine Normalzugkraft den
-        Querkraftnachweis ohnehin ausschliesst und m_Dd dann gar nicht mehr
-        gebraucht wird.
-        """
-        h = 0.3
-        fuer = lambda N: abs(min(N, 0.0)) * h / 6.0
-        self.assertAlmostEqual(fuer(-300e3), 300e3 * 0.3 / 6)   # Druck zählt
-        self.assertEqual(fuer(+300e3), 0.0)                      # Zug nicht
-        self.assertEqual(fuer(0.0), 0.0)
-
-    def test_zugkraft_schliesst_den_widerstand_aus(self):
+    def ergebnis_bei(self, N_Ed: float):
+        """Der Querkraftfall 'Feld' bei dieser Normalkraft in kN."""
         projekt = projekt_mit_querkraft()
-        projekt.querschnitte[0].kombinationen[0].N_Ed = 200.0   # Zug
-        aufbau, gefunden = urteile(projekt)
-        erg = aufbau.querkraft["q1.x"].ergebnisse[0]
-        self.assertEqual(erg.v_Rd, 0.0)
-        self.assertFalse(erg.erfuellt)
-        self.assertIn("Zugkraft", erg.begruendung)
+        projekt.querschnitte[0].kombinationen[0].N_Ed = N_Ed
+        aufbau, _ = urteile(projekt)
+        return aufbau.querkraft["q1.x"].ergebnisse[0]
+
+    def test_zug_zaehlt_beim_dekompressionsmoment_nicht(self):
+        """m_Dd = |min(N_Ed; 0)| · h/6 -- entlastend wirkt nur Druck."""
+        self.assertEqual(self.ergebnis_bei(+200.0).m_Dd, 0.0)
+        self.assertEqual(self.ergebnis_bei(0.0).m_Dd, 0.0)
+        self.assertAlmostEqual(self.ergebnis_bei(-300.0).m_Dd, 300e3 * 0.3 / 6)
+
+    def test_zugkraft_wird_gerechnet_statt_ausgeschlossen(self):
+        """
+        Eine Normalzugkraft setzte v_Rd früher kurzerhand auf null.
+
+        Nötig ist das nicht: m_Dd wird über min(N_Ed; 0) von selbst null, und
+        der kleinere Momentenwiderstand bei Zug senkt den Widerstand ohnehin --
+        der Nachweis läuft also unverändert durch.
+        """
+        zug = self.ergebnis_bei(+200.0)
+        ohne = self.ergebnis_bei(0.0)
+
+        self.assertGreater(zug.v_Rd, 0.0)
+        self.assertLess(zug.v_Rd, ohne.v_Rd)
+        # Die Begründung ist die gewöhnliche Rechnung, keine Ausnahmemeldung.
+        self.assertIn("v_Rd = k_d", zug.begruendung)
+        self.assertNotIn("Zugkraft", zug.begruendung)
 
     def test_m_rd_wird_bei_der_wirkenden_normalkraft_genommen(self):
         """

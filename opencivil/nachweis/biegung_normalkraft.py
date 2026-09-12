@@ -277,6 +277,9 @@ class BiegungNormalkraft(Nachweis):
             bezuege=bezuege,
             titel=f"M-N-Nachweis {richtung.beschriftung} – {querschnitt.name}",
             referenz="SIA 262:2025, 4.1.4",
+            # Siehe Querkraft: ohne Abschnitt landet der Nachweis unter der
+            # Ueberschrift, die die Rechenreihenfolge zufaellig offen liess.
+            abschnitt=querschnitt.abschnitt,
         )
 
     # -- Querschnittswerte --------------------------------------------------

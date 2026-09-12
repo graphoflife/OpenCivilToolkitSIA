@@ -21,9 +21,11 @@ ANSATZ::
 Vorzeichen des Moments ab: bei positivem Moment liegt der Zug unten, bei
 negativem oben.
 
-ZUG SCHLIESST DEN NACHWEIS AUS:
-Bei einer Normalzugkraft (N_Ed > 0) wird ``v_Rd = 0`` gesetzt. Ohne
-Querkraftbewehrung ist auf einen Querkraftwiderstand dann nicht zu zaehlen.
+ZUG BRAUCHT KEINEN SONDERFALL:
+Das Dekompressionsmoment ist ueber ``min(N_Ed; 0)`` definiert und wird bei
+einer Normalzugkraft von selbst null -- entlastend wirkt nur Druck. Der
+Nachweis laeuft damit unveraendert weiter; frueher stand hier ein Sonderfall,
+der ``v_Rd = 0`` setzte.
 
 EINHEITEN:
 Die Formeln der Norm sind dimensionell inhomogen -- ``d`` und ``D_max`` gehen
@@ -174,6 +176,10 @@ class Querkraft(Nachweis):
             bezuege=bezuege,
             titel=f"Querkraftnachweis {richtung.beschriftung} – {querschnitt.name}",
             referenz="SIA 262:2025, 4.3.3.2",
+            # Der Nachweis gehoert zu seiner Platte. Ohne diese Angabe stuende
+            # er unter der Ueberschrift, die zufaellig zuletzt offen war -- und
+            # welche das ist, entscheidet die Abhaengigkeitsfolge.
+            abschnitt=querschnitt.abschnitt,
         )
 
     # -- Rechnen ------------------------------------------------------------
@@ -265,18 +271,10 @@ class Querkraft(Nachweis):
         erg.d = _statische_hoehe(tiefen, h, M_Ed >= 0)
         erg.d_v = erg.d - einlage if (h / 6.0 < einlage < erg.d) else erg.d
 
-        if N_Ed > 0:
-            # Normalzugkraft: ohne Querkraftbewehrung kein Widerstand.
-            erg.v_Rd = 0.0
-            erg.erfuellungsgrad = 0.0
-            erg.erfuellt = False
-            erg.begruendung = (
-                f"N_Ed = {N_Ed / 1e3:.1f} kN ist eine Zugkraft. Ohne "
-                f"Querkraftbewehrung wird v_Rd = 0 gesetzt.")
-            return erg
-
-        # Nur Druck entlastet. Eine Zugkraft hat hier nichts zu suchen -- und
-        # kommt ohnehin nicht bis hierher, siehe oben.
+        # Nur Druck entlastet: bei Zug liefert min(N_Ed; 0) null, das
+        # Dekompressionsmoment entfaellt und der Nachweis laeuft unveraendert
+        # weiter. Eine Sonderbehandlung braucht es dafuer nicht -- sie stand
+        # frueher hier und setzte v_Rd kurzerhand auf null.
         erg.m_Dd = abs(min(N_Ed, 0.0)) * h / 6.0
         erg.m_Rd = m_Rd
         zaehler = abs(M_Ed) - erg.m_Dd
@@ -321,8 +319,7 @@ class Querkraft(Nachweis):
         p.text(
             "Querkraftwiderstand ohne Querkraftbewehrung. Massgebend sind die "
             "statische Höhe der gezogenen Bewehrung, die Grösstkorngrösse und "
-            "die Dehnung auf halber Höhe. Bei einer Normalzugkraft wird der "
-            "Widerstand zu null gesetzt."
+            "die Dehnung auf halber Höhe."
         )
         p.gleichung(
             r"v_{Rd} = k_d \cdot \tau_{cd} \cdot d_v \qquad "
@@ -339,6 +336,11 @@ class Querkraft(Nachweis):
             "m_Ed und N_Ed von der Einwirkung abhängt, wird er für jede "
             "Kombination einzeln bestimmt."
         )
+        # Grösstkorn und Einlagenhöhe gehen nur hier ein. Sie stehen darum
+        # hier und nicht am Anfang der Plattenanalyse, wo sie zwischen
+        # Abmessungen und Bewehrung niemandem etwas sagen.
+        for name in ("D_max", "einlagenhoehe"):
+            p.wert(e[name])
 
     def _protokoll_fall(
         self, p: Protokoll, erg: Querkraftergebnis, h: float, tau_cd: Groesse,
@@ -361,10 +363,6 @@ class Querkraft(Nachweis):
             rf"M_{{Ed}} = {fall.M_Ed.als_latex(1, KNM)} \qquad "
             rf"N_{{Ed}} = {fall.N_Ed.als_latex(1, KN)}",
             titel="Einwirkung")
-
-        if N_Ed > 0:
-            p.text(erg.begruendung)
-            return
 
         seite = "unten" if M_Ed >= 0 else "oben"
         p.gleichung(

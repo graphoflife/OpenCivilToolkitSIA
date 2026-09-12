@@ -113,6 +113,11 @@ def wert_dict(wert: Wert) -> dict:
         "symbol": wert.symbol,
         "wert": wert.formatiert(),
         "zahl": wert.groesse.in_einheit(wert.einheit),
+        # Rohzahl und Stellenzahl getrennt, damit eine Tabellenspalte feste
+        # Nachkommastellen setzen kann. 'wert' streicht nachlaufende Nullen --
+        # im Fliesstext richtig, in einer Zahlenkolonne nicht: dort stuende
+        # sonst 205 neben 224.5.
+        "stellen": wert.definition.stellen,
         "einheit": wert.einheit.beschriftung if wert.einheit.name not in ("", "-") else "",
         "einheit_latex": wert.einheit.latex or "",
         "beschreibung": wert.beschreibung,

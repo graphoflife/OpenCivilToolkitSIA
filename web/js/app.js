@@ -180,18 +180,57 @@ async function berichtErzeugen() {
 // Tafelbreiten
 // ===========================================================================
 
+/** Mindestbreite jeder Tafel in Pixeln. Darunter wird nichts mehr lesbar. */
+const MINDESTBREITE = { links: 200, mitte: 260, rechts: 280 };
+
+/**
+ * Die beiden Griffe zwischen den Tafeln.
+ *
+ * Ein Griff bewegt **eine** Grenze: er nimmt der einen Tafel, was er der
+ * anderen gibt. Die dritte bleibt, wo sie ist.
+ *
+ * Vorher zog der linke Griff nur `--breite-links` nach. Die mittlere Tafel
+ * behielt ihre Pixelbreite und rutschte mit, also ging die Änderung zu Lasten
+ * der rechten Tafel -- die als `1fr` schlicht den Rest bekommt. Wer die rechte
+ * schmaler wollte, musste am linken Griff ziehen. Genau das soll nicht sein.
+ *
+ * Die rechte Tafel hat keine eigene Variable; ihre Breite ergibt sich. Der
+ * rechte Griff begrenzt sich deshalb an dem, was übrig bliebe.
+ */
 function griffeEinrichten() {
+  const wurzel = document.documentElement;
+
   for (const griff of document.querySelectorAll('.griff')) {
+    const links = griff.dataset.griff === 'links';
+
     griff.addEventListener('mousedown', (start) => {
       start.preventDefault();
       griff.classList.add('ist-aktiv');
-      const welche = griff.dataset.griff === 'links' ? '--breite-links' : '--breite-mitte';
-      const anfang = parseInt(
-        getComputedStyle(document.documentElement).getPropertyValue(welche), 10);
+
+      // Gemessen statt gerechnet: die rechte Tafel hat keine eigene Variable,
+      // und zwischen den Tafeln liegen noch die Griffe. Was tatsächlich auf dem
+      // Schirm steht, weiss nur das Layout selbst.
+      const [tLinks, tMitte, tRechts] = [...document.querySelectorAll('.tafel')]
+        .map((t) => t.getBoundingClientRect().width);
+
+      // Wie weit der Griff nach links und rechts darf, bevor eine der beiden
+      // angrenzenden Tafeln ihre Mindestbreite unterschreitet. Nie negativ:
+      // ist ohnehin kein Platz mehr, bewegt sich eben nichts.
+      const luft = (breite, art) => Math.max(0, breite - MINDESTBREITE[art]);
+      const [schrumpft, waechst] = links
+        ? [luft(tLinks, 'links'), luft(tMitte, 'mitte')]
+        : [luft(tMitte, 'mitte'), luft(tRechts, 'rechts')];
+      const anfangLinks = tLinks;
+      const anfangMitte = tMitte;
 
       const bewegen = (e) => {
-        const neu = Math.min(Math.max(anfang + e.clientX - start.clientX, 200), 720);
-        document.documentElement.style.setProperty(welche, `${neu}px`);
+        const weg = Math.min(Math.max(e.clientX - start.clientX, -schrumpft), waechst);
+        if (links) {
+          wurzel.style.setProperty('--breite-links', `${anfangLinks + weg}px`);
+          wurzel.style.setProperty('--breite-mitte', `${anfangMitte - weg}px`);
+        } else {
+          wurzel.style.setProperty('--breite-mitte', `${anfangMitte + weg}px`);
+        }
       };
       const loslassen = () => {
         griff.classList.remove('ist-aktiv');

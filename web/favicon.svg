@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img"
+     aria-label="OpenCivilToolkitSIA">
+  <title>OpenCivilToolkitSIA</title>
+  <!--
+    OCT als Zeichen: O weiss, C und T im Blau der Wortmarke, auf dem dunklen
+    Blau der Kopfleiste.
+
+    Gezeichnet, nicht gesetzt. Ein <text> im Favicon haengt davon ab, welche
+    Schrift der Browser gerade findet, und im Tab ist das Zeichen 16 px gross:
+    da entscheidet die Strichstaerke, nicht die Schriftart.
+  -->
+  <rect width="64" height="64" rx="13" fill="#0c2244"/>
+
+  <g fill="none" stroke-width="4" stroke-linecap="round">
+    <!-- O -->
+    <circle cx="13" cy="32" r="5.5" stroke="#ffffff"/>
+    <!-- C: derselbe Kreis, rechts offen -->
+    <path d="M 35.5 27.8 A 5.5 5.5 0 1 0 35.5 36.2" stroke="#6ea8fe"/>
+  </g>
+
+  <!-- T -->
+  <g fill="#6ea8fe">
+    <rect x="44" y="24.5" width="15" height="4" rx="2"/>
+    <rect x="49.5" y="24.5" width="4" height="15" rx="2"/>
+  </g>
+</svg>

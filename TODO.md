@@ -22,13 +22,20 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
 - [ ] Momente stehen in der Mitschrift als `kNm`, gemeint ist `kNm/m` (die
       Platte wird je Laufmeter gerechnet). In der Eingabemaske steht es
       richtig. Einheitlich ziehen.
-- [ ] In den Tabellenspalten springt die Stellenzahl: `205` steht neben
-      `224.5`, `1.6` neben `0.99`. `Groesse.formatiert()` streicht
-      nachlaufende Nullen — im Fliesstext richtig, in einer Zahlenkolonne
-      nicht. Die Spalte bräuchte die Rohzahl samt `stellen`; heute kommt sie
-      fertig formatiert aus dem Kern.
 
 ## Erledigt zuletzt
+
+Feste Stellenzahl in den Tabellenspalten · Querkraftnachweis auch bei
+Normalzug (m_Dd wird über `min(N_Ed; 0)` von selbst null) · Durchmesser und
+Teilung nicht mehr als eigene Blöcke in der Herleitung, Grösstkorn und
+Einlagenhöhe dafür beim Querkraftnachweis · jeder Nachweis trägt den Abschnitt
+seiner Platte, statt ihn von der Rechenreihenfolge zu erben · Spaltengriffe
+bewegen je eine Grenze · Ziffern liefen unter die Pfeile der Zahlenfelder ·
+Pfeiltasten hielten bei null, obwohl Schnittgrössen negativ sein dürfen ·
+Schliessen-Knopf im Berichtsdialog war weiss auf weiss, jetzt ein × ·
+Zeichen für den Browsertab (`web/favicon.svg`).
+
+## Davor
 
 Durchsicht der laufenden Seite: leerer Index bei den Stahlflächen der
 Handrechnung (`A_{s,}`) samt der nie geschriebenen Schwerpunktformel für `d` ·

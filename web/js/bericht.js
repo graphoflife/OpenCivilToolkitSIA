@@ -127,6 +127,23 @@ function lueckenBanner(loesung) {
   ]);
 }
 
+/**
+ * Eine Zahl mit fester Stellenzahl -- für Tabellenspalten.
+ *
+ * Der Kern liefert daneben `wert`, wo nachlaufende Nullen gestrichen sind. Das
+ * liest sich im Fliesstext besser, in einer Kolonne aber nicht: dort stünde
+ * `205` neben `224.5` und `1.6` neben `0.99`, und die Kommas fluchten nicht
+ * mehr. In einer Spalte steht immer dieselbe Grösse, also passt auch immer
+ * dieselbe Stellenzahl.
+ *
+ * @param {number|null} zahl      Rohzahl; null bei unendlich (siehe `endlich()`)
+ * @param {number} stellen        Nachkommastellen laut Wertdefinition
+ * @param {string} ersatz         was ohne Zahl dasteht
+ */
+function feste(zahl, stellen, ersatz = '—') {
+  return Number.isFinite(zahl) ? zahl.toFixed(stellen ?? 0) : ersatz;
+}
+
 // ===========================================================================
 // Sichten
 // ===========================================================================
@@ -217,7 +234,7 @@ function zusammenfassung(loesung) {
     const w = u[seite];
     if (!w) return el('td.zahl', { text: '—' });
     const inhalt = el('td.zahl');
-    inhalt.append(span(`${w.symbol} = `), `${w.wert} ${w.einheit}`);
+    inhalt.append(span(`${w.symbol} = `), `${feste(w.zahl, w.stellen, w.wert)} ${w.einheit}`);
     return inhalt;
   };
 
@@ -246,7 +263,9 @@ function zusammenfassung(loesung) {
               el('td', { text: u.name }),
               zelle(u, 'widerstand'),
               zelle(u, 'einwirkung'),
-              el('td.zahl.grad', { text: u.erfuellungsgrad ?? '\u221e' }),
+              el('td.zahl.grad', {
+                text: feste(u.erfuellungsgrad_zahl, 2, '\u221e'),
+              }),
               el('td', {}, [el('span', {
                 class: u.erfuellt ? 'marke-gut' : 'marke-schlecht',
                 text: u.erfuellt ? 'erfüllt' : 'nicht erfüllt',

@@ -59,6 +59,11 @@ export function ersetzen(knoten, ...kinder) {
  * Bei Stufen wird der nächste Listeneintrag genommen, bei gleichmässigen
  * Schritten das nächste Vielfache. Ein Wert zwischen zwei Stufen rastet also
  * beim ersten Druck ein, statt die Zwischenlage mitzuschleppen.
+ *
+ * Nach unten ist hier nichts begrenzt. Wo null die Grenze ist -- Durchmesser,
+ * Teilung, Stabzahl --, sagt das Feld es über `min`. Eine eingebaute Sperre bei
+ * null hielt dagegen auch die Schnittgrössen fest, und ein Moment darf negativ
+ * sein.
  */
 export function naechsteStufe(wert, richtung, { stufen, schritt = 1 } = {}) {
   const jetzt = Number.isFinite(wert) ? wert : 0;
@@ -75,7 +80,7 @@ export function naechsteStufe(wert, richtung, { stufen, schritt = 1 } = {}) {
   const stufe = richtung > 0
     ? Math.floor(jetzt / schritt + 1e-9) + 1
     : Math.ceil(jetzt / schritt - 1e-9) - 1;
-  return Math.max(0, stufe * schritt);
+  return stufe * schritt;
 }
 
 /**
