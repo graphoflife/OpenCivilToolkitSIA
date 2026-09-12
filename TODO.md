@@ -25,7 +25,10 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
 
 ## Erledigt zuletzt
 
-Überschriften der Herleitung: fett mit blauem Akzent nur noch dort, wo ein
+Eingaben werden geprüft: eine eingegebene Null wurde stillschweigend durch die
+Vorgabe ersetzt (`h = 0` rechnete mit 300 mm und meldete «alle Nachweise
+erfüllt»), unmögliche Abmessungen liefen durch, und `γ_c = 0` kam als
+`ZeroDivisionError` beim Benutzer an · Überschriften der Herleitung: fett mit blauem Akzent nur noch dort, wo ein
 Bestandteil beginnt; innerhalb Zwischenüberschriften mit gedämpftem Akzent.
 Entschieden wird nach dem Namensraum des Blocks, nicht mehr nach der
 Schriftebene · `m_Rd(N_Ed)` wird auch beim Querkraftnachweis hergeleitet — dieselbe

@@ -194,6 +194,76 @@ class TestVollstaendigeAblage(unittest.TestCase):
         with self.assertRaises(ProjektFehler):
             projekt.aufbauen()
 
+    def test_eine_null_wird_nicht_durch_die_vorgabe_ersetzt(self):
+        """
+        Der schlimmste der bisherigen Fehler: `float(d.get("h") or 300.0)`
+        konnte eine eingegebene Null nicht von einem fehlenden Feld
+        unterscheiden. Im Eingabefeld stand 0, gerechnet wurde mit 300 mm, und
+        die Oberfläche meldete «alle Nachweise erfüllt» für eine Platte ohne
+        Dicke.
+        """
+        roh = Projekt.beispiel().als_dict()
+        roh["querschnitte"][0]["h"] = 0
+        self.assertEqual(Projekt.aus_dict(roh).querschnitt("q1").h, 0.0)
+
+        # Fehlt das Feld dagegen wirklich, greift die Vorgabe weiter.
+        del roh["querschnitte"][0]["h"]
+        self.assertEqual(Projekt.aus_dict(roh).querschnitt("q1").h, 300.0)
+
+    def test_unmoegliche_abmessungen_werden_benannt(self):
+        def mit(**aenderung):
+            projekt = Projekt.beispiel()
+            for feld, wert in aenderung.items():
+                setattr(projekt.querschnitt("q1"), feld, wert)
+            with self.assertRaises(ProjektFehler) as ctx:
+                projekt.aufbauen()
+            return str(ctx.exception)
+
+        self.assertIn("Dicke h", mit(h=0.0))
+        self.assertIn("Dicke h", mit(h=-300.0))
+        self.assertIn("Breite b", mit(b=0.0))
+        self.assertIn("Grösstkorn", mit(d_max=0.0))
+        self.assertIn("negativ", mit(ueberdeckung_unten=-10.0))
+        # Zusammen dicker als die Platte: dort ist kein Platz für Bewehrung.
+        self.assertIn("Überdeckungen", mit(ueberdeckung_unten=150.0, ueberdeckung_oben=150.0))
+
+    def test_null_ueberdeckung_bleibt_erlaubt(self):
+        """Unüblich, aber nicht unmöglich -- geprüft wird nur die Geometrie."""
+        projekt = Projekt.beispiel()
+        projekt.querschnitt("q1").ueberdeckung_unten = 0.0
+        projekt.aufbauen()          # wirft nicht
+
+    def test_materialkennwerte_muessen_positiv_sein(self):
+        """
+        gamma_c = 0 endete in einem ZeroDivisionError, ein negatives f_ck in
+        einer komplexen Wurzel -- beides kam als Absturzmeldung beim Benutzer
+        an. Jeder Kennwert dieser Baustoffe ist seiner Natur nach positiv.
+        """
+        for kurzname, zahl in (("gamma_c", 0.0), ("f_ck", -30.0)):
+            projekt = Projekt.beispiel()
+            material = projekt.material("b1")
+            material.eigenstaendig = True
+            material.abweichungen = {kurzname: zahl}
+            with self.assertRaises(ProjektFehler) as ctx:
+                projekt.aufbauen()
+            self.assertIn(kurzname, str(ctx.exception))
+
+    def test_fehlende_pflichtfelder_werden_benannt(self):
+        """Vorher kam der nackte KeyError bis in die Oberfläche."""
+        for weg in ("kennung", "beton"):
+            roh = Projekt.beispiel().als_dict()
+            del roh["querschnitte"][0][weg]
+            with self.assertRaises(ProjektFehler) as ctx:
+                Projekt.aus_dict(roh)
+            self.assertIn(weg, str(ctx.exception))
+
+    def test_eine_zahl_die_keine_ist(self):
+        roh = Projekt.beispiel().als_dict()
+        roh["querschnitte"][0]["h"] = "dreihundert"
+        with self.assertRaises(ProjektFehler) as ctx:
+            Projekt.aus_dict(roh)
+        self.assertIn("dreihundert", str(ctx.exception))
+
     def test_ohne_kombination_gibt_es_eine_warnung_statt_eines_fehlers(self):
         projekt = Projekt(
             materialien=[

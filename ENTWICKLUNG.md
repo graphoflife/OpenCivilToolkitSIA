@@ -43,6 +43,65 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-12 · Eingaben wurden auf Treu und Glauben genommen
+
+Eine Durchsicht mit Randwerten statt mit dem Beispiel. Die Verweise waren
+sauber geprüft — fehlendes Material, unbekannte Sorte, doppelter Name, alles
+mit einem verständlichen Satz. **Zahlen dagegen wurden gar nicht geprüft.**
+
+### Eine eingegebene Null verschwand
+
+```python
+h=float(d.get("h") or 300.0)
+```
+
+`0 or 300.0` ist `300.0`. Der Ausdruck kann eine eingegebene Null nicht von
+einem fehlenden Feld unterscheiden — und dieselbe Zeile gab es für `b`, beide
+Überdeckungen und `D_max`.
+
+Durchgespielt in der Oberfläche: ins Feld *Dicke h* eine `0` getippt. Das Feld
+zeigt 0, der Browserspeicher enthält 0, gerechnet wird mit **300 mm**, die
+Herleitung schreibt 300 mm hin — und oben rechts steht **«alle Nachweise
+erfüllt»**. Eine Platte ohne Dicke, und das Werkzeug beruhigt.
+
+Das ist der schlimmste Fehlerfall, den dieses Programm haben kann: nicht eine
+falsche Zahl, sondern eine falsche Zahl mit einem grünen Haken daneben.
+
+Jetzt gibt es `_zahl(d, feld, vorgabe)` — die Vorgabe greift nur, wenn nichts
+dasteht. Und `_pflichtfeld()` für die, die keine Vorgabe haben dürfen.
+
+### Unmögliche Abmessungen liefen durch
+
+`h = -300` wurde gerechnet. Eine Platte mit 400 mm Überdeckung in 300 mm Dicke
+auch. Heraus kamen Zahlen, die aussahen wie ein Ergebnis.
+
+`_masse_pruefen()` hält auf, was geometrisch unmöglich ist — und nur das. Ob
+20 mm Überdeckung für die Expositionsklasse genügen, entscheidet der Ingenieur;
+das Werkzeug hat dazu nichts zu sagen. Null Überdeckung bleibt darum erlaubt.
+
+### Rohe Python-Fehler kamen beim Benutzer an
+
+| Eingabe | Vorher |
+|---|---|
+| eigenes Material, `γ_c = 0` | `ZeroDivisionError: float division by zero` |
+| eigenes Material, `f_ck = -30` | `TypeError: … not 'complex'` |
+| Datei ohne `kennung` | `KeyError: 'kennung'` |
+
+Alle drei mit HTTP 500. Jeder Kennwert dieser beiden Baustoffe ist seiner Natur
+nach positiv — Festigkeiten, Moduln, Dehnungen, Teilsicherheitsbeiwerte. Eine
+Null liefert dort keine falsche Zahl, sondern gar keine. Das wird jetzt vorher
+gesagt, mit Sorte und Kurzname im Satz.
+
+### Nachgemessen
+
+Fünfzehn Randfälle, vorher vier Abstürze und vier stille Ersetzungen — jetzt
+durchgehend Status 400 mit einem deutschen Satz, und die zulässigen Fälle
+rechnen unverändert. Was gut war, blieb gut: fremdes JSON, doppelte Namen,
+gelöschtes Material, leeres Projekt, Rundreise durch `pruefen` (byte-gleich),
+nur eine Seite bewehrt, Stabzahl statt Teilung, gemischte Angabe.
+
+---
+
 ## 2026-09-12 · Zwei Arten von Überschrift, und nur zwei
 
 Die Mitschrift sah flach aus, wo sie es nicht ist: «Plattenanalyse: Decke über

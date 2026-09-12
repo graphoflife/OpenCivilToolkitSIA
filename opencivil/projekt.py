@@ -46,6 +46,80 @@ class ProjektFehler(Exception):
     """Die Projektbeschreibung ist in sich nicht stimmig."""
 
 
+def _zahl(d: Mapping[str, Any], feld: str, vorgabe: float) -> float:
+    """
+    Eine Zahl aus der Beschreibung. Die Vorgabe gilt nur, wenn nichts dasteht.
+
+    Bewusst **nicht** ``float(d.get(feld) or vorgabe)``: dieser Ausdruck kann
+    eine eingegebene Null nicht von einem fehlenden Feld unterscheiden und
+    ersetzt sie stillschweigend. Im Eingabefeld stand dann ``h = 0``, gerechnet
+    wurde mit 300 mm, und die Herleitung schrieb 300 mm hin -- ein Widerspruch,
+    den niemand sieht. Eine Platte ohne Dicke meldete «alle Nachweise erfüllt».
+    """
+    wert = d.get(feld)
+    if wert is None or wert == "":
+        return vorgabe
+    try:
+        return float(wert)
+    except (TypeError, ValueError):
+        raise ProjektFehler(
+            f"Das Feld '{feld}' enthält keine Zahl, sondern {wert!r}."
+        ) from None
+
+
+def _pflichtfeld(d: Mapping[str, Any], feld: str, wer: str) -> str:
+    """
+    Ein Feld, ohne das sich nichts zusammenbauen laesst.
+
+    Ohne diese Pruefung kam der nackte ``KeyError`` bis in die Oberflaeche --
+    eine Fehlermeldung, die dem Benutzer nichts sagt und nach einem Absturz
+    aussieht.
+    """
+    wert = d.get(feld)
+    if wert in (None, ""):
+        raise ProjektFehler(f"{wer} hat kein Feld '{feld}'. Die Datei ist unvollständig.")
+    return str(wert)
+
+
+def _masse_pruefen(eintrag: "QuerschnittEintrag") -> None:
+    """
+    Haelt unmoegliche Abmessungen auf, bevor daraus Zahlen werden.
+
+    Bis hierher lief jede Geometrie durch: eine Platte mit ``h = -300`` wurde
+    gerechnet, eine mit beidseitiger Ueberdeckung groesser als die Dicke auch.
+    Heraus kamen Zahlen, die aussahen wie ein Ergebnis. Ein Tragwerksnachweis
+    darf an so etwas nicht vorbeirechnen -- er muss sagen, was nicht stimmt.
+
+    Geprueft wird nur, was geometrisch unmoeglich ist, nicht was unueblich
+    waere. Ob 20 mm Ueberdeckung fuer die Expositionsklasse genuegen,
+    entscheidet der Ingenieur.
+    """
+    name = eintrag.name
+    for feld, wert, wie in (
+        ("Dicke h", eintrag.h, "grösser als null"),
+        ("Breite b", eintrag.b, "grösser als null"),
+        ("Grösstkorn D_max", eintrag.d_max, "grösser als null"),
+    ):
+        if wert <= 0.0:
+            raise ProjektFehler(
+                f"Platte '{name}': {feld} muss {wie} sein, angegeben ist {wert:g} mm.")
+
+    for feld, wert in (("Überdeckung unten", eintrag.ueberdeckung_unten),
+                       ("Überdeckung oben", eintrag.ueberdeckung_oben),
+                       ("Einlagenhöhe", eintrag.einlagenhoehe)):
+        if wert < 0.0:
+            raise ProjektFehler(
+                f"Platte '{name}': {feld} kann nicht negativ sein "
+                f"({wert:g} mm).")
+
+    zusammen = eintrag.ueberdeckung_unten + eintrag.ueberdeckung_oben
+    if zusammen >= eintrag.h:
+        raise ProjektFehler(
+            f"Platte '{name}': die Überdeckungen ergeben zusammen {zusammen:g} mm "
+            f"und lassen in einer {eintrag.h:g} mm dicken Platte keinen Platz für "
+            f"Bewehrung.")
+
+
 def sorten(art: str) -> Mapping[str, Any]:
     return BETONSORTEN if art == "beton" else STAHLSORTEN
 
@@ -112,9 +186,10 @@ class MaterialEintrag:
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "MaterialEintrag":
+        kennung = _pflichtfeld(d, "kennung", "Ein Material")
         return cls(
-            kennung=str(d["kennung"]),
-            art=str(d["art"]),
+            kennung=kennung,
+            art=_pflichtfeld(d, "art", f"Das Material '{kennung}'"),
             sorte=str(d.get("sorte", "")),
             name=str(d.get("name", "")),
             eigenstaendig=bool(d.get("eigenstaendig", False)),
@@ -162,7 +237,7 @@ class PostenEintrag:
         if abstand_wert is None and anzahl_wert is None:
             abstand_wert = cls.abstand
         return cls(
-            durchmesser=float(d.get("durchmesser") or 0.0),
+            durchmesser=_zahl(d, "durchmesser", 0.0),
             abstand=abstand_wert,
             anzahl=anzahl_wert,
         )
@@ -242,10 +317,10 @@ class KombinationEintrag:
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "KombinationEintrag":
         return cls(
-            name=str(d["name"]),
-            M_Ed=float(d.get("M_Ed") or 0.0),
-            N_Ed=float(d.get("N_Ed") or 0.0),
-            V_Ed=float(d.get("V_Ed") or 0.0),
+            name=_pflichtfeld(d, "name", "Eine Einwirkung"),
+            M_Ed=_zahl(d, "M_Ed", 0.0),
+            N_Ed=_zahl(d, "N_Ed", 0.0),
+            V_Ed=_zahl(d, "V_Ed", 0.0),
             art=str(d.get("art") or Erfuellungsart.AUTOMATISCH.value),
             richtung=str(d.get("richtung") or BEIDE_RICHTUNGEN),
         )
@@ -346,16 +421,17 @@ class QuerschnittEintrag:
         lagen = d.get("lagen")
         if lagen is None and ("lagen_unten" in d or "lagen_oben" in d):
             lagen = _lagen_aus_altem_format(d)
+        kennung = _pflichtfeld(d, "kennung", "Ein Querschnitt")
         return cls(
-            kennung=str(d["kennung"]),
-            name=str(d.get("name") or d["kennung"]),
-            beton=str(d["beton"]),
-            h=float(d.get("h") or 300.0),
-            b=float(d.get("b") or 1000.0),
-            ueberdeckung_unten=float(d.get("ueberdeckung_unten") or 30.0),
-            ueberdeckung_oben=float(d.get("ueberdeckung_oben") or 30.0),
-            d_max=float(d.get("d_max") or 32.0),
-            einlagenhoehe=float(d.get("einlagenhoehe") or 0.0),
+            kennung=kennung,
+            name=str(d.get("name") or kennung),
+            beton=_pflichtfeld(d, "beton", f"Der Querschnitt '{kennung}'"),
+            h=_zahl(d, "h", 300.0),
+            b=_zahl(d, "b", 1000.0),
+            ueberdeckung_unten=_zahl(d, "ueberdeckung_unten", 30.0),
+            ueberdeckung_oben=_zahl(d, "ueberdeckung_oben", 30.0),
+            d_max=_zahl(d, "d_max", 32.0),
+            einlagenhoehe=_zahl(d, "einlagenhoehe", 0.0),
             richtung_lage1=str(d.get("richtung_lage1") or "x"),
             richtung_lage4=str(d.get("richtung_lage4") or "x"),
             lagen=[LageEintrag.aus_dict(x) for x in (lagen or [])],
@@ -564,6 +640,19 @@ class Projekt:
     def _baustoff(self, eintrag: MaterialEintrag, symbol_index: str) -> Baustoff:
         bauer = {"beton": beton, "betonstahl": betonstahl}[eintrag.art]
         roh = bauer(eintrag.sorte, praefix=f"{eintrag.art}.{eintrag.kennung}")
+        # Jeder Kennwert dieser beiden Baustoffe ist seiner Natur nach positiv:
+        # Festigkeiten, Moduln, Dehnungen, Teilsicherheitsbeiwerte. Eine Null
+        # oder ein negativer Wert liefert keine falsche Zahl, sondern gar keine
+        # -- gamma_c = 0 endete in einem ZeroDivisionError, ein negatives f_ck
+        # in einer komplexen Wurzel. Beides kam als Absturzmeldung beim
+        # Benutzer an.
+        for topf, wie in ((eintrag.abweichungen, "abweichender Wert"),
+                          (eintrag.ueberschreibungen, "überschriebener Wert")):
+            for kurzname, zahl in topf.items():
+                if zahl <= 0.0:
+                    raise ProjektFehler(
+                        f"'{eintrag.anzeigename}': {kurzname} muss grösser als null "
+                        f"sein, angegeben ist {zahl:g} ({wie}).")
         abweichungen = {
             kurzname: Groesse(zahl, roh.definition(kurzname).einheit)
             for kurzname, zahl in eintrag.abweichungen.items()
@@ -585,6 +674,7 @@ class Projekt:
             raise ProjektFehler(
                 f"Platte '{eintrag.name}' verweist auf das Material "
                 f"'{eintrag.beton}', das es nicht (mehr) gibt.")
+        _masse_pruefen(eintrag)
 
         lagen: List[Bewehrungslage] = []
         for nummer, lage in enumerate(eintrag.lagen, start=1):
