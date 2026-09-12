@@ -43,6 +43,45 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-12 · Zwei Arten von Überschrift, und nur zwei
+
+Die Mitschrift sah flach aus, wo sie es nicht ist: «Plattenanalyse: Decke über
+EG» und «Querkraft – x-Richtung» trugen dieselbe Schrift, denselben blauen
+Akzent, dieselbe Linie. Das eine beginnt einen Bestandteil, das andere
+gliedert innerhalb — zu sehen war das nicht.
+
+Die Ursache war eine altbekannte: **die Oberfläche entschied nach der
+Schriftebene.**
+
+```js
+el(`div.b-titel${block.ebene >= 3 ? '.b-titel-3' : ''}`, …)
+```
+
+`ebene` ist eine Grössenangabe, keine Aussage über den Rang. Ein Abschnitt und
+eine Zwischenüberschrift stehen beide auf 2, also sahen sie gleich aus. Die
+Aussage steht längst im Block: trägt er einen Namensraum, beginnt hier etwas
+Neues. Genau danach wird jetzt entschieden — dasselbe `raum`, das schon den
+Umfangsschalter und die Abschnittsgruppierung trägt.
+
+Damit gibt es zwei Arten:
+
+| | Schrift | Akzent | Linie |
+|---|---|---|---|
+| `.b-titel` (neuer Bestandteil) | 700, 16 px | blau, 4 px | ja |
+| `.b-untertitel` (gliedert innerhalb) | 500, 14 px | gedämpft, 3 px | nein |
+
+Die Ebene bleibt, aber nur noch für die Tiefe *innerhalb* eines Abschnitts:
+eine Stufe tiefer wird eingerückt und einen Punkt kleiner, nicht neu
+eingefärbt. Eine dritte Farbe hätte eine Bedeutung behauptet, die es nicht
+gibt.
+
+Der Akzent der Zwischenüberschriften bekam eine eigene Variable
+(`--unterakzent`). Die Farben darüber tragen je eine Bedeutung — Beton grau,
+Betonstahl kupfer, Platte blau —; eine davon hier zu borgen hiesse, etwas
+auszusagen, was nicht gemeint ist.
+
+---
+
 ## 2026-09-12 · m_Rd(N_Ed) wird auch beim Querkraftnachweis hergeleitet
 
 Der Querkraftwiderstand hängt über ε_v vom Momentenwiderstand ab, und der

@@ -32,6 +32,11 @@
   --stahl:        #b8622a;
   --platte:       var(--blau);
 
+  /* Akzent der Zwischenüberschriften. Eigene Variable, weil die Farben oben
+     je eine Bedeutung tragen (Beton, Betonstahl, Platte) -- eine davon hier
+     zu borgen hiesse, eine Aussage zu machen, die nicht gemeint ist. */
+  --unterakzent:  #9aabc4;
+
   --radius:       7px;
   --schatten:     0 1px 2px rgba(16,24,40,.06), 0 2px 6px rgba(16,24,40,.08);
 
@@ -349,12 +354,29 @@ input[readonly], input:disabled, select:disabled {
   padding: 22px 26px; max-width: 940px; margin: 0 auto 16px; box-shadow: var(--schatten);
 }
 
+/* Zwei Arten von Überschrift, und nur zwei.
+
+   .b-titel      ein neuer Bestandteil beginnt -- ein Baustoff, eine Platte.
+                 Fett, blauer Akzent, Linie darunter.
+   .b-untertitel gliedert innerhalb. Leichter, gedämpfter Akzent, keine Linie.
+
+   Welche Art gilt, entscheidet nicht die Schriftgrösse eines Aufrufers,
+   sondern der Block: trägt er einen Namensraum, ist es das Erste. */
 .b-titel {
-  font-size: 16px; font-weight: 600; margin: 22px 0 10px; padding: 0 0 5px 10px;
+  font-size: 16px; font-weight: 700; margin: 26px 0 11px; padding: 0 0 5px 10px;
   border-bottom: 2px solid var(--rand); border-left: 4px solid var(--blau);
 }
 .b-titel:first-child { margin-top: 0; }
-.b-titel-3 { font-size: 14.5px; border-bottom-width: 1px; border-left-color: var(--rand-stark); }
+
+.b-untertitel {
+  font-size: 14px; font-weight: 500; color: var(--schrift-matt);
+  margin: 19px 0 7px; padding: 1px 0 1px 9px;
+  border-left: 3px solid var(--unterakzent);
+}
+/* Eine Ebene tiefer: eingerückt statt neu eingefärbt -- die Gliederung soll
+   sich an der Kante ablesen lassen, nicht an einer dritten Farbe. */
+.b-untertitel.ist-tief { font-size: 13px; margin: 14px 0 6px 14px; }
+
 .b-text { margin: 8px 0; }
 
 .gleichung {

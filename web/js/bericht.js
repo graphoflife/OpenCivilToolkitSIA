@@ -89,7 +89,7 @@ function bloeckeZeichnen(bloecke) {
   const knoten = [];
   for (const block of bloecke) {
     if (block.art === 'titel') {
-      knoten.push(el(`div.b-titel${block.ebene >= 3 ? '.b-titel-3' : ''}`, { text: block.text }));
+      knoten.push(titelZeichnen(block));
     } else if (block.art === 'text') {
       knoten.push(el('p.b-text', { text: block.text }));
     } else if (block.art === 'gleichung') {
@@ -102,11 +102,29 @@ function bloeckeZeichnen(bloecke) {
         block.text,
       ]));
     } else if (block.art === 'unterprotokoll') {
-      knoten.push(el('div.b-titel.b-titel-3', { text: block.titel }));
+      knoten.push(el('div.b-untertitel.ist-tief', { text: block.titel }));
       knoten.push(...bloeckeZeichnen(block.bloecke));
     }
   }
   return knoten;
+}
+
+/**
+ * Eine Überschrift der Mitschrift.
+ *
+ * Welche Art es ist, sagt der Block selbst: trägt er einen Namensraum, beginnt
+ * hier ein neuer Bestandteil -- ein Baustoff, eine Platte. Alles andere
+ * gliedert innerhalb.
+ *
+ * Vorher entschied die Ebene darüber, und die ist bei einem Abschnitt und bei
+ * «Querkraft – x-Richtung» dieselbe. Beide sahen also gleich aus, und die
+ * Mitschrift wirkte flach, wo sie es nicht ist. Die Ebene bleibt, aber nur
+ * noch für die Tiefe *innerhalb* eines Abschnitts.
+ */
+function titelZeichnen(block) {
+  if (block.raum) return el('div.b-titel', { text: block.text });
+  return el(`div.b-untertitel${block.ebene >= 3 ? '.ist-tief' : ''}`,
+    { text: block.text });
 }
 
 function lueckenBanner(loesung) {

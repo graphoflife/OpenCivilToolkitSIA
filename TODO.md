@@ -25,7 +25,10 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
 
 ## Erledigt zuletzt
 
-`m_Rd(N_Ed)` wird auch beim Querkraftnachweis hergeleitet — dieselbe
+Überschriften der Herleitung: fett mit blauem Akzent nur noch dort, wo ein
+Bestandteil beginnt; innerhalb Zwischenüberschriften mit gedämpftem Akzent.
+Entschieden wird nach dem Namensraum des Blocks, nicht mehr nach der
+Schriftebene · `m_Rd(N_Ed)` wird auch beim Querkraftnachweis hergeleitet — dieselbe
 Interpolation wie beim M-N-Nachweis, geschrieben von derselben Funktion; dazu
 die Betragsstriche in der Dehnungsformel, damit sie ihr eigenes Ergebnis
 liefert · erklärende Vorrede zur Lagentabelle entfällt · feste Stellenzahl in
