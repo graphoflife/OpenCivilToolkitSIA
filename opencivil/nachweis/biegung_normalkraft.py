@@ -50,9 +50,11 @@ from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
 from opencivil.nachweis import dehnungsfaecher, linie as geo
 from opencivil.nachweis.handrechnung import (
-    Eckpunkt, Handrechnung, lagen_zusammenfassen,
+    Eckpunkt, Handrechnung, Posten as HandPosten, lagen_zusammenfassen,
 )
-from opencivil.querschnitt.platte import Plattenquerschnitt, Richtung
+from opencivil.querschnitt.platte import (
+    Plattenquerschnitt, Richtung, posten_index,
+)
 from opencivil.querschnitt.werkstoffgesetz import Betongesetz
 
 
@@ -298,8 +300,9 @@ class BiegungNormalkraft(Nachweis):
         # (Lagen 1 und 2 liegen unten), nicht aus der Hoehenlage -- siehe
         # lagen_zusammenfassen().
         seiten = lagen_zusammenfassen([
-            (a_s, z, gesetz.f_yd, gesetz.E_s, text, posten[0].von_unten)
-            for (a_s, z, gesetz, text), posten in zip(lagen, self.posten)
+            HandPosten(a_s=a_s, z=z, f_yd=gesetz.f_yd, E_s=gesetz.E_s, text=text,
+                       index=posten_index(lage, art), von_unten=lage.von_unten)
+            for (a_s, z, gesetz, text), (lage, art, *_) in zip(lagen, self.posten)
         ])
         self.handrechnung = Handrechnung(
             h=h, b=b, f_cd=beton.f_cd, eps_c2d=beton.eps_c2d,
@@ -535,8 +538,8 @@ class BiegungNormalkraft(Nachweis):
                         M=auswertung.schnittgroessen.M_Ed.si)
         fest = lauf.von(ed)
 
-        e_lauf = rf"\mathrm{{{lauf.einheit.name}}}"
-        e_ziel = rf"\mathrm{{{ziel.einheit.name}}}"
+        e_lauf = lauf.einheit.latex
+        e_ziel = ziel.einheit.latex
 
         p.gleichung(
             rf"{ziel.name}_{{Rd}} = {ziel.name}_1 + "
@@ -550,7 +553,7 @@ class BiegungNormalkraft(Nachweis):
             rf"\left({_k(ziel.von(b))} - {_klammer(ziel.von(a))}\right)"
             rf" = {_k(auswertung.rd)}\,{e_ziel}",
             titel=(f"Widerstand bei festgehaltenem {lauf.name}_Ed = "
-                   f"{_k(fest)} {lauf.einheit.name}"),
+                   f"{_k(fest)} {lauf.einheit.beschriftung}"),
         )
         p.tabelle(
             kopf=[r"\text{Punkt}", rf"{lauf.name}\ [{e_lauf}]",
@@ -587,7 +590,7 @@ def _klammer(si_wert: float) -> str:
 def _in(si_wert: float, achse: geo.Achse) -> str:
     """Ein SI-Wert in der Einheit seiner Achse, mit Einheitenzeichen."""
     g = Groesse.aus_si(si_wert, achse.einheit)
-    return f"{g.formatiert(1)} {achse.einheit.name}"
+    return f"{g.formatiert(1)} {achse.einheit.beschriftung}"
 
 
 def _kn(si_wert: float) -> str:

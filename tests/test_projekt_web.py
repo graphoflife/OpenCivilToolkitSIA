@@ -304,7 +304,9 @@ class TestApiAbbildung(unittest.TestCase):
         d = api.loesung_dict(self.loesung, self.aufbau, self.ziele)
         f_cd = d["werte"]["beton.b1.f_cd"]
         self.assertEqual(f_cd["quelle"], "berechnet")
-        self.assertEqual(f_cd["einheit"], "N/mm^2")
+        # Die Oberfläche bekommt die lesbare Schreibweise -- sie setzt diese
+        # Einheit als blanken Text neben die Zahl, nicht als LaTeX.
+        self.assertEqual(f_cd["einheit"], "N/mm²")
         self.assertIn("mathrm", f_cd["latex"])
 
     def test_protokoll_enthaelt_gleichungen_und_tabellen(self):

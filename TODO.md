@@ -22,10 +22,21 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
 - [ ] Momente stehen in der Mitschrift als `kNm`, gemeint ist `kNm/m` (die
       Platte wird je Laufmeter gerechnet). In der Eingabemaske steht es
       richtig. Einheitlich ziehen.
+- [ ] In den Tabellenspalten springt die Stellenzahl: `205` steht neben
+      `224.5`, `1.6` neben `0.99`. `Groesse.formatiert()` streicht
+      nachlaufende Nullen — im Fliesstext richtig, in einer Zahlenkolonne
+      nicht. Die Spalte bräuchte die Rohzahl samt `stellen`; heute kommt sie
+      fertig formatiert aus dem Kern.
 
 ## Erledigt zuletzt
 
-Zwei gemeldete Fehler: die Zusammenfassung packte die Nachweise mehrerer
+Durchsicht der laufenden Seite: leerer Index bei den Stahlflächen der
+Handrechnung (`A_{s,}`) samt der nie geschriebenen Schwerpunktformel für `d` ·
+Einheiten als `N/mm^2` statt `N/mm²` in Werteliste, Kennzahlen und
+Eingabemaske · jede Abschnittsüberschrift stand mehrfach, weil die
+Rechenreihenfolge zwischen den Bauteilen springt · `Nachweis(e)`.
+
+Davor, zwei gemeldete Fehler: die Zusammenfassung packte die Nachweise mehrerer
 Platten in dieselbe Tabelle (sie schloss aus dem Anzeigetext auf die Platte —
 jetzt trägt jedes Urteil den Namensraum seines Nachweises) · eine noch leere
 Zulage stand auf «Anzahl» statt auf «Teilung».

@@ -65,7 +65,7 @@ def protokoll_zeilen(protokoll: Protokoll, einzug: int = 0) -> List[str]:
     zeilen: List[str] = []
     vorspann = " " * einzug
 
-    for block in protokoll.bloecke:
+    for block in protokoll.nach_abschnitten():
         if isinstance(block, TitelBlock):
             zeilen.append("")
             zeilen.append(f"{vorspann}{block.text}")
@@ -205,8 +205,8 @@ def _abschnitt_luecken(loesung: Loesung) -> List[str]:
         for fehlend in loesung.fehlende:
             einheit = ""
             if fehlend.definition is not None:
-                name = fehlend.definition.einheit.name
-                einheit = f" [{name}]" if name not in ("", "-") else ""
+                e = fehlend.definition.einheit
+                einheit = f" [{e.beschriftung}]" if e.name not in ("", "-") else ""
             zeilen.append(f"    - {fehlend.id}{einheit}")
             zeilen.extend(_umbrechen(fehlend.beschreibung, 8))
             if fehlend.pfad:

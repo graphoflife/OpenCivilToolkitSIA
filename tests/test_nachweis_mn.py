@@ -721,5 +721,59 @@ class TestRueckverfolgungNachweis(unittest.TestCase):
         )
 
 
+class TestHandrechnungSymbole(unittest.TestCase):
+    """
+    Die zusammengefassten Lagen tragen ihren Index und ihre Teile.
+
+    Beides ging verloren, als die Posten als blanke Tupel an
+    ``lagen_zusammenfassen`` gingen: die Mitschrift schrieb ``A_{s,}`` mit
+    leerem Index, und die Herleitung des Schwerpunkts fiel still aus, weil sie
+    ``len(teile) > 1`` verlangt.
+    """
+
+    def mitschrift(self, qs) -> str:
+        werk = Rechenwerk()
+        qs.ins_rechenwerk(werk)
+        nachweis = BiegungNormalkraft(
+            qs, [Schnittgroessen("Feld", M_Ed=Groesse(100, KNM))], Richtung.X)
+        werk.registriere(nachweis)
+        loesung = werk.loese(nachweis.d_ausnutzung["Feld"].id)
+        self.assertTrue(loesung.vollstaendig)
+        return "\n".join(
+            str(getattr(b, "latex", "") or "") for b in loesung.protokoll.bloecke)
+
+    def test_kein_symbol_mit_leerem_index(self):
+        text = self.mitschrift(einfache_platte())
+        self.assertNotIn("A_{s,}", text)
+        self.assertNotIn("d_{}", text)
+
+    def test_zusammengefasste_lage_traegt_den_index_ihrer_teile(self):
+        """Grund 1,x,g und Zulage 1,x,z ergeben zusammen 1,x."""
+        text = self.mitschrift(platte([
+            lage(1, Richtung.X, phi=18.0, zulage=12.0),
+            lage(2, Richtung.Y), lage(3, Richtung.Y), lage(4, Richtung.X, phi=12.0),
+        ]))
+        self.assertIn("A_{s,1,x}", text)
+        self.assertIn("d_{4,x}", text)
+
+    def test_der_schwerpunkt_wird_hergeleitet_wo_zwei_posten_zusammenkommen(self):
+        """
+        Besteht eine Seite aus Grundbewehrung und Zulage, muss dastehen, wie
+        ihr gemeinsames d entsteht -- sonst fällt der Wert aus dem Nichts.
+        """
+        text = self.mitschrift(platte([
+            lage(1, Richtung.X, phi=18.0, zulage=12.0),
+            lage(2, Richtung.Y), lage(3, Richtung.Y), lage(4, Richtung.X, phi=12.0),
+        ]))
+        self.assertIn(
+            r"d_{1,x} = \frac{A_{s,1,x,g} \cdot f_{yd} \cdot d_{1,x,g}", text)
+        self.assertIn("A_{s,1,x} = A_{s,1,x,g} + A_{s,1,x,z}", text)
+
+    def test_ohne_zulage_gibt_es_nichts_herzuleiten(self):
+        """Eine Seite aus einem einzigen Posten braucht keine Schwerpunktformel."""
+        text = self.mitschrift(einfache_platte())
+        self.assertNotIn(r"\frac{A_{s,1,x,g} \cdot f_{yd} \cdot", text)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -92,7 +92,7 @@ class TestBeton(unittest.TestCase):
             f_ck=(Groesse(30, N_PRO_MM2), N_PRO_MM2),
             gamma_c=(Groesse(1.5, EINHEITSLOS), EINHEITSLOS),
         )
-        self.assertIn("f_ck in N/mm^2", ergebnis.annahmen_text())
+        self.assertIn("f_ck in N/mm²", ergebnis.annahmen_text())
         self.assertAlmostEqual(ergebnis.wert.in_einheit(N_PRO_MM2), 0.3 * 30 ** 0.5 / 1.5)
 
     def test_alle_sorten_rechnen_durch(self):

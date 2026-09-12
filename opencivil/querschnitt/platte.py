@@ -209,6 +209,20 @@ class Bewehrungslage:
 # ===========================================================================
 
 
+def posten_index(lage: "Bewehrungslage", art: Postenart) -> str:
+    """
+    Der Symbolindex eines Bewehrungspostens, z.B. ``1,x,g``.
+
+    Lage, Richtung, Art -- in dieser Reihenfolge, und immer alle drei. Damit ist
+    jedes Symbol eindeutig, auch wenn zwei Lagen dieselbe Richtung tragen.
+
+    Steht hier und nirgends sonst: die Handrechnung braucht denselben Index für
+    ihre zusammengefassten Lagen, und zwei Stellen mit derselben Formel laufen
+    früher oder später auseinander.
+    """
+    return f"{lage.nummer},{lage.richtung.value},{art.kuerzel}"
+
+
 @dataclass(frozen=True)
 class Postenbezug:
     """Ein Bewehrungsposten samt der Werte, die der Lagenaufbau fuer ihn liefert."""
@@ -589,10 +603,7 @@ class Plattenquerschnitt:
                 if not posten.vorhanden:
                     continue
                 marke = f"{lage.nummer}{art.kuerzel}"
-                # Lage, Richtung, Art -- in dieser Reihenfolge, und immer alle
-                # drei. Damit ist jedes Symbol eindeutig, auch wenn zwei Lagen
-                # dieselbe Richtung tragen.
-                index = f"{lage.nummer},{lage.richtung.value},{art.kuerzel}"
+                index = posten_index(lage, art)
                 bezeichnung = f"{lage.nummer}. Lage {art.beschriftung}"
 
                 d_phi = self._def(

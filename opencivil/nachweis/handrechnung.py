@@ -42,7 +42,7 @@ Druck zu M_Rd(N = 0).
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.einheiten import (
     EINHEITSLOS, KN, KNM, MM, MM2, N_PRO_MM2, PROMILLE, Groesse,
@@ -92,6 +92,22 @@ class Lage:
 
     teile: Tuple[Posten, ...] = ()
     """Die Posten, aus denen sie entstanden ist -- fuer die Mitschrift."""
+
+    @property
+    def symbol_flaeche(self) -> str:
+        """``A_{s,1,x}`` -- oder schlicht ``A_s``, wenn es keinen Index gibt.
+
+        Eine unbewehrte Seite hat keine Lagennummer, also auch keinen Index.
+        Ihn hier zu erzwingen ergaebe ``A_{s,}`` mit leerem Tiefstellen; darum
+        bildet die Lage ihr Symbol selbst, statt es an sieben Stellen
+        zusammenzusetzen.
+        """
+        return f"A_{{s,{self.index}}}" if self.index else "A_s"
+
+    @property
+    def symbol_d(self) -> str:
+        """``d_{1,x}`` -- oder schlicht ``d``. Siehe :attr:`symbol_flaeche`."""
+        return f"d_{{{self.index}}}" if self.index else "d"
 
 
 @dataclass(frozen=True)
@@ -274,8 +290,8 @@ class Handrechnung:
 
         p.titel("Grösste Zugkraft", ebene=3)
         eingaben = {
-            "A_s": self._flaeche("As_u", f"A_{{s,{u.index}}}", u.a_s),
-            "A_s2": self._flaeche("As_o", f"A_{{s,{o.index}}}", o.a_s),
+            "A_s": self._flaeche("As_u", u.symbol_flaeche, u.a_s),
+            "A_s2": self._flaeche("As_o", o.symbol_flaeche, o.a_s),
             "f_yd": self._spannung("fyd_u", "f_{yd}", u.f_yd),
             "f_yd2": self._spannung("fyd_o", "f_{yd}", o.f_yd),
         }
@@ -292,8 +308,8 @@ class Handrechnung:
             r"+ @A_s2 \cdot @f_yd2 \cdot \left(@d2 - \tfrac{@h}{2}\right)",
             {
                 **eingaben,
-                "d": self._laenge("z_u", f"d_{{{u.index}}}", u.z),
-                "d2": self._laenge("z_o", f"d_{{{o.index}}}", o.z),
+                "d": self._laenge("z_u", u.symbol_d, u.z),
+                "d2": self._laenge("z_o", o.symbol_d, o.z),
                 "h": self._laenge("h", "h", self.h),
             },
             titel="Kräfte mal Hebelarm um die halbe Höhe",
@@ -332,7 +348,7 @@ class Handrechnung:
 
         w_x = self._laenge(f"x_{marke}", f"x^{{{hoch}}}", x, "Höhe der Druckzone")
         eingaben = {
-            "A_s": self._flaeche(f"As_{marke}", f"A_{{s,{zug.index}}}", zug.a_s),
+            "A_s": self._flaeche(f"As_{marke}", zug.symbol_flaeche, zug.a_s),
             "f_yd": self._spannung(f"fyd_{marke}", "f_{yd}", zug.f_yd),
             "b": self._laenge("b", "b", self.b),
             "f_cd": self._spannung("f_cd", "f_{cd}", self.f_cd),
@@ -349,7 +365,7 @@ class Handrechnung:
             rf"{minus}@A_s \cdot @f_yd \cdot "
             rf"\left(@d - \frac{{{BLOCKANTEIL} \cdot @x}}{{2}}\right)",
             {**eingaben,
-             "d": self._laenge(f"d_{marke}", f"d_{{{zug.index}}}", d), "x": w_x},
+             "d": self._laenge(f"d_{marke}", zug.symbol_d, d), "x": w_x},
             titel="Momentenwiderstand bei reiner Biegung",
         )
         return Eckpunkt(f"n0_{marke}", rf"M_{{Rd}}(N_{{Ed}}=0)^{{{hoch}}}",
@@ -396,7 +412,7 @@ class Handrechnung:
                     "Dehnung der Zugbewehrung"),
             r"\left(@d - @x\right) \cdot \frac{@eps_c2d}{@x}",
             {
-                "d": self._laenge(f"d_{marke}", f"d_{{{zug.index}}}", d),
+                "d": self._laenge(f"d_{marke}", zug.symbol_d, d),
                 "x": w_x,
                 "eps_c2d": self._w("eps_c2d", r"\varepsilon_{c2d}",
                                    Groesse.aus_si(self.eps_c2d, PROMILLE), 2),
@@ -426,7 +442,7 @@ class Handrechnung:
             "f_cd": self._spannung("f_cd", "f_{cd}", self.f_cd),
             "b": self._laenge("b", "b", self.b),
             "x": w_x,
-            "A_s": self._flaeche(f"As_{marke}", f"A_{{s,{zug.index}}}", zug.a_s),
+            "A_s": self._flaeche(f"As_{marke}", zug.symbol_flaeche, zug.a_s),
             "f_sd": self._spannung(f"fsd_{marke}", "f_{sd}", zug.f_yd),
         }
         p.formel(
@@ -445,7 +461,7 @@ class Handrechnung:
             {
                 **eingaben,
                 "h": self._laenge("h", "h", self.h),
-                "d": self._laenge(f"d_{marke}", f"d_{{{zug.index}}}", d),
+                "d": self._laenge(f"d_{marke}", zug.symbol_d, d),
             },
             titel="Momentengleichgewicht um die halbe Höhe",
         )
@@ -465,7 +481,19 @@ class Handrechnung:
 
 
 
-def lagen_zusammenfassen(posten) -> Dict[str, Lage]:
+def gemeinsamer_index(teile: Sequence[Posten]) -> str:
+    """
+    Der Index der zusammengefassten Lage: das, was ihre Teile gemein haben.
+
+    Grundbewehrung und Zulage einer Lage heissen ``1,x,g`` und ``1,x,z`` --
+    zusammengefasst also ``1,x``. Gehen die Teile auseinander, bleibt der Index
+    leer; eine erfundene Bezeichnung waere schlimmer als gar keine.
+    """
+    staemme = {t.index.rsplit(",", 1)[0] for t in teile if t.index}
+    return staemme.pop() if len(staemme) == 1 else ""
+
+
+def lagen_zusammenfassen(posten: Sequence[Posten]) -> Dict[str, Lage]:
     """
     Fasst die Bewehrungsposten einer Richtung zu zwei Lagen zusammen.
 
@@ -473,34 +501,44 @@ def lagen_zusammenfassen(posten) -> Dict[str, Lage]:
     bewehrung und Zulage. Fuer die Handrechnung zaehlt je Seite nur die Summe
     der Flaechen und ihr gemeinsamer Schwerpunkt.
 
-    ``posten`` ist eine Folge von ``(a_s, z, f_yd, E_s, text, von_unten)``.
-
     Gruppiert wird nach ``von_unten``, also nach der Zugehoerigkeit zur unteren
     oder oberen Lage -- **nicht** nach der Hoehenlage. Grundbewehrung und Zulage
     derselben Lage liegen naemlich auf leicht verschiedenen Hoehen, weil ihre
     Durchmesser verschieden sind. Wer nach z gruppiert, bekommt drei Gruppen
     statt zwei und verliert stillschweigend eine davon.
+
+    Die entstandene Lage behaelt ihre Teile (:attr:`Lage.teile`) und ihren
+    Index. Frueher kamen hier blanke Tupel an, in denen beides fehlte: die
+    Mitschrift schrieb dann ``A_{s,}`` mit leerem Index, und die Herleitung des
+    Schwerpunkts fiel still aus, weil sie ``len(teile) > 1`` verlangt.
     """
     if not posten:
         raise ValueError("Ohne Bewehrung lässt sich nichts von Hand rechnen.")
 
-    gruppen: Dict[bool, List] = {}
+    gruppen: Dict[bool, List[Posten]] = {}
     for eintrag in posten:
-        gruppen.setdefault(eintrag[5], []).append(eintrag)
+        gruppen.setdefault(eintrag.von_unten, []).append(eintrag)
 
-    def buendeln(gruppe) -> Lage:
-        flaeche = sum(a for a, _, _, _, _, _ in gruppe)
+    def buendeln(gruppe: List[Posten]) -> Lage:
+        flaeche = sum(t.a_s for t in gruppe)
+        beteiligt = tuple(t for t in gruppe if t.a_s > 0.0)
         if flaeche <= 0.0:
             # Ohne Flaeche gibt es keinen Schwerpunkt -- die Hoehenlage genuegt.
-            a_s, z, f_yd, E_s, text, _ = gruppe[0]
-            return Lage(0.0, z, f_yd, E_s, text)
-        schwerpunkt = sum(a * z for a, z, _, _, _, _ in gruppe) / flaeche
+            erster = gruppe[0]
+            return Lage(0.0, erster.z, erster.f_yd, erster.E_s, erster.text,
+                        index=erster.index, teile=(erster,))
+        schwerpunkt = sum(t.a_s * t.z for t in gruppe) / flaeche
         # Bei verschiedenen Stahlsorten in einer Lage zaehlt die schwaechere --
         # sonst rechnete man mit einer Festigkeit, die ein Teil nicht hat.
-        f_yd = min(f for _, _, f, _, _, _ in gruppe)
-        E_s = min(e for _, _, _, e, _, _ in gruppe)
-        beteiligt = [t for a, _, _, _, t, _ in gruppe if a > 0.0]
-        return Lage(flaeche, schwerpunkt, f_yd, E_s, " + ".join(beteiligt))
+        return Lage(
+            flaeche,
+            schwerpunkt,
+            min(t.f_yd for t in gruppe),
+            min(t.E_s for t in gruppe),
+            " + ".join(t.text for t in beteiligt),
+            index=gemeinsamer_index(beteiligt),
+            teile=beteiligt,
+        )
 
     if True not in gruppen or False not in gruppen:
         # Nur eine Seite bewehrt -- die andere zaehlt mit null Flaeche, damit

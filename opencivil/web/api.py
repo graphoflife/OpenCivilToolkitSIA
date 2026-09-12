@@ -91,7 +91,7 @@ def _vorlage_dict(vorlage) -> dict:
     return {
         "kurzname": vorlage.kurzname,
         "symbol": vorlage.symbol,
-        "einheit": vorlage.einheit.name,
+        "einheit": vorlage.einheit.beschriftung,
         "einheit_latex": vorlage.einheit.latex or "",
         "beschreibung": vorlage.beschreibung,
         "referenz": vorlage.referenz,
@@ -113,7 +113,7 @@ def wert_dict(wert: Wert) -> dict:
         "symbol": wert.symbol,
         "wert": wert.formatiert(),
         "zahl": wert.groesse.in_einheit(wert.einheit),
-        "einheit": wert.einheit.name if wert.einheit.name not in ("", "-") else "",
+        "einheit": wert.einheit.beschriftung if wert.einheit.name not in ("", "-") else "",
         "einheit_latex": wert.einheit.latex or "",
         "beschreibung": wert.beschreibung,
         "referenz": wert.referenz,
@@ -170,7 +170,7 @@ def block_dict(block: Block) -> Optional[dict]:
 
 
 def protokoll_liste(protokoll: Protokoll) -> List[dict]:
-    return [d for d in (block_dict(b) for b in protokoll.bloecke) if d is not None]
+    return [d for d in (block_dict(b) for b in protokoll.nach_abschnitten()) if d is not None]
 
 
 # ===========================================================================
@@ -201,7 +201,7 @@ def loesung_dict(
                 "benoetigt_von": f.benoetigt_von,
                 "pfad": list(f.pfad),
                 "einheit": (
-                    f.definition.einheit.name
+                    f.definition.einheit.beschriftung
                     if f.definition and f.definition.einheit.name not in ("", "-")
                     else ""
                 ),

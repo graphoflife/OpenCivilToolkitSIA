@@ -159,7 +159,7 @@ def ziele(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
             "symbol": definition.symbol,
             "beschreibung": definition.beschreibung,
             "einheit": (
-                definition.einheit.name
+                definition.einheit.beschriftung
                 if definition.einheit.name not in ("", "-") else ""
             ),
             "referenz": definition.referenz,

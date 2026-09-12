@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Iterable, List, Mapping, Optional, Sequence
+from typing import Dict, Iterable, List, Mapping, Optional, Sequence
 
 from opencivil.core import latex as tex
 from opencivil.core.wert import Wert
@@ -272,6 +272,40 @@ class Protokoll:
             yield block
             if isinstance(block, UnterprotokollBlock):
                 yield from block.protokoll.alle_bloecke()
+
+    def nach_abschnitten(self) -> List[Block]:
+        """
+        Dieselben Bloecke, aber je Abschnitt an einem Stueck.
+
+        Gerechnet wird in Abhaengigkeitsreihenfolge, und die springt zwischen
+        den Bauteilen hin und her: der Querkraftnachweis einer Platte braucht
+        ihren Momentenwiderstand, kommt also erst, wenn *alle* M-N-Nachweise
+        durch sind. Im Protokoll stand die Ueberschrift einer Platte darum
+        zweimal, mit der anderen Platte dazwischen.
+
+        Wer liest, erwartet alles zu einem Bauteil beieinander. Die Reihenfolge
+        der Abschnitte bleibt die ihres ersten Auftretens, innerhalb eines
+        Abschnitts bleibt die Rechenreihenfolge unangetastet -- verschoben wird
+        also nur, was ohnehin nur der Darstellung dient.
+
+        Eroeffnet wird ein Abschnitt von einem Titel mit Namensraum; alles
+        davor (und jeder Titel ohne Namensraum) gehoert zum laufenden.
+        """
+        teile: Dict[str, List[Block]] = {}
+        reihenfolge: List[str] = []
+        raum = ""
+
+        for block in self.bloecke:
+            if isinstance(block, TitelBlock) and block.raum:
+                raum = block.raum
+                if raum in teile:
+                    continue    # Die Ueberschrift steht schon da.
+            if raum not in teile:
+                teile[raum] = []
+                reihenfolge.append(raum)
+            teile[raum].append(block)
+
+        return [block for r in reihenfolge for block in teile[r]]
 
     def gleichungen(self) -> List[GleichungBlock]:
         return [b for b in self.alle_bloecke() if isinstance(b, GleichungBlock)]

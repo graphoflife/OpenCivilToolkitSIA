@@ -4,8 +4,8 @@ import math
 import unittest
 
 from opencivil.core.einheiten import (
-    CM2, DIMENSIONSLOS, EINHEITSLOS, GRAD, KN, KNM, KNM_PRO_M, KN_PRO_M, M, MM, MM2, MPA,
-    N, N_PRO_MM2, PROZENT, SPANNUNG,
+    CM2, DIMENSIONSLOS, EINHEITSLOS, GRAD, KG_PRO_M3, KN, KNM, KNM_PRO_M, KN_PRO_M,
+    M, MM, MM2, MPA, N, N_PRO_MM2, PROMILLE, PROZENT, SPANNUNG,
     DimensionsFehler, Dimension, Einheit, Groesse,
     einheit, empirisch, null, summe,
 )
@@ -203,8 +203,8 @@ class TestEmpirisch(unittest.TestCase):
             gamma_c=(Groesse(1.5, EINHEITSLOS), EINHEITSLOS),
         )
         text = erg.annahmen_text()
-        self.assertIn("f_ck in N/mm^2", text)
-        self.assertIn("Resultat ist in N/mm^2", text)
+        self.assertIn("f_ck in N/mm²", text)
+        self.assertIn("Resultat ist in N/mm²", text)
         self.assertIn(r"\mathrm{N}/\mathrm{mm}^{2}", erg.annahmen_latex())
 
     def test_paar_pflicht(self):
@@ -228,3 +228,36 @@ class TestPlattenEinheiten(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestBeschriftung(unittest.TestCase):
+    """
+    Die lesbare Schreibweise für die Oberfläche.
+
+    Der ``name`` bleibt ASCII -- er ist der Schlüssel im Katalog. Daneben steht
+    die Form, die ein Mensch lesen soll; ohne sie stand in der Werteliste und
+    an den Eingabefeldern ``N/mm^2``, während die Herleitung ``N/mm²`` setzte.
+    """
+
+    def test_potenzen_werden_hochgestellt(self):
+        self.assertEqual(MM2.beschriftung, "mm²")
+        self.assertEqual(N_PRO_MM2.beschriftung, "N/mm²")
+        self.assertEqual(KG_PRO_M3.beschriftung, "kg/m³")
+
+    def test_der_name_bleibt_ascii(self):
+        """Er dient als Schlüssel -- wer ihn ändert, findet die Einheit nicht mehr."""
+        self.assertEqual(N_PRO_MM2.name, "N/mm^2")
+        self.assertIs(einheit("N/mm^2"), N_PRO_MM2)
+
+    def test_promille_gibt_seine_beschriftung_selbst_an(self):
+        """Aus 'promille' liesse sich '‰' nicht ableiten."""
+        self.assertEqual(PROMILLE.beschriftung, "‰")
+
+    def test_einfache_namen_bleiben_wie_sie_sind(self):
+        self.assertEqual(MM.beschriftung, "mm")
+        self.assertEqual(KNM.beschriftung, "kNm")
+        self.assertEqual(PROZENT.beschriftung, "%")
+
+    def test_zusammengesetzte_einheiten_erben_die_beschriftung(self):
+        self.assertEqual((KN / MM2).beschriftung, "kN/mm²")
+        self.assertEqual((MM**2).beschriftung, "mm²")

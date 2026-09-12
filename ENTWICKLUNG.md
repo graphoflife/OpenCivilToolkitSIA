@@ -43,6 +43,85 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-12 · Durchsicht der laufenden Seite
+
+Vier Befunde, drei davon im Kern.
+
+### Die Stahlflächen der Handrechnung hatten einen leeren Index
+
+In der Herleitung stand `A_{s,}` — Komma, dann nichts. Beide Lagen trugen
+dasselbe Symbol, obwohl verschiedene Zahlen darunter standen, und `d` hatte gar
+keinen Index. Genau das, was mit den eindeutigen Indizes behoben worden war.
+
+Die Ursache lag eine Schicht tiefer: `lagen_zusammenfassen` bekam blanke Tupel
+
+```python
+(a_s, z, f_yd, E_s, text, von_unten)     # sechs von acht Feldern
+```
+
+obwohl es `Posten` mit genau diesen Feldern **plus** `index` und der Herkunft
+gibt. Das Tupel war die verlustbehaftete Zwischenform; was es nicht trug, war
+weg. Und weil `Lage.teile` damit immer leer blieb, lief
+
+```python
+if len(lage.teile) > 1:
+    self._schwerpunkt(p, lage)
+```
+
+**nie** — die Herleitung von `d` aus Grundbewehrung und Zulage, ausdrücklich
+gewünscht und vollständig geschrieben, war toter Code. Ein stiller Ausfall:
+keine Fehlermeldung, nur eine fehlende Formel.
+
+Behoben, indem `Posten` selbst durchgereicht wird. Der Index entsteht jetzt in
+`platte.posten_index()` statt an zwei Stellen mit derselben Formel.
+
+Der erste Test dazu fand sofort einen Fall, den ich übersehen hatte: eine
+unbewehrte Seite hat gar keine Lagennummer, also auch keinen Index — und
+schrieb weiter `A_{s,}`. Darum bildet die Lage ihr Symbol nun selbst
+(`symbol_flaeche`, `symbol_d`) und fällt ohne Index auf schlichtes `A_s`
+zurück, statt ein leeres Tiefstellen zu erzeugen.
+
+### Einheiten in zwei Schreibweisen
+
+Die Diagramme beschrifteten `σ [N/mm²]`, die Herleitung setzte `N/mm²` — und
+die Werteliste, die Kennzahlen und die Felder der Eingabemaske zeigten
+`N/mm^2`, `mm^2`, `kg/m^3`, `promille`. Dieselbe Einheit, drei Zentimeter
+auseinander, verschieden geschrieben.
+
+Der `name` einer `Einheit` ist ihr Schlüssel im Katalog und muss ASCII
+bleiben. Neben `latex` steht darum jetzt `beschriftung` — die lesbare Form für
+alles, was als blanker Text neben einer Zahl erscheint. Die Potenzen entstehen
+mechanisch, `‰` gibt `PROMILLE` selbst an, denn aus `promille` liesse es sich
+nicht ableiten. Zusammengesetzte Einheiten erben sie wie das LaTeX.
+
+### Jede Überschrift stand mehrfach
+
+Bei zwei Platten mit Querkraft zählte das Protokoll **acht** Abschnittstitel
+für vier Abschnitte: `q1` dreimal, `beton` zweimal. Der Querkraftnachweis
+einer Platte braucht ihren Momentenwiderstand und kommt darum erst, wenn alle
+M-N-Nachweise durch sind — die Rechenreihenfolge springt zwischen den Bauteilen
+hin und her, und das Protokoll bildete sie ab.
+
+`Protokoll.nach_abschnitten()` legt jeden Abschnitt wieder an ein Stück.
+Innerhalb eines Abschnitts bleibt die Rechenreihenfolge unangetastet, die
+Abschnitte selbst stehen in der Reihenfolge ihres ersten Auftretens. Es ist
+eine Frage der Darstellung, also rufen es alle drei Ausgaben auf — Oberfläche,
+LaTeX und Konsole — statt dass eine davon es für sich löst.
+
+### Kleineres
+
+`2 Nachweis(e) nicht erfüllt` schreibt sich jetzt aus. Und wo `einheit.name`
+in menschenlesbarem Text stand, steht `beschriftung`; wo es als LaTeX diente,
+`latex` — die dritte, handgeschriebene Fassung `\mathrm{{...}}` ist weg.
+
+### Was offen bleibt
+
+In den Tabellenspalten springt die Stellenzahl: `205` neben `224.5`, `1.6`
+neben `0.99`. `formatiert()` streicht nachlaufende Nullen, und das ist im
+Fliesstext richtig — in einer Zahlenkolonne nicht. Steht in `TODO.md`.
+
+---
+
 ## 2026-09-12 · Zwei gemeldete Fehler
 
 ### Alle Nachweise landeten in der Tabelle der ersten Platte

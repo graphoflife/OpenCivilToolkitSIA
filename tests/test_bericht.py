@@ -10,7 +10,7 @@ from opencivil.bericht.latex_dokument import (
     als_tex, finde_tex_maschine, formeln_sammeln, schreibe,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KNM, MM, N_PRO_MM2, Groesse
-from opencivil.core.protokoll import Protokoll
+from opencivil.core.protokoll import Protokoll, TextBlock, TitelBlock
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.core.wert import WertDef
 from opencivil.material.beton import beton
@@ -205,3 +205,56 @@ class TestTextMaskierung(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestAbschnittsordnung(unittest.TestCase):
+    """
+    Gerechnet wird in Abhängigkeitsreihenfolge, gelesen wird nach Bauteilen.
+
+    Der Querkraftnachweis einer Platte braucht ihren Momentenwiderstand und
+    kommt darum erst, wenn alle M-N-Nachweise durch sind. Im Protokoll stand
+    die Überschrift einer Platte deshalb zweimal, mit der anderen Platte
+    dazwischen.
+    """
+
+    def protokoll(self) -> Protokoll:
+        p = Protokoll()
+        p.titel("Beton: C30/37", raum="beton.b1")
+        p.text("f_cd")
+        p.titel("Platte A", raum="querschnitt.q1")
+        p.text("A: Biegung")
+        p.titel("Platte B", raum="querschnitt.q2")
+        p.text("B: Biegung")
+        p.titel("Platte A", raum="querschnitt.q1")
+        p.titel("Querkraft", ebene=3)          # ohne Raum: eröffnet nichts
+        p.text("A: Querkraft")
+        p.titel("Platte B", raum="querschnitt.q2")
+        p.text("B: Querkraft")
+        return p
+
+    def test_jede_ueberschrift_steht_genau_einmal(self):
+        titel = [b.text for b in self.protokoll().nach_abschnitten()
+                 if isinstance(b, TitelBlock) and b.raum]
+        self.assertEqual(titel, ["Beton: C30/37", "Platte A", "Platte B"])
+
+    def test_der_inhalt_folgt_seinem_abschnitt(self):
+        texte = [b.text for b in self.protokoll().nach_abschnitten()
+                 if isinstance(b, TextBlock)]
+        self.assertEqual(texte, ["f_cd", "A: Biegung", "A: Querkraft",
+                                 "B: Biegung", "B: Querkraft"])
+
+    def test_untertitel_ohne_raum_bleiben_bei_ihrem_abschnitt(self):
+        bloecke = self.protokoll().nach_abschnitten()
+        namen = [getattr(b, "text", "") for b in bloecke]
+        self.assertEqual(namen.index("Querkraft"), namen.index("A: Querkraft") - 1)
+
+    def test_kein_block_geht_verloren(self):
+        p = self.protokoll()
+        self.assertEqual(len(p.nach_abschnitten()), len(p.bloecke) - 2)  # 2 Dubletten
+
+    def test_ohne_abschnitte_bleibt_alles_wie_es_ist(self):
+        p = Protokoll()
+        p.text("eins")
+        p.titel("Zwischentitel", ebene=3)
+        p.text("zwei")
+        self.assertEqual(p.nach_abschnitten(), p.bloecke)

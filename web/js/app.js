@@ -55,11 +55,15 @@ async function rechnen({ ziele = null, stillschweigend = false } = {}) {
     }, 'loesung');
 
     if (!antwort.vollstaendig) {
-      zustandsanzeige(`${antwort.fehlende.length} Eingaben fehlen`, 'ist-fehler');
+      const fehlt = antwort.fehlende.length;
+      zustandsanzeige(fehlt === 1 ? 'Eine Eingabe fehlt' : `${fehlt} Eingaben fehlen`,
+        'ist-fehler');
     } else if (antwort.urteile.length) {
       const durchgefallen = antwort.urteile.filter((u) => !u.erfuellt).length;
       zustandsanzeige(
-        durchgefallen ? `${durchgefallen} Nachweis(e) nicht erfüllt` : 'alle Nachweise erfüllt',
+        durchgefallen === 0 ? 'alle Nachweise erfüllt'
+          : durchgefallen === 1 ? 'ein Nachweis nicht erfüllt'
+            : `${durchgefallen} Nachweise nicht erfüllt`,
         durchgefallen ? 'ist-fehler' : 'ist-gut');
     } else {
       zustandsanzeige(`${Object.keys(antwort.werte).length} Werte bestimmt`, 'ist-gut');

@@ -157,13 +157,28 @@ class Einheit:
     """
 
     name: str
+    """Maschinenlesbarer Name, zugleich Schluessel im Katalog: ``N/mm^2``."""
+
     dimension: Dimension
     faktor: float = 1.0
     latex: Optional[str] = None
 
+    beschriftung: Optional[str] = None
+    """
+    Lesbare Schreibweise fuer die Oberflaeche: ``N/mm²``.
+
+    Der ``name`` bleibt ASCII, weil er als Schluessel dient und in IDs
+    vorkommt. Wo eine Zahl ohne LaTeX-Satz neben ihrer Einheit steht -- in der
+    Werteliste, an den Eingabefeldern --, gehoert die lesbare Form hin.
+    Andernfalls stuende dort ``N/mm^2``, waehrend die Herleitung daneben
+    ``N/mm²`` setzt.
+    """
+
     def __post_init__(self) -> None:
         if self.latex is None:
             object.__setattr__(self, "latex", _name_zu_latex(self.name))
+        if self.beschriftung is None:
+            object.__setattr__(self, "beschriftung", _name_zu_text(self.name))
 
     # -- Algebra ------------------------------------------------------------
 
@@ -177,6 +192,7 @@ class Einheit:
             dimension=self.dimension * andere.dimension,
             faktor=self.faktor * andere.faktor,
             latex=rf"{self.latex}\,{andere.latex}",
+            beschriftung=f"{self.beschriftung}·{andere.beschriftung}",
         )
 
     def __truediv__(self, andere: "Einheit") -> "Einheit":
@@ -187,6 +203,7 @@ class Einheit:
             dimension=self.dimension / andere.dimension,
             faktor=self.faktor / andere.faktor,
             latex=rf"{self.latex}/{andere.latex}",
+            beschriftung=f"{self.beschriftung}/{andere.beschriftung}",
         )
 
     def __pow__(self, exponent: Zahl) -> "Einheit":
@@ -197,6 +214,7 @@ class Einheit:
             dimension=self.dimension**exponent,
             faktor=self.faktor**exponent,
             latex=rf"{self.latex}^{{{_exponent_text(exponent)}}}",
+            beschriftung=_name_zu_text(f"{self.beschriftung}^{exponent}"),
         )
 
     # -- Darstellung --------------------------------------------------------
@@ -223,6 +241,27 @@ def _name_zu_latex(name: str) -> str:
     return rf"\mathrm{{{name}}}"
 
 
+#: Hochgestellte Ziffern, soweit es sie als eigenes Zeichen gibt.
+_HOCHGESTELLT = {"1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵",
+                 "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹", "0": "⁰"}
+
+
+def _name_zu_text(name: str) -> str:
+    """
+    Macht aus dem ASCII-Namen die lesbare Schreibweise: ``mm^2`` -> ``mm²``.
+
+    Nur die Potenzen, und nur solange jede Ziffer ein hochgestelltes Zeichen
+    hat. Fuer alles Weitere -- ``‰`` etwa -- gibt die Einheit ihre
+    ``beschriftung`` selbst an; mechanisch ableiten liesse sich das nicht.
+    """
+    if not name or name == "-":
+        return ""
+    basis, trenner, exponent = name.partition("^")
+    if not trenner or not all(z in _HOCHGESTELLT for z in exponent):
+        return name
+    return basis + "".join(_HOCHGESTELLT[z] for z in exponent)
+
+
 def _exponent_text(exponent: Any) -> str:
     if isinstance(exponent, float) and exponent.is_integer():
         return str(int(exponent))
@@ -233,7 +272,8 @@ def _exponent_text(exponent: Any) -> str:
 
 EINHEITSLOS = Einheit("-", DIMENSIONSLOS, 1.0, latex="")
 PROZENT = Einheit("%", DIMENSIONSLOS, 0.01, latex=r"\%")
-PROMILLE = Einheit("promille", DIMENSIONSLOS, 0.001, latex="\\text{‰}")
+PROMILLE = Einheit("promille", DIMENSIONSLOS, 0.001, latex="\\text{‰}",
+                   beschriftung="‰")
 
 # Laenge
 M = Einheit("m", LAENGE, 1.0)
@@ -623,10 +663,10 @@ class EmpirischesErgebnis:
 
     def annahmen_text(self) -> str:
         """Einzeiler fuer den Bericht: welche Einheiten vorausgesetzt wurden."""
-        teile = [f"{e.name} in {e.erwartete_einheit.name}" for e in self.einsetzungen]
+        teile = [f"{e.name} in {e.erwartete_einheit.beschriftung}" for e in self.einsetzungen]
         return (
             f"Empirische Formel -- eingesetzt werden {', '.join(teile)}; "
-            f"das Resultat ist in {self.ergebnis_einheit.name} zu lesen."
+            f"das Resultat ist in {self.ergebnis_einheit.beschriftung} zu lesen."
         )
 
     def annahmen_latex(self) -> str:

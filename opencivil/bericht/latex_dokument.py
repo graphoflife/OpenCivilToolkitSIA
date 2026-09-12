@@ -100,7 +100,7 @@ def _protokoll_tex(protokoll: Protokoll, ebene: int = 0) -> List[str]:
     zeilen: List[str] = []
     abschnitt = ("subsection", "subsubsection", "paragraph")
 
-    for block in protokoll.bloecke:
+    for block in protokoll.nach_abschnitten():
         if isinstance(block, TitelBlock):
             stufe = abschnitt[min(max(block.ebene - 2, 0), len(abschnitt) - 1)]
             zeilen.append(rf"\{stufe}{{{text_latex(block.text)}}}")
