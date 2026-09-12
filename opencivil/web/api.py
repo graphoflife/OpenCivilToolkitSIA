@@ -221,6 +221,9 @@ def loesung_dict(
         "urteile": [
             {
                 "name": u.name,
+                # Namensraum des Nachweises -- danach gruppiert die Oberflaeche
+                # die Zusammenfassung nach Platten.
+                "raum": u.raum,
                 "erfuellt": u.erfuellt,
                 # Einzige Kennzahl: Widerstand/Einwirkung, ab 1 erfuellt.
                 "erfuellungsgrad": u.erfuellungsgrad.formatiert(2),

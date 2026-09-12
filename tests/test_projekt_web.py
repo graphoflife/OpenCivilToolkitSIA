@@ -221,6 +221,65 @@ class TestVollstaendigeAblage(unittest.TestCase):
         projekt = Projekt.beispiel()
         self.assertNotIn(projekt.freie_kennung("b"), ["b1"])
 
+    def test_leere_zulage_steht_auf_teilung(self):
+        """
+        Eine noch nicht gesetzte Zulage wird über die Teilung geführt.
+
+        Sonst stünde das Feld in der Oberfläche auf 'Anzahl' -- bei einer
+        Platte ist die Teilung der Regelfall.
+        """
+        lage = LageEintrag.aus_dict({"stahl": "s1", "grund": {"durchmesser": 16.0}})
+        self.assertEqual(lage.zulage.abstand, 150.0)
+        self.assertIsNone(lage.zulage.anzahl)
+        self.assertFalse(lage.zulage.vorhanden)   # ohne Durchmesser trotzdem leer
+        self.assertEqual(lage.grund.abstand, 150.0)
+
+    def test_eine_gewaehlte_stabzahl_bleibt_eine_stabzahl(self):
+        eintrag = PostenEintrag.aus_dict({"durchmesser": 14.0, "abstand": None, "anzahl": 6.0})
+        self.assertIsNone(eintrag.abstand)
+        self.assertEqual(eintrag.anzahl, 6.0)
+
+
+class TestUrteilsraum(unittest.TestCase):
+    """
+    Jedes Urteil trägt den Namensraum seines Nachweises.
+
+    Ohne ihn musste die Oberfläche aus dem Anzeigetext zurückschliessen, zu
+    welcher Platte ein Urteil gehört -- und packte bei zwei Platten mit
+    denselben Tragrichtungen alle Nachweise in dieselbe Tabelle.
+    """
+
+    def zweiplattenprojekt(self) -> Projekt:
+        projekt = Projekt.beispiel()
+        zweite = Projekt.aus_dict(json.loads(json.dumps(projekt.als_dict()))).querschnitt("q1")
+        zweite.kennung, zweite.name = "q2", "Decke über 1. OG"
+        projekt.querschnitte.append(zweite)
+        return projekt
+
+    def test_zwei_platten_teilen_ihre_urteile_nicht(self):
+        aufbau = self.zweiplattenprojekt().aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+
+        je_platte = {"querschnitt.q1": [], "querschnitt.q2": []}
+        for urteil in loesung.urteile:
+            passend = [ns for ns in je_platte if urteil.raum.startswith(f"{ns}.")]
+            self.assertEqual(len(passend), 1, f"'{urteil.name}' gehört zu {passend}")
+            je_platte[passend[0]].append(urteil.name)
+
+        # Beide Platten sind gleich bewehrt, also fällt für beide gleich viel an.
+        self.assertEqual(len(je_platte["querschnitt.q1"]), 6)
+        self.assertEqual(len(je_platte["querschnitt.q2"]), 6)
+        # Und die Namen allein hätten es nicht entschieden -- sie sind gleich.
+        self.assertEqual(sorted(je_platte["querschnitt.q1"]),
+                         sorted(je_platte["querschnitt.q2"]))
+
+    def test_der_raum_steht_auch_in_der_json_antwort(self):
+        antwort = dienst.bearbeite(
+            "rechnen", {"projekt": self.zweiplattenprojekt().als_dict()})
+        raeume = {u["raum"] for u in antwort.daten["urteile"]}
+        self.assertTrue(all(r.startswith("querschnitt.q") for r in raeume), raeume)
+        self.assertEqual(len(raeume), 4)   # 2 Platten x 2 Richtungen
+
 
 class TestApiAbbildung(unittest.TestCase):
     def setUp(self):

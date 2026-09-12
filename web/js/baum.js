@@ -139,7 +139,9 @@ function platteAnlegen() {
   const lage = (phi) => ({
     stahl: stahl.kennung,
     grund: { durchmesser: phi, abstand: 150, anzahl: null },
-    zulage: { durchmesser: 0, abstand: null, anzahl: null },
+    // Auch die leere Zulage wird über die Teilung geführt -- das ist der
+    // Regelfall bei Platten und die Stellung, in der das Feld erscheint.
+    zulage: { durchmesser: 0, abstand: 150, anzahl: null },
   });
   projektAendern((p) => {
     p.querschnitte.push({

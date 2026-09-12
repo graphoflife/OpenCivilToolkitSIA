@@ -23,7 +23,14 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
       Platte wird je Laufmeter gerechnet). In der Eingabemaske steht es
       richtig. Einheitlich ziehen.
 
-## Erledigt in dieser Runde
+## Erledigt zuletzt
+
+Zwei gemeldete Fehler: die Zusammenfassung packte die Nachweise mehrerer
+Platten in dieselbe Tabelle (sie schloss aus dem Anzeigetext auf die Platte —
+jetzt trägt jedes Urteil den Namensraum seines Nachweises) · eine noch leere
+Zulage stand auf «Anzahl» statt auf «Teilung».
+
+## Erledigt in der Runde davor
 
 Querkraft vollständig nachrechenbar, je Fall ein eigener Nachweis,
 `V_Rd(M_Ed, N_Ed)`, `m_Dd = |min(N_Ed;0)|·h/6`, `k_g` mit Riegel · Abschnitte

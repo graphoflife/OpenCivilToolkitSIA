@@ -35,7 +35,7 @@ Ursache erhalten.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any, Callable, Dict, Iterator, Mapping, Optional, Sequence, Tuple, Union
 
 from opencivil.core.einheiten import EINHEITSLOS, EmpirischesErgebnis, Groesse
@@ -491,6 +491,17 @@ class NachweisUrteil:
     einwirkung: Optional[Wert] = None
     widerstand: Optional[Wert] = None
 
+    raum: str = ""
+    """
+    Namensraum des Nachweises, der dieses Urteil gefaellt hat.
+
+    Wird von :meth:`Nachweis.rechne` gesetzt, nicht beim Erzeugen -- so kann
+    kein Nachweis ihn vergessen oder falsch angeben. Die Oberflaeche gruppiert
+    danach; ohne ihn muesste sie aus dem Anzeigetext zurueckschliessen, welche
+    Platte gemeint ist, und das geht schief, sobald zwei Platten dieselben
+    Richtungen tragen.
+    """
+
     def __str__(self) -> str:
         urteil = "erfüllt" if self.erfuellt else "NICHT erfüllt"
         return f"{self.name}: {urteil} (Erfüllungsgrad {self.erfuellungsgrad.formatiert(2)})"
@@ -519,7 +530,9 @@ class Nachweis(Berechnung):
 
     def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
         groessen, urteile = self.pruefe(e, p)
-        self.urteile = list(urteile)
+        # Der Namensraum wird hier gestempelt und nicht von den Unterklassen
+        # mitgegeben: er ist immer derselbe, naemlich der des Nachweises.
+        self.urteile = [replace(u, raum=self.id) for u in urteile]
         return groessen
 
     @property

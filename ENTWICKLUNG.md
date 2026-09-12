@@ -43,6 +43,69 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-12 · Zwei gemeldete Fehler
+
+### Alle Nachweise landeten in der Tabelle der ersten Platte
+
+Gemeldet: bei zwei Platten stehen die Nachweise beider in derselben Tabelle.
+
+Die Ursache war derselbe Fehler, den der dritte Befund der letzten Durchsicht
+schon einmal gefunden hatte — ich hatte ihn nur an einer Stelle übersehen. Die
+Zusammenfassung musste einem Urteil ansehen, zu welcher Platte es gehört, und
+tat das über den **Anzeigetext**:
+
+```js
+// so war es
+if (Object.keys(eintrag.nachweise || {}).some((r) =>
+  urteil.name.includes(` ${r} –`))) return kennung;
+```
+
+`r` ist die Tragrichtung, also `x` oder `y`. Jede Platte hat beide. Also passte
+jedes Urteil auf die erste Platte, und die Schleife brach dort ab: zwölf Zeilen
+in der ersten Tabelle, «kein Nachweis gerechnet» in der zweiten. Bei nur einer
+Platte fiel das nie auf — die Antwort war zufällig richtig.
+
+Die Behebung verlegt die Zuordnung dorthin, wo sie bekannt ist. Ein Urteil
+trägt jetzt den Namensraum seines Nachweises, und **gestempelt wird er in der
+Oberklasse**, nicht von den Unterklassen:
+
+```python
+def rechne(self, e, p):
+    groessen, urteile = self.pruefe(e, p)
+    self.urteile = [replace(u, raum=self.id) for u in urteile]
+    return groessen
+```
+
+Das ist der eigentliche Punkt. Hätte `NachweisUrteil` ein Pflichtfeld `raum`
+bekommen, müsste jede Nachweisklasse daran denken und könnte sich vertun. So
+gibt es die Angabe genau einmal, und sie kann nicht falsch sein. In der
+Oberfläche fällt damit die letzte Sonderbehandlung weg — es gilt dasselbe
+Prädikat wie in den anderen vier Sichten:
+
+```js
+const urteile = (loesung.urteile || []).filter(
+  (u) => imRaum(eintrag.namensraum, u.raum));
+```
+
+Geprüft mit einem Projekt aus zwei gleich bewehrten Platten: der Test verlangt,
+dass jedes Urteil auf **genau einen** Namensraum passt, und hält daneben fest,
+dass die Namen allein es nicht entschieden hätten — sie sind identisch.
+
+### Die leere Zulage stand auf «Anzahl»
+
+Zwei Felder beschreiben dieselbe Sache, und genau eines davon ist gesetzt:
+Teilung **oder** Stabzahl. War keines gesetzt — der Normalfall bei einer noch
+leeren Zulage —, las die Oberfläche das als «Stabzahl», weil sie nur auf
+`abstand !== null` prüft. Bei einer Platte ist die Teilung aber der Regelfall.
+
+Die Regel steht jetzt in `PostenEintrag.aus_dict`, also an der Stelle, durch
+die **alle drei** Wege laufen (Beispiel, Ablage im Browser, Datei von der
+Platte — `projektHolen()` schickt auch den abgelegten Stand durch `pruefen`).
+Damit richtet sich auch ein schon gespeichertes Projekt beim nächsten Öffnen.
+Eine ausdrücklich gewählte Stabzahl bleibt selbstverständlich eine Stabzahl.
+
+---
+
 ## 2026-09-11 · Drei Befunde aus dem Code-Review
 
 Eine strenge Durchsicht des eigenen Arbeitsstands. Alle drei Befunde waren

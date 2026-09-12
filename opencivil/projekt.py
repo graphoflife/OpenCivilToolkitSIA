@@ -154,10 +154,17 @@ class PostenEintrag:
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "PostenEintrag":
         abstand, anzahl = d.get("abstand"), d.get("anzahl")
+        anzahl_wert = None if anzahl in (None, "") else float(anzahl)
+        abstand_wert = None if abstand in (None, "") else float(abstand)
+        # Steht keines von beiden da -- etwa bei einer noch leeren Zulage --,
+        # dann gilt die Teilung. Sonst stuende das Feld in der Oberflaeche auf
+        # 'Anzahl', was bei einer Platte nie der Regelfall ist.
+        if abstand_wert is None and anzahl_wert is None:
+            abstand_wert = cls.abstand
         return cls(
             durchmesser=float(d.get("durchmesser") or 0.0),
-            abstand=None if abstand in (None, "") else float(abstand),
-            anzahl=None if anzahl in (None, "") else float(anzahl),
+            abstand=abstand_wert,
+            anzahl=anzahl_wert,
         )
 
     def als_posten(self) -> Bewehrungsposten:
@@ -677,7 +684,7 @@ class Projekt:
             return LageEintrag(
                 stahl="s1",
                 grund=PostenEintrag(durchmesser=phi, abstand=150.0),
-                zulage=PostenEintrag(durchmesser=zulage, abstand=150.0 if zulage else None),
+                zulage=PostenEintrag(durchmesser=zulage, abstand=150.0),
             )
 
         return cls(

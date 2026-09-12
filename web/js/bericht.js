@@ -221,9 +221,11 @@ function zusammenfassung(loesung) {
     return inhalt;
   };
 
-  const blaetter = gezeigt.map(([kennung, eintrag]) => {
+  const blaetter = gezeigt.map(([, eintrag]) => {
+    // Jedes Urteil trägt den Namensraum seines Nachweises; dasselbe Prädikat
+    // wie überall sonst ordnet es seiner Platte zu.
     const urteile = (loesung.urteile || []).filter(
-      (u) => plattenKennungZu(u, loesung) === kennung);
+      (u) => imRaum(eintrag.namensraum, u.raum));
 
     return el('div.blatt', {}, [
       el('div.b-titel', { text: `Zusammenfassung – ${eintrag.name}` }),
@@ -282,17 +284,6 @@ function plattenkennzahlen(eintrag, loesung) {
       el('span.kennzahl-name', { text: beschriftung }),
       el('span.kennzahl-wert', { text: `${wert.wert} ${wert.einheit}` }),
     ])));
-}
-
-/** Zu welcher Platte ein Urteil gehört -- über die Zuordnung der Lösung. */
-function plattenKennungZu(urteil, loesung) {
-  const qs = loesung.zuordnung?.querschnitte || {};
-  for (const [kennung, eintrag] of Object.entries(qs)) {
-    // Die Urteilsnamen tragen die Richtung, die Zuordnung den Plattennamen.
-    if (Object.keys(eintrag.nachweise || {}).some((r) =>
-      urteil.name.includes(` ${r} –`))) return kennung;
-  }
-  return Object.keys(qs)[0] || '';
 }
 
 function diagrammSicht(loesung) {
