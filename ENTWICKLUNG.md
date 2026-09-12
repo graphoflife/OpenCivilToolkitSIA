@@ -43,6 +43,51 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-12 · m_Rd(N_Ed) wird auch beim Querkraftnachweis hergeleitet
+
+Der Querkraftwiderstand hängt über ε_v vom Momentenwiderstand ab, und der
+wiederum von der wirkenden Normalkraft. In der Mitschrift stand dafür bisher
+eine blanke Zahl — nachrechenbar nur, wenn man sie im M-N-Nachweis suchen ging.
+
+Jetzt steht die Interpolation dort, wo mit ihr gerechnet wird:
+
+```
+M_Rd = M_1 + (N_Ed − N_1)/(N_2 − N_1) · (M_2 − M_1)
+     = 337.2 + (−300.0 − (−1484.6))/(0.0 − (−1484.6)) · (248.7 − 337.2)
+     = 266.6 kNm
+```
+
+samt der Tabelle der beiden Stützpunkte.
+
+**Nicht nachgebaut, sondern geteilt.** `protokoll_interpolation` war eine
+Methode von `BiegungNormalkraft` und ist jetzt eine freie Funktion; beide
+Nachweise rufen dieselbe. Eine zweite Fassung im Querkraftmodul liefe früher
+oder später auseinander — und zwar unbemerkt, weil beide plausible Zahlen
+lieferten.
+
+Was der Querkraftnachweis dafür braucht, ist die Auswertung hinter
+`M_Rd(N_Ed)`. Der M-N-Nachweis rechnet sie ohnehin (sie ist die Quelle von
+`d_m_rd`) und reicht sie über `widerstand_bei_n()` heraus — ein benannter
+Übergabepunkt statt eines Griffs in fremde Zwischenstände. Dass sie zum
+Zeitpunkt des Zugriffs vorliegt, steht nicht in einer Annahme: der
+Querkraftnachweis führt `d_m_rd` als Eingang, also sichert der Graph die
+Reihenfolge.
+
+### Dabei aufgefallen
+
+Bei negativem Moment zeigte die Interpolation `−83.9` und die Dehnungsformel
+darunter `83.9` — zwei Zahlen für dieselbe Grösse. Gerechnet wird mit dem
+Betrag, also trägt die Formel ihn jetzt auch:
+
+```
+ε_v = f_yd · (|m_Ed| − m_Dd) / (E_s · (|m_Rd(N_Ed)| − m_Dd))
+```
+
+Dasselbe Prinzip wie beim negativen Moment in der Handrechnung: die
+geschriebene Gleichung muss ihr eigenes Ergebnis liefern.
+
+---
+
 ## 2026-09-12 · Sieben Meldungen
 
 ### Zug schliesst den Querkraftnachweis nicht mehr aus

@@ -49,6 +49,7 @@ from opencivil.core.einheiten import (
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
+from opencivil.nachweis.biegung_normalkraft import protokoll_interpolation
 from opencivil.querschnitt.platte import Plattenquerschnitt, Richtung
 
 #: Unterer Riegel fuer den Beiwert der Gesteinskoernung.
@@ -122,6 +123,16 @@ class Querkraft(Nachweis):
         self.richtung = richtung
         self.faelle = list(faelle)
         self.ergebnisse: List[Querkraftergebnis] = []
+
+        self.mn = mn_nachweis
+        """
+        Der M-N-Nachweis derselben Richtung.
+
+        Gebraucht fuer die Herleitung von ``m_Rd(N_Ed)``: die Zahl kommt als
+        Eingang aus dem Graphen, die Interpolation dahinter aber liegt beim
+        Nachweis, der das Polygon gerechnet hat. Sie hier nachzubauen hiesse,
+        dieselbe Rechnung ein zweites Mal zu schreiben.
+        """
 
         r = richtung.value
         basis = f"{querschnitt.id}.nachweis.querkraft.{r}"
@@ -327,8 +338,9 @@ class Querkraft(Nachweis):
             titel="Ansatz", referenz="SIA 262:2025, 4.3.3.2.1")
         p.gleichung(
             r"m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} \qquad "
-            r"\varepsilon_v = \frac{f_{yd} \cdot (m_{Ed} - m_{Dd})}"
-            r"{E_s \cdot \left(m_{Rd}(N_{Ed}) - m_{Dd}\right)}",
+            r"\varepsilon_v = \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| "
+            r"- m_{Dd}\right)}"
+            r"{E_s \cdot \left(\left|m_{Rd}(N_{Ed})\right| - m_{Dd}\right)}",
             titel="Dekompressionsmoment und Dehnung")
         p.text(
             "Nur eine Normaldruckkraft entlastet; eine Zugkraft bleibt beim "
@@ -391,6 +403,15 @@ class Querkraft(Nachweis):
             p.text(erg.begruendung)
             return
 
+        # Der Momentenwiderstand, mit dem gleich gerechnet wird, hängt von der
+        # wirkenden Normalkraft ab. Wo er auf dem Polygon herkommt, steht hier
+        # -- geschrieben vom M-N-Nachweis, der es gerechnet hat.
+        bei_n = self.mn.widerstand_bei_n(fall.name)
+        if bei_n is not None:
+            protokoll_interpolation(
+                p, bei_n,
+                titel=f"Momentenwiderstand bei N_Ed = {N_Ed / 1e3:.1f} kN")
+
         if erg.eps_v == 0.0:
             p.text(
                 f"m_Ed = {abs(M_Ed) / 1e3:.1f} kNm/m liegt nicht über "
@@ -398,8 +419,9 @@ class Querkraft(Nachweis):
                 f"ungerissen, ε_v = 0.")
         else:
             p.gleichung(
-                r"\varepsilon_v = \frac{f_{yd} \cdot (m_{Ed} - m_{Dd})}"
-                r"{E_s \cdot \left(m_{Rd}(N_{Ed}) - m_{Dd}\right)}"
+                r"\varepsilon_v = \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| "
+                r"- m_{Dd}\right)}"
+                r"{E_s \cdot \left(\left|m_{Rd}(N_{Ed})\right| - m_{Dd}\right)}"
                 "\n= "
                 rf"\frac{{{f_yd / 1e6:.0f} \cdot \left({abs(M_Ed) / 1e3:.1f} - "
                 rf"{erg.m_Dd / 1e3:.1f}\right)}}"

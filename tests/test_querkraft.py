@@ -129,6 +129,60 @@ class TestQuerkraft(unittest.TestCase):
         erwartet = max(schnitte(nachweis.handlinie, MOMENT, -300e3))
         self.assertAlmostEqual(erg.m_Rd, erwartet, delta=1.0)
 
+    def test_m_rd_wird_im_querkraftnachweis_hergeleitet(self):
+        """
+        Der Momentenwiderstand darf auch hier nicht vom Himmel fallen.
+
+        Er hängt von der wirkenden Normalkraft ab, also muss dastehen, zwischen
+        welchen Eckpunkten des Polygons interpoliert wurde -- dieselbe
+        Herleitung wie beim M-N-Nachweis, geschrieben von derselben Stelle.
+        """
+        from opencivil.core.protokoll import GleichungBlock, TabellenBlock
+
+        projekt = projekt_mit_querkraft()
+        projekt.querschnitte[0].kombinationen[0].N_Ed = -300.0
+        aufbau = projekt.aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        erg = aufbau.querkraft["q1.x"].ergebnisse[0]
+
+        # Nur der Abschnitt des Querkraftnachweises, ab seinem ersten Fall.
+        bloecke = loesung.protokoll.nach_abschnitten()
+        beginn = next(i for i, b in enumerate(bloecke)
+                      if getattr(b, "text", "") == "Querkraftnachweis – Feld")
+        abschnitt = bloecke[beginn:beginn + 12]
+
+        gleichung = next(
+            b for b in abschnitt
+            if isinstance(b, GleichungBlock) and "Momentenwiderstand bei" in b.titel)
+        self.assertIn(r"M_{Rd} = M_1 + \frac{N_{Ed} - N_1}", gleichung.latex)
+        # Die geschriebene Zahl ist die, mit der gerechnet wird.
+        self.assertIn(f"{erg.m_Rd / 1e3:.1f}", gleichung.latex)
+
+        tabelle = next(
+            b for b in abschnitt
+            if isinstance(b, TabellenBlock) and b.titel == "Stützpunkte der Interpolation")
+        self.assertEqual(len(tabelle.zeilen), 2)
+
+    def test_der_betrag_steht_in_der_dehnungsformel(self):
+        """
+        Bei negativem Moment ist m_Rd negativ, gerechnet wird mit dem Betrag.
+
+        Ohne die Betragsstriche zeigte die Interpolation darüber -83.9 und die
+        Dehnungsformel darunter 83.9 -- zwei Zahlen für dieselbe Grösse.
+        """
+        from opencivil.core.protokoll import GleichungBlock
+
+        projekt = projekt_mit_querkraft()
+        projekt.querschnitte[0].kombinationen[0].M_Ed = -50.0
+        aufbau = projekt.aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+
+        dehnung = next(
+            b for b in loesung.protokoll.nach_abschnitten()
+            if isinstance(b, GleichungBlock) and b.titel == "Dehnung auf halber Höhe")
+        self.assertIn(r"\left|m_{Rd}(N_{Ed})\right|", dehnung.latex)
+        self.assertIn(r"\left|m_{Ed}\right|", dehnung.latex)
+
     def test_dekompressionsmoment(self):
         """m_Dd = |N_Ed| * h / 6 -- bei 300 kN und h = 300 mm also 15 kNm."""
         projekt = projekt_mit_querkraft()

@@ -25,7 +25,11 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
 
 ## Erledigt zuletzt
 
-Feste Stellenzahl in den Tabellenspalten · Querkraftnachweis auch bei
+`m_Rd(N_Ed)` wird auch beim Querkraftnachweis hergeleitet — dieselbe
+Interpolation wie beim M-N-Nachweis, geschrieben von derselben Funktion; dazu
+die Betragsstriche in der Dehnungsformel, damit sie ihr eigenes Ergebnis
+liefert · erklärende Vorrede zur Lagentabelle entfällt · feste Stellenzahl in
+den Tabellenspalten · Querkraftnachweis auch bei
 Normalzug (m_Dd wird über `min(N_Ed; 0)` von selbst null) · Durchmesser und
 Teilung nicht mehr als eigene Blöcke in der Herleitung, Grösstkorn und
 Einlagenhöhe dafür beim Querkraftnachweis · jeder Nachweis trägt den Abschnitt

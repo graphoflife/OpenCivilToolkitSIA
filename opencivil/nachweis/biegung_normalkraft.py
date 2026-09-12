@@ -196,6 +196,16 @@ class BiegungNormalkraft(Nachweis):
         self.linie: List[Linienpunkt] = []
         self.auswertungen: List[Auswertung] = []
 
+        self.bei_normalkraft: Dict[str, Optional[Auswertung]] = {}
+        """
+        Je Kombination der Momentenwiderstand bei der wirkenden Normalkraft --
+        samt der Interpolation, aus der er stammt.
+
+        Der Querkraftnachweis rechnet mit genau dieser Groesse und soll sie
+        herleiten, statt eine Zahl hinzuschreiben. Er holt sie ueber
+        :meth:`widerstand_bei_n`.
+        """
+
         r = richtung.value
         basis = f"{querschnitt.id}.nachweis.mn.{r}"
         self.d_ausnutzung: Dict[str, WertDef] = {
@@ -331,6 +341,7 @@ class BiegungNormalkraft(Nachweis):
         }
 
         self.auswertungen = []
+        self.bei_normalkraft = {}
         urteile: List[NachweisUrteil] = []
         for kombination in self.kombinationen:
             auswertung = self._auswerten(kombination, eckwerte)
@@ -342,6 +353,7 @@ class BiegungNormalkraft(Nachweis):
             # Unabhaengig vom gewaehlten Massstab: der Momentenwiderstand bei
             # dieser Normalkraft, denn der Querkraftnachweis rechnet damit.
             bei_n = self._messen(kombination, geo.MOMENT, auswertung.innerhalb)
+            self.bei_normalkraft[kombination.name] = bei_n
             ergebnis[self.d_m_rd[kombination.name].id] = Groesse.aus_si(
                 abs(bei_n.rd) if bei_n else 0.0, KNM)
             urteile.append(
@@ -355,6 +367,16 @@ class BiegungNormalkraft(Nachweis):
                 )
             )
         return ergebnis, urteile
+
+    def widerstand_bei_n(self, kombination: str) -> Optional[Auswertung]:
+        """
+        Der Momentenwiderstand bei der Normalkraft dieser Kombination.
+
+        Liegt erst nach dem Lauf vor. Der Querkraftnachweis darf sich darauf
+        verlassen: er fuehrt ``d_m_rd`` als Eingang, und damit steht die
+        Reihenfolge im Graphen statt in einer Annahme.
+        """
+        return self.bei_normalkraft.get(kombination)
 
     def _als_wert(self, auswertung: Auswertung, seite: str):
         """
@@ -503,7 +525,7 @@ class BiegungNormalkraft(Nachweis):
             rf"N_{{Ed}} = {k.N_Ed.als_latex(1, KN)}",
             titel="Einwirkung",
         )
-        self._protokoll_interpolation(p, auswertung)
+        protokoll_interpolation(p, auswertung)
 
         zustand = r"\text{erfüllt}" if auswertung.innerhalb else r"\text{NICHT erfüllt}"
         wert = (
@@ -521,53 +543,61 @@ class BiegungNormalkraft(Nachweis):
             titel="Erfüllungsgrad",
         )
 
-    def _protokoll_interpolation(self, p: Protokoll, auswertung: Auswertung) -> None:
-        """
-        Schreibt, wie der Widerstand auf dem Polygon gefunden wurde.
 
-        Ohne diesen Schritt stuende in der Mitschrift eine Zahl, die zwar aus
-        nachvollziehbaren Eckpunkten stammt, aber selbst vom Himmel faellt.
-        Hier steht, zwischen welchen beiden Punkten geradlinig interpoliert
-        wurde und mit welchem Anteil.
-        """
-        if auswertung.kante is None:
-            p.text(auswertung.begruendung)
-            return
+def protokoll_interpolation(
+    p: Protokoll, auswertung: Auswertung, titel: str = "",
+) -> None:
+    """
+    Schreibt, wie der Widerstand auf dem Polygon gefunden wurde.
 
-        a, b = auswertung.kante
-        ziel = auswertung.achse          # was gesucht wird
-        lauf = ziel.gegen                # was dabei festgehalten bleibt
-        ed = geo.Stelle(N=auswertung.schnittgroessen.N_Ed.si,
-                        M=auswertung.schnittgroessen.M_Ed.si)
-        fest = lauf.von(ed)
+    Ohne diesen Schritt stuende in der Mitschrift eine Zahl, die zwar aus
+    nachvollziehbaren Eckpunkten stammt, aber selbst vom Himmel faellt. Hier
+    steht, zwischen welchen beiden Punkten geradlinig interpoliert wurde und
+    mit welchem Anteil.
 
-        e_lauf = lauf.einheit.latex
-        e_ziel = ziel.einheit.latex
+    Frei und nicht an :class:`BiegungNormalkraft` gebunden: der
+    Querkraftnachweis rechnet mit dem Momentenwiderstand bei der wirkenden
+    Normalkraft und muss dieselbe Interpolation zeigen. Zweimal geschrieben
+    liefe sie frueher oder spaeter auseinander.
+    """
+    if auswertung.kante is None:
+        p.text(auswertung.begruendung)
+        return
 
-        p.gleichung(
-            rf"{ziel.name}_{{Rd}} = {ziel.name}_1 + "
-            rf"\frac{{{lauf.name}_{{Ed}} - {lauf.name}_1}}"
-            rf"{{{lauf.name}_2 - {lauf.name}_1}} \cdot "
-            rf"\left({ziel.name}_2 - {ziel.name}_1\right)"
-            "\n= "
-            rf"{_k(ziel.von(a))} + "
-            rf"\frac{{{_k(fest)} - {_klammer(lauf.von(a))}}}"
-            rf"{{{_k(lauf.von(b))} - {_klammer(lauf.von(a))}}} \cdot "
-            rf"\left({_k(ziel.von(b))} - {_klammer(ziel.von(a))}\right)"
-            rf" = {_k(auswertung.rd)}\,{e_ziel}",
-            titel=(f"Widerstand bei festgehaltenem {lauf.name}_Ed = "
-                   f"{_k(fest)} {lauf.einheit.beschriftung}"),
-        )
-        p.tabelle(
-            kopf=[r"\text{Punkt}", rf"{lauf.name}\ [{e_lauf}]",
-                  rf"{ziel.name}\ [{e_ziel}]"],
-            zeilen=[
-                [q.symbol, _k(lauf.von(q)), _k(ziel.von(q))]
-                for q in (a, b)
-            ],
-            titel="Stützpunkte der Interpolation",
-            ausrichtung="lrr",
-        )
+    a, b = auswertung.kante
+    ziel = auswertung.achse          # was gesucht wird
+    lauf = ziel.gegen                # was dabei festgehalten bleibt
+    ed = geo.Stelle(N=auswertung.schnittgroessen.N_Ed.si,
+                    M=auswertung.schnittgroessen.M_Ed.si)
+    fest = lauf.von(ed)
+
+    e_lauf = lauf.einheit.latex
+    e_ziel = ziel.einheit.latex
+
+    p.gleichung(
+        rf"{ziel.name}_{{Rd}} = {ziel.name}_1 + "
+        rf"\frac{{{lauf.name}_{{Ed}} - {lauf.name}_1}}"
+        rf"{{{lauf.name}_2 - {lauf.name}_1}} \cdot "
+        rf"\left({ziel.name}_2 - {ziel.name}_1\right)"
+        "\n= "
+        rf"{_k(ziel.von(a))} + "
+        rf"\frac{{{_k(fest)} - {_klammer(lauf.von(a))}}}"
+        rf"{{{_k(lauf.von(b))} - {_klammer(lauf.von(a))}}} \cdot "
+        rf"\left({_k(ziel.von(b))} - {_klammer(ziel.von(a))}\right)"
+        rf" = {_k(auswertung.rd)}\,{e_ziel}",
+        titel=titel or (f"Widerstand bei festgehaltenem {lauf.name}_Ed = "
+                        f"{_k(fest)} {lauf.einheit.beschriftung}"),
+    )
+    p.tabelle(
+        kopf=[r"\text{Punkt}", rf"{lauf.name}\ [{e_lauf}]",
+              rf"{ziel.name}\ [{e_ziel}]"],
+        zeilen=[
+            [q.symbol, _k(lauf.von(q)), _k(ziel.von(q))]
+            for q in (a, b)
+        ],
+        titel="Stützpunkte der Interpolation",
+        ausrichtung="lrr",
+    )
 
 
 def _kennung(text: str) -> str:
