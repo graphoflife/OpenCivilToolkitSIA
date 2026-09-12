@@ -3,6 +3,7 @@
 import unittest
 
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, KN_PRO_M, Groesse
+from opencivil.nachweis import querkraft
 from opencivil.projekt import Projekt
 
 
@@ -246,3 +247,91 @@ class TestQuerkraft(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestQuerkraftkurve(unittest.TestCase):
+    """
+    Die M-V-Kurve: Querkraftwiderstand über dem Moment, bei festem N_Ed.
+
+    Wichtigste Eigenschaft ist nicht ihr Verlauf, sondern dass sie aus
+    derselben Funktion stammt wie der Nachweis. Eine Kurve, die neben ihren
+    eigenen Punkten herläuft, wäre schlimmer als keine.
+    """
+
+    def aufbau(self, **abweichungen):
+        projekt = projekt_mit_querkraft(**abweichungen)
+        a = projekt.aufbauen()
+        a.werk.loese(*a.alle_nachweisziele())
+        return a
+
+    def test_fuenfzig_punkte_von_null_bis_m_rd_plus_zwanzig(self):
+        from opencivil.nachweis.querkraft import KURVENPUNKTE, KURVENZUGABE
+
+        kurve = self.aufbau().querkraft["q1.x"].kurve(0.0, moment_positiv=True)
+        self.assertEqual(len(kurve["punkte"]), KURVENPUNKTE)
+        self.assertAlmostEqual(kurve["punkte"][0][0], 0.0)
+        self.assertAlmostEqual(kurve["punkte"][-1][0], kurve["m_Rd"] + KURVENZUGABE)
+
+    def test_die_kurve_trifft_den_nachweis(self):
+        """
+        Der Bemessungspunkt liegt auf der Kurve -- nicht ungefähr, sondern
+        weil beide dieselbe Funktion rufen.
+        """
+        a = self.aufbau()
+        qk = a.querkraft["q1.x"]
+        erg = qk.ergebnisse[0]                       # Feld: M_Ed = 100, N_Ed = 0
+        kurve = qk.kurve(erg.fall.N_Ed.si, moment_positiv=True)
+
+        # Denselben Punkt direkt rechnen und mit dem Nachweis vergleichen.
+        d, d_v = qk.beiwerte.hoehen(True)
+        punkt = querkraft.widerstand(
+            M_Ed=erg.fall.M_Ed.si, N_Ed=erg.fall.N_Ed.si, h=qk.beiwerte.h,
+            d=d, d_v=d_v, tau_cd=qk.beiwerte.tau_cd, f_yd=qk.beiwerte.f_yd,
+            E_s=qk.beiwerte.E_s, k_g=qk.beiwerte.k_g, m_Rd=kurve["m_Rd"])
+        self.assertAlmostEqual(punkt.v_Rd, erg.v_Rd, places=6)
+
+    def test_jenseits_des_widerstands_faellt_die_kurve(self):
+        """
+        Über m_Rd fliesst die Bewehrung: eps_v springt, k_d sinkt. Genau
+        dieser Knick ist der Grund, 20 kNm weiter zu zeichnen.
+        """
+        kurve = self.aufbau().querkraft["q1.x"].kurve(0.0, moment_positiv=True)
+        elastisch = [v for _, v, plastisch in kurve["punkte"] if not plastisch]
+        plastisch = [v for _, v, p in kurve["punkte"] if p]
+
+        self.assertTrue(plastisch, "kein plastischer Ast gezeichnet")
+        self.assertLess(max(plastisch), min(elastisch))
+        # Und innerhalb jedes Astes fällt der Widerstand mit wachsendem Moment.
+        self.assertEqual(elastisch, sorted(elastisch, reverse=True))
+
+    def test_ohne_moment_ist_der_widerstand_am_groessten(self):
+        kurve = self.aufbau().querkraft["q1.x"].kurve(0.0, moment_positiv=True)
+        werte = [v for _, v, _ in kurve["punkte"]]
+        self.assertEqual(werte[0], max(werte))
+
+    def test_druck_hebt_die_ganze_kurve(self):
+        """Eine Normaldruckkraft entlastet über m_Dd und hebt m_Rd."""
+        qk = self.aufbau().querkraft["q1.x"]
+        ohne = qk.kurve(0.0, moment_positiv=True)
+        mit = qk.kurve(-300e3, moment_positiv=True)
+        self.assertGreater(mit["m_Rd"], ohne["m_Rd"])
+
+    def test_es_gibt_nur_kurven_zu_vorhandenen_faellen(self):
+        """
+        Ohne einen Fall mit negativem Moment gibt es keine Kurve für «Zug
+        oben» -- sie wäre eine Aussage über etwas, das niemand wissen wollte.
+        """
+        # Das Beispiel hat eine Stütze mit negativem Moment -- also beide.
+        self.assertEqual(self.aufbau().querkraft["q1.x"].momentenrichtungen,
+                         [True, False])
+
+        nur_feld = projekt_mit_querkraft()
+        for k in nur_feld.querschnitte[0].kombinationen:
+            k.M_Ed = abs(k.M_Ed)
+        a = nur_feld.aufbauen()
+        a.werk.loese(*a.alle_nachweisziele())
+        self.assertEqual(a.querkraft["q1.x"].momentenrichtungen, [True])
+
+    def test_ausserhalb_der_resistenzlinie_gibt_es_keine_kurve(self):
+        qk = self.aufbau().querkraft["q1.x"]
+        self.assertIsNone(qk.kurve(99_000e3, moment_positiv=True))

@@ -7,6 +7,12 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
 
 ## Offen
 
+- [ ] **Der plastische Ast der M-V-Kurve ist eine Auslegung.** Vorgegeben war
+      «ε_v = 1.5·M_Ed/M_Rd»; eingebaut ist `ε_v = 1.5 · f_yd/E_s · M_Ed/m_Rd`,
+      also die Fliessdehnung mit 1.5 beaufschlagt. Wörtlich genommen ergäbe
+      die Vorgabe ε_v ≈ 1.6 statt 3.5 ‰ und liesse den Widerstand auf 0.6
+      statt 136 kN/m fallen. Bestätigen oder berichtigen.
+
 - [ ] **Die Sortentabellen sind ungeprüft.** `BETONSORTEN` und `STAHLSORTEN` in
       `material/` stammen aus der Vorgängerfassung und sind nie gegen die
       gedruckte SIA 262 gehalten worden. Dasselbe gilt für sämtliche
@@ -25,7 +31,9 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
 
 ## Erledigt zuletzt
 
-Eingaben werden geprüft: eine eingegebene Null wurde stillschweigend durch die
+M-V-Kurve je Tragrichtung und Momentenvorzeichen, mit einstellbarer
+Normalkraft, angeschriebenem Höchst- und Kleinstwert und dem plastischen Ast
+jenseits von m_Rd · Eingaben werden geprüft: eine eingegebene Null wurde stillschweigend durch die
 Vorgabe ersetzt (`h = 0` rechnete mit 300 mm und meldete «alle Nachweise
 erfüllt»), unmögliche Abmessungen liefen durch, und `γ_c = 0` kam als
 `ZeroDivisionError` beim Benutzer an · Überschriften der Herleitung: fett mit blauem Akzent nur noch dort, wo ein

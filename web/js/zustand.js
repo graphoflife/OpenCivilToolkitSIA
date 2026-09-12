@@ -37,6 +37,14 @@ export const zustand = {
   /** Angehakte Ziele im Reiter "Ziel wählen". */
   gewaehlteZiele: new Set(),
   zieleListe: null,
+  /**
+   * Je M-V-Kurve die eingestellte Normalkraft in kN.
+   *
+   * Ansichtssache, kein Teil des Projekts: sie sagt nichts über das
+   * Bauwerk, sondern nur, welchen Schnitt durch die Fläche man gerade
+   * sehen will. Darum hier und nicht in der Projektbeschreibung.
+   */
+  kurvenNormalkraft: {},
 };
 
 /** Klappt ein Kapitel auf oder zu. */

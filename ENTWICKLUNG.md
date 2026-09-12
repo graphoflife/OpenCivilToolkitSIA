@@ -43,6 +43,58 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-12 · Die M-V-Kurve
+
+Ein Diagramm je Tragrichtung und Momentenvorzeichen — bis zu vier pro Platte,
+aber nur dort, wo auch ein Querkraftnachweis geführt wurde. Auf der Waagrechten
+`M_Ed` (als Betrag), senkrecht `v_Rd`, fünfzig Stützstellen von null bis
+`m_Rd + 20 kNm`.
+
+**In die Herleitung kommt davon nichts.** Die Kurve ist eine Ansicht, keine
+Rechenschaft: fünfzig Stützstellen niederzuschreiben hiesse, den Bericht mit
+Zahlen zu füllen, die niemand einzeln nachrechnet.
+
+### Eine Funktion, zwei Aufrufer
+
+Die Kurve könnte leicht neben ihren eigenen Punkten herlaufen — und das wäre
+schlimmer als gar keine Kurve, weil sie wie eine Bestätigung aussähe. Darum
+ging die Rechnung zuerst aus `_einen_fall` heraus in eine freie Funktion
+`widerstand(...)`. Nachweis und Kurve rufen dieselbe; ein Test rechnet den
+Bemessungspunkt direkt nach und vergleicht ihn mit dem Urteil.
+
+### Jenseits von m_Rd
+
+Der eigentliche Grund, 20 kNm weiterzuzeichnen. Dort fliesst die Bewehrung,
+die elastische Beziehung gilt nicht mehr, und angesetzt wird
+
+```
+ε_v = 1.5 · f_yd/E_s · |m_Ed| / m_Rd
+```
+
+Im Beispiel fällt der Widerstand an der Stelle von 170.6 auf 140.4 kN/m — ein
+Sprung von 18 %. Gezeichnet wird der Ast gestrichelt, damit der Knick nicht
+wie ein Rechenfehler aussieht.
+
+### Die Normalkraft gehört unter das Diagramm
+
+`v_Rd` hängt über `m_Rd(N_Ed)` von der Normalkraft ab. Eine Kurve gilt also
+immer nur für eine; welche, steht in einem Feld darunter.
+
+Wird sie verstellt, **rechnet der Kern neu** — eine eigene Anfrage
+`querkraftkurven`. Die naheliegende Abkürzung wäre gewesen, das Polygon in den
+Browser zu geben und dort zu interpolieren; dann stünde die Formel ein zweites
+Mal im Werkzeug, in einer anderen Sprache. Ein Umlauf kostet in Pyodide rund
+70 ms.
+
+Bemessungspunkte, deren Normalkraft nicht die eingestellte ist, werden blass
+gezeichnet statt weggelassen — sie sind ja vorhanden, nur eben auf einer
+anderen Kurve. Der Mauszeiger sagt dann, zu welcher.
+
+Die eingestellte Normalkraft steht in der Ansicht, nicht im Projekt: sie sagt
+nichts über das Bauwerk, sondern nur, welchen Schnitt man gerade sehen will.
+
+---
+
 ## 2026-09-12 · Eingaben wurden auf Treu und Glauben genommen
 
 Eine Durchsicht mit Randwerten statt mit dem Beispiel. Die Verweise waren

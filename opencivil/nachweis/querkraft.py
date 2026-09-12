@@ -55,6 +55,109 @@ from opencivil.querschnitt.platte import Plattenquerschnitt, Richtung
 #: Unterer Riegel fuer den Beiwert der Gesteinskoernung.
 K_G_MINDEST = 1.20
 
+#: Aufschlag auf die Fliessdehnung, sobald ``m_Ed`` den Widerstand ueberschreitet.
+PLASTISCH = 1.5
+
+#: Stuetzstellen der M_Ed-v_Rd-Kurve.
+KURVENPUNKTE = 50
+
+#: Wie weit die Kurve ueber ``m_Rd`` hinaus gezeichnet wird, in Nm.
+KURVENZUGABE = 20e3
+
+
+@dataclass(frozen=True)
+class Kurvenbeiwerte:
+    """
+    Was ausser Moment und Normalkraft in den Widerstand eingeht.
+
+    Alles in SI-Basis. Steht nach dem Lauf am Nachweis bereit, damit sich die
+    Kurve zu jeder eingestellten Normalkraft neu rechnen laesst -- ohne dass
+    die Oberflaeche die Formel ein zweites Mal enthaelt.
+    """
+
+    h: float
+    tiefen: Tuple[float, ...]
+    einlage: float
+    tau_cd: float
+    f_yd: float
+    E_s: float
+    k_g: float
+
+    def hoehen(self, moment_positiv: bool) -> Tuple[float, float]:
+        """``(d, d_v)`` fuer diese Momentenrichtung."""
+        d = _statische_hoehe(self.tiefen, self.h, moment_positiv)
+        d_v = d - self.einlage if (self.h / 6.0 < self.einlage < d) else d
+        return d, d_v
+
+
+@dataclass(frozen=True)
+class Widerstandspunkt:
+    """
+    Was bei einem bestimmten Moment noch an Querkraft aufnehmbar ist.
+
+    Ein einzelner Punkt der Rechnung -- der Nachweis braucht ihn fuer seine
+    Faelle, die Kurve fuer ihre fuenfzig Stuetzstellen. Beide ueber dieselbe
+    Funktion, sonst zeigte das Diagramm etwas anderes als der Nachweis.
+    """
+
+    m_Dd: float
+    eps_v: float
+    k_d: float
+    v_Rd: float
+    """in N/m."""
+
+    plastisch: bool = False
+    """``m_Ed`` liegt ueber dem Momentenwiderstand; die Bewehrung fliesst."""
+
+    grund: str = ""
+    """Gesetzt, wenn sich kein Widerstand bestimmen liess."""
+
+
+def widerstand(
+    *, M_Ed: float, N_Ed: float, h: float, d: float, d_v: float,
+    tau_cd: float, f_yd: float, E_s: float, k_g: float, m_Rd: float,
+) -> Widerstandspunkt:
+    """
+    Der Querkraftwiderstand bei diesem Moment und dieser Normalkraft.
+
+    Alles in SI-Basis; ``tau_cd`` in Pa, ``m_Rd`` in Nm, Rueckgabe in N/m.
+
+    DREI AESTE:
+
+    * ``|m_Ed| <= m_Dd`` -- der Querschnitt bleibt ungerissen, ``eps_v = 0``
+      und ``k_d`` damit am groessten.
+    * ``|m_Ed| <= m_Rd`` -- der Regelfall der Norm.
+    * ``|m_Ed| >  m_Rd`` -- die Bewehrung fliesst. Die Dehnung waechst dann
+      nicht mehr nach der elastischen Beziehung; angesetzt wird
+      ``eps_v = 1.5 * f_yd/E_s * |m_Ed|/m_Rd``. Der Widerstand faellt damit
+      sprunghaft, und genau das soll die Kurve zeigen.
+    """
+    m_Dd = abs(min(N_Ed, 0.0)) * h / 6.0
+    zaehler = abs(M_Ed) - m_Dd
+    nenner = m_Rd - m_Dd
+    plastisch = False
+
+    if zaehler <= 0.0:
+        eps_v = 0.0
+    elif nenner <= 0.0:
+        return Widerstandspunkt(
+            m_Dd=m_Dd, eps_v=0.0, k_d=0.0, v_Rd=0.0,
+            grund=(f"m_Rd(N_Ed) = {m_Rd / 1e3:.1f} kNm liegt nicht über dem "
+                   f"Dekompressionsmoment m_Dd = {m_Dd / 1e3:.1f} kNm. "
+                   f"Der Querkraftwiderstand ist so nicht bestimmbar."))
+    elif abs(M_Ed) > m_Rd:
+        eps_v = PLASTISCH * (f_yd / E_s) * abs(M_Ed) / m_Rd
+        plastisch = True
+    else:
+        eps_v = f_yd * zaehler / (E_s * nenner)
+
+    # k_d ist empirisch: d geht in Millimeter ein.
+    k_d = 1.0 / (1.0 + eps_v * (d * 1e3) * k_g)
+    return Widerstandspunkt(
+        m_Dd=m_Dd, eps_v=eps_v, k_d=k_d,
+        v_Rd=k_d * (tau_cd / 1e6) * (d_v * 1e3) * 1e3,   # N/m
+        plastisch=plastisch)
+
 
 def _statische_hoehe(tiefen: Sequence[float], h: float, moment_positiv: bool) -> float:
     """
@@ -97,6 +200,9 @@ class Querkraftergebnis:
     v_Rd: float = 0.0
     """in N/m."""
 
+    plastisch: bool = False
+    """``m_Ed`` liegt ueber dem Momentenwiderstand -- siehe :func:`widerstand`."""
+
     erfuellungsgrad: float = 0.0
     erfuellt: bool = False
     begruendung: str = ""
@@ -123,6 +229,16 @@ class Querkraft(Nachweis):
         self.richtung = richtung
         self.faelle = list(faelle)
         self.ergebnisse: List[Querkraftergebnis] = []
+
+        self.beiwerte: Optional[Kurvenbeiwerte] = None
+        """
+        Die geloesten Eingaenge, nach dem Lauf. Fuer :meth:`kurve`.
+
+        Ein Ergebnis des Laufs, das ein anderer braucht -- wie
+        :attr:`BiegungNormalkraft.bei_normalkraft`. Nicht zu verwechseln mit
+        Zwischenwerten, die zwischen eigenen Methoden gereicht werden; die
+        gehen durch die Argumentliste.
+        """
 
         self.mn = mn_nachweis
         """
@@ -229,6 +345,10 @@ class Querkraft(Nachweis):
             rf" = \max\left[{K_G_MINDEST:.2f};\ {roh:.3f}\right] = {k_g:.3f}",
             titel="Beiwert der Gesteinskörnung", referenz="SIA 262:2025, 4.3.3.2.1")
 
+        self.beiwerte = Kurvenbeiwerte(
+            h=h, tiefen=tuple(tiefen), einlage=einlage, tau_cd=tau_cd.si,
+            f_yd=f_yd, E_s=E_s, k_g=k_g)
+
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
         self.ergebnisse = []
@@ -265,6 +385,53 @@ class Querkraft(Nachweis):
 
         return ergebnis, urteile
 
+    # -- Kurve --------------------------------------------------------------
+
+    @property
+    def momentenrichtungen(self) -> List[bool]:
+        """
+        Welche Momentenvorzeichen ueberhaupt vorkommen -- hoechstens zwei.
+
+        Danach richtet sich, wie viele Kurven es fuer diese Tragrichtung gibt.
+        Ohne einen Fall mit negativem Moment waere eine Kurve fuer «Zug oben»
+        eine Aussage ueber etwas, das niemand nachgewiesen haben wollte.
+        """
+        vorhanden = {f.M_Ed.si >= 0 for f in self.faelle}
+        return [p for p in (True, False) if p in vorhanden]
+
+    def kurve(self, N_Ed: float, moment_positiv: bool) -> Optional[dict]:
+        """
+        Der Querkraftwiderstand ueber dem Moment, bei festgehaltener Normalkraft.
+
+        Fuenfzig Stuetzstellen von null bis ``m_Rd + 20 kNm``. Der Bereich
+        jenseits von ``m_Rd`` ist der eigentliche Zweck: dort faellt der
+        Widerstand, weil die Bewehrung fliesst (siehe :func:`widerstand`).
+
+        Gerechnet wird mit derselben Funktion wie im Nachweis. Die Kurve kann
+        also nicht etwas anderes zeigen als die Punkte, die darauf liegen.
+
+        :param N_Ed: eingestellte Normalkraft in N, Zug positiv.
+        :return: ``None``, wenn bei dieser Normalkraft kein Widerstand besteht.
+        """
+        if self.beiwerte is None:
+            return None
+        m_Rd = self.mn.moment_bei(N_Ed, positiv=moment_positiv)
+        if not m_Rd or m_Rd <= 0.0:
+            return None
+
+        d, d_v = self.beiwerte.hoehen(moment_positiv)
+        bis = m_Rd + KURVENZUGABE
+        punkte = []
+        for i in range(KURVENPUNKTE):
+            M_Ed = bis * i / (KURVENPUNKTE - 1)
+            p = widerstand(
+                M_Ed=M_Ed, N_Ed=N_Ed, h=self.beiwerte.h, d=d, d_v=d_v,
+                tau_cd=self.beiwerte.tau_cd, f_yd=self.beiwerte.f_yd,
+                E_s=self.beiwerte.E_s, k_g=self.beiwerte.k_g, m_Rd=m_Rd)
+            punkte.append((M_Ed, p.v_Rd, p.plastisch))
+
+        return {"punkte": punkte, "m_Rd": m_Rd, "d": d, "d_v": d_v, "N_Ed": N_Ed}
+
     def _widerstandssymbol(self, fall: Querkraftfall) -> str:
         """``v_Rd(M_Ed = 100 kNm, N_Ed = -300 kN)`` -- der Widerstand ist bedingt."""
         r = self.richtung.value
@@ -281,38 +448,26 @@ class Querkraft(Nachweis):
 
         erg.d = _statische_hoehe(tiefen, h, M_Ed >= 0)
         erg.d_v = erg.d - einlage if (h / 6.0 < einlage < erg.d) else erg.d
+        erg.m_Rd = m_Rd
 
         # Nur Druck entlastet: bei Zug liefert min(N_Ed; 0) null, das
         # Dekompressionsmoment entfaellt und der Nachweis laeuft unveraendert
         # weiter. Eine Sonderbehandlung braucht es dafuer nicht -- sie stand
         # frueher hier und setzte v_Rd kurzerhand auf null.
-        erg.m_Dd = abs(min(N_Ed, 0.0)) * h / 6.0
-        erg.m_Rd = m_Rd
-        zaehler = abs(M_Ed) - erg.m_Dd
-        nenner = m_Rd - erg.m_Dd
+        punkt = widerstand(
+            M_Ed=M_Ed, N_Ed=N_Ed, h=h, d=erg.d, d_v=erg.d_v,
+            tau_cd=tau_cd.si, f_yd=f_yd, E_s=E_s, k_g=k_g, m_Rd=m_Rd)
+        erg.m_Dd = punkt.m_Dd
+        erg.eps_v = punkt.eps_v
+        erg.k_d = punkt.k_d
+        erg.v_Rd = punkt.v_Rd
+        erg.plastisch = punkt.plastisch
 
-        if zaehler <= 0.0:
-            # Das Moment bleibt unter dem Dekompressionsmoment: der Querschnitt
-            # ist ungerissen, eps_v = 0 und k_d damit am groessten.
-            erg.eps_v = 0.0
-        elif nenner <= 0.0:
-            # Der Widerstand liegt nicht ueber dem Dekompressionsmoment -- die
-            # Formel gibt dann nichts her. Auf einen Querkraftwiderstand ist
-            # hier nicht zu zaehlen; der M-N-Nachweis zeigt das Versagen ohnehin.
-            erg.v_Rd = 0.0
+        if punkt.grund:
             erg.erfuellungsgrad = 0.0
             erg.erfuellt = False
-            erg.begruendung = (
-                f"m_Rd(N_Ed) = {m_Rd / 1e3:.1f} kNm liegt nicht über dem "
-                f"Dekompressionsmoment m_Dd = {erg.m_Dd / 1e3:.1f} kNm. "
-                f"Der Querkraftwiderstand ist so nicht bestimmbar.")
+            erg.begruendung = punkt.grund
             return erg
-        else:
-            erg.eps_v = f_yd * zaehler / (E_s * nenner)
-
-        # k_d ist empirisch: d geht in Millimeter ein.
-        erg.k_d = 1.0 / (1.0 + erg.eps_v * (erg.d * 1e3) * k_g)
-        erg.v_Rd = erg.k_d * tau_cd.in_einheit(N_PRO_MM2) * (erg.d_v * 1e3) * 1e3  # N/m
 
         erg.erfuellungsgrad = float("inf") if V_Ed == 0 else abs(erg.v_Rd) / abs(V_Ed)
         erg.erfuellt = erg.erfuellungsgrad >= 1.0

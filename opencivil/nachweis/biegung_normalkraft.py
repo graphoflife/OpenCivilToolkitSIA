@@ -368,6 +368,23 @@ class BiegungNormalkraft(Nachweis):
             )
         return ergebnis, urteile
 
+    def moment_bei(self, N_Ed: float, positiv: bool) -> Optional[float]:
+        """
+        Der Momentenwiderstand bei dieser Normalkraft, auf der gewaehlten Seite.
+
+        Fuer beliebige Normalkraefte, nicht nur die der Kombinationen: die
+        Querkraftkurve laesst den Benutzer ein N_Ed einstellen und braucht dann
+        den passenden Widerstand. Beide Seiten des Polygons sind moeglich --
+        positiv (Zug unten) und negativ (Zug oben).
+
+        ``None``, wenn die Normalkraft ausserhalb der Resistenzlinie liegt.
+
+        :param N_Ed: Normalkraft in N, Zug positiv.
+        :return: Moment in Nm, Betrag der gewaehlten Seite.
+        """
+        treffer = geo.kante(self.handlinie, geo.MOMENT, N_Ed, positiv=positiv)
+        return None if treffer is None else abs(treffer[0])
+
     def widerstand_bei_n(self, kombination: str) -> Optional[Auswertung]:
         """
         Der Momentenwiderstand bei der Normalkraft dieser Kombination.

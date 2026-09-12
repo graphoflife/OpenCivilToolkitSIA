@@ -131,6 +131,8 @@ export const api = {
   rechnen: (projekt, ziele) => ruf('rechnen', { projekt, ziele }),
   alles: (projekt) => ruf('alles', { projekt }),
   ziele: (projekt) => ruf('ziele', { projekt }),
+  /** M-V-Kurven für selbst gewählte Normalkräfte: {Kennung: N_Ed in kN}. */
+  querkraftkurven: (projekt, n_ed) => ruf('querkraftkurven', { projekt, n_ed }),
   bericht: (projekt, ziele) => ruf('bericht', { projekt, ziele }),
 };
 

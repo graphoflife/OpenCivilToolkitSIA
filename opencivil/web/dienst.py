@@ -168,6 +168,27 @@ def ziele(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     return {"ziele": eintraege, "zuordnung": api.zuordnung(aufbau)}
 
 
+def querkraftkurven(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Die M-V-Kurven fuer selbst gewaehlte Normalkraefte.
+
+    Der Querkraftwiderstand haengt ueber ``m_Rd(N_Ed)`` von der Normalkraft ab.
+    Unter jedem Diagramm laesst sich eine einstellen; ``n_ed`` bildet die
+    Kennung der Kurve auf diese Normalkraft in kN ab.
+
+    Eine eigene Anfrage, weil es eine eigene Frage ist -- und weil die
+    Oberflaeche die Formel sonst ein zweites Mal enthalten muesste, um die
+    Kurve selbst zu zeichnen. Gerechnet wird an genau einer Stelle.
+    """
+    aufbau = _projekt(rumpf).aufbauen()
+    aufbau.werk.loese(*aufbau.alle_nachweisziele())
+    gewaehlt = {
+        str(k): float(v) for k, v in (rumpf.get("n_ed") or {}).items()
+        if v is not None
+    }
+    return {"querkraftkurven": api.querkraftkurven(aufbau, gewaehlt)}
+
+
 def bericht(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
     Baut das LaTeX-Dokument und gibt es als Zeichenkette zurueck.
@@ -209,6 +230,7 @@ ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "rechnen": rechnen,
     "alles": alles,
     "ziele": ziele,
+    "querkraftkurven": querkraftkurven,
     "bericht": bericht,
 }
 

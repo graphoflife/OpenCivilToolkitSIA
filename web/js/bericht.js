@@ -13,9 +13,12 @@
  * anderes als im Bericht.
  */
 
-import { el, ersetzen, leerzustand, melden } from './dom.js';
+import { el, ersetzen, leerzustand, melden, zahlfeld } from './dom.js';
 import { kopiereFuerWord, kopiereLatex, setzen, span } from './mathe.js';
-import { diagrammZeichnen, kurveZeichnen, querschnittZeichnen } from './diagramm.js';
+import {
+  diagrammZeichnen, kurveZeichnen, querkraftkurveZeichnen, querschnittZeichnen,
+} from './diagramm.js';
+import { api } from './api.js';
 import { aendern, zustand } from './zustand.js';
 
 // ===========================================================================
@@ -362,11 +365,70 @@ function diagrammSicht(loesung) {
         }),
         diagrammZeichnen(linie),
       ]),
+      ...querkraftkurven(loesung, kennung),
     ]));
   }
 
   if (!blaetter.length) return leerzustand('Noch nichts zu zeichnen.');
   return el('div', {}, blaetter);
+}
+
+/**
+ * Stellt eine Kurve auf eine andere Normalkraft um.
+ *
+ * Gerechnet wird im Kern, nicht hier: `v_Rd` hängt über `m_Rd(N_Ed)` an der
+ * Resistenzlinie, und die Formel steht im Querkraftnachweis. Die Oberfläche
+ * fragt nach und zeichnet, was zurückkommt.
+ */
+async function normalkraftWaehlen(kennung, N_Ed) {
+  const gewaehlt = { ...zustand.kurvenNormalkraft, [kennung]: N_Ed };
+  aendern({ kurvenNormalkraft: gewaehlt }, 'kurve');
+  try {
+    const antwort = await api.querkraftkurven(zustand.projekt, gewaehlt);
+    // In die vorhandene Lösung einsetzen statt sie zu ersetzen: alles andere
+    // -- Herleitung, Werte, Urteile -- gilt unverändert weiter.
+    aendern({
+      loesung: { ...zustand.loesung, querkraftkurven: antwort.querkraftkurven },
+    }, 'kurve');
+  } catch (fehler) {
+    melden(fehler.message, true);
+  }
+}
+
+/**
+ * Die M-V-Kurven einer Platte -- bis zu vier.
+ *
+ * Je Tragrichtung und Momentenvorzeichen eine, aber nur dort, wo auch ein
+ * Querkraftnachweis geführt wurde. Der Kern sagt selbst, welche es gibt; hier
+ * wird nichts abgeleitet.
+ *
+ * Unter jeder Kurve steht die Normalkraft, für die sie gilt. Ändert man sie,
+ * rechnet der Kern die Kurve neu -- die Formel bleibt dort, wo sie hingehört.
+ */
+function querkraftkurven(loesung, querschnitt) {
+  const alle = Object.entries(loesung.querkraftkurven || {})
+    .filter(([, k]) => k.querschnitt === querschnitt);
+
+  return alle.flatMap(([kennung, kurve]) => [
+    el('div.b-titel', {
+      text: `Querkraft über Moment – ${kurve.name}, ${kurve.richtung}-Richtung, `
+          + `Zug ${kurve.zugseite}`,
+    }),
+    querkraftkurveZeichnen(kurve),
+    el('div.kurvenfuss', {}, [
+      el('span.kurvenfuss-name', { text: 'gilt für N_Ed =' }),
+      zahlfeld({
+        wert: kurve.N_Ed, schritt: 50,
+        titel: 'Normalkraft in kN – Zug positiv. Nur Bemessungspunkte mit '
+             + 'genau dieser Normalkraft liegen auf dieser Kurve.',
+        beiAenderung: (v) => normalkraftWaehlen(kennung, v ?? 0),
+      }),
+      el('span.einheit', { text: 'kN' }),
+      el('span.kurvenhinweis', {
+        text: 'Punkte mit abweichender Normalkraft sind blass gezeichnet.',
+      }),
+    ]),
+  ]);
 }
 
 function werteSicht(loesung, beiZielwahl) {

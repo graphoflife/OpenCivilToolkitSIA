@@ -16,7 +16,7 @@ from __future__ import annotations
 import math
 from typing import Any, Dict, List, Optional, Sequence
 
-from opencivil.core.einheiten import KN, KNM, MM
+from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM
 from opencivil.core.protokoll import (
     Block, GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, TextBlock,
     TitelBlock, UnterprotokollBlock,
@@ -256,9 +256,76 @@ def loesung_dict(
             if nachweis.linie
         }
         ergebnis["werkstoffgesetze"] = werkstoffgesetze(aufbau, loesung)
+        ergebnis["querkraftkurven"] = querkraftkurven(aufbau)
         ergebnis["warnungen"] = list(aufbau.warnungen)
         ergebnis["zuordnung"] = zuordnung(aufbau)
     return ergebnis
+
+
+def querkraftkurven(
+    aufbau: Aufbau, gewaehlt: Optional[Mapping[str, float]] = None
+) -> dict:
+    """
+    Der Querkraftwiderstand ueber dem Moment -- je Tragrichtung und Vorzeichen.
+
+    Bis zu vier Kurven je Platte: x und y, jeweils fuer positives und negatives
+    Moment. Es gibt sie nur, wo auch ein Querkraftnachweis gefuehrt wurde;
+    eine Kurve fuer einen Fall, den niemand nachgewiesen haben wollte, waere
+    eine Aussage ohne Anlass.
+
+    ``v_Rd`` haengt ueber ``m_Rd(N_Ed)`` von der Normalkraft ab. Welche gilt,
+    waehlt der Benutzer unter dem Diagramm; ``gewaehlt`` bildet die Kennung auf
+    diese Normalkraft in kN ab. Ohne Angabe gilt die des ersten Falls -- dann
+    liegen dessen Punkte auf der Kurve.
+
+    Einheiten wie in den anderen Diagrammen: kNm und kN/m.
+    """
+    gewaehlt = gewaehlt or {}
+    kurven: Dict[str, Any] = {}
+
+    for schluessel, nachweis in aufbau.querkraft.items():
+        querschnitt_kennung = schluessel.split(".", 1)[0]
+        querschnitt = aufbau.querschnitte.get(querschnitt_kennung)
+        for positiv in nachweis.momentenrichtungen:
+            kennung = f"{schluessel}.{'pos' if positiv else 'neg'}"
+            faelle = [erg for erg in nachweis.ergebnisse
+                      if (erg.fall.M_Ed.si >= 0) is positiv]
+            if not faelle:
+                continue
+
+            n_ed = gewaehlt.get(kennung)
+            if n_ed is None:
+                n_ed = faelle[0].fall.N_Ed.in_einheit(KN)
+            kurve = nachweis.kurve(n_ed * 1e3, positiv)
+
+            kurven[kennung] = {
+                "querschnitt": querschnitt_kennung,
+                "namensraum": querschnitt.id if querschnitt else "",
+                "name": querschnitt.name if querschnitt else querschnitt_kennung,
+                "richtung": nachweis.richtung.value,
+                "moment_positiv": positiv,
+                "zugseite": "unten" if positiv else "oben",
+                "N_Ed": n_ed,
+                "m_Rd": (kurve["m_Rd"] / 1e3) if kurve else None,
+                "d": (kurve["d"] * 1e3) if kurve else None,
+                "punkte": [
+                    {"M_Ed": M / 1e3, "v_Rd": v / 1e3, "plastisch": pl}
+                    for M, v, pl in (kurve["punkte"] if kurve else [])
+                ],
+                "faelle": [
+                    {
+                        "name": erg.fall.name,
+                        "M_Ed": abs(erg.fall.M_Ed.in_einheit(KNM)),
+                        "N_Ed": erg.fall.N_Ed.in_einheit(KN),
+                        "V_Ed": erg.fall.V_Ed.in_einheit(KN_PRO_M),
+                        "v_Rd": erg.v_Rd / 1e3,
+                        "erfuellt": erg.erfuellt,
+                        "plastisch": erg.plastisch,
+                    }
+                    for erg in faelle
+                ],
+            }
+    return kurven
 
 
 def werkstoffgesetze(aufbau: Aufbau, loesung: Loesung) -> dict:
