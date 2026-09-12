@@ -368,11 +368,15 @@ class Querkraft(Nachweis):
                 erfuellt=erg.erfuellt,
                 erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
                 begruendung=erg.begruendung,
+                # Das Vorzeichen der Querkraft spielt keine Rolle -- verglichen
+                # wird der Betrag. Also steht auch der Betrag da; sonst teilte
+                # der Leser den Widerstand durch eine negative Zahl und bekaeme
+                # etwas anderes als den danebenstehenden Erfuellungsgrad.
                 einwirkung=WertDef(
-                    id=f"{self.id}.{fall.kennung}.V_Ed", symbol=f"V_{{Ed,{self.richtung.value}}}",
+                    id=f"{self.id}.{fall.kennung}.V_Ed",
+                    symbol=rf"\left|V_{{Ed,{self.richtung.value}}}\right|",
                     einheit=KN_PRO_M, beschreibung="Einwirkung", stellen=1,
-                ).belegen(fall.V_Ed.als(KN_PRO_M) if fall.V_Ed.dimension == KN_PRO_M.dimension
-                          else Groesse.aus_si(fall.V_Ed.si, KN_PRO_M)),
+                ).belegen(Groesse.aus_si(abs(fall.V_Ed.si), KN_PRO_M)),
                 # Der Widerstand gilt nur unter genau dieser Einwirkung -- das
                 # gehoert ins Symbol, sonst liest sich v_Rd wie ein Kennwert des
                 # Querschnitts.
@@ -603,10 +607,10 @@ class Querkraft(Nachweis):
         grad = (r"\infty" if math.isinf(erg.erfuellungsgrad)
                 else f"{erg.erfuellungsgrad:.2f}")
         p.gleichung(
-            rf"\alpha_{{eff,V,{r}}} = \frac{{v_{{Rd}}}}{{V_{{Ed}}}} = "
+            rf"\alpha_{{eff,V,{r}}} = \frac{{v_{{Rd}}}}{{\left|V_{{Ed}}\right|}} = "
             rf"\frac{{{erg.v_Rd / 1e3:.1f}}}{{{abs(fall.V_Ed.si) / 1e3:.1f}}} = {grad}"
             rf" \quad \Rightarrow \quad {zustand}"
             if fall.V_Ed.si else
-            rf"\alpha_{{eff,V,{r}}} = \frac{{v_{{Rd}}}}{{V_{{Ed}}}} = {grad}"
+            rf"\alpha_{{eff,V,{r}}} = \frac{{v_{{Rd}}}}{{\left|V_{{Ed}}\right|}} = {grad}"
             rf" \quad \Rightarrow \quad {zustand}",
             titel="Erfüllungsgrad")

@@ -335,3 +335,36 @@ class TestQuerkraftkurve(unittest.TestCase):
     def test_ausserhalb_der_resistenzlinie_gibt_es_keine_kurve(self):
         qk = self.aufbau().querkraft["q1.x"]
         self.assertIsNone(qk.kurve(99_000e3, moment_positiv=True))
+
+
+class TestVorzeichenDerQuerkraft(unittest.TestCase):
+    """
+    Ob die Querkraft positiv oder negativ angegeben ist, spielt keine Rolle --
+    gerechnet und verglichen wird mit dem Betrag.
+    """
+
+    def ergebnis(self, V_Ed: float):
+        projekt = projekt_mit_querkraft()
+        projekt.querschnitte[0].kombinationen[0].V_Ed = V_Ed
+        aufbau = projekt.aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        erg = aufbau.querkraft["q1.x"].ergebnisse[0]
+        urteil = next(u for u in loesung.urteile
+                      if u.name == f"Querkraft x – {erg.fall.name}")
+        return erg, urteil
+
+    def test_das_vorzeichen_aendert_nichts(self):
+        plus, u_plus = self.ergebnis(+120.0)
+        minus, u_minus = self.ergebnis(-120.0)
+        self.assertAlmostEqual(plus.erfuellungsgrad, minus.erfuellungsgrad)
+        self.assertEqual(plus.erfuellt, minus.erfuellt)
+        self.assertAlmostEqual(plus.v_Rd, minus.v_Rd)
+
+    def test_die_einwirkung_im_urteil_ist_der_betrag(self):
+        """
+        Stünde dort -120, teilte der Leser den Widerstand durch eine negative
+        Zahl und bekäme etwas anderes als den danebenstehenden Erfüllungsgrad.
+        """
+        _, urteil = self.ergebnis(-120.0)
+        self.assertAlmostEqual(urteil.einwirkung.groesse.in_einheit(KN_PRO_M), 120.0)
+        self.assertIn("left|V_{Ed", urteil.einwirkung.symbol)

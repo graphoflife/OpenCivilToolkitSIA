@@ -312,12 +312,16 @@ def querkraftkurven(
                     {"M_Ed": M / 1e3, "v_Rd": v / 1e3, "plastisch": pl}
                     for M, v, pl in (kurve["punkte"] if kurve else [])
                 ],
+                # Moment und Querkraft als Betrag: die Kurve laeuft ueber
+                # |m_Ed|, und das Vorzeichen von V_Ed spielt keine Rolle --
+                # gerechnet wird ohnehin mit |V_Ed|. Signiert eingetragen laege
+                # ein negatives V_Ed unter der Achse.
                 "faelle": [
                     {
                         "name": erg.fall.name,
                         "M_Ed": abs(erg.fall.M_Ed.in_einheit(KNM)),
                         "N_Ed": erg.fall.N_Ed.in_einheit(KN),
-                        "V_Ed": erg.fall.V_Ed.in_einheit(KN_PRO_M),
+                        "V_Ed": abs(erg.fall.V_Ed.in_einheit(KN_PRO_M)),
                         "v_Rd": erg.v_Rd / 1e3,
                         "erfuellt": erg.erfuellt,
                         "plastisch": erg.plastisch,
