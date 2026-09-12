@@ -245,6 +245,16 @@ class Lagenaufbau(Prozedur):
     eine eigene Flaechenformel in der Herleitung -- fuenf Lagen ergaben fuenf
     gleich aussehende Bloecke, in denen sich nur die Zahlen unterschieden. Die
     Formel steht jetzt einmal da, die Ergebnisse stehen in der Tabelle.
+
+    STAPELUNG:
+    Die Lagen werden je Seite von aussen nach innen gestapelt. Die Huelle einer
+    Lage beginnt bei der Ueberdeckung und waechst um den groessten Durchmesser
+    der davorliegenden Lage. ``d`` wird von der gezogenen Randfaser aus
+    gemessen -- bei den unteren Lagen von der Unterkante, bei den oberen von
+    der Oberkante.
+
+    Wie Grundbewehrung und Zulage innerhalb einer Lage zueinander liegen, sagt
+    :attr:`Bewehrungslage.unguenstig`.
     """
 
     def __init__(
@@ -268,21 +278,8 @@ class Lagenaufbau(Prozedur):
     def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
         h = e.g("h")
         b = e.g("b")
-        p.text(
-            "Die Lagen werden je Seite von aussen nach innen gestapelt. Die Hülle "
-            "einer Lage beginnt bei der Überdeckung und wächst um den grössten "
-            "Durchmesser der davorliegenden Lage. d wird von der gezogenen "
-            "Randfaser aus gemessen, hier von der Oberkante nach unten."
-        )
-        p.text(
-            "Innerhalb einer Lage ist wählbar, wie Grundbewehrung und Zulage "
-            "zueinander liegen. Bei «günstig» berühren beide dieselbe Hülle und "
-            "sind je um ihren eigenen Halbmesser eingerückt – die äusseren "
-            "Kanten fluchten. Bei «ungünstig» fluchten die inneren Kanten: der "
-            "dünnere Stab rückt zur Plattenmitte und verliert Hebelarm. "
-            "Massgebend ist dann der dickere Stab."
-        )
-
+        # Ohne erklaerende Vorrede: die Lagentabelle zeigt Randabstand und d je
+        # Posten, und wie beides zustande kommt, steht in der Klassendoku.
         ueber_abstand = any(q.posten.ueber_abstand for q in self.posten)
         ueber_anzahl = any(not q.posten.ueber_abstand for q in self.posten)
         # Nur wenn alle Posten dieselbe Art der Mengenangabe verwenden, darf die
