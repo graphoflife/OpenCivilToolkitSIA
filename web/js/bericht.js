@@ -88,10 +88,56 @@ function tabellenBlock(block) {
   ]);
 }
 
-function bloeckeZeichnen(bloecke) {
-  const knoten = [];
+/**
+ * Legt aufeinanderfolgende Blöcke derselben Gruppe in einen Kasten.
+ *
+ * Vier Zeilen `h = 300 mm`, `b = 1000 mm`, … untereinander sind kein Nachweis,
+ * sondern eine Liste. Zusammengelegt liest sie sich besser.
+ *
+ * Entscheidend ist, dass sie **Blöcke bleiben**. Wer sie im Kern zu einem
+ * einzigen verschmölze, verlöre die Rückverfolgung: wird nur `h` gebraucht,
+ * läuft auch nur dessen Vorgabe, und dann steht im Kasten eben nur `h`. Ein
+ * verschmolzener Block wüsste davon nichts und zeigte alle vier.
+ */
+function gruppenBilden(bloecke) {
+  const heraus = [];
   for (const block of bloecke) {
-    if (block.art === 'titel') {
+    const letzte = heraus[heraus.length - 1];
+    if (block.art !== 'gleichung' || !block.gruppe) {
+      heraus.push(block);
+    } else if (letzte?.art === 'gruppe' && letzte.gruppe === block.gruppe) {
+      letzte.bloecke.push(block);
+    } else {
+      heraus.push({ art: 'gruppe', gruppe: block.gruppe, bloecke: [block] });
+    }
+  }
+  return heraus;
+}
+
+function gruppenBlock(gruppe) {
+  return el('div.angabengruppe', {}, [
+    el('div.angabengruppe-titel', { text: gruppe.gruppe }),
+    el('div.angabengruppe-inhalt', {}, gruppe.bloecke.map((block) => {
+      const hervorgehoben = block.wert_id && zustand.hervorgehoben.has(block.wert_id);
+      const zelle = el('div.angabe', {
+        class: hervorgehoben ? 'ist-hervorgehoben' : '',
+        dataset: { wertId: block.wert_id || '' },
+      }, [
+        block.titel ? el('span.angabe-name', { text: block.titel }) : null,
+        el('span.angabe-mathe'),
+      ]);
+      setzen(block.latex, zelle.querySelector('.angabe-mathe'), { displayMode: false });
+      return zelle;
+    })),
+  ]);
+}
+
+function bloeckeZeichnen(rohbloecke) {
+  const knoten = [];
+  for (const block of gruppenBilden(rohbloecke)) {
+    if (block.art === 'gruppe') {
+      knoten.push(gruppenBlock(block));
+    } else if (block.art === 'titel') {
       knoten.push(titelZeichnen(block));
     } else if (block.art === 'text') {
       knoten.push(el('p.b-text', { text: block.text }));
@@ -267,7 +313,6 @@ function zusammenfassung(loesung) {
 
     return el('div.blatt', {}, [
       el('div.b-titel', { text: `Zusammenfassung – ${eintrag.name}` }),
-      plattenangaben(eintrag, loesung),
       urteile.length
         ? el('div.tabelle-huelle', {}, [
           el('table.nachweis-tabelle', {}, [
@@ -301,32 +346,6 @@ function zusammenfassung(loesung) {
   });
 
   return el('div', {}, blaetter.concat([lueckenBanner(loesung)].filter(Boolean)));
-}
-
-/**
- * Was die Platte ist, in einer Zeile über der Tabelle.
- *
- * Abmessungen, Überdeckungen und Betonsorte. In der Herleitung stehen sie als
- * eigene Blöcke -- dort gehören sie hin, weil damit gerechnet wird. Hier
- * dagegen geht es darum, die Tabelle darunter einordnen zu können, ohne den
- * Reiter zu wechseln.
- *
- * Der Betonname kommt aus der Zuordnung, die Zahlen aus der Lösung. Nachgeholt
- * wird nichts: fehlt ein Wert, fällt er weg.
- */
-function plattenangaben(eintrag, loesung) {
-  const wert = (kurzname) => loesung.werte?.[eintrag.werte?.[kurzname]];
-  const teile = [];
-  if (eintrag.beton) teile.push(`Beton ${eintrag.beton}`);
-  for (const [name, kurzname] of [
-    ['h', 'h'], ['b', 'b'],
-    ['c_nom,u', 'c_nom_unten'], ['c_nom,o', 'c_nom_oben'],
-  ]) {
-    const w = wert(kurzname);
-    if (w) teile.push(`${name} = ${feste(w.zahl, w.stellen, w.wert)} ${w.einheit}`);
-  }
-  if (!teile.length) return null;
-  return el('p.plattenangaben', { text: teile.join('   ·   ') });
 }
 
 /**

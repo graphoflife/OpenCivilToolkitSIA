@@ -115,6 +115,21 @@ class GleichungBlock(Block):
     wert_id: str = ""
     """ID des erzeugten Wertes, falls die Gleichung einen Wert liefert."""
 
+    gruppe: str = ""
+    """
+    Name eines Kastens, in dem mehrere Angaben zusammenstehen sollen.
+
+    Vier Zeilen der Form ``h = 300 mm`` untereinander sind kein Nachweis,
+    sondern eine Liste. Zusammengelegt liest sie sich besser -- aber nur
+    fuer die Darstellung: jede Angabe bleibt ihr eigener Block mit eigener
+    ``wert_id``.
+
+    Das ist der Punkt. Wer die vier zu *einem* Block verschmelzen wollte,
+    verloere die Rueckverfolgung: wird nur ``h`` gebraucht, laeuft auch nur
+    dessen Vorgabe, und im Kasten steht dann eben nur ``h``. Ein
+    verschmolzener Block wuesste nichts davon und zeigte alle vier.
+    """
+
     formelzeile: Optional[tex.Formelzeile] = None
     """Strukturierte Fassung, sofern vorhanden -- erlaubt spaeteren Umbruch."""
 
@@ -210,7 +225,8 @@ class Protokoll:
             )
         )
 
-    def wert(self, ergebnis: Wert, titel: str = "", referenz: Optional[str] = None) -> None:
+    def wert(self, ergebnis: Wert, titel: str = "", referenz: Optional[str] = None,
+             gruppe: str = "") -> None:
         """Schlichte Form ``Symbol = Wert`` -- fuer Eingaben und Vorgaben."""
         zeile = tex.Formelzeile.bauen(ergebnis)
         self._anfuegen(
@@ -219,6 +235,7 @@ class Protokoll:
                 titel=titel or ergebnis.beschreibung,
                 referenz=ergebnis.referenz if referenz is None else referenz,
                 wert_id=ergebnis.id,
+                gruppe=gruppe,
                 formelzeile=zeile,
             )
         )

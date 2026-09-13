@@ -415,6 +415,7 @@ class Vorgabe(Berechnung):
         begruendung: str = "",
         abschnitt: Optional[Abschnitt] = None,
         stumm: bool = False,
+        gruppe: str = "",
     ) -> None:
         super().__init__(
             id,
@@ -427,6 +428,16 @@ class Vorgabe(Berechnung):
         self.ausgabe = ausgabe
         self.groesse = groesse
         self.quelle = quelle
+
+        self.gruppe = gruppe
+        """
+        Kasten, in dem diese Vorgabe mit anderen zusammensteht.
+
+        Nur Darstellung: die Vorgabe bleibt ein eigener Knoten mit eigenem
+        Block. Damit zeigt der Kasten bei einer Rueckverfolgung von selbst nur
+        die Angaben, die dafuer gebraucht wurden -- die uebrigen Vorgaben
+        laufen gar nicht erst.
+        """
 
         self.stumm = stumm
         """
@@ -447,7 +458,8 @@ class Vorgabe(Berechnung):
     def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
         wert = self.ausgabe.belegen(self.groesse, self.quelle, herkunft=self.id)
         if not self.stumm:
-            p.wert(wert, titel=self.titel, referenz=self.referenz)
+            p.wert(wert, titel=self.titel, referenz=self.referenz,
+                   gruppe=self.gruppe)
         return {self.ausgabe.id: self.groesse}
 
 

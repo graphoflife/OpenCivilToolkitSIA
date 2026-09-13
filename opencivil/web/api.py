@@ -143,6 +143,7 @@ def block_dict(block: Block) -> Optional[dict]:
             "titel": block.titel,
             "referenz": block.referenz,
             "wert_id": block.wert_id,
+            "gruppe": block.gruppe,
         }
         if block.formelzeile is not None:
             # Beide Fassungen mitgeben: die Oberflaeche kann die lange Form

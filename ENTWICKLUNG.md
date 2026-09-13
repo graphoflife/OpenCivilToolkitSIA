@@ -43,6 +43,44 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-12 · Zwei Kästen statt vier Zeilen — ohne die Rückverfolgung zu verlieren
+
+Plattendicke, Breite und die beiden Überdeckungen standen als vier einzelne
+Blöcke untereinander. Das ist kein Nachweis, das ist eine Liste. Jetzt stehen
+sie in zwei Kästen: **Abmessungen – Beton C30/37** und **Überdeckungen**.
+
+Die naheliegende Umsetzung wäre gewesen, im Kern einen Block zu schreiben, der
+alle vier enthält. Die hätte einen stillen Schaden angerichtet: bei einer
+Rückverfolgung läuft nur, was gebraucht wird. Wird allein `h` verlangt, läuft
+auch nur dessen Vorgabe — ein verschmolzener Block wüsste davon nichts und
+zeigte trotzdem alle vier Werte, davon drei, die gar nicht gerechnet wurden.
+
+Darum bleibt **jede Angabe ihr eigener Block** mit eigener `wert_id`. Sie trägt
+nur zusätzlich einen Gruppennamen, und die Oberfläche legt aufeinanderfolgende
+Blöcke derselben Gruppe in einen Kasten. Das Verhalten fällt damit von selbst
+richtig aus:
+
+| Rückverfolgtes Ziel | Kasten |
+|---|---|
+| `querschnitt.q1.h` | Abmessungen → nur Plattendicke |
+| `querschnitt.q1.c_nom_unten` | Überdeckungen → nur Überdeckung unten |
+| `querschnitt.q1.bewehrungsmass` | beide Kästen, alle vier |
+| `beton.b1.f_cd` | gar keiner |
+
+Und weil die Blöcke einzeln bleiben, lässt sich im Kasten auch weiterhin jede
+Angabe für sich hervorheben.
+
+### Die Betonsorte steht im Kastennamen
+
+Sie ist keine gerechnete Grösse und hat darum keine Kette, an der sie hängen
+könnte — filterbar wie die vier Zahlen ist sie nicht. Als Aufschrift des
+Kastens gilt sie dagegen immer, denn eine Platte hat genau einen Beton.
+
+Die Zeile in der Zusammenfassung ist damit wieder weg; sie stand ohnehin an
+der falschen Stelle.
+
+---
+
 ## 2026-09-12 · Die Sorte gehört an das Symbol
 
 Bei zwei Betonen stand in den Plattennachweisen zweimal `f_cd` mit

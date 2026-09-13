@@ -209,6 +209,17 @@ class Bewehrungslage:
 # ===========================================================================
 
 
+#: Die beiden Kaesten, in denen die Plattenangaben zusammenstehen. Der erste
+#: traegt die Betonsorte im Namen: sie ist keine gerechnete Groesse und hat
+#: darum keine eigene Kette, an der sie haengen koennte -- als Aufschrift des
+#: Kastens gilt sie dagegen immer, denn eine Platte hat genau einen Beton.
+UEBERDECKUNGEN = "Überdeckungen"
+
+
+def _abmessungen(beton_name: str) -> str:
+    return f"Abmessungen – Beton {beton_name}" if beton_name else "Abmessungen"
+
+
 def posten_index(lage: "Bewehrungslage", art: Postenart) -> str:
     """
     Der Symbolindex eines Bewehrungspostens, z.B. ``1,x,g``.
@@ -574,12 +585,20 @@ class Plattenquerschnitt:
                     abschnitt=abschnitt, stumm=True),
             Vorgabe(id=f"{self.id}.einlagenhoehe", ausgabe=d_einl,
                     groesse=self.einlagenhoehe, abschnitt=abschnitt, stumm=True),
-            Vorgabe(id=f"{self.id}.h", ausgabe=d_h, groesse=self.h, abschnitt=abschnitt),
-            Vorgabe(id=f"{self.id}.b", ausgabe=d_b, groesse=self.b, abschnitt=abschnitt),
+            # Zwei Kaesten statt vier Einzelzeilen: die Abmessungen gehoeren
+            # zusammen, die Ueberdeckungen auch. Jede Vorgabe bleibt dabei ihr
+            # eigener Knoten -- nur so zeigt der Kasten bei einer
+            # Rueckverfolgung genau die Angaben, die dafuer gebraucht wurden.
+            Vorgabe(id=f"{self.id}.h", ausgabe=d_h, groesse=self.h,
+                    abschnitt=abschnitt, gruppe=_abmessungen(self.beton.name)),
+            Vorgabe(id=f"{self.id}.b", ausgabe=d_b, groesse=self.b,
+                    abschnitt=abschnitt, gruppe=_abmessungen(self.beton.name)),
             Vorgabe(id=f"{self.id}.c_nom_unten", ausgabe=d_cu,
-                    groesse=self.ueberdeckung_unten, abschnitt=abschnitt),
+                    groesse=self.ueberdeckung_unten, abschnitt=abschnitt,
+                    gruppe=UEBERDECKUNGEN),
             Vorgabe(id=f"{self.id}.c_nom_oben", ausgabe=d_co,
-                    groesse=self.ueberdeckung_oben, abschnitt=abschnitt),
+                    groesse=self.ueberdeckung_oben, abschnitt=abschnitt,
+                    gruppe=UEBERDECKUNGEN),
         ]
 
         self.d_bewehrungsmass = self._def(

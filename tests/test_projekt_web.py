@@ -865,3 +865,63 @@ class TestUnbenutztesMaterial(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestAngabengruppen(unittest.TestCase):
+    """
+    Die Plattenangaben stehen in zwei Kästen -- bleiben aber einzelne Blöcke.
+
+    Das ist der Kern: würde man sie im Protokoll zu *einem* Block verschmelzen,
+    verlöre die Rückverfolgung ihre Auflösung. Wird nur `h` gebraucht, läuft
+    auch nur dessen Vorgabe, und dann steht im Kasten eben nur `h`.
+    """
+
+    def gruppen(self, ziele=None):
+        antwort = dienst.bearbeite(
+            "rechnen", {"projekt": Projekt.beispiel().als_dict(), "ziele": ziele})
+        self.assertEqual(antwort.status, 200)
+        gefunden = {}
+        for block in antwort.daten["protokoll"]:
+            if block.get("gruppe"):
+                gefunden.setdefault(block["gruppe"], []).append(block["titel"])
+        return gefunden
+
+    def test_zwei_kaesten_statt_vier_zeilen(self):
+        gruppen = self.gruppen()
+        self.assertEqual(sorted(gruppen), ["Abmessungen – Beton C30/37", "Überdeckungen"])
+        self.assertEqual(gruppen["Abmessungen – Beton C30/37"],
+                         ["Plattendicke", "Betrachtete Breite"])
+        self.assertEqual(gruppen["Überdeckungen"],
+                         ["Überdeckung unten", "Überdeckung oben"])
+
+    def test_die_betonsorte_steht_im_kastennamen(self):
+        """
+        Sie ist keine gerechnete Grösse und hat darum keine eigene Kette. Als
+        Aufschrift des Kastens gilt sie dagegen immer -- eine Platte hat genau
+        einen Beton.
+        """
+        self.assertIn("Beton C30/37", " ".join(self.gruppen()))
+
+    def test_die_rueckverfolgung_verkleinert_den_kasten(self):
+        nur_h = self.gruppen(["querschnitt.q1.h"])
+        self.assertEqual(nur_h, {"Abmessungen – Beton C30/37": ["Plattendicke"]})
+
+        nur_unten = self.gruppen(["querschnitt.q1.c_nom_unten"])
+        self.assertEqual(nur_unten, {"Überdeckungen": ["Überdeckung unten"]})
+
+    def test_ohne_plattenwerte_gibt_es_keinen_kasten(self):
+        self.assertEqual(self.gruppen(["beton.b1.f_cd"]), {})
+
+    def test_ein_ziel_das_alles_braucht_zeigt_alles(self):
+        alle = self.gruppen(["querschnitt.q1.bewehrungsmass"])
+        self.assertEqual(len(alle["Abmessungen – Beton C30/37"]), 2)
+        self.assertEqual(len(alle["Überdeckungen"]), 2)
+
+    def test_jede_angabe_behaelt_ihre_wert_id(self):
+        """Ohne sie liesse sich im Kasten nichts einzeln hervorheben."""
+        antwort = dienst.bearbeite("rechnen", {"projekt": Projekt.beispiel().als_dict()})
+        ids = {b["wert_id"] for b in antwort.daten["protokoll"] if b.get("gruppe")}
+        self.assertEqual(ids, {
+            "querschnitt.q1.h", "querschnitt.q1.b",
+            "querschnitt.q1.c_nom_unten", "querschnitt.q1.c_nom_oben",
+        })
