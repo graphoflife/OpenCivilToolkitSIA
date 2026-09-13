@@ -17,6 +17,7 @@ import math
 from typing import Any, Dict, List, Optional, Sequence
 
 from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM
+from opencivil.core.latex import tabelle, text_latex
 from opencivil.core.protokoll import (
     Block, GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, TextBlock,
     TitelBlock, UnterprotokollBlock,
@@ -258,6 +259,7 @@ def loesung_dict(
         }
         ergebnis["werkstoffgesetze"] = werkstoffgesetze(aufbau, loesung)
         ergebnis["querkraftkurven"] = querkraftkurven(aufbau)
+        ergebnis["zusammenfassungen"] = zusammenfassungen(loesung, aufbau)
         ergebnis["warnungen"] = list(aufbau.warnungen)
         ergebnis["zuordnung"] = zuordnung(aufbau)
     return ergebnis
@@ -508,6 +510,58 @@ def _linie_dict(nachweis) -> dict:
             for a in nachweis.auswertungen
         ],
     }
+
+
+def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
+    """
+    Je Platte die Nachweistabelle -- Zeilen **und** ihr LaTeX.
+
+    Gebaut wird sie hier und nicht in der Oberflaeche: sonst gaebe es sie
+    zweimal, einmal als HTML und einmal fuer den Kopierknopf, und die beiden
+    liefen auseinander. Die Oberflaeche faerbt nur noch ein, was ``erfuellt``
+    sagt.
+
+    Die LaTeX-Fassung entsteht ueber dieselbe Funktion wie jede Tabelle der
+    Mitschrift.
+    """
+    kopf = [r"\text{Nachweis}", r"\text{Widerstand}", r"\text{Einwirkung}",
+            r"\alpha_{eff}", r"\text{Urteil}"]
+
+    def zelle(wert) -> str:
+        """Feste Stellenzahl -- in einer Spalte steht immer dieselbe Groesse."""
+        if wert is None:
+            return r"\text{--}"
+        zahl = wert.groesse.in_einheit(wert.einheit)
+        return (rf"{wert.symbol} = {zahl:.{wert.definition.stellen}f}"
+                rf"{wert.einheit.als_latex()}")
+
+    ergebnis: Dict[str, Any] = {}
+    for kennung, qs in aufbau.querschnitte.items():
+        urteile = [u for u in loesung.urteile
+                   if u.raum == qs.id or u.raum.startswith(f"{qs.id}.")]
+        if not urteile:
+            continue
+        zeilen = [
+            {
+                "zellen": [
+                    rf"\text{{{text_latex(u.name)}}}",
+                    zelle(u.widerstand),
+                    zelle(u.einwirkung),
+                    (f"{u.erfuellungsgrad.si:.2f}"
+                     if math.isfinite(u.erfuellungsgrad.si) else r"\infty"),
+                    r"\text{erfüllt}" if u.erfuellt else r"\text{nicht erfüllt}",
+                ],
+                "erfuellt": u.erfuellt,
+                "begruendung": u.begruendung,
+            }
+            for u in urteile
+        ]
+        ergebnis[kennung] = {
+            "kopf": kopf,
+            "zeilen": zeilen,
+            "latex": tabelle(kopf, [z["zellen"] for z in zeilen], "lrrrl"),
+        }
+    return ergebnis
 
 
 def zuordnung(aufbau: Aufbau) -> dict:

@@ -917,6 +917,35 @@ class TestAngabengruppen(unittest.TestCase):
         self.assertEqual(len(alle["Abmessungen – Beton C30/37"]), 2)
         self.assertEqual(len(alle["Überdeckungen"]), 2)
 
+    def test_die_zusammenfassung_kommt_fertig_aus_dem_kern(self):
+        """
+        Zeilen und LaTeX an einer Stelle. Die Oberfläche baute sie früher ein
+        zweites Mal zusammen -- einmal fürs Auge, einmal für den Kopierknopf,
+        und die beiden liefen auseinander.
+        """
+        antwort = dienst.bearbeite("rechnen", {"projekt": Projekt.beispiel().als_dict()})
+        tabelle = antwort.daten["zusammenfassungen"]["q1"]
+
+        self.assertEqual(len(tabelle["kopf"]), 5)
+        self.assertEqual(len(tabelle["zeilen"]), 6)
+        for zeile in tabelle["zeilen"]:
+            self.assertEqual(len(zeile["zellen"]), len(tabelle["kopf"]))
+            self.assertIn("erfuellt", zeile)
+        self.assertTrue(tabelle["latex"].startswith(r"\begin{array}"))
+
+    def test_die_zahlen_der_tabelle_haben_feste_stellen(self):
+        """In einer Spalte steht immer dieselbe Grösse, also auch dieselbe Genauigkeit."""
+        antwort = dienst.bearbeite("rechnen", {"projekt": Projekt.beispiel().als_dict()})
+        erste = antwort.daten["zusammenfassungen"]["q1"]["zeilen"][0]["zellen"]
+        self.assertIn("100.0", erste[2])          # M_Ed, eine Nachkommastelle
+        self.assertRegex(erste[3], r"^\d+\.\d{2}$")  # alpha, zwei
+
+    def test_ohne_nachweise_gibt_es_keine_tabelle(self):
+        projekt = Projekt.beispiel()
+        projekt.querschnitt("q1").kombinationen = []
+        antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
+        self.assertEqual(antwort.daten["zusammenfassungen"], {})
+
     def test_jede_angabe_behaelt_ihre_wert_id(self):
         """Ohne sie liesse sich im Kasten nichts einzeln hervorheben."""
         antwort = dienst.bearbeite("rechnen", {"projekt": Projekt.beispiel().als_dict()})

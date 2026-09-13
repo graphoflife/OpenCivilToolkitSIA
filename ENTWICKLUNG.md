@@ -43,6 +43,46 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-12 · Ein Kasten, der sich nicht als Kasten zu erkennen gibt
+
+Die zusammengelegten Angaben hatten eine eigene Gestalt bekommen: eigener
+Rahmen, eigene Überschriftzeile, keine Kopierknöpfe. Damit war es **ein zweites
+Konzept für dieselbe Sache** — und man sah es sofort.
+
+Jetzt ist der zusammengelegte Kasten eine **gewöhnliche Gleichung**: dieselbe
+Hülle, dieselbe Kopfzeile, dieselben Word- und TeX-Knöpfe. Die Mehrzahl der
+Werte steckt allein darin, dass der Block mehrere `wert_ids` trägt statt einer:
+
+```js
+const ids = block.wert_ids || (block.wert_id ? [block.wert_id] : []);
+const hervorgehoben = ids.some((id) => zustand.hervorgehoben.has(id));
+```
+
+Zusammengelegt wird der Inhalt mit `\qquad` — genau so, wie die Mitschrift es
+an anderen Stellen ohnehin schon tut (`M_Ed = … \qquad N_Ed = …`). Die
+Rückverfolgung bleibt Wert für Wert auflösbar, weil im Kern weiterhin je
+Vorgabe ein Block entsteht und nur die tatsächlich gelaufenen zusammenkommen.
+
+### Tabellen bekommen dieselben Knöpfe
+
+Eine Tabelle ist eine Aussage wie eine Gleichung; dass sie sich nicht
+kopieren liess, war eine Lücke. `werkzeugleiste()` steht jetzt einmal da und
+hängt an beidem.
+
+### Die Zusammenfassungstabelle kam zweimal vor
+
+Für den Kopierknopf brauchte sie LaTeX. Die Oberfläche hätte es selbst bauen
+können — dann gäbe es die Tabelle zweimal, einmal als HTML fürs Auge und
+einmal als LaTeX für die Zwischenablage, und die beiden liefen auseinander.
+
+Also baut sie der Kern: `api.zusammenfassungen()` liefert Kopf, Zeilen **und**
+LaTeX, letzteres über dieselbe Funktion wie jede Tabelle der Mitschrift. Die
+Oberfläche setzt die Zellen und färbt ein, was `erfuellt` sagt. Nebenbei sind
+damit die Zahlen der Tabelle auf feste Stellen gebracht, ohne dafür eine eigene
+Hilfsfunktion im Browser zu brauchen.
+
+---
+
 ## 2026-09-12 · Zwei Kästen statt vier Zeilen — ohne die Rückverfolgung zu verlieren
 
 Plattendicke, Breite und die beiden Überdeckungen standen als vier einzelne

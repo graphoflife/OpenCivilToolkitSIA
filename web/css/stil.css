@@ -394,7 +394,9 @@ input[readonly], input:disabled, select:disabled {
   background: var(--flaeche); border: 1px solid var(--rand); border-radius: 5px;
   padding: 2px; box-shadow: var(--schatten);
 }
-.gleichung:hover .gleichung-werkzeug { display: flex; }
+.gleichung:hover .gleichung-werkzeug,
+.tabelle-block:hover .gleichung-werkzeug,
+.blatt:hover .gleichung-werkzeug { display: flex; }
 
 .hinweis {
   margin: 8px 0; padding: 7px 10px; border-radius: 5px; font-size: 13px;
@@ -402,6 +404,14 @@ input[readonly], input:disabled, select:disabled {
 }
 .hinweis-annahme { border-left-color: var(--blau); background: var(--blau-hell); }
 .hinweis-warnung { border-left-color: var(--warn); background: var(--warn-hell); }
+
+/* Ein Tabellenblock sieht aus wie ein Gleichungsblock -- gleicher Rahmen,
+   gleiche Kopfzeile, gleiche Kopierknöpfe. Es ist dieselbe Art Aussage. */
+.tabelle-block {
+  position: relative; margin: 12px 0; padding: 8px 10px 8px 12px;
+  border-left: 3px solid transparent; border-radius: 0 5px 5px 0;
+}
+.tabelle-block:hover { background: var(--flaeche-2); }
 
 .tabelle-titel { font-size: 12.5px; font-weight: 600; color: var(--schrift-matt); margin: 14px 0 4px; }
 table.gitter { border-collapse: collapse; font-size: 12.5px; }
@@ -616,29 +626,6 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   display: flex; align-items: center; justify-content: center;
 }
 .zahlpfeil:hover { color: var(--blau); background: var(--blau-hell); }
-
-/* ------------------------------------------ Kasten mit Angaben -- */
-/* Mehrere Vorgaben in einem Kasten statt untereinander. Jede Angabe bleibt ein
-   eigener Block -- sie kann darum einzeln hervorgehoben werden, und bei einer
-   Rückverfolgung stehen nur die tatsächlich gebrauchten da. */
-.angabengruppe {
-  margin: 12px 0; border: 1px solid var(--rand); border-radius: var(--radius);
-  border-left: 3px solid var(--platte); overflow: hidden;
-}
-.angabengruppe-titel {
-  padding: 5px 10px; font-size: 12px; font-weight: 600;
-  color: var(--schrift-matt); background: var(--flaeche-2);
-  border-bottom: 1px solid var(--rand);
-}
-.angabengruppe-inhalt {
-  display: flex; flex-wrap: wrap; gap: 4px 26px; padding: 8px 10px;
-}
-.angabe {
-  display: flex; align-items: baseline; gap: 7px;
-  padding: 2px 6px; border-radius: 4px;
-}
-.angabe-name { font-size: 12px; color: var(--schrift-zart); }
-.angabe.ist-hervorgehoben { background: var(--blau-hell); }
 
 /* --------------------------------------------- Fuss der Querkraftkurve -- */
 /* Die Normalkraft, für die die Kurve gilt. Steht unter dem Diagramm, weil sie

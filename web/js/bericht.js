@@ -14,7 +14,7 @@
  */
 
 import { el, ersetzen, leerzustand, melden, zahlfeld } from './dom.js';
-import { kopiereFuerWord, kopiereLatex, setzen, span } from './mathe.js';
+import { kopiereFuerWord, kopiereLatex, setzen } from './mathe.js';
 import {
   diagrammZeichnen, kurveZeichnen, querkraftkurveZeichnen, querschnittZeichnen,
 } from './diagramm.js';
@@ -34,13 +34,33 @@ function werkzeugKnopf(text, titel, tun) {
   });
 }
 
+/**
+ * Die beiden Kopierknöpfe. Stehen an jedem Block, der LaTeX hergibt --
+ * Gleichung wie Tabelle. Einmal geschrieben, damit sie überall dieselben sind.
+ */
+function werkzeugleiste(latex, was = 'Formel') {
+  return el('div.gleichung-werkzeug', {}, [
+    werkzeugKnopf('Word', `Als ${was} für Word kopieren (MathML)`, async () => {
+      await kopiereFuerWord(latex);
+      melden(`${was} kopiert – in Word mit Strg+V einfügen.`);
+    }),
+    werkzeugKnopf('TeX', 'LaTeX-Quelltext kopieren', async () => {
+      await kopiereLatex(latex);
+      melden('LaTeX kopiert.');
+    }),
+  ]);
+}
+
 function gleichungBlock(block) {
-  const hervorgehoben = block.wert_id && zustand.hervorgehoben.has(block.wert_id);
+  // Ein Block kann mehrere Werte tragen (siehe `gruppenBilden`). Hervorgehoben
+  // wird er, sobald einer davon zur verfolgten Kette gehört.
+  const ids = block.wert_ids || (block.wert_id ? [block.wert_id] : []);
+  const hervorgehoben = ids.some((id) => zustand.hervorgehoben.has(id));
   const latex = block.latex;
 
   const huelle = el('div.gleichung', {
     class: hervorgehoben ? 'ist-hervorgehoben' : '',
-    dataset: { wertId: block.wert_id || '' },
+    dataset: { wertId: ids.join(' ') },
   }, [
     (block.titel || block.referenz)
       ? el('div.gleichung-kopf', {}, [
@@ -49,16 +69,7 @@ function gleichungBlock(block) {
       ])
       : null,
     el('div.gleichung-mathe'),
-    el('div.gleichung-werkzeug', {}, [
-      werkzeugKnopf('Word', 'Als Formel für Word kopieren (MathML)', async () => {
-        await kopiereFuerWord(latex);
-        melden('Formel kopiert – in Word mit Strg+V einfügen.');
-      }),
-      werkzeugKnopf('TeX', 'LaTeX-Quelltext kopieren', async () => {
-        await kopiereLatex(latex);
-        melden('LaTeX kopiert.');
-      }),
-    ]),
+    werkzeugleiste(latex),
   ]);
 
   setzen(latex, huelle.querySelector('.gleichung-mathe'));
@@ -66,8 +77,12 @@ function gleichungBlock(block) {
 }
 
 function tabellenBlock(block) {
-  return el('div', {}, [
-    block.titel ? el('div.tabelle-titel', { text: block.titel }) : null,
+  return el('div.tabelle-block', {}, [
+    block.titel
+      ? el('div.gleichung-kopf', {}, [
+        el('span.gleichung-titel', { text: block.titel }),
+      ])
+      : null,
     el('div.tabelle-huelle', {}, [
       el('table.gitter', {}, [
         el('thead', {}, [
@@ -85,19 +100,22 @@ function tabellenBlock(block) {
         })))),
       ]),
     ]),
+    block.latex ? werkzeugleiste(block.latex, 'Tabelle') : null,
   ]);
 }
 
 /**
- * Legt aufeinanderfolgende Blöcke derselben Gruppe in einen Kasten.
+ * Legt aufeinanderfolgende Blöcke derselben Gruppe zu **einem** Block zusammen.
  *
  * Vier Zeilen `h = 300 mm`, `b = 1000 mm`, … untereinander sind kein Nachweis,
- * sondern eine Liste. Zusammengelegt liest sie sich besser.
+ * sondern eine Liste. Der zusammengelegte Block ist eine gewöhnliche Gleichung
+ * wie jede andere -- gleiche Gestalt, gleiche Kopierknöpfe. Ein eigenes
+ * Aussehen wäre ein zweites Konzept für dieselbe Sache gewesen.
  *
- * Entscheidend ist, dass sie **Blöcke bleiben**. Wer sie im Kern zu einem
- * einzigen verschmölze, verlöre die Rückverfolgung: wird nur `h` gebraucht,
- * läuft auch nur dessen Vorgabe, und dann steht im Kasten eben nur `h`. Ein
- * verschmolzener Block wüsste davon nichts und zeigte alle vier.
+ * Zusammengelegt wird erst **hier**, nicht im Kern. Das ist der Punkt: bei
+ * einer Rückverfolgung läuft nur, was gebraucht wird, also entstehen dort auch
+ * nur die Blöcke der gebrauchten Werte. Der zusammengelegte Block enthält
+ * damit von selbst genau sie -- und `wert_ids` hält fest, welche.
  */
 function gruppenBilden(bloecke) {
   const heraus = [];
@@ -105,39 +123,27 @@ function gruppenBilden(bloecke) {
     const letzte = heraus[heraus.length - 1];
     if (block.art !== 'gleichung' || !block.gruppe) {
       heraus.push(block);
-    } else if (letzte?.art === 'gruppe' && letzte.gruppe === block.gruppe) {
-      letzte.bloecke.push(block);
+    } else if (letzte?.gruppe === block.gruppe) {
+      letzte.latex += ` \\qquad ${block.latex}`;
+      letzte.wert_ids.push(block.wert_id);
     } else {
-      heraus.push({ art: 'gruppe', gruppe: block.gruppe, bloecke: [block] });
+      heraus.push({
+        art: 'gleichung',
+        gruppe: block.gruppe,
+        titel: block.gruppe,
+        referenz: block.referenz,
+        latex: block.latex,
+        wert_ids: [block.wert_id],
+      });
     }
   }
   return heraus;
 }
 
-function gruppenBlock(gruppe) {
-  return el('div.angabengruppe', {}, [
-    el('div.angabengruppe-titel', { text: gruppe.gruppe }),
-    el('div.angabengruppe-inhalt', {}, gruppe.bloecke.map((block) => {
-      const hervorgehoben = block.wert_id && zustand.hervorgehoben.has(block.wert_id);
-      const zelle = el('div.angabe', {
-        class: hervorgehoben ? 'ist-hervorgehoben' : '',
-        dataset: { wertId: block.wert_id || '' },
-      }, [
-        block.titel ? el('span.angabe-name', { text: block.titel }) : null,
-        el('span.angabe-mathe'),
-      ]);
-      setzen(block.latex, zelle.querySelector('.angabe-mathe'), { displayMode: false });
-      return zelle;
-    })),
-  ]);
-}
-
 function bloeckeZeichnen(rohbloecke) {
   const knoten = [];
   for (const block of gruppenBilden(rohbloecke)) {
-    if (block.art === 'gruppe') {
-      knoten.push(gruppenBlock(block));
-    } else if (block.art === 'titel') {
+    if (block.art === 'titel') {
       knoten.push(titelZeichnen(block));
     } else if (block.art === 'text') {
       knoten.push(el('p.b-text', { text: block.text }));
@@ -192,23 +198,6 @@ function lueckenBanner(loesung) {
         : null,
     ])),
   ]);
-}
-
-/**
- * Eine Zahl mit fester Stellenzahl -- für Tabellenspalten.
- *
- * Der Kern liefert daneben `wert`, wo nachlaufende Nullen gestrichen sind. Das
- * liest sich im Fliesstext besser, in einer Kolonne aber nicht: dort stünde
- * `205` neben `224.5` und `1.6` neben `0.99`, und die Kommas fluchten nicht
- * mehr. In einer Spalte steht immer dieselbe Grösse, also passt auch immer
- * dieselbe Stellenzahl.
- *
- * @param {number|null} zahl      Rohzahl; null bei unendlich (siehe `endlich()`)
- * @param {number} stellen        Nachkommastellen laut Wertdefinition
- * @param {string} ersatz         was ohne Zahl dasteht
- */
-function feste(zahl, stellen, ersatz = '—') {
-  return Number.isFinite(zahl) ? zahl.toFixed(stellen ?? 0) : ersatz;
 }
 
 // ===========================================================================
@@ -297,48 +286,36 @@ function zusammenfassung(loesung) {
     ]);
   }
 
-  const zelle = (u, seite) => {
-    const w = u[seite];
-    if (!w) return el('td.zahl', { text: '—' });
-    const inhalt = el('td.zahl');
-    inhalt.append(span(`${w.symbol} = `), `${feste(w.zahl, w.stellen, w.wert)} ${w.einheit}`);
-    return inhalt;
-  };
+  const tabellen = loesung.zusammenfassungen || {};
 
-  const blaetter = gezeigt.map(([, eintrag]) => {
-    // Jedes Urteil trägt den Namensraum seines Nachweises; dasselbe Prädikat
-    // wie überall sonst ordnet es seiner Platte zu.
-    const urteile = (loesung.urteile || []).filter(
-      (u) => imRaum(eintrag.namensraum, u.raum));
+  const blaetter = gezeigt.map(([kennung, eintrag]) => {
+    // Zeilen und LaTeX kommen fertig aus dem Kern. Sie hier ein zweites Mal
+    // zusammenzustellen hiesse, dieselbe Tabelle zweimal zu pflegen -- einmal
+    // fürs Auge, einmal für den Kopierknopf.
+    const tabelle = tabellen[kennung];
 
     return el('div.blatt', {}, [
       el('div.b-titel', { text: `Zusammenfassung – ${eintrag.name}` }),
-      urteile.length
-        ? el('div.tabelle-huelle', {}, [
-          el('table.nachweis-tabelle', {}, [
-            el('thead', {}, [el('tr', {}, [
-              el('th', { text: 'Nachweis' }),
-              el('th', { text: 'Widerstand' }),
-              el('th', { text: 'Einwirkung' }),
-              el('th', {}, [span(String.raw`\alpha_{eff}`)]),
-              el('th', { text: '' }),
-            ])]),
-            el('tbody', {}, urteile.map((u) => el('tr', {
-              class: u.erfuellt ? 'ist-gut' : 'ist-schlecht',
-              title: u.begruendung || '',
-            }, [
-              el('td', { text: u.name }),
-              zelle(u, 'widerstand'),
-              zelle(u, 'einwirkung'),
-              el('td.zahl.grad', {
-                text: feste(u.erfuellungsgrad_zahl, 2, '\u221e'),
-              }),
-              el('td', {}, [el('span', {
-                class: u.erfuellt ? 'marke-gut' : 'marke-schlecht',
-                text: u.erfuellt ? 'erfüllt' : 'nicht erfüllt',
-              })]),
-            ]))),
+      tabelle
+        ? el('div.tabelle-block', {}, [
+          el('div.tabelle-huelle', {}, [
+            el('table.nachweis-tabelle', {}, [
+              el('thead', {}, [el('tr', {}, tabelle.kopf.map((zelle) => {
+                const th = el('th');
+                setzen(zelle, th, { displayMode: false });
+                return th;
+              }))]),
+              el('tbody', {}, tabelle.zeilen.map((zeile) => el('tr', {
+                class: zeile.erfuellt ? 'ist-gut' : 'ist-schlecht',
+                title: zeile.begruendung || '',
+              }, zeile.zellen.map((zelle, i) => {
+                const td = el('td', { class: i === 0 ? '' : 'zahl' });
+                setzen(zelle, td, { displayMode: false });
+                return td;
+              })))),
+            ]),
           ]),
+          werkzeugleiste(tabelle.latex, 'Tabelle'),
         ])
         : el('div.leer', { text: 'Für diese Platte wurde kein Nachweis gerechnet.' }),
       plattenkennzahlen(eintrag, loesung),
