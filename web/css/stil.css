@@ -617,6 +617,16 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 }
 .zahlpfeil:hover { color: var(--blau); background: var(--blau-hell); }
 
+/* ------------------------------------------------ Angaben zur Platte -- */
+/* Eine Zeile über der Nachweistabelle: was die Platte ist, damit sich die
+   Zahlen darunter einordnen lassen, ohne den Reiter zu wechseln. */
+.plattenangaben {
+  margin: 0 0 10px; padding: 6px 10px;
+  font-size: 12.5px; color: var(--schrift-matt);
+  background: var(--flaeche-2); border-left: 3px solid var(--platte);
+  border-radius: 0 5px 5px 0;
+}
+
 /* --------------------------------------------- Fuss der Querkraftkurve -- */
 /* Die Normalkraft, für die die Kurve gilt. Steht unter dem Diagramm, weil sie
    die Kurve bestimmt und nicht umgekehrt. */

@@ -528,6 +528,9 @@ def zuordnung(aufbau: Aufbau) -> dict:
             kennung: {
                 "namensraum": qs.id,
                 "name": qs.name,
+                # Der Beton gehoert zur Platte und steht darum bei ihren
+                # Abmessungen, nicht nur in der Materialliste.
+                "beton": qs.beton.name,
                 "werte": {
                     kurzname: definition.id
                     for kurzname, definition in qs.definitionen.items()

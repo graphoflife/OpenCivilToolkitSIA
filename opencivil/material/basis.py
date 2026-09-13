@@ -167,6 +167,18 @@ class Baustoff:
 
     art: Baustoffart
     sorte: str = ""
+
+    symbol_index: str = ""
+    """
+    Index, der an die Symbole dieses Baustoffs gehaengt wird -- leer, solange
+    es nur einen seiner Art gibt.
+
+    Steht hier, damit auch die Nachweise ihn erreichen. Sie bauen Symbole wie
+    ``f_{cd}`` selbst, und ohne den Index waere bei zwei Betonen nicht zu
+    sehen, welcher gemeint ist. Vergeben wird er beim Aufbau des Projekts, wo
+    sich zaehlen laesst, wie viele Baustoffe einer Art vorkommen.
+    """
+
     definitionen: Dict[str, WertDef] = field(default_factory=dict)
     berechnungen: List[Berechnung] = field(default_factory=list)
     eingabewerte: Dict[str, Groesse] = field(default_factory=dict)
@@ -295,6 +307,7 @@ def erzeuge(
         name=name,
         art=art,
         sorte=sorte,
+        symbol_index=symbol_index,
         definitionen=definitionen,
         berechnungen=berechnungen,
         eingabewerte=eingabewerte,

@@ -43,6 +43,43 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-12 · Die Sorte gehört an das Symbol
+
+Bei zwei Betonen stand in den Plattennachweisen zweimal `f_cd` mit
+verschiedenen Zahlen. Der Mechanismus dafür gibt es längst — die Baustoffe
+hängen ihren Namen an, sobald mehrere ihrer Art vorkommen. Die Nachweise
+gingen daran vorbei: sie schrieben `f_{cd}` selbst hin.
+
+Behoben, indem der Baustoff seinen Index **behält** (`Baustoff.symbol_index`)
+statt ihn beim Erzeugen zu verbrauchen. Damit erreichen ihn auch Handrechnung
+und Querkraftnachweis, und beide bilden ihre Symbole über dieselbe Funktion
+`mit_index()` wie die Materialien selbst — eine Regel, nicht zwei.
+
+Betroffen sind `f_cd`, `f_ck`, `τ_cd`, `ε_c2d` (Beton) sowie `f_yd`, `f_sd`,
+`E_s` (Stahl). Der Index richtet sich je Lage nach der **massgebenden** Sorte,
+also der mit dem kleinsten `f_yd` — sonst stünde ein fremder Name an der Zahl.
+
+Eine Stelle bleibt ohne: der Spaltenkopf `f_yd [N/mm²]` der Tabelle
+«Zusammengefasste Bewehrung». Ein Kopf kann keine zwei Indizes tragen. Dort
+kommt stattdessen eine Stahlspalte dazu — aber nur, wenn es mehrere Sorten
+gibt, nach derselben Regel wie der Index selbst.
+
+### Was die Platte ist, steht jetzt über ihrer Tabelle
+
+Abmessungen, Überdeckungen und Betonsorte in einer Zeile über der
+Nachweistabelle:
+
+```
+Beton C30/37   ·   h = 400 mm   ·   b = 1000 mm   ·   c_nom,u = 30 mm   ·   c_nom,o = 30 mm
+```
+
+In der Herleitung bleiben sie als eigene Blöcke stehen — dort wird mit ihnen
+gerechnet, und eine Herleitung ohne ihre Eingangswerte wäre nicht
+nachvollziehbar. Hier geht es um etwas anderes: die Zahlen darunter einordnen
+zu können, ohne den Reiter zu wechseln.
+
+---
+
 ## 2026-09-12 · Durchsicht nach der M-V-Kurve
 
 Ein Durchgang über alles, was seit der letzten Durchsicht dazugekommen ist.

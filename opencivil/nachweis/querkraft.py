@@ -49,6 +49,7 @@ from opencivil.core.einheiten import (
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
+from opencivil.material.basis import mit_index
 from opencivil.nachweis.biegung_normalkraft import protokoll_interpolation
 from opencivil.querschnitt.platte import Plattenquerschnitt, Richtung
 
@@ -263,6 +264,14 @@ class Querkraft(Nachweis):
         gehen durch die Argumentliste.
         """
 
+        # Symbole der Baustoffkennwerte -- mit Sortenindex, sobald mehrere
+        # Betone oder Staehle im Projekt sind. Sonst stuende f_yd zweimal mit
+        # verschiedenen Zahlen im selben Bericht.
+        self.s_f_yd = mit_index("f_{yd}", self.posten[0][0].stahl.symbol_index)
+        self.s_E_s = mit_index("E_s", self.posten[0][0].stahl.symbol_index)
+        self.s_tau_cd = mit_index(r"\tau_{cd}", querschnitt.beton.symbol_index)
+        self.s_f_ck = mit_index("f_{ck}", querschnitt.beton.symbol_index)
+
         self.mn = mn_nachweis
         """
         Der M-N-Nachweis derselben Richtung.
@@ -363,7 +372,7 @@ class Querkraft(Nachweis):
         p.gleichung(
             rf"k_g = \max\left[{K_G_MINDEST:.2f};\ \frac{{48}}"
             rf"{{16 + D_{{max}} \cdot \min\left[1.0;\ "
-            rf"\left(\frac{{60}}{{f_{{ck}}}}\right)^{{2}}\right]}}\right]"
+            rf"\left(\frac{{60}}{{{self.s_f_ck}}}\right)^{{2}}\right]}}\right]"
             "\n= "
             rf"\max\left[{K_G_MINDEST:.2f};\ \frac{{48}}"
             rf"{{16 + {D_max.formatiert(0, MM)} \cdot \min\left[1.0;\ "
@@ -553,14 +562,14 @@ class Querkraft(Nachweis):
             "die Dehnung auf halber Höhe."
         )
         p.gleichung(
-            r"v_{Rd} = k_d \cdot \tau_{cd} \cdot d_v \qquad "
+            rf"v_{{Rd}} = k_d \cdot {self.s_tau_cd} \cdot d_v \qquad "
             r"k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g}",
             titel="Ansatz", referenz="SIA 262:2025, 4.3.3.2.1")
         p.gleichung(
             r"m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} \qquad "
-            r"\varepsilon_v = \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| "
+            rf"\varepsilon_v = \frac{{{self.s_f_yd} \cdot \left(\left|m_{{Ed}}\right| "
             r"- m_{Dd}\right)}"
-            r"{E_s \cdot \left(\left|m_{Rd}(N_{Ed})\right| - m_{Dd}\right)}",
+            rf"{{{self.s_E_s} \cdot \left(\left|m_{{Rd}}(N_{{Ed}})\right| - m_{{Dd}}\right)}}",
             titel="Dekompressionsmoment und Dehnung")
         p.text(
             "Nur eine Normaldruckkraft entlastet; eine Zugkraft bleibt beim "
@@ -639,9 +648,9 @@ class Querkraft(Nachweis):
                 f"ungerissen, ε_v = 0.")
         else:
             p.gleichung(
-                r"\varepsilon_v = \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| "
+                rf"\varepsilon_v = \frac{{{self.s_f_yd} \cdot \left(\left|m_{{Ed}}\right| "
                 r"- m_{Dd}\right)}"
-                r"{E_s \cdot \left(\left|m_{Rd}(N_{Ed})\right| - m_{Dd}\right)}"
+                rf"{{{self.s_E_s} \cdot \left(\left|m_{{Rd}}(N_{{Ed}})\right| - m_{{Dd}}\right)}}"
                 "\n= "
                 rf"\frac{{{f_yd / 1e6:.0f} \cdot \left({abs(M_Ed) / 1e3:.1f} - "
                 rf"{erg.m_Dd / 1e3:.1f}\right)}}"
@@ -657,7 +666,7 @@ class Querkraft(Nachweis):
             titel="Beiwert für die statische Höhe")
 
         p.gleichung(
-            rf"{self._widerstandssymbol(fall)} = k_d \cdot \tau_{{cd}} \cdot d_v"
+            rf"{self._widerstandssymbol(fall)} = k_d \cdot {self.s_tau_cd} \cdot d_v"
             "\n= "
             rf"{erg.k_d:.4f} \cdot {tau_cd.in_einheit(N_PRO_MM2):.4f}\,"
             rf"\mathrm{{N}}/\mathrm{{mm}}^{{2}} \cdot {erg.d_v * 1e3:.1f}\,\mathrm{{mm}}"

@@ -900,3 +900,69 @@ class TestPolygonreihenfolge(unittest.TestCase):
                 c, d = punkte[j], punkte[(j + 1) % anzahl]
                 self.assertFalse(kreuzt(a, b, c, d),
                                  f"Kanten {i} und {j} kreuzen sich")
+
+
+class TestSortenindex(unittest.TestCase):
+    """
+    Symbole tragen die Sorte, sobald mehrere in Frage kommen.
+
+    Bei zwei Betonen stünde sonst zweimal `f_cd` mit verschiedenen Zahlen im
+    selben Bericht, und niemand könnte sagen, welcher gemeint ist. Solange es
+    nur einen gibt, wäre der Index Ballast.
+    """
+
+    def mitschrift(self, projekt) -> str:
+        """Mit Querkraft, damit auch tau_cd und E_s vorkommen."""
+        for k in projekt.querschnitt("q1").kombinationen:
+            k.V_Ed = 120.0
+        aufbau = projekt.aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        return "\n".join(
+            str(getattr(b, "latex", "") or "") for b in loesung.protokoll.bloecke)
+
+    def test_ohne_index_wenn_es_nur_einen_gibt(self):
+        from opencivil.projekt import Projekt
+
+        text = self.mitschrift(Projekt.beispiel())
+        self.assertIn("f_{cd}", text)
+        self.assertNotIn(r"f_{cd,\text", text)
+
+    def test_mit_index_bei_zwei_betonen(self):
+        from opencivil.projekt import MaterialEintrag, Projekt
+
+        projekt = Projekt.beispiel()
+        projekt.materialien.append(MaterialEintrag("b2", "beton", "C40/50", "C40/50"))
+        text = self.mitschrift(projekt)
+        self.assertIn(r"f_{cd,\text{C30/37}}", text)
+        self.assertIn(r"\tau_{cd,\text{C30/37}}", text)
+        self.assertIn(r"\varepsilon_{c2d,\text{C30/37}}", text)
+
+    def test_mit_index_bei_zwei_staehlen(self):
+        from opencivil.projekt import MaterialEintrag, Projekt
+
+        projekt = Projekt.beispiel()
+        projekt.materialien.append(MaterialEintrag("s2", "betonstahl", "B500A", "B500A"))
+        projekt.querschnitt("q1").lagen[3].stahl = "s2"
+        text = self.mitschrift(projekt)
+        self.assertIn(r"f_{yd,\text{B500B}}", text)
+        self.assertIn(r"f_{yd,\text{B500A}}", text)
+
+    def test_die_lage_traegt_den_index_ihrer_massgebenden_sorte(self):
+        """
+        Zusammengefasst zählt die schwächere Sorte -- und der Index gehört
+        derselben, sonst stünde ein fremder Name an der Zahl.
+        """
+        from opencivil.nachweis.handrechnung import Posten, lagen_zusammenfassen
+
+        seiten = lagen_zusammenfassen([
+            Posten(a_s=1e-3, z=0.26, f_yd=500e6, E_s=205e9, text="stark",
+                   index="1,x,g", stahl_index="B500B", von_unten=True),
+            Posten(a_s=1e-3, z=0.25, f_yd=435e6, E_s=205e9, text="schwach",
+                   index="1,x,z", stahl_index="B500A", von_unten=True),
+            Posten(a_s=1e-3, z=0.04, f_yd=435e6, E_s=205e9, text="oben",
+                   index="4,x,g", stahl_index="B500A", von_unten=False),
+        ])
+        unten = seiten["unten"]
+        self.assertAlmostEqual(unten.f_yd, 435e6)
+        self.assertEqual(unten.stahl_index, "B500A")
+        self.assertEqual(unten.symbol_f_yd, r"f_{yd,\text{B500A}}")

@@ -314,13 +314,16 @@ class BiegungNormalkraft(Nachweis):
         # lagen_zusammenfassen().
         seiten = lagen_zusammenfassen([
             HandPosten(a_s=a_s, z=z, f_yd=gesetz.f_yd, E_s=gesetz.E_s, text=text,
-                       index=posten_index(lage, art), von_unten=lage.von_unten)
+                       index=posten_index(lage, art),
+                       stahl_index=lage.stahl.symbol_index,
+                       von_unten=lage.von_unten)
             for (a_s, z, gesetz, text), (lage, art, *_) in zip(lagen, self.posten)
         ])
         self.handrechnung = Handrechnung(
             h=h, b=b, f_cd=beton.f_cd, eps_c2d=beton.eps_c2d,
             unten=seiten["unten"], oben=seiten["oben"],
             richtung=self.richtung.beschriftung, basis=self.id,
+            beton_index=self.querschnitt.beton.symbol_index,
         )
         self.handlinie = self.handrechnung.rechnen(p)
 

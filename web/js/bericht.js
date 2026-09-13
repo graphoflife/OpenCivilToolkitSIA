@@ -267,6 +267,7 @@ function zusammenfassung(loesung) {
 
     return el('div.blatt', {}, [
       el('div.b-titel', { text: `Zusammenfassung – ${eintrag.name}` }),
+      plattenangaben(eintrag, loesung),
       urteile.length
         ? el('div.tabelle-huelle', {}, [
           el('table.nachweis-tabelle', {}, [
@@ -300,6 +301,32 @@ function zusammenfassung(loesung) {
   });
 
   return el('div', {}, blaetter.concat([lueckenBanner(loesung)].filter(Boolean)));
+}
+
+/**
+ * Was die Platte ist, in einer Zeile über der Tabelle.
+ *
+ * Abmessungen, Überdeckungen und Betonsorte. In der Herleitung stehen sie als
+ * eigene Blöcke -- dort gehören sie hin, weil damit gerechnet wird. Hier
+ * dagegen geht es darum, die Tabelle darunter einordnen zu können, ohne den
+ * Reiter zu wechseln.
+ *
+ * Der Betonname kommt aus der Zuordnung, die Zahlen aus der Lösung. Nachgeholt
+ * wird nichts: fehlt ein Wert, fällt er weg.
+ */
+function plattenangaben(eintrag, loesung) {
+  const wert = (kurzname) => loesung.werte?.[eintrag.werte?.[kurzname]];
+  const teile = [];
+  if (eintrag.beton) teile.push(`Beton ${eintrag.beton}`);
+  for (const [name, kurzname] of [
+    ['h', 'h'], ['b', 'b'],
+    ['c_nom,u', 'c_nom_unten'], ['c_nom,o', 'c_nom_oben'],
+  ]) {
+    const w = wert(kurzname);
+    if (w) teile.push(`${name} = ${feste(w.zahl, w.stellen, w.wert)} ${w.einheit}`);
+  }
+  if (!teile.length) return null;
+  return el('p.plattenangaben', { text: teile.join('   ·   ') });
 }
 
 /**

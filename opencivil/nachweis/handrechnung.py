@@ -50,6 +50,7 @@ from opencivil.core.einheiten import (
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import Wert, WertDef
+from opencivil.material.basis import mit_index
 
 #: Anteil der Druckzonenhoehe, ueber den der Spannungsblock wirkt.
 BLOCKANTEIL = 0.85
@@ -75,7 +76,16 @@ class Posten:
     index: str = ""
     """Index des Symbols, z.B. ``1,x,g``."""
 
+    stahl_index: str = ""
+    """Index der Stahlsorte -- leer, solange es nur eine gibt."""
+
     von_unten: bool = True
+
+    @property
+    def symbol_f_yd(self) -> str:
+        """``f_{yd,\text{B500B}}`` -- die Posten einer Lage koennen sich
+        unterscheiden, darum je Posten."""
+        return mit_index("f_{yd}", self.stahl_index)
 
 
 @dataclass(frozen=True)
@@ -90,6 +100,14 @@ class Lage:
     index: str = ""
     """Index der zusammengefassten Lage, z.B. ``1,x``."""
 
+    stahl_index: str = ""
+    """
+    Index der massgebenden Stahlsorte -- die mit dem kleinsten ``f_yd``.
+
+    Ohne ihn stuende bei zwei Sorten zweimal ``f_yd`` mit verschiedenen Zahlen
+    im selben Bericht, und niemand koennte sagen, welche Sorte gemeint ist.
+    """
+
     teile: Tuple[Posten, ...] = ()
     """Die Posten, aus denen sie entstanden ist -- fuer die Mitschrift."""
 
@@ -103,6 +121,16 @@ class Lage:
         zusammenzusetzen.
         """
         return f"A_{{s,{self.index}}}" if self.index else "A_s"
+
+    @property
+    def symbol_f_yd(self) -> str:
+        """``f_{yd,\text{B500B}}`` -- oder ``f_{yd}``, solange es nur eine Sorte gibt."""
+        return mit_index("f_{yd}", self.stahl_index)
+
+    @property
+    def symbol_f_sd(self) -> str:
+        """Die angesetzte Stahlspannung; sie gehoert zur selben Sorte wie f_yd."""
+        return mit_index("f_{sd}", self.stahl_index)
 
     @property
     def symbol_d(self) -> str:
@@ -143,6 +171,7 @@ class Handrechnung:
         self, *,
         h: float, b: float, f_cd: float, eps_c2d: float,
         unten: Lage, oben: Lage, richtung: str, basis: str,
+        beton_index: str = "",
     ) -> None:
         self.h = h
         self.b = b
@@ -152,6 +181,11 @@ class Handrechnung:
         self.oben = oben
         self.richtung = richtung
         self.basis = basis
+
+        # Symbole der Betonkennwerte: mit Sortenindex, sobald mehrere Betone
+        # im Projekt sind. Sonst stuende f_cd zweimal mit anderen Zahlen da.
+        self.s_f_cd = mit_index("f_{cd}", beton_index)
+        self.s_eps_c2d = mit_index(r"\varepsilon_{c2d}", beton_index)
 
     # -- Hilfen fuer die Mitschrift -----------------------------------------
 
@@ -232,24 +266,36 @@ class Handrechnung:
             if len(lage.teile) > 1:
                 self._schwerpunkt(p, lage)
 
+        # Die Stahlspalte nur, wenn es mehrere Sorten gibt -- dieselbe Regel
+        # wie beim Sortenindex an den Symbolen. Ein Spaltenkopf kann keine zwei
+        # Indizes tragen; welche Sorte in welcher Zeile gilt, muss aber
+        # dastehen, sobald es mehr als eine gibt.
+        seiten = (self.unten, self.oben)
+        mit_stahl = any(lage.stahl_index for lage in seiten)
+
         p.tabelle(
-            kopf=[r"\text{Seite}", r"A_s\ [\mathrm{mm}^2]",
-                  r"d\ [\mathrm{mm}]", r"f_{yd}\ [\mathrm{N/mm^2}]"],
+            kopf=([r"\text{Seite}"]
+                  + ([r"\text{Stahl}"] if mit_stahl else [])
+                  + [r"A_s\ [\mathrm{mm}^2]", r"d\ [\mathrm{mm}]",
+                     r"f_{yd}\ [\mathrm{N/mm^2}]"]),
             zeilen=[
-                [als_text(lage.text), f"{lage.a_s * 1e6:.0f}",
-                 f"{lage.z * 1e3:.1f}", f"{lage.f_yd / 1e6:.0f}"]
-                for lage in (self.unten, self.oben)
+                [als_text(lage.text)]
+                + ([als_text(lage.stahl_index or "–")] if mit_stahl else [])
+                + [f"{lage.a_s * 1e6:.0f}", f"{lage.z * 1e3:.1f}",
+                   f"{lage.f_yd / 1e6:.0f}"]
+                for lage in seiten
             ],
             titel="Zusammengefasste Bewehrung",
-            ausrichtung="lrrr",
+            ausrichtung="ll rrr".replace(" ", "") if mit_stahl else "lrrr",
         )
 
     def _schwerpunkt(self, p: Protokoll, lage: Lage) -> None:
         """Schreibt, wie sich d einer aus mehreren Posten bestehenden Lage ergibt."""
         zaehler = " + ".join(
-            rf"A_{{s,{t.index}}} \cdot f_{{yd}} \cdot d_{{{t.index}}}" for t in lage.teile)
+            rf"A_{{s,{t.index}}} \cdot {t.symbol_f_yd} \cdot d_{{{t.index}}}"
+            for t in lage.teile)
         nenner = " + ".join(
-            rf"A_{{s,{t.index}}} \cdot f_{{yd}}" for t in lage.teile)
+            rf"A_{{s,{t.index}}} \cdot {t.symbol_f_yd}" for t in lage.teile)
         zaehler_zahl = " + ".join(
             rf"{t.a_s * 1e6:.0f} \cdot {t.f_yd / 1e6:.0f} \cdot {t.z * 1e3:.1f}"
             for t in lage.teile)
@@ -283,7 +329,7 @@ class Handrechnung:
             {
                 "b": self._laenge("b", "b", self.b),
                 "h": self._laenge("h", "h", self.h),
-                "f_cd": self._spannung("f_cd", "f_{cd}", self.f_cd),
+                "f_cd": self._spannung("f_cd", self.s_f_cd, self.f_cd),
             },
             titel="Gleichmässiger Druck, ohne Bewehrung",
         )
@@ -307,8 +353,8 @@ class Handrechnung:
         eingaben = {
             "A_s": self._flaeche("As_u", u.symbol_flaeche, u.a_s),
             "A_s2": self._flaeche("As_o", o.symbol_flaeche, o.a_s),
-            "f_yd": self._spannung("fyd_u", "f_{yd}", u.f_yd),
-            "f_yd2": self._spannung("fyd_o", "f_{yd}", o.f_yd),
+            "f_yd": self._spannung("fyd_u", u.symbol_f_yd, u.f_yd),
+            "f_yd2": self._spannung("fyd_o", o.symbol_f_yd, o.f_yd),
         }
         p.formel(
             self._kraft("N_Rd_zug", "N_{Rd}^{+}", N, "Grösste aufnehmbare Zugkraft"),
@@ -364,9 +410,9 @@ class Handrechnung:
         w_x = self._laenge(f"x_{marke}", f"x^{{{hoch}}}", x, "Höhe der Druckzone")
         eingaben = {
             "A_s": self._flaeche(f"As_{marke}", zug.symbol_flaeche, zug.a_s),
-            "f_yd": self._spannung(f"fyd_{marke}", "f_{yd}", zug.f_yd),
+            "f_yd": self._spannung(f"fyd_{marke}", zug.symbol_f_yd, zug.f_yd),
             "b": self._laenge("b", "b", self.b),
-            "f_cd": self._spannung("f_cd", "f_{cd}", self.f_cd),
+            "f_cd": self._spannung("f_cd", self.s_f_cd, self.f_cd),
         }
         p.formel(
             w_x,
@@ -443,7 +489,7 @@ class Handrechnung:
             {
                 "d": self._laenge(f"d_{marke}", zug.symbol_d, d),
                 "x": w_x,
-                "eps_c2d": self._w("eps_c2d", r"\varepsilon_{c2d}",
+                "eps_c2d": self._w("eps_c2d", self.s_eps_c2d,
                                    Groesse.aus_si(self.eps_c2d, PROMILLE), 2),
             },
             titel="Fliesskriterium – Dehnung der Zugbewehrung",
@@ -468,11 +514,11 @@ class Handrechnung:
         )
 
         eingaben = {
-            "f_cd": self._spannung("f_cd", "f_{cd}", self.f_cd),
+            "f_cd": self._spannung("f_cd", self.s_f_cd, self.f_cd),
             "b": self._laenge("b", "b", self.b),
             "x": w_x,
             "A_s": self._flaeche(f"As_{marke}", zug.symbol_flaeche, zug.a_s),
-            "f_sd": self._spannung(f"fsd_{marke}", "f_{sd}", zug.f_yd),
+            "f_sd": self._spannung(f"fsd_{marke}", zug.symbol_f_sd, zug.f_yd),
         }
         p.formel(
             self._kraft(f"N_halb_{marke}", rf"N_{{Rd}}^{{{hoch}}}", N,
@@ -555,17 +601,22 @@ def lagen_zusammenfassen(posten: Sequence[Posten]) -> Dict[str, Lage]:
             # Ohne Flaeche gibt es keinen Schwerpunkt -- die Hoehenlage genuegt.
             erster = gruppe[0]
             return Lage(0.0, erster.z, erster.f_yd, erster.E_s, erster.text,
-                        index=erster.index, teile=(erster,))
+                        index=erster.index, stahl_index=erster.stahl_index,
+                        teile=(erster,))
         schwerpunkt = sum(t.a_s * t.z for t in gruppe) / flaeche
         # Bei verschiedenen Stahlsorten in einer Lage zaehlt die schwaechere --
-        # sonst rechnete man mit einer Festigkeit, die ein Teil nicht hat.
+        # sonst rechnete man mit einer Festigkeit, die ein Teil nicht hat. Der
+        # Index gehoert derselben Sorte, sonst stuende ein fremder Name an der
+        # Zahl.
+        massgebend = min(gruppe, key=lambda t: t.f_yd)
         return Lage(
             flaeche,
             schwerpunkt,
-            min(t.f_yd for t in gruppe),
+            massgebend.f_yd,
             min(t.E_s for t in gruppe),
             " + ".join(t.text for t in beteiligt),
             index=gemeinsamer_index(beteiligt),
+            stahl_index=massgebend.stahl_index,
             teile=beteiligt,
         )
 
