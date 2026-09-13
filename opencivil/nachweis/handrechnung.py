@@ -383,7 +383,21 @@ class Handrechnung:
         Gilt nur, solange die Zugbewehrung dabei noch fliesst. Tut sie es nicht,
         waere ``f_sd = f_yd`` zu guenstig angesetzt, und der Punkt faellt weg --
         das Polygon laeuft dann geradlinig vom reinen Druck zum Punkt bei N = 0.
+
+        Und er gilt nur, wenn es diese Zugbewehrung ueberhaupt gibt. Ohne sie
+        blieb der Betondruckblock allein stehen und schob dem Polygon ein
+        Moment unter, das aus nichts stammte: eine Platte nur mit unterer
+        Bewehrung wies so ein negatives Moment von 220 kNm nach. Der Punkt
+        setzt fliessenden Stahl voraus; ohne Stahl gibt es nichts, was fliesst.
         """
+        if zug.a_s <= 0.0:
+            p.hinweis(
+                f"Auf der gezogenen Seite liegt keine Bewehrung ({zug.text}). "
+                f"Der Eckpunkt x = h/2 setzt fliessenden Stahl voraus und "
+                f"entfällt; ohne Zugbewehrung gibt es hier keinen "
+                f"Momentenwiderstand.")
+            return None
+
         x = self.h / 2.0
         block = BLOCKANTEIL * x
         D = self.f_cd * self.b * block               # Betondruckkraft, Betrag

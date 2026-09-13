@@ -81,16 +81,20 @@ class Kurvenbeiwerte:
     """
 
     h: float
-    tiefen: Tuple[float, ...]
+    lagen: Tuple[Tuple[float, bool], ...]
+    """Je vorhandener Posten: ``(z ab Oberkante, liegt unten)``."""
+
     einlage: float
     tau_cd: float
     f_yd: float
     E_s: float
     k_g: float
 
-    def hoehen(self, moment_positiv: bool) -> Tuple[float, float]:
-        """``(d, d_v)`` fuer diese Momentenrichtung."""
-        d = _statische_hoehe(self.tiefen, self.h, moment_positiv)
+    def hoehen(self, moment_positiv: bool) -> Optional[Tuple[float, float]]:
+        """``(d, d_v)`` fuer diese Momentenrichtung -- ``None`` ohne Zugbewehrung."""
+        d = _statische_hoehe(self.lagen, self.h, moment_positiv)
+        if d is None:
+            return None
         d_v = d - self.einlage if (self.h / 6.0 < self.einlage < d) else d
         return d, d_v
 
@@ -164,14 +168,28 @@ def widerstand(
         plastisch=plastisch)
 
 
-def _statische_hoehe(tiefen: Sequence[float], h: float, moment_positiv: bool) -> float:
+def _statische_hoehe(
+    lagen: Sequence[Tuple[float, bool]], h: float, moment_positiv: bool
+) -> Optional[float]:
     """
     Statische Hoehe der gezogenen Bewehrung, in m ab der gedrueckten Kante.
 
+    ``lagen`` ist eine Folge von ``(z ab Oberkante, liegt unten)``.
+
     Bei positivem Moment liegt der Zug unten: gemessen wird von der Oberkante
-    zur untersten Lage. Bei negativem Moment umgekehrt.
+    zur aeussersten unteren Lage. Bei negativem Moment umgekehrt. **Nur die
+    Lagen der gezogenen Seite zaehlen.** Wer alle nimmt, bekommt bei
+    einseitiger Bewehrung eine Zahl, die gar keine statische Hoehe ist: eine
+    Platte nur mit unterer Bewehrung lieferte fuers negative Moment
+    ``h - 261 = 39 mm`` -- den Abstand der Unterkante zur *unteren* Lage.
+
+    ``None``, wenn auf der gezogenen Seite nichts liegt. Dann gibt es kein
+    ``d``, und ohne ``d`` keinen Querkraftwiderstand.
     """
-    return max(tiefen) if moment_positiv else h - min(tiefen)
+    gezogen = [z for z, unten in lagen if unten is moment_positiv]
+    if not gezogen:
+        return None
+    return max(gezogen) if moment_positiv else h - min(gezogen)
 
 
 @dataclass(frozen=True)
@@ -323,7 +341,10 @@ class Querkraft(Nachweis):
         E_s = e.g("E_s").si
         einlage = e.g("einlagenhoehe").si
         m_rd = {f.name: abs(e.g(f"m_Rd_{f.kennung}").si) for f in self.faelle}
-        tiefen = [e.g(f"z_{l.nummer}{a.kuerzel}").si for l, a, _, _, _ in self.posten]
+        # Je Posten die Tiefe und auf welcher Seite er liegt -- ohne das
+        # laesst sich die gezogene Bewehrung nicht von der gedrueckten trennen.
+        lagen = [(e.g(f"z_{l.nummer}{a.kuerzel}").si, l.von_unten)
+                 for l, a, _, _, _ in self.posten]
 
         self._protokoll_ansatz(p, e)
 
@@ -351,7 +372,7 @@ class Querkraft(Nachweis):
             titel="Beiwert der Gesteinskörnung", referenz="SIA 262:2025, 4.3.3.2.1")
 
         self.beiwerte = Kurvenbeiwerte(
-            h=h, tiefen=tuple(tiefen), einlage=einlage, tau_cd=tau_cd.si,
+            h=h, lagen=tuple(lagen), einlage=einlage, tau_cd=tau_cd.si,
             f_yd=f_yd, E_s=E_s, k_g=k_g)
 
         ergebnis: Dict[str, Groesse] = {}
@@ -360,7 +381,7 @@ class Querkraft(Nachweis):
 
         for fall in self.faelle:
             erg = self._einen_fall(fall, h, tau_cd, f_yd, E_s, einlage, k_g,
-                                   m_rd[fall.name], tiefen)
+                                   m_rd[fall.name], lagen)
             self.ergebnisse.append(erg)
             self._protokoll_fall(p, erg, h, tau_cd, f_yd, E_s, einlage, k_g)
 
@@ -396,39 +417,51 @@ class Querkraft(Nachweis):
 
     # -- Kurve --------------------------------------------------------------
 
-    @property
-    def momentenrichtungen(self) -> List[bool]:
-        """
-        Welche Momentenvorzeichen ueberhaupt vorkommen -- hoechstens zwei.
-
-        Danach richtet sich, wie viele Kurven es fuer diese Tragrichtung gibt.
-        Ohne einen Fall mit negativem Moment waere eine Kurve fuer «Zug oben»
-        eine Aussage ueber etwas, das niemand nachgewiesen haben wollte.
-        """
-        vorhanden = {f.M_Ed.si >= 0 for f in self.faelle}
-        return [p for p in (True, False) if p in vorhanden]
-
-    def kurve(self, N_Ed: float, moment_positiv: bool) -> Optional[dict]:
+    def kurve(self, N_Ed: float) -> dict:
         """
         Der Querkraftwiderstand ueber dem Moment, bei festgehaltener Normalkraft.
 
-        Fuenfzig Stuetzstellen von null bis ``m_Rd + 20 kNm``. Der Bereich
-        jenseits von ``m_Rd`` ist der eigentliche Zweck: dort faellt der
+        **Ein** Diagramm je Tragrichtung, mit vorzeichenbehafteter Waagrechten:
+        rechts das positive Moment (Zug unten), links das negative (Zug oben).
+        Frueher waren das zwei Bilder; nebeneinander liessen sie sich schlecht
+        vergleichen, obwohl sie dieselbe Platte beschreiben.
+
+        Die beiden Aeste sind getrennte Linienzuege und treffen sich bei
+        ``M_Ed = 0`` nicht unbedingt: sie haben verschiedene statische Hoehen,
+        also auch verschiedene Widerstaende bei verschiedwindendem Moment. Das
+        ist kein Zeichenfehler, sondern die Platte.
+
+        Je Ast fuenfzig Stuetzstellen von null bis ``m_Rd + 20 kNm``. Der
+        Bereich jenseits von ``m_Rd`` ist der eigentliche Zweck: dort faellt der
         Widerstand, weil die Bewehrung fliesst (siehe :func:`widerstand`).
 
         Gerechnet wird mit derselben Funktion wie im Nachweis. Die Kurve kann
         also nicht etwas anderes zeigen als die Punkte, die darauf liegen.
 
         :param N_Ed: eingestellte Normalkraft in N, Zug positiv.
-        :return: ``None``, wenn bei dieser Normalkraft kein Widerstand besteht.
+        """
+        return {"N_Ed": N_Ed,
+                "aeste": [ast for ast in (self._ast(N_Ed, True),
+                                          self._ast(N_Ed, False)) if ast]}
+
+    def _ast(self, N_Ed: float, moment_positiv: bool) -> Optional[dict]:
+        """
+        Ein Ast der Kurve. ``None``, wenn es ihn nicht gibt.
+
+        Es gibt ihn nicht, wenn auf der gezogenen Seite keine Bewehrung liegt
+        oder die Normalkraft ausserhalb der Resistenzlinie faellt -- in beiden
+        Faellen waere jeder gezeichnete Widerstand erfunden.
         """
         if self.beiwerte is None:
+            return None
+        hoehen = self.beiwerte.hoehen(moment_positiv)
+        if hoehen is None:
             return None
         m_Rd = self.mn.moment_bei(N_Ed, positiv=moment_positiv)
         if not m_Rd or m_Rd <= 0.0:
             return None
 
-        d, d_v = self.beiwerte.hoehen(moment_positiv)
+        d, d_v = hoehen
         bis = m_Rd + KURVENZUGABE
 
         # Die fuenfzig Stellen liegen gleichmaessig, treffen ``m_Rd`` aber nur
@@ -439,15 +472,17 @@ class Querkraft(Nachweis):
             {bis * i / (KURVENPUNKTE - 1) for i in range(KURVENPUNKTE)}
             | {m_Rd, m_Rd + SPRUNGSCHRITT})
 
+        vz = 1.0 if moment_positiv else -1.0
         punkte = []
         for M_Ed in stellen:
             p = widerstand(
                 M_Ed=M_Ed, N_Ed=N_Ed, h=self.beiwerte.h, d=d, d_v=d_v,
                 tau_cd=self.beiwerte.tau_cd, f_yd=self.beiwerte.f_yd,
                 E_s=self.beiwerte.E_s, k_g=self.beiwerte.k_g, m_Rd=m_Rd)
-            punkte.append((M_Ed, p.v_Rd, p.plastisch))
+            punkte.append((vz * M_Ed, p.v_Rd, p.plastisch))
 
-        return {"punkte": punkte, "m_Rd": m_Rd, "d": d, "d_v": d_v, "N_Ed": N_Ed}
+        return {"punkte": punkte, "m_Rd": vz * m_Rd, "d": d, "d_v": d_v,
+                "moment_positiv": moment_positiv}
 
     def _widerstandssymbol(self, fall: Querkraftfall) -> str:
         """``v_Rd(M_Ed = 100 kNm, N_Ed = -300 kN)`` -- der Widerstand ist bedingt."""
@@ -458,14 +493,27 @@ class Querkraft(Nachweis):
     def _einen_fall(
         self, fall: Querkraftfall, h: float, tau_cd: Groesse,
         f_yd: float, E_s: float, einlage: float, k_g: float,
-        m_Rd: float, tiefen: Sequence[float],
+        m_Rd: float, lagen: Sequence[Tuple[float, bool]],
     ) -> Querkraftergebnis:
         erg = Querkraftergebnis(fall=fall)
         M_Ed, N_Ed, V_Ed = fall.M_Ed.si, fall.N_Ed.si, fall.V_Ed.si
-
-        erg.d = _statische_hoehe(tiefen, h, M_Ed >= 0)
-        erg.d_v = erg.d - einlage if (h / 6.0 < einlage < erg.d) else erg.d
         erg.m_Rd = m_Rd
+
+        # Ohne Bewehrung auf der gezogenen Seite gibt es kein d -- und ohne d
+        # keinen Querkraftwiderstand. Frueher wurde hier die gedrueckte Seite
+        # herangezogen und lieferte eine Zahl, die keine statische Hoehe ist.
+        hoehen = _statische_hoehe(lagen, h, M_Ed >= 0)
+        if hoehen is None:
+            seite = "unten" if M_Ed >= 0 else "oben"
+            erg.erfuellungsgrad = 0.0
+            erg.erfuellt = False
+            erg.begruendung = (
+                f"Auf der gezogenen Seite ({seite}) liegt in dieser Richtung "
+                f"keine Bewehrung. Ohne statische Höhe gibt es keinen "
+                f"Querkraftwiderstand: v_Rd = 0.")
+            return erg
+        erg.d = hoehen
+        erg.d_v = erg.d - einlage if (h / 6.0 < einlage < erg.d) else erg.d
 
         # Nur Druck entlastet: bei Zug liefert min(N_Ed; 0) null, das
         # Dekompressionsmoment entfaellt und der Nachweis laeuft unveraendert

@@ -43,12 +43,57 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-12 · Ein Widerstand aus dem Nichts
+
+Gemeldet: eine Platte nur mit unterer Bewehrung weist trotzdem ein negatives
+Moment nach. Nachgestellt und bestätigt — das Polygon hatte einen Eckpunkt bei
+
+```
+x = h/2 −     N = −2550 kN,  M = −219.9 kNm
+```
+
+**ohne jede obere Bewehrung.** Der Punkt kommt aus dem Kräftegleichgewicht mit
+dem Betondruckblock; steht auf der gezogenen Seite kein Stahl, bleibt der Block
+allein da und liefert ein Moment, das aus nichts stammt. Die Mitschrift sagte
+daneben sogar «die Zugbewehrung fliesst» — über eine Bewehrung, die es nicht
+gibt. Der Punkt setzt fliessenden Stahl voraus; ohne Stahl fliesst nichts.
+
+### Dieselbe Lücke beim Querkraftnachweis
+
+`_statische_hoehe` nahm **alle** Lagen der Richtung, ohne auf die Seite zu
+achten:
+
+```python
+return max(tiefen) if moment_positiv else h - min(tiefen)
+```
+
+Bei einseitiger Bewehrung ist das keine statische Höhe mehr. Eine Platte nur
+mit unterer Bewehrung lieferte fürs negative Moment `h − 261 = 39 mm` — den
+Abstand der Unterkante zur *unteren* Lage. Daraus wurde ein Querkraftwiderstand
+gerechnet.
+
+Jetzt zählen nur die Lagen der gezogenen Seite. Gibt es dort keine, gibt es
+kein `d` — und ohne `d` keinen Widerstand: `v_Rd = 0`, mit einem Satz, der sagt
+warum.
+
+Der Nachweis wird trotzdem geführt und fällt durch. Ihn wegzulassen wäre das
+Gefährlichere: eine Einwirkung ohne roten Eintrag liest sich wie Zustimmung.
+
+---
+
 ## 2026-09-12 · Die M-V-Kurve
 
-Ein Diagramm je Tragrichtung und Momentenvorzeichen — bis zu vier pro Platte,
-aber nur dort, wo auch ein Querkraftnachweis geführt wurde. Auf der Waagrechten
-`M_Ed` (als Betrag), senkrecht `v_Rd`, fünfzig Stützstellen von null bis
-`m_Rd + 20 kNm`.
+Ein Diagramm je Tragrichtung — höchstens zwei pro Platte, und nur dort, wo auch
+ein Querkraftnachweis geführt wurde. Die Waagrechte ist vorzeichenbehaftet:
+rechts das positive Moment (Zug unten), links das negative (Zug oben). Je Ast
+fünfzig Stützstellen von null bis `m_Rd + 20 kNm`.
+
+Beide Äste im selben Bild, weil sie dieselbe Platte beschreiben. Sie treffen
+sich bei `M_Ed = 0` nicht unbedingt: jeder misst mit seiner eigenen statischen
+Höhe — im Beispiel 261 mm unten gegen 264 mm oben, also 285.9 gegen
+289.2 kN/m. Kein Zeichenfehler, sondern die Platte.
+
+Einen Ast gibt es nur, wo auf der gezogenen Seite Bewehrung liegt.
 
 **In die Herleitung kommt davon nichts.** Die Kurve ist eine Ansicht, keine
 Rechenschaft: fünfzig Stützstellen niederzuschreiben hiesse, den Bericht mit

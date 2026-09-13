@@ -646,16 +646,20 @@ export function kurveZeichnen(gesetz, { zeigeVereinfacht = true, beiUmschalten }
 }
 
 /**
- * Zeichnet den Querkraftwiderstand über dem Moment.
+ * Zeichnet den Querkraftwiderstand über dem Moment -- ein Bild je Tragrichtung.
  *
- * Der Widerstand hängt über ε_v vom Moment ab und über m_Rd(N_Ed) von der
- * Normalkraft. Die Kurve zeigt den ersten Zusammenhang; die zweite Grösse wird
- * festgehalten und ist unter dem Diagramm einstellbar.
+ * Die Waagrechte ist vorzeichenbehaftet: rechts das positive Moment (Zug
+ * unten), links das negative (Zug oben). Beide Äste im selben Bild, weil sie
+ * dieselbe Platte beschreiben; getrennt liessen sie sich schlecht vergleichen.
+ *
+ * Sie treffen sich bei M_Ed = 0 nicht unbedingt: jeder misst mit seiner
+ * eigenen statischen Höhe. Das ist kein Zeichenfehler, sondern die Platte.
  *
  * JENSEITS VON m_Rd:
- * Die Kurve läuft 20 kNm über den Momentenwiderstand hinaus. Dort fliesst die
- * Bewehrung, ε_v wächst sprunghaft und der Widerstand fällt -- genau das ist
- * der Grund, überhaupt so weit zu zeichnen.
+ * Jeder Ast läuft 20 kNm über seinen Momentenwiderstand hinaus. Dort fliesst
+ * die Bewehrung, ε_v springt auf einen festen Wert und der Widerstand bleibt
+ * danach konstant -- gestrichelt gezeichnet, damit der Absatz nicht wie ein
+ * Rechenfehler aussieht.
  *
  * AUSGEGRAUT:
  * Ein Bemessungspunkt gehört nur dann auf diese Kurve, wenn seine Normalkraft
@@ -667,8 +671,9 @@ export function kurveZeichnen(gesetz, { zeigeVereinfacht = true, beiUmschalten }
  * Funktion wie der Nachweis.
  */
 export function querkraftkurveZeichnen(kurve) {
-  const punkte = kurve.punkte || [];
-  if (!punkte.length) {
+  const aeste = kurve.aeste || [];
+  const faelle = kurve.faelle || [];
+  if (!aeste.length) {
     return el('div.leer', {
       text: 'Bei dieser Normalkraft besteht kein Momentenwiderstand – '
           + 'die Kurve lässt sich nicht bilden.',
@@ -676,16 +681,18 @@ export function querkraftkurveZeichnen(kurve) {
   }
 
   const passt = (fall) => Math.abs(fall.N_Ed - kurve.N_Ed) < 1e-6;
-  const faelle = kurve.faelle || [];
+  const alleP = aeste.flatMap((a) => a.punkte);
+  const alleM = [0, ...alleP.map((p) => p.M_Ed), ...faelle.map((f) => f.M_Ed)];
+  const alleV = [0, ...alleP.map((p) => p.v_Rd), ...faelle.map((f) => f.V_Ed)];
 
-  const alleM = [0, ...punkte.map((p) => p.M_Ed), ...faelle.map((f) => f.M_Ed)];
-  const alleV = [0, ...punkte.map((p) => p.v_Rd), ...faelle.map((f) => f.V_Ed)];
+  const mMin = Math.min(...alleM) * 1.04;
   const mMax = Math.max(...alleM) * 1.04;
-  const vMax = Math.max(...alleV) * 1.10;
+  const vMax = Math.max(...alleV) * 1.12;
+  const spanne = (mMax - mMin) || 1;
 
   const zeichenBreite = BREITE - RAND.links - RAND.rechts;
   const zeichenHoehe = HOEHE - RAND.oben - RAND.unten;
-  const x = (m) => RAND.links + (m / mMax) * zeichenBreite;
+  const x = (m) => RAND.links + ((m - mMin) / spanne) * zeichenBreite;
   const y = (v) => RAND.oben + (1 - v / vMax) * zeichenHoehe;
 
   const svg = svgEl('svg', {
@@ -695,9 +702,9 @@ export function querkraftkurveZeichnen(kurve) {
 
   // -- Gitter --------------------------------------------------------------
   const gitter = svgEl('g');
-  const mSchritt = schrittweite(mMax);
+  const mSchritt = schrittweite(spanne);
   const vSchritt = schrittweite(vMax);
-  for (let m = 0; m <= mMax; m += mSchritt) {
+  for (let m = Math.ceil(mMin / mSchritt) * mSchritt; m <= mMax; m += mSchritt) {
     gitter.append(svgEl('line', {
       x1: x(m), y1: RAND.oben, x2: x(m), y2: HOEHE - RAND.unten,
       stroke: '#e6e9ee', 'stroke-width': 1,
@@ -723,53 +730,64 @@ export function querkraftkurveZeichnen(kurve) {
   }
   svg.append(gitter);
 
-  // -- m_Rd als senkrechte Marke ------------------------------------------
-  if (kurve.m_Rd) {
+  // Die Nulllinie trennt Zug unten von Zug oben und gehört betont.
+  svg.append(svgEl('line', {
+    x1: x(0), y1: RAND.oben, x2: x(0), y2: HOEHE - RAND.unten,
+    stroke: '#b8c0cc', 'stroke-width': 1.5,
+  }));
+  for (const [m, text] of [[mMin, 'Zug oben'], [mMax, 'Zug unten']]) {
+    const t = svgEl('text', {
+      x: x(m / 2), y: HOEHE - RAND.unten - 7, 'text-anchor': 'middle',
+      'font-size': 11, fill: '#8895a8',
+    });
+    t.textContent = text;
+    svg.append(t);
+  }
+
+  // -- Die Äste ------------------------------------------------------------
+  for (const ast of aeste) {
     svg.append(svgEl('line', {
-      x1: x(kurve.m_Rd), y1: RAND.oben, x2: x(kurve.m_Rd), y2: HOEHE - RAND.unten,
+      x1: x(ast.m_Rd), y1: RAND.oben, x2: x(ast.m_Rd), y2: HOEHE - RAND.unten,
       stroke: '#1f5fa8', 'stroke-width': 1.4, 'stroke-dasharray': '4 4', opacity: .7,
     }));
     const marke = svgEl('text', {
-      x: x(kurve.m_Rd) - 6, y: RAND.oben + 13, 'text-anchor': 'end',
+      x: x(ast.m_Rd) + (ast.moment_positiv ? -6 : 6), y: RAND.oben + 13,
+      'text-anchor': ast.moment_positiv ? 'end' : 'start',
       'font-size': 11, 'font-weight': 600, fill: '#1f5fa8',
     });
-    marke.textContent = `m_Rd = ${kurve.m_Rd.toFixed(1)}`;
+    marke.textContent = `m_Rd = ${ast.m_Rd.toFixed(1)}`;
     svg.append(marke);
+
+    // Zwei Züge: bis m_Rd durchgezogen, darüber gestrichelt.
+    for (const gestrichelt of [false, true]) {
+      const teil = ast.punkte.filter((p) => p.plastisch === gestrichelt);
+      if (teil.length < 2) continue;
+      svg.append(svgEl('polyline', {
+        points: teil.map((p) => `${x(p.M_Ed).toFixed(2)},${y(p.v_Rd).toFixed(2)}`).join(' '),
+        fill: 'none', stroke: '#1f5fa8', 'stroke-width': 2.2,
+        'stroke-linejoin': 'round', 'stroke-dasharray': gestrichelt ? '7 4' : null,
+      }));
+    }
   }
 
-  // -- Die Kurve -----------------------------------------------------------
-  // Zwei Züge: bis m_Rd durchgezogen, darüber -- wo die Bewehrung fliesst --
-  // gestrichelt. Der Sprung dazwischen ist die Aussage des Diagramms.
-  const zug = (auswahl, gestrichelt) => {
-    const teil = punkte.filter(auswahl);
-    if (teil.length < 2) return;
-    svg.append(svgEl('polyline', {
-      points: teil.map((p) => `${x(p.M_Ed).toFixed(2)},${y(p.v_Rd).toFixed(2)}`).join(' '),
-      fill: 'none', stroke: '#1f5fa8', 'stroke-width': 2.2,
-      'stroke-linejoin': 'round', 'stroke-dasharray': gestrichelt ? '7 4' : null,
-    }));
-  };
-  zug((p) => !p.plastisch, false);
-  zug((p) => p.plastisch, true);
-
-  // -- Die drei Marken -----------------------------------------------------
-  // Der Höchstwert (Moment null), der letzte Wert vor dem Fliessen und die
-  // Waagrechte danach. Die beiden letzten stehen beieinander und benennen den
-  // Sprung, um den es hier geht.
-  const elastisch = punkte.filter((p) => !p.plastisch);
-  const plastisch = punkte.filter((p) => p.plastisch);
-  const marken = [
-    [punkte.reduce((a, b) => (b.v_Rd > a.v_Rd ? b : a)), 'max v_Rd', true],
-    [elastisch.at(-1), 'v_Rd bei M_Ed = m_Rd', true],
-    [plastisch[0], 'v_Rd nach Fliessbeginn', false],
-  ];
+  // -- Marken --------------------------------------------------------------
+  // Je Ast der Wert genau bei m_Rd und die Waagrechte danach, dazu einmal der
+  // Höchstwert. Mehr Zahlen im Bild helfen niemandem.
+  const marken = [];
+  const hoechst = alleP.reduce((a, b) => (b.v_Rd > a.v_Rd ? b : a));
+  marken.push([hoechst, 'max v_Rd', true]);
+  for (const ast of aeste) {
+    const elastisch = ast.punkte.filter((p) => !p.plastisch);
+    const plastisch = ast.punkte.filter((p) => p.plastisch);
+    if (elastisch.length) marken.push([elastisch.at(-1), 'v_Rd bei m_Rd', true]);
+    if (plastisch.length) marken.push([plastisch[0], 'v_Rd nach Fliessbeginn', false]);
+  }
   for (const [p, name, oben] of marken) {
-    if (!p) continue;
     svg.append(svgEl('circle', {
       cx: x(p.M_Ed), cy: y(p.v_Rd), r: 4,
       fill: '#fff', stroke: '#1f5fa8', 'stroke-width': 2,
     }));
-    const rechts = x(p.M_Ed) > BREITE * 0.62;
+    const rechts = x(p.M_Ed) > RAND.links + zeichenBreite * 0.62;
     const t = svgEl('text', {
       x: x(p.M_Ed) + (rechts ? -8 : 8),
       y: y(p.v_Rd) + (oben ? -9 : 17),
@@ -803,9 +821,10 @@ export function querkraftkurveZeichnen(kurve) {
     });
     const titel = svgEl('title');
     titel.textContent =
-      `${f.name}\nM_Ed = ${f.M_Ed.toFixed(1)} kNm, V_Ed = ${f.V_Ed.toFixed(1)} kN/m`
+      `${f.name}\nM_Ed = ${f.M_Ed.toFixed(1)} kNm, |V_Ed| = ${f.V_Ed.toFixed(1)} kN/m`
       + `\nN_Ed = ${f.N_Ed.toFixed(1)} kN, v_Rd = ${f.v_Rd.toFixed(1)} kN/m`
       + `\n${f.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`
+      + (f.begruendung ? `\n${f.begruendung}` : '')
       + (gilt ? '' : `\nGilt für N_Ed = ${f.N_Ed.toFixed(1)} kN, `
                    + `gezeigt ist ${kurve.N_Ed.toFixed(1)} kN.`);
     punkt.append(titel);
@@ -824,7 +843,7 @@ export function querkraftkurveZeichnen(kurve) {
     x: RAND.links + zeichenBreite / 2, y: HOEHE - 8,
     'text-anchor': 'middle', 'font-size': 12, fill: '#1a1f27', 'font-weight': 600,
   });
-  xTitel.textContent = 'M_Ed [kNm]   (Betrag)';
+  xTitel.textContent = 'M_Ed [kNm]';
   svg.append(xTitel);
 
   const yTitel = svgEl('text', {

@@ -411,8 +411,7 @@ function querkraftkurven(loesung, querschnitt) {
 
   return alle.flatMap(([kennung, kurve]) => [
     el('div.b-titel', {
-      text: `Querkraft über Moment – ${kurve.name}, ${kurve.richtung}-Richtung, `
-          + `Zug ${kurve.zugseite}`,
+      text: `Querkraft über Moment – ${kurve.name}, ${kurve.richtung}-Richtung`,
     }),
     querkraftkurveZeichnen(kurve),
     el('div.kurvenfuss', {}, [

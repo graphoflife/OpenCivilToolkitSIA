@@ -777,3 +777,48 @@ class TestHandrechnungSymbole(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestOhneZugbewehrung(unittest.TestCase):
+    """
+    Ein Widerstand darf nicht aus dem Nichts entstehen.
+
+    Ohne Bewehrung auf der gezogenen Seite gab es trotzdem einen Eckpunkt
+    x = h/2: der Betondruckblock stand allein da und schob dem Polygon ein
+    Moment unter. Eine Platte nur mit unterer Bewehrung wies so ein negatives
+    Moment von 220 kNm nach.
+    """
+
+    def nur_unten(self):
+        return platte([
+            lage(1, Richtung.X, phi=18.0),
+            lage(2, Richtung.Y), lage(3, Richtung.Y), lage(4, Richtung.X),
+        ])
+
+    def linie(self, qs):
+        werk = Rechenwerk()
+        qs.ins_rechenwerk(werk)
+        nachweis = BiegungNormalkraft(
+            qs, [Schnittgroessen("Feld", M_Ed=Groesse(100, KNM))], Richtung.X)
+        werk.registriere(nachweis)
+        werk.loese(nachweis.d_ausnutzung["Feld"].id)
+        return nachweis
+
+    def test_kein_eckpunkt_ohne_zugbewehrung(self):
+        nachweis = self.linie(self.nur_unten())
+        namen = [q.name for q in nachweis.handlinie]
+        self.assertIn("x = h/2 +", namen)       # unten ist bewehrt
+        self.assertNotIn("x = h/2 -", namen)    # oben nicht
+
+    def test_kein_negatives_moment_ohne_obere_bewehrung(self):
+        nachweis = self.linie(self.nur_unten())
+        self.assertAlmostEqual(min(q.M for q in nachweis.handlinie), 0.0, places=6)
+
+    def test_mit_oberer_bewehrung_gibt_es_den_eckpunkt(self):
+        beidseitig = platte([
+            lage(1, Richtung.X, phi=18.0),
+            lage(2, Richtung.Y), lage(3, Richtung.Y),
+            lage(4, Richtung.X, phi=12.0),
+        ])
+        namen = [q.name for q in self.linie(beidseitig).handlinie]
+        self.assertIn("x = h/2 -", namen)

@@ -266,69 +266,73 @@ def querkraftkurven(
     aufbau: Aufbau, gewaehlt: Optional[Mapping[str, float]] = None
 ) -> dict:
     """
-    Der Querkraftwiderstand ueber dem Moment -- je Tragrichtung und Vorzeichen.
+    Der Querkraftwiderstand ueber dem Moment -- eine Kurve je Tragrichtung.
 
-    Bis zu vier Kurven je Platte: x und y, jeweils fuer positives und negatives
-    Moment. Es gibt sie nur, wo auch ein Querkraftnachweis gefuehrt wurde;
-    eine Kurve fuer einen Fall, den niemand nachgewiesen haben wollte, waere
-    eine Aussage ohne Anlass.
+    Hoechstens zwei je Platte, x und y, und nur wo ein Querkraftnachweis
+    gefuehrt wurde. Die Waagrechte ist vorzeichenbehaftet: rechts das positive
+    Moment (Zug unten), links das negative (Zug oben). Beide Aeste im selben
+    Bild, weil sie dieselbe Platte beschreiben.
+
+    Einen Ast gibt es nur, wo auf der gezogenen Seite Bewehrung liegt. Fehlt
+    sie, gibt es kein ``d`` -- und ohne ``d`` keinen Widerstand.
 
     ``v_Rd`` haengt ueber ``m_Rd(N_Ed)`` von der Normalkraft ab. Welche gilt,
     waehlt der Benutzer unter dem Diagramm; ``gewaehlt`` bildet die Kennung auf
-    diese Normalkraft in kN ab. Ohne Angabe gilt die des ersten Falls -- dann
-    liegen dessen Punkte auf der Kurve.
+    diese Normalkraft in kN ab. Ohne Angabe gilt die des ersten Falls dieser
+    Richtung -- dann liegen dessen Punkte auf der Kurve.
 
     Einheiten wie in den anderen Diagrammen: kNm und kN/m.
     """
     gewaehlt = gewaehlt or {}
     kurven: Dict[str, Any] = {}
 
-    for schluessel, nachweis in aufbau.querkraft.items():
-        querschnitt_kennung = schluessel.split(".", 1)[0]
+    for kennung, nachweis in aufbau.querkraft.items():
+        if not nachweis.ergebnisse:
+            continue
+        querschnitt_kennung = kennung.split(".", 1)[0]
         querschnitt = aufbau.querschnitte.get(querschnitt_kennung)
-        for positiv in nachweis.momentenrichtungen:
-            kennung = f"{schluessel}.{'pos' if positiv else 'neg'}"
-            faelle = [erg for erg in nachweis.ergebnisse
-                      if (erg.fall.M_Ed.si >= 0) is positiv]
-            if not faelle:
-                continue
 
-            n_ed = gewaehlt.get(kennung)
-            if n_ed is None:
-                n_ed = faelle[0].fall.N_Ed.in_einheit(KN)
-            kurve = nachweis.kurve(n_ed * 1e3, positiv)
+        n_ed = gewaehlt.get(kennung)
+        if n_ed is None:
+            n_ed = nachweis.ergebnisse[0].fall.N_Ed.in_einheit(KN)
+        kurve = nachweis.kurve(n_ed * 1e3)
 
-            kurven[kennung] = {
-                "querschnitt": querschnitt_kennung,
-                "namensraum": querschnitt.id if querschnitt else "",
-                "name": querschnitt.name if querschnitt else querschnitt_kennung,
-                "richtung": nachweis.richtung.value,
-                "moment_positiv": positiv,
-                "zugseite": "unten" if positiv else "oben",
-                "N_Ed": n_ed,
-                "m_Rd": (kurve["m_Rd"] / 1e3) if kurve else None,
-                "d": (kurve["d"] * 1e3) if kurve else None,
-                "punkte": [
-                    {"M_Ed": M / 1e3, "v_Rd": v / 1e3, "plastisch": pl}
-                    for M, v, pl in (kurve["punkte"] if kurve else [])
-                ],
-                # Moment und Querkraft als Betrag: die Kurve laeuft ueber
-                # |m_Ed|, und das Vorzeichen von V_Ed spielt keine Rolle --
-                # gerechnet wird ohnehin mit |V_Ed|. Signiert eingetragen laege
-                # ein negatives V_Ed unter der Achse.
-                "faelle": [
-                    {
-                        "name": erg.fall.name,
-                        "M_Ed": abs(erg.fall.M_Ed.in_einheit(KNM)),
-                        "N_Ed": erg.fall.N_Ed.in_einheit(KN),
-                        "V_Ed": abs(erg.fall.V_Ed.in_einheit(KN_PRO_M)),
-                        "v_Rd": erg.v_Rd / 1e3,
-                        "erfuellt": erg.erfuellt,
-                        "plastisch": erg.plastisch,
-                    }
-                    for erg in faelle
-                ],
-            }
+        kurven[kennung] = {
+            "querschnitt": querschnitt_kennung,
+            "namensraum": querschnitt.id if querschnitt else "",
+            "name": querschnitt.name if querschnitt else querschnitt_kennung,
+            "richtung": nachweis.richtung.value,
+            "N_Ed": n_ed,
+            "aeste": [
+                {
+                    "moment_positiv": ast["moment_positiv"],
+                    "zugseite": "unten" if ast["moment_positiv"] else "oben",
+                    "m_Rd": ast["m_Rd"] / 1e3,
+                    "d": ast["d"] * 1e3,
+                    "punkte": [
+                        {"M_Ed": M / 1e3, "v_Rd": v / 1e3, "plastisch": pl}
+                        for M, v, pl in ast["punkte"]
+                    ],
+                }
+                for ast in kurve["aeste"]
+            ],
+            # Moment vorzeichenbehaftet -- der Fall gehoert auf die Seite, auf
+            # der er wirkt. Die Querkraft dagegen als Betrag: ihr Vorzeichen
+            # spielt keine Rolle, gerechnet wird ohnehin mit |V_Ed|.
+            "faelle": [
+                {
+                    "name": erg.fall.name,
+                    "M_Ed": erg.fall.M_Ed.in_einheit(KNM),
+                    "N_Ed": erg.fall.N_Ed.in_einheit(KN),
+                    "V_Ed": abs(erg.fall.V_Ed.in_einheit(KN_PRO_M)),
+                    "v_Rd": erg.v_Rd / 1e3,
+                    "erfuellt": erg.erfuellt,
+                    "plastisch": erg.plastisch,
+                    "begruendung": erg.begruendung,
+                }
+                for erg in nachweis.ergebnisse
+            ],
+        }
     return kurven
 
 

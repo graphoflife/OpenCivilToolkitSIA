@@ -26,9 +26,11 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
 
 ## Erledigt zuletzt
 
-M-V-Kurve je Tragrichtung und Momentenvorzeichen, mit einstellbarer
-Normalkraft und drei Marken: Höchstwert, Wert bei M_Ed = m_Rd und die
-waagrechte Fortsetzung nach Fliessbeginn · Eingaben werden geprüft: eine eingegebene Null wurde stillschweigend durch die
+Ein Widerstand aus dem Nichts: ohne obere Bewehrung wies das Polygon ein
+negatives Moment von 220 kNm nach, und der Querkraftnachweis rechnete mit einer
+statischen Höhe von 39 mm · M-V-Kurve je Tragrichtung, beide Momentenvorzeichen
+in einem Bild, mit einstellbarer Normalkraft und drei Marken · Eingaben werden
+geprüft: eine eingegebene Null wurde stillschweigend durch die
 Vorgabe ersetzt (`h = 0` rechnete mit 300 mm und meldete «alle Nachweise
 erfüllt»), unmögliche Abmessungen liefen durch, und `γ_c = 0` kam als
 `ZeroDivisionError` beim Benutzer an · Überschriften der Herleitung: fett mit blauem Akzent nur noch dort, wo ein
