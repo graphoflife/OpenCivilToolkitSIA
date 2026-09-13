@@ -43,6 +43,39 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-12 · Durchsicht nach der M-V-Kurve
+
+Ein Durchgang über alles, was seit der letzten Durchsicht dazugekommen ist.
+
+### Ein roher Fehler kam wieder durch
+
+Die neue Anfrage `querkraftkurven` nahm ihre Normalkraft mit `float(v)` entgegen
+— und ein Wort statt einer Zahl endete als `ValueError` mit Status 500 beim
+Benutzer. Dieselbe Klasse, die beim letzten Mal in `_zahl()` behoben wurde; der
+neue Weg ging daran vorbei.
+
+Bemerkenswert daran: die Anfrage stammt aus der eigenen Oberfläche, wo nur
+Zahlenfelder hineinschreiben. Das ist trotzdem keine Zusicherung — sie steht
+offen im Netz. Jetzt Status 400 mit Kennung und Wert im Satz.
+
+### Der Schalter günstig/ungünstig
+
+Stand unter den beiden Postenzeilen, gehört aber in den Lagenkopf: die Lage der
+Stäbe zueinander ist Geometrie der Lage, nicht Eigenschaft des Werkstoffs.
+Jetzt links vom Stahlfeld, dort wo er gesucht wird.
+
+### Was geprüft wurde und hielt
+
+Acht Randfälle der neuen Anfrage; das Polygon in vier Bewehrungsanordnungen —
+keine Selbstkreuzung, die Handlinie bleibt überall auf der sicheren Seite der
+präzisen; der Bericht (52 646 Zeichen LaTeX, keine übrigen `@`-Platzhalter,
+keine doppelten Minus); die Rückverfolgung eines Querkraftziels über 39
+Berechnungen; alle vier Reiter; der Umfangsschalter mit Materialauswahl; der
+Berichtsdialog; Speichern samt dem Punkt am Knopf. Keine Konsolenfehler, keine
+KaTeX-Fehlschläge, keine sich überdeckenden Marken im neuen Diagramm.
+
+---
+
 ## 2026-09-12 · Das Polygon kreuzte sich selbst
 
 Der Eckpunkt `x = h/2` liegt gewöhnlich im Druck. Bei einer dünnen, stark

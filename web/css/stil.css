@@ -648,8 +648,9 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 /* Eigene Farbe, damit der Schalter nicht mit x|y verwechselt wird: dort geht
    es um die Tragrichtung, hier um die Höhenlage innerhalb einer Lage. */
 
-.lagegunst { display: flex; justify-content: flex-end; margin-top: 3px; }
-.schalter-gunst { border-color: #c9a227; }
+/* Steht im Lagenkopf, links vom Stahl: die Lage der Stäbe zueinander gehört
+   zur Geometrie der Lage, nicht zum Werkstoff. */
+.schalter-gunst { border-color: #c9a227; flex: none; }
 .schalter-gunst .schalter-halb { text-transform: none; letter-spacing: 0; }
 .schalter-gunst .schalter-halb.ist-an { background: #c9a227; color: #fff; }
 .lage-y .schalter-gunst .schalter-halb.ist-an { background: #c9a227; }

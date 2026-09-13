@@ -430,6 +430,45 @@ class TestDienst(unittest.TestCase):
         self.assertEqual(antwort.status, 400)
         self.assertIn("gibt.es.nicht", antwort.daten["fehler"])
 
+    def mit_querkraft(self):
+        projekt = Projekt.beispiel()
+        for k in projekt.querschnitt("q1").kombinationen:
+            k.V_Ed = 120.0
+        return {"projekt": projekt.als_dict()}
+
+    def test_querkraftkurven_ohne_angabe(self):
+        """Ohne gewählte Normalkraft gilt die des ersten Falls der Richtung."""
+        antwort = dienst.bearbeite("querkraftkurven", self.mit_querkraft())
+        kurven = antwort.daten["querkraftkurven"]
+        self.assertEqual(sorted(kurven), ["q1.x", "q1.y"])
+        self.assertEqual(kurven["q1.x"]["N_Ed"], 0.0)
+        self.assertEqual(len(kurven["q1.x"]["aeste"]), 2)
+
+    def test_querkraftkurven_mit_gewaehlter_normalkraft(self):
+        rumpf = {**self.mit_querkraft(), "n_ed": {"q1.x": -300.0}}
+        kurven = dienst.bearbeite("querkraftkurven", rumpf).daten["querkraftkurven"]
+        self.assertEqual(kurven["q1.x"]["N_Ed"], -300.0)
+        self.assertEqual(kurven["q1.y"]["N_Ed"], 0.0)   # unberührt
+
+    def test_eine_normalkraft_die_keine_zahl_ist(self):
+        """
+        Kam als roher ValueError mit Status 500 beim Benutzer an. Die Anfrage
+        stammt zwar aus der eigenen Oberfläche, aber das ist keine
+        Zusicherung -- sie steht offen im Netz.
+        """
+        rumpf = {**self.mit_querkraft(), "n_ed": {"q1.x": "viel"}}
+        antwort = dienst.bearbeite("querkraftkurven", rumpf)
+        self.assertEqual(antwort.status, 400)
+        self.assertIn("q1.x", antwort.daten["fehler"])
+        self.assertIn("viel", antwort.daten["fehler"])
+
+    def test_leere_normalkraft_faellt_auf_die_vorgabe_zurueck(self):
+        for wert in (None, ""):
+            rumpf = {**self.mit_querkraft(), "n_ed": {"q1.x": wert}}
+            antwort = dienst.bearbeite("querkraftkurven", rumpf)
+            self.assertEqual(antwort.status, 200)
+            self.assertEqual(antwort.daten["querkraftkurven"]["q1.x"]["N_Ed"], 0.0)
+
     def test_unbekannte_anfrage(self):
         antwort = dienst.bearbeite("gibtesnicht", {})
         self.assertEqual(antwort.status, 404)

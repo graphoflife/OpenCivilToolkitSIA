@@ -312,6 +312,9 @@ function lagenBlock(querschnitt, nummer) {
           title: `Gegenrichtung zur ${partner}. Lage – dort einstellbar`,
         }),
       el('span', { style: { marginLeft: 'auto' } }),
+      // Links vom Stahl: die Lage der Stäbe zueinander gehört zur Geometrie
+      // der Lage, nicht zum Werkstoff.
+      lageSchalter(querschnitt, nummer, lage),
       el('select', {
         style: { width: 'auto', padding: '1px 6px', fontSize: '11px' },
         title: 'Betonstahl dieser Lage',
@@ -327,7 +330,6 @@ function lagenBlock(querschnitt, nummer) {
     ]),
     postenZeile(querschnitt, nummer, 'grund', 'Grund'),
     postenZeile(querschnitt, nummer, 'zulage', 'Zulage'),
-    lageSchalter(querschnitt, nummer, lage),
   ]);
 }
 
@@ -347,25 +349,23 @@ function lageSchalter(querschnitt, nummer, lage) {
   const ist = lage.unguenstig !== false;
   const untere = nummer <= 2;
 
-  return el('div.lagegunst', {}, [
-    el('span.schalter.schalter-gunst', {
-      title: untere
-        ? 'Ungünstig: gleiche Oberkante, der dünnere Stab rückt nach oben. '
-          + 'Günstig: gleiche Unterkante, jeder um seinen Halbmesser eingerückt.'
-        : 'Ungünstig: gleiche Unterkante, der dünnere Stab rückt nach unten. '
-          + 'Günstig: gleiche Oberkante, jeder um seinen Halbmesser eingerückt.',
-    }, [
-      el('button.schalter-halb', {
-        text: 'ungünstig',
-        class: ist ? 'ist-an' : '',
-        on: { click: () => { if (!ist) setzen(true); } },
-      }),
-      el('button.schalter-halb', {
-        text: 'günstig',
-        class: ist ? '' : 'ist-an',
-        on: { click: () => { if (ist) setzen(false); } },
-      }),
-    ]),
+  return el('span.schalter.schalter-gunst', {
+    title: untere
+      ? 'Ungünstig: gleiche Oberkante, der dünnere Stab rückt nach oben. '
+        + 'Günstig: gleiche Unterkante, jeder um seinen Halbmesser eingerückt.'
+      : 'Ungünstig: gleiche Unterkante, der dünnere Stab rückt nach unten. '
+        + 'Günstig: gleiche Oberkante, jeder um seinen Halbmesser eingerückt.',
+  }, [
+    el('button.schalter-halb', {
+      text: 'ungünstig',
+      class: ist ? 'ist-an' : '',
+      on: { click: () => { if (!ist) setzen(true); } },
+    }),
+    el('button.schalter-halb', {
+      text: 'günstig',
+      class: ist ? '' : 'ist-an',
+      on: { click: () => { if (ist) setzen(false); } },
+    }),
   ]);
 }
 

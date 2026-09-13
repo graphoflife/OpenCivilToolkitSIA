@@ -182,10 +182,21 @@ def querkraftkurven(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
     aufbau = _projekt(rumpf).aufbauen()
     aufbau.werk.loese(*aufbau.alle_nachweisziele())
-    gewaehlt = {
-        str(k): float(v) for k, v in (rumpf.get("n_ed") or {}).items()
-        if v is not None
-    }
+
+    gewaehlt = {}
+    for kennung, wert in (rumpf.get("n_ed") or {}).items():
+        if wert is None or wert == "":
+            continue
+        try:
+            gewaehlt[str(kennung)] = float(wert)
+        except (TypeError, ValueError):
+            # Nicht durchreichen: ein roher ValueError kaeme als Absturz beim
+            # Benutzer an. Die Anfrage kommt zwar aus der eigenen Oberflaeche,
+            # aber das ist keine Zusicherung -- sie steht offen im Netz.
+            raise DienstFehler(
+                400, f"Die Normalkraft der Kurve '{kennung}' ist keine Zahl, "
+                     f"sondern {wert!r}.")
+
     return {"querkraftkurven": api.querkraftkurven(aufbau, gewaehlt)}
 
 
