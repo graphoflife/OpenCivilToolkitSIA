@@ -822,3 +822,81 @@ class TestOhneZugbewehrung(unittest.TestCase):
         ])
         namen = [q.name for q in self.linie(beidseitig).handlinie]
         self.assertIn("x = h/2 -", namen)
+
+
+class TestPolygonreihenfolge(unittest.TestCase):
+    """
+    Das Polygon darf sich nicht selbst kreuzen.
+
+    Welcher der beiden Punkte einer Seite oben liegt, steht nicht fest: der
+    Punkt x = h/2 liegt gewöhnlich im Druck, bei einer dünnen, stark bewehrten
+    Platte aber im Zug. Fest verdrahtet kreuzte sich das Polygon dort -- und
+    ein sich kreuzendes Polygon ist keine Resistenzlinie mehr.
+    """
+
+    def duenn_und_stark_bewehrt(self):
+        """
+        h = 150 mm, ⌀20@100 beidseitig, Überdeckung 15 mm.
+
+        A_s·f_yd = 3142·435 = 1367 kN übersteigt die Blockdruckkraft
+        0.85·1000·20·75 = 1275 kN -- N bei x = h/2 wird damit positiv.
+        """
+        return platte([
+            lage(1, Richtung.X, phi=20.0, s=100.0),
+            lage(2, Richtung.Y), lage(3, Richtung.Y),
+            lage(4, Richtung.X, phi=20.0, s=100.0),
+        ], h=Groesse(150, MM),
+           ueberdeckung_unten=Groesse(15, MM), ueberdeckung_oben=Groesse(15, MM))
+
+    def linie(self):
+        qs = self.duenn_und_stark_bewehrt()
+        werk = Rechenwerk()
+        qs.ins_rechenwerk(werk)
+        nachweis = BiegungNormalkraft(
+            qs, [Schnittgroessen("Feld", M_Ed=Groesse(50, KNM))], Richtung.X)
+        werk.registriere(nachweis)
+        werk.loese(nachweis.d_ausnutzung["Feld"].id)
+        return nachweis.handlinie
+
+    def test_der_fall_tritt_ueberhaupt_ein(self):
+        """Ohne eine Zugkraft bei x = h/2 prüfte der Test nichts."""
+        punkt = next(q for q in self.linie() if q.name == "x = h/2 +")
+        self.assertGreater(punkt.N, 0.0)
+
+    def test_x_halbe_hoehe_steht_hinter_dem_punkt_bei_n_null(self):
+        namen = [q.name for q in self.linie()]
+        self.assertLess(namen.index("M_Rd(N_Ed=0) +"), namen.index("x = h/2 +"))
+        # Auf dem Rückweg umgekehrt.
+        self.assertLess(namen.index("x = h/2 -"), namen.index("M_Rd(N_Ed=0) -"))
+
+    def test_die_normalkraft_steigt_und_faellt_je_einmal(self):
+        """
+        Ein einfaches Polygon dieser Form ist in N monoton: hinauf zur
+        Zugspitze, wieder hinunter zum Druck. Mehr als ein Wechsel hiesse,
+        dass sich die Linie kreuzt.
+        """
+        werte = [q.N for q in self.linie()]
+        richtungen = [b > a for a, b in zip(werte, werte[1:] + werte[:1])]
+        wechsel = sum(1 for a, b in zip(richtungen, richtungen[1:] + richtungen[:1])
+                      if a != b)
+        self.assertEqual(wechsel, 2)
+
+    def test_das_polygon_kreuzt_sich_nicht(self):
+        punkte = [(q.M, q.N) for q in self.linie()]
+        anzahl = len(punkte)
+
+        def richtung(p, q, r):
+            return (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1])
+
+        def kreuzt(a, b, c, d):
+            return ((richtung(a, b, c) > 0) != (richtung(a, b, d) > 0)
+                    and (richtung(c, d, a) > 0) != (richtung(c, d, b) > 0))
+
+        for i in range(anzahl):
+            for j in range(i + 2, anzahl):
+                if i == 0 and j == anzahl - 1:
+                    continue                      # gemeinsamer Ringschluss
+                a, b = punkte[i], punkte[(i + 1) % anzahl]
+                c, d = punkte[j], punkte[(j + 1) % anzahl]
+                self.assertFalse(kreuzt(a, b, c, d),
+                                 f"Kanten {i} und {j} kreuzen sich")

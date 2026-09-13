@@ -26,7 +26,7 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
 
 ## Erledigt zuletzt
 
-Ein Widerstand aus dem Nichts: ohne obere Bewehrung wies das Polygon ein
+Das Handpolygon kreuzte sich selbst, sobald der Eckpunkt x = h/2 im Zug lag (dünne, stark bewehrte Platte) — die Eckpunkte werden jetzt je Seite nach der Normalkraft geordnet · Ein Widerstand aus dem Nichts: ohne obere Bewehrung wies das Polygon ein
 negatives Moment von 220 kNm nach, und der Querkraftnachweis rechnete mit einer
 statischen Höhe von 39 mm · M-V-Kurve je Tragrichtung, beide Momentenvorzeichen
 in einem Bild, mit einstellbarer Normalkraft und drei Marken · Eingaben werden

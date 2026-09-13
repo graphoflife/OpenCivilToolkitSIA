@@ -194,10 +194,25 @@ class Handrechnung:
         rechts = self._seite(p, positiv=True)
         links = self._seite(p, positiv=False)
 
+        # Innerhalb einer Seite nach der Normalkraft geordnet -- hinauf zum Zug,
+        # wieder hinunter zum Druck.
+        #
+        # Welcher der beiden Punkte oben liegt, steht nicht von vornherein fest.
+        # Der Punkt x = h/2 liegt gewoehnlich im Druck, bei einer duennen, stark
+        # bewehrten Platte aber im Zug: sobald A_s*f_yd die Blockdruckkraft
+        # uebersteigt, wird sein N positiv und er gehoert *hinter* M_Rd(N_Ed=0).
+        # Fest verdrahtet kreuzte sich das Polygon dort selbst -- und ein sich
+        # kreuzendes Polygon ist keine Resistenzlinie mehr: weder der
+        # Punkt-in-Flaeche-Test noch die Schnittsuche liefern dann etwas
+        # Brauchbares, und beide tragen jedes Urteil dieses Nachweises.
+        #
+        # Sortieren statt den Punkt zu verwerfen: er ist ein gerechneter
+        # Widerstand, und wegzulassen hiesse, Tragfaehigkeit zu verschenken.
         punkte.append(druck)
-        punkte.extend(reversed([q for q in rechts if q.gueltig]))
+        punkte.extend(sorted((q for q in rechts if q.gueltig), key=lambda q: q.N))
         punkte.append(zug)
-        punkte.extend([q for q in links if q.gueltig])
+        punkte.extend(sorted((q for q in links if q.gueltig),
+                             key=lambda q: q.N, reverse=True))
 
         self._uebersicht(p, punkte)
         return punkte

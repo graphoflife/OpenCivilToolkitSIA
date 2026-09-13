@@ -43,6 +43,34 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-12 · Das Polygon kreuzte sich selbst
+
+Der Eckpunkt `x = h/2` liegt gewöhnlich im Druck. Bei einer dünnen, stark
+bewehrten Platte aber nicht: sobald `A_s·f_yd` die Blockdruckkraft
+`0.85·b·f_cd·h/2` übersteigt, wird sein `N` positiv.
+
+Die Reihenfolge der Eckpunkte war fest verdrahtet — erst `x = h/2`, dann
+`M_Rd(N_Ed=0)`. Rutscht der erste in den Zug, läuft die Linie hinauf, wieder
+hinunter und erneut hinauf: sie kreuzt sich selbst.
+
+**Und dann ist sie keine Resistenzlinie mehr.** Weder der Punkt-in-Fläche-Test
+noch die Schnittsuche liefern auf einem sich kreuzenden Polygon etwas
+Brauchbares — und beide tragen jedes Urteil dieses Nachweises.
+
+Jetzt wird jede Seite nach der Normalkraft geordnet: hinauf zur Zugspitze,
+wieder hinunter zum Druck. Damit stimmt die Reihenfolge in beiden Fällen, ohne
+Sonderbehandlung.
+
+Nachgestellt an h = 150 mm mit ⌀20@100 beidseitig: `A_s·f_yd = 1367 kN` gegen
+`1275 kN` Blockdruck, also `N = +90.9 kN` bei `x = h/2`. Vorher sechs
+Richtungswechsel in N — jetzt zwei, wie es sein muss.
+
+Den Punkt wegzulassen wäre die andere Möglichkeit gewesen. Ordnen ist besser:
+er ist ein gerechneter Widerstand, und ihn zu streichen hiesse, Tragfähigkeit
+zu verschenken.
+
+---
+
 ## 2026-09-12 · Ein Widerstand aus dem Nichts
 
 Gemeldet: eine Platte nur mit unterer Bewehrung weist trotzdem ein negatives
