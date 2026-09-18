@@ -38,7 +38,8 @@ from opencivil.nachweis.biegung_normalkraft import (
 )
 from opencivil.nachweis.duktilitaet import Duktilitaet
 from opencivil.nachweis.fehlende_bewehrung import Ausgefallen, FehlendeBewehrung
-from opencivil.nachweis.mindestbewehrung import Rissmoment, Rissnormalkraft
+from opencivil.nachweis.mindestbewehrung import Rissnormalkraft, ZwaengungBiegung
+from opencivil.nachweis.sproedes_versagen import SproedesVersagen
 from opencivil.nachweis.querkraft import Querkraft, Querkraftfall
 from opencivil.querschnitt.platte import (
     ALPHA_MAX, ALPHA_MIN, K_C, KRIECHZAHL, LAGENZAHL, Bewehrungslage,
@@ -150,6 +151,20 @@ def _rissanforderung_aus(wert: Any) -> str:
             f"Unbekannte Rissanforderung '{text}'. Möglich sind: "
             f"{', '.join(RISSANFORDERUNGEN)}.")
     return text
+
+
+#: Fuer welche Lagen sproedes Versagen und Zwaengung auf Biegung vorgegeben
+#: sind -- nur die 1. Lage. Die uebrigen schaltet ein, wer sie braucht.
+LAGENWAHL_VORGABE = (True, False, False, False)
+
+
+def _lagenwahl_aus(wert: Any) -> List[bool]:
+    """Genau vier Schalter, mit :data:`LAGENWAHL_VORGABE` als Rueckfall."""
+    if not isinstance(wert, (list, tuple)):
+        return list(LAGENWAHL_VORGABE)
+    schalter = [bool(x) for x in wert[:LAGENZAHL]]
+    schalter += list(LAGENWAHL_VORGABE[len(schalter):])
+    return schalter
 
 
 def _duktilitaet_aus(wert: Any) -> List[bool]:
@@ -592,6 +607,14 @@ class QuerschnittEintrag:
     werden -- mit :data:`HAEUFIG_ANTEIL`. Der uebliche Fall, darum die Vorgabe.
     """
 
+    sproede_lagen: List[bool] = field(
+        default_factory=lambda: list(LAGENWAHL_VORGABE))
+    """Je Lage, ob der Nachweis gegen sproedes Versagen gefuehrt wird."""
+
+    zwaengung_biegung_lagen: List[bool] = field(
+        default_factory=lambda: list(LAGENWAHL_VORGABE))
+    """Je Lage, ob die Zwaengung auf Biegung nachgewiesen wird."""
+
     duktilitaet: List[bool] = field(
         default_factory=lambda: list(DUKTILITAET_VORGABE))
     """
@@ -618,6 +641,8 @@ class QuerschnittEintrag:
             self.lagen.append(LageEintrag())
         del self.lagen[LAGENZAHL:]
         self.duktilitaet = _duktilitaet_aus(self.duktilitaet)
+        self.sproede_lagen = _lagenwahl_aus(self.sproede_lagen)
+        self.zwaengung_biegung_lagen = _lagenwahl_aus(self.zwaengung_biegung_lagen)
 
     def richtung_von(self, nummer: int) -> Richtung:
         """Richtung der Lage 1..4 -- die Paare (1,2) und (3,4) sind gekoppelt."""
@@ -636,6 +661,8 @@ class QuerschnittEintrag:
             "k_c": self.k_c,
             "querkraftbewehrung": self.querkraftbewehrung.als_dict(),
             "duktilitaet": list(self.duktilitaet),
+            "sproede_lagen": list(self.sproede_lagen),
+            "zwaengung_biegung_lagen": list(self.zwaengung_biegung_lagen),
             "rissanforderung": self.rissanforderung,
             "kriechzahl": self.kriechzahl,
             "zwaengung_x": self.zwaengung_x,
@@ -669,6 +696,9 @@ class QuerschnittEintrag:
             querkraftbewehrung=QuerkraftbewehrungEintrag.aus_dict(
                 d.get("querkraftbewehrung") or {}),
             duktilitaet=_duktilitaet_aus(d.get("duktilitaet")),
+            sproede_lagen=_lagenwahl_aus(d.get("sproede_lagen")),
+            zwaengung_biegung_lagen=_lagenwahl_aus(
+                d.get("zwaengung_biegung_lagen")),
             rissanforderung=_rissanforderung_aus(d.get("rissanforderung")),
             kriechzahl=_zahl(d, "kriechzahl", KRIECHZAHL),
             zwaengung_x=bool(d.get("zwaengung_x", False)),
@@ -707,8 +737,11 @@ class Aufbau:
     rissnormalkraft: Dict[str, Rissnormalkraft] = field(default_factory=dict)
     """Schluessel ist ``<querschnitt>.<richtung>`` -- nur wo Zwaengung gilt."""
 
-    rissmoment: Dict[str, Rissmoment] = field(default_factory=dict)
-    """Schluessel ist ``<querschnitt>.<richtung>``; laeuft immer."""
+    sproede: Dict[str, SproedesVersagen] = field(default_factory=dict)
+    """Mindestbewehrung gegen sproedes Versagen, je ``<querschnitt>.<richtung>``."""
+
+    zwaengung_biegung: Dict[str, ZwaengungBiegung] = field(default_factory=dict)
+    """Zwaengung auf Biegung, je ``<querschnitt>.<richtung>``."""
 
     fehlende: Dict[str, FehlendeBewehrung] = field(default_factory=dict)
     """
@@ -729,7 +762,9 @@ class Aufbau:
                    for d in f.d_ausnutzung.values()]
                 + [d.id for z in self.rissnormalkraft.values()
                    for d in z.d_ausnutzung.values()]
-                + [d.id for m in self.rissmoment.values()
+                + [d.id for s in self.sproede.values()
+                   for d in s.d_ausnutzung.values()]
+                + [d.id for m in self.zwaengung_biegung.values()
                    for d in m.d_ausnutzung.values()])
 
     def eckwertziele(self) -> List[str]:
@@ -871,66 +906,54 @@ class Projekt:
             aufbau.querschnitte[eintrag.kennung] = querschnitt
             querschnitt.ins_rechenwerk(werk)
 
-            # Die Duktilitaet haengt an der Bewehrung, nicht an den
-            # Schnittgroessen -- sie laeuft auch ohne Einwirkung.
-            # Die Zwaengung haengt an der Bewehrung, nicht an den
-            # Schnittgroessen -- wie die Duktilitaet laeuft sie auch ohne
-            # Einwirkung.
-            # Sproedes Versagen unter Biegung geht jede Platte an, unabhaengig
-            # von Zwaengung und Schnittgroessen: eine Bewehrung, die das
-            # Rissmoment nicht uebernehmen kann, kuendigt nichts an.
-            for richtung in Richtung:
-                biegung = Rissmoment(
-                    querschnitt, richtung,
-                    anforderung=eintrag.rissanforderung,
-                    kriechzahl=eintrag.kriechzahl)
-                werk.registriere(biegung)
-                aufbau.rissmoment[f"{eintrag.kennung}.{richtung.value}"] = biegung
-
-            for richtung, an in ((Richtung.X, eintrag.zwaengung_x),
-                                 (Richtung.Y, eintrag.zwaengung_y)):
-                if not an:
-                    continue
-                zwang = Rissnormalkraft(
-                    querschnitt, richtung,
-                    anforderung=eintrag.rissanforderung,
-                    begrenzt=eintrag.zwaengung_begrenzt)
-                werk.registriere(zwang)
-                aufbau.rissnormalkraft[
-                    f"{eintrag.kennung}.{richtung.value}"] = zwang
-
-            gewaehlte_lagen = [i + 1 for i, an in enumerate(eintrag.duktilitaet) if an]
-            if gewaehlte_lagen:
-                duktilitaet = Duktilitaet(querschnitt, gewaehlte_lagen)
-                werk.registriere(duktilitaet)
-                aufbau.duktilitaet[eintrag.kennung] = duktilitaet
-
-            if not eintrag.kombinationen:
-                aufbau.warnungen.append(
-                    f"Platte '{eintrag.name}': keine Schnittgrössen angegeben, "
-                    f"also kein Nachweis möglich.")
-                continue
-
             bewehrt = set(querschnitt.richtungen_mit_bewehrung)
+
+            # Der M-N-Nachweis entsteht fuer jede bewehrte Richtung, auch ohne
+            # Schnittgroessen: seine Eckwerte gehoeren dem Querschnitt, nicht
+            # der Einwirkung, und der Nachweis gegen sproedes Versagen haelt
+            # M_Rd(N=0) dagegen.
             for richtung in Richtung:
                 passend = [k for k in eintrag.kombinationen if k.gilt_fuer(richtung)]
-                if not passend:
-                    # Keine Kombination fuer diese Richtung ist eine Entscheidung
-                    # des Benutzers, kein Mangel -- also auch keine Warnung.
-                    continue
                 if richtung not in bewehrt:
-                    # Ohne Bewehrung laesst sich hier nichts aufstellen. Der
-                    # Nachweis entfiel frueher stillschweigend; wer eine
-                    # Einwirkung angegeben hatte, fand sie nirgends wieder.
-                    fehlend = FehlendeBewehrung(
-                        querschnitt, richtung, self._ausgefallene(passend, richtung))
-                    werk.registriere(fehlend)
-                    aufbau.fehlende[f"{eintrag.kennung}.{richtung.value}"] = fehlend
+                    if passend:
+                        # Ohne Bewehrung laesst sich hier nichts aufstellen. Der
+                        # Nachweis entfiel frueher stillschweigend; wer eine
+                        # Einwirkung angegeben hatte, fand sie nirgends wieder.
+                        fehlend = FehlendeBewehrung(
+                            querschnitt, richtung,
+                            self._ausgefallene(passend, richtung))
+                        werk.registriere(fehlend)
+                        aufbau.fehlende[
+                            f"{eintrag.kennung}.{richtung.value}"] = fehlend
                     continue
+
                 nachweis = BiegungNormalkraft(
                     querschnitt, [self._kombination(k) for k in passend], richtung)
                 werk.registriere(nachweis)
                 aufbau.nachweise[f"{eintrag.kennung}.{richtung.value}"] = nachweis
+
+                # Sproedes Versagen: M_Rd(N=0) gegen M_Riss, je gewaehlter Lage.
+                sproede = [l.nummer for l in querschnitt.lagen
+                           if l.richtung is richtung
+                           and eintrag.sproede_lagen[l.nummer - 1]]
+                if sproede:
+                    nachweis_sv = SproedesVersagen(
+                        querschnitt, richtung, sproede, nachweis)
+                    werk.registriere(nachweis_sv)
+                    aufbau.sproede[f"{eintrag.kennung}.{richtung.value}"] = nachweis_sv
+
+                # Zwaengung auf Biegung: Stahlspannung gegen ihre Grenze.
+                zwang_biegung = [l.nummer for l in querschnitt.lagen
+                                 if l.richtung is richtung
+                                 and eintrag.zwaengung_biegung_lagen[l.nummer - 1]]
+                if zwang_biegung:
+                    biegung = ZwaengungBiegung(
+                        querschnitt, richtung, zwang_biegung,
+                        anforderung=eintrag.rissanforderung,
+                        kriechzahl=eintrag.kriechzahl)
+                    werk.registriere(biegung)
+                    aufbau.zwaengung_biegung[
+                        f"{eintrag.kennung}.{richtung.value}"] = biegung
 
                 mit_querkraft = [k for k in passend if k.V_Ed]
                 if mit_querkraft:
@@ -944,6 +967,32 @@ class Projekt:
                         richtung, nachweis)
                     werk.registriere(querkraft)
                     aufbau.querkraft[f"{eintrag.kennung}.{richtung.value}"] = querkraft
+
+            # Zwaengung auf Normalkraft: je Richtung, wenn eingeschaltet.
+            for richtung, an in ((Richtung.X, eintrag.zwaengung_x),
+                                 (Richtung.Y, eintrag.zwaengung_y)):
+                if not an:
+                    continue
+                zwang = Rissnormalkraft(
+                    querschnitt, richtung,
+                    anforderung=eintrag.rissanforderung,
+                    begrenzt=eintrag.zwaengung_begrenzt)
+                werk.registriere(zwang)
+                aufbau.rissnormalkraft[
+                    f"{eintrag.kennung}.{richtung.value}"] = zwang
+
+            # Die Duktilitaet haengt an der Bewehrung, nicht an den
+            # Schnittgroessen -- sie laeuft auch ohne Einwirkung.
+            gewaehlte_lagen = [i + 1 for i, an in enumerate(eintrag.duktilitaet) if an]
+            if gewaehlte_lagen:
+                duktilitaet = Duktilitaet(querschnitt, gewaehlte_lagen)
+                werk.registriere(duktilitaet)
+                aufbau.duktilitaet[eintrag.kennung] = duktilitaet
+
+            if not eintrag.kombinationen:
+                aufbau.warnungen.append(
+                    f"Platte '{eintrag.name}': keine Schnittgrössen angegeben, "
+                    f"also kein Tragsicherheitsnachweis möglich.")
 
         for baustoff in aufbau.baustoffe.values():
             baustoff.ins_rechenwerk(werk)

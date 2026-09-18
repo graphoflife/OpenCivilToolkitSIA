@@ -23,8 +23,8 @@ class TestProjektBeschreibung(unittest.TestCase):
         self.assertEqual(sorted(aufbau.nachweise), ["q1.x", "q1.y"])
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         self.assertTrue(loesung.vollstaendig)
-        # 6 x M-N, 2 x Duktilität, 4 x Rissmoment.
-        self.assertEqual(len(loesung.urteile), 12)
+        # 6 x M-N, 2 x Duktilität, 1 x sprödes Versagen, 1 x Zwängung Biegung.
+        self.assertEqual(len(loesung.urteile), 10)
 
     def test_hin_und_zurueck(self):
         original = Projekt.beispiel()
@@ -289,7 +289,10 @@ class TestVollstaendigeAblage(unittest.TestCase):
                                    grund=PostenEintrag(durchmesser=16.0, abstand=150.0))])])
         aufbau = projekt.aufbauen()
         self.assertTrue(aufbau.warnungen)
-        self.assertEqual(aufbau.nachweise, {})
+        # Der M-N-Nachweis entsteht (er liefert die Eckwerte), faellt aber
+        # kein Urteil: ohne Schnittgroesse gibt es nichts zu beurteilen.
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        self.assertFalse([u for u in loesung.urteile if u.art == "M-N"])
 
     def test_stabzahl_statt_abstand(self):
         projekt = Projekt.beispiel()
@@ -351,8 +354,8 @@ class TestUrteilsraum(unittest.TestCase):
 
         # Beide Platten sind gleich bewehrt, also fällt für beide gleich viel
         # an: je Richtung drei M-N-Urteile, dazu zwei Duktilitätsurteile.
-        self.assertEqual(len(je_platte["querschnitt.q1"]), 12)
-        self.assertEqual(len(je_platte["querschnitt.q2"]), 12)
+        self.assertEqual(len(je_platte["querschnitt.q1"]), 10)
+        self.assertEqual(len(je_platte["querschnitt.q2"]), 10)
         # Und die Namen allein hätten es nicht entschieden -- sie sind gleich.
         self.assertEqual(sorted(je_platte["querschnitt.q1"]),
                          sorted(je_platte["querschnitt.q2"]))
@@ -362,7 +365,8 @@ class TestUrteilsraum(unittest.TestCase):
             "rechnen", {"projekt": self.zweiplattenprojekt().als_dict()})
         raeume = {u["raum"] for u in antwort.daten["urteile"]}
         self.assertTrue(all(r.startswith("querschnitt.q") for r in raeume), raeume)
-        # 2 Platten x (2 Richtungen M-N + 1 Duktilität + 2 Rissmoment)
+        # 2 Platten x (2 Richtungen M-N + 1 Duktilität + sprödes Versagen x
+        # + Zwängung Biegung x)
         self.assertEqual(len(raeume), 10)
 
 
@@ -429,7 +433,7 @@ class TestDienst(unittest.TestCase):
         antwort = dienst.bearbeite("rechnen", self.rumpf())
         self.assertEqual(antwort.status, 200)
         self.assertTrue(antwort.daten["vollstaendig"])
-        self.assertEqual(len(antwort.daten["urteile"]), 12)
+        self.assertEqual(len(antwort.daten["urteile"]), 10)
         self.assertTrue(antwort.daten["alle_nachweise_erfuellt"])
 
     def test_rechnen_mit_einzelziel(self):
@@ -799,9 +803,14 @@ class TestNachweisrichtung(unittest.TestCase):
         """
         Keine Kombination für eine Richtung ist eine Entscheidung des Benutzers,
         kein Mangel -- dafür gibt es keine Warnung.
+
+        Der M-N-Nachweis entsteht trotzdem für beide bewehrten Richtungen: er
+        liefert die Eckwerte der Resistenzlinie, und die gehören dem
+        Querschnitt. Ein **Urteil** fällt er ohne Kombination nicht.
         """
         aufbau = self.projekt_mit("x", "x", "x").aufbauen()
-        self.assertEqual(sorted(aufbau.nachweise), ["q1.x"])
+        self.assertEqual(sorted(aufbau.nachweise), ["q1.x", "q1.y"])
+        self.assertEqual(aufbau.nachweise["q1.y"].kombinationen, [])
         self.assertEqual(aufbau.warnungen, [])
 
     def _loesen(self, projekt: Projekt):
@@ -947,8 +956,8 @@ class TestAngabengruppen(unittest.TestCase):
         # Vier Spalten: die fuenfte hiess "Urteil" und sagte neben dem
         # Erfuellungsgrad dasselbe noch einmal.
         self.assertEqual(len(tabelle["kopf"]), 4)
-        # 6 x M-N, 2 x Duktilität, 4 x Rissmoment.
-        self.assertEqual(len(tabelle["zeilen"]), 12)
+        # 6 x M-N, 2 x Duktilität, 1 x sprödes Versagen, 1 x Zwängung Biegung.
+        self.assertEqual(len(tabelle["zeilen"]), 10)
         for zeile in tabelle["zeilen"]:
             self.assertEqual(len(zeile["zellen"]), len(tabelle["kopf"]))
             self.assertIn("erfuellt", zeile)
@@ -1051,7 +1060,8 @@ class TestAngabengruppen(unittest.TestCase):
         namen = [z["zellen"][0]
                  for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
         self.assertTrue(namen)
-        self.assertTrue(all(n.startswith(r"\text{M\_Riss") for n in namen), namen)
+        self.assertEqual(sorted(namen),
+                         [r"\text{SV: 1. Lage x}", r"\text{ZB: 1. Lage x}"])
 
     def test_die_duktilitaet_laeuft_auch_ohne_schnittgroessen(self):
         projekt = Projekt.beispiel()
@@ -1255,7 +1265,9 @@ class TestRichtungOhneBewehrung(unittest.TestCase):
 
     def test_die_gegenrichtung_bleibt_unberuehrt(self):
         zeilen = self.zeilen(self.projekt())
-        x_zeilen = [z for z in zeilen if "Rd,x" in z["zellen"][1]]
+        x_zeilen = [z for z in zeilen
+                    if z["zellen"][0].startswith(r"\text{M-N")
+                    and "Rd,x" in z["zellen"][1]]
         self.assertEqual(len(x_zeilen), 3)
         self.assertTrue(all(z["erfuellt"] for z in x_zeilen))
 

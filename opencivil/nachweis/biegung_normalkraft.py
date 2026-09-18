@@ -174,8 +174,11 @@ class BiegungNormalkraft(Nachweis):
         # 40 Schritten auf fuenf Stellen auskonvergiert; die feinere Teilung
         # dient allein der Zeichnung, weil die Linie nahe dem reinen Druck
         # schnell laeuft und sonst sichtbar eckig wuerde.
-        if not kombinationen:
-            raise ValueError("Der Nachweis braucht mindestens eine Kombination.")
+        # Ohne Kombinationen bleibt der Nachweis ohne Urteil -- die Eckwerte
+        # der Resistenzlinie entstehen trotzdem. Sie sind eine Eigenschaft des
+        # Querschnitts, keine der Einwirkung, und andere Nachweise brauchen
+        # sie: der gegen sproedes Versagen haelt M_Rd(N=0) gegen das
+        # Rissmoment, ganz ohne Schnittgroessen.
         self.posten = querschnitt.posten_in_richtung(richtung)
         if not self.posten:
             raise ValueError(

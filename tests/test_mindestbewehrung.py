@@ -3,7 +3,7 @@
 import math
 import unittest
 
-from opencivil.nachweis import mindestbewehrung, zustand2
+from opencivil.nachweis import mindestbewehrung, sproedes_versagen, zustand2
 from opencivil.projekt import Projekt
 from opencivil.web import dienst
 
@@ -279,7 +279,7 @@ class TestRissmomentGroessen(unittest.TestCase):
             f_ct,eff = 2.762 N/mm²
             M_Riss   = 2.762 · 300²·1000/6 = 41.4 kNm
         """
-        g = mindestbewehrung.rissmoment(h=0.300, b=1.0, f_ctm=2.9e6)
+        g = sproedes_versagen.rissmoment(h=0.300, b=1.0, f_ctm=2.9e6)
         self.assertAlmostEqual(g.k_t, 0.9524, places=4)
         self.assertAlmostEqual(g.f_ct_eff / 1e6, 2.762, places=3)
         self.assertAlmostEqual(g.M_Riss / 1e3, 41.4, delta=0.1)
@@ -289,21 +289,39 @@ class TestRissmomentGroessen(unittest.TestCase):
         Unter Biegung reisst nur der Randbereich, unter Zwang die halbe Höhe --
         darum h/3 statt h. Das Rissmoment ist damit weniger abgemindert.
         """
-        biegung = mindestbewehrung.rissmoment(h=0.800, b=1.0, f_ctm=2.9e6)
+        biegung = sproedes_versagen.rissmoment(h=0.800, b=1.0, f_ctm=2.9e6)
         zwang = mindestbewehrung.rissnormalkraft(
             h=0.800, b=1.0, f_ctm=2.9e6, begrenzt=False)
         self.assertGreater(biegung.k_t, zwang.k_t)
 
     def test_die_dicke_geht_ungekuerzt_ein(self):
         """Die 500-mm-Grenze gilt nur für die Zwängung."""
-        g = mindestbewehrung.rissmoment(h=0.800, b=1.0, f_ctm=2.9e6)
+        g = sproedes_versagen.rissmoment(h=0.800, b=1.0, f_ctm=2.9e6)
         # M_Riss waechst mit h^2 -- bei 500 mm waere es weniger als die Haelfte.
         self.assertGreater(g.M_Riss,
-                           mindestbewehrung.rissmoment(
+                           sproedes_versagen.rissmoment(
                                h=0.500, b=1.0, f_ctm=2.9e6).M_Riss * 2.0)
 
 
-class TestRissmomentNachweis(unittest.TestCase):
+def projekt_zwang_biegung(**abweichungen) -> Projekt:
+    """Zwängung auf Biegung für alle vier Lagen eingeschaltet."""
+    projekt = Projekt.beispiel()
+    q = projekt.querschnitte[0]
+    q.zwaengung_biegung_lagen = [True] * 4
+    for name, wert in abweichungen.items():
+        setattr(q, name, wert)
+    return projekt
+
+
+class TestZwaengungBiegung(unittest.TestCase):
+    """
+    Die Stahlspannung aus einer aufgezwungenen Krümmung.
+
+    Nicht zu verwechseln mit dem Nachweis gegen sprödes Versagen: dort steht
+    der Biegewiderstand gegen das Rissmoment, hier die Stahlspannung gegen
+    ihre Grenze.
+    """
+
     def test_erste_lage_von_hand(self):
         """
         1. Lage x, φ = 2, normale Anforderung:
@@ -314,8 +332,8 @@ class TestRissmomentNachweis(unittest.TestCase):
             M_Riss  = 41.4 kNm
             α       = 6.58
         """
-        aufbau, _ = urteile(Projekt.beispiel())
-        erg = aufbau.rissmoment["q1.x"].ergebnisse[0]
+        aufbau, _ = urteile(projekt_zwang_biegung())
+        erg = aufbau.zwaengung_biegung["q1.x"].ergebnisse[0]
         self.assertEqual(erg.lage.nummer, 1)
         self.assertAlmostEqual(erg.n, 17.85, delta=0.02)
         self.assertAlmostEqual(erg.x * 1e3, 113.3, delta=0.3)
@@ -324,68 +342,64 @@ class TestRissmomentNachweis(unittest.TestCase):
         self.assertAlmostEqual(erg.erfuellungsgrad, 6.58, delta=0.03)
         self.assertTrue(erg.erfuellt)
 
-    def test_er_laeuft_immer(self):
-        """
-        Sprödes Versagen unter Biegung geht jede Platte an -- ohne Zwängung,
-        ohne Schnittgrössen, ohne Duktilität.
-        """
+    def test_nur_die_gewaehlten_lagen(self):
         projekt = Projekt.beispiel()
-        q = projekt.querschnitte[0]
-        q.kombinationen = []
-        q.duktilitaet = [False] * 4
-        q.zwaengung_x = q.zwaengung_y = False
+        projekt.querschnitte[0].zwaengung_biegung_lagen = [False, True, False, False]
         aufbau, gefunden = urteile(projekt)
-        self.assertEqual(sorted(aufbau.rissmoment), ["q1.x", "q1.y"])
-        self.assertEqual(
-            len([n for n in gefunden if n.startswith("Rissmoment")]), 4)
+        self.assertEqual(sorted(aufbau.zwaengung_biegung), ["q1.y"])
+        namen = [n for n in gefunden if n.startswith("Zwängung Biegung")]
+        self.assertEqual(namen, ["Zwängung Biegung y – 2. Lage"])
+
+    def test_ohne_gewaehlte_lage_laeuft_er_nicht(self):
+        projekt = Projekt.beispiel()
+        projekt.querschnitte[0].zwaengung_biegung_lagen = [False] * 4
+        aufbau, gefunden = urteile(projekt)
+        self.assertEqual(aufbau.zwaengung_biegung, {})
+        self.assertFalse([n for n in gefunden if n.startswith("Zwängung Biegung")])
 
     def test_bei_den_oberen_lagen_wird_von_unten_gemessen(self):
-        aufbau, _ = urteile(Projekt.beispiel())
-        nach_lage = {e.lage.nummer: e for e in aufbau.rissmoment["q1.x"].ergebnisse}
+        aufbau, _ = urteile(projekt_zwang_biegung())
+        nach_lage = {e.lage.nummer: e
+                     for e in aufbau.zwaengung_biegung["q1.x"].ergebnisse}
         h = 0.300
         self.assertAlmostEqual(nach_lage[1].d, nach_lage[1].z_s)
         self.assertAlmostEqual(nach_lage[4].d, h - nach_lage[4].z_s)
 
     def test_kriechen_macht_den_nachweis_schwerer(self):
         """Der Hebelarm schrumpft -- φ > 0 liegt auf der sicheren Seite."""
-        ohne = Projekt.beispiel()
-        ohne.querschnitte[0].kriechzahl = 0.0
-        mit = Projekt.beispiel()
-        mit.querschnitte[0].kriechzahl = 2.0
-
-        a, _ = urteile(ohne)
-        b, _ = urteile(mit)
-        trocken = a.rissmoment["q1.x"].ergebnisse[0]
-        kriechend = b.rissmoment["q1.x"].ergebnisse[0]
+        a, _ = urteile(projekt_zwang_biegung(kriechzahl=0.0))
+        b, _ = urteile(projekt_zwang_biegung(kriechzahl=2.0))
+        trocken = a.zwaengung_biegung["q1.x"].ergebnisse[0]
+        kriechend = b.zwaengung_biegung["q1.x"].ergebnisse[0]
 
         self.assertLess(trocken.x, kriechend.x)
         self.assertGreater(trocken.hebelarm, kriechend.hebelarm)
         self.assertGreater(trocken.erfuellungsgrad, kriechend.erfuellungsgrad)
 
     def test_eine_leere_lage_ist_nicht_machbar(self):
-        projekt = Projekt.beispiel()
+        projekt = projekt_zwang_biegung()
         projekt.querschnitte[0].lagen[3].grund.durchmesser = 0.0
         projekt.querschnitte[0].lagen[3].zulage.durchmesser = 0.0
         _, gefunden = urteile(projekt)
-        urteil = gefunden["Rissmoment x – 4. Lage"]
+        urteil = gefunden["Zwängung Biegung x – 4. Lage"]
         self.assertFalse(urteil.erfuellt)
         self.assertIn("nicht machbar", urteil.hinweis)
         self.assertIsNone(urteil.einwirkung)
 
     def test_zu_wenig_bewehrung_faellt_durch(self):
-        projekt = Projekt.beispiel()
+        projekt = projekt_zwang_biegung()
         lage = projekt.querschnitte[0].lagen[3]
         lage.grund.durchmesser = 6.0
         lage.grund.abstand = 300.0
         lage.zulage.durchmesser = 0.0
         projekt.querschnitte[0].h = 600.0
         _, gefunden = urteile(projekt)
-        self.assertFalse(gefunden["Rissmoment x – 4. Lage"].erfuellt)
+        self.assertFalse(gefunden["Zwängung Biegung x – 4. Lage"].erfuellt)
 
     def test_die_herleitung_zeigt_beide_querschnitte(self):
         from opencivil.core.protokoll import GleichungBlock
 
-        aufbau = Projekt.beispiel().aufbauen()
+        aufbau = projekt_zwang_biegung().aufbauen()
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         titel = [b.titel for b in loesung.protokoll.alle_bloecke()
                  if isinstance(b, GleichungBlock)]
@@ -394,4 +408,71 @@ class TestRissmomentNachweis(unittest.TestCase):
                          "Nulllinie des gerissenen Querschnitts",
                          "Innerer Hebelarm",
                          "Aufnehmbares Moment der Bewehrung"):
+            self.assertIn(erwartet, titel)
+
+
+class TestSproedesVersagen(unittest.TestCase):
+    """M_Rd(N_Ed = 0) gegen M_Riss -- der einfachere und strengere Weg."""
+
+    def test_erste_lage_von_hand(self):
+        """
+        1. Lage x: M_Rd(N=0) = 248.7 kNm, M_Riss = 41.4 kNm, α = 6.01.
+        """
+        aufbau, _ = urteile(Projekt.beispiel())
+        erg = aufbau.sproede["q1.x"].ergebnisse[0]
+        self.assertEqual(erg.lage.nummer, 1)
+        self.assertAlmostEqual(erg.M_Rd / 1e3, 248.7, delta=0.5)
+        self.assertAlmostEqual(aufbau.sproede["q1.x"].groessen.M_Riss / 1e3,
+                               41.4, delta=0.1)
+        self.assertAlmostEqual(erg.erfuellungsgrad, 6.01, delta=0.05)
+        self.assertTrue(erg.erfuellt)
+
+    def test_vorgabe_ist_nur_die_erste_lage(self):
+        aufbau, gefunden = urteile(Projekt.beispiel())
+        namen = sorted(n for n in gefunden if n.startswith("Sprödes Versagen"))
+        self.assertEqual(namen, ["Sprödes Versagen x – 1. Lage"])
+
+    def test_die_obere_lage_nimmt_den_negativen_eckwert(self):
+        projekt = Projekt.beispiel()
+        projekt.querschnitte[0].sproede_lagen = [True, False, False, True]
+        aufbau, _ = urteile(projekt)
+        nach_lage = {e.lage.nummer: e for e in aufbau.sproede["q1.x"].ergebnisse}
+        # Die 4. Lage traegt weniger -- ⌀12 gegen ⌀18+⌀12.
+        self.assertLess(nach_lage[4].M_Rd, nach_lage[1].M_Rd)
+        self.assertGreater(nach_lage[4].M_Rd, 0.0)
+
+    def test_ohne_gewaehlte_lage_laeuft_er_nicht(self):
+        projekt = Projekt.beispiel()
+        projekt.querschnitte[0].sproede_lagen = [False] * 4
+        aufbau, gefunden = urteile(projekt)
+        self.assertEqual(aufbau.sproede, {})
+        self.assertFalse([n for n in gefunden if n.startswith("Sprödes Versagen")])
+
+    def test_er_laeuft_ohne_schnittgroessen(self):
+        """Die Resistenzlinie gehört dem Querschnitt, nicht der Einwirkung."""
+        projekt = Projekt.beispiel()
+        projekt.querschnitte[0].kombinationen = []
+        aufbau, gefunden = urteile(projekt)
+        self.assertIn("q1.x", aufbau.sproede)
+        self.assertTrue([n for n in gefunden if n.startswith("Sprödes Versagen")])
+
+    def test_zu_wenig_bewehrung_faellt_durch(self):
+        projekt = Projekt.beispiel()
+        lage = projekt.querschnitte[0].lagen[0]
+        lage.grund.durchmesser = 6.0
+        lage.grund.abstand = 300.0
+        lage.zulage.durchmesser = 0.0
+        projekt.querschnitte[0].h = 600.0
+        _, gefunden = urteile(projekt)
+        self.assertFalse(gefunden["Sprödes Versagen x – 1. Lage"].erfuellt)
+
+    def test_die_herleitung_stellt_beide_gegenueber(self):
+        from opencivil.core.protokoll import GleichungBlock
+
+        aufbau = Projekt.beispiel().aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        titel = [b.titel for b in loesung.protokoll.alle_bloecke()
+                 if isinstance(b, GleichungBlock)]
+        for erwartet in ("Rissmoment des ungerissenen Querschnitts",
+                         "Biegewiderstand gegen Rissmoment"):
             self.assertIn(erwartet, titel)

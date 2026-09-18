@@ -50,6 +50,9 @@ from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, Groesse
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
 from opencivil.material.basis import mit_index
+from opencivil.nachweis.sproedes_versagen import (
+    MOMENTENTEILER, Rissgroessen as Momentgroessen, rissmoment,
+)
 from opencivil.nachweis.zustand2 import gerissen, wertigkeit
 from opencivil.querschnitt.platte import Bewehrungslage, Richtung, posten_index
 
@@ -65,9 +68,6 @@ RISSBREITE: Dict[str, Optional[float]] = {
 #: Gilt nur, wenn die Begrenzung eingeschaltet ist.
 DICKENGRENZE = 0.500
 
-#: Teiler der Plattendicke im Beiwert des Rissmoments. Unter Biegung reisst
-#: nur der Randbereich, nicht die halbe Hoehe wie beim Zwang.
-MOMENTENTEILER = 3.0
 
 
 @dataclass(frozen=True)
@@ -95,38 +95,6 @@ def rissnormalkraft(*, h: float, b: float, f_ctm: float,
     f_ct_eff = k_t * f_ctm
     return Rissgroessen(h_eff=h_eff, k_t=k_t, f_ct_eff=f_ct_eff,
                         N_Riss=h_eff / 2.0 * b * f_ct_eff)
-
-
-@dataclass(frozen=True)
-class Momentgroessen:
-    """Was allein von der Platte abhaengt, nicht von der einzelnen Lage."""
-
-    k_t: float
-    f_ct_eff: float
-    M_Riss: float
-    """Rissmoment in Nm, bezogen auf die betrachtete Breite."""
-
-
-def rissmoment(*, h: float, b: float, f_ctm: float) -> Momentgroessen:
-    """
-    Das Moment, bei dem der ungerissene Querschnitt aufreisst.
-
-    Gerechnet am **Bruttoquerschnitt** -- ``h^2*b/6`` ist sein elastisches
-    Widerstandsmoment. Das ist der Zustand *vor* dem Riss; der Widerstand
-    dagegen wird am gerissenen Querschnitt bestimmt. Dass hier zwei verschiedene
-    Querschnitte auftreten, ist kein Versehen, sondern der Kern der Frage:
-    reicht die Bewehrung fuer das, was der Beton im selben Augenblick abgibt?
-
-    Die Plattendicke geht ungekuerzt ein -- auch wenn die Zwaengung begrenzt
-    wird. Unter Biegung reisst der Randbereich, und der ist da, wie dick die
-    Platte auch sei.
-
-    Alles in SI-Basis; Rueckgabe in Nm.
-    """
-    k_t = 1.0 / (1.0 + 0.5 * h / MOMENTENTEILER)
-    f_ct_eff = k_t * f_ctm
-    return Momentgroessen(k_t=k_t, f_ct_eff=f_ct_eff,
-                          M_Riss=f_ct_eff * h * h * b / 6.0)
 
 
 def zulaessige_stahlspannung(
@@ -494,9 +462,9 @@ class Momentlagenergebnis:
         return self.a_s > 0.0
 
 
-class Rissmoment(Nachweis):
+class ZwaengungBiegung(Nachweis):
     """
-    Sprödes Versagen unter Biegung, je Tragrichtung.
+    Zwängung auf Biegung, je gewählter Lage.
 
     Zwei Urteile: die untere Lage (positives Moment) und die obere (negatives).
     Beim Reissen gibt der Beton sein Moment ab; die Bewehrung muss es
@@ -512,6 +480,7 @@ class Rissmoment(Nachweis):
         self,
         querschnitt,
         richtung: Richtung,
+        lagen: Sequence[int],
         *,
         anforderung: str,
         kriechzahl: float,
@@ -527,20 +496,26 @@ class Rissmoment(Nachweis):
         self.ergebnisse: List[Momentlagenergebnis] = []
         self.groessen: Optional[Momentgroessen] = None
 
-        self.lagen = [l for l in querschnitt.lagen if l.richtung is richtung]
+        gewaehlt = sorted(set(lagen))
+        self.lagen = [l for l in querschnitt.lagen
+                      if l.richtung is richtung and l.nummer in gewaehlt]
+        if not self.lagen:
+            raise ValueError(
+                f"Querschnitt '{querschnitt.name}': in "
+                f"{richtung.beschriftung} ist keine der gewählten Lagen vorhanden.")
         self.posten_je_lage: Dict[int, List[Tuple]] = {
             l.nummer: [e for e in querschnitt.posten_ids if e[0].nummer == l.nummer]
             for l in self.lagen
         }
 
         r = richtung.value
-        basis = f"{querschnitt.id}.nachweis.rissmoment.{r}"
+        basis = f"{querschnitt.id}.nachweis.zwang_biegung.{r}"
         self.d_ausnutzung: Dict[int, WertDef] = {
             l.nummer: WertDef(
                 id=f"{basis}.lage{l.nummer}.erfuellungsgrad",
-                symbol=rf"\alpha_{{eff,MR,{l.nummer},{r}}}",
+                symbol=rf"\alpha_{{eff,ZB,{l.nummer},{r}}}",
                 einheit=EINHEITSLOS,
-                beschreibung=(f"Erfüllungsgrad Rissmoment – "
+                beschreibung=(f"Erfüllungsgrad Zwängung auf Biegung – "
                               f"{l.nummer}. Lage {r}"),
                 referenz="SIA 262:2025, 4.4.2",
                 stellen=2,
@@ -578,7 +553,7 @@ class Rissmoment(Nachweis):
             basis,
             ausgaben=list(self.d_ausnutzung.values()),
             bezuege=bezuege,
-            titel=(f"Sprödes Versagen unter Biegung {richtung.beschriftung} – "
+            titel=(f"Zwängung auf Biegung {richtung.beschriftung} – "
                    f"{querschnitt.name}"),
             referenz="SIA 262:2025, 4.4.2",
             abschnitt=querschnitt.abschnitt,
@@ -674,8 +649,8 @@ class Rissmoment(Nachweis):
             einheit=KNM, beschreibung="Widerstand", stellen=1,
         ).belegen(Groesse.aus_si(erg.M_s_adm, KNM))
         return NachweisUrteil(
-            name=f"Rissmoment {r} – {nummer}. Lage",
-            art="M_Riss",
+            name=f"Zwängung Biegung {r} – {nummer}. Lage",
+            art="ZB",
             fall=f"{nummer}. Lage {r}",
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
@@ -691,11 +666,13 @@ class Rissmoment(Nachweis):
                           *, E_s: float, E_cm: float, phi: float,
                           n: float) -> None:
         g = self.groessen
-        p.titel(f"Sprödes Versagen unter Biegung – {self.richtung.beschriftung}")
+        p.titel(f"Zwängung auf Biegung – {self.richtung.beschriftung}")
         p.text(
-            "Beim Reissen gibt der Beton sein Moment ab. Die Bewehrung muss es "
-            "übernehmen können, ohne über die zulässige Stahlspannung zu "
-            "kommen – erst dann kündigt sich das Versagen an."
+            "Eine aufgezwungene Krümmung erzeugt beim Reissen ein Moment, das "
+            "die Bewehrung übernehmen muss – ohne über die zulässige "
+            "Stahlspannung zu kommen. Nicht zu verwechseln mit dem Nachweis "
+            "gegen sprödes Versagen: dort steht der Biegewiderstand gegen das "
+            "Rissmoment, hier die Stahlspannung gegen ihre Grenze."
         )
         p.gleichung(
             rf"k_t = \frac{{1}}{{1 + 0.5 \cdot h/{MOMENTENTEILER:.0f}}}"
@@ -736,7 +713,7 @@ class Rissmoment(Nachweis):
                         b: float, f_ctm: float) -> None:
         nummer = erg.lage.nummer
         r = self.richtung.value
-        p.titel(f"Rissmoment – {nummer}. Lage {r}", ebene=3)
+        p.titel(f"Zwängung auf Biegung – {nummer}. Lage {r}", ebene=3)
 
         if not erg.machbar:
             p.text(erg.begruendung)
@@ -809,7 +786,7 @@ class Rissmoment(Nachweis):
         grad = ("\\infty" if math.isinf(erg.erfuellungsgrad)
                 else f"{erg.erfuellungsgrad:.2f}")
         p.gleichung(
-            rf"\alpha_{{eff,MR,{index}}} = \frac{{M_{{s,adm,{index}}}}}"
+            rf"\alpha_{{eff,ZB,{index}}} = \frac{{M_{{s,adm,{index}}}}}"
             rf"{{M_{{Riss}}}} = \frac{{{erg.M_s_adm / 1e3:.1f}}}"
             rf"{{{self.groessen.M_Riss / 1e3:.1f}}} = {grad}",
             titel="Erfüllungsgrad")

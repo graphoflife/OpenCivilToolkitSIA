@@ -721,10 +721,24 @@ class TestErfuellungsgrad(unittest.TestCase):
         )
         self.assertFalse(loesung.alle_nachweise_erfuellt)
 
-    def test_ohne_kombination_verboten(self):
+    def test_ohne_kombination_bleiben_die_eckwerte(self):
+        """
+        Die Resistenzlinie gehört dem Querschnitt, nicht der Einwirkung.
+
+        Ohne Kombinationen fällt kein Urteil -- die Eckwerte entstehen
+        trotzdem. Der Nachweis gegen sprödes Versagen hält M_Rd(N=0) gegen das
+        Rissmoment und braucht dafür keine Schnittgrösse.
+        """
         platte = einfache_platte()
-        with self.assertRaises(ValueError):
-            BiegungNormalkraft(platte, [], Richtung.X)
+        werk = Rechenwerk()
+        platte.ins_rechenwerk(werk)
+        nachweis = BiegungNormalkraft(platte, [], Richtung.X)
+        werk.registriere(nachweis)
+        loesung = werk.loese(nachweis.d_eckwerte["M_Rd_N0_pos"].id)
+        self.assertTrue(loesung.vollstaendig)
+        self.assertEqual(loesung.urteile, [])
+        self.assertGreater(
+            loesung.groesse(nachweis.d_eckwerte["M_Rd_N0_pos"].id).si, 0.0)
 
 
 class TestRueckverfolgungNachweis(unittest.TestCase):
