@@ -408,6 +408,11 @@ async function normalkraftWaehlen(kennung, N_Ed) {
   aendern({ kurvenNormalkraft: gewaehlt }, 'kurve');
   try {
     const antwort = await api.querkraftkurven(zustand.projekt, gewaehlt);
+    // Wer zweimal kurz hintereinander weiterstellt, hat zwei Anfragen
+    // unterwegs -- und die ältere darf die jüngere nicht überholen. Sonst
+    // stünde unter der Kurve die eine Normalkraft und gezeichnet wäre die
+    // andere.
+    if (zustand.kurvenNormalkraft[kennung] !== N_Ed) return;
     // In die vorhandene Lösung einsetzen statt sie zu ersetzen: alles andere
     // -- Herleitung, Werte, Urteile -- gilt unverändert weiter.
     aendern({

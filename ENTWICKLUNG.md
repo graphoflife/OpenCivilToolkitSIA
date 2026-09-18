@@ -43,6 +43,65 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-18 · Eine Änderung fiel unter den Tisch
+
+Gemeldet: manchmal eine Zahl ändern, oben rechts steht «geändert …» — und es
+geschieht nichts.
+
+Der Riegel gegen doppeltes Rechnen warf den zweiten Wunsch weg:
+
+```js
+if (zustand.rechnetGerade) return;     // und damit war er fort
+```
+
+Das ist ein Riegel ohne Gedächtnis. Solange Pyodide rechnet, fällt er nie auf:
+Python läuft im Hauptfaden, ein Durchgang ist ein einziger Arbeitsschritt, und
+während dessen kann niemand tippen. Über den lokalen Server aber liegt ein
+`await fetch` dazwischen — die Oberfläche bleibt bedienbar, und wer in diesen
+gut 40 ms etwas ändert, dessen Änderung verschwindet. Nachgemessen im laufenden
+Betrieb: zwei Änderungen, **ein** Rechengang, und angezeigt wurde danach das
+Urteil zur *vorherigen* Zahl. Nicht bloss «es passiert nichts» — es stand eine
+Antwort da, die nicht zur Eingabe gehörte.
+
+Jetzt wird der jüngste Wunsch aufbewahrt und im Anschluss ausgeführt. Ältere
+dürfen verfallen: gerechnet wird ohnehin immer mit der Beschreibung, wie sie
+im Augenblick des Durchgangs aussieht.
+
+```js
+let auftrag = { ziele };
+while (auftrag) {
+  nachgereicht = null;
+  await einDurchgang(auftrag.ziele);
+  auftrag = nachgereicht;     // während des Rechnens dazugekommen
+}
+```
+
+### Der Riegel gehörte in den Schutz von `finally`
+
+Gesetzt wurde er vor dem `try`, und gesetzt wird er von `aendern()` — das
+zeichnet alle drei Tafeln neu. Wäre dabei je ein Fehler gefallen, stünde der
+Riegel für immer, und **jede** weitere Rechnung wäre gesperrt gewesen, auch die
+von Hand angestossene. Ein Fehler beim Zeichnen hätte das Werkzeug stumm
+gemacht. Er steht jetzt im `try`.
+
+### «geändert …» sagte nicht die Wahrheit
+
+Der verzögerte Durchgang lief `stillschweigend`, hat also die Anzeige nicht
+angerührt — während gerechnet wurde, stand weiter «geändert …» da. Genau der
+Eindruck, der gemeldet wurde. Das Kennzeichen ist ersatzlos weg; die Anzeige
+geht jetzt «geändert …» → «rechnet …» → Urteil.
+
+### Dieselbe Art Fehler unter dem Diagramm
+
+Wer die Normalkraft zweimal kurz hintereinander weiterstellt, hat zwei
+Anfragen unterwegs. Kommt die ältere zuletzt zurück, überschreibt sie die
+jüngere: unter der Kurve steht die eine Zahl, gezeichnet ist die andere.
+`normalkraftWaehlen` verwirft eine Antwort jetzt, wenn inzwischen weitergestellt
+wurde. Nachgestellt, indem die erste Antwort künstlich 1500 ms verzögert wurde
+und die zweite 100 — die Anzeige bleibt auf dem zuletzt Gewählten.
+
+---
+
 ## 2026-09-12 · Ein Kasten, der sich nicht als Kasten zu erkennen gibt
 
 Die zusammengelegten Angaben hatten eine eigene Gestalt bekommen: eigener

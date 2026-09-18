@@ -24,6 +24,15 @@ import { editorZeichnen } from './editor.js';
 const knoten = {};
 let rechenUhr = null;
 
+/**
+ * Was gerechnet werden soll, sobald der laufende Durchgang fertig ist.
+ *
+ * `null`, solange nichts wartet. Es wird immer nur der jüngste Wunsch
+ * aufbewahrt -- ältere sind ohnehin überholt, denn gerechnet wird stets mit der
+ * Beschreibung, wie sie in dem Augenblick aussieht.
+ */
+let nachgereicht = null;
+
 // ===========================================================================
 // Rechnen
 // ===========================================================================
@@ -33,12 +42,9 @@ function zustandsanzeige(text, art = '') {
   knoten.zustandsanzeige.className = `zustandsanzeige ${art}`;
 }
 
-async function rechnen({ ziele = null, stillschweigend = false } = {}) {
-  if (zustand.rechnetGerade) return;
-  aendern({ rechnetGerade: true }, 'rechnen-start');
-  knoten.btnRechnen.disabled = true;
-  if (!stillschweigend) zustandsanzeige('rechnet …');
-
+/** Ein einzelner Durchgang: hinschicken, Antwort übernehmen, Stand melden. */
+async function einDurchgang(ziele) {
+  zustandsanzeige('rechnet …');
   try {
     const antwort = await api.rechnen(zustand.projekt, ziele);
     const hervorgehoben = new Set();
@@ -72,7 +78,41 @@ async function rechnen({ ziele = null, stillschweigend = false } = {}) {
     zustandsanzeige('Fehler', 'ist-fehler');
     melden(fehler.message, true);
     if (fehler instanceof KernFehler && fehler.spur) console.error(fehler.spur);
+  }
+}
+
+/**
+ * Rechnet -- und rechnet gleich noch einmal, wenn währenddessen etwas geändert wurde.
+ *
+ * Ein Durchgang ist nicht sofort zu Ende: beim lokalen Server liegt eine
+ * Anfrage dazwischen, und in dieser Zeit läuft die Oberfläche weiter. Wer
+ * genau dann eine Zahl ändert, löste bisher einen Aufruf aus, der
+ * stillschweigend verworfen wurde -- angezeigt wurde danach das Urteil zur
+ * *vorherigen* Zahl, und oben stand «geändert …». Der Wunsch wird deshalb
+ * aufbewahrt statt weggeworfen.
+ *
+ * Auch der Riegel selbst gehört in den Schutz von `finally`: bliebe er nach
+ * einem Fehler beim Neuzeichnen stehen, wäre jede weitere Rechnung für immer
+ * gesperrt -- auch die von Hand angestossene.
+ */
+async function rechnen({ ziele = null } = {}) {
+  if (zustand.rechnetGerade) {
+    nachgereicht = { ziele };
+    return;
+  }
+
+  try {
+    aendern({ rechnetGerade: true }, 'rechnen-start');
+    knoten.btnRechnen.disabled = true;
+
+    let auftrag = { ziele };
+    while (auftrag) {
+      nachgereicht = null;
+      await einDurchgang(auftrag.ziele);
+      auftrag = nachgereicht;
+    }
   } finally {
+    nachgereicht = null;
     aendern({ rechnetGerade: false }, 'rechnen-ende');
     knoten.btnRechnen.disabled = false;
   }
@@ -82,7 +122,7 @@ async function rechnen({ ziele = null, stillschweigend = false } = {}) {
 function spaeterRechnen() {
   clearTimeout(rechenUhr);
   zustandsanzeige('geändert …');
-  rechenUhr = setTimeout(() => rechnen({ stillschweigend: true }), 450);
+  rechenUhr = setTimeout(() => rechnen(), 450);
 }
 
 // ===========================================================================
