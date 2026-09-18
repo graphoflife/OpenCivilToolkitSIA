@@ -29,8 +29,19 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
 - [ ] Die rechte Tafel läuft waagrecht über, sobald sie schmal wird (bei rund
       350 px um 63 Bildpunkte). Formeln und Tabellen haben je einen eigenen
       Rollbalken; ein Inhalt entkommt ihnen. Besteht schon länger, nicht neu.
+- [ ] Die Normstelle für das Fachwerkmodell mit Bügeln (`SIA 262:2025, 4.3.3.4`)
+      ist eingetragen, aber wie alle anderen Verweise nicht nachgeschlagen.
+      Dasselbe gilt für die Vorgaben `α_min = 30°`, `α_max = 45°`, `k_c = 0.55`
+      und die Regel, dass Normalzug beide Grenzen auf 40° hebt — alle nach
+      Vorgabe eingebaut, keine geprüft.
 
 ## Erledigt zuletzt
+
+Querkraftbewehrung: Bügelraster mit eigenem Stahl, Teilung je Richtung (in y
+wahlweise als Stabzahl), Grenzwinkel der Druckdiagonalen und `k_c`. Mit Bügeln
+gilt das Fachwerkmodell statt des Betonanteils, gesucht über die günstigste
+Neigung; an die Stelle der M-V-Kurve tritt der Verlauf über α. Ein Widerstand
+von null trägt jetzt überall seinen Grund sichtbar in der Zusammenfassung ·
 
 Nicht rechnen, was schon dasteht: bei `N_Ed = 0` stand ein Bruch mit null im
 Zähler, jetzt steht der getroffene Eckpunkt da — dasselbe bei `M_Ed = 0` und

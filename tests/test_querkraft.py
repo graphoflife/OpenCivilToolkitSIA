@@ -426,3 +426,179 @@ class TestVorzeichenDerQuerkraft(unittest.TestCase):
         # ohnehin der Betrag, und zwei Zeichen fuer dieselbe Aussage
         # machen die Tabelle nur breiter.
         self.assertEqual(urteil.einwirkung.symbol, "V_{Ed,x}")
+
+
+# ===========================================================================
+# Mit Querkraftbewehrung
+# ===========================================================================
+
+
+def projekt_mit_buegeln(**abweichungen) -> Projekt:
+    """Das Beispiel, zusätzlich mit Bügeln ⌀10, Raster 200/200."""
+    projekt = projekt_mit_querkraft()
+    buegel = projekt.querschnitte[0].querkraftbewehrung
+    buegel.durchmesser = 10.0
+    buegel.stahl = "s1"
+    buegel.abstand_x = 200.0
+    buegel.abstand_y = 200.0
+    for name, wert in abweichungen.items():
+        setattr(buegel, name, wert)
+    return projekt
+
+
+class TestBuegelformeln(unittest.TestCase):
+    """Die beiden Formeln für sich, ohne Rechenwerk."""
+
+    werte = dict(a_s=78.54e-6, s_x=0.2, s_y=0.2, d=0.261,
+                 f_yd=434.78e6, f_cd=20.0e6, k_c=0.55)
+
+    def test_buegelanteil_von_hand(self):
+        """
+        V_Rd,s = A/(s_x·s_y) · 0.9·d · f_yd · cot α
+
+               = 78.54e-6/(0.2·0.2) · 0.9·0.261 · 434.78e6 · cot30°
+               = 1.9635e-3 · 0.2349 · 434.78e6 · 1.7321
+               = 347.3 kN/m
+        """
+        q = querkraft.buegelwiderstand(alpha=30, **self.werte)
+        self.assertAlmostEqual(q.V_Rd_s / 1e3, 347.3, delta=0.2)
+
+    def test_druckdiagonale_von_hand(self):
+        """
+        V_Rd,c = 0.9·d · k_c · f_cd · sin α · cos α
+
+               = 0.9·0.261 · 0.55 · 20e6 · 0.5 · 0.86603
+               = 1118.9 kN/m
+
+        Je Laufmeter, wie V_Ed -- die betrachtete Breite steht nicht darin.
+        """
+        q = querkraft.buegelwiderstand(alpha=30, **self.werte)
+        self.assertAlmostEqual(q.V_Rd_c / 1e3, 1118.9, delta=0.5)
+
+    def test_massgebend_ist_das_kleinere(self):
+        q = querkraft.buegelwiderstand(alpha=30, **self.werte)
+        self.assertAlmostEqual(q.V_Rd, min(q.V_Rd_s, q.V_Rd_c))
+
+    def test_der_buegelanteil_faellt_mit_steilerer_diagonale(self):
+        flach = querkraft.buegelwiderstand(alpha=30, **self.werte)
+        steil = querkraft.buegelwiderstand(alpha=45, **self.werte)
+        self.assertGreater(flach.V_Rd_s, steil.V_Rd_s)
+        self.assertLess(flach.V_Rd_c, steil.V_Rd_c)
+
+    def test_gesucht_wird_das_groesste_kleinere(self):
+        """
+        Der Widerstand ist das Kleinere von beiden; gesucht ist dessen
+        Höchstwert. Von Hand: das Maximum über alle ganzen Grade.
+        """
+        punkte = querkraft.neigungen(alpha_min=25, alpha_max=60, **self.werte)
+        beste = querkraft.beste_neigung(punkte)
+        self.assertAlmostEqual(beste.V_Rd, max(q.V_Rd for q in punkte))
+
+    def test_bei_gleichstand_gilt_die_steilere_neigung(self):
+        """Sie beansprucht die Druckdiagonale weniger."""
+        gleich = [querkraft.Buegelpunkt(alpha=a, V_Rd_s=100.0, V_Rd_c=100.0)
+                  for a in (30, 35, 40)]
+        self.assertEqual(querkraft.beste_neigung(gleich).alpha, 40)
+
+
+class TestNachweisMitBuegeln(unittest.TestCase):
+    def test_der_widerstand_kommt_aus_dem_fachwerkmodell(self):
+        aufbau, gefunden = urteile(projekt_mit_buegeln())
+        erg = aufbau.querkraft["q1.x"].ergebnisse[0]
+        self.assertIsNotNone(erg.massgebend)
+        self.assertAlmostEqual(erg.d * 1e3, 261.0, places=6)
+        self.assertAlmostEqual(erg.v_Rd, erg.massgebend.V_Rd)
+        self.assertAlmostEqual(erg.v_Rd / 1e3, 347.3, delta=0.5)
+
+    def test_ohne_buegel_bleibt_alles_wie_zuvor(self):
+        """
+        Der Ansatz ohne Bügel darf sich durch die Erweiterung nicht ändern --
+        dieselben Zahlen wie in test_handrechnung.
+        """
+        aufbau, _ = urteile(projekt_mit_querkraft())
+        erg = aufbau.querkraft["q1.x"].ergebnisse[0]
+        self.assertIsNone(aufbau.querkraft["q1.x"].buegel)
+        self.assertAlmostEqual(erg.v_Rd / 1e3, 224.5, delta=0.2)
+        self.assertEqual(erg.punkte, ())
+
+    def test_buegel_ersetzen_den_betonanteil(self):
+        """Nicht addieren: das wäre ein drittes Modell."""
+        _, ohne = urteile(projekt_mit_querkraft())
+        _, mit = urteile(projekt_mit_buegeln())
+        name = "Querkraft x – Feld"
+        summe = (ohne[name].widerstand.groesse.in_einheit(KN_PRO_M)
+                 + 347.3)
+        self.assertLess(mit[name].widerstand.groesse.in_einheit(KN_PRO_M),
+                        summe - 1.0)
+
+    def test_zug_steilt_die_diagonale_auf(self):
+        """
+        Bei N_Ed > 0 wird α_min auf 40° gehoben -- und α_max notfalls mit,
+        damit der Bereich nicht leer wird.
+        """
+        projekt = projekt_mit_buegeln(alpha_min=30, alpha_max=35)
+        projekt.querschnitte[0].kombinationen[0].N_Ed = 400.0
+        aufbau, _ = urteile(projekt)
+        ergebnisse = {e.fall.name: e for e in aufbau.querkraft["q1.x"].ergebnisse}
+
+        mit_zug = ergebnisse["Feld"]
+        self.assertTrue(mit_zug.zug_hebt_alpha)
+        self.assertEqual((mit_zug.alpha_min, mit_zug.alpha_max), (40, 40))
+
+        ohne_zug = ergebnisse["Feld mit Druck"]
+        self.assertFalse(ohne_zug.zug_hebt_alpha)
+        self.assertEqual((ohne_zug.alpha_min, ohne_zug.alpha_max), (30, 35))
+
+    def test_die_statische_hoehe_folgt_dem_momentenvorzeichen(self):
+        """Zug oben bei M < 0 -- dann zählt die obere Lage dieser Richtung."""
+        aufbau, _ = urteile(projekt_mit_buegeln())
+        ergebnisse = {e.fall.name: e for e in aufbau.querkraft["q1.x"].ergebnisse}
+        self.assertGreater(ergebnisse["Feld"].fall.M_Ed.si, 0)
+        self.assertLess(ergebnisse["Stütze"].fall.M_Ed.si, 0)
+        self.assertNotAlmostEqual(
+            ergebnisse["Feld"].d, ergebnisse["Stütze"].d, places=6)
+
+    def test_stabzahl_in_y_schliesst_die_y_richtung_aus(self):
+        """
+        Eine Stabzahl bezieht sich auf die betrachtete Breite. In y liefe die
+        Breite längs der Traglinie mit, und die Formel hätte keinen Bezug mehr.
+        """
+        projekt = projekt_mit_buegeln(abstand_y=None, anzahl_y=5.0)
+        for k in projekt.querschnitte[0].kombinationen:
+            k.richtung = "beide"
+        aufbau, gefunden = urteile(projekt)
+
+        in_x = gefunden["Querkraft x – Feld"]
+        self.assertTrue(in_x.erfuellt)
+        self.assertGreater(in_x.widerstand.groesse.si, 0.0)
+
+        in_y = gefunden["Querkraft y – Feld"]
+        self.assertFalse(in_y.erfuellt)
+        self.assertAlmostEqual(in_y.widerstand.groesse.si, 0.0)
+        self.assertIn("Widerstand in y-Richtung nicht berechenbar, wegen "
+                      "Bügeldefinition", in_y.begruendung)
+
+    def test_die_stabzahl_wird_zur_teilung(self):
+        """s_V,y = b / n -- fünf Bügel auf 1000 mm sind 200 mm Teilung."""
+        mit_teilung = projekt_mit_buegeln()
+        mit_zahl = projekt_mit_buegeln(abstand_y=None, anzahl_y=5.0)
+        a, _ = urteile(mit_teilung)
+        b, _ = urteile(mit_zahl)
+        self.assertAlmostEqual(a.querkraft["q1.x"].ergebnisse[0].v_Rd,
+                               b.querkraft["q1.x"].ergebnisse[0].v_Rd,
+                               places=6)
+
+    def test_die_herleitung_zeigt_beide_anteile(self):
+        from opencivil.core.protokoll import GleichungBlock
+
+        projekt = projekt_mit_buegeln()
+        aufbau = projekt.aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        titel = [b.titel for b in loesung.protokoll.alle_bloecke()
+                 if isinstance(b, GleichungBlock)]
+        for erwartet in ("Querschnitt eines Bügelschenkels", "Widerstand der Bügel",
+                         "Widerstand der Druckdiagonalen", "Querkraftwiderstand"):
+            self.assertIn(erwartet, titel)
+        # Der bügellose Ansatz darf daneben nicht auch noch dastehen.
+        self.assertNotIn("Beiwert für die statische Höhe", titel)
+        self.assertNotIn("Dekompressionsmoment und Dehnung", titel)

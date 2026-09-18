@@ -418,6 +418,144 @@ function richtungVon(querschnitt, nummer) {
   }[nummer];
 }
 
+/**
+ * Die Bügel einer Platte, mit allen Feldern belegt.
+ *
+ * Eine Beschreibung aus der Zeit vor der Querkraftbewehrung hat das Feld
+ * nicht; der Kern setzt dann seine Vorgaben ein. Stünde in der Maske derweil
+ * ein leeres Feld, rechnete das Werkzeug mit einer Zahl, die nirgends steht --
+ * dieselbe Falle wie damals bei `h = 0`. Darum wird hier gefüllt, und zwar
+ * mit denselben Werten, die der Kern einsetzen würde.
+ */
+function buegelVon(querschnitt, staehle) {
+  const vorhanden = querschnitt.querkraftbewehrung || {};
+  const gesetzt = (wert, vorgabe) => (wert === undefined ? vorgabe : wert);
+  return {
+    durchmesser: gesetzt(vorhanden.durchmesser, 0),
+    stahl: vorhanden.stahl || staehle[0]?.kennung || '',
+    abstand_x: gesetzt(vorhanden.abstand_x, 200),
+    // Genau eines von abstand_y und anzahl_y ist gesetzt. Fehlen beide, gilt
+    // die Teilung -- wie bei den Lagen.
+    abstand_y: (vorhanden.abstand_y === undefined && vorhanden.anzahl_y == null)
+      ? 200 : gesetzt(vorhanden.abstand_y, null),
+    anzahl_y: gesetzt(vorhanden.anzahl_y, null),
+    alpha_min: gesetzt(vorhanden.alpha_min, 30),
+    alpha_max: gesetzt(vorhanden.alpha_max, 45),
+  };
+}
+
+/**
+ * Die Bügel -- ein Raster über die ganze Platte, unterhalb der Lagen.
+ *
+ *     ×  ⌀ [10]   x: [200]   y: [200] mm [Teilung|Anzahl]
+ *     Neigung  α_min [30]°   α_max [45]°
+ *
+ * Die Namensspalte fehlt: über der Zeile steht «Querkraftbewehrung», und die
+ * zusätzliche Teilung braucht den Platz.
+ *
+ * In y darf statt der Teilung eine Stabzahl über die betrachtete Breite
+ * stehen, in x nicht: der Widerstand gilt je Laufmeter, und eine Stabzahl
+ * hätte darin keinen Bezug. Wer sie angibt, bekommt nur noch Nachweise in
+ * x-Richtung -- der Nachweis sagt es dann selbst.
+ */
+function querkraftBlock(querschnitt) {
+  const staehle = zustand.projekt.materialien.filter((m) => m.art === 'betonstahl');
+  const buegel = buegelVon(querschnitt, staehle);
+  const ueberAbstand = buegel.abstand_y !== null && buegel.abstand_y !== undefined;
+  const leer = !(buegel.durchmesser > 0);
+
+  const aendern = (veraenderer) => projektAendern((p) => {
+    const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
+    // Erst vervollständigen, dann ändern: eine Beschreibung aus der Zeit vor
+    // den Bügeln hat das Feld gar nicht, und ein leeres Eingabefeld neben
+    // einer Rechnung mit stiller Vorgabe ist genau der Widerspruch, den
+    // niemand sieht.
+    q.querkraftbewehrung = buegelVon(q, staehle);
+    veraenderer(q.querkraftbewehrung);
+  });
+
+  return el('div.lage.lage-querkraft', { class: leer ? 'ist-leer' : '' }, [
+    el('div.lage-kopf', {}, [
+      el('span', { text: 'Querkraftbewehrung' }),
+      el('span', { style: { marginLeft: 'auto' } }),
+      el('select', {
+        style: { width: 'auto', padding: '1px 6px', fontSize: '11px' },
+        title: 'Betonstahl der Bügel',
+        on: {
+          change: (e) => aendern((x) => { x.stahl = e.target.value; }),
+        },
+      }, staehle.map((s) => el('option', {
+        value: s.kennung, text: s.name || s.sorte, selected: buegel.stahl === s.kennung,
+      }))),
+    ]),
+
+    el('div.postenzeile.postenzeile-quer', { class: leer ? 'ist-leer' : '' }, [
+      el('button.postenweg', {
+        text: '×',
+        class: leer ? '' : 'ist-scharf',
+        disabled: leer,
+        title: 'Querkraftbewehrung entfernen',
+        on: { click: () => aendern((x) => { x.durchmesser = 0; }) },
+      }),
+      el('span.zeichen', { text: '⌀' }),
+      zahlfeld({
+        wert: buegel.durchmesser || null, stufen: DURCHMESSER, min: 0,
+        titel: 'Bügeldurchmesser in mm – leer oder 0 bedeutet: keine Querkraftbewehrung',
+        beiAenderung: (v) => aendern((x) => { x.durchmesser = v ?? 0; }),
+      }),
+      el('span.zeichen', { text: 'x:' }),
+      zahlfeld({
+        wert: buegel.abstand_x, schritt: 25, min: 25,
+        titel: 'Bügelteilung in x-Richtung, in mm',
+        beiAenderung: (v) => aendern((x) => { x.abstand_x = v ?? 200; }),
+      }),
+      el('span.zeichen', { text: 'y:' }),
+      ueberAbstand
+        ? zahlfeld({
+          wert: buegel.abstand_y, schritt: 25, min: 25,
+          titel: 'Bügelteilung in y-Richtung, in mm',
+          beiAenderung: (v) => aendern((x) => { x.abstand_y = v ?? 200; }),
+        })
+        : zahlfeld({
+          wert: buegel.anzahl_y, schritt: 1, min: 1,
+          titel: 'Bügelzahl über die Breite b – dann sind nur Nachweise in '
+               + 'x-Richtung möglich',
+          beiAenderung: (v) => aendern((x) => { x.anzahl_y = v ?? 1; }),
+        }),
+      el('span.einheit', { text: ueberAbstand ? 'mm' : 'Stk' }),
+      el('button.knopf.knopf-zart.umschalter', {
+        text: ueberAbstand ? 'Teilung' : 'Anzahl',
+        title: 'In y-Richtung zwischen Teilung und Stabzahl wechseln. Eine '
+             + 'Stabzahl lässt nur Nachweise in x-Richtung zu.',
+        on: {
+          click: () => aendern((x) => {
+            if (ueberAbstand) { x.anzahl_y = x.anzahl_y || 5; x.abstand_y = null; }
+            else { x.abstand_y = x.abstand_y || 200; x.anzahl_y = null; }
+          }),
+        },
+      }),
+    ]),
+
+    el('div.neigungszeile', {}, [
+      el('span.postenname', { text: 'Neigung' }),
+      span(String.raw`\alpha_{min}`),
+      zahlfeld({
+        wert: buegel.alpha_min, schritt: 1, min: 1, max: 89,
+        titel: 'Kleinste Neigung der Druckdiagonalen in Grad (ganzzahlig)',
+        beiAenderung: (v) => aendern((x) => { x.alpha_min = Math.round(v ?? 30); }),
+      }),
+      el('span.einheit', { text: '°' }),
+      span(String.raw`\alpha_{max}`),
+      zahlfeld({
+        wert: buegel.alpha_max, schritt: 1, min: 1, max: 89,
+        titel: 'Grösste Neigung der Druckdiagonalen in Grad (ganzzahlig)',
+        beiAenderung: (v) => aendern((x) => { x.alpha_max = Math.round(v ?? 45); }),
+      }),
+      el('span.einheit', { text: '°' }),
+    ]),
+  ]);
+}
+
 function ueberdeckungsBlock(querschnitt, welche) {
   const unten = welche === 'unten';
   const aendern = (v) => projektAendern((p) => {
@@ -515,6 +653,12 @@ function plattenEditor(querschnitt) {
           titel: 'Geht in den Querkraftwiderstand ein',
           beiAenderung: (v) => aendern((q) => { q.d_max = v ?? 32; }),
         }), 'mm', 'Grösstkorndurchmesser – geht in den Querkraftwiderstand ein'),
+        feld(['Druckdiagonale ', span('k_c')], zahlfeld({
+          wert: querschnitt.k_c ?? 0.55, schritt: 0.05, min: 0,
+          titel: 'Abminderung der Betondruckfestigkeit in der Druckdiagonalen – '
+               + 'geht nur mit Querkraftbewehrung ein',
+          beiAenderung: (v) => aendern((q) => { q.k_c = v ?? 0.55; }),
+        }), '', 'Abminderung der Betondruckfestigkeit in der Druckdiagonalen'),
         feld('Einlagenhöhe', zahlfeld({
           wert: querschnitt.einlagenhoehe, schritt: 5, min: 0,
           titel: 'Verringert d_v, sofern h/6 < e < d',
@@ -531,6 +675,9 @@ function plattenEditor(querschnitt) {
         lagenBlock(querschnitt, 2),
         lagenBlock(querschnitt, 1),
         ueberdeckungsBlock(querschnitt, 'unten'),
+        // Die Bügel stehen unter den Lagen: sie greifen über die ganze Höhe
+        // und gehören in keine davon.
+        querkraftBlock(querschnitt),
       ]),
     ]),
 

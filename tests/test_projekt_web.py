@@ -8,7 +8,7 @@ from pathlib import Path
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, N_PRO_MM2, Groesse
 from opencivil.projekt import (
     KombinationEintrag, LageEintrag, MaterialEintrag, PostenEintrag, Projekt,
-    ProjektFehler, QuerschnittEintrag,
+    ProjektFehler, QuerkraftbewehrungEintrag, QuerschnittEintrag,
 )
 from opencivil.querschnitt.platte import Richtung
 from opencivil.web import api, bruecke, dienst, server
@@ -55,6 +55,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
             PostenEintrag: PostenEintrag(durchmesser=16.0, abstand=150.0),
             LageEintrag: LageEintrag(stahl="s1"),
             KombinationEintrag: KombinationEintrag("Feld", M_Ed=100.0),
+            QuerkraftbewehrungEintrag: QuerkraftbewehrungEintrag(durchmesser=10.0),
             QuerschnittEintrag: QuerschnittEintrag("q1", "Platte", "b1"),
         }
         for klasse, beispiel in beispiele.items():
@@ -82,7 +83,11 @@ class TestVollstaendigeAblage(unittest.TestCase):
                 QuerschnittEintrag(
                     "q1", "Decke", "b1", h=280.0, b=1000.0,
                     ueberdeckung_unten=25.0, ueberdeckung_oben=35.0,
-                    d_max=16.0, einlagenhoehe=40.0,
+                    d_max=16.0, einlagenhoehe=40.0, k_c=0.6,
+                    querkraftbewehrung=QuerkraftbewehrungEintrag(
+                        durchmesser=10.0, stahl="s1", abstand_x=250.0,
+                        abstand_y=None, anzahl_y=4.0,
+                        alpha_min=35, alpha_max=42),
                     richtung_lage1="y", richtung_lage4="y",
                     lagen=[
                         LageEintrag(
@@ -123,6 +128,11 @@ class TestVollstaendigeAblage(unittest.TestCase):
         self.assertEqual(kopie.querschnitt("q1").kombinationen[1].art, "naechster_Punkt")
         self.assertEqual(kopie.querschnitt("q1").kombinationen[0].V_Ed, 80.0)
         self.assertEqual(kopie.querschnitt("q2").lagen[0].stahl, "s2")
+        buegel = kopie.querschnitt("q1").querkraftbewehrung
+        self.assertEqual((buegel.durchmesser, buegel.abstand_x), (10.0, 250.0))
+        self.assertEqual((buegel.abstand_y, buegel.anzahl_y), (None, 4.0))
+        self.assertEqual((buegel.alpha_min, buegel.alpha_max), (35, 42))
+        self.assertEqual(kopie.querschnitt("q1").k_c, 0.6)
 
     def test_die_datei_geht_auch_durch_den_dienst(self):
         """Was gespeichert wurde, muss der Kern beim Öffnen wieder annehmen."""
@@ -1028,3 +1038,118 @@ class TestAngabengruppen(unittest.TestCase):
             "querschnitt.q1.h", "querschnitt.q1.b",
             "querschnitt.q1.c_nom_unten", "querschnitt.q1.c_nom_oben",
         })
+
+
+class TestQuerkraftbewehrungInDerAusgabe(unittest.TestCase):
+    """Was die Oberfläche von den Bügeln zu sehen bekommt."""
+
+    def projekt(self, **buegel) -> dict:
+        p = Projekt.beispiel()
+        q = p.querschnitt("q1")
+        for k in q.kombinationen:
+            k.V_Ed = 150.0
+            k.richtung = "x"
+        b = q.querkraftbewehrung
+        b.durchmesser, b.stahl = 10.0, "s1"
+        b.abstand_x, b.abstand_y = 200.0, 200.0
+        for name, wert in buegel.items():
+            setattr(b, name, wert)
+        return p.als_dict()
+
+    def test_die_buegel_stehen_in_der_bewehrungsuebersicht(self):
+        antwort = dienst.bearbeite("rechnen", {"projekt": self.projekt()})
+        zeilen = antwort.daten["zusammenfassungen"]["q1"]["bewehrung"]["zeilen"]
+        letzte = zeilen[-1]
+        self.assertEqual(letzte[0], r"\text{Querkraftbewehrung}")
+        self.assertIn(r"\varnothing_{V} = 10", letzte[2])
+        self.assertIn("s_{V,x}", letzte[2])
+        self.assertIn("s_{V,y}", letzte[2])
+        # Der Querschnitt eines Bügelschenkels gehört dazu -- er kommt aus der
+        # Lösung und wird hier nicht ein zweites Mal gerechnet.
+        self.assertIn(r"A_{\varnothing,V} = 78.5", letzte[2])
+        self.assertIn("B500B", letzte[3])
+
+    def test_ohne_buegel_steht_dort_nichts(self):
+        antwort = dienst.bearbeite(
+            "rechnen", {"projekt": Projekt.beispiel().als_dict()})
+        erste = [z[0] for z
+                 in antwort.daten["zusammenfassungen"]["q1"]["bewehrung"]["zeilen"]]
+        self.assertNotIn(r"\text{Querkraftbewehrung}", erste)
+
+    def test_mit_buegeln_tritt_das_neigungsdiagramm_an_die_stelle_der_m_v_kurve(self):
+        antwort = dienst.bearbeite("rechnen", {"projekt": self.projekt()})
+        self.assertEqual(antwort.daten["querkraftkurven"], {})
+        self.assertTrue(antwort.daten["neigungskurven"])
+
+    def test_ohne_buegel_bleibt_es_bei_der_m_v_kurve(self):
+        p = Projekt.beispiel()
+        for k in p.querschnitt("q1").kombinationen:
+            k.V_Ed = 150.0
+        antwort = dienst.bearbeite("rechnen", {"projekt": p.als_dict()})
+        self.assertTrue(antwort.daten["querkraftkurven"])
+        self.assertEqual(antwort.daten["neigungskurven"], {})
+
+    def test_je_statischer_hoehe_ein_eigenes_bild(self):
+        """
+        Feld und Stütze haben verschiedene Vorzeichen des Moments, also
+        verschiedene statische Höhen -- und damit verschiedene Kurven.
+        """
+        antwort = dienst.bearbeite("rechnen", {"projekt": self.projekt()})
+        kurven = antwort.daten["neigungskurven"]
+        hoehen = {round(k["d"], 6) for k in kurven.values()}
+        self.assertEqual(len(kurven), len(hoehen))
+        for kurve in kurven.values():
+            self.assertTrue(kurve["faelle"])
+
+    def test_die_kurve_reicht_ueber_die_grenzen_hinaus(self):
+        """
+        Gezeichnet wird von 25° bis 45°, blass ausserhalb der beiden Grenzen.
+        Ein dort abgeschnittener Ast liesse offen, ob die Kurve endet oder der
+        Bereich.
+        """
+        antwort = dienst.bearbeite(
+            "rechnen", {"projekt": self.projekt(alpha_min=35, alpha_max=40)})
+        kurve = next(iter(antwort.daten["neigungskurven"].values()))
+        winkel = [p["alpha"] for p in kurve["punkte"]]
+        self.assertEqual(winkel, list(range(25, 46)))
+        drin = [p["alpha"] for p in kurve["punkte"] if p["im_bereich"]]
+        self.assertEqual(drin, list(range(35, 41)))
+
+    def test_bei_zug_waechst_die_achse_mit(self):
+        """α_min = 40 und α_max = 50 müssen beide ins Bild passen."""
+        p = Projekt.beispiel()
+        q = p.querschnitt("q1")
+        q.kombinationen = [q.kombinationen[0]]
+        q.kombinationen[0].V_Ed = 150.0
+        q.kombinationen[0].N_Ed = 400.0
+        q.kombinationen[0].richtung = "x"
+        b = q.querkraftbewehrung
+        b.durchmesser, b.stahl = 10.0, "s1"
+        b.abstand_x, b.abstand_y = 200.0, 200.0
+        b.alpha_min, b.alpha_max = 30, 50
+
+        antwort = dienst.bearbeite("rechnen", {"projekt": p.als_dict()})
+        kurve = next(iter(antwort.daten["neigungskurven"].values()))
+        self.assertTrue(kurve["zug"])
+        self.assertEqual((kurve["alpha_min"], kurve["alpha_max"]), (40, 50))
+        self.assertEqual(kurve["punkte"][-1]["alpha"], 50)
+
+    def test_ein_widerstand_von_null_traegt_seinen_grund(self):
+        """
+        Eine Null erklärt sich nicht von selbst. Steht in der Tabelle 0.0 kN/m,
+        muss daneben stehen, warum -- im Tooltip allein findet es niemand.
+        """
+        projekt = self.projekt(abstand_y=None, anzahl_y=5.0)
+        for k in projekt["querschnitte"][0]["kombinationen"]:
+            k["richtung"] = "beide"
+        antwort = dienst.bearbeite("rechnen", {"projekt": projekt})
+        zeilen = antwort.daten["zusammenfassungen"]["q1"]["zeilen"]
+
+        mit_hinweis = [z for z in zeilen if z["hinweis"]]
+        self.assertTrue(mit_hinweis)
+        for zeile in mit_hinweis:
+            self.assertIn("nicht berechenbar", zeile["hinweis"])
+            self.assertIn("0.0", zeile["zellen"][1])
+        # Erfüllte Nachweise tragen keinen -- sonst stünde unter jeder Tabelle
+        # eine Wand aus Begründungen.
+        self.assertFalse([z for z in zeilen if z["erfuellt"] and z["hinweis"]])

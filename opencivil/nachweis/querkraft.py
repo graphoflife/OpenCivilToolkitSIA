@@ -1,11 +1,26 @@
 """
-opencivil/nachweis/querkraft.py -- Querkraftnachweis ohne Querkraftbewehrung.
+opencivil/nachweis/querkraft.py -- Querkraftnachweis.
 
 VERANTWORTUNG:
 Bestimmt den Querkraftwiderstand einer Platte je Tragrichtung und prueft ihn
 gegen die angegebenen Querkraefte.
 
-ANSATZ::
+ZWEI ANSAETZE, EINER DAVON GILT:
+Ob die Platte eine Querkraftbewehrung traegt, entscheidet allein, welcher der
+beiden laeuft. Beides zu addieren waere ein drittes Modell -- und dieses
+Werkzeug rechnet nur, was es auch herleitet.
+
+MIT BUEGELN -- Fachwerkmodell, siehe :func:`buegelwiderstand`::
+
+    V_Rd,s = A_(⌀,V)/(s_V,x * s_V,y) * 0.9 * d * f_yd * cot(alpha)
+    V_Rd,c = 0.9 * d * k_c * f_cd * sin(alpha) * cos(alpha)
+    V_Rd   = max ueber alpha von min(V_Rd,s; V_Rd,c)
+
+Gesucht wird ganzgradig zwischen ``alpha_min`` und ``alpha_max``. Bei
+Normalzug steilt sich die Druckdiagonale auf -- beide Grenzen werden dann auf
+mindestens ``ALPHA_ZUG`` gehoben.
+
+OHNE BUEGEL::
 
     V_Rd = k_d * tau_cd * d_v
 
@@ -51,7 +66,9 @@ from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.biegung_normalkraft import protokoll_interpolation
-from opencivil.querschnitt.platte import Plattenquerschnitt, Richtung
+from opencivil.querschnitt.platte import (
+    ALPHA_ZUG, Plattenquerschnitt, Richtung,
+)
 
 #: Unterer Riegel fuer den Beiwert der Gesteinskoernung.
 K_G_MINDEST = 1.20
@@ -169,6 +186,95 @@ def widerstand(
         plastisch=plastisch)
 
 
+@dataclass(frozen=True)
+class Buegelpunkt:
+    """
+    Was bei einer bestimmten Neigung der Druckdiagonalen aufnehmbar ist.
+
+    Beide Anteile in N/m, also je Laufmeter -- wie ``V_Ed``.
+    """
+
+    alpha: int
+    """Neigung der Druckdiagonalen in Grad."""
+
+    V_Rd_s: float
+    """Bügel: waechst, je flacher die Diagonale liegt."""
+
+    V_Rd_c: float
+    """Druckdiagonale: groesst bei 45°, faellt nach beiden Seiten."""
+
+    @property
+    def V_Rd(self) -> float:
+        """Massgebend ist der kleinere der beiden -- eines von beiden versagt."""
+        return min(self.V_Rd_s, self.V_Rd_c)
+
+
+def buegelwiderstand(
+    *, alpha: int, a_s: float, s_x: float, s_y: float, d: float,
+    f_yd: float, f_cd: float, k_c: float,
+) -> Buegelpunkt:
+    """
+    Fachwerkmodell mit veraenderlicher Neigung der Druckdiagonalen.
+
+    Alles in SI-Basis: Flaechen in m^2, Laengen in m, Festigkeiten in Pa.
+    Rueckgabe in N/m::
+
+        V_Rd,s = A_(⌀,V)/(s_x · s_y) · 0.9 · d · f_yd · cot(alpha)
+        V_Rd,c = 0.9 · d · k_c · f_cd · sin(alpha) · cos(alpha)
+
+    ``A_(⌀,V)/(s_x · s_y)`` ist der Bewehrungsgehalt: ein Buegelschenkel je
+    Rasterfeld. Beide Groessen gelten **je Laufmeter** -- so wie ``V_Ed`` und
+    wie der Widerstand ohne Buegel. Die betrachtete Breite ``b`` steht deshalb
+    in keiner der beiden Formeln; sie ist der Bezug, auf den sich alle
+    Schnittgroessen ohnehin schon beziehen.
+    """
+    bogen = math.radians(alpha)
+    return Buegelpunkt(
+        alpha=alpha,
+        V_Rd_s=a_s / (s_x * s_y) * 0.9 * d * f_yd / math.tan(bogen),
+        V_Rd_c=0.9 * d * k_c * f_cd * math.sin(bogen) * math.cos(bogen),
+    )
+
+
+@dataclass(frozen=True)
+class Buegelwerte:
+    """
+    Was ausser der Neigung und der statischen Hoehe in den Widerstand eingeht.
+
+    Alles in SI-Basis. Steht nach dem Lauf am Nachweis bereit, damit sich der
+    Verlauf ueber der Neigung zeichnen laesst -- ohne dass die Oberflaeche die
+    Formel ein zweites Mal enthaelt. Dasselbe Muster wie
+    :class:`Kurvenbeiwerte` beim Ansatz ohne Buegel.
+    """
+
+    a_s: float
+    s_x: float
+    s_y: float
+    f_yd: float
+    f_cd: float
+    k_c: float
+
+
+def neigungen(
+    *, alpha_min: int, alpha_max: int, **werte: float
+) -> List[Buegelpunkt]:
+    """Je ganzes Grad im Bereich ein Punkt, einschliesslich der Grenzen."""
+    return [buegelwiderstand(alpha=a, **werte)
+            for a in range(alpha_min, alpha_max + 1)]
+
+
+def beste_neigung(punkte: Sequence[Buegelpunkt]) -> Buegelpunkt:
+    """
+    Die Neigung mit dem groessten Widerstand.
+
+    ``V_Rd,s`` waechst mit flacherer Diagonale, ``V_Rd,c`` faellt dabei --
+    das Kleinere von beiden hat sein Groesstes dort, wo sich die beiden
+    Aeste treffen. Gesucht wird ganzgradig; bei Gleichstand gilt die
+    steilere Neigung, weil sie die Druckdiagonale weniger beansprucht.
+    """
+    return max(punkte, key=lambda q: (q.V_Rd, q.alpha))
+
+
 def _statische_hoehe(
     lagen: Sequence[Tuple[float, bool]], h: float, moment_positiv: bool
 ) -> Optional[float]:
@@ -231,9 +337,39 @@ class Querkraftergebnis:
     erfuellt: bool = False
     begruendung: str = ""
 
+    # -- nur mit Buegeln ----------------------------------------------------
+
+    punkte: Tuple[Buegelpunkt, ...] = ()
+    """Der Widerstand je ganzem Grad zwischen den beiden Grenzwinkeln."""
+
+    massgebend: Optional[Buegelpunkt] = None
+    """Der Punkt mit dem groessten Widerstand -- daraus stammt ``v_Rd``."""
+
+    alpha_min: int = 0
+    alpha_max: int = 0
+    """Die tatsaechlich verwendeten Grenzen; bei Normalzug angehoben."""
+
+    zug_hebt_alpha: bool = False
+    """Ob die Grenzen wegen einer Normalzugkraft angehoben wurden."""
+
 
 class Querkraft(Nachweis):
-    """Querkraftwiderstand ohne Querkraftbewehrung, je Tragrichtung."""
+    """
+    Querkraftwiderstand je Tragrichtung.
+
+    ZWEI ANSAETZE, EINER DAVON GILT:
+
+    * **Ohne Buegel** -- ``V_Rd = k_d · tau_cd · d_v``, der Widerstand des
+      Betons allein. Er haengt ueber ``eps_v`` an ``m_Ed`` und ``m_Rd(N_Ed)``
+      und damit an der Einwirkung.
+    * **Mit Buegeln** -- das Fachwerkmodell aus :func:`buegelwiderstand`. Der
+      Betonanteil des ersten Ansatzes entfaellt dann vollstaendig; massgebend
+      ist das Kleinere aus Buegel- und Druckdiagonalenwiderstand, gesucht
+      ueber die guenstigste Neigung.
+
+    Welcher gilt, entscheidet allein, ob die Platte eine Querkraftbewehrung
+    traegt -- nicht eine Einstellung daneben.
+    """
 
     def __init__(
         self,
@@ -254,6 +390,13 @@ class Querkraft(Nachweis):
         self.faelle = list(faelle)
         self.ergebnisse: List[Querkraftergebnis] = []
 
+        self.buegel = (querschnitt.querkraftbewehrung
+                       if querschnitt.hat_buegel else None)
+        """Die Bügel dieser Platte -- ``None`` heisst: der Ansatz ohne."""
+
+        self.buegelwerte: Optional[Buegelwerte] = None
+        """Die geloesten Eingaenge des Bügelansatzes, nach dem Lauf."""
+
         self.beiwerte: Optional[Kurvenbeiwerte] = None
         """
         Die geloesten Eingaenge, nach dem Lauf. Fuer :meth:`kurve`.
@@ -271,6 +414,9 @@ class Querkraft(Nachweis):
         self.s_E_s = mit_index("E_s", self.posten[0][0].stahl.symbol_index)
         self.s_tau_cd = mit_index(r"\tau_{cd}", querschnitt.beton.symbol_index)
         self.s_f_ck = mit_index("f_{ck}", querschnitt.beton.symbol_index)
+        self.s_f_cd = mit_index("f_{cd}", querschnitt.beton.symbol_index)
+        self.s_f_yd_V = mit_index(
+            "f_{yd}", self.buegel.stahl.symbol_index if self.buegel else "")
 
         self.mn = mn_nachweis
         """
@@ -309,25 +455,44 @@ class Querkraft(Nachweis):
 
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),
-            Eingabebezug("D_max", querschnitt.id_von("D_max")),
-            Eingabebezug("einlagenhoehe", querschnitt.id_von("einlagenhoehe")),
-            Eingabebezug("f_ck", querschnitt.beton.id_von("f_ck")),
-            Eingabebezug("tau_cd", querschnitt.beton.id_von("tau_cd")),
         ]
         for lage, art, _, as_id, z_id in self.posten:
             bezuege.append(Eingabebezug(f"z_{lage.nummer}{art.kuerzel}", z_id))
-        stahl = self.posten[0][0].stahl
-        bezuege += [
-            Eingabebezug("f_yd", stahl.id_von("f_yd")),
-            Eingabebezug("E_s", stahl.id_von("E_s")),
-        ]
-        # Der Momentenwiderstand bei der wirkenden Normalkraft kommt aus dem
-        # M-N-Nachweis -- je Fall einer. Als Eingang statt als mitgegebene Zahl,
-        # damit die Abhaengigkeit im Graphen steht und die Rueckverfolgung sie
-        # zeigt.
-        for f in self.faelle:
+
+        if self.buegel is None:
+            stahl = self.posten[0][0].stahl
+            bezuege += [
+                Eingabebezug("D_max", querschnitt.id_von("D_max")),
+                Eingabebezug("einlagenhoehe", querschnitt.id_von("einlagenhoehe")),
+                Eingabebezug("f_ck", querschnitt.beton.id_von("f_ck")),
+                Eingabebezug("tau_cd", querschnitt.beton.id_von("tau_cd")),
+                Eingabebezug("f_yd", stahl.id_von("f_yd")),
+                Eingabebezug("E_s", stahl.id_von("E_s")),
+            ]
+            # Der Momentenwiderstand bei der wirkenden Normalkraft kommt aus dem
+            # M-N-Nachweis -- je Fall einer. Als Eingang statt als mitgegebene Zahl,
+            # damit die Abhaengigkeit im Graphen steht und die Rueckverfolgung sie
+            # zeigt. Mit Buegeln geht er nicht ein; ihn trotzdem anzufordern
+            # haenge eine Interpolation in die Herleitung, die dort nichts erklaert.
+            for f in self.faelle:
+                bezuege.append(Eingabebezug(
+                    f"m_Rd_{f.kennung}", mn_nachweis.d_m_rd[f.name].id))
+        else:
+            bezuege += [
+                Eingabebezug("b", querschnitt.id_von("b")),
+                Eingabebezug("k_c", querschnitt.id_von("k_c")),
+                Eingabebezug("f_cd", querschnitt.beton.id_von("f_cd")),
+                Eingabebezug("a_s_V", querschnitt.id_von("querkraft.a_s")),
+                Eingabebezug("phi_V", querschnitt.id_von("querkraft.phi")),
+                Eingabebezug("s_x", querschnitt.id_von("querkraft.s_x")),
+                Eingabebezug("alpha_min", querschnitt.id_von("querkraft.alpha_min")),
+                Eingabebezug("alpha_max", querschnitt.id_von("querkraft.alpha_max")),
+                Eingabebezug("f_yd_V", self.buegel.stahl.id_von("f_yd")),
+            ]
             bezuege.append(Eingabebezug(
-                f"m_Rd_{f.kennung}", mn_nachweis.d_m_rd[f.name].id))
+                "menge_y",
+                querschnitt.id_von("querkraft.s_y" if self.buegel.ueber_abstand_y
+                                   else "querkraft.n_y")))
 
         super().__init__(
             basis,
@@ -344,6 +509,11 @@ class Querkraft(Nachweis):
     # -- Rechnen ------------------------------------------------------------
 
     def pruefe(self, e: Eingaben, p: Protokoll):
+        if self.buegel is not None:
+            return self._mit_buegeln(e, p)
+        return self._ohne_buegel(e, p)
+
+    def _ohne_buegel(self, e: Eingaben, p: Protokoll):
         h = e.g("h").si
         tau_cd = e.g("tau_cd")
         f_yd = e.g("f_yd").si
@@ -393,40 +563,148 @@ class Querkraft(Nachweis):
                                    m_rd[fall.name], lagen)
             self.ergebnisse.append(erg)
             self._protokoll_fall(p, erg, h, tau_cd, f_yd, E_s, einlage, k_g)
-
-            ergebnis[self.d_v_rd[fall.name].id] = Groesse.aus_si(erg.v_Rd, KN_PRO_M)
-            ergebnis[self.d_grad[fall.name].id] = Groesse(
-                min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
-
-            urteile.append(NachweisUrteil(
-                name=f"Querkraft {self.richtung.value} – {fall.name}",
-                art="V",
-                fall=fall.name,
-                erfuellt=erg.erfuellt,
-                erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
-                begruendung=erg.begruendung,
-                # Das Vorzeichen der Querkraft spielt keine Rolle -- verglichen
-                # wird der Betrag. Also steht auch der Betrag da; sonst teilte
-                # der Leser den Widerstand durch eine negative Zahl und bekaeme
-                # etwas anderes als den danebenstehenden Erfuellungsgrad. Die
-                # Betragsstriche stehen trotzdem nicht am Symbol: sie sagen
-                # nichts, was die Zahl daneben nicht schon zeigt.
-                einwirkung=WertDef(
-                    id=f"{self.id}.{fall.kennung}.V_Ed",
-                    symbol=rf"V_{{Ed,{self.richtung.value}}}",
-                    einheit=KN_PRO_M, beschreibung="Einwirkung", stellen=1,
-                ).belegen(Groesse.aus_si(abs(fall.V_Ed.si), KN_PRO_M)),
-                # Der Widerstand gilt nur unter genau dieser Einwirkung -- das
-                # gehoert ins Symbol, sonst liest sich v_Rd wie ein Kennwert des
-                # Querschnitts.
-                widerstand=WertDef(
-                    id=self.d_v_rd[fall.name].id,
-                    symbol=self._widerstandssymbol(fall),
-                    einheit=KN_PRO_M, beschreibung="Widerstand", stellen=1,
-                ).belegen(Groesse.aus_si(erg.v_Rd, KN_PRO_M)),
-            ))
+            self._eintragen(erg, ergebnis, urteile)
 
         return ergebnis, urteile
+
+    def _eintragen(
+        self, erg: Querkraftergebnis, ergebnis: Dict[str, Groesse],
+        urteile: List[NachweisUrteil],
+    ) -> None:
+        """
+        Ausgaben und Urteil eines Falls -- fuer beide Ansaetze dieselben.
+
+        Was ein Querkraftnachweis herausgibt, haengt nicht davon ab, wie der
+        Widerstand zustande kam. Zweimal geschrieben liefen die beiden Faelle
+        frueher oder spaeter auseinander.
+        """
+        fall = erg.fall
+        ergebnis[self.d_v_rd[fall.name].id] = Groesse.aus_si(erg.v_Rd, KN_PRO_M)
+        ergebnis[self.d_grad[fall.name].id] = Groesse(
+            min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
+
+        urteile.append(NachweisUrteil(
+            name=f"Querkraft {self.richtung.value} – {fall.name}",
+            art="V",
+            fall=fall.name,
+            erfuellt=erg.erfuellt,
+            erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
+            begruendung=erg.begruendung,
+            # Das Vorzeichen der Querkraft spielt keine Rolle -- verglichen
+            # wird der Betrag. Also steht auch der Betrag da; sonst teilte
+            # der Leser den Widerstand durch eine negative Zahl und bekaeme
+            # etwas anderes als den danebenstehenden Erfuellungsgrad. Die
+            # Betragsstriche stehen trotzdem nicht am Symbol: sie sagen
+            # nichts, was die Zahl daneben nicht schon zeigt.
+            einwirkung=WertDef(
+                id=f"{self.id}.{fall.kennung}.V_Ed",
+                symbol=rf"V_{{Ed,{self.richtung.value}}}",
+                einheit=KN_PRO_M, beschreibung="Einwirkung", stellen=1,
+            ).belegen(Groesse.aus_si(abs(fall.V_Ed.si), KN_PRO_M)),
+            # Der Widerstand gilt nur unter genau dieser Einwirkung -- das
+            # gehoert ins Symbol, sonst liest sich V_Rd wie ein Kennwert des
+            # Querschnitts.
+            widerstand=WertDef(
+                id=self.d_v_rd[fall.name].id,
+                symbol=self._widerstandssymbol(fall),
+                einheit=KN_PRO_M, beschreibung="Widerstand", stellen=1,
+            ).belegen(Groesse.aus_si(erg.v_Rd, KN_PRO_M)),
+        ))
+
+    # -- Mit Querkraftbewehrung ---------------------------------------------
+
+    def _mit_buegeln(self, e: Eingaben, p: Protokoll):
+        """
+        Fachwerkmodell: Bügel gegen Druckdiagonale, über die Neigung gesucht.
+
+        Der Betonanteil des bügellosen Ansatzes entfällt hier vollständig --
+        beides zu addieren wäre ein anderes Modell, und dieses Werkzeug rechnet
+        nur, was es auch herleitet.
+        """
+        h = e.g("h").si
+        b = e.g("b").si
+        a_s = e.g("a_s_V").si
+        s_x = e.g("s_x").si
+        f_yd = e.g("f_yd_V").si
+        f_cd = e.g("f_cd").si
+        k_c = e.g("k_c").si
+        lagen = [(e.g(f"z_{l.nummer}{a.kuerzel}").si, l.von_unten)
+                 for l, a, _, _, _ in self.posten]
+
+        # Die Menge in y: entweder eine Teilung oder eine Stabzahl über die
+        # betrachtete Breite. Aus der Zahl wird hier eine Teilung -- die Formel
+        # kennt nur Teilungen, und die Umrechnung steht in der Herleitung.
+        menge_y = e.g("menge_y")
+        ueber_teilung = self.buegel.ueber_abstand_y
+        s_y = menge_y.si if ueber_teilung else (b / menge_y.si if menge_y.si else 0.0)
+
+        self.buegelwerte = Buegelwerte(
+            a_s=a_s, s_x=s_x, s_y=s_y, f_yd=f_yd, f_cd=f_cd, k_c=k_c)
+
+        self._protokoll_ansatz_buegel(p, e, s_y)
+
+        ergebnis: Dict[str, Groesse] = {}
+        urteile: List[NachweisUrteil] = []
+        self.ergebnisse = []
+
+        for fall in self.faelle:
+            erg = self._einen_fall_buegel(
+                fall, h=h, lagen=lagen, a_s=a_s, s_x=s_x, s_y=s_y,
+                f_yd=f_yd, f_cd=f_cd, k_c=k_c, ueber_teilung=ueber_teilung)
+            self.ergebnisse.append(erg)
+            self._protokoll_fall_buegel(p, erg, a_s, s_x, s_y, f_yd, f_cd, k_c)
+            self._eintragen(erg, ergebnis, urteile)
+
+        return ergebnis, urteile
+
+    def _einen_fall_buegel(
+        self, fall: Querkraftfall, *, h: float,
+        lagen: Sequence[Tuple[float, bool]], a_s: float, s_x: float,
+        s_y: float, f_yd: float, f_cd: float, k_c: float, ueber_teilung: bool,
+    ) -> Querkraftergebnis:
+        erg = Querkraftergebnis(fall=fall)
+        M_Ed, N_Ed, V_Ed = fall.M_Ed.si, fall.N_Ed.si, fall.V_Ed.si
+
+        # Eine Stabzahl in y bezieht sich auf die betrachtete Breite. In
+        # x-Richtung ergibt das eine Teilung; in y-Richtung liefe die Breite
+        # laengs der Traglinie mit und die Formel haette keinen Bezug mehr.
+        if not ueber_teilung and self.richtung is Richtung.Y:
+            erg.begruendung = (
+                "Widerstand in y-Richtung nicht berechenbar, wegen "
+                "Bügeldefinition: in y ist eine Stabzahl über die betrachtete "
+                "Breite angegeben statt einer Teilung. Für einen Nachweis in "
+                "y-Richtung braucht es dort eine Teilung in mm.")
+            return erg
+
+        hoehen = _statische_hoehe(lagen, h, M_Ed >= 0)
+        if hoehen is None:
+            seite = "unten" if M_Ed >= 0 else "oben"
+            erg.begruendung = (
+                f"Auf der gezogenen Seite ({seite}) liegt in dieser Richtung "
+                f"keine Bewehrung. Ohne statische Höhe gibt es keinen "
+                f"Querkraftwiderstand: V_Rd = 0.")
+            return erg
+        erg.d = erg.d_v = hoehen
+
+        erg.zug_hebt_alpha = N_Ed > 0.0
+        erg.alpha_min, erg.alpha_max = self.buegel.grenzen(erg.zug_hebt_alpha)
+        erg.punkte = tuple(neigungen(
+            alpha_min=erg.alpha_min, alpha_max=erg.alpha_max,
+            a_s=a_s, s_x=s_x, s_y=s_y, d=erg.d,
+            f_yd=f_yd, f_cd=f_cd, k_c=k_c))
+        erg.massgebend = beste_neigung(erg.punkte)
+        erg.v_Rd = erg.massgebend.V_Rd
+
+        erg.erfuellungsgrad = float("inf") if V_Ed == 0 else abs(erg.v_Rd) / abs(V_Ed)
+        erg.erfuellt = erg.erfuellungsgrad >= 1.0
+        massgebend = ("die Bügel" if erg.massgebend.V_Rd_s <= erg.massgebend.V_Rd_c
+                      else "die Druckdiagonale")
+        erg.begruendung = (
+            f"Günstigste Neigung α = {erg.massgebend.alpha}°: "
+            f"V_Rd,s = {erg.massgebend.V_Rd_s / 1e3:.1f} kN/m, "
+            f"V_Rd,c = {erg.massgebend.V_Rd_c / 1e3:.1f} kN/m. "
+            f"Massgebend {massgebend}.")
+        return erg
 
     # -- Kurve --------------------------------------------------------------
 
@@ -497,6 +775,22 @@ class Querkraft(Nachweis):
         return {"punkte": punkte, "m_Rd": vz * m_Rd, "d": d, "d_v": d_v,
                 "moment_positiv": moment_positiv}
 
+    def neigungsverlauf(self, d: float, von: int, bis: int) -> List[Buegelpunkt]:
+        """
+        Der Widerstand ueber der Neigung -- fuer das Diagramm.
+
+        Ueber dieselbe Funktion wie der Nachweis selbst, nur ueber einen
+        weiteren Bereich: gezeichnet wird auch ausserhalb der beiden Grenzen,
+        dort blass. Zwei Rechenwege fuer dieselbe Kurve liefen auseinander.
+        """
+        if self.buegelwerte is None:
+            return []
+        w = self.buegelwerte
+        return neigungen(
+            alpha_min=von, alpha_max=bis, d=d,
+            a_s=w.a_s, s_x=w.s_x, s_y=w.s_y,
+            f_yd=w.f_yd, f_cd=w.f_cd, k_c=w.k_c)
+
     def _widerstandssymbol(self, fall: Querkraftfall) -> str:
         """``V_Rd(M_Ed = 100 kNm, N_Ed = -300 kN)`` -- der Widerstand ist bedingt."""
         r = self.richtung.value
@@ -556,6 +850,118 @@ class Querkraft(Nachweis):
         return erg
 
 
+    # -- Mitschrift mit Bügeln ----------------------------------------------
+
+    def _protokoll_ansatz_buegel(
+        self, p: Protokoll, e: Eingaben, s_y: float
+    ) -> None:
+        p.titel(f"Querkraft – {self.richtung.beschriftung}")
+        p.text(
+            "Querkraftwiderstand mit Querkraftbewehrung, Fachwerkmodell mit "
+            "veränderlicher Neigung der Druckdiagonalen. Massgebend ist das "
+            "Kleinere aus dem Widerstand der Bügel und dem der Druckdiagonalen; "
+            "der Betonanteil ohne Bügel geht nicht zusätzlich ein."
+        )
+        p.gleichung(
+            rf"V_{{Rd,s}} = \frac{{A_{{\varnothing,V}}}}{{s_{{V,x}} \cdot s_{{V,y}}}} "
+            rf"\cdot 0.9 \cdot d \cdot {self.s_f_yd_V} \cdot \cot\alpha \qquad "
+            rf"V_{{Rd,c}} = 0.9 \cdot d \cdot k_c \cdot {self.s_f_cd} "
+            r"\cdot \sin\alpha \cdot \cos\alpha",
+            titel="Ansatz", referenz="SIA 262:2025, 4.3.3.4")
+        p.text(
+            "Beide Anteile gelten je Laufmeter, wie die Querkraft selbst. "
+            "Gesucht wird ganzgradig zwischen α_min und α_max die Neigung mit "
+            f"dem grössten Widerstand V_Rd = min(V_Rd,s; V_Rd,c). Bei einer "
+            f"Normalzugkraft steilt sich die Druckdiagonale auf: α_min wird "
+            f"dann auf {ALPHA_ZUG}° gesetzt und α_max notfalls mitgehoben."
+        )
+        if not self.buegel.ueber_abstand_y:
+            n_y = e.g("menge_y")
+            b = e.g("b")
+            p.gleichung(
+                r"s_{V,y} = \frac{b}{n_{V,y}}"
+                rf" = \frac{{{b.formatiert(0, MM)}}}{{{n_y.formatiert(0)}}}"
+                rf" = {s_y * 1e3:.1f}\,\mathrm{{mm}}",
+                titel="Teilung in y aus der Stabzahl")
+
+    def _protokoll_fall_buegel(
+        self, p: Protokoll, erg: Querkraftergebnis, a_s: float, s_x: float,
+        s_y: float, f_yd: float, f_cd: float, k_c: float,
+    ) -> None:
+        fall = erg.fall
+        p.titel(f"Nachweis – {fall.name}", ebene=3)
+        p.gleichung(
+            rf"V_{{Ed}} = {fall.V_Ed.als_latex(1, KN_PRO_M)} \qquad "
+            rf"M_{{Ed}} = {fall.M_Ed.als_latex(1, KNM)} \qquad "
+            rf"N_{{Ed}} = {fall.N_Ed.als_latex(1, KN)}",
+            titel="Einwirkung")
+
+        if erg.massgebend is None:
+            p.text(erg.begruendung)
+            return
+
+        seite = "unten" if fall.M_Ed.si >= 0 else "oben"
+        p.gleichung(
+            rf"d = {erg.d * 1e3:.1f}\,\mathrm{{mm}}",
+            titel=f"Statische Höhe der gezogenen Bewehrung ({seite})")
+
+        if erg.zug_hebt_alpha:
+            p.text(
+                f"N_Ed = {fall.N_Ed.formatiert(1, KN)} kN ist eine Zugkraft – "
+                f"die Grenzen der Neigung werden auf α_min = {erg.alpha_min}° "
+                f"und α_max = {erg.alpha_max}° angehoben.")
+
+        q = erg.massgebend
+        p.text(
+            f"Zwischen α = {erg.alpha_min}° und α = {erg.alpha_max}° ganzgradig "
+            f"durchgerechnet; den grössten Widerstand liefert α = {q.alpha}°.")
+
+        p.gleichung(
+            rf"V_{{Rd,s}} = \frac{{A_{{\varnothing,V}}}}"
+            rf"{{s_{{V,x}} \cdot s_{{V,y}}}} \cdot 0.9 \cdot d \cdot "
+            rf"{self.s_f_yd_V} \cdot \cot\alpha"
+            "\n= "
+            rf"\frac{{{a_s * 1e6:.1f}\,\mathrm{{mm}}^{{2}}}}"
+            rf"{{{s_x * 1e3:.0f}\,\mathrm{{mm}} \cdot {s_y * 1e3:.0f}\,\mathrm{{mm}}}} "
+            rf"\cdot 0.9 \cdot {erg.d * 1e3:.1f}\,\mathrm{{mm}} \cdot "
+            rf"{f_yd / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}} \cdot "
+            rf"\cot {q.alpha}^{{\circ}}"
+            rf" = {q.V_Rd_s / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}}",
+            titel="Widerstand der Bügel")
+
+        p.gleichung(
+            rf"V_{{Rd,c}} = 0.9 \cdot d \cdot k_c \cdot {self.s_f_cd} "
+            r"\cdot \sin\alpha \cdot \cos\alpha"
+            "\n= "
+            rf"0.9 \cdot {erg.d * 1e3:.1f}\,\mathrm{{mm}} \cdot {k_c:.2f} \cdot "
+            rf"{f_cd / 1e6:.1f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}} \cdot "
+            rf"\sin {q.alpha}^{{\circ}} \cdot \cos {q.alpha}^{{\circ}}"
+            rf" = {q.V_Rd_c / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}}",
+            titel="Widerstand der Druckdiagonalen")
+
+        p.gleichung(
+            rf"V_{{Rd}} = \min\left[V_{{Rd,s}};\ V_{{Rd,c}}\right] = "
+            rf"\min\left[{q.V_Rd_s / 1e3:.1f};\ {q.V_Rd_c / 1e3:.1f}\right]"
+            rf" = {erg.v_Rd / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}}",
+            titel="Querkraftwiderstand")
+
+        self._protokoll_grad(p, erg)
+
+    def _protokoll_grad(self, p: Protokoll, erg: Querkraftergebnis) -> None:
+        """Die letzte Zeile jedes Falls -- für beide Ansätze dieselbe."""
+        r = self.richtung.value
+        zustand = r"\text{erfüllt}" if erg.erfuellt else r"\text{NICHT erfüllt}"
+        grad = (r"\infty" if math.isinf(erg.erfuellungsgrad)
+                else f"{erg.erfuellungsgrad:.2f}")
+        p.gleichung(
+            rf"\alpha_{{eff,V,{r}}} = \frac{{V_{{Rd}}}}{{\left|V_{{Ed}}\right|}} = "
+            rf"\frac{{{erg.v_Rd / 1e3:.1f}}}{{{abs(erg.fall.V_Ed.si) / 1e3:.1f}}} = {grad}"
+            rf" \quad \Rightarrow \quad {zustand}"
+            if erg.fall.V_Ed.si else
+            rf"\alpha_{{eff,V,{r}}} = \frac{{V_{{Rd}}}}{{\left|V_{{Ed}}\right|}} = {grad}"
+            rf" \quad \Rightarrow \quad {zustand}",
+            titel="Erfüllungsgrad")
+
     # -- Mitschrift ---------------------------------------------------------
 
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
@@ -599,7 +1005,6 @@ class Querkraft(Nachweis):
         nicht nachrechnen konnte.
         """
         fall = erg.fall
-        r = self.richtung.value
         M_Ed, N_Ed = fall.M_Ed.si, fall.N_Ed.si
 
         p.titel(f"Querkraftnachweis – {fall.name}", ebene=3)
@@ -677,14 +1082,4 @@ class Querkraft(Nachweis):
             rf" = {erg.v_Rd / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}}",
             titel="Querkraftwiderstand", referenz="SIA 262:2025, 4.3.3.2.1")
 
-        zustand = r"\text{erfüllt}" if erg.erfuellt else r"\text{NICHT erfüllt}"
-        grad = (r"\infty" if math.isinf(erg.erfuellungsgrad)
-                else f"{erg.erfuellungsgrad:.2f}")
-        p.gleichung(
-            rf"\alpha_{{eff,V,{r}}} = \frac{{V_{{Rd}}}}{{\left|V_{{Ed}}\right|}} = "
-            rf"\frac{{{erg.v_Rd / 1e3:.1f}}}{{{abs(fall.V_Ed.si) / 1e3:.1f}}} = {grad}"
-            rf" \quad \Rightarrow \quad {zustand}"
-            if fall.V_Ed.si else
-            rf"\alpha_{{eff,V,{r}}} = \frac{{V_{{Rd}}}}{{\left|V_{{Ed}}\right|}} = {grad}"
-            rf" \quad \Rightarrow \quad {zustand}",
-            titel="Erfüllungsgrad")
+        self._protokoll_grad(p, erg)

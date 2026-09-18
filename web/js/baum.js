@@ -152,7 +152,15 @@ function platteAnlegen() {
       // Grösstkorn und Einlagenhöhe gehören zur Platte und gehen in den
       // Querkraftwiderstand ein. Ohne Vorgabe stünden die Felder leer da und
       // der Nachweis meldete eine fehlende Eingabe.
-      d_max: 32, einlagenhoehe: 0,
+      d_max: 32, einlagenhoehe: 0, k_c: 0.55,
+      // Ohne Durchmesser: keine Querkraftbewehrung. Die übrigen Felder stehen
+      // trotzdem da, damit die Maske beim Eintragen eines Durchmessers nicht
+      // mit leeren Teilungen dasteht.
+      querkraftbewehrung: {
+        durchmesser: 0, stahl: stahl.kennung,
+        abstand_x: 200, abstand_y: 200, anzahl_y: null,
+        alpha_min: 30, alpha_max: 45,
+      },
       ueberdeckung_unten: 30, ueberdeckung_oben: 30,
       richtung_lage1: 'x', richtung_lage4: 'x',
       // Nur aussen bewehrt: die 1. und die 4. Lage tragen, die beiden inneren

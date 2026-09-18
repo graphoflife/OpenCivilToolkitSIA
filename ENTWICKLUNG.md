@@ -43,6 +43,80 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-18 · Querkraftbewehrung
+
+Bis hierher konnte eine Platte nur ohne Bügel nachgewiesen werden. Jetzt trägt
+sie ein Bügelraster: ein Durchmesser, eine Teilung in x, eine in y, ein eigener
+Stahl, dazu die beiden Grenzwinkel der Druckdiagonalen und `k_c`.
+
+### Zwei Ansätze, einer davon gilt
+
+```
+V_Rd,s = A_(⌀,V)/(s_V,x · s_V,y) · 0.9 · d · f_yd · cot α
+V_Rd,c = 0.9 · d · k_c · f_cd · sin α · cos α
+V_Rd   = max über α von min(V_Rd,s; V_Rd,c)
+```
+
+`V_Rd,s` wächst mit flacherer Diagonale, `V_Rd,c` fällt dabei — das Kleinere
+von beiden hat sein Grösstes dort, wo sich die Äste treffen. Gesucht wird
+ganzgradig zwischen `α_min` und `α_max`; Zwischenwerte wären eine Genauigkeit,
+die das Fachwerkmodell nicht hergibt.
+
+Ob dieser Ansatz läuft oder der bisherige, entscheidet **allein**, ob eine
+Querkraftbewehrung da ist. Beides zu addieren wäre ein drittes Modell, und
+dieses Werkzeug rechnet nur, was es auch herleitet. Mit Bügeln fordert der
+Nachweis `m_Rd(N_Ed)` gar nicht mehr an — sonst hinge eine Interpolation in der
+Herleitung, die dort nichts erklärt.
+
+### Die Breite gehört nicht in die Formel
+
+Vorgegeben war `V_Rd,c = b · 0.9 · d · k_c · f_cd · sin α · cos α`. Mit `b` darin
+ist das eine **Kraft**, `V_Rd,s` dagegen eine Kraft **je Laufmeter** — die
+beiden liessen sich nicht vergleichen. Bei den üblichen `b = 1000 mm` fällt es
+nicht auf, weil der Faktor 1 ist; bei `b = 500 mm` wäre `V_Rd,c` um das Doppelte
+zu gross. `b` steht deshalb in keiner der beiden Formeln: es ist der Bezug, auf
+den sich alle Schnittgrössen ohnehin schon beziehen.
+
+### Eine Stabzahl in y schliesst die y-Richtung aus
+
+In y darf statt der Teilung eine Stabzahl über `b` stehen; daraus wird
+`s_V,y = b/n`. In x-Richtung ergibt das eine saubere Teilung. Für einen Nachweis
+**in** y-Richtung liefe die Breite längs der Traglinie mit, und die Formel hätte
+keinen Bezug mehr — dort steht dann `V_Rd = 0` und der Grund dabei.
+
+Daraus wurde eine allgemeine Regel: **ein Widerstand von null erklärt sich nicht
+von selbst.** Steht in der Zusammenfassung `0.0 kN/m`, steht der Grund jetzt
+sichtbar unter der Tabelle statt nur im Tooltip. Das betrifft auch den älteren
+Fall «auf der gezogenen Seite liegt keine Bewehrung».
+
+### Das Diagramm
+
+Mit Bügeln hängt der Widerstand nicht mehr am Moment — die M-V-Kurve entfällt
+und an ihre Stelle tritt der Verlauf über der Neigung: V_Rd,c orange, V_Rd,s
+blau, darunter das massgebende Kleinere. Gezeichnet wird von 25° bis 45°, blass
+ausserhalb der Grenzen; ein dort abgeschnittener Ast liesse offen, ob die Kurve
+endet oder der Bereich. Bei Normalzug wächst die Achse mit, denn `α_min` springt
+dann auf 40° und `α_max` notfalls hinterher.
+
+**Ein Bild je statischer Höhe und Neigungsbereich.** Beides hängt am einzelnen
+Fall: `d` am Vorzeichen des Moments, der Bereich am Vorzeichen der Normalkraft.
+Fälle, die darin übereinstimmen, liegen auf derselben Kurve.
+
+### Die Maske
+
+Der Bügelblock steht unter den Lagen und hat einen grünen Akzent — die Bügel
+tragen quer zu beiden Tragrichtungen, also weder blau noch kupfer. Die Zeile hat
+eine Zahl mehr als eine Lagenzeile; damit sie in dieselbe Spaltenbreite passt,
+fehlt ihr die Namensspalte. Ohne das lief die mittlere Tafel um 28 Bildpunkte
+über.
+
+Eine Beschreibung aus der Zeit vor den Bügeln kennt die Felder nicht. Die Maske
+füllt sie deshalb beim ersten Anfassen mit genau den Werten, die der Kern
+einsetzen würde — sonst stünde dort ein leeres Feld, während gerechnet wird.
+Dieselbe Falle wie damals bei `h = 0`.
+
+---
+
 ## 2026-09-18 · Nicht rechnen, was schon dasteht
 
 Zwei Stellen, an denen die Mitschrift Arbeit vortäuschte, und eine, an der sie

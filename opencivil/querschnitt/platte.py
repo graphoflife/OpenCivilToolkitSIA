@@ -42,7 +42,9 @@ from typing import Dict, Iterator, List, Mapping, Optional, Sequence, Tuple
 from opencivil.core.berechnung import (
     Berechnung, Eingabebezug, Eingaben, Formel, Prozedur, Vorgabe,
 )
-from opencivil.core.einheiten import EINHEITSLOS, KG_PRO_M3, MM, MM2, Groesse
+from opencivil.core.einheiten import (
+    EINHEITSLOS, GRAD, KG_PRO_M3, MM, MM2, Groesse,
+)
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Abschnitt, Protokoll
 from opencivil.core.wert import WertDef
@@ -202,6 +204,84 @@ class Bewehrungslage:
     def beschriftung(self) -> str:
         seite = "unten" if self.von_unten else "oben"
         return f"{self.nummer}. Lage ({seite}, {self.richtung.beschriftung})"
+
+
+#: Vorgabe fuer die Neigung der Druckdiagonalen, in Grad.
+ALPHA_MIN = 30
+ALPHA_MAX = 45
+
+#: Bei einer Normalzugkraft steilt sich die Druckdiagonale auf. Beide Grenzen
+#: werden dann auf mindestens diesen Wert gehoben.
+ALPHA_ZUG = 40
+
+#: Vorgabe fuer den Abminderungsbeiwert der Betondruckfestigkeit in der
+#: Druckdiagonalen.
+K_C = 0.55
+
+
+@dataclass
+class Querkraftbewehrung:
+    """
+    Bügelbewehrung einer Platte -- ein Raster über die ganze Fläche.
+
+    Ein Durchmesser, eine Teilung in x und eine in y. In y darf statt der
+    Teilung eine Stabzahl über die betrachtete Breite ``b`` stehen; in x
+    nicht. Der Widerstand bezieht sich auf den Laufmeter in Tragrichtung, und
+    eine Stabzahl in x hätte darin keinen Bezug -- wer sie angibt, bekommt
+    deshalb nur noch Nachweise in x-Richtung.
+
+    ``alpha_min`` und ``alpha_max`` begrenzen die Neigung der Druckdiagonalen.
+    Gesucht wird darin ganzgradig die Neigung mit dem grössten Widerstand;
+    Zwischenwerte sind eine Genauigkeit, die das Fachwerkmodell nicht hergibt.
+    """
+
+    durchmesser: Groesse = field(default_factory=lambda: Groesse(0, MM))
+    stahl: Optional[Baustoff] = None
+    abstand_x: Optional[Groesse] = None
+    abstand_y: Optional[Groesse] = None
+    anzahl_y: Optional[float] = None
+    alpha_min: int = ALPHA_MIN
+    alpha_max: int = ALPHA_MAX
+
+    @property
+    def vorhanden(self) -> bool:
+        if self.durchmesser.si <= 0:
+            return False
+        if self.abstand_x is None or self.abstand_x.si <= 0:
+            return False
+        return self.ueber_abstand_y or bool(self.anzahl_y and self.anzahl_y > 0)
+
+    @property
+    def ueber_abstand_y(self) -> bool:
+        """Ob die Menge in y über die Teilung angegeben ist (statt über die Zahl)."""
+        return self.abstand_y is not None and self.abstand_y.si > 0
+
+    @property
+    def flaeche(self) -> Groesse:
+        """Querschnitt **eines** Bügelschenkels."""
+        if not self.vorhanden:
+            return Groesse(0, MM2)
+        return math.pi * self.durchmesser * self.durchmesser / 4.0
+
+    def menge_text(self) -> str:
+        if not self.vorhanden:
+            return "—"
+        y = (f"{self.abstand_y.formatiert(0)} mm" if self.ueber_abstand_y
+             else f"{self.anzahl_y:g} Stk")
+        return (f"⌀{self.durchmesser.formatiert(0)}, "
+                f"x: {self.abstand_x.formatiert(0)} mm, y: {y}")
+
+    def grenzen(self, zugkraft: bool) -> Tuple[int, int]:
+        """
+        Die beiden Grenzwinkel in Grad, angepasst an das Vorzeichen von ``N_Ed``.
+
+        Bei Normalzug steilt sich die Druckdiagonale auf: ``alpha_min`` wird auf
+        40° gesetzt und ``alpha_max`` notfalls mitgehoben, damit der Bereich
+        nicht leer wird.
+        """
+        if not zugkraft:
+            return self.alpha_min, self.alpha_max
+        return ALPHA_ZUG, max(self.alpha_max, ALPHA_ZUG)
 
 
 # ===========================================================================
@@ -478,6 +558,12 @@ class Plattenquerschnitt:
     einlagenhoehe: Groesse = field(default_factory=lambda: Groesse(0, MM))
     """Höhe einer Einlage; verringert den Hebelarm d_v, wenn h/6 < e < d."""
 
+    k_c: Groesse = field(default_factory=lambda: Groesse(K_C, EINHEITSLOS))
+    """Abminderung der Betondruckfestigkeit in der Druckdiagonalen."""
+
+    querkraftbewehrung: Optional[Querkraftbewehrung] = None
+    """Bügel, sofern welche angegeben sind. ``None`` heisst: ohne."""
+
     praefix: Optional[str] = None
 
     definitionen: Dict[str, WertDef] = field(default_factory=dict, init=False)
@@ -601,6 +687,8 @@ class Plattenquerschnitt:
                     gruppe=UEBERDECKUNGEN),
         ]
 
+        self._querkraftbewehrung_aufbauen(abschnitt)
+
         self.d_bewehrungsmass = self._def(
             "bewehrungsmass", r"\mu_s", KG_PRO_M3,
             "Bewehrungsmass je Kubikmeter Beton", 0)
@@ -667,6 +755,83 @@ class Plattenquerschnitt:
                 posten=aufbau_posten,
                 d_bewehrungsmass=self.d_bewehrungsmass,
                 d_distanzhalter=self.d_distanzhalter,
+                abschnitt=abschnitt,
+            ))
+
+    # -- Querkraftbewehrung -------------------------------------------------
+
+    @property
+    def hat_buegel(self) -> bool:
+        return bool(self.querkraftbewehrung and self.querkraftbewehrung.vorhanden)
+
+    def _querkraftbewehrung_aufbauen(self, abschnitt: Abschnitt) -> None:
+        """
+        Die Werte der Bügel -- Durchmesser, Teilungen, Grenzwinkel, k_c.
+
+        ``k_c`` entsteht auch ohne Bügel: er gehört zur Platte, nicht zur
+        Bewehrung, und eine Vorgabe, die je nach Eingabe da ist oder nicht,
+        macht die Rückverfolgung von der Bestückung abhängig.
+
+        Der Bügelquerschnitt ist eine **Formel** und keine Vorgabe: er wird aus
+        dem Durchmesser gerechnet, und wer ihn nachrechnen will, soll die
+        Rechnung sehen statt nur die Zahl.
+        """
+        d_kc = self._def("k_c", "k_c", EINHEITSLOS,
+                         "Abminderung der Betondruckfestigkeit in der Druckdiagonalen", 2)
+        self.berechnungen.append(
+            Vorgabe(id=f"{self.id}.k_c", ausgabe=d_kc, groesse=self.k_c,
+                    abschnitt=abschnitt, stumm=True))
+
+        buegel = self.querkraftbewehrung
+        if buegel is None or not buegel.vorhanden:
+            return
+
+        gruppe = "Querkraftbewehrung"
+        d_phi = self._def("querkraft.phi", r"\varnothing_{V}", MM,
+                          "Bügeldurchmesser", 0)
+        d_sx = self._def("querkraft.s_x", "s_{V,x}", MM,
+                         "Bügelteilung in x-Richtung", 0)
+        d_amin = self._def("querkraft.alpha_min", r"\alpha_{min}", GRAD,
+                           "Kleinste Neigung der Druckdiagonalen", 0)
+        d_amax = self._def("querkraft.alpha_max", r"\alpha_{max}", GRAD,
+                           "Grösste Neigung der Druckdiagonalen", 0)
+
+        self.berechnungen += [
+            Vorgabe(id=f"{self.id}.querkraft.phi", ausgabe=d_phi,
+                    groesse=buegel.durchmesser, abschnitt=abschnitt, gruppe=gruppe),
+            Vorgabe(id=f"{self.id}.querkraft.s_x", ausgabe=d_sx,
+                    groesse=buegel.abstand_x, abschnitt=abschnitt, gruppe=gruppe),
+        ]
+        if buegel.ueber_abstand_y:
+            d_y = self._def("querkraft.s_y", "s_{V,y}", MM,
+                            "Bügelteilung in y-Richtung", 0)
+            menge_y = buegel.abstand_y
+        else:
+            d_y = self._def("querkraft.n_y", "n_{V,y}", EINHEITSLOS,
+                            "Bügelzahl über die betrachtete Breite", 0)
+            menge_y = Groesse(float(buegel.anzahl_y), EINHEITSLOS)
+        self.berechnungen += [
+            Vorgabe(id=f"{self.id}.{'querkraft.s_y' if buegel.ueber_abstand_y else 'querkraft.n_y'}",
+                    ausgabe=d_y, groesse=menge_y, abschnitt=abschnitt, gruppe=gruppe),
+            Vorgabe(id=f"{self.id}.querkraft.alpha_min", ausgabe=d_amin,
+                    groesse=Groesse(buegel.alpha_min, GRAD), abschnitt=abschnitt,
+                    gruppe=gruppe),
+            Vorgabe(id=f"{self.id}.querkraft.alpha_max", ausgabe=d_amax,
+                    groesse=Groesse(buegel.alpha_max, GRAD), abschnitt=abschnitt,
+                    gruppe=gruppe),
+        ]
+
+        d_as = self._def("querkraft.a_s", r"A_{\varnothing,V}", MM2,
+                         "Querschnitt eines Bügelschenkels", 1,
+                         referenz="SIA 262:2025, 5.5.2")
+        self.berechnungen.append(
+            Formel(
+                id=f"{self.id}.querkraft.a_s",
+                ausgabe=d_as,
+                eingaben={"phi": d_phi.id},
+                vorlage=r"\frac{\pi \cdot \left(@phi\right)^{2}}{4}",
+                funktion=lambda phi: math.pi * phi * phi / 4.0,
+                titel="Querschnitt eines Bügelschenkels",
                 abschnitt=abschnitt,
             ))
 

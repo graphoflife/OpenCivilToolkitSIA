@@ -28,7 +28,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
-from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM, Groesse
+from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, KN_PRO_M, MM, Groesse
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.material.basis import Baustoff
 from opencivil.material.beton import BETONSORTEN, beton
@@ -38,7 +38,8 @@ from opencivil.nachweis.biegung_normalkraft import (
 )
 from opencivil.nachweis.querkraft import Querkraft, Querkraftfall
 from opencivil.querschnitt.platte import (
-    LAGENZAHL, Bewehrungslage, Bewehrungsposten, Plattenquerschnitt, Richtung,
+    ALPHA_MAX, ALPHA_MIN, K_C, LAGENZAHL, Bewehrungslage, Bewehrungsposten,
+    Plattenquerschnitt, Querkraftbewehrung, Richtung,
 )
 
 
@@ -283,6 +284,89 @@ class LageEintrag:
         )
 
 
+@dataclass
+class QuerkraftbewehrungEintrag:
+    """
+    Die Bügel einer Platte -- ein Raster, ein Durchmesser, zwei Teilungen.
+
+    In y darf statt der Teilung eine Stabzahl über die betrachtete Breite
+    stehen; in x nicht. Siehe
+    :class:`opencivil.querschnitt.platte.Querkraftbewehrung`.
+    """
+
+    durchmesser: float = 0.0
+    """in mm; 0 bedeutet: keine Querkraftbewehrung."""
+
+    stahl: str = ""
+    abstand_x: Optional[float] = 200.0
+    abstand_y: Optional[float] = 200.0
+    anzahl_y: Optional[float] = None
+    alpha_min: int = ALPHA_MIN
+    alpha_max: int = ALPHA_MAX
+
+    @property
+    def vorhanden(self) -> bool:
+        if self.durchmesser <= 0 or not (self.abstand_x and self.abstand_x > 0):
+            return False
+        return bool(self.abstand_y and self.abstand_y > 0) or bool(
+            self.anzahl_y and self.anzahl_y > 0)
+
+    def als_dict(self) -> dict:
+        return {
+            "durchmesser": self.durchmesser, "stahl": self.stahl,
+            "abstand_x": self.abstand_x, "abstand_y": self.abstand_y,
+            "anzahl_y": self.anzahl_y,
+            "alpha_min": self.alpha_min, "alpha_max": self.alpha_max,
+        }
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any]) -> "QuerkraftbewehrungEintrag":
+        def wahl(name: str) -> Optional[float]:
+            wert = d.get(name)
+            return None if wert in (None, "") else float(wert)
+
+        abstand_y, anzahl_y = wahl("abstand_y"), wahl("anzahl_y")
+        # Wie bei den Lagen: steht keines von beiden da, gilt die Teilung.
+        if abstand_y is None and anzahl_y is None:
+            abstand_y = cls.abstand_y
+        return cls(
+            durchmesser=_zahl(d, "durchmesser", 0.0),
+            stahl=str(d.get("stahl", "")),
+            abstand_x=wahl("abstand_x") or cls.abstand_x,
+            abstand_y=abstand_y,
+            anzahl_y=anzahl_y,
+            alpha_min=int(_zahl(d, "alpha_min", float(ALPHA_MIN))),
+            alpha_max=int(_zahl(d, "alpha_max", float(ALPHA_MAX))),
+        )
+
+    def pruefen(self, wo: str) -> None:
+        """Was nicht stimmen kann, soll als Satz beim Benutzer ankommen."""
+        if not self.vorhanden:
+            return
+        if not 1 <= self.alpha_min <= 89 or not 1 <= self.alpha_max <= 89:
+            raise ProjektFehler(
+                f"{wo}: die Neigung der Druckdiagonalen muss zwischen 1° und "
+                f"89° liegen, angegeben sind {self.alpha_min}° und "
+                f"{self.alpha_max}°.")
+        if self.alpha_min > self.alpha_max:
+            raise ProjektFehler(
+                f"{wo}: α_min = {self.alpha_min}° ist grösser als "
+                f"α_max = {self.alpha_max}°. Zwischen den beiden liegt dann "
+                f"keine Neigung, für die sich ein Widerstand rechnen liesse.")
+
+    def als_bewehrung(self, stahl: Optional[Baustoff]) -> Querkraftbewehrung:
+        ueber_teilung = bool(self.abstand_y and self.abstand_y > 0)
+        return Querkraftbewehrung(
+            durchmesser=Groesse(self.durchmesser, MM),
+            stahl=stahl,
+            abstand_x=Groesse(self.abstand_x, MM) if self.abstand_x else None,
+            abstand_y=Groesse(self.abstand_y, MM) if ueber_teilung else None,
+            anzahl_y=None if ueber_teilung else self.anzahl_y,
+            alpha_min=self.alpha_min,
+            alpha_max=self.alpha_max,
+        )
+
+
 #: Wahl der Tragrichtung einer Schnittgroessenkombination.
 BEIDE_RICHTUNGEN = "beide"
 
@@ -380,6 +464,13 @@ class QuerschnittEintrag:
     einlagenhoehe: float = 0.0
     """Höhe einer Einlage in mm."""
 
+    k_c: float = K_C
+    """Abminderung der Betondruckfestigkeit in der Druckdiagonalen."""
+
+    querkraftbewehrung: QuerkraftbewehrungEintrag = field(
+        default_factory=QuerkraftbewehrungEintrag)
+    """Bügel; ohne Durchmesser heisst: keine."""
+
     lagen: List[LageEintrag] = field(default_factory=list)
     """Genau vier, Index 0 = 1. Lage (unterste)."""
 
@@ -410,6 +501,8 @@ class QuerschnittEintrag:
             "ueberdeckung_oben": self.ueberdeckung_oben,
             "d_max": self.d_max,
             "einlagenhoehe": self.einlagenhoehe,
+            "k_c": self.k_c,
+            "querkraftbewehrung": self.querkraftbewehrung.als_dict(),
             "richtung_lage1": self.richtung_lage1,
             "richtung_lage4": self.richtung_lage4,
             "lagen": [l.als_dict() for l in self.lagen],
@@ -432,6 +525,9 @@ class QuerschnittEintrag:
             ueberdeckung_oben=_zahl(d, "ueberdeckung_oben", 30.0),
             d_max=_zahl(d, "d_max", 32.0),
             einlagenhoehe=_zahl(d, "einlagenhoehe", 0.0),
+            k_c=_zahl(d, "k_c", K_C),
+            querkraftbewehrung=QuerkraftbewehrungEintrag.aus_dict(
+                d.get("querkraftbewehrung") or {}),
             richtung_lage1=str(d.get("richtung_lage1") or "x"),
             richtung_lage4=str(d.get("richtung_lage4") or "x"),
             lagen=[LageEintrag.aus_dict(x) for x in (lagen or [])],
@@ -698,6 +794,24 @@ class Projekt:
                 f"Platte '{eintrag.name}': ohne Bewehrung lässt sich kein "
                 f"Widerstand bestimmen.")
 
+        buegel = eintrag.querkraftbewehrung
+        buegel.pruefen(f"Platte '{eintrag.name}'")
+        buegelstahl = baustoffe.get(buegel.stahl)
+        if buegelstahl is None and buegel.stahl:
+            raise ProjektFehler(
+                f"Die Querkraftbewehrung von '{eintrag.name}' verweist auf den "
+                f"Stahl '{buegel.stahl}', den es nicht (mehr) gibt.")
+        if buegelstahl is None:
+            # Kein Stahl angegeben -- wie bei den Lagen gilt dann der erste im
+            # Projekt. Eine Beschreibung aus der Zeit vor den Buegeln nennt
+            # keinen, und daran soll der ganze Lauf nicht scheitern.
+            buegelstahl = next(
+                (s for s in baustoffe.values() if s.art.value == "betonstahl"), None)
+        if buegel.vorhanden and buegelstahl is None:
+            raise ProjektFehler(
+                f"Die Querkraftbewehrung von '{eintrag.name}' braucht einen "
+                f"Betonstahl, im Projekt gibt es aber keinen.")
+
         return Plattenquerschnitt(
             name=eintrag.name,
             h=Groesse(eintrag.h, MM),
@@ -708,6 +822,9 @@ class Projekt:
             ueberdeckung_oben=Groesse(eintrag.ueberdeckung_oben, MM),
             d_max=Groesse(eintrag.d_max, MM),
             einlagenhoehe=Groesse(eintrag.einlagenhoehe, MM),
+            k_c=Groesse(eintrag.k_c, EINHEITSLOS),
+            querkraftbewehrung=(buegel.als_bewehrung(buegelstahl)
+                                if buegel.vorhanden else None),
             praefix=f"querschnitt.{eintrag.kennung}",
         )
 

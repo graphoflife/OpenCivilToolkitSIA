@@ -16,7 +16,7 @@ from __future__ import annotations
 import math
 from typing import Any, Dict, List, Optional, Sequence
 
-from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM
+from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM, MM2
 from opencivil.core.latex import als_text, tabelle, text_latex
 from opencivil.core.protokoll import (
     Block, GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, TextBlock,
@@ -259,6 +259,7 @@ def loesung_dict(
         }
         ergebnis["werkstoffgesetze"] = werkstoffgesetze(aufbau, loesung)
         ergebnis["querkraftkurven"] = querkraftkurven(aufbau)
+        ergebnis["neigungskurven"] = neigungskurven(aufbau)
         ergebnis["zusammenfassungen"] = zusammenfassungen(loesung, aufbau)
         ergebnis["warnungen"] = list(aufbau.warnungen)
         ergebnis["zuordnung"] = zuordnung(aufbau)
@@ -291,6 +292,11 @@ def querkraftkurven(
 
     for kennung, nachweis in aufbau.querkraft.items():
         if not nachweis.ergebnisse:
+            continue
+        # Mit Buegeln haengt der Widerstand nicht mehr am Moment, sondern an
+        # der Neigung der Druckdiagonalen. Dann steht dort das andere Bild --
+        # siehe neigungskurven().
+        if nachweis.buegel is not None:
             continue
         querschnitt_kennung = kennung.split(".", 1)[0]
         querschnitt = aufbau.querschnitte.get(querschnitt_kennung)
@@ -336,6 +342,83 @@ def querkraftkurven(
                 for erg in nachweis.ergebnisse
             ],
         }
+    return kurven
+
+
+#: Wie weit die Neigungskurve mindestens reicht, in Grad. Die beiden Grenzen
+#: des Benutzers liegen normalerweise darin; gehen sie darueber hinaus, waechst
+#: die Achse mit -- ein abgeschnittener Ast waere schlimmer als eine breite
+#: Achse.
+NEIGUNG_VON = 25
+NEIGUNG_BIS = 45
+
+
+def neigungskurven(aufbau: Aufbau) -> dict:
+    """
+    Der Querkraftwiderstand ueber der Neigung der Druckdiagonalen.
+
+    Nur wo Buegel liegen -- sonst haengt der Widerstand am Moment und das
+    andere Diagramm gilt.
+
+    **Ein Bild je statischer Hoehe und Neigungsbereich.** Beides haengt am
+    einzelnen Fall: ``d`` am Vorzeichen des Moments, der Bereich am Vorzeichen
+    der Normalkraft. Faelle, die darin uebereinstimmen, liegen auf derselben
+    Kurve und kommen ins selbe Bild; die anderen bekommen ihr eigenes.
+
+    Gezeichnet wird ueber den ganzen Achsenbereich, auch ausserhalb der beiden
+    Grenzen -- dort blass. Die Oberflaeche entscheidet das an ``gewaehlt``,
+    gerechnet wird beides hier.
+    """
+    kurven: Dict[str, Any] = {}
+
+    for kennung, nachweis in aufbau.querkraft.items():
+        if nachweis.buegel is None or not nachweis.ergebnisse:
+            continue
+        querschnitt_kennung = kennung.split(".", 1)[0]
+        querschnitt = aufbau.querschnitte.get(querschnitt_kennung)
+
+        # Nach (statischer Hoehe, Grenzen) gruppieren -- in dieser Reihenfolge
+        # gefunden, damit die Bilder in der Reihenfolge der Faelle stehen.
+        gruppen: Dict[tuple, List[Any]] = {}
+        for erg in nachweis.ergebnisse:
+            if erg.massgebend is None:
+                continue
+            gruppen.setdefault(
+                (round(erg.d, 9), erg.alpha_min, erg.alpha_max), []).append(erg)
+
+        for nummer, ((d, a_min, a_max), gruppe) in enumerate(gruppen.items(), start=1):
+            von = min(NEIGUNG_VON, a_min)
+            bis = max(NEIGUNG_BIS, a_max)
+            punkte = nachweis.neigungsverlauf(d, von, bis)
+            kurven[f"{kennung}.{nummer}"] = {
+                "querschnitt": querschnitt_kennung,
+                "namensraum": querschnitt.id if querschnitt else "",
+                "name": querschnitt.name if querschnitt else querschnitt_kennung,
+                "richtung": nachweis.richtung.value,
+                "d": d * 1e3,
+                "alpha_min": a_min,
+                "alpha_max": a_max,
+                "zug": gruppe[0].zug_hebt_alpha,
+                "punkte": [
+                    {"alpha": q.alpha,
+                     "V_Rd_s": q.V_Rd_s / 1e3,
+                     "V_Rd_c": q.V_Rd_c / 1e3,
+                     "V_Rd": q.V_Rd / 1e3,
+                     "im_bereich": a_min <= q.alpha <= a_max}
+                    for q in punkte
+                ],
+                "faelle": [
+                    {
+                        "name": erg.fall.name,
+                        "V_Ed": abs(erg.fall.V_Ed.in_einheit(KN_PRO_M)),
+                        "alpha": erg.massgebend.alpha,
+                        "V_Rd": erg.v_Rd / 1e3,
+                        "erfuellt": erg.erfuellt,
+                        "begruendung": erg.begruendung,
+                    }
+                    for erg in gruppe
+                ],
+            }
     return kurven
 
 
@@ -564,6 +647,10 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
                 ],
                 "erfuellt": u.erfuellt,
                 "begruendung": u.begruendung,
+                # Eine Null erklaert sich nicht von selbst: liess sich kein
+                # Widerstand bestimmen, muss der Grund in der Tabelle stehen
+                # und nicht bloss im Tooltip.
+                "hinweis": u.begruendung if _ohne_widerstand(u) else "",
             }
             for u in urteile
         ]
@@ -573,9 +660,24 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
             "grad_spalte": GRAD_SPALTE,
             "latex": tabelle(kopf, [z["zellen"] for z in zeilen], "lrrr"),
             "angaben": _plattenangaben(qs),
-            "bewehrung": _bewehrungsuebersicht(qs),
+            "bewehrung": _bewehrungsuebersicht(qs, loesung),
         }
     return ergebnis
+
+
+def _ohne_widerstand(urteil) -> bool:
+    """
+    Ob dieses Urteil auf einem Widerstand von null steht.
+
+    Dann ist nicht einfach zu wenig da -- dann liess sich gar nichts bestimmen,
+    und der Grund gehoert sichtbar in die Tabelle. Die Faelle: keine Bewehrung
+    auf der gezogenen Seite, oder eine Buegeldefinition, die in dieser Richtung
+    keinen Bezug hat.
+    """
+    return (not urteil.erfuellt
+            and urteil.widerstand is not None
+            and urteil.widerstand.groesse.si == 0.0
+            and bool(urteil.begruendung))
 
 
 def _plattenangaben(qs) -> dict:
@@ -586,7 +688,7 @@ def _plattenangaben(qs) -> dict:
     return {"latex": latex, "titel": "Angaben zur Platte"}
 
 
-def _bewehrungsuebersicht(qs) -> dict:
+def _bewehrungsuebersicht(qs, loesung: Loesung) -> dict:
     """
     Überdeckungen und Lagen, von unten nach oben gelesen.
 
@@ -623,6 +725,27 @@ def _bewehrungsuebersicht(qs) -> dict:
         ])
     zeilen.append([als_text("Überdeckung oben"), strich,
                    qs.ueberdeckung_oben.als_latex(0, MM), strich])
+
+    # Die Bügel stehen am Ende und nicht in der Stapelfolge: sie sitzen über
+    # die ganze Höhe und haben darin keinen Platz.
+    if qs.hat_buegel:
+        b = qs.querkraftbewehrung
+        menge_y = (rf"s_{{V,y}} = {b.abstand_y.als_latex(0, MM)}"
+                   if b.ueber_abstand_y
+                   else rf"n_{{V,y}} = {b.anzahl_y:g}")
+        # Der Bügelquerschnitt kommt aus der Lösung und wird hier nicht ein
+        # zweites Mal gerechnet -- er hat seine eigene Formel in der
+        # Herleitung, und zwei Wege zu derselben Zahl laufen auseinander.
+        flaeche = loesung.werte.get(qs.id_von("querkraft.a_s"))
+        zeilen.append([
+            als_text("Querkraftbewehrung"),
+            als_text("x/y"),
+            (rf"\varnothing_{{V}} = {b.durchmesser.als_latex(0, MM)} \quad "
+             rf"s_{{V,x}} = {b.abstand_x.als_latex(0, MM)} \quad {menge_y}"
+             + (rf" \quad A_{{\varnothing,V}} = "
+                rf"{flaeche.groesse.als_latex(1, MM2)}" if flaeche else "")),
+            als_text(b.stahl.name) if b.stahl else strich,
+        ])
 
     return {
         "kopf": kopf,

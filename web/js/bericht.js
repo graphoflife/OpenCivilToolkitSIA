@@ -16,7 +16,8 @@
 import { el, ersetzen, leerzustand, melden, zahlfeld } from './dom.js';
 import { kopiereFuerWord, kopiereLatex, setzen } from './mathe.js';
 import {
-  diagrammZeichnen, kurveZeichnen, querkraftkurveZeichnen, querschnittZeichnen,
+  diagrammZeichnen, kurveZeichnen, neigungskurveZeichnen,
+  querkraftkurveZeichnen, querschnittZeichnen,
 } from './diagramm.js';
 import { api } from './api.js';
 import { aendern, zustand } from './zustand.js';
@@ -269,6 +270,12 @@ function herleitung(loesung) {
  * Baustoff hat keine Nachweise, und eine willkürlich herausgegriffene Platte
  * zu zeigen wäre irreführend.
  */
+/** Holt den Klartext aus einer LaTeX-Zelle der Form `\text{…}`. */
+function textVon(zelle) {
+  const treffer = /^\\text\{(.*)\}$/.exec(zelle || '');
+  return treffer ? treffer[1] : (zelle || '');
+}
+
 function zusammenfassung(loesung) {
   const querschnitte = loesung.zuordnung?.querschnitte || {};
   const raum = eingrenzung();
@@ -327,6 +334,13 @@ function zusammenfassung(loesung) {
             ]),
           ]),
           werkzeugleiste(tabelle.latex, 'Tabelle'),
+          // Ein Widerstand von null erklärt sich nicht von selbst. Der Grund
+          // steht deshalb unter der Tabelle und nicht bloss im Tooltip.
+          ...tabelle.zeilen
+            .filter((zeile) => zeile.hinweis)
+            .map((zeile) => el('p.hinweis', {
+              text: `${textVon(zeile.zellen[0])}: ${zeile.hinweis}`,
+            })),
         ])
         : el('div.leer', { text: 'Für diese Platte wurde kein Nachweis gerechnet.' }),
       plattenkennzahlen(eintrag, loesung),
@@ -400,6 +414,7 @@ function diagrammSicht(loesung) {
         diagrammZeichnen(linie),
       ]),
       ...querkraftkurven(loesung, kennung),
+      ...neigungskurven(loesung, kennung),
     ]));
   }
 
@@ -464,6 +479,35 @@ function querkraftkurven(loesung, querschnitt) {
       el('span.einheit', { text: 'kN' }),
       el('span.kurvenhinweis', {
         text: 'Punkte mit abweichender Normalkraft sind blass gezeichnet.',
+      }),
+    ]),
+  ]);
+}
+
+/**
+ * Die Neigungskurven einer Platte -- nur mit Querkraftbewehrung.
+ *
+ * Dann hängt der Widerstand nicht mehr am Moment, sondern an der Neigung der
+ * Druckdiagonalen; an die Stelle der M-V-Kurve tritt dieses Bild. Ein Bild je
+ * statischer Höhe und Neigungsbereich -- beides hängt am einzelnen Fall, und
+ * der Kern sagt selbst, welche Bilder es gibt.
+ */
+function neigungskurven(loesung, querschnitt) {
+  const alle = Object.entries(loesung.neigungskurven || {})
+    .filter(([, k]) => k.querschnitt === querschnitt);
+
+  return alle.flatMap(([, kurve]) => [
+    el('div.b-titel', {
+      text: `Querkraft über Neigung – ${kurve.name}, ${kurve.richtung}-Richtung`,
+    }),
+    neigungskurveZeichnen(kurve),
+    el('div.kurvenfuss', {}, [
+      el('span.kurvenfuss-name', { text: `d = ${kurve.d.toFixed(1)} mm` }),
+      el('span.kurvenhinweis', {
+        text: kurve.zug
+          ? `Normalzug: α_min ist auf ${kurve.alpha_min}° angehoben. `
+            + 'Ausserhalb der Grenzen ist die Kurve blass gezeichnet.'
+          : 'Ausserhalb von α_min und α_max ist die Kurve blass gezeichnet.',
       }),
     ]),
   ]);
