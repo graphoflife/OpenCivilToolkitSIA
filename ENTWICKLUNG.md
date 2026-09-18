@@ -43,6 +43,48 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-18 · Sprödes Versagen unter Zwängung
+
+Der erste der Mindestbewehrungsnachweise. Er fragt nicht nach Tragfähigkeit,
+sondern danach, ob sich das Versagen ankündigt: ein zu schwach bewehrter
+Querschnitt reisst und bricht im selben Augenblick.
+
+```
+h_eff    = min(500 mm; h)  falls begrenzt, sonst h
+k_t      = 1/(1 + 0.5·h_eff)               h_eff in Metern
+f_ct,eff = k_t · f_ctm
+N_Riss   = h_eff/2 · b · f_ct,eff
+N_s,adm  = A_s · σ_s,adm  ≥  N_Riss
+```
+
+Zwei Urteile je Tragrichtung — die untere **und** die obere Lage. Ein Zwang
+kennt keine Zugseite; er beansprucht den Querschnitt über die ganze Höhe.
+
+### f_yk, nicht f_yd
+
+Die zulässige Stahlspannung geht von der **charakteristischen** Fliessgrenze
+aus. Das ist kein Versehen: nachgewiesen wird nicht die Tragfähigkeit, sondern
+dass die Bewehrung den Riss überlebt. Bei erhöhter und hoher Anforderung
+begrenzt zusätzlich die nominelle Rissbreite:
+
+```
+σ_s,adm = min[ √(9·E_s·f_ctm·w_nom / ⌀) ; f_yk ]
+```
+
+Dimensionell stimmig: `E_s·f_ctm` gibt Pa², `w_nom/⌀` ist dimensionslos, die
+Wurzel also eine Spannung. Massgebend ist der **dickste** Stab der Lage — er
+verteilt den Riss auf die wenigsten Stäbe und bekommt damit die grösste
+Spannung.
+
+### Eine leere Lage fällt nicht durch, sie meldet sich
+
+Ohne Bewehrung wäre `⌀ = 0` und die Wurzel undefiniert. Statt dort eine Null zu
+erfinden, gibt es ein Urteil ohne Einwirkung und Widerstand plus den Grund —
+dasselbe Muster wie beim Duktilitätsnachweis und bei der unbewehrten
+Tragrichtung.
+
+---
+
 ## 2026-09-18 · Die Übersicht liest sich jetzt wie ein Schnitt
 
 Die Bewehrungsübersicht lief von unten nach oben — untere Überdeckung, 1. bis

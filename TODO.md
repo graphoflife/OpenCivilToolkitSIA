@@ -38,15 +38,23 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
       `SIA 262:2025, 4.1.4.2.5` stehen nach Vorgabe da, nachgeschlagen ist
       keines von beiden.
 
-- [ ] **Der Mindestbewehrungsnachweis fehlt noch.** Die Eingaben stehen
-      (Rissanforderung, Zwängung in x/y, Begrenzung auf 500 mm, häufige
-      Lastfälle bzw. die 70-%-Ableitung), gerechnet wird damit noch nichts.
-      Offen sind vor allem: die zulässigen Stahlspannungen je Rissanforderung,
-      und die Stahlspannung im gerissenen Querschnitt unter M und N
-      (Zustand II) — dazu braucht es eine Festlegung für `n = E_s/E_c`, also
-      ob kurz- oder langzeitig gerechnet wird.
+- [ ] **Der Mindestbewehrungsnachweis ist erst zur Hälfte da.** Die
+      Rissnormalkraft wird gerechnet; es fehlen der Nachweis gegen das
+      Rissmoment und die Spannungsbegrenzung unter häufiger Einwirkung. Für
+      beide braucht es die Stahlspannung im gerissenen Querschnitt
+      (Zustand II) und damit `n = (E_s/E_c)·(1+φ)` — die Kriechzahl φ ist noch
+      keine Eingabe.
+- [ ] Die Zahlen des Rissnachweises sind ungeprüft wie alle anderen: `k_t`,
+      die 500-mm-Grenze, `w_nom = 0.5/0.2 mm` und die Wurzelformel für
+      `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Sprödes Versagen unter Normalkraft-Zwängung: `N_s,adm = A_s·σ_s,adm ≥ N_Riss`,
+je Tragrichtung für die untere und die obere Lage, mit `σ_s,adm` aus der
+Rissanforderung (Normal/Erhöht/Hoch) · Eingaben für die Mindestbewehrung
+(Rissanforderung, Zwängung, häufige Lastfälle, 70-%-Ableitung) · Der
+Haken/Kreuz-Schalter steht nicht mehr schief ·
 
 Die Bewehrungsübersicht läuft von oben nach unten, wie die Eingabemaske und wie
 der Schnitt durch die Platte; die Bügelzeile zeigt nur noch `⌀6@200@200` statt

@@ -38,6 +38,7 @@ from opencivil.nachweis.biegung_normalkraft import (
 )
 from opencivil.nachweis.duktilitaet import Duktilitaet
 from opencivil.nachweis.fehlende_bewehrung import Ausgefallen, FehlendeBewehrung
+from opencivil.nachweis.mindestbewehrung import Rissnormalkraft
 from opencivil.nachweis.querkraft import Querkraft, Querkraftfall
 from opencivil.querschnitt.platte import (
     ALPHA_MAX, ALPHA_MIN, K_C, LAGENZAHL, Bewehrungslage, Bewehrungsposten,
@@ -691,6 +692,9 @@ class Aufbau:
     duktilitaet: Dict[str, Duktilitaet] = field(default_factory=dict)
     """Schluessel ist die Querschnittskennung -- ein Nachweis je Platte."""
 
+    rissnormalkraft: Dict[str, Rissnormalkraft] = field(default_factory=dict)
+    """Schluessel ist ``<querschnitt>.<richtung>`` -- nur wo Zwaengung gilt."""
+
     fehlende: Dict[str, FehlendeBewehrung] = field(default_factory=dict)
     """
     Je Richtung ohne Bewehrung, fuer die dennoch Einwirkungen angegeben sind.
@@ -707,7 +711,9 @@ class Aufbau:
                 + [d.id for k in self.duktilitaet.values()
                    for d in k.d_ausnutzung.values()]
                 + [d.id for f in self.fehlende.values()
-                   for d in f.d_ausnutzung.values()])
+                   for d in f.d_ausnutzung.values()]
+                + [d.id for z in self.rissnormalkraft.values()
+                   for d in z.d_ausnutzung.values()])
 
     def eckwertziele(self) -> List[str]:
         return [d.id for n in self.nachweise.values() for d in n.d_eckwerte.values()]
@@ -850,6 +856,21 @@ class Projekt:
 
             # Die Duktilitaet haengt an der Bewehrung, nicht an den
             # Schnittgroessen -- sie laeuft auch ohne Einwirkung.
+            # Die Zwaengung haengt an der Bewehrung, nicht an den
+            # Schnittgroessen -- wie die Duktilitaet laeuft sie auch ohne
+            # Einwirkung.
+            for richtung, an in ((Richtung.X, eintrag.zwaengung_x),
+                                 (Richtung.Y, eintrag.zwaengung_y)):
+                if not an:
+                    continue
+                zwang = Rissnormalkraft(
+                    querschnitt, richtung,
+                    anforderung=eintrag.rissanforderung,
+                    begrenzt=eintrag.zwaengung_begrenzt)
+                werk.registriere(zwang)
+                aufbau.rissnormalkraft[
+                    f"{eintrag.kennung}.{richtung.value}"] = zwang
+
             gewaehlte_lagen = [i + 1 for i, an in enumerate(eintrag.duktilitaet) if an]
             if gewaehlte_lagen:
                 duktilitaet = Duktilitaet(querschnitt, gewaehlte_lagen)

@@ -1382,14 +1382,22 @@ class TestMindestbewehrungsEingaben(unittest.TestCase):
         self.assertEqual([s["beschriftung"] for s in stufen],
                          ["Normal", "Erhöht", "Hoch"])
 
-    def test_die_eingaben_aendern_noch_nichts_am_ergebnis(self):
-        """Solange kein Nachweis sie liest, dürfen sie nichts verschieben."""
+    def test_die_haeufigen_lastfaelle_aendern_noch_nichts(self):
+        """
+        Solange kein Nachweis sie liest, dürfen sie nichts verschieben.
+
+        Die Zwängung ist davon ausgenommen -- sie wird gerechnet, siehe
+        test_mindestbewehrung.
+        """
+        from opencivil.projekt import HaeufigEintrag
+
         ohne = dienst.bearbeite(
             "rechnen", {"projekt": Projekt.beispiel().als_dict()})
         projekt = Projekt.beispiel()
         q = projekt.querschnitt("q1")
         q.rissanforderung = "hoch"
-        q.zwaengung_x = q.zwaengung_y = q.zwaengung_begrenzt = True
+        q.haeufige_aus_tragsicherheit = False
+        q.haeufige = [HaeufigEintrag("Gebrauch", M_Ed=70.0)]
         mit = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         self.assertEqual([u["name"] for u in mit.daten["urteile"]],
                          [u["name"] for u in ohne.daten["urteile"]])
