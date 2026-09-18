@@ -34,8 +34,20 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
       Dasselbe gilt für die Vorgaben `α_min = 30°`, `α_max = 45°`, `k_c = 0.55`
       und die Regel, dass Normalzug beide Grenzen auf 40° hebt — alle nach
       Vorgabe eingebaut, keine geprüft.
+- [ ] Ebenso der Duktilitätsnachweis: die Grenze `x/d ≤ 0.35` und der Verweis
+      `SIA 262:2025, 4.1.4.2.5` stehen nach Vorgabe da, nachgeschlagen ist
+      keines von beiden.
 
 ## Erledigt zuletzt
+
+Duktilitätsnachweis je Bewehrungslage: `x/d ≤ 0.35` mit `x` aus dem
+Kräftegleichgewicht bei reiner Biegung, `d` ab der gedrückten Randfaser, Lage
+für Lage einschaltbar (Vorgabe: die beiden äusseren). Eine eingeschaltete, aber
+unbewehrte Lage meldet sich mit einem Satz statt mit einer erfundenen Null —
+dafür trägt das Urteil jetzt ein eigenes Feld `hinweis`, statt dass die
+Schnittstelle es aus einem Widerstand von null errät · Kreuze an den
+Bewehrungsposten als runde Knöpfe mit hellrotem Grund · Tragrichtung einer
+Einwirkung als Schalter x/y/x+y in den Farben der Lagen ·
 
 Querkraftbewehrung: Bügelraster mit eigenem Stahl, Teilung je Richtung (in y
 wahlweise als Stabzahl), Grenzwinkel der Druckdiagonalen und `k_c`. Mit Bügeln

@@ -236,6 +236,7 @@ def loesung_dict(
                 "erfuellungsgrad": u.erfuellungsgrad.formatiert(2),
                 "erfuellungsgrad_zahl": u.erfuellungsgrad.si,
                 "begruendung": u.begruendung,
+                "hinweis": u.hinweis,
                 "einwirkung": wert_dict(u.einwirkung) if u.einwirkung else None,
                 "widerstand": wert_dict(u.widerstand) if u.widerstand else None,
             }
@@ -647,10 +648,9 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
                 ],
                 "erfuellt": u.erfuellt,
                 "begruendung": u.begruendung,
-                # Eine Null erklaert sich nicht von selbst: liess sich kein
-                # Widerstand bestimmen, muss der Grund in der Tabelle stehen
-                # und nicht bloss im Tooltip.
-                "hinweis": u.begruendung if _ohne_widerstand(u) else "",
+                # Nur was die Pruefung ausdruecklich meldet -- siehe
+                # NachweisUrteil.hinweis.
+                "hinweis": u.hinweis,
             }
             for u in urteile
         ]
@@ -663,21 +663,6 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
             "bewehrung": _bewehrungsuebersicht(qs, loesung),
         }
     return ergebnis
-
-
-def _ohne_widerstand(urteil) -> bool:
-    """
-    Ob dieses Urteil auf einem Widerstand von null steht.
-
-    Dann ist nicht einfach zu wenig da -- dann liess sich gar nichts bestimmen,
-    und der Grund gehoert sichtbar in die Tabelle. Die Faelle: keine Bewehrung
-    auf der gezogenen Seite, oder eine Buegeldefinition, die in dieser Richtung
-    keinen Bezug hat.
-    """
-    return (not urteil.erfuellt
-            and urteil.widerstand is not None
-            and urteil.widerstand.groesse.si == 0.0
-            and bool(urteil.begruendung))
 
 
 def _plattenangaben(qs) -> dict:

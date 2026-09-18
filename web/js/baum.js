@@ -167,6 +167,9 @@ function platteAnlegen() {
       // sind erst einmal nicht da. Was man nicht braucht, soll man wegnehmen
       // müssen und nicht wegnehmen dürfen.
       lagen: [lage(12), lage(0), lage(0), lage(12)],
+      // Die beiden äusseren Lagen tragen Feld- und Stützmoment; dort
+      // entscheidet sich, ob der Querschnitt sein Versagen ankündigt.
+      duktilitaet: [true, false, false, true],
       // 'automatisch': beide Massstäbe werden gerechnet, massgebend ist der
       // kleinere Erfüllungsgrad. Eine feste Wahl hier hätte die neue Platte
       // vom Regelfall ausgenommen.

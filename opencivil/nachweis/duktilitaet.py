@@ -1,0 +1,377 @@
+"""
+opencivil/nachweis/duktilitaet.py -- Duktilitaetsnachweis ueber die Druckzonenhoehe.
+
+VERANTWORTUNG:
+Prueft je Bewehrungslage, ob die Druckzone schlank genug bleibt::
+
+    0.85 * x * b * f_cd = A_s * f_sd        (Kraeftegleichgewicht, M_Ed = 0)
+    x / d <= 0.35
+
+Eine flache Druckzone heisst: der Stahl fliesst lange, bevor der Beton
+versagt. Der Querschnitt kuendigt sein Versagen an, statt ploetzlich zu
+brechen -- darum wird hier keine Tragfaehigkeit nachgewiesen, sondern ein
+Verhaeltnis.
+
+JE LAGE, NICHT JE RICHTUNG:
+Anders als M-N und Querkraft gilt dieser Nachweis fuer eine einzelne
+Bewehrungslage. Welche geprueft werden, sagt der Benutzer; ueblich sind die
+beiden aeusseren. Eine eingeschaltete, aber unbewehrte Lage ist kein Fehler
+der Beschreibung -- sie bekommt ein Urteil mit Hinweis statt einer Zahl.
+
+STATISCHE HOEHE:
+``d`` wird von der **gedrueckten** Randfaser aus gemessen. Bei den unteren
+Lagen (1 und 2) liegt der Zug unten, gedrueckt ist oben: ``d = z``. Bei den
+oberen Lagen umgekehrt: ``d = h - z``. Gerechnet wird mit dem gemeinsamen
+Schwerpunkt von Grundbewehrung und Zulage -- sie gehoeren zur selben Lage.
+
+EINHEITEN:
+Alles in SI-Basis; ``x`` und ``d`` in m, Flaechen in m^2, Festigkeiten in Pa.
+Das Verhaeltnis ``x/d`` ist dimensionslos und wird als Einwirkung gegen die
+Grenze 0.35 gehalten.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Sequence, Tuple
+
+from opencivil.core.berechnung import (
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
+)
+from opencivil.core.einheiten import EINHEITSLOS, MM, MM2, Groesse
+from opencivil.core.protokoll import Protokoll
+from opencivil.core.wert import WertDef
+from opencivil.material.basis import mit_index
+from opencivil.nachweis.handrechnung import BLOCKANTEIL
+from opencivil.querschnitt.platte import Bewehrungslage, posten_index
+
+#: Groesste zulaessige bezogene Druckzonenhoehe.
+GRENZE = 0.35
+
+
+@dataclass
+class Lagenergebnis:
+    """Was der Nachweis fuer eine Lage gefunden hat."""
+
+    lage: Bewehrungslage
+    a_s: float = 0.0
+    """Summe der Bewehrungsquerschnitte dieser Lage, in m^2."""
+
+    z: float = 0.0
+    """Gemeinsamer Schwerpunkt ab Oberkante, in m."""
+
+    d: float = 0.0
+    """Statische Hoehe ab der gedrueckten Randfaser, in m."""
+
+    x: float = 0.0
+    """Druckzonenhoehe bei M_Ed = 0, in m."""
+
+    verhaeltnis: float = 0.0
+    erfuellungsgrad: float = 0.0
+    erfuellt: bool = False
+    begruendung: str = ""
+    hinweis: str = ""
+
+    @property
+    def machbar(self) -> bool:
+        return self.a_s > 0.0
+
+
+def druckzonenhoehe(*, a_s: float, f_sd: float, b: float, f_cd: float) -> float:
+    """
+    ``x`` aus dem Kraeftegleichgewicht bei reiner Biegung.
+
+    ``0.85 * x * b * f_cd = A_s * f_sd``, aufgeloest nach ``x``. Alles in
+    SI-Basis; Rueckgabe in m. Dieselbe Formel wie beim Eckpunkt *reine Biegung*
+    der Handrechnung -- sie steht dort schon einmal, weil sie dort einen
+    anderen Zweck hat, aber es ist dieselbe Gleichgewichtsbedingung.
+    """
+    return a_s * f_sd / (BLOCKANTEIL * b * f_cd)
+
+
+class Duktilitaet(Nachweis):
+    """
+    Duktilitaetsnachweis je gewaehlter Bewehrungslage.
+
+    Ein Nachweis fuer die ganze Platte, ein Urteil je Lage. Die Lagen einer
+    Platte gehoeren zusammen und stehen darum unter einer Ueberschrift; sie auf
+    vier Nachweise zu verteilen ergaebe vier fast leere Abschnitte.
+    """
+
+    def __init__(
+        self,
+        querschnitt,
+        lagen: Sequence[int],
+    ) -> None:
+        gewaehlt = sorted(set(lagen))
+        if not gewaehlt:
+            raise ValueError("Der Duktilitätsnachweis braucht mindestens eine Lage.")
+        unbekannt = [n for n in gewaehlt
+                     if not any(l.nummer == n for l in querschnitt.lagen)]
+        if unbekannt:
+            raise ValueError(
+                f"Querschnitt '{querschnitt.name}': die Lagen "
+                f"{', '.join(str(n) for n in unbekannt)} gibt es nicht.")
+
+        self.querschnitt = querschnitt
+        self.lagen = [l for l in querschnitt.lagen if l.nummer in gewaehlt]
+        self.ergebnisse: List[Lagenergebnis] = []
+
+        # Je Lage ihre Posten -- Grundbewehrung und Zulage, soweit vorhanden.
+        self.posten_je_lage: Dict[int, List[Tuple]] = {
+            l.nummer: [eintrag for eintrag in querschnitt.posten_ids
+                       if eintrag[0].nummer == l.nummer]
+            for l in self.lagen
+        }
+
+        basis = f"{querschnitt.id}.nachweis.duktilitaet"
+        self.d_ausnutzung: Dict[int, WertDef] = {
+            l.nummer: WertDef(
+                id=f"{basis}.lage{l.nummer}.erfuellungsgrad",
+                symbol=rf"\alpha_{{eff,D,{l.nummer}}}",
+                einheit=EINHEITSLOS,
+                beschreibung=f"Erfüllungsgrad Duktilität – {l.nummer}. Lage",
+                referenz="SIA 262:2025, 4.1.4.2.5",
+                stellen=2,
+            )
+            for l in self.lagen
+        }
+        self.d_verhaeltnis: Dict[int, WertDef] = {
+            l.nummer: WertDef(
+                id=f"{basis}.lage{l.nummer}.x_zu_d",
+                symbol=rf"\left(x/d\right)_{{{l.nummer}}}",
+                einheit=EINHEITSLOS,
+                beschreibung=f"Bezogene Druckzonenhöhe – {l.nummer}. Lage",
+                referenz="SIA 262:2025, 4.1.4.2.5",
+                stellen=3,
+            )
+            for l in self.lagen
+        }
+
+        bezuege = [
+            Eingabebezug("h", querschnitt.id_von("h")),
+            Eingabebezug("b", querschnitt.id_von("b")),
+            Eingabebezug("f_cd", querschnitt.beton.id_von("f_cd")),
+        ]
+        for nummer, eintraege in self.posten_je_lage.items():
+            for lage, art, _, as_id, z_id in eintraege:
+                marke = f"{nummer}{art.kuerzel}"
+                bezuege += [
+                    Eingabebezug(f"a_s_{marke}", as_id),
+                    Eingabebezug(f"z_{marke}", z_id),
+                ]
+        for stahl in {l.stahl.id: l.stahl for l in self.lagen if l.stahl}.values():
+            bezuege.append(
+                Eingabebezug(f"f_yd__{_kennung(stahl.id)}", stahl.id_von("f_yd")))
+
+        self.s_f_cd = mit_index("f_{cd}", querschnitt.beton.symbol_index)
+
+        super().__init__(
+            basis,
+            ausgaben=(list(self.d_ausnutzung.values())
+                      + list(self.d_verhaeltnis.values())),
+            bezuege=bezuege,
+            titel=f"Duktilitätsnachweis – {querschnitt.name}",
+            referenz="SIA 262:2025, 4.1.4.2.5",
+            # Wie bei den anderen Nachweisen: ohne Abschnitt stuende er unter
+            # der Ueberschrift, die die Rechenreihenfolge zufaellig offen liess.
+            abschnitt=querschnitt.abschnitt,
+        )
+
+    # -- Rechnen ------------------------------------------------------------
+
+    def pruefe(self, e: Eingaben, p: Protokoll):
+        h = e.g("h").si
+        b = e.g("b").si
+        f_cd = e.g("f_cd").si
+
+        self._protokoll_ansatz(p)
+
+        ergebnis: Dict[str, Groesse] = {}
+        urteile: List[NachweisUrteil] = []
+        self.ergebnisse = []
+
+        for lage in self.lagen:
+            erg = self._eine_lage(e, lage, h=h, b=b, f_cd=f_cd)
+            self.ergebnisse.append(erg)
+            self._protokoll_lage(p, erg, b=b, f_cd=f_cd)
+
+            ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
+                min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
+            ergebnis[self.d_verhaeltnis[lage.nummer].id] = Groesse(
+                erg.verhaeltnis, EINHEITSLOS)
+            urteile.append(self._urteil(erg))
+
+        return ergebnis, urteile
+
+    def _eine_lage(
+        self, e: Eingaben, lage: Bewehrungslage, *,
+        h: float, b: float, f_cd: float,
+    ) -> Lagenergebnis:
+        erg = Lagenergebnis(lage=lage)
+        eintraege = self.posten_je_lage[lage.nummer]
+
+        flaechen = [(e.g(f"a_s_{lage.nummer}{art.kuerzel}").si,
+                     e.g(f"z_{lage.nummer}{art.kuerzel}").si)
+                    for _, art, _, _, _ in eintraege]
+        erg.a_s = sum(a for a, _ in flaechen)
+        if erg.a_s <= 0.0:
+            erg.begruendung = erg.hinweis = (
+                f"Nachweis nicht machbar, weil die {lage.nummer}. Lage nicht "
+                f"definiert ist. Ohne Bewehrung gibt es keine Druckzone, "
+                f"deren Höhe sich begrenzen liesse.")
+            return erg
+
+        # Grundbewehrung und Zulage liegen auf leicht verschiedenen Hoehen --
+        # sie gehoeren aber zur selben Lage, also zaehlt ihr gemeinsamer
+        # Schwerpunkt. Die schwaechere Stahlsorte gaebe es hier nicht: eine
+        # Lage traegt genau einen Stahl.
+        erg.z = sum(a * z for a, z in flaechen) / erg.a_s
+        # Gemessen ab der gedrueckten Randfaser: unten bewehrt heisst oben
+        # gedrueckt. Wer hier z stehen liesse, bekaeme bei den oberen Lagen
+        # eine Zahl, die keine statische Hoehe ist.
+        erg.d = erg.z if lage.von_unten else h - erg.z
+
+        f_sd = e.g(f"f_yd__{_kennung(lage.stahl.id)}").si
+        erg.x = druckzonenhoehe(a_s=erg.a_s, f_sd=f_sd, b=b, f_cd=f_cd)
+        erg.verhaeltnis = erg.x / erg.d if erg.d > 0 else float("inf")
+        erg.erfuellt = erg.verhaeltnis <= GRENZE
+        erg.erfuellungsgrad = (
+            float("inf") if erg.verhaeltnis == 0 else GRENZE / erg.verhaeltnis)
+        erg.begruendung = (
+            f"x = {erg.x * 1e3:.1f} mm bei d = {erg.d * 1e3:.1f} mm, "
+            f"also x/d = {erg.verhaeltnis:.3f} "
+            f"{'≤' if erg.erfuellt else '>'} {GRENZE:.2f}.")
+        return erg
+
+    def _urteil(self, erg: Lagenergebnis) -> NachweisUrteil:
+        nummer = erg.lage.nummer
+        einwirkung = WertDef(
+            id=self.d_verhaeltnis[nummer].id,
+            symbol=rf"\left(x/d\right)_{{{nummer}}}",
+            einheit=EINHEITSLOS, beschreibung="Einwirkung", stellen=3,
+        ).belegen(Groesse(erg.verhaeltnis, EINHEITSLOS))
+        widerstand = WertDef(
+            id=f"{self.id}.lage{nummer}.grenze",
+            symbol=r"\left(x/d\right)_{max}",
+            einheit=EINHEITSLOS, beschreibung="Widerstand", stellen=2,
+        ).belegen(Groesse(GRENZE, EINHEITSLOS))
+        return NachweisUrteil(
+            name=f"Duktilität – {nummer}. Lage",
+            art="D",
+            fall=f"{nummer}. Lage",
+            erfuellt=erg.erfuellt,
+            erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
+            begruendung=erg.begruendung,
+            hinweis=erg.hinweis,
+            # Ohne Bewehrung gibt es kein Verhaeltnis -- dann steht dort ein
+            # Strich und daneben der Hinweis, warum.
+            einwirkung=einwirkung if erg.machbar else None,
+            widerstand=widerstand if erg.machbar else None,
+        )
+
+    # -- Mitschrift ---------------------------------------------------------
+
+    def _protokoll_ansatz(self, p: Protokoll) -> None:
+        p.titel("Duktilität")
+        p.text(
+            "Die Druckzone muss schlank bleiben, damit der Stahl lange fliesst, "
+            "bevor der Beton versagt: der Querschnitt kündigt sein Versagen an. "
+            "Gerechnet wird die Druckzonenhöhe bei reiner Biegung, je Lage "
+            "einzeln."
+        )
+        p.gleichung(
+            rf"{BLOCKANTEIL} \cdot x \cdot b \cdot {self.s_f_cd} = A_s \cdot f_{{sd}}"
+            r" \qquad \Rightarrow \qquad "
+            rf"x = \frac{{A_s \cdot f_{{sd}}}}"
+            rf"{{{BLOCKANTEIL} \cdot b \cdot {self.s_f_cd}}}",
+            titel="Kräftegleichgewicht bei M_Ed = 0",
+            referenz="SIA 262:2025, 4.1.4.2.5")
+        p.gleichung(
+            rf"\frac{{x}}{{d}} \le {GRENZE:.2f}",
+            titel="Bedingung")
+        p.text(
+            "d wird von der gedrückten Randfaser aus gemessen: bei den unteren "
+            "Lagen von der Oberkante, bei den oberen von der Unterkante. "
+            "Grundbewehrung und Zulage einer Lage zählen mit ihrem gemeinsamen "
+            "Schwerpunkt."
+        )
+
+    def _protokoll_lage(
+        self, p: Protokoll, erg: Lagenergebnis, *, b: float, f_cd: float
+    ) -> None:
+        nummer = erg.lage.nummer
+        p.titel(f"Duktilität – {nummer}. Lage", ebene=3)
+
+        if not erg.machbar:
+            p.text(erg.begruendung)
+            return
+
+        index = self._index(erg)
+        s_a_s = f"A_{{s,{index}}}" if index else "A_s"
+        s_d = f"d_{{{index}}}" if index else "d"
+        s_f_sd = mit_index("f_{sd}", erg.lage.stahl.symbol_index)
+        f_sd = erg.x * BLOCKANTEIL * b * f_cd / erg.a_s
+
+        teile = self.posten_je_lage[nummer]
+        if len(teile) > 1:
+            # Zwei Posten auf leicht verschiedenen Höhen -- ohne diese Zeile
+            # fiele der Schwerpunkt vom Himmel.
+            p.gleichung(
+                rf"{s_d} = \frac{{\sum A_{{s,i}} \cdot z_i}}{{\sum A_{{s,i}}}}"
+                rf" = {erg.z * 1e3:.1f}\,\mathrm{{mm}}"
+                + ("" if erg.lage.von_unten else
+                   rf" \quad \Rightarrow \quad {s_d} = h - {erg.z * 1e3:.1f}"
+                   rf"\,\mathrm{{mm}} = {erg.d * 1e3:.1f}\,\mathrm{{mm}}"),
+                titel="Gemeinsamer Schwerpunkt der Lage")
+        elif not erg.lage.von_unten:
+            p.gleichung(
+                rf"{s_d} = h - z = {erg.d * 1e3:.1f}\,\mathrm{{mm}}",
+                titel="Statische Höhe ab der gedrückten Randfaser (unten)")
+
+        p.gleichung(
+            rf"x = \frac{{{s_a_s} \cdot {s_f_sd}}}"
+            rf"{{{BLOCKANTEIL} \cdot b \cdot {self.s_f_cd}}}"
+            "\n= "
+            rf"\frac{{{erg.a_s * 1e6:.0f}\,\mathrm{{mm}}^{{2}} \cdot "
+            rf"{f_sd / 1e6:.1f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}}}"
+            rf"{{{BLOCKANTEIL} \cdot {b * 1e3:.0f}\,\mathrm{{mm}} \cdot "
+            rf"{f_cd / 1e6:.1f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}}}"
+            rf" = {erg.x * 1e3:.1f}\,\mathrm{{mm}}",
+            titel="Druckzonenhöhe bei reiner Biegung")
+
+        zustand = r"\text{erfüllt}" if erg.erfuellt else r"\text{NICHT erfüllt}"
+        vergleich = r"\le" if erg.erfuellt else ">"
+        p.gleichung(
+            rf"\frac{{x}}{{{s_d}}} = \frac{{{erg.x * 1e3:.1f}}}{{{erg.d * 1e3:.1f}}}"
+            rf" = {erg.verhaeltnis:.3f}"
+            rf" \quad {vergleich} \quad {GRENZE:.2f}"
+            rf" \quad \Rightarrow \quad {zustand}",
+            titel="Bezogene Druckzonenhöhe")
+
+        grad = ("\\infty" if erg.erfuellungsgrad == float("inf")
+                else f"{erg.erfuellungsgrad:.2f}")
+        p.gleichung(
+            rf"\alpha_{{eff,D,{nummer}}} = "
+            rf"\frac{{{GRENZE:.2f}}}{{x/{s_d}}} = "
+            rf"\frac{{{GRENZE:.2f}}}{{{erg.verhaeltnis:.3f}}} = {grad}",
+            titel="Erfüllungsgrad")
+
+    def _index(self, erg: Lagenergebnis) -> str:
+        """
+        Der Symbolindex der Lage -- ``1,x`` statt ``1,x,g``.
+
+        Gerechnet wird mit der ganzen Lage, nicht mit einem Posten. Ein
+        Postenindex am Symbol behauptete etwas anderes.
+        """
+        eintraege = self.posten_je_lage[erg.lage.nummer]
+        if not eintraege:
+            return ""
+        lage, art, *_ = eintraege[0]
+        if len(eintraege) == 1:
+            return posten_index(lage, art)
+        return f"{lage.nummer},{lage.richtung.value}"
+
+
+def _kennung(text: str) -> str:
+    return "".join(z if z.isalnum() else "_" for z in text)

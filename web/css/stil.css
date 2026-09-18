@@ -36,6 +36,9 @@
   --beton:        #7b8794;
   --stahl:        #b8622a;
   --platte:       var(--blau);
+  /* Beide Tragrichtungen zugleich -- ein sanftes Violett, die Mischung aus
+     dem Blau der x- und dem Kupfer der y-Lagen. */
+  --beide:        #7c62b8;
 
   /* Akzent der Zwischenüberschriften. Eigene Variable, weil die Farben oben
      je eine Bedeutung tragen (Beton, Betonstahl, Platte) -- eine davon hier
@@ -313,17 +316,45 @@ input[readonly], input:disabled, select:disabled {
 }
 .postenzeile.ist-leer { opacity: .55; }
 
-/* Nimmt den Posten heraus, indem es den Durchmesser auf null setzt. Rot nur,
-   solange es etwas zu entfernen gibt -- sonst verspräche die Farbe eine
-   Wirkung, die der Knopf nicht hat. */
+/* Nimmt den Posten heraus, indem es den Durchmesser auf null setzt. Ein runder
+   Knopf mit hellrotem Grund -- als blosses Zeichen war er kaum zu sehen und
+   sah nicht wie etwas Drückbares aus. Farbig nur, solange es etwas zu
+   entfernen gibt: sonst verspräche er eine Wirkung, die er nicht hat. */
 .postenweg {
-  padding: 0; border: none; background: transparent;
-  font-size: 13px; line-height: 1; cursor: pointer;
-  color: var(--rand-stark);
+  width: 16px; height: 16px; padding: 0; border: none; border-radius: 50%;
+  background: transparent; color: var(--rand-stark);
+  font-size: 11px; font-weight: 700; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
 }
-.postenweg.ist-scharf { color: #e07a72; }
-.postenweg.ist-scharf:hover { color: var(--schlecht); }
+.postenweg.ist-scharf { background: var(--schlecht-hell); color: var(--schlecht); }
+.postenweg.ist-scharf:hover { background: var(--schlecht); color: #fff; }
 .postenweg:disabled { cursor: default; }
+
+/* Eine Lage, ein Schalter: Haken oder Kreuz. */
+.duktilitaetszeile {
+  display: grid; grid-template-columns: 118px 18px 62px 1fr;
+  gap: 6px; align-items: center; margin-bottom: 4px;
+}
+.duktilitaetszeile .postenname {
+  font-size: 11.5px; font-weight: 600; color: var(--schrift-matt);
+}
+.duktilitaetszeile .richtung {
+  font-size: 10.5px; font-weight: 700; text-align: center;
+  border-radius: 4px; padding: 1px 0;
+  background: var(--blau-hell); color: var(--blau);
+}
+.duktilitaetszeile .richtung.lage-y { background: #fbeadf; color: var(--stahl); }
+.schalter-haken .schalter-halb { padding: 1px 7px; font-size: 11px; }
+.schalter-haken .ist-ja.ist-an   { background: var(--gut); color: #fff; }
+.schalter-haken .ist-nein.ist-an { background: var(--schlecht); color: #fff; }
+
+/* Tragrichtung einer Einwirkung -- dieselben Farben wie bei den Lagen, damit
+   man nicht überlegen muss, welche Richtung welche ist. */
+.schalter-richtung { width: 100%; }
+.schalter-richtung .schalter-halb { flex: 1; padding: 1px 2px; }
+.schalter-richtung .ist-x.ist-an     { background: var(--blau); color: #fff; }
+.schalter-richtung .ist-y.ist-an     { background: var(--stahl); color: #fff; }
+.schalter-richtung .ist-beide.ist-an { background: var(--beide); color: #fff; }
 .postenzeile .postenname { font-size: 11.5px; font-weight: 600; color: var(--schrift-matt); }
 .postenzeile .zeichen { font-size: 12px; color: var(--schrift-zart); text-align: center; }
 .postenzeile .einheit { font-size: 11px; color: var(--schrift-zart); }
@@ -370,7 +401,7 @@ input[readonly], input:disabled, select:disabled {
 /* Eine Einwirkung je Zeile */
 .einwirkung {
   display: grid;
-  grid-template-columns: 1fr 74px 74px 78px 52px 26px;
+  grid-template-columns: 1fr 70px 70px 72px 74px 22px;
   gap: 5px; align-items: center; margin-bottom: 4px;
 }
 .einwirkung.ist-kopf {
@@ -381,7 +412,7 @@ input[readonly], input:disabled, select:disabled {
 .einwirkung.ist-kopf > span:first-child { text-align: left; }
 .einwirkung input[type="number"] { padding: 3px 5px; text-align: right; }
 .einwirkung .ew-name { padding: 3px 6px; font-weight: 500; }
-.einwirkung .ew-richtung { padding: 3px 4px; font-size: 11px; text-align: center; }
+.einwirkung .schalter-richtung { justify-self: stretch; }
 
 .werteliste tr.ist-gewaehlt { background: var(--blau-hell); box-shadow: inset 3px 0 0 var(--blau); }
 

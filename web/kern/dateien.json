@@ -19,6 +19,7 @@
     "opencivil/nachweis/__init__.py",
     "opencivil/nachweis/biegung_normalkraft.py",
     "opencivil/nachweis/dehnungsfaecher.py",
+    "opencivil/nachweis/duktilitaet.py",
     "opencivil/nachweis/handrechnung.py",
     "opencivil/nachweis/linie.py",
     "opencivil/nachweis/querkraft.py",

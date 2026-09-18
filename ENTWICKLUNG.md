@@ -43,6 +43,66 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-18 · Duktilität
+
+Ein dritter Nachweis, und der erste, der nicht an einer Tragrichtung hängt,
+sondern an einer **einzelnen Bewehrungslage**:
+
+```
+0.85 · x · b · f_cd = A_s · f_sd        (Kräftegleichgewicht, M_Ed = 0)
+x / d ≤ 0.35
+```
+
+Eine flache Druckzone heisst: der Stahl fliesst lange, bevor der Beton versagt
+— der Querschnitt kündigt sein Versagen an. Nachgewiesen wird darum kein
+Widerstand, sondern ein Verhältnis. Als Erfüllungsgrad steht `0.35/(x/d)` da,
+also wieder Widerstand/Einwirkung; damit passt er in dieselbe Spalte wie alles
+andere.
+
+### Das d muss man wählen
+
+`d` gilt ab der **gedrückten** Randfaser. Bei den unteren Lagen ist das die
+Oberkante (`d = z`), bei den oberen die Unterkante (`d = h − z`). Wer hier
+stumpf `z` stehen liesse, bekäme bei den oberen Lagen eine Zahl, die keine
+statische Höhe ist — genau der Fehler, der beim Querkraftnachweis einmal
+`d = 39 mm` lieferte.
+
+Grundbewehrung und Zulage liegen auf leicht verschiedenen Höhen, gehören aber
+zur selben Lage: gerechnet wird mit ihrem gemeinsamen Schwerpunkt, und der steht
+in der Herleitung.
+
+### Eine eingeschaltete, aber leere Lage
+
+Das ist kein Fehler der Beschreibung — es kann beim Umbewehren jederzeit
+passieren. Der Nachweis läuft, fällt nicht durch mit einer erfundenen Null,
+sondern liefert ein Urteil **ohne** Einwirkung und Widerstand (in der Tabelle
+zwei Striche) und dazu den Satz, warum. Schon in der Maske steht «Lage nicht
+definiert» neben dem Schalter.
+
+### Der Hinweis ist jetzt ein Feld, keine Vermutung
+
+Dafür habe ich zurückgenommen, was ich in der Runde davor gebaut hatte: die
+Schnittstelle schloss aus «Widerstand = 0» darauf, dass etwas zu melden sei.
+Das war geraten. `NachweisUrteil` hat jetzt ein Feld `hinweis`, das nur setzt,
+wer etwas zu melden hat — die Prüfung weiss es ohnehin. Beim Duktilitätsnachweis
+ist der Widerstand nämlich 0.35 und nicht null, die alte Regel hätte ihn
+übersehen.
+
+### Maske
+
+Vier Zeilen unter den Tragsicherheitsnachweisen, je ein Schalter ✓/✗ im Stil der
+x/y-Wahl, dazu die Tragrichtung der Lage in ihrer Farbe. Vorgabe sind die beiden
+äusseren Lagen.
+
+Nebenbei zwei Kleinigkeiten: die Kreuze an den Bewehrungsposten sind runde
+Knöpfe mit hellrotem Grund geworden — als blosses Zeichen waren sie kaum zu
+sehen und sahen nicht nach etwas Drückbarem aus. Und die Tragrichtung einer
+Einwirkung ist kein Auswahlfeld mehr, sondern ein Schalter wie die übrigen: x
+blau, y kupfer wie bei den Lagen, `x+y` in einem sanften Violett — der Mischung
+aus beiden.
+
+---
+
 ## 2026-09-18 · Querkraftbewehrung
 
 Bis hierher konnte eine Platte nur ohne Bügel nachgewiesen werden. Jetzt trägt

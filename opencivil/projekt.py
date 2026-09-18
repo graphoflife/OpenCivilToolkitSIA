@@ -36,6 +36,7 @@ from opencivil.material.betonstahl import STAHLSORTEN, betonstahl
 from opencivil.nachweis.biegung_normalkraft import (
     BiegungNormalkraft, Erfuellungsart, Schnittgroessen,
 )
+from opencivil.nachweis.duktilitaet import Duktilitaet
 from opencivil.nachweis.querkraft import Querkraft, Querkraftfall
 from opencivil.querschnitt.platte import (
     ALPHA_MAX, ALPHA_MIN, K_C, LAGENZAHL, Bewehrungslage, Bewehrungsposten,
@@ -123,6 +124,27 @@ def _masse_pruefen(eintrag: "QuerschnittEintrag") -> None:
 
 def sorten(art: str) -> Mapping[str, Any]:
     return BETONSORTEN if art == "beton" else STAHLSORTEN
+
+
+#: Fuer welche Lagen der Duktilitaetsnachweis vorgegeben ist -- die beiden
+#: aeusseren. Sie tragen Feld- und Stuetzmoment; dort entscheidet sich, ob der
+#: Querschnitt sein Versagen ankuendigt.
+DUKTILITAET_VORGABE = (True, False, False, True)
+
+
+def _duktilitaet_aus(wert: Any) -> List[bool]:
+    """
+    Genau vier Schalter, egal was in der Datei steht.
+
+    Eine Beschreibung aus der Zeit vor diesem Nachweis hat das Feld nicht --
+    dann gilt die Vorgabe. Eine zu kurze oder zu lange Liste wird auf vier
+    gebracht, statt spaeter beim Zugriff auf Lage 4 zu stolpern.
+    """
+    if not isinstance(wert, (list, tuple)):
+        return list(DUKTILITAET_VORGABE)
+    schalter = [bool(x) for x in wert[:LAGENZAHL]]
+    schalter += list(DUKTILITAET_VORGABE[len(schalter):])
+    return schalter
 
 
 # ===========================================================================
@@ -471,6 +493,16 @@ class QuerschnittEintrag:
         default_factory=QuerkraftbewehrungEintrag)
     """Bügel; ohne Durchmesser heisst: keine."""
 
+    duktilitaet: List[bool] = field(
+        default_factory=lambda: list(DUKTILITAET_VORGABE))
+    """
+    Je Lage, ob der Duktilitaetsnachweis gefuehrt wird. Index 0 = 1. Lage.
+
+    Vorgabe sind die beiden aeusseren Lagen: sie tragen das Feld- und das
+    Stuetzmoment, und dort entscheidet sich, ob der Querschnitt sein Versagen
+    ankuendigt.
+    """
+
     lagen: List[LageEintrag] = field(default_factory=list)
     """Genau vier, Index 0 = 1. Lage (unterste)."""
 
@@ -486,6 +518,7 @@ class QuerschnittEintrag:
         while len(self.lagen) < LAGENZAHL:
             self.lagen.append(LageEintrag())
         del self.lagen[LAGENZAHL:]
+        self.duktilitaet = _duktilitaet_aus(self.duktilitaet)
 
     def richtung_von(self, nummer: int) -> Richtung:
         """Richtung der Lage 1..4 -- die Paare (1,2) und (3,4) sind gekoppelt."""
@@ -503,6 +536,7 @@ class QuerschnittEintrag:
             "einlagenhoehe": self.einlagenhoehe,
             "k_c": self.k_c,
             "querkraftbewehrung": self.querkraftbewehrung.als_dict(),
+            "duktilitaet": list(self.duktilitaet),
             "richtung_lage1": self.richtung_lage1,
             "richtung_lage4": self.richtung_lage4,
             "lagen": [l.als_dict() for l in self.lagen],
@@ -528,6 +562,7 @@ class QuerschnittEintrag:
             k_c=_zahl(d, "k_c", K_C),
             querkraftbewehrung=QuerkraftbewehrungEintrag.aus_dict(
                 d.get("querkraftbewehrung") or {}),
+            duktilitaet=_duktilitaet_aus(d.get("duktilitaet")),
             richtung_lage1=str(d.get("richtung_lage1") or "x"),
             richtung_lage4=str(d.get("richtung_lage4") or "x"),
             lagen=[LageEintrag.aus_dict(x) for x in (lagen or [])],
@@ -552,11 +587,16 @@ class Aufbau:
     """Schluessel ist ``<querschnitt>.<richtung>``, weil je Richtung geprueft wird."""
 
     querkraft: Dict[str, Querkraft] = field(default_factory=dict)
+    duktilitaet: Dict[str, Duktilitaet] = field(default_factory=dict)
+    """Schluessel ist die Querschnittskennung -- ein Nachweis je Platte."""
+
     warnungen: List[str] = field(default_factory=list)
 
     def alle_nachweisziele(self) -> List[str]:
         return ([d.id for n in self.nachweise.values() for d in n.d_ausnutzung.values()]
-                + [d.id for q in self.querkraft.values() for d in q.d_grad.values()])
+                + [d.id for q in self.querkraft.values() for d in q.d_grad.values()]
+                + [d.id for k in self.duktilitaet.values()
+                   for d in k.d_ausnutzung.values()])
 
     def eckwertziele(self) -> List[str]:
         return [d.id for n in self.nachweise.values() for d in n.d_eckwerte.values()]
@@ -696,6 +736,14 @@ class Projekt:
             querschnitt = self._querschnitt(eintrag, aufbau.baustoffe)
             aufbau.querschnitte[eintrag.kennung] = querschnitt
             querschnitt.ins_rechenwerk(werk)
+
+            # Die Duktilitaet haengt an der Bewehrung, nicht an den
+            # Schnittgroessen -- sie laeuft auch ohne Einwirkung.
+            gewaehlte_lagen = [i + 1 for i, an in enumerate(eintrag.duktilitaet) if an]
+            if gewaehlte_lagen:
+                duktilitaet = Duktilitaet(querschnitt, gewaehlte_lagen)
+                werk.registriere(duktilitaet)
+                aufbau.duktilitaet[eintrag.kennung] = duktilitaet
 
             if not eintrag.kombinationen:
                 aufbau.warnungen.append(

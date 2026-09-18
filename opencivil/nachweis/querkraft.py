@@ -337,6 +337,10 @@ class Querkraftergebnis:
     erfuellt: bool = False
     begruendung: str = ""
 
+    hinweis: str = ""
+    """Gesetzt, wenn sich gar kein Widerstand bestimmen liess -- siehe
+    :attr:`opencivil.core.berechnung.NachweisUrteil.hinweis`."""
+
     # -- nur mit Buegeln ----------------------------------------------------
 
     punkte: Tuple[Buegelpunkt, ...] = ()
@@ -590,6 +594,7 @@ class Querkraft(Nachweis):
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
             begruendung=erg.begruendung,
+            hinweis=erg.hinweis,
             # Das Vorzeichen der Querkraft spielt keine Rolle -- verglichen
             # wird der Betrag. Also steht auch der Betrag da; sonst teilte
             # der Leser den Widerstand durch eine negative Zahl und bekaeme
@@ -669,7 +674,7 @@ class Querkraft(Nachweis):
         # x-Richtung ergibt das eine Teilung; in y-Richtung liefe die Breite
         # laengs der Traglinie mit und die Formel haette keinen Bezug mehr.
         if not ueber_teilung and self.richtung is Richtung.Y:
-            erg.begruendung = (
+            erg.begruendung = erg.hinweis = (
                 "Widerstand in y-Richtung nicht berechenbar, wegen "
                 "Bügeldefinition: in y ist eine Stabzahl über die betrachtete "
                 "Breite angegeben statt einer Teilung. Für einen Nachweis in "
@@ -679,7 +684,7 @@ class Querkraft(Nachweis):
         hoehen = _statische_hoehe(lagen, h, M_Ed >= 0)
         if hoehen is None:
             seite = "unten" if M_Ed >= 0 else "oben"
-            erg.begruendung = (
+            erg.begruendung = erg.hinweis = (
                 f"Auf der gezogenen Seite ({seite}) liegt in dieser Richtung "
                 f"keine Bewehrung. Ohne statische Höhe gibt es keinen "
                 f"Querkraftwiderstand: V_Rd = 0.")
@@ -814,7 +819,7 @@ class Querkraft(Nachweis):
             seite = "unten" if M_Ed >= 0 else "oben"
             erg.erfuellungsgrad = 0.0
             erg.erfuellt = False
-            erg.begruendung = (
+            erg.begruendung = erg.hinweis = (
                 f"Auf der gezogenen Seite ({seite}) liegt in dieser Richtung "
                 f"keine Bewehrung. Ohne statische Höhe gibt es keinen "
                 f"Querkraftwiderstand: V_Rd = 0.")
@@ -838,7 +843,7 @@ class Querkraft(Nachweis):
         if punkt.grund:
             erg.erfuellungsgrad = 0.0
             erg.erfuellt = False
-            erg.begruendung = punkt.grund
+            erg.begruendung = erg.hinweis = punkt.grund
             return erg
 
         erg.erfuellungsgrad = float("inf") if V_Ed == 0 else abs(erg.v_Rd) / abs(V_Ed)

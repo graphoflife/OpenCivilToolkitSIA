@@ -531,6 +531,21 @@ class NachweisUrteil:
     fall: str = ""
     """Name der Einwirkungskombination, zu der dieses Urteil gehoert."""
 
+    hinweis: str = ""
+    """
+    Was in der Zusammenfassung sichtbar dabeistehen muss.
+
+    Fuer den Fall, dass sich gar kein Widerstand bestimmen liess -- keine
+    Bewehrung auf der gezogenen Seite, eine Buegeldefinition ohne Bezug in
+    dieser Richtung, eine Lage, die es nicht gibt. Dann steht in der Tabelle
+    eine Null oder ein Strich, und eine Null erklaert sich nicht von selbst.
+
+    Getrennt von :attr:`begruendung`: die traegt jedes Urteil, auch das
+    erfuellte, und gehoert in den Tooltip. Dieses Feld setzt nur, wer etwas zu
+    melden hat -- die Pruefung weiss es, die Schnittstelle soll es nicht aus
+    einer Null erraten muessen.
+    """
+
     raum: str = ""
     """
     Namensraum des Nachweises, der dieses Urteil gefaellt hat.

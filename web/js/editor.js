@@ -580,6 +580,29 @@ function ueberdeckungsBlock(querschnitt, welche) {
  * Spitzen der Resistenzlinie -- dort senkrecht. Welcher Weg gegriffen hat,
  * steht beim Nachweis.
  */
+/**
+ * Dreistellungs-Schalter für die Tragrichtung einer Einwirkung.
+ *
+ * Dieselben Farben wie bei den Lagen -- x blau, y kupfer -- damit man beim
+ * Blick auf die Maske nicht überlegen muss, welche Richtung welche ist. `x+y`
+ * bekommt ein sanftes Violett: die Mischung aus beiden.
+ */
+function richtungsWahl(gewaehlt, setzen) {
+  const stellungen = [
+    ['x', 'x', 'nur x-Richtung'],
+    ['y', 'y', 'nur y-Richtung'],
+    ['beide', 'x+y', 'beide Tragrichtungen'],
+  ];
+  return el('span.schalter.schalter-richtung', {
+    title: 'In welcher Tragrichtung nachgewiesen wird',
+  }, stellungen.map(([wert, text, beschreibung]) => el('button.schalter-halb', {
+    text,
+    title: beschreibung,
+    class: `ist-${wert}${gewaehlt === wert ? ' ist-an' : ''}`,
+    on: { click: () => { if (gewaehlt !== wert) setzen(wert); } },
+  })));
+}
+
 function einwirkungZeile(querschnitt, index) {
   const k = querschnitt.kombinationen[index];
   const aendern = (veraenderer) => projektAendern((p) => {
@@ -599,13 +622,8 @@ function einwirkungZeile(querschnitt, index) {
     zahl('M_Ed', 'Bemessungsmoment in kNm'),
     zahl('N_Ed', 'Normalkraft in kN – Zug positiv, Druck negativ'),
     zahl('V_Ed', 'Querkraft in kN/m – 0 heisst: kein Querkraftnachweis'),
-    el('select.ew-richtung', {
-      title: 'In welcher Tragrichtung nachgewiesen wird',
-      on: { change: (e) => aendern((x) => { x.richtung = e.target.value; }) },
-    }, (zustand.katalog.richtungen || []).map((r) => el('option', {
-      value: r.wert, text: r.wert, title: r.beschriftung,
-      selected: (k.richtung || 'beide') === r.wert,
-    }))),
+    richtungsWahl(k.richtung || 'beide',
+      (wert) => aendern((x) => { x.richtung = wert; })),
     el('button.knopf.knopf-zart.knopf-gefahr', {
       text: '×', title: 'Einwirkung entfernen',
       on: {
@@ -711,8 +729,73 @@ function plattenEditor(querschnitt) {
           ? querschnitt.kombinationen.map((_, i) => einwirkungZeile(querschnitt, i))
           : [el('div.leer', { text: 'Ohne Einwirkung kein Nachweis.' })]),
       ]),
+
+      el('div.unterkapitel', {}, [
+        el('div.unterkapitel-kopf', {}, [
+          el('span', { text: 'Duktilitätsnachweise' }),
+          el('span.kurvenhinweis', { text: 'x / d ≤ 0.35 bei M_Ed = 0' }),
+        ]),
+        ...[1, 2, 3, 4].map((nummer) => duktilitaetZeile(querschnitt, nummer)),
+      ]),
     ]),
   ];
+}
+
+/**
+ * Ein Schalter je Lage: wird für sie der Duktilitätsnachweis geführt?
+ *
+ * Der Nachweis gilt einer einzelnen Bewehrungslage, nicht einer Tragrichtung --
+ * darum vier Zeilen und nicht zwei. Üblich sind die beiden äusseren; die
+ * inneren tragen selten das massgebende Moment.
+ */
+function duktilitaetZeile(querschnitt, nummer) {
+  const an = duktilitaetVon(querschnitt)[nummer - 1];
+  const richtung = richtungVon(querschnitt, nummer);
+  const lage = querschnitt.lagen[nummer - 1];
+  const leer = !(lage.grund.durchmesser > 0 || lage.zulage.durchmesser > 0);
+
+  const setzen = (wert) => projektAendern((p) => {
+    const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
+    q.duktilitaet = duktilitaetVon(q);
+    q.duktilitaet[nummer - 1] = wert;
+  });
+
+  return el('div.duktilitaetszeile', {}, [
+    el('span.postenname', { text: `Duktilität ${nummer}. Lage` }),
+    el('span.richtung', {
+      text: richtung,
+      class: `lage-${richtung}`,
+      title: `Tragrichtung der ${nummer}. Lage`,
+    }),
+    el('span.schalter.schalter-haken', {
+      title: an ? 'Nachweis wird geführt' : 'Nachweis wird nicht geführt',
+    }, [
+      el('button.schalter-halb.ist-ja', {
+        text: '✓', title: 'Nachweis führen',
+        class: an ? 'ist-an' : '',
+        on: { click: () => { if (!an) setzen(true); } },
+      }),
+      el('button.schalter-halb.ist-nein', {
+        text: '✗', title: 'Nachweis nicht führen',
+        class: an ? '' : 'ist-an',
+        on: { click: () => { if (an) setzen(false); } },
+      }),
+    ]),
+    // Ein eingeschalteter Nachweis an einer leeren Lage ist kein Fehler der
+    // Eingabe -- er wird geführt und meldet selbst, dass er nicht geht. Hier
+    // steht es trotzdem, damit man es beim Einschalten schon sieht.
+    el('span.kurvenhinweis', {
+      text: (an && leer) ? 'Lage nicht definiert' : '',
+    }),
+  ]);
+}
+
+/** Genau vier Schalter, auch wenn die Beschreibung älter ist als der Nachweis. */
+function duktilitaetVon(querschnitt) {
+  const vorgabe = [true, false, false, true];
+  const vorhanden = Array.isArray(querschnitt.duktilitaet)
+    ? querschnitt.duktilitaet : [];
+  return vorgabe.map((v, i) => (i < vorhanden.length ? !!vorhanden[i] : v));
 }
 // ===========================================================================
 
