@@ -1001,13 +1001,14 @@ class TestAngabengruppen(unittest.TestCase):
         bewehrung = tabelle["bewehrung"]
         self.assertTrue(bewehrung["latex"].startswith(r"\begin{array}"))
         erste = [z[0] for z in bewehrung["zeilen"]]
-        # Von unten nach oben: untere Überdeckung, 1. bis 4. Lage, obere.
+        # Wie man die Platte im Schnitt sieht: von oben nach unten, also
+        # dieselbe Folge wie in der Eingabemaske.
         self.assertEqual(erste, [
-            r"\text{Überdeckung unten}", r"\text{1. Lage}", r"\text{2. Lage}",
-            r"\text{3. Lage}", r"\text{4. Lage}", r"\text{Überdeckung oben}",
+            r"\text{Überdeckung oben}", r"\text{4. Lage}", r"\text{3. Lage}",
+            r"\text{2. Lage}", r"\text{1. Lage}", r"\text{Überdeckung unten}",
         ])
         # Durchmesser, Teilung und Stahl stehen in derselben Zeile.
-        erste_lage = bewehrung["zeilen"][1]
+        erste_lage = bewehrung["zeilen"][4]
         self.assertIn(r"\varnothing 18@150", erste_lage[2])
         self.assertIn("B500B", erste_lage[3])
 
@@ -1018,7 +1019,8 @@ class TestAngabengruppen(unittest.TestCase):
         lage.grund.durchmesser = 0.0
         lage.zulage.durchmesser = 0.0
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
-        zweite = antwort.daten["zusammenfassungen"]["q1"]["bewehrung"]["zeilen"][2]
+        zeilen = antwort.daten["zusammenfassungen"]["q1"]["bewehrung"]["zeilen"]
+        zweite = next(z for z in zeilen if z[0] == r"\text{2. Lage}")
         self.assertEqual(zweite[2], r"\text{--}")
         self.assertEqual(zweite[3], r"\text{--}")
 
@@ -1082,13 +1084,18 @@ class TestQuerkraftbewehrungInDerAusgabe(unittest.TestCase):
         zeilen = antwort.daten["zusammenfassungen"]["q1"]["bewehrung"]["zeilen"]
         letzte = zeilen[-1]
         self.assertEqual(letzte[0], r"\text{Querkraftbewehrung}")
-        self.assertIn(r"\varnothing_{V} = 10", letzte[2])
-        self.assertIn("s_{V,x}", letzte[2])
-        self.assertIn("s_{V,y}", letzte[2])
-        # Der Querschnitt eines Bügelschenkels gehört dazu -- er kommt aus der
-        # Lösung und wird hier nicht ein zweites Mal gerechnet.
-        self.assertIn(r"A_{\varnothing,V} = 78.5", letzte[2])
+        # Kurzform wie bei den Lagen: Durchmesser und die beiden Teilungen.
+        self.assertEqual(letzte[2], r"\varnothing 10@200@200")
         self.assertIn("B500B", letzte[3])
+        # Der Bügelquerschnitt steht in der Herleitung, wo er hergeleitet
+        # wird -- in einer Übersicht ist er nur Ballast.
+        self.assertNotIn(r"A_{\varnothing,V}", letzte[2])
+
+    def test_eine_stabzahl_in_y_steht_als_stueckzahl_da(self):
+        antwort = dienst.bearbeite(
+            "rechnen", {"projekt": self.projekt(abstand_y=None, anzahl_y=5.0)})
+        letzte = antwort.daten["zusammenfassungen"]["q1"]["bewehrung"]["zeilen"][-1]
+        self.assertEqual(letzte[2], r"\varnothing 10@200@5\,\text{Stk}")
 
     def test_ohne_buegel_steht_dort_nichts(self):
         antwort = dienst.bearbeite(

@@ -43,6 +43,28 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-18 · Die Übersicht liest sich jetzt wie ein Schnitt
+
+Die Bewehrungsübersicht lief von unten nach oben — untere Überdeckung, 1. bis
+4. Lage, obere Überdeckung. Die Eingabemaske stapelt umgekehrt, wie man die
+Platte im Schnitt sieht. Zwei Folgen für dieselbe Sache nebeneinander: jetzt
+läuft auch die Tabelle von oben nach unten, die Bügel bleiben als eigene Zeile
+am Ende.
+
+Die Bügelzeile trug ausserdem die ganze Herleitung mit sich:
+
+```
+⌀_V = 6 mm   s_V,x = 200 mm   s_V,y = 200 mm   A_⌀,V = 28.3 mm²
+```
+
+In einer Übersicht ist das Ballast — und der Bügelquerschnitt steht ohnehin in
+der Herleitung, wo er auch hergeleitet wird. Jetzt dieselbe Kurzform wie bei
+den Lagen: `⌀6@200@200`, Durchmesser und die beiden Teilungen. Damit fällt auch
+die letzte Stelle weg, an der `A_⌀,V` ein zweites Mal aus der Lösung geholt
+wurde; `_bewehrungsuebersicht` braucht die Lösung gar nicht mehr.
+
+---
+
 ## 2026-09-18 · Ein Gradzeichen ohne Basis, und eine Richtung ohne Zeile
 
 ### `\,^{\circ}` bringt KaTeX zu Fall

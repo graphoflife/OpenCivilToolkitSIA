@@ -16,7 +16,7 @@ from __future__ import annotations
 import math
 from typing import Any, Dict, List, Optional, Sequence
 
-from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM, MM2
+from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM
 from opencivil.core.latex import als_text, tabelle, text_latex
 from opencivil.core.protokoll import (
     Block, GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, TextBlock,
@@ -660,7 +660,7 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
             "grad_spalte": GRAD_SPALTE,
             "latex": tabelle(kopf, [z["zellen"] for z in zeilen], "lrrr"),
             "angaben": _plattenangaben(qs),
-            "bewehrung": _bewehrungsuebersicht(qs, loesung),
+            "bewehrung": _bewehrungsuebersicht(qs),
         }
     return ergebnis
 
@@ -673,14 +673,13 @@ def _plattenangaben(qs) -> dict:
     return {"latex": latex, "titel": "Angaben zur Platte"}
 
 
-def _bewehrungsuebersicht(qs, loesung: Loesung) -> dict:
+def _bewehrungsuebersicht(qs) -> dict:
     """
-    Überdeckungen und Lagen, von unten nach oben gelesen.
+    Überdeckungen und Lagen, wie man die Platte im Schnitt sieht.
 
-    Die Reihenfolge ist die des Querschnitts und nicht die der Eingabemaske:
-    zuerst die untere Überdeckung, dann die 1. bis 4. Lage, zuletzt die obere.
-    Wer die Tabelle von oben nach unten liest, geht damit durch die Platte
-    hinauf.
+    Von oben nach unten gelesen: obere Überdeckung, 4. bis 1. Lage, untere
+    Überdeckung. Dieselbe Folge wie in der Eingabemaske -- wer beides
+    nebeneinander hat, soll nicht umdenken müssen.
 
     Grundbewehrung und Zulage stehen in einer Zeile, getrennt durch ``+`` --
     die Lage ist eine Lage, auch wenn sie aus zwei Posten besteht.
@@ -697,9 +696,9 @@ def _bewehrungsuebersicht(qs, loesung: Loesung) -> dict:
             return rf"{durchmesser}@{posten.abstand.formatiert(0)}"
         return rf"{posten.anzahl:g} \times {durchmesser}"
 
-    zeilen = [[als_text("Überdeckung unten"), strich,
-               qs.ueberdeckung_unten.als_latex(0, MM), strich]]
-    for lage in qs.lagen:
+    zeilen = [[als_text("Überdeckung oben"), strich,
+               qs.ueberdeckung_oben.als_latex(0, MM), strich]]
+    for lage in reversed(qs.lagen):
         posten = [menge(lage.grund), menge(lage.zulage)]
         vorhanden = [t for t in posten if t]
         zeilen.append([
@@ -708,34 +707,30 @@ def _bewehrungsuebersicht(qs, loesung: Loesung) -> dict:
             " + ".join(vorhanden) if vorhanden else strich,
             als_text(lage.stahl.name) if (vorhanden and lage.stahl) else strich,
         ])
-    zeilen.append([als_text("Überdeckung oben"), strich,
-                   qs.ueberdeckung_oben.als_latex(0, MM), strich])
+    zeilen.append([als_text("Überdeckung unten"), strich,
+                   qs.ueberdeckung_unten.als_latex(0, MM), strich])
 
     # Die Bügel stehen am Ende und nicht in der Stapelfolge: sie sitzen über
     # die ganze Höhe und haben darin keinen Platz.
     if qs.hat_buegel:
         b = qs.querkraftbewehrung
-        menge_y = (rf"s_{{V,y}} = {b.abstand_y.als_latex(0, MM)}"
-                   if b.ueber_abstand_y
-                   else rf"n_{{V,y}} = {b.anzahl_y:g}")
-        # Der Bügelquerschnitt kommt aus der Lösung und wird hier nicht ein
-        # zweites Mal gerechnet -- er hat seine eigene Formel in der
-        # Herleitung, und zwei Wege zu derselben Zahl laufen auseinander.
-        flaeche = loesung.werte.get(qs.id_von("querkraft.a_s"))
+        # Kurzform wie bei den Lagen: Durchmesser und die beiden Teilungen,
+        # sonst nichts. Der Bügelquerschnitt steht in der Herleitung, wo er
+        # auch hergeleitet wird -- in einer Übersicht ist er nur Ballast.
+        menge_y = (b.abstand_y.formatiert(0) if b.ueber_abstand_y
+                   else rf"{b.anzahl_y:g}\,\text{{Stk}}")
         zeilen.append([
             als_text("Querkraftbewehrung"),
             als_text("x/y"),
-            (rf"\varnothing_{{V}} = {b.durchmesser.als_latex(0, MM)} \quad "
-             rf"s_{{V,x}} = {b.abstand_x.als_latex(0, MM)} \quad {menge_y}"
-             + (rf" \quad A_{{\varnothing,V}} = "
-                rf"{flaeche.groesse.als_latex(1, MM2)}" if flaeche else "")),
+            (rf"\varnothing {b.durchmesser.formatiert(0)}"
+             rf"@{b.abstand_x.formatiert(0)}@{menge_y}"),
             als_text(b.stahl.name) if b.stahl else strich,
         ])
 
     return {
         "kopf": kopf,
         "zeilen": zeilen,
-        "titel": "Bewehrung von unten nach oben",
+        "titel": "Bewehrung von oben nach unten",
         "latex": tabelle(kopf, zeilen, "llll"),
     }
 

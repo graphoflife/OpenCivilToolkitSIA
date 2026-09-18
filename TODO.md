@@ -40,7 +40,9 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
 
 ## Erledigt zuletzt
 
-Das Gradzeichen hatte keine Basis (`\,^{\circ}`) — KaTeX brach daran ab und
+Die Bewehrungsübersicht läuft von oben nach unten, wie die Eingabemaske und wie
+der Schnitt durch die Platte; die Bügelzeile zeigt nur noch `⌀6@200@200` statt
+der halben Herleitung · Das Gradzeichen hatte keine Basis (`\,^{\circ}`) — KaTeX brach daran ab und
 zeigte den rohen Quelltext des ganzen Kastens · Der Kasten der Bügelangaben war
 zerrissen, weil die Flächenformel zwischen den Vorgaben lief: die Reihenfolge
 der Eingänge ist die Reihenfolge der Blöcke · Eine Tragrichtung ohne Bewehrung
