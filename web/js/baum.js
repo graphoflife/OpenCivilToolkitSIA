@@ -174,7 +174,10 @@ function platteAnlegen() {
       // der Platte -- wer sie braucht, schaltet sie ein.
       rissanforderung: 'normal', kriechzahl: 2.0,
       zwaengung_x: false, zwaengung_y: false, zwaengung_begrenzt: false,
-      haeufige_aus_tragsicherheit: true, haeufige: [],
+      haeufige_aus_tragsicherheit: true, haeufige: [], knickfaelle: [],
+      // Sprödes Versagen und Zwängung auf Biegung: nur die 1. Lage.
+      sproede_lagen: [true, false, false, false],
+      zwaengung_biegung_lagen: [true, false, false, false],
       // 'automatisch': beide Massstäbe werden gerechnet, massgebend ist der
       // kleinere Erfüllungsgrad. Eine feste Wahl hier hätte die neue Platte
       // vom Regelfall ausgenommen.

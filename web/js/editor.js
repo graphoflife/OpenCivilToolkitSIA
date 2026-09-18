@@ -614,7 +614,9 @@ function einwirkungZeile(querschnitt, index) {
     beiAenderung: (v) => aendern((x) => { x[feld] = v ?? 0; }),
   });
 
-  return el('div.einwirkung', {}, [
+  const an = k.aktiv !== false;
+  return el('div.einwirkung', { class: an ? '' : 'ist-aus' }, [
+    hakenSchalter(an, (wert) => aendern((x) => { x.aktiv = wert; }), 'Lastfall'),
     el('input.ew-name', {
       type: 'text', value: k.name, title: 'Bezeichnung der Einwirkung',
       on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
@@ -731,6 +733,7 @@ function plattenEditor(querschnitt) {
         ]),
         querschnitt.kombinationen.length
           ? el('div.einwirkung.ist-kopf', {}, [
+            el('span'),
             el('span', { text: 'Bezeichnung' }),
             el('span', { text: 'M_Ed [kNm]' }),
             el('span', { text: 'N_Ed [kN]' }),
@@ -752,9 +755,141 @@ function plattenEditor(querschnitt) {
         ...[1, 2, 3, 4].map((nummer) => duktilitaetZeile(querschnitt, nummer)),
       ]),
 
+      lagenkapitel(querschnitt, {
+        titel: 'Nachweise gegen sprödes Versagen',
+        feld: 'sproede_lagen',
+        hinweis: 'M_Rd(N_Ed = 0) ≥ M_Riss',
+        beschriftung: (n) => `Rissmoment ${n}. Lage`,
+        was: 'Nachweis',
+      }),
+
       mindestbewehrungsBlock(querschnitt),
+      knickBlock(querschnitt),
     ]),
   ];
+}
+
+/**
+ * Ein Kapitel mit vier Lagenschaltern -- dieselbe Gestalt wie die Duktilität.
+ *
+ * Drei Nachweise sind so gebaut (Duktilität, sprödes Versagen, Zwängung auf
+ * Biegung); dreimal dieselben zwanzig Zeilen wären dreimal dieselbe Gelegenheit
+ * auseinanderzulaufen.
+ */
+function lagenkapitel(querschnitt, { titel, feld, hinweis, beschriftung, was }) {
+  const vorgabe = [true, false, false, false];
+  const wahl = lagenwahl(querschnitt[feld], vorgabe);
+
+  const setzen = (nummer, wert) => projektAendern((p) => {
+    const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
+    q[feld] = lagenwahl(q[feld], vorgabe);
+    q[feld][nummer - 1] = wert;
+  });
+
+  return el('div.unterkapitel', {}, [
+    el('div.unterkapitel-kopf', {}, [
+      el('span', { text: titel }),
+      hinweis ? el('span.kurvenhinweis', { text: hinweis }) : null,
+    ]),
+    ...[1, 2, 3, 4].map((nummer) => {
+      const lage = querschnitt.lagen[nummer - 1];
+      const leer = !(lage.grund.durchmesser > 0 || lage.zulage.durchmesser > 0);
+      const richtung = richtungVon(querschnitt, nummer);
+      return el('div.duktilitaetszeile', {}, [
+        el('span.postenname', { text: beschriftung(nummer) }),
+        el('span.richtung', {
+          text: richtung, class: `lage-${richtung}`,
+          title: `Tragrichtung der ${nummer}. Lage`,
+        }),
+        hakenSchalter(wahl[nummer - 1], (wert) => setzen(nummer, wert), was),
+        el('span.kurvenhinweis', {
+          text: (wahl[nummer - 1] && leer) ? 'Lage nicht definiert' : '',
+        }),
+      ]);
+    }),
+  ]);
+}
+
+/** Genau vier Schalter, auch wenn die Beschreibung älter ist als der Nachweis. */
+function lagenwahl(vorhanden, vorgabe) {
+  const liste = Array.isArray(vorhanden) ? vorhanden : [];
+  return vorgabe.map((v, i) => (i < liste.length ? !!liste[i] : v));
+}
+
+/**
+ * Knicken -- Druckkraft, Moment 1. Ordnung, Länge und Knicklänge je Fall.
+ *
+ * Nur in x-Richtung: eine Knicklänge gehört zu einer Tragrichtung, und in y
+ * wäre die Breite der Platte die Länge.
+ */
+function knickBlock(querschnitt) {
+  const faelle = querschnitt.knickfaelle || [];
+  const aendern = (veraenderer) => projektAendern((p) => {
+    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
+  });
+
+  return el('div.unterkapitel', {}, [
+    el('div.unterkapitel-kopf', {}, [
+      el('span', { text: 'Knicken' }),
+      el('button.knopf.knopf-zart', {
+        text: '+ Knicknachweis',
+        on: {
+          click: () => aendern((q) => {
+            q.knickfaelle = q.knickfaelle || [];
+            q.knickfaelle.push({
+              name: `Stütze ${q.knickfaelle.length + 1}`,
+              N_Ed: -500, M_Ed_1: 20, laenge: 3, knicklaenge: 3,
+            });
+          }),
+        },
+      }),
+    ]),
+    faelle.length
+      ? el('div.einwirkung.ist-knick.ist-kopf', {}, [
+        el('span', { text: 'Bezeichnung' }),
+        el('span', { text: 'N_Ed [kN]' }),
+        el('span', { text: 'M_Ed,1 [kNm]' }),
+        el('span', { text: 'l [m]' }),
+        el('span', { text: 'l_cr [m]' }),
+        el('span'),
+      ])
+      : null,
+    ...(faelle.length
+      ? faelle.map((_, i) => knickZeile(querschnitt, i))
+      : [el('div.leer', { text: 'Kein Knicknachweis – nur in x-Richtung möglich.' })]),
+  ]);
+}
+
+function knickZeile(querschnitt, index) {
+  const k = (querschnitt.knickfaelle || [])[index];
+  const aendern = (veraenderer) => projektAendern((p) => {
+    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
+      .knickfaelle[index]);
+  });
+  const zahl = (feld, titel, schritt) => zahlfeld({
+    wert: k[feld], schritt, titel,
+    beiAenderung: (v) => aendern((x) => { x[feld] = v ?? 0; }),
+  });
+
+  return el('div.einwirkung.ist-knick', {}, [
+    el('input.ew-name', {
+      type: 'text', value: k.name, title: 'Bezeichnung des Knicknachweises',
+      on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
+    }),
+    zahl('N_Ed', 'Druckkraft in kN – negativ', 50),
+    zahl('M_Ed_1', 'Moment 1. Ordnung in kNm', 10),
+    zahl('laenge', 'Systemlänge in m – geht in die Schiefstellung ein', 0.5),
+    zahl('knicklaenge', 'Knicklänge in m', 0.5),
+    el('button.knopf.knopf-zart.knopf-gefahr', {
+      text: '×', title: 'Knicknachweis entfernen',
+      on: {
+        click: () => projektAendern((p) => {
+          p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
+            .knickfaelle.splice(index, 1);
+        }),
+      },
+    }),
+  ]);
 }
 
 /**
@@ -784,7 +919,7 @@ function mindestbewehrungsBlock(querschnitt) {
 
   return el('div.unterkapitel', {}, [
     el('div.unterkapitel-kopf', {}, [
-      el('span', { text: 'Mindestbewehrungsnachweise' }),
+      el('span', { text: 'Mindestbewehrung-Nachweise' }),
     ]),
 
     zwaengung('zwaengung_x', 'Normalkraft-Zwängung x',
@@ -793,6 +928,12 @@ function mindestbewehrungsBlock(querschnitt) {
       'Zwang in y-Richtung wird angesetzt'),
     zwaengung('zwaengung_begrenzt', 'Begrenzung auf 500 mm',
       'Die Zwängung wird höchstens für 500 mm Plattendicke angesetzt'),
+
+    el('div.unterkapitel-kopf', { style: { marginTop: '8px' } }, [
+      el('span', { text: 'Zwängung auf Biegung' }),
+      el('span.kurvenhinweis', { text: 'σ_s ≤ σ_s,adm' }),
+    ]),
+    ...[1, 2, 3, 4].map((nummer) => zwaengungBiegungZeile(querschnitt, nummer)),
 
     el('div.unterkapitel-kopf', { style: { marginTop: '8px' } }, [
       el('span', { text: 'Häufige Lastfälle' }),
@@ -836,6 +977,27 @@ function mindestbewehrungsBlock(querschnitt) {
         ? faelle.map((_, i) => haeufigZeile(querschnitt, i))
         : [el('div.leer', { text: 'Noch kein häufiger Lastfall.' })]),
     ]),
+  ]);
+}
+
+/** Eine Lagenzeile der Zwängung auf Biegung. */
+function zwaengungBiegungZeile(querschnitt, nummer) {
+  const vorgabe = [true, false, false, false];
+  const wahl = lagenwahl(querschnitt.zwaengung_biegung_lagen, vorgabe);
+  const richtung = richtungVon(querschnitt, nummer);
+  const setzen = (wert) => projektAendern((p) => {
+    const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
+    q.zwaengung_biegung_lagen = lagenwahl(q.zwaengung_biegung_lagen, vorgabe);
+    q.zwaengung_biegung_lagen[nummer - 1] = wert;
+  });
+  return el('div.duktilitaetszeile', {}, [
+    el('span.postenname', { text: `Zwängung ${nummer}. Lage` }),
+    el('span.richtung', {
+      text: richtung, class: `lage-${richtung}`,
+      title: `Tragrichtung der ${nummer}. Lage`,
+    }),
+    hakenSchalter(wahl[nummer - 1], setzen, 'Nachweis'),
+    el('span.kurvenhinweis', { text: '' }),
   ]);
 }
 

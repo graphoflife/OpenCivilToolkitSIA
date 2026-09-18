@@ -43,6 +43,85 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-18 · Ein Löser für Dehnungsebenen, und was darauf steht
+
+Vier Nachweise in einem Zug — und der Grund, warum sie zusammengehören: sie
+brauchen alle dieselbe Frage beantwortet. *Welche Dehnungsebene hält diesen
+Querschnitt unter (N, M) im Gleichgewicht?*
+
+### Sprödes Versagen war der falsche Nachweis
+
+Der Nachweis mit `σ_s,adm` gab vor, gegen sprödes Versagen zu schützen, tat
+aber etwas anderes: er begrenzt die Stahlspannung aus einer aufgezwungenen
+Krümmung. Und er war nicht einmal konservativ — bei normaler Anforderung liegt
+`M_s,adm` rund 10 % **über** `M_Rd`, weil `f_yk/f_yd = 1.15` den kleineren
+Hebelarm des gerissenen Querschnitts mehr als aufwiegt.
+
+Jetzt sind es zwei Nachweise:
+
+* **Sprödes Versagen**: `M_Rd(N_Ed = 0) ≥ M_Riss` — trägt der bewehrte
+  Querschnitt mehr als der unbewehrte im Augenblick des Risses?
+* **Zwängung auf Biegung**: `σ_s ≤ σ_s,adm` — hält die Bewehrung die Spannung
+  aus, die eine aufgezwungene Krümmung erzeugt?
+
+Dafür läuft der M-N-Nachweis jetzt für jede bewehrte Richtung, auch ohne
+Schnittgrössen: seine Eckwerte gehören dem Querschnitt, nicht der Einwirkung.
+
+### Der Querschnittslöser
+
+Mit Normalkraft gibt es keine geschlossene Lösung. Zwei Unbekannte, zwei
+Gleichgewichtsbedingungen, nichtlineares Betongesetz. `scipy.optimize.fsolve`
+kam nicht in Frage — das Werkzeug läuft auch im Browser über Pyodide.
+
+Zwei geschachtelte **Bisektionen**: bei festem `χ` wächst `N(ε_m)` monoton,
+also ist `ε_m` eindeutig bestimmbar; damit wird `M` eine Funktion von `χ`
+allein, und die äussere Bisektion sucht darin die Krümmung. Kein Startwert kann
+danebenliegen, kein Newton-Schritt davonlaufen.
+
+**Der Fehler, der mich aufgehalten hat:** ich suchte zuerst über `ε ∈ [−0.5,
+0.5]`. Jenseits der Bruchdehnung geben beide Werkstoffgesetze null zurück —
+dort ist nichts mehr monoton, und die Bisektion sah bei `ε = −0.5` dieselbe
+Normalkraft wie bei 0. Nichts konvergierte. Das Suchfenster für `ε_m` hängt
+jetzt von `χ` ab und bleibt im gültigen Bereich beider Gesetze.
+
+Gemessen an der geschlossenen Lösung des Zustands II trifft der Löser die
+Stahlspannung auf 0.01 % (183.60 gegen 183.58 N/mm²).
+
+### Was in die Mitschrift gehört
+
+Nicht die Suche, sondern die **Probe**: die gefundene Ebene und der Nachweis,
+dass mit ihr `N_int = N_Ed` und `M_int = M_Ed` herauskommt. Wer das nachrechnen
+will, integriert zwei Mal über die Höhe — das geht von Hand. Den Weg dorthin
+muss er nicht nachvollziehen. Dasselbe Vorgehen wie bei der Neigungssuche des
+Querkraftnachweises.
+
+### Spannungsbegrenzung und Knicken
+
+**Spannungsbegrenzung**: je häufigem Lastfall die Stahlspannung im gerissenen
+Querschnitt gegen `f_yd − 80 MPa` (Tabelle 17). Nur bei erhöhter und hoher
+Anforderung — bei normaler steht dort ein Strich. Gezählt wird nur gezogene
+Bewehrung.
+
+**Knicken**: die Ausmitten-Iteration am verformten System. Läuft die Folge ein,
+gibt es eine Gleichgewichtslage; wächst sie, knickt das System. Das ist die
+eigentliche Aussage: nicht erfüllt heisst hier **nicht** «eine Spannung ist
+überschritten», sondern «es gibt gar kein Gleichgewicht». Danach muss der
+Querschnitt das Moment zweiter Ordnung noch aufnehmen.
+
+Nur in x-Richtung: eine Knicklänge gehört zu einer Tragrichtung, und in y wäre
+die Breite der Platte die Länge.
+
+### Maske
+
+Vier Kapitel statt zwei, jedes mit Lagenschaltern im selben Stil — dreimal
+dieselben zwanzig Zeilen wären dreimal dieselbe Gelegenheit auseinanderzulaufen,
+darum baut `lagenkapitel()` sie alle. Jeder Tragsicherheitsfall hat einen
+Ein/Aus-Schalter; ausgeschaltet bleibt er blass stehen, statt gelöscht zu
+werden. Dazu das Panel *Spannung-Dehnung* — leer, mit einem Satz dazu, was
+dorthin gehört.
+
+---
+
 ## 2026-09-18 · Sprödes Versagen unter Biegung, und der gerissene Querschnitt
 
 ```

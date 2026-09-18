@@ -24,6 +24,65 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
       Platte wird je Laufmeter gerechnet). In der Eingabemaske steht es
       richtig. Einheitlich ziehen.
 
+## Offene Normfragen — deine Fragen, unbeantwortet
+
+Diese Punkte sind **nicht** entschieden. Ich habe je eine Annahme eingebaut und
+sie hier notiert; keine davon ist nachgeschlagen.
+
+- [ ] **Wird bei den häufigen Lastfällen mit φ gerechnet?** Eingebaut: ja,
+      `E_c,eff = E_cm/(1+φ)` mit demselben φ wie überall. Begründung: häufige
+      Einwirkung ist Dauerlast, und Kriechen senkt den Hebelarm, liegt also auf
+      der sicheren Seite. Aber die Norm sagt es an dieser Stelle nicht.
+- [ ] **Charakteristische oder Bemessungs-Kennwerte für die Stahlspannung?**
+      Eingebaut: `E_s` und `E_cm` als Mittelwerte (4.4.1.2 verlangt
+      Mittelwerte), die Grenze dagegen aus `f_yd − 80 MPa` (Tabelle 17). Das
+      mischt zwei Niveaus — nach Tabelle 17 steht dort aber ausdrücklich `f_yd`.
+- [ ] **Zugfestigkeit des Betons in der Spannungsrechnung?** Eingebaut: nein,
+      voll gerissen. Das ist konservativ (ohne Mitwirkung zwischen den Rissen),
+      aber die Norm erlaubt in 4.4.1.2 die Mittelwerte — also womöglich auch
+      `f_ctm`.
+- [ ] **Unterscheidet die Norm inneren Zwang auf Normalkraft und auf Biegung?**
+      Eingebaut: ja, als zwei getrennte Nachweise mit verschiedenem `k_t`
+      (`h` gegen `h/3`). 4.4.1.3 stützt das («für Platten- und
+      Rechteckquerschnitte unter Biegebeanspruchung gilt t = h/3»), nennt sie
+      aber nicht als zwei Nachweise.
+- [ ] **Unterscheidet die Norm sprödes Versagen auf Normalkraft und Biegung?**
+      Eingebaut: die Rissnormalkraft steht unter *Mindestbewehrung* (4.4.2), das
+      Rissmoment unter *sprödes Versagen* (4.4.1.3). Ob das die gemeinte
+      Trennung ist, steht dahin.
+- [ ] **Was macht der Eurocode?** Nicht verglichen. EC2 7.3.2 hat
+      `A_s,min·σ_s = k_c·k·f_ct,eff·A_ct` — formal dieselbe Gestalt wie
+      SIA 4.4.2, aber mit `k_c` und `k` statt `k_t`, und mit einer anderen
+      Begründung für die wirksame Zugzone. Ein Vergleich würde zeigen, ob die
+      Zahlen zusammenpassen.
+- [ ] **Steifigkeit beim Knicken: charakteristisch oder Bemessung?** Eingebaut:
+      Bemessung (`f_cd`, `f_yd`) mit `E_cm/(1+φ)`. Du vermutest dasselbe. Ob φ
+      dabei überhaupt gilt und ob `eps_c2d = 3‰` oder der Wert der Norm (3.5‰)
+      zu nehmen ist, ist offen — eingebaut sind die Werte des Betons aus dem
+      Katalog.
+- [ ] Alle diese Schalter sollen laut deiner Anmerkung **wählbar** sein
+      (φ ja/nein, charakteristisch/Bemessung). Eingebaut ist je eine feste
+      Annahme; die Schalter fehlen noch.
+
+## Noch nicht gebaut
+
+- [ ] **Automatisches Bewehrungstool.** Nicht angefangen — die Zeit ging für
+      Löser, Spannungsbegrenzung und Knicken drauf. Das Gerüst steht aber:
+      `Projekt.aufbauen()` liefert alle Urteile, und eine Suche über
+      Durchmesser × Teilung müsste nur wiederholt aufbauen und die Urteile
+      abfragen. Offen ist vor allem, wonach optimiert wird (kleinste
+      Stahlmenge? wenigste Durchmesser?) und welche Nachweise mitzählen.
+- [ ] **Spannung-Dehnung-Analyse**: das Panel steht leer da. Der Löser liefert
+      zu jedem Fall ε_m und χ; was gezeigt werden soll, ist noch nicht
+      festgelegt.
+- [ ] **Breite je Tragrichtung.** Du wolltest, dass y immer mit 1000 mm rechnet
+      und nur x die eingegebene Breite nimmt. **Nicht umgesetzt** — beide
+      Richtungen nehmen `b`. Das ist tiefer als es aussieht: `b` geht auch in
+      die Bewehrungsflächen ein (`A_s = π⌀²/4 · b/s`), also müsste der ganze
+      Lagenaufbau je Richtung gerechnet werden. Mit `b = 1000 mm` (dem
+      Regelfall) stimmt es; bei abweichender Breite ist die y-Richtung falsch
+      skaliert.
+
 ## Offen (neu)
 
 - [ ] Die rechte Tafel läuft waagrecht über, sobald sie schmal wird (bei rund
@@ -38,21 +97,18 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
       `SIA 262:2025, 4.1.4.2.5` stehen nach Vorgabe da, nachgeschlagen ist
       keines von beiden.
 
-- [ ] **Es fehlt die Spannungsbegrenzung unter häufiger Einwirkung.** Die
-      häufigen Lastfälle lassen sich eingeben (auch als 70 % der
-      Tragsicherheitsfälle), gerechnet wird damit noch nichts. Die Nulllinie
-      dafür steht in `nachweis/zustand2.py` bereit; gebraucht wird zusätzlich
-      die Stahlspannung unter *gegebenem* M und N, also der Fall mit
-      Normalkraft — der ist nicht geschlossen lösbar und braucht eine
-      Nullstellensuche über x.
-- [ ] Der Rissmomentnachweis läuft ohne Schalter, für jede Platte und beide
-      Richtungen. Falls er abschaltbar sein soll, braucht es einen Toggle wie
-      bei Duktilität und Zwängung.
 - [ ] Die Zahlen der Rissnachweise sind ungeprüft wie alle anderen: beide `k_t`,
       die 500-mm-Grenze, `h/3`, `w_nom = 0.5/0.2 mm` und die Wurzelformel für
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Querschnittslöser für Dehnungsebenen (zwei geschachtelte Bisektionen, ohne
+fremde Pakete) · Sprödes Versagen und Zwängung auf Biegung als zwei getrennte
+Nachweise, je Lage einschaltbar · Stahlspannung unter häufiger Einwirkung gegen
+`f_yd − 80 MPa` · Knicknachweis am verformten System (nur x-Richtung) ·
+Ein/Aus-Schalter an jedem Tragsicherheitsfall · Panel «Spannung-Dehnung»
+(leer) ·
 
 Sprödes Versagen unter Biegung: `M_s,adm = σ_s,adm·A_s·z ≥ M_Riss`, der
 Hebelarm aus dem gerissenen Querschnitt (Zustand II) statt aus einem

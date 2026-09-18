@@ -413,8 +413,19 @@ input[readonly], input:disabled, select:disabled {
 /* Eine Einwirkung je Zeile */
 .einwirkung {
   display: grid;
-  grid-template-columns: 1fr 70px 70px 72px 74px 22px;
+  grid-template-columns: 42px 1fr 60px 60px 62px 64px 20px;
   gap: 5px; align-items: center; margin-bottom: 4px;
+}
+/* Im Lastfall ist der Schalter nur ein Beiwerk -- er darf der Zeile nicht die
+   Breite nehmen, die die Zahlen brauchen. */
+.einwirkung .schalter-haken .schalter-halb { width: 20px; font-size: 11px; }
+/* Ein ausgeschalteter Lastfall bleibt stehen -- blass, damit man sieht, dass
+   er da ist und nicht gerechnet wird. */
+.einwirkung.ist-aus { opacity: .5; }
+/* Ein häufiger Lastfall trägt keine Querkraft, ein Knicknachweis keine
+   Richtungswahl -- je eine Spalte anders. */
+.einwirkung.ist-knick {
+  grid-template-columns: 1fr 62px 66px 54px 54px 20px;
 }
 .einwirkung.ist-kopf {
   font-size: 10.5px; font-weight: 700; text-transform: uppercase;
@@ -425,7 +436,6 @@ input[readonly], input:disabled, select:disabled {
 .einwirkung input[type="number"] { padding: 3px 5px; text-align: right; }
 .einwirkung .ew-name { padding: 3px 6px; font-weight: 500; }
 .einwirkung .schalter-richtung { justify-self: stretch; }
-/* Ein häufiger Lastfall trägt keine Querkraft -- eine Spalte weniger. */
 .einwirkung.ist-haeufig { grid-template-columns: 1fr 70px 70px 74px 22px; }
 
 .werteliste tr.ist-gewaehlt { background: var(--blau-hell); box-shadow: inset 3px 0 0 var(--blau); }

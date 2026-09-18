@@ -393,6 +393,38 @@ function plattenkennzahlen(eintrag, loesung) {
     ])));
 }
 
+/**
+ * Spannung-Dehnung-Analyse -- noch ohne Inhalt.
+ *
+ * Das Panel steht, damit klar ist, wohin die Auswertung der Dehnungsebenen
+ * gehört: der Querschnittslöser liefert zu jeder Schnittgrössenkombination
+ * ein ε_m und ein χ, und daraus liesse sich der ganze Spannungsverlauf über
+ * die Höhe zeichnen. Was genau gezeigt wird, ist noch offen -- darum steht
+ * hier bewusst ein leerer Platz und keine erfundene Darstellung.
+ */
+function spannungSicht(loesung) {
+  const querschnitte = loesung.zuordnung?.querschnitte || {};
+  const raum = eingrenzung();
+  const gezeigt = Object.entries(querschnitte).filter(
+    ([, eintrag]) => imRaum(raum, eintrag.namensraum));
+
+  if (!gezeigt.length) {
+    return leerzustand('Kein Querschnitt gewählt.',
+      'Links eine Platte wählen – oder oben auf "Gesamt" umschalten.');
+  }
+
+  return el('div', {}, gezeigt.map(([, eintrag]) => el('div.blatt', {}, [
+    el('div.b-titel', { text: `Spannung-Dehnung-Analyse – ${eintrag.name}` }),
+    el('p.b-text', {
+      text: 'Noch nicht festgelegt. Der Querschnittslöser bestimmt zu jeder '
+          + 'Schnittgrössenkombination die Dehnungsebene (ε_m und χ); daraus '
+          + 'lässt sich der Verlauf von Dehnung und Spannung über die '
+          + 'Plattenhöhe zeichnen. Welche Fälle hier gezeigt werden und in '
+          + 'welcher Form, steht noch aus.',
+    }),
+  ])));
+}
+
 function diagrammSicht(loesung) {
   const raum = eingrenzung();
   const linien = loesung.linien || {};
@@ -681,6 +713,7 @@ export function berichtZeichnen(behaelter, beiZielwahl) {
 
   const sichten = {
     nachweise: () => zusammenfassung(loesung),
+    spannung: () => spannungSicht(loesung),
     diagramm: () => diagrammSicht(loesung),
     herleitung: () => herleitung(loesung),
     werte: () => werteSicht(loesung, beiZielwahl),

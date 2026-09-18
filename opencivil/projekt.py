@@ -497,13 +497,15 @@ class HaeufigEintrag:
     M_Ed: float = 0.0
     N_Ed: float = 0.0
     richtung: str = BEIDE_RICHTUNGEN
+    aktiv: bool = True
+    """Ob dieser Lastfall gerechnet wird. Ausgeschaltet bleibt er stehen."""
 
     def gilt_fuer(self, richtung: Richtung) -> bool:
-        return self.richtung in (BEIDE_RICHTUNGEN, richtung.value)
+        return self.aktiv and self.richtung in (BEIDE_RICHTUNGEN, richtung.value)
 
     def als_dict(self) -> dict:
         return {"name": self.name, "M_Ed": self.M_Ed, "N_Ed": self.N_Ed,
-                "richtung": self.richtung}
+                "richtung": self.richtung, "aktiv": self.aktiv}
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "HaeufigEintrag":
@@ -512,6 +514,7 @@ class HaeufigEintrag:
             M_Ed=_zahl(d, "M_Ed", 0.0),
             N_Ed=_zahl(d, "N_Ed", 0.0),
             richtung=str(d.get("richtung") or BEIDE_RICHTUNGEN),
+            aktiv=bool(d.get("aktiv", True)),
         )
 
 
@@ -535,12 +538,16 @@ class KombinationEintrag:
     dieser Wahlmoeglichkeit, damit dort kein Nachweis stillschweigend wegfaellt.
     """
 
+    aktiv: bool = True
+    """Ob dieser Lastfall gerechnet wird. Ausgeschaltet bleibt er stehen."""
+
     def gilt_fuer(self, richtung: Richtung) -> bool:
-        return self.richtung in (BEIDE_RICHTUNGEN, richtung.value)
+        return self.aktiv and self.richtung in (BEIDE_RICHTUNGEN, richtung.value)
 
     def als_dict(self) -> dict:
         return {"name": self.name, "M_Ed": self.M_Ed, "N_Ed": self.N_Ed,
-                "V_Ed": self.V_Ed, "art": self.art, "richtung": self.richtung}
+                "V_Ed": self.V_Ed, "art": self.art, "richtung": self.richtung,
+                "aktiv": self.aktiv}
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "KombinationEintrag":
@@ -551,6 +558,7 @@ class KombinationEintrag:
             V_Ed=_zahl(d, "V_Ed", 0.0),
             art=str(d.get("art") or Erfuellungsart.AUTOMATISCH.value),
             richtung=str(d.get("richtung") or BEIDE_RICHTUNGEN),
+            aktiv=bool(d.get("aktiv", True)),
         )
 
 
