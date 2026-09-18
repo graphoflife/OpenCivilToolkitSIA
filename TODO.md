@@ -38,6 +38,14 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
       `SIA 262:2025, 4.1.4.2.5` stehen nach Vorgabe da, nachgeschlagen ist
       keines von beiden.
 
+- [ ] **Der Mindestbewehrungsnachweis fehlt noch.** Die Eingaben stehen
+      (Rissanforderung, Zwängung in x/y, Begrenzung auf 500 mm, häufige
+      Lastfälle bzw. die 70-%-Ableitung), gerechnet wird damit noch nichts.
+      Offen sind vor allem: die zulässigen Stahlspannungen je Rissanforderung,
+      und die Stahlspannung im gerissenen Querschnitt unter M und N
+      (Zustand II) — dazu braucht es eine Festlegung für `n = E_s/E_c`, also
+      ob kurz- oder langzeitig gerechnet wird.
+
 ## Erledigt zuletzt
 
 Die Bewehrungsübersicht läuft von oben nach unten, wie die Eingabemaske und wie

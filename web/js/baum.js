@@ -170,6 +170,11 @@ function platteAnlegen() {
       // Die beiden äusseren Lagen tragen Feld- und Stützmoment; dort
       // entscheidet sich, ob der Querschnitt sein Versagen ankündigt.
       duktilitaet: [true, false, false, true],
+      // Eine Zwängung ist eine Annahme über das Tragwerk, keine Eigenschaft
+      // der Platte -- wer sie braucht, schaltet sie ein.
+      rissanforderung: 'normal',
+      zwaengung_x: false, zwaengung_y: false, zwaengung_begrenzt: false,
+      haeufige_aus_tragsicherheit: true, haeufige: [],
       // 'automatisch': beide Massstäbe werden gerechnet, massgebend ist der
       // kleinere Erfüllungsgrad. Eine feste Wahl hier hätte die neue Platte
       // vom Regelfall ausgenommen.

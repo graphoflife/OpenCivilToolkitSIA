@@ -330,11 +330,13 @@ input[readonly], input:disabled, select:disabled {
 .postenweg.ist-scharf:hover { background: var(--schlecht); color: #fff; }
 .postenweg:disabled { cursor: default; }
 
-/* Eine Lage, ein Schalter: Haken oder Kreuz. */
+/* Eine Lage, ein Schalter: Haken oder Kreuz. Ohne Richtungsmarke -- bei der
+   Zwängung und der 70-%-Regel gibt es keine -- bekommt der Name ihren Platz. */
 .duktilitaetszeile {
-  display: grid; grid-template-columns: 118px 18px 62px 1fr;
+  display: grid; grid-template-columns: 118px 18px 54px 1fr;
   gap: 6px; align-items: center; margin-bottom: 4px;
 }
+.duktilitaetszeile.ist-breit { grid-template-columns: 142px 54px 1fr; }
 .duktilitaetszeile .postenname {
   font-size: 11.5px; font-weight: 600; color: var(--schrift-matt);
 }
@@ -344,9 +346,19 @@ input[readonly], input:disabled, select:disabled {
   background: var(--blau-hell); color: var(--blau);
 }
 .duktilitaetszeile .richtung.lage-y { background: #fbeadf; color: var(--stahl); }
-.schalter-haken .schalter-halb { padding: 1px 7px; font-size: 11px; }
+/* Beide Hälften gleich breit und die Zeichen mittig: ✓ und ✗ sind verschieden
+   breit, und bei symmetrischem Innenabstand stand der Schalter dadurch
+   schief. Die abgewählte Seite bleibt blass, damit das Auge sofort sieht,
+   welche gilt. */
+.schalter-haken .schalter-halb {
+  width: 26px; padding: 2px 0; font-size: 12px; line-height: 15px;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--rand-stark);
+}
+.schalter-haken .schalter-halb:hover { color: var(--schrift-matt); }
 .schalter-haken .ist-ja.ist-an   { background: var(--gut); color: #fff; }
 .schalter-haken .ist-nein.ist-an { background: var(--schlecht); color: #fff; }
+.schalter-haken .ist-an:hover    { color: #fff; }
 
 /* Tragrichtung einer Einwirkung -- dieselben Farben wie bei den Lagen, damit
    man nicht überlegen muss, welche Richtung welche ist. */
@@ -413,6 +425,8 @@ input[readonly], input:disabled, select:disabled {
 .einwirkung input[type="number"] { padding: 3px 5px; text-align: right; }
 .einwirkung .ew-name { padding: 3px 6px; font-weight: 500; }
 .einwirkung .schalter-richtung { justify-self: stretch; }
+/* Ein häufiger Lastfall trägt keine Querkraft -- eine Spalte weniger. */
+.einwirkung.ist-haeufig { grid-template-columns: 1fr 70px 70px 74px 22px; }
 
 .werteliste tr.ist-gewaehlt { background: var(--blau-hell); box-shadow: inset 3px 0 0 var(--blau); }
 

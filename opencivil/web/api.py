@@ -27,7 +27,7 @@ from opencivil.core.wert import Wert
 from opencivil.material.beton import BETON_VORLAGEN, BETONSORTEN
 from opencivil.material.betonstahl import STAHLSORTEN, STAHL_VORLAGEN
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
-from opencivil.projekt import BEIDE_RICHTUNGEN, Aufbau
+from opencivil.projekt import BEIDE_RICHTUNGEN, RISSANFORDERUNGEN, Aufbau
 
 
 def endlich(daten: Any) -> Any:
@@ -84,6 +84,10 @@ def katalog() -> dict:
             {"wert": "x", "beschriftung": "nur x-Richtung"},
             {"wert": "y", "beschriftung": "nur y-Richtung"},
             {"wert": BEIDE_RICHTUNGEN, "beschriftung": "beide Richtungen"},
+        ],
+        "rissanforderungen": [
+            {"wert": wert, "beschriftung": text}
+            for wert, text in RISSANFORDERUNGEN.items()
         ],
     }
 

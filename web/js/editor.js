@@ -682,6 +682,14 @@ function plattenEditor(querschnitt) {
           titel: 'Verringert d_v, sofern h/6 < e < d',
           beiAenderung: (v) => aendern((q) => { q.einlagenhoehe = v ?? 0; }),
         }), 'mm'),
+        feld('Rissanforderung', auswahl({
+          werte: (zustand.katalog.rissanforderungen || []).map((r) => ({
+            wert: r.wert, beschriftung: r.beschriftung,
+          })),
+          gewaehlt: querschnitt.rissanforderung || 'normal',
+          titel: 'Bestimmt die zulässige Stahlspannung beim Mindestbewehrungsnachweis',
+          beiAenderung: (v) => aendern((q) => { q.rissanforderung = v; }),
+        })),
       ]),
 
       el('div.feldgruppe', {}, [
@@ -737,8 +745,151 @@ function plattenEditor(querschnitt) {
         ]),
         ...[1, 2, 3, 4].map((nummer) => duktilitaetZeile(querschnitt, nummer)),
       ]),
+
+      mindestbewehrungsBlock(querschnitt),
     ]),
   ];
+}
+
+/**
+ * Mindestbewehrung: was angesetzt wird und wogegen.
+ *
+ * Zwei Teile. Oben die Zwängung -- eine Annahme über das Tragwerk, nicht über
+ * die Platte, darum ausgeschaltet, bis jemand sie trifft. Unten die häufigen
+ * Lastfälle, gegen die später die Stahlspannung begrenzt wird.
+ *
+ * Gerechnet wird hier nichts: die 70-%-Regel steht als Satz da, die Zahlen
+ * dazu bildet der Kern, sobald der Nachweis läuft.
+ */
+function mindestbewehrungsBlock(querschnitt) {
+  const aus70 = querschnitt.haeufige_aus_tragsicherheit !== false;
+  const faelle = querschnitt.haeufige || [];
+
+  const aendern = (veraenderer) => projektAendern((p) => {
+    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
+  });
+
+  const zwaengung = (feld, beschriftung, titel) => el('div.duktilitaetszeile.ist-breit', {}, [
+    el('span.postenname', { text: beschriftung, title: titel }),
+    hakenSchalter(!!querschnitt[feld],
+      (wert) => aendern((q) => { q[feld] = wert; }), 'Zwängung'),
+    el('span.kurvenhinweis', { text: titel }),
+  ]);
+
+  return el('div.unterkapitel', {}, [
+    el('div.unterkapitel-kopf', {}, [
+      el('span', { text: 'Mindestbewehrungsnachweise' }),
+    ]),
+
+    zwaengung('zwaengung_x', 'Normalkraft-Zwängung x',
+      'Zwang in x-Richtung wird angesetzt'),
+    zwaengung('zwaengung_y', 'Normalkraft-Zwängung y',
+      'Zwang in y-Richtung wird angesetzt'),
+    zwaengung('zwaengung_begrenzt', 'Begrenzung auf 500 mm',
+      'Die Zwängung wird höchstens für 500 mm Plattendicke angesetzt'),
+
+    el('div.unterkapitel-kopf', { style: { marginTop: '8px' } }, [
+      el('span', { text: 'Häufige Lastfälle' }),
+      aus70 ? null : el('button.knopf.knopf-zart', {
+        text: '+ Lastfall',
+        on: {
+          click: () => aendern((q) => {
+            q.haeufige = q.haeufige || [];
+            q.haeufige.push({
+              name: `Häufig ${q.haeufige.length + 1}`,
+              M_Ed: 0, N_Ed: 0, richtung: 'beide',
+            });
+          }),
+        },
+      }),
+    ]),
+
+    el('div.duktilitaetszeile.ist-breit', {}, [
+      el('span.postenname', { text: '70 % übernehmen' }),
+      hakenSchalter(aus70, (wert) => aendern((q) => {
+        q.haeufige_aus_tragsicherheit = wert;
+      }), 'Ableitung'),
+      el('span.kurvenhinweis', {
+        text: aus70
+          ? 'Moment und Normalkraft der Tragsicherheitsfälle, mit 70 % angesetzt'
+          : 'Eigene Lastfälle, unabhängig von den Tragsicherheitsfällen',
+      }),
+    ]),
+
+    ...(aus70 ? [] : [
+      faelle.length
+        ? el('div.einwirkung.ist-kopf.ist-haeufig', {}, [
+          el('span', { text: 'Bezeichnung' }),
+          el('span', { text: 'M_Ed [kNm]' }),
+          el('span', { text: 'N_Ed [kN]' }),
+          el('span', { text: 'Ri.' }),
+          el('span'),
+        ])
+        : null,
+      ...(faelle.length
+        ? faelle.map((_, i) => haeufigZeile(querschnitt, i))
+        : [el('div.leer', { text: 'Noch kein häufiger Lastfall.' })]),
+    ]),
+  ]);
+}
+
+/** Ein häufiger Lastfall auf einer Zeile -- wie eine Einwirkung, ohne Querkraft. */
+function haeufigZeile(querschnitt, index) {
+  const k = (querschnitt.haeufige || [])[index];
+  const aendern = (veraenderer) => projektAendern((p) => {
+    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
+      .haeufige[index]);
+  });
+
+  return el('div.einwirkung.ist-haeufig', {}, [
+    el('input.ew-name', {
+      type: 'text', value: k.name, title: 'Bezeichnung des häufigen Lastfalls',
+      on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
+    }),
+    zahlfeld({
+      wert: k.M_Ed, schritt: 10, titel: 'Moment unter häufiger Einwirkung, in kNm',
+      beiAenderung: (v) => aendern((x) => { x.M_Ed = v ?? 0; }),
+    }),
+    zahlfeld({
+      wert: k.N_Ed, schritt: 10,
+      titel: 'Normalkraft unter häufiger Einwirkung, in kN – Zug positiv',
+      beiAenderung: (v) => aendern((x) => { x.N_Ed = v ?? 0; }),
+    }),
+    richtungsWahl(k.richtung || 'beide',
+      (wert) => aendern((x) => { x.richtung = wert; })),
+    el('button.knopf.knopf-zart.knopf-gefahr', {
+      text: '×', title: 'Häufigen Lastfall entfernen',
+      on: {
+        click: () => projektAendern((p) => {
+          p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
+            .haeufige.splice(index, 1);
+        }),
+      },
+    }),
+  ]);
+}
+
+/**
+ * Zweistellungs-Schalter ja/nein -- grüner Haken, rotes Kreuz.
+ *
+ * Beide Hälften gleich breit und die Zeichen mittig: ✓ und ✗ sind verschieden
+ * breit, und bei symmetrischem Innenabstand wurde der Schalter dadurch schief.
+ */
+function hakenSchalter(an, setzen, was = 'Nachweis') {
+  return el('span.schalter.schalter-haken', {
+    title: an ? `${was} wird geführt` : `${was} wird nicht geführt`,
+  }, [
+    el('button.schalter-halb.ist-ja', {
+      text: '✓', title: `${was} führen`,
+      class: an ? 'ist-an' : '',
+      on: { click: () => { if (!an) setzen(true); } },
+    }),
+    el('button.schalter-halb.ist-nein', {
+      text: '✗', title: `${was} nicht führen`,
+      class: an ? '' : 'ist-an',
+      on: { click: () => { if (an) setzen(false); } },
+    }),
+  ]);
 }
 
 /**
@@ -767,20 +918,7 @@ function duktilitaetZeile(querschnitt, nummer) {
       class: `lage-${richtung}`,
       title: `Tragrichtung der ${nummer}. Lage`,
     }),
-    el('span.schalter.schalter-haken', {
-      title: an ? 'Nachweis wird geführt' : 'Nachweis wird nicht geführt',
-    }, [
-      el('button.schalter-halb.ist-ja', {
-        text: '✓', title: 'Nachweis führen',
-        class: an ? 'ist-an' : '',
-        on: { click: () => { if (!an) setzen(true); } },
-      }),
-      el('button.schalter-halb.ist-nein', {
-        text: '✗', title: 'Nachweis nicht führen',
-        class: an ? '' : 'ist-an',
-        on: { click: () => { if (an) setzen(false); } },
-      }),
-    ]),
+    hakenSchalter(an, setzen),
     // Ein eingeschalteter Nachweis an einer leeren Lage ist kein Fehler der
     // Eingabe -- er wird geführt und meldet selbst, dass er nicht geht. Hier
     // steht es trotzdem, damit man es beim Einschalten schon sieht.

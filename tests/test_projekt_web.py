@@ -7,8 +7,9 @@ from pathlib import Path
 
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, N_PRO_MM2, Groesse
 from opencivil.projekt import (
-    KombinationEintrag, LageEintrag, MaterialEintrag, PostenEintrag, Projekt,
-    ProjektFehler, QuerkraftbewehrungEintrag, QuerschnittEintrag,
+    HaeufigEintrag, KombinationEintrag, LageEintrag, MaterialEintrag,
+    PostenEintrag, Projekt, ProjektFehler, QuerkraftbewehrungEintrag,
+    QuerschnittEintrag,
 )
 from opencivil.querschnitt.platte import Richtung
 from opencivil.web import api, bruecke, dienst, server
@@ -57,6 +58,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
             LageEintrag: LageEintrag(stahl="s1"),
             KombinationEintrag: KombinationEintrag("Feld", M_Ed=100.0),
             QuerkraftbewehrungEintrag: QuerkraftbewehrungEintrag(durchmesser=10.0),
+            HaeufigEintrag: HaeufigEintrag("Gebrauch", M_Ed=70.0),
             QuerschnittEintrag: QuerschnittEintrag("q1", "Platte", "b1"),
         }
         for klasse, beispiel in beispiele.items():
@@ -1314,3 +1316,82 @@ class TestGradzeichen(unittest.TestCase):
         erste = gruppen.index("Querkraftbewehrung")
         self.assertEqual(gruppen[erste:erste + 5], ["Querkraftbewehrung"] * 5)
         self.assertNotEqual(gruppen[erste + 5], "Querkraftbewehrung")
+
+
+class TestMindestbewehrungsEingaben(unittest.TestCase):
+    """
+    Nur die Eingaben -- der Nachweis selbst steht noch aus.
+
+    Was hier zählt: die Angaben überleben die Datei, und eine unbekannte
+    Rissanforderung wird nicht stillschweigend auf die mildeste gezogen.
+    """
+
+    def test_vorgaben(self):
+        q = Projekt.beispiel().querschnitt("q1")
+        self.assertEqual(q.rissanforderung, "normal")
+        self.assertFalse(q.zwaengung_x)
+        self.assertFalse(q.zwaengung_y)
+        self.assertFalse(q.zwaengung_begrenzt)
+        self.assertTrue(q.haeufige_aus_tragsicherheit)
+        self.assertEqual(q.haeufige, [])
+
+    def test_alles_ueberlebt_die_datei(self):
+        from opencivil.projekt import HaeufigEintrag
+
+        projekt = Projekt.beispiel()
+        q = projekt.querschnitt("q1")
+        q.rissanforderung = "hoch"
+        q.zwaengung_x = True
+        q.zwaengung_begrenzt = True
+        q.haeufige_aus_tragsicherheit = False
+        q.haeufige = [HaeufigEintrag("Gebrauch", M_Ed=70.0, N_Ed=-40.0, richtung="x")]
+
+        kopie = Projekt.aus_dict(json.loads(json.dumps(projekt.als_dict())))
+        k = kopie.querschnitt("q1")
+        self.assertEqual(k.rissanforderung, "hoch")
+        self.assertEqual((k.zwaengung_x, k.zwaengung_y, k.zwaengung_begrenzt),
+                         (True, False, True))
+        self.assertFalse(k.haeufige_aus_tragsicherheit)
+        self.assertEqual(len(k.haeufige), 1)
+        self.assertEqual((k.haeufige[0].name, k.haeufige[0].M_Ed,
+                          k.haeufige[0].N_Ed, k.haeufige[0].richtung),
+                         ("Gebrauch", 70.0, -40.0, "x"))
+
+    def test_eine_beschreibung_ohne_die_felder_bekommt_die_vorgaben(self):
+        d = Projekt.beispiel().als_dict()
+        for q in d["querschnitte"]:
+            for feld in ("rissanforderung", "zwaengung_x", "zwaengung_y",
+                         "zwaengung_begrenzt", "haeufige",
+                         "haeufige_aus_tragsicherheit"):
+                q.pop(feld, None)
+        q = Projekt.aus_dict(d).querschnitt("q1")
+        self.assertEqual(q.rissanforderung, "normal")
+        self.assertTrue(q.haeufige_aus_tragsicherheit)
+
+    def test_unbekannte_rissanforderung_wird_gemeldet(self):
+        d = Projekt.beispiel().als_dict()
+        d["querschnitte"][0]["rissanforderung"] = "mittel"
+        with self.assertRaises(ProjektFehler) as fehler:
+            Projekt.aus_dict(d)
+        self.assertIn("Unbekannte Rissanforderung", str(fehler.exception))
+
+    def test_der_katalog_kennt_die_drei_stufen(self):
+        stufen = api.katalog()["rissanforderungen"]
+        self.assertEqual([s["wert"] for s in stufen],
+                         ["normal", "erhoeht", "hoch"])
+        self.assertEqual([s["beschriftung"] for s in stufen],
+                         ["Normal", "Erhöht", "Hoch"])
+
+    def test_die_eingaben_aendern_noch_nichts_am_ergebnis(self):
+        """Solange kein Nachweis sie liest, dürfen sie nichts verschieben."""
+        ohne = dienst.bearbeite(
+            "rechnen", {"projekt": Projekt.beispiel().als_dict()})
+        projekt = Projekt.beispiel()
+        q = projekt.querschnitt("q1")
+        q.rissanforderung = "hoch"
+        q.zwaengung_x = q.zwaengung_y = q.zwaengung_begrenzt = True
+        mit = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
+        self.assertEqual([u["name"] for u in mit.daten["urteile"]],
+                         [u["name"] for u in ohne.daten["urteile"]])
+        self.assertEqual(mit.daten["alle_nachweise_erfuellt"],
+                         ohne.daten["alle_nachweise_erfuellt"])

@@ -133,6 +133,24 @@ def sorten(art: str) -> Mapping[str, Any]:
 DUKTILITAET_VORGABE = (True, False, False, True)
 
 
+def _rissanforderung_aus(wert: Any) -> str:
+    """
+    Die Anforderung an die Rissbildung, oder die Vorgabe.
+
+    Eine unbekannte Angabe wird nicht stillschweigend auf 'normal' gezogen --
+    sie waere die mildeste der drei, und eine stillschweigende Milderung ist
+    genau das, was ein Nachweiswerkzeug nicht tun darf.
+    """
+    if wert in (None, ""):
+        return "normal"
+    text = str(wert)
+    if text not in RISSANFORDERUNGEN:
+        raise ProjektFehler(
+            f"Unbekannte Rissanforderung '{text}'. Möglich sind: "
+            f"{', '.join(RISSANFORDERUNGEN)}.")
+    return text
+
+
 def _duktilitaet_aus(wert: Any) -> List[bool]:
     """
     Genau vier Schalter, egal was in der Datei steht.
@@ -394,6 +412,51 @@ class QuerkraftbewehrungEintrag:
 BEIDE_RICHTUNGEN = "beide"
 
 
+#: Anforderung an die Rissbildung. Bestimmt spaeter die zulaessige
+#: Stahlspannung; die Zahlen dazu stehen noch aus.
+RISSANFORDERUNGEN: Dict[str, str] = {
+    "normal": "Normal",
+    "erhoeht": "Erhöht",
+    "hoch": "Hoch",
+}
+
+
+#: Anteil der Tragsicherheitslastfaelle, der als haeufiger Lastfall gilt,
+#: solange keine eigenen angegeben sind.
+HAEUFIG_ANTEIL = 0.70
+
+
+@dataclass
+class HaeufigEintrag:
+    """
+    Eine Schnittgroessenkombination unter haeufiger Einwirkung.
+
+    Wie :class:`KombinationEintrag`, aber ohne Querkraft: begrenzt wird die
+    Stahlspannung, und dafuer zaehlen Moment und Normalkraft.
+    """
+
+    name: str
+    M_Ed: float = 0.0
+    N_Ed: float = 0.0
+    richtung: str = BEIDE_RICHTUNGEN
+
+    def gilt_fuer(self, richtung: Richtung) -> bool:
+        return self.richtung in (BEIDE_RICHTUNGEN, richtung.value)
+
+    def als_dict(self) -> dict:
+        return {"name": self.name, "M_Ed": self.M_Ed, "N_Ed": self.N_Ed,
+                "richtung": self.richtung}
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any]) -> "HaeufigEintrag":
+        return cls(
+            name=_pflichtfeld(d, "name", "Ein häufiger Lastfall"),
+            M_Ed=_zahl(d, "M_Ed", 0.0),
+            N_Ed=_zahl(d, "N_Ed", 0.0),
+            richtung=str(d.get("richtung") or BEIDE_RICHTUNGEN),
+        )
+
+
 @dataclass
 class KombinationEintrag:
     """Eine zu pruefende Schnittgroessenkombination."""
@@ -494,6 +557,30 @@ class QuerschnittEintrag:
         default_factory=QuerkraftbewehrungEintrag)
     """Bügel; ohne Durchmesser heisst: keine."""
 
+    rissanforderung: str = "normal"
+    """Anforderung an die Rissbildung -- ``normal``, ``erhoeht`` oder ``hoch``."""
+
+    zwaengung_x: bool = False
+    zwaengung_y: bool = False
+    """
+    Ob in dieser Tragrichtung mit einer Normalkraft-Zwaengung zu rechnen ist.
+
+    Vorgabe aus: eine Zwaengung ist eine Annahme ueber das Tragwerk, keine
+    Eigenschaft der Platte. Wer sie braucht, schaltet sie ein.
+    """
+
+    zwaengung_begrenzt: bool = False
+    """Ob die Zwaengung auf 500 mm Plattendicke begrenzt angesetzt wird."""
+
+    haeufige: List[HaeufigEintrag] = field(default_factory=list)
+    """Eigene haeufige Lastfaelle; leer, solange die 70-%-Regel gilt."""
+
+    haeufige_aus_tragsicherheit: bool = True
+    """
+    Ob die haeufigen Lastfaelle aus den Tragsicherheitsfaellen abgeleitet
+    werden -- mit :data:`HAEUFIG_ANTEIL`. Der uebliche Fall, darum die Vorgabe.
+    """
+
     duktilitaet: List[bool] = field(
         default_factory=lambda: list(DUKTILITAET_VORGABE))
     """
@@ -538,6 +625,12 @@ class QuerschnittEintrag:
             "k_c": self.k_c,
             "querkraftbewehrung": self.querkraftbewehrung.als_dict(),
             "duktilitaet": list(self.duktilitaet),
+            "rissanforderung": self.rissanforderung,
+            "zwaengung_x": self.zwaengung_x,
+            "zwaengung_y": self.zwaengung_y,
+            "zwaengung_begrenzt": self.zwaengung_begrenzt,
+            "haeufige_aus_tragsicherheit": self.haeufige_aus_tragsicherheit,
+            "haeufige": [h.als_dict() for h in self.haeufige],
             "richtung_lage1": self.richtung_lage1,
             "richtung_lage4": self.richtung_lage4,
             "lagen": [l.als_dict() for l in self.lagen],
@@ -564,6 +657,13 @@ class QuerschnittEintrag:
             querkraftbewehrung=QuerkraftbewehrungEintrag.aus_dict(
                 d.get("querkraftbewehrung") or {}),
             duktilitaet=_duktilitaet_aus(d.get("duktilitaet")),
+            rissanforderung=_rissanforderung_aus(d.get("rissanforderung")),
+            zwaengung_x=bool(d.get("zwaengung_x", False)),
+            zwaengung_y=bool(d.get("zwaengung_y", False)),
+            zwaengung_begrenzt=bool(d.get("zwaengung_begrenzt", False)),
+            haeufige_aus_tragsicherheit=bool(
+                d.get("haeufige_aus_tragsicherheit", True)),
+            haeufige=[HaeufigEintrag.aus_dict(x) for x in (d.get("haeufige") or [])],
             richtung_lage1=str(d.get("richtung_lage1") or "x"),
             richtung_lage4=str(d.get("richtung_lage4") or "x"),
             lagen=[LageEintrag.aus_dict(x) for x in (lagen or [])],
