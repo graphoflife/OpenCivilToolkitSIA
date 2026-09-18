@@ -1174,3 +1174,136 @@ class TestQuerkraftbewehrungInDerAusgabe(unittest.TestCase):
         # Erfüllte Nachweise tragen keinen -- sonst stünde unter jeder Tabelle
         # eine Wand aus Begründungen.
         self.assertFalse([z for z in zeilen if z["erfuellt"] and z["hinweis"]])
+
+
+class TestRichtungOhneBewehrung(unittest.TestCase):
+    """
+    Eine Tragrichtung ohne jeden Bewehrungsposten.
+
+    Der Nachweis entfiel früher stillschweigend: wer eine Einwirkung in
+    y-Richtung angegeben hatte, fand sie in der Zusammenfassung nirgends
+    wieder. Ein leerer Platz liest sich aber wie «geprüft und in Ordnung».
+    """
+
+    def projekt(self, *, mit_querkraft: bool = False) -> Projekt:
+        projekt = Projekt.beispiel()
+        q = projekt.querschnitt("q1")
+        for lage in (q.lagen[1], q.lagen[2]):      # die beiden y-Lagen
+            lage.grund.durchmesser = 0.0
+            lage.zulage.durchmesser = 0.0
+        for k in q.kombinationen:
+            k.richtung = "beide"
+        if mit_querkraft:
+            q.kombinationen[0].V_Ed = 120.0
+        return projekt
+
+    def zeilen(self, projekt: Projekt):
+        antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
+        self.assertEqual(antwort.status, 200)
+        return antwort.daten["zusammenfassungen"]["q1"]["zeilen"]
+
+    def test_der_nachweis_steht_da_und_ist_nicht_erfuellt(self):
+        y_zeilen = [z for z in self.zeilen(self.projekt())
+                    if "Rd,y" in z["zellen"][1]]
+        self.assertEqual(len(y_zeilen), 3)          # drei Kombinationen
+        for zeile in y_zeilen:
+            self.assertFalse(zeile["erfuellt"])
+            self.assertEqual(zeile["zellen"][3], "0.00")
+            self.assertIn("0.0", zeile["zellen"][1])    # M_Rd = 0
+            self.assertIn("keine Bewehrung definiert", zeile["hinweis"])
+
+    def test_die_einwirkung_steht_trotzdem_da(self):
+        """Ohne sie bliebe unklar, wogegen der Widerstand null nicht reicht."""
+        zeile = next(z for z in self.zeilen(self.projekt())
+                     if "M_{Rd,y}" in z["zellen"][1])
+        self.assertIn("M_{Ed,y}", zeile["zellen"][2])
+        self.assertIn("100.0", zeile["zellen"][2])
+
+    def test_auch_die_querkraft_faellt_aus(self):
+        """
+        Ohne Bewehrung gibt es keine statische Höhe, also auch keinen
+        Querkraftwiderstand. Nur die M-N-Zeile zu zeigen hiesse, die Lücke
+        halb zu schliessen.
+        """
+        zeilen = self.zeilen(self.projekt(mit_querkraft=True))
+        quer = [z for z in zeilen if "V_{Rd,y}" in z["zellen"][1]]
+        self.assertEqual(len(quer), 1)
+        self.assertEqual(quer[0]["zellen"][3], "0.00")
+        self.assertIn("V_{Ed,y}", quer[0]["zellen"][2])
+
+    def test_erst_alle_m_n_dann_die_querkraft(self):
+        """Dieselbe Folge wie bei den Richtungen, die wirklich gerechnet werden."""
+        zeilen = [z for z in self.zeilen(self.projekt(mit_querkraft=True))
+                  if ",y}" in z["zellen"][1]]
+        arten = [z["zellen"][0].startswith(r"\text{M-N") for z in zeilen]
+        self.assertEqual(arten, sorted(arten, reverse=True), zeilen)
+
+    def test_die_gegenrichtung_bleibt_unberuehrt(self):
+        zeilen = self.zeilen(self.projekt())
+        x_zeilen = [z for z in zeilen if "Rd,x" in z["zellen"][1]]
+        self.assertEqual(len(x_zeilen), 3)
+        self.assertTrue(all(z["erfuellt"] for z in x_zeilen))
+
+    def test_ohne_einwirkung_in_dieser_richtung_steht_auch_nichts(self):
+        """Wer dort nichts nachweisen will, soll keine leeren Zeilen bekommen."""
+        projekt = self.projekt()
+        for k in projekt.querschnitt("q1").kombinationen:
+            k.richtung = "x"
+        self.assertFalse([z for z in self.zeilen(projekt) if ",y}" in z["zellen"][1]])
+
+    def test_das_urteil_traegt_den_raum_seiner_platte(self):
+        aufbau = self.projekt().aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        for urteil in loesung.urteile:
+            self.assertTrue(urteil.raum.startswith("querschnitt.q1"), urteil.raum)
+
+
+class TestGradzeichen(unittest.TestCase):
+    """
+    `\\,^{\\circ}` ist ein Exponent ohne Basis -- daran bricht KaTeX ab.
+
+    Im Bericht stand dann der rohe Quelltext statt `30°`, und zwar für den
+    ganzen Kasten, in dem die Winkel mit den übrigen Bügelangaben zusammenstehen.
+    """
+
+    def test_das_gradzeichen_hat_eine_basis(self):
+        from opencivil.core.einheiten import GRAD, Groesse
+
+        latex = Groesse(30, GRAD).als_latex(0, GRAD)
+        self.assertEqual(latex, r"30{}^{\circ}")
+        self.assertNotIn(r"\,^", latex)
+
+    def test_in_der_herleitung_steht_es_richtig(self):
+        projekt = Projekt.beispiel()
+        b = projekt.querschnitt("q1").querkraftbewehrung
+        b.durchmesser, b.stahl = 10.0, "s1"
+        b.abstand_x = b.abstand_y = 300.0
+        for k in projekt.querschnitt("q1").kombinationen:
+            k.V_Ed = 100.0
+
+        antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
+        winkel = [b["latex"] for b in antwort.daten["protokoll"]
+                  if b.get("art") == "gleichung" and r"\alpha_{min}" in b.get("latex", "")]
+        self.assertTrue(winkel)
+        for latex in winkel:
+            self.assertNotIn(r"\,^{\circ}", latex)
+
+    def test_die_buegelangaben_stehen_in_einem_kasten(self):
+        """
+        Fünf Vorgaben, ein Kasten. Der Bügelquerschnitt lief früher zwischen
+        Durchmesser und Teilung -- und zerriss ihn damit in zwei.
+        """
+        projekt = Projekt.beispiel()
+        b = projekt.querschnitt("q1").querkraftbewehrung
+        b.durchmesser, b.stahl = 10.0, "s1"
+        b.abstand_x = b.abstand_y = 300.0
+        for k in projekt.querschnitt("q1").kombinationen:
+            k.V_Ed = 100.0
+
+        antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
+        gruppen = [b.get("gruppe") for b in antwort.daten["protokoll"]
+                   if b.get("art") == "gleichung"]
+        # Die fünf Angaben müssen ohne Unterbruch aufeinanderfolgen.
+        erste = gruppen.index("Querkraftbewehrung")
+        self.assertEqual(gruppen[erste:erste + 5], ["Querkraftbewehrung"] * 5)
+        self.assertNotEqual(gruppen[erste + 5], "Querkraftbewehrung")

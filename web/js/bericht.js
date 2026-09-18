@@ -276,6 +276,26 @@ function textVon(zelle) {
   return treffer ? treffer[1] : (zelle || '');
 }
 
+/**
+ * Die Hinweise der Tabelle, nach Grund gebündelt.
+ *
+ * Eine ganze Tragrichtung ohne Bewehrung lässt jeden ihrer Nachweise
+ * ausfallen -- und zwar aus demselben Grund. Sechsmal derselbe Satz ist keine
+ * Erklärung, sondern eine Wand.
+ *
+ * @returns {Array<[string, string[]]>} je Grund die betroffenen Nachweise,
+ *   in der Reihenfolge ihres ersten Auftretens.
+ */
+function hinweiseBuendeln(zeilen) {
+  const nach_grund = new Map();
+  for (const zeile of zeilen) {
+    if (!zeile.hinweis) continue;
+    if (!nach_grund.has(zeile.hinweis)) nach_grund.set(zeile.hinweis, []);
+    nach_grund.get(zeile.hinweis).push(textVon(zeile.zellen[0]));
+  }
+  return [...nach_grund.entries()];
+}
+
 function zusammenfassung(loesung) {
   const querschnitte = loesung.zuordnung?.querschnitte || {};
   const raum = eingrenzung();
@@ -335,12 +355,11 @@ function zusammenfassung(loesung) {
           ]),
           werkzeugleiste(tabelle.latex, 'Tabelle'),
           // Ein Widerstand von null erklärt sich nicht von selbst. Der Grund
-          // steht deshalb unter der Tabelle und nicht bloss im Tooltip.
-          ...tabelle.zeilen
-            .filter((zeile) => zeile.hinweis)
-            .map((zeile) => el('p.hinweis', {
-              text: `${textVon(zeile.zellen[0])}: ${zeile.hinweis}`,
-            })),
+          // steht deshalb unter der Tabelle und nicht bloss im Tooltip --
+          // gleiche Gründe zusammengefasst, sonst stünde bei einer ganzen
+          // unbewehrten Tragrichtung sechsmal derselbe Satz.
+          ...hinweiseBuendeln(tabelle.zeilen).map(([grund, namen]) =>
+            el('p.hinweis', { text: `${namen.join(', ')}: ${grund}` })),
         ])
         : el('div.leer', { text: 'Für diese Platte wurde kein Nachweis gerechnet.' }),
       plattenkennzahlen(eintrag, loesung),

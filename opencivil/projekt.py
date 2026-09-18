@@ -37,6 +37,7 @@ from opencivil.nachweis.biegung_normalkraft import (
     BiegungNormalkraft, Erfuellungsart, Schnittgroessen,
 )
 from opencivil.nachweis.duktilitaet import Duktilitaet
+from opencivil.nachweis.fehlende_bewehrung import Ausgefallen, FehlendeBewehrung
 from opencivil.nachweis.querkraft import Querkraft, Querkraftfall
 from opencivil.querschnitt.platte import (
     ALPHA_MAX, ALPHA_MIN, K_C, LAGENZAHL, Bewehrungslage, Bewehrungsposten,
@@ -590,13 +591,23 @@ class Aufbau:
     duktilitaet: Dict[str, Duktilitaet] = field(default_factory=dict)
     """Schluessel ist die Querschnittskennung -- ein Nachweis je Platte."""
 
+    fehlende: Dict[str, FehlendeBewehrung] = field(default_factory=dict)
+    """
+    Je Richtung ohne Bewehrung, fuer die dennoch Einwirkungen angegeben sind.
+
+    Sie rechnen nichts; sie sorgen dafuer, dass in der Zusammenfassung eine
+    Zeile mit Erfuellungsgrad null steht statt gar nichts.
+    """
+
     warnungen: List[str] = field(default_factory=list)
 
     def alle_nachweisziele(self) -> List[str]:
         return ([d.id for n in self.nachweise.values() for d in n.d_ausnutzung.values()]
                 + [d.id for q in self.querkraft.values() for d in q.d_grad.values()]
                 + [d.id for k in self.duktilitaet.values()
-                   for d in k.d_ausnutzung.values()])
+                   for d in k.d_ausnutzung.values()]
+                + [d.id for f in self.fehlende.values()
+                   for d in f.d_ausnutzung.values()])
 
     def eckwertziele(self) -> List[str]:
         return [d.id for n in self.nachweise.values() for d in n.d_eckwerte.values()]
@@ -751,11 +762,21 @@ class Projekt:
                     f"also kein Nachweis möglich.")
                 continue
 
-            for richtung in querschnitt.richtungen_mit_bewehrung:
+            bewehrt = set(querschnitt.richtungen_mit_bewehrung)
+            for richtung in Richtung:
                 passend = [k for k in eintrag.kombinationen if k.gilt_fuer(richtung)]
                 if not passend:
                     # Keine Kombination fuer diese Richtung ist eine Entscheidung
                     # des Benutzers, kein Mangel -- also auch keine Warnung.
+                    continue
+                if richtung not in bewehrt:
+                    # Ohne Bewehrung laesst sich hier nichts aufstellen. Der
+                    # Nachweis entfiel frueher stillschweigend; wer eine
+                    # Einwirkung angegeben hatte, fand sie nirgends wieder.
+                    fehlend = FehlendeBewehrung(
+                        querschnitt, richtung, self._ausgefallene(passend, richtung))
+                    werk.registriere(fehlend)
+                    aufbau.fehlende[f"{eintrag.kennung}.{richtung.value}"] = fehlend
                     continue
                 nachweis = BiegungNormalkraft(
                     querschnitt, [self._kombination(k) for k in passend], richtung)
@@ -875,6 +896,38 @@ class Projekt:
                                 if buegel.vorhanden else None),
             praefix=f"querschnitt.{eintrag.kennung}",
         )
+
+    def _ausgefallene(
+        self, kombinationen: Sequence[KombinationEintrag], richtung: Richtung
+    ) -> List[Ausgefallen]:
+        """
+        Welche Nachweise in dieser unbewehrten Richtung ausfallen.
+
+        Je Kombination der M-N-Nachweis, und wo eine Querkraft angegeben ist,
+        auch der Querkraftnachweis: ohne Bewehrung gibt es keine statische
+        Hoehe, also auch keinen Querkraftwiderstand. Beide Zeilen gehoeren in
+        die Tabelle -- eine davon wegzulassen hiesse, die Luecke nur zur
+        Haelfte zu schliessen.
+        """
+        r = richtung.value
+        # Erst alle M-N, dann alle Querkraft -- dieselbe Folge wie bei den
+        # Richtungen, die wirklich gerechnet werden. Zeilen derselben Art
+        # gehoeren beieinander.
+        return [
+            Ausgefallen(
+                art="M-N", fall=k.name,
+                symbol=f"M_{{Rd,{r}}}",
+                einwirkung_symbol=f"M_{{Ed,{r}}}",
+                einwirkung=Groesse(k.M_Ed, KNM), einheit=KNM)
+            for k in kombinationen
+        ] + [
+            Ausgefallen(
+                art="V", fall=k.name,
+                symbol=f"V_{{Rd,{r}}}",
+                einwirkung_symbol=f"V_{{Ed,{r}}}",
+                einwirkung=Groesse(abs(k.V_Ed), KN_PRO_M), einheit=KN_PRO_M)
+            for k in kombinationen if k.V_Ed
+        ]
 
     def _kombination(self, eintrag: KombinationEintrag) -> Schnittgroessen:
         try:

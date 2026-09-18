@@ -482,21 +482,27 @@ class Querkraft(Nachweis):
                 bezuege.append(Eingabebezug(
                     f"m_Rd_{f.kennung}", mn_nachweis.d_m_rd[f.name].id))
         else:
+            # Die Reihenfolge der Eingaenge ist die Reihenfolge, in der der
+            # Loeser sie beschafft -- und damit die Reihenfolge der Bloecke in
+            # der Mitschrift. Die fuenf Angaben zur Buegelbewehrung stehen
+            # deshalb zusammen und der Buegelquerschnitt dahinter: stuende er
+            # dazwischen, zerrisse er den Kasten, in dem sie gemeinsam stehen
+            # sollen.
             bezuege += [
                 Eingabebezug("b", querschnitt.id_von("b")),
                 Eingabebezug("k_c", querschnitt.id_von("k_c")),
                 Eingabebezug("f_cd", querschnitt.beton.id_von("f_cd")),
-                Eingabebezug("a_s_V", querschnitt.id_von("querkraft.a_s")),
+                Eingabebezug("f_yd_V", self.buegel.stahl.id_von("f_yd")),
                 Eingabebezug("phi_V", querschnitt.id_von("querkraft.phi")),
                 Eingabebezug("s_x", querschnitt.id_von("querkraft.s_x")),
+                Eingabebezug(
+                    "menge_y",
+                    querschnitt.id_von("querkraft.s_y" if self.buegel.ueber_abstand_y
+                                       else "querkraft.n_y")),
                 Eingabebezug("alpha_min", querschnitt.id_von("querkraft.alpha_min")),
                 Eingabebezug("alpha_max", querschnitt.id_von("querkraft.alpha_max")),
-                Eingabebezug("f_yd_V", self.buegel.stahl.id_von("f_yd")),
+                Eingabebezug("a_s_V", querschnitt.id_von("querkraft.a_s")),
             ]
-            bezuege.append(Eingabebezug(
-                "menge_y",
-                querschnitt.id_von("querkraft.s_y" if self.buegel.ueber_abstand_y
-                                   else "querkraft.n_y")))
 
         super().__init__(
             basis,

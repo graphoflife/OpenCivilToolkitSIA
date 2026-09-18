@@ -163,6 +163,14 @@ class Einheit:
     faktor: float = 1.0
     latex: Optional[str] = None
 
+    klebt: bool = False
+    """
+    Ob das Zeichen unmittelbar an der Zahl haengt, ohne schmalen Abstand.
+
+    Der Regelfall ist der Abstand: ``30\\,\\mathrm{mm}``. Das Gradzeichen
+    gehoert dagegen an die Zahl -- ``30°``, nicht ``30 °``.
+    """
+
     beschriftung: Optional[str] = None
     """
     Lesbare Schreibweise fuer die Oberflaeche: ``N/mm²``.
@@ -226,7 +234,7 @@ class Einheit:
         """LaTeX-Fragment der Einheit, mit vorangestelltem schmalem Abstand."""
         if not self.name or self.name == "-":
             return ""
-        return rf"\," + (self.latex or "")
+        return (self.latex or "") if self.klebt else rf"\," + (self.latex or "")
 
 
 def _name_zu_latex(name: str) -> str:
@@ -317,7 +325,13 @@ KG_PRO_M3 = Einheit("kg/m^3", DICHTE, 1.0, latex=r"\mathrm{kg}/\mathrm{m}^{3}")
 
 # Winkel (dimensionslos, aber mit Umrechnungsfaktor)
 RAD = Einheit("rad", DIMENSIONSLOS, 1.0)
-GRAD = Einheit("Grad", DIMENSIONSLOS, math.pi / 180.0, latex=r"^{\circ}")
+# Das Gradzeichen braucht eine Basis, an die es sich haengen kann: `\,^{\circ}`
+# ist ein Exponent ohne davorstehendes Zeichen, und daran bricht KaTeX ab -- im
+# Bericht stand dann der rohe Quelltext statt 30°. Die leere Gruppe ist diese
+# Basis; `klebt` nimmt zugleich den schmalen Abstand weg, der vor einem
+# Gradzeichen ohnehin nicht hingehoert.
+GRAD = Einheit("Grad", DIMENSIONSLOS, math.pi / 180.0,
+               latex=r"{}^{\circ}", beschriftung="°", klebt=True)
 
 #: Alle benannten Einheiten, nach Namen auffindbar.
 EINHEITEN: Dict[str, Einheit] = {

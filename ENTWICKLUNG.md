@@ -43,6 +43,61 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-18 · Ein Gradzeichen ohne Basis, und eine Richtung ohne Zeile
+
+### `\,^{\circ}` bringt KaTeX zu Fall
+
+Die Einheit *Grad* trug das LaTeX `^{\circ}`, und `Einheit.als_latex()` setzt
+allem einen schmalen Abstand voran. Heraus kam `30\,^{\circ}` — ein Exponent
+**ohne Basis**. KaTeX bricht daran ab und zeigt statt der Formel den rohen
+Quelltext, und zwar für den ganzen Kasten:
+
+```
+s_{V,x} = 300\,\mathrm{mm} \qquad \alpha_{min} = 30\,^{\circ} \qquad …
+```
+
+Die leere Gruppe ist die fehlende Basis: `{}^{\circ}`. Dazu hat `Einheit` jetzt
+ein Feld `klebt` — das Gradzeichen gehört an die Zahl, nicht hinter einen
+schmalen Abstand. `30°`, nicht `30 °`.
+
+### Der Kasten war zerrissen
+
+Im gemeldeten Text fehlte `⌀_V`. Der Grund: **die Reihenfolge der Eingänge ist
+die Reihenfolge der Blöcke.** Der Querkraftnachweis forderte `A_{⌀,V}` vor den
+übrigen Bügelangaben an; der Löser beschaffte dafür zuerst den Durchmesser,
+schrieb dann die Flächenformel — und die stand mitten zwischen den fünf
+Vorgaben, die in *einem* Kasten stehen sollen. `gruppenBilden` legt nur
+aneinandergrenzende Blöcke zusammen, also wurden es zwei.
+
+Behoben, indem `a_s_V` in der Bezugsliste ans Ende wandert. Das ist eine
+stille Abhängigkeit — die Bezugsreihenfolge sah bisher wie eine Geschmacksfrage
+aus — und steht jetzt als Kommentar an der Stelle.
+
+### Eine unbewehrte Tragrichtung stand gar nicht da
+
+Wer eine Einwirkung in y-Richtung angab, ohne dort Bewehrung zu haben, fand sie
+in der Zusammenfassung nirgends wieder: `richtungen_mit_bewehrung` liess die
+Richtung aus, und damit entfiel der Nachweis stillschweigend. Ein leerer Platz
+liest sich aber wie *geprüft und in Ordnung*.
+
+Ohne Stahl ist der Momentenwiderstand der Handrechnung **null** — nicht das,
+was der Beton allein noch aufnähme (siehe den Eintrag zur präzisen
+Resistenzlinie: der Unterschied ist erheblich). Der neue Baustein
+`FehlendeBewehrung` rechnet darum nichts, sondern meldet: Widerstand null,
+Erfüllungsgrad null, nicht erfüllt, mit Grund. Dass er nichts rechnet, ist
+Absicht — ein Baustein, der hier eine Zahl herleitete, käme früher oder später
+auf die Betondruckfestigkeit und damit auf einen Widerstand aus dem Nichts.
+
+Der Querkraftnachweis fällt aus demselben Grund aus und bekommt dieselbe
+Behandlung: ohne Bewehrung keine statische Höhe, also kein `V_Rd`. Nur die
+M-N-Zeile zu zeigen hiesse, die Lücke halb zu schliessen.
+
+Nebenbei: gleiche Gründe stehen unter der Tabelle jetzt in **einer** Zeile
+zusammengefasst. Bei einer ganzen unbewehrten Richtung standen sonst sechsmal
+derselbe Satz untereinander — das ist keine Erklärung mehr, sondern eine Wand.
+
+---
+
 ## 2026-09-18 · Duktilität
 
 Ein dritter Nachweis, und der erste, der nicht an einer Tragrichtung hängt,

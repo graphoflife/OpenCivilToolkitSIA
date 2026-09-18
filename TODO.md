@@ -40,6 +40,14 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
 
 ## Erledigt zuletzt
 
+Das Gradzeichen hatte keine Basis (`\,^{\circ}`) — KaTeX brach daran ab und
+zeigte den rohen Quelltext des ganzen Kastens · Der Kasten der Bügelangaben war
+zerrissen, weil die Flächenformel zwischen den Vorgaben lief: die Reihenfolge
+der Eingänge ist die Reihenfolge der Blöcke · Eine Tragrichtung ohne Bewehrung
+stand nicht mehr in der Zusammenfassung, obwohl Einwirkungen angegeben waren;
+jetzt gibt es dort Zeilen mit Widerstand und Erfüllungsgrad null samt Grund,
+für M-N wie für Querkraft ·
+
 Duktilitätsnachweis je Bewehrungslage: `x/d ≤ 0.35` mit `x` aus dem
 Kräftegleichgewicht bei reiner Biegung, `d` ab der gedrückten Randfaser, Lage
 für Lage einschaltbar (Vorgabe: die beiden äusseren). Eine eingeschaltete, aber
