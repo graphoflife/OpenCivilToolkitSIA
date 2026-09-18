@@ -196,7 +196,7 @@ class Rissnormalkraft(Nachweis):
 
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),
-            Eingabebezug("b", querschnitt.id_von("b")),
+            Eingabebezug("b", querschnitt.id_breite(richtung)),
             Eingabebezug("f_ctm", querschnitt.beton.id_von("f_ctm")),
         ]
         for nummer, eintraege in self.posten_je_lage.items():
@@ -525,7 +525,7 @@ class ZwaengungBiegung(Nachweis):
 
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),
-            Eingabebezug("b", querschnitt.id_von("b")),
+            Eingabebezug("b", querschnitt.id_breite(richtung)),
             Eingabebezug("f_ctm", querschnitt.beton.id_von("f_ctm")),
             Eingabebezug("E_cm", querschnitt.beton.id_von("E_cm")),
             Eingabebezug("phi", querschnitt.id_von("kriechzahl")),

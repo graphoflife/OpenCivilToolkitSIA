@@ -158,7 +158,7 @@ class Knicken(Nachweis):
 
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),
-            Eingabebezug("b", querschnitt.id_von("b")),
+            Eingabebezug("b", querschnitt.id_breite(self.richtung)),
             Eingabebezug("f_cd", querschnitt.beton.id_von("f_cd")),
             Eingabebezug("E_cm", querschnitt.beton.id_von("E_cm")),
             Eingabebezug("eps_c1d", querschnitt.beton.id_von("eps_c1d")),

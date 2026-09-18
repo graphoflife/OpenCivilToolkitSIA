@@ -43,6 +43,41 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-18 · Was `b` eigentlich bedeutet
+
+Eine Platte hatte bisher eine Breite, und die galt für alles. Das ist so lange
+richtig, wie sie 1000 mm ist — und das ist sie fast immer, weshalb der Fehler
+lange keiner war.
+
+Er wird einer, sobald jemand 2000 mm einträgt. Die Angabe `b` beschreibt einen
+Streifen in x-Richtung: so breit ist das Stück Platte, über das die x-Bewehrung
+gezählt wird. Die y-Bewehrung liegt quer dazu. Ihre Teilung ist auf den
+Laufmeter bezogen und hat von `b` nie etwas mitbekommen. Wer trotzdem mit `b`
+rechnet, bekommt in y aus derselben Bewehrung den doppelten Widerstand.
+
+Also gibt es jetzt zwei Breiten. `b` ist die Eingabe, `b_y` ist festgelegt auf
+1000 mm — und steht trotzdem als Vorgabe im Protokoll, neben `b` im selben
+Kasten. Eine stille Festlegung wäre genau die Art Zahl, die man später in
+keiner Herleitung wiederfindet und dann für einen Rechenfehler hält.
+
+`Plattenquerschnitt.id_breite(richtung)` gibt die passende Kennung heraus, und
+jeder richtungsbehaftete Nachweis fragt dort nach statt bei `id_von("b")`. Der
+Lagenaufbau wählt je Posten, aus welcher Breite die Fläche kommt. Beim
+Duktilitätsnachweis war es zuerst nicht offensichtlich, dass er das überhaupt
+braucht: `x/d` ist von der Breite unabhängig, weil `x = A_s·f_sd/(b·f_cd)` sie
+herauskürzt. Unabhängig ist es aber nur, wenn `A_s` und `b` aus *derselben*
+Richtung stammen. Genau darauf prüft einer der neuen Tests.
+
+Das Bewehrungsmass war der einzige Ort, an dem beide Richtungen zusammenlaufen.
+Es rechnet jetzt jede Lage über `b/b_q` auf denselben Streifen um. Bei gleicher
+Breite ist das die schlichte Summe wie bisher — die Zahl für den Regelfall
+ändert sich nicht.
+
+Acht Tests in `tests/test_breite_je_richtung.py`, alle als Verhalten formuliert:
+`b` verdoppeln, und dann muss in x alles mitgehen und in y nichts. Absolute
+Zahlen stehen dort keine; sie wären nur eine zweite Stelle, an der dieselbe
+Formel steht.
+
 ## 2026-09-18 · Ein Löser für Dehnungsebenen, und was darauf steht
 
 Vier Nachweise in einem Zug — und der Grund, warum sie zusammengehören: sie

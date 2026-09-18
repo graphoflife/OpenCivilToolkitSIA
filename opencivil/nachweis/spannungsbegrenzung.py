@@ -131,7 +131,7 @@ class Spannungsbegrenzung(Nachweis):
 
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),
-            Eingabebezug("b", querschnitt.id_von("b")),
+            Eingabebezug("b", querschnitt.id_breite(richtung)),
             Eingabebezug("E_cm", querschnitt.beton.id_von("E_cm")),
             Eingabebezug("phi", querschnitt.id_von("kriechzahl")),
         ]

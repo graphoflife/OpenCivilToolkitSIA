@@ -256,7 +256,7 @@ class BiegungNormalkraft(Nachweis):
 
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),
-            Eingabebezug("b", querschnitt.id_von("b")),
+            Eingabebezug("b", querschnitt.id_breite(richtung)),
             Eingabebezug("f_cd", querschnitt.beton.id_von("f_cd")),
             Eingabebezug("eps_c1d", querschnitt.beton.id_von("eps_c1d")),
             Eingabebezug("eps_c2d", querschnitt.beton.id_von("eps_c2d")),

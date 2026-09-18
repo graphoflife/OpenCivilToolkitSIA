@@ -917,7 +917,8 @@ class TestAngabengruppen(unittest.TestCase):
         gruppen = self.gruppen()
         self.assertEqual(sorted(gruppen), ["Abmessungen – Beton C30/37", "Überdeckungen"])
         self.assertEqual(gruppen["Abmessungen – Beton C30/37"],
-                         ["Plattendicke", "Betrachtete Breite"])
+                         ["Plattendicke", "Betrachtete Breite (x)",
+                          "Betrachtete Breite (y)"])
         self.assertEqual(gruppen["Überdeckungen"],
                          ["Überdeckung unten", "Überdeckung oben"])
 
@@ -941,7 +942,7 @@ class TestAngabengruppen(unittest.TestCase):
 
     def test_ein_ziel_das_alles_braucht_zeigt_alles(self):
         alle = self.gruppen(["querschnitt.q1.bewehrungsmass"])
-        self.assertEqual(len(alle["Abmessungen – Beton C30/37"]), 2)
+        self.assertEqual(len(alle["Abmessungen – Beton C30/37"]), 3)
         self.assertEqual(len(alle["Überdeckungen"]), 2)
 
     def test_die_zusammenfassung_kommt_fertig_aus_dem_kern(self):
@@ -1076,7 +1077,7 @@ class TestAngabengruppen(unittest.TestCase):
         antwort = dienst.bearbeite("rechnen", {"projekt": Projekt.beispiel().als_dict()})
         ids = {b["wert_id"] for b in antwort.daten["protokoll"] if b.get("gruppe")}
         self.assertEqual(ids, {
-            "querschnitt.q1.h", "querschnitt.q1.b",
+            "querschnitt.q1.h", "querschnitt.q1.b", "querschnitt.q1.b_y",
             "querschnitt.q1.c_nom_unten", "querschnitt.q1.c_nom_oben",
         })
 

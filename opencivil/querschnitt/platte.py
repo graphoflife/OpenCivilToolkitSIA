@@ -56,6 +56,9 @@ from opencivil.material.basis import Baustoff
 LAGENZAHL = 4
 
 #: Rohdichte von Betonstahl, fuer das Bewehrungsmass.
+# In y wird immer je Laufmeter nachgewiesen; 'b' meint den Streifen in x.
+BREITE_Y_MM = 1000.0
+
 STAHLDICHTE = 7850.0
 
 
@@ -373,6 +376,12 @@ class Lagenaufbau(Prozedur):
     def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
         h = e.g("h")
         b = e.g("b")
+        b_y = e.g("b_y")
+        # Die Teilung einer y-Lage ist auf den Laufmeter bezogen, die einer
+        # x-Lage auf die eingegebene Breite. Wer hier eine einzige Breite
+        # nimmt, rechnet bei b != 1000 mm die halbe oder doppelte y-Bewehrung.
+        breite_von = lambda r: b if r is Richtung.X else b_y
+        breiten: Dict[str, Groesse] = {}
         # Ohne erklaerende Vorrede: die Lagentabelle zeigt Randabstand und d je
         # Posten, und wie beides zustande kommt, steht in der Klassendoku.
         ueber_abstand = any(q.posten.ueber_abstand for q in self.posten)
@@ -432,10 +441,12 @@ class Lagenaufbau(Prozedur):
                 (min(oben, vorher[0]), max(unten, vorher[1])) if vorher
                 else (oben, unten))
 
+            b_q = breite_von(q.lage.richtung)
+            breiten[q.as_def.id] = b_q
             if q.posten.ueber_abstand:
                 s = e.g(f"s_{q.marke}")
                 a_s = Groesse.aus_si(
-                    math.pi * phi.si * phi.si / 4.0 * (b.si / s.si), MM2)
+                    math.pi * phi.si * phi.si / 4.0 * (b_q.si / s.si), MM2)
                 # Bei gemischter Angabe muss in jeder Zelle stehen, um welche
                 # Grösse es geht -- sonst liest man 150 und 7 in derselben
                 # Spalte und weiss nicht, was gemeint ist.
@@ -458,7 +469,7 @@ class Lagenaufbau(Prozedur):
                 a_s.formatiert(0, MM2),
             ])
 
-        ergebnis.update(self._kennzahlen(p, e, h, b, ergebnis, kanten))
+        ergebnis.update(self._kennzahlen(p, e, h, b, ergebnis, kanten, breiten))
 
         if not einheitlich:
             mengenkopf = r"\text{Menge}"
@@ -481,6 +492,7 @@ class Lagenaufbau(Prozedur):
     def _kennzahlen(
         self, p: Protokoll, e: Eingaben, h: Groesse, b: Groesse,
         flaechen: Mapping[str, Groesse], kanten: Mapping[int, Tuple[float, float]],
+        breiten: Mapping[str, Groesse],
     ) -> Dict[str, Groesse]:
         """
         Bewehrungsmass und Hoehe der Distanzhalter.
@@ -491,8 +503,12 @@ class Lagenaufbau(Prozedur):
         """
         ergebnis: Dict[str, Groesse] = {}
 
+        # Auf b bezogen: eine y-Lage steht je Laufmeter da, eine x-Lage je b.
+        # Das Verhaeltnis b/b_q rechnet sie auf denselben Streifen um; sind alle
+        # Breiten gleich, ist es die schlichte Summe.
         a_s_gesamt = sum(
-            (flaechen[q.as_def.id].si for q in self.posten), 0.0)
+            (flaechen[q.as_def.id].si * (b.si / breiten[q.as_def.id].si)
+             for q in self.posten), 0.0)
         # Stahlvolumen je Betonvolumen: A_s * L * rho / (b * L * h) -- die Laenge
         # kuerzt sich heraus.
         mass = a_s_gesamt * STAHLDICHTE / (b.si * h.si)
@@ -618,6 +634,17 @@ class Plattenquerschnitt:
             )
         return self.definitionen[kurzname].id
 
+    def id_breite(self, richtung: Richtung) -> str:
+        """
+        Kennung der Breite, die fuer diese Tragrichtung gilt.
+
+        Eine Platte wird in y stets je Laufmeter nachgewiesen -- die Angabe
+        ``b`` beschreibt den Streifen in x. Wer beides dieselbe Breite nehmen
+        laesst, bekommt bei b != 1000 mm in y einen Widerstand, der zur
+        eingegebenen Bewehrung nicht passt.
+        """
+        return self.id_von("b" if richtung is Richtung.X else "b_y")
+
     def lagen_in_richtung(self, richtung: Richtung) -> List[Bewehrungslage]:
         return [l for l in self.lagen if l.richtung is richtung and l.vorhanden]
 
@@ -663,7 +690,8 @@ class Plattenquerschnitt:
 
     def _aufbauen(self) -> None:
         d_h = self._def("h", "h", MM, "Plattendicke", 0)
-        d_b = self._def("b", "b", MM, "Betrachtete Breite", 0)
+        d_b = self._def("b", "b", MM, "Betrachtete Breite (x)", 0)
+        d_b_y = self._def("b_y", "b_y", MM, "Betrachtete Breite (y)", 0)
         d_cu = self._def("c_nom_unten", "c_{nom,u}", MM, "Überdeckung unten", 0)
         d_co = self._def("c_nom_oben", "c_{nom,o}", MM, "Überdeckung oben", 0)
         d_dmax = self._def("D_max", "D_{max}", MM, "Grösstkorndurchmesser", 0)
@@ -686,6 +714,13 @@ class Plattenquerschnitt:
                     abschnitt=abschnitt, gruppe=_abmessungen(self.beton.name)),
             Vorgabe(id=f"{self.id}.b", ausgabe=d_b, groesse=self.b,
                     abschnitt=abschnitt, gruppe=_abmessungen(self.beton.name)),
+            # Die Breite in y ist keine Eingabe, sondern die Festlegung, dass in
+            # y je Laufmeter gerechnet wird. Sie steht trotzdem im Protokoll:
+            # eine stille Festlegung waere genau die Art Zahl, die man spaeter
+            # in keiner Herleitung wiederfindet.
+            Vorgabe(id=f"{self.id}.b_y", ausgabe=d_b_y,
+                    groesse=Groesse(BREITE_Y_MM, MM), abschnitt=abschnitt,
+                    gruppe=_abmessungen(self.beton.name)),
             Vorgabe(id=f"{self.id}.c_nom_unten", ausgabe=d_cu,
                     groesse=self.ueberdeckung_unten, abschnitt=abschnitt,
                     gruppe=UEBERDECKUNGEN),
@@ -708,6 +743,7 @@ class Plattenquerschnitt:
         aufbau_bezuege = [
             Eingabebezug("h", d_h.id),
             Eingabebezug("b", d_b.id),
+            Eingabebezug("b_y", d_b_y.id),
             Eingabebezug("c_nom_unten", d_cu.id),
             Eingabebezug("c_nom_oben", d_co.id),
         ]

@@ -75,13 +75,6 @@ sie hier notiert; keine davon ist nachgeschlagen.
 - [ ] **Spannung-Dehnung-Analyse**: das Panel steht leer da. Der Löser liefert
       zu jedem Fall ε_m und χ; was gezeigt werden soll, ist noch nicht
       festgelegt.
-- [ ] **Breite je Tragrichtung.** Du wolltest, dass y immer mit 1000 mm rechnet
-      und nur x die eingegebene Breite nimmt. **Nicht umgesetzt** — beide
-      Richtungen nehmen `b`. Das ist tiefer als es aussieht: `b` geht auch in
-      die Bewehrungsflächen ein (`A_s = π⌀²/4 · b/s`), also müsste der ganze
-      Lagenaufbau je Richtung gerechnet werden. Mit `b = 1000 mm` (dem
-      Regelfall) stimmt es; bei abweichender Breite ist die y-Richtung falsch
-      skaliert.
 
 ## Offen (neu)
 

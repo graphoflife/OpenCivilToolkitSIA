@@ -489,7 +489,7 @@ class Querkraft(Nachweis):
             # dazwischen, zerrisse er den Kasten, in dem sie gemeinsam stehen
             # sollen.
             bezuege += [
-                Eingabebezug("b", querschnitt.id_von("b")),
+                Eingabebezug("b", querschnitt.id_breite(richtung)),
                 Eingabebezug("k_c", querschnitt.id_von("k_c")),
                 Eingabebezug("f_cd", querschnitt.beton.id_von("f_cd")),
                 Eingabebezug("f_yd_V", self.buegel.stahl.id_von("f_yd")),

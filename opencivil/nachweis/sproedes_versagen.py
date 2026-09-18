@@ -143,7 +143,7 @@ class SproedesVersagen(Nachweis):
 
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),
-            Eingabebezug("b", querschnitt.id_von("b")),
+            Eingabebezug("b", querschnitt.id_breite(richtung)),
             Eingabebezug("f_ctm", querschnitt.beton.id_von("f_ctm")),
         ]
         # Je Seite der passende Eckwert: die untere Lage traegt das positive

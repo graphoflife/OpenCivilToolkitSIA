@@ -43,7 +43,8 @@ from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.handrechnung import BLOCKANTEIL
-from opencivil.querschnitt.platte import Bewehrungslage, posten_index
+from opencivil.querschnitt.platte import (
+    Bewehrungslage, Richtung, posten_index)
 
 #: Groesste zulaessige bezogene Druckzonenhoehe.
 GRENZE = 0.35
@@ -150,7 +151,12 @@ class Duktilitaet(Nachweis):
 
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),
+            # Zwei Breiten, weil zwei Lagen verschiedene Richtungen tragen
+            # koennen. x/d bliebe zwar unveraendert, wenn man A_s und b beide
+            # verwechselte -- aber nur dann; hier stammt A_s aus dem
+            # Lagenaufbau und kennt seine Richtung bereits.
             Eingabebezug("b", querschnitt.id_von("b")),
+            Eingabebezug("b_y", querschnitt.id_von("b_y")),
             Eingabebezug("f_cd", querschnitt.beton.id_von("f_cd")),
         ]
         for nummer, eintraege in self.posten_je_lage.items():
@@ -183,6 +189,7 @@ class Duktilitaet(Nachweis):
     def pruefe(self, e: Eingaben, p: Protokoll):
         h = e.g("h").si
         b = e.g("b").si
+        b_y = e.g("b_y").si
         f_cd = e.g("f_cd").si
 
         self._protokoll_ansatz(p)
@@ -192,9 +199,10 @@ class Duktilitaet(Nachweis):
         self.ergebnisse = []
 
         for lage in self.lagen:
-            erg = self._eine_lage(e, lage, h=h, b=b, f_cd=f_cd)
+            b_l = b if lage.richtung is Richtung.X else b_y
+            erg = self._eine_lage(e, lage, h=h, b=b_l, f_cd=f_cd)
             self.ergebnisse.append(erg)
-            self._protokoll_lage(p, erg, b=b, f_cd=f_cd)
+            self._protokoll_lage(p, erg, b=b_l, f_cd=f_cd)
 
             ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
                 min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
