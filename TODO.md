@@ -24,9 +24,24 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
       Platte wird je Laufmeter gerechnet). In der Eingabemaske steht es
       richtig. Einheitlich ziehen.
 
+## Offen (neu)
+
+- [ ] Die rechte Tafel läuft waagrecht über, sobald sie schmal wird (bei rund
+      350 px um 63 Bildpunkte). Formeln und Tabellen haben je einen eigenen
+      Rollbalken; ein Inhalt entkommt ihnen. Besteht schon länger, nicht neu.
+
 ## Erledigt zuletzt
 
-Eine Änderung während des Rechnens fiel unter den Tisch: der Riegel gegen
+Nicht rechnen, was schon dasteht: bei `N_Ed = 0` stand ein Bruch mit null im
+Zähler, jetzt steht der getroffene Eckpunkt da — dasselbe bei `M_Ed = 0` und
+Normaldruck · Der Massstab des Erfüllungsgrads wird nicht mehr über eine
+Schwelle geraten: beide Wege werden gerechnet, es gilt der kleinere · Die
+Zusammenfassung ist schlanker (`M-N: Feld`, keine Spalte *Urteil*, der
+Erfüllungsgrad weich hinterlegt) und trägt darüber Beton, Dicke, Breite sowie
+die Bewehrung von unten nach oben · `v_Rd` durchgehend gross, `V_Ed` ohne
+Betragsstriche · blauer Akzent an allen Zahlenfeldern · × vor jedem
+Bewehrungsposten · neue Platten mit `D_max = 32 mm` und Bewehrung nur in der
+1. und 4. Lage · Eine Änderung während des Rechnens fiel unter den Tisch: der Riegel gegen
 doppeltes Rechnen verwarf den zweiten Wunsch, statt ihn aufzuheben — angezeigt
 wurde danach das Urteil zur vorherigen Zahl. Dazu: der Riegel stand ausserhalb
 von `finally` und hätte nach einem Zeichenfehler jede weitere Rechnung für

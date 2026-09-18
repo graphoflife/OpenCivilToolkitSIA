@@ -149,10 +149,20 @@ function platteAnlegen() {
       name: `Platte ${p.querschnitte.length + 1}`,
       beton: beton.kennung,
       h: 300, b: 1000,
+      // Grösstkorn und Einlagenhöhe gehören zur Platte und gehen in den
+      // Querkraftwiderstand ein. Ohne Vorgabe stünden die Felder leer da und
+      // der Nachweis meldete eine fehlende Eingabe.
+      d_max: 32, einlagenhoehe: 0,
       ueberdeckung_unten: 30, ueberdeckung_oben: 30,
       richtung_lage1: 'x', richtung_lage4: 'x',
-      lagen: [lage(16), lage(12), lage(12), lage(12)],
-      kombinationen: [{ name: 'Feld', M_Ed: 100, N_Ed: 0, art: 'N_konstant', richtung: 'x' }],
+      // Nur aussen bewehrt: die 1. und die 4. Lage tragen, die beiden inneren
+      // sind erst einmal nicht da. Was man nicht braucht, soll man wegnehmen
+      // müssen und nicht wegnehmen dürfen.
+      lagen: [lage(12), lage(0), lage(0), lage(12)],
+      // 'automatisch': beide Massstäbe werden gerechnet, massgebend ist der
+      // kleinere Erfüllungsgrad. Eine feste Wahl hier hätte die neue Platte
+      // vom Regelfall ausgenommen.
+      kombinationen: [{ name: 'Feld', M_Ed: 100, N_Ed: 0, art: 'automatisch', richtung: 'x' }],
     });
   });
   aendern({ auswahl: { art: 'querschnitt', kennung } }, 'auswahl');

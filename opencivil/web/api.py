@@ -17,7 +17,7 @@ import math
 from typing import Any, Dict, List, Optional, Sequence
 
 from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM
-from opencivil.core.latex import tabelle, text_latex
+from opencivil.core.latex import als_text, tabelle, text_latex
 from opencivil.core.protokoll import (
     Block, GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, TextBlock,
     TitelBlock, UnterprotokollBlock,
@@ -512,6 +512,12 @@ def _linie_dict(nachweis) -> dict:
     }
 
 
+#: Welche Spalte der Zusammenfassung den Erfuellungsgrad traegt. Die
+#: Oberflaeche hinterlegt genau sie -- zaehlen statt raten, sonst haenge die
+#: Einfaerbung an der Reihenfolge der Kopfzeile.
+GRAD_SPALTE = 3
+
+
 def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
     """
     Je Platte die Nachweistabelle -- Zeilen **und** ihr LaTeX.
@@ -521,11 +527,17 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
     liefen auseinander. Die Oberflaeche faerbt nur noch ein, was ``erfuellt``
     sagt.
 
-    Die LaTeX-Fassung entsteht ueber dieselbe Funktion wie jede Tabelle der
-    Mitschrift.
+    Dazu die beiden Angaben ueber der Tabelle: was die Platte ist
+    (``angaben``) und wie sie bewehrt ist (``bewehrung``). Beide tragen
+    fertiges LaTeX und werden in der Oberflaeche als gewoehnliche Gleichung
+    bzw. Tabelle gezeichnet -- mit denselben Kopierknoepfen wie alles andere.
+
+    Eine Spalte *Urteil* gibt es nicht mehr: sie stand neben dem
+    Erfuellungsgrad und sagte dasselbe noch einmal. Erfuellt oder nicht zeigt
+    jetzt die Hinterlegung des Grads.
     """
     kopf = [r"\text{Nachweis}", r"\text{Widerstand}", r"\text{Einwirkung}",
-            r"\alpha_{eff}", r"\text{Urteil}"]
+            r"\alpha_{eff}"]
 
     def zelle(wert) -> str:
         """Feste Stellenzahl -- in einer Spalte steht immer dieselbe Groesse."""
@@ -544,12 +556,11 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
         zeilen = [
             {
                 "zellen": [
-                    rf"\text{{{text_latex(u.name)}}}",
+                    als_text(u.kurzname),
                     zelle(u.widerstand),
                     zelle(u.einwirkung),
                     (f"{u.erfuellungsgrad.si:.2f}"
                      if math.isfinite(u.erfuellungsgrad.si) else r"\infty"),
-                    r"\text{erfüllt}" if u.erfuellt else r"\text{nicht erfüllt}",
                 ],
                 "erfuellt": u.erfuellt,
                 "begruendung": u.begruendung,
@@ -559,9 +570,66 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
         ergebnis[kennung] = {
             "kopf": kopf,
             "zeilen": zeilen,
-            "latex": tabelle(kopf, [z["zellen"] for z in zeilen], "lrrrl"),
+            "grad_spalte": GRAD_SPALTE,
+            "latex": tabelle(kopf, [z["zellen"] for z in zeilen], "lrrr"),
+            "angaben": _plattenangaben(qs),
+            "bewehrung": _bewehrungsuebersicht(qs),
         }
     return ergebnis
+
+
+def _plattenangaben(qs) -> dict:
+    """Beton, Dicke und betrachtete Breite -- eine Zeile über der Tabelle."""
+    latex = (rf"{als_text('Beton ' + qs.beton.name)} \qquad "
+             rf"h = {qs.h.als_latex(0, MM)} \qquad "
+             rf"b = {qs.b.als_latex(0, MM)}")
+    return {"latex": latex, "titel": "Angaben zur Platte"}
+
+
+def _bewehrungsuebersicht(qs) -> dict:
+    """
+    Überdeckungen und Lagen, von unten nach oben gelesen.
+
+    Die Reihenfolge ist die des Querschnitts und nicht die der Eingabemaske:
+    zuerst die untere Überdeckung, dann die 1. bis 4. Lage, zuletzt die obere.
+    Wer die Tabelle von oben nach unten liest, geht damit durch die Platte
+    hinauf.
+
+    Grundbewehrung und Zulage stehen in einer Zeile, getrennt durch ``+`` --
+    die Lage ist eine Lage, auch wenn sie aus zwei Posten besteht.
+    """
+    kopf = [r"\text{Lage}", r"\text{Richtung}", r"\text{Bewehrung}",
+            r"\text{Stahl}"]
+    strich = r"\text{--}"
+
+    def menge(posten) -> str:
+        if not posten.vorhanden:
+            return ""
+        durchmesser = rf"\varnothing {posten.durchmesser.formatiert(0)}"
+        if posten.ueber_abstand:
+            return rf"{durchmesser}@{posten.abstand.formatiert(0)}"
+        return rf"{posten.anzahl:g} \times {durchmesser}"
+
+    zeilen = [[als_text("Überdeckung unten"), strich,
+               qs.ueberdeckung_unten.als_latex(0, MM), strich]]
+    for lage in qs.lagen:
+        posten = [menge(lage.grund), menge(lage.zulage)]
+        vorhanden = [t for t in posten if t]
+        zeilen.append([
+            als_text(f"{lage.nummer}. Lage"),
+            als_text(lage.richtung.value),
+            " + ".join(vorhanden) if vorhanden else strich,
+            als_text(lage.stahl.name) if (vorhanden and lage.stahl) else strich,
+        ])
+    zeilen.append([als_text("Überdeckung oben"), strich,
+                   qs.ueberdeckung_oben.als_latex(0, MM), strich])
+
+    return {
+        "kopf": kopf,
+        "zeilen": zeilen,
+        "titel": "Bewehrung von unten nach oben",
+        "latex": tabelle(kopf, zeilen, "llll"),
+    }
 
 
 def zuordnung(aufbau: Aufbau) -> dict:

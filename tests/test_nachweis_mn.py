@@ -450,15 +450,52 @@ class TestResistenzlinie(unittest.TestCase):
                 self.assertIn(erwartet, titel)
 
     def test_protokoll_zeigt_die_interpolation(self):
-        """Der Widerstand darf nicht vom Himmel fallen."""
+        """
+        Der Widerstand darf nicht vom Himmel fallen.
+
+        Bei einer Normalkraft zwischen zwei Eckpunkten muss dastehen, zwischen
+        welchen interpoliert wurde und mit welchem Anteil.
+        """
         from opencivil.core.protokoll import GleichungBlock, TabellenBlock
 
-        bloecke = list(self.loesung.protokoll.alle_bloecke())
+        werk = Rechenwerk()
+        platte = einfache_platte()
+        platte.ins_rechenwerk(werk)
+        nachweis = BiegungNormalkraft(
+            platte,
+            [Schnittgroessen("Druck", M_Ed=Groesse(100, KNM), N_Ed=Groesse(-200, KN))],
+            Richtung.X,
+        )
+        werk.registriere(nachweis)
+        loesung = werk.loese(nachweis.d_ausnutzung["Druck"].id)
+
+        bloecke = list(loesung.protokoll.alle_bloecke())
         self.assertIn("Stützpunkte der Interpolation",
                       [b.titel for b in bloecke if isinstance(b, TabellenBlock)])
         self.assertTrue(any(
             isinstance(b, GleichungBlock) and "Widerstand bei festgehaltenem" in b.titel
             for b in bloecke))
+
+    def test_bei_n_null_wird_nicht_interpoliert(self):
+        """
+        Trifft die Einwirkung genau einen Eckpunkt, ist nichts zu interpolieren.
+
+        Bei ``N_Ed = 0`` stand dort ein Bruch mit null im Zähler --
+        ``(0.0 - 0.0)/(910.6 - 0.0)`` --, der nichts erklärt und nur aussieht,
+        als wäre etwas gerechnet worden. Jetzt steht der Eckpunkt selbst da.
+        """
+        from opencivil.core.protokoll import GleichungBlock, TabellenBlock
+
+        bloecke = list(self.loesung.protokoll.alle_bloecke())
+        self.assertNotIn("Stützpunkte der Interpolation",
+                         [b.titel for b in bloecke if isinstance(b, TabellenBlock)])
+        gleichungen = [b for b in bloecke if isinstance(b, GleichungBlock)]
+        self.assertFalse(
+            any(r"\frac{0.0 - 0.0}" in b.latex for b in gleichungen),
+            "der entartete Bruch gehört nicht in die Mitschrift")
+        self.assertTrue(
+            any("liegt genau dort" in (b.titel or "") for b in gleichungen),
+            "der getroffene Eckpunkt muss benannt sein")
 
     def test_der_massstab_steht_nicht_in_der_mitschrift(self):
         """
@@ -534,42 +571,52 @@ class TestErfuellungsgrad(unittest.TestCase):
         self.assertLess(eta["Feld_mit_Zug"], eta["Feld"])
         self.assertGreater(eta["Feld_mit_Druck"], eta["Feld"])
 
-    def test_senkrecht_wird_nahe_den_spitzen_gemessen(self):
+    def test_es_gilt_der_kleinere_der_beiden_massstaebe(self):
         """
-        Nahe den Spitzen läuft die Linie fast waagrecht.
+        Gerechnet werden beide Wege, massgebend ist der ungünstigere.
 
-        Dort taugt der Momentenwiderstand bei festgehaltener Normalkraft nicht
-        mehr als Mass: eine kleine Änderung von N_Ed wirft ihn weit herum.
-        Gemessen wird dann senkrecht, also über den Normalkraftwiderstand.
-
-        Die Schwellen sind verschieden, weil die Linie nicht symmetrisch ist.
+        Vorher entschied eine Schwelle am Anteil der Grenznormalkraft, ob
+        waagrecht (Momentenwiderstand bei festgehaltener Normalkraft) oder
+        senkrecht gemessen wird. Das war eine Faustregel -- und sie konnte den
+        grösseren der beiden Erfüllungsgrade stehen lassen, also den
+        günstigeren. Jetzt wird nicht mehr geraten.
         """
+        from opencivil.nachweis.biegung_normalkraft import geo
+
         nachweis, _ = self._pruefe([Schnittgroessen("x", M_Ed=Groesse(100, KNM))])
         N_zug = max(p.N for p in nachweis.handlinie)
         N_druck = min(p.N for p in nachweis.handlinie)
-        eckwerte = {"N_Rd_zug": N_zug, "N_Rd_druck": N_druck}
 
-        waagrecht = Erfuellungsart.NORMALKRAFT_KONSTANT
-        senkrecht = Erfuellungsart.MOMENT_KONSTANT
-
-        faelle = [
-            (0.0, waagrecht, "reine Biegung"),
-            (N_zug * 0.20, waagrecht, "wenig Zug"),
-            (N_zug * 0.30, senkrecht, "viel Zug"),
-            (N_druck * 0.50, waagrecht, "wenig Druck"),
-            (N_druck * 0.70, senkrecht, "viel Druck"),
-        ]
-        for N_Ed, erwartet, was in faelle:
+        for anteil, N_grenze, was in [
+            (0.20, N_zug, "wenig Zug"), (0.30, N_zug, "viel Zug"),
+            (0.50, N_druck, "wenig Druck"), (0.70, N_druck, "viel Druck"),
+        ]:
             with self.subTest(fall=was):
-                self.assertIs(nachweis._massstab(N_Ed, eckwerte), erwartet)
+                kombination = Schnittgroessen(
+                    "x", M_Ed=Groesse(100, KNM),
+                    N_Ed=Groesse.aus_si(N_grenze * anteil, KN))
+                beide = [nachweis._messen(kombination, achse, True)
+                         for achse in (geo.MOMENT, geo.NORMALKRAFT)]
+                grade = [g.erfuellungsgrad for g in beide if g is not None]
+                gewaehlt = nachweis._auswerten(kombination, {})
+                self.assertAlmostEqual(gewaehlt.erfuellungsgrad, min(grade))
 
-    def test_schwellen_stehen_als_benannte_groessen_da(self):
-        """Zahlen wie 0.25 gehören nicht mitten in eine Bedingung."""
-        from opencivil.nachweis.biegung_normalkraft import (
-            SCHWELLE_DRUCK, SCHWELLE_ZUG,
-        )
-        self.assertAlmostEqual(SCHWELLE_ZUG, 0.25)
-        self.assertAlmostEqual(SCHWELLE_DRUCK, 0.60)
+    def test_ein_vorgegebener_massstab_bleibt_stehen(self):
+        """
+        Wer die Richtung selbst wählt, bekommt sie -- auch die ungünstigere.
+
+        Der Vergleich gilt nur für `automatisch`; sonst liesse sich ein
+        Zwischenwert gar nicht mehr gezielt nachrechnen.
+        """
+        nachweis, _ = self._pruefe([
+            Schnittgroessen("N_fest", M_Ed=Groesse(100, KNM), N_Ed=Groesse(-200, KN),
+                            art=Erfuellungsart.NORMALKRAFT_KONSTANT),
+            Schnittgroessen("M_fest", M_Ed=Groesse(100, KNM), N_Ed=Groesse(-200, KN),
+                            art=Erfuellungsart.MOMENT_KONSTANT),
+        ])
+        nach_name = {a.schnittgroessen.name: a for a in nachweis.auswertungen}
+        self.assertIs(nach_name["N_fest"].massstab, Erfuellungsart.NORMALKRAFT_KONSTANT)
+        self.assertIs(nach_name["M_fest"].massstab, Erfuellungsart.MOMENT_KONSTANT)
 
     def test_handrechnung_hat_einen_bauch(self):
         """

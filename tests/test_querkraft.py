@@ -94,7 +94,7 @@ class TestQuerkraft(unittest.TestCase):
         self.assertGreater(zug.v_Rd, 0.0)
         self.assertLess(zug.v_Rd, ohne.v_Rd)
         # Die Begründung ist die gewöhnliche Rechnung, keine Ausnahmemeldung.
-        self.assertIn("v_Rd = k_d", zug.begruendung)
+        self.assertIn("V_Rd = k_d", zug.begruendung)
         self.assertNotIn("Zugkraft", zug.begruendung)
 
     def test_m_rd_wird_bei_der_wirkenden_normalkraft_genommen(self):
@@ -422,4 +422,7 @@ class TestVorzeichenDerQuerkraft(unittest.TestCase):
         """
         _, urteil = self.ergebnis(-120.0)
         self.assertAlmostEqual(urteil.einwirkung.groesse.in_einheit(KN_PRO_M), 120.0)
-        self.assertIn("left|V_{Ed", urteil.einwirkung.symbol)
+        # Betragsstriche stehen nicht am Symbol: die Zahl daneben ist
+        # ohnehin der Betrag, und zwei Zeichen fuer dieselbe Aussage
+        # machen die Tabelle nur breiter.
+        self.assertEqual(urteil.einwirkung.symbol, "V_{Ed,x}")

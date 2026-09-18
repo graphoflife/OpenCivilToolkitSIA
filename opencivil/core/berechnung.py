@@ -517,6 +517,20 @@ class NachweisUrteil:
     einwirkung: Optional[Wert] = None
     widerstand: Optional[Wert] = None
 
+    art: str = ""
+    """
+    Kurzzeichen der Nachweisart -- ``M-N`` oder ``V``.
+
+    Zusammen mit :attr:`fall` ergibt es die knappe Bezeichnung fuer die
+    Zusammenfassung. Getrennt gefuehrt und nicht aus :attr:`name`
+    herausgeschnitten: den langen Namen zu zerlegen hiesse, aus Anzeigetext auf
+    Bedeutung zu schliessen -- genau der Fehler, der die Nachweise mehrerer
+    Platten schon einmal in dieselbe Tabelle gepackt hat.
+    """
+
+    fall: str = ""
+    """Name der Einwirkungskombination, zu der dieses Urteil gehoert."""
+
     raum: str = ""
     """
     Namensraum des Nachweises, der dieses Urteil gefaellt hat.
@@ -527,6 +541,19 @@ class NachweisUrteil:
     Platte gemeint ist, und das geht schief, sobald zwei Platten dieselben
     Richtungen tragen.
     """
+
+    @property
+    def kurzname(self) -> str:
+        """
+        Die knappe Bezeichnung, z.B. ``M-N: Fall 1``.
+
+        Die Richtung fehlt mit Absicht: sie steht bereits im Symbol des
+        Widerstands (``M_{Rd,x}``), und zweimal dieselbe Angabe macht die
+        Tabelle nur breiter.
+        """
+        if self.art and self.fall:
+            return f"{self.art}: {self.fall}"
+        return self.name
 
     def __str__(self) -> str:
         urteil = "erfüllt" if self.erfuellt else "NICHT erfüllt"

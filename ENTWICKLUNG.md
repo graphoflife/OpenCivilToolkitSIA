@@ -43,6 +43,92 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-18 · Nicht rechnen, was schon dasteht
+
+Zwei Stellen, an denen die Mitschrift Arbeit vortäuschte, und eine, an der sie
+sich auf eine Faustregel verliess.
+
+### Der Bruch, der immer null war
+
+Bei `N_Ed = 0` stand in der Herleitung:
+
+```
+M_Rd = M_1 + (N_Ed - N_1)/(N_2 - N_1) · (M_2 - M_1)
+     = 142.5 + (0.0 - 0.0)/(910.6 - 0.0) · (27.9 - 142.5) = 142.5 kNm
+```
+
+Der Zähler ist null, weil `N_Ed` **genau** auf dem Eckpunkt liegt. Zu
+interpolieren gibt es da nichts; die Zeile sieht nur so aus, als wäre etwas
+gerechnet worden. Jetzt steht der Eckpunkt selbst da:
+
+```
+M_Rd = M_Rd(N_Ed=0)^+ = 248.7 kNm
+```
+
+Geprüft wird nicht auf `N_Ed == 0`, sondern darauf, ob die festgehaltene Grösse
+einen Stützpunkt trifft. Damit fällt derselbe Fall auf der anderen Achse
+gleich mit weg: bei `M_Ed = 0` und Normaldruck steht jetzt
+`N_Rd = N_Rd^- = -6000.0 kN` statt einer Interpolation über eine Kante, auf der
+sich nichts ändert. Mitgeprüft wird auch der Zielwert — bei einer Kante längs
+der festgehaltenen Achse träfen sonst beide Stützpunkte zu, und nur einer davon
+ist der Widerstand.
+
+### Die Schwelle, die den günstigeren Wert stehen lassen konnte
+
+Ob der Erfüllungsgrad am Momentenwiderstand (bei festgehaltener Normalkraft)
+oder am Normalkraftwiderstand (bei festgehaltenem Moment) gemessen wird,
+entschied eine Faustregel: ab 25 % der Grenzzugkraft bzw. 60 % der
+Grenzdruckkraft senkrecht, sonst waagrecht. Zwei Zahlen, die niemand herleiten
+konnte — und in der Nähe der Schwelle konnte die Regel den **grösseren** der
+beiden Erfüllungsgrade auswählen, also den günstigeren.
+
+Gerechnet werden jetzt beide, und es gilt der kleinere. Das ist kein
+Rechenschritt, sondern die Festlegung, in welcher Richtung gemessen wird —
+deshalb steht der Vergleich nicht in der Mitschrift, wohl aber vollständig,
+was dann gerechnet wurde. Wer den Massstab selbst vorgibt, bekommt ihn
+unverändert; sonst liesse sich ein Zwischenwert nicht mehr gezielt nachrechnen.
+
+### Die Zusammenfassung sagte alles zweimal
+
+Die Spalte *Urteil* schrieb «erfüllt» neben einen Erfüllungsgrad von 2.49. Sie
+ist weg; hinterlegt wird stattdessen die Zahl selbst, weich grün oder weich
+rot. Welche Spalte das ist, sagt der Kern (`grad_spalte`) — die Oberfläche soll
+es nicht aus der Kopfzeile erraten.
+
+Der Nachweis heisst jetzt `M-N: Feld` statt `M-N-Nachweis x – Feld`. Die
+Richtung fehlt mit Absicht: sie steht im Symbol des Widerstands (`M_{Rd,x}`).
+Zusammengesetzt wird der kurze Name aus zwei neuen Feldern des Urteils
+(`art`, `fall`) und nicht aus dem langen herausgeschnitten — aus Anzeigetext
+auf Bedeutung zu schliessen hat die Nachweise mehrerer Platten schon einmal in
+dieselbe Tabelle gepackt.
+
+Über der Tabelle stehen jetzt Beton, Dicke und Breite sowie die Bewehrung von
+unten nach oben gelesen: untere Überdeckung, 1. bis 4. Lage, obere Überdeckung.
+Beide kommen fertig aus dem Kern und sind in der Oberfläche eine gewöhnliche
+Gleichung und eine gewöhnliche Tabelle — dieselbe Gestalt, dieselben
+Kopierknöpfe wie alles andere.
+
+`v_Rd` ist durchgehend `V_Rd` geworden, auch in der Herleitung. Gross in der
+Tabelle und klein in der Formel wäre genau die Art Abweichung, die dieses
+Werkzeug vermeiden will. Die Betragsstriche an `V_Ed` sind weg: die Zahl
+daneben ist ohnehin der Betrag.
+
+### Maske
+
+Zahlenfelder tragen einen leichten blauen Akzent — sie sind das, was man
+anfasst; Namensfelder und Auswahllisten bleiben unbunt. Vor jedem
+Bewehrungsposten steht ein ×, das den Durchmesser auf null setzt; es ist nur
+rot, solange es etwas zu entfernen gibt, bleibt aber auch sonst stehen, damit
+die Zeile nicht bei jeder Eingabe um seine Breite springt.
+
+Eine neue Platte bringt `D_max = 32 mm` mit — ohne Vorgabe stand das Feld leer
+und der Querkraftnachweis meldete eine fehlende Eingabe. Bewehrt ist sie nur
+noch aussen (1. und 4. Lage, ⌀12@150): was man nicht braucht, soll man
+wegnehmen müssen und nicht wegnehmen dürfen. `D_max` steht in der Maske jetzt
+mit echtem Index, dafür nimmt `feld()` neben Klartext auch Knoten entgegen.
+
+---
+
 ## 2026-09-18 · Eine Änderung fiel unter den Tisch
 
 Gemeldet: manchmal eine Zahl ändern, oben rechts steht «geändert …» — und es

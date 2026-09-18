@@ -31,7 +31,7 @@ ERFUELLUNGSGRAD:
 Ob ein Punkt drin liegt oder nicht, entscheidet immer derselbe Test (Punkt in
 geschlossener Linie), angewandt auf das Polygon der Handrechnung. Nur *wie
 weit* er von der Linie entfernt ist, haengt vom gewaehlten Massstab ab --
-siehe :class:`Erfuellungsart` und :meth:`BiegungNormalkraft._massstab`.
+siehe :class:`Erfuellungsart` und :meth:`BiegungNormalkraft._auswerten`.
 """
 
 from __future__ import annotations
@@ -62,8 +62,8 @@ class Erfuellungsart(str, Enum):
     """Massstab, in dem der Abstand zur Resistenzlinie gemessen wird."""
 
     AUTOMATISCH = "automatisch"
-    """Waagrecht, ausser nahe den Spitzen der Linie -- siehe
-    :meth:`BiegungNormalkraft._massstab`. Der Regelfall."""
+    """Beide Wege werden gerechnet, massgebend ist der kleinere Erfuellungsgrad
+    -- siehe :meth:`BiegungNormalkraft._auswerten`. Der Regelfall."""
 
     NORMALKRAFT_KONSTANT = "N_konstant"
     """Bei festgehaltener Normalkraft waagrecht bis zur Momentengrenze.
@@ -145,12 +145,6 @@ ACHSE_ZU: Dict[Erfuellungsart, geo.Achse] = {
 MASSSTAB: Dict[str, Erfuellungsart] = {
     a.name: m for m, a in ACHSE_ZU.items()
 }
-
-#: Ab welchem Anteil der Grenznormalkraft senkrecht gemessen wird. Bewusst
-#: verschieden: die Linie ist nicht symmetrisch, auf der Druckseite bleibt sie
-#: laenger brauchbar waagrecht als auf der Zugseite.
-SCHWELLE_ZUG = 0.25
-SCHWELLE_DRUCK = 0.6
 
 
 # ===========================================================================
@@ -362,6 +356,8 @@ class BiegungNormalkraft(Nachweis):
             urteile.append(
                 NachweisUrteil(
                     name=f"M-N-Nachweis {self.richtung.value} – {kombination.name}",
+                    art="M-N",
+                    fall=kombination.name,
                     erfuellt=auswertung.innerhalb,
                     erfuellungsgrad=Groesse(auswertung.erfuellungsgrad, EINHEITSLOS),
                     begruendung=auswertung.begruendung,
@@ -430,28 +426,6 @@ class BiegungNormalkraft(Nachweis):
         )
         return definition.belegen(Groesse.aus_si(zahl, einheit))
 
-    def _massstab(
-        self, N_Ed: float, eckwerte: Mapping[str, float]
-    ) -> Erfuellungsart:
-        """
-        Welcher Massstab bei ``AUTOMATISCH`` gilt.
-
-        Waagrecht (Momentenwiderstand bei festgehaltener Normalkraft) ist der
-        Regelfall. Nahe den beiden Spitzen der Linie taugt er aber nicht mehr:
-        dort laeuft die Grenze fast waagrecht, und eine kleine Aenderung der
-        Normalkraft wirft den Momentenwiderstand weit herum. Dann wird senkrecht
-        gemessen -- der Normalkraftwiderstand bei festgehaltenem Moment.
-
-        Diese Wahl erscheint **nicht** in der Mitschrift. Sie ist kein
-        Rechenschritt, sondern die Festlegung, in welcher Richtung gemessen
-        wird; was dann gerechnet wird, steht vollstaendig da.
-        """
-        if N_Ed > 0.0 and abs(N_Ed) > abs(eckwerte["N_Rd_zug"]) * SCHWELLE_ZUG:
-            return Erfuellungsart.MOMENT_KONSTANT
-        if N_Ed < 0.0 and abs(N_Ed) > abs(eckwerte["N_Rd_druck"]) * SCHWELLE_DRUCK:
-            return Erfuellungsart.MOMENT_KONSTANT
-        return Erfuellungsart.NORMALKRAFT_KONSTANT
-
     def _auswerten(
         self, kombination: Schnittgroessen, eckwerte: Mapping[str, float]
     ) -> Auswertung:
@@ -461,25 +435,38 @@ class BiegungNormalkraft(Nachweis):
         Gemessen wird gegen das Polygon aus der Handrechnung, nicht gegen die
         genaue Linie -- damit die Zahl im Urteil dieselbe ist, die in der
         Herleitung Schritt fuer Schritt hergeleitet wird.
+
+        Bei ``AUTOMATISCH`` werden **beide** Wege gerechnet -- der
+        Momentenwiderstand bei festgehaltener Normalkraft und der
+        Normalkraftwiderstand bei festgehaltenem Moment -- und der kleinere
+        Erfuellungsgrad gilt. Vorher entschied eine Schwelle am Anteil der
+        Grenznormalkraft, in welcher Richtung gemessen wird; das war eine
+        Faustregel, die nahe den Spitzen der Linie den groesseren der beiden
+        Werte stehen lassen konnte.
+
+        Der Vergleich erscheint **nicht** in der Mitschrift. Er ist kein
+        Rechenschritt, sondern die Festlegung, in welcher Richtung gemessen
+        wird; was dann gerechnet wurde, steht vollstaendig da.
         """
         N_Ed, M_Ed = kombination.N_Ed.si, kombination.M_Ed.si
         innerhalb = geo.innerhalb(N_Ed, M_Ed, self.handlinie)
 
         art = kombination.art
-        if art is Erfuellungsart.AUTOMATISCH:
-            art = self._massstab(N_Ed, eckwerte)
-
         if art is Erfuellungsart.NAECHSTER_PUNKT:
             return self._naechster(kombination, eckwerte, innerhalb)
 
-        ergebnis = self._messen(kombination, ACHSE_ZU[art], innerhalb)
-        if ergebnis is None:
+        achsen = ((geo.MOMENT, geo.NORMALKRAFT) if art is Erfuellungsart.AUTOMATISCH
+                  else (ACHSE_ZU[art],))
+        gemessen = [self._messen(kombination, achse, innerhalb) for achse in achsen]
+        gueltig = [g for g in gemessen if g is not None]
+        if not gueltig:
             return Auswertung(
                 kombination, innerhalb, 0.0, None,
                 "In dieser Richtung schneidet die Resistenzlinie nicht – die "
                 "Einwirkung liegt ganz ausserhalb des aufnehmbaren Bereichs.",
-                massstab=art)
-        return ergebnis
+                massstab=(Erfuellungsart.NORMALKRAFT_KONSTANT
+                          if art is Erfuellungsart.AUTOMATISCH else art))
+        return min(gueltig, key=lambda g: g.erfuellungsgrad)
 
     def _messen(
         self, kombination: Schnittgroessen, achse: geo.Achse, innerhalb: bool
@@ -579,6 +566,11 @@ def protokoll_interpolation(
     Querkraftnachweis rechnet mit dem Momentenwiderstand bei der wirkenden
     Normalkraft und muss dieselbe Interpolation zeigen. Zweimal geschrieben
     liefe sie frueher oder spaeter auseinander.
+
+    Faellt die festgehaltene Groesse genau auf einen Eckpunkt -- der haeufige
+    Fall ``N_Ed = 0``, und ebenso ``M_Ed = 0`` bei reiner Normalkraft --, wird
+    nicht interpoliert. Dort stuende sonst ein Bruch mit null im Zaehler, der
+    nichts erklaert und nur so aussieht, als waere etwas gerechnet worden.
     """
     if auswertung.kante is None:
         p.text(auswertung.begruendung)
@@ -593,6 +585,23 @@ def protokoll_interpolation(
 
     e_lauf = lauf.einheit.latex
     e_ziel = ziel.einheit.latex
+
+    # Der Eckpunkt selbst, falls die Einwirkung genau auf ihm liegt. Geprueft
+    # wird auch der Zielwert: bei einer Kante laengs der festgehaltenen Achse
+    # traefen beide Stuetzpunkte zu, und nur einer davon ist der Widerstand.
+    treffer = next(
+        (q for q in (a, b)
+         if _trifft(lauf.von(q), fest) and _trifft(ziel.von(q), auswertung.rd)),
+        None)
+    if treffer is not None:
+        p.gleichung(
+            rf"{ziel.name}_{{Rd}} = {treffer.symbol} = "
+            rf"{_k(auswertung.rd)}\,{e_ziel}",
+            titel=titel or (f"Widerstand bei {lauf.name}_Ed = "
+                            f"{_k(fest)} {lauf.einheit.beschriftung} – "
+                            f"ein Eckpunkt liegt genau dort"),
+        )
+        return
 
     p.gleichung(
         rf"{ziel.name}_{{Rd}} = {ziel.name}_1 + "
@@ -622,6 +631,17 @@ def protokoll_interpolation(
 
 def _kennung(text: str) -> str:
     return "".join(z if z.isalnum() else "_" for z in text)
+
+
+def _trifft(a: float, b: float) -> bool:
+    """
+    Ob zwei SI-Werte fuer die Mitschrift als derselbe gelten.
+
+    Die Schranke haengt an der Groesse der Werte, nicht an einer festen Zahl:
+    Momente liegen im Bereich 1e5 Nm, und dort ist ein absoluter Abstand von
+    1e-9 unerreichbar streng.
+    """
+    return abs(a - b) <= 1e-9 * max(1.0, abs(a), abs(b))
 
 
 def _k(si_wert: float) -> str:

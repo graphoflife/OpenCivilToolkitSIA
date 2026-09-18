@@ -7,7 +7,7 @@ gegen die angegebenen Querkraefte.
 
 ANSATZ::
 
-    v_Rd = k_d * tau_cd * d_v
+    V_Rd = k_d * tau_cd * d_v
 
     k_d   = 1 / (1 + eps_v * d * k_g)
     k_g   = 48 / (16 + D_max * min[1.0; (60/f_ck)^2])
@@ -25,13 +25,13 @@ ZUG BRAUCHT KEINEN SONDERFALL:
 Das Dekompressionsmoment ist ueber ``min(N_Ed; 0)`` definiert und wird bei
 einer Normalzugkraft von selbst null -- entlastend wirkt nur Druck. Der
 Nachweis laeuft damit unveraendert weiter; frueher stand hier ein Sonderfall,
-der ``v_Rd = 0`` setzte.
+der ``V_Rd = 0`` setzte.
 
 EINHEITEN:
 Die Formeln der Norm sind dimensionell inhomogen -- ``d`` und ``D_max`` gehen
 in Millimeter ein, ``f_ck`` in N/mm^2. Sie laufen deshalb ueber
 :func:`opencivil.core.einheiten.empirisch`, das diese Voraussetzung erzwingt.
-``v_Rd`` ergibt sich in N/mm, also kN/m -- eine Querkraft je Laufmeter.
+``V_Rd`` ergibt sich in N/mm, also kN/m -- eine Querkraft je Laufmeter.
 """
 
 from __future__ import annotations
@@ -298,7 +298,7 @@ class Querkraft(Nachweis):
         self.d_v_rd: Dict[str, WertDef] = {
             f.name: WertDef(
                 id=f"{basis}.{f.kennung}.v_Rd",
-                symbol=f"v_{{Rd,{r}}}",
+                symbol=f"V_{{Rd,{r}}}",
                 einheit=KN_PRO_M,
                 beschreibung=f"Querkraftwiderstand {richtung.beschriftung} – {f.name}",
                 referenz="SIA 262:2025, 4.3.3.2.1",
@@ -400,16 +400,20 @@ class Querkraft(Nachweis):
 
             urteile.append(NachweisUrteil(
                 name=f"Querkraft {self.richtung.value} – {fall.name}",
+                art="V",
+                fall=fall.name,
                 erfuellt=erg.erfuellt,
                 erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
                 begruendung=erg.begruendung,
                 # Das Vorzeichen der Querkraft spielt keine Rolle -- verglichen
                 # wird der Betrag. Also steht auch der Betrag da; sonst teilte
                 # der Leser den Widerstand durch eine negative Zahl und bekaeme
-                # etwas anderes als den danebenstehenden Erfuellungsgrad.
+                # etwas anderes als den danebenstehenden Erfuellungsgrad. Die
+                # Betragsstriche stehen trotzdem nicht am Symbol: sie sagen
+                # nichts, was die Zahl daneben nicht schon zeigt.
                 einwirkung=WertDef(
                     id=f"{self.id}.{fall.kennung}.V_Ed",
-                    symbol=rf"\left|V_{{Ed,{self.richtung.value}}}\right|",
+                    symbol=rf"V_{{Ed,{self.richtung.value}}}",
                     einheit=KN_PRO_M, beschreibung="Einwirkung", stellen=1,
                 ).belegen(Groesse.aus_si(abs(fall.V_Ed.si), KN_PRO_M)),
                 # Der Widerstand gilt nur unter genau dieser Einwirkung -- das
@@ -494,9 +498,9 @@ class Querkraft(Nachweis):
                 "moment_positiv": moment_positiv}
 
     def _widerstandssymbol(self, fall: Querkraftfall) -> str:
-        """``v_Rd(M_Ed = 100 kNm, N_Ed = -300 kN)`` -- der Widerstand ist bedingt."""
+        """``V_Rd(M_Ed = 100 kNm, N_Ed = -300 kN)`` -- der Widerstand ist bedingt."""
         r = self.richtung.value
-        return (rf"v_{{Rd,{r}}}(M_{{Ed}} = {fall.M_Ed.als_latex(1, KNM)},\ "
+        return (rf"V_{{Rd,{r}}}(M_{{Ed}} = {fall.M_Ed.als_latex(1, KNM)},\ "
                 rf"N_{{Ed}} = {fall.N_Ed.als_latex(1, KN)})")
 
     def _einen_fall(
@@ -519,7 +523,7 @@ class Querkraft(Nachweis):
             erg.begruendung = (
                 f"Auf der gezogenen Seite ({seite}) liegt in dieser Richtung "
                 f"keine Bewehrung. Ohne statische Höhe gibt es keinen "
-                f"Querkraftwiderstand: v_Rd = 0.")
+                f"Querkraftwiderstand: V_Rd = 0.")
             return erg
         erg.d = hoehen
         erg.d_v = erg.d - einlage if (h / 6.0 < einlage < erg.d) else erg.d
@@ -546,7 +550,7 @@ class Querkraft(Nachweis):
         erg.erfuellungsgrad = float("inf") if V_Ed == 0 else abs(erg.v_Rd) / abs(V_Ed)
         erg.erfuellt = erg.erfuellungsgrad >= 1.0
         erg.begruendung = (
-            f"v_Rd = k_d · τ_cd · d_v = {erg.k_d:.3f} · "
+            f"V_Rd = k_d · τ_cd · d_v = {erg.k_d:.3f} · "
             f"{tau_cd.formatiert(2, N_PRO_MM2)} N/mm² · {erg.d_v * 1e3:.0f} mm "
             f"= {erg.v_Rd / 1e3:.1f} kN/m.")
         return erg
@@ -562,7 +566,7 @@ class Querkraft(Nachweis):
             "die Dehnung auf halber Höhe."
         )
         p.gleichung(
-            rf"v_{{Rd}} = k_d \cdot {self.s_tau_cd} \cdot d_v \qquad "
+            rf"V_{{Rd}} = k_d \cdot {self.s_tau_cd} \cdot d_v \qquad "
             r"k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g}",
             titel="Ansatz", referenz="SIA 262:2025, 4.3.3.2.1")
         p.gleichung(
@@ -677,10 +681,10 @@ class Querkraft(Nachweis):
         grad = (r"\infty" if math.isinf(erg.erfuellungsgrad)
                 else f"{erg.erfuellungsgrad:.2f}")
         p.gleichung(
-            rf"\alpha_{{eff,V,{r}}} = \frac{{v_{{Rd}}}}{{\left|V_{{Ed}}\right|}} = "
+            rf"\alpha_{{eff,V,{r}}} = \frac{{V_{{Rd}}}}{{\left|V_{{Ed}}\right|}} = "
             rf"\frac{{{erg.v_Rd / 1e3:.1f}}}{{{abs(fall.V_Ed.si) / 1e3:.1f}}} = {grad}"
             rf" \quad \Rightarrow \quad {zustand}"
             if fall.V_Ed.si else
-            rf"\alpha_{{eff,V,{r}}} = \frac{{v_{{Rd}}}}{{\left|V_{{Ed}}\right|}} = {grad}"
+            rf"\alpha_{{eff,V,{r}}} = \frac{{V_{{Rd}}}}{{\left|V_{{Ed}}\right|}} = {grad}"
             rf" \quad \Rightarrow \quad {zustand}",
             titel="Erfüllungsgrad")

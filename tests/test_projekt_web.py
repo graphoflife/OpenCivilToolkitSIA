@@ -926,12 +926,86 @@ class TestAngabengruppen(unittest.TestCase):
         antwort = dienst.bearbeite("rechnen", {"projekt": Projekt.beispiel().als_dict()})
         tabelle = antwort.daten["zusammenfassungen"]["q1"]
 
-        self.assertEqual(len(tabelle["kopf"]), 5)
+        # Vier Spalten: die fuenfte hiess "Urteil" und sagte neben dem
+        # Erfuellungsgrad dasselbe noch einmal.
+        self.assertEqual(len(tabelle["kopf"]), 4)
         self.assertEqual(len(tabelle["zeilen"]), 6)
         for zeile in tabelle["zeilen"]:
             self.assertEqual(len(zeile["zellen"]), len(tabelle["kopf"]))
             self.assertIn("erfuellt", zeile)
         self.assertTrue(tabelle["latex"].startswith(r"\begin{array}"))
+        # Welche Spalte eingefaerbt wird, sagt der Kern -- die Oberflaeche
+        # soll es nicht aus der Kopfzeile erraten muessen.
+        self.assertEqual(tabelle["kopf"][tabelle["grad_spalte"]], r"\alpha_{eff}")
+
+    def test_der_nachweis_steht_knapp_da(self):
+        """
+        `M-N: Feld` statt `M-N-Nachweis x – Feld`.
+
+        Die Richtung fehlt mit Absicht: sie steht im Symbol des Widerstands
+        (`M_{Rd,x}`), und zweimal dieselbe Angabe macht die Tabelle nur breiter.
+        Zusammengesetzt wird sie aus zwei Feldern des Urteils und nicht aus dem
+        langen Namen herausgeschnitten.
+        """
+        antwort = dienst.bearbeite(
+            "rechnen", {"projekt": Projekt.beispiel().als_dict()})
+        namen = [z["zellen"][0]
+                 for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
+        self.assertIn(r"\text{M-N: Feld}", namen)
+        self.assertFalse(any("Nachweis" in n for n in namen))
+
+    def test_der_querkraftwiderstand_ist_gross_geschrieben(self):
+        projekt = Projekt.beispiel()
+        for k in projekt.querschnitt("q1").kombinationen:
+            k.V_Ed = 80.0
+        antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
+        zeilen = antwort.daten["zusammenfassungen"]["q1"]["zeilen"]
+        quer = [z for z in zeilen if z["zellen"][0].startswith(r"\text{V:")]
+        self.assertTrue(quer)
+        for zeile in quer:
+            self.assertTrue(zeile["zellen"][1].startswith("V_{Rd"), zeile["zellen"][1])
+            self.assertTrue(zeile["zellen"][2].startswith("V_{Ed"), zeile["zellen"][2])
+            self.assertNotIn("left|", zeile["zellen"][2])
+
+    def test_ueber_der_tabelle_stehen_die_angaben_zur_platte(self):
+        """
+        Beton, Dicke, Breite -- und darunter die Bewehrung von unten nach oben.
+
+        Beide kommen fertig aus dem Kern und tragen ihr eigenes LaTeX: in der
+        Oberfläche sind es eine gewöhnliche Gleichung und eine gewöhnliche
+        Tabelle, mit denselben Kopierknöpfen wie alles andere.
+        """
+        antwort = dienst.bearbeite(
+            "rechnen", {"projekt": Projekt.beispiel().als_dict()})
+        tabelle = antwort.daten["zusammenfassungen"]["q1"]
+
+        self.assertIn("C30/37", tabelle["angaben"]["latex"])
+        self.assertIn("h = 300", tabelle["angaben"]["latex"])
+        self.assertIn("b = 1000", tabelle["angaben"]["latex"])
+
+        bewehrung = tabelle["bewehrung"]
+        self.assertTrue(bewehrung["latex"].startswith(r"\begin{array}"))
+        erste = [z[0] for z in bewehrung["zeilen"]]
+        # Von unten nach oben: untere Überdeckung, 1. bis 4. Lage, obere.
+        self.assertEqual(erste, [
+            r"\text{Überdeckung unten}", r"\text{1. Lage}", r"\text{2. Lage}",
+            r"\text{3. Lage}", r"\text{4. Lage}", r"\text{Überdeckung oben}",
+        ])
+        # Durchmesser, Teilung und Stahl stehen in derselben Zeile.
+        erste_lage = bewehrung["zeilen"][1]
+        self.assertIn(r"\varnothing 18@150", erste_lage[2])
+        self.assertIn("B500B", erste_lage[3])
+
+    def test_eine_leere_lage_steht_ohne_bewehrung_da(self):
+        """Eine nicht definierte Lage darf keinen Stahl ausweisen."""
+        projekt = Projekt.beispiel()
+        lage = projekt.querschnitt("q1").lagen[1]
+        lage.grund.durchmesser = 0.0
+        lage.zulage.durchmesser = 0.0
+        antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
+        zweite = antwort.daten["zusammenfassungen"]["q1"]["bewehrung"]["zeilen"][2]
+        self.assertEqual(zweite[2], r"\text{--}")
+        self.assertEqual(zweite[3], r"\text{--}")
 
     def test_die_zahlen_der_tabelle_haben_feste_stellen(self):
         """In einer Spalte steht immer dieselbe Grösse, also auch dieselbe Genauigkeit."""

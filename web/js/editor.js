@@ -37,9 +37,19 @@ function gerechnet(id) {
   return zustand.loesung?.werte?.[id] || null;
 }
 
-function feld(beschriftung, eingabe, einheit) {
+/**
+ * Eine Zeile Beschriftung – Eingabe – Einheit.
+ *
+ * `beschriftung` ist entweder Klartext oder eine Liste von Knoten. Letzteres
+ * für Symbole, die tiefgestellte Teile haben: `D_max` als blosser Text gelesen
+ * hiesse, den Index zu unterschlagen.
+ */
+function feld(beschriftung, eingabe, einheit, titel) {
+  const istText = typeof beschriftung === 'string';
   return el('div.feld', {}, [
-    el('label', { text: beschriftung, title: beschriftung }),
+    istText
+      ? el('label', { text: beschriftung, title: titel || beschriftung })
+      : el('label', { title: titel || '' }, beschriftung),
     eingabe,
     el('span.einheit', { text: einheit || '' }),
   ]);
@@ -247,10 +257,15 @@ function sorteAendern(material, neu, vorlagen) {
 /**
  * Ein Bewehrungsposten auf einer Zeile:
  *
- *     Grund   ⌀ [18] @ [150] mm   [Teilung|Anzahl]
+ *     ×  Grund   ⌀ [18] @ [150] mm   [Teilung|Anzahl]
  *
  * Der letzte Schalter legt fest, ob die mittlere Zahl eine Teilung oder eine
  * Stabzahl ist -- das Trennzeichen wechselt mit (`@` bzw. `×`).
+ *
+ * Das × vorne setzt den Durchmesser auf null und nimmt den Posten damit heraus.
+ * Es ist nur rot, solange es etwas zu entfernen gibt; bei leerem Posten bleibt
+ * es blass, statt ganz zu verschwinden -- sonst rutschte die Zeile bei jeder
+ * Eingabe um seine Breite.
  */
 function postenZeile(querschnitt, nummer, welcher, beschriftung) {
   const posten = querschnitt.lagen[nummer - 1][welcher];
@@ -263,6 +278,13 @@ function postenZeile(querschnitt, nummer, welcher, beschriftung) {
   });
 
   return el('div.postenzeile', { class: leer ? 'ist-leer' : '' }, [
+    el('button.postenweg', {
+      text: '×',
+      class: leer ? '' : 'ist-scharf',
+      disabled: leer,
+      title: `${beschriftung}bewehrung der ${nummer}. Lage entfernen`,
+      on: { click: () => aendern((x) => { x.durchmesser = 0; }) },
+    }),
     el('span.postenname', { text: beschriftung }),
     el('span.zeichen', { text: '⌀' }),
     zahlfeld({
@@ -488,11 +510,11 @@ function plattenEditor(querschnitt) {
           titel: 'Mit b = 1000 mm gelten alle Schnittgrössen pro Laufmeter.',
           beiAenderung: (v) => aendern((q) => { q.b = v ?? 1000; }),
         }), 'mm'),
-        feld('Grösstkorn D_max', zahlfeld({
+        feld(['Grösstkorn ', span('D_{max}')], zahlfeld({
           wert: querschnitt.d_max, schritt: 4, min: 1,
           titel: 'Geht in den Querkraftwiderstand ein',
           beiAenderung: (v) => aendern((q) => { q.d_max = v ?? 32; }),
-        }), 'mm'),
+        }), 'mm', 'Grösstkorndurchmesser – geht in den Querkraftwiderstand ein'),
         feld('Einlagenhöhe', zahlfeld({
           wert: querschnitt.einlagenhoehe, schritt: 5, min: 0,
           titel: 'Verringert d_v, sofern h/6 < e < d',
@@ -541,13 +563,6 @@ function plattenEditor(querschnitt) {
         ...(querschnitt.kombinationen.length
           ? querschnitt.kombinationen.map((_, i) => einwirkungZeile(querschnitt, i))
           : [el('div.leer', { text: 'Ohne Einwirkung kein Nachweis.' })]),
-        el('p', {
-          text: 'V_Ed = 0 bedeutet: kein Querkraftnachweis. Der Erfüllungsgrad '
-              + 'wird am Momentenwiderstand bei festgehaltener Normalkraft '
-              + 'gemessen; nahe den Spitzen der Resistenzlinie stattdessen am '
-              + 'Normalkraftwiderstand bei festgehaltenem Moment.',
-          style: { fontSize: '11.5px', color: 'var(--schrift-zart)', margin: '6px 0 0' },
-        }),
       ]),
     ]),
   ];

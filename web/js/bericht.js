@@ -296,6 +296,11 @@ function zusammenfassung(loesung) {
 
     return el('div.blatt', {}, [
       el('div.b-titel', { text: `Zusammenfassung – ${eintrag.name}` }),
+      // Was die Platte ist und wie sie bewehrt ist, steht über der Tabelle --
+      // als gewöhnliche Gleichung und gewöhnliche Tabelle, mit denselben
+      // Kopierknöpfen wie alles andere.
+      tabelle?.angaben ? gleichungBlock(tabelle.angaben) : null,
+      tabelle?.bewehrung ? tabellenBlock(tabelle.bewehrung) : null,
       tabelle
         ? el('div.tabelle-block', {}, [
           el('div.tabelle-huelle', {}, [
@@ -309,7 +314,13 @@ function zusammenfassung(loesung) {
                 class: zeile.erfuellt ? 'ist-gut' : 'ist-schlecht',
                 title: zeile.begruendung || '',
               }, zeile.zellen.map((zelle, i) => {
-                const td = el('td', { class: i === 0 ? '' : 'zahl' });
+                // Welche Spalte der Erfüllungsgrad ist, sagt der Kern. Sie
+                // trägt jetzt allein das Urteil -- die Spalte daneben, die
+                // "erfüllt" ausschrieb, ist weg.
+                const istGrad = i === tabelle.grad_spalte;
+                const td = el('td', {
+                  class: [i === 0 ? '' : 'zahl', istGrad ? 'grad' : ''].filter(Boolean).join(' '),
+                });
                 setzen(zelle, td, { displayMode: false });
                 return td;
               })))),

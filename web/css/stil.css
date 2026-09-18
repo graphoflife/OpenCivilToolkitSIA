@@ -20,6 +20,11 @@
   --blau-tief:    #0d4ba8;
   --blau-hell:    #e7f0fe;
   --blau-leiste:  #12325c;
+  /* Nur für den Akzent der Zahlenfelder: hell genug, dass die Ziffern ruhig
+     lesbar bleiben, und deutlich genug, dass ein Eingabefeld als solches
+     auffällt. --blau-hell wäre dafür schon zu kräftig. */
+  --blau-zart:    #f4f8ff;
+  --blau-rand:    #b3c8ea;
 
   --gut:          #16794a;
   --gut-hell:     #e4f4ec;
@@ -234,9 +239,16 @@ input[type="text"], input[type="number"], select {
   width: 100%; padding: 5px 8px;
   border: 1px solid var(--rand-stark); border-radius: 5px; background: var(--flaeche);
 }
+
+/* Zahlenfelder mit leichtem blauem Akzent -- überall gleich, ob Material oder
+   Platte. Sie sind das, was man tatsächlich anfasst; Namensfelder und
+   Auswahllisten bleiben unbunt. */
+input[type="number"] { background: var(--blau-zart); border-color: var(--blau-rand); }
+
 input:focus, select:focus { outline: none; border-color: var(--blau); box-shadow: 0 0 0 2px var(--blau-hell); }
 input[readonly], input:disabled, select:disabled {
-  background: var(--flaeche-2); color: var(--schrift-matt); cursor: not-allowed;
+  background: var(--flaeche-2); border-color: var(--rand-stark);
+  color: var(--schrift-matt); cursor: not-allowed;
 }
 
 .gesperrt-hinweis {
@@ -290,13 +302,25 @@ input[readonly], input:disabled, select:disabled {
 .schalter-halb.ist-an { background: var(--blau); color: #fff; }
 .lage-y .schalter-halb.ist-an { background: var(--stahl); }
 
-/* Ein Posten auf einer Zeile: Name ⌀ [d] @ [s] mm [Umschalter] */
+/* Ein Posten auf einer Zeile: × Name ⌀ [d] @ [s] mm [Umschalter] */
 .postenzeile {
   display: grid;
-  grid-template-columns: 52px 12px 64px 12px 64px 26px 1fr;
+  grid-template-columns: 16px 52px 12px 64px 12px 64px 26px 1fr;
   gap: 5px; align-items: center; margin-top: 3px;
 }
 .postenzeile.ist-leer { opacity: .55; }
+
+/* Nimmt den Posten heraus, indem es den Durchmesser auf null setzt. Rot nur,
+   solange es etwas zu entfernen gibt -- sonst verspräche die Farbe eine
+   Wirkung, die der Knopf nicht hat. */
+.postenweg {
+  padding: 0; border: none; background: transparent;
+  font-size: 13px; line-height: 1; cursor: pointer;
+  color: var(--rand-stark);
+}
+.postenweg.ist-scharf { color: #e07a72; }
+.postenweg.ist-scharf:hover { color: var(--schlecht); }
+.postenweg:disabled { cursor: default; }
 .postenzeile .postenname { font-size: 11.5px; font-weight: 600; color: var(--schrift-matt); }
 .postenzeile .zeichen { font-size: 12px; color: var(--schrift-zart); text-align: center; }
 .postenzeile .einheit { font-size: 11px; color: var(--schrift-zart); }
@@ -432,11 +456,14 @@ table.gitter td:first-child, table.gitter th:first-child { text-align: left; }
 .nachweis-tabelle td:first-child { text-align: left; font-weight: 500; }
 .nachweis-tabelle td.zahl { font-variant-numeric: tabular-nums; }
 .nachweis-tabelle tr.ist-gut td:first-child      { box-shadow: inset 4px 0 0 var(--gut); }
-.nachweis-tabelle tr.ist-schlecht                { background: var(--schlecht-hell); }
 .nachweis-tabelle tr.ist-schlecht td:first-child { box-shadow: inset 4px 0 0 var(--schlecht); }
-.nachweis-tabelle .grad { font-weight: 700; font-size: 14px; }
-.nachweis-tabelle .ist-gut .grad      { color: var(--gut); }
-.nachweis-tabelle .ist-schlecht .grad { color: var(--schlecht); }
+
+/* Der Erfüllungsgrad trägt das Urteil allein -- die Spalte daneben, die
+   „erfüllt" ausschrieb, sagte dasselbe ein zweites Mal. Hinterlegt wird
+   deshalb genau diese Zelle und nicht mehr die ganze Zeile. */
+.nachweis-tabelle td.grad { font-weight: 700; font-size: 14px; }
+.nachweis-tabelle .ist-gut      td.grad { background: var(--gut-hell);      color: var(--gut); }
+.nachweis-tabelle .ist-schlecht td.grad { background: var(--schlecht-hell); color: var(--schlecht); }
 .marke-gut      { color: var(--gut); font-weight: 600; font-size: 12.5px; }
 .marke-schlecht { color: var(--schlecht); font-weight: 700; font-size: 12.5px; }
 
