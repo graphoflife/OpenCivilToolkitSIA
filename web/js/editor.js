@@ -663,9 +663,10 @@ function plattenEditor(querschnitt) {
           wert: querschnitt.h, schritt: 10, min: 10,
           beiAenderung: (v) => aendern((q) => { q.h = v ?? 300; }),
         }), 'mm'),
-        feld('Breite b', zahlfeld({
+        feld(['Breite ', span('b_x')], zahlfeld({
           wert: querschnitt.b, schritt: 100, min: 10,
-          titel: 'Mit b = 1000 mm gelten alle Schnittgrössen pro Laufmeter.',
+          titel: 'Breite des betrachteten Streifens in x-Richtung. In y wird '
+            + 'immer mit 1000 mm gerechnet, also je Laufmeter.',
           beiAenderung: (v) => aendern((q) => { q.b = v ?? 1000; }),
         }), 'mm'),
         feld(['Grösstkorn ', span('D_{max}')], zahlfeld({

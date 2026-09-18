@@ -1010,7 +1010,9 @@ class TestAngabengruppen(unittest.TestCase):
 
         self.assertIn("C30/37", tabelle["angaben"]["latex"])
         self.assertIn("h = 300", tabelle["angaben"]["latex"])
-        self.assertIn("b = 1000", tabelle["angaben"]["latex"])
+        self.assertIn("b_x = 1000", tabelle["angaben"]["latex"])
+        # b_y steht nur da, wenn es von b_x abweicht.
+        self.assertNotIn("b_y", tabelle["angaben"]["latex"])
 
         bewehrung = tabelle["bewehrung"]
         self.assertTrue(bewehrung["latex"].startswith(r"\begin{array}"))

@@ -16,7 +16,8 @@ from __future__ import annotations
 import math
 from typing import Any, Dict, List, Optional, Sequence
 
-from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM
+from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM, Groesse
+from opencivil.querschnitt.platte import BREITE_Y_MM
 from opencivil.core.latex import als_text, tabelle, text_latex
 from opencivil.core.protokoll import (
     Block, GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, TextBlock,
@@ -672,10 +673,17 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
 
 
 def _plattenangaben(qs) -> dict:
-    """Beton, Dicke und betrachtete Breite -- eine Zeile über der Tabelle."""
+    """
+    Beton, Dicke und betrachtete Breite -- eine Zeile ueber der Tabelle.
+
+    Die Breite in y steht nur da, wenn sie von der eingegebenen abweicht.
+    Sonst waere es bei jeder Platte dieselbe Zahl zweimal.
+    """
     latex = (rf"{als_text('Beton ' + qs.beton.name)} \qquad "
              rf"h = {qs.h.als_latex(0, MM)} \qquad "
-             rf"b = {qs.b.als_latex(0, MM)}")
+             rf"b_x = {qs.b.als_latex(0, MM)}")
+    if abs(qs.b.si - BREITE_Y_MM / 1000.0) > 1e-9:
+        latex += rf" \qquad b_y = {Groesse(BREITE_Y_MM, MM).als_latex(0, MM)}"
     return {"latex": latex, "titel": "Angaben zur Platte"}
 
 
