@@ -218,6 +218,10 @@ ALPHA_ZUG = 40
 #: Druckdiagonalen.
 K_C = 0.55
 
+#: Vorgabe fuer die Kriechzahl phi. Sie beschreibt Klima und Belastungsalter --
+#: eine Annahme ueber das Bauwerk, keine Materialgroesse.
+KRIECHZAHL = 2.0
+
 
 @dataclass
 class Querkraftbewehrung:
@@ -561,6 +565,9 @@ class Plattenquerschnitt:
     k_c: Groesse = field(default_factory=lambda: Groesse(K_C, EINHEITSLOS))
     """Abminderung der Betondruckfestigkeit in der Druckdiagonalen."""
 
+    kriechzahl: Groesse = field(default_factory=lambda: Groesse(KRIECHZAHL, EINHEITSLOS))
+    """Kriechzahl phi -- geht ueber n = (E_s/E_cm)*(1+phi) in den Hebelarm ein."""
+
     querkraftbewehrung: Optional[Querkraftbewehrung] = None
     """Bügel, sofern welche angegeben sind. ``None`` heisst: ohne."""
 
@@ -778,9 +785,16 @@ class Plattenquerschnitt:
         """
         d_kc = self._def("k_c", "k_c", EINHEITSLOS,
                          "Abminderung der Betondruckfestigkeit in der Druckdiagonalen", 2)
-        self.berechnungen.append(
+        d_phi = self._def("kriechzahl", r"\varphi", EINHEITSLOS,
+                          "Kriechzahl", 2)
+        self.berechnungen += [
             Vorgabe(id=f"{self.id}.k_c", ausgabe=d_kc, groesse=self.k_c,
-                    abschnitt=abschnitt, stumm=True))
+                    abschnitt=abschnitt, stumm=True),
+            # Wie k_c: sie steht dort, wo sie erklaert wird -- beim Nachweis,
+            # der mit ihr rechnet, nicht verwaist am Anfang der Plattenanalyse.
+            Vorgabe(id=f"{self.id}.kriechzahl", ausgabe=d_phi,
+                    groesse=self.kriechzahl, abschnitt=abschnitt, stumm=True),
+        ]
 
         buegel = self.querkraftbewehrung
         if buegel is None or not buegel.vorhanden:

@@ -43,6 +43,79 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-18 · Sprödes Versagen unter Biegung, und der gerissene Querschnitt
+
+```
+k_t      = 1/(1 + 0.5·h/3)                 h in Metern, immer die ganze Dicke
+M_Riss   = k_t·f_ctm · h²·b/6              ungerissener Bruttoquerschnitt
+M_s,adm  = σ_s,adm · A_s · z  ≥  M_Riss    gerissener Querschnitt
+```
+
+**Zwei verschiedene Querschnitte in einem Nachweis** — und das ist kein
+Versehen, sondern die Frage selbst: das Rissmoment gehört dem Zustand *vor*
+dem Riss, der Widerstand dem Augenblick *danach*. Reicht die Bewehrung für
+das, was der Beton abgibt? Die Stelle ist in der Herleitung mit einem Satz
+erklärt, weil man dort sonst stolpert.
+
+### Der Hebelarm kam nicht aus einem plastischen Ansatz
+
+Naheliegend wäre `A_s·f_yk = x·b·f_cd/2`, dann `M = σ_s,adm·A_s·z`. Das mischt
+aber drei Sicherheitsniveaus (f_yk, f_cd, σ_s,adm), und das `x` gehört zu einer
+Spannung, die gar nicht herrscht. Unmittelbar nach dem Riss ist der Querschnitt
+im **Zustand II**: gerissen, beide Baustoffe elastisch, Gebrauchsspannungen.
+
+Dort hängt `x` überhaupt nicht von der Last ab — alles ist linear, die
+Nulllinie ist eine reine Querschnittseigenschaft:
+
+```
+ρ = n·A_s/b
+x = √(ρ² + 2·d·ρ) − ρ
+z = d − x/3
+```
+
+Das `x/3` ist die Stelle, an der man sich vertut: die Betondruckspannung
+verläuft dreieckig mit dem Maximum an der gedrückten Kante, ihre Resultierende
+liegt also bei `x/3` **von dieser Kante**, nicht bei `2x/3`.
+
+### Kriechen ist immer konservativ — bewiesen, nicht vermutet
+
+`n = (E_s/E_cm)·(1+φ)`; die Klammer ist wesentlich, `E_s/(E_cm·(1+φ))` wäre das
+Gegenteil. Ob ein grösseres φ nun günstig oder ungünstig ist, lässt sich
+ausrechnen statt raten:
+
+```
+dx/dρ = (ρ+d)/√(ρ²+2dρ) − 1 > 0,  denn (ρ+d)² − (ρ²+2dρ) = d² > 0
+```
+
+Grösseres n gibt also immer grösseres x, kleineres z, kleineres `M_s,adm` — für
+**jede** Geometrie. Ein Test rechnet das über drei Bewehrungsgrade und drei
+statische Höhen nach, damit die Aussage nicht an einem Zahlenbeispiel hängt.
+Damit braucht es keine Fallunterscheidung: gerechnet wird mit dem eingegebenen
+φ, Vorgabe 2.0.
+
+### Zustand II als eigener Baustein
+
+`nachweis/zustand2.py` — 80 Zeilen, zwei Funktionen. Der Grund steht im Kopf
+der Datei: die Spannungsbegrenzung unter häufiger Einwirkung braucht dieselbe
+Nulllinie, und zwei Rechenwege für dieselbe Grösse laufen auseinander. Das ist
+in diesem Werkzeug schon zweimal passiert.
+
+### E_cm gab es längst
+
+Ich hatte angefangen, eine Spalte `E_cm` in die Sortentabelle zu schreiben — und
+dabei den bestehenden Kennwert überschrieben. Er wird schon hergeleitet, aus
+`k_e · f_cm^(1/3)`, und steht damit in der Mitschrift. Für C30/37 gibt das
+33 620 N/mm². Die Tabellenspalte ist wieder weg.
+
+### Der Nachweis läuft ohne Schalter
+
+Anders als Duktilität und Zwängung: sprödes Versagen unter Biegung geht jede
+Platte an, unabhängig von Einwirkung und Zwang. Damit gibt es keinen Zustand
+mehr, in dem die Zusammenfassung leer bleibt — vier Zeilen je Platte kommen
+immer.
+
+---
+
 ## 2026-09-18 · Sprödes Versagen unter Zwängung
 
 Der erste der Mindestbewehrungsnachweise. Er fragt nicht nach Tragfähigkeit,

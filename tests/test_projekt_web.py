@@ -23,8 +23,8 @@ class TestProjektBeschreibung(unittest.TestCase):
         self.assertEqual(sorted(aufbau.nachweise), ["q1.x", "q1.y"])
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         self.assertTrue(loesung.vollstaendig)
-        # Drei M-N je Richtung, dazu die beiden Duktilitätsurteile.
-        self.assertEqual(len(loesung.urteile), 8)
+        # 6 x M-N, 2 x Duktilität, 4 x Rissmoment.
+        self.assertEqual(len(loesung.urteile), 12)
 
     def test_hin_und_zurueck(self):
         original = Projekt.beispiel()
@@ -351,8 +351,8 @@ class TestUrteilsraum(unittest.TestCase):
 
         # Beide Platten sind gleich bewehrt, also fällt für beide gleich viel
         # an: je Richtung drei M-N-Urteile, dazu zwei Duktilitätsurteile.
-        self.assertEqual(len(je_platte["querschnitt.q1"]), 8)
-        self.assertEqual(len(je_platte["querschnitt.q2"]), 8)
+        self.assertEqual(len(je_platte["querschnitt.q1"]), 12)
+        self.assertEqual(len(je_platte["querschnitt.q2"]), 12)
         # Und die Namen allein hätten es nicht entschieden -- sie sind gleich.
         self.assertEqual(sorted(je_platte["querschnitt.q1"]),
                          sorted(je_platte["querschnitt.q2"]))
@@ -362,8 +362,8 @@ class TestUrteilsraum(unittest.TestCase):
             "rechnen", {"projekt": self.zweiplattenprojekt().als_dict()})
         raeume = {u["raum"] for u in antwort.daten["urteile"]}
         self.assertTrue(all(r.startswith("querschnitt.q") for r in raeume), raeume)
-        # 2 Platten x (2 Richtungen M-N + 1 Duktilität)
-        self.assertEqual(len(raeume), 6)
+        # 2 Platten x (2 Richtungen M-N + 1 Duktilität + 2 Rissmoment)
+        self.assertEqual(len(raeume), 10)
 
 
 class TestApiAbbildung(unittest.TestCase):
@@ -429,7 +429,7 @@ class TestDienst(unittest.TestCase):
         antwort = dienst.bearbeite("rechnen", self.rumpf())
         self.assertEqual(antwort.status, 200)
         self.assertTrue(antwort.daten["vollstaendig"])
-        self.assertEqual(len(antwort.daten["urteile"]), 8)
+        self.assertEqual(len(antwort.daten["urteile"]), 12)
         self.assertTrue(antwort.daten["alle_nachweise_erfuellt"])
 
     def test_rechnen_mit_einzelziel(self):
@@ -763,7 +763,8 @@ class TestNachweisrichtung(unittest.TestCase):
 
     def projekt_mit(self, *richtungen: str) -> Projekt:
         projekt = Projekt.beispiel()
-        # Die Duktilität hängt nicht an der Tragrichtung -- hier stört sie nur.
+        # Duktilität und Mindestbewehrung hängen nicht an der Tragrichtung der
+        # Einwirkung -- hier zählen nur die M-N-Urteile.
         projekt.querschnitte[0].duktilitaet = [False] * 4
         for eintrag, richtung in zip(projekt.querschnitte[0].kombinationen, richtungen):
             eintrag.richtung = richtung
@@ -771,13 +772,13 @@ class TestNachweisrichtung(unittest.TestCase):
 
     def test_nur_x(self):
         projekt = self.projekt_mit("x", "x", "x")
-        loesung = self._loesen(projekt)
-        self.assertTrue(all("Nachweis x" in u.name for u in loesung.urteile))
-        self.assertEqual(len(loesung.urteile), 3)
+        mn = [u for u in self._loesen(projekt).urteile if u.art == "M-N"]
+        self.assertTrue(all("Nachweis x" in u.name for u in mn))
+        self.assertEqual(len(mn), 3)
 
     def test_getrennt_je_richtung(self):
         projekt = self.projekt_mit("x", "x", "y")
-        namen = [u.name for u in self._loesen(projekt).urteile]
+        namen = [u.name for u in self._loesen(projekt).urteile if u.art == "M-N"]
         self.assertEqual(sum("Nachweis x" in n for n in namen), 2)
         self.assertEqual(sum("Nachweis y" in n for n in namen), 1)
 
@@ -946,7 +947,8 @@ class TestAngabengruppen(unittest.TestCase):
         # Vier Spalten: die fuenfte hiess "Urteil" und sagte neben dem
         # Erfuellungsgrad dasselbe noch einmal.
         self.assertEqual(len(tabelle["kopf"]), 4)
-        self.assertEqual(len(tabelle["zeilen"]), 8)
+        # 6 x M-N, 2 x Duktilität, 4 x Rissmoment.
+        self.assertEqual(len(tabelle["zeilen"]), 12)
         for zeile in tabelle["zeilen"]:
             self.assertEqual(len(zeile["zellen"]), len(tabelle["kopf"]))
             self.assertIn("erfuellt", zeile)
@@ -1033,19 +1035,23 @@ class TestAngabengruppen(unittest.TestCase):
         self.assertIn("100.0", erste[2])          # M_Ed, eine Nachkommastelle
         self.assertRegex(erste[3], r"^\d+\.\d{2}$")  # alpha, zwei
 
-    def test_ohne_nachweise_gibt_es_keine_tabelle(self):
+    def test_ohne_einwirkung_bleibt_die_mindestbewehrung(self):
         """
-        Ohne Schnittgrössen **und** ohne Duktilität bleibt nichts zu zeigen.
+        Ohne Schnittgrössen und ohne Duktilität bleiben die Rissmomente.
 
-        Die Duktilität hängt an der Bewehrung, nicht an der Einwirkung -- sie
-        läuft auch dann, wenn keine Schnittgrösse angegeben ist.
+        Sprödes Versagen unter Biegung geht jede Platte an -- unabhängig von
+        Zwängung und Einwirkung. Eine Bewehrung, die das Rissmoment nicht
+        übernehmen kann, kündigt nichts an.
         """
         projekt = Projekt.beispiel()
         q = projekt.querschnitt("q1")
         q.kombinationen = []
         q.duktilitaet = [False] * 4
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
-        self.assertEqual(antwort.daten["zusammenfassungen"], {})
+        namen = [z["zellen"][0]
+                 for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
+        self.assertTrue(namen)
+        self.assertTrue(all(n.startswith(r"\text{M\_Riss") for n in namen), namen)
 
     def test_die_duktilitaet_laeuft_auch_ohne_schnittgroessen(self):
         projekt = Projekt.beispiel()
@@ -1053,7 +1059,7 @@ class TestAngabengruppen(unittest.TestCase):
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         namen = [z["zellen"][0]
                  for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
-        self.assertEqual(namen, [r"\text{D: 1. Lage}", r"\text{D: 4. Lage}"])
+        self.assertEqual(namen[:2], [r"\text{D: 1. Lage}", r"\text{D: 4. Lage}"])
 
     def test_jede_angabe_behaelt_ihre_wert_id(self):
         """Ohne sie liesse sich im Kasten nichts einzeln hervorheben."""

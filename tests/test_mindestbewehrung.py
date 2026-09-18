@@ -3,7 +3,7 @@
 import math
 import unittest
 
-from opencivil.nachweis import mindestbewehrung
+from opencivil.nachweis import mindestbewehrung, zustand2
 from opencivil.projekt import Projekt
 from opencivil.web import dienst
 
@@ -210,3 +210,188 @@ class TestInDerZusammenfassung(unittest.TestCase):
         self.assertIn("N_{Riss}", zeile["zellen"][2])
         self.assertIn("N_{s,adm,1,x}", zeile["zellen"][1])
         self.assertIn(r"\mathrm{kN}", zeile["zellen"][1])
+
+
+# ===========================================================================
+# Rissmoment
+# ===========================================================================
+
+
+class TestZustand2(unittest.TestCase):
+    """Der gerissene Querschnitt für sich."""
+
+    def test_wertigkeit_von_hand(self):
+        """
+        n = (E_s/E_cm)·(1+φ) = (200000/33620)·3 = 17.85
+
+        Die Klammer ist wesentlich: E_s/(E_cm·(1+φ)) wäre das Gegenteil.
+        """
+        n = zustand2.wertigkeit(E_s=200e9, E_cm=33.62e9, phi=2.0)
+        self.assertAlmostEqual(n, 17.85, delta=0.02)
+
+    def test_nulllinie_von_hand(self):
+        """
+        n = 17.846, A_s = 2450 mm², b = 1000 mm, d = 260.1 mm:
+
+            ρ = 17.846·2450e-6/1.0 = 43.72 mm
+            x = √(43.72² + 2·260.1·43.72) − 43.72 = 113.3 mm
+            z = 260.1 − 113.3/3 = 222.3 mm
+        """
+        z2 = zustand2.gerissen(n=17.846, a_s=2450e-6, b=1.0, d=0.2601)
+        self.assertAlmostEqual(z2.x * 1e3, 113.3, delta=0.2)
+        self.assertAlmostEqual(z2.z * 1e3, 222.3, delta=0.2)
+
+    def test_die_nulllinie_erfuellt_das_erste_moment(self):
+        """b·x²/2 = n·A_s·(d − x) -- die Bedingung, aus der x kommt."""
+        n, a_s, b, d = 17.846, 2450e-6, 1.0, 0.2601
+        x = zustand2.gerissen(n=n, a_s=a_s, b=b, d=d).x
+        self.assertAlmostEqual(b * x * x / 2.0, n * a_s * (d - x), places=9)
+
+    def test_kriechen_ist_immer_konservativ(self):
+        """
+        dx/dρ > 0, also senkt ein grösseres φ den Hebelarm -- für jede
+        Geometrie. Nachgerechnet über einen weiten Bereich, damit die Aussage
+        nicht an einem Zahlenbeispiel hängt.
+        """
+        for a_s in (200e-6, 1000e-6, 5000e-6):
+            for d in (0.05, 0.26, 0.9):
+                with self.subTest(a_s=a_s, d=d):
+                    ohne = zustand2.gerissen(
+                        n=zustand2.wertigkeit(E_s=200e9, E_cm=33.62e9, phi=0.0),
+                        a_s=a_s, b=1.0, d=d)
+                    mit = zustand2.gerissen(
+                        n=zustand2.wertigkeit(E_s=200e9, E_cm=33.62e9, phi=2.0),
+                        a_s=a_s, b=1.0, d=d)
+                    self.assertGreater(mit.x, ohne.x)
+                    self.assertLess(mit.z, ohne.z)
+
+    def test_ohne_bewehrung_gibt_es_keine_nulllinie(self):
+        with self.assertRaises(ValueError):
+            zustand2.gerissen(n=17.8, a_s=0.0, b=1.0, d=0.26)
+
+
+class TestRissmomentGroessen(unittest.TestCase):
+    def test_von_hand(self):
+        """
+        h = 300 mm, f_ctm = 2.9 N/mm²:
+
+            k_t      = 1/(1 + 0.5·0.300/3) = 0.9524
+            f_ct,eff = 2.762 N/mm²
+            M_Riss   = 2.762 · 300²·1000/6 = 41.4 kNm
+        """
+        g = mindestbewehrung.rissmoment(h=0.300, b=1.0, f_ctm=2.9e6)
+        self.assertAlmostEqual(g.k_t, 0.9524, places=4)
+        self.assertAlmostEqual(g.f_ct_eff / 1e6, 2.762, places=3)
+        self.assertAlmostEqual(g.M_Riss / 1e3, 41.4, delta=0.1)
+
+    def test_der_teiler_unterscheidet_sich_vom_zwang(self):
+        """
+        Unter Biegung reisst nur der Randbereich, unter Zwang die halbe Höhe --
+        darum h/3 statt h. Das Rissmoment ist damit weniger abgemindert.
+        """
+        biegung = mindestbewehrung.rissmoment(h=0.800, b=1.0, f_ctm=2.9e6)
+        zwang = mindestbewehrung.rissnormalkraft(
+            h=0.800, b=1.0, f_ctm=2.9e6, begrenzt=False)
+        self.assertGreater(biegung.k_t, zwang.k_t)
+
+    def test_die_dicke_geht_ungekuerzt_ein(self):
+        """Die 500-mm-Grenze gilt nur für die Zwängung."""
+        g = mindestbewehrung.rissmoment(h=0.800, b=1.0, f_ctm=2.9e6)
+        # M_Riss waechst mit h^2 -- bei 500 mm waere es weniger als die Haelfte.
+        self.assertGreater(g.M_Riss,
+                           mindestbewehrung.rissmoment(
+                               h=0.500, b=1.0, f_ctm=2.9e6).M_Riss * 2.0)
+
+
+class TestRissmomentNachweis(unittest.TestCase):
+    def test_erste_lage_von_hand(self):
+        """
+        1. Lage x, φ = 2, normale Anforderung:
+
+            n       = 17.85
+            x       = 113.3 mm,  z = 222.3 mm
+            M_s,adm = 500 · 2450 · 222.3 = 272.3 kNm
+            M_Riss  = 41.4 kNm
+            α       = 6.58
+        """
+        aufbau, _ = urteile(Projekt.beispiel())
+        erg = aufbau.rissmoment["q1.x"].ergebnisse[0]
+        self.assertEqual(erg.lage.nummer, 1)
+        self.assertAlmostEqual(erg.n, 17.85, delta=0.02)
+        self.assertAlmostEqual(erg.x * 1e3, 113.3, delta=0.3)
+        self.assertAlmostEqual(erg.hebelarm * 1e3, 222.3, delta=0.3)
+        self.assertAlmostEqual(erg.M_s_adm / 1e3, 272.3, delta=0.5)
+        self.assertAlmostEqual(erg.erfuellungsgrad, 6.58, delta=0.03)
+        self.assertTrue(erg.erfuellt)
+
+    def test_er_laeuft_immer(self):
+        """
+        Sprödes Versagen unter Biegung geht jede Platte an -- ohne Zwängung,
+        ohne Schnittgrössen, ohne Duktilität.
+        """
+        projekt = Projekt.beispiel()
+        q = projekt.querschnitte[0]
+        q.kombinationen = []
+        q.duktilitaet = [False] * 4
+        q.zwaengung_x = q.zwaengung_y = False
+        aufbau, gefunden = urteile(projekt)
+        self.assertEqual(sorted(aufbau.rissmoment), ["q1.x", "q1.y"])
+        self.assertEqual(
+            len([n for n in gefunden if n.startswith("Rissmoment")]), 4)
+
+    def test_bei_den_oberen_lagen_wird_von_unten_gemessen(self):
+        aufbau, _ = urteile(Projekt.beispiel())
+        nach_lage = {e.lage.nummer: e for e in aufbau.rissmoment["q1.x"].ergebnisse}
+        h = 0.300
+        self.assertAlmostEqual(nach_lage[1].d, nach_lage[1].z_s)
+        self.assertAlmostEqual(nach_lage[4].d, h - nach_lage[4].z_s)
+
+    def test_kriechen_macht_den_nachweis_schwerer(self):
+        """Der Hebelarm schrumpft -- φ > 0 liegt auf der sicheren Seite."""
+        ohne = Projekt.beispiel()
+        ohne.querschnitte[0].kriechzahl = 0.0
+        mit = Projekt.beispiel()
+        mit.querschnitte[0].kriechzahl = 2.0
+
+        a, _ = urteile(ohne)
+        b, _ = urteile(mit)
+        trocken = a.rissmoment["q1.x"].ergebnisse[0]
+        kriechend = b.rissmoment["q1.x"].ergebnisse[0]
+
+        self.assertLess(trocken.x, kriechend.x)
+        self.assertGreater(trocken.hebelarm, kriechend.hebelarm)
+        self.assertGreater(trocken.erfuellungsgrad, kriechend.erfuellungsgrad)
+
+    def test_eine_leere_lage_ist_nicht_machbar(self):
+        projekt = Projekt.beispiel()
+        projekt.querschnitte[0].lagen[3].grund.durchmesser = 0.0
+        projekt.querschnitte[0].lagen[3].zulage.durchmesser = 0.0
+        _, gefunden = urteile(projekt)
+        urteil = gefunden["Rissmoment x – 4. Lage"]
+        self.assertFalse(urteil.erfuellt)
+        self.assertIn("nicht machbar", urteil.hinweis)
+        self.assertIsNone(urteil.einwirkung)
+
+    def test_zu_wenig_bewehrung_faellt_durch(self):
+        projekt = Projekt.beispiel()
+        lage = projekt.querschnitte[0].lagen[3]
+        lage.grund.durchmesser = 6.0
+        lage.grund.abstand = 300.0
+        lage.zulage.durchmesser = 0.0
+        projekt.querschnitte[0].h = 600.0
+        _, gefunden = urteile(projekt)
+        self.assertFalse(gefunden["Rissmoment x – 4. Lage"].erfuellt)
+
+    def test_die_herleitung_zeigt_beide_querschnitte(self):
+        from opencivil.core.protokoll import GleichungBlock
+
+        aufbau = Projekt.beispiel().aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        titel = [b.titel for b in loesung.protokoll.alle_bloecke()
+                 if isinstance(b, GleichungBlock)]
+        for erwartet in ("Rissmoment des ungerissenen Querschnitts",
+                         "Wertigkeit im gerissenen Zustand",
+                         "Nulllinie des gerissenen Querschnitts",
+                         "Innerer Hebelarm",
+                         "Aufnehmbares Moment der Bewehrung"):
+            self.assertIn(erwartet, titel)

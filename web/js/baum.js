@@ -172,7 +172,7 @@ function platteAnlegen() {
       duktilitaet: [true, false, false, true],
       // Eine Zwängung ist eine Annahme über das Tragwerk, keine Eigenschaft
       // der Platte -- wer sie braucht, schaltet sie ein.
-      rissanforderung: 'normal',
+      rissanforderung: 'normal', kriechzahl: 2.0,
       zwaengung_x: false, zwaengung_y: false, zwaengung_begrenzt: false,
       haeufige_aus_tragsicherheit: true, haeufige: [],
       // 'automatisch': beide Massstäbe werden gerechnet, massgebend ist der

@@ -25,6 +25,7 @@
     "opencivil/nachweis/linie.py",
     "opencivil/nachweis/mindestbewehrung.py",
     "opencivil/nachweis/querkraft.py",
+    "opencivil/nachweis/zustand2.py",
     "opencivil/projekt.py",
     "opencivil/querschnitt/__init__.py",
     "opencivil/querschnitt/platte.py",

@@ -213,8 +213,10 @@ class TestInDerZusammenfassung(unittest.TestCase):
             "rechnen", {"projekt": Projekt.beispiel().als_dict()})
         namen = [z["zellen"][0]
                  for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
-        self.assertEqual(namen[-2:], [r"\text{D: 1. Lage}", r"\text{D: 4. Lage}"])
-        self.assertTrue(all(n.startswith(r"\text{M-N") for n in namen[:-2]))
+        # Erst die Tragsicherheit, dann die Duktilität, dann die Mindestbewehrung.
+        self.assertTrue(all(n.startswith(r"\text{M-N") for n in namen[:6]))
+        self.assertEqual(namen[6:8], [r"\text{D: 1. Lage}", r"\text{D: 4. Lage}"])
+        self.assertTrue(all(n.startswith(r"\text{M\_Riss") for n in namen[8:]))
 
     def test_eine_unbewehrte_lage_meldet_sich_sichtbar(self):
         projekt = projekt_mit((True, True, False, True))

@@ -38,11 +38,11 @@ from opencivil.nachweis.biegung_normalkraft import (
 )
 from opencivil.nachweis.duktilitaet import Duktilitaet
 from opencivil.nachweis.fehlende_bewehrung import Ausgefallen, FehlendeBewehrung
-from opencivil.nachweis.mindestbewehrung import Rissnormalkraft
+from opencivil.nachweis.mindestbewehrung import Rissmoment, Rissnormalkraft
 from opencivil.nachweis.querkraft import Querkraft, Querkraftfall
 from opencivil.querschnitt.platte import (
-    ALPHA_MAX, ALPHA_MIN, K_C, LAGENZAHL, Bewehrungslage, Bewehrungsposten,
-    Plattenquerschnitt, Querkraftbewehrung, Richtung,
+    ALPHA_MAX, ALPHA_MIN, K_C, KRIECHZAHL, LAGENZAHL, Bewehrungslage,
+    Bewehrungsposten, Plattenquerschnitt, Querkraftbewehrung, Richtung,
 )
 
 
@@ -427,6 +427,7 @@ RISSANFORDERUNGEN: Dict[str, str] = {
 HAEUFIG_ANTEIL = 0.70
 
 
+
 @dataclass
 class HaeufigEintrag:
     """
@@ -561,6 +562,15 @@ class QuerschnittEintrag:
     rissanforderung: str = "normal"
     """Anforderung an die Rissbildung -- ``normal``, ``erhoeht`` oder ``hoch``."""
 
+    kriechzahl: float = KRIECHZAHL
+    """
+    Kriechzahl phi fuer den gerissenen Zustand.
+
+    Geht ueber ``n = (E_s/E_cm)*(1+phi)`` in den Hebelarm ein. Ein groesseres
+    phi ist dabei **immer** der konservative Fall: die Nulllinie rutscht
+    tiefer, der Hebelarm schrumpft, der aufnehmbare Moment sinkt.
+    """
+
     zwaengung_x: bool = False
     zwaengung_y: bool = False
     """
@@ -627,6 +637,7 @@ class QuerschnittEintrag:
             "querkraftbewehrung": self.querkraftbewehrung.als_dict(),
             "duktilitaet": list(self.duktilitaet),
             "rissanforderung": self.rissanforderung,
+            "kriechzahl": self.kriechzahl,
             "zwaengung_x": self.zwaengung_x,
             "zwaengung_y": self.zwaengung_y,
             "zwaengung_begrenzt": self.zwaengung_begrenzt,
@@ -659,6 +670,7 @@ class QuerschnittEintrag:
                 d.get("querkraftbewehrung") or {}),
             duktilitaet=_duktilitaet_aus(d.get("duktilitaet")),
             rissanforderung=_rissanforderung_aus(d.get("rissanforderung")),
+            kriechzahl=_zahl(d, "kriechzahl", KRIECHZAHL),
             zwaengung_x=bool(d.get("zwaengung_x", False)),
             zwaengung_y=bool(d.get("zwaengung_y", False)),
             zwaengung_begrenzt=bool(d.get("zwaengung_begrenzt", False)),
@@ -695,6 +707,9 @@ class Aufbau:
     rissnormalkraft: Dict[str, Rissnormalkraft] = field(default_factory=dict)
     """Schluessel ist ``<querschnitt>.<richtung>`` -- nur wo Zwaengung gilt."""
 
+    rissmoment: Dict[str, Rissmoment] = field(default_factory=dict)
+    """Schluessel ist ``<querschnitt>.<richtung>``; laeuft immer."""
+
     fehlende: Dict[str, FehlendeBewehrung] = field(default_factory=dict)
     """
     Je Richtung ohne Bewehrung, fuer die dennoch Einwirkungen angegeben sind.
@@ -713,7 +728,9 @@ class Aufbau:
                 + [d.id for f in self.fehlende.values()
                    for d in f.d_ausnutzung.values()]
                 + [d.id for z in self.rissnormalkraft.values()
-                   for d in z.d_ausnutzung.values()])
+                   for d in z.d_ausnutzung.values()]
+                + [d.id for m in self.rissmoment.values()
+                   for d in m.d_ausnutzung.values()])
 
     def eckwertziele(self) -> List[str]:
         return [d.id for n in self.nachweise.values() for d in n.d_eckwerte.values()]
@@ -859,6 +876,17 @@ class Projekt:
             # Die Zwaengung haengt an der Bewehrung, nicht an den
             # Schnittgroessen -- wie die Duktilitaet laeuft sie auch ohne
             # Einwirkung.
+            # Sproedes Versagen unter Biegung geht jede Platte an, unabhaengig
+            # von Zwaengung und Schnittgroessen: eine Bewehrung, die das
+            # Rissmoment nicht uebernehmen kann, kuendigt nichts an.
+            for richtung in Richtung:
+                biegung = Rissmoment(
+                    querschnitt, richtung,
+                    anforderung=eintrag.rissanforderung,
+                    kriechzahl=eintrag.kriechzahl)
+                werk.registriere(biegung)
+                aufbau.rissmoment[f"{eintrag.kennung}.{richtung.value}"] = biegung
+
             for richtung, an in ((Richtung.X, eintrag.zwaengung_x),
                                  (Richtung.Y, eintrag.zwaengung_y)):
                 if not an:
@@ -1013,6 +1041,7 @@ class Projekt:
             d_max=Groesse(eintrag.d_max, MM),
             einlagenhoehe=Groesse(eintrag.einlagenhoehe, MM),
             k_c=Groesse(eintrag.k_c, EINHEITSLOS),
+            kriechzahl=Groesse(eintrag.kriechzahl, EINHEITSLOS),
             querkraftbewehrung=(buegel.als_bewehrung(buegelstahl)
                                 if buegel.vorhanden else None),
             praefix=f"querschnitt.{eintrag.kennung}",

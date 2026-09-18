@@ -38,17 +38,30 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
       `SIA 262:2025, 4.1.4.2.5` stehen nach Vorgabe da, nachgeschlagen ist
       keines von beiden.
 
-- [ ] **Der Mindestbewehrungsnachweis ist erst zur Hälfte da.** Die
-      Rissnormalkraft wird gerechnet; es fehlen der Nachweis gegen das
-      Rissmoment und die Spannungsbegrenzung unter häufiger Einwirkung. Für
-      beide braucht es die Stahlspannung im gerissenen Querschnitt
-      (Zustand II) und damit `n = (E_s/E_c)·(1+φ)` — die Kriechzahl φ ist noch
-      keine Eingabe.
-- [ ] Die Zahlen des Rissnachweises sind ungeprüft wie alle anderen: `k_t`,
-      die 500-mm-Grenze, `w_nom = 0.5/0.2 mm` und die Wurzelformel für
+- [ ] **Es fehlt die Spannungsbegrenzung unter häufiger Einwirkung.** Die
+      häufigen Lastfälle lassen sich eingeben (auch als 70 % der
+      Tragsicherheitsfälle), gerechnet wird damit noch nichts. Die Nulllinie
+      dafür steht in `nachweis/zustand2.py` bereit; gebraucht wird zusätzlich
+      die Stahlspannung unter *gegebenem* M und N, also der Fall mit
+      Normalkraft — der ist nicht geschlossen lösbar und braucht eine
+      Nullstellensuche über x.
+- [ ] Der Rissmomentnachweis läuft ohne Schalter, für jede Platte und beide
+      Richtungen. Falls er abschaltbar sein soll, braucht es einen Toggle wie
+      bei Duktilität und Zwängung.
+- [ ] Die Zahlen der Rissnachweise sind ungeprüft wie alle anderen: beide `k_t`,
+      die 500-mm-Grenze, `h/3`, `w_nom = 0.5/0.2 mm` und die Wurzelformel für
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Sprödes Versagen unter Biegung: `M_s,adm = σ_s,adm·A_s·z ≥ M_Riss`, der
+Hebelarm aus dem gerissenen Querschnitt (Zustand II) statt aus einem
+plastischen Ansatz — dort hängt `x` nicht von der Last ab, ist also eine reine
+Querschnittseigenschaft. Kriechen über `n = (E_s/E_cm)·(1+φ)` mit φ als
+Eingabe; dass ein grösseres φ immer konservativ ist, ist bewiesen und nicht
+vermutet · Der gerissene Querschnitt als eigener Baustein
+(`nachweis/zustand2.py`), damit die spätere Spannungsbegrenzung dieselbe
+Nulllinie benutzt ·
 
 Sprödes Versagen unter Normalkraft-Zwängung: `N_s,adm = A_s·σ_s,adm ≥ N_Riss`,
 je Tragrichtung für die untere und die obere Lage, mit `σ_s,adm` aus der

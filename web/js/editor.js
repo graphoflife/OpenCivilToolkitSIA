@@ -682,6 +682,12 @@ function plattenEditor(querschnitt) {
           titel: 'Verringert d_v, sofern h/6 < e < d',
           beiAenderung: (v) => aendern((q) => { q.einlagenhoehe = v ?? 0; }),
         }), 'mm'),
+        feld(['Kriechzahl ', span(String.raw`\varphi`)], zahlfeld({
+          wert: querschnitt.kriechzahl ?? 2.0, schritt: 0.1, min: 0,
+          titel: 'Geht über n = (E_s/E_cm)·(1+φ) in den gerissenen Zustand ein. '
+               + 'Ein grösseres φ senkt den Hebelarm und liegt auf der sicheren Seite.',
+          beiAenderung: (v) => aendern((q) => { q.kriechzahl = v ?? 2.0; }),
+        }), '', 'Kriechzahl φ für den gerissenen Zustand'),
         feld('Rissanforderung', auswahl({
           werte: (zustand.katalog.rissanforderungen || []).map((r) => ({
             wert: r.wert, beschriftung: r.beschriftung,
