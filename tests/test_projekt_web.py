@@ -1400,24 +1400,23 @@ class TestMindestbewehrungsEingaben(unittest.TestCase):
         self.assertEqual([s["beschriftung"] for s in stufen],
                          ["Normal", "Erhöht", "Hoch"])
 
-    def test_die_haeufigen_lastfaelle_aendern_noch_nichts(self):
+    def test_eigene_lastfaelle_ersetzen_die_ableitung(self):
         """
-        Solange kein Nachweis sie liest, dürfen sie nichts verschieben.
-
-        Die Zwängung ist davon ausgenommen -- sie wird gerechnet, siehe
-        test_mindestbewehrung.
+        Die häufigen Lastfälle werden gerechnet -- aber nur bei erhöhter oder
+        hoher Anforderung. Bei normaler steht in Tabelle 17 ein Strich.
         """
         from opencivil.projekt import HaeufigEintrag
 
         ohne = dienst.bearbeite(
             "rechnen", {"projekt": Projekt.beispiel().als_dict()})
+        self.assertFalse([u for u in ohne.daten["urteile"]
+                          if u["art"] == "σ_s"])
+
         projekt = Projekt.beispiel()
         q = projekt.querschnitt("q1")
         q.rissanforderung = "hoch"
         q.haeufige_aus_tragsicherheit = False
         q.haeufige = [HaeufigEintrag("Gebrauch", M_Ed=70.0)]
         mit = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
-        self.assertEqual([u["name"] for u in mit.daten["urteile"]],
-                         [u["name"] for u in ohne.daten["urteile"]])
-        self.assertEqual(mit.daten["alle_nachweise_erfuellt"],
-                         ohne.daten["alle_nachweise_erfuellt"])
+        namen = [u["fall"] for u in mit.daten["urteile"] if u["art"] == "σ_s"]
+        self.assertEqual(namen, ["Gebrauch", "Gebrauch"])   # x und y

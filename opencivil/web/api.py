@@ -235,6 +235,8 @@ def loesung_dict(
                 # Namensraum des Nachweises -- danach gruppiert die Oberflaeche
                 # die Zusammenfassung nach Platten.
                 "raum": u.raum,
+                "art": u.art,
+                "fall": u.fall,
                 "erfuellt": u.erfuellt,
                 # Einzige Kennzahl: Widerstand/Einwirkung, ab 1 erfuellt.
                 "erfuellungsgrad": u.erfuellungsgrad.formatiert(2),

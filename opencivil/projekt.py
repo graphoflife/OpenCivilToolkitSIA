@@ -28,7 +28,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
-from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, KN_PRO_M, MM, Groesse
+from opencivil.core.einheiten import (
+    EINHEITSLOS, KN, KNM, KN_PRO_M, M, MM, Groesse,
+)
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.material.basis import Baustoff
 from opencivil.material.beton import BETONSORTEN, beton
@@ -37,8 +39,12 @@ from opencivil.nachweis.biegung_normalkraft import (
     BiegungNormalkraft, Erfuellungsart, Schnittgroessen,
 )
 from opencivil.nachweis.duktilitaet import Duktilitaet
+from opencivil.nachweis.knicken import Knickfall, Knicken
 from opencivil.nachweis.fehlende_bewehrung import Ausgefallen, FehlendeBewehrung
 from opencivil.nachweis.mindestbewehrung import Rissnormalkraft, ZwaengungBiegung
+from opencivil.nachweis.spannungsbegrenzung import (
+    GEFORDERT, Haeufigerfall, Spannungsbegrenzung,
+)
 from opencivil.nachweis.sproedes_versagen import SproedesVersagen
 from opencivil.nachweis.querkraft import Querkraft, Querkraftfall
 from opencivil.querschnitt.platte import (
@@ -424,6 +430,41 @@ class QuerkraftbewehrungEintrag:
         )
 
 
+@dataclass
+class KnickEintrag:
+    """
+    Ein Knicknachweis: Druckkraft, Moment 1. Ordnung, Laenge, Knicklaenge.
+
+    Nur in x-Richtung -- eine Knicklaenge gehoert zu einer Tragrichtung, und
+    in y waere die Breite der Platte die Laenge.
+    """
+
+    name: str
+    N_Ed: float = 0.0
+    """in kN, Druck negativ."""
+
+    M_Ed_1: float = 0.0
+    laenge: float = 3.0
+    """Systemlaenge in m -- geht in die Schiefstellung ein."""
+
+    knicklaenge: float = 3.0
+    """Knicklaenge in m."""
+
+    def als_dict(self) -> dict:
+        return {"name": self.name, "N_Ed": self.N_Ed, "M_Ed_1": self.M_Ed_1,
+                "laenge": self.laenge, "knicklaenge": self.knicklaenge}
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any]) -> "KnickEintrag":
+        return cls(
+            name=_pflichtfeld(d, "name", "Ein Knicknachweis"),
+            N_Ed=_zahl(d, "N_Ed", 0.0),
+            M_Ed_1=_zahl(d, "M_Ed_1", 0.0),
+            laenge=_zahl(d, "laenge", 3.0),
+            knicklaenge=_zahl(d, "knicklaenge", 3.0),
+        )
+
+
 #: Wahl der Tragrichtung einer Schnittgroessenkombination.
 BEIDE_RICHTUNGEN = "beide"
 
@@ -601,6 +642,9 @@ class QuerschnittEintrag:
     haeufige: List[HaeufigEintrag] = field(default_factory=list)
     """Eigene haeufige Lastfaelle; leer, solange die 70-%-Regel gilt."""
 
+    knickfaelle: List[KnickEintrag] = field(default_factory=list)
+    """Knicknachweise; leer heisst: keiner."""
+
     haeufige_aus_tragsicherheit: bool = True
     """
     Ob die haeufigen Lastfaelle aus den Tragsicherheitsfaellen abgeleitet
@@ -670,6 +714,7 @@ class QuerschnittEintrag:
             "zwaengung_begrenzt": self.zwaengung_begrenzt,
             "haeufige_aus_tragsicherheit": self.haeufige_aus_tragsicherheit,
             "haeufige": [h.als_dict() for h in self.haeufige],
+            "knickfaelle": [k.als_dict() for k in self.knickfaelle],
             "richtung_lage1": self.richtung_lage1,
             "richtung_lage4": self.richtung_lage4,
             "lagen": [l.als_dict() for l in self.lagen],
@@ -707,6 +752,8 @@ class QuerschnittEintrag:
             haeufige_aus_tragsicherheit=bool(
                 d.get("haeufige_aus_tragsicherheit", True)),
             haeufige=[HaeufigEintrag.aus_dict(x) for x in (d.get("haeufige") or [])],
+            knickfaelle=[KnickEintrag.aus_dict(x)
+                         for x in (d.get("knickfaelle") or [])],
             richtung_lage1=str(d.get("richtung_lage1") or "x"),
             richtung_lage4=str(d.get("richtung_lage4") or "x"),
             lagen=[LageEintrag.aus_dict(x) for x in (lagen or [])],
@@ -743,6 +790,12 @@ class Aufbau:
     zwaengung_biegung: Dict[str, ZwaengungBiegung] = field(default_factory=dict)
     """Zwaengung auf Biegung, je ``<querschnitt>.<richtung>``."""
 
+    spannung: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)
+    """Stahlspannung unter haeufiger Einwirkung, je ``<querschnitt>.<richtung>``."""
+
+    knicken: Dict[str, Knicken] = field(default_factory=dict)
+    """Nachweis am verformten System, je Querschnitt -- nur in x-Richtung."""
+
     fehlende: Dict[str, FehlendeBewehrung] = field(default_factory=dict)
     """
     Je Richtung ohne Bewehrung, fuer die dennoch Einwirkungen angegeben sind.
@@ -765,7 +818,11 @@ class Aufbau:
                 + [d.id for s in self.sproede.values()
                    for d in s.d_ausnutzung.values()]
                 + [d.id for m in self.zwaengung_biegung.values()
-                   for d in m.d_ausnutzung.values()])
+                   for d in m.d_ausnutzung.values()]
+                + [d.id for s in self.spannung.values()
+                   for d in s.d_ausnutzung.values()]
+                + [d.id for k in self.knicken.values()
+                   for d in k.d_ausnutzung.values()])
 
     def eckwertziele(self) -> List[str]:
         return [d.id for n in self.nachweise.values() for d in n.d_eckwerte.values()]
@@ -955,6 +1012,16 @@ class Projekt:
                     aufbau.zwaengung_biegung[
                         f"{eintrag.kennung}.{richtung.value}"] = biegung
 
+                # Stahlspannung unter haeufiger Einwirkung. Nur bei erhoehter
+                # und hoher Anforderung -- bei normaler steht in Tabelle 17
+                # ein Strich.
+                haeufige = self._haeufige(eintrag, richtung)
+                if haeufige and eintrag.rissanforderung in GEFORDERT:
+                    spannung = Spannungsbegrenzung(querschnitt, richtung, haeufige)
+                    werk.registriere(spannung)
+                    aufbau.spannung[
+                        f"{eintrag.kennung}.{richtung.value}"] = spannung
+
                 mit_querkraft = [k for k in passend if k.V_Ed]
                 if mit_querkraft:
                     querkraft = Querkraft(
@@ -967,6 +1034,27 @@ class Projekt:
                         richtung, nachweis)
                     werk.registriere(querkraft)
                     aufbau.querkraft[f"{eintrag.kennung}.{richtung.value}"] = querkraft
+
+            # Knicken haengt an der Knicklaenge und damit an einer
+            # Tragrichtung -- gerechnet wird nur in x.
+            if eintrag.knickfaelle:
+                mn_x = aufbau.nachweise.get(f"{eintrag.kennung}.x")
+                if mn_x is not None:
+                    knick = Knicken(
+                        querschnitt,
+                        [Knickfall(name=k.name,
+                                   N_Ed=Groesse(k.N_Ed, KN),
+                                   M_Ed_1=Groesse(k.M_Ed_1, KNM),
+                                   laenge=Groesse(k.laenge, M),
+                                   knicklaenge=Groesse(k.knicklaenge, M))
+                         for k in eintrag.knickfaelle],
+                        mn_x)
+                    werk.registriere(knick)
+                    aufbau.knicken[eintrag.kennung] = knick
+                else:
+                    aufbau.warnungen.append(
+                        f"Platte '{eintrag.name}': Knicken braucht Bewehrung in "
+                        f"x-Richtung; ohne sie entfällt der Nachweis.")
 
             # Zwaengung auf Normalkraft: je Richtung, wenn eingeschaltet.
             for richtung, an in ((Richtung.X, eintrag.zwaengung_x),
@@ -1095,6 +1183,30 @@ class Projekt:
                                 if buegel.vorhanden else None),
             praefix=f"querschnitt.{eintrag.kennung}",
         )
+
+    def _haeufige(self, eintrag: "QuerschnittEintrag",
+                  richtung: Richtung) -> List[Haeufigerfall]:
+        """
+        Die haeufigen Lastfaelle dieser Richtung.
+
+        Entweder die eigens angegebenen oder -- wenn die Ableitung gilt -- die
+        Tragsicherheitsfaelle mit :data:`HAEUFIG_ANTEIL`. Die Rechnung steht
+        hier und nicht in der Oberflaeche: dort waere sie eine zweite Wahrheit.
+        """
+        if eintrag.haeufige_aus_tragsicherheit:
+            return [
+                Haeufigerfall(
+                    name=f"{k.name} ({HAEUFIG_ANTEIL * 100:.0f} %)",
+                    M_Ed=Groesse(HAEUFIG_ANTEIL * k.M_Ed, KNM),
+                    N_Ed=Groesse(HAEUFIG_ANTEIL * k.N_Ed, KN))
+                for k in eintrag.kombinationen if k.gilt_fuer(richtung)
+            ]
+        return [
+            Haeufigerfall(name=h.name,
+                          M_Ed=Groesse(h.M_Ed, KNM),
+                          N_Ed=Groesse(h.N_Ed, KN))
+            for h in eintrag.haeufige if h.gilt_fuer(richtung)
+        ]
 
     def _ausgefallene(
         self, kombinationen: Sequence[KombinationEintrag], richtung: Richtung
