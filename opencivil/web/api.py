@@ -17,7 +17,7 @@ import math
 from typing import Any, Dict, List, Optional, Sequence
 
 from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM, Groesse
-from opencivil.querschnitt.platte import BREITE_Y_MM
+from opencivil.querschnitt.platte import BREITE_Y_MM, Richtung
 from opencivil.core.latex import als_text, tabelle, text_latex
 from opencivil.core.protokoll import (
     Block, GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, TextBlock,
@@ -261,7 +261,7 @@ def loesung_dict(
     }
     if aufbau is not None:
         ergebnis["linien"] = {
-            kennung: _linie_dict(nachweis)
+            kennung: _linie_dict(nachweis, aufbau)
             for kennung, nachweis in aufbau.nachweise.items()
             if nachweis.linie
         }
@@ -559,7 +559,42 @@ def _stahlkurve(stoff, wert) -> Optional[dict]:
     }
 
 
-def _linie_dict(nachweis) -> dict:
+def _knickpunkte(aufbau, nachweis) -> list:
+    """
+    Die Knicknachweise als Punktepaare fuer das M-N-Diagramm.
+
+    Zu jedem Fall zwei Punkte auf derselben Hoehe N_Ed: das Moment 1. Ordnung
+    und das am verformten System. Die Strecke dazwischen ist der Zuwachs aus
+    Schiefstellung und Verformung -- im Diagramm sieht man sofort, ob er den
+    Punkt ueber die Linie schiebt.
+
+    Nur in x-Richtung, denn nur dort gibt es einen Knicknachweis.
+    """
+    if nachweis.richtung is not Richtung.X:
+        return []
+    kennung = nachweis.querschnitt.id.rsplit(".", 1)[-1]
+    knicken = (aufbau.knicken or {}).get(kennung)
+    if knicken is None:
+        return []
+    punkte = []
+    for erg in knicken.ergebnisse:
+        if erg.fall.N_Ed.si >= 0.0:
+            continue
+        punkte.append({
+            "name": erg.fall.name,
+            "N_Ed": erg.fall.N_Ed.in_einheit(KN),
+            "M_Ed_1": abs(erg.fall.M_Ed_1.in_einheit(KNM)),
+            "M_Ed_II": abs(erg.M_ges) / 1e3,
+            "N_Rd": erg.N_Rd / 1e3,
+            "erfuellungsgrad": erg.erfuellungsgrad,
+            "erfuellt": erg.erfuellt,
+            "stabil": erg.stabil,
+            "begruendung": erg.begruendung,
+        })
+    return punkte
+
+
+def _linie_dict(nachweis, aufbau=None) -> dict:
     """
     Die M-N-Interaktionslinien zum Zeichnen -- in kN und kNm.
 
@@ -600,6 +635,9 @@ def _linie_dict(nachweis) -> dict:
             }
             for a in nachweis.auswertungen
         ],
+        # Die Knickfaelle gehoeren in dasselbe Bild: sie tragen dieselbe
+        # Normalkraft gegen dieselbe Linie, nur mit einem groesseren Moment.
+        "knickfaelle": _knickpunkte(aufbau, nachweis) if aufbau else [],
     }
 
 

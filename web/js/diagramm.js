@@ -325,6 +325,11 @@ export function diagrammZeichnen(linie) {
   const alleM = [...punkte, ...hand].map((p) => p.M);
   const alleN = [...punkte, ...hand].map((p) => p.N);
   for (const k of linie.kombinationen) { alleM.push(k.M_Ed); alleN.push(k.N_Ed); }
+  // Auch die Knickpunkte: sonst liegt der mit dem grössten Moment zweiter
+  // Ordnung ausserhalb des gezeichneten Bereichs.
+  for (const k of (linie.knickfaelle || [])) {
+    alleM.push(k.M_Ed_1, k.M_Ed_II); alleN.push(k.N_Ed);
+  }
 
   const spielraum = 0.08;
   const mSpanne = (Math.max(...alleM) - Math.min(...alleM)) || 1;
@@ -452,6 +457,49 @@ export function diagrammZeichnen(linie) {
     });
     beschriftung.textContent = k.name;
     svg.append(beschriftung);
+  }
+
+  // -- Knicknachweise ------------------------------------------------------
+  // Zwei Punkte auf derselben Höhe: das Moment 1. Ordnung und das am
+  // verformten System. Die Strecke dazwischen ist der Zuwachs aus
+  // Schiefstellung und Verformung -- man sieht auf einen Blick, ob er den
+  // Punkt über die Linie schiebt.
+  for (const k of (linie.knickfaelle || [])) {
+    const farbe = k.erfuellt ? '#1a7f45' : '#b3261e';
+    const y0 = y(k.N_Ed);
+    svg.append(svgEl('line', {
+      x1: x(k.M_Ed_1), y1: y0, x2: x(k.M_Ed_II), y2: y0,
+      stroke: farbe, 'stroke-width': 1.6, 'stroke-dasharray': '2 3', opacity: .85,
+    }));
+    // Erster Punkt: hohl, das ist die Einwirkung vor der Verformung.
+    svg.append(svgEl('circle', {
+      cx: x(k.M_Ed_1), cy: y0, r: 4,
+      fill: '#fff', stroke: farbe, 'stroke-width': 1.6,
+    }));
+    // Zweiter Punkt: Raute, damit er sich von den Kombinationen unterscheidet.
+    const s = 6;
+    const raute = svgEl('polygon', {
+      points: [[x(k.M_Ed_II), y0 - s], [x(k.M_Ed_II) + s, y0],
+        [x(k.M_Ed_II), y0 + s], [x(k.M_Ed_II) - s, y0]]
+        .map((q) => q.map((v) => v.toFixed(2)).join(',')).join(' '),
+      fill: farbe, stroke: '#fff', 'stroke-width': 2,
+    });
+    const kt = svgEl('title');
+    const grad = Number.isFinite(k.erfuellungsgrad) ? k.erfuellungsgrad.toFixed(2) : '∞';
+    kt.textContent =
+      `Knicken – ${k.name}\nN_Ed = ${k.N_Ed.toFixed(1)} kN`
+      + `\nM_Ed,1 = ${k.M_Ed_1.toFixed(1)} kNm → M_Ed,II = ${k.M_Ed_II.toFixed(1)} kNm`
+      + `\nN_Rd = ${k.N_Rd.toFixed(1)} kN, α_eff = ${grad}`
+      + `\n${k.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`;
+    raute.append(kt);
+    svg.append(raute);
+
+    const marke = svgEl('text', {
+      x: x(k.M_Ed_II) + 9, y: y0 + 14,
+      'font-size': 11, 'font-weight': 600, fill: farbe,
+    });
+    marke.textContent = `K: ${k.name}`;
+    svg.append(marke);
   }
 
   // -- Achsenbeschriftung --------------------------------------------------
