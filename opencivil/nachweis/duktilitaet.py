@@ -267,6 +267,7 @@ class Duktilitaet(Nachweis):
         return NachweisUrteil(
             name=f"Duktilität – {nummer}. Lage",
             art="D",
+            langname=f"Duktilität ({erg.lage.richtung.value})",
             fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),

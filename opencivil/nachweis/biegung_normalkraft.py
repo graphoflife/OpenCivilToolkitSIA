@@ -360,6 +360,8 @@ class BiegungNormalkraft(Nachweis):
                 NachweisUrteil(
                     name=f"M-N-Nachweis {self.richtung.value} – {kombination.name}",
                     art="M-N",
+                    langname=("Biegung und Normalkraft "
+                              f"({self.richtung.value})"),
                     fall=kombination.name,
                     erfuellt=auswertung.innerhalb,
                     erfuellungsgrad=Groesse(auswertung.erfuellungsgrad, EINHEITSLOS),

@@ -606,7 +606,12 @@ def _linie_dict(nachweis) -> dict:
 #: Welche Spalte der Zusammenfassung den Erfuellungsgrad traegt. Die
 #: Oberflaeche hinterlegt genau sie -- zaehlen statt raten, sonst haenge die
 #: Einfaerbung an der Reihenfolge der Kopfzeile.
-GRAD_SPALTE = 3
+GRAD_SPALTE = 4
+
+#: Ausrichtung der Spalten, in der Schreibweise von LaTeX. Sie geht auch an
+#: die Oberflaeche: dort richtet sich der Textsatz danach, statt aus dem
+#: Spaltenindex zu erraten, was Zahl ist und was nicht.
+AUSRICHTUNG = "llrrr"
 
 
 def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
@@ -626,9 +631,15 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
     Eine Spalte *Urteil* gibt es nicht mehr: sie stand neben dem
     Erfuellungsgrad und sagte dasselbe noch einmal. Erfuellt oder nicht zeigt
     jetzt die Hinterlegung des Grads.
+
+    *Nachweis* und *Bezeichnung* stehen dagegen getrennt. Vorher stand dort
+    ``M-N: Feld``, und zwei Kombinationen gleichen Namens in x und y ergaben
+    zweimal dieselbe Zeile. Jetzt sagt die erste Spalte, was fuer ein Nachweis
+    es ist -- ausgeschrieben, mit Richtung -- und die zweite, wie der Fall
+    heisst.
     """
-    kopf = [r"\text{Nachweis}", r"\text{Widerstand}", r"\text{Einwirkung}",
-            r"\alpha_{eff}"]
+    kopf = [r"\text{Nachweis}", r"\text{Bezeichnung}", r"\text{Widerstand}",
+            r"\text{Einwirkung}", r"\alpha_{eff}"]
 
     def zelle(wert) -> str:
         """Feste Stellenzahl -- in einer Spalte steht immer dieselbe Groesse."""
@@ -647,7 +658,10 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
         zeilen = [
             {
                 "zellen": [
-                    als_text(u.kurzname),
+                    # Faellt langname aus, bleibt das Kuerzel -- lieber knapp
+                    # als leer. Ein Nachweis ohne beides hat nur den Namen.
+                    als_text(u.langname or u.art or u.name),
+                    als_text(u.fall) if u.fall else r"\text{--}",
                     zelle(u.widerstand),
                     zelle(u.einwirkung),
                     (f"{u.erfuellungsgrad.si:.2f}"
@@ -665,7 +679,8 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
             "kopf": kopf,
             "zeilen": zeilen,
             "grad_spalte": GRAD_SPALTE,
-            "latex": tabelle(kopf, [z["zellen"] for z in zeilen], "lrrr"),
+            "ausrichtung": AUSRICHTUNG,
+            "latex": tabelle(kopf, [z["zellen"] for z in zeilen], AUSRICHTUNG),
             "angaben": _plattenangaben(qs),
             "bewehrung": _bewehrungsuebersicht(qs),
         }

@@ -1234,14 +1234,15 @@ class Projekt:
         # gehoeren beieinander.
         return [
             Ausgefallen(
-                art="M-N", fall=k.name,
+                art="M-N", langname=f"Biegung und Normalkraft ({r})",
+                fall=k.name,
                 symbol=f"M_{{Rd,{r}}}",
                 einwirkung_symbol=f"M_{{Ed,{r}}}",
                 einwirkung=Groesse(k.M_Ed, KNM), einheit=KNM)
             for k in kombinationen
         ] + [
             Ausgefallen(
-                art="V", fall=k.name,
+                art="V", langname=f"Querkraft ({r})", fall=k.name,
                 symbol=f"V_{{Rd,{r}}}",
                 einwirkung_symbol=f"V_{{Ed,{r}}}",
                 einwirkung=Groesse(abs(k.V_Ed), KN_PRO_M), einheit=KN_PRO_M)

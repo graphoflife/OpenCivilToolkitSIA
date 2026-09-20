@@ -41,6 +41,9 @@ class Ausgefallen:
     art: str
     """Kurzzeichen der Nachweisart -- ``M-N`` oder ``V``."""
 
+    langname: str
+    """Die Nachweisart ausgeschrieben, mit Richtung."""
+
     fall: str
     """Name der Einwirkungskombination."""
 
@@ -117,6 +120,7 @@ class FehlendeBewehrung(Nachweis):
             urteile.append(NachweisUrteil(
                 name=f"{fall.art} {self.richtung.value} – {fall.fall}",
                 art=fall.art,
+                langname=fall.langname,
                 fall=fall.fall,
                 erfuellt=False,
                 erfuellungsgrad=Groesse(0.0, EINHEITSLOS),

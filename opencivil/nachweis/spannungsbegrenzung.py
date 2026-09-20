@@ -245,6 +245,7 @@ class Spannungsbegrenzung(Nachweis):
         return NachweisUrteil(
             name=f"Stahlspannung {r} – {erg.fall.name}",
             art="σ_s",
+            langname=f"Stahlspannung ({r})",
             fall=erg.fall.name,
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),

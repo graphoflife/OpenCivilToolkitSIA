@@ -528,8 +528,28 @@ class NachweisUrteil:
     Platten schon einmal in dieselbe Tabelle gepackt hat.
     """
 
+    langname: str = ""
+    """
+    Die Nachweisart ausgeschrieben -- ``Biegung und Normalkraft (x)``.
+
+    Steht in der Zusammenfassung in einer eigenen Spalte neben
+    :attr:`fall`. Sie wird hier gefuehrt und nicht in der Schnittstelle aus
+    :attr:`art` nachgeschlagen: eine Tabelle von Kuerzeln auf Klartext waere
+    eine zweite Stelle, an der jeder neue Nachweis eingetragen werden muss --
+    und die eine, die man vergisst.
+
+    Die Tragrichtung gehoert hier hinein, wo eine da ist. In der Zeile steht
+    sie sonst nirgends, und zwei Kombinationen gleichen Namens in x und y
+    saehen in der Tabelle gleich aus.
+    """
+
     fall: str = ""
-    """Name der Einwirkungskombination, zu der dieses Urteil gehoert."""
+    """
+    Bezeichnung dieses einen Falls -- der eingestellte Name, wo es einen gibt.
+
+    Bei einer Einwirkungskombination ist das ihr Name, bei einem Nachweis je
+    Lage die Lage. Ohne Richtung: die steht in :attr:`langname`.
+    """
 
     hinweis: str = ""
     """
@@ -562,9 +582,10 @@ class NachweisUrteil:
         """
         Die knappe Bezeichnung, z.B. ``M-N: Fall 1``.
 
-        Die Richtung fehlt mit Absicht: sie steht bereits im Symbol des
-        Widerstands (``M_{Rd,x}``), und zweimal dieselbe Angabe macht die
-        Tabelle nur breiter.
+        Fuer Meldungen und Protokolle. Die Zusammenfassung nimmt statt
+        dessen :attr:`langname` und :attr:`fall` in zwei Spalten -- ein
+        Kuerzel spart Platz, den man in einer Tabelle nicht braucht, und
+        kostet eine Legende, die es nicht gibt.
         """
         if self.art and self.fall:
             return f"{self.art}: {self.fall}"

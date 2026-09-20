@@ -304,7 +304,8 @@ class Rissnormalkraft(Nachweis):
         return NachweisUrteil(
             name=f"Rissnormalkraft {r} – {nummer}. Lage",
             art="N_Riss",
-            fall=f"{nummer}. Lage {r}",
+            langname=f"Zwängung auf Normalkraft ({r})",
+            fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
             begruendung=erg.begruendung,
@@ -651,7 +652,8 @@ class ZwaengungBiegung(Nachweis):
         return NachweisUrteil(
             name=f"Zwängung Biegung {r} – {nummer}. Lage",
             art="ZB",
-            fall=f"{nummer}. Lage {r}",
+            langname=f"Zwängung auf Biegung ({r})",
+            fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
             begruendung=erg.begruendung,

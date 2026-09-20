@@ -954,9 +954,10 @@ class TestAngabengruppen(unittest.TestCase):
         antwort = dienst.bearbeite("rechnen", {"projekt": Projekt.beispiel().als_dict()})
         tabelle = antwort.daten["zusammenfassungen"]["q1"]
 
-        # Vier Spalten: die fuenfte hiess "Urteil" und sagte neben dem
-        # Erfuellungsgrad dasselbe noch einmal.
-        self.assertEqual(len(tabelle["kopf"]), 4)
+        # Fuenf Spalten: Nachweis, Bezeichnung, Widerstand, Einwirkung,
+        # Erfuellungsgrad. Eine Spalte "Urteil" gab es einmal; sie stand neben
+        # dem Grad und sagte dasselbe noch einmal.
+        self.assertEqual(len(tabelle["kopf"]), 5)
         # 6 x M-N, 2 x Duktilität, 1 x sprödes Versagen, 1 x Zwängung Biegung.
         self.assertEqual(len(tabelle["zeilen"]), 10)
         for zeile in tabelle["zeilen"]:
@@ -967,21 +968,25 @@ class TestAngabengruppen(unittest.TestCase):
         # soll es nicht aus der Kopfzeile erraten muessen.
         self.assertEqual(tabelle["kopf"][tabelle["grad_spalte"]], r"\alpha_{eff}")
 
-    def test_der_nachweis_steht_knapp_da(self):
+    def test_nachweis_und_bezeichnung_stehen_getrennt(self):
         """
-        `M-N: Feld` statt `M-N-Nachweis x – Feld`.
+        Erste Spalte: was fuer ein Nachweis, ausgeschrieben und mit Richtung.
+        Zweite Spalte: wie der Fall heisst.
 
-        Die Richtung fehlt mit Absicht: sie steht im Symbol des Widerstands
-        (`M_{Rd,x}`), und zweimal dieselbe Angabe macht die Tabelle nur breiter.
-        Zusammengesetzt wird sie aus zwei Feldern des Urteils und nicht aus dem
-        langen Namen herausgeschnitten.
+        Beide kommen aus eigenen Feldern des Urteils und werden nicht aus dem
+        langen Namen herausgeschnitten -- aus Anzeigetext auf Bedeutung zu
+        schliessen geht schief, sobald jemand einen Fall "Nachweis Ost" nennt.
         """
         antwort = dienst.bearbeite(
             "rechnen", {"projekt": Projekt.beispiel().als_dict()})
-        namen = [z["zellen"][0]
-                 for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
-        self.assertIn(r"\text{M-N: Feld}", namen)
-        self.assertFalse(any("Nachweis" in n for n in namen))
+        zeilen = antwort.daten["zusammenfassungen"]["q1"]["zeilen"]
+        paare = [(z["zellen"][0], z["zellen"][1]) for z in zeilen]
+        self.assertIn((r"\text{Biegung und Normalkraft (x)}", r"\text{Feld}"),
+                      paare)
+        # Dieselbe Kombination in y ist eine andere Zeile -- vorher waren beide
+        # nicht zu unterscheiden.
+        self.assertIn((r"\text{Biegung und Normalkraft (y)}", r"\text{Feld}"),
+                      paare)
 
     def test_der_querkraftwiderstand_ist_gross_geschrieben(self):
         projekt = Projekt.beispiel()
@@ -989,12 +994,13 @@ class TestAngabengruppen(unittest.TestCase):
             k.V_Ed = 80.0
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         zeilen = antwort.daten["zusammenfassungen"]["q1"]["zeilen"]
-        quer = [z for z in zeilen if z["zellen"][0].startswith(r"\text{V:")]
+        quer = [z for z in zeilen
+                if z["zellen"][0].startswith(r"\text{Querkraft")]
         self.assertTrue(quer)
         for zeile in quer:
-            self.assertTrue(zeile["zellen"][1].startswith("V_{Rd"), zeile["zellen"][1])
-            self.assertTrue(zeile["zellen"][2].startswith("V_{Ed"), zeile["zellen"][2])
-            self.assertNotIn("left|", zeile["zellen"][2])
+            self.assertTrue(zeile["zellen"][2].startswith("V_{Rd"), zeile["zellen"][2])
+            self.assertTrue(zeile["zellen"][3].startswith("V_{Ed"), zeile["zellen"][3])
+            self.assertNotIn("left|", zeile["zellen"][3])
 
     def test_ueber_der_tabelle_stehen_die_angaben_zur_platte(self):
         """
@@ -1044,8 +1050,8 @@ class TestAngabengruppen(unittest.TestCase):
         """In einer Spalte steht immer dieselbe Grösse, also auch dieselbe Genauigkeit."""
         antwort = dienst.bearbeite("rechnen", {"projekt": Projekt.beispiel().als_dict()})
         erste = antwort.daten["zusammenfassungen"]["q1"]["zeilen"][0]["zellen"]
-        self.assertIn("100.0", erste[2])          # M_Ed, eine Nachkommastelle
-        self.assertRegex(erste[3], r"^\d+\.\d{2}$")  # alpha, zwei
+        self.assertIn("100.0", erste[3])          # M_Ed, eine Nachkommastelle
+        self.assertRegex(erste[4], r"^\d+\.\d{2}$")  # alpha, zwei
 
     def test_ohne_einwirkung_bleibt_die_mindestbewehrung(self):
         """
@@ -1064,7 +1070,8 @@ class TestAngabengruppen(unittest.TestCase):
                  for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
         self.assertTrue(namen)
         self.assertEqual(sorted(namen),
-                         [r"\text{SV: 1. Lage x}", r"\text{ZB: 1. Lage x}"])
+                         [r"\text{Sprödes Versagen (x)}",
+                          r"\text{Zwängung auf Biegung (x)}"])
 
     def test_die_duktilitaet_laeuft_auch_ohne_schnittgroessen(self):
         projekt = Projekt.beispiel()
@@ -1072,7 +1079,12 @@ class TestAngabengruppen(unittest.TestCase):
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         namen = [z["zellen"][0]
                  for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
-        self.assertEqual(namen[:2], [r"\text{D: 1. Lage}", r"\text{D: 4. Lage}"])
+        self.assertEqual(namen[:2],
+                         [r"\text{Duktilität (x)}", r"\text{Duktilität (x)}"])
+        bezeichnungen = [z["zellen"][1]
+                         for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
+        self.assertEqual(bezeichnungen[:2],
+                         [r"\text{1. Lage}", r"\text{4. Lage}"])
 
     def test_jede_angabe_behaelt_ihre_wert_id(self):
         """Ohne sie liesse sich im Kasten nichts einzeln hervorheben."""
@@ -1198,7 +1210,7 @@ class TestQuerkraftbewehrungInDerAusgabe(unittest.TestCase):
         self.assertTrue(mit_hinweis)
         for zeile in mit_hinweis:
             self.assertIn("nicht berechenbar", zeile["hinweis"])
-            self.assertIn("0.0", zeile["zellen"][1])
+            self.assertIn("0.0", zeile["zellen"][2])
         # Erfüllte Nachweise tragen keinen -- sonst stünde unter jeder Tabelle
         # eine Wand aus Begründungen.
         self.assertFalse([z for z in zeilen if z["erfuellt"] and z["hinweis"]])
@@ -1232,20 +1244,20 @@ class TestRichtungOhneBewehrung(unittest.TestCase):
 
     def test_der_nachweis_steht_da_und_ist_nicht_erfuellt(self):
         y_zeilen = [z for z in self.zeilen(self.projekt())
-                    if "Rd,y" in z["zellen"][1]]
+                    if "Rd,y" in z["zellen"][2]]
         self.assertEqual(len(y_zeilen), 3)          # drei Kombinationen
         for zeile in y_zeilen:
             self.assertFalse(zeile["erfuellt"])
-            self.assertEqual(zeile["zellen"][3], "0.00")
-            self.assertIn("0.0", zeile["zellen"][1])    # M_Rd = 0
+            self.assertEqual(zeile["zellen"][4], "0.00")
+            self.assertIn("0.0", zeile["zellen"][2])    # M_Rd = 0
             self.assertIn("keine Bewehrung definiert", zeile["hinweis"])
 
     def test_die_einwirkung_steht_trotzdem_da(self):
         """Ohne sie bliebe unklar, wogegen der Widerstand null nicht reicht."""
         zeile = next(z for z in self.zeilen(self.projekt())
-                     if "M_{Rd,y}" in z["zellen"][1])
-        self.assertIn("M_{Ed,y}", zeile["zellen"][2])
-        self.assertIn("100.0", zeile["zellen"][2])
+                     if "M_{Rd,y}" in z["zellen"][2])
+        self.assertIn("M_{Ed,y}", zeile["zellen"][3])
+        self.assertIn("100.0", zeile["zellen"][3])
 
     def test_auch_die_querkraft_faellt_aus(self):
         """
@@ -1254,23 +1266,24 @@ class TestRichtungOhneBewehrung(unittest.TestCase):
         halb zu schliessen.
         """
         zeilen = self.zeilen(self.projekt(mit_querkraft=True))
-        quer = [z for z in zeilen if "V_{Rd,y}" in z["zellen"][1]]
+        quer = [z for z in zeilen if "V_{Rd,y}" in z["zellen"][2]]
         self.assertEqual(len(quer), 1)
-        self.assertEqual(quer[0]["zellen"][3], "0.00")
-        self.assertIn("V_{Ed,y}", quer[0]["zellen"][2])
+        self.assertEqual(quer[0]["zellen"][4], "0.00")
+        self.assertIn("V_{Ed,y}", quer[0]["zellen"][3])
 
     def test_erst_alle_m_n_dann_die_querkraft(self):
         """Dieselbe Folge wie bei den Richtungen, die wirklich gerechnet werden."""
         zeilen = [z for z in self.zeilen(self.projekt(mit_querkraft=True))
-                  if ",y}" in z["zellen"][1]]
-        arten = [z["zellen"][0].startswith(r"\text{M-N") for z in zeilen]
+                  if ",y}" in z["zellen"][2]]
+        arten = [z["zellen"][0].startswith(r"\text{Biegung und Normalkraft")
+                 for z in zeilen]
         self.assertEqual(arten, sorted(arten, reverse=True), zeilen)
 
     def test_die_gegenrichtung_bleibt_unberuehrt(self):
         zeilen = self.zeilen(self.projekt())
         x_zeilen = [z for z in zeilen
-                    if z["zellen"][0].startswith(r"\text{M-N")
-                    and "Rd,x" in z["zellen"][1]]
+                    if z["zellen"][0].startswith(r"\text{Biegung und Normalkraft")
+                    and "Rd,x" in z["zellen"][2]]
         self.assertEqual(len(x_zeilen), 3)
         self.assertTrue(all(z["erfuellt"] for z in x_zeilen))
 
@@ -1279,7 +1292,7 @@ class TestRichtungOhneBewehrung(unittest.TestCase):
         projekt = self.projekt()
         for k in projekt.querschnitt("q1").kombinationen:
             k.richtung = "x"
-        self.assertFalse([z for z in self.zeilen(projekt) if ",y}" in z["zellen"][1]])
+        self.assertFalse([z for z in self.zeilen(projekt) if ",y}" in z["zellen"][2]])
 
     def test_das_urteil_traegt_den_raum_seiner_platte(self):
         aufbau = self.projekt().aufbauen()

@@ -222,7 +222,8 @@ class SproedesVersagen(Nachweis):
         return NachweisUrteil(
             name=f"Sprödes Versagen {r} – {nummer}. Lage",
             art="SV",
-            fall=f"{nummer}. Lage {r}",
+            langname=f"Sprödes Versagen ({r})",
+            fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
             begruendung=erg.begruendung,

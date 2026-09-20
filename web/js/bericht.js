@@ -291,7 +291,11 @@ function hinweiseBuendeln(zeilen) {
   for (const zeile of zeilen) {
     if (!zeile.hinweis) continue;
     if (!nach_grund.has(zeile.hinweis)) nach_grund.set(zeile.hinweis, []);
-    nach_grund.get(zeile.hinweis).push(textVon(zeile.zellen[0]));
+    // Nachweis und Bezeichnung zusammen -- 'Querkraft (y)' allein
+    // sagt nicht, welcher Fall gemeint ist.
+    nach_grund.get(zeile.hinweis).push(
+      [zeile.zellen[0], zeile.zellen[1]].map(textVon).filter((s) => s && s !== '--')
+        .join(' – '));
   }
   return [...nach_grund.entries()];
 }
@@ -345,8 +349,12 @@ function zusammenfassung(loesung) {
                 // trägt jetzt allein das Urteil -- die Spalte daneben, die
                 // "erfüllt" ausschrieb, ist weg.
                 const istGrad = i === tabelle.grad_spalte;
+                // Links oder rechts sagt ebenfalls der Kern -- dieselbe
+                // Ausrichtung, die auch das LaTeX bekommt. Aus dem Index zu
+                // schliessen ging gut, solange nur die erste Spalte Text war.
+                const rechts = (tabelle.ausrichtung || '')[i] !== 'l';
                 const td = el('td', {
-                  class: [i === 0 ? '' : 'zahl', istGrad ? 'grad' : ''].filter(Boolean).join(' '),
+                  class: [rechts ? 'zahl' : '', istGrad ? 'grad' : ''].filter(Boolean).join(' '),
                 });
                 setzen(zelle, td, { displayMode: false });
                 return td;

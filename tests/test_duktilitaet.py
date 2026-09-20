@@ -211,13 +211,15 @@ class TestInDerZusammenfassung(unittest.TestCase):
     def test_die_zeilen_stehen_unter_den_tragsicherheitsnachweisen(self):
         antwort = dienst.bearbeite(
             "rechnen", {"projekt": Projekt.beispiel().als_dict()})
-        namen = [z["zellen"][0]
+        paare = [(z["zellen"][0], z["zellen"][1])
                  for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
+        dukt = (r"\text{Duktilität (x)}", r"\text{1. Lage}")
         # Die Duktilitätszeilen stehen hinter den Tragsicherheitsnachweisen.
-        self.assertIn(r"\text{D: 1. Lage}", namen)
-        self.assertIn(r"\text{D: 4. Lage}", namen)
-        self.assertGreater(namen.index(r"\text{D: 1. Lage}"),
-                           namen.index(r"\text{M-N: Feld}"))
+        self.assertIn(dukt, paare)
+        self.assertIn((r"\text{Duktilität (x)}", r"\text{4. Lage}"), paare)
+        self.assertGreater(
+            paare.index(dukt),
+            paare.index((r"\text{Biegung und Normalkraft (x)}", r"\text{Feld}")))
 
     def test_eine_unbewehrte_lage_meldet_sich_sichtbar(self):
         projekt = projekt_mit((True, True, False, True))
@@ -227,8 +229,8 @@ class TestInDerZusammenfassung(unittest.TestCase):
 
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         zeilen = antwort.daten["zusammenfassungen"]["q1"]["zeilen"]
-        betroffen = next(z for z in zeilen if z["zellen"][0] == r"\text{D: 2. Lage}")
+        betroffen = next(z for z in zeilen if z["zellen"][1] == r"\text{2. Lage}")
         self.assertIn("nicht machbar", betroffen["hinweis"])
         # Widerstand und Einwirkung sind Striche, keine erfundenen Nullen.
-        self.assertEqual(betroffen["zellen"][1], r"\text{--}")
         self.assertEqual(betroffen["zellen"][2], r"\text{--}")
+        self.assertEqual(betroffen["zellen"][3], r"\text{--}")
