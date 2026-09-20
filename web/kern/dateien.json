@@ -5,6 +5,7 @@
     "opencivil/bericht/__init__.py",
     "opencivil/bericht/konsole.py",
     "opencivil/bericht/latex_dokument.py",
+    "opencivil/bewehrungssuche.py",
     "opencivil/core/__init__.py",
     "opencivil/core/berechnung.py",
     "opencivil/core/einheiten.py",

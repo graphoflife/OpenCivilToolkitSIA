@@ -204,6 +204,7 @@ class Knicken(Nachweis):
         querschnitt,
         faelle: Sequence[Knickfall],
         mn_nachweis,
+        schnell: bool = False,
     ) -> None:
         if not faelle:
             raise ValueError("Der Knicknachweis braucht mindestens einen Fall.")
@@ -217,6 +218,20 @@ class Knicken(Nachweis):
         self.richtung = Richtung.X
         self.faelle = list(faelle)
         self.mn = mn_nachweis
+        self.schnell = schnell
+        """
+        Ob die Suche nach N_Rd uebersprungen wird.
+
+        Sie kostet rund fuenfzehn vollstaendige Ausmitten-Iterationen und ist
+        damit das Teuerste im ganzen Werkzeug. Fuer das *Urteil* ist sie
+        entbehrlich: ``N_Rd >= |N_Ed|`` gilt genau dann, wenn der Querschnitt
+        bei ``N_Ed`` das Moment zweiter Ordnung aufnimmt -- erfuellt oder
+        nicht kommt also gleich heraus. Nur die Zahl daneben ist eine andere,
+        naemlich das Verhaeltnis der Momente statt der Kraefte.
+
+        Eingeschaltet wird das vom Bewehrungswerkzeug, das hunderte Male
+        rechnet und nur wissen muss, ob es aufgeht.
+        """
         self.ergebnisse: List[Knickergebnis] = []
 
         basis = f"{querschnitt.id}.nachweis.knicken"
@@ -342,8 +357,15 @@ class Knicken(Nachweis):
         erg.eps_m, erg.chi = bei_N_Ed.eps_m, bei_N_Ed.chi
         erg.N_int, erg.M_int = bei_N_Ed.N_int, bei_N_Ed.M_int
 
-        erg.N_Rd = self._grenzkraft(loeser, abs(N_Ed), erg, l_cr,
-                                    traegt=bei_N_Ed.traegt)
+        if self.schnell:
+            # Dasselbe Ja oder Nein, nur ohne die Suche: getragen ist N_Ed
+            # genau dann, wenn M_Rd fuer M_Ed,II reicht.
+            verhaeltnis = (bei_N_Ed.M_Rd / abs(bei_N_Ed.M_ges)
+                           if bei_N_Ed.stabil and bei_N_Ed.M_ges else 0.0)
+            erg.N_Rd = abs(N_Ed) * verhaeltnis
+        else:
+            erg.N_Rd = self._grenzkraft(loeser, abs(N_Ed), erg, l_cr,
+                                        traegt=bei_N_Ed.traegt)
         erg.erfuellungsgrad = erg.N_Rd / abs(N_Ed)
         erg.erfuellt = bei_N_Ed.traegt
         erg.begruendung = self._begruendung(erg, bei_N_Ed)

@@ -27,10 +27,12 @@ EIGENSTAENDIG NUTZBAR::
 from __future__ import annotations
 
 import json
+import math
 import traceback
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Mapping
 
+from opencivil import bewehrungssuche
 from opencivil.bericht.latex_dokument import als_tex
 from opencivil.core.rechenwerk import RechenwerkFehler
 from opencivil.projekt import Projekt, ProjektFehler
@@ -233,6 +235,72 @@ def dateiname(name: str) -> str:
 
 
 #: Name der Anfrage -> Funktion. Diese Namen sind der ganze Vertrag zwischen
+def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Sucht zu einer Platte die kleinste Bewehrung und gibt sie zurueck.
+
+    Gerechnet, nicht gesetzt: zurueck kommt das gefundene Projekt, und ob die
+    Oberflaeche es uebernimmt, entscheidet sie. So bleibt der Knopf ein
+    einzelner Schritt, den man sieht und rueckgaengig machen kann -- und
+    nicht eine Bewehrung, die sich bei jeder Eingabe im Hintergrund aendert.
+    """
+    projekt = _projekt(rumpf)
+    kennung = rumpf.get("kennung")
+    if not kennung:
+        raise DienstFehler(400, "Es fehlt die Kennung der Platte.")
+    try:
+        projekt.querschnitt(kennung)
+    except Exception:
+        raise DienstFehler(404, f"Keine Platte mit der Kennung '{kennung}'.") from None
+
+    eintrag = projekt.querschnitt(kennung)
+    modus = rumpf.get("modus") or eintrag.automatik_modus
+    teilungen = rumpf.get("teilungen") or eintrag.automatik_teilungen
+    try:
+        modus = bewehrungssuche.Suchmodus(modus)
+    except ValueError:
+        moeglich = ", ".join(m.value for m in bewehrungssuche.Suchmodus)
+        raise DienstFehler(400, f"Unbekannter Suchmodus '{modus}'. "
+                                f"Möglich sind: {moeglich}.") from None
+
+    ergebnis = bewehrungssuche.suche(projekt, kennung, modus=modus,
+                                     teilungen=teilungen)
+    antwort: Dict[str, Any] = {
+        "gefunden": ergebnis.gefunden,
+        "modus": modus.value,
+        "modus_text": modus.beschriftung,
+        "begruendung": ergebnis.begruendung,
+        "loesungen": [
+            {"teilung": l.teilung, "gefunden": l.gefunden,
+             "durchmesser": l.durchmesser, "stahlflaeche": l.stahlflaeche,
+             "schlechtester": (l.schlechtester
+                               if math.isfinite(l.schlechtester) else None),
+             "nachweis": l.nachweis, "begruendung": l.begruendung,
+             "runden": len(l.schritte)}
+            for l in ergebnis.loesungen
+        ],
+    }
+    if ergebnis.beste:
+        bewehrungssuche.uebernehmen(projekt, kennung, ergebnis.beste)
+
+    # Die Buegel erst danach: sie haengen an der Laengsbewehrung, weil die
+    # statische Hoehe in den Querkraftwiderstand eingeht.
+    if eintrag.automatik_querkraft:
+        buegel = bewehrungssuche.buegel_suchen(
+            projekt, kennung,
+            teilungen=(rumpf.get("querkraft_teilungen")
+                       or eintrag.automatik_querkraft_teilungen))
+        antwort["buegel"] = {
+            "gefunden": buegel.gefunden, "durchmesser": buegel.durchmesser,
+            "teilung": buegel.teilung, "begruendung": buegel.begruendung,
+        }
+        if buegel.gefunden:
+            bewehrungssuche.buegel_uebernehmen(projekt, kennung, buegel)
+
+    antwort["projekt"] = projekt.als_dict()
+    return antwort
+
+
 #: Oberflaeche und Kern; beide Huellen reichen sie unveraendert durch.
 ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "katalog": katalog,
@@ -243,6 +311,7 @@ ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "ziele": ziele,
     "querkraftkurven": querkraftkurven,
     "bericht": bericht,
+    "bewehrung_suchen": bewehrung_suchen,
 }
 
 

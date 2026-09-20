@@ -783,3 +783,16 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .schalter-gunst .schalter-halb { text-transform: none; letter-spacing: 0; }
 .schalter-gunst .schalter-halb.ist-an { background: #c9a227; color: #fff; }
 .lage-y .schalter-gunst .schalter-halb.ist-an { background: #c9a227; }
+
+/* Der Knopf, der die Bewehrung sucht, und die Meldung daneben. Die Meldung
+   steht in der Zeile und nicht als Blase oben rechts: sie gehört zu diesem
+   Knopf und soll stehen bleiben, solange man das Ergebnis ansieht. */
+.automatik-leiste {
+  display: flex; align-items: flex-start; gap: 8px; margin-top: 6px;
+}
+.automatik-meldung {
+  font-size: 11px; line-height: 1.35; color: var(--schrift-zart);
+  flex: 1; min-width: 0;
+}
+.automatik-meldung.ist-gut     { color: var(--gut); }
+.automatik-meldung.ist-schlecht { color: var(--schlecht); }

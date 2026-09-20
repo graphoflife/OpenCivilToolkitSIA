@@ -17,6 +17,7 @@
  * Oberfläche nachgerechneter.
  */
 
+import { api } from './api.js';
 import { auswahl, el, ersetzen, melden, zahlfeld } from './dom.js';
 
 /**
@@ -28,8 +29,20 @@ import { auswahl, el, ersetzen, melden, zahlfeld } from './dom.js';
 const DURCHMESSER = [6, 8, 10, 12, 14, 16, 18, 20, 22, 26, 30, 34, 40];
 import { span } from './mathe.js';
 import {
-  gewaehltesMaterial, gewaehlterQuerschnitt, kennwertId, projektAendern, zustand,
+  aendern, gewaehltesMaterial, gewaehlterQuerschnitt, kennwertId, projektAendern,
+  zustand,
 } from './zustand.js';
+
+/**
+ * Was die letzte Bewehrungssuche je Platte gemeldet hat.
+ *
+ * Ausserhalb des Baums: das Ergebnis übernehmen heisst, das Projekt zu
+ * ändern, und das zeichnet die Tafel neu. Stünde die Meldung im DOM, wäre
+ * sie genau in dem Augenblick weg, in dem sie etwas zu sagen hat. Ins
+ * Projekt gehört sie auch nicht -- sie beschreibt einen Vorgang, keine
+ * Eigenschaft der Platte, und niemand will sie in der abgelegten Datei.
+ */
+const automatikMeldungen = new Map();
 
 const ART_TEXT = { beton: 'Beton', betonstahl: 'Betonstahl' };
 
@@ -701,6 +714,8 @@ function plattenEditor(querschnitt) {
         })),
       ]),
 
+      automatikBlock(querschnitt),
+
       el('div.feldgruppe', {}, [
         el('h3', {}, [el('span', { text: 'Bewehrung' }),
           el('span', { text: 'von unten nach oben' })]),
@@ -1134,4 +1149,118 @@ export function editorZeichnen(behaelter, titelKnoten, hinweisKnoten) {
     el('p', { text: 'Links einen Bestandteil auswählen.' }),
     el('p', { text: 'Materialien und Platten legst du über das + im Kapitelkopf an.' }),
   ]));
+}
+
+
+/**
+ * Die Bewehrung suchen lassen, statt sie zu setzen.
+ *
+ * Ein einzelner Knopf, kein Automatismus im Hintergrund: was hier
+ * herauskommt, wird in die Lagen darunter geschrieben und steht dann da wie
+ * eine Eingabe von Hand -- man sieht es, kann es ändern und kann es lassen.
+ * Eine Bewehrung, die sich bei jeder Zahl neu setzt, wäre keine Eingabe mehr.
+ *
+ * Gesucht wird gegen die Nachweise, die eingeschaltet sind. Die Schalter
+ * weiter unten steuern damit unmittelbar, wonach gesucht wird.
+ */
+function automatikBlock(querschnitt) {
+  const aendern = (veraenderer) => projektAendern((p) => {
+    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
+  });
+  const moden = [
+    { wert: 'grund_ohne', beschriftung: 'Grundbewehrung ohne Kräfte' },
+    { wert: 'grund_mit', beschriftung: 'Grundbewehrung mit Kräften' },
+    { wert: 'grund_ohne_zulage_mit',
+      beschriftung: 'Grund ohne Kräfte, Zulage mit Kräften' },
+  ];
+  const quer = querschnitt.automatik_querkraft === true;
+
+  // Die Teilungen als Text: «100, 150» liest und tippt sich schneller als
+  // eine Liste aus Zahlenfeldern mit Plus- und Minusknöpfen.
+  const teilungsfeld = (feld, titel) => el('input.ew-name', {
+    type: 'text', value: (querschnitt[feld] || []).join(', '), title: titel,
+    on: {
+      change: (e) => aendern((q) => {
+        q[feld] = e.target.value.split(/[^0-9.]+/)
+          .map(Number).filter((x) => x > 0);
+      }),
+    },
+  });
+
+  return el('div.feldgruppe', {}, [
+    el('h3', {}, [el('span', { text: 'Bewehrung ermitteln' }),
+      el('span', { text: 'kleinste Stahlfläche' })]),
+    el('div.unterkapitel', {}, [
+      feld('Modus', auswahl({
+        werte: moden, gewaehlt: querschnitt.automatik_modus || 'grund_ohne',
+        titel: 'Ohne Kräfte bleiben Duktilität, sprödes Versagen und die '
+          + 'Rissbreitenbegrenzung – das, was eine Platte unabhängig von der '
+          + 'Belastung braucht.',
+        beiAenderung: (v) => aendern((q) => { q.automatik_modus = v; }),
+      })),
+      feld('Teilungen', teilungsfeld('automatik_teilungen',
+        'Liste in mm, durch Komma getrennt. Grundbewehrung und Zulage einer '
+        + 'Lage bekommen dieselbe Teilung.'), 'mm'),
+      el('div.duktilitaetszeile.ist-breit', {}, [
+        el('span.postenname', { text: 'Querkraftbewehrung mitsuchen' }),
+        hakenSchalter(quer, (wert) => aendern((q) => {
+          q.automatik_querkraft = wert;
+        }), 'Bügelsuche'),
+        el('span.kurvenhinweis', { text: '' }),
+      ]),
+      ...(quer ? [feld('Bügelteilungen',
+        teilungsfeld('automatik_querkraft_teilungen',
+          'Liste in mm. Das Bügelraster ist quadratisch: s_x = s_y.'), 'mm')] : []),
+      automatikLeiste(querschnitt.kennung),
+    ]),
+  ]);
+}
+
+function automatikLeiste(kennung) {
+  const stand = automatikMeldungen.get(kennung);
+  const laeuft = stand?.laeuft === true;
+  return el('div.automatik-leiste', {}, [
+    el('button.knopf.knopf-haupt', {
+      text: laeuft ? 'sucht …' : 'Bewehrung ermitteln',
+      title: 'Sucht einmalig und schreibt das Ergebnis in die Lagen',
+      disabled: laeuft,
+      on: { click: () => bewehrungErmitteln(kennung) },
+    }),
+    stand?.text
+      ? el('span.automatik-meldung', {
+        text: stand.text,
+        class: stand.gut === null ? '' : (stand.gut ? 'ist-gut' : 'ist-schlecht'),
+      })
+      : null,
+  ]);
+}
+
+/** Einmal suchen, das Ergebnis übernehmen, die Meldung stehen lassen. */
+async function bewehrungErmitteln(kennung) {
+  automatikMeldungen.set(kennung, { laeuft: true, text: '', gut: null });
+  aendern({}, 'bewehrungssuche-start');
+  try {
+    const antwort = await api.bewehrungSuchen(zustand.projekt, kennung);
+    const teile = [antwort.begruendung];
+    if (antwort.buegel) teile.push(`Bügel: ${antwort.buegel.begruendung}`);
+    automatikMeldungen.set(kennung, {
+      laeuft: false, text: teile.join(' '), gut: antwort.gefunden,
+    });
+    if (antwort.gefunden) {
+      // Der Kern gibt das fertige Projekt zurück -- übernommen wird es als
+      // eine Änderung, damit ein Rückgängig sie als eine zurücknimmt.
+      projektAendern((p) => {
+        const alt = p.querschnitte.findIndex((x) => x.kennung === kennung);
+        const neu = antwort.projekt.querschnitte.find((x) => x.kennung === kennung);
+        if (alt >= 0 && neu) p.querschnitte[alt] = neu;
+      });
+    } else {
+      aendern({}, 'bewehrungssuche-ende');
+    }
+  } catch (fehler) {
+    automatikMeldungen.set(kennung, {
+      laeuft: false, text: String(fehler.message || fehler), gut: false,
+    });
+    aendern({}, 'bewehrungssuche-fehler');
+  }
 }

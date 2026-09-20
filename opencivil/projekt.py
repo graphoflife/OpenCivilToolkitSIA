@@ -164,6 +164,25 @@ def _rissanforderung_aus(wert: Any) -> str:
 LAGENWAHL_VORGABE = (True, False, False, False)
 
 
+def _teilungen_aus(roh, vorgabe) -> List[float]:
+    """
+    Eine Liste von Teilungen, aufsteigend und ohne Unsinn.
+
+    Ohne brauchbare Angabe die Vorgabe: eine leere Liste hiesse, dass die
+    Suche nichts zu versuchen haette, und das ist kein Zustand, in dem man
+    eine Oberflaeche stehen lassen will.
+    """
+    werte = []
+    for x in (roh or []):
+        try:
+            zahl = float(x)
+        except (TypeError, ValueError):
+            continue
+        if zahl > 0:
+            werte.append(zahl)
+    return sorted(set(werte)) or list(vorgabe)
+
+
 def _lagenwahl_aus(wert: Any) -> List[bool]:
     """Genau vier Schalter, mit :data:`LAGENWAHL_VORGABE` als Rueckfall."""
     if not isinstance(wert, (list, tuple)):
@@ -665,6 +684,18 @@ class QuerschnittEintrag:
     werden -- mit :data:`HAEUFIG_ANTEIL`. Der uebliche Fall, darum die Vorgabe.
     """
 
+    automatik_modus: str = "grund_ohne"
+    """Wonach das Bewehrungswerkzeug sucht -- siehe ``bewehrungssuche.Suchmodus``."""
+
+    automatik_teilungen: List[float] = field(default_factory=lambda: [100.0, 150.0])
+    """Teilungen, die es versucht. Grundbewehrung und Zulage teilen sich eine."""
+
+    automatik_querkraft: bool = False
+    """Ob auch die Buegel gesucht werden."""
+
+    automatik_querkraft_teilungen: List[float] = field(
+        default_factory=lambda: [100.0, 150.0, 200.0])
+
     sproede_lagen: List[bool] = field(
         default_factory=lambda: list(LAGENWAHL_VORGABE))
     """Je Lage, ob der Nachweis gegen sproedes Versagen gefuehrt wird."""
@@ -719,6 +750,10 @@ class QuerschnittEintrag:
             "k_c": self.k_c,
             "querkraftbewehrung": self.querkraftbewehrung.als_dict(),
             "duktilitaet": list(self.duktilitaet),
+            "automatik_modus": self.automatik_modus,
+            "automatik_teilungen": list(self.automatik_teilungen),
+            "automatik_querkraft": self.automatik_querkraft,
+            "automatik_querkraft_teilungen": list(self.automatik_querkraft_teilungen),
             "sproede_lagen": list(self.sproede_lagen),
             "zwaengung_biegung_lagen": list(self.zwaengung_biegung_lagen),
             "rissanforderung": self.rissanforderung,
@@ -755,6 +790,12 @@ class QuerschnittEintrag:
             querkraftbewehrung=QuerkraftbewehrungEintrag.aus_dict(
                 d.get("querkraftbewehrung") or {}),
             duktilitaet=_duktilitaet_aus(d.get("duktilitaet")),
+            automatik_modus=str(d.get("automatik_modus") or "grund_ohne"),
+            automatik_teilungen=_teilungen_aus(d.get("automatik_teilungen"),
+                                               (100.0, 150.0)),
+            automatik_querkraft=bool(d.get("automatik_querkraft", False)),
+            automatik_querkraft_teilungen=_teilungen_aus(
+                d.get("automatik_querkraft_teilungen"), (100.0, 150.0, 200.0)),
             sproede_lagen=_lagenwahl_aus(d.get("sproede_lagen")),
             zwaengung_biegung_lagen=_lagenwahl_aus(
                 d.get("zwaengung_biegung_lagen")),
@@ -951,12 +992,18 @@ class Projekt:
 
     # -- Aufbau -------------------------------------------------------------
 
-    def aufbauen(self) -> Aufbau:
+    def aufbauen(self, *, schnell: bool = False) -> Aufbau:
         """
         Baut aus der Beschreibung ein vollstaendiges Rechenwerk.
 
         Wirft :class:`ProjektFehler`, wenn die Beschreibung nicht stimmig ist --
         etwa wenn ein Querschnitt auf ein geloeschtes Material verweist.
+
+        Mit ``schnell`` lassen Nachweise teure Nebenrechnungen weg, die das
+        Urteil nicht aendern -- derzeit die Suche nach der Knickgrenzkraft.
+        Gedacht fuer das Bewehrungswerkzeug, das hundertfach rechnet und nur
+        wissen muss, ob es aufgeht. Fuer eine Herleitung ist das nichts: dort
+        soll die Zahl stehen, die auch in der Tabelle steht.
         """
         self.pruefen()
         werk = Rechenwerk()
@@ -1063,7 +1110,7 @@ class Projekt:
                                    laenge=Groesse(k.laenge, M),
                                    knicklaenge=Groesse(k.knicklaenge, M))
                          for k in knickfaelle],
-                        mn_x)
+                        mn_x, schnell=schnell)
                     werk.registriere(knick)
                     aufbau.knicken[eintrag.kennung] = knick
                 else:
