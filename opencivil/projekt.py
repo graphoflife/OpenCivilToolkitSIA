@@ -450,9 +450,14 @@ class KnickEintrag:
     knicklaenge: float = 3.0
     """Knicklaenge in m."""
 
+    aktiv: bool = True
+    """Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen -- eine
+    geloeschte Zeile muesste man neu eintippen, um sie wieder anzusehen."""
+
     def als_dict(self) -> dict:
         return {"name": self.name, "N_Ed": self.N_Ed, "M_Ed_1": self.M_Ed_1,
-                "laenge": self.laenge, "knicklaenge": self.knicklaenge}
+                "laenge": self.laenge, "knicklaenge": self.knicklaenge,
+                "aktiv": self.aktiv}
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "KnickEintrag":
@@ -462,6 +467,7 @@ class KnickEintrag:
             M_Ed_1=_zahl(d, "M_Ed_1", 0.0),
             laenge=_zahl(d, "laenge", 3.0),
             knicklaenge=_zahl(d, "knicklaenge", 3.0),
+            aktiv=bool(d.get("aktiv", True)),
         )
 
 
@@ -1045,7 +1051,8 @@ class Projekt:
 
             # Knicken haengt an der Knicklaenge und damit an einer
             # Tragrichtung -- gerechnet wird nur in x.
-            if eintrag.knickfaelle:
+            knickfaelle = [k for k in eintrag.knickfaelle if k.aktiv]
+            if knickfaelle:
                 mn_x = aufbau.nachweise.get(f"{eintrag.kennung}.x")
                 if mn_x is not None:
                     knick = Knicken(
@@ -1055,7 +1062,7 @@ class Projekt:
                                    M_Ed_1=Groesse(k.M_Ed_1, KNM),
                                    laenge=Groesse(k.laenge, M),
                                    knicklaenge=Groesse(k.knicklaenge, M))
-                         for k in eintrag.knickfaelle],
+                         for k in knickfaelle],
                         mn_x)
                     werk.registriere(knick)
                     aufbau.knicken[eintrag.kennung] = knick
@@ -1197,24 +1204,30 @@ class Projekt:
         """
         Die haeufigen Lastfaelle dieser Richtung.
 
-        Entweder die eigens angegebenen oder -- wenn die Ableitung gilt -- die
-        Tragsicherheitsfaelle mit :data:`HAEUFIG_ANTEIL`. Die Rechnung steht
-        hier und nicht in der Oberflaeche: dort waere sie eine zweite Wahrheit.
+        Die eigens angegebenen, und -- wenn die Ableitung gilt -- zusaetzlich
+        die Tragsicherheitsfaelle mit :data:`HAEUFIG_ANTEIL`. Beides
+        nebeneinander: die 70 % sind eine bequeme Abschaetzung, decken aber
+        nicht den Fall ab, den es nur unter haeufiger Einwirkung gibt. Wer
+        einen solchen kennt, soll ihn dazustellen koennen, ohne die
+        Abschaetzung fuer alle anderen aufzugeben.
+
+        Die Rechnung steht hier und nicht in der Oberflaeche: dort waere sie
+        eine zweite Wahrheit.
         """
-        if eintrag.haeufige_aus_tragsicherheit:
-            return [
-                Haeufigerfall(
-                    name=f"{k.name} ({HAEUFIG_ANTEIL * 100:.0f} %)",
-                    M_Ed=Groesse(HAEUFIG_ANTEIL * k.M_Ed, KNM),
-                    N_Ed=Groesse(HAEUFIG_ANTEIL * k.N_Ed, KN))
-                for k in eintrag.kombinationen if k.gilt_fuer(richtung)
-            ]
-        return [
+        abgeleitet = [
+            Haeufigerfall(
+                name=f"{k.name} ({HAEUFIG_ANTEIL * 100:.0f} %)",
+                M_Ed=Groesse(HAEUFIG_ANTEIL * k.M_Ed, KNM),
+                N_Ed=Groesse(HAEUFIG_ANTEIL * k.N_Ed, KN))
+            for k in eintrag.kombinationen if k.gilt_fuer(richtung)
+        ] if eintrag.haeufige_aus_tragsicherheit else []
+        eigene = [
             Haeufigerfall(name=h.name,
                           M_Ed=Groesse(h.M_Ed, KNM),
                           N_Ed=Groesse(h.N_Ed, KN))
             for h in eintrag.haeufige if h.gilt_fuer(richtung)
         ]
+        return abgeleitet + eigene
 
     def _ausgefallene(
         self, kombinationen: Sequence[KombinationEintrag], richtung: Richtung

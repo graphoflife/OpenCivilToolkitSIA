@@ -839,7 +839,7 @@ function knickBlock(querschnitt) {
             q.knickfaelle = q.knickfaelle || [];
             q.knickfaelle.push({
               name: `Stütze ${q.knickfaelle.length + 1}`,
-              N_Ed: -500, M_Ed_1: 20, laenge: 3, knicklaenge: 3,
+              N_Ed: -500, M_Ed_1: 20, laenge: 3, knicklaenge: 3, aktiv: true,
             });
           }),
         },
@@ -847,6 +847,7 @@ function knickBlock(querschnitt) {
     ]),
     faelle.length
       ? el('div.einwirkung.ist-knick.ist-kopf', {}, [
+        el('span'),
         el('span', { text: 'Bezeichnung' }),
         el('span', { text: 'N_Ed [kN]' }),
         el('span', { text: 'M_Ed,1 [kNm]' }),
@@ -872,7 +873,9 @@ function knickZeile(querschnitt, index) {
     beiAenderung: (v) => aendern((x) => { x[feld] = v ?? 0; }),
   });
 
-  return el('div.einwirkung.ist-knick', {}, [
+  const aktiv = k.aktiv !== false;
+  return el('div.einwirkung.ist-knick', { class: aktiv ? '' : 'ist-aus' }, [
+    hakenSchalter(aktiv, (wert) => aendern((x) => { x.aktiv = wert; }), 'Knicknachweis'),
     el('input.ew-name', {
       type: 'text', value: k.name, title: 'Bezeichnung des Knicknachweises',
       on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
@@ -911,34 +914,35 @@ function mindestbewehrungsBlock(querschnitt) {
     veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
   });
 
-  const zwaengung = (feld, beschriftung, titel) => el('div.duktilitaetszeile.ist-breit', {}, [
-    el('span.postenname', { text: beschriftung, title: titel }),
+  // Der Zeilentitel sagt schon, was der Schalter tut. Die Spalte rechts
+  // wiederholte das in einem ganzen Satz und machte die Tafel breit.
+  const zwaengung = (feld, beschriftung) => el('div.duktilitaetszeile.ist-breit', {}, [
+    el('span.postenname', { text: beschriftung }),
     hakenSchalter(!!querschnitt[feld],
       (wert) => aendern((q) => { q[feld] = wert; }), 'Zwängung'),
-    el('span.kurvenhinweis', { text: titel }),
+    el('span.kurvenhinweis', { text: '' }),
   ]);
 
   return el('div.unterkapitel', {}, [
     el('div.unterkapitel-kopf', {}, [
-      el('span', { text: 'Mindestbewehrung-Nachweise' }),
+      el('span', { text: 'Nachweise der Rissbreitenbegrenzung' }),
     ]),
-
-    zwaengung('zwaengung_x', 'Normalkraft-Zwängung x',
-      'Zwang in x-Richtung wird angesetzt'),
-    zwaengung('zwaengung_y', 'Normalkraft-Zwängung y',
-      'Zwang in y-Richtung wird angesetzt'),
-    zwaengung('zwaengung_begrenzt', 'Begrenzung auf 500 mm',
-      'Die Zwängung wird höchstens für 500 mm Plattendicke angesetzt'),
 
     el('div.unterkapitel-kopf', { style: { marginTop: '8px' } }, [
-      el('span', { text: 'Zwängung auf Biegung' }),
-      el('span.kurvenhinweis', { text: 'σ_s ≤ σ_s,adm' }),
+      el('span', { text: 'Begrenzung der Rissbreiten unter aufgezwungenen '
+        + 'Verformungen' }),
     ]),
+    zwaengung('zwaengung_x', 'Zwängung auf Normalkraft x'),
+    zwaengung('zwaengung_y', 'Zwängung auf Normalkraft y'),
+    zwaengung('zwaengung_begrenzt', 'Begrenzung auf 500 mm'),
+
+    // Ohne eigene Überschrift: die vier Zeilen schreiben ihren Nachweis selbst
+    // aus und stehen unter derselben Aufschrift wie die Normalkraft-Zwängung.
     ...[1, 2, 3, 4].map((nummer) => zwaengungBiegungZeile(querschnitt, nummer)),
 
     el('div.unterkapitel-kopf', { style: { marginTop: '8px' } }, [
-      el('span', { text: 'Häufige Lastfälle' }),
-      aus70 ? null : el('button.knopf.knopf-zart', {
+      el('span', { text: 'Verhindern des Fliessens für häufige Lastfälle' }),
+      el('button.knopf.knopf-zart', {
         text: '+ Lastfall',
         on: {
           click: () => aendern((q) => {
@@ -953,18 +957,17 @@ function mindestbewehrungsBlock(querschnitt) {
     ]),
 
     el('div.duktilitaetszeile.ist-breit', {}, [
-      el('span.postenname', { text: '70 % übernehmen' }),
+      el('span.postenname', { text: '70 % der Tragsicherheitseinwirkungen' }),
       hakenSchalter(aus70, (wert) => aendern((q) => {
         q.haeufige_aus_tragsicherheit = wert;
       }), 'Ableitung'),
-      el('span.kurvenhinweis', {
-        text: aus70
-          ? 'Moment und Normalkraft der Tragsicherheitsfälle, mit 70 % angesetzt'
-          : 'Eigene Lastfälle, unabhängig von den Tragsicherheitsfällen',
-      }),
+      el('span.kurvenhinweis', { text: '' }),
     ]),
 
-    ...(aus70 ? [] : [
+    // Die abgeleiteten Fälle und eigene schliessen sich nicht aus: wer die
+    // 70 % nimmt, kann trotzdem einen Fall von Hand dazustellen, den keine
+    // Tragsicherheitskombination abbildet.
+    ...[
       faelle.length
         ? el('div.einwirkung.ist-kopf.ist-haeufig', {}, [
           el('span', { text: 'Bezeichnung' }),
@@ -976,8 +979,12 @@ function mindestbewehrungsBlock(querschnitt) {
         : null,
       ...(faelle.length
         ? faelle.map((_, i) => haeufigZeile(querschnitt, i))
-        : [el('div.leer', { text: 'Noch kein häufiger Lastfall.' })]),
-    ]),
+        : [el('div.leer', {
+          text: aus70
+            ? 'Nur die abgeleiteten Fälle.'
+            : 'Noch kein häufiger Lastfall.',
+        })]),
+    ],
   ]);
 }
 
@@ -992,7 +999,7 @@ function zwaengungBiegungZeile(querschnitt, nummer) {
     q.zwaengung_biegung_lagen[nummer - 1] = wert;
   });
   return el('div.duktilitaetszeile', {}, [
-    el('span.postenname', { text: `Zwängung ${nummer}. Lage` }),
+    el('span.postenname', { text: `Zwängung auf Biegung ${nummer}. Lage` }),
     el('span.richtung', {
       text: richtung, class: `lage-${richtung}`,
       title: `Tragrichtung der ${nummer}. Lage`,

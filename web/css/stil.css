@@ -332,11 +332,16 @@ input[readonly], input:disabled, select:disabled {
 
 /* Eine Lage, ein Schalter: Haken oder Kreuz. Ohne Richtungsmarke -- bei der
    Zwängung und der 70-%-Regel gibt es keine -- bekommt der Name ihren Platz. */
+/* Der Name nimmt, was übrig ist. «Zwängung auf Biegung 4. Lage» und
+   «70 % der Tragsicherheitseinwirkungen» schreiben ihren Nachweis aus statt
+   ihn in einer Spalte daneben zu erklären -- eine feste Namensbreite hiesse,
+   dass der längste von ihnen umbricht und seine Zeile doppelt so hoch wird.
+   Die Hinweisspalte steht auf auto: leer ist sie null breit. */
 .duktilitaetszeile {
-  display: grid; grid-template-columns: 118px 18px 54px 1fr;
+  display: grid; grid-template-columns: minmax(0, 1fr) 18px 54px auto;
   gap: 6px; align-items: center; margin-bottom: 4px;
 }
-.duktilitaetszeile.ist-breit { grid-template-columns: 142px 54px 1fr; }
+.duktilitaetszeile.ist-breit { grid-template-columns: minmax(0, 1fr) 54px auto; }
 .duktilitaetszeile .postenname {
   font-size: 11.5px; font-weight: 600; color: var(--schrift-matt);
 }
@@ -350,15 +355,25 @@ input[readonly], input:disabled, select:disabled {
    breit, und bei symmetrischem Innenabstand stand der Schalter dadurch
    schief. Die abgewählte Seite bleibt blass, damit das Auge sofort sieht,
    welche gilt. */
+/* Ja|Nein als ein Stück: die abgewählte Hälfte bleibt sichtbar, aber sie
+   soll nicht als weisse Spalte neben der farbigen stehen. Reines Weiss
+   neben Grün oder Rot liest sich wie eine Lücke im Schalter -- ein zarter
+   Grauton gehört erkennbar zum selben Knopf. */
+.schalter-haken { background: var(--flaeche-2); }
 .schalter-haken .schalter-halb {
   width: 26px; padding: 2px 0; font-size: 12px; line-height: 15px;
   display: inline-flex; align-items: center; justify-content: center;
-  color: var(--rand-stark);
+  color: var(--rand-stark); background: var(--flaeche-2);
 }
-.schalter-haken .schalter-halb:hover { color: var(--schrift-matt); }
+.schalter-haken .schalter-halb:hover {
+  color: var(--schrift-matt); background: var(--flaeche-2);
+}
 .schalter-haken .ist-ja.ist-an   { background: var(--gut); color: #fff; }
 .schalter-haken .ist-nein.ist-an { background: var(--schlecht); color: #fff; }
-.schalter-haken .ist-an:hover    { color: #fff; }
+/* Die eingeschaltete Hälfte behält ihre Farbe auch unter dem Zeiger --
+   sonst blitzt beim Darüberfahren genau das Grau auf, das hier weg soll. */
+.schalter-haken .ist-ja.ist-an:hover   { background: var(--gut); color: #fff; }
+.schalter-haken .ist-nein.ist-an:hover { background: var(--schlecht); color: #fff; }
 
 /* Tragrichtung einer Einwirkung -- dieselben Farben wie bei den Lagen, damit
    man nicht überlegen muss, welche Richtung welche ist. */
@@ -425,7 +440,7 @@ input[readonly], input:disabled, select:disabled {
 /* Ein häufiger Lastfall trägt keine Querkraft, ein Knicknachweis keine
    Richtungswahl -- je eine Spalte anders. */
 .einwirkung.ist-knick {
-  grid-template-columns: 1fr 62px 66px 54px 54px 20px;
+  grid-template-columns: 42px 1fr 60px 62px 50px 50px 20px;
 }
 .einwirkung.ist-kopf {
   font-size: 10.5px; font-weight: 700; text-transform: uppercase;
