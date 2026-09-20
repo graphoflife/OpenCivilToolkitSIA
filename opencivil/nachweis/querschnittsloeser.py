@@ -57,9 +57,20 @@ from typing import Callable, List, Optional, Sequence, Tuple
 #: und der Fehler der Mittelpunktsregel faellt mit dem Quadrat der Faserdicke.
 FASERN = 60
 
-#: Halbierungen je Bisektion. 60 bringt jedes Intervall auf 1e-18 seiner
-#: Breite -- mehr als die doppelte Genauigkeit erlaubt.
+#: Obergrenze der Halbierungen je Bisektion. Erreicht wird sie fast nie --
+#: abgebrochen wird ueber die Schranken darunter, sobald das Fenster eng
+#: genug ist. Die Zahl steht nur da, damit keine Schleife ewig laeuft.
 SCHRITTE = 60
+
+#: Wann das Dehnungsfenster eng genug ist. Der Startbereich ist rund 0.05
+#: breit; 1e-11 ist ein Zehntausendstel eines Promille und liegt weit unter
+#: allem, was eine Eingabe hergibt. Ohne diese Schranke lief die Bisektion
+#: stur sechzig Mal -- die letzten zehn Durchlaeufe aendern in doppelter
+#: Genauigkeit nichts mehr und kosten doch jedesmal einen Faserdurchgang.
+EPS_SCHRANKE = 1e-11
+
+#: Dasselbe fuer die Kruemmung, in 1/m.
+CHI_SCHRANKE = 1e-10
 
 #: Aeusserste Dehnungen, innerhalb derer gesucht wird -- Stauchung und
 #: Dehnung. **Der Suchbereich muss im gueltigen Bereich beider Gesetze
@@ -159,10 +170,16 @@ class Querschnittsloeser:
         self.fasern = fasern
         self.eps_druck = abs(eps_druck)
         self.eps_zug = abs(eps_zug)
-        # Mittelpunkte und Dicke der Fasern -- einmal gerechnet, tausendfach
-        # gebraucht.
+        # Hebelarme und Flaeche der Fasern -- einmal gerechnet, hunderttausendfach
+        # gebraucht. Gespeichert wird der Abstand zur Mittelebene und nicht die
+        # Lage ueber Unterkante: gebraucht wird in jedem Durchgang nur der Arm,
+        # und die Verschiebung jedesmal neu abzuziehen kostet bei sechzig
+        # Fasern mal tausend Aufrufen spuerbar Zeit.
         self.dicke = h / fasern
         self.mitten = [(i + 0.5) * self.dicke for i in range(fasern)]
+        self.arme = [z - h / 2.0 for z in self.mitten]
+        self.faserflaeche = self.dicke * b
+        self.stahlarme = [(l.z - h / 2.0) for l in self.lagen]
 
     # -- Vorwaerts ----------------------------------------------------------
 
@@ -176,21 +193,23 @@ class Querschnittsloeser:
         """
         N = 0.0
         M = 0.0
-        halb = self.h / 2.0
+        # Ortsgebunden: diese Schleife laeuft in jedem Nachweis hunderttausende
+        # Male, und jeder Zugriff ueber self kostet darin eine Suche.
+        beton = self.beton
+        flaeche = self.faserflaeche
 
-        for z in self.mitten:
-            sigma = self.beton(eps_m + chi * (z - halb))
-            kraft = sigma * self.dicke * self.b
+        for arm in self.arme:
+            kraft = beton(eps_m + chi * arm) * flaeche
             N += kraft
-            M += kraft * (z - halb)
+            M += kraft * arm
 
-        for lage in self.lagen:
-            eps = eps_m + chi * (lage.z - halb)
+        stahl = self.stahl
+        for lage, arm in zip(self.lagen, self.stahlarme):
+            eps = eps_m + chi * arm
             # Netto: der Stahl ersetzt den Beton an dieser Stelle.
-            sigma = self.stahl(eps) - self.beton(eps)
-            kraft = sigma * lage.a_s
+            kraft = (stahl(eps) - beton(eps)) * lage.a_s
             N += kraft
-            M += kraft * (lage.z - halb)
+            M += kraft * arm
 
         return Schnittkraefte(N=N, M=M)
 
@@ -227,6 +246,8 @@ class Querschnittsloeser:
         if self.kraefte(oben, chi).N < N_ziel:
             return None
         for _ in range(SCHRITTE):
+            if oben - unten <= EPS_SCHRANKE:
+                break
             mitte = 0.5 * (unten + oben)
             if self.kraefte(mitte, chi).N < N_ziel:
                 unten = mitte
@@ -259,6 +280,8 @@ class Querschnittsloeser:
             return self._ergebnis(0.0, 0.0, konvergiert=False)
 
         for _ in range(SCHRITTE):
+            if oben - unten <= CHI_SCHRANKE:
+                break
             mitte = 0.5 * (unten + oben)
             m = moment(mitte)
             if m is None:

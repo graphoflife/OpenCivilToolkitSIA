@@ -14,15 +14,34 @@ DAS VERFAHREN::
     e_2d    = |chi| * l_cr^2 / pi^2                        Ausmitte 2. Ordnung
 
     wiederhole:
-        M_ziel = |N_Ed| * (e_0d + e_1d + e_2d)
-        (eps_m, chi) = Gleichgewicht zu (N_Ed, M_ziel)
+        M_ziel = |N| * (e_0d + e_1d + e_2d)
+        (eps_m, chi) = Gleichgewicht zu (N, M_ziel)
         e_2d neu aus chi
     bis M_ziel sich nicht mehr aendert
 
-Konvergiert die Folge, gibt es eine Gleichgewichtslage: das System ist stabil.
-Waechst sie, kippt es -- dann ist der Nachweis nicht erfuellt, und zwar nicht
-wegen einer ueberschrittenen Spannung, sondern weil es gar kein Gleichgewicht
-gibt. Genau das ist Knicken.
+Die Kruemmung haengt am Moment, das Moment an der Ausmitte und die Ausmitte
+wieder an der Kruemmung. Es gibt dafuer keine geschlossene Loesung; gesucht
+wird der Fixpunkt. Laeuft die Folge ein, gibt es eine Gleichgewichtslage.
+Waechst sie, kippt das System -- und zwar nicht wegen einer ueberschrittenen
+Spannung, sondern weil es gar kein Gleichgewicht gibt. Genau das ist Knicken.
+
+DER ERFUELLUNGSGRAD IST EIN VERHAELTNIS VON NORMALKRAEFTEN::
+
+    N_Rd = groesste Druckkraft, die der Stab noch traegt
+    alpha_eff = N_Rd / |N_Ed|
+
+Gesucht wird ``N_Rd`` durch Halbieren: zu jeder Probekraft laeuft das
+Verfahren oben, und getragen ist sie, wenn die Folge einlaeuft *und* der
+Querschnitt das dabei entstehende Moment aufnimmt. Die gewollte Ausmitte
+``e_1d`` bleibt dabei fest -- sie ist eine Eigenschaft des Systems, nicht der
+Last; ``M_Ed,1`` waechst also mit. ``e_0d`` ist rein geometrisch und aendert
+sich ohnehin nicht.
+
+Ueber ``M_Rd`` zu vergleichen waere das naechstliegende gewesen und ist
+trotzdem falsch: beim Knicken gibt es Faelle, in denen gar kein Moment mehr
+herauskommt, weil die Folge davonlaeuft. Dann steht da kein Widerstand,
+sondern nichts -- und ein Nachweis ohne Zahl sagt nicht, wie weit er daneben
+liegt. Die Normalkraft dagegen hat immer einen Grenzwert.
 
 NUR IN X-RICHTUNG:
 Ein Knicknachweis braucht eine Knicklaenge, und die gehoert zu einer
@@ -30,15 +49,17 @@ Tragrichtung. Gerechnet wird darum nur mit der Bewehrung in x -- in y waere
 die Breite der Platte die Laenge, und die ist keine Stuetze.
 
 WAS IN DIE MITSCHRIFT GEHOERT:
-Das Verfahren, die letzte Ausmitte und die **Probe**: mit der gefundenen Ebene
-entstehen genau ``N_Ed`` und das Moment zweiter Ordnung. Die Iteration selbst
-steht nicht da.
+Die Iteration Durchlauf fuer Durchlauf -- sie *ist* hier das Verfahren und
+nicht bloss eine Nullstellensuche, die man auch anders haette machen koennen.
+Dazu die Probe, dass die gefundene Dehnungsebene genau diese Schnittgroessen
+erzeugt, und die Suche nach ``N_Rd`` als Verfahren beschrieben: von der
+laeuft nur das Ergebnis mit, sonst stuenden vierzig Iterationstabellen da.
 """
 
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import (
@@ -58,6 +79,17 @@ DURCHLAEUFE = 40
 
 #: Wann die Iteration als eingelaufen gilt -- Aenderung des Moments.
 SCHRANKE = 1e-4
+
+#: Durchlaeufe der Halbierung, die N_Rd sucht. Das Fenster ist so breit wie
+#: die getragene Kraft selbst; 14 Schritte bringen es auf deren
+#: Sechzehntausendstel, bei 2000 kN also auf ein Zehntel Kilonewton. Jeder
+#: weitere Schritt kostet eine vollstaendige Ausmitten-Iteration und aendert
+#: nichts mehr an der Zahl, die in der Tabelle steht.
+HALBIERUNGEN = 14
+
+#: Wie weit die Suche nach oben gehen darf, als Vielfaches von |N_Ed|. Wer
+#: einen Stab mit alpha_eff > 64 baut, hat kein Knickproblem.
+OBERGRENZE = 64.0
 
 #: Riegel der Schiefstellung, SIA 262:2025, 4.3.7.
 ALPHA_UNTEN = 1.0 / 300.0
@@ -81,6 +113,42 @@ class Knickfall:
         return "".join(z if z.isalnum() else "_" for z in self.name)
 
 
+@dataclass(frozen=True)
+class Durchlauf:
+    """Ein Schritt der Ausmitten-Iteration -- eine Zeile der Mitschrift."""
+
+    nummer: int
+    e_2d_vorher: float
+    """Ausmitte, mit der dieser Durchlauf begonnen hat -- im ersten null."""
+
+    M_ziel: float
+    """Moment am verformten System, aus ``e_2d_vorher``."""
+
+    chi: float
+    """Kruemmung im Gleichgewicht dazu. ``nan``, wenn es keine gibt."""
+
+    e_2d: float
+    """Ausmitte, die aus ``chi`` folgt -- der Start des naechsten Durchlaufs."""
+
+
+@dataclass
+class Gleichgewicht:
+    """Was bei einer Probekraft herauskommt."""
+
+    traegt: bool = False
+    stabil: bool = False
+    """Ob die Ausmitten-Iteration eingelaufen ist."""
+
+    e_2d: float = 0.0
+    M_ges: float = 0.0
+    M_Rd: float = 0.0
+    eps_m: float = 0.0
+    chi: float = 0.0
+    N_int: float = 0.0
+    M_int: float = 0.0
+    schritte: List[Durchlauf] = field(default_factory=list)
+
+
 @dataclass
 class Knickergebnis:
     """Alle Zwischenwerte eines Knickfalls."""
@@ -102,6 +170,13 @@ class Knickergebnis:
     M_Rd: float = 0.0
     """Momentenwiderstand bei dieser Normalkraft, in Nm."""
 
+    N_Rd: float = 0.0
+    """Groesste Druckkraft mit Gleichgewicht, als Betrag in N."""
+
+    schritte: List[Durchlauf] = field(default_factory=list)
+    """Die Ausmitten-Iteration bei N_Ed -- Zeile fuer Zeile."""
+
+    halbierungen: int = 0
     erfuellungsgrad: float = 0.0
     erfuellt: bool = False
     begruendung: str = ""
@@ -214,6 +289,9 @@ class Knicken(Nachweis):
                                     eps_c1d=eps_c1d, eps_c2d=eps_c2d),
             stahl=stahl_bilinear(E_s=E_s, f_sd=f_yd, eps_ud=eps_ud),
             eps_druck=eps_c2d, eps_zug=eps_ud)
+        # Aufgehoben wie self.ergebnisse: wer nachrechnen will, was bei einer
+        # anderen Druckkraft herauskaeme, braucht denselben Loeser.
+        self.loeser = loeser
 
         self._protokoll_ansatz(p, phi, E_cm, f_cd)
 
@@ -249,63 +327,140 @@ class Knicken(Nachweis):
         d = max(l.z for l in loeser.lagen)
         erg.alpha_i = schiefstellung(fall.laenge.si)
         erg.e_0d = max(d / 30.0, erg.alpha_i * l_cr / 2.0)
+        # Die gewollte Ausmitte ist eine Eigenschaft des Systems und bleibt
+        # bei der Suche nach N_Rd fest -- M_Ed,1 waechst mit der Last.
         erg.e_1d = abs(fall.M_Ed_1.si / N_Ed)
 
+        bei_N_Ed = self._gleichgewicht(loeser, abs(N_Ed), erg, l_cr)
+        erg.schritte = bei_N_Ed.schritte
+        erg.durchlaeufe = len(bei_N_Ed.schritte)
+        erg.stabil = bei_N_Ed.stabil
+        erg.e_2d = bei_N_Ed.e_2d
+        erg.M_ges = bei_N_Ed.M_ges
+        erg.M_Rd = bei_N_Ed.M_Rd
+        erg.eps_m, erg.chi = bei_N_Ed.eps_m, bei_N_Ed.chi
+        erg.N_int, erg.M_int = bei_N_Ed.N_int, bei_N_Ed.M_int
+
+        erg.N_Rd = self._grenzkraft(loeser, abs(N_Ed), erg, l_cr,
+                                    traegt=bei_N_Ed.traegt)
+        erg.erfuellungsgrad = erg.N_Rd / abs(N_Ed)
+        erg.erfuellt = bei_N_Ed.traegt
+        erg.begruendung = self._begruendung(erg, bei_N_Ed)
+        if not bei_N_Ed.stabil:
+            erg.hinweis = (
+                f"Bei N_Ed = {fall.N_Ed.formatiert(1, KN)} kN stellt sich keine "
+                f"Gleichgewichtslage ein: die Ausmitte zweiter Ordnung läuft "
+                f"nicht ein. Das System knickt. N_Rd ist die grösste "
+                f"Druckkraft, bei der es noch steht.")
+        return erg
+
+    def _begruendung(self, erg: Knickergebnis, gg: Gleichgewicht) -> str:
+        grenze = (f"N_Rd = {erg.N_Rd / 1e3:.1f} kN gegen "
+                  f"|N_Ed| = {abs(erg.fall.N_Ed.si) / 1e3:.1f} kN.")
+        if not gg.stabil:
+            return (f"Die Ausmitte zweiter Ordnung läuft nicht ein – das "
+                    f"System knickt unter dieser Last. {grenze}")
+        return (f"Stabil nach {len(gg.schritte)} Durchläufen: "
+                f"e_0d = {erg.e_0d * 1e3:.1f} mm, e_1d = {erg.e_1d * 1e3:.1f} mm, "
+                f"e_2d = {erg.e_2d * 1e3:.1f} mm, also "
+                f"M_Ed,II = {erg.M_ges / 1e3:.1f} kNm gegen "
+                f"M_Rd = {erg.M_Rd / 1e3:.1f} kNm. {grenze}")
+
+    # -- Gleichgewicht bei einer Probekraft ---------------------------------
+
+    def _gleichgewicht(self, loeser: Querschnittsloeser, N: float,
+                       erg: Knickergebnis, l_cr: float) -> Gleichgewicht:
+        """
+        Die Ausmitten-Iteration bei der Druckkraft ``N`` (Betrag).
+
+        Getragen ist ``N``, wenn die Folge einlaeuft **und** der Querschnitt
+        das Moment am verformten System aufnimmt. Beides gehoert zusammen: ein
+        Stab, der kippt, ist so wenig nachgewiesen wie einer, dessen
+        Querschnitt aufreisst.
+        """
+        gg = Gleichgewicht()
         e_2d = 0.0
         vorher: Optional[float] = None
-        for durchlauf in range(1, DURCHLAEUFE + 1):
-            erg.durchlaeufe = durchlauf
-            M_ziel = abs(N_Ed) * (erg.e_0d + erg.e_1d + e_2d)
-            ebene = loeser.loese(N_Ed=N_Ed, M_Ed=M_ziel)
+        for nummer in range(1, DURCHLAEUFE + 1):
+            M_ziel = N * (erg.e_0d + erg.e_1d + e_2d)
+            ebene = loeser.loese(N_Ed=-N, M_Ed=M_ziel)
             if not ebene.konvergiert:
-                erg.begruendung = erg.hinweis = (
-                    f"Bei N_Ed = {fall.N_Ed.formatiert(1, KN)} kN stellt sich "
-                    f"keine Gleichgewichtslage mehr ein: das Moment zweiter "
-                    f"Ordnung wächst über das, was der Querschnitt aufnimmt. "
-                    f"Das System knickt.")
-                return erg
-            e_2d = abs(ebene.chi) * l_cr * l_cr / (math.pi ** 2)
-            if vorher is not None and abs(M_ziel - vorher) <= SCHRANKE * max(
-                    abs(M_ziel), 1.0):
-                erg.stabil = True
-                erg.e_2d = e_2d
-                erg.M_ges = M_ziel
-                erg.eps_m, erg.chi = ebene.eps_m, ebene.chi
-                erg.N_int, erg.M_int = ebene.N_int, ebene.M_int
+                # Kein Gleichgewicht zu dieser Ausmitte: der Querschnitt
+                # nimmt das Moment nicht mehr auf, die Folge waechst weiter.
+                gg.schritte.append(
+                    Durchlauf(nummer, e_2d, M_ziel, float("nan"), float("nan")))
+                return gg
+            neu = abs(ebene.chi) * l_cr * l_cr / (math.pi ** 2)
+            gg.schritte.append(Durchlauf(nummer, e_2d, M_ziel, ebene.chi, neu))
+            e_2d = neu
+            eingelaufen = vorher is not None and abs(M_ziel - vorher) <= (
+                SCHRANKE * max(abs(M_ziel), 1.0))
+            if eingelaufen:
+                gg.stabil = True
+                gg.e_2d, gg.M_ges = e_2d, M_ziel
+                gg.eps_m, gg.chi = ebene.eps_m, ebene.chi
+                gg.N_int, gg.M_int = ebene.N_int, ebene.M_int
                 break
             vorher = M_ziel
         else:
-            erg.begruendung = erg.hinweis = (
-                f"Die Ausmitte zweiter Ordnung läuft nach {DURCHLAEUFE} "
-                f"Durchläufen nicht ein. Das System ist nicht stabil.")
-            return erg
+            return gg
 
         # Der Querschnitt muss das Moment am verformten System aufnehmen.
-        widerstand = self.mn.moment_bei(N_Ed, positiv=erg.M_ges >= 0)
-        erg.M_Rd = widerstand or 0.0
-        erg.erfuellungsgrad = (float("inf") if erg.M_ges == 0
-                               else erg.M_Rd / abs(erg.M_ges))
-        erg.erfuellt = erg.M_Rd >= abs(erg.M_ges)
-        erg.begruendung = (
-            f"Stabil nach {erg.durchlaeufe} Durchläufen: "
-            f"e_0d = {erg.e_0d * 1e3:.1f} mm, e_1d = {erg.e_1d * 1e3:.1f} mm, "
-            f"e_2d = {erg.e_2d * 1e3:.1f} mm. "
-            f"M_ges = {erg.M_ges / 1e3:.1f} kNm gegen "
-            f"M_Rd = {erg.M_Rd / 1e3:.1f} kNm.")
-        return erg
+        gg.M_Rd = self.mn.moment_bei(-N, positiv=gg.M_ges >= 0) or 0.0
+        gg.traegt = gg.M_Rd >= abs(gg.M_ges)
+        return gg
+
+    def _grenzkraft(self, loeser: Querschnittsloeser, N_Ed: float,
+                    erg: Knickergebnis, l_cr: float, *, traegt: bool) -> float:
+        """
+        Die groesste getragene Druckkraft, durch Halbieren.
+
+        Bei ``N = 0`` traegt der Stab immer: mit der Last verschwindet auch
+        das Moment, denn ``e_1d`` ist fest. Das ist die untere Schranke, die
+        das Halbieren braucht -- sie muss nicht gesucht werden.
+        """
+        def traegt_bei(N: float) -> bool:
+            return self._gleichgewicht(loeser, N, erg, l_cr).traegt
+
+        if traegt:
+            # Oben suchen: verdoppeln, bis es nicht mehr traegt.
+            unten, oben = N_Ed, N_Ed * 2.0
+            while oben <= N_Ed * OBERGRENZE and traegt_bei(oben):
+                unten, oben = oben, oben * 2.0
+            if oben > N_Ed * OBERGRENZE:
+                # So weit ueber der Last, dass die Zahl nichts mehr aussagt.
+                erg.halbierungen = 0
+                return unten
+        else:
+            unten, oben = 0.0, N_Ed
+
+        for schritt in range(1, HALBIERUNGEN + 1):
+            erg.halbierungen = schritt
+            mitte = 0.5 * (unten + oben)
+            if traegt_bei(mitte):
+                unten = mitte
+            else:
+                oben = mitte
+        return unten
 
     def _urteil(self, erg: Knickergebnis) -> NachweisUrteil:
-        machbar = erg.stabil
+        # Verglichen werden Normalkraefte: N_Rd ist die groesste Druckkraft,
+        # die noch eine Gleichgewichtslage hat. Das Moment zweiter Ordnung
+        # steht in der Herleitung -- in der Tabelle waere es die Groesse, die
+        # beim Knicken gerade verschwindet.
+        machbar = erg.fall.N_Ed.si < 0.0
+        # Beide Zahlen als Betrag: ein Widerstand mit umgekehrtem Vorzeichen
+        # neben seiner Einwirkung liest sich wie ein Fehler.
         einwirkung = WertDef(
-            id=f"{self.id}.{erg.fall.kennung}.M_ges",
-            symbol=r"M_{Ed,II}",
-            einheit=KNM, beschreibung="Einwirkung", stellen=1,
-        ).belegen(Groesse.aus_si(abs(erg.M_ges), KNM))
+            id=f"{self.id}.{erg.fall.kennung}.N_Ed",
+            symbol=r"N_{Ed}",
+            einheit=KN, beschreibung="Einwirkung", stellen=1,
+        ).belegen(Groesse.aus_si(abs(erg.fall.N_Ed.si), KN))
         widerstand = WertDef(
-            id=f"{self.id}.{erg.fall.kennung}.M_Rd",
-            symbol=r"M_{Rd,x}(N_{Ed})",
-            einheit=KNM, beschreibung="Widerstand", stellen=1,
-        ).belegen(Groesse.aus_si(erg.M_Rd, KNM))
+            id=f"{self.id}.{erg.fall.kennung}.N_Rd",
+            symbol=r"N_{Rd,K}",
+            einheit=KN, beschreibung="Widerstand", stellen=1,
+        ).belegen(Groesse.aus_si(erg.N_Rd, KN))
         return NachweisUrteil(
             name=f"Knicken – {erg.fall.name}",
             art="K",
@@ -331,31 +486,41 @@ class Knicken(Nachweis):
             "lange durchlaufen, bis sie einläuft. Läuft sie nicht ein, gibt es "
             "keine Gleichgewichtslage: das System knickt."
         )
+        p.text(
+            "Der Erfüllungsgrad ist ein Verhältnis von Normalkräften: N_Rd "
+            "ist die grösste Druckkraft, unter der der Stab noch steht. Über "
+            "Momente zu vergleichen ginge nur, solange es ein Gleichgewicht "
+            "gibt – beim Knicken ist gerade das der Fall, der fehlt."
+        )
         p.gleichung(
             r"\alpha_i = \min\left[\max\left(\frac{0.01}{\sqrt{l}};\ "
             rf"\frac{{1}}{{300}}\right);\ \frac{{1}}{{200}}\right] \qquad "
             r"e_{0d} = \max\left(\frac{d}{30};\ "
             r"\frac{\alpha_i \cdot l_{cr}}{2}\right)",
-            titel="Ungewollte Ausmitte", referenz="SIA 262:2025, 4.3.7")
+            titel="Ungewollte Ausmitte – allgemein",
+            referenz="SIA 262:2025, 4.3.7")
         p.gleichung(
             r"e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| \qquad "
             r"e_{2d} = \left|\chi\right| \cdot \frac{l_{cr}^{2}}{\pi^{2}} "
             r"\qquad M_{Ed,II} = \left|N_{Ed}\right| \cdot "
             r"\left(e_{0d} + e_{1d} + e_{2d}\right)",
-            titel="Gewollte Ausmitte und Ausmitte 2. Ordnung")
+            titel="Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein")
         p.gleichung(
             rf"E_{{c,eff}} = \frac{{E_{{cm}}}}{{1 + \varphi}} = "
-            rf"\frac{{{E_cm / 1e6:.0f}}}{{1 + {phi:.2f}}} = "
+            rf"\frac{{{E_cm / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}}}"
+            rf"{{1 + {phi:.2f}}} = "
             rf"{E_cm / (1.0 + phi) / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
             rf" \qquad {self.s_f_cd} = {f_cd / 1e6:.1f}"
             rf"\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}",
             titel="Steifigkeit des Betons")
         p.text(
             "Gerechnet wird mit dem nichtlinearen Werkstoffgesetz und den "
-            "Bemessungswerten. Die Krümmung zu einer Schnittgrössenkombination "
-            "wird gesucht, nicht hergeleitet; nachgewiesen wird deshalb die "
-            "Probe – dass die gefundene Dehnungsebene genau diese Kräfte "
-            "erzeugt."
+            "Bemessungswerten. Die Dehnungsebene zu einem Moment wird gesucht "
+            "und nicht hergeleitet; belegt wird sie deshalb durch die Probe – "
+            "dass genau diese Ebene die verlangten Schnittgrössen erzeugt. "
+            "Die Ausmitten-Iteration darüber steht dagegen vollständig da: "
+            "sie ist das Verfahren selbst, und dass sie einläuft, ist die "
+            "Aussage des Nachweises."
         )
 
     def _protokoll_fall(self, p: Protokoll, erg: Knickergebnis) -> None:
@@ -368,39 +533,118 @@ class Knicken(Nachweis):
             rf"l_{{cr}} = {fall.knicklaenge.als_latex(2)}",
             titel="Einwirkung und System")
 
-        if not erg.stabil:
+        if fall.N_Ed.si >= 0.0:
             p.text(erg.begruendung)
             return
 
+        d = erg.e_0d
         p.gleichung(
-            rf"\alpha_i = {erg.alpha_i:.5f} \qquad "
-            rf"e_{{0d}} = {erg.e_0d * 1e3:.1f}\,\mathrm{{mm}} \qquad "
-            rf"e_{{1d}} = {erg.e_1d * 1e3:.1f}\,\mathrm{{mm}} \qquad "
-            rf"e_{{2d}} = {erg.e_2d * 1e3:.1f}\,\mathrm{{mm}}",
-            titel=f"Ausmitten nach {erg.durchlaeufe} Durchläufen")
+            rf"\alpha_i = \min\left[\max\left(\frac{{0.01}}"
+            rf"{{\sqrt{{{fall.laenge.si:.2f}}}}};\ \frac{{1}}{{300}}\right);\ "
+            rf"\frac{{1}}{{200}}\right] = {erg.alpha_i:.5f}"
+            rf" \qquad e_{{0d}} = \max\left(\frac{{d}}{{30}};\ "
+            rf"\frac{{\alpha_i \cdot l_{{cr}}}}{{2}}\right)"
+            rf" = {d * 1e3:.1f}\,\mathrm{{mm}}",
+            titel="Ungewollte Ausmitte", referenz="SIA 262:2025, 4.3.7")
         p.gleichung(
-            rf"M_{{Ed,II}} = \left|N_{{Ed}}\right| \cdot "
-            rf"\left(e_{{0d}} + e_{{1d}} + e_{{2d}}\right)"
-            rf" = {abs(fall.N_Ed.si) / 1e3:.1f} \cdot "
-            rf"\left({erg.e_0d * 1e3:.1f} + {erg.e_1d * 1e3:.1f} + "
-            rf"{erg.e_2d * 1e3:.1f}\right) \cdot 10^{{-3}}"
-            rf" = {erg.M_ges / 1e3:.1f}\,\mathrm{{kNm}}",
-            titel="Moment am verformten System")
-        p.gleichung(
-            rf"\varepsilon_m = {erg.eps_m * 1e3:.4f}\,\text{{‰}} \qquad "
-            rf"\chi = {erg.chi:.5f}\,\mathrm{{m}}^{{-1}}",
-            titel="Gefundene Dehnungsebene")
-        p.gleichung(
-            rf"N_{{int}} = {erg.N_int / 1e3:.1f}\,\mathrm{{kN}} \;\checkmark"
-            rf" \qquad M_{{int}} = {erg.M_int / 1e3:.1f}\,\mathrm{{kNm}}"
-            rf" \;\checkmark",
-            titel="Probe: die Ebene erzeugt die Schnittgrössen")
+            rf"e_{{1d}} = \left|\frac{{M_{{Ed,1}}}}{{N_{{Ed}}}}\right|"
+            rf" = \left|\frac{{{fall.M_Ed_1.si / 1e3:.1f}\,\mathrm{{kNm}}}}"
+            rf"{{{fall.N_Ed.si / 1e3:.1f}\,\mathrm{{kN}}}}\right|"
+            rf" = {erg.e_1d * 1e3:.1f}\,\mathrm{{mm}}",
+            titel="Gewollte Ausmitte")
 
-        zustand = r"\text{erfüllt}" if erg.erfuellt else r"\text{NICHT erfüllt}"
-        vergleich = r"\ge" if erg.erfuellt else "<"
+        self._protokoll_iteration(p, erg)
+
+        if not erg.stabil:
+            p.text(
+                "Die Folge läuft nicht ein: zu jeder Ausmitte gehört eine "
+                "grössere Krümmung und dazu wieder eine grössere Ausmitte. "
+                "Unter dieser Druckkraft gibt es keine Gleichgewichtslage."
+            )
+        else:
+            p.gleichung(
+                rf"\varepsilon_m = {erg.eps_m * 1e3:.4f}\,\text{{‰}} \qquad "
+                rf"\chi = {erg.chi:.5f}\,\mathrm{{m}}^{{-1}} \qquad "
+                rf"N_{{int}} = {erg.N_int / 1e3:.1f}\,\mathrm{{kN}} \;\checkmark"
+                rf" \qquad M_{{int}} = {erg.M_int / 1e3:.1f}\,\mathrm{{kNm}}"
+                rf" \;\checkmark",
+                titel="Probe: die gefundene Ebene erzeugt die Schnittgrössen")
+            zeichen = r"\ge" if erg.M_Rd >= abs(erg.M_ges) else "<"
+            p.gleichung(
+                rf"M_{{Rd,x}}(N_{{Ed}}) = {erg.M_Rd / 1e3:.1f}\,\mathrm{{kNm}}"
+                rf" \quad {zeichen} \quad M_{{Ed,II}} = "
+                rf"{abs(erg.M_ges) / 1e3:.1f}\,\mathrm{{kNm}}",
+                titel="Querschnitt am verformten System")
+
+        self._protokoll_grenzkraft(p, erg)
+
+    def _protokoll_iteration(self, p: Protokoll, erg: Knickergebnis) -> None:
+        """
+        Die Ausmitten-Iteration, Durchlauf fuer Durchlauf.
+
+        Anders als bei den Nullstellensuchen im Faserloeser steht sie hier
+        vollstaendig da: sie ist nicht ein Weg zum Ergebnis, sondern das
+        Verfahren selbst. Dass die Folge einlaeuft, *ist* die Aussage des
+        Nachweises -- und das sieht man nur, wenn man die Folge sieht.
+        """
+        N = abs(erg.fall.N_Ed.si)
         p.gleichung(
-            rf"M_{{Rd,x}}(N_{{Ed}}) = {erg.M_Rd / 1e3:.1f}\,\mathrm{{kNm}}"
-            rf" \quad {vergleich} \quad M_{{Ed,II}} = "
-            rf"{abs(erg.M_ges) / 1e3:.1f}\,\mathrm{{kNm}}"
-            rf" \quad \Rightarrow \quad {zustand}",
-            titel="Momentenwiderstand am verformten System")
+            r"e_{2d}^{(k)} = \left|\chi^{(k)}\right| \cdot "
+            r"\frac{l_{cr}^{2}}{\pi^{2}} \qquad "
+            r"M_{Ed,II}^{(k)} = \left|N_{Ed}\right| \cdot \left(e_{0d} + "
+            r"e_{1d} + e_{2d}^{(k-1)}\right)",
+            titel="Das Verfahren", referenz="SIA 262:2025, 4.3.7")
+        p.text(
+            "Zu jedem Moment wird die Dehnungsebene gesucht, die es im "
+            "Gleichgewicht hält; aus deren Krümmung folgt die nächste "
+            "Ausmitte. Begonnen wird mit e_2d = 0, also ohne Verformung."
+        )
+        zeilen = []
+        for s in erg.schritte:
+            gibts = s.chi == s.chi   # nan ist mit sich selbst nicht gleich
+            zeilen.append([
+                str(s.nummer),
+                f"{s.e_2d_vorher * 1e3:.2f}",
+                f"{s.M_ziel / 1e3:.2f}",
+                rf"{s.chi:.5f}" if gibts else r"\text{kein Gleichgewicht}",
+                f"{s.e_2d * 1e3:.2f}" if gibts else r"\text{--}",
+            ])
+        p.tabelle(
+            kopf=[r"k", r"e_{2d}^{(k-1)}\ [\mathrm{mm}]",
+                  r"M_{Ed,II}^{(k)}\ [\mathrm{kNm}]",
+                  r"\chi^{(k)}\ [\mathrm{m}^{-1}]",
+                  r"e_{2d}^{(k)}\ [\mathrm{mm}]"],
+            zeilen=zeilen,
+            titel=f"Ausmitten-Iteration bei N_Ed = {N / 1e3:.1f} kN",
+            ausrichtung="rrrrr",
+        )
+
+    def _protokoll_grenzkraft(self, p: Protokoll, erg: Knickergebnis) -> None:
+        """
+        Der Erfuellungsgrad -- und wie N_Rd gefunden wurde.
+
+        Von der Halbierung steht nur das Verfahren da. Jede Probekraft zieht
+        eine eigene Ausmitten-Iteration nach sich; die alle abzudrucken hiesse,
+        dreissig Tabellen fuer eine einzige Zahl zu zeigen.
+        """
+        N_Ed = abs(erg.fall.N_Ed.si)
+        p.text(
+            "Gesucht wird die grösste Druckkraft mit Gleichgewichtslage. Die "
+            "gewollte Ausmitte e_1d bleibt dabei fest – sie gehört zum System "
+            "und nicht zur Last, M_Ed,1 wächst also mit. Bei N = 0 trägt der "
+            "Stab immer; von dort aus wird das Fenster halbiert, bis "
+            "getragene und nicht getragene Kraft zusammenfallen."
+        )
+        zustand = r"\text{erfüllt}" if erg.erfuellt else r"\text{NICHT erfüllt}"
+        zeichen = r"\ge" if erg.erfuellt else "<"
+        p.gleichung(
+            rf"N_{{Rd,K}} = {erg.N_Rd / 1e3:.1f}\,\mathrm{{kN}} \quad "
+            rf"{zeichen} \quad \left|N_{{Ed}}\right| = "
+            rf"{N_Ed / 1e3:.1f}\,\mathrm{{kN}}",
+            titel="Grenzkraft des Stabes")
+        p.gleichung(
+            rf"\alpha_{{eff}} = \frac{{N_{{Rd,K}}}}{{\left|N_{{Ed}}\right|}}"
+            rf" = \frac{{{erg.N_Rd / 1e3:.1f}\,\mathrm{{kN}}}}"
+            rf"{{{N_Ed / 1e3:.1f}\,\mathrm{{kN}}}}"
+            rf" = {erg.erfuellungsgrad:.2f} \quad \Rightarrow \quad {zustand}",
+            titel="Erfüllungsgrad")

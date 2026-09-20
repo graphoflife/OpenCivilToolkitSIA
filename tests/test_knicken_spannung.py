@@ -116,6 +116,71 @@ class TestKnicken(unittest.TestCase):
         self.assertFalse(gefunden["Knicken – schlank"].erfuellt)
         self.assertIn("keine Gleichgewichtslage", gefunden["Knicken – schlank"].hinweis)
 
+    def test_der_erfuellungsgrad_ist_ein_verhaeltnis_von_normalkraeften(self):
+        """
+        N_Rd/|N_Ed| -- und beide stehen als Betrag in der Tabelle.
+
+        Über Momente zu vergleichen ginge nur, solange es ein Gleichgewicht
+        gibt; beim Knicken fehlt gerade das.
+        """
+        aufbau, gefunden = urteile(self.projekt(
+            KnickEintrag("Stütze", N_Ed=-800.0, M_Ed_1=20.0,
+                         laenge=4.0, knicklaenge=4.0)))
+        urteil = gefunden["Knicken – Stütze"]
+        erg = aufbau.knicken["q1"].ergebnisse[0]
+        self.assertEqual(urteil.einwirkung.groesse.si, 800e3)
+        self.assertAlmostEqual(urteil.widerstand.groesse.si, erg.N_Rd, delta=1.0)
+        self.assertAlmostEqual(urteil.erfuellungsgrad.si, erg.N_Rd / 800e3,
+                               places=6)
+
+    def test_auch_ein_knickender_stab_bekommt_einen_grad(self):
+        """
+        Vorher stand dort nichts: ohne Gleichgewicht gab es kein Moment und
+        damit keine Zahl. Ein Nachweis ohne Zahl sagt aber nicht, wie weit er
+        danebenliegt.
+        """
+        _, gefunden = urteile(self.projekt(
+            KnickEintrag("schlank", N_Ed=-1500.0, M_Ed_1=30.0,
+                         laenge=12.0, knicklaenge=12.0)))
+        urteil = gefunden["Knicken – schlank"]
+        self.assertFalse(urteil.erfuellt)
+        self.assertLess(urteil.erfuellungsgrad.si, 1.0)
+        self.assertGreater(urteil.erfuellungsgrad.si, 0.0)
+        # N_Rd ist die Kraft, bei der er gerade noch steht.
+        self.assertLess(urteil.widerstand.groesse.si, 1500e3)
+
+    def test_die_grenzkraft_traegt_und_ein_bisschen_mehr_nicht(self):
+        """Die Probe auf die Halbierung: bei N_Rd steht er, knapp darüber nicht."""
+        aufbau, _ = urteile(self.projekt(
+            KnickEintrag("Stütze", N_Ed=-800.0, M_Ed_1=20.0,
+                         laenge=6.0, knicklaenge=6.0)))
+        nachweis = aufbau.knicken["q1"]
+        erg = nachweis.ergebnisse[0]
+        loeser = nachweis.loeser
+        l_cr = 6.0
+        self.assertTrue(nachweis._gleichgewicht(loeser, erg.N_Rd * 0.999,
+                                                erg, l_cr).traegt)
+        self.assertFalse(nachweis._gleichgewicht(loeser, erg.N_Rd * 1.02,
+                                                 erg, l_cr).traegt)
+
+    def test_die_iteration_steht_schritt_fuer_schritt_da(self):
+        """
+        Das Verfahren ist die Iteration -- also wird sie gezeigt, nicht nur
+        ihr Ergebnis. Jeder Durchlauf trägt das Moment, mit dem er gerechnet
+        hat, und die Krümmung, die dabei herauskam.
+        """
+        aufbau, _ = urteile(self.projekt(
+            KnickEintrag("Stütze", N_Ed=-800.0, M_Ed_1=20.0,
+                         laenge=4.0, knicklaenge=4.0)))
+        erg = aufbau.knicken["q1"].ergebnisse[0]
+        self.assertGreaterEqual(len(erg.schritte), 2)
+        self.assertEqual(erg.schritte[0].nummer, 1)
+        # Begonnen wird ohne Verformung.
+        self.assertEqual(erg.schritte[0].e_2d_vorher, 0.0)
+        # Und der letzte Durchlauf ist der, der in der Herleitung steht.
+        self.assertAlmostEqual(erg.schritte[-1].M_ziel, erg.M_ges, delta=1.0)
+        self.assertAlmostEqual(erg.schritte[-1].e_2d, erg.e_2d, places=9)
+
     def test_eine_laengere_knicklaenge_ist_unguenstiger(self):
         kurz, _ = urteile(self.projekt(
             KnickEintrag("k", N_Ed=-800.0, M_Ed_1=20.0, laenge=3.0, knicklaenge=3.0)))
