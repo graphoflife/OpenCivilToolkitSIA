@@ -569,8 +569,11 @@ function plattenEditor(querschnitt) {
 
   return [
     // Platte und Bewehrung stehen nebeneinander -- beides gehört zur Geometrie
-    // und wird beim Bemessen gemeinsam gelesen.
+    // und wird beim Bemessen gemeinsam gelesen. Das Werkzeug, das die
+    // Bewehrung sucht, steht unter der Platte: es liest deren Angaben und
+    // schreibt in die Spalte daneben.
     el('div.zweispaltig', {}, [
+      el('div.spalte', {}, [
       el('div.feldgruppe', {}, [
         el('h3', { text: 'Platte' }),
         feld('Bezeichnung', el('input', {
@@ -623,8 +626,8 @@ function plattenEditor(querschnitt) {
           beiAenderung: (v) => aendern((q) => { q.rissanforderung = v; }),
         })),
       ]),
-
       automatikBlock(querschnitt),
+      ]),
 
       el('div.feldgruppe', {}, [
         el('h3', {}, [el('span', { text: 'Bewehrung' }),

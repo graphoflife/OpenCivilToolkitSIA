@@ -43,6 +43,37 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-20 · Der Knopf, den man zweimal drücken musste
+
+Ein Druck auf «Bewehrung ermitteln» tat nichts, der zweite zeigte das
+Ergebnis des ersten. Die Suche lief also -- nur sah man sie nicht.
+
+Der Zustand der Meldung liegt ausserhalb des Projekts, in einer Map neben der
+Tafel: sie beschreibt einen Vorgang und keine Eigenschaft der Platte. Damit
+sie sichtbar wird, muss nach dem Eintragen jemand neu zeichnen, und das hing
+am Zweig: bei Erfolg tat es `projektAendern`, bei Misserfolg ein eigener
+Aufruf. Der Erfolgszweig zeichnete aber schon *vor* dem Eintragen der Meldung
+-- übernommen wurde das Projekt, und das löst für sich ein Neuzeichnen aus.
+Danach stand die Meldung im Speicher und niemand fragte mehr danach. Erst der
+nächste Druck zeichnete neu, und zwar als Erstes: also sah man das alte
+Ergebnis.
+
+Jetzt steht das Neuzeichnen in einem `finally`. Zuletzt und immer, egal
+welcher Zweig gelaufen ist. Das ist die Art Stelle, an der eine
+Fallunterscheidung sich rächt, die es gar nicht hätte geben müssen.
+
+Dazu drei Dinge am Bild. Die Schalter stehen jetzt in jedem Kapitel ganz
+links, wie bei den Tragsicherheitsnachweisen -- das Auge sucht die Spalte
+einmal und findet sie danach wieder. Zwischen den Nachweiskapiteln ist Luft;
+innerhalb bleibt es eng. Und das Werkzeug steht unter der Platte statt neben
+ihr: es liest deren Angaben und schreibt in die Spalte daneben.
+
+Beim Umstellen fiel auf, dass es die Lagenzeile dreimal gab -- einmal für die
+Duktilität, einmal für das spröde Versagen, einmal für die Zwängung auf
+Biegung. Dieselben zwanzig Zeilen, nur mit anderer Vorgabe. Jetzt baut
+`lagenkapitel` alle drei; die Vorgabe ist ein Beiwert. Die Umstellung war
+danach eine Stelle statt drei.
+
 ## 2026-09-20 · Zwei Fehler in einer Suche
 
 Das Bewehrungswerkzeug fand für eine frische Platte mit h = 300 mm nichts. Es

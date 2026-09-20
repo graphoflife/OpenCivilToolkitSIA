@@ -68,13 +68,16 @@ export function nachweiseBlock(querschnitt) {
         : [el('div.leer', { text: 'Ohne Einwirkung kein Nachweis.' })]),
     ]),
 
-    el('div.unterkapitel', {}, [
-      el('div.unterkapitel-kopf', {}, [
-        el('span', { text: 'Duktilitätsnachweise' }),
-        el('span.kurvenhinweis', { text: 'x / d ≤ 0.35 bei M_Ed = 0' }),
-      ]),
-      ...[1, 2, 3, 4].map((nummer) => duktilitaetZeile(querschnitt, nummer)),
-    ]),
+    lagenkapitel(querschnitt, {
+      titel: 'Duktilitätsnachweise',
+      feld: 'duktilitaet',
+      // Die beiden äusseren Lagen: sie tragen Feld- und Stützmoment, und dort
+      // entscheidet sich, ob der Querschnitt sein Versagen ankündigt.
+      vorgabe: [true, false, false, true],
+      hinweis: 'x / d ≤ 0.35 bei M_Ed = 0',
+      beschriftung: (n) => `Duktilität ${n}. Lage`,
+      was: 'Nachweis',
+    }),
 
     lagenkapitel(querschnitt, {
       titel: 'Nachweise gegen sprödes Versagen',
@@ -131,8 +134,10 @@ function einwirkungZeile(querschnitt, index) {
  * Biegung); dreimal dieselben zwanzig Zeilen wären dreimal dieselbe Gelegenheit
  * auseinanderzulaufen.
  */
-function lagenkapitel(querschnitt, { titel, feld, hinweis, beschriftung, was }) {
-  const vorgabe = [true, false, false, false];
+function lagenkapitel(querschnitt, {
+  titel, feld, hinweis, beschriftung, was,
+  vorgabe = [true, false, false, false],
+}) {
   const wahl = lagenwahl(querschnitt[feld], vorgabe);
 
   const setzen = (nummer, wert) => projektAendern((p) => {
@@ -150,13 +155,18 @@ function lagenkapitel(querschnitt, { titel, feld, hinweis, beschriftung, was }) 
       const lage = querschnitt.lagen[nummer - 1];
       const leer = !(lage.grund.durchmesser > 0 || lage.zulage.durchmesser > 0);
       const richtung = richtungVon(querschnitt, nummer);
+      // Schalter ganz links, wie bei den Tragsicherheitsnachweisen: das Auge
+      // sucht die Spalte einmal und findet sie danach in jedem Kapitel.
       return el('div.duktilitaetszeile', {}, [
-        el('span.postenname', { text: beschriftung(nummer) }),
+        hakenSchalter(wahl[nummer - 1], (wert) => setzen(nummer, wert), was),
         el('span.richtung', {
           text: richtung, class: `lage-${richtung}`,
           title: `Tragrichtung der ${nummer}. Lage`,
         }),
-        hakenSchalter(wahl[nummer - 1], (wert) => setzen(nummer, wert), was),
+        el('span.postenname', { text: beschriftung(nummer) }),
+        // Ein eingeschalteter Nachweis an einer leeren Lage ist kein Fehler
+        // der Eingabe -- er wird geführt und meldet selbst, dass er nicht
+        // geht. Hier steht es trotzdem, damit man es beim Einschalten sieht.
         el('span.kurvenhinweis', {
           text: (wahl[nummer - 1] && leer) ? 'Lage nicht definiert' : '',
         }),
@@ -265,9 +275,9 @@ function mindestbewehrungsBlock(querschnitt) {
   // Der Zeilentitel sagt schon, was der Schalter tut. Die Spalte rechts
   // wiederholte das in einem ganzen Satz und machte die Tafel breit.
   const zwaengung = (feld, beschriftung) => el('div.duktilitaetszeile.ist-breit', {}, [
-    el('span.postenname', { text: beschriftung }),
     hakenSchalter(!!querschnitt[feld],
       (wert) => aendern((q) => { q[feld] = wert; }), 'Zwängung'),
+    el('span.postenname', { text: beschriftung }),
     el('span.kurvenhinweis', { text: '' }),
   ]);
 
@@ -286,7 +296,11 @@ function mindestbewehrungsBlock(querschnitt) {
 
     // Ohne eigene Überschrift: die vier Zeilen schreiben ihren Nachweis selbst
     // aus und stehen unter derselben Aufschrift wie die Normalkraft-Zwängung.
-    ...[1, 2, 3, 4].map((nummer) => zwaengungBiegungZeile(querschnitt, nummer)),
+    ...lagenkapitel(querschnitt, {
+      feld: 'zwaengung_biegung_lagen',
+      beschriftung: (n) => `Zwängung auf Biegung ${n}. Lage`,
+      was: 'Nachweis',
+    }).childNodes,
 
     el('div.unterkapitel-kopf', { style: { marginTop: '8px' } }, [
       el('span', { text: 'Verhindern des Fliessens für häufige Lastfälle' }),
@@ -305,10 +319,10 @@ function mindestbewehrungsBlock(querschnitt) {
     ]),
 
     el('div.duktilitaetszeile.ist-breit', {}, [
-      el('span.postenname', { text: '70 % der Tragsicherheitseinwirkungen' }),
       hakenSchalter(aus70, (wert) => aendern((q) => {
         q.haeufige_aus_tragsicherheit = wert;
       }), 'Ableitung'),
+      el('span.postenname', { text: '70 % der Tragsicherheitseinwirkungen' }),
       el('span.kurvenhinweis', { text: '' }),
     ]),
 
@@ -337,26 +351,6 @@ function mindestbewehrungsBlock(querschnitt) {
   ]);
 }
 
-/** Eine Lagenzeile der Zwängung auf Biegung. */
-function zwaengungBiegungZeile(querschnitt, nummer) {
-  const vorgabe = [true, false, false, false];
-  const wahl = lagenwahl(querschnitt.zwaengung_biegung_lagen, vorgabe);
-  const richtung = richtungVon(querschnitt, nummer);
-  const setzen = (wert) => projektAendern((p) => {
-    const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
-    q.zwaengung_biegung_lagen = lagenwahl(q.zwaengung_biegung_lagen, vorgabe);
-    q.zwaengung_biegung_lagen[nummer - 1] = wert;
-  });
-  return el('div.duktilitaetszeile', {}, [
-    el('span.postenname', { text: `Zwängung auf Biegung ${nummer}. Lage` }),
-    el('span.richtung', {
-      text: richtung, class: `lage-${richtung}`,
-      title: `Tragrichtung der ${nummer}. Lage`,
-    }),
-    hakenSchalter(wahl[nummer - 1], setzen, 'Nachweis'),
-    el('span.kurvenhinweis', { text: '' }),
-  ]);
-}
 
 /** Ein häufiger Lastfall auf einer Zeile -- wie eine Einwirkung, ohne Querkraft. */
 function haeufigZeile(querschnitt, index) {
@@ -396,49 +390,7 @@ function haeufigZeile(querschnitt, index) {
   ]);
 }
 
-/**
- * Ein Schalter je Lage: wird für sie der Duktilitätsnachweis geführt?
- *
- * Der Nachweis gilt einer einzelnen Bewehrungslage, nicht einer Tragrichtung --
- * darum vier Zeilen und nicht zwei. Üblich sind die beiden äusseren; die
- * inneren tragen selten das massgebende Moment.
- */
-function duktilitaetZeile(querschnitt, nummer) {
-  const an = duktilitaetVon(querschnitt)[nummer - 1];
-  const richtung = richtungVon(querschnitt, nummer);
-  const lage = querschnitt.lagen[nummer - 1];
-  const leer = !(lage.grund.durchmesser > 0 || lage.zulage.durchmesser > 0);
 
-  const setzen = (wert) => projektAendern((p) => {
-    const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
-    q.duktilitaet = duktilitaetVon(q);
-    q.duktilitaet[nummer - 1] = wert;
-  });
-
-  return el('div.duktilitaetszeile', {}, [
-    el('span.postenname', { text: `Duktilität ${nummer}. Lage` }),
-    el('span.richtung', {
-      text: richtung,
-      class: `lage-${richtung}`,
-      title: `Tragrichtung der ${nummer}. Lage`,
-    }),
-    hakenSchalter(an, setzen),
-    // Ein eingeschalteter Nachweis an einer leeren Lage ist kein Fehler der
-    // Eingabe -- er wird geführt und meldet selbst, dass er nicht geht. Hier
-    // steht es trotzdem, damit man es beim Einschalten schon sieht.
-    el('span.kurvenhinweis', {
-      text: (an && leer) ? 'Lage nicht definiert' : '',
-    }),
-  ]);
-}
-
-/** Genau vier Schalter, auch wenn die Beschreibung älter ist als der Nachweis. */
-function duktilitaetVon(querschnitt) {
-  const vorgabe = [true, false, false, true];
-  const vorhanden = Array.isArray(querschnitt.duktilitaet)
-    ? querschnitt.duktilitaet : [];
-  return vorgabe.map((v, i) => (i < vorhanden.length ? !!vorhanden[i] : v));
-}
 
 /**
  * Die Bewehrung suchen lassen, statt sie zu setzen.
@@ -490,10 +442,10 @@ export function automatikBlock(querschnitt) {
         'Liste in mm, durch Komma getrennt. Grundbewehrung und Zulage einer '
         + 'Lage bekommen dieselbe Teilung.'), 'mm'),
       el('div.duktilitaetszeile.ist-breit', {}, [
-        el('span.postenname', { text: 'Querkraftbewehrung mitsuchen' }),
         hakenSchalter(quer, (wert) => aendern((q) => {
           q.automatik_querkraft = wert;
         }), 'Bügelsuche'),
+        el('span.postenname', { text: 'Querkraftbewehrung mitsuchen' }),
         el('span.kurvenhinweis', { text: '' }),
       ]),
       ...(quer ? [feld('Bügelteilungen',
@@ -540,16 +492,20 @@ async function bewehrungErmitteln(kennung) {
       // eine Änderung, damit ein Rückgängig sie als eine zurücknimmt.
       projektAendern((p) => {
         const alt = p.querschnitte.findIndex((x) => x.kennung === kennung);
-        const neu = antwort.projekt.querschnitte.find((x) => x.kennung === kennung);
+        const neu = antwort.projekt?.querschnitte?.find((x) => x.kennung === kennung);
         if (alt >= 0 && neu) p.querschnitte[alt] = neu;
       });
-    } else {
-      aendern({}, 'bewehrungssuche-ende');
     }
   } catch (fehler) {
     automatikMeldungen.set(kennung, {
       laeuft: false, text: String(fehler.message || fehler), gut: false,
     });
-    aendern({}, 'bewehrungssuche-fehler');
+  } finally {
+    // Zuletzt und immer. Vorher hing das Neuzeichnen an dem Zweig, der gerade
+    // gelaufen war -- und wenn das Übernehmen des Ergebnisses schon eines
+    // ausgelöst hatte, stand die Meldung zwar im Speicher, aber nichts zeigte
+    // sie an. Man musste ein zweites Mal drücken, um das Ergebnis des ersten
+    // Drucks zu sehen.
+    aendern({}, 'bewehrungssuche-ende');
   }
 }

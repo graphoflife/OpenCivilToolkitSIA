@@ -239,31 +239,80 @@ class TestNurDieEigenePlatte(unittest.TestCase):
     Bewertet wurde das *ganze Projekt*. Stand daneben eine Platte, die aus
     eigenen Gründen nicht aufging, trug ihr Rückstand mit -- und die gesuchte
     Platte bekam die Schuld. In den Tests gab es immer nur eine Platte.
+
+    Darum prüft diese Klasse jeden Modus zweimal: allein und mit drei
+    Nachbarn, von denen jeder auf eine andere Weise scheitert.
     """
 
-    def mit_hoffnungslosem_nachbarn(self) -> Projekt:
+    def mit_nachbarn(self) -> Projekt:
         projekt = platte()
-        kaputt = copy.deepcopy(projekt.querschnitte[0])
-        kaputt.kennung, kaputt.name, kaputt.h = "q2", "zu dünn", 70.0
-        for k in kaputt.kombinationen:
+
+        zu_duenn = copy.deepcopy(projekt.querschnitte[0])
+        zu_duenn.kennung, zu_duenn.name, zu_duenn.h = "q2", "zu dünn", 70.0
+        for k in zu_duenn.kombinationen:
             k.M_Ed = 500.0
-        projekt.querschnitte.append(kaputt)
+
+        ohne_y = copy.deepcopy(projekt.querschnitte[0])
+        ohne_y.kennung, ohne_y.name = "q3", "ohne y"
+        ohne_y.richtung_lage1 = ohne_y.richtung_lage4 = "x"
+        for nummer in (2, 3):
+            ohne_y.lagen[nummer - 1].grund.durchmesser = 0
+        ohne_y.zwaengung_x = ohne_y.zwaengung_y = True
+
+        knickt = copy.deepcopy(projekt.querschnitte[0])
+        knickt.kennung, knickt.name = "q4", "knickt"
+        knickt.knickfaelle = [KnickEintrag("Stütze", N_Ed=-2500.0, M_Ed_1=60.0,
+                                           laenge=12.0, knicklaenge=12.0)]
+
+        projekt.querschnitte += [zu_duenn, ohne_y, knickt]
         return projekt
 
-    def test_der_nachbar_bleibt_aussen_vor(self):
-        projekt = self.mit_hoffnungslosem_nachbarn()
-        allein = suche.suche(platte(), "q1", modus=suche.Suchmodus.GRUND_MIT)
-        daneben = suche.suche(projekt, "q1", modus=suche.Suchmodus.GRUND_MIT)
-        self.assertTrue(allein.gefunden)
-        self.assertTrue(daneben.gefunden, daneben.begruendung)
-        self.assertEqual(daneben.beste.durchmesser, allein.beste.durchmesser)
+    def test_jeder_modus_findet_dasselbe_wie_allein(self):
+        for modus in suche.Suchmodus:
+            allein = suche.suche(platte(), "q1", modus=modus)
+            daneben = suche.suche(self.mit_nachbarn(), "q1", modus=modus)
+            with self.subTest(modus=modus.value):
+                self.assertTrue(allein.gefunden, allein.begruendung)
+                self.assertTrue(daneben.gefunden, daneben.begruendung)
+                self.assertEqual(daneben.beste.durchmesser, allein.beste.durchmesser)
+                self.assertEqual(daneben.beste.teilung, allein.beste.teilung)
 
     def test_auch_die_buegel_sehen_nur_ihre_platte(self):
-        projekt = self.mit_hoffnungslosem_nachbarn()
-        for k in projekt.querschnitt("q1").kombinationen:
-            k.V_Ed = 600.0
-        loesung = suche.buegel_suchen(projekt, "q1")
-        self.assertTrue(loesung.gefunden, loesung.begruendung)
+        allein, daneben = platte(), self.mit_nachbarn()
+        for projekt in (allein, daneben):
+            for k in projekt.querschnitt("q1").kombinationen:
+                k.V_Ed = 600.0
+        eine = suche.buegel_suchen(allein, "q1")
+        andere = suche.buegel_suchen(daneben, "q1")
+        self.assertTrue(andere.gefunden, andere.begruendung)
+        self.assertEqual(andere.durchmesser, eine.durchmesser)
+        self.assertEqual(andere.teilung, eine.teilung)
+
+    def test_auch_ein_nachbar_laesst_sich_suchen(self):
+        """Die kaputte Platte bleibt kaputt, die gesunde daneben nicht."""
+        projekt = self.mit_nachbarn()
+        self.assertFalse(
+            suche.suche(projekt, "q2", modus=suche.Suchmodus.GRUND_MIT).gefunden)
+        self.assertTrue(
+            suche.suche(projekt, "q4", modus=suche.Suchmodus.GRUND_OHNE).gefunden)
+
+    def test_nur_die_gesuchte_platte_kommt_geaendert_zurueck(self):
+        """
+        Die Antwort trägt das ganze Projekt. Käme darin eine andere Platte
+        verändert zurück, überschriebe ein Klick Eingaben, die niemand
+        angefasst hat.
+        """
+        vorher = self.mit_nachbarn().als_dict()
+        for modus in suche.Suchmodus:
+            antwort = dienst.bearbeite("bewehrung_suchen", {
+                "projekt": vorher, "kennung": "q1", "modus": modus.value})
+            nachher = antwort.daten["projekt"]
+            geaendert = [neu["kennung"] for alt, neu
+                         in zip(vorher["querschnitte"], nachher["querschnitte"])
+                         if alt != neu]
+            with self.subTest(modus=modus.value):
+                self.assertEqual(geaendert, ["q1"])
+                self.assertEqual(nachher["materialien"], vorher["materialien"])
 
 
 class TestNurEingeschaltetes(unittest.TestCase):

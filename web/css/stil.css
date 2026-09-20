@@ -337,11 +337,14 @@ input[readonly], input:disabled, select:disabled {
    ihn in einer Spalte daneben zu erklären -- eine feste Namensbreite hiesse,
    dass der längste von ihnen umbricht und seine Zeile doppelt so hoch wird.
    Die Hinweisspalte steht auf auto: leer ist sie null breit. */
+/* Schalter, Richtung, Name, Hinweis -- der Schalter ganz links wie bei den
+   Tragsicherheitsnachweisen. Das Auge sucht die Spalte einmal und findet sie
+   danach in jedem Kapitel wieder. */
 .duktilitaetszeile {
-  display: grid; grid-template-columns: minmax(0, 1fr) 18px 54px auto;
+  display: grid; grid-template-columns: 54px 18px minmax(0, 1fr) auto;
   gap: 6px; align-items: center; margin-bottom: 4px;
 }
-.duktilitaetszeile.ist-breit { grid-template-columns: minmax(0, 1fr) 54px auto; }
+.duktilitaetszeile.ist-breit { grid-template-columns: 54px minmax(0, 1fr) auto; }
 .duktilitaetszeile .postenname {
   font-size: 11.5px; font-weight: 600; color: var(--schrift-matt);
 }
@@ -415,10 +418,19 @@ input[readonly], input:disabled, select:disabled {
 .ueberdeckung .feld { margin-bottom: 0; }
 
 /* Platte und Bewehrung nebeneinander, sobald die Tafel breit genug ist. */
-.zweispaltig { display: grid; grid-template-columns: 1fr; gap: 14px; }
+.zweispaltig { display: grid; grid-template-columns: 1fr; gap: 14px;
+               align-items: start; }
 @media (min-width: 1500px) { .zweispaltig { grid-template-columns: 1fr 1fr; } }
+/* Eine Spalte fasst mehrere Feldgruppen zusammen -- links die Platte und das
+   Werkzeug darunter, rechts die Bewehrung. Ohne sie wären es drei gleiche
+   Kacheln im Raster und das Werkzeug landete neben der Platte statt unter ihr. */
+.spalte { display: flex; flex-direction: column; }
 
 .unterkapitel { border-left: 2px solid var(--rand); padding-left: 9px; margin-top: 6px; }
+/* Zwischen den Nachweiskapiteln Luft: Tragsicherheit, Duktilität, sprödes
+   Versagen, Riss, Knicken sind verschiedene Fragen und sollen auch so
+   aussehen. Innerhalb eines Kapitels bleibt es eng. */
+.feldgruppe > .unterkapitel + .unterkapitel { margin-top: 16px; }
 .unterkapitel-kopf {
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
   font-size: 11.5px; font-weight: 700; text-transform: uppercase;
