@@ -43,6 +43,45 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-20 · Zwei Fehler in einer Suche
+
+Das Bewehrungswerkzeug fand für eine frische Platte mit h = 300 mm nichts. Es
+steckten zwei Fehler darin, und keiner war der, den ich vermutet hatte.
+
+**Der erste war die Zielgrösse.** Gemessen habe ich den Fortschritt am
+*schlechtesten* Erfüllungsgrad: nimm den Schritt, der ihn am weitesten hebt.
+Das klingt vernünftig und hat eine Lücke. Halten zwei Nachweise das Minimum
+gleichzeitig — sprödes Versagen in der 1. und in der 4. Lage, gleich bewehrt,
+also gleich weit daneben —, dann hebt kein einzelner Schritt es, weil der
+jeweils andere stehen bleibt. Die Suche sah eine Ebene und gab auf, obwohl der
+nächste Durchmesser offensichtlich geholfen hätte. Gemessen wird jetzt die
+Summe der Fehlbeträge, `Σ max(0, 1 − α)`. Die kennt keine Ebene: sie fällt,
+sobald irgendein unerfüllter Nachweis besser wird, und ist null genau dann,
+wenn alle aufgehen. Eine Zeile, und die ganze Kategorie ist weg.
+
+**Der zweite war schlimmer und in den Tests unsichtbar.** Bewertet wurde das
+*ganze Projekt*. Stand neben der gesuchten Platte eine andere, die aus eigenen
+Gründen nicht aufging, trug deren Rückstand mit — und die gesuchte Platte
+bekam die Schuld. In den Tests gab es immer nur eine Platte; in der
+Oberfläche legt man eine zweite an, und schon findet die Suche nie wieder
+etwas. Die Arbeitskopie enthält jetzt nur noch die eine Platte. Das ist
+zugleich schneller, denn die anderen wurden bei jedem Schritt mitgerechnet.
+
+Dazu die Entscheidung, die du getroffen hast: **die Duktilität bleibt
+draussen.** Sie ist der einzige Nachweis, der durch mehr Bewehrung schlechter
+wird — er begrenzt die Druckzonenhöhe, und die wächst mit der Stahlfläche.
+Eine Suche, die von unten aufsteigt, hat gegen ihn kein Mittel ausser
+aufzugeben. Abgeschaltet wird er nicht beim Bewerten, sondern in der
+Arbeitskopie, gleich neben den Lastfällen: gebaut wird nur, was eingeschaltet
+ist, und gezählt wird, was gebaut wurde. An dieser Regel soll die Suche nichts
+vorbeischmuggeln. Verschwiegen wird er trotzdem nicht — nach dem Fund läuft
+er einmal mit, und das Ergebnis sagt, ob er aufgeht.
+
+Und ein Nein soll sagen, warum. «Mehr Stahl bringt nichts» ist richtig und
+hilft niemandem, wenn es in der Richtung gar keinen Stahl gibt, den man
+vergrössern könnte. Ist eine ganze Tragrichtung unbewehrt, steht das jetzt
+dabei.
+
 ## 2026-09-20 · Was vom letzten Lauf noch gilt
 
 Bisher rechnete jede geänderte Zahl alles neu: Materialien, alle Platten, das

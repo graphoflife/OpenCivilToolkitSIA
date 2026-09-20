@@ -134,6 +134,14 @@ class Suchergebnis:
     loesungen: List[Loesung] = field(default_factory=list)
     beste: Optional[Loesung] = None
     begruendung: str = ""
+    duktilitaet: str = ""
+    """
+    Was der Duktilitaetsnachweis zur gefundenen Bewehrung sagt.
+
+    Gesucht wird ohne ihn -- er wird durch mehr Stahl schlechter, und eine
+    Suche, die von unten aufsteigt, hat gegen ihn kein Mittel. Verschwiegen
+    wird er deshalb nicht: hier steht, ob er mit dem Ergebnis noch aufgeht.
+    """
 
     @property
     def gefunden(self) -> bool:
@@ -187,55 +195,100 @@ def _flaeche(eintrag, posten: Sequence[Posten], teilung: float,
 
 @dataclass
 class Bewertung:
-    """Der schlechteste Erfuellungsgrad einer Rechnung."""
+    """Wie weit eine Bewehrung von der Erfuellung entfernt ist."""
+
+    rueckstand: float
+    """
+    Summe der Fehlbetraege, ``sum(max(0, 1 - alpha))`` ueber alle Nachweise.
+
+    **Nicht** der schlechteste Grad. Der war die erste Fassung, und er hat die
+    Suche zum Stehen gebracht: halten zwei Nachweise gleichzeitig das Minimum
+    -- etwa sproedes Versagen in der 1. und in der 4. Lage bei gleicher
+    Bewehrung --, dann hebt kein einzelner Schritt es, weil der jeweils andere
+    stehen bleibt. Die Suche sah eine Ebene und gab auf, obwohl der naechste
+    Durchmesser offensichtlich geholfen haette.
+
+    Die Summe der Fehlbetraege kennt diese Ebene nicht: sie faellt, sobald
+    *irgendein* unerfuellter Nachweis besser wird. Null heisst genau, dass
+    alle aufgehen.
+    """
 
     grad: float
+    """Der schlechteste Erfuellungsgrad -- nur zum Berichten."""
+
     nachweis: str
     anzahl: int
     """Wie viele Urteile ueberhaupt gefaellt wurden."""
 
     fehler: str = ""
 
+    @property
+    def erfuellt(self) -> bool:
+        return not self.fehler and self.rueckstand <= 0.0
+
 
 def bewerte(projekt) -> Bewertung:
     """
-    Rechnen und den schlechtesten Erfuellungsgrad zurueckgeben.
+    Rechnen und sagen, wie weit es noch ist.
 
     Gezaehlt wird jedes Urteil, das entsteht -- und es entsteht nur, was
     eingeschaltet ist. Eine zweite Liste, welche Nachweise zaehlen, gaebe es
-    hier also nur, um mit der ersten auseinanderzulaufen.
+    hier also nur, um mit der ersten auseinanderzulaufen; der
+    Duktilitaetsnachweis wird darum nicht hier uebergangen, sondern in
+    :func:`_arbeitskopie` abgeschaltet.
     """
     try:
         aufbau = projekt.aufbauen(schnell=True)
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
     except Exception as fehler:      # Eine unmoegliche Bewehrung ist kein
-        return Bewertung(0.0, "", 0, str(fehler))   # Absturz, sondern ein Nein.
+        return Bewertung(math.inf, 0.0, "", 0, str(fehler))  # Absturz, sondern ein Nein.
 
-    schlechtester, name = math.inf, ""
+    rueckstand, schlechtester, name = 0.0, math.inf, ""
     for u in loesung.urteile:
         grad = u.erfuellungsgrad.si
+        rueckstand += max(0.0, 1.0 - grad)
         if grad < schlechtester:
             schlechtester, name = grad, f"{u.langname or u.art}: {u.fall}"
-    return Bewertung(schlechtester, name, len(loesung.urteile))
+    return Bewertung(rueckstand, schlechtester, name, len(loesung.urteile))
 
 
 # ===========================================================================
 # Suchen
 # ===========================================================================
 
-def _ohne_kraefte(projekt, kennung: str):
+def _arbeitskopie(projekt, kennung: str, *, kraefte: bool):
     """
-    Dieselbe Platte ohne Einwirkungen.
+    Die Platte, gegen die gesucht wird -- ohne das, was die Suche nicht fuehren
+    kann.
 
-    Die Kombinationen und Knickfaelle fallen weg; damit fallen auch die
-    Nachweise weg, die sie brauchen, und es bleiben die, die eine Platte
+    **Ohne Duktilitaet, immer.** Sie ist der einzige Nachweis, der durch mehr
+    Bewehrung *schlechter* wird: er begrenzt die Druckzonenhoehe, und die
+    waechst mit der Stahlflaeche. Eine Suche, die von unten aufsteigt, kann ihn
+    darum nicht erfuellen, sondern nur verletzen -- sie haette gegen ihn kein
+    Mittel ausser aufzugeben. Also bleibt er draussen, und das Ergebnis sagt
+    hinterher, ob er mit der gefundenen Bewehrung noch aufgeht.
+
+    Ohne ``kraefte`` fallen zusaetzlich Kombinationen, Knickfaelle und
+    haeufige Lastfaelle weg. Uebrig bleiben die Nachweise, die eine Platte
     unabhaengig von der Belastung erfuellen muss.
+
+    Abgeschaltet wird hier und nicht beim Bewerten: gebaut wird nur, was
+    eingeschaltet ist, und gezaehlt wird, was gebaut wurde. An dieser einen
+    Regel soll die Suche nichts vorbeischmuggeln.
     """
     kopie = copy.deepcopy(projekt)
+    # **Nur diese Platte.** Die anderen kann die Suche nicht beeinflussen; ihre
+    # Nachweise wuerden den Rueckstand trotzdem mittragen, und eine Platte, die
+    # aus ganz eigenen Gruenden nicht aufgeht, liesse jede Suche im Projekt
+    # scheitern. Genau daran ist die erste Fassung gestorben: an einer
+    # frischen Platte, neben der eine andere stand.
+    kopie.querschnitte = [q for q in kopie.querschnitte if q.kennung == kennung]
     eintrag = kopie.querschnitt(kennung)
-    eintrag.kombinationen = []
-    eintrag.knickfaelle = []
-    eintrag.haeufige = []
+    eintrag.duktilitaet = [False] * len(eintrag.duktilitaet)
+    if not kraefte:
+        eintrag.kombinationen = []
+        eintrag.knickfaelle = []
+        eintrag.haeufige = []
     return kopie
 
 
@@ -281,7 +334,7 @@ def _eine_teilung(projekt, kennung: str, teilung: float,
         if bewertung.fehler:
             loesung.begruendung = bewertung.fehler
             return loesung
-        if bewertung.grad >= 1.0:
+        if bewertung.erfuellt:
             loesung.gefunden = True
             loesung.durchmesser = stand_als_dict()
             loesung.schlechtester = bewertung.grad
@@ -304,8 +357,8 @@ def _eine_teilung(projekt, kennung: str, teilung: float,
             stand[p] -= 1
             if versuch.fehler:
                 continue
-            if bester is None or versuch.grad > bester[0]:
-                bester = (versuch.grad, p, versuch)
+            if bester is None or versuch.rueckstand < bester[0]:
+                bester = (versuch.rueckstand, p, versuch)
         setzen()
 
         if bester is None:
@@ -314,13 +367,12 @@ def _eine_teilung(projekt, kennung: str, teilung: float,
                 f"Erfüllungsgrad bleibt bei {bewertung.grad:.2f} "
                 f"({bewertung.nachweis}).")
             return loesung
-        if bester[0] <= bewertung.grad:
+        if bester[0] >= bewertung.rueckstand:
             loesung.begruendung = (
-                f"Mehr Stahl hilft nicht mehr: «{bewertung.nachweis}» steht "
+                f"Mehr Stahl bringt nichts mehr: «{bewertung.nachweis}» steht "
                 f"bei {bewertung.grad:.2f} und wird durch keinen grösseren "
-                f"Durchmesser besser. Das ist der Fall beim "
-                f"Duktilitätsnachweis – dort begrenzt die Bewehrung sich "
-                f"selbst, und es hilft nur eine dickere Platte.")
+                f"Durchmesser besser. Hier hilft nur eine dickere Platte oder "
+                f"ein festerer Beton.")
             loesung.schlechtester = bewertung.grad
             loesung.nachweis = bewertung.nachweis
             return loesung
@@ -354,6 +406,11 @@ def suche(projekt, kennung: str, *,
         ergebnis.loesungen.append(loesung)
 
     gefunden = [l for l in ergebnis.loesungen if l.gefunden]
+    if not gefunden:
+        ergebnis.begruendung = (
+            "Mit keiner der angegebenen Teilungen gehen alle eingeschalteten "
+            "Nachweise auf." + _leere_lagen(projekt.querschnitt(kennung)))
+        return ergebnis
     if gefunden:
         # Kleinste Stahlflaeche gewinnt. Bei Gleichstand die groessere
         # Teilung: weniger Staebe bei gleichem Querschnitt ist weniger Arbeit.
@@ -362,29 +419,73 @@ def suche(projekt, kennung: str, *,
             f"Teilung {ergebnis.beste.teilung:.0f} mm mit "
             f"{ergebnis.beste.stahlflaeche:.0f} mm² – die kleinste "
             f"Stahlfläche unter den {len(gefunden)} Lösungen.")
-    else:
-        ergebnis.begruendung = (
-            "Mit keiner der angegebenen Teilungen gehen alle eingeschalteten "
-            "Nachweise auf.")
+    ergebnis.duktilitaet = _duktilitaetsbefund(projekt, kennung, ergebnis.beste)
     return ergebnis
+
+
+def _leere_lagen(eintrag) -> str:
+    """
+    Der haeufigste Grund fuer ein Nein -- und einer, der nicht nach einem
+    Rechenproblem aussieht.
+
+    Wo kein Durchmesser steht, legt die Suche keinen an: welche Lage es gibt
+    und wohin sie traegt, ist eine Anordnung und keine Suche. Ein Nachweis in
+    einer unbewehrten Richtung kann darum nie aufgehen, und die Meldung soll
+    das sagen statt ueber Durchmesser zu klagen.
+    """
+    leer = [nummer for nummer in (1, 2, 3, 4)
+            if eintrag.lagen[nummer - 1].grund.durchmesser <= 0]
+    # Nur melden, wenn eine ganze Tragrichtung leer ist. Eine einzelne leere
+    # Lage neben einer bewehrten in derselben Richtung ist der Normalfall und
+    # kein Grund fuer irgendetwas.
+    ohne = [r for r in ("x", "y")
+            if all(eintrag.richtung_von(n).value != r or n in leer
+                   for n in (1, 2, 3, 4))]
+    if not ohne:
+        return ""
+    welche = " und ".join(ohne)
+    return (f" In {welche}-Richtung trägt keine Lage einen Durchmesser – dort "
+            f"legt die Suche keine Bewehrung an, weil die Anordnung eine "
+            f"Entscheidung ist und keine Rechnung. Ein Nachweis in dieser "
+            f"Richtung kann so nicht aufgehen.")
+
+
+def _duktilitaetsbefund(projekt, kennung: str, loesung: "Loesung") -> str:
+    """Ob die gefundene Bewehrung die Druckzone noch genuegend begrenzt."""
+    probe = copy.deepcopy(projekt)
+    uebernehmen(probe, kennung, loesung)
+    probe.querschnitte = [q for q in probe.querschnitte if q.kennung == kennung]
+    eintrag = probe.querschnitt(kennung)
+    if not any(eintrag.duktilitaet):
+        return ""
+    eintrag.kombinationen = []
+    eintrag.knickfaelle = []
+    eintrag.haeufige = []
+    bewertung = bewerte(probe)
+    if bewertung.erfuellt:
+        return "Der Duktilitätsnachweis geht damit auf."
+    return (f"Achtung: der Duktilitätsnachweis geht damit **nicht** auf – "
+            f"«{bewertung.nachweis}» bei {bewertung.grad:.2f}. Gegen ihn hilft "
+            f"keine stärkere Bewehrung, sondern nur eine dickere Platte; "
+            f"gesucht wurde deshalb ohne ihn.")
 
 
 def _fuer_teilung(projekt, kennung: str, teilung: float, modus: Suchmodus,
                   durchmesser: Sequence[float]) -> Loesung:
     """Eine Teilung, je nach Modus in einem oder zwei Schritten."""
     if modus is Suchmodus.GRUND_MIT:
-        arbeit = copy.deepcopy(projekt)
+        arbeit = _arbeitskopie(projekt, kennung, kraefte=True)
         posten = _gesuchte(arbeit.querschnitt(kennung), arten=("grund",))
         return _eine_teilung(arbeit, kennung, teilung, posten, durchmesser)
 
     if modus is Suchmodus.GRUND_OHNE:
-        arbeit = _ohne_kraefte(projekt, kennung)
+        arbeit = _arbeitskopie(projekt, kennung, kraefte=False)
         posten = _gesuchte(arbeit.querschnitt(kennung), arten=("grund",))
         return _eine_teilung(arbeit, kennung, teilung, posten, durchmesser)
 
     # Zwei Schritte: erst die Grundbewehrung ohne Kraefte, dann die Zulage
     # gegen alles. Der zweite Schritt uebernimmt die Durchmesser des ersten.
-    ohne = _ohne_kraefte(projekt, kennung)
+    ohne = _arbeitskopie(projekt, kennung, kraefte=False)
     grund_posten = _gesuchte(ohne.querschnitt(kennung), arten=("grund",))
     erst = _eine_teilung(ohne, kennung, teilung, grund_posten, durchmesser)
     if not erst.gefunden:
@@ -393,7 +494,7 @@ def _fuer_teilung(projekt, kennung: str, teilung: float, modus: Suchmodus,
             + erst.begruendung)
         return erst
 
-    arbeit = copy.deepcopy(projekt)
+    arbeit = _arbeitskopie(projekt, kennung, kraefte=True)
     eintrag = arbeit.querschnitt(kennung)
     for lage, art in grund_posten:
         p = _posten(eintrag, lage, art)
@@ -452,13 +553,13 @@ def buegel_suchen(projekt, kennung: str, *,
     teilungen = sorted(t for t in teilungen if t > 0) or list(TEILUNGEN)
     durchmesser = sorted(d for d in durchmesser if d > 0) or list(DURCHMESSER)
 
-    arbeit = copy.deepcopy(projekt)
+    arbeit = _arbeitskopie(projekt, kennung, kraefte=True)
     eintrag = arbeit.querschnitt(kennung)
     buegel = eintrag.querkraftbewehrung
 
     # Erst ohne: was man nicht braucht, soll nicht eingebaut werden.
     buegel.durchmesser = 0
-    if bewerte(arbeit).grad >= 1.0:
+    if bewerte(arbeit).erfuellt:
         return Buegelloesung(
             gefunden=True, durchmesser=0.0, teilung=0.0,
             begruendung="Ohne Querkraftbewehrung geht es auf.")
@@ -470,7 +571,7 @@ def buegel_suchen(projekt, kennung: str, *,
         buegel.anzahl_y = None
         for d in durchmesser:
             buegel.durchmesser = d
-            if bewerte(arbeit).grad < 1.0:
+            if not bewerte(arbeit).erfuellt:
                 continue
             volumen = math.pi * d * d / 4.0 / (teilung * teilung) * 1e6
             if beste is None or volumen < beste.stahlvolumen:

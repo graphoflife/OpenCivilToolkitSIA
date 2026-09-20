@@ -8,6 +8,7 @@ Nachweise erfüllt, dass es das kleinste ist, das sie erfüllt, und dass sie
 ehrlich Nein sagt, wo es keines gibt.
 """
 
+import copy
 import unittest
 
 from opencivil import bewehrungssuche as suche
@@ -25,6 +26,11 @@ def platte(**abweichungen) -> Projekt:
 
 def schlechtester(projekt) -> float:
     return suche.bewerte(projekt).grad
+
+
+def _urteile(projekt):
+    aufbau = projekt.aufbauen()
+    return aufbau.werk.loese(*aufbau.alle_nachweisziele()).urteile
 
 
 class TestSuche(unittest.TestCase):
@@ -117,6 +123,147 @@ class TestSuche(unittest.TestCase):
         ergebnis = suche.suche(projekt, "q1", modus=suche.Suchmodus.GRUND_OHNE)
         self.assertNotIn("2g", ergebnis.beste.durchmesser)
         self.assertNotIn("3g", ergebnis.beste.durchmesser)
+
+
+class TestDieEbeneAufDerDieSucheStehenblieb(unittest.TestCase):
+    """
+    Der Fehler, an dem das Werkzeug zuerst scheiterte.
+
+    Gemessen wurde der Fortschritt am *schlechtesten* Erfüllungsgrad. Halten
+    zwei Nachweise ihn gleichzeitig -- sprödes Versagen in der 1. und in der
+    4. Lage bei gleicher Bewehrung --, dann hebt kein einzelner Schritt ihn,
+    weil der jeweils andere stehen bleibt. Die Suche sah eine Ebene und gab
+    auf, obwohl der nächste Durchmesser offensichtlich geholfen hätte.
+
+    Gemessen wird jetzt die Summe der Fehlbeträge. Die kennt keine Ebene: sie
+    fällt, sobald irgendein unerfüllter Nachweis besser wird.
+    """
+
+    def gleichstand(self, durchmesser: float = 12.0) -> Projekt:
+        """
+        Zwei Lagen in x, gleich bewehrt, beide im Nachweis.
+
+        Beide tragen dasselbe, also haben beide denselben Erfüllungsgrad --
+        und genau das ist die Ebene. Die Zulagen sind leer, damit die Gleichheit
+        nicht zufällig von einer Seite gebrochen wird.
+        """
+        projekt = platte(sproede_lagen=[True, False, False, True])
+        q = projekt.querschnitt("q1")
+        q.richtung_lage1 = q.richtung_lage4 = "x"
+        q.kombinationen = []
+        for nummer in (1, 2, 3, 4):
+            lage = q.lagen[nummer - 1]
+            lage.zulage.durchmesser = 0
+            lage.grund.durchmesser = durchmesser if nummer in (1, 4) else 0
+        return projekt
+
+    def test_zwei_gleich_schlechte_nachweise_halten_die_suche_nicht_auf(self):
+        projekt = self.gleichstand()
+        ergebnis = suche.suche(projekt, "q1", modus=suche.Suchmodus.GRUND_OHNE,
+                               teilungen=[150.0])
+        self.assertTrue(ergebnis.gefunden, ergebnis.loesungen[0].begruendung)
+        suche.uebernehmen(projekt, "q1", ergebnis.beste)
+        self.assertTrue(suche.bewerte(projekt).erfuellt)
+
+    def test_der_rueckstand_faellt_auch_wenn_der_schlechteste_steht(self):
+        """Die Eigenschaft, auf der das Verfahren beruht -- also geprüft."""
+        projekt = suche._arbeitskopie(self.gleichstand(8.0), "q1", kraefte=False)
+        q = projekt.querschnitt("q1")
+        vorher = suche.bewerte(projekt)
+        self.assertFalse(vorher.erfuellt)   # sonst prüft der Rest nichts
+
+        q.lagen[0].grund.durchmesser = 10      # nur *eine* der beiden Lagen
+        nachher = suche.bewerte(projekt)
+        self.assertAlmostEqual(nachher.grad, vorher.grad, places=9)   # die Ebene
+        self.assertLess(nachher.rueckstand, vorher.rueckstand)        # der Ausweg
+
+
+class TestDuktilitaetBleibtDraussen(unittest.TestCase):
+    """
+    Sie ist der einzige Nachweis, der durch mehr Bewehrung schlechter wird.
+    Eine Suche, die von unten aufsteigt, hat gegen ihn kein Mittel -- also
+    sucht sie ohne ihn und sagt hinterher, wie er dasteht.
+    """
+
+    def duenn(self) -> Projekt:
+        """Dünn genug, dass die nötige Bewehrung die Druckzone zu tief macht."""
+        projekt = platte(h=200.0)
+        for k in projekt.querschnitt("q1").kombinationen:
+            k.M_Ed, k.richtung = 120.0, "x"
+        return projekt
+
+    def test_die_suche_findet_auch_wenn_die_duktilitaet_nicht_aufgeht(self):
+        ergebnis = suche.suche(self.duenn(), "q1",
+                               modus=suche.Suchmodus.GRUND_MIT)
+        self.assertTrue(ergebnis.gefunden, ergebnis.begruendung)
+
+    def test_sie_wird_aber_nicht_verschwiegen(self):
+        projekt = self.duenn()
+        ergebnis = suche.suche(projekt, "q1", modus=suche.Suchmodus.GRUND_MIT)
+        self.assertIn("nicht", ergebnis.duktilitaet)
+        suche.uebernehmen(projekt, "q1", ergebnis.beste)
+        dukt = [u for u in _urteile(projekt) if u.art == "D"]
+        self.assertTrue(dukt)
+        self.assertFalse(all(u.erfuellt for u in dukt))
+
+    def test_wo_sie_aufgeht_steht_das_auch_da(self):
+        ergebnis = suche.suche(platte(), "q1", modus=suche.Suchmodus.GRUND_OHNE)
+        self.assertIn("geht damit auf", ergebnis.duktilitaet)
+
+    def test_die_arbeitskopie_kennt_keinen_duktilitaetsnachweis(self):
+        kopie = suche._arbeitskopie(platte(), "q1", kraefte=True)
+        self.assertFalse(any(kopie.querschnitt("q1").duktilitaet))
+        self.assertFalse([u for u in _urteile(kopie) if u.art == "D"])
+
+
+class TestEineLageWirdNichtErfunden(unittest.TestCase):
+    def test_der_grund_steht_in_der_meldung(self):
+        """
+        «Mehr Stahl bringt nichts» ist richtig und hilft niemandem, wenn es in
+        der Richtung gar keinen Stahl gibt, den man vergrössern könnte.
+        """
+        projekt = platte(zwaengung_x=True, zwaengung_y=True)
+        q = projekt.querschnitt("q1")
+        q.richtung_lage1 = q.richtung_lage4 = "x"
+        for nummer in (2, 3):
+            q.lagen[nummer - 1].grund.durchmesser = 0
+        ergebnis = suche.suche(projekt, "q1", modus=suche.Suchmodus.GRUND_OHNE)
+        self.assertFalse(ergebnis.gefunden)
+        self.assertIn("y-Richtung trägt keine Lage", ergebnis.begruendung)
+
+
+class TestNurDieEigenePlatte(unittest.TestCase):
+    """
+    Der Fehler, den man in der Oberfläche sah und in den Tests nie:
+
+    Bewertet wurde das *ganze Projekt*. Stand daneben eine Platte, die aus
+    eigenen Gründen nicht aufging, trug ihr Rückstand mit -- und die gesuchte
+    Platte bekam die Schuld. In den Tests gab es immer nur eine Platte.
+    """
+
+    def mit_hoffnungslosem_nachbarn(self) -> Projekt:
+        projekt = platte()
+        kaputt = copy.deepcopy(projekt.querschnitte[0])
+        kaputt.kennung, kaputt.name, kaputt.h = "q2", "zu dünn", 70.0
+        for k in kaputt.kombinationen:
+            k.M_Ed = 500.0
+        projekt.querschnitte.append(kaputt)
+        return projekt
+
+    def test_der_nachbar_bleibt_aussen_vor(self):
+        projekt = self.mit_hoffnungslosem_nachbarn()
+        allein = suche.suche(platte(), "q1", modus=suche.Suchmodus.GRUND_MIT)
+        daneben = suche.suche(projekt, "q1", modus=suche.Suchmodus.GRUND_MIT)
+        self.assertTrue(allein.gefunden)
+        self.assertTrue(daneben.gefunden, daneben.begruendung)
+        self.assertEqual(daneben.beste.durchmesser, allein.beste.durchmesser)
+
+    def test_auch_die_buegel_sehen_nur_ihre_platte(self):
+        projekt = self.mit_hoffnungslosem_nachbarn()
+        for k in projekt.querschnitt("q1").kombinationen:
+            k.V_Ed = 600.0
+        loesung = suche.buegel_suchen(projekt, "q1")
+        self.assertTrue(loesung.gefunden, loesung.begruendung)
 
 
 class TestNurEingeschaltetes(unittest.TestCase):

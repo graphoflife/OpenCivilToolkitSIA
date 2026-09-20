@@ -531,6 +531,7 @@ async function bewehrungErmitteln(kennung) {
     const antwort = await api.bewehrungSuchen(zustand.projekt, kennung);
     const teile = [antwort.begruendung];
     if (antwort.buegel) teile.push(`Bügel: ${antwort.buegel.begruendung}`);
+    if (antwort.duktilitaet) teile.push(antwort.duktilitaet);
     automatikMeldungen.set(kennung, {
       laeuft: false, text: teile.join(' '), gut: antwort.gefunden,
     });

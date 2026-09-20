@@ -326,6 +326,9 @@ def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
         "modus": modus.value,
         "modus_text": modus.beschriftung,
         "begruendung": ergebnis.begruendung,
+        # Gesucht wird ohne Duktilitaet -- sie wird durch mehr Stahl
+        # schlechter. Verschwiegen wird sie darum nicht.
+        "duktilitaet": ergebnis.duktilitaet,
         "loesungen": [
             {"teilung": l.teilung, "gefunden": l.gefunden,
              "durchmesser": l.durchmesser, "stahlflaeche": l.stahlflaeche,
