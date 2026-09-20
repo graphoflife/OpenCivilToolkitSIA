@@ -66,12 +66,20 @@ sie hier notiert; keine davon ist nachgeschlagen.
 
 ## Noch nicht gebaut
 
-- [ ] **Automatisches Bewehrungstool.** Nicht angefangen — die Zeit ging für
-      Löser, Spannungsbegrenzung und Knicken drauf. Das Gerüst steht aber:
-      `Projekt.aufbauen()` liefert alle Urteile, und eine Suche über
-      Durchmesser × Teilung müsste nur wiederholt aufbauen und die Urteile
-      abfragen. Offen ist vor allem, wonach optimiert wird (kleinste
-      Stahlmenge? wenigste Durchmesser?) und welche Nachweise mitzählen.
+- [ ] **Es wird bei jeder Eingabe alles neu gerechnet.** Innerhalb eines
+      Laufs ist das Rechenwerk sparsam: `loese(*ziele)` rechnet nur, was die
+      Ziele brauchen, und merkt sich jeden Wert. *Zwischen* zwei Anfragen
+      merkt es sich nichts — jede Änderung schickt das ganze Projekt an
+      `/api/rechnen`, und dort entsteht alles neu, Materialien und alle
+      Platten. Eine geänderte Zahl in Platte 2 rechnet Platte 1 mit.
+      Gewünscht ist das Gegenteil: nur was stromabwärts der geänderten
+      Eingabe liegt. Dafür bräuchte der Kern einen Zustand über Anfragen
+      hinweg — die Werte behalten und jeden verwerfen, dessen Eingaben sich
+      geändert haben. Die Abhängigkeiten dafür stehen schon da (`bezuege`),
+      es fehlt der Speicher und ein Vergleich der Eingaben. Dass es bisher
+      nicht störte, liegt an der Grösse: ein Durchgang des Beispiels dauert
+      rund 30 ms. Mit einem Knicknachweis sind es Sekunden, und dann stört
+      es.
 - [ ] **Spannung-Dehnung-Analyse**: das Panel steht leer da. Der Löser liefert
       zu jedem Fall ε_m und χ; was gezeigt werden soll, ist noch nicht
       festgelegt.

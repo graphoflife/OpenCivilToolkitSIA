@@ -43,6 +43,50 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-20 · Suchen statt setzen
+
+Das automatische Bewehrungswerkzeug war das letzte offene Stück, und es fing
+mit einer Frage an: lässt sich die Bewehrung nicht einfach ausrechnen?
+
+Für einen einzelnen Nachweis ja. Für alle zusammen nicht, und der Grund ist
+der Duktilitätsnachweis: er wird durch *mehr* Stahl schlechter, alle anderen
+besser. Zwischen beiden liegt ein Fenster, und ob es offen ist, weiss man
+erst, wenn man hineingeschaut hat. Also wird gesucht.
+
+Gestiegen wird von unten. Alle Posten auf den kleinsten Durchmesser, dann
+Runde für Runde: jeden Posten einzeln einen Schritt grösser probieren und den
+nehmen, der den schlechtesten Erfüllungsgrad am weitesten hebt. Der Schritt
+wird ausprobiert und nicht geraten — eine Regel der Art „bei einem
+Momentenversagen die Zuglage verstärken" liefe beim Duktilitätsnachweis
+genau verkehrt. Bei dreissig Millisekunden je Rechnung ist Ausprobieren der
+günstigere Handel.
+
+Welche Nachweise zählen, musste nirgends aufgeschrieben werden: gebaut wird
+nur, was eingeschaltet ist, und gezählt wird, was gebaut wurde. Die Schalter
+in der Maske steuern die Suche damit unmittelbar. Eine zweite Liste hätte es
+hier nur gegeben, um mit der ersten auseinanderzulaufen.
+
+Der Knicknachweis stellte sich quer. Er kostet je Rechnung Sekunden statt
+Millisekunden, weil er N_Rd durch Halbieren sucht und jede Probekraft eine
+eigene Ausmitten-Iteration nach sich zieht. Ein Suchlauf mit einer Stütze
+brauchte Minuten. Die Abkürzung: während der Suche entfällt die Halbierung.
+Erfüllt oder nicht kommt gleich heraus — N_Rd ≥ |N_Ed| gilt genau dann, wenn
+der Querschnitt bei N_Ed das Moment zweiter Ordnung aufnimmt. Nur die Zahl
+daneben ist eine andere. Dafür gibt es einen Test, der beides gegeneinander
+hält.
+
+Beim Knicken selbst hat sich vorher schon etwas Grundsätzliches geändert.
+Verglichen wurden M_Rd und M_Ed,II, und das geht nur, solange es ein
+Gleichgewicht gibt. Beim Knicken fehlt gerade das: ein kippender Stab hatte
+kein Moment und darum kein Urteil, sondern einen Satz. Jetzt ist der
+Erfüllungsgrad N_Rd/|N_Ed| — die Normalkraft hat immer einen Grenzwert.
+
+Die Ausmitten-Iteration steht seither vollständig in der Herleitung. Das ist
+der Unterschied zur Nullstellensuche im Faserlöser: dort ist die Halbierung
+ein Weg zu einem Rechenschritt, hier ist die Folge der Rechenschritt selbst.
+Dass sie einläuft, *ist* die Aussage des Nachweises — und das sieht man nur,
+wenn man die Folge sieht.
+
 ## 2026-09-18 · Was `b` eigentlich bedeutet
 
 Eine Platte hatte bisher eine Breite, und die galt für alles. Das ist so lange
