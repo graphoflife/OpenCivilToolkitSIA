@@ -451,7 +451,7 @@ input[readonly], input:disabled, select:disabled {
 .einwirkung input[type="number"] { padding: 3px 5px; text-align: right; }
 .einwirkung .ew-name { padding: 3px 6px; font-weight: 500; }
 .einwirkung .schalter-richtung { justify-self: stretch; }
-.einwirkung.ist-haeufig { grid-template-columns: 1fr 70px 70px 74px 22px; }
+.einwirkung.ist-haeufig { grid-template-columns: 42px 1fr 62px 62px 66px 20px; }
 
 .werteliste tr.ist-gewaehlt { background: var(--blau-hell); box-shadow: inset 3px 0 0 var(--blau); }
 

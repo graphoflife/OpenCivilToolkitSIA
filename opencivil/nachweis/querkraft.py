@@ -434,7 +434,7 @@ class Querkraft(Nachweis):
 
         r = richtung.value
         basis = f"{querschnitt.id}.nachweis.querkraft.{r}"
-        self.d_grad: Dict[str, WertDef] = {
+        self.d_ausnutzung: Dict[str, WertDef] = {
             f.name: WertDef(
                 id=f"{basis}.{f.kennung}.erfuellungsgrad",
                 symbol=rf"\alpha_{{eff,V,{r},{f.kennung}}}",
@@ -506,7 +506,7 @@ class Querkraft(Nachweis):
 
         super().__init__(
             basis,
-            ausgaben=list(self.d_grad.values()) + list(self.d_v_rd.values()),
+            ausgaben=list(self.d_ausnutzung.values()) + list(self.d_v_rd.values()),
             bezuege=bezuege,
             titel=f"Querkraftnachweis {richtung.beschriftung} – {querschnitt.name}",
             referenz="SIA 262:2025, 4.3.3.2",
@@ -590,7 +590,7 @@ class Querkraft(Nachweis):
         """
         fall = erg.fall
         ergebnis[self.d_v_rd[fall.name].id] = Groesse.aus_si(erg.v_Rd, KN_PRO_M)
-        ergebnis[self.d_grad[fall.name].id] = Groesse(
+        ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(
             min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
 
         urteile.append(NachweisUrteil(

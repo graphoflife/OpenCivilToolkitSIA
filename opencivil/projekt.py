@@ -24,7 +24,7 @@ geschieht erst beim Aufbau, ueber die :class:`Groesse`.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence
 
@@ -213,7 +213,33 @@ def _duktilitaet_aus(wert: Any) -> List[bool]:
 
 
 @dataclass
-class MaterialEintrag:
+class Beschreibung:
+    """
+    Gemeinsamer Boden aller Beschreibungsteile.
+
+    Der Weg nach draussen sind die Felder der Datenklasse, nicht mehr. Von
+    Hand geschrieben war ``als_dict`` ein Spiegel, der nur stimmt, solange
+    jemand ihn nachfuehrt -- neun Stueck, zusammen gut hundert Zeilen, deren
+    ganze Aufgabe war, identisch zu etwas zu sein, das die Standardbibliothek
+    schon kann.
+
+    Seit der Zwischenspeicher (:mod:`opencivil.web.speicher`) seinen Abdruck
+    daraus bildet, waere ein vergessenes Feld auch nicht mehr bloss eine
+    unvollstaendige Datei: die Aenderung faende sich im Abdruck nicht wieder,
+    das Bauteil gaelte als unveraendert, und die Oberflaeche zeigte eine alte
+    Zahl. Von allen Fehlern der schlimmste -- und mit dieser Zeile gibt es ihn
+    nicht.
+
+    Der Weg hinein bleibt je Klasse von Hand: dort stehen Vorgaben, alte
+    Dateiformate und Pruefungen, und das ist Arbeit und kein Spiegel.
+    """
+
+    def als_dict(self) -> dict:
+        return asdict(self)
+
+
+@dataclass
+class MaterialEintrag(Beschreibung):
     """Ein Baustoff, wie ihn die Oberflaeche beschreibt."""
 
     kennung: str
@@ -259,13 +285,6 @@ class MaterialEintrag:
                     f"Eine unveränderte Normsorte muss '{self.sorte}' heissen, "
                     f"nicht '{self.name}'.")
 
-    def als_dict(self) -> dict:
-        return {
-            "kennung": self.kennung, "art": self.art, "sorte": self.sorte,
-            "name": self.anzeigename, "eigenstaendig": self.eigenstaendig,
-            "abweichungen": dict(self.abweichungen),
-            "ueberschreibungen": dict(self.ueberschreibungen),
-        }
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "MaterialEintrag":
@@ -288,7 +307,7 @@ class MaterialEintrag:
 
 
 @dataclass
-class PostenEintrag:
+class PostenEintrag(Beschreibung):
     """Grundbewehrung oder Zulage einer Lage."""
 
     durchmesser: float = 0.0
@@ -305,9 +324,6 @@ class PostenEintrag:
             return False
         return bool(self.abstand and self.abstand > 0) or bool(self.anzahl and self.anzahl > 0)
 
-    def als_dict(self) -> dict:
-        return {"durchmesser": self.durchmesser, "abstand": self.abstand,
-                "anzahl": self.anzahl}
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "PostenEintrag":
@@ -334,7 +350,7 @@ class PostenEintrag:
 
 
 @dataclass
-class LageEintrag:
+class LageEintrag(Beschreibung):
     """Eine der vier Lagen."""
 
     stahl: str = ""
@@ -349,9 +365,6 @@ class LageEintrag:
     def vorhanden(self) -> bool:
         return self.grund.vorhanden or self.zulage.vorhanden
 
-    def als_dict(self) -> dict:
-        return {"stahl": self.stahl, "grund": self.grund.als_dict(),
-                "zulage": self.zulage.als_dict(), "unguenstig": self.unguenstig}
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "LageEintrag":
@@ -367,7 +380,7 @@ class LageEintrag:
 
 
 @dataclass
-class QuerkraftbewehrungEintrag:
+class QuerkraftbewehrungEintrag(Beschreibung):
     """
     Die Bügel einer Platte -- ein Raster, ein Durchmesser, zwei Teilungen.
 
@@ -393,13 +406,6 @@ class QuerkraftbewehrungEintrag:
         return bool(self.abstand_y and self.abstand_y > 0) or bool(
             self.anzahl_y and self.anzahl_y > 0)
 
-    def als_dict(self) -> dict:
-        return {
-            "durchmesser": self.durchmesser, "stahl": self.stahl,
-            "abstand_x": self.abstand_x, "abstand_y": self.abstand_y,
-            "anzahl_y": self.anzahl_y,
-            "alpha_min": self.alpha_min, "alpha_max": self.alpha_max,
-        }
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "QuerkraftbewehrungEintrag":
@@ -450,7 +456,7 @@ class QuerkraftbewehrungEintrag:
 
 
 @dataclass
-class KnickEintrag:
+class KnickEintrag(Beschreibung):
     """
     Ein Knicknachweis: Druckkraft, Moment 1. Ordnung, Laenge, Knicklaenge.
 
@@ -473,10 +479,6 @@ class KnickEintrag:
     """Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen -- eine
     geloeschte Zeile muesste man neu eintippen, um sie wieder anzusehen."""
 
-    def als_dict(self) -> dict:
-        return {"name": self.name, "N_Ed": self.N_Ed, "M_Ed_1": self.M_Ed_1,
-                "laenge": self.laenge, "knicklaenge": self.knicklaenge,
-                "aktiv": self.aktiv}
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "KnickEintrag":
@@ -510,7 +512,7 @@ HAEUFIG_ANTEIL = 0.70
 
 
 @dataclass
-class HaeufigEintrag:
+class HaeufigEintrag(Beschreibung):
     """
     Eine Schnittgroessenkombination unter haeufiger Einwirkung.
 
@@ -528,9 +530,6 @@ class HaeufigEintrag:
     def gilt_fuer(self, richtung: Richtung) -> bool:
         return self.aktiv and self.richtung in (BEIDE_RICHTUNGEN, richtung.value)
 
-    def als_dict(self) -> dict:
-        return {"name": self.name, "M_Ed": self.M_Ed, "N_Ed": self.N_Ed,
-                "richtung": self.richtung, "aktiv": self.aktiv}
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "HaeufigEintrag":
@@ -544,7 +543,7 @@ class HaeufigEintrag:
 
 
 @dataclass
-class KombinationEintrag:
+class KombinationEintrag(Beschreibung):
     """Eine zu pruefende Schnittgroessenkombination."""
 
     name: str
@@ -569,10 +568,6 @@ class KombinationEintrag:
     def gilt_fuer(self, richtung: Richtung) -> bool:
         return self.aktiv and self.richtung in (BEIDE_RICHTUNGEN, richtung.value)
 
-    def als_dict(self) -> dict:
-        return {"name": self.name, "M_Ed": self.M_Ed, "N_Ed": self.N_Ed,
-                "V_Ed": self.V_Ed, "art": self.art, "richtung": self.richtung,
-                "aktiv": self.aktiv}
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "KombinationEintrag":
@@ -625,7 +620,7 @@ def _lagen_aus_altem_format(d: Mapping[str, Any]) -> List[dict]:
 
 
 @dataclass
-class QuerschnittEintrag:
+class QuerschnittEintrag(Beschreibung):
     """Eine Stahlbeton-Platte mit genau vier Bewehrungslagen."""
 
     kennung: str
@@ -739,36 +734,6 @@ class QuerschnittEintrag:
         vier = Richtung(self.richtung_lage4)
         return {1: eins, 2: eins.gegenrichtung, 3: vier.gegenrichtung, 4: vier}[nummer]
 
-    def als_dict(self) -> dict:
-        return {
-            "kennung": self.kennung, "name": self.name, "beton": self.beton,
-            "h": self.h, "b": self.b,
-            "ueberdeckung_unten": self.ueberdeckung_unten,
-            "ueberdeckung_oben": self.ueberdeckung_oben,
-            "d_max": self.d_max,
-            "einlagenhoehe": self.einlagenhoehe,
-            "k_c": self.k_c,
-            "querkraftbewehrung": self.querkraftbewehrung.als_dict(),
-            "duktilitaet": list(self.duktilitaet),
-            "automatik_modus": self.automatik_modus,
-            "automatik_teilungen": list(self.automatik_teilungen),
-            "automatik_querkraft": self.automatik_querkraft,
-            "automatik_querkraft_teilungen": list(self.automatik_querkraft_teilungen),
-            "sproede_lagen": list(self.sproede_lagen),
-            "zwaengung_biegung_lagen": list(self.zwaengung_biegung_lagen),
-            "rissanforderung": self.rissanforderung,
-            "kriechzahl": self.kriechzahl,
-            "zwaengung_x": self.zwaengung_x,
-            "zwaengung_y": self.zwaengung_y,
-            "zwaengung_begrenzt": self.zwaengung_begrenzt,
-            "haeufige_aus_tragsicherheit": self.haeufige_aus_tragsicherheit,
-            "haeufige": [h.als_dict() for h in self.haeufige],
-            "knickfaelle": [k.als_dict() for k in self.knickfaelle],
-            "richtung_lage1": self.richtung_lage1,
-            "richtung_lage4": self.richtung_lage4,
-            "lagen": [l.als_dict() for l in self.lagen],
-            "kombinationen": [k.als_dict() for k in self.kombinationen],
-        }
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "QuerschnittEintrag":
@@ -861,31 +826,30 @@ class Aufbau:
 
     warnungen: List[str] = field(default_factory=list)
 
-    def alle_nachweisziele(self) -> List[str]:
-        return ([d.id for n in self.nachweise.values() for d in n.d_ausnutzung.values()]
-                + [d.id for q in self.querkraft.values() for d in q.d_grad.values()]
-                + [d.id for k in self.duktilitaet.values()
-                   for d in k.d_ausnutzung.values()]
-                + [d.id for f in self.fehlende.values()
-                   for d in f.d_ausnutzung.values()]
-                + [d.id for z in self.rissnormalkraft.values()
-                   for d in z.d_ausnutzung.values()]
-                + [d.id for s in self.sproede.values()
-                   for d in s.d_ausnutzung.values()]
-                + [d.id for m in self.zwaengung_biegung.values()
-                   for d in m.d_ausnutzung.values()]
-                + [d.id for s in self.spannung.values()
-                   for d in s.d_ausnutzung.values()]
-                + [d.id for k in self.knicken.values()
-                   for d in k.d_ausnutzung.values()])
-
-    #: Die Felder, in denen die Nachweise einer Platte stehen. Sie alle sind
-    #: nach Kennung geschluesselt -- entweder ``q1`` oder ``q1.x``. Die Liste
-    #: steht hier und nicht dreimal verteilt: wer ein Feld hinzufuegt, traegt
-    #: es hier ein und bekommt Aufteilen und Zwischenspeichern geschenkt.
+    #: Die Felder, in denen die Nachweise einer Platte stehen -- die eine
+    #: Stelle, an der ein neuer Nachweis eingetragen wird. Alle sind nach
+    #: Kennung geschluesselt (``q1`` oder ``q1.x``) und alle tragen Nachweise
+    #: mit ``d_ausnutzung``. Daraus ergeben sich Rechenziele, Aufteilen nach
+    #: Platte und Zwischenspeichern von selbst; frueher stand dieselbe Liste
+    #: viermal da, und wer einen Nachweis hinzufuegte, musste alle vier
+    #: finden.
     NACHWEISFELDER = ("nachweise", "querkraft", "duktilitaet", "fehlende",
                       "rissnormalkraft", "sproede", "zwaengung_biegung",
                       "spannung", "knicken")
+
+    def nachweise_je_feld(self):
+        """Alle Nachweise, Feld fuer Feld und in der Reihenfolge der Liste."""
+        for feld in self.NACHWEISFELDER:
+            yield feld, getattr(self, feld)
+
+    def alle_nachweise(self):
+        """Jeden Nachweis einmal, in derselben Reihenfolge wie im Protokoll."""
+        for _, eintraege in self.nachweise_je_feld():
+            yield from eintraege.values()
+
+    def alle_nachweisziele(self) -> List[str]:
+        return [d.id for n in self.alle_nachweise()
+                for d in n.d_ausnutzung.values()]
 
     def gehoert_zu(self, schluessel: str, kennung: str) -> bool:
         """Ob ein Feldschluessel (``q1`` oder ``q1.x``) zu dieser Platte gehoert."""
@@ -901,11 +865,9 @@ class Aufbau:
         Iterationsschritte. Die Schnittstelle liest das aus den Objekten, also
         muessen die Objekte mitwandern und nicht bloss ihre Ausgabewerte.
         """
-        teile: Dict[str, Dict[str, Any]] = {}
-        for feld in self.NACHWEISFELDER:
-            teile[feld] = {s: w for s, w in getattr(self, feld).items()
-                           if self.gehoert_zu(s, kennung)}
-        return teile
+        return {feld: {s: w for s, w in eintraege.items()
+                       if self.gehoert_zu(s, kennung)}
+                for feld, eintraege in self.nachweise_je_feld()}
 
     def teile_setzen(self, kennung: str, teile: Mapping[str, Dict[str, Any]]) -> None:
         """Die Nachweisobjekte einer Platte durch frueher gerechnete ersetzen."""
@@ -918,9 +880,8 @@ class Aufbau:
     def ziele_von(self, kennung: str) -> List[str]:
         """Die Rechenziele einer einzelnen Platte -- Eckwerte und Nachweise."""
         alle = self.eckwertziele() + self.alle_nachweisziele()
-        raeume = {w.id for feld in self.NACHWEISFELDER
-                  for s, w in getattr(self, feld).items()
-                  if self.gehoert_zu(s, kennung)}
+        raeume = {w.id for _, eintraege in self.nachweise_je_feld()
+                  for s, w in eintraege.items() if self.gehoert_zu(s, kennung)}
         return [z for z in alle if any(z.startswith(f"{r}.") for r in raeume)]
 
     def eckwertziele(self) -> List[str]:
@@ -951,7 +912,7 @@ class Aufbau:
 
 
 @dataclass
-class Projekt:
+class Projekt(Beschreibung):
     """Die vollstaendige, speicherbare Beschreibung eines Projekts."""
 
     name: str = "Neues Projekt"
@@ -1381,12 +1342,6 @@ class Projekt:
 
     # -- Speichern ----------------------------------------------------------
 
-    def als_dict(self) -> dict:
-        return {
-            "name": self.name,
-            "materialien": [m.als_dict() for m in self.materialien],
-            "querschnitte": [q.als_dict() for q in self.querschnitte],
-        }
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "Projekt":

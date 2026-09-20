@@ -11,10 +11,11 @@ warmem Speicher, einmal aus dem Kalten, und die beiden Antworten gegeneinander.
 """
 
 import copy
+import dataclasses
 import json
 import unittest
 
-from opencivil.projekt import KnickEintrag, Projekt
+from opencivil.projekt import KnickEintrag, Projekt, QuerschnittEintrag
 from opencivil.web import dienst, speicher
 
 
@@ -32,6 +33,19 @@ def projekt_mit_zwei_platten() -> dict:
         k.V_Ed = 80.0
     p.querschnitte[0].querkraftbewehrung.durchmesser = 10
     return p.als_dict()
+
+
+def _anders(wert):
+    """Irgendein anderer Wert derselben Art -- egal welcher, Hauptsache neu."""
+    if isinstance(wert, bool):
+        return not wert
+    if isinstance(wert, (int, float)):
+        return wert + 1
+    if isinstance(wert, str):
+        return wert + "!"
+    if isinstance(wert, list):
+        return wert[1:] if wert else [1]
+    return None if wert is not None else 1
 
 
 def rechnen(beschreibung: dict, *, frisch: bool):
@@ -151,31 +165,34 @@ class TestAbdruck(unittest.TestCase):
         self.assertEqual(speicher.abdruck(d, "q1"),
                          speicher.abdruck(copy.deepcopy(d), "q1"))
 
-    def test_jede_ecke_der_platte_faellt_auf(self):
+    def test_jedes_feld_der_platte_faellt_auf(self):
         """
-        Der Abdruck muss jede Änderung sehen. Eine, die er übersieht, liefert
-        stillschweigend falsche Zahlen -- von allen Fehlern der schlimmste.
+        Der Abdruck muss **jede** Änderung sehen. Eine, die er übersieht,
+        lässt das Bauteil als unverändert gelten und liefert stillschweigend
+        eine alte Zahl -- von allen Fehlern der schlimmste.
+
+        Darum keine Auswahl von Proben, sondern alle Felder der Datenklasse.
+        Ein neues Feld ist damit automatisch mitgeprüft; vergessen kann man es
+        nicht mehr.
         """
+        for feld in dataclasses.fields(QuerschnittEintrag):
+            if feld.name == "kennung":
+                continue                       # die ist der Schlüssel selbst
+            eintrag = QuerschnittEintrag.aus_dict(
+                projekt_mit_zwei_platten()["querschnitte"][0])
+            vorher = speicher.abdruck({"querschnitte": [eintrag.als_dict()],
+                                       "materialien": []}, "q1")
+            setattr(eintrag, feld.name, _anders(getattr(eintrag, feld.name)))
+            nachher = speicher.abdruck({"querschnitte": [eintrag.als_dict()],
+                                        "materialien": []}, "q1")
+            with self.subTest(feld=feld.name):
+                self.assertNotEqual(nachher, vorher)
+
+    def test_auch_das_material_faellt_auf(self):
         d = projekt_mit_zwei_platten()
         vorher = speicher.abdruck(d, "q1")
-        proben = [
-            lambda x: x["querschnitte"][0].__setitem__("h", 301),
-            lambda x: x["querschnitte"][0].__setitem__("kriechzahl", 1.5),
-            lambda x: x["querschnitte"][0]["lagen"][2]["zulage"].__setitem__("durchmesser", 10),
-            lambda x: x["querschnitte"][0]["kombinationen"][0].__setitem__("N_Ed", -50),
-            lambda x: x["querschnitte"][0]["kombinationen"][0].__setitem__("aktiv", False),
-            lambda x: x["querschnitte"][0].__setitem__("sproede_lagen", [1, 1, 0, 0]),
-            lambda x: x["querschnitte"][0]["querkraftbewehrung"].__setitem__("alpha_min", 35),
-            lambda x: x["querschnitte"][0].__setitem__("knickfaelle", [
-                {"name": "K", "N_Ed": -100, "M_Ed_1": 5, "laenge": 3,
-                 "knicklaenge": 3, "aktiv": True}]),
-            lambda x: x["materialien"][0].__setitem__("ueberschreibungen", {"f_ck": 33.0}),
-        ]
-        for i, probe in enumerate(proben):
-            kopie = copy.deepcopy(d)
-            probe(kopie)
-            with self.subTest(probe=i):
-                self.assertNotEqual(speicher.abdruck(kopie, "q1"), vorher)
+        d["materialien"][0]["ueberschreibungen"] = {"f_ck": 33.0}
+        self.assertNotEqual(speicher.abdruck(d, "q1"), vorher)
 
     def test_eine_andere_platte_aendert_den_abdruck_nicht(self):
         """Genau das ist der Punkt der Übung."""

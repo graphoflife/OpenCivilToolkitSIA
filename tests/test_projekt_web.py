@@ -7,9 +7,9 @@ from pathlib import Path
 
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, N_PRO_MM2, Groesse
 from opencivil.projekt import (
-    HaeufigEintrag, KombinationEintrag, LageEintrag, MaterialEintrag,
-    PostenEintrag, Projekt, ProjektFehler, QuerkraftbewehrungEintrag,
-    QuerschnittEintrag,
+    Aufbau, HaeufigEintrag, KnickEintrag, KombinationEintrag, LageEintrag,
+    MaterialEintrag, PostenEintrag, Projekt, ProjektFehler,
+    QuerkraftbewehrungEintrag, QuerschnittEintrag,
 )
 from opencivil.querschnitt.platte import Richtung
 from opencivil.web import api, bruecke, dienst, server
@@ -892,6 +892,55 @@ class TestUnbenutztesMaterial(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestNachweisfelder(unittest.TestCase):
+    """
+    Die eine Liste, aus der Rechenziele, Aufteilen und Zwischenspeichern
+    folgen. Stimmt sie nicht, fällt ein Nachweis stillschweigend aus allen
+    dreien heraus.
+    """
+
+    def aufbau(self):
+        projekt = Projekt.beispiel()
+        q = projekt.querschnitt("q1")
+        q.rissanforderung = "hoch"
+        q.zwaengung_x = q.zwaengung_y = True
+        q.knickfaelle = [KnickEintrag("Stütze", N_Ed=-500.0, M_Ed_1=20.0)]
+        for k in q.kombinationen:
+            k.V_Ed = 80.0
+        return projekt.aufbauen(schnell=True)
+
+    def test_jedes_feld_gibt_es_auch(self):
+        aufbau = self.aufbau()
+        for feld in Aufbau.NACHWEISFELDER:
+            with self.subTest(feld=feld):
+                self.assertIsInstance(getattr(aufbau, feld), dict)
+
+    def test_jeder_nachweis_traegt_seine_ausnutzung(self):
+        """
+        Der Querkraftnachweis hiess sie einmal `d_grad` und brauchte darum
+        eine eigene Zeile in der Zielliste. Jetzt heissen alle gleich.
+        """
+        aufbau = self.aufbau()
+        nachweise = list(aufbau.alle_nachweise())
+        self.assertGreaterEqual(len(nachweise), 7)
+        for n in nachweise:
+            with self.subTest(nachweis=type(n).__name__):
+                self.assertTrue(n.d_ausnutzung)
+
+    def test_kein_nachweis_faellt_aus_der_zielliste(self):
+        aufbau = self.aufbau()
+        aus_feldern = {d.id for n in aufbau.alle_nachweise()
+                       for d in n.d_ausnutzung.values()}
+        self.assertEqual(set(aufbau.alle_nachweisziele()), aus_feldern)
+
+    def test_jeder_nachweis_gehoert_zu_genau_einer_platte(self):
+        """Sonst käme ein Ergebnis beim Zwischenspeichern doppelt oder gar nicht."""
+        aufbau = self.aufbau()
+        eigene = aufbau.ziele_von("q1")
+        self.assertEqual(sorted(eigene),
+                         sorted(aufbau.eckwertziele() + aufbau.alle_nachweisziele()))
 
 
 class TestAngabengruppen(unittest.TestCase):
