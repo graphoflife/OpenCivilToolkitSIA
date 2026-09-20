@@ -43,6 +43,62 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-20 · Was vom letzten Lauf noch gilt
+
+Bisher rechnete jede geänderte Zahl alles neu: Materialien, alle Platten, das
+ganze Protokoll. Bei einer Platte sind das dreissig Millisekunden und es fällt
+niemandem auf. Bei vier Platten hundertzwanzig, bei einer Platte mit
+Knicknachweis anderthalb Sekunden — und dann fällt es auf.
+
+Gemessen zuerst, und die Messung war eindeutig: `Projekt.aufbauen()` kostet
+0.4 ms, das Lösen 30 ms. Bauen ist gratis, Lösen ist alles, und es skaliert
+linear mit der Zahl der Platten. Also muss man nicht den Aufbau
+zwischenspeichern, sondern das Ergebnis.
+
+Das Rechenwerk konnte das nicht selbst. Innerhalb eines Laufs ist es längst
+sparsam — es rechnet nur, was die Ziele brauchen, und jeden Wert einmal. Was
+ihm fehlt, ist das Gedächtnis *zwischen* zwei Läufen, und das kann es sich
+nicht geben: es sieht einen fertigen Graphen und weiss nicht, welche Eingabe
+jemand angefasst hat. Das weiss nur, wer die Beschreibung entgegennimmt.
+
+Gebraucht wurde dafür genau ein neues Mittel: `loese(*ziele, bekannt=…)`.
+Mitgebrachte Werte stehen im Zwischenspeicher, als wären sie eben gerechnet
+worden — der Lauf geht über sie hinweg, ohne Rechnung und ohne
+Protokollblock. Damit lassen sich mehrere Läufe aneinanderhängen: erst die
+Baustoffe, dann Platte für Platte, und die Herleitung liest sich am Ende wie
+aus einem Guss.
+
+Die eigentliche Frage war die Körnung. Verlockend wäre je Nachweis gewesen:
+einen Duktilitätsschalter umlegen und den Knicknachweis stehen lassen. Das
+geht nicht, und der Grund ist unangenehm konkret — die Nachweise tragen ihre
+Lastfälle im Bauch, nicht in ihren Bezügen. Ein Knickfall mit geänderter
+Normalkraft hat denselben Bezugsgraphen und dieselben Ausgabekennungen wie
+vorher. Ein feiner Abdruck sähe keinen Unterschied und gäbe ein falsches
+Ergebnis heraus, ohne dass irgendwo etwas auffiele.
+
+Also grob: der Abdruck einer Platte ist ihr ganzer JSON-Eintrag plus *alle*
+Materialien. Nicht nur die verwendeten — ein Vergleich, der erst auflösen
+müsste, welche Kennung wohin zeigt, wäre genau die Stelle, an der man eines
+vergisst. Die Regel dahinter: lieber zu viel verwerfen als zu wenig. Ein
+Abdruck, der eine Änderung übersieht, liefert falsche Zahlen; einer, der zu
+oft verwirft, kostet Zeit. Von beiden Fehlern ist nur einer hinnehmbar.
+
+Eine Überraschung gab es doch. Ein übernommenes Bauteil besteht nicht nur aus
+Zahlen: die Nachweise merken sich beim Rechnen einiges, was die Schnittstelle
+später ausliest — Interaktionslinien, Fallergebnisse, Iterationsschritte.
+Hätte man nur die Werte aufbewahrt, stünde die Zusammenfassung da und das
+Diagramm wäre leer. Also wandern die Nachweis*objekte* mit.
+
+Die Zusage ist nicht «schneller», sondern «gleich». Der Haupttest fährt acht
+Änderungen durch — Dicke, Moment, Betonsorte, Stabdurchmesser, ein Schalter,
+eine Knicknormalkraft, eine gelöschte Platte — und hält jedes Mal die Antwort
+mit warmem Speicher gegen die aus dem Kalten. Zeichen für Zeichen dieselbe.
+Ein Werkzeug, das je nach Vorgeschichte verschiedene Zahlen zeigt, wäre
+schlimmer als ein langsames.
+
+Vier Platten, gemessen: erster Lauf 131 ms, unverändert 6 ms, eine von vier
+geändert 38 ms.
+
 ## 2026-09-20 · Suchen statt setzen
 
 Das automatische Bewehrungswerkzeug war das letzte offene Stück, und es fing

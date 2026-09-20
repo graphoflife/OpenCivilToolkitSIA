@@ -39,6 +39,7 @@
     "opencivil/web/api.py",
     "opencivil/web/bruecke.py",
     "opencivil/web/dienst.py",
-    "opencivil/web/server.py"
+    "opencivil/web/server.py",
+    "opencivil/web/speicher.py"
   ]
 }

@@ -297,7 +297,8 @@ class Rechenwerk:
 
     # -- Aufloesen ----------------------------------------------------------
 
-    def loese(self, *ziele: str) -> Loesung:
+    def loese(self, *ziele: str,
+              bekannt: Optional[Mapping[str, Wert]] = None) -> Loesung:
         """
         Berechnet die angegebenen Ziele und alles, was dafuer noetig ist.
 
@@ -305,8 +306,19 @@ class Rechenwerk:
         Laesst sich ein Ziel nicht aufloesen, bricht der Lauf nicht ab -- das
         Ziel landet in :attr:`Loesung.nicht_berechenbar`, und die fehlenden
         Eingaben werden benannt.
+
+        ``bekannt`` sind Werte, die bereits vorliegen. Sie gelten als
+        gerechnet: der Lauf holt sie nicht noch einmal und schreibt sie auch
+        nicht noch einmal ins Protokoll. Damit lassen sich mehrere Laeufe
+        aneinanderhaengen, ohne dass die Baustoffe in jedem davon erneut
+        hergeleitet werden -- und damit laesst sich ein Bauteil auslassen,
+        dessen Ergebnis von einem frueheren Lauf noch gilt.
+
+        **Der Aufrufer haftet dafuer, dass die Werte noch gelten.** Das
+        Rechenwerk prueft es nicht; es kann es nicht, denn was eine Eingabe
+        wert ist, weiss nur, wer sie gesetzt hat.
         """
-        lauf = _Lauf(self)
+        lauf = _Lauf(self, bekannt=bekannt)
         for ziel in ziele:
             lauf.ziel(ziel)
         return lauf.abschliessen()
@@ -344,9 +356,18 @@ class _Lauf:
     die Quere kommen.
     """
 
-    def __init__(self, werk: Rechenwerk) -> None:
+    def __init__(self, werk: Rechenwerk,
+                 bekannt: Optional[Mapping[str, Wert]] = None) -> None:
         self.werk = werk
         self.loesung = Loesung()
+        # Mitgebrachte Werte stehen im Zwischenspeicher, als waeren sie eben
+        # gerechnet worden. aufloesen() findet sie in Schritt 1 und geht
+        # darueber hinweg -- ohne Rechnung und ohne Protokollblock.
+        if bekannt:
+            self.loesung.werte.update(bekannt)
+            self._mitgebracht = set(bekannt)
+        else:
+            self._mitgebracht = set()
         self._stapel: List[str] = []
         self._gescheitert: Dict[str, NichtBerechenbar] = {}
         self._ziele: List[str] = []

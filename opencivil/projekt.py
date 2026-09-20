@@ -879,6 +879,50 @@ class Aufbau:
                 + [d.id for k in self.knicken.values()
                    for d in k.d_ausnutzung.values()])
 
+    #: Die Felder, in denen die Nachweise einer Platte stehen. Sie alle sind
+    #: nach Kennung geschluesselt -- entweder ``q1`` oder ``q1.x``. Die Liste
+    #: steht hier und nicht dreimal verteilt: wer ein Feld hinzufuegt, traegt
+    #: es hier ein und bekommt Aufteilen und Zwischenspeichern geschenkt.
+    NACHWEISFELDER = ("nachweise", "querkraft", "duktilitaet", "fehlende",
+                      "rissnormalkraft", "sproede", "zwaengung_biegung",
+                      "spannung", "knicken")
+
+    def gehoert_zu(self, schluessel: str, kennung: str) -> bool:
+        """Ob ein Feldschluessel (``q1`` oder ``q1.x``) zu dieser Platte gehoert."""
+        return schluessel == kennung or schluessel.startswith(f"{kennung}.")
+
+    def teile_von(self, kennung: str) -> Dict[str, Dict[str, Any]]:
+        """
+        Alle Nachweisobjekte einer Platte, nach Feld geordnet.
+
+        Gebraucht vom Zwischenspeicher: ein uebernommenes Ergebnis besteht
+        nicht nur aus Zahlen, sondern auch aus dem, was die Nachweise sich
+        beim Rechnen gemerkt haben -- Interaktionslinien, Fallergebnisse,
+        Iterationsschritte. Die Schnittstelle liest das aus den Objekten, also
+        muessen die Objekte mitwandern und nicht bloss ihre Ausgabewerte.
+        """
+        teile: Dict[str, Dict[str, Any]] = {}
+        for feld in self.NACHWEISFELDER:
+            teile[feld] = {s: w for s, w in getattr(self, feld).items()
+                           if self.gehoert_zu(s, kennung)}
+        return teile
+
+    def teile_setzen(self, kennung: str, teile: Mapping[str, Dict[str, Any]]) -> None:
+        """Die Nachweisobjekte einer Platte durch frueher gerechnete ersetzen."""
+        for feld, eintraege in teile.items():
+            ziel = getattr(self, feld)
+            for schluessel in [s for s in ziel if self.gehoert_zu(s, kennung)]:
+                del ziel[schluessel]
+            ziel.update(eintraege)
+
+    def ziele_von(self, kennung: str) -> List[str]:
+        """Die Rechenziele einer einzelnen Platte -- Eckwerte und Nachweise."""
+        alle = self.eckwertziele() + self.alle_nachweisziele()
+        raeume = {w.id for feld in self.NACHWEISFELDER
+                  for s, w in getattr(self, feld).items()
+                  if self.gehoert_zu(s, kennung)}
+        return [z for z in alle if any(z.startswith(f"{r}.") for r in raeume)]
+
     def eckwertziele(self) -> List[str]:
         return [d.id for n in self.nachweise.values() for d in n.d_eckwerte.values()]
 

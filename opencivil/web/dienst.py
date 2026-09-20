@@ -36,8 +36,13 @@ from opencivil import bewehrungssuche
 from opencivil.bericht.latex_dokument import als_tex
 from opencivil.core.rechenwerk import RechenwerkFehler
 from opencivil.projekt import Projekt, ProjektFehler
-from opencivil.web import api
+from opencivil.web import api, speicher
 from opencivil.web.api import endlich
+
+#: Das Gedaechtnis zwischen zwei Anfragen -- siehe :mod:`opencivil.web.speicher`.
+#: Im Modul und damit im Prozess: beim Server die laufende Sitzung, im Browser
+#: der offene Reiter.
+SPEICHER = speicher.Ergebnisspeicher()
 
 
 class DienstFehler(Exception):
@@ -125,21 +130,72 @@ def rechnen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     projekt = _projekt(rumpf)
     aufbau = projekt.aufbauen()
 
-    ziele = list(rumpf.get("ziele") or [])
-    if not ziele:
-        # Die Reihenfolge bestimmt den Aufbau der Herleitung: erst die
-        # Baustoffe, dann die Bauteile.
-        ziele = (aufbau.materialziele() + aufbau.eckwertziele()
-                 + aufbau.alle_nachweisziele())
-    if not ziele:
+    gewaehlt = list(rumpf.get("ziele") or [])
+    if gewaehlt:
+        unbekannt = [z for z in gewaehlt if aufbau.werk.definition(z) is None]
+        if unbekannt:
+            raise DienstFehler(400, f"Unbekannte Ziele: {', '.join(unbekannt)}")
+        # Rueckverfolgung: genau diese Ziele, ohne Zwischenspeicher. Ein
+        # Teillauf darf den Speicher weder fuellen noch benutzen -- er rechnet
+        # absichtlich nicht alles, und ein halbes Ergebnis als ganzes
+        # aufzubewahren waere der Weg zu Zahlen, die niemand erklaeren kann.
+        return api.loesung_dict(aufbau.werk.loese(*gewaehlt), aufbau, gewaehlt)
+
+    if not (aufbau.materialziele() + aufbau.eckwertziele()
+            + aufbau.alle_nachweisziele()):
         # Kein Nachweis vorhanden -- dann wenigstens alle Materialkennwerte.
         return api.loesung_dict(aufbau.werk.loese_alles(), aufbau, ())
 
-    unbekannt = [z for z in ziele if aufbau.werk.definition(z) is None]
-    if unbekannt:
-        raise DienstFehler(400, f"Unbekannte Ziele: {', '.join(unbekannt)}")
+    loesung, ziele = _stromabwaerts(projekt, aufbau)
+    return api.loesung_dict(loesung, aufbau, ziele)
 
-    return api.loesung_dict(aufbau.werk.loese(*ziele), aufbau, ziele)
+
+def _stromabwaerts(projekt: Projekt, aufbau) -> tuple:
+    """
+    Alles rechnen -- aber nur, was sich geaendert hat.
+
+    Zuerst die Baustoffe: sie stehen am Anfang jeder Herleitung und jede
+    Platte braucht sie. Dann Platte fuer Platte, jede in einem eigenen Lauf,
+    der die schon bekannten Werte mitbekommt und sie darum weder erneut
+    rechnet noch erneut herleitet. Eine Platte, deren Abdruck seit dem letzten
+    Mal derselbe ist, wird gar nicht erst angefasst; ihr Beitrag kommt
+    fertig aus dem Speicher.
+
+    Die Reihenfolge ist dieselbe wie vorher -- erst die Baustoffe, dann die
+    Bauteile in der Reihenfolge der Beschreibung --, und daran haengt der
+    Aufbau des Protokolls. Ein Zwischenspeicher, der die Reihenfolge
+    verschoebe, aenderte den Bericht, und das waere keine Beschleunigung mehr,
+    sondern eine andere Ausgabe.
+    """
+    kennungen = [q.kennung for q in projekt.querschnitte]
+    SPEICHER.aufraeumen(kennungen)
+
+    materialziele = aufbau.materialziele()
+    gesamt = aufbau.werk.loese(*materialziele)
+    bekannt = dict(gesamt.werte)
+    ziele = list(materialziele)
+
+    for kennung in kennungen:
+        eigene = aufbau.ziele_von(kennung)
+        if not eigene:
+            continue
+        ziele += eigene
+        stempel = speicher.abdruck(projekt.als_dict(), kennung)
+        teil = SPEICHER.hole(kennung, stempel)
+        if teil is None:
+            lauf = aufbau.werk.loese(*eigene, bekannt=bekannt)
+            teil = speicher.als_teil(lauf, aufbau.teile_von(kennung),
+                                     ohne=bekannt)
+            SPEICHER.merken(kennung, stempel, teil)
+        else:
+            # Die Nachweise haben sich beim Rechnen mehr gemerkt als ihre
+            # Ausgabewerte; die Schnittstelle liest es aus den Objekten. Also
+            # wandern die Objekte von damals zurueck in den Aufbau.
+            aufbau.teile_setzen(kennung, teil.teile)
+        speicher.verschmelzen(gesamt, teil)
+        bekannt.update(teil.werte)
+
+    return gesamt, ziele
 
 
 def alles(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
