@@ -246,8 +246,8 @@ class SproedesVersagen(Nachweis):
         )
         p.gleichung(
             rf"k_t = \frac{{1}}{{1 + 0.5 \cdot h/{MOMENTENTEILER:.0f}}}"
-            rf" = \frac{{1}}{{1 + 0.5 \cdot {h:.3f}/{MOMENTENTEILER:.0f}}}"
-            rf" = {g.k_t:.3f}",
+            rf" = \frac{{1}}{{1 + 0.5 \cdot {h:.3f}\,\mathrm{{m}}"
+            rf"/{MOMENTENTEILER:.0f}}} = {g.k_t:.3f}",
             titel="Beiwert für die Plattendicke",
             referenz="SIA 262:2025, 4.4.1.3")
         p.gleichung(
@@ -257,8 +257,9 @@ class SproedesVersagen(Nachweis):
             titel="Wirksame Zugfestigkeit")
         p.gleichung(
             r"M_{Riss} = f_{ct,eff} \cdot \frac{h^{2} \cdot b}{6}"
-            rf" = {g.f_ct_eff / 1e6:.2f} \cdot "
-            rf"\frac{{{h * 1e3:.0f}^{{2}} \cdot {b * 1e3:.0f}}}{{6}}"
+            rf" = {g.f_ct_eff / 1e6:.2f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}} \cdot "
+            rf"\frac{{\left({h * 1e3:.0f}\,\mathrm{{mm}}\right)^{{2}} \cdot "
+            rf"{b * 1e3:.0f}\,\mathrm{{mm}}}}{{6}}"
             rf" = {g.M_Riss / 1e3:.1f}\,\mathrm{{kNm}}",
             titel="Rissmoment des ungerissenen Querschnitts")
 
@@ -284,6 +285,6 @@ class SproedesVersagen(Nachweis):
         p.gleichung(
             rf"\alpha_{{eff,SV,{nummer},{r}}} = "
             rf"\frac{{M_{{Rd}}(N_{{Ed}} = 0)}}{{M_{{Riss}}}} = "
-            rf"\frac{{{erg.M_Rd / 1e3:.1f}}}"
-            rf"{{{self.groessen.M_Riss / 1e3:.1f}}} = {grad}",
+            rf"\frac{{{erg.M_Rd / 1e3:.1f}\,\mathrm{{kNm}}}}"
+            rf"{{{self.groessen.M_Riss / 1e3:.1f}\,\mathrm{{kNm}}}} = {grad}",
             titel="Erfüllungsgrad")

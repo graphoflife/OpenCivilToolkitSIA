@@ -352,7 +352,8 @@ class Duktilitaet(Nachweis):
         zustand = r"\text{erfüllt}" if erg.erfuellt else r"\text{NICHT erfüllt}"
         vergleich = r"\le" if erg.erfuellt else ">"
         p.gleichung(
-            rf"\frac{{x}}{{{s_d}}} = \frac{{{erg.x * 1e3:.1f}}}{{{erg.d * 1e3:.1f}}}"
+            rf"\frac{{x}}{{{s_d}}} = \frac{{{erg.x * 1e3:.1f}\,\mathrm{{mm}}}}"
+            rf"{{{erg.d * 1e3:.1f}\,\mathrm{{mm}}}}"
             rf" = {erg.verhaeltnis:.3f}"
             rf" \quad {vergleich} \quad {GRENZE:.2f}"
             rf" \quad \Rightarrow \quad {zustand}",

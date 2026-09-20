@@ -333,7 +333,8 @@ class Handrechnung:
             },
             titel="Gleichmässiger Druck, ohne Bewehrung",
         )
-        p.gleichung(r"M_{Rd}(N_{Rd}^{-}) = 0", titel="Zugehöriges Moment")
+        p.gleichung(r"M_{Rd}(N_{Rd}^{-}) = 0\,\mathrm{kNm}",
+                    titel="Zugehöriges Moment")
         return Eckpunkt("druck", r"N_{Rd}^{-}", "grösste Druckkraft", N, 0.0)
 
     def _groesste_zugkraft(self, p: Protokoll) -> Eckpunkt:

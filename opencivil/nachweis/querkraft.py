@@ -953,7 +953,8 @@ class Querkraft(Nachweis):
 
         p.gleichung(
             rf"V_{{Rd}} = \min\left[V_{{Rd,s}};\ V_{{Rd,c}}\right] = "
-            rf"\min\left[{q.V_Rd_s / 1e3:.1f};\ {q.V_Rd_c / 1e3:.1f}\right]"
+            rf"\min\left[{q.V_Rd_s / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}};\ "
+            rf"{q.V_Rd_c / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}}\right]"
             rf" = {erg.v_Rd / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}}",
             titel="Querkraftwiderstand")
 
@@ -967,7 +968,8 @@ class Querkraft(Nachweis):
                 else f"{erg.erfuellungsgrad:.2f}")
         p.gleichung(
             rf"\alpha_{{eff,V,{r}}} = \frac{{V_{{Rd}}}}{{\left|V_{{Ed}}\right|}} = "
-            rf"\frac{{{erg.v_Rd / 1e3:.1f}}}{{{abs(erg.fall.V_Ed.si) / 1e3:.1f}}} = {grad}"
+            rf"\frac{{{erg.v_Rd / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}}}}"
+            rf"{{{abs(erg.fall.V_Ed.si) / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}}}} = {grad}"
             rf" \quad \Rightarrow \quad {zustand}"
             if erg.fall.V_Ed.si else
             rf"\alpha_{{eff,V,{r}}} = \frac{{V_{{Rd}}}}{{\left|V_{{Ed}}\right|}} = {grad}"

@@ -323,7 +323,13 @@ class Spannungsbegrenzung(Nachweis):
             titel="Grösste Zugspannung in der Bewehrung")
         grad = ("\\infty" if math.isinf(erg.erfuellungsgrad)
                 else f"{erg.erfuellungsgrad:.2f}")
+        # Ohne Zug in der Bewehrung gibt es nichts einzusetzen -- dann stuende
+        # dort eine Null im Nenner.
+        eingesetzt = (
+            rf" = \frac{{{erg.sigma_s_adm / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}}}"
+            rf"{{{erg.sigma_s / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}}}"
+            if erg.sigma_s > 0.0 else "")
         p.gleichung(
             rf"\alpha_{{eff,\sigma}} = "
-            rf"\frac{{\sigma_{{s,adm}}}}{{\sigma_s}} = {grad}",
+            rf"\frac{{\sigma_{{s,adm}}}}{{\sigma_s}}{eingesetzt} = {grad}",
             titel="Erfüllungsgrad")

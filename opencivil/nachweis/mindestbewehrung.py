@@ -340,7 +340,8 @@ class Rissnormalkraft(Nachweis):
 
         p.gleichung(
             r"k_t = \frac{1}{1 + 0.5 \cdot h_{eff}}"
-            rf" = \frac{{1}}{{1 + 0.5 \cdot {g.h_eff:.3f}}} = {g.k_t:.3f}",
+            rf" = \frac{{1}}{{1 + 0.5 \cdot {g.h_eff:.3f}\,\mathrm{{m}}}}"
+            rf" = {g.k_t:.3f}",
             titel="Beiwert für die Plattendicke",
             referenz="SIA 262:2025, 4.4.2")
         p.gleichung(
@@ -350,8 +351,9 @@ class Rissnormalkraft(Nachweis):
             titel="Wirksame Zugfestigkeit")
         p.gleichung(
             r"N_{Riss} = \frac{h_{eff}}{2} \cdot b \cdot f_{ct,eff}"
-            rf" = \frac{{{g.h_eff * 1e3:.0f}}}{{2}} \cdot {b * 1e3:.0f} \cdot "
-            rf"{g.f_ct_eff / 1e6:.2f}"
+            rf" = \frac{{{g.h_eff * 1e3:.0f}\,\mathrm{{mm}}}}{{2}} \cdot "
+            rf"{b * 1e3:.0f}\,\mathrm{{mm}} \cdot "
+            rf"{g.f_ct_eff / 1e6:.2f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
             rf" = {g.N_Riss / 1e3:.1f}\,\mathrm{{kN}}",
             titel="Risskraft der gezogenen Querschnittshälfte")
 
@@ -407,8 +409,8 @@ class Rissnormalkraft(Nachweis):
                 else f"{erg.erfuellungsgrad:.2f}")
         p.gleichung(
             rf"\alpha_{{eff,NR,{index}}} = \frac{{N_{{s,adm,{index}}}}}"
-            rf"{{N_{{Riss}}}} = \frac{{{erg.N_s_adm / 1e3:.1f}}}"
-            rf"{{{self.groessen.N_Riss / 1e3:.1f}}} = {grad}",
+            rf"{{N_{{Riss}}}} = \frac{{{erg.N_s_adm / 1e3:.1f}\,\mathrm{{kN}}}}"
+            rf"{{{self.groessen.N_Riss / 1e3:.1f}\,\mathrm{{kN}}}} = {grad}",
             titel="Erfüllungsgrad")
 
     def _index(self, erg: Lagenergebnis) -> str:
@@ -678,8 +680,8 @@ class ZwaengungBiegung(Nachweis):
         )
         p.gleichung(
             rf"k_t = \frac{{1}}{{1 + 0.5 \cdot h/{MOMENTENTEILER:.0f}}}"
-            rf" = \frac{{1}}{{1 + 0.5 \cdot {h:.3f}/{MOMENTENTEILER:.0f}}}"
-            rf" = {g.k_t:.3f}",
+            rf" = \frac{{1}}{{1 + 0.5 \cdot {h:.3f}\,\mathrm{{m}}"
+            rf"/{MOMENTENTEILER:.0f}}} = {g.k_t:.3f}",
             titel="Beiwert für die Plattendicke",
             referenz="SIA 262:2025, 4.4.2")
         p.gleichung(
@@ -689,8 +691,9 @@ class ZwaengungBiegung(Nachweis):
             titel="Wirksame Zugfestigkeit")
         p.gleichung(
             r"M_{Riss} = f_{ct,eff} \cdot \frac{h^{2} \cdot b}{6}"
-            rf" = {g.f_ct_eff / 1e6:.2f} \cdot "
-            rf"\frac{{{h * 1e3:.0f}^{{2}} \cdot {b * 1e3:.0f}}}{{6}}"
+            rf" = {g.f_ct_eff / 1e6:.2f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}} \cdot "
+            rf"\frac{{\left({h * 1e3:.0f}\,\mathrm{{mm}}\right)^{{2}} \cdot "
+            rf"{b * 1e3:.0f}\,\mathrm{{mm}}}}{{6}}"
             rf" = {g.M_Riss / 1e3:.1f}\,\mathrm{{kNm}}",
             titel="Rissmoment des ungerissenen Querschnitts")
         p.text(
@@ -702,7 +705,8 @@ class ZwaengungBiegung(Nachweis):
         )
         p.gleichung(
             rf"n = \frac{{E_s}}{{{self.s_E_cm}}} \cdot \left(1 + \varphi\right)"
-            rf" = \frac{{{E_s / 1e6:.0f}}}{{{E_cm / 1e6:.0f}}} \cdot "
+            rf" = \frac{{{E_s / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}}}"
+            rf"{{{E_cm / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}}} \cdot "
             rf"\left(1 + {phi:.2f}\right) = {n:.2f}",
             titel="Wertigkeit im gerissenen Zustand")
         p.text(
@@ -789,8 +793,8 @@ class ZwaengungBiegung(Nachweis):
                 else f"{erg.erfuellungsgrad:.2f}")
         p.gleichung(
             rf"\alpha_{{eff,ZB,{index}}} = \frac{{M_{{s,adm,{index}}}}}"
-            rf"{{M_{{Riss}}}} = \frac{{{erg.M_s_adm / 1e3:.1f}}}"
-            rf"{{{self.groessen.M_Riss / 1e3:.1f}}} = {grad}",
+            rf"{{M_{{Riss}}}} = \frac{{{erg.M_s_adm / 1e3:.1f}\,\mathrm{{kNm}}}}"
+            rf"{{{self.groessen.M_Riss / 1e3:.1f}\,\mathrm{{kNm}}}} = {grad}",
             titel="Erfüllungsgrad")
 
     def _index(self, erg: Momentlagenergebnis) -> str:
