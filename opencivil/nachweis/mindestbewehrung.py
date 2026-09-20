@@ -761,15 +761,16 @@ class ZwaengungBiegung(Nachweis):
             rf"\rho = \frac{{n \cdot {s_a_s}}}{{b}} \qquad "
             rf"x = \sqrt{{\rho^{{2}} + 2 \cdot {s_d} \cdot \rho}} - \rho"
             "\n= "
-            rf"\sqrt{{{erg.n * erg.a_s / b * 1e3:.2f}^{{2}} + 2 \cdot "
-            rf"{erg.d * 1e3:.1f} \cdot {erg.n * erg.a_s / b * 1e3:.2f}}} - "
-            rf"{erg.n * erg.a_s / b * 1e3:.2f}"
+            rf"\sqrt{{\left({erg.n * erg.a_s / b * 1e3:.2f}\,\mathrm{{mm}}"
+            rf"\right)^{{2}} + 2 \cdot {erg.d * 1e3:.1f}\,\mathrm{{mm}} \cdot "
+            rf"{erg.n * erg.a_s / b * 1e3:.2f}\,\mathrm{{mm}}}} - "
+            rf"{erg.n * erg.a_s / b * 1e3:.2f}\,\mathrm{{mm}}"
             rf" = {erg.x * 1e3:.1f}\,\mathrm{{mm}}",
             titel="Nulllinie des gerissenen Querschnitts")
         p.gleichung(
-            rf"z = {s_d} - \frac{{x}}{{3}} = {erg.d * 1e3:.1f} - "
-            rf"\frac{{{erg.x * 1e3:.1f}}}{{3}} = {erg.hebelarm * 1e3:.1f}"
-            rf"\,\mathrm{{mm}}",
+            rf"z = {s_d} - \frac{{x}}{{3}} = {erg.d * 1e3:.1f}\,\mathrm{{mm}}"
+            rf" - \frac{{{erg.x * 1e3:.1f}\,\mathrm{{mm}}}}{{3}}"
+            rf" = {erg.hebelarm * 1e3:.1f}\,\mathrm{{mm}}",
             titel="Innerer Hebelarm")
         p.text(
             "Die Betondruckspannung verläuft dreieckig – null in der Nulllinie, "
@@ -781,8 +782,9 @@ class ZwaengungBiegung(Nachweis):
         vergleich = r"\ge" if erg.erfuellt else "<"
         p.gleichung(
             rf"M_{{s,adm,{index}}} = {s_sigma} \cdot {s_a_s} \cdot z"
-            rf" = {erg.sigma_s_adm / 1e6:.0f} \cdot {erg.a_s * 1e6:.0f} \cdot "
-            rf"{erg.hebelarm * 1e3:.1f}"
+            rf" = {erg.sigma_s_adm / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
+            rf" \cdot {erg.a_s * 1e6:.0f}\,\mathrm{{mm}}^{{2}} \cdot "
+            rf"{erg.hebelarm * 1e3:.1f}\,\mathrm{{mm}}"
             rf" = {erg.M_s_adm / 1e3:.1f}\,\mathrm{{kNm}}"
             rf" \quad {vergleich} \quad M_{{Riss}} = "
             rf"{self.groessen.M_Riss / 1e3:.1f}\,\mathrm{{kNm}}"

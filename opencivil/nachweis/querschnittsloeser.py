@@ -133,6 +133,64 @@ class Ebene:
         return self.eps_m + self.chi * (z - h / 2.0)
 
 
+
+def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float,
+                        fasern: int = FASERN) -> None:
+    """
+    Der Ablauf der Suche, in die Mitschrift geschrieben.
+
+    Steht hier und nicht bei den Nachweisen, die den Loeser benutzen: sonst
+    stuende dieselbe Beschreibung zweimal da, und beim naechsten Eingriff in
+    das Verfahren aendert man eine davon.
+
+    Beschrieben wird der *Ablauf*, nicht jeder Zwischenwert. Die Halbierungen
+    abzudrucken hiesse, hundert Zeilen zu zeigen, von denen nur die letzte
+    etwas behauptet -- und die wird ohnehin durch die Probe belegt.
+    """
+    p.text(
+        "Die Dehnungsebene wird gesucht, nicht hergeleitet. Eine ebene "
+        "Dehnungsverteilung hat zwei Unbekannte – die Dehnung in der "
+        "Mittelebene ε_m und die Krümmung χ – und ihnen stehen zwei "
+        "Gleichgewichtsbedingungen gegenüber: N und M. Geschlossen auflösen "
+        "lässt sich das nicht, weil die Werkstoffgesetze nichtlinear sind."
+    )
+    p.gleichung(
+        r"\varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \frac{h}{2}"
+        r"\right) \qquad "
+        r"N_{int} = \int_A \sigma\left(\varepsilon\right)\,\mathrm{d}A "
+        r"\qquad "
+        r"M_{int} = \int_A \sigma\left(\varepsilon\right) \cdot "
+        r"\left(z - \frac{h}{2}\right)\,\mathrm{d}A",
+        titel="Dehnungsebene und innere Kräfte")
+    p.text(
+        f"Das Integral über den Beton wird als Summe über {fasern} Fasern "
+        f"gleicher Dicke gebildet, jede mit der Spannung in ihrer Mitte; der "
+        f"Stahl kommt Lage für Lage dazu, und die von ihm verdrängte "
+        f"Betonfläche wird abgezogen, damit dieselbe Fläche nicht zweimal "
+        f"zählt."
+    )
+    p.text(
+        "Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer "
+        "festgehaltenen Krümmung χ wird ε_m so lange halbiert, bis N_int die "
+        "verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung "
+        "immer mehr Zug bedeutet. Aussen: mit diesem ε_m bleibt ein Moment "
+        "übrig, und χ wird so lange halbiert, bis auch M_int stimmt – hier "
+        "trägt die Monotonie, dass mehr Krümmung mehr Moment heisst."
+    )
+    p.text(
+        f"Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen "
+        f"({-eps_druck * 1e3:.1f} ‰ bis {eps_zug * 1e3:.1f} ‰). Jenseits "
+        f"davon geben die Werkstoffgesetze null zurück, die Kraft wäre nicht "
+        f"mehr monoton, und die Halbierung liefe auf eine beliebige Stelle "
+        f"zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine "
+        f"Gleichgewichtslage – dann sagt der Nachweis das und rät nicht."
+    )
+    p.text(
+        "Nachgewiesen wird deshalb nicht der Weg, sondern das Ergebnis: dass "
+        "die gefundene Ebene genau die angegebenen Schnittgrössen erzeugt. "
+        "Diese Probe steht bei jedem Fall."
+    )
+
 class Querschnittsloeser:
     """
     Der Querschnitt als Faserintegral, mit Suche nach der Dehnungsebene.

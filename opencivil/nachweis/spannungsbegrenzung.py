@@ -20,10 +20,12 @@ gedrueckte Lage wuerde den Hebelarm vergroessern und den Nachweis guenstiger
 machen, als er ist.
 
 WAS IN DER MITSCHRIFT STEHT:
-Das Verfahren in zwei Saetzen, dann die gefundene Ebene und die **Probe**:
-mit diesem ``eps_m`` und ``chi`` entstehen genau ``N_Ed`` und ``M_Ed``. Die
-Suche selbst steht nicht da -- sie ist kein Rechenschritt, den jemand
-nachvollziehen soll.
+Der **Ablauf** der Suche (aus :func:`querschnittsloeser.protokoll_verfahren`),
+die beiden Festlegungen dahinter -- Kriechzahl und Bemessungswerte --, dann je
+Fall die gefundene Ebene und die **Probe**: mit diesem ``eps_m`` und ``chi``
+entstehen genau ``N_Ed`` und ``M_Ed``. Die einzelnen Halbierungen stehen nicht
+da; sie sind kein Rechenschritt, sondern der Weg zu einem, und belegt wird der
+durch die Probe.
 """
 
 from __future__ import annotations
@@ -40,6 +42,7 @@ from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.querschnittsloeser import (
+    EPS_DRUCK, EPS_ZUG, protokoll_verfahren,
     Querschnittsloeser, Stahllage, beton_elastisch, stahl_bilinear,
 )
 from opencivil.nachweis.zustand2 import wertigkeit
@@ -270,24 +273,41 @@ class Spannungsbegrenzung(Nachweis):
         )
         p.gleichung(
             rf"E_{{c,eff}} = \frac{{{self.s_E_cm}}}{{1 + \varphi}}"
-            rf" = \frac{{{E_cm / 1e6:.0f}}}{{1 + {phi:.2f}}}"
+            rf" = \frac{{{E_cm / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}}}"
+            rf"{{1 + {phi:.2f}}}"
             rf" = {E_c_eff / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
             rf" \qquad n = {n:.2f}",
             titel="Wirksamer Elastizitätsmodul")
         p.gleichung(
             rf"\sigma_{{s,adm}} = {self.s_f_yd} - {FLIESSABSTAND / 1e6:.0f}"
             rf"\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
-            rf" = {f_yd / 1e6:.0f} - {FLIESSABSTAND / 1e6:.0f}"
+            rf" = {f_yd / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
+            rf" - {FLIESSABSTAND / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
             rf" = {sigma_adm / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}",
             titel="Zulässige Stahlspannung",
             referenz="SIA 262:2025, Tabelle 17")
+        p.titel("Welche Werte angesetzt werden", ebene=3)
         p.text(
-            "Die Dehnungsebene wird gesucht, nicht hergeleitet: zwei "
-            "Unbekannte (ε_m und χ) gegen zwei Gleichgewichtsbedingungen, "
-            "gelöst durch fortgesetzte Halbierung. Nachgewiesen wird deshalb "
-            "nicht der Weg, sondern das Ergebnis – dass die gefundene Ebene "
-            "genau die angegebenen Schnittgrössen erzeugt."
+            "Zwei Festlegungen stecken in jeder Zahl unten, und beide sind "
+            "Auslegung der Norm und nicht Rechnung. Erstens das Kriechen: "
+            "angesetzt wird dasselbe φ wie sonst, hier aus der Eingabe. Das "
+            "liegt auf der sicheren Seite – ein grösseres φ weicht den Beton "
+            "auf, die Druckzone wächst, der Hebelarm wird kleiner und die "
+            "Stahlspannung damit grösser. Wer φ = 0 setzte, bekäme kleinere "
+            "Spannungen und einen Nachweis, der leichter aufgeht."
         )
+        p.text(
+            "Zweitens die Festigkeiten: gerechnet wird mit den "
+            "Bemessungswerten, also mit f_yd und dem um γ geteilten "
+            "Betonmodul, und nicht mit den charakteristischen Werten. Für "
+            "einen Gebrauchsnachweis ist das die strengere Wahl – die "
+            "zulässige Spannung f_yd − 80 N/mm² liegt rund 15 % unter dem, "
+            "was f_yk − 80 ergäbe. Die Norm sagt an dieser Stelle nicht "
+            "eindeutig, welche Werte gemeint sind; gewählt ist deshalb die "
+            "Seite, auf der man nicht danebenliegen kann."
+        )
+        p.titel("Wie die Dehnungsebene gefunden wird", ebene=3)
+        protokoll_verfahren(p, eps_druck=EPS_DRUCK, eps_zug=EPS_ZUG)
 
     def _protokoll_fall(self, p: Protokoll, erg: Fallergebnis) -> None:
         fall = erg.fall

@@ -70,7 +70,8 @@ from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.querschnittsloeser import (
-    Querschnittsloeser, Stahllage, beton_nichtlinear, stahl_bilinear,
+    EPS_DRUCK, EPS_ZUG, Querschnittsloeser, Stahllage, beton_nichtlinear,
+    protokoll_verfahren, stahl_bilinear,
 )
 from opencivil.querschnitt.platte import Richtung
 
@@ -514,13 +515,26 @@ class Knicken(Nachweis):
             rf"\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}",
             titel="Steifigkeit des Betons")
         p.text(
-            "Gerechnet wird mit dem nichtlinearen Werkstoffgesetz und den "
-            "Bemessungswerten. Die Dehnungsebene zu einem Moment wird gesucht "
-            "und nicht hergeleitet; belegt wird sie deshalb durch die Probe – "
-            "dass genau diese Ebene die verlangten Schnittgrössen erzeugt. "
-            "Die Ausmitten-Iteration darüber steht dagegen vollständig da: "
-            "sie ist das Verfahren selbst, und dass sie einläuft, ist die "
-            "Aussage des Nachweises."
+            "Angesetzt wird das Kriechen mit demselben φ wie sonst, hier aus "
+            "der Eingabe. Beim Knicken ist das nicht bloss zulässig, sondern "
+            "wesentlich: ein aufgeweichter Beton verformt sich mehr, die "
+            "Ausmitte zweiter Ordnung wächst, und der Stab knickt früher. "
+            "φ = 0 läge hier deutlich auf der unsicheren Seite."
+        )
+        p.text(
+            "Die Festigkeiten sind Bemessungswerte – f_cd und f_yd, nicht die "
+            "charakteristischen. Gerechnet wird mit dem nichtlinearen "
+            "Betongesetz; im Bereich der Gebrauchslasten unterscheidet es "
+            "sich kaum vom linearen, in der Nähe der Grenzlast erheblich, und "
+            "genau dort entscheidet sich, ob es noch eine "
+            "Gleichgewichtslage gibt."
+        )
+        p.titel("Wie die Dehnungsebene gefunden wird", ebene=3)
+        protokoll_verfahren(p, eps_druck=EPS_DRUCK, eps_zug=EPS_ZUG)
+        p.text(
+            "Die Ausmitten-Iteration darüber steht dagegen vollständig da, "
+            "Durchlauf für Durchlauf: sie ist das Verfahren selbst, und dass "
+            "sie einläuft, ist die Aussage des Nachweises."
         )
 
     def _protokoll_fall(self, p: Protokoll, erg: Knickergebnis) -> None:
