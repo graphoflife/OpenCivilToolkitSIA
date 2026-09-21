@@ -19,6 +19,7 @@ import {
   diagrammZeichnen, kurveZeichnen, neigungskurveZeichnen,
   querkraftkurveZeichnen, querschnittZeichnen,
 } from './diagramm.js';
+import { spannungsfallZeichnen } from './spannungsbild.js';
 import { api } from './api.js';
 import { aendern, zustand } from './zustand.js';
 
@@ -421,16 +422,20 @@ function spannungSicht(loesung) {
       'Links eine Platte wählen – oder oben auf "Gesamt" umschalten.');
   }
 
-  return el('div', {}, gezeigt.map(([, eintrag]) => el('div.blatt', {}, [
-    el('div.b-titel', { text: `Spannung-Dehnung-Analyse – ${eintrag.name}` }),
-    el('p.b-text', {
-      text: 'Noch nicht festgelegt. Der Querschnittslöser bestimmt zu jeder '
-          + 'Schnittgrössenkombination die Dehnungsebene (ε_m und χ); daraus '
-          + 'lässt sich der Verlauf von Dehnung und Spannung über die '
-          + 'Plattenhöhe zeichnen. Welche Fälle hier gezeigt werden und in '
-          + 'welcher Form, steht noch aus.',
-    }),
-  ])));
+  const analysen = loesung.spannungsanalysen || {};
+  return el('div', {}, gezeigt.map(([kennung, eintrag]) => {
+    const faelle = analysen[kennung] || [];
+    return el('div.blatt', {}, [
+      el('div.b-titel', { text: `Spannung-Dehnung-Analyse – ${eintrag.name}` }),
+      faelle.length
+        ? el('div', {}, faelle.map(spannungsfallZeichnen))
+        : el('p.b-text', {
+          text: 'Für diese Platte ist keine Analyse angelegt. Im mittleren '
+              + 'Feld unter «Knicken» lassen sich welche hinzufügen: aus N '
+              + 'und M, aus Randdehnungen, oder als Momenten-Krümmungs-Linie.',
+        }),
+    ]);
+  }));
 }
 
 function diagrammSicht(loesung) {

@@ -89,6 +89,7 @@ export function nachweiseBlock(querschnitt) {
 
     mindestbewehrungsBlock(querschnitt),
     knickBlock(querschnitt),
+    spannungsBlock(querschnitt),
   ]);
 }
 
@@ -508,4 +509,103 @@ async function bewehrungErmitteln(kennung) {
     // Drucks zu sehen.
     aendern({}, 'bewehrungssuche-ende');
   }
+}
+
+/**
+ * Spannung-Dehnung-Analyse: drei Fragen an denselben Querschnitt.
+ *
+ * Kein Nachweis -- es wird nichts gegen etwas gehalten. Darum auch keine
+ * Erfüllungsgrade in der Zusammenfassung; die Bilder stehen im eigenen
+ * Reiter. Was jede Zeile braucht, hängt an ihrer Art, und die Felder
+ * wechseln entsprechend: eine Zeile, die nach N und M fragt, soll nicht
+ * daneben zwei Dehnungsfelder zeigen, die sie nicht liest.
+ */
+function spannungsBlock(querschnitt) {
+  const faelle = querschnitt.spannungsfaelle || [];
+  const aendern = (veraenderer) => projektAendern((p) => {
+    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
+  });
+
+  return el('div.unterkapitel', {}, [
+    el('div.unterkapitel-kopf', {}, [
+      el('span', { text: 'Spannung-Dehnung-Analyse' }),
+      el('button.knopf.knopf-zart', {
+        text: '+ Analyse',
+        on: {
+          click: () => aendern((q) => {
+            q.spannungsfaelle = q.spannungsfaelle || [];
+            q.spannungsfaelle.push({
+              name: `Bild ${q.spannungsfaelle.length + 1}`,
+              art: 'schnittgroessen', richtung: 'x',
+              N_Ed: 0, M_Ed: 100, eps_oben: -1, eps_unten: 2, aktiv: true,
+            });
+          }),
+        },
+      }),
+    ]),
+    ...(faelle.length
+      ? faelle.map((_, i) => spannungsZeile(querschnitt, i))
+      : [el('div.leer', { text: 'Keine Analyse angelegt.' })]),
+  ]);
+}
+
+/** Eine Analysezeile. Die Zahlenfelder richten sich nach der gewählten Art. */
+function spannungsZeile(querschnitt, index) {
+  const k = (querschnitt.spannungsfaelle || [])[index];
+  const aendern = (veraenderer) => projektAendern((p) => {
+    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
+      .spannungsfaelle[index]);
+  });
+  const zahl = (feld, titel, schritt) => zahlfeld({
+    wert: k[feld], schritt, titel,
+    beiAenderung: (v) => aendern((x) => { x[feld] = v ?? 0; }),
+  });
+  const aktiv = k.aktiv !== false;
+
+  // Je Art andere Felder -- und immer zwei, damit die Zeilen untereinander
+  // dieselbe Gestalt behalten.
+  const felder = {
+    schnittgroessen: () => [
+      zahl('N_Ed', 'Normalkraft in kN – Zug positiv', 50),
+      zahl('M_Ed', 'Moment in kNm', 10),
+    ],
+    dehnungen: () => [
+      zahl('eps_oben', 'Randdehnung oben in ‰ – Zug positiv', 0.5),
+      zahl('eps_unten', 'Randdehnung unten in ‰ – Zug positiv', 0.5),
+    ],
+    moment_kruemmung: () => [
+      zahl('N_Ed', 'Normalkraft in kN – Zug positiv', 50),
+      el('span.kurvenhinweis', { text: '0 … M_Rd' }),
+    ],
+  }[k.art] || (() => [el('span'), el('span')]);
+
+  return el('div.einwirkung.ist-spannung', { class: aktiv ? '' : 'ist-aus' }, [
+    hakenSchalter(aktiv, (wert) => aendern((x) => { x.aktiv = wert; }), 'Analyse'),
+    el('input.ew-name', {
+      type: 'text', value: k.name, title: 'Bezeichnung der Analyse',
+      on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
+    }),
+    auswahl({
+      werte: [
+        { wert: 'schnittgroessen', beschriftung: 'N, M' },
+        { wert: 'dehnungen', beschriftung: 'ε oben/unten' },
+        { wert: 'moment_kruemmung', beschriftung: 'M–χ' },
+      ],
+      gewaehlt: k.art || 'schnittgroessen',
+      titel: 'Was eingegeben wird – und damit, was herauskommt',
+      beiAenderung: (v) => aendern((x) => { x.art = v; }),
+    }),
+    ...felder(),
+    richtungsWahl(k.richtung || 'x', (wert) => aendern((x) => { x.richtung = wert; }),
+      ['x', 'y']),
+    el('button.knopf.knopf-zart.knopf-gefahr', {
+      text: '×', title: 'Analyse entfernen',
+      on: {
+        click: () => projektAendern((p) => {
+          p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
+            .spannungsfaelle.splice(index, 1);
+        }),
+      },
+    }),
+  ]);
 }

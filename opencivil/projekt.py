@@ -512,6 +512,51 @@ HAEUFIG_ANTEIL = 0.70
 
 
 @dataclass
+class SpannungsfallEintrag(Beschreibung):
+    """
+    Eine Auswertung am Querschnitt -- kein Nachweis.
+
+    Es wird nichts gegen etwas gehalten: kein Erfuellungsgrad, kein Urteil.
+    Gefragt wird, was im Querschnitt geschieht, und je nach :attr:`art` von
+    der einen oder der anderen Seite -- aus Schnittgroessen, aus Dehnungen
+    oder als ganze Momenten-Kruemmungs-Linie.
+    """
+
+    name: str
+    art: str = "schnittgroessen"
+    """``schnittgroessen``, ``dehnungen`` oder ``moment_kruemmung``."""
+
+    richtung: str = "x"
+    """Welche Bewehrung zaehlt. Hier keine Wahl ``beide``: ein Bild zeigt
+    einen Querschnitt, und der liegt in einer Richtung."""
+
+    N_Ed: float = 0.0
+    """in kN, Zug positiv -- fuer ``schnittgroessen`` und ``moment_kruemmung``."""
+
+    M_Ed: float = 0.0
+    """in kNm -- nur fuer ``schnittgroessen``."""
+
+    eps_oben: float = -1.0
+    eps_unten: float = 2.0
+    """Randdehnungen in Promille -- nur fuer ``dehnungen``."""
+
+    aktiv: bool = True
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any]) -> "SpannungsfallEintrag":
+        return cls(
+            name=_pflichtfeld(d, "name", "Eine Spannungsanalyse"),
+            art=str(d.get("art") or "schnittgroessen"),
+            richtung=str(d.get("richtung") or "x"),
+            N_Ed=_zahl(d, "N_Ed", 0.0),
+            M_Ed=_zahl(d, "M_Ed", 0.0),
+            eps_oben=_zahl(d, "eps_oben", -1.0),
+            eps_unten=_zahl(d, "eps_unten", 2.0),
+            aktiv=bool(d.get("aktiv", True)),
+        )
+
+
+@dataclass
 class HaeufigEintrag(Beschreibung):
     """
     Eine Schnittgroessenkombination unter haeufiger Einwirkung.
@@ -673,6 +718,9 @@ class QuerschnittEintrag(Beschreibung):
     knickfaelle: List[KnickEintrag] = field(default_factory=list)
     """Knicknachweise; leer heisst: keiner."""
 
+    spannungsfaelle: List[SpannungsfallEintrag] = field(default_factory=list)
+    """Auswertungen am Querschnitt -- Bilder, keine Nachweise."""
+
     haeufige_aus_tragsicherheit: bool = True
     """
     Ob die haeufigen Lastfaelle aus den Tragsicherheitsfaellen abgeleitet
@@ -774,6 +822,8 @@ class QuerschnittEintrag(Beschreibung):
             haeufige=[HaeufigEintrag.aus_dict(x) for x in (d.get("haeufige") or [])],
             knickfaelle=[KnickEintrag.aus_dict(x)
                          for x in (d.get("knickfaelle") or [])],
+            spannungsfaelle=[SpannungsfallEintrag.aus_dict(x)
+                             for x in (d.get("spannungsfaelle") or [])],
             richtung_lage1=str(d.get("richtung_lage1") or "x"),
             richtung_lage4=str(d.get("richtung_lage4") or "x"),
             lagen=[LageEintrag.aus_dict(x) for x in (lagen or [])],
@@ -822,6 +872,14 @@ class Aufbau:
 
     Sie rechnen nichts; sie sorgen dafuer, dass in der Zusammenfassung eine
     Zeile mit Erfuellungsgrad null steht statt gar nichts.
+    """
+
+    spannungsfaelle: Dict[str, List["SpannungsfallEintrag"]] = field(
+        default_factory=dict)
+    """
+    Je Platte die Auswertungen am Querschnitt -- als Beschreibung, nicht als
+    Nachweis. Sie laufen nicht im Rechenwerk: sie haben kein Ziel, das jemand
+    anderes brauchen koennte, und nichts haengt von ihnen ab.
     """
 
     warnungen: List[str] = field(default_factory=list)
@@ -1143,6 +1201,10 @@ class Projekt(Beschreibung):
                 duktilitaet = Duktilitaet(querschnitt, gewaehlte_lagen)
                 werk.registriere(duktilitaet)
                 aufbau.duktilitaet[eintrag.kennung] = duktilitaet
+
+            aktive = [s for s in eintrag.spannungsfaelle if s.aktiv]
+            if aktive:
+                aufbau.spannungsfaelle[eintrag.kennung] = aktive
 
             if not eintrag.kombinationen:
                 aufbau.warnungen.append(

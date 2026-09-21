@@ -56,12 +56,15 @@ export function richtungVon(querschnitt, nummer) {
  * Blick auf die Maske nicht überlegen muss, welche Richtung welche ist. `x+y`
  * bekommt ein sanftes Violett: die Mischung aus beiden.
  */
-export function richtungsWahl(gewaehlt, setzen) {
+export function richtungsWahl(gewaehlt, setzen, nur = null) {
+  // `nur` schränkt die Stellungen ein. Ein Querschnittsbild zeigt einen
+  // Schnitt, und der liegt in einer Richtung -- «beide» wäre dort keine
+  // Antwort, sondern zwei.
   const stellungen = [
     ['x', 'x', 'nur x-Richtung'],
     ['y', 'y', 'nur y-Richtung'],
     ['beide', 'x+y', 'beide Tragrichtungen'],
-  ];
+  ].filter(([wert]) => !nur || nur.includes(wert));
   return el('span.schalter.schalter-richtung', {
     title: 'In welcher Tragrichtung nachgewiesen wird',
   }, stellungen.map(([wert, text, beschreibung]) => el('button.schalter-halb', {

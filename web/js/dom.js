@@ -42,6 +42,20 @@ export function el(tag, eigen = {}, kinder = []) {
   return knoten;
 }
 
+/**
+ * Dasselbe für SVG: eigener Namensraum, sonst zeichnet der Browser nichts.
+ *
+ * Steht neben `el`, weil es dieselbe Aufgabe hat. Vorher lag es in
+ * `diagramm.js` -- solange dort alles gezeichnet wurde, fiel das nicht auf.
+ */
+export function svgEl(name, attribute = {}) {
+  const knoten = document.createElementNS('http://www.w3.org/2000/svg', name);
+  for (const [k, v] of Object.entries(attribute)) {
+    if (v !== null && v !== undefined) knoten.setAttribute(k, String(v));
+  }
+  return knoten;
+}
+
 export function leeren(knoten) {
   while (knoten.firstChild) knoten.removeChild(knoten.firstChild);
   return knoten;

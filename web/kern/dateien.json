@@ -35,6 +35,7 @@
     "opencivil/querschnitt/__init__.py",
     "opencivil/querschnitt/platte.py",
     "opencivil/querschnitt/werkstoffgesetz.py",
+    "opencivil/spannungsanalyse.py",
     "opencivil/web/__init__.py",
     "opencivil/web/api.py",
     "opencivil/web/bruecke.py",

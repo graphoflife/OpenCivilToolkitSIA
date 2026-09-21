@@ -76,12 +76,15 @@ sie hier notiert; keine davon ist nachgeschlagen.
       Normalkraft denselben Bezugsgraphen wie vorher, und ein feiner Abdruck
       sähe den Unterschied nicht. Das wäre ein Umbau an jedem Nachweis, und der
       Fehlerfall wäre eine stillschweigend falsche Zahl.
-- [ ] **Spannung-Dehnung-Analyse**: das Panel steht leer da. Der Löser liefert
-      zu jedem Fall ε_m und χ; was gezeigt werden soll, ist noch nicht
-      festgelegt.
-
-## Offen (neu)
-
+- [ ] **Der Beiwert der Zugversteifung steht fest auf 1.0.** Die
+      Momenten-Krümmungs-Linie mischt Zustand I und II über
+      `ζ = 1 − β·(M_Riss/M)²`. Üblich sind β = 1.0 für kurzzeitige und
+      β = 0.5 für dauernde oder wiederholte Einwirkung; eingebaut ist 1.0.
+      Welcher Wert nach SIA 262 wann gilt, ist nicht nachgeschlagen — und
+      welche Seite konservativ ist, hängt an der Frage: für eine Durchbiegung
+      ist der kleinere Beiwert (weicher) der ungünstige, für eine Zwängung
+      der grössere. Solange das offen ist, sollte der Wert nicht wählbar sein,
+      sondern nachgeschlagen werden.
 - [ ] Die rechte Tafel läuft waagrecht über, sobald sie schmal wird (bei rund
       350 px um 63 Bildpunkte). Formeln und Tabellen haben je einen eigenen
       Rollbalken; ein Inhalt entkommt ihnen. Besteht schon länger, nicht neu.

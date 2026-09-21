@@ -43,6 +43,48 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-21 · Den Querschnitt ansehen, ohne ihn nachzuweisen
+
+Die Spannung-Dehnung-Analyse ist das erste Stück in diesem Werkzeug, das
+nichts nachweist. Es gibt keinen Erfüllungsgrad und kein Urteil — gefragt
+wird, was im Querschnitt eigentlich geschieht. Darum läuft sie auch nicht im
+Rechenwerk: sie hat kein Ziel, das jemand anderes brauchen könnte, und nichts
+hängt von ihr ab.
+
+Drei Fragen an dasselbe Faserintegral. Aus N und M die Dehnungsebene — das
+ist der Löser, wie ihn die Nachweise benutzen. Aus den Randdehnungen die
+Kräfte — das ist die Umkehrung und braucht gar keine Suche, denn die Ebene
+steht ja schon da. Und die Momenten-Krümmungs-Linie bei festgehaltener
+Normalkraft.
+
+Die dritte war die interessante. Unterhalb des Rissmoments ist der
+Querschnitt ungerissen und deutlich steifer, als die Nachweise ihn rechnen —
+dort wird der Beton auf Zug grundsätzlich nicht angesetzt. Für eine
+Verformungsbetrachtung wäre das falsch herum: man bekäme eine Krümmung, die
+es bei kleinen Momenten gar nicht gibt.
+
+Der naheliegende Weg wäre eine zweite Formel gewesen, `χ_I = M/(E·I)` mit dem
+Trägheitsmoment des ideellen Querschnitts. Stattdessen läuft derselbe Löser
+ein zweites Mal, und es wechselt genau ein Stück: das Betongesetz. Zustand I
+nimmt Zug linear auf, Zustand II gar nicht; alles andere — Höhe, Breite,
+Lagen, Stahlgesetz, Suchfenster — ist dasselbe Objekt. Eine zweite Formel
+wäre eine zweite Wahrheit über denselben Querschnitt gewesen, und sie hätte
+ihre eigenen Annahmen über die Mitwirkung des Stahls mitgebracht.
+
+Beim Zeichnen stolperte ich über die Höhenachse. Der Löser rechnet mit einem
+`z`, das ich für «von der Unterkante» gehalten hatte — bis die 1. Lage bei
+z = 261 mm auftauchte und die 4. bei 36. Es ist der Abstand von der
+*gedrückten* Randfaser, also von oben. Ein Bild mit der anderen Annahme wäre
+nicht falsch gewesen, sondern auf dem Kopf, und hätte neben dem Nachweis
+gestanden wie ein Widerspruch. Jetzt prüft ein Test die Richtung: positives
+Moment heisst unten gezogen, und die 1. Lage liegt unten.
+
+Die Zusage der Tests ist nicht, dass eine Zahl stimmt — die kommt aus
+demselben Integral wie die Nachweise und ist dort geprüft. Geprüft wird, dass
+die drei zueinander passen: aus N und M eine Ebene, aus deren Randdehnungen
+wieder N und M. Und dass die eigenständig gesuchte Grenze der Linie dasselbe
+`M_Rd` ist, das im M-N-Nachweis steht.
+
 ## 2026-09-20 · Der Knopf, den man zweimal drücken musste
 
 Ein Druck auf «Bewehrung ermitteln» tat nichts, der zweite zeigte das

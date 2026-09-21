@@ -10,7 +10,7 @@
  * Es wird nichts nachgerechnet: sämtliche Koordinaten kommen aus der Lösung.
  */
 
-import { el } from './dom.js';
+import { el, svgEl } from './dom.js';
 
 const NR = 'http://www.w3.org/2000/svg';
 const BREITE = 720;
@@ -22,14 +22,6 @@ const GRUEN = '#16794a';
 
 /** Die genaue Resistenzlinie: zurückhaltend, sie ist nur Vergleich. */
 const GENAU = '#8895a8';
-
-function svgEl(name, attribute = {}) {
-  const knoten = document.createElementNS(NR, name);
-  for (const [k, v] of Object.entries(attribute)) {
-    if (v !== null && v !== undefined) knoten.setAttribute(k, String(v));
-  }
-  return knoten;
-}
 
 /**
  * Schiebt Beschriftungen so weit auseinander, dass sie sich nicht überdecken.
