@@ -43,6 +43,51 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-21 · Die Abkürzung, die die Suche zweimal fand
+
+Die Bewehrungssuche darf jetzt leere Lagen bewehren -- vorher blieb, was auf
+null stand, auf null. Das war zu vorsichtig: wer die Bewehrung ermitteln
+lässt, will wissen, *wo* welche hingehört. Dazu ein Mindestdurchmesser, damit
+kein Stab dünner wird als das, was man verlegen will; null bleibt erlaubt,
+denn eine Lage ganz wegzulassen ist eine gültige Antwort.
+
+Damit kam ein Fallstrick, und zwar ein hübscher: **die Menge der Nachweise
+hängt an der Bewehrung.** Nimmt man allen Stahl weg, gibt es keine Lage mehr,
+der ein Nachweis gälte -- und kein Nachweis heisst Rückstand null. Die Suche
+hat das sofort gefunden und mir stolz eine Platte ohne jede Bewehrung als
+«alle Nachweise erfüllt» zurückgegeben.
+
+Der erste Anlauf war eine Schranke beim Annehmen: weniger Urteile als die voll
+bewehrte Platte, also kein Ergebnis. Das reichte nicht, denn gesucht wird ja
+auch *unterwegs*: der nächste Schritt geht dorthin, wo der Rückstand am
+kleinsten ist, und das war wieder der Zustand mit den wenigsten Nachweisen.
+Jetzt gibt es eine einzige Zahl, an der sich alles ausrichtet: Rückstand plus
+ein voller Punkt für jeden Nachweis, den es gar nicht gibt. Ein Nachweis, der
+sich nicht einmal aufstellen lässt, ist so schlecht wie einer, der bei null
+steht.
+
+Zwei weitere Unstimmigkeiten fielen dabei auf. Erstens hat die Suche nie
+wieder hinunter gerechnet: der Aufstieg nimmt in jeder Runde den Schritt, der
+am meisten bringt, und der kann über das Ziel hinausgehen. «Die kleinste
+Bewehrung» war damit eine Zusage, die das Werkzeug nicht hielt. Jetzt folgt
+ein Abstieg, Stufe um Stufe, solange alles aufgeht.
+
+Zweitens räumte die Arbeitskopie die Platte leer -- richtig, denn das Werkzeug
+*ermittelt* die Bewehrung und legt nicht zu dem dazu, was zufällig dasteht --,
+aber `uebernehmen` schrieb nur die gesuchten Posten zurück. Bei einer Platte
+mit vorhandener Zulage blieb die stehen: gerechnet war die Grundbewehrung
+ohne sie, eingebaut war sie mit. Die Lösung enthält jetzt jeden Posten, die
+nicht gesuchten ausdrücklich mit null.
+
+Dazu eine Reihe kleinerer Sachen an der Oberfläche: der Reiter
+Spannung-Dehnung ist weg, seine Bilder stehen bei den Diagrammen, und dort
+lässt sich einstellen, wie viele Blätter nebeneinander stehen. Die
+Plus-Knöpfe sind unter ihre Listen gewandert und sehen aus wie Knöpfe. Die
+Analysezeilen beschriften ihre Zahlenfelder je nach Art. Und der Knicknachweis
+zeigt im M-N-Diagramm drei Punkte statt zwei: Einwirkung 1. Ordnung, am
+verformten System, und den Widerstand bei N_Rd -- der liegt auf der
+Resistenzlinie, denn dort steht der Stab an seiner Grenze.
+
 ## 2026-09-21 · Luft, und ein Umbruch, der auf die falsche Zahl sah
 
 Aufräumen an der Oberfläche: mehr Abstand zwischen den Tafeln, mehr zwischen

@@ -749,6 +749,15 @@ class QuerschnittEintrag(Beschreibung):
     Suchlauf, und meistens steht die Teilung ohnehin fest.
     """
 
+    automatik_mindestdurchmesser: float = 10.0
+    """
+    Duennster Stab, den die Suche einbaut -- in mm.
+
+    Null bleibt davon unberuehrt: eine Lage ganz wegzulassen ist immer
+    erlaubt. Gemeint ist, dass ein *vorhandener* Stab nicht duenner wird als
+    das, was man verlegen will.
+    """
+
     automatik_querkraft: bool = False
     """Ob auch die Buegel gesucht werden."""
 
@@ -822,6 +831,8 @@ class QuerschnittEintrag(Beschreibung):
             automatik_modus=str(d.get("automatik_modus") or "grund_ohne"),
             automatik_teilungen=_teilungen_aus(d.get("automatik_teilungen"),
                                                (150.0,)),
+            automatik_mindestdurchmesser=_zahl(
+                d, "automatik_mindestdurchmesser", 10.0),
             automatik_querkraft=bool(d.get("automatik_querkraft", False)),
             automatik_querkraft_teilungen=_teilungen_aus(
                 d.get("automatik_querkraft_teilungen"), (100.0, 150.0, 200.0)),

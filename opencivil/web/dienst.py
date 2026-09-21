@@ -319,8 +319,10 @@ def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
         raise DienstFehler(400, f"Unbekannter Suchmodus '{modus}'. "
                                 f"Möglich sind: {moeglich}.") from None
 
-    ergebnis = bewehrungssuche.suche(projekt, kennung, modus=modus,
-                                     teilungen=teilungen)
+    ergebnis = bewehrungssuche.suche(
+        projekt, kennung, modus=modus, teilungen=teilungen,
+        mindestdurchmesser=(rumpf.get("mindestdurchmesser")
+                            or eintrag.automatik_mindestdurchmesser))
     antwort: Dict[str, Any] = {
         "gefunden": ergebnis.gefunden,
         "modus": modus.value,

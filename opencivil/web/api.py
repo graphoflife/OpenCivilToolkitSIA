@@ -715,6 +715,7 @@ def _knickpunkte(aufbau, nachweis) -> list:
             "M_Ed_1": abs(erg.fall.M_Ed_1.in_einheit(KNM)),
             "M_Ed_II": abs(erg.M_ges) / 1e3,
             "N_Rd": erg.N_Rd / 1e3,
+            "M_bei_N_Rd": erg.M_bei_N_Rd / 1e3,
             "erfuellungsgrad": erg.erfuellungsgrad,
             "erfuellt": erg.erfuellt,
             "stabil": erg.stabil,

@@ -54,6 +54,12 @@ DURCHMESSER: Tuple[float, ...] = (8, 10, 12, 14, 16, 18, 20, 22, 26)
 #: uebliche -- jede weitere kostet einen vollstaendigen Suchlauf.
 TEILUNGEN: Tuple[float, ...] = (150.0,)
 
+#: Kleinster Durchmesser, den die Suche einbaut. Duenner lohnt sich nicht:
+#: die Ersparnis ist gering, und auf der Baustelle will niemand vier
+#: Stabdurchmesser auseinanderhalten. Null bleibt erlaubt -- das heisst, die
+#: Lage bekommt gar keine Bewehrung.
+MINDESTDURCHMESSER = 10.0
+
 #: Obergrenze der Runden je Teilung. Mehr Runden als Posten mal Durchmesser
 #: kann es nicht geben -- die Zahl ist der Riegel gegen einen Denkfehler.
 RUNDEN = 60
@@ -163,19 +169,35 @@ def _marke(lage: int, art: str) -> str:
 
 def _gesuchte(eintrag, *, arten: Sequence[str]) -> List[Posten]:
     """
-    Welche Posten die Suche anfasst.
+    Welche Posten die Suche anfasst: alle.
 
-    Nur solche, die es schon gibt: ein Durchmesser von null heisst, dass diese
-    Lage nicht bewehrt werden soll, und das ist eine Entscheidung ueber die
-    Anordnung. Die trifft die Suche nicht -- sie wuerde sonst Lagen erfinden,
-    die niemand bestellt hat.
+    Auch die, die gerade auf null stehen. Frueher blieben die draussen -- eine
+    leere Lage galt als Entscheidung ueber die Anordnung, die die Suche nicht
+    treffen sollte. Das war zu vorsichtig: wer die Bewehrung ermitteln laesst,
+    will wissen, *wo* welche hingehoert, und nicht bloss, wie dick die schon
+    eingetragene wird.
+
+    Null bleibt dabei ein gueltiges Ergebnis und ist der Anfang jeder Suche
+    (siehe :func:`stufen`). Eine Lage, die kein Nachweis braucht -- etwa in
+    einer Richtung, in der nichts nachgewiesen wird --, bleibt darum leer:
+    kein Schritt hebt dort den Rueckstand, also wird keiner genommen.
     """
-    gefunden = []
-    for lage in range(1, len(eintrag.lagen) + 1):
-        for art in arten:
-            if _posten(eintrag, lage, art).durchmesser > 0:
-                gefunden.append((lage, art))
-    return gefunden
+    return [(lage, art) for lage in range(1, len(eintrag.lagen) + 1)
+            for art in arten]
+
+
+def stufen(durchmesser: Sequence[float], mindest: float) -> List[float]:
+    """
+    Die Durchmesser, die zur Auswahl stehen -- mit der Null davor.
+
+    Die Null heisst «nicht vorhanden» und ist die unterste Stufe; von ihr aus
+    steigt die Suche. Darueber kommt nichts unter ``mindest``: ein aktiver
+    Stab soll nicht duenner sein als das, was man verlegen will.
+    """
+    grosse = sorted(d for d in durchmesser if d >= max(mindest, 0.0) and d > 0)
+    if not grosse:
+        grosse = [max(mindest, min(DURCHMESSER))]
+    return [0.0, *grosse]
 
 
 def _flaeche(eintrag, posten: Sequence[Posten], teilung: float,
@@ -223,9 +245,30 @@ class Bewertung:
 
     fehler: str = ""
 
-    @property
-    def erfuellt(self) -> bool:
-        return not self.fehler and self.rueckstand <= 0.0
+    def abstand(self, erwartet: int = 1) -> float:
+        """
+        Wie weit diese Bewehrung vom Ziel entfernt ist -- die eine Zahl, an
+        der sich die Suche ausrichtet.
+
+        Das ist der Rueckstand **plus ein voller Punkt fuer jeden Nachweis,
+        den es gar nicht gibt**. ``erwartet`` ist die Zahl der Urteile, die
+        die Platte voll bewehrt faellt; fehlt eines, ist die Lage, der es
+        gilt, unbewehrt -- und ein Nachweis, der sich nicht einmal aufstellen
+        laesst, ist so schlecht wie einer, der bei null steht.
+
+        Ohne diesen Zuschlag hat die Suche eine Abkuerzung: nimm allen Stahl
+        weg, dann gibt es keinen Nachweis mehr, und kein Nachweis heisst
+        Rueckstand null. Sie hat sie gefunden, kaum dass leere Lagen suchbar
+        waren -- und zwar nicht erst beim Annehmen des Ergebnisses, sondern
+        schon bei der Wahl des naechsten Schritts.
+        """
+        if self.fehler:
+            return math.inf
+        return self.rueckstand + max(0, erwartet - self.anzahl)
+
+    def erfuellt(self, erwartet: int = 1) -> bool:
+        """Ob alle erwarteten Nachweise da sind und alle aufgehen."""
+        return self.abstand(erwartet) <= 0.0
 
 
 def bewerte(projekt) -> Bewertung:
@@ -257,7 +300,7 @@ def bewerte(projekt) -> Bewertung:
 # Suchen
 # ===========================================================================
 
-def _arbeitskopie(projekt, kennung: str, *, kraefte: bool):
+def _arbeitskopie(projekt, kennung: str, *, kraefte: bool, leeren: bool = True):
     """
     Die Platte, gegen die gesucht wird -- ohne das, was die Suche nicht fuehren
     kann.
@@ -268,6 +311,12 @@ def _arbeitskopie(projekt, kennung: str, *, kraefte: bool):
     darum nicht erfuellen, sondern nur verletzen -- sie haette gegen ihn kein
     Mittel ausser aufzugeben. Also bleibt er draussen, und das Ergebnis sagt
     hinterher, ob er mit der gefundenen Bewehrung noch aufgeht.
+
+    **Ohne Bewehrung, sofern ``leeren``.** Das Werkzeug *ermittelt* die
+    Bewehrung; es legt nicht zu dem dazu, was zufaellig dasteht. Die
+    Buegelsuche laeuft danach und braucht die gefundene Laengsbewehrung --
+    sie setzt ``leeren=False``, denn ohne statische Hoehe gibt es keinen
+    Querkraftwiderstand.
 
     Ohne ``kraefte`` fallen zusaetzlich Kombinationen, Knickfaelle und
     haeufige Lastfaelle weg. Uebrig bleiben die Nachweise, die eine Platte
@@ -286,6 +335,13 @@ def _arbeitskopie(projekt, kennung: str, *, kraefte: bool):
     kopie.querschnitte = [q for q in kopie.querschnitte if q.kennung == kennung]
     eintrag = kopie.querschnitt(kennung)
     eintrag.duktilitaet = [False] * len(eintrag.duktilitaet)
+    if leeren:
+        # Sonst kaeme bei einer Platte mit vorhandener Zulage eine
+        # Grundbewehrung von null heraus -- richtig gerechnet und trotzdem
+        # nicht die Antwort auf die gestellte Frage.
+        for lage in eintrag.lagen:
+            lage.grund.durchmesser = 0
+            lage.zulage.durchmesser = 0
     if not kraefte:
         eintrag.kombinationen = []
         eintrag.knickfaelle = []
@@ -300,8 +356,11 @@ def _eine_teilung(projekt, kennung: str, teilung: float,
     Die kleinste Bewehrung bei dieser Teilung -- oder die Auskunft, dass es
     keine gibt.
 
-    Aufgestiegen wird von unten: alle Posten auf den kleinsten Durchmesser,
-    dann Runde fuer Runde den Schritt nehmen, der am meisten bringt.
+    Aufgestiegen wird von unten: alle Posten auf null -- also unbewehrt --,
+    dann Runde fuer Runde den Schritt nehmen, der am meisten bringt. Der
+    Anfang ist darum ein Querschnitt, den es so gar nicht geben kann; er
+    liefert keinen Rueckstand, sondern einen Fehler, und das ist kein Abbruch,
+    sondern der Grund, ueberhaupt einen Schritt zu suchen.
     """
     eintrag = projekt.querschnitt(kennung)
     loesung = Loesung(teilung=teilung)
@@ -311,7 +370,9 @@ def _eine_teilung(projekt, kennung: str, teilung: float,
             "Lage bewehrt haben will, gibt ihr einen Durchmesser.")
         return loesung
 
-    stand = {p: 0 for p in posten}
+    # Wie viele Urteile die voll bewehrte Platte faellt. Weniger darf am Ende
+    # nicht herauskommen -- siehe Bewertung.erfuellt.
+    stand = {p: len(durchmesser) - 1 for p in posten}
 
     def setzen() -> None:
         for (lage, art), i in stand.items():
@@ -326,16 +387,19 @@ def _eine_teilung(projekt, kennung: str, teilung: float,
         return {_marke(l, a): durchmesser[i] for (l, a), i in stand.items()}
 
     setzen()
+    erwartet = bewerte(projekt).anzahl
+    for p in posten:
+        stand[p] = 0
+    setzen()
     bewertung = bewerte(projekt)
     for runde in range(1, RUNDEN + 1):
         loesung.schritte.append(Schritt(
             runde=runde, durchmesser=stand_als_dict(),
             schlechtester=bewertung.grad, nachweis=bewertung.nachweis))
 
-        if bewertung.fehler:
-            loesung.begruendung = bewertung.fehler
-            return loesung
-        if bewertung.erfuellt:
+        if bewertung.erfuellt(erwartet):
+            bewertung = _absteigen(projekt, posten, stand, durchmesser,
+                                   setzen, bewertung, erwartet)
             loesung.gefunden = True
             loesung.durchmesser = stand_als_dict()
             loesung.schlechtester = bewertung.grad
@@ -356,19 +420,18 @@ def _eine_teilung(projekt, kennung: str, teilung: float,
             setzen()
             versuch = bewerte(projekt)
             stand[p] -= 1
-            if versuch.fehler:
-                continue
-            if bester is None or versuch.rueckstand < bester[0]:
-                bester = (versuch.rueckstand, p, versuch)
+            abstand = versuch.abstand(erwartet)
+            if bester is None or abstand < bester[0]:
+                bester = (abstand, p, versuch)
         setzen()
 
         if bester is None:
-            loesung.begruendung = (
+            loesung.begruendung = bewertung.fehler or (
                 f"Alle Durchmesser der Liste ausgeschöpft; der schlechteste "
                 f"Erfüllungsgrad bleibt bei {bewertung.grad:.2f} "
                 f"({bewertung.nachweis}).")
             return loesung
-        if bester[0] >= bewertung.rueckstand:
+        if bester[0] >= bewertung.abstand(erwartet):
             loesung.begruendung = (
                 f"Mehr Stahl bringt nichts mehr: «{bewertung.nachweis}» steht "
                 f"bei {bewertung.grad:.2f} und wird durch keinen grösseren "
@@ -389,7 +452,8 @@ def _eine_teilung(projekt, kennung: str, teilung: float,
 def suche(projekt, kennung: str, *,
           modus: Suchmodus = Suchmodus.GRUND_OHNE,
           teilungen: Sequence[float] = TEILUNGEN,
-          durchmesser: Sequence[float] = DURCHMESSER) -> Suchergebnis:
+          durchmesser: Sequence[float] = DURCHMESSER,
+          mindestdurchmesser: float = MINDESTDURCHMESSER) -> Suchergebnis:
     """
     Die kleinste Bewehrung, mit der alle eingeschalteten Nachweise aufgehen.
 
@@ -399,7 +463,7 @@ def suche(projekt, kennung: str, *,
     """
     ergebnis = Suchergebnis(modus=Suchmodus(modus))
     teilungen = [t for t in teilungen if t > 0] or list(TEILUNGEN)
-    durchmesser = sorted(d for d in durchmesser if d > 0) or list(DURCHMESSER)
+    durchmesser = stufen(durchmesser, mindestdurchmesser)
 
     for teilung in sorted(teilungen):
         loesung = _fuer_teilung(projekt, kennung, teilung,
@@ -457,13 +521,19 @@ def _duktilitaetsbefund(projekt, kennung: str, loesung: "Loesung") -> str:
     uebernehmen(probe, kennung, loesung)
     probe.querschnitte = [q for q in probe.querschnitte if q.kennung == kennung]
     eintrag = probe.querschnitt(kennung)
+    # Nur Lagen, die am Ende auch Bewehrung tragen. Eine leer gebliebene Lage
+    # kann nicht duktil sein, und «geht nicht auf» waere dort keine Auskunft
+    # ueber die gefundene Bewehrung, sondern darueber, dass es keine gibt.
+    eintrag.duktilitaet = [
+        an and (lage.grund.durchmesser > 0 or lage.zulage.durchmesser > 0)
+        for an, lage in zip(eintrag.duktilitaet, eintrag.lagen)]
     if not any(eintrag.duktilitaet):
         return ""
     eintrag.kombinationen = []
     eintrag.knickfaelle = []
     eintrag.haeufige = []
     bewertung = bewerte(probe)
-    if bewertung.erfuellt:
+    if bewertung.erfuellt():
         return "Der Duktilitätsnachweis geht damit auf."
     return (f"Achtung: der Duktilitätsnachweis geht damit **nicht** auf – "
             f"«{bewertung.nachweis}» bei {bewertung.grad:.2f}. Gegen ihn hilft "
@@ -471,18 +541,69 @@ def _duktilitaetsbefund(projekt, kennung: str, loesung: "Loesung") -> str:
             f"gesucht wurde deshalb ohne ihn.")
 
 
+def _absteigen(projekt, posten, stand, durchmesser, setzen,
+               bewertung: Bewertung, erwartet: int) -> Bewertung:
+    """
+    Wieder hinunter, solange es noch aufgeht.
+
+    Der Aufstieg nimmt in jeder Runde den Schritt, der den Rueckstand am
+    weitesten senkt -- und der kann ueber das Ziel hinausgehen: ein Posten
+    landet zwei Stufen hoeher, obwohl eine gereicht haette, weil die zweite
+    unterwegs am meisten gebracht hat. Hier wird das zurueckgenommen, Stufe um
+    Stufe, solange alle Nachweise aufgehen.
+
+    Ohne diesen Abstieg waere «die kleinste Bewehrung» eine Zusage, die das
+    Werkzeug nicht haelt: es gaebe Ergebnisse, aus denen sich noch ein
+    Durchmesser herausnehmen liesse.
+    """
+    geaendert = True
+    while geaendert:
+        geaendert = False
+        for p in posten:
+            if stand[p] == 0:
+                continue
+            stand[p] -= 1
+            setzen()
+            versuch = bewerte(projekt)
+            if versuch.erfuellt(erwartet):
+                bewertung, geaendert = versuch, True
+            else:
+                stand[p] += 1
+                setzen()
+    return bewertung
+
+
+def _vollstaendig(loesung: Loesung, eintrag) -> Loesung:
+    """
+    Jeden Posten in die Loesung schreiben, auch die nicht gesuchten.
+
+    Die Suche raeumt die Platte leer und sucht dann eine Auswahl von Posten --
+    in den Grund-Modi etwa nur die Grundbewehrung. Stuende in der Loesung nur
+    diese Auswahl, schriebe :func:`uebernehmen` sie in eine Platte, in der die
+    Zulage noch steht: mehr Stahl, als die Suche angenommen hat. Gerechnet
+    waere richtig und die Platte trotzdem eine andere.
+
+    Was nicht gesucht wurde, ist darum ausdruecklich null.
+    """
+    if not loesung.gefunden:
+        return loesung
+    for nummer in range(1, len(eintrag.lagen) + 1):
+        for art in ("grund", "zulage"):
+            loesung.durchmesser.setdefault(_marke(nummer, art), 0.0)
+    return loesung
+
+
 def _fuer_teilung(projekt, kennung: str, teilung: float, modus: Suchmodus,
                   durchmesser: Sequence[float]) -> Loesung:
     """Eine Teilung, je nach Modus in einem oder zwei Schritten."""
-    if modus is Suchmodus.GRUND_MIT:
-        arbeit = _arbeitskopie(projekt, kennung, kraefte=True)
-        posten = _gesuchte(arbeit.querschnitt(kennung), arten=("grund",))
-        return _eine_teilung(arbeit, kennung, teilung, posten, durchmesser)
-
-    if modus is Suchmodus.GRUND_OHNE:
-        arbeit = _arbeitskopie(projekt, kennung, kraefte=False)
-        posten = _gesuchte(arbeit.querschnitt(kennung), arten=("grund",))
-        return _eine_teilung(arbeit, kennung, teilung, posten, durchmesser)
+    if modus in (Suchmodus.GRUND_MIT, Suchmodus.GRUND_OHNE):
+        arbeit = _arbeitskopie(projekt, kennung,
+                               kraefte=modus is Suchmodus.GRUND_MIT)
+        eintrag = arbeit.querschnitt(kennung)
+        posten = _gesuchte(eintrag, arten=("grund",))
+        return _vollstaendig(
+            _eine_teilung(arbeit, kennung, teilung, posten, durchmesser),
+            eintrag)
 
     # Zwei Schritte: erst die Grundbewehrung ohne Kraefte, dann die Zulage
     # gegen alles. Der zweite Schritt uebernimmt die Durchmesser des ersten.
@@ -495,25 +616,26 @@ def _fuer_teilung(projekt, kennung: str, teilung: float, modus: Suchmodus,
             + erst.begruendung)
         return erst
 
-    arbeit = _arbeitskopie(projekt, kennung, kraefte=True)
+    # Die Grundbewehrung aus dem ersten Schritt bleibt stehen; gesucht wird
+    # jetzt nur noch die Zulage.
+    arbeit = _arbeitskopie(projekt, kennung, kraefte=True, leeren=False)
     eintrag = arbeit.querschnitt(kennung)
+    for lage in eintrag.lagen:
+        lage.zulage.durchmesser = 0
     for lage, art in grund_posten:
         p = _posten(eintrag, lage, art)
         p.durchmesser = erst.durchmesser[_marke(lage, art)]
         p.abstand = teilung
         p.anzahl = None
     # Eine Zulage gehoert zu einer bewehrten Lage, nicht zu einer leeren --
-    # gesucht wird sie darum ueberall dort, wo eine Grundbewehrung liegt. Die
-    # Null steht in der Liste vorne: keine Zulage ist ein gueltiges Ergebnis
-    # und zugleich der Anfang der Suche.
+    # gesucht wird sie darum ueberall dort, wo Grundbewehrung liegen koennte.
     zulage_posten = [(lage, "zulage") for lage, _ in grund_posten]
-    zweit = _eine_teilung(arbeit, kennung, teilung, zulage_posten,
-                          [0.0, *durchmesser])
+    zweit = _eine_teilung(arbeit, kennung, teilung, zulage_posten, durchmesser)
     zweit.durchmesser = {**erst.durchmesser, **zweit.durchmesser}
     zweit.stahlflaeche = _flaeche(eintrag, grund_posten + zulage_posten,
                                   teilung, eintrag.b)
     zweit.schritte = erst.schritte + zweit.schritte
-    return zweit
+    return _vollstaendig(zweit, eintrag)
 
 
 # ===========================================================================
@@ -554,13 +676,15 @@ def buegel_suchen(projekt, kennung: str, *,
     teilungen = sorted(t for t in teilungen if t > 0) or list(TEILUNGEN)
     durchmesser = sorted(d for d in durchmesser if d > 0) or list(DURCHMESSER)
 
-    arbeit = _arbeitskopie(projekt, kennung, kraefte=True)
+    # Mit der vorhandenen Laengsbewehrung: die Buegel kommen danach, und ohne
+    # statische Hoehe gibt es keinen Querkraftwiderstand.
+    arbeit = _arbeitskopie(projekt, kennung, kraefte=True, leeren=False)
     eintrag = arbeit.querschnitt(kennung)
     buegel = eintrag.querkraftbewehrung
 
     # Erst ohne: was man nicht braucht, soll nicht eingebaut werden.
     buegel.durchmesser = 0
-    if bewerte(arbeit).erfuellt:
+    if bewerte(arbeit).erfuellt():
         return Buegelloesung(
             gefunden=True, durchmesser=0.0, teilung=0.0,
             begruendung="Ohne Querkraftbewehrung geht es auf.")
@@ -572,7 +696,7 @@ def buegel_suchen(projekt, kennung: str, *,
         buegel.anzahl_y = None
         for d in durchmesser:
             buegel.durchmesser = d
-            if not bewerte(arbeit).erfuellt:
+            if not bewerte(arbeit).erfuellt():
                 continue
             volumen = math.pi * d * d / 4.0 / (teilung * teilung) * 1e6
             if beste is None or volumen < beste.stahlvolumen:

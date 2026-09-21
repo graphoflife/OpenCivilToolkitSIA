@@ -174,6 +174,16 @@ class Knickergebnis:
     N_Rd: float = 0.0
     """Groesste Druckkraft mit Gleichgewicht, als Betrag in N."""
 
+    M_bei_N_Rd: float = 0.0
+    """
+    Das Moment am verformten System bei ``N_Rd``, in Nm.
+
+    Dort liegt der Stab an seiner Grenze, also ist es zugleich sein
+    Momentenwiderstand bei dieser Normalkraft -- der Punkt sitzt damit auf
+    der Interaktionslinie. Im M-N-Diagramm ist das der Widerstandspunkt des
+    Knicknachweises.
+    """
+
     schritte: List[Durchlauf] = field(default_factory=list)
     """Die Ausmitten-Iteration bei N_Ed -- Zeile fuer Zeile."""
 
@@ -363,9 +373,14 @@ class Knicken(Nachweis):
             verhaeltnis = (bei_N_Ed.M_Rd / abs(bei_N_Ed.M_ges)
                            if bei_N_Ed.stabil and bei_N_Ed.M_ges else 0.0)
             erg.N_Rd = abs(N_Ed) * verhaeltnis
+            erg.M_bei_N_Rd = bei_N_Ed.M_Rd
         else:
             erg.N_Rd = self._grenzkraft(loeser, abs(N_Ed), erg, l_cr,
                                         traegt=bei_N_Ed.traegt)
+            # Bei N_Rd steht der Stab an seiner Grenze: das Moment am
+            # verformten System *ist* dort der Widerstand.
+            grenze = self._gleichgewicht(loeser, erg.N_Rd, erg, l_cr)
+            erg.M_bei_N_Rd = abs(grenze.M_ges) if grenze.stabil else grenze.M_Rd
         erg.erfuellungsgrad = erg.N_Rd / abs(N_Ed)
         erg.erfuellt = bei_N_Ed.traegt
         erg.begruendung = self._begruendung(erg, bei_N_Ed)

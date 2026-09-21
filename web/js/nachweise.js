@@ -34,6 +34,18 @@ import { aendern, projektAendern, zustand } from './zustand.js';
  */
 const laufendeSuche = new Set();
 
+/**
+ * Der Knopf, der eine Liste verlängert.
+ *
+ * Steht unter der Liste und nicht in der Überschrift: dort ist die Stelle,
+ * an der die nächste Zeile erscheint, und ein Knopf gehört dorthin, wo seine
+ * Wirkung sichtbar wird. Über die ganze Breite und mit gestricheltem Rand --
+ * man sieht, dass dort noch etwas hinkommt.
+ */
+function anfuegenKnopf(text, tun) {
+  return el('button.knopf-anfuegen', { text: `+ ${text}`, on: { click: tun } });
+}
+
 /** Die Nachweiskapitel einer Platte, von der Tragsicherheit bis zum Riss. */
 export function nachweiseBlock(querschnitt) {
   const aendernAn = (veraenderer) => projektAendern((p) => {
@@ -44,16 +56,6 @@ export function nachweiseBlock(querschnitt) {
     el('div.unterkapitel', {}, [
       el('div.unterkapitel-kopf', {}, [
         el('span', { text: 'Tragsicherheitsnachweise' }),
-        el('button.knopf.knopf-zart', {
-          text: '+ Einwirkung',
-          on: {
-            click: () => aendernAn((q) => q.kombinationen.push({
-              name: `Fall ${q.kombinationen.length + 1}`,
-              M_Ed: 100, N_Ed: 0, V_Ed: 0,
-              art: 'automatisch', richtung: 'x',
-            })),
-          },
-        }),
       ]),
       querschnitt.kombinationen.length
         ? el('div.einwirkung.ist-kopf', {}, [
@@ -69,6 +71,10 @@ export function nachweiseBlock(querschnitt) {
       ...(querschnitt.kombinationen.length
         ? querschnitt.kombinationen.map((_, i) => einwirkungZeile(querschnitt, i))
         : [el('div.leer', { text: 'Ohne Einwirkung kein Nachweis.' })]),
+      anfuegenKnopf('Einwirkung', () => aendernAn((q) => q.kombinationen.push({
+        name: `Fall ${q.kombinationen.length + 1}`,
+        M_Ed: 30, N_Ed: 0, V_Ed: 0, art: 'automatisch', richtung: 'x',
+      }))),
     ]),
 
     lagenkapitel(querschnitt, {
@@ -192,21 +198,7 @@ function knickBlock(querschnitt) {
   });
 
   return el('div.unterkapitel', {}, [
-    el('div.unterkapitel-kopf', {}, [
-      el('span', { text: 'Knicken' }),
-      el('button.knopf.knopf-zart', {
-        text: '+ Knicknachweis',
-        on: {
-          click: () => aendern((q) => {
-            q.knickfaelle = q.knickfaelle || [];
-            q.knickfaelle.push({
-              name: `Stütze ${q.knickfaelle.length + 1}`,
-              N_Ed: -500, M_Ed_1: 20, laenge: 3, knicklaenge: 3, aktiv: true,
-            });
-          }),
-        },
-      }),
-    ]),
+    el('div.unterkapitel-kopf', {}, [el('span', { text: 'Knicken' })]),
     faelle.length
       ? el('div.einwirkung.ist-knick.ist-kopf', {}, [
         el('span'),
@@ -221,6 +213,13 @@ function knickBlock(querschnitt) {
     ...(faelle.length
       ? faelle.map((_, i) => knickZeile(querschnitt, i))
       : [el('div.leer', { text: 'Kein Knicknachweis – nur in x-Richtung möglich.' })]),
+    anfuegenKnopf('Knicknachweis', () => aendern((q) => {
+      q.knickfaelle = q.knickfaelle || [];
+      q.knickfaelle.push({
+        name: `Stütze ${q.knickfaelle.length + 1}`,
+        N_Ed: -500, M_Ed_1: 20, laenge: 3, knicklaenge: 3, aktiv: true,
+      });
+    })),
   ]);
 }
 
@@ -308,18 +307,6 @@ function mindestbewehrungsBlock(querschnitt) {
 
     el('div.unterkapitel-kopf', { style: { marginTop: '8px' } }, [
       el('span', { text: 'Verhindern des Fliessens für häufige Lastfälle' }),
-      el('button.knopf.knopf-zart', {
-        text: '+ Lastfall',
-        on: {
-          click: () => aendern((q) => {
-            q.haeufige = q.haeufige || [];
-            q.haeufige.push({
-              name: `Häufig ${q.haeufige.length + 1}`,
-              M_Ed: 0, N_Ed: 0, richtung: 'beide', aktiv: true,
-            });
-          }),
-        },
-      }),
     ]),
 
     el('div.duktilitaetszeile.ist-breit', {}, [
@@ -351,6 +338,13 @@ function mindestbewehrungsBlock(querschnitt) {
             ? 'Nur die abgeleiteten Fälle.'
             : 'Noch kein häufiger Lastfall.',
         })]),
+      anfuegenKnopf('Lastfall', () => aendern((q) => {
+        q.haeufige = q.haeufige || [];
+        q.haeufige.push({
+          name: `Häufig ${q.haeufige.length + 1}`,
+          M_Ed: 0, N_Ed: 0, richtung: 'beide', aktiv: true,
+        });
+      })),
     ],
   ]);
 }
@@ -445,6 +439,15 @@ export function automatikBlock(querschnitt) {
       feld('Teilungen', teilungsfeld('automatik_teilungen',
         'Liste in mm, durch Komma getrennt. Grundbewehrung und Zulage einer '
         + 'Lage bekommen dieselbe Teilung.'), 'mm'),
+      feld('Mindestdurchmesser', zahlfeld({
+        wert: querschnitt.automatik_mindestdurchmesser ?? 10, schritt: 2, min: 0,
+        titel: 'Dünner baut die Suche nicht ein. Eine Lage ganz wegzulassen '
+          + 'bleibt erlaubt – gemeint ist, dass ein vorhandener Stab nicht '
+          + 'dünner wird als das, was man verlegen will.',
+        beiAenderung: (v) => aendern((q) => {
+          q.automatik_mindestdurchmesser = v ?? 10;
+        }),
+      }), 'mm'),
       el('div.duktilitaetszeile.ist-breit', {}, [
         hakenSchalter(quer, (wert) => aendern((q) => {
           q.automatik_querkraft = wert;
@@ -520,23 +523,18 @@ function spannungsBlock(querschnitt) {
   return el('div.unterkapitel', {}, [
     el('div.unterkapitel-kopf', {}, [
       el('span', { text: 'Spannung-Dehnung-Analyse' }),
-      el('button.knopf.knopf-zart', {
-        text: '+ Analyse',
-        on: {
-          click: () => aendern((q) => {
-            q.spannungsfaelle = q.spannungsfaelle || [];
-            q.spannungsfaelle.push({
-              name: `Bild ${q.spannungsfaelle.length + 1}`,
-              art: 'schnittgroessen', richtung: 'x',
-              N_Ed: 0, M_Ed: 100, eps_oben: -1, eps_unten: 2, aktiv: true,
-            });
-          }),
-        },
-      }),
     ]),
     ...(faelle.length
       ? faelle.map((_, i) => spannungsZeile(querschnitt, i))
       : [el('div.leer', { text: 'Keine Analyse angelegt.' })]),
+    anfuegenKnopf('Analyse', () => aendern((q) => {
+      q.spannungsfaelle = q.spannungsfaelle || [];
+      q.spannungsfaelle.push({
+        name: `Bild ${q.spannungsfaelle.length + 1}`,
+        art: 'schnittgroessen', richtung: 'x',
+        N_Ed: 0, M_Ed: 30, eps_oben: -1, eps_unten: 2, aktiv: true,
+      });
+    })),
   ]);
 }
 
@@ -555,20 +553,32 @@ function spannungsZeile(querschnitt, index) {
 
   // Je Art andere Felder -- und immer zwei, damit die Zeilen untereinander
   // dieselbe Gestalt behalten.
-  const felder = {
-    schnittgroessen: () => [
-      zahl('N_Ed', 'Normalkraft in kN – Zug positiv', 50),
-      zahl('M_Ed', 'Moment in kNm', 10),
-    ],
-    dehnungen: () => [
-      zahl('eps_oben', 'Randdehnung oben in ‰ – Zug positiv', 0.5),
-      zahl('eps_unten', 'Randdehnung unten in ‰ – Zug positiv', 0.5),
-    ],
-    moment_kruemmung: () => [
-      zahl('N_Ed', 'Normalkraft in kN – Zug positiv', 50),
-      el('span.kurvenhinweis', { text: '0 … M_Rd' }),
-    ],
-  }[k.art] || (() => [el('span'), el('span')]);
+  // Je Art andere Felder -- und andere Beschriftungen darüber. Ohne sie
+  // stünden dort zwei namenlose Zahlen, und ob die erste eine Kraft oder
+  // eine Dehnung ist, sähe man erst am Ergebnis.
+  const bauplan = {
+    schnittgroessen: {
+      kopf: ['N_Ed [kN]', 'M_Ed [kNm]'],
+      felder: () => [
+        zahl('N_Ed', 'Normalkraft in kN – Zug positiv', 50),
+        zahl('M_Ed', 'Moment in kNm', 10),
+      ],
+    },
+    dehnungen: {
+      kopf: ['ε oben [‰]', 'ε unten [‰]'],
+      felder: () => [
+        zahl('eps_oben', 'Randdehnung oben in ‰ – Zug positiv', 0.5),
+        zahl('eps_unten', 'Randdehnung unten in ‰ – Zug positiv', 0.5),
+      ],
+    },
+    moment_kruemmung: {
+      kopf: ['N_Ed [kN]', ''],
+      felder: () => [
+        zahl('N_Ed', 'Normalkraft in kN – Zug positiv', 50),
+        el('span.kurvenhinweis', { text: '0 … M_Rd' }),
+      ],
+    },
+  }[k.art] || { kopf: ['', ''], felder: () => [el('span'), el('span')] };
 
   return el('div.einwirkung.ist-spannung', { class: aktiv ? '' : 'ist-aus' }, [
     hakenSchalter(aktiv, (wert) => aendern((x) => { x.aktiv = wert; }), 'Analyse'),
@@ -586,7 +596,12 @@ function spannungsZeile(querschnitt, index) {
       titel: 'Was eingegeben wird – und damit, was herauskommt',
       beiAenderung: (v) => aendern((x) => { x.art = v; }),
     }),
-    ...felder(),
+    // Beschriftung über dem Feld, nicht daneben: so bleibt das Raster der
+    // Zeile dasselbe, gleich welche Art gewählt ist.
+    ...bauplan.felder().map((eingabe, i) => el('div.mit-kopf', {}, [
+      el('span.spaltenkopf', { text: bauplan.kopf[i] || '' }),
+      eingabe,
+    ])),
     richtungsWahl(k.richtung || 'x', (wert) => aendern((x) => { x.richtung = wert; }),
       ['x', 'y']),
     el('button.knopf.knopf-zart.knopf-gefahr', {

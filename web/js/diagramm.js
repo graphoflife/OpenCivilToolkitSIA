@@ -320,7 +320,8 @@ export function diagrammZeichnen(linie) {
   // Auch die Knickpunkte: sonst liegt der mit dem grössten Moment zweiter
   // Ordnung ausserhalb des gezeichneten Bereichs.
   for (const k of (linie.knickfaelle || [])) {
-    alleM.push(k.M_Ed_1, k.M_Ed_II); alleN.push(k.N_Ed);
+    alleM.push(k.M_Ed_1, k.M_Ed_II, k.M_bei_N_Rd);
+    alleN.push(k.N_Ed, -Math.abs(k.N_Rd));
   }
 
   const spielraum = 0.08;
@@ -452,27 +453,36 @@ export function diagrammZeichnen(linie) {
   }
 
   // -- Knicknachweise ------------------------------------------------------
-  // Zwei Punkte auf derselben Höhe: das Moment 1. Ordnung und das am
-  // verformten System. Die Strecke dazwischen ist der Zuwachs aus
-  // Schiefstellung und Verformung -- man sieht auf einen Blick, ob er den
-  // Punkt über die Linie schiebt.
+  // Drei Punkte und eine Kette dazwischen:
+  //   1. Einwirkung 1. Ordnung   (M_Ed,1  | N_Ed)
+  //   2. am verformten System    (M_Ed,II | N_Ed)   -- der Zuwachs
+  //   3. Widerstand              (M_Rd    | N_Rd)   -- auf der Linie
+  // Die Strecke 1-2 ist, was Schiefstellung und Verformung dazulegen; die
+  // Strecke 2-3, wie weit es bis zum Versagen noch ist.
   for (const k of (linie.knickfaelle || [])) {
     const farbe = k.erfuellt ? '#1a7f45' : '#b3261e';
-    const y0 = y(k.N_Ed);
-    svg.append(svgEl('line', {
-      x1: x(k.M_Ed_1), y1: y0, x2: x(k.M_Ed_II), y2: y0,
-      stroke: farbe, 'stroke-width': 1.6, 'stroke-dasharray': '2 3', opacity: .85,
-    }));
-    // Erster Punkt: hohl, das ist die Einwirkung vor der Verformung.
+    const eins = [x(k.M_Ed_1), y(k.N_Ed)];
+    const zwei = [x(k.M_Ed_II), y(k.N_Ed)];
+    const drei = [x(k.M_bei_N_Rd), y(-Math.abs(k.N_Rd))];
+
+    for (const [von, bis, muster] of [[eins, zwei, '2 3'], [zwei, drei, '5 4']]) {
+      svg.append(svgEl('line', {
+        x1: von[0], y1: von[1], x2: bis[0], y2: bis[1],
+        stroke: farbe, 'stroke-width': 1.6, 'stroke-dasharray': muster, opacity: .85,
+      }));
+    }
+
+    // Erster Punkt: klein und hohl -- die Einwirkung vor der Verformung.
     svg.append(svgEl('circle', {
-      cx: x(k.M_Ed_1), cy: y0, r: 4,
+      cx: eins[0], cy: eins[1], r: 3.5,
       fill: '#fff', stroke: farbe, 'stroke-width': 1.6,
     }));
-    // Zweiter Punkt: Raute, damit er sich von den Kombinationen unterscheidet.
+
+    // Zweiter: gefüllte Raute, das ist die massgebende Einwirkung.
     const s = 6;
     const raute = svgEl('polygon', {
-      points: [[x(k.M_Ed_II), y0 - s], [x(k.M_Ed_II) + s, y0],
-        [x(k.M_Ed_II), y0 + s], [x(k.M_Ed_II) - s, y0]]
+      points: [[zwei[0], zwei[1] - s], [zwei[0] + s, zwei[1]],
+        [zwei[0], zwei[1] + s], [zwei[0] - s, zwei[1]]]
         .map((q) => q.map((v) => v.toFixed(2)).join(',')).join(' '),
       fill: farbe, stroke: '#fff', 'stroke-width': 2,
     });
@@ -481,13 +491,19 @@ export function diagrammZeichnen(linie) {
     kt.textContent =
       `Knicken – ${k.name}\nN_Ed = ${k.N_Ed.toFixed(1)} kN`
       + `\nM_Ed,1 = ${k.M_Ed_1.toFixed(1)} kNm → M_Ed,II = ${k.M_Ed_II.toFixed(1)} kNm`
-      + `\nN_Rd = ${k.N_Rd.toFixed(1)} kN, α_eff = ${grad}`
-      + `\n${k.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`;
+      + `\nN_Rd = ${k.N_Rd.toFixed(1)} kN bei M = ${k.M_bei_N_Rd.toFixed(1)} kNm`
+      + `\nα_eff = ${grad} – ${k.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`;
     raute.append(kt);
     svg.append(raute);
 
+    // Dritter: der Widerstandspunkt, wie bei den Kombinationen hohl.
+    svg.append(svgEl('circle', {
+      cx: drei[0], cy: drei[1], r: 4.5,
+      fill: '#fff', stroke: farbe, 'stroke-width': 1.8,
+    }));
+
     const marke = svgEl('text', {
-      x: x(k.M_Ed_II) + 9, y: y0 + 14,
+      x: zwei[0] + 9, y: zwei[1] + 14,
       'font-size': 11, 'font-weight': 600, fill: farbe,
     });
     marke.textContent = `K: ${k.name}`;

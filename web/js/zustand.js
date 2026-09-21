@@ -23,7 +23,10 @@ export const zustand = {
   /** Welcher Reiter rechts offen ist. */
   reiter: 'nachweise',
   /** 'gesamt' oder 'seite' -- ob nur der gewählte Bestandteil gezeigt wird. */
-  umfang: 'gesamt',
+  // Die aktuelle Seite ist die Vorgabe: wer links eine Platte wählt, will in
+  // aller Regel deren Nachweise sehen und nicht die des ganzen Projekts.
+  umfang: 'seite',
+  diagrammspalten: 1,
   /** Ob im Betondiagramm der vereinfachte Spannungsblock mitgezeichnet wird. */
   zeigeVereinfacht: true,
   /** Wert-IDs, die hervorgehoben werden (Rückverfolgung eines Ziels). */

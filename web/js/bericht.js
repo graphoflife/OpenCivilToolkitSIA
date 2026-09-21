@@ -411,32 +411,6 @@ function plattenkennzahlen(eintrag, loesung) {
  * die Höhe zeichnen. Was genau gezeigt wird, ist noch offen -- darum steht
  * hier bewusst ein leerer Platz und keine erfundene Darstellung.
  */
-function spannungSicht(loesung) {
-  const querschnitte = loesung.zuordnung?.querschnitte || {};
-  const raum = eingrenzung();
-  const gezeigt = Object.entries(querschnitte).filter(
-    ([, eintrag]) => imRaum(raum, eintrag.namensraum));
-
-  if (!gezeigt.length) {
-    return leerzustand('Kein Querschnitt gewählt.',
-      'Links eine Platte wählen – oder oben auf "Gesamt" umschalten.');
-  }
-
-  const analysen = loesung.spannungsanalysen || {};
-  return el('div', {}, gezeigt.map(([kennung, eintrag]) => {
-    const faelle = analysen[kennung] || [];
-    return el('div.blatt', {}, [
-      el('div.b-titel', { text: `Spannung-Dehnung-Analyse – ${eintrag.name}` }),
-      faelle.length
-        ? el('div', {}, faelle.map(spannungsfallZeichnen))
-        : el('p.b-text', {
-          text: 'Für diese Platte ist keine Analyse angelegt. Im mittleren '
-              + 'Feld unter «Knicken» lassen sich welche hinzufügen: aus N '
-              + 'und M, aus Randdehnungen, oder als Momenten-Krümmungs-Linie.',
-        }),
-    ]);
-  }));
-}
 
 function diagrammSicht(loesung) {
   const raum = eingrenzung();
@@ -463,7 +437,8 @@ function diagrammSicht(loesung) {
     ]));
   }
 
-  // -- Querschnitt und Interaktionslinien ---------------------------------
+  // -- Querschnitt, Interaktionslinien und Spannungsbilder ----------------
+  const analysen = loesung.spannungsanalysen || {};
   for (const [kennung, eintrag] of Object.entries(querschnitte)) {
     if (!imRaum(raum, eintrag.namensraum)) continue;
     const eigene = Object.entries(linien)
@@ -479,11 +454,30 @@ function diagrammSicht(loesung) {
       ]),
       ...querkraftkurven(loesung, kennung),
       ...neigungskurven(loesung, kennung),
+      ...(analysen[kennung] || []).map(spannungsfallZeichnen),
     ]));
   }
 
   if (!blaetter.length) return leerzustand('Noch nichts zu zeichnen.');
-  return el('div', {}, blaetter);
+  // Wie viele Blätter nebeneinander -- der Schalter steht über allem, weil er
+  // für alle gilt und nicht für eines.
+  return el('div', {}, [spaltenwahl(), el('div.blaetter', {
+    class: `ist-${zustand.diagrammspalten || 1}`,
+  }, blaetter)]);
+}
+
+/** Wie viele Diagramme nebeneinander stehen -- eins, zwei oder drei. */
+function spaltenwahl() {
+  const jetzt = zustand.diagrammspalten || 1;
+  return el('div.spaltenwahl', {}, [
+    el('span', { text: 'Diagramme nebeneinander' }),
+    el('span.schalter', {}, [1, 2, 3].map((n) => el('button.schalter-halb', {
+      text: String(n),
+      class: n === jetzt ? 'ist-an' : '',
+      title: `${n} Diagramm${n > 1 ? 'e' : ''} je Zeile`,
+      on: { click: () => aendern({ diagrammspalten: n }, 'diagramm') },
+    }))),
+  ]);
 }
 
 /**
@@ -726,7 +720,6 @@ export function berichtZeichnen(behaelter, beiZielwahl) {
 
   const sichten = {
     nachweise: () => zusammenfassung(loesung),
-    spannung: () => spannungSicht(loesung),
     diagramm: () => diagrammSicht(loesung),
     herleitung: () => herleitung(loesung),
     werte: () => werteSicht(loesung, beiZielwahl),

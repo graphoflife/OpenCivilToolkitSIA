@@ -179,6 +179,7 @@ function platteAnlegen() {
       // nicht nur als Vorgabe im Kern: sonst zeigte die Maske ein leeres
       // Teilungsfeld, während gerechnet würde, als stünde 150 darin.
       automatik_modus: 'grund_ohne', automatik_teilungen: [150],
+      automatik_mindestdurchmesser: 10,
       automatik_querkraft: false, automatik_querkraft_teilungen: [100, 150, 200],
       beschreibung: '',
       spannungsfaelle: [],
