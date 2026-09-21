@@ -175,13 +175,20 @@ function platteAnlegen() {
       rissanforderung: 'normal', kriechzahl: 2.0,
       zwaengung_x: false, zwaengung_y: false, zwaengung_begrenzt: false,
       haeufige_aus_tragsicherheit: true, haeufige: [], knickfaelle: [],
+      // Was das Bewehrungswerkzeug voreingestellt versucht. Steht hier und
+      // nicht nur als Vorgabe im Kern: sonst zeigte die Maske ein leeres
+      // Teilungsfeld, während gerechnet würde, als stünde 150 darin.
+      automatik_modus: 'grund_ohne', automatik_teilungen: [150],
+      automatik_querkraft: false, automatik_querkraft_teilungen: [100, 150, 200],
+      beschreibung: '',
+      spannungsfaelle: [],
       // Sprödes Versagen und Zwängung auf Biegung: nur die 1. Lage.
       sproede_lagen: [true, false, false, false],
       zwaengung_biegung_lagen: [true, false, false, false],
       // 'automatisch': beide Massstäbe werden gerechnet, massgebend ist der
       // kleinere Erfüllungsgrad. Eine feste Wahl hier hätte die neue Platte
       // vom Regelfall ausgenommen.
-      kombinationen: [{ name: 'Feld', M_Ed: 100, N_Ed: 0, art: 'automatisch', richtung: 'x' }],
+      kombinationen: [{ name: 'Feld', M_Ed: 30, N_Ed: 0, art: 'automatisch', richtung: 'x' }],
     });
   });
   aendern({ auswahl: { art: 'querschnitt', kennung } }, 'auswahl');

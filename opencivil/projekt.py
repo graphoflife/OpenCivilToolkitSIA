@@ -691,6 +691,16 @@ class QuerschnittEintrag(Beschreibung):
     rissanforderung: str = "normal"
     """Anforderung an die Rissbildung -- ``normal``, ``erhoeht`` oder ``hoch``."""
 
+    beschreibung: str = ""
+    """
+    Freier Text zur Platte -- was sonst nirgends hinpasst.
+
+    Wo sie liegt, woher die Schnittgroessen stammen, was noch zu klaeren ist.
+    Geht in keine Rechnung ein und steht in keinem Nachweis; sie wird
+    gespeichert und wieder angezeigt, mehr nicht. Genau dafuer gibt es sie:
+    ohne ein solches Feld landen solche Saetze im Namen der Platte.
+    """
+
     kriechzahl: float = KRIECHZAHL
     """
     Kriechzahl phi fuer den gerissenen Zustand.
@@ -730,8 +740,14 @@ class QuerschnittEintrag(Beschreibung):
     automatik_modus: str = "grund_ohne"
     """Wonach das Bewehrungswerkzeug sucht -- siehe ``bewehrungssuche.Suchmodus``."""
 
-    automatik_teilungen: List[float] = field(default_factory=lambda: [100.0, 150.0])
-    """Teilungen, die es versucht. Grundbewehrung und Zulage teilen sich eine."""
+    automatik_teilungen: List[float] = field(default_factory=lambda: [150.0])
+    """
+    Teilungen, die es versucht. Grundbewehrung und Zulage teilen sich eine.
+
+    Vorgabe ist die eine uebliche. Wer mehrere angibt, bekommt die mit der
+    kleinsten Stahlflaeche -- das kostet aber je Teilung einen ganzen
+    Suchlauf, und meistens steht die Teilung ohnehin fest.
+    """
 
     automatik_querkraft: bool = False
     """Ob auch die Buegel gesucht werden."""
@@ -805,7 +821,7 @@ class QuerschnittEintrag(Beschreibung):
             duktilitaet=_duktilitaet_aus(d.get("duktilitaet")),
             automatik_modus=str(d.get("automatik_modus") or "grund_ohne"),
             automatik_teilungen=_teilungen_aus(d.get("automatik_teilungen"),
-                                               (100.0, 150.0)),
+                                               (150.0,)),
             automatik_querkraft=bool(d.get("automatik_querkraft", False)),
             automatik_querkraft_teilungen=_teilungen_aus(
                 d.get("automatik_querkraft_teilungen"), (100.0, 150.0, 200.0)),
@@ -813,6 +829,7 @@ class QuerschnittEintrag(Beschreibung):
             zwaengung_biegung_lagen=_lagenwahl_aus(
                 d.get("zwaengung_biegung_lagen")),
             rissanforderung=_rissanforderung_aus(d.get("rissanforderung")),
+            beschreibung=str(d.get("beschreibung") or ""),
             kriechzahl=_zahl(d, "kriechzahl", KRIECHZAHL),
             zwaengung_x=bool(d.get("zwaengung_x", False)),
             zwaengung_y=bool(d.get("zwaengung_y", False)),

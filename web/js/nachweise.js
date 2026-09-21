@@ -17,19 +17,22 @@
 
 import { api } from './api.js';
 import { feld, hakenSchalter, lagenwahl, richtungVon, richtungsWahl } from './bausteine.js';
-import { auswahl, el, zahlfeld } from './dom.js';
+import { auswahl, el, melden, zahlfeld } from './dom.js';
 import { aendern, projektAendern, zustand } from './zustand.js';
 
 /**
- * Was die letzte Bewehrungssuche je Platte gemeldet hat.
+ * Welche Platte gerade durchsucht wird.
  *
- * Ausserhalb des Baums: das Ergebnis übernehmen heisst, das Projekt zu
- * ändern, und das zeichnet die Tafel neu. Stünde die Meldung im DOM, wäre
- * sie genau in dem Augenblick weg, in dem sie etwas zu sagen hat. Ins
- * Projekt gehört sie auch nicht -- sie beschreibt einen Vorgang, keine
- * Eigenschaft der Platte, und niemand will sie in der abgelegten Datei.
+ * Nur das: der Knopf soll währenddessen «sucht …» heissen und nicht zweimal
+ * auslösen. Das Ergebnis steht danach in den Lagen und in der
+ * Zusammenfassung -- dort sieht man, ob es aufgeht. Ein Satz daneben, grün
+ * oder rot, sagte dasselbe ein zweites Mal und blieb stehen, bis man etwas
+ * anderes tat.
+ *
+ * Ausserhalb des Projekts: das ist ein Vorgang und keine Eigenschaft der
+ * Platte, und niemand will ihn in der abgelegten Datei.
  */
-const automatikMeldungen = new Map();
+const laufendeSuche = new Set();
 
 /** Die Nachweiskapitel einer Platte, von der Tragsicherheit bis zum Riss. */
 export function nachweiseBlock(querschnitt) {
@@ -458,8 +461,7 @@ export function automatikBlock(querschnitt) {
 }
 
 function automatikLeiste(kennung) {
-  const stand = automatikMeldungen.get(kennung);
-  const laeuft = stand?.laeuft === true;
+  const laeuft = laufendeSuche.has(kennung);
   return el('div.automatik-leiste', {}, [
     el('button.knopf.knopf-haupt', {
       text: laeuft ? 'sucht …' : 'Bewehrung ermitteln',
@@ -467,27 +469,15 @@ function automatikLeiste(kennung) {
       disabled: laeuft,
       on: { click: () => bewehrungErmitteln(kennung) },
     }),
-    stand?.text
-      ? el('span.automatik-meldung', {
-        text: stand.text,
-        class: stand.gut === null ? '' : (stand.gut ? 'ist-gut' : 'ist-schlecht'),
-      })
-      : null,
   ]);
 }
 
-/** Einmal suchen, das Ergebnis übernehmen, die Meldung stehen lassen. */
+/** Einmal suchen und das Ergebnis in die Lagen schreiben. */
 async function bewehrungErmitteln(kennung) {
-  automatikMeldungen.set(kennung, { laeuft: true, text: '', gut: null });
+  laufendeSuche.add(kennung);
   aendern({}, 'bewehrungssuche-start');
   try {
     const antwort = await api.bewehrungSuchen(zustand.projekt, kennung);
-    const teile = [antwort.begruendung];
-    if (antwort.buegel) teile.push(`Bügel: ${antwort.buegel.begruendung}`);
-    if (antwort.duktilitaet) teile.push(antwort.duktilitaet);
-    automatikMeldungen.set(kennung, {
-      laeuft: false, text: teile.join(' '), gut: antwort.gefunden,
-    });
     if (antwort.gefunden) {
       // Der Kern gibt das fertige Projekt zurück -- übernommen wird es als
       // eine Änderung, damit ein Rückgängig sie als eine zurücknimmt.
@@ -496,17 +486,18 @@ async function bewehrungErmitteln(kennung) {
         const neu = antwort.projekt?.querschnitte?.find((x) => x.kennung === kennung);
         if (alt >= 0 && neu) p.querschnitte[alt] = neu;
       });
+    } else {
+      // Nichts gefunden heisst: die Lagen bleiben, wie sie waren. Das sieht
+      // man nicht von selbst, also sagt es die Meldungszeile oben -- dort,
+      // wo auch sonst steht, was schiefging.
+      melden(antwort.begruendung, true);
     }
   } catch (fehler) {
-    automatikMeldungen.set(kennung, {
-      laeuft: false, text: String(fehler.message || fehler), gut: false,
-    });
+    melden(String(fehler.message || fehler), true);
   } finally {
-    // Zuletzt und immer. Vorher hing das Neuzeichnen an dem Zweig, der gerade
-    // gelaufen war -- und wenn das Übernehmen des Ergebnisses schon eines
-    // ausgelöst hatte, stand die Meldung zwar im Speicher, aber nichts zeigte
-    // sie an. Man musste ein zweites Mal drücken, um das Ergebnis des ersten
-    // Drucks zu sehen.
+    // Zuletzt und immer. Hing das Neuzeichnen am Zweig, blieb der Knopf auf
+    // «sucht …» stehen, und man musste ein zweites Mal drücken.
+    laufendeSuche.delete(kennung);
     aendern({}, 'bewehrungssuche-ende');
   }
 }

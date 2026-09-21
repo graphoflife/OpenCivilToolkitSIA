@@ -50,8 +50,9 @@ from typing import Dict, List, Optional, Sequence, Tuple
 #: Reihe nach durch; was nicht in der Liste steht, kommt nicht heraus.
 DURCHMESSER: Tuple[float, ...] = (8, 10, 12, 14, 16, 18, 20, 22, 26)
 
-#: Teilungen in mm, die ohne eigene Angabe versucht werden.
-TEILUNGEN: Tuple[float, ...] = (100.0, 150.0)
+#: Teilungen in mm, die ohne eigene Angabe versucht werden. Die eine
+#: uebliche -- jede weitere kostet einen vollstaendigen Suchlauf.
+TEILUNGEN: Tuple[float, ...] = (150.0,)
 
 #: Obergrenze der Runden je Teilung. Mehr Runden als Posten mal Durchmesser
 #: kann es nicht geben -- die Zahl ist der Riegel gegen einen Denkfehler.

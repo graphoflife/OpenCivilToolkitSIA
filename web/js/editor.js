@@ -625,6 +625,19 @@ function plattenEditor(querschnitt) {
           titel: 'Bestimmt die zulässige Stahlspannung beim Mindestbewehrungsnachweis',
           beiAenderung: (v) => aendern((q) => { q.rissanforderung = v; }),
         })),
+        // Freier Text, der in keine Rechnung eingeht. Ohne ein solches Feld
+        // landen solche Sätze im Namen der Platte.
+        el('div.beschreibung', {}, [
+          el('label', { text: 'Beschreibung' }),
+          el('textarea', {
+            rows: 3, value: querschnitt.beschreibung || '',
+            placeholder: 'Wo die Platte liegt, woher die Schnittgrössen '
+              + 'stammen, was noch zu klären ist …',
+            on: {
+              change: (e) => aendern((q) => { q.beschreibung = e.target.value; }),
+            },
+          }),
+        ]),
       ]),
       automatikBlock(querschnitt),
       ]),

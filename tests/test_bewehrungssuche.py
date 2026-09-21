@@ -185,6 +185,11 @@ class TestDuktilitaetBleibtDraussen(unittest.TestCase):
     sucht sie ohne ihn und sagt hinterher, wie er dasteht.
     """
 
+    #: Ausdrücklich beide Teilungen. Der Fall braucht die engere, und woran
+    #: er scheitert, soll nicht an der Vorgabe hängen -- geprüft wird hier die
+    #: Duktilität und nicht, welche Teilung voreingestellt ist.
+    TEILUNGEN = [100.0, 150.0]
+
     def duenn(self) -> Projekt:
         """Dünn genug, dass die nötige Bewehrung die Druckzone zu tief macht."""
         projekt = platte(h=200.0)
@@ -193,13 +198,14 @@ class TestDuktilitaetBleibtDraussen(unittest.TestCase):
         return projekt
 
     def test_die_suche_findet_auch_wenn_die_duktilitaet_nicht_aufgeht(self):
-        ergebnis = suche.suche(self.duenn(), "q1",
+        ergebnis = suche.suche(self.duenn(), "q1", teilungen=self.TEILUNGEN,
                                modus=suche.Suchmodus.GRUND_MIT)
         self.assertTrue(ergebnis.gefunden, ergebnis.begruendung)
 
     def test_sie_wird_aber_nicht_verschwiegen(self):
         projekt = self.duenn()
-        ergebnis = suche.suche(projekt, "q1", modus=suche.Suchmodus.GRUND_MIT)
+        ergebnis = suche.suche(projekt, "q1", teilungen=self.TEILUNGEN,
+                               modus=suche.Suchmodus.GRUND_MIT)
         self.assertIn("nicht", ergebnis.duktilitaet)
         suche.uebernehmen(projekt, "q1", ergebnis.beste)
         dukt = [u for u in _urteile(projekt) if u.art == "D"]
@@ -230,6 +236,17 @@ class TestEineLageWirdNichtErfunden(unittest.TestCase):
         ergebnis = suche.suche(projekt, "q1", modus=suche.Suchmodus.GRUND_OHNE)
         self.assertFalse(ergebnis.gefunden)
         self.assertIn("y-Richtung trägt keine Lage", ergebnis.begruendung)
+
+
+class TestDieVorgabe(unittest.TestCase):
+    def test_voreingestellt_wird_eine_teilung_versucht(self):
+        """
+        150 mm, die eine übliche. Jede weitere kostet einen vollständigen
+        Suchlauf, und meistens steht die Teilung ohnehin fest.
+        """
+        self.assertEqual(list(suche.TEILUNGEN), [150.0])
+        ergebnis = suche.suche(platte(), "q1", modus=suche.Suchmodus.GRUND_OHNE)
+        self.assertEqual([l.teilung for l in ergebnis.loesungen], [150.0])
 
 
 class TestNurDieEigenePlatte(unittest.TestCase):

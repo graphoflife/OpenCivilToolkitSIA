@@ -43,6 +43,47 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-21 · Luft, und ein Umbruch, der auf die falsche Zahl sah
+
+Aufräumen an der Oberfläche: mehr Abstand zwischen den Tafeln, mehr zwischen
+den Kapiteln, und Kapitel, die überall gleich aussehen.
+
+Der Abstand zwischen zwei Tafeln entsteht nicht am Griff, sondern in den
+Tafeln selbst -- jede gibt auf der Seite nach, an der eine andere steht. So
+bleibt der Griff schmal und greifbar, und der Inhalt hat trotzdem Luft.
+
+Bei den Kapiteln fiel auf, dass «Platte» keine Linie links hatte und
+«Nachweise» schon: die Linie hing an `.unterkapitel`, und die Platte hat
+keines. Statt sieben Aufrufstellen um einen Körper-Container zu erweitern,
+sitzt die Linie jetzt an der Gruppe selbst, und die Überschrift holt sich die
+Einrückung mit einem negativen Rand zurück. Eine Regel statt sieben Eingriffe.
+Die Unterkapitel wurden dafür zu Karten wie die Bewehrungslagen -- bei fünf
+Nachweiskapiteln untereinander sah man vorher nicht, wo eines aufhört.
+
+Das Padding hat dann etwas ans Licht geholt, das schon länger schief lag: der
+Editor klappt in zwei Spalten auf, und der Umbruch hing an einer
+`@media`-Abfrage -- also an der **Fensterbreite**. Das ist die falsche Zahl.
+Die Tafeln sind in der Breite verstellbar; ein breites Fenster sagt nichts
+darüber, wie viel Platz eine einzelne Tafel hat. Bei 1600 px Fenster und
+420 px Tafel klappte der Editor zweispaltig auf und lief um 200 Pixel über.
+Jetzt entscheidet eine `@container`-Abfrage, und sie sieht die Tafel.
+
+Danach blieben 15 Pixel übrig, und auch die hatten einen Grund: die
+Einwirkungszeilen standen auf `1fr` für den Namen. Ohne `minmax(0, 1fr)` nimmt
+ein Gitter die Mindestbreite des Inhalts, und die Zeile wächst über die Karte
+hinaus, statt den Namen zu kürzen.
+
+Der Knopf «Bewehrung ermitteln» hat seine Meldung verloren. Das Ergebnis steht
+danach in den Lagen und in der Zusammenfassung -- ein Satz daneben sagte
+dasselbe ein zweites Mal und blieb stehen, bis man etwas anderes tat. Geht es
+nicht auf, meldet es die Zeile oben rechts, dort, wo auch sonst steht, was
+schiefging. Aus der Map mit Meldungen wurde ein Set mit Kennungen: der Knopf
+muss nur noch wissen, ob er gerade läuft.
+
+Dabei fiel eine Unstimmigkeit auf: eine neue Platte zeigte ein leeres
+Teilungsfeld, während der Kern mit 150 mm rechnete. Was man sieht, muss
+laufen -- die Vorgaben stehen jetzt auch in der neu angelegten Platte.
+
 ## 2026-09-21 · Den Querschnitt ansehen, ohne ihn nachzuweisen
 
 Die Spannung-Dehnung-Analyse ist das erste Stück in diesem Werkzeug, das

@@ -29,6 +29,11 @@
   --gut:          #16794a;
   --gut-hell:     #e4f4ec;
   --schlecht:     #c0281f;
+  /* Eigene, weichere Toene fuer die Ja/Nein-Schalter. Das kraeftige Rot der
+     Urteile gehoert dorthin, wo etwas nicht aufgeht -- ein abgeschalteter
+     Nachweis ist aber kein Fehler, sondern eine Entscheidung. */
+  --haken-gut:      #3f9d6d;
+  --haken-schlecht: #d4756e;
   --schlecht-hell:#fdeceb;
   --warn:         #8a6100;
   --warn-hell:    #fdf4e0;
@@ -162,8 +167,20 @@ button, input, select { font: inherit; color: inherit; }
 .tafel-inhalt {
   flex: 1 1 auto; min-height: 0;
   overflow-y: auto; overflow-x: hidden;
-  padding: 10px 12px 48px;
+  padding: 12px 12px 48px;
+  /* Bezugsgrösse für die Umbrüche darin. Sie richteten sich früher nach dem
+     Fenster, und das ist die falsche Zahl: die Tafeln sind in der Breite
+     verstellbar, ein breites Fenster sagt also nichts darüber, wie viel Platz
+     eine einzelne Tafel hat. Bei 1600 px Fenster und 420 px Tafel klappte der
+     Editor in zwei Spalten auf und lief über. */
+  container-type: inline-size;
 }
+/* Der Abstand zwischen zwei Tafeln entsteht nicht am Griff, sondern in den
+   Tafeln selbst: jede gibt auf der Seite nach, an der eine andere steht. So
+   bleibt der Griff schmal und greifbar, und der Inhalt hat trotzdem Luft. */
+.tafel-links  .tafel-inhalt { padding-right: 20px; }
+.tafel-mitte  .tafel-inhalt { padding-left: 20px; padding-right: 20px; }
+.tafel-rechts .tafel-inhalt { padding-left: 20px; }
 
 .griff { background: var(--rand); cursor: col-resize; }
 .griff:hover, .griff.ist-aktiv { background: var(--blau); }
@@ -224,15 +241,27 @@ button, input, select { font: inherit; color: inherit; }
 
 /* ------------------------------------------------------------- Editor -- */
 
-.feldgruppe { margin-bottom: 16px; }
+/* Ein Kapitel sieht ueberall gleich aus: Linie links, fetter Titel darueber.
+   Die Linie sitzt an der Gruppe und nicht an einem eigenen Koerper-Element --
+   dann gilt sie fuer jedes Kapitel, ohne dass sieben Aufrufstellen davon
+   wissen muessen. Die Ueberschrift holt sich die Einrueckung mit einem
+   negativen Rand zurueck und steht buendig auf der Linie. */
+.feldgruppe {
+  margin-bottom: 24px;
+  border-left: 2px solid var(--rand);
+  padding-left: 13px;
+}
 .feldgruppe > h3 {
   font-size: 12px; text-transform: uppercase; letter-spacing: .5px;
-  color: var(--schrift-matt); margin-bottom: 8px;
-  padding: 5px 8px; border-radius: 5px; background: var(--flaeche-2);
+  font-weight: 700; color: var(--schrift); margin: 0 0 10px -13px;
+  padding: 6px 9px; border-radius: 5px; background: var(--flaeche-2);
   border-left: 3px solid var(--blau);
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
 }
-.feldgruppe > h3 > span:last-child { font-weight: 400; text-transform: none; letter-spacing: 0; }
+.feldgruppe > h3 > span:last-child {
+  font-weight: 400; text-transform: none; letter-spacing: 0;
+  color: var(--schrift-zart);
+}
 
 .feld { display: grid; grid-template-columns: 1fr 112px 48px; gap: 6px; align-items: center; margin-bottom: 5px; }
 .feld > label { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -341,10 +370,11 @@ input[readonly], input:disabled, select:disabled {
    Tragsicherheitsnachweisen. Das Auge sucht die Spalte einmal und findet sie
    danach in jedem Kapitel wieder. */
 .duktilitaetszeile {
-  display: grid; grid-template-columns: 54px 18px minmax(0, 1fr) auto;
+  display: grid; grid-template-columns: 46px 18px minmax(0, 1fr) auto;
   gap: 6px; align-items: center; margin-bottom: 4px;
 }
-.duktilitaetszeile.ist-breit { grid-template-columns: 54px minmax(0, 1fr) auto; }
+.duktilitaetszeile.ist-breit { grid-template-columns: 46px minmax(0, 1fr) auto; }
+.duktilitaetszeile .schalter-haken .schalter-halb { width: 22px; }
 .duktilitaetszeile .postenname {
   font-size: 11.5px; font-weight: 600; color: var(--schrift-matt);
 }
@@ -371,12 +401,12 @@ input[readonly], input:disabled, select:disabled {
 .schalter-haken .schalter-halb:hover {
   color: var(--schrift-matt); background: var(--flaeche-2);
 }
-.schalter-haken .ist-ja.ist-an   { background: var(--gut); color: #fff; }
-.schalter-haken .ist-nein.ist-an { background: var(--schlecht); color: #fff; }
+.schalter-haken .ist-ja.ist-an   { background: var(--haken-gut); color: #fff; }
+.schalter-haken .ist-nein.ist-an { background: var(--haken-schlecht); color: #fff; }
 /* Die eingeschaltete Hälfte behält ihre Farbe auch unter dem Zeiger --
    sonst blitzt beim Darüberfahren genau das Grau auf, das hier weg soll. */
-.schalter-haken .ist-ja.ist-an:hover   { background: var(--gut); color: #fff; }
-.schalter-haken .ist-nein.ist-an:hover { background: var(--schlecht); color: #fff; }
+.schalter-haken .ist-ja.ist-an:hover   { background: var(--haken-gut); color: #fff; }
+.schalter-haken .ist-nein.ist-an:hover { background: var(--haken-schlecht); color: #fff; }
 
 /* Tragrichtung einer Einwirkung -- dieselben Farben wie bei den Lagen, damit
    man nicht überlegen muss, welche Richtung welche ist. */
@@ -418,41 +448,54 @@ input[readonly], input:disabled, select:disabled {
 .ueberdeckung .feld { margin-bottom: 0; }
 
 /* Platte und Bewehrung nebeneinander, sobald die Tafel breit genug ist. */
-.zweispaltig { display: grid; grid-template-columns: 1fr; gap: 14px;
+.zweispaltig { display: grid; grid-template-columns: 1fr; gap: 16px;
                align-items: start; }
-@media (min-width: 1500px) { .zweispaltig { grid-template-columns: 1fr 1fr; } }
+/* Zwei Spalten erst, wenn die *Tafel* sie trägt -- nicht, wenn das Fenster
+   breit ist. Eine Spalte braucht rund 340 px, dazu der Zwischenraum. */
+@container (min-width: 740px) { .zweispaltig { grid-template-columns: 1fr 1fr; } }
 /* Eine Spalte fasst mehrere Feldgruppen zusammen -- links die Platte und das
    Werkzeug darunter, rechts die Bewehrung. Ohne sie wären es drei gleiche
    Kacheln im Raster und das Werkzeug landete neben der Platte statt unter ihr. */
 .spalte { display: flex; flex-direction: column; }
 
-.unterkapitel { border-left: 2px solid var(--rand); padding-left: 9px; margin-top: 6px; }
+/* Ein Unterkapitel ist eine Karte wie eine Bewehrungslage -- gerahmt, mit
+   farbiger Kante links. Vorher war es ein blosser Strich, und bei fuenf
+   Nachweiskapiteln untereinander sah man nicht, wo eines aufhoert. */
+.unterkapitel {
+  border: 1px solid var(--rand); border-left: 4px solid var(--blau);
+  border-radius: var(--radius); padding: 8px 10px; margin-bottom: 8px;
+  background: var(--flaeche);
+}
 /* Zwischen den Nachweiskapiteln Luft: Tragsicherheit, Duktilität, sprödes
    Versagen, Riss, Knicken sind verschiedene Fragen und sollen auch so
    aussehen. Innerhalb eines Kapitels bleibt es eng. */
-.feldgruppe > .unterkapitel + .unterkapitel { margin-top: 16px; }
+.feldgruppe > .unterkapitel + .unterkapitel { margin-top: 14px; }
 .unterkapitel-kopf {
+  font-weight: 700; color: var(--schrift-matt);
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
   font-size: 11.5px; font-weight: 700; text-transform: uppercase;
   letter-spacing: .4px; color: var(--schrift-matt); margin-bottom: 5px;
 }
 
-/* Eine Einwirkung je Zeile */
+/* Eine Einwirkung je Zeile.
+   Die Namensspalte steht auf minmax(0, 1fr): ohne die Null als Untergrenze
+   nimmt ein Gitter die Mindestbreite des Inhalts, und die Zeile wächst über
+   die Karte hinaus, statt den Namen zu kürzen. */
 .einwirkung {
   display: grid;
-  grid-template-columns: 42px 1fr 60px 60px 62px 64px 20px;
-  gap: 5px; align-items: center; margin-bottom: 4px;
+  grid-template-columns: 38px minmax(0, 1fr) 54px 54px 56px 56px 18px;
+  gap: 4px; align-items: center; margin-bottom: 4px;
 }
 /* Im Lastfall ist der Schalter nur ein Beiwerk -- er darf der Zeile nicht die
    Breite nehmen, die die Zahlen brauchen. */
-.einwirkung .schalter-haken .schalter-halb { width: 20px; font-size: 11px; }
+.einwirkung .schalter-haken .schalter-halb { width: 18px; font-size: 11px; }
 /* Ein ausgeschalteter Lastfall bleibt stehen -- blass, damit man sieht, dass
    er da ist und nicht gerechnet wird. */
 .einwirkung.ist-aus { opacity: .5; }
 /* Ein häufiger Lastfall trägt keine Querkraft, ein Knicknachweis keine
    Richtungswahl -- je eine Spalte anders. */
 .einwirkung.ist-knick {
-  grid-template-columns: 42px 1fr 60px 62px 50px 50px 20px;
+  grid-template-columns: 38px minmax(0, 1fr) 56px 58px 46px 46px 18px;
 }
 .einwirkung.ist-kopf {
   font-size: 10.5px; font-weight: 700; text-transform: uppercase;
@@ -463,7 +506,9 @@ input[readonly], input:disabled, select:disabled {
 .einwirkung input[type="number"] { padding: 3px 5px; text-align: right; }
 .einwirkung .ew-name { padding: 3px 6px; font-weight: 500; }
 .einwirkung .schalter-richtung { justify-self: stretch; }
-.einwirkung.ist-haeufig { grid-template-columns: 42px 1fr 62px 62px 66px 20px; }
+.einwirkung.ist-haeufig {
+  grid-template-columns: 38px minmax(0, 1fr) 56px 56px 58px 18px;
+}
 
 .werteliste tr.ist-gewaehlt { background: var(--blau-hell); box-shadow: inset 3px 0 0 var(--blau); }
 
@@ -796,22 +841,15 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .schalter-gunst .schalter-halb.ist-an { background: #c9a227; color: #fff; }
 .lage-y .schalter-gunst .schalter-halb.ist-an { background: #c9a227; }
 
-/* Der Knopf, der die Bewehrung sucht, und die Meldung daneben. Die Meldung
-   steht in der Zeile und nicht als Blase oben rechts: sie gehört zu diesem
-   Knopf und soll stehen bleiben, solange man das Ergebnis ansieht. */
-.automatik-leiste {
-  display: flex; align-items: flex-start; gap: 8px; margin-top: 6px;
-}
-.automatik-meldung {
-  font-size: 11px; line-height: 1.35; color: var(--schrift-zart);
-  flex: 1; min-width: 0;
-}
-.automatik-meldung.ist-gut     { color: var(--gut); }
-.automatik-meldung.ist-schlecht { color: var(--schlecht); }
+/* Der Knopf, der die Bewehrung sucht. Ohne Meldung daneben: das Ergebnis
+   steht danach in den Lagen und in der Zusammenfassung, und ein Satz daneben
+   sagte dasselbe ein zweites Mal. Geht es nicht auf, meldet es die Zeile
+   oben rechts -- dort, wo auch sonst steht, was schiefging. */
+.automatik-leiste { margin-top: 8px; }
 
 /* Eine Analysezeile: Schalter, Name, Art, zwei Zahlen, Richtung, Löschen. */
 .einwirkung.ist-spannung {
-  grid-template-columns: 42px 1fr 86px 58px 58px 46px 20px;
+  grid-template-columns: 38px minmax(0, 1fr) 76px 52px 52px 40px 18px;
 }
 
 /* Die Bilder der Spannung-Dehnung-Analyse. Zwei nebeneinander, solange Platz
@@ -830,3 +868,20 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .sd-bild { width: 300px; max-width: 100%; height: auto; }
 .sd-bild.sd-breit { width: 600px; }
 .sd-legende { font-size: 11px; color: var(--schrift-zart); margin-top: 4px; }
+
+/* Freier Text zur Platte. Über die ganze Breite statt in der Feldspalte:
+   ein Satz ist kein Zahlenwert und passt nicht in 112 Pixel. */
+.beschreibung { margin-top: 10px; }
+.beschreibung > label {
+  display: block; font-size: 13px; margin-bottom: 4px;
+}
+.beschreibung > textarea {
+  width: 100%; padding: 6px 8px; font: inherit; font-size: 12.5px;
+  line-height: 1.45; resize: vertical; min-height: 58px;
+  border: 1px solid var(--rand-stark); border-radius: 5px;
+  background: var(--flaeche); color: var(--schrift);
+}
+.beschreibung > textarea:focus {
+  outline: none; border-color: var(--blau);
+  box-shadow: 0 0 0 2px var(--blau-hell);
+}
