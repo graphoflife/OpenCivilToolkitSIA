@@ -275,11 +275,11 @@ def bewerte(projekt) -> Bewertung:
     """
     Rechnen und sagen, wie weit es noch ist.
 
-    Gezaehlt wird jedes Urteil, das entsteht -- und es entsteht nur, was
-    eingeschaltet ist. Eine zweite Liste, welche Nachweise zaehlen, gaebe es
-    hier also nur, um mit der ersten auseinanderzulaufen; der
-    Duktilitaetsnachweis wird darum nicht hier uebergangen, sondern in
-    :func:`_arbeitskopie` abgeschaltet.
+    Gezaehlt wird jedes Urteil, das nicht still ist -- still heisst
+    ausgeschaltet, und gegen einen Nachweis zu suchen, den niemand fuehrt,
+    hiesse dem Benutzer Bewehrung aufzudraengen, die er nicht verlangt hat.
+    Der Duktilitaetsnachweis faellt so von selbst heraus:
+    :func:`_arbeitskopie` schaltet ihn ab.
     """
     try:
         aufbau = projekt.aufbauen(schnell=True)
@@ -287,13 +287,14 @@ def bewerte(projekt) -> Bewertung:
     except Exception as fehler:      # Eine unmoegliche Bewehrung ist kein
         return Bewertung(math.inf, 0.0, "", 0, str(fehler))  # Absturz, sondern ein Nein.
 
+    zaehlt = [u for u in loesung.urteile if not u.still]
     rueckstand, schlechtester, name = 0.0, math.inf, ""
-    for u in loesung.urteile:
+    for u in zaehlt:
         grad = u.erfuellungsgrad.si
         rueckstand += max(0.0, 1.0 - grad)
         if grad < schlechtester:
             schlechtester, name = grad, f"{u.langname or u.art}: {u.fall}"
-    return Bewertung(rueckstand, schlechtester, name, len(loesung.urteile))
+    return Bewertung(rueckstand, schlechtester, name, len(zaehlt))
 
 
 # ===========================================================================
@@ -524,9 +525,13 @@ def _duktilitaetsbefund(projekt, kennung: str, loesung: "Loesung") -> str:
     # Nur Lagen, die am Ende auch Bewehrung tragen. Eine leer gebliebene Lage
     # kann nicht duktil sein, und «geht nicht auf» waere dort keine Auskunft
     # ueber die gefundene Bewehrung, sondern darueber, dass es keine gibt.
+    #
+    # Unabhaengig von den Schaltern: die Suche geht dem Nachweis aus dem Weg,
+    # also schuldet sie eine Auskunft ueber ihn -- auch dort, wo er gerade
+    # nicht gefuehrt wird.
     eintrag.duktilitaet = [
-        an and (lage.grund.durchmesser > 0 or lage.zulage.durchmesser > 0)
-        for an, lage in zip(eintrag.duktilitaet, eintrag.lagen)]
+        lage.grund.durchmesser > 0 or lage.zulage.durchmesser > 0
+        for lage in eintrag.lagen]
     if not any(eintrag.duktilitaet):
         return ""
     eintrag.kombinationen = []

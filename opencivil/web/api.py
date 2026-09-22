@@ -251,7 +251,12 @@ def loesung_dict(
                 "einwirkung": wert_dict(u.einwirkung) if u.einwirkung else None,
                 "widerstand": wert_dict(u.widerstand) if u.widerstand else None,
             }
-            for u in loesung.urteile
+            # Ohne die stillen: diese Liste sagt, welche Nachweise gefuehrt
+            # wurden, und danach zaehlt die Anzeige oben rechts. Ein stiller
+            # Nachweis stuende dort als «nicht erfuellt», waere aber in keiner
+            # Tabelle zu finden. Wo er hingehoert, steht er: unter der
+            # Zusammenfassung seiner Platte, als Hinweis.
+            for u in loesung.urteile if not u.still
         ],
         "alle_nachweise_erfuellt": loesung.alle_nachweise_erfuellt,
         "ketten": {
@@ -782,6 +787,25 @@ GRAD_SPALTE = 4
 AUSRICHTUNG = "llrrr"
 
 
+def gradtext(urteil) -> str:
+    """
+    Der Erfuellungsgrad als Text -- knapp, aber nie gerundet bis zur Luege.
+
+    Zwei Stellen genuegen fast immer. Nur wo ein Nachweis knapp nicht aufgeht,
+    zeigen sie ``1.00`` und sagen damit das Gegenteil des Urteils daneben --
+    einmal rot hinterlegt, einmal mit «nicht erfuellt» im Satz davor. Dann
+    kommt eine Stelle dazu, abgeschnitten statt gerundet: der Grad soll
+    kleiner als eins bleiben, weil er das ist.
+    """
+    grad = urteil.erfuellungsgrad.si
+    if not math.isfinite(grad):
+        return r"\infty"
+    text = f"{grad:.2f}"
+    if not urteil.erfuellt and float(text) >= 1.0:
+        text = f"{math.floor(grad * 1000) / 1000:.3f}"
+    return text
+
+
 def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
     """
     Je Platte die Nachweistabelle -- Zeilen **und** ihr LaTeX.
@@ -819,9 +843,16 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
 
     ergebnis: Dict[str, Any] = {}
     for kennung, qs in aufbau.querschnitte.items():
-        urteile = [u for u in loesung.urteile
-                   if u.raum == qs.id or u.raum.startswith(f"{qs.id}.")]
-        if not urteile:
+        eigene = [u for u in loesung.urteile
+                  if u.raum == qs.id or u.raum.startswith(f"{qs.id}.")]
+        urteile = [u for u in eigene if not u.still]
+        # Ausgeschaltete Nachweise stehen nicht in der Tabelle -- aber wenn
+        # einer nicht aufgeht, soll man es erfahren. Ohne Widerstand ist er
+        # gar nicht fuehrbar (etwa an einer unbewehrten Lage); das ist keine
+        # Auskunft ueber die Bewehrung und bleibt darum draussen.
+        stille = [u for u in eigene
+                  if u.still and not u.erfuellt and u.widerstand is not None]
+        if not urteile and not stille:
             continue
         zeilen = [
             {
@@ -832,8 +863,7 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
                     als_text(u.fall) if u.fall else r"\text{--}",
                     zelle(u.widerstand),
                     zelle(u.einwirkung),
-                    (f"{u.erfuellungsgrad.si:.2f}"
-                     if math.isfinite(u.erfuellungsgrad.si) else r"\infty"),
+                    gradtext(u),
                 ],
                 "erfuellt": u.erfuellt,
                 "begruendung": u.begruendung,
@@ -851,6 +881,14 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
             "latex": tabelle(kopf, [z["zellen"] for z in zeilen], AUSRICHTUNG),
             "angaben": _plattenangaben(qs),
             "bewehrung": _bewehrungsuebersicht(qs),
+            # Der Grad kommt fertig gesetzt: welche Stelle noetig ist, damit
+            # er dem Wort «nicht erfuellt» nicht widerspricht, weiss hier
+            # dieselbe Stelle wie fuer die Tabelle.
+            "stille": [
+                {"nachweis": u.langname or u.art, "fall": u.fall,
+                 "grad": gradtext(u), "begruendung": u.begruendung}
+                for u in stille
+            ],
         }
     return ergebnis
 

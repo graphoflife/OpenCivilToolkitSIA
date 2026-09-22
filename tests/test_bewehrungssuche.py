@@ -283,10 +283,17 @@ class TestDuktilitaetBleibtDraussen(unittest.TestCase):
         ergebnis = suche.suche(platte(), "q1", modus=suche.Suchmodus.GRUND_MIT)
         self.assertIn("geht damit auf", ergebnis.duktilitaet)
 
-    def test_die_arbeitskopie_kennt_keinen_duktilitaetsnachweis(self):
+    def test_die_arbeitskopie_zaehlt_keinen_duktilitaetsnachweis(self):
+        """
+        Gerechnet wird er auch dort -- er ist nie ganz weg. Aber er ist still,
+        und die Suche zählt nur, was laut ist: sonst suchte sie gegen einen
+        Nachweis, gegen den sie kein Mittel hat.
+        """
         kopie = suche._arbeitskopie(platte(), "q1", kraefte=True, leeren=False)
         self.assertFalse(any(kopie.querschnitt("q1").duktilitaet))
-        self.assertFalse([u for u in _urteile(kopie) if u.art == "D"])
+        dukt = [u for u in _urteile(kopie) if u.art == "D"]
+        self.assertTrue(dukt)
+        self.assertTrue(all(u.still for u in dukt))
 
 
 class TestEineLageWirdNichtErfunden(unittest.TestCase):

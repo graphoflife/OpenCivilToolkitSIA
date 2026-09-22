@@ -36,7 +36,10 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field, replace
-from typing import Any, Callable, Dict, Iterator, Mapping, Optional, Sequence, Tuple, Union
+from typing import (
+    Any, Callable, Dict, Iterable, Iterator, Mapping, Optional, Sequence,
+    Tuple, Union,
+)
 
 from opencivil.core.einheiten import EINHEITSLOS, EmpirischesErgebnis, Groesse
 from opencivil.core.protokoll import Abschnitt, Protokoll
@@ -566,6 +569,15 @@ class NachweisUrteil:
     einer Null erraten muessen.
     """
 
+    still: bool = False
+    """
+    Ob dieses Urteil aus einem ausgeschalteten Nachweis stammt.
+
+    Es zaehlt dann nicht in der Zusammenfassung und nicht im Gesamturteil --
+    sichtbar wird es nur als Hinweis darunter, und auch nur, wenn es nicht
+    aufgeht.
+    """
+
     raum: str = ""
     """
     Namensraum des Nachweises, der dieses Urteil gefaellt hat.
@@ -605,9 +617,51 @@ class Nachweis(Berechnung):
     zur Verfuegung -- der Bericht kann daraus die Nachweistabelle bauen.
     """
 
+    still: bool = False
+    """
+    Ob der Nachweis mitrechnet, ohne in die Herleitung zu kommen.
+
+    Ausgeschaltete Nachweise verschwinden nicht, sie werden still: gerechnet
+    wird weiter, in der Zusammenfassung stehen sie nicht, und wenn einer von
+    ihnen nicht aufgeht, steht darunter ein Hinweis. Das ist der Unterschied
+    zwischen «interessiert mich gerade nicht» und «gilt nicht» -- und nur das
+    erste trifft auf einen Schalter zu, den jemand umgelegt hat.
+    """
+
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.urteile: list[NachweisUrteil] = []
+        self.stille_faelle: set = set()
+        """
+        Welche einzelnen Faelle still bleiben, obwohl der Nachweis laeuft.
+
+        Ein Nachweis deckt oft mehrere Faelle ab -- vier Lagen, mehrere
+        Lastfaelle --, und eingeschaltet wird jeder fuer sich. Ohne diese
+        Menge haette ein einzelner Haken alle vier Lagen in die Tabelle
+        gehoben; der Schalter neben den anderen dreien waere wirkungslos
+        geworden, ohne es zu zeigen.
+
+        Worauf sich die Schluessel beziehen, entscheidet der Nachweis --
+        Lagennummer oder Fallname. Gefragt wird ueber :meth:`leise`, und
+        gefuellt ueber :meth:`stillstellen`.
+        """
+
+    def leise(self, schluessel: Any) -> bool:
+        """Ob dieser Fall nur mitrechnet: einzeln oder mit dem ganzen Nachweis."""
+        return self.still or schluessel in self.stille_faelle
+
+    def stillstellen(self, alle: Iterable[Any], laut: Iterable[Any]) -> None:
+        """
+        Festlegen, welche Faelle in der Herleitung stehen und welche nur
+        mitrechnen.
+
+        Sind *alle* still, schweigt der Nachweis ganz -- sonst stuende seine
+        Ueberschrift samt Ansatz ueber einer Herleitung ohne einen einzigen
+        Fall darunter.
+        """
+        alle, laut = set(alle), set(laut)
+        self.stille_faelle = alle - laut
+        self.still = not (alle & laut)
 
     @abstractmethod
     def pruefe(self, e: Eingaben, p: Protokoll) -> Tuple[Mapping[str, Groesse], Sequence[NachweisUrteil]]:
@@ -621,7 +675,10 @@ class Nachweis(Berechnung):
         groessen, urteile = self.pruefe(e, p)
         # Der Namensraum wird hier gestempelt und nicht von den Unterklassen
         # mitgegeben: er ist immer derselbe, naemlich der des Nachweises.
-        self.urteile = [replace(u, raum=self.id) for u in urteile]
+        # Still ist ein Urteil, wenn der ganze Nachweis es ist oder wenn die
+        # Pruefung es einzeln so gestempelt hat -- sie kennt ihre Faelle.
+        self.urteile = [replace(u, raum=self.id, still=self.still or u.still)
+                        for u in urteile]
         return groessen
 
     @property

@@ -28,7 +28,7 @@ import { auswahl, el, ersetzen, melden, zahlfeld } from './dom.js';
  */
 const DURCHMESSER = [6, 8, 10, 12, 14, 16, 18, 20, 22, 26, 30, 34, 40];
 import { span } from './mathe.js';
-import { automatikBlock, nachweiseBlock } from './nachweise.js';
+import { analysenBlock, automatikBlock, nachweiseBlock } from './nachweise.js';
 import {
   aendern, gewaehltesMaterial, gewaehlterQuerschnitt, kennwertId, projektAendern,
   zustand,
@@ -275,9 +275,9 @@ function postenZeile(querschnitt, nummer, welcher, beschriftung) {
   });
 
   return el('div.postenzeile', { class: leer ? 'ist-leer' : '' }, [
-    el('button.postenweg', {
+    el('button.weg', {
       text: '×',
-      class: leer ? '' : 'ist-scharf',
+      class: leer ? 'ist-stumpf' : '',
       disabled: leer,
       title: `${beschriftung}bewehrung der ${nummer}. Lage entfernen`,
       on: { click: () => aendern((x) => { x.durchmesser = 0; }) },
@@ -478,9 +478,9 @@ function querkraftBlock(querschnitt) {
     ]),
 
     el('div.postenzeile.postenzeile-quer', { class: leer ? 'ist-leer' : '' }, [
-      el('button.postenweg', {
+      el('button.weg', {
         text: '×',
-        class: leer ? '' : 'ist-scharf',
+        class: leer ? 'ist-stumpf' : '',
         disabled: leer,
         title: 'Querkraftbewehrung entfernen',
         on: { click: () => aendern((x) => { x.durchmesser = 0; }) },
@@ -631,8 +631,6 @@ function plattenEditor(querschnitt) {
           el('label', { text: 'Beschreibung' }),
           el('textarea', {
             rows: 3, value: querschnitt.beschreibung || '',
-            placeholder: 'Wo die Platte liegt, woher die Schnittgrössen '
-              + 'stammen, was noch zu klären ist …',
             on: {
               change: (e) => aendern((q) => { q.beschreibung = e.target.value; }),
             },
@@ -658,6 +656,7 @@ function plattenEditor(querschnitt) {
     ]),
 
     nachweiseBlock(querschnitt),
+    analysenBlock(querschnitt),
   ];
 }
 

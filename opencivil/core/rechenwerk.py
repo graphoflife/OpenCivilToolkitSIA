@@ -127,7 +127,13 @@ class Loesung:
 
     @property
     def alle_nachweise_erfuellt(self) -> bool:
-        return all(u.erfuellt for u in self.urteile)
+        """
+        Ohne die stillen: sie sind ausgeschaltet und zaehlen nicht mit.
+
+        Sonst staende oben rechts «nicht erfuellt» wegen eines Nachweises,
+        den niemand fuehrt -- und man faende in der Tabelle nichts dazu.
+        """
+        return all(u.erfuellt for u in self.urteile if not u.still)
 
     def kette(self, wert_id: str) -> List[str]:
         """
@@ -481,7 +487,12 @@ class _Lauf:
         grund: str,
         echte_wahl: bool,
     ) -> None:
-        protokoll = self.loesung.protokoll
+        # Ein stiller Nachweis rechnet mit, schreibt aber in einen Block, den
+        # niemand liest. Er ist ausgeschaltet und soll darum nicht in der
+        # Herleitung stehen -- sein Ergebnis wird trotzdem gebraucht, denn
+        # unter der Zusammenfassung steht ein Hinweis, wenn er nicht aufgeht.
+        still = getattr(berechnung, "still", False)
+        protokoll = Protokoll() if still else self.loesung.protokoll
 
         # Ueberschrift setzen, sobald der Abschnitt wechselt. Welche Berechnung
         # eines Bauteils zuerst laeuft, entscheidet die Abhaengigkeitsfolge --
@@ -491,7 +502,7 @@ class _Lauf:
         # Abschnitt -- sonst stuende eine Ueberschrift ohne alles darunter.
         abschnitt = berechnung.abschnitt
         if (abschnitt is not None and abschnitt.raum != self._abschnitt
-                and not getattr(berechnung, "stumm", False)):
+                and not still and not getattr(berechnung, "stumm", False)):
             protokoll.titel(abschnitt.titel, raum=abschnitt.raum)
             self._abschnitt = abschnitt.raum
 

@@ -581,12 +581,15 @@ class ZwaengungBiegung(Nachweis):
         self.ergebnisse = []
 
         for lage in self.lagen:
+            # Ausgeschaltete Lagen rechnen mit und schweigen dabei.
+            leise = self.leise(lage.nummer)
             erg = self._eine_lage(e, lage, h=h, b=b, f_ctm=f_ctm, E_cm=E_cm, phi=phi)
             self.ergebnisse.append(erg)
-            self._protokoll_lage(p, erg, b=b, f_ctm=f_ctm)
+            if not leise:
+                self._protokoll_lage(p, erg, b=b, f_ctm=f_ctm)
             ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
                 min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
-            urteile.append(self._urteil(erg))
+            urteile.append(self._urteil(erg, still=leise))
 
         return ergebnis, urteile
 
@@ -638,7 +641,8 @@ class ZwaengungBiegung(Nachweis):
             f"M_Riss = {M_Riss / 1e3:.1f} kNm.")
         return erg
 
-    def _urteil(self, erg: Momentlagenergebnis) -> NachweisUrteil:
+    def _urteil(self, erg: Momentlagenergebnis, *,
+                still: bool = False) -> NachweisUrteil:
         nummer = erg.lage.nummer
         r = self.richtung.value
         einwirkung = WertDef(
@@ -662,6 +666,7 @@ class ZwaengungBiegung(Nachweis):
             hinweis=erg.hinweis,
             einwirkung=einwirkung if erg.machbar else None,
             widerstand=widerstand if erg.machbar else None,
+            still=still,
         )
 
     # -- Mitschrift ---------------------------------------------------------

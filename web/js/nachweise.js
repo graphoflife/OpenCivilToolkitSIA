@@ -16,7 +16,7 @@
  */
 
 import { api } from './api.js';
-import { feld, hakenSchalter, lagenwahl, richtungVon, richtungsWahl } from './bausteine.js';
+import { erklaerung, feld, hakenSchalter, lagenwahl, richtungVon, richtungsWahl } from './bausteine.js';
 import { auswahl, el, melden, zahlfeld } from './dom.js';
 import { aendern, projektAendern, zustand } from './zustand.js';
 
@@ -44,6 +44,21 @@ const laufendeSuche = new Set();
  */
 function anfuegenKnopf(text, tun) {
   return el('button.knopf-anfuegen', { text: `+ ${text}`, on: { click: tun } });
+}
+
+/**
+ * Was am Querschnitt ausgewertet wird, ohne dass es ein Nachweis waere.
+ *
+ * Eigenes Kapitel, weil hier nichts gegen etwas gehalten wird: kein
+ * Erfüllungsgrad, kein Urteil. Unter den Nachweisen zu stehen hiesse, den
+ * Unterschied zu verwischen, um den es dabei geht.
+ */
+export function analysenBlock(querschnitt) {
+  return el('div.feldgruppe', {}, [
+    el('h3', {}, [el('span', { text: 'Weitere Analysen' }),
+      el('span', { text: 'kein Nachweis' })]),
+    spannungsBlock(querschnitt),
+  ]);
 }
 
 /** Die Nachweiskapitel einer Platte, von der Tragsicherheit bis zum Riss. */
@@ -82,8 +97,13 @@ export function nachweiseBlock(querschnitt) {
       feld: 'duktilitaet',
       // Die beiden äusseren Lagen: sie tragen Feld- und Stützmoment, und dort
       // entscheidet sich, ob der Querschnitt sein Versagen ankündigt.
-      vorgabe: [true, false, false, true],
-      hinweis: 'x / d ≤ 0.35 bei M_Ed = 0',
+      vorgabe: [false, false, false, false],
+      hinweis: {
+        text: 'Begrenzt die Druckzonenhöhe, damit der Querschnitt sein '
+          + 'Versagen ankündigt: die Bewehrung fliesst, bevor der Beton '
+          + 'bricht. Gerechnet ohne Normalkraft.',
+        formel: 'x / d ≤ 0.35   bei M_Ed = 0',
+      },
       beschriftung: (n) => `Duktilität ${n}. Lage`,
       was: 'Nachweis',
     }),
@@ -91,14 +111,19 @@ export function nachweiseBlock(querschnitt) {
     lagenkapitel(querschnitt, {
       titel: 'Nachweise gegen sprödes Versagen',
       feld: 'sproede_lagen',
-      hinweis: 'M_Rd(N_Ed = 0) ≥ M_Riss',
+      vorgabe: [false, false, false, false],
+      hinweis: {
+        text: 'Die Bewehrung muss aufnehmen, was der Beton im Augenblick des '
+          + 'Reissens abgibt. Sonst reisst und versagt der Querschnitt '
+          + 'gleichzeitig, ohne Vorankündigung.',
+        formel: 'M_Rd(N_Ed = 0) ≥ M_Riss = f_ct,eff · h²·b / 6',
+      },
       beschriftung: (n) => `Rissmoment ${n}. Lage`,
       was: 'Nachweis',
     }),
 
     mindestbewehrungsBlock(querschnitt),
     knickBlock(querschnitt),
-    spannungsBlock(querschnitt),
   ]);
 }
 
@@ -125,7 +150,7 @@ function einwirkungZeile(querschnitt, index) {
     zahl('V_Ed', 'Querkraft in kN/m – 0 heisst: kein Querkraftnachweis'),
     richtungsWahl(k.richtung || 'beide',
       (wert) => aendern((x) => { x.richtung = wert; })),
-    el('button.knopf.knopf-zart.knopf-gefahr', {
+    el('button.weg', {
       text: '×', title: 'Einwirkung entfernen',
       on: {
         click: () => projektAendern((p) => {
@@ -159,7 +184,7 @@ function lagenkapitel(querschnitt, {
   return el('div.unterkapitel', {}, [
     el('div.unterkapitel-kopf', {}, [
       el('span', { text: titel }),
-      hinweis ? el('span.kurvenhinweis', { text: hinweis }) : null,
+      hinweis ? erklaerung(hinweis.text, hinweis.formel) : null,
     ]),
     ...[1, 2, 3, 4].map((nummer) => {
       const lage = querschnitt.lagen[nummer - 1];
@@ -203,8 +228,8 @@ function knickBlock(querschnitt) {
       ? el('div.einwirkung.ist-knick.ist-kopf', {}, [
         el('span'),
         el('span', { text: 'Bezeichnung' }),
-        el('span', { text: 'N_Ed [kN]' }),
-        el('span', { text: 'M_Ed,1 [kNm]' }),
+        el('span', { text: 'N_Ed,x [kN]' }),
+        el('span', { text: 'M_Ed,1,x [kNm]' }),
         el('span', { text: 'l [m]' }),
         el('span', { text: 'l_cr [m]' }),
         el('span'),
@@ -241,11 +266,11 @@ function knickZeile(querschnitt, index) {
       type: 'text', value: k.name, title: 'Bezeichnung des Knicknachweises',
       on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
     }),
-    zahl('N_Ed', 'Druckkraft in kN – negativ', 50),
-    zahl('M_Ed_1', 'Moment 1. Ordnung in kNm', 10),
+    zahl('N_Ed', 'Druckkraft in kN – negativ, in x-Richtung', 50),
+    zahl('M_Ed_1', 'Moment 1. Ordnung in kNm, um die y-Achse (Tragrichtung x)', 10),
     zahl('laenge', 'Systemlänge in m – geht in die Schiefstellung ein', 0.5),
     zahl('knicklaenge', 'Knicklänge in m', 0.5),
-    el('button.knopf.knopf-zart.knopf-gefahr', {
+    el('button.weg', {
       text: '×', title: 'Knicknachweis entfernen',
       on: {
         click: () => projektAendern((p) => {
@@ -277,12 +302,21 @@ function mindestbewehrungsBlock(querschnitt) {
 
   // Der Zeilentitel sagt schon, was der Schalter tut. Die Spalte rechts
   // wiederholte das in einem ganzen Satz und machte die Tafel breit.
-  const zwaengung = (feld, beschriftung) => el('div.duktilitaetszeile.ist-breit', {}, [
-    hakenSchalter(!!querschnitt[feld],
-      (wert) => aendern((q) => { q[feld] = wert; }), 'Zwängung'),
-    el('span.postenname', { text: beschriftung }),
-    el('span.kurvenhinweis', { text: '' }),
-  ]);
+  // Mit Richtungsmarke wie die Lagenzeilen: dieselbe Angabe soll überall
+  // gleich aussehen, sonst liest man sie zweimal verschieden.
+  const zwaengung = (feld, beschriftung, richtung = null) => el(
+    `div.duktilitaetszeile${richtung ? '' : '.ist-breit'}`, {}, [
+      hakenSchalter(!!querschnitt[feld],
+        (wert) => aendern((q) => { q[feld] = wert; }), 'Zwängung'),
+      richtung
+        ? el('span.richtung', {
+          text: richtung, class: `lage-${richtung}`,
+          title: `Zwängung in ${richtung}-Richtung`,
+        })
+        : null,
+      el('span.postenname', { text: beschriftung }),
+      el('span.kurvenhinweis', { text: '' }),
+    ]);
 
   return el('div.unterkapitel', {}, [
     el('div.unterkapitel-kopf', {}, [
@@ -290,23 +324,35 @@ function mindestbewehrungsBlock(querschnitt) {
     ]),
 
     el('div.unterkapitel-kopf', { style: { marginTop: '8px' } }, [
-      el('span', { text: 'Begrenzung der Rissbreiten unter aufgezwungenen '
-        + 'Verformungen' }),
+      el('span', { text: 'Rissbreiten Begrenzung bei Zwang' }),
+      erklaerung(
+        'Wird eine Verformung aufgezwungen – Schwinden, Temperatur, eine '
+        + 'Stütze, die nicht nachgibt –, reisst der Beton, und die Bewehrung '
+        + 'muss die freiwerdende Kraft aufnehmen, ohne dass der Riss zu '
+        + 'breit wird. Die zulässige Stahlspannung folgt aus der '
+        + 'Rissbreite nach Tabelle 17.',
+        'σ_s,adm ≥ N_Riss / A_s   mit   N_Riss = h_eff/2 · b · f_ct,eff'),
     ]),
-    zwaengung('zwaengung_x', 'Zwängung auf Normalkraft x'),
-    zwaengung('zwaengung_y', 'Zwängung auf Normalkraft y'),
+    zwaengung('zwaengung_x', 'Zwängung auf Normalkraft', 'x'),
+    zwaengung('zwaengung_y', 'Zwängung auf Normalkraft', 'y'),
     zwaengung('zwaengung_begrenzt', 'Begrenzung auf 500 mm'),
 
     // Ohne eigene Überschrift: die vier Zeilen schreiben ihren Nachweis selbst
     // aus und stehen unter derselben Aufschrift wie die Normalkraft-Zwängung.
     ...lagenkapitel(querschnitt, {
       feld: 'zwaengung_biegung_lagen',
+      vorgabe: [false, false, false, false],
       beschriftung: (n) => `Zwängung auf Biegung ${n}. Lage`,
       was: 'Nachweis',
     }).childNodes,
 
     el('div.unterkapitel-kopf', { style: { marginTop: '8px' } }, [
       el('span', { text: 'Verhindern des Fliessens für häufige Lastfälle' }),
+      erklaerung(
+        'Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst '
+        + 'bleiben Risse und Durchbiegung dauerhaft. Gerechnet am gerissenen '
+        + 'Querschnitt, gezählt nur die gezogene Bewehrung.',
+        'σ_s ≤ f_yd − 80 N/mm²'),
     ]),
 
     el('div.duktilitaetszeile.ist-breit', {}, [
@@ -376,7 +422,7 @@ function haeufigZeile(querschnitt, index) {
     }),
     richtungsWahl(k.richtung || 'beide',
       (wert) => aendern((x) => { x.richtung = wert; })),
-    el('button.knopf.knopf-zart.knopf-gefahr', {
+    el('button.weg', {
       text: '×', title: 'Häufigen Lastfall entfernen',
       on: {
         click: () => projektAendern((p) => {
@@ -604,7 +650,7 @@ function spannungsZeile(querschnitt, index) {
     ])),
     richtungsWahl(k.richtung || 'x', (wert) => aendern((x) => { x.richtung = wert; }),
       ['x', 'y']),
-    el('button.knopf.knopf-zart.knopf-gefahr', {
+    el('button.weg', {
       text: '×', title: 'Analyse entfernen',
       on: {
         click: () => projektAendern((p) => {

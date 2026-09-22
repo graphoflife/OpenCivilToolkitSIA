@@ -29,9 +29,21 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         self.assertFalse([n for n in gefunden if n.startswith("Stahlspannung")])
 
     def test_bei_erhoehter_anforderung_laeuft_er(self):
+        """
+        Er läuft -- still, solange die 70 % nicht eingeschaltet sind. Die
+        Abschätzung ist bequem, aber nicht selbstverständlich; sie ungefragt
+        in die Tabelle zu stellen hiesse, sie zur Norm zu erklären.
+        """
         aufbau, gefunden = urteile(self.projekt("erhoeht"))
         self.assertEqual(sorted(aufbau.spannung), ["q1.x", "q1.y"])
         self.assertTrue([n for n in gefunden if n.startswith("Stahlspannung")])
+        self.assertTrue(all(n.still for n in aufbau.spannung.values()))
+
+    def test_mit_den_siebzig_prozent_wird_er_laut(self):
+        aufbau, _ = urteile(
+            self.projekt("erhoeht", haeufige_aus_tragsicherheit=True))
+        laut = [u.fall for u in aufbau.spannung["q1.x"].urteile if not u.still]
+        self.assertIn("Feld (70 %)", laut)
 
     def test_die_grenze_ist_f_yd_minus_80(self):
         _, gefunden = urteile(self.projekt("hoch"))
@@ -57,6 +69,11 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         self.assertAlmostEqual(faelle["Feld (70 %)"].M_Ed.si / 1e3, 70.0, delta=0.01)
 
     def test_eigene_lastfaelle_statt_der_ableitung(self):
+        """
+        Ohne die 70 % zählen nur die eigenen Fälle. Gerechnet wird die
+        Abschätzung trotzdem -- still, damit ein Hinweis stehen kann, wenn sie
+        nicht aufgeht.
+        """
         from opencivil.projekt import HaeufigEintrag
 
         projekt = self.projekt("hoch")
@@ -64,8 +81,10 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         q.haeufige_aus_tragsicherheit = False
         q.haeufige = [HaeufigEintrag("Gebrauch", M_Ed=60.0, N_Ed=0.0, richtung="x")]
         aufbau, _ = urteile(projekt)
-        namen = [e.fall.name for e in aufbau.spannung["q1.x"].ergebnisse]
-        self.assertEqual(namen, ["Gebrauch"])
+        spannung = aufbau.spannung["q1.x"]
+        self.assertEqual([u.fall for u in spannung.urteile if not u.still],
+                         ["Gebrauch"])
+        self.assertIn("Feld (70 %)", [e.fall.name for e in spannung.ergebnisse])
 
     def test_mehr_moment_gibt_mehr_spannung(self):
         wenig = self.projekt("hoch")

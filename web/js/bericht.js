@@ -369,6 +369,15 @@ function zusammenfassung(loesung) {
           // unbewehrten Tragrichtung sechsmal derselbe Satz.
           ...hinweiseBuendeln(tabelle.zeilen).map(([grund, namen]) =>
             el('p.hinweis', { text: `${namen.join(', ')}: ${grund}` })),
+          // Ausgeschaltete Nachweise: sie laufen mit, stehen aber nicht in
+          // der Tabelle und nicht in der Herleitung. Geht einer nicht auf,
+          // steht es hier -- leise, denn geführt wird er ja nicht.
+          ...(tabelle.stille || []).map((s) => el('p.stiller-hinweis', {
+            text: `${s.nachweis} – ${s.fall}: nicht erfüllt`
+              + (s.grad ? ` (α_eff = ${s.grad})` : '')
+              + '. Dieser Nachweis ist ausgeschaltet und steht nicht in der '
+              + 'Herleitung.',
+          })),
         ])
         : el('div.leer', { text: 'Für diese Platte wurde kein Nachweis gerechnet.' }),
       plattenkennzahlen(eintrag, loesung),

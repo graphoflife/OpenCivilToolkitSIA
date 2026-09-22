@@ -103,3 +103,24 @@ export function hakenSchalter(an, setzen, was = 'Nachweis') {
     }),
   ]);
 }
+
+/**
+ * Ein Fragezeichen, das seine Erklärung beim Darüberfahren zeigt.
+ *
+ * Die Erklärungen standen vorher offen neben den Kapitelüberschriften --
+ * «x / d ≤ 0.35 bei M_Ed = 0» und ähnliches. Richtig, aber laut: wer die
+ * Maske bedient, liest sie beim ersten Mal und danach nie wieder, und
+ * breiter machen sie die Tafel jedes Mal.
+ *
+ * `text` ist die kurze Fassung, `formel` die Bedingung in einer Zeile.
+ */
+export function erklaerung(text, formel = '') {
+  const zettel = el('span.erklaerung', { title: `${text}${formel ? `\n\n${formel}` : ''}` }, [
+    el('span.erklaerung-zeichen', { text: '?' }),
+    el('span.erklaerung-blase', {}, [
+      el('span', { text }),
+      formel ? el('code', { text: formel }) : null,
+    ]),
+  ]);
+  return zettel;
+}

@@ -85,15 +85,22 @@ button, input, select { font: inherit; color: inherit; }
 .marke span { color: #6ea8fe; }               /* CivilToolkit in angenehmem Blau */
 .marke em    { color: #ff8a7a; font-style: normal; font-weight: 800; }
 
-.projektname {
+/* Das Feld steht in der dunklen Kopfleiste und nicht im Editor -- also helle
+   Schrift auf durchscheinendem Grund. Als `input.projektname` geschrieben,
+   damit es den allgemeinen Eingaberegeln weiter unten standhält: ein
+   Typselektor mit Attribut sticht sonst die blosse Klasse, und dann stünde
+   weisse Schrift auf hellblauem Grund. */
+input.projektname {
   flex: 1; min-width: 120px; max-width: 420px;
   padding: 6px 10px;
   border: 1px solid rgba(255,255,255,.18); border-radius: var(--radius);
   background: rgba(255,255,255,.10); color: #fff; font-weight: 500;
 }
-.projektname::placeholder { color: rgba(255,255,255,.5); }
-.projektname:hover { background: rgba(255,255,255,.16); }
-.projektname:focus { background: #fff; color: var(--schrift); border-color: var(--blau); outline: none; }
+input.projektname::placeholder { color: rgba(255,255,255,.5); }
+input.projektname:hover { background: rgba(255,255,255,.16); }
+input.projektname:focus {
+  background: #fff; color: var(--schrift); border-color: var(--blau); outline: none;
+}
 
 .kopf-knoepfe { display: flex; gap: 6px; margin-left: auto; }
 
@@ -267,17 +274,24 @@ button, input, select { font: inherit; color: inherit; }
 .feld > label { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .feld .einheit { font-size: 12px; color: var(--schrift-zart); }
 
-input[type="text"], input[type="number"], select {
-  width: 100%; padding: 5px 8px;
-  border: 1px solid var(--rand-stark); border-radius: 5px; background: var(--flaeche);
+/* Alles, was man anfasst, sieht gleich aus: Zahlenfeld, Namensfeld,
+   Auswahlliste, Textkasten. Vorher trugen nur die Zahlenfelder den blauen
+   Akzent, und in derselben Zeile stand dann ein weisses Namensfeld daneben --
+   zwei Eingaben, die verschieden aussahen, ohne verschieden zu sein.
+
+   Der Textkasten steht mit in dieser Regel und nicht in einer eigenen: eine
+   zweite Stelle, die sagt, wie eine Eingabe aussieht, weicht mit dem ersten
+   Rundungswert davon ab. Genau so war der Kasten unter «Beschreibung» weiss
+   geblieben, als alles andere blau wurde. */
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%; padding: 5px 8px; border-radius: 5px;
+  border: 1px solid var(--blau-rand); background: var(--blau-zart);
+  color: var(--schrift);
 }
 
-/* Zahlenfelder mit leichtem blauem Akzent -- überall gleich, ob Material oder
-   Platte. Sie sind das, was man tatsächlich anfasst; Namensfelder und
-   Auswahllisten bleiben unbunt. */
-input[type="number"] { background: var(--blau-zart); border-color: var(--blau-rand); }
-
-input:focus, select:focus { outline: none; border-color: var(--blau); box-shadow: 0 0 0 2px var(--blau-hell); }
+input:focus, select:focus, textarea:focus {
+  outline: none; border-color: var(--blau); box-shadow: 0 0 0 2px var(--blau-hell);
+}
 input[readonly], input:disabled, select:disabled {
   background: var(--flaeche-2); border-color: var(--rand-stark);
   color: var(--schrift-matt); cursor: not-allowed;
@@ -349,15 +363,20 @@ input[readonly], input:disabled, select:disabled {
    Knopf mit hellrotem Grund -- als blosses Zeichen war er kaum zu sehen und
    sah nicht wie etwas Drückbares aus. Farbig nur, solange es etwas zu
    entfernen gibt: sonst verspräche er eine Wirkung, die er nicht hat. */
-.postenweg {
+/* Der eine Löschknopf. Er stand einmal nur bei den Bewehrungslagen; jede
+   Liste hat sich danach ihren eigenen gebaut, und am Ende gab es drei, die
+   verschieden aussahen und dasselbe taten. Wer eine Zeile zum Löschen
+   braucht, nimmt diesen -- neue werden keine mehr definiert. */
+.weg {
   width: 16px; height: 16px; padding: 0; border: none; border-radius: 50%;
-  background: transparent; color: var(--rand-stark);
+  background: var(--schlecht-hell); color: var(--schlecht);
   font-size: 11px; font-weight: 700; line-height: 1; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
 }
-.postenweg.ist-scharf { background: var(--schlecht-hell); color: var(--schlecht); }
-.postenweg.ist-scharf:hover { background: var(--schlecht); color: #fff; }
-.postenweg:disabled { cursor: default; }
+.weg:hover:not(:disabled) { background: var(--schlecht); color: #fff; }
+/* Stumpf: es gibt nichts zu löschen. Sichtbar bleibt er trotzdem, damit die
+   Zeile ihre Breite behält und nicht bei jedem Durchmesser springt. */
+.weg.ist-stumpf { background: transparent; color: var(--rand-stark); cursor: default; }
 
 /* Eine Lage, ein Schalter: Haken oder Kreuz. Ohne Richtungsmarke -- bei der
    Zwängung und der 70-%-Regel gibt es keine -- bekommt der Name ihren Platz. */
@@ -875,15 +894,12 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .beschreibung > label {
   display: block; font-size: 13px; margin-bottom: 4px;
 }
+/* Nur was am Textkasten anders ist als an jeder anderen Eingabe: mehr Hoehe,
+   verstellbar, etwas kleinere Schrift. Farbe und Rand kommen von dort, wo
+   sie fuer alle stehen. */
 .beschreibung > textarea {
-  width: 100%; padding: 6px 8px; font: inherit; font-size: 12.5px;
-  line-height: 1.45; resize: vertical; min-height: 58px;
-  border: 1px solid var(--rand-stark); border-radius: 5px;
-  background: var(--flaeche); color: var(--schrift);
-}
-.beschreibung > textarea:focus {
-  outline: none; border-color: var(--blau);
-  box-shadow: 0 0 0 2px var(--blau-hell);
+  font: inherit; font-size: 12.5px; line-height: 1.45;
+  resize: vertical; min-height: 58px;
 }
 
 /* Wie viele Diagramme nebeneinander. Der Schalter steht über allem, weil er
@@ -927,3 +943,38 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .einwirkung.ist-spannung { align-items: end; }
+
+/* Fragezeichen mit Erklärung. Die Blase hängt am Zeichen und erscheint beim
+   Darüberfahren -- sie nimmt keinen Platz in der Zeile, solange niemand
+   fragt. `title` trägt denselben Text noch einmal, damit die Erklärung auch
+   ohne Maus erreichbar bleibt. */
+.erklaerung { position: relative; display: inline-flex; flex: none; }
+.erklaerung-zeichen {
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--blau-hell); color: var(--blau);
+  font-size: 10px; font-weight: 800; line-height: 15px; text-align: center;
+  cursor: help; user-select: none;
+}
+.erklaerung:hover .erklaerung-zeichen { background: var(--blau); color: #fff; }
+.erklaerung-blase {
+  position: absolute; right: 0; top: 20px; z-index: 40;
+  display: none; flex-direction: column; gap: 6px;
+  width: max-content; max-width: 280px; padding: 8px 10px;
+  border: 1px solid var(--rand-stark); border-radius: var(--radius);
+  background: var(--flaeche); box-shadow: 0 6px 18px rgba(20, 32, 48, .16);
+  font-size: 11.5px; line-height: 1.45; color: var(--schrift-matt);
+  font-weight: 400; text-transform: none; letter-spacing: 0;
+}
+.erklaerung:hover .erklaerung-blase { display: flex; }
+.erklaerung-blase code {
+  font-size: 11.5px; color: var(--schrift); background: var(--flaeche-2);
+  padding: 4px 6px; border-radius: 4px; white-space: pre-wrap;
+}
+
+/* Ein ausgeschalteter Nachweis, der nicht aufgeht. Leiser als ein echtes
+   Urteil -- geführt wird er ja nicht --, aber deutlich genug, dass man ihn
+   nicht überliest. */
+.stiller-hinweis {
+  font-size: 11.5px; line-height: 1.45; margin: 4px 0 0;
+  color: #9a6a68;
+}

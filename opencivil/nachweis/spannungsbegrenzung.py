@@ -194,12 +194,15 @@ class Spannungsbegrenzung(Nachweis):
         self.ergebnisse = []
 
         for fall in self.faelle:
+            # Ausgeschaltete Lastfaelle rechnen mit und schweigen dabei.
+            leise = self.leise(fall.name)
             erg = self._einen_fall(loeser, fall, sigma_adm)
             self.ergebnisse.append(erg)
-            self._protokoll_fall(p, erg)
+            if not leise:
+                self._protokoll_fall(p, erg)
             ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(
                 min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
-            urteile.append(self._urteil(erg))
+            urteile.append(self._urteil(erg, still=leise))
 
         return ergebnis, urteile
 
@@ -233,7 +236,7 @@ class Spannungsbegrenzung(Nachweis):
             f"σ_s,adm = {sigma_adm / 1e6:.0f} N/mm².")
         return erg
 
-    def _urteil(self, erg: Fallergebnis) -> NachweisUrteil:
+    def _urteil(self, erg: Fallergebnis, *, still: bool = False) -> NachweisUrteil:
         r = self.richtung.value
         einwirkung = WertDef(
             id=f"{self.id}.{erg.fall.kennung}.sigma_s",
@@ -256,6 +259,7 @@ class Spannungsbegrenzung(Nachweis):
             hinweis=erg.hinweis,
             einwirkung=einwirkung if erg.konvergiert else None,
             widerstand=widerstand if erg.konvergiert else None,
+            still=still,
         )
 
     # -- Mitschrift ---------------------------------------------------------

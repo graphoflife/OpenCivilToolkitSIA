@@ -23,8 +23,13 @@ class TestProjektBeschreibung(unittest.TestCase):
         self.assertEqual(sorted(aufbau.nachweise), ["q1.x", "q1.y"])
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         self.assertTrue(loesung.vollstaendig)
-        # 6 x M-N, 2 x Duktilität, 1 x sprödes Versagen, 1 x Zwängung Biegung.
-        self.assertEqual(len(loesung.urteile), 10)
+        # Gefuehrt werden die 6 M-N-Nachweise. Die uebrigen rechnen still mit:
+        # eingeschaltet hat sie niemand, und ungefragt in der Tabelle staenden
+        # sie sonst bei jeder Platte.
+        laut = [u for u in loesung.urteile if not u.still]
+        self.assertEqual(len(laut), 6)
+        self.assertTrue(all(u.art == "M-N" for u in laut))
+        self.assertTrue([u for u in loesung.urteile if u.still])
 
     def test_hin_und_zurueck(self):
         original = Projekt.beispiel()
@@ -353,9 +358,10 @@ class TestUrteilsraum(unittest.TestCase):
             je_platte[passend[0]].append(urteil.name)
 
         # Beide Platten sind gleich bewehrt, also fällt für beide gleich viel
-        # an: je Richtung drei M-N-Urteile, dazu zwei Duktilitätsurteile.
-        self.assertEqual(len(je_platte["querschnitt.q1"]), 10)
-        self.assertEqual(len(je_platte["querschnitt.q2"]), 10)
+        # an -- gefragt ist hier nur, dass nichts vermischt wird.
+        self.assertEqual(len(je_platte["querschnitt.q1"]),
+                         len(je_platte["querschnitt.q2"]))
+        self.assertTrue(je_platte["querschnitt.q1"])
         # Und die Namen allein hätten es nicht entschieden -- sie sind gleich.
         self.assertEqual(sorted(je_platte["querschnitt.q1"]),
                          sorted(je_platte["querschnitt.q2"]))
@@ -365,9 +371,109 @@ class TestUrteilsraum(unittest.TestCase):
             "rechnen", {"projekt": self.zweiplattenprojekt().als_dict()})
         raeume = {u["raum"] for u in antwort.daten["urteile"]}
         self.assertTrue(all(r.startswith("querschnitt.q") for r in raeume), raeume)
-        # 2 Platten x (2 Richtungen M-N + 1 Duktilität + sprödes Versagen x
-        # + Zwängung Biegung x)
-        self.assertEqual(len(raeume), 10)
+        # 2 Platten x 2 Richtungen M-N -- mehr ist im Beispiel nicht
+        # eingeschaltet, und die stillen Nachweise stehen nicht in dieser Liste.
+        self.assertEqual(len(raeume), 4)
+
+
+class TestStilleNachweise(unittest.TestCase):
+    """
+    Ausgeschaltet heisst still, nicht weg.
+
+    Ein Schalter sagt «interessiert mich gerade nicht» und nicht «gilt nicht».
+    Gerechnet wird darum weiter; was nicht aufgeht, steht als Hinweis unter
+    der Zusammenfassung -- nicht in der Tabelle und nicht in der Herleitung.
+    """
+
+    def platte(self) -> Projekt:
+        """
+        Zu schwach bewehrt für ihr Rissmoment -- sprödes Versagen fällt durch.
+
+        Die Einwirkung ist klein gehalten, damit die Tragsicherheit aufgeht:
+        geprüft wird hier, was ein *stiller* Nachweis auslöst, und ein lauter
+        daneben, der ebenfalls durchfällt, würde das verdecken.
+        """
+        projekt = Projekt.beispiel()
+        q = projekt.querschnitt("q1")
+        q.h = 600.0
+        for k in q.kombinationen:
+            k.M_Ed, k.N_Ed, k.V_Ed = 10.0, 0.0, 0.0
+        lage = q.lagen[0]
+        lage.grund.durchmesser, lage.grund.abstand = 6.0, 300.0
+        lage.zulage.durchmesser = 0.0
+        return projekt
+
+    def antwort(self, projekt: Projekt) -> dict:
+        return dienst.bearbeite(
+            "rechnen", {"projekt": projekt.als_dict()}
+        ).daten["zusammenfassungen"]["q1"]
+
+    def test_der_hinweis_steht_unter_der_tabelle(self):
+        tabelle = self.antwort(self.platte())
+        stille = [h for h in tabelle["stille"]
+                  if h["nachweis"].startswith("Sprödes Versagen")]
+        self.assertTrue(stille, tabelle["stille"])
+        self.assertEqual(stille[0]["fall"], "1. Lage")
+        self.assertLess(float(stille[0]["grad"]), 1.0)
+
+    def test_und_nicht_in_der_tabelle(self):
+        tabelle = self.antwort(self.platte())
+        arten = {z["zellen"][0] for z in tabelle["zeilen"]}
+        self.assertNotIn(r"\text{Sprödes Versagen (x)}", arten)
+
+    def test_und_nicht_in_der_herleitung(self):
+        from opencivil.core.protokoll import TitelBlock
+
+        aufbau = self.platte().aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        texte = [b.text for b in loesung.protokoll.alle_bloecke()
+                 if isinstance(b, TitelBlock)]
+        self.assertFalse([t for t in texte if "Sprödes Versagen" in t])
+
+    def test_er_zaehlt_nicht_im_gesamturteil(self):
+        """
+        Sonst stünde oben rechts «nicht erfüllt» wegen eines Nachweises, den
+        niemand führt -- und in der Tabelle fände man dazu nichts.
+        """
+        aufbau = self.platte().aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        durchgefallen = [u for u in loesung.urteile if not u.erfuellt]
+        self.assertTrue(durchgefallen)
+        self.assertTrue(all(u.still for u in durchgefallen))
+        self.assertTrue(loesung.alle_nachweise_erfuellt)
+
+    def test_eingeschaltet_wechselt_er_die_seite(self):
+        projekt = self.platte()
+        projekt.querschnitt("q1").sproede_lagen = [True, False, False, False]
+        tabelle = self.antwort(projekt)
+        self.assertFalse([h for h in tabelle["stille"]
+                          if h["nachweis"].startswith("Sprödes Versagen")])
+        arten = {z["zellen"][0] for z in tabelle["zeilen"]}
+        self.assertIn(r"\text{Sprödes Versagen (x)}", arten)
+
+    def test_was_aufgeht_meldet_sich_nicht(self):
+        """
+        Ein Hinweis zu jedem stillen Nachweis wäre bloss Rauschen -- gemeldet
+        wird nur, was nicht aufgeht.
+        """
+        tabelle = self.antwort(Projekt.beispiel())
+        # Die Duktilität geht im Beispiel auf, sie steht also nirgends.
+        self.assertFalse([h for h in tabelle["stille"]
+                          if h["nachweis"].startswith("Duktilität")])
+        for hinweis in tabelle["stille"]:
+            self.assertLess(float(hinweis["grad"]), 1.0, hinweis)
+
+    def test_ein_knapp_verfehlter_grad_liest_sich_nicht_als_eins(self):
+        """
+        «nicht erfüllt (α_eff = 1.00)» widerspricht sich selbst. Die zweite
+        Stelle rundet 0.997 auf eins -- dann kommt eine dritte dazu.
+        """
+        tabelle = self.antwort(Projekt.beispiel())
+        knapp = [h for h in tabelle["stille"]
+                 if h["nachweis"].startswith("Zwängung auf Normalkraft")]
+        self.assertTrue(knapp, tabelle["stille"])
+        for hinweis in knapp:
+            self.assertEqual(hinweis["grad"], "0.996")
 
 
 class TestApiAbbildung(unittest.TestCase):
@@ -433,7 +539,9 @@ class TestDienst(unittest.TestCase):
         antwort = dienst.bearbeite("rechnen", self.rumpf())
         self.assertEqual(antwort.status, 200)
         self.assertTrue(antwort.daten["vollstaendig"])
-        self.assertEqual(len(antwort.daten["urteile"]), 10)
+        # Nur die gefuehrten Nachweise -- die stillen stehen als Hinweis unter
+        # der Zusammenfassung, nicht in dieser Liste.
+        self.assertEqual(len(antwort.daten["urteile"]), 6)
         self.assertTrue(antwort.daten["alle_nachweise_erfuellt"])
 
     def test_rechnen_mit_einzelziel(self):
@@ -1007,8 +1115,9 @@ class TestAngabengruppen(unittest.TestCase):
         # Erfuellungsgrad. Eine Spalte "Urteil" gab es einmal; sie stand neben
         # dem Grad und sagte dasselbe noch einmal.
         self.assertEqual(len(tabelle["kopf"]), 5)
-        # 6 x M-N, 2 x Duktilität, 1 x sprödes Versagen, 1 x Zwängung Biegung.
-        self.assertEqual(len(tabelle["zeilen"]), 10)
+        # 6 x M-N -- die uebrigen Nachweise rechnen still mit und stehen
+        # darum nicht in der Tabelle.
+        self.assertEqual(len(tabelle["zeilen"]), 6)
         for zeile in tabelle["zeilen"]:
             self.assertEqual(len(zeile["zellen"]), len(tabelle["kopf"]))
             self.assertIn("erfuellt", zeile)
@@ -1114,6 +1223,8 @@ class TestAngabengruppen(unittest.TestCase):
         q = projekt.querschnitt("q1")
         q.kombinationen = []
         q.duktilitaet = [False] * 4
+        q.sproede_lagen = [True, False, False, False]
+        q.zwaengung_biegung_lagen = [True, False, False, False]
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         namen = [z["zellen"][0]
                  for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
@@ -1125,6 +1236,7 @@ class TestAngabengruppen(unittest.TestCase):
     def test_die_duktilitaet_laeuft_auch_ohne_schnittgroessen(self):
         projekt = Projekt.beispiel()
         projekt.querschnitt("q1").kombinationen = []
+        projekt.querschnitt("q1").duktilitaet = [True, False, False, True]
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         namen = [z["zellen"][0]
                  for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
@@ -1415,7 +1527,9 @@ class TestMindestbewehrungsEingaben(unittest.TestCase):
         self.assertFalse(q.zwaengung_x)
         self.assertFalse(q.zwaengung_y)
         self.assertFalse(q.zwaengung_begrenzt)
-        self.assertTrue(q.haeufige_aus_tragsicherheit)
+        # Die 70 % sind eine Abschaetzung und keine Norm -- eingeschaltet wird
+        # sie von Hand. Gerechnet wird sie trotzdem, still.
+        self.assertFalse(q.haeufige_aus_tragsicherheit)
         self.assertEqual(q.haeufige, [])
 
     def test_alles_ueberlebt_die_datei(self):
@@ -1449,7 +1563,7 @@ class TestMindestbewehrungsEingaben(unittest.TestCase):
                 q.pop(feld, None)
         q = Projekt.aus_dict(d).querschnitt("q1")
         self.assertEqual(q.rissanforderung, "normal")
-        self.assertTrue(q.haeufige_aus_tragsicherheit)
+        self.assertFalse(q.haeufige_aus_tragsicherheit)
 
     def test_unbekannte_rissanforderung_wird_gemeldet(self):
         d = Projekt.beispiel().als_dict()

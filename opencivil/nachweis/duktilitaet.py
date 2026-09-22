@@ -199,16 +199,21 @@ class Duktilitaet(Nachweis):
         self.ergebnisse = []
 
         for lage in self.lagen:
+            # Ausgeschaltete Lagen rechnen mit, stehen aber nicht in der
+            # Herleitung -- ihr Urteil taucht nur als Hinweis auf, falls es
+            # nicht aufgeht.
+            leise = self.leise(lage.nummer)
             b_l = b if lage.richtung is Richtung.X else b_y
             erg = self._eine_lage(e, lage, h=h, b=b_l, f_cd=f_cd)
             self.ergebnisse.append(erg)
-            self._protokoll_lage(p, erg, b=b_l, f_cd=f_cd)
+            if not leise:
+                self._protokoll_lage(p, erg, b=b_l, f_cd=f_cd)
 
             ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
                 min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
             ergebnis[self.d_verhaeltnis[lage.nummer].id] = Groesse(
                 erg.verhaeltnis, EINHEITSLOS)
-            urteile.append(self._urteil(erg))
+            urteile.append(self._urteil(erg, still=leise))
 
         return ergebnis, urteile
 
@@ -252,7 +257,7 @@ class Duktilitaet(Nachweis):
             f"{'≤' if erg.erfuellt else '>'} {GRENZE:.2f}.")
         return erg
 
-    def _urteil(self, erg: Lagenergebnis) -> NachweisUrteil:
+    def _urteil(self, erg: Lagenergebnis, *, still: bool = False) -> NachweisUrteil:
         nummer = erg.lage.nummer
         einwirkung = WertDef(
             id=self.d_verhaeltnis[nummer].id,
@@ -277,6 +282,7 @@ class Duktilitaet(Nachweis):
             # Strich und daneben der Hinweis, warum.
             einwirkung=einwirkung if erg.machbar else None,
             widerstand=widerstand if erg.machbar else None,
+            still=still,
         )
 
     # -- Mitschrift ---------------------------------------------------------

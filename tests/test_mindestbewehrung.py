@@ -108,16 +108,23 @@ class TestNachweis(unittest.TestCase):
     def test_zwei_urteile_je_richtung(self):
         """Ein Zwang kennt keine Zugseite -- beide Lagen müssen können."""
         _, gefunden = urteile(projekt_mit())
-        namen = sorted(n for n in gefunden if n.startswith("Rissnormalkraft"))
+        namen = sorted(n for n, u in gefunden.items()
+                       if n.startswith("Rissnormalkraft") and not u.still)
         self.assertEqual(namen, ["Rissnormalkraft x – 1. Lage",
                                  "Rissnormalkraft x – 4. Lage"])
 
-    def test_ohne_zwaengung_laeuft_er_nicht(self):
+    def test_ohne_zwaengung_rechnet_er_still_mit(self):
+        """
+        Ausgeschaltet heisst nicht weg: gerechnet wird weiter, damit unter der
+        Tabelle ein Hinweis stehen kann -- in der Herleitung steht er nicht.
+        """
         projekt = projekt_mit()
         projekt.querschnitte[0].zwaengung_x = False
         aufbau, gefunden = urteile(projekt)
-        self.assertEqual(aufbau.rissnormalkraft, {})
-        self.assertFalse([n for n in gefunden if n.startswith("Rissnormalkraft")])
+        self.assertTrue(all(n.still for n in aufbau.rissnormalkraft.values()))
+        rn = [u for n, u in gefunden.items() if n.startswith("Rissnormalkraft")]
+        self.assertTrue(rn)
+        self.assertTrue(all(u.still for u in rn))
 
     def test_beide_richtungen_getrennt(self):
         projekt = projekt_mit(zwaengung_y=True)
@@ -343,20 +350,25 @@ class TestZwaengungBiegung(unittest.TestCase):
         self.assertAlmostEqual(erg.erfuellungsgrad, 6.58, delta=0.03)
         self.assertTrue(erg.erfuellt)
 
-    def test_nur_die_gewaehlten_lagen(self):
+    def test_nur_die_gewaehlten_lagen_sind_laut(self):
+        """Gerechnet wird überall, sichtbar ist die eingeschaltete Lage."""
         projekt = Projekt.beispiel()
         projekt.querschnitte[0].zwaengung_biegung_lagen = [False, True, False, False]
         aufbau, gefunden = urteile(projekt)
-        self.assertEqual(sorted(aufbau.zwaengung_biegung), ["q1.y"])
-        namen = [n for n in gefunden if n.startswith("Zwängung Biegung")]
-        self.assertEqual(namen, ["Zwängung Biegung y – 2. Lage"])
+        self.assertEqual(sorted(aufbau.zwaengung_biegung), ["q1.x", "q1.y"])
+        self.assertTrue(aufbau.zwaengung_biegung["q1.x"].still)
+        laut = [n for n, u in gefunden.items()
+                if n.startswith("Zwängung Biegung") and not u.still]
+        self.assertEqual(laut, ["Zwängung Biegung y – 2. Lage"])
 
-    def test_ohne_gewaehlte_lage_laeuft_er_nicht(self):
+    def test_ohne_gewaehlte_lage_rechnet_er_still_mit(self):
         projekt = Projekt.beispiel()
         projekt.querschnitte[0].zwaengung_biegung_lagen = [False] * 4
         aufbau, gefunden = urteile(projekt)
-        self.assertEqual(aufbau.zwaengung_biegung, {})
-        self.assertFalse([n for n in gefunden if n.startswith("Zwängung Biegung")])
+        self.assertTrue(all(n.still for n in aufbau.zwaengung_biegung.values()))
+        zb = [u for n, u in gefunden.items() if n.startswith("Zwängung Biegung")]
+        self.assertEqual(len(zb), 4)
+        self.assertTrue(all(u.still for u in zb))
 
     def test_bei_den_oberen_lagen_wird_von_unten_gemessen(self):
         aufbau, _ = urteile(projekt_zwang_biegung())
@@ -412,6 +424,16 @@ class TestZwaengungBiegung(unittest.TestCase):
             self.assertIn(erwartet, titel)
 
 
+def projekt_sproede(**abweichungen) -> Projekt:
+    """Sprödes Versagen für die 1. Lage eingeschaltet."""
+    projekt = Projekt.beispiel()
+    q = projekt.querschnitte[0]
+    q.sproede_lagen = [True, False, False, False]
+    for name, wert in abweichungen.items():
+        setattr(q, name, wert)
+    return projekt
+
+
 class TestSproedesVersagen(unittest.TestCase):
     """M_Rd(N_Ed = 0) gegen M_Riss -- der einfachere und strengere Weg."""
 
@@ -428,10 +450,21 @@ class TestSproedesVersagen(unittest.TestCase):
         self.assertAlmostEqual(erg.erfuellungsgrad, 6.01, delta=0.05)
         self.assertTrue(erg.erfuellt)
 
-    def test_vorgabe_ist_nur_die_erste_lage(self):
-        aufbau, gefunden = urteile(Projekt.beispiel())
-        namen = sorted(n for n in gefunden if n.startswith("Sprödes Versagen"))
-        self.assertEqual(namen, ["Sprödes Versagen x – 1. Lage"])
+    def test_vorgegeben_ist_keine_lage(self):
+        """
+        Eingeschaltet wird der Nachweis von Hand; von selbst rechnet er still
+        mit. Eine Vorgabe stünde sonst ungefragt in jeder Tabelle.
+        """
+        _, gefunden = urteile(Projekt.beispiel())
+        sv = {n: u for n, u in gefunden.items() if n.startswith("Sprödes Versagen")}
+        self.assertEqual(len(sv), 4)
+        self.assertFalse([n for n, u in sv.items() if not u.still])
+
+    def test_die_eingeschaltete_lage_ist_laut(self):
+        _, gefunden = urteile(projekt_sproede())
+        laut = sorted(n for n, u in gefunden.items()
+                      if n.startswith("Sprödes Versagen") and not u.still)
+        self.assertEqual(laut, ["Sprödes Versagen x – 1. Lage"])
 
     def test_die_obere_lage_nimmt_den_negativen_eckwert(self):
         projekt = Projekt.beispiel()
@@ -442,20 +475,22 @@ class TestSproedesVersagen(unittest.TestCase):
         self.assertLess(nach_lage[4].M_Rd, nach_lage[1].M_Rd)
         self.assertGreater(nach_lage[4].M_Rd, 0.0)
 
-    def test_ohne_gewaehlte_lage_laeuft_er_nicht(self):
+    def test_ohne_gewaehlte_lage_rechnet_er_still_mit(self):
         projekt = Projekt.beispiel()
         projekt.querschnitte[0].sproede_lagen = [False] * 4
         aufbau, gefunden = urteile(projekt)
-        self.assertEqual(aufbau.sproede, {})
-        self.assertFalse([n for n in gefunden if n.startswith("Sprödes Versagen")])
+        self.assertTrue(all(n.still for n in aufbau.sproede.values()))
+        sv = [u for n, u in gefunden.items() if n.startswith("Sprödes Versagen")]
+        self.assertEqual(len(sv), 4)
+        self.assertTrue(all(u.still for u in sv))
 
     def test_er_laeuft_ohne_schnittgroessen(self):
         """Die Resistenzlinie gehört dem Querschnitt, nicht der Einwirkung."""
-        projekt = Projekt.beispiel()
-        projekt.querschnitte[0].kombinationen = []
+        projekt = projekt_sproede(kombinationen=[])
         aufbau, gefunden = urteile(projekt)
         self.assertIn("q1.x", aufbau.sproede)
-        self.assertTrue([n for n in gefunden if n.startswith("Sprödes Versagen")])
+        self.assertTrue([n for n, u in gefunden.items()
+                         if n.startswith("Sprödes Versagen") and not u.still])
 
     def test_zu_wenig_bewehrung_faellt_durch(self):
         projekt = Projekt.beispiel()
@@ -470,10 +505,22 @@ class TestSproedesVersagen(unittest.TestCase):
     def test_die_herleitung_stellt_beide_gegenueber(self):
         from opencivil.core.protokoll import GleichungBlock
 
-        aufbau = Projekt.beispiel().aufbauen()
+        aufbau = projekt_sproede().aufbauen()
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         titel = [b.titel for b in loesung.protokoll.alle_bloecke()
                  if isinstance(b, GleichungBlock)]
         for erwartet in ("Rissmoment des ungerissenen Querschnitts",
                          "Biegewiderstand gegen Rissmoment"):
             self.assertIn(erwartet, titel)
+
+    def test_die_stille_lage_steht_nicht_in_der_herleitung(self):
+        """Mitrechnen ja, mitschreiben nein -- sonst wäre still nur ein Wort."""
+        from opencivil.core.protokoll import GleichungBlock
+
+        aufbau = projekt_sproede().aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        titel = [b.titel for b in loesung.protokoll.alle_bloecke()
+                 if isinstance(b, GleichungBlock)]
+        self.assertIn("Biegewiderstand gegen Rissmoment", titel)
+        # Vier Lagen sind gerechnet, geschrieben ist die eine eingeschaltete.
+        self.assertEqual(titel.count("Biegewiderstand gegen Rissmoment"), 1)

@@ -180,6 +180,8 @@ class SproedesVersagen(Nachweis):
         self.ergebnisse = []
 
         for lage in self.lagen:
+            # Ausgeschaltete Lagen rechnen mit und schweigen dabei.
+            leise = self.leise(lage.nummer)
             erg = Lagenergebnis(lage=lage)
             erg.M_Rd = abs(e.g(f"M_Rd_{lage.nummer}").si)
             M_Riss = self.groessen.M_Riss
@@ -199,14 +201,15 @@ class SproedesVersagen(Nachweis):
                     f"M_Riss = {M_Riss / 1e3:.1f} kNm.")
 
             self.ergebnisse.append(erg)
-            self._protokoll_lage(p, erg)
+            if not leise:
+                self._protokoll_lage(p, erg)
             ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
                 min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
-            urteile.append(self._urteil(erg))
+            urteile.append(self._urteil(erg, still=leise))
 
         return ergebnis, urteile
 
-    def _urteil(self, erg: Lagenergebnis) -> NachweisUrteil:
+    def _urteil(self, erg: Lagenergebnis, *, still: bool = False) -> NachweisUrteil:
         nummer = erg.lage.nummer
         r = self.richtung.value
         einwirkung = WertDef(
@@ -230,6 +233,7 @@ class SproedesVersagen(Nachweis):
             hinweis=erg.hinweis,
             einwirkung=einwirkung if erg.machbar else None,
             widerstand=widerstand if erg.machbar else None,
+            still=still,
         )
 
     # -- Mitschrift ---------------------------------------------------------

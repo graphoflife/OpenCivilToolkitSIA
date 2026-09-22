@@ -145,15 +145,24 @@ class TestNachweis(unittest.TestCase):
         self.assertIsNone(urteil.einwirkung)
         self.assertIsNone(urteil.widerstand)
 
-    def test_nur_die_gewaehlten_lagen(self):
-        aufbau, gefunden = urteile(projekt_mit((False, True, False, False)))
-        namen = [n for n in gefunden if n.startswith("Duktilität")]
-        self.assertEqual(namen, ["Duktilität – 2. Lage"])
+    def test_nur_die_gewaehlten_lagen_sind_laut(self):
+        """
+        Gerechnet werden alle vier, sichtbar ist die eine eingeschaltete. Die
+        übrigen bleiben still: sie rechnen mit, damit ein Hinweis unter der
+        Tabelle stehen kann, stehen aber nicht in der Herleitung.
+        """
+        _, gefunden = urteile(projekt_mit((False, True, False, False)))
+        dukt = {n: u for n, u in gefunden.items() if n.startswith("Duktilität")}
+        self.assertEqual(len(dukt), 4)
+        self.assertEqual([n for n, u in dukt.items() if not u.still],
+                         ["Duktilität – 2. Lage"])
 
-    def test_ohne_gewaehlte_lage_laeuft_der_nachweis_gar_nicht(self):
+    def test_ohne_gewaehlte_lage_rechnet_er_still_mit(self):
         aufbau, gefunden = urteile(projekt_mit((False, False, False, False)))
-        self.assertEqual(aufbau.duktilitaet, {})
-        self.assertFalse([n for n in gefunden if n.startswith("Duktilität")])
+        self.assertTrue(aufbau.duktilitaet["q1"].still)
+        dukt = [u for n, u in gefunden.items() if n.startswith("Duktilität")]
+        self.assertEqual(len(dukt), 4)
+        self.assertTrue(all(u.still for u in dukt))
 
     def test_das_urteil_traegt_den_raum_seiner_platte(self):
         _, gefunden = urteile(projekt_mit())
@@ -180,9 +189,14 @@ class TestNachweis(unittest.TestCase):
 
 
 class TestVorgabeUndAblage(unittest.TestCase):
-    def test_vorgabe_sind_die_beiden_aeusseren_lagen(self):
+    def test_vorgegeben_ist_keine_lage(self):
+        """
+        Der Nachweis läuft von selbst mit, gefordert ist er nicht: er steht in
+        der Norm nicht für jede Platte, und wer ihn führen will, schaltet ihn
+        ein. Ungefragt in der Tabelle stünde er sonst bei jeder Platte.
+        """
         self.assertEqual(Projekt.beispiel().querschnitt("q1").duktilitaet,
-                         [True, False, False, True])
+                         [False, False, False, False])
 
     def test_eine_beschreibung_ohne_das_feld_bekommt_die_vorgabe(self):
         """Eine Datei aus der Zeit vor diesem Nachweis muss weiter laufen."""
@@ -191,14 +205,14 @@ class TestVorgabeUndAblage(unittest.TestCase):
             q.pop("duktilitaet", None)
         projekt = Projekt.aus_dict(d)
         self.assertEqual(projekt.querschnitt("q1").duktilitaet,
-                         [True, False, False, True])
+                         [False, False, False, False])
 
     def test_eine_zu_kurze_liste_wird_ergaenzt(self):
         d = Projekt.beispiel().als_dict()
         d["querschnitte"][0]["duktilitaet"] = [False, True]
         projekt = Projekt.aus_dict(d)
         self.assertEqual(projekt.querschnitt("q1").duktilitaet,
-                         [False, True, False, True])
+                         [False, True, False, False])
 
     def test_die_wahl_ueberlebt_die_datei(self):
         projekt = projekt_mit((False, True, True, False))
@@ -210,7 +224,7 @@ class TestVorgabeUndAblage(unittest.TestCase):
 class TestInDerZusammenfassung(unittest.TestCase):
     def test_die_zeilen_stehen_unter_den_tragsicherheitsnachweisen(self):
         antwort = dienst.bearbeite(
-            "rechnen", {"projekt": Projekt.beispiel().als_dict()})
+            "rechnen", {"projekt": projekt_mit((True, False, False, True)).als_dict()})
         paare = [(z["zellen"][0], z["zellen"][1])
                  for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
         dukt = (r"\text{Duktilität (x)}", r"\text{1. Lage}")

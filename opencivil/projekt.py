@@ -26,7 +26,7 @@ from __future__ import annotations
 import json
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional, Sequence
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.einheiten import (
     EINHEITSLOS, KN, KNM, KN_PRO_M, M, MM, Groesse,
@@ -138,7 +138,7 @@ def sorten(art: str) -> Mapping[str, Any]:
 #: Fuer welche Lagen der Duktilitaetsnachweis vorgegeben ist -- die beiden
 #: aeusseren. Sie tragen Feld- und Stuetzmoment; dort entscheidet sich, ob der
 #: Querschnitt sein Versagen ankuendigt.
-DUKTILITAET_VORGABE = (True, False, False, True)
+DUKTILITAET_VORGABE = (False, False, False, False)
 
 
 def _rissanforderung_aus(wert: Any) -> str:
@@ -161,7 +161,7 @@ def _rissanforderung_aus(wert: Any) -> str:
 
 #: Fuer welche Lagen sproedes Versagen und Zwaengung auf Biegung vorgegeben
 #: sind -- nur die 1. Lage. Die uebrigen schaltet ein, wer sie braucht.
-LAGENWAHL_VORGABE = (True, False, False, False)
+LAGENWAHL_VORGABE = (False, False, False, False)
 
 
 def _teilungen_aus(roh, vorgabe) -> List[float]:
@@ -731,7 +731,7 @@ class QuerschnittEintrag(Beschreibung):
     spannungsfaelle: List[SpannungsfallEintrag] = field(default_factory=list)
     """Auswertungen am Querschnitt -- Bilder, keine Nachweise."""
 
-    haeufige_aus_tragsicherheit: bool = True
+    haeufige_aus_tragsicherheit: bool = False
     """
     Ob die haeufigen Lastfaelle aus den Tragsicherheitsfaellen abgeleitet
     werden -- mit :data:`HAEUFIG_ANTEIL`. Der uebliche Fall, darum die Vorgabe.
@@ -846,7 +846,7 @@ class QuerschnittEintrag(Beschreibung):
             zwaengung_y=bool(d.get("zwaengung_y", False)),
             zwaengung_begrenzt=bool(d.get("zwaengung_begrenzt", False)),
             haeufige_aus_tragsicherheit=bool(
-                d.get("haeufige_aus_tragsicherheit", True)),
+                d.get("haeufige_aus_tragsicherheit", False)),
             haeufige=[HaeufigEintrag.aus_dict(x) for x in (d.get("haeufige") or [])],
             knickfaelle=[KnickEintrag.aus_dict(x)
                          for x in (d.get("knickfaelle") or [])],
@@ -1141,25 +1141,30 @@ class Projekt(Beschreibung):
                 werk.registriere(nachweis)
                 aufbau.nachweise[f"{eintrag.kennung}.{richtung.value}"] = nachweis
 
-                # Sproedes Versagen: M_Rd(N=0) gegen M_Riss, je gewaehlter Lage.
-                sproede = [l.nummer for l in querschnitt.lagen
-                           if l.richtung is richtung
-                           and eintrag.sproede_lagen[l.nummer - 1]]
-                if sproede:
+                # Sproedes Versagen: M_Rd(N=0) gegen M_Riss, je Lage.
+                # Alle Lagen der Richtung, nicht nur die eingeschalteten:
+                # ausgeschaltet heisst still und nicht weg. Die Lage rechnet
+                # mit, steht aber nicht in der Herleitung -- und wenn sie
+                # nicht aufgeht, sagt es der Hinweis unter der Tabelle.
+                lagen = [l.nummer for l in querschnitt.lagen
+                         if l.richtung is richtung]
+                if lagen:
                     nachweis_sv = SproedesVersagen(
-                        querschnitt, richtung, sproede, nachweis)
+                        querschnitt, richtung, lagen, nachweis)
+                    nachweis_sv.stillstellen(
+                        lagen, [n for n in lagen if eintrag.sproede_lagen[n - 1]])
                     werk.registriere(nachweis_sv)
                     aufbau.sproede[f"{eintrag.kennung}.{richtung.value}"] = nachweis_sv
 
-                # Zwaengung auf Biegung: Stahlspannung gegen ihre Grenze.
-                zwang_biegung = [l.nummer for l in querschnitt.lagen
-                                 if l.richtung is richtung
-                                 and eintrag.zwaengung_biegung_lagen[l.nummer - 1]]
-                if zwang_biegung:
+                    # Zwaengung auf Biegung: Stahlspannung gegen ihre Grenze.
                     biegung = ZwaengungBiegung(
-                        querschnitt, richtung, zwang_biegung,
+                        querschnitt, richtung, lagen,
                         anforderung=eintrag.rissanforderung,
                         kriechzahl=eintrag.kriechzahl)
+                    biegung.stillstellen(
+                        lagen,
+                        [n for n in lagen
+                         if eintrag.zwaengung_biegung_lagen[n - 1]])
                     werk.registriere(biegung)
                     aufbau.zwaengung_biegung[
                         f"{eintrag.kennung}.{richtung.value}"] = biegung
@@ -1167,9 +1172,10 @@ class Projekt(Beschreibung):
                 # Stahlspannung unter haeufiger Einwirkung. Nur bei erhoehter
                 # und hoher Anforderung -- bei normaler steht in Tabelle 17
                 # ein Strich.
-                haeufige = self._haeufige(eintrag, richtung)
+                haeufige, laute = self._haeufige(eintrag, richtung)
                 if haeufige and eintrag.rissanforderung in GEFORDERT:
                     spannung = Spannungsbegrenzung(querschnitt, richtung, haeufige)
+                    spannung.stillstellen([f.name for f in haeufige], laute)
                     werk.registriere(spannung)
                     aufbau.spannung[
                         f"{eintrag.kennung}.{richtung.value}"] = spannung
@@ -1212,21 +1218,25 @@ class Projekt(Beschreibung):
             # Zwaengung auf Normalkraft: je Richtung, wenn eingeschaltet.
             for richtung, an in ((Richtung.X, eintrag.zwaengung_x),
                                  (Richtung.Y, eintrag.zwaengung_y)):
-                if not an:
+                if richtung not in bewehrt:
                     continue
                 zwang = Rissnormalkraft(
                     querschnitt, richtung,
                     anforderung=eintrag.rissanforderung,
                     begrenzt=eintrag.zwaengung_begrenzt)
+                zwang.still = not an
                 werk.registriere(zwang)
                 aufbau.rissnormalkraft[
                     f"{eintrag.kennung}.{richtung.value}"] = zwang
 
             # Die Duktilitaet haengt an der Bewehrung, nicht an den
             # Schnittgroessen -- sie laeuft auch ohne Einwirkung.
-            gewaehlte_lagen = [i + 1 for i, an in enumerate(eintrag.duktilitaet) if an]
-            if gewaehlte_lagen:
-                duktilitaet = Duktilitaet(querschnitt, gewaehlte_lagen)
+            alle_lagen = [l.nummer for l in querschnitt.lagen]
+            if alle_lagen:
+                duktilitaet = Duktilitaet(querschnitt, alle_lagen)
+                duktilitaet.stillstellen(
+                    alle_lagen,
+                    [n for n in alle_lagen if eintrag.duktilitaet[n - 1]])
                 werk.registriere(duktilitaet)
                 aufbau.duktilitaet[eintrag.kennung] = duktilitaet
 
@@ -1342,16 +1352,21 @@ class Projekt(Beschreibung):
         )
 
     def _haeufige(self, eintrag: "QuerschnittEintrag",
-                  richtung: Richtung) -> List[Haeufigerfall]:
+                  richtung: Richtung) -> Tuple[List[Haeufigerfall], List[str]]:
         """
-        Die haeufigen Lastfaelle dieser Richtung.
+        Die haeufigen Lastfaelle dieser Richtung -- und welche davon laut sind.
 
-        Die eigens angegebenen, und -- wenn die Ableitung gilt -- zusaetzlich
-        die Tragsicherheitsfaelle mit :data:`HAEUFIG_ANTEIL`. Beides
-        nebeneinander: die 70 % sind eine bequeme Abschaetzung, decken aber
-        nicht den Fall ab, den es nur unter haeufiger Einwirkung gibt. Wer
-        einen solchen kennt, soll ihn dazustellen koennen, ohne die
-        Abschaetzung fuer alle anderen aufzugeben.
+        Die eigens angegebenen, und zusaetzlich die Tragsicherheitsfaelle mit
+        :data:`HAEUFIG_ANTEIL`. Beides nebeneinander: die 70 % sind eine
+        bequeme Abschaetzung, decken aber nicht den Fall ab, den es nur unter
+        haeufiger Einwirkung gibt. Wer einen solchen kennt, soll ihn
+        dazustellen koennen, ohne die Abschaetzung fuer alle anderen
+        aufzugeben.
+
+        Die abgeleiteten Faelle entstehen auch dann, wenn ihr Schalter aus
+        ist -- dann eben still. Sie ganz wegzulassen hiesse, den Nachweis erst
+        auf Verlangen zu fuehren; so steht wenigstens ein Hinweis da, wenn die
+        Abschaetzung nicht aufgeht.
 
         Die Rechnung steht hier und nicht in der Oberflaeche: dort waere sie
         eine zweite Wahrheit.
@@ -1362,14 +1377,17 @@ class Projekt(Beschreibung):
                 M_Ed=Groesse(HAEUFIG_ANTEIL * k.M_Ed, KNM),
                 N_Ed=Groesse(HAEUFIG_ANTEIL * k.N_Ed, KN))
             for k in eintrag.kombinationen if k.gilt_fuer(richtung)
-        ] if eintrag.haeufige_aus_tragsicherheit else []
+        ]
         eigene = [
             Haeufigerfall(name=h.name,
                           M_Ed=Groesse(h.M_Ed, KNM),
                           N_Ed=Groesse(h.N_Ed, KN))
             for h in eintrag.haeufige if h.gilt_fuer(richtung)
         ]
-        return abgeleitet + eigene
+        laute = [f.name for f in eigene]
+        if eintrag.haeufige_aus_tragsicherheit:
+            laute += [f.name for f in abgeleitet]
+        return abgeleitet + eigene, laute
 
     def _ausgefallene(
         self, kombinationen: Sequence[KombinationEintrag], richtung: Richtung
