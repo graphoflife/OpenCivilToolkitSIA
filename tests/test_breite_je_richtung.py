@@ -21,8 +21,10 @@ def geloest(b_mm: float):
     projekt = Projekt.beispiel()
     q = projekt.querschnitte[0]
     q.b = b_mm
-    # Die Beispielplatte trägt in beiden Richtungen: 1. und 4. Lage in x,
-    # 2. und 3. Lage in y. Genau das braucht dieser Test.
+    # Die Beispielplatte trägt in beiden Richtungen: 2. und 3. Lage in x,
+    # 1. und 4. in y. Genau das braucht dieser Test -- nachgewiesen wird zwar
+    # nur x, aber die y-Bewehrung steht im Querschnitt und muss ihre eigene
+    # Breite behalten.
     aufbau = projekt.aufbauen()
     return aufbau, aufbau.werk.loese(*aufbau.alle_nachweisziele())
 
@@ -55,13 +57,13 @@ class TestBreiteJeRichtung(unittest.TestCase):
         return wert(loesung, f"querschnitt.q1.lage.{marke}.a_s")
 
     def test_die_x_lage_waechst_mit_der_breite(self):
-        """⌀12@150 auf 2000 mm sind doppelt so viel Stahl wie auf 1000 mm."""
-        self.assertAlmostEqual(self._flaeche(self.l2, "1g"),
-                               2.0 * self._flaeche(self.l1, "1g"), places=9)
+        """⌀18@150 auf 2000 mm sind doppelt so viel Stahl wie auf 1000 mm."""
+        self.assertAlmostEqual(self._flaeche(self.l2, "2g"),
+                               2.0 * self._flaeche(self.l1, "2g"), places=9)
 
     def test_die_y_lage_bleibt_wie_sie_war(self):
-        self.assertAlmostEqual(self._flaeche(self.l2, "2g"),
-                               self._flaeche(self.l1, "2g"), places=9)
+        self.assertAlmostEqual(self._flaeche(self.l2, "1g"),
+                               self._flaeche(self.l1, "1g"), places=9)
 
     # -- Widerstände --------------------------------------------------------
 
@@ -75,10 +77,10 @@ class TestBreiteJeRichtung(unittest.TestCase):
                                2.0 * self._m_rd(self.einfach, self.l1, "x"),
                                delta=10.0)
 
-    def test_der_momentenwiderstand_in_y_bleibt_gleich(self):
-        self.assertAlmostEqual(self._m_rd(self.doppelt, self.l2, "y"),
-                               self._m_rd(self.einfach, self.l1, "y"),
-                               delta=10.0)
+    # Einen Momentenwiderstand in y gibt es nicht mehr -- dort wird nichts
+    # nachgewiesen. Dass die y-Bewehrung von `b` unberührt bleibt, prüft
+    # `test_die_y_lage_bleibt_wie_sie_war` an der Fläche selbst; das ist die
+    # Grösse, aus der ein Widerstand entstünde.
 
     # -- Bezogene Grössen ---------------------------------------------------
 
@@ -88,7 +90,7 @@ class TestBreiteJeRichtung(unittest.TestCase):
         sich die Breite heraus. Genau das ist die Probe darauf, dass keine der
         beiden Grössen aus der falschen Richtung kommt.
         """
-        for lage in (1, 4):  # beide in x -- die Duktilität läuft nur dort
+        for lage in (2, 3):  # beide in x -- die Duktilität läuft nur dort
             a = next(e for e in self.einfach.duktilitaet["q1"].ergebnisse
                      if e.lage.nummer == lage)
             b = next(e for e in self.doppelt.duktilitaet["q1"].ergebnisse

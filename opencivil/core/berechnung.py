@@ -569,6 +569,22 @@ class NachweisUrteil:
     einer Null erraten muessen.
     """
 
+    sammel: bool = False
+    """
+    Ob dieses Urteil eines von mehreren zur selben Frage ist.
+
+    Die Nachweise, die je Bewehrungslage rechnen, faellen ein Urteil je Lage.
+    Beantwortet ist die Frage aber von der schlechtesten: geht die auf, gehen
+    die anderen erst recht auf. In Tabelle und Bericht steht darum nur sie --
+    siehe :attr:`Loesung.gefuehrte_urteile`.
+
+    Gerechnet und *gezaehlt* werden trotzdem alle. Die Bewehrungssuche misst
+    ihren Fortschritt an der Summe der Rueckstaende; saehe sie nur das
+    Minimum, stuende sie, sobald zwei Lagen gleich schlecht sind -- kein
+    einzelner Schritt hebt dann das Minimum, und die Suche gaebe auf, obwohl
+    der naechste Durchmesser offensichtlich hilft.
+    """
+
     still: bool = False
     """
     Ob dieses Urteil aus einem ausgeschalteten Nachweis stammt.
@@ -665,6 +681,32 @@ class Nachweis(Berechnung):
     def leise(self, schluessel: Any) -> bool:
         """Ob dieser Fall nur mitrechnet: einzeln oder mit dem ganzen Nachweis."""
         return self.still or schluessel in self.stille_faelle
+
+    @staticmethod
+    def massgebend(
+        urteile: Sequence[NachweisUrteil],
+    ) -> List[NachweisUrteil]:
+        """
+        Von mehreren Teilurteilen das schlechteste -- als Liste.
+
+        Wer eine Tabelle baut, meint dieses eine; leer bleibt leer.
+        """
+        if not urteile:
+            return []
+        return [min(urteile, key=lambda u: u.erfuellungsgrad.si)]
+
+    @staticmethod
+    def teilurteile(
+        urteile: Sequence[NachweisUrteil],
+    ) -> List[NachweisUrteil]:
+        """
+        Dieselben Urteile, jedes als Teil derselben Frage gekennzeichnet.
+
+        Zurueck kommt alles: gezaehlt und gerechnet wird jede Lage. Erst die
+        Darstellung nimmt daraus das schlechteste -- siehe
+        :attr:`NachweisUrteil.sammel`.
+        """
+        return [replace(u, sammel=True) for u in urteile]
 
     def stillstellen(self, alle: Iterable[Any], laut: Iterable[Any]) -> None:
         """

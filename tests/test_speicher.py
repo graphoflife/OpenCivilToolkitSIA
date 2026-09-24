@@ -25,7 +25,7 @@ def projekt_mit_zwei_platten() -> dict:
     zweite = copy.deepcopy(p.querschnitte[0])
     zweite.kennung, zweite.name = "q2", "Platte 2"
     zweite.rissanforderung = "hoch"
-    zweite.zwaengung_x = True
+    zweite.zwaengung = True
     zweite.knickfaelle = [KnickEintrag("Stütze", N_Ed=-900.0, M_Ed_1=25.0,
                                        laenge=4.0, knicklaenge=4.0)]
     p.querschnitte.append(zweite)

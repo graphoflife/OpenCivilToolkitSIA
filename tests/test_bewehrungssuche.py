@@ -42,7 +42,7 @@ def ohne_duktilitaet(projekt) -> suche.Bewertung:
     """
     kopie = copy.deepcopy(projekt)
     q = kopie.querschnitt("q1")
-    q.duktilitaet = [False] * len(q.duktilitaet)
+    q.duktilitaet = False
     return suche.bewerte(kopie)
 
 
@@ -131,18 +131,25 @@ class TestSuche(unittest.TestCase):
         self.assertTrue(ergebnis.begruendung)
         self.assertTrue(any(l.begruendung for l in ergebnis.loesungen))
 
-    def test_eine_lage_ohne_nachweis_bleibt_leer(self):
+    def test_die_y_lagen_fasst_die_suche_nicht_an(self):
         """
-        Gesucht werden alle vier Lagen, auch die leeren -- aber bewehrt wird
-        nur, wo ein Nachweis es verlangt. Ohne Einwirkung in y bleibt dort null.
+        Gesucht werden die x-Lagen. In y wird nichts nachgewiesen, also gäbe
+        es dort auch kein Mass, an dem sich ein Durchmesser bemessen liesse --
+        die Suche zöge ihn auf null, und genau das wäre falsch: die
+        y-Bewehrung liegt aussen und kostet x seine statische Höhe.
         """
         projekt = platte()
-        for k in projekt.querschnitt("q1").kombinationen:
-            k.richtung = "x"
-        ergebnis = suche.suche(projekt, "q1", modus=suche.Suchmodus.GRUND_OHNE)
-        self.assertEqual(ergebnis.beste.durchmesser["2g"], 0.0)
-        self.assertEqual(ergebnis.beste.durchmesser["3g"], 0.0)
-        self.assertGreater(ergebnis.beste.durchmesser["1g"], 0.0)
+        vorher = [l.grund.durchmesser for l in projekt.querschnitt("q1").lagen]
+        ergebnis = suche.suche(projekt, "q1", modus=suche.Suchmodus.GRUND_MIT)
+        self.assertTrue(ergebnis.gefunden, ergebnis.begruendung)
+        # Grund und Zulage der beiden x-Lagen -- und sonst nichts.
+        self.assertEqual(sorted(ergebnis.beste.durchmesser),
+                         ["2g", "2z", "3g", "3z"])
+
+        suche.uebernehmen(projekt, "q1", ergebnis.beste)
+        nachher = [l.grund.durchmesser for l in projekt.querschnitt("q1").lagen]
+        self.assertEqual(nachher[0], vorher[0])   # 1. Lage y
+        self.assertEqual(nachher[3], vorher[3])   # 4. Lage y
 
     def test_eine_leere_lage_wird_bewehrt_wo_es_noetig_ist(self):
         """
@@ -174,7 +181,10 @@ class TestSuche(unittest.TestCase):
         Bewehrung; es legt nicht zu dem dazu, was zufällig dasteht.
         """
         kopie = suche._arbeitskopie(platte(), "q1", kraefte=True)
-        for lage in kopie.querschnitt("q1").lagen:
+        q = kopie.querschnitt("q1")
+        for nummer, lage in enumerate(q.lagen, start=1):
+            if q.richtung_von(nummer).value != "x":
+                continue        # y bleibt stehen -- die sucht niemand
             self.assertEqual(lage.grund.durchmesser, 0)
             self.assertEqual(lage.zulage.durchmesser, 0)
 
@@ -201,7 +211,7 @@ class TestDieEbeneAufDerDieSucheStehenblieb(unittest.TestCase):
         und genau das ist die Ebene. Die Zulagen sind leer, damit die Gleichheit
         nicht zufällig von einer Seite gebrochen wird.
         """
-        projekt = platte(sproede_lagen=[True, False, False, True])
+        projekt = platte(sproede = True)
         q = projekt.querschnitt("q1")
         q.richtung_lage1 = q.richtung_lage4 = "x"
         q.kombinationen = []
@@ -290,7 +300,7 @@ class TestDuktilitaetBleibtDraussen(unittest.TestCase):
         Nachweis, gegen den sie kein Mittel hat.
         """
         kopie = suche._arbeitskopie(platte(), "q1", kraefte=True, leeren=False)
-        self.assertFalse(any(kopie.querschnitt("q1").duktilitaet))
+        self.assertFalse(kopie.querschnitt("q1").duktilitaet)
         dukt = [u for u in _urteile(kopie) if u.art == "D"]
         self.assertTrue(dukt)
         self.assertTrue(all(u.still for u in dukt))
@@ -303,7 +313,7 @@ class TestEineLageWirdNichtErfunden(unittest.TestCase):
         fasste sie nicht an. Jetzt legt sie dort Bewehrung an -- die Zwängung
         verlangt sie ja.
         """
-        projekt = platte(zwaengung_x=True, zwaengung_y=True)
+        projekt = platte(zwaengung=True)
         ergebnis = suche.suche(projekt, "q1", modus=suche.Suchmodus.GRUND_OHNE)
         self.assertTrue(ergebnis.gefunden, ergebnis.begruendung)
         self.assertGreater(ergebnis.beste.durchmesser["2g"], 0.0)
@@ -345,7 +355,7 @@ class TestNurDieEigenePlatte(unittest.TestCase):
         ohne_y.richtung_lage1 = ohne_y.richtung_lage4 = "x"
         for nummer in (2, 3):
             ohne_y.lagen[nummer - 1].grund.durchmesser = 0
-        ohne_y.zwaengung_x = ohne_y.zwaengung_y = True
+        ohne_y.zwaengung = True
 
         knickt = copy.deepcopy(projekt.querschnitte[0])
         knickt.kennung, knickt.name = "q4", "knickt"

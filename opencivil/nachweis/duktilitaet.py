@@ -206,23 +206,19 @@ class Duktilitaet(Nachweis):
         self.ergebnisse = []
 
         for lage in self.lagen:
-            # Ausgeschaltete Lagen rechnen mit, stehen aber nicht in der
-            # Herleitung -- ihr Urteil taucht nur als Hinweis auf, falls es
-            # nicht aufgeht.
-            leise = self.leise(lage.nummer)
             b_l = b if lage.richtung is Richtung.X else b_y
             erg = self._eine_lage(e, lage, h=h, b=b_l, f_cd=f_cd)
             self.ergebnisse.append(erg)
-            if not leise:
-                self._protokoll_lage(p, erg, b=b_l, f_cd=f_cd)
+            self._protokoll_lage(p, erg, b=b_l, f_cd=f_cd)
 
             ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
                 min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
             ergebnis[self.d_verhaeltnis[lage.nummer].id] = Groesse(
                 erg.verhaeltnis, EINHEITSLOS)
-            urteile.append(self._urteil(erg, still=leise))
+            urteile.append(self._urteil(erg))
 
-        return ergebnis, urteile
+        self._protokoll_massgebend(p, urteile)
+        return ergebnis, self.teilurteile(urteile)
 
     def _eine_lage(
         self, e: Eingaben, lage: Bewehrungslage, *,
@@ -264,7 +260,7 @@ class Duktilitaet(Nachweis):
             f"{'≤' if erg.erfuellt else '>'} {GRENZE:.2f}.")
         return erg
 
-    def _urteil(self, erg: Lagenergebnis, *, still: bool = False) -> NachweisUrteil:
+    def _urteil(self, erg: Lagenergebnis) -> NachweisUrteil:
         nummer = erg.lage.nummer
         einwirkung = WertDef(
             id=self.d_verhaeltnis[nummer].id,
@@ -279,7 +275,7 @@ class Duktilitaet(Nachweis):
         return NachweisUrteil(
             name=f"Duktilität – {nummer}. Lage",
             art="D",
-            langname=f"Duktilität ({erg.lage.richtung.value})",
+            langname="Duktilität",
             fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
@@ -289,8 +285,24 @@ class Duktilitaet(Nachweis):
             # Strich und daneben der Hinweis, warum.
             einwirkung=einwirkung if erg.machbar else None,
             widerstand=widerstand if erg.machbar else None,
-            still=still,
         )
+
+
+    def _protokoll_massgebend(self, p: Protokoll,
+                              urteile: Sequence[NachweisUrteil]) -> None:
+        """
+        Welche Lage den Nachweis entscheidet.
+
+        In der Zusammenfassung steht nur eine Zeile -- die schlechtere der
+        beiden Lagen. Ohne diesen Satz stuende in der Herleitung beides
+        nebeneinander und man muesste die Zahlen selbst vergleichen, um zu
+        wissen, welche davon in der Tabelle gelandet ist.
+        """
+        massgebend = self.massgebend(urteile)
+        if len(urteile) < 2 or not massgebend:
+            return
+        p.text(f"Massgebend ist die {massgebend[0].fall} mit dem kleineren "
+               f"Erfüllungsgrad; sie steht in der Zusammenfassung.")
 
     # -- Mitschrift ---------------------------------------------------------
 

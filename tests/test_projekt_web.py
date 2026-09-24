@@ -20,14 +20,14 @@ class TestProjektBeschreibung(unittest.TestCase):
         aufbau = Projekt.beispiel().aufbauen()
         self.assertEqual(len(aufbau.baustoffe), 2)
         self.assertEqual(len(aufbau.querschnitte), 1)
-        self.assertEqual(sorted(aufbau.nachweise), ["q1.x", "q1.y"])
+        self.assertEqual(sorted(aufbau.nachweise), ["q1.x"])
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         self.assertTrue(loesung.vollstaendig)
         # Gefuehrt werden die 6 M-N-Nachweise. Die uebrigen rechnen still mit:
         # eingeschaltet hat sie niemand, und ungefragt in der Tabelle staenden
         # sie sonst bei jeder Platte.
         laut = [u for u in loesung.urteile if not u.still]
-        self.assertEqual(len(laut), 6)
+        self.assertEqual(len(laut), 3)
         self.assertTrue(all(u.art == "M-N" for u in laut))
         self.assertTrue([u for u in loesung.urteile if u.still])
 
@@ -110,9 +110,9 @@ class TestVollstaendigeAblage(unittest.TestCase):
                     ],
                     kombinationen=[
                         KombinationEintrag("Feld", 120.0, -50.0, 80.0,
-                                           art="M_konstant", richtung="x"),
+                                           art="M_konstant"),
                         KombinationEintrag("Stütze", -90.0, 0.0, 140.0,
-                                           art="naechster_Punkt", richtung="y"),
+                                           art="naechster_Punkt"),
                     ]),
                 QuerschnittEintrag(
                     "q2", "Wand", "b2", h=200.0, b=1000.0,
@@ -371,9 +371,9 @@ class TestUrteilsraum(unittest.TestCase):
             "rechnen", {"projekt": self.zweiplattenprojekt().als_dict()})
         raeume = {u["raum"] for u in antwort.daten["urteile"]}
         self.assertTrue(all(r.startswith("querschnitt.q") for r in raeume), raeume)
-        # 2 Platten x 2 Richtungen M-N -- mehr ist im Beispiel nicht
+        # 2 Platten, je ein M-N-Nachweis in x -- mehr ist im Beispiel nicht
         # eingeschaltet, und die stillen Nachweise stehen nicht in dieser Liste.
-        self.assertEqual(len(raeume), 4)
+        self.assertEqual(len(raeume), 2)
 
 
 class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
@@ -388,18 +388,19 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
     def test_der_katalog_traegt_sie(self):
         vorlage = api.katalog()["neue_platte"]
         self.assertEqual(vorlage["h"], 300.0)
+        # Alle vier: die y-Lagen liegen aussen und kosten x seine statische
+        # Höhe -- sie leer zu lassen hiesse, mit einer Höhe zu rechnen, die es
+        # auf der Baustelle nicht gibt.
         self.assertEqual([l["grund"]["durchmesser"] for l in vorlage["lagen"]],
-                         [12.0, 0.0, 0.0, 12.0])
+                         [12.0] * 4)
         self.assertEqual(vorlage["kombinationen"][0]["M_Ed"], 30.0)
 
     def test_ihre_nachweise_sind_ausgeschaltet(self):
         vorlage = api.katalog()["neue_platte"]
-        for feld in ("duktilitaet", "sproede_lagen", "zwaengung_biegung_lagen"):
+        for feld in ("duktilitaet", "sproede", "zwaengung_biegung", "zwaengung"):
             with self.subTest(feld=feld):
-                self.assertEqual(vorlage[feld], [False] * 4)
+                self.assertIs(vorlage[feld], False)
         self.assertFalse(vorlage["haeufige_aus_tragsicherheit"])
-        self.assertFalse(vorlage["zwaengung_x"])
-        self.assertFalse(vorlage["zwaengung_y"])
 
     def test_sie_folgt_den_vorgaben_der_beschreibung(self):
         """
@@ -410,7 +411,7 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
 
         vorlage = api.katalog()["neue_platte"]
         leer = QuerschnittEintrag(kennung="x", name="x", beton="b").als_dict()
-        for feld in ("duktilitaet", "sproede_lagen", "zwaengung_biegung_lagen",
+        for feld in ("duktilitaet", "sproede", "zwaengung_biegung", "zwaengung",
                      "haeufige_aus_tragsicherheit", "automatik_modus",
                      "automatik_teilungen", "automatik_mindestdurchmesser",
                      "rissanforderung", "kriechzahl", "d_max", "k_c", "b"):
@@ -516,8 +517,8 @@ class TestKurzeSchalterlisten(unittest.TestCase):
 
     def test_eine_kurze_liste_stuerzt_nicht_ab(self):
         for feld, kurz in (("duktilitaet", [True]),
-                           ("sproede_lagen", []),
-                           ("zwaengung_biegung_lagen", [False, True])):
+                           ("sproede", []),
+                           ("zwaengung_biegung", [False, True])):
             with self.subTest(feld=feld):
                 projekt = Projekt.beispiel()
                 setattr(projekt.querschnitt("q1"), feld, list(kurz))
@@ -529,8 +530,8 @@ class TestKurzeSchalterlisten(unittest.TestCase):
         projekt.querschnitt("q1").duktilitaet = [True]
         aufbau = projekt.aufbauen()
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-        laut = [u.name for u in loesung.gefuehrte_urteile if u.art == "D"]
-        self.assertEqual(laut, ["Duktilität – 1. Lage"])
+        self.assertEqual(len([u for u in loesung.gefuehrte_urteile
+                              if u.art == "D"]), 1)
 
 
 class TestSpannungsnachweisNurWoGefordert(unittest.TestCase):
@@ -584,9 +585,14 @@ class TestStilleNachweise(unittest.TestCase):
         q.h = 600.0
         for k in q.kombinationen:
             k.M_Ed, k.N_Ed, k.V_Ed = 10.0, 0.0, 0.0
-        lage = q.lagen[0]
-        lage.grund.durchmesser, lage.grund.abstand = 6.0, 300.0
-        lage.zulage.durchmesser = 0.0
+        # Beide x-Lagen dünn: geprüft wird der schlechtere Fall, und der soll
+        # am sprödem Versagen scheitern und nicht daran, dass eine Lage fehlt.
+        for nummer in (1, 2, 3, 4):
+            if q.richtung_von(nummer).value != "x":
+                continue
+            lage = q.lagen[nummer - 1]
+            lage.grund.durchmesser, lage.grund.abstand = 6.0, 300.0
+            lage.zulage.durchmesser = 0.0
         return projekt
 
     def antwort(self, projekt: Projekt) -> dict:
@@ -599,13 +605,13 @@ class TestStilleNachweise(unittest.TestCase):
         stille = [h for h in tabelle["stille"]
                   if h["nachweis"].startswith("Sprödes Versagen")]
         self.assertTrue(stille, tabelle["stille"])
-        self.assertEqual(stille[0]["fall"], "1. Lage")
+        self.assertEqual(len(stille), 1)          # eine Zeile, nicht zwei
         self.assertLess(float(stille[0]["grad"]), 1.0)
 
     def test_und_nicht_in_der_tabelle(self):
         tabelle = self.antwort(self.platte())
         arten = {z["zellen"][0] for z in tabelle["zeilen"]}
-        self.assertNotIn(r"\text{Sprödes Versagen (x)}", arten)
+        self.assertNotIn(r"\text{Sprödes Versagen}", arten)
 
     def test_und_nicht_in_der_herleitung(self):
         from opencivil.core.protokoll import TitelBlock
@@ -630,12 +636,12 @@ class TestStilleNachweise(unittest.TestCase):
 
     def test_eingeschaltet_wechselt_er_die_seite(self):
         projekt = self.platte()
-        projekt.querschnitt("q1").sproede_lagen = [True, False, False, False]
+        projekt.querschnitt("q1").sproede = True
         tabelle = self.antwort(projekt)
         self.assertFalse([h for h in tabelle["stille"]
                           if h["nachweis"].startswith("Sprödes Versagen")])
         arten = {z["zellen"][0] for z in tabelle["zeilen"]}
-        self.assertIn(r"\text{Sprödes Versagen (x)}", arten)
+        self.assertIn(r"\text{Sprödes Versagen}", arten)
 
     def test_was_aufgeht_meldet_sich_nicht(self):
         """
@@ -748,7 +754,8 @@ class TestDienst(unittest.TestCase):
         self.assertTrue(antwort.daten["vollstaendig"])
         # Nur die gefuehrten Nachweise -- die stillen stehen als Hinweis unter
         # der Zusammenfassung, nicht in dieser Liste.
-        self.assertEqual(len(antwort.daten["urteile"]), 6)
+        # 3 M-N-Fälle in x; mehr ist im Beispiel nicht eingeschaltet.
+        self.assertEqual(len(antwort.daten["urteile"]), 3)
         self.assertTrue(antwort.daten["alle_nachweise_erfuellt"])
 
     def test_rechnen_mit_einzelziel(self):
@@ -774,7 +781,7 @@ class TestDienst(unittest.TestCase):
         """Ohne gewählte Normalkraft gilt die des ersten Falls der Richtung."""
         antwort = dienst.bearbeite("querkraftkurven", self.mit_querkraft())
         kurven = antwort.daten["querkraftkurven"]
-        self.assertEqual(sorted(kurven), ["q1.x", "q1.y"])
+        self.assertEqual(sorted(kurven), ["q1.x"])
         self.assertEqual(kurven["q1.x"]["N_Ed"], 0.0)
         self.assertEqual(len(kurven["q1.x"]["aeste"]), 2)
 
@@ -782,7 +789,7 @@ class TestDienst(unittest.TestCase):
         rumpf = {**self.mit_querkraft(), "n_ed": {"q1.x": -300.0}}
         kurven = dienst.bearbeite("querkraftkurven", rumpf).daten["querkraftkurven"]
         self.assertEqual(kurven["q1.x"]["N_Ed"], -300.0)
-        self.assertEqual(kurven["q1.y"]["N_Ed"], 0.0)   # unberührt
+        self.assertEqual(sorted(kurven), ["q1.x"])   # in y wird nichts geführt
 
     def test_eine_normalkraft_die_keine_zahl_ist(self):
         """
@@ -1036,7 +1043,7 @@ class TestMehrfachverwendung(unittest.TestCase):
         zweite.kennung, zweite.name = "q2", "Zweite Platte"
         projekt.querschnitte.append(zweite)
         aufbau = projekt.aufbauen()
-        self.assertEqual(sorted(aufbau.nachweise), ["q1.x", "q1.y", "q2.x", "q2.y"])
+        self.assertEqual(sorted(aufbau.nachweise), ["q1.x", "q2.x"])
         self.assertTrue(aufbau.werk.loese(*aufbau.alle_nachweisziele()).vollstaendig)
 
 
@@ -1077,56 +1084,68 @@ class TestAltesFormat(unittest.TestCase):
         self.assertTrue(aufbau.werk.loese(*aufbau.alle_nachweisziele()).vollstaendig)
 
 
-class TestNachweisrichtung(unittest.TestCase):
-    """Je Kombination wählbar, in welcher Tragrichtung sie gilt."""
+class TestNurDieTragrichtungX(unittest.TestCase):
+    """
+    Schnittgrössen gehören immer zur Tragrichtung x.
 
-    def projekt_mit(self, *richtungen: str) -> Projekt:
+    Je Kombination war das einmal wählbar -- x, y oder beide. Nachgewiesen
+    wird nur noch x: die y-Lagen stehen im Querschnitt, weil sie die statische
+    Höhe von x bestimmen und zum Bewehrungsgehalt zählen, aber kein Nachweis
+    fragt nach ihnen. Die halbe Tabelle handelte von einer Richtung, für die
+    niemand Schnittgrössen hatte.
+    """
+
+    def test_jede_kombination_wirkt_in_x(self):
         projekt = Projekt.beispiel()
-        # Duktilität und Mindestbewehrung hängen nicht an der Tragrichtung der
-        # Einwirkung -- hier zählen nur die M-N-Urteile.
-        projekt.querschnitte[0].duktilitaet = [False] * 4
-        for eintrag, richtung in zip(projekt.querschnitte[0].kombinationen, richtungen):
-            eintrag.richtung = richtung
-        return projekt
-
-    def test_nur_x(self):
-        projekt = self.projekt_mit("x", "x", "x")
         mn = [u for u in self._loesen(projekt).urteile if u.art == "M-N"]
+        self.assertEqual(len(mn), len(projekt.querschnitt("q1").kombinationen))
         self.assertTrue(all("Nachweis x" in u.name for u in mn))
-        self.assertEqual(len(mn), 3)
 
-    def test_getrennt_je_richtung(self):
-        projekt = self.projekt_mit("x", "x", "y")
-        namen = [u.name for u in self._loesen(projekt).urteile if u.art == "M-N"]
-        self.assertEqual(sum("Nachweis x" in n for n in namen), 2)
-        self.assertEqual(sum("Nachweis y" in n for n in namen), 1)
+    def test_in_y_entsteht_kein_nachweis(self):
+        aufbau = Projekt.beispiel().aufbauen()
+        for feld in Aufbau.NACHWEISFELDER:
+            with self.subTest(feld=feld):
+                self.assertFalse([s for s in getattr(aufbau, feld)
+                                  if s.endswith(".y")])
 
-    def test_beide_ist_die_vorgabe_alter_beschreibungen(self):
-        """Ohne das Feld darf kein Nachweis stillschweigend wegfallen."""
-        eintrag = KombinationEintrag.aus_dict({"name": "Feld", "M_Ed": 100.0})
-        self.assertEqual(eintrag.richtung, "beide")
-        self.assertTrue(eintrag.gilt_fuer(Richtung.X))
-        self.assertTrue(eintrag.gilt_fuer(Richtung.Y))
+    def test_eine_alte_richtung_stoert_nicht(self):
+        """``x`` und ``beide`` heissen beide: gilt in x. Das Feld entfällt."""
+        for richtung in ("x", "beide"):
+            with self.subTest(richtung=richtung):
+                eintrag = KombinationEintrag.aus_dict(
+                    {"name": "Feld", "M_Ed": 100.0, "richtung": richtung})
+                self.assertEqual(eintrag.M_Ed, 100.0)
+                self.assertFalse(hasattr(eintrag, "richtung"))
 
-    def test_richtung_ueberlebt_das_speichern(self):
-        projekt = self.projekt_mit("y", "x", "beide")
-        kopie = Projekt.aus_dict(json.loads(json.dumps(projekt.als_dict())))
-        self.assertEqual([k.richtung for k in kopie.querschnitte[0].kombinationen],
-                         ["y", "x", "beide"])
-
-    def test_richtung_ohne_kombination_bleibt_stumm(self):
+    def test_ein_reiner_y_lastfall_wird_gemeldet(self):
         """
-        Keine Kombination für eine Richtung ist eine Entscheidung des Benutzers,
-        kein Mangel -- dafür gibt es keine Warnung.
+        Ihn stillschweigend auf x umzudeuten hiesse, eine Zahl an einem
+        anderen Querschnitt anzusetzen als der Benutzer gemeint hat.
+        """
+        for klasse, was in ((KombinationEintrag, "Einwirkung"),
+                            (HaeufigEintrag, "häufige Lastfall")):
+            with self.subTest(klasse=klasse.__name__):
+                with self.assertRaises(ProjektFehler) as fehler:
+                    klasse.aus_dict({"name": "Feld", "M_Ed": 100.0,
+                                     "richtung": "y"})
+                self.assertIn("nur in y-Richtung", str(fehler.exception))
 
-        Der M-N-Nachweis entsteht trotzdem für beide bewehrten Richtungen: er
+    def test_ohne_kombination_bleibt_es_stumm(self):
+        """
+        Keine Kombination ist eine Entscheidung des Benutzers, kein Mangel --
+        dafür gibt es keine Warnung. Der M-N-Nachweis entsteht trotzdem: er
         liefert die Eckwerte der Resistenzlinie, und die gehören dem
         Querschnitt. Ein **Urteil** fällt er ohne Kombination nicht.
         """
-        aufbau = self.projekt_mit("x", "x", "x").aufbauen()
-        self.assertEqual(sorted(aufbau.nachweise), ["q1.x", "q1.y"])
-        self.assertEqual(aufbau.nachweise["q1.y"].kombinationen, [])
-        self.assertEqual(aufbau.warnungen, [])
+        projekt = Projekt.beispiel()
+        projekt.querschnitt("q1").kombinationen = []
+        aufbau = projekt.aufbauen()
+        self.assertEqual(sorted(aufbau.nachweise), ["q1.x"])
+        self.assertEqual(aufbau.nachweise["q1.x"].kombinationen, [])
+        # Eine Warnung gibt es -- dass ohne Schnittgrössen kein
+        # Tragsicherheitsnachweis läuft. Das ist keine Aussage über die
+        # Richtung, und genau darum geht es hier nicht.
+        self.assertFalse([w for w in aufbau.warnungen if "Richtung" in w])
 
     def _loesen(self, projekt: Projekt):
         aufbau = projekt.aufbauen()
@@ -1220,7 +1239,8 @@ class TestNachweisfelder(unittest.TestCase):
         projekt = Projekt.beispiel()
         q = projekt.querschnitt("q1")
         q.rissanforderung = "hoch"
-        q.zwaengung_x = q.zwaengung_y = True
+        q.zwaengung = q.zwaengung_biegung = q.sproede = True
+        q.duktilitaet = True
         q.knickfaelle = [KnickEintrag("Stütze", N_Ed=-500.0, M_Ed_1=20.0)]
         for k in q.kombinationen:
             k.V_Ed = 80.0
@@ -1322,9 +1342,9 @@ class TestAngabengruppen(unittest.TestCase):
         # Erfuellungsgrad. Eine Spalte "Urteil" gab es einmal; sie stand neben
         # dem Grad und sagte dasselbe noch einmal.
         self.assertEqual(len(tabelle["kopf"]), 5)
-        # 6 x M-N -- die uebrigen Nachweise rechnen still mit und stehen
-        # darum nicht in der Tabelle.
-        self.assertEqual(len(tabelle["zeilen"]), 6)
+        # 3 x M-N in x -- die uebrigen Nachweise rechnen still mit und
+        # stehen darum nicht in der Tabelle.
+        self.assertEqual(len(tabelle["zeilen"]), 3)
         for zeile in tabelle["zeilen"]:
             self.assertEqual(len(zeile["zellen"]), len(tabelle["kopf"]))
             self.assertIn("erfuellt", zeile)
@@ -1346,11 +1366,11 @@ class TestAngabengruppen(unittest.TestCase):
             "rechnen", {"projekt": Projekt.beispiel().als_dict()})
         zeilen = antwort.daten["zusammenfassungen"]["q1"]["zeilen"]
         paare = [(z["zellen"][0], z["zellen"][1]) for z in zeilen]
-        self.assertIn((r"\text{Biegung und Normalkraft (x)}", r"\text{Feld}"),
+        self.assertIn((r"\text{Biegung und Normalkraft}", r"\text{Feld}"),
                       paare)
         # Dieselbe Kombination in y ist eine andere Zeile -- vorher waren beide
         # nicht zu unterscheiden.
-        self.assertIn((r"\text{Biegung und Normalkraft (y)}", r"\text{Feld}"),
+        self.assertIn((r"\text{Biegung und Normalkraft}", r"\text{Feld}"),
                       paare)
 
     def test_der_querkraftwiderstand_ist_gross_geschrieben(self):
@@ -1396,7 +1416,7 @@ class TestAngabengruppen(unittest.TestCase):
         ])
         # Durchmesser, Teilung und Stahl stehen in derselben Zeile.
         erste_lage = bewehrung["zeilen"][4]
-        self.assertIn(r"\varnothing 18@150", erste_lage[2])
+        self.assertIn(r"\varnothing 12@150", erste_lage[2])
         self.assertIn("B500B", erste_lage[3])
 
     def test_eine_leere_lage_steht_ohne_bewehrung_da(self):
@@ -1430,15 +1450,15 @@ class TestAngabengruppen(unittest.TestCase):
         q = projekt.querschnitt("q1")
         q.kombinationen = []
         q.duktilitaet = [False] * 4
-        q.sproede_lagen = [True, False, False, False]
-        q.zwaengung_biegung_lagen = [True, False, False, False]
+        q.sproede = True
+        q.zwaengung_biegung = True
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         namen = [z["zellen"][0]
                  for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
         self.assertTrue(namen)
         self.assertEqual(sorted(namen),
-                         [r"\text{Sprödes Versagen (x)}",
-                          r"\text{Zwängung auf Biegung (x)}"])
+                         [r"\text{Sprödes Versagen}",
+                          r"\text{Zwängung auf Biegung}"])
 
     def test_die_duktilitaet_laeuft_auch_ohne_schnittgroessen(self):
         projekt = Projekt.beispiel()
@@ -1447,12 +1467,8 @@ class TestAngabengruppen(unittest.TestCase):
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         namen = [z["zellen"][0]
                  for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
-        self.assertEqual(namen[:2],
-                         [r"\text{Duktilität (x)}", r"\text{Duktilität (x)}"])
-        bezeichnungen = [z["zellen"][1]
-                         for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
-        self.assertEqual(bezeichnungen[:2],
-                         [r"\text{1. Lage}", r"\text{4. Lage}"])
+        # Eine Zeile: die ungünstigere der beiden x-Lagen.
+        self.assertEqual(namen, [r"\text{Duktilität}"])
 
     def test_jede_angabe_behaelt_ihre_wert_id(self):
         """Ohne sie liesse sich im Kasten nichts einzeln hervorheben."""
@@ -1551,7 +1567,6 @@ class TestQuerkraftbewehrungInDerAusgabe(unittest.TestCase):
         q.kombinationen = [q.kombinationen[0]]
         q.kombinationen[0].V_Ed = 150.0
         q.kombinationen[0].N_Ed = 400.0
-        q.kombinationen[0].richtung = "x"
         b = q.querkraftbewehrung
         b.durchmesser, b.stahl = 10.0, "s1"
         b.abstand_x, b.abstand_y = 200.0, 200.0
@@ -1563,44 +1578,36 @@ class TestQuerkraftbewehrungInDerAusgabe(unittest.TestCase):
         self.assertEqual((kurve["alpha_min"], kurve["alpha_max"]), (40, 50))
         self.assertEqual(kurve["punkte"][-1]["alpha"], 50)
 
-    def test_ein_widerstand_von_null_traegt_seinen_grund(self):
-        """
-        Eine Null erklärt sich nicht von selbst. Steht in der Tabelle 0.0 kN/m,
-        muss daneben stehen, warum -- im Tooltip allein findet es niemand.
-        """
-        projekt = self.projekt(abstand_y=None, anzahl_y=5.0)
-        for k in projekt["querschnitte"][0]["kombinationen"]:
-            k["richtung"] = "beide"
-        antwort = dienst.bearbeite("rechnen", {"projekt": projekt})
-        zeilen = antwort.daten["zusammenfassungen"]["q1"]["zeilen"]
+    # Ein Widerstand von null trug seinen Grund -- geprüft wurde das an einer
+    # Bügeldefinition, die in y nicht rechenbar war. In y wird nichts mehr
+    # nachgewiesen; dieselbe Zusage prüft jetzt `TestOhneBewehrungInX`.
 
-        mit_hinweis = [z for z in zeilen if z["hinweis"]]
-        self.assertTrue(mit_hinweis)
-        for zeile in mit_hinweis:
-            self.assertIn("nicht berechenbar", zeile["hinweis"])
-            self.assertIn("0.0", zeile["zellen"][2])
-        # Erfüllte Nachweise tragen keinen -- sonst stünde unter jeder Tabelle
-        # eine Wand aus Begründungen.
+    def test_erfuellte_nachweise_tragen_keinen_hinweis(self):
+        """Sonst stünde unter jeder Tabelle eine Wand aus Begründungen."""
+        antwort = dienst.bearbeite(
+            "rechnen", {"projekt": Projekt.beispiel().als_dict()})
+        zeilen = antwort.daten["zusammenfassungen"]["q1"]["zeilen"]
+        self.assertTrue(zeilen)
         self.assertFalse([z for z in zeilen if z["erfuellt"] and z["hinweis"]])
 
 
-class TestRichtungOhneBewehrung(unittest.TestCase):
+class TestOhneBewehrungInX(unittest.TestCase):
     """
-    Eine Tragrichtung ohne jeden Bewehrungsposten.
+    Die Tragrichtung x ohne jeden Bewehrungsposten.
 
-    Der Nachweis entfiel früher stillschweigend: wer eine Einwirkung in
-    y-Richtung angegeben hatte, fand sie in der Zusammenfassung nirgends
-    wieder. Ein leerer Platz liest sich aber wie «geprüft und in Ordnung».
+    Der Nachweis entfiel früher stillschweigend: wer eine Einwirkung angegeben
+    hatte, fand sie in der Zusammenfassung nirgends wieder. Ein leerer Platz
+    liest sich aber wie «geprüft und in Ordnung».
     """
 
     def projekt(self, *, mit_querkraft: bool = False) -> Projekt:
         projekt = Projekt.beispiel()
         q = projekt.querschnitt("q1")
-        for lage in (q.lagen[1], q.lagen[2]):      # die beiden y-Lagen
-            lage.grund.durchmesser = 0.0
-            lage.zulage.durchmesser = 0.0
-        for k in q.kombinationen:
-            k.richtung = "beide"
+        for nummer in (1, 2, 3, 4):
+            if q.richtung_von(nummer).value != "x":
+                continue
+            q.lagen[nummer - 1].grund.durchmesser = 0.0
+            q.lagen[nummer - 1].zulage.durchmesser = 0.0
         if mit_querkraft:
             q.kombinationen[0].V_Ed = 120.0
         return projekt
@@ -1611,10 +1618,10 @@ class TestRichtungOhneBewehrung(unittest.TestCase):
         return antwort.daten["zusammenfassungen"]["q1"]["zeilen"]
 
     def test_der_nachweis_steht_da_und_ist_nicht_erfuellt(self):
-        y_zeilen = [z for z in self.zeilen(self.projekt())
-                    if "Rd,y" in z["zellen"][2]]
-        self.assertEqual(len(y_zeilen), 3)          # drei Kombinationen
-        for zeile in y_zeilen:
+        zeilen = [z for z in self.zeilen(self.projekt())
+                  if "Rd,x" in z["zellen"][2]]
+        self.assertEqual(len(zeilen), 3)          # drei Kombinationen
+        for zeile in zeilen:
             self.assertFalse(zeile["erfuellt"])
             self.assertEqual(zeile["zellen"][4], "0.00")
             self.assertIn("0.0", zeile["zellen"][2])    # M_Rd = 0
@@ -1623,8 +1630,8 @@ class TestRichtungOhneBewehrung(unittest.TestCase):
     def test_die_einwirkung_steht_trotzdem_da(self):
         """Ohne sie bliebe unklar, wogegen der Widerstand null nicht reicht."""
         zeile = next(z for z in self.zeilen(self.projekt())
-                     if "M_{Rd,y}" in z["zellen"][2])
-        self.assertIn("M_{Ed,y}", zeile["zellen"][3])
+                     if "M_{Rd,x}" in z["zellen"][2])
+        self.assertIn("M_{Ed,x}", zeile["zellen"][3])
         self.assertIn("100.0", zeile["zellen"][3])
 
     def test_auch_die_querkraft_faellt_aus(self):
@@ -1634,39 +1641,24 @@ class TestRichtungOhneBewehrung(unittest.TestCase):
         halb zu schliessen.
         """
         zeilen = self.zeilen(self.projekt(mit_querkraft=True))
-        quer = [z for z in zeilen if "V_{Rd,y}" in z["zellen"][2]]
+        quer = [z for z in zeilen if "V_{Rd,x}" in z["zellen"][2]]
         self.assertEqual(len(quer), 1)
         self.assertEqual(quer[0]["zellen"][4], "0.00")
-        self.assertIn("V_{Ed,y}", quer[0]["zellen"][3])
+        self.assertIn("V_{Ed,x}", quer[0]["zellen"][3])
 
     def test_erst_alle_m_n_dann_die_querkraft(self):
-        """Dieselbe Folge wie bei den Richtungen, die wirklich gerechnet werden."""
-        zeilen = [z for z in self.zeilen(self.projekt(mit_querkraft=True))
-                  if ",y}" in z["zellen"][2]]
+        """Dieselbe Folge wie dort, wo wirklich gerechnet wird."""
+        zeilen = self.zeilen(self.projekt(mit_querkraft=True))
         arten = [z["zellen"][0].startswith(r"\text{Biegung und Normalkraft")
                  for z in zeilen]
         self.assertEqual(arten, sorted(arten, reverse=True), zeilen)
 
-    def test_die_gegenrichtung_bleibt_unberuehrt(self):
-        zeilen = self.zeilen(self.projekt())
-        x_zeilen = [z for z in zeilen
-                    if z["zellen"][0].startswith(r"\text{Biegung und Normalkraft")
-                    and "Rd,x" in z["zellen"][2]]
-        self.assertEqual(len(x_zeilen), 3)
-        self.assertTrue(all(z["erfuellt"] for z in x_zeilen))
-
-    def test_ohne_einwirkung_in_dieser_richtung_steht_auch_nichts(self):
-        """Wer dort nichts nachweisen will, soll keine leeren Zeilen bekommen."""
+    def test_die_y_lagen_bleiben_unberuehrt(self):
+        """Sie stehen im Querschnitt und zählen zum Bewehrungsgehalt."""
         projekt = self.projekt()
-        for k in projekt.querschnitt("q1").kombinationen:
-            k.richtung = "x"
-        self.assertFalse([z for z in self.zeilen(projekt) if ",y}" in z["zellen"][2]])
-
-    def test_das_urteil_traegt_den_raum_seiner_platte(self):
-        aufbau = self.projekt().aufbauen()
-        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-        for urteil in loesung.urteile:
-            self.assertTrue(urteil.raum.startswith("querschnitt.q1"), urteil.raum)
+        antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
+        bewehrung = antwort.daten["zusammenfassungen"]["q1"]["bewehrung"]
+        self.assertIn("12@150", bewehrung["latex"])
 
 
 class TestGradzeichen(unittest.TestCase):
@@ -1731,8 +1723,7 @@ class TestMindestbewehrungsEingaben(unittest.TestCase):
     def test_vorgaben(self):
         q = Projekt.beispiel().querschnitt("q1")
         self.assertEqual(q.rissanforderung, "normal")
-        self.assertFalse(q.zwaengung_x)
-        self.assertFalse(q.zwaengung_y)
+        self.assertFalse(q.zwaengung)
         self.assertFalse(q.zwaengung_begrenzt)
         # Die 70 % sind eine Abschaetzung und keine Norm -- eingeschaltet wird
         # sie von Hand. Gerechnet wird sie trotzdem, still.
@@ -1745,26 +1736,24 @@ class TestMindestbewehrungsEingaben(unittest.TestCase):
         projekt = Projekt.beispiel()
         q = projekt.querschnitt("q1")
         q.rissanforderung = "hoch"
-        q.zwaengung_x = True
+        q.zwaengung = True
         q.zwaengung_begrenzt = True
         q.haeufige_aus_tragsicherheit = False
-        q.haeufige = [HaeufigEintrag("Gebrauch", M_Ed=70.0, N_Ed=-40.0, richtung="x")]
+        q.haeufige = [HaeufigEintrag("Gebrauch", M_Ed=70.0, N_Ed=-40.0)]
 
         kopie = Projekt.aus_dict(json.loads(json.dumps(projekt.als_dict())))
         k = kopie.querschnitt("q1")
         self.assertEqual(k.rissanforderung, "hoch")
-        self.assertEqual((k.zwaengung_x, k.zwaengung_y, k.zwaengung_begrenzt),
-                         (True, False, True))
+        self.assertEqual((k.zwaengung, k.zwaengung_begrenzt), (True, True))
         self.assertFalse(k.haeufige_aus_tragsicherheit)
         self.assertEqual(len(k.haeufige), 1)
         self.assertEqual((k.haeufige[0].name, k.haeufige[0].M_Ed,
-                          k.haeufige[0].N_Ed, k.haeufige[0].richtung),
-                         ("Gebrauch", 70.0, -40.0, "x"))
+                          k.haeufige[0].N_Ed), ("Gebrauch", 70.0, -40.0))
 
     def test_eine_beschreibung_ohne_die_felder_bekommt_die_vorgaben(self):
         d = Projekt.beispiel().als_dict()
         for q in d["querschnitte"]:
-            for feld in ("rissanforderung", "zwaengung_x", "zwaengung_y",
+            for feld in ("rissanforderung", "zwaengung",
                          "zwaengung_begrenzt", "haeufige",
                          "haeufige_aus_tragsicherheit"):
                 q.pop(feld, None)
@@ -1805,4 +1794,4 @@ class TestMindestbewehrungsEingaben(unittest.TestCase):
         q.haeufige = [HaeufigEintrag("Gebrauch", M_Ed=70.0)]
         mit = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         namen = [u["fall"] for u in mit.daten["urteile"] if u["art"] == "σ_s"]
-        self.assertEqual(namen, ["Gebrauch", "Gebrauch"])   # x und y
+        self.assertEqual(namen, ["Gebrauch"])

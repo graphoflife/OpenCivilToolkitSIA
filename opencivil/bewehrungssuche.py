@@ -46,6 +46,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional, Sequence, Tuple
 
+from opencivil.querschnitt.platte import Richtung
+
 #: Lieferbare Stabdurchmesser in mm, aufsteigend. Die Suche geht sie der
 #: Reihe nach durch; was nicht in der Liste steht, kommt nicht heraus.
 DURCHMESSER: Tuple[float, ...] = (8, 10, 12, 14, 16, 18, 20, 22, 26)
@@ -169,7 +171,7 @@ def _marke(lage: int, art: str) -> str:
 
 def _gesuchte(eintrag, *, arten: Sequence[str]) -> List[Posten]:
     """
-    Welche Posten die Suche anfasst: alle.
+    Welche Posten die Suche anfasst: die der Tragrichtung x.
 
     Auch die, die gerade auf null stehen. Frueher blieben die draussen -- eine
     leere Lage galt als Entscheidung ueber die Anordnung, die die Suche nicht
@@ -177,12 +179,18 @@ def _gesuchte(eintrag, *, arten: Sequence[str]) -> List[Posten]:
     will wissen, *wo* welche hingehoert, und nicht bloss, wie dick die schon
     eingetragene wird.
 
-    Null bleibt dabei ein gueltiges Ergebnis und ist der Anfang jeder Suche
-    (siehe :func:`stufen`). Eine Lage, die kein Nachweis braucht -- etwa in
-    einer Richtung, in der nichts nachgewiesen wird --, bleibt darum leer:
-    kein Schritt hebt dort den Rueckstand, also wird keiner genommen.
+    Die y-Lagen bleiben, wie sie sind. Nachgewiesen wird in y nichts, also
+    gaebe es dort auch kein Mass, an dem sich ein Durchmesser bemessen liesse
+    -- die Suche wuerde sie auf null ziehen, und genau das waere falsch: die
+    y-Bewehrung liegt aussen und bestimmt, wieviel statische Hoehe der
+    x-Bewehrung bleibt. Was dort liegt, sagt der Benutzer.
+
+    Null bleibt fuer die x-Lagen ein gueltiges Ergebnis und ist der Anfang
+    jeder Suche (siehe :func:`stufen`).
     """
-    return [(lage, art) for lage in range(1, len(eintrag.lagen) + 1)
+    return [(lage, art)
+            for lage in range(1, len(eintrag.lagen) + 1)
+            if eintrag.richtung_von(lage) is Richtung.X
             for art in arten]
 
 
@@ -341,12 +349,18 @@ def _arbeitskopie(projekt, kennung: str, *, kraefte: bool, leeren: bool = True):
     # frischen Platte, neben der eine andere stand.
     kopie.querschnitte = [q for q in kopie.querschnitte if q.kennung == kennung]
     eintrag = kopie.querschnitt(kennung)
-    eintrag.duktilitaet = [False] * len(eintrag.duktilitaet)
+    eintrag.duktilitaet = False
     if leeren:
         # Sonst kaeme bei einer Platte mit vorhandener Zulage eine
         # Grundbewehrung von null heraus -- richtig gerechnet und trotzdem
         # nicht die Antwort auf die gestellte Frage.
-        for lage in eintrag.lagen:
+        #
+        # Nur die x-Lagen: die y-Bewehrung sucht niemand, sie steht da, wo der
+        # Benutzer sie hingelegt hat, und die Suche muss mit ihr rechnen --
+        # sie kostet die x-Lagen ihre statische Hoehe.
+        for nummer, lage in enumerate(eintrag.lagen, start=1):
+            if eintrag.richtung_von(nummer) is not Richtung.X:
+                continue
             lage.grund.durchmesser = 0
             lage.zulage.durchmesser = 0
     if not kraefte:
@@ -528,17 +542,18 @@ def _duktilitaetsbefund(projekt, kennung: str, loesung: "Loesung") -> str:
     uebernehmen(probe, kennung, loesung)
     probe.querschnitte = [q for q in probe.querschnitte if q.kennung == kennung]
     eintrag = probe.querschnitt(kennung)
-    # Nur Lagen, die am Ende auch Bewehrung tragen. Eine leer gebliebene Lage
+    # Unabhaengig vom Schalter: die Suche geht dem Nachweis aus dem Weg, also
+    # schuldet sie eine Auskunft ueber ihn -- auch dort, wo er gerade nicht
+    # gefuehrt wird.
+    #
+    # Traegt keine x-Lage Bewehrung, gibt es nichts zu sagen: eine leere Lage
     # kann nicht duktil sein, und «geht nicht auf» waere dort keine Auskunft
     # ueber die gefundene Bewehrung, sondern darueber, dass es keine gibt.
-    #
-    # Unabhaengig von den Schaltern: die Suche geht dem Nachweis aus dem Weg,
-    # also schuldet sie eine Auskunft ueber ihn -- auch dort, wo er gerade
-    # nicht gefuehrt wird.
-    eintrag.duktilitaet = [
+    eintrag.duktilitaet = any(
         lage.grund.durchmesser > 0 or lage.zulage.durchmesser > 0
-        for lage in eintrag.lagen]
-    if not any(eintrag.duktilitaet):
+        for nummer, lage in enumerate(eintrag.lagen, start=1)
+        if eintrag.richtung_von(nummer) is Richtung.X)
+    if not eintrag.duktilitaet:
         return ""
     eintrag.kombinationen = []
     eintrag.knickfaelle = []
@@ -599,6 +614,8 @@ def _vollstaendig(loesung: Loesung, eintrag) -> Loesung:
     if not loesung.gefunden:
         return loesung
     for nummer in range(1, len(eintrag.lagen) + 1):
+        if eintrag.richtung_von(nummer) is not Richtung.X:
+            continue
         for art in ("grund", "zulage"):
             loesung.durchmesser.setdefault(_marke(nummer, art), 0.0)
     return loesung

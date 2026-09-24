@@ -267,12 +267,12 @@ def loesung_dict(
                 "einwirkung": wert_dict(u.einwirkung) if u.einwirkung else None,
                 "widerstand": wert_dict(u.widerstand) if u.widerstand else None,
             }
-            # Ohne die stillen: diese Liste sagt, welche Nachweise gefuehrt
+            # Die gefuehrten: diese Liste sagt, welche Nachweise gefuehrt
             # wurden, und danach zaehlt die Anzeige oben rechts. Ein stiller
             # Nachweis stuende dort als «nicht erfuellt», waere aber in keiner
             # Tabelle zu finden. Wo er hingehoert, steht er: unter der
             # Zusammenfassung seiner Platte, als Hinweis.
-            for u in loesung.urteile if not u.still
+            for u in loesung.gefuehrte_urteile
         ],
         "alle_nachweise_erfuellt": loesung.alle_nachweise_erfuellt,
         "ketten": {
@@ -865,14 +865,17 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
 
     ergebnis: Dict[str, Any] = {}
     for kennung, qs in aufbau.querschnitte.items():
-        eigene = [u for u in loesung.urteile
-                  if u.raum == qs.id or u.raum.startswith(f"{qs.id}.")]
-        urteile = [u for u in eigene if not u.still]
+        def eigene(urteile):
+            return [u for u in urteile
+                    if u.raum == qs.id or u.raum.startswith(f"{qs.id}.")]
+
+        # Beides kommt fertig aus der Loesung: ohne die stillen, und je
+        # Nachweis, der seine Lagen sammelt, nur die schlechteste. Hier zu
+        # filtern hiesse, die Regel ein zweites Mal zu schreiben.
+        urteile = eigene(loesung.gefuehrte_urteile)
         # Ausgeschaltete Nachweise stehen nicht in der Tabelle -- aber wenn
-        # einer nicht aufgeht, soll man es erfahren. Was dabei meldenswert
-        # ist, entscheidet das Urteil selbst; Konsole und LaTeX-Bericht
-        # fragen dieselbe Eigenschaft.
-        stille = [u for u in eigene if u.meldenswert]
+        # einer nicht aufgeht, soll man es erfahren.
+        stille = eigene(loesung.stille_maengel)
         if not urteile and not stille:
             continue
         zeilen = [

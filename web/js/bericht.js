@@ -457,7 +457,7 @@ function diagrammSicht(loesung) {
       querschnittZeichnen(eintrag, loesung.werte || {}),
       ...eigene.flatMap(([, linie]) => [
         el('div.b-titel', {
-          text: `M-N-Interaktionsdiagramm – ${eintrag.name}, ${linie.richtung}-Richtung`,
+          text: `M-N-Interaktionsdiagramm – ${eintrag.name}`,
         }),
         diagrammZeichnen(linie),
       ]),
@@ -532,7 +532,7 @@ function querkraftkurven(loesung, querschnitt) {
 
   return alle.flatMap(([kennung, kurve]) => [
     el('div.b-titel', {
-      text: `Querkraft über Moment – ${kurve.name}, ${kurve.richtung}-Richtung`,
+      text: `Querkraft über Moment – ${kurve.name}`,
     }),
     querkraftkurveZeichnen(kurve),
     el('div.kurvenfuss', {}, [
@@ -565,7 +565,7 @@ function neigungskurven(loesung, querschnitt) {
 
   return alle.flatMap(([, kurve]) => [
     el('div.b-titel', {
-      text: `Querkraft über Neigung – ${kurve.name}, ${kurve.richtung}-Richtung`,
+      text: `Querkraft über Neigung – ${kurve.name}`,
     }),
     neigungskurveZeichnen(kurve),
     el('div.kurvenfuss', {}, [

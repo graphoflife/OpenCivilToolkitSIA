@@ -249,7 +249,8 @@ class Rissnormalkraft(Nachweis):
                 min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
             urteile.append(self._urteil(erg))
 
-        return ergebnis, urteile
+        self._protokoll_massgebend(p, urteile)
+        return ergebnis, self.teilurteile(urteile)
 
     def _eine_lage(self, e: Eingaben, lage: Bewehrungslage, *,
                    f_ctm: float) -> Lagenergebnis:
@@ -304,7 +305,7 @@ class Rissnormalkraft(Nachweis):
         return NachweisUrteil(
             name=f"Rissnormalkraft {r} – {nummer}. Lage",
             art="N_Riss",
-            langname=f"Zwängung auf Normalkraft ({r})",
+            langname="Zwängung auf Normalkraft",
             fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
@@ -313,6 +314,23 @@ class Rissnormalkraft(Nachweis):
             einwirkung=einwirkung if erg.machbar else None,
             widerstand=widerstand if erg.machbar else None,
         )
+
+
+    def _protokoll_massgebend(self, p: Protokoll,
+                              urteile: Sequence[NachweisUrteil]) -> None:
+        """
+        Welche Lage den Nachweis entscheidet.
+
+        In der Zusammenfassung steht nur eine Zeile -- die schlechtere der
+        beiden Lagen. Ohne diesen Satz stuende in der Herleitung beides
+        nebeneinander und man muesste die Zahlen selbst vergleichen, um zu
+        wissen, welche davon in der Tabelle gelandet ist.
+        """
+        massgebend = self.massgebend(urteile)
+        if len(urteile) < 2 or not massgebend:
+            return
+        p.text(f"Massgebend ist die {massgebend[0].fall} mit dem kleineren "
+               f"Erfüllungsgrad; sie steht in der Zusammenfassung.")
 
     # -- Mitschrift ---------------------------------------------------------
 
@@ -581,17 +599,15 @@ class ZwaengungBiegung(Nachweis):
         self.ergebnisse = []
 
         for lage in self.lagen:
-            # Ausgeschaltete Lagen rechnen mit und schweigen dabei.
-            leise = self.leise(lage.nummer)
             erg = self._eine_lage(e, lage, h=h, b=b, f_ctm=f_ctm, E_cm=E_cm, phi=phi)
             self.ergebnisse.append(erg)
-            if not leise:
-                self._protokoll_lage(p, erg, b=b, f_ctm=f_ctm)
+            self._protokoll_lage(p, erg, b=b, f_ctm=f_ctm)
             ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
                 min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
-            urteile.append(self._urteil(erg, still=leise))
+            urteile.append(self._urteil(erg))
 
-        return ergebnis, urteile
+        self._protokoll_massgebend(p, urteile)
+        return ergebnis, self.teilurteile(urteile)
 
     def _eine_lage(self, e: Eingaben, lage: Bewehrungslage, *, h: float,
                    b: float, f_ctm: float, E_cm: float,
@@ -641,8 +657,7 @@ class ZwaengungBiegung(Nachweis):
             f"M_Riss = {M_Riss / 1e3:.1f} kNm.")
         return erg
 
-    def _urteil(self, erg: Momentlagenergebnis, *,
-                still: bool = False) -> NachweisUrteil:
+    def _urteil(self, erg: Momentlagenergebnis) -> NachweisUrteil:
         nummer = erg.lage.nummer
         r = self.richtung.value
         einwirkung = WertDef(
@@ -658,7 +673,7 @@ class ZwaengungBiegung(Nachweis):
         return NachweisUrteil(
             name=f"Zwängung Biegung {r} – {nummer}. Lage",
             art="ZB",
-            langname=f"Zwängung auf Biegung ({r})",
+            langname="Zwängung auf Biegung",
             fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
@@ -666,8 +681,24 @@ class ZwaengungBiegung(Nachweis):
             hinweis=erg.hinweis,
             einwirkung=einwirkung if erg.machbar else None,
             widerstand=widerstand if erg.machbar else None,
-            still=still,
         )
+
+
+    def _protokoll_massgebend(self, p: Protokoll,
+                              urteile: Sequence[NachweisUrteil]) -> None:
+        """
+        Welche Lage den Nachweis entscheidet.
+
+        In der Zusammenfassung steht nur eine Zeile -- die schlechtere der
+        beiden Lagen. Ohne diesen Satz stuende in der Herleitung beides
+        nebeneinander und man muesste die Zahlen selbst vergleichen, um zu
+        wissen, welche davon in der Tabelle gelandet ist.
+        """
+        massgebend = self.massgebend(urteile)
+        if len(urteile) < 2 or not massgebend:
+            return
+        p.text(f"Massgebend ist die {massgebend[0].fall} mit dem kleineren "
+               f"Erfüllungsgrad; sie steht in der Zusammenfassung.")
 
     # -- Mitschrift ---------------------------------------------------------
 

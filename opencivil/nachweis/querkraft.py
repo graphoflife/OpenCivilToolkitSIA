@@ -596,7 +596,7 @@ class Querkraft(Nachweis):
         urteile.append(NachweisUrteil(
             name=f"Querkraft {self.richtung.value} – {fall.name}",
             art="V",
-            langname=f"Querkraft ({self.richtung.value})",
+            langname="Querkraft",
             fall=fall.name,
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),

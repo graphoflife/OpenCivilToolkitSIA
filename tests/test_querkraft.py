@@ -29,14 +29,16 @@ class TestQuerkraft(unittest.TestCase):
         """
         Feld, x-Richtung, M_Ed = 100 kNm/m, N_Ed = 0, von Hand nachgerechnet:
 
-            d     = 261 mm            (Grund ⌀18; die Zulage ⌀12 liegt bei
-                                       ungünstiger Lage weiter innen)
+            d     = 249 mm            (Grund ⌀18 in der 2. Lage; darunter
+                                       liegt die y-Lage ⌀12, und die Zulage
+                                       ⌀12 sitzt bei ungünstiger Lage weiter
+                                       innen)
             k_g   = max(1.20; 48/(16+32·1))   = 1.200   ← der Riegel greift
-            m_Rd  = 248.7 kNm/m       (Handrechnung bei N_Ed = 0)
-            eps_v = 434.8·100/(200000·248.7)  = 0.8741 ‰
-            k_d   = 1/(1+0.8741e-3·261·1.200) = 0.7851
+            m_Rd  = 235.9 kNm/m       (Handrechnung bei N_Ed = 0)
+            eps_v = 434.8·100/(200000·235.9)  = 0.9214 ‰
+            k_d   = 1/(1+0.9214e-3·249·1.200) = 0.7841
             tau_cd= 0.3·sqrt(30)/1.5          = 1.0954 N/mm²
-            v_Rd  = 0.7851·1.0954·261         = 224.5 kN/m
+            v_Rd  = 0.7841·1.0954·249         = 213.9 kN/m
         """
         aufbau, gefunden = urteile(projekt_mit_querkraft())
         # Auch das Querkrafturteil trägt den Namensraum seines Nachweises --
@@ -44,10 +46,10 @@ class TestQuerkraft(unittest.TestCase):
         for name, urteil in gefunden.items():
             self.assertTrue(urteil.raum.startswith("querschnitt.q1."), f"{name}: {urteil.raum}")
         erg = aufbau.querkraft["q1.x"].ergebnisse[0]
-        self.assertAlmostEqual(erg.d * 1e3, 261.0, places=6)
-        self.assertAlmostEqual(erg.eps_v * 1e3, 0.8741, places=4)
-        self.assertAlmostEqual(erg.k_d, 0.7851, places=4)
-        self.assertAlmostEqual(erg.v_Rd / 1e3, 224.5, delta=0.2)
+        self.assertAlmostEqual(erg.d * 1e3, 249.0, places=6)
+        self.assertAlmostEqual(erg.eps_v * 1e3, 0.9214, places=4)
+        self.assertAlmostEqual(erg.k_d, 0.7841, places=4)
+        self.assertAlmostEqual(erg.v_Rd / 1e3, 213.9, delta=0.2)
 
     def test_k_g_hat_einen_unteren_riegel(self):
         """
@@ -290,8 +292,8 @@ class TestQuerkraftkurve(unittest.TestCase):
         kurve = self.aufbau().querkraft["q1.x"].kurve(0.0)
         unten = self.ast(kurve, True)["d"]
         oben = self.ast(kurve, False)["d"]
-        self.assertAlmostEqual(unten, 0.261, places=6)    # 1. Lage, ⌀18
-        self.assertAlmostEqual(oben, 0.264, places=6)     # 4. Lage, ⌀12
+        self.assertAlmostEqual(unten, 0.249, places=6)    # untere x-Lage, ⌀18
+        self.assertAlmostEqual(oben, 0.252, places=6)     # obere x-Lage, ⌀12
         self.assertNotAlmostEqual(unten, oben)
 
     def test_fuenfzig_punkte_je_ast_von_null_bis_m_rd_plus_zwanzig(self):
@@ -506,9 +508,9 @@ class TestNachweisMitBuegeln(unittest.TestCase):
         aufbau, gefunden = urteile(projekt_mit_buegeln())
         erg = aufbau.querkraft["q1.x"].ergebnisse[0]
         self.assertIsNotNone(erg.massgebend)
-        self.assertAlmostEqual(erg.d * 1e3, 261.0, places=6)
+        self.assertAlmostEqual(erg.d * 1e3, 249.0, places=6)
         self.assertAlmostEqual(erg.v_Rd, erg.massgebend.V_Rd)
-        self.assertAlmostEqual(erg.v_Rd / 1e3, 347.3, delta=0.5)
+        self.assertAlmostEqual(erg.v_Rd / 1e3, 331.4, delta=0.5)
 
     def test_ohne_buegel_bleibt_alles_wie_zuvor(self):
         """
@@ -518,7 +520,7 @@ class TestNachweisMitBuegeln(unittest.TestCase):
         aufbau, _ = urteile(projekt_mit_querkraft())
         erg = aufbau.querkraft["q1.x"].ergebnisse[0]
         self.assertIsNone(aufbau.querkraft["q1.x"].buegel)
-        self.assertAlmostEqual(erg.v_Rd / 1e3, 224.5, delta=0.2)
+        self.assertAlmostEqual(erg.v_Rd / 1e3, 213.9, delta=0.2)
         self.assertEqual(erg.punkte, ())
 
     def test_buegel_ersetzen_den_betonanteil(self):
@@ -558,25 +560,21 @@ class TestNachweisMitBuegeln(unittest.TestCase):
         self.assertNotAlmostEqual(
             ergebnisse["Feld"].d, ergebnisse["Stütze"].d, places=6)
 
-    def test_stabzahl_in_y_schliesst_die_y_richtung_aus(self):
+    def test_eine_stabzahl_in_y_bleibt_rechenbar(self):
         """
-        Eine Stabzahl bezieht sich auf die betrachtete Breite. In y liefe die
-        Breite längs der Traglinie mit, und die Formel hätte keinen Bezug mehr.
+        Eine Stabzahl bezieht sich auf die betrachtete Breite. Früher schloss
+        sie den Querkraftnachweis in y aus -- dort liefe die Breite längs der
+        Traglinie mit, und die Formel hätte keinen Bezug mehr. Nachgewiesen
+        wird ohnehin nur x, also stellt sich die Frage nicht mehr; geprüft
+        bleibt, dass x davon unberührt ist.
         """
         projekt = projekt_mit_buegeln(abstand_y=None, anzahl_y=5.0)
-        for k in projekt.querschnitte[0].kombinationen:
-            k.richtung = "beide"
         aufbau, gefunden = urteile(projekt)
 
         in_x = gefunden["Querkraft x – Feld"]
         self.assertTrue(in_x.erfuellt)
         self.assertGreater(in_x.widerstand.groesse.si, 0.0)
-
-        in_y = gefunden["Querkraft y – Feld"]
-        self.assertFalse(in_y.erfuellt)
-        self.assertAlmostEqual(in_y.widerstand.groesse.si, 0.0)
-        self.assertIn("Widerstand in y-Richtung nicht berechenbar, wegen "
-                      "Bügeldefinition", in_y.begruendung)
+        self.assertFalse([n for n in gefunden if n.startswith("Querkraft y")])
 
     def test_die_stabzahl_wird_zur_teilung(self):
         """s_V,y = b / n -- fünf Bügel auf 1000 mm sind 200 mm Teilung."""

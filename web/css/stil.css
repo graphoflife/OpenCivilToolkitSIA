@@ -518,7 +518,7 @@ input[readonly], input:disabled, select:disabled {
    die Karte hinaus, statt den Namen zu kürzen. */
 .einwirkung {
   display: grid;
-  grid-template-columns: 38px minmax(0, 1fr) 54px 54px 56px 56px 18px;
+  grid-template-columns: 38px minmax(0, 1fr) 60px 60px 62px 18px;
   gap: 4px; align-items: center; margin-bottom: 4px;
 }
 /* Im Lastfall ist der Schalter nur ein Beiwerk -- er darf der Zeile nicht die
@@ -527,8 +527,8 @@ input[readonly], input:disabled, select:disabled {
 /* Ein ausgeschalteter Lastfall bleibt stehen -- blass, damit man sieht, dass
    er da ist und nicht gerechnet wird. */
 .einwirkung.ist-aus { opacity: .5; }
-/* Ein häufiger Lastfall trägt keine Querkraft, ein Knicknachweis keine
-   Richtungswahl -- je eine Spalte anders. */
+/* Ein häufiger Lastfall trägt keine Querkraft, ein Knicknachweis dafür
+   zwei Längen -- je eine Spalte anders. */
 .einwirkung.ist-knick {
   grid-template-columns: 38px minmax(0, 1fr) 56px 58px 46px 46px 18px;
 }
@@ -542,7 +542,7 @@ input[readonly], input:disabled, select:disabled {
 .einwirkung .ew-name { padding: 3px 6px; font-weight: 500; }
 .einwirkung .schalter-richtung { justify-self: stretch; }
 .einwirkung.ist-haeufig {
-  grid-template-columns: 38px minmax(0, 1fr) 56px 56px 58px 18px;
+  grid-template-columns: 38px minmax(0, 1fr) 62px 62px 18px;
 }
 
 .werteliste tr.ist-gewaehlt { background: var(--blau-hell); box-shadow: inset 3px 0 0 var(--blau); }

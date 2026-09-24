@@ -35,7 +35,7 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         in die Tabelle zu stellen hiesse, sie zur Norm zu erklären.
         """
         aufbau, gefunden = urteile(self.projekt("erhoeht"))
-        self.assertEqual(sorted(aufbau.spannung), ["q1.x", "q1.y"])
+        self.assertEqual(sorted(aufbau.spannung), ["q1.x"])
         self.assertTrue([n for n in gefunden if n.startswith("Stahlspannung")])
         self.assertTrue(all(n.still for n in aufbau.spannung.values()))
 
@@ -79,7 +79,7 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         projekt = self.projekt("hoch")
         q = projekt.querschnitte[0]
         q.haeufige_aus_tragsicherheit = False
-        q.haeufige = [HaeufigEintrag("Gebrauch", M_Ed=60.0, N_Ed=0.0, richtung="x")]
+        q.haeufige = [HaeufigEintrag("Gebrauch", M_Ed=60.0, N_Ed=0.0)]
         aufbau, _ = urteile(projekt)
         spannung = aufbau.spannung["q1.x"]
         self.assertEqual([u.fall for u in spannung.urteile if not u.still],

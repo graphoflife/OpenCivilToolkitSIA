@@ -135,16 +135,6 @@ def sorten(art: str) -> Mapping[str, Any]:
     return BETONSORTEN if art == "beton" else STAHLSORTEN
 
 
-#: Fuer welche Lagen der Duktilitaetsnachweis gefuehrt wird -- keine.
-#:
-#: Er laeuft trotzdem, fuer jede Lage: ausgeschaltet heisst still und nicht
-#: weg. Geht er mit der vorliegenden Bewehrung nicht auf, steht ein Hinweis
-#: unter der Zusammenfassung. In der Tabelle und in der Herleitung steht er
-#: erst, wenn ihn jemand einschaltet -- die Norm verlangt ihn nicht fuer jede
-#: Platte, und ungefragt stuende er sonst ueberall.
-DUKTILITAET_VORGABE = (False, False, False, False)
-
-
 def _rissanforderung_aus(wert: Any) -> str:
     """
     Die Anforderung an die Rissbildung, oder die Vorgabe.
@@ -161,12 +151,6 @@ def _rissanforderung_aus(wert: Any) -> str:
             f"Unbekannte Rissanforderung '{text}'. Möglich sind: "
             f"{', '.join(RISSANFORDERUNGEN)}.")
     return text
-
-
-#: Fuer welche Lagen sproedes Versagen und Zwaengung auf Biegung gefuehrt
-#: werden -- keine. Wie bei :data:`DUKTILITAET_VORGABE`: gerechnet wird
-#: trotzdem, sichtbar wird es auf Verlangen.
-LAGENWAHL_VORGABE = (False, False, False, False)
 
 
 def _teilungen_aus(roh, vorgabe) -> List[float]:
@@ -188,28 +172,27 @@ def _teilungen_aus(roh, vorgabe) -> List[float]:
     return sorted(set(werte)) or list(vorgabe)
 
 
-def _lagenwahl_aus(wert: Any) -> List[bool]:
-    """Genau vier Schalter, mit :data:`LAGENWAHL_VORGABE` als Rueckfall."""
-    if not isinstance(wert, (list, tuple)):
-        return list(LAGENWAHL_VORGABE)
-    schalter = [bool(x) for x in wert[:LAGENZAHL]]
-    schalter += list(LAGENWAHL_VORGABE[len(schalter):])
-    return schalter
-
-
-def _duktilitaet_aus(wert: Any) -> List[bool]:
+def _schalter_aus(*werte: Any, vorgabe: bool = False) -> bool:
     """
-    Genau vier Schalter, egal was in der Datei steht.
+    Ein Schalter aus dem, was in der Datei steht.
 
-    Eine Beschreibung aus der Zeit vor diesem Nachweis hat das Feld nicht --
-    dann gilt die Vorgabe. Eine zu kurze oder zu lange Liste wird auf vier
-    gebracht, statt spaeter beim Zugriff auf Lage 4 zu stolpern.
+    Frueher war jeder dieser Nachweise eine Liste von vier Schaltern, einer je
+    Lage, und die Zwaengung hatte je einen fuer x und y. Nachgewiesen wird nur
+    noch x, und dort entscheidet die unguenstigere der beiden Lagen -- ein
+    Schalter genuegt. Eine alte Datei bringt noch die Liste mit: war darin
+    irgendein Haken gesetzt, gilt der Nachweis als eingeschaltet. Das ist die
+    Lesart, die nichts wegnimmt, was jemand verlangt hat.
+
+    Mehrere Werte, weil aus `zwaengung_x` und `zwaengung_y` einer wird.
     """
-    if not isinstance(wert, (list, tuple)):
-        return list(DUKTILITAET_VORGABE)
-    schalter = [bool(x) for x in wert[:LAGENZAHL]]
-    schalter += list(DUKTILITAET_VORGABE[len(schalter):])
-    return schalter
+    gefunden = False
+    for wert in werte:
+        if wert is None:
+            continue
+        gefunden = True
+        if any(wert) if isinstance(wert, (list, tuple)) else bool(wert):
+            return True
+    return False if gefunden else vorgabe
 
 
 # ===========================================================================
@@ -497,8 +480,29 @@ class KnickEintrag(Beschreibung):
         )
 
 
-#: Wahl der Tragrichtung einer Schnittgroessenkombination.
+#: Wahl der Tragrichtung einer Schnittgroessenkombination -- historisch.
+#:
+#: Schnittgroessen gehoeren jetzt immer zur Tragrichtung x; die Wahl gibt es
+#: nicht mehr. Die Konstante steht noch, um alte Dateien zu lesen.
 BEIDE_RICHTUNGEN = "beide"
+
+
+def _nur_x(d: Mapping[str, Any], was: str) -> None:
+    """
+    Alte Lastfaelle, die nur in y galten, gehen nicht mehr.
+
+    Nachgewiesen wird ausschliesslich x. Ein Lastfall mit ``richtung: "y"``
+    stillschweigend auf x umzudeuten hiesse, eine Zahl an einem anderen
+    Querschnitt anzusetzen als der Benutzer gemeint hat -- genau die Art von
+    stiller Aenderung, die ein Nachweiswerkzeug nicht machen darf. ``x`` und
+    ``beide`` gelten unveraendert weiter.
+    """
+    if str(d.get("richtung") or "") == Richtung.Y.value:
+        raise ProjektFehler(
+            f"{was} gilt nur in y-Richtung. Nachgewiesen wird nur noch x -- "
+            f"die y-Lagen stehen im Querschnitt, damit die statische Höhe und "
+            f"der Bewehrungsgehalt stimmen, nachgewiesen werden sie nicht. "
+            f"Bitte die Richtung auf x stellen oder den Lastfall löschen.")
 
 
 #: Anforderung an die Rissbildung. Bestimmt spaeter die zulaessige
@@ -573,21 +577,16 @@ class HaeufigEintrag(Beschreibung):
     name: str
     M_Ed: float = 0.0
     N_Ed: float = 0.0
-    richtung: str = BEIDE_RICHTUNGEN
     aktiv: bool = True
     """Ob dieser Lastfall gerechnet wird. Ausgeschaltet bleibt er stehen."""
 
-    def gilt_fuer(self, richtung: Richtung) -> bool:
-        return self.aktiv and self.richtung in (BEIDE_RICHTUNGEN, richtung.value)
-
-
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "HaeufigEintrag":
+        _nur_x(d, f"Der häufige Lastfall '{d.get('name')}'")
         return cls(
             name=_pflichtfeld(d, "name", "Ein häufiger Lastfall"),
             M_Ed=_zahl(d, "M_Ed", 0.0),
             N_Ed=_zahl(d, "N_Ed", 0.0),
-            richtung=str(d.get("richtung") or BEIDE_RICHTUNGEN),
             aktiv=bool(d.get("aktiv", True)),
         )
 
@@ -603,31 +602,19 @@ class KombinationEintrag(Beschreibung):
     """Querkraft in kN/m -- für den Querkraftnachweis."""
 
     art: str = Erfuellungsart.AUTOMATISCH.value
-    richtung: str = BEIDE_RICHTUNGEN
-    """``x``, ``y`` oder ``beide``.
-
-    In der Regel gehoert eine Schnittgroesse zu einer Tragrichtung -- M_Ed,x
-    und M_Ed,y sind verschiedene Zahlen. ``beide`` prueft dieselben Werte in
-    beiden Richtungen und ist die Vorgabe fuer Beschreibungen aus der Zeit vor
-    dieser Wahlmoeglichkeit, damit dort kein Nachweis stillschweigend wegfaellt.
-    """
 
     aktiv: bool = True
     """Ob dieser Lastfall gerechnet wird. Ausgeschaltet bleibt er stehen."""
 
-    def gilt_fuer(self, richtung: Richtung) -> bool:
-        return self.aktiv and self.richtung in (BEIDE_RICHTUNGEN, richtung.value)
-
-
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "KombinationEintrag":
+        _nur_x(d, f"Die Einwirkung '{d.get('name')}'")
         return cls(
             name=_pflichtfeld(d, "name", "Eine Einwirkung"),
             M_Ed=_zahl(d, "M_Ed", 0.0),
             N_Ed=_zahl(d, "N_Ed", 0.0),
             V_Ed=_zahl(d, "V_Ed", 0.0),
             art=str(d.get("art") or Erfuellungsart.AUTOMATISCH.value),
-            richtung=str(d.get("richtung") or BEIDE_RICHTUNGEN),
             aktiv=bool(d.get("aktiv", True)),
         )
 
@@ -715,13 +702,17 @@ class QuerschnittEintrag(Beschreibung):
     tiefer, der Hebelarm schrumpft, der aufnehmbare Moment sinkt.
     """
 
-    zwaengung_x: bool = False
-    zwaengung_y: bool = False
+    zwaengung: bool = False
     """
-    Ob in dieser Tragrichtung mit einer Normalkraft-Zwaengung zu rechnen ist.
+    Ob mit einer Normalkraft-Zwaengung zu rechnen ist.
 
     Vorgabe aus: eine Zwaengung ist eine Annahme ueber das Tragwerk, keine
     Eigenschaft der Platte. Wer sie braucht, schaltet sie ein.
+
+    Ein Schalter, nicht zwei: nachgewiesen wird nur die Tragrichtung x. Die
+    y-Lagen stehen im Querschnitt, weil sie die statische Hoehe von x
+    bestimmen und zum Bewehrungsgehalt zaehlen -- nachgewiesen werden sie
+    nicht.
     """
 
     zwaengung_begrenzt: bool = False
@@ -773,32 +764,38 @@ class QuerschnittEintrag(Beschreibung):
     automatik_querkraft_teilungen: List[float] = field(
         default_factory=lambda: [100.0, 150.0, 200.0])
 
-    sproede_lagen: List[bool] = field(
-        default_factory=lambda: list(LAGENWAHL_VORGABE))
-    """Je Lage, ob der Nachweis gegen sproedes Versagen gefuehrt wird."""
+    sproede: bool = False
+    """Ob der Nachweis gegen sproedes Versagen gefuehrt wird."""
 
-    zwaengung_biegung_lagen: List[bool] = field(
-        default_factory=lambda: list(LAGENWAHL_VORGABE))
-    """Je Lage, ob die Zwaengung auf Biegung nachgewiesen wird."""
+    zwaengung_biegung: bool = False
+    """Ob die Zwaengung auf Biegung nachgewiesen wird."""
 
-    duktilitaet: List[bool] = field(
-        default_factory=lambda: list(DUKTILITAET_VORGABE))
+    duktilitaet: bool = False
     """
-    Je Lage, ob der Duktilitaetsnachweis *gefuehrt* wird. Index 0 = 1. Lage.
+    Ob der Duktilitaetsnachweis gefuehrt wird.
 
-    Gerechnet wird er ohnehin fuer jede Lage; diese Liste sagt nur, welche in
-    Tabelle und Herleitung stehen. Ueblich sind die beiden aeusseren: sie
-    tragen Feld- und Stuetzmoment, und dort entscheidet sich, ob der
-    Querschnitt sein Versagen ankuendigt.
+    Ein Schalter fuer die Platte und nicht einer je Lage. Gerechnet werden
+    beide x-Lagen -- die obere traegt das Stuetz-, die untere das Feldmoment
+    --, und in der Zusammenfassung steht die unguenstigere. Vier Schalter fuer
+    einen Nachweis waren vier Gelegenheiten, den falschen zu vergessen; die
+    Frage ist ohnehin, ob der Querschnitt sein Versagen ankuendigt, und die
+    beantwortet die schlechtere Lage.
     """
 
     lagen: List[LageEintrag] = field(default_factory=list)
     """Genau vier, Index 0 = 1. Lage (unterste)."""
 
-    richtung_lage1: str = "x"
-    """Richtung der 1. Lage; die 2. bekommt die Gegenrichtung."""
+    richtung_lage1: str = "y"
+    """
+    Richtung der 1. Lage; die 2. bekommt die Gegenrichtung.
 
-    richtung_lage4: str = "x"
+    Vorgabe y, damit x auf der 2. und 3. Lage liegt -- innen. Das ist der
+    unguenstigere Fall und der haeufigere: die Tragrichtung liegt selten zu
+    unterst, weil die Querrichtung darunter durchlaeuft. Wer es anders
+    verlegt, stellt es um.
+    """
+
+    richtung_lage4: str = "y"
     """Richtung der 4. Lage; die 3. bekommt die Gegenrichtung."""
 
     kombinationen: List[KombinationEintrag] = field(default_factory=list)
@@ -807,9 +804,6 @@ class QuerschnittEintrag(Beschreibung):
         while len(self.lagen) < LAGENZAHL:
             self.lagen.append(LageEintrag())
         del self.lagen[LAGENZAHL:]
-        self.duktilitaet = _duktilitaet_aus(self.duktilitaet)
-        self.sproede_lagen = _lagenwahl_aus(self.sproede_lagen)
-        self.zwaengung_biegung_lagen = _lagenwahl_aus(self.zwaengung_biegung_lagen)
 
     def richtung_von(self, nummer: int) -> Richtung:
         """Richtung der Lage 1..4 -- die Paare (1,2) und (3,4) sind gekoppelt."""
@@ -830,9 +824,9 @@ class QuerschnittEintrag(Beschreibung):
         Vorgaben aenderten, lief er auseinander: neue Platten brachten
         Nachweise eingeschaltet mit, die ueberall sonst aus waren.
 
-        Was hier steht, sind Entscheidungen und keine Vorgaben: nur aussen
-        bewehrt, ein Feldmoment zum Anfangen. Alles Uebrige kommt aus den
-        Vorgabewerten der Felder.
+        Was hier steht, sind Entscheidungen und keine Vorgaben: alle vier
+        Lagen bewehrt, ein Feldmoment zum Anfangen. Alles Uebrige kommt aus
+        den Vorgabewerten der Felder.
         """
         def lage(d: float) -> LageEintrag:
             return LageEintrag(
@@ -847,14 +841,15 @@ class QuerschnittEintrag(Beschreibung):
             kennung=kennung,
             name=name,
             beton=beton,
-            # Nur aussen bewehrt: die 1. und die 4. Lage tragen, die beiden
-            # inneren sind erst einmal nicht da. Was man nicht braucht, soll
-            # man wegnehmen muessen und nicht wegnehmen duerfen.
-            lagen=[lage(durchmesser), lage(0.0), lage(0.0), lage(durchmesser)],
+            # Alle vier Lagen bewehrt. Nachgewiesen wird nur x -- das sind
+            # die beiden inneren --, aber die aeusseren y-Lagen liegen
+            # darunter und darueber und druecken die statische Hoehe von x
+            # nach innen. Sie leer zu lassen hiesse, mit einer Hoehe zu
+            # rechnen, die es auf der Baustelle nicht gibt.
+            lagen=[lage(durchmesser) for _ in range(LAGENZAHL)],
             querkraftbewehrung=QuerkraftbewehrungEintrag(
                 durchmesser=0.0, stahl=stahl),
-            kombinationen=[KombinationEintrag(name="Feld", M_Ed=30.0,
-                                              richtung=Richtung.X.value)],
+            kombinationen=[KombinationEintrag(name="Feld", M_Ed=30.0)],
         )
 
     @classmethod
@@ -876,7 +871,7 @@ class QuerschnittEintrag(Beschreibung):
             k_c=_zahl(d, "k_c", K_C),
             querkraftbewehrung=QuerkraftbewehrungEintrag.aus_dict(
                 d.get("querkraftbewehrung") or {}),
-            duktilitaet=_duktilitaet_aus(d.get("duktilitaet")),
+            duktilitaet=_schalter_aus(d.get("duktilitaet")),
             automatik_modus=str(d.get("automatik_modus") or "grund_ohne"),
             automatik_teilungen=_teilungen_aus(d.get("automatik_teilungen"),
                                                (150.0,)),
@@ -885,14 +880,15 @@ class QuerschnittEintrag(Beschreibung):
             automatik_querkraft=bool(d.get("automatik_querkraft", False)),
             automatik_querkraft_teilungen=_teilungen_aus(
                 d.get("automatik_querkraft_teilungen"), (100.0, 150.0, 200.0)),
-            sproede_lagen=_lagenwahl_aus(d.get("sproede_lagen")),
-            zwaengung_biegung_lagen=_lagenwahl_aus(
-                d.get("zwaengung_biegung_lagen")),
+            sproede=_schalter_aus(d.get("sproede"), d.get("sproede_lagen")),
+            zwaengung_biegung=_schalter_aus(
+                d.get("zwaengung_biegung"), d.get("zwaengung_biegung_lagen")),
             rissanforderung=_rissanforderung_aus(d.get("rissanforderung")),
             beschreibung=str(d.get("beschreibung") or ""),
             kriechzahl=_zahl(d, "kriechzahl", KRIECHZAHL),
-            zwaengung_x=bool(d.get("zwaengung_x", False)),
-            zwaengung_y=bool(d.get("zwaengung_y", False)),
+            # Aus x und y wird einer: nachgewiesen wird nur noch x.
+            zwaengung=_schalter_aus(d.get("zwaengung"), d.get("zwaengung_x"),
+                                    d.get("zwaengung_y")),
             zwaengung_begrenzt=bool(d.get("zwaengung_begrenzt", False)),
             haeufige_aus_tragsicherheit=bool(
                 d.get("haeufige_aus_tragsicherheit", False)),
@@ -901,8 +897,8 @@ class QuerschnittEintrag(Beschreibung):
                          for x in (d.get("knickfaelle") or [])],
             spannungsfaelle=[SpannungsfallEintrag.aus_dict(x)
                              for x in (d.get("spannungsfaelle") or [])],
-            richtung_lage1=str(d.get("richtung_lage1") or "x"),
-            richtung_lage4=str(d.get("richtung_lage4") or "x"),
+            richtung_lage1=str(d.get("richtung_lage1") or "y"),
+            richtung_lage4=str(d.get("richtung_lage4") or "y"),
             lagen=[LageEintrag.aus_dict(x) for x in (lagen or [])],
             kombinationen=[
                 KombinationEintrag.aus_dict(x) for x in (d.get("kombinationen") or [])],
@@ -1213,80 +1209,87 @@ class Projekt(Beschreibung):
 
             bewehrt = set(querschnitt.richtungen_mit_bewehrung)
 
-            # Die Schalterlisten hier noch einmal auf vier bringen. Beim
-            # Einlesen tut das schon `__post_init__` -- aber wer die Platte von
-            # Hand baut und `q.duktilitaet = [True]` schreibt, laeuft daran
-            # vorbei, und der Aufbau quittierte das mit einem nackten
-            # IndexError. Gelesen wird, was dasteht; ergaenzt wird mit der
-            # Vorgabe, wie ueberall sonst auch.
-            duktil = _duktilitaet_aus(eintrag.duktilitaet)
-            sproede_wahl = _lagenwahl_aus(eintrag.sproede_lagen)
-            biegung_wahl = _lagenwahl_aus(eintrag.zwaengung_biegung_lagen)
+            # Die vier Schalter durch denselben Leser wie beim Einlesen.
+            # Wer eine alte Beschreibung im Speicher haelt, traegt dort noch
+            # eine Liste -- und `[False, False, False, False]` ist als Wahrheit
+            # *wahr*. Der Nachweis stuende dann eingeschaltet da, obwohl jeder
+            # einzelne Haken aus ist.
+            an_duktil = _schalter_aus(eintrag.duktilitaet)
+            an_sproede = _schalter_aus(eintrag.sproede)
+            an_biegung = _schalter_aus(eintrag.zwaengung_biegung)
+            an_zwang = _schalter_aus(eintrag.zwaengung)
 
-            # Der M-N-Nachweis entsteht fuer jede bewehrte Richtung, auch ohne
-            # Schnittgroessen: seine Eckwerte gehoeren dem Querschnitt, nicht
-            # der Einwirkung, und der Nachweis gegen sproedes Versagen haelt
-            # M_Rd(N=0) dagegen.
-            for richtung in Richtung:
-                passend = [k for k in eintrag.kombinationen if k.gilt_fuer(richtung)]
-                if richtung not in bewehrt:
-                    if passend:
-                        # Ohne Bewehrung laesst sich hier nichts aufstellen. Der
-                        # Nachweis entfiel frueher stillschweigend; wer eine
-                        # Einwirkung angegeben hatte, fand sie nirgends wieder.
-                        fehlend = FehlendeBewehrung(
-                            querschnitt, richtung,
-                            self._ausgefallene(passend, richtung))
-                        werk.registriere(fehlend)
-                        aufbau.fehlende[
-                            f"{eintrag.kennung}.{richtung.value}"] = fehlend
-                    continue
+            # Nachgewiesen wird nur die Tragrichtung x. Die y-Lagen stehen
+            # im Querschnitt -- sie tragen zum Bewehrungsgehalt bei und
+            # druecken die statische Hoehe von x nach innen --, aber kein
+            # Nachweis fragt nach ihnen. Vorher lief hier alles doppelt,
+            # einmal je Richtung, und die Haelfte der Tabelle handelte von
+            # einer Richtung, fuer die niemand Schnittgroessen hatte.
+            richtung = Richtung.X
+            aktiv = [k for k in eintrag.kombinationen if k.aktiv]
 
+            if richtung not in bewehrt:
+                if aktiv:
+                    # Ohne Bewehrung laesst sich hier nichts aufstellen. Der
+                    # Nachweis entfiel frueher stillschweigend; wer eine
+                    # Einwirkung angegeben hatte, fand sie nirgends wieder.
+                    fehlend = FehlendeBewehrung(
+                        querschnitt, richtung,
+                        self._ausgefallene(aktiv, richtung))
+                    werk.registriere(fehlend)
+                    aufbau.fehlende[f"{eintrag.kennung}.x"] = fehlend
+            else:
+                # Der M-N-Nachweis entsteht auch ohne Schnittgroessen: seine
+                # Eckwerte gehoeren dem Querschnitt, nicht der Einwirkung, und
+                # der Nachweis gegen sproedes Versagen haelt M_Rd(N=0) dagegen.
                 nachweis = BiegungNormalkraft(
-                    querschnitt, [self._kombination(k) for k in passend], richtung)
+                    querschnitt, [self._kombination(k) for k in aktiv], richtung)
                 werk.registriere(nachweis)
-                aufbau.nachweise[f"{eintrag.kennung}.{richtung.value}"] = nachweis
+                aufbau.nachweise[f"{eintrag.kennung}.x"] = nachweis
 
-                # Sproedes Versagen: M_Rd(N=0) gegen M_Riss, je Lage.
-                # Alle Lagen der Richtung, nicht nur die eingeschalteten:
-                # ausgeschaltet heisst still und nicht weg. Die Lage rechnet
-                # mit, steht aber nicht in der Herleitung -- und wenn sie
-                # nicht aufgeht, sagt es der Hinweis unter der Tabelle.
+                # Die beiden x-Lagen, von unten nach oben. Beide werden
+                # gerechnet; in die Zusammenfassung kommt die unguenstigere.
                 lagen = [l.nummer for l in querschnitt.lagen
                          if l.richtung is richtung]
                 if lagen:
                     nachweis_sv = SproedesVersagen(
                         querschnitt, richtung, lagen, nachweis)
-                    nachweis_sv.stillstellen(
-                        lagen, [n for n in lagen if sproede_wahl[n - 1]])
+                    nachweis_sv.still = not an_sproede
                     werk.registriere(nachweis_sv)
-                    aufbau.sproede[f"{eintrag.kennung}.{richtung.value}"] = nachweis_sv
+                    aufbau.sproede[f"{eintrag.kennung}.x"] = nachweis_sv
 
-                    # Zwaengung auf Biegung: Stahlspannung gegen ihre Grenze.
                     biegung = ZwaengungBiegung(
                         querschnitt, richtung, lagen,
                         anforderung=eintrag.rissanforderung,
                         kriechzahl=eintrag.kriechzahl)
-                    biegung.stillstellen(
-                        lagen,
-                        [n for n in lagen
-                         if biegung_wahl[n - 1]])
+                    biegung.still = not an_biegung
                     werk.registriere(biegung)
-                    aufbau.zwaengung_biegung[
-                        f"{eintrag.kennung}.{richtung.value}"] = biegung
+                    aufbau.zwaengung_biegung[f"{eintrag.kennung}.x"] = biegung
+
+                    zwang = Rissnormalkraft(
+                        querschnitt, richtung,
+                        anforderung=eintrag.rissanforderung,
+                        begrenzt=eintrag.zwaengung_begrenzt)
+                    zwang.still = not an_zwang
+                    werk.registriere(zwang)
+                    aufbau.rissnormalkraft[f"{eintrag.kennung}.x"] = zwang
+
+                    duktilitaet = Duktilitaet(querschnitt, lagen)
+                    duktilitaet.still = not an_duktil
+                    werk.registriere(duktilitaet)
+                    aufbau.duktilitaet[eintrag.kennung] = duktilitaet
 
                 # Stahlspannung unter haeufiger Einwirkung. Nur bei erhoehter
                 # und hoher Anforderung -- bei normaler steht in Tabelle 17
                 # ein Strich.
-                haeufige, laute = self._haeufige(eintrag, richtung)
+                haeufige, laute = self._haeufige(eintrag)
                 if haeufige and eintrag.rissanforderung in GEFORDERT:
                     spannung = Spannungsbegrenzung(querschnitt, richtung, haeufige)
                     spannung.stillstellen([f.name for f in haeufige], laute)
                     werk.registriere(spannung)
-                    aufbau.spannung[
-                        f"{eintrag.kennung}.{richtung.value}"] = spannung
+                    aufbau.spannung[f"{eintrag.kennung}.x"] = spannung
 
-                mit_querkraft = [k for k in passend if k.V_Ed]
+                mit_querkraft = [k for k in aktiv if k.V_Ed]
                 if mit_querkraft:
                     querkraft = Querkraft(
                         querschnitt,
@@ -1297,14 +1300,10 @@ class Projekt(Beschreibung):
                          for k in mit_querkraft],
                         richtung, nachweis)
                     werk.registriere(querkraft)
-                    aufbau.querkraft[f"{eintrag.kennung}.{richtung.value}"] = querkraft
+                    aufbau.querkraft[f"{eintrag.kennung}.x"] = querkraft
 
-            # Knicken haengt an der Knicklaenge und damit an einer
-            # Tragrichtung -- gerechnet wird nur in x.
-            knickfaelle = [k for k in eintrag.knickfaelle if k.aktiv]
-            if knickfaelle:
-                mn_x = aufbau.nachweise.get(f"{eintrag.kennung}.x")
-                if mn_x is not None:
+                knickfaelle = [k for k in eintrag.knickfaelle if k.aktiv]
+                if knickfaelle:
                     knick = Knicken(
                         querschnitt,
                         [Knickfall(name=k.name,
@@ -1313,38 +1312,13 @@ class Projekt(Beschreibung):
                                    laenge=Groesse(k.laenge, M),
                                    knicklaenge=Groesse(k.knicklaenge, M))
                          for k in knickfaelle],
-                        mn_x, schnell=schnell)
+                        nachweis, schnell=schnell)
                     werk.registriere(knick)
                     aufbau.knicken[eintrag.kennung] = knick
-                else:
-                    aufbau.warnungen.append(
-                        f"Platte '{eintrag.name}': Knicken braucht Bewehrung in "
-                        f"x-Richtung; ohne sie entfällt der Nachweis.")
-
-            # Zwaengung auf Normalkraft: je Richtung, wenn eingeschaltet.
-            for richtung, an in ((Richtung.X, eintrag.zwaengung_x),
-                                 (Richtung.Y, eintrag.zwaengung_y)):
-                if richtung not in bewehrt:
-                    continue
-                zwang = Rissnormalkraft(
-                    querschnitt, richtung,
-                    anforderung=eintrag.rissanforderung,
-                    begrenzt=eintrag.zwaengung_begrenzt)
-                zwang.still = not an
-                werk.registriere(zwang)
-                aufbau.rissnormalkraft[
-                    f"{eintrag.kennung}.{richtung.value}"] = zwang
-
-            # Die Duktilitaet haengt an der Bewehrung, nicht an den
-            # Schnittgroessen -- sie laeuft auch ohne Einwirkung.
-            alle_lagen = [l.nummer for l in querschnitt.lagen]
-            if alle_lagen:
-                duktilitaet = Duktilitaet(querschnitt, alle_lagen)
-                duktilitaet.stillstellen(
-                    alle_lagen,
-                    [n for n in alle_lagen if duktil[n - 1]])
-                werk.registriere(duktilitaet)
-                aufbau.duktilitaet[eintrag.kennung] = duktilitaet
+            if richtung not in bewehrt and eintrag.knickfaelle:
+                aufbau.warnungen.append(
+                    f"Platte '{eintrag.name}': Knicken braucht Bewehrung in "
+                    f"x-Richtung; ohne sie entfällt der Nachweis.")
 
             aktive = [s for s in eintrag.spannungsfaelle if s.aktiv]
             if aktive:
@@ -1458,9 +1432,9 @@ class Projekt(Beschreibung):
         )
 
     def _haeufige(self, eintrag: "QuerschnittEintrag",
-                  richtung: Richtung) -> Tuple[List[Haeufigerfall], List[str]]:
+                  ) -> Tuple[List[Haeufigerfall], List[str]]:
         """
-        Die haeufigen Lastfaelle dieser Richtung -- und welche davon laut sind.
+        Die haeufigen Lastfaelle -- und welche davon laut sind.
 
         Die eigens angegebenen, und zusaetzlich die Tragsicherheitsfaelle mit
         :data:`HAEUFIG_ANTEIL`. Beides nebeneinander: die 70 % sind eine
@@ -1494,13 +1468,13 @@ class Projekt(Beschreibung):
                 name=f"{k.name} ({HAEUFIG_ANTEIL * 100:.0f} %)",
                 M_Ed=Groesse(HAEUFIG_ANTEIL * k.M_Ed, KNM),
                 N_Ed=Groesse(HAEUFIG_ANTEIL * k.N_Ed, KN))
-            for k in eintrag.kombinationen if k.gilt_fuer(richtung)
+            for k in eintrag.kombinationen if k.aktiv
         ]
         eigene = [
             Haeufigerfall(name=h.name,
                           M_Ed=Groesse(h.M_Ed, KNM),
                           N_Ed=Groesse(h.N_Ed, KN))
-            for h in eintrag.haeufige if h.gilt_fuer(richtung)
+            for h in eintrag.haeufige if h.aktiv
         ]
         laute = [f.name for f in eigene]
         if eintrag.haeufige_aus_tragsicherheit:
@@ -1525,7 +1499,7 @@ class Projekt(Beschreibung):
         # gehoeren beieinander.
         return [
             Ausgefallen(
-                art="M-N", langname=f"Biegung und Normalkraft ({r})",
+                art="M-N", langname="Biegung und Normalkraft",
                 fall=k.name,
                 symbol=f"M_{{Rd,{r}}}",
                 einwirkung_symbol=f"M_{{Ed,{r}}}",
@@ -1533,7 +1507,7 @@ class Projekt(Beschreibung):
             for k in kombinationen
         ] + [
             Ausgefallen(
-                art="V", langname=f"Querkraft ({r})", fall=k.name,
+                art="V", langname="Querkraft", fall=k.name,
                 symbol=f"V_{{Rd,{r}}}",
                 einwirkung_symbol=f"V_{{Ed,{r}}}",
                 einwirkung=Groesse(abs(k.V_Ed), KN_PRO_M), einheit=KN_PRO_M)
@@ -1609,18 +1583,17 @@ class Projekt(Beschreibung):
             querschnitte=[QuerschnittEintrag(
                 kennung="q1", name="Decke über EG", beton="b1",
                 h=300.0, b=1000.0,
-                # 1. Lage in x (Haupttragrichtung unten), 2. Lage damit in y;
-                # 4. Lage in x, 3. Lage in y.
-                richtung_lage1="x", richtung_lage4="x",
+                # Aussen y, innen x -- der übliche Fall: die Querrichtung
+                # läuft unten und oben durch, die Tragrichtung liegt dazwischen
+                # und verliert dadurch statische Höhe.
+                richtung_lage1="y", richtung_lage4="y",
                 lagen=[
-                    lage(18.0, zulage=12.0),   # 1. Lage x, mit Zulage
-                    lage(16.0),                # 2. Lage y
-                    lage(12.0),                # 3. Lage y
-                    lage(12.0),                # 4. Lage x
+                    lage(12.0),                # 1. Lage y, unten aussen
+                    lage(18.0, zulage=12.0),   # 2. Lage x, mit Zulage
+                    lage(12.0),                # 3. Lage x
+                    lage(12.0),                # 4. Lage y, oben aussen
                 ],
-                # Dieselbe Kombination wird in beiden Tragrichtungen geprüft.
-                # Die Werte sind so gewählt, dass beide Richtungen aufgehen --
-                # das Beispiel soll grün starten.
+                # Die Werte sind so gewählt, dass das Beispiel grün startet.
                 kombinationen=[
                     KombinationEintrag(name="Feld", M_Ed=100.0, N_Ed=0.0),
                     KombinationEintrag(name="Feld mit Druck", M_Ed=100.0, N_Ed=-300.0),

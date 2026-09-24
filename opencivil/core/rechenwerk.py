@@ -87,6 +87,34 @@ class NichtBerechenbar:
         return "\n".join(zeilen)
 
 
+def _gesammelt(urteile: Sequence[NachweisUrteil]) -> List[NachweisUrteil]:
+    """
+    Teilurteile derselben Frage auf das schlechteste zusammenziehen.
+
+    Gesammelt wird je Namensraum, also je Nachweis: die vier Lagen des
+    Duktilitaetsnachweises sind vier Antworten auf dieselbe Frage, die drei
+    Lastfaelle des M-N-Nachweises sind drei verschiedene Fragen. Welche von
+    beidem es ist, sagt das Urteil selbst -- nicht diese Stelle, die von den
+    Nachweisen nichts weiss.
+
+    Die Reihenfolge bleibt die des ersten Teilurteils: eine Tabelle, in der
+    Zeilen ihren Platz je nach Zahlenwert wechseln, laesst sich nicht
+    vergleichen.
+    """
+    heraus: List[NachweisUrteil] = []
+    platz: Dict[str, int] = {}
+    for u in urteile:
+        if not u.sammel:
+            heraus.append(u)
+            continue
+        if u.raum not in platz:
+            platz[u.raum] = len(heraus)
+            heraus.append(u)
+        elif u.erfuellungsgrad.si < heraus[platz[u.raum]].erfuellungsgrad.si:
+            heraus[platz[u.raum]] = u
+    return heraus
+
+
 @dataclass
 class Loesung:
     """Ergebnis eines Rechenlaufs."""
@@ -128,19 +156,23 @@ class Loesung:
     @property
     def gefuehrte_urteile(self) -> List[NachweisUrteil]:
         """
-        Die Urteile, die in eine Tabelle gehoeren -- ohne die stillen.
+        Die Urteile, die in eine Tabelle gehoeren.
 
-        Ein stiller Nachweis ist ausgeschaltet: er rechnet mit, damit ein
-        Hinweis stehen kann, wenn er nicht aufgeht, aber gefuehrt hat ihn
-        niemand. Wer eine Zusammenstellung der Nachweise baut, meint diese
-        Liste.
+        Ohne die stillen: ein stiller Nachweis ist ausgeschaltet, er rechnet
+        mit, damit ein Hinweis stehen kann, wenn er nicht aufgeht -- gefuehrt
+        hat ihn niemand.
+
+        Und je Nachweis, der seine Faelle als Teile derselben Frage stempelt
+        (siehe :attr:`NachweisUrteil.sammel`), nur das schlechteste. Vier
+        Zeilen fuer eine Frage waren drei zuviel; beantwortet wird sie von
+        der schlechtesten Lage.
         """
-        return [u for u in self.urteile if not u.still]
+        return _gesammelt([u for u in self.urteile if not u.still])
 
     @property
     def stille_maengel(self) -> List[NachweisUrteil]:
         """Ausgeschaltete Nachweise, die nicht aufgehen -- nur als Hinweis."""
-        return [u for u in self.urteile if u.meldenswert]
+        return _gesammelt([u for u in self.urteile if u.meldenswert])
 
     @property
     def alle_nachweise_erfuellt(self) -> bool:

@@ -180,8 +180,6 @@ class SproedesVersagen(Nachweis):
         self.ergebnisse = []
 
         for lage in self.lagen:
-            # Ausgeschaltete Lagen rechnen mit und schweigen dabei.
-            leise = self.leise(lage.nummer)
             erg = Lagenergebnis(lage=lage)
             erg.M_Rd = abs(e.g(f"M_Rd_{lage.nummer}").si)
             M_Riss = self.groessen.M_Riss
@@ -201,15 +199,15 @@ class SproedesVersagen(Nachweis):
                     f"M_Riss = {M_Riss / 1e3:.1f} kNm.")
 
             self.ergebnisse.append(erg)
-            if not leise:
-                self._protokoll_lage(p, erg)
+            self._protokoll_lage(p, erg)
             ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
                 min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
-            urteile.append(self._urteil(erg, still=leise))
+            urteile.append(self._urteil(erg))
 
-        return ergebnis, urteile
+        self._protokoll_massgebend(p, urteile)
+        return ergebnis, self.teilurteile(urteile)
 
-    def _urteil(self, erg: Lagenergebnis, *, still: bool = False) -> NachweisUrteil:
+    def _urteil(self, erg: Lagenergebnis) -> NachweisUrteil:
         nummer = erg.lage.nummer
         r = self.richtung.value
         einwirkung = WertDef(
@@ -225,7 +223,7 @@ class SproedesVersagen(Nachweis):
         return NachweisUrteil(
             name=f"Sprödes Versagen {r} – {nummer}. Lage",
             art="SV",
-            langname=f"Sprödes Versagen ({r})",
+            langname="Sprödes Versagen",
             fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
@@ -233,8 +231,24 @@ class SproedesVersagen(Nachweis):
             hinweis=erg.hinweis,
             einwirkung=einwirkung if erg.machbar else None,
             widerstand=widerstand if erg.machbar else None,
-            still=still,
         )
+
+
+    def _protokoll_massgebend(self, p: Protokoll,
+                              urteile: Sequence[NachweisUrteil]) -> None:
+        """
+        Welche Lage den Nachweis entscheidet.
+
+        In der Zusammenfassung steht nur eine Zeile -- die schlechtere der
+        beiden Lagen. Ohne diesen Satz stuende in der Herleitung beides
+        nebeneinander und man muesste die Zahlen selbst vergleichen, um zu
+        wissen, welche davon in der Tabelle gelandet ist.
+        """
+        massgebend = self.massgebend(urteile)
+        if len(urteile) < 2 or not massgebend:
+            return
+        p.text(f"Massgebend ist die {massgebend[0].fall} mit dem kleineren "
+               f"Erfüllungsgrad; sie steht in der Zusammenfassung.")
 
     # -- Mitschrift ---------------------------------------------------------
 

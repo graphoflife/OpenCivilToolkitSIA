@@ -16,7 +16,7 @@
  */
 
 import { api } from './api.js';
-import { erklaerung, feld, hakenSchalter, lagenwahl, richtungVon, richtungsWahl } from './bausteine.js';
+import { erklaerung, feld, hakenSchalter, richtungVon, richtungsWahl } from './bausteine.js';
 import { auswahl, el, melden, zahlfeld } from './dom.js';
 import { aendern, projektAendern, zustand } from './zustand.js';
 
@@ -79,7 +79,6 @@ export function nachweiseBlock(querschnitt) {
           el('span', { text: 'M_Ed [kNm]' }),
           el('span', { text: 'N_Ed [kN]' }),
           el('span', { text: 'V_Ed [kN/m]' }),
-          el('span', { text: 'Ri.' }),
           el('span'),
         ])
         : null,
@@ -88,34 +87,31 @@ export function nachweiseBlock(querschnitt) {
         : [el('div.leer', { text: 'Ohne Einwirkung kein Nachweis.' })]),
       anfuegenKnopf('Einwirkung', () => aendernAn((q) => q.kombinationen.push({
         name: `Fall ${q.kombinationen.length + 1}`,
-        M_Ed: 30, N_Ed: 0, V_Ed: 0, art: 'automatisch', richtung: 'x',
+        M_Ed: 30, N_Ed: 0, V_Ed: 0, art: 'automatisch',
       }))),
     ]),
 
-    lagenkapitel(querschnitt, {
-      titel: 'Duktilitätsnachweise',
+    nachweiskapitel(querschnitt, {
+      titel: 'Duktilitätsnachweis',
       feld: 'duktilitaet',
       hinweis: {
         text: 'Begrenzt die Druckzonenhöhe, damit der Querschnitt sein '
           + 'Versagen ankündigt: die Bewehrung fliesst, bevor der Beton '
-          + 'bricht. Gerechnet ohne Normalkraft.',
+          + 'bricht. Gerechnet ohne Normalkraft, für beide x-Lagen; '
+          + 'angezeigt wird die ungünstigere.',
         formel: 'x / d ≤ 0.35   bei M_Ed = 0',
       },
-      beschriftung: (n) => `Duktilität ${n}. Lage`,
-      was: 'Nachweis',
     }),
 
-    lagenkapitel(querschnitt, {
-      titel: 'Nachweise gegen sprödes Versagen',
-      feld: 'sproede_lagen',
+    nachweiskapitel(querschnitt, {
+      titel: 'Nachweis gegen sprödes Versagen',
+      feld: 'sproede',
       hinweis: {
         text: 'Die Bewehrung muss aufnehmen, was der Beton im Augenblick des '
           + 'Reissens abgibt. Sonst reisst und versagt der Querschnitt '
           + 'gleichzeitig, ohne Vorankündigung.',
         formel: 'M_Rd(N_Ed = 0) ≥ M_Riss = f_ct,eff · h²·b / 6',
       },
-      beschriftung: (n) => `Rissmoment ${n}. Lage`,
-      was: 'Nachweis',
     }),
 
     mindestbewehrungsBlock(querschnitt),
@@ -144,8 +140,6 @@ function einwirkungZeile(querschnitt, index) {
     zahl('M_Ed', 'Bemessungsmoment in kNm'),
     zahl('N_Ed', 'Normalkraft in kN – Zug positiv, Druck negativ'),
     zahl('V_Ed', 'Querkraft in kN/m – 0 heisst: kein Querkraftnachweis'),
-    richtungsWahl(k.richtung || 'beide',
-      (wert) => aendern((x) => { x.richtung = wert; })),
     el('button.weg', {
       text: '×', title: 'Einwirkung entfernen',
       on: {
@@ -159,53 +153,47 @@ function einwirkungZeile(querschnitt, index) {
 }
 
 /**
- * Ein Kapitel mit vier Lagenschaltern -- dieselbe Gestalt wie die Duktilität.
+ * Ein Nachweiskapitel mit *einem* Schalter.
  *
- * Drei Nachweise sind so gebaut (Duktilität, sprödes Versagen, Zwängung auf
- * Biegung); dreimal dieselben zwanzig Zeilen wären dreimal dieselbe Gelegenheit
- * auseinanderzulaufen.
+ * Duktilität, sprödes Versagen und Zwängung auf Biegung sind gleich gebaut:
+ * gerechnet werden die beiden x-Lagen, in der Zusammenfassung steht die
+ * ungünstigere. Vorher stand hier ein Schalter je Lage -- vier Haken für eine
+ * Frage, und drei davon betrafen Lagen, die niemand nachweist.
+ *
+ * Nachgewiesen wird nur x. Die y-Lagen stehen im Querschnitt, weil sie die
+ * statische Höhe von x bestimmen; ein Nachweis fragt nicht nach ihnen.
  */
-function lagenkapitel(querschnitt, { titel, feld, hinweis, beschriftung, was }) {
-  // Die Vorgabe steht in der frischen Platte, und die kommt aus dem Kern.
-  // Sie stand einmal hier als Literal, dazu dreimal an den Aufrufstellen und
-  // ein viertes Mal in der Plattenvorlage -- vier Stellen für eine Frage, und
-  // beim ersten Umstellen fanden wir zwei davon.
-  const vorgabe = zustand.katalog?.neue_platte?.[feld] || [false, false, false, false];
-  const wahl = lagenwahl(querschnitt[feld], vorgabe);
-
-  const setzen = (nummer, wert) => projektAendern((p) => {
-    const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
-    q[feld] = lagenwahl(q[feld], vorgabe);
-    q[feld][nummer - 1] = wert;
-  });
+function nachweiskapitel(querschnitt, { titel, feld, hinweis }) {
+  const an = !!querschnitt[feld];
+  const leer = !xLagen(querschnitt).some(
+    (n) => querschnitt.lagen[n - 1].grund.durchmesser > 0
+        || querschnitt.lagen[n - 1].zulage.durchmesser > 0);
 
   return el('div.unterkapitel', {}, [
     el('div.unterkapitel-kopf', {}, [
       el('span', { text: titel }),
       hinweis ? erklaerung(hinweis.text, hinweis.formel) : null,
     ]),
-    ...[1, 2, 3, 4].map((nummer) => {
-      const lage = querschnitt.lagen[nummer - 1];
-      const leer = !(lage.grund.durchmesser > 0 || lage.zulage.durchmesser > 0);
-      const richtung = richtungVon(querschnitt, nummer);
-      // Schalter ganz links, wie bei den Tragsicherheitsnachweisen: das Auge
-      // sucht die Spalte einmal und findet sie danach in jedem Kapitel.
-      return el('div.duktilitaetszeile', {}, [
-        hakenSchalter(wahl[nummer - 1], (wert) => setzen(nummer, wert), was),
-        el('span.richtung', {
-          text: richtung, class: `lage-${richtung}`,
-          title: `Tragrichtung der ${nummer}. Lage`,
-        }),
-        el('span.postenname', { text: beschriftung(nummer) }),
-        // Ein eingeschalteter Nachweis an einer leeren Lage ist kein Fehler
-        // der Eingabe -- er wird geführt und meldet selbst, dass er nicht
-        // geht. Hier steht es trotzdem, damit man es beim Einschalten sieht.
-        el('span.kurvenhinweis', {
-          text: (wahl[nummer - 1] && leer) ? 'Lage nicht definiert' : '',
-        }),
-      ]);
-    }),
+    el('div.duktilitaetszeile', {}, [
+      hakenSchalter(an, (wert) => projektAendern((p) => {
+        p.querschnitte.find((x) => x.kennung === querschnitt.kennung)[feld] = wert;
+      }), 'Nachweis'),
+      el('span.richtung', {
+        text: 'x', class: 'lage-x',
+        title: 'Nachgewiesen wird nur die Tragrichtung x',
+      }),
+      el('span.postenname', { text: 'Geführt für die ungünstigere x-Lage' }),
+      // Ein eingeschalteter Nachweis ohne Bewehrung ist kein Fehler der
+      // Eingabe -- er wird geführt und meldet selbst, dass er nicht geht.
+      // Hier steht es trotzdem, damit man es beim Einschalten sieht.
+      el('span.kurvenhinweis', { text: (an && leer) ? 'keine x-Bewehrung' : '' }),
+    ]),
   ]);
+}
+
+/** Welche der vier Lagen in x tragen -- in aller Regel die 2. und die 3. */
+function xLagen(querschnitt) {
+  return [1, 2, 3, 4].filter((n) => richtungVon(querschnitt, n) === 'x');
 }
 
 /**
@@ -323,7 +311,7 @@ function mindestbewehrungsBlock(querschnitt) {
       richtung
         ? el('span.richtung', {
           text: richtung, class: `lage-${richtung}`,
-          title: `Zwängung in ${richtung}-Richtung`,
+          title: 'Nachgewiesen wird nur die Tragrichtung x',
         })
         : null,
       el('span.postenname', { text: beschriftung }),
@@ -345,17 +333,9 @@ function mindestbewehrungsBlock(querschnitt) {
         + 'Rissbreite nach Tabelle 17.',
         'σ_s,adm ≥ N_Riss / A_s   mit   N_Riss = h_eff/2 · b · f_ct,eff'),
     ]),
-    zwaengung('zwaengung_x', 'Zwängung auf Normalkraft', 'x'),
-    zwaengung('zwaengung_y', 'Zwängung auf Normalkraft', 'y'),
+    zwaengung('zwaengung', 'Zwängung auf Normalkraft', 'x'),
+    zwaengung('zwaengung_biegung', 'Zwängung auf Biegung', 'x'),
     zwaengung('zwaengung_begrenzt', 'Begrenzung auf 500 mm'),
-
-    // Ohne eigene Überschrift: die vier Zeilen schreiben ihren Nachweis selbst
-    // aus und stehen unter derselben Aufschrift wie die Normalkraft-Zwängung.
-    ...lagenkapitel(querschnitt, {
-      feld: 'zwaengung_biegung_lagen',
-      beschriftung: (n) => `Zwängung auf Biegung ${n}. Lage`,
-      was: 'Nachweis',
-    }).childNodes,
 
     el('div.unterkapitel-kopf', { style: { marginTop: '8px' } }, [
       el('span', { text: 'Verhindern des Fliessens für häufige Lastfälle' }),
@@ -397,7 +377,6 @@ function mindestbewehrungsBlock(querschnitt) {
           el('span', { text: 'Bezeichnung' }),
           el('span', { text: 'M_Ed [kNm]' }),
           el('span', { text: 'N_Ed [kN]' }),
-          el('span', { text: 'Ri.' }),
           el('span'),
         ])
         : null,
@@ -412,7 +391,7 @@ function mindestbewehrungsBlock(querschnitt) {
         q.haeufige = q.haeufige || [];
         q.haeufige.push({
           name: `Häufig ${q.haeufige.length + 1}`,
-          M_Ed: 0, N_Ed: 0, richtung: 'beide', aktiv: true,
+          M_Ed: 0, N_Ed: 0, aktiv: true,
         });
       })),
     ],
@@ -444,8 +423,6 @@ function haeufigZeile(querschnitt, index) {
       titel: 'Normalkraft unter häufiger Einwirkung, in kN – Zug positiv',
       beiAenderung: (v) => aendern((x) => { x.N_Ed = v ?? 0; }),
     }),
-    richtungsWahl(k.richtung || 'beide',
-      (wert) => aendern((x) => { x.richtung = wert; })),
     el('button.weg', {
       text: '×', title: 'Häufigen Lastfall entfernen',
       on: {

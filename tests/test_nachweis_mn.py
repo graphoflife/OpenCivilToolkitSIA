@@ -1003,7 +1003,9 @@ class TestSortenindex(unittest.TestCase):
 
         projekt = Projekt.beispiel()
         projekt.materialien.append(MaterialEintrag("s2", "betonstahl", "B500A", "B500A"))
-        projekt.querschnitt("q1").lagen[3].stahl = "s2"
+        # Eine Lage in x -- nur dort wird gerechnet, und nur was gerechnet
+        # wird, steht in der Mitschrift.
+        projekt.querschnitt("q1").lagen[2].stahl = "s2"
         text = self.mitschrift(projekt)
         self.assertIn(r"f_{yd,\text{B500B}}", text)
         self.assertIn(r"f_{yd,\text{B500A}}", text)

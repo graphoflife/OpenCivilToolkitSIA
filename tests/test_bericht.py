@@ -294,13 +294,13 @@ class TestStilleNachweiseImBericht(unittest.TestCase):
         text = als_text(self.loesung())
         abschnitt = text[text.index("Nachweise"):]
         kopf = abschnitt[:abschnitt.index("Nicht geführt")]
-        self.assertNotIn("Sprödes Versagen", kopf)
+        self.assertNotIn("Rissnormalkraft", kopf)
         self.assertIn("M-N-Nachweis", kopf)
 
     def test_die_konsole_verschweigt_sie_aber_nicht(self):
         text = als_text(self.loesung())
         self.assertIn("Nicht geführt, geht aber nicht auf:", text)
-        self.assertIn("Sprödes Versagen x – 1. Lage", text)
+        self.assertIn("Rissnormalkraft x –", text)
 
     def test_das_latex_dokument_widerspricht_sich_nicht(self):
         tex = als_tex(self.loesung())

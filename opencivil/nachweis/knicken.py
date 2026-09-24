@@ -502,7 +502,7 @@ class Knicken(Nachweis):
         return NachweisUrteil(
             name=f"Knicken – {erg.fall.name}",
             art="K",
-            langname=f"Knicken ({self.richtung.value})",
+            langname="Knicken",
             fall=erg.fall.name,
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),

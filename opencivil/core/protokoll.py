@@ -283,12 +283,23 @@ class Protokoll:
     def ist_leer(self) -> bool:
         return not self.bloecke
 
-    def alle_bloecke(self) -> Iterable[Block]:
-        """Laeuft rekursiv durch alle Bloecke, auch die eingeschachtelten."""
+    def alle_bloecke(self) -> List[Block]:
+        """
+        Alle Bloecke, auch die eingeschachtelten -- als Liste.
+
+        Als Liste und nicht als Generator: der Name verspricht eine Sammlung,
+        und wer eine Sammlung zweimal durchlaeuft, erwartet zweimal dasselbe.
+        Ein Generator gab beim zweiten Mal nichts zurueck, lautlos -- eine
+        Pruefung, die danach «nicht gefunden» meldete, obwohl es dastand.
+        Die Blockzahl ist die eines Berichts; sie in eine Liste zu legen
+        kostet nichts.
+        """
+        heraus: List[Block] = []
         for block in self.bloecke:
-            yield block
+            heraus.append(block)
             if isinstance(block, UnterprotokollBlock):
-                yield from block.protokoll.alle_bloecke()
+                heraus.extend(block.protokoll.alle_bloecke())
+        return heraus
 
     def nach_abschnitten(self) -> List[Block]:
         """

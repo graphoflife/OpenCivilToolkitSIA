@@ -91,8 +91,8 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
         # Positives Moment: unten gezogen, oben gedrückt.
         self.assertLess(oben.eps, 0.0)
         self.assertGreater(unten.eps, 0.0)
-        # Und die 1. Lage liegt unten, also bei grossem z.
-        erste = next(s for s in bild.stahl if s.nummer == 1)
+        # Und die unterste Lage liegt bei grossem z.
+        erste = max(bild.stahl, key=lambda s: s.z)
         self.assertGreater(erste.z, self.gerissen.h / 2.0)
         self.assertGreater(erste.sigma, 0.0)
 
@@ -124,8 +124,8 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
         """
         bild = sa.aus_dehnungen(self.gerissen, eps_oben=-0.001, eps_unten=-0.001)
         self.assertNotAlmostEqual(bild.M / 1e3, 0.0, delta=5.0)
-        unten = next(s for s in bild.stahl if s.nummer == 1)
-        oben = next(s for s in bild.stahl if s.nummer == 4)
+        unten = max(bild.stahl, key=lambda s: s.z)
+        oben = min(bild.stahl, key=lambda s: s.z)
         self.assertGreater(abs(unten.kraft), abs(oben.kraft))
 
     def test_eine_unmoegliche_kombination_sagt_das(self):
@@ -232,11 +232,12 @@ class TestUeberDenDienst(unittest.TestCase):
     def test_eine_unbewehrte_richtung_sagt_warum(self):
         projekt = Projekt.beispiel()
         q = projekt.querschnitte[0]
+        # x nach aussen legen und die y-Lagen leeren -- dann gibt es in y
+        # nichts, woraus sich ein Bild bauen liesse.
         q.richtung_lage1 = q.richtung_lage4 = "x"
         for nummer in (2, 3):
             q.lagen[nummer - 1].grund.durchmesser = 0
-        for k in q.kombinationen:
-            k.richtung = "x"
+            q.lagen[nummer - 1].zulage.durchmesser = 0
         q.spannungsfaelle = [SpannungsfallEintrag(name="y", richtung="y")]
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         fall = antwort.daten["spannungsanalysen"]["q1"][0]
