@@ -145,11 +145,13 @@ class Lagenergebnis:
 
 class Rissnormalkraft(Nachweis):
     """
-    Sprödes Versagen unter Normalkraft-Zwängung, je Tragrichtung.
+    Sprödes Versagen unter Normalkraft-Zwängung.
 
-    Zwei Urteile: die untere und die obere Lage dieser Richtung. Beide müssen
+    Ein Urteil je Lage der Tragrichtung: die untere und die obere müssen beide
     die Risskraft aufnehmen können -- ein Zwang kennt keine Zugseite, er
-    beansprucht den Querschnitt über die ganze Höhe.
+    beansprucht den Querschnitt über die ganze Höhe. In der Zusammenfassung
+    steht die ungünstigere der beiden; die Urteile sind als Teile derselben
+    Frage gestempelt (siehe ``Nachweis.teilurteile``).
     """
 
     def __init__(

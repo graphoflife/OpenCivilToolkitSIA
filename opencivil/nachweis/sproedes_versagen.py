@@ -94,11 +94,11 @@ class Lagenergebnis:
 
 class SproedesVersagen(Nachweis):
     """
-    Mindestbewehrung gegen sprödes Versagen, je gewählter Lage.
+    Mindestbewehrung gegen sprödes Versagen.
 
-    Ein Nachweis je Platte und Tragrichtung, ein Urteil je Lage dieser
-    Richtung. Welche Lagen geprüft werden, sagt der Benutzer -- üblich ist die
-    Lage, die das grösste Moment trägt.
+    Ein Nachweis je Platte, ein Urteil je Lage der Tragrichtung. In der
+    Zusammenfassung steht die ungünstigere der beiden -- geht die auf, geht
+    auch die andere auf.
 
     ``M_Rd(N=0)`` kommt als Eingang aus dem M-N-Nachweis. Als Eingang und nicht
     als mitgegebene Zahl, damit die Abhängigkeit im Graphen steht und die

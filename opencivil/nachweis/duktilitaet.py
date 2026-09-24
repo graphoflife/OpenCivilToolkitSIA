@@ -12,15 +12,19 @@ versagt. Der Querschnitt kuendigt sein Versagen an, statt ploetzlich zu
 brechen -- darum wird hier keine Tragfaehigkeit nachgewiesen, sondern ein
 Verhaeltnis.
 
-JE LAGE, NICHT JE RICHTUNG:
+JE LAGE, EIN URTEIL JE LAGE:
 Anders als M-N und Querkraft gilt dieser Nachweis fuer eine einzelne
-Bewehrungslage. Gerechnet werden alle vier; welche davon in Tabelle und
-Herleitung stehen, sagt der Benutzer je Lage (siehe
-:meth:`~opencivil.core.berechnung.Nachweis.stillstellen`). Die uebrigen
-rechnen still mit -- geht eine von ihnen nicht auf, steht darueber ein
-Hinweis unter der Zusammenfassung. Eine eingeschaltete, aber unbewehrte Lage
-ist kein Fehler der Beschreibung: sie bekommt ein Urteil mit Hinweis statt
-einer Zahl.
+Bewehrungslage. Gerechnet werden die beiden Lagen der Tragrichtung -- die
+untere traegt das Feld-, die obere das Stuetzmoment. In der Zusammenfassung
+steht die unguenstigere: geht die auf, gehen beide auf. Die Urteile sind
+dafuer als Teile derselben Frage gestempelt (siehe
+:meth:`~opencivil.core.berechnung.Nachweis.teilurteile`); gezaehlt werden
+trotzdem beide, denn die Bewehrungssuche misst ihren Fortschritt an der Summe
+der Rueckstaende.
+
+Eine unbewehrte Lage ist kein Fehler der Beschreibung: sie bekommt ein Urteil
+mit Hinweis statt einer Zahl -- und ist damit die unguenstigere, steht also
+auch in der Tabelle.
 
 STATISCHE HOEHE:
 ``d`` wird von der **gedrueckten** Randfaser aus gemessen. Bei den unteren
@@ -100,10 +104,10 @@ class Duktilitaet(Nachweis):
 
     Ein Nachweis fuer die ganze Platte, ein Urteil je Lage. Die Lagen einer
     Platte gehoeren zusammen und stehen darum unter einer Ueberschrift; sie auf
-    vier Nachweise zu verteilen ergaebe vier fast leere Abschnitte.
+    zwei Nachweise zu verteilen ergaebe zwei fast leere Abschnitte.
 
-    Welche Lagen laut sind, entscheidet der Aufbau ueber ``stillstellen``;
-    gerechnet werden immer alle, die ihm uebergeben werden.
+    Ob er ueberhaupt gefuehrt wird, entscheidet ein einziger Schalter am
+    Querschnitt; welche Lagen er ansieht, sagt der Aufbau.
     """
 
     def __init__(

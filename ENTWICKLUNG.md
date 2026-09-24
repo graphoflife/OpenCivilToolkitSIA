@@ -43,6 +43,78 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-24 · Eine Tragrichtung, und ein Schalter je Nachweis
+
+Bis heute rechnete das Werkzeug jeden Nachweis in beiden Tragrichtungen. Das
+klang vollständig und war es nicht: für y hatte niemand Schnittgrössen, die
+Toggles standen dort auf aus, und in der Zusammenfassung stand trotzdem die
+halbe Tabelle voll Zeilen, die nichts aussagten. Nachgewiesen wird jetzt nur
+noch x.
+
+Die y-Lagen bleiben trotzdem. Sie sind keine Zierde: sie zählen zum
+Bewehrungsgehalt, und vor allem liegen sie aussen und drücken die x-Bewehrung
+nach innen. Wer sie weglässt, rechnet mit einer statischen Höhe, die es auf der
+Baustelle nicht gibt -- im Beispiel sind das 261 statt 249 mm, also 5 % zuviel.
+Darum ist die Vorgabe neu **x auf der 2. und 3. Lage**: die Querrichtung läuft
+unten und oben durch, die Tragrichtung liegt dazwischen. Der häufigere Fall,
+und der ungünstigere.
+
+Die Suche fasst die y-Lagen nicht an. Das war eine Entscheidung mit zwei
+möglichen Antworten, und die falsche wäre teuer gewesen: sucht man y gegen
+dieselben Nachweise wie x, bekommt y auch dann Eisen, wenn niemand etwas
+nachweisen will -- und sucht man es gegen die *eingeschalteten* Nachweise, bleibt
+y bei den Vorgaben (alles aus) leer, und die statische Höhe von x ist wieder
+optimistisch. Beides schlecht. Also gar nicht: der y-Durchmesser ist eine
+Eingabe, und die Suche rechnet mit ihm.
+
+### Vier Haken werden einer
+
+Duktilität, sprödes Versagen, Zwängung auf Biegung und Zwängung auf Normalkraft
+hatten je einen Schalter pro Lage. Vier Haken für eine Frage, und drei davon
+betrafen Lagen, die niemand nachweist. Jetzt ist es einer. Gerechnet werden
+beide x-Lagen -- die untere trägt das Feld-, die obere das Stützmoment --, in
+der Zusammenfassung steht die ungünstigere, und die Herleitung zeigt beide samt
+einem Satz, welche entschieden hat.
+
+### Wo gesammelt wird, und wo nicht
+
+Der erste Anlauf liess die Nachweise nur noch das schlechteste Urteil
+zurückgeben. Das war die naheliegende Stelle und die falsche: damit war die
+Ebene zurück, an der die Bewehrungssuche vor ein paar Runden schon einmal
+stehengeblieben ist. Halten zwei Lagen gemeinsam das Minimum, hebt es kein
+einzelner Schritt -- die Suche sieht eine Ebene und gibt auf, obwohl der
+nächste Durchmesser offensichtlich hilft. Genau dafür zählt sie die *Summe*
+der Rückstände, und die braucht jede Lage einzeln.
+
+Der Test von damals hat es sofort gemeldet. Gesammelt wird jetzt in
+`Loesung.gefuehrte_urteile`, also dort, wo ohnehin entschieden wird, was in
+eine Tabelle gehört. Die Urteile tragen dafür ein `sammel`-Kennzeichen: vier
+Lagen sind vier Antworten auf dieselbe Frage, drei Lastfälle sind drei
+verschiedene Fragen, und welches von beidem vorliegt, weiß nur der Nachweis.
+
+Die Regel dahinter ist älter als dieser Fall: **was gerechnet wird, und was man
+davon sieht, sind zwei Fragen.** Das Stillstellen ausgeschalteter Nachweise
+folgt derselben; beide gehören in die Darstellung, keine in die Prüfung.
+
+### Was beim Einlesen passiert
+
+Alte Dateien bringen die Listen noch mit. War irgendein Haken gesetzt, gilt der
+Nachweis als eingeschaltet -- die Lesart, die nichts wegnimmt, was jemand
+verlangt hat. Ein Lastfall dagegen, der nur in y galt, wird **gemeldet** statt
+umgedeutet: ihn auf x zu legen hiesse, eine Zahl an einem anderen Querschnitt
+anzusetzen als der Benutzer gemeint hat. Eine stillschweigende Milderung ist
+genau das, was ein Nachweiswerkzeug nicht tun darf -- die Regel steht seit der
+Rissanforderung im Code und gilt auch hier.
+
+### Nebenbei
+
+`Protokoll.alle_bloecke()` war ein Generator. Ein Test lief zweimal darüber:
+beim zweiten Mal kam nichts, lautlos, und die Prüfung meldete «nicht
+gefunden», obwohl es dastand. Ein Name, der eine Sammlung verspricht, muss
+zweimal dasselbe liefern -- jetzt ist es eine Liste.
+
+---
+
 ## 2026-09-21 · Die Abkürzung, die die Suche zweimal fand
 
 Die Bewehrungssuche darf jetzt leere Lagen bewehren -- vorher blieb, was auf

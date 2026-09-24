@@ -918,20 +918,27 @@ class Aufbau:
     baustoffe: Dict[str, Baustoff] = field(default_factory=dict)
     querschnitte: Dict[str, Plattenquerschnitt] = field(default_factory=dict)
     nachweise: Dict[str, BiegungNormalkraft] = field(default_factory=dict)
-    """Schluessel ist ``<querschnitt>.<richtung>``, weil je Richtung geprueft wird."""
+    """
+    Schluessel ist ``<querschnitt>.x``.
+
+    Die Richtung steht noch im Schluessel, obwohl es nur eine gibt -- sie sagt
+    dem Leser einer Wert-ID, welcher Querschnitt gemeint ist, und die
+    Wert-IDs in abgelegten Berichten sollen nicht bei jeder Umstellung
+    wechseln.
+    """
 
     querkraft: Dict[str, Querkraft] = field(default_factory=dict)
     duktilitaet: Dict[str, Duktilitaet] = field(default_factory=dict)
     """Schluessel ist die Querschnittskennung -- ein Nachweis je Platte."""
 
     rissnormalkraft: Dict[str, Rissnormalkraft] = field(default_factory=dict)
-    """Schluessel ist ``<querschnitt>.<richtung>`` -- nur wo Zwaengung gilt."""
+    """Schluessel ist ``<querschnitt>.x``."""
 
     sproede: Dict[str, SproedesVersagen] = field(default_factory=dict)
-    """Mindestbewehrung gegen sproedes Versagen, je ``<querschnitt>.<richtung>``."""
+    """Mindestbewehrung gegen sproedes Versagen, je ``<querschnitt>.x``."""
 
     zwaengung_biegung: Dict[str, ZwaengungBiegung] = field(default_factory=dict)
-    """Zwaengung auf Biegung, je ``<querschnitt>.<richtung>``."""
+    """Zwaengung auf Biegung, je ``<querschnitt>.x``."""
 
     spannung: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)
     """Stahlspannung unter haeufiger Einwirkung, je ``<querschnitt>.<richtung>``."""

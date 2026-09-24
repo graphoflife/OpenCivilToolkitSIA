@@ -85,9 +85,6 @@ sie hier notiert; keine davon ist nachgeschlagen.
       ist der kleinere Beiwert (weicher) der ungünstige, für eine Zwängung
       der grössere. Solange das offen ist, sollte der Wert nicht wählbar sein,
       sondern nachgeschlagen werden.
-- [ ] Die rechte Tafel läuft waagrecht über, sobald sie schmal wird (bei rund
-      350 px um 63 Bildpunkte). Formeln und Tabellen haben je einen eigenen
-      Rollbalken; ein Inhalt entkommt ihnen. Besteht schon länger, nicht neu.
 - [ ] Die Normstelle für das Fachwerkmodell mit Bügeln (`SIA 262:2025, 4.3.3.4`)
       ist eingetragen, aber wie alle anderen Verweise nicht nachgeschlagen.
       Dasselbe gilt für die Vorgaben `α_min = 30°`, `α_max = 45°`, `k_c = 0.55`
@@ -102,6 +99,24 @@ sie hier notiert; keine davon ist nachgeschlagen.
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Nachgewiesen wird nur noch die Tragrichtung x; die y-Lagen bleiben im
+Querschnitt, weil sie die statische Höhe von x bestimmen und zum
+Bewehrungsgehalt zählen · Vorgabe ist x auf der 2. und 3. Lage, also innen ·
+Ein Schalter je Nachweis statt einer je Lage, angezeigt wird die ungünstigere
+der beiden x-Lagen · Gesammelt wird in der Darstellung, nicht in der Prüfung --
+die Suche zählt weiterhin jede Lage, sonst wäre die Ebene zurück, an der sie
+einmal stehenblieb ·
+
+Schmale Fenster: unter 900 px steht eine Tafel allein, ein Umschalter am
+unteren Rand wechselt · Fingerziele ab 34 px, Erklärungen auf Tipp statt nur
+auf Hover, `100dvh` gegen die Adressleiste · `.feld` und `.zweispaltig` auf
+`minmax(0, 1fr)`, sonst nimmt ein Gitter die Mindestbreite seines Inhalts ·
+
+Ausgeschaltete Nachweise rechnen still mit und melden sich unter der
+Zusammenfassung, wenn sie nicht aufgehen · Die Plattenvorlage steht im Kern
+(`QuerschnittEintrag.neu()`), nicht mehr in der Oberfläche · Doppelte
+Lastfallnamen werden gemeldet, statt sich still zu überschreiben ·
 
 Querschnittslöser für Dehnungsebenen (zwei geschachtelte Bisektionen, ohne
 fremde Pakete) · Sprödes Versagen und Zwängung auf Biegung als zwei getrennte

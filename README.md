@@ -17,8 +17,8 @@ Formel ist in JavaScript nachgebaut — das wäre ein zweiter Rechenweg, der
 irgendwann vom ersten abweicht, und dann wüsste niemand mehr, welcher stimmt.
 
 Der erste Aufruf lädt einmalig ≈13 MB Python-Laufzeit; danach liegt sie im
-Zwischenspeicher des Browsers. Ein Durchgang des Beispielprojekts braucht
-anschliessend 73 ms — gegenüber 57 ms in CPython.
+Zwischenspeicher des Browsers. Ein Durchgang des Beispielprojekts braucht in
+CPython rund 25 ms; im Browser ist es etwa das Anderthalbfache.
 
 ## Auf dem eigenen Rechner
 
@@ -44,7 +44,7 @@ zurück. Gelesen wird die Datei im Kern, mit denselben Prüfungen wie alles ande
 
 ## Stand
 
-Fertig und getestet (264 Tests):
+Fertig und getestet (569 Tests):
 
 | Baustein | Inhalt |
 |---|---|
@@ -59,9 +59,13 @@ Fertig und getestet (264 Tests):
 | `nachweis/linie` | Geometrie einer M-N-Linie, `Achse` als Wert |
 | `nachweis/handrechnung` | die von Hand nachrechenbaren Eckpunkte |
 | `nachweis/dehnungsfaecher` | die präzise Linie -- nur für das Diagramm |
-| `nachweis/` | M-N-Nachweis und Querkraft |
+| `nachweis/querschnittsloeser` | Dehnungsebene aus N und M, zwei Bisektionen |
+| `nachweis/` | M-N, Querkraft (mit Bügeln), Duktilität, sprödes Versagen, Zwängung auf Normalkraft und auf Biegung, Stahlspannung unter häufiger Last, Knicken am verformten System |
+| `spannungsanalyse.py` | drei Bilder am Querschnitt — kein Nachweis |
+| `bewehrungssuche.py` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt |
 | `bericht/` | Konsole und LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) |
 | `projekt.py` | speicherbare Projektbeschreibung, baut daraus ein Rechenwerk |
+| `web/speicher.py` | Ergebnisse je Bauteil, damit nur Geändertes neu rechnet |
 | `web/dienst.py` | der Rechendienst, unabhängig vom Transportweg |
 | `web/server.py` | HTTP-Hülle darum (nur Standardbibliothek) |
 | `web/js/kern.js` | Pyodide-Hülle darum, für die Seite ohne Server |
@@ -73,7 +77,9 @@ Wie das zusammenhängt und warum es so gebaut ist, steht in
 ## Oberfläche
 
 Drei Tafeln: links die Bestandteile des Projekts, in der Mitte die Eingaben zum
-ausgewählten Bestandteil, rechts das Ergebnis.
+ausgewählten Bestandteil, rechts das Ergebnis. Unter 900 px Fensterbreite steht
+eine Tafel allein und ein Umschalter am unteren Rand wechselt zwischen ihnen --
+dieselbe Aufteilung, nur nacheinander.
 
 Die Oberfläche rechnet nichts. Sie schickt die Projektbeschreibung an den Kern
 und stellt dar, was zurückkommt -- fertige Zahlen und fertige LaTeX-Zeichen­ketten.
@@ -81,10 +87,12 @@ Deshalb kann am Bildschirm gar nichts anderes stehen als im Bericht.
 
 **Rechte Tafel:**
 
-* *Nachweise* -- Widerstand, Einwirkung und Erfüllungsgrad je Kombination
+* *Zusammenfassung* -- je Platte eine Tabelle: Widerstand, Einwirkung und
+  Erfüllungsgrad. Darunter, in gedämpftem Rot, die ausgeschalteten Nachweise,
+  die mit der vorliegenden Bewehrung *nicht* aufgehen würden
 * *Diagramme* -- Plattenquerschnitt, M-N-Resistenzlinie mit den
   Bemessungspunkten (die gestrichelte Strecke zeigt den Weg, in dem der
-  Erfüllungsgrad gemessen wurde) und die Spannungs-Dehnungs-Beziehungen
+  Erfüllungsgrad gemessen wurde), Querkraftkurven, Spannungs-Dehnungs-Bilder
 * *Herleitung* -- die Mitschrift, Formel für Formel, mit Normstelle
 * *Werte* -- alle Grössen mit ihrer Herkunft (Eingabe, Vorgabe, berechnet,
   überschrieben); dort lässt sich auch ein Ziel wählen: der Kern löst rückwärts
@@ -167,6 +175,42 @@ Berechnet wird nur, was das Ziel braucht. Wird ein Wert von Hand gesetzt
 (`werk.setze(...)`), gilt er als überschrieben und der ganze Zweig dahinter
 entfällt.
 
+## Nachgewiesen wird x
+
+Eine Platte trägt in zwei Richtungen, nachgewiesen wird hier nur eine: **x**.
+Die y-Lagen werden trotzdem eingegeben, und zwar aus zwei Gründen. Sie zählen
+zum Bewehrungsgehalt, und sie liegen aussen -- ihr Durchmesser bestimmt, wieviel
+statische Höhe der x-Bewehrung bleibt. Wer sie weglässt, rechnet x mit einer
+Höhe, die es auf der Baustelle nicht gibt.
+
+Vorgegeben tragen darum die **2. und die 3. Lage** in x: die Querrichtung läuft
+unten und oben durch, die Tragrichtung liegt dazwischen. Wer anders verlegt,
+stellt die Richtung der 1. und der 4. Lage um; die beiden inneren bekommen
+zwingend die Gegenrichtung.
+
+Die Bewehrungssuche fasst die y-Lagen nicht an. In y wird nichts nachgewiesen,
+also gäbe es dort kein Mass, an dem sich ein Durchmesser bemessen liesse -- sie
+zöge ihn auf null, und genau das wäre falsch. Was in y liegt, sagt der Benutzer.
+
+Schnittgrössen gehören damit immer zu x. Eine ältere Datei mit einem Lastfall
+in y lässt sich nicht öffnen; sie meldet, was zu tun ist. Ihn stillschweigend
+auf x umzudeuten hiesse, eine Zahl an einem anderen Querschnitt anzusetzen als
+gemeint war.
+
+## Ein Schalter je Nachweis
+
+Duktilität, sprödes Versagen, Zwängung auf Biegung und Zwängung auf Normalkraft
+haben je **einen** Haken. Gerechnet werden beide x-Lagen -- die untere trägt das
+Feld-, die obere das Stützmoment --, in der Zusammenfassung steht die
+ungünstigere, und die Herleitung zeigt beide samt einem Satz, welche entschieden
+hat. Geht die schlechtere auf, gehen beide auf; vier Zeilen für eine Frage waren
+drei zuviel.
+
+Ausgeschaltet heisst dabei nicht weg: der Nachweis rechnet weiter mit, er steht
+nur nicht in Tabelle und Herleitung. Geht er mit der vorliegenden Bewehrung
+nicht auf, steht darüber ein Hinweis unter der Zusammenfassung. Ein Schalter
+sagt «interessiert mich gerade nicht» und nicht «gilt nicht».
+
 ## Vorzeichen und Einheiten im Querschnitt
 
 * `z` von der Oberkante nach unten, `0 ≤ z ≤ h`
@@ -186,12 +230,6 @@ Test. Nur *wie weit* er entfernt ist, hängt vom gewählten Massstab ab:
 | `MOMENT_KONSTANT` | senkrecht bis zur Normalkraftgrenze, `η = \|N_Ed\| / \|N_Rd\|` |
 | `NAECHSTER_PUNKT` | kürzester Abstand im auf die Eckwerte normierten Diagramm |
 
-Je Kombination ist ausserdem wählbar, in welcher **Tragrichtung** sie
-nachgewiesen wird -- `x`, `y` oder `beide`. In der Regel gehört eine
-Schnittgrösse zu einer Richtung, denn M_Ed,x und M_Ed,y sind verschiedene
-Zahlen. Beschreibungen ohne dieses Feld gelten für beide Richtungen, damit beim
-Laden älterer Projekte kein Nachweis stillschweigend wegfällt.
-
 > Bei `MOMENT_KONSTANT` fällt η klein aus, wenn der Fall vom Moment beherrscht
 > wird – die Reserve wird dann in einer Richtung gemessen, in der viel Luft ist.
 > Das ist kein Fehler, sondern liegt in der Natur dieses Massstabs.
@@ -200,13 +238,10 @@ Laden älterer Projekte kein Nachweis stillschweigend wegfällt.
 
 * **PDF**: sobald `tectonic`, `latexmk` oder `pdflatex` installiert ist, wird
   automatisch übersetzt. Bis dahin steht das `.tex` bereit (Overleaf-tauglich).
-* **Weitere Nachweise**: Querkraft, Mindestbewehrung, Rissbegrenzung,
-  Rotationskapazität, Knicken.
-* **Zulagen und schiefe Lagen** im Lagenaufbau (die alte Fassung konnte das).
-* **Querschnittszeichnung** in der Oberfläche.
-* **Schmale Fenster**: die drei Tafeln stehen fest nebeneinander; unter etwa
-  900 px wird es eng. Für ein Werkzeug am Arbeitsplatz verschmerzbar, aber
-  offen.
+* **Weitere Nachweise**: Rotationskapazität. Querkraft, Mindestbewehrung,
+  Rissbegrenzung und Knicken sind gebaut.
+* **Schiefe Lagen** im Lagenaufbau (die alte Fassung konnte das). Zulagen gibt
+  es.
 * **Normwerte prüfen**: die Sortentabellen in `material/beton.py` und
   `material/betonstahl.py` sind aus der Vorgängerfassung übernommen und vor dem
   produktiven Einsatz gegen die gedruckte Norm abzugleichen.
