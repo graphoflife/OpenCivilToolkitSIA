@@ -674,8 +674,22 @@ class Nachweis(Berechnung):
         Sind *alle* still, schweigt der Nachweis ganz -- sonst stuende seine
         Ueberschrift samt Ansatz ueber einer Herleitung ohne einen einzigen
         Fall darunter.
+
+        Ein Schluessel in ``laut``, den ``alle`` nicht kennt, ist ein
+        Aufbaufehler und wird gemeldet. Stillschweigend uebergangen waere er
+        die unangenehmste Art von Fehler: der Nachweis verschwaende aus
+        Tabelle und Herleitung, ohne dass irgendwo etwas danebenstuende --
+        und gesucht wuerde er dann beim Nachweis und nicht beim Tippfehler.
         """
         alle, laut = set(alle), set(laut)
+        fremd = laut - alle
+        if fremd:
+            raise BerechnungsFehler(
+                self.id,
+                f"die Fälle "
+                f"{', '.join(repr(f) for f in sorted(map(str, fremd)))} "
+                f"sollen laut sein, kommen aber nicht vor. Bekannt sind "
+                f"{', '.join(repr(f) for f in sorted(map(str, alle)))}.")
         self.stille_faelle = alle - laut
         self.still = not (alle & laut)
 
@@ -697,6 +711,7 @@ class Nachweis(Berechnung):
                         for u in urteile]
         return groessen
 
-    @property
-    def alle_erfuellt(self) -> bool:
-        return all(u.erfuellt for u in self.urteile)
+    # Ein `alle_erfuellt` gab es hier einmal. Es hatte keinen Aufrufer und
+    # zaehlte die stillen Urteile mit -- also das Gegenteil von dem, was
+    # `Loesung.alle_nachweise_erfuellt` sagt. Zwei gleichnamige Antworten auf
+    # dieselbe Frage, von denen die unbenutzte die falsche war.

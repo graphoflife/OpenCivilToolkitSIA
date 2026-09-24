@@ -14,9 +14,13 @@ Verhaeltnis.
 
 JE LAGE, NICHT JE RICHTUNG:
 Anders als M-N und Querkraft gilt dieser Nachweis fuer eine einzelne
-Bewehrungslage. Welche geprueft werden, sagt der Benutzer; ueblich sind die
-beiden aeusseren. Eine eingeschaltete, aber unbewehrte Lage ist kein Fehler
-der Beschreibung -- sie bekommt ein Urteil mit Hinweis statt einer Zahl.
+Bewehrungslage. Gerechnet werden alle vier; welche davon in Tabelle und
+Herleitung stehen, sagt der Benutzer je Lage (siehe
+:meth:`~opencivil.core.berechnung.Nachweis.stillstellen`). Die uebrigen
+rechnen still mit -- geht eine von ihnen nicht auf, steht darueber ein
+Hinweis unter der Zusammenfassung. Eine eingeschaltete, aber unbewehrte Lage
+ist kein Fehler der Beschreibung: sie bekommt ein Urteil mit Hinweis statt
+einer Zahl.
 
 STATISCHE HOEHE:
 ``d`` wird von der **gedrueckten** Randfaser aus gemessen. Bei den unteren
@@ -92,11 +96,14 @@ def druckzonenhoehe(*, a_s: float, f_sd: float, b: float, f_cd: float) -> float:
 
 class Duktilitaet(Nachweis):
     """
-    Duktilitaetsnachweis je gewaehlter Bewehrungslage.
+    Duktilitaetsnachweis je Bewehrungslage.
 
     Ein Nachweis fuer die ganze Platte, ein Urteil je Lage. Die Lagen einer
     Platte gehoeren zusammen und stehen darum unter einer Ueberschrift; sie auf
     vier Nachweise zu verteilen ergaebe vier fast leere Abschnitte.
+
+    Welche Lagen laut sind, entscheidet der Aufbau ueber ``stillstellen``;
+    gerechnet werden immer alle, die ihm uebergeben werden.
     """
 
     def __init__(

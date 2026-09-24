@@ -803,7 +803,7 @@ GRAD_SPALTE = 4
 AUSRICHTUNG = "llrrr"
 
 
-def gradtext(urteil) -> str:
+def gradtext(urteil, *, latex: bool = False) -> str:
     """
     Der Erfuellungsgrad als Text -- knapp, aber nie gerundet bis zur Luege.
 
@@ -812,10 +812,16 @@ def gradtext(urteil) -> str:
     einmal rot hinterlegt, einmal mit «nicht erfuellt» im Satz davor. Dann
     kommt eine Stelle dazu, abgeschnitten statt gerundet: der Grad soll
     kleiner als eins bleiben, weil er das ist.
+
+    ``latex`` sagt, in welcher Sprache die Unendlichkeit geschrieben wird:
+    ``\\infty`` fuer die Tabelle, ``∞`` fuer den Fliesstext daneben. Die Zahl
+    selbst ist in beiden dieselbe. Ohne diesen Schalter gab die Funktion immer
+    LaTeX zurueck -- richtig fuer den einen Aufrufer, und beim anderen stuende
+    im Hinweis woertlich «α_eff = \\infty».
     """
     grad = urteil.erfuellungsgrad.si
     if not math.isfinite(grad):
-        return r"\infty"
+        return r"\infty" if latex else "∞"
     text = f"{grad:.2f}"
     if not urteil.erfuellt and float(text) >= 1.0:
         text = f"{math.floor(grad * 1000) / 1000:.3f}"
@@ -878,7 +884,7 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
                     als_text(u.fall) if u.fall else r"\text{--}",
                     zelle(u.widerstand),
                     zelle(u.einwirkung),
-                    gradtext(u),
+                    gradtext(u, latex=True),
                 ],
                 "erfuellt": u.erfuellt,
                 "begruendung": u.begruendung,

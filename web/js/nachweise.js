@@ -95,9 +95,6 @@ export function nachweiseBlock(querschnitt) {
     lagenkapitel(querschnitt, {
       titel: 'Duktilitätsnachweise',
       feld: 'duktilitaet',
-      // Die beiden äusseren Lagen: sie tragen Feld- und Stützmoment, und dort
-      // entscheidet sich, ob der Querschnitt sein Versagen ankündigt.
-      vorgabe: [false, false, false, false],
       hinweis: {
         text: 'Begrenzt die Druckzonenhöhe, damit der Querschnitt sein '
           + 'Versagen ankündigt: die Bewehrung fliesst, bevor der Beton '
@@ -111,7 +108,6 @@ export function nachweiseBlock(querschnitt) {
     lagenkapitel(querschnitt, {
       titel: 'Nachweise gegen sprödes Versagen',
       feld: 'sproede_lagen',
-      vorgabe: [false, false, false, false],
       hinweis: {
         text: 'Die Bewehrung muss aufnehmen, was der Beton im Augenblick des '
           + 'Reissens abgibt. Sonst reisst und versagt der Querschnitt '
@@ -169,10 +165,12 @@ function einwirkungZeile(querschnitt, index) {
  * Biegung); dreimal dieselben zwanzig Zeilen wären dreimal dieselbe Gelegenheit
  * auseinanderzulaufen.
  */
-function lagenkapitel(querschnitt, {
-  titel, feld, hinweis, beschriftung, was,
-  vorgabe = [true, false, false, false],
-}) {
+function lagenkapitel(querschnitt, { titel, feld, hinweis, beschriftung, was }) {
+  // Die Vorgabe steht in der frischen Platte, und die kommt aus dem Kern.
+  // Sie stand einmal hier als Literal, dazu dreimal an den Aufrufstellen und
+  // ein viertes Mal in der Plattenvorlage -- vier Stellen für eine Frage, und
+  // beim ersten Umstellen fanden wir zwei davon.
+  const vorgabe = zustand.katalog?.neue_platte?.[feld] || [false, false, false, false];
   const wahl = lagenwahl(querschnitt[feld], vorgabe);
 
   const setzen = (nummer, wert) => projektAendern((p) => {
@@ -355,7 +353,6 @@ function mindestbewehrungsBlock(querschnitt) {
     // aus und stehen unter derselben Aufschrift wie die Normalkraft-Zwängung.
     ...lagenkapitel(querschnitt, {
       feld: 'zwaengung_biegung_lagen',
-      vorgabe: [false, false, false, false],
       beschriftung: (n) => `Zwängung auf Biegung ${n}. Lage`,
       was: 'Nachweis',
     }).childNodes,

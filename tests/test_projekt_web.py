@@ -432,6 +432,79 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
         self.assertIn("q9", antwort.daten["zusammenfassungen"])
 
 
+class TestDoppelteFallnamen(unittest.TestCase):
+    """
+    Zwei Lastfälle gleichen Namens ergaben eine Zeile statt zwei.
+
+    Die Nachweise legen ihre Ergebniswerte unter dem Fallnamen ab -- M-N,
+    Querkraft und Stahlspannung alle drei. Der zweite überschrieb den ersten,
+    ohne Fehler und ohne Warnung: in der Tabelle fehlte einfach eine Zeile.
+    """
+
+    def test_zwei_gleiche_kombinationen_werden_gemeldet(self):
+        from opencivil.projekt import KombinationEintrag
+
+        projekt = Projekt.beispiel()
+        q = projekt.querschnitt("q1")
+        q.kombinationen = [KombinationEintrag(name="Feld", M_Ed=30.0),
+                           KombinationEintrag(name="Feld", M_Ed=99.0)]
+        with self.assertRaises(ProjektFehler) as fehler:
+            projekt.aufbauen()
+        self.assertIn("'Feld' ist zweimal", str(fehler.exception))
+
+    def test_auch_haeufige_und_knickfaelle(self):
+        from opencivil.projekt import HaeufigEintrag, KnickEintrag
+
+        for feld, eintraege in (
+            ("haeufige", [HaeufigEintrag("Gebrauch"), HaeufigEintrag("Gebrauch")]),
+            ("knickfaelle", [KnickEintrag("Stütze", N_Ed=-100.0, laenge=3.0,
+                                          knicklaenge=3.0),
+                             KnickEintrag("Stütze", N_Ed=-200.0, laenge=3.0,
+                                          knicklaenge=3.0)]),
+        ):
+            with self.subTest(feld=feld):
+                projekt = Projekt.beispiel()
+                setattr(projekt.querschnitt("q1"), feld, eintraege)
+                with self.assertRaises(ProjektFehler):
+                    projekt.aufbauen()
+
+    def test_ein_eigener_fall_darf_nicht_wie_der_abgeleitete_heissen(self):
+        """
+        Die abgeleiteten tragen den Namen ihrer Kombination mit angehängtem
+        Anteil -- wer genau so benennt, trifft denselben Schlüssel.
+        """
+        from opencivil.projekt import HaeufigEintrag
+
+        projekt = Projekt.beispiel()
+        q = projekt.querschnitt("q1")
+        q.rissanforderung = "hoch"
+        q.haeufige = [HaeufigEintrag(f"{q.kombinationen[0].name} (70 %)",
+                                     M_Ed=70.0)]
+        with self.assertRaises(ProjektFehler) as fehler:
+            projekt.aufbauen()
+        self.assertIn("abgeleitete", str(fehler.exception))
+
+    def test_verschiedene_namen_gehen_weiterhin(self):
+        """Die Regel darf nicht mehr verbieten als sie muss."""
+        from opencivil.projekt import HaeufigEintrag
+
+        projekt = Projekt.beispiel()
+        q = projekt.querschnitt("q1")
+        q.rissanforderung = "hoch"
+        q.haeufige = [HaeufigEintrag("Gebrauch", M_Ed=70.0),
+                      HaeufigEintrag("Gebrauch selten", M_Ed=40.0)]
+        antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
+        self.assertEqual(antwort.status, 200)
+
+    def test_zwei_platten_duerfen_dieselben_namen_tragen(self):
+        """Der Name muss je Platte eindeutig sein, nicht im ganzen Projekt."""
+        d = Projekt.beispiel().als_dict()
+        zweite = json.loads(json.dumps(d["querschnitte"][0]))
+        zweite["kennung"], zweite["name"] = "q2", "Decke über 1. OG"
+        d["querschnitte"].append(zweite)
+        self.assertEqual(dienst.bearbeite("rechnen", {"projekt": d}).status, 200)
+
+
 class TestKurzeSchalterlisten(unittest.TestCase):
     """
     Von Hand gebaute Beschreibungen sind der zweite Weg ins Werkzeug.
@@ -575,6 +648,27 @@ class TestStilleNachweise(unittest.TestCase):
                           if h["nachweis"].startswith("Duktilität")])
         for hinweis in tabelle["stille"]:
             self.assertLess(float(hinweis["grad"]), 1.0, hinweis)
+
+    def test_der_grad_spricht_die_sprache_seines_empfaengers(self):
+        """
+        `\\infty` gehört in die LaTeX-Tabelle, `∞` in den Fliesstext daneben.
+        Eine Funktion, die immer LaTeX lieferte, schrieb im Hinweis wörtlich
+        «α_eff = \\infty».
+        """
+        from opencivil.core.berechnung import NachweisUrteil
+        from opencivil.core.einheiten import EINHEITSLOS, Groesse
+
+        unendlich = NachweisUrteil(
+            name="Probe", erfuellt=True,
+            erfuellungsgrad=Groesse(float("inf"), EINHEITSLOS))
+        self.assertEqual(api.gradtext(unendlich, latex=True), r"\infty")
+        self.assertEqual(api.gradtext(unendlich), "∞")
+
+        endlich = NachweisUrteil(
+            name="Probe", erfuellt=True,
+            erfuellungsgrad=Groesse(2.345, EINHEITSLOS))
+        self.assertEqual(api.gradtext(endlich), "2.35")
+        self.assertEqual(api.gradtext(endlich, latex=True), "2.35")
 
     def test_ein_knapp_verfehlter_grad_liest_sich_nicht_als_eins(self):
         """

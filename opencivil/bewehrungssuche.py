@@ -241,7 +241,13 @@ class Bewertung:
 
     nachweis: str
     anzahl: int
-    """Wie viele Urteile ueberhaupt gefaellt wurden."""
+    """
+    Wie viele *gefuehrte* Urteile gefaellt wurden.
+
+    Ohne die stillen: gegen einen Nachweis, den niemand fuehrt, sucht die
+    Suche nicht, also zaehlt sie ihn auch nicht mit -- sonst haette sie einen
+    Rueckstand aufzuholen, den niemand verlangt hat.
+    """
 
     fehler: str = ""
 

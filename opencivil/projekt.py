@@ -135,9 +135,13 @@ def sorten(art: str) -> Mapping[str, Any]:
     return BETONSORTEN if art == "beton" else STAHLSORTEN
 
 
-#: Fuer welche Lagen der Duktilitaetsnachweis vorgegeben ist -- die beiden
-#: aeusseren. Sie tragen Feld- und Stuetzmoment; dort entscheidet sich, ob der
-#: Querschnitt sein Versagen ankuendigt.
+#: Fuer welche Lagen der Duktilitaetsnachweis gefuehrt wird -- keine.
+#:
+#: Er laeuft trotzdem, fuer jede Lage: ausgeschaltet heisst still und nicht
+#: weg. Geht er mit der vorliegenden Bewehrung nicht auf, steht ein Hinweis
+#: unter der Zusammenfassung. In der Tabelle und in der Herleitung steht er
+#: erst, wenn ihn jemand einschaltet -- die Norm verlangt ihn nicht fuer jede
+#: Platte, und ungefragt stuende er sonst ueberall.
 DUKTILITAET_VORGABE = (False, False, False, False)
 
 
@@ -159,8 +163,9 @@ def _rissanforderung_aus(wert: Any) -> str:
     return text
 
 
-#: Fuer welche Lagen sproedes Versagen und Zwaengung auf Biegung vorgegeben
-#: sind -- nur die 1. Lage. Die uebrigen schaltet ein, wer sie braucht.
+#: Fuer welche Lagen sproedes Versagen und Zwaengung auf Biegung gefuehrt
+#: werden -- keine. Wie bei :data:`DUKTILITAET_VORGABE`: gerechnet wird
+#: trotzdem, sichtbar wird es auf Verlangen.
 LAGENWAHL_VORGABE = (False, False, False, False)
 
 
@@ -733,8 +738,12 @@ class QuerschnittEintrag(Beschreibung):
 
     haeufige_aus_tragsicherheit: bool = False
     """
-    Ob die haeufigen Lastfaelle aus den Tragsicherheitsfaellen abgeleitet
-    werden -- mit :data:`HAEUFIG_ANTEIL`. Der uebliche Fall, darum die Vorgabe.
+    Ob die aus den Tragsicherheitsfaellen abgeleiteten haeufigen Lastfaelle
+    *gefuehrt* werden -- mit :data:`HAEUFIG_ANTEIL`.
+
+    Gebildet werden sie immer; ausgeschaltet rechnen sie still mit. Die 70 %
+    sind eine bequeme Abschaetzung und keine Norm, darum stehen sie nur auf
+    Verlangen in der Tabelle.
     """
 
     automatik_modus: str = "grund_ohne"
@@ -775,11 +784,12 @@ class QuerschnittEintrag(Beschreibung):
     duktilitaet: List[bool] = field(
         default_factory=lambda: list(DUKTILITAET_VORGABE))
     """
-    Je Lage, ob der Duktilitaetsnachweis gefuehrt wird. Index 0 = 1. Lage.
+    Je Lage, ob der Duktilitaetsnachweis *gefuehrt* wird. Index 0 = 1. Lage.
 
-    Vorgabe sind die beiden aeusseren Lagen: sie tragen das Feld- und das
-    Stuetzmoment, und dort entscheidet sich, ob der Querschnitt sein Versagen
-    ankuendigt.
+    Gerechnet wird er ohnehin fuer jede Lage; diese Liste sagt nur, welche in
+    Tabelle und Herleitung stehen. Ueblich sind die beiden aeusseren: sie
+    tragen Feld- und Stuetzmoment, und dort entscheidet sich, ob der
+    Querschnitt sein Versagen ankuendigt.
     """
 
     lagen: List[LageEintrag] = field(default_factory=list)
@@ -1120,6 +1130,53 @@ class Projekt(Beschreibung):
                     f"erkennen, welches gemeint ist.")
             gesehen[m.anzeigename] = m.kennung
 
+        for eintrag in self.querschnitte:
+            self._namen_pruefen(eintrag)
+
+    @staticmethod
+    def _namen_pruefen(eintrag: "QuerschnittEintrag") -> None:
+        """
+        Lastfallnamen muessen je Platte und Liste eindeutig sein.
+
+        Die Nachweise legen ihre Ergebniswerte unter dem Fallnamen ab -- M-N,
+        Querkraft und Stahlspannung alle drei. Zwei Kombinationen gleichen
+        Namens fielen darum auf einen Eintrag zusammen: der zweite ueberschrieb
+        den ersten, und in der Tabelle fehlte eine Zeile. Kein Fehler, keine
+        Warnung, eine Zahl weniger.
+
+        Gemeldet statt umbenannt: welcher der beiden gemeint war, weiss nur
+        der Benutzer, und ein automatisch angehaengtes «(2)» stuende danach in
+        seinem Bericht.
+        """
+        def eindeutig(faelle, was: str) -> None:
+            gesehen = set()
+            for f in faelle:
+                if f.name in gesehen:
+                    raise ProjektFehler(
+                        f"Platte '{eintrag.name}': der Name '{f.name}' ist "
+                        f"zweimal als {was} vergeben. Die Nachweise legen ihre "
+                        f"Ergebnisse unter dem Fallnamen ab -- zwei gleiche "
+                        f"Namen ergeben eine Zeile statt zwei.")
+                gesehen.add(f.name)
+
+        eindeutig(eintrag.kombinationen, "Tragsicherheitseinwirkung")
+        eindeutig(eintrag.haeufige, "häufiger Lastfall")
+        eindeutig(eintrag.knickfaelle, "Knicknachweis")
+        eindeutig(eintrag.spannungsfaelle, "Spannung-Dehnung-Analyse")
+
+        # Die abgeleiteten Faelle tragen den Namen ihrer Kombination mit
+        # angehaengtem Anteil. Wer einen eigenen Lastfall genau so nennt,
+        # traefe denselben Schluessel.
+        abgeleitet = {f"{k.name} ({HAEUFIG_ANTEIL * 100:.0f} %)"
+                      for k in eintrag.kombinationen}
+        for h in eintrag.haeufige:
+            if h.name in abgeleitet:
+                raise ProjektFehler(
+                    f"Platte '{eintrag.name}': der häufige Lastfall "
+                    f"'{h.name}' heisst wie der aus der Tragsicherheit "
+                    f"abgeleitete. Bitte anders benennen -- sonst lässt sich "
+                    f"nicht auseinanderhalten, welcher gerechnet wurde.")
+
     # -- Aufbau -------------------------------------------------------------
 
     def aufbauen(self, *, schnell: bool = False) -> Aufbau:
@@ -1416,6 +1473,18 @@ class Projekt(Beschreibung):
         ist -- dann eben still. Sie ganz wegzulassen hiesse, den Nachweis erst
         auf Verlangen zu fuehren; so steht wenigstens ein Hinweis da, wenn die
         Abschaetzung nicht aufgeht.
+
+        **Was das kostet.** Jeder Fall ist ein Gleichgewicht am gerissenen
+        Querschnitt, also ein Durchlauf des Faserloesers -- rund 8 ms, und
+        damit der teuerste stille Nachweis, den es hier gibt. Gemessen an der
+        Beispielplatte: bei normaler Anforderung entsteht er gar nicht (47 ms
+        gesamt), bei erhoehter kostet er die Haelfte der Rechenzeit (98 ms).
+        Ob der Schalter dabei an oder aus steht, macht keinen Unterschied --
+        bei erhoehter Anforderung verlangt die Norm den Nachweis ohnehin, und
+        ausgeschaltet ist nur die Frage, ob man ihn sehen will. Wer die Zeit
+        zurueckhaben will, kommt nicht an dieser Stelle weiter, sondern am
+        Loeser oder daran, die stillen Nachweise erst nach dem sichtbaren
+        Ergebnis nachzuziehen.
 
         Die Rechnung steht hier und nicht in der Oberflaeche: dort waere sie
         eine zweite Wahrheit.

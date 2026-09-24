@@ -674,3 +674,49 @@ class TestHinweisReihenfolge(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestStillstellen(unittest.TestCase):
+    """
+    Welche Fälle nur mitrechnen -- und was passiert, wenn man sich vertippt.
+    """
+
+    def nachweis(self):
+        from opencivil.core.berechnung import Nachweis
+        from opencivil.core.einheiten import EINHEITSLOS
+        from opencivil.core.wert import WertDef
+
+        class Probe(Nachweis):
+            def pruefe(self, e, p):
+                return {}, []
+
+        return Probe("probe", ausgaben=[WertDef(
+            id="probe.wert", symbol="x", einheit=EINHEITSLOS,
+            beschreibung="Probe")])
+
+    def test_einer_laut_heisst_der_nachweis_spricht(self):
+        n = self.nachweis()
+        n.stillstellen([1, 2, 3, 4], [2])
+        self.assertFalse(n.still)
+        self.assertEqual(n.stille_faelle, {1, 3, 4})
+        self.assertTrue(n.leise(1))
+        self.assertFalse(n.leise(2))
+
+    def test_keiner_laut_heisst_der_ganze_nachweis_schweigt(self):
+        n = self.nachweis()
+        n.stillstellen([1, 2], [])
+        self.assertTrue(n.still)
+        self.assertTrue(n.leise(1))
+        self.assertTrue(n.leise(2))
+
+    def test_ein_unbekannter_schluessel_wird_gemeldet(self):
+        """
+        Stillschweigend übergangen wäre er die unangenehmste Art von Fehler:
+        der Nachweis verschwände aus Tabelle und Herleitung, ohne dass
+        irgendwo etwas danebenstünde.
+        """
+        n = self.nachweis()
+        with self.assertRaises(BerechnungsFehler) as fehler:
+            n.stillstellen([1, 2, 3, 4], ["2"])      # String statt Zahl
+        self.assertIn("kommen aber nicht vor", str(fehler.exception))
+        self.assertIn("'2'", str(fehler.exception))
