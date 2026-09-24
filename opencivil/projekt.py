@@ -809,6 +809,45 @@ class QuerschnittEintrag(Beschreibung):
 
 
     @classmethod
+    def neu(cls, kennung: str, name: str, beton: str, stahl: str,
+            durchmesser: float = 12.0) -> "QuerschnittEintrag":
+        """
+        Eine frische Platte, wie sie der Benutzer angelegt bekommt.
+
+        Steht hier und nicht in der Oberflaeche. Dort stand sie einmal -- ein
+        Wortschatz aus zwanzig Feldern, den jemand von Hand mit den Vorgaben
+        dieser Klasse gleichhalten musste. Beim ersten Mal, als sich die
+        Vorgaben aenderten, lief er auseinander: neue Platten brachten
+        Nachweise eingeschaltet mit, die ueberall sonst aus waren.
+
+        Was hier steht, sind Entscheidungen und keine Vorgaben: nur aussen
+        bewehrt, ein Feldmoment zum Anfangen. Alles Uebrige kommt aus den
+        Vorgabewerten der Felder.
+        """
+        def lage(d: float) -> LageEintrag:
+            return LageEintrag(
+                stahl=stahl,
+                grund=PostenEintrag(durchmesser=d, abstand=150.0),
+                # Auch die leere Zulage wird ueber die Teilung gefuehrt --
+                # das ist der Regelfall bei Platten.
+                zulage=PostenEintrag(durchmesser=0.0, abstand=150.0),
+            )
+
+        return cls(
+            kennung=kennung,
+            name=name,
+            beton=beton,
+            # Nur aussen bewehrt: die 1. und die 4. Lage tragen, die beiden
+            # inneren sind erst einmal nicht da. Was man nicht braucht, soll
+            # man wegnehmen muessen und nicht wegnehmen duerfen.
+            lagen=[lage(durchmesser), lage(0.0), lage(0.0), lage(durchmesser)],
+            querkraftbewehrung=QuerkraftbewehrungEintrag(
+                durchmesser=0.0, stahl=stahl),
+            kombinationen=[KombinationEintrag(name="Feld", M_Ed=30.0,
+                                              richtung=Richtung.X.value)],
+        )
+
+    @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "QuerschnittEintrag":
         lagen = d.get("lagen")
         if lagen is None and ("lagen_unten" in d or "lagen_oben" in d):
@@ -1117,6 +1156,16 @@ class Projekt(Beschreibung):
 
             bewehrt = set(querschnitt.richtungen_mit_bewehrung)
 
+            # Die Schalterlisten hier noch einmal auf vier bringen. Beim
+            # Einlesen tut das schon `__post_init__` -- aber wer die Platte von
+            # Hand baut und `q.duktilitaet = [True]` schreibt, laeuft daran
+            # vorbei, und der Aufbau quittierte das mit einem nackten
+            # IndexError. Gelesen wird, was dasteht; ergaenzt wird mit der
+            # Vorgabe, wie ueberall sonst auch.
+            duktil = _duktilitaet_aus(eintrag.duktilitaet)
+            sproede_wahl = _lagenwahl_aus(eintrag.sproede_lagen)
+            biegung_wahl = _lagenwahl_aus(eintrag.zwaengung_biegung_lagen)
+
             # Der M-N-Nachweis entsteht fuer jede bewehrte Richtung, auch ohne
             # Schnittgroessen: seine Eckwerte gehoeren dem Querschnitt, nicht
             # der Einwirkung, und der Nachweis gegen sproedes Versagen haelt
@@ -1152,7 +1201,7 @@ class Projekt(Beschreibung):
                     nachweis_sv = SproedesVersagen(
                         querschnitt, richtung, lagen, nachweis)
                     nachweis_sv.stillstellen(
-                        lagen, [n for n in lagen if eintrag.sproede_lagen[n - 1]])
+                        lagen, [n for n in lagen if sproede_wahl[n - 1]])
                     werk.registriere(nachweis_sv)
                     aufbau.sproede[f"{eintrag.kennung}.{richtung.value}"] = nachweis_sv
 
@@ -1164,7 +1213,7 @@ class Projekt(Beschreibung):
                     biegung.stillstellen(
                         lagen,
                         [n for n in lagen
-                         if eintrag.zwaengung_biegung_lagen[n - 1]])
+                         if biegung_wahl[n - 1]])
                     werk.registriere(biegung)
                     aufbau.zwaengung_biegung[
                         f"{eintrag.kennung}.{richtung.value}"] = biegung
@@ -1236,7 +1285,7 @@ class Projekt(Beschreibung):
                 duktilitaet = Duktilitaet(querschnitt, alle_lagen)
                 duktilitaet.stillstellen(
                     alle_lagen,
-                    [n for n in alle_lagen if eintrag.duktilitaet[n - 1]])
+                    [n for n in alle_lagen if duktil[n - 1]])
                 werk.registriere(duktilitaet)
                 aufbau.duktilitaet[eintrag.kennung] = duktilitaet
 

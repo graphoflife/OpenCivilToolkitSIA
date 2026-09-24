@@ -292,9 +292,23 @@ function knickZeile(querschnitt, index) {
  * Gerechnet wird hier nichts: die 70-%-Regel steht als Satz da, die Zahlen
  * dazu bildet der Kern, sobald der Nachweis läuft.
  */
+/** Die gewählte Rissanforderung aus dem Katalog -- oder nichts, wenn er fehlt. */
+function anforderung(querschnitt) {
+  return (zustand.katalog?.rissanforderungen || [])
+    .find((r) => r.wert === (querschnitt.rissanforderung || 'normal'));
+}
+
+/** «normaler», «erhöhter» … -- klein geschrieben, für den Satz im Hinweis. */
+function anforderungstext(querschnitt) {
+  const a = anforderung(querschnitt);
+  return a ? `${a.beschriftung.toLowerCase()}er` : 'dieser';
+}
+
 function mindestbewehrungsBlock(querschnitt) {
   const aus70 = querschnitt.haeufige_aus_tragsicherheit !== false;
   const faelle = querschnitt.haeufige || [];
+  // Ob dieser Nachweis überhaupt gefordert ist, weiss der Kern.
+  const gefordert = anforderung(querschnitt)?.spannungsnachweis !== false;
 
   const aendern = (veraenderer) => projektAendern((p) => {
     veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
@@ -354,6 +368,19 @@ function mindestbewehrungsBlock(querschnitt) {
         + 'Querschnitt, gezählt nur die gezogene Bewehrung.',
         'σ_s ≤ f_yd − 80 N/mm²'),
     ]),
+
+    // Bei normaler Anforderung steht in Tabelle 17 ein Strich: der Nachweis
+    // entfällt, und damit auch alles, was unten eingetragen wird. Ohne diesen
+    // Satz nimmt die Maske Lastfälle entgegen und rechnet sie stillschweigend
+    // nicht -- man sucht das Ergebnis in der Zusammenfassung und findet nichts.
+    // Was gefordert ist, sagt der Kern über den Katalog; hier steht keine
+    // zweite Fassung der Norm.
+    gefordert ? null : el('p.hinweis.hinweis-annahme', {
+      text: `Bei ${anforderungstext(querschnitt)} Rissanforderung verlangt `
+        + 'SIA 262 Tabelle 17 diesen Nachweis nicht. Er wird nicht geführt – '
+        + 'weder die 70 % noch eigene Lastfälle. Stelle die Rissanforderung '
+        + 'oben auf «Erhöht» oder «Hoch», wenn du ihn brauchst.',
+    }),
 
     el('div.duktilitaetszeile.ist-breit', {}, [
       hakenSchalter(aus70, (wert) => aendern((q) => {

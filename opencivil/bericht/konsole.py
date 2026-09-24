@@ -176,10 +176,15 @@ def _abschnitt_werte(loesung: Loesung) -> List[str]:
 
 
 def _abschnitt_nachweise(loesung: Loesung) -> List[str]:
-    if not loesung.urteile:
+    # Nur die gefuehrten. Ein ausgeschalteter Nachweis stand hier als
+    # «NICHT ERFÜLLT» und darunter die Zeile «Alle Nachweise erfüllt» -- die
+    # zaehlt die stillen naemlich schon immer nicht mit.
+    gefuehrt = loesung.gefuehrte_urteile
+    maengel = loesung.stille_maengel
+    if not gefuehrt and not maengel:
         return []
     zeilen = ["", ""] + _ueberschrift("Nachweise", "=") + [""]
-    for urteil in loesung.urteile:
+    for urteil in gefuehrt:
         zustand = "erfüllt" if urteil.erfuellt else "NICHT ERFÜLLT"
         zeilen.append(
             f"  {urteil.name.ljust(40)} Erfüllungsgrad "
@@ -187,10 +192,19 @@ def _abschnitt_nachweise(loesung: Loesung) -> List[str]:
         )
         if urteil.begruendung:
             zeilen.extend(_umbrechen(urteil.begruendung, 6))
-    gesamt = "Alle Nachweise erfüllt." if loesung.alle_nachweise_erfuellt else (
-        "Mindestens ein Nachweis ist nicht erfüllt."
-    )
-    zeilen.extend(["", f"  {gesamt}"])
+    if gefuehrt:
+        gesamt = ("Alle geführten Nachweise erfüllt."
+                  if loesung.alle_nachweise_erfuellt
+                  else "Mindestens ein Nachweis ist nicht erfüllt.")
+        zeilen.extend(["", f"  {gesamt}"])
+
+    if maengel:
+        zeilen.extend(["", "  Nicht geführt, geht aber nicht auf:"])
+        for urteil in maengel:
+            zeilen.append(
+                f"    {urteil.name.ljust(38)} Erfüllungsgrad "
+                f"{urteil.erfuellungsgrad.formatiert(2).rjust(8)}"
+            )
     return zeilen
 
 

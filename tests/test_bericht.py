@@ -258,3 +258,59 @@ class TestAbschnittsordnung(unittest.TestCase):
         p.titel("Zwischentitel", ebene=3)
         p.text("zwei")
         self.assertEqual(p.nach_abschnitten(), p.bloecke)
+
+
+class TestStilleNachweiseImBericht(unittest.TestCase):
+    """
+    Ein ausgeschalteter Nachweis darf nicht als geführter dastehen.
+
+    Beide Berichte zählten früher jedes Urteil auf, der Schlusssatz darunter
+    aber nur die geführten -- das Dokument widersprach sich selbst: vier
+    Zeilen «nicht erfüllt» und darunter «Sämtliche Nachweise sind erfüllt».
+    """
+
+    def loesung(self):
+        """Eine Platte, an der nur *stille* Nachweise durchfallen."""
+        from opencivil.projekt import Projekt
+
+        projekt = Projekt.beispiel()
+        q = projekt.querschnitt("q1")
+        q.h = 600.0
+        for k in q.kombinationen:
+            k.M_Ed, k.N_Ed, k.V_Ed = 10.0, 0.0, 0.0
+        lage = q.lagen[0]
+        lage.grund.durchmesser, lage.grund.abstand = 6.0, 300.0
+        lage.zulage.durchmesser = 0.0
+        aufbau = projekt.aufbauen()
+        return aufbau.werk.loese(*aufbau.alle_nachweisziele())
+
+    def test_die_probe_faellt_wirklich_nur_still_durch(self):
+        """Sonst prüfte der Rest nichts."""
+        loesung = self.loesung()
+        self.assertTrue(loesung.stille_maengel)
+        self.assertTrue(loesung.alle_nachweise_erfuellt)
+
+    def test_die_konsole_zaehlt_nur_gefuehrte_auf(self):
+        text = als_text(self.loesung())
+        abschnitt = text[text.index("Nachweise"):]
+        kopf = abschnitt[:abschnitt.index("Nicht geführt")]
+        self.assertNotIn("Sprödes Versagen", kopf)
+        self.assertIn("M-N-Nachweis", kopf)
+
+    def test_die_konsole_verschweigt_sie_aber_nicht(self):
+        text = als_text(self.loesung())
+        self.assertIn("Nicht geführt, geht aber nicht auf:", text)
+        self.assertIn("Sprödes Versagen x – 1. Lage", text)
+
+    def test_das_latex_dokument_widerspricht_sich_nicht(self):
+        tex = als_tex(self.loesung())
+        tabelle = tex[tex.index("Zusammenstellung der Nachweise"):]
+        tabelle = tabelle[:tabelle.index(r"\end{longtable}")]
+        self.assertNotIn("Rissnormalkraft", tabelle)
+        self.assertNotIn("nicht erfüllt", tabelle)
+        self.assertIn("Sämtliche geführten Nachweise sind erfüllt.", tex)
+
+    def test_das_latex_dokument_meldet_sie_darunter(self):
+        tex = als_tex(self.loesung())
+        hinweis = tex[tex.index("Nicht geführte Nachweise"):]
+        self.assertIn("Rissnormalkraft", hinweis)

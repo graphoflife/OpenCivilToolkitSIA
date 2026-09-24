@@ -590,6 +590,22 @@ class NachweisUrteil:
     """
 
     @property
+    def meldenswert(self) -> bool:
+        """
+        Ob dieses stille Urteil einen Hinweis wert ist.
+
+        Nur was still ist und nicht aufgeht -- und nur, wenn es ueberhaupt
+        einen Widerstand gibt. Ohne ihn liess sich der Nachweis gar nicht
+        fuehren (etwa an einer unbewehrten Lage); das ist keine Auskunft
+        ueber die Bewehrung, sondern darueber, dass es keine gibt.
+
+        Die Regel steht hier und nicht in der Schnittstelle: Tabelle,
+        Konsolenbericht und LaTeX-Dokument stellen dieselbe Frage, und drei
+        Antworten darauf waeren drei Gelegenheiten, auseinanderzulaufen.
+        """
+        return self.still and not self.erfuellt and self.widerstand is not None
+
+    @property
     def kurzname(self) -> str:
         """
         Die knappe Bezeichnung, z.B. ``M-N: Fall 1``.

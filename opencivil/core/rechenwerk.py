@@ -126,6 +126,23 @@ class Loesung:
         return not self.fehlende and not self.nicht_berechenbar
 
     @property
+    def gefuehrte_urteile(self) -> List[NachweisUrteil]:
+        """
+        Die Urteile, die in eine Tabelle gehoeren -- ohne die stillen.
+
+        Ein stiller Nachweis ist ausgeschaltet: er rechnet mit, damit ein
+        Hinweis stehen kann, wenn er nicht aufgeht, aber gefuehrt hat ihn
+        niemand. Wer eine Zusammenstellung der Nachweise baut, meint diese
+        Liste.
+        """
+        return [u for u in self.urteile if not u.still]
+
+    @property
+    def stille_maengel(self) -> List[NachweisUrteil]:
+        """Ausgeschaltete Nachweise, die nicht aufgehen -- nur als Hinweis."""
+        return [u for u in self.urteile if u.meldenswert]
+
+    @property
     def alle_nachweise_erfuellt(self) -> bool:
         """
         Ohne die stillen: sie sind ausgeschaltet und zaehlen nicht mit.
@@ -133,7 +150,7 @@ class Loesung:
         Sonst staende oben rechts «nicht erfuellt» wegen eines Nachweises,
         den niemand fuehrt -- und man faende in der Tabelle nichts dazu.
         """
-        return all(u.erfuellt for u in self.urteile if not u.still)
+        return all(u.erfuellt for u in self.gefuehrte_urteile)
 
     def kette(self, wert_id: str) -> List[str]:
         """

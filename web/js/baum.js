@@ -135,62 +135,28 @@ function platteAnlegen() {
     melden('Zuerst je ein Beton- und ein Betonstahlmaterial anlegen.', true);
     return;
   }
+  // Die Vorlage kommt aus dem Kern. Sie stand einmal hier -- zwanzig Felder,
+  // die von Hand mit den Vorgaben in projekt.py gleichgehalten werden
+  // mussten. Als sich die Vorgaben änderten, blieb diese Kopie stehen, und
+  // neue Platten brachten Nachweise eingeschaltet mit, die überall sonst aus
+  // waren. Gesetzt wird hier nur noch, was der Kern nicht wissen kann: die
+  // Kennung, der Name und welche Materialien es im Projekt gibt.
+  const vorlage = zustand.katalog?.neue_platte;
+  if (!vorlage) {
+    melden('Der Katalog ist noch nicht geladen.', true);
+    return;
+  }
   const kennung = freieKennung('q');
-  const lage = (phi) => ({
-    stahl: stahl.kennung,
-    grund: { durchmesser: phi, abstand: 150, anzahl: null },
-    // Auch die leere Zulage wird über die Teilung geführt -- das ist der
-    // Regelfall bei Platten und die Stellung, in der das Feld erscheint.
-    zulage: { durchmesser: 0, abstand: 150, anzahl: null },
-  });
   projektAendern((p) => {
-    p.querschnitte.push({
-      kennung,
-      name: `Platte ${p.querschnitte.length + 1}`,
-      beton: beton.kennung,
-      h: 300, b: 1000,
-      // Grösstkorn und Einlagenhöhe gehören zur Platte und gehen in den
-      // Querkraftwiderstand ein. Ohne Vorgabe stünden die Felder leer da und
-      // der Nachweis meldete eine fehlende Eingabe.
-      d_max: 32, einlagenhoehe: 0, k_c: 0.55,
-      // Ohne Durchmesser: keine Querkraftbewehrung. Die übrigen Felder stehen
-      // trotzdem da, damit die Maske beim Eintragen eines Durchmessers nicht
-      // mit leeren Teilungen dasteht.
-      querkraftbewehrung: {
-        durchmesser: 0, stahl: stahl.kennung,
-        abstand_x: 200, abstand_y: 200, anzahl_y: null,
-        alpha_min: 30, alpha_max: 45,
-      },
-      ueberdeckung_unten: 30, ueberdeckung_oben: 30,
-      richtung_lage1: 'x', richtung_lage4: 'x',
-      // Nur aussen bewehrt: die 1. und die 4. Lage tragen, die beiden inneren
-      // sind erst einmal nicht da. Was man nicht braucht, soll man wegnehmen
-      // müssen und nicht wegnehmen dürfen.
-      lagen: [lage(12), lage(0), lage(0), lage(12)],
-      // Die beiden äusseren Lagen tragen Feld- und Stützmoment; dort
-      // entscheidet sich, ob der Querschnitt sein Versagen ankündigt.
-      duktilitaet: [true, false, false, true],
-      // Eine Zwängung ist eine Annahme über das Tragwerk, keine Eigenschaft
-      // der Platte -- wer sie braucht, schaltet sie ein.
-      rissanforderung: 'normal', kriechzahl: 2.0,
-      zwaengung_x: false, zwaengung_y: false, zwaengung_begrenzt: false,
-      haeufige_aus_tragsicherheit: true, haeufige: [], knickfaelle: [],
-      // Was das Bewehrungswerkzeug voreingestellt versucht. Steht hier und
-      // nicht nur als Vorgabe im Kern: sonst zeigte die Maske ein leeres
-      // Teilungsfeld, während gerechnet würde, als stünde 150 darin.
-      automatik_modus: 'grund_ohne', automatik_teilungen: [150],
-      automatik_mindestdurchmesser: 10,
-      automatik_querkraft: false, automatik_querkraft_teilungen: [100, 150, 200],
-      beschreibung: '',
-      spannungsfaelle: [],
-      // Sprödes Versagen und Zwängung auf Biegung: nur die 1. Lage.
-      sproede_lagen: [true, false, false, false],
-      zwaengung_biegung_lagen: [true, false, false, false],
-      // 'automatisch': beide Massstäbe werden gerechnet, massgebend ist der
-      // kleinere Erfüllungsgrad. Eine feste Wahl hier hätte die neue Platte
-      // vom Regelfall ausgenommen.
-      kombinationen: [{ name: 'Feld', M_Ed: 30, N_Ed: 0, art: 'automatisch', richtung: 'x' }],
-    });
+    // Kopie, nicht die Vorlage selbst: sonst teilten sich alle neuen Platten
+    // dieselben Lagen, und die zweite änderte die erste mit.
+    const platte = structuredClone(vorlage);
+    platte.kennung = kennung;
+    platte.name = `Platte ${p.querschnitte.length + 1}`;
+    platte.beton = beton.kennung;
+    platte.querkraftbewehrung.stahl = stahl.kennung;
+    platte.lagen.forEach((l) => { l.stahl = stahl.kennung; });
+    p.querschnitte.push(platte);
   });
   aendern({ auswahl: { art: 'querschnitt', kennung } }, 'auswahl');
 }

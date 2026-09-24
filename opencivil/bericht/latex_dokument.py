@@ -166,33 +166,70 @@ def _werte_tex(loesung: Loesung) -> List[str]:
 
 
 def _nachweise_tex(loesung: Loesung) -> List[str]:
-    if not loesung.urteile:
+    # Nur die gefuehrten: ein ausgeschalteter Nachweis stand hier als Zeile
+    # «nicht erfuellt», und der Schlusssatz darunter -- der die stillen schon
+    # immer uebergangen hat -- sagte im selben Atemzug «saemtliche Nachweise
+    # sind erfuellt». Ein Bericht, der sich selbst widerspricht, ist
+    # schlimmer als einer, der schweigt.
+    gefuehrt = loesung.gefuehrte_urteile
+    if not gefuehrt and not loesung.stille_maengel:
         return []
-    zeilen = [
-        r"\section{Zusammenstellung der Nachweise}",
-        r"\begin{longtable}{lrl}",
-        r"\toprule",
-        r"Nachweis & Erfüllungsgrad $\alpha_{eff}$ & Ergebnis \\",
-        r"\midrule",
-        r"\endhead",
-    ]
-    for urteil in loesung.urteile:
-        ergebnis = (
-            r"\textcolor{green!50!black}{erfüllt}"
-            if urteil.erfuellt
-            else r"\textcolor{red}{\textbf{nicht erfüllt}}"
-        )
-        zeilen.append(
-            f"{text_latex(urteil.name)} & {urteil.erfuellungsgrad.formatiert(2)} & {ergebnis} \\\\"
-        )
-    zeilen += [r"\bottomrule", r"\end{longtable}"]
+    zeilen = [r"\section{Zusammenstellung der Nachweise}"]
+    if gefuehrt:
+        zeilen += [
+            r"\begin{longtable}{lrl}",
+            r"\toprule",
+            r"Nachweis & Erfüllungsgrad $\alpha_{eff}$ & Ergebnis \\",
+            r"\midrule",
+            r"\endhead",
+        ]
+        for urteil in gefuehrt:
+            ergebnis = (
+                r"\textcolor{green!50!black}{erfüllt}"
+                if urteil.erfuellt
+                else r"\textcolor{red}{\textbf{nicht erfüllt}}"
+            )
+            zeilen.append(
+                f"{text_latex(urteil.name)} & "
+                f"{urteil.erfuellungsgrad.formatiert(2)} & {ergebnis} \\\\"
+            )
+        zeilen += [r"\bottomrule", r"\end{longtable}"]
 
-    gesamt = (
-        "Sämtliche Nachweise sind erfüllt."
-        if loesung.alle_nachweise_erfuellt
-        else r"\textbf{Mindestens ein Nachweis ist nicht erfüllt.}"
+        gesamt = (
+            "Sämtliche geführten Nachweise sind erfüllt."
+            if loesung.alle_nachweise_erfuellt
+            else r"\textbf{Mindestens ein Nachweis ist nicht erfüllt.}"
+        )
+        zeilen.append(rf"\noindent {gesamt}")
+
+    zeilen += _stille_maengel_tex(loesung)
+    return zeilen
+
+
+def _stille_maengel_tex(loesung: Loesung) -> List[str]:
+    """
+    Was ausgeschaltet ist und trotzdem nicht aufgeht -- als Hinweis, nicht als
+    Zeile.
+
+    Dieselbe Auskunft wie unter der Tabelle in der Oberflaeche, an derselben
+    Stelle im Dokument: hinter der Zusammenstellung, klein gesetzt.
+    """
+    maengel = loesung.stille_maengel
+    if not maengel:
+        return []
+    zeilen = ["", r"\vspace{0.6em}", r"\noindent\footnotesize"]
+    zeilen.append(
+        r"\textit{Nicht geführte Nachweise, die mit der vorliegenden "
+        r"Bewehrung nicht aufgehen:}"
+        r"\begin{itemize}\setlength{\itemsep}{0pt}"
     )
-    zeilen.append(rf"\noindent {gesamt}")
+    for urteil in maengel:
+        zeilen.append(
+            rf"\item {text_latex(urteil.name)} -- "
+            rf"$\alpha_{{eff}} = {urteil.erfuellungsgrad.formatiert(2)}$. "
+            rf"{text_latex(urteil.begruendung)}"
+        )
+    zeilen += [r"\end{itemize}", r"\normalsize"]
     return zeilen
 
 

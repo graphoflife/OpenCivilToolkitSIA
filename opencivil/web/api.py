@@ -32,7 +32,10 @@ from opencivil.core.wert import Wert
 from opencivil.material.beton import BETON_VORLAGEN, BETONSORTEN
 from opencivil.material.betonstahl import STAHLSORTEN, STAHL_VORLAGEN
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
-from opencivil.projekt import BEIDE_RICHTUNGEN, RISSANFORDERUNGEN, Aufbau
+from opencivil.nachweis.spannungsbegrenzung import GEFORDERT
+from opencivil.projekt import (
+    BEIDE_RICHTUNGEN, RISSANFORDERUNGEN, Aufbau, QuerschnittEintrag,
+)
 
 
 def endlich(daten: Any) -> Any:
@@ -90,8 +93,21 @@ def katalog() -> dict:
             {"wert": "y", "beschriftung": "nur y-Richtung"},
             {"wert": BEIDE_RICHTUNGEN, "beschriftung": "beide Richtungen"},
         ],
+        # Die frische Platte kommt aus dem Kern. Die Oberflaeche trug sie
+        # einmal selbst -- zwanzig Felder, die jemand von Hand mit den
+        # Vorgaben gleichhalten musste, und beim ersten Mal, als sich die
+        # Vorgaben aenderten, lief das auseinander. Gesetzt werden dort jetzt
+        # nur noch Kennung, Name und die beiden Materialien.
+        "neue_platte": QuerschnittEintrag.neu(
+            kennung="", name="", beton="", stahl="").als_dict(),
+        # `spannungsnachweis` sagt, ob diese Anforderung den Nachweis gegen
+        # das Fliessen unter haeufiger Einwirkung ueberhaupt verlangt -- bei
+        # normaler steht in Tabelle 17 ein Strich. Die Oberflaeche braucht
+        # das, um die eingetragenen Lastfaelle nicht stillschweigend
+        # wegzurechnen; die Regel selbst bleibt im Kern.
         "rissanforderungen": [
-            {"wert": wert, "beschriftung": text}
+            {"wert": wert, "beschriftung": text,
+             "spannungsnachweis": wert in GEFORDERT}
             for wert, text in RISSANFORDERUNGEN.items()
         ],
     }
@@ -847,11 +863,10 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
                   if u.raum == qs.id or u.raum.startswith(f"{qs.id}.")]
         urteile = [u for u in eigene if not u.still]
         # Ausgeschaltete Nachweise stehen nicht in der Tabelle -- aber wenn
-        # einer nicht aufgeht, soll man es erfahren. Ohne Widerstand ist er
-        # gar nicht fuehrbar (etwa an einer unbewehrten Lage); das ist keine
-        # Auskunft ueber die Bewehrung und bleibt darum draussen.
-        stille = [u for u in eigene
-                  if u.still and not u.erfuellt and u.widerstand is not None]
+        # einer nicht aufgeht, soll man es erfahren. Was dabei meldenswert
+        # ist, entscheidet das Urteil selbst; Konsole und LaTeX-Bericht
+        # fragen dieselbe Eigenschaft.
+        stille = [u for u in eigene if u.meldenswert]
         if not urteile and not stille:
             continue
         zeilen = [

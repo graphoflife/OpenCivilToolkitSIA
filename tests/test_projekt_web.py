@@ -376,6 +376,119 @@ class TestUrteilsraum(unittest.TestCase):
         self.assertEqual(len(raeume), 4)
 
 
+class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
+    """
+    Die Vorlage für eine frische Platte steht an *einer* Stelle.
+
+    Sie stand einmal auch in der Oberfläche, als Wortschatz aus zwanzig
+    Feldern. Als sich die Vorgaben änderten, blieb die Kopie stehen und neue
+    Platten brachten Nachweise eingeschaltet mit, die überall sonst aus waren.
+    """
+
+    def test_der_katalog_traegt_sie(self):
+        vorlage = api.katalog()["neue_platte"]
+        self.assertEqual(vorlage["h"], 300.0)
+        self.assertEqual([l["grund"]["durchmesser"] for l in vorlage["lagen"]],
+                         [12.0, 0.0, 0.0, 12.0])
+        self.assertEqual(vorlage["kombinationen"][0]["M_Ed"], 30.0)
+
+    def test_ihre_nachweise_sind_ausgeschaltet(self):
+        vorlage = api.katalog()["neue_platte"]
+        for feld in ("duktilitaet", "sproede_lagen", "zwaengung_biegung_lagen"):
+            with self.subTest(feld=feld):
+                self.assertEqual(vorlage[feld], [False] * 4)
+        self.assertFalse(vorlage["haeufige_aus_tragsicherheit"])
+        self.assertFalse(vorlage["zwaengung_x"])
+        self.assertFalse(vorlage["zwaengung_y"])
+
+    def test_sie_folgt_den_vorgaben_der_beschreibung(self):
+        """
+        Der eigentliche Punkt: kein zweiter Satz Vorgaben. Ändert sich einer
+        in QuerschnittEintrag, ändert sich die Vorlage mit.
+        """
+        from opencivil.projekt import QuerschnittEintrag
+
+        vorlage = api.katalog()["neue_platte"]
+        leer = QuerschnittEintrag(kennung="x", name="x", beton="b").als_dict()
+        for feld in ("duktilitaet", "sproede_lagen", "zwaengung_biegung_lagen",
+                     "haeufige_aus_tragsicherheit", "automatik_modus",
+                     "automatik_teilungen", "automatik_mindestdurchmesser",
+                     "rissanforderung", "kriechzahl", "d_max", "k_c", "b"):
+            with self.subTest(feld=feld):
+                self.assertEqual(vorlage[feld], leer[feld])
+
+    def test_sie_laesst_sich_ohne_nacharbeit_rechnen(self):
+        """Was die Oberfläche einfügt, muss der Kern auch wieder annehmen."""
+        vorlage = dict(api.katalog()["neue_platte"])
+        vorlage.update(kennung="q9", name="Platte 9", beton="b1")
+        for lage in vorlage["lagen"]:
+            lage["stahl"] = "s1"
+        vorlage["querkraftbewehrung"]["stahl"] = "s1"
+
+        d = Projekt.beispiel().als_dict()
+        d["querschnitte"].append(vorlage)
+        antwort = dienst.bearbeite("rechnen", {"projekt": d})
+        self.assertEqual(antwort.status, 200)
+        self.assertIn("q9", antwort.daten["zusammenfassungen"])
+
+
+class TestKurzeSchalterlisten(unittest.TestCase):
+    """
+    Von Hand gebaute Beschreibungen sind der zweite Weg ins Werkzeug.
+
+    `aus_dict` bringt die Schalterlisten auf vier; wer das Feld nachträglich
+    zuweist, läuft daran vorbei. Der Aufbau quittierte das mit einem nackten
+    IndexError.
+    """
+
+    def test_eine_kurze_liste_stuerzt_nicht_ab(self):
+        for feld, kurz in (("duktilitaet", [True]),
+                           ("sproede_lagen", []),
+                           ("zwaengung_biegung_lagen", [False, True])):
+            with self.subTest(feld=feld):
+                projekt = Projekt.beispiel()
+                setattr(projekt.querschnitt("q1"), feld, list(kurz))
+                aufbau = projekt.aufbauen()
+                aufbau.werk.loese(*aufbau.alle_nachweisziele())
+
+    def test_die_angegebenen_schalter_gelten_trotzdem(self):
+        projekt = Projekt.beispiel()
+        projekt.querschnitt("q1").duktilitaet = [True]
+        aufbau = projekt.aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        laut = [u.name for u in loesung.gefuehrte_urteile if u.art == "D"]
+        self.assertEqual(laut, ["Duktilität – 1. Lage"])
+
+
+class TestSpannungsnachweisNurWoGefordert(unittest.TestCase):
+    """
+    Bei normaler Rissanforderung steht in Tabelle 17 ein Strich.
+
+    Die Maske nahm häufige Lastfälle trotzdem entgegen und rechnete sie
+    stillschweigend nicht. Welche Anforderung den Nachweis verlangt, sagt
+    jetzt der Katalog -- damit die Oberfläche es sagen kann, ohne die Norm
+    ein zweites Mal aufzuschreiben.
+    """
+
+    def test_der_katalog_sagt_es(self):
+        nach_wert = {r["wert"]: r["spannungsnachweis"]
+                     for r in api.katalog()["rissanforderungen"]}
+        self.assertEqual(nach_wert,
+                         {"normal": False, "erhoeht": True, "hoch": True})
+
+    def test_und_es_stimmt_mit_dem_ueberein_was_gebaut_wird(self):
+        from opencivil.projekt import HaeufigEintrag
+
+        for eintrag in api.katalog()["rissanforderungen"]:
+            projekt = Projekt.beispiel()
+            q = projekt.querschnitt("q1")
+            q.rissanforderung = eintrag["wert"]
+            q.haeufige = [HaeufigEintrag("Gebrauch", M_Ed=70.0)]
+            with self.subTest(anforderung=eintrag["wert"]):
+                self.assertEqual(bool(projekt.aufbauen().spannung),
+                                 eintrag["spannungsnachweis"])
+
+
 class TestStilleNachweise(unittest.TestCase):
     """
     Ausgeschaltet heisst still, nicht weg.
