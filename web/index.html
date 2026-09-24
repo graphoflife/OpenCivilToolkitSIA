@@ -94,6 +94,16 @@
 
 </main>
 
+<!-- Nur auf schmalen Geräten sichtbar: dort steht immer eine Tafel allein, und
+     hiermit wechselt man zwischen ihnen. Dasselbe Reiter-Muster wie oben
+     rechts in der Berechnung -- es soll nicht zwei Arten geben, in diesem
+     Werkzeug umzuschalten. Unten, weil der Daumen dort ist. -->
+<nav class="tafelwahl reiter" id="tafelwahl" aria-label="Tafel wählen">
+  <button class="reiter-knopf" data-tafel="links">Projekt</button>
+  <button class="reiter-knopf ist-aktiv" data-tafel="mitte">Eingaben</button>
+  <button class="reiter-knopf" data-tafel="rechts">Berechnung</button>
+</nav>
+
 <footer class="fussleiste">
   <span id="kernanzeige" class="kernanzeige" title="Wo gerechnet wird"></span>
 </footer>

@@ -283,6 +283,37 @@ function griffeEinrichten() {
   }
 }
 
+/**
+ * Auf schmalen Geräten steht immer eine Tafel allein -- hier wird gewechselt.
+ *
+ * Drei Tafeln nebeneinander sind am Schreibtisch richtig und auf dem Telefon
+ * unbrauchbar: bei 375 px blieb für die rechte nichts übrig, und Herleitung,
+ * Zusammenfassung und Diagramme waren schlicht nicht erreichbar.
+ *
+ * Welche Tafel gilt, steht als `data-tafel` am Raster. Das Umschalten ist
+ * darum eine reine Anzeigefrage und geht nicht durch den Zustand: es ändert
+ * nichts am Projekt, und eine Rechnung soll es auch nicht auslösen.
+ */
+function tafelwahlEinrichten() {
+  const wahl = document.getElementById('tafelwahl');
+  const raster = document.getElementById('raster');
+  if (!wahl || !raster) return;
+
+  raster.dataset.tafel = 'mitte';
+  wahl.addEventListener('click', (e) => {
+    const knopf = e.target.closest('[data-tafel]');
+    if (!knopf) return;
+    raster.dataset.tafel = knopf.dataset.tafel;
+    for (const k of wahl.querySelectorAll('[data-tafel]')) {
+      k.classList.toggle('ist-aktiv', k === knopf);
+    }
+    // Jede Tafel scrollt für sich. Ohne das stünde man nach dem Wechsel
+    // mitten im Text, den man beim letzten Mal verlassen hat.
+    raster.querySelector(`.tafel-${knopf.dataset.tafel} .tafel-inhalt`)
+      ?.scrollTo({ top: 0 });
+  });
+}
+
 // ===========================================================================
 // Zeichnen
 // ===========================================================================
@@ -496,6 +527,7 @@ async function starten() {
   }
 
   griffeEinrichten();
+  tafelwahlEinrichten();
   ablageEinrichten(imBrowserAblegen);
   horchen(allesZeichnen);
 

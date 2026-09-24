@@ -105,22 +105,43 @@ export function hakenSchalter(an, setzen, was = 'Nachweis') {
 }
 
 /**
- * Ein Fragezeichen, das seine Erklärung beim Darüberfahren zeigt.
+ * Ein Fragezeichen, das seine Erklärung zeigt -- beim Darüberfahren oder auf
+ * Tipp.
  *
  * Die Erklärungen standen vorher offen neben den Kapitelüberschriften --
  * «x / d ≤ 0.35 bei M_Ed = 0» und ähnliches. Richtig, aber laut: wer die
  * Maske bedient, liest sie beim ersten Mal und danach nie wieder, und
  * breiter machen sie die Tafel jedes Mal.
  *
+ * Ein Knopf und kein `span`: auf dem Telefon gibt es kein Darüberfahren, und
+ * ohne Klick wäre die Erklärung dort gar nicht zu bekommen. Das `title`-
+ * Attribut ist weg -- es zeigte dieselbe Erklärung ein zweites Mal, als
+ * Systemblase über der eigenen.
+ *
  * `text` ist die kurze Fassung, `formel` die Bedingung in einer Zeile.
  */
 export function erklaerung(text, formel = '') {
-  const zettel = el('span.erklaerung', { title: `${text}${formel ? `\n\n${formel}` : ''}` }, [
-    el('span.erklaerung-zeichen', { text: '?' }),
-    el('span.erklaerung-blase', {}, [
-      el('span', { text }),
-      formel ? el('code', { text: formel }) : null,
-    ]),
+  const blase = el('span.erklaerung-blase', {}, [
+    el('span', { text }),
+    formel ? el('code', { text: formel }) : null,
   ]);
+  const zeichen = el('button.erklaerung-zeichen', {
+    text: '?', type: 'button',
+    'aria-label': 'Erklärung anzeigen', 'aria-expanded': 'false',
+  });
+  const zettel = el('span.erklaerung', {}, [zeichen, blase]);
+
+  zeichen.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const offen = zettel.classList.toggle('ist-offen');
+    zeichen.setAttribute('aria-expanded', String(offen));
+    // Immer nur eine offen -- sonst stapeln sich die Blasen übereinander und
+    // man weiss nicht mehr, welche zu welchem Titel gehört.
+    if (offen) {
+      for (const andere of document.querySelectorAll('.erklaerung.ist-offen')) {
+        if (andere !== zettel) andere.classList.remove('ist-offen');
+      }
+    }
+  });
   return zettel;
 }

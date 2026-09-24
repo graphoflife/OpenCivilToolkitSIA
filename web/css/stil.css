@@ -55,6 +55,14 @@
 
   --breite-links: 300px;
   --breite-mitte: 440px;
+
+  /* Die Kopfleiste steht fest; das Raster darunter zieht sie ab. Als
+     Variable, weil sie auf schmalen Geraeten umbricht und dann hoeher ist --
+     zwei Zahlen an zwei Stellen liefen beim ersten Umbruch auseinander. */
+  --kopfhoehe: 50px;
+  /* Der Umschalter am unteren Rand -- am Schreibtisch gibt es ihn nicht,
+     also nimmt er dort auch keine Hoehe. */
+  --wahlhoehe: 0px;
 }
 
 * { box-sizing: border-box; }
@@ -75,7 +83,7 @@ button, input, select { font: inherit; color: inherit; }
 
 .kopfleiste {
   display: flex; align-items: center; gap: 12px;
-  height: 50px; padding: 0 14px;
+  height: var(--kopfhoehe); padding: 0 14px;
   background: var(--blau-leiste);
   border-bottom: 3px solid var(--blau);
   position: relative; z-index: 5;
@@ -139,9 +147,15 @@ input.projektname:focus {
 .raster {
   display: grid;
   grid-template-columns: var(--breite-links) 5px var(--breite-mitte) 5px 1fr;
-  height: calc(100vh - 50px);
+  height: calc(100vh - var(--kopfhoehe));
+  /* dvh statt vh: auf dem Telefon zaehlt vh die Adressleiste mit, die beim
+     Scrollen verschwindet -- die Tafel waere unten abgeschnitten und der
+     Umschalter nicht erreichbar. Die vh-Zeile darueber bleibt als Rueckfall
+     fuer Browser ohne dvh stehen. */
+  height: calc(100dvh - var(--kopfhoehe));
   min-height: 0;
 }
+
 
 /* min-height:0 ist entscheidend: ohne das behält der Flex-/Grid-Nachkomme
    min-height:auto, wächst über den Container hinaus und der Inhalt lässt sich
@@ -270,7 +284,7 @@ input.projektname:focus {
   color: var(--schrift-zart);
 }
 
-.feld { display: grid; grid-template-columns: 1fr 112px 48px; gap: 6px; align-items: center; margin-bottom: 5px; }
+.feld { display: grid; grid-template-columns: minmax(0, 1fr) 112px 48px; gap: 6px; align-items: center; margin-bottom: 5px; }
 .feld > label { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .feld .einheit { font-size: 12px; color: var(--schrift-zart); }
 
@@ -467,11 +481,13 @@ input[readonly], input:disabled, select:disabled {
 .ueberdeckung .feld { margin-bottom: 0; }
 
 /* Platte und Bewehrung nebeneinander, sobald die Tafel breit genug ist. */
-.zweispaltig { display: grid; grid-template-columns: 1fr; gap: 16px;
+.zweispaltig { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px;
                align-items: start; }
 /* Zwei Spalten erst, wenn die *Tafel* sie trägt -- nicht, wenn das Fenster
    breit ist. Eine Spalte braucht rund 340 px, dazu der Zwischenraum. */
-@container (min-width: 740px) { .zweispaltig { grid-template-columns: 1fr 1fr; } }
+@container (min-width: 740px) {
+  .zweispaltig { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}
 /* Eine Spalte fasst mehrere Feldgruppen zusammen -- links die Platte und das
    Werkzeug darunter, rechts die Bewehrung. Ohne sie wären es drei gleiche
    Kacheln im Raster und das Werkzeug landete neben der Platte statt unter ihr. */
@@ -950,12 +966,13 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
    ohne Maus erreichbar bleibt. */
 .erklaerung { position: relative; display: inline-flex; flex: none; }
 .erklaerung-zeichen {
-  width: 15px; height: 15px; border-radius: 50%;
+  width: 15px; height: 15px; padding: 0; border: none; border-radius: 50%;
   background: var(--blau-hell); color: var(--blau);
   font-size: 10px; font-weight: 800; line-height: 15px; text-align: center;
   cursor: help; user-select: none;
 }
-.erklaerung:hover .erklaerung-zeichen { background: var(--blau); color: #fff; }
+.erklaerung:hover .erklaerung-zeichen,
+.erklaerung.ist-offen .erklaerung-zeichen { background: var(--blau); color: #fff; }
 .erklaerung-blase {
   position: absolute; right: 0; top: 20px; z-index: 40;
   display: none; flex-direction: column; gap: 6px;
@@ -965,7 +982,9 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   font-size: 11.5px; line-height: 1.45; color: var(--schrift-matt);
   font-weight: 400; text-transform: none; letter-spacing: 0;
 }
-.erklaerung:hover .erklaerung-blase { display: flex; }
+/* Darüberfahren *oder* angetippt: auf dem Telefon gibt es nur das zweite. */
+.erklaerung:hover .erklaerung-blase,
+.erklaerung.ist-offen .erklaerung-blase { display: flex; }
 .erklaerung-blase code {
   font-size: 11.5px; color: var(--schrift); background: var(--flaeche-2);
   padding: 4px 6px; border-radius: 4px; white-space: pre-wrap;
@@ -978,3 +997,110 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   font-size: 11.5px; line-height: 1.45; margin: 4px 0 0;
   color: #9a6a68;
 }
+
+
+/* ------------------------------------------------------------- Schmal -- */
+
+/* Der Umschalter zwischen den Tafeln -- nur auf schmalen Geraeten.
+
+   Steht hier unten und nicht oben beim Raster: er traegt auch die Klasse
+   `reiter`, damit er aussieht wie die Reiter in der Berechnung, und
+   `.reiter { display: flex }` wuerde ihn sonst wieder einblenden -- gleiche
+   Spezifitaet, spaeter im Text. */
+.tafelwahl { display: none; }
+
+/* Drei Tafeln nebeneinander sind am Schreibtisch richtig und auf dem Telefon
+   unbrauchbar. Bei 375 px stand links 300 px, in der Mitte 440 px -- die
+   rechte Tafel bekam 0 px, und Zusammenfassung, Herleitung und Diagramme
+   waren nicht erreichbar, auch nicht durch Schieben: die Seite scrollt nicht
+   waagrecht.
+
+   Darum steht hier immer eine Tafel allein, und unten wechselt man. Es ist
+   dieselbe Aufteilung, nur nacheinander statt nebeneinander -- keine zweite
+   Oberflaeche, die eigene Pflege braucht.
+
+   Die Grenze liegt bei 900 px: darunter bliebe für die rechte Tafel weniger
+   als ihre Mindestbreite, und ein Drittel eines Diagramms ist kein Diagramm. */
+@media (max-width: 900px) {
+  .raster {
+    grid-template-columns: 1fr;
+    height: calc(100vh - var(--kopfhoehe) - var(--wahlhoehe));
+    height: calc(100dvh - var(--kopfhoehe) - var(--wahlhoehe));
+  }
+
+  /* Griffe gibt es nicht: gezogen wird mit der Maus, und es ist nur eine
+     Tafel da. */
+  .griff { display: none; }
+
+  .tafel { display: none; border-right: none; }
+  .raster[data-tafel="links"]  .tafel-links,
+  .raster[data-tafel="mitte"]  .tafel-mitte,
+  .raster[data-tafel="rechts"] .tafel-rechts { display: flex; }
+
+  /* Die Tafeln geben einander nicht mehr nach -- nebeneinander steht ja
+     nichts. Stattdessen überall gleich viel Luft zum Rand. */
+  .tafel-links  .tafel-inhalt,
+  .tafel-mitte  .tafel-inhalt,
+  .tafel-rechts .tafel-inhalt { padding-left: 12px; padding-right: 12px; }
+
+  .tafelwahl {
+    display: flex; gap: 4px; margin: 0;
+    height: var(--wahlhoehe); padding: 5px 8px;
+    border-top: 1px solid var(--rand);
+    background: var(--flaeche);
+  }
+  .tafelwahl .reiter-knopf { flex: 1; padding: 9px 6px; font-size: 13px; }
+
+  /* Kopfleiste: der Projektname braucht die ganze Zeile, die Knöpfe rutschen
+     darunter. Damit die Höhe stimmt, wächst die Variable mit. */
+  :root { --kopfhoehe: 96px; --wahlhoehe: 46px; }
+  .kopfleiste { flex-wrap: wrap; align-content: center; padding: 6px 10px; gap: 8px; }
+  .kopfleiste .marke { font-size: 15px; }
+  input.projektname { order: 3; flex: 1 1 100%; }
+  .kopf-knoepfe { margin-left: auto; }
+  .zustandsanzeige { min-width: 0; }
+
+  /* Fingerziele. 15 px sind mit der Maus genau, mit dem Daumen geraten --
+     was man antippen soll, ist hier mindestens 34 px hoch. Gilt für alles,
+     was tippbar ist, damit nicht der nächste Knopf wieder zu klein anfängt. */
+  .weg, .knopf-zart, .reiter-knopf, .erklaerung-zeichen,
+  .baum-eintrag > button {
+    min-height: 34px; min-width: 34px;
+  }
+  /* Die Halbschalter stehen paarweise in engen Zeilen -- ihnen genügt die
+     Höhe. Eine Mindestbreite schob die Lagenzeile über den Rand hinaus. */
+  .schalter-halb { min-height: 34px; padding: 6px 10px; }
+  .erklaerung-zeichen {
+    width: 34px; height: 34px; line-height: 34px; font-size: 14px;
+    border-radius: var(--radius);
+  }
+  /* Die Blase hat keinen Platz mehr neben dem Zeichen -- sie legt sich über
+     die Breite der Tafel. */
+  .erklaerung-blase { left: auto; right: 0; max-width: min(280px, 82vw); }
+
+  /* Zahlenfelder: iOS zoomt beim Antippen, wenn die Schrift unter 16 px
+     liegt, und kommt danach nicht von selbst zurück. */
+  input[type="text"], input[type="number"], select, textarea {
+    font-size: 16px; min-height: 34px;
+  }
+
+  /* Die kleinen Pfeile am Zahlenfeld gibt es hier nicht. Sie teilen sich die
+     Höhe des Feldes, sind also halb so hoch wie es -- 17 px, und sie sitzen
+     genau dort, wo man hintippt, um das Feld zu treffen. Mit dem Ziffernblock
+     tippt man die Zahl ohnehin ein. */
+  .zahlpfeile { display: none; }
+  .zahlfeld > input { padding-right: 8px; }
+
+  /* 26 px Rand auf jeder Seite kosten bei 375 px Breite ein Siebtel des
+     Blattes. Am Schreibtisch ist der Rand Ruhe, hier ist er Verlust. */
+  .blatt { padding: 14px 12px; margin-bottom: 12px; }
+
+  /* Die Feldzeile wird schmaler: Beschriftung, Wert, Einheit müssen
+     nebeneinander bleiben, aber der Wert darf nicht 112 px festhalten. */
+  .feld { grid-template-columns: minmax(0, 1fr) 96px 34px; }
+
+  /* Der Umschalter «Teilung/Anzahl» steht in der Postenzeile ganz rechts und
+     ging als einziges Element über den Rand. Er darf hier umbrechen. */
+  .postenzeile .umschalter { justify-self: stretch; white-space: normal; }
+}
+
