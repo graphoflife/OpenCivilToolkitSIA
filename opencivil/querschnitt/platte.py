@@ -617,7 +617,7 @@ class Lagenaufbau(Prozedur):
             self.d_distanzhalter.belegen(Groesse.aus_si(hoehe, MM)), "@OK - @UK",
             {"OK": werte.laenge("OK", r"\text{OK innere untere Lage}", unten[0]),
              "UK": werte.laenge("UK", r"\text{UK innere obere Lage}", oben[1])},
-            titel="Höhe der Distanzhalter", referenz="")
+            titel="Höhe der Distanzhalter")
         return ergebnis
 
 

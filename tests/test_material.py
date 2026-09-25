@@ -65,24 +65,25 @@ class TestBeton(unittest.TestCase):
         erwartet = (10000 * 38 ** (1 / 3)) / (400 * 20.0)
         self.assertAlmostEqual(self.w("k_sigma").in_einheit(EINHEITSLOS), erwartet, places=6)
 
-    def test_empirische_annahme_steht_nicht_im_bericht(self):
+    def test_empirische_annahme_steht_an_der_formel(self):
         """
-        Die Einheitenannahme wird erzwungen, aber nicht mehr ausgeschrieben.
+        Die Einheitenannahme steht als Nachsatz an der Formel, nicht als Satz.
 
-        Woher die Formel stammt, sagt die Normreferenz an der Gleichung; der
-        Zusatz "eingesetzt werden f_ck in N/mm^2 ..." wiederholte das bloss in
-        Worten und stand in jeder zweiten Zeile.
+        Frueher stand "eingesetzt werden f_ck in N/mm^2 ..." als eigener Text
+        in jeder zweiten Zeile; ganz ohne Hinweis aber stuende die blanke Zahl
+        unter der Wurzel da, und niemand wuesste, in welcher Einheit.
         """
         loesung = self.werk.loese(self.c30.id_von("tau_cd"))
-        texte = [b.text for b in loesung.protokoll.alle_bloecke() if hasattr(b, "text")]
+        bloecke = loesung.protokoll.alle_bloecke()
+        texte = [b.text for b in bloecke if hasattr(b, "text")]
         self.assertFalse(any("Empirische Formel" in t for t in texte))
+        tau = next(b for b in bloecke if getattr(b, "wert_id", "") == self.c30.id_von("tau_cd"))
+        self.assertIn(r"f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}", tau.latex)
 
-    def test_empirische_annahme_wird_trotzdem_gefuehrt(self):
+    def test_empirische_annahme_wird_gefuehrt(self):
         """
-        Der Mechanismus bleibt: jede Einheit muss weiterhin benannt werden.
-
-        Nur die Ausgabe im Bericht entfällt. Wer die Annahme braucht -- etwa für
-        eine spätere Prüfliste --, bekommt sie über annahmen_text().
+        Jede Einheit muss benannt werden; der Hinweis an der Formel liest sie
+        aus ``einheiten``.
         """
         from opencivil.core.einheiten import EINHEITSLOS, empirisch
 
@@ -92,7 +93,7 @@ class TestBeton(unittest.TestCase):
             f_ck=(Groesse(30, N_PRO_MM2), N_PRO_MM2),
             gamma_c=(Groesse(1.5, EINHEITSLOS), EINHEITSLOS),
         )
-        self.assertIn("f_ck in N/mm²", ergebnis.annahmen_text())
+        self.assertEqual(ergebnis.einheiten["f_ck"], N_PRO_MM2)
         self.assertAlmostEqual(ergebnis.wert.in_einheit(N_PRO_MM2), 0.3 * 30 ** 0.5 / 1.5)
 
     def test_alle_sorten_rechnen_durch(self):

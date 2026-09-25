@@ -535,8 +535,8 @@ class BiegungNormalkraft(Nachweis):
         return Auswertung(
             kombination, innerhalb, grad, stelle,
             f"Kürzester Abstand zur Resistenzlinie im normierten Diagramm: "
-            f"{abstand:.3f}. Nächster Punkt: N = {_kn(stelle[0])} kN, "
-            f"M = {_knm(stelle[1])} kNm.",
+            f"{abstand:.3f}. Nächster Punkt: N = {_in(stelle[0], geo.NORMALKRAFT)}, "
+            f"M = {_in(stelle[1], geo.MOMENT)}.",
             achse=geo.MOMENT, ed=M_Ed, rd=stelle[1],
             massstab=Erfuellungsart.NAECHSTER_PUNKT)
 
@@ -551,7 +551,7 @@ class BiegungNormalkraft(Nachweis):
             rf"N_{{Ed}} = {k.N_Ed.als_latex(1, KN)}",
             titel="Einwirkung",
         )
-        basis = f"{self.id}.{kennung_aus(k.name)}"
+        basis = f"{self.id}.{k.kennung}"
         protokoll_interpolation(p, auswertung, basis=basis)
 
         werte, achse = Zwischenwerte(basis), auswertung.achse
@@ -564,7 +564,7 @@ class BiegungNormalkraft(Nachweis):
 
 def protokoll_interpolation(
     p: Protokoll, auswertung: Auswertung, titel: str = "",
-    *, basis: str = "interpolation",
+    *, basis: str,
 ) -> None:
     """
     Schreibt, wie der Widerstand auf dem Polygon gefunden wurde.
@@ -663,12 +663,3 @@ def _in(si_wert: float, achse: geo.Achse) -> str:
     g = Groesse.aus_si(si_wert, achse.einheit)
     return f"{g.formatiert(1)} {achse.einheit.beschriftung}"
 
-
-def _kn(si_wert: float) -> str:
-    """Formatiert eine Kraft, die in SI-Basis (N) vorliegt, als Kilonewton."""
-    return Groesse.aus_si(si_wert, KN).formatiert(1)
-
-
-def _knm(si_wert: float) -> str:
-    """Formatiert ein Moment, das in SI-Basis (Nm) vorliegt, als Kilonewtonmeter."""
-    return Groesse.aus_si(si_wert, KNM).formatiert(1)

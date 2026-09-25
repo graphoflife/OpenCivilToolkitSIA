@@ -331,6 +331,9 @@ class Querkraftergebnis:
     """Alle Zwischenwerte eines Falls, damit die Herleitung vollstaendig ist."""
 
     fall: Querkraftfall
+    zuglage: Optional[int] = None
+    """Die aeusserste gezogene Lage, als Index in den Posten -- aus ihr kommt ``d``."""
+
     d: float = 0.0
     d_v: float = 0.0
     k_g: float = 0.0
@@ -691,6 +694,7 @@ class Querkraft(Nachweis):
                 "y-Richtung braucht es dort eine Teilung in mm.")
             return erg
 
+        erg.zuglage = _zuglage(lagen, M_Ed >= 0)
         hoehen = _statische_hoehe(lagen, h, M_Ed >= 0)
         if hoehen is None:
             seite = "unten" if M_Ed >= 0 else "oben"
@@ -824,6 +828,7 @@ class Querkraft(Nachweis):
         # Ohne Bewehrung auf der gezogenen Seite gibt es kein d -- und ohne d
         # keinen Querkraftwiderstand. Frueher wurde hier die gedrueckte Seite
         # herangezogen und lieferte eine Zahl, die keine statische Hoehe ist.
+        erg.zuglage = _zuglage(lagen, M_Ed >= 0)
         hoehen = _statische_hoehe(lagen, h, M_Ed >= 0)
         if hoehen is None:
             seite = "unten" if M_Ed >= 0 else "oben"
@@ -952,7 +957,7 @@ class Querkraft(Nachweis):
                          werte: Zwischenwerte) -> Wert:
         """Die statische Höhe der gezogenen Bewehrung -- geschrieben, und für die Formeln danach."""
         positiv = erg.fall.M_Ed.si >= 0
-        lage, art = self.posten[_zuglage(self._lagen(e), positiv)][:2]
+        lage, art = self.posten[erg.zuglage][:2]
         z = e[f"z_{lage.nummer}{art.kuerzel}"]
         if not positiv:
             # Die Platte fuehrt die Tiefe ab Oberkante unter d. Bei einer
@@ -1031,7 +1036,7 @@ class Querkraft(Nachweis):
 
         # Ohne Bewehrung auf der gezogenen Seite gibt es kein d -- und nichts
         # weiter herzuleiten.
-        if _zuglage(self._lagen(e), M_Ed >= 0) is None:
+        if erg.zuglage is None:
             p.text(erg.begruendung)
             return
 
@@ -1060,7 +1065,7 @@ class Querkraft(Nachweis):
         bei_n = self.mn.widerstand_bei_n(fall.name)
         if bei_n is not None:
             protokoll_interpolation(
-                p, bei_n, basis=f"{self.id}.{kennung_aus(fall.name)}",
+                p, bei_n, basis=werte.basis,
                 titel=f"Momentenwiderstand bei N_Ed = {fall.N_Ed.formatiert(1, KN)} kN")
 
         m_Ed = werte.moment("m_Ed", "m_{Ed}", M_Ed)

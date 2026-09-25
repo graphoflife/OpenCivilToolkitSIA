@@ -681,26 +681,6 @@ class EmpirischesErgebnis:
         """Je Eingabe die Einheit, in der sie als blanke Zahl einging."""
         return {e.name: e.erwartete_einheit for e in self.einsetzungen}
 
-    def annahmen_text(self) -> str:
-        """Einzeiler fuer den Bericht: welche Einheiten vorausgesetzt wurden."""
-        teile = [f"{e.name} in {e.erwartete_einheit.beschriftung}" for e in self.einsetzungen]
-        return (
-            f"Empirische Formel -- eingesetzt werden {', '.join(teile)}; "
-            f"das Resultat ist in {self.ergebnis_einheit.beschriftung} zu lesen."
-        )
-
-    def annahmen_latex(self) -> str:
-        teile = [
-            rf"{e.name}\ \text{{in}}\ {e.erwartete_einheit.latex}"
-            for e in self.einsetzungen
-        ]
-        return (
-            r"\text{empirisch, mit }"
-            + r",\ ".join(teile)
-            + r"\text{; Resultat in }"
-            + (self.ergebnis_einheit.latex or "-")
-        )
-
 
 def empirisch(
     funktion: Callable[..., float],
@@ -728,7 +708,7 @@ def empirisch(
             gamma_c=(gamma_c_groesse, EINHEITSLOS),
         )
         print(erg.wert)            # z.B. '1.0 N/mm^2'
-        print(erg.annahmen_text())
+        print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
     """
     einsetzungen = []
     zahlenwerte: Dict[str, float] = {}

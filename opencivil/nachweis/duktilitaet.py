@@ -184,7 +184,6 @@ class Duktilitaet(Nachweis):
             bezuege.append(
                 Eingabebezug(f"f_yd__{kennung_aus(stahl.id)}", stahl.id_von("f_yd")))
 
-        self.s_f_cd = mit_index("f_{cd}", querschnitt.beton.symbol_index)
 
         super().__init__(
             basis,
@@ -204,7 +203,7 @@ class Duktilitaet(Nachweis):
         h = e.g("h").si
         f_cd = e.g("f_cd").si
 
-        self._protokoll_ansatz(p)
+        self._protokoll_ansatz(p, e)
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
@@ -315,7 +314,7 @@ class Duktilitaet(Nachweis):
 
     # -- Mitschrift ---------------------------------------------------------
 
-    def _protokoll_ansatz(self, p: Protokoll) -> None:
+    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
         p.titel("Duktilität")
         p.text(
             "Die Druckzone muss schlank bleiben, damit der Stahl lange fliesst, "
@@ -323,11 +322,12 @@ class Duktilitaet(Nachweis):
             "Gerechnet wird die Druckzonenhöhe bei reiner Biegung, je Lage "
             "einzeln."
         )
+        f_cd = e["f_cd"].symbol
         p.gleichung(
-            rf"{BLOCKANTEIL} \cdot x \cdot b \cdot {self.s_f_cd} = A_s \cdot f_{{sd}}"
+            rf"{BLOCKANTEIL} \cdot x \cdot b \cdot {f_cd} = A_s \cdot f_{{sd}}"
             r" \qquad \Rightarrow \qquad "
             rf"x = \frac{{A_s \cdot f_{{sd}}}}"
-            rf"{{{BLOCKANTEIL} \cdot b \cdot {self.s_f_cd}}}",
+            rf"{{{BLOCKANTEIL} \cdot b \cdot {f_cd}}}",
             titel="Kräftegleichgewicht bei M_Ed = 0",
             referenz="SIA 262:2025, 4.1.4.2.5")
         p.gleichung(

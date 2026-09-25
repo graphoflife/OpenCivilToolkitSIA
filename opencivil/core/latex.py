@@ -184,11 +184,6 @@ def einsetzen_numerisch(
 
 
 # ===========================================================================
-# Formelzeile
-# ===========================================================================
-
-
-# ===========================================================================
 # Sichtbare Breite
 # ===========================================================================
 
@@ -228,8 +223,6 @@ def _gruppe(s: str, i: int) -> tuple[str, int]:
         return s[i], i + 1
     tiefe = 0
     for j in range(i, len(s)):
-        if s[j] == "\\":
-            continue
         if s[j] == "{" and (j == 0 or s[j - 1] != "\\"):
             tiefe += 1
         elif s[j] == "}" and s[j - 1] != "\\":
@@ -300,6 +293,11 @@ def sichtbare_breite(latex: str) -> float:
             elif zeichen not in "{} &":
                 breite += 1.0
     return breite
+
+
+# ===========================================================================
+# Formelzeile
+# ===========================================================================
 
 
 @dataclass(frozen=True)
@@ -404,7 +402,7 @@ class Formelzeile:
         inhalt = " \\\\\n  ".join(zeilen)
         return f"\\begin{{aligned}}\n  {inhalt}\n\\end{{aligned}}"
 
-    def darstellen(self, mehrzeilig_ab: float = ZEILENBREITE) -> str:
+    def darstellen(self) -> str:
         """
         Eine Zeile, solange sie gesetzt hineinpasst, sonst untereinander.
 
@@ -414,7 +412,7 @@ class Formelzeile:
         mitzaehlten.
         """
         einzeilig = self.einzeilig()
-        if sichtbare_breite(einzeilig) <= mehrzeilig_ab:
+        if sichtbare_breite(einzeilig) <= ZEILENBREITE:
             return einzeilig
         return self.mehrzeilig()
 

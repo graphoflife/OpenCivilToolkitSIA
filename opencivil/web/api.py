@@ -179,11 +179,6 @@ def _gleichung_dict(block: GleichungBlock, tiefe: int) -> dict:
         "wert_id": block.wert_id,
         "gruppe": block.gruppe,
     }
-    if block.formelzeile is not None:
-        # Beide Fassungen mitgeben: die Oberflaeche kann die lange Form
-        # umbrechen oder auf eine Zeile legen, ohne neu zu rechnen.
-        eintrag["einzeilig"] = block.formelzeile.einzeilig()
-        eintrag["mehrzeilig"] = block.formelzeile.mehrzeilig()
     return eintrag
 
 

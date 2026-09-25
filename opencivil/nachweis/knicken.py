@@ -584,7 +584,7 @@ class Knicken(Nachweis):
             p.text(erg.begruendung)
             return
 
-        werte = Zwischenwerte(f"{self.id}.{kennung_aus(fall.name)}")
+        werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
         # Empirisch: die Norm setzt die Stablaenge in Metern ein.
         alpha_i = werte.zahl("alpha_i", r"\alpha_i", erg.alpha_i, stellen=5)
         p.formel(alpha_i,

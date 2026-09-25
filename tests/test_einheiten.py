@@ -195,17 +195,15 @@ class TestEmpirisch(unittest.TestCase):
                 f_ck=(Groesse(30, MM), N_PRO_MM2),
             )
 
-    def test_annahmen_werden_protokolliert(self):
+    def test_die_einheiten_bleiben_benannt(self):
+        """Die Herleitung liest daraus, welche Zahl blank in welcher Einheit steht."""
         erg = empirisch(
             lambda f_ck, gamma_c: 0.3 * math.sqrt(f_ck) / gamma_c,
             ergebnis=N_PRO_MM2,
             f_ck=(Groesse(30, MPA), N_PRO_MM2),
             gamma_c=(Groesse(1.5, EINHEITSLOS), EINHEITSLOS),
         )
-        text = erg.annahmen_text()
-        self.assertIn("f_ck in N/mm²", text)
-        self.assertIn("Resultat ist in N/mm²", text)
-        self.assertIn(r"\mathrm{N}/\mathrm{mm}^{2}", erg.annahmen_latex())
+        self.assertEqual(erg.einheiten, {"f_ck": N_PRO_MM2, "gamma_c": EINHEITSLOS})
 
     def test_paar_pflicht(self):
         with self.assertRaises(TypeError):

@@ -272,11 +272,11 @@ class Handrechnung:
         momente = " + ".join(rf"{k} \cdot @d{i}" for i, k in enumerate(kraefte))
         summe = " + ".join(kraefte)
         p.formel(
-            self.werte.laenge(f"d_{lage.index}", f"d_{{{lage.index}}}", lage.z),
+            self.werte.laenge(f"d_{lage.index}", lage.symbol_d, lage.z),
             rf"\frac{{{momente}}}{{{summe}}}",
             eingaben, titel=f"Statische Höhe der zusammengefassten Lage – {lage.text}")
         p.formel(
-            self.werte.flaeche(f"A_s_{lage.index}", f"A_{{s,{lage.index}}}", lage.a_s),
+            self.werte.flaeche(f"A_s_{lage.index}", lage.symbol_flaeche, lage.a_s),
             " + ".join(f"@A{i}" for i in range(len(lage.teile))), eingaben,
             titel="Bewehrungsquerschnitt der zusammengefassten Lage")
 

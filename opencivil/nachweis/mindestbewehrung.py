@@ -192,10 +192,6 @@ class Lagenergebnis:
     durchmesser: float = 0.0
     """Der groesste Stabdurchmesser der Lage, in m -- er bestimmt die Rissbreite."""
 
-    f_yk: float = 0.0
-    E_s: float = 0.0
-    """Die Kennwerte des Stahls dieser Lage -- fuer die Mitschrift."""
-
     sigma_s_adm: float = 0.0
     N_s_adm: float = 0.0
     erfuellungsgrad: float = 0.0
@@ -333,11 +329,10 @@ class Rissnormalkraft(Nachweis):
         # die wenigsten Stäbe und bekommt damit die grösste Spannung.
         erg.durchmesser = max(e.g(f"phi_{m}").si for m in marken)
         kurz = kennung_aus(lage.stahl.id)
-        erg.f_yk = e.g(f"f_yk__{kurz}").si
-        erg.E_s = e.g(f"E_s__{kurz}").si
+        E_s = e.g(f"E_s__{kurz}").si
         erg.sigma_s_adm = zulaessige_stahlspannung(
             anforderung=self.anforderung,
-            f_yk=erg.f_yk, E_s=erg.E_s, f_ctm=f_ctm,
+            f_yk=e.g(f"f_yk__{kurz}").si, E_s=E_s, f_ctm=f_ctm,
             durchmesser=erg.durchmesser)
         erg.N_s_adm = erg.a_s * erg.sigma_s_adm
 
@@ -467,8 +462,6 @@ class Momentlagenergebnis:
     """Statische Hoehe ab der gedrueckten Randfaser, in m."""
 
     durchmesser: float = 0.0
-    f_yk: float = 0.0
-    E_s: float = 0.0
     sigma_s_adm: float = 0.0
 
     n: float = 0.0
@@ -631,14 +624,13 @@ class ZwaengungBiegung(Nachweis):
         erg.durchmesser = max(e.g(f"phi_{m}").si for m in marken)
 
         kurz = kennung_aus(lage.stahl.id)
-        erg.f_yk = e.g(f"f_yk__{kurz}").si
-        erg.E_s = e.g(f"E_s__{kurz}").si
+        E_s = e.g(f"E_s__{kurz}").si
         erg.sigma_s_adm = zulaessige_stahlspannung(
             anforderung=self.anforderung,
-            f_yk=erg.f_yk, E_s=erg.E_s, f_ctm=f_ctm,
+            f_yk=e.g(f"f_yk__{kurz}").si, E_s=E_s, f_ctm=f_ctm,
             durchmesser=erg.durchmesser)
 
-        erg.n = wertigkeit(E_s=erg.E_s, E_cm=E_cm, phi=phi)
+        erg.n = wertigkeit(E_s=E_s, E_cm=E_cm, phi=phi)
         riss = gerissen(n=erg.n, a_s=erg.a_s, b=b, d=erg.d)
         erg.rho = riss.rho
         erg.x = riss.x
