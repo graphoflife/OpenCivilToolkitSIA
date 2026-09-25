@@ -56,9 +56,17 @@ function anfuegenKnopf(text, tun) {
 export function analysenBlock(querschnitt) {
   return el('div.feldgruppe', {}, [
     el('h3', {}, [el('span', { text: 'Weitere Analysen' }),
-      el('span', { text: 'kein Nachweis' })]),
+      el('span', { text: `kein Nachweis · ${jeB(querschnitt)}` })]),
     spannungsBlock(querschnitt),
   ]);
+}
+
+/**
+ * Worauf sich M und N beziehen: auf den Streifen b, nicht auf den Meter --
+ * bei b = 500 mm heisst M_Ed = 50 kNm also 100 kNm/m. V gilt je Meter.
+ */
+function jeB(querschnitt) {
+  return `M, N je b = ${querschnitt.b} mm`;
 }
 
 /** Die Nachweiskapitel einer Platte, von der Tragsicherheit bis zum Riss. */
@@ -67,7 +75,8 @@ export function nachweiseBlock(querschnitt) {
     veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
   });
   return el('div.feldgruppe', {}, [
-    el('h3', { text: 'Nachweise' }),
+    el('h3', {}, [el('span', { text: 'Nachweise' }),
+      el('span', { text: `${jeB(querschnitt)} · V je m` })]),
     el('div.unterkapitel', {}, [
       el('div.unterkapitel-kopf', {}, [
         el('span', { text: 'Tragsicherheitsnachweise' }),

@@ -36,7 +36,7 @@ $$
 c_{nom,o} = 30\,\mathrm{mm}
 $$
 
-**Bewehrungsquerschnitt je Laufmeter** *(SIA 262:2025, 5.5.2)*
+**Bewehrungsquerschnitt über die Breite b** *(SIA 262:2025, 5.5.2)*
 
 $$
 A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}

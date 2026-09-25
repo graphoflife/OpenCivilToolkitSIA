@@ -55,10 +55,11 @@ from opencivil.material.basis import Baustoff
 #: Sonderfall mit leeren Lagen.
 LAGENZAHL = 4
 
-#: Rohdichte von Betonstahl, fuer das Bewehrungsmass.
-# In y wird immer je Laufmeter nachgewiesen; 'b' meint den Streifen in x.
+#: Breite, auf die sich eine y-Lage bezieht: in y wird immer je Laufmeter
+#: gerechnet, ``b`` ist der Streifen in x.
 BREITE_Y_MM = 1000.0
 
+#: Rohdichte von Betonstahl, fuer das Bewehrungsmass.
 STAHLDICHTE = 7850.0
 
 
@@ -464,7 +465,7 @@ class Lagenaufbau(Prozedur):
         if ueber_abstand:
             p.gleichung(
                 r"A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}",
-                titel="Bewehrungsquerschnitt je Laufmeter",
+                titel="Bewehrungsquerschnitt über die Breite b",
                 referenz="SIA 262:2025, 5.5.2")
         if ueber_anzahl:
             p.gleichung(
@@ -537,6 +538,7 @@ class Lagenaufbau(Prozedur):
                 q.lage.stahl.name if q.lage.stahl else "–",
                 Mathe(phi.formatiert(0, MM)),
                 menge,
+                Mathe(b_q.formatiert(0, MM)),
                 Mathe(rand.formatiert(1, MM)),
                 Mathe(z.formatiert(1, MM)),
                 Mathe(a_s.formatiert(0, MM2)),
@@ -551,14 +553,21 @@ class Lagenaufbau(Prozedur):
         else:
             mengenkopf = Mathe("n")
 
+        # Die Breite je Zeile nur, wo sie sich unterscheidet: x gilt je b, y
+        # je Laufmeter. Bei b = 1000 mm stuende in jeder Zeile dieselbe Zahl.
+        mit_breite = len({g.si for g in breiten.values()}) > 1
+        if not mit_breite:
+            for zeile in zeilen:
+                del zeile[5]
         p.tabelle(
             kopf=["Bewehrung", "Richtung", "Stahl",
-                  Mathe(r"\varnothing\ [\mathrm{mm}]"), mengenkopf,
-                  "Randabstand [mm]",
-                  Mathe(r"z\ [\mathrm{mm}]"), Mathe(r"A_s\ [\mathrm{mm}^2]")],
+                  Mathe(r"\varnothing\ [\mathrm{mm}]"), mengenkopf]
+                 + ([Mathe(r"b\ [\mathrm{mm}]")] if mit_breite else [])
+                 + ["Randabstand [mm]",
+                    Mathe(r"z\ [\mathrm{mm}]"), Mathe(r"A_s\ [\mathrm{mm}^2]")],
             zeilen=zeilen,
             titel="Randabstände, Tiefen ab Oberkante und Bewehrungsquerschnitte",
-            ausrichtung="lllrrrrr",
+            ausrichtung="lllrr" + "r" * (4 if mit_breite else 3),
         )
         return ergebnis
 

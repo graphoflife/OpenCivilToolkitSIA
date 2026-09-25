@@ -45,8 +45,9 @@ def _voll():
 
     Erhöhte Anforderung mit allen Schaltern und begrenzter rissaktiver
     Dicke, häufige und quasi-ständige Lastfälle abgeleitet und eigene, Bügel
-    mit Stabzahl in y, ein Knickfall; eine zweite Platte mit x aussen, die im
-    Feld nicht aufgeht und deren Stahl unter Dauerlast fliesst, dazu
+    mit Stabzahl in y, ein Knickfall; eine zweite Platte mit x aussen und
+    b = 500 mm, die im Feld nicht aufgeht und deren Stahl unter Dauerlast
+    fliesst, dazu
     Querkraft ohne Bügel -- einmal über m_Rd, einmal darunter, mit Einlage;
     eine dritte ohne x-Bewehrung; eine vierte mit Querkraft ohne Einlage,
     einer Einwirkung, die am kürzesten Abstand gemessen wird, und ⌀40 in y
@@ -74,11 +75,14 @@ def _voll():
     decke.quasistaendig.lastfall("Dauerlast", M_Ed=70)
     decke.knickfall("Wand", N_Ed=-800, M_Ed_1=20, laenge=3.0)
 
+    # Ein Streifen von 500 mm: M und N je b, V je Meter. Mit halben Momenten
+    # sind es dieselben Grade wie bei 1000 mm -- nur die Lagentabelle zeigt,
+    # dass x je b und y je Laufmeter gilt.
     dach = p.platte("Dach", h=200, x=[10, 10], y=[8, 8], x_innen=False,
-                    einlagenhoehe=40)
-    dach.einwirkung("Feld", M_Ed=80, V_Ed=40)
-    dach.einwirkung("Rand", M_Ed=20, V_Ed=30)
-    dach.quasistaendig.lastfall("Dauerlast", M_Ed=40)
+                    einlagenhoehe=40, b=500)
+    dach.einwirkung("Feld", M_Ed=40, V_Ed=40)
+    dach.einwirkung("Rand", M_Ed=10, V_Ed=30)
+    dach.quasistaendig.lastfall("Dauerlast", M_Ed=20)
 
     ohne = p.platte("Ohne x", h=250, x=[0, 0], y=[12, 12])
     ohne.einwirkung("Feld", M_Ed=30, V_Ed=20)

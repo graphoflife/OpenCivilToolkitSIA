@@ -8,7 +8,9 @@ Richtungen mit derselben Breite rechnet, bekommt bei b = 2000 mm in y den
 doppelten Widerstand aus derselben Bewehrung.
 
 Geprüft wird darum nicht eine Zahl, sondern ein Verhalten: was passiert, wenn
-man ``b`` verdoppelt? In x muss sich alles mitbewegen, in y nichts.
+man ``b`` verdoppelt? In x muss sich alles mitbewegen, in y nichts. Und ein
+halb so breiter Streifen mit halben M und N ist dieselbe Platte -- jeder Grad
+bleibt, wie er war.
 """
 
 import unittest
@@ -46,57 +48,14 @@ class TestBreiteJeRichtung(unittest.TestCase):
         self.assertAlmostEqual(wert(self.l2, qs.id_breite(Richtung.Y)),
                                BREITE_Y_MM / 1000.0)
 
-    def test_id_breite_trennt_die_richtungen(self):
-        qs = self.einfach.querschnitte["q1"]
-        self.assertEqual(qs.id_breite(Richtung.X), qs.id_von("b"))
-        self.assertNotEqual(qs.id_breite(Richtung.Y), qs.id_von("b"))
-
     # -- Bewehrungsquerschnitte ---------------------------------------------
 
     def _flaeche(self, loesung, marke: str) -> float:
         return wert(loesung, f"querschnitt.q1.lage.{marke}.a_s")
 
-    def test_die_x_lage_waechst_mit_der_breite(self):
-        """⌀18@150 auf 2000 mm sind doppelt so viel Stahl wie auf 1000 mm."""
-        self.assertAlmostEqual(self._flaeche(self.l2, "2g"),
-                               2.0 * self._flaeche(self.l1, "2g"), places=9)
-
     def test_die_y_lage_bleibt_wie_sie_war(self):
         self.assertAlmostEqual(self._flaeche(self.l2, "1g"),
                                self._flaeche(self.l1, "1g"), places=9)
-
-    # -- Widerstände --------------------------------------------------------
-
-    def _m_rd(self, aufbau, loesung, richtung: str) -> float:
-        """M_Rd bei N_Ed = 0 -- der Eckwert, den die Bewehrung allein trägt."""
-        nachweis = aufbau.nachweise[f"q1.{richtung}"]
-        return wert(loesung, nachweis.d_eckwerte["M_Rd_N0_pos"].id)
-
-    def test_der_momentenwiderstand_in_x_verdoppelt_sich(self):
-        self.assertAlmostEqual(self._m_rd(self.doppelt, self.l2, "x"),
-                               2.0 * self._m_rd(self.einfach, self.l1, "x"),
-                               delta=10.0)
-
-    # Einen Momentenwiderstand in y gibt es nicht mehr -- dort wird nichts
-    # nachgewiesen. Dass die y-Bewehrung von `b` unberührt bleibt, prüft
-    # `test_die_y_lage_bleibt_wie_sie_war` an der Fläche selbst; das ist die
-    # Grösse, aus der ein Widerstand entstünde.
-
-    # -- Bezogene Grössen ---------------------------------------------------
-
-    def test_die_druckzonenhoehe_ist_von_der_breite_unabhaengig(self):
-        """
-        x = A_s·f_sd/(b·f_cd): stehen A_s und b in derselben Richtung, kürzt
-        sich die Breite heraus. Genau das ist die Probe darauf, dass keine der
-        beiden Grössen aus der falschen Richtung kommt.
-        """
-        for lage in (2, 3):  # beide in x -- die Duktilität läuft nur dort
-            a = next(e for e in self.einfach.duktilitaet["q1"].ergebnisse
-                     if e.lage.nummer == lage)
-            b = next(e for e in self.doppelt.duktilitaet["q1"].ergebnisse
-                     if e.lage.nummer == lage)
-            with self.subTest(lage=lage):
-                self.assertAlmostEqual(a.verhaeltnis, b.verhaeltnis, places=9)
 
     def test_das_bewehrungsmass_bleibt_dasselbe(self):
         """
@@ -107,6 +66,36 @@ class TestBreiteJeRichtung(unittest.TestCase):
         self.assertAlmostEqual(wert(self.l1, qs.d_bewehrungsmass.id),
                                wert(self.l2, qs.d_bewehrungsmass.id),
                                places=6)
+
+
+class TestHalbeBreiteHalbeSchnittgroessen(unittest.TestCase):
+    def test_jeder_grad_bleibt(self):
+        """
+        M und N gelten je b, V je Meter. Kommt irgendwo eine Breite aus der
+        falschen Richtung -- A_s je Laufmeter gegen b, ein Widerstand je
+        Meter gegen M je b --, weicht mindestens ein Grad ab.
+        """
+        def grade(b_mm: float, anteil: float):
+            projekt = Projekt.beispiel()
+            q = projekt.querschnitte[0]
+            q.b = b_mm
+            q.sproede = q.duktilitaet = q.zwaengung = q.zwaengung_biegung = True
+            q.rissanforderung = "erhoeht"
+            q.haeufig.aus_tragsicherheit = q.quasistaendig.aus_tragsicherheit = True
+            for k in q.kombinationen:
+                k.M_Ed *= anteil
+                k.N_Ed *= anteil
+            aufbau = projekt.aufbauen()
+            loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele(),
+                                        ohne_herleitung=True)
+            return [(u.art, u.fall, u.erfuellungsgrad.si) for u in loesung.urteile]
+
+        voll, halb = grade(1000.0, 1.0), grade(500.0, 0.5)
+        self.assertEqual([u[:2] for u in voll], [u[:2] for u in halb])
+        self.assertGreater(len(voll), 10)
+        for (art, fall, grad), (_, _, grad_halb) in zip(voll, halb):
+            with self.subTest(nachweis=art, fall=fall):
+                self.assertAlmostEqual(grad_halb, grad, places=6)
 
 
 if __name__ == "__main__":

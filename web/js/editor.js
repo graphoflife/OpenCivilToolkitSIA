@@ -499,7 +499,7 @@ function querkraftBlock(querschnitt) {
                + 'x-Richtung möglich',
           beiAenderung: (v) => aendern((x) => { x.anzahl_y = v ?? 1; }),
         }),
-      el('span.einheit', { text: ueberAbstand ? 'mm' : 'Stk' }),
+      el('span.einheit', { text: ueberAbstand ? 'mm' : 'Stk/b' }),
       el('button.knopf.knopf-zart.umschalter', {
         text: ueberAbstand ? 'Teilung' : 'Anzahl',
         title: 'In y-Richtung zwischen Teilung und Stabzahl wechseln. Eine '
@@ -577,8 +577,7 @@ function plattenEditor(querschnitt) {
         }), 'mm'),
         feld(['Breite ', span('b_x')], zahlfeld({
           wert: querschnitt.b, schritt: 100, min: 10,
-          titel: 'Breite des betrachteten Streifens in x-Richtung. In y wird '
-            + 'immer mit 1000 mm gerechnet, also je Laufmeter.',
+          titel: 'Streifen in x: A_s, M und N je b. y: je 1000 mm',
           beiAenderung: (v) => aendern((q) => { q.b = v ?? 1000; }),
         }), 'mm'),
         feld(['Grösstkorn ', span('D_{max}')], zahlfeld({
