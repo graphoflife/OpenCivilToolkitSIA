@@ -14,14 +14,10 @@ erfinden, sonst laufen Bericht und Bildschirm auseinander.
 from __future__ import annotations
 
 import math
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence
 
 from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM, Groesse
 from opencivil import spannungsanalyse
-from opencivil.nachweis.querschnittsloeser import (
-    Querschnittsloeser, Stahllage, Werkstoffsatz, beton_nichtlinear,
-    stahl_bilinear)
-from opencivil.nachweis.sproedes_versagen import rissmoment
 from opencivil.querschnitt.platte import BREITE_Y_MM, Richtung
 from opencivil.bericht.zusammenfassung import zusammenfassen
 from opencivil.core.berechnung import grad_als_text
@@ -460,48 +456,6 @@ def neigungskurven(aufbau: Aufbau) -> dict:
     return kurven
 
 
-def _loeserpaar(qs, richtung, wert) -> Optional[Tuple[Querschnittsloeser,
-                                                      Querschnittsloeser, float]]:
-    """
-    Die beiden Querschnittsloeser einer Tragrichtung -- gerissen und nicht.
-
-    Sie unterscheiden sich in genau einem Stueck, dem Betongesetz. Alles
-    andere -- Hoehe, Breite, Lagen, Stahlgesetz, Suchfenster -- ist dasselbe,
-    und das muss es sein: sonst verglichen die beiden Zustaende zwei
-    verschiedene Querschnitte.
-
-    Dazu das Rissmoment, denn zwischen den beiden wird darueber interpoliert.
-    ``None``, wenn in dieser Richtung keine Bewehrung liegt.
-    """
-    posten = qs.posten_in_richtung(richtung)
-    if not posten:
-        return None
-    lagen = [Stahllage(a_s=wert(as_id), z=wert(z_id), nummer=lage.nummer)
-             for lage, _, _, as_id, z_id in posten]
-    stahl = posten[0][0].stahl
-    # Die Analyse zeigt den Querschnitt mit den Gesetzen der Tragsicherheit.
-    # Eine Wahl dafuer in der Oberflaeche waere ein Argument an dieser Stelle.
-    satz = Werkstoffsatz.BEMESSUNG
-    E_c_eff = wert(qs.beton.id_von("E_cm")) / (1.0 + wert(qs.id_von("kriechzahl")))
-    gemeinsam = dict(
-        h=wert(qs.id_von("h")), b=wert(qs.id_breite(richtung)), lagen=lagen,
-        stahl=stahl_bilinear(E_s=wert(stahl.id_von("E_s")),
-                             f_sd=wert(stahl.id_von(satz.stahl)),
-                             eps_ud=wert(stahl.id_von("eps_ud"))),
-        eps_druck=wert(qs.beton.id_von("eps_c2d")),
-        eps_zug=wert(stahl.id_von("eps_ud")))
-    gerissen = Querschnittsloeser(
-        beton=beton_nichtlinear(f_cd=wert(qs.beton.id_von(satz.beton)), E_c=E_c_eff,
-                                eps_c1d=wert(qs.beton.id_von("eps_c1d")),
-                                eps_c2d=wert(qs.beton.id_von("eps_c2d"))),
-        **gemeinsam)
-    ungerissen = Querschnittsloeser(
-        beton=spannungsanalyse.beton_ungerissen(E_c=E_c_eff), **gemeinsam)
-    M_Riss = rissmoment(h=gemeinsam["h"], b=gemeinsam["b"],
-                        f_ctm=wert(qs.beton.id_von("f_ctm"))).M_Riss
-    return gerissen, ungerissen, M_Riss
-
-
 def _bild_dict(bild, h: float) -> dict:
     """Ein Querschnittsbild in Zeichengroessen: mm, Promille, N/mm², kN."""
     return {
@@ -523,68 +477,28 @@ def spannungsanalysen(aufbau: Aufbau, loesung: Loesung) -> dict:
     """
     Die Auswertungen am Querschnitt, je Platte -- fertig zum Zeichnen.
 
-    Kein Nachweis: hier steht kein Erfuellungsgrad und kein Urteil, sondern
-    eine Antwort auf die Frage, was im Querschnitt geschieht. Gerechnet wird
-    trotzdem mit demselben Faserintegral und denselben Werkstoffgesetzen wie
-    in den Nachweisen -- ein zweites Modell daneben waere eine zweite
-    Wahrheit ueber denselben Querschnitt.
+    Gerechnet wird in :func:`opencivil.spannungsanalyse.analysen`; hier wird
+    nur in Zeichengroessen abgebildet.
     """
-    ergebnis: Dict[str, list] = {}
-    for kennung, eintrag in aufbau.spannungsfaelle.items():
-        qs = aufbau.querschnitte.get(kennung)
-        if qs is None:
-            continue
-
-        def wert(kid: str) -> float:
-            return loesung.werte[kid].groesse.si
-
-        faelle = []
-        paare: Dict[str, Any] = {}
-        for fall in eintrag:
-            try:
-                richtung = Richtung(fall.richtung)
-            except ValueError:
-                richtung = Richtung.X
-            if richtung.value not in paare:
-                try:
-                    paare[richtung.value] = _loeserpaar(qs, richtung, wert)
-                except KeyError:
-                    paare[richtung.value] = None
-            paar = paare[richtung.value]
-            kopf = {"name": fall.name, "art": fall.art,
-                    "richtung": richtung.value,
-                    "titel": spannungsanalyse.Analyseart(fall.art).beschriftung}
-            if paar is None:
-                faelle.append({**kopf, "moeglich": False, "hinweis": (
-                    f"In {richtung.beschriftung} liegt keine Bewehrung – ohne "
-                    f"sie gibt es keinen Querschnitt zum Auswerten.")})
-                continue
-            gerissen, ungerissen, M_Riss = paar
-            faelle.append({**kopf, "moeglich": True,
-                           **_auswertung(fall, gerissen, ungerissen, M_Riss)})
-        ergebnis[kennung] = faelle
-    return ergebnis
+    return {kennung: [_analyse_dict(a) for a in liste]
+            for kennung, liste in spannungsanalyse.analysen(aufbau, loesung).items()}
 
 
-def _auswertung(fall, gerissen, ungerissen, M_Riss: float) -> dict:
-    """Die eine der drei Fragen stellen, die dieser Fall stellt."""
-    art = spannungsanalyse.Analyseart(fall.art)
-    if art is spannungsanalyse.Analyseart.DEHNUNGEN:
-        bild = spannungsanalyse.aus_dehnungen(
-            gerissen, eps_oben=fall.eps_oben / 1e3, eps_unten=fall.eps_unten / 1e3)
-        return {"bild": _bild_dict(bild, gerissen.h)}
-    if art is spannungsanalyse.Analyseart.MOMENT_KRUEMMUNG:
-        kurve = spannungsanalyse.moment_kruemmung(
-            gerissen, ungerissen, N=fall.N_Ed * 1e3, M_Riss=M_Riss)
-        return {"kurve": {
+def _analyse_dict(analyse) -> dict:
+    kopf = {"name": analyse.fall.name, "art": analyse.art.value,
+            "richtung": analyse.richtung.value,
+            "titel": analyse.art.beschriftung}
+    if not analyse.moeglich:
+        return {**kopf, "moeglich": False, "hinweis": analyse.hinweis}
+    if analyse.kurve is not None:
+        kurve = analyse.kurve
+        return {**kopf, "moeglich": True, "kurve": {
             "N": kurve.N / 1e3, "M_Riss": kurve.M_Riss / 1e3,
             "M_Rd": kurve.M_Rd / 1e3, "hinweis": kurve.hinweis,
             "punkte": [{"M": p.M / 1e3, "chi": p.chi, "zeta": p.zeta,
                         "chi_I": p.chi_I, "chi_II": p.chi_II}
                        for p in kurve.punkte]}}
-    bild = spannungsanalyse.aus_schnittgroessen(
-        gerissen, N=fall.N_Ed * 1e3, M=fall.M_Ed * 1e3)
-    return {"bild": _bild_dict(bild, gerissen.h)}
+    return {**kopf, "moeglich": True, "bild": _bild_dict(analyse.bild, analyse.h)}
 
 
 def werkstoffgesetze(aufbau: Aufbau, loesung: Loesung) -> dict:

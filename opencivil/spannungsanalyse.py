@@ -43,9 +43,18 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Callable, List, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence, Tuple
 
-from opencivil.nachweis.querschnittsloeser import Querschnittsloeser
+from opencivil.nachweis.querschnittsloeser import (
+    Querschnittsloeser, Stahllage, Werkstoffsatz, beton_nichtlinear,
+    stahl_bilinear,
+)
+from opencivil.nachweis.sproedes_versagen import rissmoment
+from opencivil.querschnitt.platte import Richtung
+
+if TYPE_CHECKING:
+    from opencivil.core.rechenwerk import Loesung
+    from opencivil.projekt import Aufbau
 
 #: Punkte ueber die Hoehe, mit denen Dehnung und Spannung gezeichnet werden.
 #: Die Betonspannung hat am Nulldurchgang einen Knick; 41 Punkte zeigen ihn,
@@ -322,3 +331,147 @@ def beton_ungerissen(*, E_c: float) -> Callable[[float], float]:
     def sigma(eps: float) -> float:
         return E_c * eps
     return sigma
+
+
+# ===========================================================================
+# Die Analysen einer Platte
+# ===========================================================================
+
+
+@dataclass(frozen=True)
+class Loeserpaar:
+    """
+    Die beiden Querschnittsloeser einer Tragrichtung -- gerissen und nicht.
+
+    Sie unterscheiden sich in genau einem Stueck, dem Betongesetz. Alles
+    andere -- Hoehe, Breite, Lagen, Stahlgesetz, Suchfenster -- ist dasselbe,
+    und das muss es sein: sonst verglichen die beiden Zustaende zwei
+    verschiedene Querschnitte. Dazu das Rissmoment, denn zwischen den beiden
+    wird darueber interpoliert.
+    """
+
+    gerissen: Querschnittsloeser
+    ungerissen: Querschnittsloeser
+    M_Riss: float
+
+
+def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
+               *, satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG,
+               ) -> Optional[Loeserpaar]:
+    """
+    Das Loeserpaar einer Platte in einer Richtung -- ``None`` ohne Bewehrung.
+
+    ``wert`` liefert zu einer Wert-ID die Zahl in SI, aus einer Loesung.
+    ``satz`` sagt, mit welchen Festigkeiten die Werkstoffgesetze rechnen; die
+    Analyse zeigt den Querschnitt mit denen der Tragsicherheit.
+
+    Stand frueher in der Schnittstelle zur Oberflaeche. Dort war sie ohne
+    Oberflaeche nicht erreichbar, und ein Test baute sie als eigene Kopie
+    nach -- er pruefte seine Kopie statt der echten.
+    """
+    posten = querschnitt.posten_in_richtung(richtung)
+    if not posten:
+        return None
+    lagen = [Stahllage(a_s=wert(as_id), z=wert(z_id), nummer=lage.nummer)
+             for lage, _, _, as_id, z_id in posten]
+    stahl = posten[0][0].stahl
+    beton = querschnitt.beton
+    E_c_eff = wert(beton.id_von("E_cm")) / (1.0 + wert(querschnitt.id_von("kriechzahl")))
+    gemeinsam = dict(
+        h=wert(querschnitt.id_von("h")), b=wert(querschnitt.id_breite(richtung)),
+        lagen=lagen,
+        stahl=stahl_bilinear(E_s=wert(stahl.id_von("E_s")),
+                             f_sd=wert(stahl.id_von(satz.stahl)),
+                             eps_ud=wert(stahl.id_von("eps_ud"))),
+        eps_druck=wert(beton.id_von("eps_c2d")),
+        eps_zug=wert(stahl.id_von("eps_ud")))
+    gerissen = Querschnittsloeser(
+        beton=beton_nichtlinear(f_cd=wert(beton.id_von(satz.beton)), E_c=E_c_eff,
+                                eps_c1d=wert(beton.id_von("eps_c1d")),
+                                eps_c2d=wert(beton.id_von("eps_c2d"))),
+        **gemeinsam)
+    ungerissen = Querschnittsloeser(beton=beton_ungerissen(E_c=E_c_eff), **gemeinsam)
+    M_Riss = rissmoment(h=gemeinsam["h"], b=gemeinsam["b"],
+                        f_ctm=wert(beton.id_von("f_ctm"))).M_Riss
+    return Loeserpaar(gerissen=gerissen, ungerissen=ungerissen, M_Riss=M_Riss)
+
+
+@dataclass
+class Analyse:
+    """Ein Spannungsfall der Beschreibung -- und was die Auswertung ergab."""
+
+    fall: Any
+    """Der :class:`SpannungsfallEintrag`, wie er in der Beschreibung steht."""
+
+    art: Analyseart
+    richtung: Richtung
+    h: float = 0.0
+    """Plattendicke in m -- fuer das Bild."""
+
+    bild: Optional[Querschnittsbild] = None
+    kurve: Optional["Momentenkurve"] = None
+    hinweis: str = ""
+    """Warum es nichts auszuwerten gab, falls es nichts gab."""
+
+    @property
+    def moeglich(self) -> bool:
+        return self.bild is not None or self.kurve is not None
+
+
+def auswerten(fall, art: Analyseart, paar: Loeserpaar) -> Tuple[
+        Optional[Querschnittsbild], Optional["Momentenkurve"]]:
+    """Die eine der drei Fragen stellen, die dieser Fall stellt -- in SI."""
+    if art is Analyseart.DEHNUNGEN:
+        return aus_dehnungen(paar.gerissen, eps_oben=fall.eps_oben / 1e3,
+                             eps_unten=fall.eps_unten / 1e3), None
+    if art is Analyseart.MOMENT_KRUEMMUNG:
+        return None, moment_kruemmung(paar.gerissen, paar.ungerissen,
+                                      N=fall.N_Ed * 1e3, M_Riss=paar.M_Riss)
+    return aus_schnittgroessen(paar.gerissen, N=fall.N_Ed * 1e3,
+                               M=fall.M_Ed * 1e3), None
+
+
+def analysen(aufbau: "Aufbau", loesung: "Loesung") -> Dict[str, List[Analyse]]:
+    """
+    Die Auswertungen am Querschnitt, je Platte.
+
+    Kein Nachweis: hier steht kein Erfuellungsgrad und kein Urteil, sondern
+    eine Antwort auf die Frage, was im Querschnitt geschieht. Gerechnet wird
+    trotzdem mit demselben Faserintegral und denselben Werkstoffgesetzen wie
+    in den Nachweisen -- ein zweites Modell daneben waere eine zweite
+    Wahrheit ueber denselben Querschnitt.
+    """
+    def wert(kid: str) -> float:
+        return loesung.werte[kid].groesse.si
+
+    ergebnis: Dict[str, List[Analyse]] = {}
+    for kennung, faelle in aufbau.spannungsfaelle.items():
+        querschnitt = aufbau.querschnitte.get(kennung)
+        if querschnitt is None:
+            continue
+        paare: Dict[Richtung, Optional[Loeserpaar]] = {}
+        liste: List[Analyse] = []
+        for fall in faelle:
+            try:
+                richtung = Richtung(fall.richtung)
+            except ValueError:
+                richtung = Richtung.X
+            if richtung not in paare:
+                try:
+                    paare[richtung] = loeserpaar(querschnitt, richtung, wert)
+                except KeyError:
+                    # Ein Wert dieser Richtung wurde nicht gerechnet -- dann
+                    # gibt es fuer sie keinen Querschnitt zum Auswerten.
+                    paare[richtung] = None
+            paar = paare[richtung]
+            analyse = Analyse(fall=fall, art=Analyseart(fall.art), richtung=richtung)
+            if paar is None:
+                analyse.hinweis = (
+                    f"In {richtung.beschriftung} liegt keine Bewehrung – ohne "
+                    f"sie gibt es keinen Querschnitt zum Auswerten.")
+            else:
+                analyse.h = paar.gerissen.h
+                analyse.bild, analyse.kurve = auswerten(fall, analyse.art, paar)
+            liste.append(analyse)
+        ergebnis[kennung] = liste
+    return ergebnis

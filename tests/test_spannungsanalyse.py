@@ -11,45 +11,24 @@ Grund, warum es sie gibt.
 import unittest
 
 from opencivil import spannungsanalyse as sa
-from opencivil.nachweis.querschnittsloeser import (
-    Querschnittsloeser, Stahllage, beton_nichtlinear, stahl_bilinear)
-from opencivil.nachweis.sproedes_versagen import rissmoment
 from opencivil.projekt import Projekt, SpannungsfallEintrag
 from opencivil.querschnitt.platte import Richtung
 from opencivil.web import dienst
 
 
 def loeserpaar():
-    """Dieselbe Platte, zweimal -- gerissen und ungerissen."""
+    """
+    Dieselbe Platte, zweimal -- gerissen und ungerissen.
+
+    Ueber :func:`spannungsanalyse.loeserpaar`, dieselbe Funktion, die auch
+    die Oberflaeche benutzt. Hier stand einmal eine eigene Kopie davon; der
+    Test pruefte dann seine Kopie und nicht das, was gezeichnet wird.
+    """
     aufbau = Projekt.beispiel().aufbauen()
     loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-    qs = aufbau.querschnitte["q1"]
-
-    def wert(kid):
-        return loesung.werte[kid].groesse.si
-
-    posten = qs.posten_in_richtung(Richtung.X)
-    lagen = [Stahllage(a_s=wert(a), z=wert(z), nummer=lage.nummer)
-             for lage, _, _, a, z in posten]
-    stahl = posten[0][0].stahl
-    E_c_eff = wert(qs.beton.id_von("E_cm")) / (1.0 + wert(qs.id_von("kriechzahl")))
-    h, b = wert(qs.id_von("h")), wert(qs.id_breite(Richtung.X))
-    gemeinsam = dict(
-        h=h, b=b, lagen=lagen,
-        stahl=stahl_bilinear(E_s=wert(stahl.id_von("E_s")),
-                             f_sd=wert(stahl.id_von("f_yd")),
-                             eps_ud=wert(stahl.id_von("eps_ud"))),
-        eps_druck=wert(qs.beton.id_von("eps_c2d")),
-        eps_zug=wert(stahl.id_von("eps_ud")))
-    gerissen = Querschnittsloeser(
-        beton=beton_nichtlinear(f_cd=wert(qs.beton.id_von("f_cd")), E_c=E_c_eff,
-                                eps_c1d=wert(qs.beton.id_von("eps_c1d")),
-                                eps_c2d=wert(qs.beton.id_von("eps_c2d"))),
-        **gemeinsam)
-    ungerissen = Querschnittsloeser(
-        beton=sa.beton_ungerissen(E_c=E_c_eff), **gemeinsam)
-    M_Riss = rissmoment(h=h, b=b, f_ctm=wert(qs.beton.id_von("f_ctm"))).M_Riss
-    return gerissen, ungerissen, M_Riss
+    paar = sa.loeserpaar(aufbau.querschnitte["q1"], Richtung.X,
+                         lambda kid: loesung.werte[kid].groesse.si)
+    return paar.gerissen, paar.ungerissen, paar.M_Riss
 
 
 class TestDieDreiPassenZueinander(unittest.TestCase):

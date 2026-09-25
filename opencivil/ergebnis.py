@@ -25,14 +25,16 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, Dict, List
 
+from opencivil import spannungsanalyse
 from opencivil.bericht import konsole
 from opencivil.bericht.latex_dokument import Ausgabeergebnis, schreibe
 from opencivil.bericht.zusammenfassung import zusammenfassen
 from opencivil.core.berechnung import NachweisUrteil
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
+from opencivil.spannungsanalyse import Analyse
 
 if TYPE_CHECKING:
     from opencivil.projekt import Aufbau, Projekt
@@ -79,6 +81,16 @@ class Ergebnis:
     def wert(self, wert_id: str) -> Wert:
         """Ein einzelner gerechneter Wert, mit Einheit, Herkunft und Norm."""
         return self.loesung.wert(wert_id)
+
+    def analysen(self) -> Dict[str, List[Analyse]]:
+        """
+        Die Spannung-Dehnung-Analysen je Platte -- Bilder, keine Nachweise.
+
+        Dieselben, die die Oberflaeche zeichnet: je Fall das Querschnittsbild
+        (Dehnungsebene, Spannungen, Schnittgroessen) oder die
+        Momenten-Kruemmungs-Linie, in SI.
+        """
+        return spannungsanalyse.analysen(self.aufbau, self.loesung)
 
     # -- Ansehen ------------------------------------------------------------
 

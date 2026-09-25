@@ -206,6 +206,26 @@ class TestRechnen(unittest.TestCase):
         self.assertEqual(ausgabe.tex_pfad.name, "probe.tex")
         self.assertIn(r"\section{Zusammenstellung der Nachweise}", tex)
 
+    def test_die_analysen_ohne_oberflaeche(self):
+        """
+        Die Spannung-Dehnung-Analyse war nur ueber die Schnittstelle zu
+        haben. Jetzt liefert das Ergebnis sie selbst -- dieselben, die die
+        Oberflaeche zeichnet.
+        """
+        from opencivil.projekt import SpannungsfallEintrag
+        from opencivil.web import api
+
+        projekt = Projekt.beispiel()
+        projekt.querschnitte[0].spannungsfaelle = [
+            SpannungsfallEintrag("Feld", M_Ed=80.0),
+            SpannungsfallEintrag("Linie", art="moment_kruemmung")]
+        ergebnis = projekt.rechnen()
+        feld, linie = ergebnis.analysen()["q1"]
+        self.assertAlmostEqual(feld.bild.M / 1e3, 80.0, places=3)
+        self.assertGreater(linie.kurve.M_Rd, linie.kurve.M_Riss)
+        bilder = api.spannungsanalysen(ergebnis.aufbau, ergebnis.loesung)["q1"]
+        self.assertAlmostEqual(bilder[0]["bild"]["M"], feld.bild.M / 1e3)
+
     def test_ein_wert_mit_herkunft(self):
         wert = self.ergebnis.wert("beton.b1.f_cd")
         self.assertEqual(wert.formatiert(), "20")
