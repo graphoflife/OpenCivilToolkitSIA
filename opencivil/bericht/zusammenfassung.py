@@ -151,6 +151,10 @@ NACHWEISKOPF: List[Zelle] = [
 #: der Kopfzeile.
 GRAD_SPALTE = 4
 
+#: Widerstand und Einwirkung: die Oberflaeche setzt sie uebereinander in eine
+#: Zelle, der Bericht behaelt beide Spalten.
+STAPEL_SPALTEN = (2, 3)
+
 #: Nachweis und Bezeichnung duerfen umbrechen: mit zwei Formeln daneben
 #: liefe die Tabelle im Bericht sonst ueber den Rand.
 AUSRICHTUNG = "LLrrr"

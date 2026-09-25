@@ -660,8 +660,15 @@ table.gitter th { font-weight: 600; color: var(--schrift-matt); border-bottom: 2
 table.gitter td:first-child, table.gitter th:first-child { text-align: left; }
 .tabelle-huelle { overflow-x: auto; }
 
-/* Nachweise -- kompakt */
-.nachweis-tabelle { width: 100%; border-collapse: collapse; font-size: 13px; }
+/* Nachweise -- kompakt. Keine Zelle mit mehr als zwei Zeilen: jede Zeile
+   bricht nicht weiter um, und die Tabelle ist so breit wie dieser Inhalt --
+   schmaler nie, breiter gern. Ist die Tafel schmaler, rollt die Hülle. */
+.nachweis-tabelle {
+  width: max-content; min-width: 100%;
+  border-collapse: collapse; font-size: 13px;
+}
+.nachweis-tabelle .zeile { display: block; white-space: nowrap; }
+.nachweis-tabelle .links { text-align: left; }
 .nachweis-tabelle th {
   font-size: 11.5px; text-transform: uppercase; letter-spacing: .4px;
   color: var(--schrift-matt); text-align: right; padding: 6px 10px;

@@ -309,7 +309,6 @@ function herleitung(loesung) {
  * Baustoff hat keine Nachweise, und eine willkürlich herausgegriffene Platte
  * zu zeigen wäre irreführend.
  */
-/** Holt den Klartext aus einer LaTeX-Zelle der Form `\text{…}`. */
 function zusammenfassung(loesung) {
   const querschnitte = loesung.zuordnung?.querschnitte || {};
   const raum = eingrenzung();
@@ -344,28 +343,7 @@ function zusammenfassung(loesung) {
       tabelle?.bewehrung ? tabellenBlock(tabelle.bewehrung) : null,
       tabelle
         ? el('div.tabelle-block', {}, [
-          el('div.tabelle-huelle', {}, [
-            el('table.nachweis-tabelle', {}, [
-              el('thead', {}, [el('tr', {},
-                tabelle.kopf.map((zelle) => zelleSetzen(zelle, el('th'))))]),
-              el('tbody', {}, tabelle.zeilen.map((zeile) => el('tr', {
-                class: zeile.erfuellt ? 'ist-gut' : 'ist-schlecht',
-                title: zeile.begruendung || '',
-              }, zeile.zellen.map((zelle, i) => {
-                // Welche Spalte der Erfüllungsgrad ist, sagt der Kern. Sie
-                // trägt jetzt allein das Urteil -- die Spalte daneben, die
-                // "erfüllt" ausschrieb, ist weg.
-                const istGrad = i === tabelle.grad_spalte;
-                // Links oder rechts sagt ebenfalls der Kern -- dieselbe
-                // Ausrichtung, die auch das LaTeX bekommt. Aus dem Index zu
-                // schliessen ging gut, solange nur die erste Spalte Text war.
-                const rechts = spaltenausrichtung(tabelle.ausrichtung, i) !== 'left';
-                return zelleSetzen(zelle, el('td', {
-                  class: [rechts ? 'zahl' : '', istGrad ? 'grad' : ''].filter(Boolean).join(' '),
-                }));
-              })))),
-            ]),
-          ]),
+          el('div.tabelle-huelle', {}, [nachweistabelle(tabelle)]),
           werkzeugleiste({
             latex: tabelle.latex,
             markdown: tabelle.markdown,
@@ -388,6 +366,64 @@ function zusammenfassung(loesung) {
   });
 
   return el('div', {}, blaetter.concat([lueckenBanner(loesung)].filter(Boolean)));
+}
+
+/**
+ * Die Nachweistabelle der Oberfläche: keine Zelle mit mehr als zwei Zeilen.
+ *
+ * Widerstand und Einwirkung stehen übereinander in einer Zelle -- welche
+ * Spalten das sind, sagt der Kern (`stapel_spalten`); der Bericht und der
+ * Kopierknopf behalten beide Spalten. Texte werden an der ausgewogensten
+ * Wortgrenze in zwei Zeilen geteilt, und keine Zeile bricht weiter um. Die
+ * Tabelle ist darum nie schmaler als dieser Inhalt; ist die Tafel schmaler,
+ * rollt die Hülle.
+ */
+function nachweistabelle(tabelle) {
+  const [oben, unten] = tabelle.stapel_spalten || [];
+  const zelle = (inhalte, art, i) => {
+    // Links oder rechts sagt der Kern -- dieselbe Ausrichtung, die auch das
+    // LaTeX bekommt.
+    const rechts = spaltenausrichtung(tabelle.ausrichtung, i) !== 'left';
+    // Welche Spalte der Erfüllungsgrad ist, sagt der Kern. Sie trägt das
+    // Urteil allein.
+    const istGrad = art === 'td' && i === tabelle.grad_spalte;
+    const knoten = el(art, {
+      class: [rechts ? 'zahl' : 'links', istGrad ? 'grad' : ''].filter(Boolean).join(' '),
+    });
+    knoten.append(...inhalte.flatMap(zeilenVon).map((z) => zelleSetzen(z, el('span.zeile'))));
+    return knoten;
+  };
+  const reihe = (zellen, art) => zellen.flatMap((inhalt, i) => {
+    if (i === unten) return [];
+    return [zelle(i === oben ? [inhalt, zellen[unten]] : [inhalt], art, i)];
+  });
+
+  return el('table.nachweis-tabelle', {}, [
+    el('thead', {}, [el('tr', {}, reihe(tabelle.kopf, 'th'))]),
+    el('tbody', {}, tabelle.zeilen.map((zeile) => el('tr', {
+      class: zeile.erfuellt ? 'ist-gut' : 'ist-schlecht',
+      title: zeile.begruendung || '',
+    }, reihe(zeile.zellen, 'td')))),
+  ]);
+}
+
+/**
+ * Eine Zelle als Zeilen: Formeln bleiben ganz, Text wird an der
+ * ausgewogensten Wortgrenze geteilt -- aber nur, wenn das die Spalte
+ * spürbar schmaler macht. «Tragsicherheit 1» bleibt beisammen,
+ * «Biegung und Normalkraft» wird «Biegung und / Normalkraft».
+ */
+function zeilenVon(zelle) {
+  if (zelle.mathe !== undefined) return [zelle];
+  const woerter = zelle.text.split(' ');
+  let beste = null;
+  for (let i = 1; i < woerter.length; i += 1) {
+    const zeilen = [woerter.slice(0, i).join(' '), woerter.slice(i).join(' ')];
+    const breite = Math.max(...zeilen.map((z) => z.length));
+    if (!beste || breite < beste.breite) beste = { breite, zeilen };
+  }
+  if (!beste || beste.breite > 0.75 * zelle.text.length) return [zelle];
+  return beste.zeilen.map((text) => ({ text }));
 }
 
 /**

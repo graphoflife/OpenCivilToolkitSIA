@@ -22,7 +22,7 @@ from opencivil.bewehrungssuche import Suchmodus
 from opencivil.core.einheiten import MM
 from opencivil.bericht.markdown import block_markdown
 from opencivil.bericht.zusammenfassung import (
-    GRAD_SPALTE, bewehrungsuebersicht, hinweise, nachweistabelle,
+    GRAD_SPALTE, STAPEL_SPALTEN, bewehrungsuebersicht, hinweise, nachweistabelle,
     plattenangaben, stiller_hinweis, zusammenfassen,
 )
 from opencivil.core.latex import Mathe, Zelle
@@ -365,6 +365,7 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
                 for z, zellen in zip(platte.zeilen, tabelle.zeilen)
             ],
             "grad_spalte": GRAD_SPALTE,
+            "stapel_spalten": list(STAPEL_SPALTEN),
             "ausrichtung": tabelle.ausrichtung,
             "latex": tabelle.als_latex(),
             "markdown": block_markdown(tabelle),
