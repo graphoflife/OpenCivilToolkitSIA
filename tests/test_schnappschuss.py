@@ -43,11 +43,13 @@ def _voll():
     """
     Jeder Nachweis einmal laut -- und die Fälle, die das Beispiel nie zeigt.
 
-    Erhöhte Anforderung mit allen Schaltern, häufige und quasi-ständige
-    Lastfälle abgeleitet und eigene, Bügel, ein Knickfall; eine zweite Platte
-    mit x aussen, die im Feld nicht aufgeht und deren Stahl unter Dauerlast
-    fliesst; eine dritte ohne x-Bewehrung. Gebaut über die Fassade, wie ein
-    Benutzer es in Python täte.
+    Erhöhte Anforderung mit allen Schaltern und begrenzter rissaktiver
+    Dicke, häufige und quasi-ständige Lastfälle abgeleitet und eigene, Bügel
+    mit Stabzahl in y, ein Knickfall; eine zweite Platte mit x aussen, die im
+    Feld nicht aufgeht und deren Stahl unter Dauerlast fliesst, dazu
+    Querkraft ohne Bügel -- einmal über m_Rd, einmal darunter, mit Einlage;
+    eine dritte ohne x-Bewehrung; eine vierte mit Querkraft ohne Einlage.
+    Gebaut über die Fassade, wie ein Benutzer es in Python täte.
     """
     from opencivil.projekt import Projekt
 
@@ -56,8 +58,11 @@ def _voll():
     p.stahl("B500B")
     decke = p.platte("Decke", h=300, x=[18, 12], x_zulage=[12, 0], y=[12, 12],
                      rissanforderung="erhoeht", duktilitaet=True, sproede=True,
-                     zwaengung=True, zwaengung_biegung=True)
+                     zwaengung=True, zwaengung_begrenzt=True,
+                     zwaengung_biegung=True)
     decke.querkraftbewehrung.durchmesser = 8.0
+    decke.querkraftbewehrung.abstand_y = None
+    decke.querkraftbewehrung.anzahl_y = 5.0
     decke.einwirkung("Feld", M_Ed=150, V_Ed=80)
     decke.einwirkung("Feld mit Druck", M_Ed=120, N_Ed=-300)
     decke.einwirkung("Stütze", M_Ed=-60, V_Ed=60)
@@ -67,12 +72,17 @@ def _voll():
     decke.quasistaendig.lastfall("Dauerlast", M_Ed=70)
     decke.knickfall("Wand", N_Ed=-800, M_Ed_1=20, laenge=3.0)
 
-    dach = p.platte("Dach", h=200, x=[10, 10], y=[8, 8], x_innen=False)
-    dach.einwirkung("Feld", M_Ed=80)
+    dach = p.platte("Dach", h=200, x=[10, 10], y=[8, 8], x_innen=False,
+                    einlagenhoehe=40)
+    dach.einwirkung("Feld", M_Ed=80, V_Ed=40)
+    dach.einwirkung("Rand", M_Ed=20, V_Ed=30)
     dach.quasistaendig.lastfall("Dauerlast", M_Ed=40)
 
     ohne = p.platte("Ohne x", h=250, x=[0, 0], y=[12, 12])
     ohne.einwirkung("Feld", M_Ed=30, V_Ed=20)
+
+    konsole = p.platte("Konsole", h=250, x=[12, 12], y=[10, 10])
+    konsole.einwirkung("Feld", M_Ed=40, V_Ed=50)
     return p
 
 
