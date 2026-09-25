@@ -224,10 +224,27 @@ class TestQuerkraft(unittest.TestCase):
         self.assertGreater(a2.querkraft["q1.x"].ergebnisse[0].v_Rd,
                            a1.querkraft["q1.x"].ergebnisse[0].v_Rd)
 
-    def test_ohne_v_ed_kein_querkraftnachweis(self):
-        projekt = Projekt.beispiel()   # V_Ed überall 0
-        aufbau = projekt.aufbauen()
-        self.assertEqual(aufbau.querkraft, {})
+    def test_ohne_v_ed_rechnet_er_still_nur_fuer_das_diagramm(self):
+        """
+        Kein Urteil in Tabelle und Herleitung -- aber das Bild: ohne Bügel
+        die M-V-Kurve, mit Bügeln der Verlauf über die Neigung, beide ohne
+        Fallpunkt.
+        """
+        from opencivil.web import diagrammdaten
+
+        mit_buegeln = projekt_mit_buegeln()
+        for k in mit_buegeln.querschnitte[0].kombinationen:
+            k.V_Ed = 0.0
+        for projekt, bild in ((Projekt.beispiel(), diagrammdaten.querkraftkurven),
+                              (mit_buegeln, diagrammdaten.neigungskurven)):
+            aufbau = projekt.aufbauen()
+            loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+            with self.subTest(bild=bild.__name__):
+                self.assertTrue(aufbau.querkraft["q1.x"].still)
+                self.assertFalse([u for u in loesung.gefuehrte_urteile if u.art == "V"])
+                kurven = bild(aufbau)
+                self.assertTrue(kurven)
+                self.assertTrue(all(k["faelle"] == [] for k in kurven.values()))
 
     def test_erfuellungsgrad_ist_widerstand_durch_einwirkung(self):
         aufbau, gefunden = urteile(projekt_mit_querkraft())

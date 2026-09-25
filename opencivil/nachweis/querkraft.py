@@ -325,6 +325,14 @@ class Querkraftfall:
         return kennung_aus(self.name)
 
 
+#: Der Fall eines Querkraftnachweises ohne Querkraft: er rechnet still, nur
+#: fuer das Diagramm -- die M-V-Kurve und der Verlauf ueber die Neigung
+#: brauchen die Beiwerte, die erst im Lauf entstehen. Ohne Einwirkung nie ein
+#: Mangel; M = 0 misst d fuer das positive Moment.
+NUR_KURVE = Querkraftfall(name="ohne Einwirkung", V_Ed=Groesse(0.0, KN_PRO_M),
+                          M_Ed=Groesse(0.0, KNM), N_Ed=Groesse(0.0, KN))
+
+
 @dataclass
 class Querkraftergebnis:
     """Alle Zwischenwerte eines Falls, damit die Herleitung vollstaendig ist."""
@@ -397,8 +405,6 @@ class Querkraft(Nachweis):
         richtung: Richtung,
         mn_nachweis,
     ) -> None:
-        if not faelle:
-            raise ValueError("Der Querkraftnachweis braucht mindestens einen Fall.")
         self.posten = querschnitt.posten_in_richtung(richtung)
         if not self.posten:
             raise ValueError(
@@ -406,7 +412,8 @@ class Querkraft(Nachweis):
                 f"keine Bewehrung.")
         self.querschnitt = querschnitt
         self.richtung = richtung
-        self.faelle = list(faelle)
+        # Ohne Fall still und mit dem Nullfall -- siehe NUR_KURVE.
+        self.faelle = list(faelle) or [NUR_KURVE]
         self.ergebnisse: List[Querkraftergebnis] = []
 
         self.buegel = (querschnitt.querkraftbewehrung
@@ -480,9 +487,12 @@ class Querkraft(Nachweis):
             # damit die Abhaengigkeit im Graphen steht und die Rueckverfolgung sie
             # zeigt. Mit Buegeln geht er nicht ein; ihn trotzdem anzufordern
             # haenge eine Interpolation in die Herleitung, die dort nichts erklaert.
+            # Der Nullfall hat keine Kombination; ohne Normalkraft gilt der
+            # Eckwert M_Rd(N = 0).
             for f in self.faelle:
-                bezuege.append(Eingabebezug(
-                    f"m_Rd_{f.kennung}", mn_nachweis.d_m_rd[f.name].id))
+                m_rd = (mn_nachweis.d_eckwerte["M_Rd_N0_pos"] if f == NUR_KURVE
+                        else mn_nachweis.d_m_rd[f.name])
+                bezuege.append(Eingabebezug(f"m_Rd_{f.kennung}", m_rd.id))
         else:
             # Die Reihenfolge der Eingaenge ist die Reihenfolge, in der der
             # Loeser sie beschafft -- und damit die Reihenfolge der Bloecke in
@@ -517,6 +527,7 @@ class Querkraft(Nachweis):
             # welche das ist, entscheidet die Abhaengigkeitsfolge.
             abschnitt=querschnitt.abschnitt,
         )
+        self.still = not faelle
 
     # -- Rechnen ------------------------------------------------------------
 

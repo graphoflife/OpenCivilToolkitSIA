@@ -40,8 +40,8 @@ def querkraftkurven(
     """
     Der Querkraftwiderstand ueber dem Moment -- eine Kurve je Tragrichtung.
 
-    Hoechstens zwei je Platte, x und y, und nur wo ein Querkraftnachweis
-    gefuehrt wurde. Die Waagrechte ist vorzeichenbehaftet: rechts das positive
+    Eine je Platte ohne Buegel, auch ohne Querkraft: dann rechnet der
+    Nachweis still, nur fuer dieses Bild. Die Waagrechte ist vorzeichenbehaftet: rechts das positive
     Moment (Zug unten), links das negative (Zug oben). Beide Aeste im selben
     Bild, weil sie dieselbe Platte beschreiben.
 
@@ -96,7 +96,9 @@ def querkraftkurven(
             # Moment vorzeichenbehaftet -- der Fall gehoert auf die Seite, auf
             # der er wirkt. Die Querkraft dagegen als Betrag: ihr Vorzeichen
             # spielt keine Rolle, gerechnet wird ohnehin mit |V_Ed|.
-            "faelle": [
+            # Ein stiller Nachweis rechnet nur fuer die Kurve: sein Nullfall
+            # ist keine Einwirkung und kein Punkt im Bild.
+            "faelle": [] if nachweis.still else [
                 {
                     "name": erg.fall.name,
                     "M_Ed": erg.fall.M_Ed.in_einheit(KNM),
@@ -175,7 +177,7 @@ def neigungskurven(aufbau: Aufbau) -> dict:
                      "im_bereich": a_min <= q.alpha <= a_max}
                     for q in punkte
                 ],
-                "faelle": [
+                "faelle": [] if nachweis.still else [
                     {
                         "name": erg.fall.name,
                         "V_Ed": abs(erg.fall.V_Ed.in_einheit(KN_PRO_M)),

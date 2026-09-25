@@ -353,16 +353,15 @@ def _platte(eintrag: QuerschnittEintrag, aufbau: Aufbau, eintragen: Eintragen,
         _lagennachweise(eintrag, querschnitt, richtung, nachweis, eintragen)
         _spannungsnachweise(eintrag, querschnitt, richtung, eintragen)
 
-        mit_querkraft = [k for k in aktiv if k.V_Ed]
-        if mit_querkraft:
-            eintragen("querkraft", kennung_x, Querkraft(
-                querschnitt,
-                [Querkraftfall(name=k.name,
-                               V_Ed=Groesse(k.V_Ed, KN_PRO_M),
-                               M_Ed=Groesse(k.M_Ed, KNM),
-                               N_Ed=Groesse(k.N_Ed, KN))
-                 for k in mit_querkraft],
-                richtung, nachweis))
+        # Auch ohne V_Ed: dann still, nur fuer das Diagramm.
+        eintragen("querkraft", kennung_x, Querkraft(
+            querschnitt,
+            [Querkraftfall(name=k.name,
+                           V_Ed=Groesse(k.V_Ed, KN_PRO_M),
+                           M_Ed=Groesse(k.M_Ed, KNM),
+                           N_Ed=Groesse(k.N_Ed, KN))
+             for k in aktiv if k.V_Ed],
+            richtung, nachweis))
 
         knickfaelle = [k for k in eintrag.knickfaelle if k.aktiv]
         if knickfaelle:

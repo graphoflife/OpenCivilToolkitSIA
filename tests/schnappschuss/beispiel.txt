@@ -2,7 +2,7 @@
 Beispiel
 ====================================================================================================
 
-43 Berechnungen ausgeführt, 73 Werte bestimmt.
+47 Berechnungen ausgeführt, 78 Werte bestimmt.
 
 ====================================================================================================
 Herleitung
@@ -278,6 +278,9 @@ Bemessungswert des Elastizitätsmoduls   [SIA 262:2025, 4.2.1.15]
 Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung   [SIA 262:2025, 4.2.1.6]
     k_{\sigma} = \frac{E_{cd}}{400 \cdot f_{cd}} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 4.202
 
+Bemessungswert der Schubspannungsgrenze   [SIA 262:2025, 2.4.2.4]
+    \tau_{cd} = \frac{0.3 \cdot \sqrt{f_{ck}}}{\gamma_c} = \frac{0.3 \cdot \sqrt{30}}{1.5} = 1.1\,\mathrm{N}/\mathrm{mm}^{2} \quad \left(f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+
 Mittelwert der Zugfestigkeit   [SIA 262:2025, 3.1.2.2.7]
     f_{ctm} = 2.9\,\mathrm{N}/\mathrm{mm}^{2}
 
@@ -355,6 +358,7 @@ Werte
     Teilsicherheitsbeiwert für den Elastizitätsmodul                                \gamma_{cE}                                                 1           Vorgabe
     Beiwert für die Gesteinskörnung                                                 k_e                                                     10000           Vorgabe
     Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung                               k_{\sigma}                                              4.202           berechnet
+    Bemessungswert der Schubspannungsgrenze                                         \tau_{cd}                                                 1.1  N/mm²    berechnet
     Elastizitätsmodul des Betonstahls                                               E_s                                                    200000  N/mm²    Vorgabe
     Bemessungswert der Dehnung bei Höchstlast                                       \varepsilon_{ud}                                          4.5  %        Vorgabe
     Bemessungswert der Fliessgrenze                                                 f_{yd}                                                    435  N/mm²    berechnet
@@ -362,12 +366,14 @@ Werte
     Charakteristische Fliessgrenze                                                  f_{yk}                                                    500  N/mm²    Vorgabe
     Charakteristische Fliessgrenze auf Druck                                        f_{yk}^{-}                                                500  N/mm²    Vorgabe
     Teilsicherheitsbeiwert für Betonstahl                                           \gamma_s                                                 1.15           Vorgabe
+    Grösstkorndurchmesser                                                           D_{max}                                                    32  mm       Vorgabe
     Betrachtete Breite (x)                                                          b                                                        1000  mm       Vorgabe
     Betrachtete Breite (y)                                                          b_y                                                      1000  mm       Vorgabe
     Bewehrungsmass je Kubikmeter Beton                                              \mu_s                                                     123  kg/m³    berechnet
     Überdeckung oben                                                                c_{nom,o}                                                  30  mm       Vorgabe
     Überdeckung unten                                                               c_{nom,u}                                                  30  mm       Vorgabe
     Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage)              h_{Dist}                                                  186  mm       berechnet
+    Höhe der Einlage                                                                e_{Einlage}                                                 0  mm       Vorgabe
     Plattendicke                                                                    h                                                         300  mm       Vorgabe
     Kriechzahl                                                                      \varphi                                                     2           Vorgabe
     Bewehrungsquerschnitt 1. Lage Grundbewehrung                                    A_{s,1,y,g}                                               754  mm²      berechnet
@@ -406,6 +412,8 @@ Werte
     Grösste aufnehmbare Zugkraft (x-Richtung)                                       N_{Rd,x}^{+}                                           1393.2  kN       berechnet
     Momentenwiderstand bei N_Ed (x-Richtung) – Stütze                               M_{Rd,x}(N_{Ed})_{\text{Stütze}}                         79.9  kNm      berechnet
     Erfüllungsgrad x-Richtung – Stütze                                              \alpha_{eff,x,\text{Stütze}}                             1.60           berechnet
+    Erfüllungsgrad Querkraft x-Richtung – ohne Einwirkung                           \alpha_{eff,V,x,\text{ohne Einwirkung}}                \infty           berechnet
+    Querkraftwiderstand x-Richtung – ohne Einwirkung                                V_{Rd,x}                                                272.8  kN/m     berechnet
     Erfüllungsgrad Rissnormalkraft – 2. Lage x                                      \alpha_{eff,NR,2,x}                                      3.24           berechnet
     Erfüllungsgrad Rissnormalkraft – 3. Lage x                                      \alpha_{eff,NR,3,x}                                     0.996           berechnet
     Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %)            \alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}              4.29           berechnet
