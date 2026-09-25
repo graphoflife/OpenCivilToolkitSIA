@@ -263,32 +263,22 @@ class Handrechnung:
 
     def _schwerpunkt(self, p: Protokoll, lage: Lage) -> None:
         """Schreibt, wie sich d einer aus mehreren Posten bestehenden Lage ergibt."""
-        zaehler = " + ".join(
-            rf"A_{{s,{t.index}}} \cdot {t.symbol_f_yd} \cdot d_{{{t.index}}}"
-            for t in lage.teile)
-        nenner = " + ".join(
-            rf"A_{{s,{t.index}}} \cdot {t.symbol_f_yd}" for t in lage.teile)
-        zaehler_zahl = " + ".join(
-            rf"{t.a_s * 1e6:.0f} \cdot {t.f_yd / 1e6:.0f} \cdot {t.z * 1e3:.1f}"
-            for t in lage.teile)
-        nenner_zahl = " + ".join(
-            rf"{t.a_s * 1e6:.0f} \cdot {t.f_yd / 1e6:.0f}" for t in lage.teile)
-
-        p.gleichung(
-            rf"d_{{{lage.index}}} = \frac{{{zaehler}}}{{{nenner}}}"
-            "\n= "
-            rf"\frac{{{zaehler_zahl}}}{{{nenner_zahl}}}"
-            rf" = {lage.z * 1e3:.1f}\,\mathrm{{mm}}",
-            titel=f"Statische Höhe der zusammengefassten Lage – {lage.text}",
-        )
-        p.gleichung(
-            rf"A_{{s,{lage.index}}} = "
-            + " + ".join(rf"A_{{s,{t.index}}}" for t in lage.teile)
-            + " = "
-            + " + ".join(f"{t.a_s * 1e6:.0f}" for t in lage.teile)
-            + rf" = {lage.a_s * 1e6:.0f}\,\mathrm{{mm}}^{{2}}",
-            titel="Bewehrungsquerschnitt der zusammengefassten Lage",
-        )
+        eingaben = {}
+        for i, t in enumerate(lage.teile):
+            eingaben[f"A{i}"] = self.werte.flaeche(f"A_s_{t.index}", f"A_{{s,{t.index}}}", t.a_s)
+            eingaben[f"f{i}"] = self.werte.spannung(f"f_yd_{t.index}", t.symbol_f_yd, t.f_yd)
+            eingaben[f"d{i}"] = self.werte.laenge(f"d_{t.index}", f"d_{{{t.index}}}", t.z)
+        kraefte = [rf"@A{i} \cdot @f{i}" for i in range(len(lage.teile))]
+        momente = " + ".join(rf"{k} \cdot @d{i}" for i, k in enumerate(kraefte))
+        summe = " + ".join(kraefte)
+        p.formel(
+            self.werte.laenge(f"d_{lage.index}", f"d_{{{lage.index}}}", lage.z),
+            rf"\frac{{{momente}}}{{{summe}}}",
+            eingaben, titel=f"Statische Höhe der zusammengefassten Lage – {lage.text}")
+        p.formel(
+            self.werte.flaeche(f"A_s_{lage.index}", f"A_{{s,{lage.index}}}", lage.a_s),
+            " + ".join(f"@A{i}" for i in range(len(lage.teile))), eingaben,
+            titel="Bewehrungsquerschnitt der zusammengefassten Lage")
 
     def _groesste_druckkraft(self, p: Protokoll) -> Eckpunkt:
         """Reiner Beton ohne Stahl -- die einfachste aller Grenzen."""
@@ -305,8 +295,8 @@ class Handrechnung:
             },
             titel="Gleichmässiger Druck, ohne Bewehrung",
         )
-        p.gleichung(r"M_{Rd}(N_{Rd}^{-}) = 0\,\mathrm{kNm}",
-                    titel="Zugehöriges Moment")
+        p.wert(self.werte.moment("M_druck", r"M_{Rd}(N_{Rd}^{-})", 0.0),
+               titel="Zugehöriges Moment")
         return Eckpunkt("druck", r"N_{Rd}^{-}", "grösste Druckkraft", N, 0.0)
 
     def _groesste_zugkraft(self, p: Protokoll) -> Eckpunkt:

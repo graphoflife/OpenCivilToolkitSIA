@@ -45,13 +45,17 @@ $$
 **Bewehrungsmass je Kubikmeter Beton**
 
 $$
-\mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{b \cdot h} = \frac{4712.39\,\mathrm{mm}^{2} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{1000\,\mathrm{mm} \cdot 300\,\mathrm{mm}} = 123\,\mathrm{kg}/\mathrm{m}^{3}
+\mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{b \cdot h} = \frac{4712\,\mathrm{mm}^{2} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{1000\,\mathrm{mm} \cdot 300\,\mathrm{mm}} = 123\,\mathrm{kg}/\mathrm{m}^{3}
 $$
 
 **Höhe der Distanzhalter**
 
 $$
-h_{Dist} = \text{OK innere untere Lage} - \text{UK innere obere Lage} = 240.0\,\mathrm{mm} - 54.0\,\mathrm{mm} = 186.0\,\mathrm{mm}
+\begin{aligned}
+  h_{Dist} &= \text{OK innere untere Lage} - \text{UK innere obere Lage} \\
+  &= 240\,\mathrm{mm} - 54\,\mathrm{mm} \\
+  &= 186\,\mathrm{mm}
+\end{aligned}
 $$
 
 **Randabstände, statische Höhen und Bewehrungsquerschnitte**
@@ -71,14 +75,17 @@ Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f\_cd; gedrückte
 **Statische Höhe der zusammengefassten Lage – 2. Lage Grundbewehrung + 2. Lage Zulage**
 
 $$
-d_{2,x} = \frac{A_{s,2,x,g} \cdot f_{yd} \cdot d_{2,x,g} + A_{s,2,x,z} \cdot f_{yd} \cdot d_{2,x,z}}{A_{s,2,x,g} \cdot f_{yd} + A_{s,2,x,z} \cdot f_{yd}}
-= \frac{1696 \cdot 435 \cdot 249.0 + 754 \cdot 435 \cdot 246.0}{1696 \cdot 435 + 754 \cdot 435} = 248.1\,\mathrm{mm}
+\begin{aligned}
+  d_{2,x} &= \frac{A_{s,2,x,g} \cdot f_{yd} \cdot d_{2,x,g} + A_{s,2,x,z} \cdot f_{yd} \cdot d_{2,x,z}}{A_{s,2,x,g} \cdot f_{yd} + A_{s,2,x,z} \cdot f_{yd}} \\
+  &= \frac{1696\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot 246\,\mathrm{mm}}{1696\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}} \\
+  &= 248.1\,\mathrm{mm}
+\end{aligned}
 $$
 
 **Bewehrungsquerschnitt der zusammengefassten Lage**
 
 $$
-A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z} = 1696 + 754 = 2450\,\mathrm{mm}^{2}
+A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z} = 1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2} = 2450\,\mathrm{mm}^{2}
 $$
 
 **Zusammengefasste Bewehrung**

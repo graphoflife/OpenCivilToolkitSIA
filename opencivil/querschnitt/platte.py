@@ -46,7 +46,7 @@ from opencivil.core.einheiten import (
     EINHEITSLOS, GRAD, KG_PRO_M3, MM, MM2, Groesse,
 )
 from opencivil.core.latex import Mathe
-from opencivil.core.protokoll import Abschnitt, Protokoll
+from opencivil.core.protokoll import Abschnitt, Protokoll, Zwischenwerte
 from opencivil.core.wert import WertDef, kennung_aus
 from opencivil.material.basis import Baustoff
 
@@ -503,6 +503,7 @@ class Lagenaufbau(Prozedur):
         Herleitung stehen und sich zurueckverfolgen lassen.
         """
         ergebnis: Dict[str, Groesse] = {}
+        werte = Zwischenwerte(self.id)
 
         # Auf b bezogen: eine y-Lage steht je Laufmeter da, eine x-Lage je b.
         # Das Verhaeltnis b/b_q rechnet sie auf denselben Streifen um; sind alle
@@ -518,13 +519,8 @@ class Lagenaufbau(Prozedur):
             self.d_bewehrungsmass.belegen(Groesse(mass, KG_PRO_M3)),
             rf"\frac{{@A_s \cdot {STAHLDICHTE:g}\,\mathrm{{kg}}/\mathrm{{m}}^{{3}}}}"
             rf"{{@b \cdot @h}}",
-            {
-                "A_s": WertDef(f"{self.id}.A_s_gesamt", "A_{s,tot}", MM2,
-                               "Bewehrungsquerschnitt gesamt", 0
-                               ).belegen(Groesse.aus_si(a_s_gesamt, MM2)),
-                "b": WertDef(f"{self.id}._b", "b", MM, "Breite", 0).belegen(b),
-                "h": WertDef(f"{self.id}._h", "h", MM, "Dicke", 0).belegen(h),
-            },
+            {"A_s": werte.flaeche("A_s_gesamt", "A_{s,tot}", a_s_gesamt),
+             "b": e["b"], "h": e["h"]},
             titel="Bewehrungsmass je Kubikmeter Beton",
         )
 
@@ -544,11 +540,11 @@ class Lagenaufbau(Prozedur):
 
         hoehe = unten[0] - oben[1]
         ergebnis[self.d_distanzhalter.id] = Groesse.aus_si(hoehe, MM)
-        p.gleichung(
-            r"h_{Dist} = \text{OK innere untere Lage} - \text{UK innere obere Lage}"
-            rf" = {unten[0] * 1e3:.1f}\,\mathrm{{mm}} - {oben[1] * 1e3:.1f}\,\mathrm{{mm}}"
-            rf" = {hoehe * 1e3:.1f}\,\mathrm{{mm}}",
-            titel="Höhe der Distanzhalter")
+        p.formel(
+            self.d_distanzhalter.belegen(Groesse.aus_si(hoehe, MM)), "@OK - @UK",
+            {"OK": werte.laenge("OK", r"\text{OK innere untere Lage}", unten[0]),
+             "UK": werte.laenge("UK", r"\text{UK innere obere Lage}", oben[1])},
+            titel="Höhe der Distanzhalter", referenz="")
         return ergebnis
 
 

@@ -826,8 +826,9 @@ class TestHandrechnungSymbole(unittest.TestCase):
             lage(1, Richtung.X, phi=18.0, zulage=12.0),
             lage(2, Richtung.Y), lage(3, Richtung.Y), lage(4, Richtung.X, phi=12.0),
         ]))
-        self.assertIn(
-            r"d_{1,x} = \frac{A_{s,1,x,g} \cdot f_{yd} \cdot d_{1,x,g}", text)
+        # Ein- oder mehrzeilig gesetzt -- «=» oder «&=».
+        self.assertRegex(
+            text, r"d_\{1,x\} &?= \\frac\{A_\{s,1,x,g\} \\cdot f_\{yd\} \\cdot d_\{1,x,g\}")
         self.assertIn("A_{s,1,x} = A_{s,1,x,g} + A_{s,1,x,z}", text)
 
     def test_ohne_zulage_gibt_es_nichts_herzuleiten(self):
