@@ -63,7 +63,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_als_text,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, MM, Groesse
 from opencivil.core.latex import Mathe, als_text
@@ -703,5 +703,6 @@ class Knicken(Nachweis):
             rf"\alpha_{{eff}} = \frac{{N_{{Rd,K}}}}{{\left|N_{{Ed}}\right|}}"
             rf" = \frac{{{erg.N_Rd / 1e3:.1f}\,\mathrm{{kN}}}}"
             rf"{{{N_Ed / 1e3:.1f}\,\mathrm{{kN}}}}"
-            rf" = {erg.erfuellungsgrad:.2f} \quad \Rightarrow \quad {zustand}",
+            rf" = {grad_als_text(erg.erfuellungsgrad, erg.erfuellt, latex=True)}"
+            rf" \quad \Rightarrow \quad {zustand}",
             titel="Erfüllungsgrad")

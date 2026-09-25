@@ -56,7 +56,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_als_text,
 )
 from opencivil.core.einheiten import (
     EINHEITSLOS, KN, KN_PRO_M, KNM, MM, N_PRO_MM2, Groesse, empirisch,
@@ -965,8 +965,7 @@ class Querkraft(Nachweis):
         """Die letzte Zeile jedes Falls -- für beide Ansätze dieselbe."""
         r = self.richtung.value
         zustand = r"\text{erfüllt}" if erg.erfuellt else r"\text{NICHT erfüllt}"
-        grad = (r"\infty" if math.isinf(erg.erfuellungsgrad)
-                else f"{erg.erfuellungsgrad:.2f}")
+        grad = grad_als_text(erg.erfuellungsgrad, erg.erfuellt, latex=True)
         p.gleichung(
             rf"\alpha_{{eff,V,{r}}} = \frac{{V_{{Rd}}}}{{\left|V_{{Ed}}\right|}} = "
             rf"\frac{{{erg.v_Rd / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}}}}"

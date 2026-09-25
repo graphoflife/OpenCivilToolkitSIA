@@ -32,12 +32,11 @@ die halbe Hoehe wie beim Zwang (SIA 262:2025, 4.4.1.3).
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_als_text,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KNM, Groesse
 from opencivil.core.protokoll import Protokoll
@@ -298,8 +297,7 @@ class SproedesVersagen(Nachweis):
             rf"{self.groessen.M_Riss / 1e3:.1f}\,\mathrm{{kNm}}"
             rf" \quad \Rightarrow \quad {zustand}",
             titel="Biegewiderstand gegen Rissmoment")
-        grad = ("\\infty" if math.isinf(erg.erfuellungsgrad)
-                else f"{erg.erfuellungsgrad:.2f}")
+        grad = grad_als_text(erg.erfuellungsgrad, erg.erfuellt, latex=True)
         p.gleichung(
             rf"\alpha_{{eff,SV,{nummer},{r}}} = "
             rf"\frac{{M_{{Rd}}(N_{{Ed}} = 0)}}{{M_{{Riss}}}} = "

@@ -375,6 +375,28 @@ class TestKnappVerfehlterGrad(unittest.TestCase):
         self.assertIn(r"(α\_eff = 0.996)", tex)
         self.assertNotIn(r"(α\_eff = 1)", tex)
 
+    def test_die_herleitung_auch(self):
+        """
+        Eingeschaltet steht der Nachweis in der Herleitung. Dort rundete jeder
+        Nachweis seinen Grad selbst -- «= 1.00» neben «nicht erfüllt».
+        """
+        from opencivil.core.protokoll import GleichungBlock
+        from opencivil.projekt import Projekt
+
+        projekt = Projekt.beispiel()
+        projekt.querschnitt("q1").zwaengung = True
+        aufbau = projekt.aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        urteil = next(u for u in loesung.gefuehrte_urteile
+                      if u.name == "Rissnormalkraft x – 3. Lage")
+        self.assertFalse(urteil.erfuellt)
+        grade = [b.latex for b in loesung.protokoll.alle_bloecke()
+                 if isinstance(b, GleichungBlock) and b.titel == "Erfüllungsgrad"
+                 and r"\alpha_{eff,NR,3" in b.latex]
+        self.assertEqual(len(grade), 1)
+        self.assertIn("0.996", grade[0])
+        self.assertNotIn("1.00", grade[0])
+
     def test_die_diagrammpunkte_bringen_den_grad_fertig_mit(self):
         """
         Die Tooltips rundeten in JavaScript selbst -- ``toFixed(2)`` neben

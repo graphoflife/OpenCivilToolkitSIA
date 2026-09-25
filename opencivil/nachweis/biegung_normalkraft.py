@@ -42,7 +42,7 @@ from enum import Enum
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_als_text,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, MM, Groesse
 from opencivil.core.latex import Mathe, als_text
@@ -556,10 +556,8 @@ class BiegungNormalkraft(Nachweis):
         protokoll_interpolation(p, auswertung)
 
         zustand = r"\text{erfüllt}" if auswertung.innerhalb else r"\text{NICHT erfüllt}"
-        wert = (
-            r"\infty" if math.isinf(auswertung.erfuellungsgrad)
-            else f"{auswertung.erfuellungsgrad:.2f}"
-        )
+        wert = grad_als_text(auswertung.erfuellungsgrad, auswertung.innerhalb,
+                             latex=True)
         gross = auswertung.achse.name
         p.gleichung(
             rf"\alpha_{{eff}} = \frac{{{gross}_{{Rd}}}}{{{gross}_{{Ed}}}} "

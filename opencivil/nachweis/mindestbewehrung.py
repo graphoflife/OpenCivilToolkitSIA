@@ -44,7 +44,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_als_text,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, Groesse
 from opencivil.core.protokoll import Protokoll
@@ -426,8 +426,7 @@ class Rissnormalkraft(Nachweis):
             rf" \quad \Rightarrow \quad {zustand}",
             titel="Aufnehmbare Risskraft")
 
-        grad = ("\\infty" if math.isinf(erg.erfuellungsgrad)
-                else f"{erg.erfuellungsgrad:.2f}")
+        grad = grad_als_text(erg.erfuellungsgrad, erg.erfuellt, latex=True)
         p.gleichung(
             rf"\alpha_{{eff,NR,{index}}} = \frac{{N_{{s,adm,{index}}}}}"
             rf"{{N_{{Riss}}}} = \frac{{{erg.N_s_adm / 1e3:.1f}\,\mathrm{{kN}}}}"
@@ -827,8 +826,7 @@ class ZwaengungBiegung(Nachweis):
             rf" \quad \Rightarrow \quad {zustand}",
             titel="Aufnehmbares Moment der Bewehrung")
 
-        grad = ("\\infty" if math.isinf(erg.erfuellungsgrad)
-                else f"{erg.erfuellungsgrad:.2f}")
+        grad = grad_als_text(erg.erfuellungsgrad, erg.erfuellt, latex=True)
         p.gleichung(
             rf"\alpha_{{eff,ZB,{index}}} = \frac{{M_{{s,adm,{index}}}}}"
             rf"{{M_{{Riss}}}} = \frac{{{erg.M_s_adm / 1e3:.1f}\,\mathrm{{kNm}}}}"

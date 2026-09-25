@@ -59,13 +59,12 @@ durch die Probe.
 
 from __future__ import annotations
 
-import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_als_text,
 )
 from opencivil.core.einheiten import (
     EINHEITSLOS, KN, KNM, N_PRO_MM2, PROMILLE, Groesse,
@@ -721,8 +720,7 @@ class Spannungsbegrenzung(Nachweis):
             titel="Probe: die Ebene erzeugt die Einwirkung")
 
         zustand = r"\text{erfüllt}" if erg.erfuellt else r"\text{NICHT erfüllt}"
-        grad = ("\\infty" if math.isinf(erg.erfuellungsgrad)
-                else f"{erg.erfuellungsgrad:.2f}")
+        grad = grad_als_text(erg.erfuellungsgrad, erg.erfuellt, latex=True)
 
         if erg.fliesst:
             self._protokoll_fliessen(p, erg, zustand, grad)
