@@ -338,44 +338,43 @@ def lagenindex(eintraege: Sequence[Tuple]) -> str:
     return f"{lage.nummer},{lage.richtung.value}"
 
 
-def protokoll_bewehrung(
-    p: Protokoll, werte: Zwischenwerte, index: str, flaechen: Sequence[Wert],
-    a_s: float,
-) -> Wert:
-    """``A_s`` einer Lage -- liegen Grundbewehrung und Zulage darin, als Summe."""
-    flaeche = werte.flaeche("A_s", f"A_{{s,{index}}}", a_s)
-    if len(flaechen) > 1:
-        p.formel(flaeche, " + ".join(f"@a{i}" for i in range(len(flaechen))),
-                 {f"a{i}": a for i, a in enumerate(flaechen)},
-                 titel="Bewehrung der Lage")
-    return flaeche
-
-
-def protokoll_hoehe_der_lage(
-    p: Protokoll, werte: Zwischenwerte, index: str, flaechen: Sequence[Wert],
-    tiefen: Sequence[Wert], *, z: float, d: float, h: Wert, von_unten: bool,
-) -> Wert:
+def protokoll_lage(
+    p: Protokoll, e: Eingaben, werte: Zwischenwerte, eintraege: Sequence[Tuple],
+    *, a_s: float, z: Optional[float] = None, d: float = 0.0,
+) -> Tuple[Wert, Optional[Wert]]:
     """
-    ``d`` einer Lage aus den Tiefen ihrer Posten ab Oberkante.
+    Querschnitt und statische Hoehe einer Lage, aus ihren Posten hergeleitet.
 
-    Grundbewehrung und Zulage liegen auf leicht verschiedenen Hoehen -- zaehlen
-    beide, steht ihr gemeinsamer Schwerpunkt da, sonst fiele er vom Himmel.
+    ``eintraege`` sind die Zeilen der Lage aus ``posten_ids``; die Eingaben
+    der Posten heissen ``a_s_<marke>`` und ``z_<marke>``, die Dicke ``h``.
+    Liegen Grundbewehrung und Zulage in der Lage, stehen Summe und
+    gemeinsamer Schwerpunkt da -- sonst fiele der Schwerpunkt vom Himmel.
     Unten ist die Tiefe ab Oberkante schon die statische Hoehe; oben misst
-    ``d`` ab dem unteren Rand, und die Tiefe heisst ``z``.
+    ``d`` ab dem unteren Rand, und die Tiefe heisst ``z``. Ohne ``z`` nur der
+    Querschnitt. Zurueck kommen ``A_s`` und ``d`` fuer die Formeln danach.
     """
-    tiefe = werte.laenge("z", f"{'d' if von_unten else 'z'}_{{{index}}}", z)
-    if len(tiefen) > 1:
-        eingaben = {f"a{i}": a for i, a in enumerate(flaechen)}
-        eingaben.update({f"z{i}": t for i, t in enumerate(tiefen)})
-        summe = " + ".join(f"@a{i}" for i in range(len(flaechen)))
-        momente = " + ".join(rf"@a{i} \cdot @z{i}" for i in range(len(flaechen)))
+    lage = eintraege[0][0]
+    index = lagenindex(eintraege)
+    marken = [f"{lage.nummer}{art.kuerzel}" for _, art, *_ in eintraege]
+    eingaben = {f"a{i}": e[f"a_s_{m}"] for i, m in enumerate(marken)}
+    summe = " + ".join(f"@{name}" for name in eingaben)
+    flaeche = werte.flaeche("A_s", f"A_{{s,{index}}}", a_s)
+    if len(marken) > 1:
+        p.formel(flaeche, summe, eingaben, titel="Bewehrung der Lage")
+    if z is None:
+        return flaeche, None
+
+    tiefe = werte.laenge("z", f"{'d' if lage.von_unten else 'z'}_{{{index}}}", z)
+    if len(marken) > 1:
+        eingaben.update({f"z{i}": e[f"z_{m}"] for i, m in enumerate(marken)})
+        momente = " + ".join(rf"@a{i} \cdot @z{i}" for i in range(len(marken)))
         p.formel(tiefe, rf"\frac{{{momente}}}{{{summe}}}", eingaben,
                  titel="Gemeinsamer Schwerpunkt der Lage")
-    if von_unten:
-        return tiefe
+    if lage.von_unten:
+        return flaeche, tiefe
     hoehe = werte.laenge("d", f"d_{{{index}}}", d)
-    protokoll_statische_hoehe(p, hoehe, h=h, z=tiefe, von_unten=False)
-    return hoehe
+    protokoll_statische_hoehe(p, hoehe, h=e["h"], z=tiefe, von_unten=False)
+    return flaeche, hoehe
 
 
 def protokoll_statische_hoehe(

@@ -53,8 +53,7 @@ from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.handrechnung import BLOCKANTEIL
 from opencivil.querschnitt.platte import (
-    Bewehrungslage, Richtung, lagenindex, protokoll_bewehrung,
-    protokoll_hoehe_der_lage,
+    Bewehrungslage, Richtung, protokoll_lage,
 )
 
 #: Groesste zulaessige bezogene Druckzonenhoehe.
@@ -355,17 +354,9 @@ class Duktilitaet(Nachweis):
             p.text(erg.begruendung)
             return
 
-        eintraege = self.posten_je_lage[nummer]
-        index = lagenindex(eintraege)
         werte = Zwischenwerte(f"{self.id}.lage{nummer}")
-        # Je Posten Querschnitt und Hoehe ab Oberkante -- dieselben Werte wie
-        # in der Tabelle der Platte.
-        marken = [f"{nummer}{art.kuerzel}" for _, art, *_ in eintraege]
-        flaechen = [e[f"a_s_{m}"] for m in marken]
-        a_s = protokoll_bewehrung(p, werte, index, flaechen, erg.a_s)
-        d = protokoll_hoehe_der_lage(
-            p, werte, index, flaechen, [e[f"z_{m}"] for m in marken],
-            z=erg.z, d=erg.d, h=e["h"], von_unten=erg.lage.von_unten)
+        a_s, d = protokoll_lage(p, e, werte, self.posten_je_lage[nummer],
+                                a_s=erg.a_s, z=erg.z, d=erg.d)
 
         x = werte.laenge("x", "x", erg.x)
         p.formel(

@@ -56,8 +56,7 @@ from opencivil.nachweis.sproedes_versagen import (
 )
 from opencivil.nachweis.zustand2 import gerissen, wertigkeit
 from opencivil.querschnitt.platte import (
-    Bewehrungslage, Richtung, lagenindex, protokoll_bewehrung,
-    protokoll_hoehe_der_lage,
+    Bewehrungslage, Richtung, protokoll_lage,
 )
 
 #: Nominelle Rissbreite je Anforderung, in m. ``None`` heisst: keine Grenze aus
@@ -152,7 +151,7 @@ def protokoll_zulaessige_stahlspannung(
 
 def _protokoll_stahlspannung(
     p: Protokoll, e: Eingaben, werte: Zwischenwerte, erg, *,
-    marken: Sequence[str], anforderung: str,
+    eintraege: Sequence[Tuple], anforderung: str,
 ) -> Wert:
     """
     ``sigma_s,adm`` einer Lage -- fuer beide Zwängungen dieselbe Herleitung.
@@ -163,7 +162,7 @@ def _protokoll_stahlspannung(
     Widerstand und Erfuellungsgrad in der Tabelle.
     """
     lage = f"{erg.lage.nummer},{erg.lage.richtung.value}"
-    staebe = [e[f"phi_{m}"] for m in marken]
+    staebe = [e[f"phi_{erg.lage.nummer}{art.kuerzel}"] for _, art, *_ in eintraege]
     if len(staebe) == 1:
         durchmesser = staebe[0]
     else:
@@ -436,12 +435,9 @@ class Rissnormalkraft(Nachweis):
             return
 
         eintraege = self.posten_je_lage[nummer]
-        index = lagenindex(eintraege)
         werte = Zwischenwerte(f"{self.id}.lage{nummer}")
-        marken = [f"{nummer}{art.kuerzel}" for _, art, *_ in eintraege]
-        a_s = protokoll_bewehrung(p, werte, index,
-                                  [e[f"a_s_{m}"] for m in marken], erg.a_s)
-        sigma = _protokoll_stahlspannung(p, e, werte, erg, marken=marken,
+        a_s, _ = protokoll_lage(p, e, werte, eintraege, a_s=erg.a_s)
+        sigma = _protokoll_stahlspannung(p, e, werte, erg, eintraege=eintraege,
                                          anforderung=self.anforderung)
 
         n_s_adm, n_riss = self._n_s_adm(erg), self._n_riss()
@@ -745,15 +741,9 @@ class ZwaengungBiegung(Nachweis):
             return
 
         eintraege = self.posten_je_lage[nummer]
-        index = lagenindex(eintraege)
         werte = Zwischenwerte(f"{self.id}.lage{nummer}")
-        marken = [f"{nummer}{art.kuerzel}" for _, art, *_ in eintraege]
-        flaechen = [e[f"a_s_{m}"] for m in marken]
-        a_s = protokoll_bewehrung(p, werte, index, flaechen, erg.a_s)
-        d = protokoll_hoehe_der_lage(
-            p, werte, index, flaechen, [e[f"z_{m}"] for m in marken],
-            z=erg.z_s, d=erg.d, h=e["h"], von_unten=erg.lage.von_unten)
-        sigma = _protokoll_stahlspannung(p, e, werte, erg, marken=marken,
+        a_s, d = protokoll_lage(p, e, werte, eintraege, a_s=erg.a_s, z=erg.z_s, d=erg.d)
+        sigma = _protokoll_stahlspannung(p, e, werte, erg, eintraege=eintraege,
                                          anforderung=self.anforderung)
 
         rho = werte.laenge("rho", r"\rho", erg.rho, stellen=2)
