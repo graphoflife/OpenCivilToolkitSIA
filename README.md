@@ -60,7 +60,7 @@ Fertig und getestet (569 Tests):
 | `nachweis/handrechnung` | die von Hand nachrechenbaren Eckpunkte |
 | `nachweis/dehnungsfaecher` | die präzise Linie -- nur für das Diagramm |
 | `nachweis/querschnittsloeser` | Dehnungsebene aus N und M, zwei Bisektionen |
-| `nachweis/` | M-N, Querkraft (mit Bügeln), Duktilität, sprödes Versagen, Zwängung auf Normalkraft und auf Biegung, Stahlspannung unter häufiger Last, Knicken am verformten System |
+| `nachweis/` | M-N, Querkraft (mit Bügeln), Duktilität, sprödes Versagen, Zwängung auf Normalkraft und auf Biegung, Stahlspannung unter häufiger (gegen Fliessen) und quasi-ständiger Last (aus der Rissbreite), Knicken am verformten System |
 | `spannungsanalyse.py` | drei Bilder am Querschnitt — kein Nachweis |
 | `bewehrungssuche.py` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt |
 | `bericht/` | Konsole und LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) |

@@ -437,7 +437,7 @@ class Querkraft(Nachweis):
         self.d_ausnutzung: Dict[str, WertDef] = {
             f.name: WertDef(
                 id=f"{basis}.{f.kennung}.erfuellungsgrad",
-                symbol=rf"\alpha_{{eff,V,{r},{f.kennung}}}",
+                symbol=rf"\alpha_{{eff,V,{r},{als_text(f.name)}}}",
                 einheit=EINHEITSLOS,
                 beschreibung=f"Erfüllungsgrad Querkraft {richtung.beschriftung} – {f.name}",
                 referenz="SIA 262:2025, 4.3.3.2",

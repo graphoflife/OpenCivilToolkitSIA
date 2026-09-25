@@ -291,9 +291,7 @@ function anforderungstext(querschnitt) {
 }
 
 function mindestbewehrungsBlock(querschnitt) {
-  const aus70 = querschnitt.haeufige_aus_tragsicherheit !== false;
-  const faelle = querschnitt.haeufige || [];
-  // Ob dieser Nachweis überhaupt gefordert ist, weiss der Kern.
+  // Ob der Nachweis gegen Fliessen überhaupt gefordert ist, weiss der Kern.
   const gefordert = anforderung(querschnitt)?.spannungsnachweis !== false;
 
   const aendern = (veraenderer) => projektAendern((p) => {
@@ -337,98 +335,155 @@ function mindestbewehrungsBlock(querschnitt) {
     zwaengung('zwaengung_biegung', 'Zwängung auf Biegung', 'x'),
     zwaengung('zwaengung_begrenzt', 'Begrenzung auf 500 mm'),
 
-    el('div.unterkapitel-kopf', { style: { marginTop: '8px' } }, [
-      el('span', { text: 'Verhindern des Fliessens für häufige Lastfälle' }),
-      erklaerung(
+    gebrauchsKapitel(querschnitt, {
+      titel: 'Stahlspannungsbegrenzung bei quasi-ständigen Lastfällen',
+      erklaerungText:
+        'Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die '
+        + 'Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die '
+        + 'Spannung aus den Lasten kommt. Bei normaler Anforderung ist sie '
+        + 'f_yk, bei erhöhter und hoher zusätzlich durch w_nom begrenzt. '
+        + 'Geführt bei jeder Anforderung.',
+      formel: 'σ_s ≤ σ_s,adm',
+      liste: 'quasistaendige',
+      ableiten: 'quasistaendige_aus_tragsicherheit',
+      anteil: 'quasistaendige_anteil',
+      wort: 'quasi-ständig',
+      neu: 'Quasi-ständig',
+    }),
+
+    gebrauchsKapitel(querschnitt, {
+      titel: 'Verhindern des Fliessens für häufige Lastfälle',
+      erklaerungText:
         'Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst '
         + 'bleiben Risse und Durchbiegung dauerhaft. Gerechnet am gerissenen '
         + 'Querschnitt, gezählt nur die gezogene Bewehrung.',
-        'σ_s ≤ f_yd − 80 N/mm²'),
-    ]),
-
-    // Bei normaler Anforderung steht in Tabelle 17 ein Strich: der Nachweis
-    // entfällt, und damit auch alles, was unten eingetragen wird. Ohne diesen
-    // Satz nimmt die Maske Lastfälle entgegen und rechnet sie stillschweigend
-    // nicht -- man sucht das Ergebnis in der Zusammenfassung und findet nichts.
-    // Was gefordert ist, sagt der Kern über den Katalog; hier steht keine
-    // zweite Fassung der Norm.
-    gefordert ? null : el('p.hinweis.hinweis-annahme', {
-      text: `Bei ${anforderungstext(querschnitt)} Rissanforderung verlangt `
-        + 'SIA 262 Tabelle 17 diesen Nachweis nicht. Er wird nicht geführt – '
-        + 'weder die 70 % noch eigene Lastfälle. Stelle die Rissanforderung '
-        + 'oben auf «Erhöht» oder «Hoch», wenn du ihn brauchst.',
+      formel: 'σ_s ≤ f_yd − 80 N/mm²',
+      liste: 'haeufige',
+      ableiten: 'haeufige_aus_tragsicherheit',
+      anteil: 'haeufige_anteil',
+      wort: 'häufig',
+      neu: 'Häufig',
+      // Bei normaler Anforderung steht in Tabelle 17 ein Strich: der
+      // Nachweis entfällt, und damit auch alles, was unten eingetragen wird.
+      // Ohne diesen Satz nimmt die Maske Lastfälle entgegen und rechnet sie
+      // stillschweigend nicht -- man sucht das Ergebnis in der
+      // Zusammenfassung und findet nichts. Was gefordert ist, sagt der Kern
+      // über den Katalog; hier steht keine zweite Fassung der Norm. Nur
+      // dieses Kapitel: das quasi-ständige darüber läuft immer.
+      hinweis: gefordert ? null
+        : `Bei ${anforderungstext(querschnitt)} Rissanforderung verlangt `
+          + 'SIA 262 Tabelle 17 diesen Nachweis nicht. Er wird nicht geführt '
+          + '– weder die abgeleiteten noch eigene Lastfälle. Stelle die '
+          + 'Rissanforderung oben auf «Erhöht» oder «Hoch», wenn du ihn '
+          + 'brauchst.',
     }),
-
-    el('div.duktilitaetszeile.ist-breit', {}, [
-      hakenSchalter(aus70, (wert) => aendern((q) => {
-        q.haeufige_aus_tragsicherheit = wert;
-      }), 'Ableitung'),
-      el('span.postenname', { text: '70 % der Tragsicherheitseinwirkungen' }),
-      el('span.kurvenhinweis', { text: '' }),
-    ]),
-
-    // Die abgeleiteten Fälle und eigene schliessen sich nicht aus: wer die
-    // 70 % nimmt, kann trotzdem einen Fall von Hand dazustellen, den keine
-    // Tragsicherheitskombination abbildet.
-    ...[
-      faelle.length
-        ? el('div.einwirkung.ist-kopf.ist-haeufig', {}, [
-          el('span'),
-          el('span', { text: 'Bezeichnung' }),
-          el('span', { text: 'M_Ed [kNm]' }),
-          el('span', { text: 'N_Ed [kN]' }),
-          el('span'),
-        ])
-        : null,
-      ...(faelle.length
-        ? faelle.map((_, i) => haeufigZeile(querschnitt, i))
-        : [el('div.leer', {
-          text: aus70
-            ? 'Nur die abgeleiteten Fälle.'
-            : 'Noch kein häufiger Lastfall.',
-        })]),
-      anfuegenKnopf('Lastfall', () => aendern((q) => {
-        q.haeufige = q.haeufige || [];
-        q.haeufige.push({
-          name: `Häufig ${q.haeufige.length + 1}`,
-          M_Ed: 0, N_Ed: 0, aktiv: true,
-        });
-      })),
-    ],
   ]);
 }
 
+/**
+ * Ein Stahlspannungsnachweis unter Gebrauchslast: Überschrift, der Anteil
+ * der Tragsicherheitseinwirkungen und die eigenen Lastfälle.
+ *
+ * Zweimal gebraucht -- quasi-ständig gegen die Rissbreite, häufig gegen das
+ * Fliessen. Im Kern sind beide dieselbe Rechnung mit anderer Grenze, hier
+ * dieselbe Maske mit anderen Feldern. Eine Kopie davon stünde in der
+ * Oberfläche genau so, wie sie im Kern vermieden wurde.
+ *
+ * Der Anteil steht in der Schalterzeile und nicht darunter: «[✓] [60] % der
+ * Tragsicherheitseinwirkungen» liest sich als ein Satz, und man sieht beim
+ * Einschalten, womit gerechnet wird. Seine Vorgabe kommt aus dem Kern -- die
+ * Datei läuft beim Laden durch ihn und bringt den Wert immer mit.
+ */
+function gebrauchsKapitel(querschnitt, {
+  titel, erklaerungText, formel, liste, ableiten, anteil, wort, neu, hinweis,
+}) {
+  const abgeleitet = !!querschnitt[ableiten];
+  const faelle = querschnitt[liste] || [];
+  const aendern = (veraenderer) => projektAendern((p) => {
+    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
+  });
 
-/** Ein häufiger Lastfall auf einer Zeile -- wie eine Einwirkung, ohne Querkraft. */
-function haeufigZeile(querschnitt, index) {
-  const k = (querschnitt.haeufige || [])[index];
+  return el('div', {}, [
+    el('div.unterkapitel-kopf', { style: { marginTop: '8px' } }, [
+      el('span', { text: titel }),
+      erklaerung(erklaerungText, formel),
+    ]),
+    hinweis ? el('p.hinweis.hinweis-annahme', { text: hinweis }) : null,
+
+    el('div.duktilitaetszeile.ist-anteil', {}, [
+      hakenSchalter(abgeleitet, (wert) => aendern((q) => {
+        q[ableiten] = wert;
+      }), 'Ableitung'),
+      zahlfeld({
+        wert: querschnitt[anteil], schritt: 5, min: 5, max: 100,
+        titel: `Welcher Anteil der Tragsicherheitseinwirkungen als ${wort} gilt, in %`,
+        // Leer gelassen bleibt der bisherige Wert -- eine Null wäre kein
+        // Anteil, und der Kern wiese sie ohnehin zurück.
+        beiAenderung: (v) => aendern((q) => { if (v !== null) q[anteil] = v; }),
+      }),
+      el('span.postenname', { text: '% der Tragsicherheitseinwirkungen' }),
+      el('span.kurvenhinweis', { text: '' }),
+    ]),
+
+    // Die abgeleiteten Fälle und eigene schliessen sich nicht aus: wer den
+    // Anteil nimmt, kann trotzdem einen Fall von Hand dazustellen, den keine
+    // Tragsicherheitskombination abbildet.
+    faelle.length
+      ? el('div.einwirkung.ist-kopf.ist-gebrauch', {}, [
+        el('span'),
+        el('span', { text: 'Bezeichnung' }),
+        el('span', { text: 'M_Ed [kNm]' }),
+        el('span', { text: 'N_Ed [kN]' }),
+        el('span'),
+      ])
+      : null,
+    ...(faelle.length
+      ? faelle.map((_, i) => gebrauchsfallZeile(querschnitt, liste, wort, i))
+      : [el('div.leer', {
+        text: abgeleitet
+          ? 'Nur die abgeleiteten Fälle.'
+          : `Noch kein ${wort}er Lastfall.`,
+      })]),
+    anfuegenKnopf('Lastfall', () => aendern((q) => {
+      q[liste] = q[liste] || [];
+      q[liste].push({
+        name: `${neu} ${q[liste].length + 1}`,
+        M_Ed: 0, N_Ed: 0, aktiv: true,
+      });
+    })),
+  ]);
+}
+
+/** Ein Lastfall unter Gebrauchslast auf einer Zeile -- wie eine Einwirkung, ohne Querkraft. */
+function gebrauchsfallZeile(querschnitt, liste, wort, index) {
+  const k = querschnitt[liste][index];
   const aendern = (veraenderer) => projektAendern((p) => {
     veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
-      .haeufige[index]);
+      [liste][index]);
   });
 
   const aktiv = k.aktiv !== false;
-  return el('div.einwirkung.ist-haeufig', { class: aktiv ? '' : 'ist-aus' }, [
+  return el('div.einwirkung.ist-gebrauch', { class: aktiv ? '' : 'ist-aus' }, [
     hakenSchalter(aktiv, (wert) => aendern((x) => { x.aktiv = wert; }), 'Lastfall'),
     el('input.ew-name', {
-      type: 'text', value: k.name, title: 'Bezeichnung des häufigen Lastfalls',
+      type: 'text', value: k.name, title: `Bezeichnung des ${wort}en Lastfalls`,
       on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
     }),
     zahlfeld({
-      wert: k.M_Ed, schritt: 10, titel: 'Moment unter häufiger Einwirkung, in kNm',
+      wert: k.M_Ed, schritt: 10, titel: `Moment unter ${wort}er Einwirkung, in kNm`,
       beiAenderung: (v) => aendern((x) => { x.M_Ed = v ?? 0; }),
     }),
     zahlfeld({
       wert: k.N_Ed, schritt: 10,
-      titel: 'Normalkraft unter häufiger Einwirkung, in kN – Zug positiv',
+      titel: `Normalkraft unter ${wort}er Einwirkung, in kN – Zug positiv`,
       beiAenderung: (v) => aendern((x) => { x.N_Ed = v ?? 0; }),
     }),
     el('button.weg', {
-      text: '×', title: 'Häufigen Lastfall entfernen',
+      text: '×', title: `${wort[0].toUpperCase()}${wort.slice(1)}en Lastfall entfernen`,
       on: {
         click: () => projektAendern((p) => {
           p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
-            .haeufige.splice(index, 1);
+            [liste].splice(index, 1);
         }),
       },
     }),

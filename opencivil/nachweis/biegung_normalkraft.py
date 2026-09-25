@@ -223,7 +223,7 @@ class BiegungNormalkraft(Nachweis):
         self.d_ausnutzung: Dict[str, WertDef] = {
             k.name: WertDef(
                 id=f"{basis}.{k.kennung}.erfuellungsgrad",
-                symbol=rf"\alpha_{{eff,{r},{k.kennung}}}",
+                symbol=rf"\alpha_{{eff,{r},{als_text(k.name)}}}",
                 einheit=EINHEITSLOS,
                 beschreibung=f"Erfüllungsgrad {richtung.beschriftung} – {k.name}",
                 referenz="SIA 262:2025, 4.1.4",
@@ -237,7 +237,7 @@ class BiegungNormalkraft(Nachweis):
         self.d_m_rd: Dict[str, WertDef] = {
             k.name: WertDef(
                 id=f"{basis}.{k.kennung}.M_Rd_bei_N_Ed",
-                symbol=rf"M_{{Rd,{r}}}(N_{{Ed}})_{{{k.kennung}}}",
+                symbol=rf"M_{{Rd,{r}}}(N_{{Ed}})_{{{als_text(k.name)}}}",
                 einheit=KNM,
                 beschreibung=(f"Momentenwiderstand bei N_Ed "
                               f"({richtung.beschriftung}) – {k.name}"),

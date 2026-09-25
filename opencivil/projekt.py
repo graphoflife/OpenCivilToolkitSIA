@@ -43,7 +43,8 @@ from opencivil.nachweis.knicken import Knickfall, Knicken
 from opencivil.nachweis.fehlende_bewehrung import Ausgefallen, FehlendeBewehrung
 from opencivil.nachweis.mindestbewehrung import Rissnormalkraft, ZwaengungBiegung
 from opencivil.nachweis.spannungsbegrenzung import (
-    GEFORDERT, Haeufigerfall, Spannungsbegrenzung,
+    GEFORDERT, Gebrauchsfall, GrenzeAusRissbreite, GrenzeGegenFliessen,
+    Spannungsbegrenzung, fallkennung,
 )
 from opencivil.nachweis.sproedes_versagen import SproedesVersagen
 from opencivil.nachweis.querkraft import Querkraft, Querkraftfall
@@ -514,9 +515,23 @@ RISSANFORDERUNGEN: Dict[str, str] = {
 }
 
 
-#: Anteil der Tragsicherheitslastfaelle, der als haeufiger Lastfall gilt,
-#: solange keine eigenen angegeben sind.
-HAEUFIG_ANTEIL = 0.70
+#: Anteil der Tragsicherheitseinwirkungen, der als haeufiger Lastfall gilt --
+#: in Prozent, wie die Maske ihn zeigt. Eine Vorgabe, einstellbar je Platte.
+HAEUFIG_ANTEIL = 70.0
+
+#: Dasselbe fuer die quasi-staendigen Lastfaelle.
+QUASISTAENDIG_ANTEIL = 60.0
+
+
+def abgeleiteter_name(name: str, anteil: float) -> str:
+    """
+    Wie ein aus der Tragsicherheit abgeleiteter Lastfall heisst.
+
+    Die eine Stelle dafuer: der Aufbau benennt die Faelle so, und die
+    Namenspruefung muss genau denselben Namen bilden, um einen gleichlautenden
+    eigenen Fall zu erkennen. ``70.0`` wird zu «70 %», ``62.5`` zu «62.5 %».
+    """
+    return f"{name} ({anteil:g} %)"
 
 
 
@@ -566,12 +581,13 @@ class SpannungsfallEintrag(Beschreibung):
 
 
 @dataclass
-class HaeufigEintrag(Beschreibung):
+class GebrauchsfallEintrag(Beschreibung):
     """
-    Eine Schnittgroessenkombination unter haeufiger Einwirkung.
+    Eine Schnittgroessenkombination unter Gebrauchslast.
 
     Wie :class:`KombinationEintrag`, aber ohne Querkraft: begrenzt wird die
-    Stahlspannung, und dafuer zaehlen Moment und Normalkraft.
+    Stahlspannung, und dafuer zaehlen Moment und Normalkraft. Ob der Fall
+    haeufig oder quasi-staendig ist, sagt die Liste, in der er steht.
     """
 
     name: str
@@ -581,10 +597,12 @@ class HaeufigEintrag(Beschreibung):
     """Ob dieser Lastfall gerechnet wird. Ausgeschaltet bleibt er stehen."""
 
     @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "HaeufigEintrag":
-        _nur_x(d, f"Der häufige Lastfall '{d.get('name')}'")
+    def aus_dict(cls, d: Mapping[str, Any],
+                 wort: str = "häufige") -> "GebrauchsfallEintrag":
+        """``wort`` nennt die Liste in der Meldung -- «häufige» oder «quasi-ständige»."""
+        _nur_x(d, f"Der {wort} Lastfall '{d.get('name')}'")
         return cls(
-            name=_pflichtfeld(d, "name", "Ein häufiger Lastfall"),
+            name=_pflichtfeld(d, "name", f"Ein {wort}r Lastfall"),
             M_Ed=_zahl(d, "M_Ed", 0.0),
             N_Ed=_zahl(d, "N_Ed", 0.0),
             aktiv=bool(d.get("aktiv", True)),
@@ -718,8 +736,11 @@ class QuerschnittEintrag(Beschreibung):
     zwaengung_begrenzt: bool = False
     """Ob die Zwaengung auf 500 mm Plattendicke begrenzt angesetzt wird."""
 
-    haeufige: List[HaeufigEintrag] = field(default_factory=list)
-    """Eigene haeufige Lastfaelle; leer, solange die 70-%-Regel gilt."""
+    haeufige: List[GebrauchsfallEintrag] = field(default_factory=list)
+    """Eigene haeufige Lastfaelle -- neben den abgeleiteten, nicht statt ihrer."""
+
+    quasistaendige: List[GebrauchsfallEintrag] = field(default_factory=list)
+    """Eigene quasi-staendige Lastfaelle -- ebenso."""
 
     knickfaelle: List[KnickEintrag] = field(default_factory=list)
     """Knicknachweise; leer heisst: keiner."""
@@ -730,12 +751,21 @@ class QuerschnittEintrag(Beschreibung):
     haeufige_aus_tragsicherheit: bool = False
     """
     Ob die aus den Tragsicherheitsfaellen abgeleiteten haeufigen Lastfaelle
-    *gefuehrt* werden -- mit :data:`HAEUFIG_ANTEIL`.
+    *gefuehrt* werden -- mit :attr:`haeufige_anteil`.
 
-    Gebildet werden sie immer; ausgeschaltet rechnen sie still mit. Die 70 %
-    sind eine bequeme Abschaetzung und keine Norm, darum stehen sie nur auf
-    Verlangen in der Tabelle.
+    Gebildet werden sie immer; ausgeschaltet rechnen sie still mit. Der
+    Anteil ist eine bequeme Abschaetzung und keine Norm, darum stehen die
+    Faelle nur auf Verlangen in der Tabelle.
     """
+
+    haeufige_anteil: float = HAEUFIG_ANTEIL
+    """Welcher Anteil der Tragsicherheitseinwirkungen als haeufig gilt, in %."""
+
+    quasistaendige_aus_tragsicherheit: bool = False
+    """Dasselbe fuer die quasi-staendigen Lastfaelle."""
+
+    quasistaendige_anteil: float = QUASISTAENDIG_ANTEIL
+    """Welcher Anteil als quasi-staendig gilt, in %."""
 
     automatik_modus: str = "grund_ohne"
     """Wonach das Bewehrungswerkzeug sucht -- siehe ``bewehrungssuche.Suchmodus``."""
@@ -892,7 +922,15 @@ class QuerschnittEintrag(Beschreibung):
             zwaengung_begrenzt=bool(d.get("zwaengung_begrenzt", False)),
             haeufige_aus_tragsicherheit=bool(
                 d.get("haeufige_aus_tragsicherheit", False)),
-            haeufige=[HaeufigEintrag.aus_dict(x) for x in (d.get("haeufige") or [])],
+            haeufige_anteil=_zahl(d, "haeufige_anteil", HAEUFIG_ANTEIL),
+            haeufige=[GebrauchsfallEintrag.aus_dict(x)
+                      for x in (d.get("haeufige") or [])],
+            quasistaendige_aus_tragsicherheit=bool(
+                d.get("quasistaendige_aus_tragsicherheit", False)),
+            quasistaendige_anteil=_zahl(d, "quasistaendige_anteil",
+                                        QUASISTAENDIG_ANTEIL),
+            quasistaendige=[GebrauchsfallEintrag.aus_dict(x, "quasi-ständige")
+                            for x in (d.get("quasistaendige") or [])],
             knickfaelle=[KnickEintrag.aus_dict(x)
                          for x in (d.get("knickfaelle") or [])],
             spannungsfaelle=[SpannungsfallEintrag.aus_dict(x)
@@ -941,7 +979,10 @@ class Aufbau:
     """Zwaengung auf Biegung, je ``<querschnitt>.x``."""
 
     spannung: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)
-    """Stahlspannung unter haeufiger Einwirkung, je ``<querschnitt>.<richtung>``."""
+    """Stahlspannung gegen Fliessen unter haeufiger Einwirkung, je ``<querschnitt>.x``."""
+
+    spannung_riss: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)
+    """Stahlspannung aus der Rissbreite unter quasi-staendiger Einwirkung, je ``<querschnitt>.x``."""
 
     knicken: Dict[str, Knicken] = field(default_factory=dict)
     """Nachweis am verformten System, je Querschnitt -- nur in x-Richtung."""
@@ -973,7 +1014,7 @@ class Aufbau:
     #: finden.
     NACHWEISFELDER = ("nachweise", "querkraft", "duktilitaet", "fehlende",
                       "rissnormalkraft", "sproede", "zwaengung_biegung",
-                      "spannung", "knicken")
+                      "spannung_riss", "spannung", "knicken")
 
     def nachweise_je_feld(self):
         """Alle Nachweise, Feld fuer Feld und in der Reihenfolge der Liste."""
@@ -1135,6 +1176,25 @@ class Projekt(Beschreibung):
 
         for eintrag in self.querschnitte:
             self._namen_pruefen(eintrag)
+            self._anteile_pruefen(eintrag)
+
+    @staticmethod
+    def _anteile_pruefen(eintrag: "QuerschnittEintrag") -> None:
+        """
+        Ein Anteil muss zwischen null und hundert Prozent liegen.
+
+        Null ergaebe Lastfaelle ohne Last -- ein Nachweis, der immer aufgeht
+        und nichts sagt. Ueber hundert waere keine Gebrauchslast mehr, sondern
+        mehr als die Tragsicherheit. Gemeldet statt begrenzt: wer 700 statt
+        70 tippt, soll es erfahren und nicht mit 100 weiterrechnen.
+        """
+        for anteil, was in ((eintrag.haeufige_anteil, "häufigen"),
+                            (eintrag.quasistaendige_anteil, "quasi-ständigen")):
+            if not 0.0 < anteil <= 100.0:
+                raise ProjektFehler(
+                    f"Platte '{eintrag.name}': der Anteil für die {was} "
+                    f"Lastfälle muss zwischen 0 und 100 % liegen, angegeben "
+                    f"sind {anteil:g} %.")
 
     @staticmethod
     def _namen_pruefen(eintrag: "QuerschnittEintrag") -> None:
@@ -1163,22 +1223,46 @@ class Projekt(Beschreibung):
                 gesehen.add(f.name)
 
         eindeutig(eintrag.kombinationen, "Tragsicherheitseinwirkung")
-        eindeutig(eintrag.haeufige, "häufiger Lastfall")
         eindeutig(eintrag.knickfaelle, "Knicknachweis")
         eindeutig(eintrag.spannungsfaelle, "Spannung-Dehnung-Analyse")
 
-        # Die abgeleiteten Faelle tragen den Namen ihrer Kombination mit
-        # angehaengtem Anteil. Wer einen eigenen Lastfall genau so nennt,
-        # traefe denselben Schluessel.
-        abgeleitet = {f"{k.name} ({HAEUFIG_ANTEIL * 100:.0f} %)"
-                      for k in eintrag.kombinationen}
-        for h in eintrag.haeufige:
-            if h.name in abgeleitet:
-                raise ProjektFehler(
-                    f"Platte '{eintrag.name}': der häufige Lastfall "
-                    f"'{h.name}' heisst wie der aus der Tragsicherheit "
-                    f"abgeleitete. Bitte anders benennen -- sonst lässt sich "
-                    f"nicht auseinanderhalten, welcher gerechnet wurde.")
+        # Je Gebrauchsliste fuer sich -- sie landen in getrennten Nachweisen
+        # und damit in getrennten ID-Raeumen. Ein Fall «Dauer» darf in beiden
+        # stehen.
+        for eigene, anteil, wort in (
+                (eintrag.haeufige, eintrag.haeufige_anteil, "häufige"),
+                (eintrag.quasistaendige, eintrag.quasistaendige_anteil,
+                 "quasi-ständige")):
+            eindeutig(eigene, f"{wort}r Lastfall")
+
+            # Die abgeleiteten Faelle tragen den Namen ihrer Kombination mit
+            # angehaengtem Anteil. Wer einen eigenen Lastfall genau so nennt,
+            # traefe denselben Schluessel.
+            abgeleitet = [abgeleiteter_name(k.name, anteil)
+                          for k in eintrag.kombinationen]
+            for h in eigene:
+                if h.name in abgeleitet:
+                    raise ProjektFehler(
+                        f"Platte '{eintrag.name}': der {wort} Lastfall "
+                        f"'{h.name}' heisst wie der aus der Tragsicherheit "
+                        f"abgeleitete. Bitte anders benennen -- sonst lässt "
+                        f"sich nicht auseinanderhalten, welcher gerechnet "
+                        f"wurde.")
+
+            # Verschiedene Namen koennen dieselbe Wert-ID ergeben: «Feld A»
+            # und «Feld-A» werden beide zu «Feld_A». Das Rechenwerk wiese den
+            # zweiten zurueck, aber mit einer Meldung ueber Wert-IDs, die
+            # niemand an der Maske versteht.
+            kennungen: Dict[str, str] = {}
+            for name in abgeleitet + [h.name for h in eigene]:
+                frueher = kennungen.setdefault(fallkennung(name), name)
+                if frueher != name:
+                    raise ProjektFehler(
+                        f"Platte '{eintrag.name}': die {wort}n Lastfälle "
+                        f"'{frueher}' und '{name}' unterscheiden sich nur in "
+                        f"Satz- oder Leerzeichen. Im Bericht fielen sie auf "
+                        f"denselben Eintrag -- bitte einen davon anders "
+                        f"benennen.")
 
     # -- Aufbau -------------------------------------------------------------
 
@@ -1190,14 +1274,32 @@ class Projekt(Beschreibung):
         etwa wenn ein Querschnitt auf ein geloeschtes Material verweist.
 
         Mit ``schnell`` lassen Nachweise teure Nebenrechnungen weg, die das
-        Urteil nicht aendern -- derzeit die Suche nach der Knickgrenzkraft.
-        Gedacht fuer das Bewehrungswerkzeug, das hundertfach rechnet und nur
-        wissen muss, ob es aufgeht. Fuer eine Herleitung ist das nichts: dort
-        soll die Zahl stehen, die auch in der Tabelle steht.
+        Urteil nicht aendern -- die Suche nach der Knickgrenzkraft und die
+        genaue Resistenzlinie --, und ganz stille Nachweise entstehen gar
+        nicht erst. Gedacht fuer das Bewehrungswerkzeug, das hundertfach
+        rechnet und nur wissen muss, ob es aufgeht. Fuer eine Herleitung ist
+        das nichts: dort soll die Zahl stehen, die auch in der Tabelle steht.
         """
         self.pruefen()
         werk = Rechenwerk()
         aufbau = Aufbau(werk=werk)
+
+        def eintragen(feld: str, schluessel: str, nachweis) -> None:
+            """
+            Einen Nachweis anmelden -- ausser er ist ganz still, und es wird
+            schnell gerechnet.
+
+            Den schnellen Weg nimmt nur die Bewehrungssuche, und die zaehlt
+            stille Urteile nicht (:func:`bewehrungssuche.bewerte`). Ein ganz
+            stiller Nachweis kann ihr Ergebnis also nicht aendern, er kostet
+            nur Zeit -- und bei der Stahlspannung, die immer mitlaeuft, ist
+            das der groessere Teil der ganzen Rechnung. Exakt und nicht
+            genaehert: gezaehlt wird dasselbe wie vorher.
+            """
+            if schnell and nachweis.still:
+                return
+            werk.registriere(nachweis)
+            getattr(aufbau, feld)[schluessel] = nachweis
 
         # Nur wenn mehrere Materialien derselben Art vorkommen, braucht es
         # Indizes an den Symbolen -- sonst waere f_{cd,C30/37} bloss Ballast.
@@ -1267,39 +1369,55 @@ class Projekt(Beschreibung):
                     nachweis_sv = SproedesVersagen(
                         querschnitt, richtung, lagen, nachweis)
                     nachweis_sv.still = not an_sproede
-                    werk.registriere(nachweis_sv)
-                    aufbau.sproede[f"{eintrag.kennung}.x"] = nachweis_sv
+                    eintragen("sproede", f"{eintrag.kennung}.x", nachweis_sv)
 
                     biegung = ZwaengungBiegung(
                         querschnitt, richtung, lagen,
                         anforderung=eintrag.rissanforderung,
                         kriechzahl=eintrag.kriechzahl)
                     biegung.still = not an_biegung
-                    werk.registriere(biegung)
-                    aufbau.zwaengung_biegung[f"{eintrag.kennung}.x"] = biegung
+                    eintragen("zwaengung_biegung", f"{eintrag.kennung}.x",
+                              biegung)
 
                     zwang = Rissnormalkraft(
                         querschnitt, richtung,
                         anforderung=eintrag.rissanforderung,
                         begrenzt=eintrag.zwaengung_begrenzt)
                     zwang.still = not an_zwang
-                    werk.registriere(zwang)
-                    aufbau.rissnormalkraft[f"{eintrag.kennung}.x"] = zwang
+                    eintragen("rissnormalkraft", f"{eintrag.kennung}.x", zwang)
 
                     duktilitaet = Duktilitaet(querschnitt, lagen)
                     duktilitaet.still = not an_duktil
-                    werk.registriere(duktilitaet)
-                    aufbau.duktilitaet[eintrag.kennung] = duktilitaet
+                    eintragen("duktilitaet", eintrag.kennung, duktilitaet)
 
-                # Stahlspannung unter haeufiger Einwirkung. Nur bei erhoehter
-                # und hoher Anforderung -- bei normaler steht in Tabelle 17
-                # ein Strich.
-                haeufige, laute = self._haeufige(eintrag)
-                if haeufige and eintrag.rissanforderung in GEFORDERT:
-                    spannung = Spannungsbegrenzung(querschnitt, richtung, haeufige)
-                    spannung.stillstellen([f.name for f in haeufige], laute)
-                    werk.registriere(spannung)
-                    aufbau.spannung[f"{eintrag.kennung}.x"] = spannung
+                # Stahlspannung aus der Rissbreite unter quasi-staendiger
+                # Einwirkung. Bei jeder Anforderung -- bei normaler ist die
+                # Grenze f_yk, aber auch dort darf die Bewehrung unter
+                # Dauerlast nicht fliessen.
+                faelle, laute = self._gebrauchsfaelle(
+                    eintrag, eigene=eintrag.quasistaendige,
+                    ableiten=eintrag.quasistaendige_aus_tragsicherheit,
+                    anteil=eintrag.quasistaendige_anteil)
+                if faelle:
+                    riss = Spannungsbegrenzung(
+                        querschnitt, richtung, faelle,
+                        grenze=GrenzeAusRissbreite(eintrag.rissanforderung))
+                    riss.stillstellen([f.name for f in faelle], laute)
+                    eintragen("spannung_riss", f"{eintrag.kennung}.x", riss)
+
+                # Stahlspannung gegen Fliessen unter haeufiger Einwirkung. Nur
+                # bei erhoehter und hoher Anforderung -- bei normaler steht in
+                # Tabelle 17 ein Strich.
+                faelle, laute = self._gebrauchsfaelle(
+                    eintrag, eigene=eintrag.haeufige,
+                    ableiten=eintrag.haeufige_aus_tragsicherheit,
+                    anteil=eintrag.haeufige_anteil)
+                if faelle and eintrag.rissanforderung in GEFORDERT:
+                    spannung = Spannungsbegrenzung(
+                        querschnitt, richtung, faelle,
+                        grenze=GrenzeGegenFliessen())
+                    spannung.stillstellen([f.name for f in faelle], laute)
+                    eintragen("spannung", f"{eintrag.kennung}.x", spannung)
 
                 mit_querkraft = [k for k in aktiv if k.V_Ed]
                 if mit_querkraft:
@@ -1443,55 +1561,60 @@ class Projekt(Beschreibung):
             praefix=f"querschnitt.{eintrag.kennung}",
         )
 
-    def _haeufige(self, eintrag: "QuerschnittEintrag",
-                  ) -> Tuple[List[Haeufigerfall], List[str]]:
+    def _gebrauchsfaelle(
+        self, eintrag: "QuerschnittEintrag", *,
+        eigene: Sequence["GebrauchsfallEintrag"], ableiten: bool,
+        anteil: float,
+    ) -> Tuple[List[Gebrauchsfall], List[str]]:
         """
-        Die haeufigen Lastfaelle -- und welche davon laut sind.
+        Die Lastfaelle eines Stahlspannungsnachweises -- und welche laut sind.
+
+        Einmal fuer die haeufigen, einmal fuer die quasi-staendigen; beide
+        Listen werden gleich gebildet und unterscheiden sich nur im Anteil.
 
         Die eigens angegebenen, und zusaetzlich die Tragsicherheitsfaelle mit
-        :data:`HAEUFIG_ANTEIL`. Beides nebeneinander: die 70 % sind eine
-        bequeme Abschaetzung, decken aber nicht den Fall ab, den es nur unter
-        haeufiger Einwirkung gibt. Wer einen solchen kennt, soll ihn
-        dazustellen koennen, ohne die Abschaetzung fuer alle anderen
-        aufzugeben.
+        ``anteil`` Prozent. Beides nebeneinander: der Anteil ist eine bequeme
+        Abschaetzung, deckt aber nicht den Fall ab, den es nur unter
+        Gebrauchslast gibt. Wer einen solchen kennt, soll ihn dazustellen
+        koennen, ohne die Abschaetzung fuer alle anderen aufzugeben.
 
-        Die abgeleiteten Faelle entstehen auch dann, wenn ihr Schalter aus
-        ist -- dann eben still. Sie ganz wegzulassen hiesse, den Nachweis erst
-        auf Verlangen zu fuehren; so steht wenigstens ein Hinweis da, wenn die
+        Die abgeleiteten Faelle entstehen auch dann, wenn ``ableiten`` aus ist
+        -- dann eben still. Sie ganz wegzulassen hiesse, den Nachweis erst auf
+        Verlangen zu fuehren; so steht wenigstens ein Hinweis da, wenn die
         Abschaetzung nicht aufgeht.
 
         **Was das kostet.** Jeder Fall ist ein Gleichgewicht am gerissenen
-        Querschnitt, also ein Durchlauf des Faserloesers -- rund 8 ms, und
-        damit der teuerste stille Nachweis, den es hier gibt. Gemessen an der
-        Beispielplatte: bei normaler Anforderung entsteht er gar nicht (47 ms
-        gesamt), bei erhoehter kostet er die Haelfte der Rechenzeit (98 ms).
-        Ob der Schalter dabei an oder aus steht, macht keinen Unterschied --
-        bei erhoehter Anforderung verlangt die Norm den Nachweis ohnehin, und
-        ausgeschaltet ist nur die Frage, ob man ihn sehen will. Wer die Zeit
-        zurueckhaben will, kommt nicht an dieser Stelle weiter, sondern am
-        Loeser oder daran, die stillen Nachweise erst nach dem sichtbaren
-        Ergebnis nachzuziehen.
+        Querschnitt, also ein Durchlauf des Faserloesers -- rund 8 ms.
+        Gemessen an der Beispielplatte mit drei Kombinationen: der
+        quasi-staendige Nachweis laeuft immer und hebt die ganze Rechnung von
+        27 auf 52 ms; bei erhoehter Anforderung kommt der haeufige dazu, 79 ms.
+        Die Bewehrungssuche zahlt davon nichts, solange beide still sind --
+        im schnellen Aufbau entstehen ganz stille Nachweise gar nicht (2.5
+        statt 29 ms je Bewertung bei erhoehter Anforderung). Wer die Zeit
+        auch in der Anzeige zurueckhaben will, kommt nicht an dieser Stelle
+        weiter, sondern am Loeser.
 
         Die Rechnung steht hier und nicht in der Oberflaeche: dort waere sie
         eine zweite Wahrheit.
         """
+        faktor = anteil / 100.0
         abgeleitet = [
-            Haeufigerfall(
-                name=f"{k.name} ({HAEUFIG_ANTEIL * 100:.0f} %)",
-                M_Ed=Groesse(HAEUFIG_ANTEIL * k.M_Ed, KNM),
-                N_Ed=Groesse(HAEUFIG_ANTEIL * k.N_Ed, KN))
+            Gebrauchsfall(
+                name=abgeleiteter_name(k.name, anteil),
+                M_Ed=Groesse(faktor * k.M_Ed, KNM),
+                N_Ed=Groesse(faktor * k.N_Ed, KN))
             for k in eintrag.kombinationen if k.aktiv
         ]
-        eigene = [
-            Haeufigerfall(name=h.name,
+        eigen = [
+            Gebrauchsfall(name=h.name,
                           M_Ed=Groesse(h.M_Ed, KNM),
                           N_Ed=Groesse(h.N_Ed, KN))
-            for h in eintrag.haeufige if h.aktiv
+            for h in eigene if h.aktiv
         ]
-        laute = [f.name for f in eigene]
-        if eintrag.haeufige_aus_tragsicherheit:
+        laute = [f.name for f in eigen]
+        if ableiten:
             laute += [f.name for f in abgeleitet]
-        return abgeleitet + eigene, laute
+        return abgeleitet + eigen, laute
 
     def _ausgefallene(
         self, kombinationen: Sequence[KombinationEintrag], richtung: Richtung

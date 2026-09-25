@@ -66,6 +66,7 @@ from opencivil.core.berechnung import (
     Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, MM, Groesse
+from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
 from opencivil.material.basis import mit_index
@@ -248,7 +249,7 @@ class Knicken(Nachweis):
         self.d_ausnutzung: Dict[str, WertDef] = {
             f.name: WertDef(
                 id=f"{basis}.{f.kennung}.erfuellungsgrad",
-                symbol=rf"\alpha_{{eff,K,{f.kennung}}}",
+                symbol=rf"\alpha_{{eff,K,{als_text(f.name)}}}",
                 einheit=EINHEITSLOS,
                 beschreibung=f"Erfüllungsgrad Knicken – {f.name}",
                 referenz="SIA 262:2025, 4.3.7",

@@ -7,7 +7,7 @@ from pathlib import Path
 
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, N_PRO_MM2, Groesse
 from opencivil.projekt import (
-    Aufbau, HaeufigEintrag, KnickEintrag, KombinationEintrag, LageEintrag,
+    Aufbau, GebrauchsfallEintrag, KnickEintrag, KombinationEintrag, LageEintrag,
     MaterialEintrag, PostenEintrag, Projekt, ProjektFehler,
     QuerkraftbewehrungEintrag, QuerschnittEintrag,
 )
@@ -63,7 +63,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
             LageEintrag: LageEintrag(stahl="s1"),
             KombinationEintrag: KombinationEintrag("Feld", M_Ed=100.0),
             QuerkraftbewehrungEintrag: QuerkraftbewehrungEintrag(durchmesser=10.0),
-            HaeufigEintrag: HaeufigEintrag("Gebrauch", M_Ed=70.0),
+            GebrauchsfallEintrag: GebrauchsfallEintrag("Gebrauch", M_Ed=70.0),
             QuerschnittEintrag: QuerschnittEintrag("q1", "Platte", "b1"),
         }
         for klasse, beispiel in beispiele.items():
@@ -454,10 +454,10 @@ class TestDoppelteFallnamen(unittest.TestCase):
         self.assertIn("'Feld' ist zweimal", str(fehler.exception))
 
     def test_auch_haeufige_und_knickfaelle(self):
-        from opencivil.projekt import HaeufigEintrag, KnickEintrag
+        from opencivil.projekt import GebrauchsfallEintrag, KnickEintrag
 
         for feld, eintraege in (
-            ("haeufige", [HaeufigEintrag("Gebrauch"), HaeufigEintrag("Gebrauch")]),
+            ("haeufige", [GebrauchsfallEintrag("Gebrauch"), GebrauchsfallEintrag("Gebrauch")]),
             ("knickfaelle", [KnickEintrag("Stütze", N_Ed=-100.0, laenge=3.0,
                                           knicklaenge=3.0),
                              KnickEintrag("Stütze", N_Ed=-200.0, laenge=3.0,
@@ -474,12 +474,12 @@ class TestDoppelteFallnamen(unittest.TestCase):
         Die abgeleiteten tragen den Namen ihrer Kombination mit angehängtem
         Anteil -- wer genau so benennt, trifft denselben Schlüssel.
         """
-        from opencivil.projekt import HaeufigEintrag
+        from opencivil.projekt import GebrauchsfallEintrag
 
         projekt = Projekt.beispiel()
         q = projekt.querschnitt("q1")
         q.rissanforderung = "hoch"
-        q.haeufige = [HaeufigEintrag(f"{q.kombinationen[0].name} (70 %)",
+        q.haeufige = [GebrauchsfallEintrag(f"{q.kombinationen[0].name} (70 %)",
                                      M_Ed=70.0)]
         with self.assertRaises(ProjektFehler) as fehler:
             projekt.aufbauen()
@@ -487,13 +487,13 @@ class TestDoppelteFallnamen(unittest.TestCase):
 
     def test_verschiedene_namen_gehen_weiterhin(self):
         """Die Regel darf nicht mehr verbieten als sie muss."""
-        from opencivil.projekt import HaeufigEintrag
+        from opencivil.projekt import GebrauchsfallEintrag
 
         projekt = Projekt.beispiel()
         q = projekt.querschnitt("q1")
         q.rissanforderung = "hoch"
-        q.haeufige = [HaeufigEintrag("Gebrauch", M_Ed=70.0),
-                      HaeufigEintrag("Gebrauch selten", M_Ed=40.0)]
+        q.haeufige = [GebrauchsfallEintrag("Gebrauch", M_Ed=70.0),
+                      GebrauchsfallEintrag("Gebrauch selten", M_Ed=40.0)]
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         self.assertEqual(antwort.status, 200)
 
@@ -551,13 +551,13 @@ class TestSpannungsnachweisNurWoGefordert(unittest.TestCase):
                          {"normal": False, "erhoeht": True, "hoch": True})
 
     def test_und_es_stimmt_mit_dem_ueberein_was_gebaut_wird(self):
-        from opencivil.projekt import HaeufigEintrag
+        from opencivil.projekt import GebrauchsfallEintrag
 
         for eintrag in api.katalog()["rissanforderungen"]:
             projekt = Projekt.beispiel()
             q = projekt.querschnitt("q1")
             q.rissanforderung = eintrag["wert"]
-            q.haeufige = [HaeufigEintrag("Gebrauch", M_Ed=70.0)]
+            q.haeufige = [GebrauchsfallEintrag("Gebrauch", M_Ed=70.0)]
             with self.subTest(anforderung=eintrag["wert"]):
                 self.assertEqual(bool(projekt.aufbauen().spannung),
                                  eintrag["spannungsnachweis"])
@@ -1123,7 +1123,7 @@ class TestNurDieTragrichtungX(unittest.TestCase):
         anderen Querschnitt anzusetzen als der Benutzer gemeint hat.
         """
         for klasse, was in ((KombinationEintrag, "Einwirkung"),
-                            (HaeufigEintrag, "häufige Lastfall")):
+                            (GebrauchsfallEintrag, "häufige Lastfall")):
             with self.subTest(klasse=klasse.__name__):
                 with self.assertRaises(ProjektFehler) as fehler:
                     klasse.aus_dict({"name": "Feld", "M_Ed": 100.0,
@@ -1731,7 +1731,7 @@ class TestMindestbewehrungsEingaben(unittest.TestCase):
         self.assertEqual(q.haeufige, [])
 
     def test_alles_ueberlebt_die_datei(self):
-        from opencivil.projekt import HaeufigEintrag
+        from opencivil.projekt import GebrauchsfallEintrag
 
         projekt = Projekt.beispiel()
         q = projekt.querschnitt("q1")
@@ -1739,7 +1739,7 @@ class TestMindestbewehrungsEingaben(unittest.TestCase):
         q.zwaengung = True
         q.zwaengung_begrenzt = True
         q.haeufige_aus_tragsicherheit = False
-        q.haeufige = [HaeufigEintrag("Gebrauch", M_Ed=70.0, N_Ed=-40.0)]
+        q.haeufige = [GebrauchsfallEintrag("Gebrauch", M_Ed=70.0, N_Ed=-40.0)]
 
         kopie = Projekt.aus_dict(json.loads(json.dumps(projekt.als_dict())))
         k = kopie.querschnitt("q1")
@@ -1780,7 +1780,7 @@ class TestMindestbewehrungsEingaben(unittest.TestCase):
         Die häufigen Lastfälle werden gerechnet -- aber nur bei erhöhter oder
         hoher Anforderung. Bei normaler steht in Tabelle 17 ein Strich.
         """
-        from opencivil.projekt import HaeufigEintrag
+        from opencivil.projekt import GebrauchsfallEintrag
 
         ohne = dienst.bearbeite(
             "rechnen", {"projekt": Projekt.beispiel().als_dict()})
@@ -1791,7 +1791,7 @@ class TestMindestbewehrungsEingaben(unittest.TestCase):
         q = projekt.querschnitt("q1")
         q.rissanforderung = "hoch"
         q.haeufige_aus_tragsicherheit = False
-        q.haeufige = [HaeufigEintrag("Gebrauch", M_Ed=70.0)]
+        q.haeufige = [GebrauchsfallEintrag("Gebrauch", M_Ed=70.0)]
         mit = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         namen = [u["fall"] for u in mit.daten["urteile"] if u["art"] == "σ_s"]
         self.assertEqual(namen, ["Gebrauch"])

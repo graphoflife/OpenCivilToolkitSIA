@@ -104,7 +104,8 @@ def katalog() -> dict:
         # das Fliessen unter haeufiger Einwirkung ueberhaupt verlangt -- bei
         # normaler steht in Tabelle 17 ein Strich. Die Oberflaeche braucht
         # das, um die eingetragenen Lastfaelle nicht stillschweigend
-        # wegzurechnen; die Regel selbst bleibt im Kern.
+        # wegzurechnen; die Regel selbst bleibt im Kern. Nur dieser eine
+        # Nachweis -- der quasi-staendige aus der Rissbreite laeuft immer.
         "rissanforderungen": [
             {"wert": wert, "beschriftung": text,
              "spannungsnachweis": wert in GEFORDERT}

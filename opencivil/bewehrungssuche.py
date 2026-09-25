@@ -333,8 +333,8 @@ def _arbeitskopie(projekt, kennung: str, *, kraefte: bool, leeren: bool = True):
     sie setzt ``leeren=False``, denn ohne statische Hoehe gibt es keinen
     Querkraftwiderstand.
 
-    Ohne ``kraefte`` fallen zusaetzlich Kombinationen, Knickfaelle und
-    haeufige Lastfaelle weg. Uebrig bleiben die Nachweise, die eine Platte
+    Ohne ``kraefte`` fallen zusaetzlich alle Lastfaelle weg -- Kombinationen,
+    Knickfaelle, haeufige und quasi-staendige. Uebrig bleiben die Nachweise, die eine Platte
     unabhaengig von der Belastung erfuellen muss.
 
     Abgeschaltet wird hier und nicht beim Bewerten: gebaut wird nur, was
@@ -364,10 +364,22 @@ def _arbeitskopie(projekt, kennung: str, *, kraefte: bool, leeren: bool = True):
             lage.grund.durchmesser = 0
             lage.zulage.durchmesser = 0
     if not kraefte:
-        eintrag.kombinationen = []
-        eintrag.knickfaelle = []
-        eintrag.haeufige = []
+        _ohne_kraefte(eintrag)
     return kopie
+
+
+def _ohne_kraefte(eintrag) -> None:
+    """
+    Alle Lastfaelle weg -- was bleibt, fragt nicht nach der Belastung.
+
+    Eine Stelle, weil es zwei Aufrufer gibt und jede neue Lastfallliste an
+    beide muesste. Die quasi-staendigen kamen dazu, als hier noch zwei Kopien
+    standen; vergessen haette man sie in einer davon.
+    """
+    eintrag.kombinationen = []
+    eintrag.knickfaelle = []
+    eintrag.haeufige = []
+    eintrag.quasistaendige = []
 
 
 def _eine_teilung(projekt, kennung: str, teilung: float,
@@ -555,9 +567,7 @@ def _duktilitaetsbefund(projekt, kennung: str, loesung: "Loesung") -> str:
         if eintrag.richtung_von(nummer) is Richtung.X)
     if not eintrag.duktilitaet:
         return ""
-    eintrag.kombinationen = []
-    eintrag.knickfaelle = []
-    eintrag.haeufige = []
+    _ohne_kraefte(eintrag)
     bewertung = bewerte(probe)
     if bewertung.erfuellt():
         return "Der Duktilitätsnachweis geht damit auf."

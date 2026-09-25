@@ -51,6 +51,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from enum import Enum
 from typing import Callable, List, Optional, Sequence, Tuple
 
 #: Fasern ueber die Plattenhoehe. 60 reichen: die Betonspannung ist stetig,
@@ -197,8 +198,9 @@ class Querschnittsloeser:
 
     ``beton`` und ``stahl`` sind Funktionen ``eps -> sigma`` in SI. Damit
     bleibt der Loeser frei von Annahmen ueber das Werkstoffgesetz: die
-    Spannungsbegrenzung rechnet elastisch mit Kriechen, der Knicknachweis mit
-    dem nichtlinearen Gesetz der Norm.
+    Spannungsbegrenzung rechnet elastisch mit Kriechen und charakteristischen
+    Festigkeiten, der Knicknachweis mit dem nichtlinearen Gesetz der Norm und
+    Bemessungswerten -- siehe :class:`Werkstoffsatz`.
 
     **Das Suchfenster muss zu den Gesetzen passen.** ``eps_druck`` und
     ``eps_zug`` duerfen nicht weiter reichen als der Bereich, in dem beide
@@ -399,15 +401,69 @@ class Querschnittsloeser:
 # ===========================================================================
 
 
-def beton_elastisch(*, E_c: float) -> Callable[[float], float]:
+class Werkstoffsatz(str, Enum):
     """
-    Beton ohne Zugfestigkeit, im Druck linear.
+    Mit welchen Festigkeiten die Werkstoffgesetze rechnen.
+
+    **Bemessung** -- ``f_cd`` und ``f_yd``. Fuer die Tragsicherheit: gefragt
+    ist, was der Querschnitt *darf*, und dahinein gehoert der
+    Teilsicherheitsbeiwert.
+
+    **Charakteristisch** -- ``f_ck`` und ``f_yk``. Fuer die
+    Gebrauchstauglichkeit: gefragt ist, was der Querschnitt *tut*, und Stahl
+    fliesst bei ``f_yk``, nicht bei ``f_yd``. Mit dem Plateau bei ``f_yd``
+    laege jede Stahlspannung unter 435 N/mm², und eine Grenze darueber --
+    ``f_yk`` bei normaler Rissanforderung -- waere nie zu ueberschreiten: ein
+    Nachweis, der per Konstruktion immer aufgeht.
+
+    Der Satz bestimmt, **wo die Plateaus liegen**, und sonst nichts. Die
+    Moduln und Dehnungsgrenzen sind in beiden Saetzen dieselben. Er steht hier
+    als Name und nicht als zwei Zahlen an jeder Aufrufstelle: welche Werte ein
+    Nachweis ansetzt, ist eine Entscheidung, und eine Entscheidung soll man
+    lesen koennen, statt sie aus ``f_sd=...`` erschliessen zu muessen.
+    """
+
+    BEMESSUNG = "bemessung"
+    CHARAKTERISTISCH = "charakteristisch"
+
+    @property
+    def stahl(self) -> str:
+        """Kurzname der Stahlfestigkeit -- dort beginnt das Fliessplateau."""
+        return "f_yd" if self is Werkstoffsatz.BEMESSUNG else "f_yk"
+
+    @property
+    def beton(self) -> str:
+        """Kurzname der Betonfestigkeit -- dort endet der Anstieg im Druck."""
+        return "f_cd" if self is Werkstoffsatz.BEMESSUNG else "f_ck"
+
+
+def beton_elastisch(*, E_c: float,
+                    f_c: float = math.inf) -> Callable[[float], float]:
+    """
+    Beton ohne Zugfestigkeit, im Druck linear bis ``f_c``, dann waagrecht.
 
     Fuer den gerissenen Gebrauchszustand. ``E_c`` ist bereits der wirksame
-    Modul, also ``E_cm/(1+phi)``, falls Kriechen zaehlt.
+    Modul, also ``E_cm/(1+phi)``, falls Kriechen zaehlt. ``f_c`` ist die
+    Festigkeit aus dem :class:`Werkstoffsatz` -- im Gebrauchszustand ``f_ck``.
+
+    Linear und nicht als Parabel: im Gebrauchszustand liegt die
+    Betonspannung weit unter der Festigkeit, und dort ist die Parabel eine
+    Gerade. Die Grenze steht trotzdem da, damit eine Druckzone, die doch
+    einmal so weit kommt, nicht mehr aufnimmt, als der Beton hergibt. Ohne
+    ``f_c`` bleibt das Gesetz unbegrenzt linear -- fuer Rechnungen, die mit
+    Festigkeiten nichts zu tun haben.
+
+    Ein Vergleich und nicht ``max()``: das Gesetz laeuft je Nachweisfall
+    rund siebzigtausend Mal, und der Funktionsaufruf kostete doppelt so viel
+    wie die Rechnung selbst -- gemessen 28 ms je Platte.
     """
+    grenze = -f_c
+
     def sigma(eps: float) -> float:
-        return 0.0 if eps > 0.0 else E_c * eps
+        if eps > 0.0:
+            return 0.0
+        s = E_c * eps
+        return s if s > grenze else grenze
     return sigma
 
 
@@ -437,7 +493,12 @@ def beton_nichtlinear(*, f_cd: float, E_c: float,
 
 def stahl_bilinear(*, E_s: float, f_sd: float,
                    eps_ud: float = 0.045) -> Callable[[float], float]:
-    """Linear bis zur Fliessgrenze, dann waagrecht; jenseits von ``eps_ud`` null."""
+    """
+    Linear bis zur Fliessgrenze, dann waagrecht; jenseits von ``eps_ud`` null.
+
+    ``f_sd`` ist die Grenze, ab der es waagrecht geht -- ``f_yd`` oder
+    ``f_yk``, je nach :class:`Werkstoffsatz`.
+    """
     def sigma(eps: float) -> float:
         if abs(eps) > eps_ud:
             return 0.0

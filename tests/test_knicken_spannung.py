@@ -23,10 +23,15 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         return projekt
 
     def test_bei_normaler_anforderung_entfaellt_er(self):
-        """In Tabelle 17 steht dort ein Strich."""
+        """
+        In Tabelle 17 steht dort ein Strich. Gemeint ist nur der Nachweis
+        gegen Fliessen -- der aus der Rissbreite läuft trotzdem, und das
+        prüft seine eigene Klasse.
+        """
         aufbau, gefunden = urteile(self.projekt("normal"))
         self.assertEqual(aufbau.spannung, {})
-        self.assertFalse([n for n in gefunden if n.startswith("Stahlspannung")])
+        self.assertFalse([u for u in gefunden.values()
+                          if u.langname == "Stahlspannung gegen Fliessen"])
 
     def test_bei_erhoehter_anforderung_laeuft_er(self):
         """
@@ -46,8 +51,8 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         self.assertIn("Feld (70 %)", laut)
 
     def test_die_grenze_ist_f_yd_minus_80(self):
-        _, gefunden = urteile(self.projekt("hoch"))
-        urteil = next(u for n, u in gefunden.items() if n.startswith("Stahlspannung"))
+        aufbau, _ = urteile(self.projekt("hoch"))
+        urteil = aufbau.spannung["q1.x"].urteile[0]
         # B500B: f_yd = 434.8, minus 80 -> 354.8 N/mm²
         self.assertAlmostEqual(urteil.widerstand.groesse.si / 1e6, 354.8, delta=0.5)
 
@@ -74,12 +79,12 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         Abschätzung trotzdem -- still, damit ein Hinweis stehen kann, wenn sie
         nicht aufgeht.
         """
-        from opencivil.projekt import HaeufigEintrag
+        from opencivil.projekt import GebrauchsfallEintrag
 
         projekt = self.projekt("hoch")
         q = projekt.querschnitte[0]
         q.haeufige_aus_tragsicherheit = False
-        q.haeufige = [HaeufigEintrag("Gebrauch", M_Ed=60.0, N_Ed=0.0)]
+        q.haeufige = [GebrauchsfallEintrag("Gebrauch", M_Ed=60.0, N_Ed=0.0)]
         aufbau, _ = urteile(projekt)
         spannung = aufbau.spannung["q1.x"]
         self.assertEqual([u.fall for u in spannung.urteile if not u.still],
@@ -95,6 +100,264 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         b, _ = urteile(viel)
         self.assertLess(a.spannung["q1.x"].ergebnisse[0].sigma_s,
                         b.spannung["q1.x"].ergebnisse[0].sigma_s)
+
+
+
+class TestStahlspannungAusRissbreite(unittest.TestCase):
+    """
+    Der Nachweis unter quasi-ständiger Einwirkung: dieselbe Rechnung wie
+    gegen Fliessen, aber mit 60 % und gegen σ_s,adm aus der Rissanforderung.
+    """
+
+    def projekt(self, anforderung="normal", *eigene, **abweichungen) -> Projekt:
+        projekt = Projekt.beispiel()
+        q = projekt.querschnitte[0]
+        q.rissanforderung = anforderung
+        q.quasistaendige = list(eigene)
+        for name, wert in abweichungen.items():
+            setattr(q, name, wert)
+        return projekt
+
+    def nachweis(self, projekt):
+        aufbau, _ = urteile(projekt)
+        return aufbau.spannung_riss["q1.x"]
+
+    def test_er_laeuft_auch_bei_normaler_anforderung(self):
+        """Dort ist die Grenze f_yk -- auch dann darf nichts fliessen."""
+        nachweis = self.nachweis(self.projekt("normal"))
+        self.assertAlmostEqual(nachweis.ergebnisse[0].sigma_s_adm / 1e6, 500.0)
+
+    def test_bei_hoher_anforderung_begrenzt_die_rissbreite(self):
+        """
+        √(9 · E_s · f_ctm · w_nom / ⌀) mit dem dicksten Stab der Tragrichtung
+        -- im Beispiel die ⌀18 der 2. Lage, nicht die ⌀12 der 3.
+        """
+        nachweis = self.nachweis(self.projekt("hoch"))
+        erwartet = (9 * 200000 * 2.9 * 0.2 / 18) ** 0.5
+        self.assertAlmostEqual(nachweis.ergebnisse[0].sigma_s_adm / 1e6,
+                               erwartet, places=3)
+
+    def test_die_sechzig_prozent_kommen_aus_dem_kern(self):
+        faelle = {e.fall.name: e.fall
+                  for e in self.nachweis(self.projekt()).ergebnisse}
+        self.assertIn("Feld (60 %)", faelle)
+        self.assertAlmostEqual(faelle["Feld (60 %)"].M_Ed.si / 1e3, 60.0)
+
+    def test_der_anteil_ist_einstellbar(self):
+        """Und er steht im Namen -- sonst wüsste niemand, womit gerechnet wurde."""
+        nachweis = self.nachweis(self.projekt(quasistaendige_anteil=50.0))
+        faelle = {e.fall.name: e.fall for e in nachweis.ergebnisse}
+        self.assertEqual(sorted(faelle), ["Feld (50 %)", "Feld mit Druck (50 %)",
+                                          "Stütze (50 %)"])
+        self.assertAlmostEqual(faelle["Stütze (50 %)"].M_Ed.si / 1e3, -25.0)
+
+    def test_der_haeufige_anteil_ist_einstellbar(self):
+        projekt = self.projekt("hoch", haeufige_anteil=80.0)
+        aufbau, _ = urteile(projekt)
+        faelle = {e.fall.name: e.fall for e in aufbau.spannung["q1.x"].ergebnisse}
+        self.assertAlmostEqual(faelle["Feld (80 %)"].M_Ed.si / 1e3, 80.0)
+
+    def test_ohne_schalter_still_mit_schalter_laut(self):
+        still = self.nachweis(self.projekt())
+        self.assertTrue(still.still)
+        laut = self.nachweis(self.projekt(quasistaendige_aus_tragsicherheit=True))
+        self.assertEqual([u.fall for u in laut.urteile if not u.still],
+                         ["Feld (60 %)", "Feld mit Druck (60 %)", "Stütze (60 %)"])
+
+    def test_eigene_faelle_sind_laut_die_abgeleiteten_nicht(self):
+        from opencivil.projekt import GebrauchsfallEintrag
+
+        nachweis = self.nachweis(self.projekt(
+            "normal", GebrauchsfallEintrag("Dauerlast", M_Ed=80.0)))
+        self.assertEqual([u.fall for u in nachweis.urteile if not u.still],
+                         ["Dauerlast"])
+
+    def test_zwei_nachweise_zwei_zeilen(self):
+        """
+        Gegen Fliessen und aus Rissbreite stehen nebeneinander in derselben
+        Tabelle -- mit gleichem Namen wären sie nicht zu unterscheiden.
+        """
+        projekt = self.projekt("hoch", haeufige_aus_tragsicherheit=True,
+                               quasistaendige_aus_tragsicherheit=True)
+        aufbau, gefunden = urteile(projekt)
+        namen = {u.langname for u in gefunden.values() if not u.still}
+        self.assertIn("Stahlspannung gegen Fliessen", namen)
+        self.assertIn("Stahlspannung aus Rissbreite", namen)
+        self.assertNotEqual(aufbau.spannung["q1.x"].id,
+                            aufbau.spannung_riss["q1.x"].id)
+
+    def test_elastisch_ist_es_der_spannungsvergleich(self):
+        erg = self.nachweis(self.projekt("hoch")).ergebnisse[0]
+        self.assertFalse(erg.fliesst)
+        self.assertEqual(erg.erfuellungsgrad, erg.sigma_s_adm / erg.sigma_s)
+
+    def test_fliessen_ist_nicht_gerade_noch_erfuellt(self):
+        """
+        Bei normaler Anforderung ist die Grenze f_yk, und dort liegt auch das
+        Fliessplateau. Wer an der Spannung misst, bekäme 500 gegen 500 --
+        erfüllt, mit 1.00. Gemessen wird darum an der Dehnung, und die wächst
+        auf dem Plateau weiter.
+        """
+        from opencivil.core.einheiten import PROMILLE
+        from opencivil.projekt import GebrauchsfallEintrag
+
+        nachweis = self.nachweis(self.projekt(
+            "normal", GebrauchsfallEintrag("fliesst", M_Ed=262.0)))
+        erg = nachweis.ergebnisse[-1]
+        urteil = nachweis.urteile[-1]
+        self.assertTrue(erg.konvergiert)
+        self.assertTrue(erg.fliesst)
+        self.assertAlmostEqual(erg.sigma_s / 1e6, 500.0)
+        self.assertFalse(erg.erfuellt)
+        self.assertLess(erg.erfuellungsgrad, 0.9)
+        # In der Tabelle Dehnungen, nicht zweimal 500 N/mm².
+        self.assertIs(urteil.einwirkung.definition.einheit, PROMILLE)
+        self.assertGreater(urteil.einwirkung.groesse.si,
+                           urteil.widerstand.groesse.si)
+
+    def test_mehr_dehnung_heisst_kleinerer_erfuellungsgrad(self):
+        """Auch jenseits des Fliessens -- sonst fände die Suche keine Richtung."""
+        from opencivil.projekt import GebrauchsfallEintrag
+
+        nachweis = self.nachweis(self.projekt(
+            "normal", *(GebrauchsfallEintrag(f"M{m}", M_Ed=float(m))
+                        for m in (258, 262, 266, 270))))
+        grade = [e.erfuellungsgrad for e in nachweis.ergebnisse[-4:]]
+        self.assertEqual(grade, sorted(grade, reverse=True))
+        self.assertTrue(all(e.fliesst for e in nachweis.ergebnisse[-4:]))
+
+    def test_die_mitschrift_nennt_das_fliessen(self):
+        from opencivil.projekt import GebrauchsfallEintrag
+
+        projekt = self.projekt("normal", GebrauchsfallEintrag("fliesst", M_Ed=262.0))
+        aufbau = projekt.aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        text = " ".join(
+            getattr(b, "text", "") + getattr(b, "latex", "")
+            for b in loesung.protokoll.alle_bloecke())
+        self.assertIn("Die Bewehrung fliesst", text)
+        self.assertIn(r"\varepsilon_{s,adm}", text)
+
+
+
+class TestFallnamenInSymbolen(unittest.TestCase):
+    """
+    Ein Fallname steht als Text im Symbol, nicht als Wert-ID.
+
+    Aus «Feld (60 %)» wurde vorher ``Feld__60___`` -- zwei Unterstriche
+    hintereinander sind in LaTeX ein doppelter Index, KaTeX brach ab, und in
+    der Werteliste stand der rohe Quelltext. Seit der quasi-ständige Nachweis
+    immer läuft, stand das schon im Beispielprojekt.
+    """
+
+    def test_kein_symbol_enthaelt_einen_doppelten_index(self):
+        from opencivil.projekt import GebrauchsfallEintrag, KnickEintrag
+
+        projekt = Projekt.beispiel()
+        q = projekt.querschnitte[0]
+        q.rissanforderung = "hoch"
+        q.kombinationen[0].V_Ed = 50.0
+        q.knickfaelle = [KnickEintrag("Stütze (EG)", N_Ed=-500.0, M_Ed_1=10.0,
+                                      laenge=3.0, knicklaenge=3.0)]
+        q.haeufige = [GebrauchsfallEintrag("Dauer_1 (a)", M_Ed=40.0)]
+        werk = projekt.aufbauen().werk
+        schlecht = [(wid, werk.definition(wid).symbol)
+                    for wid in werk.bekannte_werte
+                    if "__" in werk.definition(wid).symbol]
+        self.assertEqual(schlecht, [])
+
+    def test_der_name_steht_als_text_da(self):
+        aufbau = Projekt.beispiel().aufbauen()
+        symbole = [d.symbol for d in
+                   aufbau.spannung_riss["q1.x"].d_ausnutzung.values()]
+        self.assertIn(r"\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}", symbole)
+
+
+class TestGebrauchsfallPruefung(unittest.TestCase):
+    """Was an der Maske eingegeben wird und nicht stimmen kann."""
+
+    def fehler(self, **abweichungen) -> str:
+        from opencivil.projekt import ProjektFehler
+
+        projekt = Projekt.beispiel()
+        for name, wert in abweichungen.items():
+            setattr(projekt.querschnitte[0], name, wert)
+        with self.assertRaises(ProjektFehler) as fehler:
+            projekt.aufbauen()
+        return str(fehler.exception)
+
+    def test_ein_eigener_fall_heisst_wie_ein_abgeleiteter(self):
+        from opencivil.projekt import GebrauchsfallEintrag
+
+        meldung = self.fehler(quasistaendige=[
+            GebrauchsfallEintrag("Feld (60 %)", M_Ed=10.0)])
+        self.assertIn("quasi-ständige Lastfall 'Feld (60 %)'", meldung)
+
+    def test_gleiche_namen_in_beiden_listen_sind_erlaubt(self):
+        """Sie landen in zwei Nachweisen und damit in zwei ID-Räumen."""
+        from opencivil.projekt import GebrauchsfallEintrag
+
+        projekt = Projekt.beispiel()
+        q = projekt.querschnitte[0]
+        q.rissanforderung = "hoch"
+        q.haeufige = [GebrauchsfallEintrag("Dauer", M_Ed=50.0)]
+        q.quasistaendige = [GebrauchsfallEintrag("Dauer", M_Ed=40.0)]
+        aufbau, _ = urteile(projekt)
+        self.assertIn("Dauer", [e.fall.name for e in aufbau.spannung["q1.x"].ergebnisse])
+        self.assertIn("Dauer", [e.fall.name
+                                for e in aufbau.spannung_riss["q1.x"].ergebnisse])
+
+    def test_namen_die_auf_dieselbe_kennung_fallen(self):
+        """«Feld A» und «Feld-A» werden beide zu Feld_A."""
+        from opencivil.projekt import GebrauchsfallEintrag
+
+        meldung = self.fehler(quasistaendige=[
+            GebrauchsfallEintrag("Feld A", M_Ed=10.0),
+            GebrauchsfallEintrag("Feld-A", M_Ed=20.0)])
+        self.assertIn("'Feld A' und 'Feld-A'", meldung)
+
+    def test_ein_anteil_ausserhalb_von_null_bis_hundert(self):
+        for feld, wert in (("quasistaendige_anteil", 0.0),
+                           ("quasistaendige_anteil", -10.0),
+                           ("haeufige_anteil", 700.0)):
+            with self.subTest(feld=feld, wert=wert):
+                self.assertIn("zwischen 0 und 100 %",
+                              self.fehler(**{feld: wert}))
+
+    def test_die_felder_ueberleben_die_datei(self):
+        from opencivil.projekt import GebrauchsfallEintrag
+
+        projekt = Projekt.beispiel()
+        q = projekt.querschnitte[0]
+        q.quasistaendige = [GebrauchsfallEintrag("Dauer", M_Ed=40.0, N_Ed=-5.0,
+                                                 aktiv=False)]
+        q.quasistaendige_aus_tragsicherheit = True
+        q.quasistaendige_anteil = 55.0
+        q.haeufige_anteil = 75.0
+        zurueck = Projekt.aus_dict(projekt.als_dict()).querschnitte[0]
+        self.assertEqual(zurueck.quasistaendige, q.quasistaendige)
+        self.assertTrue(zurueck.quasistaendige_aus_tragsicherheit)
+        self.assertEqual(zurueck.quasistaendige_anteil, 55.0)
+        self.assertEqual(zurueck.haeufige_anteil, 75.0)
+
+    def test_eine_alte_datei_bekommt_die_vorgaben(self):
+        daten = Projekt.beispiel().als_dict()
+        for feld in ("quasistaendige", "quasistaendige_aus_tragsicherheit",
+                     "quasistaendige_anteil", "haeufige_anteil"):
+            daten["querschnitte"][0].pop(feld)
+        q = Projekt.aus_dict(daten).querschnitte[0]
+        self.assertEqual((q.haeufige_anteil, q.quasistaendige_anteil), (70.0, 60.0))
+        self.assertEqual(q.quasistaendige, [])
+
+    def test_ohne_kraefte_sucht_die_suche_ohne_quasistaendige(self):
+        from opencivil.bewehrungssuche import _arbeitskopie
+        from opencivil.projekt import GebrauchsfallEintrag
+
+        projekt = Projekt.beispiel()
+        projekt.querschnitte[0].quasistaendige = [
+            GebrauchsfallEintrag("Dauer", M_Ed=40.0)]
+        kopie = _arbeitskopie(projekt, "q1", kraefte=False)
+        self.assertEqual(kopie.querschnitte[0].quasistaendige, [])
 
 
 class TestSchiefstellung(unittest.TestCase):

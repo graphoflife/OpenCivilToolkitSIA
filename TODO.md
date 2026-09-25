@@ -34,9 +34,20 @@ sie hier notiert; keine davon ist nachgeschlagen.
       Einwirkung ist Dauerlast, und Kriechen senkt den Hebelarm, liegt also auf
       der sicheren Seite. Aber die Norm sagt es an dieser Stelle nicht.
 - [ ] **Charakteristische oder Bemessungs-Kennwerte für die Stahlspannung?**
-      Eingebaut: `E_s` und `E_cm` als Mittelwerte (4.4.1.2 verlangt
-      Mittelwerte), die Grenze dagegen aus `f_yd − 80 MPa` (Tabelle 17). Das
-      mischt zwei Niveaus — nach Tabelle 17 steht dort aber ausdrücklich `f_yd`.
+      Die Werkstoffgesetze sind entschieden (deine Vorgabe): charakteristisch,
+      das Fliessplateau bei `f_yk`, der Beton gedeckelt bei `f_ck`, dazu `E_s`
+      und `E_cm` als Mittelwerte (4.4.1.2). Offen bleibt nur die **Grenze** des
+      Nachweises gegen Fliessen: eingebaut `f_yd − 80 MPa`, weil Tabelle 17
+      ausdrücklich `f_yd` nennt — das mischt zwei Niveaus, ist aber die
+      strengere Seite.
+- [ ] **Welcher Durchmesser bestimmt `σ_s,adm` unter quasi-ständiger Last?**
+      Eingebaut: der dickste Stab der Tragrichtung. Die Spannung kommt aus dem
+      ganzen Querschnitt, und welche Lage am stärksten gezogen ist, wechselt
+      mit dem Lastfall; der dickste Stab gibt die kleinste Grenze. Denkbar
+      wäre auch der Stab der jeweils am stärksten gezogenen Lage.
+- [ ] **60 % und 70 % sind Abschätzungen, keine Normwerte.** Beide sind je
+      Platte einstellbar; wer die echten ψ-Kombinationen kennt, trägt sie als
+      eigene Lastfälle ein.
 - [ ] **Zugfestigkeit des Betons in der Spannungsrechnung?** Eingebaut: nein,
       voll gerissen. Das ist konservativ (ohne Mitwirkung zwischen den Rissen),
       aber die Norm erlaubt in 4.4.1.2 die Mittelwerte — also womöglich auch
@@ -99,6 +110,22 @@ sie hier notiert; keine davon ist nachgeschlagen.
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Stahlspannung unter quasi-ständiger Einwirkung: dieselbe Rechnung wie gegen
+Fliessen, mit 60 % statt 70 % und gegen `σ_s,adm` aus der Rissanforderung
+(`f_yk` bei normaler, die Wurzelformel mit `w_nom` bei erhöhter und hoher) —
+geführt bei jeder Anforderung · Eine Klasse, zwei Grenzen
+(`GrenzeGegenFliessen`, `GrenzeAusRissbreite`) statt eines kopierten Kerns ·
+Beide Anteile je Platte einstellbar, 60 und 70 als Vorgabe · Die
+Werkstoffgesetze im Gebrauchszustand charakteristisch: Plateau bei `f_yk`
+statt `f_yd`, Beton gedeckelt bei `f_ck` (`Werkstoffsatz` im Löser) ·
+Fliesst der Stahl, wird an der Dehnung gemessen — sonst stünde bei normaler
+Anforderung `f_yk` gegen `f_yk` mit «erfüllt» da · Im schnellen Aufbau der
+Suche entstehen ganz stille Nachweise nicht: 29 → 2.5 ms je Bewertung bei
+erhöhter Anforderung · Fallnamen stehen als `\text{…}` in den Symbolen —
+`Feld__60___` war ein doppelter Index, und KaTeX brach daran ab ·
+Fallnamen, die auf dieselbe Wert-ID fallen («Feld A», «Feld-A»), werden
+gemeldet ·
 
 Nachgewiesen wird nur noch die Tragrichtung x; die y-Lagen bleiben im
 Querschnitt, weil sie die statische Höhe von x bestimmen und zum
