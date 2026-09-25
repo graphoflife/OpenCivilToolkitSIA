@@ -42,9 +42,9 @@ from enum import Enum
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_formel,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
-from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, MM, Groesse
+from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, Groesse
 from opencivil.core.latex import Mathe, als_text
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import WertDef
@@ -222,13 +222,11 @@ class BiegungNormalkraft(Nachweis):
         r = richtung.value
         basis = f"{querschnitt.id}.nachweis.mn.{r}"
         self.d_ausnutzung: Dict[str, WertDef] = {
-            k.name: WertDef(
-                id=f"{basis}.{k.kennung}.erfuellungsgrad",
-                symbol=rf"\alpha_{{eff,{r},{als_text(k.name)}}}",
-                einheit=EINHEITSLOS,
-                beschreibung=f"Erfüllungsgrad {richtung.beschriftung} – {k.name}",
-                referenz="SIA 262:2025, 4.1.4",
-                stellen=3,
+            k.name: grad_def(
+                f"{basis}.{k.kennung}.erfuellungsgrad",
+                rf"\alpha_{{eff,{r},{als_text(k.name)}}}",
+                f"Erfüllungsgrad {richtung.beschriftung} – {k.name}",
+                "SIA 262:2025, 4.1.4",
             )
             for k in self.kombinationen
         }
@@ -365,7 +363,7 @@ class BiegungNormalkraft(Nachweis):
             self.auswertungen.append(auswertung)
             self._protokoll_kombination(p, auswertung)
             ergebnis[self.d_ausnutzung[kombination.name].id] = Groesse(
-                min(auswertung.erfuellungsgrad, 1e9), EINHEITSLOS
+                auswertung.erfuellungsgrad, EINHEITSLOS
             )
             # Unabhaengig vom gewaehlten Massstab: der Momentenwiderstand bei
             # dieser Normalkraft, denn der Querkraftnachweis rechnet damit.
@@ -556,19 +554,12 @@ class BiegungNormalkraft(Nachweis):
         basis = f"{self.id}.{kennung_aus(k.name)}"
         protokoll_interpolation(p, auswertung, basis=basis)
 
-        # Ohne Einwirkung gibt es nichts einzusetzen: der Grad ist unendlich.
-        vorlage, eingaben = r"\frac{R_d}{E_d}", {}
-        if auswertung.ed:
-            werte, achse = Zwischenwerte(basis), auswertung.achse
-            vorlage = r"\frac{@Rd}{@Ed}"
-            eingaben = {
-                name: werte.wert(name, f"{achse.name}_{{{name}}}",
-                                 Groesse.aus_si(abs(si), achse.einheit))
-                for name, si in (("Rd", auswertung.rd), ("Ed", auswertung.ed))
-            }
-        grad_formel(p, self.d_ausnutzung[k.name].belegen(
-                        Groesse(auswertung.erfuellungsgrad, EINHEITSLOS)),
-                    vorlage, eingaben, auswertung.innerhalb, mit_urteil=True)
+        werte, achse = Zwischenwerte(basis), auswertung.achse
+        rd, ed = (werte.wert(name, f"{achse.name}_{{{name}}}",
+                             Groesse.aus_si(abs(si), achse.einheit))
+                  for name, si in (("Rd", auswertung.rd), ("Ed", auswertung.ed)))
+        grad_formel(p, self.d_ausnutzung[k.name], auswertung.erfuellungsgrad,
+                    rd, ed, auswertung.innerhalb, mit_urteil=True)
 
 
 def protokoll_interpolation(

@@ -130,7 +130,7 @@ def _werte(p: Protokoll, loesung: Loesung) -> None:
         einheit = (wert.einheit.beschriftung
                    if wert.einheit.name not in ("", "-") else "")
         zeilen.append([wert.beschreibung or wert_id, Mathe(wert.symbol),
-                       Mathe(wert.formatiert()), einheit,
+                       Mathe(wert.formatiert(latex=True)), einheit,
                        wert.quelle.beschriftung])
     p.anfuegen(TabellenBlock(
         kopf=["Bezeichnung", "Symbol", "Wert", "Einheit", "Herkunft"],

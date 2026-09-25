@@ -53,17 +53,17 @@ in Millimeter ein, ``f_ck`` in N/mm^2. ``k_g`` laeuft deshalb ueber
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
-from typing import Dict, List, Mapping, Optional, Sequence, Tuple
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_formel,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import (
     EINHEITSLOS, GRAD, KN, KN_PRO_M, KNM, MM, N_PRO_MM2, EmpirischesErgebnis,
     Groesse, empirisch,
 )
-from opencivil.core.latex import als_text, angabe
+from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.nachweis.biegung_normalkraft import protokoll_interpolation
@@ -437,13 +437,11 @@ class Querkraft(Nachweis):
         r = richtung.value
         basis = f"{querschnitt.id}.nachweis.querkraft.{r}"
         self.d_ausnutzung: Dict[str, WertDef] = {
-            f.name: WertDef(
-                id=f"{basis}.{f.kennung}.erfuellungsgrad",
-                symbol=rf"\alpha_{{eff,V,{r},{als_text(f.name)}}}",
-                einheit=EINHEITSLOS,
-                beschreibung=f"Erfüllungsgrad Querkraft {richtung.beschriftung} – {f.name}",
-                referenz="SIA 262:2025, 4.3.3.2",
-                stellen=2,
+            f.name: grad_def(
+                f"{basis}.{f.kennung}.erfuellungsgrad",
+                rf"\alpha_{{eff,V,{r},{als_text(f.name)}}}",
+                f"Erfüllungsgrad Querkraft {richtung.beschriftung} – {f.name}",
+                "SIA 262:2025, 4.3.3.2",
             )
             for f in self.faelle
         }
@@ -579,7 +577,7 @@ class Querkraft(Nachweis):
         fall = erg.fall
         ergebnis[self.d_v_rd[fall.name].id] = Groesse.aus_si(erg.v_Rd, KN_PRO_M)
         ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(
-            min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
+            erg.erfuellungsgrad, EINHEITSLOS)
 
         urteile.append(NachweisUrteil(
             name=f"Querkraft {self.richtung.value} – {fall.name}",
@@ -972,15 +970,9 @@ class Querkraft(Nachweis):
     def _protokoll_grad(self, p: Protokoll, erg: Querkraftergebnis) -> None:
         """Die letzte Zeile jedes Falls -- für beide Ansätze dieselbe."""
         name = erg.fall.name
-        grad = self.d_ausnutzung[name].belegen(Groesse(erg.erfuellungsgrad, EINHEITSLOS))
         widerstand = self.d_v_rd[name].belegen(Groesse.aus_si(erg.v_Rd, KN_PRO_M))
-        einwirkung = self._einwirkung(erg.fall)
-        # Ohne Querkraft stuende eine Null im Nenner -- dann ohne Zahlen.
-        if erg.fall.V_Ed.si:
-            vorlage, eingaben = r"\frac{@V_Rd}{@V_Ed}", {"V_Rd": widerstand, "V_Ed": einwirkung}
-        else:
-            vorlage, eingaben = rf"\frac{{{widerstand.symbol}}}{{{einwirkung.symbol}}}", {}
-        grad_formel(p, grad, vorlage, eingaben, erg.erfuellt, mit_urteil=True)
+        grad_formel(p, self.d_ausnutzung[name], erg.erfuellungsgrad, widerstand,
+                    self._einwirkung(erg.fall), erg.erfuellt, mit_urteil=True)
 
     # -- Mitschrift ohne Bügel -------------------------------------------------
 

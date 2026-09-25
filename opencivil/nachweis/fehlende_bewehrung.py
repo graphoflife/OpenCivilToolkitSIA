@@ -27,7 +27,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Sequence
 
-from opencivil.core.berechnung import Eingaben, Nachweis, NachweisUrteil
+from opencivil.core.berechnung import Eingaben, Nachweis, NachweisUrteil, grad_def
 from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
@@ -85,13 +85,11 @@ class FehlendeBewehrung(Nachweis):
         r = richtung.value
         basis = f"{querschnitt.id}.nachweis.fehlt.{r}"
         self.d_ausnutzung: Dict[str, WertDef] = {
-            f.kennung: WertDef(
-                id=f"{basis}.{f.kennung}.erfuellungsgrad",
-                symbol=rf"\alpha_{{eff,{f.art},{r},{als_text(f.fall)}}}",
-                einheit=EINHEITSLOS,
-                beschreibung=(f"Erfüllungsgrad {f.art} {richtung.beschriftung} – "
-                              f"{f.fall} (keine Bewehrung)"),
-                stellen=2,
+            f.kennung: grad_def(
+                f"{basis}.{f.kennung}.erfuellungsgrad",
+                rf"\alpha_{{eff,{f.art},{r},{als_text(f.fall)}}}",
+                (f"Erfüllungsgrad {f.art} {richtung.beschriftung} – "
+                 f"{f.fall} (keine Bewehrung)"),
             )
             for f in self.faelle
         }

@@ -34,9 +34,8 @@ Ursache erhalten.
 
 from __future__ import annotations
 
-import math
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, replace
 from typing import (
     Any, Callable, Dict, Iterable, Iterator, Mapping, Optional, Sequence,
     Tuple, Union,
@@ -45,7 +44,7 @@ from typing import (
 from opencivil.core import latex as tex
 from opencivil.core.einheiten import EINHEITSLOS, EmpirischesErgebnis, Groesse
 from opencivil.core.protokoll import Abschnitt, Protokoll
-from opencivil.core.wert import Quelle, Wert, WertDef
+from opencivil.core.wert import Quelle, Wert, WertDef, grad_als_text
 
 
 class BerechnungsFehler(Exception):
@@ -505,46 +504,37 @@ class Prozedur(Berechnung):
 # ===========================================================================
 
 
-def grad_als_text(grad: float, erfuellt: bool, *, latex: bool = False) -> str:
+def grad_def(id: str, symbol: str, beschreibung: str, referenz: str = "") -> WertDef:
     """
-    Ein Erfuellungsgrad als Text -- knapp, aber nie gerundet bis zur Luege.
+    Die Definition eines Erfuellungsgrads -- fuer jeden Nachweis dieselbe.
 
-    Zwei Stellen genuegen fast immer. Nur wo ein Nachweis knapp nicht
-    aufgeht, zeigen sie ``1.00`` und sagen damit das Gegenteil des Urteils
-    daneben. Dann kommt eine Stelle dazu, abgeschnitten statt gerundet: der
-    Grad soll kleiner als eins bleiben, weil er das ist.
-
-    Die eine Stelle fuer diese Regel. Zuerst stand sie nur in der
-    Schnittstelle, und Konsolenbericht, LaTeX-Dokument und die Tooltips der
-    Diagramme rundeten weiter selbst -- dort stand bei 0.9966 «1» neben
-    «nicht erfuellt».
-
-    ``latex`` sagt, in welcher Sprache die Unendlichkeit geschrieben wird:
-    ``\\infty`` fuer eine Formel, ``∞`` fuer Fliesstext. Die Zahl selbst ist
-    in beiden dieselbe.
+    Frueher legte jeder Nachweis seine eigene an, mit eigener Stellenzahl, und
+    die Werttabelle rundete an :func:`grad_als_text` vorbei: dort stand 0.996
+    als «1», neben «nicht erfuellt».
     """
-    if not math.isfinite(grad):
-        return r"\infty" if latex else "∞"
-    text = f"{grad:.2f}"
-    if not erfuellt and float(text) >= 1.0:
-        text = f"{math.floor(grad * 1000) / 1000:.3f}"
-    return text
+    return WertDef(id=id, symbol=symbol, einheit=EINHEITSLOS,
+                   beschreibung=beschreibung, referenz=referenz,
+                   erfuellungsgrad=True)
 
 
 def grad_formel(
-    p: Protokoll, ergebnis: Wert, vorlage: str, eingaben: Mapping[str, Wert],
-    erfuellt: bool, *, mit_urteil: bool = False,
+    p: Protokoll, definition: WertDef, grad: float, widerstand: Wert,
+    einwirkung: Wert, erfuellt: bool, *, mit_urteil: bool = False,
 ) -> None:
     """
-    Die Zeile mit dem Erfuellungsgrad -- in jedem Nachweis dieselbe Form.
+    Die Zeile mit dem Erfuellungsgrad -- in jedem Nachweis dieselbe Form,
+    Widerstand durch Einwirkung.
 
-    Der Grad steht gesetzt wie in Tabelle und Bericht (:func:`grad_als_text`),
-    nicht mit der Stellenzahl seines Werts: 0.9966 heisst sonst 1.00 neben
-    «nicht erfuellt». Ohne Normverweis -- den traegt die Zeile, aus der
-    Widerstand und Einwirkung kommen.
+    Der Grad setzt sich selbst (:func:`grad_als_text`). Stuende im Nenner eine
+    Null, bleibt es bei den Symbolen. Ohne Normverweis -- den traegt die
+    Zeile, aus der Widerstand und Einwirkung kommen.
     """
-    p.formel(ergebnis, vorlage, eingaben, titel="Erfüllungsgrad", referenz="",
-             ergebnis_latex=grad_als_text(ergebnis.groesse.si, erfuellt, latex=True),
+    if einwirkung.formatiert() == "0":
+        vorlage, eingaben = rf"\frac{{{widerstand.symbol}}}{{{einwirkung.symbol}}}", {}
+    else:
+        vorlage, eingaben = r"\frac{@R}{@E}", {"R": widerstand, "E": einwirkung}
+    p.formel(definition.belegen(Groesse(grad, EINHEITSLOS)), vorlage, eingaben,
+             titel="Erfüllungsgrad", referenz="",
              nachsatz=(rf"\quad \Rightarrow \quad {tex.urteil(erfuellt)}"
                        if mit_urteil else ""))
 

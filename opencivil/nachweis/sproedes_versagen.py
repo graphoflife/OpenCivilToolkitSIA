@@ -33,10 +33,10 @@ die halbe Hoehe wie beim Zwang (SIA 262:2025, 4.4.1.3).
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_formel,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KNM, M, Groesse
 from opencivil.core.latex import angabe, bedingung
@@ -186,14 +186,12 @@ class SproedesVersagen(Nachweis):
         r = richtung.value
         basis = f"{querschnitt.id}.nachweis.sproede.{r}"
         self.d_ausnutzung: Dict[int, WertDef] = {
-            l.nummer: WertDef(
-                id=f"{basis}.lage{l.nummer}.erfuellungsgrad",
-                symbol=rf"\alpha_{{eff,SV,{l.nummer},{r}}}",
-                einheit=EINHEITSLOS,
-                beschreibung=(f"Erfüllungsgrad sprödes Versagen – "
-                              f"{l.nummer}. Lage {r}"),
-                referenz="SIA 262:2025, 4.4.1.3",
-                stellen=2,
+            l.nummer: grad_def(
+                f"{basis}.lage{l.nummer}.erfuellungsgrad",
+                rf"\alpha_{{eff,SV,{l.nummer},{r}}}",
+                (f"Erfüllungsgrad sprödes Versagen – "
+                 f"{l.nummer}. Lage {r}"),
+                "SIA 262:2025, 4.4.1.3",
             )
             for l in self.lagen
         }
@@ -256,7 +254,7 @@ class SproedesVersagen(Nachweis):
             self.ergebnisse.append(erg)
             self._protokoll_lage(p, erg)
             ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
-                min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
+                erg.erfuellungsgrad, EINHEITSLOS)
             urteile.append(self._urteil(erg))
 
         self._protokoll_massgebend(p, urteile)
@@ -330,7 +328,5 @@ class SproedesVersagen(Nachweis):
         p.gleichung(bedingung(angabe(m_rd), r"\ge" if erg.erfuellt else "<",
                               angabe(m_riss), erg.erfuellt),
                     titel="Biegewiderstand gegen Rissmoment")
-        grad_formel(p, self.d_ausnutzung[nummer].belegen(
-                        Groesse(erg.erfuellungsgrad, EINHEITSLOS)),
-                    r"\frac{@M_Rd}{@M_Riss}", {"M_Rd": m_rd, "M_Riss": m_riss},
-                    erg.erfuellt)
+        grad_formel(p, self.d_ausnutzung[nummer], erg.erfuellungsgrad,
+                    m_rd, m_riss, erg.erfuellt)

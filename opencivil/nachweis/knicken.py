@@ -63,9 +63,9 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_formel,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
-from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, M, MM, Groesse
+from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, M, Groesse
 from opencivil.core.latex import Mathe, angabe, als_text
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import WertDef
@@ -253,13 +253,11 @@ class Knicken(Nachweis):
 
         basis = f"{querschnitt.id}.nachweis.knicken"
         self.d_ausnutzung: Dict[str, WertDef] = {
-            f.name: WertDef(
-                id=f"{basis}.{f.kennung}.erfuellungsgrad",
-                symbol=rf"\alpha_{{eff,K,{als_text(f.name)}}}",
-                einheit=EINHEITSLOS,
-                beschreibung=f"Erfüllungsgrad Knicken – {f.name}",
-                referenz="SIA 262:2025, 4.3.7",
-                stellen=2,
+            f.name: grad_def(
+                f"{basis}.{f.kennung}.erfuellungsgrad",
+                rf"\alpha_{{eff,K,{als_text(f.name)}}}",
+                f"Erfüllungsgrad Knicken – {f.name}",
+                "SIA 262:2025, 4.3.7",
             )
             for f in self.faelle
         }
@@ -336,7 +334,7 @@ class Knicken(Nachweis):
             self.ergebnisse.append(erg)
             self._protokoll_fall(p, erg)
             ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(
-                min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
+                erg.erfuellungsgrad, EINHEITSLOS)
             urteile.append(self._urteil(erg))
 
         return ergebnis, urteile
@@ -697,7 +695,5 @@ class Knicken(Nachweis):
         n_ed = werte.kraft("N_Ed_betrag", r"\left|N_{Ed}\right|", N_Ed)
         p.gleichung(rf"{angabe(n_rd)} \quad {r'\ge' if erg.erfuellt else '<'} \quad "
                     rf"{angabe(n_ed)}", titel="Grenzkraft des Stabes")
-        grad_formel(p, self.d_ausnutzung[erg.fall.name].belegen(
-                        Groesse(erg.erfuellungsgrad, EINHEITSLOS)),
-                    r"\frac{@N_Rd}{@N_Ed}", {"N_Rd": n_rd, "N_Ed": n_ed},
-                    erg.erfuellt, mit_urteil=True)
+        grad_formel(p, self.d_ausnutzung[erg.fall.name], erg.erfuellungsgrad,
+                    n_rd, n_ed, erg.erfuellt, mit_urteil=True)

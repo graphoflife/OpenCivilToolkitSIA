@@ -64,7 +64,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_formel,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import (
     EINHEITSLOS, KN, KNM, N_PRO_MM2, PROMILLE, Groesse,
@@ -422,14 +422,12 @@ class Spannungsbegrenzung(Nachweis):
         r = richtung.value
         basis = grenze.id
         self.d_ausnutzung: Dict[str, WertDef] = {
-            f.name: WertDef(
-                id=f"{basis}.{f.kennung}.erfuellungsgrad",
-                symbol=rf"\alpha_{{eff,{grenze.symbolteil},{r},{als_text(f.name)}}}",
-                einheit=EINHEITSLOS,
-                beschreibung=(f"Erfüllungsgrad {grenze.langname} "
-                              f"{richtung.beschriftung} – {f.name}"),
-                referenz=grenze.referenz,
-                stellen=2,
+            f.name: grad_def(
+                f"{basis}.{f.kennung}.erfuellungsgrad",
+                rf"\alpha_{{eff,{grenze.symbolteil},{r},{als_text(f.name)}}}",
+                (f"Erfüllungsgrad {grenze.langname} "
+                 f"{richtung.beschriftung} – {f.name}"),
+                grenze.referenz,
             )
             for f in self.faelle
         }
@@ -510,7 +508,7 @@ class Spannungsbegrenzung(Nachweis):
             if not leise:
                 self._protokoll_fall(p, e, erg)
             ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(
-                min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
+                erg.erfuellungsgrad, EINHEITSLOS)
             urteile.append(self._urteil(erg, still=leise))
 
         return ergebnis, urteile
@@ -691,26 +689,18 @@ class Spannungsbegrenzung(Nachweis):
             rf"{angabe(N_int)} \;\checkmark \qquad {angabe(M_int)} \;\checkmark",
             titel="Probe: die Ebene erzeugt die Einwirkung")
 
-        grad = self.d_ausnutzung[fall.name].belegen(
-            Groesse(erg.erfuellungsgrad, EINHEITSLOS))
         wirkt, grenze = erg.vergleich.einwirkung, erg.vergleich.widerstand
         if erg.fliesst:
-            self._protokoll_fliessen(p, e, erg, werte, grad)
-            return
-
-        p.gleichung(bedingung(angabe(wirkt), r"\le" if erg.erfuellt else ">",
-                              angabe(grenze), erg.erfuellt),
-                    titel="Grösste Zugspannung in der Bewehrung")
-        # Ohne Zug in der Bewehrung gibt es nichts einzusetzen -- dann stuende
-        # dort eine Null im Nenner.
-        if erg.sigma_s > 0.0:
-            vorlage, eingaben = r"\frac{@adm}{@s}", {"adm": grenze, "s": wirkt}
+            self._protokoll_fliessen(p, e, erg, werte, wirkt, grenze)
         else:
-            vorlage, eingaben = rf"\frac{{{grenze.symbol}}}{{{wirkt.symbol}}}", {}
-        grad_formel(p, grad, vorlage, eingaben, erg.erfuellt)
+            p.gleichung(bedingung(angabe(wirkt), r"\le" if erg.erfuellt else ">",
+                                  angabe(grenze), erg.erfuellt),
+                        titel="Grösste Zugspannung in der Bewehrung")
+        grad_formel(p, self.d_ausnutzung[fall.name], erg.erfuellungsgrad,
+                    grenze, wirkt, erg.erfuellt)
 
     def _protokoll_fliessen(self, p: Protokoll, e: Eingaben, erg: Fallergebnis,
-                            werte: Zwischenwerte, grad: Wert) -> None:
+                            werte: Zwischenwerte, wirkt: Wert, grenze: Wert) -> None:
         """Der Fall, in dem die Spannung am Plateau stehen bleibt."""
         p.text(
             f"Die Bewehrung fliesst: die grösste Zugdehnung liegt über der "
@@ -718,7 +708,6 @@ class Spannungsbegrenzung(Nachweis):
             f"N/mm² und sagt nichts mehr darüber, wie weit die Grenze "
             f"überschritten ist. Verglichen wird die Dehnung."
         )
-        wirkt, grenze = erg.vergleich.einwirkung, erg.vergleich.widerstand
         p.formel(werte.dehnung("eps_y", r"\varepsilon_y", erg.eps_y),
                  r"\frac{@f_s}{@E_s}", {"f_s": e[WERKSTOFFE.stahl], "E_s": e["E_s"]},
                  titel="Grösste Zugdehnung in der Bewehrung",
@@ -730,5 +719,3 @@ class Spannungsbegrenzung(Nachweis):
                  titel="Zulässige Dehnung",
                  nachsatz=vergleich(r"\ge" if erg.erfuellt else "<", angabe(wirkt),
                                     erg.erfuellt))
-        grad_formel(p, grad, r"\frac{@adm}{@eps}", {"adm": grenze, "eps": wirkt},
-                    erg.erfuellt)

@@ -22,7 +22,8 @@ Werte gegenseitig ueberschreiben.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+import math
+from dataclasses import dataclass, field, replace
 from enum import Enum
 from typing import Optional
 
@@ -77,6 +78,32 @@ class Quelle(str, Enum):
         return self in (Quelle.EINGABE, Quelle.VORGABE, Quelle.UEBERSCHRIEBEN)
 
 
+def grad_als_text(grad: float, erfuellt: bool, *, latex: bool = False) -> str:
+    """
+    Ein Erfuellungsgrad als Text -- knapp, aber nie gerundet bis zur Luege.
+
+    Zwei Stellen genuegen fast immer. Nur wo ein Nachweis knapp nicht
+    aufgeht, zeigen sie ``1.00`` und sagen damit das Gegenteil des Urteils
+    daneben. Dann kommt eine Stelle dazu, abgeschnitten statt gerundet: der
+    Grad soll kleiner als eins bleiben, weil er das ist.
+
+    Die eine Stelle fuer diese Regel. Zuerst stand sie nur in der
+    Schnittstelle, und Konsolenbericht, LaTeX-Dokument und die Tooltips der
+    Diagramme rundeten weiter selbst -- dort stand bei 0.9966 «1» neben
+    «nicht erfuellt».
+
+    ``latex`` sagt, in welcher Sprache die Unendlichkeit geschrieben wird:
+    ``\\infty`` fuer eine Formel, ``∞`` fuer Fliesstext. Die Zahl selbst ist
+    in beiden dieselbe.
+    """
+    if not math.isfinite(grad):
+        return r"\infty" if latex else "∞"
+    text = f"{grad:.2f}"
+    if not erfuellt and float(text) >= 1.0:
+        text = f"{math.floor(grad * 1000) / 1000:.3f}"
+    return text
+
+
 @dataclass(frozen=True)
 class WertDef:
     """
@@ -103,6 +130,10 @@ class WertDef:
 
     stellen: int = 2
     """Nachkommastellen fuer die Darstellung."""
+
+    erfuellungsgrad: bool = False
+    """Ein Erfuellungsgrad: gesetzt nach :func:`grad_als_text` statt mit
+    ``stellen`` -- in Herleitung, Werttabelle und Oberflaeche derselbe Text."""
 
     def __post_init__(self) -> None:
         if not self.id:
@@ -137,15 +168,7 @@ class WertDef:
         Erlaubt es, Wert-Vorlagen (z.B. alle Betoneigenschaften) einmal zu
         definieren und pro Material zu instanziieren.
         """
-        neue_id = f"{praefix}.{self.id}" if praefix else self.id
-        return WertDef(
-            id=neue_id,
-            symbol=self.symbol,
-            einheit=self.einheit,
-            beschreibung=self.beschreibung,
-            referenz=self.referenz,
-            stellen=self.stellen,
-        )
+        return replace(self, id=f"{praefix}.{self.id}" if praefix else self.id)
 
     def __str__(self) -> str:
         return self.id
@@ -206,12 +229,23 @@ class Wert:
 
     # -- Darstellung --------------------------------------------------------
 
-    def formatiert(self) -> str:
-        """Zahlenwert in der definierten Einheit und Genauigkeit."""
+    def formatiert(self, latex: bool = False) -> str:
+        """
+        Zahlenwert in der definierten Einheit und Genauigkeit.
+
+        Ein Erfuellungsgrad folgt :func:`grad_als_text`; ab eins gilt er als
+        erfuellt, so ist er definiert. ``latex`` sagt, wie seine
+        Unendlichkeit geschrieben wird.
+        """
+        if self.definition.erfuellungsgrad:
+            grad = self.groesse.si
+            return grad_als_text(grad, grad >= 1.0, latex=latex)
         return self.groesse.formatiert(self.stellen, self.einheit)
 
     def zahl_latex(self) -> str:
         """Zahlenwert samt Einheit als LaTeX-Fragment, z.B. ``18.7\\,\\mathrm{MPa}``."""
+        if self.definition.erfuellungsgrad:
+            return self.formatiert(latex=True)
         return self.groesse.als_latex(self.stellen, self.einheit)
 
     def __str__(self) -> str:

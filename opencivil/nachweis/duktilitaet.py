@@ -40,11 +40,11 @@ Grenze 0.35 gehalten.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Sequence, Tuple
+from dataclasses import dataclass
+from typing import Dict, List, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_formel,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import angabe, vergleich
@@ -144,13 +144,11 @@ class Duktilitaet(Nachweis):
 
         basis = f"{querschnitt.id}.nachweis.duktilitaet"
         self.d_ausnutzung: Dict[int, WertDef] = {
-            l.nummer: WertDef(
-                id=f"{basis}.lage{l.nummer}.erfuellungsgrad",
-                symbol=rf"\alpha_{{eff,D,{l.nummer}}}",
-                einheit=EINHEITSLOS,
-                beschreibung=f"Erfüllungsgrad Duktilität – {l.nummer}. Lage",
-                referenz="SIA 262:2025, 4.1.4.2.5",
-                stellen=2,
+            l.nummer: grad_def(
+                f"{basis}.lage{l.nummer}.erfuellungsgrad",
+                rf"\alpha_{{eff,D,{l.nummer}}}",
+                f"Erfüllungsgrad Duktilität – {l.nummer}. Lage",
+                "SIA 262:2025, 4.1.4.2.5",
             )
             for l in self.lagen
         }
@@ -221,7 +219,7 @@ class Duktilitaet(Nachweis):
             self._protokoll_lage(p, e, erg, breite)
 
             ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
-                min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
+                erg.erfuellungsgrad, EINHEITSLOS)
             ergebnis[self.d_verhaeltnis[lage.nummer].id] = Groesse(
                 erg.verhaeltnis, EINHEITSLOS)
             urteile.append(self._urteil(erg))
@@ -385,7 +383,5 @@ class Duktilitaet(Nachweis):
                  titel="Bezogene Druckzonenhöhe",
                  nachsatz=vergleich(r"\le" if erg.erfuellt else ">", angabe(grenze),
                                     erg.erfuellt))
-        grad_formel(p, self.d_ausnutzung[nummer].belegen(
-                        Groesse(erg.erfuellungsgrad, EINHEITSLOS)),
-                    r"\frac{@grenze}{@verhaeltnis}",
-                    {"grenze": grenze, "verhaeltnis": verhaeltnis}, erg.erfuellt)
+        grad_formel(p, self.d_ausnutzung[nummer], erg.erfuellungsgrad,
+                    grenze, verhaeltnis, erg.erfuellt)

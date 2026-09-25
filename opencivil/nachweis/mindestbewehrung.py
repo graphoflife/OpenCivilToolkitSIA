@@ -44,7 +44,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_formel,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, MM, Groesse
 from opencivil.core.latex import angabe, vergleich
@@ -250,14 +250,12 @@ class Rissnormalkraft(Nachweis):
         r = richtung.value
         basis = f"{querschnitt.id}.nachweis.rissnormalkraft.{r}"
         self.d_ausnutzung: Dict[int, WertDef] = {
-            l.nummer: WertDef(
-                id=f"{basis}.lage{l.nummer}.erfuellungsgrad",
-                symbol=rf"\alpha_{{eff,NR,{l.nummer},{r}}}",
-                einheit=EINHEITSLOS,
-                beschreibung=(f"Erfüllungsgrad Rissnormalkraft – "
-                              f"{l.nummer}. Lage {r}"),
-                referenz="SIA 262:2025, 4.4.2",
-                stellen=2,
+            l.nummer: grad_def(
+                f"{basis}.lage{l.nummer}.erfuellungsgrad",
+                rf"\alpha_{{eff,NR,{l.nummer},{r}}}",
+                (f"Erfüllungsgrad Rissnormalkraft – "
+                 f"{l.nummer}. Lage {r}"),
+                "SIA 262:2025, 4.4.2",
             )
             for l in self.lagen
         }
@@ -312,7 +310,7 @@ class Rissnormalkraft(Nachweis):
             self.ergebnisse.append(erg)
             self._protokoll_lage(p, e, erg)
             ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
-                min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
+                erg.erfuellungsgrad, EINHEITSLOS)
             urteile.append(self._urteil(erg))
 
         self._protokoll_massgebend(p, urteile)
@@ -455,10 +453,8 @@ class Rissnormalkraft(Nachweis):
                  titel="Aufnehmbare Risskraft",
                  nachsatz=vergleich(r"\ge" if erg.erfuellt else "<", angabe(n_riss),
                                     erg.erfuellt))
-        grad_formel(p, self.d_ausnutzung[nummer].belegen(
-                        Groesse(erg.erfuellungsgrad, EINHEITSLOS)),
-                    r"\frac{@N}{@N_Riss}", {"N": n_s_adm, "N_Riss": n_riss},
-                    erg.erfuellt)
+        grad_formel(p, self.d_ausnutzung[nummer], erg.erfuellungsgrad,
+                    n_s_adm, n_riss, erg.erfuellt)
 
 
 
@@ -551,14 +547,12 @@ class ZwaengungBiegung(Nachweis):
         r = richtung.value
         basis = f"{querschnitt.id}.nachweis.zwang_biegung.{r}"
         self.d_ausnutzung: Dict[int, WertDef] = {
-            l.nummer: WertDef(
-                id=f"{basis}.lage{l.nummer}.erfuellungsgrad",
-                symbol=rf"\alpha_{{eff,ZB,{l.nummer},{r}}}",
-                einheit=EINHEITSLOS,
-                beschreibung=(f"Erfüllungsgrad Zwängung auf Biegung – "
-                              f"{l.nummer}. Lage {r}"),
-                referenz="SIA 262:2025, 4.4.2",
-                stellen=2,
+            l.nummer: grad_def(
+                f"{basis}.lage{l.nummer}.erfuellungsgrad",
+                rf"\alpha_{{eff,ZB,{l.nummer},{r}}}",
+                (f"Erfüllungsgrad Zwängung auf Biegung – "
+                 f"{l.nummer}. Lage {r}"),
+                "SIA 262:2025, 4.4.2",
             )
             for l in self.lagen
         }
@@ -617,7 +611,7 @@ class ZwaengungBiegung(Nachweis):
             self.ergebnisse.append(erg)
             self._protokoll_lage(p, e, erg)
             ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
-                min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
+                erg.erfuellungsgrad, EINHEITSLOS)
             urteile.append(self._urteil(erg))
 
         self._protokoll_massgebend(p, urteile)
@@ -791,10 +785,8 @@ class ZwaengungBiegung(Nachweis):
                  titel="Aufnehmbares Moment der Bewehrung",
                  nachsatz=vergleich(r"\ge" if erg.erfuellt else "<", angabe(m_riss),
                                     erg.erfuellt))
-        grad_formel(p, self.d_ausnutzung[nummer].belegen(
-                        Groesse(erg.erfuellungsgrad, EINHEITSLOS)),
-                    r"\frac{@M}{@M_Riss}", {"M": m_s_adm, "M_Riss": m_riss},
-                    erg.erfuellt)
+        grad_formel(p, self.d_ausnutzung[nummer], erg.erfuellungsgrad,
+                    m_s_adm, m_riss, erg.erfuellt)
 
 
 def _erster_E_s(e: Eingaben, lagen: Sequence[Bewehrungslage]) -> Optional[Wert]:

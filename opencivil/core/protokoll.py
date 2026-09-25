@@ -24,7 +24,7 @@ mit hunderten Dehnungsebenen) will man nichts mitschreiben. Dafuer gibt es
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass
 from enum import Enum
 from typing import (
     Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Type,
@@ -225,7 +225,6 @@ class Protokoll:
         titel: str = "",
         referenz: Optional[str] = None,
         *,
-        ergebnis_latex: Optional[str] = None,
         empirisch: Optional[Mapping[str, Einheit]] = None,
         nachsatz: str = "",
     ) -> None:
@@ -237,11 +236,6 @@ class Protokoll:
         automatisch aus ``eingaben``. Zwischenergebnisse, die keine Werte des
         Rechenwerks sind, legt :class:`Zwischenwerte` an.
 
-        ``ergebnis_latex`` setzt das Resultat anders als mit seiner
-        Stellenzahl -- ein Erfuellungsgrad folgt
-        :func:`opencivil.core.berechnung.grad_als_text`, damit 0.9966 nicht
-        als 1.00 neben «nicht erfuellt» steht.
-
         ``empirisch`` nennt die Eingaben einer dimensionell inhomogenen
         Normformel mit der Einheit, in der sie als blanke Zahl eingehen
         (:func:`latex.einsetzen_numerisch`). ``nachsatz`` steht hinter dem
@@ -249,8 +243,6 @@ class Protokoll:
         """
         zeile = tex.Formelzeile.bauen(ergebnis, vorlage, eingaben,
                                       empirisch=empirisch, nachsatz=nachsatz)
-        if ergebnis_latex is not None:
-            zeile = replace(zeile, ergebnis=ergebnis_latex)
         self._anfuegen(
             GleichungBlock(
                 latex=zeile.darstellen(),

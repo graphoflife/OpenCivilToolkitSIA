@@ -10,7 +10,7 @@ from typing import Mapping
 
 from opencivil.core.berechnung import (
     Berechnung, BerechnungsFehler, Eingabebezug, Eingaben, Formel, Nachweis,
-    NachweisUrteil, Prozedur, Vorgabe,
+    NachweisUrteil, Prozedur, Vorgabe, grad_def,
 )
 from opencivil.core.einheiten import (
     EINHEITSLOS, KN, KNM, M, MM, MM2, MPA, N_PRO_MM2, DimensionsFehler, Groesse,
@@ -113,6 +113,19 @@ class TestWert(unittest.TestCase):
         wert = D_F_CD.belegen(Groesse(16.6667, MPA))
         self.assertEqual(wert.formatiert(), "16.7")
         self.assertEqual(wert.zahl_latex(), r"16.7\,\mathrm{MPa}")
+
+    def test_ein_erfuellungsgrad_setzt_sich_selbst(self):
+        """
+        Überall derselbe Text: in der Werttabelle stand ein knapp verfehlter
+        Grad als «1», gerundet an grad_als_text vorbei.
+        """
+        grad = grad_def("n.erfuellungsgrad", r"\alpha_{eff}", "Erfüllungsgrad")
+        fall = lambda g: grad.belegen(Groesse(g, EINHEITSLOS))
+        self.assertEqual(fall(0.9966).formatiert(), "0.996")
+        self.assertEqual(fall(2.359).formatiert(), "2.36")
+        self.assertEqual(fall(3.7).formatiert(), "3.70")
+        self.assertEqual(fall(float("inf")).formatiert(), "∞")
+        self.assertEqual(fall(float("inf")).zahl_latex(), r"\infty")
 
 
 class TestLatexEinsetzen(unittest.TestCase):

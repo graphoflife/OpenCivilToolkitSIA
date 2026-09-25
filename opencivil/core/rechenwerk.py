@@ -37,10 +37,10 @@ EIGENSTAENDIG NUTZBAR::
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Set, Tuple
+from typing import Dict, List, Mapping, Optional, Sequence, Set, Tuple
 
 from opencivil.core.berechnung import (
-    Berechnung, BerechnungsFehler, Eingaben, Nachweis, NachweisUrteil,
+    Berechnung, Eingaben, Nachweis, NachweisUrteil,
 )
 from opencivil.core.einheiten import Groesse
 from opencivil.core.protokoll import Protokoll, StillesProtokoll
