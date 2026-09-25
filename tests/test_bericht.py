@@ -10,6 +10,7 @@ from opencivil.bericht.latex_dokument import (
     als_tex, finde_tex_maschine, formeln_sammeln, schreibe,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KNM, MM, N_PRO_MM2, Groesse
+from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import (
     Block, Protokoll, TextBlock, TitelBlock, UnterprotokollBlock, darstellen,
 )
@@ -396,6 +397,39 @@ class TestKnappVerfehlterGrad(unittest.TestCase):
                          api.grad_als_text(knick["erfuellungsgrad"], False))
 
 
+class TestMarkdown(unittest.TestCase):
+    """Der Bericht als Markdown: Text ist Markdown, Formeln sind LaTeX-Mathe."""
+
+    def test_text_wird_maskiert(self):
+        from opencivil.bericht.markdown import absatz_markdown, text_markdown
+
+        self.assertEqual(text_markdown("N_Ed = 5 * 3 $ | ü"),
+                         r"N\_Ed = 5 \* 3 \$ \| ü")
+        # Nur am Anfang eines Absatzes wird aus «2.» eine Liste.
+        self.assertEqual(text_markdown("2. Lage"), "2. Lage")
+        self.assertEqual(absatz_markdown("2. Lage"), r"2\. Lage")
+        self.assertEqual(absatz_markdown("- minus"), r"\- minus")
+
+    def test_ein_betrag_in_der_tabelle_teilt_die_zelle_nicht(self):
+        from opencivil.bericht.markdown import protokoll_zeilen
+
+        p = Protokoll()
+        p.tabelle([Mathe("N"), "Art"], [[Mathe(r"\left|N_{Ed}\right|"), "Druck"]],
+                  ausrichtung="rl")
+        kopf, trenner, zeile = [z for z in protokoll_zeilen(p) if z]
+        self.assertEqual(trenner, "| ---: | :--- |")
+        self.assertEqual(zeile, r"| $\left\vert N_{Ed}\right\vert $ | Druck |")
+
+    def test_jede_formel_steht_als_formelblock_da(self):
+        from opencivil.bericht.markdown import als_markdown
+
+        loesung, _ = beispiel_loesung()
+        text = als_markdown(loesung, titel="Probe")
+        self.assertTrue(text.startswith("# Probe\n"))
+        for gleichung in loesung.protokoll.gleichungen():
+            self.assertIn(f"$$\n{gleichung.latex}\n$$", text)
+
+
 class TestBerichtWieBildschirm(unittest.TestCase):
     """
     Der Bericht zeigt je Platte, was der Bildschirm zeigt -- aus denselben
@@ -458,11 +492,11 @@ class TestTafeln(unittest.TestCase):
     """
 
     def tafeln(self):
-        from opencivil.bericht import konsole, latex_dokument
+        from opencivil.bericht import konsole, latex_dokument, markdown
         from opencivil.web import api
 
         return {"Konsole": konsole.TAFEL, "LaTeX": latex_dokument.TAFEL,
-                "Oberfläche": api.TAFEL}
+                "Markdown": markdown.TAFEL, "Oberfläche": api.TAFEL}
 
     def test_jede_tafel_kennt_jede_blockart(self):
         def unterklassen(art):

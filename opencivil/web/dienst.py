@@ -34,6 +34,7 @@ from typing import Any, Callable, Dict, Mapping
 
 from opencivil import bewehrungssuche
 from opencivil.bericht.latex_dokument import als_tex
+from opencivil.bericht.markdown import als_markdown
 from opencivil.core.rechenwerk import RechenwerkFehler
 from opencivil.projekt import Projekt, ProjektFehler
 from opencivil.web import api, speicher
@@ -258,7 +259,8 @@ def querkraftkurven(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
 
 def bericht(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
-    Baut das LaTeX-Dokument und gibt es als Zeichenkette zurueck.
+    Baut den Bericht als LaTeX-Dokument und als Markdown, beide als
+    Zeichenkette.
 
     Geschrieben wird hier nichts. Der Browser macht daraus einen Download, der
     Server legt es zusaetzlich in ``ausgabe/`` ab und versucht die Uebersetzung
@@ -272,13 +274,12 @@ def bericht(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     loesung = (aufbau.werk.loese(*gewuenscht) if gewuenscht
                else aufbau.werk.loese_alles())
 
+    untertitel = "OpenCivilToolkitSIA – Berechnung nach SIA 262:2025"
     return {
-        "tex": als_tex(
-            loesung,
-            titel=projekt.name,
-            untertitel="OpenCivilToolkitSIA – Berechnung nach SIA 262:2025",
-            aufbau=aufbau,
-        ),
+        "tex": als_tex(loesung, titel=projekt.name, untertitel=untertitel,
+                       aufbau=aufbau),
+        "markdown": als_markdown(loesung, titel=projekt.name,
+                                 untertitel=untertitel, aufbau=aufbau),
         "dateiname": dateiname(projekt.name),
     }
 

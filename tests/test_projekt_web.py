@@ -841,6 +841,17 @@ class TestDienst(unittest.TestCase):
         # Kein Pfad in der Antwort: der Dienst fasst die Platte nicht an.
         self.assertNotIn("tex_pfad", antwort.daten)
 
+    def test_bericht_auch_als_markdown(self):
+        """Derselbe Bericht: dieselben Abschnitte, dieselbe Plattentabelle."""
+        daten = dienst.bearbeite("bericht", self.rumpf()).daten
+        name = Projekt.beispiel().name
+        self.assertTrue(daten["markdown"].startswith(f"# {name}\n"))
+        for abschnitt in ("Herleitung", "Nachweise", "Werte"):
+            self.assertIn(f"\n## {abschnitt}\n", daten["markdown"])
+            self.assertIn(rf"\section{{{abschnitt}}}", daten["tex"])
+        self.assertIn("| Nachweis | Bezeichnung | Widerstand | Einwirkung |",
+                      daten["markdown"])
+
     def test_pruefen_reicht_das_projekt_aufgeraeumt_zurueck(self):
         antwort = dienst.bearbeite("pruefen", self.rumpf())
         self.assertEqual(antwort.daten["projekt"], Projekt.beispiel().als_dict())

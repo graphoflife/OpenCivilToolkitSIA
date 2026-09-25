@@ -23,11 +23,13 @@ etwas geändert hat, nicht ob es richtig ist. Aber er lässt nichts durch.
 """
 
 import os
+import re
 import sys
 import unittest
 from pathlib import Path
 
 ORDNER = Path(__file__).parent / "schnappschuss"
+WURZEL = Path(__file__).resolve().parents[1]
 
 #: Feste Breite für den Konsolenbericht.
 #:
@@ -90,6 +92,7 @@ def berichte() -> dict:
     """Name der Datei auf ihren Inhalt -- die eine Stelle, die das erzeugt."""
     from opencivil.bericht import konsole
     from opencivil.bericht.latex_dokument import als_tex
+    from opencivil.bericht.markdown import als_markdown
 
     vorher, konsole._BREITE = konsole._BREITE, BREITE
     try:
@@ -100,6 +103,7 @@ def berichte() -> dict:
             dateien[f"{name}.txt"] = konsole.als_text(loesung, titel=titel,
                                                       aufbau=aufbau)
             dateien[f"{name}.tex"] = als_tex(loesung, titel=titel, aufbau=aufbau)
+            dateien[f"{name}.md"] = als_markdown(loesung, titel=titel, aufbau=aufbau)
         return dateien
     finally:
         konsole._BREITE = vorher
@@ -133,6 +137,25 @@ class TestSchnappschuss(unittest.TestCase):
                 if any(not u.still for n in eintraege.values() for u in n.urteile):
                     gezeigt.add(feld)
         self.assertEqual(set(Aufbau.NACHWEISFELDER) - gezeigt, set())
+
+    def test_nur_gewoehnliches_latex(self):
+        """
+        Markdown und LaTeX-Dokument gehen an Leser, die nicht KaTeX sind:
+        GitHub, Pandoc, pdflatex. Ein Makro, das nur die Oberflaeche kennt,
+        stuende dort als Fehler. Welche das sind, sagt die Einstellung von
+        KaTeX selbst -- dazu die, die erst ``trust`` freischaltet.
+        """
+        einstellung = (WURZEL / "web" / "js" / "mathe.js").read_text(encoding="utf-8")
+        nur_katex = re.findall(r"'\\\\([a-zA-Z]+)':", einstellung)
+        self.assertIn("diameter", nur_katex, "die Einstellung liess sich nicht lesen")
+        nur_katex += ["htmlClass", "htmlId", "htmlStyle", "htmlData", "href", "url",
+                      "includegraphics"]
+        for name, inhalt in berichte().items():
+            if name.endswith(".txt"):
+                continue
+            with self.subTest(datei=name):
+                gefunden = set(re.findall(r"\\([a-zA-Z]+)", inhalt)) & set(nur_katex)
+                self.assertEqual(gefunden, set())
 
     def test_der_bericht_ist_unveraendert(self):
         for name, ist in berichte().items():

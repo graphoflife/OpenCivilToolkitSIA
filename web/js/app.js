@@ -185,7 +185,7 @@ async function berichtErzeugen() {
 
     // Das .tex ist auf beiden Wegen dasselbe. Nur der Server kann es zusätzlich
     // ablegen und übersetzen -- im Browser gibt es keine TeX-Maschine.
-    let meldung = 'Das LaTeX steht bereit. In Overleaf einfügen oder herunterladen.';
+    let meldung = 'Der Bericht steht bereit: als LaTeX für Overleaf oder als Markdown.';
     if (antwort.pdf_pfad) meldung = `PDF erzeugt mit ${antwort.maschine}: ${antwort.pdf_pfad}`;
     else if (antwort.tex_pfad) meldung = `LaTeX geschrieben: ${antwort.tex_pfad}\n(${antwort.meldung})`;
 
@@ -205,6 +205,24 @@ async function berichtErzeugen() {
           text: '.tex herunterladen',
           download: `${antwort.dateiname || 'bericht'}.tex`,
           href: URL.createObjectURL(new Blob([antwort.tex], { type: 'application/x-tex' })),
+        }),
+      ]),
+      // Derselbe Bericht als Markdown -- für GitHub, Obsidian, ein Wiki. Die
+      // Formeln stehen darin als LaTeX-Mathe, wie es diese Leser erwarten.
+      el('div.reihe', { style: { margin: '10px 0' } }, [
+        el('button.knopf', {
+          text: 'Markdown in die Zwischenablage',
+          on: {
+            click: async () => {
+              await navigator.clipboard.writeText(antwort.markdown);
+              melden('Markdown kopiert.');
+            },
+          },
+        }),
+        el('a.knopf', {
+          text: '.md herunterladen',
+          download: `${antwort.dateiname || 'bericht'}.md`,
+          href: URL.createObjectURL(new Blob([antwort.markdown], { type: 'text/markdown' })),
         }),
       ]),
       el('pre', { text: antwort.tex }),

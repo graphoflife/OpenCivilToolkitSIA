@@ -6,6 +6,7 @@
     "opencivil/bericht/gliederung.py",
     "opencivil/bericht/konsole.py",
     "opencivil/bericht/latex_dokument.py",
+    "opencivil/bericht/markdown.py",
     "opencivil/bericht/zusammenfassung.py",
     "opencivil/bewehrungssuche.py",
     "opencivil/core/__init__.py",

@@ -25,11 +25,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, List
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 from opencivil import spannungsanalyse
 from opencivil.bericht import konsole
 from opencivil.bericht.latex_dokument import Ausgabeergebnis, schreibe
+from opencivil.bericht.markdown import als_markdown
 from opencivil.bericht.zusammenfassung import zusammenfassen
 from opencivil.core.berechnung import NachweisUrteil
 from opencivil.core.rechenwerk import Loesung
@@ -102,6 +103,21 @@ class Ergebnis:
         """Der vollstaendige Bericht mit Herleitung, als Text."""
         return konsole.als_text(self.loesung, titel=self.projekt.name,
                                 aufbau=self.aufbau)
+
+    def markdown(self, pfad: Optional[str | Path] = None) -> str:
+        """
+        Der Bericht als Markdown, mit den Formeln als LaTeX-Mathe.
+
+        Mit ``pfad`` auch als ``.md``-Datei abgelegt; zurueck kommt der Text
+        in jedem Fall.
+        """
+        text = als_markdown(self.loesung, titel=self.projekt.name,
+                            aufbau=self.aufbau)
+        if pfad is not None:
+            datei = Path(pfad).with_suffix(".md")
+            datei.parent.mkdir(parents=True, exist_ok=True)
+            datei.write_text(text, encoding="utf-8")
+        return text
 
     def latex(self, pfad: str | Path, *, pdf: bool = False) -> Ausgabeergebnis:
         """
