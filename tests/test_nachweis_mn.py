@@ -625,7 +625,7 @@ class TestErfuellungsgrad(unittest.TestCase):
 
         Eine Normaldruckkraft vergrössert den Momentenwiderstand, bis die
         Druckzone zu gross wird. Beim Polygon kommt das vom Eckpunkt bei
-        x = h/2; der gilt, solange die Zugbewehrung dort noch fliesst.
+        x = h/2.
 
         Beide Höchstwerte liegen nahe beieinander. Auf welcher Seite die
         Handrechnung landet, ist nicht festgelegt und soll es auch nicht sein:
@@ -643,29 +643,30 @@ class TestErfuellungsgrad(unittest.TestCase):
         self.assertLess(hand.N, 0.0, "das Polygon auch")
         self.assertAlmostEqual(hand.M / genau.M, 1.0, delta=0.10)
 
-    def test_eckpunkt_faellt_weg_wenn_die_bewehrung_nicht_fliesst(self):
+    def test_ohne_fliessen_rechnet_der_eckpunkt_elastisch(self):
         """
-        Ohne Fliessen bei x = h/2 wäre f_sd = f_yd zu günstig angesetzt.
+        Fliesst die Zugbewehrung bei x = h/2 nicht, rechnet der Eckpunkt mit
+        σ_sd = E_s·ε_s < f_yd, statt wegzufallen.
 
-        Erzwungen mit einer sehr grossen unteren Überdeckung: dann liegt die
-        untere Bewehrung nahe der Nulllinie und dehnt sich kaum. Für das
-        positive Moment muss der Eckpunkt wegfallen, statt mit einer Spannung
-        zu rechnen, die der Stahl nicht erreicht.
+        Der Fall aus der Oberfläche: x in der 2. Lage, darunter ⌀40 in y. Ohne
+        den Eckpunkt lief das Polygon geradlinig vom reinen Druck zu
+        M_Rd(N = 0) -- bei N = -2000 kN standen von Hand 81 kNm, genau 282.
         """
         querschnitt = platte(
-            [lage(1, Richtung.X, phi=18.0), lage(2, Richtung.Y),
-             lage(3, Richtung.Y), lage(4, Richtung.X, phi=12.0)],
-            ueberdeckung_unten=Groesse(130, MM))
+            [lage(1, Richtung.Y, phi=40.0), lage(2, Richtung.X, phi=16.0),
+             lage(3, Richtung.X, phi=12.0), lage(4, Richtung.Y, phi=12.0)])
         nachweis, _ = self._pruefe(
-            [Schnittgroessen("Feld", M_Ed=Groesse(40, KNM))], querschnitt=querschnitt)
+            [Schnittgroessen("Druck", M_Ed=Groesse(200, KNM), N_Ed=Groesse(-2000, KN))],
+            querschnitt=querschnitt)
 
-        # Auf der Druckseite darf kein Bauch mehr entstehen: der Höchstwert des
-        # positiven Moments liegt wieder bei N = 0.
-        bester = max(nachweis.handlinie, key=lambda punkt: punkt.M)
-        self.assertAlmostEqual(bester.N, 0.0, places=6)
         self.assertEqual(
-            1, sum(1 for q in nachweis.handlinie if q.name.startswith("x = h/2")),
-            "nur die negative Seite darf den Eckpunkt behalten")
+            2, sum(1 for q in nachweis.handlinie if q.name.startswith("x = h/2")))
+        self.assertEqual(kreuzungen([(q.M, q.N) for q in nachweis.handlinie]), [])
+        hand = max(schnitte(nachweis.handlinie, MOMENT, -2000e3))
+        genau = max(schnitte(nachweis.linie, MOMENT, -2000e3))
+        # Innerhalb der genauen Linie, aber nicht mehr weit davon.
+        self.assertLess(hand, genau)
+        self.assertGreater(hand / genau, 0.8)
 
     def test_alle_drei_massstaebe_liefern_ein_ergebnis(self):
         kombinationen = [

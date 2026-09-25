@@ -116,21 +116,26 @@ Momentenwiderstand bei reiner Biegung
 Nulllinie auf halber Höhe: x = h/2
     x^{+} = \frac{h}{2} = \frac{300\,\mathrm{mm}}{2} = 150\,\mathrm{mm}
 
-Fliesskriterium – Dehnung der Zugbewehrung
+Dehnung der Zugbewehrung
     \varepsilon_s^{+} = \left(d_{2,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}} = \left(248.1\,\mathrm{mm} - 150\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{150\,\mathrm{mm}} = 2.29\,\text{‰}
 
-ε_s = 2.29 ‰ ≥ ε_yd = 2.17 ‰ – die Zugbewehrung fliesst, f_sd = f_yd gilt.
+Stahlspannung, höchstens die Fliessgrenze
+    \begin{aligned}
+      \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{+};\ f_{yd}\right] \\
+      &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.29\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+      &= 435\,\mathrm{N}/\mathrm{mm}^{2}
+    \end{aligned}
 
 Kräftegleichgewicht
     \begin{aligned}
-      N_{Rd}^{+} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{+} + A_{s,2,x} \cdot f_{sd} \\
+      N_{Rd}^{+} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{+} + A_{s,2,x} \cdot \sigma_{sd} \\
       &= -20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 150\,\mathrm{mm} + 2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \\
       &= -1484.6\,\mathrm{kN}
     \end{aligned}
 
 Momentengleichgewicht um die halbe Höhe
     \begin{aligned}
-      M_{Rd}^{+} &= \left[f_{cd} \cdot b \cdot 0.85 \cdot x^{+} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{+}}{2}\right) + A_{s,2,x} \cdot f_{sd} \cdot \left(d_{2,x} - \tfrac{h}{2}\right)\right] \\
+      M_{Rd}^{+} &= \left[f_{cd} \cdot b \cdot 0.85 \cdot x^{+} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{+}}{2}\right) + A_{s,2,x} \cdot \sigma_{sd} \cdot \left(d_{2,x} - \tfrac{h}{2}\right)\right] \\
       &= \left[20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 150\,\mathrm{mm} \cdot \left(\tfrac{300\,\mathrm{mm}}{2} - \tfrac{0.85 \cdot 150\,\mathrm{mm}}{2}\right) + 2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(248.1\,\mathrm{mm} - \tfrac{300\,\mathrm{mm}}{2}\right)\right] \\
       &= 324.4\,\mathrm{kNm}
     \end{aligned}
@@ -154,21 +159,26 @@ Momentenwiderstand bei reiner Biegung
 Nulllinie auf halber Höhe: x = h/2
     x^{-} = \frac{h}{2} = \frac{300\,\mathrm{mm}}{2} = 150\,\mathrm{mm}
 
-Fliesskriterium – Dehnung der Zugbewehrung
+Dehnung der Zugbewehrung
     \varepsilon_s^{-} = \left(d_{3,x} - x^{-}\right) \cdot \frac{\varepsilon_{c2d}}{x^{-}} = \left(252\,\mathrm{mm} - 150\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{150\,\mathrm{mm}} = 2.38\,\text{‰}
 
-ε_s = 2.38 ‰ ≥ ε_yd = 2.17 ‰ – die Zugbewehrung fliesst, f_sd = f_yd gilt.
+Stahlspannung, höchstens die Fliessgrenze
+    \begin{aligned}
+      \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{-};\ f_{yd}\right] \\
+      &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.38\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+      &= 435\,\mathrm{N}/\mathrm{mm}^{2}
+    \end{aligned}
 
 Kräftegleichgewicht
     \begin{aligned}
-      N_{Rd}^{-} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{-} + A_{s,3,x} \cdot f_{sd} \\
+      N_{Rd}^{-} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{-} + A_{s,3,x} \cdot \sigma_{sd} \\
       &= -20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 150\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \\
       &= -2222.2\,\mathrm{kN}
     \end{aligned}
 
 Momentengleichgewicht um die halbe Höhe
     \begin{aligned}
-      M_{Rd}^{-} &= -\left[f_{cd} \cdot b \cdot 0.85 \cdot x^{-} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{-}}{2}\right) + A_{s,3,x} \cdot f_{sd} \cdot \left(d_{3,x} - \tfrac{h}{2}\right)\right] \\
+      M_{Rd}^{-} &= -\left[f_{cd} \cdot b \cdot 0.85 \cdot x^{-} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{-}}{2}\right) + A_{s,3,x} \cdot \sigma_{sd} \cdot \left(d_{3,x} - \tfrac{h}{2}\right)\right] \\
       &= -\left[20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 150\,\mathrm{mm} \cdot \left(\tfrac{300\,\mathrm{mm}}{2} - \tfrac{0.85 \cdot 150\,\mathrm{mm}}{2}\right) + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(252\,\mathrm{mm} - \tfrac{300\,\mathrm{mm}}{2}\right)\right] \\
       &= -253.4\,\mathrm{kNm}
     \end{aligned}
@@ -1187,21 +1197,26 @@ Momentenwiderstand bei reiner Biegung
 Nulllinie auf halber Höhe: x = h/2
     x^{+} = \frac{h}{2} = \frac{200\,\mathrm{mm}}{2} = 100\,\mathrm{mm}
 
-Fliesskriterium – Dehnung der Zugbewehrung
+Dehnung der Zugbewehrung
     \varepsilon_s^{+} = \left(d_{1,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}} = \left(165\,\mathrm{mm} - 100\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{100\,\mathrm{mm}} = 2.27\,\text{‰}
 
-ε_s = 2.27 ‰ ≥ ε_yd = 2.17 ‰ – die Zugbewehrung fliesst, f_sd = f_yd gilt.
+Stahlspannung, höchstens die Fliessgrenze
+    \begin{aligned}
+      \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{+};\ f_{yd}\right] \\
+      &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.27\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+      &= 435\,\mathrm{N}/\mathrm{mm}^{2}
+    \end{aligned}
 
 Kräftegleichgewicht
     \begin{aligned}
-      N_{Rd}^{+} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{+} + A_{s,1,x} \cdot f_{sd} \\
+      N_{Rd}^{+} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{+} + A_{s,1,x} \cdot \sigma_{sd} \\
       &= -20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 100\,\mathrm{mm} + 524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \\
       &= -1472.3\,\mathrm{kN}
     \end{aligned}
 
 Momentengleichgewicht um die halbe Höhe
     \begin{aligned}
-      M_{Rd}^{+} &= \left[f_{cd} \cdot b \cdot 0.85 \cdot x^{+} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{+}}{2}\right) + A_{s,1,x} \cdot f_{sd} \cdot \left(d_{1,x} - \tfrac{h}{2}\right)\right] \\
+      M_{Rd}^{+} &= \left[f_{cd} \cdot b \cdot 0.85 \cdot x^{+} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{+}}{2}\right) + A_{s,1,x} \cdot \sigma_{sd} \cdot \left(d_{1,x} - \tfrac{h}{2}\right)\right] \\
       &= \left[20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 100\,\mathrm{mm} \cdot \left(\tfrac{200\,\mathrm{mm}}{2} - \tfrac{0.85 \cdot 100\,\mathrm{mm}}{2}\right) + 524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(165\,\mathrm{mm} - \tfrac{200\,\mathrm{mm}}{2}\right)\right] \\
       &= 112.5\,\mathrm{kNm}
     \end{aligned}
@@ -1225,21 +1240,26 @@ Momentenwiderstand bei reiner Biegung
 Nulllinie auf halber Höhe: x = h/2
     x^{-} = \frac{h}{2} = \frac{200\,\mathrm{mm}}{2} = 100\,\mathrm{mm}
 
-Fliesskriterium – Dehnung der Zugbewehrung
+Dehnung der Zugbewehrung
     \varepsilon_s^{-} = \left(d_{4,x} - x^{-}\right) \cdot \frac{\varepsilon_{c2d}}{x^{-}} = \left(165\,\mathrm{mm} - 100\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{100\,\mathrm{mm}} = 2.27\,\text{‰}
 
-ε_s = 2.27 ‰ ≥ ε_yd = 2.17 ‰ – die Zugbewehrung fliesst, f_sd = f_yd gilt.
+Stahlspannung, höchstens die Fliessgrenze
+    \begin{aligned}
+      \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{-};\ f_{yd}\right] \\
+      &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.27\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+      &= 435\,\mathrm{N}/\mathrm{mm}^{2}
+    \end{aligned}
 
 Kräftegleichgewicht
     \begin{aligned}
-      N_{Rd}^{-} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{-} + A_{s,4,x} \cdot f_{sd} \\
+      N_{Rd}^{-} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{-} + A_{s,4,x} \cdot \sigma_{sd} \\
       &= -20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 100\,\mathrm{mm} + 524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \\
       &= -1472.3\,\mathrm{kN}
     \end{aligned}
 
 Momentengleichgewicht um die halbe Höhe
     \begin{aligned}
-      M_{Rd}^{-} &= -\left[f_{cd} \cdot b \cdot 0.85 \cdot x^{-} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{-}}{2}\right) + A_{s,4,x} \cdot f_{sd} \cdot \left(d_{4,x} - \tfrac{h}{2}\right)\right] \\
+      M_{Rd}^{-} &= -\left[f_{cd} \cdot b \cdot 0.85 \cdot x^{-} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{-}}{2}\right) + A_{s,4,x} \cdot \sigma_{sd} \cdot \left(d_{4,x} - \tfrac{h}{2}\right)\right] \\
       &= -\left[20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 100\,\mathrm{mm} \cdot \left(\tfrac{200\,\mathrm{mm}}{2} - \tfrac{0.85 \cdot 100\,\mathrm{mm}}{2}\right) + 524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(165\,\mathrm{mm} - \tfrac{200\,\mathrm{mm}}{2}\right)\right] \\
       &= -112.5\,\mathrm{kNm}
     \end{aligned}
@@ -1504,20 +1524,20 @@ Bewehrungsquerschnitt je Laufmeter   [SIA 262:2025, 5.5.2]
     A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
 
 Bewehrungsmass je Kubikmeter Beton
-    \mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{b \cdot h} = \frac{2555\,\mathrm{mm}^{2} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{1000\,\mathrm{mm} \cdot 250\,\mathrm{mm}} = 80\,\mathrm{kg}/\mathrm{m}^{3}
+    \mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{b \cdot h} = \frac{10409\,\mathrm{mm}^{2} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{1000\,\mathrm{mm} \cdot 250\,\mathrm{mm}} = 327\,\mathrm{kg}/\mathrm{m}^{3}
 
 Höhe der Distanzhalter
     \begin{aligned}
       h_{Dist} &= \text{OK innere untere Lage} - \text{UK innere obere Lage} \\
-      &= 198\,\mathrm{mm} - 52\,\mathrm{mm} \\
-      &= 146\,\mathrm{mm}
+      &= 168\,\mathrm{mm} - 52\,\mathrm{mm} \\
+      &= 116\,\mathrm{mm}
     \end{aligned}
 
 Randabstände, Tiefen ab Oberkante und Bewehrungsquerschnitte
     Bewehrung               Richtung  Stahl  \varnothing\ [\mathrm{mm}]  s\ [\mathrm{mm}]  Randabstand [mm]  z\ [\mathrm{mm}]  A_s\ [\mathrm{mm}^2]
     ----------------------  --------  -----  --------------------------  ----------------  ----------------  ----------------  --------------------
-    1. Lage Grundbewehrung  y         B500B                          10               150                35               215                   524
-    2. Lage Grundbewehrung  x         B500B                          12               150                46               204                   754
+    1. Lage Grundbewehrung  y         B500B                          40               150                50               200                  8378
+    2. Lage Grundbewehrung  x         B500B                          12               150                76               174                   754
     3. Lage Grundbewehrung  x         B500B                          12               150                46                46                   754
     4. Lage Grundbewehrung  y         B500B                          10               150                35                35                   524
 
@@ -1531,7 +1551,7 @@ auf die halbe Querschnittshöhe.
 Zusammengefasste Bewehrung
     Seite                   A_s\ [\mathrm{mm}^2]  z\ [\mathrm{mm}]  f_{yd}\ [\mathrm{N/mm^2}]
     ----------------------  --------------------  ----------------  -------------------------
-    2. Lage Grundbewehrung                   754             204.0                        435
+    2. Lage Grundbewehrung                   754             174.0                        435
     3. Lage Grundbewehrung                   754              46.0                        435
 
 Grösste Druckkraft
@@ -1556,15 +1576,15 @@ Beide Lagen fliessen auf Zug
 Kräfte mal Hebelarm um die halbe Höhe
     \begin{aligned}
       M_{Rd}(N_{Rd}^{+}) &= A_{s,2,x} \cdot f_{yd} \cdot \left(z_{2,x} - \tfrac{h}{2}\right) + A_{s,3,x} \cdot f_{yd} \cdot \left(z_{3,x} - \tfrac{h}{2}\right) \\
-      &= 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(204\,\mathrm{mm} - \tfrac{250\,\mathrm{mm}}{2}\right) + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(46\,\mathrm{mm} - \tfrac{250\,\mathrm{mm}}{2}\right) \\
-      &= 0\,\mathrm{kNm}
+      &= 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(174\,\mathrm{mm} - \tfrac{250\,\mathrm{mm}}{2}\right) + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(46\,\mathrm{mm} - \tfrac{250\,\mathrm{mm}}{2}\right) \\
+      &= -9.8\,\mathrm{kNm}
     \end{aligned}
 
 Positives Moment (Zug unten)
 ----------------------------
 
 Statische Höhe der Lage unten, ab dem gedrückten Rand oben
-    d_{2,x} = z_{2,x} = 204\,\mathrm{mm}
+    d_{2,x} = z_{2,x} = 174\,\mathrm{mm}
 
 Druckzonenhöhe aus dem Kräftegleichgewicht
     x^{+} = \frac{A_{s,2,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} = \frac{754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 19.3\,\mathrm{mm}
@@ -1572,30 +1592,35 @@ Druckzonenhöhe aus dem Kräftegleichgewicht
 Momentenwiderstand bei reiner Biegung
     \begin{aligned}
       M_{Rd}(N_{Ed}=0)^{+} &= A_{s,2,x} \cdot f_{yd} \cdot \left(d_{2,x} - \frac{0.85 \cdot x^{+}}{2}\right) \\
-      &= 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(204\,\mathrm{mm} - \frac{0.85 \cdot 19.3\,\mathrm{mm}}{2}\right) \\
-      &= 64.2\,\mathrm{kNm}
+      &= 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(174\,\mathrm{mm} - \frac{0.85 \cdot 19.3\,\mathrm{mm}}{2}\right) \\
+      &= 54.4\,\mathrm{kNm}
     \end{aligned}
 
 Nulllinie auf halber Höhe: x = h/2
     x^{+} = \frac{h}{2} = \frac{250\,\mathrm{mm}}{2} = 125\,\mathrm{mm}
 
-Fliesskriterium – Dehnung der Zugbewehrung
-    \varepsilon_s^{+} = \left(d_{2,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}} = \left(204\,\mathrm{mm} - 125\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{125\,\mathrm{mm}} = 2.21\,\text{‰}
+Dehnung der Zugbewehrung
+    \varepsilon_s^{+} = \left(d_{2,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}} = \left(174\,\mathrm{mm} - 125\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{125\,\mathrm{mm}} = 1.37\,\text{‰}
 
-ε_s = 2.21 ‰ ≥ ε_yd = 2.17 ‰ – die Zugbewehrung fliesst, f_sd = f_yd gilt.
+Stahlspannung, höchstens die Fliessgrenze
+    \begin{aligned}
+      \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{+};\ f_{yd}\right] \\
+      &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1.37\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+      &= 274\,\mathrm{N}/\mathrm{mm}^{2}
+    \end{aligned}
 
 Kräftegleichgewicht
     \begin{aligned}
-      N_{Rd}^{+} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{+} + A_{s,2,x} \cdot f_{sd} \\
-      &= -20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 125\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \\
-      &= -1797.2\,\mathrm{kN}
+      N_{Rd}^{+} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{+} + A_{s,2,x} \cdot \sigma_{sd} \\
+      &= -20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 125\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 274\,\mathrm{N}/\mathrm{mm}^{2} \\
+      &= -1918.1\,\mathrm{kN}
     \end{aligned}
 
 Momentengleichgewicht um die halbe Höhe
     \begin{aligned}
-      M_{Rd}^{+} &= \left[f_{cd} \cdot b \cdot 0.85 \cdot x^{+} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{+}}{2}\right) + A_{s,2,x} \cdot f_{sd} \cdot \left(d_{2,x} - \tfrac{h}{2}\right)\right] \\
-      &= \left[20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 125\,\mathrm{mm} \cdot \left(\tfrac{250\,\mathrm{mm}}{2} - \tfrac{0.85 \cdot 125\,\mathrm{mm}}{2}\right) + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(204\,\mathrm{mm} - \tfrac{250\,\mathrm{mm}}{2}\right)\right] \\
-      &= 178.6\,\mathrm{kNm}
+      M_{Rd}^{+} &= \left[f_{cd} \cdot b \cdot 0.85 \cdot x^{+} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{+}}{2}\right) + A_{s,2,x} \cdot \sigma_{sd} \cdot \left(d_{2,x} - \tfrac{h}{2}\right)\right] \\
+      &= \left[20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 125\,\mathrm{mm} \cdot \left(\tfrac{250\,\mathrm{mm}}{2} - \tfrac{0.85 \cdot 125\,\mathrm{mm}}{2}\right) + 754\,\mathrm{mm}^{2} \cdot 274\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(174\,\mathrm{mm} - \tfrac{250\,\mathrm{mm}}{2}\right)\right] \\
+      &= 162.9\,\mathrm{kNm}
     \end{aligned}
 
 Negatives Moment (Zug oben)
@@ -1617,21 +1642,26 @@ Momentenwiderstand bei reiner Biegung
 Nulllinie auf halber Höhe: x = h/2
     x^{-} = \frac{h}{2} = \frac{250\,\mathrm{mm}}{2} = 125\,\mathrm{mm}
 
-Fliesskriterium – Dehnung der Zugbewehrung
+Dehnung der Zugbewehrung
     \varepsilon_s^{-} = \left(d_{3,x} - x^{-}\right) \cdot \frac{\varepsilon_{c2d}}{x^{-}} = \left(204\,\mathrm{mm} - 125\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{125\,\mathrm{mm}} = 2.21\,\text{‰}
 
-ε_s = 2.21 ‰ ≥ ε_yd = 2.17 ‰ – die Zugbewehrung fliesst, f_sd = f_yd gilt.
+Stahlspannung, höchstens die Fliessgrenze
+    \begin{aligned}
+      \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{-};\ f_{yd}\right] \\
+      &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.21\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+      &= 435\,\mathrm{N}/\mathrm{mm}^{2}
+    \end{aligned}
 
 Kräftegleichgewicht
     \begin{aligned}
-      N_{Rd}^{-} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{-} + A_{s,3,x} \cdot f_{sd} \\
+      N_{Rd}^{-} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{-} + A_{s,3,x} \cdot \sigma_{sd} \\
       &= -20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 125\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \\
       &= -1797.2\,\mathrm{kN}
     \end{aligned}
 
 Momentengleichgewicht um die halbe Höhe
     \begin{aligned}
-      M_{Rd}^{-} &= -\left[f_{cd} \cdot b \cdot 0.85 \cdot x^{-} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{-}}{2}\right) + A_{s,3,x} \cdot f_{sd} \cdot \left(d_{3,x} - \tfrac{h}{2}\right)\right] \\
+      M_{Rd}^{-} &= -\left[f_{cd} \cdot b \cdot 0.85 \cdot x^{-} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{-}}{2}\right) + A_{s,3,x} \cdot \sigma_{sd} \cdot \left(d_{3,x} - \tfrac{h}{2}\right)\right] \\
       &= -\left[20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 125\,\mathrm{mm} \cdot \left(\tfrac{250\,\mathrm{mm}}{2} - \tfrac{0.85 \cdot 125\,\mathrm{mm}}{2}\right) + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(204\,\mathrm{mm} - \tfrac{250\,\mathrm{mm}}{2}\right)\right] \\
       &= -178.6\,\mathrm{kNm}
     \end{aligned}
@@ -1640,9 +1670,9 @@ Eckpunkte der Resistenzlinie aus Handrechnung
     Eckpunkt                    N\ [\mathrm{kN}]  M\ [\mathrm{kNm}]
     --------------------------  ----------------  -----------------
     N_{Rd}^{-}                           -5000.0                0.0
-    M_{Rd}(x=\tfrac{h}{2})^{+}           -1797.2              178.6
-    M_{Rd}(N_{Ed}=0)^{+}                     0.0               64.2
-    N_{Rd}^{+}                             655.6                0.0
+    M_{Rd}(x=\tfrac{h}{2})^{+}           -1918.1              162.9
+    M_{Rd}(N_{Ed}=0)^{+}                     0.0               54.4
+    N_{Rd}^{+}                             655.6               -9.8
     M_{Rd}(N_{Ed}=0)^{-}                     0.0              -64.2
     M_{Rd}(x=\tfrac{h}{2})^{-}           -1797.2             -178.6
 
@@ -1653,10 +1683,10 @@ Einwirkung
     M_{Ed} = 40\,\mathrm{kNm} \qquad N_{Ed} = 0\,\mathrm{kN}
 
 Widerstand bei N_Ed = 0.0 kN – ein Eckpunkt liegt genau dort
-    M_{Rd} = M_{Rd}(N_{Ed}=0)^{+} = 64.2\,\mathrm{kNm}
+    M_{Rd} = M_{Rd}(N_{Ed}=0)^{+} = 54.4\,\mathrm{kNm}
 
 Erfüllungsgrad
-    \alpha_{eff,x,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{64.2\,\mathrm{kNm}}{40\,\mathrm{kNm}} = 1.60 \quad \Rightarrow \quad \text{erfüllt}
+    \alpha_{eff,x,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{54.4\,\mathrm{kNm}}{40\,\mathrm{kNm}} = 1.36 \quad \Rightarrow \quad \text{erfüllt}
 
 Nachweis – Schräg
 -----------------
@@ -1674,7 +1704,7 @@ Bezugsgrösse der Normalkraft
 Bezugsgrösse des Moments
     \begin{aligned}
       M_{ref} &= \max\left(\left|M_{Rd,x}^{+}\right|;\ \left|M_{Rd,x}^{-}\right|\right) \\
-      &= \max\left(\left|178.6\,\mathrm{kNm}\right|;\ \left|-178.6\,\mathrm{kNm}\right|\right) \\
+      &= \max\left(\left|162.9\,\mathrm{kNm}\right|;\ \left|-178.6\,\mathrm{kNm}\right|\right) \\
       &= 178.6\,\mathrm{kNm}
     \end{aligned}
 
@@ -1682,20 +1712,20 @@ Einwirkung im normierten Diagramm
     \bar{E}_{d,x} = \sqrt{\left(\frac{N_{Ed}}{N_{ref}}\right)^{2} + \left(\frac{M_{Ed}}{M_{ref}}\right)^{2}} = \sqrt{\left(\frac{-500\,\mathrm{kN}}{5000\,\mathrm{kN}}\right)^{2} + \left(\frac{30\,\mathrm{kNm}}{178.6\,\mathrm{kNm}}\right)^{2}} = 0.195
 
 Nächster Punkt P der Resistenzlinie
-    N_P = 249.4\,\mathrm{kN} \qquad M_P = 39.8\,\mathrm{kNm}
+    N_P = 160.8\,\mathrm{kN} \qquad M_P = 38.6\,\mathrm{kNm}
 
 Kürzester Abstand zur Resistenzlinie
     \begin{aligned}
       a &= \sqrt{\left(\frac{N_{Ed} - N_P}{N_{ref}}\right)^{2} + \left(\frac{M_{Ed} - M_P}{M_{ref}}\right)^{2}} \\
-      &= \sqrt{\left(\frac{-500\,\mathrm{kN} - 249.4\,\mathrm{kN}}{5000\,\mathrm{kN}}\right)^{2} + \left(\frac{30\,\mathrm{kNm} - 39.8\,\mathrm{kNm}}{178.6\,\mathrm{kNm}}\right)^{2}} \\
-      &= 0.16
+      &= \sqrt{\left(\frac{-500\,\mathrm{kN} - 160.8\,\mathrm{kN}}{5000\,\mathrm{kN}}\right)^{2} + \left(\frac{30\,\mathrm{kNm} - 38.6\,\mathrm{kNm}}{178.6\,\mathrm{kNm}}\right)^{2}} \\
+      &= 0.141
     \end{aligned}
 
 Widerstand im normierten Diagramm
-    \bar{R}_{d,x} = \bar{E}_{d,x} + a = 0.195 + 0.16 = 0.355
+    \bar{R}_{d,x} = \bar{E}_{d,x} + a = 0.195 + 0.141 = 0.336
 
 Erfüllungsgrad
-    \alpha_{eff,x,\text{Schräg}} = \frac{\bar{R}_{d,x}}{\bar{E}_{d,x}} = \frac{0.355}{0.195} = 1.82 \quad \Rightarrow \quad \text{erfüllt}
+    \alpha_{eff,x,\text{Schräg}} = \frac{\bar{R}_{d,x}}{\bar{E}_{d,x}} = \frac{0.336}{0.195} = 1.72 \quad \Rightarrow \quad \text{erfüllt}
 
 Querkraft – x-Richtung
 ----------------------
@@ -1733,36 +1763,36 @@ Einwirkung
     V_{Ed} = 50\,\mathrm{kN}/\mathrm{m} \qquad M_{Ed} = 40\,\mathrm{kNm} \qquad N_{Ed} = 0\,\mathrm{kN}
 
 Statische Höhe der Lage unten, ab dem gedrückten Rand oben
-    d = z_{2,x,g} = 204\,\mathrm{mm}
+    d = z_{2,x,g} = 174\,\mathrm{mm}
 
 Wirksame Höhe (Einlage nicht massgebend)
-    d_v = d = 204\,\mathrm{mm}
+    d_v = d = 174\,\mathrm{mm}
 
 Dekompressionsmoment
     m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} = \frac{\left|\min(0\,\mathrm{kN};\ 0)\right| \cdot 250\,\mathrm{mm}}{6} = 0\,\mathrm{kNm}
 
 Momentenwiderstand bei N_Ed = 0.0 kN
-    M_{Rd} = M_{Rd}(N_{Ed}=0)^{+} = 64.2\,\mathrm{kNm}
+    M_{Rd} = M_{Rd}(N_{Ed}=0)^{+} = 54.4\,\mathrm{kNm}
 
 Dehnung auf halber Höhe
     \begin{aligned}
       \varepsilon_v &= \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| - m_{Dd}\right)}{E_s \cdot \left(\left|m_{Rd}(N_{Ed})\right| - m_{Dd}\right)} \\
-      &= \frac{435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(\left|40\,\mathrm{kNm}\right| - 0\,\mathrm{kNm}\right)}{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(\left|64.2\,\mathrm{kNm}\right| - 0\,\mathrm{kNm}\right)} \\
-      &= 1.355\,\text{‰}
+      &= \frac{435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(\left|40\,\mathrm{kNm}\right| - 0\,\mathrm{kNm}\right)}{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(\left|54.4\,\mathrm{kNm}\right| - 0\,\mathrm{kNm}\right)} \\
+      &= 1.6\,\text{‰}
     \end{aligned}
 
 Beiwert für die statische Höhe
-    k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g} = \frac{1}{1 + 1.355\,\text{‰} \cdot 204 \cdot 1.2} = 0.751 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
+    k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g} = \frac{1}{1 + 1.6\,\text{‰} \cdot 174 \cdot 1.2} = 0.7496 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
 
 Querkraftwiderstand   [SIA 262:2025, 4.3.3.2.1]
     \begin{aligned}
       V_{Rd,x}(M_{Ed} = 40\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) &= k_d \cdot \tau_{cd} \cdot d_v \\
-      &= 0.751 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 204\,\mathrm{mm} \\
-      &= 167.8\,\mathrm{kN}/\mathrm{m}
+      &= 0.7496 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 174\,\mathrm{mm} \\
+      &= 142.9\,\mathrm{kN}/\mathrm{m}
     \end{aligned}
 
 Erfüllungsgrad
-    \alpha_{eff,V,x,\text{Feld}} = \frac{V_{Rd,x}}{V_{Ed,x}} = \frac{167.8\,\mathrm{kN}/\mathrm{m}}{50\,\mathrm{kN}/\mathrm{m}} = 3.36 \quad \Rightarrow \quad \text{erfüllt}
+    \alpha_{eff,V,x,\text{Feld}} = \frac{V_{Rd,x}}{V_{Ed,x}} = \frac{142.9\,\mathrm{kN}/\mathrm{m}}{50\,\mathrm{kN}/\mathrm{m}} = 2.86 \quad \Rightarrow \quad \text{erfüllt}
 
 Plattenanalyse: Ohne x
 ----------------------
@@ -1885,14 +1915,14 @@ Bewehrung von oben nach unten
     4. Lage            y         \varnothing 10@150  B500B
     3. Lage            x         \varnothing 12@150  B500B
     2. Lage            x         \varnothing 12@150  B500B
-    1. Lage            y         \varnothing 10@150  B500B
+    1. Lage            y         \varnothing 40@150  B500B
     Überdeckung unten  –         30\,\mathrm{mm}     –
 
     Nachweis                 Bezeichnung                                                                                     Widerstand                               Einwirkung  \alpha_{eff}
     -----------------------  -----------  ---------------------------------------------------------------------------------------------  ---------------------------------------  ------------
-    Biegung und Normalkraft  Feld                                                M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = 64.2\,\mathrm{kNm}            M_{Ed,x} = 40.0\,\mathrm{kNm}          1.60
-    Biegung und Normalkraft  Schräg                                                                               \bar{R}_{d,x} = 0.355                    \bar{E}_{d,x} = 0.195          1.82
-    Querkraft                Feld         V_{Rd,x}(M_{Ed} = 40\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 167.8\,\mathrm{kN}/\mathrm{m}  V_{Ed,x} = 50.0\,\mathrm{kN}/\mathrm{m}          3.36
+    Biegung und Normalkraft  Feld                                                M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = 54.4\,\mathrm{kNm}            M_{Ed,x} = 40.0\,\mathrm{kNm}          1.36
+    Biegung und Normalkraft  Schräg                                                                               \bar{R}_{d,x} = 0.336                    \bar{E}_{d,x} = 0.195          1.72
+    Querkraft                Feld         V_{Rd,x}(M_{Ed} = 40\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 142.9\,\mathrm{kN}/\mathrm{m}  V_{Ed,x} = 50.0\,\mathrm{kN}/\mathrm{m}          2.86
 
 Mindestens ein Nachweis ist nicht erfüllt.
 
@@ -2051,21 +2081,21 @@ Werte
     Grösstkorndurchmesser                                                           D_{max}                                                    32  mm       Vorgabe
     Betrachtete Breite (x)                                                          b                                                        1000  mm       Vorgabe
     Betrachtete Breite (y)                                                          b_y                                                      1000  mm       Vorgabe
-    Bewehrungsmass je Kubikmeter Beton                                              \mu_s                                                      80  kg/m³    berechnet
+    Bewehrungsmass je Kubikmeter Beton                                              \mu_s                                                     327  kg/m³    berechnet
     Überdeckung oben                                                                c_{nom,o}                                                  30  mm       Vorgabe
     Überdeckung unten                                                               c_{nom,u}                                                  30  mm       Vorgabe
-    Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage)              h_{Dist}                                                  146  mm       berechnet
+    Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage)              h_{Dist}                                                  116  mm       berechnet
     Höhe der Einlage                                                                e_{Einlage}                                                 0  mm       Vorgabe
     Plattendicke                                                                    h                                                         250  mm       Vorgabe
     Kriechzahl                                                                      \varphi                                                     2           Vorgabe
-    Bewehrungsquerschnitt 1. Lage Grundbewehrung                                    A_{s,1,y,g}                                               524  mm²      berechnet
-    Stabdurchmesser 1. Lage Grundbewehrung                                          \varnothing_{1,y,g}                                        10  mm       Vorgabe
+    Bewehrungsquerschnitt 1. Lage Grundbewehrung                                    A_{s,1,y,g}                                              8378  mm²      berechnet
+    Stabdurchmesser 1. Lage Grundbewehrung                                          \varnothing_{1,y,g}                                        40  mm       Vorgabe
     Teilung 1. Lage Grundbewehrung                                                  s_{1,y,g}                                                 150  mm       Vorgabe
-    Tiefe 1. Lage Grundbewehrung ab Oberkante                                       z_{1,y,g}                                                 215  mm       berechnet
+    Tiefe 1. Lage Grundbewehrung ab Oberkante                                       z_{1,y,g}                                                 200  mm       berechnet
     Bewehrungsquerschnitt 2. Lage Grundbewehrung                                    A_{s,2,x,g}                                               754  mm²      berechnet
     Stabdurchmesser 2. Lage Grundbewehrung                                          \varnothing_{2,x,g}                                        12  mm       Vorgabe
     Teilung 2. Lage Grundbewehrung                                                  s_{2,x,g}                                                 150  mm       Vorgabe
-    Tiefe 2. Lage Grundbewehrung ab Oberkante                                       z_{2,x,g}                                                 204  mm       berechnet
+    Tiefe 2. Lage Grundbewehrung ab Oberkante                                       z_{2,x,g}                                                 174  mm       berechnet
     Bewehrungsquerschnitt 3. Lage Grundbewehrung                                    A_{s,3,x,g}                                               754  mm²      berechnet
     Stabdurchmesser 3. Lage Grundbewehrung                                          \varnothing_{3,x,g}                                        12  mm       Vorgabe
     Teilung 3. Lage Grundbewehrung                                                  s_{3,x,g}                                                 150  mm       Vorgabe
@@ -2074,27 +2104,27 @@ Werte
     Stabdurchmesser 4. Lage Grundbewehrung                                          \varnothing_{4,y,g}                                        10  mm       Vorgabe
     Teilung 4. Lage Grundbewehrung                                                  s_{4,y,g}                                                 150  mm       Vorgabe
     Tiefe 4. Lage Grundbewehrung ab Oberkante                                       z_{4,y,g}                                                  35  mm       berechnet
-    Erfüllungsgrad Duktilität – 2. Lage                                             \alpha_{eff,D,2}                                         3.70           berechnet
-    Bezogene Druckzonenhöhe – 2. Lage                                               \left(x/d\right)_{2}                                    0.095           berechnet
+    Erfüllungsgrad Duktilität – 2. Lage                                             \alpha_{eff,D,2}                                         3.16           berechnet
+    Bezogene Druckzonenhöhe – 2. Lage                                               \left(x/d\right)_{2}                                    0.111           berechnet
     Erfüllungsgrad Duktilität – 3. Lage                                             \alpha_{eff,D,3}                                         3.70           berechnet
     Bezogene Druckzonenhöhe – 3. Lage                                               \left(x/d\right)_{3}                                    0.095           berechnet
-    Momentenwiderstand bei N_Ed (x-Richtung) – Feld                                 M_{Rd,x}(N_{Ed})_{\text{Feld}}                           64.2  kNm      berechnet
-    Erfüllungsgrad x-Richtung – Feld                                                \alpha_{eff,x,\text{Feld}}                               1.60           berechnet
+    Momentenwiderstand bei N_Ed (x-Richtung) – Feld                                 M_{Rd,x}(N_{Ed})_{\text{Feld}}                           54.4  kNm      berechnet
+    Erfüllungsgrad x-Richtung – Feld                                                \alpha_{eff,x,\text{Feld}}                               1.36           berechnet
     Momentenwiderstand bei N = 0, negativ (x-Richtung)                              M_{Rd,x}(N=0)^{-}                                       -64.2  kNm      berechnet
-    Momentenwiderstand bei N = 0, positiv (x-Richtung)                              M_{Rd,x}(N=0)^{+}                                        64.2  kNm      berechnet
-    Grösster positiver Momentenwiderstand (x-Richtung)                              M_{Rd,x}^{+}                                            178.6  kNm      berechnet
+    Momentenwiderstand bei N = 0, positiv (x-Richtung)                              M_{Rd,x}(N=0)^{+}                                        54.4  kNm      berechnet
+    Grösster positiver Momentenwiderstand (x-Richtung)                              M_{Rd,x}^{+}                                            162.9  kNm      berechnet
     Grösster negativer Momentenwiderstand (x-Richtung)                              M_{Rd,x}^{-}                                           -178.6  kNm      berechnet
     Grösste aufnehmbare Druckkraft (x-Richtung)                                     N_{Rd,x}^{-}                                            -5000  kN       berechnet
     Grösste aufnehmbare Zugkraft (x-Richtung)                                       N_{Rd,x}^{+}                                            655.6  kN       berechnet
-    Momentenwiderstand bei N_Ed (x-Richtung) – Schräg                               M_{Rd,x}(N_{Ed})_{\text{Schräg}}                           96  kNm      berechnet
-    Erfüllungsgrad x-Richtung – Schräg                                              \alpha_{eff,x,\text{Schräg}}                             1.82           berechnet
-    Erfüllungsgrad Querkraft x-Richtung – Feld                                      \alpha_{eff,V,x,\text{Feld}}                             3.36           berechnet
-    Querkraftwiderstand x-Richtung – Feld                                           V_{Rd,x}                                                167.8  kN/m     berechnet
+    Momentenwiderstand bei N_Ed (x-Richtung) – Schräg                               M_{Rd,x}(N_{Ed})_{\text{Schräg}}                         82.6  kNm      berechnet
+    Erfüllungsgrad x-Richtung – Schräg                                              \alpha_{eff,x,\text{Schräg}}                             1.72           berechnet
+    Erfüllungsgrad Querkraft x-Richtung – Feld                                      \alpha_{eff,V,x,\text{Feld}}                             2.86           berechnet
+    Querkraftwiderstand x-Richtung – Feld                                           V_{Rd,x}                                                142.9  kN/m     berechnet
     Erfüllungsgrad Rissnormalkraft – 2. Lage x                                      \alpha_{eff,NR,2,x}                                      1.17           berechnet
     Erfüllungsgrad Rissnormalkraft – 3. Lage x                                      \alpha_{eff,NR,3,x}                                      1.17           berechnet
-    Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %)            \alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}              2.86           berechnet
-    Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Schräg (60 %)          \alpha_{eff,\sigma,w,x,\text{Schräg (60 \%)}}          761.26           berechnet
-    Erfüllungsgrad sprödes Versagen – 2. Lage x                                     \alpha_{eff,SV,2,x}                                      2.21           berechnet
+    Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %)            \alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}              2.42           berechnet
+    Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Schräg (60 %)          \alpha_{eff,\sigma,w,x,\text{Schräg (60 \%)}}          \infty           berechnet
+    Erfüllungsgrad sprödes Versagen – 2. Lage x                                     \alpha_{eff,SV,2,x}                                      1.87           berechnet
     Erfüllungsgrad sprödes Versagen – 3. Lage x                                     \alpha_{eff,SV,3,x}                                      2.21           berechnet
-    Erfüllungsgrad Zwängung auf Biegung – 2. Lage x                                 \alpha_{eff,ZB,2,x}                                      2.38           berechnet
+    Erfüllungsgrad Zwängung auf Biegung – 2. Lage x                                 \alpha_{eff,ZB,2,x}                                      2.02           berechnet
     Erfüllungsgrad Zwängung auf Biegung – 3. Lage x                                 \alpha_{eff,ZB,3,x}                                      2.38           berechnet

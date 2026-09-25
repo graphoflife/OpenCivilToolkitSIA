@@ -161,19 +161,27 @@ $$
 x^{+} = \frac{h}{2} = \frac{300\,\mathrm{mm}}{2} = 150\,\mathrm{mm}
 $$
 
-**Fliesskriterium – Dehnung der Zugbewehrung**
+**Dehnung der Zugbewehrung**
 
 $$
 \varepsilon_s^{+} = \left(d_{2,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}} = \left(248.1\,\mathrm{mm} - 150\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{150\,\mathrm{mm}} = 2.29\,\text{‰}
 $$
 
-ε\_s = 2.29 ‰ ≥ ε\_yd = 2.17 ‰ – die Zugbewehrung fliesst, f\_sd = f\_yd gilt.
+**Stahlspannung, höchstens die Fliessgrenze**
+
+$$
+\begin{aligned}
+  \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{+};\ f_{yd}\right] \\
+  &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.29\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+  &= 435\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+$$
 
 **Kräftegleichgewicht**
 
 $$
 \begin{aligned}
-  N_{Rd}^{+} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{+} + A_{s,2,x} \cdot f_{sd} \\
+  N_{Rd}^{+} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{+} + A_{s,2,x} \cdot \sigma_{sd} \\
   &= -20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 150\,\mathrm{mm} + 2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \\
   &= -1484.6\,\mathrm{kN}
 \end{aligned}
@@ -183,7 +191,7 @@ $$
 
 $$
 \begin{aligned}
-  M_{Rd}^{+} &= \left[f_{cd} \cdot b \cdot 0.85 \cdot x^{+} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{+}}{2}\right) + A_{s,2,x} \cdot f_{sd} \cdot \left(d_{2,x} - \tfrac{h}{2}\right)\right] \\
+  M_{Rd}^{+} &= \left[f_{cd} \cdot b \cdot 0.85 \cdot x^{+} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{+}}{2}\right) + A_{s,2,x} \cdot \sigma_{sd} \cdot \left(d_{2,x} - \tfrac{h}{2}\right)\right] \\
   &= \left[20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 150\,\mathrm{mm} \cdot \left(\tfrac{300\,\mathrm{mm}}{2} - \tfrac{0.85 \cdot 150\,\mathrm{mm}}{2}\right) + 2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(248.1\,\mathrm{mm} - \tfrac{300\,\mathrm{mm}}{2}\right)\right] \\
   &= 324.4\,\mathrm{kNm}
 \end{aligned}
@@ -219,19 +227,27 @@ $$
 x^{-} = \frac{h}{2} = \frac{300\,\mathrm{mm}}{2} = 150\,\mathrm{mm}
 $$
 
-**Fliesskriterium – Dehnung der Zugbewehrung**
+**Dehnung der Zugbewehrung**
 
 $$
 \varepsilon_s^{-} = \left(d_{3,x} - x^{-}\right) \cdot \frac{\varepsilon_{c2d}}{x^{-}} = \left(252\,\mathrm{mm} - 150\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{150\,\mathrm{mm}} = 2.38\,\text{‰}
 $$
 
-ε\_s = 2.38 ‰ ≥ ε\_yd = 2.17 ‰ – die Zugbewehrung fliesst, f\_sd = f\_yd gilt.
+**Stahlspannung, höchstens die Fliessgrenze**
+
+$$
+\begin{aligned}
+  \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{-};\ f_{yd}\right] \\
+  &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.38\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+  &= 435\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+$$
 
 **Kräftegleichgewicht**
 
 $$
 \begin{aligned}
-  N_{Rd}^{-} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{-} + A_{s,3,x} \cdot f_{sd} \\
+  N_{Rd}^{-} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{-} + A_{s,3,x} \cdot \sigma_{sd} \\
   &= -20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 150\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \\
   &= -2222.2\,\mathrm{kN}
 \end{aligned}
@@ -241,7 +257,7 @@ $$
 
 $$
 \begin{aligned}
-  M_{Rd}^{-} &= -\left[f_{cd} \cdot b \cdot 0.85 \cdot x^{-} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{-}}{2}\right) + A_{s,3,x} \cdot f_{sd} \cdot \left(d_{3,x} - \tfrac{h}{2}\right)\right] \\
+  M_{Rd}^{-} &= -\left[f_{cd} \cdot b \cdot 0.85 \cdot x^{-} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{-}}{2}\right) + A_{s,3,x} \cdot \sigma_{sd} \cdot \left(d_{3,x} - \tfrac{h}{2}\right)\right] \\
   &= -\left[20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 150\,\mathrm{mm} \cdot \left(\tfrac{300\,\mathrm{mm}}{2} - \tfrac{0.85 \cdot 150\,\mathrm{mm}}{2}\right) + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(252\,\mathrm{mm} - \tfrac{300\,\mathrm{mm}}{2}\right)\right] \\
   &= -253.4\,\mathrm{kNm}
 \end{aligned}

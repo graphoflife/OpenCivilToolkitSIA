@@ -34,9 +34,8 @@ DIE VIER PUNKTE (je Momentenvorzeichen, ausser wo vermerkt):
     4  Punkt mit x = h/2   Nulllinie auf halber Hoehe, Block bis 0.85*h/2
 
 Punkt 4 liegt knapp unterhalb des Balancepunkts und gibt dem Polygon den Bauch,
-den die genaue Linie unter Druck hat. Er gilt nur, wenn die Zugbewehrung dort
-noch fliesst; sonst faellt er weg und das Polygon laeuft geradlinig vom reinen
-Druck zu M_Rd(N = 0).
+den die genaue Linie unter Druck hat. Die Zugbewehrung traegt dort, was ihre
+Dehnung hergibt: ``sigma_sd = min(E_s * eps_s; f_yd)``.
 """
 
 from __future__ import annotations
@@ -126,9 +125,13 @@ class Lage:
         return mit_index("f_{yd}", self.stahl_index)
 
     @property
-    def symbol_f_sd(self) -> str:
+    def symbol_sigma_sd(self) -> str:
         """Die angesetzte Stahlspannung; sie gehoert zur selben Sorte wie f_yd."""
-        return mit_index("f_{sd}", self.stahl_index)
+        return mit_index(r"\sigma_{sd}", self.stahl_index)
+
+    @property
+    def symbol_E_s(self) -> str:
+        return mit_index("E_s", self.stahl_index)
 
     @property
     def symbol_d(self) -> str:
@@ -157,9 +160,6 @@ class Eckpunkt:
 
     M: float
     """Moment in Nm (Zug unten positiv)."""
-
-    gueltig: bool = True
-    hinweis: str = ""
 
 
 class Handrechnung:
@@ -225,10 +225,9 @@ class Handrechnung:
         # Sortieren statt den Punkt zu verwerfen: er ist ein gerechneter
         # Widerstand, und wegzulassen hiesse, Tragfaehigkeit zu verschenken.
         punkte.append(druck)
-        punkte.extend(sorted((q for q in rechts if q.gueltig), key=lambda q: q.N))
+        punkte.extend(sorted(rechts, key=lambda q: q.N))
         punkte.append(zug)
-        punkte.extend(sorted((q for q in links if q.gueltig),
-                             key=lambda q: q.N, reverse=True))
+        punkte.extend(sorted(links, key=lambda q: q.N, reverse=True))
 
         self._uebersicht(p, punkte)
         return punkte
@@ -423,36 +422,36 @@ class Handrechnung:
         knapp unterhalb des Balancepunkts und gibt dem Polygon den Bauch, den
         die genaue Linie unter Druck hat.
 
-        Gilt nur, solange die Zugbewehrung dabei noch fliesst. Tut sie es nicht,
-        waere ``f_sd = f_yd`` zu guenstig angesetzt, und der Punkt faellt weg --
-        das Polygon laeuft dann geradlinig vom reinen Druck zum Punkt bei N = 0.
+        **Die Zugbewehrung traegt, was ihre Dehnung hergibt:**
+        ``sigma_sd = min(E_s * eps_s; f_yd)``. Frueher galt der Punkt nur,
+        solange sie fliesst -- also fuer ``d >= h/2 * (1 + eps_yd/eps_c2d)`` --,
+        sonst fiel er weg und mit ihm der ganze Bauch. Bei tief liegender
+        x-Bewehrung (dicke y-Lage aussen, x in der 2. Lage) lief das Polygon
+        dann geradlinig vom reinen Druck zu M_Rd(N = 0): bei N = -2000 kN
+        standen 81 kNm statt rund 250. Die Dehnungsebene ist dieselbe; der
+        Stahl rechnet nur mit der Spannung, die zu ihr gehoert.
 
-        Und er gilt nur, wenn es diese Zugbewehrung ueberhaupt gibt. Ohne sie
-        blieb der Betondruckblock allein stehen und schob dem Polygon ein
-        Moment unter, das aus nichts stammte: eine Platte nur mit unterer
-        Bewehrung wies so ein negatives Moment von 220 kNm nach. Der Punkt
-        setzt fliessenden Stahl voraus; ohne Stahl gibt es nichts, was fliesst.
+        Und er gilt nur, wenn es diese Zugbewehrung ueberhaupt gibt -- unter
+        der Nulllinie. Ohne sie blieb der Betondruckblock allein stehen und
+        schob dem Polygon ein Moment unter, das aus nichts stammte: eine
+        Platte nur mit unterer Bewehrung wies so ein negatives Moment von
+        220 kNm nach.
         """
-        if zug.a_s <= 0.0:
-            p.hinweis(
-                f"Auf der gezogenen Seite liegt keine Bewehrung ({zug.text}). "
-                f"Der Eckpunkt x = h/2 setzt fliessenden Stahl voraus und "
-                f"entfällt; ohne Zugbewehrung gibt es hier keinen "
-                f"Momentenwiderstand.")
-            return None
-
         d = w_d.groesse.si
         x = self.h / 2.0
+        if zug.a_s <= 0.0 or d <= x:
+            p.hinweis("Keine Zugbewehrung unter x = h/2 → Eckpunkt x = h/2 "
+                      "entfällt.")
+            return None
+
         block = BLOCKANTEIL * x
         D = self.f_cd * self.b * block               # Betondruckkraft, Betrag
-        N = -D + zug.a_s * zug.f_yd
-        M = D * (self.h / 2 - block / 2) + zug.a_s * zug.f_yd * (d - self.h / 2)
-
-        # Fliesskriterium: die Dehnung der Zugbewehrung bei Kruemmung
-        # chi = eps_c2d / x muss die Fliessdehnung erreichen.
-        chi = self.eps_c2d / x
-        eps_s = (d - x) * chi
-        eps_yd = zug.f_yd / zug.E_s
+        # Die Dehnung aus der Ebene durch eps_c2d am gedrueckten Rand und null
+        # in x, die Spannung daraus -- hoechstens bis zur Fliessgrenze.
+        eps_s = (d - x) * self.eps_c2d / x
+        sigma = min(zug.E_s * eps_s, zug.f_yd)
+        N = -D + zug.a_s * sigma
+        M = D * (self.h / 2 - block / 2) + zug.a_s * sigma * (d - self.h / 2)
 
         hoch = "+" if vz > 0 else "-"
         minus = "" if vz > 0 else "-"
@@ -464,9 +463,10 @@ class Handrechnung:
             {"h": self.werte.laenge("h", "h", self.h)},
             titel="Nulllinie auf halber Höhe: x = h/2",
         )
+        w_eps = self.werte.dehnung(f"eps_s_{marke}", rf"\varepsilon_s^{{{hoch}}}",
+                                   eps_s, "Dehnung der Zugbewehrung")
         p.formel(
-            self.werte.dehnung(f"eps_s_{marke}", rf"\varepsilon_s^{{{hoch}}}",
-                               eps_s, "Dehnung der Zugbewehrung"),
+            w_eps,
             r"\left(@d - @x\right) \cdot \frac{@eps_c2d}{@x}",
             {
                 "d": w_d,
@@ -474,25 +474,20 @@ class Handrechnung:
                 "eps_c2d": self.werte.dehnung("eps_c2d", self.s_eps_c2d,
                                               self.eps_c2d),
             },
-            titel="Fliesskriterium – Dehnung der Zugbewehrung",
+            titel="Dehnung der Zugbewehrung",
         )
-
-        if eps_s < eps_yd:
-            p.hinweis(
-                f"Die Zugbewehrung erreicht die Fliessdehnung nicht "
-                f"(ε_s = {eps_s * 1e3:.2f} ‰ < ε_yd = {eps_yd * 1e3:.2f} ‰). "
-                f"Dieser Eckpunkt entfällt; das Polygon verläuft geradlinig vom "
-                f"reinen Druck zum Punkt bei N = 0."
-            )
-            return Eckpunkt(
-                f"halb_{marke}", rf"M_{{Rd}}(x=\tfrac{{h}}{{2}})^{{{hoch}}}",
-                f"x = h/2 {hoch}", N, vz * M,
-                gueltig=False,
-                hinweis=f"ε_s = {eps_s * 1e3:.2f} ‰ < ε_yd = {eps_yd * 1e3:.2f} ‰")
-
-        p.text(
-            f"ε_s = {eps_s * 1e3:.2f} ‰ ≥ ε_yd = {eps_yd * 1e3:.2f} ‰ – "
-            f"die Zugbewehrung fliesst, f_sd = f_yd gilt."
+        w_sigma = self.werte.spannung(
+            f"sigma_sd_{marke}", zug.symbol_sigma_sd, sigma, "Stahlspannung")
+        p.formel(
+            w_sigma,
+            r"\min\left[@E_s \cdot @eps_s;\ @f_yd\right]",
+            {
+                "E_s": self.werte.spannung(f"E_s_{marke}", zug.symbol_E_s, zug.E_s),
+                "eps_s": w_eps,
+                "f_yd": self.werte.spannung(f"fyd_{marke}", zug.symbol_f_yd,
+                                            zug.f_yd),
+            },
+            titel="Stahlspannung, höchstens die Fliessgrenze",
         )
 
         eingaben = {
@@ -500,12 +495,12 @@ class Handrechnung:
             "b": self.werte.laenge("b", "b", self.b),
             "x": w_x,
             "A_s": self.werte.flaeche(f"As_{marke}", zug.symbol_flaeche, zug.a_s),
-            "f_sd": self.werte.spannung(f"fsd_{marke}", zug.symbol_f_sd, zug.f_yd),
+            "sigma_sd": w_sigma,
         }
         p.formel(
             self.werte.kraft(f"N_halb_{marke}", rf"N_{{Rd}}^{{{hoch}}}", N,
                         "Normalkraft in diesem Punkt"),
-            rf"-@f_cd \cdot @b \cdot {BLOCKANTEIL} \cdot @x + @A_s \cdot @f_sd",
+            rf"-@f_cd \cdot @b \cdot {BLOCKANTEIL} \cdot @x + @A_s \cdot @sigma_sd",
             eingaben,
             titel="Kräftegleichgewicht",
         )
@@ -514,7 +509,7 @@ class Handrechnung:
                          "Moment in diesem Punkt"),
             rf"{minus}\left[@f_cd \cdot @b \cdot {BLOCKANTEIL} \cdot @x \cdot "
             rf"\left(\tfrac{{@h}}{{2}} - \tfrac{{{BLOCKANTEIL} \cdot @x}}{{2}}\right) "
-            rf"+ @A_s \cdot @f_sd \cdot \left(@d - \tfrac{{@h}}{{2}}\right)\right]",
+            rf"+ @A_s \cdot @sigma_sd \cdot \left(@d - \tfrac{{@h}}{{2}}\right)\right]",
             {
                 **eingaben,
                 "h": self.werte.laenge("h", "h", self.h),
