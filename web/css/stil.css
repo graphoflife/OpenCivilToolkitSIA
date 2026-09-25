@@ -882,6 +882,24 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
    oben rechts -- dort, wo auch sonst steht, was schiefging. */
 .automatik-leiste { margin-top: 8px; }
 
+/* Der Knopf, während gesucht wird. Derselbe laufende Balken wie beim Start
+   -- eine Bewegung, eine Bedeutung; ein zweites Ladebild wäre ein zweites
+   Konzept für dieselbe Sache. Und nicht auf .5 ausgegraut: der Knopf ist
+   nicht unverfügbar, er arbeitet. */
+.knopf.ist-am-suchen { display: inline-flex; align-items: center; gap: 8px; }
+.knopf.ist-am-suchen:disabled { opacity: .9; cursor: progress; }
+.laufbalken {
+  flex: none; width: 28px; height: 3px; border-radius: 2px; overflow: hidden;
+  background: rgba(255,255,255,.3);
+}
+.laufbalken::after {
+  content: ''; display: block; width: 45%; height: 100%; background: #fff;
+  animation: lade-lauf 1.1s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .laufbalken::after { animation: none; width: 100%; opacity: .6; }
+}
+
 /* Eine Analysezeile: Schalter, Name, Art, zwei Zahlen, Richtung, Löschen. */
 .einwirkung.ist-spannung {
   grid-template-columns: 38px minmax(0, 1fr) 76px 52px 52px 40px 18px;

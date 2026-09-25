@@ -169,6 +169,7 @@ class BiegungNormalkraft(Nachweis):
         *,
         schritte: int = 80,
         fasern: int = 200,
+        mit_linie: bool = True,
     ) -> None:
         # 80 Schritte je Abschnitt kosten rund 16 ms. Die Eckwerte sind schon bei
         # 40 Schritten auf fuenf Stellen auskonvergiert; die feinere Teilung
@@ -190,6 +191,20 @@ class BiegungNormalkraft(Nachweis):
         self.kombinationen = list(kombinationen)
         self.schritte = schritte
         self.fasern = fasern
+        self.mit_linie = mit_linie
+        """
+        Ob die genaue Resistenzlinie mitgerechnet wird.
+
+        Sie kostet fast die ganze Rechenzeit dieses Nachweises -- 482
+        Dehnungsebenen mit je 200 Betonfasern, rund 46 ms von 48 -- und das
+        Urteil faellt ohne sie: nachgewiesen wird gegen das Polygon aus der
+        Handrechnung. Gebraucht wird sie allein im Diagramm.
+
+        Die Bewehrungssuche rechnet je Lauf ein paar Dutzend Mal und sieht
+        dabei kein Diagramm an. Sie baut darum ueber ``aufbauen(schnell=True)``
+        ohne Linie -- dieselben Zahlen, ein Bruchteil der Zeit.
+        """
+
         self.linie: List[Linienpunkt] = []
         self.auswertungen: List[Auswertung] = []
 
@@ -301,9 +316,10 @@ class BiegungNormalkraft(Nachweis):
 
         # Die genaue Linie: nur fuer das Diagramm, ohne Mitschrift. Sie steht
         # zum Vergleich daneben -- das Urteil faellt ueber die Handrechnung.
+        # Wer sie nicht zeichnet, braucht sie nicht; siehe `mit_linie`.
         self.linie = dehnungsfaecher.aufbauen(
             h=h, b=b, lagen=lagen, beton=beton,
-            schritte=self.schritte, fasern=self.fasern)
+            schritte=self.schritte, fasern=self.fasern) if self.mit_linie else []
 
         # -- Die Handrechnung: das, wogegen nachgewiesen wird ----------------
         # Die Zugehoerigkeit zur unteren oder oberen Lage kommt aus dem Modell

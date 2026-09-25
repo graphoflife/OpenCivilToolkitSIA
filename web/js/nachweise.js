@@ -514,23 +514,44 @@ function automatikLeiste(kennung) {
   const laeuft = laufendeSuche.has(kennung);
   return el('div.automatik-leiste', {}, [
     el('button.knopf.knopf-haupt', {
-      text: laeuft ? 'sucht …' : 'Bewehrung ermitteln',
+      class: laeuft ? 'ist-am-suchen' : '',
       title: 'Sucht einmalig und schreibt das Ergebnis in die Lagen',
       disabled: laeuft,
       on: { click: () => bewehrungErmitteln(kennung) },
-    }),
+    }, laeuft
+      // Ein Balken, der läuft: die Suche dauert je nach Platte ein paar
+      // Zehntelsekunden bis zu Sekunden. Ein Knopf, der bloss grau wird,
+      // sieht in dieser Zeit aus wie einer, der nichts getan hat.
+      ? [el('span.laufbalken'), el('span', { text: 'sucht …' })]
+      : [el('span', { text: 'Bewehrung ermitteln' })]),
   ]);
 }
 
 /** Einmal suchen und das Ergebnis in die Lagen schreiben. */
 async function bewehrungErmitteln(kennung) {
   laufendeSuche.add(kennung);
-  aendern({}, 'bewehrungssuche-start');
+  // Die gesuchten Lagen zuerst leeren -- sichtbar, im selben Augenblick.
+  //
+  // Die Suche fängt ohnehin bei null an (sie *ermittelt* die Bewehrung, sie
+  // legt nicht zu dem dazu, was dasteht). Vorher blieben die alten
+  // Durchmesser stehen, bis das Ergebnis kam, und wer denselben Durchmesser
+  // zurückbekam, sah nicht, ob überhaupt etwas passiert war.
+  //
+  // Nur x: die y-Lagen sucht niemand, sie bleiben wie eingetragen.
+  projektAendern((p) => {
+    const q = p.querschnitte.find((x) => x.kennung === kennung);
+    if (!q) return;
+    q.lagen.forEach((lage, i) => {
+      if (richtungVon(q, i + 1) !== 'x') return;
+      lage.grund.durchmesser = 0;
+      lage.zulage.durchmesser = 0;
+    });
+  });
   try {
     const antwort = await api.bewehrungSuchen(zustand.projekt, kennung);
     if (antwort.gefunden) {
-      // Der Kern gibt das fertige Projekt zurück -- übernommen wird es als
-      // eine Änderung, damit ein Rückgängig sie als eine zurücknimmt.
+      // Der Kern gibt das fertige Projekt zurück; übernommen wird die eine
+      // gesuchte Platte, damit die anderen unberührt bleiben.
       projektAendern((p) => {
         const alt = p.querschnitte.findIndex((x) => x.kennung === kennung);
         const neu = antwort.projekt?.querschnitte?.find((x) => x.kennung === kennung);
