@@ -119,20 +119,29 @@ Fallunterscheidung falsch. k_d, k_t und α_i rechnen nicht über `empirisch()`;
 ihre Einheit steht neben der Vorlage, und die Kurve rechnet k_d fünfzigmal.
 Vorlagen zwischenzuspeichern brächte ein Prozent.
 
+### Danach, auf Entscheid
+
+* **Die Tiefe einer Lage heisst `z`.** Die Platte führte sie unter `d`: für
+  eine obere Lage stand in der Tabelle d = 48 mm, im Nachweis darunter
+  d = 252 mm. Jetzt heisst sie an der Quelle z (Tabelle «Randabstände,
+  Tiefen ab Oberkante», Werttabelle, Handrechnung), und die statische Höhe
+  steht überall in einer eigenen Zeile, `d = z` unten, `d = h − z` oben.
+  Den Schwerpunkt einer Seite schrieb die Handrechnung nach Kräften
+  gewichtet, gerechnet wurde nach Flächen -- jetzt steht dasselbe da.
+* **M-N, «nächster Punkt»:** Der Grad ist ein Verhältnis von Längen im
+  normierten Diagramm, (Ē_d ± a)/Ē_d. Herleitung und Zusammenfassung zeigten
+  das Moment des nächsten Punkts gegen M_Ed (175.1/150, wo der Grad 1.40
+  war). Jetzt stehen N_ref, M_ref, Ē_d, der Punkt P, a und R̄_d da, und die
+  Zusammenfassung zeigt dasselbe Paar. «voll» führt einen solchen Fall mit.
+* **Ohne Einwirkung keine Dehnung:** Für M = N = 0 fand der Löser die
+  Nullebene nur bis auf seine Schranke; der Rest gab einen Grad von 3 · 10⁸
+  statt ∞. Der Löser gibt die Nullebene jetzt exakt zurück.
+
 ### Offen
 
-* **Die Tiefe einer Lage heisst in der Platte `d`**, auch bei einer oberen
-  Lage: in der Tabelle steht d = 48 mm, wo die statische Höhe 252 mm ist.
-  Duktilität, Zwängung und Querkraft nennen sie darum `z`. Die Wurzel ist das
-  Symbol in `platte.py`; es zu ändern, ändert Tabelle und Handrechnung.
 * **Lagen mit einem Posten** heissen je nach Stelle `3,x` oder `3,x,g`; die
   Handrechnung schreibt A_s,3,x, die Nachweise A_s,3,x,g. Dahinter steht
   `posten_ids` als Tupel ohne Marke und Index.
-* **M-N, Erfüllungsart «nächster Punkt»:** Die Grad-Zeile zeigt
-  M_Rd/M_Ed = 175.1/150 = 1.40; der Grad ist dort aber ein Abstandsverhältnis
-  im normierten Diagramm, der Bruch ergibt 1.17. Älter als diese Runde.
-* **Spannungsbegrenzung ohne Moment:** Eine Restspannung von fast null gibt
-  einen Grad von 4 · 10⁸ statt ∞.
 
 ---
 
