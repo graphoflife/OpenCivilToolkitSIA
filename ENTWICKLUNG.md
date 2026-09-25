@@ -43,6 +43,115 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-25 · Stahlspannung unter Dauerlast, und was ein strenges Review daran verschob
+
+Neu ist ein Nachweis: die Stahlspannung unter quasi-ständiger Einwirkung,
+gehalten gegen dieselbe zulässige Spannung wie bei der Zwängung -- `f_yk` bei
+normaler Anforderung, die Wurzelformel mit `w_nom` bei erhöhter und hoher.
+Gerechnet wird mit 60 % der Tragsicherheitseinwirkungen, beim bestehenden
+Nachweis gegen Fliessen mit 70 %; beide Anteile sind je Platte einstellbar.
+Das Was steht im Code. Hier steht, warum er so aussieht -- und was eine
+zweite, strenge Durchsicht danach noch verschoben hat.
+
+### Das Plateau gehört zu f_yk
+
+Die Gebrauchsnachweise rechneten mit dem Fliessplateau bei `f_yd`. Für den
+neuen Nachweis wäre das tödlich gewesen: bei normaler Anforderung ist die
+Grenze `f_yk = 500`, das Plateau kappte die Spannung aber bei 435 -- ein
+Nachweis, der per Konstruktion nie durchfällt. Der Teilsicherheitsbeiwert
+gehört in die Tragsicherheit; im Gebrauchszustand wird gefragt, was der
+Querschnitt *tut*, und Stahl fliesst bei `f_yk`.
+
+Welche Werte ein Nachweis ansetzt, ist seither ein Name und keine Zahl an der
+Aufrufstelle: `Werkstoffsatz.BEMESSUNG` oder `CHARAKTERISTISCH`. Zuerst hatte
+der Satz nur einen Nutzer, und die anderen schrieben weiter `"f_yd"` von Hand --
+eine Abstraktion, die zur Hälfte eingeführt ist, ist schlechter als keine. Jetzt
+nennt jeder Nutzer des Löser seine Wahl.
+
+### Gemessen wird an der Dehnung, wenn der Stahl fliesst
+
+Bei normaler Anforderung fallen Grenze und Plateau zusammen. Ein fliessender
+Stahl hätte dann `σ_s = σ_s,adm` und stünde mit 1.00 als erfüllt da -- dieselbe
+Falle wie das «1.00 neben nicht erfüllt», die schon einmal behoben wurde, nur
+von der anderen Seite. Darum `α = σ_s,adm / (E_s · ε_s)`: elastisch ist das Bit
+für Bit der Spannungsvergleich, auf dem Plateau wächst die Dehnung weiter, und
+der Nachweis fällt um so deutlicher durch, je weiter der Stahl gedehnt ist. Das
+braucht auch die Bewehrungssuche -- ein Grad, der auf dem Plateau festsitzt,
+zeigt ihr keine Richtung.
+
+### Eine Klasse, zwei Grenzen
+
+Beide Stahlspannungsnachweise sind dieselbe Rechnung: derselbe Löser, dieselbe
+Fallschleife. Verschieden ist die Grenze -- ihre Zahl, ihre Eingaben, ihr
+Absatz in der Herleitung. Also eine Klasse, und die Grenze als Objekt, das
+diese drei zusammenhält. Zwei Klassen mit kopiertem Kern wären genau das, wovor
+`zustand2.py` warnt: zwei Nachweise, die für denselben Querschnitt verschiedene
+σ_s melden.
+
+Die Durchsicht fand daran noch zweierlei. Die Grenzen legten beim Anmelden
+Zustand ab, den sie später lasen -- eine Reihenfolge, die nur ein Docstring
+sicherte. Und *wann* eine Grenze gilt, stand draussen, im Aufbau und im Katalog
+der Oberfläche. Jetzt werden beide Grenzen gleich gebaut und sagen selbst, bei
+welcher Anforderung sie gelten; im Aufbau sind die zwei Blöcke eine Schleife.
+
+### Ein Konzept, ein Typ
+
+Die Gebrauchslastfälle waren sechs flache Felder an der Platte, und fünf Stellen
+setzten die drei zusammengehörigen über ihre Namen wieder zusammen. Jetzt ist
+es eine `Gebrauchsliste` mit Anteil, Schalter und Fällen, die sich selbst
+prüft. Das Dateiformat war erst eine Runde alt -- billiger wurde die Umstellung
+nicht mehr. Alte Dateien werden gelesen und neu geschrieben.
+
+Dieselbe Frage stellte sich an kleinerer Stelle mehrmals: was zu einer Platte
+gehört, gehört an die Platte. Ihre Namensprüfung stand am Projekt, ihre
+Massprüfung im Aufbau, die Aufzählung ihrer Lastfalllisten in der Suche. Jetzt
+hat `QuerschnittEintrag` `pruefen()`, `masse_pruefen()` und `ohne_lastfaelle()`
+-- und die Massprüfung bewusst *nicht* in `pruefen()`, weil das auch beim
+Öffnen läuft: eine gespeicherte Platte mit `h = 0` liesse sich sonst nicht mehr
+öffnen und korrigieren.
+
+### Warum die Suche lange brauchte
+
+Nicht zu viele Nachweise, sondern einer, der ein Bild malt: der M-N-Nachweis
+baute bei jeder Bewertung die genaue Resistenzlinie, 97 000 Auswertungen des
+Werkstoffgesetzes, für ein Diagramm, das während der Suche niemand ansieht.
+Ohne sie: 289 → 56 ms je Bewertung. Dazu entstehen im schnellen Aufbau ganz
+stille Nachweise nicht mehr -- exakt und nicht genähert, denn die Suche zählt
+stille Urteile ohnehin nicht. Und ein `max()` im Betongesetz kostete, bei
+siebzigtausend Aufrufen je Fall, allein 28 ms.
+
+### Ohne Oberfläche, aber nicht daneben
+
+`p.beton()`, `p.platte()`, `p.rechnen()` legen dieselben Einträge an, die die
+Maske anlegen würde -- kein zweites Objektmodell, das mit dem ersten gleich
+bleiben müsste. `Projekt.beispiel()` ist selbst so gebaut, damit prüft der
+Schnappschuss die Fassade mit. Und die Zusammenfassung gibt es seit der
+Durchsicht einmal, als Zeilenmodell, das Oberfläche und Konsole je auf ihre
+Art setzen. Vorher baute jede ihre Zeilen selbst, und sie waren schon
+auseinandergelaufen, bevor es jemand merkte.
+
+### Der Schnappschuss
+
+Vor allem anderen kam ein Test, der den ganzen Bericht des Beispiels Byte für
+Byte vergleicht. Der Anlass war eine Zahl, die einmal von 261 auf 249 mm
+gewandert war, ohne dass ein Einzeltest darauf zeigte. Seither ist jede Runde
+daran gemessen: ob sich nur bewegt hat, was sich bewegen sollte. Die Durchsicht
+hat in keinem ihrer sieben Schritte eine Zahl im Bericht geändert.
+
+### Nebenbei
+
+* Fallnamen standen roh als Wert-ID in den Formelzeichen. Aus «Feld (60 %)»
+  wurde `Feld__60___`, ein doppelter Index, an dem KaTeX abbrach -- sichtbar,
+  sobald der neue Nachweis immer lief. Jedes Symbol wird jetzt geprüft.
+* Ein knapp verfehlter Grad hiess in beiden Berichten «1». Die Regel dagegen
+  stand nur in der Schnittstelle; jetzt steht sie im Kern.
+* Ein Test-Helfer setzte Felder mit `setattr`. Nach der Umstellung auf die
+  Gebrauchsliste gab es die alten Namen nicht mehr -- `setattr` legte sie still
+  neu an, und fünf Tests prüften nichts. Ein Helfer, der nach Namen setzt,
+  muss unbekannte Namen ablehnen; dieser tut es jetzt.
+
+---
+
 ## 2026-09-24 · Eine Tragrichtung, und ein Schalter je Nachweis
 
 Bis heute rechnete das Werkzeug jeden Nachweis in beiden Tragrichtungen. Das
