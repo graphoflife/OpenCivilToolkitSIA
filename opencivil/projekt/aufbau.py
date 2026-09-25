@@ -184,19 +184,27 @@ class Aufbau:
     def eckwertziele(self) -> List[str]:
         return [d.id for n in self.nachweise.values() for d in n.d_eckwerte.values()]
 
+    def ziele_je_platte(self) -> List[Tuple[str, List[str]]]:
+        """
+        Die Rechenziele Platte fuer Platte, in der Reihenfolge der Beschreibung.
+
+        Die eine Stelle, die diese Reihenfolge festlegt. Die Oberflaeche geht
+        darueber, um je Platte zwischenzuspeichern
+        (:func:`opencivil.web.dienst._stromabwaerts`); :meth:`alle_ziele`
+        haengt sie aneinander. Vorher bildete jede der beiden die Folge
+        selbst, und dass sie gleich war, stand nur im Docstring.
+        """
+        return [(kennung, self.ziele_von(kennung)) for kennung in self.querschnitte]
+
     def alle_ziele(self) -> List[str]:
         """
-        Was ein vollstaendiger Lauf rechnet, in der Reihenfolge der Herleitung.
-
-        Erst die Baustoffe, dann Platte fuer Platte ihre Eckwerte und
-        Nachweise. Die Oberflaeche rechnet dieselben Ziele in derselben
-        Folge, nur plattenweise mit Zwischenspeicher
-        (:func:`opencivil.web.dienst._stromabwaerts`); wer ohne Oberflaeche
-        rechnet, bekommt so denselben Bericht.
+        Was ein vollstaendiger Lauf rechnet, in der Reihenfolge der Herleitung:
+        erst die Baustoffe, dann Platte fuer Platte ihre Eckwerte und
+        Nachweise. Wer ohne Oberflaeche rechnet, bekommt so denselben Bericht.
         """
         ziele = self.materialziele()
-        for kennung in self.querschnitte:
-            ziele += self.ziele_von(kennung)
+        for _, eigene in self.ziele_je_platte():
+            ziele += eigene
         return ziele
 
     def urteile_von(self, kennung: str, urteile: Iterable[NachweisUrteil],

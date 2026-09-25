@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Mapping, Sequence, Union
 
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
+from opencivil.ergebnis import Ergebnis
 from opencivil.projekt.eintraege import (
     Beschreibung, MaterialEintrag, PostenEintrag,
 )
@@ -221,7 +222,7 @@ class Projekt(Beschreibung):
                    f"projekt.{'beton' if art == 'beton' else 'stahl'}(...)."))
         return vorhanden[0].kennung
 
-    def rechnen(self) -> "Ergebnis":
+    def rechnen(self) -> Ergebnis:
         """
         Alles rechnen, was die Oberflaeche auch rechnet -- ohne sie.
 
@@ -229,8 +230,6 @@ class Projekt(Beschreibung):
         also derselbe Bericht. Ohne Zwischenspeicher: der lohnt sich erst,
         wenn man dieselbe Platte hundertmal rechnet.
         """
-        from opencivil.ergebnis import Ergebnis
-
         aufbau = self.aufbauen()
         return Ergebnis(projekt=self, aufbau=aufbau,
                         loesung=aufbau.werk.loese(*aufbau.alle_ziele()))

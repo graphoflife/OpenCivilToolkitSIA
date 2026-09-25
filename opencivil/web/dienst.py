@@ -174,8 +174,7 @@ def _stromabwaerts(projekt: Projekt, aufbau) -> tuple:
     bekannt = dict(gesamt.werte)
     ziele = list(materialziele)
 
-    for kennung in kennungen:
-        eigene = aufbau.ziele_von(kennung)
+    for kennung, eigene in aufbau.ziele_je_platte():
         if not eigene:
             continue
         ziele += eigene
