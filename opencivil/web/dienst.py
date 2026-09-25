@@ -238,7 +238,7 @@ def querkraftkurven(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     Kurve selbst zu zeichnen. Gerechnet wird an genau einer Stelle.
     """
     aufbau = _projekt(rumpf).aufbauen()
-    aufbau.werk.loese(*aufbau.alle_nachweisziele())
+    aufbau.werk.loese(*aufbau.alle_nachweisziele(), ohne_herleitung=True)
 
     gewaehlt = {}
     for kennung, wert in (rumpf.get("n_ed") or {}).items():

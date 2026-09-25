@@ -43,7 +43,7 @@ from opencivil.core.berechnung import (
     Berechnung, BerechnungsFehler, Eingaben, Nachweis, NachweisUrteil,
 )
 from opencivil.core.einheiten import Groesse
-from opencivil.core.protokoll import Protokoll
+from opencivil.core.protokoll import Protokoll, StillesProtokoll
 from opencivil.core.wert import FehlendeEingabe, Quelle, Wert, WertDef
 
 
@@ -353,7 +353,8 @@ class Rechenwerk:
     # -- Aufloesen ----------------------------------------------------------
 
     def loese(self, *ziele: str,
-              bekannt: Optional[Mapping[str, Wert]] = None) -> Loesung:
+              bekannt: Optional[Mapping[str, Wert]] = None,
+              ohne_herleitung: bool = False) -> Loesung:
         """
         Berechnet die angegebenen Ziele und alles, was dafuer noetig ist.
 
@@ -372,8 +373,11 @@ class Rechenwerk:
         **Der Aufrufer haftet dafuer, dass die Werte noch gelten.** Das
         Rechenwerk prueft es nicht; es kann es nicht, denn was eine Eingabe
         wert ist, weiss nur, wer sie gesetzt hat.
+
+        ``ohne_herleitung`` rechnet dasselbe, schreibt aber nichts mit --
+        fuer Laeufe, die nur Werte und Urteile brauchen.
         """
-        lauf = _Lauf(self, bekannt=bekannt)
+        lauf = _Lauf(self, bekannt=bekannt, ohne_herleitung=ohne_herleitung)
         for ziel in ziele:
             lauf.ziel(ziel)
         return lauf.abschliessen()
@@ -412,9 +416,11 @@ class _Lauf:
     """
 
     def __init__(self, werk: Rechenwerk,
-                 bekannt: Optional[Mapping[str, Wert]] = None) -> None:
+                 bekannt: Optional[Mapping[str, Wert]] = None,
+                 ohne_herleitung: bool = False) -> None:
         self.werk = werk
-        self.loesung = Loesung()
+        self.loesung = (Loesung(protokoll=StillesProtokoll()) if ohne_herleitung
+                        else Loesung())
         # Mitgebrachte Werte stehen im Zwischenspeicher, als waeren sie eben
         # gerechnet worden. aufloesen() findet sie in Schritt 1 und geht
         # darueber hinweg -- ohne Rechnung und ohne Protokollblock.
@@ -541,7 +547,7 @@ class _Lauf:
         # Herleitung stehen -- sein Ergebnis wird trotzdem gebraucht, denn
         # unter der Zusammenfassung steht ein Hinweis, wenn er nicht aufgeht.
         still = getattr(berechnung, "still", False)
-        protokoll = Protokoll() if still else self.loesung.protokoll
+        protokoll = StillesProtokoll() if still else self.loesung.protokoll
 
         # Ueberschrift setzen, sobald der Abschnitt wechselt. Welche Berechnung
         # eines Bauteils zuerst laeuft, entscheidet die Abhaengigkeitsfolge --

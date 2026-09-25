@@ -297,7 +297,8 @@ def bewerte(projekt) -> Bewertung:
     """
     try:
         aufbau = projekt.aufbauen(schnell=True)
-        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele(),
+                                    ohne_herleitung=True)
     except Exception as fehler:      # Eine unmoegliche Bewehrung ist kein
         return Bewertung(math.inf, 0.0, "", 0, str(fehler))  # Absturz, sondern ein Nein.
 

@@ -390,15 +390,37 @@ class Protokoll:
 
 class StillesProtokoll(Protokoll):
     """
-    Verwirft alles. Fuer Schleifen, deren Einzelschritte nicht in den Bericht sollen.
+    Verwirft alles. Fuer Laeufe, deren Herleitung niemand liest.
 
     Die Schnittstelle bleibt identisch, damit derselbe Rechencode einmal
     protokollierend und einmal still laufen kann -- ohne Verzweigung im Code
     und ohne dass die beiden Pfade auseinanderlaufen koennen.
+
+    Gebaut wird gar nichts, nicht erst gebaut und dann verworfen: eine Formel
+    setzt ihre Vorlage zweimal ein und misst ihre Breite, und die
+    Bewehrungssuche rechnet hundertfach, ohne je eine Zeile zu zeigen.
     """
 
     def _anfuegen(self, block: Block) -> Block:
         return block
+
+    def titel(self, *_, **__) -> None:
+        pass
+
+    def text(self, *_, **__) -> None:
+        pass
+
+    def gleichung(self, *_, **__) -> None:
+        pass
+
+    def formel(self, *_, **__) -> None:
+        pass
+
+    def wert(self, *_, **__) -> None:
+        pass
+
+    def tabelle(self, *_, **__) -> None:
+        pass
 
     def unterprotokoll(self, titel: str) -> "Protokoll":
         return self
