@@ -43,6 +43,99 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-25 · Jede Formel aus einer Vorlage -- und danach vereinfacht
+
+Der Pilot der letzten Runde (Duktilität) hatte gezeigt, dass Vorlagen tragen.
+Jetzt stehen alle Herleitungen so da: die Formel einmal mit Symbolen, Zahlen
+und Einheiten setzt das Programm aus den gerechneten Werten ein. Von Hand
+gesetzte Einheiten in den Nachweisen und Querschnitten: vorher 179, jetzt 13
+-- Tabellenköpfe und die Stahldichte 7850 kg/m³. Jeder Schritt wurde am
+Schnappschuss gemessen; geändert hat sich die Darstellung, keine gerechnete
+Zahl. Damit das auch dort galt, wo bisher kein Projekt hinkam, ist «voll»
+zuerst um Querkraft ohne Bügel, Bügel mit Stabzahl in y und die begrenzte
+rissaktive Dicke erweitert worden.
+
+### Zuerst die beiden Befunde des Piloten
+
+* **Kein «1.00» neben «nicht erfüllt».** Die Herleitung rundete den Grad
+  selbst. Jetzt kennt ein Wert, ob er ein Erfüllungsgrad ist (`grad_def`),
+  und setzt sich überall nach `grad_als_text` -- auch in der Werttabelle,
+  die dasselbe an ihr vorbei tat: dort stand 0.996 als «1». Die Obergrenze
+  1e9, die acht Nachweise einzeln setzten, fällt weg; ein unendlicher Grad
+  steht als ∞ da, JSON bekommt `null` (das konnte `endlich()` längst).
+* **Umbruch nach dem, was man sieht.** `sichtbare_breite` zählt einen Bruch
+  so breit wie seinen breiteren Teil, `\left` und `\,\mathrm{mm}` fast gar
+  nicht. Zwischen 52 und 68 sichtbaren Zeichen lag im Projekt keine Formel;
+  die Grenze steht bei 60.
+
+### Empirische Formeln
+
+Wo die Norm eine Einheit voraussetzt, steht die Zahl blank in dieser Einheit,
+dahinter der Hinweis: `k_t = 1/(1 + 0.5 · 0.3/3) = 0.952 (h in m)`. So bei
+E_cm, τ_cd, k_t (dreimal), α_i, k_g und k_d. Die Stellen wandern mit der
+Einheit -- 300 mm stehen als 0.3 m da, nicht als 0. Vorher stand bei E_cm
+`∛(38 N/mm²)`, bei k_d ein von Hand gesetztes `· 10⁻³`.
+
+### Was beim Umstellen auffiel
+
+* **Querkraft, fliessende Bewehrung:** Liegt m_Ed über m_Rd, ist ε_v fest,
+  1.5 · f_yd/E_s. Die Herleitung zeigte trotzdem die Formel mit m_Ed und
+  m_Rd -- mit Zahlen, die ein anderes ε_v ergeben (4.79 statt 3.26 ‰).
+* **A_s,tot** stand mit zwei Nachkommastellen da: eine von Hand gebaute
+  WertDef gab die Stellenzahl als Normverweis weiter.
+* **Eine auf null gerundete Zahl** stand als «-0».
+* **f_cd in der Handrechnung** ohne Nachkommastelle: bei C25/30 «17» statt
+  16.7, die Druckkraft ging von Hand um 2 % daneben.
+* Grössen der ganzen Lage tragen deren Index (σ_s,adm,3,x), wie Widerstand
+  und Grad in der Tabelle; die statische Höhe sagt, aus welcher Lage sie
+  kommt (`d = h − z_{3,x,g}`).
+
+### Vereinfacht
+
+Vier Durchsichten des Diffs -- Wiederverwendung, Vereinfachung, Effizienz,
+Ebene der Lösung --, jeder Befund ein Commit, der Bericht dabei unverändert:
+
+* **Ohne Leser keine Herleitung.** Bewehrungssuche, ausgeschaltete Nachweise
+  und Querkraftkurven bauten jede Formel -- zweimal eingesetzt, Breite
+  gemessen -- und warfen sie weg. Die Suche an der Decke von «voll» brauchte
+  91 ms statt 42 ms vor der Umstellung. Das stille Protokoll baut jetzt gar
+  nichts; `loese(…, ohne_herleitung=True)`. Dieselbe Suche: 33 ms.
+* **Was mehrere Nachweise gleich herleiten, steht einmal da:** k_t mit
+  f_ct,eff und das Rissmoment (`protokoll_rissmoment`), die zulässige
+  Stahlspannung, Summe, Schwerpunkt und statische Höhe einer Lage
+  (`protokoll_lage`), der wirksame Modul, die Grad-Zeile (`grad_formel` nimmt
+  Widerstand und Einwirkung), das Gegenzeichen eines Vergleichs (`vergleich`
+  bekommt das Sollzeichen).
+* Einwirkung und Widerstand für Tabelle und Herleitung über `Zwischenwerte`
+  statt je vier Zeilen WertDef. Die Spannungsbegrenzung nimmt Platte und
+  Richtung von ihrer Grenze, statt beides doppelt zu bekommen und zu prüfen.
+* Gestrichen: `annahmen_text/_latex`, die JSON-Felder `einzeilig`/`mehrzeilig`
+  (las niemand), Symbolfelder, deren Eingabe ihr Symbol mitbringt, tote
+  Parameter und Importe.
+
+Bewusst nicht: Der Umgebungszweig in `sichtbare_breite` bleibt, obwohl ihn
+heute keine Formel erreicht -- ohne ihn wäre die Messung für eine
+Fallunterscheidung falsch. k_d, k_t und α_i rechnen nicht über `empirisch()`;
+ihre Einheit steht neben der Vorlage, und die Kurve rechnet k_d fünfzigmal.
+Vorlagen zwischenzuspeichern brächte ein Prozent.
+
+### Offen
+
+* **Die Tiefe einer Lage heisst in der Platte `d`**, auch bei einer oberen
+  Lage: in der Tabelle steht d = 48 mm, wo die statische Höhe 252 mm ist.
+  Duktilität, Zwängung und Querkraft nennen sie darum `z`. Die Wurzel ist das
+  Symbol in `platte.py`; es zu ändern, ändert Tabelle und Handrechnung.
+* **Lagen mit einem Posten** heissen je nach Stelle `3,x` oder `3,x,g`; die
+  Handrechnung schreibt A_s,3,x, die Nachweise A_s,3,x,g. Dahinter steht
+  `posten_ids` als Tupel ohne Marke und Index.
+* **M-N, Erfüllungsart «nächster Punkt»:** Die Grad-Zeile zeigt
+  M_Rd/M_Ed = 175.1/150 = 1.40; der Grad ist dort aber ein Abstandsverhältnis
+  im normierten Diagramm, der Bruch ergibt 1.17. Älter als diese Runde.
+* **Spannungsbegrenzung ohne Moment:** Eine Restspannung von fast null gibt
+  einen Grad von 4 · 10⁸ statt ∞.
+
+---
+
 ## 2026-09-25 · LaTeX für Formeln, Text für Text: der Bericht aus Blöcken, in drei Formaten
 
 Anlass war die Frage, ob LaTeX die richtige Entscheidung war, und ob Formeln
