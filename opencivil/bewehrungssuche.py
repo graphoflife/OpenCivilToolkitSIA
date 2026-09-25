@@ -378,8 +378,8 @@ def _ohne_kraefte(eintrag) -> None:
     """
     eintrag.kombinationen = []
     eintrag.knickfaelle = []
-    eintrag.haeufige = []
-    eintrag.quasistaendige = []
+    eintrag.haeufig.faelle = []
+    eintrag.quasistaendig.faelle = []
 
 
 def _eine_teilung(projekt, kennung: str, teilung: float,

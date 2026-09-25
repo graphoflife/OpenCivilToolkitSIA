@@ -400,7 +400,7 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
         for feld in ("duktilitaet", "sproede", "zwaengung_biegung", "zwaengung"):
             with self.subTest(feld=feld):
                 self.assertIs(vorlage[feld], False)
-        self.assertFalse(vorlage["haeufige_aus_tragsicherheit"])
+        self.assertFalse(vorlage["haeufig"]["aus_tragsicherheit"])
 
     def test_sie_folgt_den_vorgaben_der_beschreibung(self):
         """
@@ -412,7 +412,7 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
         vorlage = api.katalog()["neue_platte"]
         leer = QuerschnittEintrag(kennung="x", name="x", beton="b").als_dict()
         for feld in ("duktilitaet", "sproede", "zwaengung_biegung", "zwaengung",
-                     "haeufige_aus_tragsicherheit", "automatik_modus",
+                     "haeufig", "quasistaendig", "automatik_modus",
                      "automatik_teilungen", "automatik_mindestdurchmesser",
                      "rissanforderung", "kriechzahl", "d_max", "k_c", "b"):
             with self.subTest(feld=feld):
@@ -457,7 +457,7 @@ class TestDoppelteFallnamen(unittest.TestCase):
         from opencivil.projekt import GebrauchsfallEintrag, KnickEintrag
 
         for feld, eintraege in (
-            ("haeufige", [GebrauchsfallEintrag("Gebrauch"), GebrauchsfallEintrag("Gebrauch")]),
+            ("haeufig", [GebrauchsfallEintrag("Gebrauch"), GebrauchsfallEintrag("Gebrauch")]),
             ("knickfaelle", [KnickEintrag("Stütze", N_Ed=-100.0, laenge=3.0,
                                           knicklaenge=3.0),
                              KnickEintrag("Stütze", N_Ed=-200.0, laenge=3.0,
@@ -465,7 +465,11 @@ class TestDoppelteFallnamen(unittest.TestCase):
         ):
             with self.subTest(feld=feld):
                 projekt = Projekt.beispiel()
-                setattr(projekt.querschnitt("q1"), feld, eintraege)
+                q = projekt.querschnitt("q1")
+                if feld == "haeufig":
+                    q.haeufig.faelle = eintraege
+                else:
+                    setattr(q, feld, eintraege)
                 with self.assertRaises(ProjektFehler):
                     projekt.aufbauen()
 
@@ -479,8 +483,8 @@ class TestDoppelteFallnamen(unittest.TestCase):
         projekt = Projekt.beispiel()
         q = projekt.querschnitt("q1")
         q.rissanforderung = "hoch"
-        q.haeufige = [GebrauchsfallEintrag(f"{q.kombinationen[0].name} (70 %)",
-                                     M_Ed=70.0)]
+        q.haeufig.faelle = [GebrauchsfallEintrag(
+            f"{q.kombinationen[0].name} (70 %)", M_Ed=70.0)]
         with self.assertRaises(ProjektFehler) as fehler:
             projekt.aufbauen()
         self.assertIn("abgeleitete", str(fehler.exception))
@@ -492,8 +496,8 @@ class TestDoppelteFallnamen(unittest.TestCase):
         projekt = Projekt.beispiel()
         q = projekt.querschnitt("q1")
         q.rissanforderung = "hoch"
-        q.haeufige = [GebrauchsfallEintrag("Gebrauch", M_Ed=70.0),
-                      GebrauchsfallEintrag("Gebrauch selten", M_Ed=40.0)]
+        q.haeufig.faelle = [GebrauchsfallEintrag("Gebrauch", M_Ed=70.0),
+                            GebrauchsfallEintrag("Gebrauch selten", M_Ed=40.0)]
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         self.assertEqual(antwort.status, 200)
 
@@ -545,7 +549,7 @@ class TestSpannungsnachweisNurWoGefordert(unittest.TestCase):
     """
 
     def test_der_katalog_sagt_es(self):
-        nach_wert = {r["wert"]: r["spannungsnachweis"]
+        nach_wert = {r["wert"]: r["fliessnachweis"]
                      for r in api.katalog()["rissanforderungen"]}
         self.assertEqual(nach_wert,
                          {"normal": False, "erhoeht": True, "hoch": True})
@@ -557,10 +561,10 @@ class TestSpannungsnachweisNurWoGefordert(unittest.TestCase):
             projekt = Projekt.beispiel()
             q = projekt.querschnitt("q1")
             q.rissanforderung = eintrag["wert"]
-            q.haeufige = [GebrauchsfallEintrag("Gebrauch", M_Ed=70.0)]
+            q.haeufig.faelle = [GebrauchsfallEintrag("Gebrauch", M_Ed=70.0)]
             with self.subTest(anforderung=eintrag["wert"]):
                 self.assertEqual(bool(projekt.aufbauen().spannung),
-                                 eintrag["spannungsnachweis"])
+                                 eintrag["fliessnachweis"])
 
 
 class TestStilleNachweise(unittest.TestCase):
@@ -1727,8 +1731,8 @@ class TestMindestbewehrungsEingaben(unittest.TestCase):
         self.assertFalse(q.zwaengung_begrenzt)
         # Die 70 % sind eine Abschaetzung und keine Norm -- eingeschaltet wird
         # sie von Hand. Gerechnet wird sie trotzdem, still.
-        self.assertFalse(q.haeufige_aus_tragsicherheit)
-        self.assertEqual(q.haeufige, [])
+        self.assertFalse(q.haeufig.aus_tragsicherheit)
+        self.assertEqual(q.haeufig.faelle, [])
 
     def test_alles_ueberlebt_die_datei(self):
         from opencivil.projekt import GebrauchsfallEintrag
@@ -1738,28 +1742,27 @@ class TestMindestbewehrungsEingaben(unittest.TestCase):
         q.rissanforderung = "hoch"
         q.zwaengung = True
         q.zwaengung_begrenzt = True
-        q.haeufige_aus_tragsicherheit = False
-        q.haeufige = [GebrauchsfallEintrag("Gebrauch", M_Ed=70.0, N_Ed=-40.0)]
+        q.haeufig.aus_tragsicherheit = False
+        q.haeufig.faelle = [GebrauchsfallEintrag("Gebrauch", M_Ed=70.0, N_Ed=-40.0)]
 
         kopie = Projekt.aus_dict(json.loads(json.dumps(projekt.als_dict())))
         k = kopie.querschnitt("q1")
         self.assertEqual(k.rissanforderung, "hoch")
         self.assertEqual((k.zwaengung, k.zwaengung_begrenzt), (True, True))
-        self.assertFalse(k.haeufige_aus_tragsicherheit)
-        self.assertEqual(len(k.haeufige), 1)
-        self.assertEqual((k.haeufige[0].name, k.haeufige[0].M_Ed,
-                          k.haeufige[0].N_Ed), ("Gebrauch", 70.0, -40.0))
+        self.assertFalse(k.haeufig.aus_tragsicherheit)
+        self.assertEqual(len(k.haeufig.faelle), 1)
+        fall = k.haeufig.faelle[0]
+        self.assertEqual((fall.name, fall.M_Ed, fall.N_Ed), ("Gebrauch", 70.0, -40.0))
 
     def test_eine_beschreibung_ohne_die_felder_bekommt_die_vorgaben(self):
         d = Projekt.beispiel().als_dict()
         for q in d["querschnitte"]:
             for feld in ("rissanforderung", "zwaengung",
-                         "zwaengung_begrenzt", "haeufige",
-                         "haeufige_aus_tragsicherheit"):
+                         "zwaengung_begrenzt", "haeufig"):
                 q.pop(feld, None)
         q = Projekt.aus_dict(d).querschnitt("q1")
         self.assertEqual(q.rissanforderung, "normal")
-        self.assertFalse(q.haeufige_aus_tragsicherheit)
+        self.assertFalse(q.haeufig.aus_tragsicherheit)
 
     def test_unbekannte_rissanforderung_wird_gemeldet(self):
         d = Projekt.beispiel().als_dict()
@@ -1790,8 +1793,8 @@ class TestMindestbewehrungsEingaben(unittest.TestCase):
         projekt = Projekt.beispiel()
         q = projekt.querschnitt("q1")
         q.rissanforderung = "hoch"
-        q.haeufige_aus_tragsicherheit = False
-        q.haeufige = [GebrauchsfallEintrag("Gebrauch", M_Ed=70.0)]
+        q.haeufig.aus_tragsicherheit = False
+        q.haeufig.faelle = [GebrauchsfallEintrag("Gebrauch", M_Ed=70.0)]
         mit = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         namen = [u["fall"] for u in mit.daten["urteile"] if u["art"] == "σ_s"]
         self.assertEqual(namen, ["Gebrauch"])

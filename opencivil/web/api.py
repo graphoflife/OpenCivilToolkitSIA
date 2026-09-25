@@ -34,7 +34,7 @@ from opencivil.core.wert import Wert
 from opencivil.material.beton import BETON_VORLAGEN, BETONSORTEN
 from opencivil.material.betonstahl import STAHLSORTEN, STAHL_VORLAGEN
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
-from opencivil.nachweis.spannungsbegrenzung import GEFORDERT
+from opencivil.nachweis.spannungsbegrenzung import GrenzeGegenFliessen
 from opencivil.projekt import (
     BEIDE_RICHTUNGEN, RISSANFORDERUNGEN, Aufbau, QuerschnittEintrag,
 )
@@ -102,15 +102,15 @@ def katalog() -> dict:
         # nur noch Kennung, Name und die beiden Materialien.
         "neue_platte": QuerschnittEintrag.neu(
             kennung="", name="", beton="", stahl="").als_dict(),
-        # `spannungsnachweis` sagt, ob diese Anforderung den Nachweis gegen
+        # `fliessnachweis` sagt, ob diese Anforderung den Nachweis gegen
         # das Fliessen unter haeufiger Einwirkung ueberhaupt verlangt -- bei
         # normaler steht in Tabelle 17 ein Strich. Die Oberflaeche braucht
         # das, um die eingetragenen Lastfaelle nicht stillschweigend
-        # wegzurechnen; die Regel selbst bleibt im Kern. Nur dieser eine
-        # Nachweis -- der quasi-staendige aus der Rissbreite laeuft immer.
+        # wegzurechnen; die Regel selbst bleibt bei der Grenze. Der
+        # quasi-staendige Nachweis aus der Rissbreite laeuft immer.
         "rissanforderungen": [
             {"wert": wert, "beschriftung": text,
-             "spannungsnachweis": wert in GEFORDERT}
+             "fliessnachweis": GrenzeGegenFliessen.gilt_bei(wert)}
             for wert, text in RISSANFORDERUNGEN.items()
         ],
     }

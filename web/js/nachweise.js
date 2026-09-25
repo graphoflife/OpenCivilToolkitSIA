@@ -292,7 +292,7 @@ function anforderungstext(querschnitt) {
 
 function mindestbewehrungsBlock(querschnitt) {
   // Ob der Nachweis gegen Fliessen überhaupt gefordert ist, weiss der Kern.
-  const gefordert = anforderung(querschnitt)?.spannungsnachweis !== false;
+  const gefordert = anforderung(querschnitt)?.fliessnachweis !== false;
 
   const aendern = (veraenderer) => projektAendern((p) => {
     veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
@@ -344,9 +344,7 @@ function mindestbewehrungsBlock(querschnitt) {
         + 'f_yk, bei erhöhter und hoher zusätzlich durch w_nom begrenzt. '
         + 'Geführt bei jeder Anforderung.',
       formel: 'σ_s ≤ σ_s,adm',
-      liste: 'quasistaendige',
-      ableiten: 'quasistaendige_aus_tragsicherheit',
-      anteil: 'quasistaendige_anteil',
+      feld: 'quasistaendig',
       wort: 'quasi-ständig',
       neu: 'Quasi-ständig',
     }),
@@ -358,9 +356,7 @@ function mindestbewehrungsBlock(querschnitt) {
         + 'bleiben Risse und Durchbiegung dauerhaft. Gerechnet am gerissenen '
         + 'Querschnitt, gezählt nur die gezogene Bewehrung.',
       formel: 'σ_s ≤ f_yd − 80 N/mm²',
-      liste: 'haeufige',
-      ableiten: 'haeufige_aus_tragsicherheit',
-      anteil: 'haeufige_anteil',
+      feld: 'haeufig',
       wort: 'häufig',
       neu: 'Häufig',
       // Bei normaler Anforderung steht in Tabelle 17 ein Strich: der
@@ -389,18 +385,23 @@ function mindestbewehrungsBlock(querschnitt) {
  * dieselbe Maske mit anderen Feldern. Eine Kopie davon stünde in der
  * Oberfläche genau so, wie sie im Kern vermieden wurde.
  *
+ * `feld` ist die Gebrauchsliste der Platte -- `haeufig` oder `quasistaendig`,
+ * je mit `anteil`, `aus_tragsicherheit` und `faelle`. Vorher waren das drei
+ * Feldnamen je Kapitel, die hier wieder zusammengesetzt wurden.
+ *
  * Der Anteil steht in der Schalterzeile und nicht darunter: «[✓] [60] % der
  * Tragsicherheitseinwirkungen» liest sich als ein Satz, und man sieht beim
  * Einschalten, womit gerechnet wird. Seine Vorgabe kommt aus dem Kern -- die
  * Datei läuft beim Laden durch ihn und bringt den Wert immer mit.
  */
 function gebrauchsKapitel(querschnitt, {
-  titel, erklaerungText, formel, liste, ableiten, anteil, wort, neu, hinweis,
+  titel, erklaerungText, formel, feld, wort, neu, hinweis,
 }) {
-  const abgeleitet = !!querschnitt[ableiten];
-  const faelle = querschnitt[liste] || [];
+  const liste = querschnitt[feld];
+  const abgeleitet = !!liste.aus_tragsicherheit;
+  const faelle = liste.faelle;
   const aendern = (veraenderer) => projektAendern((p) => {
-    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
+    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung)[feld]);
   });
 
   return el('div', {}, [
@@ -411,15 +412,15 @@ function gebrauchsKapitel(querschnitt, {
     hinweis ? el('p.hinweis.hinweis-annahme', { text: hinweis }) : null,
 
     el('div.duktilitaetszeile.ist-anteil', {}, [
-      hakenSchalter(abgeleitet, (wert) => aendern((q) => {
-        q[ableiten] = wert;
+      hakenSchalter(abgeleitet, (wert) => aendern((l) => {
+        l.aus_tragsicherheit = wert;
       }), 'Ableitung'),
       zahlfeld({
-        wert: querschnitt[anteil], schritt: 5, min: 5, max: 100,
+        wert: liste.anteil, schritt: 5, min: 5, max: 100,
         titel: `Welcher Anteil der Tragsicherheitseinwirkungen als ${wort} gilt, in %`,
         // Leer gelassen bleibt der bisherige Wert -- eine Null wäre kein
         // Anteil, und der Kern wiese sie ohnehin zurück.
-        beiAenderung: (v) => aendern((q) => { if (v !== null) q[anteil] = v; }),
+        beiAenderung: (v) => aendern((l) => { if (v !== null) l.anteil = v; }),
       }),
       el('span.postenname', { text: '% der Tragsicherheitseinwirkungen' }),
       el('span.kurvenhinweis', { text: '' }),
@@ -438,16 +439,15 @@ function gebrauchsKapitel(querschnitt, {
       ])
       : null,
     ...(faelle.length
-      ? faelle.map((_, i) => gebrauchsfallZeile(querschnitt, liste, wort, i))
+      ? faelle.map((_, i) => gebrauchsfallZeile(querschnitt, feld, wort, i))
       : [el('div.leer', {
         text: abgeleitet
           ? 'Nur die abgeleiteten Fälle.'
           : `Noch kein ${wort}er Lastfall.`,
       })]),
-    anfuegenKnopf('Lastfall', () => aendern((q) => {
-      q[liste] = q[liste] || [];
-      q[liste].push({
-        name: `${neu} ${q[liste].length + 1}`,
+    anfuegenKnopf('Lastfall', () => aendern((l) => {
+      l.faelle.push({
+        name: `${neu} ${l.faelle.length + 1}`,
         M_Ed: 0, N_Ed: 0, aktiv: true,
       });
     })),
@@ -455,11 +455,11 @@ function gebrauchsKapitel(querschnitt, {
 }
 
 /** Ein Lastfall unter Gebrauchslast auf einer Zeile -- wie eine Einwirkung, ohne Querkraft. */
-function gebrauchsfallZeile(querschnitt, liste, wort, index) {
-  const k = querschnitt[liste][index];
+function gebrauchsfallZeile(querschnitt, feld, wort, index) {
+  const k = querschnitt[feld].faelle[index];
   const aendern = (veraenderer) => projektAendern((p) => {
     veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
-      [liste][index]);
+      [feld].faelle[index]);
   });
 
   const aktiv = k.aktiv !== false;
@@ -483,7 +483,7 @@ function gebrauchsfallZeile(querschnitt, liste, wort, index) {
       on: {
         click: () => projektAendern((p) => {
           p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
-            [liste].splice(index, 1);
+            [feld].faelle.splice(index, 1);
         }),
       },
     }),

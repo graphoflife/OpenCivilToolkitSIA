@@ -22,6 +22,7 @@ from opencivil.material.basis import Baustoff
 from opencivil.material.beton import BETONSORTEN
 from opencivil.material.betonstahl import STAHLSORTEN
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
+from opencivil.nachweis.spannungsbegrenzung import fallkennung
 from opencivil.querschnitt.platte import (
     ALPHA_MAX, ALPHA_MIN, Bewehrungsposten, Querkraftbewehrung, Richtung,
 )
@@ -540,6 +541,147 @@ class GebrauchsfallEintrag(Beschreibung):
             N_Ed=_zahl(d, "N_Ed", 0.0),
             aktiv=bool(d.get("aktiv", True)),
         )
+
+
+def eindeutig(faelle, platte: str, was: str) -> None:
+    """
+    Lastfallnamen muessen je Platte und Liste eindeutig sein.
+
+    Die Nachweise legen ihre Ergebniswerte unter dem Fallnamen ab -- M-N,
+    Querkraft und Stahlspannung alle drei. Zwei Kombinationen gleichen
+    Namens fielen darum auf einen Eintrag zusammen: der zweite ueberschrieb
+    den ersten, und in der Tabelle fehlte eine Zeile. Kein Fehler, keine
+    Warnung, eine Zahl weniger.
+
+    Gemeldet statt umbenannt: welcher der beiden gemeint war, weiss nur der
+    Benutzer, und ein automatisch angehaengtes «(2)» stuende danach in seinem
+    Bericht.
+    """
+    gesehen = set()
+    for f in faelle:
+        if f.name in gesehen:
+            raise ProjektFehler(
+                f"Platte '{platte}': der Name '{f.name}' ist zweimal als {was} "
+                f"vergeben. Die Nachweise legen ihre Ergebnisse unter dem "
+                f"Fallnamen ab -- zwei gleiche Namen ergeben eine Zeile statt "
+                f"zwei.")
+        gesehen.add(f.name)
+
+
+@dataclass
+class Gebrauchsliste(Beschreibung):
+    """
+    Die Lastfaelle eines Stahlspannungsnachweises: eigene und abgeleitete.
+
+    Eine Platte hat zwei davon, eine haeufige und eine quasi-staendige. Beide
+    werden gleich gebildet -- die eigenen Faelle, dazu die
+    Tragsicherheitseinwirkungen mal ``anteil`` Prozent -- und unterscheiden
+    sich nur darin, wogegen der Nachweis sie haelt.
+
+    Frueher waren das sechs flache Felder an der Platte, und jede Stelle, die
+    damit arbeitete, setzte die drei zusammengehoerigen wieder ueber ihre
+    Namen zusammen. Welche Liste haeufig und welche quasi-staendig ist, sagt
+    das Feld der Platte, in dem sie steht; die Liste selbst weiss es nicht.
+    """
+
+    anteil: float
+    """Welcher Anteil der Tragsicherheitseinwirkungen abgeleitet wird, in %."""
+
+    aus_tragsicherheit: bool = False
+    """
+    Ob die abgeleiteten Faelle *gefuehrt* werden.
+
+    Gebildet werden sie immer; ausgeschaltet rechnen sie still mit. Der
+    Anteil ist eine bequeme Abschaetzung und keine Norm, darum stehen die
+    Faelle nur auf Verlangen in der Tabelle.
+    """
+
+    faelle: List[GebrauchsfallEintrag] = field(default_factory=list)
+    """Eigene Lastfaelle -- neben den abgeleiteten, nicht statt ihrer."""
+
+    def lastfall(self, name: str, *, M_Ed: float = 0.0,
+                 N_Ed: float = 0.0) -> GebrauchsfallEintrag:
+        """Einen eigenen Lastfall anfuegen -- kNm und kN, Zug positiv."""
+        eintrag = GebrauchsfallEintrag(name=name, M_Ed=M_Ed, N_Ed=N_Ed)
+        self.faelle.append(eintrag)
+        return eintrag
+
+    def pruefen(self, platte: str, kombinationen: List["KombinationEintrag"],
+                wort: str) -> None:
+        """
+        Was an dieser Liste nicht stimmen kann -- ``wort`` ist «häufige» oder
+        «quasi-ständige» und steht in der Meldung.
+
+        Je Liste fuer sich: die beiden Listen landen in getrennten Nachweisen
+        und damit in getrennten ID-Raeumen. Ein Fall «Dauer» darf in beiden
+        stehen.
+        """
+        # Null ergaebe Lastfaelle ohne Last -- ein Nachweis, der immer
+        # aufgeht und nichts sagt. Ueber hundert waere keine Gebrauchslast
+        # mehr. Gemeldet statt begrenzt: wer 700 statt 70 tippt, soll es
+        # erfahren und nicht mit 100 weiterrechnen.
+        if not 0.0 < self.anteil <= 100.0:
+            raise ProjektFehler(
+                f"Platte '{platte}': der Anteil für die {wort}n Lastfälle muss "
+                f"zwischen 0 und 100 % liegen, angegeben sind "
+                f"{self.anteil:g} %.")
+
+        eindeutig(self.faelle, platte, f"{wort}r Lastfall")
+
+        # Die abgeleiteten Faelle tragen den Namen ihrer Kombination mit
+        # angehaengtem Anteil. Wer einen eigenen Lastfall genau so nennt,
+        # traefe denselben Schluessel.
+        abgeleitet = [abgeleiteter_fallname(k.name, self.anteil)
+                      for k in kombinationen]
+        for f in self.faelle:
+            if f.name in abgeleitet:
+                raise ProjektFehler(
+                    f"Platte '{platte}': der {wort} Lastfall '{f.name}' heisst "
+                    f"wie der aus der Tragsicherheit abgeleitete. Bitte anders "
+                    f"benennen -- sonst lässt sich nicht auseinanderhalten, "
+                    f"welcher gerechnet wurde.")
+
+        # Verschiedene Namen koennen dieselbe Wert-ID ergeben: «Feld A» und
+        # «Feld-A» werden beide zu «Feld_A». Das Rechenwerk wiese den zweiten
+        # zurueck, aber mit einer Meldung ueber Wert-IDs, die niemand an der
+        # Maske versteht.
+        kennungen: Dict[str, str] = {}
+        for name in abgeleitet + [f.name for f in self.faelle]:
+            frueher = kennungen.setdefault(fallkennung(name), name)
+            if frueher != name:
+                raise ProjektFehler(
+                    f"Platte '{platte}': die {wort}n Lastfälle '{frueher}' und "
+                    f"'{name}' unterscheiden sich nur in Satz- oder "
+                    f"Leerzeichen. Im Bericht fielen sie auf denselben Eintrag "
+                    f"-- bitte einen davon anders benennen.")
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any], *, wort: str,
+                 vorgabe: float) -> "Gebrauchsliste":
+        return cls(
+            anteil=_zahl(d, "anteil", vorgabe),
+            aus_tragsicherheit=bool(d.get("aus_tragsicherheit", False)),
+            faelle=[GebrauchsfallEintrag.aus_dict(x, wort)
+                    for x in (d.get("faelle") or [])],
+        )
+
+
+def gebrauchsliste_roh(d: Mapping[str, Any], feld: str,
+                       alt: str) -> Mapping[str, Any]:
+    """
+    Die Gebrauchsliste einer Platte aus der Datei -- verschachtelt oder flach.
+
+    Bis zur :class:`Gebrauchsliste` standen die drei Angaben einzeln an der
+    Platte: ``haeufige``, ``haeufige_aus_tragsicherheit``, ``haeufige_anteil``
+    und dasselbe fuer ``quasistaendige``. Solche Dateien gibt es; sie werden
+    hier in die neue Form gebracht, geschrieben wird nur noch diese.
+    """
+    neu = d.get(feld)
+    if isinstance(neu, Mapping):
+        return neu
+    return {"faelle": d.get(alt) or [],
+            "aus_tragsicherheit": d.get(f"{alt}_aus_tragsicherheit", False),
+            "anteil": d.get(f"{alt}_anteil")}
 
 
 @dataclass

@@ -99,12 +99,12 @@ class TestAnlegen(unittest.TestCase):
     def test_lastfaelle_landen_in_ihrer_liste(self):
         q = einfach().platte("P")
         self.assertIsInstance(q.einwirkung("Feld", M_Ed=10, V_Ed=5), KombinationEintrag)
-        q.haeufiger_lastfall("H", M_Ed=7)
-        q.quasistaendiger_lastfall("Q", M_Ed=6)
+        self.assertIsInstance(q.haeufig.lastfall("H", M_Ed=7), GebrauchsfallEintrag)
+        q.quasistaendig.lastfall("Q", M_Ed=6)
         knick = q.knickfall("K", N_Ed=-500, laenge=4)
         self.assertEqual([k.name for k in q.kombinationen], ["Feld"])
-        self.assertEqual(q.haeufige, [GebrauchsfallEintrag("H", M_Ed=7)])
-        self.assertEqual(q.quasistaendige, [GebrauchsfallEintrag("Q", M_Ed=6)])
+        self.assertEqual(q.haeufig.faelle, [GebrauchsfallEintrag("H", M_Ed=7)])
+        self.assertEqual(q.quasistaendig.faelle, [GebrauchsfallEintrag("Q", M_Ed=6)])
         self.assertIsInstance(knick, KnickEintrag)
         self.assertEqual(knick.knicklaenge, 4, "ohne Angabe gleich der Länge")
 

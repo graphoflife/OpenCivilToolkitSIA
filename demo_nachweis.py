@@ -45,11 +45,11 @@ def main(ausgabe: Path = AUSGABE) -> None:
     decke.einwirkung("Feld mit Druck", M_Ed=150, N_Ed=-300)
     decke.einwirkung("Feld mit Zug", M_Ed=150, N_Ed=300)
     decke.einwirkung("Stütze", M_Ed=-60, V_Ed=80)
-    decke.quasistaendiger_lastfall("Dauerlast", M_Ed=80)
+    decke.quasistaendig.lastfall("Dauerlast", M_Ed=80)
 
     # Was die Fassade nicht abdeckt, setzt man am Eintrag selbst.
     decke.duktilitaet = True
-    decke.haeufige_aus_tragsicherheit = True
+    decke.haeufig.aus_tragsicherheit = True
 
     # -- 2. Rechnen und zusammenfassen --------------------------------------
     ergebnis = projekt.rechnen()

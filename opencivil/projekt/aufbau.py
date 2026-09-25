@@ -41,7 +41,7 @@ from opencivil.nachweis.mindestbewehrung import (
     Rissnormalkraft, ZwaengungBiegung,
 )
 from opencivil.nachweis.spannungsbegrenzung import (
-    GEFORDERT, Gebrauchsfall, GrenzeAusRissbreite, GrenzeGegenFliessen,
+    Gebrauchsfall, GrenzeAusRissbreite, GrenzeGegenFliessen,
     Spannungsbegrenzung,
 )
 from opencivil.nachweis.sproedes_versagen import SproedesVersagen
@@ -50,7 +50,7 @@ from opencivil.querschnitt.platte import (
     Bewehrungslage, Plattenquerschnitt, Richtung,
 )
 from opencivil.projekt.eintraege import (
-    GebrauchsfallEintrag, KombinationEintrag, MaterialEintrag,
+    Gebrauchsliste, KombinationEintrag, MaterialEintrag,
     ProjektFehler, SpannungsfallEintrag, _schalter_aus,
     abgeleiteter_fallname,
 )
@@ -392,34 +392,23 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
                 duktilitaet.still = not an_duktil
                 eintragen("duktilitaet", eintrag.kennung, duktilitaet)
 
-            # Stahlspannung aus der Rissbreite unter quasi-staendiger
-            # Einwirkung. Bei jeder Anforderung -- bei normaler ist die
-            # Grenze f_yk, aber auch dort darf die Bewehrung unter
-            # Dauerlast nicht fliessen.
-            faelle, laute = _gebrauchsfaelle(
-                eintrag, eigene=eintrag.quasistaendige,
-                ableiten=eintrag.quasistaendige_aus_tragsicherheit,
-                anteil=eintrag.quasistaendige_anteil)
-            if faelle:
-                riss = Spannungsbegrenzung(
-                    querschnitt, richtung, faelle,
-                    grenze=GrenzeAusRissbreite(eintrag.rissanforderung))
-                riss.stillstellen([f.name for f in faelle], laute)
-                eintragen("spannung_riss", f"{eintrag.kennung}.x", riss)
-
-            # Stahlspannung gegen Fliessen unter haeufiger Einwirkung. Nur
-            # bei erhoehter und hoher Anforderung -- bei normaler steht in
-            # Tabelle 17 ein Strich.
-            faelle, laute = _gebrauchsfaelle(
-                eintrag, eigene=eintrag.haeufige,
-                ableiten=eintrag.haeufige_aus_tragsicherheit,
-                anteil=eintrag.haeufige_anteil)
-            if faelle and eintrag.rissanforderung in GEFORDERT:
-                spannung = Spannungsbegrenzung(
-                    querschnitt, richtung, faelle,
-                    grenze=GrenzeGegenFliessen())
-                spannung.stillstellen([f.name for f in faelle], laute)
-                eintragen("spannung", f"{eintrag.kennung}.x", spannung)
+            # Die Stahlspannung, zweimal: aus der Rissbreite unter
+            # quasi-staendiger Einwirkung (bei jeder Anforderung) und gegen
+            # Fliessen unter haeufiger (nur bei erhoehter und hoher). Welche
+            # wann gilt, weiss die Grenze selbst.
+            for feld, liste, grenze in (
+                    ("spannung_riss", eintrag.quasistaendig, GrenzeAusRissbreite),
+                    ("spannung", eintrag.haeufig, GrenzeGegenFliessen)):
+                if not grenze.gilt_bei(eintrag.rissanforderung):
+                    continue
+                faelle, laute = _gebrauchsfaelle(eintrag.kombinationen, liste)
+                if faelle:
+                    spannung = Spannungsbegrenzung(
+                        querschnitt, richtung, faelle,
+                        grenze=grenze(querschnitt, richtung,
+                                      eintrag.rissanforderung))
+                    spannung.stillstellen([f.name for f in faelle], laute)
+                    eintragen(feld, f"{eintrag.kennung}.x", spannung)
 
             mit_querkraft = [k for k in aktiv if k.V_Ed]
             if mit_querkraft:
@@ -567,9 +556,7 @@ def _querschnitt(
 
 
 def _gebrauchsfaelle(
-    eintrag: "QuerschnittEintrag", *,
-    eigene: Sequence["GebrauchsfallEintrag"], ableiten: bool,
-    anteil: float,
+    kombinationen: Sequence[KombinationEintrag], liste: Gebrauchsliste,
 ) -> Tuple[List[Gebrauchsfall], List[str]]:
     """
     Die Lastfaelle eines Stahlspannungsnachweises -- und welche laut sind.
@@ -578,12 +565,13 @@ def _gebrauchsfaelle(
     Listen werden gleich gebildet und unterscheiden sich nur im Anteil.
 
     Die eigens angegebenen, und zusaetzlich die Tragsicherheitsfaelle mit
-    ``anteil`` Prozent. Beides nebeneinander: der Anteil ist eine bequeme
+    ``liste.anteil`` Prozent. Beides nebeneinander: der Anteil ist eine bequeme
     Abschaetzung, deckt aber nicht den Fall ab, den es nur unter
     Gebrauchslast gibt. Wer einen solchen kennt, soll ihn dazustellen
     koennen, ohne die Abschaetzung fuer alle anderen aufzugeben.
 
-    Die abgeleiteten Faelle entstehen auch dann, wenn ``ableiten`` aus ist
+    Die abgeleiteten Faelle entstehen auch dann, wenn
+    ``liste.aus_tragsicherheit`` aus ist
     -- dann eben still. Sie ganz wegzulassen hiesse, den Nachweis erst auf
     Verlangen zu fuehren; so steht wenigstens ein Hinweis da, wenn die
     Abschaetzung nicht aufgeht.
@@ -602,22 +590,22 @@ def _gebrauchsfaelle(
     Die Rechnung steht hier und nicht in der Oberflaeche: dort waere sie
     eine zweite Wahrheit.
     """
-    faktor = anteil / 100.0
+    faktor = liste.anteil / 100.0
     abgeleitet = [
         Gebrauchsfall(
-            name=abgeleiteter_fallname(k.name, anteil),
+            name=abgeleiteter_fallname(k.name, liste.anteil),
             M_Ed=Groesse(faktor * k.M_Ed, KNM),
             N_Ed=Groesse(faktor * k.N_Ed, KN))
-        for k in eintrag.kombinationen if k.aktiv
+        for k in kombinationen if k.aktiv
     ]
     eigen = [
         Gebrauchsfall(name=h.name,
                       M_Ed=Groesse(h.M_Ed, KNM),
                       N_Ed=Groesse(h.N_Ed, KN))
-        for h in eigene if h.aktiv
+        for h in liste.faelle if h.aktiv
     ]
     laute = [f.name for f in eigen]
-    if ableiten:
+    if liste.aus_tragsicherheit:
         laute += [f.name for f in abgeleitet]
     return abgeleitet + eigen, laute
 

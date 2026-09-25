@@ -89,9 +89,9 @@ from opencivil.querschnitt.platte import Richtung
 FLIESSABSTAND = 80e6
 
 #: Anforderungen, bei denen der Nachweis gegen Fliessen gefuehrt wird. Bei
-#: *normal* steht in der Tabelle ein Strich. Der Nachweis aus der Rissbreite
-#: kennt keine solche Liste -- er laeuft immer.
-GEFORDERT = ("erhoeht", "hoch")
+#: *normal* steht in der Tabelle ein Strich. Von aussen fragt man
+#: :meth:`GrenzeGegenFliessen.gilt_bei` -- die Liste gehoert der Grenze.
+_GEFORDERT = ("erhoeht", "hoch")
 
 #: Womit die Werkstoffgesetze rechnen. Ein Gebrauchsnachweis fragt, was der
 #: Querschnitt tut, nicht was er darf.
@@ -204,20 +204,36 @@ class Spannungsgrenze(ABC):
     #: Ueberschrift je Fall.
     fallwort: str
     referenz: str
+    #: Der erste Satz der Herleitung: wozu der Nachweis da ist.
+    einleitung: str
+
+    def __init__(self, querschnitt, richtung: Richtung, anforderung: str) -> None:
+        """
+        Alle Grenzen werden gleich gebaut -- aus der Platte, der Tragrichtung
+        und der Rissanforderung. Was eine davon nicht braucht, laesst sie
+        liegen; so kann der Aufbau beide in derselben Schleife anlegen.
+        """
+        if anforderung not in RISSBREITE:
+            raise ValueError(
+                f"Unbekannte Rissanforderung '{anforderung}'. Möglich sind: "
+                f"{', '.join(RISSBREITE)}.")
+        self.posten = querschnitt.posten_in_richtung(richtung)
+        if not self.posten:
+            raise ValueError(
+                f"Querschnitt '{querschnitt.name}': in {richtung.beschriftung} "
+                f"liegt keine Bewehrung.")
+        self.querschnitt = querschnitt
+        self.anforderung = anforderung
+        self.stahl = self.posten[0][0].stahl
+
+    @classmethod
+    def gilt_bei(cls, anforderung: str) -> bool:
+        """Ob der Nachweis bei dieser Rissanforderung verlangt ist."""
+        return True
 
     @abstractmethod
-    def bezuege(self, querschnitt, posten) -> List[Eingabebezug]:
-        """
-        Was nur diese Grenze braucht, zusaetzlich zur gemeinsamen Rechnung.
-
-        Einmal je Nachweis aufgerufen, beim Bauen. Die Grenze merkt sich
-        dabei, was sie spaeter zum Rechnen und Schreiben braucht -- eine
-        Grenze gehoert darum zu genau einem Nachweis.
-        """
-
-    @abstractmethod
-    def einleitung(self) -> str:
-        """Der erste Satz der Herleitung: wozu der Nachweis da ist."""
+    def bezuege(self) -> List[Eingabebezug]:
+        """Was nur diese Grenze braucht, zusaetzlich zur gemeinsamen Rechnung."""
 
     @abstractmethod
     def bestimmen(self, e: Eingaben, p: Protokoll) -> float:
@@ -232,9 +248,9 @@ class GrenzeGegenFliessen(Spannungsgrenze):
     """
     ``f_yd - 80 N/mm²`` unter haeufiger Einwirkung -- das Fliessen verhindern.
 
-    Nur bei erhoehter und hoher Anforderung (:data:`GEFORDERT`). Das
-    entscheidet der Aufbau, der den Nachweis gar nicht erst baut; die Grenze
-    selbst kennt keine Anforderung.
+    Nur bei erhoehter und hoher Anforderung -- bei normaler steht in
+    Tabelle 17 ein Strich. Das sagt :meth:`gilt_bei`; der Aufbau fragt, und
+    der Katalog der Oberflaeche auch.
     """
 
     idteil = "spannung"
@@ -246,15 +262,19 @@ class GrenzeGegenFliessen(Spannungsgrenze):
     lastindex = "häufig"
     fallwort = "Häufiger Lastfall"
     referenz = "SIA 262:2025, Tabelle 17"
+    einleitung = ("Unter häufiger Einwirkung darf die Bewehrung nicht "
+                  "fliessen – sonst bleiben Risse und Durchbiegung dauerhaft.")
 
-    def bezuege(self, querschnitt, posten) -> List[Eingabebezug]:
-        stahl = posten[0][0].stahl
-        self.s_f_yd = mit_index("f_{yd}", stahl.symbol_index)
-        return [Eingabebezug("f_yd", stahl.id_von("f_yd"))]
+    def __init__(self, querschnitt, richtung: Richtung, anforderung: str) -> None:
+        super().__init__(querschnitt, richtung, anforderung)
+        self.s_f_yd = mit_index("f_{yd}", self.stahl.symbol_index)
 
-    def einleitung(self) -> str:
-        return ("Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – "
-                "sonst bleiben Risse und Durchbiegung dauerhaft.")
+    @classmethod
+    def gilt_bei(cls, anforderung: str) -> bool:
+        return anforderung in _GEFORDERT
+
+    def bezuege(self) -> List[Eingabebezug]:
+        return [Eingabebezug("f_yd", self.stahl.id_von("f_yd"))]
 
     def bestimmen(self, e: Eingaben, p: Protokoll) -> float:
         f_yd = e.g("f_yd").si
@@ -310,35 +330,27 @@ class GrenzeAusRissbreite(Spannungsgrenze):
     lastindex = r"\text{quasi-ständig}"
     fallwort = "Quasi-ständiger Lastfall"
     referenz = "SIA 262:2025, 4.4.2"
+    einleitung = ("Unter quasi-ständiger Einwirkung begrenzt die "
+                  "Stahlspannung die Rissbreite – dieselbe Grenze wie bei der "
+                  "Zwängung, nur dass die Spannung hier aus den Lasten kommt "
+                  "und nicht aus einer aufgezwungenen Verformung.")
 
-    def __init__(self, anforderung: str) -> None:
-        if anforderung not in RISSBREITE:
-            raise ValueError(
-                f"Unbekannte Rissanforderung '{anforderung}'. Möglich sind: "
-                f"{', '.join(RISSBREITE)}.")
-        self.anforderung = anforderung
-        self.marken: List[str] = []
-
-    def bezuege(self, querschnitt, posten) -> List[Eingabebezug]:
-        stahl = posten[0][0].stahl
+    def __init__(self, querschnitt, richtung: Richtung, anforderung: str) -> None:
+        super().__init__(querschnitt, richtung, anforderung)
         self.marken = [f"{lage.nummer}{art.kuerzel}"
-                       for lage, art, _, _, _ in posten]
-        self.s_f_yk = mit_index("f_{yk}", stahl.symbol_index)
+                       for lage, art, _, _, _ in self.posten]
+        self.s_f_yk = mit_index("f_{yk}", self.stahl.symbol_index)
         self.s_f_ctm = mit_index("f_{ctm}", querschnitt.beton.symbol_index)
+
+    def bezuege(self) -> List[Eingabebezug]:
         return [
-            Eingabebezug("f_yk", stahl.id_von("f_yk")),
-            Eingabebezug("E_s", stahl.id_von("E_s")),
-            Eingabebezug("f_ctm", querschnitt.beton.id_von("f_ctm")),
+            Eingabebezug("f_yk", self.stahl.id_von("f_yk")),
+            Eingabebezug("E_s", self.stahl.id_von("E_s")),
+            Eingabebezug("f_ctm", self.querschnitt.beton.id_von("f_ctm")),
         ] + [
-            Eingabebezug(f"dm_{m}", querschnitt.id_von(f"lage.{m}.phi"))
+            Eingabebezug(f"dm_{m}", self.querschnitt.id_von(f"lage.{m}.phi"))
             for m in self.marken
         ]
-
-    def einleitung(self) -> str:
-        return ("Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung "
-                "die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur "
-                "dass die Spannung hier aus den Lasten kommt und nicht aus "
-                "einer aufgezwungenen Verformung.")
 
     def bestimmen(self, e: Eingaben, p: Protokoll) -> float:
         f_yk = e.g("f_yk").si
@@ -460,7 +472,7 @@ class Spannungsbegrenzung(Nachweis):
         # auch das Werkstoffgesetz. Doppelt anmelden ginge nicht, und dieselbe
         # Zahl unter zwei Namen zu fuehren hiesse, sie zweimal zu lesen.
         vorhanden = {b.name: b.wert_id for b in bezuege}
-        for b in grenze.bezuege(querschnitt, self.posten):
+        for b in grenze.bezuege():
             if b.name not in vorhanden:
                 bezuege.append(b)
             elif vorhanden[b.name] != b.wert_id:
@@ -631,7 +643,7 @@ class Spannungsbegrenzung(Nachweis):
         p.titel(f"Stahlspannung unter {g.einwirkung} Einwirkung – "
                 f"{self.richtung.beschriftung}")
         p.text(
-            f"{g.einleitung()} Gerechnet wird am gerissenen Querschnitt: der "
+            f"{g.einleitung} Gerechnet wird am gerissenen Querschnitt: der "
             f"Beton nimmt keinen Zug auf, im Druck rechnet er linear mit dem "
             f"wirksamen Modul. Gezählt wird nur gezogene Bewehrung."
         )

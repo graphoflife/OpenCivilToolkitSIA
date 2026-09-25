@@ -18,9 +18,9 @@ from typing import Any, List, Mapping, Optional
 
 from opencivil.querschnitt.platte import K_C, KRIECHZAHL, LAGENZAHL, Richtung
 from opencivil.projekt.eintraege import (
-    Beschreibung, GebrauchsfallEintrag, HAEUFIG_ANTEIL, KnickEintrag,
+    Beschreibung, Gebrauchsliste, HAEUFIG_ANTEIL, KnickEintrag,
     KombinationEintrag, LageEintrag, PostenEintrag, QUASISTAENDIG_ANTEIL,
-    QuerkraftbewehrungEintrag, SpannungsfallEintrag,
+    QuerkraftbewehrungEintrag, SpannungsfallEintrag, gebrauchsliste_roh,
     _lagen_aus_altem_format, _pflichtfeld, _rissanforderung_aus,
     _schalter_aus, _teilungen_aus, _zahl,
 )
@@ -88,36 +88,19 @@ class QuerschnittEintrag(Beschreibung):
     zwaengung_begrenzt: bool = False
     """Ob die Zwaengung auf 500 mm Plattendicke begrenzt angesetzt wird."""
 
-    haeufige: List[GebrauchsfallEintrag] = field(default_factory=list)
-    """Eigene haeufige Lastfaelle -- neben den abgeleiteten, nicht statt ihrer."""
+    haeufig: Gebrauchsliste = field(
+        default_factory=lambda: Gebrauchsliste(anteil=HAEUFIG_ANTEIL))
+    """Die haeufigen Lastfaelle -- fuer den Nachweis gegen Fliessen."""
 
-    quasistaendige: List[GebrauchsfallEintrag] = field(default_factory=list)
-    """Eigene quasi-staendige Lastfaelle -- ebenso."""
+    quasistaendig: Gebrauchsliste = field(
+        default_factory=lambda: Gebrauchsliste(anteil=QUASISTAENDIG_ANTEIL))
+    """Die quasi-staendigen Lastfaelle -- fuer die Rissbreite."""
 
     knickfaelle: List[KnickEintrag] = field(default_factory=list)
     """Knicknachweise; leer heisst: keiner."""
 
     spannungsfaelle: List[SpannungsfallEintrag] = field(default_factory=list)
     """Auswertungen am Querschnitt -- Bilder, keine Nachweise."""
-
-    haeufige_aus_tragsicherheit: bool = False
-    """
-    Ob die aus den Tragsicherheitsfaellen abgeleiteten haeufigen Lastfaelle
-    *gefuehrt* werden -- mit :attr:`haeufige_anteil`.
-
-    Gebildet werden sie immer; ausgeschaltet rechnen sie still mit. Der
-    Anteil ist eine bequeme Abschaetzung und keine Norm, darum stehen die
-    Faelle nur auf Verlangen in der Tabelle.
-    """
-
-    haeufige_anteil: float = HAEUFIG_ANTEIL
-    """Welcher Anteil der Tragsicherheitseinwirkungen als haeufig gilt, in %."""
-
-    quasistaendige_aus_tragsicherheit: bool = False
-    """Dasselbe fuer die quasi-staendigen Lastfaelle."""
-
-    quasistaendige_anteil: float = QUASISTAENDIG_ANTEIL
-    """Welcher Anteil als quasi-staendig gilt, in %."""
 
     automatik_modus: str = "grund_ohne"
     """Wonach das Bewehrungswerkzeug sucht -- siehe ``bewehrungssuche.Suchmodus``."""
@@ -205,20 +188,6 @@ class QuerschnittEintrag(Beschreibung):
         """Eine Tragsicherheitseinwirkung -- kNm, kN und kN/m, Zug positiv."""
         eintrag = KombinationEintrag(name=name, M_Ed=M_Ed, N_Ed=N_Ed, V_Ed=V_Ed)
         self.kombinationen.append(eintrag)
-        return eintrag
-
-    def haeufiger_lastfall(self, name: str, *, M_Ed: float = 0.0,
-                           N_Ed: float = 0.0) -> GebrauchsfallEintrag:
-        """Ein eigener haeufiger Lastfall -- fuer den Nachweis gegen Fliessen."""
-        eintrag = GebrauchsfallEintrag(name=name, M_Ed=M_Ed, N_Ed=N_Ed)
-        self.haeufige.append(eintrag)
-        return eintrag
-
-    def quasistaendiger_lastfall(self, name: str, *, M_Ed: float = 0.0,
-                                 N_Ed: float = 0.0) -> GebrauchsfallEintrag:
-        """Ein eigener quasi-staendiger Lastfall -- fuer die Rissbreite."""
-        eintrag = GebrauchsfallEintrag(name=name, M_Ed=M_Ed, N_Ed=N_Ed)
-        self.quasistaendige.append(eintrag)
         return eintrag
 
     def knickfall(self, name: str, *, N_Ed: float, M_Ed_1: float = 0.0,
@@ -310,17 +279,12 @@ class QuerschnittEintrag(Beschreibung):
             zwaengung=_schalter_aus(d.get("zwaengung"), d.get("zwaengung_x"),
                                     d.get("zwaengung_y")),
             zwaengung_begrenzt=bool(d.get("zwaengung_begrenzt", False)),
-            haeufige_aus_tragsicherheit=bool(
-                d.get("haeufige_aus_tragsicherheit", False)),
-            haeufige_anteil=_zahl(d, "haeufige_anteil", HAEUFIG_ANTEIL),
-            haeufige=[GebrauchsfallEintrag.aus_dict(x)
-                      for x in (d.get("haeufige") or [])],
-            quasistaendige_aus_tragsicherheit=bool(
-                d.get("quasistaendige_aus_tragsicherheit", False)),
-            quasistaendige_anteil=_zahl(d, "quasistaendige_anteil",
-                                        QUASISTAENDIG_ANTEIL),
-            quasistaendige=[GebrauchsfallEintrag.aus_dict(x, "quasi-ständige")
-                            for x in (d.get("quasistaendige") or [])],
+            haeufig=Gebrauchsliste.aus_dict(
+                gebrauchsliste_roh(d, "haeufig", "haeufige"),
+                wort="häufige", vorgabe=HAEUFIG_ANTEIL),
+            quasistaendig=Gebrauchsliste.aus_dict(
+                gebrauchsliste_roh(d, "quasistaendig", "quasistaendige"),
+                wort="quasi-ständige", vorgabe=QUASISTAENDIG_ANTEIL),
             knickfaelle=[KnickEintrag.aus_dict(x)
                          for x in (d.get("knickfaelle") or [])],
             spannungsfaelle=[SpannungsfallEintrag.aus_dict(x)

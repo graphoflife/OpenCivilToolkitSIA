@@ -50,7 +50,7 @@ p.stahl("B500B")
 q = p.platte("Decke", h=300, x=[18, 12], x_zulage=[12, 0], y=[12, 12],
              teilung=150, rissanforderung="erhoeht")
 q.einwirkung("Feld", M_Ed=150, V_Ed=80)       # kNm, kN, kN/m; Zug positiv
-q.quasistaendiger_lastfall("Dauerlast", M_Ed=80)
+q.quasistaendig.lastfall("Dauerlast", M_Ed=80)
 q.duktilitaet = True                          # alles Weitere am Eintrag selbst
 
 ergebnis = p.rechnen()

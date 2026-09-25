@@ -20,11 +20,9 @@ from dataclasses import dataclass, field, fields
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Sequence, Union
 
-from opencivil.nachweis.spannungsbegrenzung import fallkennung
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
 from opencivil.projekt.eintraege import (
-    Beschreibung, MaterialEintrag, PostenEintrag, ProjektFehler,
-    abgeleiteter_fallname,
+    Beschreibung, MaterialEintrag, PostenEintrag, ProjektFehler, eindeutig,
 )
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.aufbau import Aufbau, aufbauen
@@ -255,93 +253,21 @@ class Projekt(Beschreibung):
 
         for eintrag in self.querschnitte:
             self._namen_pruefen(eintrag)
-            self._anteile_pruefen(eintrag)
-
-    @staticmethod
-    def _anteile_pruefen(eintrag: "QuerschnittEintrag") -> None:
-        """
-        Ein Anteil muss zwischen null und hundert Prozent liegen.
-
-        Null ergaebe Lastfaelle ohne Last -- ein Nachweis, der immer aufgeht
-        und nichts sagt. Ueber hundert waere keine Gebrauchslast mehr, sondern
-        mehr als die Tragsicherheit. Gemeldet statt begrenzt: wer 700 statt
-        70 tippt, soll es erfahren und nicht mit 100 weiterrechnen.
-        """
-        for anteil, was in ((eintrag.haeufige_anteil, "häufigen"),
-                            (eintrag.quasistaendige_anteil, "quasi-ständigen")):
-            if not 0.0 < anteil <= 100.0:
-                raise ProjektFehler(
-                    f"Platte '{eintrag.name}': der Anteil für die {was} "
-                    f"Lastfälle muss zwischen 0 und 100 % liegen, angegeben "
-                    f"sind {anteil:g} %.")
 
     @staticmethod
     def _namen_pruefen(eintrag: "QuerschnittEintrag") -> None:
         """
-        Lastfallnamen muessen je Platte und Liste eindeutig sein.
-
-        Die Nachweise legen ihre Ergebniswerte unter dem Fallnamen ab -- M-N,
-        Querkraft und Stahlspannung alle drei. Zwei Kombinationen gleichen
-        Namens fielen darum auf einen Eintrag zusammen: der zweite ueberschrieb
-        den ersten, und in der Tabelle fehlte eine Zeile. Kein Fehler, keine
-        Warnung, eine Zahl weniger.
-
-        Gemeldet statt umbenannt: welcher der beiden gemeint war, weiss nur
-        der Benutzer, und ein automatisch angehaengtes «(2)» stuende danach in
-        seinem Bericht.
+        Lastfallnamen muessen je Platte und Liste eindeutig sein -- siehe
+        :func:`eintraege.eindeutig`. Die Gebrauchslisten pruefen sich
+        selbst, samt Anteil und abgeleiteten Namen.
         """
-        def eindeutig(faelle, was: str) -> None:
-            gesehen = set()
-            for f in faelle:
-                if f.name in gesehen:
-                    raise ProjektFehler(
-                        f"Platte '{eintrag.name}': der Name '{f.name}' ist "
-                        f"zweimal als {was} vergeben. Die Nachweise legen ihre "
-                        f"Ergebnisse unter dem Fallnamen ab -- zwei gleiche "
-                        f"Namen ergeben eine Zeile statt zwei.")
-                gesehen.add(f.name)
-
-        eindeutig(eintrag.kombinationen, "Tragsicherheitseinwirkung")
-        eindeutig(eintrag.knickfaelle, "Knicknachweis")
-        eindeutig(eintrag.spannungsfaelle, "Spannung-Dehnung-Analyse")
-
-        # Je Gebrauchsliste fuer sich -- sie landen in getrennten Nachweisen
-        # und damit in getrennten ID-Raeumen. Ein Fall «Dauer» darf in beiden
-        # stehen.
-        for eigene, anteil, wort in (
-                (eintrag.haeufige, eintrag.haeufige_anteil, "häufige"),
-                (eintrag.quasistaendige, eintrag.quasistaendige_anteil,
-                 "quasi-ständige")):
-            eindeutig(eigene, f"{wort}r Lastfall")
-
-            # Die abgeleiteten Faelle tragen den Namen ihrer Kombination mit
-            # angehaengtem Anteil. Wer einen eigenen Lastfall genau so nennt,
-            # traefe denselben Schluessel.
-            abgeleitet = [abgeleiteter_fallname(k.name, anteil)
-                          for k in eintrag.kombinationen]
-            for h in eigene:
-                if h.name in abgeleitet:
-                    raise ProjektFehler(
-                        f"Platte '{eintrag.name}': der {wort} Lastfall "
-                        f"'{h.name}' heisst wie der aus der Tragsicherheit "
-                        f"abgeleitete. Bitte anders benennen -- sonst lässt "
-                        f"sich nicht auseinanderhalten, welcher gerechnet "
-                        f"wurde.")
-
-            # Verschiedene Namen koennen dieselbe Wert-ID ergeben: «Feld A»
-            # und «Feld-A» werden beide zu «Feld_A». Das Rechenwerk wiese den
-            # zweiten zurueck, aber mit einer Meldung ueber Wert-IDs, die
-            # niemand an der Maske versteht.
-            kennungen: Dict[str, str] = {}
-            for name in abgeleitet + [h.name for h in eigene]:
-                frueher = kennungen.setdefault(fallkennung(name), name)
-                if frueher != name:
-                    raise ProjektFehler(
-                        f"Platte '{eintrag.name}': die {wort}n Lastfälle "
-                        f"'{frueher}' und '{name}' unterscheiden sich nur in "
-                        f"Satz- oder Leerzeichen. Im Bericht fielen sie auf "
-                        f"denselben Eintrag -- bitte einen davon anders "
-                        f"benennen.")
+        eindeutig(eintrag.kombinationen, eintrag.name, "Tragsicherheitseinwirkung")
+        eindeutig(eintrag.knickfaelle, eintrag.name, "Knicknachweis")
+        eindeutig(eintrag.spannungsfaelle, eintrag.name,
+                  "Spannung-Dehnung-Analyse")
+        for liste, wort in ((eintrag.haeufig, "häufige"),
+                            (eintrag.quasistaendig, "quasi-ständige")):
+            liste.pruefen(eintrag.name, eintrag.kombinationen, wort)
 
     # -- Aufbau -------------------------------------------------------------
 

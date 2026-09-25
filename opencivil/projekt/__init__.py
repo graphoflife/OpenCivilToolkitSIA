@@ -38,10 +38,10 @@ geschieht erst beim Aufbau, ueber die :class:`Groesse`.
 
 from opencivil.projekt.eintraege import (
     BEIDE_RICHTUNGEN, HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, RISSANFORDERUNGEN,
-    Beschreibung, GebrauchsfallEintrag, KnickEintrag, KombinationEintrag,
-    LageEintrag, MaterialEintrag, PostenEintrag, ProjektFehler,
-    QuerkraftbewehrungEintrag, SpannungsfallEintrag, abgeleiteter_fallname,
-    sorten,
+    Beschreibung, GebrauchsfallEintrag, Gebrauchsliste, KnickEintrag,
+    KombinationEintrag, LageEintrag, MaterialEintrag, PostenEintrag,
+    ProjektFehler, QuerkraftbewehrungEintrag, SpannungsfallEintrag,
+    abgeleiteter_fallname, sorten,
 )
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.aufbau import Aufbau, aufbauen
@@ -49,6 +49,7 @@ from opencivil.projekt.projekt import Projekt
 
 __all__ = [
     "Aufbau", "BEIDE_RICHTUNGEN", "Beschreibung", "GebrauchsfallEintrag",
+    "Gebrauchsliste",
     "HAEUFIG_ANTEIL", "KnickEintrag", "KombinationEintrag", "LageEintrag",
     "MaterialEintrag", "PostenEintrag", "Projekt", "ProjektFehler",
     "QUASISTAENDIG_ANTEIL", "QuerkraftbewehrungEintrag", "QuerschnittEintrag",
