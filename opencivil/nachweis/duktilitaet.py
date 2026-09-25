@@ -49,6 +49,7 @@ from opencivil.core.berechnung import (
 from opencivil.core.einheiten import EINHEITSLOS, MM, MM2, Groesse
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
+from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.handrechnung import BLOCKANTEIL
 from opencivil.querschnitt.platte import (
@@ -179,7 +180,7 @@ class Duktilitaet(Nachweis):
                 ]
         for stahl in {l.stahl.id: l.stahl for l in self.lagen if l.stahl}.values():
             bezuege.append(
-                Eingabebezug(f"f_yd__{_kennung(stahl.id)}", stahl.id_von("f_yd")))
+                Eingabebezug(f"f_yd__{kennung_aus(stahl.id)}", stahl.id_von("f_yd")))
 
         self.s_f_cd = mit_index("f_{cd}", querschnitt.beton.symbol_index)
 
@@ -252,7 +253,7 @@ class Duktilitaet(Nachweis):
         # eine Zahl, die keine statische Hoehe ist.
         erg.d = erg.z if lage.von_unten else h - erg.z
 
-        f_sd = e.g(f"f_yd__{_kennung(lage.stahl.id)}").si
+        f_sd = e.g(f"f_yd__{kennung_aus(lage.stahl.id)}").si
         erg.x = druckzonenhoehe(a_s=erg.a_s, f_sd=f_sd, b=b, f_cd=f_cd)
         erg.verhaeltnis = erg.x / erg.d if erg.d > 0 else float("inf")
         erg.erfuellt = erg.verhaeltnis <= GRENZE
@@ -411,6 +412,3 @@ class Duktilitaet(Nachweis):
             return posten_index(lage, art)
         return f"{lage.nummer},{lage.richtung.value}"
 
-
-def _kennung(text: str) -> str:
-    return "".join(z if z.isalnum() else "_" for z in text)

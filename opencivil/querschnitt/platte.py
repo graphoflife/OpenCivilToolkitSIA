@@ -47,7 +47,7 @@ from opencivil.core.einheiten import (
 )
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Abschnitt, Protokoll
-from opencivil.core.wert import WertDef
+from opencivil.core.wert import WertDef, kennung_aus
 from opencivil.material.basis import Baustoff
 
 #: Anzahl Lagen einer Platte. Bewusst fest -- eine Platte hat unten und oben je
@@ -621,7 +621,7 @@ class Plattenquerschnitt:
                 f"Querschnitt '{self.name}': ohne Bewehrung lässt sich kein "
                 f"Widerstand bestimmen."
             )
-        self.id = self.praefix or f"querschnitt.{_kennung(self.name)}"
+        self.id = self.praefix or f"querschnitt.{kennung_aus(self.name)}"
         self._aufbauen()
 
     # -- Zugriff ------------------------------------------------------------
@@ -888,8 +888,3 @@ class Plattenquerschnitt:
     def __repr__(self) -> str:
         return (f"Plattenquerschnitt({self.name!r}, h={self.h}, b={self.b}, "
                 f"{len(self.posten_ids)} Bewehrungsposten)")
-
-
-def _kennung(text: str) -> str:
-    ersetzt = text.replace("/", "_").replace(" ", "_").replace(".", "_")
-    return "".join(z for z in ersetzt if z.isalnum() or z == "_")

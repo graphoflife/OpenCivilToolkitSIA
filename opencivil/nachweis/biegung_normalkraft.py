@@ -48,6 +48,7 @@ from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, MM, Groesse
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
+from opencivil.core.wert import kennung_aus
 from opencivil.nachweis import dehnungsfaecher, linie as geo
 from opencivil.nachweis.handrechnung import (
     Eckpunkt, Handrechnung, Posten as HandPosten, lagen_zusammenfassen,
@@ -101,7 +102,7 @@ class Schnittgroessen:
 
     @property
     def kennung(self) -> str:
-        return "".join(z if z.isalnum() else "_" for z in self.name)
+        return kennung_aus(self.name)
 
 
 @dataclass
@@ -286,7 +287,7 @@ class BiegungNormalkraft(Nachweis):
                 Eingabebezug(f"z_{marke}", z_id),
             ]
         for stahl in {l.stahl.id: l.stahl for l, _, _, _, _ in self.posten}.values():
-            kurz = _kennung(stahl.id)
+            kurz = kennung_aus(stahl.id)
             for kennwert in ("E_s", "f_yd", "f_yd_druck", "eps_ud"):
                 bezuege.append(
                     Eingabebezug(f"{kennwert}__{kurz}", stahl.id_von(kennwert))
@@ -648,9 +649,6 @@ def protokoll_interpolation(
         ausrichtung="lrr",
     )
 
-
-def _kennung(text: str) -> str:
-    return "".join(z if z.isalnum() else "_" for z in text)
 
 
 def _trifft(a: float, b: float) -> bool:

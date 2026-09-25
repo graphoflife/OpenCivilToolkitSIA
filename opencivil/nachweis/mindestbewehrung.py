@@ -49,6 +49,7 @@ from opencivil.core.berechnung import (
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, Groesse
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
+from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.sproedes_versagen import (
     MOMENTENTEILER, Rissgroessen as Momentgroessen, rissmoment,
@@ -210,7 +211,7 @@ class Rissnormalkraft(Nachweis):
                                  querschnitt.id_von(f"lage.{marke}.phi")),
                 ]
         for stahl in {l.stahl.id: l.stahl for l in self.lagen if l.stahl}.values():
-            kurz = _kennung(stahl.id)
+            kurz = kennung_aus(stahl.id)
             bezuege += [
                 Eingabebezug(f"f_yk__{kurz}", stahl.id_von("f_yk")),
                 Eingabebezug(f"E_s__{kurz}", stahl.id_von("E_s")),
@@ -271,7 +272,7 @@ class Rissnormalkraft(Nachweis):
         # Der dickste Stab bestimmt die Rissbreite: er verteilt den Riss auf
         # die wenigsten Stäbe und bekommt damit die grösste Spannung.
         erg.durchmesser = max(e.g(f"phi_{m}").si for m in marken)
-        kurz = _kennung(lage.stahl.id)
+        kurz = kennung_aus(lage.stahl.id)
         erg.f_yk = e.g(f"f_yk__{kurz}").si
         erg.E_s = e.g(f"E_s__{kurz}").si
         erg.sigma_s_adm = zulaessige_stahlspannung(
@@ -444,9 +445,6 @@ class Rissnormalkraft(Nachweis):
         return f"{lage.nummer},{lage.richtung.value}"
 
 
-def _kennung(text: str) -> str:
-    return "".join(z if z.isalnum() else "_" for z in text)
-
 
 # ===========================================================================
 # Rissmoment
@@ -563,7 +561,7 @@ class ZwaengungBiegung(Nachweis):
                                  querschnitt.id_von(f"lage.{marke}.phi")),
                 ]
         for stahl in {l.stahl.id: l.stahl for l in self.lagen if l.stahl}.values():
-            kurz = _kennung(stahl.id)
+            kurz = kennung_aus(stahl.id)
             bezuege += [
                 Eingabebezug(f"f_yk__{kurz}", stahl.id_von("f_yk")),
                 Eingabebezug(f"E_s__{kurz}", stahl.id_von("E_s")),
@@ -633,7 +631,7 @@ class ZwaengungBiegung(Nachweis):
         erg.d = erg.z_s if lage.von_unten else h - erg.z_s
         erg.durchmesser = max(e.g(f"phi_{m}").si for m in marken)
 
-        kurz = _kennung(lage.stahl.id)
+        kurz = kennung_aus(lage.stahl.id)
         erg.f_yk = e.g(f"f_yk__{kurz}").si
         erg.E_s = e.g(f"E_s__{kurz}").si
         erg.sigma_s_adm = zulaessige_stahlspannung(
@@ -857,5 +855,5 @@ def _erster_E_s(e: Eingaben, lagen: Sequence[Bewehrungslage]) -> float:
     """
     for lage in lagen:
         if lage.stahl:
-            return e.g(f"E_s__{_kennung(lage.stahl.id)}").si
+            return e.g(f"E_s__{kennung_aus(lage.stahl.id)}").si
     return 0.0

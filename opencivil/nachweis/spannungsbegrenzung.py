@@ -73,6 +73,7 @@ from opencivil.core.einheiten import (
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import Wert, WertDef
+from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.mindestbewehrung import (
     RISSBREITE, zulaessige_stahlspannung,
@@ -98,17 +99,6 @@ _GEFORDERT = ("erhoeht", "hoch")
 WERKSTOFFE = Werkstoffsatz.CHARAKTERISTISCH
 
 
-def fallkennung(name: str) -> str:
-    """
-    Der Fallname, wie er in einer Wert-ID stehen darf.
-
-    Alles ausser Buchstaben und Ziffern wird zum Unterstrich. Damit bilden
-    «Feld A» und «Feld-A» auf dieselbe Kennung ab -- wer Fallnamen prueft,
-    muss darum auch die Kennungen pruefen, nicht nur die Namen.
-    """
-    return "".join(z if z.isalnum() else "_" for z in name)
-
-
 @dataclass(frozen=True)
 class Gebrauchsfall:
     """
@@ -124,7 +114,7 @@ class Gebrauchsfall:
 
     @property
     def kennung(self) -> str:
-        return fallkennung(self.name)
+        return kennung_aus(self.name)
 
 
 @dataclass(frozen=True)

@@ -32,6 +32,7 @@ from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
+from opencivil.core.wert import kennung_aus
 from opencivil.querschnitt.platte import Plattenquerschnitt, Richtung
 
 
@@ -57,8 +58,7 @@ class Ausgefallen:
 
     @property
     def kennung(self) -> str:
-        roh = f"{self.art}_{self.fall}"
-        return "".join(z if z.isalnum() else "_" for z in roh)
+        return kennung_aus(f"{self.art}_{self.fall}")
 
 
 class FehlendeBewehrung(Nachweis):

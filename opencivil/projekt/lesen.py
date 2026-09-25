@@ -20,6 +20,7 @@ from typing import Any, Dict, List, Mapping, Optional
 
 from opencivil.material.beton import BETONSORTEN
 from opencivil.material.betonstahl import STAHLSORTEN
+from opencivil.nachweis.mindestbewehrung import RISSBREITE
 from opencivil.querschnitt.platte import Richtung
 
 
@@ -151,13 +152,19 @@ def nur_x(d: Mapping[str, Any], was: str) -> None:
             f"Bitte die Richtung auf x stellen oder den Lastfall löschen.")
 
 
-#: Anforderung an die Rissbildung, mit ihrer Beschriftung. Welche
-#: Stahlspannung daraus folgt, steht in :data:`mindestbewehrung.RISSBREITE`.
-RISSANFORDERUNGEN: Dict[str, str] = {
+#: Wie die Rissanforderungen an der Maske heissen.
+_BESCHRIFTUNG: Dict[str, str] = {
     "normal": "Normal",
     "erhoeht": "Erhöht",
     "hoch": "Hoch",
 }
+
+#: Anforderung an die Rissbildung, mit ihrer Beschriftung. Welche es gibt,
+#: sagt :data:`mindestbewehrung.RISSBREITE` -- dort steht zu jeder die
+#: Rissbreite, und die Liste der Werte soll nur einmal dastehen. Kaeme dort
+#: eine dazu, ohne dass sie hier eine Beschriftung hat, scheiterte schon der
+#: Import.
+RISSANFORDERUNGEN: Dict[str, str] = {wert: _BESCHRIFTUNG[wert] for wert in RISSBREITE}
 
 
 def gebrauchsliste_roh(d: Mapping[str, Any], feld: str,

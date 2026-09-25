@@ -1256,6 +1256,20 @@ class TestNachweisfelder(unittest.TestCase):
             with self.subTest(feld=feld):
                 self.assertIsInstance(getattr(aufbau, feld), dict)
 
+    def test_ein_feld_ausserhalb_der_liste_scheitert_laut(self):
+        """
+        Die andere Richtung: ein Nachweis, der in einem Feld landet, das die
+        Liste nicht kennt, waere kein Ziel und fehlte still in jeder Tabelle.
+        Das Anmelden weist ihn darum zurueck.
+        """
+        from unittest import mock
+
+        ohne_knicken = tuple(f for f in Aufbau.NACHWEISFELDER if f != "knicken")
+        with mock.patch.object(Aufbau, "NACHWEISFELDER", ohne_knicken):
+            with self.assertRaises(ValueError) as fehler:
+                self.aufbau()
+        self.assertIn("'knicken'", str(fehler.exception))
+
     def test_jeder_nachweis_traegt_seine_ausnutzung(self):
         """
         Der Querkraftnachweis hiess sie einmal `d_grad` und brauchte darum

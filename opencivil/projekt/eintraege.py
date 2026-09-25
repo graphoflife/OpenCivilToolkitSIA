@@ -18,9 +18,9 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Mapping, Optional
 
 from opencivil.core.einheiten import MM, Groesse
+from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import Baustoff
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
-from opencivil.nachweis.spannungsbegrenzung import fallkennung
 from opencivil.querschnitt.platte import (
     ALPHA_MAX, ALPHA_MIN, Bewehrungsposten, Querkraftbewehrung,
 )
@@ -511,7 +511,7 @@ class Gebrauchsliste(Beschreibung):
         # Maske versteht.
         kennungen: Dict[str, str] = {}
         for name in abgeleitet + [f.name for f in self.faelle]:
-            frueher = kennungen.setdefault(fallkennung(name), name)
+            frueher = kennungen.setdefault(kennung_aus(name), name)
             if frueher != name:
                 raise ProjektFehler(
                     f"Platte '{platte}': die {wort}n Lastfälle '{frueher}' und "

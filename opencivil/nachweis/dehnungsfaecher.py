@@ -58,6 +58,7 @@ from typing import Dict, List, Mapping, Sequence, Tuple
 from opencivil.core.berechnung import Eingaben
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
+from opencivil.core.wert import kennung_aus
 from opencivil.nachweis import linie as geo
 from opencivil.querschnitt.werkstoffgesetz import (
     Betongesetz, Dehnungsebene, Stahlgesetz,
@@ -91,7 +92,7 @@ def lagen_aus_eingaben(posten, e: Eingaben) -> List[Tuple[float, float, Stahlges
     """Je Bewehrungsposten dieser Richtung: (Fläche m^2, z m, Gesetz, Text)."""
     gesetze: Dict[str, Stahlgesetz] = {}
     for stahl in {l.stahl.id: l.stahl for l, _, _, _, _ in posten}.values():
-        kurz = _kennung(stahl.id)
+        kurz = kennung_aus(stahl.id)
         gesetze[stahl.id] = Stahlgesetz.aus_werten({
             kennwert: e[f"{kennwert}__{kurz}"]
             for kennwert in ("E_s", "f_yd", "f_yd_druck", "eps_ud")
@@ -219,9 +220,6 @@ def aufbauen(
         for marke, ebene in faecher(h, lagen, beton, schritte)
     ])
 
-
-def _kennung(text: str) -> str:
-    return "".join(z if z.isalnum() else "_" for z in text)
 
 
 # ===========================================================================

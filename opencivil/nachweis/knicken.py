@@ -69,6 +69,7 @@ from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, MM, Groesse
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
+from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.querschnittsloeser import (
     EPS_DRUCK, EPS_ZUG, Querschnittsloeser, Stahllage, Werkstoffsatz,
@@ -115,7 +116,7 @@ class Knickfall:
 
     @property
     def kennung(self) -> str:
-        return "".join(z if z.isalnum() else "_" for z in self.name)
+        return kennung_aus(self.name)
 
 
 @dataclass(frozen=True)

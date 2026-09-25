@@ -30,7 +30,7 @@ from opencivil.core.berechnung import Berechnung, Formel, FormelFunktion, Vorgab
 from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
 from opencivil.core.latex import text_latex
 from opencivil.core.protokoll import Abschnitt
-from opencivil.core.wert import Quelle, WertDef
+from opencivil.core.wert import Quelle, WertDef, kennung_aus
 
 
 #: Symbol mit optionalem Index und optionalem Hochgestellten, z.B. ``f_{yk}^{-}``.
@@ -252,7 +252,7 @@ def erzeuge(
     :param werte: Zahlenwerte der Eingabekennwerte, nach Kurzname
                   (typischerweise aus der Sortentabelle).
     """
-    namensraum = praefix or f"{art.value}.{_kennung(sorte or name)}"
+    namensraum = praefix or f"{art.value}.{kennung_aus(sorte or name)}"
     definitionen = {v.kurzname: v.definition(namensraum, symbol_index) for v in vorlagen}
     berechnungen: List[Berechnung] = []
     eingabewerte: Dict[str, Groesse] = {}
@@ -312,9 +312,3 @@ def erzeuge(
         berechnungen=berechnungen,
         eingabewerte=eingabewerte,
     )
-
-
-def _kennung(text: str) -> str:
-    """Macht aus 'C30/37' die namensraumtaugliche Kennung 'C30_37'."""
-    ersetzt = text.replace("/", "_").replace(" ", "_").replace(".", "_")
-    return "".join(z for z in ersetzt if z.isalnum() or z == "_")

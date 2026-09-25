@@ -276,6 +276,12 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
         Jeder Nachweis geht hier durch, auch die, die nie still sind -- ein
         Weg zum Anmelden, nicht zwei.
         """
+        if feld not in Aufbau.NACHWEISFELDER:
+            # Sonst waere der Nachweis angemeldet, aber kein Ziel: niemand
+            # rechnete ihn, und er fehlte in jeder Tabelle -- still.
+            raise ValueError(
+                f"'{feld}' steht nicht in Aufbau.NACHWEISFELDER. Ein Nachweis "
+                f"in diesem Feld waere kein Ziel und fehlte still.")
         if schnell and nachweis.still:
             return
         werk.registriere(nachweis)

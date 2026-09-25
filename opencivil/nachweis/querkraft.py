@@ -64,6 +64,7 @@ from opencivil.core.einheiten import (
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
+from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.biegung_normalkraft import protokoll_interpolation
 from opencivil.querschnitt.platte import (
@@ -310,7 +311,7 @@ class Querkraftfall:
 
     @property
     def kennung(self) -> str:
-        return "".join(z if z.isalnum() else "_" for z in self.name)
+        return kennung_aus(self.name)
 
 
 @dataclass

@@ -29,6 +29,21 @@ from typing import Optional
 from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
 
 
+def kennung_aus(text: str) -> str:
+    """
+    Ein Name, wie er in einer Wert-ID stehen darf.
+
+    Alles ausser Buchstaben und Ziffern wird zum Unterstrich. Damit bilden
+    «Feld A» und «Feld-A» auf dieselbe Kennung ab -- wer Namen prueft, muss
+    darum auch die Kennungen pruefen, nicht nur die Namen.
+
+    Die eine Stelle fuer diese Regel. Sie stand einmal neunmal da, in jedem
+    Nachweis als eigene Kopie; eine davon anders zu aendern haette Wert-IDs
+    ergeben, die nicht mehr zu den Namen in der Pruefung passen.
+    """
+    return "".join(z if z.isalnum() else "_" for z in text)
+
+
 class Quelle(str, Enum):
     """Woher ein Wert stammt -- entscheidend fuer die Nachvollziehbarkeit."""
 
