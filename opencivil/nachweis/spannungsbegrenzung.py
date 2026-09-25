@@ -693,8 +693,7 @@ class Spannungsbegrenzung(Nachweis):
         if erg.fliesst:
             self._protokoll_fliessen(p, e, erg, werte, wirkt, grenze)
         else:
-            p.gleichung(bedingung(angabe(wirkt), r"\le" if erg.erfuellt else ">",
-                                  angabe(grenze), erg.erfuellt),
+            p.gleichung(bedingung(angabe(wirkt), r"\le", angabe(grenze), erg.erfuellt),
                         titel="Grösste Zugspannung in der Bewehrung")
         grad_formel(p, self.d_ausnutzung[fall.name], erg.erfuellungsgrad,
                     grenze, wirkt, erg.erfuellt)
@@ -717,5 +716,4 @@ class Spannungsbegrenzung(Nachweis):
                                           erg.sigma_s_adm),
                   "E_s": e["E_s"]},
                  titel="Zulässige Dehnung",
-                 nachsatz=vergleich(r"\ge" if erg.erfuellt else "<", angabe(wirkt),
-                                    erg.erfuellt))
+                 nachsatz=vergleich(r"\ge", angabe(wirkt), erg.erfuellt))

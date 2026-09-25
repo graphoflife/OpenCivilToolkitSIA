@@ -451,8 +451,7 @@ class Rissnormalkraft(Nachweis):
         n_s_adm, n_riss = self._n_s_adm(erg), self._n_riss()
         p.formel(n_s_adm, r"@A_s \cdot @sigma", {"A_s": a_s, "sigma": sigma},
                  titel="Aufnehmbare Risskraft",
-                 nachsatz=vergleich(r"\ge" if erg.erfuellt else "<", angabe(n_riss),
-                                    erg.erfuellt))
+                 nachsatz=vergleich(r"\ge", angabe(n_riss), erg.erfuellt))
         grad_formel(p, self.d_ausnutzung[nummer], erg.erfuellungsgrad,
                     n_s_adm, n_riss, erg.erfuellt)
 
@@ -783,8 +782,7 @@ class ZwaengungBiegung(Nachweis):
         p.formel(m_s_adm, r"@sigma \cdot @A_s \cdot @z",
                  {"sigma": sigma, "A_s": a_s, "z": hebelarm},
                  titel="Aufnehmbares Moment der Bewehrung",
-                 nachsatz=vergleich(r"\ge" if erg.erfuellt else "<", angabe(m_riss),
-                                    erg.erfuellt))
+                 nachsatz=vergleich(r"\ge", angabe(m_riss), erg.erfuellt))
         grad_formel(p, self.d_ausnutzung[nummer], erg.erfuellungsgrad,
                     m_s_adm, m_riss, erg.erfuellt)
 

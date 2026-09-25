@@ -381,7 +381,6 @@ class Duktilitaet(Nachweis):
         grenze = self._grenze(nummer)
         p.formel(verhaeltnis, r"\frac{@x}{@d}", {"x": x, "d": d},
                  titel="Bezogene Druckzonenhöhe",
-                 nachsatz=vergleich(r"\le" if erg.erfuellt else ">", angabe(grenze),
-                                    erg.erfuellt))
+                 nachsatz=vergleich(r"\le", angabe(grenze), erg.erfuellt))
         grad_formel(p, self.d_ausnutzung[nummer], erg.erfuellungsgrad,
                     grenze, verhaeltnis, erg.erfuellt)

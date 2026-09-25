@@ -437,25 +437,40 @@ def angabe(wert: Wert) -> str:
     return f"{wert.symbol} = {wert.zahl_latex()}"
 
 
-def bedingung(links: str, zeichen: str, rechts: str, erfuellt: bool) -> str:
-    """
-    Setzt einen Vergleich mit sichtbarem Ergebnis, z.B. fuer Nachweise::
-
-        M_{Ed} = 120\\,\\mathrm{kNm} \\quad \\le \\quad M_{Rd} = 145\\,\\mathrm{kNm}
-        \\quad \\Rightarrow \\quad \\text{erfüllt}
-    """
-    return (rf"{links} \quad {zeichen} \quad {rechts}"
-            rf" \quad \Rightarrow \quad {urteil(erfuellt)}")
+#: Was statt des Sollzeichens dasteht, wenn der Vergleich nicht aufgeht.
+_GEGENTEIL = {r"\le": ">", r"\ge": "<", "<": r"\ge", ">": r"\le"}
 
 
-def vergleich(zeichen: str, rechts: str, erfuellt: bool) -> str:
+def folgerung(erfuellt: bool) -> str:
+    """``⇒ erfüllt`` am Ende einer Zeile -- ein Wortlaut fuer alle."""
+    return rf"\quad \Rightarrow \quad {urteil(erfuellt)}"
+
+
+def vergleich(soll: str, rechts: str, erfuellt: bool, *,
+              mit_urteil: bool = True) -> str:
     """
     Der Nachsatz einer Formel, deren Resultat gegen etwas gehalten wird::
 
         \\quad \\ge \\quad N_{Riss} = 378.3\\,\\mathrm{kN}
         \\quad \\Rightarrow \\quad \\text{NICHT erfüllt}
+
+    ``soll`` ist das Zeichen, das gelten muss; geht der Vergleich nicht auf,
+    steht sein Gegenteil da -- im Beispiel ``<``.
     """
-    return rf"\quad {zeichen} \quad {rechts} \quad \Rightarrow \quad {urteil(erfuellt)}"
+    zeichen = soll if erfuellt else _GEGENTEIL[soll]
+    nachsatz = rf"\quad {zeichen} \quad {rechts}"
+    return f"{nachsatz} {folgerung(erfuellt)}" if mit_urteil else nachsatz
+
+
+def bedingung(links: str, soll: str, rechts: str, erfuellt: bool, *,
+              mit_urteil: bool = True) -> str:
+    """
+    Ein Vergleich mit sichtbarem Ergebnis, z.B. fuer Nachweise::
+
+        M_{Ed} = 120\\,\\mathrm{kNm} \\quad \\le \\quad M_{Rd} = 145\\,\\mathrm{kNm}
+        \\quad \\Rightarrow \\quad \\text{erfüllt}
+    """
+    return f"{links} {vergleich(soll, rechts, erfuellt, mit_urteil=mit_urteil)}"
 
 
 @dataclass(frozen=True)

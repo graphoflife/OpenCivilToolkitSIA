@@ -66,7 +66,7 @@ from opencivil.core.berechnung import (
     Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, M, Groesse
-from opencivil.core.latex import Mathe, angabe, als_text
+from opencivil.core.latex import Mathe, angabe, als_text, bedingung
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import WertDef
 from opencivil.core.wert import kennung_aus
@@ -624,11 +624,11 @@ class Knicken(Nachweis):
                     angabe(werte.moment("M_int", "M_{int}", erg.M_int)) + r" \;\checkmark",
                 ]),
                 titel="Probe: die gefundene Ebene erzeugt die Schnittgrössen")
-            zeichen = r"\ge" if erg.M_Rd >= abs(erg.M_ges) else "<"
             p.gleichung(
-                rf"{angabe(werte.moment('M_Rd', r'M_{Rd,x}(N_{Ed})', erg.M_Rd))}"
-                rf" \quad {zeichen} \quad "
-                rf"{angabe(werte.moment('M_II', r'M_{Ed,II}', abs(erg.M_ges)))}",
+                bedingung(angabe(werte.moment("M_Rd", "M_{Rd,x}(N_{Ed})", erg.M_Rd)),
+                          r"\ge",
+                          angabe(werte.moment("M_II", "M_{Ed,II}", abs(erg.M_ges))),
+                          erg.M_Rd >= abs(erg.M_ges), mit_urteil=False),
                 titel="Querschnitt am verformten System")
 
         self._protokoll_grenzkraft(p, erg)
@@ -693,7 +693,8 @@ class Knicken(Nachweis):
         werte = Zwischenwerte(f"{self.id}.{kennung_aus(erg.fall.name)}")
         n_rd = werte.kraft("N_Rd", "N_{Rd,K}", erg.N_Rd)
         n_ed = werte.kraft("N_Ed_betrag", r"\left|N_{Ed}\right|", N_Ed)
-        p.gleichung(rf"{angabe(n_rd)} \quad {r'\ge' if erg.erfuellt else '<'} \quad "
-                    rf"{angabe(n_ed)}", titel="Grenzkraft des Stabes")
+        p.gleichung(bedingung(angabe(n_rd), r"\ge", angabe(n_ed), erg.erfuellt,
+                              mit_urteil=False),
+                    titel="Grenzkraft des Stabes")
         grad_formel(p, self.d_ausnutzung[erg.fall.name], erg.erfuellungsgrad,
                     n_rd, n_ed, erg.erfuellt, mit_urteil=True)

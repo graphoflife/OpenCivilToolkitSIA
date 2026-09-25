@@ -325,8 +325,7 @@ class SproedesVersagen(Nachweis):
             return
 
         m_rd, m_riss = self._m_rd(erg), rissmoment_wert(self.id, self.groessen)
-        p.gleichung(bedingung(angabe(m_rd), r"\ge" if erg.erfuellt else "<",
-                              angabe(m_riss), erg.erfuellt),
+        p.gleichung(bedingung(angabe(m_rd), r"\ge", angabe(m_riss), erg.erfuellt),
                     titel="Biegewiderstand gegen Rissmoment")
         grad_formel(p, self.d_ausnutzung[nummer], erg.erfuellungsgrad,
                     m_rd, m_riss, erg.erfuellt)

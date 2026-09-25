@@ -535,8 +535,7 @@ def grad_formel(
         vorlage, eingaben = r"\frac{@R}{@E}", {"R": widerstand, "E": einwirkung}
     p.formel(definition.belegen(Groesse(grad, EINHEITSLOS)), vorlage, eingaben,
              titel="Erfüllungsgrad", referenz="",
-             nachsatz=(rf"\quad \Rightarrow \quad {tex.urteil(erfuellt)}"
-                       if mit_urteil else ""))
+             nachsatz=tex.folgerung(erfuellt) if mit_urteil else "")
 
 
 
