@@ -44,12 +44,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from opencivil.core.einheiten import (
-    EINHEITSLOS, KN, KNM, MM, MM2, N_PRO_MM2, PROMILLE, Groesse,
-)
 from opencivil.core.latex import Mathe
-from opencivil.core.protokoll import Protokoll
-from opencivil.core.wert import Wert, WertDef
+from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.material.basis import mit_index
 
 #: Anteil der Druckzonenhoehe, ueber den der Spannungsblock wirkt.
@@ -180,37 +176,13 @@ class Handrechnung:
         self.unten = unten
         self.oben = oben
         self.richtung = richtung
-        self.basis = basis
+        # Zwischenwerte der Mitschrift, unter der Kennung des Nachweises.
+        self.werte = Zwischenwerte(f"{basis}.hand")
 
         # Symbole der Betonkennwerte: mit Sortenindex, sobald mehrere Betone
         # im Projekt sind. Sonst stuende f_cd zweimal mit anderen Zahlen da.
         self.s_f_cd = mit_index("f_{cd}", beton_index)
         self.s_eps_c2d = mit_index(r"\varepsilon_{c2d}", beton_index)
-
-    # -- Hilfen fuer die Mitschrift -----------------------------------------
-
-    def _w(self, name: str, symbol: str, groesse: Groesse,
-           stellen: int = 1, beschreibung: str = "") -> Wert:
-        """Ein benannter Zwischenwert, nur fuer die Darstellung."""
-        return WertDef(
-            id=f"{self.basis}.hand.{name}", symbol=symbol,
-            einheit=groesse.anzeige, beschreibung=beschreibung, stellen=stellen,
-        ).belegen(groesse)
-
-    def _laenge(self, name: str, symbol: str, si: float, beschreibung: str = "") -> Wert:
-        return self._w(name, symbol, Groesse.aus_si(si, MM), 1, beschreibung)
-
-    def _flaeche(self, name: str, symbol: str, si: float, beschreibung: str = "") -> Wert:
-        return self._w(name, symbol, Groesse.aus_si(si, MM2), 0, beschreibung)
-
-    def _spannung(self, name: str, symbol: str, si: float, beschreibung: str = "") -> Wert:
-        return self._w(name, symbol, Groesse.aus_si(si, N_PRO_MM2), 0, beschreibung)
-
-    def _kraft(self, name: str, symbol: str, si: float, beschreibung: str = "") -> Wert:
-        return self._w(name, symbol, Groesse.aus_si(si, KN), 1, beschreibung)
-
-    def _moment(self, name: str, symbol: str, si: float, beschreibung: str = "") -> Wert:
-        return self._w(name, symbol, Groesse.aus_si(si, KNM), 1, beschreibung)
 
     # -- Die Punkte ---------------------------------------------------------
 
@@ -323,13 +295,13 @@ class Handrechnung:
         N = -self.b * self.h * self.f_cd
         p.titel("Grösste Druckkraft", ebene=3)
         p.formel(
-            self._kraft("N_Rd_druck", "N_{Rd}^{-}", N,
+            self.werte.kraft("N_Rd_druck", "N_{Rd}^{-}", N,
                         "Grösste aufnehmbare Druckkraft"),
             r"-@b \cdot @h \cdot @f_cd",
             {
-                "b": self._laenge("b", "b", self.b),
-                "h": self._laenge("h", "h", self.h),
-                "f_cd": self._spannung("f_cd", self.s_f_cd, self.f_cd),
+                "b": self.werte.laenge("b", "b", self.b),
+                "h": self.werte.laenge("h", "h", self.h),
+                "f_cd": self.werte.spannung("f_cd", self.s_f_cd, self.f_cd),
             },
             titel="Gleichmässiger Druck, ohne Bewehrung",
         )
@@ -352,27 +324,27 @@ class Handrechnung:
 
         p.titel("Grösste Zugkraft", ebene=3)
         eingaben = {
-            "A_s": self._flaeche("As_u", u.symbol_flaeche, u.a_s),
-            "A_s2": self._flaeche("As_o", o.symbol_flaeche, o.a_s),
-            "f_yd": self._spannung("fyd_u", u.symbol_f_yd, u.f_yd),
-            "f_yd2": self._spannung("fyd_o", o.symbol_f_yd, o.f_yd),
+            "A_s": self.werte.flaeche("As_u", u.symbol_flaeche, u.a_s),
+            "A_s2": self.werte.flaeche("As_o", o.symbol_flaeche, o.a_s),
+            "f_yd": self.werte.spannung("fyd_u", u.symbol_f_yd, u.f_yd),
+            "f_yd2": self.werte.spannung("fyd_o", o.symbol_f_yd, o.f_yd),
         }
         p.formel(
-            self._kraft("N_Rd_zug", "N_{Rd}^{+}", N, "Grösste aufnehmbare Zugkraft"),
+            self.werte.kraft("N_Rd_zug", "N_{Rd}^{+}", N, "Grösste aufnehmbare Zugkraft"),
             r"@A_s \cdot @f_yd + @A_s2 \cdot @f_yd2",
             eingaben,
             titel="Beide Lagen fliessen auf Zug",
         )
         p.formel(
-            self._moment("M_Rd_zug", "M_{Rd}(N_{Rd}^{+})", M,
+            self.werte.moment("M_Rd_zug", "M_{Rd}(N_{Rd}^{+})", M,
                          "Moment bei grösster Zugkraft"),
             r"@A_s \cdot @f_yd \cdot \left(@d - \tfrac{@h}{2}\right) "
             r"+ @A_s2 \cdot @f_yd2 \cdot \left(@d2 - \tfrac{@h}{2}\right)",
             {
                 **eingaben,
-                "d": self._laenge("z_u", u.symbol_d, u.z),
-                "d2": self._laenge("z_o", o.symbol_d, o.z),
-                "h": self._laenge("h", "h", self.h),
+                "d": self.werte.laenge("z_u", u.symbol_d, u.z),
+                "d2": self.werte.laenge("z_o", o.symbol_d, o.z),
+                "h": self.werte.laenge("h", "h", self.h),
             },
             titel="Kräfte mal Hebelarm um die halbe Höhe",
         )
@@ -408,12 +380,12 @@ class Handrechnung:
         # eine Gleichung da, deren rechte Seite nicht ihr eigenes Ergebnis ist.
         minus = "" if vz > 0 else "-"
 
-        w_x = self._laenge(f"x_{marke}", f"x^{{{hoch}}}", x, "Höhe der Druckzone")
+        w_x = self.werte.laenge(f"x_{marke}", f"x^{{{hoch}}}", x, "Höhe der Druckzone")
         eingaben = {
-            "A_s": self._flaeche(f"As_{marke}", zug.symbol_flaeche, zug.a_s),
-            "f_yd": self._spannung(f"fyd_{marke}", zug.symbol_f_yd, zug.f_yd),
-            "b": self._laenge("b", "b", self.b),
-            "f_cd": self._spannung("f_cd", self.s_f_cd, self.f_cd),
+            "A_s": self.werte.flaeche(f"As_{marke}", zug.symbol_flaeche, zug.a_s),
+            "f_yd": self.werte.spannung(f"fyd_{marke}", zug.symbol_f_yd, zug.f_yd),
+            "b": self.werte.laenge("b", "b", self.b),
+            "f_cd": self.werte.spannung("f_cd", self.s_f_cd, self.f_cd),
         }
         p.formel(
             w_x,
@@ -422,12 +394,12 @@ class Handrechnung:
             titel="Druckzonenhöhe aus dem Kräftegleichgewicht",
         )
         p.formel(
-            self._moment(f"M_Rd_N0_{marke}", rf"M_{{Rd}}(N_{{Ed}}=0)^{{{hoch}}}",
+            self.werte.moment(f"M_Rd_N0_{marke}", rf"M_{{Rd}}(N_{{Ed}}=0)^{{{hoch}}}",
                          vz * M, "Momentenwiderstand bei N_Ed = 0"),
             rf"{minus}@A_s \cdot @f_yd \cdot "
             rf"\left(@d - \frac{{{BLOCKANTEIL} \cdot @x}}{{2}}\right)",
             {**eingaben,
-             "d": self._laenge(f"d_{marke}", zug.symbol_d, d), "x": w_x},
+             "d": self.werte.laenge(f"d_{marke}", zug.symbol_d, d), "x": w_x},
             titel="Momentenwiderstand bei reiner Biegung",
         )
         return Eckpunkt(f"n0_{marke}", rf"M_{{Rd}}(N_{{Ed}}=0)^{{{hoch}}}",
@@ -475,23 +447,22 @@ class Handrechnung:
         hoch = "+" if vz > 0 else "-"
         minus = "" if vz > 0 else "-"
 
-        w_x = self._laenge(f"xh_{marke}", f"x^{{{hoch}}}", x, "Druckzonenhöhe")
+        w_x = self.werte.laenge(f"xh_{marke}", f"x^{{{hoch}}}", x, "Druckzonenhöhe")
         p.formel(
             w_x,
             r"\frac{@h}{2}",
-            {"h": self._laenge("h", "h", self.h)},
+            {"h": self.werte.laenge("h", "h", self.h)},
             titel="Nulllinie auf halber Höhe: x = h/2",
         )
         p.formel(
-            self._w(f"eps_s_{marke}", rf"\varepsilon_s^{{{hoch}}}",
-                    Groesse.aus_si(eps_s, PROMILLE), 2,
-                    "Dehnung der Zugbewehrung"),
+            self.werte.dehnung(f"eps_s_{marke}", rf"\varepsilon_s^{{{hoch}}}",
+                               eps_s, "Dehnung der Zugbewehrung"),
             r"\left(@d - @x\right) \cdot \frac{@eps_c2d}{@x}",
             {
-                "d": self._laenge(f"d_{marke}", zug.symbol_d, d),
+                "d": self.werte.laenge(f"d_{marke}", zug.symbol_d, d),
                 "x": w_x,
-                "eps_c2d": self._w("eps_c2d", self.s_eps_c2d,
-                                   Groesse.aus_si(self.eps_c2d, PROMILLE), 2),
+                "eps_c2d": self.werte.dehnung("eps_c2d", self.s_eps_c2d,
+                                              self.eps_c2d),
             },
             titel="Fliesskriterium – Dehnung der Zugbewehrung",
         )
@@ -515,29 +486,29 @@ class Handrechnung:
         )
 
         eingaben = {
-            "f_cd": self._spannung("f_cd", self.s_f_cd, self.f_cd),
-            "b": self._laenge("b", "b", self.b),
+            "f_cd": self.werte.spannung("f_cd", self.s_f_cd, self.f_cd),
+            "b": self.werte.laenge("b", "b", self.b),
             "x": w_x,
-            "A_s": self._flaeche(f"As_{marke}", zug.symbol_flaeche, zug.a_s),
-            "f_sd": self._spannung(f"fsd_{marke}", zug.symbol_f_sd, zug.f_yd),
+            "A_s": self.werte.flaeche(f"As_{marke}", zug.symbol_flaeche, zug.a_s),
+            "f_sd": self.werte.spannung(f"fsd_{marke}", zug.symbol_f_sd, zug.f_yd),
         }
         p.formel(
-            self._kraft(f"N_halb_{marke}", rf"N_{{Rd}}^{{{hoch}}}", N,
+            self.werte.kraft(f"N_halb_{marke}", rf"N_{{Rd}}^{{{hoch}}}", N,
                         "Normalkraft in diesem Punkt"),
             rf"-@f_cd \cdot @b \cdot {BLOCKANTEIL} \cdot @x + @A_s \cdot @f_sd",
             eingaben,
             titel="Kräftegleichgewicht",
         )
         p.formel(
-            self._moment(f"M_halb_{marke}", rf"M_{{Rd}}^{{{hoch}}}", vz * M,
+            self.werte.moment(f"M_halb_{marke}", rf"M_{{Rd}}^{{{hoch}}}", vz * M,
                          "Moment in diesem Punkt"),
             rf"{minus}\left[@f_cd \cdot @b \cdot {BLOCKANTEIL} \cdot @x \cdot "
             rf"\left(\tfrac{{@h}}{{2}} - \tfrac{{{BLOCKANTEIL} \cdot @x}}{{2}}\right) "
             rf"+ @A_s \cdot @f_sd \cdot \left(@d - \tfrac{{@h}}{{2}}\right)\right]",
             {
                 **eingaben,
-                "h": self._laenge("h", "h", self.h),
-                "d": self._laenge(f"d_{marke}", zug.symbol_d, d),
+                "h": self.werte.laenge("h", "h", self.h),
+                "d": self.werte.laenge(f"d_{marke}", zug.symbol_d, d),
             },
             titel="Momentengleichgewicht um die halbe Höhe",
         )

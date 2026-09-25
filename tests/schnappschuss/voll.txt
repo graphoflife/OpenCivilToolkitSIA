@@ -344,34 +344,73 @@ Schwerpunkt.
 Duktilität – 2. Lage
 --------------------
 
+Bewehrung der Lage
+    \begin{aligned}
+      A_{s,2,x} &= A_{s,2,x,g} + A_{s,2,x,z} \\
+      &= 1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2} \\
+      &= 2450\,\mathrm{mm}^{2}
+    \end{aligned}
+
 Gemeinsamer Schwerpunkt der Lage
-    d_{2,x} = \frac{\sum A_{s,i} \cdot z_i}{\sum A_{s,i}} = 248.1\,\mathrm{mm}
+    \begin{aligned}
+      d_{2,x} &= \frac{A_{s,2,x,g} \cdot d_{2,x,g} + A_{s,2,x,z} \cdot d_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}} \\
+      &= \frac{1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 246\,\mathrm{mm}}{1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2}} \\
+      &= 248.1\,\mathrm{mm}
+    \end{aligned}
 
 Druckzonenhöhe bei reiner Biegung
-    x = \frac{A_{s,2,x} \cdot f_{sd}}{0.85 \cdot b \cdot f_{cd}}
-    = \frac{2450\,\mathrm{mm}^{2} \cdot 434.8\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20.0\,\mathrm{N}/\mathrm{mm}^{2}} = 62.7\,\mathrm{mm}
+    \begin{aligned}
+      x &= \frac{A_{s,2,x} \cdot f_{sd}}{0.85 \cdot b \cdot f_{cd}} \\
+      &= \frac{2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} \\
+      &= 62.7\,\mathrm{mm}
+    \end{aligned}
 
-Bezogene Druckzonenhöhe
-    \frac{x}{d_{2,x}} = \frac{62.7\,\mathrm{mm}}{248.1\,\mathrm{mm}} = 0.253 \quad \le \quad 0.35 \quad \Rightarrow \quad \text{erfüllt}
+Bezogene Druckzonenhöhe   [SIA 262:2025, 4.1.4.2.5]
+    \begin{aligned}
+      \left(x/d\right)_{2} &= \frac{x}{d_{2,x}} \\
+      &= \frac{62.7\,\mathrm{mm}}{248.1\,\mathrm{mm}} \\
+      &= 0.253
+    \end{aligned}
 
-Erfüllungsgrad
-    \alpha_{eff,D,2} = \frac{0.35}{x/d_{2,x}} = \frac{0.35}{0.253} = 1.39
+Bedingung
+    \left(x/d\right)_{2} = 0.253 \le \left(x/d\right)_{max} = 0.35 \quad \Rightarrow \quad \text{erfüllt}
+
+Erfüllungsgrad   [SIA 262:2025, 4.1.4.2.5]
+    \begin{aligned}
+      \alpha_{eff,D,2} &= \frac{\left(x/d\right)_{max}}{\left(x/d\right)_{2}} \\
+      &= \frac{0.35}{0.253} \\
+      &= 1.39
+    \end{aligned}
 
 Duktilität – 3. Lage
 --------------------
 
 Statische Höhe ab der gedrückten Randfaser (unten)
-    d_{3,x,g} = h - z = 252.0\,\mathrm{mm}
+    d_{3,x,g} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
 
 Druckzonenhöhe bei reiner Biegung
-    x = \frac{A_{s,3,x,g} \cdot f_{sd}}{0.85 \cdot b \cdot f_{cd}}
-    = \frac{754\,\mathrm{mm}^{2} \cdot 434.8\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20.0\,\mathrm{N}/\mathrm{mm}^{2}} = 19.3\,\mathrm{mm}
+    \begin{aligned}
+      x &= \frac{A_{s,3,x,g} \cdot f_{sd}}{0.85 \cdot b \cdot f_{cd}} \\
+      &= \frac{754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} \\
+      &= 19.3\,\mathrm{mm}
+    \end{aligned}
 
-Bezogene Druckzonenhöhe
-    \frac{x}{d_{3,x,g}} = \frac{19.3\,\mathrm{mm}}{252.0\,\mathrm{mm}} = 0.077 \quad \le \quad 0.35 \quad \Rightarrow \quad \text{erfüllt}
+Bezogene Druckzonenhöhe   [SIA 262:2025, 4.1.4.2.5]
+    \begin{aligned}
+      \left(x/d\right)_{3} &= \frac{x}{d_{3,x,g}} \\
+      &= \frac{19.3\,\mathrm{mm}}{252\,\mathrm{mm}} \\
+      &= 0.077
+    \end{aligned}
 
-Erfüllungsgrad
-    \alpha_{eff,D,3} = \frac{0.35}{x/d_{3,x,g}} = \frac{0.35}{0.077} = 4.57
+Bedingung
+    \left(x/d\right)_{3} = 0.077 \le \left(x/d\right)_{max} = 0.35 \quad \Rightarrow \quad \text{erfüllt}
+
+Erfüllungsgrad   [SIA 262:2025, 4.1.4.2.5]
+    \begin{aligned}
+      \alpha_{eff,D,3} &= \frac{\left(x/d\right)_{max}}{\left(x/d\right)_{3}} \\
+      &= \frac{0.35}{0.077} \\
+      &= 4.57
+    \end{aligned}
 
 Massgebend ist die 2. Lage mit dem kleineren Erfüllungsgrad; sie steht in der Zusammenfassung.
 

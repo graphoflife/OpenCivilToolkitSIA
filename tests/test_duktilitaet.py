@@ -221,6 +221,52 @@ class TestNachweis(unittest.TestCase):
         self.assertIn(r"\mathrm{mm}^{2}", rechnung.latex)
 
 
+class TestHerleitungAusVorlagen(unittest.TestCase):
+    """
+    Der Pilot: die Herleitung entsteht aus Vorlagen. Jede Formel steht einmal
+    mit Symbolen da; Zahlen, Einheiten und Umrechnungen setzt die Vorlage ein.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from opencivil.core.protokoll import GleichungBlock
+
+        cls.aufbau = projekt_mit().aufbauen()
+        loesung = cls.aufbau.werk.loese(*cls.aufbau.alle_nachweisziele())
+        cls.bloecke = [b for b in loesung.protokoll.alle_bloecke()
+                       if isinstance(b, GleichungBlock)]
+        cls.nachweis = next(iter(cls.aufbau.duktilitaet.values()))
+
+    def block(self, wert_id):
+        return next(b for b in self.bloecke if b.wert_id == wert_id)
+
+    def test_verhaeltnis_und_grad_tragen_die_werte_des_nachweises(self):
+        """Damit hebt die Rückverfolgung genau diese Zeilen hervor."""
+        for nummer in x_lagen(projekt_mit()):
+            with self.subTest(lage=nummer):
+                grad = self.block(self.nachweis.d_ausnutzung[nummer].id)
+                self.assertEqual(grad.titel, "Erfüllungsgrad")
+                self.assertIsNotNone(grad.formelzeile)
+                verhaeltnis = self.block(self.nachweis.d_verhaeltnis[nummer].id)
+                self.assertIn(r"\frac{x}{d_{", verhaeltnis.latex)
+
+    def test_der_grad_folgt_der_regel_fuer_erfuellungsgrade(self):
+        """Gesetzt wie in der Tabelle -- nicht mit der Stellenzahl des Werts."""
+        from opencivil.core.berechnung import grad_als_text
+
+        for erg in self.nachweis.ergebnisse:
+            grad = self.block(self.nachweis.d_ausnutzung[erg.lage.nummer].id)
+            self.assertEqual(
+                grad.formelzeile.ergebnis,
+                grad_als_text(erg.erfuellungsgrad, erg.erfuellt, latex=True))
+
+    def test_der_schwerpunkt_zeigt_seine_zahlen(self):
+        schwerpunkt = next(b for b in self.bloecke
+                           if b.titel == "Gemeinsamer Schwerpunkt der Lage")
+        # Beide Posten mit Querschnitt und Höhe, nicht nur das Resultat.
+        self.assertIn(r"1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm}", schwerpunkt.latex)
+
+
 class TestVorgabeUndAblage(unittest.TestCase):
     def test_vorgegeben_ist_er_aus(self):
         """

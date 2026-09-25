@@ -24,7 +24,7 @@ mit hunderten Dehnungsebenen) will man nichts mitschreiben. Dafuer gibt es
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import Enum
 from typing import (
     Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Type,
@@ -32,7 +32,10 @@ from typing import (
 )
 
 from opencivil.core import latex as tex
-from opencivil.core.wert import Wert
+from opencivil.core.einheiten import (
+    EINHEITSLOS, KN, KNM, MM, MM2, N_PRO_MM2, PROMILLE, Groesse,
+)
+from opencivil.core.wert import Wert, WertDef
 
 
 # ===========================================================================
@@ -221,15 +224,25 @@ class Protokoll:
         eingaben: Mapping[str, Wert],
         titel: str = "",
         referenz: Optional[str] = None,
+        *,
+        ergebnis_latex: Optional[str] = None,
     ) -> None:
         """
         Der Regelfall: ``Symbol = analytische Formel = Formel mit Zahlen = Resultat``.
 
         Von Hand geschrieben wird nur ``vorlage`` (die analytische Form mit
         ``@name``-Platzhaltern). Die Fassung mit Zahlen und Einheiten entsteht
-        automatisch aus ``eingaben``.
+        automatisch aus ``eingaben``. Zwischenergebnisse, die keine Werte des
+        Rechenwerks sind, legt :class:`Zwischenwerte` an.
+
+        ``ergebnis_latex`` setzt das Resultat anders als mit seiner
+        Stellenzahl -- ein Erfuellungsgrad folgt
+        :func:`opencivil.core.berechnung.grad_als_text`, damit 0.9966 nicht
+        als 1.00 neben «nicht erfuellt» steht.
         """
         zeile = tex.Formelzeile.bauen(ergebnis, vorlage, eingaben)
+        if ergebnis_latex is not None:
+            zeile = replace(zeile, ergebnis=ergebnis_latex)
         self._anfuegen(
             GleichungBlock(
                 latex=zeile.darstellen(),
@@ -385,6 +398,63 @@ class StillesProtokoll(Protokoll):
     @property
     def ist_leer(self) -> bool:
         return True
+
+
+# ===========================================================================
+# Zwischenwerte
+# ===========================================================================
+
+
+class Zwischenwerte:
+    """
+    Benannte Zwischenwerte fuer :meth:`Protokoll.formel`.
+
+    Eine Vorlage wird zweimal eingesetzt, mit Symbolen und mit Zahlen samt
+    Einheit. Dafuer braucht jede Groesse ein Symbol, eine Einheit und eine
+    Stellenzahl -- auch ein Zwischenergebnis, das kein Wert des Rechenwerks
+    ist. Hier entstehen solche Werte, mit festen Gewohnheiten je Groessenart:
+    Laengen in mm auf eine Stelle, Flaechen in mm² und Spannungen in N/mm²
+    ganz, Kraefte in kN und Momente in kNm auf eine Stelle, Dehnungen in
+    Promille auf zwei. Jede Stelle, die das von Hand tat, rechnete dafuer selbst
+    um und schrieb die Einheit selbst dazu.
+
+    Die Kennung ist ``{basis}.{name}``: eindeutig in der Mitschrift, aber nie
+    im Rechenwerk angemeldet -- diese Werte zeigen eine Rechnung, sie gehen in
+    keine ein.
+    """
+
+    def __init__(self, basis: str) -> None:
+        self.basis = basis
+
+    def wert(self, name: str, symbol: str, groesse: Groesse,
+             stellen: int = 1, beschreibung: str = "") -> Wert:
+        """Ein Zwischenwert in der Einheit, in der ``groesse`` angezeigt wird."""
+        return WertDef(
+            id=f"{self.basis}.{name}", symbol=symbol, einheit=groesse.anzeige,
+            beschreibung=beschreibung, stellen=stellen,
+        ).belegen(groesse)
+
+    def laenge(self, name: str, symbol: str, si: float, beschreibung: str = "") -> Wert:
+        return self.wert(name, symbol, Groesse.aus_si(si, MM), 1, beschreibung)
+
+    def flaeche(self, name: str, symbol: str, si: float, beschreibung: str = "") -> Wert:
+        return self.wert(name, symbol, Groesse.aus_si(si, MM2), 0, beschreibung)
+
+    def spannung(self, name: str, symbol: str, si: float, beschreibung: str = "") -> Wert:
+        return self.wert(name, symbol, Groesse.aus_si(si, N_PRO_MM2), 0, beschreibung)
+
+    def kraft(self, name: str, symbol: str, si: float, beschreibung: str = "") -> Wert:
+        return self.wert(name, symbol, Groesse.aus_si(si, KN), 1, beschreibung)
+
+    def moment(self, name: str, symbol: str, si: float, beschreibung: str = "") -> Wert:
+        return self.wert(name, symbol, Groesse.aus_si(si, KNM), 1, beschreibung)
+
+    def dehnung(self, name: str, symbol: str, si: float, beschreibung: str = "") -> Wert:
+        return self.wert(name, symbol, Groesse.aus_si(si, PROMILLE), 2, beschreibung)
+
+    def zahl(self, name: str, symbol: str, zahl: float, stellen: int = 3,
+             beschreibung: str = "") -> Wert:
+        return self.wert(name, symbol, Groesse(zahl, EINHEITSLOS), stellen, beschreibung)
 
 
 # ===========================================================================

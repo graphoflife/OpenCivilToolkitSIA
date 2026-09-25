@@ -44,12 +44,12 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_als_text,
 )
-from opencivil.core.einheiten import EINHEITSLOS, MM, MM2, Groesse
-from opencivil.core.protokoll import Protokoll
-from opencivil.core.wert import WertDef
-from opencivil.core.wert import kennung_aus
+from opencivil.core.einheiten import EINHEITSLOS, Groesse
+from opencivil.core.latex import bedingung
+from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.handrechnung import BLOCKANTEIL
 from opencivil.querschnitt.platte import (
@@ -72,6 +72,9 @@ class Lagenergebnis:
 
     d: float = 0.0
     """Statische Hoehe ab der gedrueckten Randfaser, in m."""
+
+    f_sd: float = 0.0
+    """Stahlspannung im Gleichgewicht -- die fliessende Bewehrung, in Pa."""
 
     x: float = 0.0
     """Druckzonenhoehe bei M_Ed = 0, in m."""
@@ -200,8 +203,6 @@ class Duktilitaet(Nachweis):
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         h = e.g("h").si
-        b = e.g("b").si
-        b_y = e.g("b_y").si
         f_cd = e.g("f_cd").si
 
         self._protokoll_ansatz(p)
@@ -211,10 +212,11 @@ class Duktilitaet(Nachweis):
         self.ergebnisse = []
 
         for lage in self.lagen:
-            b_l = b if lage.richtung is Richtung.X else b_y
-            erg = self._eine_lage(e, lage, h=h, b=b_l, f_cd=f_cd)
+            # Die Breite in der Richtung der Lage.
+            breite = "b" if lage.richtung is Richtung.X else "b_y"
+            erg = self._eine_lage(e, lage, h=h, b=e.g(breite).si, f_cd=f_cd)
             self.ergebnisse.append(erg)
-            self._protokoll_lage(p, erg, b=b_l, f_cd=f_cd)
+            self._protokoll_lage(p, e, erg, breite)
 
             ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
                 min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
@@ -253,8 +255,8 @@ class Duktilitaet(Nachweis):
         # eine Zahl, die keine statische Hoehe ist.
         erg.d = erg.z if lage.von_unten else h - erg.z
 
-        f_sd = e.g(f"f_yd__{kennung_aus(lage.stahl.id)}").si
-        erg.x = druckzonenhoehe(a_s=erg.a_s, f_sd=f_sd, b=b, f_cd=f_cd)
+        erg.f_sd = e.g(f"f_yd__{kennung_aus(lage.stahl.id)}").si
+        erg.x = druckzonenhoehe(a_s=erg.a_s, f_sd=erg.f_sd, b=b, f_cd=f_cd)
         erg.verhaeltnis = erg.x / erg.d if erg.d > 0 else float("inf")
         erg.erfuellt = erg.verhaeltnis <= GRENZE
         erg.erfuellungsgrad = (
@@ -272,11 +274,6 @@ class Duktilitaet(Nachweis):
             symbol=rf"\left(x/d\right)_{{{nummer}}}",
             einheit=EINHEITSLOS, beschreibung="Einwirkung", stellen=3,
         ).belegen(Groesse(erg.verhaeltnis, EINHEITSLOS))
-        widerstand = WertDef(
-            id=f"{self.id}.lage{nummer}.grenze",
-            symbol=r"\left(x/d\right)_{max}",
-            einheit=EINHEITSLOS, beschreibung="Widerstand", stellen=2,
-        ).belegen(Groesse(GRENZE, EINHEITSLOS))
         return NachweisUrteil(
             name=f"Duktilität – {nummer}. Lage",
             art="D",
@@ -289,8 +286,16 @@ class Duktilitaet(Nachweis):
             # Ohne Bewehrung gibt es kein Verhaeltnis -- dann steht dort ein
             # Strich und daneben der Hinweis, warum.
             einwirkung=einwirkung if erg.machbar else None,
-            widerstand=widerstand if erg.machbar else None,
+            widerstand=self._grenze(nummer) if erg.machbar else None,
         )
+
+    def _grenze(self, nummer: int) -> Wert:
+        """Die zulaessige bezogene Druckzonenhoehe -- Widerstand und Herleitung."""
+        return WertDef(
+            id=f"{self.id}.lage{nummer}.grenze",
+            symbol=r"\left(x/d\right)_{max}",
+            einheit=EINHEITSLOS, beschreibung="Widerstand", stellen=2,
+        ).belegen(Groesse(GRENZE, EINHEITSLOS))
 
 
     def _protokoll_massgebend(self, p: Protokoll,
@@ -337,8 +342,12 @@ class Duktilitaet(Nachweis):
         )
 
     def _protokoll_lage(
-        self, p: Protokoll, erg: Lagenergebnis, *, b: float, f_cd: float
+        self, p: Protokoll, e: Eingaben, erg: Lagenergebnis, breite: str,
     ) -> None:
+        """
+        Die Herleitung einer Lage, aus Vorlagen: jede Formel steht einmal mit
+        Symbolen da, die Fassung mit Zahlen und Einheiten entsteht daraus.
+        """
         nummer = erg.lage.nummer
         p.titel(f"Duktilität – {nummer}. Lage", ebene=3)
 
@@ -347,55 +356,61 @@ class Duktilitaet(Nachweis):
             return
 
         index = self._index(erg)
+        werte = Zwischenwerte(f"{self.id}.lage{nummer}")
         s_a_s = f"A_{{s,{index}}}" if index else "A_s"
         s_d = f"d_{{{index}}}" if index else "d"
-        s_f_sd = mit_index("f_{sd}", erg.lage.stahl.symbol_index)
-        f_sd = erg.x * BLOCKANTEIL * b * f_cd / erg.a_s
+        s_z = f"z_{{{index}}}" if index else "z"
+        # Je Posten Querschnitt und Hoehe ab Oberkante -- dieselben Werte wie
+        # in der Tabelle der Platte.
+        posten = [(e[f"a_s_{nummer}{art.kuerzel}"], e[f"z_{nummer}{art.kuerzel}"])
+                  for _, art, *_ in self.posten_je_lage[nummer]]
 
-        teile = self.posten_je_lage[nummer]
-        if len(teile) > 1:
-            # Zwei Posten auf leicht verschiedenen Höhen -- ohne diese Zeile
-            # fiele der Schwerpunkt vom Himmel.
-            p.gleichung(
-                rf"{s_d} = \frac{{\sum A_{{s,i}} \cdot z_i}}{{\sum A_{{s,i}}}}"
-                rf" = {erg.z * 1e3:.1f}\,\mathrm{{mm}}"
-                + ("" if erg.lage.von_unten else
-                   rf" \quad \Rightarrow \quad {s_d} = h - {erg.z * 1e3:.1f}"
-                   rf"\,\mathrm{{mm}} = {erg.d * 1e3:.1f}\,\mathrm{{mm}}"),
-                titel="Gemeinsamer Schwerpunkt der Lage")
-        elif not erg.lage.von_unten:
-            p.gleichung(
-                rf"{s_d} = h - z = {erg.d * 1e3:.1f}\,\mathrm{{mm}}",
-                titel="Statische Höhe ab der gedrückten Randfaser (unten)")
+        a_s = werte.flaeche("A_s", s_a_s, erg.a_s)
+        # Unten bewehrt ist die Hoehe ab Oberkante schon die statische Hoehe.
+        z = werte.laenge("z", s_d if erg.lage.von_unten else s_z, erg.z)
+        if len(posten) > 1:
+            # Grundbewehrung und Zulage liegen auf leicht verschiedenen Hoehen
+            # -- ohne diese beiden Zeilen fiele der Schwerpunkt vom Himmel.
+            eingaben: Dict[str, Wert] = {}
+            for i, (flaeche, hoehe) in enumerate(posten):
+                eingaben[f"a{i}"], eingaben[f"z{i}"] = flaeche, hoehe
+            summe = " + ".join(f"@a{i}" for i in range(len(posten)))
+            momente = " + ".join(rf"@a{i} \cdot @z{i}" for i in range(len(posten)))
+            p.formel(a_s, summe, eingaben, titel="Bewehrung der Lage")
+            p.formel(z, rf"\frac{{{momente}}}{{{summe}}}", eingaben,
+                     titel="Gemeinsamer Schwerpunkt der Lage")
+        if erg.lage.von_unten:
+            d = z
+        else:
+            d = werte.laenge("d", s_d, erg.d)
+            p.formel(d, "@h - @z", {"h": e["h"], "z": z},
+                     titel="Statische Höhe ab der gedrückten Randfaser (unten)")
 
-        p.gleichung(
-            rf"x = \frac{{{s_a_s} \cdot {s_f_sd}}}"
-            rf"{{{BLOCKANTEIL} \cdot b \cdot {self.s_f_cd}}}"
-            "\n= "
-            rf"\frac{{{erg.a_s * 1e6:.0f}\,\mathrm{{mm}}^{{2}} \cdot "
-            rf"{f_sd / 1e6:.1f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}}}"
-            rf"{{{BLOCKANTEIL} \cdot {b * 1e3:.0f}\,\mathrm{{mm}} \cdot "
-            rf"{f_cd / 1e6:.1f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}}}"
-            rf" = {erg.x * 1e3:.1f}\,\mathrm{{mm}}",
+        x = werte.laenge("x", "x", erg.x)
+        p.formel(
+            x,
+            rf"\frac{{@A_s \cdot @f_sd}}{{{BLOCKANTEIL} \cdot @b \cdot @f_cd}}",
+            {"A_s": a_s, "b": e[breite], "f_cd": e["f_cd"],
+             "f_sd": werte.spannung(
+                 "f_sd", mit_index("f_{sd}", erg.lage.stahl.symbol_index), erg.f_sd)},
             titel="Druckzonenhöhe bei reiner Biegung")
 
-        zustand = r"\text{erfüllt}" if erg.erfuellt else r"\text{NICHT erfüllt}"
-        vergleich = r"\le" if erg.erfuellt else ">"
+        verhaeltnis = self.d_verhaeltnis[nummer].belegen(
+            Groesse(erg.verhaeltnis, EINHEITSLOS))
+        grenze = self._grenze(nummer)
+        p.formel(verhaeltnis, r"\frac{@x}{@d}", {"x": x, "d": d},
+                 titel="Bezogene Druckzonenhöhe")
         p.gleichung(
-            rf"\frac{{x}}{{{s_d}}} = \frac{{{erg.x * 1e3:.1f}\,\mathrm{{mm}}}}"
-            rf"{{{erg.d * 1e3:.1f}\,\mathrm{{mm}}}}"
-            rf" = {erg.verhaeltnis:.3f}"
-            rf" \quad {vergleich} \quad {GRENZE:.2f}"
-            rf" \quad \Rightarrow \quad {zustand}",
-            titel="Bezogene Druckzonenhöhe")
-
-        grad = ("\\infty" if erg.erfuellungsgrad == float("inf")
-                else f"{erg.erfuellungsgrad:.2f}")
-        p.gleichung(
-            rf"\alpha_{{eff,D,{nummer}}} = "
-            rf"\frac{{{GRENZE:.2f}}}{{x/{s_d}}} = "
-            rf"\frac{{{GRENZE:.2f}}}{{{erg.verhaeltnis:.3f}}} = {grad}",
-            titel="Erfüllungsgrad")
+            bedingung(rf"{verhaeltnis.symbol} = {verhaeltnis.zahl_latex()}",
+                      r"\le" if erg.erfuellt else ">",
+                      rf"{grenze.symbol} = {grenze.zahl_latex()}", erg.erfuellt),
+            titel="Bedingung")
+        p.formel(
+            self.d_ausnutzung[nummer].belegen(Groesse(erg.erfuellungsgrad, EINHEITSLOS)),
+            r"\frac{@grenze}{@verhaeltnis}",
+            {"grenze": grenze, "verhaeltnis": verhaeltnis},
+            titel="Erfüllungsgrad",
+            ergebnis_latex=grad_als_text(erg.erfuellungsgrad, erg.erfuellt, latex=True))
 
     def _index(self, erg: Lagenergebnis) -> str:
         """
