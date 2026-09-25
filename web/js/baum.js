@@ -136,11 +136,12 @@ function platteAnlegen() {
     return;
   }
   // Die Vorlage kommt aus dem Kern. Sie stand einmal hier -- zwanzig Felder,
-  // die von Hand mit den Vorgaben in projekt.py gleichgehalten werden
-  // mussten. Als sich die Vorgaben änderten, blieb diese Kopie stehen, und
-  // neue Platten brachten Nachweise eingeschaltet mit, die überall sonst aus
-  // waren. Gesetzt wird hier nur noch, was der Kern nicht wissen kann: die
-  // Kennung, der Name und welche Materialien es im Projekt gibt.
+  // die von Hand mit den Vorgaben in opencivil/projekt/platte.py
+  // gleichgehalten werden mussten. Als sich die Vorgaben änderten, blieb
+  // diese Kopie stehen, und neue Platten brachten Nachweise eingeschaltet
+  // mit, die überall sonst aus waren. Gesetzt wird hier nur noch, was der
+  // Kern nicht wissen kann: die Kennung, der Name und welche Materialien es
+  // im Projekt gibt.
   const vorlage = zustand.katalog?.neue_platte;
   if (!vorlage) {
     melden('Der Katalog ist noch nicht geladen.', true);

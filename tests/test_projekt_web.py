@@ -938,7 +938,7 @@ class TestServerHuelle(unittest.TestCase):
                 self.assertIsNone(server.aufloesen(pfad))
 
         for pfad in ("/", "/index.html", "/web/index.html",
-                     "/opencivil/projekt.py", "/opencivil/web/dienst.py"):
+                     "/opencivil/projekt/projekt.py", "/opencivil/web/dienst.py"):
             with self.subTest(pfad=pfad):
                 self.assertIsNotNone(server.aufloesen(pfad))
 
@@ -967,7 +967,7 @@ class TestBruecke(unittest.TestCase):
     def test_der_dienst_ist_im_manifest(self):
         dateien = bruecke.kerndateien()
         self.assertIn("opencivil/web/dienst.py", dateien)
-        self.assertIn("opencivil/projekt.py", dateien)
+        self.assertIn("opencivil/projekt/projekt.py", dateien)
 
     def test_kein_zwischenstand_im_manifest(self):
         self.assertFalse(

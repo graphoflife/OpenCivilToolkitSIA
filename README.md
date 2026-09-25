@@ -94,7 +94,8 @@ Fertig und getestet (569 Tests):
 | `spannungsanalyse.py` | drei Bilder am Querschnitt — kein Nachweis |
 | `bewehrungssuche.py` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt |
 | `bericht/` | Konsole und LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) |
-| `projekt.py` | speicherbare Projektbeschreibung, baut daraus ein Rechenwerk |
+| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `projekt`) und was daraus gebaut wird (`aufbau`) |
+| `ergebnis.py` | ein gerechnetes Projekt: Zusammenfassung, Bericht, LaTeX |
 | `web/speicher.py` | Ergebnisse je Bauteil, damit nur Geändertes neu rechnet |
 | `web/dienst.py` | der Rechendienst, unabhängig vom Transportweg |
 | `web/server.py` | HTTP-Hülle darum (nur Standardbibliothek) |
