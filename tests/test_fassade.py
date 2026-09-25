@@ -218,13 +218,12 @@ class TestRechnen(unittest.TestCase):
         from opencivil.web import diagrammdaten
 
         projekt = Projekt.beispiel()
-        projekt.querschnitte[0].spannungsfaelle = [
-            SpannungsfallEintrag("Feld", M_Ed=80.0),
-            SpannungsfallEintrag("Linie", art="moment_kruemmung")]
+        # Ein Fall genügt: dass alle Arten durchkommen, prüft
+        # test_spannungsanalyse -- hier geht es um den Weg ohne Oberfläche.
+        projekt.querschnitte[0].spannungsfaelle = [SpannungsfallEintrag("Feld", M_Ed=80.0)]
         ergebnis = projekt.rechnen()
-        feld, linie = ergebnis.analysen()["q1"]
+        feld, = ergebnis.analysen()["q1"]
         self.assertAlmostEqual(feld.bild.M / 1e3, 80.0, places=3)
-        self.assertGreater(linie.kurve.M_Rd, linie.kurve.M_Riss)
         bilder = diagrammdaten.spannungsanalysen(ergebnis.aufbau, ergebnis.loesung)["q1"]
         self.assertAlmostEqual(bilder[0]["bild"]["M"], feld.bild.M / 1e3)
 

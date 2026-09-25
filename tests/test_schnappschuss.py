@@ -22,6 +22,7 @@ Der Schnappschuss ist kein Ersatz für die Einzeltests: er sagt, *dass* sich
 etwas geändert hat, nicht ob es richtig ist. Aber er lässt nichts durch.
 """
 
+import functools
 import os
 import re
 import sys
@@ -100,6 +101,13 @@ def _loesung(projekt):
     return aufbau, aufbau.werk.loese(*aufbau.alle_nachweisziele())
 
 
+@functools.lru_cache(maxsize=None)
+def _gerechnet() -> dict:
+    """Name auf (Aufbau, Lösung) -- einmal je Lauf, die Tests teilen es."""
+    return {name: _loesung(projekt) for name, projekt in projekte().items()}
+
+
+@functools.lru_cache(maxsize=None)
 def berichte() -> dict:
     """Name der Datei auf ihren Inhalt -- die eine Stelle, die das erzeugt."""
     from opencivil.bericht import konsole
@@ -109,9 +117,8 @@ def berichte() -> dict:
     vorher, konsole._BREITE = konsole._BREITE, BREITE
     try:
         dateien = {}
-        for name, projekt in projekte().items():
+        for name, (aufbau, loesung) in _gerechnet().items():
             titel = name.capitalize()
-            aufbau, loesung = _loesung(projekt)
             dateien[f"{name}.txt"] = konsole.als_text(loesung, titel=titel,
                                                       aufbau=aufbau)
             dateien[f"{name}.tex"] = als_tex(loesung, titel=titel, aufbau=aufbau)
@@ -143,8 +150,7 @@ class TestSchnappschuss(unittest.TestCase):
         from opencivil.projekt import Aufbau
 
         gezeigt = set()
-        for projekt in projekte().values():
-            aufbau, _ = _loesung(projekt)
+        for aufbau, _ in _gerechnet().values():
             for feld, eintraege in aufbau.nachweise_je_feld():
                 if any(not u.still for n in eintraege.values() for u in n.urteile):
                     gezeigt.add(feld)

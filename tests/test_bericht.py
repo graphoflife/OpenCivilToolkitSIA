@@ -407,7 +407,7 @@ class TestKnappVerfehlterGrad(unittest.TestCase):
 
         projekt = Projekt.beispiel()
         projekt.querschnitte[0].knickfaelle = [KnickEintrag(
-            "schlank", N_Ed=-1500.0, M_Ed_1=30.0, laenge=12.0, knicklaenge=12.0)]
+            "überlastet", N_Ed=-8000.0, M_Ed_1=30.0, laenge=3.0, knicklaenge=3.0)]
         aufbau = projekt.aufbauen()
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         linie = api.loesung_dict(loesung, aufbau=aufbau)["linien"]["q1.x"]

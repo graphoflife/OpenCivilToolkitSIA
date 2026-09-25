@@ -118,10 +118,13 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
 
 
 class TestMomentenKruemmung(unittest.TestCase):
-    def setUp(self):
-        self.gerissen, self.ungerissen, self.M_Riss = loeserpaar()
-        self.kurve = sa.moment_kruemmung(
-            self.gerissen, self.ungerissen, N=0.0, M_Riss=self.M_Riss)
+    @classmethod
+    def setUpClass(cls):
+        # Einmal für alle: die Linie kostet über eine Sekunde, und jeder Test
+        # liest sie nur.
+        cls.gerissen, cls.ungerissen, cls.M_Riss = loeserpaar()
+        cls.kurve = sa.moment_kruemmung(
+            cls.gerissen, cls.ungerissen, N=0.0, M_Riss=cls.M_Riss)
 
     def test_sie_reicht_von_null_bis_zum_widerstand(self):
         self.assertTrue(self.kurve.punkte)

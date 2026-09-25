@@ -20,14 +20,18 @@ from opencivil.web import dienst, speicher
 
 
 def projekt_mit_zwei_platten() -> dict:
-    """Zwei Platten, die sich unterscheiden -- sonst merkt man nichts."""
+    """
+    Zwei Platten, die sich unterscheiden -- sonst merkt man nichts.
+
+    Ohne Knickfall: seine Grenzkraft kostet je kalten Lauf zwei Sekunden, und
+    fast jeder Test hier rechnet kalt. Die Änderung, die ihn braucht, legt ihn
+    selbst an.
+    """
     p = Projekt.beispiel()
     zweite = copy.deepcopy(p.querschnitte[0])
     zweite.kennung, zweite.name = "q2", "Platte 2"
     zweite.rissanforderung = "hoch"
     zweite.zwaengung = True
-    zweite.knickfaelle = [KnickEintrag("Stütze", N_Ed=-900.0, M_Ed_1=25.0,
-                                       laenge=4.0, knicklaenge=4.0)]
     p.querschnitte.append(zweite)
     for k in p.querschnitte[0].kombinationen:
         k.V_Ed = 80.0
@@ -69,8 +73,11 @@ AENDERUNGEN = [
     ("Durchmesser einer Lage",
      lambda d: d["querschnitte"][0]["lagen"][0]["grund"].__setitem__("durchmesser", 20)),
     ("ein Nachweisschalter",
-     lambda d: d["querschnitte"][1].__setitem__("duktilitaet", [False, True, True, False])),
-    ("Normalkraft eines Knickfalls",
+     lambda d: d["querschnitte"][1].__setitem__("duktilitaet", True)),
+    ("ein Knickfall kommt dazu",
+     lambda d: d["querschnitte"][1]["knickfaelle"].append(dataclasses.asdict(
+         KnickEintrag("Stütze", N_Ed=-900.0, M_Ed_1=25.0, laenge=4.0, knicklaenge=4.0)))),
+    ("Normalkraft des Knickfalls",
      lambda d: d["querschnitte"][1]["knickfaelle"][0].__setitem__("N_Ed", -1400.0)),
     ("eine gelöschte Platte", lambda d: d["querschnitte"].pop()),
 ]
@@ -88,22 +95,9 @@ class TestDasselbeErgebnis(unittest.TestCase):
                 self.assertEqual(mit.status, 200)
                 self.assertEqual(als_text(mit), als_text(ohne))
             # Warm für die nächste Runde -- geprüft wird ja der warme Fall.
+            # Der Textvergleich umfasst das ganze Protokoll samt Reihenfolge
+            # der Blöcke: daran hängt der Bericht.
             rechnen(beschreibung, frisch=False)
-
-    def test_auch_die_reihenfolge_des_protokolls_bleibt(self):
-        """
-        Daran hängt der ganze Bericht. Ein Speicher, der die Blöcke umstellt,
-        wäre keine Beschleunigung mehr, sondern eine andere Ausgabe.
-        """
-        beschreibung = projekt_mit_zwei_platten()
-        ohne = rechnen(beschreibung, frisch=True)
-        rechnen(beschreibung, frisch=False)
-        beschreibung["querschnitte"][0]["h"] = 310
-        mit = rechnen(beschreibung, frisch=False)
-        frisch = rechnen(beschreibung, frisch=True)
-        self.assertEqual([b["art"] for b in mit.daten["protokoll"]],
-                         [b["art"] for b in frisch.daten["protokoll"]])
-        self.assertNotEqual(als_text(mit), als_text(ohne))   # es hat sich ja was geändert
 
 
 class TestWasUebernommenWird(unittest.TestCase):
