@@ -33,7 +33,7 @@ from typing import (
 
 from opencivil.core import latex as tex
 from opencivil.core.einheiten import (
-    EINHEITSLOS, KN, KNM, MM, MM2, N_PRO_MM2, PROMILLE, Einheit, Groesse,
+    EINHEITSLOS, KN, KNM, MM, MM2, N_PRO_MM2, PRO_M, PROMILLE, Einheit, Groesse,
 )
 from opencivil.core.wert import Wert, WertDef
 
@@ -423,7 +423,7 @@ class Zwischenwerte:
     ist. Hier entstehen solche Werte, mit festen Gewohnheiten je Groessenart:
     Laengen in mm auf eine Stelle, Flaechen in mm² und Spannungen in N/mm²
     ganz, Kraefte in kN und Momente in kNm auf eine Stelle, Dehnungen in
-    Promille auf zwei; wo eine Groesse mehr verlangt (die Zugfestigkeit des
+    Promille auf zwei, Kruemmungen in 1/m auf fuenf; wo eine Groesse mehr verlangt (die Zugfestigkeit des
     Betons auf zwei Stellen), sagt es ``stellen``. Jede Stelle, die das von
     Hand tat, rechnete dafuer selbst um und schrieb die Einheit selbst dazu.
 
@@ -466,6 +466,10 @@ class Zwischenwerte:
     def dehnung(self, name: str, symbol: str, si: float, beschreibung: str = "",
                 *, stellen: int = 2) -> Wert:
         return self.wert(name, symbol, Groesse.aus_si(si, PROMILLE), stellen, beschreibung)
+
+    def kruemmung(self, name: str, symbol: str, si: float, beschreibung: str = "",
+                  *, stellen: int = 5) -> Wert:
+        return self.wert(name, symbol, Groesse.aus_si(si, PRO_M), stellen, beschreibung)
 
     def zahl(self, name: str, symbol: str, zahl: float, beschreibung: str = "",
              *, stellen: int = 3) -> Wert:

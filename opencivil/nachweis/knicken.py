@@ -63,14 +63,13 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_als_text,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_formel,
 )
-from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, MM, Groesse
-from opencivil.core.latex import Mathe, als_text
-from opencivil.core.protokoll import Protokoll
+from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, M, MM, Groesse
+from opencivil.core.latex import Mathe, angabe, als_text
+from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import WertDef
 from opencivil.core.wert import kennung_aus
-from opencivil.material.basis import mit_index
 from opencivil.nachweis.querschnittsloeser import (
     EPS_DRUCK, EPS_ZUG, Querschnittsloeser, Stahllage, Werkstoffsatz,
     beton_nichtlinear, protokoll_verfahren, stahl_bilinear,
@@ -161,6 +160,9 @@ class Knickergebnis:
 
     fall: Knickfall
     alpha_i: float = 0.0
+    d: float = 0.0
+    """Statische Hoehe der untersten x-Lage, in m -- fuer die Mindestausmitte."""
+
     e_0d: float = 0.0
     e_1d: float = 0.0
     e_2d: float = 0.0
@@ -283,8 +285,6 @@ class Knicken(Nachweis):
             Eingabebezug("f_yd", stahl.id_von(WERKSTOFFE.stahl)),
             Eingabebezug("eps_ud", stahl.id_von("eps_ud")),
         ]
-        self.s_f_cd = mit_index(WERKSTOFFE.beton_zeichen,
-                                querschnitt.beton.symbol_index)
 
         super().__init__(
             basis,
@@ -325,7 +325,7 @@ class Knicken(Nachweis):
         # anderen Druckkraft herauskaeme, braucht denselben Loeser.
         self.loeser = loeser
 
-        self._protokoll_ansatz(p, phi, E_cm, f_cd)
+        self._protokoll_ansatz(p, e)
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
@@ -356,9 +356,9 @@ class Knicken(Nachweis):
             return erg
 
         # Statische Hoehe der untersten x-Lage -- daraus die Mindestausmitte.
-        d = max(l.z for l in loeser.lagen)
+        erg.d = max(l.z for l in loeser.lagen)
         erg.alpha_i = schiefstellung(fall.laenge.si)
-        erg.e_0d = max(d / 30.0, erg.alpha_i * l_cr / 2.0)
+        erg.e_0d = max(erg.d / 30.0, erg.alpha_i * l_cr / 2.0)
         # Die gewollte Ausmitte ist eine Eigenschaft des Systems und bleibt
         # bei der Suche nach N_Rd fest -- M_Ed,1 waechst mit der Last.
         erg.e_1d = abs(fall.M_Ed_1.si / N_Ed)
@@ -520,8 +520,7 @@ class Knicken(Nachweis):
 
     # -- Mitschrift ---------------------------------------------------------
 
-    def _protokoll_ansatz(self, p: Protokoll, phi: float, E_cm: float,
-                          f_cd: float) -> None:
+    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
         p.titel("Knicken")
         p.text(
             "Nachgewiesen wird am verformten System. Die Ausmitte zweiter "
@@ -549,14 +548,10 @@ class Knicken(Nachweis):
             r"\qquad M_{Ed,II} = \left|N_{Ed}\right| \cdot "
             r"\left(e_{0d} + e_{1d} + e_{2d}\right)",
             titel="Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein")
-        p.gleichung(
-            rf"E_{{c,eff}} = \frac{{E_{{cm}}}}{{1 + \varphi}} = "
-            rf"\frac{{{E_cm / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}}}"
-            rf"{{1 + {phi:.2f}}} = "
-            rf"{E_cm / (1.0 + phi) / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
-            rf" \qquad {self.s_f_cd} = {f_cd / 1e6:.1f}"
-            rf"\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}",
-            titel="Steifigkeit des Betons")
+        E_c_eff = e.g("E_cm").si / (1.0 + e.g("phi").si)
+        p.formel(Zwischenwerte(self.id).spannung("E_c_eff", "E_{c,eff}", E_c_eff),
+                 r"\frac{@E_cm}{1 + @phi}", {"E_cm": e["E_cm"], "phi": e["phi"]},
+                 titel="Steifigkeit des Betons", nachsatz=rf"\qquad {angabe(e['f_cd'])}")
         p.text(
             "Angesetzt wird das Kriechen mit demselben φ wie sonst, hier aus "
             "der Eingabe. Beim Knicken ist das nicht bloss zulässig, sondern "
@@ -594,21 +589,25 @@ class Knicken(Nachweis):
             p.text(erg.begruendung)
             return
 
-        d = erg.e_0d
-        p.gleichung(
-            rf"\alpha_i = \min\left[\max\left(\frac{{0.01}}"
-            rf"{{\sqrt{{{fall.laenge.si:.2f}}}}};\ \frac{{1}}{{300}}\right);\ "
-            rf"\frac{{1}}{{200}}\right] = {erg.alpha_i:.5f}"
-            rf" \qquad e_{{0d}} = \max\left(\frac{{d}}{{30}};\ "
-            rf"\frac{{\alpha_i \cdot l_{{cr}}}}{{2}}\right)"
-            rf" = {d * 1e3:.1f}\,\mathrm{{mm}}",
-            titel="Ungewollte Ausmitte", referenz="SIA 262:2025, 4.3.7")
-        p.gleichung(
-            rf"e_{{1d}} = \left|\frac{{M_{{Ed,1}}}}{{N_{{Ed}}}}\right|"
-            rf" = \left|\frac{{{fall.M_Ed_1.si / 1e3:.1f}\,\mathrm{{kNm}}}}"
-            rf"{{{fall.N_Ed.si / 1e3:.1f}\,\mathrm{{kN}}}}\right|"
-            rf" = {erg.e_1d * 1e3:.1f}\,\mathrm{{mm}}",
-            titel="Gewollte Ausmitte")
+        werte = Zwischenwerte(f"{self.id}.{kennung_aus(fall.name)}")
+        # Empirisch: die Norm setzt die Stablaenge in Metern ein.
+        alpha_i = werte.zahl("alpha_i", r"\alpha_i", erg.alpha_i, stellen=5)
+        p.formel(alpha_i,
+                 r"\min\left[\max\left(\frac{0.01}{\sqrt{@l}};\ \frac{1}{300}\right);\ "
+                 r"\frac{1}{200}\right]",
+                 {"l": werte.wert("l", "l", fall.laenge, 2)},
+                 titel="Schiefstellung", referenz="SIA 262:2025, 4.3.7",
+                 empirisch={"l": M})
+        p.formel(werte.laenge("e_0d", "e_{0d}", erg.e_0d),
+                 r"\max\left(\frac{@d}{30};\ \frac{@alpha_i \cdot @l_cr}{2}\right)",
+                 {"d": werte.laenge("d", "d", erg.d), "alpha_i": alpha_i,
+                  "l_cr": werte.wert("l_cr", "l_{cr}", fall.knicklaenge, 2)},
+                 titel="Ungewollte Ausmitte", referenz="SIA 262:2025, 4.3.7")
+        p.formel(werte.laenge("e_1d", "e_{1d}", erg.e_1d),
+                 r"\left|\frac{@M_Ed_1}{@N_Ed}\right|",
+                 {"M_Ed_1": werte.moment("M_Ed_1", "M_{Ed,1}", fall.M_Ed_1.si),
+                  "N_Ed": werte.kraft("N_Ed", "N_{Ed}", fall.N_Ed.si)},
+                 titel="Gewollte Ausmitte")
 
         self._protokoll_iteration(p, erg)
 
@@ -620,17 +619,18 @@ class Knicken(Nachweis):
             )
         else:
             p.gleichung(
-                rf"\varepsilon_m = {erg.eps_m * 1e3:.4f}\,\text{{‰}} \qquad "
-                rf"\chi = {erg.chi:.5f}\,\mathrm{{m}}^{{-1}} \qquad "
-                rf"N_{{int}} = {erg.N_int / 1e3:.1f}\,\mathrm{{kN}} \;\checkmark"
-                rf" \qquad M_{{int}} = {erg.M_int / 1e3:.1f}\,\mathrm{{kNm}}"
-                rf" \;\checkmark",
+                r" \qquad ".join([
+                    angabe(werte.dehnung("eps_m", r"\varepsilon_m", erg.eps_m, stellen=4)),
+                    angabe(werte.kruemmung("chi", r"\chi", erg.chi)),
+                    angabe(werte.kraft("N_int", "N_{int}", erg.N_int)) + r" \;\checkmark",
+                    angabe(werte.moment("M_int", "M_{int}", erg.M_int)) + r" \;\checkmark",
+                ]),
                 titel="Probe: die gefundene Ebene erzeugt die Schnittgrössen")
             zeichen = r"\ge" if erg.M_Rd >= abs(erg.M_ges) else "<"
             p.gleichung(
-                rf"M_{{Rd,x}}(N_{{Ed}}) = {erg.M_Rd / 1e3:.1f}\,\mathrm{{kNm}}"
-                rf" \quad {zeichen} \quad M_{{Ed,II}} = "
-                rf"{abs(erg.M_ges) / 1e3:.1f}\,\mathrm{{kNm}}",
+                rf"{angabe(werte.moment('M_Rd', r'M_{Rd,x}(N_{Ed})', erg.M_Rd))}"
+                rf" \quad {zeichen} \quad "
+                rf"{angabe(werte.moment('M_II', r'M_{Ed,II}', abs(erg.M_ges)))}",
                 titel="Querschnitt am verformten System")
 
         self._protokoll_grenzkraft(p, erg)
@@ -692,17 +692,12 @@ class Knicken(Nachweis):
             "Stab immer; von dort aus wird das Fenster halbiert, bis "
             "getragene und nicht getragene Kraft zusammenfallen."
         )
-        zustand = r"\text{erfüllt}" if erg.erfuellt else r"\text{NICHT erfüllt}"
-        zeichen = r"\ge" if erg.erfuellt else "<"
-        p.gleichung(
-            rf"N_{{Rd,K}} = {erg.N_Rd / 1e3:.1f}\,\mathrm{{kN}} \quad "
-            rf"{zeichen} \quad \left|N_{{Ed}}\right| = "
-            rf"{N_Ed / 1e3:.1f}\,\mathrm{{kN}}",
-            titel="Grenzkraft des Stabes")
-        p.gleichung(
-            rf"\alpha_{{eff}} = \frac{{N_{{Rd,K}}}}{{\left|N_{{Ed}}\right|}}"
-            rf" = \frac{{{erg.N_Rd / 1e3:.1f}\,\mathrm{{kN}}}}"
-            rf"{{{N_Ed / 1e3:.1f}\,\mathrm{{kN}}}}"
-            rf" = {grad_als_text(erg.erfuellungsgrad, erg.erfuellt, latex=True)}"
-            rf" \quad \Rightarrow \quad {zustand}",
-            titel="Erfüllungsgrad")
+        werte = Zwischenwerte(f"{self.id}.{kennung_aus(erg.fall.name)}")
+        n_rd = werte.kraft("N_Rd", "N_{Rd,K}", erg.N_Rd)
+        n_ed = werte.kraft("N_Ed_betrag", r"\left|N_{Ed}\right|", N_Ed)
+        p.gleichung(rf"{angabe(n_rd)} \quad {r'\ge' if erg.erfuellt else '<'} \quad "
+                    rf"{angabe(n_ed)}", titel="Grenzkraft des Stabes")
+        grad_formel(p, self.d_ausnutzung[erg.fall.name].belegen(
+                        Groesse(erg.erfuellungsgrad, EINHEITSLOS)),
+                    r"\frac{@N_Rd}{@N_Ed}", {"N_Rd": n_rd, "N_Ed": n_ed},
+                    erg.erfuellt, mit_urteil=True)

@@ -134,6 +134,7 @@ KRAFT_PRO_LAENGE = KRAFT / LAENGE                # N/m
 MOMENT_PRO_LAENGE = MOMENT / LAENGE              # Nm/m
 DICHTE = MASSE / VOLUMEN                         # kg/m^3
 FLAECHE_PRO_LAENGE = FLAECHE / LAENGE            # m^2/m
+KRUEMMUNG = DIMENSIONSLOS / LAENGE               # 1/m
 
 
 # ===========================================================================
@@ -317,6 +318,7 @@ MNM = Einheit("MNm", MOMENT, 1e6)
 KN_PRO_M = Einheit("kN/m", KRAFT_PRO_LAENGE, 1e3, latex=r"\mathrm{kN}/\mathrm{m}")
 KNM_PRO_M = Einheit("kNm/m", MOMENT_PRO_LAENGE, 1e3, latex=r"\mathrm{kNm}/\mathrm{m}")
 MM2_PRO_M = Einheit("mm^2/m", FLAECHE_PRO_LAENGE, 1e-6, latex=r"\mathrm{mm}^{2}/\mathrm{m}")
+PRO_M = Einheit("1/m", KRUEMMUNG, 1.0, latex=r"\mathrm{m}^{-1}", beschriftung="1/m")
 
 # Masse und Dichte
 KG = Einheit("kg", MASSE, 1.0)
@@ -343,7 +345,7 @@ EINHEITEN: Dict[str, Einheit] = {
         N, KN, MN,
         PA, KPA, MPA, GPA, N_PRO_MM2, KN_PRO_M2,
         NM, KNM, MNM,
-        KN_PRO_M, KNM_PRO_M, MM2_PRO_M,
+        KN_PRO_M, KNM_PRO_M, MM2_PRO_M, PRO_M,
         KG, T, KG_PRO_M3,
         RAD, GRAD,
     )

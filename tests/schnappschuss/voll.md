@@ -1163,7 +1163,7 @@ $$
 **Steifigkeit des Betons**
 
 $$
-E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2.00} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad f_{cd} = 20.0\,\mathrm{N}/\mathrm{mm}^{2}
+E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 Angesetzt wird das Kriechen mit demselben φ wie sonst, hier aus der Eingabe. Beim Knicken ist das nicht bloss zulässig, sondern wesentlich: ein aufgeweichter Beton verformt sich mehr, die Ausmitte zweiter Ordnung wächst, und der Stab knickt früher. φ = 0 läge hier deutlich auf der unsicheren Seite.
@@ -1198,16 +1198,26 @@ $$
 N_{Ed} = -800\,\mathrm{kN} \qquad M_{Ed,1} = 20\,\mathrm{kNm} \qquad l = 3\,\mathrm{m} \qquad l_{cr} = 3\,\mathrm{m}
 $$
 
+**Schiefstellung** *(SIA 262:2025, 4.3.7)*
+
+$$
+\begin{aligned}
+  \alpha_i &= \min\left[\max\left(\frac{0.01}{\sqrt{l}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \\
+  &= \min\left[\max\left(\frac{0.01}{\sqrt{3}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \\
+  &= 0.005 \quad \left(l\ \text{in}\ \mathrm{m}\right)
+\end{aligned}
+$$
+
 **Ungewollte Ausmitte** *(SIA 262:2025, 4.3.7)*
 
 $$
-\alpha_i = \min\left[\max\left(\frac{0.01}{\sqrt{3.00}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] = 0.00500 \qquad e_{0d} = \max\left(\frac{d}{30};\ \frac{\alpha_i \cdot l_{cr}}{2}\right) = 8.3\,\mathrm{mm}
+e_{0d} = \max\left(\frac{d}{30};\ \frac{\alpha_i \cdot l_{cr}}{2}\right) = \max\left(\frac{249\,\mathrm{mm}}{30};\ \frac{0.005 \cdot 3\,\mathrm{m}}{2}\right) = 8.3\,\mathrm{mm}
 $$
 
 **Gewollte Ausmitte**
 
 $$
-e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| = \left|\frac{20.0\,\mathrm{kNm}}{-800.0\,\mathrm{kN}}\right| = 25.0\,\mathrm{mm}
+e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| = \left|\frac{20\,\mathrm{kNm}}{-800\,\mathrm{kN}}\right| = 25\,\mathrm{mm}
 $$
 
 **Das Verfahren** *(SIA 262:2025, 4.3.7)*
@@ -1230,7 +1240,7 @@ Zu jedem Moment wird die Dehnungsebene gesucht, die es im Gleichgewicht hält; a
 **Probe: die gefundene Ebene erzeugt die Schnittgrössen**
 
 $$
-\varepsilon_m = -0.1743\,\text{‰} \qquad \chi = 0.00089\,\mathrm{m}^{-1} \qquad N_{int} = -800.0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 27.3\,\mathrm{kNm} \;\checkmark
+\varepsilon_m = -0.1743\,\text{‰} \qquad \chi = 0.00089\,\mathrm{m}^{-1} \qquad N_{int} = -800\,\mathrm{kN} \;\checkmark \qquad M_{int} = 27.3\,\mathrm{kNm} \;\checkmark
 $$
 
 **Querschnitt am verformten System**
@@ -1244,13 +1254,13 @@ Gesucht wird die grösste Druckkraft mit Gleichgewichtslage. Die gewollte Ausmit
 **Grenzkraft des Stabes**
 
 $$
-N_{Rd,K} = 3900.6\,\mathrm{kN} \quad \ge \quad \left|N_{Ed}\right| = 800.0\,\mathrm{kN}
+N_{Rd,K} = 3900.6\,\mathrm{kN} \quad \ge \quad \left|N_{Ed}\right| = 800\,\mathrm{kN}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff} = \frac{N_{Rd,K}}{\left|N_{Ed}\right|} = \frac{3900.6\,\mathrm{kN}}{800.0\,\mathrm{kN}} = 4.88 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,K,\text{Wand}} = \frac{N_{Rd,K}}{\left|N_{Ed}\right|} = \frac{3900.6\,\mathrm{kN}}{800\,\mathrm{kN}} = 4.88 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Beton: C30/37
