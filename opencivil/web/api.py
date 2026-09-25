@@ -19,7 +19,8 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple
 from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM, Groesse
 from opencivil import spannungsanalyse
 from opencivil.nachweis.querschnittsloeser import (
-    Querschnittsloeser, Stahllage, beton_nichtlinear, stahl_bilinear)
+    Querschnittsloeser, Stahllage, Werkstoffsatz, beton_nichtlinear,
+    stahl_bilinear)
 from opencivil.nachweis.sproedes_versagen import rissmoment
 from opencivil.querschnitt.platte import BREITE_Y_MM, Richtung
 from opencivil.bericht.zusammenfassung import zusammenfassen
@@ -478,16 +479,19 @@ def _loeserpaar(qs, richtung, wert) -> Optional[Tuple[Querschnittsloeser,
     lagen = [Stahllage(a_s=wert(as_id), z=wert(z_id), nummer=lage.nummer)
              for lage, _, _, as_id, z_id in posten]
     stahl = posten[0][0].stahl
+    # Die Analyse zeigt den Querschnitt mit den Gesetzen der Tragsicherheit.
+    # Eine Wahl dafuer in der Oberflaeche waere ein Argument an dieser Stelle.
+    satz = Werkstoffsatz.BEMESSUNG
     E_c_eff = wert(qs.beton.id_von("E_cm")) / (1.0 + wert(qs.id_von("kriechzahl")))
     gemeinsam = dict(
         h=wert(qs.id_von("h")), b=wert(qs.id_breite(richtung)), lagen=lagen,
         stahl=stahl_bilinear(E_s=wert(stahl.id_von("E_s")),
-                             f_sd=wert(stahl.id_von("f_yd")),
+                             f_sd=wert(stahl.id_von(satz.stahl)),
                              eps_ud=wert(stahl.id_von("eps_ud"))),
         eps_druck=wert(qs.beton.id_von("eps_c2d")),
         eps_zug=wert(stahl.id_von("eps_ud")))
     gerissen = Querschnittsloeser(
-        beton=beton_nichtlinear(f_cd=wert(qs.beton.id_von("f_cd")), E_c=E_c_eff,
+        beton=beton_nichtlinear(f_cd=wert(qs.beton.id_von(satz.beton)), E_c=E_c_eff,
                                 eps_c1d=wert(qs.beton.id_von("eps_c1d")),
                                 eps_c2d=wert(qs.beton.id_von("eps_c2d"))),
         **gemeinsam)

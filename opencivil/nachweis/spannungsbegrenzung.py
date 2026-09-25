@@ -98,12 +98,6 @@ _GEFORDERT = ("erhoeht", "hoch")
 WERKSTOFFE = Werkstoffsatz.CHARAKTERISTISCH
 
 
-def _formelzeichen(kurzname: str) -> str:
-    """``f_yk`` wird zu ``f_{yk}`` -- der ganze Index tief gestellt."""
-    zeichen, _, index = kurzname.partition("_")
-    return f"{zeichen}_{{{index}}}"
-
-
 def fallkennung(name: str) -> str:
     """
     Der Fallname, wie er in einer Wert-ID stehen darf.
@@ -501,10 +495,8 @@ class Spannungsbegrenzung(Nachweis):
                     f"Nachweis führt denselben Namen als {vorhanden[b.name]}.")
 
         self.s_E_cm = mit_index("E_{cm}", beton.symbol_index)
-        self.s_f_s = mit_index(_formelzeichen(WERKSTOFFE.stahl),
-                               stahl.symbol_index)
-        self.s_f_c = mit_index(_formelzeichen(WERKSTOFFE.beton),
-                               beton.symbol_index)
+        self.s_f_s = mit_index(WERKSTOFFE.stahl_zeichen, stahl.symbol_index)
+        self.s_f_c = mit_index(WERKSTOFFE.beton_zeichen, beton.symbol_index)
 
         super().__init__(
             basis,

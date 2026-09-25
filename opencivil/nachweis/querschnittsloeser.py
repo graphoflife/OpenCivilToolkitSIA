@@ -420,7 +420,10 @@ class Werkstoffsatz(str, Enum):
     Moduln und Dehnungsgrenzen sind in beiden Saetzen dieselben. Er steht hier
     als Name und nicht als zwei Zahlen an jeder Aufrufstelle: welche Werte ein
     Nachweis ansetzt, ist eine Entscheidung, und eine Entscheidung soll man
-    lesen koennen, statt sie aus ``f_sd=...`` erschliessen zu muessen.
+    lesen koennen, statt sie aus ``f_sd=...`` erschliessen zu muessen. Jeder
+    Nutzer des Loesers nennt darum seinen Satz -- der Knicknachweis und die
+    Spannung-Dehnung-Analyse ``BEMESSUNG``, die Spannungsbegrenzung
+    ``CHARAKTERISTISCH``.
     """
 
     BEMESSUNG = "bemessung"
@@ -435,6 +438,16 @@ class Werkstoffsatz(str, Enum):
     def beton(self) -> str:
         """Kurzname der Betonfestigkeit -- dort endet der Anstieg im Druck."""
         return "f_cd" if self is Werkstoffsatz.BEMESSUNG else "f_ck"
+
+    @property
+    def stahl_zeichen(self) -> str:
+        """Das Formelzeichen dazu, fuer die Herleitung -- ``f_{yd}``."""
+        return "f_{yd}" if self is Werkstoffsatz.BEMESSUNG else "f_{yk}"
+
+    @property
+    def beton_zeichen(self) -> str:
+        """Das Formelzeichen dazu, fuer die Herleitung -- ``f_{cd}``."""
+        return "f_{cd}" if self is Werkstoffsatz.BEMESSUNG else "f_{ck}"
 
 
 def beton_elastisch(*, E_c: float,

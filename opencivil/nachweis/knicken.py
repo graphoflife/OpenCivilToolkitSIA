@@ -71,10 +71,13 @@ from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.querschnittsloeser import (
-    EPS_DRUCK, EPS_ZUG, Querschnittsloeser, Stahllage, beton_nichtlinear,
-    protokoll_verfahren, stahl_bilinear,
+    EPS_DRUCK, EPS_ZUG, Querschnittsloeser, Stahllage, Werkstoffsatz,
+    beton_nichtlinear, protokoll_verfahren, stahl_bilinear,
 )
 from opencivil.querschnitt.platte import Richtung
+
+#: Womit die Werkstoffgesetze rechnen: ein Knicknachweis ist Tragsicherheit.
+WERKSTOFFE = Werkstoffsatz.BEMESSUNG
 
 #: Groesste Zahl an Durchlaeufen der Ausmitten-Iteration.
 DURCHLAEUFE = 40
@@ -261,7 +264,7 @@ class Knicken(Nachweis):
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),
             Eingabebezug("b", querschnitt.id_breite(self.richtung)),
-            Eingabebezug("f_cd", querschnitt.beton.id_von("f_cd")),
+            Eingabebezug("f_cd", querschnitt.beton.id_von(WERKSTOFFE.beton)),
             Eingabebezug("E_cm", querschnitt.beton.id_von("E_cm")),
             Eingabebezug("eps_c1d", querschnitt.beton.id_von("eps_c1d")),
             Eingabebezug("eps_c2d", querschnitt.beton.id_von("eps_c2d")),
@@ -276,10 +279,11 @@ class Knicken(Nachweis):
         stahl = self.posten[0][0].stahl
         bezuege += [
             Eingabebezug("E_s", stahl.id_von("E_s")),
-            Eingabebezug("f_yd", stahl.id_von("f_yd")),
+            Eingabebezug("f_yd", stahl.id_von(WERKSTOFFE.stahl)),
             Eingabebezug("eps_ud", stahl.id_von("eps_ud")),
         ]
-        self.s_f_cd = mit_index("f_{cd}", querschnitt.beton.symbol_index)
+        self.s_f_cd = mit_index(WERKSTOFFE.beton_zeichen,
+                                querschnitt.beton.symbol_index)
 
         super().__init__(
             basis,
