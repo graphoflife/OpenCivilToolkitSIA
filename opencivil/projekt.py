@@ -23,14 +23,18 @@ geschieht erst beim Aufbau, ueber die :class:`Groesse`.
 
 from __future__ import annotations
 
+import difflib
 import json
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, fields
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import (
+    Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Union,
+)
 
 from opencivil.core.einheiten import (
     EINHEITSLOS, KN, KNM, KN_PRO_M, M, MM, Groesse,
 )
+from opencivil.core.berechnung import NachweisUrteil
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.material.basis import Baustoff
 from opencivil.material.beton import BETONSORTEN, beton
@@ -523,7 +527,7 @@ HAEUFIG_ANTEIL = 70.0
 QUASISTAENDIG_ANTEIL = 60.0
 
 
-def abgeleiteter_name(name: str, anteil: float) -> str:
+def abgeleiteter_fallname(name: str, anteil: float) -> str:
     """
     Wie ein aus der Tragsicherheit abgeleiteter Lastfall heisst.
 
@@ -841,6 +845,44 @@ class QuerschnittEintrag(Beschreibung):
         vier = Richtung(self.richtung_lage4)
         return {1: eins, 2: eins.gegenrichtung, 3: vier.gegenrichtung, 4: vier}[nummer]
 
+    # -- Ohne Oberflaeche ---------------------------------------------------
+    #
+    # Wer in Python rechnet, soll eine Einwirkung anfuegen koennen, ohne die
+    # Eintragsklasse und die Liste zu kennen, in die sie gehoert. Jede Methode
+    # haengt genau einen Eintrag an und gibt ihn zurueck -- er ist derselbe,
+    # den die Oberflaeche anlegen wuerde, und laesst sich danach aendern.
+
+    def einwirkung(self, name: str, *, M_Ed: float = 0.0, N_Ed: float = 0.0,
+                   V_Ed: float = 0.0) -> KombinationEintrag:
+        """Eine Tragsicherheitseinwirkung -- kNm, kN und kN/m, Zug positiv."""
+        eintrag = KombinationEintrag(name=name, M_Ed=M_Ed, N_Ed=N_Ed, V_Ed=V_Ed)
+        self.kombinationen.append(eintrag)
+        return eintrag
+
+    def haeufiger_lastfall(self, name: str, *, M_Ed: float = 0.0,
+                           N_Ed: float = 0.0) -> GebrauchsfallEintrag:
+        """Ein eigener haeufiger Lastfall -- fuer den Nachweis gegen Fliessen."""
+        eintrag = GebrauchsfallEintrag(name=name, M_Ed=M_Ed, N_Ed=N_Ed)
+        self.haeufige.append(eintrag)
+        return eintrag
+
+    def quasistaendiger_lastfall(self, name: str, *, M_Ed: float = 0.0,
+                                 N_Ed: float = 0.0) -> GebrauchsfallEintrag:
+        """Ein eigener quasi-staendiger Lastfall -- fuer die Rissbreite."""
+        eintrag = GebrauchsfallEintrag(name=name, M_Ed=M_Ed, N_Ed=N_Ed)
+        self.quasistaendige.append(eintrag)
+        return eintrag
+
+    def knickfall(self, name: str, *, N_Ed: float, M_Ed_1: float = 0.0,
+                  laenge: float = 3.0,
+                  knicklaenge: Optional[float] = None) -> KnickEintrag:
+        """Ein Knicknachweis -- N_Ed in kN (Druck negativ), Laengen in m."""
+        eintrag = KnickEintrag(
+            name=name, N_Ed=N_Ed, M_Ed_1=M_Ed_1, laenge=laenge,
+            knicklaenge=laenge if knicklaenge is None else knicklaenge)
+        self.knickfaelle.append(eintrag)
+        return eintrag
+
 
     @classmethod
     def neu(cls, kennung: str, name: str, beton: str, stahl: str,
@@ -1066,6 +1108,33 @@ class Aufbau:
     def eckwertziele(self) -> List[str]:
         return [d.id for n in self.nachweise.values() for d in n.d_eckwerte.values()]
 
+    def alle_ziele(self) -> List[str]:
+        """
+        Was ein vollstaendiger Lauf rechnet, in der Reihenfolge der Herleitung.
+
+        Erst die Baustoffe, dann Platte fuer Platte ihre Eckwerte und
+        Nachweise. Die Oberflaeche rechnet dieselben Ziele in derselben
+        Folge, nur plattenweise mit Zwischenspeicher
+        (:func:`opencivil.web.dienst._stromabwaerts`); wer ohne Oberflaeche
+        rechnet, bekommt so denselben Bericht.
+        """
+        ziele = self.materialziele()
+        for kennung in self.querschnitte:
+            ziele += self.ziele_von(kennung)
+        return ziele
+
+    def urteile_von(self, kennung: str, urteile: Iterable[NachweisUrteil],
+                    ) -> List[NachweisUrteil]:
+        """
+        Die Urteile einer Platte -- erkannt am Namensraum ihres Nachweises.
+
+        Nicht am Namen: den Anzeigetext zu zerlegen hat schon einmal die
+        Nachweise mehrerer Platten in dieselbe Tabelle gepackt.
+        """
+        raum = self.querschnitte[kennung].id
+        return [u for u in urteile
+                if u.raum == raum or u.raum.startswith(f"{raum}.")]
+
     def materialziele(self) -> List[str]:
         """
         Saemtliche Kennwerte aller Materialien -- Beton zuerst, dann Betonstahl.
@@ -1157,6 +1226,140 @@ class Projekt(Beschreibung):
         eintrag.name = self.abgeleiteter_name(eintrag.sorte, ausser=kennung)
         return eintrag
 
+    # -- Ohne Oberflaeche ---------------------------------------------------
+    #
+    # Die Beschreibung ist das Modell, auch in Python. Diese Methoden legen an,
+    # was die Oberflaeche anlegen wuerde, und geben den Eintrag zurueck; was
+    # sie nicht abdecken, setzt man am Eintrag selbst. Einen zweiten Satz
+    # Klassen daneben gibt es nicht -- er muesste mit diesem gleich bleiben,
+    # und genau das tut so etwas nie lange.
+
+    def beton(self, sorte: str = "C30/37") -> MaterialEintrag:
+        """Eine Betonsorte nach Norm -- Kennung ``b1``, ``b2`` ..."""
+        return self._normsorte("beton", "b", sorte)
+
+    def stahl(self, sorte: str = "B500B") -> MaterialEintrag:
+        """Eine Betonstahlsorte nach Norm -- Kennung ``s1``, ``s2`` ..."""
+        return self._normsorte("betonstahl", "s", sorte)
+
+    def _normsorte(self, art: str, vorsilbe: str, sorte: str) -> MaterialEintrag:
+        """
+        Legt eine Normsorte an und prueft sie sofort.
+
+        Sofort und nicht erst beim Rechnen: ein Tippfehler in der Sorte soll
+        an der Zeile auffallen, in der er steht.
+        """
+        eintrag = MaterialEintrag(kennung=self.freie_kennung(vorsilbe), art=art,
+                                  sorte=sorte, name=sorte)
+        eintrag.pruefen()
+        if any(m.anzeigename == sorte for m in self.materialien):
+            raise ProjektFehler(
+                f"'{sorte}' steht schon im Projekt. Eine Normsorte braucht es "
+                f"nur einmal -- mehrere Platten verwenden dieselbe.")
+        self.materialien.append(eintrag)
+        return eintrag
+
+    def platte(
+        self,
+        name: str,
+        *,
+        h: float = 300.0,
+        x: Sequence[float] = (12.0, 12.0),
+        y: Sequence[float] = (12.0, 12.0),
+        x_zulage: Sequence[float] = (0.0, 0.0),
+        y_zulage: Sequence[float] = (0.0, 0.0),
+        teilung: float = 150.0,
+        x_innen: bool = True,
+        beton: Union[str, MaterialEintrag, None] = None,
+        stahl: Union[str, MaterialEintrag, None] = None,
+        **felder: Any,
+    ) -> QuerschnittEintrag:
+        """
+        Eine Platte -- Masse in mm, Bewehrung als Durchmesser je Richtung.
+
+        ``x`` und ``y`` sind je zwei Durchmesser, *unten* und *oben*;
+        ``x_zulage`` und ``y_zulage`` ebenso, null heisst keine. Alle Posten
+        liegen in derselben ``teilung``. ``x_innen`` legt die Tragrichtung
+        auf die 2. und 3. Lage, wie die Vorgabe der Oberflaeche.
+
+        ``beton`` und ``stahl`` duerfen fehlen, solange das Projekt nur je
+        einen hat. Alles Weitere -- ``b``, ``rissanforderung``,
+        ``duktilitaet`` ... -- geht als Stichwort an den Eintrag; ein
+        unbekanntes Stichwort wird gemeldet, statt still zu verschwinden.
+
+        Gebaut wird ueber :meth:`QuerschnittEintrag.neu`, dieselbe Vorlage wie
+        in der Oberflaeche, nur ohne deren Startlast: wer rechnet, gibt seine
+        Einwirkungen selbst an.
+        """
+        beton_kennung = self._einziges("beton", beton)
+        stahl_kennung = self._einziges("betonstahl", stahl)
+        eintrag = QuerschnittEintrag.neu(
+            kennung=self.freie_kennung("q"), name=name,
+            beton=beton_kennung, stahl=stahl_kennung)
+        eintrag.h = float(h)
+        eintrag.kombinationen = []
+        aussen = Richtung.Y if x_innen else Richtung.X
+        eintrag.richtung_lage1 = eintrag.richtung_lage4 = aussen.value
+
+        durchmesser = {Richtung.X: (x, x_zulage), Richtung.Y: (y, y_zulage)}
+        for richtung, (grund, zulage) in durchmesser.items():
+            r = richtung.value
+            for was, werte in ((r, grund), (f"{r}_zulage", zulage)):
+                if len(werte) != 2:
+                    raise ProjektFehler(
+                        f"Platte '{name}': je Richtung zwei Durchmesser, unten "
+                        f"und oben -- angegeben sind {len(werte)} ({was}).")
+            nummern = [n for n in range(1, LAGENZAHL + 1)
+                       if eintrag.richtung_von(n) is richtung]
+            for nummer, d, dz in zip(nummern, grund, zulage):
+                lage = eintrag.lagen[nummer - 1]
+                lage.grund = PostenEintrag(durchmesser=float(d), abstand=teilung)
+                lage.zulage = PostenEintrag(durchmesser=float(dz), abstand=teilung)
+
+        bekannt = {f.name for f in fields(QuerschnittEintrag)}
+        for feld, wert in felder.items():
+            if feld not in bekannt:
+                aehnlich = difflib.get_close_matches(feld, bekannt, n=1)
+                raise ProjektFehler(
+                    f"Platte '{name}': ein Feld '{feld}' gibt es nicht."
+                    + (f" Gemeint ist vielleicht '{aehnlich[0]}'?" if aehnlich else ""))
+            setattr(eintrag, feld, wert)
+
+        self.querschnitte.append(eintrag)
+        return eintrag
+
+    def _einziges(self, art: str,
+                  gewaehlt: Union[str, MaterialEintrag, None]) -> str:
+        """Die Kennung des gewaehlten Materials -- oder des einzigen dieser Art."""
+        if isinstance(gewaehlt, MaterialEintrag):
+            return gewaehlt.kennung
+        if gewaehlt:
+            return self.material(gewaehlt).kennung
+        vorhanden = [m for m in self.materialien if m.art == art]
+        wort = "Beton" if art == "beton" else "Betonstahl"
+        if len(vorhanden) != 1:
+            raise ProjektFehler(
+                f"Welcher {wort}? Im Projekt stehen {len(vorhanden)} -- bitte "
+                f"mit {'beton' if art == 'beton' else 'stahl'}=... angeben"
+                + ("." if vorhanden else
+                   f", oder zuerst einen anlegen: "
+                   f"projekt.{'beton' if art == 'beton' else 'stahl'}(...)."))
+        return vorhanden[0].kennung
+
+    def rechnen(self) -> "Ergebnis":
+        """
+        Alles rechnen, was die Oberflaeche auch rechnet -- ohne sie.
+
+        Dieselben Ziele in derselben Reihenfolge (:meth:`Aufbau.alle_ziele`),
+        also derselbe Bericht. Ohne Zwischenspeicher: der lohnt sich erst,
+        wenn man dieselbe Platte hundertmal rechnet.
+        """
+        from opencivil.ergebnis import Ergebnis
+
+        aufbau = self.aufbauen()
+        return Ergebnis(projekt=self, aufbau=aufbau,
+                        loesung=aufbau.werk.loese(*aufbau.alle_ziele()))
+
     # -- Pruefung -----------------------------------------------------------
 
     def pruefen(self) -> None:
@@ -1238,7 +1441,7 @@ class Projekt(Beschreibung):
             # Die abgeleiteten Faelle tragen den Namen ihrer Kombination mit
             # angehaengtem Anteil. Wer einen eigenen Lastfall genau so nennt,
             # traefe denselben Schluessel.
-            abgeleitet = [abgeleiteter_name(k.name, anteil)
+            abgeleitet = [abgeleiteter_fallname(k.name, anteil)
                           for k in eintrag.kombinationen]
             for h in eigene:
                 if h.name in abgeleitet:
@@ -1600,7 +1803,7 @@ class Projekt(Beschreibung):
         faktor = anteil / 100.0
         abgeleitet = [
             Gebrauchsfall(
-                name=abgeleiteter_name(k.name, anteil),
+                name=abgeleiteter_fallname(k.name, anteil),
                 M_Ed=Groesse(faktor * k.M_Ed, KNM),
                 N_Ed=Groesse(faktor * k.N_Ed, KN))
             for k in eintrag.kombinationen if k.aktiv
@@ -1701,37 +1904,24 @@ class Projekt(Beschreibung):
 
     @classmethod
     def beispiel(cls) -> "Projekt":
-        """Ein lauffähiges Beispiel, damit die Oberfläche nicht leer startet."""
-        def lage(phi: float, zulage: float = 0.0) -> LageEintrag:
-            return LageEintrag(
-                stahl="s1",
-                grund=PostenEintrag(durchmesser=phi, abstand=150.0),
-                zulage=PostenEintrag(durchmesser=zulage, abstand=150.0),
-            )
+        """
+        Ein lauffähiges Beispiel, damit die Oberfläche nicht leer startet.
 
-        return cls(
-            name="Beispiel – Decke über EG",
-            materialien=[
-                MaterialEintrag(kennung="b1", art="beton", sorte="C30/37", name="C30/37"),
-                MaterialEintrag(kennung="s1", art="betonstahl", sorte="B500B", name="B500B"),
-            ],
-            querschnitte=[QuerschnittEintrag(
-                kennung="q1", name="Decke über EG", beton="b1",
-                h=300.0, b=1000.0,
-                # Aussen y, innen x -- der übliche Fall: die Querrichtung
-                # läuft unten und oben durch, die Tragrichtung liegt dazwischen
-                # und verliert dadurch statische Höhe.
-                richtung_lage1="y", richtung_lage4="y",
-                lagen=[
-                    lage(12.0),                # 1. Lage y, unten aussen
-                    lage(18.0, zulage=12.0),   # 2. Lage x, mit Zulage
-                    lage(12.0),                # 3. Lage x
-                    lage(12.0),                # 4. Lage y, oben aussen
-                ],
-                # Die Werte sind so gewählt, dass das Beispiel grün startet.
-                kombinationen=[
-                    KombinationEintrag(name="Feld", M_Ed=100.0, N_Ed=0.0),
-                    KombinationEintrag(name="Feld mit Druck", M_Ed=100.0, N_Ed=-300.0),
-                    KombinationEintrag(name="Stütze", M_Ed=-50.0, N_Ed=0.0),
-                ])],
-        )
+        Gebaut über dieselben Methoden, die man ohne Oberfläche benutzt. So
+        steht die Fassade an einer Stelle vorgeführt -- und der
+        Schnappschuss-Test prüft sie mit: baute sie etwas anderes als die
+        Einträge von Hand, die hier vorher standen, änderte sich der Bericht.
+        """
+        projekt = cls(name="Beispiel – Decke über EG")
+        projekt.beton("C30/37")
+        projekt.stahl("B500B")
+        # Aussen y, innen x -- der übliche Fall: die Querrichtung läuft unten
+        # und oben durch, die Tragrichtung liegt dazwischen und verliert
+        # dadurch statische Höhe. Die 2. Lage trägt eine Zulage.
+        platte = projekt.platte("Decke über EG", h=300,
+                                x=[18, 12], x_zulage=[12, 0], y=[12, 12])
+        # Die Werte sind so gewählt, dass das Beispiel grün startet.
+        platte.einwirkung("Feld", M_Ed=100.0)
+        platte.einwirkung("Feld mit Druck", M_Ed=100.0, N_Ed=-300.0)
+        platte.einwirkung("Stütze", M_Ed=-50.0)
+        return projekt

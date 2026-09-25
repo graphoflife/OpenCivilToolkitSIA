@@ -13,6 +13,7 @@
     "opencivil/core/protokoll.py",
     "opencivil/core/rechenwerk.py",
     "opencivil/core/wert.py",
+    "opencivil/ergebnis.py",
     "opencivil/material/__init__.py",
     "opencivil/material/basis.py",
     "opencivil/material/beton.py",

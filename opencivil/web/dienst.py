@@ -141,8 +141,7 @@ def rechnen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
         # aufzubewahren waere der Weg zu Zahlen, die niemand erklaeren kann.
         return api.loesung_dict(aufbau.werk.loese(*gewaehlt), aufbau, gewaehlt)
 
-    if not (aufbau.materialziele() + aufbau.eckwertziele()
-            + aufbau.alle_nachweisziele()):
+    if not aufbau.alle_ziele():
         # Kein Nachweis vorhanden -- dann wenigstens alle Materialkennwerte.
         return api.loesung_dict(aufbau.werk.loese_alles(), aufbau, ())
 

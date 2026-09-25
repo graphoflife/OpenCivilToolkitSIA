@@ -25,7 +25,7 @@ CPython rund 25 ms; im Browser ist es etwa das Anderthalbfache.
 ```bash
 python3 start_ui.py          # Oberfläche auf http://127.0.0.1:8080
 python3 demo_material.py     # Kern allein: Kennwerte, Rückverfolgung, Überschreiben
-python3 demo_nachweis.py     # Kern allein: Querschnitt, M-N-Nachweis, Bericht
+python3 demo_nachweis.py     # Kern allein: Platte beschreiben, rechnen, Bericht
 python3 -m unittest discover -s tests -t .
 ```
 
@@ -35,6 +35,36 @@ TeX-Maschine zu PDF übersetzen. Sonst ist er dasselbe: beide Wege rufen
 
 Kein Fremdpaket, nirgends — es genügt ein `python3`. KaTeX und Pyodide liegen
 unter `web/vendor/` bei, damit die Seite ohne fremden Dienst auskommt.
+
+## In Python, ohne Oberfläche
+
+```python
+from opencivil import Projekt
+
+p = Projekt("Decke über EG")
+p.beton("C30/37")
+p.stahl("B500B")
+
+# Masse in mm; je Richtung zwei Durchmesser, unten und oben.
+# x liegt innen (2. und 3. Lage), y aussen.
+q = p.platte("Decke", h=300, x=[18, 12], x_zulage=[12, 0], y=[12, 12],
+             teilung=150, rissanforderung="erhoeht")
+q.einwirkung("Feld", M_Ed=150, V_Ed=80)       # kNm, kN, kN/m; Zug positiv
+q.quasistaendiger_lastfall("Dauerlast", M_Ed=80)
+q.duktilitaet = True                          # alles Weitere am Eintrag selbst
+
+ergebnis = p.rechnen()
+print(ergebnis.zusammenfassung())             # je Platte eine Tabelle
+ergebnis.erfuellt                             # True / False
+ergebnis.bericht()                            # der ganze Bericht mit Herleitung
+ergebnis.latex("ausgabe/decke")               # .tex, mit pdf=True auch PDF
+p.speichern("decke.json")                     # lässt sich in der Oberfläche öffnen
+```
+
+Es ist dieselbe Beschreibung, die die Oberfläche speichert, und dieselbe
+Rechnung: `p.rechnen()` liefert dieselben Urteile wie die Maske, und
+`Projekt.beispiel()` ist selbst so gebaut. Ein vertipptes Feld
+(`riss_anforderung=...`) wird gemeldet, nicht still übergangen.
 
 ## Speichern
 

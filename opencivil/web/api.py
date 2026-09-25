@@ -845,8 +845,7 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
     ergebnis: Dict[str, Any] = {}
     for kennung, qs in aufbau.querschnitte.items():
         def eigene(urteile):
-            return [u for u in urteile
-                    if u.raum == qs.id or u.raum.startswith(f"{qs.id}.")]
+            return aufbau.urteile_von(kennung, urteile)
 
         # Beides kommt fertig aus der Loesung: ohne die stillen, und je
         # Nachweis, der seine Lagen sammelt, nur die schlechteste. Hier zu

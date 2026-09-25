@@ -19,14 +19,15 @@ EIGENSTAENDIG NUTZBAR::
 from __future__ import annotations
 
 import shutil
-from typing import Iterable, List, Optional, TextIO
+from typing import Iterable, List, Optional, Sequence, TextIO
 
 from opencivil.core.protokoll import (
     Block, GleichungBlock, HinweisArt, HinweisBlock, Protokoll, TabellenBlock,
     TextBlock, TitelBlock, UnterprotokollBlock,
 )
+from opencivil.core.berechnung import NachweisUrteil
 from opencivil.core.rechenwerk import Loesung
-from opencivil.core.wert import Quelle
+from opencivil.core.wert import Quelle, Wert
 
 _BREITE = min(shutil.get_terminal_size((100, 24)).columns, 100)
 
@@ -109,13 +110,24 @@ def protokoll_zeilen(protokoll: Protokoll, einzug: int = 0) -> List[str]:
 
 
 def _tabelle_zeilen(block: TabellenBlock, einzug: int) -> List[str]:
-    """Setzt die Tabelle als Text -- Spaltenbreiten nach dem laengsten Eintrag."""
+    """
+    Setzt die Tabelle als Text -- Spaltenbreiten nach dem laengsten Eintrag.
+
+    Zahlen rechts, Text links, wenn die Tabelle es sagt (``ausrichtung`` wie
+    in LaTeX, ``l``, ``c`` oder ``r`` je Spalte). Ohne Angabe alles rechts.
+    Frueher galt immer rechts, auch wo die Tabelle ``l`` verlangte -- im
+    LaTeX-Dokument stand sie richtig, auf der Konsole nicht.
+    """
+    setzen = {"l": str.ljust, "c": str.center}
     alle = [list(block.kopf)] + [list(z) for z in block.zeilen]
     breiten = [max(len(z[i]) for z in alle) for i in range(len(block.kopf))]
+    ausrichtung = (block.ausrichtung or "").ljust(len(breiten), "r")
     vorspann = " " * einzug
 
     def zeile(zellen: Iterable[str]) -> str:
-        return vorspann + "  ".join(t.rjust(b) for t, b in zip(zellen, breiten))
+        return (vorspann + "  ".join(
+            setzen.get(a, str.rjust)(t, b)
+            for t, b, a in zip(zellen, breiten, ausrichtung))).rstrip()
 
     ausgabe = [zeile(block.kopf), vorspann + "  ".join("-" * b for b in breiten)]
     ausgabe.extend(zeile(z) for z in block.zeilen)
@@ -198,14 +210,70 @@ def _abschnitt_nachweise(loesung: Loesung) -> List[str]:
                   else "Mindestens ein Nachweis ist nicht erfüllt.")
         zeilen.extend(["", f"  {gesamt}"])
 
-    if maengel:
-        zeilen.extend(["", "  Nicht geführt, geht aber nicht auf:"])
-        for urteil in maengel:
-            zeilen.append(
-                f"    {urteil.name.ljust(38)} Erfüllungsgrad "
-                f"{urteil.gradtext().rjust(8)}"
-            )
+    return zeilen + _maengelzeilen(maengel)
+
+
+def _maengelzeilen(maengel: Sequence[NachweisUrteil]) -> List[str]:
+    """Was ausgeschaltet ist und nicht aufgeht -- unter der Liste der gefuehrten."""
+    if not maengel:
+        return []
+    zeilen = ["", "  Nicht geführt, geht aber nicht auf:"]
+    for urteil in maengel:
+        zeilen.append(
+            f"    {urteil.name.ljust(38)} Erfüllungsgrad "
+            f"{urteil.gradtext().rjust(8)}"
+        )
     return zeilen
+
+
+def _wert_text(wert: Optional[Wert]) -> str:
+    """Zahl und Einheit, ohne Formelzeichen -- die Spalte sagt, was es ist."""
+    if wert is None:
+        return "–"
+    einheit = wert.einheit.beschriftung if wert.einheit.name not in ("", "-") else ""
+    return f"{wert.formatiert()} {einheit}".rstrip()
+
+
+def zusammenfassung(aufbau, loesung: Loesung) -> str:
+    """
+    Je Platte eine Tabelle der Nachweise -- die Zusammenfassung der
+    Oberflaeche, fuer die Konsole.
+
+    Dieselben Urteile wie dort: die gefuehrten aus der Loesung, bei
+    Nachweisen je Lage nur die schlechtere, und darunter, was still nicht
+    aufgeht. Je Platte eine eigene Tabelle, weil die Urteilsnamen die Platte
+    nicht nennen -- zwei Platten mit einer Kombination «Feld» stuenden sonst
+    als zwei gleiche Zeilen da.
+
+    ``aufbau`` ist ein :class:`opencivil.projekt.Aufbau`; von dort kommen die
+    Plattennamen und die Zuordnung der Urteile.
+    """
+    zeilen: List[str] = []
+    for kennung, qs in aufbau.querschnitte.items():
+        gefuehrt = aufbau.urteile_von(kennung, loesung.gefuehrte_urteile)
+        maengel = aufbau.urteile_von(kennung, loesung.stille_maengel)
+        zeilen += [qs.name, "-" * len(qs.name)]
+        if gefuehrt:
+            tabelle = TabellenBlock(
+                kopf=["Nachweis", "Fall", "Widerstand", "Einwirkung", "α_eff", ""],
+                zeilen=[[u.langname or u.art or u.name, u.fall or "–",
+                         _wert_text(u.widerstand), _wert_text(u.einwirkung),
+                         u.gradtext(),
+                         "erfüllt" if u.erfuellt else "NICHT ERFÜLLT"]
+                        for u in gefuehrt],
+                ausrichtung="llrrrl")
+            zeilen += _tabelle_zeilen(tabelle, 2)
+        else:
+            zeilen.append("  Kein Nachweis geführt.")
+        zeilen += _maengelzeilen(maengel) + [""]
+
+    if loesung.gefuehrte_urteile:
+        zeilen.append("Alle geführten Nachweise erfüllt."
+                      if loesung.alle_nachweise_erfuellt
+                      else "Mindestens ein Nachweis ist NICHT erfüllt.")
+    if aufbau.warnungen:
+        zeilen += ["", "Hinweise:"] + [f"  - {w}" for w in aufbau.warnungen]
+    return "\n".join(zeilen).rstrip() + "\n"
 
 
 def _abschnitt_luecken(loesung: Loesung) -> List[str]:
