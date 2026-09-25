@@ -117,6 +117,17 @@ class TestProbe(unittest.TestCase):
 
 
 class TestGrenzen(unittest.TestCase):
+    def test_ohne_einwirkung_ist_die_ebene_null(self):
+        """
+        Exakt null, nicht bis auf die Schranke der Bisektion: der Rest von
+        1e-11 gab als Stahlspannung von einem Pascal einen Erfüllungsgrad
+        von 3·10⁸ statt ∞.
+        """
+        e = elastischer_loeser().loese(N_Ed=0.0, M_Ed=0.0)
+        self.assertTrue(e.konvergiert)
+        self.assertEqual((e.eps_m, e.chi), (0.0, 0.0))
+        self.assertEqual(max(e.sigma_s), 0.0)
+
     def test_ueberforderter_querschnitt_meldet_sich(self):
         """
         Kein Ergebnis ist besser als ein erfundenes: wo kein Gleichgewicht

@@ -105,6 +105,19 @@ class TestSpannungsbegrenzung(unittest.TestCase):
                          ["Gebrauch"])
         self.assertIn("Feld (70 %)", [e.fall.name for e in spannung.ergebnisse])
 
+    def test_ohne_moment_ist_der_grad_unendlich(self):
+        """Nichts wirkt, also nichts zu begrenzen -- ∞, keine Zahl aus dem Rundungsrest."""
+        from opencivil.projekt import GebrauchsfallEintrag
+
+        projekt = self.projekt("hoch")
+        q = projekt.querschnitte[0]
+        q.haeufig.aus_tragsicherheit = False
+        q.haeufig.faelle = [GebrauchsfallEintrag("Leer", M_Ed=0.0, N_Ed=0.0)]
+        aufbau, _ = urteile(projekt)
+        leer = next(e for e in aufbau.spannung["q1.x"].ergebnisse if e.fall.name == "Leer")
+        self.assertEqual(leer.erfuellungsgrad, float("inf"))
+        self.assertTrue(leer.erfuellt)
+
     def test_mehr_moment_gibt_mehr_spannung(self):
         wenig = self.projekt("hoch")
         viel = self.projekt("hoch")

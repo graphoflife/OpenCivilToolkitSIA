@@ -343,6 +343,12 @@ class Querschnittsloeser:
         gegen ``M_Ed`` gehalten. ``M(chi)`` waechst monoton -- mehr Kruemmung
         heisst mehr Moment --, solange der Querschnitt nicht versagt.
         """
+        # Ohne Einwirkung ist die Ebene exakt null. Die Bisektion faende sie
+        # nur bis auf ihre Schranken -- ein Rest von 1e-11, der als
+        # Stahlspannung von einem Pascal einen Erfuellungsgrad von 3e8 ergab.
+        if N_Ed == 0.0 and M_Ed == 0.0:
+            return self._ergebnis(0.0, 0.0)
+
         def moment(chi: float) -> Optional[float]:
             eps_m = self._eps_zu_normalkraft(chi, N_Ed)
             if eps_m is None:

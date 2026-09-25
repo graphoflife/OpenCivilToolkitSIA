@@ -683,6 +683,25 @@ class TestErfuellungsgrad(unittest.TestCase):
         # Derselbe Punkt liegt drin -- unabhängig vom Massstab.
         self.assertTrue(loesung.alle_nachweise_erfuellt)
 
+    def test_widerstand_durch_einwirkung_ist_der_grad(self):
+        """
+        In jedem Massstab, auch beim kürzesten Abstand: dort sind es Längen
+        im normierten Diagramm. Vorher stand das Moment des nächsten Punkts
+        gegen M_Ed da -- 175.1 / 150, wo der Grad 1.40 war.
+        """
+        kombinationen = [
+            Schnittgroessen(art.value, M_Ed=Groesse(100, KNM), N_Ed=Groesse(-500, KN),
+                            art=art)
+            for art in (Erfuellungsart.NORMALKRAFT_KONSTANT,
+                        Erfuellungsart.MOMENT_KONSTANT, Erfuellungsart.NAECHSTER_PUNKT)
+        ]
+        _, loesung = self._pruefe(kombinationen)
+        for u in loesung.urteile:
+            with self.subTest(fall=u.fall):
+                self.assertAlmostEqual(
+                    u.widerstand.groesse.si / u.einwirkung.groesse.si,
+                    u.erfuellungsgrad.si, places=9)
+
     def test_automatisch_ist_der_standard(self):
         """Der ungünstigere der beiden Massstäbe wird selbst gefunden."""
         self.assertIs(
