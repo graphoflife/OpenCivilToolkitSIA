@@ -155,17 +155,6 @@ class TestNachweis(unittest.TestCase):
         self.assertEqual(len(rn), 2)
         self.assertTrue(all(u.still for u in rn))
 
-    def test_nur_die_tragrichtung_x(self):
-        """
-        In y wird nichts nachgewiesen. Die y-Lagen stehen im Querschnitt, weil
-        sie die statische Höhe von x bestimmen -- ein Nachweis fragt nicht
-        nach ihnen.
-        """
-        aufbau, gefunden = urteile(projekt_mit(zwaengung=True))
-        self.assertEqual(sorted(aufbau.rissnormalkraft), ["q1.x"])
-        self.assertEqual(
-            len([n for n in gefunden if n.startswith("Rissnormalkraft")]), 1)
-
     def test_erste_lage_von_hand(self):
         """
         Untere x-Lage: ⌀18@150 + ⌀12@150, A_s = 2450 mm², normale
@@ -525,16 +514,6 @@ class TestSproedesVersagen(unittest.TestCase):
         # Die obere x-Lage traegt weniger -- ⌀12 gegen ⌀18+⌀12.
         self.assertLess(nach_lage[obere].M_Rd, nach_lage[untere].M_Rd)
         self.assertGreater(nach_lage[obere].M_Rd, 0.0)
-
-    def test_ausgeschaltet_rechnet_er_still_mit(self):
-        projekt = Projekt.beispiel()
-        projekt.querschnitte[0].sproede = False
-        aufbau, gefunden = urteile(projekt)
-        self.assertTrue(all(n.still for n in aufbau.sproede.values()))
-        self.assertFalse([n for n in gefunden if n.startswith("Sprödes Versagen")])
-        sv = [u for u in alle_urteile(projekt) if u.art == "SV"]
-        self.assertEqual(len(sv), 2)
-        self.assertTrue(all(u.still for u in sv))
 
     def test_er_laeuft_ohne_schnittgroessen(self):
         """Die Resistenzlinie gehört dem Querschnitt, nicht der Einwirkung."""

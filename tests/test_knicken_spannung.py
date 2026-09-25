@@ -4,7 +4,6 @@ import unittest
 
 from opencivil.nachweis import knicken as knick_modul
 from opencivil.projekt import KnickEintrag, Projekt
-from opencivil.web import dienst
 
 
 def urteile(projekt: Projekt):

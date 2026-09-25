@@ -6,8 +6,8 @@ import unittest
 from opencivil.core.einheiten import (
     CM2, DIMENSIONSLOS, EINHEITSLOS, GRAD, KG_PRO_M3, KN, KNM, KNM_PRO_M, KN_PRO_M,
     M, MM, MM2, MPA, N, N_PRO_MM2, PROMILLE, PROZENT, SPANNUNG,
-    DimensionsFehler, Dimension, Einheit, Groesse,
-    einheit, empirisch, null, summe,
+    DimensionsFehler, Dimension, Groesse,
+    einheit, empirisch, summe,
 )
 
 

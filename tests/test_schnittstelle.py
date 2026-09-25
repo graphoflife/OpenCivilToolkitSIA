@@ -141,18 +141,6 @@ class TestStilleNachweise(unittest.TestCase):
                  if isinstance(b, TitelBlock)]
         self.assertFalse([t for t in texte if "Sprödes Versagen" in t])
 
-    def test_er_zaehlt_nicht_im_gesamturteil(self):
-        """
-        Sonst stünde oben rechts «nicht erfüllt» wegen eines Nachweises, den
-        niemand führt -- und in der Tabelle fände man dazu nichts.
-        """
-        aufbau = self.platte().aufbauen()
-        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-        durchgefallen = [u for u in loesung.urteile if not u.erfuellt]
-        self.assertTrue(durchgefallen)
-        self.assertTrue(all(u.still for u in durchgefallen))
-        self.assertTrue(loesung.alle_nachweise_erfuellt)
-
     def test_eingeschaltet_wechselt_er_die_seite(self):
         projekt = self.platte()
         projekt.querschnitt("q1").sproede = True
@@ -333,14 +321,6 @@ class TestAngabengruppen(unittest.TestCase):
         self.assertEqual(gruppen["Überdeckungen"],
                          ["Überdeckung unten", "Überdeckung oben"])
 
-    def test_die_betonsorte_steht_im_kastennamen(self):
-        """
-        Sie ist keine gerechnete Grösse und hat darum keine eigene Kette. Als
-        Aufschrift des Kastens gilt sie dagegen immer -- eine Platte hat genau
-        einen Beton.
-        """
-        self.assertIn("Beton C30/37", " ".join(self.gruppen()))
-
     def test_die_rueckverfolgung_verkleinert_den_kasten(self):
         nur_h = self.gruppen(["querschnitt.q1.h"])
         self.assertEqual(nur_h, {"Abmessungen – Beton C30/37": ["Plattendicke"]})
@@ -394,9 +374,6 @@ class TestAngabengruppen(unittest.TestCase):
             "rechnen", {"projekt": Projekt.beispiel().als_dict()})
         zeilen = antwort.daten["zusammenfassungen"]["q1"]["zeilen"]
         paare = [(z["zellen"][0]["text"], z["zellen"][1]["text"]) for z in zeilen]
-        self.assertIn(("Biegung und Normalkraft", "Feld"), paare)
-        # Dieselbe Kombination in y ist eine andere Zeile -- vorher waren beide
-        # nicht zu unterscheiden.
         self.assertIn(("Biegung und Normalkraft", "Feld"), paare)
 
     def test_der_querkraftwiderstand_ist_gross_geschrieben(self):

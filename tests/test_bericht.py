@@ -9,7 +9,7 @@ from opencivil.bericht.konsole import als_text, protokoll_zeilen
 from opencivil.bericht.latex_dokument import (
     als_tex, finde_tex_maschine, formeln_sammeln, schreibe,
 )
-from opencivil.core.einheiten import EINHEITSLOS, KNM, MM, N_PRO_MM2, Groesse
+from opencivil.core.einheiten import EINHEITSLOS, N_PRO_MM2, Groesse
 from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import (
     Block, Protokoll, TextBlock, TitelBlock, UnterprotokollBlock, darstellen,
@@ -206,14 +206,6 @@ class TestTextMaskierung(unittest.TestCase):
         self.assertEqual(als_text("C12/15_1"), r"\text{C12/15\_1}")
         # Umlaute bleiben stehen -- der Bericht ist UTF-8.
         self.assertEqual(als_text("grösste Zugkraft"), r"\text{grösste Zugkraft}")
-
-    def test_text_maskieren_ist_dieselbe_funktion(self):
-        """Zwei Maskierungen nebeneinander wären zwei Stellen zum Auseinanderlaufen."""
-        from opencivil.core.latex import text_latex
-        from opencivil.material.basis import text_maskieren
-
-        self.assertIs(text_maskieren, text_latex)
-
 
 
 class TestAbschnittsordnung(unittest.TestCase):

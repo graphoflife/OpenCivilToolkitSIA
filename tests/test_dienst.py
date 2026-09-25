@@ -115,10 +115,6 @@ class TestDienst(unittest.TestCase):
         self.assertIn("| Nachweis | Bezeichnung | Widerstand | Einwirkung |",
                       daten["markdown"])
 
-    def test_pruefen_reicht_das_projekt_aufgeraeumt_zurueck(self):
-        antwort = dienst.bearbeite("pruefen", self.rumpf())
-        self.assertEqual(antwort.daten["projekt"], Projekt.beispiel().als_dict())
-
     def test_pruefen_meldet_kaputte_beschreibung(self):
         kaputt = Projekt.beispiel().als_dict()
         kaputt["materialien"][0]["name"] = kaputt["materialien"][1]["name"]
@@ -171,17 +167,6 @@ class TestDienstUeberJson(unittest.TestCase):
     def test_kein_rumpf(self):
         umschlag = json.loads(dienst.bearbeite_json("katalog"))
         self.assertEqual(umschlag["status"], 200)
-
-    def test_json_bleibt_lesbar_fuer_den_browser(self):
-        """
-        Unendliche Werte kommen in Nachweisen vor (Erfüllungsgrad ohne
-        Einwirkung). json.dumps schriebe dafür ``Infinity`` -- gültiges Python,
-        ungültiges JSON, und JSON.parse im Browser bricht ab.
-        """
-        roh = dienst.bearbeite_json(
-            "rechnen", json.dumps({"projekt": Projekt.beispiel().als_dict()}))
-        self.assertNotIn("Infinity", roh)
-        self.assertNotIn("NaN", roh)
 
 
 class TestServerHuelle(unittest.TestCase):

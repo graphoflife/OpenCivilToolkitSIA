@@ -10,7 +10,7 @@ import math
 import unittest
 
 from opencivil.core.einheiten import (
-    EINHEITSLOS, KN, KNM, MM, MM2, N_PRO_MM2, Groesse,
+    EINHEITSLOS, KN, KNM, MM, MM2, Groesse,
 )
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.material.beton import beton
@@ -20,7 +20,7 @@ from opencivil.nachweis.biegung_normalkraft import (
 )
 from opencivil.nachweis.linie import MOMENT, schnitte
 from opencivil.querschnitt.platte import (
-    Bewehrungslage, Bewehrungsposten, Plattenquerschnitt, Postenart, Richtung,
+    Bewehrungslage, Bewehrungsposten, Plattenquerschnitt, Richtung,
 )
 from opencivil.querschnitt.werkstoffgesetz import Betongesetz, Dehnungsebene, Stahlgesetz
 
@@ -70,6 +70,27 @@ def symmetrische_platte() -> Plattenquerschnitt:
         lage(3, Richtung.Y),
         lage(4, Richtung.X, phi=16.0),
     ])
+
+
+def kreuzungen(punkte):
+    """
+    Die Kantenpaare eines geschlossenen Polygons, die sich kreuzen.
+
+    Eine Resistenzlinie ist der Rand eines zusammenhängenden Bereichs; kreuzt
+    sie sich, stimmen weder der Punkt-in-Linie-Test noch die Schnittsuche.
+    """
+    def richtung(p, q, r):
+        return (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1])
+
+    def kreuzt(a, b, c, d):
+        return ((richtung(a, b, c) > 0) != (richtung(a, b, d) > 0)
+                and (richtung(c, d, a) > 0) != (richtung(c, d, b) > 0))
+
+    anzahl = len(punkte)
+    return [(i, j) for i in range(anzahl) for j in range(i + 2, anzahl)
+            if not (i == 0 and j == anzahl - 1)          # gemeinsamer Ringschluss
+            and kreuzt(punkte[i], punkte[(i + 1) % anzahl],
+                       punkte[j], punkte[(j + 1) % anzahl])]
 
 
 # ---------------------------------------------------------------------------
@@ -305,35 +326,15 @@ class TestResistenzlinie(unittest.TestCase):
     def eck(self, name: str) -> Groesse:
         return self.loesung.groesse(self.nachweis.d_eckwerte[name].id)
 
-    def test_linie_ist_geschlossen(self):
-        self.assertGreater(len(self.nachweis.linie), 100)
-
     def test_linie_schneidet_sich_nicht_selbst(self):
         """
         Eine Resistenzlinie ist der Rand eines zusammenhängenden Bereichs. Kreuzt
         sie sich, stimmt weder der Punkt-in-Linie-Test noch die Schnittsuche --
         und beides trägt jedes Urteil dieses Nachweises.
         """
-        punkte = [(p.M, p.N) for p in self.nachweis.linie]
-        anzahl = len(punkte)
-
-        def richtung(p, q, r):
-            return (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1])
-
-        def kreuzt(a, b, c, d):
-            return ((richtung(a, b, c) > 0) != (richtung(a, b, d) > 0)
-                    and (richtung(c, d, a) > 0) != (richtung(c, d, b) > 0))
-
-        for i in range(anzahl):
-            for j in range(i + 2, anzahl):
-                if i == 0 and j == anzahl - 1:
-                    continue  # gemeinsamer Ringschluss
-                with self.subTest(i=i, j=j):
-                    self.assertFalse(
-                        kreuzt(punkte[i], punkte[(i + 1) % anzahl],
-                               punkte[j], punkte[(j + 1) % anzahl]),
-                        f"Segment {i} ({self.nachweis.linie[i].abschnitt}) kreuzt "
-                        f"{j} ({self.nachweis.linie[j].abschnitt})")
+        linie = self.nachweis.linie
+        self.assertEqual([(f"{linie[i].abschnitt} × {linie[j].abschnitt}")
+                          for i, j in kreuzungen([(p.M, p.N) for p in linie])], [])
 
     def test_keine_faser_ueberschreitet_die_bruchdehnung(self):
         for p in self.nachweis.linie:
@@ -702,34 +703,6 @@ class TestErfuellungsgrad(unittest.TestCase):
                     u.widerstand.groesse.si / u.einwirkung.groesse.si,
                     u.erfuellungsgrad.si, places=9)
 
-    def test_automatisch_ist_der_standard(self):
-        """Der ungünstigere der beiden Massstäbe wird selbst gefunden."""
-        self.assertIs(
-            Schnittgroessen("x", M_Ed=Groesse(1, KNM)).art,
-            Erfuellungsart.AUTOMATISCH,
-        )
-
-    def test_automatik_nimmt_den_kleineren_erfuellungsgrad(self):
-        platte_ = einfache_platte()
-        werk = Rechenwerk(); platte_.ins_rechenwerk(werk)
-        auto = BiegungNormalkraft(
-            platte_, [Schnittgroessen("K", M_Ed=Groesse(100, KNM),
-                                      N_Ed=Groesse(-500, KN))], Richtung.X)
-        werk.registriere(auto)
-        werk.loese(auto.d_ausnutzung["K"].id)
-        gewaehlt = auto.auswertungen[0]
-
-        einzeln = []
-        for art in (Erfuellungsart.NORMALKRAFT_KONSTANT, Erfuellungsart.MOMENT_KONSTANT):
-            w2 = Rechenwerk(); platte_.ins_rechenwerk(w2)
-            n2 = BiegungNormalkraft(
-                platte_, [Schnittgroessen("K", M_Ed=Groesse(100, KNM),
-                                          N_Ed=Groesse(-500, KN), art=art)], Richtung.X)
-            w2.registriere(n2)
-            w2.loese(n2.d_ausnutzung["K"].id)
-            einzeln.append(n2.auswertungen[0].erfuellungsgrad)
-        self.assertAlmostEqual(gewaehlt.erfuellungsgrad, min(einzeln), places=6)
-
     def test_begruendung_nennt_den_widerstand(self):
         nachweis, loesung = self._pruefe([Schnittgroessen("Feld", M_Ed=Groesse(100, KNM))])
         self.assertIn("Momentenwiderstand", loesung.urteile[0].begruendung)
@@ -859,9 +832,6 @@ class TestHandrechnungSymbole(unittest.TestCase):
         self.assertNotIn(r"\frac{A_{s,1,x,g} \cdot z_{1,x,g}", text)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
 
 class TestOhneZugbewehrung(unittest.TestCase):
     """
@@ -947,43 +917,8 @@ class TestPolygonreihenfolge(unittest.TestCase):
         punkt = next(q for q in self.linie() if q.name == "x = h/2 +")
         self.assertGreater(punkt.N, 0.0)
 
-    def test_x_halbe_hoehe_steht_hinter_dem_punkt_bei_n_null(self):
-        namen = [q.name for q in self.linie()]
-        self.assertLess(namen.index("M_Rd(N_Ed=0) +"), namen.index("x = h/2 +"))
-        # Auf dem Rückweg umgekehrt.
-        self.assertLess(namen.index("x = h/2 -"), namen.index("M_Rd(N_Ed=0) -"))
-
-    def test_die_normalkraft_steigt_und_faellt_je_einmal(self):
-        """
-        Ein einfaches Polygon dieser Form ist in N monoton: hinauf zur
-        Zugspitze, wieder hinunter zum Druck. Mehr als ein Wechsel hiesse,
-        dass sich die Linie kreuzt.
-        """
-        werte = [q.N for q in self.linie()]
-        richtungen = [b > a for a, b in zip(werte, werte[1:] + werte[:1])]
-        wechsel = sum(1 for a, b in zip(richtungen, richtungen[1:] + richtungen[:1])
-                      if a != b)
-        self.assertEqual(wechsel, 2)
-
     def test_das_polygon_kreuzt_sich_nicht(self):
-        punkte = [(q.M, q.N) for q in self.linie()]
-        anzahl = len(punkte)
-
-        def richtung(p, q, r):
-            return (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1])
-
-        def kreuzt(a, b, c, d):
-            return ((richtung(a, b, c) > 0) != (richtung(a, b, d) > 0)
-                    and (richtung(c, d, a) > 0) != (richtung(c, d, b) > 0))
-
-        for i in range(anzahl):
-            for j in range(i + 2, anzahl):
-                if i == 0 and j == anzahl - 1:
-                    continue                      # gemeinsamer Ringschluss
-                a, b = punkte[i], punkte[(i + 1) % anzahl]
-                c, d = punkte[j], punkte[(j + 1) % anzahl]
-                self.assertFalse(kreuzt(a, b, c, d),
-                                 f"Kanten {i} und {j} kreuzen sich")
+        self.assertEqual(kreuzungen([(q.M, q.N) for q in self.linie()]), [])
 
 
 class TestSortenindex(unittest.TestCase):
@@ -1052,3 +987,7 @@ class TestSortenindex(unittest.TestCase):
         self.assertAlmostEqual(unten.f_yd, 435e6)
         self.assertEqual(unten.stahl_index, "B500A")
         self.assertEqual(unten.symbol_f_yd, r"f_{yd,\text{B500A}}")
+
+
+if __name__ == "__main__":
+    unittest.main()

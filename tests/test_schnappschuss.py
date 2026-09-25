@@ -23,7 +23,6 @@ etwas geändert hat, nicht ob es richtig ist. Aber er lässt nichts durch.
 """
 
 import functools
-import os
 import re
 import sys
 import unittest

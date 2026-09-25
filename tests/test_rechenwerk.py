@@ -21,7 +21,7 @@ from opencivil.core.latex import (
 )
 from opencivil.core.protokoll import GleichungBlock, Protokoll, StillesProtokoll, TabellenBlock
 from opencivil.core.rechenwerk import Rechenwerk, RechenwerkFehler, ZyklusFehler
-from opencivil.core.wert import Quelle, Wert, WertDef
+from opencivil.core.wert import Quelle, WertDef
 
 # ---------------------------------------------------------------------------
 # Gemeinsame Definitionen

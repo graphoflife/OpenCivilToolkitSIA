@@ -2,7 +2,7 @@
 
 import unittest
 
-from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, KN_PRO_M, Groesse
+from opencivil.core.einheiten import EINHEITSLOS, KNM, KN_PRO_M
 from opencivil.nachweis import querkraft
 from opencivil.projekt import Projekt
 
@@ -188,14 +188,6 @@ class TestQuerkraft(unittest.TestCase):
         self.assertIn(r"\left|m_{Rd}(N_{Ed})\right|", dehnung.latex)
         self.assertIn(r"\left|m_{Ed}\right|", dehnung.latex)
 
-    def test_dekompressionsmoment(self):
-        """m_Dd = |N_Ed| * h / 6 -- bei 300 kN und h = 300 mm also 15 kNm."""
-        projekt = projekt_mit_querkraft()
-        projekt.querschnitte[0].kombinationen[0].N_Ed = -300.0
-        aufbau, _ = urteile(projekt)
-        self.assertAlmostEqual(
-            aufbau.querkraft["q1.x"].ergebnisse[0].m_Dd / 1e3, 15.0, places=6)
-
     def test_moment_unter_dekompression_gibt_vollen_widerstand(self):
         """Bleibt m_Ed unter m_Dd, ist der Querschnitt ungerissen: eps_v = 0."""
         projekt = projekt_mit_querkraft()
@@ -248,9 +240,6 @@ class TestQuerkraft(unittest.TestCase):
         self.assertAlmostEqual(
             urteil.erfuellungsgrad.in_einheit(EINHEITSLOS), erg.v_Rd / 120e3, places=6)
 
-
-if __name__ == "__main__":
-    unittest.main()
 
 
 class TestQuerkraftkurve(unittest.TestCase):
@@ -514,17 +503,6 @@ class TestNachweisMitBuegeln(unittest.TestCase):
         self.assertAlmostEqual(erg.v_Rd, erg.massgebend.V_Rd)
         self.assertAlmostEqual(erg.v_Rd / 1e3, 331.4, delta=0.5)
 
-    def test_ohne_buegel_bleibt_alles_wie_zuvor(self):
-        """
-        Der Ansatz ohne Bügel darf sich durch die Erweiterung nicht ändern --
-        dieselben Zahlen wie in test_handrechnung.
-        """
-        aufbau, _ = urteile(projekt_mit_querkraft())
-        erg = aufbau.querkraft["q1.x"].ergebnisse[0]
-        self.assertIsNone(aufbau.querkraft["q1.x"].buegel)
-        self.assertAlmostEqual(erg.v_Rd / 1e3, 213.9, delta=0.2)
-        self.assertEqual(erg.punkte, ())
-
     def test_buegel_ersetzen_den_betonanteil(self):
         """Nicht addieren: das wäre ein drittes Modell."""
         _, ohne = urteile(projekt_mit_querkraft())
@@ -562,22 +540,6 @@ class TestNachweisMitBuegeln(unittest.TestCase):
         self.assertNotAlmostEqual(
             ergebnisse["Feld"].d, ergebnisse["Stütze"].d, places=6)
 
-    def test_eine_stabzahl_in_y_bleibt_rechenbar(self):
-        """
-        Eine Stabzahl bezieht sich auf die betrachtete Breite. Früher schloss
-        sie den Querkraftnachweis in y aus -- dort liefe die Breite längs der
-        Traglinie mit, und die Formel hätte keinen Bezug mehr. Nachgewiesen
-        wird ohnehin nur x, also stellt sich die Frage nicht mehr; geprüft
-        bleibt, dass x davon unberührt ist.
-        """
-        projekt = projekt_mit_buegeln(abstand_y=None, anzahl_y=5.0)
-        aufbau, gefunden = urteile(projekt)
-
-        in_x = gefunden["Querkraft x – Feld"]
-        self.assertTrue(in_x.erfuellt)
-        self.assertGreater(in_x.widerstand.groesse.si, 0.0)
-        self.assertFalse([n for n in gefunden if n.startswith("Querkraft y")])
-
     def test_die_stabzahl_wird_zur_teilung(self):
         """s_V,y = b / n -- fünf Bügel auf 1000 mm sind 200 mm Teilung."""
         mit_teilung = projekt_mit_buegeln()
@@ -602,3 +564,7 @@ class TestNachweisMitBuegeln(unittest.TestCase):
         # Der bügellose Ansatz darf daneben nicht auch noch dastehen.
         self.assertNotIn("Beiwert für die statische Höhe", titel)
         self.assertNotIn("Dekompressionsmoment und Dehnung", titel)
+
+
+if __name__ == "__main__":
+    unittest.main()

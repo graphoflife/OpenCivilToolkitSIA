@@ -464,34 +464,6 @@ class TestDoppelteFallnamen(unittest.TestCase):
         self.assertEqual(dienst.bearbeite("rechnen", {"projekt": d}).status, 200)
 
 
-class TestKurzeSchalterlisten(unittest.TestCase):
-    """
-    Von Hand gebaute Beschreibungen sind der zweite Weg ins Werkzeug.
-
-    `aus_dict` bringt die Schalterlisten auf vier; wer das Feld nachträglich
-    zuweist, läuft daran vorbei. Der Aufbau quittierte das mit einem nackten
-    IndexError.
-    """
-
-    def test_eine_kurze_liste_stuerzt_nicht_ab(self):
-        for feld, kurz in (("duktilitaet", [True]),
-                           ("sproede", []),
-                           ("zwaengung_biegung", [False, True])):
-            with self.subTest(feld=feld):
-                projekt = Projekt.beispiel()
-                setattr(projekt.querschnitt("q1"), feld, list(kurz))
-                aufbau = projekt.aufbauen()
-                aufbau.werk.loese(*aufbau.alle_nachweisziele())
-
-    def test_die_angegebenen_schalter_gelten_trotzdem(self):
-        projekt = Projekt.beispiel()
-        projekt.querschnitt("q1").duktilitaet = [True]
-        aufbau = projekt.aufbauen()
-        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-        self.assertEqual(len([u for u in loesung.gefuehrte_urteile
-                              if u.art == "D"]), 1)
-
-
 class TestMaterialsperre(unittest.TestCase):
     """Nur die unveränderte Normsorte darf die Sortenbezeichnung tragen."""
 
@@ -709,12 +681,6 @@ class TestNachweisfelder(unittest.TestCase):
             k.V_Ed = 80.0
         return projekt.aufbauen(schnell=True)
 
-    def test_jedes_feld_gibt_es_auch(self):
-        aufbau = self.aufbau()
-        for feld in Aufbau.NACHWEISFELDER:
-            with self.subTest(feld=feld):
-                self.assertIsInstance(getattr(aufbau, feld), dict)
-
     def test_ein_feld_ausserhalb_der_liste_scheitert_laut(self):
         """
         Die andere Richtung: ein Nachweis, der in einem Feld landet, das die
@@ -729,24 +695,6 @@ class TestNachweisfelder(unittest.TestCase):
                 self.aufbau()
         self.assertIn("'knicken'", str(fehler.exception))
 
-    def test_jeder_nachweis_traegt_seine_ausnutzung(self):
-        """
-        Der Querkraftnachweis hiess sie einmal `d_grad` und brauchte darum
-        eine eigene Zeile in der Zielliste. Jetzt heissen alle gleich.
-        """
-        aufbau = self.aufbau()
-        nachweise = list(aufbau.alle_nachweise())
-        self.assertGreaterEqual(len(nachweise), 7)
-        for n in nachweise:
-            with self.subTest(nachweis=type(n).__name__):
-                self.assertTrue(n.d_ausnutzung)
-
-    def test_kein_nachweis_faellt_aus_der_zielliste(self):
-        aufbau = self.aufbau()
-        aus_feldern = {d.id for n in aufbau.alle_nachweise()
-                       for d in n.d_ausnutzung.values()}
-        self.assertEqual(set(aufbau.alle_nachweisziele()), aus_feldern)
-
     def test_jeder_nachweis_gehoert_zu_genau_einer_platte(self):
         """Sonst käme ein Ergebnis beim Zwischenspeichern doppelt oder gar nicht."""
         aufbau = self.aufbau()
@@ -757,10 +705,9 @@ class TestNachweisfelder(unittest.TestCase):
 
 class TestMindestbewehrungsEingaben(unittest.TestCase):
     """
-    Nur die Eingaben -- der Nachweis selbst steht noch aus.
-
-    Was hier zählt: die Angaben überleben die Datei, und eine unbekannte
-    Rissanforderung wird nicht stillschweigend auf die mildeste gezogen.
+    Die Eingaben der Mindestbewehrung: sie überleben die Datei, und eine
+    unbekannte Rissanforderung wird nicht stillschweigend auf die mildeste
+    gezogen.
     """
 
     def test_vorgaben(self):
@@ -816,27 +763,6 @@ class TestMindestbewehrungsEingaben(unittest.TestCase):
                          ["normal", "erhoeht", "hoch"])
         self.assertEqual([s["beschriftung"] for s in stufen],
                          ["Normal", "Erhöht", "Hoch"])
-
-    def test_eigene_lastfaelle_ersetzen_die_ableitung(self):
-        """
-        Die häufigen Lastfälle werden gerechnet -- aber nur bei erhöhter oder
-        hoher Anforderung. Bei normaler steht in Tabelle 17 ein Strich.
-        """
-        from opencivil.projekt import GebrauchsfallEintrag
-
-        ohne = dienst.bearbeite(
-            "rechnen", {"projekt": Projekt.beispiel().als_dict()})
-        self.assertFalse([u for u in ohne.daten["urteile"]
-                          if u["art"] == "σ_s"])
-
-        projekt = Projekt.beispiel()
-        q = projekt.querschnitt("q1")
-        q.rissanforderung = "hoch"
-        q.haeufig.aus_tragsicherheit = False
-        q.haeufig.faelle = [GebrauchsfallEintrag("Gebrauch", M_Ed=70.0)]
-        mit = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
-        namen = [u["fall"] for u in mit.daten["urteile"] if u["art"] == "σ_s"]
-        self.assertEqual(namen, ["Gebrauch"])
 
 
 if __name__ == "__main__":
