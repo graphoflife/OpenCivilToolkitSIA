@@ -62,7 +62,7 @@ from __future__ import annotations
 import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Dict, List, Sequence
+from typing import Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import (
     Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
@@ -72,7 +72,7 @@ from opencivil.core.einheiten import (
 )
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
-from opencivil.core.wert import WertDef
+from opencivil.core.wert import Wert, WertDef
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.mindestbewehrung import (
     RISSBREITE, zulaessige_stahlspannung,
@@ -133,6 +133,23 @@ class Gebrauchsfall:
         return fallkennung(self.name)
 
 
+@dataclass(frozen=True)
+class Vergleich:
+    """
+    Was in der Tabelle gegeneinander steht -- und wie es im Satz heisst.
+
+    Spannungen, solange der Stahl elastisch bleibt. Fliesst er, Dehnungen:
+    sonst stuende ``f_yk`` neben ``f_yk`` und daneben «nicht erfuellt» --
+    richtig gerechnet und doch nicht zu lesen. Entschieden wird das einmal,
+    in :meth:`Spannungsbegrenzung._einen_fall`; Urteil und Begruendung lesen
+    es nur noch ab.
+    """
+
+    einwirkung: Wert
+    widerstand: Wert
+    satz: str
+
+
 @dataclass
 class Fallergebnis:
     """Was der Nachweis fuer einen Lastfall gefunden hat."""
@@ -158,6 +175,9 @@ class Fallergebnis:
     erfuellungsgrad: float = 0.0
     erfuellt: bool = False
     konvergiert: bool = True
+    vergleich: Optional[Vergleich] = None
+    """Fehlt nur, wenn sich keine Gleichgewichtslage fand."""
+
     begruendung: str = ""
     hinweis: str = ""
 
@@ -571,54 +591,49 @@ class Spannungsbegrenzung(Nachweis):
         erg.erfuellungsgrad = (float("inf") if gedehnt <= 0.0
                                else sigma_adm / gedehnt)
         erg.erfuellt = gedehnt <= sigma_adm
-        ebene_text = (f"Gerissener Querschnitt: ε_m = {erg.eps_m * 1e3:.4f} ‰, "
-                      f"χ = {erg.chi:.5f} 1/m.")
-        if erg.fliesst:
-            erg.begruendung = (
-                f"{ebene_text} Die Bewehrung fliesst: ε_s = "
-                f"{erg.eps_s * 1e3:.2f} ‰ über der Fliessdehnung "
-                f"{erg.eps_y * 1e3:.2f} ‰, gegen ε_s,adm = "
-                f"{erg.eps_s_adm * 1e3:.2f} ‰ aus σ_s,adm = "
-                f"{sigma_adm / 1e6:.0f} N/mm².")
-        else:
-            erg.begruendung = (
-                f"{ebene_text} Grösste Zugspannung "
-                f"σ_s = {erg.sigma_s / 1e6:.0f} N/mm² gegen "
-                f"σ_s,adm = {sigma_adm / 1e6:.0f} N/mm².")
+        erg.vergleich = self._vergleich(erg)
+        erg.begruendung = (
+            f"Gerissener Querschnitt: ε_m = {erg.eps_m * 1e3:.4f} ‰, "
+            f"χ = {erg.chi:.5f} 1/m. {erg.vergleich.satz}")
         return erg
 
-    def _urteil(self, erg: Fallergebnis, *, still: bool = False) -> NachweisUrteil:
-        """
-        Das Urteil eines Falls.
-
-        Einwirkung und Widerstand sind Spannungen, solange der Stahl
-        elastisch bleibt. Fliesst er, sind es Dehnungen: in der Tabelle
-        stuende sonst ``f_yk`` neben ``f_yk`` und daneben «nicht erfuellt» --
-        richtig gerechnet und doch nicht zu lesen.
-        """
+    def _vergleich(self, erg: Fallergebnis) -> Vergleich:
+        """Spannungen oder Dehnungen -- die eine Stelle, die das entscheidet."""
         r = self.richtung.value
         if erg.fliesst:
-            einwirkung = WertDef(
-                id=f"{self.id}.{erg.fall.kennung}.eps_s",
-                symbol=rf"\varepsilon_{{s,{r}}}",
-                einheit=PROMILLE, beschreibung="Einwirkung", stellen=2,
-            ).belegen(Groesse.aus_si(erg.eps_s, PROMILLE))
-            widerstand = WertDef(
-                id=f"{self.id}.eps_s_adm",
-                symbol=r"\varepsilon_{s,adm}",
-                einheit=PROMILLE, beschreibung="Widerstand", stellen=2,
-            ).belegen(Groesse.aus_si(erg.eps_s_adm, PROMILLE))
-        else:
-            einwirkung = WertDef(
+            return Vergleich(
+                einwirkung=WertDef(
+                    id=f"{self.id}.{erg.fall.kennung}.eps_s",
+                    symbol=rf"\varepsilon_{{s,{r}}}",
+                    einheit=PROMILLE, beschreibung="Einwirkung", stellen=2,
+                ).belegen(Groesse.aus_si(erg.eps_s, PROMILLE)),
+                widerstand=WertDef(
+                    id=f"{self.id}.eps_s_adm",
+                    symbol=r"\varepsilon_{s,adm}",
+                    einheit=PROMILLE, beschreibung="Widerstand", stellen=2,
+                ).belegen(Groesse.aus_si(erg.eps_s_adm, PROMILLE)),
+                satz=(f"Die Bewehrung fliesst: ε_s = {erg.eps_s * 1e3:.2f} ‰ "
+                      f"über der Fliessdehnung {erg.eps_y * 1e3:.2f} ‰, gegen "
+                      f"ε_s,adm = {erg.eps_s_adm * 1e3:.2f} ‰ aus σ_s,adm = "
+                      f"{erg.sigma_s_adm / 1e6:.0f} N/mm²."))
+        return Vergleich(
+            einwirkung=WertDef(
                 id=f"{self.id}.{erg.fall.kennung}.sigma_s",
                 symbol=rf"\sigma_{{s,{r}}}",
                 einheit=N_PRO_MM2, beschreibung="Einwirkung", stellen=0,
-            ).belegen(Groesse.aus_si(erg.sigma_s, N_PRO_MM2))
-            widerstand = WertDef(
+            ).belegen(Groesse.aus_si(erg.sigma_s, N_PRO_MM2)),
+            widerstand=WertDef(
                 id=f"{self.id}.sigma_s_adm",
                 symbol=r"\sigma_{s,adm}",
                 einheit=N_PRO_MM2, beschreibung="Widerstand", stellen=0,
-            ).belegen(Groesse.aus_si(erg.sigma_s_adm, N_PRO_MM2))
+            ).belegen(Groesse.aus_si(erg.sigma_s_adm, N_PRO_MM2)),
+            satz=(f"Grösste Zugspannung σ_s = {erg.sigma_s / 1e6:.0f} N/mm² "
+                  f"gegen σ_s,adm = {erg.sigma_s_adm / 1e6:.0f} N/mm²."))
+
+    def _urteil(self, erg: Fallergebnis, *, still: bool = False) -> NachweisUrteil:
+        """Das Urteil eines Falls -- was gegeneinander steht, sagt der Vergleich."""
+        r = self.richtung.value
+        vergleich = erg.vergleich
         return NachweisUrteil(
             name=f"{self.grenze.urteilsname} {r} – {erg.fall.name}",
             art=self.grenze.art,
@@ -628,8 +643,8 @@ class Spannungsbegrenzung(Nachweis):
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
             begruendung=erg.begruendung,
             hinweis=erg.hinweis,
-            einwirkung=einwirkung if erg.konvergiert else None,
-            widerstand=widerstand if erg.konvergiert else None,
+            einwirkung=vergleich.einwirkung if vergleich else None,
+            widerstand=vergleich.widerstand if vergleich else None,
             still=still,
         )
 
