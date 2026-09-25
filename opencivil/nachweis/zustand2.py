@@ -50,6 +50,9 @@ class Zustand2:
     n: float
     """Wertigkeit ``E_s/E_c,eff`` -- um wie viel steifer der Stahl ist."""
 
+    rho: float
+    """``n * A_s / b`` -- die Hilfsgroesse, aus der die Nulllinie folgt, in m."""
+
     x: float
     """Druckzonenhoehe ab der gedrueckten Kante, in m."""
 
@@ -81,4 +84,4 @@ def gerissen(*, n: float, a_s: float, b: float, d: float) -> Zustand2:
             "Höhe; ohne sie gibt es keine Nulllinie.")
     rho = n * a_s / b
     x = math.sqrt(rho * rho + 2.0 * d * rho) - rho
-    return Zustand2(n=n, x=x, z=d - x / 3.0)
+    return Zustand2(n=n, rho=rho, x=x, z=d - x / 3.0)

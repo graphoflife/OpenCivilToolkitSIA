@@ -531,7 +531,7 @@ $$
 
 #### Duktilität – 3. Lage
 
-**Statische Höhe ab der gedrückten Randfaser (unten)**
+**Statische Höhe der Lage oben, ab dem gedrückten Rand unten**
 
 $$
 d_{3,x,g} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
@@ -564,19 +564,19 @@ Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Di
 **Rissaktive Plattendicke**
 
 $$
-h_{eff} = \min\left[500\,\mathrm{mm};\ h\right] = \min\left[500;\ 300\right] = 300\,\mathrm{mm}
+h_{eff} = \min\left[500\,\mathrm{mm};\ h\right] = \min\left[500\,\mathrm{mm};\ 300\,\mathrm{mm}\right] = 300\,\mathrm{mm}
 $$
 
 **Beiwert für die Plattendicke** *(SIA 262:2025, 4.4.2)*
 
 $$
-k_t = \frac{1}{1 + 0.5 \cdot h_{eff}} = \frac{1}{1 + 0.5 \cdot 0.300\,\mathrm{m}} = 0.870
+k_t = \frac{1}{1 + 0.5 \cdot h_{eff}} = \frac{1}{1 + 0.5 \cdot 0.3} = 0.87 \quad \left(h_{eff}\ \text{in}\ \mathrm{m}\right)
 $$
 
 **Wirksame Zugfestigkeit**
 
 $$
-f_{ct,eff} = k_t \cdot f_{ctm} = 0.870 \cdot 2.90\,\mathrm{N}/\mathrm{mm}^{2} = 2.52\,\mathrm{N}/\mathrm{mm}^{2}
+f_{ct,eff} = k_t \cdot f_{ctm} = 0.87 \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} = 2.52\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Risskraft der gezogenen Querschnittshälfte**
@@ -587,17 +587,36 @@ $$
 
 #### Rissnormalkraft – 2. Lage x
 
+**Bewehrung der Lage**
+
+$$
+A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z} = 1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2} = 2450\,\mathrm{mm}^{2}
+$$
+
+**Dickster Stab der Lage**
+
+$$
+\varnothing_{2,x} = \max\left[\varnothing_{2,x,g};\ \varnothing_{2,x,z}\right] = \max\left[18\,\mathrm{mm};\ 12\,\mathrm{mm}\right] = 18\,\mathrm{mm}
+$$
+
 **Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
 
 $$
-\sigma_{s,adm,2,x} = \min\left[\sqrt{\frac{9 \cdot E_s \cdot f_{ctm} \cdot w_{nom}}{\varnothing_{2,x}}};\ f_{yk}\right]
-= \min\left[\sqrt{\frac{9 \cdot 200000 \cdot 2.90 \cdot 0.5}{18}};\ 500\right] = 381\,\mathrm{N}/\mathrm{mm}^{2}
+\begin{aligned}
+  \sigma_{s,adm,2,x} &= \min\left[\sqrt{\frac{9 \cdot E_s \cdot f_{ctm} \cdot w_{nom}}{\varnothing_{2,x}}};\ f_{yk}\right] \\
+  &= \min\left[\sqrt{\frac{9 \cdot 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.5\,\mathrm{mm}}{18\,\mathrm{mm}}};\ 500\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+  &= 381\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
 $$
 
 **Aufnehmbare Risskraft**
 
 $$
-N_{s,adm,2,x} = A_{s,2,x} \cdot \sigma_{s,adm,2,x} = 2450\,\mathrm{mm}^{2} \cdot 381\,\mathrm{N}/\mathrm{mm}^{2} = 933.1\,\mathrm{kN} \quad \ge \quad N_{Riss} = 378.3\,\mathrm{kN} \quad \Rightarrow \quad \text{erfüllt}
+\begin{aligned}
+  N_{s,adm,2,x} &= A_{s,2,x} \cdot \sigma_{s,adm,2,x} \\
+  &= 2450\,\mathrm{mm}^{2} \cdot 381\,\mathrm{N}/\mathrm{mm}^{2} \\
+  &= 933.1\,\mathrm{kN} \quad \ge \quad N_{Riss} = 378.3\,\mathrm{kN} \quad \Rightarrow \quad \text{erfüllt}
+\end{aligned}
 $$
 
 **Erfüllungsgrad**
@@ -611,20 +630,27 @@ $$
 **Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
 
 $$
-\sigma_{s,adm,3,x,g} = \min\left[\sqrt{\frac{9 \cdot E_s \cdot f_{ctm} \cdot w_{nom}}{\varnothing_{3,x,g}}};\ f_{yk}\right]
-= \min\left[\sqrt{\frac{9 \cdot 200000 \cdot 2.90 \cdot 0.5}{12}};\ 500\right] = 466\,\mathrm{N}/\mathrm{mm}^{2}
+\begin{aligned}
+  \sigma_{s,adm,3,x} &= \min\left[\sqrt{\frac{9 \cdot E_s \cdot f_{ctm} \cdot w_{nom}}{\varnothing_{3,x,g}}};\ f_{yk}\right] \\
+  &= \min\left[\sqrt{\frac{9 \cdot 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.5\,\mathrm{mm}}{12\,\mathrm{mm}}};\ 500\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+  &= 466\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
 $$
 
 **Aufnehmbare Risskraft**
 
 $$
-N_{s,adm,3,x,g} = A_{s,3,x,g} \cdot \sigma_{s,adm,3,x,g} = 754\,\mathrm{mm}^{2} \cdot 466\,\mathrm{N}/\mathrm{mm}^{2} = 351.6\,\mathrm{kN} \quad < \quad N_{Riss} = 378.3\,\mathrm{kN} \quad \Rightarrow \quad \text{NICHT erfüllt}
+\begin{aligned}
+  N_{s,adm,3,x} &= A_{s,3,x,g} \cdot \sigma_{s,adm,3,x} \\
+  &= 754\,\mathrm{mm}^{2} \cdot 466\,\mathrm{N}/\mathrm{mm}^{2} \\
+  &= 351.6\,\mathrm{kN} \quad < \quad N_{Riss} = 378.3\,\mathrm{kN} \quad \Rightarrow \quad \text{NICHT erfüllt}
+\end{aligned}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,NR,3,x,g} = \frac{N_{s,adm,3,x,g}}{N_{Riss}} = \frac{351.6\,\mathrm{kN}}{378.3\,\mathrm{kN}} = 0.93
+\alpha_{eff,NR,3,x} = \frac{N_{s,adm,3,x}}{N_{Riss}} = \frac{351.6\,\mathrm{kN}}{378.3\,\mathrm{kN}} = 0.93
 $$
 
 Massgebend ist die 3. Lage mit dem kleineren Erfüllungsgrad; sie steht in der Zusammenfassung.
@@ -688,13 +714,13 @@ Eine aufgezwungene Krümmung erzeugt beim Reissen ein Moment, das die Bewehrung 
 **Beiwert für die Plattendicke** *(SIA 262:2025, 4.4.2)*
 
 $$
-k_t = \frac{1}{1 + 0.5 \cdot h/3} = \frac{1}{1 + 0.5 \cdot 0.300\,\mathrm{m}/3} = 0.952
+k_t = \frac{1}{1 + 0.5 \cdot h/3} = \frac{1}{1 + 0.5 \cdot 0.3/3} = 0.952 \quad \left(h\ \text{in}\ \mathrm{m}\right)
 $$
 
 **Wirksame Zugfestigkeit**
 
 $$
-f_{ct,eff} = k_t \cdot f_{ctm} = 0.952 \cdot 2.90\,\mathrm{N}/\mathrm{mm}^{2} = 2.76\,\mathrm{N}/\mathrm{mm}^{2}
+f_{ct,eff} = k_t \cdot f_{ctm} = 0.952 \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} = 2.76\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Rissmoment des ungerissenen Querschnitts**
@@ -708,31 +734,59 @@ Das Rissmoment gilt für den ungerissenen Bruttoquerschnitt – den Zustand vor 
 **Wertigkeit im gerissenen Zustand**
 
 $$
-n = \frac{E_s}{E_{cm}} \cdot \left(1 + \varphi\right) = \frac{200000\,\mathrm{N}/\mathrm{mm}^{2}}{33620\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(1 + 2.00\right) = 17.85
+n = \frac{E_s}{E_{cm}} \cdot \left(1 + \varphi\right) = \frac{200000\,\mathrm{N}/\mathrm{mm}^{2}}{33620\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(1 + 2\right) = 17.85
 $$
 
 Das Kriechen weicht den Beton auf: E\_c,eff = E\_cm/(1+φ), und die Wertigkeit ist E\_s/E\_c,eff. Ein grösseres φ senkt damit den Hebelarm und liegt auf der sicheren Seite.
 
 #### Zwängung auf Biegung – 2. Lage x
 
-**Statische Höhe ab der gedrückten Randfaser (unten)**
+**Bewehrung der Lage**
 
 $$
-d_{2,x} = 248.1\,\mathrm{mm}
+A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z} = 1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2} = 2450\,\mathrm{mm}^{2}
+$$
+
+**Gemeinsamer Schwerpunkt der Lage**
+
+$$
+\begin{aligned}
+  d_{2,x} &= \frac{A_{s,2,x,g} \cdot d_{2,x,g} + A_{s,2,x,z} \cdot d_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}} \\
+  &= \frac{1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 246\,\mathrm{mm}}{1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2}} \\
+  &= 248.1\,\mathrm{mm}
+\end{aligned}
+$$
+
+**Dickster Stab der Lage**
+
+$$
+\varnothing_{2,x} = \max\left[\varnothing_{2,x,g};\ \varnothing_{2,x,z}\right] = \max\left[18\,\mathrm{mm};\ 12\,\mathrm{mm}\right] = 18\,\mathrm{mm}
 $$
 
 **Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
 
 $$
-\sigma_{s,adm,2,x} = \min\left[\sqrt{\frac{9 \cdot E_s \cdot f_{ctm} \cdot w_{nom}}{\varnothing_{2,x}}};\ f_{yk}\right]
-= \min\left[\sqrt{\frac{9 \cdot 200000 \cdot 2.90 \cdot 0.5}{18}};\ 500\right] = 381\,\mathrm{N}/\mathrm{mm}^{2}
+\begin{aligned}
+  \sigma_{s,adm,2,x} &= \min\left[\sqrt{\frac{9 \cdot E_s \cdot f_{ctm} \cdot w_{nom}}{\varnothing_{2,x}}};\ f_{yk}\right] \\
+  &= \min\left[\sqrt{\frac{9 \cdot 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.5\,\mathrm{mm}}{18\,\mathrm{mm}}};\ 500\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+  &= 381\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+$$
+
+**Hilfsgrösse der Nulllinie**
+
+$$
+\rho = \frac{n \cdot A_{s,2,x}}{b} = \frac{17.85 \cdot 2450\,\mathrm{mm}^{2}}{1000\,\mathrm{mm}} = 43.73\,\mathrm{mm}
 $$
 
 **Nulllinie des gerissenen Querschnitts**
 
 $$
-\rho = \frac{n \cdot A_{s,2,x}}{b} \qquad x = \sqrt{\rho^{2} + 2 \cdot d_{2,x} \cdot \rho} - \rho
-= \sqrt{\left(43.73\,\mathrm{mm}\right)^{2} + 2 \cdot 248.1\,\mathrm{mm} \cdot 43.73\,\mathrm{mm}} - 43.73\,\mathrm{mm} = 109.9\,\mathrm{mm}
+\begin{aligned}
+  x &= \sqrt{\rho^{2} + 2 \cdot d_{2,x} \cdot \rho} - \rho \\
+  &= \sqrt{\left(43.73\,\mathrm{mm}\right)^{2} + 2 \cdot 248.1\,\mathrm{mm} \cdot 43.73\,\mathrm{mm}} - 43.73\,\mathrm{mm} \\
+  &= 109.9\,\mathrm{mm}
+\end{aligned}
 $$
 
 **Innerer Hebelarm**
@@ -746,7 +800,11 @@ Die Betondruckspannung verläuft dreieckig – null in der Nulllinie, am grösst
 **Aufnehmbares Moment der Bewehrung**
 
 $$
-M_{s,adm,2,x} = \sigma_{s,adm,2,x} \cdot A_{s,2,x} \cdot z = 381\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2450\,\mathrm{mm}^{2} \cdot 211.4\,\mathrm{mm} = 197.3\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 41.4\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+\begin{aligned}
+  M_{s,adm,2,x} &= \sigma_{s,adm,2,x} \cdot A_{s,2,x} \cdot z \\
+  &= 381\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2450\,\mathrm{mm}^{2} \cdot 211.4\,\mathrm{mm} \\
+  &= 197.3\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 41.4\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+\end{aligned}
 $$
 
 **Erfüllungsgrad**
@@ -757,30 +815,42 @@ $$
 
 #### Zwängung auf Biegung – 3. Lage x
 
-**Statische Höhe ab der gedrückten Randfaser (oben)**
+**Statische Höhe der Lage oben, ab dem gedrückten Rand unten**
 
 $$
-d_{3,x,g} = 252.0\,\mathrm{mm}
+d_{3,x,g} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
 $$
 
 **Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
 
 $$
-\sigma_{s,adm,3,x,g} = \min\left[\sqrt{\frac{9 \cdot E_s \cdot f_{ctm} \cdot w_{nom}}{\varnothing_{3,x,g}}};\ f_{yk}\right]
-= \min\left[\sqrt{\frac{9 \cdot 200000 \cdot 2.90 \cdot 0.5}{12}};\ 500\right] = 466\,\mathrm{N}/\mathrm{mm}^{2}
+\begin{aligned}
+  \sigma_{s,adm,3,x} &= \min\left[\sqrt{\frac{9 \cdot E_s \cdot f_{ctm} \cdot w_{nom}}{\varnothing_{3,x,g}}};\ f_{yk}\right] \\
+  &= \min\left[\sqrt{\frac{9 \cdot 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.5\,\mathrm{mm}}{12\,\mathrm{mm}}};\ 500\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+  &= 466\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+$$
+
+**Hilfsgrösse der Nulllinie**
+
+$$
+\rho = \frac{n \cdot A_{s,3,x,g}}{b} = \frac{17.85 \cdot 754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm}} = 13.46\,\mathrm{mm}
 $$
 
 **Nulllinie des gerissenen Querschnitts**
 
 $$
-\rho = \frac{n \cdot A_{s,3,x,g}}{b} \qquad x = \sqrt{\rho^{2} + 2 \cdot d_{3,x,g} \cdot \rho} - \rho
-= \sqrt{\left(13.46\,\mathrm{mm}\right)^{2} + 2 \cdot 252.0\,\mathrm{mm} \cdot 13.46\,\mathrm{mm}} - 13.46\,\mathrm{mm} = 70.0\,\mathrm{mm}
+\begin{aligned}
+  x &= \sqrt{\rho^{2} + 2 \cdot d_{3,x,g} \cdot \rho} - \rho \\
+  &= \sqrt{\left(13.46\,\mathrm{mm}\right)^{2} + 2 \cdot 252\,\mathrm{mm} \cdot 13.46\,\mathrm{mm}} - 13.46\,\mathrm{mm} \\
+  &= 70\,\mathrm{mm}
+\end{aligned}
 $$
 
 **Innerer Hebelarm**
 
 $$
-z = d_{3,x,g} - \frac{x}{3} = 252.0\,\mathrm{mm} - \frac{70.0\,\mathrm{mm}}{3} = 228.7\,\mathrm{mm}
+z = d_{3,x,g} - \frac{x}{3} = 252\,\mathrm{mm} - \frac{70\,\mathrm{mm}}{3} = 228.7\,\mathrm{mm}
 $$
 
 Die Betondruckspannung verläuft dreieckig – null in der Nulllinie, am grössten an der gedrückten Kante. Ihre Resultierende liegt deshalb bei x/3 von dieser Kante.
@@ -788,13 +858,17 @@ Die Betondruckspannung verläuft dreieckig – null in der Nulllinie, am grösst
 **Aufnehmbares Moment der Bewehrung**
 
 $$
-M_{s,adm,3,x,g} = \sigma_{s,adm,3,x,g} \cdot A_{s,3,x,g} \cdot z = 466\,\mathrm{N}/\mathrm{mm}^{2} \cdot 754\,\mathrm{mm}^{2} \cdot 228.7\,\mathrm{mm} = 80.4\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 41.4\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+\begin{aligned}
+  M_{s,adm,3,x} &= \sigma_{s,adm,3,x} \cdot A_{s,3,x,g} \cdot z \\
+  &= 466\,\mathrm{N}/\mathrm{mm}^{2} \cdot 754\,\mathrm{mm}^{2} \cdot 228.7\,\mathrm{mm} \\
+  &= 80.4\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 41.4\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+\end{aligned}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,ZB,3,x,g} = \frac{M_{s,adm,3,x,g}}{M_{Riss}} = \frac{80.4\,\mathrm{kNm}}{41.4\,\mathrm{kNm}} = 1.94
+\alpha_{eff,ZB,3,x} = \frac{M_{s,adm,3,x}}{M_{Riss}} = \frac{80.4\,\mathrm{kNm}}{41.4\,\mathrm{kNm}} = 1.94
 $$
 
 Massgebend ist die 3. Lage mit dem kleineren Erfüllungsgrad; sie steht in der Zusammenfassung.

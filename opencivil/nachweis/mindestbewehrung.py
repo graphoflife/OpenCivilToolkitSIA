@@ -44,18 +44,21 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_als_text,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_formel,
 )
-from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, Groesse
+from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, MM, Groesse
+from opencivil.core.latex import angabe, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.wert import Wert, WertDef
-from opencivil.core.wert import kennung_aus
-from opencivil.material.basis import mit_index
+from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.nachweis.sproedes_versagen import (
-    MOMENTENTEILER, Rissgroessen as Momentgroessen, rissmoment,
+    Rissgroessen as Momentgroessen, beiwert_dicke, protokoll_rissmoment,
+    protokoll_zugfestigkeit, rissmoment, rissmoment_wert,
 )
 from opencivil.nachweis.zustand2 import gerissen, wertigkeit
-from opencivil.querschnitt.platte import Bewehrungslage, Richtung, posten_index
+from opencivil.querschnitt.platte import (
+    Bewehrungslage, Richtung, lagenindex, protokoll_bewehrung,
+    protokoll_hoehe_der_lage,
+)
 
 #: Nominelle Rissbreite je Anforderung, in m. ``None`` heisst: keine Grenze aus
 #: der Rissbreite, dann gilt allein ``f_yk``.
@@ -92,7 +95,7 @@ def rissnormalkraft(*, h: float, b: float, f_ctm: float,
     Alles in SI-Basis; ``h`` und ``b`` in m, ``f_ctm`` in Pa, Rueckgabe in N.
     """
     h_eff = min(DICKENGRENZE, h) if begrenzt else h
-    k_t = 1.0 / (1.0 + 0.5 * h_eff)
+    k_t = beiwert_dicke(h_eff)
     f_ct_eff = k_t * f_ctm
     return Rissgroessen(h_eff=h_eff, k_t=k_t, f_ct_eff=f_ct_eff,
                         N_Riss=h_eff / 2.0 * b * f_ct_eff)
@@ -145,6 +148,40 @@ def protokoll_zulaessige_stahlspannung(
         {"E_s": E_s, "f_ctm": f_ctm, "w_nom": w, "dm": durchmesser, "f_yk": f_yk},
         titel=f"Zulässige Stahlspannung (Rissbreite w_nom = {w.formatiert()} mm)",
         referenz=referenz)
+
+
+def _protokoll_stahlspannung(
+    p: Protokoll, e: Eingaben, werte: Zwischenwerte, erg, *,
+    marken: Sequence[str], anforderung: str,
+) -> Wert:
+    """
+    ``sigma_s,adm`` einer Lage -- fuer beide Zwängungen dieselbe Herleitung.
+
+    Liegen mehrere Posten in der Lage und begrenzt die Rissbreite, steht
+    zuerst da, welcher Stab der dickste ist: er bestimmt die Rissbreite.
+    Die Spannung gehoert der ganzen Lage und traegt deren Index, wie
+    Widerstand und Erfuellungsgrad in der Tabelle.
+    """
+    lage = f"{erg.lage.nummer},{erg.lage.richtung.value}"
+    staebe = [e[f"phi_{m}"] for m in marken]
+    if len(staebe) == 1:
+        durchmesser = staebe[0]
+    else:
+        durchmesser = werte.laenge("phi", rf"\varnothing_{{{lage}}}",
+                                   erg.durchmesser, stellen=0)
+        if RISSBREITE[anforderung] is not None:
+            glieder = r";\ ".join(f"@d{i}" for i in range(len(staebe)))
+            p.formel(durchmesser, rf"\max\left[{glieder}\right]",
+                     {f"d{i}": s for i, s in enumerate(staebe)},
+                     titel="Dickster Stab der Lage")
+    kurz = kennung_aus(erg.lage.stahl.id)
+    sigma = werte.spannung("sigma_s_adm", rf"\sigma_{{s,adm,{lage}}}",
+                           erg.sigma_s_adm)
+    protokoll_zulaessige_stahlspannung(
+        p, sigma, anforderung=anforderung, f_yk=e[f"f_yk__{kurz}"],
+        E_s=e[f"E_s__{kurz}"], f_ctm=e["f_ctm"], durchmesser=durchmesser,
+        basis=werte.basis, referenz="SIA 262:2025, 4.4.2")
+    return sigma
 
 
 @dataclass
@@ -245,8 +282,6 @@ class Rissnormalkraft(Nachweis):
                 Eingabebezug(f"E_s__{kurz}", stahl.id_von("E_s")),
             ]
 
-        self.s_f_ctm = mit_index("f_{ctm}", querschnitt.beton.symbol_index)
-
         super().__init__(
             basis,
             ausgaben=list(self.d_ausnutzung.values()),
@@ -266,7 +301,7 @@ class Rissnormalkraft(Nachweis):
 
         self.groessen = rissnormalkraft(h=h, b=b, f_ctm=f_ctm,
                                         begrenzt=self.begrenzt)
-        self._protokoll_ansatz(p, h, b, f_ctm)
+        self._protokoll_ansatz(p, e)
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
@@ -275,7 +310,7 @@ class Rissnormalkraft(Nachweis):
         for lage in self.lagen:
             erg = self._eine_lage(e, lage, f_ctm=f_ctm)
             self.ergebnisse.append(erg)
-            self._protokoll_lage(p, erg, f_ctm)
+            self._protokoll_lage(p, e, erg)
             ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
                 min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
             urteile.append(self._urteil(erg))
@@ -320,19 +355,25 @@ class Rissnormalkraft(Nachweis):
             f"N_Riss = {N_Riss / 1e3:.1f} kN.")
         return erg
 
+    def _n_riss(self) -> Wert:
+        """Die Risskraft -- die Einwirkung in Tabelle und Herleitung."""
+        return WertDef(
+            id=f"{self.id}.N_Riss", symbol=r"N_{Riss}",
+            einheit=KN, beschreibung="Einwirkung", stellen=1,
+        ).belegen(Groesse.aus_si(self.groessen.N_Riss, KN))
+
+    def _n_s_adm(self, erg: Lagenergebnis) -> Wert:
+        """Was die Lage aufnimmt -- der Widerstand in Tabelle und Herleitung."""
+        nummer, r = erg.lage.nummer, self.richtung.value
+        return WertDef(
+            id=f"{self.id}.lage{nummer}.N_s_adm", symbol=rf"N_{{s,adm,{nummer},{r}}}",
+            einheit=KN, beschreibung="Widerstand", stellen=1,
+        ).belegen(Groesse.aus_si(erg.N_s_adm, KN))
+
     def _urteil(self, erg: Lagenergebnis) -> NachweisUrteil:
         nummer = erg.lage.nummer
         r = self.richtung.value
-        einwirkung = WertDef(
-            id=f"{self.id}.N_Riss",
-            symbol=r"N_{Riss}",
-            einheit=KN, beschreibung="Einwirkung", stellen=1,
-        ).belegen(Groesse.aus_si(self.groessen.N_Riss, KN))
-        widerstand = WertDef(
-            id=f"{self.id}.lage{nummer}.N_s_adm",
-            symbol=rf"N_{{s,adm,{nummer},{r}}}",
-            einheit=KN, beschreibung="Widerstand", stellen=1,
-        ).belegen(Groesse.aus_si(erg.N_s_adm, KN))
+        einwirkung, widerstand = self._n_riss(), self._n_s_adm(erg)
         return NachweisUrteil(
             name=f"Rissnormalkraft {r} – {nummer}. Lage",
             art="N_Riss",
@@ -365,9 +406,9 @@ class Rissnormalkraft(Nachweis):
 
     # -- Mitschrift ---------------------------------------------------------
 
-    def _protokoll_ansatz(self, p: Protokoll, h: float, b: float,
-                          f_ctm: float) -> None:
+    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
         g = self.groessen
+        werte = Zwischenwerte(self.id)
         p.titel(f"Sprödes Versagen unter Zwängung – {self.richtung.beschriftung}")
         p.text(
             "Ein zu schwach bewehrter Querschnitt reisst und versagt im selben "
@@ -376,100 +417,48 @@ class Rissnormalkraft(Nachweis):
             "Versagen an."
         )
 
+        h_eff = werte.laenge("h_eff", "h_{eff}", g.h_eff)
         if self.begrenzt:
-            p.gleichung(
-                rf"h_{{eff}} = \min\left[{DICKENGRENZE * 1e3:.0f}\,\mathrm{{mm}};\ "
-                rf"h\right] = \min\left[{DICKENGRENZE * 1e3:.0f};\ {h * 1e3:.0f}"
-                rf"\right] = {g.h_eff * 1e3:.0f}\,\mathrm{{mm}}",
-                titel="Rissaktive Plattendicke")
+            grenze = Groesse.aus_si(DICKENGRENZE, MM).als_latex(0)
+            p.formel(h_eff, rf"\min\left[{grenze};\ @h\right]", {"h": e["h"]},
+                     titel="Rissaktive Plattendicke")
         else:
-            p.gleichung(
-                rf"h_{{eff}} = h = {g.h_eff * 1e3:.0f}\,\mathrm{{mm}}",
-                titel="Rissaktive Plattendicke")
+            p.formel(h_eff, "@h", {"h": e["h"]}, titel="Rissaktive Plattendicke")
 
-        p.gleichung(
-            r"k_t = \frac{1}{1 + 0.5 \cdot h_{eff}}"
-            rf" = \frac{{1}}{{1 + 0.5 \cdot {g.h_eff:.3f}\,\mathrm{{m}}}}"
-            rf" = {g.k_t:.3f}",
-            titel="Beiwert für die Plattendicke",
-            referenz="SIA 262:2025, 4.4.2")
-        p.gleichung(
-            rf"f_{{ct,eff}} = k_t \cdot {self.s_f_ctm} = {g.k_t:.3f} \cdot "
-            rf"{f_ctm / 1e6:.2f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
-            rf" = {g.f_ct_eff / 1e6:.2f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}",
-            titel="Wirksame Zugfestigkeit")
-        p.gleichung(
-            r"N_{Riss} = \frac{h_{eff}}{2} \cdot b \cdot f_{ct,eff}"
-            rf" = \frac{{{g.h_eff * 1e3:.0f}\,\mathrm{{mm}}}}{{2}} \cdot "
-            rf"{b * 1e3:.0f}\,\mathrm{{mm}} \cdot "
-            rf"{g.f_ct_eff / 1e6:.2f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
-            rf" = {g.N_Riss / 1e3:.1f}\,\mathrm{{kN}}",
-            titel="Risskraft der gezogenen Querschnittshälfte")
+        f_ct_eff = protokoll_zugfestigkeit(
+            p, werte, k_t=g.k_t, f_ct_eff=g.f_ct_eff, h=h_eff, f_ctm=e["f_ctm"],
+            teiler=1, referenz="SIA 262:2025, 4.4.2")
+        p.formel(self._n_riss(), r"\frac{@h_eff}{2} \cdot @b \cdot @f_ct_eff",
+                 {"h_eff": h_eff, "b": e["b"], "f_ct_eff": f_ct_eff},
+                 titel="Risskraft der gezogenen Querschnittshälfte")
 
-    def _protokoll_lage(self, p: Protokoll, erg: Lagenergebnis,
-                        f_ctm: float) -> None:
+    def _protokoll_lage(self, p: Protokoll, e: Eingaben,
+                        erg: Lagenergebnis) -> None:
         nummer = erg.lage.nummer
-        r = self.richtung.value
-        p.titel(f"Rissnormalkraft – {nummer}. Lage {r}", ebene=3)
+        p.titel(f"Rissnormalkraft – {nummer}. Lage {self.richtung.value}", ebene=3)
 
         if not erg.machbar:
             p.text(erg.begruendung)
             return
 
-        index = self._index(erg)
-        s_a_s = f"A_{{s,{index}}}" if index else "A_s"
-        s_sigma = rf"\sigma_{{s,adm,{index}}}" if index else r"\sigma_{s,adm}"
-        s_f_yk = mit_index("f_{yk}", erg.lage.stahl.symbol_index)
-        w_nom = RISSBREITE[self.anforderung]
+        eintraege = self.posten_je_lage[nummer]
+        index = lagenindex(eintraege)
+        werte = Zwischenwerte(f"{self.id}.lage{nummer}")
+        marken = [f"{nummer}{art.kuerzel}" for _, art, *_ in eintraege]
+        a_s = protokoll_bewehrung(p, werte, index,
+                                  [e[f"a_s_{m}"] for m in marken], erg.a_s)
+        sigma = _protokoll_stahlspannung(p, e, werte, erg, marken=marken,
+                                         anforderung=self.anforderung)
 
-        if w_nom is None:
-            p.gleichung(
-                rf"{s_sigma} = {s_f_yk} = {erg.sigma_s_adm / 1e6:.0f}"
-                rf"\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}",
-                titel="Zulässige Stahlspannung (normale Anforderung)")
-        else:
-            p.gleichung(
-                rf"{s_sigma} = \min\left[\sqrt{{\frac{{9 \cdot E_s \cdot "
-                rf"{self.s_f_ctm} \cdot w_{{nom}}}}{{\varnothing_{{{index}}}}}}};\ "
-                rf"{s_f_yk}\right]"
-                "\n= "
-                rf"\min\left[\sqrt{{\frac{{9 \cdot {erg.E_s / 1e6:.0f} \cdot "
-                rf"{f_ctm / 1e6:.2f} \cdot {w_nom * 1e3:.1f}}}"
-                rf"{{{erg.durchmesser * 1e3:.0f}}}}};\ "
-                rf"{erg.f_yk / 1e6:.0f}\right]"
-                rf" = {erg.sigma_s_adm / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}",
-                titel=(f"Zulässige Stahlspannung (Rissbreite "
-                       f"w_nom = {w_nom * 1e3:.1f} mm)"),
-                referenz="SIA 262:2025, 4.4.2")
-
-        zustand = r"\text{erfüllt}" if erg.erfuellt else r"\text{NICHT erfüllt}"
-        vergleich = r"\ge" if erg.erfuellt else "<"
-        p.gleichung(
-            rf"N_{{s,adm,{index}}} = {s_a_s} \cdot {s_sigma}"
-            rf" = {erg.a_s * 1e6:.0f}\,\mathrm{{mm}}^{{2}} \cdot "
-            rf"{erg.sigma_s_adm / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
-            rf" = {erg.N_s_adm / 1e3:.1f}\,\mathrm{{kN}}"
-            rf" \quad {vergleich} \quad N_{{Riss}} = "
-            rf"{self.groessen.N_Riss / 1e3:.1f}\,\mathrm{{kN}}"
-            rf" \quad \Rightarrow \quad {zustand}",
-            titel="Aufnehmbare Risskraft")
-
-        grad = grad_als_text(erg.erfuellungsgrad, erg.erfuellt, latex=True)
-        p.gleichung(
-            rf"\alpha_{{eff,NR,{index}}} = \frac{{N_{{s,adm,{index}}}}}"
-            rf"{{N_{{Riss}}}} = \frac{{{erg.N_s_adm / 1e3:.1f}\,\mathrm{{kN}}}}"
-            rf"{{{self.groessen.N_Riss / 1e3:.1f}\,\mathrm{{kN}}}} = {grad}",
-            titel="Erfüllungsgrad")
-
-    def _index(self, erg: Lagenergebnis) -> str:
-        """Der Symbolindex der Lage -- ``1,x`` statt ``1,x,g``."""
-        eintraege = self.posten_je_lage[erg.lage.nummer]
-        if not eintraege:
-            return ""
-        lage, art, *_ = eintraege[0]
-        if len(eintraege) == 1:
-            return posten_index(lage, art)
-        return f"{lage.nummer},{lage.richtung.value}"
+        n_s_adm, n_riss = self._n_s_adm(erg), self._n_riss()
+        p.formel(n_s_adm, r"@A_s \cdot @sigma", {"A_s": a_s, "sigma": sigma},
+                 titel="Aufnehmbare Risskraft",
+                 nachsatz=vergleich(r"\ge" if erg.erfuellt else "<", angabe(n_riss),
+                                    erg.erfuellt))
+        grad_formel(p, self.d_ausnutzung[nummer].belegen(
+                        Groesse(erg.erfuellungsgrad, EINHEITSLOS)),
+                    r"\frac{@N}{@N_Riss}", {"N": n_s_adm, "N_Riss": n_riss},
+                    erg.erfuellt)
 
 
 
@@ -496,6 +485,9 @@ class Momentlagenergebnis:
     sigma_s_adm: float = 0.0
 
     n: float = 0.0
+    rho: float = 0.0
+    """``n * A_s / b``, die Hilfsgroesse der Nulllinie, in m."""
+
     x: float = 0.0
     hebelarm: float = 0.0
     M_s_adm: float = 0.0
@@ -594,9 +586,6 @@ class ZwaengungBiegung(Nachweis):
                 Eingabebezug(f"E_s__{kurz}", stahl.id_von("E_s")),
             ]
 
-        self.s_f_ctm = mit_index("f_{ctm}", querschnitt.beton.symbol_index)
-        self.s_E_cm = mit_index("E_{cm}", querschnitt.beton.symbol_index)
-
         super().__init__(
             basis,
             ausgaben=list(self.d_ausnutzung.values()),
@@ -617,9 +606,7 @@ class ZwaengungBiegung(Nachweis):
         phi = e.g("phi").si
 
         self.groessen = rissmoment(h=h, b=b, f_ctm=f_ctm)
-        E_s = _erster_E_s(e, self.lagen)
-        n = wertigkeit(E_s=E_s, E_cm=E_cm, phi=phi)
-        self._protokoll_ansatz(p, h, b, f_ctm, E_s=E_s, E_cm=E_cm, phi=phi, n=n)
+        self._protokoll_ansatz(p, e)
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
@@ -628,7 +615,7 @@ class ZwaengungBiegung(Nachweis):
         for lage in self.lagen:
             erg = self._eine_lage(e, lage, h=h, b=b, f_ctm=f_ctm, E_cm=E_cm, phi=phi)
             self.ergebnisse.append(erg)
-            self._protokoll_lage(p, erg, b=b, f_ctm=f_ctm)
+            self._protokoll_lage(p, e, erg)
             ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
                 min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
             urteile.append(self._urteil(erg))
@@ -668,6 +655,7 @@ class ZwaengungBiegung(Nachweis):
 
         erg.n = wertigkeit(E_s=erg.E_s, E_cm=E_cm, phi=phi)
         riss = gerissen(n=erg.n, a_s=erg.a_s, b=b, d=erg.d)
+        erg.rho = riss.rho
         erg.x = riss.x
         erg.hebelarm = riss.z
         erg.M_s_adm = erg.sigma_s_adm * erg.a_s * erg.hebelarm
@@ -684,19 +672,19 @@ class ZwaengungBiegung(Nachweis):
             f"M_Riss = {M_Riss / 1e3:.1f} kNm.")
         return erg
 
+    def _m_s_adm(self, erg: Momentlagenergebnis) -> Wert:
+        """Was die Lage aufnimmt -- der Widerstand in Tabelle und Herleitung."""
+        nummer, r = erg.lage.nummer, self.richtung.value
+        return WertDef(
+            id=f"{self.id}.lage{nummer}.M_s_adm", symbol=rf"M_{{s,adm,{nummer},{r}}}",
+            einheit=KNM, beschreibung="Widerstand", stellen=1,
+        ).belegen(Groesse.aus_si(erg.M_s_adm, KNM))
+
     def _urteil(self, erg: Momentlagenergebnis) -> NachweisUrteil:
         nummer = erg.lage.nummer
         r = self.richtung.value
-        einwirkung = WertDef(
-            id=f"{self.id}.M_Riss",
-            symbol=r"M_{Riss}",
-            einheit=KNM, beschreibung="Einwirkung", stellen=1,
-        ).belegen(Groesse.aus_si(self.groessen.M_Riss, KNM))
-        widerstand = WertDef(
-            id=f"{self.id}.lage{nummer}.M_s_adm",
-            symbol=rf"M_{{s,adm,{nummer},{r}}}",
-            einheit=KNM, beschreibung="Widerstand", stellen=1,
-        ).belegen(Groesse.aus_si(erg.M_s_adm, KNM))
+        einwirkung = rissmoment_wert(self.id, self.groessen)
+        widerstand = self._m_s_adm(erg)
         return NachweisUrteil(
             name=f"Zwängung Biegung {r} – {nummer}. Lage",
             art="ZB",
@@ -729,10 +717,7 @@ class ZwaengungBiegung(Nachweis):
 
     # -- Mitschrift ---------------------------------------------------------
 
-    def _protokoll_ansatz(self, p: Protokoll, h: float, b: float, f_ctm: float,
-                          *, E_s: float, E_cm: float, phi: float,
-                          n: float) -> None:
-        g = self.groessen
+    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
         p.titel(f"Zwängung auf Biegung – {self.richtung.beschriftung}")
         p.text(
             "Eine aufgezwungene Krümmung erzeugt beim Reissen ein Moment, das "
@@ -741,24 +726,8 @@ class ZwaengungBiegung(Nachweis):
             "gegen sprödes Versagen: dort steht der Biegewiderstand gegen das "
             "Rissmoment, hier die Stahlspannung gegen ihre Grenze."
         )
-        p.gleichung(
-            rf"k_t = \frac{{1}}{{1 + 0.5 \cdot h/{MOMENTENTEILER:.0f}}}"
-            rf" = \frac{{1}}{{1 + 0.5 \cdot {h:.3f}\,\mathrm{{m}}"
-            rf"/{MOMENTENTEILER:.0f}}} = {g.k_t:.3f}",
-            titel="Beiwert für die Plattendicke",
-            referenz="SIA 262:2025, 4.4.2")
-        p.gleichung(
-            rf"f_{{ct,eff}} = k_t \cdot {self.s_f_ctm} = {g.k_t:.3f} \cdot "
-            rf"{f_ctm / 1e6:.2f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
-            rf" = {g.f_ct_eff / 1e6:.2f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}",
-            titel="Wirksame Zugfestigkeit")
-        p.gleichung(
-            r"M_{Riss} = f_{ct,eff} \cdot \frac{h^{2} \cdot b}{6}"
-            rf" = {g.f_ct_eff / 1e6:.2f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}} \cdot "
-            rf"\frac{{\left({h * 1e3:.0f}\,\mathrm{{mm}}\right)^{{2}} \cdot "
-            rf"{b * 1e3:.0f}\,\mathrm{{mm}}}}{{6}}"
-            rf" = {g.M_Riss / 1e3:.1f}\,\mathrm{{kNm}}",
-            titel="Rissmoment des ungerissenen Querschnitts")
+        protokoll_rissmoment(p, e, self.groessen, basis=self.id,
+                             referenz="SIA 262:2025, 4.4.2")
         p.text(
             "Das Rissmoment gilt für den ungerissenen Bruttoquerschnitt – den "
             "Zustand vor dem Riss. Der Widerstand dagegen wird am gerissenen "
@@ -766,120 +735,78 @@ class ZwaengungBiegung(Nachweis):
             "verschiedene Querschnitte auftreten, ist genau die Frage: reicht "
             "die Bewehrung für das, was der Beton abgibt?"
         )
-        p.gleichung(
-            rf"n = \frac{{E_s}}{{{self.s_E_cm}}} \cdot \left(1 + \varphi\right)"
-            rf" = \frac{{{E_s / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}}}"
-            rf"{{{E_cm / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}}} \cdot "
-            rf"\left(1 + {phi:.2f}\right) = {n:.2f}",
-            titel="Wertigkeit im gerissenen Zustand")
+        E_s = _erster_E_s(e, self.lagen)
+        if E_s is not None:
+            n = wertigkeit(E_s=E_s.groesse.si, E_cm=e.g("E_cm").si, phi=e.g("phi").si)
+            p.formel(Zwischenwerte(self.id).zahl("n", "n", n, stellen=2),
+                     r"\frac{@E_s}{@E_cm} \cdot \left(1 + @phi\right)",
+                     {"E_s": E_s, "E_cm": e["E_cm"], "phi": e["phi"]},
+                     titel="Wertigkeit im gerissenen Zustand")
         p.text(
             "Das Kriechen weicht den Beton auf: E_c,eff = E_cm/(1+φ), und die "
             "Wertigkeit ist E_s/E_c,eff. Ein grösseres φ senkt damit den "
             "Hebelarm und liegt auf der sicheren Seite."
         )
 
-    def _protokoll_lage(self, p: Protokoll, erg: Momentlagenergebnis, *,
-                        b: float, f_ctm: float) -> None:
+    def _protokoll_lage(self, p: Protokoll, e: Eingaben,
+                        erg: Momentlagenergebnis) -> None:
         nummer = erg.lage.nummer
-        r = self.richtung.value
-        p.titel(f"Zwängung auf Biegung – {nummer}. Lage {r}", ebene=3)
+        p.titel(f"Zwängung auf Biegung – {nummer}. Lage {self.richtung.value}", ebene=3)
 
         if not erg.machbar:
             p.text(erg.begruendung)
             return
 
-        index = self._index(erg)
-        s_a_s = f"A_{{s,{index}}}" if index else "A_s"
-        s_d = f"d_{{{index}}}" if index else "d"
-        s_sigma = rf"\sigma_{{s,adm,{index}}}" if index else r"\sigma_{s,adm}"
-        s_f_yk = mit_index("f_{yk}", erg.lage.stahl.symbol_index)
-        w_nom = RISSBREITE[self.anforderung]
+        eintraege = self.posten_je_lage[nummer]
+        index = lagenindex(eintraege)
+        werte = Zwischenwerte(f"{self.id}.lage{nummer}")
+        marken = [f"{nummer}{art.kuerzel}" for _, art, *_ in eintraege]
+        flaechen = [e[f"a_s_{m}"] for m in marken]
+        a_s = protokoll_bewehrung(p, werte, index, flaechen, erg.a_s)
+        d = protokoll_hoehe_der_lage(
+            p, werte, index, flaechen, [e[f"z_{m}"] for m in marken],
+            z=erg.z_s, d=erg.d, h=e["h"], von_unten=erg.lage.von_unten)
+        sigma = _protokoll_stahlspannung(p, e, werte, erg, marken=marken,
+                                         anforderung=self.anforderung)
 
-        seite = "unten" if erg.lage.von_unten else "oben"
-        p.gleichung(
-            rf"{s_d} = {erg.d * 1e3:.1f}\,\mathrm{{mm}}",
-            titel=f"Statische Höhe ab der gedrückten Randfaser ({seite})")
-
-        if w_nom is None:
-            p.gleichung(
-                rf"{s_sigma} = {s_f_yk} = {erg.sigma_s_adm / 1e6:.0f}"
-                rf"\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}",
-                titel="Zulässige Stahlspannung (normale Anforderung)")
-        else:
-            p.gleichung(
-                rf"{s_sigma} = \min\left[\sqrt{{\frac{{9 \cdot E_s \cdot "
-                rf"{self.s_f_ctm} \cdot w_{{nom}}}}{{\varnothing_{{{index}}}}}}};\ "
-                rf"{s_f_yk}\right]"
-                "\n= "
-                rf"\min\left[\sqrt{{\frac{{9 \cdot {erg.E_s / 1e6:.0f} \cdot "
-                rf"{f_ctm / 1e6:.2f} \cdot {w_nom * 1e3:.1f}}}"
-                rf"{{{erg.durchmesser * 1e3:.0f}}}}};\ "
-                rf"{erg.f_yk / 1e6:.0f}\right]"
-                rf" = {erg.sigma_s_adm / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}",
-                titel=(f"Zulässige Stahlspannung (Rissbreite "
-                       f"w_nom = {w_nom * 1e3:.1f} mm)"),
-                referenz="SIA 262:2025, 4.4.2")
-
-        p.gleichung(
-            rf"\rho = \frac{{n \cdot {s_a_s}}}{{b}} \qquad "
-            rf"x = \sqrt{{\rho^{{2}} + 2 \cdot {s_d} \cdot \rho}} - \rho"
-            "\n= "
-            rf"\sqrt{{\left({erg.n * erg.a_s / b * 1e3:.2f}\,\mathrm{{mm}}"
-            rf"\right)^{{2}} + 2 \cdot {erg.d * 1e3:.1f}\,\mathrm{{mm}} \cdot "
-            rf"{erg.n * erg.a_s / b * 1e3:.2f}\,\mathrm{{mm}}}} - "
-            rf"{erg.n * erg.a_s / b * 1e3:.2f}\,\mathrm{{mm}}"
-            rf" = {erg.x * 1e3:.1f}\,\mathrm{{mm}}",
-            titel="Nulllinie des gerissenen Querschnitts")
-        p.gleichung(
-            rf"z = {s_d} - \frac{{x}}{{3}} = {erg.d * 1e3:.1f}\,\mathrm{{mm}}"
-            rf" - \frac{{{erg.x * 1e3:.1f}\,\mathrm{{mm}}}}{{3}}"
-            rf" = {erg.hebelarm * 1e3:.1f}\,\mathrm{{mm}}",
-            titel="Innerer Hebelarm")
+        rho = werte.laenge("rho", r"\rho", erg.rho, stellen=2)
+        p.formel(rho, r"\frac{@n \cdot @A_s}{@b}",
+                 {"n": werte.zahl("n", "n", erg.n, stellen=2), "A_s": a_s, "b": e["b"]},
+                 titel="Hilfsgrösse der Nulllinie")
+        x = werte.laenge("x", "x", erg.x)
+        p.formel(x, r"\sqrt{@rho^{2} + 2 \cdot @d \cdot @rho} - @rho",
+                 {"rho": rho, "d": d}, titel="Nulllinie des gerissenen Querschnitts")
+        hebelarm = werte.laenge("hebelarm", "z", erg.hebelarm)
+        p.formel(hebelarm, r"@d - \frac{@x}{3}", {"d": d, "x": x},
+                 titel="Innerer Hebelarm")
         p.text(
             "Die Betondruckspannung verläuft dreieckig – null in der Nulllinie, "
             "am grössten an der gedrückten Kante. Ihre Resultierende liegt "
             "deshalb bei x/3 von dieser Kante."
         )
 
-        zustand = r"\text{erfüllt}" if erg.erfuellt else r"\text{NICHT erfüllt}"
-        vergleich = r"\ge" if erg.erfuellt else "<"
-        p.gleichung(
-            rf"M_{{s,adm,{index}}} = {s_sigma} \cdot {s_a_s} \cdot z"
-            rf" = {erg.sigma_s_adm / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
-            rf" \cdot {erg.a_s * 1e6:.0f}\,\mathrm{{mm}}^{{2}} \cdot "
-            rf"{erg.hebelarm * 1e3:.1f}\,\mathrm{{mm}}"
-            rf" = {erg.M_s_adm / 1e3:.1f}\,\mathrm{{kNm}}"
-            rf" \quad {vergleich} \quad M_{{Riss}} = "
-            rf"{self.groessen.M_Riss / 1e3:.1f}\,\mathrm{{kNm}}"
-            rf" \quad \Rightarrow \quad {zustand}",
-            titel="Aufnehmbares Moment der Bewehrung")
-
-        grad = grad_als_text(erg.erfuellungsgrad, erg.erfuellt, latex=True)
-        p.gleichung(
-            rf"\alpha_{{eff,ZB,{index}}} = \frac{{M_{{s,adm,{index}}}}}"
-            rf"{{M_{{Riss}}}} = \frac{{{erg.M_s_adm / 1e3:.1f}\,\mathrm{{kNm}}}}"
-            rf"{{{self.groessen.M_Riss / 1e3:.1f}\,\mathrm{{kNm}}}} = {grad}",
-            titel="Erfüllungsgrad")
-
-    def _index(self, erg: Momentlagenergebnis) -> str:
-        eintraege = self.posten_je_lage[erg.lage.nummer]
-        if not eintraege:
-            return ""
-        lage, art, *_ = eintraege[0]
-        if len(eintraege) == 1:
-            return posten_index(lage, art)
-        return f"{lage.nummer},{lage.richtung.value}"
+        m_s_adm, m_riss = self._m_s_adm(erg), rissmoment_wert(self.id, self.groessen)
+        p.formel(m_s_adm, r"@sigma \cdot @A_s \cdot @z",
+                 {"sigma": sigma, "A_s": a_s, "z": hebelarm},
+                 titel="Aufnehmbares Moment der Bewehrung",
+                 nachsatz=vergleich(r"\ge" if erg.erfuellt else "<", angabe(m_riss),
+                                    erg.erfuellt))
+        grad_formel(p, self.d_ausnutzung[nummer].belegen(
+                        Groesse(erg.erfuellungsgrad, EINHEITSLOS)),
+                    r"\frac{@M}{@M_Riss}", {"M": m_s_adm, "M_Riss": m_riss},
+                    erg.erfuellt)
 
 
-def _erster_E_s(e: Eingaben, lagen: Sequence[Bewehrungslage]) -> float:
+def _erster_E_s(e: Eingaben, lagen: Sequence[Bewehrungslage]) -> Optional[Wert]:
     """
     Der Elastizitaetsmodul fuer die Wertigkeit im Ansatz.
 
     Im Ansatz steht n einmal; je Lage wird es mit dem Stahl dieser Lage
     gerechnet. Bei einer Platte mit zwei Sorten weichen die Zahlen dann ab --
-    massgebend ist, was in der Lagenrechnung steht.
+    massgebend ist, was in der Lagenrechnung steht. ``None``, wenn keine der
+    Lagen einen Stahl traegt.
     """
     for lage in lagen:
         if lage.stahl:
-            return e.g(f"E_s__{kennung_aus(lage.stahl.id)}").si
-    return 0.0
+            return e[f"E_s__{kennung_aus(lage.stahl.id)}"]
+    return None

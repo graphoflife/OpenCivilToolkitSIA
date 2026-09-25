@@ -321,6 +321,63 @@ def posten_index(lage: "Bewehrungslage", art: Postenart) -> str:
     return f"{lage.nummer},{lage.richtung.value},{art.kuerzel}"
 
 
+def lagenindex(eintraege: Sequence[Tuple]) -> str:
+    """
+    Der Symbolindex einer Lage aus ihren Posten -- ``1,x`` statt ``1,x,g``.
+
+    Gerechnet wird mit der ganzen Lage, nicht mit einem Posten; ein
+    Postenindex am Symbol behauptete etwas anderes. Hat die Lage nur einen
+    Posten, ist dessen Index auch ihrer -- dann heisst ``A_s`` so wie in der
+    Tabelle der Platte. ``eintraege`` sind Zeilen aus ``posten_ids``.
+    """
+    if not eintraege:
+        return ""
+    lage, art, *_ = eintraege[0]
+    if len(eintraege) == 1:
+        return posten_index(lage, art)
+    return f"{lage.nummer},{lage.richtung.value}"
+
+
+def protokoll_bewehrung(
+    p: Protokoll, werte: Zwischenwerte, index: str, flaechen: Sequence[Wert],
+    a_s: float,
+) -> Wert:
+    """``A_s`` einer Lage -- liegen Grundbewehrung und Zulage darin, als Summe."""
+    flaeche = werte.flaeche("A_s", f"A_{{s,{index}}}", a_s)
+    if len(flaechen) > 1:
+        p.formel(flaeche, " + ".join(f"@a{i}" for i in range(len(flaechen))),
+                 {f"a{i}": a for i, a in enumerate(flaechen)},
+                 titel="Bewehrung der Lage")
+    return flaeche
+
+
+def protokoll_hoehe_der_lage(
+    p: Protokoll, werte: Zwischenwerte, index: str, flaechen: Sequence[Wert],
+    tiefen: Sequence[Wert], *, z: float, d: float, h: Wert, von_unten: bool,
+) -> Wert:
+    """
+    ``d`` einer Lage aus den Tiefen ihrer Posten ab Oberkante.
+
+    Grundbewehrung und Zulage liegen auf leicht verschiedenen Hoehen -- zaehlen
+    beide, steht ihr gemeinsamer Schwerpunkt da, sonst fiele er vom Himmel.
+    Unten ist die Tiefe ab Oberkante schon die statische Hoehe; oben misst
+    ``d`` ab dem unteren Rand, und die Tiefe heisst ``z``.
+    """
+    tiefe = werte.laenge("z", f"{'d' if von_unten else 'z'}_{{{index}}}", z)
+    if len(tiefen) > 1:
+        eingaben = {f"a{i}": a for i, a in enumerate(flaechen)}
+        eingaben.update({f"z{i}": t for i, t in enumerate(tiefen)})
+        summe = " + ".join(f"@a{i}" for i in range(len(flaechen)))
+        momente = " + ".join(rf"@a{i} \cdot @z{i}" for i in range(len(flaechen)))
+        p.formel(tiefe, rf"\frac{{{momente}}}{{{summe}}}", eingaben,
+                 titel="Gemeinsamer Schwerpunkt der Lage")
+    if von_unten:
+        return tiefe
+    hoehe = werte.laenge("d", f"d_{{{index}}}", d)
+    protokoll_statische_hoehe(p, hoehe, h=h, z=tiefe, von_unten=False)
+    return hoehe
+
+
 def protokoll_statische_hoehe(
     p: Protokoll, d: Wert, *, h: Wert, z: Wert, von_unten: bool,
 ) -> None:

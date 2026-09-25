@@ -60,6 +60,17 @@ class Rissgroessen:
 MOMENTENTEILER = 3.0
 
 
+def beiwert_dicke(h_riss: float) -> float:
+    """
+    ``k_t = 1 / (1 + 0.5 * h)`` -- eine dicke Platte reisst nicht ueber ihre
+    ganze Hoehe gleichzeitig.
+
+    Empirisch: ``h_riss`` geht in Metern ein, und Meter ist die SI-Basis.
+    Unter Biegung ist es ein Drittel der Dicke, beim Zwang die rissaktive.
+    """
+    return 1.0 / (1.0 + 0.5 * h_riss)
+
+
 def rissmoment(*, h: float, b: float, f_ctm: float) -> Rissgroessen:
     """
     Das Moment, bei dem der ungerissene Querschnitt aufreisst.
@@ -67,10 +78,57 @@ def rissmoment(*, h: float, b: float, f_ctm: float) -> Rissgroessen:
     ``h^2*b/6`` ist das elastische Widerstandsmoment des Bruttoquerschnitts.
     Alles in SI-Basis; Rueckgabe in Nm.
     """
-    k_t = 1.0 / (1.0 + 0.5 * h / MOMENTENTEILER)
+    k_t = beiwert_dicke(h / MOMENTENTEILER)
     f_ct_eff = k_t * f_ctm
     return Rissgroessen(k_t=k_t, f_ct_eff=f_ct_eff,
                         M_Riss=f_ct_eff * h * h * b / 6.0)
+
+
+def rissmoment_wert(basis: str, g: Rissgroessen) -> Wert:
+    """Das Rissmoment -- die Einwirkung in Tabelle und Herleitung."""
+    return WertDef(
+        id=f"{basis}.M_Riss", symbol=r"M_{Riss}",
+        einheit=KNM, beschreibung="Einwirkung", stellen=1,
+    ).belegen(Groesse.aus_si(g.M_Riss, KNM))
+
+
+def protokoll_zugfestigkeit(
+    p: Protokoll, werte: Zwischenwerte, *, k_t: float, f_ct_eff: float,
+    h: Wert, f_ctm: Wert, teiler: float, referenz: str,
+) -> Wert:
+    """
+    Beiwert fuer die Plattendicke und wirksame Zugfestigkeit, hergeleitet.
+
+    Drei Nachweise brauchen die beiden Zeilen -- das spröde Versagen und beide
+    Zwängungen. ``teiler`` ist der Anteil der Dicke, der reisst: ein Drittel
+    unter Biegung, bei der Normalkraft die ganze rissaktive Dicke (``1``).
+    Zurueck kommt ``f_ct,eff`` fuer die Zeile danach.
+    """
+    anteil = "@h" if teiler == 1 else rf"@h/{teiler:.0f}"
+    beiwert = werte.zahl("k_t", "k_t", k_t)
+    p.formel(beiwert, rf"\frac{{1}}{{1 + 0.5 \cdot {anteil}}}", {"h": h},
+             titel="Beiwert für die Plattendicke", referenz=referenz,
+             empirisch={"h": M})
+    wirksam = werte.spannung("f_ct_eff", "f_{ct,eff}", f_ct_eff, stellen=2)
+    p.formel(wirksam, r"@k_t \cdot @f_ctm", {"k_t": beiwert, "f_ctm": f_ctm},
+             titel="Wirksame Zugfestigkeit")
+    return wirksam
+
+
+def protokoll_rissmoment(
+    p: Protokoll, e: Eingaben, g: Rissgroessen, *, basis: str, referenz: str,
+) -> None:
+    """
+    Das Rissmoment von ``k_t`` an -- fuer das spröde Versagen und die
+    Zwängung auf Biegung dieselben drei Zeilen. Gebraucht werden die
+    Eingaben ``h``, ``b`` und ``f_ctm``.
+    """
+    f_ct_eff = protokoll_zugfestigkeit(
+        p, Zwischenwerte(basis), k_t=g.k_t, f_ct_eff=g.f_ct_eff, h=e["h"],
+        f_ctm=e["f_ctm"], teiler=MOMENTENTEILER, referenz=referenz)
+    p.formel(rissmoment_wert(basis, g), r"@f_ct_eff \cdot \frac{@h^{2} \cdot @b}{6}",
+             {"f_ct_eff": f_ct_eff, "h": e["h"], "b": e["b"]},
+             titel="Rissmoment des ungerissenen Querschnitts")
 
 
 @dataclass
@@ -204,13 +262,6 @@ class SproedesVersagen(Nachweis):
         self._protokoll_massgebend(p, urteile)
         return ergebnis, self.teilurteile(urteile)
 
-    def _m_riss(self) -> Wert:
-        """Das Rissmoment -- die Einwirkung in Tabelle und Herleitung."""
-        return WertDef(
-            id=f"{self.id}.M_Riss", symbol=r"M_{Riss}",
-            einheit=KNM, beschreibung="Einwirkung", stellen=1,
-        ).belegen(Groesse.aus_si(self.groessen.M_Riss, KNM))
-
     def _m_rd(self, erg: Lagenergebnis) -> Wert:
         """Der Biegewiderstand der Lage -- der Widerstand in Tabelle und Herleitung."""
         nummer, r = erg.lage.nummer, self.richtung.value
@@ -232,7 +283,7 @@ class SproedesVersagen(Nachweis):
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
             begruendung=erg.begruendung,
             hinweis=erg.hinweis,
-            einwirkung=self._m_riss() if erg.machbar else None,
+            einwirkung=rissmoment_wert(self.id, self.groessen) if erg.machbar else None,
             widerstand=self._m_rd(erg) if erg.machbar else None,
         )
 
@@ -256,8 +307,6 @@ class SproedesVersagen(Nachweis):
     # -- Mitschrift ---------------------------------------------------------
 
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
-        g = self.groessen
-        werte = Zwischenwerte(self.id)
         p.titel(f"Sprödes Versagen – {self.richtung.beschriftung}")
         p.text(
             "Ein zu schwach bewehrter Querschnitt reisst und versagt im selben "
@@ -265,17 +314,8 @@ class SproedesVersagen(Nachweis):
             "Querschnitt mehr trägt als der unbewehrte im Augenblick des "
             "Risses: M_Rd(N_Ed = 0) ≥ M_Riss."
         )
-        # Empirisch: die Norm setzt die Dicke in Metern ein.
-        k_t = werte.zahl("k_t", "k_t", g.k_t)
-        p.formel(k_t, rf"\frac{{1}}{{1 + 0.5 \cdot @h/{MOMENTENTEILER:.0f}}}",
-                 {"h": e["h"]}, titel="Beiwert für die Plattendicke",
-                 referenz="SIA 262:2025, 4.4.1.3", empirisch={"h": M})
-        f_ct_eff = werte.spannung("f_ct_eff", "f_{ct,eff}", g.f_ct_eff, stellen=2)
-        p.formel(f_ct_eff, r"@k_t \cdot @f_ctm", {"k_t": k_t, "f_ctm": e["f_ctm"]},
-                 titel="Wirksame Zugfestigkeit")
-        p.formel(self._m_riss(), r"@f_ct_eff \cdot \frac{@h^{2} \cdot @b}{6}",
-                 {"f_ct_eff": f_ct_eff, "h": e["h"], "b": e["b"]},
-                 titel="Rissmoment des ungerissenen Querschnitts")
+        protokoll_rissmoment(p, e, self.groessen, basis=self.id,
+                             referenz="SIA 262:2025, 4.4.1.3")
 
     def _protokoll_lage(self, p: Protokoll, erg: Lagenergebnis) -> None:
         nummer = erg.lage.nummer
@@ -286,7 +326,7 @@ class SproedesVersagen(Nachweis):
             p.text(erg.begruendung)
             return
 
-        m_rd, m_riss = self._m_rd(erg), self._m_riss()
+        m_rd, m_riss = self._m_rd(erg), rissmoment_wert(self.id, self.groessen)
         p.gleichung(bedingung(angabe(m_rd), r"\ge" if erg.erfuellt else "<",
                               angabe(m_riss), erg.erfuellt),
                     titel="Biegewiderstand gegen Rissmoment")

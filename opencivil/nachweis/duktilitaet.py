@@ -53,7 +53,9 @@ from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.handrechnung import BLOCKANTEIL
 from opencivil.querschnitt.platte import (
-    Bewehrungslage, Richtung, posten_index)
+    Bewehrungslage, Richtung, lagenindex, protokoll_bewehrung,
+    protokoll_hoehe_der_lage,
+)
 
 #: Groesste zulaessige bezogene Druckzonenhoehe.
 GRENZE = 0.35
@@ -355,36 +357,17 @@ class Duktilitaet(Nachweis):
             p.text(erg.begruendung)
             return
 
-        index = self._index(erg)
+        eintraege = self.posten_je_lage[nummer]
+        index = lagenindex(eintraege)
         werte = Zwischenwerte(f"{self.id}.lage{nummer}")
-        s_a_s = f"A_{{s,{index}}}" if index else "A_s"
-        s_d = f"d_{{{index}}}" if index else "d"
-        s_z = f"z_{{{index}}}" if index else "z"
         # Je Posten Querschnitt und Hoehe ab Oberkante -- dieselben Werte wie
         # in der Tabelle der Platte.
-        posten = [(e[f"a_s_{nummer}{art.kuerzel}"], e[f"z_{nummer}{art.kuerzel}"])
-                  for _, art, *_ in self.posten_je_lage[nummer]]
-
-        a_s = werte.flaeche("A_s", s_a_s, erg.a_s)
-        # Unten bewehrt ist die Hoehe ab Oberkante schon die statische Hoehe.
-        z = werte.laenge("z", s_d if erg.lage.von_unten else s_z, erg.z)
-        if len(posten) > 1:
-            # Grundbewehrung und Zulage liegen auf leicht verschiedenen Hoehen
-            # -- ohne diese beiden Zeilen fiele der Schwerpunkt vom Himmel.
-            eingaben: Dict[str, Wert] = {}
-            for i, (flaeche, hoehe) in enumerate(posten):
-                eingaben[f"a{i}"], eingaben[f"z{i}"] = flaeche, hoehe
-            summe = " + ".join(f"@a{i}" for i in range(len(posten)))
-            momente = " + ".join(rf"@a{i} \cdot @z{i}" for i in range(len(posten)))
-            p.formel(a_s, summe, eingaben, titel="Bewehrung der Lage")
-            p.formel(z, rf"\frac{{{momente}}}{{{summe}}}", eingaben,
-                     titel="Gemeinsamer Schwerpunkt der Lage")
-        if erg.lage.von_unten:
-            d = z
-        else:
-            d = werte.laenge("d", s_d, erg.d)
-            p.formel(d, "@h - @z", {"h": e["h"], "z": z},
-                     titel="Statische Höhe ab der gedrückten Randfaser (unten)")
+        marken = [f"{nummer}{art.kuerzel}" for _, art, *_ in eintraege]
+        flaechen = [e[f"a_s_{m}"] for m in marken]
+        a_s = protokoll_bewehrung(p, werte, index, flaechen, erg.a_s)
+        d = protokoll_hoehe_der_lage(
+            p, werte, index, flaechen, [e[f"z_{m}"] for m in marken],
+            z=erg.z, d=erg.d, h=e["h"], von_unten=erg.lage.von_unten)
 
         x = werte.laenge("x", "x", erg.x)
         p.formel(
@@ -406,19 +389,3 @@ class Duktilitaet(Nachweis):
                         Groesse(erg.erfuellungsgrad, EINHEITSLOS)),
                     r"\frac{@grenze}{@verhaeltnis}",
                     {"grenze": grenze, "verhaeltnis": verhaeltnis}, erg.erfuellt)
-
-    def _index(self, erg: Lagenergebnis) -> str:
-        """
-        Der Symbolindex der Lage -- ``1,x`` statt ``1,x,g``.
-
-        Gerechnet wird mit der ganzen Lage, nicht mit einem Posten. Ein
-        Postenindex am Symbol behauptete etwas anderes.
-        """
-        eintraege = self.posten_je_lage[erg.lage.nummer]
-        if not eintraege:
-            return ""
-        lage, art, *_ = eintraege[0]
-        if len(eintraege) == 1:
-            return posten_index(lage, art)
-        return f"{lage.nummer},{lage.richtung.value}"
-
