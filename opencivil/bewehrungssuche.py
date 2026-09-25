@@ -93,10 +93,10 @@ class Suchmodus(str, Enum):
     @property
     def beschriftung(self) -> str:
         return {
-            Suchmodus.GRUND_OHNE: "Grundbewehrung ohne Kräfte",
-            Suchmodus.GRUND_MIT: "Grundbewehrung mit Kräften",
+            Suchmodus.GRUND_OHNE: "Grundbew. ohne Kräfte",
+            Suchmodus.GRUND_MIT: "Grundbew. mit Kräften",
             Suchmodus.GRUND_OHNE_ZULAGE_MIT:
-                "Grundbewehrung ohne Kräfte, Zulage mit Kräften",
+                "Grundbew. ohne Kräfte, Zulage mit Kräften",
         }[self]
 
 
@@ -127,7 +127,8 @@ class Loesung:
     """Posten (``'1g'``, ``'4z'``, …) auf Durchmesser in mm."""
 
     stahlflaeche: float = 0.0
-    """Summe der Bewehrungsquerschnitte in mm²/Streifen."""
+    """Summe der Bewehrungsquerschnitte in mm²/Streifen -- alles, was die
+    Loesung einbaut, auch die y-Grundbewehrung, die x folgt."""
 
     schlechtester: float = 0.0
     nachweis: str = ""
@@ -183,7 +184,8 @@ def _gesuchte(eintrag, *, arten: Sequence[str]) -> List[Posten]:
     gaebe es dort auch kein Mass, an dem sich ein Durchmesser bemessen liesse
     -- die Suche wuerde sie auf null ziehen, und genau das waere falsch: die
     y-Bewehrung liegt aussen und bestimmt, wieviel statische Hoehe der
-    x-Bewehrung bleibt. Was dort liegt, sagt der Benutzer.
+    x-Bewehrung bleibt. Was dort liegt, sagt der Benutzer -- oder er laesst
+    die y-Grundbewehrung der x-Grundbewehrung folgen (:func:`_y_folgt_x`).
 
     Null bleibt fuer die x-Lagen ein gueltiges Ergebnis und ist der Anfang
     jeder Suche (siehe :func:`stufen`).
@@ -208,16 +210,32 @@ def stufen(durchmesser: Sequence[float], mindest: float) -> List[float]:
     return [0.0, *grosse]
 
 
-def _flaeche(eintrag, posten: Sequence[Posten], teilung: float,
+def _seiten(eintrag) -> List[Tuple[int, int]]:
+    """Je Seite das Paar (x-Lage, y-Lage): unten 1 und 2, oben 3 und 4."""
+    return [(a, b) if eintrag.richtung_von(a) is Richtung.X else (b, a)
+            for a, b in ((1, 2), (3, 4))]
+
+
+def _y_folgt_x(eintrag) -> None:
+    """
+    Die y-Grundbewehrung jeder Seite wie die x-Grundbewehrung dieser Seite.
+
+    Im Suchlauf nach jedem Setzen, nicht erst beim Uebernehmen: liegt y
+    aussen, kostet ihr Durchmesser x die statische Hoehe, und gesucht werden
+    soll mit der Bewehrung, die hinterher dasteht.
+    """
+    for x, y in _seiten(eintrag):
+        vorbild, folger = _posten(eintrag, x, "grund"), _posten(eintrag, y, "grund")
+        folger.durchmesser = vorbild.durchmesser
+        folger.abstand = vorbild.abstand
+        folger.anzahl = vorbild.anzahl
+
+
+def _flaeche(durchmesser: Dict[str, float], teilung: float,
              breite: float) -> float:
-    """Stahlquerschnitt aller gesuchten Posten, in mm²."""
-    summe = 0.0
-    for lage, art in posten:
-        d = _posten(eintrag, lage, art).durchmesser
-        if d <= 0:
-            continue
-        summe += math.pi * d * d / 4.0 * (breite / teilung)
-    return summe
+    """Stahlquerschnitt aller Posten einer Loesung, in mm² je Streifen."""
+    return sum(math.pi * d * d / 4.0 * (breite / teilung)
+               for d in durchmesser.values() if d > 0)
 
 
 # ===========================================================================
@@ -402,6 +420,8 @@ def _eine_teilung(projekt, kennung: str, teilung: float,
             # liessen sich Grundbewehrung und Zulage nicht gemeinsam verlegen.
             eintrag_posten.abstand = teilung
             eintrag_posten.anzahl = None
+        if eintrag.automatik_y_wie_x:
+            _y_folgt_x(eintrag)
 
     def stand_als_dict() -> Dict[str, float]:
         return {_marke(l, a): durchmesser[i] for (l, a), i in stand.items()}
@@ -424,8 +444,6 @@ def _eine_teilung(projekt, kennung: str, teilung: float,
             loesung.durchmesser = stand_als_dict()
             loesung.schlechtester = bewertung.grad
             loesung.nachweis = bewertung.nachweis
-            loesung.stahlflaeche = _flaeche(eintrag, posten, teilung,
-                                            eintrag.b)
             return loesung
 
         # Jeden Posten einzeln einen Schritt groesser probieren. Genommen wird
@@ -598,7 +616,8 @@ def _absteigen(projekt, posten, stand, durchmesser, setzen,
 
 def _vollstaendig(loesung: Loesung, eintrag) -> Loesung:
     """
-    Jeden Posten in die Loesung schreiben, auch die nicht gesuchten.
+    Jeden Posten in die Loesung schreiben, auch die nicht gesuchten -- und die
+    Stahlflaeche aus allem, was sie einbaut.
 
     Die Suche raeumt die Platte leer und sucht dann eine Auswahl von Posten --
     in den Grund-Modi etwa nur die Grundbewehrung. Stuende in der Loesung nur
@@ -606,7 +625,9 @@ def _vollstaendig(loesung: Loesung, eintrag) -> Loesung:
     Zulage noch steht: mehr Stahl, als die Suche angenommen hat. Gerechnet
     waere richtig und die Platte trotzdem eine andere.
 
-    Was nicht gesucht wurde, ist darum ausdruecklich null.
+    Was nicht gesucht wurde, ist darum ausdruecklich null. Folgt y der
+    x-Grundbewehrung, steht auch sie darin: eingerechnet hat die Suche sie
+    schon, also baut :func:`uebernehmen` sie auch ein.
     """
     if not loesung.gefunden:
         return loesung
@@ -615,6 +636,12 @@ def _vollstaendig(loesung: Loesung, eintrag) -> Loesung:
             continue
         for art in ("grund", "zulage"):
             loesung.durchmesser.setdefault(_marke(nummer, art), 0.0)
+    if eintrag.automatik_y_wie_x:
+        for x, y in _seiten(eintrag):
+            loesung.durchmesser[_marke(y, "grund")] = (
+                loesung.durchmesser[_marke(x, "grund")])
+    loesung.stahlflaeche = _flaeche(loesung.durchmesser, loesung.teilung,
+                                    eintrag.b)
     return loesung
 
 
@@ -657,8 +684,6 @@ def _fuer_teilung(projekt, kennung: str, teilung: float, modus: Suchmodus,
     zulage_posten = [(lage, "zulage") for lage, _ in grund_posten]
     zweit = _eine_teilung(arbeit, kennung, teilung, zulage_posten, durchmesser)
     zweit.durchmesser = {**erst.durchmesser, **zweit.durchmesser}
-    zweit.stahlflaeche = _flaeche(eintrag, grund_posten + zulage_posten,
-                                  teilung, eintrag.b)
     zweit.schritte = erst.schritte + zweit.schritte
     return _vollstaendig(zweit, eintrag)
 

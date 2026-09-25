@@ -104,8 +104,17 @@ class QuerschnittEintrag(Beschreibung):
     spannungsfaelle: List[SpannungsfallEintrag] = field(default_factory=list)
     """Auswertungen am Querschnitt -- Bilder, keine Nachweise."""
 
-    automatik_modus: str = "grund_ohne"
+    automatik_modus: str = "grund_ohne_zulage_mit"
     """Wonach das Bewehrungswerkzeug sucht -- siehe ``bewehrungssuche.Suchmodus``."""
+
+    automatik_y_wie_x: bool = False
+    """
+    Ob die y-Grundbewehrung jeder Seite der x-Grundbewehrung dieser Seite
+    folgt -- gleicher Durchmesser, gleiche Teilung.
+
+    Ein Netz, wie es verlegt wird. Die Suche rechnet schon waehrend des Suchens
+    damit: liegt y aussen, kostet ihr Durchmesser x die statische Hoehe.
+    """
 
     automatik_teilungen: List[float] = field(default_factory=lambda: [150.0])
     """
@@ -341,7 +350,9 @@ class QuerschnittEintrag(Beschreibung):
             querkraftbewehrung=QuerkraftbewehrungEintrag.aus_dict(
                 d.get("querkraftbewehrung") or {}),
             duktilitaet=schalter_aus(d.get("duktilitaet")),
-            automatik_modus=str(d.get("automatik_modus") or "grund_ohne"),
+            automatik_modus=str(d.get("automatik_modus")
+                                 or "grund_ohne_zulage_mit"),
+            automatik_y_wie_x=bool(d.get("automatik_y_wie_x", False)),
             automatik_teilungen=teilungen_aus(d.get("automatik_teilungen"),
                                                (150.0,)),
             automatik_mindestdurchmesser=zahl(

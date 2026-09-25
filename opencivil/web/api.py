@@ -18,6 +18,7 @@ from __future__ import annotations
 import math
 from typing import Any, Dict, List, Optional, Sequence
 
+from opencivil.bewehrungssuche import Suchmodus
 from opencivil.core.einheiten import MM
 from opencivil.bericht.markdown import block_markdown
 from opencivil.bericht.zusammenfassung import (
@@ -113,6 +114,9 @@ def katalog() -> dict:
             {"wert": wert, "beschriftung": text,
              "fliessnachweis": GrenzeGegenFliessen.gilt_bei(wert)}
             for wert, text in RISSANFORDERUNGEN.items()
+        ],
+        "suchmodi": [
+            {"wert": m.value, "beschriftung": m.beschriftung} for m in Suchmodus
         ],
     }
 

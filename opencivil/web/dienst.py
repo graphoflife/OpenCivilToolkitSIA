@@ -290,7 +290,6 @@ def dateiname(name: str) -> str:
     return gesaeubert.strip("_") or "bericht"
 
 
-#: Name der Anfrage -> Funktion. Diese Namen sind der ganze Vertrag zwischen
 def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
     Sucht zu einer Platte die kleinste Bewehrung und gibt sie zurueck.
@@ -362,6 +361,7 @@ def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     return antwort
 
 
+#: Name der Anfrage -> Funktion. Diese Namen sind der ganze Vertrag zwischen
 #: Oberflaeche und Kern; beide Huellen reichen sie unveraendert durch.
 ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "katalog": katalog,

@@ -491,10 +491,6 @@ input[readonly], input:disabled, select:disabled {
 @container (min-width: 740px) {
   .zweispaltig { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 }
-/* Eine Spalte fasst mehrere Feldgruppen zusammen -- links die Platte und das
-   Werkzeug darunter, rechts die Bewehrung. Ohne sie wären es drei gleiche
-   Kacheln im Raster und das Werkzeug landete neben der Platte statt unter ihr. */
-.spalte { display: flex; flex-direction: column; }
 
 /* Ein Unterkapitel ist eine Karte wie eine Bewehrungslage -- gerahmt, mit
    farbiger Kante links. Vorher war es ein blosser Strich, und bei fuenf
@@ -550,6 +546,35 @@ input[readonly], input:disabled, select:disabled {
 /* Häufig oder quasi-ständig -- dieselbe Zeile, ohne Querkraft. */
 .einwirkung.ist-gebrauch {
   grid-template-columns: 38px minmax(0, 1fr) repeat(2, var(--zahlspalte)) 18px;
+}
+/* Eine Analysezeile: Schalter, Name, Art, zwei Zahlen, Richtung, Löschen. */
+.einwirkung.ist-spannung {
+  grid-template-columns: 38px minmax(0, 1fr) 76px repeat(2, var(--zahlspalte)) 40px 18px;
+}
+/* Schmale Tafel: zwei Zeilen statt einer -- oben Schalter, Name und Löschen,
+   darunter die Zahlen, gleich breit und je unter ihrer Kopfbeschriftung.
+   Nach der Tafel und nicht nach dem Fenster: auch am breiten Bildschirm
+   kann die Eingabetafel schmal gezogen sein, und dann blieben dem Namen
+   neben drei Zahlenspalten zwei Buchstaben.
+   Jede Zeile hat denselben Aufbau -- Schalter, Name, n Felder, Löschen --,
+   darum trägt Kind k die Spalte k-1. */
+@container (max-width: 600px) {
+  .einwirkung, .einwirkung.ist-knick, .einwirkung.ist-gebrauch, .einwirkung.ist-spannung {
+    grid-template-columns: 38px repeat(var(--felder, 3), minmax(0, 1fr)) 18px;
+    row-gap: 3px;
+  }
+  .einwirkung.ist-knick, .einwirkung.ist-spannung { --felder: 4; }
+  .einwirkung.ist-gebrauch { --felder: 2; }
+  .einwirkung > :nth-child(n+3) { grid-row: 2; }
+  .einwirkung > :nth-child(3) { grid-column: 2; }
+  .einwirkung > :nth-child(4) { grid-column: 3; }
+  .einwirkung > :nth-child(5) { grid-column: 4; }
+  .einwirkung > :nth-child(6) { grid-column: 5; }
+  .einwirkung > :nth-child(2) { grid-column: 2 / -2; }
+  .einwirkung > :last-child { grid-column: -2; grid-row: 1; }
+  /* Der Kopf trägt nur die Zahlen -- was der Name ist, sieht man. */
+  .einwirkung.ist-kopf > :nth-child(n+3) { grid-row: 1; }
+  .einwirkung.ist-kopf > :nth-child(2) { display: none; }
 }
 
 .werteliste tr.ist-gewaehlt { background: var(--blau-hell); box-shadow: inset 3px 0 0 var(--blau); }
@@ -883,6 +908,12 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .schalter-gunst .schalter-halb.ist-an { background: #c9a227; color: #fff; }
 .lage-y .schalter-gunst .schalter-halb.ist-an { background: #c9a227; }
 
+/* «Automatische Bewehrung» -- eine Karte unter den Bügeln. Die Moduswahl
+   nimmt die ganze Zeile: «Grundbew. ohne Kräfte, Zulage mit Kräften» passt
+   in keine Zahlenspalte. */
+.automatik { margin-top: 10px; }
+.automatik > select { width: 100%; margin-bottom: 6px; }
+
 /* Der Knopf, der die Bewehrung sucht. Ohne Meldung daneben: das Ergebnis
    steht danach in den Lagen und in der Zusammenfassung, und ein Satz daneben
    sagte dasselbe ein zweites Mal. Geht es nicht auf, meldet es die Zeile
@@ -905,11 +936,6 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
   .laufbalken::after { animation: none; width: 100%; opacity: .6; }
-}
-
-/* Eine Analysezeile: Schalter, Name, Art, zwei Zahlen, Richtung, Löschen. */
-.einwirkung.ist-spannung {
-  grid-template-columns: 38px minmax(0, 1fr) 76px repeat(2, var(--zahlspalte)) 40px 18px;
 }
 
 /* Die Bilder der Spannung-Dehnung-Analyse. Zwei nebeneinander, solange Platz
@@ -1115,27 +1141,6 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
      tippt man die Zahl ohnehin ein. */
   .zahlpfeile { display: none; }
   .zahlfeld > input { padding-right: 8px; }
-  /* Zwei Zeilen statt einer: oben Schalter, Name und Löschen, darunter die
-     Zahlen, gleich breit und je unter ihrer Kopfbeschriftung. In einer Zeile
-     blieben dem Namen bei 375 px keine 20 px, und «-10000» lief über.
-     Jede Zeile hat denselben Aufbau -- Schalter, Name, n Felder, Löschen --,
-     darum trägt Kind k die Spalte k-1. */
-  .einwirkung, .einwirkung.ist-knick, .einwirkung.ist-gebrauch, .einwirkung.ist-spannung {
-    grid-template-columns: 38px repeat(var(--felder, 3), minmax(0, 1fr)) 18px;
-    row-gap: 3px;
-  }
-  .einwirkung.ist-knick, .einwirkung.ist-spannung { --felder: 4; }
-  .einwirkung.ist-gebrauch { --felder: 2; }
-  .einwirkung > :nth-child(n+3) { grid-row: 2; }
-  .einwirkung > :nth-child(3) { grid-column: 2; }
-  .einwirkung > :nth-child(4) { grid-column: 3; }
-  .einwirkung > :nth-child(5) { grid-column: 4; }
-  .einwirkung > :nth-child(6) { grid-column: 5; }
-  .einwirkung > :nth-child(2) { grid-column: 2 / -2; }
-  .einwirkung > :last-child { grid-column: -2; grid-row: 1; }
-  /* Der Kopf trägt nur die Zahlen -- was der Name ist, sieht man. */
-  .einwirkung.ist-kopf > :nth-child(n+3) { grid-row: 1; }
-  .einwirkung.ist-kopf > :nth-child(2) { display: none; }
 
   /* 26 px Rand auf jeder Seite kosten bei 375 px Breite ein Siebtel des
      Blattes. Am Schreibtisch ist der Rand Ruhe, hier ist er Verlust. */

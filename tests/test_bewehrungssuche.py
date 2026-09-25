@@ -10,6 +10,7 @@ ehrlich Nein sagt, wo es keines gibt.
 
 import copy
 import unittest
+from unittest import mock
 
 from opencivil import bewehrungssuche as suche
 from opencivil.projekt import KnickEintrag, Projekt
@@ -317,6 +318,61 @@ class TestEineLageWirdNichtErfunden(unittest.TestCase):
         ergebnis = suche.suche(projekt, "q1", modus=suche.Suchmodus.GRUND_OHNE)
         self.assertTrue(ergebnis.gefunden, ergebnis.begruendung)
         self.assertGreater(ergebnis.beste.durchmesser["2g"], 0.0)
+
+
+class TestYWieX(unittest.TestCase):
+    """
+    «y-Grundbew. wie x»: die y-Grundbewehrung jeder Seite folgt der
+    x-Grundbewehrung dieser Seite -- gleicher Durchmesser, gleiche Teilung.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        # y vorher leer. Folgte y erst beim Übernehmen, rechnete die Suche mit
+        # zu viel statischer Höhe, und das Ergebnis ginge danach nicht auf.
+        cls.projekt = platte(automatik_y_wie_x=True)
+        for nummer in (1, 4):
+            cls.projekt.querschnitt("q1").lagen[nummer - 1].grund.durchmesser = 0.0
+        cls.ergebnis = suche.suche(cls.projekt, "q1",
+                                   modus=suche.Suchmodus.GRUND_OHNE_ZULAGE_MIT)
+        cls.danach = copy.deepcopy(cls.projekt)
+        suche.uebernehmen(cls.danach, "q1", cls.ergebnis.beste)
+
+    def test_y_folgt_je_seite_der_x_grundbewehrung(self):
+        self.assertTrue(self.ergebnis.gefunden, self.ergebnis.begruendung)
+        lagen = self.danach.querschnitt("q1").lagen
+        # Im Beispiel liegt y aussen: unten die 1. unter der 2., oben die 4.
+        # über der 3. Lage.
+        self.assertTrue(any(lagen[x - 1].grund.durchmesser for x in (2, 3)))
+        for y, x in ((1, 2), (4, 3)):
+            with self.subTest(y=y):
+                self.assertEqual(lagen[y - 1].grund.durchmesser,
+                                 lagen[x - 1].grund.durchmesser)
+                self.assertEqual(lagen[y - 1].grund.abstand,
+                                 lagen[x - 1].grund.abstand)
+
+    def test_jede_rechnung_der_suche_sieht_y_wie_x(self):
+        """
+        Nicht erst das Übernehmen: liegt y aussen, kostet ihr Durchmesser x
+        die statische Höhe, und gesucht werden soll mit der Bewehrung, die
+        hinterher dasteht.
+        """
+        gesehen = []
+        bewerte = suche.bewerte
+
+        def mitschreiben(projekt):
+            lagen = projekt.querschnitt("q1").lagen
+            gesehen.extend((lagen[y - 1].grund.durchmesser,
+                            lagen[x - 1].grund.durchmesser)
+                           for y, x in ((1, 2), (4, 3)))
+            return bewerte(projekt)
+
+        with mock.patch.object(suche, "bewerte", mitschreiben):
+            suche.suche(self.projekt, "q1",
+                        modus=suche.Suchmodus.GRUND_OHNE_ZULAGE_MIT)
+        self.assertTrue(gesehen)
+        self.assertTrue(all(y == x for y, x in gesehen))
+        self.assertTrue(ohne_duktilitaet(self.danach).erfuellt())
 
 
 class TestDieVorgabe(unittest.TestCase):

@@ -493,11 +493,13 @@ function gebrauchsfallZeile(querschnitt, feld, wort, index) {
 
 
 /**
- * Die Bewehrung suchen lassen, statt sie zu setzen.
+ * «Automatische Bewehrung» -- die Bewehrung suchen lassen, statt sie zu setzen.
+ *
+ * Unten im Kapitel «Bewehrung»: das Werkzeug schreibt in die Lagen darüber.
  *
  * Ein einzelner Knopf, kein Automatismus im Hintergrund: was hier
- * herauskommt, wird in die Lagen darunter geschrieben und steht dann da wie
- * eine Eingabe von Hand -- man sieht es, kann es ändern und kann es lassen.
+ * herauskommt, wird in die Lagen geschrieben und steht dann da wie eine
+ * Eingabe von Hand -- man sieht es, kann es ändern und kann es lassen.
  * Eine Bewehrung, die sich bei jeder Zahl neu setzt, wäre keine Eingabe mehr.
  *
  * Gesucht wird gegen die Nachweise, die eingeschaltet sind. Die Schalter
@@ -507,17 +509,11 @@ export function automatikBlock(querschnitt) {
   const aendern = (veraenderer) => projektAendern((p) => {
     veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
   });
-  const moden = [
-    { wert: 'grund_ohne', beschriftung: 'Grundbewehrung ohne Kräfte' },
-    { wert: 'grund_mit', beschriftung: 'Grundbewehrung mit Kräften' },
-    { wert: 'grund_ohne_zulage_mit',
-      beschriftung: 'Grund ohne Kräfte, Zulage mit Kräften' },
-  ];
   const quer = querschnitt.automatik_querkraft === true;
 
   // Die Teilungen als Text: «100, 150» liest und tippt sich schneller als
   // eine Liste aus Zahlenfeldern mit Plus- und Minusknöpfen.
-  const teilungsfeld = (feld, titel) => el('input.ew-name', {
+  const teilungsfeld = (feld, titel) => el('input', {
     type: 'text', value: (querschnitt[feld] || []).join(', '), title: titel,
     on: {
       change: (e) => aendern((q) => {
@@ -526,42 +522,42 @@ export function automatikBlock(querschnitt) {
       }),
     },
   });
+  const hakenzeile = (an, setzen, text) => el('div.duktilitaetszeile.ist-breit', {}, [
+    hakenSchalter(an, setzen, text),
+    el('span.postenname', { text }),
+    el('span'),
+  ]);
 
-  return el('div.feldgruppe', {}, [
-    el('h3', {}, [el('span', { text: 'Bewehrung ermitteln' }),
-      el('span', { text: 'kleinste Stahlfläche' })]),
-    el('div.unterkapitel', {}, [
-      feld('Modus', auswahl({
-        werte: moden, gewaehlt: querschnitt.automatik_modus || 'grund_ohne',
-        titel: 'Ohne Kräfte bleiben Duktilität, sprödes Versagen und die '
-          + 'Rissbreitenbegrenzung – das, was eine Platte unabhängig von der '
-          + 'Belastung braucht.',
-        beiAenderung: (v) => aendern((q) => { q.automatik_modus = v; }),
-      })),
-      feld('Teilungen', teilungsfeld('automatik_teilungen',
-        'Liste in mm, durch Komma getrennt. Grundbewehrung und Zulage einer '
-        + 'Lage bekommen dieselbe Teilung.'), 'mm'),
-      feld('Mindestdurchmesser', zahlfeld({
-        wert: querschnitt.automatik_mindestdurchmesser ?? 10, schritt: 2, min: 0,
-        titel: 'Dünner baut die Suche nicht ein. Eine Lage ganz wegzulassen '
-          + 'bleibt erlaubt – gemeint ist, dass ein vorhandener Stab nicht '
-          + 'dünner wird als das, was man verlegen will.',
-        beiAenderung: (v) => aendern((q) => {
-          q.automatik_mindestdurchmesser = v ?? 10;
-        }),
-      }), 'mm'),
-      el('div.duktilitaetszeile.ist-breit', {}, [
-        hakenSchalter(quer, (wert) => aendern((q) => {
-          q.automatik_querkraft = wert;
-        }), 'Bügelsuche'),
-        el('span.postenname', { text: 'Querkraftbewehrung mitsuchen' }),
-        el('span.kurvenhinweis', { text: '' }),
-      ]),
-      ...(quer ? [feld('Bügelteilungen',
-        teilungsfeld('automatik_querkraft_teilungen',
-          'Liste in mm. Das Bügelraster ist quadratisch: s_x = s_y.'), 'mm')] : []),
-      automatikLeiste(querschnitt.kennung),
-    ]),
+  // Die Modi kommen aus dem Kern: ihre Namen stehen dort, wo sie gesucht
+  // werden, und nicht ein zweites Mal hier. Die Wahl über die ganze Breite
+  // und ohne Beschriftung davor -- der längste Modus braucht die Zeile.
+  return el('div.unterkapitel.automatik', {}, [
+    el('div.unterkapitel-kopf', {}, [el('span', { text: 'Automatische Bewehrung' })]),
+    auswahl({
+      werte: zustand.katalog?.suchmodi || [],
+      gewaehlt: querschnitt.automatik_modus,
+      titel: 'Modus. Ohne Kräfte: Duktilität, sprödes Versagen, Riss unter Zwang',
+      beiAenderung: (v) => aendern((q) => { q.automatik_modus = v; }),
+    }),
+    feld('Teilungen', teilungsfeld('automatik_teilungen',
+      'mm, durch Komma getrennt. Grund und Zulage einer Lage: gleiche Teilung'), 'mm'),
+    feld('Mindestdurchmesser', zahlfeld({
+      wert: querschnitt.automatik_mindestdurchmesser ?? 10, schritt: 2, min: 0,
+      titel: 'Dünnster eingebauter Stab. Lage weglassen (⌀ 0) bleibt erlaubt',
+      beiAenderung: (v) => aendern((q) => {
+        q.automatik_mindestdurchmesser = v ?? 10;
+      }),
+    }), 'mm'),
+    hakenzeile(querschnitt.automatik_y_wie_x === true, (wert) => aendern((q) => {
+      q.automatik_y_wie_x = wert;
+    }), 'y-Grundbew. wie x'),
+    hakenzeile(quer, (wert) => aendern((q) => {
+      q.automatik_querkraft = wert;
+    }), 'Bügel mitsuchen'),
+    ...(quer ? [feld('Bügelteilungen',
+      teilungsfeld('automatik_querkraft_teilungen', 'mm, Raster quadratisch: s_x = s_y'),
+      'mm')] : []),
+    automatikLeiste(querschnitt.kennung),
   ]);
 }
 
@@ -578,7 +574,7 @@ function automatikLeiste(kennung) {
       // Zehntelsekunden bis zu Sekunden. Ein Knopf, der bloss grau wird,
       // sieht in dieser Zeit aus wie einer, der nichts getan hat.
       ? [el('span.laufbalken'), el('span', { text: 'sucht …' })]
-      : [el('span', { text: 'Bewehrung ermitteln' })]),
+      : [el('span', { text: 'Bewehrung suchen' })]),
   ]);
 }
 
@@ -592,14 +588,15 @@ async function bewehrungErmitteln(kennung) {
   // Durchmesser stehen, bis das Ergebnis kam, und wer denselben Durchmesser
   // zurückbekam, sah nicht, ob überhaupt etwas passiert war.
   //
-  // Nur x: die y-Lagen sucht niemand, sie bleiben wie eingetragen.
+  // In y nur die Grundbewehrung, und nur, wenn sie x folgt -- sonst sucht
+  // die y-Lagen niemand, und sie bleiben wie eingetragen.
   projektAendern((p) => {
     const q = p.querschnitte.find((x) => x.kennung === kennung);
     if (!q) return;
     q.lagen.forEach((lage, i) => {
-      if (richtungVon(q, i + 1) !== 'x') return;
-      lage.grund.durchmesser = 0;
-      lage.zulage.durchmesser = 0;
+      const x = richtungVon(q, i + 1) === 'x';
+      if (x || q.automatik_y_wie_x) lage.grund.durchmesser = 0;
+      if (x) lage.zulage.durchmesser = 0;
     });
   });
   try {

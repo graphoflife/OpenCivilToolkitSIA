@@ -34,17 +34,6 @@ import {
   zustand,
 } from './zustand.js';
 
-/**
- * Was die letzte Bewehrungssuche je Platte gemeldet hat.
- *
- * Ausserhalb des Baums: das Ergebnis übernehmen heisst, das Projekt zu
- * ändern, und das zeichnet die Tafel neu. Stünde die Meldung im DOM, wäre
- * sie genau in dem Augenblick weg, in dem sie etwas zu sagen hat. Ins
- * Projekt gehört sie auch nicht -- sie beschreibt einen Vorgang, keine
- * Eigenschaft der Platte, und niemand will sie in der abgelegten Datei.
- */
-const automatikMeldungen = new Map();
-
 const ART_TEXT = { beton: 'Beton', betonstahl: 'Betonstahl' };
 
 function gerechnet(id) {
@@ -569,11 +558,8 @@ function plattenEditor(querschnitt) {
 
   return [
     // Platte und Bewehrung stehen nebeneinander -- beides gehört zur Geometrie
-    // und wird beim Bemessen gemeinsam gelesen. Das Werkzeug, das die
-    // Bewehrung sucht, steht unter der Platte: es liest deren Angaben und
-    // schreibt in die Spalte daneben.
+    // und wird beim Bemessen gemeinsam gelesen.
     el('div.zweispaltig', {}, [
-      el('div.spalte', {}, [
       el('div.feldgruppe', {}, [
         el('h3', { text: 'Platte' }),
         feld('Bezeichnung', el('input', {
@@ -637,8 +623,6 @@ function plattenEditor(querschnitt) {
           }),
         ]),
       ]),
-      automatikBlock(querschnitt),
-      ]),
 
       el('div.feldgruppe', {}, [
         el('h3', {}, [el('span', { text: 'Bewehrung' }),
@@ -652,6 +636,8 @@ function plattenEditor(querschnitt) {
         // Die Bügel stehen unter den Lagen: sie greifen über die ganze Höhe
         // und gehören in keine davon.
         querkraftBlock(querschnitt),
+        // Zuunterst das Werkzeug, das in die Lagen darüber schreibt.
+        automatikBlock(querschnitt),
       ]),
     ]),
 

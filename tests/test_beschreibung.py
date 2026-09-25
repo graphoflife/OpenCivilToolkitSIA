@@ -98,6 +98,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
                     spannungsfaelle=[SpannungsfallEintrag("Feld", M_Ed=80.0)],
                     automatik_modus="grund_mit", automatik_teilungen=[100.0, 200.0],
                     automatik_mindestdurchmesser=12.0, automatik_querkraft=True,
+                    automatik_y_wie_x=True,
                     automatik_querkraft_teilungen=[150.0],
                     sproede=True, zwaengung_biegung=True, duktilitaet=True,
                     querkraftbewehrung=QuerkraftbewehrungEintrag(
