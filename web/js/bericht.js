@@ -15,7 +15,7 @@
 
 import { el, ersetzen, leerzustand, melden, zahlfeld } from './dom.js';
 import {
-  kopiereFuerWord, kopiereLatex, kopiereTabelleFuerWord, setzen,
+  kopiereFuerWord, kopiereTabelleFuerWord, kopiereText, setzen,
 } from './mathe.js';
 import {
   diagrammZeichnen, kurveZeichnen, neigungskurveZeichnen,
@@ -39,26 +39,34 @@ function werkzeugKnopf(text, titel, tun) {
 }
 
 /**
- * Die beiden Kopierknöpfe. Stehen an jedem Block, der LaTeX hergibt --
- * Gleichung wie Tabelle. Einmal geschrieben, damit sie überall dieselben sind.
+ * Die drei Kopierknöpfe Word, TeX und MD. Stehen an jedem Block, der LaTeX
+ * hergibt -- Gleichung wie Tabelle. Einmal geschrieben, damit sie überall
+ * dieselben sind.
  *
- * @param latex    das LaTeX des Blocks, für den TeX-Knopf
- * @param tabelle  `{kopf, zeilen}`, wenn der Block eine Tabelle ist: Word
- *   bekommt dann eine echte Tabelle statt einer Formel.
+ * @param block  `{latex, markdown}`, bei einer Tabelle dazu `{kopf, zeilen}`:
+ *   Word bekommt dann eine echte Tabelle statt einer Formel. Das Markdown
+ *   kommt fertig aus dem Kern -- der Block, wie er im Markdown-Bericht steht.
  */
-function werkzeugleiste(latex, tabelle = null) {
+function werkzeugleiste(block) {
+  const tabelle = block.kopf !== undefined;
   const was = tabelle ? 'Tabelle' : 'Formel';
   return el('div.gleichung-werkzeug', {}, [
     werkzeugKnopf('Word', `Als ${was} für Word kopieren`, async () => {
       await (tabelle
-        ? kopiereTabelleFuerWord(tabelle.kopf, tabelle.zeilen)
-        : kopiereFuerWord(latex));
+        ? kopiereTabelleFuerWord(block.kopf, block.zeilen)
+        : kopiereFuerWord(block.latex));
       melden(`${was} kopiert – in Word mit Strg+V einfügen.`);
     }),
     werkzeugKnopf('TeX', 'LaTeX-Quelltext kopieren', async () => {
-      await kopiereLatex(latex);
+      await kopiereText(block.latex);
       melden('LaTeX kopiert.');
     }),
+    block.markdown
+      ? werkzeugKnopf('MD', 'Als Markdown kopieren', async () => {
+        await kopiereText(block.markdown);
+        melden('Markdown kopiert.');
+      })
+      : null,
   ]);
 }
 
@@ -80,7 +88,7 @@ function gleichungBlock(block) {
       ])
       : null,
     el('div.gleichung-mathe'),
-    werkzeugleiste(latex),
+    werkzeugleiste(block),
   ]);
 
   setzen(latex, huelle.querySelector('.gleichung-mathe'));
@@ -100,7 +108,19 @@ function zelleSetzen(zelle, knoten) {
   return knoten;
 }
 
+/**
+ * Wie eine Spalte ausgerichtet ist -- so, wie der Kern es angibt, in der
+ * Schreibweise von LaTeX (``L`` ist links und darf umbrechen). Ohne Angabe
+ * bleibt es beim Stil: Zahlen rechts, die erste Spalte links.
+ */
+function spaltenausrichtung(ausrichtung, i) {
+  return { l: 'left', L: 'left', c: 'center', r: 'right' }[(ausrichtung || '')[i]] || '';
+}
+
 function tabellenBlock(block) {
+  const zelle = (inhalt, art, i) => zelleSetzen(inhalt, el(art, {
+    style: { textAlign: spaltenausrichtung(block.ausrichtung, i) },
+  }));
   return el('div.tabelle-block', {}, [
     block.titel
       ? el('div.gleichung-kopf', {}, [
@@ -110,13 +130,13 @@ function tabellenBlock(block) {
     el('div.tabelle-huelle', {}, [
       el('table.gitter', {}, [
         el('thead', {}, [
-          el('tr', {}, block.kopf.map((zelle) => zelleSetzen(zelle, el('th')))),
+          el('tr', {}, block.kopf.map((inhalt, i) => zelle(inhalt, 'th', i))),
         ]),
         el('tbody', {}, block.zeilen.map((zeile) => el('tr', {},
-          zeile.map((zelle) => zelleSetzen(zelle, el('td')))))),
+          zeile.map((inhalt, i) => zelle(inhalt, 'td', i))))),
       ]),
     ]),
-    block.latex ? werkzeugleiste(block.latex, block) : null,
+    block.latex ? werkzeugleiste(block) : null,
   ]);
 }
 
@@ -141,6 +161,9 @@ function gruppenBilden(bloecke) {
       heraus.push(block);
     } else if (letzte?.gruppe === block.gruppe) {
       letzte.latex += ` \\qquad ${block.latex}`;
+      // Im Markdown-Bericht stehen die Angaben einzeln; zusammengelegt wird
+      // nur hier. Der MD-Knopf liefert darum die Blöcke, wie sie dort stehen.
+      letzte.markdown += `\n\n${block.markdown}`;
       letzte.wert_ids.push(block.wert_id);
     } else {
       heraus.push({
@@ -149,6 +172,7 @@ function gruppenBilden(bloecke) {
         titel: block.gruppe,
         referenz: block.referenz,
         latex: block.latex,
+        markdown: block.markdown,
         wert_ids: [block.wert_id],
       });
     }
@@ -335,16 +359,18 @@ function zusammenfassung(loesung) {
                 // Links oder rechts sagt ebenfalls der Kern -- dieselbe
                 // Ausrichtung, die auch das LaTeX bekommt. Aus dem Index zu
                 // schliessen ging gut, solange nur die erste Spalte Text war.
-                // «L» ist links und darf umbrechen; das tut hier jede Zelle.
-                const rechts = ((tabelle.ausrichtung || '')[i] || '').toLowerCase() !== 'l';
+                const rechts = spaltenausrichtung(tabelle.ausrichtung, i) !== 'left';
                 return zelleSetzen(zelle, el('td', {
                   class: [rechts ? 'zahl' : '', istGrad ? 'grad' : ''].filter(Boolean).join(' '),
                 }));
               })))),
             ]),
           ]),
-          werkzeugleiste(tabelle.latex, {
-            kopf: tabelle.kopf, zeilen: tabelle.zeilen.map((z) => z.zellen),
+          werkzeugleiste({
+            latex: tabelle.latex,
+            markdown: tabelle.markdown,
+            kopf: tabelle.kopf,
+            zeilen: tabelle.zeilen.map((z) => z.zellen),
           }),
           // Ein Widerstand von null erklärt sich nicht von selbst. Der Grund
           // steht deshalb unter der Tabelle und nicht bloss im Tooltip, nach

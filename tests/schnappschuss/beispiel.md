@@ -60,7 +60,7 @@ $$
 
 **Randabstände, statische Höhen und Bewehrungsquerschnitte**
 
-| Bewehrung | Richtung | Stahl | $\varnothing\ [\mathrm{mm}]$ | $s\ [\mathrm{mm}]$ | Randabstand \[mm\] | $d\ [\mathrm{mm}]$ | $A_s\ [\mathrm{mm}^2]$ |
+| Bewehrung | Richtung | Stahl | $\varnothing\ [\mathrm{mm}]$ | $s\ [\mathrm{mm}]$ | Randabstand [mm] | $d\ [\mathrm{mm}]$ | $A_s\ [\mathrm{mm}^2]$ |
 | :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: |
 | 1. Lage Grundbewehrung | y | B500B | $12$ | $150$ | $36$ | $264$ | $754$ |
 | 2. Lage Grundbewehrung | x | B500B | $18$ | $150$ | $51$ | $249$ | $1696$ |

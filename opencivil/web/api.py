@@ -19,6 +19,7 @@ from typing import Any, Dict, List, Optional, Sequence
 from opencivil.core.einheiten import KN, KNM, KN_PRO_M, MM
 from opencivil import spannungsanalyse
 from opencivil.querschnitt.platte import Richtung
+from opencivil.bericht.markdown import block_markdown
 from opencivil.bericht.zusammenfassung import (
     GRAD_SPALTE, bewehrungsuebersicht, hinweise, nachweistabelle,
     plattenangaben, stiller_hinweis, zusammenfassen,
@@ -171,6 +172,8 @@ def _gleichung_dict(block: GleichungBlock, tiefe: int) -> dict:
     eintrag = {
         "art": "gleichung",
         "latex": block.latex,
+        # Fuer die Kopierknoepfe: der Block, wie er im Markdown-Bericht steht.
+        "markdown": block_markdown(block),
         "titel": block.titel,
         "referenz": block.referenz,
         "wert_id": block.wert_id,
@@ -192,6 +195,7 @@ def _tabelle_dict(block: TabellenBlock, tiefe: int) -> dict:
         "zeilen": [[zelle_dict(z) for z in zeile] for zeile in block.zeilen],
         "ausrichtung": block.ausrichtung,
         "latex": block.als_latex(),
+        "markdown": block_markdown(block),
     }
 
 
@@ -783,6 +787,7 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
             "grad_spalte": GRAD_SPALTE,
             "ausrichtung": tabelle.ausrichtung,
             "latex": tabelle.als_latex(),
+            "markdown": block_markdown(tabelle),
             "hinweise": hinweise(platte),
             "angaben": _gleichung_dict(plattenangaben(qs), 0),
             "bewehrung": _tabelle_dict(bewehrungsuebersicht(qs), 0),

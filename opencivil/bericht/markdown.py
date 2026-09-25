@@ -26,8 +26,8 @@ from typing import TYPE_CHECKING, List, Optional
 from opencivil.bericht.gliederung import bericht
 from opencivil.core.latex import Mathe, Zelle
 from opencivil.core.protokoll import (
-    GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, Tafel, TextBlock,
-    TitelBlock, UnterprotokollBlock, darstellen,
+    Block, GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, Tafel,
+    TextBlock, TitelBlock, UnterprotokollBlock, darstellen,
 )
 from opencivil.core.rechenwerk import Loesung
 
@@ -36,7 +36,9 @@ if TYPE_CHECKING:
 
 #: Zeichen, die Markdown im Fliesstext als Auszeichnung liest. ``$`` gehoert
 #: dazu: wer Formeln kann, laese sonst zwischen zwei Betraegen eine Formel.
-_AUSZEICHNUNG = re.compile(r"([\\`*_\[\]<>$|])")
+#: Eckige Klammern nicht: ohne ``(...)`` dahinter sind sie ohnehin Text, und
+#: ``\[`` laese MathJax (etwa in Jupyter) als Anfang einer Formel.
+_AUSZEICHNUNG = re.compile(r"([\\`*_<>$|])")
 
 #: Am Anfang eines Absatzes waere «2. Lage» eine nummerierte Liste, ein
 #: «-» oder «+» eine Aufzaehlung und ein «#» eine Ueberschrift.
@@ -125,6 +127,15 @@ TAFEL: Tafel[List[str]] = {
 
 def protokoll_zeilen(protokoll: Protokoll, tiefe: int = 0) -> List[str]:
     return [zeile for teil in darstellen(protokoll, TAFEL, tiefe) for zeile in teil]
+
+
+def block_markdown(block: Block) -> str:
+    """
+    Ein einzelner Block, wie er im Markdown-Bericht steht -- fuer den
+    Kopierknopf an diesem Block. Aus derselben Tafel, damit Knopf und
+    Dokument dasselbe liefern.
+    """
+    return "\n".join(TAFEL[type(block)](block, 0)).strip("\n")
 
 
 def als_markdown(

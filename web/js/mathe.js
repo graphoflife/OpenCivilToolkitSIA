@@ -98,17 +98,20 @@ async function inZwischenablage(teile, rueckfallText) {
   return geklappt;
 }
 
-/** Legt das rohe LaTeX in die Zwischenablage (Overleaf, Word-Formeleditor). */
-export function kopiereLatex(latex) {
+/**
+ * Legt Text in die Zwischenablage: rohes LaTeX (Overleaf, Formeleditor von
+ * Word 365) oder Markdown.
+ */
+export function kopiereText(text) {
   return inZwischenablage(
-    { 'text/plain': new Blob([latex], { type: 'text/plain' }) },
-    latex);
+    { 'text/plain': new Blob([text], { type: 'text/plain' }) },
+    text);
 }
 
 /** Legt die Formel als MathML ab -- Word fügt sie als Gleichung ein. */
 export function kopiereFuerWord(latex) {
   const mathml = alsMathML(latex);
-  if (!mathml) return kopiereLatex(latex);
+  if (!mathml) return kopiereText(latex);
   return inZwischenablage(
     {
       'text/html': new Blob([mathml], { type: 'text/html' }),

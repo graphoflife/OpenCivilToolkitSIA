@@ -430,6 +430,36 @@ class TestMarkdown(unittest.TestCase):
             self.assertIn(f"$$\n{gleichung.latex}\n$$", text)
 
 
+class TestKopierknoepfe(unittest.TestCase):
+    """
+    Der MD-Knopf an einem Block liefert, was im Markdown-Bericht steht --
+    aus derselben Tafel, nicht aus einer zweiten Regel in der Oberfläche.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from opencivil.bericht.markdown import als_markdown
+        from opencivil.projekt import Projekt
+        from opencivil.web import api
+
+        cls.aufbau = Projekt.beispiel().aufbauen()
+        cls.loesung = cls.aufbau.werk.loese(*cls.aufbau.alle_nachweisziele())
+        cls.bloecke = api.protokoll_liste(cls.loesung.protokoll)
+        cls.zusammenfassung = api.zusammenfassungen(cls.loesung, cls.aufbau)["q1"]
+        cls.dokument = als_markdown(cls.loesung, aufbau=cls.aufbau)
+
+    def test_jede_formel_und_tabelle_der_herleitung(self):
+        mit = [b for b in self.bloecke if b["art"] in ("gleichung", "tabelle")]
+        self.assertTrue(any(b["art"] == "tabelle" for b in mit))
+        for block in mit:
+            self.assertIn(block["markdown"], self.dokument)
+
+    def test_die_zusammenfassung_auch(self):
+        for teil in (self.zusammenfassung, self.zusammenfassung["angaben"],
+                     self.zusammenfassung["bewehrung"]):
+            self.assertIn(teil["markdown"], self.dokument)
+
+
 class TestBerichtWieBildschirm(unittest.TestCase):
     """
     Der Bericht zeigt je Platte, was der Bildschirm zeigt -- aus denselben
