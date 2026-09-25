@@ -145,6 +145,120 @@ def einsetzen_numerisch(
 # ===========================================================================
 
 
+# ===========================================================================
+# Sichtbare Breite
+# ===========================================================================
+
+#: Wie breit eine Formel gesetzt hoechstens sein darf, damit sie auf einer
+#: Zeile steht -- in Zeichen, wie :func:`sichtbare_breite` sie zaehlt. Etwa
+#: das, was auf einer A4-Seite und in der rechten Tafel noch Platz hat.
+ZEILENBREITE = 60.0
+
+#: Befehle ohne eigene Breite: Formatierung, oder ihr Argument steht fuer sie.
+_OHNE_BREITE = {"left", "right", "mathrm", "text", "operatorname", "mathbf",
+                "mathit", "displaystyle", "textstyle", "big", "Big", "bigl",
+                "bigr", "Bigl", "Bigr", "limits", "nolimits"}
+#: Operatoren, die mit ihren Buchstaben dastehen.
+_WOERTER = {"min", "max", "sin", "cos", "tan", "cot", "log", "ln", "exp",
+            "lim", "sup", "inf"}
+#: Zwischenraeume, in Zeichen.
+_RAEUME = {",": 0.2, ":": 0.25, ";": 0.3, "!": 0.0, " ": 0.3,
+           "quad": 1.0, "qquad": 2.0}
+#: Relationen und Pfeile stehen mit Luft auf beiden Seiten, Rechenzeichen
+#: mit etwas weniger.
+_RELATIONEN = {"le", "ge", "leq", "geq", "approx", "neq", "equiv",
+               "Rightarrow", "Leftarrow", "rightarrow", "leftarrow", "to"}
+_BINAER = {"cdot", "times", "pm", "mp"}
+_BEFEHL = re.compile(r"\\([A-Za-z]+|.)")
+
+
+def _gruppe(s: str, i: int) -> tuple[str, int]:
+    """Das Argument ab ``i``: eine ``{...}``-Gruppe oder ein einzelnes Zeichen."""
+    while i < len(s) and s[i] == " ":
+        i += 1
+    if i >= len(s):
+        return "", i
+    if s[i] == "\\":
+        treffer = _BEFEHL.match(s, i)
+        return treffer.group(0), treffer.end()
+    if s[i] != "{":
+        return s[i], i + 1
+    tiefe = 0
+    for j in range(i, len(s)):
+        if s[j] == "\\":
+            continue
+        if s[j] == "{" and (j == 0 or s[j - 1] != "\\"):
+            tiefe += 1
+        elif s[j] == "}" and s[j - 1] != "\\":
+            tiefe -= 1
+            if tiefe == 0:
+                return s[i + 1:j], j + 1
+    return s[i + 1:], len(s)
+
+
+def sichtbare_breite(latex: str) -> float:
+    """
+    Ungefaehr, wie breit eine Formel gesetzt wird -- in Zeichen.
+
+    Gezaehlt wird, was man sieht: ein Bruch so breit wie sein breiterer Teil,
+    Hoch- und Tiefgestelltes kleiner, ``\\alpha`` oder ``\\cdot`` als ein
+    Zeichen, Formatierung (``\\left``, ``\\,``, ``\\mathrm``, die Klammern
+    einer Gruppe) fast nichts. Eine Umgebung mit Zeilen ist so breit wie ihre
+    breiteste Zeile.
+    """
+    breite = 0.0
+    i = 0
+    while i < len(latex):
+        zeichen = latex[i]
+        if zeichen == "\\":
+            treffer = _BEFEHL.match(latex, i)
+            name, i = treffer.group(1), treffer.end()
+            if name in ("frac", "tfrac", "dfrac"):
+                oben, i = _gruppe(latex, i)
+                unten, i = _gruppe(latex, i)
+                faktor = 0.8 if name == "tfrac" else 1.0
+                breite += faktor * max(sichtbare_breite(oben), sichtbare_breite(unten)) + 0.4
+            elif name == "sqrt":
+                if i < len(latex) and latex[i] == "[":
+                    i = latex.index("]", i) + 1
+                inhalt, i = _gruppe(latex, i)
+                breite += sichtbare_breite(inhalt) + 1.0
+            elif name == "begin":
+                umgebung, i = _gruppe(latex, i)
+                if umgebung == "array":
+                    _, i = _gruppe(latex, i)
+                ende = latex.find(rf"\end{{{umgebung}}}", i)
+                ende = len(latex) if ende < 0 else ende
+                zeilen = latex[i:ende].split("\\\\")
+                breite += max(sichtbare_breite(z) for z in zeilen)
+                breite += 1.0 if umgebung == "cases" else 0.0
+                i = ende + len(rf"\end{{{umgebung}}}")
+            elif name in _OHNE_BREITE:
+                pass
+            elif name in _RAEUME:
+                breite += _RAEUME[name]
+            elif name in _WOERTER:
+                breite += len(name)
+            elif name in _RELATIONEN:
+                breite += 2.0
+            elif name in _BINAER:
+                breite += 1.6
+            else:
+                breite += 1.0
+        elif zeichen in "^_":
+            inhalt, i = _gruppe(latex, i + 1)
+            breite += 0.7 * sichtbare_breite(inhalt)
+        else:
+            i += 1
+            if zeichen in "=<>":
+                breite += 2.0
+            elif zeichen in "+-":
+                breite += 1.6
+            elif zeichen not in "{} &":
+                breite += 1.0
+    return breite
+
+
 @dataclass(frozen=True)
 class Formelzeile:
     """
@@ -226,10 +340,17 @@ class Formelzeile:
         inhalt = " \\\\\n  ".join(zeilen)
         return f"\\begin{{aligned}}\n  {inhalt}\n\\end{{aligned}}"
 
-    def darstellen(self, mehrzeilig_ab: int = 90) -> str:
-        """Waehlt automatisch zwischen ein- und mehrzeilig nach Laenge."""
+    def darstellen(self, mehrzeilig_ab: float = ZEILENBREITE) -> str:
+        """
+        Eine Zeile, solange sie gesetzt hineinpasst, sonst untereinander.
+
+        Gemessen wird, was man sieht (:func:`sichtbare_breite`), nicht der
+        Quelltext. Mit dessen Laenge standen kurze Formeln auf drei Zeilen,
+        weil ``\\left``, ``\\,\\mathrm{mm}`` und die Klammern der Gruppen
+        mitzaehlten.
+        """
         einzeilig = self.einzeilig()
-        if len(einzeilig) <= mehrzeilig_ab:
+        if sichtbare_breite(einzeilig) <= mehrzeilig_ab:
             return einzeilig
         return self.mehrzeilig()
 

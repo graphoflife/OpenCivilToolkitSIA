@@ -15,7 +15,10 @@ from opencivil.core.berechnung import (
 from opencivil.core.einheiten import (
     EINHEITSLOS, KN, KNM, M, MM, MM2, MPA, N_PRO_MM2, DimensionsFehler, Groesse,
 )
-from opencivil.core.latex import Formelzeile, LatexFehler, einsetzen_numerisch, einsetzen_symbolisch
+from opencivil.core.latex import (
+    Formelzeile, LatexFehler, einsetzen_numerisch, einsetzen_symbolisch,
+    sichtbare_breite,
+)
 from opencivil.core.protokoll import GleichungBlock, Protokoll, StillesProtokoll, TabellenBlock
 from opencivil.core.rechenwerk import Rechenwerk, RechenwerkFehler, ZyklusFehler
 from opencivil.core.wert import Quelle, Wert, WertDef
@@ -179,6 +182,30 @@ class TestFormelzeile(unittest.TestCase):
             eingaben,
         )
         self.assertEqual(len(zeile._teile()), 4)
+
+
+class TestSichtbareBreite(unittest.TestCase):
+    """Gezählt wird, was man gesetzt sieht -- nicht der Quelltext."""
+
+    def test_formatierung_zaehlt_nicht(self):
+        self.assertEqual(sichtbare_breite(r"\left(x\right)"), sichtbare_breite("(x)"))
+        self.assertEqual(sichtbare_breite(r"30\,\mathrm{mm}"),
+                         sichtbare_breite("30mm") + 0.2)
+
+    def test_ein_bruch_ist_so_breit_wie_sein_breiterer_teil(self):
+        self.assertAlmostEqual(sichtbare_breite(r"\frac{a}{bbbb}"),
+                               sichtbare_breite("bbbb") + 0.4)
+
+    def test_eine_umgebung_so_breit_wie_ihre_breiteste_zeile(self):
+        self.assertEqual(sichtbare_breite(r"\begin{aligned} a \\ bbb \end{aligned}"), 3)
+
+    def test_kurze_formel_bleibt_auf_einer_zeile(self):
+        """Mit dem Quelltext gemessen standen solche Formeln auf drei Zeilen."""
+        eingaben = {"b": D_B.belegen(Groesse(1000, MM)), "h": D_H.belegen(Groesse(300, MM))}
+        zeile = Formelzeile.bauen(D_A.belegen(Groesse(300000, MM2)),
+                                  r"\left(@b\right) \cdot \left(@h\right)", eingaben)
+        self.assertGreater(len(zeile.einzeilig()), 90)
+        self.assertEqual(zeile.darstellen(), zeile.einzeilig())
 
 
 class TestFormel(unittest.TestCase):

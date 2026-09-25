@@ -45,11 +45,7 @@ $$
 **Bewehrungsmass je Kubikmeter Beton**
 
 $$
-\begin{aligned}
-  \mu_s &= \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{b \cdot h} \\
-  &= \frac{4712.39\,\mathrm{mm}^{2} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{1000\,\mathrm{mm} \cdot 300\,\mathrm{mm}} \\
-  &= 123\,\mathrm{kg}/\mathrm{m}^{3}
-\end{aligned}
+\mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{b \cdot h} = \frac{4712.39\,\mathrm{mm}^{2} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{1000\,\mathrm{mm} \cdot 300\,\mathrm{mm}} = 123\,\mathrm{kg}/\mathrm{m}^{3}
 $$
 
 **Höhe der Distanzhalter**
@@ -97,11 +93,7 @@ $$
 **Gleichmässiger Druck, ohne Bewehrung**
 
 $$
-\begin{aligned}
-  N_{Rd}^{-} &= -b \cdot h \cdot f_{cd} \\
-  &= -1000\,\mathrm{mm} \cdot 300\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} \\
-  &= -6000\,\mathrm{kN}
-\end{aligned}
+N_{Rd}^{-} = -b \cdot h \cdot f_{cd} = -1000\,\mathrm{mm} \cdot 300\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} = -6000\,\mathrm{kN}
 $$
 
 **Zugehöriges Moment**
@@ -137,11 +129,7 @@ $$
 **Druckzonenhöhe aus dem Kräftegleichgewicht**
 
 $$
-\begin{aligned}
-  x^{+} &= \frac{A_{s,2,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} \\
-  &= \frac{2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} \\
-  &= 62.7\,\mathrm{mm}
-\end{aligned}
+x^{+} = \frac{A_{s,2,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} = \frac{2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 62.7\,\mathrm{mm}
 $$
 
 **Momentenwiderstand bei reiner Biegung**
@@ -163,11 +151,7 @@ $$
 **Fliesskriterium – Dehnung der Zugbewehrung**
 
 $$
-\begin{aligned}
-  \varepsilon_s^{+} &= \left(d_{2,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}} \\
-  &= \left(248.1\,\mathrm{mm} - 150\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{150\,\mathrm{mm}} \\
-  &= 2.29\,\text{‰}
-\end{aligned}
+\varepsilon_s^{+} = \left(d_{2,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}} = \left(248.1\,\mathrm{mm} - 150\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{150\,\mathrm{mm}} = 2.29\,\text{‰}
 $$
 
 ε\_s = 2.29 ‰ ≥ ε\_yd = 2.17 ‰ – die Zugbewehrung fliesst, f\_sd = f\_yd gilt.
@@ -197,11 +181,7 @@ $$
 **Druckzonenhöhe aus dem Kräftegleichgewicht**
 
 $$
-\begin{aligned}
-  x^{-} &= \frac{A_{s,3,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} \\
-  &= \frac{754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} \\
-  &= 19.3\,\mathrm{mm}
-\end{aligned}
+x^{-} = \frac{A_{s,3,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} = \frac{754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 19.3\,\mathrm{mm}
 $$
 
 **Momentenwiderstand bei reiner Biegung**
@@ -223,11 +203,7 @@ $$
 **Fliesskriterium – Dehnung der Zugbewehrung**
 
 $$
-\begin{aligned}
-  \varepsilon_s^{-} &= \left(d_{3,x} - x^{-}\right) \cdot \frac{\varepsilon_{c2d}}{x^{-}} \\
-  &= \left(252\,\mathrm{mm} - 150\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{150\,\mathrm{mm}} \\
-  &= 2.38\,\text{‰}
-\end{aligned}
+\varepsilon_s^{-} = \left(d_{3,x} - x^{-}\right) \cdot \frac{\varepsilon_{c2d}}{x^{-}} = \left(252\,\mathrm{mm} - 150\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{150\,\mathrm{mm}} = 2.38\,\text{‰}
 $$
 
 ε\_s = 2.38 ‰ ≥ ε\_yd = 2.17 ‰ – die Zugbewehrung fliesst, f\_sd = f\_yd gilt.
@@ -364,11 +340,7 @@ $$
 **Querschnitt eines Bügelschenkels** *(SIA 262:2025, 5.5.2)*
 
 $$
-\begin{aligned}
-  A_{\varnothing,V} &= \frac{\pi \cdot \left(\varnothing_{V}\right)^{2}}{4} \\
-  &= \frac{\pi \cdot \left(8\,\mathrm{mm}\right)^{2}}{4} \\
-  &= 50.3\,\mathrm{mm}^{2}
-\end{aligned}
+A_{\varnothing,V} = \frac{\pi \cdot \left(\varnothing_{V}\right)^{2}}{4} = \frac{\pi \cdot \left(8\,\mathrm{mm}\right)^{2}}{4} = 50.3\,\mathrm{mm}^{2}
 $$
 
 ### Querkraft – x-Richtung
@@ -490,11 +462,7 @@ d wird von der gedrückten Randfaser aus gemessen: bei den unteren Lagen von der
 **Bewehrung der Lage**
 
 $$
-\begin{aligned}
-  A_{s,2,x} &= A_{s,2,x,g} + A_{s,2,x,z} \\
-  &= 1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2} \\
-  &= 2450\,\mathrm{mm}^{2}
-\end{aligned}
+A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z} = 1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2} = 2450\,\mathrm{mm}^{2}
 $$
 
 **Gemeinsamer Schwerpunkt der Lage**
@@ -510,21 +478,13 @@ $$
 **Druckzonenhöhe bei reiner Biegung**
 
 $$
-\begin{aligned}
-  x &= \frac{A_{s,2,x} \cdot f_{sd}}{0.85 \cdot b \cdot f_{cd}} \\
-  &= \frac{2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} \\
-  &= 62.7\,\mathrm{mm}
-\end{aligned}
+x = \frac{A_{s,2,x} \cdot f_{sd}}{0.85 \cdot b \cdot f_{cd}} = \frac{2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 62.7\,\mathrm{mm}
 $$
 
 **Bezogene Druckzonenhöhe** *(SIA 262:2025, 4.1.4.2.5)*
 
 $$
-\begin{aligned}
-  \left(x/d\right)_{2} &= \frac{x}{d_{2,x}} \\
-  &= \frac{62.7\,\mathrm{mm}}{248.1\,\mathrm{mm}} \\
-  &= 0.253
-\end{aligned}
+\left(x/d\right)_{2} = \frac{x}{d_{2,x}} = \frac{62.7\,\mathrm{mm}}{248.1\,\mathrm{mm}} = 0.253
 $$
 
 **Bedingung**
@@ -536,11 +496,7 @@ $$
 **Erfüllungsgrad** *(SIA 262:2025, 4.1.4.2.5)*
 
 $$
-\begin{aligned}
-  \alpha_{eff,D,2} &= \frac{\left(x/d\right)_{max}}{\left(x/d\right)_{2}} \\
-  &= \frac{0.35}{0.253} \\
-  &= 1.39
-\end{aligned}
+\alpha_{eff,D,2} = \frac{\left(x/d\right)_{max}}{\left(x/d\right)_{2}} = \frac{0.35}{0.253} = 1.39
 $$
 
 #### Duktilität – 3. Lage
@@ -554,21 +510,13 @@ $$
 **Druckzonenhöhe bei reiner Biegung**
 
 $$
-\begin{aligned}
-  x &= \frac{A_{s,3,x,g} \cdot f_{sd}}{0.85 \cdot b \cdot f_{cd}} \\
-  &= \frac{754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} \\
-  &= 19.3\,\mathrm{mm}
-\end{aligned}
+x = \frac{A_{s,3,x,g} \cdot f_{sd}}{0.85 \cdot b \cdot f_{cd}} = \frac{754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 19.3\,\mathrm{mm}
 $$
 
 **Bezogene Druckzonenhöhe** *(SIA 262:2025, 4.1.4.2.5)*
 
 $$
-\begin{aligned}
-  \left(x/d\right)_{3} &= \frac{x}{d_{3,x,g}} \\
-  &= \frac{19.3\,\mathrm{mm}}{252\,\mathrm{mm}} \\
-  &= 0.077
-\end{aligned}
+\left(x/d\right)_{3} = \frac{x}{d_{3,x,g}} = \frac{19.3\,\mathrm{mm}}{252\,\mathrm{mm}} = 0.077
 $$
 
 **Bedingung**
@@ -580,11 +528,7 @@ $$
 **Erfüllungsgrad** *(SIA 262:2025, 4.1.4.2.5)*
 
 $$
-\begin{aligned}
-  \alpha_{eff,D,3} &= \frac{\left(x/d\right)_{max}}{\left(x/d\right)_{3}} \\
-  &= \frac{0.35}{0.077} \\
-  &= 4.57
-\end{aligned}
+\alpha_{eff,D,3} = \frac{\left(x/d\right)_{max}}{\left(x/d\right)_{3}} = \frac{0.35}{0.077} = 4.57
 $$
 
 Massgebend ist die 2. Lage mit dem kleineren Erfüllungsgrad; sie steht in der Zusammenfassung.
@@ -1316,11 +1260,7 @@ $$
 **Beiwert zur Berücksichtigung der Festigkeitsminderung** *(SIA 262:2025, 2.4.2.3)*
 
 $$
-\begin{aligned}
-  \eta_{fc} &= \min\left[\left(\frac{40\,\mathrm{N}/\mathrm{mm}^{2}}{f_{ck}}\right)^{1/3};\ 1.0\right] \\
-  &= \min\left[\left(\frac{40\,\mathrm{N}/\mathrm{mm}^{2}}{30\,\mathrm{N}/\mathrm{mm}^{2}}\right)^{1/3};\ 1.0\right] \\
-  &= 1
-\end{aligned}
+\eta_{fc} = \min\left[\left(\frac{40\,\mathrm{N}/\mathrm{mm}^{2}}{f_{ck}}\right)^{1/3};\ 1.0\right] = \min\left[\left(\frac{40\,\mathrm{N}/\mathrm{mm}^{2}}{30\,\mathrm{N}/\mathrm{mm}^{2}}\right)^{1/3};\ 1.0\right] = 1
 $$
 
 **Teilsicherheitsbeiwert für Beton** *(SIA 262:2025, 2.4.2.6)*
@@ -1332,11 +1272,7 @@ $$
 **Bemessungswert der Betondruckfestigkeit** *(SIA 262:2025, 2.4.2.3)*
 
 $$
-\begin{aligned}
-  f_{cd} &= \frac{\eta_{fc} \cdot f_{ck}}{\gamma_c} \\
-  &= \frac{1 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}{1.5} \\
-  &= 20\,\mathrm{N}/\mathrm{mm}^{2}
-\end{aligned}
+f_{cd} = \frac{\eta_{fc} \cdot f_{ck}}{\gamma_c} = \frac{1 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}{1.5} = 20\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Dehnung am Ende des ansteigenden Astes** *(SIA 262:2025, 4.2.1.4)*
@@ -1360,21 +1296,13 @@ $$
 **Mittelwert der Zylinderdruckfestigkeit** *(SIA 262:2025, 3.1.2.2.2)*
 
 $$
-\begin{aligned}
-  f_{cm} &= f_{ck} + 8\,\mathrm{N}/\mathrm{mm}^{2} \\
-  &= 30\,\mathrm{N}/\mathrm{mm}^{2} + 8\,\mathrm{N}/\mathrm{mm}^{2} \\
-  &= 38\,\mathrm{N}/\mathrm{mm}^{2}
-\end{aligned}
+f_{cm} = f_{ck} + 8\,\mathrm{N}/\mathrm{mm}^{2} = 30\,\mathrm{N}/\mathrm{mm}^{2} + 8\,\mathrm{N}/\mathrm{mm}^{2} = 38\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Mittelwert des Elastizitätsmoduls** *(SIA 262:2025, 3.1.2.3.3)*
 
 $$
-\begin{aligned}
-  E_{cm} &= k_e \cdot \sqrt[3]{f_{cm}} \\
-  &= 10000 \cdot \sqrt[3]{38\,\mathrm{N}/\mathrm{mm}^{2}} \\
-  &= 33620\,\mathrm{N}/\mathrm{mm}^{2}
-\end{aligned}
+E_{cm} = k_e \cdot \sqrt[3]{f_{cm}} = 10000 \cdot \sqrt[3]{38\,\mathrm{N}/\mathrm{mm}^{2}} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Teilsicherheitsbeiwert für den Elastizitätsmodul** *(SIA 262:2025, 4.2.1.15)*
@@ -1386,21 +1314,13 @@ $$
 **Bemessungswert des Elastizitätsmoduls** *(SIA 262:2025, 4.2.1.15)*
 
 $$
-\begin{aligned}
-  E_{cd} &= \frac{E_{cm}}{\gamma_{cE}} \\
-  &= \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1} \\
-  &= 33620\,\mathrm{N}/\mathrm{mm}^{2}
-\end{aligned}
+E_{cd} = \frac{E_{cm}}{\gamma_{cE}} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung** *(SIA 262:2025, 4.2.1.6)*
 
 $$
-\begin{aligned}
-  k_{\sigma} &= \frac{E_{cd}}{400 \cdot f_{cd}} \\
-  &= \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} \\
-  &= 4.202
-\end{aligned}
+k_{\sigma} = \frac{E_{cd}}{400 \cdot f_{cd}} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 4.202
 $$
 
 **Mittelwert der Zugfestigkeit** *(SIA 262:2025, 3.1.2.2.7)*
@@ -1432,11 +1352,7 @@ $$
 **Bemessungswert der Fliessgrenze** *(SIA 262:2025, 2.4.2.5)*
 
 $$
-\begin{aligned}
-  f_{yd} &= \frac{f_{yk}}{\gamma_s} \\
-  &= \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{1.15} \\
-  &= 435\,\mathrm{N}/\mathrm{mm}^{2}
-\end{aligned}
+f_{yd} = \frac{f_{yk}}{\gamma_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{1.15} = 435\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Charakteristische Fliessgrenze auf Druck** *(SIA 262:2025, 3.2.2.3)*
@@ -1448,11 +1364,7 @@ $$
 **Bemessungswert der Fliessgrenze auf Druck** *(SIA 262:2025, 2.4.2.5)*
 
 $$
-\begin{aligned}
-  f_{yd}^{-} &= \frac{f_{yk}^{-}}{\gamma_s} \\
-  &= \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{1.15} \\
-  &= 435\,\mathrm{N}/\mathrm{mm}^{2}
-\end{aligned}
+f_{yd}^{-} = \frac{f_{yk}^{-}}{\gamma_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{1.15} = 435\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Bemessungswert der Dehnung bei Höchstlast** *(SIA 262:2025, 4.2.2.1)*
@@ -1502,11 +1414,7 @@ $$
 **Bewehrungsmass je Kubikmeter Beton**
 
 $$
-\begin{aligned}
-  \mu_s &= \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{b \cdot h} \\
-  &= \frac{1717.4\,\mathrm{mm}^{2} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{1000\,\mathrm{mm} \cdot 200\,\mathrm{mm}} \\
-  &= 67\,\mathrm{kg}/\mathrm{m}^{3}
-\end{aligned}
+\mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{b \cdot h} = \frac{1717.4\,\mathrm{mm}^{2} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{1000\,\mathrm{mm} \cdot 200\,\mathrm{mm}} = 67\,\mathrm{kg}/\mathrm{m}^{3}
 $$
 
 **Höhe der Distanzhalter**
@@ -1540,11 +1448,7 @@ Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f\_cd; gedrückte
 **Gleichmässiger Druck, ohne Bewehrung**
 
 $$
-\begin{aligned}
-  N_{Rd}^{-} &= -b \cdot h \cdot f_{cd} \\
-  &= -1000\,\mathrm{mm} \cdot 200\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} \\
-  &= -4000\,\mathrm{kN}
-\end{aligned}
+N_{Rd}^{-} = -b \cdot h \cdot f_{cd} = -1000\,\mathrm{mm} \cdot 200\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} = -4000\,\mathrm{kN}
 $$
 
 **Zugehöriges Moment**
@@ -1580,11 +1484,7 @@ $$
 **Druckzonenhöhe aus dem Kräftegleichgewicht**
 
 $$
-\begin{aligned}
-  x^{+} &= \frac{A_{s,1,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} \\
-  &= \frac{524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} \\
-  &= 13.4\,\mathrm{mm}
-\end{aligned}
+x^{+} = \frac{A_{s,1,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} = \frac{524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 13.4\,\mathrm{mm}
 $$
 
 **Momentenwiderstand bei reiner Biegung**
@@ -1606,11 +1506,7 @@ $$
 **Fliesskriterium – Dehnung der Zugbewehrung**
 
 $$
-\begin{aligned}
-  \varepsilon_s^{+} &= \left(d_{1,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}} \\
-  &= \left(165\,\mathrm{mm} - 100\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{100\,\mathrm{mm}} \\
-  &= 2.27\,\text{‰}
-\end{aligned}
+\varepsilon_s^{+} = \left(d_{1,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}} = \left(165\,\mathrm{mm} - 100\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{100\,\mathrm{mm}} = 2.27\,\text{‰}
 $$
 
 ε\_s = 2.27 ‰ ≥ ε\_yd = 2.17 ‰ – die Zugbewehrung fliesst, f\_sd = f\_yd gilt.
@@ -1640,11 +1536,7 @@ $$
 **Druckzonenhöhe aus dem Kräftegleichgewicht**
 
 $$
-\begin{aligned}
-  x^{-} &= \frac{A_{s,4,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} \\
-  &= \frac{524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} \\
-  &= 13.4\,\mathrm{mm}
-\end{aligned}
+x^{-} = \frac{A_{s,4,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} = \frac{524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 13.4\,\mathrm{mm}
 $$
 
 **Momentenwiderstand bei reiner Biegung**
@@ -1666,11 +1558,7 @@ $$
 **Fliesskriterium – Dehnung der Zugbewehrung**
 
 $$
-\begin{aligned}
-  \varepsilon_s^{-} &= \left(d_{4,x} - x^{-}\right) \cdot \frac{\varepsilon_{c2d}}{x^{-}} \\
-  &= \left(165\,\mathrm{mm} - 100\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{100\,\mathrm{mm}} \\
-  &= 2.27\,\text{‰}
-\end{aligned}
+\varepsilon_s^{-} = \left(d_{4,x} - x^{-}\right) \cdot \frac{\varepsilon_{c2d}}{x^{-}} = \left(165\,\mathrm{mm} - 100\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{100\,\mathrm{mm}} = 2.27\,\text{‰}
 $$
 
 ε\_s = 2.27 ‰ ≥ ε\_yd = 2.17 ‰ – die Zugbewehrung fliesst, f\_sd = f\_yd gilt.
