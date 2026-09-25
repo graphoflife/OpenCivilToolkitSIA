@@ -66,7 +66,7 @@ Welche Werte ein Nachweis ansetzt, ist seither ein Name und keine Zahl an der
 Aufrufstelle: `Werkstoffsatz.BEMESSUNG` oder `CHARAKTERISTISCH`. Zuerst hatte
 der Satz nur einen Nutzer, und die anderen schrieben weiter `"f_yd"` von Hand --
 eine Abstraktion, die zur Hälfte eingeführt ist, ist schlechter als keine. Jetzt
-nennt jeder Nutzer des Löser seine Wahl.
+nennt jeder Nutzer des Lösers seine Wahl.
 
 ### Gemessen wird an der Dehnung, wenn der Stahl fliesst
 
