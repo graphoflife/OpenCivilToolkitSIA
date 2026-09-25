@@ -390,7 +390,47 @@ class TestGebrauchsfallPruefung(unittest.TestCase):
             self.assertNotIn(alt, geschrieben)
         self.assertEqual(geschrieben["haeufig"]["anteil"], 75.0)
 
-    def test_ohne_kraefte_sucht_die_suche_ohne_quasistaendige(self):
+    def test_ohne_lastfaelle_leert_jede_lastfallliste(self):
+        """
+        Die Regel heisst «alle». Gefunden werden die Listen ueber die Typen
+        der Felder -- auch in einer Gebrauchsliste --, damit eine neue Liste,
+        die in ohne_lastfaelle() fehlt, hier auffaellt, statt dass die Suche
+        «ohne Kraefte» still mit Kraeften rechnet.
+        """
+        import dataclasses
+        import typing
+
+        def ist_lastfall(klasse) -> bool:
+            return dataclasses.is_dataclass(klasse) and any(
+                f.name in ("M_Ed", "N_Ed") for f in dataclasses.fields(klasse))
+
+        def listen(objekt, pfad=""):
+            hinweise = typing.get_type_hints(type(objekt))
+            for f in dataclasses.fields(objekt):
+                typ, wert = hinweise[f.name], getattr(objekt, f.name)
+                if typing.get_origin(typ) is list:
+                    (element,) = typing.get_args(typ)
+                    if ist_lastfall(element):
+                        yield f"{pfad}{f.name}", objekt, f.name, element
+                elif dataclasses.is_dataclass(wert):
+                    yield from listen(wert, f"{pfad}{f.name}.")
+
+        q = Projekt.beispiel().querschnitte[0]
+        gefunden = list(listen(q))
+        # Die Probe muss die Listen auch finden -- sonst prueft sie nichts.
+        self.assertEqual(
+            sorted(pfad for pfad, *_ in gefunden),
+            ["haeufig.faelle", "knickfaelle", "kombinationen",
+             "quasistaendig.faelle", "spannungsfaelle"])
+        for _, besitzer, feld, element in gefunden:
+            setattr(besitzer, feld, [element(name="probe")])
+
+        q.ohne_lastfaelle()
+        self.assertEqual(
+            [pfad for pfad, besitzer, feld, _ in gefunden
+             if getattr(besitzer, feld)], [])
+
+    def test_die_suche_nimmt_dieselbe_regel(self):
         from opencivil.bewehrungssuche import _arbeitskopie
         from opencivil.projekt import GebrauchsfallEintrag
 
@@ -399,6 +439,7 @@ class TestGebrauchsfallPruefung(unittest.TestCase):
             GebrauchsfallEintrag("Dauer", M_Ed=40.0)]
         kopie = _arbeitskopie(projekt, "q1", kraefte=False)
         self.assertEqual(kopie.querschnitte[0].quasistaendig.faelle, [])
+        self.assertEqual(kopie.querschnitte[0].kombinationen, [])
 
 
 class TestSchiefstellung(unittest.TestCase):

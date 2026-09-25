@@ -22,7 +22,7 @@ from typing import Any, Dict, List, Mapping, Sequence, Union
 
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
 from opencivil.projekt.eintraege import (
-    Beschreibung, MaterialEintrag, PostenEintrag, ProjektFehler, eindeutig,
+    Beschreibung, MaterialEintrag, PostenEintrag, ProjektFehler,
 )
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.aufbau import Aufbau, aufbauen
@@ -252,22 +252,7 @@ class Projekt(Beschreibung):
             gesehen[m.anzeigename] = m.kennung
 
         for eintrag in self.querschnitte:
-            self._namen_pruefen(eintrag)
-
-    @staticmethod
-    def _namen_pruefen(eintrag: "QuerschnittEintrag") -> None:
-        """
-        Lastfallnamen muessen je Platte und Liste eindeutig sein -- siehe
-        :func:`eintraege.eindeutig`. Die Gebrauchslisten pruefen sich
-        selbst, samt Anteil und abgeleiteten Namen.
-        """
-        eindeutig(eintrag.kombinationen, eintrag.name, "Tragsicherheitseinwirkung")
-        eindeutig(eintrag.knickfaelle, eintrag.name, "Knicknachweis")
-        eindeutig(eintrag.spannungsfaelle, eintrag.name,
-                  "Spannung-Dehnung-Analyse")
-        for liste, wort in ((eintrag.haeufig, "häufige"),
-                            (eintrag.quasistaendig, "quasi-ständige")):
-            liste.pruefen(eintrag.name, eintrag.kombinationen, wort)
+            eintrag.pruefen()
 
     # -- Aufbau -------------------------------------------------------------
 

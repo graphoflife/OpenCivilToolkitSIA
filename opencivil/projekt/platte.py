@@ -18,11 +18,11 @@ from typing import Any, List, Mapping, Optional
 
 from opencivil.querschnitt.platte import K_C, KRIECHZAHL, LAGENZAHL, Richtung
 from opencivil.projekt.eintraege import (
-    Beschreibung, Gebrauchsliste, HAEUFIG_ANTEIL, KnickEintrag,
-    KombinationEintrag, LageEintrag, PostenEintrag, QUASISTAENDIG_ANTEIL,
-    QuerkraftbewehrungEintrag, SpannungsfallEintrag, gebrauchsliste_roh,
-    _lagen_aus_altem_format, _pflichtfeld, _rissanforderung_aus,
-    _schalter_aus, _teilungen_aus, _zahl,
+    HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste,
+    KnickEintrag, KombinationEintrag, LageEintrag, PostenEintrag,
+    ProjektFehler, QuerkraftbewehrungEintrag, SpannungsfallEintrag,
+    eindeutig, gebrauchsliste_roh, _lagen_aus_altem_format, _pflichtfeld,
+    _rissanforderung_aus, _schalter_aus, _teilungen_aus, _zahl,
 )
 
 
@@ -175,6 +175,84 @@ class QuerschnittEintrag(Beschreibung):
         eins = Richtung(self.richtung_lage1)
         vier = Richtung(self.richtung_lage4)
         return {1: eins, 2: eins.gegenrichtung, 3: vier.gegenrichtung, 4: vier}[nummer]
+
+    # -- Pruefen und Leeren -------------------------------------------------
+
+    def pruefen(self) -> None:
+        """
+        Was an dieser Platte nicht stimmen kann, bevor daraus gerechnet wird.
+
+        Lastfallnamen eindeutig je Liste (siehe :func:`eintraege.eindeutig`);
+        die Gebrauchslisten pruefen sich selbst, samt Anteil und abgeleiteten
+        Namen. Laeuft auch beim Oeffnen einer Datei -- darum hier nichts, was
+        eine gespeicherte Platte unoeffenbar machte (siehe
+        :meth:`masse_pruefen`).
+        """
+        eindeutig(self.kombinationen, self.name, "Tragsicherheitseinwirkung")
+        eindeutig(self.knickfaelle, self.name, "Knicknachweis")
+        eindeutig(self.spannungsfaelle, self.name, "Spannung-Dehnung-Analyse")
+        for liste, wort in ((self.haeufig, "häufige"),
+                            (self.quasistaendig, "quasi-ständige")):
+            liste.pruefen(self.name, self.kombinationen, wort)
+
+    def masse_pruefen(self) -> None:
+        """
+        Haelt unmoegliche Abmessungen auf, bevor daraus Zahlen werden.
+
+        Bis hierher lief jede Geometrie durch: eine Platte mit ``h = -300`` wurde
+        gerechnet, eine mit beidseitiger Ueberdeckung groesser als die Dicke auch.
+        Heraus kamen Zahlen, die aussahen wie ein Ergebnis. Ein Tragwerksnachweis
+        darf an so etwas nicht vorbeirechnen -- er muss sagen, was nicht stimmt.
+
+        Geprueft wird nur, was geometrisch unmoeglich ist, nicht was unueblich
+        waere. Ob 20 mm Ueberdeckung fuer die Expositionsklasse genuegen,
+        entscheidet der Ingenieur.
+
+        **Nicht in :meth:`pruefen`.** Das laeuft auch beim Oeffnen einer Datei;
+        eine abgelegte Platte mit ``h = 0`` liesse sich dann nicht mehr oeffnen
+        -- und damit nicht mehr korrigieren. Gefragt wird erst beim Bauen.
+        """
+        name = self.name
+        for feld, wert, wie in (
+            ("Dicke h", self.h, "grösser als null"),
+            ("Breite b", self.b, "grösser als null"),
+            ("Grösstkorn D_max", self.d_max, "grösser als null"),
+        ):
+            if wert <= 0.0:
+                raise ProjektFehler(
+                    f"Platte '{name}': {feld} muss {wie} sein, angegeben ist {wert:g} mm.")
+
+        for feld, wert in (("Überdeckung unten", self.ueberdeckung_unten),
+                           ("Überdeckung oben", self.ueberdeckung_oben),
+                           ("Einlagenhöhe", self.einlagenhoehe)):
+            if wert < 0.0:
+                raise ProjektFehler(
+                    f"Platte '{name}': {feld} kann nicht negativ sein "
+                    f"({wert:g} mm).")
+
+        zusammen = self.ueberdeckung_unten + self.ueberdeckung_oben
+        if zusammen >= self.h:
+            raise ProjektFehler(
+                f"Platte '{name}': die Überdeckungen ergeben zusammen {zusammen:g} mm "
+                f"und lassen in einer {self.h:g} mm dicken Platte keinen Platz für "
+                f"Bewehrung.")
+
+    def ohne_lastfaelle(self) -> None:
+        """
+        Jede Lastfallliste leeren -- was bleibt, fragt nicht nach der Belastung.
+
+        Die Bewehrungssuche braucht das fuer ihre Modi ohne Kraefte. Die Regel
+        heisst «alle», ohne Ausnahme, und sie steht neben den Feldern: wer
+        eine Lastfallliste anfuegt, findet sie hier. Ein Test sucht die Listen
+        ueber die Typen der Felder und schlaegt an, wenn eine fehlt -- frueher
+        stand diese Aufzaehlung in der Suche, und die quasi-staendigen waeren
+        dort beinahe vergessen worden.
+        """
+        self.kombinationen = []
+        self.knickfaelle = []
+        self.spannungsfaelle = []
+        self.haeufig.faelle = []
+        self.quasistaendig.faelle = []
 
     # -- Ohne Oberflaeche ---------------------------------------------------
     #

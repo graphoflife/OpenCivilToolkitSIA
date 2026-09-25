@@ -364,22 +364,8 @@ def _arbeitskopie(projekt, kennung: str, *, kraefte: bool, leeren: bool = True):
             lage.grund.durchmesser = 0
             lage.zulage.durchmesser = 0
     if not kraefte:
-        _ohne_kraefte(eintrag)
+        eintrag.ohne_lastfaelle()
     return kopie
-
-
-def _ohne_kraefte(eintrag) -> None:
-    """
-    Alle Lastfaelle weg -- was bleibt, fragt nicht nach der Belastung.
-
-    Eine Stelle, weil es zwei Aufrufer gibt und jede neue Lastfallliste an
-    beide muesste. Die quasi-staendigen kamen dazu, als hier noch zwei Kopien
-    standen; vergessen haette man sie in einer davon.
-    """
-    eintrag.kombinationen = []
-    eintrag.knickfaelle = []
-    eintrag.haeufig.faelle = []
-    eintrag.quasistaendig.faelle = []
 
 
 def _eine_teilung(projekt, kennung: str, teilung: float,
@@ -567,7 +553,7 @@ def _duktilitaetsbefund(projekt, kennung: str, loesung: "Loesung") -> str:
         if eintrag.richtung_von(nummer) is Richtung.X)
     if not eintrag.duktilitaet:
         return ""
-    _ohne_kraefte(eintrag)
+    eintrag.ohne_lastfaelle()
     bewertung = bewerte(probe)
     if bewertung.erfuellt():
         return "Der Duktilitätsnachweis geht damit auf."

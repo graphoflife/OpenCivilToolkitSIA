@@ -60,45 +60,6 @@ if TYPE_CHECKING:
     from opencivil.projekt.projekt import Projekt
 
 
-def _masse_pruefen(eintrag: "QuerschnittEintrag") -> None:
-    """
-    Haelt unmoegliche Abmessungen auf, bevor daraus Zahlen werden.
-
-    Bis hierher lief jede Geometrie durch: eine Platte mit ``h = -300`` wurde
-    gerechnet, eine mit beidseitiger Ueberdeckung groesser als die Dicke auch.
-    Heraus kamen Zahlen, die aussahen wie ein Ergebnis. Ein Tragwerksnachweis
-    darf an so etwas nicht vorbeirechnen -- er muss sagen, was nicht stimmt.
-
-    Geprueft wird nur, was geometrisch unmoeglich ist, nicht was unueblich
-    waere. Ob 20 mm Ueberdeckung fuer die Expositionsklasse genuegen,
-    entscheidet der Ingenieur.
-    """
-    name = eintrag.name
-    for feld, wert, wie in (
-        ("Dicke h", eintrag.h, "grösser als null"),
-        ("Breite b", eintrag.b, "grösser als null"),
-        ("Grösstkorn D_max", eintrag.d_max, "grösser als null"),
-    ):
-        if wert <= 0.0:
-            raise ProjektFehler(
-                f"Platte '{name}': {feld} muss {wie} sein, angegeben ist {wert:g} mm.")
-
-    for feld, wert in (("Überdeckung unten", eintrag.ueberdeckung_unten),
-                       ("Überdeckung oben", eintrag.ueberdeckung_oben),
-                       ("Einlagenhöhe", eintrag.einlagenhoehe)):
-        if wert < 0.0:
-            raise ProjektFehler(
-                f"Platte '{name}': {feld} kann nicht negativ sein "
-                f"({wert:g} mm).")
-
-    zusammen = eintrag.ueberdeckung_unten + eintrag.ueberdeckung_oben
-    if zusammen >= eintrag.h:
-        raise ProjektFehler(
-            f"Platte '{name}': die Überdeckungen ergeben zusammen {zusammen:g} mm "
-            f"und lassen in einer {eintrag.h:g} mm dicken Platte keinen Platz für "
-            f"Bewehrung.")
-
-
 # ===========================================================================
 # Aufbau
 # ===========================================================================
@@ -495,7 +456,7 @@ def _querschnitt(
         raise ProjektFehler(
             f"Platte '{eintrag.name}' verweist auf das Material "
             f"'{eintrag.beton}', das es nicht (mehr) gibt.")
-    _masse_pruefen(eintrag)
+    eintrag.masse_pruefen()
 
     lagen: List[Bewehrungslage] = []
     for nummer, lage in enumerate(eintrag.lagen, start=1):
