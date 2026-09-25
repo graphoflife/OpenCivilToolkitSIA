@@ -241,22 +241,22 @@ class TestInDerZusammenfassung(unittest.TestCase):
     def test_eine_zeile_fuer_die_schlechtere_lage(self):
         projekt = projekt_mit()
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
-        paare = [(z["zellen"][0], z["zellen"][1])
+        paare = [(z["zellen"][0]["text"], z["zellen"][1]["text"])
                  for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
-        art = r"\text{Zwängung auf Normalkraft}"
+        art = "Zwängung auf Normalkraft"
         zeilen = [pa for pa in paare if pa[0] == art]
         self.assertEqual(len(zeilen), 1)
         self.assertIn(zeilen[0][1],
-                      [rf"\text{{{n}. Lage}}" for n in x_lagen(projekt)])
+                      [f"{n}. Lage" for n in x_lagen(projekt)])
 
     def test_einwirkung_und_widerstand_sind_kraefte(self):
         projekt = projekt_mit()
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         zeile = next(z for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]
-                     if z["zellen"][0] == r"\text{Zwängung auf Normalkraft}")
-        self.assertIn("N_{Riss}", zeile["zellen"][3])
-        self.assertIn("N_{s,adm", zeile["zellen"][2])
-        self.assertIn(r"\mathrm{kN}", zeile["zellen"][2])
+                     if z["zellen"][0] == {"text": "Zwängung auf Normalkraft"})
+        self.assertIn("N_{Riss}", zeile["zellen"][3]["mathe"])
+        self.assertIn("N_{s,adm", zeile["zellen"][2]["mathe"])
+        self.assertIn(r"\mathrm{kN}", zeile["zellen"][2]["mathe"])
 
 
 # ===========================================================================

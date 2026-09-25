@@ -167,6 +167,7 @@ class TestTextMaskierung(unittest.TestCase):
         self.assertFalse(self.unmaskierte_stellen(r"\text{grösste Zugkraft}"))
 
     def test_die_ganze_mitschrift_ist_sauber(self):
+        from opencivil.core.latex import Mathe
         from opencivil.core.protokoll import GleichungBlock, TabellenBlock
         from opencivil.projekt import Projekt
 
@@ -177,7 +178,10 @@ class TestTextMaskierung(unittest.TestCase):
             if isinstance(block, GleichungBlock):
                 stuecke = [block.latex]
             elif isinstance(block, TabellenBlock):
-                stuecke = list(block.kopf) + [z for zeile in block.zeilen for z in zeile]
+                # Nur die Mathe-Zellen sind LaTeX; Text wird beim Setzen
+                # maskiert und steht hier roh.
+                zellen = list(block.kopf) + [z for zeile in block.zeilen for z in zeile]
+                stuecke = [z.latex for z in zellen if isinstance(z, Mathe)]
             else:
                 continue
             for stueck in stuecke:

@@ -17,3 +17,6 @@ ausgabe/
 *.out
 *.synctex.gz
 daten/
+
+# Ist-Fassung eines abweichenden Berichts, zum Ansehen neben der Soll-Fassung.
+tests/schnappschuss/*.ist

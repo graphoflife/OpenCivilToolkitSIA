@@ -21,7 +21,7 @@ from opencivil import spannungsanalyse
 from opencivil.querschnitt.platte import BREITE_Y_MM, Richtung
 from opencivil.bericht.zusammenfassung import zusammenfassen
 from opencivil.core.berechnung import grad_als_text
-from opencivil.core.latex import als_text, tabelle, text_latex
+from opencivil.core.latex import Mathe, Zelle, als_text, tabelle
 from opencivil.core.protokoll import (
     Block, GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, TextBlock,
     TitelBlock, UnterprotokollBlock,
@@ -181,8 +181,9 @@ def block_dict(block: Block) -> Optional[dict]:
         return {
             "art": "tabelle",
             "titel": block.titel,
-            "kopf": list(block.kopf),
-            "zeilen": [list(z) for z in block.zeilen],
+            "kopf": [zelle_dict(z) for z in block.kopf],
+            "zeilen": [[zelle_dict(z) for z in zeile] for zeile in block.zeilen],
+            "ausrichtung": block.ausrichtung,
             "latex": block.als_latex(),
         }
     if isinstance(block, HinweisBlock):
@@ -199,6 +200,17 @@ def block_dict(block: Block) -> Optional[dict]:
             "bloecke": protokoll_liste(block.protokoll),
         }
     return None
+
+
+def zelle_dict(zelle: Zelle) -> dict:
+    """
+    Eine Tabellenzelle fuer die Oberflaeche: ``{"text": ...}`` oder
+    ``{"mathe": ...}``. Die Oberflaeche setzt nur Formeln mit KaTeX -- Text
+    aus LaTeX zurueckzulesen, wie sie es frueher musste, entfaellt.
+    """
+    if isinstance(zelle, Mathe):
+        return {"mathe": zelle.latex}
+    return {"text": zelle}
 
 
 def protokoll_liste(protokoll: Protokoll) -> List[dict]:
@@ -750,16 +762,16 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
     es ist -- ausgeschrieben, mit Richtung -- und die zweite, wie der Fall
     heisst.
     """
-    kopf = [r"\text{Nachweis}", r"\text{Bezeichnung}", r"\text{Widerstand}",
-            r"\text{Einwirkung}", r"\alpha_{eff}"]
+    kopf = ["Nachweis", "Bezeichnung", "Widerstand", "Einwirkung",
+            Mathe(r"\alpha_{eff}")]
 
-    def zelle(wert) -> str:
+    def zelle(wert) -> Zelle:
         """Feste Stellenzahl -- in einer Spalte steht immer dieselbe Groesse."""
         if wert is None:
-            return r"\text{--}"
+            return "–"
         zahl = wert.groesse.in_einheit(wert.einheit)
-        return (rf"{wert.symbol} = {zahl:.{wert.definition.stellen}f}"
-                rf"{wert.einheit.als_latex()}")
+        return Mathe(rf"{wert.symbol} = {zahl:.{wert.definition.stellen}f}"
+                      rf"{wert.einheit.als_latex()}")
 
     ergebnis: Dict[str, Any] = {}
     for platte in zusammenfassen(aufbau, loesung).platten:
@@ -772,11 +784,11 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
         zeilen = [
             {
                 "zellen": [
-                    als_text(z.nachweis),
-                    als_text(z.fall) if z.fall else r"\text{--}",
+                    z.nachweis,
+                    z.fall or "–",
                     zelle(z.widerstand),
                     zelle(z.einwirkung),
-                    z.urteil.gradtext(latex=True),
+                    Mathe(z.urteil.gradtext(latex=True)),
                 ],
                 "erfuellt": z.urteil.erfuellt,
                 "begruendung": z.urteil.begruendung,
@@ -787,8 +799,9 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
             for z in platte.zeilen
         ]
         ergebnis[platte.kennung] = {
-            "kopf": kopf,
-            "zeilen": zeilen,
+            "kopf": [zelle_dict(k) for k in kopf],
+            "zeilen": [{**z, "zellen": [zelle_dict(c) for c in z["zellen"]]}
+                       for z in zeilen],
             "grad_spalte": GRAD_SPALTE,
             "ausrichtung": AUSRICHTUNG,
             "latex": tabelle(kopf, [z["zellen"] for z in zeilen], AUSRICHTUNG),
@@ -832,9 +845,8 @@ def _bewehrungsuebersicht(qs) -> dict:
     Grundbewehrung und Zulage stehen in einer Zeile, getrennt durch ``+`` --
     die Lage ist eine Lage, auch wenn sie aus zwei Posten besteht.
     """
-    kopf = [r"\text{Lage}", r"\text{Richtung}", r"\text{Bewehrung}",
-            r"\text{Stahl}"]
-    strich = r"\text{--}"
+    kopf = ["Lage", "Richtung", "Bewehrung", "Stahl"]
+    strich = "–"
 
     def menge(posten) -> str:
         if not posten.vorhanden:
@@ -844,19 +856,19 @@ def _bewehrungsuebersicht(qs) -> dict:
             return rf"{durchmesser}@{posten.abstand.formatiert(0)}"
         return rf"{posten.anzahl:g} \times {durchmesser}"
 
-    zeilen = [[als_text("Überdeckung oben"), strich,
-               qs.ueberdeckung_oben.als_latex(0, MM), strich]]
+    zeilen = [["Überdeckung oben", strich,
+               Mathe(qs.ueberdeckung_oben.als_latex(0, MM)), strich]]
     for lage in reversed(qs.lagen):
         posten = [menge(lage.grund), menge(lage.zulage)]
         vorhanden = [t for t in posten if t]
         zeilen.append([
-            als_text(f"{lage.nummer}. Lage"),
-            als_text(lage.richtung.value),
-            " + ".join(vorhanden) if vorhanden else strich,
-            als_text(lage.stahl.name) if (vorhanden and lage.stahl) else strich,
+            f"{lage.nummer}. Lage",
+            lage.richtung.value,
+            Mathe(" + ".join(vorhanden)) if vorhanden else strich,
+            lage.stahl.name if (vorhanden and lage.stahl) else strich,
         ])
-    zeilen.append([als_text("Überdeckung unten"), strich,
-                   qs.ueberdeckung_unten.als_latex(0, MM), strich])
+    zeilen.append(["Überdeckung unten", strich,
+                   Mathe(qs.ueberdeckung_unten.als_latex(0, MM)), strich])
 
     # Die Bügel stehen am Ende und nicht in der Stapelfolge: sie sitzen über
     # die ganze Höhe und haben darin keinen Platz.
@@ -868,16 +880,17 @@ def _bewehrungsuebersicht(qs) -> dict:
         menge_y = (b.abstand_y.formatiert(0) if b.ueber_abstand_y
                    else rf"{b.anzahl_y:g}\,\text{{Stk}}")
         zeilen.append([
-            als_text("Querkraftbewehrung"),
-            als_text("x/y"),
-            (rf"\varnothing {b.durchmesser.formatiert(0)}"
-             rf"@{b.abstand_x.formatiert(0)}@{menge_y}"),
-            als_text(b.stahl.name) if b.stahl else strich,
+            "Querkraftbewehrung",
+            "x/y",
+            Mathe(rf"\varnothing {b.durchmesser.formatiert(0)}"
+                   rf"@{b.abstand_x.formatiert(0)}@{menge_y}"),
+            b.stahl.name if b.stahl else strich,
         ])
 
     return {
-        "kopf": kopf,
-        "zeilen": zeilen,
+        "kopf": [zelle_dict(k) for k in kopf],
+        "zeilen": [[zelle_dict(c) for c in zeile] for zeile in zeilen],
+        "ausrichtung": "llll",
         "titel": "Bewehrung von oben nach unten",
         "latex": tabelle(kopf, zeilen, "llll"),
     }

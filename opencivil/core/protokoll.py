@@ -136,10 +136,15 @@ class GleichungBlock(Block):
 
 @dataclass
 class TabellenBlock(Block):
-    """Tabelle, typischerweise ein Iterationsprotokoll."""
+    """
+    Tabelle, typischerweise ein Iterationsprotokoll.
 
-    kopf: Sequence[str]
-    zeilen: Sequence[Sequence[str]]
+    Jede Zelle ist Text (``str``) oder :class:`latex.Mathe` -- die
+    Darstellung entscheidet, wie sie beides setzt.
+    """
+
+    kopf: Sequence[tex.Zelle]
+    zeilen: Sequence[Sequence[tex.Zelle]]
     titel: str = ""
     ausrichtung: Optional[str] = None
 
@@ -242,8 +247,8 @@ class Protokoll:
 
     def tabelle(
         self,
-        kopf: Sequence[str],
-        zeilen: Iterable[Sequence[str]],
+        kopf: Sequence[tex.Zelle],
+        zeilen: Iterable[Sequence[tex.Zelle]],
         titel: str = "",
         ausrichtung: Optional[str] = None,
     ) -> None:

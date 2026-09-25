@@ -185,7 +185,7 @@ class TestRechnen(unittest.TestCase):
                 name = projekt.querschnitt(kennung).name
                 teil = text[text.index(f"{name}\n"):]
                 for zeile in tabelle["zeilen"]:
-                    self.assertIn(zeile["zellen"][4], teil)
+                    self.assertIn(zeile["zellen"][4]["mathe"], teil)
                 for still in tabelle["stille"]:
                     self.assertIn(f"{still['nachweis']} – {still['fall']}: "
                                   f"α_eff = {still['grad']}", teil)

@@ -56,7 +56,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Mapping, Sequence, Tuple
 
 from opencivil.core.berechnung import Eingaben
-from opencivil.core.latex import als_text
+from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import kennung_aus
 from opencivil.nachweis import linie as geo
@@ -259,11 +259,12 @@ def protokoll_ansatz(p: Protokoll, beton: Betongesetz, lagen, fasern: int = FASE
         f"Betonfläche wird abgezogen."
     )
     p.tabelle(
-        kopf=[r"\text{Lage}", r"a_s\ [\mathrm{mm}^2]", r"z\ [\mathrm{mm}]",
-              r"f_{yd}\ [\mathrm{N/mm^2}]"],
+        kopf=["Lage", Mathe(r"a_s\ [\mathrm{mm}^2]"), Mathe(r"z\ [\mathrm{mm}]"),
+              Mathe(r"f_{yd}\ [\mathrm{N/mm^2}]")],
         zeilen=[
-            [als_text(beschriftung),
-             f"{a_s * 1e6:.0f}", f"{z * 1e3:.1f}", f"{stahl.f_yd / 1e6:.0f}"]
+            [beschriftung,
+             Mathe(f"{a_s * 1e6:.0f}"), Mathe(f"{z * 1e3:.1f}"),
+             Mathe(f"{stahl.f_yd / 1e6:.0f}")]
             for a_s, z, stahl, beschriftung in lagen
         ],
         titel="Berücksichtigte Bewehrungslagen",
@@ -291,16 +292,16 @@ def protokoll_linie(p: Protokoll, linie: Sequence[Linienpunkt],
         if grenze:
             zeilen.append([
                 punkt.abschnitt,
-                f"{punkt.eps_oben * 1000:.2f}",
-                f"{punkt.eps_unten * 1000:.2f}",
-                f"{punkt.N / 1e3:.1f}",
-                f"{punkt.M / 1e3:.1f}",
+                Mathe(f"{punkt.eps_oben * 1000:.2f}"),
+                Mathe(f"{punkt.eps_unten * 1000:.2f}"),
+                Mathe(f"{punkt.N / 1e3:.1f}"),
+                Mathe(f"{punkt.M / 1e3:.1f}"),
             ])
         vorher = punkt.abschnitt
     p.tabelle(
-        kopf=[r"\text{Abschn.}", r"\varepsilon_{oben}\ [\text{‰}]",
-              r"\varepsilon_{unten}\ [\text{‰}]",
-              r"N\ [\mathrm{kN}]", r"M\ [\mathrm{kNm}]"],
+        kopf=["Abschn.", Mathe(r"\varepsilon_{oben}\ [\text{‰}]"),
+              Mathe(r"\varepsilon_{unten}\ [\text{‰}]"),
+              Mathe(r"N\ [\mathrm{kN}]"), Mathe(r"M\ [\mathrm{kNm}]")],
         zeilen=zeilen,
         titel="Stützstellen des Dehnungsfächers",
         ausrichtung="lrrrr",
@@ -309,10 +310,10 @@ def protokoll_linie(p: Protokoll, linie: Sequence[Linienpunkt],
 def protokoll_eckwerte(p: Protokoll, eckwerte: Mapping[str, str]) -> None:
     """Eckwerte der genauen Linie, je Kennung als fertige Zeichenkette."""
     p.tabelle(
-        kopf=[r"\text{Eckwert}", r"\text{Symbol}", r"\text{Wert}"],
+        kopf=["Eckwert", "Symbol", "Wert"],
         zeilen=[
-            [als_text(beschreibung), symbol,
-             eckwerte[schluessel]]
+            [beschreibung, Mathe(symbol),
+             Mathe(eckwerte[schluessel])]
             for schluessel, symbol, beschreibung in (
                 ("N_Rd_zug", "N_{Rd}^{+}", "grösste Zugkraft"),
                 ("N_Rd_druck", "N_{Rd}^{-}", "grösste Druckkraft"),

@@ -110,6 +110,10 @@ def uebernehmen() -> None:
     for name, inhalt in berichte().items():
         (ORDNER / name).write_text(inhalt, encoding="utf-8")
         print(f"geschrieben: {ORDNER / name}")
+    # Die Ist-Fassungen sind damit Soll geworden; liegen blieben sie nur als
+    # veralteter Vergleich.
+    for ist in ORDNER.glob("*.ist"):
+        ist.unlink()
 
 
 class TestSchnappschuss(unittest.TestCase):

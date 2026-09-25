@@ -47,7 +47,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 from opencivil.core.einheiten import (
     EINHEITSLOS, KN, KNM, MM, MM2, N_PRO_MM2, PROMILLE, Groesse,
 )
-from opencivil.core.latex import als_text
+from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import Wert, WertDef
 from opencivil.material.basis import mit_index
@@ -274,15 +274,15 @@ class Handrechnung:
         mit_stahl = any(lage.stahl_index for lage in seiten)
 
         p.tabelle(
-            kopf=([r"\text{Seite}"]
-                  + ([r"\text{Stahl}"] if mit_stahl else [])
-                  + [r"A_s\ [\mathrm{mm}^2]", r"d\ [\mathrm{mm}]",
-                     r"f_{yd}\ [\mathrm{N/mm^2}]"]),
+            kopf=(["Seite"]
+                  + (["Stahl"] if mit_stahl else [])
+                  + [Mathe(r"A_s\ [\mathrm{mm}^2]"), Mathe(r"d\ [\mathrm{mm}]"),
+                     Mathe(r"f_{yd}\ [\mathrm{N/mm^2}]")]),
             zeilen=[
-                [als_text(lage.text)]
-                + ([als_text(lage.stahl_index or "–")] if mit_stahl else [])
-                + [f"{lage.a_s * 1e6:.0f}", f"{lage.z * 1e3:.1f}",
-                   f"{lage.f_yd / 1e6:.0f}"]
+                [lage.text]
+                + ([lage.stahl_index or "–"] if mit_stahl else [])
+                + [Mathe(f"{lage.a_s * 1e6:.0f}"), Mathe(f"{lage.z * 1e3:.1f}"),
+                   Mathe(f"{lage.f_yd / 1e6:.0f}")]
                 for lage in seiten
             ],
             titel="Zusammengefasste Bewehrung",
@@ -546,9 +546,9 @@ class Handrechnung:
 
     def _uebersicht(self, p: Protokoll, punkte: List[Eckpunkt]) -> None:
         p.tabelle(
-            kopf=[r"\text{Eckpunkt}", r"N\ [\mathrm{kN}]", r"M\ [\mathrm{kNm}]"],
+            kopf=["Eckpunkt", Mathe(r"N\ [\mathrm{kN}]"), Mathe(r"M\ [\mathrm{kNm}]")],
             zeilen=[
-                [q.symbol, f"{q.N / 1e3:.1f}", f"{q.M / 1e3:.1f}"]
+                [Mathe(q.symbol), Mathe(f"{q.N / 1e3:.1f}"), Mathe(f"{q.M / 1e3:.1f}")]
                 for q in punkte
             ],
             titel="Eckpunkte der Resistenzlinie aus Handrechnung",

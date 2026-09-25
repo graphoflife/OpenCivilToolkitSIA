@@ -14,7 +14,9 @@
  */
 
 import { el, ersetzen, leerzustand, melden, zahlfeld } from './dom.js';
-import { kopiereFuerWord, kopiereLatex, setzen } from './mathe.js';
+import {
+  kopiereFuerWord, kopiereLatex, kopiereTabelleFuerWord, setzen,
+} from './mathe.js';
 import {
   diagrammZeichnen, kurveZeichnen, neigungskurveZeichnen,
   querkraftkurveZeichnen, querschnittZeichnen,
@@ -39,11 +41,18 @@ function werkzeugKnopf(text, titel, tun) {
 /**
  * Die beiden Kopierknöpfe. Stehen an jedem Block, der LaTeX hergibt --
  * Gleichung wie Tabelle. Einmal geschrieben, damit sie überall dieselben sind.
+ *
+ * @param latex    das LaTeX des Blocks, für den TeX-Knopf
+ * @param tabelle  `{kopf, zeilen}`, wenn der Block eine Tabelle ist: Word
+ *   bekommt dann eine echte Tabelle statt einer Formel.
  */
-function werkzeugleiste(latex, was = 'Formel') {
+function werkzeugleiste(latex, tabelle = null) {
+  const was = tabelle ? 'Tabelle' : 'Formel';
   return el('div.gleichung-werkzeug', {}, [
-    werkzeugKnopf('Word', `Als ${was} für Word kopieren (MathML)`, async () => {
-      await kopiereFuerWord(latex);
+    werkzeugKnopf('Word', `Als ${was} für Word kopieren`, async () => {
+      await (tabelle
+        ? kopiereTabelleFuerWord(tabelle.kopf, tabelle.zeilen)
+        : kopiereFuerWord(latex));
       melden(`${was} kopiert – in Word mit Strg+V einfügen.`);
     }),
     werkzeugKnopf('TeX', 'LaTeX-Quelltext kopieren', async () => {
@@ -78,6 +87,19 @@ function gleichungBlock(block) {
   return huelle;
 }
 
+/**
+ * Setzt eine Tabellenzelle: Text als Text, nur eine Formel mit KaTeX.
+ *
+ * Welche Art eine Zelle hat, sagt der Kern (`{text}` oder `{mathe}`). Früher
+ * war jede Zelle LaTeX, und reiner Text musste per regulärem Ausdruck aus
+ * `\text{…}` zurückgelesen werden.
+ */
+function zelleSetzen(zelle, knoten) {
+  if (zelle.mathe !== undefined) setzen(zelle.mathe, knoten, { displayMode: false });
+  else knoten.textContent = zelle.text;
+  return knoten;
+}
+
 function tabellenBlock(block) {
   return el('div.tabelle-block', {}, [
     block.titel
@@ -88,21 +110,13 @@ function tabellenBlock(block) {
     el('div.tabelle-huelle', {}, [
       el('table.gitter', {}, [
         el('thead', {}, [
-          el('tr', {}, block.kopf.map((zelle) => {
-            const th = el('th');
-            setzen(zelle, th, { displayMode: false });
-            return th;
-          })),
+          el('tr', {}, block.kopf.map((zelle) => zelleSetzen(zelle, el('th')))),
         ]),
-        el('tbody', {}, block.zeilen.map((zeile) => el('tr', {}, zeile.map((zelle) => {
-          const td = el('td');
-          // Zellen können Symbole enthalten; reine Zahlen setzt KaTeX unverändert.
-          setzen(zelle, td, { displayMode: false });
-          return td;
-        })))),
+        el('tbody', {}, block.zeilen.map((zeile) => el('tr', {},
+          zeile.map((zelle) => zelleSetzen(zelle, el('td')))))),
       ]),
     ]),
-    block.latex ? werkzeugleiste(block.latex, 'Tabelle') : null,
+    block.latex ? werkzeugleiste(block.latex, block) : null,
   ]);
 }
 
@@ -272,11 +286,6 @@ function herleitung(loesung) {
  * zu zeigen wäre irreführend.
  */
 /** Holt den Klartext aus einer LaTeX-Zelle der Form `\text{…}`. */
-function textVon(zelle) {
-  const treffer = /^\\text\{(.*)\}$/.exec(zelle || '');
-  return treffer ? treffer[1] : (zelle || '');
-}
-
 /**
  * Die Hinweise der Tabelle, nach Grund gebündelt.
  *
@@ -295,7 +304,7 @@ function hinweiseBuendeln(zeilen) {
     // Nachweis und Bezeichnung zusammen -- 'Querkraft (y)' allein
     // sagt nicht, welcher Fall gemeint ist.
     nach_grund.get(zeile.hinweis).push(
-      [zeile.zellen[0], zeile.zellen[1]].map(textVon).filter((s) => s && s !== '--')
+      [zeile.zellen[0], zeile.zellen[1]].map((z) => z.text).filter((s) => s && s !== '–')
         .join(' – '));
   }
   return [...nach_grund.entries()];
@@ -337,11 +346,8 @@ function zusammenfassung(loesung) {
         ? el('div.tabelle-block', {}, [
           el('div.tabelle-huelle', {}, [
             el('table.nachweis-tabelle', {}, [
-              el('thead', {}, [el('tr', {}, tabelle.kopf.map((zelle) => {
-                const th = el('th');
-                setzen(zelle, th, { displayMode: false });
-                return th;
-              }))]),
+              el('thead', {}, [el('tr', {},
+                tabelle.kopf.map((zelle) => zelleSetzen(zelle, el('th'))))]),
               el('tbody', {}, tabelle.zeilen.map((zeile) => el('tr', {
                 class: zeile.erfuellt ? 'ist-gut' : 'ist-schlecht',
                 title: zeile.begruendung || '',
@@ -354,15 +360,15 @@ function zusammenfassung(loesung) {
                 // Ausrichtung, die auch das LaTeX bekommt. Aus dem Index zu
                 // schliessen ging gut, solange nur die erste Spalte Text war.
                 const rechts = (tabelle.ausrichtung || '')[i] !== 'l';
-                const td = el('td', {
+                return zelleSetzen(zelle, el('td', {
                   class: [rechts ? 'zahl' : '', istGrad ? 'grad' : ''].filter(Boolean).join(' '),
-                });
-                setzen(zelle, td, { displayMode: false });
-                return td;
+                }));
               })))),
             ]),
           ]),
-          werkzeugleiste(tabelle.latex, 'Tabelle'),
+          werkzeugleiste(tabelle.latex, {
+            kopf: tabelle.kopf, zeilen: tabelle.zeilen.map((z) => z.zellen),
+          }),
           // Ein Widerstand von null erklärt sich nicht von selbst. Der Grund
           // steht deshalb unter der Tabelle und nicht bloss im Tooltip --
           // gleiche Gründe zusammengefasst, sonst stünde bei einer ganzen

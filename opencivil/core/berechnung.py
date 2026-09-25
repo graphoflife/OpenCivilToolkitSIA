@@ -489,8 +489,10 @@ class Prozedur(Berechnung):
                 zeilen = []
                 for schritt in range(...):
                     ...
-                    zeilen.append([str(schritt), x.als_latex(1), fehler.als_latex(2)])
-                p.tabelle(["i", "x", "\\\\Delta F"], zeilen, titel="Iterationsverlauf")
+                    zeilen.append([Mathe(str(schritt)), Mathe(x.formatiert(1)),
+                                   Mathe(fehler.formatiert(2))])
+                p.tabelle([Mathe("i"), Mathe("x"), Mathe(r"\\Delta F")], zeilen,
+                          titel="Iterationsverlauf")
                 p.formel(...)
                 return {...}
     """

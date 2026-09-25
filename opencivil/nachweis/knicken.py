@@ -66,7 +66,7 @@ from opencivil.core.berechnung import (
     Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, MM, Groesse
-from opencivil.core.latex import als_text
+from opencivil.core.latex import Mathe, als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
 from opencivil.core.wert import kennung_aus
@@ -660,17 +660,17 @@ class Knicken(Nachweis):
         for s in erg.schritte:
             gibts = s.chi == s.chi   # nan ist mit sich selbst nicht gleich
             zeilen.append([
-                str(s.nummer),
-                f"{s.e_2d_vorher * 1e3:.2f}",
-                f"{s.M_ziel / 1e3:.2f}",
-                rf"{s.chi:.5f}" if gibts else r"\text{kein Gleichgewicht}",
-                f"{s.e_2d * 1e3:.2f}" if gibts else r"\text{--}",
+                Mathe(str(s.nummer)),
+                Mathe(f"{s.e_2d_vorher * 1e3:.2f}"),
+                Mathe(f"{s.M_ziel / 1e3:.2f}"),
+                Mathe(f"{s.chi:.5f}") if gibts else "kein Gleichgewicht",
+                Mathe(f"{s.e_2d * 1e3:.2f}") if gibts else "–",
             ])
         p.tabelle(
-            kopf=[r"k", r"e_{2d}^{(k-1)}\ [\mathrm{mm}]",
-                  r"M_{Ed,II}^{(k)}\ [\mathrm{kNm}]",
-                  r"\chi^{(k)}\ [\mathrm{m}^{-1}]",
-                  r"e_{2d}^{(k)}\ [\mathrm{mm}]"],
+            kopf=[Mathe("k"), Mathe(r"e_{2d}^{(k-1)}\ [\mathrm{mm}]"),
+                  Mathe(r"M_{Ed,II}^{(k)}\ [\mathrm{kNm}]"),
+                  Mathe(r"\chi^{(k)}\ [\mathrm{m}^{-1}]"),
+                  Mathe(r"e_{2d}^{(k)}\ [\mathrm{mm}]")],
             zeilen=zeilen,
             titel=f"Ausmitten-Iteration bei N_Ed = {N / 1e3:.1f} kN",
             ausrichtung="rrrrr",

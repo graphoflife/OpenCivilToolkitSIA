@@ -614,8 +614,8 @@ class TestStilleNachweise(unittest.TestCase):
 
     def test_und_nicht_in_der_tabelle(self):
         tabelle = self.antwort(self.platte())
-        arten = {z["zellen"][0] for z in tabelle["zeilen"]}
-        self.assertNotIn(r"\text{Sprödes Versagen}", arten)
+        arten = {z["zellen"][0]["text"] for z in tabelle["zeilen"]}
+        self.assertNotIn("Sprödes Versagen", arten)
 
     def test_und_nicht_in_der_herleitung(self):
         from opencivil.core.protokoll import TitelBlock
@@ -644,8 +644,8 @@ class TestStilleNachweise(unittest.TestCase):
         tabelle = self.antwort(projekt)
         self.assertFalse([h for h in tabelle["stille"]
                           if h["nachweis"].startswith("Sprödes Versagen")])
-        arten = {z["zellen"][0] for z in tabelle["zeilen"]}
-        self.assertIn(r"\text{Sprödes Versagen}", arten)
+        arten = {z["zellen"][0]["text"] for z in tabelle["zeilen"]}
+        self.assertIn("Sprödes Versagen", arten)
 
     def test_was_aufgeht_meldet_sich_nicht(self):
         """
@@ -1366,10 +1366,11 @@ class TestAngabengruppen(unittest.TestCase):
         for zeile in tabelle["zeilen"]:
             self.assertEqual(len(zeile["zellen"]), len(tabelle["kopf"]))
             self.assertIn("erfuellt", zeile)
-        self.assertTrue(tabelle["latex"].startswith(r"\begin{array}"))
+        self.assertTrue(tabelle["latex"].startswith(r"\begin{tabular}"))
         # Welche Spalte eingefaerbt wird, sagt der Kern -- die Oberflaeche
         # soll es nicht aus der Kopfzeile erraten muessen.
-        self.assertEqual(tabelle["kopf"][tabelle["grad_spalte"]], r"\alpha_{eff}")
+        self.assertEqual(tabelle["kopf"][tabelle["grad_spalte"]],
+                         {"mathe": r"\alpha_{eff}"})
 
     def test_nachweis_und_bezeichnung_stehen_getrennt(self):
         """
@@ -1383,13 +1384,11 @@ class TestAngabengruppen(unittest.TestCase):
         antwort = dienst.bearbeite(
             "rechnen", {"projekt": Projekt.beispiel().als_dict()})
         zeilen = antwort.daten["zusammenfassungen"]["q1"]["zeilen"]
-        paare = [(z["zellen"][0], z["zellen"][1]) for z in zeilen]
-        self.assertIn((r"\text{Biegung und Normalkraft}", r"\text{Feld}"),
-                      paare)
+        paare = [(z["zellen"][0]["text"], z["zellen"][1]["text"]) for z in zeilen]
+        self.assertIn(("Biegung und Normalkraft", "Feld"), paare)
         # Dieselbe Kombination in y ist eine andere Zeile -- vorher waren beide
         # nicht zu unterscheiden.
-        self.assertIn((r"\text{Biegung und Normalkraft}", r"\text{Feld}"),
-                      paare)
+        self.assertIn(("Biegung und Normalkraft", "Feld"), paare)
 
     def test_der_querkraftwiderstand_ist_gross_geschrieben(self):
         projekt = Projekt.beispiel()
@@ -1398,12 +1397,12 @@ class TestAngabengruppen(unittest.TestCase):
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         zeilen = antwort.daten["zusammenfassungen"]["q1"]["zeilen"]
         quer = [z for z in zeilen
-                if z["zellen"][0].startswith(r"\text{Querkraft")]
+                if z["zellen"][0]["text"].startswith("Querkraft")]
         self.assertTrue(quer)
         for zeile in quer:
-            self.assertTrue(zeile["zellen"][2].startswith("V_{Rd"), zeile["zellen"][2])
-            self.assertTrue(zeile["zellen"][3].startswith("V_{Ed"), zeile["zellen"][3])
-            self.assertNotIn("left|", zeile["zellen"][3])
+            self.assertTrue(zeile["zellen"][2]["mathe"].startswith("V_{Rd"), zeile["zellen"][2])
+            self.assertTrue(zeile["zellen"][3]["mathe"].startswith("V_{Ed"), zeile["zellen"][3])
+            self.assertNotIn("left|", zeile["zellen"][3]["mathe"])
 
     def test_ueber_der_tabelle_stehen_die_angaben_zur_platte(self):
         """
@@ -1424,18 +1423,18 @@ class TestAngabengruppen(unittest.TestCase):
         self.assertNotIn("b_y", tabelle["angaben"]["latex"])
 
         bewehrung = tabelle["bewehrung"]
-        self.assertTrue(bewehrung["latex"].startswith(r"\begin{array}"))
-        erste = [z[0] for z in bewehrung["zeilen"]]
+        self.assertTrue(bewehrung["latex"].startswith(r"\begin{tabular}"))
+        erste = [z[0]["text"] for z in bewehrung["zeilen"]]
         # Wie man die Platte im Schnitt sieht: von oben nach unten, also
         # dieselbe Folge wie in der Eingabemaske.
         self.assertEqual(erste, [
-            r"\text{Überdeckung oben}", r"\text{4. Lage}", r"\text{3. Lage}",
-            r"\text{2. Lage}", r"\text{1. Lage}", r"\text{Überdeckung unten}",
+            "Überdeckung oben", "4. Lage", "3. Lage",
+            "2. Lage", "1. Lage", "Überdeckung unten",
         ])
         # Durchmesser, Teilung und Stahl stehen in derselben Zeile.
         erste_lage = bewehrung["zeilen"][4]
-        self.assertIn(r"\varnothing 12@150", erste_lage[2])
-        self.assertIn("B500B", erste_lage[3])
+        self.assertIn(r"\varnothing 12@150", erste_lage[2]["mathe"])
+        self.assertEqual(erste_lage[3], {"text": "B500B"})
 
     def test_eine_leere_lage_steht_ohne_bewehrung_da(self):
         """Eine nicht definierte Lage darf keinen Stahl ausweisen."""
@@ -1445,16 +1444,16 @@ class TestAngabengruppen(unittest.TestCase):
         lage.zulage.durchmesser = 0.0
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         zeilen = antwort.daten["zusammenfassungen"]["q1"]["bewehrung"]["zeilen"]
-        zweite = next(z for z in zeilen if z[0] == r"\text{2. Lage}")
-        self.assertEqual(zweite[2], r"\text{--}")
-        self.assertEqual(zweite[3], r"\text{--}")
+        zweite = next(z for z in zeilen if z[0] == {"text": "2. Lage"})
+        self.assertEqual(zweite[2], {"text": "–"})
+        self.assertEqual(zweite[3], {"text": "–"})
 
     def test_die_zahlen_der_tabelle_haben_feste_stellen(self):
         """In einer Spalte steht immer dieselbe Grösse, also auch dieselbe Genauigkeit."""
         antwort = dienst.bearbeite("rechnen", {"projekt": Projekt.beispiel().als_dict()})
         erste = antwort.daten["zusammenfassungen"]["q1"]["zeilen"][0]["zellen"]
-        self.assertIn("100.0", erste[3])          # M_Ed, eine Nachkommastelle
-        self.assertRegex(erste[4], r"^\d+\.\d{2}$")  # alpha, zwei
+        self.assertIn("100.0", erste[3]["mathe"])  # M_Ed, eine Nachkommastelle
+        self.assertRegex(erste[4]["mathe"], r"^\d+\.\d{2}$")  # alpha, zwei
 
     def test_ohne_einwirkung_bleibt_die_mindestbewehrung(self):
         """
@@ -1471,22 +1470,21 @@ class TestAngabengruppen(unittest.TestCase):
         q.sproede = True
         q.zwaengung_biegung = True
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
-        namen = [z["zellen"][0]
+        namen = [z["zellen"][0]["text"]
                  for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
         self.assertTrue(namen)
         self.assertEqual(sorted(namen),
-                         [r"\text{Sprödes Versagen}",
-                          r"\text{Zwängung auf Biegung}"])
+                         ["Sprödes Versagen", "Zwängung auf Biegung"])
 
     def test_die_duktilitaet_laeuft_auch_ohne_schnittgroessen(self):
         projekt = Projekt.beispiel()
         projekt.querschnitt("q1").kombinationen = []
         projekt.querschnitt("q1").duktilitaet = [True, False, False, True]
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
-        namen = [z["zellen"][0]
+        namen = [z["zellen"][0]["text"]
                  for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
         # Eine Zeile: die ungünstigere der beiden x-Lagen.
-        self.assertEqual(namen, [r"\text{Duktilität}"])
+        self.assertEqual(namen, ["Duktilität"])
 
     def test_jede_angabe_behaelt_ihre_wert_id(self):
         """Ohne sie liesse sich im Kasten nichts einzeln hervorheben."""
@@ -1518,26 +1516,26 @@ class TestQuerkraftbewehrungInDerAusgabe(unittest.TestCase):
         antwort = dienst.bearbeite("rechnen", {"projekt": self.projekt()})
         zeilen = antwort.daten["zusammenfassungen"]["q1"]["bewehrung"]["zeilen"]
         letzte = zeilen[-1]
-        self.assertEqual(letzte[0], r"\text{Querkraftbewehrung}")
+        self.assertEqual(letzte[0], {"text": "Querkraftbewehrung"})
         # Kurzform wie bei den Lagen: Durchmesser und die beiden Teilungen.
-        self.assertEqual(letzte[2], r"\varnothing 10@200@200")
-        self.assertIn("B500B", letzte[3])
+        self.assertEqual(letzte[2], {"mathe": r"\varnothing 10@200@200"})
+        self.assertEqual(letzte[3], {"text": "B500B"})
         # Der Bügelquerschnitt steht in der Herleitung, wo er hergeleitet
         # wird -- in einer Übersicht ist er nur Ballast.
-        self.assertNotIn(r"A_{\varnothing,V}", letzte[2])
+        self.assertNotIn(r"A_{\varnothing,V}", letzte[2]["mathe"])
 
     def test_eine_stabzahl_in_y_steht_als_stueckzahl_da(self):
         antwort = dienst.bearbeite(
             "rechnen", {"projekt": self.projekt(abstand_y=None, anzahl_y=5.0)})
         letzte = antwort.daten["zusammenfassungen"]["q1"]["bewehrung"]["zeilen"][-1]
-        self.assertEqual(letzte[2], r"\varnothing 10@200@5\,\text{Stk}")
+        self.assertEqual(letzte[2], {"mathe": r"\varnothing 10@200@5\,\text{Stk}"})
 
     def test_ohne_buegel_steht_dort_nichts(self):
         antwort = dienst.bearbeite(
             "rechnen", {"projekt": Projekt.beispiel().als_dict()})
-        erste = [z[0] for z
+        erste = [z[0]["text"] for z
                  in antwort.daten["zusammenfassungen"]["q1"]["bewehrung"]["zeilen"]]
-        self.assertNotIn(r"\text{Querkraftbewehrung}", erste)
+        self.assertNotIn("Querkraftbewehrung", erste)
 
     def test_mit_buegeln_tritt_das_neigungsdiagramm_an_die_stelle_der_m_v_kurve(self):
         antwort = dienst.bearbeite("rechnen", {"projekt": self.projekt()})
@@ -1637,20 +1635,20 @@ class TestOhneBewehrungInX(unittest.TestCase):
 
     def test_der_nachweis_steht_da_und_ist_nicht_erfuellt(self):
         zeilen = [z for z in self.zeilen(self.projekt())
-                  if "Rd,x" in z["zellen"][2]]
+                  if "Rd,x" in z["zellen"][2]["mathe"]]
         self.assertEqual(len(zeilen), 3)          # drei Kombinationen
         for zeile in zeilen:
             self.assertFalse(zeile["erfuellt"])
-            self.assertEqual(zeile["zellen"][4], "0.00")
-            self.assertIn("0.0", zeile["zellen"][2])    # M_Rd = 0
+            self.assertEqual(zeile["zellen"][4], {"mathe": "0.00"})
+            self.assertIn("0.0", zeile["zellen"][2]["mathe"])    # M_Rd = 0
             self.assertIn("keine Bewehrung definiert", zeile["hinweis"])
 
     def test_die_einwirkung_steht_trotzdem_da(self):
         """Ohne sie bliebe unklar, wogegen der Widerstand null nicht reicht."""
         zeile = next(z for z in self.zeilen(self.projekt())
-                     if "M_{Rd,x}" in z["zellen"][2])
-        self.assertIn("M_{Ed,x}", zeile["zellen"][3])
-        self.assertIn("100.0", zeile["zellen"][3])
+                     if "M_{Rd,x}" in z["zellen"][2]["mathe"])
+        self.assertIn("M_{Ed,x}", zeile["zellen"][3]["mathe"])
+        self.assertIn("100.0", zeile["zellen"][3]["mathe"])
 
     def test_auch_die_querkraft_faellt_aus(self):
         """
@@ -1659,15 +1657,15 @@ class TestOhneBewehrungInX(unittest.TestCase):
         halb zu schliessen.
         """
         zeilen = self.zeilen(self.projekt(mit_querkraft=True))
-        quer = [z for z in zeilen if "V_{Rd,x}" in z["zellen"][2]]
+        quer = [z for z in zeilen if "V_{Rd,x}" in z["zellen"][2]["mathe"]]
         self.assertEqual(len(quer), 1)
-        self.assertEqual(quer[0]["zellen"][4], "0.00")
-        self.assertIn("V_{Ed,x}", quer[0]["zellen"][3])
+        self.assertEqual(quer[0]["zellen"][4], {"mathe": "0.00"})
+        self.assertIn("V_{Ed,x}", quer[0]["zellen"][3]["mathe"])
 
     def test_erst_alle_m_n_dann_die_querkraft(self):
         """Dieselbe Folge wie dort, wo wirklich gerechnet wird."""
         zeilen = self.zeilen(self.projekt(mit_querkraft=True))
-        arten = [z["zellen"][0].startswith(r"\text{Biegung und Normalkraft")
+        arten = [z["zellen"][0]["text"].startswith("Biegung und Normalkraft")
                  for z in zeilen]
         self.assertEqual(arten, sorted(arten, reverse=True), zeilen)
 

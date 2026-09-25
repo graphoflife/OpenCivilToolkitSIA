@@ -11,6 +11,9 @@
  * bearbeitbare Formel ein -- nicht als Bild und nicht als Text. Als Rückfall
  * liegt zusätzlich das rohe LaTeX als `text/plain` bereit; damit kommt der
  * Formeleditor von Word 365 ebenfalls zurecht, und Overleaf sowieso.
+ *
+ * Eine Tabelle geht als HTML-Tabelle hinüber, nicht als Formel: Word fügt
+ * dann eine echte Tabelle ein, in der nur die Formelzellen Formeln sind.
  */
 
 const KATEX_EINSTELLUNGEN = {
@@ -45,12 +48,15 @@ export function span(latex, { displayMode = false } = {}) {
   return knoten;
 }
 
-/** Das reine MathML einer Formel, oder null wenn KaTeX es nicht liefert. */
-export function alsMathML(latex) {
+/**
+ * Das reine MathML einer Formel, oder null wenn KaTeX es nicht liefert.
+ * `abgesetzt` wie eine Gleichung für sich; in einer Tabellenzelle nicht.
+ */
+export function alsMathML(latex, { abgesetzt = true } = {}) {
   if (!window.katex) return null;
   try {
     const markup = window.katex.renderToString(latex, {
-      ...KATEX_EINSTELLUNGEN, output: 'mathml',
+      ...KATEX_EINSTELLUNGEN, displayMode: abgesetzt, output: 'mathml',
     });
     const huelle = document.createElement('div');
     huelle.innerHTML = markup;
@@ -60,7 +66,7 @@ export function alsMathML(latex) {
     if (!mathe.getAttribute('xmlns')) {
       mathe.setAttribute('xmlns', 'http://www.w3.org/1998/Math/MathML');
     }
-    mathe.setAttribute('display', 'block');
+    mathe.setAttribute('display', abgesetzt ? 'block' : 'inline');
     return mathe.outerHTML;
   } catch {
     return null;
@@ -109,4 +115,47 @@ export function kopiereFuerWord(latex) {
       'text/plain': new Blob([latex], { type: 'text/plain' }),
     },
     latex);
+}
+
+/**
+ * Legt eine Tabelle ab, die Word als **Tabelle** einfügt.
+ *
+ * Textzellen stehen als Text in einer HTML-Tabelle, Formelzellen als MathML.
+ * Als eine einzige Formel -- eine Matrix -- liesse sich die Tabelle in Word
+ * weder umbrechen noch wie eine Tabelle bearbeiten. Als Rückfall liegt sie
+ * mit Tabulatoren getrennt bereit, Formelzellen als LaTeX; so nimmt sie
+ * auch Excel.
+ *
+ * @param kopf    Zellen der Kopfzeile, je `{text}` oder `{mathe}`
+ * @param zeilen  Zeilen aus ebensolchen Zellen
+ */
+export function kopiereTabelleFuerWord(kopf, zeilen) {
+  const tabelle = document.createElement('table');
+  tabelle.setAttribute('border', '1');
+  tabelle.style.borderCollapse = 'collapse';
+  const zeileAnlegen = (teil, zellen, art) => {
+    const tr = teil.insertRow();
+    for (const zelle of zellen) {
+      const td = document.createElement(art);
+      const mathml = zelle.mathe !== undefined
+        ? alsMathML(zelle.mathe, { abgesetzt: false }) : null;
+      if (mathml) td.innerHTML = mathml;
+      else td.textContent = zelle.mathe ?? zelle.text;
+      tr.append(td);
+    }
+  };
+  // Die Kopfzeile im thead: als Kopf ausgezeichnet, nicht bloss als erste Zeile.
+  zeileAnlegen(tabelle.createTHead(), kopf, 'th');
+  const rumpf = tabelle.createTBody();
+  for (const zeile of zeilen) zeileAnlegen(rumpf, zeile, 'td');
+
+  const tabulatoren = [kopf, ...zeilen]
+    .map((zellen) => zellen.map((z) => z.mathe ?? z.text).join('\t'))
+    .join('\n');
+  return inZwischenablage(
+    {
+      'text/html': new Blob([tabelle.outerHTML], { type: 'text/html' }),
+      'text/plain': new Blob([tabulatoren], { type: 'text/plain' }),
+    },
+    tabulatoren);
 }

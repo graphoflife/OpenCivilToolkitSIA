@@ -26,6 +26,7 @@ from opencivil.core.protokoll import (
     TextBlock, TitelBlock, UnterprotokollBlock,
 )
 from opencivil.core.berechnung import NachweisUrteil
+from opencivil.core.latex import Mathe, Zelle
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Quelle, Wert
 
@@ -122,7 +123,8 @@ def _tabelle_zeilen(block: TabellenBlock, einzug: int) -> List[str]:
     LaTeX-Dokument stand sie richtig, auf der Konsole nicht.
     """
     setzen = {"l": str.ljust, "c": str.center}
-    alle = [list(block.kopf)] + [list(z) for z in block.zeilen]
+    alle = [[_zelle(z) for z in block.kopf]] + [[_zelle(z) for z in zeile]
+                                                for zeile in block.zeilen]
     breiten = [max(len(z[i]) for z in alle) for i in range(len(block.kopf))]
     ausrichtung = (block.ausrichtung or "").ljust(len(breiten), "r")
     vorspann = " " * einzug
@@ -132,9 +134,14 @@ def _tabelle_zeilen(block: TabellenBlock, einzug: int) -> List[str]:
             setzen.get(a, str.rjust)(t, b)
             for t, b, a in zip(zellen, breiten, ausrichtung))).rstrip()
 
-    ausgabe = [zeile(block.kopf), vorspann + "  ".join("-" * b for b in breiten)]
-    ausgabe.extend(zeile(z) for z in block.zeilen)
+    ausgabe = [zeile(alle[0]), vorspann + "  ".join("-" * b for b in breiten)]
+    ausgabe.extend(zeile(z) for z in alle[1:])
     return ausgabe
+
+
+def _zelle(zelle: Zelle) -> str:
+    """Text wie er ist; eine Formel als Quelltext, wie ueberall auf der Konsole."""
+    return zelle.latex if isinstance(zelle, Mathe) else zelle
 
 
 # ===========================================================================

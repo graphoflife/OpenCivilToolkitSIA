@@ -40,13 +40,13 @@ Höhe der Distanzhalter
     h_{Dist} = \text{OK innere untere Lage} - \text{UK innere obere Lage} = 240.0\,\mathrm{mm} - 54.0\,\mathrm{mm} = 186.0\,\mathrm{mm}
 
 Randabstände, statische Höhen und Bewehrungsquerschnitte
-    \text{Bewehrung}               \text{Richtung}  \text{Stahl}  \varnothing\ [\mathrm{mm}]  s\ [\mathrm{mm}]  \text{Randabstand}\ [\mathrm{mm}]  d\ [\mathrm{mm}]  A_s\ [\mathrm{mm}^2]
-    -----------------------------  ---------------  ------------  --------------------------  ----------------  ---------------------------------  ----------------  --------------------
-    \text{1. Lage Grundbewehrung}  \text{y}         \text{B500B}                          12               150                                 36               264                   754
-    \text{2. Lage Grundbewehrung}  \text{x}         \text{B500B}                          18               150                                 51               249                  1696
-    \text{2. Lage Zulage}          \text{x}         \text{B500B}                          12               150                                 54               246                   754
-    \text{3. Lage Grundbewehrung}  \text{x}         \text{B500B}                          12               150                                 48                48                   754
-    \text{4. Lage Grundbewehrung}  \text{y}         \text{B500B}                          12               150                                 36                36                   754
+    Bewehrung               Richtung  Stahl  \varnothing\ [\mathrm{mm}]  s\ [\mathrm{mm}]  Randabstand [mm]  d\ [\mathrm{mm}]  A_s\ [\mathrm{mm}^2]
+    ----------------------  --------  -----  --------------------------  ----------------  ----------------  ----------------  --------------------
+    1. Lage Grundbewehrung  y         B500B                          12               150                36               264                   754
+    2. Lage Grundbewehrung  x         B500B                          18               150                51               249                  1696
+    2. Lage Zulage          x         B500B                          12               150                54               246                   754
+    3. Lage Grundbewehrung  x         B500B                          12               150                48                48                   754
+    4. Lage Grundbewehrung  y         B500B                          12               150                36                36                   754
 
 Resistenzlinie aus Handrechnung – x-Richtung
 --------------------------------------------
@@ -63,10 +63,10 @@ Bewehrungsquerschnitt der zusammengefassten Lage
     A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z} = 1696 + 754 = 2450\,\mathrm{mm}^{2}
 
 Zusammengefasste Bewehrung
-    \text{Seite}                                    A_s\ [\mathrm{mm}^2]  d\ [\mathrm{mm}]  f_{yd}\ [\mathrm{N/mm^2}]
-    ----------------------------------------------  --------------------  ----------------  -------------------------
-    \text{2. Lage Grundbewehrung + 2. Lage Zulage}                  2450             248.1                        435
-    \text{3. Lage Grundbewehrung}                                    754              48.0                        435
+    Seite                                    A_s\ [\mathrm{mm}^2]  d\ [\mathrm{mm}]  f_{yd}\ [\mathrm{N/mm^2}]
+    ---------------------------------------  --------------------  ----------------  -------------------------
+    2. Lage Grundbewehrung + 2. Lage Zulage                  2450             248.1                        435
+    3. Lage Grundbewehrung                                    754              48.0                        435
 
 Grösste Druckkraft
 ------------------
@@ -185,7 +185,7 @@ Momentengleichgewicht um die halbe Höhe
     \end{aligned}
 
 Eckpunkte der Resistenzlinie aus Handrechnung
-    \text{Eckpunkt}             N\ [\mathrm{kN}]  M\ [\mathrm{kNm}]
+    Eckpunkt                    N\ [\mathrm{kN}]  M\ [\mathrm{kNm}]
     --------------------------  ----------------  -----------------
     N_{Rd}^{-}                           -6000.0                0.0
     M_{Rd}(x=\tfrac{h}{2})^{+}           -1484.6              324.4
@@ -217,7 +217,7 @@ Widerstand bei festgehaltenem N_Ed = -300.0 kN
     = 324.4 + \frac{-300.0 - \left(-1484.6\right)}{0.0 - \left(-1484.6\right)} \cdot \left(235.9 - 324.4\right) = 253.8\,\mathrm{kNm}
 
 Stützpunkte der Interpolation
-    \text{Punkt}                N\ [\mathrm{kN}]  M\ [\mathrm{kNm}]
+    Punkt                       N\ [\mathrm{kN}]  M\ [\mathrm{kNm}]
     --------------------------  ----------------  -----------------
     M_{Rd}(x=\tfrac{h}{2})^{+}           -1484.6              324.4
     M_{Rd}(N_{Ed}=0)^{+}                     0.0              235.9
@@ -1063,12 +1063,12 @@ Höhe der Distanzhalter
     h_{Dist} = \text{OK innere untere Lage} - \text{UK innere obere Lage} = 152.0\,\mathrm{mm} - 48.0\,\mathrm{mm} = 104.0\,\mathrm{mm}
 
 Randabstände, statische Höhen und Bewehrungsquerschnitte
-    \text{Bewehrung}               \text{Richtung}  \text{Stahl}  \varnothing\ [\mathrm{mm}]  s\ [\mathrm{mm}]  \text{Randabstand}\ [\mathrm{mm}]  d\ [\mathrm{mm}]  A_s\ [\mathrm{mm}^2]
-    -----------------------------  ---------------  ------------  --------------------------  ----------------  ---------------------------------  ----------------  --------------------
-    \text{1. Lage Grundbewehrung}  \text{x}         \text{B500B}                          10               150                                 35               165                   524
-    \text{2. Lage Grundbewehrung}  \text{y}         \text{B500B}                           8               150                                 44               156                   335
-    \text{3. Lage Grundbewehrung}  \text{y}         \text{B500B}                           8               150                                 44                44                   335
-    \text{4. Lage Grundbewehrung}  \text{x}         \text{B500B}                          10               150                                 35                35                   524
+    Bewehrung               Richtung  Stahl  \varnothing\ [\mathrm{mm}]  s\ [\mathrm{mm}]  Randabstand [mm]  d\ [\mathrm{mm}]  A_s\ [\mathrm{mm}^2]
+    ----------------------  --------  -----  --------------------------  ----------------  ----------------  ----------------  --------------------
+    1. Lage Grundbewehrung  x         B500B                          10               150                35               165                   524
+    2. Lage Grundbewehrung  y         B500B                           8               150                44               156                   335
+    3. Lage Grundbewehrung  y         B500B                           8               150                44                44                   335
+    4. Lage Grundbewehrung  x         B500B                          10               150                35                35                   524
 
 Resistenzlinie aus Handrechnung – x-Richtung
 --------------------------------------------
@@ -1078,10 +1078,10 @@ unberücksichtigt. Die Bewehrung ist je Seite zu einer Lage zusammengefasst, das
 auf die halbe Querschnittshöhe.
 
 Zusammengefasste Bewehrung
-    \text{Seite}                   A_s\ [\mathrm{mm}^2]  d\ [\mathrm{mm}]  f_{yd}\ [\mathrm{N/mm^2}]
-    -----------------------------  --------------------  ----------------  -------------------------
-    \text{1. Lage Grundbewehrung}                   524             165.0                        435
-    \text{4. Lage Grundbewehrung}                   524              35.0                        435
+    Seite                   A_s\ [\mathrm{mm}^2]  d\ [\mathrm{mm}]  f_{yd}\ [\mathrm{N/mm^2}]
+    ----------------------  --------------------  ----------------  -------------------------
+    1. Lage Grundbewehrung                   524             165.0                        435
+    4. Lage Grundbewehrung                   524              35.0                        435
 
 Grösste Druckkraft
 ------------------
@@ -1200,7 +1200,7 @@ Momentengleichgewicht um die halbe Höhe
     \end{aligned}
 
 Eckpunkte der Resistenzlinie aus Handrechnung
-    \text{Eckpunkt}             N\ [\mathrm{kN}]  M\ [\mathrm{kNm}]
+    Eckpunkt                    N\ [\mathrm{kN}]  M\ [\mathrm{kNm}]
     --------------------------  ----------------  -----------------
     N_{Rd}^{-}                           -4000.0                0.0
     M_{Rd}(x=\tfrac{h}{2})^{+}           -1472.3              112.5

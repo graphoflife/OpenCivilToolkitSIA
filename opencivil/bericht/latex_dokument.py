@@ -120,9 +120,9 @@ def _protokoll_tex(protokoll: Protokoll, ebene: int = 0) -> List[str]:
         elif isinstance(block, TabellenBlock):
             if block.titel:
                 zeilen.append(rf"\noindent\textbf{{{text_latex(block.titel)}}}")
-            zeilen.append(r"\begin{equation*}")
+            zeilen.append(r"\begin{center}")
             zeilen.append(block.als_latex())
-            zeilen.append(r"\end{equation*}")
+            zeilen.append(r"\end{center}")
 
         elif isinstance(block, HinweisBlock):
             zeilen.append(

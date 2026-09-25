@@ -45,7 +45,7 @@ from opencivil.core.berechnung import (
 from opencivil.core.einheiten import (
     EINHEITSLOS, GRAD, KG_PRO_M3, MM, MM2, Groesse,
 )
-from opencivil.core.latex import als_text
+from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Abschnitt, Protokoll
 from opencivil.core.wert import WertDef, kennung_aus
 from opencivil.material.basis import Baustoff
@@ -450,39 +450,40 @@ class Lagenaufbau(Prozedur):
                 # Bei gemischter Angabe muss in jeder Zelle stehen, um welche
                 # Grösse es geht -- sonst liest man 150 und 7 in derselben
                 # Spalte und weiss nicht, was gemeint ist.
-                menge = s.formatiert(0, MM) if einheitlich else rf"s = {s.als_latex(0, MM)}"
+                menge = Mathe(s.formatiert(0, MM) if einheitlich
+                              else rf"s = {s.als_latex(0, MM)}")
             else:
                 anzahl = float(q.posten.anzahl)
                 a_s = Groesse.aus_si(math.pi * phi.si * phi.si / 4.0 * anzahl, MM2)
-                menge = f"{anzahl:g}" if einheitlich else f"n = {anzahl:g}"
+                menge = Mathe(f"{anzahl:g}" if einheitlich else f"n = {anzahl:g}")
 
             ergebnis[q.d_def.id] = d
             ergebnis[q.as_def.id] = a_s
             zeilen.append([
-                als_text(f"{q.lage.nummer}. Lage {q.art.beschriftung}"),
-                als_text(q.lage.richtung.value),
-                als_text(q.lage.stahl.name if q.lage.stahl else "–"),
-                phi.formatiert(0, MM),
+                f"{q.lage.nummer}. Lage {q.art.beschriftung}",
+                q.lage.richtung.value,
+                q.lage.stahl.name if q.lage.stahl else "–",
+                Mathe(phi.formatiert(0, MM)),
                 menge,
-                rand.formatiert(1, MM),
-                d.formatiert(1, MM),
-                a_s.formatiert(0, MM2),
+                Mathe(rand.formatiert(1, MM)),
+                Mathe(d.formatiert(1, MM)),
+                Mathe(a_s.formatiert(0, MM2)),
             ])
 
         ergebnis.update(self._kennzahlen(p, e, h, b, ergebnis, kanten, breiten))
 
         if not einheitlich:
-            mengenkopf = r"\text{Menge}"
+            mengenkopf = "Menge"
         elif ueber_abstand:
-            mengenkopf = r"s\ [\mathrm{mm}]"
+            mengenkopf = Mathe(r"s\ [\mathrm{mm}]")
         else:
-            mengenkopf = r"n"
+            mengenkopf = Mathe("n")
 
         p.tabelle(
-            kopf=[r"\text{Bewehrung}", r"\text{Richtung}", r"\text{Stahl}",
-                  r"\varnothing\ [\mathrm{mm}]", mengenkopf,
-                  r"\text{Randabstand}\ [\mathrm{mm}]",
-                  r"d\ [\mathrm{mm}]", r"A_s\ [\mathrm{mm}^2]"],
+            kopf=["Bewehrung", "Richtung", "Stahl",
+                  Mathe(r"\varnothing\ [\mathrm{mm}]"), mengenkopf,
+                  "Randabstand [mm]",
+                  Mathe(r"d\ [\mathrm{mm}]"), Mathe(r"A_s\ [\mathrm{mm}^2]")],
             zeilen=zeilen,
             titel="Randabstände, statische Höhen und Bewehrungsquerschnitte",
             ausrichtung="lllrrrrr",

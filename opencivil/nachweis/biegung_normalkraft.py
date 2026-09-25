@@ -45,7 +45,7 @@ from opencivil.core.berechnung import (
     Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, MM, Groesse
-from opencivil.core.latex import als_text
+from opencivil.core.latex import Mathe, als_text
 from opencivil.core.protokoll import Protokoll
 from opencivil.core.wert import WertDef
 from opencivil.core.wert import kennung_aus
@@ -639,10 +639,10 @@ def protokoll_interpolation(
                         f"{_k(fest)} {lauf.einheit.beschriftung}"),
     )
     p.tabelle(
-        kopf=[r"\text{Punkt}", rf"{lauf.name}\ [{e_lauf}]",
-              rf"{ziel.name}\ [{e_ziel}]"],
+        kopf=["Punkt", Mathe(rf"{lauf.name}\ [{e_lauf}]"),
+              Mathe(rf"{ziel.name}\ [{e_ziel}]")],
         zeilen=[
-            [q.symbol, _k(lauf.von(q)), _k(ziel.von(q))]
+            [Mathe(q.symbol), Mathe(_k(lauf.von(q))), Mathe(_k(ziel.von(q)))]
             for q in (a, b)
         ],
         titel="Stützpunkte der Interpolation",

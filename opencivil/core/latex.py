@@ -31,7 +31,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Iterable, Mapping, Optional, Sequence
+from typing import Iterable, Mapping, Optional, Sequence, Union
 
 from opencivil.core.wert import Wert
 
@@ -253,16 +253,51 @@ def bedingung(links: str, zeichen: str, rechts: str, erfuellt: bool) -> str:
     return rf"{links} {zeichen} {rechts} \quad \Rightarrow \quad {urteil}"
 
 
+@dataclass(frozen=True)
+class Mathe:
+    """
+    Eine Tabellenzelle, die Mathematik ist -- Symbol, Einheit, Formel.
+
+    Nicht ``Formel``: so heisst schon die deklarative Berechnung in
+    :mod:`opencivil.core.berechnung`, und die beiden sind verschiedene Dinge.
+
+    Eine Zahl ist ebenfalls Mathe: ihr Minus ist ein Minuszeichen und kein
+    Bindestrich, und sie steht in derselben Schrift wie in den Gleichungen.
+
+    Jede andere Zelle ist Text: ein ``str``. Vorher war jede Zelle LaTeX,
+    und reiner Text stand als ``\\text{...}`` darin. Die Konsole druckte das
+    so ab, der Word-Knopf lieferte eine Formelmatrix statt einer Tabelle, und
+    die Oberflaeche las den Text per regulaerem Ausdruck wieder heraus.
+    Welche Art eine Zelle hat, weiss nur, wer sie schreibt -- also sagt sie
+    es.
+    """
+
+    latex: str
+
+
+#: Eine Tabellenzelle: Text oder :class:`Mathe`.
+Zelle = Union[str, Mathe]
+
+
+def zelle_latex(zelle: Zelle) -> str:
+    """Eine Zelle fuer ein LaTeX-Dokument: Text maskiert, Formel in ``$...$``."""
+    if isinstance(zelle, Mathe):
+        return f"${zelle.latex}$"
+    return text_latex(zelle)
+
+
 def tabelle(
-    kopf: Sequence[str],
-    zeilen: Iterable[Sequence[str]],
+    kopf: Sequence[Zelle],
+    zeilen: Iterable[Sequence[Zelle]],
     ausrichtung: Optional[str] = None,
 ) -> str:
     """
-    Baut eine ``array``-Tabelle -- gedacht fuer Iterationsprotokolle.
+    Eine Tabelle fuer ein LaTeX-Dokument -- ``tabular`` mit ``\\hline``.
 
-    Kopfzeilen und Zellen werden als bereits gueltiges LaTeX uebernommen, damit
-    Symbole und Einheiten darin stehen koennen.
+    Kein ``array`` mehr: das ist eine Formel und keine Tabelle, und Word und
+    Markdown koennen damit nichts anfangen. ``\\hline`` statt booktabs,
+    damit ein kopiertes Stueck in jedem Dokument laeuft, ohne dass dort
+    erst ein Paket geladen werden muss.
     """
     kopf = list(kopf)
     spalten = ausrichtung or ("r" * len(kopf))
@@ -270,15 +305,16 @@ def tabelle(
         raise LatexFehler(
             f"Ausrichtung '{spalten}' passt nicht zu {len(kopf)} Spalten."
         )
-    aufbau = [rf"\begin{{array}}{{{spalten}}}", " & ".join(kopf) + r" \\ \hline"]
+    aufbau = [rf"\begin{{tabular}}{{{spalten}}}", r"\hline",
+              " & ".join(zelle_latex(z) for z in kopf) + r" \\", r"\hline"]
     for zeile in zeilen:
-        zelle = list(zeile)
-        if len(zelle) != len(kopf):
+        zellen = list(zeile)
+        if len(zellen) != len(kopf):
             raise LatexFehler(
-                f"Tabellenzeile hat {len(zelle)} Zellen, erwartet werden {len(kopf)}."
+                f"Tabellenzeile hat {len(zellen)} Zellen, erwartet werden {len(kopf)}."
             )
-        aufbau.append(" & ".join(zelle) + r" \\")
-    aufbau.append(r"\end{array}")
+        aufbau.append(" & ".join(zelle_latex(z) for z in zellen) + r" \\")
+    aufbau += [r"\hline", r"\end{tabular}"]
     return "\n".join(aufbau)
 
 

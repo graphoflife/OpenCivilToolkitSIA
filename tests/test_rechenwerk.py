@@ -572,7 +572,7 @@ class TestProzedur(unittest.TestCase):
         tabellen = [b for b in bloecke if isinstance(b, TabellenBlock)]
         self.assertEqual(len(tabellen), 1)
         self.assertGreater(len(tabellen[0].zeilen), 3)
-        self.assertIn(r"\begin{array}", tabellen[0].als_latex())
+        self.assertIn(r"\begin{tabular}", tabellen[0].als_latex())
 
     def test_stilles_protokoll_verwirft(self):
         d_x, d_i, prozedur = self._iterations_prozedur()
