@@ -1022,6 +1022,9 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   font-size: 11.5px; color: var(--schrift); background: var(--flaeche-2);
   padding: 4px 6px; border-radius: 4px; white-space: pre-wrap;
 }
+/* Stichworte: «Weg: …», «Werte: …», «φ: …» -- eng untereinander. */
+.erklaerung-zeilen { display: flex; flex-direction: column; gap: 2px; }
+.erklaerung-zeilen b { font-weight: 600; color: var(--schrift); }
 
 /* Ein ausgeschalteter Nachweis, der nicht aufgeht. Leiser als ein echtes
    Urteil -- geführt wird er ja nicht --, aber deutlich genug, dass man ihn

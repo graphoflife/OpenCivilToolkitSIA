@@ -35,6 +35,79 @@ import { aendern, naechsterName, projektAendern, zustand } from './zustand.js';
 const laufendeSuche = new Set();
 
 /**
+ * Was hinter jedem Fragezeichen steht: Rechenweg, Werte (Bemessung oder
+ * charakteristisch), φ -- als Stichworte, dazu die Bedingung. Alle an einer
+ * Stelle, damit sie gleich gebaut sind. Die Begründungen stehen in der
+ * Formelsammlung, nicht hier.
+ */
+const HILFE = {
+  tragsicherheit: {
+    zeilen: [
+      ['M-N', 'Resistenzlinie von Hand, Block 0.85·x mit f_cd, Druckstahl weggelassen'],
+      ['V', 'ohne Bügel k_d·τ_cd·d_v, mit Bügeln Fachwerk bei günstigster Neigung'],
+      ['Werte', 'Bemessung (f_cd, f_yd, τ_cd)'],
+      ['φ', '–'],
+    ],
+    formel: 'α_eff = Widerstand / Einwirkung ≥ 1',
+  },
+  duktilitaet: {
+    zeilen: [
+      ['Weg', 'Druckzone aus Kräftegleichgewicht bei M_Ed = 0; beide x-Lagen, gezeigt die ungünstigere'],
+      ['Werte', 'Bemessung (f_cd, f_yd)'],
+      ['φ', '–'],
+    ],
+    formel: '0.85·x·b·f_cd = A_s·f_yd    x/d ≤ 0.35',
+  },
+  sproede: {
+    zeilen: [
+      ['Weg', 'M_Rd bei N = 0 gegen Rissmoment des ungerissenen Querschnitts'],
+      ['Werte', 'M_Rd Bemessung (f_cd, f_yd), M_Riss Mittelwert (f_ctm)'],
+      ['φ', '–'],
+    ],
+    formel: 'M_Rd(N_Ed = 0) ≥ M_Riss = f_ct,eff · h²·b / 6',
+  },
+  zwang: {
+    zeilen: [
+      ['Weg', 'Risskraft des ungerissenen Querschnitts gegen A_s bei σ_s,adm'],
+      ['Werte', 'f_ctm, f_yk; σ_s,adm nach Tab. 17 und Rissanforderung'],
+      ['φ', '–'],
+    ],
+    formel: 'σ_s,adm ≥ N_Riss / A_s    N_Riss = h_eff/2 · b · f_ct,eff',
+  },
+  quasistaendig: {
+    zeilen: [
+      ['Weg', 'Stahlspannung am gerissenen Querschnitt, nur gezogene Bewehrung'],
+      ['Werte', 'charakteristisch (f_ck, f_yk)'],
+      ['φ', 'aus Eingabe → E_c,eff = E_cm / (1 + φ)'],
+    ],
+    formel: 'σ_s ≤ σ_s,adm (Tab. 17)',
+  },
+  haeufig: {
+    zeilen: [
+      ['Weg', 'Stahlspannung am gerissenen Querschnitt, nur gezogene Bewehrung'],
+      ['Werte', 'charakteristisch (f_ck, f_yk), Grenze aus f_yd'],
+      ['φ', 'aus Eingabe → E_c,eff = E_cm / (1 + φ)'],
+    ],
+    formel: 'σ_s ≤ f_yd − 80 N/mm²',
+  },
+  knicken: {
+    zeilen: [
+      ['Weg', 'verformtes System: e_0d + e_1d + e_2d, iteriert über die Krümmung'],
+      ['N_Rd', 'grösste Druckkraft mit Gleichgewichtslage'],
+      ['Werte', 'Bemessung (f_cd, f_yd)'],
+      ['φ', 'aus Eingabe → E_c,eff = E_cm / (1 + φ)'],
+    ],
+    formel: 'α_eff = N_Rd / |N_Ed|',
+  },
+};
+
+/** Das Fragezeichen zu einem Eintrag der Tafel oben. */
+function hilfe(schluessel) {
+  const { zeilen, formel } = HILFE[schluessel];
+  return erklaerung(zeilen, formel);
+}
+
+/**
  * Der Knopf, der eine Liste verlängert.
  *
  * Steht unter der Liste und nicht in der Überschrift: dort ist die Stelle,
@@ -80,6 +153,7 @@ export function nachweiseBlock(querschnitt) {
     el('div.unterkapitel', {}, [
       el('div.unterkapitel-kopf', {}, [
         el('span', { text: 'Tragsicherheitsnachweise' }),
+        hilfe('tragsicherheit'),
       ]),
       querschnitt.kombinationen.length
         ? el('div.einwirkung.ist-kopf', {}, [
@@ -100,28 +174,8 @@ export function nachweiseBlock(querschnitt) {
       }))),
     ]),
 
-    nachweiskapitel(querschnitt, {
-      titel: 'Duktilitätsnachweis',
-      feld: 'duktilitaet',
-      hinweis: {
-        text: 'Begrenzt die Druckzonenhöhe, damit der Querschnitt sein '
-          + 'Versagen ankündigt: die Bewehrung fliesst, bevor der Beton '
-          + 'bricht. Gerechnet ohne Normalkraft, für beide x-Lagen; '
-          + 'angezeigt wird die ungünstigere.',
-        formel: 'x / d ≤ 0.35   bei M_Ed = 0',
-      },
-    }),
-
-    nachweiskapitel(querschnitt, {
-      titel: 'Nachweis gegen sprödes Versagen',
-      feld: 'sproede',
-      hinweis: {
-        text: 'Die Bewehrung muss aufnehmen, was der Beton im Augenblick des '
-          + 'Reissens abgibt. Sonst reisst und versagt der Querschnitt '
-          + 'gleichzeitig, ohne Vorankündigung.',
-        formel: 'M_Rd(N_Ed = 0) ≥ M_Riss = f_ct,eff · h²·b / 6',
-      },
-    }),
+    nachweiskapitel(querschnitt, { titel: 'Duktilitätsnachweis', feld: 'duktilitaet' }),
+    nachweiskapitel(querschnitt, { titel: 'Nachweis gegen sprödes Versagen', feld: 'sproede' }),
 
     mindestbewehrungsBlock(querschnitt),
     knickBlock(querschnitt),
@@ -172,7 +226,7 @@ function einwirkungZeile(querschnitt, index) {
  * Nachgewiesen wird nur x. Die y-Lagen stehen im Querschnitt, weil sie die
  * statische Höhe von x bestimmen; ein Nachweis fragt nicht nach ihnen.
  */
-function nachweiskapitel(querschnitt, { titel, feld, hinweis }) {
+function nachweiskapitel(querschnitt, { titel, feld }) {
   const an = !!querschnitt[feld];
   const leer = !xLagen(querschnitt).some(
     (n) => querschnitt.lagen[n - 1].grund.durchmesser > 0
@@ -181,7 +235,7 @@ function nachweiskapitel(querschnitt, { titel, feld, hinweis }) {
   return el('div.unterkapitel', {}, [
     el('div.unterkapitel-kopf', {}, [
       el('span', { text: titel }),
-      hinweis ? erklaerung(hinweis.text, hinweis.formel) : null,
+      hilfe(feld),
     ]),
     el('div.duktilitaetszeile', {}, [
       hakenSchalter(an, (wert) => projektAendern((p) => {
@@ -218,7 +272,7 @@ function knickBlock(querschnitt) {
   });
 
   return el('div.unterkapitel', {}, [
-    el('div.unterkapitel-kopf', {}, [el('span', { text: 'Knicken' })]),
+    el('div.unterkapitel-kopf', {}, [el('span', { text: 'Knicken' }), hilfe('knicken')]),
     faelle.length
       ? el('div.einwirkung.ist-knick.ist-kopf', {}, [
         el('span'),
@@ -332,13 +386,7 @@ function mindestbewehrungsBlock(querschnitt) {
 
     el('div.unterkapitel-kopf', { style: { marginTop: '8px' } }, [
       el('span', { text: 'Rissbreiten Begrenzung bei Zwang' }),
-      erklaerung(
-        'Wird eine Verformung aufgezwungen – Schwinden, Temperatur, eine '
-        + 'Stütze, die nicht nachgibt –, reisst der Beton, und die Bewehrung '
-        + 'muss die freiwerdende Kraft aufnehmen, ohne dass der Riss zu '
-        + 'breit wird. Die zulässige Stahlspannung folgt aus der '
-        + 'Rissbreite nach Tabelle 17.',
-        'σ_s,adm ≥ N_Riss / A_s   mit   N_Riss = h_eff/2 · b · f_ct,eff'),
+      hilfe('zwang'),
     ]),
     zwaengung('zwaengung', 'Zwängung auf Normalkraft', 'x'),
     zwaengung('zwaengung_biegung', 'Zwängung auf Biegung', 'x'),
@@ -346,13 +394,6 @@ function mindestbewehrungsBlock(querschnitt) {
 
     gebrauchsKapitel(querschnitt, {
       titel: 'Stahlspannungsbegrenzung bei quasi-ständigen Lastfällen',
-      erklaerungText:
-        'Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die '
-        + 'Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die '
-        + 'Spannung aus den Lasten kommt. Bei normaler Anforderung ist sie '
-        + 'f_yk, bei erhöhter und hoher zusätzlich durch w_nom begrenzt. '
-        + 'Geführt bei jeder Anforderung.',
-      formel: 'σ_s ≤ σ_s,adm',
       feld: 'quasistaendig',
       wort: 'quasi-ständig',
       neu: 'Quasi-ständig',
@@ -360,11 +401,6 @@ function mindestbewehrungsBlock(querschnitt) {
 
     gebrauchsKapitel(querschnitt, {
       titel: 'Verhindern des Fliessens für häufige Lastfälle',
-      erklaerungText:
-        'Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst '
-        + 'bleiben Risse und Durchbiegung dauerhaft. Gerechnet am gerissenen '
-        + 'Querschnitt, gezählt nur die gezogene Bewehrung.',
-      formel: 'σ_s ≤ f_yd − 80 N/mm²',
       feld: 'haeufig',
       wort: 'häufig',
       neu: 'Häufig',
@@ -404,7 +440,7 @@ function mindestbewehrungsBlock(querschnitt) {
  * Datei läuft beim Laden durch ihn und bringt den Wert immer mit.
  */
 function gebrauchsKapitel(querschnitt, {
-  titel, erklaerungText, formel, feld, wort, neu, hinweis,
+  titel, feld, wort, neu, hinweis,
 }) {
   const liste = querschnitt[feld];
   const abgeleitet = !!liste.aus_tragsicherheit;
@@ -416,7 +452,7 @@ function gebrauchsKapitel(querschnitt, {
   return el('div', {}, [
     el('div.unterkapitel-kopf', { style: { marginTop: '8px' } }, [
       el('span', { text: titel }),
-      erklaerung(erklaerungText, formel),
+      hilfe(feld),
     ]),
     hinweis ? el('p.hinweis.hinweis-annahme', { text: hinweis }) : null,
 
