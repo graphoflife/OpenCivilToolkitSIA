@@ -54,6 +54,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Callable, List, Optional, Sequence, Tuple
 
+from opencivil.core.protokoll import Zwischenwerte
+
 #: Fasern ueber die Plattenhoehe. 60 reichen: die Betonspannung ist stetig,
 #: und der Fehler der Mittelpunktsregel faellt mit dem Quadrat der Faserdicke.
 FASERN = 60
@@ -133,6 +135,23 @@ class Ebene:
         """Die Dehnung in der Tiefe ``z``."""
         return self.eps_m + self.chi * (z - h / 2.0)
 
+
+
+def wirksamer_modul(E_cm: float, phi: float) -> float:
+    """``E_c,eff = E_cm / (1 + phi)`` -- das Kriechen weicht den Beton auf."""
+    return E_cm / (1.0 + phi)
+
+
+def protokoll_wirksamer_modul(p, e, basis: str, *, titel: str,
+                              nachsatz: str = "") -> None:
+    """
+    Die Zeile zu :func:`wirksamer_modul`, aus den Eingaben ``E_cm`` und
+    ``phi`` -- fuer jeden Nachweis, der mit dem aufgeweichten Beton rechnet.
+    """
+    modul = wirksamer_modul(e.g("E_cm").si, e.g("phi").si)
+    p.formel(Zwischenwerte(basis).spannung("E_c_eff", "E_{c,eff}", modul),
+             r"\frac{@E_cm}{1 + @phi}", {"E_cm": e["E_cm"], "phi": e["phi"]},
+             titel=titel, nachsatz=nachsatz)
 
 
 def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float,

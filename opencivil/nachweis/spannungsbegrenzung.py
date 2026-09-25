@@ -74,7 +74,7 @@ from opencivil.nachweis.mindestbewehrung import (
     RISSBREITE, protokoll_zulaessige_stahlspannung, zulaessige_stahlspannung,
 )
 from opencivil.nachweis.querschnittsloeser import (
-    EPS_DRUCK, EPS_ZUG, protokoll_verfahren,
+    EPS_DRUCK, EPS_ZUG, protokoll_verfahren, protokoll_wirksamer_modul, wirksamer_modul,
     Querschnittsloeser, Stahllage, Werkstoffsatz, beton_elastisch,
     stahl_bilinear,
 )
@@ -481,14 +481,14 @@ class Spannungsbegrenzung(Nachweis):
                            nummer=l.nummer)
                  for l, a, _, _, _ in self.posten]
         n = wertigkeit(E_s=E_s, E_cm=E_cm, phi=phi)
-        E_c_eff = E_cm / (1.0 + phi)
+        E_c_eff = wirksamer_modul(E_cm, phi)
 
         loeser = Querschnittsloeser(
             h=h, b=b, lagen=lagen,
             beton=beton_elastisch(E_c=E_c_eff, f_c=f_c),
             stahl=stahl_bilinear(E_s=E_s, f_sd=f_s))
 
-        sigma_adm = self._protokoll_ansatz(p, e, n, E_c_eff)
+        sigma_adm = self._protokoll_ansatz(p, e, n)
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
@@ -586,8 +586,7 @@ class Spannungsbegrenzung(Nachweis):
 
     # -- Mitschrift ---------------------------------------------------------
 
-    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, n: float,
-                          E_c_eff: float) -> float:
+    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, n: float) -> float:
         """Was fuer alle Faelle gilt -- und die Grenze, die dabei entsteht."""
         g = self.grenze
         p.titel(f"Stahlspannung unter {g.einwirkung} Einwirkung – "
@@ -597,11 +596,9 @@ class Spannungsbegrenzung(Nachweis):
             f"Beton nimmt keinen Zug auf, im Druck rechnet er linear mit dem "
             f"wirksamen Modul. Gezählt wird nur gezogene Bewehrung."
         )
-        werte = Zwischenwerte(self.id)
-        p.formel(werte.spannung("E_c_eff", "E_{c,eff}", E_c_eff),
-                 r"\frac{@E_cm}{1 + @phi}", {"E_cm": e["E_cm"], "phi": e["phi"]},
-                 titel="Wirksamer Elastizitätsmodul",
-                 nachsatz=rf"\qquad {angabe(werte.zahl('n', 'n', n, stellen=2))}")
+        wertigkeit = Zwischenwerte(self.id).zahl("n", "n", n, stellen=2)
+        protokoll_wirksamer_modul(p, e, self.id, titel="Wirksamer Elastizitätsmodul",
+                                  nachsatz=rf"\qquad {angabe(wertigkeit)}")
         sigma_adm = g.bestimmen(e, p)
 
         p.titel("Welche Werte angesetzt werden", ebene=3)

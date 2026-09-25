@@ -71,7 +71,8 @@ from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.nachweis.querschnittsloeser import (
     EPS_DRUCK, EPS_ZUG, Querschnittsloeser, Stahllage, Werkstoffsatz,
-    beton_nichtlinear, protokoll_verfahren, stahl_bilinear,
+    beton_nichtlinear, protokoll_verfahren, protokoll_wirksamer_modul,
+    stahl_bilinear, wirksamer_modul,
 )
 from opencivil.querschnitt.platte import Richtung
 
@@ -314,7 +315,7 @@ class Knicken(Nachweis):
         # Modul. eps_c1d und eps_c2d bleiben, wie die Norm sie angibt.
         loeser = Querschnittsloeser(
             h=h, b=b, lagen=lagen,
-            beton=beton_nichtlinear(f_cd=f_cd, E_c=E_cm / (1.0 + phi),
+            beton=beton_nichtlinear(f_cd=f_cd, E_c=wirksamer_modul(E_cm, phi),
                                     eps_c1d=eps_c1d, eps_c2d=eps_c2d),
             stahl=stahl_bilinear(E_s=E_s, f_sd=f_yd, eps_ud=eps_ud),
             eps_druck=eps_c2d, eps_zug=eps_ud)
@@ -543,10 +544,8 @@ class Knicken(Nachweis):
             r"\qquad M_{Ed,II} = \left|N_{Ed}\right| \cdot "
             r"\left(e_{0d} + e_{1d} + e_{2d}\right)",
             titel="Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein")
-        E_c_eff = e.g("E_cm").si / (1.0 + e.g("phi").si)
-        p.formel(Zwischenwerte(self.id).spannung("E_c_eff", "E_{c,eff}", E_c_eff),
-                 r"\frac{@E_cm}{1 + @phi}", {"E_cm": e["E_cm"], "phi": e["phi"]},
-                 titel="Steifigkeit des Betons", nachsatz=rf"\qquad {angabe(e['f_cd'])}")
+        protokoll_wirksamer_modul(p, e, self.id, titel="Steifigkeit des Betons",
+                                  nachsatz=rf"\qquad {angabe(e['f_cd'])}")
         p.text(
             "Angesetzt wird das Kriechen mit demselben φ wie sonst, hier aus "
             "der Eingabe. Beim Knicken ist das nicht bloss zulässig, sondern "

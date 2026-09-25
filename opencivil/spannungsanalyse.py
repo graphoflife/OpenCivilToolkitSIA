@@ -40,14 +40,13 @@ damit fuer eine Verformung *unguenstigere* Fall nicht. Siehe TODO.md.
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple
 
 from opencivil.nachweis.querschnittsloeser import (
     Querschnittsloeser, Stahllage, Werkstoffsatz, beton_nichtlinear,
-    stahl_bilinear,
+    stahl_bilinear, wirksamer_modul,
 )
 from opencivil.nachweis.sproedes_versagen import rissmoment
 from opencivil.querschnitt.platte import Richtung
@@ -376,7 +375,7 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
              for lage, _, _, as_id, z_id in posten]
     stahl = posten[0][0].stahl
     beton = querschnitt.beton
-    E_c_eff = wert(beton.id_von("E_cm")) / (1.0 + wert(querschnitt.id_von("kriechzahl")))
+    E_c_eff = wirksamer_modul(wert(beton.id_von("E_cm")), wert(querschnitt.id_von("kriechzahl")))
     gemeinsam = dict(
         h=wert(querschnitt.id_von("h")), b=wert(querschnitt.id_breite(richtung)),
         lagen=lagen,
