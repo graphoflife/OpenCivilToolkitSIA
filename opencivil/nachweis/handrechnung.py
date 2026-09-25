@@ -183,6 +183,9 @@ class Handrechnung:
         # im Projekt sind. Sonst stuende f_cd zweimal mit anderen Zahlen da.
         self.s_f_cd = mit_index("f_{cd}", beton_index)
         self.s_eps_c2d = mit_index(r"\varepsilon_{c2d}", beton_index)
+        # Eine Stelle wie in der Baustofftabelle: mit keiner stuende bei C25/30
+        # «17» da, gerechnet wird mit 16.7 -- die Nachrechnung ginge daneben.
+        self.w_f_cd = self.werte.spannung("f_cd", self.s_f_cd, self.f_cd, stellen=1)
 
     # -- Die Punkte ---------------------------------------------------------
 
@@ -291,7 +294,7 @@ class Handrechnung:
             {
                 "b": self.werte.laenge("b", "b", self.b),
                 "h": self.werte.laenge("h", "h", self.h),
-                "f_cd": self.werte.spannung("f_cd", self.s_f_cd, self.f_cd),
+                "f_cd": self.w_f_cd,
             },
             titel="Gleichmässiger Druck, ohne Bewehrung",
         )
@@ -375,7 +378,7 @@ class Handrechnung:
             "A_s": self.werte.flaeche(f"As_{marke}", zug.symbol_flaeche, zug.a_s),
             "f_yd": self.werte.spannung(f"fyd_{marke}", zug.symbol_f_yd, zug.f_yd),
             "b": self.werte.laenge("b", "b", self.b),
-            "f_cd": self.werte.spannung("f_cd", self.s_f_cd, self.f_cd),
+            "f_cd": self.w_f_cd,
         }
         p.formel(
             w_x,
@@ -476,7 +479,7 @@ class Handrechnung:
         )
 
         eingaben = {
-            "f_cd": self.werte.spannung("f_cd", self.s_f_cd, self.f_cd),
+            "f_cd": self.w_f_cd,
             "b": self.werte.laenge("b", "b", self.b),
             "x": w_x,
             "A_s": self.werte.flaeche(f"As_{marke}", zug.symbol_flaeche, zug.a_s),

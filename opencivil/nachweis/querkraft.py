@@ -864,8 +864,9 @@ class Querkraft(Nachweis):
         erg.erfuellungsgrad = float("inf") if V_Ed == 0 else abs(erg.v_Rd) / abs(V_Ed)
         erg.erfuellt = erg.erfuellungsgrad >= 1.0
         erg.begruendung = (
-            f"V_Rd = k_d · τ_cd · d_v = {erg.k_d:.3f} · "
-            f"{tau_cd.formatiert(2, N_PRO_MM2)} N/mm² · {erg.d_v * 1e3:.0f} mm "
+            f"V_Rd = k_d · τ_cd · d_v = {erg.k_d:.4f} · "
+            f"{tau_cd.formatiert(4, N_PRO_MM2)} N/mm² · "
+            f"{Groesse.aus_si(erg.d_v, MM).formatiert(1)} mm "
             f"= {erg.v_Rd / 1e3:.1f} kN/m.")
         return erg
 
