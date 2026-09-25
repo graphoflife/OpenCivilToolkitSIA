@@ -577,8 +577,6 @@ input[readonly], input:disabled, select:disabled {
   .einwirkung.ist-kopf > :nth-child(2) { display: none; }
 }
 
-.werteliste tr.ist-gewaehlt { background: var(--blau-hell); box-shadow: inset 3px 0 0 var(--blau); }
-
 /* ------------------------------------------------------------ Bericht -- */
 
 .reiter { display: flex; gap: 3px; margin-left: auto; flex-wrap: wrap; }
@@ -624,7 +622,6 @@ input[readonly], input:disabled, select:disabled {
   border-left: 3px solid transparent; border-radius: 0 5px 5px 0;
 }
 .gleichung:hover { background: var(--flaeche-2); border-left-color: var(--rand-stark); }
-.gleichung.ist-hervorgehoben { background: var(--blau-hell); border-left-color: var(--blau); }
 .gleichung-kopf { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
 .gleichung-titel { font-size: 12.5px; font-weight: 600; color: var(--schrift-matt); }
 .gleichung-ref { font-size: 11.5px; color: var(--schrift-zart); margin-left: auto; white-space: nowrap; }
@@ -669,6 +666,20 @@ table.gitter td:first-child, table.gitter th:first-child { text-align: left; }
 }
 .nachweis-tabelle .zeile { display: block; white-space: nowrap; }
 .nachweis-tabelle .links { text-align: left; }
+/* Das Auge je Zeile: genau dieser Nachweis in der Herleitung. Blass, bis
+   man darüberfährt -- ein Weg, keine Aussage. */
+.nachweis-tabelle td.auge-zelle { width: 1%; padding: 0 4px; }
+.auge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; padding: 0; border: 0; border-radius: 6px;
+  background: none; color: var(--schrift-zart); cursor: pointer;
+}
+.auge:hover, .auge:focus-visible, .auge.ist-an {
+  background: var(--blau-hell); color: var(--blau);
+}
+/* Über der Herleitung eines einzelnen Nachweises: welcher, und zurück. */
+.hinweis.verfolgung { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.hinweis.verfolgung .knopf { margin-left: auto; }
 .nachweis-tabelle th {
   font-size: 11.5px; text-transform: uppercase; letter-spacing: .4px;
   color: var(--schrift-matt); text-align: right; padding: 6px 10px;
@@ -694,41 +705,6 @@ table.gitter td:first-child, table.gitter th:first-child { text-align: left; }
           border: 1px solid var(--warn); border-left-width: 4px; background: var(--warn-hell); }
 .luecke code { font-size: 12px; background: rgba(0,0,0,.05); padding: 1px 5px; border-radius: 3px; }
 .luecke .pfad { font-size: 11.5px; color: var(--schrift-matt); margin-top: 3px; }
-
-/* Werteliste */
-.werteliste { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-.werteliste th, .werteliste td { padding: 4px 8px; border-bottom: 1px solid var(--rand); text-align: left; }
-.werteliste td.zahl { text-align: right; font-variant-numeric: tabular-nums; }
-.werteliste tr:hover { background: var(--flaeche-2); }
-.werteliste tr.ist-hervorgehoben { background: var(--blau-hell); }
-.werteliste .kennung { font-size: 11px; color: var(--schrift-zart); }
-.quelle-marke { font-size: 11px; padding: 1px 6px; border-radius: 9px; background: var(--flaeche-2); color: var(--schrift-matt); }
-.quelle-ueberschrieben { background: var(--warn-hell); color: var(--warn); font-weight: 600; }
-.quelle-vorgabe { background: var(--blau-hell); color: var(--blau-tief); }
-
-/* Ziele */
-.ziel-leiste {
-  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  padding: 9px 11px; margin-bottom: 12px; border-radius: var(--radius);
-  background: var(--flaeche-2); border: 1px solid var(--rand); position: sticky; top: 0; z-index: 2;
-}
-.ziel-leiste .anzahl { font-weight: 600; color: var(--blau-tief); }
-.zielgruppe-kopf {
-  display: flex; align-items: center; gap: 8px; margin: 14px 0 4px;
-  font-size: 12px; font-weight: 700; color: var(--schrift-matt);
-  text-transform: uppercase; letter-spacing: .4px;
-}
-.zielzeile {
-  display: grid; grid-template-columns: 20px 26px 1fr auto; gap: 8px; align-items: center;
-  padding: 5px 8px; border-radius: 5px; cursor: pointer;
-}
-.zielzeile:hover { background: var(--flaeche-2); }
-.zielzeile.ist-gewaehlt { background: var(--blau-hell); box-shadow: inset 3px 0 0 var(--blau); }
-.zielzeile .beschreibung { font-size: 12.5px; }
-.zielzeile .kennung { font-size: 11px; color: var(--schrift-zart); }
-
-.kettenliste { font-size: 12.5px; margin: 6px 0 0; padding-left: 20px; }
-.kettenliste li { padding: 1px 0; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11.5px; }
 
 /* Diagramme */
 .diagramm-huelle { text-align: center; }
@@ -839,8 +815,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 
 /* KaTeX vom Versalsatz ausnehmen. text-transform macht aus dem kleinen Alpha
    des Erfüllungsgrads sonst ein grosses -- und damit ein anderes Zeichen. */
-.nachweis-tabelle th .katex,
-.zielgruppe-kopf .katex { text-transform: none; }
+.nachweis-tabelle th .katex { text-transform: none; }
 
 .kurvenschalter {
   display: inline-flex; align-items: center; gap: 6px; cursor: pointer;

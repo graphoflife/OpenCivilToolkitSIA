@@ -16,8 +16,12 @@ export const zustand = {
   projekt: null,
   katalog: null,
   loesung: null,
-  /** Kennungen der Ziele, die zuletzt angefordert wurden. */
-  ziele: [],
+  /**
+   * Der eine Nachweis, den das Auge in der Zusammenfassung zeigt:
+   * `{ziel, name, loesung}` -- ein Teillauf neben der Gesamtlösung. Nur die
+   * Herleitung liest ihn.
+   */
+  verfolgung: null,
   /** Was links ausgewählt ist: {art: 'material'|'querschnitt', kennung}. */
   auswahl: null,
   /** Welcher Reiter rechts offen ist. */
@@ -29,17 +33,10 @@ export const zustand = {
   diagrammspalten: 1,
   /** Ob im Betondiagramm der vereinfachte Spannungsblock mitgezeichnet wird. */
   zeigeVereinfacht: true,
-  /** Wert-IDs, die hervorgehoben werden (Rückverfolgung eines Ziels). */
-  hervorgehoben: new Set(),
-  /** Für welches Ziel die Rückverfolgung gerade gilt. */
-  verfolgtesZiel: null,
   rechnetGerade: false,
   ungespeichert: false,
   /** Aufgeklappte Kapitel im Baum. */
   offen: new Set(['materialien', 'beton', 'betonstahl', 'platten']),
-  /** Angehakte Ziele im Reiter "Ziel wählen". */
-  gewaehlteZiele: new Set(),
-  zieleListe: null,
   /**
    * Je M-V-Kurve die eingestellte Normalkraft in kN.
    *

@@ -128,12 +128,11 @@ export const api = {
   beispiel: () => ruf('beispiel', {}),
   /** Prüft eine Beschreibung (aus der Ablage oder aus einer Datei). */
   pruefen: (projekt) => ruf('pruefen', { projekt }),
+  /** Ohne `ziele` alles; mit `ziele` genau diese samt dem, was sie brauchen. */
   rechnen: (projekt, ziele) => ruf('rechnen', { projekt, ziele }),
-  alles: (projekt) => ruf('alles', { projekt }),
-  ziele: (projekt) => ruf('ziele', { projekt }),
   /** M-V-Kurven für selbst gewählte Normalkräfte: {Kennung: N_Ed in kN}. */
   querkraftkurven: (projekt, n_ed) => ruf('querkraftkurven', { projekt, n_ed }),
-  bericht: (projekt, ziele) => ruf('bericht', { projekt, ziele }),
+  bericht: (projekt) => ruf('bericht', { projekt }),
   /** Sucht die kleinste Bewehrung und gibt das geänderte Projekt zurück. */
   bewehrungSuchen: (projekt, kennung) =>
     ruf('bewehrung_suchen', { projekt, kennung }),

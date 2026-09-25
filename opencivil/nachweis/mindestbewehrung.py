@@ -365,6 +365,7 @@ class Rissnormalkraft(Nachweis):
         return NachweisUrteil(
             name=f"Rissnormalkraft {r} – {nummer}. Lage",
             art="N_Riss",
+            ziel=self.d_ausnutzung[nummer].id,
             langname="Zwängung auf Normalkraft",
             fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,
@@ -663,6 +664,7 @@ class ZwaengungBiegung(Nachweis):
         return NachweisUrteil(
             name=f"Zwängung Biegung {r} – {nummer}. Lage",
             art="ZB",
+            ziel=self.d_ausnutzung[nummer].id,
             langname="Zwängung auf Biegung",
             fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,

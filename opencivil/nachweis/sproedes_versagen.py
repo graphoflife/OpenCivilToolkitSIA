@@ -269,6 +269,7 @@ class SproedesVersagen(Nachweis):
         return NachweisUrteil(
             name=f"Sprödes Versagen {r} – {nummer}. Lage",
             art="SV",
+            ziel=self.d_ausnutzung[nummer].id,
             langname="Sprödes Versagen",
             fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,

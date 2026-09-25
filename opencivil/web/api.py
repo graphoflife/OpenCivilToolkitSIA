@@ -246,17 +246,8 @@ def protokoll_liste(protokoll: Protokoll) -> List[dict]:
 # ===========================================================================
 
 
-def loesung_dict(
-    loesung: Loesung,
-    aufbau: Optional[Aufbau] = None,
-    ziele: Sequence[str] = (),
-) -> dict:
-    """
-    Vollstaendige Abbildung eines Rechenlaufs.
-
-    ``ketten`` enthaelt fuer jedes angeforderte Ziel die Rueckverfolgung -- genau
-    die Berechnungen und Werte, die die Oberflaeche hervorheben soll.
-    """
+def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None) -> dict:
+    """Vollstaendige Abbildung eines Rechenlaufs."""
     ergebnis: Dict[str, Any] = {
         "werte": {wid: wert_dict(w) for wid, w in loesung.werte.items()},
         "protokoll": protokoll_liste(loesung.protokoll),
@@ -311,14 +302,6 @@ def loesung_dict(
             for u in loesung.gefuehrte_urteile
         ],
         "alle_nachweise_erfuellt": loesung.alle_nachweise_erfuellt,
-        "ketten": {
-            ziel: {
-                "berechnungen": loesung.kette(ziel),
-                "werte": loesung.benoetigte_werte(ziel),
-            }
-            for ziel in ziele
-            if loesung.hat(ziel)
-        },
     }
     if aufbau is not None:
         ergebnis["linien"] = diagrammdaten.linien(aufbau)
@@ -361,6 +344,8 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
                     # Nur was die Pruefung ausdruecklich meldet -- siehe
                     # NachweisUrteil.hinweis.
                     "hinweis": z.urteil.hinweis,
+                    # Womit sich genau dieser Nachweis nachrechnen laesst.
+                    "ziel": z.urteil.ziel,
                 }
                 for z, zellen in zip(platte.zeilen, tabelle.zeilen)
             ],

@@ -275,6 +275,7 @@ class Duktilitaet(Nachweis):
         return NachweisUrteil(
             name=f"Duktilität – {nummer}. Lage",
             art="D",
+            ziel=self.d_ausnutzung[nummer].id,
             langname="Duktilität",
             fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,

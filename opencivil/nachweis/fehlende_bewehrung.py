@@ -119,6 +119,7 @@ class FehlendeBewehrung(Nachweis):
             urteile.append(NachweisUrteil(
                 name=f"{fall.art} {self.richtung.value} – {fall.fall}",
                 art=fall.art,
+                ziel=self.d_ausnutzung[fall.kennung].id,
                 langname=fall.langname,
                 fall=fall.fall,
                 erfuellt=False,

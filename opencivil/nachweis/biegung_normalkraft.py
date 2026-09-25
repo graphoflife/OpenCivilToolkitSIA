@@ -404,6 +404,7 @@ class BiegungNormalkraft(Nachweis):
                 NachweisUrteil(
                     name=f"M-N-Nachweis {self.richtung.value} – {kombination.name}",
                     art="M-N",
+                    ziel=self.d_ausnutzung[kombination.name].id,
                     langname="Biegung und Normalkraft",
                     fall=kombination.name,
                     erfuellt=auswertung.innerhalb,

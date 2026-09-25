@@ -608,6 +608,15 @@ class NachweisUrteil:
     einer Null erraten muessen.
     """
 
+    ziel: str = ""
+    """
+    Wert-ID des Erfuellungsgrads, der dieses Urteil traegt.
+
+    Das Ziel, mit dem sich genau dieser Nachweis samt allem, was er braucht,
+    nachrechnen laesst -- das Auge in der Zusammenfassung. Gesetzt von der
+    Pruefung: nur sie weiss, welcher ihrer Grade zu welchem Fall gehoert.
+    """
+
     sammel: bool = False
     """
     Ob dieses Urteil eines von mehreren zur selben Frage ist.

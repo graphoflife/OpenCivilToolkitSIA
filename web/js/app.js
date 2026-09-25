@@ -25,13 +25,11 @@ const knoten = {};
 let rechenUhr = null;
 
 /**
- * Was gerechnet werden soll, sobald der laufende Durchgang fertig ist.
- *
- * `null`, solange nichts wartet. Es wird immer nur der jüngste Wunsch
- * aufbewahrt -- ältere sind ohnehin überholt, denn gerechnet wird stets mit der
- * Beschreibung, wie sie in dem Augenblick aussieht.
+ * Ob noch einmal gerechnet werden soll, sobald der laufende Durchgang fertig
+ * ist. Ein Merker genügt: gerechnet wird stets mit der Beschreibung, wie sie
+ * in dem Augenblick aussieht -- ältere Wünsche sind ohnehin überholt.
  */
-let nachgereicht = null;
+let nachgereicht = false;
 
 // ===========================================================================
 // Rechnen
@@ -43,22 +41,14 @@ function zustandsanzeige(text, art = '') {
 }
 
 /** Ein einzelner Durchgang: hinschicken, Antwort übernehmen, Stand melden. */
-async function einDurchgang(ziele) {
+async function einDurchgang() {
   zustandsanzeige('rechnet …');
   try {
-    const antwort = await api.rechnen(zustand.projekt, ziele);
-    const hervorgehoben = new Set();
-    const verfolgt = ziele?.length === 1 ? ziele[0] : null;
-    if (verfolgt && antwort.ketten?.[verfolgt]) {
-      for (const id of antwort.ketten[verfolgt].werte) hervorgehoben.add(id);
-    }
-
-    aendern({
-      loesung: antwort,
-      ziele: ziele || [],
-      verfolgtesZiel: verfolgt,
-      hervorgehoben,
-    }, 'loesung');
+    const antwort = await api.rechnen(zustand.projekt);
+    aendern({ loesung: antwort }, 'loesung');
+    // Der gezeigte Einzelnachweis rechnet mit: sonst stünde in der
+    // Herleitung eine Zahl von vor der letzten Eingabe.
+    if (zustand.verfolgung) await verfolgen(zustand.verfolgung.ziel);
 
     if (!antwort.vollstaendig) {
       const fehlt = antwort.fehlende.length;
@@ -95,9 +85,9 @@ async function einDurchgang(ziele) {
  * einem Fehler beim Neuzeichnen stehen, wäre jede weitere Rechnung für immer
  * gesperrt -- auch die von Hand angestossene.
  */
-async function rechnen({ ziele = null } = {}) {
+async function rechnen() {
   if (zustand.rechnetGerade) {
-    nachgereicht = { ziele };
+    nachgereicht = true;
     return;
   }
 
@@ -105,16 +95,29 @@ async function rechnen({ ziele = null } = {}) {
     aendern({ rechnetGerade: true }, 'rechnen-start');
     knoten.btnRechnen.disabled = true;
 
-    let auftrag = { ziele };
-    while (auftrag) {
-      nachgereicht = null;
-      await einDurchgang(auftrag.ziele);
-      auftrag = nachgereicht;
-    }
+    do {
+      nachgereicht = false;
+      await einDurchgang();
+    } while (nachgereicht);
   } finally {
-    nachgereicht = null;
+    nachgereicht = false;
     aendern({ rechnetGerade: false }, 'rechnen-ende');
     knoten.btnRechnen.disabled = false;
+  }
+}
+
+/**
+ * Das Auge in der Zusammenfassung: genau diesen Nachweis mit allem, was er
+ * braucht -- als Teillauf *neben* der Gesamtlösung. Zusammenfassung,
+ * Diagramme und Bericht bleiben vollständig; nur die Herleitung zeigt ihn.
+ * Gibt es das Ziel nicht mehr (Fall gelöscht), endet die Verfolgung still.
+ */
+async function verfolgen(ziel, name = zustand.verfolgung?.name) {
+  try {
+    const loesung = await api.rechnen(zustand.projekt, [ziel]);
+    aendern({ verfolgung: { ziel, name, loesung } }, 'verfolgung');
+  } catch {
+    aendern({ verfolgung: null }, 'verfolgung');
   }
 }
 
@@ -159,11 +162,7 @@ async function oeffnen() {
       ungespeichert: false,
       auswahl: null,
       loesung: null,
-      ziele: [],
-      hervorgehoben: new Set(),
-      verfolgtesZiel: null,
-      gewaehlteZiele: new Set(),
-      zieleListe: null,
+      verfolgung: null,
     }, 'start');
     melden(`Projekt «${projekt.name}» geöffnet.`);
     await rechnen();
@@ -181,7 +180,7 @@ function dialogZeigen(titel, inhalt) {
 async function berichtErzeugen() {
   zustandsanzeige('erzeuge Bericht …');
   try {
-    const antwort = await api.bericht(zustand.projekt, zustand.ziele);
+    const antwort = await api.bericht(zustand.projekt);
 
     // Das .tex ist auf beiden Wegen dasselbe. Nur der Server kann es zusätzlich
     // ablegen und übersetzen -- im Browser gibt es keine TeX-Maschine.
@@ -474,8 +473,12 @@ function allesZeichnen(anlass) {
   ohneSprung(() => {
     baumZeichnen(knoten.baum);
     editorZeichnen(knoten.editor, knoten.editorTitel, knoten.editorHinweis);
-    // Der Reiter 'Ziel wählen' liefert eine Liste (oder null für 'alles').
-    berichtZeichnen(knoten.bericht, (ziele) => rechnen({ ziele }));
+    berichtZeichnen(knoten.bericht, {
+      verfolgen: (ziel, name) => {
+        aendern({ reiter: 'herleitung' }, 'reiter');
+        verfolgen(ziel, name);
+      },
+    });
   });
 
   knoten.btnSpeichern.textContent = zustand.ungespeichert ? 'Speichern •' : 'Speichern';
@@ -523,7 +526,9 @@ async function starten() {
     dialog: document.getElementById('dialog'),
     dialogTitel: document.getElementById('dialog-titel'),
     dialogInhalt: document.getElementById('dialog-inhalt'),
-    reiterKnoepfe: [...document.querySelectorAll('.reiter-knopf')],
+    // Nur die Reiter der Berechnung -- die Tafelwahl unten sieht gleich aus,
+    // trägt aber kein `data-reiter` und setzte den Reiter sonst auf nichts.
+    reiterKnoepfe: [...document.querySelectorAll('#reiter .reiter-knopf')],
   });
 
   knoten.btnRechnen.addEventListener('click', () => rechnen());

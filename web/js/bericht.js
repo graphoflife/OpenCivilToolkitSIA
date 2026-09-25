@@ -1,19 +1,18 @@
 /**
  * bericht.js -- Rechte Tafel: das Rechenergebnis.
  *
- * Fünf Sichten auf dieselbe Lösung:
- *   Herleitung  die Mitschrift des Rechenkerns, Formel für Formel
- *   Zusammenfassung  je Platte eine Tabelle mit Urteilen und Erfüllungsgraden
- *   Diagramm    die M-N-Interaktionslinie
- *   Werte       alle bestimmten Grössen mit ihrer Herkunft
- *   Ziel wählen einen Wert anfordern und zurückverfolgen, was dafür nötig ist
+ * Drei Sichten auf dieselbe Lösung:
+ *   Zusammenfassung  je Platte eine Tabelle mit Urteilen und Erfüllungsgraden;
+ *                    das Auge je Zeile zeigt genau diesen Nachweis
+ *   Diagramme        Interaktionslinien, Kurven, Querschnitt
+ *   Herleitung       die Mitschrift des Rechenkerns, Formel für Formel
  *
  * Sämtliche Zahlen und Formeln stammen unverändert aus der Lösung. Die
  * Oberfläche formatiert nichts nach -- sonst stünde am Bildschirm etwas
  * anderes als im Bericht.
  */
 
-import { el, ersetzen, leerzustand, melden, zahlfeld } from './dom.js';
+import { el, ersetzen, leerzustand, melden, svgEl, zahlfeld } from './dom.js';
 import {
   kopiereFuerWord, kopiereTabelleFuerWord, kopiereText, setzen,
 } from './mathe.js';
@@ -71,14 +70,11 @@ function werkzeugleiste(block) {
 }
 
 function gleichungBlock(block) {
-  // Ein Block kann mehrere Werte tragen (siehe `gruppenBilden`). Hervorgehoben
-  // wird er, sobald einer davon zur verfolgten Kette gehört.
+  // Ein Block kann mehrere Werte tragen (siehe `gruppenBilden`).
   const ids = block.wert_ids || (block.wert_id ? [block.wert_id] : []);
-  const hervorgehoben = ids.some((id) => zustand.hervorgehoben.has(id));
   const latex = block.latex;
 
   const huelle = el('div.gleichung', {
-    class: hervorgehoben ? 'ist-hervorgehoben' : '',
     dataset: { wertId: ids.join(' ') },
   }, [
     (block.titel || block.referenz)
@@ -263,12 +259,20 @@ function nurAbschnitt(bloecke, raum) {
   return gewaehlt;
 }
 
-function herleitung(loesung) {
+/**
+ * Die Herleitung -- ganz, oder nur der eine Nachweis, den das Auge in der
+ * Zusammenfassung gewählt hat (`zustand.verfolgung`). Der zeigt alles, was er
+ * braucht, auch die Baustoffe ausserhalb der gewählten Platte; darum gilt
+ * dann kein Seitenfilter.
+ */
+function herleitung(gesamt) {
+  const verfolgung = zustand.verfolgung;
+  const loesung = verfolgung?.loesung || gesamt;
   if (!loesung.protokoll?.length) {
     return leerzustand('Noch nichts gerechnet.', 'Oben auf "Rechnen" klicken.');
   }
-  const raum = eingrenzung();
-  if (zustand.umfang === 'seite' && !raum) {
+  const raum = verfolgung ? null : eingrenzung();
+  if (!verfolgung && zustand.umfang === 'seite' && !raum) {
     return leerzustand('Nichts ausgewählt.',
       'Links einen Bestandteil wählen – oder oben auf "Gesamt" umschalten.');
   }
@@ -277,19 +281,14 @@ function herleitung(loesung) {
     return leerzustand('Für diesen Bestandteil wurde nichts gerechnet.');
   }
 
-  const verfolgt = zustand.verfolgtesZiel;
   return el('div.blatt', {}, [
-    verfolgt
-      ? el('div.hinweis.hinweis-annahme', {}, [
-        el('b', { text: 'Rückverfolgung: ' }),
-        `Hervorgehoben ist, was für ${verfolgt} gebraucht wurde `
-        + `(${loesung.reihenfolge.length} Rechenschritte). `,
+    verfolgung
+      ? el('div.hinweis.hinweis-annahme.verfolgung', {}, [
+        el('b', { text: verfolgung.name }),
+        el('span', { text: ` · ${loesung.reihenfolge.length} Rechenschritte` }),
         el('button.knopf.knopf-klein', {
-          text: 'aufheben',
-          on: {
-            click: () => aendern(
-              { verfolgtesZiel: null, hervorgehoben: new Set() }, 'hervorhebung'),
-          },
+          text: 'ganze Herleitung',
+          on: { click: () => aendern({ verfolgung: null }, 'verfolgung') },
         }),
       ])
       : null,
@@ -309,7 +308,7 @@ function herleitung(loesung) {
  * Baustoff hat keine Nachweise, und eine willkürlich herausgegriffene Platte
  * zu zeigen wäre irreführend.
  */
-function zusammenfassung(loesung) {
+function zusammenfassung(loesung, verfolgen) {
   const querschnitte = loesung.zuordnung?.querschnitte || {};
   const raum = eingrenzung();
 
@@ -343,7 +342,7 @@ function zusammenfassung(loesung) {
       tabelle?.bewehrung ? tabellenBlock(tabelle.bewehrung) : null,
       tabelle
         ? el('div.tabelle-block', {}, [
-          el('div.tabelle-huelle', {}, [nachweistabelle(tabelle)]),
+          el('div.tabelle-huelle', {}, [nachweistabelle(tabelle, verfolgen)]),
           werkzeugleiste({
             latex: tabelle.latex,
             markdown: tabelle.markdown,
@@ -377,8 +376,10 @@ function zusammenfassung(loesung) {
  * Wortgrenze in zwei Zeilen geteilt, und keine Zeile bricht weiter um. Die
  * Tabelle ist darum nie schmaler als dieser Inhalt; ist die Tafel schmaler,
  * rollt die Hülle.
+ *
+ * Zuletzt je Zeile ein Auge: genau dieser Nachweis in der Herleitung.
  */
-function nachweistabelle(tabelle) {
+function nachweistabelle(tabelle, verfolgen) {
   const [oben, unten] = tabelle.stapel_spalten || [];
   const zelle = (inhalte, art, i) => {
     // Links oder rechts sagt der Kern -- dieselbe Ausrichtung, die auch das
@@ -398,13 +399,37 @@ function nachweistabelle(tabelle) {
     return [zelle(i === oben ? [inhalt, zellen[unten]] : [inhalt], art, i)];
   });
 
+  const auge = (zeile) => {
+    const name = zeile.zellen.slice(0, 2).map((z) => z.text).filter(Boolean).join(' – ');
+    return el('td.auge-zelle', {}, [el('button.auge', {
+      title: 'Spezifischen Nachweis zeigen',
+      'aria-label': `Spezifischen Nachweis zeigen: ${name}`,
+      class: zustand.verfolgung?.ziel === zeile.ziel ? 'ist-an' : '',
+      on: { click: () => verfolgen(zeile.ziel, name) },
+    }, [augenbild()])]);
+  };
+
   return el('table.nachweis-tabelle', {}, [
-    el('thead', {}, [el('tr', {}, reihe(tabelle.kopf, 'th'))]),
+    el('thead', {}, [el('tr', {}, [...reihe(tabelle.kopf, 'th'), el('th')])]),
     el('tbody', {}, tabelle.zeilen.map((zeile) => el('tr', {
       class: zeile.erfuellt ? 'ist-gut' : 'ist-schlecht',
       title: zeile.begruendung || '',
-    }, reihe(zeile.zellen, 'td')))),
+    }, [...reihe(zeile.zellen, 'td'), zeile.ziel ? auge(zeile) : el('td')]))),
   ]);
+}
+
+/** Ein Auge als Strichzeichnung -- in der Schriftfarbe, also auch dunkel lesbar. */
+function augenbild() {
+  const bild = svgEl('svg', {
+    viewBox: '0 0 24 24', width: 16, height: 16, 'aria-hidden': 'true',
+    fill: 'none', stroke: 'currentColor', 'stroke-width': 1.8,
+    'stroke-linecap': 'round', 'stroke-linejoin': 'round',
+  });
+  bild.append(
+    svgEl('path', { d: 'M1.5 12S5.5 5 12 5s10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z' }),
+    svgEl('circle', { cx: 12, cy: 12, r: 3 }),
+  );
+  return bild;
 }
 
 /**
@@ -619,110 +644,6 @@ function neigungskurven(loesung, querschnitt) {
   ]);
 }
 
-function werteSicht(loesung, beiZielwahl) {
-  let eintraege = Object.values(loesung.werte || {});
-  if (!eintraege.length) return leerzustand('Noch keine Werte bestimmt.');
-  const raum = eingrenzung();
-  if (raum) eintraege = eintraege.filter((w) => imRaum(raum, w.id));
-  eintraege.sort((a, b) => a.id.localeCompare(b.id, 'de'));
-
-  // Nur Werte, die aus einer Berechnung stammen, taugen als Ziel -- eine
-  // Eingabe zurückzuverfolgen hätte keinen Inhalt.
-  const waehlbar = eintraege.filter((w) => w.quelle === 'berechnet');
-  const gewaehlt = zustand.gewaehlteZiele;
-  const setzeAuswahl = (ids) => aendern({ gewaehlteZiele: new Set(ids) }, 'zielauswahl');
-  const umschalten = (id) => {
-    const neu = new Set(gewaehlt);
-    if (neu.has(id)) neu.delete(id); else neu.add(id);
-    setzeAuswahl(neu);
-  };
-
-  const leiste = el('div.ziel-leiste', {}, [
-    el('input', {
-      type: 'checkbox',
-      checked: gewaehlt.size > 0 && gewaehlt.size === waehlbar.length,
-      indeterminate: gewaehlt.size > 0 && gewaehlt.size < waehlbar.length,
-      title: 'Alle berechneten Werte an- oder abwählen',
-      on: { change: (e) => setzeAuswahl(e.target.checked ? waehlbar.map((w) => w.id) : []) },
-    }),
-    el('span', {}, [
-      el('span.anzahl', { text: String(gewaehlt.size) }),
-      ` von ${waehlbar.length} berechneten Werten als Ziel gewählt`,
-    ]),
-    el('span', { style: { marginLeft: 'auto' } }),
-    el('button.knopf.knopf-haupt', {
-      text: 'Gewählte zurückverfolgen',
-      disabled: gewaehlt.size === 0,
-      on: { click: () => beiZielwahl([...gewaehlt]) },
-    }),
-    el('button.knopf', {
-      text: 'Alles rechnen',
-      on: { click: () => beiZielwahl(null) },
-    }),
-  ]);
-
-  const kette = zustand.verfolgtesZiel && loesung?.ketten?.[zustand.verfolgtesZiel];
-
-  return el('div.blatt', {}, [
-    el('div.b-titel', { text: `Werte (${eintraege.length})` }),
-    el('p.b-text', {
-      text: 'Berechnete Werte lassen sich anhaken und zurückverfolgen: der Kern '
-          + 'löst rückwärts auf und rechnet nur, was dafür nötig ist.',
-    }),
-    leiste,
-    kette
-      ? el('div.hinweis.hinweis-annahme', {}, [
-        el('div', {}, [el('b', { text: `Für ${zustand.verfolgtesZiel} nötig:` })]),
-        el('div', { text: `${kette.berechnungen.length} Rechenschritte, ${kette.werte.length} Werte` }),
-        el('ol.kettenliste', {}, kette.berechnungen.map((b) => el('li', { text: b }))),
-      ])
-      : null,
-    el('div.tabelle-huelle', {}, [
-      el('table.werteliste', {}, [
-        el('thead', {}, [el('tr', {}, [
-          el('th', { text: '' }),
-          el('th', { text: 'Bezeichnung' }),
-          el('th', { text: 'Symbol' }),
-          el('th', { text: 'Wert', style: { textAlign: 'right' } }),
-          el('th', { text: 'Einheit' }),
-          el('th', { text: 'Herkunft' }),
-        ])]),
-        el('tbody', {}, eintraege.map((w) => {
-          const symbol = el('td');
-          setzen(w.symbol, symbol, { displayMode: false });
-          const istWaehlbar = w.quelle === 'berechnet';
-          return el('tr', {
-            class: [
-              zustand.hervorgehoben.has(w.id) ? 'ist-hervorgehoben' : '',
-              gewaehlt.has(w.id) ? 'ist-gewaehlt' : '',
-            ].join(' '),
-            title: w.referenz || '',
-          }, [
-            el('td', {}, [istWaehlbar
-              ? el('input', {
-                type: 'checkbox', checked: gewaehlt.has(w.id),
-                title: 'Als Rechenziel wählen',
-                on: { change: () => umschalten(w.id) },
-              })
-              : el('span', { text: '', title: 'Eingabe – nicht zurückverfolgbar' })]),
-            el('td', {}, [
-              el('div', { text: w.beschreibung || w.kurzname }),
-              el('div.kennung', { text: w.id }),
-            ]),
-            symbol,
-            el('td.zahl', { text: w.wert }),
-            el('td', { text: w.einheit }),
-            el('td', {}, [el('span', {
-              class: `quelle-marke quelle-${w.quelle}`, text: w.quelle_text,
-            })]),
-          ]);
-        })),
-      ]),
-    ]),
-  ]);
-}
-
-/** Namensraum des links gewählten Bestandteils, für den Seitenfilter. */
 /**
  * Der Namensraum des links gewählten Bestandteils -- `beton.b1`,
  * `querschnitt.q1`. Null, wenn nichts gewählt ist.
@@ -757,7 +678,7 @@ function imRaum(raum, id) {
 
 // ===========================================================================
 
-export function berichtZeichnen(behaelter, beiZielwahl) {
+export function berichtZeichnen(behaelter, { verfolgen }) {
   const loesung = zustand.loesung;
 
   if (!loesung) {
@@ -767,10 +688,9 @@ export function berichtZeichnen(behaelter, beiZielwahl) {
   }
 
   const sichten = {
-    nachweise: () => zusammenfassung(loesung),
+    nachweise: () => zusammenfassung(loesung, verfolgen),
     diagramm: () => diagrammSicht(loesung),
     herleitung: () => herleitung(loesung),
-    werte: () => werteSicht(loesung, beiZielwahl),
   };
   return ersetzen(behaelter, (sichten[zustand.reiter] || sichten.nachweise)());
 }

@@ -30,8 +30,7 @@ class TestDienst(unittest.TestCase):
         self.assertEqual(set(antwort.daten["werte"]), {
             "beton.b1.eta_fc", "beton.b1.f_ck", "beton.b1.f_cd", "beton.b1.gamma_c",
         })
-        self.assertEqual(
-            antwort.daten["ketten"]["beton.b1.f_cd"]["berechnungen"][-1], "beton.b1.f_cd")
+        self.assertEqual(antwort.daten["reihenfolge"][-1], "beton.b1.f_cd")
 
     def test_unbekanntes_ziel(self):
         antwort = dienst.bearbeite("rechnen", self.rumpf(ziele=["gibt.es.nicht"]))
@@ -82,17 +81,6 @@ class TestDienst(unittest.TestCase):
         self.assertEqual(antwort.status, 404)
         # Die Meldung soll weiterhelfen, nicht bloss abweisen.
         self.assertIn("rechnen", antwort.daten["fehler"])
-
-    def test_ziele_auflisten(self):
-        antwort = dienst.bearbeite("ziele", self.rumpf())
-        ids = {z["id"] for z in antwort.daten["ziele"]}
-        self.assertIn("beton.b1.f_cd", ids)
-        self.assertIn("betonstahl.s1.f_yd", ids)
-        self.assertTrue(all("symbol" in z for z in antwort.daten["ziele"]))
-
-    def test_alles_rechnen(self):
-        antwort = dienst.bearbeite("alles", self.rumpf())
-        self.assertGreater(len(antwort.daten["werte"]), 30)
 
     def test_katalog_und_beispiel_brauchen_keinen_rumpf(self):
         self.assertIn("betonsorten", dienst.bearbeite("katalog").daten)

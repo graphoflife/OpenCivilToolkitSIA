@@ -35,7 +35,7 @@ from typing import Any, Callable, Dict, Mapping
 from opencivil import bewehrungssuche
 from opencivil.bericht.latex_dokument import als_tex
 from opencivil.bericht.markdown import als_markdown
-from opencivil.core.rechenwerk import RechenwerkFehler
+from opencivil.core.rechenwerk import Loesung, RechenwerkFehler
 from opencivil.projekt import Projekt, ProjektFehler
 from opencivil.web import api, diagrammdaten, speicher
 from opencivil.web.api import endlich
@@ -140,17 +140,16 @@ def rechnen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
         # Teillauf darf den Speicher weder fuellen noch benutzen -- er rechnet
         # absichtlich nicht alles, und ein halbes Ergebnis als ganzes
         # aufzubewahren waere der Weg zu Zahlen, die niemand erklaeren kann.
-        return api.loesung_dict(aufbau.werk.loese(*gewaehlt), aufbau, gewaehlt)
+        return api.loesung_dict(aufbau.werk.loese(*gewaehlt), aufbau)
 
     if not aufbau.alle_ziele():
         # Kein Nachweis vorhanden -- dann wenigstens alle Materialkennwerte.
-        return api.loesung_dict(aufbau.werk.loese_alles(), aufbau, ())
+        return api.loesung_dict(aufbau.werk.loese_alles(), aufbau)
 
-    loesung, ziele = _stromabwaerts(projekt, aufbau)
-    return api.loesung_dict(loesung, aufbau, ziele)
+    return api.loesung_dict(_stromabwaerts(projekt, aufbau), aufbau)
 
 
-def _stromabwaerts(projekt: Projekt, aufbau) -> tuple:
+def _stromabwaerts(projekt: Projekt, aufbau) -> Loesung:
     """
     Alles rechnen -- aber nur, was sich geaendert hat.
 
@@ -173,12 +172,10 @@ def _stromabwaerts(projekt: Projekt, aufbau) -> tuple:
     materialziele = aufbau.materialziele()
     gesamt = aufbau.werk.loese(*materialziele)
     bekannt = dict(gesamt.werte)
-    ziele = list(materialziele)
 
     for kennung, eigene in aufbau.ziele_je_platte():
         if not eigene:
             continue
-        ziele += eigene
         stempel = speicher.abdruck(projekt.als_dict(), kennung)
         teil = SPEICHER.hole(kennung, stempel)
         if teil is None:
@@ -194,35 +191,7 @@ def _stromabwaerts(projekt: Projekt, aufbau) -> tuple:
         speicher.verschmelzen(gesamt, teil)
         bekannt.update(teil.werte)
 
-    return gesamt, ziele
-
-
-def alles(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
-    """Rechnet alles, was sich aus den vorhandenen Eingaben ergibt."""
-    aufbau = _projekt(rumpf).aufbauen()
-    return api.loesung_dict(aufbau.werk.loese_alles(), aufbau, ())
-
-
-def ziele(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
-    """Alle Werte, die sich als Rechenziel waehlen lassen."""
-    aufbau = _projekt(rumpf).aufbauen()
-    eintraege = []
-    for wert_id in aufbau.werk.moegliche_ziele():
-        definition = aufbau.werk.definition(wert_id)
-        if definition is None:
-            continue
-        eintraege.append({
-            "id": wert_id,
-            "symbol": definition.symbol,
-            "beschreibung": definition.beschreibung,
-            "einheit": (
-                definition.einheit.beschriftung
-                if definition.einheit.name not in ("", "-") else ""
-            ),
-            "referenz": definition.referenz,
-            "namensraum": definition.namensraum,
-        })
-    return {"ziele": eintraege, "zuordnung": api.zuordnung(aufbau)}
+    return gesamt
 
 
 def querkraftkurven(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
@@ -368,8 +337,6 @@ ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "beispiel": beispiel,
     "pruefen": pruefen,
     "rechnen": rechnen,
-    "alles": alles,
-    "ziele": ziele,
     "querkraftkurven": querkraftkurven,
     "bericht": bericht,
     "bewehrung_suchen": bewehrung_suchen,

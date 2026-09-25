@@ -124,14 +124,13 @@ Deshalb kann am Bildschirm gar nichts anderes stehen als im Bericht.
 
 * *Zusammenfassung* -- je Platte eine Tabelle: Widerstand, Einwirkung und
   Erfüllungsgrad. Darunter, in gedämpftem Rot, die ausgeschalteten Nachweise,
-  die mit der vorliegenden Bewehrung *nicht* aufgehen würden
+  die mit der vorliegenden Bewehrung *nicht* aufgehen würden. Das Auge am
+  Ende jeder Zeile zeigt genau diesen Nachweis: der Kern löst rückwärts auf,
+  rechnet nur das Nötige, und die Herleitung zeigt nur diese Schritte
 * *Diagramme* -- Plattenquerschnitt, M-N-Resistenzlinie mit den
   Bemessungspunkten (die gestrichelte Strecke zeigt den Weg, in dem der
   Erfüllungsgrad gemessen wurde), Querkraftkurven, Spannungs-Dehnungs-Bilder
 * *Herleitung* -- die Mitschrift, Formel für Formel, mit Normstelle
-* *Werte* -- alle Grössen mit ihrer Herkunft (Eingabe, Vorgabe, berechnet,
-  überschrieben); dort lässt sich auch ein Ziel wählen: der Kern löst rückwärts
-  auf, rechnet nur das Nötige und zeigt die Kette der erforderlichen Schritte
 
 **Kopieren nach Word, LaTeX und Markdown:** jede Formel und jede Tabelle hat
 drei Knöpfe. *Word* legt eine Formel als MathML in die Zwischenablage -- Word

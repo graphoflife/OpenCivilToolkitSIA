@@ -212,11 +212,11 @@ class TestApiAbbildung(unittest.TestCase):
         self.assertTrue(any(v["aus_sorte"] for v in k["kennwerte"]["beton"]))
 
     def test_alles_ist_json_faehig(self):
-        d = api.loesung_dict(self.loesung, self.aufbau, self.ziele)
+        d = api.loesung_dict(self.loesung, self.aufbau)
         json.dumps(d)  # wirft, wenn etwas nicht serialisierbar ist
 
     def test_werte_tragen_ihre_herkunft(self):
-        d = api.loesung_dict(self.loesung, self.aufbau, self.ziele)
+        d = api.loesung_dict(self.loesung, self.aufbau)
         f_cd = d["werte"]["beton.b1.f_cd"]
         self.assertEqual(f_cd["quelle"], "berechnet")
         # Die Oberfläche bekommt die lesbare Schreibweise -- sie setzt diese
@@ -225,26 +225,20 @@ class TestApiAbbildung(unittest.TestCase):
         self.assertIn("mathrm", f_cd["latex"])
 
     def test_protokoll_enthaelt_gleichungen_und_tabellen(self):
-        d = api.loesung_dict(self.loesung, self.aufbau, self.ziele)
+        d = api.loesung_dict(self.loesung, self.aufbau)
         arten = {b["art"] for b in d["protokoll"]}
         self.assertIn("gleichung", arten)
         self.assertIn("tabelle", arten)
 
-    def test_ketten_je_ziel(self):
-        d = api.loesung_dict(self.loesung, self.aufbau, self.ziele)
-        for ziel in self.ziele:
-            self.assertIn(ziel, d["ketten"])
-            self.assertTrue(d["ketten"][ziel]["berechnungen"])
-
     def test_linie_wird_mitgeliefert(self):
-        d = api.loesung_dict(self.loesung, self.aufbau, self.ziele)
+        d = api.loesung_dict(self.loesung, self.aufbau)
         linie = d["linien"]["q1.x"]
         self.assertGreater(len(linie["punkte"]), 100)
         self.assertEqual(len(linie["kombinationen"]), 3)
         self.assertIn("art_text", linie["kombinationen"][0])
 
     def test_zuordnung_verbindet_kennung_und_wert_id(self):
-        d = api.loesung_dict(self.loesung, self.aufbau, self.ziele)
+        d = api.loesung_dict(self.loesung, self.aufbau)
         self.assertEqual(
             d["zuordnung"]["materialien"]["b1"]["kennwerte"]["f_cd"], "beton.b1.f_cd")
 
@@ -360,6 +354,21 @@ class TestAngabengruppen(unittest.TestCase):
         # soll es nicht aus der Kopfzeile erraten muessen.
         self.assertEqual(tabelle["kopf"][tabelle["grad_spalte"]],
                          {"mathe": r"\alpha_{eff}"})
+
+    def test_jede_zeile_traegt_ihr_ziel(self):
+        """
+        Das Auge in der Zusammenfassung: der Teillauf mit dem Ziel der Zeile
+        rechnet genau diesen Nachweis nach -- und kommt auf denselben Grad.
+        """
+        projekt = Projekt.beispiel().als_dict()
+        voll = dienst.bearbeite("rechnen", {"projekt": projekt}).daten
+        for zeile in voll["zusammenfassungen"]["q1"]["zeilen"]:
+            ziel = zeile["ziel"]
+            with self.subTest(ziel=ziel):
+                teil = dienst.bearbeite(
+                    "rechnen", {"projekt": projekt, "ziele": [ziel]}).daten
+                self.assertEqual(teil["werte"][ziel]["wert"], voll["werte"][ziel]["wert"])
+                self.assertLess(len(teil["reihenfolge"]), len(voll["reihenfolge"]))
 
     def test_nachweis_und_bezeichnung_stehen_getrennt(self):
         """

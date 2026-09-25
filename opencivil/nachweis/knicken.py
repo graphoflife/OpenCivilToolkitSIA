@@ -499,6 +499,7 @@ class Knicken(Nachweis):
         return NachweisUrteil(
             name=f"Knicken – {erg.fall.name}",
             art="K",
+            ziel=self.d_ausnutzung[erg.fall.name].id,
             langname="Knicken",
             fall=erg.fall.name,
             erfuellt=erg.erfuellt,
