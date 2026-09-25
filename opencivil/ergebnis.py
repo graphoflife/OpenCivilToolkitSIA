@@ -29,6 +29,7 @@ from typing import TYPE_CHECKING, List
 
 from opencivil.bericht import konsole
 from opencivil.bericht.latex_dokument import Ausgabeergebnis, schreibe
+from opencivil.bericht.zusammenfassung import zusammenfassen
 from opencivil.core.berechnung import NachweisUrteil
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
@@ -83,7 +84,7 @@ class Ergebnis:
 
     def zusammenfassung(self) -> str:
         """Je Platte eine Tabelle der Nachweise -- wie in der Oberflaeche."""
-        return konsole.zusammenfassung(self.aufbau, self.loesung)
+        return konsole.zusammenfassung(zusammenfassen(self.aufbau, self.loesung))
 
     def bericht(self) -> str:
         """Der vollstaendige Bericht mit Herleitung, als Text."""

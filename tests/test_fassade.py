@@ -161,6 +161,36 @@ class TestRechnen(unittest.TestCase):
         self.assertIn("Mindestens ein Nachweis ist NICHT erfüllt.", text)
         self.assertFalse(ergebnis.erfuellt)
 
+    def test_oberflaeche_und_konsole_fuehren_dieselben_zeilen(self):
+        """
+        Beide setzen dieselbe Zusammenfassung, nur anders. Vorher baute jede
+        ihre Zeilen selbst -- und ein still verfehlter Nachweis hiess in der
+        Oberflaeche anders als auf der Konsole.
+        """
+        from opencivil.bericht import konsole
+        from opencivil.bericht.zusammenfassung import zusammenfassen
+        from opencivil.web import api
+
+        projekt = Projekt.beispiel()
+        dach = projekt.platte("Dach", h=200, x=[10, 10])
+        dach.einwirkung("Feld", M_Ed=300)
+        aufbau = projekt.aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_ziele())
+        web = api.zusammenfassungen(loesung, aufbau)
+        text = konsole.zusammenfassung(zusammenfassen(aufbau, loesung))
+
+        self.assertEqual(sorted(web), ["q1", "q2"])
+        for kennung, tabelle in web.items():
+            with self.subTest(platte=kennung):
+                name = projekt.querschnitt(kennung).name
+                teil = text[text.index(f"{name}\n"):]
+                for zeile in tabelle["zeilen"]:
+                    self.assertIn(zeile["zellen"][4], teil)
+                for still in tabelle["stille"]:
+                    self.assertIn(f"{still['nachweis']} – {still['fall']}: "
+                                  f"α_eff = {still['grad']}", teil)
+                self.assertTrue(tabelle["stille"], "die Probe braucht einen stillen")
+
     def test_eine_platte_ohne_einwirkung(self):
         projekt = einfach()
         projekt.platte("Leer")

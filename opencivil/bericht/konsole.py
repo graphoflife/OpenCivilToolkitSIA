@@ -19,7 +19,7 @@ EIGENSTAENDIG NUTZBAR::
 from __future__ import annotations
 
 import shutil
-from typing import Iterable, List, Optional, Sequence, TextIO
+from typing import TYPE_CHECKING, Iterable, List, Optional, Sequence, TextIO
 
 from opencivil.core.protokoll import (
     Block, GleichungBlock, HinweisArt, HinweisBlock, Protokoll, TabellenBlock,
@@ -28,6 +28,9 @@ from opencivil.core.protokoll import (
 from opencivil.core.berechnung import NachweisUrteil
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Quelle, Wert
+
+if TYPE_CHECKING:
+    from opencivil.bericht.zusammenfassung import Zusammenfassung
 
 _BREITE = min(shutil.get_terminal_size((100, 24)).columns, 100)
 
@@ -234,45 +237,44 @@ def _wert_text(wert: Optional[Wert]) -> str:
     return f"{wert.formatiert()} {einheit}".rstrip()
 
 
-def zusammenfassung(aufbau, loesung: Loesung) -> str:
+def zusammenfassung(zusammenfassung: "Zusammenfassung") -> str:
     """
     Je Platte eine Tabelle der Nachweise -- die Zusammenfassung der
     Oberflaeche, fuer die Konsole.
 
-    Dieselben Urteile wie dort: die gefuehrten aus der Loesung, bei
-    Nachweisen je Lage nur die schlechtere, und darunter, was still nicht
-    aufgeht. Je Platte eine eigene Tabelle, weil die Urteilsnamen die Platte
+    Welche Zeilen dastehen, entscheidet
+    :func:`opencivil.bericht.zusammenfassung.zusammenfassen`; hier wird nur
+    gesetzt. Je Platte eine eigene Tabelle, weil die Urteilsnamen die Platte
     nicht nennen -- zwei Platten mit einer Kombination «Feld» stuenden sonst
     als zwei gleiche Zeilen da.
-
-    ``aufbau`` ist ein :class:`opencivil.projekt.Aufbau`; von dort kommen die
-    Plattennamen und die Zuordnung der Urteile.
     """
     zeilen: List[str] = []
-    for kennung, qs in aufbau.querschnitte.items():
-        gefuehrt = aufbau.urteile_von(kennung, loesung.gefuehrte_urteile)
-        maengel = aufbau.urteile_von(kennung, loesung.stille_maengel)
-        zeilen += [qs.name, "-" * len(qs.name)]
-        if gefuehrt:
+    for platte in zusammenfassung.platten:
+        zeilen += [platte.name, "-" * len(platte.name)]
+        if platte.zeilen:
             tabelle = TabellenBlock(
                 kopf=["Nachweis", "Fall", "Widerstand", "Einwirkung", "α_eff", ""],
-                zeilen=[[u.langname or u.art or u.name, u.fall or "–",
-                         _wert_text(u.widerstand), _wert_text(u.einwirkung),
-                         u.gradtext(),
-                         "erfüllt" if u.erfuellt else "NICHT ERFÜLLT"]
-                        for u in gefuehrt],
+                zeilen=[[z.nachweis, z.fall or "–",
+                         _wert_text(z.widerstand), _wert_text(z.einwirkung),
+                         z.urteil.gradtext(),
+                         "erfüllt" if z.urteil.erfuellt else "NICHT ERFÜLLT"]
+                        for z in platte.zeilen],
                 ausrichtung="llrrrl")
             zeilen += _tabelle_zeilen(tabelle, 2)
         else:
             zeilen.append("  Kein Nachweis geführt.")
-        zeilen += _maengelzeilen(maengel) + [""]
+        if platte.stille:
+            zeilen += ["", "  Nicht geführt, geht aber nicht auf:"]
+            zeilen += [f"    {z.nachweis}{f' – {z.fall}' if z.fall else ''}: "
+                       f"α_eff = {z.urteil.gradtext()}" for z in platte.stille]
+        zeilen.append("")
 
-    if loesung.gefuehrte_urteile:
+    if zusammenfassung.gefuehrt:
         zeilen.append("Alle geführten Nachweise erfüllt."
-                      if loesung.alle_nachweise_erfuellt
+                      if zusammenfassung.erfuellt
                       else "Mindestens ein Nachweis ist NICHT erfüllt.")
-    if aufbau.warnungen:
-        zeilen += ["", "Hinweise:"] + [f"  - {w}" for w in aufbau.warnungen]
+    if zusammenfassung.warnungen:
+        zeilen += ["", "Hinweise:"] + [f"  - {w}" for w in zusammenfassung.warnungen]
     return "\n".join(zeilen).rstrip() + "\n"
 
 

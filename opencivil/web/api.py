@@ -22,6 +22,7 @@ from opencivil.nachweis.querschnittsloeser import (
     Querschnittsloeser, Stahllage, beton_nichtlinear, stahl_bilinear)
 from opencivil.nachweis.sproedes_versagen import rissmoment
 from opencivil.querschnitt.platte import BREITE_Y_MM, Richtung
+from opencivil.bericht.zusammenfassung import zusammenfassen
 from opencivil.core.berechnung import grad_als_text
 from opencivil.core.latex import als_text, tabelle, text_latex
 from opencivil.core.protokoll import (
@@ -843,39 +844,31 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
                 rf"{wert.einheit.als_latex()}")
 
     ergebnis: Dict[str, Any] = {}
-    for kennung, qs in aufbau.querschnitte.items():
-        def eigene(urteile):
-            return aufbau.urteile_von(kennung, urteile)
-
-        # Beides kommt fertig aus der Loesung: ohne die stillen, und je
-        # Nachweis, der seine Lagen sammelt, nur die schlechteste. Hier zu
-        # filtern hiesse, die Regel ein zweites Mal zu schreiben.
-        urteile = eigene(loesung.gefuehrte_urteile)
-        # Ausgeschaltete Nachweise stehen nicht in der Tabelle -- aber wenn
-        # einer nicht aufgeht, soll man es erfahren.
-        stille = eigene(loesung.stille_maengel)
-        if not urteile and not stille:
+    for platte in zusammenfassen(aufbau, loesung).platten:
+        # Eine Platte ohne jedes Urteil bekommt keine Tabelle -- die
+        # Oberflaeche zeigt dafuer ihren eigenen Leerzustand. Die Konsole
+        # schreibt an dieser Stelle «Kein Nachweis gefuehrt».
+        if platte.leer:
             continue
+        qs = aufbau.querschnitte[platte.kennung]
         zeilen = [
             {
                 "zellen": [
-                    # Faellt langname aus, bleibt das Kuerzel -- lieber knapp
-                    # als leer. Ein Nachweis ohne beides hat nur den Namen.
-                    als_text(u.langname or u.art or u.name),
-                    als_text(u.fall) if u.fall else r"\text{--}",
-                    zelle(u.widerstand),
-                    zelle(u.einwirkung),
-                    u.gradtext(latex=True),
+                    als_text(z.nachweis),
+                    als_text(z.fall) if z.fall else r"\text{--}",
+                    zelle(z.widerstand),
+                    zelle(z.einwirkung),
+                    z.urteil.gradtext(latex=True),
                 ],
-                "erfuellt": u.erfuellt,
-                "begruendung": u.begruendung,
+                "erfuellt": z.urteil.erfuellt,
+                "begruendung": z.urteil.begruendung,
                 # Nur was die Pruefung ausdruecklich meldet -- siehe
                 # NachweisUrteil.hinweis.
-                "hinweis": u.hinweis,
+                "hinweis": z.urteil.hinweis,
             }
-            for u in urteile
+            for z in platte.zeilen
         ]
-        ergebnis[kennung] = {
+        ergebnis[platte.kennung] = {
             "kopf": kopf,
             "zeilen": zeilen,
             "grad_spalte": GRAD_SPALTE,
@@ -887,9 +880,9 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
             # er dem Wort «nicht erfuellt» nicht widerspricht, weiss hier
             # dieselbe Stelle wie fuer die Tabelle.
             "stille": [
-                {"nachweis": u.langname or u.art, "fall": u.fall,
-                 "grad": u.gradtext(), "begruendung": u.begruendung}
-                for u in stille
+                {"nachweis": z.nachweis, "fall": z.fall,
+                 "grad": z.urteil.gradtext(), "begruendung": z.urteil.begruendung}
+                for z in platte.stille
             ],
         }
     return ergebnis
