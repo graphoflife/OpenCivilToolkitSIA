@@ -33,7 +33,9 @@ class TestKonsole(unittest.TestCase):
         self.assertIn("Prüfbericht", text)
         self.assertIn("Herleitung", text)
         self.assertIn("Werte", text)
-        self.assertIn(c30.id_von("f_cd"), text)
+        # Die Werteuebersicht nennt jeden Wert mit Bezeichnung und Symbol.
+        self.assertIn("Bemessungswert der Betondruckfestigkeit", text)
+        self.assertIn(c30.definition("f_cd").symbol, text)
 
     def test_latex_wird_roh_ausgegeben(self):
         """Auf der Konsole soll der LaTeX-Quelltext lesbar dastehen."""
@@ -53,7 +55,7 @@ class TestKonsole(unittest.TestCase):
         c30 = beton("C30/37").ins_rechenwerk(werk)
         werk.setze(c30.id_von("f_cd"), Groesse(15, N_PRO_MM2))
         text = als_text(werk.loese(c30.id_von("f_cd")))
-        self.assertIn("ÜBERSCHRIEBEN", text)
+        self.assertIn("vom Benutzer überschrieben", text)
 
     def test_tabelle_wird_ausgerichtet(self):
         p = Protokoll()
@@ -94,8 +96,11 @@ class TestLatexDokument(unittest.TestCase):
     def test_werteuebersicht(self):
         loesung, c30 = beispiel_loesung()
         tex = als_tex(loesung)
-        self.assertIn("Werteübersicht", tex)
-        self.assertIn(r"\begin{longtable}", tex)
+        self.assertIn(r"\section{Werte}", tex)
+        # Lang genug fuer mehrere Seiten: der Kopf wiederholt sich dort.
+        werte = tex[tex.index(r"\section{Werte}"):]
+        self.assertIn(r"\begin{xltabular}", werte)
+        self.assertIn(r"\endhead", werte)
 
     def test_fehlende_eingaben_im_dokument(self):
         loesung, c30 = beispiel_loesung(vollstaendig=False)
@@ -272,7 +277,7 @@ class TestStilleNachweiseImBericht(unittest.TestCase):
     Zeilen «nicht erfüllt» und darunter «Sämtliche Nachweise sind erfüllt».
     """
 
-    def loesung(self):
+    def aufbau_und_loesung(self):
         """Eine Platte, an der nur *stille* Nachweise durchfallen."""
         from opencivil.projekt import Projekt
 
@@ -285,38 +290,54 @@ class TestStilleNachweiseImBericht(unittest.TestCase):
         lage.grund.durchmesser, lage.grund.abstand = 6.0, 300.0
         lage.zulage.durchmesser = 0.0
         aufbau = projekt.aufbauen()
-        return aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        return aufbau, aufbau.werk.loese(*aufbau.alle_nachweisziele())
+
+    def text(self) -> str:
+        aufbau, loesung = self.aufbau_und_loesung()
+        return als_text(loesung, aufbau=aufbau)
+
+    def tex(self) -> str:
+        aufbau, loesung = self.aufbau_und_loesung()
+        return als_tex(loesung, aufbau=aufbau)
 
     def test_die_probe_faellt_wirklich_nur_still_durch(self):
         """Sonst prüfte der Rest nichts."""
-        loesung = self.loesung()
+        _, loesung = self.aufbau_und_loesung()
         self.assertTrue(loesung.stille_maengel)
         self.assertTrue(loesung.alle_nachweise_erfuellt)
+        self.assertTrue(any(u.name.startswith("Rissnormalkraft")
+                            for u in loesung.stille_maengel))
 
     def test_die_konsole_zaehlt_nur_gefuehrte_auf(self):
-        text = als_text(self.loesung())
-        abschnitt = text[text.index("Nachweise"):]
-        kopf = abschnitt[:abschnitt.index("Nicht geführt")]
-        self.assertNotIn("Rissnormalkraft", kopf)
-        self.assertIn("M-N-Nachweis", kopf)
+        text = self.text()
+        abschnitt = text[text.index("\nNachweise\n"):]
+        tabelle = abschnitt[:abschnitt.index("[i] Hinweis")]
+        self.assertNotIn("Zwängung auf Normalkraft", tabelle)
+        self.assertIn("Biegung und Normalkraft", tabelle)
+        self.assertIn("Alle geführten Nachweise sind erfüllt.", abschnitt)
 
     def test_die_konsole_verschweigt_sie_aber_nicht(self):
-        text = als_text(self.loesung())
-        self.assertIn("Nicht geführt, geht aber nicht auf:", text)
-        self.assertIn("Rissnormalkraft x –", text)
+        text = self.text()
+        self.assertRegex(text, r"\[i\] Hinweis: Zwängung auf Normalkraft – \d\. Lage: "
+                               r"nicht erfüllt")
+        # Die Konsole bricht den Satz um; verglichen wird der Wortlaut.
+        self.assertIn("Dieser Nachweis ist ausgeschaltet", " ".join(text.split()))
 
     def test_das_latex_dokument_widerspricht_sich_nicht(self):
-        tex = als_tex(self.loesung())
-        tabelle = tex[tex.index("Zusammenstellung der Nachweise"):]
-        tabelle = tabelle[:tabelle.index(r"\end{longtable}")]
-        self.assertNotIn("Rissnormalkraft", tabelle)
+        tex = self.tex()
+        abschnitt = tex[tex.index(r"\section{Nachweise}"):]
+        tabelle = abschnitt[abschnitt.index("Nachweis & Bezeichnung"):]
+        tabelle = tabelle[:tabelle.index(r"\end{xltabular}")]
+        self.assertNotIn("Zwängung auf Normalkraft", tabelle)
         self.assertNotIn("nicht erfüllt", tabelle)
-        self.assertIn("Sämtliche geführten Nachweise sind erfüllt.", tex)
+        self.assertIn("Alle geführten Nachweise sind erfüllt.", abschnitt)
 
     def test_das_latex_dokument_meldet_sie_darunter(self):
-        tex = als_tex(self.loesung())
-        hinweis = tex[tex.index("Nicht geführte Nachweise"):]
-        self.assertIn("Rissnormalkraft", hinweis)
+        tex = self.tex()
+        abschnitt = tex[tex.index(r"\section{Nachweise}"):]
+        hinweis = abschnitt[abschnitt.index(r"\end{xltabular}"):]
+        self.assertRegex(hinweis, r"\\hinweis\{Hinweis\}\{Zwängung auf Normalkraft – "
+                                  r"\d\. Lage: nicht erfüllt")
 
 
 class TestKnappVerfehlterGrad(unittest.TestCase):
@@ -332,8 +353,8 @@ class TestKnappVerfehlterGrad(unittest.TestCase):
     def setUpClass(cls):
         from opencivil.projekt import Projekt
 
-        aufbau = Projekt.beispiel().aufbauen()
-        cls.loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        cls.aufbau = Projekt.beispiel().aufbauen()
+        cls.loesung = cls.aufbau.werk.loese(*cls.aufbau.alle_nachweisziele())
         cls.urteil = next(u for u in cls.loesung.stille_maengel
                           if u.name == "Rissnormalkraft x – 3. Lage")
 
@@ -343,14 +364,15 @@ class TestKnappVerfehlterGrad(unittest.TestCase):
         self.assertEqual(f"{self.urteil.erfuellungsgrad.si:.2f}", "1.00")
 
     def test_die_konsole_schreibt_ihn_kleiner_als_eins(self):
-        zeile = next(z for z in als_text(self.loesung).splitlines()
-                     if "Rissnormalkraft x – 3. Lage" in z)
-        self.assertTrue(zeile.rstrip().endswith("0.996"), zeile)
+        text = als_text(self.loesung, aufbau=self.aufbau)
+        self.assertIn("Zwängung auf Normalkraft – 3. Lage: nicht erfüllt "
+                      "(α_eff = 0.996)", text)
+        self.assertNotIn("(α_eff = 1)", text)
 
     def test_das_latex_dokument_auch(self):
-        tex = als_tex(self.loesung)
-        self.assertIn(r"\alpha_{eff} = 0.996", tex)
-        self.assertNotIn(r"\alpha_{eff} = 1$", tex)
+        tex = als_tex(self.loesung, aufbau=self.aufbau)
+        self.assertIn(r"(α\_eff = 0.996)", tex)
+        self.assertNotIn(r"(α\_eff = 1)", tex)
 
     def test_die_diagrammpunkte_bringen_den_grad_fertig_mit(self):
         """
@@ -372,6 +394,59 @@ class TestKnappVerfehlterGrad(unittest.TestCase):
         self.assertFalse(knick["erfuellt"])
         self.assertEqual(knick["grad_text"],
                          api.grad_als_text(knick["erfuellungsgrad"], False))
+
+
+class TestBerichtWieBildschirm(unittest.TestCase):
+    """
+    Der Bericht zeigt je Platte, was der Bildschirm zeigt -- aus denselben
+    Stücken. Vorher fasste er die Nachweise flach zusammen, ohne Platten, und
+    zwei Kombinationen «Feld» zweier Platten sahen gleich aus.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from opencivil.projekt import Projekt
+        from opencivil.web import api
+
+        projekt = Projekt.beispiel()
+        dach = projekt.platte("Dach", h=200, x=[10, 10])
+        dach.einwirkung("Feld", M_Ed=300)
+        ohne = projekt.platte("Ohne x", h=250, x=[0, 0], y=[12, 12])
+        ohne.einwirkung("Feld", M_Ed=30, V_Ed=20)
+        cls.aufbau = projekt.aufbauen()
+        cls.loesung = cls.aufbau.werk.loese(*cls.aufbau.alle_nachweisziele())
+        cls.web = api.zusammenfassungen(cls.loesung, cls.aufbau)
+        # Die Konsole bricht lange Saetze um; verglichen wird der Wortlaut.
+        cls.text = " ".join(als_text(cls.loesung, aufbau=cls.aufbau).split())
+
+    def test_jede_platte_hat_ihren_abschnitt(self):
+        self.assertEqual(len(self.web), 3)
+        for kennung in self.web:
+            name = self.aufbau.querschnitte[kennung].name
+            self.assertIn(f"{name} {'-' * len(name)} Angaben zur Platte", self.text)
+
+    def test_die_zellen_der_tabelle_stehen_im_bericht(self):
+        for tabelle in self.web.values():
+            for zeile in tabelle["zeilen"]:
+                for zelle in zeile["zellen"]:
+                    self.assertIn(zelle.get("mathe", zelle.get("text")), self.text)
+
+    def test_hinweise_und_stille_saetze_stehen_wortgleich_da(self):
+        saetze = [satz for tabelle in self.web.values()
+                  for satz in tabelle["hinweise"] + [s["text"] for s in tabelle["stille"]]]
+        self.assertTrue(any(t["hinweise"] for t in self.web.values()),
+                        "die Probe braucht einen Hinweis")
+        self.assertTrue(any(t["stille"] for t in self.web.values()),
+                        "und einen stillen Mangel")
+        for satz in saetze:
+            self.assertIn(satz, self.text)
+
+    def test_was_nicht_aufgeht_steht_mit_begruendung_darunter(self):
+        """Auf Papier gibt es weder rote Zeilen noch Tooltips."""
+        self.assertIn("[!] Warnung: Biegung und Normalkraft – Feld: nicht erfüllt. "
+                      "Bei festgehaltenem N_Ed = 0 kN", self.text)
+        # Die Platte ohne Bewehrung erklaert schon der gebuendelte Hinweis.
+        self.assertNotIn("Querkraft – Feld: nicht erfüllt.", self.text)
 
 
 class TestTafeln(unittest.TestCase):

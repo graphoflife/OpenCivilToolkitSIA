@@ -199,6 +199,11 @@ class Protokoll:
         self.bloecke.append(block)
         return block
 
+    def anfuegen(self, *bloecke: Block) -> None:
+        """Fertige Bloecke uebernehmen -- etwa die Tabelle einer Zusammenfassung."""
+        for block in bloecke:
+            self._anfuegen(block)
+
     def titel(self, text: str, ebene: int = 2, raum: str = "") -> None:
         self._anfuegen(TitelBlock(text=text, ebene=ebene, raum=raum))
 

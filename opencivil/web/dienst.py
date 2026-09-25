@@ -277,6 +277,7 @@ def bericht(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
             loesung,
             titel=projekt.name,
             untertitel="OpenCivilToolkitSIA – Berechnung nach SIA 262:2025",
+            aufbau=aufbau,
         ),
         "dateiname": dateiname(projekt.name),
     }

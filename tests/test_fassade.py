@@ -204,7 +204,9 @@ class TestRechnen(unittest.TestCase):
             ausgabe = self.ergebnis.latex(Path(ordner) / "probe")
             tex = Path(ordner, "probe.tex").read_text(encoding="utf-8")
         self.assertEqual(ausgabe.tex_pfad.name, "probe.tex")
-        self.assertIn(r"\section{Zusammenstellung der Nachweise}", tex)
+        # Die Nachweise je Platte, mit derselben Tabelle wie der Bildschirm.
+        self.assertIn(r"\section{Nachweise}", tex)
+        self.assertIn("Nachweis & Bezeichnung & Widerstand & Einwirkung", tex)
 
     def test_die_analysen_ohne_oberflaeche(self):
         """

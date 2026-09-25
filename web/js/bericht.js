@@ -286,30 +286,6 @@ function herleitung(loesung) {
  * zu zeigen wäre irreführend.
  */
 /** Holt den Klartext aus einer LaTeX-Zelle der Form `\text{…}`. */
-/**
- * Die Hinweise der Tabelle, nach Grund gebündelt.
- *
- * Eine ganze Tragrichtung ohne Bewehrung lässt jeden ihrer Nachweise
- * ausfallen -- und zwar aus demselben Grund. Sechsmal derselbe Satz ist keine
- * Erklärung, sondern eine Wand.
- *
- * @returns {Array<[string, string[]]>} je Grund die betroffenen Nachweise,
- *   in der Reihenfolge ihres ersten Auftretens.
- */
-function hinweiseBuendeln(zeilen) {
-  const nach_grund = new Map();
-  for (const zeile of zeilen) {
-    if (!zeile.hinweis) continue;
-    if (!nach_grund.has(zeile.hinweis)) nach_grund.set(zeile.hinweis, []);
-    // Nachweis und Bezeichnung zusammen -- 'Querkraft (y)' allein
-    // sagt nicht, welcher Fall gemeint ist.
-    nach_grund.get(zeile.hinweis).push(
-      [zeile.zellen[0], zeile.zellen[1]].map((z) => z.text).filter((s) => s && s !== '–')
-        .join(' – '));
-  }
-  return [...nach_grund.entries()];
-}
-
 function zusammenfassung(loesung) {
   const querschnitte = loesung.zuordnung?.querschnitte || {};
   const raum = eingrenzung();
@@ -359,7 +335,8 @@ function zusammenfassung(loesung) {
                 // Links oder rechts sagt ebenfalls der Kern -- dieselbe
                 // Ausrichtung, die auch das LaTeX bekommt. Aus dem Index zu
                 // schliessen ging gut, solange nur die erste Spalte Text war.
-                const rechts = (tabelle.ausrichtung || '')[i] !== 'l';
+                // «L» ist links und darf umbrechen; das tut hier jede Zelle.
+                const rechts = ((tabelle.ausrichtung || '')[i] || '').toLowerCase() !== 'l';
                 return zelleSetzen(zelle, el('td', {
                   class: [rechts ? 'zahl' : '', istGrad ? 'grad' : ''].filter(Boolean).join(' '),
                 }));
@@ -370,20 +347,14 @@ function zusammenfassung(loesung) {
             kopf: tabelle.kopf, zeilen: tabelle.zeilen.map((z) => z.zellen),
           }),
           // Ein Widerstand von null erklärt sich nicht von selbst. Der Grund
-          // steht deshalb unter der Tabelle und nicht bloss im Tooltip --
-          // gleiche Gründe zusammengefasst, sonst stünde bei einer ganzen
-          // unbewehrten Tragrichtung sechsmal derselbe Satz.
-          ...hinweiseBuendeln(tabelle.zeilen).map(([grund, namen]) =>
-            el('p.hinweis', { text: `${namen.join(', ')}: ${grund}` })),
+          // steht deshalb unter der Tabelle und nicht bloss im Tooltip, nach
+          // Grund gebündelt -- die Sätze kommen fertig aus dem Kern, derselbe
+          // Wortlaut wie im Bericht.
+          ...(tabelle.hinweise || []).map((text) => el('p.hinweis', { text })),
           // Ausgeschaltete Nachweise: sie laufen mit, stehen aber nicht in
           // der Tabelle und nicht in der Herleitung. Geht einer nicht auf,
           // steht es hier -- leise, denn geführt wird er ja nicht.
-          ...(tabelle.stille || []).map((s) => el('p.stiller-hinweis', {
-            text: `${s.nachweis} – ${s.fall}: nicht erfüllt`
-              + (s.grad ? ` (α_eff = ${s.grad})` : '')
-              + '. Dieser Nachweis ist ausgeschaltet und steht nicht in der '
-              + 'Herleitung.',
-          })),
+          ...(tabelle.stille || []).map((s) => el('p.stiller-hinweis', { text: s.text })),
         ])
         : el('div.leer', { text: 'Für diese Platte wurde kein Nachweis gerechnet.' }),
       plattenkennzahlen(eintrag, loesung),

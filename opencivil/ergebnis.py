@@ -100,7 +100,8 @@ class Ergebnis:
 
     def bericht(self) -> str:
         """Der vollstaendige Bericht mit Herleitung, als Text."""
-        return konsole.als_text(self.loesung, titel=self.projekt.name)
+        return konsole.als_text(self.loesung, titel=self.projekt.name,
+                                aufbau=self.aufbau)
 
     def latex(self, pfad: str | Path, *, pdf: bool = False) -> Ausgabeergebnis:
         """
@@ -109,7 +110,8 @@ class Ergebnis:
         ``pdf`` ist aus, solange niemand es verlangt: uebersetzt wird mit dem,
         was auf dem Rechner an TeX liegt, und das ist nicht ueberall etwas.
         """
-        return schreibe(self.loesung, pfad, titel=self.projekt.name, pdf=pdf)
+        return schreibe(self.loesung, pfad, titel=self.projekt.name, pdf=pdf,
+                        aufbau=self.aufbau)
 
     def __str__(self) -> str:
         return self.zusammenfassung()

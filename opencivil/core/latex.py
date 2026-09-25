@@ -286,36 +286,68 @@ def zelle_latex(zelle: Zelle) -> str:
     return text_latex(zelle)
 
 
+#: Eine Spalte, die links steht und umbrechen darf -- ``L`` in der Ausrichtung.
+UMBRUCHSPALTE = r">{\raggedright\arraybackslash}X"
+
+
 def tabelle(
     kopf: Sequence[Zelle],
     zeilen: Iterable[Sequence[Zelle]],
     ausrichtung: Optional[str] = None,
+    *,
+    lang: bool = False,
 ) -> str:
     """
-    Eine Tabelle fuer ein LaTeX-Dokument -- ``tabular`` mit ``\\hline``.
+    Eine Tabelle fuer ein LaTeX-Dokument.
 
-    Kein ``array`` mehr: das ist eine Formel und keine Tabelle, und Word und
-    Markdown koennen damit nichts anfangen. ``\\hline`` statt booktabs,
-    damit ein kopiertes Stueck in jedem Dokument laeuft, ohne dass dort
-    erst ein Paket geladen werden muss.
+    ``ausrichtung`` je Spalte ``l``, ``c`` oder ``r`` wie in LaTeX, dazu
+    ``L``: links, und die Spalte darf umbrechen. Das braucht eine Textspalte,
+    die sonst die Tabelle ueber den Rand schoebe -- welche das ist, weiss nur,
+    wer die Tabelle schreibt.
+
+    Ohne ``lang`` ein ``tabular`` mit ``\\hline``, fuer die Kopierknoepfe:
+    es laeuft in jedem Dokument, ohne dass dort erst ein Paket geladen werden
+    muss, und ``L`` gilt darin als ``l``. Kein ``array`` mehr: das ist eine
+    Formel und keine Tabelle, und Word und Markdown koennen damit nichts
+    anfangen.
+
+    Mit ``lang`` fuer den Bericht: die Tabelle darf ueber Seiten laufen und
+    wiederholt dort ihren Kopf (``longtable``). Hat sie eine ``L``-Spalte,
+    nimmt sie die Zeilenbreite ein, und nur diese Spalten brechen um
+    (``xltabular``).
     """
     kopf = list(kopf)
     spalten = ausrichtung or ("r" * len(kopf))
-    if len(spalten) != len(kopf):
+    if len(spalten) != len(kopf) or set(spalten) - set("lcrL"):
         raise LatexFehler(
-            f"Ausrichtung '{spalten}' passt nicht zu {len(kopf)} Spalten."
+            f"Ausrichtung '{spalten}' passt nicht zu {len(kopf)} Spalten "
+            f"(je Spalte l, c, r oder L)."
         )
-    aufbau = [rf"\begin{{tabular}}{{{spalten}}}", r"\hline",
-              " & ".join(zelle_latex(z) for z in kopf) + r" \\", r"\hline"]
-    for zeile in zeilen:
-        zellen = list(zeile)
+
+    def zeile(zellen: Sequence[Zelle]) -> str:
         if len(zellen) != len(kopf):
             raise LatexFehler(
                 f"Tabellenzeile hat {len(zellen)} Zellen, erwartet werden {len(kopf)}."
             )
-        aufbau.append(" & ".join(zelle_latex(z) for z in zellen) + r" \\")
-    aufbau += [r"\hline", r"\end{tabular}"]
-    return "\n".join(aufbau)
+        return " & ".join(zelle_latex(z) for z in zellen) + r" \\"
+
+    koerper = [zeile(list(z)) for z in zeilen]
+    if not lang:
+        return "\n".join([
+            rf"\begin{{tabular}}{{{spalten.replace('L', 'l')}}}", r"\hline",
+            zeile(kopf), r"\hline", *koerper, r"\hline", r"\end{tabular}",
+        ])
+    if "L" in spalten:
+        umgebung = "xltabular"
+        anfang = (rf"\begin{{xltabular}}{{\linewidth}}"
+                  rf"{{{spalten.replace('L', UMBRUCHSPALTE)}}}")
+    else:
+        umgebung = "longtable"
+        anfang = rf"\begin{{longtable}}{{{spalten}}}"
+    return "\n".join([
+        anfang, r"\hline", zeile(kopf), r"\hline", r"\endhead",
+        *koerper, r"\hline", rf"\end{{{umgebung}}}",
+    ])
 
 
 def fallunterscheidung(faelle: Sequence[tuple[str, str]], gewaehlt: int = -1) -> str:

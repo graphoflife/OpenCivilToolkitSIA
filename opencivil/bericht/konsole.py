@@ -6,9 +6,9 @@ Macht das Backend fuer sich allein bedienbar. Die LaTeX-Formeln werden roh
 ausgegeben -- nicht gesetzt, sondern als Quelltext, damit man sie lesen,
 pruefen und direkt weiterverwenden kann.
 
-Der Bericht ist reine Darstellung: er liest eine :class:`Loesung` und erzeugt
-Text. Er rechnet nichts und weiss nichts ueber Beton oder Stahl. Genau darum
-ist er austauschbar -- das LaTeX-Dokument nutzt dieselbe Loesung.
+Der Bericht ist reine Darstellung: was darin steht und in welcher Folge,
+legt :func:`opencivil.bericht.gliederung.bericht` fest -- fuer die Konsole
+wie fuer das LaTeX-Dokument. Hier wird es nur als Text gesetzt.
 
 EIGENSTAENDIG NUTZBAR::
 
@@ -19,19 +19,20 @@ EIGENSTAENDIG NUTZBAR::
 from __future__ import annotations
 
 import shutil
-from typing import TYPE_CHECKING, Iterable, List, Optional, Sequence, TextIO
+from typing import TYPE_CHECKING, Iterable, List, Optional, TextIO
 
+from opencivil.bericht.gliederung import bericht
 from opencivil.core.protokoll import (
     GleichungBlock, HinweisArt, HinweisBlock, Protokoll, TabellenBlock, Tafel,
     TextBlock, TitelBlock, UnterprotokollBlock, darstellen,
 )
-from opencivil.core.berechnung import NachweisUrteil
 from opencivil.core.latex import Mathe, Zelle
 from opencivil.core.rechenwerk import Loesung
-from opencivil.core.wert import Quelle, Wert
+from opencivil.core.wert import Wert
 
 if TYPE_CHECKING:
     from opencivil.bericht.zusammenfassung import Zusammenfassung
+    from opencivil.projekt import Aufbau
 
 _BREITE = min(shutil.get_terminal_size((100, 24)).columns, 100)
 
@@ -76,6 +77,8 @@ def _vorspann(tiefe: int) -> str:
 
 
 def _titel(block: TitelBlock, tiefe: int) -> List[str]:
+    if block.ebene <= 1:
+        return [""] + _ueberschrift(block.text)
     vorspann = _vorspann(tiefe)
     return ["", f"{vorspann}{block.text}", f"{vorspann}{'-' * len(block.text)}"]
 
@@ -134,7 +137,7 @@ def _tabelle_zeilen(block: TabellenBlock, einzug: int) -> List[str]:
     Frueher galt immer rechts, auch wo die Tabelle ``l`` verlangte -- im
     LaTeX-Dokument stand sie richtig, auf der Konsole nicht.
     """
-    setzen = {"l": str.ljust, "c": str.center}
+    setzen = {"l": str.ljust, "L": str.ljust, "c": str.center}
     alle = [[_zelle(z) for z in block.kopf]] + [[_zelle(z) for z in zeile]
                                                 for zeile in block.zeilen]
     breiten = [max(len(z[i]) for z in alle) for i in range(len(block.kopf))]
@@ -157,95 +160,8 @@ def _zelle(zelle: Zelle) -> str:
 
 
 # ===========================================================================
-# Loesung
+# Zusammenfassung
 # ===========================================================================
-
-
-def loesung_zeilen(loesung: Loesung, titel: str = "Berechnung") -> List[str]:
-    """Baut den vollstaendigen Konsolenbericht einer Loesung."""
-    zeilen = _ueberschrift(titel)
-
-    zeilen.append("")
-    zeilen.append(
-        f"{len(loesung.reihenfolge)} Berechnungen ausgeführt, "
-        f"{len(loesung.werte)} Werte bestimmt."
-    )
-
-    zeilen.extend(_abschnitt_herleitung(loesung))
-    zeilen.extend(_abschnitt_werte(loesung))
-    zeilen.extend(_abschnitt_nachweise(loesung))
-    zeilen.extend(_abschnitt_luecken(loesung))
-    return zeilen
-
-
-def _abschnitt_herleitung(loesung: Loesung) -> List[str]:
-    if loesung.protokoll.ist_leer:
-        return []
-    zeilen = [""] + _ueberschrift("Herleitung", "=")
-    zeilen.extend(protokoll_zeilen(loesung.protokoll))
-    return zeilen
-
-
-def _abschnitt_werte(loesung: Loesung) -> List[str]:
-    if not loesung.werte:
-        return []
-    zeilen = ["", ""] + _ueberschrift("Werte", "=") + [""]
-
-    namen = sorted(loesung.werte)
-    breite_id = max(len(n) for n in namen)
-    for name in namen:
-        wert = loesung.werte[name]
-        einheit = wert.einheit.name if wert.einheit.name not in ("", "-") else ""
-        marke = {
-            Quelle.EINGABE: "Eingabe",
-            Quelle.VORGABE: "Vorgabe",
-            Quelle.BERECHNET: "",
-            Quelle.UEBERSCHRIEBEN: "ÜBERSCHRIEBEN",
-        }[wert.quelle]
-        zeilen.append(
-            f"  {name.ljust(breite_id)}  {wert.formatiert().rjust(12)} {einheit.ljust(8)}"
-            f" {marke}".rstrip()
-        )
-    return zeilen
-
-
-def _abschnitt_nachweise(loesung: Loesung) -> List[str]:
-    # Nur die gefuehrten. Ein ausgeschalteter Nachweis stand hier als
-    # «NICHT ERFÜLLT» und darunter die Zeile «Alle Nachweise erfüllt» -- die
-    # zaehlt die stillen naemlich schon immer nicht mit.
-    gefuehrt = loesung.gefuehrte_urteile
-    maengel = loesung.stille_maengel
-    if not gefuehrt and not maengel:
-        return []
-    zeilen = ["", ""] + _ueberschrift("Nachweise", "=") + [""]
-    for urteil in gefuehrt:
-        zustand = "erfüllt" if urteil.erfuellt else "NICHT ERFÜLLT"
-        zeilen.append(
-            f"  {urteil.name.ljust(40)} Erfüllungsgrad "
-            f"{urteil.gradtext().rjust(8)}   {zustand}"
-        )
-        if urteil.begruendung:
-            zeilen.extend(_umbrechen(urteil.begruendung, 6))
-    if gefuehrt:
-        gesamt = ("Alle geführten Nachweise erfüllt."
-                  if loesung.alle_nachweise_erfuellt
-                  else "Mindestens ein Nachweis ist nicht erfüllt.")
-        zeilen.extend(["", f"  {gesamt}"])
-
-    return zeilen + _maengelzeilen(maengel)
-
-
-def _maengelzeilen(maengel: Sequence[NachweisUrteil]) -> List[str]:
-    """Was ausgeschaltet ist und nicht aufgeht -- unter der Liste der gefuehrten."""
-    if not maengel:
-        return []
-    zeilen = ["", "  Nicht geführt, geht aber nicht auf:"]
-    for urteil in maengel:
-        zeilen.append(
-            f"    {urteil.name.ljust(38)} Erfüllungsgrad "
-            f"{urteil.gradtext().rjust(8)}"
-        )
-    return zeilen
 
 
 def _wert_text(wert: Optional[Wert]) -> str:
@@ -297,48 +213,28 @@ def zusammenfassung(zusammenfassung: "Zusammenfassung") -> str:
     return "\n".join(zeilen).rstrip() + "\n"
 
 
-def _abschnitt_luecken(loesung: Loesung) -> List[str]:
-    if loesung.vollstaendig:
-        return []
-    zeilen = ["", ""] + _ueberschrift("Fehlende Eingaben", "=") + [""]
-
-    if loesung.fehlende:
-        zeilen.append("  Damit weitergerechnet werden kann, werden gebraucht:")
-        zeilen.append("")
-        for fehlend in loesung.fehlende:
-            einheit = ""
-            if fehlend.definition is not None:
-                e = fehlend.definition.einheit
-                einheit = f" [{e.beschriftung}]" if e.name not in ("", "-") else ""
-            zeilen.append(f"    - {fehlend.id}{einheit}")
-            zeilen.extend(_umbrechen(fehlend.beschreibung, 8))
-            if fehlend.pfad:
-                zeilen.append(f"        benötigt für: {' -> '.join(fehlend.pfad)}")
-
-    nicht_erreicht = [z for z in loesung.nicht_berechenbar if z not in loesung.werte]
-    if nicht_erreicht:
-        zeilen.extend(["", "  Nicht berechenbare Ziele:", ""])
-        for ziel in nicht_erreicht:
-            scheitern = loesung.nicht_berechenbar[ziel]
-            zeilen.append(f"    - {ziel}")
-            for bid, grund in scheitern.verworfene_varianten:
-                zeilen.append(f"        Variante '{bid}': {grund}")
-    return zeilen
-
-
 # ===========================================================================
 # Ausgabe
 # ===========================================================================
 
 
-def als_text(loesung: Loesung, titel: str = "Berechnung") -> str:
-    return "\n".join(loesung_zeilen(loesung, titel))
+def als_text(
+    loesung: Loesung,
+    titel: str = "Berechnung",
+    *,
+    aufbau: Optional["Aufbau"] = None,
+) -> str:
+    """Der ganze Bericht als Text -- mit ``aufbau`` die Nachweise je Platte."""
+    protokoll = bericht(loesung, titel=titel, aufbau=aufbau)
+    return "\n".join(_ueberschrift(protokoll.kopftitel) + protokoll_zeilen(protokoll))
 
 
 def drucke(
     loesung: Loesung,
     titel: str = "Berechnung",
     datei: Optional[TextIO] = None,
+    *,
+    aufbau: Optional["Aufbau"] = None,
 ) -> None:
     """Schreibt den Bericht auf die Konsole (oder einen anderen Datenstrom)."""
-    print(als_text(loesung, titel), file=datei)
+    print(als_text(loesung, titel, aufbau=aufbau), file=datei)

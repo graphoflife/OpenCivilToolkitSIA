@@ -96,9 +96,10 @@ def berichte() -> dict:
         dateien = {}
         for name, projekt in projekte().items():
             titel = name.capitalize()
-            _, loesung = _loesung(projekt)
-            dateien[f"{name}.txt"] = konsole.als_text(loesung, titel=titel)
-            dateien[f"{name}.tex"] = als_tex(loesung, titel=titel)
+            aufbau, loesung = _loesung(projekt)
+            dateien[f"{name}.txt"] = konsole.als_text(loesung, titel=titel,
+                                                      aufbau=aufbau)
+            dateien[f"{name}.tex"] = als_tex(loesung, titel=titel, aufbau=aufbau)
         return dateien
     finally:
         konsole._BREITE = vorher

@@ -68,7 +68,7 @@ class Quelle(str, Enum):
             Quelle.EINGABE: "Eingabe",
             Quelle.VORGABE: "Vorgabe",
             Quelle.BERECHNET: "berechnet",
-            Quelle.UEBERSCHRIEBEN: "vom Benutzer ueberschrieben",
+            Quelle.UEBERSCHRIEBEN: "vom Benutzer überschrieben",
         }[self]
 
     @property

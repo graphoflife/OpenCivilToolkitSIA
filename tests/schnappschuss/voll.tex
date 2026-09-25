@@ -4,8 +4,9 @@
 \usepackage[ngerman]{babel}
 \usepackage{amsmath,amssymb}
 \usepackage[a4paper,margin=25mm]{geometry}
-\usepackage{longtable}
-\usepackage{booktabs}
+% longtable und tabularx in einem: Tabellen laufen ueber Seiten, und
+% Textspalten, die umbrechen duerfen, nehmen die Zeilenbreite ein.
+\usepackage{xltabular}
 \usepackage{xcolor}
 \usepackage{textcomp}
 \usepackage{fancyhdr}
@@ -27,6 +28,8 @@
 \date{\today}
 \begin{document}
 \maketitle
+75 Berechnungen ausgeführt, 136 Werte bestimmt.
+
 \section{Herleitung}
 \subsection{Plattenanalyse: Decke}
 \noindent\textbf{Plattendicke}
@@ -66,19 +69,18 @@ A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
 h_{Dist} = \text{OK innere untere Lage} - \text{UK innere obere Lage} = 240.0\,\mathrm{mm} - 54.0\,\mathrm{mm} = 186.0\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Randabstände, statische Höhen und Bewehrungsquerschnitte}
-\begin{center}
-\begin{tabular}{lllrrrrr}
+\begin{longtable}{lllrrrrr}
 \hline
 Bewehrung & Richtung & Stahl & $\varnothing\ [\mathrm{mm}]$ & $s\ [\mathrm{mm}]$ & Randabstand [mm] & $d\ [\mathrm{mm}]$ & $A_s\ [\mathrm{mm}^2]$ \\
 \hline
+\endhead
 1. Lage Grundbewehrung & y & B500B & $12$ & $150$ & $36$ & $264$ & $754$ \\
 2. Lage Grundbewehrung & x & B500B & $18$ & $150$ & $51$ & $249$ & $1696$ \\
 2. Lage Zulage & x & B500B & $12$ & $150$ & $54$ & $246$ & $754$ \\
 3. Lage Grundbewehrung & x & B500B & $12$ & $150$ & $48$ & $48$ & $754$ \\
 4. Lage Grundbewehrung & y & B500B & $12$ & $150$ & $36$ & $36$ & $754$ \\
 \hline
-\end{tabular}
-\end{center}
+\end{longtable}
 \subsection{Resistenzlinie aus Handrechnung – x-Richtung}
 Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f\_cd; gedrückter Stahl bleibt unberücksichtigt. Die Bewehrung ist je Seite zu einer Lage zusammengefasst, das Moment bezieht sich auf die halbe Querschnittshöhe.
 
@@ -92,16 +94,15 @@ d_{2,x} = \frac{A_{s,2,x,g} \cdot f_{yd} \cdot d_{2,x,g} + A_{s,2,x,z} \cdot f_{
 A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z} = 1696 + 754 = 2450\,\mathrm{mm}^{2}
 \end{equation*}
 \noindent\textbf{Zusammengefasste Bewehrung}
-\begin{center}
-\begin{tabular}{lrrr}
+\begin{longtable}{lrrr}
 \hline
 Seite & $A_s\ [\mathrm{mm}^2]$ & $d\ [\mathrm{mm}]$ & $f_{yd}\ [\mathrm{N/mm^2}]$ \\
 \hline
+\endhead
 2. Lage Grundbewehrung + 2. Lage Zulage & $2450$ & $248.1$ & $435$ \\
 3. Lage Grundbewehrung & $754$ & $48.0$ & $435$ \\
 \hline
-\end{tabular}
-\end{center}
+\end{longtable}
 \subsubsection{Grösste Druckkraft}
 \noindent\textbf{Gleichmässiger Druck, ohne Bewehrung}
 \begin{equation*}
@@ -227,11 +228,11 @@ x^{-} = \frac{h}{2} = \frac{300\,\mathrm{mm}}{2} = 150\,\mathrm{mm}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Eckpunkte der Resistenzlinie aus Handrechnung}
-\begin{center}
-\begin{tabular}{lrr}
+\begin{longtable}{lrr}
 \hline
 Eckpunkt & $N\ [\mathrm{kN}]$ & $M\ [\mathrm{kNm}]$ \\
 \hline
+\endhead
 $N_{Rd}^{-}$ & $-6000.0$ & $0.0$ \\
 $M_{Rd}(x=\tfrac{h}{2})^{+}$ & $-1484.6$ & $324.4$ \\
 $M_{Rd}(N_{Ed}=0)^{+}$ & $0.0$ & $235.9$ \\
@@ -239,8 +240,7 @@ $N_{Rd}^{+}$ & $1393.2$ & $71.1$ \\
 $M_{Rd}(N_{Ed}=0)^{-}$ & $0.0$ & $-79.9$ \\
 $M_{Rd}(x=\tfrac{h}{2})^{-}$ & $-2222.2$ & $-253.4$ \\
 \hline
-\end{tabular}
-\end{center}
+\end{longtable}
 \subsubsection{Nachweis – Feld}
 \noindent\textbf{Einwirkung}
 \begin{equation*}
@@ -265,16 +265,15 @@ M_{Rd} = M_1 + \frac{N_{Ed} - N_1}{N_2 - N_1} \cdot \left(M_2 - M_1\right)
 = 324.4 + \frac{-300.0 - \left(-1484.6\right)}{0.0 - \left(-1484.6\right)} \cdot \left(235.9 - 324.4\right) = 253.8\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Stützpunkte der Interpolation}
-\begin{center}
-\begin{tabular}{lrr}
+\begin{longtable}{lrr}
 \hline
 Punkt & $N\ [\mathrm{kN}]$ & $M\ [\mathrm{kNm}]$ \\
 \hline
+\endhead
 $M_{Rd}(x=\tfrac{h}{2})^{+}$ & $-1484.6$ & $324.4$ \\
 $M_{Rd}(N_{Ed}=0)^{+}$ & $0.0$ & $235.9$ \\
 \hline
-\end{tabular}
-\end{center}
+\end{longtable}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
 \alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} = \frac{253.8}{120.0} = 2.12 \quad \Rightarrow \quad \text{erfüllt}
@@ -914,18 +913,17 @@ e_{2d}^{(k)} = \left|\chi^{(k)}\right| \cdot \frac{l_{cr}^{2}}{\pi^{2}} \qquad M
 Zu jedem Moment wird die Dehnungsebene gesucht, die es im Gleichgewicht hält; aus deren Krümmung folgt die nächste Ausmitte. Begonnen wird mit e\_2d = 0, also ohne Verformung.
 
 \noindent\textbf{Ausmitten-Iteration bei N\_Ed = 800.0 kN}
-\begin{center}
-\begin{tabular}{rrrrr}
+\begin{longtable}{rrrrr}
 \hline
 $k$ & $e_{2d}^{(k-1)}\ [\mathrm{mm}]$ & $M_{Ed,II}^{(k)}\ [\mathrm{kNm}]$ & $\chi^{(k)}\ [\mathrm{m}^{-1}]$ & $e_{2d}^{(k)}\ [\mathrm{mm}]$ \\
 \hline
+\endhead
 $1$ & $0.00$ & $26.64$ & $0.00087$ & $0.79$ \\
 $2$ & $0.79$ & $27.28$ & $0.00089$ & $0.81$ \\
 $3$ & $0.81$ & $27.29$ & $0.00089$ & $0.81$ \\
 $4$ & $0.81$ & $27.29$ & $0.00089$ & $0.81$ \\
 \hline
-\end{tabular}
-\end{center}
+\end{longtable}
 \noindent\textbf{Probe: die gefundene Ebene erzeugt die Schnittgrössen}
 \begin{equation*}
 \varepsilon_m = -0.1743\,\text{‰} \qquad \chi = 0.00089\,\mathrm{m}^{-1} \qquad N_{int} = -800.0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 27.3\,\mathrm{kNm} \;\checkmark
@@ -1096,32 +1094,30 @@ A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
 h_{Dist} = \text{OK innere untere Lage} - \text{UK innere obere Lage} = 152.0\,\mathrm{mm} - 48.0\,\mathrm{mm} = 104.0\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Randabstände, statische Höhen und Bewehrungsquerschnitte}
-\begin{center}
-\begin{tabular}{lllrrrrr}
+\begin{longtable}{lllrrrrr}
 \hline
 Bewehrung & Richtung & Stahl & $\varnothing\ [\mathrm{mm}]$ & $s\ [\mathrm{mm}]$ & Randabstand [mm] & $d\ [\mathrm{mm}]$ & $A_s\ [\mathrm{mm}^2]$ \\
 \hline
+\endhead
 1. Lage Grundbewehrung & x & B500B & $10$ & $150$ & $35$ & $165$ & $524$ \\
 2. Lage Grundbewehrung & y & B500B & $8$ & $150$ & $44$ & $156$ & $335$ \\
 3. Lage Grundbewehrung & y & B500B & $8$ & $150$ & $44$ & $44$ & $335$ \\
 4. Lage Grundbewehrung & x & B500B & $10$ & $150$ & $35$ & $35$ & $524$ \\
 \hline
-\end{tabular}
-\end{center}
+\end{longtable}
 \subsection{Resistenzlinie aus Handrechnung – x-Richtung}
 Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f\_cd; gedrückter Stahl bleibt unberücksichtigt. Die Bewehrung ist je Seite zu einer Lage zusammengefasst, das Moment bezieht sich auf die halbe Querschnittshöhe.
 
 \noindent\textbf{Zusammengefasste Bewehrung}
-\begin{center}
-\begin{tabular}{lrrr}
+\begin{longtable}{lrrr}
 \hline
 Seite & $A_s\ [\mathrm{mm}^2]$ & $d\ [\mathrm{mm}]$ & $f_{yd}\ [\mathrm{N/mm^2}]$ \\
 \hline
+\endhead
 1. Lage Grundbewehrung & $524$ & $165.0$ & $435$ \\
 4. Lage Grundbewehrung & $524$ & $35.0$ & $435$ \\
 \hline
-\end{tabular}
-\end{center}
+\end{longtable}
 \subsubsection{Grösste Druckkraft}
 \noindent\textbf{Gleichmässiger Druck, ohne Bewehrung}
 \begin{equation*}
@@ -1247,11 +1243,11 @@ x^{-} = \frac{h}{2} = \frac{200\,\mathrm{mm}}{2} = 100\,\mathrm{mm}
 \end{aligned}
 \end{equation*}
 \noindent\textbf{Eckpunkte der Resistenzlinie aus Handrechnung}
-\begin{center}
-\begin{tabular}{lrr}
+\begin{longtable}{lrr}
 \hline
 Eckpunkt & $N\ [\mathrm{kN}]$ & $M\ [\mathrm{kNm}]$ \\
 \hline
+\endhead
 $N_{Rd}^{-}$ & $-4000.0$ & $0.0$ \\
 $M_{Rd}(x=\tfrac{h}{2})^{+}$ & $-1472.3$ & $112.5$ \\
 $M_{Rd}(N_{Ed}=0)^{+}$ & $0.0$ & $36.3$ \\
@@ -1259,8 +1255,7 @@ $N_{Rd}^{+}$ & $455.3$ & $0.0$ \\
 $M_{Rd}(N_{Ed}=0)^{-}$ & $0.0$ & $-36.3$ \\
 $M_{Rd}(x=\tfrac{h}{2})^{-}$ & $-1472.3$ & $-112.5$ \\
 \hline
-\end{tabular}
-\end{center}
+\end{longtable}
 \subsubsection{Nachweis – Feld}
 \noindent\textbf{Einwirkung}
 \begin{equation*}
@@ -1344,186 +1339,257 @@ Die Bewehrung fliesst: die grösste Zugdehnung liegt über der Fliessdehnung, di
 \subsection{Ohne Bewehrung – x-Richtung}
 In x-Richtung ist keine Bewehrung definiert. Der Widerstand der Handrechnung ist damit null, der Nachweis nicht erfüllt.
 
-\section{Zusammenstellung der Nachweise}
-\begin{longtable}{lrl}
-\toprule
-Nachweis & Erfüllungsgrad $\alpha_{eff}$ & Ergebnis \\
-\midrule
+\section{Nachweise}
+\subsection{Decke}
+\noindent\textbf{Angaben zur Platte}
+\begin{equation*}
+\text{Beton C30/37} \qquad h = 300\,\mathrm{mm} \qquad b_x = 1000\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Bewehrung von oben nach unten}
+\begin{longtable}{llll}
+\hline
+Lage & Richtung & Bewehrung & Stahl \\
+\hline
 \endhead
-M-N-Nachweis x – Feld & $1.57$ & \textcolor{green!50!black}{erfüllt} \\
-M-N-Nachweis x – Feld mit Druck & $2.12$ & \textcolor{green!50!black}{erfüllt} \\
-M-N-Nachweis x – Stütze & $1.33$ & \textcolor{green!50!black}{erfüllt} \\
-M-N-Nachweis x – Feld & $0.45$ & \textcolor{red}{\textbf{nicht erfüllt}} \\
-Querkraft x – Feld & $2.65$ & \textcolor{green!50!black}{erfüllt} \\
-Querkraft x – Stütze & $3.58$ & \textcolor{green!50!black}{erfüllt} \\
-Duktilität – 2. Lage & $1.39$ & \textcolor{green!50!black}{erfüllt} \\
-M-N x – Feld & $0.00$ & \textcolor{red}{\textbf{nicht erfüllt}} \\
-V x – Feld & $0.00$ & \textcolor{red}{\textbf{nicht erfüllt}} \\
-Rissnormalkraft x – 3. Lage & $0.93$ & \textcolor{red}{\textbf{nicht erfüllt}} \\
-Sprödes Versagen x – 3. Lage & $1.93$ & \textcolor{green!50!black}{erfüllt} \\
-Zwängung Biegung x – 3. Lage & $1.94$ & \textcolor{green!50!black}{erfüllt} \\
-Stahlspannung (Rissbreite) x – Feld (60 \%) & $2.18$ & \textcolor{green!50!black}{erfüllt} \\
-Stahlspannung (Rissbreite) x – Feld mit Druck (60 \%) & $3.60$ & \textcolor{green!50!black}{erfüllt} \\
-Stahlspannung (Rissbreite) x – Stütze (60 \%) & $1.79$ & \textcolor{green!50!black}{erfüllt} \\
-Stahlspannung (Rissbreite) x – Dauerlast & $2.80$ & \textcolor{green!50!black}{erfüllt} \\
-Stahlspannung (Rissbreite) x – Dauerlast & $0.54$ & \textcolor{red}{\textbf{nicht erfüllt}} \\
-Stahlspannung x – Feld (70 \%) & $1.74$ & \textcolor{green!50!black}{erfüllt} \\
-Stahlspannung x – Feld mit Druck (70 \%) & $2.88$ & \textcolor{green!50!black}{erfüllt} \\
-Stahlspannung x – Stütze (70 \%) & $1.43$ & \textcolor{green!50!black}{erfüllt} \\
-Stahlspannung x – Gebrauch & $2.03$ & \textcolor{green!50!black}{erfüllt} \\
-Knicken – Wand & $4.88$ & \textcolor{green!50!black}{erfüllt} \\
-\bottomrule
+Überdeckung oben & – & $30\,\mathrm{mm}$ & – \\
+4. Lage & y & $\varnothing 12@150$ & B500B \\
+3. Lage & x & $\varnothing 12@150$ & B500B \\
+2. Lage & x & $\varnothing 18@150 + \varnothing 12@150$ & B500B \\
+1. Lage & y & $\varnothing 12@150$ & B500B \\
+Überdeckung unten & – & $30\,\mathrm{mm}$ & – \\
+Querkraftbewehrung & x/y & $\varnothing 8@200@200$ & B500B \\
+\hline
 \end{longtable}
-\noindent \textbf{Mindestens ein Nachweis ist nicht erfüllt.}
+\begin{xltabular}{\linewidth}{>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}Xrrr}
+\hline
+Nachweis & Bezeichnung & Widerstand & Einwirkung & $\alpha_{eff}$ \\
+\hline
+\endhead
+Biegung und Normalkraft & Feld & $M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = 235.9\,\mathrm{kNm}$ & $M_{Ed,x} = 150.0\,\mathrm{kNm}$ & $1.57$ \\
+Biegung und Normalkraft & Feld mit Druck & $M_{Rd,x}(N_{Ed} = -300\,\mathrm{kN}) = 253.8\,\mathrm{kNm}$ & $M_{Ed,x} = 120.0\,\mathrm{kNm}$ & $2.12$ \\
+Biegung und Normalkraft & Stütze & $M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = -79.9\,\mathrm{kNm}$ & $M_{Ed,x} = -60.0\,\mathrm{kNm}$ & $1.33$ \\
+Querkraft & Feld & $V_{Rd,x}(M_{Ed} = 150\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 212.1\,\mathrm{kN}/\mathrm{m}$ & $V_{Ed,x} = 80.0\,\mathrm{kN}/\mathrm{m}$ & $2.65$ \\
+Querkraft & Stütze & $V_{Rd,x}(M_{Ed} = -60\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 214.6\,\mathrm{kN}/\mathrm{m}$ & $V_{Ed,x} = 60.0\,\mathrm{kN}/\mathrm{m}$ & $3.58$ \\
+Duktilität & 2. Lage & $\left(x/d\right)_{max} = 0.35$ & $\left(x/d\right)_{2} = 0.253$ & $1.39$ \\
+Zwängung auf Normalkraft & 3. Lage & $N_{s,adm,3,x} = 351.6\,\mathrm{kN}$ & $N_{Riss} = 378.3\,\mathrm{kN}$ & $0.93$ \\
+Sprödes Versagen & 3. Lage & $M_{Rd,x}(N_{Ed} = 0)_{3} = 79.9\,\mathrm{kNm}$ & $M_{Riss} = 41.4\,\mathrm{kNm}$ & $1.93$ \\
+Zwängung auf Biegung & 3. Lage & $M_{s,adm,3,x} = 80.4\,\mathrm{kNm}$ & $M_{Riss} = 41.4\,\mathrm{kNm}$ & $1.94$ \\
+Stahlspannung aus Rissbreite & Feld (60 \%) & $\sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}$ & $\sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2}$ & $2.18$ \\
+Stahlspannung aus Rissbreite & Feld mit Druck (60 \%) & $\sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}$ & $\sigma_{s,x} = 106\,\mathrm{N}/\mathrm{mm}^{2}$ & $3.60$ \\
+Stahlspannung aus Rissbreite & Stütze (60 \%) & $\sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}$ & $\sigma_{s,x} = 212\,\mathrm{N}/\mathrm{mm}^{2}$ & $1.79$ \\
+Stahlspannung aus Rissbreite & Dauerlast & $\sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}$ & $\sigma_{s,x} = 136\,\mathrm{N}/\mathrm{mm}^{2}$ & $2.80$ \\
+Stahlspannung gegen Fliessen & Feld (70 \%) & $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ & $\sigma_{s,x} = 204\,\mathrm{N}/\mathrm{mm}^{2}$ & $1.74$ \\
+Stahlspannung gegen Fliessen & Feld mit Druck (70 \%) & $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ & $\sigma_{s,x} = 123\,\mathrm{N}/\mathrm{mm}^{2}$ & $2.88$ \\
+Stahlspannung gegen Fliessen & Stütze (70 \%) & $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ & $\sigma_{s,x} = 248\,\mathrm{N}/\mathrm{mm}^{2}$ & $1.43$ \\
+Stahlspannung gegen Fliessen & Gebrauch & $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ & $\sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2}$ & $2.03$ \\
+Knicken & Wand & $N_{Rd,K} = 3900.6\,\mathrm{kN}$ & $N_{Ed} = 800.0\,\mathrm{kN}$ & $4.88$ \\
+\hline
+\end{xltabular}
+\hinweis{Warnung}{Zwängung auf Normalkraft – 3. Lage: nicht erfüllt. A\_s = 754 mm² bei σ\_s,adm = 466 N/mm² ergibt N\_s,adm = 351.6 kN gegen N\_Riss = 378.3 kN.}
+\subsection{Dach}
+\noindent\textbf{Angaben zur Platte}
+\begin{equation*}
+\text{Beton C30/37} \qquad h = 200\,\mathrm{mm} \qquad b_x = 1000\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Bewehrung von oben nach unten}
+\begin{longtable}{llll}
+\hline
+Lage & Richtung & Bewehrung & Stahl \\
+\hline
+\endhead
+Überdeckung oben & – & $30\,\mathrm{mm}$ & – \\
+4. Lage & x & $\varnothing 10@150$ & B500B \\
+3. Lage & y & $\varnothing 8@150$ & B500B \\
+2. Lage & y & $\varnothing 8@150$ & B500B \\
+1. Lage & x & $\varnothing 10@150$ & B500B \\
+Überdeckung unten & – & $30\,\mathrm{mm}$ & – \\
+\hline
+\end{longtable}
+\begin{xltabular}{\linewidth}{>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}Xrrr}
+\hline
+Nachweis & Bezeichnung & Widerstand & Einwirkung & $\alpha_{eff}$ \\
+\hline
+\endhead
+Biegung und Normalkraft & Feld & $M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = 36.3\,\mathrm{kNm}$ & $M_{Ed,x} = 80.0\,\mathrm{kNm}$ & $0.45$ \\
+Stahlspannung aus Rissbreite & Dauerlast & $\varepsilon_{s,adm} = 2.50\,\text{‰}$ & $\varepsilon_{s,x} = 4.67\,\text{‰}$ & $0.54$ \\
+\hline
+\end{xltabular}
+\hinweis{Warnung}{Biegung und Normalkraft – Feld: nicht erfüllt. Bei festgehaltenem N\_Ed = 0 kN beträgt der Momentenwiderstand M\_Rd = 36.3 kNm.}
+\hinweis{Warnung}{Stahlspannung aus Rissbreite – Dauerlast: nicht erfüllt. Gerissener Querschnitt: ε\_m = 2.3198 ‰, χ = 0.03612 1/m. Die Bewehrung fliesst: ε\_s = 4.67 ‰ über der Fliessdehnung 2.50 ‰, gegen ε\_s,adm = 2.50 ‰ aus σ\_s,adm = 500 N/mm².}
+\hinweis{Hinweis}{Zwängung auf Normalkraft – 1. Lage: nicht erfüllt (α\_eff = 0.99). Dieser Nachweis ist ausgeschaltet und steht nicht in der Herleitung. A\_s = 524 mm² bei σ\_s,adm = 500 N/mm² ergibt N\_s,adm = 261.8 kN gegen N\_Riss = 263.6 kN.}
+\subsection{Ohne x}
+\noindent\textbf{Angaben zur Platte}
+\begin{equation*}
+\text{Beton C30/37} \qquad h = 250\,\mathrm{mm} \qquad b_x = 1000\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Bewehrung von oben nach unten}
+\begin{longtable}{llll}
+\hline
+Lage & Richtung & Bewehrung & Stahl \\
+\hline
+\endhead
+Überdeckung oben & – & $30\,\mathrm{mm}$ & – \\
+4. Lage & y & $\varnothing 12@150$ & B500B \\
+3. Lage & x & – & – \\
+2. Lage & x & – & – \\
+1. Lage & y & $\varnothing 12@150$ & B500B \\
+Überdeckung unten & – & $30\,\mathrm{mm}$ & – \\
+\hline
+\end{longtable}
+\begin{xltabular}{\linewidth}{>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}Xrrr}
+\hline
+Nachweis & Bezeichnung & Widerstand & Einwirkung & $\alpha_{eff}$ \\
+\hline
+\endhead
+Biegung und Normalkraft & Feld & $M_{Rd,x} = 0.0\,\mathrm{kNm}$ & $M_{Ed,x} = 30.0\,\mathrm{kNm}$ & $0.00$ \\
+Querkraft & Feld & $V_{Rd,x} = 0.0\,\mathrm{kN}/\mathrm{m}$ & $V_{Ed,x} = 20.0\,\mathrm{kN}/\mathrm{m}$ & $0.00$ \\
+\hline
+\end{xltabular}
+\hinweis{Hinweis}{Biegung und Normalkraft – Feld, Querkraft – Feld: In x-Richtung ist keine Bewehrung definiert. Der Widerstand der Handrechnung ist damit null, der Nachweis nicht erfüllt.}
+Mindestens ein Nachweis ist nicht erfüllt.
 
-\vspace{0.6em}
-\noindent\footnotesize
-\textit{Nicht geführte Nachweise, die mit der vorliegenden Bewehrung nicht aufgehen:}\begin{itemize}\setlength{\itemsep}{0pt}
-\item Rissnormalkraft x – 1. Lage -- $\alpha_{eff} = 0.99$. A\_s = 524 mm² bei σ\_s,adm = 500 N/mm² ergibt N\_s,adm = 261.8 kN gegen N\_Riss = 263.6 kN.
-\end{itemize}
-\normalsize
-\section{Werteübersicht}
-\begin{longtable}{llrll}
-\toprule
+\section{Werte}
+\begin{xltabular}{\linewidth}{>{\raggedright\arraybackslash}Xlrll}
+\hline
 Bezeichnung & Symbol & Wert & Einheit & Herkunft \\
-\midrule
+\hline
 \endhead
-Bemessungswert des Elastizitätsmoduls & $E_{cd}$ & 33620 & N/mm\textasciicircum{}2 & berechnet \\
-Mittelwert des Elastizitätsmoduls & $E_{cm}$ & 33620 & N/mm\textasciicircum{}2 & berechnet \\
-Dehnung am Ende des ansteigenden Astes & $\varepsilon_{c1d}$ & 2 & promille & Vorgabe \\
-Bruchdehnung des Betons & $\varepsilon_{c2d}$ & 3.5 & promille & Vorgabe \\
-Beiwert zur Berücksichtigung der Festigkeitsminderung & $\eta_{fc}$ & 1 &  & berechnet \\
-Bemessungswert der Betondruckfestigkeit & $f_{cd}$ & 20 & N/mm\textasciicircum{}2 & berechnet \\
-Charakteristische Zylinderdruckfestigkeit & $f_{ck}$ & 30 & N/mm\textasciicircum{}2 & Vorgabe \\
-Mittelwert der Zylinderdruckfestigkeit & $f_{cm}$ & 38 & N/mm\textasciicircum{}2 & berechnet \\
-Mittelwert der Zugfestigkeit & $f_{ctm}$ & 2.9 & N/mm\textasciicircum{}2 & Vorgabe \\
-Teilsicherheitsbeiwert für Beton & $\gamma_c$ & 1.5 &  & Vorgabe \\
-Teilsicherheitsbeiwert für den Elastizitätsmodul & $\gamma_{cE}$ & 1 &  & Vorgabe \\
-Beiwert für die Gesteinskörnung & $k_e$ & 10000 &  & Vorgabe \\
-Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung & $k_{\sigma}$ & 4.202 &  & berechnet \\
-Elastizitätsmodul des Betonstahls & $E_s$ & 200000 & N/mm\textasciicircum{}2 & Vorgabe \\
-Bemessungswert der Dehnung bei Höchstlast & $\varepsilon_{ud}$ & 4.5 & \% & Vorgabe \\
-Bemessungswert der Fliessgrenze & $f_{yd}$ & 435 & N/mm\textasciicircum{}2 & berechnet \\
-Bemessungswert der Fliessgrenze auf Druck & $f_{yd}^{-}$ & 435 & N/mm\textasciicircum{}2 & berechnet \\
-Charakteristische Fliessgrenze & $f_{yk}$ & 500 & N/mm\textasciicircum{}2 & Vorgabe \\
-Charakteristische Fliessgrenze auf Druck & $f_{yk}^{-}$ & 500 & N/mm\textasciicircum{}2 & Vorgabe \\
-Teilsicherheitsbeiwert für Betonstahl & $\gamma_s$ & 1.15 &  & Vorgabe \\
-Betrachtete Breite (x) & $b$ & 1000 & mm & Vorgabe \\
-Betrachtete Breite (y) & $b_y$ & 1000 & mm & Vorgabe \\
-Bewehrungsmass je Kubikmeter Beton & $\mu_s$ & 123 & kg/m\textasciicircum{}3 & berechnet \\
-Überdeckung oben & $c_{nom,o}$ & 30 & mm & Vorgabe \\
-Überdeckung unten & $c_{nom,u}$ & 30 & mm & Vorgabe \\
-Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) & $h_{Dist}$ & 186 & mm & berechnet \\
-Plattendicke & $h$ & 300 & mm & Vorgabe \\
-Abminderung der Betondruckfestigkeit in der Druckdiagonalen & $k_c$ & 0.55 &  & Vorgabe \\
-Kriechzahl & $\varphi$ & 2 &  & Vorgabe \\
-Bewehrungsquerschnitt 1. Lage Grundbewehrung & $A_{s,1,y,g}$ & 754 & mm\textasciicircum{}2 & berechnet \\
-Stabdurchmesser 1. Lage Grundbewehrung & $\varnothing_{1,y,g}$ & 12 & mm & Vorgabe \\
-Teilung 1. Lage Grundbewehrung & $s_{1,y,g}$ & 150 & mm & Vorgabe \\
-Statische Höhe 1. Lage Grundbewehrung (ab Oberkante) & $d_{1,y,g}$ & 264 & mm & berechnet \\
-Bewehrungsquerschnitt 2. Lage Grundbewehrung & $A_{s,2,x,g}$ & 1696 & mm\textasciicircum{}2 & berechnet \\
-Stabdurchmesser 2. Lage Grundbewehrung & $\varnothing_{2,x,g}$ & 18 & mm & Vorgabe \\
-Teilung 2. Lage Grundbewehrung & $s_{2,x,g}$ & 150 & mm & Vorgabe \\
-Statische Höhe 2. Lage Grundbewehrung (ab Oberkante) & $d_{2,x,g}$ & 249 & mm & berechnet \\
-Bewehrungsquerschnitt 2. Lage Zulage & $A_{s,2,x,z}$ & 754 & mm\textasciicircum{}2 & berechnet \\
-Stabdurchmesser 2. Lage Zulage & $\varnothing_{2,x,z}$ & 12 & mm & Vorgabe \\
-Teilung 2. Lage Zulage & $s_{2,x,z}$ & 150 & mm & Vorgabe \\
-Statische Höhe 2. Lage Zulage (ab Oberkante) & $d_{2,x,z}$ & 246 & mm & berechnet \\
-Bewehrungsquerschnitt 3. Lage Grundbewehrung & $A_{s,3,x,g}$ & 754 & mm\textasciicircum{}2 & berechnet \\
-Stabdurchmesser 3. Lage Grundbewehrung & $\varnothing_{3,x,g}$ & 12 & mm & Vorgabe \\
-Teilung 3. Lage Grundbewehrung & $s_{3,x,g}$ & 150 & mm & Vorgabe \\
-Statische Höhe 3. Lage Grundbewehrung (ab Oberkante) & $d_{3,x,g}$ & 48 & mm & berechnet \\
-Bewehrungsquerschnitt 4. Lage Grundbewehrung & $A_{s,4,y,g}$ & 754 & mm\textasciicircum{}2 & berechnet \\
-Stabdurchmesser 4. Lage Grundbewehrung & $\varnothing_{4,y,g}$ & 12 & mm & Vorgabe \\
-Teilung 4. Lage Grundbewehrung & $s_{4,y,g}$ & 150 & mm & Vorgabe \\
-Statische Höhe 4. Lage Grundbewehrung (ab Oberkante) & $d_{4,y,g}$ & 36 & mm & berechnet \\
-Erfüllungsgrad Duktilität – 2. Lage & $\alpha_{eff,D,2}$ & 1.39 &  & berechnet \\
-Bezogene Druckzonenhöhe – 2. Lage & $\left(x/d\right)_{2}$ & 0.253 &  & berechnet \\
-Erfüllungsgrad Duktilität – 3. Lage & $\alpha_{eff,D,3}$ & 4.57 &  & berechnet \\
-Bezogene Druckzonenhöhe – 3. Lage & $\left(x/d\right)_{3}$ & 0.077 &  & berechnet \\
-Erfüllungsgrad Knicken – Wand & $\alpha_{eff,K,\text{Wand}}$ & 4.88 &  & berechnet \\
-Momentenwiderstand bei N\_Ed (x-Richtung) – Feld & $M_{Rd,x}(N_{Ed})_{\text{Feld}}$ & 235.9 & kNm & berechnet \\
-Erfüllungsgrad x-Richtung – Feld & $\alpha_{eff,x,\text{Feld}}$ & 1.573 &  & berechnet \\
-Momentenwiderstand bei N\_Ed (x-Richtung) – Feld mit Druck & $M_{Rd,x}(N_{Ed})_{\text{Feld mit Druck}}$ & 253.8 & kNm & berechnet \\
-Erfüllungsgrad x-Richtung – Feld mit Druck & $\alpha_{eff,x,\text{Feld mit Druck}}$ & 2.115 &  & berechnet \\
-Momentenwiderstand bei N = 0, negativ (x-Richtung) & $M_{Rd,x}(N=0)^{-}$ & -79.9 & kNm & berechnet \\
-Momentenwiderstand bei N = 0, positiv (x-Richtung) & $M_{Rd,x}(N=0)^{+}$ & 235.9 & kNm & berechnet \\
-Grösster positiver Momentenwiderstand (x-Richtung) & $M_{Rd,x}^{+}$ & 324.4 & kNm & berechnet \\
-Grösster negativer Momentenwiderstand (x-Richtung) & $M_{Rd,x}^{-}$ & -253.4 & kNm & berechnet \\
-Grösste aufnehmbare Druckkraft (x-Richtung) & $N_{Rd,x}^{-}$ & -6000 & kN & berechnet \\
-Grösste aufnehmbare Zugkraft (x-Richtung) & $N_{Rd,x}^{+}$ & 1393.2 & kN & berechnet \\
-Momentenwiderstand bei N\_Ed (x-Richtung) – Stütze & $M_{Rd,x}(N_{Ed})_{\text{Stütze}}$ & 79.9 & kNm & berechnet \\
-Erfüllungsgrad x-Richtung – Stütze & $\alpha_{eff,x,\text{Stütze}}$ & 1.332 &  & berechnet \\
-Erfüllungsgrad Querkraft x-Richtung – Feld & $\alpha_{eff,V,x,\text{Feld}}$ & 2.65 &  & berechnet \\
-Querkraftwiderstand x-Richtung – Feld & $V_{Rd,x}$ & 212.1 & kN/m & berechnet \\
-Erfüllungsgrad Querkraft x-Richtung – Stütze & $\alpha_{eff,V,x,\text{Stütze}}$ & 3.58 &  & berechnet \\
-Querkraftwiderstand x-Richtung – Stütze & $V_{Rd,x}$ & 214.6 & kN/m & berechnet \\
-Erfüllungsgrad Rissnormalkraft – 2. Lage x & $\alpha_{eff,NR,2,x}$ & 2.47 &  & berechnet \\
-Erfüllungsgrad Rissnormalkraft – 3. Lage x & $\alpha_{eff,NR,3,x}$ & 0.93 &  & berechnet \\
-Erfüllungsgrad Stahlspannung gegen Fliessen x-Richtung – Feld (70 \%) & $\alpha_{eff,\sigma,x,\text{Feld (70 \%)}}$ & 1.74 &  & berechnet \\
-Erfüllungsgrad Stahlspannung gegen Fliessen x-Richtung – Feld mit Druck (70 \%) & $\alpha_{eff,\sigma,x,\text{Feld mit Druck (70 \%)}}$ & 2.88 &  & berechnet \\
-Erfüllungsgrad Stahlspannung gegen Fliessen x-Richtung – Gebrauch & $\alpha_{eff,\sigma,x,\text{Gebrauch}}$ & 2.03 &  & berechnet \\
-Erfüllungsgrad Stahlspannung gegen Fliessen x-Richtung – Stütze (70 \%) & $\alpha_{eff,\sigma,x,\text{Stütze (70 \%)}}$ & 1.43 &  & berechnet \\
-Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Dauerlast & $\alpha_{eff,\sigma,w,x,\text{Dauerlast}}$ & 2.8 &  & berechnet \\
-Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 \%) & $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ & 2.18 &  & berechnet \\
-Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld mit Druck (60 \%) & $\alpha_{eff,\sigma,w,x,\text{Feld mit Druck (60 \%)}}$ & 3.6 &  & berechnet \\
-Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Stütze (60 \%) & $\alpha_{eff,\sigma,w,x,\text{Stütze (60 \%)}}$ & 1.79 &  & berechnet \\
-Erfüllungsgrad sprödes Versagen – 2. Lage x & $\alpha_{eff,SV,2,x}$ & 5.69 &  & berechnet \\
-Erfüllungsgrad sprödes Versagen – 3. Lage x & $\alpha_{eff,SV,3,x}$ & 1.93 &  & berechnet \\
-Erfüllungsgrad Zwängung auf Biegung – 2. Lage x & $\alpha_{eff,ZB,2,x}$ & 4.76 &  & berechnet \\
-Erfüllungsgrad Zwängung auf Biegung – 3. Lage x & $\alpha_{eff,ZB,3,x}$ & 1.94 &  & berechnet \\
-Querschnitt eines Bügelschenkels & $A_{\varnothing,V}$ & 50.3 & mm\textasciicircum{}2 & berechnet \\
-Grösste Neigung der Druckdiagonalen & $\alpha_{max}$ & 45 & Grad & Vorgabe \\
-Kleinste Neigung der Druckdiagonalen & $\alpha_{min}$ & 30 & Grad & Vorgabe \\
-Bügeldurchmesser & $\varnothing_{V}$ & 8 & mm & Vorgabe \\
-Bügelteilung in x-Richtung & $s_{V,x}$ & 200 & mm & Vorgabe \\
-Bügelteilung in y-Richtung & $s_{V,y}$ & 200 & mm & Vorgabe \\
-Betrachtete Breite (x) & $b$ & 1000 & mm & Vorgabe \\
-Betrachtete Breite (y) & $b_y$ & 1000 & mm & Vorgabe \\
-Bewehrungsmass je Kubikmeter Beton & $\mu_s$ & 67 & kg/m\textasciicircum{}3 & berechnet \\
-Überdeckung oben & $c_{nom,o}$ & 30 & mm & Vorgabe \\
-Überdeckung unten & $c_{nom,u}$ & 30 & mm & Vorgabe \\
-Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) & $h_{Dist}$ & 104 & mm & berechnet \\
-Plattendicke & $h$ & 200 & mm & Vorgabe \\
-Kriechzahl & $\varphi$ & 2 &  & Vorgabe \\
-Bewehrungsquerschnitt 1. Lage Grundbewehrung & $A_{s,1,x,g}$ & 524 & mm\textasciicircum{}2 & berechnet \\
-Stabdurchmesser 1. Lage Grundbewehrung & $\varnothing_{1,x,g}$ & 10 & mm & Vorgabe \\
-Teilung 1. Lage Grundbewehrung & $s_{1,x,g}$ & 150 & mm & Vorgabe \\
-Statische Höhe 1. Lage Grundbewehrung (ab Oberkante) & $d_{1,x,g}$ & 165 & mm & berechnet \\
-Bewehrungsquerschnitt 2. Lage Grundbewehrung & $A_{s,2,y,g}$ & 335 & mm\textasciicircum{}2 & berechnet \\
-Stabdurchmesser 2. Lage Grundbewehrung & $\varnothing_{2,y,g}$ & 8 & mm & Vorgabe \\
-Teilung 2. Lage Grundbewehrung & $s_{2,y,g}$ & 150 & mm & Vorgabe \\
-Statische Höhe 2. Lage Grundbewehrung (ab Oberkante) & $d_{2,y,g}$ & 156 & mm & berechnet \\
-Bewehrungsquerschnitt 3. Lage Grundbewehrung & $A_{s,3,y,g}$ & 335 & mm\textasciicircum{}2 & berechnet \\
-Stabdurchmesser 3. Lage Grundbewehrung & $\varnothing_{3,y,g}$ & 8 & mm & Vorgabe \\
-Teilung 3. Lage Grundbewehrung & $s_{3,y,g}$ & 150 & mm & Vorgabe \\
-Statische Höhe 3. Lage Grundbewehrung (ab Oberkante) & $d_{3,y,g}$ & 44 & mm & berechnet \\
-Bewehrungsquerschnitt 4. Lage Grundbewehrung & $A_{s,4,x,g}$ & 524 & mm\textasciicircum{}2 & berechnet \\
-Stabdurchmesser 4. Lage Grundbewehrung & $\varnothing_{4,x,g}$ & 10 & mm & Vorgabe \\
-Teilung 4. Lage Grundbewehrung & $s_{4,x,g}$ & 150 & mm & Vorgabe \\
-Statische Höhe 4. Lage Grundbewehrung (ab Oberkante) & $d_{4,x,g}$ & 35 & mm & berechnet \\
-Erfüllungsgrad Duktilität – 1. Lage & $\alpha_{eff,D,1}$ & 4.31 &  & berechnet \\
-Bezogene Druckzonenhöhe – 1. Lage & $\left(x/d\right)_{1}$ & 0.081 &  & berechnet \\
-Erfüllungsgrad Duktilität – 4. Lage & $\alpha_{eff,D,4}$ & 4.31 &  & berechnet \\
-Bezogene Druckzonenhöhe – 4. Lage & $\left(x/d\right)_{4}$ & 0.081 &  & berechnet \\
-Momentenwiderstand bei N\_Ed (x-Richtung) – Feld & $M_{Rd,x}(N_{Ed})_{\text{Feld}}$ & 36.3 & kNm & berechnet \\
-Erfüllungsgrad x-Richtung – Feld & $\alpha_{eff,x,\text{Feld}}$ & 0.453 &  & berechnet \\
-Momentenwiderstand bei N = 0, negativ (x-Richtung) & $M_{Rd,x}(N=0)^{-}$ & -36.3 & kNm & berechnet \\
-Momentenwiderstand bei N = 0, positiv (x-Richtung) & $M_{Rd,x}(N=0)^{+}$ & 36.3 & kNm & berechnet \\
-Grösster positiver Momentenwiderstand (x-Richtung) & $M_{Rd,x}^{+}$ & 112.5 & kNm & berechnet \\
-Grösster negativer Momentenwiderstand (x-Richtung) & $M_{Rd,x}^{-}$ & -112.5 & kNm & berechnet \\
-Grösste aufnehmbare Druckkraft (x-Richtung) & $N_{Rd,x}^{-}$ & -4000 & kN & berechnet \\
-Grösste aufnehmbare Zugkraft (x-Richtung) & $N_{Rd,x}^{+}$ & 455.3 & kN & berechnet \\
-Erfüllungsgrad Rissnormalkraft – 1. Lage x & $\alpha_{eff,NR,1,x}$ & 0.99 &  & berechnet \\
-Erfüllungsgrad Rissnormalkraft – 4. Lage x & $\alpha_{eff,NR,4,x}$ & 0.99 &  & berechnet \\
-Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Dauerlast & $\alpha_{eff,\sigma,w,x,\text{Dauerlast}}$ & 0.54 &  & berechnet \\
-Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 \%) & $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ & 0 &  & berechnet \\
-Erfüllungsgrad sprödes Versagen – 1. Lage x & $\alpha_{eff,SV,1,x}$ & 1.94 &  & berechnet \\
-Erfüllungsgrad sprödes Versagen – 4. Lage x & $\alpha_{eff,SV,4,x}$ & 1.94 &  & berechnet \\
-Erfüllungsgrad Zwängung auf Biegung – 1. Lage x & $\alpha_{eff,ZB,1,x}$ & 2.09 &  & berechnet \\
-Erfüllungsgrad Zwängung auf Biegung – 4. Lage x & $\alpha_{eff,ZB,4,x}$ & 2.09 &  & berechnet \\
-Erfüllungsgrad M-N x-Richtung – Feld (keine Bewehrung) & $\alpha_{eff,M-N,x,\text{Feld}}$ & 0 &  & berechnet \\
-Erfüllungsgrad V x-Richtung – Feld (keine Bewehrung) & $\alpha_{eff,V,x,\text{Feld}}$ & 0 &  & berechnet \\
-\bottomrule
-\end{longtable}
+Bemessungswert des Elastizitätsmoduls & $E_{cd}$ & $33620$ & N/mm² & berechnet \\
+Mittelwert des Elastizitätsmoduls & $E_{cm}$ & $33620$ & N/mm² & berechnet \\
+Dehnung am Ende des ansteigenden Astes & $\varepsilon_{c1d}$ & $2$ & ‰ & Vorgabe \\
+Bruchdehnung des Betons & $\varepsilon_{c2d}$ & $3.5$ & ‰ & Vorgabe \\
+Beiwert zur Berücksichtigung der Festigkeitsminderung & $\eta_{fc}$ & $1$ &  & berechnet \\
+Bemessungswert der Betondruckfestigkeit & $f_{cd}$ & $20$ & N/mm² & berechnet \\
+Charakteristische Zylinderdruckfestigkeit & $f_{ck}$ & $30$ & N/mm² & Vorgabe \\
+Mittelwert der Zylinderdruckfestigkeit & $f_{cm}$ & $38$ & N/mm² & berechnet \\
+Mittelwert der Zugfestigkeit & $f_{ctm}$ & $2.9$ & N/mm² & Vorgabe \\
+Teilsicherheitsbeiwert für Beton & $\gamma_c$ & $1.5$ &  & Vorgabe \\
+Teilsicherheitsbeiwert für den Elastizitätsmodul & $\gamma_{cE}$ & $1$ &  & Vorgabe \\
+Beiwert für die Gesteinskörnung & $k_e$ & $10000$ &  & Vorgabe \\
+Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung & $k_{\sigma}$ & $4.202$ &  & berechnet \\
+Elastizitätsmodul des Betonstahls & $E_s$ & $200000$ & N/mm² & Vorgabe \\
+Bemessungswert der Dehnung bei Höchstlast & $\varepsilon_{ud}$ & $4.5$ & \% & Vorgabe \\
+Bemessungswert der Fliessgrenze & $f_{yd}$ & $435$ & N/mm² & berechnet \\
+Bemessungswert der Fliessgrenze auf Druck & $f_{yd}^{-}$ & $435$ & N/mm² & berechnet \\
+Charakteristische Fliessgrenze & $f_{yk}$ & $500$ & N/mm² & Vorgabe \\
+Charakteristische Fliessgrenze auf Druck & $f_{yk}^{-}$ & $500$ & N/mm² & Vorgabe \\
+Teilsicherheitsbeiwert für Betonstahl & $\gamma_s$ & $1.15$ &  & Vorgabe \\
+Betrachtete Breite (x) & $b$ & $1000$ & mm & Vorgabe \\
+Betrachtete Breite (y) & $b_y$ & $1000$ & mm & Vorgabe \\
+Bewehrungsmass je Kubikmeter Beton & $\mu_s$ & $123$ & kg/m³ & berechnet \\
+Überdeckung oben & $c_{nom,o}$ & $30$ & mm & Vorgabe \\
+Überdeckung unten & $c_{nom,u}$ & $30$ & mm & Vorgabe \\
+Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) & $h_{Dist}$ & $186$ & mm & berechnet \\
+Plattendicke & $h$ & $300$ & mm & Vorgabe \\
+Abminderung der Betondruckfestigkeit in der Druckdiagonalen & $k_c$ & $0.55$ &  & Vorgabe \\
+Kriechzahl & $\varphi$ & $2$ &  & Vorgabe \\
+Bewehrungsquerschnitt 1. Lage Grundbewehrung & $A_{s,1,y,g}$ & $754$ & mm² & berechnet \\
+Stabdurchmesser 1. Lage Grundbewehrung & $\varnothing_{1,y,g}$ & $12$ & mm & Vorgabe \\
+Teilung 1. Lage Grundbewehrung & $s_{1,y,g}$ & $150$ & mm & Vorgabe \\
+Statische Höhe 1. Lage Grundbewehrung (ab Oberkante) & $d_{1,y,g}$ & $264$ & mm & berechnet \\
+Bewehrungsquerschnitt 2. Lage Grundbewehrung & $A_{s,2,x,g}$ & $1696$ & mm² & berechnet \\
+Stabdurchmesser 2. Lage Grundbewehrung & $\varnothing_{2,x,g}$ & $18$ & mm & Vorgabe \\
+Teilung 2. Lage Grundbewehrung & $s_{2,x,g}$ & $150$ & mm & Vorgabe \\
+Statische Höhe 2. Lage Grundbewehrung (ab Oberkante) & $d_{2,x,g}$ & $249$ & mm & berechnet \\
+Bewehrungsquerschnitt 2. Lage Zulage & $A_{s,2,x,z}$ & $754$ & mm² & berechnet \\
+Stabdurchmesser 2. Lage Zulage & $\varnothing_{2,x,z}$ & $12$ & mm & Vorgabe \\
+Teilung 2. Lage Zulage & $s_{2,x,z}$ & $150$ & mm & Vorgabe \\
+Statische Höhe 2. Lage Zulage (ab Oberkante) & $d_{2,x,z}$ & $246$ & mm & berechnet \\
+Bewehrungsquerschnitt 3. Lage Grundbewehrung & $A_{s,3,x,g}$ & $754$ & mm² & berechnet \\
+Stabdurchmesser 3. Lage Grundbewehrung & $\varnothing_{3,x,g}$ & $12$ & mm & Vorgabe \\
+Teilung 3. Lage Grundbewehrung & $s_{3,x,g}$ & $150$ & mm & Vorgabe \\
+Statische Höhe 3. Lage Grundbewehrung (ab Oberkante) & $d_{3,x,g}$ & $48$ & mm & berechnet \\
+Bewehrungsquerschnitt 4. Lage Grundbewehrung & $A_{s,4,y,g}$ & $754$ & mm² & berechnet \\
+Stabdurchmesser 4. Lage Grundbewehrung & $\varnothing_{4,y,g}$ & $12$ & mm & Vorgabe \\
+Teilung 4. Lage Grundbewehrung & $s_{4,y,g}$ & $150$ & mm & Vorgabe \\
+Statische Höhe 4. Lage Grundbewehrung (ab Oberkante) & $d_{4,y,g}$ & $36$ & mm & berechnet \\
+Erfüllungsgrad Duktilität – 2. Lage & $\alpha_{eff,D,2}$ & $1.39$ &  & berechnet \\
+Bezogene Druckzonenhöhe – 2. Lage & $\left(x/d\right)_{2}$ & $0.253$ &  & berechnet \\
+Erfüllungsgrad Duktilität – 3. Lage & $\alpha_{eff,D,3}$ & $4.57$ &  & berechnet \\
+Bezogene Druckzonenhöhe – 3. Lage & $\left(x/d\right)_{3}$ & $0.077$ &  & berechnet \\
+Erfüllungsgrad Knicken – Wand & $\alpha_{eff,K,\text{Wand}}$ & $4.88$ &  & berechnet \\
+Momentenwiderstand bei N\_Ed (x-Richtung) – Feld & $M_{Rd,x}(N_{Ed})_{\text{Feld}}$ & $235.9$ & kNm & berechnet \\
+Erfüllungsgrad x-Richtung – Feld & $\alpha_{eff,x,\text{Feld}}$ & $1.573$ &  & berechnet \\
+Momentenwiderstand bei N\_Ed (x-Richtung) – Feld mit Druck & $M_{Rd,x}(N_{Ed})_{\text{Feld mit Druck}}$ & $253.8$ & kNm & berechnet \\
+Erfüllungsgrad x-Richtung – Feld mit Druck & $\alpha_{eff,x,\text{Feld mit Druck}}$ & $2.115$ &  & berechnet \\
+Momentenwiderstand bei N = 0, negativ (x-Richtung) & $M_{Rd,x}(N=0)^{-}$ & $-79.9$ & kNm & berechnet \\
+Momentenwiderstand bei N = 0, positiv (x-Richtung) & $M_{Rd,x}(N=0)^{+}$ & $235.9$ & kNm & berechnet \\
+Grösster positiver Momentenwiderstand (x-Richtung) & $M_{Rd,x}^{+}$ & $324.4$ & kNm & berechnet \\
+Grösster negativer Momentenwiderstand (x-Richtung) & $M_{Rd,x}^{-}$ & $-253.4$ & kNm & berechnet \\
+Grösste aufnehmbare Druckkraft (x-Richtung) & $N_{Rd,x}^{-}$ & $-6000$ & kN & berechnet \\
+Grösste aufnehmbare Zugkraft (x-Richtung) & $N_{Rd,x}^{+}$ & $1393.2$ & kN & berechnet \\
+Momentenwiderstand bei N\_Ed (x-Richtung) – Stütze & $M_{Rd,x}(N_{Ed})_{\text{Stütze}}$ & $79.9$ & kNm & berechnet \\
+Erfüllungsgrad x-Richtung – Stütze & $\alpha_{eff,x,\text{Stütze}}$ & $1.332$ &  & berechnet \\
+Erfüllungsgrad Querkraft x-Richtung – Feld & $\alpha_{eff,V,x,\text{Feld}}$ & $2.65$ &  & berechnet \\
+Querkraftwiderstand x-Richtung – Feld & $V_{Rd,x}$ & $212.1$ & kN/m & berechnet \\
+Erfüllungsgrad Querkraft x-Richtung – Stütze & $\alpha_{eff,V,x,\text{Stütze}}$ & $3.58$ &  & berechnet \\
+Querkraftwiderstand x-Richtung – Stütze & $V_{Rd,x}$ & $214.6$ & kN/m & berechnet \\
+Erfüllungsgrad Rissnormalkraft – 2. Lage x & $\alpha_{eff,NR,2,x}$ & $2.47$ &  & berechnet \\
+Erfüllungsgrad Rissnormalkraft – 3. Lage x & $\alpha_{eff,NR,3,x}$ & $0.93$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung gegen Fliessen x-Richtung – Feld (70 \%) & $\alpha_{eff,\sigma,x,\text{Feld (70 \%)}}$ & $1.74$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung gegen Fliessen x-Richtung – Feld mit Druck (70 \%) & $\alpha_{eff,\sigma,x,\text{Feld mit Druck (70 \%)}}$ & $2.88$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung gegen Fliessen x-Richtung – Gebrauch & $\alpha_{eff,\sigma,x,\text{Gebrauch}}$ & $2.03$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung gegen Fliessen x-Richtung – Stütze (70 \%) & $\alpha_{eff,\sigma,x,\text{Stütze (70 \%)}}$ & $1.43$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Dauerlast & $\alpha_{eff,\sigma,w,x,\text{Dauerlast}}$ & $2.8$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 \%) & $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ & $2.18$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld mit Druck (60 \%) & $\alpha_{eff,\sigma,w,x,\text{Feld mit Druck (60 \%)}}$ & $3.6$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Stütze (60 \%) & $\alpha_{eff,\sigma,w,x,\text{Stütze (60 \%)}}$ & $1.79$ &  & berechnet \\
+Erfüllungsgrad sprödes Versagen – 2. Lage x & $\alpha_{eff,SV,2,x}$ & $5.69$ &  & berechnet \\
+Erfüllungsgrad sprödes Versagen – 3. Lage x & $\alpha_{eff,SV,3,x}$ & $1.93$ &  & berechnet \\
+Erfüllungsgrad Zwängung auf Biegung – 2. Lage x & $\alpha_{eff,ZB,2,x}$ & $4.76$ &  & berechnet \\
+Erfüllungsgrad Zwängung auf Biegung – 3. Lage x & $\alpha_{eff,ZB,3,x}$ & $1.94$ &  & berechnet \\
+Querschnitt eines Bügelschenkels & $A_{\varnothing,V}$ & $50.3$ & mm² & berechnet \\
+Grösste Neigung der Druckdiagonalen & $\alpha_{max}$ & $45$ & ° & Vorgabe \\
+Kleinste Neigung der Druckdiagonalen & $\alpha_{min}$ & $30$ & ° & Vorgabe \\
+Bügeldurchmesser & $\varnothing_{V}$ & $8$ & mm & Vorgabe \\
+Bügelteilung in x-Richtung & $s_{V,x}$ & $200$ & mm & Vorgabe \\
+Bügelteilung in y-Richtung & $s_{V,y}$ & $200$ & mm & Vorgabe \\
+Betrachtete Breite (x) & $b$ & $1000$ & mm & Vorgabe \\
+Betrachtete Breite (y) & $b_y$ & $1000$ & mm & Vorgabe \\
+Bewehrungsmass je Kubikmeter Beton & $\mu_s$ & $67$ & kg/m³ & berechnet \\
+Überdeckung oben & $c_{nom,o}$ & $30$ & mm & Vorgabe \\
+Überdeckung unten & $c_{nom,u}$ & $30$ & mm & Vorgabe \\
+Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) & $h_{Dist}$ & $104$ & mm & berechnet \\
+Plattendicke & $h$ & $200$ & mm & Vorgabe \\
+Kriechzahl & $\varphi$ & $2$ &  & Vorgabe \\
+Bewehrungsquerschnitt 1. Lage Grundbewehrung & $A_{s,1,x,g}$ & $524$ & mm² & berechnet \\
+Stabdurchmesser 1. Lage Grundbewehrung & $\varnothing_{1,x,g}$ & $10$ & mm & Vorgabe \\
+Teilung 1. Lage Grundbewehrung & $s_{1,x,g}$ & $150$ & mm & Vorgabe \\
+Statische Höhe 1. Lage Grundbewehrung (ab Oberkante) & $d_{1,x,g}$ & $165$ & mm & berechnet \\
+Bewehrungsquerschnitt 2. Lage Grundbewehrung & $A_{s,2,y,g}$ & $335$ & mm² & berechnet \\
+Stabdurchmesser 2. Lage Grundbewehrung & $\varnothing_{2,y,g}$ & $8$ & mm & Vorgabe \\
+Teilung 2. Lage Grundbewehrung & $s_{2,y,g}$ & $150$ & mm & Vorgabe \\
+Statische Höhe 2. Lage Grundbewehrung (ab Oberkante) & $d_{2,y,g}$ & $156$ & mm & berechnet \\
+Bewehrungsquerschnitt 3. Lage Grundbewehrung & $A_{s,3,y,g}$ & $335$ & mm² & berechnet \\
+Stabdurchmesser 3. Lage Grundbewehrung & $\varnothing_{3,y,g}$ & $8$ & mm & Vorgabe \\
+Teilung 3. Lage Grundbewehrung & $s_{3,y,g}$ & $150$ & mm & Vorgabe \\
+Statische Höhe 3. Lage Grundbewehrung (ab Oberkante) & $d_{3,y,g}$ & $44$ & mm & berechnet \\
+Bewehrungsquerschnitt 4. Lage Grundbewehrung & $A_{s,4,x,g}$ & $524$ & mm² & berechnet \\
+Stabdurchmesser 4. Lage Grundbewehrung & $\varnothing_{4,x,g}$ & $10$ & mm & Vorgabe \\
+Teilung 4. Lage Grundbewehrung & $s_{4,x,g}$ & $150$ & mm & Vorgabe \\
+Statische Höhe 4. Lage Grundbewehrung (ab Oberkante) & $d_{4,x,g}$ & $35$ & mm & berechnet \\
+Erfüllungsgrad Duktilität – 1. Lage & $\alpha_{eff,D,1}$ & $4.31$ &  & berechnet \\
+Bezogene Druckzonenhöhe – 1. Lage & $\left(x/d\right)_{1}$ & $0.081$ &  & berechnet \\
+Erfüllungsgrad Duktilität – 4. Lage & $\alpha_{eff,D,4}$ & $4.31$ &  & berechnet \\
+Bezogene Druckzonenhöhe – 4. Lage & $\left(x/d\right)_{4}$ & $0.081$ &  & berechnet \\
+Momentenwiderstand bei N\_Ed (x-Richtung) – Feld & $M_{Rd,x}(N_{Ed})_{\text{Feld}}$ & $36.3$ & kNm & berechnet \\
+Erfüllungsgrad x-Richtung – Feld & $\alpha_{eff,x,\text{Feld}}$ & $0.453$ &  & berechnet \\
+Momentenwiderstand bei N = 0, negativ (x-Richtung) & $M_{Rd,x}(N=0)^{-}$ & $-36.3$ & kNm & berechnet \\
+Momentenwiderstand bei N = 0, positiv (x-Richtung) & $M_{Rd,x}(N=0)^{+}$ & $36.3$ & kNm & berechnet \\
+Grösster positiver Momentenwiderstand (x-Richtung) & $M_{Rd,x}^{+}$ & $112.5$ & kNm & berechnet \\
+Grösster negativer Momentenwiderstand (x-Richtung) & $M_{Rd,x}^{-}$ & $-112.5$ & kNm & berechnet \\
+Grösste aufnehmbare Druckkraft (x-Richtung) & $N_{Rd,x}^{-}$ & $-4000$ & kN & berechnet \\
+Grösste aufnehmbare Zugkraft (x-Richtung) & $N_{Rd,x}^{+}$ & $455.3$ & kN & berechnet \\
+Erfüllungsgrad Rissnormalkraft – 1. Lage x & $\alpha_{eff,NR,1,x}$ & $0.99$ &  & berechnet \\
+Erfüllungsgrad Rissnormalkraft – 4. Lage x & $\alpha_{eff,NR,4,x}$ & $0.99$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Dauerlast & $\alpha_{eff,\sigma,w,x,\text{Dauerlast}}$ & $0.54$ &  & berechnet \\
+Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 \%) & $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ & $0$ &  & berechnet \\
+Erfüllungsgrad sprödes Versagen – 1. Lage x & $\alpha_{eff,SV,1,x}$ & $1.94$ &  & berechnet \\
+Erfüllungsgrad sprödes Versagen – 4. Lage x & $\alpha_{eff,SV,4,x}$ & $1.94$ &  & berechnet \\
+Erfüllungsgrad Zwängung auf Biegung – 1. Lage x & $\alpha_{eff,ZB,1,x}$ & $2.09$ &  & berechnet \\
+Erfüllungsgrad Zwängung auf Biegung – 4. Lage x & $\alpha_{eff,ZB,4,x}$ & $2.09$ &  & berechnet \\
+Erfüllungsgrad M-N x-Richtung – Feld (keine Bewehrung) & $\alpha_{eff,M-N,x,\text{Feld}}$ & $0$ &  & berechnet \\
+Erfüllungsgrad V x-Richtung – Feld (keine Bewehrung) & $\alpha_{eff,V,x,\text{Feld}}$ & $0$ &  & berechnet \\
+\hline
+\end{xltabular}
 \end{document}

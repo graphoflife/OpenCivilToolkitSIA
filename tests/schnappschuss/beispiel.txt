@@ -335,98 +335,113 @@ Bemessungswert der Fliessgrenze auf Druck   [SIA 262:2025, 2.4.2.5]
 Bemessungswert der Dehnung bei Höchstlast   [SIA 262:2025, 4.2.2.1]
     \varepsilon_{ud} = 4.5\,\%
 
+====================================================================================================
+Nachweise
+====================================================================================================
+
+Decke über EG
+-------------
+
+Angaben zur Platte
+    \text{Beton C30/37} \qquad h = 300\,\mathrm{mm} \qquad b_x = 1000\,\mathrm{mm}
+
+Bewehrung von oben nach unten
+    Lage               Richtung  Bewehrung                                Stahl
+    -----------------  --------  ---------------------------------------  -----
+    Überdeckung oben   –         30\,\mathrm{mm}                          –
+    4. Lage            y         \varnothing 12@150                       B500B
+    3. Lage            x         \varnothing 12@150                       B500B
+    2. Lage            x         \varnothing 18@150 + \varnothing 12@150  B500B
+    1. Lage            y         \varnothing 12@150                       B500B
+    Überdeckung unten  –         30\,\mathrm{mm}                          –
+
+    Nachweis                 Bezeichnung                                                     Widerstand                      Einwirkung  \alpha_{eff}
+    -----------------------  --------------  ----------------------------------------------------------  ------------------------------  ------------
+    Biegung und Normalkraft  Feld               M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = 235.9\,\mathrm{kNm}  M_{Ed,x} = 100.0\,\mathrm{kNm}          2.36
+    Biegung und Normalkraft  Feld mit Druck  M_{Rd,x}(N_{Ed} = -300\,\mathrm{kN}) = 253.8\,\mathrm{kNm}  M_{Ed,x} = 100.0\,\mathrm{kNm}          2.54
+    Biegung und Normalkraft  Stütze             M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = -79.9\,\mathrm{kNm}  M_{Ed,x} = -50.0\,\mathrm{kNm}          1.60
+[i] Hinweis: Zwängung auf Normalkraft – 3. Lage: nicht erfüllt (α_eff = 0.996). Dieser Nachweis ist
+ausgeschaltet und steht nicht in der Herleitung. A_s = 754 mm² bei σ_s,adm = 500 N/mm² ergibt
+N_s,adm = 377.0 kN gegen N_Riss = 378.3 kN.
+
+Alle geführten Nachweise sind erfüllt.
 
 ====================================================================================================
 Werte
 ====================================================================================================
 
-  beton.b1.E_cd                                                                         33620 N/mm^2
-  beton.b1.E_cm                                                                         33620 N/mm^2
-  beton.b1.eps_c1d                                                                          2 promille Vorgabe
-  beton.b1.eps_c2d                                                                        3.5 promille Vorgabe
-  beton.b1.eta_fc                                                                           1
-  beton.b1.f_cd                                                                            20 N/mm^2
-  beton.b1.f_ck                                                                            30 N/mm^2   Vorgabe
-  beton.b1.f_cm                                                                            38 N/mm^2
-  beton.b1.f_ctm                                                                          2.9 N/mm^2   Vorgabe
-  beton.b1.gamma_c                                                                        1.5          Vorgabe
-  beton.b1.gamma_cE                                                                         1          Vorgabe
-  beton.b1.k_e                                                                          10000          Vorgabe
-  beton.b1.k_sigma                                                                      4.202
-  betonstahl.s1.E_s                                                                    200000 N/mm^2   Vorgabe
-  betonstahl.s1.eps_ud                                                                    4.5 %        Vorgabe
-  betonstahl.s1.f_yd                                                                      435 N/mm^2
-  betonstahl.s1.f_yd_druck                                                                435 N/mm^2
-  betonstahl.s1.f_yk                                                                      500 N/mm^2   Vorgabe
-  betonstahl.s1.f_yk_druck                                                                500 N/mm^2   Vorgabe
-  betonstahl.s1.gamma_s                                                                  1.15          Vorgabe
-  querschnitt.q1.b                                                                       1000 mm       Vorgabe
-  querschnitt.q1.b_y                                                                     1000 mm       Vorgabe
-  querschnitt.q1.bewehrungsmass                                                           123 kg/m^3
-  querschnitt.q1.c_nom_oben                                                                30 mm       Vorgabe
-  querschnitt.q1.c_nom_unten                                                               30 mm       Vorgabe
-  querschnitt.q1.distanzhalter                                                            186 mm
-  querschnitt.q1.h                                                                        300 mm       Vorgabe
-  querschnitt.q1.kriechzahl                                                                 2          Vorgabe
-  querschnitt.q1.lage.1g.a_s                                                              754 mm^2
-  querschnitt.q1.lage.1g.phi                                                               12 mm       Vorgabe
-  querschnitt.q1.lage.1g.s                                                                150 mm       Vorgabe
-  querschnitt.q1.lage.1g.z                                                                264 mm
-  querschnitt.q1.lage.2g.a_s                                                             1696 mm^2
-  querschnitt.q1.lage.2g.phi                                                               18 mm       Vorgabe
-  querschnitt.q1.lage.2g.s                                                                150 mm       Vorgabe
-  querschnitt.q1.lage.2g.z                                                                249 mm
-  querschnitt.q1.lage.2z.a_s                                                              754 mm^2
-  querschnitt.q1.lage.2z.phi                                                               12 mm       Vorgabe
-  querschnitt.q1.lage.2z.s                                                                150 mm       Vorgabe
-  querschnitt.q1.lage.2z.z                                                                246 mm
-  querschnitt.q1.lage.3g.a_s                                                              754 mm^2
-  querschnitt.q1.lage.3g.phi                                                               12 mm       Vorgabe
-  querschnitt.q1.lage.3g.s                                                                150 mm       Vorgabe
-  querschnitt.q1.lage.3g.z                                                                 48 mm
-  querschnitt.q1.lage.4g.a_s                                                              754 mm^2
-  querschnitt.q1.lage.4g.phi                                                               12 mm       Vorgabe
-  querschnitt.q1.lage.4g.s                                                                150 mm       Vorgabe
-  querschnitt.q1.lage.4g.z                                                                 36 mm
-  querschnitt.q1.nachweis.duktilitaet.lage2.erfuellungsgrad                              1.39
-  querschnitt.q1.nachweis.duktilitaet.lage2.x_zu_d                                      0.253
-  querschnitt.q1.nachweis.duktilitaet.lage3.erfuellungsgrad                              4.57
-  querschnitt.q1.nachweis.duktilitaet.lage3.x_zu_d                                      0.077
-  querschnitt.q1.nachweis.mn.x.Feld.M_Rd_bei_N_Ed                                       235.9 kNm
-  querschnitt.q1.nachweis.mn.x.Feld.erfuellungsgrad                                     2.359
-  querschnitt.q1.nachweis.mn.x.Feld_mit_Druck.M_Rd_bei_N_Ed                             253.8 kNm
-  querschnitt.q1.nachweis.mn.x.Feld_mit_Druck.erfuellungsgrad                           2.538
-  querschnitt.q1.nachweis.mn.x.M_Rd_N0_neg                                              -79.9 kNm
-  querschnitt.q1.nachweis.mn.x.M_Rd_N0_pos                                              235.9 kNm
-  querschnitt.q1.nachweis.mn.x.M_Rd_max                                                 324.4 kNm
-  querschnitt.q1.nachweis.mn.x.M_Rd_min                                                -253.4 kNm
-  querschnitt.q1.nachweis.mn.x.N_Rd_druck                                               -6000 kN
-  querschnitt.q1.nachweis.mn.x.N_Rd_zug                                                1393.2 kN
-  querschnitt.q1.nachweis.mn.x.Stütze.M_Rd_bei_N_Ed                                      79.9 kNm
-  querschnitt.q1.nachweis.mn.x.Stütze.erfuellungsgrad                                   1.598
-  querschnitt.q1.nachweis.rissnormalkraft.x.lage2.erfuellungsgrad                        3.24
-  querschnitt.q1.nachweis.rissnormalkraft.x.lage3.erfuellungsgrad                           1
-  querschnitt.q1.nachweis.spannung_riss.x.Feld__60___.erfuellungsgrad                    4.29
-  querschnitt.q1.nachweis.spannung_riss.x.Feld_mit_Druck__60___.erfuellungsgrad          6.05
-  querschnitt.q1.nachweis.spannung_riss.x.Stütze__60___.erfuellungsgrad                  2.82
-  querschnitt.q1.nachweis.sproede.x.lage2.erfuellungsgrad                                5.69
-  querschnitt.q1.nachweis.sproede.x.lage3.erfuellungsgrad                                1.93
-  querschnitt.q1.nachweis.zwang_biegung.x.lage2.erfuellungsgrad                          6.25
-  querschnitt.q1.nachweis.zwang_biegung.x.lage3.erfuellungsgrad                          2.08
-
-
-====================================================================================================
-Nachweise
-====================================================================================================
-
-  M-N-Nachweis x – Feld                    Erfüllungsgrad     2.36   erfüllt
-      Bei festgehaltenem N_Ed = 0 kN beträgt der Momentenwiderstand M_Rd = 235.9 kNm.
-  M-N-Nachweis x – Feld mit Druck          Erfüllungsgrad     2.54   erfüllt
-      Bei festgehaltenem N_Ed = -300 kN beträgt der Momentenwiderstand M_Rd = 253.8 kNm.
-  M-N-Nachweis x – Stütze                  Erfüllungsgrad     1.60   erfüllt
-      Bei festgehaltenem N_Ed = 0 kN beträgt der Momentenwiderstand M_Rd = -79.9 kNm.
-
-  Alle geführten Nachweise erfüllt.
-
-  Nicht geführt, geht aber nicht auf:
-    Rissnormalkraft x – 3. Lage            Erfüllungsgrad    0.996
+    Bezeichnung                                                                     Symbol                                                   Wert  Einheit  Herkunft
+    ------------------------------------------------------------------------------  -----------------------------------------------------  ------  -------  ---------
+    Bemessungswert des Elastizitätsmoduls                                           E_{cd}                                                  33620  N/mm²    berechnet
+    Mittelwert des Elastizitätsmoduls                                               E_{cm}                                                  33620  N/mm²    berechnet
+    Dehnung am Ende des ansteigenden Astes                                          \varepsilon_{c1d}                                           2  ‰        Vorgabe
+    Bruchdehnung des Betons                                                         \varepsilon_{c2d}                                         3.5  ‰        Vorgabe
+    Beiwert zur Berücksichtigung der Festigkeitsminderung                           \eta_{fc}                                                   1           berechnet
+    Bemessungswert der Betondruckfestigkeit                                         f_{cd}                                                     20  N/mm²    berechnet
+    Charakteristische Zylinderdruckfestigkeit                                       f_{ck}                                                     30  N/mm²    Vorgabe
+    Mittelwert der Zylinderdruckfestigkeit                                          f_{cm}                                                     38  N/mm²    berechnet
+    Mittelwert der Zugfestigkeit                                                    f_{ctm}                                                   2.9  N/mm²    Vorgabe
+    Teilsicherheitsbeiwert für Beton                                                \gamma_c                                                  1.5           Vorgabe
+    Teilsicherheitsbeiwert für den Elastizitätsmodul                                \gamma_{cE}                                                 1           Vorgabe
+    Beiwert für die Gesteinskörnung                                                 k_e                                                     10000           Vorgabe
+    Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung                               k_{\sigma}                                              4.202           berechnet
+    Elastizitätsmodul des Betonstahls                                               E_s                                                    200000  N/mm²    Vorgabe
+    Bemessungswert der Dehnung bei Höchstlast                                       \varepsilon_{ud}                                          4.5  %        Vorgabe
+    Bemessungswert der Fliessgrenze                                                 f_{yd}                                                    435  N/mm²    berechnet
+    Bemessungswert der Fliessgrenze auf Druck                                       f_{yd}^{-}                                                435  N/mm²    berechnet
+    Charakteristische Fliessgrenze                                                  f_{yk}                                                    500  N/mm²    Vorgabe
+    Charakteristische Fliessgrenze auf Druck                                        f_{yk}^{-}                                                500  N/mm²    Vorgabe
+    Teilsicherheitsbeiwert für Betonstahl                                           \gamma_s                                                 1.15           Vorgabe
+    Betrachtete Breite (x)                                                          b                                                        1000  mm       Vorgabe
+    Betrachtete Breite (y)                                                          b_y                                                      1000  mm       Vorgabe
+    Bewehrungsmass je Kubikmeter Beton                                              \mu_s                                                     123  kg/m³    berechnet
+    Überdeckung oben                                                                c_{nom,o}                                                  30  mm       Vorgabe
+    Überdeckung unten                                                               c_{nom,u}                                                  30  mm       Vorgabe
+    Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage)              h_{Dist}                                                  186  mm       berechnet
+    Plattendicke                                                                    h                                                         300  mm       Vorgabe
+    Kriechzahl                                                                      \varphi                                                     2           Vorgabe
+    Bewehrungsquerschnitt 1. Lage Grundbewehrung                                    A_{s,1,y,g}                                               754  mm²      berechnet
+    Stabdurchmesser 1. Lage Grundbewehrung                                          \varnothing_{1,y,g}                                        12  mm       Vorgabe
+    Teilung 1. Lage Grundbewehrung                                                  s_{1,y,g}                                                 150  mm       Vorgabe
+    Statische Höhe 1. Lage Grundbewehrung (ab Oberkante)                            d_{1,y,g}                                                 264  mm       berechnet
+    Bewehrungsquerschnitt 2. Lage Grundbewehrung                                    A_{s,2,x,g}                                              1696  mm²      berechnet
+    Stabdurchmesser 2. Lage Grundbewehrung                                          \varnothing_{2,x,g}                                        18  mm       Vorgabe
+    Teilung 2. Lage Grundbewehrung                                                  s_{2,x,g}                                                 150  mm       Vorgabe
+    Statische Höhe 2. Lage Grundbewehrung (ab Oberkante)                            d_{2,x,g}                                                 249  mm       berechnet
+    Bewehrungsquerschnitt 2. Lage Zulage                                            A_{s,2,x,z}                                               754  mm²      berechnet
+    Stabdurchmesser 2. Lage Zulage                                                  \varnothing_{2,x,z}                                        12  mm       Vorgabe
+    Teilung 2. Lage Zulage                                                          s_{2,x,z}                                                 150  mm       Vorgabe
+    Statische Höhe 2. Lage Zulage (ab Oberkante)                                    d_{2,x,z}                                                 246  mm       berechnet
+    Bewehrungsquerschnitt 3. Lage Grundbewehrung                                    A_{s,3,x,g}                                               754  mm²      berechnet
+    Stabdurchmesser 3. Lage Grundbewehrung                                          \varnothing_{3,x,g}                                        12  mm       Vorgabe
+    Teilung 3. Lage Grundbewehrung                                                  s_{3,x,g}                                                 150  mm       Vorgabe
+    Statische Höhe 3. Lage Grundbewehrung (ab Oberkante)                            d_{3,x,g}                                                  48  mm       berechnet
+    Bewehrungsquerschnitt 4. Lage Grundbewehrung                                    A_{s,4,y,g}                                               754  mm²      berechnet
+    Stabdurchmesser 4. Lage Grundbewehrung                                          \varnothing_{4,y,g}                                        12  mm       Vorgabe
+    Teilung 4. Lage Grundbewehrung                                                  s_{4,y,g}                                                 150  mm       Vorgabe
+    Statische Höhe 4. Lage Grundbewehrung (ab Oberkante)                            d_{4,y,g}                                                  36  mm       berechnet
+    Erfüllungsgrad Duktilität – 2. Lage                                             \alpha_{eff,D,2}                                         1.39           berechnet
+    Bezogene Druckzonenhöhe – 2. Lage                                               \left(x/d\right)_{2}                                    0.253           berechnet
+    Erfüllungsgrad Duktilität – 3. Lage                                             \alpha_{eff,D,3}                                         4.57           berechnet
+    Bezogene Druckzonenhöhe – 3. Lage                                               \left(x/d\right)_{3}                                    0.077           berechnet
+    Momentenwiderstand bei N_Ed (x-Richtung) – Feld                                 M_{Rd,x}(N_{Ed})_{\text{Feld}}                          235.9  kNm      berechnet
+    Erfüllungsgrad x-Richtung – Feld                                                \alpha_{eff,x,\text{Feld}}                              2.359           berechnet
+    Momentenwiderstand bei N_Ed (x-Richtung) – Feld mit Druck                       M_{Rd,x}(N_{Ed})_{\text{Feld mit Druck}}                253.8  kNm      berechnet
+    Erfüllungsgrad x-Richtung – Feld mit Druck                                      \alpha_{eff,x,\text{Feld mit Druck}}                    2.538           berechnet
+    Momentenwiderstand bei N = 0, negativ (x-Richtung)                              M_{Rd,x}(N=0)^{-}                                       -79.9  kNm      berechnet
+    Momentenwiderstand bei N = 0, positiv (x-Richtung)                              M_{Rd,x}(N=0)^{+}                                       235.9  kNm      berechnet
+    Grösster positiver Momentenwiderstand (x-Richtung)                              M_{Rd,x}^{+}                                            324.4  kNm      berechnet
+    Grösster negativer Momentenwiderstand (x-Richtung)                              M_{Rd,x}^{-}                                           -253.4  kNm      berechnet
+    Grösste aufnehmbare Druckkraft (x-Richtung)                                     N_{Rd,x}^{-}                                            -6000  kN       berechnet
+    Grösste aufnehmbare Zugkraft (x-Richtung)                                       N_{Rd,x}^{+}                                           1393.2  kN       berechnet
+    Momentenwiderstand bei N_Ed (x-Richtung) – Stütze                               M_{Rd,x}(N_{Ed})_{\text{Stütze}}                         79.9  kNm      berechnet
+    Erfüllungsgrad x-Richtung – Stütze                                              \alpha_{eff,x,\text{Stütze}}                            1.598           berechnet
+    Erfüllungsgrad Rissnormalkraft – 2. Lage x                                      \alpha_{eff,NR,2,x}                                      3.24           berechnet
+    Erfüllungsgrad Rissnormalkraft – 3. Lage x                                      \alpha_{eff,NR,3,x}                                         1           berechnet
+    Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %)            \alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}              4.29           berechnet
+    Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld mit Druck (60 %)  \alpha_{eff,\sigma,w,x,\text{Feld mit Druck (60 \%)}}    6.05           berechnet
+    Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Stütze (60 %)          \alpha_{eff,\sigma,w,x,\text{Stütze (60 \%)}}            2.82           berechnet
+    Erfüllungsgrad sprödes Versagen – 2. Lage x                                     \alpha_{eff,SV,2,x}                                      5.69           berechnet
+    Erfüllungsgrad sprödes Versagen – 3. Lage x                                     \alpha_{eff,SV,3,x}                                      1.93           berechnet
+    Erfüllungsgrad Zwängung auf Biegung – 2. Lage x                                 \alpha_{eff,ZB,2,x}                                      6.25           berechnet
+    Erfüllungsgrad Zwängung auf Biegung – 3. Lage x                                 \alpha_{eff,ZB,3,x}                                      2.08           berechnet
