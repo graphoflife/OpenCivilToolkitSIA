@@ -18,13 +18,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import (
-    TYPE_CHECKING, Any, Dict, Iterable, List, Mapping, Sequence, Tuple,
+    TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Mapping, Sequence,
+    Tuple,
 )
 
 from opencivil.core.einheiten import (
     EINHEITSLOS, KN, KNM, KN_PRO_M, M, MM, Groesse,
 )
-from opencivil.core.berechnung import NachweisUrteil
+from opencivil.core.berechnung import Nachweis, NachweisUrteil
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.material.basis import Baustoff
 from opencivil.material.beton import beton
@@ -50,10 +51,10 @@ from opencivil.querschnitt.platte import (
     Bewehrungslage, Plattenquerschnitt, Richtung,
 )
 from opencivil.projekt.eintraege import (
-    Gebrauchsliste, KombinationEintrag, MaterialEintrag,
-    ProjektFehler, SpannungsfallEintrag, _schalter_aus,
+    Gebrauchsliste, KombinationEintrag, MaterialEintrag, SpannungsfallEintrag,
     abgeleiteter_fallname,
 )
+from opencivil.projekt.lesen import ProjektFehler, schalter_aus
 from opencivil.projekt.platte import QuerschnittEintrag
 
 if TYPE_CHECKING:
@@ -229,6 +230,11 @@ class Aufbau:
         return nach_art["beton"] + nach_art["betonstahl"]
 
 
+#: Wie ein fertig gebauter Nachweis angemeldet wird: Feld im
+#: :class:`Aufbau`, Schluessel darin, Nachweis.
+Eintragen = Callable[[str, str, Nachweis], None]
+
+
 def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
     """
     Baut aus der Beschreibung ein vollstaendiges Rechenwerk.
@@ -247,7 +253,7 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
     werk = Rechenwerk()
     aufbau = Aufbau(werk=werk)
 
-    def eintragen(feld: str, schluessel: str, nachweis) -> None:
+    def eintragen(feld: str, schluessel: str, nachweis: Nachweis) -> None:
         """
         Einen Nachweis anmelden -- ausser er ist ganz still, und es wird
         schnell gerechnet.
@@ -258,6 +264,9 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
         nur Zeit -- und bei der Stahlspannung, die immer mitlaeuft, ist
         das der groessere Teil der ganzen Rechnung. Exakt und nicht
         genaehert: gezaehlt wird dasselbe wie vorher.
+
+        Jeder Nachweis geht hier durch, auch die, die nie still sind -- ein
+        Weg zum Anmelden, nicht zwei.
         """
         if schnell and nachweis.still:
             return
@@ -269,153 +278,163 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
     je_art: Dict[str, int] = {}
     for m in projekt.materialien:
         je_art[m.art] = je_art.get(m.art, 0) + 1
-
     for eintrag in projekt.materialien:
         index = eintrag.anzeigename if je_art[eintrag.art] > 1 else ""
         aufbau.baustoffe[eintrag.kennung] = _baustoff(eintrag, index)
 
     for eintrag in projekt.querschnitte:
-        querschnitt = _querschnitt(eintrag, aufbau.baustoffe)
-        aufbau.querschnitte[eintrag.kennung] = querschnitt
-        querschnitt.ins_rechenwerk(werk)
-
-        bewehrt = set(querschnitt.richtungen_mit_bewehrung)
-
-        # Die vier Schalter durch denselben Leser wie beim Einlesen.
-        # Wer eine alte Beschreibung im Speicher haelt, traegt dort noch
-        # eine Liste -- und `[False, False, False, False]` ist als Wahrheit
-        # *wahr*. Der Nachweis stuende dann eingeschaltet da, obwohl jeder
-        # einzelne Haken aus ist.
-        an_duktil = _schalter_aus(eintrag.duktilitaet)
-        an_sproede = _schalter_aus(eintrag.sproede)
-        an_biegung = _schalter_aus(eintrag.zwaengung_biegung)
-        an_zwang = _schalter_aus(eintrag.zwaengung)
-
-        # Nachgewiesen wird nur die Tragrichtung x. Die y-Lagen stehen
-        # im Querschnitt -- sie tragen zum Bewehrungsgehalt bei und
-        # druecken die statische Hoehe von x nach innen --, aber kein
-        # Nachweis fragt nach ihnen. Vorher lief hier alles doppelt,
-        # einmal je Richtung, und die Haelfte der Tabelle handelte von
-        # einer Richtung, fuer die niemand Schnittgroessen hatte.
-        richtung = Richtung.X
-        aktiv = [k for k in eintrag.kombinationen if k.aktiv]
-
-        if richtung not in bewehrt:
-            if aktiv:
-                # Ohne Bewehrung laesst sich hier nichts aufstellen. Der
-                # Nachweis entfiel frueher stillschweigend; wer eine
-                # Einwirkung angegeben hatte, fand sie nirgends wieder.
-                fehlend = FehlendeBewehrung(
-                    querschnitt, richtung,
-                    _ausgefallene(aktiv, richtung))
-                werk.registriere(fehlend)
-                aufbau.fehlende[f"{eintrag.kennung}.x"] = fehlend
-        else:
-            # Der M-N-Nachweis entsteht auch ohne Schnittgroessen: seine
-            # Eckwerte gehoeren dem Querschnitt, nicht der Einwirkung, und
-            # der Nachweis gegen sproedes Versagen haelt M_Rd(N=0) dagegen.
-            # Ohne die genaue Resistenzlinie, wenn schnell gerechnet wird:
-            # sie kostet fast die ganze Zeit dieses Nachweises und wird
-            # allein im Diagramm gebraucht. Wer schnell rechnet, sucht eine
-            # Bewehrung und sieht dabei kein Diagramm an.
-            nachweis = BiegungNormalkraft(
-                querschnitt, [_kombination(k) for k in aktiv], richtung,
-                mit_linie=not schnell)
-            werk.registriere(nachweis)
-            aufbau.nachweise[f"{eintrag.kennung}.x"] = nachweis
-
-            # Die beiden x-Lagen, von unten nach oben. Beide werden
-            # gerechnet; in die Zusammenfassung kommt die unguenstigere.
-            lagen = [l.nummer for l in querschnitt.lagen
-                     if l.richtung is richtung]
-            if lagen:
-                nachweis_sv = SproedesVersagen(
-                    querschnitt, richtung, lagen, nachweis)
-                nachweis_sv.still = not an_sproede
-                eintragen("sproede", f"{eintrag.kennung}.x", nachweis_sv)
-
-                biegung = ZwaengungBiegung(
-                    querschnitt, richtung, lagen,
-                    anforderung=eintrag.rissanforderung,
-                    kriechzahl=eintrag.kriechzahl)
-                biegung.still = not an_biegung
-                eintragen("zwaengung_biegung", f"{eintrag.kennung}.x",
-                          biegung)
-
-                zwang = Rissnormalkraft(
-                    querschnitt, richtung,
-                    anforderung=eintrag.rissanforderung,
-                    begrenzt=eintrag.zwaengung_begrenzt)
-                zwang.still = not an_zwang
-                eintragen("rissnormalkraft", f"{eintrag.kennung}.x", zwang)
-
-                duktilitaet = Duktilitaet(querschnitt, lagen)
-                duktilitaet.still = not an_duktil
-                eintragen("duktilitaet", eintrag.kennung, duktilitaet)
-
-            # Die Stahlspannung, zweimal: aus der Rissbreite unter
-            # quasi-staendiger Einwirkung (bei jeder Anforderung) und gegen
-            # Fliessen unter haeufiger (nur bei erhoehter und hoher). Welche
-            # wann gilt, weiss die Grenze selbst.
-            for feld, liste, grenze in (
-                    ("spannung_riss", eintrag.quasistaendig, GrenzeAusRissbreite),
-                    ("spannung", eintrag.haeufig, GrenzeGegenFliessen)):
-                if not grenze.gilt_bei(eintrag.rissanforderung):
-                    continue
-                faelle, laute = _gebrauchsfaelle(eintrag.kombinationen, liste)
-                if faelle:
-                    spannung = Spannungsbegrenzung(
-                        querschnitt, richtung, faelle,
-                        grenze=grenze(querschnitt, richtung,
-                                      eintrag.rissanforderung))
-                    spannung.stillstellen([f.name for f in faelle], laute)
-                    eintragen(feld, f"{eintrag.kennung}.x", spannung)
-
-            mit_querkraft = [k for k in aktiv if k.V_Ed]
-            if mit_querkraft:
-                querkraft = Querkraft(
-                    querschnitt,
-                    [Querkraftfall(name=k.name,
-                                   V_Ed=Groesse(k.V_Ed, KN_PRO_M),
-                                   M_Ed=Groesse(k.M_Ed, KNM),
-                                   N_Ed=Groesse(k.N_Ed, KN))
-                     for k in mit_querkraft],
-                    richtung, nachweis)
-                werk.registriere(querkraft)
-                aufbau.querkraft[f"{eintrag.kennung}.x"] = querkraft
-
-            knickfaelle = [k for k in eintrag.knickfaelle if k.aktiv]
-            if knickfaelle:
-                knick = Knicken(
-                    querschnitt,
-                    [Knickfall(name=k.name,
-                               N_Ed=Groesse(k.N_Ed, KN),
-                               M_Ed_1=Groesse(k.M_Ed_1, KNM),
-                               laenge=Groesse(k.laenge, M),
-                               knicklaenge=Groesse(k.knicklaenge, M))
-                     for k in knickfaelle],
-                    nachweis, schnell=schnell)
-                werk.registriere(knick)
-                aufbau.knicken[eintrag.kennung] = knick
-        if richtung not in bewehrt and eintrag.knickfaelle:
-            aufbau.warnungen.append(
-                f"Platte '{eintrag.name}': Knicken braucht Bewehrung in "
-                f"x-Richtung; ohne sie entfällt der Nachweis.")
-
-        aktive = [s for s in eintrag.spannungsfaelle if s.aktiv]
-        if aktive:
-            aufbau.spannungsfaelle[eintrag.kennung] = aktive
-
-        if not eintrag.kombinationen:
-            aufbau.warnungen.append(
-                f"Platte '{eintrag.name}': keine Schnittgrössen angegeben, "
-                f"also kein Tragsicherheitsnachweis möglich.")
+        _platte(eintrag, aufbau, eintragen, schnell=schnell)
 
     for baustoff in aufbau.baustoffe.values():
         baustoff.ins_rechenwerk(werk)
 
     _ueberschreibungen_setzen(projekt, werk, aufbau)
     return aufbau
+
+
+def _platte(eintrag: QuerschnittEintrag, aufbau: Aufbau, eintragen: Eintragen,
+            *, schnell: bool) -> None:
+    """
+    Eine Platte: der Querschnitt und alle Nachweise, die an ihm haengen.
+
+    Nachgewiesen wird nur die Tragrichtung x. Die y-Lagen stehen im
+    Querschnitt -- sie tragen zum Bewehrungsgehalt bei und druecken die
+    statische Hoehe von x nach innen --, aber kein Nachweis fragt nach ihnen.
+    Vorher lief hier alles doppelt, einmal je Richtung, und die Haelfte der
+    Tabelle handelte von einer Richtung, fuer die niemand Schnittgroessen
+    hatte.
+    """
+    querschnitt = _querschnitt(eintrag, aufbau.baustoffe)
+    aufbau.querschnitte[eintrag.kennung] = querschnitt
+    querschnitt.ins_rechenwerk(aufbau.werk)
+
+    richtung = Richtung.X
+    kennung_x = f"{eintrag.kennung}.x"
+    aktiv = [k for k in eintrag.kombinationen if k.aktiv]
+
+    if richtung not in querschnitt.richtungen_mit_bewehrung:
+        if aktiv:
+            # Ohne Bewehrung laesst sich hier nichts aufstellen. Der
+            # Nachweis entfiel frueher stillschweigend; wer eine Einwirkung
+            # angegeben hatte, fand sie nirgends wieder.
+            eintragen("fehlende", kennung_x, FehlendeBewehrung(
+                querschnitt, richtung, _ausgefallene(aktiv, richtung)))
+        if eintrag.knickfaelle:
+            aufbau.warnungen.append(
+                f"Platte '{eintrag.name}': Knicken braucht Bewehrung in "
+                f"x-Richtung; ohne sie entfällt der Nachweis.")
+    else:
+        # Der M-N-Nachweis entsteht auch ohne Schnittgroessen: seine
+        # Eckwerte gehoeren dem Querschnitt, nicht der Einwirkung, und der
+        # Nachweis gegen sproedes Versagen haelt M_Rd(N=0) dagegen. Ohne die
+        # genaue Resistenzlinie, wenn schnell gerechnet wird: sie kostet fast
+        # die ganze Zeit dieses Nachweises und wird allein im Diagramm
+        # gebraucht. Wer schnell rechnet, sucht eine Bewehrung und sieht
+        # dabei kein Diagramm an.
+        nachweis = BiegungNormalkraft(
+            querschnitt, [_kombination(k) for k in aktiv], richtung,
+            mit_linie=not schnell)
+        eintragen("nachweise", kennung_x, nachweis)
+
+        _lagennachweise(eintrag, querschnitt, richtung, nachweis, eintragen)
+        _spannungsnachweise(eintrag, querschnitt, richtung, eintragen)
+
+        mit_querkraft = [k for k in aktiv if k.V_Ed]
+        if mit_querkraft:
+            eintragen("querkraft", kennung_x, Querkraft(
+                querschnitt,
+                [Querkraftfall(name=k.name,
+                               V_Ed=Groesse(k.V_Ed, KN_PRO_M),
+                               M_Ed=Groesse(k.M_Ed, KNM),
+                               N_Ed=Groesse(k.N_Ed, KN))
+                 for k in mit_querkraft],
+                richtung, nachweis))
+
+        knickfaelle = [k for k in eintrag.knickfaelle if k.aktiv]
+        if knickfaelle:
+            eintragen("knicken", eintrag.kennung, Knicken(
+                querschnitt,
+                [Knickfall(name=k.name,
+                           N_Ed=Groesse(k.N_Ed, KN),
+                           M_Ed_1=Groesse(k.M_Ed_1, KNM),
+                           laenge=Groesse(k.laenge, M),
+                           knicklaenge=Groesse(k.knicklaenge, M))
+                 for k in knickfaelle],
+                nachweis, schnell=schnell))
+
+    aktive = [s for s in eintrag.spannungsfaelle if s.aktiv]
+    if aktive:
+        aufbau.spannungsfaelle[eintrag.kennung] = aktive
+
+    if not eintrag.kombinationen:
+        aufbau.warnungen.append(
+            f"Platte '{eintrag.name}': keine Schnittgrössen angegeben, "
+            f"also kein Tragsicherheitsnachweis möglich.")
+
+
+def _lagennachweise(eintrag: QuerschnittEintrag, querschnitt: Plattenquerschnitt,
+                    richtung: Richtung, nachweis: BiegungNormalkraft,
+                    eintragen: Eintragen) -> None:
+    """
+    Die Nachweise je x-Lage: sproedes Versagen, Zwaengung auf Biegung und
+    auf Normalkraft, Duktilitaet.
+
+    Die beiden x-Lagen, von unten nach oben. Beide werden gerechnet; in die
+    Zusammenfassung kommt die unguenstigere. Ausgeschaltet heisst still --
+    gerechnet wird trotzdem, damit ein Hinweis stehen kann.
+    """
+    lagen = [l.nummer for l in querschnitt.lagen if l.richtung is richtung]
+    if not lagen:
+        return
+    kennung_x = f"{eintrag.kennung}.x"
+
+    # Die vier Schalter durch denselben Leser wie beim Einlesen. Wer eine
+    # alte Beschreibung im Speicher haelt, traegt dort noch eine Liste -- und
+    # `[False, False, False, False]` ist als Wahrheit *wahr*. Der Nachweis
+    # stuende dann eingeschaltet da, obwohl jeder einzelne Haken aus ist.
+    sproede = SproedesVersagen(querschnitt, richtung, lagen, nachweis)
+    sproede.still = not schalter_aus(eintrag.sproede)
+    eintragen("sproede", kennung_x, sproede)
+
+    biegung = ZwaengungBiegung(
+        querschnitt, richtung, lagen,
+        anforderung=eintrag.rissanforderung, kriechzahl=eintrag.kriechzahl)
+    biegung.still = not schalter_aus(eintrag.zwaengung_biegung)
+    eintragen("zwaengung_biegung", kennung_x, biegung)
+
+    zwang = Rissnormalkraft(
+        querschnitt, richtung,
+        anforderung=eintrag.rissanforderung,
+        begrenzt=eintrag.zwaengung_begrenzt)
+    zwang.still = not schalter_aus(eintrag.zwaengung)
+    eintragen("rissnormalkraft", kennung_x, zwang)
+
+    duktilitaet = Duktilitaet(querschnitt, lagen)
+    duktilitaet.still = not schalter_aus(eintrag.duktilitaet)
+    eintragen("duktilitaet", eintrag.kennung, duktilitaet)
+
+
+def _spannungsnachweise(eintrag: QuerschnittEintrag,
+                        querschnitt: Plattenquerschnitt, richtung: Richtung,
+                        eintragen: Eintragen) -> None:
+    """
+    Die Stahlspannung, zweimal: aus der Rissbreite unter quasi-staendiger
+    Einwirkung (bei jeder Anforderung) und gegen Fliessen unter haeufiger
+    (nur bei erhoehter und hoher). Welche wann gilt, weiss die Grenze selbst.
+    """
+    for feld, liste, grenze in (
+            ("spannung_riss", eintrag.quasistaendig, GrenzeAusRissbreite),
+            ("spannung", eintrag.haeufig, GrenzeGegenFliessen)):
+        if not grenze.gilt_bei(eintrag.rissanforderung):
+            continue
+        faelle, laute = _gebrauchsfaelle(eintrag.kombinationen, liste)
+        if not faelle:
+            continue
+        spannung = Spannungsbegrenzung(
+            querschnitt, richtung, faelle,
+            grenze=grenze(querschnitt, richtung, eintrag.rissanforderung))
+        spannung.stillstellen([f.name for f in faelle], laute)
+        eintragen(feld, f"{eintrag.kennung}.x", spannung)
 
 
 def _baustoff(eintrag: MaterialEintrag, symbol_index: str) -> Baustoff:

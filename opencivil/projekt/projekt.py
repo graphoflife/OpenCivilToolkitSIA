@@ -22,8 +22,9 @@ from typing import Any, Dict, List, Mapping, Sequence, Union
 
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
 from opencivil.projekt.eintraege import (
-    Beschreibung, MaterialEintrag, PostenEintrag, ProjektFehler,
+    Beschreibung, MaterialEintrag, PostenEintrag,
 )
+from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.aufbau import Aufbau, aufbauen
 

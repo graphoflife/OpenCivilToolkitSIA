@@ -20,9 +20,11 @@ from opencivil.querschnitt.platte import K_C, KRIECHZAHL, LAGENZAHL, Richtung
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste,
     KnickEintrag, KombinationEintrag, LageEintrag, PostenEintrag,
-    ProjektFehler, QuerkraftbewehrungEintrag, SpannungsfallEintrag,
-    eindeutig, gebrauchsliste_roh, _lagen_aus_altem_format, _pflichtfeld,
-    _rissanforderung_aus, _schalter_aus, _teilungen_aus, _zahl,
+    QuerkraftbewehrungEintrag, SpannungsfallEintrag, eindeutig,
+)
+from opencivil.projekt.lesen import (
+    ProjektFehler, gebrauchsliste_roh, lagen_aus_altem_format, pflichtfeld,
+    rissanforderung_aus, schalter_aus, teilungen_aus, zahl,
 )
 
 
@@ -323,38 +325,38 @@ class QuerschnittEintrag(Beschreibung):
     def aus_dict(cls, d: Mapping[str, Any]) -> "QuerschnittEintrag":
         lagen = d.get("lagen")
         if lagen is None and ("lagen_unten" in d or "lagen_oben" in d):
-            lagen = _lagen_aus_altem_format(d)
-        kennung = _pflichtfeld(d, "kennung", "Ein Querschnitt")
+            lagen = lagen_aus_altem_format(d)
+        kennung = pflichtfeld(d, "kennung", "Ein Querschnitt")
         return cls(
             kennung=kennung,
             name=str(d.get("name") or kennung),
-            beton=_pflichtfeld(d, "beton", f"Der Querschnitt '{kennung}'"),
-            h=_zahl(d, "h", 300.0),
-            b=_zahl(d, "b", 1000.0),
-            ueberdeckung_unten=_zahl(d, "ueberdeckung_unten", 30.0),
-            ueberdeckung_oben=_zahl(d, "ueberdeckung_oben", 30.0),
-            d_max=_zahl(d, "d_max", 32.0),
-            einlagenhoehe=_zahl(d, "einlagenhoehe", 0.0),
-            k_c=_zahl(d, "k_c", K_C),
+            beton=pflichtfeld(d, "beton", f"Der Querschnitt '{kennung}'"),
+            h=zahl(d, "h", 300.0),
+            b=zahl(d, "b", 1000.0),
+            ueberdeckung_unten=zahl(d, "ueberdeckung_unten", 30.0),
+            ueberdeckung_oben=zahl(d, "ueberdeckung_oben", 30.0),
+            d_max=zahl(d, "d_max", 32.0),
+            einlagenhoehe=zahl(d, "einlagenhoehe", 0.0),
+            k_c=zahl(d, "k_c", K_C),
             querkraftbewehrung=QuerkraftbewehrungEintrag.aus_dict(
                 d.get("querkraftbewehrung") or {}),
-            duktilitaet=_schalter_aus(d.get("duktilitaet")),
+            duktilitaet=schalter_aus(d.get("duktilitaet")),
             automatik_modus=str(d.get("automatik_modus") or "grund_ohne"),
-            automatik_teilungen=_teilungen_aus(d.get("automatik_teilungen"),
+            automatik_teilungen=teilungen_aus(d.get("automatik_teilungen"),
                                                (150.0,)),
-            automatik_mindestdurchmesser=_zahl(
+            automatik_mindestdurchmesser=zahl(
                 d, "automatik_mindestdurchmesser", 10.0),
             automatik_querkraft=bool(d.get("automatik_querkraft", False)),
-            automatik_querkraft_teilungen=_teilungen_aus(
+            automatik_querkraft_teilungen=teilungen_aus(
                 d.get("automatik_querkraft_teilungen"), (100.0, 150.0, 200.0)),
-            sproede=_schalter_aus(d.get("sproede"), d.get("sproede_lagen")),
-            zwaengung_biegung=_schalter_aus(
+            sproede=schalter_aus(d.get("sproede"), d.get("sproede_lagen")),
+            zwaengung_biegung=schalter_aus(
                 d.get("zwaengung_biegung"), d.get("zwaengung_biegung_lagen")),
-            rissanforderung=_rissanforderung_aus(d.get("rissanforderung")),
+            rissanforderung=rissanforderung_aus(d.get("rissanforderung")),
             beschreibung=str(d.get("beschreibung") or ""),
-            kriechzahl=_zahl(d, "kriechzahl", KRIECHZAHL),
+            kriechzahl=zahl(d, "kriechzahl", KRIECHZAHL),
             # Aus x und y wird einer: nachgewiesen wird nur noch x.
-            zwaengung=_schalter_aus(d.get("zwaengung"), d.get("zwaengung_x"),
+            zwaengung=schalter_aus(d.get("zwaengung"), d.get("zwaengung_x"),
                                     d.get("zwaengung_y")),
             zwaengung_begrenzt=bool(d.get("zwaengung_begrenzt", False)),
             haeufig=Gebrauchsliste.aus_dict(

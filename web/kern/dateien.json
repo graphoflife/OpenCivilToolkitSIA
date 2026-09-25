@@ -36,6 +36,7 @@
     "opencivil/projekt/__init__.py",
     "opencivil/projekt/aufbau.py",
     "opencivil/projekt/eintraege.py",
+    "opencivil/projekt/lesen.py",
     "opencivil/projekt/platte.py",
     "opencivil/projekt/projekt.py",
     "opencivil/querschnitt/__init__.py",

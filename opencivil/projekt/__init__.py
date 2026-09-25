@@ -11,15 +11,16 @@ AUFTEILUNG:
 Frueher eine Datei mit knapp zweitausend Zeilen und drei Aufgaben. Jetzt je
 Aufgabe ein Modul::
 
-    eintraege.py   die Teile: Material, Lagen, Buegel, Lastfaelle -- und
-                   die Leser fuer Zahlen, Schalter und alte Dateiformate
+    lesen.py       was in einer Datei stehen darf und wie es gelesen wird,
+                   samt den alten Formaten
+    eintraege.py   die Teile: Material, Lagen, Buegel, Lastfaelle
     platte.py      eine Platte mit ihren vier Lagen und allen Schaltern
     projekt.py     das Ganze: Zugriff, Rechnen ohne Oberflaeche, Pruefung,
                    Speichern, das Beispiel
     aufbau.py      aus der Beschreibung ein Rechenwerk
 
-Die Abhaengigkeit laeuft in eine Richtung: eintraege <- platte <- aufbau <-
-projekt. Wer von aussen kommt, importiert aus dem Paket, nicht aus den
+Die Abhaengigkeit laeuft in eine Richtung: lesen <- eintraege <- platte <-
+aufbau <- projekt. Wer von aussen kommt, importiert aus dem Paket, nicht aus den
 Modulen: ``from opencivil.projekt import Projekt``.
 
 NORMSORTE ODER EIGENES MATERIAL:
@@ -36,12 +37,14 @@ kNm, ...) -- also so, wie der Benutzer sie eintippt. Die Umrechnung in SI
 geschieht erst beim Aufbau, ueber die :class:`Groesse`.
 """
 
+from opencivil.projekt.lesen import (
+    BEIDE_RICHTUNGEN, RISSANFORDERUNGEN, ProjektFehler, sorten,
+)
 from opencivil.projekt.eintraege import (
-    BEIDE_RICHTUNGEN, HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, RISSANFORDERUNGEN,
-    Beschreibung, GebrauchsfallEintrag, Gebrauchsliste, KnickEintrag,
-    KombinationEintrag, LageEintrag, MaterialEintrag, PostenEintrag,
-    ProjektFehler, QuerkraftbewehrungEintrag, SpannungsfallEintrag,
-    abgeleiteter_fallname, sorten,
+    HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, GebrauchsfallEintrag,
+    Gebrauchsliste, KnickEintrag, KombinationEintrag, LageEintrag,
+    MaterialEintrag, PostenEintrag, QuerkraftbewehrungEintrag,
+    SpannungsfallEintrag, abgeleiteter_fallname,
 )
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.aufbau import Aufbau, aufbauen
