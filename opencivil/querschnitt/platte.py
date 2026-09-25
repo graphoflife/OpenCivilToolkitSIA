@@ -47,7 +47,7 @@ from opencivil.core.einheiten import (
 )
 from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Abschnitt, Protokoll, Zwischenwerte
-from opencivil.core.wert import WertDef, kennung_aus
+from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.material.basis import Baustoff
 
 #: Anzahl Lagen einer Platte. Bewusst fest -- eine Platte hat unten und oben je
@@ -319,6 +319,23 @@ def posten_index(lage: "Bewehrungslage", art: Postenart) -> str:
     früher oder später auseinander.
     """
     return f"{lage.nummer},{lage.richtung.value},{art.kuerzel}"
+
+
+def protokoll_statische_hoehe(
+    p: Protokoll, d: Wert, *, h: Wert, z: Wert, von_unten: bool,
+) -> None:
+    """
+    Die statische Hoehe einer gezogenen Lage, gemessen ab dem gedrueckten Rand.
+
+    Eine untere Lage misst ab der Oberkante, ``d = z``; eine obere ab der
+    Unterkante, ``d = h - z``. Mehrere Nachweise brauchen diese Zeile -- steht
+    sie an einer Stelle, sagt «unten» in allen dasselbe.
+    """
+    seite, rand = ("unten", "oben") if von_unten else ("oben", "unten")
+    vorlage, eingaben = (("@z", {"z": z}) if von_unten
+                         else ("@h - @z", {"h": h, "z": z}))
+    p.formel(d, vorlage, eingaben,
+             titel=f"Statische Höhe der Lage {seite}, ab dem gedrückten Rand {rand}")
 
 
 @dataclass(frozen=True)

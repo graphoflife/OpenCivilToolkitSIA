@@ -378,7 +378,7 @@ class Formel(Berechnung):
         empirisch = None
         if isinstance(roh, EmpirischesErgebnis):
             groesse = roh.wert
-            empirisch = {e.name: e.erwartete_einheit for e in roh.einsetzungen}
+            empirisch = roh.einheiten
         elif isinstance(roh, Groesse):
             groesse = roh
         else:

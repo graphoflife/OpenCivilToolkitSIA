@@ -312,65 +312,85 @@ Beide Anteile gelten je Laufmeter, wie die Querkraft selbst. Gesucht wird ganzgr
 
 \noindent\textbf{Teilung in y aus der Stabzahl}
 \begin{equation*}
-s_{V,y} = \frac{b}{n_{V,y}} = \frac{1000}{5} = 200.0\,\mathrm{mm}
+s_{V,y} = \frac{b}{n_{V,y}} = \frac{1000\,\mathrm{mm}}{5} = 200\,\mathrm{mm}
 \end{equation*}
 \subsubsection{Nachweis – Feld}
 \noindent\textbf{Einwirkung}
 \begin{equation*}
 V_{Ed} = 80\,\mathrm{kN}/\mathrm{m} \qquad M_{Ed} = 150\,\mathrm{kNm} \qquad N_{Ed} = 0\,\mathrm{kN}
 \end{equation*}
-\noindent\textbf{Statische Höhe der gezogenen Bewehrung (unten)}
+\noindent\textbf{Statische Höhe der Lage unten, ab dem gedrückten Rand oben}
 \begin{equation*}
-d = 249.0\,\mathrm{mm}
+d = d_{2,x,g} = 249\,\mathrm{mm}
 \end{equation*}
 Zwischen α = 30° und α = 45° ganzgradig durchgerechnet; den grössten Widerstand liefert α = 30°.
 
 \noindent\textbf{Widerstand der Bügel}
 \begin{equation*}
-V_{Rd,s} = \frac{A_{\varnothing,V}}{s_{V,x} \cdot s_{V,y}} \cdot 0.9 \cdot d \cdot f_{yd} \cdot \cot\alpha
-= \frac{50.3\,\mathrm{mm}^{2}}{200\,\mathrm{mm} \cdot 200\,\mathrm{mm}} \cdot 0.9 \cdot 249.0\,\mathrm{mm} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \cot 30^{\circ} = 212.1\,\mathrm{kN}/\mathrm{m}
+\begin{aligned}
+  V_{Rd,s} &= \frac{A_{\varnothing,V}}{s_{V,x} \cdot s_{V,y}} \cdot 0.9 \cdot d \cdot f_{yd} \cdot \cot \alpha \\
+  &= \frac{50.3\,\mathrm{mm}^{2}}{200\,\mathrm{mm} \cdot 200\,\mathrm{mm}} \cdot 0.9 \cdot 249\,\mathrm{mm} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \cot 30{}^{\circ} \\
+  &= 212.1\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
 \end{equation*}
 \noindent\textbf{Widerstand der Druckdiagonalen}
 \begin{equation*}
-V_{Rd,c} = 0.9 \cdot d \cdot k_c \cdot f_{cd} \cdot \sin\alpha \cdot \cos\alpha
-= 0.9 \cdot 249.0\,\mathrm{mm} \cdot 0.55 \cdot 20.0\,\mathrm{N}/\mathrm{mm}^{2} \cdot \sin 30^{\circ} \cdot \cos 30^{\circ} = 1067.4\,\mathrm{kN}/\mathrm{m}
+\begin{aligned}
+  V_{Rd,c} &= 0.9 \cdot d \cdot k_c \cdot f_{cd} \cdot \sin \alpha \cdot \cos \alpha \\
+  &= 0.9 \cdot 249\,\mathrm{mm} \cdot 0.55 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} \cdot \sin 30{}^{\circ} \cdot \cos 30{}^{\circ} \\
+  &= 1067.4\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
 \end{equation*}
 \noindent\textbf{Querkraftwiderstand}
 \begin{equation*}
-V_{Rd} = \min\left[V_{Rd,s};\ V_{Rd,c}\right] = \min\left[212.1\,\mathrm{kN}/\mathrm{m};\ 1067.4\,\mathrm{kN}/\mathrm{m}\right] = 212.1\,\mathrm{kN}/\mathrm{m}
+\begin{aligned}
+  V_{Rd,x}(M_{Ed} = 150\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) &= \min\left[V_{Rd,s};\ V_{Rd,c}\right] \\
+  &= \min\left[212.1\,\mathrm{kN}/\mathrm{m};\ 1067.4\,\mathrm{kN}/\mathrm{m}\right] \\
+  &= 212.1\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,V,x} = \frac{V_{Rd}}{\left|V_{Ed}\right|} = \frac{212.1\,\mathrm{kN}/\mathrm{m}}{80.0\,\mathrm{kN}/\mathrm{m}} = 2.65 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,V,x,\text{Feld}} = \frac{V_{Rd,x}}{V_{Ed,x}} = \frac{212.1\,\mathrm{kN}/\mathrm{m}}{80\,\mathrm{kN}/\mathrm{m}} = 2.65 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \subsubsection{Nachweis – Stütze}
 \noindent\textbf{Einwirkung}
 \begin{equation*}
 V_{Ed} = 60\,\mathrm{kN}/\mathrm{m} \qquad M_{Ed} = -60\,\mathrm{kNm} \qquad N_{Ed} = 0\,\mathrm{kN}
 \end{equation*}
-\noindent\textbf{Statische Höhe der gezogenen Bewehrung (oben)}
+\noindent\textbf{Statische Höhe der Lage oben, ab dem gedrückten Rand unten}
 \begin{equation*}
-d = 252.0\,\mathrm{mm}
+d = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
 \end{equation*}
 Zwischen α = 30° und α = 45° ganzgradig durchgerechnet; den grössten Widerstand liefert α = 30°.
 
 \noindent\textbf{Widerstand der Bügel}
 \begin{equation*}
-V_{Rd,s} = \frac{A_{\varnothing,V}}{s_{V,x} \cdot s_{V,y}} \cdot 0.9 \cdot d \cdot f_{yd} \cdot \cot\alpha
-= \frac{50.3\,\mathrm{mm}^{2}}{200\,\mathrm{mm} \cdot 200\,\mathrm{mm}} \cdot 0.9 \cdot 252.0\,\mathrm{mm} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \cot 30^{\circ} = 214.6\,\mathrm{kN}/\mathrm{m}
+\begin{aligned}
+  V_{Rd,s} &= \frac{A_{\varnothing,V}}{s_{V,x} \cdot s_{V,y}} \cdot 0.9 \cdot d \cdot f_{yd} \cdot \cot \alpha \\
+  &= \frac{50.3\,\mathrm{mm}^{2}}{200\,\mathrm{mm} \cdot 200\,\mathrm{mm}} \cdot 0.9 \cdot 252\,\mathrm{mm} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \cot 30{}^{\circ} \\
+  &= 214.6\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
 \end{equation*}
 \noindent\textbf{Widerstand der Druckdiagonalen}
 \begin{equation*}
-V_{Rd,c} = 0.9 \cdot d \cdot k_c \cdot f_{cd} \cdot \sin\alpha \cdot \cos\alpha
-= 0.9 \cdot 252.0\,\mathrm{mm} \cdot 0.55 \cdot 20.0\,\mathrm{N}/\mathrm{mm}^{2} \cdot \sin 30^{\circ} \cdot \cos 30^{\circ} = 1080.3\,\mathrm{kN}/\mathrm{m}
+\begin{aligned}
+  V_{Rd,c} &= 0.9 \cdot d \cdot k_c \cdot f_{cd} \cdot \sin \alpha \cdot \cos \alpha \\
+  &= 0.9 \cdot 252\,\mathrm{mm} \cdot 0.55 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} \cdot \sin 30{}^{\circ} \cdot \cos 30{}^{\circ} \\
+  &= 1080.3\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
 \end{equation*}
 \noindent\textbf{Querkraftwiderstand}
 \begin{equation*}
-V_{Rd} = \min\left[V_{Rd,s};\ V_{Rd,c}\right] = \min\left[214.6\,\mathrm{kN}/\mathrm{m};\ 1080.3\,\mathrm{kN}/\mathrm{m}\right] = 214.6\,\mathrm{kN}/\mathrm{m}
+\begin{aligned}
+  V_{Rd,x}(M_{Ed} = -60\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) &= \min\left[V_{Rd,s};\ V_{Rd,c}\right] \\
+  &= \min\left[214.6\,\mathrm{kN}/\mathrm{m};\ 1080.3\,\mathrm{kN}/\mathrm{m}\right] \\
+  &= 214.6\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,V,x} = \frac{V_{Rd}}{\left|V_{Ed}\right|} = \frac{214.6\,\mathrm{kN}/\mathrm{m}}{60.0\,\mathrm{kN}/\mathrm{m}} = 3.58 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,V,x,\text{Stütze}} = \frac{V_{Rd,x}}{V_{Ed,x}} = \frac{214.6\,\mathrm{kN}/\mathrm{m}}{60\,\mathrm{kN}/\mathrm{m}} = 3.58 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \subsection{Duktilität}
 Die Druckzone muss schlank bleiben, damit der Stahl lange fliesst, bevor der Beton versagt: der Querschnitt kündigt sein Versagen an. Gerechnet wird die Druckzonenhöhe bei reiner Biegung, je Lage einzeln.
@@ -1260,86 +1280,99 @@ e_{Einlage} = 40\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Beiwert der Gesteinskörnung} \hfill \normref{SIA 262:2025, 4.3.3.2.1}
 \begin{equation*}
-k_g = \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right]
-= \max\left[1.20;\ \frac{48}{16 + 32 \cdot \min\left[1.0;\ \left(\frac{60}{30}\right)^{2}\right]}\right] = \max\left[1.20;\ 1.000\right] = 1.200
+\begin{aligned}
+  k_g &= \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right] \\
+  &= \max\left[1.20;\ \frac{48}{16 + 32 \cdot \min\left[1.0;\ \left(\frac{60}{30}\right)^{2}\right]}\right] \\
+  &= 1.2 \quad \left(D_{max}\ \text{in}\ \mathrm{mm},\ f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+\end{aligned}
 \end{equation*}
 \subsubsection{Querkraftnachweis – Feld}
 \noindent\textbf{Einwirkung}
 \begin{equation*}
 V_{Ed} = 40\,\mathrm{kN}/\mathrm{m} \qquad M_{Ed} = 80\,\mathrm{kNm} \qquad N_{Ed} = 0\,\mathrm{kN}
 \end{equation*}
-\noindent\textbf{Statische Höhe der gezogenen Bewehrung}
+\noindent\textbf{Statische Höhe der Lage unten, ab dem gedrückten Rand oben}
 \begin{equation*}
-d = 165.0\,\mathrm{mm}\qquad \text{(Zug unten)}
+d = d_{1,x,g} = 165\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Wirksame Höhe, um die Einlage vermindert}
 \begin{equation*}
-d_v = d - e_{Einlage} = 165.0\,\mathrm{mm} - 40.0\,\mathrm{mm} = 125.0\,\mathrm{mm}
+d_v = d - e_{Einlage} = 165\,\mathrm{mm} - 40\,\mathrm{mm} = 125\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Dekompressionsmoment}
 \begin{equation*}
-m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} = \frac{\left|0.0\right| \cdot 200\,\mathrm{mm}}{6} = 0.0\,\mathrm{kNm/m}
+m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} = \frac{\left|\min(0\,\mathrm{kN};\ 0)\right| \cdot 200\,\mathrm{mm}}{6} = 0\,\mathrm{kNm}
 \end{equation*}
-\noindent\textbf{Momentenwiderstand bei N\_Ed = 0.0 kN}
+\noindent\textbf{Momentenwiderstand bei N\_Ed = 0 kN}
 \begin{equation*}
 M_{Rd} = M_{Rd}(N_{Ed}=0)^{+} = 36.3\,\mathrm{kNm}
 \end{equation*}
+|m\_Ed| = 80 kNm liegt über m\_Rd(N\_Ed) = 36.3 kNm: die Bewehrung fliesst. Die Dehnung folgt dann nicht mehr dem Moment, sie ist fest.
+
 \noindent\textbf{Dehnung auf halber Höhe}
 \begin{equation*}
-\varepsilon_v = \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| - m_{Dd}\right)}{E_s \cdot \left(\left|m_{Rd}(N_{Ed})\right| - m_{Dd}\right)}
-= \frac{435 \cdot \left(80.0 - 0.0\right)}{200000 \cdot \left(36.3 - 0.0\right)} = 3.261\,\text{‰}
+\varepsilon_v = 1.5 \cdot \frac{f_{yd}}{E_s} = 1.5 \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 3.261\,\text{‰}
 \end{equation*}
 \noindent\textbf{Beiwert für die statische Höhe}
 \begin{equation*}
-k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g} = \frac{1}{1 + 3.2609 \cdot 10^{-3} \cdot 165.0 \cdot 1.200} = 0.6077
+k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g} = \frac{1}{1 + 3.261\,\text{‰} \cdot 165 \cdot 1.2} = 0.6077 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
 \end{equation*}
 \noindent\textbf{Querkraftwiderstand} \hfill \normref{SIA 262:2025, 4.3.3.2.1}
 \begin{equation*}
-V_{Rd,x}(M_{Ed} = 80\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = k_d \cdot \tau_{cd} \cdot d_v
-= 0.6077 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 125.0\,\mathrm{mm} = 83.2\,\mathrm{kN}/\mathrm{m}
+\begin{aligned}
+  V_{Rd,x}(M_{Ed} = 80\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) &= k_d \cdot \tau_{cd} \cdot d_v \\
+  &= 0.6077 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 125\,\mathrm{mm} \\
+  &= 83.2\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,V,x} = \frac{V_{Rd}}{\left|V_{Ed}\right|} = \frac{83.2\,\mathrm{kN}/\mathrm{m}}{40.0\,\mathrm{kN}/\mathrm{m}} = 2.08 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,V,x,\text{Feld}} = \frac{V_{Rd,x}}{V_{Ed,x}} = \frac{83.2\,\mathrm{kN}/\mathrm{m}}{40\,\mathrm{kN}/\mathrm{m}} = 2.08 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \subsubsection{Querkraftnachweis – Rand}
 \noindent\textbf{Einwirkung}
 \begin{equation*}
 V_{Ed} = 30\,\mathrm{kN}/\mathrm{m} \qquad M_{Ed} = 20\,\mathrm{kNm} \qquad N_{Ed} = 0\,\mathrm{kN}
 \end{equation*}
-\noindent\textbf{Statische Höhe der gezogenen Bewehrung}
+\noindent\textbf{Statische Höhe der Lage unten, ab dem gedrückten Rand oben}
 \begin{equation*}
-d = 165.0\,\mathrm{mm}\qquad \text{(Zug unten)}
+d = d_{1,x,g} = 165\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Wirksame Höhe, um die Einlage vermindert}
 \begin{equation*}
-d_v = d - e_{Einlage} = 165.0\,\mathrm{mm} - 40.0\,\mathrm{mm} = 125.0\,\mathrm{mm}
+d_v = d - e_{Einlage} = 165\,\mathrm{mm} - 40\,\mathrm{mm} = 125\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Dekompressionsmoment}
 \begin{equation*}
-m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} = \frac{\left|0.0\right| \cdot 200\,\mathrm{mm}}{6} = 0.0\,\mathrm{kNm/m}
+m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} = \frac{\left|\min(0\,\mathrm{kN};\ 0)\right| \cdot 200\,\mathrm{mm}}{6} = 0\,\mathrm{kNm}
 \end{equation*}
-\noindent\textbf{Momentenwiderstand bei N\_Ed = 0.0 kN}
+\noindent\textbf{Momentenwiderstand bei N\_Ed = 0 kN}
 \begin{equation*}
 M_{Rd} = M_{Rd}(N_{Ed}=0)^{+} = 36.3\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Dehnung auf halber Höhe}
 \begin{equation*}
-\varepsilon_v = \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| - m_{Dd}\right)}{E_s \cdot \left(\left|m_{Rd}(N_{Ed})\right| - m_{Dd}\right)}
-= \frac{435 \cdot \left(20.0 - 0.0\right)}{200000 \cdot \left(36.3 - 0.0\right)} = 1.199\,\text{‰}
+\begin{aligned}
+  \varepsilon_v &= \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| - m_{Dd}\right)}{E_s \cdot \left(\left|m_{Rd}(N_{Ed})\right| - m_{Dd}\right)} \\
+  &= \frac{435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(\left|20\,\mathrm{kNm}\right| - 0\,\mathrm{kNm}\right)}{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(\left|36.3\,\mathrm{kNm}\right| - 0\,\mathrm{kNm}\right)} \\
+  &= 1.199\,\text{‰}
+\end{aligned}
 \end{equation*}
 \noindent\textbf{Beiwert für die statische Höhe}
 \begin{equation*}
-k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g} = \frac{1}{1 + 1.1988 \cdot 10^{-3} \cdot 165.0 \cdot 1.200} = 0.8082
+k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g} = \frac{1}{1 + 1.199\,\text{‰} \cdot 165 \cdot 1.2} = 0.8082 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
 \end{equation*}
 \noindent\textbf{Querkraftwiderstand} \hfill \normref{SIA 262:2025, 4.3.3.2.1}
 \begin{equation*}
-V_{Rd,x}(M_{Ed} = 20\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = k_d \cdot \tau_{cd} \cdot d_v
-= 0.8082 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 125.0\,\mathrm{mm} = 110.7\,\mathrm{kN}/\mathrm{m}
+\begin{aligned}
+  V_{Rd,x}(M_{Ed} = 20\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) &= k_d \cdot \tau_{cd} \cdot d_v \\
+  &= 0.8082 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 125\,\mathrm{mm} \\
+  &= 110.7\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,V,x} = \frac{V_{Rd}}{\left|V_{Ed}\right|} = \frac{110.7\,\mathrm{kN}/\mathrm{m}}{30.0\,\mathrm{kN}/\mathrm{m}} = 3.69 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,V,x,\text{Rand}} = \frac{V_{Rd,x}}{V_{Ed,x}} = \frac{110.7\,\mathrm{kN}/\mathrm{m}}{30\,\mathrm{kN}/\mathrm{m}} = 3.69 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \subsection{Stahlspannung unter quasi-ständiger Einwirkung – x-Richtung}
 Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf, im Druck rechnet er linear mit dem wirksamen Modul. Gezählt wird nur gezogene Bewehrung.
@@ -1627,47 +1660,56 @@ e_{Einlage} = 0\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Beiwert der Gesteinskörnung} \hfill \normref{SIA 262:2025, 4.3.3.2.1}
 \begin{equation*}
-k_g = \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right]
-= \max\left[1.20;\ \frac{48}{16 + 32 \cdot \min\left[1.0;\ \left(\frac{60}{30}\right)^{2}\right]}\right] = \max\left[1.20;\ 1.000\right] = 1.200
+\begin{aligned}
+  k_g &= \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right] \\
+  &= \max\left[1.20;\ \frac{48}{16 + 32 \cdot \min\left[1.0;\ \left(\frac{60}{30}\right)^{2}\right]}\right] \\
+  &= 1.2 \quad \left(D_{max}\ \text{in}\ \mathrm{mm},\ f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+\end{aligned}
 \end{equation*}
 \subsubsection{Querkraftnachweis – Feld}
 \noindent\textbf{Einwirkung}
 \begin{equation*}
 V_{Ed} = 50\,\mathrm{kN}/\mathrm{m} \qquad M_{Ed} = 40\,\mathrm{kNm} \qquad N_{Ed} = 0\,\mathrm{kN}
 \end{equation*}
-\noindent\textbf{Statische Höhe der gezogenen Bewehrung}
+\noindent\textbf{Statische Höhe der Lage unten, ab dem gedrückten Rand oben}
 \begin{equation*}
-d = 204.0\,\mathrm{mm}\qquad \text{(Zug unten)}
+d = d_{2,x,g} = 204\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Wirksame Höhe (Einlage nicht massgebend)}
 \begin{equation*}
-d_v = d = 204.0\,\mathrm{mm}
+d_v = d = 204\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Dekompressionsmoment}
 \begin{equation*}
-m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} = \frac{\left|0.0\right| \cdot 250\,\mathrm{mm}}{6} = 0.0\,\mathrm{kNm/m}
+m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} = \frac{\left|\min(0\,\mathrm{kN};\ 0)\right| \cdot 250\,\mathrm{mm}}{6} = 0\,\mathrm{kNm}
 \end{equation*}
-\noindent\textbf{Momentenwiderstand bei N\_Ed = 0.0 kN}
+\noindent\textbf{Momentenwiderstand bei N\_Ed = 0 kN}
 \begin{equation*}
 M_{Rd} = M_{Rd}(N_{Ed}=0)^{+} = 64.2\,\mathrm{kNm}
 \end{equation*}
 \noindent\textbf{Dehnung auf halber Höhe}
 \begin{equation*}
-\varepsilon_v = \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| - m_{Dd}\right)}{E_s \cdot \left(\left|m_{Rd}(N_{Ed})\right| - m_{Dd}\right)}
-= \frac{435 \cdot \left(40.0 - 0.0\right)}{200000 \cdot \left(64.2 - 0.0\right)} = 1.355\,\text{‰}
+\begin{aligned}
+  \varepsilon_v &= \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| - m_{Dd}\right)}{E_s \cdot \left(\left|m_{Rd}(N_{Ed})\right| - m_{Dd}\right)} \\
+  &= \frac{435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(\left|40\,\mathrm{kNm}\right| - 0\,\mathrm{kNm}\right)}{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(\left|64.2\,\mathrm{kNm}\right| - 0\,\mathrm{kNm}\right)} \\
+  &= 1.355\,\text{‰}
+\end{aligned}
 \end{equation*}
 \noindent\textbf{Beiwert für die statische Höhe}
 \begin{equation*}
-k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g} = \frac{1}{1 + 1.3547 \cdot 10^{-3} \cdot 204.0 \cdot 1.200} = 0.7510
+k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g} = \frac{1}{1 + 1.355\,\text{‰} \cdot 204 \cdot 1.2} = 0.751 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
 \end{equation*}
 \noindent\textbf{Querkraftwiderstand} \hfill \normref{SIA 262:2025, 4.3.3.2.1}
 \begin{equation*}
-V_{Rd,x}(M_{Ed} = 40\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = k_d \cdot \tau_{cd} \cdot d_v
-= 0.7510 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 204.0\,\mathrm{mm} = 167.8\,\mathrm{kN}/\mathrm{m}
+\begin{aligned}
+  V_{Rd,x}(M_{Ed} = 40\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) &= k_d \cdot \tau_{cd} \cdot d_v \\
+  &= 0.751 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 204\,\mathrm{mm} \\
+  &= 167.8\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
 \end{equation*}
 \noindent\textbf{Erfüllungsgrad}
 \begin{equation*}
-\alpha_{eff,V,x} = \frac{V_{Rd}}{\left|V_{Ed}\right|} = \frac{167.8\,\mathrm{kN}/\mathrm{m}}{50.0\,\mathrm{kN}/\mathrm{m}} = 3.36 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,V,x,\text{Feld}} = \frac{V_{Rd,x}}{V_{Ed,x}} = \frac{167.8\,\mathrm{kN}/\mathrm{m}}{50\,\mathrm{kN}/\mathrm{m}} = 3.36 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
 \subsection{Plattenanalyse: Ohne x}
 \subsection{Ohne Bewehrung – x-Richtung}

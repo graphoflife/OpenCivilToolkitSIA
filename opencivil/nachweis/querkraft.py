@@ -44,8 +44,9 @@ der ``V_Rd = 0`` setzte.
 
 EINHEITEN:
 Die Formeln der Norm sind dimensionell inhomogen -- ``d`` und ``D_max`` gehen
-in Millimeter ein, ``f_ck`` in N/mm^2. Sie laufen deshalb ueber
-:func:`opencivil.core.einheiten.empirisch`, das diese Voraussetzung erzwingt.
+in Millimeter ein, ``f_ck`` in N/mm^2. ``k_g`` laeuft deshalb ueber
+:func:`opencivil.core.einheiten.empirisch`, das diese Voraussetzung erzwingt;
+``k_d`` rechnet ``d`` in Millimeter um, und die Herleitung sagt es dazu.
 ``V_Rd`` ergibt sich in N/mm, also kN/m -- eine Querkraft je Laufmeter.
 """
 
@@ -56,19 +57,19 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_als_text,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_formel,
 )
 from opencivil.core.einheiten import (
-    EINHEITSLOS, KN, KN_PRO_M, KNM, MM, N_PRO_MM2, Groesse, empirisch,
+    EINHEITSLOS, GRAD, KN, KN_PRO_M, KNM, MM, N_PRO_MM2, EmpirischesErgebnis,
+    Groesse, empirisch,
 )
-from opencivil.core.latex import als_text
-from opencivil.core.protokoll import Protokoll
-from opencivil.core.wert import WertDef
-from opencivil.core.wert import kennung_aus
-from opencivil.material.basis import mit_index
+from opencivil.core.latex import als_text, angabe
+from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.nachweis.biegung_normalkraft import protokoll_interpolation
 from opencivil.querschnitt.platte import (
-    ALPHA_ZUG, Plattenquerschnitt, Richtung,
+    ALPHA_ZUG, Plattenquerschnitt, Richtung, posten_index,
+    protokoll_statische_hoehe,
 )
 
 #: Unterer Riegel fuer den Beiwert der Gesteinskoernung.
@@ -294,10 +295,21 @@ def _statische_hoehe(
     ``None``, wenn auf der gezogenen Seite nichts liegt. Dann gibt es kein
     ``d``, und ohne ``d`` keinen Querkraftwiderstand.
     """
-    gezogen = [z for z, unten in lagen if unten is moment_positiv]
+    i = _zuglage(lagen, moment_positiv)
+    if i is None:
+        return None
+    z = lagen[i][0]
+    return z if moment_positiv else h - z
+
+
+def _zuglage(
+    lagen: Sequence[Tuple[float, bool]], moment_positiv: bool
+) -> Optional[int]:
+    """Die aeusserste Lage der gezogenen Seite, als Index in ``lagen``."""
+    gezogen = [i for i, (_, unten) in enumerate(lagen) if unten is moment_positiv]
     if not gezogen:
         return None
-    return max(gezogen) if moment_positiv else h - min(gezogen)
+    return (max if moment_positiv else min)(gezogen, key=lambda i: lagen[i][0])
 
 
 @dataclass(frozen=True)
@@ -412,17 +424,6 @@ class Querkraft(Nachweis):
         gehen durch die Argumentliste.
         """
 
-        # Symbole der Baustoffkennwerte -- mit Sortenindex, sobald mehrere
-        # Betone oder Staehle im Projekt sind. Sonst stuende f_yd zweimal mit
-        # verschiedenen Zahlen im selben Bericht.
-        self.s_f_yd = mit_index("f_{yd}", self.posten[0][0].stahl.symbol_index)
-        self.s_E_s = mit_index("E_s", self.posten[0][0].stahl.symbol_index)
-        self.s_tau_cd = mit_index(r"\tau_{cd}", querschnitt.beton.symbol_index)
-        self.s_f_ck = mit_index("f_{ck}", querschnitt.beton.symbol_index)
-        self.s_f_cd = mit_index("f_{cd}", querschnitt.beton.symbol_index)
-        self.s_f_yd_V = mit_index(
-            "f_{yd}", self.buegel.stahl.symbol_index if self.buegel else "")
-
         self.mn = mn_nachweis
         """
         Der M-N-Nachweis derselben Richtung.
@@ -531,10 +532,7 @@ class Querkraft(Nachweis):
         E_s = e.g("E_s").si
         einlage = e.g("einlagenhoehe").si
         m_rd = {f.name: abs(e.g(f"m_Rd_{f.kennung}").si) for f in self.faelle}
-        # Je Posten die Tiefe und auf welcher Seite er liegt -- ohne das
-        # laesst sich die gezogene Bewehrung nicht von der gedrueckten trennen.
-        lagen = [(e.g(f"z_{l.nummer}{a.kuerzel}").si, l.von_unten)
-                 for l, a, _, _, _ in self.posten]
+        lagen = self._lagen(e)
 
         self._protokoll_ansatz(p, e)
 
@@ -548,18 +546,7 @@ class Querkraft(Nachweis):
             f_ck=(f_ck, N_PRO_MM2),
         )
         k_g = k_g_erg.wert.si
-        roh = 48.0 / (16.0 + D_max.in_einheit(MM)
-                      * min(1.0, (60.0 / f_ck.in_einheit(N_PRO_MM2)) ** 2))
-        p.gleichung(
-            rf"k_g = \max\left[{K_G_MINDEST:.2f};\ \frac{{48}}"
-            rf"{{16 + D_{{max}} \cdot \min\left[1.0;\ "
-            rf"\left(\frac{{60}}{{{self.s_f_ck}}}\right)^{{2}}\right]}}\right]"
-            "\n= "
-            rf"\max\left[{K_G_MINDEST:.2f};\ \frac{{48}}"
-            rf"{{16 + {D_max.formatiert(0, MM)} \cdot \min\left[1.0;\ "
-            rf"\left(\frac{{60}}{{{f_ck.formatiert(0, N_PRO_MM2)}}}\right)^{{2}}\right]}}\right]"
-            rf" = \max\left[{K_G_MINDEST:.2f};\ {roh:.3f}\right] = {k_g:.3f}",
-            titel="Beiwert der Gesteinskörnung", referenz="SIA 262:2025, 4.3.3.2.1")
+        beiwert = self._protokoll_k_g(p, e, k_g_erg)
 
         self.beiwerte = Kurvenbeiwerte(
             h=h, lagen=tuple(lagen), einlage=einlage, tau_cd=tau_cd.si,
@@ -573,7 +560,7 @@ class Querkraft(Nachweis):
             erg = self._einen_fall(fall, h, tau_cd, f_yd, E_s, einlage, k_g,
                                    m_rd[fall.name], lagen)
             self.ergebnisse.append(erg)
-            self._protokoll_fall(p, erg, h, tau_cd, f_yd, E_s, einlage, k_g)
+            self._protokoll_fall(p, e, erg, beiwert)
             self._eintragen(erg, ergebnis, urteile)
 
         return ergebnis, urteile
@@ -603,26 +590,46 @@ class Querkraft(Nachweis):
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
             begruendung=erg.begruendung,
             hinweis=erg.hinweis,
-            # Das Vorzeichen der Querkraft spielt keine Rolle -- verglichen
-            # wird der Betrag. Also steht auch der Betrag da; sonst teilte
-            # der Leser den Widerstand durch eine negative Zahl und bekaeme
-            # etwas anderes als den danebenstehenden Erfuellungsgrad. Die
-            # Betragsstriche stehen trotzdem nicht am Symbol: sie sagen
-            # nichts, was die Zahl daneben nicht schon zeigt.
-            einwirkung=WertDef(
-                id=f"{self.id}.{fall.kennung}.V_Ed",
-                symbol=rf"V_{{Ed,{self.richtung.value}}}",
-                einheit=KN_PRO_M, beschreibung="Einwirkung", stellen=1,
-            ).belegen(Groesse.aus_si(abs(fall.V_Ed.si), KN_PRO_M)),
-            # Der Widerstand gilt nur unter genau dieser Einwirkung -- das
-            # gehoert ins Symbol, sonst liest sich V_Rd wie ein Kennwert des
-            # Querschnitts.
-            widerstand=WertDef(
-                id=self.d_v_rd[fall.name].id,
-                symbol=self._widerstandssymbol(fall),
-                einheit=KN_PRO_M, beschreibung="Widerstand", stellen=1,
-            ).belegen(Groesse.aus_si(erg.v_Rd, KN_PRO_M)),
+            einwirkung=self._einwirkung(fall),
+            widerstand=self._widerstand(erg),
         ))
+
+    def _einwirkung(self, fall: Querkraftfall) -> Wert:
+        """
+        Die Querkraft als Betrag -- fuer Urteil und Erfuellungsgrad dieselbe.
+
+        Das Vorzeichen spielt keine Rolle, verglichen wird der Betrag. Also
+        steht auch der Betrag da; sonst teilte der Leser den Widerstand durch
+        eine negative Zahl und bekaeme etwas anderes als den danebenstehenden
+        Erfuellungsgrad. Die Betragsstriche stehen trotzdem nicht am Symbol:
+        sie sagen nichts, was die Zahl daneben nicht schon zeigt.
+        """
+        return WertDef(
+            id=f"{self.id}.{fall.kennung}.V_Ed",
+            symbol=rf"V_{{Ed,{self.richtung.value}}}",
+            einheit=KN_PRO_M, beschreibung="Einwirkung", stellen=1,
+        ).belegen(Groesse.aus_si(abs(fall.V_Ed.si), KN_PRO_M))
+
+    def _widerstand(self, erg: Querkraftergebnis) -> Wert:
+        """
+        Der Widerstand eines Falls -- fuer Urteil und Herleitung derselbe.
+
+        Er gilt nur unter genau dieser Einwirkung; das gehoert ins Symbol,
+        sonst liest sich V_Rd wie ein Kennwert des Querschnitts.
+        """
+        return WertDef(
+            id=self.d_v_rd[erg.fall.name].id,
+            symbol=self._widerstandssymbol(erg.fall),
+            einheit=KN_PRO_M, beschreibung="Widerstand", stellen=1,
+        ).belegen(Groesse.aus_si(erg.v_Rd, KN_PRO_M))
+
+    def _lagen(self, e: Eingaben) -> List[Tuple[float, bool]]:
+        """
+        Je Posten die Tiefe und auf welcher Seite er liegt -- ohne das laesst
+        sich die gezogene Bewehrung nicht von der gedrueckten trennen.
+        """
+        return [(e.g(f"z_{l.nummer}{a.kuerzel}").si, l.von_unten)
+                for l, a, _, _, _ in self.posten]
 
     # -- Mit Querkraftbewehrung ---------------------------------------------
 
@@ -641,8 +648,7 @@ class Querkraft(Nachweis):
         f_yd = e.g("f_yd_V").si
         f_cd = e.g("f_cd").si
         k_c = e.g("k_c").si
-        lagen = [(e.g(f"z_{l.nummer}{a.kuerzel}").si, l.von_unten)
-                 for l, a, _, _, _ in self.posten]
+        lagen = self._lagen(e)
 
         # Die Menge in y: entweder eine Teilung oder eine Stabzahl über die
         # betrachtete Breite. Aus der Zahl wird hier eine Teilung -- die Formel
@@ -654,7 +660,9 @@ class Querkraft(Nachweis):
         self.buegelwerte = Buegelwerte(
             a_s=a_s, s_x=s_x, s_y=s_y, f_yd=f_yd, f_cd=f_cd, k_c=k_c)
 
-        self._protokoll_ansatz_buegel(p, e, s_y)
+        teilung_y = (e["menge_y"] if ueber_teilung else
+                     Zwischenwerte(self.id).laenge("s_y", "s_{V,y}", s_y))
+        self._protokoll_ansatz_buegel(p, e, teilung_y)
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
@@ -665,7 +673,7 @@ class Querkraft(Nachweis):
                 fall, h=h, lagen=lagen, a_s=a_s, s_x=s_x, s_y=s_y,
                 f_yd=f_yd, f_cd=f_cd, k_c=k_c, ueber_teilung=ueber_teilung)
             self.ergebnisse.append(erg)
-            self._protokoll_fall_buegel(p, erg, a_s, s_x, s_y, f_yd, f_cd, k_c)
+            self._protokoll_fall_buegel(p, e, erg, teilung_y)
             self._eintragen(erg, ergebnis, urteile)
 
         return ergebnis, urteile
@@ -866,7 +874,7 @@ class Querkraft(Nachweis):
     # -- Mitschrift mit Bügeln ----------------------------------------------
 
     def _protokoll_ansatz_buegel(
-        self, p: Protokoll, e: Eingaben, s_y: float
+        self, p: Protokoll, e: Eingaben, s_y: Wert
     ) -> None:
         p.titel(f"Querkraft – {self.richtung.beschriftung}")
         p.text(
@@ -875,10 +883,11 @@ class Querkraft(Nachweis):
             "Kleinere aus dem Widerstand der Bügel und dem der Druckdiagonalen; "
             "der Betonanteil ohne Bügel geht nicht zusätzlich ein."
         )
+        s = {name: e[name].symbol for name in ("a_s_V", "s_x", "f_yd_V", "k_c", "f_cd")}
         p.gleichung(
-            rf"V_{{Rd,s}} = \frac{{A_{{\varnothing,V}}}}{{s_{{V,x}} \cdot s_{{V,y}}}} "
-            rf"\cdot 0.9 \cdot d \cdot {self.s_f_yd_V} \cdot \cot\alpha \qquad "
-            rf"V_{{Rd,c}} = 0.9 \cdot d \cdot k_c \cdot {self.s_f_cd} "
+            rf"V_{{Rd,s}} = \frac{{{s['a_s_V']}}}{{{s['s_x']} \cdot {s_y.symbol}}} "
+            rf"\cdot 0.9 \cdot d \cdot {s['f_yd_V']} \cdot \cot\alpha \qquad "
+            rf"V_{{Rd,c}} = 0.9 \cdot d \cdot {s['k_c']} \cdot {s['f_cd']} "
             r"\cdot \sin\alpha \cdot \cos\alpha",
             titel="Ansatz", referenz="SIA 262:2025, 4.3.3.4")
         p.text(
@@ -889,34 +898,22 @@ class Querkraft(Nachweis):
             f"dann auf {ALPHA_ZUG}° gesetzt und α_max notfalls mitgehoben."
         )
         if not self.buegel.ueber_abstand_y:
-            n_y = e.g("menge_y")
-            b = e.g("b")
-            p.gleichung(
-                r"s_{V,y} = \frac{b}{n_{V,y}}"
-                rf" = \frac{{{b.formatiert(0, MM)}}}{{{n_y.formatiert(0)}}}"
-                rf" = {s_y * 1e3:.1f}\,\mathrm{{mm}}",
-                titel="Teilung in y aus der Stabzahl")
+            p.formel(s_y, r"\frac{@b}{@n}", {"b": e["b"], "n": e["menge_y"]},
+                     titel="Teilung in y aus der Stabzahl")
 
     def _protokoll_fall_buegel(
-        self, p: Protokoll, erg: Querkraftergebnis, a_s: float, s_x: float,
-        s_y: float, f_yd: float, f_cd: float, k_c: float,
+        self, p: Protokoll, e: Eingaben, erg: Querkraftergebnis, s_y: Wert,
     ) -> None:
         fall = erg.fall
         p.titel(f"Nachweis – {fall.name}", ebene=3)
-        p.gleichung(
-            rf"V_{{Ed}} = {fall.V_Ed.als_latex(1, KN_PRO_M)} \qquad "
-            rf"M_{{Ed}} = {fall.M_Ed.als_latex(1, KNM)} \qquad "
-            rf"N_{{Ed}} = {fall.N_Ed.als_latex(1, KN)}",
-            titel="Einwirkung")
+        self._protokoll_einwirkung(p, fall)
 
         if erg.massgebend is None:
             p.text(erg.begruendung)
             return
 
-        seite = "unten" if fall.M_Ed.si >= 0 else "oben"
-        p.gleichung(
-            rf"d = {erg.d * 1e3:.1f}\,\mathrm{{mm}}",
-            titel=f"Statische Höhe der gezogenen Bewehrung ({seite})")
+        werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
+        d = self._protokoll_hoehe(p, e, erg, werte)
 
         if erg.zug_hebt_alpha:
             p.text(
@@ -929,54 +926,63 @@ class Querkraft(Nachweis):
             f"Zwischen α = {erg.alpha_min}° und α = {erg.alpha_max}° ganzgradig "
             f"durchgerechnet; den grössten Widerstand liefert α = {q.alpha}°.")
 
-        p.gleichung(
-            rf"V_{{Rd,s}} = \frac{{A_{{\varnothing,V}}}}"
-            rf"{{s_{{V,x}} \cdot s_{{V,y}}}} \cdot 0.9 \cdot d \cdot "
-            rf"{self.s_f_yd_V} \cdot \cot\alpha"
-            "\n= "
-            rf"\frac{{{a_s * 1e6:.1f}\,\mathrm{{mm}}^{{2}}}}"
-            rf"{{{s_x * 1e3:.0f}\,\mathrm{{mm}} \cdot {s_y * 1e3:.0f}\,\mathrm{{mm}}}} "
-            rf"\cdot 0.9 \cdot {erg.d * 1e3:.1f}\,\mathrm{{mm}} \cdot "
-            rf"{f_yd / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}} \cdot "
-            rf"\cot {q.alpha}^{{\circ}}"
-            rf" = {q.V_Rd_s / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}}",
+        alpha = werte.wert("alpha", r"\alpha", Groesse(q.alpha, GRAD), 0)
+        buegel = werte.wert("V_Rd_s", "V_{Rd,s}", Groesse.aus_si(q.V_Rd_s, KN_PRO_M))
+        diagonale = werte.wert("V_Rd_c", "V_{Rd,c}", Groesse.aus_si(q.V_Rd_c, KN_PRO_M))
+        p.formel(
+            buegel,
+            r"\frac{@A}{@s_x \cdot @s_y} \cdot 0.9 \cdot @d \cdot @f_yd \cdot \cot @alpha",
+            {"A": e["a_s_V"], "s_x": e["s_x"], "s_y": s_y, "d": d,
+             "f_yd": e["f_yd_V"], "alpha": alpha},
             titel="Widerstand der Bügel")
-
-        p.gleichung(
-            rf"V_{{Rd,c}} = 0.9 \cdot d \cdot k_c \cdot {self.s_f_cd} "
-            r"\cdot \sin\alpha \cdot \cos\alpha"
-            "\n= "
-            rf"0.9 \cdot {erg.d * 1e3:.1f}\,\mathrm{{mm}} \cdot {k_c:.2f} \cdot "
-            rf"{f_cd / 1e6:.1f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}} \cdot "
-            rf"\sin {q.alpha}^{{\circ}} \cdot \cos {q.alpha}^{{\circ}}"
-            rf" = {q.V_Rd_c / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}}",
+        p.formel(
+            diagonale,
+            r"0.9 \cdot @d \cdot @k_c \cdot @f_cd \cdot \sin @alpha \cdot \cos @alpha",
+            {"d": d, "k_c": e["k_c"], "f_cd": e["f_cd"], "alpha": alpha},
             titel="Widerstand der Druckdiagonalen")
-
-        p.gleichung(
-            rf"V_{{Rd}} = \min\left[V_{{Rd,s}};\ V_{{Rd,c}}\right] = "
-            rf"\min\left[{q.V_Rd_s / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}};\ "
-            rf"{q.V_Rd_c / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}}\right]"
-            rf" = {erg.v_Rd / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}}",
-            titel="Querkraftwiderstand")
+        p.formel(self._widerstand(erg), r"\min\left[@s;\ @c\right]",
+                 {"s": buegel, "c": diagonale}, titel="Querkraftwiderstand")
 
         self._protokoll_grad(p, erg)
 
+    # -- Mitschrift, für beide Ansätze ----------------------------------------
+
+    def _protokoll_einwirkung(self, p: Protokoll, fall: Querkraftfall) -> None:
+        p.gleichung(
+            rf"V_{{Ed}} = {fall.V_Ed.als_latex(1, KN_PRO_M)} \qquad "
+            rf"M_{{Ed}} = {fall.M_Ed.als_latex(1, KNM)} \qquad "
+            rf"N_{{Ed}} = {fall.N_Ed.als_latex(1, KN)}",
+            titel="Einwirkung")
+
+    def _protokoll_hoehe(self, p: Protokoll, e: Eingaben, erg: Querkraftergebnis,
+                         werte: Zwischenwerte) -> Wert:
+        """Die statische Höhe der gezogenen Bewehrung -- geschrieben, und für die Formeln danach."""
+        positiv = erg.fall.M_Ed.si >= 0
+        lage, art = self.posten[_zuglage(self._lagen(e), positiv)][:2]
+        z = e[f"z_{lage.nummer}{art.kuerzel}"]
+        if not positiv:
+            # Die Platte fuehrt die Tiefe ab Oberkante unter d. Bei einer
+            # oberen Lage ist das nicht die statische Hoehe -- hier heisst sie
+            # darum z, wie in der Duktilitaet.
+            z = werte.wert("z", f"z_{{{posten_index(lage, art)}}}", z.groesse, z.stellen)
+        d = werte.laenge("d", "d", erg.d)
+        protokoll_statische_hoehe(p, d, h=e["h"], z=z, von_unten=positiv)
+        return d
+
     def _protokoll_grad(self, p: Protokoll, erg: Querkraftergebnis) -> None:
         """Die letzte Zeile jedes Falls -- für beide Ansätze dieselbe."""
-        r = self.richtung.value
-        zustand = r"\text{erfüllt}" if erg.erfuellt else r"\text{NICHT erfüllt}"
-        grad = grad_als_text(erg.erfuellungsgrad, erg.erfuellt, latex=True)
-        p.gleichung(
-            rf"\alpha_{{eff,V,{r}}} = \frac{{V_{{Rd}}}}{{\left|V_{{Ed}}\right|}} = "
-            rf"\frac{{{erg.v_Rd / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}}}}"
-            rf"{{{abs(erg.fall.V_Ed.si) / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}}}} = {grad}"
-            rf" \quad \Rightarrow \quad {zustand}"
-            if erg.fall.V_Ed.si else
-            rf"\alpha_{{eff,V,{r}}} = \frac{{V_{{Rd}}}}{{\left|V_{{Ed}}\right|}} = {grad}"
-            rf" \quad \Rightarrow \quad {zustand}",
-            titel="Erfüllungsgrad")
+        name = erg.fall.name
+        grad = self.d_ausnutzung[name].belegen(Groesse(erg.erfuellungsgrad, EINHEITSLOS))
+        widerstand = self.d_v_rd[name].belegen(Groesse.aus_si(erg.v_Rd, KN_PRO_M))
+        einwirkung = self._einwirkung(erg.fall)
+        # Ohne Querkraft stuende eine Null im Nenner -- dann ohne Zahlen.
+        if erg.fall.V_Ed.si:
+            vorlage, eingaben = r"\frac{@V_Rd}{@V_Ed}", {"V_Rd": widerstand, "V_Ed": einwirkung}
+        else:
+            vorlage, eingaben = rf"\frac{{{widerstand.symbol}}}{{{einwirkung.symbol}}}", {}
+        grad_formel(p, grad, vorlage, eingaben, erg.erfuellt, mit_urteil=True)
 
-    # -- Mitschrift ---------------------------------------------------------
+    # -- Mitschrift ohne Bügel -------------------------------------------------
 
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
         p.titel(f"Querkraft – {self.richtung.beschriftung}")
@@ -985,15 +991,16 @@ class Querkraft(Nachweis):
             "statische Höhe der gezogenen Bewehrung, die Grösstkorngrösse und "
             "die Dehnung auf halber Höhe."
         )
+        s = {name: e[name].symbol for name in ("tau_cd", "f_yd", "E_s")}
         p.gleichung(
-            rf"V_{{Rd}} = k_d \cdot {self.s_tau_cd} \cdot d_v \qquad "
+            rf"V_{{Rd}} = k_d \cdot {s['tau_cd']} \cdot d_v \qquad "
             r"k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g}",
             titel="Ansatz", referenz="SIA 262:2025, 4.3.3.2.1")
         p.gleichung(
             r"m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} \qquad "
-            rf"\varepsilon_v = \frac{{{self.s_f_yd} \cdot \left(\left|m_{{Ed}}\right| "
+            rf"\varepsilon_v = \frac{{{s['f_yd']} \cdot \left(\left|m_{{Ed}}\right| "
             r"- m_{Dd}\right)}"
-            rf"{{{self.s_E_s} \cdot \left(\left|m_{{Rd}}(N_{{Ed}})\right| - m_{{Dd}}\right)}}",
+            rf"{{{s['E_s']} \cdot \left(\left|m_{{Rd}}(N_{{Ed}})\right| - m_{{Dd}}\right)}}",
             titel="Dekompressionsmoment und Dehnung")
         p.text(
             "Nur eine Normaldruckkraft entlastet; eine Zugkraft bleibt beim "
@@ -1007,9 +1014,19 @@ class Querkraft(Nachweis):
         for name in ("D_max", "einlagenhoehe"):
             p.wert(e[name])
 
+    def _protokoll_k_g(self, p: Protokoll, e: Eingaben,
+                       k_g: EmpirischesErgebnis) -> Wert:
+        beiwert = Zwischenwerte(self.id).zahl("k_g", "k_g", k_g.wert.si)
+        p.formel(
+            beiwert,
+            rf"\max\left[{K_G_MINDEST:.2f};\ \frac{{48}}{{16 + @D_max \cdot "
+            r"\min\left[1.0;\ \left(\frac{60}{@f_ck}\right)^{2}\right]}\right]",
+            {"D_max": e["D_max"], "f_ck": e["f_ck"]}, empirisch=k_g.einheiten,
+            titel="Beiwert der Gesteinskörnung", referenz="SIA 262:2025, 4.3.3.2.1")
+        return beiwert
+
     def _protokoll_fall(
-        self, p: Protokoll, erg: Querkraftergebnis, h: float, tau_cd: Groesse,
-        f_yd: float, E_s: float, einlage: float, k_g: float,
+        self, p: Protokoll, e: Eingaben, erg: Querkraftergebnis, k_g: Wert,
     ) -> None:
         """
         Die vollstaendige Rechnung eines Falls, mit Zahlen in jeder Zeile.
@@ -1022,34 +1039,28 @@ class Querkraft(Nachweis):
         M_Ed, N_Ed = fall.M_Ed.si, fall.N_Ed.si
 
         p.titel(f"Querkraftnachweis – {fall.name}", ebene=3)
-        p.gleichung(
-            rf"V_{{Ed}} = {fall.V_Ed.als_latex(1, KN_PRO_M)} \qquad "
-            rf"M_{{Ed}} = {fall.M_Ed.als_latex(1, KNM)} \qquad "
-            rf"N_{{Ed}} = {fall.N_Ed.als_latex(1, KN)}",
-            titel="Einwirkung")
+        self._protokoll_einwirkung(p, fall)
 
-        seite = "unten" if M_Ed >= 0 else "oben"
-        p.gleichung(
-            rf"d = {erg.d * 1e3:.1f}\,\mathrm{{mm}}"
-            rf"\qquad \text{{(Zug {seite})}}",
-            titel="Statische Höhe der gezogenen Bewehrung")
+        # Ohne Bewehrung auf der gezogenen Seite gibt es kein d -- und nichts
+        # weiter herzuleiten.
+        if _zuglage(self._lagen(e), M_Ed >= 0) is None:
+            p.text(erg.begruendung)
+            return
 
+        werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
+        d = self._protokoll_hoehe(p, e, erg, werte)
+        d_v = werte.laenge("d_v", "d_v", erg.d_v)
         if erg.d_v < erg.d:
-            p.gleichung(
-                rf"d_v = d - e_{{Einlage}} = {erg.d * 1e3:.1f}\,\mathrm{{mm}} - "
-                rf"{einlage * 1e3:.1f}\,\mathrm{{mm}} = {erg.d_v * 1e3:.1f}\,\mathrm{{mm}}",
-                titel="Wirksame Höhe, um die Einlage vermindert")
+            p.formel(d_v, "@d - @e", {"d": d, "e": e["einlagenhoehe"]},
+                     titel="Wirksame Höhe, um die Einlage vermindert")
         else:
-            p.gleichung(
-                rf"d_v = d = {erg.d_v * 1e3:.1f}\,\mathrm{{mm}}",
-                titel="Wirksame Höhe (Einlage nicht massgebend)")
+            p.formel(d_v, "@d", {"d": d},
+                     titel="Wirksame Höhe (Einlage nicht massgebend)")
 
-        p.gleichung(
-            r"m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6}"
-            rf" = \frac{{\left|{min(N_Ed, 0.0) / 1e3:.1f}\right| \cdot "
-            rf"{h * 1e3:.0f}\,\mathrm{{mm}}}}{{6}}"
-            rf" = {erg.m_Dd / 1e3:.1f}\,\mathrm{{kNm/m}}",
-            titel="Dekompressionsmoment")
+        m_Dd = werte.moment("m_Dd", "m_{Dd}", erg.m_Dd)
+        p.formel(m_Dd, r"\frac{\left|\min(@N_Ed;\ 0)\right| \cdot @h}{6}",
+                 {"N_Ed": werte.kraft("N_Ed", "N_{Ed}", N_Ed), "h": e["h"]},
+                 titel="Dekompressionsmoment")
 
         if erg.v_Rd == 0.0 and erg.begruendung:
             p.text(erg.begruendung)
@@ -1062,38 +1073,47 @@ class Querkraft(Nachweis):
         if bei_n is not None:
             protokoll_interpolation(
                 p, bei_n, basis=f"{self.id}.{kennung_aus(fall.name)}",
-                titel=f"Momentenwiderstand bei N_Ed = {N_Ed / 1e3:.1f} kN")
+                titel=f"Momentenwiderstand bei N_Ed = {fall.N_Ed.formatiert(1, KN)} kN")
 
+        m_Ed = werte.moment("m_Ed", "m_{Ed}", M_Ed)
+        m_Rd = werte.moment("m_Rd", "m_{Rd}(N_{Ed})", erg.m_Rd)
+        eps_v = werte.dehnung("eps_v", r"\varepsilon_v", erg.eps_v, stellen=3)
+        stahl = {"f_yd": e["f_yd"], "E_s": e["E_s"]}
         if erg.eps_v == 0.0:
             p.text(
-                f"m_Ed = {abs(M_Ed) / 1e3:.1f} kNm/m liegt nicht über "
-                f"m_Dd = {erg.m_Dd / 1e3:.1f} kNm/m – der Querschnitt bleibt "
-                f"ungerissen, ε_v = 0.")
+                f"|m_Ed| = {Groesse.aus_si(abs(M_Ed), KNM).formatiert(1)} kNm liegt "
+                f"nicht über m_Dd = {m_Dd.formatiert()} kNm – der Querschnitt "
+                f"bleibt ungerissen, ε_v = 0.")
+        elif erg.plastisch:
+            # Die Dehnung folgt hier nicht der Formel darüber -- sie ist fest.
+            # Stünde die Formel mit den Zahlen da, ergäbe sie etwas anderes
+            # als das Resultat daneben.
+            p.text(
+                f"|m_Ed| = {Groesse.aus_si(abs(M_Ed), KNM).formatiert(1)} kNm liegt "
+                f"über m_Rd(N_Ed) = {m_Rd.formatiert()} kNm: die Bewehrung "
+                f"fliesst. Die Dehnung folgt dann nicht mehr dem Moment, sie "
+                f"ist fest.")
+            p.formel(eps_v, rf"{PLASTISCH} \cdot \frac{{@f_yd}}{{@E_s}}", stahl,
+                     titel="Dehnung auf halber Höhe")
         else:
-            p.gleichung(
-                rf"\varepsilon_v = \frac{{{self.s_f_yd} \cdot \left(\left|m_{{Ed}}\right| "
-                r"- m_{Dd}\right)}"
-                rf"{{{self.s_E_s} \cdot \left(\left|m_{{Rd}}(N_{{Ed}})\right| - m_{{Dd}}\right)}}"
-                "\n= "
-                rf"\frac{{{f_yd / 1e6:.0f} \cdot \left({abs(M_Ed) / 1e3:.1f} - "
-                rf"{erg.m_Dd / 1e3:.1f}\right)}}"
-                rf"{{{E_s / 1e6:.0f} \cdot \left({erg.m_Rd / 1e3:.1f} - "
-                rf"{erg.m_Dd / 1e3:.1f}\right)}}"
-                rf" = {erg.eps_v * 1e3:.3f}\,\text{{‰}}",
+            p.formel(
+                eps_v,
+                r"\frac{@f_yd \cdot \left(\left|@m_Ed\right| - @m_Dd\right)}"
+                r"{@E_s \cdot \left(\left|@m_Rd\right| - @m_Dd\right)}",
+                {**stahl, "m_Ed": m_Ed, "m_Dd": m_Dd, "m_Rd": m_Rd},
                 titel="Dehnung auf halber Höhe")
 
-        p.gleichung(
-            r"k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g}"
-            rf" = \frac{{1}}{{1 + {erg.eps_v * 1e3:.4f} \cdot 10^{{-3}} \cdot "
-            rf"{erg.d * 1e3:.1f} \cdot {k_g:.3f}}} = {erg.k_d:.4f}",
-            titel="Beiwert für die statische Höhe")
+        k_d = werte.zahl("k_d", "k_d", erg.k_d, stellen=4)
+        p.formel(k_d, r"\frac{1}{1 + @eps_v \cdot @d \cdot @k_g}",
+                 {"eps_v": eps_v, "d": d, "k_g": k_g}, empirisch={"d": MM},
+                 titel="Beiwert für die statische Höhe")
 
-        p.gleichung(
-            rf"{self._widerstandssymbol(fall)} = k_d \cdot {self.s_tau_cd} \cdot d_v"
-            "\n= "
-            rf"{erg.k_d:.4f} \cdot {tau_cd.in_einheit(N_PRO_MM2):.4f}\,"
-            rf"\mathrm{{N}}/\mathrm{{mm}}^{{2}} \cdot {erg.d_v * 1e3:.1f}\,\mathrm{{mm}}"
-            rf" = {erg.v_Rd / 1e3:.1f}\,\mathrm{{kN}}/\mathrm{{m}}",
-            titel="Querkraftwiderstand", referenz="SIA 262:2025, 4.3.3.2.1")
+        # tau_cd steht in der Baustofftabelle auf zwei Stellen (1.1); mit so
+        # wenigen ginge die Nachrechnung hier um ein halbes Prozent daneben.
+        tau = e["tau_cd"]
+        p.formel(self._widerstand(erg), r"@k_d \cdot @tau_cd \cdot @d_v",
+                 {"k_d": k_d, "tau_cd": werte.wert("tau_cd", tau.symbol, tau.groesse, 4),
+                  "d_v": d_v},
+                 titel="Querkraftwiderstand", referenz="SIA 262:2025, 4.3.3.2.1")
 
         self._protokoll_grad(p, erg)

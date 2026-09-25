@@ -676,6 +676,11 @@ class EmpirischesErgebnis:
     einsetzungen: Tuple[EmpirischeEinsetzung, ...]
     ergebnis_einheit: Einheit
 
+    @property
+    def einheiten(self) -> Dict[str, Einheit]:
+        """Je Eingabe die Einheit, in der sie als blanke Zahl einging."""
+        return {e.name: e.erwartete_einheit for e in self.einsetzungen}
+
     def annahmen_text(self) -> str:
         """Einzeiler fuer den Bericht: welche Einheiten vorausgesetzt wurden."""
         teile = [f"{e.name} in {e.erwartete_einheit.beschriftung}" for e in self.einsetzungen]
