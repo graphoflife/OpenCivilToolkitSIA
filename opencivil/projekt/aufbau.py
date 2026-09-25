@@ -445,8 +445,7 @@ def _spannungsnachweise(eintrag: QuerschnittEintrag,
         if not faelle:
             continue
         spannung = Spannungsbegrenzung(
-            querschnitt, richtung, faelle,
-            grenze=grenze(querschnitt, richtung, eintrag.rissanforderung))
+            faelle, grenze=grenze(querschnitt, richtung, eintrag.rissanforderung))
         spannung.stillstellen([f.name for f in faelle], laute)
         eintragen(feld, f"{eintrag.kennung}.x", spannung)
 
