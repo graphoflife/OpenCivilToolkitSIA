@@ -58,6 +58,8 @@ print(ergebnis.zusammenfassung())             # je Platte eine Tabelle
 ergebnis.erfuellt                             # True / False
 ergebnis.bericht()                            # der ganze Bericht mit Herleitung
 ergebnis.latex("ausgabe/decke")               # .tex, mit pdf=True auch PDF
+ergebnis.markdown("ausgabe/decke")            # .md, Formeln als LaTeX-Mathe
+ergebnis.analysen()                           # Spannungsbilder, M-κ-Linien
 p.speichern("decke.json")                     # lässt sich in der Oberfläche öffnen
 ```
 
@@ -74,15 +76,15 @@ zurück. Gelesen wird die Datei im Kern, mit denselben Prüfungen wie alles ande
 
 ## Stand
 
-Fertig und getestet (569 Tests):
+Fertig und getestet (641 Tests):
 
 | Baustein | Inhalt |
 |---|---|
 | `core/einheiten` | `Groesse` mit Dimensionsprüfung, Einheitenkatalog, `empirisch()` |
 | `core/wert` | Trennung von Definition und Belegung, Quelle eines Wertes |
 | `core/berechnung` | `Formel`, `Vorgabe`, `Prozedur`, `Nachweis` |
-| `core/latex` | Platzhalter-Einsetzung, `Formelzeile`, Tabellen, Fallunterscheidung |
-| `core/protokoll` | Mitschrift als Datenstruktur, `StillesProtokoll` |
+| `core/latex` | Platzhalter-Einsetzung, `Formelzeile`, Tabellen aus Text- und Formelzellen, Fallunterscheidung |
+| `core/protokoll` | Mitschrift als Datenstruktur, `Zwischenwerte` für Vorlagen, ein Durchlauf mit einer Tafel je Darstellung, `StillesProtokoll` |
 | `core/rechenwerk` | Rückwärtsauflösung, Variantenwahl, fehlende Eingaben, Zyklen |
 | `material/` | Beton und Betonstahl nach SIA 262:2025 |
 | `querschnitt/` | Plattenquerschnitt, Lagenaufbau, Werkstoffgesetze |
@@ -93,9 +95,11 @@ Fertig und getestet (569 Tests):
 | `nachweis/` | M-N, Querkraft (mit Bügeln), Duktilität, sprödes Versagen, Zwängung auf Normalkraft und auf Biegung, Stahlspannung unter häufiger (gegen Fliessen) und quasi-ständiger Last (aus der Rissbreite), Knicken am verformten System |
 | `spannungsanalyse.py` | drei Bilder am Querschnitt — kein Nachweis |
 | `bewehrungssuche.py` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt |
-| `bericht/` | Konsole und LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) |
+| `bericht/` | der Bericht als Blöcke (`gliederung`), gesetzt als Konsolentext, LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) und Markdown; die Zusammenfassung je Platte |
 | `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `projekt`) und was daraus gebaut wird (`aufbau`) |
-| `ergebnis.py` | ein gerechnetes Projekt: Zusammenfassung, Bericht, LaTeX |
+| `ergebnis.py` | ein gerechnetes Projekt: Zusammenfassung, Bericht, LaTeX, Markdown, Analysen |
+| `web/api.py` | Lösung, Mitschrift und Zusammenfassung als JSON |
+| `web/diagrammdaten.py` | die Punktfolgen der Diagramme als JSON |
 | `web/speicher.py` | Ergebnisse je Bauteil, damit nur Geändertes neu rechnet |
 | `web/dienst.py` | der Rechendienst, unabhängig vom Transportweg |
 | `web/server.py` | HTTP-Hülle darum (nur Standardbibliothek) |
@@ -129,10 +133,19 @@ Deshalb kann am Bildschirm gar nichts anderes stehen als im Bericht.
   überschrieben); dort lässt sich auch ein Ziel wählen: der Kern löst rückwärts
   auf, rechnet nur das Nötige und zeigt die Kette der erforderlichen Schritte
 
-**Formel nach Word:** jede Formel hat zwei Knöpfe. *Word* legt sie als MathML in
-die Zwischenablage -- Word fügt daraus eine richtige, weiter bearbeitbare
-Gleichung ein, kein Bild. *TeX* legt den LaTeX-Quelltext ab, für Overleaf oder
-den Formeleditor von Word 365.
+**Kopieren nach Word, LaTeX und Markdown:** jede Formel und jede Tabelle hat
+drei Knöpfe. *Word* legt eine Formel als MathML in die Zwischenablage -- Word
+fügt daraus eine richtige, weiter bearbeitbare Gleichung ein, kein Bild --
+und eine Tabelle als echte Tabelle, deren Formelzellen Gleichungen sind. *TeX*
+legt den LaTeX-Quelltext ab, für Overleaf oder den Formeleditor von Word 365.
+*MD* legt den Block so ab, wie er im Markdown-Bericht steht.
+
+**Bericht:** der Knopf oben rechts erzeugt den ganzen Bericht -- Herleitung,
+die Nachweise je Platte mit derselben Tabelle wie am Bildschirm, alle Werte,
+fehlende Eingaben -- als LaTeX (für Overleaf, auf dem eigenen Rechner auch
+als PDF) und als Markdown (für GitHub, Obsidian, ein Wiki). In Markdown
+stehen die Formeln als LaTeX-Mathe zwischen `$…$` und `$$…$$`; so lesen es
+alle, die Formeln darstellen können.
 
 **Überschreiben:** bei jedem gerechneten Kennwert steht ein Haken. Wird er
 gesetzt, gilt der eingetippte Wert, und der ganze Zweig dahinter entfällt --

@@ -43,6 +43,113 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-25 · LaTeX für Formeln, Text für Text: der Bericht aus Blöcken, in drei Formaten
+
+Anlass war die Frage, ob LaTeX die richtige Entscheidung war, und ob Formeln
+und Tabellen nicht auch in Markdown gingen. Die Antwort und eine zweite
+strenge Durchsicht des ganzen Codes führten zu elf Schritten, jeder am
+Schnappschuss des Berichts gemessen -- der dafür zuerst auf ein zweites
+Projekt verbreitert wurde, das jeden Nachweis einmal laut führt.
+
+### LaTeX ja -- aber nur, wo Mathematik steht
+
+Markdown hat keine eigene Formelsprache. Wer Formeln darstellt -- GitHub,
+Obsidian, Jupyter, Pandoc --, liest LaTeX-Mathe zwischen `$…$` und `$$…$$`;
+Word 365 versteht LaTeX-Mathe im Formeleditor und MathML aus der
+Zwischenablage. Für Formeln war LaTeX also richtig.
+
+Falsch war es als Träger von Text und Tabellen. Jede Tabellenzelle war LaTeX,
+Text stand als `\text{…}` darin: die Konsole druckte das so ab, der
+Word-Knopf einer Tabelle lieferte eine Formelmatrix statt einer Tabelle, und
+die Oberfläche las den Text per regulärem Ausdruck zurück. Jetzt sagt eine
+Zelle, was sie ist: ein `str` oder `Mathe(latex)`. Auch jede Zahl ist Mathe --
+ihr Minus ist ein Minuszeichen und kein Bindestrich; beim ersten Umbau waren
+Zahlen kurz Text, und im `.tex` stand `-6000.0` mit Bindestrich. Im Dokument
+sind Tabellen jetzt `tabular` bzw. `longtable`, nicht mehr eine Formel.
+
+### Der Bericht besteht aus Blöcken
+
+Konsole und LaTeX-Dokument bauten ihre Abschnitte je selbst und liefen
+auseinander: die Werte vor oder hinter den Nachweisen, nach Kennung oder nach
+Bezeichnung; und beide fassten die Nachweise flach zusammen, ohne Platten --
+zwei Kombinationen «Feld» zweier Platten sahen gleich aus. Ein
+Markdown-Bericht hätte eine dritte Kopie gebraucht.
+
+Jetzt legt `bericht/gliederung.py` den ganzen Bericht als `Protokoll` an, aus
+denselben sechs Blockarten wie die Herleitung. Jede Darstellung ist eine Tafel
+`{Blockart: Funktion}`, ein Durchlauf setzt sie; eine Blockart ohne Eintrag
+wirft, statt still zu fehlen (vorher gab die Oberfläche für Unbekanntes `None`
+zurück, und das wurde weggefiltert). Die Nachweise stehen je Platte mit
+derselben Tabelle wie am Bildschirm, aus denselben Stücken
+(`bericht/zusammenfassung.py`). Eines kommt im Bericht dazu: auf Papier gibt
+es weder rote Zeilen noch Tooltips, darum steht jeder nicht erfüllte Nachweis
+mit seiner Begründung unter der Tabelle.
+
+Tabellen dürfen jetzt eine Spalte als umbrechbar auszeichnen (`L`). Im
+Dokument nimmt eine solche Tabelle die Zeilenbreite ein und bricht nur diese
+Spalten um (`xltabular`); sonst liefe die Nachweistabelle mit zwei Formeln
+nebeneinander über den Rand.
+
+### Markdown und drei Knöpfe
+
+Der Markdown-Bericht ist die dritte Tafel. An jeder Formel und jeder Tabelle
+stehen jetzt *Word*, *TeX* und *MD*. Das Markdown eines Blocks kommt aus
+derselben Tafel wie das Dokument, damit Knopf und Dokument dasselbe liefern.
+Eine Tabelle geht als HTML-Tabelle nach Word, Formelzellen darin als MathML.
+Ob Word sie so einfügt, wie es soll, ist hier nicht prüfbar -- die
+Zwischenablage enthält, was sie soll.
+
+### Der Pilot: Herleitung aus Vorlagen
+
+Die Handrechnung schrieb ihre Formeln schon als Vorlage, `p.formel` setzte
+Zahlen und Einheiten ein. Die übrigen Nachweise schreiben Symbol- und
+Zahlenzeile von Hand, mit eigener Umrechnung. Probeweise umgestellt ist die
+Duktilität: im Modul von 10 handgesetzten Einheiten auf 0, von 13
+Umrechnungen auf 2 (beide im Begründungssatz), und Querschnitt und
+Schwerpunkt einer Lage aus zwei Posten stehen jetzt mit Zahlen da statt nur
+mit dem Resultat. Dafür wurden die Zwischenwerte der Handrechnung zu
+`Zwischenwerte` neben `Protokoll.formel`.
+
+Was der Pilot zeigte:
+
+* **Jeder Nachweis rundet seinen Erfüllungsgrad selbst**, sieben Stellen mit
+  `f"{grad:.2f}"`. Ein knapp verfehlter steht in der Herleitung damit als
+  «1.00» neben «nicht erfüllt» -- genau das, was `grad_als_text` verhindert,
+  aber die Herleitung geht an ihr vorbei. Über `p.formel(…, ergebnis_latex=…)`
+  folgt die Duktilität jetzt der Regel; die übrigen täten es mit der
+  Umstellung.
+* **Der Umbruch zählt Quelltext**, nicht was man sieht: `darstellen()` setzt
+  mehrzeilig ab 90 Zeichen LaTeX, und `\left`, `\,\mathrm{mm}` zählen mit.
+  Von 45 mehrzeilig gesetzten Formeln im Projekt «voll» sind 30 sichtbar
+  kürzer als 70 Zeichen. Das gilt schon für die Baustoffe und die
+  Handrechnung; vor einer Umstellung der übrigen wäre das zu klären.
+* **Die Postenhöhe heisst `d`, ist aber `z`**: gemessen ab Oberkante. Von
+  Hand fiel das nicht auf, in einer Vorlage steht dann `d = h - d`. Die
+  Duktilität setzt darum ein eigenes `z`.
+
+Offen und zu entscheiden: rund 80 Gleichungen in acht Modulen, mit 124 von
+Hand gesetzten Einheiten.
+
+### Nebenbei
+
+* Sechs Diagramme bauten Massstab, Gitter und Titel je selbst. `achsen.js`
+  macht das einmal; verglichen wurde das SVG jedes Diagramms vorher und
+  nachher, 8 von 10 gleich, die Werkstoffgesetze absichtlich angeglichen.
+* Die Spannung-Dehnung-Analyse baute ihre Löser in der Schnittstelle -- ohne
+  Oberfläche war sie nicht zu haben, und ihr Test prüfte eine eigene Kopie
+  des Aufbaus. Jetzt `spannungsanalyse.analysen()` und `Ergebnis.analysen()`.
+* Die Punktfolgen der Diagramme stehen in `web/diagrammdaten.py`; dabei fiel
+  eine zweite Kopie von `BLOCKANTEIL = 0.85` weg. Die Webtests sind nach
+  Thema geteilt.
+* Eine Regel für Fallkennungen statt elf Kopien, eine Liste der
+  Rissanforderungen statt zwei; `eintragen()` lehnt ein Nachweisfeld ab, das
+  nicht in `NACHWEISFELDER` steht.
+* Im LaTeX-Fliesstext stehen griechische Buchstaben und `≥` als Unicode. Unter
+  pdflatex bricht das ab -- älter als diese Runde und als eigene Aufgabe
+  vermerkt. Eine TeX-Maschine gibt es hier nicht; übersetzt wurde nichts.
+
+---
+
 ## 2026-09-25 · Stahlspannung unter Dauerlast, und was ein strenges Review daran verschob
 
 Neu ist ein Nachweis: die Stahlspannung unter quasi-ständiger Einwirkung,
