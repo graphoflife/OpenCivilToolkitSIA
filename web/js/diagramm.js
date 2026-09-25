@@ -10,9 +10,9 @@
  * Es wird nichts nachgerechnet: sämtliche Koordinaten kommen aus der Lösung.
  */
 
+import { achsenkreuz, NR, schrittweite } from './achsen.js';
 import { el, svgEl } from './dom.js';
 
-const NR = 'http://www.w3.org/2000/svg';
 const BREITE = 720;
 const HOEHE = 520;
 const RAND = { oben: 22, rechts: 22, unten: 46, links: 74 };
@@ -142,15 +142,6 @@ export function spielraum(breite, stellen, randabstand) {
     ? (stellen[1] - stellen[0]) / 2
     : breite / 2;
   return Math.max(0, Math.min(links, rechts, halbeTeilung));
-}
-
-/** Sucht einen runden Schrittabstand für die Achsenteilung. */
-function schrittweite(spanne, zielAnzahl = 8) {
-  const roh = spanne / zielAnzahl;
-  const groesse = 10 ** Math.floor(Math.log10(Math.abs(roh) || 1));
-  const rest = roh / groesse;
-  const gewaehlt = rest >= 5 ? 10 : rest >= 2 ? 5 : rest >= 1 ? 2 : 1;
-  return gewaehlt * groesse;
 }
 
 /**
@@ -332,74 +323,27 @@ export function diagrammZeichnen(linie) {
   const nMin = Math.min(...alleN) - nSpanne * spielraum;
   const nMax = Math.max(...alleN) + nSpanne * spielraum;
 
-  const zeichenBreite = BREITE - RAND.links - RAND.rechts;
-  const zeichenHoehe = HOEHE - RAND.oben - RAND.unten;
-  const x = (m) => RAND.links + ((m - mMin) / (mMax - mMin)) * zeichenBreite;
-  const y = (n) => RAND.oben + (1 - (n - nMin) / (nMax - nMin)) * zeichenHoehe;
-
-  const svg = svgEl('svg', {
-    class: 'mn', viewBox: `0 0 ${BREITE} ${HOEHE}`,
-    xmlns: NR, role: 'img',
-    'aria-label': 'M-N-Interaktionsdiagramm',
+  const { svg, daten, x, y } = achsenkreuz({
+    breite: BREITE, hoehe: HOEHE, rand: RAND,
+    attribute: {
+      class: 'mn', xmlns: NR, role: 'img', 'aria-label': 'M-N-Interaktionsdiagramm',
+    },
+    x: { bereich: [mMin, mMax], teilung: {}, null: true, titel: 'M [kNm]' },
+    y: { bereich: [nMin, nMax], teilung: {}, null: true, titel: 'N [kN]   (Zug positiv)' },
   });
-
-  // -- Gitter und Achsen --------------------------------------------------
-  const gitter = svgEl('g');
-  const mSchritt = schrittweite(mMax - mMin);
-  const nSchritt = schrittweite(nMax - nMin);
-
-  for (let m = Math.ceil(mMin / mSchritt) * mSchritt; m <= mMax; m += mSchritt) {
-    gitter.append(svgEl('line', {
-      x1: x(m), y1: RAND.oben, x2: x(m), y2: HOEHE - RAND.unten,
-      stroke: '#e6e9ee', 'stroke-width': 1,
-    }));
-    const beschriftung = svgEl('text', {
-      x: x(m), y: HOEHE - RAND.unten + 16, 'text-anchor': 'middle',
-      'font-size': 11, fill: '#5c6773',
-    });
-    beschriftung.textContent = Math.round(m);
-    gitter.append(beschriftung);
-  }
-  for (let n = Math.ceil(nMin / nSchritt) * nSchritt; n <= nMax; n += nSchritt) {
-    gitter.append(svgEl('line', {
-      x1: RAND.links, y1: y(n), x2: BREITE - RAND.rechts, y2: y(n),
-      stroke: '#e6e9ee', 'stroke-width': 1,
-    }));
-    const beschriftung = svgEl('text', {
-      x: RAND.links - 8, y: y(n) + 4, 'text-anchor': 'end',
-      'font-size': 11, fill: '#5c6773',
-    });
-    beschriftung.textContent = Math.round(n);
-    gitter.append(beschriftung);
-  }
-  svg.append(gitter);
-
-  // Nulllinien kräftiger, damit Zug und Druck auf einen Blick trennbar sind.
-  if (nMin < 0 && nMax > 0) {
-    svg.append(svgEl('line', {
-      x1: RAND.links, y1: y(0), x2: BREITE - RAND.rechts, y2: y(0),
-      stroke: '#b8c0cc', 'stroke-width': 1.5,
-    }));
-  }
-  if (mMin < 0 && mMax > 0) {
-    svg.append(svgEl('line', {
-      x1: x(0), y1: RAND.oben, x2: x(0), y2: HOEHE - RAND.unten,
-      stroke: '#b8c0cc', 'stroke-width': 1.5,
-    }));
-  }
 
   // -- Die beiden Resistenzlinien ------------------------------------------
   // Die genaue Linie ist nur Vergleich: dünn, ohne Füllung. Gefüllt und kräftig
   // ist das Polygon aus der Handrechnung -- das ist die Linie, gegen die
   // nachgewiesen wird, und sie soll den Blick auf sich ziehen.
-  svg.append(svgEl('polygon', {
+  daten.append(svgEl('polygon', {
     points: punkte.map((p) => `${x(p.M).toFixed(2)},${y(p.N).toFixed(2)}`).join(' '),
     fill: 'none', stroke: GENAU, 'stroke-width': 1.3,
     'stroke-dasharray': '6 3', 'stroke-linejoin': 'round', opacity: 0.8,
   }));
 
   if (hand.length) {
-    svg.append(svgEl('polygon', {
+    daten.append(svgEl('polygon', {
       points: hand.map((p) => `${x(p.M).toFixed(2)},${y(p.N).toFixed(2)}`).join(' '),
       fill: 'rgba(31,95,168,.07)', stroke: '#1f5fa8', 'stroke-width': 2,
       'stroke-linejoin': 'round',
@@ -412,7 +356,7 @@ export function diagrammZeichnen(linie) {
       const t = svgEl('title');
       t.textContent = `${p.name}\nM = ${p.M.toFixed(1)} kNm, N = ${p.N.toFixed(1)} kN`;
       ecke.append(t);
-      svg.append(ecke);
+      daten.append(ecke);
     }
   }
 
@@ -421,11 +365,11 @@ export function diagrammZeichnen(linie) {
     const farbe = k.innerhalb ? '#1a7f45' : '#b3261e';
 
     if (k.widerstand) {
-      svg.append(svgEl('line', {
+      daten.append(svgEl('line', {
         x1: x(k.M_Ed), y1: y(k.N_Ed), x2: x(k.widerstand.M), y2: y(k.widerstand.N),
         stroke: farbe, 'stroke-width': 1.4, 'stroke-dasharray': '5 3', opacity: .75,
       }));
-      svg.append(svgEl('circle', {
+      daten.append(svgEl('circle', {
         cx: x(k.widerstand.M), cy: y(k.widerstand.N), r: 3.5,
         fill: '#fff', stroke: farbe, 'stroke-width': 1.6,
       }));
@@ -443,14 +387,14 @@ export function diagrammZeichnen(linie) {
       + `\nErfüllungsgrad α_eff = ${k.grad_text} (${k.massstab_text})`
       + `\n${k.innerhalb ? 'erfüllt' : 'NICHT erfüllt'}`;
     punkt.append(titel);
-    svg.append(punkt);
+    daten.append(punkt);
 
     const beschriftung = svgEl('text', {
       x: x(k.M_Ed) + 9, y: y(k.N_Ed) - 8,
       'font-size': 11, 'font-weight': 600, fill: farbe,
     });
     beschriftung.textContent = k.name;
-    svg.append(beschriftung);
+    daten.append(beschriftung);
   }
 
   // -- Knicknachweise ------------------------------------------------------
@@ -467,14 +411,14 @@ export function diagrammZeichnen(linie) {
     const drei = [x(k.M_bei_N_Rd), y(-Math.abs(k.N_Rd))];
 
     for (const [von, bis, muster] of [[eins, zwei, '2 3'], [zwei, drei, '5 4']]) {
-      svg.append(svgEl('line', {
+      daten.append(svgEl('line', {
         x1: von[0], y1: von[1], x2: bis[0], y2: bis[1],
         stroke: farbe, 'stroke-width': 1.6, 'stroke-dasharray': muster, opacity: .85,
       }));
     }
 
     // Erster Punkt: klein und hohl -- die Einwirkung vor der Verformung.
-    svg.append(svgEl('circle', {
+    daten.append(svgEl('circle', {
       cx: eins[0], cy: eins[1], r: 3.5,
       fill: '#fff', stroke: farbe, 'stroke-width': 1.6,
     }));
@@ -494,10 +438,10 @@ export function diagrammZeichnen(linie) {
       + `\nN_Rd = ${k.N_Rd.toFixed(1)} kN bei M = ${k.M_bei_N_Rd.toFixed(1)} kNm`
       + `\nα_eff = ${k.grad_text} – ${k.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`;
     raute.append(kt);
-    svg.append(raute);
+    daten.append(raute);
 
     // Dritter: der Widerstandspunkt, wie bei den Kombinationen hohl.
-    svg.append(svgEl('circle', {
+    daten.append(svgEl('circle', {
       cx: drei[0], cy: drei[1], r: 4.5,
       fill: '#fff', stroke: farbe, 'stroke-width': 1.8,
     }));
@@ -507,24 +451,8 @@ export function diagrammZeichnen(linie) {
       'font-size': 11, 'font-weight': 600, fill: farbe,
     });
     marke.textContent = `K: ${k.name}`;
-    svg.append(marke);
+    daten.append(marke);
   }
-
-  // -- Achsenbeschriftung --------------------------------------------------
-  const xTitel = svgEl('text', {
-    x: RAND.links + zeichenBreite / 2, y: HOEHE - 8,
-    'text-anchor': 'middle', 'font-size': 12, fill: '#1a1f27', 'font-weight': 600,
-  });
-  xTitel.textContent = 'M [kNm]';
-  svg.append(xTitel);
-
-  const yTitel = svgEl('text', {
-    x: 16, y: RAND.oben + zeichenHoehe / 2,
-    'text-anchor': 'middle', 'font-size': 12, fill: '#1a1f27', 'font-weight': 600,
-    transform: `rotate(-90 16 ${RAND.oben + zeichenHoehe / 2})`,
-  });
-  yTitel.textContent = 'N [kN]   (Zug positiv)';
-  svg.append(yTitel);
 
   return el('div.diagramm-huelle', {}, [
     svg,
@@ -557,12 +485,6 @@ export function kurveZeichnen(gesetz, { zeigeVereinfacht = true, beiUmschalten }
   const punkte = gesetz.punkte || [];
   if (!punkte.length) return el('div.leer', { text: 'Keine Kurve vorhanden.' });
 
-  const BREITE = 560;
-  const HOEHE = 360;
-  const RAND = { oben: 18, rechts: 22, unten: 40, links: 68 };
-  const zBreite = BREITE - RAND.links - RAND.rechts;
-  const zHoehe = HOEHE - RAND.oben - RAND.unten;
-
   const eps = punkte.map((p) => p.eps);
   const sig = punkte.map((p) => p.sigma);
   // Der Nullpunkt gehört immer ins Bild, sonst hängt die Kurve im Nichts.
@@ -572,57 +494,19 @@ export function kurveZeichnen(gesetz, { zeigeVereinfacht = true, beiUmschalten }
     const d = (max - min) || 1;
     return [min - d * luft, max + d * luft];
   };
-  const [xMin, xMax] = spanne(eps);
-  const [yMin, yMax] = spanne(sig);
 
-  const x = (v) => RAND.links + ((v - xMin) / (xMax - xMin)) * zBreite;
-  const y = (v) => RAND.oben + (1 - (v - yMin) / (yMax - yMin)) * zHoehe;
-
-  const svg = svgEl('svg', {
-    class: 'mn', viewBox: `0 0 ${BREITE} ${HOEHE}`, xmlns: NR,
-    role: 'img', 'aria-label': gesetz.titel,
+  const { svg, daten, x, y } = achsenkreuz({
+    breite: 560, hoehe: 360, rand: { oben: 18, rechts: 22, unten: 40, links: 68 },
+    attribute: { class: 'mn', xmlns: NR, role: 'img', 'aria-label': gesetz.titel },
+    x: {
+      bereich: spanne(eps), teilung: { ziel: 6, format: (v) => Number(v.toFixed(2)) },
+      null: true, titel: gesetz.x_titel,
+    },
+    y: { bereich: spanne(sig), teilung: { ziel: 6 }, null: true, titel: gesetz.y_titel },
   });
 
-  // Gitter
-  const xs = schrittweite(xMax - xMin, 6);
-  const ys = schrittweite(yMax - yMin, 6);
-  for (let v = Math.ceil(xMin / xs) * xs; v <= xMax; v += xs) {
-    svg.append(svgEl('line', {
-      x1: x(v), y1: RAND.oben, x2: x(v), y2: HOEHE - RAND.unten,
-      stroke: '#e6e9ee', 'stroke-width': 1,
-    }));
-    const t = svgEl('text', {
-      x: x(v), y: HOEHE - RAND.unten + 15, 'text-anchor': 'middle',
-      'font-size': 10.5, fill: '#5c6773',
-    });
-    t.textContent = Number(v.toFixed(2));
-    svg.append(t);
-  }
-  for (let v = Math.ceil(yMin / ys) * ys; v <= yMax; v += ys) {
-    svg.append(svgEl('line', {
-      x1: RAND.links, y1: y(v), x2: BREITE - RAND.rechts, y2: y(v),
-      stroke: '#e6e9ee', 'stroke-width': 1,
-    }));
-    const t = svgEl('text', {
-      x: RAND.links - 7, y: y(v) + 4, 'text-anchor': 'end',
-      'font-size': 10.5, fill: '#5c6773',
-    });
-    t.textContent = Math.round(v);
-    svg.append(t);
-  }
-
-  // Nullachsen
-  for (const [a, b, c, d] of [
-    [RAND.links, y(0), BREITE - RAND.rechts, y(0)],
-    [x(0), RAND.oben, x(0), HOEHE - RAND.unten],
-  ]) {
-    svg.append(svgEl('line', {
-      x1: a, y1: b, x2: c, y2: d, stroke: '#b4becd', 'stroke-width': 1.4,
-    }));
-  }
-
   // Kurve
-  svg.append(svgEl('polyline', {
+  daten.append(svgEl('polyline', {
     points: punkte.map((p) => `${x(p.eps).toFixed(2)},${y(p.sigma).toFixed(2)}`).join(' '),
     fill: 'none', stroke: '#1f6feb', 'stroke-width': 2.2,
     'stroke-linejoin': 'round', 'stroke-linecap': 'round',
@@ -630,7 +514,7 @@ export function kurveZeichnen(gesetz, { zeigeVereinfacht = true, beiUmschalten }
 
   // Vereinfachter Verlauf (Spannungsblock), sofern der Kern einen liefert.
   if (gesetz.vereinfacht && zeigeVereinfacht) {
-    svg.append(svgEl('polyline', {
+    daten.append(svgEl('polyline', {
       points: gesetz.vereinfacht.punkte
         .map((p) => `${x(p.eps).toFixed(2)},${y(p.sigma).toFixed(2)}`).join(' '),
       fill: 'none', stroke: GRUEN, 'stroke-width': 2,
@@ -640,11 +524,11 @@ export function kurveZeichnen(gesetz, { zeigeVereinfacht = true, beiUmschalten }
 
   // Marken für die Grenzdehnungen
   for (const marke of gesetz.marken || []) {
-    svg.append(svgEl('line', {
+    daten.append(svgEl('line', {
       x1: x(marke.eps), y1: y(0), x2: x(marke.eps), y2: y(marke.sigma),
       stroke: '#8895a8', 'stroke-width': 1, 'stroke-dasharray': '3 3',
     }));
-    svg.append(svgEl('circle', {
+    daten.append(svgEl('circle', {
       cx: x(marke.eps), cy: y(marke.sigma), r: 3.2,
       fill: '#fff', stroke: '#1f6feb', 'stroke-width': 1.6,
     }));
@@ -653,24 +537,8 @@ export function kurveZeichnen(gesetz, { zeigeVereinfacht = true, beiUmschalten }
       'text-anchor': 'middle', 'font-size': 10.5, fill: '#0d4ba8', 'font-weight': 600,
     });
     t.textContent = marke.text;
-    svg.append(t);
+    daten.append(t);
   }
-
-  // Achsenbeschriftung
-  const xt = svgEl('text', {
-    x: RAND.links + zBreite / 2, y: HOEHE - 6, 'text-anchor': 'middle',
-    'font-size': 11.5, fill: '#16202c', 'font-weight': 600,
-  });
-  xt.textContent = gesetz.x_titel;
-  svg.append(xt);
-
-  const yt = svgEl('text', {
-    x: 14, y: RAND.oben + zHoehe / 2, 'text-anchor': 'middle',
-    'font-size': 11.5, fill: '#16202c', 'font-weight': 600,
-    transform: `rotate(-90 14 ${RAND.oben + zHoehe / 2})`,
-  });
-  yt.textContent = gesetz.y_titel;
-  svg.append(yt);
 
   if (!gesetz.vereinfacht) return el('div.diagramm-huelle', {}, [svg]);
 
@@ -744,81 +612,45 @@ export function querkraftkurveZeichnen(kurve) {
   const mMin = Math.min(...alleM) * 1.04;
   const mMax = Math.max(...alleM) * 1.04;
   const vMax = Math.max(...alleV) * 1.12;
-  const spanne = (mMax - mMin) || 1;
-
-  const zeichenBreite = BREITE - RAND.links - RAND.rechts;
-  const zeichenHoehe = HOEHE - RAND.oben - RAND.unten;
-  const x = (m) => RAND.links + ((m - mMin) / spanne) * zeichenBreite;
-  const y = (v) => RAND.oben + (1 - v / vMax) * zeichenHoehe;
-
-  const svg = svgEl('svg', {
-    class: 'mv', viewBox: `0 0 ${BREITE} ${HOEHE}`, xmlns: NR, role: 'img',
-    'aria-label': 'Querkraftwiderstand über dem Moment',
-  });
-
-  // -- Gitter --------------------------------------------------------------
-  const gitter = svgEl('g');
-  const mSchritt = schrittweite(spanne);
-  const vSchritt = schrittweite(vMax);
-  for (let m = Math.ceil(mMin / mSchritt) * mSchritt; m <= mMax; m += mSchritt) {
-    gitter.append(svgEl('line', {
-      x1: x(m), y1: RAND.oben, x2: x(m), y2: HOEHE - RAND.unten,
-      stroke: '#e6e9ee', 'stroke-width': 1,
-    }));
-    const t = svgEl('text', {
-      x: x(m), y: HOEHE - RAND.unten + 16, 'text-anchor': 'middle',
-      'font-size': 11, fill: '#5c6773',
-    });
-    t.textContent = Math.round(m);
-    gitter.append(t);
-  }
-  for (let v = 0; v <= vMax; v += vSchritt) {
-    gitter.append(svgEl('line', {
-      x1: RAND.links, y1: y(v), x2: BREITE - RAND.rechts, y2: y(v),
-      stroke: '#e6e9ee', 'stroke-width': 1,
-    }));
-    const t = svgEl('text', {
-      x: RAND.links - 8, y: y(v) + 4, 'text-anchor': 'end',
-      'font-size': 11, fill: '#5c6773',
-    });
-    t.textContent = Math.round(v);
-    gitter.append(t);
-  }
-  svg.append(gitter);
 
   // Die Nulllinie trennt Zug unten von Zug oben und gehört betont.
-  svg.append(svgEl('line', {
-    x1: x(0), y1: RAND.oben, x2: x(0), y2: HOEHE - RAND.unten,
-    stroke: '#b8c0cc', 'stroke-width': 1.5,
-  }));
+  const { svg, daten, x, y, feld } = achsenkreuz({
+    breite: BREITE, hoehe: HOEHE, rand: RAND,
+    attribute: {
+      class: 'mv', xmlns: NR, role: 'img', 'aria-label': 'Querkraftwiderstand über dem Moment',
+    },
+    x: { bereich: [mMin, mMax], teilung: {}, null: true, titel: 'M_Ed [kNm]' },
+    y: { bereich: [0, vMax], teilung: {}, titel: 'v_Rd [kN/m]' },
+  });
+
   for (const [m, text] of [[mMin, 'Zug oben'], [mMax, 'Zug unten']]) {
     const t = svgEl('text', {
-      x: x(m / 2), y: HOEHE - RAND.unten - 7, 'text-anchor': 'middle',
+      x: x(m / 2), y: feld.unten - 7, 'text-anchor': 'middle',
       'font-size': 11, fill: '#8895a8',
     });
     t.textContent = text;
-    svg.append(t);
+    daten.append(t);
   }
 
   // -- Die Äste ------------------------------------------------------------
   for (const ast of aeste) {
-    svg.append(svgEl('line', {
-      x1: x(ast.m_Rd), y1: RAND.oben, x2: x(ast.m_Rd), y2: HOEHE - RAND.unten,
+    daten.append(svgEl('line', {
+      x1: x(ast.m_Rd), y1: feld.oben, x2: x(ast.m_Rd), y2: feld.unten,
       stroke: '#1f5fa8', 'stroke-width': 1.4, 'stroke-dasharray': '4 4', opacity: .7,
     }));
     const marke = svgEl('text', {
-      x: x(ast.m_Rd) + (ast.moment_positiv ? -6 : 6), y: RAND.oben + 13,
+      x: x(ast.m_Rd) + (ast.moment_positiv ? -6 : 6), y: feld.oben + 13,
       'text-anchor': ast.moment_positiv ? 'end' : 'start',
       'font-size': 11, 'font-weight': 600, fill: '#1f5fa8',
     });
     marke.textContent = `m_Rd = ${ast.m_Rd.toFixed(1)}`;
-    svg.append(marke);
+    daten.append(marke);
 
     // Zwei Züge: bis m_Rd durchgezogen, darüber gestrichelt.
     for (const gestrichelt of [false, true]) {
       const teil = ast.punkte.filter((p) => p.plastisch === gestrichelt);
       if (teil.length < 2) continue;
-      svg.append(svgEl('polyline', {
+      daten.append(svgEl('polyline', {
         points: teil.map((p) => `${x(p.M_Ed).toFixed(2)},${y(p.v_Rd).toFixed(2)}`).join(' '),
         fill: 'none', stroke: '#1f5fa8', 'stroke-width': 2.2,
         'stroke-linejoin': 'round', 'stroke-dasharray': gestrichelt ? '7 4' : null,
@@ -839,11 +671,11 @@ export function querkraftkurveZeichnen(kurve) {
     if (plastisch.length) marken.push([plastisch[0], 'v_Rd nach Fliessbeginn', false]);
   }
   for (const [p, name, oben] of marken) {
-    svg.append(svgEl('circle', {
+    daten.append(svgEl('circle', {
       cx: x(p.M_Ed), cy: y(p.v_Rd), r: 4,
       fill: '#fff', stroke: '#1f5fa8', 'stroke-width': 2,
     }));
-    const rechts = x(p.M_Ed) > RAND.links + zeichenBreite * 0.62;
+    const rechts = x(p.M_Ed) > feld.links + (feld.rechts - feld.links) * 0.62;
     const t = svgEl('text', {
       x: x(p.M_Ed) + (rechts ? -8 : 8),
       y: y(p.v_Rd) + (oben ? -9 : 17),
@@ -851,7 +683,7 @@ export function querkraftkurveZeichnen(kurve) {
       'font-size': 11, 'font-weight': 600, fill: '#1f5fa8',
     });
     t.textContent = `${name} = ${p.v_Rd.toFixed(1)} kN/m`;
-    svg.append(t);
+    daten.append(t);
   }
 
   // -- Bemessungspunkte ----------------------------------------------------
@@ -861,12 +693,12 @@ export function querkraftkurveZeichnen(kurve) {
     const deckung = gilt ? 1 : 0.28;
 
     // Senkrechte von der Einwirkung hinauf zum Widerstand auf der Kurve.
-    svg.append(svgEl('line', {
+    daten.append(svgEl('line', {
       x1: x(f.M_Ed), y1: y(f.V_Ed), x2: x(f.M_Ed), y2: y(f.v_Rd),
       stroke: farbe, 'stroke-width': 1.4, 'stroke-dasharray': '5 3',
       opacity: 0.75 * deckung,
     }));
-    svg.append(svgEl('circle', {
+    daten.append(svgEl('circle', {
       cx: x(f.M_Ed), cy: y(f.v_Rd), r: 3.5,
       fill: '#fff', stroke: farbe, 'stroke-width': 1.6, opacity: deckung,
     }));
@@ -884,31 +716,15 @@ export function querkraftkurveZeichnen(kurve) {
       + (gilt ? '' : `\nGilt für N_Ed = ${f.N_Ed.toFixed(1)} kN, `
                    + `gezeigt ist ${kurve.N_Ed.toFixed(1)} kN.`);
     punkt.append(titel);
-    svg.append(punkt);
+    daten.append(punkt);
 
     const beschriftung = svgEl('text', {
       x: x(f.M_Ed) + 9, y: y(f.V_Ed) + 16,
       'font-size': 11, 'font-weight': 600, fill: farbe, opacity: deckung,
     });
     beschriftung.textContent = f.name;
-    svg.append(beschriftung);
+    daten.append(beschriftung);
   }
-
-  // -- Achsenbeschriftung --------------------------------------------------
-  const xTitel = svgEl('text', {
-    x: RAND.links + zeichenBreite / 2, y: HOEHE - 8,
-    'text-anchor': 'middle', 'font-size': 12, fill: '#1a1f27', 'font-weight': 600,
-  });
-  xTitel.textContent = 'M_Ed [kNm]';
-  svg.append(xTitel);
-
-  const yTitel = svgEl('text', {
-    x: 16, y: RAND.oben + zeichenHoehe / 2,
-    'text-anchor': 'middle', 'font-size': 12, fill: '#1a1f27', 'font-weight': 600,
-    transform: `rotate(-90 16 ${RAND.oben + zeichenHoehe / 2})`,
-  });
-  yTitel.textContent = 'v_Rd [kN/m]';
-  svg.append(yTitel);
 
   return svg;
 }
@@ -943,70 +759,49 @@ export function neigungskurveZeichnen(kurve) {
   const aMin = punkte[0].alpha;
   const aMax = punkte.at(-1).alpha;
   const vMax = Math.max(...alleV) * 1.12 || 1;
-  const spanne = (aMax - aMin) || 1;
 
-  const zeichenBreite = BREITE - RAND.links - RAND.rechts;
-  const zeichenHoehe = HOEHE - RAND.oben - RAND.unten;
-  const x = (a) => RAND.links + ((a - aMin) / spanne) * zeichenBreite;
-  const y = (v) => RAND.oben + (1 - v / vMax) * zeichenHoehe;
-
-  const svg = svgEl('svg', {
-    class: 'mv', viewBox: `0 0 ${BREITE} ${HOEHE}`, xmlns: NR, role: 'img',
-    'aria-label': 'Querkraftwiderstand über der Neigung der Druckdiagonalen',
+  const { svg, daten, x, y, feld } = achsenkreuz({
+    breite: BREITE, hoehe: HOEHE, rand: RAND,
+    attribute: {
+      class: 'mv', xmlns: NR, role: 'img',
+      'aria-label': 'Querkraftwiderstand über der Neigung der Druckdiagonalen',
+    },
+    x: {
+      bereich: [aMin, aMax],
+      // Ganze Grade: eine Teilung in halben stünde für eine Genauigkeit, die
+      // die Suche nicht hat -- sie geht gradweise.
+      teilung: {
+        schritt: Math.max(1, schrittweite((aMax - aMin) || 1)),
+        format: (a) => `${Math.round(a)}°`,
+      },
+      titel: 'α – Neigung der Druckdiagonalen [°]',
+    },
+    y: { bereich: [0, vMax], teilung: {}, titel: 'V_Rd [kN/m]' },
   });
 
-  // -- Gitter --------------------------------------------------------------
-  const gitter = svgEl('g');
-  const aSchritt = Math.max(1, schrittweite(spanne));
-  const vSchritt = schrittweite(vMax);
-  for (let a = Math.ceil(aMin / aSchritt) * aSchritt; a <= aMax; a += aSchritt) {
-    gitter.append(svgEl('line', {
-      x1: x(a), y1: RAND.oben, x2: x(a), y2: HOEHE - RAND.unten,
-      stroke: '#e6e9ee', 'stroke-width': 1,
-    }));
-    const t = svgEl('text', {
-      x: x(a), y: HOEHE - RAND.unten + 16, 'text-anchor': 'middle',
-      'font-size': 11, fill: '#5c6773',
-    });
-    t.textContent = `${Math.round(a)}°`;
-    gitter.append(t);
-  }
-  for (let v = 0; v <= vMax; v += vSchritt) {
-    gitter.append(svgEl('line', {
-      x1: RAND.links, y1: y(v), x2: BREITE - RAND.rechts, y2: y(v),
-      stroke: '#e6e9ee', 'stroke-width': 1,
-    }));
-    const t = svgEl('text', {
-      x: RAND.links - 8, y: y(v) + 4, 'text-anchor': 'end',
-      'font-size': 11, fill: '#5c6773',
-    });
-    t.textContent = Math.round(v);
-    gitter.append(t);
-  }
-  svg.append(gitter);
-
   // -- Der zulässige Bereich -----------------------------------------------
-  svg.append(svgEl('rect', {
-    x: x(kurve.alpha_min), y: RAND.oben,
-    width: Math.max(0, x(kurve.alpha_max) - x(kurve.alpha_min)), height: zeichenHoehe,
+  daten.append(svgEl('rect', {
+    x: x(kurve.alpha_min), y: feld.oben,
+    width: Math.max(0, x(kurve.alpha_max) - x(kurve.alpha_min)),
+    height: feld.unten - feld.oben,
     fill: '#1f6feb', opacity: 0.05,
   }));
   for (const [a, text] of [[kurve.alpha_min, 'α_min'], [kurve.alpha_max, 'α_max']]) {
-    svg.append(svgEl('line', {
-      x1: x(a), y1: RAND.oben, x2: x(a), y2: HOEHE - RAND.unten,
+    daten.append(svgEl('line', {
+      x1: x(a), y1: feld.oben, x2: x(a), y2: feld.unten,
       stroke: '#8895a8', 'stroke-width': 1.3, 'stroke-dasharray': '4 4',
     }));
     const t = svgEl('text', {
-      x: x(a) + 5, y: RAND.oben + 13, 'font-size': 11, fill: '#5c6773',
+      x: x(a) + 5, y: feld.oben + 13, 'font-size': 11, fill: '#5c6773',
     });
     t.textContent = `${text} = ${a}°`;
-    svg.append(t);
+    daten.append(t);
   }
 
   // -- Die beiden Äste ------------------------------------------------------
   // Je Ast zwei Züge: innerhalb der Grenzen kräftig, ausserhalb blass. Der
   // Übergang gehört zu beiden, sonst klaffte an der Grenze eine Lücke.
-  const zug = (feld, farbe, drin) => {
+  const zug = (wert, farbe, drin) => {
     const teil = punkte.filter((p, i) => p.im_bereich === drin
       || (punkte[i - 1] && punkte[i - 1].im_bereich === drin)
       || (punkte[i + 1] && punkte[i + 1].im_bereich === drin));
@@ -1018,36 +813,36 @@ export function neigungskurveZeichnen(kurve) {
     }
     if (lauf.length) stuecke.push(lauf);
     return stuecke.filter((s) => s.length > 1).map((s) => svgEl('polyline', {
-      points: s.map((p) => `${x(p.alpha).toFixed(2)},${y(p[feld]).toFixed(2)}`).join(' '),
+      points: s.map((p) => `${x(p.alpha).toFixed(2)},${y(p[wert]).toFixed(2)}`).join(' '),
       fill: 'none', stroke: farbe, 'stroke-width': drin ? 2.4 : 1.6,
       'stroke-linejoin': 'round', opacity: drin ? 1 : 0.3,
     }));
   };
-  for (const [feld, farbe] of [['V_Rd_c', DIAGONALE], ['V_Rd_s', BUEGEL]]) {
-    for (const drin of [false, true]) svg.append(...zug(feld, farbe, drin));
+  for (const [wert, farbe] of [['V_Rd_c', DIAGONALE], ['V_Rd_s', BUEGEL]]) {
+    for (const drin of [false, true]) daten.append(...zug(wert, farbe, drin));
   }
 
   // Der massgebende Verlauf: das Kleinere von beiden, als kräftige Linie.
   const drin = punkte.filter((p) => p.im_bereich);
   if (drin.length > 1) {
-    svg.append(svgEl('polyline', {
+    daten.append(svgEl('polyline', {
       points: drin.map((p) => `${x(p.alpha).toFixed(2)},${y(p.V_Rd).toFixed(2)}`).join(' '),
       fill: 'none', stroke: '#16202c', 'stroke-width': 3.2,
       'stroke-linejoin': 'round', opacity: 0.85,
     }));
   }
 
-  for (const [feld, farbe, text] of [
+  for (const [wert, farbe, text] of [
     ['V_Rd_s', BUEGEL, 'V_Rd,s (Bügel)'],
     ['V_Rd_c', DIAGONALE, 'V_Rd,c (Druckdiagonale)'],
   ]) {
     const letzter = punkte.at(-1);
     const t = svgEl('text', {
-      x: x(letzter.alpha) - 6, y: y(letzter[feld]) - 8, 'text-anchor': 'end',
+      x: x(letzter.alpha) - 6, y: y(letzter[wert]) - 8, 'text-anchor': 'end',
       'font-size': 11, 'font-weight': 600, fill: farbe,
     });
     t.textContent = text;
-    svg.append(t);
+    daten.append(t);
   }
 
   // -- Die Bemessungsfälle --------------------------------------------------
@@ -1055,11 +850,11 @@ export function neigungskurveZeichnen(kurve) {
     const farbe = f.erfuellt ? '#1a7f45' : '#b3261e';
 
     // Senkrechte von der Einwirkung hinauf zum Widerstand bei diesem α.
-    svg.append(svgEl('line', {
+    daten.append(svgEl('line', {
       x1: x(f.alpha), y1: y(f.V_Ed), x2: x(f.alpha), y2: y(f.V_Rd),
       stroke: farbe, 'stroke-width': 1.4, 'stroke-dasharray': '5 3', opacity: 0.75,
     }));
-    svg.append(svgEl('circle', {
+    daten.append(svgEl('circle', {
       cx: x(f.alpha), cy: y(f.V_Rd), r: 4,
       fill: '#fff', stroke: farbe, 'stroke-width': 1.8,
     }));
@@ -1075,31 +870,15 @@ export function neigungskurveZeichnen(kurve) {
       + `\n${f.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`
       + (f.begruendung ? `\n${f.begruendung}` : '');
     punkt.append(titel);
-    svg.append(punkt);
+    daten.append(punkt);
 
     const beschriftung = svgEl('text', {
       x: x(f.alpha) + 9, y: y(f.V_Ed) + 16,
       'font-size': 11, 'font-weight': 600, fill: farbe,
     });
     beschriftung.textContent = `${f.name} · V_Ed = ${f.V_Ed.toFixed(1)}`;
-    svg.append(beschriftung);
+    daten.append(beschriftung);
   }
-
-  // -- Achsenbeschriftung --------------------------------------------------
-  const xTitel = svgEl('text', {
-    x: RAND.links + zeichenBreite / 2, y: HOEHE - 8,
-    'text-anchor': 'middle', 'font-size': 12, fill: '#1a1f27', 'font-weight': 600,
-  });
-  xTitel.textContent = 'α – Neigung der Druckdiagonalen [°]';
-  svg.append(xTitel);
-
-  const yTitel = svgEl('text', {
-    x: 16, y: RAND.oben + zeichenHoehe / 2,
-    'text-anchor': 'middle', 'font-size': 12, fill: '#1a1f27', 'font-weight': 600,
-    transform: `rotate(-90 16 ${RAND.oben + zeichenHoehe / 2})`,
-  });
-  yTitel.textContent = 'V_Rd [kN/m]';
-  svg.append(yTitel);
 
   return svg;
 }
