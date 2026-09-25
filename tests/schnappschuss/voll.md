@@ -484,16 +484,10 @@ $$
 **Bezogene Druckzonenhöhe** *(SIA 262:2025, 4.1.4.2.5)*
 
 $$
-\left(x/d\right)_{2} = \frac{x}{d_{2,x}} = \frac{62.7\,\mathrm{mm}}{248.1\,\mathrm{mm}} = 0.253
+\left(x/d\right)_{2} = \frac{x}{d_{2,x}} = \frac{62.7\,\mathrm{mm}}{248.1\,\mathrm{mm}} = 0.253 \quad \le \quad \left(x/d\right)_{max} = 0.35 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
-**Bedingung**
-
-$$
-\left(x/d\right)_{2} = 0.253 \le \left(x/d\right)_{max} = 0.35 \quad \Rightarrow \quad \text{erfüllt}
-$$
-
-**Erfüllungsgrad** *(SIA 262:2025, 4.1.4.2.5)*
+**Erfüllungsgrad**
 
 $$
 \alpha_{eff,D,2} = \frac{\left(x/d\right)_{max}}{\left(x/d\right)_{2}} = \frac{0.35}{0.253} = 1.39
@@ -516,16 +510,10 @@ $$
 **Bezogene Druckzonenhöhe** *(SIA 262:2025, 4.1.4.2.5)*
 
 $$
-\left(x/d\right)_{3} = \frac{x}{d_{3,x,g}} = \frac{19.3\,\mathrm{mm}}{252\,\mathrm{mm}} = 0.077
+\left(x/d\right)_{3} = \frac{x}{d_{3,x,g}} = \frac{19.3\,\mathrm{mm}}{252\,\mathrm{mm}} = 0.077 \quad \le \quad \left(x/d\right)_{max} = 0.35 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
-**Bedingung**
-
-$$
-\left(x/d\right)_{3} = 0.077 \le \left(x/d\right)_{max} = 0.35 \quad \Rightarrow \quad \text{erfüllt}
-$$
-
-**Erfüllungsgrad** *(SIA 262:2025, 4.1.4.2.5)*
+**Erfüllungsgrad**
 
 $$
 \alpha_{eff,D,3} = \frac{\left(x/d\right)_{max}}{\left(x/d\right)_{3}} = \frac{0.35}{0.077} = 4.57
@@ -612,13 +600,13 @@ Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Na
 **Beiwert für die Plattendicke** *(SIA 262:2025, 4.4.1.3)*
 
 $$
-k_t = \frac{1}{1 + 0.5 \cdot h/3} = \frac{1}{1 + 0.5 \cdot 0.300\,\mathrm{m}/3} = 0.952
+k_t = \frac{1}{1 + 0.5 \cdot h/3} = \frac{1}{1 + 0.5 \cdot 0.3/3} = 0.952 \quad \left(h\ \text{in}\ \mathrm{m}\right)
 $$
 
 **Wirksame Zugfestigkeit**
 
 $$
-f_{ct,eff} = k_t \cdot f_{ctm} = 0.952 \cdot 2.90\,\mathrm{N}/\mathrm{mm}^{2} = 2.76\,\mathrm{N}/\mathrm{mm}^{2}
+f_{ct,eff} = k_t \cdot f_{ctm} = 0.952 \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} = 2.76\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Rissmoment des ungerissenen Querschnitts**
@@ -632,13 +620,13 @@ $$
 **Biegewiderstand gegen Rissmoment**
 
 $$
-M_{Rd,x}(N_{Ed} = 0) = 235.9\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 41.4\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+M_{Rd,x}(N_{Ed} = 0)_{2} = 235.9\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 41.4\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,SV,2,x} = \frac{M_{Rd}(N_{Ed} = 0)}{M_{Riss}} = \frac{235.9\,\mathrm{kNm}}{41.4\,\mathrm{kNm}} = 5.69
+\alpha_{eff,SV,2,x} = \frac{M_{Rd,x}(N_{Ed} = 0)_{2}}{M_{Riss}} = \frac{235.9\,\mathrm{kNm}}{41.4\,\mathrm{kNm}} = 5.69
 $$
 
 #### Sprödes Versagen – 3. Lage x
@@ -646,13 +634,13 @@ $$
 **Biegewiderstand gegen Rissmoment**
 
 $$
-M_{Rd,x}(N_{Ed} = 0) = 79.9\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 41.4\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+M_{Rd,x}(N_{Ed} = 0)_{3} = 79.9\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 41.4\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,SV,3,x} = \frac{M_{Rd}(N_{Ed} = 0)}{M_{Riss}} = \frac{79.9\,\mathrm{kNm}}{41.4\,\mathrm{kNm}} = 1.93
+\alpha_{eff,SV,3,x} = \frac{M_{Rd,x}(N_{Ed} = 0)_{3}}{M_{Riss}} = \frac{79.9\,\mathrm{kNm}}{41.4\,\mathrm{kNm}} = 1.93
 $$
 
 Massgebend ist die 3. Lage mit dem kleineren Erfüllungsgrad; sie steht in der Zusammenfassung.

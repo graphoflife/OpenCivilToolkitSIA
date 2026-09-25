@@ -36,12 +36,12 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_als_text,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_formel,
 )
-from opencivil.core.einheiten import EINHEITSLOS, KNM, Groesse
-from opencivil.core.protokoll import Protokoll
-from opencivil.core.wert import WertDef
-from opencivil.material.basis import mit_index
+from opencivil.core.einheiten import EINHEITSLOS, KNM, M, Groesse
+from opencivil.core.latex import angabe, bedingung
+from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.wert import Wert, WertDef
 from opencivil.querschnitt.platte import Bewehrungslage, Richtung
 
 
@@ -152,8 +152,6 @@ class SproedesVersagen(Nachweis):
             bezuege.append(Eingabebezug(
                 f"M_Rd_{lage.nummer}", mn_nachweis.d_eckwerte[schluessel].id))
 
-        self.s_f_ctm = mit_index("f_{ctm}", querschnitt.beton.symbol_index)
-
         super().__init__(
             basis,
             ausgaben=list(self.d_ausnutzung.values()),
@@ -172,7 +170,7 @@ class SproedesVersagen(Nachweis):
         f_ctm = e.g("f_ctm").si
 
         self.groessen = rissmoment(h=h, b=b, f_ctm=f_ctm)
-        self._protokoll_ansatz(p, h, b, f_ctm)
+        self._protokoll_ansatz(p, e)
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
@@ -206,19 +204,25 @@ class SproedesVersagen(Nachweis):
         self._protokoll_massgebend(p, urteile)
         return ergebnis, self.teilurteile(urteile)
 
-    def _urteil(self, erg: Lagenergebnis) -> NachweisUrteil:
-        nummer = erg.lage.nummer
-        r = self.richtung.value
-        einwirkung = WertDef(
-            id=f"{self.id}.M_Riss",
-            symbol=r"M_{Riss}",
+    def _m_riss(self) -> Wert:
+        """Das Rissmoment -- die Einwirkung in Tabelle und Herleitung."""
+        return WertDef(
+            id=f"{self.id}.M_Riss", symbol=r"M_{Riss}",
             einheit=KNM, beschreibung="Einwirkung", stellen=1,
         ).belegen(Groesse.aus_si(self.groessen.M_Riss, KNM))
-        widerstand = WertDef(
+
+    def _m_rd(self, erg: Lagenergebnis) -> Wert:
+        """Der Biegewiderstand der Lage -- der Widerstand in Tabelle und Herleitung."""
+        nummer, r = erg.lage.nummer, self.richtung.value
+        return WertDef(
             id=f"{self.id}.lage{nummer}.M_Rd",
             symbol=rf"M_{{Rd,{r}}}(N_{{Ed}} = 0)_{{{nummer}}}",
             einheit=KNM, beschreibung="Widerstand", stellen=1,
         ).belegen(Groesse.aus_si(erg.M_Rd, KNM))
+
+    def _urteil(self, erg: Lagenergebnis) -> NachweisUrteil:
+        nummer = erg.lage.nummer
+        r = self.richtung.value
         return NachweisUrteil(
             name=f"Sprödes Versagen {r} – {nummer}. Lage",
             art="SV",
@@ -228,8 +232,8 @@ class SproedesVersagen(Nachweis):
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
             begruendung=erg.begruendung,
             hinweis=erg.hinweis,
-            einwirkung=einwirkung if erg.machbar else None,
-            widerstand=widerstand if erg.machbar else None,
+            einwirkung=self._m_riss() if erg.machbar else None,
+            widerstand=self._m_rd(erg) if erg.machbar else None,
         )
 
 
@@ -251,9 +255,9 @@ class SproedesVersagen(Nachweis):
 
     # -- Mitschrift ---------------------------------------------------------
 
-    def _protokoll_ansatz(self, p: Protokoll, h: float, b: float,
-                          f_ctm: float) -> None:
+    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
         g = self.groessen
+        werte = Zwischenwerte(self.id)
         p.titel(f"Sprödes Versagen – {self.richtung.beschriftung}")
         p.text(
             "Ein zu schwach bewehrter Querschnitt reisst und versagt im selben "
@@ -261,24 +265,17 @@ class SproedesVersagen(Nachweis):
             "Querschnitt mehr trägt als der unbewehrte im Augenblick des "
             "Risses: M_Rd(N_Ed = 0) ≥ M_Riss."
         )
-        p.gleichung(
-            rf"k_t = \frac{{1}}{{1 + 0.5 \cdot h/{MOMENTENTEILER:.0f}}}"
-            rf" = \frac{{1}}{{1 + 0.5 \cdot {h:.3f}\,\mathrm{{m}}"
-            rf"/{MOMENTENTEILER:.0f}}} = {g.k_t:.3f}",
-            titel="Beiwert für die Plattendicke",
-            referenz="SIA 262:2025, 4.4.1.3")
-        p.gleichung(
-            rf"f_{{ct,eff}} = k_t \cdot {self.s_f_ctm} = {g.k_t:.3f} \cdot "
-            rf"{f_ctm / 1e6:.2f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
-            rf" = {g.f_ct_eff / 1e6:.2f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}",
-            titel="Wirksame Zugfestigkeit")
-        p.gleichung(
-            r"M_{Riss} = f_{ct,eff} \cdot \frac{h^{2} \cdot b}{6}"
-            rf" = {g.f_ct_eff / 1e6:.2f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}} \cdot "
-            rf"\frac{{\left({h * 1e3:.0f}\,\mathrm{{mm}}\right)^{{2}} \cdot "
-            rf"{b * 1e3:.0f}\,\mathrm{{mm}}}}{{6}}"
-            rf" = {g.M_Riss / 1e3:.1f}\,\mathrm{{kNm}}",
-            titel="Rissmoment des ungerissenen Querschnitts")
+        # Empirisch: die Norm setzt die Dicke in Metern ein.
+        k_t = werte.zahl("k_t", "k_t", g.k_t)
+        p.formel(k_t, rf"\frac{{1}}{{1 + 0.5 \cdot @h/{MOMENTENTEILER:.0f}}}",
+                 {"h": e["h"]}, titel="Beiwert für die Plattendicke",
+                 referenz="SIA 262:2025, 4.4.1.3", empirisch={"h": M})
+        f_ct_eff = werte.spannung("f_ct_eff", "f_{ct,eff}", g.f_ct_eff, stellen=2)
+        p.formel(f_ct_eff, r"@k_t \cdot @f_ctm", {"k_t": k_t, "f_ctm": e["f_ctm"]},
+                 titel="Wirksame Zugfestigkeit")
+        p.formel(self._m_riss(), r"@f_ct_eff \cdot \frac{@h^{2} \cdot @b}{6}",
+                 {"f_ct_eff": f_ct_eff, "h": e["h"], "b": e["b"]},
+                 titel="Rissmoment des ungerissenen Querschnitts")
 
     def _protokoll_lage(self, p: Protokoll, erg: Lagenergebnis) -> None:
         nummer = erg.lage.nummer
@@ -289,18 +286,11 @@ class SproedesVersagen(Nachweis):
             p.text(erg.begruendung)
             return
 
-        zustand = r"\text{erfüllt}" if erg.erfuellt else r"\text{NICHT erfüllt}"
-        vergleich = r"\ge" if erg.erfuellt else "<"
-        p.gleichung(
-            rf"M_{{Rd,{r}}}(N_{{Ed}} = 0) = {erg.M_Rd / 1e3:.1f}\,\mathrm{{kNm}}"
-            rf" \quad {vergleich} \quad M_{{Riss}} = "
-            rf"{self.groessen.M_Riss / 1e3:.1f}\,\mathrm{{kNm}}"
-            rf" \quad \Rightarrow \quad {zustand}",
-            titel="Biegewiderstand gegen Rissmoment")
-        grad = grad_als_text(erg.erfuellungsgrad, erg.erfuellt, latex=True)
-        p.gleichung(
-            rf"\alpha_{{eff,SV,{nummer},{r}}} = "
-            rf"\frac{{M_{{Rd}}(N_{{Ed}} = 0)}}{{M_{{Riss}}}} = "
-            rf"\frac{{{erg.M_Rd / 1e3:.1f}\,\mathrm{{kNm}}}}"
-            rf"{{{self.groessen.M_Riss / 1e3:.1f}\,\mathrm{{kNm}}}} = {grad}",
-            titel="Erfüllungsgrad")
+        m_rd, m_riss = self._m_rd(erg), self._m_riss()
+        p.gleichung(bedingung(angabe(m_rd), r"\ge" if erg.erfuellt else "<",
+                              angabe(m_riss), erg.erfuellt),
+                    titel="Biegewiderstand gegen Rissmoment")
+        grad_formel(p, self.d_ausnutzung[nummer].belegen(
+                        Groesse(erg.erfuellungsgrad, EINHEITSLOS)),
+                    r"\frac{@M_Rd}{@M_Riss}", {"M_Rd": m_rd, "M_Riss": m_riss},
+                    erg.erfuellt)

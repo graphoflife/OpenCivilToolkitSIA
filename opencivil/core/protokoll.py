@@ -423,8 +423,9 @@ class Zwischenwerte:
     ist. Hier entstehen solche Werte, mit festen Gewohnheiten je Groessenart:
     Laengen in mm auf eine Stelle, Flaechen in mm² und Spannungen in N/mm²
     ganz, Kraefte in kN und Momente in kNm auf eine Stelle, Dehnungen in
-    Promille auf zwei. Jede Stelle, die das von Hand tat, rechnete dafuer selbst
-    um und schrieb die Einheit selbst dazu.
+    Promille auf zwei; wo eine Groesse mehr verlangt (die Zugfestigkeit des
+    Betons auf zwei Stellen), sagt es ``stellen``. Jede Stelle, die das von
+    Hand tat, rechnete dafuer selbst um und schrieb die Einheit selbst dazu.
 
     Die Kennung ist ``{basis}.{name}``: eindeutig in der Mitschrift, aber nie
     im Rechenwerk angemeldet -- diese Werte zeigen eine Rechnung, sie gehen in
@@ -442,26 +443,32 @@ class Zwischenwerte:
             beschreibung=beschreibung, stellen=stellen,
         ).belegen(groesse)
 
-    def laenge(self, name: str, symbol: str, si: float, beschreibung: str = "") -> Wert:
-        return self.wert(name, symbol, Groesse.aus_si(si, MM), 1, beschreibung)
+    def laenge(self, name: str, symbol: str, si: float, beschreibung: str = "",
+               *, stellen: int = 1) -> Wert:
+        return self.wert(name, symbol, Groesse.aus_si(si, MM), stellen, beschreibung)
 
-    def flaeche(self, name: str, symbol: str, si: float, beschreibung: str = "") -> Wert:
-        return self.wert(name, symbol, Groesse.aus_si(si, MM2), 0, beschreibung)
+    def flaeche(self, name: str, symbol: str, si: float, beschreibung: str = "",
+                *, stellen: int = 0) -> Wert:
+        return self.wert(name, symbol, Groesse.aus_si(si, MM2), stellen, beschreibung)
 
-    def spannung(self, name: str, symbol: str, si: float, beschreibung: str = "") -> Wert:
-        return self.wert(name, symbol, Groesse.aus_si(si, N_PRO_MM2), 0, beschreibung)
+    def spannung(self, name: str, symbol: str, si: float, beschreibung: str = "",
+                 *, stellen: int = 0) -> Wert:
+        return self.wert(name, symbol, Groesse.aus_si(si, N_PRO_MM2), stellen, beschreibung)
 
-    def kraft(self, name: str, symbol: str, si: float, beschreibung: str = "") -> Wert:
-        return self.wert(name, symbol, Groesse.aus_si(si, KN), 1, beschreibung)
+    def kraft(self, name: str, symbol: str, si: float, beschreibung: str = "",
+              *, stellen: int = 1) -> Wert:
+        return self.wert(name, symbol, Groesse.aus_si(si, KN), stellen, beschreibung)
 
-    def moment(self, name: str, symbol: str, si: float, beschreibung: str = "") -> Wert:
-        return self.wert(name, symbol, Groesse.aus_si(si, KNM), 1, beschreibung)
+    def moment(self, name: str, symbol: str, si: float, beschreibung: str = "",
+               *, stellen: int = 1) -> Wert:
+        return self.wert(name, symbol, Groesse.aus_si(si, KNM), stellen, beschreibung)
 
-    def dehnung(self, name: str, symbol: str, si: float, beschreibung: str = "") -> Wert:
-        return self.wert(name, symbol, Groesse.aus_si(si, PROMILLE), 2, beschreibung)
+    def dehnung(self, name: str, symbol: str, si: float, beschreibung: str = "",
+                *, stellen: int = 2) -> Wert:
+        return self.wert(name, symbol, Groesse.aus_si(si, PROMILLE), stellen, beschreibung)
 
-    def zahl(self, name: str, symbol: str, zahl: float, stellen: int = 3,
-             beschreibung: str = "") -> Wert:
+    def zahl(self, name: str, symbol: str, zahl: float, beschreibung: str = "",
+             *, stellen: int = 3) -> Wert:
         return self.wert(name, symbol, Groesse(zahl, EINHEITSLOS), stellen, beschreibung)
 
 

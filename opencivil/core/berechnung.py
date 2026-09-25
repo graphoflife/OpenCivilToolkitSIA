@@ -42,6 +42,7 @@ from typing import (
     Tuple, Union,
 )
 
+from opencivil.core import latex as tex
 from opencivil.core.einheiten import EINHEITSLOS, EmpirischesErgebnis, Groesse
 from opencivil.core.protokoll import Abschnitt, Protokoll
 from opencivil.core.wert import Quelle, Wert, WertDef
@@ -528,6 +529,24 @@ def grad_als_text(grad: float, erfuellt: bool, *, latex: bool = False) -> str:
     if not erfuellt and float(text) >= 1.0:
         text = f"{math.floor(grad * 1000) / 1000:.3f}"
     return text
+
+
+def grad_formel(
+    p: Protokoll, ergebnis: Wert, vorlage: str, eingaben: Mapping[str, Wert],
+    erfuellt: bool, *, mit_urteil: bool = False,
+) -> None:
+    """
+    Die Zeile mit dem Erfuellungsgrad -- in jedem Nachweis dieselbe Form.
+
+    Der Grad steht gesetzt wie in Tabelle und Bericht (:func:`grad_als_text`),
+    nicht mit der Stellenzahl seines Werts: 0.9966 heisst sonst 1.00 neben
+    «nicht erfuellt». Ohne Normverweis -- den traegt die Zeile, aus der
+    Widerstand und Einwirkung kommen.
+    """
+    p.formel(ergebnis, vorlage, eingaben, titel="Erfüllungsgrad", referenz="",
+             ergebnis_latex=grad_als_text(ergebnis.groesse.si, erfuellt, latex=True),
+             nachsatz=(rf"\quad \Rightarrow \quad {tex.urteil(erfuellt)}"
+                       if mit_urteil else ""))
 
 
 

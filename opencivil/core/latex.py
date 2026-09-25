@@ -94,10 +94,16 @@ def platzhalter_namen(vorlage: str) -> list[str]:
 
 
 def _ersetzen(vorlage: str, ersatz) -> str:
-    """Ersetzt alle Platzhalter mittels einer Funktion ``name -> str``."""
+    """
+    Ersetzt alle Platzhalter mittels einer Funktion ``(name, hoch) -> str``.
+
+    ``hoch`` sagt, ob hinter dem Platzhalter ein Exponent steht: ``@h^{2}``
+    braucht mit Zahl und Einheit eine Klammer, ``(300 mm)^2`` und nicht
+    ``300 mm^2``.
+    """
 
     def _treffer(m: re.Match) -> str:
-        return ersatz(m.group(1) or m.group(2))
+        return ersatz(m.group(1) or m.group(2), vorlage.startswith("^", m.end()))
 
     return _PLATZHALTER.sub(_treffer, vorlage)
 
@@ -116,7 +122,13 @@ def einsetzen_symbolisch(
 ) -> str:
     """Ersetzt die Platzhalter durch die Symbole der Eingaben."""
     _pruefe_vollstaendig(vorlage, eingaben, kontext)
-    return _ersetzen(vorlage, lambda name: eingaben[name].symbol)
+
+    def _symbol(name: str, hoch: bool) -> str:
+        # Ein Symbol mit eigenem Hochindex vertraegt keinen zweiten.
+        symbol = eingaben[name].symbol
+        return f"{{{symbol}}}" if hoch and "^" in symbol else symbol
+
+    return _ersetzen(vorlage, _symbol)
 
 
 def _blank(wert: Wert, einheit: Einheit) -> str:
@@ -152,11 +164,11 @@ def einsetzen_numerisch(
     nur_ein_platzhalter = _PLATZHALTER.fullmatch(vorlage.strip()) is not None
     empirisch = empirisch or {}
 
-    def _wert(name: str) -> str:
+    def _wert(name: str, hoch: bool) -> str:
         wert = eingaben[name]
-        text = (_blank(wert, empirisch[name]) if name in empirisch
-                else wert.zahl_latex())
-        if wert.groesse.si < 0 and not nur_ein_platzhalter:
+        blank = name in empirisch or wert.einheit is EINHEITSLOS
+        text = _blank(wert, empirisch[name]) if name in empirisch else wert.zahl_latex()
+        if (wert.groesse.si < 0 and not nur_ein_platzhalter) or (hoch and not blank):
             return f"\\left({text}\\right)"
         return text
 
@@ -421,10 +433,11 @@ def bedingung(links: str, zeichen: str, rechts: str, erfuellt: bool) -> str:
     """
     Setzt einen Vergleich mit sichtbarem Ergebnis, z.B. fuer Nachweise::
 
-        M_{Ed} = 120\\,\\mathrm{kNm} \\le M_{Rd} = 145\\,\\mathrm{kNm}
+        M_{Ed} = 120\\,\\mathrm{kNm} \\quad \\le \\quad M_{Rd} = 145\\,\\mathrm{kNm}
         \\quad \\Rightarrow \\quad \\text{erfüllt}
     """
-    return rf"{links} {zeichen} {rechts} \quad \Rightarrow \quad {urteil(erfuellt)}"
+    return (rf"{links} \quad {zeichen} \quad {rechts}"
+            rf" \quad \Rightarrow \quad {urteil(erfuellt)}")
 
 
 def vergleich(zeichen: str, rechts: str, erfuellt: bool) -> str:

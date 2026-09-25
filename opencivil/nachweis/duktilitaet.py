@@ -44,10 +44,10 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_als_text,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
-from opencivil.core.latex import bedingung
+from opencivil.core.latex import angabe, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.material.basis import mit_index
@@ -399,18 +399,13 @@ class Duktilitaet(Nachweis):
             Groesse(erg.verhaeltnis, EINHEITSLOS))
         grenze = self._grenze(nummer)
         p.formel(verhaeltnis, r"\frac{@x}{@d}", {"x": x, "d": d},
-                 titel="Bezogene Druckzonenhöhe")
-        p.gleichung(
-            bedingung(rf"{verhaeltnis.symbol} = {verhaeltnis.zahl_latex()}",
-                      r"\le" if erg.erfuellt else ">",
-                      rf"{grenze.symbol} = {grenze.zahl_latex()}", erg.erfuellt),
-            titel="Bedingung")
-        p.formel(
-            self.d_ausnutzung[nummer].belegen(Groesse(erg.erfuellungsgrad, EINHEITSLOS)),
-            r"\frac{@grenze}{@verhaeltnis}",
-            {"grenze": grenze, "verhaeltnis": verhaeltnis},
-            titel="Erfüllungsgrad",
-            ergebnis_latex=grad_als_text(erg.erfuellungsgrad, erg.erfuellt, latex=True))
+                 titel="Bezogene Druckzonenhöhe",
+                 nachsatz=vergleich(r"\le" if erg.erfuellt else ">", angabe(grenze),
+                                    erg.erfuellt))
+        grad_formel(p, self.d_ausnutzung[nummer].belegen(
+                        Groesse(erg.erfuellungsgrad, EINHEITSLOS)),
+                    r"\frac{@grenze}{@verhaeltnis}",
+                    {"grenze": grenze, "verhaeltnis": verhaeltnis}, erg.erfuellt)
 
     def _index(self, erg: Lagenergebnis) -> str:
         """
