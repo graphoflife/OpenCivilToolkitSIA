@@ -10,7 +10,9 @@ from opencivil.bericht.latex_dokument import (
     als_tex, finde_tex_maschine, formeln_sammeln, schreibe,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KNM, MM, N_PRO_MM2, Groesse
-from opencivil.core.protokoll import Protokoll, TextBlock, TitelBlock
+from opencivil.core.protokoll import (
+    Block, Protokoll, TextBlock, TitelBlock, UnterprotokollBlock, darstellen,
+)
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.core.wert import WertDef
 from opencivil.material.beton import beton
@@ -207,9 +209,6 @@ class TestTextMaskierung(unittest.TestCase):
         self.assertIs(text_maskieren, text_latex)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
 
 class TestAbschnittsordnung(unittest.TestCase):
     """
@@ -373,3 +372,53 @@ class TestKnappVerfehlterGrad(unittest.TestCase):
         self.assertFalse(knick["erfuellt"])
         self.assertEqual(knick["grad_text"],
                          api.grad_als_text(knick["erfuellungsgrad"], False))
+
+
+class TestTafeln(unittest.TestCase):
+    """
+    Jede Darstellung setzt die Blöcke über eine Tafel {Blockart: Funktion}.
+
+    Vorher unterschied jede die Blockarten mit einer eigenen if/elif-Kette,
+    und die der Oberfläche liess eine unbekannte Art still weg.
+    """
+
+    def tafeln(self):
+        from opencivil.bericht import konsole, latex_dokument
+        from opencivil.web import api
+
+        return {"Konsole": konsole.TAFEL, "LaTeX": latex_dokument.TAFEL,
+                "Oberfläche": api.TAFEL}
+
+    def test_jede_tafel_kennt_jede_blockart(self):
+        def unterklassen(art):
+            for unter in art.__subclasses__():
+                yield unter
+                yield from unterklassen(unter)
+
+        arten = set(unterklassen(Block))
+        self.assertIn(UnterprotokollBlock, arten)
+        for name, tafel in self.tafeln().items():
+            with self.subTest(darstellung=name):
+                self.assertEqual(set(tafel), arten)
+
+    def test_eine_unbekannte_blockart_wirft(self):
+        p = Protokoll()
+        p.titel("Titel")
+        p.text("Text")
+        with self.assertRaisesRegex(TypeError, "TextBlock"):
+            darstellen(p, {TitelBlock: lambda block, tiefe: block.text})
+
+    def test_die_tiefe_zaehlt_die_unterprotokolle(self):
+        p = Protokoll()
+        p.text("aussen")
+        p.unterprotokoll("Durchlauf").text("innen")
+        tafel = {
+            TextBlock: lambda block, tiefe: (block.text, tiefe),
+            UnterprotokollBlock:
+                lambda block, tiefe: darstellen(block.protokoll, tafel, tiefe + 1),
+        }
+        self.assertEqual(darstellen(p, tafel), [("aussen", 0), [("innen", 1)]])
+
+
+if __name__ == "__main__":
+    unittest.main()

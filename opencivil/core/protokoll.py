@@ -12,7 +12,9 @@ einer Tabelle, Abbruchkriterium. Ein Leser muss die Rechnung von Hand
 nachvollziehen koennen.
 
 Das Protokoll ist reine Datenstruktur. Ob daraus Konsolentext, ein LaTeX-
-Dokument oder HTML wird, entscheidet erst der Bericht.
+Dokument oder HTML wird, entscheidet erst der Bericht -- jede Darstellung mit
+einer Tafel, die fuer jede Blockart sagt, wie sie gesetzt wird (siehe
+:func:`darstellen`).
 
 STILLES PROTOKOLL:
 In heissen Schleifen (z.B. beim punktweisen Aufbau einer M-N-Interaktionslinie
@@ -24,7 +26,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, Iterable, List, Mapping, Optional, Sequence
+from typing import (
+    Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Type,
+    TypeVar,
+)
 
 from opencivil.core import latex as tex
 from opencivil.core.wert import Wert
@@ -375,3 +380,38 @@ class StillesProtokoll(Protokoll):
     @property
     def ist_leer(self) -> bool:
         return True
+
+
+# ===========================================================================
+# Darstellen
+# ===========================================================================
+
+T = TypeVar("T")
+
+#: Wie eine Darstellung die Bloecke setzt: je Blockart eine Funktion, die den
+#: Block und seine Tiefe bekommt -- die Zahl der Unterprotokolle, in denen er
+#: steht.
+Tafel = Mapping[Type[Block], Callable[[Any, int], T]]
+
+
+def darstellen(protokoll: Protokoll, tafel: Tafel[T], tiefe: int = 0) -> List[T]:
+    """
+    Setzt jeden Block eines Protokolls mit der Funktion seiner Art.
+
+    Ein Durchlauf fuer alle Darstellungen. Vorher unterschied jede die
+    Blockarten mit einer eigenen ``if/elif``-Kette, und die der Oberflaeche
+    liess eine unbekannte Art stillschweigend weg. Jetzt wirft eine Blockart
+    ohne Eintrag: eine neue fehlt nicht still in der Darstellung, die sie
+    noch nicht kennt.
+
+    Gesucht wird die genaue Art, nicht eine Oberklasse -- auch eine
+    abgeleitete Blockart braucht ihren eigenen Eintrag.
+    """
+    heraus: List[T] = []
+    for block in protokoll.nach_abschnitten():
+        setzen = tafel.get(type(block))
+        if setzen is None:
+            raise TypeError(
+                f"Diese Darstellung kennt keine {type(block).__name__}.")
+        heraus.append(setzen(block, tiefe))
+    return heraus

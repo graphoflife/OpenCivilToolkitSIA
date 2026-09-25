@@ -23,8 +23,8 @@ from opencivil.bericht.zusammenfassung import zusammenfassen
 from opencivil.core.berechnung import grad_als_text
 from opencivil.core.latex import Mathe, Zelle, als_text, tabelle
 from opencivil.core.protokoll import (
-    Block, GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, TextBlock,
-    TitelBlock, UnterprotokollBlock,
+    GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, Tafel, TextBlock,
+    TitelBlock, UnterprotokollBlock, darstellen,
 )
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
@@ -155,51 +155,69 @@ def wert_dict(wert: Wert) -> dict:
     }
 
 
-def block_dict(block: Block) -> Optional[dict]:
-    """Bildet einen Protokollbaustein ab. None fuer Unbekanntes."""
-    if isinstance(block, TitelBlock):
-        return {"art": "titel", "text": block.text, "ebene": block.ebene,
-                "raum": block.raum}
-    if isinstance(block, TextBlock):
-        return {"art": "text", "text": block.text}
-    if isinstance(block, GleichungBlock):
-        eintrag = {
-            "art": "gleichung",
-            "latex": block.latex,
-            "titel": block.titel,
-            "referenz": block.referenz,
-            "wert_id": block.wert_id,
-            "gruppe": block.gruppe,
-        }
-        if block.formelzeile is not None:
-            # Beide Fassungen mitgeben: die Oberflaeche kann die lange Form
-            # umbrechen oder auf eine Zeile legen, ohne neu zu rechnen.
-            eintrag["einzeilig"] = block.formelzeile.einzeilig()
-            eintrag["mehrzeilig"] = block.formelzeile.mehrzeilig()
-        return eintrag
-    if isinstance(block, TabellenBlock):
-        return {
-            "art": "tabelle",
-            "titel": block.titel,
-            "kopf": [zelle_dict(z) for z in block.kopf],
-            "zeilen": [[zelle_dict(z) for z in zeile] for zeile in block.zeilen],
-            "ausrichtung": block.ausrichtung,
-            "latex": block.als_latex(),
-        }
-    if isinstance(block, HinweisBlock):
-        return {
-            "art": "hinweis",
-            "text": block.text,
-            "hinweisart": block.art.value,
-            "beschriftung": block.art.beschriftung,
-        }
-    if isinstance(block, UnterprotokollBlock):
-        return {
-            "art": "unterprotokoll",
-            "titel": block.titel,
-            "bloecke": protokoll_liste(block.protokoll),
-        }
-    return None
+def _titel_dict(block: TitelBlock, tiefe: int) -> dict:
+    return {"art": "titel", "text": block.text, "ebene": block.ebene,
+            "raum": block.raum}
+
+
+def _text_dict(block: TextBlock, tiefe: int) -> dict:
+    return {"art": "text", "text": block.text}
+
+
+def _gleichung_dict(block: GleichungBlock, tiefe: int) -> dict:
+    eintrag = {
+        "art": "gleichung",
+        "latex": block.latex,
+        "titel": block.titel,
+        "referenz": block.referenz,
+        "wert_id": block.wert_id,
+        "gruppe": block.gruppe,
+    }
+    if block.formelzeile is not None:
+        # Beide Fassungen mitgeben: die Oberflaeche kann die lange Form
+        # umbrechen oder auf eine Zeile legen, ohne neu zu rechnen.
+        eintrag["einzeilig"] = block.formelzeile.einzeilig()
+        eintrag["mehrzeilig"] = block.formelzeile.mehrzeilig()
+    return eintrag
+
+
+def _tabelle_dict(block: TabellenBlock, tiefe: int) -> dict:
+    return {
+        "art": "tabelle",
+        "titel": block.titel,
+        "kopf": [zelle_dict(z) for z in block.kopf],
+        "zeilen": [[zelle_dict(z) for z in zeile] for zeile in block.zeilen],
+        "ausrichtung": block.ausrichtung,
+        "latex": block.als_latex(),
+    }
+
+
+def _hinweis_dict(block: HinweisBlock, tiefe: int) -> dict:
+    return {
+        "art": "hinweis",
+        "text": block.text,
+        "hinweisart": block.art.value,
+        "beschriftung": block.art.beschriftung,
+    }
+
+
+def _unterprotokoll_dict(block: UnterprotokollBlock, tiefe: int) -> dict:
+    return {
+        "art": "unterprotokoll",
+        "titel": block.titel,
+        "bloecke": darstellen(block.protokoll, TAFEL, tiefe + 1),
+    }
+
+
+#: Je Blockart, wie die Oberflaeche sie bekommt -- jede als JSON-Objekt.
+TAFEL: Tafel[dict] = {
+    TitelBlock: _titel_dict,
+    TextBlock: _text_dict,
+    GleichungBlock: _gleichung_dict,
+    TabellenBlock: _tabelle_dict,
+    HinweisBlock: _hinweis_dict,
+    UnterprotokollBlock: _unterprotokoll_dict,
+}
 
 
 def zelle_dict(zelle: Zelle) -> dict:
@@ -214,7 +232,7 @@ def zelle_dict(zelle: Zelle) -> dict:
 
 
 def protokoll_liste(protokoll: Protokoll) -> List[dict]:
-    return [d for d in (block_dict(b) for b in protokoll.nach_abschnitten()) if d is not None]
+    return darstellen(protokoll, TAFEL)
 
 
 # ===========================================================================

@@ -22,8 +22,8 @@ import shutil
 from typing import TYPE_CHECKING, Iterable, List, Optional, Sequence, TextIO
 
 from opencivil.core.protokoll import (
-    Block, GleichungBlock, HinweisArt, HinweisBlock, Protokoll, TabellenBlock,
-    TextBlock, TitelBlock, UnterprotokollBlock,
+    GleichungBlock, HinweisArt, HinweisBlock, Protokoll, TabellenBlock, Tafel,
+    TextBlock, TitelBlock, UnterprotokollBlock, darstellen,
 )
 from opencivil.core.berechnung import NachweisUrteil
 from opencivil.core.latex import Mathe, Zelle
@@ -65,52 +65,64 @@ def _umbrechen(text: str, einzug: int = 0) -> List[str]:
 # ===========================================================================
 
 
-def protokoll_zeilen(protokoll: Protokoll, einzug: int = 0) -> List[str]:
+def protokoll_zeilen(protokoll: Protokoll, tiefe: int = 0) -> List[str]:
     """Wandelt eine Mitschrift in Konsolenzeilen um."""
-    zeilen: List[str] = []
-    vorspann = " " * einzug
+    return [zeile for teil in darstellen(protokoll, TAFEL, tiefe) for zeile in teil]
 
-    for block in protokoll.nach_abschnitten():
-        if isinstance(block, TitelBlock):
-            zeilen.append("")
-            zeilen.append(f"{vorspann}{block.text}")
-            zeilen.append(f"{vorspann}{'-' * len(block.text)}")
 
-        elif isinstance(block, TextBlock):
-            zeilen.append("")
-            zeilen.extend(_umbrechen(block.text, einzug))
+def _vorspann(tiefe: int) -> str:
+    """Ein Unterprotokoll steht je Stufe zwei Zeichen weiter innen."""
+    return "  " * tiefe
 
-        elif isinstance(block, GleichungBlock):
-            zeilen.append("")
-            kopf = block.titel or block.wert_id
-            if kopf:
-                nachweis = f"   [{block.referenz}]" if block.referenz else ""
-                zeilen.append(f"{vorspann}{kopf}{nachweis}")
-            for teil in block.latex.splitlines():
-                zeilen.append(f"{vorspann}    {teil}")
 
-        elif isinstance(block, TabellenBlock):
-            zeilen.append("")
-            if block.titel:
-                zeilen.append(f"{vorspann}{block.titel}")
-            zeilen.extend(_tabelle_zeilen(block, einzug + 4))
+def _titel(block: TitelBlock, tiefe: int) -> List[str]:
+    vorspann = _vorspann(tiefe)
+    return ["", f"{vorspann}{block.text}", f"{vorspann}{'-' * len(block.text)}"]
 
-        elif isinstance(block, HinweisBlock):
-            marke = {
-                HinweisArt.INFO: "i",
-                HinweisArt.WARNUNG: "!",
-                HinweisArt.ANNAHME: "*",
-            }[block.art]
-            zeilen.extend(
-                _umbrechen(f"[{marke}] {block.art.beschriftung}: {block.text}", einzug)
-            )
 
-        elif isinstance(block, UnterprotokollBlock):
-            zeilen.append("")
-            zeilen.append(f"{vorspann}> {block.titel}")
-            zeilen.extend(protokoll_zeilen(block.protokoll, einzug + 2))
+def _text(block: TextBlock, tiefe: int) -> List[str]:
+    return [""] + _umbrechen(block.text, len(_vorspann(tiefe)))
 
-    return zeilen
+
+def _gleichung(block: GleichungBlock, tiefe: int) -> List[str]:
+    vorspann = _vorspann(tiefe)
+    zeilen = [""]
+    kopf = block.titel or block.wert_id
+    if kopf:
+        nachweis = f"   [{block.referenz}]" if block.referenz else ""
+        zeilen.append(f"{vorspann}{kopf}{nachweis}")
+    return zeilen + [f"{vorspann}    {teil}" for teil in block.latex.splitlines()]
+
+
+def _tabelle(block: TabellenBlock, tiefe: int) -> List[str]:
+    vorspann = _vorspann(tiefe)
+    zeilen = [""] + ([f"{vorspann}{block.titel}"] if block.titel else [])
+    return zeilen + _tabelle_zeilen(block, len(vorspann) + 4)
+
+
+_MARKE = {HinweisArt.INFO: "i", HinweisArt.WARNUNG: "!", HinweisArt.ANNAHME: "*"}
+
+
+def _hinweis(block: HinweisBlock, tiefe: int) -> List[str]:
+    return _umbrechen(
+        f"[{_MARKE[block.art]}] {block.art.beschriftung}: {block.text}",
+        len(_vorspann(tiefe)))
+
+
+def _unterprotokoll(block: UnterprotokollBlock, tiefe: int) -> List[str]:
+    return (["", f"{_vorspann(tiefe)}> {block.titel}"]
+            + protokoll_zeilen(block.protokoll, tiefe + 1))
+
+
+#: Je Blockart, wie die Konsole sie setzt -- jede als Zeilen.
+TAFEL: Tafel[List[str]] = {
+    TitelBlock: _titel,
+    TextBlock: _text,
+    GleichungBlock: _gleichung,
+    TabellenBlock: _tabelle,
+    HinweisBlock: _hinweis,
+    UnterprotokollBlock: _unterprotokoll,
+}
 
 
 def _tabelle_zeilen(block: TabellenBlock, einzug: int) -> List[str]:

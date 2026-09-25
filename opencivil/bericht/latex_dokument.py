@@ -34,8 +34,8 @@ from typing import Dict, List, Optional, Sequence
 
 from opencivil.core.latex import text_latex
 from opencivil.core.protokoll import (
-    GleichungBlock, HinweisArt, HinweisBlock, Protokoll, TabellenBlock, TextBlock,
-    TitelBlock, UnterprotokollBlock,
+    GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, Tafel, TextBlock,
+    TitelBlock, UnterprotokollBlock, darstellen,
 )
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Quelle
@@ -96,45 +96,60 @@ class Ausgabeergebnis:
 # ===========================================================================
 
 
-def _protokoll_tex(protokoll: Protokoll, ebene: int = 0) -> List[str]:
-    zeilen: List[str] = []
-    abschnitt = ("subsection", "subsubsection", "paragraph")
+def _protokoll_tex(protokoll: Protokoll, tiefe: int = 0) -> List[str]:
+    return [zeile for teil in darstellen(protokoll, TAFEL, tiefe) for zeile in teil]
 
-    for block in protokoll.nach_abschnitten():
-        if isinstance(block, TitelBlock):
-            stufe = abschnitt[min(max(block.ebene - 2, 0), len(abschnitt) - 1)]
-            zeilen.append(rf"\{stufe}{{{text_latex(block.text)}}}")
 
-        elif isinstance(block, TextBlock):
-            zeilen.append(text_latex(block.text))
-            zeilen.append("")
+_STUFEN = ("subsection", "subsubsection", "paragraph")
 
-        elif isinstance(block, GleichungBlock):
-            if block.titel:
-                referenz = rf" \hfill \normref{{{text_latex(block.referenz)}}}" if block.referenz else ""
-                zeilen.append(rf"\noindent\textbf{{{text_latex(block.titel)}}}{referenz}")
-            zeilen.append(r"\begin{equation*}")
-            zeilen.append(block.latex)
-            zeilen.append(r"\end{equation*}")
 
-        elif isinstance(block, TabellenBlock):
-            if block.titel:
-                zeilen.append(rf"\noindent\textbf{{{text_latex(block.titel)}}}")
-            zeilen.append(r"\begin{center}")
-            zeilen.append(block.als_latex())
-            zeilen.append(r"\end{center}")
+def _stufe(nummer: int) -> str:
+    """Die Gliederungsstufe; tiefer als die letzte geht es nicht."""
+    return _STUFEN[min(max(nummer, 0), len(_STUFEN) - 1)]
 
-        elif isinstance(block, HinweisBlock):
-            zeilen.append(
-                rf"\hinweis{{{text_latex(block.art.beschriftung)}}}{{{text_latex(block.text)}}}"
-            )
 
-        elif isinstance(block, UnterprotokollBlock):
-            stufe = abschnitt[min(ebene + 1, len(abschnitt) - 1)]
-            zeilen.append(rf"\{stufe}{{{text_latex(block.titel)}}}")
-            zeilen.extend(_protokoll_tex(block.protokoll, ebene + 1))
+def _titel(block: TitelBlock, tiefe: int) -> List[str]:
+    return [rf"\{_stufe(block.ebene - 2)}{{{text_latex(block.text)}}}"]
 
-    return zeilen
+
+def _text(block: TextBlock, tiefe: int) -> List[str]:
+    return [text_latex(block.text), ""]
+
+
+def _gleichung(block: GleichungBlock, tiefe: int) -> List[str]:
+    zeilen = []
+    if block.titel:
+        referenz = (rf" \hfill \normref{{{text_latex(block.referenz)}}}"
+                    if block.referenz else "")
+        zeilen.append(rf"\noindent\textbf{{{text_latex(block.titel)}}}{referenz}")
+    return zeilen + [r"\begin{equation*}", block.latex, r"\end{equation*}"]
+
+
+def _tabelle(block: TabellenBlock, tiefe: int) -> List[str]:
+    zeilen = ([rf"\noindent\textbf{{{text_latex(block.titel)}}}"]
+              if block.titel else [])
+    return zeilen + [r"\begin{center}", block.als_latex(), r"\end{center}"]
+
+
+def _hinweis(block: HinweisBlock, tiefe: int) -> List[str]:
+    return [rf"\hinweis{{{text_latex(block.art.beschriftung)}}}"
+            rf"{{{text_latex(block.text)}}}"]
+
+
+def _unterprotokoll(block: UnterprotokollBlock, tiefe: int) -> List[str]:
+    return ([rf"\{_stufe(tiefe + 1)}{{{text_latex(block.titel)}}}"]
+            + _protokoll_tex(block.protokoll, tiefe + 1))
+
+
+#: Je Blockart, wie das LaTeX-Dokument sie setzt -- jede als Zeilen.
+TAFEL: Tafel[List[str]] = {
+    TitelBlock: _titel,
+    TextBlock: _text,
+    GleichungBlock: _gleichung,
+    TabellenBlock: _tabelle,
+    HinweisBlock: _hinweis,
+    UnterprotokollBlock: _unterprotokoll,
+}
 
 
 def _werte_tex(loesung: Loesung) -> List[str]:
