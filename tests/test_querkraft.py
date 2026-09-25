@@ -157,7 +157,9 @@ class TestQuerkraft(unittest.TestCase):
         gleichung = next(
             b for b in abschnitt
             if isinstance(b, GleichungBlock) and "Momentenwiderstand bei" in b.titel)
-        self.assertIn(r"M_{Rd} = M_1 + \frac{N_{Ed} - N_1}", gleichung.latex)
+        self.assertEqual(gleichung.formelzeile.symbol, "M_{Rd}")
+        self.assertTrue(gleichung.formelzeile.analytisch.startswith(
+            r"M_1 + \frac{N_{Ed} - N_1}"))
         # Die geschriebene Zahl ist die, mit der gerechnet wird.
         self.assertIn(f"{erg.m_Rd / 1e3:.1f}", gleichung.latex)
 

@@ -1061,7 +1061,7 @@ class Querkraft(Nachweis):
         bei_n = self.mn.widerstand_bei_n(fall.name)
         if bei_n is not None:
             protokoll_interpolation(
-                p, bei_n,
+                p, bei_n, basis=f"{self.id}.{kennung_aus(fall.name)}",
                 titel=f"Momentenwiderstand bei N_Ed = {N_Ed / 1e3:.1f} kN")
 
         if erg.eps_v == 0.0:

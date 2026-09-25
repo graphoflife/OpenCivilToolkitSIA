@@ -139,11 +139,22 @@ class TestLatexEinsetzen(unittest.TestCase):
             einsetzen_symbolisch(r"@f_yk", self.eingaben)
         self.assertIn("f_yk", str(ctx.exception))
 
-    def test_negative_werte_werden_geklammert(self):
+    def test_negative_werte_werden_nach_einem_rechenzeichen_geklammert(self):
         eingaben = {"M": WertDef("m", "M", KNM).belegen(Groesse(-120, KNM))}
-        self.assertIn(r"\left(", einsetzen_numerisch(r"@M \cdot 2", eingaben))
-        # Steht der Platzhalter allein, waere die Klammer nur Unruhe.
-        self.assertNotIn(r"\left(", einsetzen_numerisch(r"@M", eingaben))
+        for vorlage in (r"2 \cdot @M", r"5 - @M", r"5 + @M"):
+            with self.subTest(vorlage=vorlage):
+                self.assertIn(r"\left(", einsetzen_numerisch(vorlage, eingaben))
+        # Am Anfang eines Ausdrucks waere die Klammer nur Unruhe.
+        for vorlage in (r"@M", r"@M \cdot 2", r"\frac{@M}{2}", r"\left(@M - 5\right)"):
+            with self.subTest(vorlage=vorlage):
+                ergebnis = einsetzen_numerisch(vorlage, eingaben)
+                self.assertEqual(ergebnis.count(r"\left("), vorlage.count(r"\left("))
+
+    def test_vor_einem_exponenten_steht_die_zahl_mit_einheit_in_klammern(self):
+        eingaben = {"h": D_H.belegen(Groesse(300, MM))}
+        self.assertEqual(einsetzen_numerisch(r"@h^{2}", eingaben),
+                         r"\left(300\,\mathrm{mm}\right)^{2}")
+        self.assertEqual(einsetzen_symbolisch(r"@h^{2}", eingaben), "h^{2}")
 
 
 class TestFormelzeile(unittest.TestCase):

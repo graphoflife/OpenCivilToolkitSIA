@@ -42,11 +42,11 @@ from enum import Enum
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_als_text,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, MM, Groesse
 from opencivil.core.latex import Mathe, als_text
-from opencivil.core.protokoll import Protokoll
+from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import WertDef
 from opencivil.core.wert import kennung_aus
 from opencivil.nachweis import dehnungsfaecher, linie as geo
@@ -553,25 +553,27 @@ class BiegungNormalkraft(Nachweis):
             rf"N_{{Ed}} = {k.N_Ed.als_latex(1, KN)}",
             titel="Einwirkung",
         )
-        protokoll_interpolation(p, auswertung)
+        basis = f"{self.id}.{kennung_aus(k.name)}"
+        protokoll_interpolation(p, auswertung, basis=basis)
 
-        zustand = r"\text{erfüllt}" if auswertung.innerhalb else r"\text{NICHT erfüllt}"
-        wert = grad_als_text(auswertung.erfuellungsgrad, auswertung.innerhalb,
-                             latex=True)
-        gross = auswertung.achse.name
-        p.gleichung(
-            rf"\alpha_{{eff}} = \frac{{{gross}_{{Rd}}}}{{{gross}_{{Ed}}}} "
-            rf"= \frac{{{abs(auswertung.rd) / 1e3:.1f}}}{{{abs(auswertung.ed) / 1e3:.1f}}} "
-            rf"= {wert} \quad \Rightarrow \quad {zustand}"
-            if auswertung.ed
-            else rf"\alpha_{{eff}} = \frac{{R_d}}{{E_d}} = {wert} "
-                 rf"\quad \Rightarrow \quad {zustand}",
-            titel="Erfüllungsgrad",
-        )
+        # Ohne Einwirkung gibt es nichts einzusetzen: der Grad ist unendlich.
+        vorlage, eingaben = r"\frac{R_d}{E_d}", {}
+        if auswertung.ed:
+            werte, achse = Zwischenwerte(basis), auswertung.achse
+            vorlage = r"\frac{@Rd}{@Ed}"
+            eingaben = {
+                name: werte.wert(name, f"{achse.name}_{{{name}}}",
+                                 Groesse.aus_si(abs(si), achse.einheit))
+                for name, si in (("Rd", auswertung.rd), ("Ed", auswertung.ed))
+            }
+        grad_formel(p, self.d_ausnutzung[k.name].belegen(
+                        Groesse(auswertung.erfuellungsgrad, EINHEITSLOS)),
+                    vorlage, eingaben, auswertung.innerhalb, mit_urteil=True)
 
 
 def protokoll_interpolation(
     p: Protokoll, auswertung: Auswertung, titel: str = "",
+    *, basis: str = "interpolation",
 ) -> None:
     """
     Schreibt, wie der Widerstand auf dem Polygon gefunden wurde.
@@ -612,27 +614,27 @@ def protokoll_interpolation(
         (q for q in (a, b)
          if _trifft(lauf.von(q), fest) and _trifft(ziel.von(q), auswertung.rd)),
         None)
+
+    werte = Zwischenwerte(basis)
+
+    def wert(name: str, symbol: str, si: float, achse: geo.Achse):
+        return werte.wert(name, symbol, Groesse.aus_si(si, achse.einheit))
+
+    rd = wert("Rd", f"{ziel.name}_{{Rd}}", auswertung.rd, ziel)
     if treffer is not None:
-        p.gleichung(
-            rf"{ziel.name}_{{Rd}} = {treffer.symbol} = "
-            rf"{_k(auswertung.rd)}\,{e_ziel}",
-            titel=titel or (f"Widerstand bei {lauf.name}_Ed = "
-                            f"{_k(fest)} {lauf.einheit.beschriftung} – "
-                            f"ein Eckpunkt liegt genau dort"),
-        )
+        p.formel(rd, "@P", {"P": wert("P", treffer.symbol, ziel.von(treffer), ziel)},
+                 titel=titel or (f"Widerstand bei {lauf.name}_Ed = "
+                                 f"{_k(fest)} {lauf.einheit.beschriftung} – "
+                                 f"ein Eckpunkt liegt genau dort"))
         return
 
-    p.gleichung(
-        rf"{ziel.name}_{{Rd}} = {ziel.name}_1 + "
-        rf"\frac{{{lauf.name}_{{Ed}} - {lauf.name}_1}}"
-        rf"{{{lauf.name}_2 - {lauf.name}_1}} \cdot "
-        rf"\left({ziel.name}_2 - {ziel.name}_1\right)"
-        "\n= "
-        rf"{_k(ziel.von(a))} + "
-        rf"\frac{{{_k(fest)} - {_klammer(lauf.von(a))}}}"
-        rf"{{{_k(lauf.von(b))} - {_klammer(lauf.von(a))}}} \cdot "
-        rf"\left({_k(ziel.von(b))} - {_klammer(ziel.von(a))}\right)"
-        rf" = {_k(auswertung.rd)}\,{e_ziel}",
+    p.formel(
+        rd, r"@x_1 + \frac{@y_Ed - @y_1}{@y_2 - @y_1} \cdot \left(@x_2 - @x_1\right)",
+        {"x_1": wert("x_1", f"{ziel.name}_1", ziel.von(a), ziel),
+         "x_2": wert("x_2", f"{ziel.name}_2", ziel.von(b), ziel),
+         "y_1": wert("y_1", f"{lauf.name}_1", lauf.von(a), lauf),
+         "y_2": wert("y_2", f"{lauf.name}_2", lauf.von(b), lauf),
+         "y_Ed": wert("y_Ed", f"{lauf.name}_{{Ed}}", fest, lauf)},
         titel=titel or (f"Widerstand bei festgehaltenem {lauf.name}_Ed = "
                         f"{_k(fest)} {lauf.einheit.beschriftung}"),
     )
@@ -663,17 +665,6 @@ def _trifft(a: float, b: float) -> bool:
 def _k(si_wert: float) -> str:
     """Ein SI-Wert in Kilo-Einheiten, eine Nachkommastelle."""
     return f"{si_wert / 1e3:.1f}"
-
-
-def _klammer(si_wert: float) -> str:
-    """
-    Wie :func:`_k`, aber negative Werte in Klammern.
-
-    Steht ein negativer Wert hinter einem Minuszeichen, ergaebe sich sonst
-    ``100.0 - -6000.0``. Mit Klammern liest es sich als das, was es ist.
-    """
-    text = _k(si_wert)
-    return f"\\left({text}\\right)" if si_wert < 0 else text
 
 
 def _in(si_wert: float, achse: geo.Achse) -> str:

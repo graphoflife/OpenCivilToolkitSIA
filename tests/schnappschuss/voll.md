@@ -256,7 +256,7 @@ $$
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} = \frac{235.9}{150.0} = 1.57 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,x,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{235.9\,\mathrm{kNm}}{150\,\mathrm{kNm}} = 1.57 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Nachweis – Feld mit Druck
@@ -270,8 +270,11 @@ $$
 **Widerstand bei festgehaltenem N\_Ed = -300.0 kN**
 
 $$
-M_{Rd} = M_1 + \frac{N_{Ed} - N_1}{N_2 - N_1} \cdot \left(M_2 - M_1\right)
-= 324.4 + \frac{-300.0 - \left(-1484.6\right)}{0.0 - \left(-1484.6\right)} \cdot \left(235.9 - 324.4\right) = 253.8\,\mathrm{kNm}
+\begin{aligned}
+  M_{Rd} &= M_1 + \frac{N_{Ed} - N_1}{N_2 - N_1} \cdot \left(M_2 - M_1\right) \\
+  &= 324.4\,\mathrm{kNm} + \frac{-300\,\mathrm{kN} - \left(-1484.6\,\mathrm{kN}\right)}{0\,\mathrm{kN} - \left(-1484.6\,\mathrm{kN}\right)} \cdot \left(235.9\,\mathrm{kNm} - 324.4\,\mathrm{kNm}\right) \\
+  &= 253.8\,\mathrm{kNm}
+\end{aligned}
 $$
 
 **Stützpunkte der Interpolation**
@@ -284,7 +287,7 @@ $$
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} = \frac{253.8}{120.0} = 2.12 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,x,\text{Feld mit Druck}} = \frac{M_{Rd}}{M_{Ed}} = \frac{253.8\,\mathrm{kNm}}{120\,\mathrm{kNm}} = 2.12 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 #### Nachweis – Stütze
@@ -304,7 +307,7 @@ $$
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} = \frac{79.9}{60.0} = 1.33 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,x,\text{Stütze}} = \frac{M_{Rd}}{M_{Ed}} = \frac{79.9\,\mathrm{kNm}}{60\,\mathrm{kNm}} = 1.33 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 **Bügeldurchmesser**
@@ -1611,7 +1614,7 @@ $$
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} = \frac{36.3}{80.0} = 0.45 \quad \Rightarrow \quad \text{NICHT erfüllt}
+\alpha_{eff,x,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{36.3\,\mathrm{kNm}}{80\,\mathrm{kNm}} = 0.45 \quad \Rightarrow \quad \text{NICHT erfüllt}
 $$
 
 #### Nachweis – Rand
@@ -1631,7 +1634,7 @@ $$
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} = \frac{36.3}{20.0} = 1.81 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,x,\text{Rand}} = \frac{M_{Rd}}{M_{Ed}} = \frac{36.3\,\mathrm{kNm}}{20\,\mathrm{kNm}} = 1.81 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Querkraft – x-Richtung
@@ -2115,7 +2118,7 @@ $$
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} = \frac{64.2}{40.0} = 1.60 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,x,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{64.2\,\mathrm{kNm}}{40\,\mathrm{kNm}} = 1.60 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Querkraft – x-Richtung

@@ -93,17 +93,25 @@ def platzhalter_namen(vorlage: str) -> list[str]:
     return namen
 
 
+#: Nach diesen Zeichen braucht eine negative Zahl eine Klammer: ``a - (-5)``,
+#: ``a \\cdot (-5)``. Am Anfang eines Ausdrucks nicht: ``-300 - (-1484.6)``.
+_RECHENZEICHEN = ("+", "-", r"\cdot", r"\times", "/")
+
+
 def _ersetzen(vorlage: str, ersatz) -> str:
     """
-    Ersetzt alle Platzhalter mittels einer Funktion ``(name, hoch) -> str``.
+    Ersetzt alle Platzhalter mittels ``(name, hoch, nach_rechenzeichen) -> str``.
 
     ``hoch`` sagt, ob hinter dem Platzhalter ein Exponent steht: ``@h^{2}``
     braucht mit Zahl und Einheit eine Klammer, ``(300 mm)^2`` und nicht
-    ``300 mm^2``.
+    ``300 mm^2``. ``nach_rechenzeichen``, ob davor ein Rechenzeichen steht --
+    dann braucht eine negative Zahl eine.
     """
 
     def _treffer(m: re.Match) -> str:
-        return ersatz(m.group(1) or m.group(2), vorlage.startswith("^", m.end()))
+        davor = vorlage[:m.start()].rstrip()
+        return ersatz(m.group(1) or m.group(2), vorlage.startswith("^", m.end()),
+                      davor.endswith(_RECHENZEICHEN))
 
     return _PLATZHALTER.sub(_treffer, vorlage)
 
@@ -123,7 +131,7 @@ def einsetzen_symbolisch(
     """Ersetzt die Platzhalter durch die Symbole der Eingaben."""
     _pruefe_vollstaendig(vorlage, eingaben, kontext)
 
-    def _symbol(name: str, hoch: bool) -> str:
+    def _symbol(name: str, hoch: bool, nach_rechenzeichen: bool) -> str:
         # Ein Symbol mit eigenem Hochindex vertraegt keinen zweiten.
         symbol = eingaben[name].symbol
         return f"{{{symbol}}}" if hoch and "^" in symbol else symbol
@@ -150,9 +158,9 @@ def einsetzen_numerisch(
     """
     Ersetzt die Platzhalter durch Zahlenwerte samt Einheit.
 
-    Negative Werte werden geklammert, damit nicht ``a \\cdot -5`` entsteht.
-    Besteht die Vorlage nur aus einem einzigen Platzhalter, entfaellt die
-    Klammer -- dort waere sie reine Unruhe.
+    Negative Werte werden hinter einem Rechenzeichen geklammert, damit nicht
+    ``a \\cdot -5`` entsteht; am Anfang eines Ausdrucks waere die Klammer
+    reine Unruhe.
 
     ``empirisch`` nennt die Eingaben einer dimensionell inhomogenen
     Normformel mit der Einheit, in der die Norm sie verlangt. Sie stehen als
@@ -161,14 +169,14 @@ def einsetzen_numerisch(
     Spannung gibt es nicht, und so zu tun waere falsch.
     """
     _pruefe_vollstaendig(vorlage, eingaben, kontext)
-    nur_ein_platzhalter = _PLATZHALTER.fullmatch(vorlage.strip()) is not None
     empirisch = empirisch or {}
 
-    def _wert(name: str, hoch: bool) -> str:
+    def _wert(name: str, hoch: bool, nach_rechenzeichen: bool) -> str:
         wert = eingaben[name]
         blank = name in empirisch or wert.einheit is EINHEITSLOS
         text = _blank(wert, empirisch[name]) if name in empirisch else wert.zahl_latex()
-        if (wert.groesse.si < 0 and not nur_ein_platzhalter) or (hoch and not blank):
+        negativ = wert.groesse.si < 0
+        if (negativ and (nach_rechenzeichen or hoch)) or (hoch and not blank):
             return f"\\left({text}\\right)"
         return text
 
