@@ -1,5 +1,6 @@
 """Tests für die Projektbeschreibung: lesen, ablegen, prüfen, aufbauen."""
 
+import dataclasses
 import json
 import tempfile
 import unittest
@@ -7,9 +8,9 @@ from pathlib import Path
 
 from opencivil.core.einheiten import N_PRO_MM2
 from opencivil.projekt import (
-    Aufbau, GebrauchsfallEintrag, KnickEintrag, KombinationEintrag, LageEintrag,
-    MaterialEintrag, PostenEintrag, Projekt, ProjektFehler,
-    QuerkraftbewehrungEintrag, QuerschnittEintrag,
+    Aufbau, GebrauchsfallEintrag, Gebrauchsliste, KnickEintrag, KombinationEintrag,
+    LageEintrag, MaterialEintrag, PostenEintrag, Projekt, ProjektFehler,
+    QuerkraftbewehrungEintrag, QuerschnittEintrag, SpannungsfallEintrag,
 )
 from opencivil.web import api, dienst
 
@@ -29,11 +30,6 @@ class TestProjektBeschreibung(unittest.TestCase):
         self.assertEqual(len(laut), 3)
         self.assertTrue(all(u.art == "M-N" for u in laut))
         self.assertTrue([u for u in loesung.urteile if u.still])
-
-    def test_hin_und_zurueck(self):
-        original = Projekt.beispiel()
-        kopie = Projekt.aus_dict(json.loads(json.dumps(original.als_dict())))
-        self.assertEqual(kopie.als_dict(), original.als_dict())
 
 
 class TestVollstaendigeAblage(unittest.TestCase):
@@ -88,14 +84,27 @@ class TestVollstaendigeAblage(unittest.TestCase):
             ],
             querschnitte=[
                 QuerschnittEintrag(
-                    "q1", "Decke", "b1", h=280.0, b=1000.0,
+                    "q1", "Decke", "b1", h=280.0, b=900.0,
                     ueberdeckung_unten=25.0, ueberdeckung_oben=35.0,
                     d_max=16.0, einlagenhoehe=40.0, k_c=0.6,
+                    rissanforderung="hoch", beschreibung="Unter dem Dach",
+                    kriechzahl=2.5, zwaengung=True, zwaengung_begrenzt=True,
+                    haeufig=Gebrauchsliste(anteil=75.0, aus_tragsicherheit=True, faelle=[
+                        GebrauchsfallEintrag("Gebrauch", M_Ed=70.0, N_Ed=-40.0)]),
+                    quasistaendig=Gebrauchsliste(anteil=55.0, aus_tragsicherheit=True, faelle=[
+                        GebrauchsfallEintrag("Dauer", M_Ed=40.0, N_Ed=-5.0, aktiv=False)]),
+                    knickfaelle=[KnickEintrag("Stütze", N_Ed=-900.0, M_Ed_1=25.0,
+                                              laenge=5.0, knicklaenge=3.5)],
+                    spannungsfaelle=[SpannungsfallEintrag("Feld", M_Ed=80.0)],
+                    automatik_modus="grund_mit", automatik_teilungen=[100.0, 200.0],
+                    automatik_mindestdurchmesser=12.0, automatik_querkraft=True,
+                    automatik_querkraft_teilungen=[150.0],
+                    sproede=True, zwaengung_biegung=True, duktilitaet=True,
                     querkraftbewehrung=QuerkraftbewehrungEintrag(
                         durchmesser=10.0, stahl="s1", abstand_x=250.0,
                         abstand_y=None, anzahl_y=4.0,
                         alpha_min=35, alpha_max=42),
-                    richtung_lage1="y", richtung_lage4="y",
+                    richtung_lage1="x", richtung_lage4="x",
                     lagen=[
                         LageEintrag(
                             stahl="s1",
@@ -130,7 +139,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
         # Stichproben an Stellen, die leicht verloren gingen:
         self.assertEqual(kopie.material("b2").ueberschreibungen, {"f_cd": 15.0})
         self.assertEqual(kopie.querschnitt("q1").einlagenhoehe, 40.0)
-        self.assertEqual(kopie.querschnitt("q1").richtung_lage1, "y")
+        self.assertEqual(kopie.querschnitt("q1").richtung_lage1, "x")
         self.assertEqual(kopie.querschnitt("q1").lagen[0].zulage.anzahl, 6.0)
         self.assertEqual(kopie.querschnitt("q1").kombinationen[1].art, "naechster_Punkt")
         self.assertEqual(kopie.querschnitt("q1").kombinationen[0].V_Ed, 80.0)
@@ -140,6 +149,14 @@ class TestVollstaendigeAblage(unittest.TestCase):
         self.assertEqual((buegel.abstand_y, buegel.anzahl_y), (None, 4.0))
         self.assertEqual((buegel.alpha_min, buegel.alpha_max), (35, 42))
         self.assertEqual(kopie.querschnitt("q1").k_c, 0.6)
+
+        # Keine Auswahl von Proben: jedes Feld der ersten Platte weicht von
+        # der Vorgabe ab, der Vergleich oben prüft also alle. Ein neues Feld
+        # fällt hier auf, bis es mitgeprüft wird.
+        vorgabe = QuerschnittEintrag("q9", "X", "b9")
+        self.assertEqual([f.name for f in dataclasses.fields(QuerschnittEintrag)
+                          if getattr(projekt.querschnitt("q1"), f.name)
+                          == getattr(vorgabe, f.name)], [])
 
     def test_die_datei_geht_auch_durch_den_dienst(self):
         """Was gespeichert wurde, muss der Kern beim Öffnen wieder annehmen."""
@@ -703,6 +720,60 @@ class TestNachweisfelder(unittest.TestCase):
                          sorted(aufbau.eckwertziele() + aufbau.alle_nachweisziele()))
 
 
+class TestAusgeschaltetHeisstStill(unittest.TestCase):
+    """
+    Ausgeschaltet heisst nicht weg: der Nachweis rechnet still mit. In
+    Tabelle und Herleitung steht er nicht, unter der Tabelle kann ein Hinweis
+    stehen. Für jeden Schalter derselbe Mechanismus -- darum ein Test.
+    """
+
+    #: Schalter der Platte -> (Feld im Aufbau, Art der Urteile).
+    SCHALTER = {
+        "duktilitaet": ("duktilitaet", "D"),
+        "sproede": ("sproede", "SV"),
+        "zwaengung": ("rissnormalkraft", "N_Riss"),
+        "zwaengung_biegung": ("zwaengung_biegung", "ZB"),
+    }
+
+    def test_jeder_schalter(self):
+        for schalter, (feld, art) in self.SCHALTER.items():
+            projekt = Projekt.beispiel()
+            setattr(projekt.querschnitt("q1"), schalter, False)
+            aufbau = projekt.aufbauen()
+            loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+            with self.subTest(schalter=schalter):
+                self.assertTrue(all(n.still for n in getattr(aufbau, feld).values()))
+                urteile = [u for u in loesung.urteile if u.art == art]
+                self.assertEqual(len(urteile), 2)          # beide x-Lagen
+                self.assertTrue(all(u.still for u in urteile))
+                self.assertFalse([u for u in loesung.gefuehrte_urteile if u.art == art])
+
+
+class TestEinUrteilJeLagennachweis(unittest.TestCase):
+    """
+    Gerechnet wird jede x-Lage, in der Tabelle steht eine Zeile: die
+    schlechtere. Vier Zeilen für eine Frage wären drei zuviel -- beantwortet
+    wird sie ohnehin von der schlechteren Lage. Derselbe Mechanismus für jeden
+    Lagennachweis (``Nachweis.teilurteile``), darum ein Test.
+    """
+
+    def test_jeder_lagennachweis(self):
+        projekt = Projekt.beispiel()
+        for schalter in TestAusgeschaltetHeisstStill.SCHALTER:
+            setattr(projekt.querschnitt("q1"), schalter, True)
+        aufbau = projekt.aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        for schalter, (feld, art) in TestAusgeschaltetHeisstStill.SCHALTER.items():
+            with self.subTest(schalter=schalter):
+                nachweis, = getattr(aufbau, feld).values()
+                self.assertEqual(len(nachweis.ergebnisse), 2)       # beide x-Lagen
+                laut = [u for u in loesung.gefuehrte_urteile if u.art == art]
+                self.assertEqual(len(laut), 1)
+                self.assertAlmostEqual(
+                    laut[0].erfuellungsgrad.si,
+                    min(e.erfuellungsgrad for e in nachweis.ergebnisse), places=9)
+
+
 class TestMindestbewehrungsEingaben(unittest.TestCase):
     """
     Die Eingaben der Mindestbewehrung: sie überleben die Datei, und eine
@@ -719,26 +790,6 @@ class TestMindestbewehrungsEingaben(unittest.TestCase):
         # sie von Hand. Gerechnet wird sie trotzdem, still.
         self.assertFalse(q.haeufig.aus_tragsicherheit)
         self.assertEqual(q.haeufig.faelle, [])
-
-    def test_alles_ueberlebt_die_datei(self):
-        from opencivil.projekt import GebrauchsfallEintrag
-
-        projekt = Projekt.beispiel()
-        q = projekt.querschnitt("q1")
-        q.rissanforderung = "hoch"
-        q.zwaengung = True
-        q.zwaengung_begrenzt = True
-        q.haeufig.aus_tragsicherheit = False
-        q.haeufig.faelle = [GebrauchsfallEintrag("Gebrauch", M_Ed=70.0, N_Ed=-40.0)]
-
-        kopie = Projekt.aus_dict(json.loads(json.dumps(projekt.als_dict())))
-        k = kopie.querschnitt("q1")
-        self.assertEqual(k.rissanforderung, "hoch")
-        self.assertEqual((k.zwaengung, k.zwaengung_begrenzt), (True, True))
-        self.assertFalse(k.haeufig.aus_tragsicherheit)
-        self.assertEqual(len(k.haeufig.faelle), 1)
-        fall = k.haeufig.faelle[0]
-        self.assertEqual((fall.name, fall.M_Ed, fall.N_Ed), ("Gebrauch", 70.0, -40.0))
 
     def test_eine_beschreibung_ohne_die_felder_bekommt_die_vorgaben(self):
         d = Projekt.beispiel().als_dict()

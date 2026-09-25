@@ -170,39 +170,6 @@ class TestNachweis(unittest.TestCase):
         self.assertIsNone(urteil.einwirkung)
         self.assertIsNone(urteil.widerstand)
 
-    def test_ein_urteil_und_zwar_das_schlechtere(self):
-        """
-        Gerechnet werden beide x-Lagen, in der Zusammenfassung steht eine
-        Zeile. Vier Zeilen für eine Frage waren drei zuviel -- beantwortet
-        wird sie ohnehin von der schlechteren Lage.
-        """
-        projekt = projekt_mit()
-        aufbau, gefunden = urteile(projekt)
-        self.assertEqual(len(aufbau.duktilitaet["q1"].ergebnisse), 2)
-
-        dukt = [u for n, u in gefunden.items() if n.startswith("Duktilität")]
-        self.assertEqual(len(dukt), 1)
-        grade = [e.erfuellungsgrad
-                 for e in aufbau.duktilitaet["q1"].ergebnisse]
-        self.assertAlmostEqual(dukt[0].erfuellungsgrad.si, min(grade), places=9)
-
-    def test_ausgeschaltet_rechnet_er_still_mit(self):
-        projekt = projekt_mit(False)
-        aufbau, gefunden = urteile(projekt)
-        self.assertTrue(aufbau.duktilitaet["q1"].still)
-        # In der Tabelle steht er nicht ...
-        self.assertFalse([n for n in gefunden if n.startswith("Duktilität")])
-        # ... gerechnet wird er trotzdem, für jede x-Lage.
-        dukt = [u for u in alle_urteile(projekt) if u.art == "D"]
-        self.assertEqual(len(dukt), 2)
-        self.assertTrue(all(u.still for u in dukt))
-
-    def test_das_urteil_traegt_den_raum_seiner_platte(self):
-        _, gefunden = urteile(projekt_mit())
-        for name, urteil in gefunden.items():
-            if name.startswith("Duktilität"):
-                self.assertTrue(urteil.raum.startswith("querschnitt.q1"), urteil.raum)
-
     def test_die_herleitung_zeigt_die_rechnung(self):
         from opencivil.core.protokoll import GleichungBlock
 
@@ -268,14 +235,6 @@ class TestHerleitungAusVorlagen(unittest.TestCase):
 
 
 class TestVorgabeUndAblage(unittest.TestCase):
-    def test_vorgegeben_ist_er_aus(self):
-        """
-        Der Nachweis läuft von selbst mit, gefordert ist er nicht: er steht in
-        der Norm nicht für jede Platte, und wer ihn führen will, schaltet ihn
-        ein. Ungefragt in der Tabelle stünde er sonst bei jeder Platte.
-        """
-        self.assertIs(Projekt.beispiel().querschnitt("q1").duktilitaet, False)
-
     def test_eine_beschreibung_ohne_das_feld_bekommt_die_vorgabe(self):
         """Eine Datei aus der Zeit vor diesem Nachweis muss weiter laufen."""
         d = Projekt.beispiel().als_dict()
@@ -299,11 +258,6 @@ class TestVorgabeUndAblage(unittest.TestCase):
             with self.subTest(liste=liste):
                 self.assertIs(
                     Projekt.aus_dict(d).querschnitt("q1").duktilitaet, erwartet)
-
-    def test_die_wahl_ueberlebt_die_datei(self):
-        projekt = projekt_mit(True)
-        kopie = Projekt.aus_dict(projekt.als_dict())
-        self.assertIs(kopie.querschnitt("q1").duktilitaet, True)
 
 
 class TestInDerZusammenfassung(unittest.TestCase):

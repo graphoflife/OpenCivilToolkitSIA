@@ -350,20 +350,6 @@ class TestGebrauchsfallPruefung(unittest.TestCase):
                 self.assertIn("zwischen 0 und 100 %",
                               self.fehler(**{feld: wert}))
 
-    def test_die_felder_ueberleben_die_datei(self):
-        from opencivil.projekt import GebrauchsfallEintrag
-
-        projekt = Projekt.beispiel()
-        q = projekt.querschnitte[0]
-        q.quasistaendig.faelle = [GebrauchsfallEintrag(
-            "Dauer", M_Ed=40.0, N_Ed=-5.0, aktiv=False)]
-        q.quasistaendig.aus_tragsicherheit = True
-        q.quasistaendig.anteil = 55.0
-        q.haeufig.anteil = 75.0
-        zurueck = Projekt.aus_dict(projekt.als_dict()).querschnitte[0]
-        self.assertEqual(zurueck.quasistaendig, q.quasistaendig)
-        self.assertEqual(zurueck.haeufig.anteil, 75.0)
-
     def test_eine_datei_ohne_die_listen_bekommt_die_vorgaben(self):
         daten = Projekt.beispiel().als_dict()
         for feld in ("haeufig", "quasistaendig"):
@@ -566,13 +552,3 @@ class TestKnicken(unittest.TestCase):
         aufbau, gefunden = urteile(Projekt.beispiel())
         self.assertEqual(aufbau.knicken, {})
         self.assertFalse([n for n in gefunden if n.startswith("Knicken")])
-
-    def test_die_knickfaelle_ueberleben_die_datei(self):
-        import json
-        projekt = self.projekt(
-            KnickEintrag("Stütze", N_Ed=-900.0, M_Ed_1=25.0,
-                         laenge=5.0, knicklaenge=3.5))
-        kopie = Projekt.aus_dict(json.loads(json.dumps(projekt.als_dict())))
-        fall = kopie.querschnitt("q1").knickfaelle[0]
-        self.assertEqual((fall.name, fall.N_Ed, fall.M_Ed_1), ("Stütze", -900.0, 25.0))
-        self.assertEqual((fall.laenge, fall.knicklaenge), (5.0, 3.5))

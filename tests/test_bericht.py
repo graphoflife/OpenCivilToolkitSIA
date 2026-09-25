@@ -340,6 +340,7 @@ class TestKnappVerfehlterGrad(unittest.TestCase):
     Das Beispielprojekt trägt genau einen solchen Fall: die Rissnormalkraft
     der 3. Lage, still, mit α = 0.9966. Auf zwei Stellen gerundet stand in
     beiden Berichten «1» -- neben der Überschrift «geht aber nicht auf».
+    Wie Konsole und LaTeX-Dokument ihn schreiben, hält der Schnappschuss fest.
     """
 
     @classmethod
@@ -355,17 +356,6 @@ class TestKnappVerfehlterGrad(unittest.TestCase):
         """Sonst prüfte der Rest nichts."""
         self.assertFalse(self.urteil.erfuellt)
         self.assertEqual(f"{self.urteil.erfuellungsgrad.si:.2f}", "1.00")
-
-    def test_die_konsole_schreibt_ihn_kleiner_als_eins(self):
-        text = als_text(self.loesung, aufbau=self.aufbau)
-        self.assertIn("Zwängung auf Normalkraft – 3. Lage: nicht erfüllt "
-                      "(α_eff = 0.996)", text)
-        self.assertNotIn("(α_eff = 1)", text)
-
-    def test_das_latex_dokument_auch(self):
-        tex = als_tex(self.loesung, aufbau=self.aufbau)
-        self.assertIn(r"(α\_eff = 0.996)", tex)
-        self.assertNotIn(r"(α\_eff = 1)", tex)
 
     def test_die_herleitung_auch(self):
         """

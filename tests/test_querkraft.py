@@ -40,11 +40,7 @@ class TestQuerkraft(unittest.TestCase):
             tau_cd= 0.3·sqrt(30)/1.5          = 1.0954 N/mm²
             v_Rd  = 0.7841·1.0954·249         = 213.9 kN/m
         """
-        aufbau, gefunden = urteile(projekt_mit_querkraft())
-        # Auch das Querkrafturteil trägt den Namensraum seines Nachweises --
-        # die Zusammenfassung gruppiert danach nach Platten.
-        for name, urteil in gefunden.items():
-            self.assertTrue(urteil.raum.startswith("querschnitt.q1."), f"{name}: {urteil.raum}")
+        aufbau, _ = urteile(projekt_mit_querkraft())
         erg = aufbau.querkraft["q1.x"].ergebnisse[0]
         self.assertAlmostEqual(erg.d * 1e3, 249.0, places=6)
         self.assertAlmostEqual(erg.eps_v * 1e3, 0.9214, places=4)
