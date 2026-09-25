@@ -1821,7 +1821,7 @@ $$
 m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} = \frac{\left|\min(0\,\mathrm{kN};\ 0)\right| \cdot 200\,\mathrm{mm}}{6} = 0\,\mathrm{kNm}
 $$
 
-**Momentenwiderstand bei N\_Ed = 0 kN**
+**Momentenwiderstand bei N\_Ed = 0.0 kN**
 
 $$
 M_{Rd} = M_{Rd}(N_{Ed}=0)^{+} = 36.3\,\mathrm{kNm}
@@ -1883,7 +1883,7 @@ $$
 m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} = \frac{\left|\min(0\,\mathrm{kN};\ 0)\right| \cdot 200\,\mathrm{mm}}{6} = 0\,\mathrm{kNm}
 $$
 
-**Momentenwiderstand bei N\_Ed = 0 kN**
+**Momentenwiderstand bei N\_Ed = 0.0 kN**
 
 $$
 M_{Rd} = M_{Rd}(N_{Ed}=0)^{+} = 36.3\,\mathrm{kNm}
@@ -2326,7 +2326,7 @@ $$
 m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} = \frac{\left|\min(0\,\mathrm{kN};\ 0)\right| \cdot 250\,\mathrm{mm}}{6} = 0\,\mathrm{kNm}
 $$
 
-**Momentenwiderstand bei N\_Ed = 0 kN**
+**Momentenwiderstand bei N\_Ed = 0.0 kN**
 
 $$
 M_{Rd} = M_{Rd}(N_{Ed}=0)^{+} = 64.2\,\mathrm{kNm}

@@ -1066,7 +1066,7 @@ class Querkraft(Nachweis):
         if bei_n is not None:
             protokoll_interpolation(
                 p, bei_n, basis=werte.basis,
-                titel=f"Momentenwiderstand bei N_Ed = {fall.N_Ed.formatiert(1, KN)} kN")
+                titel=f"Momentenwiderstand bei N_Ed = {N_Ed / 1e3:.1f} kN")
 
         m_Ed = werte.moment("m_Ed", "m_{Ed}", M_Ed)
         m_Rd = werte.moment("m_Rd", "m_{Rd}(N_{Ed})", erg.m_Rd)
