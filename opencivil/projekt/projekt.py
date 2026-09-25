@@ -299,7 +299,7 @@ class Projekt(Beschreibung):
         Schnappschuss-Test prüft sie mit: baute sie etwas anderes als die
         Einträge von Hand, die hier vorher standen, änderte sich der Bericht.
         """
-        projekt = cls(name="Beispiel – Decke über EG")
+        projekt = cls(name="OCT Projekt")
         projekt.beton("C30/37")
         projekt.stahl("B500B")
         # Aussen y, innen x -- der übliche Fall: die Querrichtung läuft unten

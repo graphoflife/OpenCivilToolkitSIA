@@ -18,7 +18,7 @@
 import { api } from './api.js';
 import { erklaerung, feld, hakenSchalter, richtungVon, richtungsWahl } from './bausteine.js';
 import { auswahl, el, melden, zahlfeld } from './dom.js';
-import { aendern, projektAendern, zustand } from './zustand.js';
+import { aendern, naechsterName, projektAendern, zustand } from './zustand.js';
 
 /**
  * Welche Platte gerade durchsucht wird.
@@ -86,7 +86,7 @@ export function nachweiseBlock(querschnitt) {
         ? querschnitt.kombinationen.map((_, i) => einwirkungZeile(querschnitt, i))
         : [el('div.leer', { text: 'Ohne Einwirkung kein Nachweis.' })]),
       anfuegenKnopf('Einwirkung', () => aendernAn((q) => q.kombinationen.push({
-        name: `Fall ${q.kombinationen.length + 1}`,
+        name: naechsterName('Tragsicherheit', q.kombinationen),
         M_Ed: 30, N_Ed: 0, V_Ed: 0, art: 'automatisch',
       }))),
     ]),
@@ -227,7 +227,7 @@ function knickBlock(querschnitt) {
     anfuegenKnopf('Knicknachweis', () => aendern((q) => {
       q.knickfaelle = q.knickfaelle || [];
       q.knickfaelle.push({
-        name: `Stütze ${q.knickfaelle.length + 1}`,
+        name: naechsterName('Knicken', q.knickfaelle),
         N_Ed: -500, M_Ed_1: 20, laenge: 3, knicklaenge: 3, aktiv: true,
       });
     })),
@@ -447,7 +447,7 @@ function gebrauchsKapitel(querschnitt, {
       })]),
     anfuegenKnopf('Lastfall', () => aendern((l) => {
       l.faelle.push({
-        name: `${neu} ${l.faelle.length + 1}`,
+        name: naechsterName(neu, l.faelle),
         M_Ed: 0, N_Ed: 0, aktiv: true,
       });
     })),
@@ -653,7 +653,7 @@ function spannungsBlock(querschnitt) {
     anfuegenKnopf('Analyse', () => aendern((q) => {
       q.spannungsfaelle = q.spannungsfaelle || [];
       q.spannungsfaelle.push({
-        name: `Bild ${q.spannungsfaelle.length + 1}`,
+        name: naechsterName('Bild', q.spannungsfaelle),
         art: 'schnittgroessen', richtung: 'x',
         N_Ed: 0, M_Ed: 30, eps_oben: -1, eps_unten: 2, aktiv: true,
       });

@@ -518,10 +518,13 @@ input[readonly], input:disabled, select:disabled {
 /* Eine Einwirkung je Zeile.
    Die Namensspalte steht auf minmax(0, 1fr): ohne die Null als Untergrenze
    nimmt ein Gitter die Mindestbreite des Inhalts, und die Zeile wächst über
-   die Karte hinaus, statt den Namen zu kürzen. */
+   die Karte hinaus, statt den Namen zu kürzen.
+   Eine Zahlenspalte ist so breit wie «-10000» plus die Pfeile daneben: mit
+   60 px blieben für die Ziffern gut 30 px, und von «-10000» sah man «-100». */
 .einwirkung {
+  --zahlspalte: 80px;
   display: grid;
-  grid-template-columns: 38px minmax(0, 1fr) 60px 60px 62px 18px;
+  grid-template-columns: 38px minmax(0, 1fr) repeat(3, var(--zahlspalte)) 18px;
   gap: 4px; align-items: center; margin-bottom: 4px;
 }
 /* Im Lastfall ist der Schalter nur ein Beiwerk -- er darf der Zeile nicht die
@@ -533,7 +536,7 @@ input[readonly], input:disabled, select:disabled {
 /* Ein Gebrauchslastfall trägt keine Querkraft, ein Knicknachweis dafür
    zwei Längen -- je eine Spalte anders. */
 .einwirkung.ist-knick {
-  grid-template-columns: 38px minmax(0, 1fr) 56px 58px 46px 46px 18px;
+  grid-template-columns: 38px minmax(0, 1fr) repeat(2, var(--zahlspalte)) 50px 50px 18px;
 }
 .einwirkung.ist-kopf {
   font-size: 10.5px; font-weight: 700; text-transform: uppercase;
@@ -546,7 +549,7 @@ input[readonly], input:disabled, select:disabled {
 .einwirkung .schalter-richtung { justify-self: stretch; }
 /* Häufig oder quasi-ständig -- dieselbe Zeile, ohne Querkraft. */
 .einwirkung.ist-gebrauch {
-  grid-template-columns: 38px minmax(0, 1fr) 62px 62px 18px;
+  grid-template-columns: 38px minmax(0, 1fr) repeat(2, var(--zahlspalte)) 18px;
 }
 
 .werteliste tr.ist-gewaehlt { background: var(--blau-hell); box-shadow: inset 3px 0 0 var(--blau); }
@@ -906,7 +909,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 
 /* Eine Analysezeile: Schalter, Name, Art, zwei Zahlen, Richtung, Löschen. */
 .einwirkung.ist-spannung {
-  grid-template-columns: 38px minmax(0, 1fr) 76px 52px 52px 40px 18px;
+  grid-template-columns: 38px minmax(0, 1fr) 76px repeat(2, var(--zahlspalte)) 40px 18px;
 }
 
 /* Die Bilder der Spannung-Dehnung-Analyse. Zwei nebeneinander, solange Platz
@@ -1112,6 +1115,27 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
      tippt man die Zahl ohnehin ein. */
   .zahlpfeile { display: none; }
   .zahlfeld > input { padding-right: 8px; }
+  /* Zwei Zeilen statt einer: oben Schalter, Name und Löschen, darunter die
+     Zahlen, gleich breit und je unter ihrer Kopfbeschriftung. In einer Zeile
+     blieben dem Namen bei 375 px keine 20 px, und «-10000» lief über.
+     Jede Zeile hat denselben Aufbau -- Schalter, Name, n Felder, Löschen --,
+     darum trägt Kind k die Spalte k-1. */
+  .einwirkung, .einwirkung.ist-knick, .einwirkung.ist-gebrauch, .einwirkung.ist-spannung {
+    grid-template-columns: 38px repeat(var(--felder, 3), minmax(0, 1fr)) 18px;
+    row-gap: 3px;
+  }
+  .einwirkung.ist-knick, .einwirkung.ist-spannung { --felder: 4; }
+  .einwirkung.ist-gebrauch { --felder: 2; }
+  .einwirkung > :nth-child(n+3) { grid-row: 2; }
+  .einwirkung > :nth-child(3) { grid-column: 2; }
+  .einwirkung > :nth-child(4) { grid-column: 3; }
+  .einwirkung > :nth-child(5) { grid-column: 4; }
+  .einwirkung > :nth-child(6) { grid-column: 5; }
+  .einwirkung > :nth-child(2) { grid-column: 2 / -2; }
+  .einwirkung > :last-child { grid-column: -2; grid-row: 1; }
+  /* Der Kopf trägt nur die Zahlen -- was der Name ist, sieht man. */
+  .einwirkung.ist-kopf > :nth-child(n+3) { grid-row: 1; }
+  .einwirkung.ist-kopf > :nth-child(2) { display: none; }
 
   /* 26 px Rand auf jeder Seite kosten bei 375 px Breite ein Siebtel des
      Blattes. Am Schreibtisch ist der Rand Ruhe, hier ist er Verlust. */

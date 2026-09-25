@@ -318,7 +318,7 @@ class QuerschnittEintrag(Beschreibung):
             lagen=[lage(durchmesser) for _ in range(LAGENZAHL)],
             querkraftbewehrung=QuerkraftbewehrungEintrag(
                 durchmesser=0.0, stahl=stahl),
-            kombinationen=[KombinationEintrag(name="Feld", M_Ed=30.0)],
+            kombinationen=[KombinationEintrag(name="Tragsicherheit 1", M_Ed=30.0)],
         )
 
     @classmethod

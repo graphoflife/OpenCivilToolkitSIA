@@ -16,7 +16,9 @@
  */
 
 import { el, ersetzen, melden } from './dom.js';
-import { aendern, freieKennung, projektAendern, umschalten, zustand } from './zustand.js';
+import {
+  aendern, freieKennung, naechsterName, projektAendern, umschalten, zustand,
+} from './zustand.js';
 
 const SINNBILD = {
   materialien: '▣',   // ▣
@@ -153,7 +155,7 @@ function platteAnlegen() {
     // dieselben Lagen, und die zweite änderte die erste mit.
     const platte = structuredClone(vorlage);
     platte.kennung = kennung;
-    platte.name = `Platte ${p.querschnitte.length + 1}`;
+    platte.name = naechsterName('Platte', p.querschnitte);
     platte.beton = beton.kennung;
     platte.querkraftbewehrung.stahl = stahl.kennung;
     platte.lagen.forEach((l) => { l.stahl = stahl.kennung; });

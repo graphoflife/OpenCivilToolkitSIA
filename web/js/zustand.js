@@ -124,6 +124,19 @@ export function freieKennung(vorsilbe) {
   return `${vorsilbe}${i}`;
 }
 
+/**
+ * «Tragsicherheit 3» -- die kleinste Nummer, die in der Liste noch frei ist.
+ *
+ * Nicht `länge + 1`: nach dem Löschen eines Eintrags ergäbe das einen Namen,
+ * den es schon gibt, und der Kern weist doppelte Namen ab.
+ */
+export function naechsterName(stamm, eintraege) {
+  const vergeben = new Set(eintraege.map((e) => e.name));
+  let i = 1;
+  while (vergeben.has(`${stamm} ${i}`)) i += 1;
+  return `${stamm} ${i}`;
+}
+
 /** Der Namensraum eines Materials im Rechenwerk, z.B. `beton.b1`. */
 export function namensraum(art, kennung) {
   return `${art}.${kennung}`;
