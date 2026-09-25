@@ -423,10 +423,10 @@ Nachweise
       Bei festgehaltenem N_Ed = 0 kN beträgt der Momentenwiderstand M_Rd = 235.9 kNm.
   M-N-Nachweis x – Feld mit Druck          Erfüllungsgrad     2.54   erfüllt
       Bei festgehaltenem N_Ed = -300 kN beträgt der Momentenwiderstand M_Rd = 253.8 kNm.
-  M-N-Nachweis x – Stütze                  Erfüllungsgrad      1.6   erfüllt
+  M-N-Nachweis x – Stütze                  Erfüllungsgrad     1.60   erfüllt
       Bei festgehaltenem N_Ed = 0 kN beträgt der Momentenwiderstand M_Rd = -79.9 kNm.
 
   Alle geführten Nachweise erfüllt.
 
   Nicht geführt, geht aber nicht auf:
-    Rissnormalkraft x – 3. Lage            Erfüllungsgrad        1
+    Rissnormalkraft x – 3. Lage            Erfüllungsgrad    0.996

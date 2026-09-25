@@ -34,6 +34,7 @@ Ursache erhalten.
 
 from __future__ import annotations
 
+import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field, replace
 from typing import (
@@ -500,6 +501,33 @@ class Prozedur(Berechnung):
 # ===========================================================================
 
 
+def grad_als_text(grad: float, erfuellt: bool, *, latex: bool = False) -> str:
+    """
+    Ein Erfuellungsgrad als Text -- knapp, aber nie gerundet bis zur Luege.
+
+    Zwei Stellen genuegen fast immer. Nur wo ein Nachweis knapp nicht
+    aufgeht, zeigen sie ``1.00`` und sagen damit das Gegenteil des Urteils
+    daneben. Dann kommt eine Stelle dazu, abgeschnitten statt gerundet: der
+    Grad soll kleiner als eins bleiben, weil er das ist.
+
+    Die eine Stelle fuer diese Regel. Zuerst stand sie nur in der
+    Schnittstelle, und Konsolenbericht, LaTeX-Dokument und die Tooltips der
+    Diagramme rundeten weiter selbst -- dort stand bei 0.9966 «1» neben
+    «nicht erfuellt».
+
+    ``latex`` sagt, in welcher Sprache die Unendlichkeit geschrieben wird:
+    ``\\infty`` fuer eine Formel, ``∞`` fuer Fliesstext. Die Zahl selbst ist
+    in beiden dieselbe.
+    """
+    if not math.isfinite(grad):
+        return r"\infty" if latex else "∞"
+    text = f"{grad:.2f}"
+    if not erfuellt and float(text) >= 1.0:
+        text = f"{math.floor(grad * 1000) / 1000:.3f}"
+    return text
+
+
+
 @dataclass(frozen=True)
 class NachweisUrteil:
     """
@@ -635,9 +663,13 @@ class NachweisUrteil:
             return f"{self.art}: {self.fall}"
         return self.name
 
+    def gradtext(self, *, latex: bool = False) -> str:
+        """Der Erfuellungsgrad als Text -- siehe :func:`grad_als_text`."""
+        return grad_als_text(self.erfuellungsgrad.si, self.erfuellt, latex=latex)
+
     def __str__(self) -> str:
         urteil = "erfüllt" if self.erfuellt else "NICHT erfüllt"
-        return f"{self.name}: {urteil} (Erfüllungsgrad {self.erfuellungsgrad.formatiert(2)})"
+        return f"{self.name}: {urteil} (Erfüllungsgrad {self.gradtext()})"
 
 
 class Nachweis(Berechnung):

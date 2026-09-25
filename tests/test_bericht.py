@@ -314,3 +314,58 @@ class TestStilleNachweiseImBericht(unittest.TestCase):
         tex = als_tex(self.loesung())
         hinweis = tex[tex.index("Nicht geführte Nachweise"):]
         self.assertIn("Rissnormalkraft", hinweis)
+
+
+class TestKnappVerfehlterGrad(unittest.TestCase):
+    """
+    0.9966 ist nicht erfüllt, und so darf es auch nicht aussehen.
+
+    Das Beispielprojekt trägt genau einen solchen Fall: die Rissnormalkraft
+    der 3. Lage, still, mit α = 0.9966. Auf zwei Stellen gerundet stand in
+    beiden Berichten «1» -- neben der Überschrift «geht aber nicht auf».
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from opencivil.projekt import Projekt
+
+        aufbau = Projekt.beispiel().aufbauen()
+        cls.loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        cls.urteil = next(u for u in cls.loesung.stille_maengel
+                          if u.name == "Rissnormalkraft x – 3. Lage")
+
+    def test_die_probe_ist_knapp_verfehlt(self):
+        """Sonst prüfte der Rest nichts."""
+        self.assertFalse(self.urteil.erfuellt)
+        self.assertEqual(f"{self.urteil.erfuellungsgrad.si:.2f}", "1.00")
+
+    def test_die_konsole_schreibt_ihn_kleiner_als_eins(self):
+        zeile = next(z for z in als_text(self.loesung).splitlines()
+                     if "Rissnormalkraft x – 3. Lage" in z)
+        self.assertTrue(zeile.rstrip().endswith("0.996"), zeile)
+
+    def test_das_latex_dokument_auch(self):
+        tex = als_tex(self.loesung)
+        self.assertIn(r"\alpha_{eff} = 0.996", tex)
+        self.assertNotIn(r"\alpha_{eff} = 1$", tex)
+
+    def test_die_diagrammpunkte_bringen_den_grad_fertig_mit(self):
+        """
+        Die Tooltips rundeten in JavaScript selbst -- ``toFixed(2)`` neben
+        «NICHT erfüllt». Jetzt kommt der Text aus derselben Regel.
+        """
+        from opencivil.projekt import KnickEintrag, Projekt
+        from opencivil.web import api
+
+        projekt = Projekt.beispiel()
+        projekt.querschnitte[0].knickfaelle = [KnickEintrag(
+            "schlank", N_Ed=-1500.0, M_Ed_1=30.0, laenge=12.0, knicklaenge=12.0)]
+        aufbau = projekt.aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        linie = api.loesung_dict(loesung, aufbau=aufbau)["linien"]["q1.x"]
+        self.assertEqual([k["grad_text"] for k in linie["kombinationen"]],
+                         ["2.36", "2.54", "1.60"])
+        knick = linie["knickfaelle"][0]
+        self.assertFalse(knick["erfuellt"])
+        self.assertEqual(knick["grad_text"],
+                         api.grad_als_text(knick["erfuellungsgrad"], False))

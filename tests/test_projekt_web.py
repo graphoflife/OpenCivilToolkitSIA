@@ -667,14 +667,14 @@ class TestStilleNachweise(unittest.TestCase):
         unendlich = NachweisUrteil(
             name="Probe", erfuellt=True,
             erfuellungsgrad=Groesse(float("inf"), EINHEITSLOS))
-        self.assertEqual(api.gradtext(unendlich, latex=True), r"\infty")
-        self.assertEqual(api.gradtext(unendlich), "∞")
+        self.assertEqual(unendlich.gradtext(latex=True), r"\infty")
+        self.assertEqual(unendlich.gradtext(), "∞")
 
         endlich = NachweisUrteil(
             name="Probe", erfuellt=True,
             erfuellungsgrad=Groesse(2.345, EINHEITSLOS))
-        self.assertEqual(api.gradtext(endlich), "2.35")
-        self.assertEqual(api.gradtext(endlich, latex=True), "2.35")
+        self.assertEqual(endlich.gradtext(), "2.35")
+        self.assertEqual(endlich.gradtext(latex=True), "2.35")
 
     def test_ein_knapp_verfehlter_grad_liest_sich_nicht_als_eins(self):
         """

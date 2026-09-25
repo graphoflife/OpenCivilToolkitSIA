@@ -22,6 +22,7 @@ from opencivil.nachweis.querschnittsloeser import (
     Querschnittsloeser, Stahllage, beton_nichtlinear, stahl_bilinear)
 from opencivil.nachweis.sproedes_versagen import rissmoment
 from opencivil.querschnitt.platte import BREITE_Y_MM, Richtung
+from opencivil.core.berechnung import grad_als_text
 from opencivil.core.latex import als_text, tabelle, text_latex
 from opencivil.core.protokoll import (
     Block, GleichungBlock, HinweisBlock, Protokoll, TabellenBlock, TextBlock,
@@ -261,7 +262,7 @@ def loesung_dict(
                 "fall": u.fall,
                 "erfuellt": u.erfuellt,
                 # Einzige Kennzahl: Widerstand/Einwirkung, ab 1 erfuellt.
-                "erfuellungsgrad": u.erfuellungsgrad.formatiert(2),
+                "erfuellungsgrad": u.gradtext(),
                 "erfuellungsgrad_zahl": u.erfuellungsgrad.si,
                 "begruendung": u.begruendung,
                 "hinweis": u.hinweis,
@@ -739,6 +740,7 @@ def _knickpunkte(aufbau, nachweis) -> list:
             "N_Rd": erg.N_Rd / 1e3,
             "M_bei_N_Rd": erg.M_bei_N_Rd / 1e3,
             "erfuellungsgrad": erg.erfuellungsgrad,
+            "grad_text": grad_als_text(erg.erfuellungsgrad, erg.erfuellt),
             "erfuellt": erg.erfuellt,
             "stabil": erg.stabil,
             "begruendung": erg.begruendung,
@@ -775,6 +777,7 @@ def _linie_dict(nachweis, aufbau=None) -> dict:
                 "art_text": a.schnittgroessen.art.beschriftung,
                 "innerhalb": a.innerhalb,
                 "erfuellungsgrad": a.erfuellungsgrad,
+                "grad_text": grad_als_text(a.erfuellungsgrad, a.innerhalb),
                 "groesse": a.achse.name,
                 "massstab": a.massstab.value,
                 "massstab_text": a.massstab.beschriftung,
@@ -802,31 +805,6 @@ GRAD_SPALTE = 4
 #: die Oberflaeche: dort richtet sich der Textsatz danach, statt aus dem
 #: Spaltenindex zu erraten, was Zahl ist und was nicht.
 AUSRICHTUNG = "llrrr"
-
-
-def gradtext(urteil, *, latex: bool = False) -> str:
-    """
-    Der Erfuellungsgrad als Text -- knapp, aber nie gerundet bis zur Luege.
-
-    Zwei Stellen genuegen fast immer. Nur wo ein Nachweis knapp nicht aufgeht,
-    zeigen sie ``1.00`` und sagen damit das Gegenteil des Urteils daneben --
-    einmal rot hinterlegt, einmal mit «nicht erfuellt» im Satz davor. Dann
-    kommt eine Stelle dazu, abgeschnitten statt gerundet: der Grad soll
-    kleiner als eins bleiben, weil er das ist.
-
-    ``latex`` sagt, in welcher Sprache die Unendlichkeit geschrieben wird:
-    ``\\infty`` fuer die Tabelle, ``∞`` fuer den Fliesstext daneben. Die Zahl
-    selbst ist in beiden dieselbe. Ohne diesen Schalter gab die Funktion immer
-    LaTeX zurueck -- richtig fuer den einen Aufrufer, und beim anderen stuende
-    im Hinweis woertlich «α_eff = \\infty».
-    """
-    grad = urteil.erfuellungsgrad.si
-    if not math.isfinite(grad):
-        return r"\infty" if latex else "∞"
-    text = f"{grad:.2f}"
-    if not urteil.erfuellt and float(text) >= 1.0:
-        text = f"{math.floor(grad * 1000) / 1000:.3f}"
-    return text
 
 
 def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
@@ -888,7 +866,7 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
                     als_text(u.fall) if u.fall else r"\text{--}",
                     zelle(u.widerstand),
                     zelle(u.einwirkung),
-                    gradtext(u, latex=True),
+                    u.gradtext(latex=True),
                 ],
                 "erfuellt": u.erfuellt,
                 "begruendung": u.begruendung,
@@ -911,7 +889,7 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
             # dieselbe Stelle wie fuer die Tabelle.
             "stille": [
                 {"nachweis": u.langname or u.art, "fall": u.fall,
-                 "grad": gradtext(u), "begruendung": u.begruendung}
+                 "grad": u.gradtext(), "begruendung": u.begruendung}
                 for u in stille
             ],
         }

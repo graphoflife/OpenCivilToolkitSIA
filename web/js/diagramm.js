@@ -436,10 +436,11 @@ export function diagrammZeichnen(linie) {
       fill: farbe, stroke: '#fff', 'stroke-width': 2,
     });
     const titel = svgEl('title');
-    const grad = Number.isFinite(k.erfuellungsgrad) ? k.erfuellungsgrad.toFixed(3) : '∞';
+    // Der Grad kommt fertig gesetzt aus dem Kern: gerundet stuende bei
+    // 0.9996 «1.000» neben «NICHT erfüllt».
     titel.textContent =
       `${k.name}\nM_Ed = ${k.M_Ed.toFixed(1)} kNm, N_Ed = ${k.N_Ed.toFixed(1)} kN`
-      + `\nErfüllungsgrad α_eff = ${grad} (${k.massstab_text})`
+      + `\nErfüllungsgrad α_eff = ${k.grad_text} (${k.massstab_text})`
       + `\n${k.innerhalb ? 'erfüllt' : 'NICHT erfüllt'}`;
     punkt.append(titel);
     svg.append(punkt);
@@ -487,12 +488,11 @@ export function diagrammZeichnen(linie) {
       fill: farbe, stroke: '#fff', 'stroke-width': 2,
     });
     const kt = svgEl('title');
-    const grad = Number.isFinite(k.erfuellungsgrad) ? k.erfuellungsgrad.toFixed(2) : '∞';
     kt.textContent =
       `Knicken – ${k.name}\nN_Ed = ${k.N_Ed.toFixed(1)} kN`
       + `\nM_Ed,1 = ${k.M_Ed_1.toFixed(1)} kNm → M_Ed,II = ${k.M_Ed_II.toFixed(1)} kNm`
       + `\nN_Rd = ${k.N_Rd.toFixed(1)} kN bei M = ${k.M_bei_N_Rd.toFixed(1)} kNm`
-      + `\nα_eff = ${grad} – ${k.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`;
+      + `\nα_eff = ${k.grad_text} – ${k.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`;
     raute.append(kt);
     svg.append(raute);
 

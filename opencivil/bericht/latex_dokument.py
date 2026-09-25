@@ -191,7 +191,7 @@ def _nachweise_tex(loesung: Loesung) -> List[str]:
             )
             zeilen.append(
                 f"{text_latex(urteil.name)} & "
-                f"{urteil.erfuellungsgrad.formatiert(2)} & {ergebnis} \\\\"
+                f"${urteil.gradtext(latex=True)}$ & {ergebnis} \\\\"
             )
         zeilen += [r"\bottomrule", r"\end{longtable}"]
 
@@ -226,7 +226,7 @@ def _stille_maengel_tex(loesung: Loesung) -> List[str]:
     for urteil in maengel:
         zeilen.append(
             rf"\item {text_latex(urteil.name)} -- "
-            rf"$\alpha_{{eff}} = {urteil.erfuellungsgrad.formatiert(2)}$. "
+            rf"$\alpha_{{eff}} = {urteil.gradtext(latex=True)}$. "
             rf"{text_latex(urteil.begruendung)}"
         )
     zeilen += [r"\end{itemize}", r"\normalsize"]

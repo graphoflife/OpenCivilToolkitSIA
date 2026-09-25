@@ -188,7 +188,7 @@ def _abschnitt_nachweise(loesung: Loesung) -> List[str]:
         zustand = "erfüllt" if urteil.erfuellt else "NICHT ERFÜLLT"
         zeilen.append(
             f"  {urteil.name.ljust(40)} Erfüllungsgrad "
-            f"{urteil.erfuellungsgrad.formatiert(2).rjust(8)}   {zustand}"
+            f"{urteil.gradtext().rjust(8)}   {zustand}"
         )
         if urteil.begruendung:
             zeilen.extend(_umbrechen(urteil.begruendung, 6))
@@ -203,7 +203,7 @@ def _abschnitt_nachweise(loesung: Loesung) -> List[str]:
         for urteil in maengel:
             zeilen.append(
                 f"    {urteil.name.ljust(38)} Erfüllungsgrad "
-                f"{urteil.erfuellungsgrad.formatiert(2).rjust(8)}"
+                f"{urteil.gradtext().rjust(8)}"
             )
     return zeilen
 
