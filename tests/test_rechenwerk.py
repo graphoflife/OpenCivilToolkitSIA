@@ -17,7 +17,7 @@ from opencivil.core.einheiten import (
 )
 from opencivil.core.latex import (
     Formelzeile, LatexFehler, einsetzen_numerisch, einsetzen_symbolisch,
-    sichtbare_breite,
+    sichtbare_breite, vergleich,
 )
 from opencivil.core.protokoll import GleichungBlock, Protokoll, StillesProtokoll, TabellenBlock
 from opencivil.core.rechenwerk import Rechenwerk, RechenwerkFehler, ZyklusFehler
@@ -182,6 +182,56 @@ class TestFormelzeile(unittest.TestCase):
             eingaben,
         )
         self.assertEqual(len(zeile._teile()), 4)
+
+
+class TestEmpirischUndNachsatz(unittest.TestCase):
+    """
+    Eine empirische Normformel verlangt blanke Zahlen in bestimmten Einheiten.
+    Automatisch mit Einheit eingesetzt stuende die Wurzel einer Spannung da.
+    """
+
+    def eingaben(self):
+        f_ck = D_F_CK.belegen(Groesse(30, MPA))
+        gamma = D_GAMMA_C.belegen(Groesse(1.5, EINHEITSLOS))
+        return {"f_ck": f_ck, "gamma_c": gamma}
+
+    def test_empirisch_steht_die_blanke_zahl_da(self):
+        zeile = Formelzeile.bauen(
+            D_F_CD.belegen(Groesse(1.1, MPA)), r"\frac{0.3 \cdot \sqrt{@f_ck}}{@gamma_c}",
+            self.eingaben(), empirisch={"f_ck": MPA, "gamma_c": EINHEITSLOS})
+        self.assertIn(r"\sqrt{30}", zeile.numerisch)
+        # Welche Einheit gemeint ist, steht dahinter -- nur fuer die mit Einheit.
+        self.assertIn(r"f_{ck}\ \text{in}\ \mathrm{MPa}", zeile.einzeilig())
+        self.assertNotIn(r"\gamma_c\ \text{in}", zeile.einzeilig())
+
+    def test_in_der_verlangten_einheit_mit_passenden_stellen(self):
+        """248.1 mm, in Metern verlangt: 0.2481 und nicht 0.2."""
+        d = WertDef("qs.d", "d", MM, "Statische Hoehe", stellen=1).belegen(Groesse(248.1, MM))
+        self.assertEqual(einsetzen_numerisch(r"@d", {"d": d}, empirisch={"d": M}), "0.2481")
+
+    def test_ohne_empirisch_wie_bisher(self):
+        text = einsetzen_numerisch(r"\sqrt{@f_ck}", self.eingaben())
+        self.assertIn(r"\mathrm{MPa}", text)
+
+    def test_der_nachsatz_steht_hinter_dem_resultat(self):
+        zeile = Formelzeile.bauen(
+            D_F_CD.belegen(Groesse(20, MPA)), r"\frac{@f_ck}{@gamma_c}", self.eingaben(),
+            nachsatz=vergleich(r"\ge", r"f_{grenz} = 15\,\mathrm{MPa}", True))
+        self.assertTrue(zeile.einzeilig().endswith(r"\Rightarrow \quad \text{erfüllt}"))
+        self.assertTrue(zeile.mehrzeilig().rstrip().endswith(r"\end{aligned}"))
+        self.assertIn(r"\text{erfüllt}", zeile.mehrzeilig())
+
+    def test_die_formel_eines_baustoffs_setzt_empirisch_ein(self):
+        """E_cm = k_e * f_cm^(1/3) mit f_cm in N/mm2 -- wie im Rechenwerk selbst."""
+        from opencivil.material.beton import beton
+
+        werk = Rechenwerk()
+        c30 = beton("C30/37").ins_rechenwerk(werk)
+        loesung = werk.loese(c30.id_von("E_cm"))
+        zeile = next(b.latex for b in loesung.protokoll.alle_bloecke()
+                     if isinstance(b, GleichungBlock) and b.wert_id == c30.id_von("E_cm"))
+        self.assertIn(r"\sqrt[3]{38}", zeile)
+        self.assertIn(r"f_{cm}\ \text{in}", zeile)
 
 
 class TestSichtbareBreite(unittest.TestCase):

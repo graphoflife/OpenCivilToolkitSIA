@@ -29,10 +29,12 @@ EIGENSTAENDIG NUTZBAR::
 
 from __future__ import annotations
 
+import math
 import re
 from dataclasses import dataclass
 from typing import Iterable, Mapping, Optional, Sequence, Union
 
+from opencivil.core.einheiten import EINHEITSLOS, Einheit
 from opencivil.core.wert import Wert
 
 #: ``@name`` oder ``@{name}``
@@ -117,8 +119,21 @@ def einsetzen_symbolisch(
     return _ersetzen(vorlage, lambda name: eingaben[name].symbol)
 
 
+def _blank(wert: Wert, einheit: Einheit) -> str:
+    """
+    Die Zahl eines Werts in einer anderen Einheit, ohne diese dazuzuschreiben.
+
+    Die Stellen wandern mit: 248.1 mm auf eine Stelle sind in Metern 0.2481,
+    nicht 0.2 -- sonst ginge in der Herleitung Genauigkeit verloren, die die
+    Rechnung hatte.
+    """
+    verschiebung = round(math.log10(wert.einheit.faktor / einheit.faktor))
+    return wert.groesse.formatiert(max(0, wert.stellen - verschiebung), einheit)
+
+
 def einsetzen_numerisch(
-    vorlage: str, eingaben: Mapping[str, Wert], kontext: str = "Formel"
+    vorlage: str, eingaben: Mapping[str, Wert], kontext: str = "Formel",
+    *, empirisch: Optional[Mapping[str, Einheit]] = None,
 ) -> str:
     """
     Ersetzt die Platzhalter durch Zahlenwerte samt Einheit.
@@ -126,13 +141,21 @@ def einsetzen_numerisch(
     Negative Werte werden geklammert, damit nicht ``a \\cdot -5`` entsteht.
     Besteht die Vorlage nur aus einem einzigen Platzhalter, entfaellt die
     Klammer -- dort waere sie reine Unruhe.
+
+    ``empirisch`` nennt die Eingaben einer dimensionell inhomogenen
+    Normformel mit der Einheit, in der die Norm sie verlangt. Sie stehen als
+    blanke Zahl in dieser Einheit da: ``\\sqrt{30}`` und nicht
+    ``\\sqrt{30\\,\\mathrm{N}/\\mathrm{mm}^{2}}`` -- die Wurzel einer
+    Spannung gibt es nicht, und so zu tun waere falsch.
     """
     _pruefe_vollstaendig(vorlage, eingaben, kontext)
     nur_ein_platzhalter = _PLATZHALTER.fullmatch(vorlage.strip()) is not None
+    empirisch = empirisch or {}
 
     def _wert(name: str) -> str:
         wert = eingaben[name]
-        text = wert.zahl_latex()
+        text = (_blank(wert, empirisch[name]) if name in empirisch
+                else wert.zahl_latex())
         if wert.groesse.si < 0 and not nur_ein_platzhalter:
             return f"\\left({text}\\right)"
         return text
@@ -282,18 +305,27 @@ class Formelzeile:
     ergebnis: str
     """Resultat mit Einheit, z.B. ``18.7\\,\\mathrm{MPa}``."""
 
+    nachsatz: str = ""
+    """Was hinter dem Resultat steht: ein Vergleich mit Urteil, ein Hinweis."""
+
     @classmethod
     def bauen(
         cls,
         ergebnis: Wert,
         vorlage: Optional[str] = None,
         eingaben: Optional[Mapping[str, Wert]] = None,
+        *,
+        empirisch: Optional[Mapping[str, Einheit]] = None,
+        nachsatz: str = "",
     ) -> "Formelzeile":
         """
         Baut die Zeile aus Resultat, analytischer Vorlage und Eingaben.
 
         Ohne Vorlage entsteht die schlichte Form ``symbol = wert`` -- passend
-        fuer Eingaben und Vorgabewerte.
+        fuer Eingaben und Vorgabewerte. Zu ``empirisch`` siehe
+        :func:`einsetzen_numerisch`; welche Einheiten dort vorausgesetzt sind,
+        steht am Ende der Zeile, sonst liessen sich die blanken Zahlen nicht
+        lesen.
         """
         eingaben = eingaben or {}
         kontext = f"Wert '{ergebnis.id}'"
@@ -303,12 +335,22 @@ class Formelzeile:
                 analytisch=None,
                 numerisch=None,
                 ergebnis=ergebnis.zahl_latex(),
+                nachsatz=nachsatz,
             )
+        einheiten = [rf"{eingaben[name].symbol}\ \text{{in}}\ {einheit.latex}"
+                     for name, einheit in (empirisch or {}).items()
+                     if einheit is not EINHEITSLOS and name in eingaben]
+        if einheiten:
+            trenner = r",\ "
+            hinweis = rf"\quad \left({trenner.join(einheiten)}\right)"
+            nachsatz = f"{nachsatz} {hinweis}".strip()
         return cls(
             symbol=ergebnis.symbol,
             analytisch=einsetzen_symbolisch(vorlage, eingaben, kontext),
-            numerisch=einsetzen_numerisch(vorlage, eingaben, kontext),
+            numerisch=einsetzen_numerisch(vorlage, eingaben, kontext,
+                                          empirisch=empirisch),
             ergebnis=ergebnis.zahl_latex(),
+            nachsatz=nachsatz,
         )
 
     # -- Darstellung --------------------------------------------------------
@@ -328,7 +370,7 @@ class Formelzeile:
 
     def einzeilig(self) -> str:
         """``f_{cd} = \\frac{...} = \\frac{...} = 18.7\\,\\mathrm{MPa}``"""
-        return " = ".join(self._teile())
+        return " ".join(filter(None, [" = ".join(self._teile()), self.nachsatz]))
 
     def mehrzeilig(self) -> str:
         """Dieselbe Zeile als ``aligned``-Umgebung, fuer lange Formeln."""
@@ -337,6 +379,8 @@ class Formelzeile:
             return self.einzeilig()
         zeilen = [f"{teile[0]} &= {teile[1]}"]
         zeilen.extend(f"&= {t}" for t in teile[2:])
+        if self.nachsatz:
+            zeilen[-1] += f" {self.nachsatz}"
         inhalt = " \\\\\n  ".join(zeilen)
         return f"\\begin{{aligned}}\n  {inhalt}\n\\end{{aligned}}"
 
@@ -363,6 +407,16 @@ class Formelzeile:
 # ===========================================================================
 
 
+def urteil(erfuellt: bool) -> str:
+    """Das Urteil hinter einem Nachweis -- ein Wortlaut fuer alle."""
+    return r"\text{erfüllt}" if erfuellt else r"\text{NICHT erfüllt}"
+
+
+def angabe(wert: Wert) -> str:
+    """``Symbol = Zahl Einheit`` -- ein Wert, wie er in einem Vergleich steht."""
+    return f"{wert.symbol} = {wert.zahl_latex()}"
+
+
 def bedingung(links: str, zeichen: str, rechts: str, erfuellt: bool) -> str:
     """
     Setzt einen Vergleich mit sichtbarem Ergebnis, z.B. fuer Nachweise::
@@ -370,8 +424,17 @@ def bedingung(links: str, zeichen: str, rechts: str, erfuellt: bool) -> str:
         M_{Ed} = 120\\,\\mathrm{kNm} \\le M_{Rd} = 145\\,\\mathrm{kNm}
         \\quad \\Rightarrow \\quad \\text{erfüllt}
     """
-    urteil = r"\text{erfüllt}" if erfuellt else r"\text{NICHT erfüllt}"
-    return rf"{links} {zeichen} {rechts} \quad \Rightarrow \quad {urteil}"
+    return rf"{links} {zeichen} {rechts} \quad \Rightarrow \quad {urteil(erfuellt)}"
+
+
+def vergleich(zeichen: str, rechts: str, erfuellt: bool) -> str:
+    """
+    Der Nachsatz einer Formel, deren Resultat gegen etwas gehalten wird::
+
+        \\quad \\ge \\quad N_{Riss} = 378.3\\,\\mathrm{kN}
+        \\quad \\Rightarrow \\quad \\text{NICHT erfüllt}
+    """
+    return rf"\quad {zeichen} \quad {rechts} \quad \Rightarrow \quad {urteil(erfuellt)}"
 
 
 @dataclass(frozen=True)

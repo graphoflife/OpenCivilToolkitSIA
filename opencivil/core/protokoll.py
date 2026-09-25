@@ -33,7 +33,7 @@ from typing import (
 
 from opencivil.core import latex as tex
 from opencivil.core.einheiten import (
-    EINHEITSLOS, KN, KNM, MM, MM2, N_PRO_MM2, PROMILLE, Groesse,
+    EINHEITSLOS, KN, KNM, MM, MM2, N_PRO_MM2, PROMILLE, Einheit, Groesse,
 )
 from opencivil.core.wert import Wert, WertDef
 
@@ -226,6 +226,8 @@ class Protokoll:
         referenz: Optional[str] = None,
         *,
         ergebnis_latex: Optional[str] = None,
+        empirisch: Optional[Mapping[str, Einheit]] = None,
+        nachsatz: str = "",
     ) -> None:
         """
         Der Regelfall: ``Symbol = analytische Formel = Formel mit Zahlen = Resultat``.
@@ -239,8 +241,14 @@ class Protokoll:
         Stellenzahl -- ein Erfuellungsgrad folgt
         :func:`opencivil.core.berechnung.grad_als_text`, damit 0.9966 nicht
         als 1.00 neben «nicht erfuellt» steht.
+
+        ``empirisch`` nennt die Eingaben einer dimensionell inhomogenen
+        Normformel mit der Einheit, in der sie als blanke Zahl eingehen
+        (:func:`latex.einsetzen_numerisch`). ``nachsatz`` steht hinter dem
+        Resultat, etwa ein Vergleich (:func:`latex.vergleich`).
         """
-        zeile = tex.Formelzeile.bauen(ergebnis, vorlage, eingaben)
+        zeile = tex.Formelzeile.bauen(ergebnis, vorlage, eingaben,
+                                      empirisch=empirisch, nachsatz=nachsatz)
         if ergebnis_latex is not None:
             zeile = replace(zeile, ergebnis=ergebnis_latex)
         self._anfuegen(

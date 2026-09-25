@@ -360,7 +360,7 @@ $$
 **Mittelwert des Elastizitätsmoduls** *(SIA 262:2025, 3.1.2.3.3)*
 
 $$
-E_{cm} = k_e \cdot \sqrt[3]{f_{cm}} = 10000 \cdot \sqrt[3]{38\,\mathrm{N}/\mathrm{mm}^{2}} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
+E_{cm} = k_e \cdot \sqrt[3]{f_{cm}} = 10000 \cdot \sqrt[3]{38} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \quad \left(f_{cm}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
 $$
 
 **Teilsicherheitsbeiwert für den Elastizitätsmodul** *(SIA 262:2025, 4.2.1.15)*

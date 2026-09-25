@@ -371,13 +371,13 @@ class Formel(Berechnung):
     def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
         roh = self.funktion(**e.groessen())
 
-        # Die Einheitenannahme einer empirischen Formel wird weiterhin erzwungen
-        # und geprueft -- nur nicht mehr in den Bericht geschrieben. Wo die
-        # Formel herkommt, sagt die Normreferenz an der Gleichung; der Zusatz
-        # wiederholte das bloss in Worten. Der Text bleibt ueber
-        # EmpirischesErgebnis.annahmen_text() erreichbar.
+        # Eine empirische Formel verlangt ihre Eingaben als blanke Zahlen in
+        # bestimmten Einheiten. So stehen sie auch in der Herleitung -- mit
+        # Einheit eingesetzt stuende dort die Wurzel einer Spannung.
+        empirisch = None
         if isinstance(roh, EmpirischesErgebnis):
             groesse = roh.wert
+            empirisch = {e.name: e.erwartete_einheit for e in roh.einsetzungen}
         elif isinstance(roh, Groesse):
             groesse = roh
         else:
@@ -390,7 +390,8 @@ class Formel(Berechnung):
         if self.vorlage:
             # Nur die in der Vorlage benutzten Eingaben werden eingesetzt --
             # optionale, die diesmal fehlen, stoeren so nicht.
-            p.formel(wert, self.vorlage, e, titel=self.titel, referenz=self.referenz)
+            p.formel(wert, self.vorlage, e, titel=self.titel, referenz=self.referenz,
+                     empirisch=empirisch)
         else:
             p.wert(wert, titel=self.titel, referenz=self.referenz)
         # Die Begruendung schreibt der Loeser -- er weiss als einziger, ob es
