@@ -543,12 +543,11 @@ class Groesse:
         """
         ziel = einheit_ or self.anzeige
         wert = self.in_einheit(ziel)
-        if stellen <= 0:
-            return f"{wert:.0f}"
-        text = f"{wert:.{stellen}f}"
+        text = f"{wert:.{max(stellen, 0)}f}"
         if "." in text:
             text = text.rstrip("0").rstrip(".")
-        return text or "0"
+        # Was auf null rundet, hat kein Vorzeichen: «-0» sieht nach etwas aus.
+        return "0" if text in ("", "-0") else text
 
     def als_latex(self, stellen: int = 2, einheit_: Optional[Einheit] = None) -> str:
         """Formatierter Zahlenwert samt Einheit als LaTeX-Fragment."""

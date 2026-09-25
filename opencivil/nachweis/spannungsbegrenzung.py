@@ -64,18 +64,17 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_als_text,
+    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_formel,
 )
 from opencivil.core.einheiten import (
     EINHEITSLOS, KN, KNM, N_PRO_MM2, PROMILLE, Groesse,
 )
-from opencivil.core.latex import als_text
-from opencivil.core.protokoll import Protokoll
+from opencivil.core.latex import als_text, angabe, bedingung, vergleich
+from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
 from opencivil.core.wert import kennung_aus
-from opencivil.material.basis import mit_index
 from opencivil.nachweis.mindestbewehrung import (
-    RISSBREITE, zulaessige_stahlspannung,
+    RISSBREITE, protokoll_zulaessige_stahlspannung, zulaessige_stahlspannung,
 )
 from opencivil.nachweis.querschnittsloeser import (
     EPS_DRUCK, EPS_ZUG, protokoll_verfahren,
@@ -226,8 +225,14 @@ class Spannungsgrenze(ABC):
                 f"Querschnitt '{querschnitt.name}': in {richtung.beschriftung} "
                 f"liegt keine Bewehrung.")
         self.querschnitt = querschnitt
+        self.richtung = richtung
         self.anforderung = anforderung
         self.stahl = self.posten[0][0].stahl
+
+    @property
+    def id(self) -> str:
+        """Die Kennung des Nachweises, zu dem die Grenze gehoert."""
+        return f"{self.querschnitt.id}.nachweis.{self.idteil}.{self.richtung.value}"
 
     @classmethod
     def gilt_bei(cls, anforderung: str) -> bool:
@@ -268,10 +273,6 @@ class GrenzeGegenFliessen(Spannungsgrenze):
     einleitung = ("Unter häufiger Einwirkung darf die Bewehrung nicht "
                   "fliessen – sonst bleiben Risse und Durchbiegung dauerhaft.")
 
-    def __init__(self, querschnitt, richtung: Richtung, anforderung: str) -> None:
-        super().__init__(querschnitt, richtung, anforderung)
-        self.s_f_yd = mit_index("f_{yd}", self.stahl.symbol_index)
-
     @classmethod
     def gilt_bei(cls, anforderung: str) -> bool:
         return anforderung in _GEFORDERT
@@ -280,16 +281,12 @@ class GrenzeGegenFliessen(Spannungsgrenze):
         return [Eingabebezug("f_yd", self.stahl.id_von("f_yd"))]
 
     def bestimmen(self, e: Eingaben, p: Protokoll) -> float:
-        f_yd = e.g("f_yd").si
-        sigma_adm = f_yd - FLIESSABSTAND
-        p.gleichung(
-            rf"\sigma_{{s,adm}} = {self.s_f_yd} - {FLIESSABSTAND / 1e6:.0f}"
-            rf"\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
-            rf" = {f_yd / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
-            rf" - {FLIESSABSTAND / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
-            rf" = {sigma_adm / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}",
-            titel="Zulässige Stahlspannung",
-            referenz=self.referenz)
+        sigma_adm = e.g("f_yd").si - FLIESSABSTAND
+        # Die 80 N/mm² haben kein Zeichen -- sie stehen als Zahl in der Formel.
+        abstand = Groesse.aus_si(FLIESSABSTAND, N_PRO_MM2).als_latex(0)
+        p.formel(Zwischenwerte(self.id).spannung("sigma_s_adm", r"\sigma_{s,adm}", sigma_adm),
+                 f"@f_yd - {abstand}", {"f_yd": e["f_yd"]},
+                 titel="Zulässige Stahlspannung", referenz=self.referenz)
         return sigma_adm
 
     def festlegung(self, p: Protokoll) -> None:
@@ -342,8 +339,6 @@ class GrenzeAusRissbreite(Spannungsgrenze):
         super().__init__(querschnitt, richtung, anforderung)
         self.marken = [f"{lage.nummer}{art.kuerzel}"
                        for lage, art, _, _, _ in self.posten]
-        self.s_f_yk = mit_index("f_{yk}", self.stahl.symbol_index)
-        self.s_f_ctm = mit_index("f_{ctm}", querschnitt.beton.symbol_index)
 
     def bezuege(self) -> List[Eingabebezug]:
         return [
@@ -364,31 +359,14 @@ class GrenzeAusRissbreite(Spannungsgrenze):
             anforderung=self.anforderung, f_yk=f_yk, E_s=E_s, f_ctm=f_ctm,
             durchmesser=durchmesser)
 
-        w_nom = RISSBREITE[self.anforderung]
-        if w_nom is None:
-            p.gleichung(
-                rf"\sigma_{{s,adm}} = {self.s_f_yk} = {sigma_adm / 1e6:.0f}"
-                rf"\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}",
-                titel="Zulässige Stahlspannung (normale Anforderung)",
-                referenz=self.referenz)
-            return sigma_adm
-
-        p.gleichung(
-            rf"\varnothing_{{max}} = {durchmesser * 1e3:.0f}\,\mathrm{{mm}}",
-            titel="Dickster Stab der Tragrichtung")
-        p.gleichung(
-            rf"\sigma_{{s,adm}} = \min\left[\sqrt{{\frac{{9 \cdot E_s \cdot "
-            rf"{self.s_f_ctm} \cdot w_{{nom}}}}{{\varnothing_{{max}}}}}};\ "
-            rf"{self.s_f_yk}\right]"
-            "\n= "
-            rf"\min\left[\sqrt{{\frac{{9 \cdot {E_s / 1e6:.0f} \cdot "
-            rf"{f_ctm / 1e6:.2f} \cdot {w_nom * 1e3:.1f}}}"
-            rf"{{{durchmesser * 1e3:.0f}}}}};\ "
-            rf"{f_yk / 1e6:.0f}\right]"
-            rf" = {sigma_adm / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}",
-            titel=(f"Zulässige Stahlspannung (Rissbreite "
-                   f"w_nom = {w_nom * 1e3:.1f} mm)"),
-            referenz=self.referenz)
+        werte = Zwischenwerte(self.id)
+        dm = werte.laenge("dm_max", r"\varnothing_{max}", durchmesser, stellen=0)
+        if RISSBREITE[self.anforderung] is not None:
+            p.wert(dm, titel="Dickster Stab der Tragrichtung")
+        protokoll_zulaessige_stahlspannung(
+            p, werte.spannung("sigma_s_adm", r"\sigma_{s,adm}", sigma_adm),
+            anforderung=self.anforderung, f_yk=e["f_yk"], E_s=e["E_s"],
+            f_ctm=e["f_ctm"], durchmesser=dm, basis=self.id, referenz=self.referenz)
         return sigma_adm
 
     def festlegung(self, p: Protokoll) -> None:
@@ -427,6 +405,8 @@ class Spannungsbegrenzung(Nachweis):
     ) -> None:
         if not faelle:
             raise ValueError("Ohne Lastfall gibt es nichts zu begrenzen.")
+        if grenze.richtung is not richtung:
+            raise ValueError("Grenze und Nachweis gehören zur selben Tragrichtung.")
         self.posten = querschnitt.posten_in_richtung(richtung)
         if not self.posten:
             raise ValueError(
@@ -440,7 +420,7 @@ class Spannungsbegrenzung(Nachweis):
         self.ergebnisse: List[Fallergebnis] = []
 
         r = richtung.value
-        basis = f"{querschnitt.id}.nachweis.{grenze.idteil}.{r}"
+        basis = grenze.id
         self.d_ausnutzung: Dict[str, WertDef] = {
             f.name: WertDef(
                 id=f"{basis}.{f.kennung}.erfuellungsgrad",
@@ -483,10 +463,6 @@ class Spannungsbegrenzung(Nachweis):
                     f"Die Grenze meldet '{b.name}' als {b.wert_id}, der "
                     f"Nachweis führt denselben Namen als {vorhanden[b.name]}.")
 
-        self.s_E_cm = mit_index("E_{cm}", beton.symbol_index)
-        self.s_f_s = mit_index(WERKSTOFFE.stahl_zeichen, stahl.symbol_index)
-        self.s_f_c = mit_index(WERKSTOFFE.beton_zeichen, beton.symbol_index)
-
         super().__init__(
             basis,
             ausgaben=list(self.d_ausnutzung.values()),
@@ -520,8 +496,7 @@ class Spannungsbegrenzung(Nachweis):
             beton=beton_elastisch(E_c=E_c_eff, f_c=f_c),
             stahl=stahl_bilinear(E_s=E_s, f_sd=f_s))
 
-        sigma_adm = self._protokoll_ansatz(p, e, E_cm, phi, n, E_c_eff,
-                                           E_s, f_s, f_c)
+        sigma_adm = self._protokoll_ansatz(p, e, n, E_c_eff)
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
@@ -533,7 +508,7 @@ class Spannungsbegrenzung(Nachweis):
             erg = self._einen_fall(loeser, fall, sigma_adm, E_s=E_s, f_s=f_s)
             self.ergebnisse.append(erg)
             if not leise:
-                self._protokoll_fall(p, erg)
+                self._protokoll_fall(p, e, erg)
             ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(
                 min(erg.erfuellungsgrad, 1e9), EINHEITSLOS)
             urteile.append(self._urteil(erg, still=leise))
@@ -631,9 +606,8 @@ class Spannungsbegrenzung(Nachweis):
 
     # -- Mitschrift ---------------------------------------------------------
 
-    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, E_cm: float,
-                          phi: float, n: float, E_c_eff: float, E_s: float,
-                          f_s: float, f_c: float) -> float:
+    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, n: float,
+                          E_c_eff: float) -> float:
         """Was fuer alle Faelle gilt -- und die Grenze, die dabei entsteht."""
         g = self.grenze
         p.titel(f"Stahlspannung unter {g.einwirkung} Einwirkung – "
@@ -643,13 +617,11 @@ class Spannungsbegrenzung(Nachweis):
             f"Beton nimmt keinen Zug auf, im Druck rechnet er linear mit dem "
             f"wirksamen Modul. Gezählt wird nur gezogene Bewehrung."
         )
-        p.gleichung(
-            rf"E_{{c,eff}} = \frac{{{self.s_E_cm}}}{{1 + \varphi}}"
-            rf" = \frac{{{E_cm / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}}}"
-            rf"{{1 + {phi:.2f}}}"
-            rf" = {E_c_eff / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
-            rf" \qquad n = {n:.2f}",
-            titel="Wirksamer Elastizitätsmodul")
+        werte = Zwischenwerte(self.id)
+        p.formel(werte.spannung("E_c_eff", "E_{c,eff}", E_c_eff),
+                 r"\frac{@E_cm}{1 + @phi}", {"E_cm": e["E_cm"], "phi": e["phi"]},
+                 titel="Wirksamer Elastizitätsmodul",
+                 nachsatz=rf"\qquad {angabe(werte.zahl('n', 'n', n, stellen=2))}")
         sigma_adm = g.bestimmen(e, p)
 
         p.titel("Welche Werte angesetzt werden", ebene=3)
@@ -673,13 +645,12 @@ class Spannungsbegrenzung(Nachweis):
             "Stahlspannung darunter, und eine Grenze darüber könnte nie "
             "überschritten werden."
         )
+        f_s, f_c = e[WERKSTOFFE.stahl], e[WERKSTOFFE.beton]
         p.gleichung(
-            rf"\sigma_s = \min\left[E_s \cdot \varepsilon_s;\ {self.s_f_s}"
-            rf"\right] \quad {self.s_f_s} = {f_s / 1e6:.0f}"
-            rf"\,\mathrm{{N}}/\mathrm{{mm}}^{{2}} \qquad "
-            rf"\sigma_c = \max\left[E_{{c,eff}} \cdot \varepsilon_c;\ "
-            rf"-{self.s_f_c}\right] \quad {self.s_f_c} = {f_c / 1e6:.0f}"
-            rf"\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}",
+            rf"\sigma_s = \min\left[E_s \cdot \varepsilon_s;\ {f_s.symbol}\right]"
+            rf" \quad {angabe(f_s)} \qquad "
+            rf"\sigma_c = \max\left[E_{{c,eff}} \cdot \varepsilon_c;\ -{f_c.symbol}\right]"
+            rf" \quad {angabe(f_c)}",
             titel="Werkstoffgesetze im Gebrauchszustand")
         g.festlegung(p)
         p.text(
@@ -694,7 +665,7 @@ class Spannungsbegrenzung(Nachweis):
         protokoll_verfahren(p, eps_druck=EPS_DRUCK, eps_zug=EPS_ZUG)
         return sigma_adm
 
-    def _protokoll_fall(self, p: Protokoll, erg: Fallergebnis) -> None:
+    def _protokoll_fall(self, p: Protokoll, e: Eingaben, erg: Fallergebnis) -> None:
         fall = erg.fall
         index = self.grenze.lastindex
         p.titel(f"{self.grenze.fallwort} – {fall.name}", ebene=3)
@@ -707,45 +678,39 @@ class Spannungsbegrenzung(Nachweis):
             p.text(erg.begruendung)
             return
 
+        werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
+        eps_m = werte.dehnung("eps_m", r"\varepsilon_m", erg.eps_m, stellen=4)
+        chi = werte.kruemmung("chi", r"\chi", erg.chi)
         p.gleichung(
-            rf"\varepsilon_m = {erg.eps_m * 1e3:.4f}\,\text{{‰}} \qquad "
-            rf"\chi = {erg.chi:.5f}\,\mathrm{{m}}^{{-1}}"
-            rf" \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot "
-            rf"\left(z - \tfrac{{h}}{{2}}\right)",
+            rf"{angabe(eps_m)} \qquad {angabe(chi)} \qquad "
+            r"\varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)",
             titel="Gefundene Dehnungsebene")
+        N_int = werte.kraft("N_int", "N_{int}", erg.N_int)
+        M_int = werte.moment("M_int", "M_{int}", erg.M_int)
         p.gleichung(
-            rf"N_{{int}} = {erg.N_int / 1e3:.1f}\,\mathrm{{kN}} \;\checkmark"
-            rf" \qquad M_{{int}} = {erg.M_int / 1e3:.1f}\,\mathrm{{kNm}}"
-            rf" \;\checkmark",
+            rf"{angabe(N_int)} \;\checkmark \qquad {angabe(M_int)} \;\checkmark",
             titel="Probe: die Ebene erzeugt die Einwirkung")
 
-        zustand = r"\text{erfüllt}" if erg.erfuellt else r"\text{NICHT erfüllt}"
-        grad = grad_als_text(erg.erfuellungsgrad, erg.erfuellt, latex=True)
-
+        grad = self.d_ausnutzung[fall.name].belegen(
+            Groesse(erg.erfuellungsgrad, EINHEITSLOS))
+        wirkt, grenze = erg.vergleich.einwirkung, erg.vergleich.widerstand
         if erg.fliesst:
-            self._protokoll_fliessen(p, erg, zustand, grad)
+            self._protokoll_fliessen(p, e, erg, werte, grad)
             return
 
-        vergleich = r"\le" if erg.erfuellt else ">"
-        p.gleichung(
-            rf"\sigma_s = {erg.sigma_s / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
-            rf" \quad {vergleich} \quad \sigma_{{s,adm}} = "
-            rf"{erg.sigma_s_adm / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}"
-            rf" \quad \Rightarrow \quad {zustand}",
-            titel="Grösste Zugspannung in der Bewehrung")
+        p.gleichung(bedingung(angabe(wirkt), r"\le" if erg.erfuellt else ">",
+                              angabe(grenze), erg.erfuellt),
+                    titel="Grösste Zugspannung in der Bewehrung")
         # Ohne Zug in der Bewehrung gibt es nichts einzusetzen -- dann stuende
         # dort eine Null im Nenner.
-        eingesetzt = (
-            rf" = \frac{{{erg.sigma_s_adm / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}}}"
-            rf"{{{erg.sigma_s / 1e6:.0f}\,\mathrm{{N}}/\mathrm{{mm}}^{{2}}}}"
-            if erg.sigma_s > 0.0 else "")
-        p.gleichung(
-            rf"\alpha_{{eff,\sigma}} = "
-            rf"\frac{{\sigma_{{s,adm}}}}{{\sigma_s}}{eingesetzt} = {grad}",
-            titel="Erfüllungsgrad")
+        if erg.sigma_s > 0.0:
+            vorlage, eingaben = r"\frac{@adm}{@s}", {"adm": grenze, "s": wirkt}
+        else:
+            vorlage, eingaben = rf"\frac{{{grenze.symbol}}}{{{wirkt.symbol}}}", {}
+        grad_formel(p, grad, vorlage, eingaben, erg.erfuellt)
 
-    def _protokoll_fliessen(self, p: Protokoll, erg: Fallergebnis,
-                            zustand: str, grad: str) -> None:
+    def _protokoll_fliessen(self, p: Protokoll, e: Eingaben, erg: Fallergebnis,
+                            werte: Zwischenwerte, grad: Wert) -> None:
         """Der Fall, in dem die Spannung am Plateau stehen bleibt."""
         p.text(
             f"Die Bewehrung fliesst: die grösste Zugdehnung liegt über der "
@@ -753,22 +718,17 @@ class Spannungsbegrenzung(Nachweis):
             f"N/mm² und sagt nichts mehr darüber, wie weit die Grenze "
             f"überschritten ist. Verglichen wird die Dehnung."
         )
-        p.gleichung(
-            rf"\varepsilon_s = {erg.eps_s * 1e3:.2f}\,\text{{‰}} \quad > \quad "
-            rf"\varepsilon_{{y}} = \frac{{{self.s_f_s}}}{{E_s}}"
-            rf" = {erg.eps_y * 1e3:.2f}\,\text{{‰}}",
-            titel="Grösste Zugdehnung in der Bewehrung")
-        vergleich = r"\le" if erg.erfuellt else ">"
-        p.gleichung(
-            rf"\varepsilon_{{s,adm}} = \frac{{\sigma_{{s,adm}}}}{{E_s}}"
-            rf" = {erg.eps_s_adm * 1e3:.2f}\,\text{{‰}} \qquad "
-            rf"\varepsilon_s = {erg.eps_s * 1e3:.2f}\,\text{{‰}} \quad "
-            rf"{vergleich} \quad \varepsilon_{{s,adm}}"
-            rf" \quad \Rightarrow \quad {zustand}",
-            titel="Zulässige Dehnung")
-        p.gleichung(
-            rf"\alpha_{{eff,\sigma}} = "
-            rf"\frac{{\varepsilon_{{s,adm}}}}{{\varepsilon_s}}"
-            rf" = \frac{{{erg.eps_s_adm * 1e3:.2f}\,\text{{‰}}}}"
-            rf"{{{erg.eps_s * 1e3:.2f}\,\text{{‰}}}} = {grad}",
-            titel="Erfüllungsgrad")
+        wirkt, grenze = erg.vergleich.einwirkung, erg.vergleich.widerstand
+        p.formel(werte.dehnung("eps_y", r"\varepsilon_y", erg.eps_y),
+                 r"\frac{@f_s}{@E_s}", {"f_s": e[WERKSTOFFE.stahl], "E_s": e["E_s"]},
+                 titel="Grösste Zugdehnung in der Bewehrung",
+                 nachsatz=rf"\quad < \quad {angabe(wirkt)}")
+        p.formel(grenze, r"\frac{@sigma}{@E_s}",
+                 {"sigma": werte.spannung("sigma_s_adm", r"\sigma_{s,adm}",
+                                          erg.sigma_s_adm),
+                  "E_s": e["E_s"]},
+                 titel="Zulässige Dehnung",
+                 nachsatz=vergleich(r"\ge" if erg.erfuellt else "<", angabe(wirkt),
+                                    erg.erfuellt))
+        grad_formel(p, grad, r"\frac{@adm}{@eps}", {"adm": grenze, "eps": wirkt},
+                    erg.erfuellt)

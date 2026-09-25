@@ -47,8 +47,8 @@ from opencivil.core.berechnung import (
     Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_als_text,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, Groesse
-from opencivil.core.protokoll import Protokoll
-from opencivil.core.wert import WertDef
+from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.wert import Wert, WertDef
 from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.sproedes_versagen import (
@@ -117,6 +117,34 @@ def zulaessige_stahlspannung(
     if w_nom is None or durchmesser <= 0.0:
         return f_yk
     return min(math.sqrt(9.0 * E_s * f_ctm * w_nom / durchmesser), f_yk)
+
+
+def protokoll_zulaessige_stahlspannung(
+    p: Protokoll, sigma: Wert, *, anforderung: str, f_yk: Wert, E_s: Wert,
+    f_ctm: Wert, durchmesser: Wert, basis: str, referenz: str = "",
+) -> None:
+    """
+    Wie :func:`zulaessige_stahlspannung` zu ihrer Zahl kommt -- eine
+    Herleitung fuer jeden Nachweis, der sie braucht.
+
+    ``sigma`` ist das Resultat unter dem Symbol, unter dem es im Nachweis
+    steht; ``durchmesser`` der Stab, der die Rissbreite bestimmt. Die Formel
+    ist dimensionsrein -- (N/mm²)² unter der Wurzel -- und steht darum mit
+    Einheiten da.
+    """
+    w_nom = RISSBREITE.get(anforderung)
+    if w_nom is None or durchmesser.groesse.si <= 0.0:
+        p.formel(sigma, "@f_yk", {"f_yk": f_yk},
+                 titel="Zulässige Stahlspannung (normale Anforderung)",
+                 referenz=referenz)
+        return
+    w = Zwischenwerte(basis).laenge("w_nom", "w_{nom}", w_nom)
+    p.formel(
+        sigma,
+        r"\min\left[\sqrt{\frac{9 \cdot @E_s \cdot @f_ctm \cdot @w_nom}{@dm}};\ @f_yk\right]",
+        {"E_s": E_s, "f_ctm": f_ctm, "w_nom": w, "dm": durchmesser, "f_yk": f_yk},
+        titel=f"Zulässige Stahlspannung (Rissbreite w_nom = {w.formatiert()} mm)",
+        referenz=referenz)
 
 
 @dataclass

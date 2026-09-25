@@ -538,14 +538,17 @@ Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug
 rechnet er linear mit dem wirksamen Modul. Gezählt wird nur gezogene Bewehrung.
 
 Wirksamer Elastizitätsmodul
-    E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2.00} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 17.85
+    E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 17.85
 
 Dickster Stab der Tragrichtung
     \varnothing_{max} = 18\,\mathrm{mm}
 
 Zulässige Stahlspannung (Rissbreite w_nom = 0.5 mm)   [SIA 262:2025, 4.4.2]
-    \sigma_{s,adm} = \min\left[\sqrt{\frac{9 \cdot E_s \cdot f_{ctm} \cdot w_{nom}}{\varnothing_{max}}};\ f_{yk}\right]
-    = \min\left[\sqrt{\frac{9 \cdot 200000 \cdot 2.90 \cdot 0.5}{18}};\ 500\right] = 381\,\mathrm{N}/\mathrm{mm}^{2}
+    \begin{aligned}
+      \sigma_{s,adm} &= \min\left[\sqrt{\frac{9 \cdot E_s \cdot f_{ctm} \cdot w_{nom}}{\varnothing_{max}}};\ f_{yk}\right] \\
+      &= \min\left[\sqrt{\frac{9 \cdot 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.5\,\mathrm{mm}}{18\,\mathrm{mm}}};\ 500\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+      &= 381\,\mathrm{N}/\mathrm{mm}^{2}
+    \end{aligned}
 
 Welche Werte angesetzt werden
 -----------------------------
@@ -614,13 +617,13 @@ Gefundene Dehnungsebene
     \varepsilon_m = 0.2725\,\text{‰} \qquad \chi = 0.00607\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 
 Probe: die Ebene erzeugt die Einwirkung
-    N_{int} = -0.0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 90.0\,\mathrm{kNm} \;\checkmark
+    N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 90\,\mathrm{kNm} \;\checkmark
 
 Grösste Zugspannung in der Bewehrung
-    \sigma_s = 175\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+    \sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
 
 Erfüllungsgrad
-    \alpha_{eff,\sigma} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{175\,\mathrm{N}/\mathrm{mm}^{2}} = 2.18
+    \alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{175\,\mathrm{N}/\mathrm{mm}^{2}} = 2.18
 
 Quasi-ständiger Lastfall – Feld mit Druck (60 %)
 ------------------------------------------------
@@ -632,13 +635,13 @@ Gefundene Dehnungsebene
     \varepsilon_m = 0.1006\,\text{‰} \qquad \chi = 0.00432\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 
 Probe: die Ebene erzeugt die Einwirkung
-    N_{int} = -180.0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 72.0\,\mathrm{kNm} \;\checkmark
+    N_{int} = -180\,\mathrm{kN} \;\checkmark \qquad M_{int} = 72\,\mathrm{kNm} \;\checkmark
 
 Grösste Zugspannung in der Bewehrung
-    \sigma_s = 106\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+    \sigma_{s,x} = 106\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
 
 Erfüllungsgrad
-    \alpha_{eff,\sigma} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{106\,\mathrm{N}/\mathrm{mm}^{2}} = 3.60
+    \alpha_{eff,\sigma,w,x,\text{Feld mit Druck (60 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{106\,\mathrm{N}/\mathrm{mm}^{2}} = 3.60
 
 Quasi-ständiger Lastfall – Stütze (60 %)
 ----------------------------------------
@@ -650,13 +653,13 @@ Gefundene Dehnungsebene
     \varepsilon_m = 0.4864\,\text{‰} \qquad \chi = -0.00565\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 
 Probe: die Ebene erzeugt die Einwirkung
-    N_{int} = 0.0\,\mathrm{kN} \;\checkmark \qquad M_{int} = -36.0\,\mathrm{kNm} \;\checkmark
+    N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{int} = -36\,\mathrm{kNm} \;\checkmark
 
 Grösste Zugspannung in der Bewehrung
-    \sigma_s = 212\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+    \sigma_{s,x} = 212\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
 
 Erfüllungsgrad
-    \alpha_{eff,\sigma} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{212\,\mathrm{N}/\mathrm{mm}^{2}} = 1.79
+    \alpha_{eff,\sigma,w,x,\text{Stütze (60 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{212\,\mathrm{N}/\mathrm{mm}^{2}} = 1.79
 
 Quasi-ständiger Lastfall – Dauerlast
 ------------------------------------
@@ -665,16 +668,16 @@ Einwirkung
     M_{Ed,\text{quasi-ständig}} = 70\,\mathrm{kNm} \qquad N_{Ed,\text{quasi-ständig}} = 0\,\mathrm{kN}
 
 Gefundene Dehnungsebene
-    \varepsilon_m = 0.2120\,\text{‰} \qquad \chi = 0.00472\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
+    \varepsilon_m = 0.212\,\text{‰} \qquad \chi = 0.00472\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 
 Probe: die Ebene erzeugt die Einwirkung
-    N_{int} = -0.0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 70.0\,\mathrm{kNm} \;\checkmark
+    N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 70\,\mathrm{kNm} \;\checkmark
 
 Grösste Zugspannung in der Bewehrung
-    \sigma_s = 136\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+    \sigma_{s,x} = 136\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
 
 Erfüllungsgrad
-    \alpha_{eff,\sigma} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{136\,\mathrm{N}/\mathrm{mm}^{2}} = 2.80
+    \alpha_{eff,\sigma,w,x,\text{Dauerlast}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{381\,\mathrm{N}/\mathrm{mm}^{2}}{136\,\mathrm{N}/\mathrm{mm}^{2}} = 2.80
 
 Stahlspannung unter häufiger Einwirkung – x-Richtung
 ----------------------------------------------------
@@ -684,7 +687,7 @@ dauerhaft. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug 
 rechnet er linear mit dem wirksamen Modul. Gezählt wird nur gezogene Bewehrung.
 
 Wirksamer Elastizitätsmodul
-    E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2.00} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 17.85
+    E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 17.85
 
 Zulässige Stahlspannung   [SIA 262:2025, Tabelle 17]
     \sigma_{s,adm} = f_{yd} - 80\,\mathrm{N}/\mathrm{mm}^{2} = 435\,\mathrm{N}/\mathrm{mm}^{2} - 80\,\mathrm{N}/\mathrm{mm}^{2} = 355\,\mathrm{N}/\mathrm{mm}^{2}
@@ -753,16 +756,16 @@ Einwirkung
     M_{Ed,häufig} = 105\,\mathrm{kNm} \qquad N_{Ed,häufig} = 0\,\mathrm{kN}
 
 Gefundene Dehnungsebene
-    \varepsilon_m = 0.3180\,\text{‰} \qquad \chi = 0.00709\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
+    \varepsilon_m = 0.318\,\text{‰} \qquad \chi = 0.00709\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 
 Probe: die Ebene erzeugt die Einwirkung
-    N_{int} = -0.0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 105.0\,\mathrm{kNm} \;\checkmark
+    N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 105\,\mathrm{kNm} \;\checkmark
 
 Grösste Zugspannung in der Bewehrung
-    \sigma_s = 204\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+    \sigma_{s,x} = 204\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
 
 Erfüllungsgrad
-    \alpha_{eff,\sigma} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{204\,\mathrm{N}/\mathrm{mm}^{2}} = 1.74
+    \alpha_{eff,\sigma,x,\text{Feld (70 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{204\,\mathrm{N}/\mathrm{mm}^{2}} = 1.74
 
 Häufiger Lastfall – Feld mit Druck (70 %)
 -----------------------------------------
@@ -774,13 +777,13 @@ Gefundene Dehnungsebene
     \varepsilon_m = 0.1174\,\text{‰} \qquad \chi = 0.00504\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 
 Probe: die Ebene erzeugt die Einwirkung
-    N_{int} = -210.0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 84.0\,\mathrm{kNm} \;\checkmark
+    N_{int} = -210\,\mathrm{kN} \;\checkmark \qquad M_{int} = 84\,\mathrm{kNm} \;\checkmark
 
 Grösste Zugspannung in der Bewehrung
-    \sigma_s = 123\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+    \sigma_{s,x} = 123\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
 
 Erfüllungsgrad
-    \alpha_{eff,\sigma} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{123\,\mathrm{N}/\mathrm{mm}^{2}} = 2.88
+    \alpha_{eff,\sigma,x,\text{Feld mit Druck (70 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{123\,\mathrm{N}/\mathrm{mm}^{2}} = 2.88
 
 Häufiger Lastfall – Stütze (70 %)
 ---------------------------------
@@ -792,13 +795,13 @@ Gefundene Dehnungsebene
     \varepsilon_m = 0.5674\,\text{‰} \qquad \chi = -0.00659\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 
 Probe: die Ebene erzeugt die Einwirkung
-    N_{int} = -0.0\,\mathrm{kN} \;\checkmark \qquad M_{int} = -42.0\,\mathrm{kNm} \;\checkmark
+    N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{int} = -42\,\mathrm{kNm} \;\checkmark
 
 Grösste Zugspannung in der Bewehrung
-    \sigma_s = 248\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+    \sigma_{s,x} = 248\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
 
 Erfüllungsgrad
-    \alpha_{eff,\sigma} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{248\,\mathrm{N}/\mathrm{mm}^{2}} = 1.43
+    \alpha_{eff,\sigma,x,\text{Stütze (70 \%)}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{248\,\mathrm{N}/\mathrm{mm}^{2}} = 1.43
 
 Häufiger Lastfall – Gebrauch
 ----------------------------
@@ -810,13 +813,13 @@ Gefundene Dehnungsebene
     \varepsilon_m = 0.2725\,\text{‰} \qquad \chi = 0.00607\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 
 Probe: die Ebene erzeugt die Einwirkung
-    N_{int} = -0.0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 90.0\,\mathrm{kNm} \;\checkmark
+    N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 90\,\mathrm{kNm} \;\checkmark
 
 Grösste Zugspannung in der Bewehrung
-    \sigma_s = 175\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+    \sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
 
 Erfüllungsgrad
-    \alpha_{eff,\sigma} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{175\,\mathrm{N}/\mathrm{mm}^{2}} = 2.03
+    \alpha_{eff,\sigma,x,\text{Gebrauch}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{175\,\mathrm{N}/\mathrm{mm}^{2}} = 2.03
 
 Knicken
 -------
@@ -1280,7 +1283,7 @@ Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug
 rechnet er linear mit dem wirksamen Modul. Gezählt wird nur gezogene Bewehrung.
 
 Wirksamer Elastizitätsmodul
-    E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2.00} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 17.85
+    E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 17.85
 
 Zulässige Stahlspannung (normale Anforderung)   [SIA 262:2025, 4.4.2]
     \sigma_{s,adm} = f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2}
@@ -1352,20 +1355,24 @@ Gefundene Dehnungsebene
     \varepsilon_m = 2.3198\,\text{‰} \qquad \chi = 0.03612\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
 
 Probe: die Ebene erzeugt die Einwirkung
-    N_{int} = -0.0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 40.0\,\mathrm{kNm} \;\checkmark
+    N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 40\,\mathrm{kNm} \;\checkmark
 
 Die Bewehrung fliesst: die grösste Zugdehnung liegt über der Fliessdehnung, die Spannung steht bei
 500 N/mm² und sagt nichts mehr darüber, wie weit die Grenze überschritten ist. Verglichen wird die
 Dehnung.
 
 Grösste Zugdehnung in der Bewehrung
-    \varepsilon_s = 4.67\,\text{‰} \quad > \quad \varepsilon_{y} = \frac{f_{yk}}{E_s} = 2.50\,\text{‰}
+    \varepsilon_y = \frac{f_{yk}}{E_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 2.5\,\text{‰} \quad < \quad \varepsilon_{s,x} = 4.67\,\text{‰}
 
 Zulässige Dehnung
-    \varepsilon_{s,adm} = \frac{\sigma_{s,adm}}{E_s} = 2.50\,\text{‰} \qquad \varepsilon_s = 4.67\,\text{‰} \quad > \quad \varepsilon_{s,adm} \quad \Rightarrow \quad \text{NICHT erfüllt}
+    \begin{aligned}
+      \varepsilon_{s,adm} &= \frac{\sigma_{s,adm}}{E_s} \\
+      &= \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} \\
+      &= 2.5\,\text{‰} \quad < \quad \varepsilon_{s,x} = 4.67\,\text{‰} \quad \Rightarrow \quad \text{NICHT erfüllt}
+    \end{aligned}
 
 Erfüllungsgrad
-    \alpha_{eff,\sigma} = \frac{\varepsilon_{s,adm}}{\varepsilon_s} = \frac{2.50\,\text{‰}}{4.67\,\text{‰}} = 0.54
+    \alpha_{eff,\sigma,w,x,\text{Dauerlast}} = \frac{\varepsilon_{s,adm}}{\varepsilon_{s,x}} = \frac{2.5\,\text{‰}}{4.67\,\text{‰}} = 0.54
 
 Plattenanalyse: Konsole
 -----------------------
