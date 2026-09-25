@@ -602,11 +602,9 @@ class Querkraft(Nachweis):
         Erfuellungsgrad. Die Betragsstriche stehen trotzdem nicht am Symbol:
         sie sagen nichts, was die Zahl daneben nicht schon zeigt.
         """
-        return WertDef(
-            id=f"{self.id}.{fall.kennung}.V_Ed",
-            symbol=rf"V_{{Ed,{self.richtung.value}}}",
-            einheit=KN_PRO_M, beschreibung="Einwirkung", stellen=1,
-        ).belegen(Groesse.aus_si(abs(fall.V_Ed.si), KN_PRO_M))
+        return Zwischenwerte(f"{self.id}.{fall.kennung}").wert(
+            "V_Ed", rf"V_{{Ed,{self.richtung.value}}}",
+            Groesse.aus_si(abs(fall.V_Ed.si), KN_PRO_M), beschreibung="Einwirkung")
 
     def _widerstand(self, erg: Querkraftergebnis) -> Wert:
         """
@@ -615,11 +613,9 @@ class Querkraft(Nachweis):
         Er gilt nur unter genau dieser Einwirkung; das gehoert ins Symbol,
         sonst liest sich V_Rd wie ein Kennwert des Querschnitts.
         """
-        return WertDef(
-            id=self.d_v_rd[erg.fall.name].id,
-            symbol=self._widerstandssymbol(erg.fall),
-            einheit=KN_PRO_M, beschreibung="Widerstand", stellen=1,
-        ).belegen(Groesse.aus_si(erg.v_Rd, KN_PRO_M))
+        return Zwischenwerte(f"{self.id}.{erg.fall.kennung}").wert(
+            "v_Rd", self._widerstandssymbol(erg.fall),
+            Groesse.aus_si(erg.v_Rd, KN_PRO_M), beschreibung="Widerstand")
 
     def _lagen(self, e: Eingaben) -> List[Tuple[float, bool]]:
         """

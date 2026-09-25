@@ -46,7 +46,7 @@ from typing import Dict, List, Optional, Sequence, Tuple
 from opencivil.core.berechnung import (
     Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
-from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, MM, Groesse
+from opencivil.core.einheiten import EINHEITSLOS, MM, Groesse
 from opencivil.core.latex import angabe, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
@@ -355,18 +355,14 @@ class Rissnormalkraft(Nachweis):
 
     def _n_riss(self) -> Wert:
         """Die Risskraft -- die Einwirkung in Tabelle und Herleitung."""
-        return WertDef(
-            id=f"{self.id}.N_Riss", symbol=r"N_{Riss}",
-            einheit=KN, beschreibung="Einwirkung", stellen=1,
-        ).belegen(Groesse.aus_si(self.groessen.N_Riss, KN))
+        return Zwischenwerte(self.id).kraft("N_Riss", "N_{Riss}", self.groessen.N_Riss,
+                                            "Einwirkung")
 
     def _n_s_adm(self, erg: Lagenergebnis) -> Wert:
         """Was die Lage aufnimmt -- der Widerstand in Tabelle und Herleitung."""
         nummer, r = erg.lage.nummer, self.richtung.value
-        return WertDef(
-            id=f"{self.id}.lage{nummer}.N_s_adm", symbol=rf"N_{{s,adm,{nummer},{r}}}",
-            einheit=KN, beschreibung="Widerstand", stellen=1,
-        ).belegen(Groesse.aus_si(erg.N_s_adm, KN))
+        return Zwischenwerte(f"{self.id}.lage{nummer}").kraft(
+            "N_s_adm", rf"N_{{s,adm,{nummer},{r}}}", erg.N_s_adm, "Widerstand")
 
     def _urteil(self, erg: Lagenergebnis) -> NachweisUrteil:
         nummer = erg.lage.nummer
@@ -668,10 +664,8 @@ class ZwaengungBiegung(Nachweis):
     def _m_s_adm(self, erg: Momentlagenergebnis) -> Wert:
         """Was die Lage aufnimmt -- der Widerstand in Tabelle und Herleitung."""
         nummer, r = erg.lage.nummer, self.richtung.value
-        return WertDef(
-            id=f"{self.id}.lage{nummer}.M_s_adm", symbol=rf"M_{{s,adm,{nummer},{r}}}",
-            einheit=KNM, beschreibung="Widerstand", stellen=1,
-        ).belegen(Groesse.aus_si(erg.M_s_adm, KNM))
+        return Zwischenwerte(f"{self.id}.lage{nummer}").moment(
+            "M_s_adm", rf"M_{{s,adm,{nummer},{r}}}", erg.M_s_adm, "Widerstand")
 
     def _urteil(self, erg: Momentlagenergebnis) -> NachweisUrteil:
         nummer = erg.lage.nummer

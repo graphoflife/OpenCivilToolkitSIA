@@ -68,8 +68,7 @@ from opencivil.core.berechnung import (
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, M, Groesse
 from opencivil.core.latex import Mathe, angabe, als_text, bedingung
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.wert import WertDef
-from opencivil.core.wert import kennung_aus
+from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.nachweis.querschnittsloeser import (
     EPS_DRUCK, EPS_ZUG, Querschnittsloeser, Stahllage, Werkstoffsatz,
     beton_nichtlinear, protokoll_verfahren, stahl_bilinear,
@@ -493,16 +492,9 @@ class Knicken(Nachweis):
         machbar = erg.fall.N_Ed.si < 0.0
         # Beide Zahlen als Betrag: ein Widerstand mit umgekehrtem Vorzeichen
         # neben seiner Einwirkung liest sich wie ein Fehler.
-        einwirkung = WertDef(
-            id=f"{self.id}.{erg.fall.kennung}.N_Ed",
-            symbol=r"N_{Ed}",
-            einheit=KN, beschreibung="Einwirkung", stellen=1,
-        ).belegen(Groesse.aus_si(abs(erg.fall.N_Ed.si), KN))
-        widerstand = WertDef(
-            id=f"{self.id}.{erg.fall.kennung}.N_Rd",
-            symbol=r"N_{Rd,K}",
-            einheit=KN, beschreibung="Widerstand", stellen=1,
-        ).belegen(Groesse.aus_si(erg.N_Rd, KN))
+        einwirkung = Zwischenwerte(f"{self.id}.{erg.fall.kennung}").kraft(
+            "N_Ed", "N_{Ed}", abs(erg.fall.N_Ed.si), "Einwirkung")
+        widerstand = self._n_rd(erg)
         return NachweisUrteil(
             name=f"Knicken – {erg.fall.name}",
             art="K",
@@ -515,6 +507,11 @@ class Knicken(Nachweis):
             einwirkung=einwirkung if machbar else None,
             widerstand=widerstand if machbar else None,
         )
+
+    def _n_rd(self, erg: Knickergebnis) -> Wert:
+        """Die Grenzkraft -- der Widerstand in Tabelle und Herleitung."""
+        return Zwischenwerte(f"{self.id}.{erg.fall.kennung}").kraft(
+            "N_Rd", "N_{Rd,K}", erg.N_Rd, "Widerstand")
 
     # -- Mitschrift ---------------------------------------------------------
 
@@ -690,9 +687,9 @@ class Knicken(Nachweis):
             "Stab immer; von dort aus wird das Fenster halbiert, bis "
             "getragene und nicht getragene Kraft zusammenfallen."
         )
-        werte = Zwischenwerte(f"{self.id}.{kennung_aus(erg.fall.name)}")
-        n_rd = werte.kraft("N_Rd", "N_{Rd,K}", erg.N_Rd)
-        n_ed = werte.kraft("N_Ed_betrag", r"\left|N_{Ed}\right|", N_Ed)
+        n_rd = self._n_rd(erg)
+        n_ed = Zwischenwerte(f"{self.id}.{erg.fall.kennung}").kraft(
+            "N_Ed_betrag", r"\left|N_{Ed}\right|", N_Ed)
         p.gleichung(bedingung(angabe(n_rd), r"\ge", angabe(n_ed), erg.erfuellt,
                               mit_urteil=False),
                     titel="Grenzkraft des Stabes")

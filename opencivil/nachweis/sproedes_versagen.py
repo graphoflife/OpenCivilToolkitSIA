@@ -38,7 +38,7 @@ from typing import Dict, List, Optional, Sequence
 from opencivil.core.berechnung import (
     Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
-from opencivil.core.einheiten import EINHEITSLOS, KNM, M, Groesse
+from opencivil.core.einheiten import EINHEITSLOS, M, Groesse
 from opencivil.core.latex import angabe, bedingung
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
@@ -86,10 +86,7 @@ def rissmoment(*, h: float, b: float, f_ctm: float) -> Rissgroessen:
 
 def rissmoment_wert(basis: str, g: Rissgroessen) -> Wert:
     """Das Rissmoment -- die Einwirkung in Tabelle und Herleitung."""
-    return WertDef(
-        id=f"{basis}.M_Riss", symbol=r"M_{Riss}",
-        einheit=KNM, beschreibung="Einwirkung", stellen=1,
-    ).belegen(Groesse.aus_si(g.M_Riss, KNM))
+    return Zwischenwerte(basis).moment("M_Riss", "M_{Riss}", g.M_Riss, "Einwirkung")
 
 
 def protokoll_zugfestigkeit(
@@ -263,11 +260,8 @@ class SproedesVersagen(Nachweis):
     def _m_rd(self, erg: Lagenergebnis) -> Wert:
         """Der Biegewiderstand der Lage -- der Widerstand in Tabelle und Herleitung."""
         nummer, r = erg.lage.nummer, self.richtung.value
-        return WertDef(
-            id=f"{self.id}.lage{nummer}.M_Rd",
-            symbol=rf"M_{{Rd,{r}}}(N_{{Ed}} = 0)_{{{nummer}}}",
-            einheit=KNM, beschreibung="Widerstand", stellen=1,
-        ).belegen(Groesse.aus_si(erg.M_Rd, KNM))
+        return Zwischenwerte(f"{self.id}.lage{nummer}").moment(
+            "M_Rd", rf"M_{{Rd,{r}}}(N_{{Ed}} = 0)_{{{nummer}}}", erg.M_Rd, "Widerstand")
 
     def _urteil(self, erg: Lagenergebnis) -> NachweisUrteil:
         nummer = erg.lage.nummer
