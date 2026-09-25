@@ -37,7 +37,7 @@ from opencivil.bericht.latex_dokument import als_tex
 from opencivil.bericht.markdown import als_markdown
 from opencivil.core.rechenwerk import RechenwerkFehler
 from opencivil.projekt import Projekt, ProjektFehler
-from opencivil.web import api, speicher
+from opencivil.web import api, diagrammdaten, speicher
 from opencivil.web.api import endlich
 
 #: Das Gedaechtnis zwischen zwei Anfragen -- siehe :mod:`opencivil.web.speicher`.
@@ -254,7 +254,7 @@ def querkraftkurven(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
                 400, f"Die Normalkraft der Kurve '{kennung}' ist keine Zahl, "
                      f"sondern {wert!r}.")
 
-    return {"querkraftkurven": api.querkraftkurven(aufbau, gewaehlt)}
+    return {"querkraftkurven": diagrammdaten.querkraftkurven(aufbau, gewaehlt)}
 
 
 def bericht(rumpf: Mapping[str, Any]) -> Dict[str, Any]:

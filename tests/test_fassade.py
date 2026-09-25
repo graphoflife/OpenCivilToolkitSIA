@@ -215,7 +215,7 @@ class TestRechnen(unittest.TestCase):
         Oberflaeche zeichnet.
         """
         from opencivil.projekt import SpannungsfallEintrag
-        from opencivil.web import api
+        from opencivil.web import diagrammdaten
 
         projekt = Projekt.beispiel()
         projekt.querschnitte[0].spannungsfaelle = [
@@ -225,7 +225,7 @@ class TestRechnen(unittest.TestCase):
         feld, linie = ergebnis.analysen()["q1"]
         self.assertAlmostEqual(feld.bild.M / 1e3, 80.0, places=3)
         self.assertGreater(linie.kurve.M_Rd, linie.kurve.M_Riss)
-        bilder = api.spannungsanalysen(ergebnis.aufbau, ergebnis.loesung)["q1"]
+        bilder = diagrammdaten.spannungsanalysen(ergebnis.aufbau, ergebnis.loesung)["q1"]
         self.assertAlmostEqual(bilder[0]["bild"]["M"], feld.bild.M / 1e3)
 
     def test_ein_wert_mit_herkunft(self):

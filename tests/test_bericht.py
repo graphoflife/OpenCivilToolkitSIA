@@ -393,8 +393,10 @@ class TestKnappVerfehlterGrad(unittest.TestCase):
                          ["2.36", "2.54", "1.60"])
         knick = linie["knickfaelle"][0]
         self.assertFalse(knick["erfuellt"])
+        from opencivil.core.berechnung import grad_als_text
+
         self.assertEqual(knick["grad_text"],
-                         api.grad_als_text(knick["erfuellungsgrad"], False))
+                         grad_als_text(knick["erfuellungsgrad"], False))
 
 
 class TestMarkdown(unittest.TestCase):
