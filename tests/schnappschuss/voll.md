@@ -1,6 +1,6 @@
 # Voll
 
-103 Berechnungen ausgeführt, 193 Werte bestimmt.
+103 Berechnungen ausgeführt, 196 Werte bestimmt.
 
 ## Herleitung
 
@@ -2308,6 +2308,68 @@ $$
 \alpha_{eff,x,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{64.2\,\mathrm{kNm}}{40\,\mathrm{kNm}} = 1.60 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
+#### Nachweis – Schräg
+
+**Einwirkung**
+
+$$
+M_{Ed} = 30\,\mathrm{kNm} \qquad N_{Ed} = -500\,\mathrm{kN}
+$$
+
+**Bezugsgrösse der Normalkraft**
+
+$$
+\begin{aligned}
+  N_{ref} &= \max\left(\left|N_{Rd,x}^{+}\right|;\ \left|N_{Rd,x}^{-}\right|\right) \\
+  &= \max\left(\left|655.6\,\mathrm{kN}\right|;\ \left|-5000\,\mathrm{kN}\right|\right) \\
+  &= 5000\,\mathrm{kN}
+\end{aligned}
+$$
+
+**Bezugsgrösse des Moments**
+
+$$
+\begin{aligned}
+  M_{ref} &= \max\left(\left|M_{Rd,x}^{+}\right|;\ \left|M_{Rd,x}^{-}\right|\right) \\
+  &= \max\left(\left|178.6\,\mathrm{kNm}\right|;\ \left|-178.6\,\mathrm{kNm}\right|\right) \\
+  &= 178.6\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Einwirkung im normierten Diagramm**
+
+$$
+\bar{E}_{d,x} = \sqrt{\left(\frac{N_{Ed}}{N_{ref}}\right)^{2} + \left(\frac{M_{Ed}}{M_{ref}}\right)^{2}} = \sqrt{\left(\frac{-500\,\mathrm{kN}}{5000\,\mathrm{kN}}\right)^{2} + \left(\frac{30\,\mathrm{kNm}}{178.6\,\mathrm{kNm}}\right)^{2}} = 0.195
+$$
+
+**Nächster Punkt P der Resistenzlinie**
+
+$$
+N_P = 249.4\,\mathrm{kN} \qquad M_P = 39.8\,\mathrm{kNm}
+$$
+
+**Kürzester Abstand zur Resistenzlinie**
+
+$$
+\begin{aligned}
+  a &= \sqrt{\left(\frac{N_{Ed} - N_P}{N_{ref}}\right)^{2} + \left(\frac{M_{Ed} - M_P}{M_{ref}}\right)^{2}} \\
+  &= \sqrt{\left(\frac{-500\,\mathrm{kN} - 249.4\,\mathrm{kN}}{5000\,\mathrm{kN}}\right)^{2} + \left(\frac{30\,\mathrm{kNm} - 39.8\,\mathrm{kNm}}{178.6\,\mathrm{kNm}}\right)^{2}} \\
+  &= 0.16
+\end{aligned}
+$$
+
+**Widerstand im normierten Diagramm**
+
+$$
+\bar{R}_{d,x} = \bar{E}_{d,x} + a = 0.195 + 0.16 = 0.355
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,x,\text{Schräg}} = \frac{\bar{R}_{d,x}}{\bar{E}_{d,x}} = \frac{0.355}{0.195} = 1.82 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
 ### Querkraft – x-Richtung
 
 Querkraftwiderstand ohne Querkraftbewehrung. Massgebend sind die statische Höhe der gezogenen Bewehrung, die Grösstkorngrösse und die Dehnung auf halber Höhe.
@@ -2544,6 +2606,7 @@ $$
 | Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
 | :--- | :--- | ---: | ---: | ---: |
 | Biegung und Normalkraft | Feld | $M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = 64.2\,\mathrm{kNm}$ | $M_{Ed,x} = 40.0\,\mathrm{kNm}$ | $1.60$ |
+| Biegung und Normalkraft | Schräg | $\bar{R}_{d,x} = 0.355$ | $\bar{E}_{d,x} = 0.195$ | $1.82$ |
 | Querkraft | Feld | $V_{Rd,x}(M_{Ed} = 40\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 167.8\,\mathrm{kN}/\mathrm{m}$ | $V_{Ed,x} = 50.0\,\mathrm{kN}/\mathrm{m}$ | $3.36$ |
 
 Mindestens ein Nachweis ist nicht erfüllt.
@@ -2736,11 +2799,14 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Grösster negativer Momentenwiderstand (x-Richtung) | $M_{Rd,x}^{-}$ | $-178.6$ | kNm | berechnet |
 | Grösste aufnehmbare Druckkraft (x-Richtung) | $N_{Rd,x}^{-}$ | $-5000$ | kN | berechnet |
 | Grösste aufnehmbare Zugkraft (x-Richtung) | $N_{Rd,x}^{+}$ | $655.6$ | kN | berechnet |
+| Momentenwiderstand bei N\_Ed (x-Richtung) – Schräg | $M_{Rd,x}(N_{Ed})_{\text{Schräg}}$ | $96$ | kNm | berechnet |
+| Erfüllungsgrad x-Richtung – Schräg | $\alpha_{eff,x,\text{Schräg}}$ | $1.82$ |  | berechnet |
 | Erfüllungsgrad Querkraft x-Richtung – Feld | $\alpha_{eff,V,x,\text{Feld}}$ | $3.36$ |  | berechnet |
 | Querkraftwiderstand x-Richtung – Feld | $V_{Rd,x}$ | $167.8$ | kN/m | berechnet |
 | Erfüllungsgrad Rissnormalkraft – 2. Lage x | $\alpha_{eff,NR,2,x}$ | $1.17$ |  | berechnet |
 | Erfüllungsgrad Rissnormalkraft – 3. Lage x | $\alpha_{eff,NR,3,x}$ | $1.17$ |  | berechnet |
 | Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %) | $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ | $2.86$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Schräg (60 %) | $\alpha_{eff,\sigma,w,x,\text{Schräg (60 \%)}}$ | $761.26$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – 2. Lage x | $\alpha_{eff,SV,2,x}$ | $2.21$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – 3. Lage x | $\alpha_{eff,SV,3,x}$ | $2.21$ |  | berechnet |
 | Erfüllungsgrad Zwängung auf Biegung – 2. Lage x | $\alpha_{eff,ZB,2,x}$ | $2.38$ |  | berechnet |

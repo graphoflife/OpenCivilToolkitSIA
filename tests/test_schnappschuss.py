@@ -48,7 +48,8 @@ def _voll():
     mit Stabzahl in y, ein Knickfall; eine zweite Platte mit x aussen, die im
     Feld nicht aufgeht und deren Stahl unter Dauerlast fliesst, dazu
     Querkraft ohne Bügel -- einmal über m_Rd, einmal darunter, mit Einlage;
-    eine dritte ohne x-Bewehrung; eine vierte mit Querkraft ohne Einlage.
+    eine dritte ohne x-Bewehrung; eine vierte mit Querkraft ohne Einlage und
+    einer Einwirkung, die am kürzesten Abstand gemessen wird.
     Gebaut über die Fassade, wie ein Benutzer es in Python täte.
     """
     from opencivil.projekt import Projekt
@@ -83,6 +84,7 @@ def _voll():
 
     konsole = p.platte("Konsole", h=250, x=[12, 12], y=[10, 10])
     konsole.einwirkung("Feld", M_Ed=40, V_Ed=50)
+    konsole.einwirkung("Schräg", M_Ed=30, N_Ed=-500).art = "naechster_Punkt"
     return p
 
 

@@ -45,9 +45,9 @@ from opencivil.core.berechnung import (
     Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, Groesse
-from opencivil.core.latex import Mathe, als_text
+from opencivil.core.latex import Mathe, als_text, angabe
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.wert import WertDef
+from opencivil.core.wert import Wert, WertDef
 from opencivil.core.wert import kennung_aus
 from opencivil.nachweis import dehnungsfaecher, linie as geo
 from opencivil.nachweis.handrechnung import (
@@ -105,6 +105,31 @@ class Schnittgroessen:
         return kennung_aus(self.name)
 
 
+@dataclass(frozen=True)
+class Normierung:
+    """
+    Der kuerzeste Abstand im normierten Diagramm -- alles, was die Mitschrift
+    davon braucht.
+
+    Normiert wird auf die groesste Normalkraft und das groesste Moment der
+    Linie; ohne das haenge der Abstand von der Wahl der Einheiten ab. Der
+    Grad ist ``rand / laenge`` -- ein Verhaeltnis von Laengen im Diagramm,
+    nicht von Momenten.
+    """
+
+    N_ref: float
+    M_ref: float
+    laenge: float
+    """Die Einwirkung als Abstand vom Ursprung."""
+
+    abstand: float
+    """Kuerzester Abstand zur Resistenzlinie."""
+
+    rand: float
+    """``laenge + abstand`` innerhalb, ``laenge - abstand`` ausserhalb, nicht
+    unter null -- der Widerstand im normierten Diagramm."""
+
+
 @dataclass
 class Auswertung:
     """Ergebnis der Prüfung einer Kombination."""
@@ -134,6 +159,10 @@ class Auswertung:
     kante: Optional[Tuple["Eckpunkt", "Eckpunkt"]] = None
     """Zwischen welchen beiden Eckpunkten interpoliert wurde -- fuer die
     Mitschrift, damit dort nicht bloss das Ergebnis steht."""
+
+    normierung: Optional[Normierung] = None
+    """Nur beim kuerzesten Abstand: dort ist der Grad kein Verhaeltnis von
+    Momenten, sondern von Laengen im normierten Diagramm."""
 
 
 #: Welche Achse ein Massstab sucht. Die einzige Stelle, an der die beiden
@@ -361,7 +390,7 @@ class BiegungNormalkraft(Nachweis):
         for kombination in self.kombinationen:
             auswertung = self._auswerten(kombination, eckwerte)
             self.auswertungen.append(auswertung)
-            self._protokoll_kombination(p, auswertung)
+            self._protokoll_kombination(p, auswertung, eckwerte)
             ergebnis[self.d_ausnutzung[kombination.name].id] = Groesse(
                 auswertung.erfuellungsgrad, EINHEITSLOS
             )
@@ -419,8 +448,13 @@ class BiegungNormalkraft(Nachweis):
 
         Welche Groesse verglichen wird, haengt vom Massstab ab -- bei
         'Normalkraft konstant' das Moment, bei 'Moment konstant' die Normalkraft.
-        Das Urteil traegt deshalb Symbol und Einheit selbst mit sich.
+        Das Urteil traegt deshalb Symbol und Einheit selbst mit sich. Beim
+        kuerzesten Abstand sind es Laengen im normierten Diagramm -- sonst
+        stuenden zwei Momente da, deren Quotient nicht der Grad ist.
         """
+        if auswertung.normierung is not None:
+            einwirkung, widerstand = self._normiert(auswertung)
+            return einwirkung if seite == "Ed" else widerstand
         achse = auswertung.achse
         einheit = achse.einheit
         zahl = auswertung.ed if seite == "Ed" else auswertung.rd
@@ -530,20 +564,29 @@ class BiegungNormalkraft(Nachweis):
         abstand, stelle = geo.naechster_punkt(
             N_Ed, M_Ed, self.handlinie, N_ref, M_ref)
         laenge = math.hypot(N_Ed / N_ref, M_Ed / M_ref)
-        rand = laenge + abstand if innerhalb else laenge - abstand
-        grad = float("inf") if laenge == 0 else max(rand, 0.0) / laenge
+        rand = max(laenge + abstand if innerhalb else laenge - abstand, 0.0)
+        grad = float("inf") if laenge == 0 else rand / laenge
         return Auswertung(
             kombination, innerhalb, grad, stelle,
             f"Kürzester Abstand zur Resistenzlinie im normierten Diagramm: "
             f"{abstand:.3f}. Nächster Punkt: N = {_in(stelle[0], geo.NORMALKRAFT)}, "
             f"M = {_in(stelle[1], geo.MOMENT)}.",
             achse=geo.MOMENT, ed=M_Ed, rd=stelle[1],
-            massstab=Erfuellungsart.NAECHSTER_PUNKT)
+            massstab=Erfuellungsart.NAECHSTER_PUNKT,
+            normierung=Normierung(N_ref, M_ref, laenge, abstand, rand))
 
     # -- Mitschrift ---------------------------------------------------------
 
 
-    def _protokoll_kombination(self, p: Protokoll, auswertung: Auswertung) -> None:
+    def _normiert(self, auswertung: Auswertung) -> Tuple[Wert, Wert]:
+        """Einwirkung und Widerstand im normierten Diagramm -- fuer Tabelle und Herleitung."""
+        n, r = auswertung.normierung, self.richtung.value
+        werte = Zwischenwerte(f"{self.id}.{auswertung.schnittgroessen.kennung}")
+        return (werte.zahl("E_norm", rf"\bar{{E}}_{{d,{r}}}", n.laenge, "Einwirkung"),
+                werte.zahl("R_norm", rf"\bar{{R}}_{{d,{r}}}", n.rand, "Widerstand"))
+
+    def _protokoll_kombination(self, p: Protokoll, auswertung: Auswertung,
+                               eckwerte: Mapping[str, float]) -> None:
         k = auswertung.schnittgroessen
         p.titel(f"Nachweis – {k.name}", ebene=3)
         p.gleichung(
@@ -552,14 +595,64 @@ class BiegungNormalkraft(Nachweis):
             titel="Einwirkung",
         )
         basis = f"{self.id}.{k.kennung}"
-        protokoll_interpolation(p, auswertung, basis=basis)
-
-        werte, achse = Zwischenwerte(basis), auswertung.achse
-        rd, ed = (werte.wert(name, f"{achse.name}_{{{name}}}",
-                             Groesse.aus_si(abs(si), achse.einheit))
-                  for name, si in (("Rd", auswertung.rd), ("Ed", auswertung.ed)))
+        if auswertung.normierung is not None:
+            ed, rd = self._protokoll_naechster(p, auswertung, eckwerte, basis)
+        else:
+            protokoll_interpolation(p, auswertung, basis=basis)
+            werte, achse = Zwischenwerte(basis), auswertung.achse
+            rd, ed = (werte.wert(name, f"{achse.name}_{{{name}}}",
+                                 Groesse.aus_si(abs(si), achse.einheit))
+                      for name, si in (("Rd", auswertung.rd), ("Ed", auswertung.ed)))
         grad_formel(p, self.d_ausnutzung[k.name], auswertung.erfuellungsgrad,
                     rd, ed, auswertung.innerhalb, mit_urteil=True)
+
+    def _protokoll_naechster(
+        self, p: Protokoll, auswertung: Auswertung, eckwerte: Mapping[str, float],
+        basis: str,
+    ) -> Tuple[Wert, Wert]:
+        """
+        Der kuerzeste Abstand, Schritt fuer Schritt -- und daraus Einwirkung und
+        Widerstand im normierten Diagramm, deren Quotient der Grad ist.
+        """
+        n, k = auswertung.normierung, auswertung.schnittgroessen
+        werte = Zwischenwerte(basis)
+        eck = {name: self.d_eckwerte[name].belegen(
+                   Groesse.aus_si(eckwerte[name], KN if name.startswith("N") else KNM))
+               for name in ("N_Rd_zug", "N_Rd_druck", "M_Rd_max", "M_Rd_min")}
+        N_ref = werte.kraft("N_ref", "N_{ref}", n.N_ref)
+        M_ref = werte.moment("M_ref", "M_{ref}", n.M_ref)
+        p.formel(N_ref, r"\max\left(\left|@a\right|;\ \left|@b\right|\right)",
+                 {"a": eck["N_Rd_zug"], "b": eck["N_Rd_druck"]},
+                 titel="Bezugsgrösse der Normalkraft")
+        p.formel(M_ref, r"\max\left(\left|@a\right|;\ \left|@b\right|\right)",
+                 {"a": eck["M_Rd_max"], "b": eck["M_Rd_min"]},
+                 titel="Bezugsgrösse des Moments")
+
+        einwirkung, widerstand = self._normiert(auswertung)
+        N_Ed = werte.kraft("N_Ed", "N_{Ed}", k.N_Ed.si)
+        M_Ed = werte.moment("M_Ed", "M_{Ed}", k.M_Ed.si)
+        p.formel(einwirkung,
+                 r"\sqrt{\left(\frac{@N_Ed}{@N_ref}\right)^{2} + "
+                 r"\left(\frac{@M_Ed}{@M_ref}\right)^{2}}",
+                 {"N_Ed": N_Ed, "M_Ed": M_Ed, "N_ref": N_ref, "M_ref": M_ref},
+                 titel="Einwirkung im normierten Diagramm")
+
+        N_P = werte.kraft("N_P", "N_P", auswertung.widerstand[0])
+        M_P = werte.moment("M_P", "M_P", auswertung.widerstand[1])
+        p.gleichung(rf"{angabe(N_P)} \qquad {angabe(M_P)}",
+                    titel="Nächster Punkt P der Resistenzlinie")
+        abstand = werte.zahl("a", "a", n.abstand)
+        p.formel(abstand,
+                 r"\sqrt{\left(\frac{@N_Ed - @N_P}{@N_ref}\right)^{2} + "
+                 r"\left(\frac{@M_Ed - @M_P}{@M_ref}\right)^{2}}",
+                 {"N_Ed": N_Ed, "M_Ed": M_Ed, "N_P": N_P, "M_P": M_P,
+                  "N_ref": N_ref, "M_ref": M_ref},
+                 titel="Kürzester Abstand zur Resistenzlinie")
+        # Innerhalb liegt der Rand um a weiter aussen, ausserhalb um a innen.
+        vorlage = "@E + @a" if auswertung.innerhalb else r"\max\left(@E - @a;\ 0\right)"
+        p.formel(widerstand, vorlage, {"E": einwirkung, "a": abstand},
+                 titel="Widerstand im normierten Diagramm")
+        return einwirkung, widerstand
 
 
 def protokoll_interpolation(
