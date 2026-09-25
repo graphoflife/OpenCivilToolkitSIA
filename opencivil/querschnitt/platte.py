@@ -346,12 +346,11 @@ def protokoll_lage(
     Querschnitt und statische Hoehe einer Lage, aus ihren Posten hergeleitet.
 
     ``eintraege`` sind die Zeilen der Lage aus ``posten_ids``; die Eingaben
-    der Posten heissen ``a_s_<marke>`` und ``z_<marke>``, die Dicke ``h``.
-    Liegen Grundbewehrung und Zulage in der Lage, stehen Summe und
-    gemeinsamer Schwerpunkt da -- sonst fiele der Schwerpunkt vom Himmel.
-    Unten ist die Tiefe ab Oberkante schon die statische Hoehe; oben misst
-    ``d`` ab dem unteren Rand, und die Tiefe heisst ``z``. Ohne ``z`` nur der
-    Querschnitt. Zurueck kommen ``A_s`` und ``d`` fuer die Formeln danach.
+    der Posten heissen ``a_s_<marke>`` und ``z_<marke>`` (Tiefe ab
+    Oberkante), die Dicke ``h``. Liegen Grundbewehrung und Zulage in der Lage,
+    stehen Summe und gemeinsamer Schwerpunkt da -- sonst fiele der
+    Schwerpunkt vom Himmel. Ohne ``z`` nur der Querschnitt. Zurueck kommen
+    ``A_s`` und ``d`` fuer die Formeln danach.
     """
     lage = eintraege[0][0]
     index = lagenindex(eintraege)
@@ -364,16 +363,16 @@ def protokoll_lage(
     if z is None:
         return flaeche, None
 
-    tiefe = werte.laenge("z", f"{'d' if lage.von_unten else 'z'}_{{{index}}}", z)
     if len(marken) > 1:
+        tiefe = werte.laenge("z", f"z_{{{index}}}", z)
         eingaben.update({f"z{i}": e[f"z_{m}"] for i, m in enumerate(marken)})
         momente = " + ".join(rf"@a{i} \cdot @z{i}" for i in range(len(marken)))
         p.formel(tiefe, rf"\frac{{{momente}}}{{{summe}}}", eingaben,
                  titel="Gemeinsamer Schwerpunkt der Lage")
-    if lage.von_unten:
-        return flaeche, tiefe
+    else:
+        tiefe = e[f"z_{marken[0]}"]
     hoehe = werte.laenge("d", f"d_{{{index}}}", d)
-    protokoll_statische_hoehe(p, hoehe, h=e["h"], z=tiefe, von_unten=False)
+    protokoll_statische_hoehe(p, hoehe, h=e["h"], z=tiefe, von_unten=lage.von_unten)
     return flaeche, hoehe
 
 
@@ -404,7 +403,7 @@ class Postenbezug:
     marke: str
     """Kurzform fuer die Eingabenamen, z.B. ``1g``."""
 
-    d_def: WertDef
+    z_def: WertDef
     as_def: WertDef
 
 
@@ -455,8 +454,8 @@ class Lagenaufbau(Prozedur):
         # nimmt, rechnet bei b != 1000 mm die halbe oder doppelte y-Bewehrung.
         breite_von = lambda r: b if r is Richtung.X else b_y
         breiten: Dict[str, Groesse] = {}
-        # Ohne erklaerende Vorrede: die Lagentabelle zeigt Randabstand und d je
-        # Posten, und wie beides zustande kommt, steht in der Klassendoku.
+        # Ohne erklaerende Vorrede: die Lagentabelle zeigt Randabstand und Tiefe
+        # je Posten, und wie beides zustande kommt, steht in der Klassendoku.
         ueber_abstand = any(q.posten.ueber_abstand for q in self.posten)
         ueber_anzahl = any(not q.posten.ueber_abstand for q in self.posten)
         # Nur wenn alle Posten dieselbe Art der Mengenangabe verwenden, darf die
@@ -506,9 +505,9 @@ class Lagenaufbau(Prozedur):
             else:
                 # Äussere Kanten fluchten, jeder um seinen eigenen Halbmesser.
                 rand = huellebene + phi / 2.0
-            d = h - rand if q.lage.von_unten else rand
+            z = h - rand if q.lage.von_unten else rand
 
-            oben, unten = d.si - phi.si / 2.0, d.si + phi.si / 2.0
+            oben, unten = z.si - phi.si / 2.0, z.si + phi.si / 2.0
             vorher = kanten.get(q.lage.nummer)
             kanten[q.lage.nummer] = (
                 (min(oben, vorher[0]), max(unten, vorher[1])) if vorher
@@ -530,7 +529,7 @@ class Lagenaufbau(Prozedur):
                 a_s = Groesse.aus_si(math.pi * phi.si * phi.si / 4.0 * anzahl, MM2)
                 menge = Mathe(f"{anzahl:g}" if einheitlich else f"n = {anzahl:g}")
 
-            ergebnis[q.d_def.id] = d
+            ergebnis[q.z_def.id] = z
             ergebnis[q.as_def.id] = a_s
             zeilen.append([
                 f"{q.lage.nummer}. Lage {q.art.beschriftung}",
@@ -539,7 +538,7 @@ class Lagenaufbau(Prozedur):
                 Mathe(phi.formatiert(0, MM)),
                 menge,
                 Mathe(rand.formatiert(1, MM)),
-                Mathe(d.formatiert(1, MM)),
+                Mathe(z.formatiert(1, MM)),
                 Mathe(a_s.formatiert(0, MM2)),
             ])
 
@@ -556,9 +555,9 @@ class Lagenaufbau(Prozedur):
             kopf=["Bewehrung", "Richtung", "Stahl",
                   Mathe(r"\varnothing\ [\mathrm{mm}]"), mengenkopf,
                   "Randabstand [mm]",
-                  Mathe(r"d\ [\mathrm{mm}]"), Mathe(r"A_s\ [\mathrm{mm}^2]")],
+                  Mathe(r"z\ [\mathrm{mm}]"), Mathe(r"A_s\ [\mathrm{mm}^2]")],
             zeilen=zeilen,
-            titel="Randabstände, statische Höhen und Bewehrungsquerschnitte",
+            titel="Randabstände, Tiefen ab Oberkante und Bewehrungsquerschnitte",
             ausrichtung="lllrrrrr",
         )
         return ergebnis
@@ -852,13 +851,16 @@ class Plattenquerschnitt:
                     f"lage.{marke}.a_s", f"A_{{s,{index}}}", MM2,
                     f"Bewehrungsquerschnitt {bezeichnung}", 0,
                     referenz="SIA 262:2025, 5.5.2")
-                d_d = self._def(
-                    f"lage.{marke}.z", f"d_{{{index}}}", MM,
-                    f"Statische Höhe {bezeichnung} (ab Oberkante)", 1)
+                # Die Tiefe ab Oberkante, nicht die statische Hoehe: bei einer
+                # oberen Lage misst die ab der Unterkante. Mit «d» hiess eine
+                # obere Lage hier 48 mm, im Nachweis darunter 252 mm.
+                d_z = self._def(
+                    f"lage.{marke}.z", f"z_{{{index}}}", MM,
+                    f"Tiefe {bezeichnung} ab Oberkante", 1)
 
-                aufbau_ausgaben += [d_d, d_as]
-                aufbau_posten.append(Postenbezug(lage, art, posten, marke, d_d, d_as))
-                self.posten_ids.append((lage, art, posten, d_as.id, d_d.id))
+                aufbau_ausgaben += [d_z, d_as]
+                aufbau_posten.append(Postenbezug(lage, art, posten, marke, d_z, d_as))
+                self.posten_ids.append((lage, art, posten, d_as.id, d_z.id))
 
         self.berechnungen.append(
             Lagenaufbau(

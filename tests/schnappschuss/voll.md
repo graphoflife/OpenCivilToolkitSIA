@@ -58,9 +58,9 @@ $$
 \end{aligned}
 $$
 
-**Randabstände, statische Höhen und Bewehrungsquerschnitte**
+**Randabstände, Tiefen ab Oberkante und Bewehrungsquerschnitte**
 
-| Bewehrung | Richtung | Stahl | $\varnothing\ [\mathrm{mm}]$ | $s\ [\mathrm{mm}]$ | Randabstand [mm] | $d\ [\mathrm{mm}]$ | $A_s\ [\mathrm{mm}^2]$ |
+| Bewehrung | Richtung | Stahl | $\varnothing\ [\mathrm{mm}]$ | $s\ [\mathrm{mm}]$ | Randabstand [mm] | $z\ [\mathrm{mm}]$ | $A_s\ [\mathrm{mm}^2]$ |
 | :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: |
 | 1. Lage Grundbewehrung | y | B500B | $12$ | $150$ | $36$ | $264$ | $754$ |
 | 2. Lage Grundbewehrung | x | B500B | $18$ | $150$ | $51$ | $249$ | $1696$ |
@@ -72,12 +72,12 @@ $$
 
 Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f\_cd; gedrückter Stahl bleibt unberücksichtigt. Die Bewehrung ist je Seite zu einer Lage zusammengefasst, das Moment bezieht sich auf die halbe Querschnittshöhe.
 
-**Statische Höhe der zusammengefassten Lage – 2. Lage Grundbewehrung + 2. Lage Zulage**
+**Schwerpunkt der zusammengefassten Lage – 2. Lage Grundbewehrung + 2. Lage Zulage**
 
 $$
 \begin{aligned}
-  d_{2,x} &= \frac{A_{s,2,x,g} \cdot f_{yd} \cdot d_{2,x,g} + A_{s,2,x,z} \cdot f_{yd} \cdot d_{2,x,z}}{A_{s,2,x,g} \cdot f_{yd} + A_{s,2,x,z} \cdot f_{yd}} \\
-  &= \frac{1696\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot 246\,\mathrm{mm}}{1696\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}} \\
+  z_{2,x} &= \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}} \\
+  &= \frac{1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 246\,\mathrm{mm}}{1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2}} \\
   &= 248.1\,\mathrm{mm}
 \end{aligned}
 $$
@@ -90,7 +90,7 @@ $$
 
 **Zusammengefasste Bewehrung**
 
-| Seite | $A_s\ [\mathrm{mm}^2]$ | $d\ [\mathrm{mm}]$ | $f_{yd}\ [\mathrm{N/mm^2}]$ |
+| Seite | $A_s\ [\mathrm{mm}^2]$ | $z\ [\mathrm{mm}]$ | $f_{yd}\ [\mathrm{N/mm^2}]$ |
 | :--- | ---: | ---: | ---: |
 | 2. Lage Grundbewehrung + 2. Lage Zulage | $2450$ | $248.1$ | $435$ |
 | 3. Lage Grundbewehrung | $754$ | $48.0$ | $435$ |
@@ -125,13 +125,19 @@ $$
 
 $$
 \begin{aligned}
-  M_{Rd}(N_{Rd}^{+}) &= A_{s,2,x} \cdot f_{yd} \cdot \left(d_{2,x} - \tfrac{h}{2}\right) + A_{s,3,x} \cdot f_{yd} \cdot \left(d_{3,x} - \tfrac{h}{2}\right) \\
+  M_{Rd}(N_{Rd}^{+}) &= A_{s,2,x} \cdot f_{yd} \cdot \left(z_{2,x} - \tfrac{h}{2}\right) + A_{s,3,x} \cdot f_{yd} \cdot \left(z_{3,x} - \tfrac{h}{2}\right) \\
   &= 2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(248.1\,\mathrm{mm} - \tfrac{300\,\mathrm{mm}}{2}\right) + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(48\,\mathrm{mm} - \tfrac{300\,\mathrm{mm}}{2}\right) \\
   &= 71.1\,\mathrm{kNm}
 \end{aligned}
 $$
 
 #### Positives Moment (Zug unten)
+
+**Statische Höhe der Lage unten, ab dem gedrückten Rand oben**
+
+$$
+d_{2,x} = z_{2,x} = 248.1\,\mathrm{mm}
+$$
 
 **Druckzonenhöhe aus dem Kräftegleichgewicht**
 
@@ -184,6 +190,12 @@ $$
 $$
 
 #### Negatives Moment (Zug oben)
+
+**Statische Höhe der Lage oben, ab dem gedrückten Rand unten**
+
+$$
+d_{3,x} = h - z_{3,x} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
+$$
 
 **Druckzonenhöhe aus dem Kräftegleichgewicht**
 
@@ -382,7 +394,7 @@ $$
 **Statische Höhe der Lage unten, ab dem gedrückten Rand oben**
 
 $$
-d = d_{2,x,g} = 249\,\mathrm{mm}
+d = z_{2,x,g} = 249\,\mathrm{mm}
 $$
 
 Zwischen α = 30° und α = 45° ganzgradig durchgerechnet; den grössten Widerstand liefert α = 30°.
@@ -505,10 +517,16 @@ $$
 
 $$
 \begin{aligned}
-  d_{2,x} &= \frac{A_{s,2,x,g} \cdot d_{2,x,g} + A_{s,2,x,z} \cdot d_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}} \\
+  z_{2,x} &= \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}} \\
   &= \frac{1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 246\,\mathrm{mm}}{1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2}} \\
   &= 248.1\,\mathrm{mm}
 \end{aligned}
+$$
+
+**Statische Höhe der Lage unten, ab dem gedrückten Rand oben**
+
+$$
+d_{2,x} = z_{2,x} = 248.1\,\mathrm{mm}
 $$
 
 **Druckzonenhöhe bei reiner Biegung**
@@ -751,10 +769,16 @@ $$
 
 $$
 \begin{aligned}
-  d_{2,x} &= \frac{A_{s,2,x,g} \cdot d_{2,x,g} + A_{s,2,x,z} \cdot d_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}} \\
+  z_{2,x} &= \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}} \\
   &= \frac{1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 246\,\mathrm{mm}}{1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2}} \\
   &= 248.1\,\mathrm{mm}
 \end{aligned}
+$$
+
+**Statische Höhe der Lage unten, ab dem gedrückten Rand oben**
+
+$$
+d_{2,x} = z_{2,x} = 248.1\,\mathrm{mm}
 $$
 
 **Dickster Stab der Lage**
@@ -1544,9 +1568,9 @@ $$
 \end{aligned}
 $$
 
-**Randabstände, statische Höhen und Bewehrungsquerschnitte**
+**Randabstände, Tiefen ab Oberkante und Bewehrungsquerschnitte**
 
-| Bewehrung | Richtung | Stahl | $\varnothing\ [\mathrm{mm}]$ | $s\ [\mathrm{mm}]$ | Randabstand [mm] | $d\ [\mathrm{mm}]$ | $A_s\ [\mathrm{mm}^2]$ |
+| Bewehrung | Richtung | Stahl | $\varnothing\ [\mathrm{mm}]$ | $s\ [\mathrm{mm}]$ | Randabstand [mm] | $z\ [\mathrm{mm}]$ | $A_s\ [\mathrm{mm}^2]$ |
 | :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: |
 | 1. Lage Grundbewehrung | x | B500B | $10$ | $150$ | $35$ | $165$ | $524$ |
 | 2. Lage Grundbewehrung | y | B500B | $8$ | $150$ | $44$ | $156$ | $335$ |
@@ -1559,7 +1583,7 @@ Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f\_cd; gedrückte
 
 **Zusammengefasste Bewehrung**
 
-| Seite | $A_s\ [\mathrm{mm}^2]$ | $d\ [\mathrm{mm}]$ | $f_{yd}\ [\mathrm{N/mm^2}]$ |
+| Seite | $A_s\ [\mathrm{mm}^2]$ | $z\ [\mathrm{mm}]$ | $f_{yd}\ [\mathrm{N/mm^2}]$ |
 | :--- | ---: | ---: | ---: |
 | 1. Lage Grundbewehrung | $524$ | $165.0$ | $435$ |
 | 4. Lage Grundbewehrung | $524$ | $35.0$ | $435$ |
@@ -1594,13 +1618,19 @@ $$
 
 $$
 \begin{aligned}
-  M_{Rd}(N_{Rd}^{+}) &= A_{s,1,x} \cdot f_{yd} \cdot \left(d_{1,x} - \tfrac{h}{2}\right) + A_{s,4,x} \cdot f_{yd} \cdot \left(d_{4,x} - \tfrac{h}{2}\right) \\
+  M_{Rd}(N_{Rd}^{+}) &= A_{s,1,x} \cdot f_{yd} \cdot \left(z_{1,x} - \tfrac{h}{2}\right) + A_{s,4,x} \cdot f_{yd} \cdot \left(z_{4,x} - \tfrac{h}{2}\right) \\
   &= 524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(165\,\mathrm{mm} - \tfrac{200\,\mathrm{mm}}{2}\right) + 524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(35\,\mathrm{mm} - \tfrac{200\,\mathrm{mm}}{2}\right) \\
   &= 0\,\mathrm{kNm}
 \end{aligned}
 $$
 
 #### Positives Moment (Zug unten)
+
+**Statische Höhe der Lage unten, ab dem gedrückten Rand oben**
+
+$$
+d_{1,x} = z_{1,x} = 165\,\mathrm{mm}
+$$
 
 **Druckzonenhöhe aus dem Kräftegleichgewicht**
 
@@ -1653,6 +1683,12 @@ $$
 $$
 
 #### Negatives Moment (Zug oben)
+
+**Statische Höhe der Lage oben, ab dem gedrückten Rand unten**
+
+$$
+d_{4,x} = h - z_{4,x} = 200\,\mathrm{mm} - 35\,\mathrm{mm} = 165\,\mathrm{mm}
+$$
 
 **Druckzonenhöhe aus dem Kräftegleichgewicht**
 
@@ -1806,7 +1842,7 @@ $$
 **Statische Höhe der Lage unten, ab dem gedrückten Rand oben**
 
 $$
-d = d_{1,x,g} = 165\,\mathrm{mm}
+d = z_{1,x,g} = 165\,\mathrm{mm}
 $$
 
 **Wirksame Höhe, um die Einlage vermindert**
@@ -1868,7 +1904,7 @@ $$
 **Statische Höhe der Lage unten, ab dem gedrückten Rand oben**
 
 $$
-d = d_{1,x,g} = 165\,\mathrm{mm}
+d = z_{1,x,g} = 165\,\mathrm{mm}
 $$
 
 **Wirksame Höhe, um die Einlage vermindert**
@@ -2069,9 +2105,9 @@ $$
 \end{aligned}
 $$
 
-**Randabstände, statische Höhen und Bewehrungsquerschnitte**
+**Randabstände, Tiefen ab Oberkante und Bewehrungsquerschnitte**
 
-| Bewehrung | Richtung | Stahl | $\varnothing\ [\mathrm{mm}]$ | $s\ [\mathrm{mm}]$ | Randabstand [mm] | $d\ [\mathrm{mm}]$ | $A_s\ [\mathrm{mm}^2]$ |
+| Bewehrung | Richtung | Stahl | $\varnothing\ [\mathrm{mm}]$ | $s\ [\mathrm{mm}]$ | Randabstand [mm] | $z\ [\mathrm{mm}]$ | $A_s\ [\mathrm{mm}^2]$ |
 | :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: |
 | 1. Lage Grundbewehrung | y | B500B | $10$ | $150$ | $35$ | $215$ | $524$ |
 | 2. Lage Grundbewehrung | x | B500B | $12$ | $150$ | $46$ | $204$ | $754$ |
@@ -2084,7 +2120,7 @@ Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f\_cd; gedrückte
 
 **Zusammengefasste Bewehrung**
 
-| Seite | $A_s\ [\mathrm{mm}^2]$ | $d\ [\mathrm{mm}]$ | $f_{yd}\ [\mathrm{N/mm^2}]$ |
+| Seite | $A_s\ [\mathrm{mm}^2]$ | $z\ [\mathrm{mm}]$ | $f_{yd}\ [\mathrm{N/mm^2}]$ |
 | :--- | ---: | ---: | ---: |
 | 2. Lage Grundbewehrung | $754$ | $204.0$ | $435$ |
 | 3. Lage Grundbewehrung | $754$ | $46.0$ | $435$ |
@@ -2119,13 +2155,19 @@ $$
 
 $$
 \begin{aligned}
-  M_{Rd}(N_{Rd}^{+}) &= A_{s,2,x} \cdot f_{yd} \cdot \left(d_{2,x} - \tfrac{h}{2}\right) + A_{s,3,x} \cdot f_{yd} \cdot \left(d_{3,x} - \tfrac{h}{2}\right) \\
+  M_{Rd}(N_{Rd}^{+}) &= A_{s,2,x} \cdot f_{yd} \cdot \left(z_{2,x} - \tfrac{h}{2}\right) + A_{s,3,x} \cdot f_{yd} \cdot \left(z_{3,x} - \tfrac{h}{2}\right) \\
   &= 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(204\,\mathrm{mm} - \tfrac{250\,\mathrm{mm}}{2}\right) + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(46\,\mathrm{mm} - \tfrac{250\,\mathrm{mm}}{2}\right) \\
   &= 0\,\mathrm{kNm}
 \end{aligned}
 $$
 
 #### Positives Moment (Zug unten)
+
+**Statische Höhe der Lage unten, ab dem gedrückten Rand oben**
+
+$$
+d_{2,x} = z_{2,x} = 204\,\mathrm{mm}
+$$
 
 **Druckzonenhöhe aus dem Kräftegleichgewicht**
 
@@ -2178,6 +2220,12 @@ $$
 $$
 
 #### Negatives Moment (Zug oben)
+
+**Statische Höhe der Lage oben, ab dem gedrückten Rand unten**
+
+$$
+d_{3,x} = h - z_{3,x} = 250\,\mathrm{mm} - 46\,\mathrm{mm} = 204\,\mathrm{mm}
+$$
 
 **Druckzonenhöhe aus dem Kräftegleichgewicht**
 
@@ -2311,7 +2359,7 @@ $$
 **Statische Höhe der Lage unten, ab dem gedrückten Rand oben**
 
 $$
-d = d_{2,x,g} = 204\,\mathrm{mm}
+d = z_{2,x,g} = 204\,\mathrm{mm}
 $$
 
 **Wirksame Höhe (Einlage nicht massgebend)**
@@ -2537,23 +2585,23 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Bewehrungsquerschnitt 1. Lage Grundbewehrung | $A_{s,1,y,g}$ | $754$ | mm² | berechnet |
 | Stabdurchmesser 1. Lage Grundbewehrung | $\varnothing_{1,y,g}$ | $12$ | mm | Vorgabe |
 | Teilung 1. Lage Grundbewehrung | $s_{1,y,g}$ | $150$ | mm | Vorgabe |
-| Statische Höhe 1. Lage Grundbewehrung (ab Oberkante) | $d_{1,y,g}$ | $264$ | mm | berechnet |
+| Tiefe 1. Lage Grundbewehrung ab Oberkante | $z_{1,y,g}$ | $264$ | mm | berechnet |
 | Bewehrungsquerschnitt 2. Lage Grundbewehrung | $A_{s,2,x,g}$ | $1696$ | mm² | berechnet |
 | Stabdurchmesser 2. Lage Grundbewehrung | $\varnothing_{2,x,g}$ | $18$ | mm | Vorgabe |
 | Teilung 2. Lage Grundbewehrung | $s_{2,x,g}$ | $150$ | mm | Vorgabe |
-| Statische Höhe 2. Lage Grundbewehrung (ab Oberkante) | $d_{2,x,g}$ | $249$ | mm | berechnet |
+| Tiefe 2. Lage Grundbewehrung ab Oberkante | $z_{2,x,g}$ | $249$ | mm | berechnet |
 | Bewehrungsquerschnitt 2. Lage Zulage | $A_{s,2,x,z}$ | $754$ | mm² | berechnet |
 | Stabdurchmesser 2. Lage Zulage | $\varnothing_{2,x,z}$ | $12$ | mm | Vorgabe |
 | Teilung 2. Lage Zulage | $s_{2,x,z}$ | $150$ | mm | Vorgabe |
-| Statische Höhe 2. Lage Zulage (ab Oberkante) | $d_{2,x,z}$ | $246$ | mm | berechnet |
+| Tiefe 2. Lage Zulage ab Oberkante | $z_{2,x,z}$ | $246$ | mm | berechnet |
 | Bewehrungsquerschnitt 3. Lage Grundbewehrung | $A_{s,3,x,g}$ | $754$ | mm² | berechnet |
 | Stabdurchmesser 3. Lage Grundbewehrung | $\varnothing_{3,x,g}$ | $12$ | mm | Vorgabe |
 | Teilung 3. Lage Grundbewehrung | $s_{3,x,g}$ | $150$ | mm | Vorgabe |
-| Statische Höhe 3. Lage Grundbewehrung (ab Oberkante) | $d_{3,x,g}$ | $48$ | mm | berechnet |
+| Tiefe 3. Lage Grundbewehrung ab Oberkante | $z_{3,x,g}$ | $48$ | mm | berechnet |
 | Bewehrungsquerschnitt 4. Lage Grundbewehrung | $A_{s,4,y,g}$ | $754$ | mm² | berechnet |
 | Stabdurchmesser 4. Lage Grundbewehrung | $\varnothing_{4,y,g}$ | $12$ | mm | Vorgabe |
 | Teilung 4. Lage Grundbewehrung | $s_{4,y,g}$ | $150$ | mm | Vorgabe |
-| Statische Höhe 4. Lage Grundbewehrung (ab Oberkante) | $d_{4,y,g}$ | $36$ | mm | berechnet |
+| Tiefe 4. Lage Grundbewehrung ab Oberkante | $z_{4,y,g}$ | $36$ | mm | berechnet |
 | Erfüllungsgrad Duktilität – 2. Lage | $\alpha_{eff,D,2}$ | $1.39$ |  | berechnet |
 | Bezogene Druckzonenhöhe – 2. Lage | $\left(x/d\right)_{2}$ | $0.253$ |  | berechnet |
 | Erfüllungsgrad Duktilität – 3. Lage | $\alpha_{eff,D,3}$ | $4.57$ |  | berechnet |
@@ -2608,19 +2656,19 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Bewehrungsquerschnitt 1. Lage Grundbewehrung | $A_{s,1,x,g}$ | $524$ | mm² | berechnet |
 | Stabdurchmesser 1. Lage Grundbewehrung | $\varnothing_{1,x,g}$ | $10$ | mm | Vorgabe |
 | Teilung 1. Lage Grundbewehrung | $s_{1,x,g}$ | $150$ | mm | Vorgabe |
-| Statische Höhe 1. Lage Grundbewehrung (ab Oberkante) | $d_{1,x,g}$ | $165$ | mm | berechnet |
+| Tiefe 1. Lage Grundbewehrung ab Oberkante | $z_{1,x,g}$ | $165$ | mm | berechnet |
 | Bewehrungsquerschnitt 2. Lage Grundbewehrung | $A_{s,2,y,g}$ | $335$ | mm² | berechnet |
 | Stabdurchmesser 2. Lage Grundbewehrung | $\varnothing_{2,y,g}$ | $8$ | mm | Vorgabe |
 | Teilung 2. Lage Grundbewehrung | $s_{2,y,g}$ | $150$ | mm | Vorgabe |
-| Statische Höhe 2. Lage Grundbewehrung (ab Oberkante) | $d_{2,y,g}$ | $156$ | mm | berechnet |
+| Tiefe 2. Lage Grundbewehrung ab Oberkante | $z_{2,y,g}$ | $156$ | mm | berechnet |
 | Bewehrungsquerschnitt 3. Lage Grundbewehrung | $A_{s,3,y,g}$ | $335$ | mm² | berechnet |
 | Stabdurchmesser 3. Lage Grundbewehrung | $\varnothing_{3,y,g}$ | $8$ | mm | Vorgabe |
 | Teilung 3. Lage Grundbewehrung | $s_{3,y,g}$ | $150$ | mm | Vorgabe |
-| Statische Höhe 3. Lage Grundbewehrung (ab Oberkante) | $d_{3,y,g}$ | $44$ | mm | berechnet |
+| Tiefe 3. Lage Grundbewehrung ab Oberkante | $z_{3,y,g}$ | $44$ | mm | berechnet |
 | Bewehrungsquerschnitt 4. Lage Grundbewehrung | $A_{s,4,x,g}$ | $524$ | mm² | berechnet |
 | Stabdurchmesser 4. Lage Grundbewehrung | $\varnothing_{4,x,g}$ | $10$ | mm | Vorgabe |
 | Teilung 4. Lage Grundbewehrung | $s_{4,x,g}$ | $150$ | mm | Vorgabe |
-| Statische Höhe 4. Lage Grundbewehrung (ab Oberkante) | $d_{4,x,g}$ | $35$ | mm | berechnet |
+| Tiefe 4. Lage Grundbewehrung ab Oberkante | $z_{4,x,g}$ | $35$ | mm | berechnet |
 | Erfüllungsgrad Duktilität – 1. Lage | $\alpha_{eff,D,1}$ | $4.31$ |  | berechnet |
 | Bezogene Druckzonenhöhe – 1. Lage | $\left(x/d\right)_{1}$ | $0.081$ |  | berechnet |
 | Erfüllungsgrad Duktilität – 4. Lage | $\alpha_{eff,D,4}$ | $4.31$ |  | berechnet |
@@ -2663,19 +2711,19 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Bewehrungsquerschnitt 1. Lage Grundbewehrung | $A_{s,1,y,g}$ | $524$ | mm² | berechnet |
 | Stabdurchmesser 1. Lage Grundbewehrung | $\varnothing_{1,y,g}$ | $10$ | mm | Vorgabe |
 | Teilung 1. Lage Grundbewehrung | $s_{1,y,g}$ | $150$ | mm | Vorgabe |
-| Statische Höhe 1. Lage Grundbewehrung (ab Oberkante) | $d_{1,y,g}$ | $215$ | mm | berechnet |
+| Tiefe 1. Lage Grundbewehrung ab Oberkante | $z_{1,y,g}$ | $215$ | mm | berechnet |
 | Bewehrungsquerschnitt 2. Lage Grundbewehrung | $A_{s,2,x,g}$ | $754$ | mm² | berechnet |
 | Stabdurchmesser 2. Lage Grundbewehrung | $\varnothing_{2,x,g}$ | $12$ | mm | Vorgabe |
 | Teilung 2. Lage Grundbewehrung | $s_{2,x,g}$ | $150$ | mm | Vorgabe |
-| Statische Höhe 2. Lage Grundbewehrung (ab Oberkante) | $d_{2,x,g}$ | $204$ | mm | berechnet |
+| Tiefe 2. Lage Grundbewehrung ab Oberkante | $z_{2,x,g}$ | $204$ | mm | berechnet |
 | Bewehrungsquerschnitt 3. Lage Grundbewehrung | $A_{s,3,x,g}$ | $754$ | mm² | berechnet |
 | Stabdurchmesser 3. Lage Grundbewehrung | $\varnothing_{3,x,g}$ | $12$ | mm | Vorgabe |
 | Teilung 3. Lage Grundbewehrung | $s_{3,x,g}$ | $150$ | mm | Vorgabe |
-| Statische Höhe 3. Lage Grundbewehrung (ab Oberkante) | $d_{3,x,g}$ | $46$ | mm | berechnet |
+| Tiefe 3. Lage Grundbewehrung ab Oberkante | $z_{3,x,g}$ | $46$ | mm | berechnet |
 | Bewehrungsquerschnitt 4. Lage Grundbewehrung | $A_{s,4,y,g}$ | $524$ | mm² | berechnet |
 | Stabdurchmesser 4. Lage Grundbewehrung | $\varnothing_{4,y,g}$ | $10$ | mm | Vorgabe |
 | Teilung 4. Lage Grundbewehrung | $s_{4,y,g}$ | $150$ | mm | Vorgabe |
-| Statische Höhe 4. Lage Grundbewehrung (ab Oberkante) | $d_{4,y,g}$ | $35$ | mm | berechnet |
+| Tiefe 4. Lage Grundbewehrung ab Oberkante | $z_{4,y,g}$ | $35$ | mm | berechnet |
 | Erfüllungsgrad Duktilität – 2. Lage | $\alpha_{eff,D,2}$ | $3.70$ |  | berechnet |
 | Bezogene Druckzonenhöhe – 2. Lage | $\left(x/d\right)_{2}$ | $0.095$ |  | berechnet |
 | Erfüllungsgrad Duktilität – 3. Lage | $\alpha_{eff,D,3}$ | $3.70$ |  | berechnet |

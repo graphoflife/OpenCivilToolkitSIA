@@ -820,7 +820,8 @@ class TestHandrechnungSymbole(unittest.TestCase):
     def test_der_schwerpunkt_wird_hergeleitet_wo_zwei_posten_zusammenkommen(self):
         """
         Besteht eine Seite aus Grundbewehrung und Zulage, muss dastehen, wie
-        ihr gemeinsames d entsteht -- sonst fällt der Wert aus dem Nichts.
+        ihre gemeinsame Tiefe z entsteht -- sonst fällt der Wert aus dem
+        Nichts. Die statische Höhe d folgt daraus in einer eigenen Zeile.
         """
         text = self.mitschrift(platte([
             lage(1, Richtung.X, phi=18.0, zulage=12.0),
@@ -828,13 +829,15 @@ class TestHandrechnungSymbole(unittest.TestCase):
         ]))
         # Ein- oder mehrzeilig gesetzt -- «=» oder «&=».
         self.assertRegex(
-            text, r"d_\{1,x\} &?= \\frac\{A_\{s,1,x,g\} \\cdot f_\{yd\} \\cdot d_\{1,x,g\}")
+            text, r"z_\{1,x\} &?= \\frac\{A_\{s,1,x,g\} \\cdot z_\{1,x,g\}")
         self.assertIn("A_{s,1,x} = A_{s,1,x,g} + A_{s,1,x,z}", text)
+        self.assertIn("d_{1,x} = z_{1,x}", text)
+        self.assertIn(r"d_{4,x} = h - z_{4,x}", text)
 
     def test_ohne_zulage_gibt_es_nichts_herzuleiten(self):
         """Eine Seite aus einem einzigen Posten braucht keine Schwerpunktformel."""
         text = self.mitschrift(einfache_platte())
-        self.assertNotIn(r"\frac{A_{s,1,x,g} \cdot f_{yd} \cdot", text)
+        self.assertNotIn(r"\frac{A_{s,1,x,g} \cdot z_{1,x,g}", text)
 
 
 if __name__ == "__main__":

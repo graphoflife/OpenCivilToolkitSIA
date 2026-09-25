@@ -68,8 +68,7 @@ from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.nachweis.biegung_normalkraft import protokoll_interpolation
 from opencivil.querschnitt.platte import (
-    ALPHA_ZUG, Plattenquerschnitt, Richtung, posten_index,
-    protokoll_statische_hoehe,
+    ALPHA_ZUG, Plattenquerschnitt, Richtung, protokoll_statische_hoehe,
 )
 
 #: Unterer Riegel fuer den Beiwert der Gesteinskoernung.
@@ -959,14 +958,9 @@ class Querkraft(Nachweis):
         """Die statische Höhe der gezogenen Bewehrung -- geschrieben, und für die Formeln danach."""
         positiv = erg.fall.M_Ed.si >= 0
         lage, art = self.posten[erg.zuglage][:2]
-        z = e[f"z_{lage.nummer}{art.kuerzel}"]
-        if not positiv:
-            # Die Platte fuehrt die Tiefe ab Oberkante unter d. Bei einer
-            # oberen Lage ist das nicht die statische Hoehe -- hier heisst sie
-            # darum z, wie in der Duktilitaet.
-            z = werte.wert("z", f"z_{{{posten_index(lage, art)}}}", z.groesse, z.stellen)
         d = werte.laenge("d", "d", erg.d)
-        protokoll_statische_hoehe(p, d, h=e["h"], z=z, von_unten=positiv)
+        protokoll_statische_hoehe(p, d, h=e["h"], z=e[f"z_{lage.nummer}{art.kuerzel}"],
+                                  von_unten=positiv)
         return d
 
     def _protokoll_grad(self, p: Protokoll, erg: Querkraftergebnis) -> None:

@@ -46,7 +46,9 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.wert import Wert
 from opencivil.material.basis import mit_index
+from opencivil.querschnitt.platte import protokoll_statische_hoehe
 
 #: Anteil der Druckzonenhoehe, ueber den der Spannungsblock wirkt.
 BLOCKANTEIL = 0.85
@@ -132,6 +134,11 @@ class Lage:
     def symbol_d(self) -> str:
         """``d_{1,x}`` -- oder schlicht ``d``. Siehe :attr:`symbol_flaeche`."""
         return f"d_{{{self.index}}}" if self.index else "d"
+
+    @property
+    def symbol_z(self) -> str:
+        """``z_{1,x}``, die Tiefe ab Oberkante -- oder ``z``. Siehe :attr:`symbol_flaeche`."""
+        return f"z_{{{self.index}}}" if self.index else "z"
 
 
 @dataclass(frozen=True)
@@ -236,7 +243,7 @@ class Handrechnung:
         )
 
         # Wo eine Seite aus mehreren Posten besteht, muss dastehen, wie ihr
-        # Schwerpunkt entsteht -- sonst faellt d aus dem Nichts.
+        # Schwerpunkt entsteht -- sonst faellt z aus dem Nichts.
         for lage in (self.unten, self.oben):
             if len(lage.teile) > 1:
                 self._schwerpunkt(p, lage)
@@ -251,7 +258,7 @@ class Handrechnung:
         p.tabelle(
             kopf=(["Seite"]
                   + (["Stahl"] if mit_stahl else [])
-                  + [Mathe(r"A_s\ [\mathrm{mm}^2]"), Mathe(r"d\ [\mathrm{mm}]"),
+                  + [Mathe(r"A_s\ [\mathrm{mm}^2]"), Mathe(r"z\ [\mathrm{mm}]"),
                      Mathe(r"f_{yd}\ [\mathrm{N/mm^2}]")]),
             zeilen=[
                 [lage.text]
@@ -265,22 +272,27 @@ class Handrechnung:
         )
 
     def _schwerpunkt(self, p: Protokoll, lage: Lage) -> None:
-        """Schreibt, wie sich d einer aus mehreren Posten bestehenden Lage ergibt."""
+        """
+        Schreibt, wie Tiefe und Querschnitt einer Lage aus mehreren Posten
+        entstehen.
+
+        Nach Flaechen gewichtet, wie :func:`lagen_zusammenfassen` rechnet: die Lage
+        traegt die Fliessgrenze ihrer schwaechsten Sorte, also stehen alle
+        Posten unter derselben Spannung.
+        """
         eingaben = {}
         for i, t in enumerate(lage.teile):
             eingaben[f"A{i}"] = self.werte.flaeche(f"A_s_{t.index}", f"A_{{s,{t.index}}}", t.a_s)
-            eingaben[f"f{i}"] = self.werte.spannung(f"f_yd_{t.index}", t.symbol_f_yd, t.f_yd)
-            eingaben[f"d{i}"] = self.werte.laenge(f"d_{t.index}", f"d_{{{t.index}}}", t.z)
-        kraefte = [rf"@A{i} \cdot @f{i}" for i in range(len(lage.teile))]
-        momente = " + ".join(rf"{k} \cdot @d{i}" for i, k in enumerate(kraefte))
-        summe = " + ".join(kraefte)
+            eingaben[f"z{i}"] = self.werte.laenge(f"z_{t.index}", f"z_{{{t.index}}}", t.z)
+        summe = " + ".join(f"@A{i}" for i in range(len(lage.teile)))
+        momente = " + ".join(rf"@A{i} \cdot @z{i}" for i in range(len(lage.teile)))
         p.formel(
-            self.werte.laenge(f"d_{lage.index}", lage.symbol_d, lage.z),
+            self.werte.laenge(f"z_{lage.index}", lage.symbol_z, lage.z),
             rf"\frac{{{momente}}}{{{summe}}}",
-            eingaben, titel=f"Statische Höhe der zusammengefassten Lage – {lage.text}")
+            eingaben, titel=f"Schwerpunkt der zusammengefassten Lage – {lage.text}")
         p.formel(
             self.werte.flaeche(f"A_s_{lage.index}", lage.symbol_flaeche, lage.a_s),
-            " + ".join(f"@A{i}" for i in range(len(lage.teile))), eingaben,
+            summe, eingaben,
             titel="Bewehrungsquerschnitt der zusammengefassten Lage")
 
     def _groesste_druckkraft(self, p: Protokoll) -> Eckpunkt:
@@ -331,12 +343,12 @@ class Handrechnung:
         p.formel(
             self.werte.moment("M_Rd_zug", "M_{Rd}(N_{Rd}^{+})", M,
                          "Moment bei grösster Zugkraft"),
-            r"@A_s \cdot @f_yd \cdot \left(@d - \tfrac{@h}{2}\right) "
-            r"+ @A_s2 \cdot @f_yd2 \cdot \left(@d2 - \tfrac{@h}{2}\right)",
+            r"@A_s \cdot @f_yd \cdot \left(@z - \tfrac{@h}{2}\right) "
+            r"+ @A_s2 \cdot @f_yd2 \cdot \left(@z2 - \tfrac{@h}{2}\right)",
             {
                 **eingaben,
-                "d": self.werte.laenge("z_u", u.symbol_d, u.z),
-                "d2": self.werte.laenge("z_o", o.symbol_d, o.z),
+                "z": self.werte.laenge("z_u", u.symbol_z, u.z),
+                "z2": self.werte.laenge("z_o", o.symbol_z, o.z),
                 "h": self.werte.laenge("h", "h", self.h),
             },
             titel="Kräfte mal Hebelarm um die halbe Höhe",
@@ -346,15 +358,20 @@ class Handrechnung:
     def _seite(self, p: Protokoll, *, positiv: bool) -> List[Eckpunkt]:
         """Die beiden Punkte eines Momentenvorzeichens."""
         zug, gegen = (self.unten, self.oben) if positiv else (self.oben, self.unten)
-        # d wird ab der gedrueckten Randfaser gemessen -- die wechselt mit dem
-        # Vorzeichen des Moments die Seite.
-        d = zug.z if positiv else self.h - zug.z
         vz = 1.0 if positiv else -1.0
         marke = "pos" if positiv else "neg"
 
         p.titel(
             "Positives Moment (Zug unten)" if positiv
             else "Negatives Moment (Zug oben)", ebene=3)
+        # d wird ab der gedrueckten Randfaser gemessen -- die wechselt mit dem
+        # Vorzeichen des Moments die Seite.
+        d = self.werte.laenge(f"d_{marke}", zug.symbol_d,
+                              zug.z if positiv else self.h - zug.z)
+        if zug.a_s > 0.0:
+            protokoll_statische_hoehe(
+                p, d, h=self.werte.laenge("h", "h", self.h),
+                z=self.werte.laenge(f"z_{marke}", zug.symbol_z, zug.z), von_unten=positiv)
 
         punkte = [self._bei_n_null(p, zug, d, vz, marke)]
         halb = self._halbe_hoehe(p, zug, d, vz, marke)
@@ -362,11 +379,11 @@ class Handrechnung:
             punkte.append(halb)
         return punkte
 
-    def _bei_n_null(self, p: Protokoll, zug: Lage, d: float,
+    def _bei_n_null(self, p: Protokoll, zug: Lage, d: Wert,
                     vz: float, marke: str) -> Eckpunkt:
         """Reine Biegung: die Druckkraft im Beton haelt der Zugkraft die Waage."""
         x = zug.a_s * zug.f_yd / (BLOCKANTEIL * self.b * self.f_cd)
-        M = zug.a_s * zug.f_yd * (d - BLOCKANTEIL * x / 2.0)
+        M = zug.a_s * zug.f_yd * (d.groesse.si - BLOCKANTEIL * x / 2.0)
 
         hoch = "+" if vz > 0 else "-"
         # Bei negativem Moment traegt die Formel selbst das Minus. Sonst stuende
@@ -391,14 +408,13 @@ class Handrechnung:
                          vz * M, "Momentenwiderstand bei N_Ed = 0"),
             rf"{minus}@A_s \cdot @f_yd \cdot "
             rf"\left(@d - \frac{{{BLOCKANTEIL} \cdot @x}}{{2}}\right)",
-            {**eingaben,
-             "d": self.werte.laenge(f"d_{marke}", zug.symbol_d, d), "x": w_x},
+            {**eingaben, "d": d, "x": w_x},
             titel="Momentenwiderstand bei reiner Biegung",
         )
         return Eckpunkt(f"n0_{marke}", rf"M_{{Rd}}(N_{{Ed}}=0)^{{{hoch}}}",
                         f"M_Rd(N_Ed=0) {hoch}", 0.0, vz * M)
 
-    def _halbe_hoehe(self, p: Protokoll, zug: Lage, d: float,
+    def _halbe_hoehe(self, p: Protokoll, zug: Lage, w_d: Wert,
                      vz: float, marke: str) -> Optional[Eckpunkt]:
         """
         Der Punkt mit der Nulllinie auf halber Hoehe: ``x = h/2``.
@@ -425,6 +441,7 @@ class Handrechnung:
                 f"Momentenwiderstand.")
             return None
 
+        d = w_d.groesse.si
         x = self.h / 2.0
         block = BLOCKANTEIL * x
         D = self.f_cd * self.b * block               # Betondruckkraft, Betrag
@@ -452,7 +469,7 @@ class Handrechnung:
                                eps_s, "Dehnung der Zugbewehrung"),
             r"\left(@d - @x\right) \cdot \frac{@eps_c2d}{@x}",
             {
-                "d": self.werte.laenge(f"d_{marke}", zug.symbol_d, d),
+                "d": w_d,
                 "x": w_x,
                 "eps_c2d": self.werte.dehnung("eps_c2d", self.s_eps_c2d,
                                               self.eps_c2d),
@@ -501,7 +518,7 @@ class Handrechnung:
             {
                 **eingaben,
                 "h": self.werte.laenge("h", "h", self.h),
-                "d": self.werte.laenge(f"d_{marke}", zug.symbol_d, d),
+                "d": w_d,
             },
             titel="Momentengleichgewicht um die halbe Höhe",
         )
