@@ -33,7 +33,10 @@ das sie braucht, und nicht bei jedem noch einmal.
 
 WOHER DAS THEMA KOMMT:
 Das Rechenwerk stempelt es auf jeden Block, den eine Berechnung schreibt
-(:meth:`Protokoll.herkunft_stempeln`).
+(:meth:`Protokoll.herkunft_stempeln`). Zu welchem Bestandteil ein Thema
+gehoert -- Beton, Betonstahl, Platte --, sagt der Abschnitt, unter dem es zum
+ersten Mal steht: sein Namensraum beginnt mit der Art (``beton.b1``). Danach
+zeigt die Oberflaeche je Bestandteil nur seine Formeln.
 """
 
 from __future__ import annotations
@@ -43,12 +46,15 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Set
 
 from opencivil.core.latex import ohne_namen_im_index
-from opencivil.core.protokoll import GleichungBlock, Protokoll, TextBlock
+from opencivil.core.protokoll import GleichungBlock, Protokoll, TextBlock, TitelBlock
 
 
 @dataclass
 class Thema:
     name: str
+    art: str = ""
+    """Zu welchem Bestandteil es gehoert: ``beton``, ``betonstahl``, ``querschnitt``."""
+
     erklaerungen: List[TextBlock] = field(default_factory=list)
     formeln: List[GleichungBlock] = field(default_factory=list)
 
@@ -114,10 +120,13 @@ def formelsammlung(protokoll: Protokoll) -> List[Thema]:
     themen: Dict[str, Thema] = {}
     gesehen: Set[tuple] = set()
     gesetzt: Set[str] = set()
+    art = ""
     for block in protokoll.alle_bloecke():
+        if isinstance(block, TitelBlock) and block.raum:
+            art = block.raum.split(".", 1)[0]
         if not isinstance(block, (GleichungBlock, TextBlock)) or not block.thema:
             continue
-        thema = themen.setdefault(block.thema, Thema(block.thema))
+        thema = themen.setdefault(block.thema, Thema(block.thema, art))
         schluessel = _schluessel(block)
         if schluessel is None or schluessel in gesehen:
             continue

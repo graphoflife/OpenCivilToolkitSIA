@@ -145,12 +145,32 @@ export function spielraum(breite, stellen, randabstand) {
 }
 
 /**
+ * Wo die Bügelstriche stehen, in mm ab dem linken Rand.
+ *
+ * `soll` ist die Reihe in ihrer Teilung, schon als Ganzes so verschoben, dass
+ * sie den Stäben am besten ausweicht (siehe `besterVersatz`) -- die Teilung
+ * soll man ablesen können. Trifft danach noch ein Strich einen x-Stab, rückt
+ * er allein an den Rand des Kreises, auf die nächste freie Seite: so, wie ein
+ * Bügelschenkel neben dem Längsstab liegt und nicht durch ihn hindurch.
+ * `kreise` in mm ({mm, r}), `luft` der halbe Strich samt Abstand.
+ */
+function buegelStellen(soll, kreise, luft, breite) {
+  const frei = (mm) => kreise.every((k) => Math.abs(mm - k.mm) >= k.r + luft);
+  return soll.map((mm) => [mm, ...kreise.flatMap((k) => [k.mm - k.r - luft, k.mm + k.r + luft])]
+    .filter((stelle) => stelle >= 0 && stelle <= breite)
+    .sort((a, c) => Math.abs(a - mm) - Math.abs(c - mm))
+    .find(frei) ?? mm);
+}
+
+/**
  * Zeichnet den Plattenquerschnitt mit seinen vier Bewehrungslagen.
  *
  * Gezeigt wird ein Schnitt senkrecht zur x-Achse: Stäbe in x-Richtung sind
  * angeschnitten (Kreise), Stäbe in y-Richtung laufen in der Schnittebene
- * (Balken). Sämtliche Höhenlagen stammen aus der Lösung -- hier wird nichts
- * nachgerechnet.
+ * (Balken). Die Bügel stehen senkrecht, von der Unterkante der 1. bis zur
+ * Oberkante der 4. Lage, im Abstand ihrer Teilung in y -- in dieser Richtung
+ * läuft der Schnitt. Sämtliche Höhenlagen stammen aus der Lösung -- hier wird
+ * nichts nachgerechnet.
  */
 export function querschnittZeichnen(eintrag, werte) {
   const zahl = (id) => (werte[id] ? werte[id].zahl : null);
@@ -179,8 +199,11 @@ export function querschnittZeichnen(eintrag, werte) {
     fill: '#eceff4', stroke: '#7b8794', 'stroke-width': 1.6,
   }));
 
-  // Dieselben Farben wie die Lagen in der Maske -- aus dem Stil.
+  // Dieselben Farben wie die Lagen in der Maske -- aus dem Stil. Die
+  // Beschriftung in der tiefen Fassung: gelbe Schrift auf Weiss liest niemand.
   const farbe = { x: stilfarbe('richtung-x'), y: stilfarbe('richtung-y') };
+  const schrift = { x: stilfarbe('richtung-x-tief'), y: stilfarbe('richtung-y-tief') };
+  const violett = stilfarbe('beide');
   const zettel = [];
   // Schon gezeichnete Stäbe, in Millimetern -- damit die nächste Reihe weiss,
   // wem sie ausweichen muss.
@@ -205,11 +228,17 @@ export function querschnittZeichnen(eintrag, werte) {
       fill: farbe.y, opacity: bew.art === 'zulage' ? 0.6 : 0.85,
     }));
     zettel.push({
-      soll: y(z), anker: y(z), farbe: farbe.y,
+      soll: y(z), anker: y(z), farbe: farbe.y, schrift: schrift.y,
       text: `${bew.lage}. ${bew.art === 'grund' ? 'Grund' : 'Zulage'} `
           + `${bew.menge} (${bew.richtung})`,
     });
   }
+
+  // Die Bügel liegen unter den x-Stäben. Gezogen werden ihre Striche aber
+  // erst, wenn die Kreise stehen -- ausweichen können sie nur Kreisen, die es
+  // schon gibt. Darum hier nur der Platz in der Zeichenfolge.
+  const buegelSchicht = svgEl('g');
+  svg.append(buegelSchicht);
 
   for (const bew of quer) {
     const z = zahl(bew.z_id);
@@ -233,10 +262,33 @@ export function querschnittZeichnen(eintrag, werte) {
       }));
     }
     zettel.push({
-      soll: y(z), anker: y(z), farbe: farbe.x,
+      soll: y(z), anker: y(z), farbe: farbe.x, schrift: schrift.x,
       text: `${bew.lage}. ${bew.art === 'grund' ? 'Grund' : 'Zulage'} `
           + `${bew.menge} (${bew.richtung})`,
     });
+  }
+
+  // Die Bügel: Teilung in y oder Anzahl über die Breite, wie eingegeben.
+  const phiV = zahl(eintrag.werte['querkraft.phi']);
+  const kanten = eintrag.bewehrung
+    .map((bew) => ({ z: zahl(bew.z_id), r: (bew.phi || 12) / 2 }))
+    .filter((k) => k.z !== null);
+  const mitBuegeln = phiV > 0 && kanten.length > 0;
+  if (mitBuegeln) {
+    const oben = Math.min(...kanten.map((k) => k.z - k.r));    // OK 4. Lage
+    const unten = Math.max(...kanten.map((k) => k.z + k.r));   // UK 1. Lage
+    const sY = zahl(eintrag.werte['querkraft.s_y']);
+    const reihe = stabstellen(b, sY ? { abstand: sY } : { anzahl: zahl(eintrag.werte['querkraft.n_y']) });
+    const versatz = besterVersatz(reihe, gesetzt.map((g) => g.mm), spielraum(b, reihe, phiV / 2));
+    const strich = Math.max(phiV * massstab, 1.2);
+    const kreise = gesetzt.map((g) => ({ mm: g.mm, r: g.r / massstab }));
+    const soll = reihe.map((mm) => mm + versatz);
+    for (const mm of buegelStellen(soll, kreise, (strich / 2 + 1) / massstab, b)) {
+      buegelSchicht.append(svgEl('line', {
+        x1: x(mm), y1: y(oben), x2: x(mm), y2: y(unten),
+        stroke: violett, 'stroke-width': strich,
+      }));
+    }
   }
 
   for (const z of beschriftungenEntzerren(zettel, 13, RAND.oben, HOEHE - RAND.unten)) {
@@ -251,7 +303,7 @@ export function querschnittZeichnen(eintrag, werte) {
       }));
     }
     const beschriftung = svgEl('text', {
-      x: links, y: z.y + 3.5, 'font-size': 10.5, fill: z.farbe,
+      x: links, y: z.y + 3.5, 'font-size': 10.5, fill: z.schrift,
     });
     beschriftung.textContent = z.text;
     svg.append(beschriftung);
@@ -296,6 +348,9 @@ export function querschnittZeichnen(eintrag, werte) {
       el('span', {}, [el('i', {
         style: { background: farbe.y, borderRadius: '1px', height: '3px', opacity: '.7' },
       }), 'y-Richtung (durchgezogen, in der Schnittebene)']),
+      mitBuegeln ? el('span', {}, [el('i', {
+        style: { background: violett, borderRadius: '1px', width: '3px', height: '12px' },
+      }), 'Querkraftbewehrung (Abstand wie Teilung y)']) : null,
       el('span', { text: 'blasser = Zulage' }),
     ]),
   ]);

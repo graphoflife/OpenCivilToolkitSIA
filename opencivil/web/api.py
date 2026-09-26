@@ -269,9 +269,13 @@ def protokoll_liste(protokoll: Protokoll) -> List[dict]:
 
 
 def formelsammlung_liste(themen: List[Thema]) -> List[dict]:
-    """Je Thema die Bloecke wie im Bericht, als Bloecke derselben Tafel."""
+    """
+    Je Thema die Bloecke wie im Bericht, als Bloecke derselben Tafel -- und
+    der Bestandteil, zu dem es gehoert: danach grenzt die Oberflaeche ein.
+    """
     return [
-        {"thema": thema.name, "bloecke": [TAFEL[type(b)](b, 0) for b in thema.bloecke]}
+        {"thema": thema.name, "art": thema.art,
+         "bloecke": [TAFEL[type(b)](b, 0) for b in thema.bloecke]}
         for thema in themen
     ]
 

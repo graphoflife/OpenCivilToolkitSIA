@@ -44,6 +44,58 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-26 · Orange und Gelb, Bügel im Querschnitt, Formeln je Bestandteil
+
+Wunsch: neue Farben für die Richtungen und die Ja/Nein-Schalter, die Bügel
+im Querschnittsbild, die Formelsammlung je Bestandteil, die Stahlwahl nur an
+den x-Lagen.
+
+### Farben
+
+| | vorher | nachher |
+| --- | --- | --- |
+| x-Lagen | saftgrün | kräftig orange |
+| y-Lagen | hellrot | kräftig gelb, auf Weiss noch sichtbar |
+| Bügel und «beide» | sanftes Violett | leuchtendes Violett |
+| Ja/Nein-Schalter | weiches Grün und Rot | das Grün und Rot, das vorher x und y trugen |
+
+* **Gelb trägt keine Schrift.** Auf dem gelben Schalter steht dunkle Schrift,
+  und die Beschriftungen im Querschnittsbild stehen in der tiefen Fassung
+  der Farbe.
+* **«ungünstig | günstig» ist jetzt blau.** Er war gold, damit man ihn nicht
+  mit x|y verwechselt, als x noch blau war. Neben dem Gelb der y-Lagen wäre
+  Gold genau diese Verwechslung.
+
+### Bügel im Querschnittsbild
+
+* **Senkrechte violette Striche** in Stabdicke, von der Unterkante der 1.
+  bis zur Oberkante der 4. Lage.
+* **Abstand wie die Teilung in y** (oder die Anzahl über die Breite). Die
+  Werte kommen aus der Lösung (`querkraft.s_y`, `querkraft.n_y`). Der
+  Schnitt läuft in y, darum zählt diese Teilung.
+* **Kein Strich schneidet einen x-Stab.** Die Reihe wird als Ganzes
+  verschoben wie eine Zulage (`besterVersatz`), damit die Teilung ablesbar
+  bleibt. Trifft danach noch ein Strich, rückt er allein neben den Stab.
+  Beispiel ⌀10@200: fünf Striche im Abstand 200 mm, keiner berührt einen
+  Kreis. Ein erster Versuch rückte jeden Strich einzeln; die Abstände wurden
+  dabei ungleich (116, 216, 191, 193 mm).
+
+### Formelsammlung je Bestandteil
+
+* Beton gewählt: nur «Beton». Betonstahl: nur «Betonstahl». Platte: ihre
+  zehn Themen. «Gesamt»: alle zwölf.
+* **Zu welchem Bestandteil ein Thema gehört, sagt der Kern** (`Thema.art`):
+  der Namensraum des Abschnitts, unter dem es zum ersten Mal steht, etwa
+  `beton.b1`.
+
+### Stahl nur an den x-Lagen
+
+* An einer y-Lage steht keine Stahlwahl mehr. Die Wahl an der x-Lage gilt für
+  beide Lagen dieser Seite. So kann eine verborgene y-Wahl nicht unbemerkt
+  vom Rest abweichen.
+
+---
+
 ## 2026-09-26 · Schalter an jeder Lage, eine eigene Grenze x/d
 
 Wunsch: x|y-Schalter auch an der 2. und 3. Lage, ein Feld «Max. x/d» beim

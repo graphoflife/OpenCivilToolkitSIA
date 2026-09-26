@@ -3,6 +3,7 @@
   "themen": [
     {
       "thema": "Beton",
+      "art": "beton",
       "bloecke": [
         {
           "art": "gleichung",
@@ -71,6 +72,7 @@
     },
     {
       "thema": "Betonstahl",
+      "art": "betonstahl",
       "bloecke": [
         {
           "art": "gleichung",
@@ -103,6 +105,7 @@
     },
     {
       "thema": "Querschnitt",
+      "art": "querschnitt",
       "bloecke": [
         {
           "art": "gleichung",
@@ -144,6 +147,7 @@
     },
     {
       "thema": "Biegung und Normalkraft",
+      "art": "querschnitt",
       "bloecke": [
         {
           "art": "text",
@@ -351,6 +355,7 @@
     },
     {
       "thema": "Querkraft",
+      "art": "querschnitt",
       "bloecke": [
         {
           "art": "text",
@@ -507,6 +512,7 @@
     },
     {
       "thema": "Duktilität",
+      "art": "querschnitt",
       "bloecke": [
         {
           "art": "text",
@@ -556,6 +562,7 @@
     },
     {
       "thema": "Zwängung auf Normalkraft",
+      "art": "querschnitt",
       "bloecke": [
         {
           "art": "text",
@@ -628,6 +635,7 @@
     },
     {
       "thema": "Sprödes Versagen",
+      "art": "querschnitt",
       "bloecke": [
         {
           "art": "text",
@@ -655,6 +663,7 @@
     },
     {
       "thema": "Zwängung auf Biegung",
+      "art": "querschnitt",
       "bloecke": [
         {
           "art": "text",
@@ -721,6 +730,7 @@
     },
     {
       "thema": "Stahlspannung aus Rissbreite",
+      "art": "querschnitt",
       "bloecke": [
         {
           "art": "text",
@@ -811,6 +821,7 @@
     },
     {
       "thema": "Stahlspannung gegen Fliessen",
+      "art": "querschnitt",
       "bloecke": [
         {
           "art": "text",
@@ -833,6 +844,7 @@
     },
     {
       "thema": "Knicken",
+      "art": "querschnitt",
       "bloecke": [
         {
           "art": "text",

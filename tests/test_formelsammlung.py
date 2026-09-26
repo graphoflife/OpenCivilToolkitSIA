@@ -50,6 +50,17 @@ class TestFormelsammlung(unittest.TestCase):
              "Duktilität", "Sprödes Versagen", "Knicken"}, alle)
         self.assertLess(im_beispiel, alle)
 
+    def test_jedes_thema_weiss_seinen_bestandteil(self):
+        """Danach zeigt die Oberfläche beim Beton nur Beton, bei der Platte die Platte."""
+        art = {t.name: t.art for t in self.alle}
+        self.assertEqual(art["Beton"], "beton")
+        self.assertEqual(art["Betonstahl"], "betonstahl")
+        for name in ("Querschnitt", "Biegung und Normalkraft", "Querkraft", "Knicken"):
+            with self.subTest(thema=name):
+                self.assertEqual(art[name], "querschnitt")
+        self.assertEqual({t["art"] for t in api.formelsammlung_liste(self.alle)},
+                         {"beton", "betonstahl", "querschnitt"})
+
     def test_die_erklaerungen_wandern_aus_der_herleitung(self):
         """Im Bericht unter «Verwendete Formeln»: die Erklärungen dieses Laufs, alle."""
         erklaerungen = {b.text for b in self.loesung.protokoll.alle_bloecke()

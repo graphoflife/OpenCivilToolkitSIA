@@ -3,8 +3,9 @@
 
    Ruhige Grundfläche, farbige Leisten. Die Farbe trägt eine Aussage: Beton
    grau, Betonstahl kupfer, Platte blau, erfüllt grün, nicht erfüllt rot,
-   überschrieben ocker; Tragrichtung x saftgrün, y hellrot, beide und die
-   Bügel violett. Wo nichts auszusagen ist, bleibt es unbunt.
+   überschrieben ocker; Tragrichtung x orange, y gelb, beide und die Bügel
+   violett; Ja/Nein-Schalter grün und rot. Wo nichts auszusagen ist, bleibt
+   es unbunt.
    ========================================================================== */
 
 :root {
@@ -33,11 +34,12 @@
   --gut:          #16794a;
   --gut-hell:     #e4f4ec;
   --schlecht:     #c0281f;
-  /* Eigene, weichere Toene fuer die Ja/Nein-Schalter. Das kraeftige Rot der
-     Urteile gehoert dorthin, wo etwas nicht aufgeht -- ein abgeschalteter
-     Nachweis ist aber kein Fehler, sondern eine Entscheidung. */
-  --haken-gut:      #3f9d6d;
-  --haken-schlecht: #d4756e;
+  /* Eigene Toene fuer die Ja/Nein-Schalter: frisch, aber heller als Gruen
+     und Rot der Urteile. Das kraeftige Rot gehoert dorthin, wo etwas nicht
+     aufgeht -- ein abgeschalteter Nachweis ist kein Fehler, sondern eine
+     Entscheidung. */
+  --haken-gut:      #2f9e44;
+  --haken-schlecht: #e5484d;
   --schlecht-hell:#fdeceb;
   --warn:         #8a6100;
   --warn-hell:    #fdf4e0;
@@ -46,20 +48,20 @@
   --stahl:        #b8622a;
   --platte:       var(--blau);
 
-  /* Die Tragrichtungen. Dieselben Farben an den Lagen, an den Schaltern und
-     im Querschnittsbild -- man soll nicht überlegen müssen, welche Richtung
-     welche ist. Heller und gelblicher als das Grün und Rot der Urteile, damit
-     eine y-Lage nicht wie ein verfehlter Nachweis aussieht. Die tiefe Fassung
-     ist für Schrift auf der hellen. */
-  --richtung-x:      #2f9e44;
-  --richtung-x-hell: #e6f4ea;
-  --richtung-x-tief: #1f7a33;
-  --richtung-y:      #e5484d;
-  --richtung-y-hell: #fdecee;
-  --richtung-y-tief: #c22f3a;
+  /* Die Tragrichtungen: x kräftig orange, y kräftig gelb -- so gelb, dass es
+     auf Weiss noch zu sehen ist. Dieselben Farben an den Lagen, an den
+     Schaltern und im Querschnittsbild; man soll nicht überlegen müssen,
+     welche Richtung welche ist. Die tiefe Fassung ist für Schrift: auf Gelb
+     ist weisse Schrift nicht zu lesen, und gelbe auf Weiss auch nicht. */
+  --richtung-x:      #f76707;
+  --richtung-x-hell: #fff0e6;
+  --richtung-x-tief: #c2410c;
+  --richtung-y:      #eab308;
+  --richtung-y-hell: #fef7d6;
+  --richtung-y-tief: #8f6b00;
   /* Beide Tragrichtungen zugleich -- und die Bügel, die quer zu beiden
-     tragen: ein sanftes Violett. */
-  --beide:        #7c62b8;
+     tragen: ein leuchtendes Violett. */
+  --beide:        #8b5cf6;
 
   /* Akzent der Zwischenüberschriften. Eigene Variable, weil die Farben oben
      je eine Bedeutung tragen (Beton, Betonstahl, Platte) -- eine davon hier
@@ -380,7 +382,7 @@ input[readonly], input:disabled, select:disabled {
    wie beim Lastfall. Die Hälfte sagt es selbst, nicht die Karte, in der sie
    steht: sonst färbte eine y-Lage jeden anderen Schalter darin mit. */
 .schalter-halb.ist-x.ist-an     { background: var(--richtung-x); color: #fff; }
-.schalter-halb.ist-y.ist-an     { background: var(--richtung-y); color: #fff; }
+.schalter-halb.ist-y.ist-an     { background: var(--richtung-y); color: var(--schrift); }
 .schalter-halb.ist-beide.ist-an { background: var(--beide); color: #fff; }
 /* Unsichtbar, aber mit seinem Platz: sonst sprängen die Reiter daneben. */
 .schalter.ist-verborgen { visibility: hidden; }
@@ -915,14 +917,15 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .kennzahl-wert { font-weight: 600; }
 
 /* ------------------------------------------------ Lage innerhalb der Lage -- */
-/* Eigene Farbe, damit der Schalter nicht mit x|y verwechselt wird: dort geht
-   es um die Tragrichtung, hier um die Höhenlage innerhalb einer Lage. */
+/* Im Blau der gewöhnlichen Schalter. Er war einmal gold, damit man ihn nicht
+   mit x|y verwechselt, als x noch blau war -- neben dem Gelb der y-Lagen
+   wäre Gold jetzt genau diese Verwechslung. Hier geht es um die Höhenlage
+   innerhalb einer Lage, nicht um die Tragrichtung.
 
-/* Steht im Lagenkopf, links vom Stahl: die Lage der Stäbe zueinander gehört
+   Steht im Lagenkopf, links vom Stahl: die Lage der Stäbe zueinander gehört
    zur Geometrie der Lage, nicht zum Werkstoff. */
-.schalter-gunst { border-color: #a8850f; flex: none; }
+.schalter-gunst { flex: none; }
 .schalter-gunst .schalter-halb { text-transform: none; letter-spacing: 0; }
-.schalter-gunst .schalter-halb.ist-an { background: #c9a227; color: #fff; }
 
 /* «Automatische Bewehrung» -- eine Karte unter den Bügeln. Die Moduswahl
    nimmt die ganze Zeile: «Grundbew. ohne Kräfte, Zulage mit Kräften» passt

@@ -308,8 +308,12 @@ let formelsammlungLaden = null;
  * Die Formelsammlung: jede Formel des Werkzeugs einmal, ohne Zahlen, mit den
  * Erklärungen und denselben Kopierknöpfen wie in der Herleitung -- zum
  * Nachschlagen, gleich welches Projekt offen ist und welche Nachweise darin
- * laufen. Darum auch kein Seitenfilter. Der Kern legt sie fertig ab
- * (`python3 -m opencivil.web.bruecke`); hier wird sie nur gelesen.
+ * laufen. Der Kern legt sie fertig ab (`python3 -m opencivil.web.bruecke`);
+ * hier wird sie nur gelesen.
+ *
+ * Je Bestandteil seine Formeln: bei einem Beton die des Betons, bei einer
+ * Platte die der Platte. Zu welchem ein Thema gehört, sagt der Kern (`art`);
+ * «Gesamt» zeigt alle.
  */
 function formelsammlung() {
   if (!zustand.formelsammlung) {
@@ -322,7 +326,14 @@ function formelsammlung() {
       .catch((fehler) => melden(`Formelsammlung nicht ladbar: ${fehler.message}`, true));
     return leerzustand('Formelsammlung wird geladen …');
   }
-  return el('div.blatt', {}, zustand.formelsammlung.flatMap((t) => [
+  const leer = ohneAuswahl();
+  if (leer) return leer;
+  const art = eingrenzung()?.split('.')[0];
+  const themen = zustand.formelsammlung.filter((t) => !art || t.art === art);
+  if (!themen.length) {
+    return leerzustand('Keine Formeln für diesen Bestandteil.', 'Oben «Gesamt»: alle.');
+  }
+  return el('div.blatt', {}, themen.flatMap((t) => [
     el('div.b-untertitel', { text: t.thema }),
     ...bloeckeZeichnen(t.bloecke),
   ]));

@@ -309,18 +309,23 @@ function lagenBlock(querschnitt, nummer) {
       // Links vom Stahl: die Lage der Stäbe zueinander gehört zur Geometrie
       // der Lage, nicht zum Werkstoff.
       lageSchalter(querschnitt, nummer, lage),
-      el('select', {
+      // Gewählt wird der Stahl nur an der x-Lage; die y-Lage derselben Seite
+      // bekommt ihn mit. Nachgewiesen wird nur x -- eine eigene Wahl in y
+      // stünde da, ohne dass ein Nachweis nach ihr fragt, und eine
+      // verborgene könnte unbemerkt vom Rest abweichen.
+      richtung === 'x' ? el('select', {
         style: { width: 'auto', padding: '1px 6px', fontSize: '11px' },
-        title: 'Betonstahl dieser Lage',
+        title: 'Betonstahl dieser Seite – x- und y-Lage',
         on: {
           change: (e) => projektAendern((p) => {
-            p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
-              .lagen[nummer - 1].stahl = e.target.value;
+            const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
+            q.lagen[nummer - 1].stahl = e.target.value;
+            q.lagen[partner - 1].stahl = e.target.value;
           }),
         },
       }, staehle.map((s) => el('option', {
         value: s.kennung, text: s.name || s.sorte, selected: lage.stahl === s.kennung,
-      }))),
+      }))) : null,
     ]),
     postenZeile(querschnitt, nummer, 'grund', 'Grund'),
     postenZeile(querschnitt, nummer, 'zulage', 'Zulage'),

@@ -3,7 +3,7 @@
   "dateien": {
     "opencivil/__init__.py": "6221ac8cbf06",
     "opencivil/bericht/__init__.py": "e3b0c44298fc",
-    "opencivil/bericht/formelsammlung.py": "998d24030603",
+    "opencivil/bericht/formelsammlung.py": "eea9eceef752",
     "opencivil/bericht/gliederung.py": "8150a5e1527f",
     "opencivil/bericht/konsole.py": "a08dfd774264",
     "opencivil/bericht/latex_dokument.py": "9283b17b157a",
@@ -51,7 +51,7 @@
     "opencivil/querschnitt/werkstoffgesetz.py": "7b425b08ac0a",
     "opencivil/spannungsanalyse.py": "f0a37d33b984",
     "opencivil/web/__init__.py": "e3b0c44298fc",
-    "opencivil/web/api.py": "743a1d9da335",
+    "opencivil/web/api.py": "65edf4df4623",
     "opencivil/web/bruecke.py": "d8aeb4a299b7",
     "opencivil/web/diagrammdaten.py": "411a020372bb",
     "opencivil/web/dienst.py": "4342c944af88",
