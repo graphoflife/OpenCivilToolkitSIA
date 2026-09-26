@@ -20,7 +20,9 @@ import {
   DURCHMESSER, erklaerung, feld, hakenSchalter, richtungVon, richtungsWahl,
 } from './bausteine.js';
 import { auswahl, el, melden, zahlfeld } from './dom.js';
-import { aendern, naechsterName, projektAendern, zustand } from './zustand.js';
+import {
+  aendern, ausVorlage, naechsterName, projektAendern, zustand,
+} from './zustand.js';
 
 /**
  * Welche Platte gerade durchsucht wird.
@@ -170,10 +172,9 @@ export function nachweiseBlock(querschnitt) {
       ...(querschnitt.kombinationen.length
         ? querschnitt.kombinationen.map((_, i) => einwirkungZeile(querschnitt, i))
         : [el('div.leer', { text: 'Ohne Einwirkung kein Nachweis.' })]),
-      anfuegenKnopf('Einwirkung', () => aendernAn((q) => q.kombinationen.push({
-        name: naechsterName('Tragsicherheit', q.kombinationen),
-        M_Ed: 30, N_Ed: 0, V_Ed: 0, art: 'automatisch',
-      }))),
+      anfuegenKnopf('Einwirkung', () => aendernAn((q) => q.kombinationen.push(
+        ausVorlage('einwirkung', { name: naechsterName('Tragsicherheit', q.kombinationen) }),
+      ))),
     ]),
 
     nachweiskapitel(querschnitt, {
@@ -185,7 +186,7 @@ export function nachweiseBlock(querschnitt) {
         max: zustand.katalog?.duktilitaet?.hoechstens,
         titel: `Grenze der Druckzonenhöhe x/d; höchstens ${
           zustand.katalog?.duktilitaet?.hoechstens ?? '–'}`,
-        beiAenderung: (v) => aendernAn((q) => { if (v !== null) q.x_d_max = v; }),
+        beiAenderung: (v) => aendernAn((q) => { q.x_d_max = v; }),
       }),
     }),
     nachweiskapitel(querschnitt, {
@@ -203,9 +204,10 @@ function einwirkungZeile(querschnitt, index) {
     veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung).kombinationen[index]);
   });
 
+  // Eine Last, die man leert, ist keine Last.
   const zahl = (feld, titel, schritt = 10) => zahlfeld({
-    wert: k[feld], schritt, titel,
-    beiAenderung: (v) => aendern((x) => { x[feld] = v ?? 0; }),
+    wert: k[feld], schritt, titel, leer: 0,
+    beiAenderung: (v) => aendern((x) => { x[feld] = v; }),
   });
 
   const an = k.aktiv !== false;
@@ -310,10 +312,8 @@ function knickBlock(querschnitt) {
       : [el('div.leer', { text: 'Kein Knicknachweis (nur x).' })]),
     anfuegenKnopf('Knicknachweis', () => aendern((q) => {
       q.knickfaelle = q.knickfaelle || [];
-      q.knickfaelle.push({
-        name: naechsterName('Knicken', q.knickfaelle),
-        N_Ed: -500, M_Ed_1: 20, laenge: 3, knicklaenge: 3, aktiv: true,
-      });
+      q.knickfaelle.push(
+        ausVorlage('knickfall', { name: naechsterName('Knicken', q.knickfaelle) }));
     })),
   ]);
 }
@@ -324,9 +324,10 @@ function knickZeile(querschnitt, index) {
     veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
       .knickfaelle[index]);
   });
+  // Eine Länge null gibt es nicht -- geleert bleibt der bisherige Wert.
   const zahl = (feld, titel, schritt) => zahlfeld({
     wert: k[feld], schritt, titel,
-    beiAenderung: (v) => aendern((x) => { x[feld] = v ?? 0; }),
+    beiAenderung: (v) => aendern((x) => { x[feld] = v; }),
   });
 
   const aktiv = k.aktiv !== false;
@@ -477,7 +478,7 @@ function gebrauchsKapitel(querschnitt, {
         titel: `Anteil der Tragsicherheitseinwirkungen als ${wort}, in %`,
         // Leer gelassen bleibt der bisherige Wert -- eine Null wäre kein
         // Anteil, und der Kern wiese sie ohnehin zurück.
-        beiAenderung: (v) => aendern((l) => { if (v !== null) l.anteil = v; }),
+        beiAenderung: (v) => aendern((l) => { l.anteil = v; }),
       }),
       el('span.postenname', { text: '% der Tragsicherheitseinwirkungen' }),
       el('span.kurvenhinweis', { text: '' }),
@@ -503,10 +504,7 @@ function gebrauchsKapitel(querschnitt, {
           : `Noch kein ${wort}er Lastfall.`,
       })]),
     anfuegenKnopf('Lastfall', () => aendern((l) => {
-      l.faelle.push({
-        name: naechsterName(neu, l.faelle),
-        M_Ed: 0, N_Ed: 0, aktiv: true,
-      });
+      l.faelle.push(ausVorlage('gebrauchsfall', { name: naechsterName(neu, l.faelle) }));
     })),
   ]);
 }
@@ -528,12 +526,14 @@ function gebrauchsfallZeile(querschnitt, feld, wort, index) {
     }),
     zahlfeld({
       wert: k.M_Ed, schritt: 10, titel: `Moment unter ${wort}er Einwirkung, in kNm`,
-      beiAenderung: (v) => aendern((x) => { x.M_Ed = v ?? 0; }),
+      leer: 0,
+      beiAenderung: (v) => aendern((x) => { x.M_Ed = v; }),
     }),
     zahlfeld({
       wert: k.N_Ed, schritt: 10,
       titel: `Normalkraft unter ${wort}er Einwirkung, in kN – Zug positiv`,
-      beiAenderung: (v) => aendern((x) => { x.N_Ed = v ?? 0; }),
+      leer: 0,
+      beiAenderung: (v) => aendern((x) => { x.N_Ed = v; }),
     }),
     el('button.weg', {
       text: '×', title: `${wort[0].toUpperCase()}${wort.slice(1)}en Lastfall entfernen`,
@@ -603,9 +603,9 @@ export function automatikBlock(querschnitt) {
       q.automatik_dicke = wert;
     }), 'Plattendicke optimieren'),
     ...(dicke ? [feld('Mindestdicke', zahlfeld({
-      wert: querschnitt.automatik_mindestdicke ?? 150, schritt: 10, min: 10,
+      wert: querschnitt.automatik_mindestdicke, schritt: 10, min: 10,
       titel: 'Dünner sucht die Dickenoptimierung keine Platte',
-      beiAenderung: (v) => aendern((q) => { q.automatik_mindestdicke = v ?? 150; }),
+      beiAenderung: (v) => aendern((q) => { q.automatik_mindestdicke = v; }),
     }), 'mm')] : []),
     feld('Teilungen', teilungsfeld('automatik_teilungen',
       'mm, durch Komma getrennt. Grund und Zulage einer Lage: gleiche Teilung'), 'mm'),
@@ -616,9 +616,8 @@ export function automatikBlock(querschnitt) {
     feld('Mindestdurchmesser', zahlfeld({
       wert: querschnitt.automatik_mindestdurchmesser || null, stufen: DURCHMESSER, min: 0,
       titel: 'Grundbew. jeder Lage mindestens mit diesem ⌀; leer: Lage darf leer bleiben',
-      beiAenderung: (v) => aendern((q) => {
-        q.automatik_mindestdurchmesser = v ?? 0;
-      }),
+      leer: 0,
+      beiAenderung: (v) => aendern((q) => { q.automatik_mindestdurchmesser = v; }),
     }), 'mm'),
     ...obergrenze(querschnitt, aendern),
     hakenzeile(querschnitt.automatik_y_wie_x === true, (wert) => aendern((q) => {
@@ -652,12 +651,13 @@ function obergrenze(querschnitt, aendern) {
       zahlfeld({
         wert: posten.durchmesser || null, stufen: DURCHMESSER, min: 0,
         titel: '⌀ in mm; Grund und Zulage leer: keine Obergrenze',
-        beiAenderung: (v) => setzen('durchmesser', v ?? 0),
+        leer: 0,
+        beiAenderung: (v) => setzen('durchmesser', v),
       }),
       el('span.zeichen', { text: '@' }),
       zahlfeld({
         wert: posten.abstand, schritt: 25, min: 25, titel: 'Teilung in mm',
-        beiAenderung: (v) => setzen('abstand', v ?? 150),
+        beiAenderung: (v) => setzen('abstand', v),
       }),
       el('span.einheit', { text: 'mm' }),
     ]);
@@ -781,11 +781,8 @@ function spannungsBlock(querschnitt) {
       : [el('div.leer', { text: 'Keine Analyse angelegt.' })]),
     anfuegenKnopf('Analyse', () => aendern((q) => {
       q.spannungsfaelle = q.spannungsfaelle || [];
-      q.spannungsfaelle.push({
-        name: naechsterName('Bild', q.spannungsfaelle),
-        art: 'schnittgroessen', richtung: 'x',
-        N_Ed: 0, M_Ed: 30, eps_oben: -1, eps_unten: 2, aktiv: true,
-      });
+      q.spannungsfaelle.push(
+        ausVorlage('analyse', { name: naechsterName('Bild', q.spannungsfaelle) }));
     })),
   ]);
 }
@@ -798,8 +795,8 @@ function spannungsZeile(querschnitt, index) {
       .spannungsfaelle[index]);
   });
   const zahl = (feld, titel, schritt) => zahlfeld({
-    wert: k[feld], schritt, titel,
-    beiAenderung: (v) => aendern((x) => { x[feld] = v ?? 0; }),
+    wert: k[feld], schritt, titel, leer: 0,
+    beiAenderung: (v) => aendern((x) => { x[feld] = v; }),
   });
   const aktiv = k.aktiv !== false;
 

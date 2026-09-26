@@ -119,10 +119,18 @@ export function naechsteStufe(wert, richtung, { stufen, schritt = 1 } = {}) {
  * gleichmässige Schritte kann. Durchmesser springen aber von 22 auf 26 und
  * von 30 auf 34 -- eine Liste, kein Raster.
  *
+ * Ein geleertes Feld behält seinen bisherigen Wert. Eigene Vorgaben kennt die
+ * Oberfläche nicht -- die stehen im Kern, und vorher stand hier dieselbe Zahl
+ * ein zweites Mal (`q.h = v ?? 300`). Nur wo leer etwas heisst, sagt das Feld
+ * es mit `leer`: `0` für «keins» (kein Stab, keine Last), `null` für «zurück
+ * zum Normwert».
+ *
  * @param {number[]} [stufen]  erlaubte Werte; sonst wird `schritt` verwendet
+ * @param {number|null} [leer] was ein geleertes Feld meldet; fehlt es, bleibt
+ *                             der bisherige Wert
  */
 export function zahlfeld({
-  wert, schritt = 1, stufen, min, max, beiAenderung, titel, readonly,
+  wert, schritt = 1, stufen, min, max, beiAenderung, titel, readonly, leer,
 }) {
   const melden = (neu) => beiAenderung(neu);
 
@@ -134,7 +142,9 @@ export function zahlfeld({
     on: {
       change: (e) => {
         const roh = e.target.value.trim();
-        melden(roh === '' ? null : Number(roh));
+        if (roh !== '') melden(Number(roh));
+        else if (leer !== undefined) melden(leer);
+        else e.target.value = wert ?? '';
       },
       keydown: (e) => {
         if (readonly || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown')) return;

@@ -40,7 +40,8 @@ from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.nachweis.duktilitaet import HOECHSTENS as DUKTILITAET_HOECHSTENS
 from opencivil.nachweis.spannungsbegrenzung import GrenzeGegenFliessen
 from opencivil.projekt import (
-    BEIDE_RICHTUNGEN, RISSANFORDERUNGEN, Aufbau, QuerschnittEintrag,
+    BEIDE_RICHTUNGEN, RISSANFORDERUNGEN, Aufbau, GebrauchsfallEintrag, KnickEintrag,
+    KombinationEintrag, MaterialEintrag, QuerschnittEintrag, SpannungsfallEintrag,
 )
 from opencivil.projekt.gleichungen import GleichungszeileEintrag
 from opencivil.web import diagrammdaten
@@ -108,6 +109,17 @@ def katalog() -> dict:
         # nur noch Kennung, Name und die beiden Materialien.
         "neue_platte": QuerschnittEintrag.neu(
             kennung="", name="", beton="", stahl="").als_dict(),
+        # Dasselbe fuer jede Zeile, die man anfuegt -- mit den Startwerten, die
+        # eine frische Zeile haben soll (eine Einwirkung von 30 kNm, ein
+        # Knickfall unter Druck). Die Oberflaeche setzt nur den Namen und beim
+        # Material Kennung, Art und Sorte.
+        "neue_zeilen": {
+            "einwirkung": KombinationEintrag(name="", M_Ed=30.0).als_dict(),
+            "knickfall": KnickEintrag(name="", N_Ed=-500.0, M_Ed_1=20.0).als_dict(),
+            "gebrauchsfall": GebrauchsfallEintrag(name="").als_dict(),
+            "analyse": SpannungsfallEintrag(name="", M_Ed=30.0).als_dict(),
+            "material": MaterialEintrag(kennung="", art="", sorte="").als_dict(),
+        },
         # `fliessnachweis` sagt, ob diese Anforderung den Nachweis gegen
         # das Fliessen unter haeufiger Einwirkung ueberhaupt verlangt -- bei
         # normaler steht in Tabelle 17 ein Strich. Die Oberflaeche braucht

@@ -18,7 +18,7 @@
 import { el, ersetzen, melden } from './dom.js';
 import { neueZeile } from './gleichungen.js';
 import {
-  aendern, freieKennung, naechsterName, projektAendern, umschalten, zustand,
+  aendern, ausVorlage, freieKennung, naechsterName, projektAendern, umschalten, zustand,
 } from './zustand.js';
 
 const SINNBILD = {
@@ -148,10 +148,9 @@ function materialAnlegen(art) {
     return;
   }
   projektAendern((p) => {
-    p.materialien.push({
+    p.materialien.push(ausVorlage('material', {
       kennung, art, sorte: frei.sorte, name: frei.sorte,
-      eigenstaendig: false, abweichungen: {}, ueberschreibungen: {},
-    });
+    }));
   });
   aendern({ auswahl: { art: 'material', kennung } }, 'auswahl');
 }

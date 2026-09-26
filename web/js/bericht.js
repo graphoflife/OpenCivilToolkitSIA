@@ -639,7 +639,8 @@ function querkraftkurven(loesung, querschnitt) {
       zahlfeld({
         wert: kurve.N_Ed, schritt: 50,
         titel: 'N in kN, Zug positiv. Nur Punkte mit genau diesem N liegen auf der Kurve.',
-        beiAenderung: (v) => normalkraftWaehlen(kennung, v ?? 0),
+        leer: 0,
+        beiAenderung: (v) => normalkraftWaehlen(kennung, v),
       }),
       el('span.einheit', { text: 'kN' }),
       el('span.kurvenhinweis', {

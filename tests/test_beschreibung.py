@@ -411,6 +411,19 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
     Platten brachten Nachweise eingeschaltet mit, die überall sonst aus waren.
     """
 
+    def test_auch_jede_neue_zeile(self):
+        """Jede Vorlage ist ein gültiger Eintrag -- der Leser lässt sie, wie sie ist."""
+        zeilen = api.katalog()["neue_zeilen"]
+        for art, cls in (("einwirkung", KombinationEintrag), ("knickfall", KnickEintrag),
+                         ("gebrauchsfall", GebrauchsfallEintrag),
+                         ("analyse", SpannungsfallEintrag)):
+            with self.subTest(art=art):
+                roh = {**zeilen[art], "name": "Neu"}
+                self.assertEqual(cls.aus_dict(roh).als_dict(), roh)
+        material = {**zeilen["material"], "kennung": "b9", "art": "beton",
+                    "sorte": "C30/37", "name": "C30/37"}
+        self.assertEqual(MaterialEintrag.aus_dict(material).als_dict(), material)
+
     def test_der_katalog_traegt_sie(self):
         vorlage = api.katalog()["neue_platte"]
         self.assertEqual(vorlage["h"], 300.0)

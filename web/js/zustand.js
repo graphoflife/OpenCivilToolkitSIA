@@ -133,6 +133,15 @@ export function freieKennung(vorsilbe) {
 }
 
 /**
+ * Eine neue Zeile nach der Vorlage des Kerns (`katalog.neue_zeilen`) -- mit
+ * dem, was nur die Oberfläche weiss: Name, Kennung. Eine Kopie, nicht die
+ * Vorlage selbst: sonst teilten sich zwei Materialien dieselben Abweichungen.
+ */
+export function ausVorlage(art, felder) {
+  return { ...structuredClone(zustand.katalog.neue_zeilen[art]), ...felder };
+}
+
+/**
  * «Tragsicherheit 3» -- die kleinste Nummer, die in der Liste noch frei ist.
  *
  * Nicht `länge + 1`: nach dem Löschen eines Eintrags ergäbe das einen Namen,

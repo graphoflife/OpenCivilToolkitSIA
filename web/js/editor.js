@@ -60,6 +60,8 @@ function kennwertZeile(material, vorlage) {
     readonly: !schreibbar,
     titel: gesperrt ? 'Normsorte – erst modifizieren, dann änderbar'
       : (vorlage.berechnet && !istUeberschrieben ? 'Wird gerechnet. Haken setzen zum Überschreiben.' : ''),
+    // Leer: die eigene Zahl weg, der Wert der Sorte gilt wieder.
+    leer: null,
     beiAenderung: (neu) => projektAendern((p) => {
       const m = p.materialien.find((x) => x.kennung === material.kennung);
       const topf = vorlage.berechnet ? m.ueberschreibungen : m.abweichungen;
@@ -268,17 +270,18 @@ function postenZeile(querschnitt, nummer, welcher, beschriftung) {
     zahlfeld({
       wert: posten.durchmesser || null, stufen: DURCHMESSER, min: 0,
       titel: '⌀ in mm; leer oder 0: keine Bewehrung',
-      beiAenderung: (v) => aendern((x) => { x.durchmesser = v ?? 0; }),
+      leer: 0,
+      beiAenderung: (v) => aendern((x) => { x.durchmesser = v; }),
     }),
     el('span.zeichen', { text: ueberAbstand ? '@' : '×' }),
     ueberAbstand
       ? zahlfeld({
         wert: posten.abstand, schritt: 25, min: 25, titel: 'Teilung in mm',
-        beiAenderung: (v) => aendern((x) => { x.abstand = v ?? 150; }),
+        beiAenderung: (v) => aendern((x) => { x.abstand = v; }),
       })
       : zahlfeld({
         wert: posten.anzahl, schritt: 1, min: 1, titel: 'Stabzahl je b',
-        beiAenderung: (v) => aendern((x) => { x.anzahl = v ?? 1; }),
+        beiAenderung: (v) => aendern((x) => { x.anzahl = v; }),
       }),
     el('span.einheit', { text: ueberAbstand ? 'mm' : 'Stk' }),
     el('button.knopf.knopf-zart.umschalter', {
@@ -393,32 +396,6 @@ function richtungsSchalter(querschnitt, nummer, richtung, partner) {
 
 
 /**
- * Die Bügel einer Platte, mit allen Feldern belegt.
- *
- * Eine Beschreibung aus der Zeit vor der Querkraftbewehrung hat das Feld
- * nicht; der Kern setzt dann seine Vorgaben ein. Stünde in der Maske derweil
- * ein leeres Feld, rechnete das Werkzeug mit einer Zahl, die nirgends steht --
- * dieselbe Falle wie damals bei `h = 0`. Darum wird hier gefüllt, und zwar
- * mit denselben Werten, die der Kern einsetzen würde.
- */
-function buegelVon(querschnitt, staehle) {
-  const vorhanden = querschnitt.querkraftbewehrung || {};
-  const gesetzt = (wert, vorgabe) => (wert === undefined ? vorgabe : wert);
-  return {
-    durchmesser: gesetzt(vorhanden.durchmesser, 0),
-    stahl: vorhanden.stahl || staehle[0]?.kennung || '',
-    abstand_x: gesetzt(vorhanden.abstand_x, 200),
-    // Genau eines von abstand_y und anzahl_y ist gesetzt. Fehlen beide, gilt
-    // die Teilung -- wie bei den Lagen.
-    abstand_y: (vorhanden.abstand_y === undefined && vorhanden.anzahl_y == null)
-      ? 200 : gesetzt(vorhanden.abstand_y, null),
-    anzahl_y: gesetzt(vorhanden.anzahl_y, null),
-    alpha_min: gesetzt(vorhanden.alpha_min, 30),
-    alpha_max: gesetzt(vorhanden.alpha_max, 45),
-  };
-}
-
-/**
  * Die Bügel -- ein Raster über die ganze Platte, unterhalb der Lagen.
  *
  *     ×  ⌀ [10]   x: [200]   y: [200] mm [Teilung|Anzahl]
@@ -434,18 +411,16 @@ function buegelVon(querschnitt, staehle) {
  */
 function querkraftBlock(querschnitt) {
   const staehle = zustand.projekt.materialien.filter((m) => m.art === 'betonstahl');
-  const buegel = buegelVon(querschnitt, staehle);
+  // Vollständig: jede Platte kommt durch den Kern, und der setzt die Bügel
+  // mit allen Feldern -- auch in einer Datei aus der Zeit vor den Bügeln.
+  // Ohne Stahl nimmt er den ersten; die Auswahl zeigt dann ebenfalls ihn.
+  const buegel = querschnitt.querkraftbewehrung;
   const ueberAbstand = buegel.abstand_y !== null && buegel.abstand_y !== undefined;
   const leer = !(buegel.durchmesser > 0);
 
   const aendern = (veraenderer) => projektAendern((p) => {
-    const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
-    // Erst vervollständigen, dann ändern: eine Beschreibung aus der Zeit vor
-    // den Bügeln hat das Feld gar nicht, und ein leeres Eingabefeld neben
-    // einer Rechnung mit stiller Vorgabe ist genau der Widerspruch, den
-    // niemand sieht.
-    q.querkraftbewehrung = buegelVon(q, staehle);
-    veraenderer(q.querkraftbewehrung);
+    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
+      .querkraftbewehrung);
   });
 
   return el('div.lage.lage-querkraft', { class: leer ? 'ist-leer' : '' }, [
@@ -475,25 +450,26 @@ function querkraftBlock(querschnitt) {
       zahlfeld({
         wert: buegel.durchmesser || null, stufen: DURCHMESSER, min: 0,
         titel: 'Bügel-⌀ in mm; leer oder 0: keine Bügel',
-        beiAenderung: (v) => aendern((x) => { x.durchmesser = v ?? 0; }),
+        leer: 0,
+        beiAenderung: (v) => aendern((x) => { x.durchmesser = v; }),
       }),
       el('span.zeichen', { text: 'x:' }),
       zahlfeld({
         wert: buegel.abstand_x, schritt: 25, min: 25,
         titel: 'Bügelteilung x in mm',
-        beiAenderung: (v) => aendern((x) => { x.abstand_x = v ?? 200; }),
+        beiAenderung: (v) => aendern((x) => { x.abstand_x = v; }),
       }),
       el('span.zeichen', { text: 'y:' }),
       ueberAbstand
         ? zahlfeld({
           wert: buegel.abstand_y, schritt: 25, min: 25,
           titel: 'Bügelteilung y in mm',
-          beiAenderung: (v) => aendern((x) => { x.abstand_y = v ?? 200; }),
+          beiAenderung: (v) => aendern((x) => { x.abstand_y = v; }),
         })
         : zahlfeld({
           wert: buegel.anzahl_y, schritt: 1, min: 1,
           titel: 'Bügelzahl je b; dann nur Nachweise in x',
-          beiAenderung: (v) => aendern((x) => { x.anzahl_y = v ?? 1; }),
+          beiAenderung: (v) => aendern((x) => { x.anzahl_y = v; }),
         }),
       el('span.einheit', { text: ueberAbstand ? 'mm' : 'Stk/b' }),
       el('button.knopf.knopf-zart.umschalter', {
@@ -514,14 +490,14 @@ function querkraftBlock(querschnitt) {
       zahlfeld({
         wert: buegel.alpha_min, schritt: 1, min: 1, max: 89,
         titel: 'Kleinste Neigung der Druckdiagonalen, ganze °',
-        beiAenderung: (v) => aendern((x) => { x.alpha_min = Math.round(v ?? 30); }),
+        beiAenderung: (v) => aendern((x) => { x.alpha_min = Math.round(v); }),
       }),
       el('span.einheit', { text: '°' }),
       span(String.raw`\alpha_{max}`),
       zahlfeld({
         wert: buegel.alpha_max, schritt: 1, min: 1, max: 89,
         titel: 'Grösste Neigung der Druckdiagonalen, ganze °',
-        beiAenderung: (v) => aendern((x) => { x.alpha_max = Math.round(v ?? 45); }),
+        beiAenderung: (v) => aendern((x) => { x.alpha_max = Math.round(v); }),
       }),
       el('span.einheit', { text: '°' }),
     ]),
@@ -532,8 +508,8 @@ function ueberdeckungsBlock(querschnitt, welche) {
   const unten = welche === 'unten';
   const aendern = (v) => projektAendern((p) => {
     const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
-    if (unten) q.ueberdeckung_unten = v ?? 30;
-    else q.ueberdeckung_oben = v ?? 30;
+    if (unten) q.ueberdeckung_unten = v;
+    else q.ueberdeckung_oben = v;
   });
   return el('div.ueberdeckung', {}, [
     feld(`Überdeckung ${welche}`, zahlfeld({
@@ -571,32 +547,33 @@ function plattenEditor(querschnitt) {
           })),
           feld('Dicke h', zahlfeld({
             wert: querschnitt.h, schritt: 10, min: 10,
-            beiAenderung: (v) => aendern((q) => { q.h = v ?? 300; }),
+            beiAenderung: (v) => aendern((q) => { q.h = v; }),
           }), 'mm'),
           feld(['Breite ', span('b_x')], zahlfeld({
             wert: querschnitt.b, schritt: 100, min: 10,
             titel: 'Streifen in x: A_s, M und N je b. y: je 1000 mm',
-            beiAenderung: (v) => aendern((q) => { q.b = v ?? 1000; }),
+            beiAenderung: (v) => aendern((q) => { q.b = v; }),
           }), 'mm'),
           feld(['Grösstkorn ', span('D_{max}')], zahlfeld({
             wert: querschnitt.d_max, schritt: 4, min: 1,
             titel: 'Für k_g, Querkraft ohne Bügel',
-            beiAenderung: (v) => aendern((q) => { q.d_max = v ?? 32; }),
+            beiAenderung: (v) => aendern((q) => { q.d_max = v; }),
           }), 'mm', 'Grösstkorn → k_g, Querkraft ohne Bügel'),
           feld(['Druckdiagonale ', span('k_c')], zahlfeld({
-            wert: querschnitt.k_c ?? 0.55, schritt: 0.05, min: 0,
+            wert: querschnitt.k_c, schritt: 0.05, min: 0,
             titel: 'Abminderung f_cd in der Druckdiagonalen; nur mit Bügeln',
-            beiAenderung: (v) => aendern((q) => { q.k_c = v ?? 0.55; }),
+            beiAenderung: (v) => aendern((q) => { q.k_c = v; }),
           }), '', 'Abminderung f_cd in der Druckdiagonalen'),
           feld('Einlagenhöhe', zahlfeld({
             wert: querschnitt.einlagenhoehe, schritt: 5, min: 0,
             titel: 'Verringert d_v, falls h/6 < e < d',
-            beiAenderung: (v) => aendern((q) => { q.einlagenhoehe = v ?? 0; }),
+            leer: 0,
+            beiAenderung: (v) => aendern((q) => { q.einlagenhoehe = v; }),
           }), 'mm'),
           feld(['Kriechzahl ', span(String.raw`\varphi`)], zahlfeld({
-            wert: querschnitt.kriechzahl ?? 2.0, schritt: 0.1, min: 0,
+            wert: querschnitt.kriechzahl, schritt: 0.1, min: 0,
             titel: 'n = E_s/E_cm · (1+φ), gerissener Zustand; grösser → sicherer',
-            beiAenderung: (v) => aendern((q) => { q.kriechzahl = v ?? 2.0; }),
+            beiAenderung: (v) => aendern((q) => { q.kriechzahl = v; }),
           }), '', 'Kriechzahl φ, gerissener Zustand'),
           feld('Rissanforderung', auswahl({
             werte: (zustand.katalog.rissanforderungen || []).map((r) => ({
