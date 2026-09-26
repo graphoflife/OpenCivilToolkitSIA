@@ -44,6 +44,86 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-26 · Umbau nach dem strengen Review: jede Regel an einer Stelle
+
+Anlass: ein Review, das nicht nach Fehlern fragt, sondern nach Form. Es fand
+zwei Blocker und einen echten Fehler. Umgesetzt in neun Schritten, jeder für
+sich getestet und gepusht. Die Hauptprobe war jedes Mal dieselbe: **Der
+Bericht bleibt Zeichen für Zeichen gleich**, und die Suche findet in 65
+Vergleichsfällen dieselben Lagen und Dicken. Gerechnet wurden das Beispiel,
+«y wie x», eine dünne y-Lage und jeder Nachweis, in allen Modi, mit
+Mindestdurchmesser 0, 10 und 16.
+
+### Der Fehler
+
+`bewehrung_suchen` las Einstellungen als `rumpf.get(...) or eintrag...`. Das
+`or` hält eine 0 für «nicht angegeben». Ein Mindestdurchmesser 0, also «kein
+Minimum», wurde darum still zur Vorgabe der Platte. Jetzt kommen die
+Einstellungen nur von der Platte. Die Oberfläche hatte die Übersteuerungen
+ohnehin nie benutzt.
+
+### Vorher und nachher
+
+| | vorher | nachher |
+| --- | --- | --- |
+| `bewehrungssuche` | eine Datei, 1009 Zeilen | Paket aus 4 Teilen, das grösste 554 Zeilen |
+| Ergebnis der Suche | Wörterbuch aus Marken (`'2g'`, `'3z'`) | die Lagen selbst |
+| Regeln für die y-Lagen | an 3 Stellen, dazu eine Liste «gehoben» | eine Funktion `_y_ableiten` |
+| Start der Grundbewehrung | Index `grund_ab` durch 4 Funktionen | eine Stufenliste je Art (`Stufen`) |
+| «Plattendicke optimieren» | 2 von 5 Modi, zwei Eigenschaften trennten sie wieder | eigener Schalter `automatik_dicke` |
+| eine Vorgabe wie `h = 300` | im Feld, im Leser und in der Oberfläche | nur im Feld |
+| `?? Zahl` in der Oberfläche | 30 Stellen | 1 (der Haken beim Materialwert) |
+| Durchmesserliste | im Kern und in der Oberfläche, schon verschieden (⌀6) | nur im Kern, über den Katalog |
+| Kopplung der Lagenpaare in JS | dreifach | ein Modul `lagen.js` |
+| Urteilsnamen | 9 eigene f-Strings, jeder anders | gestempelt aus Langname, Richtung, Fall |
+
+Unterm Strich ist der Code gleich lang (+1337/−1333 Zeilen), denn die neuen
+Module haben Kopfkommentare bekommen. Kürzer geworden ist die Logik: rund
+fünfzehn Begriffe fallen weg, von `_vollstaendig` bis `buegelVon`.
+
+### Was sich für dich ändert
+
+* **Ein geleertes Zahlenfeld behält seinen Wert.** Vorher sprang «h» auf 300,
+  eine Zahl, die die Oberfläche selbst kannte. Nur wo leer etwas heisst,
+  sagt das Feld es: «keins» bei Durchmesser, Lasten, Einlagenhöhe und
+  Mindestdurchmesser, «zurück zum Normwert» beim Materialkennwert
+  (`zahlfeld({leer})`).
+* **«Plattendicke optimieren» ist ein Schalter** unter der Moduswahl. Alte
+  Dateien mit den Dickenmodi lesen sich richtig.
+* **Die Suche leert die Lagen nicht mehr.** Das Leeren sollte zeigen, dass
+  etwas passiert. Dafür musste die Oberfläche wissen, welche Posten der
+  Kern sucht, und die Anhebung der y-Lagen kam dort nie an. Jetzt zeigt es
+  der Laufbalken, und danach meldet die Suche ihr Ergebnis.
+* **⌀6 bieten die Pfeile nicht mehr an.** Eintippen geht weiter; die Suche
+  kannte ihn nie.
+* **Die gemeldete Stahlfläche zählt alle Lagen,** auch die unberührten
+  y-Lagen (Beispiel 3079 statt 1571 mm²). Welche Teilung gewinnt, ändert
+  sich dadurch nicht.
+* **Formelsammlung:** Der Schalter «Aktuelle Seite | Gesamt» war dort noch
+  ausgeblendet («zeigt immer alles»). Seit sie je Bestandteil filtert, kam
+  man so nicht mehr zu «Gesamt». Er steht jetzt wieder da. Das war ein
+  Fehler aus dem vorigen Auftrag.
+
+### Bewusst stehen gelassen
+
+* **Das Kürzel `art` der Urteile.** Das Review nannte es einen blossen
+  Rückfall. Es ist aber der feste Schlüssel der Nachweisart, an dem Tests
+  filtern. Ein Anzeigename ändert sich, wie die Umbenennung zu «Risse: …»
+  gezeigt hat.
+* **Ein Wächter statt eines generischen Lesers:** Die Leser bleiben von Hand
+  geschrieben, weil darin Altformate und Prüfungen stehen. Neu nehmen sie
+  ihre Vorgaben aber von der Klasse (`cls.h`, `vorgabe(cls, feld)`), und ein
+  Test prüft je Eintragsklasse, dass ein Wörterbuch mit nur den
+  Pflichtfeldern genau die Vorgaben ergibt.
+
+### Offen, nicht gewählt
+
+`stil.css` (über 1200 Zeilen) und `querkraft.py` (über 1100) aufteilen, die
+Querschnittszeichnung zerlegen, die acht `automatik_`-Felder als eigene
+Gruppe, `masse_pruefen` richtig benennen, `rechnetImBrowser` ohne Aufrufer.
+
+---
+
 ## 2026-09-26 · Orange und Gelb, Bügel im Querschnitt, Formeln je Bestandteil
 
 Wunsch: neue Farben für die Richtungen und die Ja/Nein-Schalter, die Bügel

@@ -228,18 +228,21 @@ Höhe, die es auf der Baustelle nicht gibt.
 
 Vorgegeben tragen darum die **2. und die 3. Lage** in x: die Querrichtung läuft
 unten und oben durch, die Tragrichtung liegt dazwischen. Wer anders verlegt,
-stellt die Richtung der 1. und der 4. Lage um; die beiden inneren bekommen
+stellt die Richtung einer Lage um; die andere Lage derselben Seite bekommt
 zwingend die Gegenrichtung.
 
-Die Bewehrungssuche fasst die y-Lagen nicht an. In y wird nichts nachgewiesen,
+Die Bewehrungssuche bemisst die y-Lagen nicht. In y wird nichts nachgewiesen,
 also gäbe es dort kein Mass, an dem sich ein Durchmesser bemessen liesse -- sie
-zöge ihn auf null, und genau das wäre falsch. Was in y liegt, sagt der Benutzer.
+zöge ihn auf null, und genau das wäre falsch. Was in y liegt, sagt der Benutzer,
+oder die y-Grundbewehrung folgt der x-Grundbewehrung («y-Grundbew. wie x»).
+Dünner als der Mindestdurchmesser bleibt sie aber nicht: die Grundbewehrung
+jeder Lage hat ihn mindestens.
 
 Mehr als die **Obergrenze** bekommt keine x-Lage: eingegeben wie eine Lage,
 Grund ⌀@s plus Zulage ⌀@s (Vorgabe ⌀30@150 = 4712 mm²/m), und es zählt die
-Summe je Lage. Zwei Modi suchen dazu die **dünnste Platte**: halbieren oder
-verdoppeln, dann Bisektion auf den Zentimeter -- nie unter die Mindestdicke
-(Vorgabe 150 mm) und nicht über 2 m.
+Summe je Lage. Mit dem Schalter «Plattendicke optimieren» sucht sie dazu die
+**dünnste Platte**: halbieren oder verdoppeln, dann Bisektion auf den
+Zentimeter -- nie unter die Mindestdicke (Vorgabe 150 mm) und nicht über 2 m.
 
 Schnittgrössen gehören damit immer zu x. Eine ältere Datei mit einem Lastfall
 in y lässt sich nicht öffnen; sie meldet, was zu tun ist. Ihn stillschweigend
