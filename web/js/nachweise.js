@@ -17,9 +17,10 @@
 
 import { api } from './api.js';
 import {
-  DURCHMESSER, erklaerung, feld, hakenSchalter, richtungVon, richtungsWahl,
+  erklaerung, feld, hakenSchalter, richtungsWahl,
 } from './bausteine.js';
 import { auswahl, el, melden, zahlfeld } from './dom.js';
+import { xLagen } from './lagen.js';
 import {
   aendern, ausVorlage, naechsterName, projektAendern, zustand,
 } from './zustand.js';
@@ -275,11 +276,6 @@ function nachweiskapitel(querschnitt, {
       el('span.kurvenhinweis', { text: (an && leer) ? 'keine x-Bewehrung' : '' }),
     ]),
   ]);
-}
-
-/** Welche der vier Lagen in x tragen -- in aller Regel die 2. und die 3. */
-function xLagen(querschnitt) {
-  return [1, 2, 3, 4].filter((n) => richtungVon(querschnitt, n) === 'x');
 }
 
 /**
@@ -614,7 +610,8 @@ export function automatikBlock(querschnitt) {
     // wie bei der Obergrenze durch die Durchmesser: von leer aus auf 2 mm
     // hiesse einen Stab, den es nicht gibt.
     feld('Mindestdurchmesser', zahlfeld({
-      wert: querschnitt.automatik_mindestdurchmesser || null, stufen: DURCHMESSER, min: 0,
+      wert: querschnitt.automatik_mindestdurchmesser || null,
+      stufen: zustand.katalog.durchmesser, min: 0,
       titel: 'Grundbew. jeder Lage mindestens mit diesem ⌀; leer: Lage darf leer bleiben',
       leer: 0,
       beiAenderung: (v) => aendern((q) => { q.automatik_mindestdurchmesser = v; }),
@@ -649,7 +646,7 @@ function obergrenze(querschnitt, aendern) {
       el('span.postenname', { text: name }),
       el('span.zeichen', { text: '⌀' }),
       zahlfeld({
-        wert: posten.durchmesser || null, stufen: DURCHMESSER, min: 0,
+        wert: posten.durchmesser || null, stufen: zustand.katalog.durchmesser, min: 0,
         titel: '⌀ in mm; Grund und Zulage leer: keine Obergrenze',
         leer: 0,
         beiAenderung: (v) => setzen('durchmesser', v),
@@ -691,65 +688,34 @@ function automatikLeiste(querschnitt) {
   ]);
 }
 
-/** Einmal suchen und das Ergebnis in die Lagen schreiben. */
+/**
+ * Einmal suchen und das Ergebnis in die Lagen schreiben.
+ *
+ * Die Lagen bleiben stehen, bis das Ergebnis da ist; dass gesucht wird,
+ * zeigt der Laufbalken. Früher wurden sie zuerst geleert -- dafür musste
+ * die Oberfläche wissen, welche Posten der Kern sucht, und wusste es bald
+ * nicht mehr (die Anhebung der y-Lagen kam dort nie an). Was herauskam,
+ * sagt jetzt die Meldung, auch wenn dieselben Durchmesser zurückkommen.
+ */
 async function bewehrungErmitteln(kennung) {
   laufendeSuche.add(kennung);
-  // Die gesuchten Lagen zuerst leeren -- sichtbar, im selben Augenblick.
-  //
-  // Die Suche fängt ohnehin bei null an (sie *ermittelt* die Bewehrung, sie
-  // legt nicht zu dem dazu, was dasteht). Vorher blieben die alten
-  // Durchmesser stehen, bis das Ergebnis kam, und wer denselben Durchmesser
-  // zurückbekam, sah nicht, ob überhaupt etwas passiert war.
-  //
-  // In y nur die Grundbewehrung, und nur, wenn sie x folgt -- sonst sucht
-  // die y-Lagen niemand, und sie bleiben wie eingetragen.
-  let vorher = null;
-  projektAendern((p) => {
-    const q = p.querschnitte.find((x) => x.kennung === kennung);
-    if (!q) return;
-    vorher = q.lagen.map((lage) => [lage.grund.durchmesser, lage.zulage.durchmesser]);
-    q.lagen.forEach((lage, i) => {
-      const x = richtungVon(q, i + 1) === 'x';
-      if (x || q.automatik_y_wie_x) lage.grund.durchmesser = 0;
-      if (x) lage.zulage.durchmesser = 0;
-    });
-  });
-  let gefunden = false;
+  aendern({}, 'bewehrungssuche-start');
   try {
     const antwort = await api.bewehrungSuchen(zustand.projekt, kennung);
-    gefunden = antwort.gefunden;
-    if (gefunden) {
+    if (antwort.gefunden) {
       // Der Kern gibt das fertige Projekt zurück; übernommen wird die eine
       // gesuchte Platte, damit die anderen unberührt bleiben -- mit der
-      // neuen Dicke, wenn der Modus sie gesucht hat.
+      // neuen Dicke, wenn sie gesucht wurde.
       projektAendern((p) => {
         const alt = p.querschnitte.findIndex((x) => x.kennung === kennung);
         const neu = antwort.projekt?.querschnitte?.find((x) => x.kennung === kennung);
         if (alt >= 0 && neu) p.querschnitte[alt] = neu;
       });
-      // Welche Dicken geprüft wurden, sieht man sonst nirgends.
-      if (antwort.dicke) melden(antwort.begruendung);
-    } else {
-      // Nichts gefunden heisst: die Lagen kommen zurück, wie sie waren (unten).
-      // Das sieht man nicht von selbst, also sagt es die Meldungszeile oben --
-      // dort, wo auch sonst steht, was schiefging.
-      melden(antwort.begruendung, true);
     }
+    melden(antwort.begruendung, !antwort.gefunden);
   } catch (fehler) {
     melden(String(fehler.message || fehler), true);
   } finally {
-    // Geleert waren die Lagen nur als Zeichen, dass gesucht wird. Ohne
-    // Ergebnis die Durchmesser von vorher -- wo das Feld noch leer ist; was
-    // jemand inzwischen eingetragen hat, bleibt.
-    if (!gefunden && vorher) {
-      projektAendern((p) => {
-        p.querschnitte.find((x) => x.kennung === kennung)?.lagen.forEach((lage, i) => {
-          const [grund, zulage] = vorher[i];
-          if (!lage.grund.durchmesser) lage.grund.durchmesser = grund;
-          if (!lage.zulage.durchmesser) lage.zulage.durchmesser = zulage;
-        });
-      });
-    }
     // Zuletzt und immer. Hing das Neuzeichnen am Zweig, blieb der Knopf auf
     // «sucht …» stehen, und man musste ein zweites Mal drücken.
     laufendeSuche.delete(kennung);

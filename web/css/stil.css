@@ -384,8 +384,6 @@ input[readonly], input:disabled, select:disabled {
 .schalter-halb.ist-x.ist-an     { background: var(--richtung-x); color: #fff; }
 .schalter-halb.ist-y.ist-an     { background: var(--richtung-y); color: var(--schrift); }
 .schalter-halb.ist-beide.ist-an { background: var(--beide); color: #fff; }
-/* Unsichtbar, aber mit seinem Platz: sonst sprängen die Reiter daneben. */
-.schalter.ist-verborgen { visibility: hidden; }
 
 /* Ein Posten auf einer Zeile: × Name ⌀ [d] @ [s] mm [Umschalter] */
 .postenzeile {

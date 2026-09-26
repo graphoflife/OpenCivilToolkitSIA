@@ -17,11 +17,12 @@
  * Oberfläche nachgerechneter.
  */
 
-import { DURCHMESSER, feld, richtungVon } from './bausteine.js';
+import { feld } from './bausteine.js';
 import { auswahl, el, ersetzen, melden, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
 import { analysenBlock, automatikBlock, nachweiseBlock } from './nachweise.js';
 import { blattZeichnen } from './gleichungen.js';
+import { partnerVon, richtungSetzen, richtungVon } from './lagen.js';
 import {
   aendern, gewaehltesBlatt, gewaehltesMaterial, gewaehlterQuerschnitt, kennwertId,
   projektAendern, zustand,
@@ -268,7 +269,7 @@ function postenZeile(querschnitt, nummer, welcher, beschriftung) {
     el('span.postenname', { text: beschriftung }),
     el('span.zeichen', { text: '⌀' }),
     zahlfeld({
-      wert: posten.durchmesser || null, stufen: DURCHMESSER, min: 0,
+      wert: posten.durchmesser || null, stufen: zustand.katalog.durchmesser, min: 0,
       titel: '⌀ in mm; leer oder 0: keine Bewehrung',
       leer: 0,
       beiAenderung: (v) => aendern((x) => { x.durchmesser = v; }),
@@ -301,7 +302,7 @@ function lagenBlock(querschnitt, nummer) {
   const lage = querschnitt.lagen[nummer - 1];
   const staehle = zustand.projekt.materialien.filter((m) => m.art === 'betonstahl');
   const richtung = richtungVon(querschnitt, nummer);
-  const partner = { 1: 2, 2: 1, 3: 4, 4: 3 }[nummer];
+  const partner = partnerVon(nummer);
   const leer = !(lage.grund.durchmesser > 0 || lage.zulage.durchmesser > 0);
 
   return el('div.lage', { class: `lage-${richtung} ${leer ? 'ist-leer' : ''}` }, [
@@ -373,16 +374,11 @@ function lageSchalter(querschnitt, nummer, lage) {
 
 /** Zweistellungs-Schalter x|y. Die Partnerlage folgt zwingend der Gegenrichtung. */
 function richtungsSchalter(querschnitt, nummer, richtung, partner) {
-  // Gespeichert ist die Richtung der äusseren Lage (1 und 4); die innere hat
-  // immer die Gegenrichtung. Wer an der inneren schaltet, stellt also die
-  // äussere auf das Gegenteil -- beide Schalter eines Paars zeigen dasselbe
-  // Paar, nur von der anderen Seite.
+  // Beide Schalter eines Paars zeigen dasselbe Paar, nur von der anderen
+  // Seite -- wie gespeichert wird, weiss lagen.js.
   const setzen = (wert) => projektAendern((p) => {
-    const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
-    const aussen = nummer === 1 || nummer === 4;
-    const gespeichert = aussen ? wert : { x: 'y', y: 'x' }[wert];
-    if (nummer <= 2) q.richtung_lage1 = gespeichert;
-    else q.richtung_lage4 = gespeichert;
+    richtungSetzen(p.querschnitte.find((x) => x.kennung === querschnitt.kennung),
+      nummer, wert);
   });
 
   return el('span.schalter', {
@@ -448,7 +444,7 @@ function querkraftBlock(querschnitt) {
       }),
       el('span.zeichen', { text: '⌀' }),
       zahlfeld({
-        wert: buegel.durchmesser || null, stufen: DURCHMESSER, min: 0,
+        wert: buegel.durchmesser || null, stufen: zustand.katalog.durchmesser, min: 0,
         titel: 'Bügel-⌀ in mm; leer oder 0: keine Bügel',
         leer: 0,
         beiAenderung: (v) => aendern((x) => { x.durchmesser = v; }),

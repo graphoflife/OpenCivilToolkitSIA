@@ -18,7 +18,7 @@ from __future__ import annotations
 import math
 from typing import Any, Dict, List, Optional
 
-from opencivil.bewehrungssuche import Suchmodus
+from opencivil.bewehrungssuche import DURCHMESSER, Suchmodus
 from opencivil.core.einheiten import MM
 from opencivil.bericht.formelsammlung import Thema
 from opencivil.bericht.markdown import block_markdown
@@ -131,6 +131,9 @@ def katalog() -> dict:
              "fliessnachweis": GrenzeGegenFliessen.gilt_bei(wert)}
             for wert, text in RISSANFORDERUNGEN.items()
         ],
+        # Die lieferbaren Stabdurchmesser -- die Stufen der Durchmesserfelder
+        # und die Liste, durch die die Suche geht. Eine Liste, nicht zwei.
+        "durchmesser": list(DURCHMESSER),
         "suchmodi": [
             {"wert": m.value, "beschriftung": m.beschriftung}
             for m in Suchmodus

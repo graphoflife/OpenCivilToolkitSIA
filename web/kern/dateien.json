@@ -55,7 +55,7 @@
     "opencivil/querschnitt/werkstoffgesetz.py": "7b425b08ac0a",
     "opencivil/spannungsanalyse.py": "f0a37d33b984",
     "opencivil/web/__init__.py": "e3b0c44298fc",
-    "opencivil/web/api.py": "aa4a2242a3dc",
+    "opencivil/web/api.py": "51fd82cb3154",
     "opencivil/web/bruecke.py": "d8aeb4a299b7",
     "opencivil/web/diagrammdaten.py": "411a020372bb",
     "opencivil/web/dienst.py": "8ebb5135ad72",

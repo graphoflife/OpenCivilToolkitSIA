@@ -13,14 +13,6 @@ import { el } from './dom.js';
 import { span } from './mathe.js';
 
 /**
- * Lieferbare Stabdurchmesser in mm -- die Stufen der Durchmesserfelder.
- *
- * Oberhalb von 22 mm wird die Reihe grober -- deshalb eine Liste und kein
- * gleichmässiger Schritt.
- */
-export const DURCHMESSER = [6, 8, 10, 12, 14, 16, 18, 20, 22, 26, 30, 34, 40];
-
-/**
  * Eine Zeile Beschriftung – Eingabe – Einheit.
  *
  * `beschriftung` ist entweder Klartext oder eine Liste von Knoten. Letzteres
@@ -36,16 +28,6 @@ export function feld(beschriftung, eingabe, einheit, titel) {
     eingabe,
     el('span.einheit', { text: einheit || '' }),
   ]);
-}
-
-export function richtungVon(querschnitt, nummer) {
-  const gegen = (r) => (r === 'x' ? 'y' : 'x');
-  return {
-    1: querschnitt.richtung_lage1,
-    2: gegen(querschnitt.richtung_lage1),
-    3: gegen(querschnitt.richtung_lage4),
-    4: querschnitt.richtung_lage4,
-  }[nummer];
 }
 
 /**
