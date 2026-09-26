@@ -326,6 +326,12 @@ class Formelzeile:
     nachsatz: str = ""
     """Was hinter dem Resultat steht: ein Vergleich mit Urteil, ein Hinweis."""
 
+    vorlage: Optional[str] = None
+    """Die Vorlage mit ``@name`` -- dieselbe Formel, gleich welche Zahlen."""
+
+    einheiten: str = ""
+    """Bei empirischen Formeln: in welchen Einheiten die Zahlen eingehen."""
+
     @classmethod
     def bauen(
         cls,
@@ -358,6 +364,7 @@ class Formelzeile:
         einheiten = [rf"{eingaben[name].symbol}\ \text{{in}}\ {einheit.latex}"
                      for name, einheit in (empirisch or {}).items()
                      if einheit is not EINHEITSLOS and name in eingaben]
+        hinweis = ""
         if einheiten:
             trenner = r",\ "
             hinweis = rf"\quad \left({trenner.join(einheiten)}\right)"
@@ -369,6 +376,8 @@ class Formelzeile:
                                           empirisch=empirisch),
             ergebnis=ergebnis.zahl_latex(),
             nachsatz=nachsatz,
+            vorlage=vorlage,
+            einheiten=hinweis,
         )
 
     # -- Darstellung --------------------------------------------------------

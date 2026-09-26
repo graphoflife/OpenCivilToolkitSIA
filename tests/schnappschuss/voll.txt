@@ -51,10 +51,6 @@ Randabstände, Tiefen ab Oberkante und Bewehrungsquerschnitte
 Resistenzlinie aus Handrechnung – x-Richtung
 --------------------------------------------
 
-Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f_cd; gedrückter Stahl bleibt
-unberücksichtigt. Die Bewehrung ist je Seite zu einer Lage zusammengefasst, das Moment bezieht sich
-auf die halbe Querschnittshöhe.
-
 Schwerpunkt der zusammengefassten Lage – 2. Lage Grundbewehrung + 2. Lage Zulage
     \begin{aligned}
       z_{2,x} &= \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}} \\
@@ -113,7 +109,7 @@ Momentenwiderstand bei reiner Biegung
       &= 235.9\,\mathrm{kNm}
     \end{aligned}
 
-Nulllinie auf halber Höhe: x = h/2
+Nulllinie auf halber Höhe
     x^{+} = \frac{h}{2} = \frac{300\,\mathrm{mm}}{2} = 150\,\mathrm{mm}
 
 Dehnung der Zugbewehrung
@@ -156,7 +152,7 @@ Momentenwiderstand bei reiner Biegung
       &= -79.9\,\mathrm{kNm}
     \end{aligned}
 
-Nulllinie auf halber Höhe: x = h/2
+Nulllinie auf halber Höhe
     x^{-} = \frac{h}{2} = \frac{300\,\mathrm{mm}}{2} = 150\,\mathrm{mm}
 
 Dehnung der Zugbewehrung
@@ -260,17 +256,8 @@ Querschnitt eines Bügelschenkels   [SIA 262:2025, 5.5.2]
 Querkraft – x-Richtung
 ----------------------
 
-Querkraftwiderstand mit Querkraftbewehrung, Fachwerkmodell mit veränderlicher Neigung der
-Druckdiagonalen. Massgebend ist das Kleinere aus dem Widerstand der Bügel und dem der
-Druckdiagonalen; der Betonanteil ohne Bügel geht nicht zusätzlich ein.
-
 Ansatz   [SIA 262:2025, 4.3.3.4]
     V_{Rd,s} = \frac{A_{\varnothing,V}}{s_{V,x} \cdot s_{V,y}} \cdot 0.9 \cdot d \cdot f_{yd} \cdot \cot\alpha \qquad V_{Rd,c} = 0.9 \cdot d \cdot k_c \cdot f_{cd} \cdot \sin\alpha \cdot \cos\alpha
-
-Beide Anteile gelten je Laufmeter, wie die Querkraft selbst. Gesucht wird ganzgradig zwischen α_min
-und α_max die Neigung mit dem grössten Widerstand V_Rd = min(V_Rd,s; V_Rd,c). Bei einer
-Normalzugkraft steilt sich die Druckdiagonale auf: α_min wird dann auf 40° gesetzt und α_max
-notfalls mitgehoben.
 
 Teilung in y aus der Stabzahl
     s_{V,y} = \frac{b}{n_{V,y}} = \frac{1000\,\mathrm{mm}}{5} = 200\,\mathrm{mm}
@@ -284,7 +271,7 @@ Einwirkung
 Statische Höhe der Lage unten, ab dem gedrückten Rand oben
     d = z_{2,x,g} = 249\,\mathrm{mm}
 
-Zwischen α = 30° und α = 45° ganzgradig durchgerechnet; den grössten Widerstand liefert α = 30°.
+α = 30° … 45° ganzgradig → grösster Widerstand bei α = 30°.
 
 Widerstand der Bügel
     \begin{aligned}
@@ -319,7 +306,7 @@ Einwirkung
 Statische Höhe der Lage oben, ab dem gedrückten Rand unten
     d = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
 
-Zwischen α = 30° und α = 45° ganzgradig durchgerechnet; den grössten Widerstand liefert α = 30°.
+α = 30° … 45° ganzgradig → grösster Widerstand bei α = 30°.
 
 Widerstand der Bügel
     \begin{aligned}
@@ -348,19 +335,11 @@ Erfüllungsgrad
 Duktilität
 ----------
 
-Die Druckzone muss schlank bleiben, damit der Stahl lange fliesst, bevor der Beton versagt: der
-Querschnitt kündigt sein Versagen an. Gerechnet wird die Druckzonenhöhe bei reiner Biegung, je Lage
-einzeln.
-
 Kräftegleichgewicht bei M_Ed = 0   [SIA 262:2025, 4.1.4.2.5]
     0.85 \cdot x \cdot b \cdot f_{cd} = A_s \cdot f_{sd} \qquad \Rightarrow \qquad x = \frac{A_s \cdot f_{sd}}{0.85 \cdot b \cdot f_{cd}}
 
 Bedingung
     \frac{x}{d} \le 0.35
-
-d wird von der gedrückten Randfaser aus gemessen: bei den unteren Lagen von der Oberkante, bei den
-oberen von der Unterkante. Grundbewehrung und Zulage einer Lage zählen mit ihrem gemeinsamen
-Schwerpunkt.
 
 Duktilität – 2. Lage
 --------------------
@@ -402,13 +381,10 @@ Bezogene Druckzonenhöhe   [SIA 262:2025, 4.1.4.2.5]
 Erfüllungsgrad
     \alpha_{eff,D,3} = \frac{\left(x/d\right)_{max}}{\left(x/d\right)_{3}} = \frac{0.35}{0.077} = 4.57
 
-Massgebend ist die 2. Lage mit dem kleineren Erfüllungsgrad; sie steht in der Zusammenfassung.
+Massgebend: 2. Lage (kleinster Erfüllungsgrad).
 
 Sprödes Versagen unter Zwängung – x-Richtung
 --------------------------------------------
-
-Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Die Bewehrung muss die
-Kraft übernehmen können, die der Beton beim Reissen abgibt – erst dann kündigt sich das Versagen an.
 
 Rissaktive Plattendicke
     h_{eff} = \min\left[500\,\mathrm{mm};\ h\right] = \min\left[500\,\mathrm{mm};\ 300\,\mathrm{mm}\right] = 300\,\mathrm{mm}
@@ -468,14 +444,10 @@ Aufnehmbare Risskraft
 Erfüllungsgrad
     \alpha_{eff,NR,3,x} = \frac{N_{s,adm,3,x}}{N_{Riss}} = \frac{351.6\,\mathrm{kN}}{378.3\,\mathrm{kN}} = 0.93
 
-Massgebend ist die 3. Lage mit dem kleineren Erfüllungsgrad; sie steht in der Zusammenfassung.
+Massgebend: 3. Lage (kleinster Erfüllungsgrad).
 
 Sprödes Versagen – x-Richtung
 -----------------------------
-
-Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Nachgewiesen wird
-deshalb, dass der bewehrte Querschnitt mehr trägt als der unbewehrte im Augenblick des Risses:
-M_Rd(N_Ed = 0) ≥ M_Riss.
 
 Beiwert für die Plattendicke   [SIA 262:2025, 4.4.1.3]
     k_t = \frac{1}{1 + 0.5 \cdot h/3} = \frac{1}{1 + 0.5 \cdot 0.3/3} = 0.952 \quad \left(h\ \text{in}\ \mathrm{m}\right)
@@ -504,15 +476,10 @@ Biegewiderstand gegen Rissmoment
 Erfüllungsgrad
     \alpha_{eff,SV,3,x} = \frac{M_{Rd,x}(N_{Ed} = 0)_{3}}{M_{Riss}} = \frac{79.9\,\mathrm{kNm}}{41.4\,\mathrm{kNm}} = 1.93
 
-Massgebend ist die 3. Lage mit dem kleineren Erfüllungsgrad; sie steht in der Zusammenfassung.
+Massgebend: 3. Lage (kleinster Erfüllungsgrad).
 
 Zwängung auf Biegung – x-Richtung
 ---------------------------------
-
-Eine aufgezwungene Krümmung erzeugt beim Reissen ein Moment, das die Bewehrung übernehmen muss –
-ohne über die zulässige Stahlspannung zu kommen. Nicht zu verwechseln mit dem Nachweis gegen sprödes
-Versagen: dort steht der Biegewiderstand gegen das Rissmoment, hier die Stahlspannung gegen ihre
-Grenze.
 
 Beiwert für die Plattendicke   [SIA 262:2025, 4.4.2]
     k_t = \frac{1}{1 + 0.5 \cdot h/3} = \frac{1}{1 + 0.5 \cdot 0.3/3} = 0.952 \quad \left(h\ \text{in}\ \mathrm{m}\right)
@@ -523,16 +490,8 @@ Wirksame Zugfestigkeit
 Rissmoment des ungerissenen Querschnitts
     M_{Riss} = f_{ct,eff} \cdot \frac{h^{2} \cdot b}{6} = 2.76\,\mathrm{N}/\mathrm{mm}^{2} \cdot \frac{\left(300\,\mathrm{mm}\right)^{2} \cdot 1000\,\mathrm{mm}}{6} = 41.4\,\mathrm{kNm}
 
-Das Rissmoment gilt für den ungerissenen Bruttoquerschnitt – den Zustand vor dem Riss. Der
-Widerstand dagegen wird am gerissenen Querschnitt bestimmt, also für den Augenblick danach. Dass
-zwei verschiedene Querschnitte auftreten, ist genau die Frage: reicht die Bewehrung für das, was der
-Beton abgibt?
-
 Wertigkeit im gerissenen Zustand
     n = \frac{E_s}{E_{cm}} \cdot \left(1 + \varphi\right) = \frac{200000\,\mathrm{N}/\mathrm{mm}^{2}}{33620\,\mathrm{N}/\mathrm{mm}^{2}} \cdot \left(1 + 2\right) = 17.85
-
-Das Kriechen weicht den Beton auf: E_c,eff = E_cm/(1+φ), und die Wertigkeit ist E_s/E_c,eff. Ein
-grösseres φ senkt damit den Hebelarm und liegt auf der sicheren Seite.
 
 Zwängung auf Biegung – 2. Lage x
 --------------------------------
@@ -573,9 +532,6 @@ Nulllinie des gerissenen Querschnitts
 Innerer Hebelarm
     z = d_{2,x} - \frac{x}{3} = 248.1\,\mathrm{mm} - \frac{109.9\,\mathrm{mm}}{3} = 211.4\,\mathrm{mm}
 
-Die Betondruckspannung verläuft dreieckig – null in der Nulllinie, am grössten an der gedrückten
-Kante. Ihre Resultierende liegt deshalb bei x/3 von dieser Kante.
-
 Aufnehmbares Moment der Bewehrung
     \begin{aligned}
       M_{s,adm,2,x} &= \sigma_{s,adm,2,x} \cdot A_{s,2,x} \cdot z \\
@@ -612,9 +568,6 @@ Nulllinie des gerissenen Querschnitts
 Innerer Hebelarm
     z = d_{3,x,g} - \frac{x}{3} = 252\,\mathrm{mm} - \frac{70\,\mathrm{mm}}{3} = 228.7\,\mathrm{mm}
 
-Die Betondruckspannung verläuft dreieckig – null in der Nulllinie, am grössten an der gedrückten
-Kante. Ihre Resultierende liegt deshalb bei x/3 von dieser Kante.
-
 Aufnehmbares Moment der Bewehrung
     \begin{aligned}
       M_{s,adm,3,x} &= \sigma_{s,adm,3,x} \cdot A_{s,3,x,g} \cdot z \\
@@ -625,15 +578,10 @@ Aufnehmbares Moment der Bewehrung
 Erfüllungsgrad
     \alpha_{eff,ZB,3,x} = \frac{M_{s,adm,3,x}}{M_{Riss}} = \frac{80.4\,\mathrm{kNm}}{41.4\,\mathrm{kNm}} = 1.94
 
-Massgebend ist die 3. Lage mit dem kleineren Erfüllungsgrad; sie steht in der Zusammenfassung.
+Massgebend: 3. Lage (kleinster Erfüllungsgrad).
 
 Stahlspannung unter quasi-ständiger Einwirkung – x-Richtung
 -----------------------------------------------------------
-
-Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei
-der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen
-Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf, im Druck
-rechnet er linear mit dem wirksamen Modul. Gezählt wird nur gezogene Bewehrung.
 
 Wirksamer Elastizitätsmodul
     E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 17.85
@@ -651,59 +599,14 @@ Zulässige Stahlspannung (Rissbreite w_nom = 0.5 mm)   [SIA 262:2025, 4.4.2]
 Welche Werte angesetzt werden
 -----------------------------
 
-Drei Festlegungen stecken in jeder Zahl unten, und alle drei sind Auslegung der Norm und nicht
-Rechnung. Erstens das Kriechen: angesetzt wird dasselbe φ wie sonst, hier aus der Eingabe. Das liegt
-auf der sicheren Seite – ein grösseres φ weicht den Beton auf, die Druckzone wächst, der Hebelarm
-wird kleiner und die Stahlspannung damit grösser. Wer φ = 0 setzte, bekäme kleinere Spannungen und
-einen Nachweis, der leichter aufgeht.
-
-Zweitens die Werkstoffgesetze: sie rechnen mit den charakteristischen Festigkeiten. Der Stahl ist
-linear bis f_yk und fliesst dann, der Beton linear bis f_ck. Ein Gebrauchsnachweis fragt, was der
-Querschnitt tut, und nicht, was er darf – der Teilsicherheitsbeiwert gehört in die Tragsicherheit.
-Läge das Plateau bei f_yd, bliebe jede Stahlspannung darunter, und eine Grenze darüber könnte nie
-überschritten werden.
-
 Werkstoffgesetze im Gebrauchszustand
     \sigma_s = \min\left[E_s \cdot \varepsilon_s;\ f_{yk}\right] \quad f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \qquad \sigma_c = \max\left[E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right] \quad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
-
-Drittens die Grenze: dieselbe wie bei der Zwängung, mit f_yk und bei erhöhter und hoher Anforderung
-zusätzlich begrenzt durch die Rissbreite. Massgebend ist der dickste Stab der Tragrichtung. Welche
-Lage die grösste Zugspannung trägt, wechselt mit dem Lastfall – bei einem Feldmoment die untere, bei
-einem Stützmoment die obere –, und der dickste Stab gibt die kleinste zulässige Spannung. Das liegt
-für beide auf der sicheren Seite.
-
-Fliesst die Bewehrung, bleibt ihre Spannung bei f_yk stehen, während die Dehnung weiterwächst.
-Verglichen wird dann die Dehnung: ε_s gegen ε_s,adm = σ_s,adm / E_s. Solange der Stahl elastisch
-bleibt, ist das genau der Spannungsvergleich; fliesst er, fällt der Nachweis durch, und zwar um so
-deutlicher, je weiter er gedehnt ist.
 
 Wie die Dehnungsebene gefunden wird
 -----------------------------------
 
-Die Dehnungsebene wird gesucht, nicht hergeleitet. Eine ebene Dehnungsverteilung hat zwei Unbekannte
-– die Dehnung in der Mittelebene ε_m und die Krümmung χ – und ihnen stehen zwei
-Gleichgewichtsbedingungen gegenüber: N und M. Geschlossen auflösen lässt sich das nicht, weil die
-Werkstoffgesetze nichtlinear sind.
-
 Dehnungsebene und innere Kräfte
     \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \frac{h}{2}\right) \qquad N_{int} = \int_A \sigma\left(\varepsilon\right)\,\mathrm{d}A \qquad M_{int} = \int_A \sigma\left(\varepsilon\right) \cdot \left(z - \frac{h}{2}\right)\,\mathrm{d}A
-
-Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebildet, jede mit der
-Spannung in ihrer Mitte; der Stahl kommt Lage für Lage dazu, und die von ihm verdrängte Betonfläche
-wird abgezogen, damit dieselbe Fläche nicht zweimal zählt.
-
-Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer festgehaltenen Krümmung χ wird ε_m
-so lange halbiert, bis N_int die verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung
-immer mehr Zug bedeutet. Aussen: mit diesem ε_m bleibt ein Moment übrig, und χ wird so lange
-halbiert, bis auch M_int stimmt – hier trägt die Monotonie, dass mehr Krümmung mehr Moment heisst.
-
-Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.0 ‰ bis 45.0 ‰). Jenseits davon geben
-die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Halbierung liefe auf
-eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine
-Gleichgewichtslage – dann sagt der Nachweis das und rät nicht.
-
-Nachgewiesen wird deshalb nicht der Weg, sondern das Ergebnis: dass die gefundene Ebene genau die
-angegebenen Schnittgrössen erzeugt. Diese Probe steht bei jedem Fall.
 
 Quasi-ständiger Lastfall – Feld (60 %)
 --------------------------------------
@@ -780,10 +683,6 @@ Erfüllungsgrad
 Stahlspannung unter häufiger Einwirkung – x-Richtung
 ----------------------------------------------------
 
-Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst bleiben Risse und Durchbiegung
-dauerhaft. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf, im Druck
-rechnet er linear mit dem wirksamen Modul. Gezählt wird nur gezogene Bewehrung.
-
 Wirksamer Elastizitätsmodul
     E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 17.85
 
@@ -793,59 +692,14 @@ Zulässige Stahlspannung   [SIA 262:2025, Tabelle 17]
 Welche Werte angesetzt werden
 -----------------------------
 
-Drei Festlegungen stecken in jeder Zahl unten, und alle drei sind Auslegung der Norm und nicht
-Rechnung. Erstens das Kriechen: angesetzt wird dasselbe φ wie sonst, hier aus der Eingabe. Das liegt
-auf der sicheren Seite – ein grösseres φ weicht den Beton auf, die Druckzone wächst, der Hebelarm
-wird kleiner und die Stahlspannung damit grösser. Wer φ = 0 setzte, bekäme kleinere Spannungen und
-einen Nachweis, der leichter aufgeht.
-
-Zweitens die Werkstoffgesetze: sie rechnen mit den charakteristischen Festigkeiten. Der Stahl ist
-linear bis f_yk und fliesst dann, der Beton linear bis f_ck. Ein Gebrauchsnachweis fragt, was der
-Querschnitt tut, und nicht, was er darf – der Teilsicherheitsbeiwert gehört in die Tragsicherheit.
-Läge das Plateau bei f_yd, bliebe jede Stahlspannung darunter, und eine Grenze darüber könnte nie
-überschritten werden.
-
 Werkstoffgesetze im Gebrauchszustand
     \sigma_s = \min\left[E_s \cdot \varepsilon_s;\ f_{yk}\right] \quad f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \qquad \sigma_c = \max\left[E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right] \quad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
-
-Drittens die Grenze: sie rechnet mit dem Bemessungswert, σ_s,adm = f_yd − 80 N/mm², und nicht mit
-f_yk − 80. Die Norm sagt an dieser Stelle nicht eindeutig, welcher Wert gemeint ist; f_yd ist die
-strengere Wahl – die Grenze liegt rund 15 % tiefer –, gewählt ist deshalb die Seite, auf der man
-nicht danebenliegen kann. Das ist etwas anderes als das Fliessplateau oben: dort geht es darum, was
-der Stahl tut, hier darum, wie viel Abstand man davon verlangt.
-
-Fliesst die Bewehrung, bleibt ihre Spannung bei f_yk stehen, während die Dehnung weiterwächst.
-Verglichen wird dann die Dehnung: ε_s gegen ε_s,adm = σ_s,adm / E_s. Solange der Stahl elastisch
-bleibt, ist das genau der Spannungsvergleich; fliesst er, fällt der Nachweis durch, und zwar um so
-deutlicher, je weiter er gedehnt ist.
 
 Wie die Dehnungsebene gefunden wird
 -----------------------------------
 
-Die Dehnungsebene wird gesucht, nicht hergeleitet. Eine ebene Dehnungsverteilung hat zwei Unbekannte
-– die Dehnung in der Mittelebene ε_m und die Krümmung χ – und ihnen stehen zwei
-Gleichgewichtsbedingungen gegenüber: N und M. Geschlossen auflösen lässt sich das nicht, weil die
-Werkstoffgesetze nichtlinear sind.
-
 Dehnungsebene und innere Kräfte
     \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \frac{h}{2}\right) \qquad N_{int} = \int_A \sigma\left(\varepsilon\right)\,\mathrm{d}A \qquad M_{int} = \int_A \sigma\left(\varepsilon\right) \cdot \left(z - \frac{h}{2}\right)\,\mathrm{d}A
-
-Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebildet, jede mit der
-Spannung in ihrer Mitte; der Stahl kommt Lage für Lage dazu, und die von ihm verdrängte Betonfläche
-wird abgezogen, damit dieselbe Fläche nicht zweimal zählt.
-
-Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer festgehaltenen Krümmung χ wird ε_m
-so lange halbiert, bis N_int die verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung
-immer mehr Zug bedeutet. Aussen: mit diesem ε_m bleibt ein Moment übrig, und χ wird so lange
-halbiert, bis auch M_int stimmt – hier trägt die Monotonie, dass mehr Krümmung mehr Moment heisst.
-
-Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.0 ‰ bis 45.0 ‰). Jenseits davon geben
-die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Halbierung liefe auf
-eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine
-Gleichgewichtslage – dann sagt der Nachweis das und rät nicht.
-
-Nachgewiesen wird deshalb nicht der Weg, sondern das Ergebnis: dass die gefundene Ebene genau die
-angegebenen Schnittgrössen erzeugt. Diese Probe steht bei jedem Fall.
 
 Häufiger Lastfall – Feld (70 %)
 -------------------------------
@@ -922,15 +776,6 @@ Erfüllungsgrad
 Knicken
 -------
 
-Nachgewiesen wird am verformten System. Die Ausmitte zweiter Ordnung hängt von der Krümmung ab, die
-Krümmung vom Moment und das Moment wieder von der Ausmitte – also wird die Folge so lange
-durchlaufen, bis sie einläuft. Läuft sie nicht ein, gibt es keine Gleichgewichtslage: das System
-knickt.
-
-Der Erfüllungsgrad ist ein Verhältnis von Normalkräften: N_Rd ist die grösste Druckkraft, unter der
-der Stab noch steht. Über Momente zu vergleichen ginge nur, solange es ein Gleichgewicht gibt – beim
-Knicken ist gerade das der Fall, der fehlt.
-
 Ungewollte Ausmitte – allgemein   [SIA 262:2025, 4.3.7]
     \alpha_i = \min\left[\max\left(\frac{0.01}{\sqrt{l}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \qquad e_{0d} = \max\left(\frac{d}{30};\ \frac{\alpha_i \cdot l_{cr}}{2}\right)
 
@@ -940,46 +785,11 @@ Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein
 Steifigkeit des Betons
     E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2}
 
-Angesetzt wird das Kriechen mit demselben φ wie sonst, hier aus der Eingabe. Beim Knicken ist das
-nicht bloss zulässig, sondern wesentlich: ein aufgeweichter Beton verformt sich mehr, die Ausmitte
-zweiter Ordnung wächst, und der Stab knickt früher. φ = 0 läge hier deutlich auf der unsicheren
-Seite.
-
-Die Festigkeiten sind Bemessungswerte – f_cd und f_yd, nicht die charakteristischen. Gerechnet wird
-mit dem nichtlinearen Betongesetz; im Bereich der Gebrauchslasten unterscheidet es sich kaum vom
-linearen, in der Nähe der Grenzlast erheblich, und genau dort entscheidet sich, ob es noch eine
-Gleichgewichtslage gibt.
-
 Wie die Dehnungsebene gefunden wird
 -----------------------------------
 
-Die Dehnungsebene wird gesucht, nicht hergeleitet. Eine ebene Dehnungsverteilung hat zwei Unbekannte
-– die Dehnung in der Mittelebene ε_m und die Krümmung χ – und ihnen stehen zwei
-Gleichgewichtsbedingungen gegenüber: N und M. Geschlossen auflösen lässt sich das nicht, weil die
-Werkstoffgesetze nichtlinear sind.
-
 Dehnungsebene und innere Kräfte
     \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \frac{h}{2}\right) \qquad N_{int} = \int_A \sigma\left(\varepsilon\right)\,\mathrm{d}A \qquad M_{int} = \int_A \sigma\left(\varepsilon\right) \cdot \left(z - \frac{h}{2}\right)\,\mathrm{d}A
-
-Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebildet, jede mit der
-Spannung in ihrer Mitte; der Stahl kommt Lage für Lage dazu, und die von ihm verdrängte Betonfläche
-wird abgezogen, damit dieselbe Fläche nicht zweimal zählt.
-
-Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer festgehaltenen Krümmung χ wird ε_m
-so lange halbiert, bis N_int die verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung
-immer mehr Zug bedeutet. Aussen: mit diesem ε_m bleibt ein Moment übrig, und χ wird so lange
-halbiert, bis auch M_int stimmt – hier trägt die Monotonie, dass mehr Krümmung mehr Moment heisst.
-
-Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.0 ‰ bis 45.0 ‰). Jenseits davon geben
-die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Halbierung liefe auf
-eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine
-Gleichgewichtslage – dann sagt der Nachweis das und rät nicht.
-
-Nachgewiesen wird deshalb nicht der Weg, sondern das Ergebnis: dass die gefundene Ebene genau die
-angegebenen Schnittgrössen erzeugt. Diese Probe steht bei jedem Fall.
-
-Die Ausmitten-Iteration darüber steht dagegen vollständig da, Durchlauf für Durchlauf: sie ist das
-Verfahren selbst, und dass sie einläuft, ist die Aussage des Nachweises.
 
 Knicken – Wand
 --------------
@@ -1003,9 +813,6 @@ Gewollte Ausmitte
 Das Verfahren   [SIA 262:2025, 4.3.7]
     e_{2d}^{(k)} = \left|\chi^{(k)}\right| \cdot \frac{l_{cr}^{2}}{\pi^{2}} \qquad M_{Ed,II}^{(k)} = \left|N_{Ed}\right| \cdot \left(e_{0d} + e_{1d} + e_{2d}^{(k-1)}\right)
 
-Zu jedem Moment wird die Dehnungsebene gesucht, die es im Gleichgewicht hält; aus deren Krümmung
-folgt die nächste Ausmitte. Begonnen wird mit e_2d = 0, also ohne Verformung.
-
 Ausmitten-Iteration bei N_Ed = 800.0 kN
     k  e_{2d}^{(k-1)}\ [\mathrm{mm}]  M_{Ed,II}^{(k)}\ [\mathrm{kNm}]  \chi^{(k)}\ [\mathrm{m}^{-1}]  e_{2d}^{(k)}\ [\mathrm{mm}]
     -  -----------------------------  -------------------------------  -----------------------------  ---------------------------
@@ -1019,11 +826,6 @@ Probe: die gefundene Ebene erzeugt die Schnittgrössen
 
 Querschnitt am verformten System
     M_{Rd,x}(N_{Ed}) = 283.6\,\mathrm{kNm} \quad \ge \quad M_{Ed,II} = 27.3\,\mathrm{kNm}
-
-Gesucht wird die grösste Druckkraft mit Gleichgewichtslage. Die gewollte Ausmitte e_1d bleibt dabei
-fest – sie gehört zum System und nicht zur Last, M_Ed,1 wächst also mit. Bei N = 0 trägt der Stab
-immer; von dort aus wird das Fenster halbiert, bis getragene und nicht getragene Kraft
-zusammenfallen.
 
 Grenzkraft des Stabes
     N_{Rd,K} = 3900.6\,\mathrm{kN} \quad \ge \quad \left|N_{Ed}\right| = 800\,\mathrm{kN}
@@ -1142,10 +944,6 @@ Randabstände, Tiefen ab Oberkante und Bewehrungsquerschnitte
 Resistenzlinie aus Handrechnung – x-Richtung
 --------------------------------------------
 
-Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f_cd; gedrückter Stahl bleibt
-unberücksichtigt. Die Bewehrung ist je Seite zu einer Lage zusammengefasst, das Moment bezieht sich
-auf die halbe Querschnittshöhe.
-
 Zusammengefasste Bewehrung
     Seite                   A_s\ [\mathrm{mm}^2]  z\ [\mathrm{mm}]  f_{yd}\ [\mathrm{N/mm^2}]
     ----------------------  --------------------  ----------------  -------------------------
@@ -1194,7 +992,7 @@ Momentenwiderstand bei reiner Biegung
       &= 18.1\,\mathrm{kNm}
     \end{aligned}
 
-Nulllinie auf halber Höhe: x = h/2
+Nulllinie auf halber Höhe
     x^{+} = \frac{h}{2} = \frac{200\,\mathrm{mm}}{2} = 100\,\mathrm{mm}
 
 Dehnung der Zugbewehrung
@@ -1237,7 +1035,7 @@ Momentenwiderstand bei reiner Biegung
       &= -18.1\,\mathrm{kNm}
     \end{aligned}
 
-Nulllinie auf halber Höhe: x = h/2
+Nulllinie auf halber Höhe
     x^{-} = \frac{h}{2} = \frac{200\,\mathrm{mm}}{2} = 100\,\mathrm{mm}
 
 Dehnung der Zugbewehrung
@@ -1301,18 +1099,11 @@ Erfüllungsgrad
 Querkraft – x-Richtung
 ----------------------
 
-Querkraftwiderstand ohne Querkraftbewehrung. Massgebend sind die statische Höhe der gezogenen
-Bewehrung, die Grösstkorngrösse und die Dehnung auf halber Höhe.
-
 Ansatz   [SIA 262:2025, 4.3.3.2.1]
     V_{Rd} = k_d \cdot \tau_{cd} \cdot d_v \qquad k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g}
 
 Dekompressionsmoment und Dehnung
     m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} \qquad \varepsilon_v = \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| - m_{Dd}\right)}{E_s \cdot \left(\left|m_{Rd}(N_{Ed})\right| - m_{Dd}\right)}
-
-Nur eine Normaldruckkraft entlastet; eine Zugkraft bleibt beim Dekompressionsmoment
-unberücksichtigt. Da der Widerstand über m_Ed und N_Ed von der Einwirkung abhängt, wird er für jede
-Kombination einzeln bestimmt.
 
 Grösstkorndurchmesser
     D_{max} = 32\,\mathrm{mm}
@@ -1345,8 +1136,7 @@ Dekompressionsmoment
 Momentenwiderstand bei N_Ed = 0.0 kN
     M_{Rd} = M_{Rd}(N_{Ed}=0)^{+} = 18.1\,\mathrm{kNm}
 
-|m_Ed| = 40 kNm liegt über m_Rd(N_Ed) = 18.1 kNm: die Bewehrung fliesst. Die Dehnung folgt dann
-nicht mehr dem Moment, sie ist fest.
+|m_Ed| = 40 kNm > m_Rd(N_Ed) = 18.1 kNm → Bewehrung fliesst, ε_v fest.
 
 Dehnung auf halber Höhe
     \varepsilon_v = 1.5 \cdot \frac{f_{yd}}{E_s} = 1.5 \cdot \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 3.261\,\text{‰}
@@ -1405,11 +1195,6 @@ Erfüllungsgrad
 Stahlspannung unter quasi-ständiger Einwirkung – x-Richtung
 -----------------------------------------------------------
 
-Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei
-der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen
-Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf, im Druck
-rechnet er linear mit dem wirksamen Modul. Gezählt wird nur gezogene Bewehrung.
-
 Wirksamer Elastizitätsmodul
     E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 17.85
 
@@ -1419,59 +1204,14 @@ Zulässige Stahlspannung (normale Anforderung)   [SIA 262:2025, 4.4.2]
 Welche Werte angesetzt werden
 -----------------------------
 
-Drei Festlegungen stecken in jeder Zahl unten, und alle drei sind Auslegung der Norm und nicht
-Rechnung. Erstens das Kriechen: angesetzt wird dasselbe φ wie sonst, hier aus der Eingabe. Das liegt
-auf der sicheren Seite – ein grösseres φ weicht den Beton auf, die Druckzone wächst, der Hebelarm
-wird kleiner und die Stahlspannung damit grösser. Wer φ = 0 setzte, bekäme kleinere Spannungen und
-einen Nachweis, der leichter aufgeht.
-
-Zweitens die Werkstoffgesetze: sie rechnen mit den charakteristischen Festigkeiten. Der Stahl ist
-linear bis f_yk und fliesst dann, der Beton linear bis f_ck. Ein Gebrauchsnachweis fragt, was der
-Querschnitt tut, und nicht, was er darf – der Teilsicherheitsbeiwert gehört in die Tragsicherheit.
-Läge das Plateau bei f_yd, bliebe jede Stahlspannung darunter, und eine Grenze darüber könnte nie
-überschritten werden.
-
 Werkstoffgesetze im Gebrauchszustand
     \sigma_s = \min\left[E_s \cdot \varepsilon_s;\ f_{yk}\right] \quad f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \qquad \sigma_c = \max\left[E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right] \quad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
-
-Drittens die Grenze: dieselbe wie bei der Zwängung, mit f_yk und bei erhöhter und hoher Anforderung
-zusätzlich begrenzt durch die Rissbreite. Massgebend ist der dickste Stab der Tragrichtung. Welche
-Lage die grösste Zugspannung trägt, wechselt mit dem Lastfall – bei einem Feldmoment die untere, bei
-einem Stützmoment die obere –, und der dickste Stab gibt die kleinste zulässige Spannung. Das liegt
-für beide auf der sicheren Seite.
-
-Fliesst die Bewehrung, bleibt ihre Spannung bei f_yk stehen, während die Dehnung weiterwächst.
-Verglichen wird dann die Dehnung: ε_s gegen ε_s,adm = σ_s,adm / E_s. Solange der Stahl elastisch
-bleibt, ist das genau der Spannungsvergleich; fliesst er, fällt der Nachweis durch, und zwar um so
-deutlicher, je weiter er gedehnt ist.
 
 Wie die Dehnungsebene gefunden wird
 -----------------------------------
 
-Die Dehnungsebene wird gesucht, nicht hergeleitet. Eine ebene Dehnungsverteilung hat zwei Unbekannte
-– die Dehnung in der Mittelebene ε_m und die Krümmung χ – und ihnen stehen zwei
-Gleichgewichtsbedingungen gegenüber: N und M. Geschlossen auflösen lässt sich das nicht, weil die
-Werkstoffgesetze nichtlinear sind.
-
 Dehnungsebene und innere Kräfte
     \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \frac{h}{2}\right) \qquad N_{int} = \int_A \sigma\left(\varepsilon\right)\,\mathrm{d}A \qquad M_{int} = \int_A \sigma\left(\varepsilon\right) \cdot \left(z - \frac{h}{2}\right)\,\mathrm{d}A
-
-Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebildet, jede mit der
-Spannung in ihrer Mitte; der Stahl kommt Lage für Lage dazu, und die von ihm verdrängte Betonfläche
-wird abgezogen, damit dieselbe Fläche nicht zweimal zählt.
-
-Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer festgehaltenen Krümmung χ wird ε_m
-so lange halbiert, bis N_int die verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung
-immer mehr Zug bedeutet. Aussen: mit diesem ε_m bleibt ein Moment übrig, und χ wird so lange
-halbiert, bis auch M_int stimmt – hier trägt die Monotonie, dass mehr Krümmung mehr Moment heisst.
-
-Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.0 ‰ bis 45.0 ‰). Jenseits davon geben
-die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Halbierung liefe auf
-eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine
-Gleichgewichtslage – dann sagt der Nachweis das und rät nicht.
-
-Nachgewiesen wird deshalb nicht der Weg, sondern das Ergebnis: dass die gefundene Ebene genau die
-angegebenen Schnittgrössen erzeugt. Diese Probe steht bei jedem Fall.
 
 Quasi-ständiger Lastfall – Dauerlast
 ------------------------------------
@@ -1485,9 +1225,7 @@ Gefundene Dehnungsebene
 Probe: die Ebene erzeugt die Einwirkung
     N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 20\,\mathrm{kNm} \;\checkmark
 
-Die Bewehrung fliesst: die grösste Zugdehnung liegt über der Fliessdehnung, die Spannung steht bei
-500 N/mm² und sagt nichts mehr darüber, wie weit die Grenze überschritten ist. Verglichen wird die
-Dehnung.
+Stahl fliesst (σ_s = 500 N/mm²) → Vergleich über die Dehnung.
 
 Grösste Zugdehnung in der Bewehrung
     \varepsilon_y = \frac{f_{yk}}{E_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 2.5\,\text{‰} \quad < \quad \varepsilon_{s,x} = 4.67\,\text{‰}
@@ -1544,10 +1282,6 @@ Randabstände, Tiefen ab Oberkante und Bewehrungsquerschnitte
 Resistenzlinie aus Handrechnung – x-Richtung
 --------------------------------------------
 
-Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f_cd; gedrückter Stahl bleibt
-unberücksichtigt. Die Bewehrung ist je Seite zu einer Lage zusammengefasst, das Moment bezieht sich
-auf die halbe Querschnittshöhe.
-
 Zusammengefasste Bewehrung
     Seite                   A_s\ [\mathrm{mm}^2]  z\ [\mathrm{mm}]  f_{yd}\ [\mathrm{N/mm^2}]
     ----------------------  --------------------  ----------------  -------------------------
@@ -1596,7 +1330,7 @@ Momentenwiderstand bei reiner Biegung
       &= 54.4\,\mathrm{kNm}
     \end{aligned}
 
-Nulllinie auf halber Höhe: x = h/2
+Nulllinie auf halber Höhe
     x^{+} = \frac{h}{2} = \frac{250\,\mathrm{mm}}{2} = 125\,\mathrm{mm}
 
 Dehnung der Zugbewehrung
@@ -1639,7 +1373,7 @@ Momentenwiderstand bei reiner Biegung
       &= -64.2\,\mathrm{kNm}
     \end{aligned}
 
-Nulllinie auf halber Höhe: x = h/2
+Nulllinie auf halber Höhe
     x^{-} = \frac{h}{2} = \frac{250\,\mathrm{mm}}{2} = 125\,\mathrm{mm}
 
 Dehnung der Zugbewehrung
@@ -1730,18 +1464,11 @@ Erfüllungsgrad
 Querkraft – x-Richtung
 ----------------------
 
-Querkraftwiderstand ohne Querkraftbewehrung. Massgebend sind die statische Höhe der gezogenen
-Bewehrung, die Grösstkorngrösse und die Dehnung auf halber Höhe.
-
 Ansatz   [SIA 262:2025, 4.3.3.2.1]
     V_{Rd} = k_d \cdot \tau_{cd} \cdot d_v \qquad k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g}
 
 Dekompressionsmoment und Dehnung
     m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} \qquad \varepsilon_v = \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| - m_{Dd}\right)}{E_s \cdot \left(\left|m_{Rd}(N_{Ed})\right| - m_{Dd}\right)}
-
-Nur eine Normaldruckkraft entlastet; eine Zugkraft bleibt beim Dekompressionsmoment
-unberücksichtigt. Da der Widerstand über m_Ed und N_Ed von der Einwirkung abhängt, wird er für jede
-Kombination einzeln bestimmt.
 
 Grösstkorndurchmesser
     D_{max} = 32\,\mathrm{mm}
@@ -1802,6 +1529,433 @@ Ohne Bewehrung – x-Richtung
 
 In x-Richtung ist keine Bewehrung definiert. Der Widerstand der Handrechnung ist damit null, der
 Nachweis nicht erfüllt.
+
+====================================================================================================
+Formelsammlung
+====================================================================================================
+
+Querschnitt
+-----------
+
+Bewehrungsquerschnitt über die Breite b   [SIA 262:2025, 5.5.2]
+    A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
+
+Bewehrungsmass je Kubikmeter Beton
+    \mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{b \cdot h}
+
+Höhe der Distanzhalter
+    h_{Dist} = \text{OK innere untere Lage} - \text{UK innere obere Lage}
+
+Querschnitt eines Bügelschenkels   [SIA 262:2025, 5.5.2]
+    A_{\varnothing,V} = \frac{\pi \cdot \left(\varnothing_{V}\right)^{2}}{4}
+
+Beton
+-----
+
+Beiwert zur Berücksichtigung der Festigkeitsminderung   [SIA 262:2025, 2.4.2.3]
+    \eta_{fc} = \min\left[\left(\frac{40\,\mathrm{N}/\mathrm{mm}^{2}}{f_{ck}}\right)^{1/3};\ 1.0\right]
+
+Bemessungswert der Betondruckfestigkeit   [SIA 262:2025, 2.4.2.3]
+    f_{cd} = \frac{\eta_{fc} \cdot f_{ck}}{\gamma_c}
+
+Mittelwert der Zylinderdruckfestigkeit   [SIA 262:2025, 3.1.2.2.2]
+    f_{cm} = f_{ck} + 8\,\mathrm{N}/\mathrm{mm}^{2}
+
+Mittelwert des Elastizitätsmoduls   [SIA 262:2025, 3.1.2.3.3]
+    E_{cm} = k_e \cdot \sqrt[3]{f_{cm}} \quad \left(f_{cm}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+
+Bemessungswert des Elastizitätsmoduls   [SIA 262:2025, 4.2.1.15]
+    E_{cd} = \frac{E_{cm}}{\gamma_{cE}}
+
+Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung   [SIA 262:2025, 4.2.1.6]
+    k_{\sigma} = \frac{E_{cd}}{400 \cdot f_{cd}}
+
+Bemessungswert der Schubspannungsgrenze   [SIA 262:2025, 2.4.2.4]
+    \tau_{cd} = \frac{0.3 \cdot \sqrt{f_{ck}}}{\gamma_c} \quad \left(f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+
+Betonstahl
+----------
+
+Bemessungswert der Fliessgrenze   [SIA 262:2025, 2.4.2.5]
+    f_{yd} = \frac{f_{yk}}{\gamma_s}
+
+Bemessungswert der Fliessgrenze auf Druck   [SIA 262:2025, 2.4.2.5]
+    f_{yd}^{-} = \frac{f_{yk}^{-}}{\gamma_s}
+
+Biegung und Normalkraft
+-----------------------
+
+Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f_cd; gedrückter Stahl bleibt
+unberücksichtigt. Die Bewehrung ist je Seite zu einer Lage zusammengefasst, das Moment bezieht sich
+auf die halbe Querschnittshöhe.
+
+Schwerpunkt der zusammengefassten Lage – 2. Lage Grundbewehrung + 2. Lage Zulage
+    z_{2,x} = \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}}
+
+Bewehrungsquerschnitt der zusammengefassten Lage
+    A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z}
+
+Gleichmässiger Druck, ohne Bewehrung
+    N_{Rd}^{-} = -b \cdot h \cdot f_{cd}
+
+Beide Lagen fliessen auf Zug
+    N_{Rd}^{+} = A_{s,2,x} \cdot f_{yd} + A_{s,3,x} \cdot f_{yd}
+
+Kräfte mal Hebelarm um die halbe Höhe
+    M_{Rd}(N_{Rd}^{+}) = A_{s,2,x} \cdot f_{yd} \cdot \left(z_{2,x} - \tfrac{h}{2}\right) + A_{s,3,x} \cdot f_{yd} \cdot \left(z_{3,x} - \tfrac{h}{2}\right)
+
+Statische Höhe der Lage unten, ab dem gedrückten Rand oben
+    d_{2,x} = z_{2,x}
+
+Druckzonenhöhe aus dem Kräftegleichgewicht
+    x^{+} = \frac{A_{s,2,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}}
+
+Momentenwiderstand bei reiner Biegung
+    M_{Rd}(N_{Ed}=0)^{+} = A_{s,2,x} \cdot f_{yd} \cdot \left(d_{2,x} - \frac{0.85 \cdot x^{+}}{2}\right)
+
+Nulllinie auf halber Höhe
+    x^{+} = \frac{h}{2}
+
+Dehnung der Zugbewehrung
+    \varepsilon_s^{+} = \left(d_{2,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}}
+
+Stahlspannung, höchstens die Fliessgrenze
+    \sigma_{sd} = \min\left[E_s \cdot \varepsilon_s^{+};\ f_{yd}\right]
+
+Kräftegleichgewicht
+    N_{Rd}^{+} = -f_{cd} \cdot b \cdot 0.85 \cdot x^{+} + A_{s,2,x} \cdot \sigma_{sd}
+
+Momentengleichgewicht um die halbe Höhe
+    M_{Rd}^{+} = \left[f_{cd} \cdot b \cdot 0.85 \cdot x^{+} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{+}}{2}\right) + A_{s,2,x} \cdot \sigma_{sd} \cdot \left(d_{2,x} - \tfrac{h}{2}\right)\right]
+
+Statische Höhe der Lage oben, ab dem gedrückten Rand unten
+    d_{3,x} = h - z_{3,x}
+
+Widerstand bei N_Ed – ein Eckpunkt liegt genau dort
+    M_{Rd} = M_{Rd}(N_{Ed}=0)^{+}
+
+Erfüllungsgrad
+    \alpha_{eff,x} = \frac{M_{Rd}}{M_{Ed}}
+
+Widerstand bei festgehaltenem N_Ed
+    M_{Rd} = M_1 + \frac{N_{Ed} - N_1}{N_2 - N_1} \cdot \left(M_2 - M_1\right)
+
+Bezugsgrösse der Normalkraft
+    N_{ref} = \max\left(\left|N_{Rd,x}^{+}\right|;\ \left|N_{Rd,x}^{-}\right|\right)
+
+Bezugsgrösse des Moments
+    M_{ref} = \max\left(\left|M_{Rd,x}^{+}\right|;\ \left|M_{Rd,x}^{-}\right|\right)
+
+Einwirkung im normierten Diagramm
+    \bar{E}_{d,x} = \sqrt{\left(\frac{N_{Ed}}{N_{ref}}\right)^{2} + \left(\frac{M_{Ed}}{M_{ref}}\right)^{2}}
+
+Kürzester Abstand zur Resistenzlinie
+    a = \sqrt{\left(\frac{N_{Ed} - N_P}{N_{ref}}\right)^{2} + \left(\frac{M_{Ed} - M_P}{M_{ref}}\right)^{2}}
+
+Widerstand im normierten Diagramm
+    \bar{R}_{d,x} = \bar{E}_{d,x} + a
+
+Querkraft
+---------
+
+Querkraftwiderstand mit Querkraftbewehrung, Fachwerkmodell mit veränderlicher Neigung der
+Druckdiagonalen. Massgebend ist das Kleinere aus dem Widerstand der Bügel und dem der
+Druckdiagonalen; der Betonanteil ohne Bügel geht nicht zusätzlich ein.
+
+Beide Anteile gelten je Laufmeter, wie die Querkraft selbst. Gesucht wird ganzgradig zwischen α_min
+und α_max die Neigung mit dem grössten Widerstand V_Rd = min(V_Rd,s; V_Rd,c). Bei einer
+Normalzugkraft steilt sich die Druckdiagonale auf: α_min wird dann auf 40° gesetzt und α_max
+notfalls mitgehoben.
+
+Querkraftwiderstand ohne Querkraftbewehrung. Massgebend sind die statische Höhe der gezogenen
+Bewehrung, die Grösstkorngrösse und die Dehnung auf halber Höhe.
+
+Nur eine Normaldruckkraft entlastet; eine Zugkraft bleibt beim Dekompressionsmoment
+unberücksichtigt. Da der Widerstand über m_Ed und N_Ed von der Einwirkung abhängt, wird er für jede
+Kombination einzeln bestimmt.
+
+Ansatz   [SIA 262:2025, 4.3.3.4]
+    V_{Rd,s} = \frac{A_{\varnothing,V}}{s_{V,x} \cdot s_{V,y}} \cdot 0.9 \cdot d \cdot f_{yd} \cdot \cot\alpha \qquad V_{Rd,c} = 0.9 \cdot d \cdot k_c \cdot f_{cd} \cdot \sin\alpha \cdot \cos\alpha
+
+Teilung in y aus der Stabzahl
+    s_{V,y} = \frac{b}{n_{V,y}}
+
+Widerstand der Bügel
+    V_{Rd,s} = \frac{A_{\varnothing,V}}{s_{V,x} \cdot s_{V,y}} \cdot 0.9 \cdot d \cdot f_{yd} \cdot \cot \alpha
+
+Widerstand der Druckdiagonalen
+    V_{Rd,c} = 0.9 \cdot d \cdot k_c \cdot f_{cd} \cdot \sin \alpha \cdot \cos \alpha
+
+Querkraftwiderstand
+    V_{Rd,x} = \min\left[V_{Rd,s};\ V_{Rd,c}\right]
+
+Ansatz   [SIA 262:2025, 4.3.3.2.1]
+    V_{Rd} = k_d \cdot \tau_{cd} \cdot d_v \qquad k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g}
+
+Dekompressionsmoment und Dehnung
+    m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} \qquad \varepsilon_v = \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| - m_{Dd}\right)}{E_s \cdot \left(\left|m_{Rd}(N_{Ed})\right| - m_{Dd}\right)}
+
+Beiwert der Gesteinskörnung   [SIA 262:2025, 4.3.3.2.1]
+    k_g = \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right] \quad \left(D_{max}\ \text{in}\ \mathrm{mm},\ f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+
+Wirksame Höhe, um die Einlage vermindert
+    d_v = d - e_{Einlage}
+
+Dekompressionsmoment
+    m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6}
+
+Dehnung auf halber Höhe
+    \varepsilon_v = 1.5 \cdot \frac{f_{yd}}{E_s}
+
+Beiwert für die statische Höhe
+    k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g} \quad \left(d\ \text{in}\ \mathrm{mm}\right)
+
+Querkraftwiderstand   [SIA 262:2025, 4.3.3.2.1]
+    V_{Rd,x} = k_d \cdot \tau_{cd} \cdot d_v
+
+Dehnung auf halber Höhe
+    \varepsilon_v = \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| - m_{Dd}\right)}{E_s \cdot \left(\left|m_{Rd}(N_{Ed})\right| - m_{Dd}\right)}
+
+Wirksame Höhe (Einlage nicht massgebend)
+    d_v = d
+
+Duktilität
+----------
+
+Die Druckzone muss schlank bleiben, damit der Stahl lange fliesst, bevor der Beton versagt: der
+Querschnitt kündigt sein Versagen an. Gerechnet wird die Druckzonenhöhe bei reiner Biegung, je Lage
+einzeln.
+
+d wird von der gedrückten Randfaser aus gemessen: bei den unteren Lagen von der Oberkante, bei den
+oberen von der Unterkante. Grundbewehrung und Zulage einer Lage zählen mit ihrem gemeinsamen
+Schwerpunkt.
+
+Kräftegleichgewicht bei M_Ed = 0   [SIA 262:2025, 4.1.4.2.5]
+    0.85 \cdot x \cdot b \cdot f_{cd} = A_s \cdot f_{sd} \qquad \Rightarrow \qquad x = \frac{A_s \cdot f_{sd}}{0.85 \cdot b \cdot f_{cd}}
+
+Bedingung
+    \frac{x}{d} \le 0.35
+
+Bewehrung der Lage
+    A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z}
+
+Gemeinsamer Schwerpunkt der Lage
+    z_{2,x} = \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}}
+
+Druckzonenhöhe bei reiner Biegung
+    x = \frac{A_{s,2,x} \cdot f_{sd}}{0.85 \cdot b \cdot f_{cd}}
+
+Bezogene Druckzonenhöhe   [SIA 262:2025, 4.1.4.2.5]
+    \left(x/d\right)_{2} = \frac{x}{d_{2,x}}
+
+Zwängung auf Normalkraft
+------------------------
+
+Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Die Bewehrung muss die
+Kraft übernehmen können, die der Beton beim Reissen abgibt – erst dann kündigt sich das Versagen an.
+
+Rissaktive Plattendicke
+    h_{eff} = \min\left[500\,\mathrm{mm};\ h\right]
+
+Beiwert für die Plattendicke   [SIA 262:2025, 4.4.2]
+    k_t = \frac{1}{1 + 0.5 \cdot h_{eff}} \quad \left(h_{eff}\ \text{in}\ \mathrm{m}\right)
+
+Wirksame Zugfestigkeit
+    f_{ct,eff} = k_t \cdot f_{ctm}
+
+Risskraft der gezogenen Querschnittshälfte
+    N_{Riss} = \frac{h_{eff}}{2} \cdot b \cdot f_{ct,eff}
+
+Dickster Stab der Lage
+    \varnothing_{2,x} = \max\left[\varnothing_{2,x,g};\ \varnothing_{2,x,z}\right]
+
+Zulässige Stahlspannung (Rissbreite w_nom)   [SIA 262:2025, 4.4.2]
+    \sigma_{s,adm,2,x} = \min\left[\sqrt{\frac{9 \cdot E_s \cdot f_{ctm} \cdot w_{nom}}{\varnothing_{2,x}}};\ f_{yk}\right]
+
+Aufnehmbare Risskraft
+    N_{s,adm,2,x} = A_{s,2,x} \cdot \sigma_{s,adm,2,x}
+
+Sprödes Versagen
+----------------
+
+Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Nachgewiesen wird
+deshalb, dass der bewehrte Querschnitt mehr trägt als der unbewehrte im Augenblick des Risses:
+M_Rd(N_Ed = 0) ≥ M_Riss.
+
+Beiwert für die Plattendicke   [SIA 262:2025, 4.4.1.3]
+    k_t = \frac{1}{1 + 0.5 \cdot h/3} \quad \left(h\ \text{in}\ \mathrm{m}\right)
+
+Rissmoment des ungerissenen Querschnitts
+    M_{Riss} = f_{ct,eff} \cdot \frac{h^{2} \cdot b}{6}
+
+Zwängung auf Biegung
+--------------------
+
+Eine aufgezwungene Krümmung erzeugt beim Reissen ein Moment, das die Bewehrung übernehmen muss –
+ohne über die zulässige Stahlspannung zu kommen. Nicht zu verwechseln mit dem Nachweis gegen sprödes
+Versagen: dort steht der Biegewiderstand gegen das Rissmoment, hier die Stahlspannung gegen ihre
+Grenze.
+
+Das Rissmoment gilt für den ungerissenen Bruttoquerschnitt – den Zustand vor dem Riss. Der
+Widerstand dagegen wird am gerissenen Querschnitt bestimmt, also für den Augenblick danach. Dass
+zwei verschiedene Querschnitte auftreten, ist genau die Frage: reicht die Bewehrung für das, was der
+Beton abgibt?
+
+Das Kriechen weicht den Beton auf: E_c,eff = E_cm/(1+φ), und die Wertigkeit ist E_s/E_c,eff. Ein
+grösseres φ senkt damit den Hebelarm und liegt auf der sicheren Seite.
+
+Die Betondruckspannung verläuft dreieckig – null in der Nulllinie, am grössten an der gedrückten
+Kante. Ihre Resultierende liegt deshalb bei x/3 von dieser Kante.
+
+Wertigkeit im gerissenen Zustand
+    n = \frac{E_s}{E_{cm}} \cdot \left(1 + \varphi\right)
+
+Hilfsgrösse der Nulllinie
+    \rho = \frac{n \cdot A_{s,2,x}}{b}
+
+Nulllinie des gerissenen Querschnitts
+    x = \sqrt{\rho^{2} + 2 \cdot d_{2,x} \cdot \rho} - \rho
+
+Innerer Hebelarm
+    z = d_{2,x} - \frac{x}{3}
+
+Aufnehmbares Moment der Bewehrung
+    M_{s,adm,2,x} = \sigma_{s,adm,2,x} \cdot A_{s,2,x} \cdot z
+
+Stahlspannung aus Rissbreite
+----------------------------
+
+Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei
+der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen
+Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf, im Druck
+rechnet er linear mit dem wirksamen Modul. Gezählt wird nur gezogene Bewehrung.
+
+Drei Festlegungen stecken in jeder Zahl unten, und alle drei sind Auslegung der Norm und nicht
+Rechnung. Erstens das Kriechen: angesetzt wird dasselbe φ wie sonst, hier aus der Eingabe. Das liegt
+auf der sicheren Seite – ein grösseres φ weicht den Beton auf, die Druckzone wächst, der Hebelarm
+wird kleiner und die Stahlspannung damit grösser. Wer φ = 0 setzte, bekäme kleinere Spannungen und
+einen Nachweis, der leichter aufgeht.
+
+Zweitens die Werkstoffgesetze: sie rechnen mit den charakteristischen Festigkeiten. Der Stahl ist
+linear bis f_yk und fliesst dann, der Beton linear bis f_ck. Ein Gebrauchsnachweis fragt, was der
+Querschnitt tut, und nicht, was er darf – der Teilsicherheitsbeiwert gehört in die Tragsicherheit.
+Läge das Plateau bei f_yd, bliebe jede Stahlspannung darunter, und eine Grenze darüber könnte nie
+überschritten werden.
+
+Drittens die Grenze: dieselbe wie bei der Zwängung, mit f_yk und bei erhöhter und hoher Anforderung
+zusätzlich begrenzt durch die Rissbreite. Massgebend ist der dickste Stab der Tragrichtung. Welche
+Lage die grösste Zugspannung trägt, wechselt mit dem Lastfall – bei einem Feldmoment die untere, bei
+einem Stützmoment die obere –, und der dickste Stab gibt die kleinste zulässige Spannung. Das liegt
+für beide auf der sicheren Seite.
+
+Fliesst die Bewehrung, bleibt ihre Spannung bei f_yk stehen, während die Dehnung weiterwächst.
+Verglichen wird dann die Dehnung: ε_s gegen ε_s,adm = σ_s,adm / E_s. Solange der Stahl elastisch
+bleibt, ist das genau der Spannungsvergleich; fliesst er, fällt der Nachweis durch, und zwar um so
+deutlicher, je weiter er gedehnt ist.
+
+Die Dehnungsebene wird gesucht, nicht hergeleitet. Eine ebene Dehnungsverteilung hat zwei Unbekannte
+– die Dehnung in der Mittelebene ε_m und die Krümmung χ – und ihnen stehen zwei
+Gleichgewichtsbedingungen gegenüber: N und M. Geschlossen auflösen lässt sich das nicht, weil die
+Werkstoffgesetze nichtlinear sind.
+
+Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebildet, jede mit der
+Spannung in ihrer Mitte; der Stahl kommt Lage für Lage dazu, und die von ihm verdrängte Betonfläche
+wird abgezogen, damit dieselbe Fläche nicht zweimal zählt.
+
+Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer festgehaltenen Krümmung χ wird ε_m
+so lange halbiert, bis N_int die verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung
+immer mehr Zug bedeutet. Aussen: mit diesem ε_m bleibt ein Moment übrig, und χ wird so lange
+halbiert, bis auch M_int stimmt – hier trägt die Monotonie, dass mehr Krümmung mehr Moment heisst.
+
+Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.0 ‰ bis 45.0 ‰). Jenseits davon geben
+die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Halbierung liefe auf
+eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine
+Gleichgewichtslage – dann sagt der Nachweis das und rät nicht.
+
+Nachgewiesen wird deshalb nicht der Weg, sondern das Ergebnis: dass die gefundene Ebene genau die
+angegebenen Schnittgrössen erzeugt. Diese Probe steht bei jedem Fall.
+
+Wirksamer Elastizitätsmodul
+    E_{c,eff} = \frac{E_{cm}}{1 + \varphi}
+
+Dehnungsebene und innere Kräfte
+    \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \frac{h}{2}\right) \qquad N_{int} = \int_A \sigma\left(\varepsilon\right)\,\mathrm{d}A \qquad M_{int} = \int_A \sigma\left(\varepsilon\right) \cdot \left(z - \frac{h}{2}\right)\,\mathrm{d}A
+
+Zulässige Stahlspannung (normale Anforderung)   [SIA 262:2025, 4.4.2]
+    \sigma_{s,adm} = f_{yk}
+
+Grösste Zugdehnung in der Bewehrung
+    \varepsilon_y = \frac{f_{yk}}{E_s}
+
+Zulässige Dehnung
+    \varepsilon_{s,adm} = \frac{\sigma_{s,adm}}{E_s}
+
+Stahlspannung gegen Fliessen
+----------------------------
+
+Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst bleiben Risse und Durchbiegung
+dauerhaft. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf, im Druck
+rechnet er linear mit dem wirksamen Modul. Gezählt wird nur gezogene Bewehrung.
+
+Drittens die Grenze: sie rechnet mit dem Bemessungswert, σ_s,adm = f_yd − 80 N/mm², und nicht mit
+f_yk − 80. Die Norm sagt an dieser Stelle nicht eindeutig, welcher Wert gemeint ist; f_yd ist die
+strengere Wahl – die Grenze liegt rund 15 % tiefer –, gewählt ist deshalb die Seite, auf der man
+nicht danebenliegen kann. Das ist etwas anderes als das Fliessplateau oben: dort geht es darum, was
+der Stahl tut, hier darum, wie viel Abstand man davon verlangt.
+
+Zulässige Stahlspannung   [SIA 262:2025, Tabelle 17]
+    \sigma_{s,adm} = f_{yd} - 80\,\mathrm{N}/\mathrm{mm}^{2}
+
+Knicken
+-------
+
+Nachgewiesen wird am verformten System. Die Ausmitte zweiter Ordnung hängt von der Krümmung ab, die
+Krümmung vom Moment und das Moment wieder von der Ausmitte – also wird die Folge so lange
+durchlaufen, bis sie einläuft. Läuft sie nicht ein, gibt es keine Gleichgewichtslage: das System
+knickt.
+
+Der Erfüllungsgrad ist ein Verhältnis von Normalkräften: N_Rd ist die grösste Druckkraft, unter der
+der Stab noch steht. Über Momente zu vergleichen ginge nur, solange es ein Gleichgewicht gibt – beim
+Knicken ist gerade das der Fall, der fehlt.
+
+Angesetzt wird das Kriechen mit demselben φ wie sonst, hier aus der Eingabe. Beim Knicken ist das
+nicht bloss zulässig, sondern wesentlich: ein aufgeweichter Beton verformt sich mehr, die Ausmitte
+zweiter Ordnung wächst, und der Stab knickt früher. φ = 0 läge hier deutlich auf der unsicheren
+Seite.
+
+Die Festigkeiten sind Bemessungswerte – f_cd und f_yd, nicht die charakteristischen. Gerechnet wird
+mit dem nichtlinearen Betongesetz; im Bereich der Gebrauchslasten unterscheidet es sich kaum vom
+linearen, in der Nähe der Grenzlast erheblich, und genau dort entscheidet sich, ob es noch eine
+Gleichgewichtslage gibt.
+
+Die Ausmitten-Iteration darüber steht dagegen vollständig da, Durchlauf für Durchlauf: sie ist das
+Verfahren selbst, und dass sie einläuft, ist die Aussage des Nachweises.
+
+Zu jedem Moment wird die Dehnungsebene gesucht, die es im Gleichgewicht hält; aus deren Krümmung
+folgt die nächste Ausmitte. Begonnen wird mit e_2d = 0, also ohne Verformung.
+
+Gesucht wird die grösste Druckkraft mit Gleichgewichtslage. Die gewollte Ausmitte e_1d bleibt dabei
+fest – sie gehört zum System und nicht zur Last, M_Ed,1 wächst also mit. Bei N = 0 trägt der Stab
+immer; von dort aus wird das Fenster halbiert, bis getragene und nicht getragene Kraft
+zusammenfallen.
+
+Ungewollte Ausmitte – allgemein   [SIA 262:2025, 4.3.7]
+    \alpha_i = \min\left[\max\left(\frac{0.01}{\sqrt{l}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \qquad e_{0d} = \max\left(\frac{d}{30};\ \frac{\alpha_i \cdot l_{cr}}{2}\right)
+
+Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein
+    e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| \qquad e_{2d} = \left|\chi\right| \cdot \frac{l_{cr}^{2}}{\pi^{2}} \qquad M_{Ed,II} = \left|N_{Ed}\right| \cdot \left(e_{0d} + e_{1d} + e_{2d}\right)
+
+Schiefstellung   [SIA 262:2025, 4.3.7]
+    \alpha_i = \min\left[\max\left(\frac{0.01}{\sqrt{l}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \quad \left(l\ \text{in}\ \mathrm{m}\right)
+
+Ungewollte Ausmitte   [SIA 262:2025, 4.3.7]
+    e_{0d} = \max\left(\frac{d}{30};\ \frac{\alpha_i \cdot l_{cr}}{2}\right)
+
+Gewollte Ausmitte
+    e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right|
+
+Das Verfahren   [SIA 262:2025, 4.3.7]
+    e_{2d}^{(k)} = \left|\chi^{(k)}\right| \cdot \frac{l_{cr}^{2}}{\pi^{2}} \qquad M_{Ed,II}^{(k)} = \left|N_{Ed}\right| \cdot \left(e_{0d} + e_{1d} + e_{2d}^{(k-1)}\right)
 
 ====================================================================================================
 Nachweise

@@ -159,6 +159,8 @@ class SproedesVersagen(Nachweis):
     Rückverfolgung sie zeigt.
     """
 
+    THEMA = "Sprödes Versagen"
+
     def __init__(
         self,
         querschnitt,
@@ -254,7 +256,7 @@ class SproedesVersagen(Nachweis):
                 erg.erfuellungsgrad, EINHEITSLOS)
             urteile.append(self._urteil(erg))
 
-        self._protokoll_massgebend(p, urteile)
+        self.protokoll_massgebend(p, urteile)
         return ergebnis, self.teilurteile(urteile)
 
     def _m_rd(self, erg: Lagenergebnis) -> Wert:
@@ -270,7 +272,7 @@ class SproedesVersagen(Nachweis):
             name=f"Sprödes Versagen {r} – {nummer}. Lage",
             art="SV",
             ziel=self.d_ausnutzung[nummer].id,
-            langname="Sprödes Versagen",
+            langname=self.thema,
             fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
@@ -280,28 +282,11 @@ class SproedesVersagen(Nachweis):
             widerstand=self._m_rd(erg) if erg.machbar else None,
         )
 
-
-    def _protokoll_massgebend(self, p: Protokoll,
-                              urteile: Sequence[NachweisUrteil]) -> None:
-        """
-        Welche Lage den Nachweis entscheidet.
-
-        In der Zusammenfassung steht nur eine Zeile -- die schlechtere der
-        beiden Lagen. Ohne diesen Satz stuende in der Herleitung beides
-        nebeneinander und man muesste die Zahlen selbst vergleichen, um zu
-        wissen, welche davon in der Tabelle gelandet ist.
-        """
-        massgebend = self.massgebend(urteile)
-        if len(urteile) < 2 or not massgebend:
-            return
-        p.text(f"Massgebend ist die {massgebend[0].fall} mit dem kleineren "
-               f"Erfüllungsgrad; sie steht in der Zusammenfassung.")
-
     # -- Mitschrift ---------------------------------------------------------
 
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
         p.titel(f"Sprödes Versagen – {self.richtung.beschriftung}")
-        p.text(
+        p.erklaerung(
             "Ein zu schwach bewehrter Querschnitt reisst und versagt im selben "
             "Augenblick. Nachgewiesen wird deshalb, dass der bewehrte "
             "Querschnitt mehr trägt als der unbewehrte im Augenblick des "

@@ -3,6 +3,7 @@
   "dateien": [
     "opencivil/__init__.py",
     "opencivil/bericht/__init__.py",
+    "opencivil/bericht/formelsammlung.py",
     "opencivil/bericht/gliederung.py",
     "opencivil/bericht/konsole.py",
     "opencivil/bericht/latex_dokument.py",

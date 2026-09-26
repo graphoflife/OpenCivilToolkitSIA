@@ -261,7 +261,7 @@ class TestStahlspannungAusRissbreite(unittest.TestCase):
         text = " ".join(
             getattr(b, "text", "") + getattr(b, "latex", "")
             for b in loesung.protokoll.alle_bloecke())
-        self.assertIn("Die Bewehrung fliesst", text)
+        self.assertIn("Stahl fliesst", text)
         self.assertIn(r"\varepsilon_{s,adm}", text)
 
 

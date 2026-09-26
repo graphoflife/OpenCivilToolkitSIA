@@ -216,6 +216,8 @@ class Knicken(Nachweis):
     der Querschnitt das Moment zweiter Ordnung aufnimmt.
     """
 
+    THEMA = "Knicken"
+
     def __init__(
         self,
         querschnitt,
@@ -500,7 +502,7 @@ class Knicken(Nachweis):
             name=f"Knicken – {erg.fall.name}",
             art="K",
             ziel=self.d_ausnutzung[erg.fall.name].id,
-            langname="Knicken",
+            langname=self.thema,
             fall=erg.fall.name,
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
@@ -519,27 +521,27 @@ class Knicken(Nachweis):
 
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
         p.titel("Knicken")
-        p.text(
+        p.erklaerung(
             "Nachgewiesen wird am verformten System. Die Ausmitte zweiter "
             "Ordnung hängt von der Krümmung ab, die Krümmung vom Moment und "
             "das Moment wieder von der Ausmitte – also wird die Folge so "
             "lange durchlaufen, bis sie einläuft. Läuft sie nicht ein, gibt es "
             "keine Gleichgewichtslage: das System knickt."
         )
-        p.text(
+        p.erklaerung(
             "Der Erfüllungsgrad ist ein Verhältnis von Normalkräften: N_Rd "
             "ist die grösste Druckkraft, unter der der Stab noch steht. Über "
             "Momente zu vergleichen ginge nur, solange es ein Gleichgewicht "
             "gibt – beim Knicken ist gerade das der Fall, der fehlt."
         )
-        p.gleichung(
+        p.ansatz(
             r"\alpha_i = \min\left[\max\left(\frac{0.01}{\sqrt{l}};\ "
             rf"\frac{{1}}{{300}}\right);\ \frac{{1}}{{200}}\right] \qquad "
             r"e_{0d} = \max\left(\frac{d}{30};\ "
             r"\frac{\alpha_i \cdot l_{cr}}{2}\right)",
             titel="Ungewollte Ausmitte – allgemein",
             referenz="SIA 262:2025, 4.3.7")
-        p.gleichung(
+        p.ansatz(
             r"e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| \qquad "
             r"e_{2d} = \left|\chi\right| \cdot \frac{l_{cr}^{2}}{\pi^{2}} "
             r"\qquad M_{Ed,II} = \left|N_{Ed}\right| \cdot "
@@ -547,14 +549,14 @@ class Knicken(Nachweis):
             titel="Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein")
         protokoll_wirksamer_modul(p, e, self.id, titel="Steifigkeit des Betons",
                                   nachsatz=rf"\qquad {angabe(e['f_cd'])}")
-        p.text(
+        p.erklaerung(
             "Angesetzt wird das Kriechen mit demselben φ wie sonst, hier aus "
             "der Eingabe. Beim Knicken ist das nicht bloss zulässig, sondern "
             "wesentlich: ein aufgeweichter Beton verformt sich mehr, die "
             "Ausmitte zweiter Ordnung wächst, und der Stab knickt früher. "
             "φ = 0 läge hier deutlich auf der unsicheren Seite."
         )
-        p.text(
+        p.erklaerung(
             "Die Festigkeiten sind Bemessungswerte – f_cd und f_yd, nicht die "
             "charakteristischen. Gerechnet wird mit dem nichtlinearen "
             "Betongesetz; im Bereich der Gebrauchslasten unterscheidet es "
@@ -564,7 +566,7 @@ class Knicken(Nachweis):
         )
         p.titel("Wie die Dehnungsebene gefunden wird", ebene=3)
         protokoll_verfahren(p, eps_druck=EPS_DRUCK, eps_zug=EPS_ZUG)
-        p.text(
+        p.erklaerung(
             "Die Ausmitten-Iteration darüber steht dagegen vollständig da, "
             "Durchlauf für Durchlauf: sie ist das Verfahren selbst, und dass "
             "sie einläuft, ist die Aussage des Nachweises."
@@ -607,11 +609,8 @@ class Knicken(Nachweis):
         self._protokoll_iteration(p, erg)
 
         if not erg.stabil:
-            p.text(
-                "Die Folge läuft nicht ein: zu jeder Ausmitte gehört eine "
-                "grössere Krümmung und dazu wieder eine grössere Ausmitte. "
-                "Unter dieser Druckkraft gibt es keine Gleichgewichtslage."
-            )
+            p.text("Folge läuft nicht ein → keine Gleichgewichtslage unter "
+                   "dieser Druckkraft.")
         else:
             p.gleichung(
                 r" \qquad ".join([
@@ -640,13 +639,13 @@ class Knicken(Nachweis):
         Nachweises -- und das sieht man nur, wenn man die Folge sieht.
         """
         N = abs(erg.fall.N_Ed.si)
-        p.gleichung(
+        p.ansatz(
             r"e_{2d}^{(k)} = \left|\chi^{(k)}\right| \cdot "
             r"\frac{l_{cr}^{2}}{\pi^{2}} \qquad "
             r"M_{Ed,II}^{(k)} = \left|N_{Ed}\right| \cdot \left(e_{0d} + "
             r"e_{1d} + e_{2d}^{(k-1)}\right)",
             titel="Das Verfahren", referenz="SIA 262:2025, 4.3.7")
-        p.text(
+        p.erklaerung(
             "Zu jedem Moment wird die Dehnungsebene gesucht, die es im "
             "Gleichgewicht hält; aus deren Krümmung folgt die nächste "
             "Ausmitte. Begonnen wird mit e_2d = 0, also ohne Verformung."
@@ -680,7 +679,7 @@ class Knicken(Nachweis):
         dreissig Tabellen fuer eine einzige Zahl zu zeigen.
         """
         N_Ed = abs(erg.fall.N_Ed.si)
-        p.text(
+        p.erklaerung(
             "Gesucht wird die grösste Druckkraft mit Gleichgewichtslage. Die "
             "gewollte Ausmitte e_1d bleibt dabei fest – sie gehört zum System "
             "und nicht zur Last, M_Ed,1 wächst also mit. Bei N = 0 trägt der "

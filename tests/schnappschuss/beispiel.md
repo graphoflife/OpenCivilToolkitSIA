@@ -70,8 +70,6 @@ $$
 
 ### Resistenzlinie aus Handrechnung – x-Richtung
 
-Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f\_cd; gedrückter Stahl bleibt unberücksichtigt. Die Bewehrung ist je Seite zu einer Lage zusammengefasst, das Moment bezieht sich auf die halbe Querschnittshöhe.
-
 **Schwerpunkt der zusammengefassten Lage – 2. Lage Grundbewehrung + 2. Lage Zulage**
 
 $$
@@ -155,7 +153,7 @@ $$
 \end{aligned}
 $$
 
-**Nulllinie auf halber Höhe: x = h/2**
+**Nulllinie auf halber Höhe**
 
 $$
 x^{+} = \frac{h}{2} = \frac{300\,\mathrm{mm}}{2} = 150\,\mathrm{mm}
@@ -221,7 +219,7 @@ $$
 \end{aligned}
 $$
 
-**Nulllinie auf halber Höhe: x = h/2**
+**Nulllinie auf halber Höhe**
 
 $$
 x^{-} = \frac{h}{2} = \frac{300\,\mathrm{mm}}{2} = 150\,\mathrm{mm}
@@ -473,6 +471,192 @@ $$
 
 $$
 \varepsilon_{ud} = 4.5\,\%
+$$
+
+## Formelsammlung
+
+### Querschnitt
+
+**Bewehrungsquerschnitt über die Breite b** *(SIA 262:2025, 5.5.2)*
+
+$$
+A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
+$$
+
+**Bewehrungsmass je Kubikmeter Beton**
+
+$$
+\mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{b \cdot h}
+$$
+
+**Höhe der Distanzhalter**
+
+$$
+h_{Dist} = \text{OK innere untere Lage} - \text{UK innere obere Lage}
+$$
+
+### Beton
+
+**Beiwert zur Berücksichtigung der Festigkeitsminderung** *(SIA 262:2025, 2.4.2.3)*
+
+$$
+\eta_{fc} = \min\left[\left(\frac{40\,\mathrm{N}/\mathrm{mm}^{2}}{f_{ck}}\right)^{1/3};\ 1.0\right]
+$$
+
+**Bemessungswert der Betondruckfestigkeit** *(SIA 262:2025, 2.4.2.3)*
+
+$$
+f_{cd} = \frac{\eta_{fc} \cdot f_{ck}}{\gamma_c}
+$$
+
+**Mittelwert der Zylinderdruckfestigkeit** *(SIA 262:2025, 3.1.2.2.2)*
+
+$$
+f_{cm} = f_{ck} + 8\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Mittelwert des Elastizitätsmoduls** *(SIA 262:2025, 3.1.2.3.3)*
+
+$$
+E_{cm} = k_e \cdot \sqrt[3]{f_{cm}} \quad \left(f_{cm}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+$$
+
+**Bemessungswert des Elastizitätsmoduls** *(SIA 262:2025, 4.2.1.15)*
+
+$$
+E_{cd} = \frac{E_{cm}}{\gamma_{cE}}
+$$
+
+**Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung** *(SIA 262:2025, 4.2.1.6)*
+
+$$
+k_{\sigma} = \frac{E_{cd}}{400 \cdot f_{cd}}
+$$
+
+**Bemessungswert der Schubspannungsgrenze** *(SIA 262:2025, 2.4.2.4)*
+
+$$
+\tau_{cd} = \frac{0.3 \cdot \sqrt{f_{ck}}}{\gamma_c} \quad \left(f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+$$
+
+### Betonstahl
+
+**Bemessungswert der Fliessgrenze** *(SIA 262:2025, 2.4.2.5)*
+
+$$
+f_{yd} = \frac{f_{yk}}{\gamma_s}
+$$
+
+**Bemessungswert der Fliessgrenze auf Druck** *(SIA 262:2025, 2.4.2.5)*
+
+$$
+f_{yd}^{-} = \frac{f_{yk}^{-}}{\gamma_s}
+$$
+
+### Biegung und Normalkraft
+
+Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f\_cd; gedrückter Stahl bleibt unberücksichtigt. Die Bewehrung ist je Seite zu einer Lage zusammengefasst, das Moment bezieht sich auf die halbe Querschnittshöhe.
+
+**Schwerpunkt der zusammengefassten Lage – 2. Lage Grundbewehrung + 2. Lage Zulage**
+
+$$
+z_{2,x} = \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}}
+$$
+
+**Bewehrungsquerschnitt der zusammengefassten Lage**
+
+$$
+A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z}
+$$
+
+**Gleichmässiger Druck, ohne Bewehrung**
+
+$$
+N_{Rd}^{-} = -b \cdot h \cdot f_{cd}
+$$
+
+**Beide Lagen fliessen auf Zug**
+
+$$
+N_{Rd}^{+} = A_{s,2,x} \cdot f_{yd} + A_{s,3,x} \cdot f_{yd}
+$$
+
+**Kräfte mal Hebelarm um die halbe Höhe**
+
+$$
+M_{Rd}(N_{Rd}^{+}) = A_{s,2,x} \cdot f_{yd} \cdot \left(z_{2,x} - \tfrac{h}{2}\right) + A_{s,3,x} \cdot f_{yd} \cdot \left(z_{3,x} - \tfrac{h}{2}\right)
+$$
+
+**Statische Höhe der Lage unten, ab dem gedrückten Rand oben**
+
+$$
+d_{2,x} = z_{2,x}
+$$
+
+**Druckzonenhöhe aus dem Kräftegleichgewicht**
+
+$$
+x^{+} = \frac{A_{s,2,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}}
+$$
+
+**Momentenwiderstand bei reiner Biegung**
+
+$$
+M_{Rd}(N_{Ed}=0)^{+} = A_{s,2,x} \cdot f_{yd} \cdot \left(d_{2,x} - \frac{0.85 \cdot x^{+}}{2}\right)
+$$
+
+**Nulllinie auf halber Höhe**
+
+$$
+x^{+} = \frac{h}{2}
+$$
+
+**Dehnung der Zugbewehrung**
+
+$$
+\varepsilon_s^{+} = \left(d_{2,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}}
+$$
+
+**Stahlspannung, höchstens die Fliessgrenze**
+
+$$
+\sigma_{sd} = \min\left[E_s \cdot \varepsilon_s^{+};\ f_{yd}\right]
+$$
+
+**Kräftegleichgewicht**
+
+$$
+N_{Rd}^{+} = -f_{cd} \cdot b \cdot 0.85 \cdot x^{+} + A_{s,2,x} \cdot \sigma_{sd}
+$$
+
+**Momentengleichgewicht um die halbe Höhe**
+
+$$
+M_{Rd}^{+} = \left[f_{cd} \cdot b \cdot 0.85 \cdot x^{+} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{+}}{2}\right) + A_{s,2,x} \cdot \sigma_{sd} \cdot \left(d_{2,x} - \tfrac{h}{2}\right)\right]
+$$
+
+**Statische Höhe der Lage oben, ab dem gedrückten Rand unten**
+
+$$
+d_{3,x} = h - z_{3,x}
+$$
+
+**Widerstand bei N\_Ed – ein Eckpunkt liegt genau dort**
+
+$$
+M_{Rd} = M_{Rd}(N_{Ed}=0)^{+}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,x} = \frac{M_{Rd}}{M_{Ed}}
+$$
+
+**Widerstand bei festgehaltenem N\_Ed**
+
+$$
+M_{Rd} = M_1 + \frac{N_{Ed} - N_1}{N_2 - N_1} \cdot \left(M_2 - M_1\right)
 $$
 
 ## Nachweise

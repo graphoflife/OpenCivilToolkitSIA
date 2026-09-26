@@ -238,22 +238,22 @@ def aufbauen(
 
 def protokoll_ansatz(p: Protokoll, beton: Betongesetz, lagen, fasern: int = FASERN) -> None:
     p.titel("Ansatz")
-    p.text(
+    p.erklaerung(
         "Der Querschnitt bleibt eben (Bernoulli). Zu jeder zulässigen "
         "Dehnungsebene werden Normalkraft und Moment durch Integration über "
         "die Querschnittshöhe bestimmt. Zug ist positiv, das Moment bezieht "
         "sich auf die halbe Querschnittshöhe."
     )
-    p.gleichung(beton.latex(), titel="Beton – Parabel-Rechteck-Beziehung",
-                referenz="SIA 262:2025, 4.2.1.6")
-    p.gleichung(lagen[0][2].latex(), titel="Betonstahl – bilineare Beziehung",
-                referenz="SIA 262:2025, 4.2.2.4")
-    p.gleichung(
+    p.ansatz(beton.latex(), titel="Beton – Parabel-Rechteck-Beziehung",
+             referenz="SIA 262:2025, 4.2.1.6")
+    p.ansatz(lagen[0][2].latex(), titel="Betonstahl – bilineare Beziehung",
+             referenz="SIA 262:2025, 4.2.2.4")
+    p.ansatz(
         r"N = \int_A \sigma\,\mathrm{d}A \qquad "
         r"M = \int_A \sigma \cdot \left(z - \tfrac{h}{2}\right)\,\mathrm{d}A",
         titel="Schnittgrössen aus der Spannungsverteilung",
     )
-    p.text(
+    p.erklaerung(
         f"Der Beton wird in {fasern} Fasern über die Höhe integriert, "
         f"die Bewehrung lagenweise. Die von der Bewehrung verdrängte "
         f"Betonfläche wird abgezogen."
@@ -274,7 +274,7 @@ def protokoll_ansatz(p: Protokoll, beton: Betongesetz, lagen, fasern: int = FASE
 def protokoll_linie(p: Protokoll, linie: Sequence[Linienpunkt],
                 schritte: int = SCHRITTE) -> None:
     p.titel("Aufbau der Resistenzlinie")
-    p.text(
+    p.erklaerung(
         f"Der Dehnungsfächer wird in vier Abschnitten mit je "
         f"{schritte} Schritten abgefahren; das ergibt "
         f"{len(linie)} Punkte. Ausgewiesen ist jeder Abschnittsanfang "

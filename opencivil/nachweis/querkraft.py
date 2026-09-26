@@ -398,6 +398,8 @@ class Querkraft(Nachweis):
     traegt -- nicht eine Einstellung daneben.
     """
 
+    THEMA = "Querkraft"
+
     def __init__(
         self,
         querschnitt: Plattenquerschnitt,
@@ -596,7 +598,7 @@ class Querkraft(Nachweis):
             name=f"Querkraft {self.richtung.value} – {fall.name}",
             art="V",
             ziel=self.d_ausnutzung[fall.name].id,
-            langname="Querkraft",
+            langname=self.thema,
             fall=fall.name,
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
@@ -888,20 +890,20 @@ class Querkraft(Nachweis):
         self, p: Protokoll, e: Eingaben, s_y: Wert
     ) -> None:
         p.titel(f"Querkraft – {self.richtung.beschriftung}")
-        p.text(
+        p.erklaerung(
             "Querkraftwiderstand mit Querkraftbewehrung, Fachwerkmodell mit "
             "veränderlicher Neigung der Druckdiagonalen. Massgebend ist das "
             "Kleinere aus dem Widerstand der Bügel und dem der Druckdiagonalen; "
             "der Betonanteil ohne Bügel geht nicht zusätzlich ein."
         )
         s = {name: e[name].symbol for name in ("a_s_V", "s_x", "f_yd_V", "k_c", "f_cd")}
-        p.gleichung(
+        p.ansatz(
             rf"V_{{Rd,s}} = \frac{{{s['a_s_V']}}}{{{s['s_x']} \cdot {s_y.symbol}}} "
             rf"\cdot 0.9 \cdot d \cdot {s['f_yd_V']} \cdot \cot\alpha \qquad "
             rf"V_{{Rd,c}} = 0.9 \cdot d \cdot {s['k_c']} \cdot {s['f_cd']} "
             r"\cdot \sin\alpha \cdot \cos\alpha",
             titel="Ansatz", referenz="SIA 262:2025, 4.3.3.4")
-        p.text(
+        p.erklaerung(
             "Beide Anteile gelten je Laufmeter, wie die Querkraft selbst. "
             "Gesucht wird ganzgradig zwischen α_min und α_max die Neigung mit "
             f"dem grössten Widerstand V_Rd = min(V_Rd,s; V_Rd,c). Bei einer "
@@ -927,15 +929,12 @@ class Querkraft(Nachweis):
         d = self._protokoll_hoehe(p, e, erg, werte)
 
         if erg.zug_hebt_alpha:
-            p.text(
-                f"N_Ed = {fall.N_Ed.formatiert(1, KN)} kN ist eine Zugkraft – "
-                f"die Grenzen der Neigung werden auf α_min = {erg.alpha_min}° "
-                f"und α_max = {erg.alpha_max}° angehoben.")
+            p.text(f"N_Ed = {fall.N_Ed.formatiert(1, KN)} kN (Zug) → "
+                   f"α_min = {erg.alpha_min}°, α_max = {erg.alpha_max}°.")
 
         q = erg.massgebend
-        p.text(
-            f"Zwischen α = {erg.alpha_min}° und α = {erg.alpha_max}° ganzgradig "
-            f"durchgerechnet; den grössten Widerstand liefert α = {q.alpha}°.")
+        p.text(f"α = {erg.alpha_min}° … {erg.alpha_max}° ganzgradig → grösster "
+               f"Widerstand bei α = {q.alpha}°.")
 
         alpha = werte.wert("alpha", r"\alpha", Groesse(q.alpha, GRAD), 0)
         buegel = werte.wert("V_Rd_s", "V_{Rd,s}", Groesse.aus_si(q.V_Rd_s, KN_PRO_M))
@@ -986,23 +985,23 @@ class Querkraft(Nachweis):
 
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
         p.titel(f"Querkraft – {self.richtung.beschriftung}")
-        p.text(
+        p.erklaerung(
             "Querkraftwiderstand ohne Querkraftbewehrung. Massgebend sind die "
             "statische Höhe der gezogenen Bewehrung, die Grösstkorngrösse und "
             "die Dehnung auf halber Höhe."
         )
         s = {name: e[name].symbol for name in ("tau_cd", "f_yd", "E_s")}
-        p.gleichung(
+        p.ansatz(
             rf"V_{{Rd}} = k_d \cdot {s['tau_cd']} \cdot d_v \qquad "
             r"k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g}",
             titel="Ansatz", referenz="SIA 262:2025, 4.3.3.2.1")
-        p.gleichung(
+        p.ansatz(
             r"m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} \qquad "
             rf"\varepsilon_v = \frac{{{s['f_yd']} \cdot \left(\left|m_{{Ed}}\right| "
             r"- m_{Dd}\right)}"
             rf"{{{s['E_s']} \cdot \left(\left|m_{{Rd}}(N_{{Ed}})\right| - m_{{Dd}}\right)}}",
             titel="Dekompressionsmoment und Dehnung")
-        p.text(
+        p.erklaerung(
             "Nur eine Normaldruckkraft entlastet; eine Zugkraft bleibt beim "
             "Dekompressionsmoment unberücksichtigt. Da der Widerstand über "
             "m_Ed und N_Ed von der Einwirkung abhängt, wird er für jede "
@@ -1080,19 +1079,15 @@ class Querkraft(Nachweis):
         eps_v = werte.dehnung("eps_v", r"\varepsilon_v", erg.eps_v, stellen=3)
         stahl = {"f_yd": e["f_yd"], "E_s": e["E_s"]}
         if erg.eps_v == 0.0:
-            p.text(
-                f"|m_Ed| = {Groesse.aus_si(abs(M_Ed), KNM).formatiert(1)} kNm liegt "
-                f"nicht über m_Dd = {m_Dd.formatiert()} kNm – der Querschnitt "
-                f"bleibt ungerissen, ε_v = 0.")
+            p.text(f"|m_Ed| = {Groesse.aus_si(abs(M_Ed), KNM).formatiert(1)} kNm "
+                   f"≤ m_Dd = {m_Dd.formatiert()} kNm → ungerissen, ε_v = 0.")
         elif erg.plastisch:
             # Die Dehnung folgt hier nicht der Formel darüber -- sie ist fest.
             # Stünde die Formel mit den Zahlen da, ergäbe sie etwas anderes
             # als das Resultat daneben.
-            p.text(
-                f"|m_Ed| = {Groesse.aus_si(abs(M_Ed), KNM).formatiert(1)} kNm liegt "
-                f"über m_Rd(N_Ed) = {m_Rd.formatiert()} kNm: die Bewehrung "
-                f"fliesst. Die Dehnung folgt dann nicht mehr dem Moment, sie "
-                f"ist fest.")
+            p.text(f"|m_Ed| = {Groesse.aus_si(abs(M_Ed), KNM).formatiert(1)} kNm "
+                   f"> m_Rd(N_Ed) = {m_Rd.formatiert()} kNm → Bewehrung fliesst, "
+                   f"ε_v fest.")
             p.formel(eps_v, rf"{PLASTISCH} \cdot \frac{{@f_yd}}{{@E_s}}", stahl,
                      titel="Dehnung auf halber Höhe")
         else:

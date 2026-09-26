@@ -20,6 +20,7 @@ from typing import Any, Dict, List, Optional, Sequence
 
 from opencivil.bewehrungssuche import Suchmodus
 from opencivil.core.einheiten import MM
+from opencivil.bericht.formelsammlung import formelsammlung
 from opencivil.bericht.markdown import block_markdown
 from opencivil.bericht.zusammenfassung import (
     GRAD_SPALTE, STAPEL_SPALTEN, bewehrungsuebersicht, hinweise, nachweistabelle,
@@ -241,6 +242,24 @@ def protokoll_liste(protokoll: Protokoll) -> List[dict]:
     return darstellen(protokoll, TAFEL)
 
 
+def formelsammlung_liste(protokoll: Protokoll) -> List[dict]:
+    """
+    Je Thema die Erklaerungen und die Formeln ohne Zahlen -- jede mit den
+    Raeumen, in denen sie vorkam, damit die Oberflaeche «Aktuelle Seite»
+    eingrenzen kann.
+    """
+    return [
+        {
+            "thema": thema.name,
+            "erklaerungen": [{"text": e.block.text, "raeume": e.raeume}
+                             for e in thema.erklaerungen],
+            "formeln": [{**_gleichung_dict(e.block, 0), "raeume": e.raeume}
+                        for e in thema.formeln],
+        }
+        for thema in formelsammlung(protokoll)
+    ]
+
+
 # ===========================================================================
 # Loesung
 # ===========================================================================
@@ -251,6 +270,7 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None) -> dict:
     ergebnis: Dict[str, Any] = {
         "werte": {wid: wert_dict(w) for wid, w in loesung.werte.items()},
         "protokoll": protokoll_liste(loesung.protokoll),
+        "formelsammlung": formelsammlung_liste(loesung.protokoll),
         "reihenfolge": list(loesung.reihenfolge),
         "vollstaendig": loesung.vollstaendig,
         "fehlende": [

@@ -463,12 +463,12 @@ class Lagenaufbau(Prozedur):
         # Grösse in die Kopfzeile. Sonst muss sie in jeder Zelle stehen.
         einheitlich = not (ueber_abstand and ueber_anzahl)
         if ueber_abstand:
-            p.gleichung(
+            p.ansatz(
                 r"A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}",
                 titel="Bewehrungsquerschnitt über die Breite b",
                 referenz="SIA 262:2025, 5.5.2")
         if ueber_anzahl:
-            p.gleichung(
+            p.ansatz(
                 r"A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot n",
                 titel="Bewehrungsquerschnitt aus der Stabzahl",
                 referenz="SIA 262:2025, 5.5.2")
@@ -614,9 +614,7 @@ class Lagenaufbau(Prozedur):
             # Loeser ab. Ohne Bewehrung auf beiden Seiten gibt es nichts
             # abzustuetzen -- null ist hier die richtige Antwort, nicht "fehlt".
             ergebnis[self.d_distanzhalter.id] = Groesse(0, MM)
-            p.text(
-                "Es liegt nur auf einer Seite Bewehrung – Distanzhalter "
-                "zwischen unterer und oberer Lage gibt es keine.")
+            p.text("Bewehrung nur auf einer Seite → keine Distanzhalter.")
             return ergebnis
 
         hoehe = unten[0] - oben[1]
@@ -764,7 +762,7 @@ class Plattenquerschnitt:
     @property
     def abschnitt(self) -> Abschnitt:
         """Ueberschrift, unter der die ganze Platte in der Herleitung steht."""
-        return Abschnitt(f"Plattenanalyse: {self.name}", self.id)
+        return Abschnitt(f"Plattenanalyse: {self.name}", self.id, thema="Querschnitt")
 
     def _aufbauen(self) -> None:
         d_h = self._def("h", "h", MM, "Plattendicke", 0)

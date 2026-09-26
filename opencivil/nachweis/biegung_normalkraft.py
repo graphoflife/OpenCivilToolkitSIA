@@ -191,6 +191,8 @@ class BiegungNormalkraft(Nachweis):
     Linie (:attr:`linie`) wird mitgerechnet und steht im Diagramm daneben.
     """
 
+    THEMA = "Biegung und Normalkraft"
+
     def __init__(
         self,
         querschnitt: Plattenquerschnitt,
@@ -405,7 +407,7 @@ class BiegungNormalkraft(Nachweis):
                     name=f"M-N-Nachweis {self.richtung.value} – {kombination.name}",
                     art="M-N",
                     ziel=self.d_ausnutzung[kombination.name].id,
-                    langname="Biegung und Normalkraft",
+                    langname=self.thema,
                     fall=kombination.name,
                     erfuellt=auswertung.innerhalb,
                     erfuellungsgrad=Groesse(auswertung.erfuellungsgrad, EINHEITSLOS),

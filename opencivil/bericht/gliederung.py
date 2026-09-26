@@ -3,7 +3,7 @@ opencivil/bericht/gliederung.py -- der ganze Bericht als Bloecke.
 
 VERANTWORTUNG:
 Legt fest, was im Bericht steht und in welcher Folge: die Herleitung, die
-Nachweise je Platte, die Werte, die fehlenden Eingaben. Als
+Formelsammlung, die Nachweise je Platte, die Werte, die fehlenden Eingaben. Als
 :class:`Protokoll`, aus denselben Bloecken, aus denen schon die Herleitung
 besteht. Konsole und LaTeX-Dokument setzen nur noch dieses eine Protokoll,
 jede mit ihrer Tafel.
@@ -27,6 +27,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional
 
+from opencivil.bericht.formelsammlung import als_protokoll, formelsammlung
 from opencivil.bericht.zusammenfassung import (
     Zusammenfassung, bewehrungsuebersicht, hinweise, nachweistabelle,
     plattenangaben, stiller_hinweis, zusammenfassen,
@@ -58,6 +59,10 @@ def bericht(
     if not loesung.protokoll.ist_leer:
         _abschnitt(p, "Herleitung")
         p.anfuegen(*loesung.protokoll.nach_abschnitten())
+    themen = formelsammlung(loesung.protokoll)
+    if themen:
+        _abschnitt(p, "Formelsammlung")
+        p.anfuegen(*als_protokoll(themen).bloecke)
     _nachweise(p, zusammenfassen(aufbau, loesung), aufbau)
     _werte(p, loesung)
     _luecken(p, loesung)

@@ -291,7 +291,7 @@ class GrenzeGegenFliessen(Spannungsgrenze):
         return sigma_adm
 
     def festlegung(self, p: Protokoll) -> None:
-        p.text(
+        p.erklaerung(
             "Drittens die Grenze: sie rechnet mit dem Bemessungswert, "
             "σ_s,adm = f_yd − 80 N/mm², und nicht mit f_yk − 80. Die Norm sagt "
             "an dieser Stelle nicht eindeutig, welcher Wert gemeint ist; f_yd "
@@ -371,7 +371,7 @@ class GrenzeAusRissbreite(Spannungsgrenze):
         return sigma_adm
 
     def festlegung(self, p: Protokoll) -> None:
-        p.text(
+        p.erklaerung(
             "Drittens die Grenze: dieselbe wie bei der Zwängung, mit f_yk und "
             "bei erhöhter und hoher Anforderung zusätzlich begrenzt durch die "
             "Rissbreite. Massgebend ist der dickste Stab der Tragrichtung. "
@@ -395,6 +395,11 @@ class Spannungsbegrenzung(Nachweis):
     wirksamen Elastizitätsmodul und charakteristischen Festigkeiten; gezählt
     wird nur die gezogene Bewehrung. Wogegen gehalten wird, sagt ``grenze``.
     """
+
+    @property
+    def thema(self) -> str:
+        """Je Grenze eines: gegen Fliessen oder aus der Rissbreite."""
+        return self.grenze.langname
 
     def __init__(
         self,
@@ -574,7 +579,7 @@ class Spannungsbegrenzung(Nachweis):
             name=f"{self.grenze.urteilsname} {r} – {erg.fall.name}",
             art=self.grenze.art,
             ziel=self.d_ausnutzung[erg.fall.name].id,
-            langname=self.grenze.langname,
+            langname=self.thema,
             fall=erg.fall.name,
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
@@ -592,7 +597,7 @@ class Spannungsbegrenzung(Nachweis):
         g = self.grenze
         p.titel(f"Stahlspannung unter {g.einwirkung} Einwirkung – "
                 f"{self.richtung.beschriftung}")
-        p.text(
+        p.erklaerung(
             f"{g.einleitung} Gerechnet wird am gerissenen Querschnitt: der "
             f"Beton nimmt keinen Zug auf, im Druck rechnet er linear mit dem "
             f"wirksamen Modul. Gezählt wird nur gezogene Bewehrung."
@@ -603,7 +608,7 @@ class Spannungsbegrenzung(Nachweis):
         sigma_adm = g.bestimmen(e, p)
 
         p.titel("Welche Werte angesetzt werden", ebene=3)
-        p.text(
+        p.erklaerung(
             "Drei Festlegungen stecken in jeder Zahl unten, und alle drei "
             "sind Auslegung der Norm und nicht Rechnung. Erstens das "
             "Kriechen: angesetzt wird dasselbe φ wie sonst, hier aus der "
@@ -613,7 +618,7 @@ class Spannungsbegrenzung(Nachweis):
             "bekäme kleinere Spannungen und einen Nachweis, der leichter "
             "aufgeht."
         )
-        p.text(
+        p.erklaerung(
             "Zweitens die Werkstoffgesetze: sie rechnen mit den "
             "charakteristischen Festigkeiten. Der Stahl ist linear bis f_yk "
             "und fliesst dann, der Beton linear bis f_ck. Ein "
@@ -631,7 +636,7 @@ class Spannungsbegrenzung(Nachweis):
             rf" \quad {angabe(f_c)}",
             titel="Werkstoffgesetze im Gebrauchszustand")
         g.festlegung(p)
-        p.text(
+        p.erklaerung(
             "Fliesst die Bewehrung, bleibt ihre Spannung bei f_yk stehen, "
             "während die Dehnung weiterwächst. Verglichen wird dann die "
             "Dehnung: ε_s gegen ε_s,adm = σ_s,adm / E_s. Solange der Stahl "
@@ -681,12 +686,8 @@ class Spannungsbegrenzung(Nachweis):
     def _protokoll_fliessen(self, p: Protokoll, e: Eingaben, erg: Fallergebnis,
                             werte: Zwischenwerte, wirkt: Wert, grenze: Wert) -> None:
         """Der Fall, in dem die Spannung am Plateau stehen bleibt."""
-        p.text(
-            f"Die Bewehrung fliesst: die grösste Zugdehnung liegt über der "
-            f"Fliessdehnung, die Spannung steht bei {erg.sigma_s / 1e6:.0f} "
-            f"N/mm² und sagt nichts mehr darüber, wie weit die Grenze "
-            f"überschritten ist. Verglichen wird die Dehnung."
-        )
+        p.text(f"Stahl fliesst (σ_s = {erg.sigma_s / 1e6:.0f} N/mm²) → "
+               f"Vergleich über die Dehnung.")
         p.formel(werte.dehnung("eps_y", r"\varepsilon_y", erg.eps_y),
                  r"\frac{@f_s}{@E_s}", {"f_s": e[WERKSTOFFE.stahl], "E_s": e["E_s"]},
                  titel="Grösste Zugdehnung in der Bewehrung",

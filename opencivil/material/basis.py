@@ -256,7 +256,8 @@ def erzeuge(
     definitionen = {v.kurzname: v.definition(namensraum, symbol_index) for v in vorlagen}
     berechnungen: List[Berechnung] = []
     eingabewerte: Dict[str, Groesse] = {}
-    abschnitt = Abschnitt(f"{art.beschriftung}: {name}", namensraum)
+    abschnitt = Abschnitt(f"{art.beschriftung}: {name}", namensraum,
+                          thema=art.beschriftung)
 
     for vorlage in vorlagen:
         ausgabe = definitionen[vorlage.kurzname]

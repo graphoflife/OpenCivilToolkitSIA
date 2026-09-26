@@ -136,6 +136,16 @@ class Berechnung(ABC):
     :meth:`ausfuehren`, das die Ergebnisse prueft und in :class:`Wert` verpackt.
     """
 
+    THEMA: str = ""
+    """
+    Unter welchem Thema ihre Formeln in der Formelsammlung stehen -- ein
+    Nachweis nennt sich selbst. Leer: das Thema ihres Abschnitts.
+    """
+
+    @property
+    def thema(self) -> str:
+        return self.THEMA or (self.abschnitt.thema if self.abschnitt else "")
+
     def __init__(
         self,
         id: str,
@@ -746,6 +756,19 @@ class Nachweis(Berechnung):
         if not urteile:
             return []
         return [min(urteile, key=lambda u: u.erfuellungsgrad.si)]
+
+    def protokoll_massgebend(self, p: Protokoll,
+                             urteile: Sequence[NachweisUrteil]) -> None:
+        """
+        Welcher Teil entscheidet, wo es mehrere gibt -- etwa zwei Lagen.
+
+        In der Zusammenfassung steht nur der schlechteste; ohne diese Zeile
+        muesste man die Zahlen der Herleitung selbst vergleichen, um zu wissen,
+        welcher dort gelandet ist.
+        """
+        massgebend = self.massgebend(urteile)
+        if len(urteile) >= 2 and massgebend:
+            p.text(f"Massgebend: {massgebend[0].fall} (kleinster Erfüllungsgrad).")
 
     @staticmethod
     def teilurteile(

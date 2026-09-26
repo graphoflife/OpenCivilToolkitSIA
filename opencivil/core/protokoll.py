@@ -77,6 +77,12 @@ class Abschnitt:
     titel: str
     raum: str
 
+    thema: str = ""
+    """
+    Unter welchem Thema die Formeln des Abschnitts in der Formelsammlung
+    stehen, sofern die Berechnung keines mitbringt -- «Beton», «Querschnitt».
+    """
+
 
 @dataclass
 class TitelBlock(Block):
@@ -108,9 +114,24 @@ class TitelBlock(Block):
 
 @dataclass
 class TextBlock(Block):
-    """Erklaerender Fliesstext -- das 'Warum' zwischen den Formeln."""
+    """Fliesstext zwischen den Formeln."""
 
     text: str
+
+    erklaerung: bool = False
+    """
+    Ob der Text erklaert, statt ein Ergebnis zu nennen -- das 'Warum'.
+
+    Erklaerungen stehen nicht in der Herleitung (siehe :func:`darstellen`),
+    sondern in der Formelsammlung unter den Formeln ihres Themas. Die
+    Herleitung zeigt Formeln, Zahlen und Stichworte.
+    """
+
+    thema: str = ""
+    """Thema der Berechnung, die den Block schrieb -- vom Rechenwerk gestempelt."""
+
+    raum: str = ""
+    """Namensraum ihres Abschnitts -- ebenso gestempelt."""
 
 
 @dataclass
@@ -140,6 +161,19 @@ class GleichungBlock(Block):
 
     formelzeile: Optional[tex.Formelzeile] = None
     """Strukturierte Fassung, sofern vorhanden -- erlaubt spaeteren Umbruch."""
+
+    ansatz: bool = False
+    """
+    Ob die Gleichung rein symbolisch ist -- ein Ansatz ohne Zahlen, etwa das
+    Werkstoffgesetz oder die Formel, nach der gleich gerechnet wird. Die
+    Formelsammlung nimmt sie so, wie sie dasteht.
+    """
+
+    thema: str = ""
+    """Thema der Berechnung, die den Block schrieb -- vom Rechenwerk gestempelt."""
+
+    raum: str = ""
+    """Namensraum ihres Abschnitts -- ebenso gestempelt."""
 
 
 @dataclass
@@ -211,11 +245,21 @@ class Protokoll:
         self._anfuegen(TitelBlock(text=text, ebene=ebene, raum=raum))
 
     def text(self, text: str) -> None:
+        """Ein Ergebnis in Worten -- knapp, es steht in der Herleitung."""
         self._anfuegen(TextBlock(text=text))
+
+    def erklaerung(self, text: str) -> None:
+        """Das Warum -- steht in der Formelsammlung, nicht in der Herleitung."""
+        self._anfuegen(TextBlock(text=text, erklaerung=True))
 
     def gleichung(self, latex: str, titel: str = "", referenz: str = "") -> None:
         """Setzt beliebiges, bereits fertiges LaTeX."""
         self._anfuegen(GleichungBlock(latex=latex, titel=titel, referenz=referenz))
+
+    def ansatz(self, latex: str, titel: str = "", referenz: str = "") -> None:
+        """Eine Gleichung ohne Zahlen -- sie kommt auch in die Formelsammlung."""
+        self._anfuegen(GleichungBlock(latex=latex, titel=titel, referenz=referenz,
+                                      ansatz=True))
 
     def formel(
         self,
@@ -304,6 +348,21 @@ class Protokoll:
         unter = Protokoll(titel=titel)
         self._anfuegen(UnterprotokollBlock(titel=titel, protokoll=unter))
         return unter
+
+    def herkunft_stempeln(self, thema: str, raum: str, ab: int = 0) -> None:
+        """
+        Thema und Namensraum auf die Bloecke ab ``ab`` -- auch eingeschachtelte.
+
+        Das Rechenwerk ruft das nach jeder Berechnung fuer das, was sie
+        geschrieben hat. Die Formelsammlung ordnet danach; die Berechnung
+        selbst muss nichts davon wissen.
+        """
+        for block in self.bloecke[ab:]:
+            if isinstance(block, (GleichungBlock, TextBlock)):
+                block.thema = block.thema or thema
+                block.raum = block.raum or raum
+            elif isinstance(block, UnterprotokollBlock):
+                block.protokoll.herkunft_stempeln(thema, raum)
 
     # -- Auswerten ----------------------------------------------------------
 
@@ -402,7 +461,13 @@ class StillesProtokoll(Protokoll):
     def text(self, *_, **__) -> None:
         pass
 
+    def erklaerung(self, *_, **__) -> None:
+        pass
+
     def gleichung(self, *_, **__) -> None:
+        pass
+
+    def ansatz(self, *_, **__) -> None:
         pass
 
     def formel(self, *_, **__) -> None:
@@ -514,9 +579,15 @@ def darstellen(protokoll: Protokoll, tafel: Tafel[T], tiefe: int = 0) -> List[T]
 
     Gesucht wird die genaue Art, nicht eine Oberklasse -- auch eine
     abgeleitete Blockart braucht ihren eigenen Eintrag.
+
+    Erklaerungen (:attr:`TextBlock.erklaerung`) laesst jede Darstellung weg:
+    sie stehen in der Formelsammlung. Hier, an der einen Stelle, durch die
+    Oberflaeche und alle Berichte gehen.
     """
     heraus: List[T] = []
     for block in protokoll.nach_abschnitten():
+        if isinstance(block, TextBlock) and block.erklaerung:
+            continue
         setzen = tafel.get(type(block))
         if setzen is None:
             raise TypeError(

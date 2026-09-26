@@ -115,6 +115,8 @@ class Duktilitaet(Nachweis):
     Querschnitt; welche Lagen er ansieht, sagt der Aufbau.
     """
 
+    THEMA = "Duktilität"
+
     def __init__(
         self,
         querschnitt,
@@ -222,7 +224,7 @@ class Duktilitaet(Nachweis):
                 erg.verhaeltnis, EINHEITSLOS)
             urteile.append(self._urteil(erg))
 
-        self._protokoll_massgebend(p, urteile)
+        self.protokoll_massgebend(p, urteile)
         return ergebnis, self.teilurteile(urteile)
 
     def _eine_lage(
@@ -276,7 +278,7 @@ class Duktilitaet(Nachweis):
             name=f"Duktilität – {nummer}. Lage",
             art="D",
             ziel=self.d_ausnutzung[nummer].id,
-            langname="Duktilität",
+            langname=self.thema,
             fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
@@ -296,45 +298,28 @@ class Duktilitaet(Nachweis):
             einheit=EINHEITSLOS, beschreibung="Widerstand", stellen=2,
         ).belegen(Groesse(GRENZE, EINHEITSLOS))
 
-
-    def _protokoll_massgebend(self, p: Protokoll,
-                              urteile: Sequence[NachweisUrteil]) -> None:
-        """
-        Welche Lage den Nachweis entscheidet.
-
-        In der Zusammenfassung steht nur eine Zeile -- die schlechtere der
-        beiden Lagen. Ohne diesen Satz stuende in der Herleitung beides
-        nebeneinander und man muesste die Zahlen selbst vergleichen, um zu
-        wissen, welche davon in der Tabelle gelandet ist.
-        """
-        massgebend = self.massgebend(urteile)
-        if len(urteile) < 2 or not massgebend:
-            return
-        p.text(f"Massgebend ist die {massgebend[0].fall} mit dem kleineren "
-               f"Erfüllungsgrad; sie steht in der Zusammenfassung.")
-
     # -- Mitschrift ---------------------------------------------------------
 
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
         p.titel("Duktilität")
-        p.text(
+        p.erklaerung(
             "Die Druckzone muss schlank bleiben, damit der Stahl lange fliesst, "
             "bevor der Beton versagt: der Querschnitt kündigt sein Versagen an. "
             "Gerechnet wird die Druckzonenhöhe bei reiner Biegung, je Lage "
             "einzeln."
         )
         f_cd = e["f_cd"].symbol
-        p.gleichung(
+        p.ansatz(
             rf"{BLOCKANTEIL} \cdot x \cdot b \cdot {f_cd} = A_s \cdot f_{{sd}}"
             r" \qquad \Rightarrow \qquad "
             rf"x = \frac{{A_s \cdot f_{{sd}}}}"
             rf"{{{BLOCKANTEIL} \cdot b \cdot {f_cd}}}",
             titel="Kräftegleichgewicht bei M_Ed = 0",
             referenz="SIA 262:2025, 4.1.4.2.5")
-        p.gleichung(
+        p.ansatz(
             rf"\frac{{x}}{{d}} \le {GRENZE:.2f}",
             titel="Bedingung")
-        p.text(
+        p.erklaerung(
             "d wird von der gedrückten Randfaser aus gemessen: bei den unteren "
             "Lagen von der Oberkante, bei den oberen von der Unterkante. "
             "Grundbewehrung und Zulage einer Lage zählen mit ihrem gemeinsamen "

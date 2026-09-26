@@ -234,7 +234,7 @@ class Handrechnung:
 
     def _ansatz(self, p: Protokoll) -> None:
         p.titel(f"Resistenzlinie aus Handrechnung – {self.richtung}")
-        p.text(
+        p.erklaerung(
             "Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f_cd; "
             "gedrückter Stahl bleibt unberücksichtigt. Die Bewehrung ist je Seite "
             "zu einer Lage zusammengefasst, das Moment bezieht sich auf die halbe "
@@ -461,7 +461,7 @@ class Handrechnung:
             w_x,
             r"\frac{@h}{2}",
             {"h": self.werte.laenge("h", "h", self.h)},
-            titel="Nulllinie auf halber Höhe: x = h/2",
+            titel="Nulllinie auf halber Höhe",
         )
         w_eps = self.werte.dehnung(f"eps_s_{marke}", rf"\varepsilon_s^{{{hoch}}}",
                                    eps_s, "Dehnung der Zugbewehrung")

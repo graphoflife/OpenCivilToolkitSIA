@@ -1,11 +1,12 @@
 /**
  * bericht.js -- Rechte Tafel: das Rechenergebnis.
  *
- * Drei Sichten auf dieselbe Lösung:
+ * Vier Sichten auf dieselbe Lösung:
  *   Zusammenfassung  je Platte eine Tabelle mit Urteilen und Erfüllungsgraden;
  *                    das Auge je Zeile zeigt genau diesen Nachweis
  *   Diagramme        Interaktionslinien, Kurven, Querschnitt
  *   Herleitung       die Mitschrift des Rechenkerns, Formel für Formel
+ *   Formelsammlung   jede Formel einmal, ohne Zahlen, mit Erklärung
  *
  * Sämtliche Zahlen und Formeln stammen unverändert aus der Lösung. Die
  * Oberfläche formatiert nichts nach -- sonst stünde am Bildschirm etwas
@@ -298,6 +299,30 @@ function herleitung(gesamt) {
     ...bloeckeZeichnen(bloecke),
     lueckenBanner(loesung),
   ]);
+}
+
+/**
+ * Die Formelsammlung: je Thema die Erklärungen und jede Formel einmal, ohne
+ * Zahlen -- mit denselben Kopierknöpfen wie in der Herleitung. Gesammelt hat
+ * der Kern; «Aktuelle Seite» zeigt, was beim gewählten Bestandteil vorkam.
+ */
+function formelsammlung(loesung) {
+  const raum = eingrenzung();
+  if (zustand.umfang === 'seite' && !raum) {
+    return leerzustand('Nichts ausgewählt.',
+      'Links einen Bestandteil wählen – oder oben auf "Gesamt" umschalten.');
+  }
+  const dabei = (eintrag) => !raum || eintrag.raeume.some((r) => imRaum(raum, r));
+  const themen = (loesung.formelsammlung || []).map((t) => ({
+    ...t, erklaerungen: t.erklaerungen.filter(dabei), formeln: t.formeln.filter(dabei),
+  })).filter((t) => t.erklaerungen.length || t.formeln.length);
+  if (!themen.length) return leerzustand('Keine Formeln für diesen Bestandteil.');
+
+  return el('div.blatt', {}, themen.flatMap((t) => [
+    el('div.b-untertitel', { text: t.thema }),
+    ...t.erklaerungen.map((e) => el('p.b-text', { text: e.text })),
+    ...t.formeln.map(gleichungBlock),
+  ]));
 }
 
 /**
@@ -691,6 +716,7 @@ export function berichtZeichnen(behaelter, { verfolgen }) {
     nachweise: () => zusammenfassung(loesung, verfolgen),
     diagramm: () => diagrammSicht(loesung),
     herleitung: () => herleitung(loesung),
+    formelsammlung: () => formelsammlung(loesung),
   };
   return ersetzen(behaelter, (sichten[zustand.reiter] || sichten.nachweise)());
 }

@@ -471,4 +471,4 @@ class TestSproedesVersagen(unittest.TestCase):
         self.assertEqual(titel.count("Biegewiderstand gegen Rissmoment"), 2)
 
         texte = [b.text for b in bloecke if isinstance(b, TextBlock)]
-        self.assertTrue([x for x in texte if x.startswith("Massgebend ist die")])
+        self.assertTrue([x for x in texte if x.startswith("Massgebend: ")])

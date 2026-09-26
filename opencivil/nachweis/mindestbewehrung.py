@@ -215,6 +215,8 @@ class Rissnormalkraft(Nachweis):
     Frage gestempelt (siehe ``Nachweis.teilurteile``).
     """
 
+    THEMA = "Zwängung auf Normalkraft"
+
     def __init__(
         self,
         querschnitt,
@@ -308,7 +310,7 @@ class Rissnormalkraft(Nachweis):
                 erg.erfuellungsgrad, EINHEITSLOS)
             urteile.append(self._urteil(erg))
 
-        self._protokoll_massgebend(p, urteile)
+        self.protokoll_massgebend(p, urteile)
         return ergebnis, self.teilurteile(urteile)
 
     def _eine_lage(self, e: Eingaben, lage: Bewehrungslage, *,
@@ -366,7 +368,7 @@ class Rissnormalkraft(Nachweis):
             name=f"Rissnormalkraft {r} – {nummer}. Lage",
             art="N_Riss",
             ziel=self.d_ausnutzung[nummer].id,
-            langname="Zwängung auf Normalkraft",
+            langname=self.thema,
             fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
@@ -376,30 +378,13 @@ class Rissnormalkraft(Nachweis):
             widerstand=widerstand if erg.machbar else None,
         )
 
-
-    def _protokoll_massgebend(self, p: Protokoll,
-                              urteile: Sequence[NachweisUrteil]) -> None:
-        """
-        Welche Lage den Nachweis entscheidet.
-
-        In der Zusammenfassung steht nur eine Zeile -- die schlechtere der
-        beiden Lagen. Ohne diesen Satz stuende in der Herleitung beides
-        nebeneinander und man muesste die Zahlen selbst vergleichen, um zu
-        wissen, welche davon in der Tabelle gelandet ist.
-        """
-        massgebend = self.massgebend(urteile)
-        if len(urteile) < 2 or not massgebend:
-            return
-        p.text(f"Massgebend ist die {massgebend[0].fall} mit dem kleineren "
-               f"Erfüllungsgrad; sie steht in der Zusammenfassung.")
-
     # -- Mitschrift ---------------------------------------------------------
 
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
         g = self.groessen
         werte = Zwischenwerte(self.id)
         p.titel(f"Sprödes Versagen unter Zwängung – {self.richtung.beschriftung}")
-        p.text(
+        p.erklaerung(
             "Ein zu schwach bewehrter Querschnitt reisst und versagt im selben "
             "Augenblick. Die Bewehrung muss die Kraft übernehmen können, die "
             "der Beton beim Reissen abgibt – erst dann kündigt sich das "
@@ -496,6 +481,8 @@ class ZwaengungBiegung(Nachweis):
     Spannungen sind Gebrauchsspannungen, also elastisch. Eine plastische
     Druckzone gibt es in diesem Augenblick nicht.
     """
+
+    THEMA = "Zwängung auf Biegung"
 
     def __init__(
         self,
@@ -599,7 +586,7 @@ class ZwaengungBiegung(Nachweis):
                 erg.erfuellungsgrad, EINHEITSLOS)
             urteile.append(self._urteil(erg))
 
-        self._protokoll_massgebend(p, urteile)
+        self.protokoll_massgebend(p, urteile)
         return ergebnis, self.teilurteile(urteile)
 
     def _eine_lage(self, e: Eingaben, lage: Bewehrungslage, *, h: float,
@@ -665,7 +652,7 @@ class ZwaengungBiegung(Nachweis):
             name=f"Zwängung Biegung {r} – {nummer}. Lage",
             art="ZB",
             ziel=self.d_ausnutzung[nummer].id,
-            langname="Zwängung auf Biegung",
+            langname=self.thema,
             fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
@@ -675,28 +662,11 @@ class ZwaengungBiegung(Nachweis):
             widerstand=widerstand if erg.machbar else None,
         )
 
-
-    def _protokoll_massgebend(self, p: Protokoll,
-                              urteile: Sequence[NachweisUrteil]) -> None:
-        """
-        Welche Lage den Nachweis entscheidet.
-
-        In der Zusammenfassung steht nur eine Zeile -- die schlechtere der
-        beiden Lagen. Ohne diesen Satz stuende in der Herleitung beides
-        nebeneinander und man muesste die Zahlen selbst vergleichen, um zu
-        wissen, welche davon in der Tabelle gelandet ist.
-        """
-        massgebend = self.massgebend(urteile)
-        if len(urteile) < 2 or not massgebend:
-            return
-        p.text(f"Massgebend ist die {massgebend[0].fall} mit dem kleineren "
-               f"Erfüllungsgrad; sie steht in der Zusammenfassung.")
-
     # -- Mitschrift ---------------------------------------------------------
 
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
         p.titel(f"Zwängung auf Biegung – {self.richtung.beschriftung}")
-        p.text(
+        p.erklaerung(
             "Eine aufgezwungene Krümmung erzeugt beim Reissen ein Moment, das "
             "die Bewehrung übernehmen muss – ohne über die zulässige "
             "Stahlspannung zu kommen. Nicht zu verwechseln mit dem Nachweis "
@@ -705,7 +675,7 @@ class ZwaengungBiegung(Nachweis):
         )
         protokoll_rissmoment(p, e, self.groessen, basis=self.id,
                              referenz="SIA 262:2025, 4.4.2")
-        p.text(
+        p.erklaerung(
             "Das Rissmoment gilt für den ungerissenen Bruttoquerschnitt – den "
             "Zustand vor dem Riss. Der Widerstand dagegen wird am gerissenen "
             "Querschnitt bestimmt, also für den Augenblick danach. Dass zwei "
@@ -719,7 +689,7 @@ class ZwaengungBiegung(Nachweis):
                      r"\frac{@E_s}{@E_cm} \cdot \left(1 + @phi\right)",
                      {"E_s": E_s, "E_cm": e["E_cm"], "phi": e["phi"]},
                      titel="Wertigkeit im gerissenen Zustand")
-        p.text(
+        p.erklaerung(
             "Das Kriechen weicht den Beton auf: E_c,eff = E_cm/(1+φ), und die "
             "Wertigkeit ist E_s/E_c,eff. Ein grösseres φ senkt damit den "
             "Hebelarm und liegt auf der sicheren Seite."
@@ -750,7 +720,7 @@ class ZwaengungBiegung(Nachweis):
         hebelarm = werte.laenge("hebelarm", "z", erg.hebelarm)
         p.formel(hebelarm, r"@d - \frac{@x}{3}", {"d": d, "x": x},
                  titel="Innerer Hebelarm")
-        p.text(
+        p.erklaerung(
             "Die Betondruckspannung verläuft dreieckig – null in der Nulllinie, "
             "am grössten an der gedrückten Kante. Ihre Resultierende liegt "
             "deshalb bei x/3 von dieser Kante."
