@@ -206,7 +206,11 @@ class TestServerHuelle(unittest.TestCase):
 
 
 class TestBruecke(unittest.TestCase):
-    """Das Manifest, aus dem der Browser den Rechenkern zusammenliest."""
+    """
+    Was die Brücke für den Browser ablegt: das Manifest, aus dem er den
+    Rechenkern zusammenliest, die Formelsammlung und die Versionsmarken der
+    Seite.
+    """
 
     def test_manifest_ist_auf_dem_stand_der_quellen(self):
         self.assertTrue(
@@ -251,6 +255,38 @@ class TestBruecke(unittest.TestCase):
             a = bruecke.schreiben(Path(ordner) / "a.json").read_text(encoding="utf-8")
             b = bruecke.schreiben(Path(ordner) / "b.json").read_text(encoding="utf-8")
         self.assertEqual(a, b)
+
+    def test_versionsmarken_sind_auf_dem_stand(self):
+        self.assertTrue(
+            bruecke.versionsmarken_stimmen(),
+            "Die Versionsmarken in web/index.html passen nicht mehr zu den Dateien. "
+            "Bitte 'python3 -m opencivil.web.bruecke' laufen lassen -- sonst holt "
+            "der Browser womöglich alte Module aus dem Zwischenspeicher.")
+
+    def test_die_tafel_kennt_module_und_verzeichnisse(self):
+        tafel = [p.relative_to(bruecke.WURZEL).as_posix() for p in bruecke.tafeldateien()]
+        for datei in ("web/js/app.js", "web/js/kern_arbeiter.js",
+                      "web/kern/dateien.json", "web/kern/formelsammlung.json"):
+            with self.subTest(datei=datei):
+                self.assertIn(datei, tafel)
+
+    def test_marken_schreiben_laesst_den_rest_der_seite(self):
+        kopf = f"<head>\n  {bruecke.ANFANG}\n"
+        fuss = f"  {bruecke.ENDE}\n</head>\n"
+        with tempfile.TemporaryDirectory() as ordner:
+            seite = Path(ordner) / "index.html"
+            seite.write_text(kopf + "  alt\n" + fuss, encoding="utf-8")
+            bruecke.versionsmarken_schreiben(seite)
+            self.assertEqual(seite.read_text(encoding="utf-8"),
+                             kopf + bruecke.versionsmarken() + fuss)
+
+    def test_ohne_kommentare_bricht_das_schreiben_ab(self):
+        """Still nichts zu schreiben hiesse: die alten Marken blieben stehen."""
+        with tempfile.TemporaryDirectory() as ordner:
+            seite = Path(ordner) / "index.html"
+            seite.write_text("<head></head>\n", encoding="utf-8")
+            with self.assertRaises(ValueError):
+                bruecke.versionsmarken_schreiben(seite)
 
 
 if __name__ == "__main__":

@@ -13,8 +13,13 @@
  * Nachweisen braucht bis zu einer halben Minute. Hier rechnet Python, und die
  * Oberfläche bleibt bedienbar: der Laufbalken läuft, die Seite scrollt.
  *
- * Nachrichten an den Hauptfaden: `fortschritt` (für den Ladeschirm), `bereit`
- * oder `gescheitert` (einmal, nach dem Start), `antwort` (je Anfrage).
+ * Nachrichten vom Hauptfaden: zuerst `start` mit der Adresse des
+ * Kernverzeichnisses, dann je Anfrage eine. Nachrichten an den Hauptfaden:
+ * `fortschritt` (für den Ladeschirm), `bereit` oder `gescheitert` (einmal,
+ * nach dem Start), `antwort` (je Anfrage).
+ *
+ * Die Importtafel aus index.html gilt in einem Faden nicht. Darum bindet
+ * dieser keine eigenen Module ein -- sie kämen ohne Versionsmarke.
  */
 
 /** Verzeichnis, in das die Quelldateien im Dateisystem von Pyodide wandern. */
@@ -24,7 +29,6 @@ const EINHAENGEPUNKT = '/kern';
 const WURZEL = new URL('../../', import.meta.url);
 
 const PYODIDE = new URL('../vendor/pyodide/', import.meta.url);
-const MANIFEST = new URL('../kern/dateien.json', import.meta.url);
 
 const melden = (nachricht) => self.postMessage(nachricht);
 
@@ -48,14 +52,15 @@ function startfehler(meldung, spur = '') {
  * Browser kann keine alte Fassung aus dem Zwischenspeicher nehmen, während die
  * übrigen schon neu sind.
  *
- * Das Verzeichnis selbst kommt dagegen wie jede andere Datei, auch aus dem
- * Zwischenspeicher. Es soll so alt sein wie die Oberfläche, die es liest --
- * GitHub Pages speichert beide zehn Minuten. An jedem Speicher vorbei geholt,
- * träfe nach einer Veröffentlichung eine noch gespeicherte alte Oberfläche
- * auf den neuen Kern.
+ * Das Verzeichnis selbst hat seine Marke in der Importtafel von index.html,
+ * wie jedes Modul der Oberfläche. Es ist damit genau so alt wie die Seite, die
+ * es liest. An jedem Speicher vorbei geholt, träfe nach einer Veröffentlichung
+ * eine noch gespeicherte alte Seite auf den neuen Kern.
+ *
+ * @param {string} verzeichnis  Adresse von `web/kern/dateien.json`, mit Marke
  */
-async function quellenEinhaengen(pyodide) {
-  const antwort = await fetch(MANIFEST);
+async function quellenEinhaengen(pyodide, verzeichnis) {
+  const antwort = await fetch(verzeichnis);
   if (!antwort.ok) {
     throw startfehler(
       `Kernverzeichnis fehlt (${antwort.status}) → «python3 -m opencivil.web.bruecke».`);
@@ -82,7 +87,7 @@ async function quellenEinhaengen(pyodide) {
 }
 
 /** Python laden, den Kern einhängen, den Dienst einbinden -- und melden, dass es geht. */
-async function starten() {
+async function starten(verzeichnis) {
   melden({ art: 'fortschritt', text: 'Python wird geladen …' });
 
   let loadPyodide;
@@ -102,7 +107,7 @@ async function starten() {
   });
 
   melden({ art: 'fortschritt', text: 'Rechenkern wird eingelesen …' });
-  const anzahl = await quellenEinhaengen(pyodide);
+  const anzahl = await quellenEinhaengen(pyodide, verzeichnis);
 
   pyodide.runPython(`
 import sys
@@ -124,18 +129,25 @@ if ${JSON.stringify(EINHAENGEPUNKT)} not in sys.path:
   return dienst;
 }
 
-const dienstBereit = starten().catch((fehler) => {
-  melden({ art: 'gescheitert', meldung: fehler.message, spur: fehler.spur || '' });
-  return null;
-});
+/** Versprechen auf den Dienst, gesetzt mit der Startnachricht; `null`, wenn der Start scheitert. */
+let dienstBereit;
 
 /**
- * Eine Anfrage: `{nr, name, rumpf}`, der Rumpf schon als JSON. Hinein und
+ * Die erste Nachricht startet: `{art: 'start', verzeichnis}`. Jede weitere ist
+ * eine Anfrage: `{nr, name, rumpf}`, der Rumpf schon als JSON. Hinein und
  * heraus geht JSON -- genau wie über HTTP; so bekommt die Oberfläche auf beiden
  * Wegen dieselben Daten, bis aufs Zeichen. Der Reihe nach, weil Python in
  * diesem Faden eines nach dem anderen tut.
  */
-self.onmessage = async ({ data: { nr, name, rumpf } }) => {
+self.onmessage = async ({ data }) => {
+  if (data.art === 'start') {
+    dienstBereit = starten(data.verzeichnis).catch((fehler) => {
+      melden({ art: 'gescheitert', meldung: fehler.message, spur: fehler.spur || '' });
+      return null;
+    });
+    return;
+  }
+  const { nr, name, rumpf } = data;
   const dienst = await dienstBereit;
   if (!dienst) return;   // Der Start ist gescheitert; das ist schon gemeldet.
   try {

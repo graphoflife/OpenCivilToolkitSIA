@@ -44,6 +44,68 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-26 · Versionsmarken auch für JavaScript und CSS
+
+Wunsch: Nach einer Änderung soll der Browser nie mehr alte und neue Teile der
+Oberfläche mischen.
+
+### Vorher und nachher
+
+Die `.py`-Dateien des Kerns hatten schon Marken (`…py?v=Marke`). Die Module
+der Oberfläche, das Stilblatt und die beiden Verzeichnisse unter `web/kern/`
+nicht. Ein Server ohne Cache-Angabe lässt den Browser selbst schätzen, wie
+lange er eine Datei behält. So lief beim Prüfen einmal ein altes
+`nachweise.js` mit dem neuen Kern. Neu laden half nicht sicher: Chrome prüft
+dabei nur die Seite selbst beim Server nach. Die eingebundenen Dateien nimmt
+es weiter aus dem Speicher.
+
+| | vorher | nachher |
+| --- | --- | --- |
+| Modul geändert, Seite neu geladen | das Modul kann alt bleiben | neue Marke, neue Adresse: sicher neu |
+| Stilblatt | ohne Marke | mit Marke |
+| `dateien.json`, `formelsammlung.json` | ohne Marke | mit Marke |
+
+Im eingebauten Browser nachgespielt: `nachweise.js` probehalber geändert, die
+Brücke laufen lassen, neu geladen. Geholt wurde `nachweise.js?v=a1c47523be1e`
+statt `?v=44617ce23c2b`, mit dem neuen Inhalt.
+
+### Wie es gebaut ist
+
+* **Eine Importtafel in `web/index.html`.** `python3 -m opencivil.web.bruecke`
+  schreibt sie zwischen zwei Kommentare: je Modul unter `web/js/` und je
+  Verzeichnis unter `web/kern/` die Adresse mit Marke, dazu das Stilblatt mit
+  Marke. Die Module selbst bleiben, wie sie sind: `import './dom.js'` führt
+  über die Tafel auf `./dom.js?v=Marke`.
+* **`app.js` wird im Seitenkopf eingebunden statt mit `src` geladen.** Ein
+  `src`-Attribut liest die Tafel nicht.
+* **Formelsammlung und Faden holen ihre Adressen mit `import.meta.resolve`**,
+  also ebenfalls über die Tafel.
+* **Im Faden gilt die Tafel nicht.** Darum schickt `kern.js` ihm als erste
+  Nachricht die Adresse des Kernverzeichnisses, samt Marke. Der Faden bindet
+  keine eigenen Module ein; die kämen ohne Marke.
+* **Ein Test meldet, wenn die Brücke vergessen ging**
+  (`test_versionsmarken_sind_auf_dem_stand`), wie schon beim Kern. Sie muss
+  jetzt auch nach jeder Änderung unter `web/js/` oder `web/css/` laufen.
+
+### Was bleibt
+
+* **Die Seite selbst** kann noch aus dem Speicher kommen, auf GitHub Pages
+  bis zu zehn Minuten. Dann ist aber alles gleich alt, und Neuladen holt alles
+  neu. Beim Prüfen kam genau das vor: der eingebaute Browser nahm beim
+  Navigieren die alte Seite, erst Neuladen brachte die neue.
+* **Die Fremdbibliotheken** unter `web/vendor/` (KaTeX, MathLive, Pyodide)
+  bleiben ohne Marke. Sie ändern sich nur, wenn jemand bewusst eine neue
+  Fassung einlegt.
+
+### Nachgeprüft
+
+666 Tests. In einem frischen Chrome, ohne Server (Pyodide) und mit Server:
+alle eigenen Dateien kommen mit Marke, der Kern läuft, die Formelsammlung
+lädt, die Konsole bleibt ohne Fehler. Das Protokoll des statischen Servers
+zeigt `dateien.json?v=3288a407ae8a`, geholt vom Faden.
+
+---
+
 ## 2026-09-26 · Umbau nach dem strengen Review: jede Regel an einer Stelle
 
 Anlass: ein Review, das nicht nach Fehlern fragt, sondern nach Form. Es fand

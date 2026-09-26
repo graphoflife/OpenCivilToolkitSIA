@@ -317,7 +317,7 @@ let formelsammlungLaden = null;
  */
 function formelsammlung() {
   if (!zustand.formelsammlung) {
-    formelsammlungLaden ??= fetch(new URL('../kern/formelsammlung.json', import.meta.url))
+    formelsammlungLaden ??= fetch(import.meta.resolve('../kern/formelsammlung.json'))
       .then((antwort) => {
         if (!antwort.ok) throw new Error(`Status ${antwort.status}`);
         return antwort.json();

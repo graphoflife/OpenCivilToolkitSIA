@@ -33,6 +33,17 @@ beim ersten Blick in den Reiter. Darum legt die Bruecke sie fertig ab,
 ``web/kern/formelsammlung.json``, und die Oberflaeche liest sie nur noch. Ein
 Test merkt, wenn sie nicht mehr zum Kern passt.
 
+MARKEN AUCH FUER DIE OBERFLAECHE:
+Dasselbe traf die Module der Oberflaeche: nach einer Aenderung kam einmal ein
+altes ``nachweise.js`` zum neuen Kern. Darum schreibt die Bruecke in
+``web/index.html`` eine Importtafel (``<script type="importmap">``): je Modul
+unter ``web/js/`` und je Verzeichnis unter ``web/kern/`` die Adresse mit
+Marke, dazu das Stilblatt mit Marke. Die Module selbst bleiben, wie sie sind
+-- ``import './dom.js'`` fuehrt ueber die Tafel auf ``./dom.js?v=Marke``.
+So haengt alles an der Seite: wer sie neu laedt, bekommt den Rest im selben
+Stand. Ohne Marke bleiben nur die Fremdbibliotheken unter ``web/vendor/``;
+die aendern sich nur, wenn jemand bewusst eine neue Fassung einlegt.
+
 WARUM ALLE DATEIEN UND NICHT NUR DIE GEBRAUCHTEN:
 Man koennte die Liste auf das beschraenken, was :mod:`opencivil.web.dienst`
 einbindet. Dann muesste die Regel aber bei jeder neuen Einbindung nachgezogen
@@ -41,7 +52,7 @@ Kilobyte sind der bessere Handel.
 
 AUFRUF::
 
-    python3 -m opencivil.web.bruecke        # schreibt beide Dateien in web/kern/
+    python3 -m opencivil.web.bruecke    # schreibt web/kern/ und die Marken in web/index.html
 """
 
 from __future__ import annotations
@@ -49,7 +60,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from opencivil.bericht.formelsammlung import vollstaendig
 from opencivil.web.api import formelsammlung_liste
@@ -58,6 +69,13 @@ WURZEL = Path(__file__).resolve().parents[2]
 PAKET = WURZEL / "opencivil"
 MANIFEST = WURZEL / "web" / "kern" / "dateien.json"
 FORMELSAMMLUNG = WURZEL / "web" / "kern" / "formelsammlung.json"
+SEITE = WURZEL / "web" / "index.html"
+STILBLATT = WURZEL / "web" / "css" / "stil.css"
+
+# Zwischen diesen beiden Kommentaren in der Seite schreibt die Bruecke.
+ANFANG = ("<!-- Versionsmarken: geschrieben von «python3 -m opencivil.web.bruecke», "
+          "nicht von Hand ändern -->")
+ENDE = "<!-- Ende der Versionsmarken -->"
 
 
 def kerndateien() -> List[str]:
@@ -148,6 +166,67 @@ def _json_schreiben(ziel: Path, daten: dict) -> Path:
     return ziel
 
 
+def tafeldateien() -> List[Path]:
+    """
+    Was ueber die Importtafel der Seite geht: jedes Modul der Oberflaeche und
+    die beiden Verzeichnisse unter ``web/kern/``.
+    """
+    return sorted([*(SEITE.parent / "js").glob("*.js"), MANIFEST, FORMELSAMMLUNG])
+
+
+def versionsmarken() -> str:
+    """
+    Was in der Seite zwischen :data:`ANFANG` und :data:`ENDE` steht: das
+    Stilblatt und die Importtafel, jede Adresse mit der Marke ihrer Datei.
+    """
+    tafel = {"imports": {_adresse(pfad): _adresse(pfad, mit_marke=True)
+                         for pfad in tafeldateien()}}
+    zeilen = [
+        f'<link rel="stylesheet" href="{_adresse(STILBLATT, mit_marke=True)}">',
+        '<script type="importmap">',
+        *json.dumps(tafel, indent=2).splitlines(),
+        "</script>",
+    ]
+    return "".join(f"  {zeile}\n" for zeile in zeilen)
+
+
+def _adresse(pfad: Path, *, mit_marke: bool = False) -> str:
+    """Die Adresse einer Datei von der Seite aus, auf Wunsch mit ihrer Marke."""
+    adresse = f"./{pfad.relative_to(SEITE.parent).as_posix()}"
+    return f"{adresse}?v={marke(pfad)}" if mit_marke else adresse
+
+
+def versionsmarken_stimmen() -> bool:
+    """Ob die Marken in der Seite zu den Dateien passen, auf die sie zeigen."""
+    _, block, _ = _zerlegen(SEITE)
+    return block == versionsmarken()
+
+
+def versionsmarken_schreiben(seite: Path | None = None) -> Path:
+    """Ersetzt die Marken in der Seite; alles ausserhalb der beiden Kommentare bleibt."""
+    seite = Path(seite) if seite is not None else SEITE
+    kopf, _, fuss = _zerlegen(seite)
+    seite.write_text(kopf + versionsmarken() + fuss, encoding="utf-8")
+    return seite
+
+
+def _zerlegen(seite: Path) -> Tuple[str, str, str]:
+    """
+    Die Seite in drei Stuecke: bis und mit dem Anfangskommentar, die Marken,
+    ab dem Endkommentar. Fehlt ein Kommentar, bricht es ab -- still nichts zu
+    schreiben hiesse, die alten Marken blieben stehen.
+    """
+    zeilen = seite.read_text(encoding="utf-8").splitlines(keepends=True)
+    try:
+        anfang = next(i for i, zeile in enumerate(zeilen) if zeile.strip() == ANFANG)
+        ende = next(i for i, zeile in enumerate(zeilen)
+                    if zeile.strip() == ENDE and i > anfang)
+    except StopIteration:
+        raise ValueError(f"{seite}: Anfang oder Ende der Versionsmarken fehlt.") from None
+    return ("".join(zeilen[:anfang + 1]), "".join(zeilen[anfang + 1:ende]),
+            "".join(zeilen[ende:]))
+
+
 if __name__ == "__main__":
     geschrieben = schreiben()
     print(f"{geschrieben.relative_to(WURZEL)}: {len(kerndateien())} Dateien")
@@ -155,3 +234,8 @@ if __name__ == "__main__":
     themen = json.loads(sammlung.read_text(encoding="utf-8"))["themen"]
     print(f"{sammlung.relative_to(WURZEL)}: {len(themen)} Themen, "
           f"{sum(len(t['bloecke']) for t in themen)} Einträge")
+    # Zuletzt: die Marken der beiden Verzeichnisse haengen an dem, was eben
+    # geschrieben wurde.
+    seite = versionsmarken_schreiben()
+    print(f"{seite.relative_to(WURZEL)}: Marken für das Stilblatt und "
+          f"{len(tafeldateien())} Dateien")

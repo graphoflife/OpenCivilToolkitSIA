@@ -39,8 +39,11 @@ export class KernFehler extends Error {
  * @returns {Promise<{ruf: Function, art: string, fassung: string}>}
  */
 export function kernStarten(fortschritt = () => {}) {
-  const arbeiter = new Worker(new URL('./kern_arbeiter.js', import.meta.url),
-    { type: 'module' });
+  // Beide Adressen kommen über die Importtafel in index.html, also mit
+  // Versionsmarke. Im Faden gilt die Tafel nicht; die Adresse des
+  // Kernverzeichnisses bekommt er darum mit der ersten Nachricht.
+  const arbeiter = new Worker(import.meta.resolve('./kern_arbeiter.js'), { type: 'module' });
+  arbeiter.postMessage({ art: 'start', verzeichnis: import.meta.resolve('../kern/dateien.json') });
   /** Nummer der Anfrage -> ihr Versprechen, bis die Antwort da ist. */
   const offen = new Map();
   let nummer = 0;
