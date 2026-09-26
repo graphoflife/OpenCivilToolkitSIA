@@ -43,6 +43,179 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-26 · Aufgeräumte Oberfläche, eine Formelsammlung und ein Blatt wie Mathcad
+
+Eine Liste mit fünfzehn Punkten, abgearbeitet in vierzehn Schritten, jeder
+ein Commit. Die Tests kamen zuerst, weil jeder spätere Schritt die Suite
+laufen lässt: 132 s → 28 s, ohne Abdeckung zu verlieren. Gestrichen wurde
+nur Doppeltes; mit den Tests der neuen Teile sind es jetzt 637 statt 656.
+
+### Die Zeit steckte in wenigen Rechnungen
+
+Drei Viertel der Laufzeit gingen auf eine Handvoll Rechnungen: dieselben
+Knickfälle in jedem Test neu, ein zwölf Meter langer Stab mit fünf Sekunden
+je Grenzkraftsuche, ein Knickfall im Standardprojekt, der jeden kalten Lauf
+zwei Sekunden kostete. Jetzt rechnet jede Klasse sie einmal, und der instabile
+Fall ist −8000 kN auf 3 m. Erst danach wurde gestrichen, und nur, was ein
+anderer Test schon prüft.
+
+### Zwei Rechenfragen
+
+* **Die Breite b rechnete richtig.** Bei b = 500 halbieren sich A_s, M_Rd,
+  N_Rd und das Rissmoment, und alle Grade bleiben gleich. Nur die Darstellung
+  verschwieg den Bezug: Die Lagentabelle mischte «je b» und «je 1000 mm».
+  Jetzt bekommt sie eine Spalte b, sobald x und y verschieden breit sind.
+  Die Maske schreibt «M, N je b = … mm · V je m». Ein Test halbiert b, M und
+  N und erwartet jeden Grad unverändert.
+* **Der Eckpunkt x = h/2 fiel weg**, sobald die Zugbewehrung dort nicht
+  fliesst, und mit ihm der ganze Bauch des Polygons. Liegt die x-Bewehrung
+  tief, ergab das bei N = −2000 kN von Hand 81 kNm; genau gerechnet sind es
+  282 kNm. Jetzt trägt der Stahl, was seine Dehnung hergibt,
+  σ_sd = min(E_s·ε_s; f_yd). Das ergibt 246 kNm, innerhalb der genauen
+  Linie. Querkraft und Knicken erben das Polygon und damit die Korrektur.
+
+### Oberfläche
+
+* **Neue Einträge nehmen die kleinste freie Nummer.** Bisher war es
+  «Anzahl + 1», was nach dem Löschen einen doppelten Namen ergab. Den wies
+  der Kern ab.
+* **Die automatische Bewehrung steht im Bewehrungs-Panel**, also dort, wohin
+  sie schreibt. Ihre Moduswörter kommen aus dem Kern
+  (`Suchmodus.beschriftung`) statt aus einer JS-Kopie. «y-Grundbew. wie x»
+  wirkt schon in jeder Rechnung der Suche, denn eine aussen liegende y-Lage
+  kostet die x-Richtung statische Höhe.
+* **Die Zusammenfassung hat höchstens zwei Zeilen je Zelle.** Welche Spalten
+  übereinander stehen, sagt der Kern (`stapel_spalten`), wie schon bei der
+  Grad-Spalte.
+* **Ein Auge statt des Reiters «Werte».** Es startet einen Teillauf neben
+  der Gesamtlösung, nicht an ihrer Stelle, damit Zusammenfassung, Diagramme
+  und Bericht vollständig bleiben. Sein Ziel ist `NachweisUrteil.ziel`, die
+  Wert-ID des Erfüllungsgrads.
+* **Das Querkraft-Diagramm steht immer da.** Ohne V_Ed läuft der Nachweis
+  still mit einem Nullfall, weil die Beiwerte der Kurve erst im Lauf
+  entstehen. Er fällt kein Urteil, meldet keinen Mangel und schreibt keine
+  Herleitung.
+* **Fragezeichen und Texte:** Alle Hilfetexte stehen in einer Tafel (`HILFE`)
+  mit den Stichworten Rechenweg · Werte · φ. Sichtbare Texte sind knapp;
+  längere Texte gibt es nur in der Formelsammlung.
+
+### Die Formelsammlung
+
+Die erklärenden Absätze standen in der Herleitung mitten zwischen den Zahlen.
+Jetzt heissen sie `p.erklaerung(…)`. `darstellen()` lässt sie aus, und diese
+eine Stelle gilt für die Oberfläche und alle Berichte. Die Sammlung nimmt sie
+auf, ebenso die rein symbolischen Ansätze (`p.ansatz(…)`). Nach jeder
+Berechnung stempelt das Rechenwerk das Thema auf ihre Blöcke; das spart jeder
+Berechnung, es selbst durchzureichen. Den Raum liest die Sammlung am
+Abschnittstitel (siehe «Vereinfacht»). Entdoppelt wird über den
+ganzen Lauf, nach der Vorlage ohne führendes Minus und nach dem Grundzeichen
+des Ergebnisses. So bleibt M_Rd,x = … und M_Rd,y = … eine einzige Formel.
+
+### Analytische Gleichungen
+
+* **Kein `eval`.** Ein rekursiver Abstieg liest die LaTeX-Teilmenge, die
+  MathLive liefert, und rechnet mit `Groesse`. Einheiten prüft er also wie
+  überall im Kern.
+* **Getipptes LaTeX erreicht KaTeX nie.** Die Anzeige entsteht aus dem
+  Syntaxbaum als Vorlage und geht durch dieselbe `Formelzeile` wie jede
+  Herleitung: Symbol = Formel = Zahlen = Ergebnis. `\href`, `\htmlClass`
+  und ähnliche Befehle weist schon der Leser ab.
+* **Jede Zeile steht für sich.** Ein Fehler bleibt bei seiner Zeile und bei
+  den Zeilen, die ihr Ergebnis brauchen («y: Fehler in Zeile 7»). Er bricht
+  weder das Blatt noch die Platten ab. Eine Neudefinition gilt ab ihrer
+  Zeile, wie beim Lesen von oben nach unten.
+* **Projektwerte sind Eingabebezüge.** Das Rechenwerk rechnet darum die
+  Platte vorher. Ein verschwundener Wert ist ein Fehler seiner Zeile und
+  kein Abbruch.
+* **MathLive liegt im Repo** (840 KB) und wird erst geladen, wenn ein Blatt
+  offen ist. Seine Schriften sind byte-gleich mit denen von KaTeX und werden
+  von dort genommen.
+* **Die Ansicht bleibt stehen.** Neu gezeichnet verlöre ein Formelfeld mitten
+  im Tippen Fokus und Cursor. Die Ansicht behält darum ihre Knoten, solange
+  die Zeilen dieselben bleiben. Kommt eine Zeile dazu, wird sie neu gebaut.
+  Vorher lässt sie den Fokus los: MathLive merkt sich das fokussierte Feld,
+  und verschwindet es ohne Blur, wirft der nächste Fokus.
+
+### Beim Durchsehen gefunden
+
+Drei Fehler, jeder mit eigenem Commit und Test:
+
+* **Das Auge bei Knicken.** Das Knicken las das M-N-Polygon direkt vom
+  Nachweisobjekt, meldete es dem Rechenwerk aber nicht als Eingang. Im
+  Gesamtlauf fiel das nicht auf, weil M-N vorher rechnet. Der Teillauf des
+  Auges brach dagegen ab, und die Oberfläche zeigte still die ganze
+  Herleitung. Jetzt ist N_Rd⁻ ein Eingang, wie m_Rd bei der Querkraft. Die
+  Lücke bestand seit dem 18.9.; sichtbar wurde sie erst mit dem Auge.
+* **Querkraft ohne V_Ed.** Der stille Nullfall für das Diagramm gab ein
+  Urteil ab. Ohne Zugbewehrung ist V_Rd = 0, und die Zusammenfassung meldete
+  «Querkraft – ohne Einwirkung: nicht erfüllt, ausgeschaltet» bei einer
+  Platte ganz ohne Querkraft. Jetzt gibt der Nullfall kein Urteil ab. Das
+  Diagramm lässt ihn nach dem Fall weg, nicht nach dem Schalter «still»:
+  der heisst «ausgeschaltet», nicht «nur für das Bild».
+* **Bewehrung suchen.** Die Suche leert die gesuchten Lagen zuerst, als
+  Zeichen, dass gesucht wird, und zwar im gespeicherten Projekt. Fand sie
+  nichts, blieben die Lagen leer, obwohl der Kommentar das Gegenteil sagte.
+  Jetzt kommen die alten Durchmesser zurück, wo das Feld noch leer ist.
+
+### Vereinfacht
+
+Wieder vier Durchsichten des Diffs: Wiederverwendung, Vereinfachung,
+Effizienz, Ebene der Lösung. Der Bericht blieb dabei unverändert.
+
+* **Eine Stelle statt mehrerer:**
+  - Der Langname eines Urteils wird gestempelt wie der Raum, statt achtmal
+    mitgegeben.
+  - «n. Lage ohne Bewehrung» und «Zugseite ohne Bewehrung» stehen je einmal
+    da.
+  - Sekunde, Minute, Stunde, m³ und kN/m³ stehen im Einheitenkatalog statt im
+    Leser. Eine getippte Einheit kommt zuerst von dort: «N/mm2» wird N/mm²,
+    «1/m» wird überhaupt erst lesbar.
+  - Der «Name im Index» (Sorte, Fall) gilt für Formelsammlung und Blatt
+    gleich.
+* **Die Oberfläche fragt den Kern:**
+  - Leere Gleichungszeile, Einheiten für die Tipp-Kürzel und
+    Namensvorschlag eines Projektwerts kommen aus dem Kern.
+  - Den Vorschlag macht der Leser selbst. Vorher schlug die Oberfläche
+    ⌀_{1,y,g} vor, das der Leser ablehnt, und k_σ nicht, das er annimmt.
+* **Der Raum eines Formelblocks** kommt aus dem Abschnittstitel, wie in
+  `nach_abschnitten`, statt auf jeden Block gestempelt zu werden: zwei
+  Antworten auf dieselbe Frage sind eine zu viel. Je Thema gibt es eine
+  Liste `eintraege`, gezeichnet vom gemeinsamen Blockzeichner.
+* **Das Auge ist schneller:**
+  - Vorher zeichnete der Klick erst die ganze Herleitung und warf sie gleich
+    wieder weg. Unter Pyodide kostete das bei drei Platten eine halbe
+    Sekunde.
+  - Nach einer Eingabe kommen Haupt- und Teillauf in einem Zeichnen an.
+  - Der Teillauf rechnet nur, wenn die Herleitung zu sehen ist.
+
+Bewusst nicht:
+
+* **Die Rechenfolge** Baustoffe → Platten → Blätter steht sowohl in
+  `alle_ziele` als auch in `_stromabwaerts`. Eine gemeinsame Liste schickte
+  die Baustoffe durch den Verschmelzungsweg des Zwischenspeichers, und das
+  kann die Herleitung verschieben.
+* **Eine schlanke Antwort für Teilläufe** sparte etwa ein Zehntel und
+  änderte die Form der Schnittstelle.
+* **Diese Umbauten** wären grösser, als der Nutzen rechtfertigt:
+  - Zeilen des Blatts einzeln nachführen statt neu bauen (31 ms bei 12
+    Zeilen unter Pyodide).
+  - Die M-V-Kurve zwischenspeichern (2–4 %).
+  - Die Suche als Ansichtszustand führen, statt die Lagen im Projekt zu
+    leeren. Die Rückgabe der alten Werte behebt den Verlust schon.
+
+### Offen
+
+* **Kerndateien ohne Versionsmarke.** Nach einer Änderung kann der Browser
+  alte `.py`-Dateien mit neuen `.js`-Dateien mischen. Gesehen mit dem
+  statischen Server; GitHub Pages speichert zehn Minuten zwischen. Als
+  eigene Aufgabe vorgemerkt: eine Prüfsumme je Datei im Manifest.
+* **Das Ziel eines Blatts** ist «Zeilen ohne Fehler», ein Platzhalter. Er
+  steht in der Werteliste des Berichts, die Zeilenwerte selbst nicht. Das
+  Rechenwerk verlangt vorab erklärte Ausgaben, aber die Einheit einer Zeile
+  steht erst nach dem Rechnen fest.
+
+---
+
 ## 2026-09-25 · Jede Formel aus einer Vorlage -- und danach vereinfacht
 
 Der Pilot der letzten Runde (Duktilität) hatte gezeigt, dass Vorlagen tragen.
