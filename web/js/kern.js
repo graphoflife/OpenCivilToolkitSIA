@@ -48,6 +48,18 @@ export class KernFehler extends Error {
  * den vorhandenen Dateien passt. Deshalb steht hier keine einzige
  * Dateiliste -- veraltete Abschriften wären genau die Art Fehler, die man erst
  * auf der veröffentlichten Seite bemerkt.
+ *
+ * VERSIONSMARKEN:
+ * Jede Datei steht dort mit einer Marke (Prüfsumme ihres Inhalts) und wird als
+ * `…py?v=Marke` geholt. Eine geänderte Datei hat so eine neue Adresse: der
+ * Browser kann keine alte Fassung aus dem Zwischenspeicher nehmen, während die
+ * übrigen schon neu sind.
+ *
+ * Das Verzeichnis selbst kommt dagegen wie jede andere Datei, auch aus dem
+ * Zwischenspeicher. Es soll so alt sein wie die Oberfläche, die es liest --
+ * GitHub Pages speichert beide zehn Minuten. An jedem Speicher vorbei geholt,
+ * träfe nach einer Veröffentlichung eine noch gespeicherte alte Oberfläche
+ * auf den neuen Kern.
  */
 async function quellenEinhaengen(pyodide) {
   const antwort = await fetch(MANIFEST);
@@ -56,14 +68,13 @@ async function quellenEinhaengen(pyodide) {
       `Kernverzeichnis fehlt (${antwort.status}) → «python3 -m opencivil.web.bruecke».`);
   }
   const { dateien } = await antwort.json();
-  if (!Array.isArray(dateien) || !dateien.length) {
-    throw new KernFehler('Kernverzeichnis leer.');
-  }
+  const eintraege = Object.entries(dateien || {});
+  if (!eintraege.length) throw new KernFehler('Kernverzeichnis leer.');
 
   // Erst alle holen, dann alle schreiben: die Anfragen laufen so nebeneinander
-  // statt hintereinander, was bei knapp dreissig Dateien deutlich ausmacht.
-  const geladen = await Promise.all(dateien.map(async (name) => {
-    const datei = await fetch(new URL(name, WURZEL));
+  // statt hintereinander, was bei gut fünfzig Dateien deutlich ausmacht.
+  const geladen = await Promise.all(eintraege.map(async ([name, marke]) => {
+    const datei = await fetch(new URL(`${name}?v=${marke}`, WURZEL));
     if (!datei.ok) throw new KernFehler(`Kerndatei nicht erreichbar: ${name} (${datei.status})`);
     return [name, await datei.text()];
   }));
@@ -74,7 +85,7 @@ async function quellenEinhaengen(pyodide) {
     pyodide.FS.mkdirTree(pfad.slice(0, pfad.lastIndexOf('/')));
     pyodide.FS.writeFile(pfad, kodierer.encode(inhalt));
   }
-  return dateien.length;
+  return eintraege.length;
 }
 
 /**

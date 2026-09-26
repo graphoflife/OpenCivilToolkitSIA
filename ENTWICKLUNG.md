@@ -203,12 +203,26 @@ Bewusst nicht:
   - Die Suche als Ansichtszustand führen, statt die Lagen im Projekt zu
     leeren. Die Rückgabe der alten Werte behebt den Verlust schon.
 
+### Kerndateien mit Versionsmarke
+
+Beim Prüfen mit Pyodide kam `blatt.py` nach einer Änderung noch alt, während
+die Oberfläche schon neu war. Ein schlichter statischer Server sagt nichts
+übers Zwischenspeichern, und der Browser schätzt dann selbst.
+
+* **Jetzt steht im Manifest neben jedem Pfad eine Marke:** die ersten zwölf
+  Zeichen von SHA-256 über den Inhalt. `kern.js` holt `…py?v=Marke`, eine
+  geänderte Datei hat also eine neue Adresse. Geprüft: nach einer Änderung
+  kam genau sie frisch, die übrigen 54 aus dem Zwischenspeicher.
+* **Das Manifest selbst geht bewusst nicht an jedem Speicher vorbei.** Es
+  soll so alt sein wie die Oberfläche, die es liest; GitHub Pages speichert
+  beide zehn Minuten. Frisch geholt träfe nach einer Veröffentlichung eine
+  noch gespeicherte alte Oberfläche auf den neuen Kern.
+* **Das Manifest ändert sich jetzt mit jeder Änderung am Kern.** Der Test
+  in `test_dienst` meldet, wenn `python3 -m opencivil.web.bruecke` vergessen
+  ging.
+
 ### Offen
 
-* **Kerndateien ohne Versionsmarke.** Nach einer Änderung kann der Browser
-  alte `.py`-Dateien mit neuen `.js`-Dateien mischen. Gesehen mit dem
-  statischen Server; GitHub Pages speichert zehn Minuten zwischen. Als
-  eigene Aufgabe vorgemerkt: eine Prüfsumme je Datei im Manifest.
 * **Das Ziel eines Blatts** ist «Zeilen ohne Fehler», ein Platzhalter. Er
   steht in der Werteliste des Berichts, die Zeilenwerte selbst nicht. Das
   Rechenwerk verlangt vorab erklärte Ausgaben, aber die Einheit einer Zeile

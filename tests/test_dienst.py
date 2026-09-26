@@ -224,6 +224,20 @@ class TestBruecke(unittest.TestCase):
         self.assertFalse(
             [d for d in bruecke.kerndateien() if "__pycache__" in d])
 
+    def test_die_marke_haengt_am_inhalt(self):
+        """
+        Geaendert heisst neue Marke, also neue Adresse im Browser -- und kein
+        alter Stand aus dem Zwischenspeicher. Windows-Zeilenenden zaehlen nicht.
+        """
+        with tempfile.TemporaryDirectory() as ordner:
+            datei = Path(ordner) / "x.py"
+            datei.write_bytes(b"a = 1\n")
+            vorher = bruecke.marke(datei)
+            datei.write_bytes(b"a = 1\r\n")
+            self.assertEqual(bruecke.marke(datei), vorher)
+            datei.write_bytes(b"a = 2\n")
+            self.assertNotEqual(bruecke.marke(datei), vorher)
+
     def test_schreiben_ist_wiederholbar(self):
         """Zweimal geschrieben ergibt zeichengleich dasselbe -- sonst rauscht das Diff."""
         with tempfile.TemporaryDirectory() as ordner:

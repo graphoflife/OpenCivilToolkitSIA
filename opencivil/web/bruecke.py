@@ -15,6 +15,16 @@ lesbar, und :func:`stimmt_ueberein` prueft im Test, dass sie zu den
 tatsaechlich vorhandenen Dateien passt. Veraltet sie, schlaegt der Test an,
 nicht erst die veroeffentlichte Seite.
 
+JE DATEI EINE MARKE:
+Neben jedem Pfad steht eine Marke, die ersten zwoelf Zeichen von SHA-256 ueber
+den Inhalt. Der Browser holt die Datei als ``...py?v=Marke``: eine geaenderte
+Datei hat damit eine neue Adresse, und aus dem Zwischenspeicher kommt keine
+alte Fassung mehr, waehrend die uebrigen schon neu sind. Ein schlichter
+statischer Server ohne Cache-Angabe laesst den Browser nach Gefuehl
+zwischenspeichern -- so kam einmal ``blatt.py`` nach einer Aenderung noch alt.
+Das Manifest aendert sich darum mit jeder Aenderung am Kern; der Test merkt,
+wenn das Neuschreiben vergessen ging.
+
 WARUM ALLE DATEIEN UND NICHT NUR DIE GEBRAUCHTEN:
 Man koennte die Liste auf das beschraenken, was :mod:`opencivil.web.dienst`
 einbindet. Dann muesste die Regel aber bei jeder neuen Einbindung nachgezogen
@@ -28,9 +38,10 @@ AUFRUF::
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 WURZEL = Path(__file__).resolve().parents[2]
 PAKET = WURZEL / "opencivil"
@@ -51,25 +62,40 @@ def kerndateien() -> List[str]:
     )
 
 
+def marke(pfad: Path) -> str:
+    """
+    Die Versionsmarke einer Datei: die ersten zwoelf Zeichen von SHA-256 ueber
+    ihren Inhalt. Windows-Zeilenenden zaehlen nicht -- sonst stimmte das
+    Manifest nach einem Auschecken mit CRLF nicht mehr.
+    """
+    return hashlib.sha256(pfad.read_bytes().replace(b"\r\n", b"\n")).hexdigest()[:12]
+
+
 def manifest() -> dict:
     return {
         "hinweis": (
             "Erzeugt von opencivil/web/bruecke.py. Nicht von Hand ändern -- "
-            "stattdessen 'python3 -m opencivil.web.bruecke' laufen lassen."
+            "nach jeder Änderung unter opencivil/ 'python3 -m "
+            "opencivil.web.bruecke' laufen lassen."
         ),
-        "dateien": kerndateien(),
+        "dateien": _mit_marken(),
     }
 
 
+def _mit_marken() -> Dict[str, str]:
+    """Pfad -> Marke, in der Reihenfolge von :func:`kerndateien`."""
+    return {name: marke(WURZEL / name) for name in kerndateien()}
+
+
 def stimmt_ueberein() -> bool:
-    """Ob das abgelegte Manifest den vorhandenen Dateien entspricht."""
+    """Ob das abgelegte Manifest den vorhandenen Dateien entspricht -- samt Marken."""
     if not MANIFEST.is_file():
         return False
     try:
         abgelegt = json.loads(MANIFEST.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
         return False
-    return abgelegt.get("dateien") == kerndateien()
+    return abgelegt.get("dateien") == _mit_marken()
 
 
 def schreiben(pfad: Path | None = None) -> Path:
