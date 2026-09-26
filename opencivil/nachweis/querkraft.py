@@ -326,8 +326,8 @@ class Querkraftfall:
 
 #: Der Fall eines Querkraftnachweises ohne Querkraft: er rechnet still, nur
 #: fuer das Diagramm -- die M-V-Kurve und der Verlauf ueber die Neigung
-#: brauchen die Beiwerte, die erst im Lauf entstehen. Ohne Einwirkung nie ein
-#: Mangel; M = 0 misst d fuer das positive Moment.
+#: brauchen die Beiwerte, die erst im Lauf entstehen. Ohne Einwirkung kein
+#: Urteil und kein Punkt im Bild; M = 0 misst d fuer das positive Moment.
 NUR_KURVE = Querkraftfall(name="ohne Einwirkung", V_Ed=Groesse(0.0, KN_PRO_M),
                           M_Ed=Groesse(0.0, KNM), N_Ed=Groesse(0.0, KN))
 
@@ -592,6 +592,11 @@ class Querkraft(Nachweis):
         ergebnis[self.d_v_rd[fall.name].id] = Groesse.aus_si(erg.v_Rd, KN_PRO_M)
         ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(
             erg.erfuellungsgrad, EINHEITSLOS)
+        # Der Nullfall ist nur das Ziel des Laufs. Ein Urteil von ihm meldete
+        # die Zusammenfassung als ausgeschalteten Mangel, sobald V_Rd = 0 ist
+        # (Zugseite ohne Bewehrung) -- ohne dass es eine Querkraft gibt.
+        if fall is NUR_KURVE:
+            return
 
         urteile.append(NachweisUrteil(
             name=f"Querkraft {self.richtung.value} – {fall.name}",

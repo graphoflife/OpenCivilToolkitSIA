@@ -21,6 +21,7 @@ from opencivil.core.berechnung import grad_als_text
 from opencivil.core.einheiten import KN, KNM, KN_PRO_M
 from opencivil.core.rechenwerk import Loesung
 from opencivil.nachweis.handrechnung import BLOCKANTEIL
+from opencivil.nachweis.querkraft import NUR_KURVE
 from opencivil.projekt import Aufbau
 from opencivil.querschnitt.platte import Richtung
 
@@ -96,9 +97,8 @@ def querkraftkurven(
             # Moment vorzeichenbehaftet -- der Fall gehoert auf die Seite, auf
             # der er wirkt. Die Querkraft dagegen als Betrag: ihr Vorzeichen
             # spielt keine Rolle, gerechnet wird ohnehin mit |V_Ed|.
-            # Ein stiller Nachweis rechnet nur fuer die Kurve: sein Nullfall
-            # ist keine Einwirkung und kein Punkt im Bild.
-            "faelle": [] if nachweis.still else [
+            # Der Nullfall ist keine Einwirkung und kein Punkt im Bild.
+            "faelle": [
                 {
                     "name": erg.fall.name,
                     "M_Ed": erg.fall.M_Ed.in_einheit(KNM),
@@ -109,7 +109,7 @@ def querkraftkurven(
                     "plastisch": erg.plastisch,
                     "begruendung": erg.begruendung,
                 }
-                for erg in nachweis.ergebnisse
+                for erg in nachweis.ergebnisse if erg.fall is not NUR_KURVE
             ],
         }
     return kurven
@@ -177,7 +177,7 @@ def neigungskurven(aufbau: Aufbau) -> dict:
                      "im_bereich": a_min <= q.alpha <= a_max}
                     for q in punkte
                 ],
-                "faelle": [] if nachweis.still else [
+                "faelle": [
                     {
                         "name": erg.fall.name,
                         "V_Ed": abs(erg.fall.V_Ed.in_einheit(KN_PRO_M)),
@@ -186,7 +186,7 @@ def neigungskurven(aufbau: Aufbau) -> dict:
                         "erfuellt": erg.erfuellt,
                         "begruendung": erg.begruendung,
                     }
-                    for erg in gruppe
+                    for erg in gruppe if erg.fall is not NUR_KURVE
                 ],
             }
     return kurven

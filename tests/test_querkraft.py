@@ -246,6 +246,23 @@ class TestQuerkraft(unittest.TestCase):
                 self.assertTrue(kurven)
                 self.assertTrue(all(k["faelle"] == [] for k in kurven.values()))
 
+    def test_ohne_v_ed_auch_kein_stiller_mangel(self):
+        """
+        Unten ohne x-Bewehrung ist V_Rd = 0 -- ohne Querkraft ist das kein
+        Mangel. Vorher stand in der Zusammenfassung «Querkraft – ohne
+        Einwirkung: nicht erfüllt (α_eff = 0.00), ausgeschaltet».
+        """
+        projekt = Projekt.beispiel()
+        q = projekt.querschnitte[0]
+        for nummer in (1, 2):
+            if q.richtung_von(nummer).value == "x":
+                q.lagen[nummer - 1].grund.durchmesser = 0.0
+                q.lagen[nummer - 1].zulage.durchmesser = 0.0
+        aufbau = projekt.aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        self.assertTrue(aufbau.querkraft["q1.x"].still)
+        self.assertFalse([u for u in loesung.urteile if u.art == "V"])
+
     def test_erfuellungsgrad_ist_widerstand_durch_einwirkung(self):
         aufbau, gefunden = urteile(projekt_mit_querkraft())
         urteil = gefunden["Querkraft x – Feld"]
