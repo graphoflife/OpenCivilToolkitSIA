@@ -20,7 +20,7 @@ from typing import Any, Dict, List, Optional
 
 from opencivil.bewehrungssuche import Suchmodus
 from opencivil.core.einheiten import MM
-from opencivil.bericht.formelsammlung import formelsammlung
+from opencivil.bericht.formelsammlung import Thema
 from opencivil.bericht.markdown import block_markdown
 from opencivil.bericht.zusammenfassung import (
     GRAD_SPALTE, STAPEL_SPALTEN, bewehrungsuebersicht, hinweise, nachweistabelle,
@@ -251,19 +251,11 @@ def protokoll_liste(protokoll: Protokoll) -> List[dict]:
     return darstellen(protokoll, TAFEL)
 
 
-def formelsammlung_liste(protokoll: Protokoll) -> List[dict]:
-    """
-    Je Thema die Eintraege wie im Bericht, als Bloecke derselben Tafel -- jeder
-    mit den Raeumen, in denen er vorkam, damit die Oberflaeche «Aktuelle Seite»
-    eingrenzen kann.
-    """
+def formelsammlung_liste(themen: List[Thema]) -> List[dict]:
+    """Je Thema die Bloecke wie im Bericht, als Bloecke derselben Tafel."""
     return [
-        {
-            "thema": thema.name,
-            "eintraege": [{**TAFEL[type(e.block)](e.block, 0), "raeume": e.raeume}
-                          for e in thema.eintraege],
-        }
-        for thema in formelsammlung(protokoll)
+        {"thema": thema.name, "bloecke": [TAFEL[type(b)](b, 0) for b in thema.bloecke]}
+        for thema in themen
     ]
 
 
@@ -277,7 +269,6 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None) -> dict:
     ergebnis: Dict[str, Any] = {
         "werte": {wid: wert_dict(w) for wid, w in loesung.werte.items()},
         "protokoll": protokoll_liste(loesung.protokoll),
-        "formelsammlung": formelsammlung_liste(loesung.protokoll),
         "reihenfolge": list(loesung.reihenfolge),
         "vollstaendig": loesung.vollstaendig,
         "fehlende": [

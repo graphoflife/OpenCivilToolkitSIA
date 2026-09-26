@@ -60,9 +60,11 @@ def bericht(
     if not loesung.protokoll.ist_leer:
         _abschnitt(p, "Herleitung")
         p.anfuegen(*loesung.protokoll.nach_abschnitten())
+    # Nur, was dieser Lauf rechnet: die ganze Formelsammlung steht in der
+    # Oberflaeche, hier die Formeln und Erklaerungen zu diesem Bericht.
     themen = formelsammlung(loesung.protokoll)
     if themen:
-        _abschnitt(p, "Formelsammlung")
+        _abschnitt(p, "Verwendete Formeln")
         formelsammlung_anfuegen(p, themen)
     _nachweise(p, zusammenfassen(aufbau, loesung), aufbau)
     _werte(p, loesung)

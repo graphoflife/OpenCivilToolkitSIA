@@ -25,6 +25,14 @@ zwischenspeichern -- so kam einmal ``blatt.py`` nach einer Aenderung noch alt.
 Das Manifest aendert sich darum mit jeder Aenderung am Kern; der Test merkt,
 wenn das Neuschreiben vergessen ging.
 
+UND DIE FORMELSAMMLUNG:
+Die ganze Formelsammlung (:func:`opencivil.bericht.formelsammlung.vollstaendig`)
+haengt an keinem Projekt -- rechnen muss man sie trotzdem: zwei Projekte, die
+zusammen jeden Nachweis fuehren. Unter Pyodide dauerte das Sekunden, jedesmal
+beim ersten Blick in den Reiter. Darum legt die Bruecke sie fertig ab,
+``web/kern/formelsammlung.json``, und die Oberflaeche liest sie nur noch. Ein
+Test merkt, wenn sie nicht mehr zum Kern passt.
+
 WARUM ALLE DATEIEN UND NICHT NUR DIE GEBRAUCHTEN:
 Man koennte die Liste auf das beschraenken, was :mod:`opencivil.web.dienst`
 einbindet. Dann muesste die Regel aber bei jeder neuen Einbindung nachgezogen
@@ -33,7 +41,7 @@ Kilobyte sind der bessere Handel.
 
 AUFRUF::
 
-    python3 -m opencivil.web.bruecke        # schreibt web/kern/dateien.json
+    python3 -m opencivil.web.bruecke        # schreibt beide Dateien in web/kern/
 """
 
 from __future__ import annotations
@@ -43,9 +51,13 @@ import json
 from pathlib import Path
 from typing import Dict, List
 
+from opencivil.bericht.formelsammlung import vollstaendig
+from opencivil.web.api import formelsammlung_liste
+
 WURZEL = Path(__file__).resolve().parents[2]
 PAKET = WURZEL / "opencivil"
 MANIFEST = WURZEL / "web" / "kern" / "dateien.json"
+FORMELSAMMLUNG = WURZEL / "web" / "kern" / "formelsammlung.json"
 
 
 def kerndateien() -> List[str]:
@@ -99,13 +111,47 @@ def stimmt_ueberein() -> bool:
 
 
 def schreiben(pfad: Path | None = None) -> Path:
-    ziel = Path(pfad) if pfad is not None else MANIFEST
+    return _json_schreiben(Path(pfad) if pfad is not None else MANIFEST, manifest())
+
+
+def formelsammlung() -> dict:
+    """Die ganze Formelsammlung, so wie die Oberflaeche sie liest."""
+    return {
+        "hinweis": (
+            "Erzeugt von opencivil/web/bruecke.py aus Projekt.beispiel und "
+            "Projekt.jeder_nachweis. Nicht von Hand ändern."
+        ),
+        "themen": formelsammlung_liste(vollstaendig()),
+    }
+
+
+def formelsammlung_stimmt() -> bool:
+    """Ob die abgelegte Formelsammlung der entspricht, die der Kern heute ergibt."""
+    if not FORMELSAMMLUNG.is_file():
+        return False
+    try:
+        abgelegt = json.loads(FORMELSAMMLUNG.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return False
+    # Durch JSON hin und zurueck, damit beide Seiten dieselben Typen haben.
+    return abgelegt.get("themen") == json.loads(json.dumps(formelsammlung()["themen"]))
+
+
+def formelsammlung_schreiben(pfad: Path | None = None) -> Path:
+    return _json_schreiben(Path(pfad) if pfad is not None else FORMELSAMMLUNG,
+                           formelsammlung())
+
+
+def _json_schreiben(ziel: Path, daten: dict) -> Path:
     ziel.parent.mkdir(parents=True, exist_ok=True)
-    ziel.write_text(
-        json.dumps(manifest(), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    ziel.write_text(json.dumps(daten, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return ziel
 
 
 if __name__ == "__main__":
     geschrieben = schreiben()
     print(f"{geschrieben.relative_to(WURZEL)}: {len(kerndateien())} Dateien")
+    sammlung = formelsammlung_schreiben()
+    themen = json.loads(sammlung.read_text(encoding="utf-8"))["themen"]
+    print(f"{sammlung.relative_to(WURZEL)}: {len(themen)} Themen, "
+          f"{sum(len(t['bloecke']) for t in themen)} Einträge")

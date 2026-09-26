@@ -215,6 +215,13 @@ class TestBruecke(unittest.TestCase):
             "opencivil/. Bitte 'python3 -m opencivil.web.bruecke' laufen lassen -- "
             "sonst lädt die Seite einen veralteten Kern.")
 
+    def test_formelsammlung_ist_auf_dem_stand(self):
+        self.assertTrue(
+            bruecke.formelsammlung_stimmt(),
+            "web/kern/formelsammlung.json passt nicht mehr zum Kern. Bitte "
+            "'python3 -m opencivil.web.bruecke' laufen lassen -- sonst zeigt die "
+            "Oberfläche eine veraltete Formelsammlung.")
+
     def test_der_dienst_ist_im_manifest(self):
         dateien = bruecke.kerndateien()
         self.assertIn("opencivil/web/dienst.py", dateien)

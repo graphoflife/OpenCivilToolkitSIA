@@ -301,24 +301,30 @@ function herleitung(gesamt) {
   ]);
 }
 
-/**
- * Die Formelsammlung: je Thema die Erklärungen und jede Formel einmal, ohne
- * Zahlen -- mit denselben Kopierknöpfen wie in der Herleitung. Gesammelt hat
- * der Kern; «Aktuelle Seite» zeigt, was beim gewählten Bestandteil vorkam.
- */
-function formelsammlung(loesung) {
-  const leer = ohneAuswahl();
-  if (leer) return leer;
-  const raum = eingrenzung();
-  const dabei = (eintrag) => !raum || eintrag.raeume.some((r) => imRaum(raum, r));
-  const themen = (loesung.formelsammlung || [])
-    .map((t) => ({ thema: t.thema, eintraege: t.eintraege.filter(dabei) }))
-    .filter((t) => t.eintraege.length);
-  if (!themen.length) return leerzustand('Keine Formeln für diesen Bestandteil.');
+/** Das Laden der Formelsammlung -- einmal, beim ersten Blick in den Reiter. */
+let formelsammlungLaden = null;
 
-  return el('div.blatt', {}, themen.flatMap((t) => [
+/**
+ * Die Formelsammlung: jede Formel des Werkzeugs einmal, ohne Zahlen, mit den
+ * Erklärungen und denselben Kopierknöpfen wie in der Herleitung -- zum
+ * Nachschlagen, gleich welches Projekt offen ist und welche Nachweise darin
+ * laufen. Darum auch kein Seitenfilter. Der Kern legt sie fertig ab
+ * (`python3 -m opencivil.web.bruecke`); hier wird sie nur gelesen.
+ */
+function formelsammlung() {
+  if (!zustand.formelsammlung) {
+    formelsammlungLaden ??= fetch(new URL('../kern/formelsammlung.json', import.meta.url))
+      .then((antwort) => {
+        if (!antwort.ok) throw new Error(`Status ${antwort.status}`);
+        return antwort.json();
+      })
+      .then(({ themen }) => aendern({ formelsammlung: themen }, 'formelsammlung'))
+      .catch((fehler) => melden(`Formelsammlung nicht ladbar: ${fehler.message}`, true));
+    return leerzustand('Formelsammlung wird geladen …');
+  }
+  return el('div.blatt', {}, zustand.formelsammlung.flatMap((t) => [
     el('div.b-untertitel', { text: t.thema }),
-    ...bloeckeZeichnen(t.eintraege),
+    ...bloeckeZeichnen(t.bloecke),
   ]));
 }
 
@@ -704,18 +710,16 @@ function imRaum(raum, id) {
 
 export function berichtZeichnen(behaelter, { verfolgen }) {
   const loesung = zustand.loesung;
-
-  if (!loesung) {
-    return ersetzen(behaelter, leerzustand(
-      'Noch nichts gerechnet.',
-      'Oben «Rechnen».'));
-  }
-
   const sichten = {
     nachweise: () => zusammenfassung(loesung, verfolgen),
     diagramm: () => diagrammSicht(loesung),
     herleitung: () => herleitung(loesung),
-    formelsammlung: () => formelsammlung(loesung),
+    formelsammlung,
   };
-  return ersetzen(behaelter, (sichten[zustand.reiter] || sichten.nachweise)());
+  const sicht = sichten[zustand.reiter] || sichten.nachweise;
+  // Die Formelsammlung hängt an keiner Rechnung, die übrigen Reiter schon.
+  if (!loesung && sicht !== formelsammlung) {
+    return ersetzen(behaelter, leerzustand('Noch nichts gerechnet.', 'Oben «Rechnen».'));
+  }
+  return ersetzen(behaelter, sicht());
 }

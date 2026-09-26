@@ -1,0 +1,922 @@
+{
+  "hinweis": "Erzeugt von opencivil/web/bruecke.py aus Projekt.beispiel und Projekt.jeder_nachweis. Nicht von Hand ändern.",
+  "themen": [
+    {
+      "thema": "Beton",
+      "bloecke": [
+        {
+          "art": "gleichung",
+          "latex": "\\eta_{fc} = \\min\\left[\\left(\\frac{40\\,\\mathrm{N}/\\mathrm{mm}^{2}}{f_{ck}}\\right)^{1/3};\\ 1.0\\right]",
+          "markdown": "**Beiwert zur Berücksichtigung der Festigkeitsminderung** *(SIA 262:2025, 2.4.2.3)*\n\n$$\n\\eta_{fc} = \\min\\left[\\left(\\frac{40\\,\\mathrm{N}/\\mathrm{mm}^{2}}{f_{ck}}\\right)^{1/3};\\ 1.0\\right]\n$$",
+          "titel": "Beiwert zur Berücksichtigung der Festigkeitsminderung",
+          "referenz": "SIA 262:2025, 2.4.2.3",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "f_{cd} = \\frac{\\eta_{fc} \\cdot f_{ck}}{\\gamma_c}",
+          "markdown": "**Bemessungswert der Betondruckfestigkeit** *(SIA 262:2025, 2.4.2.3)*\n\n$$\nf_{cd} = \\frac{\\eta_{fc} \\cdot f_{ck}}{\\gamma_c}\n$$",
+          "titel": "Bemessungswert der Betondruckfestigkeit",
+          "referenz": "SIA 262:2025, 2.4.2.3",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\tau_{cd} = \\frac{0.3 \\cdot \\sqrt{f_{ck}}}{\\gamma_c} \\quad \\left(f_{ck}\\ \\text{in}\\ \\mathrm{N}/\\mathrm{mm}^{2}\\right)",
+          "markdown": "**Bemessungswert der Schubspannungsgrenze** *(SIA 262:2025, 2.4.2.4)*\n\n$$\n\\tau_{cd} = \\frac{0.3 \\cdot \\sqrt{f_{ck}}}{\\gamma_c} \\quad \\left(f_{ck}\\ \\text{in}\\ \\mathrm{N}/\\mathrm{mm}^{2}\\right)\n$$",
+          "titel": "Bemessungswert der Schubspannungsgrenze",
+          "referenz": "SIA 262:2025, 2.4.2.4",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "f_{cm} = f_{ck} + 8\\,\\mathrm{N}/\\mathrm{mm}^{2}",
+          "markdown": "**Mittelwert der Zylinderdruckfestigkeit** *(SIA 262:2025, 3.1.2.2.2)*\n\n$$\nf_{cm} = f_{ck} + 8\\,\\mathrm{N}/\\mathrm{mm}^{2}\n$$",
+          "titel": "Mittelwert der Zylinderdruckfestigkeit",
+          "referenz": "SIA 262:2025, 3.1.2.2.2",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "E_{cm} = k_e \\cdot \\sqrt[3]{f_{cm}} \\quad \\left(f_{cm}\\ \\text{in}\\ \\mathrm{N}/\\mathrm{mm}^{2}\\right)",
+          "markdown": "**Mittelwert des Elastizitätsmoduls** *(SIA 262:2025, 3.1.2.3.3)*\n\n$$\nE_{cm} = k_e \\cdot \\sqrt[3]{f_{cm}} \\quad \\left(f_{cm}\\ \\text{in}\\ \\mathrm{N}/\\mathrm{mm}^{2}\\right)\n$$",
+          "titel": "Mittelwert des Elastizitätsmoduls",
+          "referenz": "SIA 262:2025, 3.1.2.3.3",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "E_{cd} = \\frac{E_{cm}}{\\gamma_{cE}}",
+          "markdown": "**Bemessungswert des Elastizitätsmoduls** *(SIA 262:2025, 4.2.1.15)*\n\n$$\nE_{cd} = \\frac{E_{cm}}{\\gamma_{cE}}\n$$",
+          "titel": "Bemessungswert des Elastizitätsmoduls",
+          "referenz": "SIA 262:2025, 4.2.1.15",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "k_{\\sigma} = \\frac{E_{cd}}{400 \\cdot f_{cd}}",
+          "markdown": "**Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung** *(SIA 262:2025, 4.2.1.6)*\n\n$$\nk_{\\sigma} = \\frac{E_{cd}}{400 \\cdot f_{cd}}\n$$",
+          "titel": "Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung",
+          "referenz": "SIA 262:2025, 4.2.1.6",
+          "wert_id": "",
+          "gruppe": ""
+        }
+      ]
+    },
+    {
+      "thema": "Betonstahl",
+      "bloecke": [
+        {
+          "art": "gleichung",
+          "latex": "f_{yd} = \\frac{f_{yk}}{\\gamma_s}",
+          "markdown": "**Bemessungswert der Fliessgrenze** *(SIA 262:2025, 2.4.2.5)*\n\n$$\nf_{yd} = \\frac{f_{yk}}{\\gamma_s}\n$$",
+          "titel": "Bemessungswert der Fliessgrenze",
+          "referenz": "SIA 262:2025, 2.4.2.5",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "f_{yd}^{-} = \\frac{f_{yk}^{-}}{\\gamma_s}",
+          "markdown": "**Bemessungswert der Fliessgrenze auf Druck** *(SIA 262:2025, 2.4.2.5)*\n\n$$\nf_{yd}^{-} = \\frac{f_{yk}^{-}}{\\gamma_s}\n$$",
+          "titel": "Bemessungswert der Fliessgrenze auf Druck",
+          "referenz": "SIA 262:2025, 2.4.2.5",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\varepsilon_{yd} = \\frac{f_{yd}}{E_s}",
+          "markdown": "**Fliessdehnung (Bemessungswert)** *(SIA 262:2025, 4.2.2.4)*\n\n$$\n\\varepsilon_{yd} = \\frac{f_{yd}}{E_s}\n$$",
+          "titel": "Fliessdehnung (Bemessungswert)",
+          "referenz": "SIA 262:2025, 4.2.2.4",
+          "wert_id": "",
+          "gruppe": ""
+        }
+      ]
+    },
+    {
+      "thema": "Querschnitt",
+      "bloecke": [
+        {
+          "art": "gleichung",
+          "latex": "A_s = \\frac{\\pi \\cdot \\varnothing^{2}}{4} \\cdot \\frac{b}{s}",
+          "markdown": "**Bewehrungsquerschnitt über die Breite b** *(SIA 262:2025, 5.5.2)*\n\n$$\nA_s = \\frac{\\pi \\cdot \\varnothing^{2}}{4} \\cdot \\frac{b}{s}\n$$",
+          "titel": "Bewehrungsquerschnitt über die Breite b",
+          "referenz": "SIA 262:2025, 5.5.2",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\mu_s = \\frac{A_{s,tot} \\cdot 7850\\,\\mathrm{kg}/\\mathrm{m}^{3}}{b \\cdot h}",
+          "markdown": "**Bewehrungsmass je Kubikmeter Beton**\n\n$$\n\\mu_s = \\frac{A_{s,tot} \\cdot 7850\\,\\mathrm{kg}/\\mathrm{m}^{3}}{b \\cdot h}\n$$",
+          "titel": "Bewehrungsmass je Kubikmeter Beton",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "h_{Dist} = \\text{OK innere untere Lage} - \\text{UK innere obere Lage}",
+          "markdown": "**Höhe der Distanzhalter**\n\n$$\nh_{Dist} = \\text{OK innere untere Lage} - \\text{UK innere obere Lage}\n$$",
+          "titel": "Höhe der Distanzhalter",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "A_{\\varnothing,V} = \\frac{\\pi \\cdot \\left(\\varnothing_{V}\\right)^{2}}{4}",
+          "markdown": "**Querschnitt eines Bügelschenkels** *(SIA 262:2025, 5.5.2)*\n\n$$\nA_{\\varnothing,V} = \\frac{\\pi \\cdot \\left(\\varnothing_{V}\\right)^{2}}{4}\n$$",
+          "titel": "Querschnitt eines Bügelschenkels",
+          "referenz": "SIA 262:2025, 5.5.2",
+          "wert_id": "",
+          "gruppe": ""
+        }
+      ]
+    },
+    {
+      "thema": "Biegung und Normalkraft",
+      "bloecke": [
+        {
+          "art": "text",
+          "text": "Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f_cd; gedrückter Stahl bleibt unberücksichtigt. Die Bewehrung ist je Seite zu einer Lage zusammengefasst, das Moment bezieht sich auf die halbe Querschnittshöhe."
+        },
+        {
+          "art": "gleichung",
+          "latex": "z_{2,x} = \\frac{A_{s,2,x,g} \\cdot z_{2,x,g} + A_{s,2,x,z} \\cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}}",
+          "markdown": "**Schwerpunkt der zusammengefassten Lage – 2. Lage Grundbewehrung + 2. Lage Zulage**\n\n$$\nz_{2,x} = \\frac{A_{s,2,x,g} \\cdot z_{2,x,g} + A_{s,2,x,z} \\cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}}\n$$",
+          "titel": "Schwerpunkt der zusammengefassten Lage – 2. Lage Grundbewehrung + 2. Lage Zulage",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z}",
+          "markdown": "**Bewehrungsquerschnitt der zusammengefassten Lage**\n\n$$\nA_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z}\n$$",
+          "titel": "Bewehrungsquerschnitt der zusammengefassten Lage",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "N_{Rd}^{-} = -b \\cdot h \\cdot f_{cd}",
+          "markdown": "**Gleichmässiger Druck, ohne Bewehrung**\n\n$$\nN_{Rd}^{-} = -b \\cdot h \\cdot f_{cd}\n$$",
+          "titel": "Gleichmässiger Druck, ohne Bewehrung",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "N_{Rd}^{+} = A_{s,2,x} \\cdot f_{yd} + A_{s,3,x} \\cdot f_{yd}",
+          "markdown": "**Beide Lagen fliessen auf Zug**\n\n$$\nN_{Rd}^{+} = A_{s,2,x} \\cdot f_{yd} + A_{s,3,x} \\cdot f_{yd}\n$$",
+          "titel": "Beide Lagen fliessen auf Zug",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "M_{Rd}(N_{Rd}^{+}) = A_{s,2,x} \\cdot f_{yd} \\cdot \\left(z_{2,x} - \\tfrac{h}{2}\\right) + A_{s,3,x} \\cdot f_{yd} \\cdot \\left(z_{3,x} - \\tfrac{h}{2}\\right)",
+          "markdown": "**Kräfte mal Hebelarm um die halbe Höhe**\n\n$$\nM_{Rd}(N_{Rd}^{+}) = A_{s,2,x} \\cdot f_{yd} \\cdot \\left(z_{2,x} - \\tfrac{h}{2}\\right) + A_{s,3,x} \\cdot f_{yd} \\cdot \\left(z_{3,x} - \\tfrac{h}{2}\\right)\n$$",
+          "titel": "Kräfte mal Hebelarm um die halbe Höhe",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "d_{2,x} = z_{2,x}",
+          "markdown": "**Statische Höhe der Lage unten, ab dem gedrückten Rand oben**\n\n$$\nd_{2,x} = z_{2,x}\n$$",
+          "titel": "Statische Höhe der Lage unten, ab dem gedrückten Rand oben",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "x^{+} = \\frac{A_{s,2,x} \\cdot f_{yd}}{0.85 \\cdot b \\cdot f_{cd}}",
+          "markdown": "**Druckzonenhöhe aus dem Kräftegleichgewicht**\n\n$$\nx^{+} = \\frac{A_{s,2,x} \\cdot f_{yd}}{0.85 \\cdot b \\cdot f_{cd}}\n$$",
+          "titel": "Druckzonenhöhe aus dem Kräftegleichgewicht",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "M_{Rd}(N_{Ed}=0)^{+} = A_{s,2,x} \\cdot f_{yd} \\cdot \\left(d_{2,x} - \\frac{0.85 \\cdot x^{+}}{2}\\right)",
+          "markdown": "**Momentenwiderstand bei reiner Biegung**\n\n$$\nM_{Rd}(N_{Ed}=0)^{+} = A_{s,2,x} \\cdot f_{yd} \\cdot \\left(d_{2,x} - \\frac{0.85 \\cdot x^{+}}{2}\\right)\n$$",
+          "titel": "Momentenwiderstand bei reiner Biegung",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "x^{+} = \\frac{h}{2}",
+          "markdown": "**Nulllinie auf halber Höhe**\n\n$$\nx^{+} = \\frac{h}{2}\n$$",
+          "titel": "Nulllinie auf halber Höhe",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\varepsilon_s^{+} = \\left(d_{2,x} - x^{+}\\right) \\cdot \\frac{\\varepsilon_{c2d}}{x^{+}}",
+          "markdown": "**Dehnung der Zugbewehrung**\n\n$$\n\\varepsilon_s^{+} = \\left(d_{2,x} - x^{+}\\right) \\cdot \\frac{\\varepsilon_{c2d}}{x^{+}}\n$$",
+          "titel": "Dehnung der Zugbewehrung",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\sigma_{sd} = \\min\\left[E_s \\cdot \\varepsilon_s^{+};\\ f_{yd}\\right]",
+          "markdown": "**Stahlspannung, höchstens die Fliessgrenze**\n\n$$\n\\sigma_{sd} = \\min\\left[E_s \\cdot \\varepsilon_s^{+};\\ f_{yd}\\right]\n$$",
+          "titel": "Stahlspannung, höchstens die Fliessgrenze",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "N_{Rd}^{+} = -f_{cd} \\cdot b \\cdot 0.85 \\cdot x^{+} + A_{s,2,x} \\cdot \\sigma_{sd}",
+          "markdown": "**Kräftegleichgewicht**\n\n$$\nN_{Rd}^{+} = -f_{cd} \\cdot b \\cdot 0.85 \\cdot x^{+} + A_{s,2,x} \\cdot \\sigma_{sd}\n$$",
+          "titel": "Kräftegleichgewicht",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "M_{Rd}^{+} = \\left[f_{cd} \\cdot b \\cdot 0.85 \\cdot x^{+} \\cdot \\left(\\tfrac{h}{2} - \\tfrac{0.85 \\cdot x^{+}}{2}\\right) + A_{s,2,x} \\cdot \\sigma_{sd} \\cdot \\left(d_{2,x} - \\tfrac{h}{2}\\right)\\right]",
+          "markdown": "**Momentengleichgewicht um die halbe Höhe**\n\n$$\nM_{Rd}^{+} = \\left[f_{cd} \\cdot b \\cdot 0.85 \\cdot x^{+} \\cdot \\left(\\tfrac{h}{2} - \\tfrac{0.85 \\cdot x^{+}}{2}\\right) + A_{s,2,x} \\cdot \\sigma_{sd} \\cdot \\left(d_{2,x} - \\tfrac{h}{2}\\right)\\right]\n$$",
+          "titel": "Momentengleichgewicht um die halbe Höhe",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "d_{3,x} = h - z_{3,x}",
+          "markdown": "**Statische Höhe der Lage oben, ab dem gedrückten Rand unten**\n\n$$\nd_{3,x} = h - z_{3,x}\n$$",
+          "titel": "Statische Höhe der Lage oben, ab dem gedrückten Rand unten",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "M_{Rd} = M_{Rd}(N_{Ed}=0)^{+}",
+          "markdown": "**Widerstand bei N\\_Ed – ein Eckpunkt liegt genau dort**\n\n$$\nM_{Rd} = M_{Rd}(N_{Ed}=0)^{+}\n$$",
+          "titel": "Widerstand bei N_Ed – ein Eckpunkt liegt genau dort",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\alpha_{eff,x} = \\frac{M_{Rd}}{M_{Ed}}",
+          "markdown": "**Erfüllungsgrad**\n\n$$\n\\alpha_{eff,x} = \\frac{M_{Rd}}{M_{Ed}}\n$$",
+          "titel": "Erfüllungsgrad",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "M_{Rd} = M_1 + \\frac{N_{Ed} - N_1}{N_2 - N_1} \\cdot \\left(M_2 - M_1\\right)",
+          "markdown": "**Widerstand bei festgehaltenem N\\_Ed**\n\n$$\nM_{Rd} = M_1 + \\frac{N_{Ed} - N_1}{N_2 - N_1} \\cdot \\left(M_2 - M_1\\right)\n$$",
+          "titel": "Widerstand bei festgehaltenem N_Ed",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "N_{ref} = \\max\\left(\\left|N_{Rd,x}^{+}\\right|;\\ \\left|N_{Rd,x}^{-}\\right|\\right)",
+          "markdown": "**Bezugsgrösse der Normalkraft**\n\n$$\nN_{ref} = \\max\\left(\\left|N_{Rd,x}^{+}\\right|;\\ \\left|N_{Rd,x}^{-}\\right|\\right)\n$$",
+          "titel": "Bezugsgrösse der Normalkraft",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "M_{ref} = \\max\\left(\\left|M_{Rd,x}^{+}\\right|;\\ \\left|M_{Rd,x}^{-}\\right|\\right)",
+          "markdown": "**Bezugsgrösse des Moments**\n\n$$\nM_{ref} = \\max\\left(\\left|M_{Rd,x}^{+}\\right|;\\ \\left|M_{Rd,x}^{-}\\right|\\right)\n$$",
+          "titel": "Bezugsgrösse des Moments",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\bar{E}_{d,x} = \\sqrt{\\left(\\frac{N_{Ed}}{N_{ref}}\\right)^{2} + \\left(\\frac{M_{Ed}}{M_{ref}}\\right)^{2}}",
+          "markdown": "**Einwirkung im normierten Diagramm**\n\n$$\n\\bar{E}_{d,x} = \\sqrt{\\left(\\frac{N_{Ed}}{N_{ref}}\\right)^{2} + \\left(\\frac{M_{Ed}}{M_{ref}}\\right)^{2}}\n$$",
+          "titel": "Einwirkung im normierten Diagramm",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "a = \\sqrt{\\left(\\frac{N_{Ed} - N_P}{N_{ref}}\\right)^{2} + \\left(\\frac{M_{Ed} - M_P}{M_{ref}}\\right)^{2}}",
+          "markdown": "**Kürzester Abstand zur Resistenzlinie**\n\n$$\na = \\sqrt{\\left(\\frac{N_{Ed} - N_P}{N_{ref}}\\right)^{2} + \\left(\\frac{M_{Ed} - M_P}{M_{ref}}\\right)^{2}}\n$$",
+          "titel": "Kürzester Abstand zur Resistenzlinie",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\bar{R}_{d,x} = \\bar{E}_{d,x} + a",
+          "markdown": "**Widerstand im normierten Diagramm**\n\n$$\n\\bar{R}_{d,x} = \\bar{E}_{d,x} + a\n$$",
+          "titel": "Widerstand im normierten Diagramm",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        }
+      ]
+    },
+    {
+      "thema": "Querkraft",
+      "bloecke": [
+        {
+          "art": "text",
+          "text": "Querkraftwiderstand mit Querkraftbewehrung, Fachwerkmodell mit veränderlicher Neigung der Druckdiagonalen. Massgebend ist das Kleinere aus dem Widerstand der Bügel und dem der Druckdiagonalen; der Betonanteil ohne Bügel geht nicht zusätzlich ein."
+        },
+        {
+          "art": "text",
+          "text": "Beide Anteile gelten je Laufmeter, wie die Querkraft selbst. Gesucht wird ganzgradig zwischen α_min und α_max die Neigung mit dem grössten Widerstand V_Rd = min(V_Rd,s; V_Rd,c). Bei einer Normalzugkraft steilt sich die Druckdiagonale auf: α_min wird dann auf 40° gesetzt und α_max notfalls mitgehoben."
+        },
+        {
+          "art": "text",
+          "text": "Querkraftwiderstand ohne Querkraftbewehrung. Massgebend sind die statische Höhe der gezogenen Bewehrung, die Grösstkorngrösse und die Dehnung auf halber Höhe."
+        },
+        {
+          "art": "text",
+          "text": "Nur eine Normaldruckkraft entlastet; eine Zugkraft bleibt beim Dekompressionsmoment unberücksichtigt. Da der Widerstand über m_Ed und N_Ed von der Einwirkung abhängt, wird er für jede Kombination einzeln bestimmt."
+        },
+        {
+          "art": "gleichung",
+          "latex": "V_{Rd,s} = \\frac{A_{\\varnothing,V}}{s_{V,x} \\cdot s_{V,y}} \\cdot 0.9 \\cdot d \\cdot f_{yd} \\cdot \\cot\\alpha \\qquad V_{Rd,c} = 0.9 \\cdot d \\cdot k_c \\cdot f_{cd} \\cdot \\sin\\alpha \\cdot \\cos\\alpha",
+          "markdown": "**Ansatz** *(SIA 262:2025, 4.3.3.4)*\n\n$$\nV_{Rd,s} = \\frac{A_{\\varnothing,V}}{s_{V,x} \\cdot s_{V,y}} \\cdot 0.9 \\cdot d \\cdot f_{yd} \\cdot \\cot\\alpha \\qquad V_{Rd,c} = 0.9 \\cdot d \\cdot k_c \\cdot f_{cd} \\cdot \\sin\\alpha \\cdot \\cos\\alpha\n$$",
+          "titel": "Ansatz",
+          "referenz": "SIA 262:2025, 4.3.3.4",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "s_{V,y} = \\frac{b}{n_{V,y}}",
+          "markdown": "**Teilung in y aus der Stabzahl**\n\n$$\ns_{V,y} = \\frac{b}{n_{V,y}}\n$$",
+          "titel": "Teilung in y aus der Stabzahl",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "V_{Rd,s} = \\frac{A_{\\varnothing,V}}{s_{V,x} \\cdot s_{V,y}} \\cdot 0.9 \\cdot d \\cdot f_{yd} \\cdot \\cot \\alpha",
+          "markdown": "**Widerstand der Bügel**\n\n$$\nV_{Rd,s} = \\frac{A_{\\varnothing,V}}{s_{V,x} \\cdot s_{V,y}} \\cdot 0.9 \\cdot d \\cdot f_{yd} \\cdot \\cot \\alpha\n$$",
+          "titel": "Widerstand der Bügel",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "V_{Rd,c} = 0.9 \\cdot d \\cdot k_c \\cdot f_{cd} \\cdot \\sin \\alpha \\cdot \\cos \\alpha",
+          "markdown": "**Widerstand der Druckdiagonalen**\n\n$$\nV_{Rd,c} = 0.9 \\cdot d \\cdot k_c \\cdot f_{cd} \\cdot \\sin \\alpha \\cdot \\cos \\alpha\n$$",
+          "titel": "Widerstand der Druckdiagonalen",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "V_{Rd,x} = \\min\\left[V_{Rd,s};\\ V_{Rd,c}\\right]",
+          "markdown": "**Querkraftwiderstand**\n\n$$\nV_{Rd,x} = \\min\\left[V_{Rd,s};\\ V_{Rd,c}\\right]\n$$",
+          "titel": "Querkraftwiderstand",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "V_{Rd} = k_d \\cdot \\tau_{cd} \\cdot d_v \\qquad k_d = \\frac{1}{1 + \\varepsilon_v \\cdot d \\cdot k_g}",
+          "markdown": "**Ansatz** *(SIA 262:2025, 4.3.3.2.1)*\n\n$$\nV_{Rd} = k_d \\cdot \\tau_{cd} \\cdot d_v \\qquad k_d = \\frac{1}{1 + \\varepsilon_v \\cdot d \\cdot k_g}\n$$",
+          "titel": "Ansatz",
+          "referenz": "SIA 262:2025, 4.3.3.2.1",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "m_{Dd} = \\frac{\\left|\\min(N_{Ed};\\ 0)\\right| \\cdot h}{6} \\qquad \\varepsilon_v = \\frac{f_{yd} \\cdot \\left(\\left|m_{Ed}\\right| - m_{Dd}\\right)}{E_s \\cdot \\left(\\left|m_{Rd}(N_{Ed})\\right| - m_{Dd}\\right)}",
+          "markdown": "**Dekompressionsmoment und Dehnung**\n\n$$\nm_{Dd} = \\frac{\\left|\\min(N_{Ed};\\ 0)\\right| \\cdot h}{6} \\qquad \\varepsilon_v = \\frac{f_{yd} \\cdot \\left(\\left|m_{Ed}\\right| - m_{Dd}\\right)}{E_s \\cdot \\left(\\left|m_{Rd}(N_{Ed})\\right| - m_{Dd}\\right)}\n$$",
+          "titel": "Dekompressionsmoment und Dehnung",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "k_g = \\max\\left[1.20;\\ \\frac{48}{16 + D_{max} \\cdot \\min\\left[1.0;\\ \\left(\\frac{60}{f_{ck}}\\right)^{2}\\right]}\\right] \\quad \\left(D_{max}\\ \\text{in}\\ \\mathrm{mm},\\ f_{ck}\\ \\text{in}\\ \\mathrm{N}/\\mathrm{mm}^{2}\\right)",
+          "markdown": "**Beiwert der Gesteinskörnung** *(SIA 262:2025, 4.3.3.2.1)*\n\n$$\nk_g = \\max\\left[1.20;\\ \\frac{48}{16 + D_{max} \\cdot \\min\\left[1.0;\\ \\left(\\frac{60}{f_{ck}}\\right)^{2}\\right]}\\right] \\quad \\left(D_{max}\\ \\text{in}\\ \\mathrm{mm},\\ f_{ck}\\ \\text{in}\\ \\mathrm{N}/\\mathrm{mm}^{2}\\right)\n$$",
+          "titel": "Beiwert der Gesteinskörnung",
+          "referenz": "SIA 262:2025, 4.3.3.2.1",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "d_v = d - e_{Einlage}",
+          "markdown": "**Wirksame Höhe, um die Einlage vermindert**\n\n$$\nd_v = d - e_{Einlage}\n$$",
+          "titel": "Wirksame Höhe, um die Einlage vermindert",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "m_{Dd} = \\frac{\\left|\\min(N_{Ed};\\ 0)\\right| \\cdot h}{6}",
+          "markdown": "**Dekompressionsmoment**\n\n$$\nm_{Dd} = \\frac{\\left|\\min(N_{Ed};\\ 0)\\right| \\cdot h}{6}\n$$",
+          "titel": "Dekompressionsmoment",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\varepsilon_v = 1.5 \\cdot \\frac{f_{yd}}{E_s}",
+          "markdown": "**Dehnung auf halber Höhe**\n\n$$\n\\varepsilon_v = 1.5 \\cdot \\frac{f_{yd}}{E_s}\n$$",
+          "titel": "Dehnung auf halber Höhe",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "k_d = \\frac{1}{1 + \\varepsilon_v \\cdot d \\cdot k_g} \\quad \\left(d\\ \\text{in}\\ \\mathrm{mm}\\right)",
+          "markdown": "**Beiwert für die statische Höhe**\n\n$$\nk_d = \\frac{1}{1 + \\varepsilon_v \\cdot d \\cdot k_g} \\quad \\left(d\\ \\text{in}\\ \\mathrm{mm}\\right)\n$$",
+          "titel": "Beiwert für die statische Höhe",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "V_{Rd,x} = k_d \\cdot \\tau_{cd} \\cdot d_v",
+          "markdown": "**Querkraftwiderstand** *(SIA 262:2025, 4.3.3.2.1)*\n\n$$\nV_{Rd,x} = k_d \\cdot \\tau_{cd} \\cdot d_v\n$$",
+          "titel": "Querkraftwiderstand",
+          "referenz": "SIA 262:2025, 4.3.3.2.1",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\varepsilon_v = \\frac{f_{yd} \\cdot \\left(\\left|m_{Ed}\\right| - m_{Dd}\\right)}{E_s \\cdot \\left(\\left|m_{Rd}(N_{Ed})\\right| - m_{Dd}\\right)}",
+          "markdown": "**Dehnung auf halber Höhe**\n\n$$\n\\varepsilon_v = \\frac{f_{yd} \\cdot \\left(\\left|m_{Ed}\\right| - m_{Dd}\\right)}{E_s \\cdot \\left(\\left|m_{Rd}(N_{Ed})\\right| - m_{Dd}\\right)}\n$$",
+          "titel": "Dehnung auf halber Höhe",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "d_v = d",
+          "markdown": "**Wirksame Höhe (Einlage nicht massgebend)**\n\n$$\nd_v = d\n$$",
+          "titel": "Wirksame Höhe (Einlage nicht massgebend)",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        }
+      ]
+    },
+    {
+      "thema": "Duktilität",
+      "bloecke": [
+        {
+          "art": "text",
+          "text": "Die Druckzone muss schlank bleiben, damit der Stahl lange fliesst, bevor der Beton versagt: der Querschnitt kündigt sein Versagen an. Gerechnet wird die Druckzonenhöhe bei reiner Biegung, je Lage einzeln."
+        },
+        {
+          "art": "text",
+          "text": "d wird von der gedrückten Randfaser aus gemessen: bei den unteren Lagen von der Oberkante, bei den oberen von der Unterkante. Grundbewehrung und Zulage einer Lage zählen mit ihrem gemeinsamen Schwerpunkt."
+        },
+        {
+          "art": "gleichung",
+          "latex": "0.85 \\cdot x \\cdot b \\cdot f_{cd} = A_s \\cdot f_{sd} \\qquad \\Rightarrow \\qquad x = \\frac{A_s \\cdot f_{sd}}{0.85 \\cdot b \\cdot f_{cd}}",
+          "markdown": "**Kräftegleichgewicht bei M\\_Ed = 0** *(SIA 262:2025, 4.1.4.2.5)*\n\n$$\n0.85 \\cdot x \\cdot b \\cdot f_{cd} = A_s \\cdot f_{sd} \\qquad \\Rightarrow \\qquad x = \\frac{A_s \\cdot f_{sd}}{0.85 \\cdot b \\cdot f_{cd}}\n$$",
+          "titel": "Kräftegleichgewicht bei M_Ed = 0",
+          "referenz": "SIA 262:2025, 4.1.4.2.5",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\frac{x}{d} \\le 0.35",
+          "markdown": "**Bedingung**\n\n$$\n\\frac{x}{d} \\le 0.35\n$$",
+          "titel": "Bedingung",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "x = \\frac{A_{s,2,x} \\cdot f_{sd}}{0.85 \\cdot b \\cdot f_{cd}}",
+          "markdown": "**Druckzonenhöhe bei reiner Biegung**\n\n$$\nx = \\frac{A_{s,2,x} \\cdot f_{sd}}{0.85 \\cdot b \\cdot f_{cd}}\n$$",
+          "titel": "Druckzonenhöhe bei reiner Biegung",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\left(x/d\\right)_{2} = \\frac{x}{d_{2,x}}",
+          "markdown": "**Bezogene Druckzonenhöhe** *(SIA 262:2025, 4.1.4.2.5)*\n\n$$\n\\left(x/d\\right)_{2} = \\frac{x}{d_{2,x}}\n$$",
+          "titel": "Bezogene Druckzonenhöhe",
+          "referenz": "SIA 262:2025, 4.1.4.2.5",
+          "wert_id": "",
+          "gruppe": ""
+        }
+      ]
+    },
+    {
+      "thema": "Zwängung auf Normalkraft",
+      "bloecke": [
+        {
+          "art": "text",
+          "text": "Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Die Bewehrung muss die Kraft übernehmen können, die der Beton beim Reissen abgibt – erst dann kündigt sich das Versagen an."
+        },
+        {
+          "art": "gleichung",
+          "latex": "h_{eff} = \\min\\left[500\\,\\mathrm{mm};\\ h\\right]",
+          "markdown": "**Rissaktive Plattendicke**\n\n$$\nh_{eff} = \\min\\left[500\\,\\mathrm{mm};\\ h\\right]\n$$",
+          "titel": "Rissaktive Plattendicke",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "k_t = \\frac{1}{1 + 0.5 \\cdot h_{eff}} \\quad \\left(h_{eff}\\ \\text{in}\\ \\mathrm{m}\\right)",
+          "markdown": "**Beiwert für die Plattendicke** *(SIA 262:2025, 4.4.2)*\n\n$$\nk_t = \\frac{1}{1 + 0.5 \\cdot h_{eff}} \\quad \\left(h_{eff}\\ \\text{in}\\ \\mathrm{m}\\right)\n$$",
+          "titel": "Beiwert für die Plattendicke",
+          "referenz": "SIA 262:2025, 4.4.2",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "f_{ct,eff} = k_t \\cdot f_{ctm}",
+          "markdown": "**Wirksame Zugfestigkeit**\n\n$$\nf_{ct,eff} = k_t \\cdot f_{ctm}\n$$",
+          "titel": "Wirksame Zugfestigkeit",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "N_{Riss} = \\frac{h_{eff}}{2} \\cdot b \\cdot f_{ct,eff}",
+          "markdown": "**Risskraft der gezogenen Querschnittshälfte**\n\n$$\nN_{Riss} = \\frac{h_{eff}}{2} \\cdot b \\cdot f_{ct,eff}\n$$",
+          "titel": "Risskraft der gezogenen Querschnittshälfte",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\varnothing_{2,x} = \\max\\left[\\varnothing_{2,x,g};\\ \\varnothing_{2,x,z}\\right]",
+          "markdown": "**Dickster Stab der Lage**\n\n$$\n\\varnothing_{2,x} = \\max\\left[\\varnothing_{2,x,g};\\ \\varnothing_{2,x,z}\\right]\n$$",
+          "titel": "Dickster Stab der Lage",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\sigma_{s,adm,2,x} = \\min\\left[\\sqrt{\\frac{9 \\cdot E_s \\cdot f_{ctm} \\cdot w_{nom}}{\\varnothing_{2,x}}};\\ f_{yk}\\right]",
+          "markdown": "**Zulässige Stahlspannung (Rissbreite w\\_nom)** *(SIA 262:2025, 4.4.2)*\n\n$$\n\\sigma_{s,adm,2,x} = \\min\\left[\\sqrt{\\frac{9 \\cdot E_s \\cdot f_{ctm} \\cdot w_{nom}}{\\varnothing_{2,x}}};\\ f_{yk}\\right]\n$$",
+          "titel": "Zulässige Stahlspannung (Rissbreite w_nom)",
+          "referenz": "SIA 262:2025, 4.4.2",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "N_{s,adm,2,x} = A_{s,2,x} \\cdot \\sigma_{s,adm,2,x}",
+          "markdown": "**Aufnehmbare Risskraft**\n\n$$\nN_{s,adm,2,x} = A_{s,2,x} \\cdot \\sigma_{s,adm,2,x}\n$$",
+          "titel": "Aufnehmbare Risskraft",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        }
+      ]
+    },
+    {
+      "thema": "Sprödes Versagen",
+      "bloecke": [
+        {
+          "art": "text",
+          "text": "Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Nachgewiesen wird deshalb, dass der bewehrte Querschnitt mehr trägt als der unbewehrte im Augenblick des Risses: M_Rd(N_Ed = 0) ≥ M_Riss."
+        },
+        {
+          "art": "gleichung",
+          "latex": "k_t = \\frac{1}{1 + 0.5 \\cdot h/3} \\quad \\left(h\\ \\text{in}\\ \\mathrm{m}\\right)",
+          "markdown": "**Beiwert für die Plattendicke** *(SIA 262:2025, 4.4.1.3)*\n\n$$\nk_t = \\frac{1}{1 + 0.5 \\cdot h/3} \\quad \\left(h\\ \\text{in}\\ \\mathrm{m}\\right)\n$$",
+          "titel": "Beiwert für die Plattendicke",
+          "referenz": "SIA 262:2025, 4.4.1.3",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "M_{Riss} = f_{ct,eff} \\cdot \\frac{h^{2} \\cdot b}{6}",
+          "markdown": "**Rissmoment des ungerissenen Querschnitts**\n\n$$\nM_{Riss} = f_{ct,eff} \\cdot \\frac{h^{2} \\cdot b}{6}\n$$",
+          "titel": "Rissmoment des ungerissenen Querschnitts",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        }
+      ]
+    },
+    {
+      "thema": "Zwängung auf Biegung",
+      "bloecke": [
+        {
+          "art": "text",
+          "text": "Eine aufgezwungene Krümmung erzeugt beim Reissen ein Moment, das die Bewehrung übernehmen muss – ohne über die zulässige Stahlspannung zu kommen. Nicht zu verwechseln mit dem Nachweis gegen sprödes Versagen: dort steht der Biegewiderstand gegen das Rissmoment, hier die Stahlspannung gegen ihre Grenze."
+        },
+        {
+          "art": "text",
+          "text": "Das Rissmoment gilt für den ungerissenen Bruttoquerschnitt – den Zustand vor dem Riss. Der Widerstand dagegen wird am gerissenen Querschnitt bestimmt, also für den Augenblick danach. Dass zwei verschiedene Querschnitte auftreten, ist genau die Frage: reicht die Bewehrung für das, was der Beton abgibt?"
+        },
+        {
+          "art": "text",
+          "text": "Das Kriechen weicht den Beton auf: E_c,eff = E_cm/(1+φ), und die Wertigkeit ist E_s/E_c,eff. Ein grösseres φ senkt damit den Hebelarm und liegt auf der sicheren Seite."
+        },
+        {
+          "art": "text",
+          "text": "Die Betondruckspannung verläuft dreieckig – null in der Nulllinie, am grössten an der gedrückten Kante. Ihre Resultierende liegt deshalb bei x/3 von dieser Kante."
+        },
+        {
+          "art": "gleichung",
+          "latex": "n = \\frac{E_s}{E_{cm}} \\cdot \\left(1 + \\varphi\\right)",
+          "markdown": "**Wertigkeit im gerissenen Zustand**\n\n$$\nn = \\frac{E_s}{E_{cm}} \\cdot \\left(1 + \\varphi\\right)\n$$",
+          "titel": "Wertigkeit im gerissenen Zustand",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\rho = \\frac{n \\cdot A_{s,2,x}}{b}",
+          "markdown": "**Hilfsgrösse der Nulllinie**\n\n$$\n\\rho = \\frac{n \\cdot A_{s,2,x}}{b}\n$$",
+          "titel": "Hilfsgrösse der Nulllinie",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "x = \\sqrt{\\rho^{2} + 2 \\cdot d_{2,x} \\cdot \\rho} - \\rho",
+          "markdown": "**Nulllinie des gerissenen Querschnitts**\n\n$$\nx = \\sqrt{\\rho^{2} + 2 \\cdot d_{2,x} \\cdot \\rho} - \\rho\n$$",
+          "titel": "Nulllinie des gerissenen Querschnitts",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "z = d_{2,x} - \\frac{x}{3}",
+          "markdown": "**Innerer Hebelarm**\n\n$$\nz = d_{2,x} - \\frac{x}{3}\n$$",
+          "titel": "Innerer Hebelarm",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "M_{s,adm,2,x} = \\sigma_{s,adm,2,x} \\cdot A_{s,2,x} \\cdot z",
+          "markdown": "**Aufnehmbares Moment der Bewehrung**\n\n$$\nM_{s,adm,2,x} = \\sigma_{s,adm,2,x} \\cdot A_{s,2,x} \\cdot z\n$$",
+          "titel": "Aufnehmbares Moment der Bewehrung",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        }
+      ]
+    },
+    {
+      "thema": "Stahlspannung aus Rissbreite",
+      "bloecke": [
+        {
+          "art": "text",
+          "text": "Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf, im Druck rechnet er linear mit dem wirksamen Modul. Gezählt wird nur gezogene Bewehrung."
+        },
+        {
+          "art": "text",
+          "text": "Drei Festlegungen stecken in jeder Zahl unten, und alle drei sind Auslegung der Norm und nicht Rechnung. Erstens das Kriechen: angesetzt wird dasselbe φ wie sonst, hier aus der Eingabe. Das liegt auf der sicheren Seite – ein grösseres φ weicht den Beton auf, die Druckzone wächst, der Hebelarm wird kleiner und die Stahlspannung damit grösser. Wer φ = 0 setzte, bekäme kleinere Spannungen und einen Nachweis, der leichter aufgeht."
+        },
+        {
+          "art": "text",
+          "text": "Zweitens die Werkstoffgesetze: sie rechnen mit den charakteristischen Festigkeiten. Der Stahl ist linear bis f_yk und fliesst dann, der Beton linear bis f_ck. Ein Gebrauchsnachweis fragt, was der Querschnitt tut, und nicht, was er darf – der Teilsicherheitsbeiwert gehört in die Tragsicherheit. Läge das Plateau bei f_yd, bliebe jede Stahlspannung darunter, und eine Grenze darüber könnte nie überschritten werden."
+        },
+        {
+          "art": "text",
+          "text": "Drittens die Grenze: dieselbe wie bei der Zwängung, mit f_yk und bei erhöhter und hoher Anforderung zusätzlich begrenzt durch die Rissbreite. Massgebend ist der dickste Stab der Tragrichtung. Welche Lage die grösste Zugspannung trägt, wechselt mit dem Lastfall – bei einem Feldmoment die untere, bei einem Stützmoment die obere –, und der dickste Stab gibt die kleinste zulässige Spannung. Das liegt für beide auf der sicheren Seite."
+        },
+        {
+          "art": "text",
+          "text": "Fliesst die Bewehrung, bleibt ihre Spannung bei f_yk stehen, während die Dehnung weiterwächst. Verglichen wird dann die Dehnung: ε_s gegen ε_s,adm = σ_s,adm / E_s. Solange der Stahl elastisch bleibt, ist das genau der Spannungsvergleich; fliesst er, fällt der Nachweis durch, und zwar um so deutlicher, je weiter er gedehnt ist."
+        },
+        {
+          "art": "text",
+          "text": "Die Dehnungsebene wird gesucht, nicht hergeleitet. Eine ebene Dehnungsverteilung hat zwei Unbekannte – die Dehnung in der Mittelebene ε_m und die Krümmung χ – und ihnen stehen zwei Gleichgewichtsbedingungen gegenüber: N und M. Geschlossen auflösen lässt sich das nicht, weil die Werkstoffgesetze nichtlinear sind."
+        },
+        {
+          "art": "text",
+          "text": "Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebildet, jede mit der Spannung in ihrer Mitte; der Stahl kommt Lage für Lage dazu, und die von ihm verdrängte Betonfläche wird abgezogen, damit dieselbe Fläche nicht zweimal zählt."
+        },
+        {
+          "art": "text",
+          "text": "Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer festgehaltenen Krümmung χ wird ε_m so lange halbiert, bis N_int die verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung immer mehr Zug bedeutet. Aussen: mit diesem ε_m bleibt ein Moment übrig, und χ wird so lange halbiert, bis auch M_int stimmt – hier trägt die Monotonie, dass mehr Krümmung mehr Moment heisst."
+        },
+        {
+          "art": "text",
+          "text": "Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.0 ‰ bis 45.0 ‰). Jenseits davon geben die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Halbierung liefe auf eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine Gleichgewichtslage – dann sagt der Nachweis das und rät nicht."
+        },
+        {
+          "art": "text",
+          "text": "Nachgewiesen wird deshalb nicht der Weg, sondern das Ergebnis: dass die gefundene Ebene genau die angegebenen Schnittgrössen erzeugt. Diese Probe steht bei jedem Fall."
+        },
+        {
+          "art": "gleichung",
+          "latex": "E_{c,eff} = \\frac{E_{cm}}{1 + \\varphi}",
+          "markdown": "**Wirksamer Elastizitätsmodul**\n\n$$\nE_{c,eff} = \\frac{E_{cm}}{1 + \\varphi}\n$$",
+          "titel": "Wirksamer Elastizitätsmodul",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\varepsilon(z) = \\varepsilon_m + \\chi \\cdot \\left(z - \\frac{h}{2}\\right) \\qquad N_{int} = \\int_A \\sigma\\left(\\varepsilon\\right)\\,\\mathrm{d}A \\qquad M_{int} = \\int_A \\sigma\\left(\\varepsilon\\right) \\cdot \\left(z - \\frac{h}{2}\\right)\\,\\mathrm{d}A",
+          "markdown": "**Dehnungsebene und innere Kräfte**\n\n$$\n\\varepsilon(z) = \\varepsilon_m + \\chi \\cdot \\left(z - \\frac{h}{2}\\right) \\qquad N_{int} = \\int_A \\sigma\\left(\\varepsilon\\right)\\,\\mathrm{d}A \\qquad M_{int} = \\int_A \\sigma\\left(\\varepsilon\\right) \\cdot \\left(z - \\frac{h}{2}\\right)\\,\\mathrm{d}A\n$$",
+          "titel": "Dehnungsebene und innere Kräfte",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\sigma_{s,adm} = f_{yk}",
+          "markdown": "**Zulässige Stahlspannung (normale Anforderung)** *(SIA 262:2025, 4.4.2)*\n\n$$\n\\sigma_{s,adm} = f_{yk}\n$$",
+          "titel": "Zulässige Stahlspannung (normale Anforderung)",
+          "referenz": "SIA 262:2025, 4.4.2",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\varepsilon_y = \\frac{f_{yk}}{E_s}",
+          "markdown": "**Grösste Zugdehnung in der Bewehrung**\n\n$$\n\\varepsilon_y = \\frac{f_{yk}}{E_s}\n$$",
+          "titel": "Grösste Zugdehnung in der Bewehrung",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\varepsilon_{s,adm} = \\frac{\\sigma_{s,adm}}{E_s}",
+          "markdown": "**Zulässige Dehnung**\n\n$$\n\\varepsilon_{s,adm} = \\frac{\\sigma_{s,adm}}{E_s}\n$$",
+          "titel": "Zulässige Dehnung",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        }
+      ]
+    },
+    {
+      "thema": "Stahlspannung gegen Fliessen",
+      "bloecke": [
+        {
+          "art": "text",
+          "text": "Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst bleiben Risse und Durchbiegung dauerhaft. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf, im Druck rechnet er linear mit dem wirksamen Modul. Gezählt wird nur gezogene Bewehrung."
+        },
+        {
+          "art": "text",
+          "text": "Drittens die Grenze: sie rechnet mit dem Bemessungswert, σ_s,adm = f_yd − 80 N/mm², und nicht mit f_yk − 80. Die Norm sagt an dieser Stelle nicht eindeutig, welcher Wert gemeint ist; f_yd ist die strengere Wahl – die Grenze liegt rund 15 % tiefer –, gewählt ist deshalb die Seite, auf der man nicht danebenliegen kann. Das ist etwas anderes als das Fliessplateau oben: dort geht es darum, was der Stahl tut, hier darum, wie viel Abstand man davon verlangt."
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\sigma_{s,adm} = f_{yd} - 80\\,\\mathrm{N}/\\mathrm{mm}^{2}",
+          "markdown": "**Zulässige Stahlspannung** *(SIA 262:2025, Tabelle 17)*\n\n$$\n\\sigma_{s,adm} = f_{yd} - 80\\,\\mathrm{N}/\\mathrm{mm}^{2}\n$$",
+          "titel": "Zulässige Stahlspannung",
+          "referenz": "SIA 262:2025, Tabelle 17",
+          "wert_id": "",
+          "gruppe": ""
+        }
+      ]
+    },
+    {
+      "thema": "Knicken",
+      "bloecke": [
+        {
+          "art": "text",
+          "text": "Nachgewiesen wird am verformten System. Die Ausmitte zweiter Ordnung hängt von der Krümmung ab, die Krümmung vom Moment und das Moment wieder von der Ausmitte – also wird die Folge so lange durchlaufen, bis sie einläuft. Läuft sie nicht ein, gibt es keine Gleichgewichtslage: das System knickt."
+        },
+        {
+          "art": "text",
+          "text": "Der Erfüllungsgrad ist ein Verhältnis von Normalkräften: N_Rd ist die grösste Druckkraft, unter der der Stab noch steht. Über Momente zu vergleichen ginge nur, solange es ein Gleichgewicht gibt – beim Knicken ist gerade das der Fall, der fehlt."
+        },
+        {
+          "art": "text",
+          "text": "Angesetzt wird das Kriechen mit demselben φ wie sonst, hier aus der Eingabe. Beim Knicken ist das nicht bloss zulässig, sondern wesentlich: ein aufgeweichter Beton verformt sich mehr, die Ausmitte zweiter Ordnung wächst, und der Stab knickt früher. φ = 0 läge hier deutlich auf der unsicheren Seite."
+        },
+        {
+          "art": "text",
+          "text": "Die Festigkeiten sind Bemessungswerte – f_cd und f_yd, nicht die charakteristischen. Gerechnet wird mit dem nichtlinearen Betongesetz; im Bereich der Gebrauchslasten unterscheidet es sich kaum vom linearen, in der Nähe der Grenzlast erheblich, und genau dort entscheidet sich, ob es noch eine Gleichgewichtslage gibt."
+        },
+        {
+          "art": "text",
+          "text": "Die Ausmitten-Iteration darüber steht dagegen vollständig da, Durchlauf für Durchlauf: sie ist das Verfahren selbst, und dass sie einläuft, ist die Aussage des Nachweises."
+        },
+        {
+          "art": "text",
+          "text": "Zu jedem Moment wird die Dehnungsebene gesucht, die es im Gleichgewicht hält; aus deren Krümmung folgt die nächste Ausmitte. Begonnen wird mit e_2d = 0, also ohne Verformung."
+        },
+        {
+          "art": "text",
+          "text": "Gesucht wird die grösste Druckkraft mit Gleichgewichtslage. Die gewollte Ausmitte e_1d bleibt dabei fest – sie gehört zum System und nicht zur Last, M_Ed,1 wächst also mit. Bei N = 0 trägt der Stab immer; von dort aus wird das Fenster halbiert, bis getragene und nicht getragene Kraft zusammenfallen."
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\alpha_i = \\min\\left[\\max\\left(\\frac{0.01}{\\sqrt{l}};\\ \\frac{1}{300}\\right);\\ \\frac{1}{200}\\right] \\qquad e_{0d} = \\max\\left(\\frac{d}{30};\\ \\frac{\\alpha_i \\cdot l_{cr}}{2}\\right)",
+          "markdown": "**Ungewollte Ausmitte – allgemein** *(SIA 262:2025, 4.3.7)*\n\n$$\n\\alpha_i = \\min\\left[\\max\\left(\\frac{0.01}{\\sqrt{l}};\\ \\frac{1}{300}\\right);\\ \\frac{1}{200}\\right] \\qquad e_{0d} = \\max\\left(\\frac{d}{30};\\ \\frac{\\alpha_i \\cdot l_{cr}}{2}\\right)\n$$",
+          "titel": "Ungewollte Ausmitte – allgemein",
+          "referenz": "SIA 262:2025, 4.3.7",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "e_{1d} = \\left|\\frac{M_{Ed,1}}{N_{Ed}}\\right| \\qquad e_{2d} = \\left|\\chi\\right| \\cdot \\frac{l_{cr}^{2}}{\\pi^{2}} \\qquad M_{Ed,II} = \\left|N_{Ed}\\right| \\cdot \\left(e_{0d} + e_{1d} + e_{2d}\\right)",
+          "markdown": "**Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein**\n\n$$\ne_{1d} = \\left|\\frac{M_{Ed,1}}{N_{Ed}}\\right| \\qquad e_{2d} = \\left|\\chi\\right| \\cdot \\frac{l_{cr}^{2}}{\\pi^{2}} \\qquad M_{Ed,II} = \\left|N_{Ed}\\right| \\cdot \\left(e_{0d} + e_{1d} + e_{2d}\\right)\n$$",
+          "titel": "Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\alpha_i = \\min\\left[\\max\\left(\\frac{0.01}{\\sqrt{l}};\\ \\frac{1}{300}\\right);\\ \\frac{1}{200}\\right] \\quad \\left(l\\ \\text{in}\\ \\mathrm{m}\\right)",
+          "markdown": "**Schiefstellung** *(SIA 262:2025, 4.3.7)*\n\n$$\n\\alpha_i = \\min\\left[\\max\\left(\\frac{0.01}{\\sqrt{l}};\\ \\frac{1}{300}\\right);\\ \\frac{1}{200}\\right] \\quad \\left(l\\ \\text{in}\\ \\mathrm{m}\\right)\n$$",
+          "titel": "Schiefstellung",
+          "referenz": "SIA 262:2025, 4.3.7",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "e_{0d} = \\max\\left(\\frac{d}{30};\\ \\frac{\\alpha_i \\cdot l_{cr}}{2}\\right)",
+          "markdown": "**Ungewollte Ausmitte** *(SIA 262:2025, 4.3.7)*\n\n$$\ne_{0d} = \\max\\left(\\frac{d}{30};\\ \\frac{\\alpha_i \\cdot l_{cr}}{2}\\right)\n$$",
+          "titel": "Ungewollte Ausmitte",
+          "referenz": "SIA 262:2025, 4.3.7",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "e_{1d} = \\left|\\frac{M_{Ed,1}}{N_{Ed}}\\right|",
+          "markdown": "**Gewollte Ausmitte**\n\n$$\ne_{1d} = \\left|\\frac{M_{Ed,1}}{N_{Ed}}\\right|\n$$",
+          "titel": "Gewollte Ausmitte",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "e_{2d}^{(k)} = \\left|\\chi^{(k)}\\right| \\cdot \\frac{l_{cr}^{2}}{\\pi^{2}} \\qquad M_{Ed,II}^{(k)} = \\left|N_{Ed}\\right| \\cdot \\left(e_{0d} + e_{1d} + e_{2d}^{(k-1)}\\right)",
+          "markdown": "**Das Verfahren** *(SIA 262:2025, 4.3.7)*\n\n$$\ne_{2d}^{(k)} = \\left|\\chi^{(k)}\\right| \\cdot \\frac{l_{cr}^{2}}{\\pi^{2}} \\qquad M_{Ed,II}^{(k)} = \\left|N_{Ed}\\right| \\cdot \\left(e_{0d} + e_{1d} + e_{2d}^{(k-1)}\\right)\n$$",
+          "titel": "Das Verfahren",
+          "referenz": "SIA 262:2025, 4.3.7",
+          "wert_id": "",
+          "gruppe": ""
+        }
+      ]
+    }
+  ]
+}

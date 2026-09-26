@@ -22,6 +22,11 @@ export const zustand = {
    * Herleitung liest ihn.
    */
   verfolgung: null,
+  /**
+   * Die ganze Formelsammlung, `[{thema, bloecke}]` -- an kein Projekt
+   * gebunden, einmal geladen (siehe `formelsammlung` in bericht.js).
+   */
+  formelsammlung: null,
   /** Was links ausgewählt ist: {art: 'material'|'querschnitt', kennung}. */
   auswahl: null,
   /** Welcher Reiter rechts offen ist. */

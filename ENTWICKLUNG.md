@@ -106,10 +106,11 @@ Jetzt heissen sie `p.erklaerung(…)`. `darstellen()` lässt sie aus, und diese
 eine Stelle gilt für die Oberfläche und alle Berichte. Die Sammlung nimmt sie
 auf, ebenso die rein symbolischen Ansätze (`p.ansatz(…)`). Nach jeder
 Berechnung stempelt das Rechenwerk das Thema auf ihre Blöcke; das spart jeder
-Berechnung, es selbst durchzureichen. Den Raum liest die Sammlung am
-Abschnittstitel (siehe «Vereinfacht»). Entdoppelt wird über den
-ganzen Lauf, nach der Vorlage ohne führendes Minus und nach dem Grundzeichen
-des Ergebnisses. So bleibt M_Rd,x = … und M_Rd,y = … eine einzige Formel.
+Berechnung, es selbst durchzureichen. Entdoppelt wird über den ganzen Lauf,
+nach der Vorlage ohne führendes Minus und nach dem Grundzeichen des
+Ergebnisses. So bleibt M_Rd,x = … und M_Rd,y = … eine einzige Formel. (Was
+die Oberfläche davon zeigt, hat sich danach noch geändert: siehe «Die
+Formelsammlung zeigt alles».)
 
 ### Analytische Gleichungen
 
@@ -177,10 +178,10 @@ Effizienz, Ebene der Lösung. Der Bericht blieb dabei unverändert.
     Namensvorschlag eines Projektwerts kommen aus dem Kern.
   - Den Vorschlag macht der Leser selbst. Vorher schlug die Oberfläche
     ⌀_{1,y,g} vor, das der Leser ablehnt, und k_σ nicht, das er annimmt.
-* **Der Raum eines Formelblocks** kommt aus dem Abschnittstitel, wie in
-  `nach_abschnitten`, statt auf jeden Block gestempelt zu werden: zwei
-  Antworten auf dieselbe Frage sind eine zu viel. Je Thema gibt es eine
-  Liste `eintraege`, gezeichnet vom gemeinsamen Blockzeichner.
+* **Kein Raum auf jedem Formelblock:** zwei Antworten auf dieselbe Frage
+  -- der Abschnittstitel trägt ihn schon -- sind eine zu viel. (Seit die
+  Formelsammlung alles zeigt, braucht sie gar keinen Raum mehr.) Die
+  Oberfläche zeichnet die Sammlung mit dem gemeinsamen Blockzeichner.
 * **Das Auge ist schneller:**
   - Vorher zeichnete der Klick erst die ganze Herleitung und warf sie gleich
     wieder weg. Unter Pyodide kostete das bei drei Platten eine halbe
@@ -244,6 +245,42 @@ Fehler – Vorbemessung, n = 5». Die Zeilenwerte selbst fehlten.
   V_Rd und Erfüllungsgrad «ohne Einwirkung» sind nur Ziel, damit die Kurve
   entsteht. Sie tragen dasselbe Kennzeichen; aus der Werteliste von
   «beispiel» fielen damit zwei Zeilen.
+
+### Die Formelsammlung zeigt alles
+
+Die Formelsammlung entstand aus dem Lauf des offenen Projekts. Sie zeigte
+darum nur, was dort gerechnet wurde; im Beispiel waren das 30 Formeln zu vier
+Themen, kein Knicken, keine Querkraft. Gemeint war sie aber zum Nachschlagen,
+unabhängig vom Projekt. Jetzt zeigt sie jede Formel des Werkzeugs: 81 Formeln
+und 32 Erklärungen zu zwölf Themen.
+
+* **Woher die Formeln kommen:** aus zwei Projekten, die zusammen jeden
+  Nachweis laut führen. Das sind dieselben wie im Schnappschuss, und ein
+  Test wacht darüber.
+  - Das zweite, «voll», stand bisher im Test. Jetzt steht es als
+    `Projekt.jeder_nachweis()` im Kern, eine Stelle für beide Zwecke.
+  - Gerechnet wird mit allen Kennwerten der Baustoffe (`alle_ziele`), sonst
+    fehlte ε_yd.
+  - Gerechnet wird im schnellen Aufbau: 0.3 s statt 2.6 s, bei derselben
+    Sammlung, Zeichen für Zeichen.
+* **Vorab erzeugt:** Unter Pyodide dauerte das Rechnen beim ersten Blick in
+  den Reiter mehrere Sekunden. Darum schreibt `python3 -m
+  opencivil.web.bruecke` die Sammlung als `web/kern/formelsammlung.json`,
+  und die Oberfläche liest sie nur noch. Ein Test meldet, wenn sie nicht
+  mehr zum Kern passt.
+  - Die Antwort jeder Rechnung trägt sie nicht mehr mit.
+  - Den Schalter «Aktuelle Seite / Gesamt» gibt es in diesem Reiter nicht
+    mehr, denn es gibt nichts einzugrenzen.
+* **Dieselbe Formel, zweimal geschrieben:** Summe und Schwerpunkt einer Lage
+  schreiben Handrechnung und Lagennachweise mit anderen Platzhalternamen.
+  - In der ganzen Sammlung standen sie darum doppelt, gleich gesetzt.
+  - Jetzt gilt zusätzlich: was gesetzt gleich aussieht, ist dieselbe Formel.
+  - Die Platzhalter einfach gleichzumachen wäre zu grob: dann fielen etwa
+    σ = N/A und σ = M/W zusammen.
+* **Im Bericht bleiben die Formeln des Laufs.** Ein Bericht erklärt, was er
+  rechnet, nicht alles. Der Abschnitt heisst darum jetzt «Verwendete
+  Formeln»; zwei verschiedene Dinge unter dem Namen «Formelsammlung» wären
+  eines zu viel.
 
 ---
 

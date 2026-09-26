@@ -2432,7 +2432,7 @@ $$
 
 > **Warnung:** Zeile 6: Einheiten passen nicht zusammen.
 
-## Formelsammlung
+## Verwendete Formeln
 
 ### Querschnitt
 
@@ -2770,18 +2770,6 @@ $$
 
 $$
 \frac{x}{d} \le 0.35
-$$
-
-**Bewehrung der Lage**
-
-$$
-A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z}
-$$
-
-**Gemeinsamer Schwerpunkt der Lage**
-
-$$
-z_{2,x} = \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}}
 $$
 
 **Druckzonenhöhe bei reiner Biegung**

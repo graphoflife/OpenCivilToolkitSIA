@@ -473,7 +473,7 @@ $$
 \varepsilon_{ud} = 4.5\,\%
 $$
 
-## Formelsammlung
+## Verwendete Formeln
 
 ### Querschnitt
 

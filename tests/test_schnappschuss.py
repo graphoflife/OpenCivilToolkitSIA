@@ -39,78 +39,14 @@ WURZEL = Path(__file__).resolve().parents[1]
 BREITE = 100
 
 
-def _voll():
-    """
-    Jeder Nachweis einmal laut -- und die Fälle, die das Beispiel nie zeigt.
-
-    Erhöhte Anforderung mit allen Schaltern und begrenzter rissaktiver
-    Dicke, häufige und quasi-ständige Lastfälle abgeleitet und eigene, Bügel
-    mit Stabzahl in y, ein Knickfall; eine zweite Platte mit x aussen und
-    b = 500 mm, die im Feld nicht aufgeht und deren Stahl unter Dauerlast
-    fliesst, dazu
-    Querkraft ohne Bügel -- einmal über m_Rd, einmal darunter, mit Einlage;
-    eine dritte ohne x-Bewehrung; eine vierte mit Querkraft ohne Einlage,
-    einer Einwirkung, die am kürzesten Abstand gemessen wird, und ⌀40 in y
-    unter der x-Bewehrung -- die fliesst bei x = h/2 nicht.
-    Gebaut über die Fassade, wie ein Benutzer es in Python täte.
-    """
-    from opencivil.projekt import Projekt
-
-    p = Projekt("Jeder Nachweis einmal")
-    p.beton("C30/37")
-    p.stahl("B500B")
-    decke = p.platte("Decke", h=300, x=[18, 12], x_zulage=[12, 0], y=[12, 12],
-                     rissanforderung="erhoeht", duktilitaet=True, sproede=True,
-                     zwaengung=True, zwaengung_begrenzt=True,
-                     zwaengung_biegung=True)
-    decke.querkraftbewehrung.durchmesser = 8.0
-    decke.querkraftbewehrung.abstand_y = None
-    decke.querkraftbewehrung.anzahl_y = 5.0
-    decke.einwirkung("Feld", M_Ed=150, V_Ed=80)
-    decke.einwirkung("Feld mit Druck", M_Ed=120, N_Ed=-300)
-    decke.einwirkung("Stütze", M_Ed=-60, V_Ed=60)
-    decke.haeufig.aus_tragsicherheit = True
-    decke.haeufig.lastfall("Gebrauch", M_Ed=90)
-    decke.quasistaendig.aus_tragsicherheit = True
-    decke.quasistaendig.lastfall("Dauerlast", M_Ed=70)
-    decke.knickfall("Wand", N_Ed=-800, M_Ed_1=20, laenge=3.0)
-
-    # Ein Streifen von 500 mm: M und N je b, V je Meter. Mit halben Momenten
-    # sind es dieselben Grade wie bei 1000 mm -- nur die Lagentabelle zeigt,
-    # dass x je b und y je Laufmeter gilt.
-    dach = p.platte("Dach", h=200, x=[10, 10], y=[8, 8], x_innen=False,
-                    einlagenhoehe=40, b=500)
-    dach.einwirkung("Feld", M_Ed=40, V_Ed=40)
-    dach.einwirkung("Rand", M_Ed=10, V_Ed=30)
-    dach.quasistaendig.lastfall("Dauerlast", M_Ed=20)
-
-    ohne = p.platte("Ohne x", h=250, x=[0, 0], y=[12, 12])
-    ohne.einwirkung("Feld", M_Ed=30, V_Ed=20)
-
-    konsole = p.platte("Konsole", h=250, x=[12, 12], y=[40, 10])
-    konsole.einwirkung("Feld", M_Ed=40, V_Ed=50)
-    konsole.einwirkung("Schräg", M_Ed=30, N_Ed=-500).art = "naechster_Punkt"
-
-    # Ein Blatt Gleichungen: Definition, Projektwert, Auswertung mit
-    # gewünschter Einheit, Text -- und eine Zeile mit Fehler.
-    from opencivil.projekt.gleichungen import (
-        GleichungsblattEintrag, GleichungszeileEintrag as Zeile)
-    p.gleichungen.append(GleichungsblattEintrag(p.freie_kennung("g"), "Vorbemessung", [
-        Zeile(art="text", text="Stütze 30 × 30 cm, zentrisch."),
-        Zeile(latex=r"a=30\mathrm{cm}"),
-        Zeile(art="projektwert", name=r"f_{cd}", wert_id="beton.b1.f_cd"),
-        Zeile(latex=r"N_{Rd}=a^{2}\cdot f_{cd}", einheit="kN"),
-        Zeile(latex=r"\frac{N_{Rd}}{1.5\mathrm{m}}="),
-        Zeile(latex=r"b=a+N_{Rd}"),
-    ]))
-    return p
-
-
 def projekte() -> dict:
-    """Name auf Projekt -- die Projekte, deren Bericht festgehalten wird."""
+    """
+    Name auf Projekt -- die Projekte, deren Bericht festgehalten wird. Das
+    zweite führt jeden Nachweis laut (:meth:`Projekt.jeder_nachweis`).
+    """
     from opencivil.projekt import Projekt
 
-    return {"beispiel": Projekt.beispiel(), "voll": _voll()}
+    return {"beispiel": Projekt.beispiel(), "voll": Projekt.jeder_nachweis()}
 
 
 def _loesung(projekt):

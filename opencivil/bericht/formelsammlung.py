@@ -1,12 +1,20 @@
 """
-opencivil/bericht/formelsammlung.py -- jede Formel des Laufs einmal, ohne Zahlen.
+opencivil/bericht/formelsammlung.py -- jede Formel einmal, ohne Zahlen.
 
 VERANTWORTUNG:
-Sammelt aus der Herleitung je Thema -- «Beton», «Querkraft», «Knicken» --
+Sammelt aus einer Herleitung je Thema -- «Beton», «Querkraft», «Knicken» --
 die Formeln in ihrer symbolischen Fassung, ``Symbol = Formel``, mit Titel
 und Normstelle, und die Erklaerungen dazu. Die Herleitung zeigt Formeln mit
 Zahlen und laesst die Erklaerungen weg; hier ist es umgekehrt: keine Zahlen,
 dafuer das Warum.
+
+ZWEI SAMMLUNGEN:
+* Die ganze, zum Nachschlagen (:func:`vollstaendig`): jede Formel des
+  Werkzeugs, gleich welches Projekt offen ist und welche Nachweise darin
+  laufen. Die Oberflaeche zeigt sie; vorab erzeugt von
+  ``python3 -m opencivil.web.bruecke``.
+* Die eines Laufs (:func:`formelsammlung`): im Bericht als «Verwendete
+  Formeln» -- die Erklaerungen zu dem, was er rechnet, und nicht zu allem.
 
 JEDE FORMEL EINMAL:
 Dieselbe Formel steht in der Herleitung oft mehrfach -- je Lage, je Fall, je
@@ -15,47 +23,39 @@ Minus davor. Erkannt wird sie an ihrer Vorlage (``@name``-Form, siehe
 :attr:`Formelzeile.vorlage`, ohne fuehrendes Minus) und dem Grundzeichen ihres
 Ergebnisses; gezeigt wird die erste Fassung. Ein Ansatz ohne Zahlen
 (:meth:`Protokoll.ansatz`) ist schon symbolisch und zaehlt mit seinem LaTeX.
+Und was gesetzt gleich aussieht, ist dieselbe Formel: Summe und Schwerpunkt
+einer Lage schreiben Handrechnung und Lagennachweise mit anderen
+Platzhalternamen.
 
 Einmal im ganzen Lauf, nicht je Thema: gemeinsame Bausteine -- die statische
 Hoehe, der Querschnittsloeser, die Zugfestigkeit -- stehen beim ersten Thema,
 das sie braucht, und nicht bei jedem noch einmal.
 
-WOHER THEMA UND RAUM KOMMEN:
-Das Thema stempelt das Rechenwerk auf jeden Block, den eine Berechnung
-schreibt (:meth:`Protokoll.herkunft_stempeln`). Der Raum ist der des
-Abschnitts, in dem der Block steht -- gelesen am Abschnittstitel, wie in
-:meth:`Protokoll.nach_abschnitten`. Er sagt, bei welchem Bestandteil eine
-Formel vorkam; danach grenzt die Oberflaeche «Aktuelle Seite» ein.
+WOHER DAS THEMA KOMMT:
+Das Rechenwerk stempelt es auf jeden Block, den eine Berechnung schreibt
+(:meth:`Protokoll.herkunft_stempeln`).
 """
 
 from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from typing import Callable, Dict, List, Optional
+from typing import Dict, List, Optional, Set
 
 from opencivil.core.latex import ohne_namen_im_index
-from opencivil.core.protokoll import GleichungBlock, Protokoll, TextBlock, TitelBlock
-
-
-@dataclass
-class Eintrag:
-    """Eine Formel oder eine Erklaerung -- mit den Raeumen, in denen sie vorkam."""
-
-    block: GleichungBlock | TextBlock
-    raeume: List[str] = field(default_factory=list)
+from opencivil.core.protokoll import GleichungBlock, Protokoll, TextBlock
 
 
 @dataclass
 class Thema:
     name: str
-    erklaerungen: List[Eintrag] = field(default_factory=list)
-    formeln: List[Eintrag] = field(default_factory=list)
+    erklaerungen: List[TextBlock] = field(default_factory=list)
+    formeln: List[GleichungBlock] = field(default_factory=list)
 
     @property
-    def eintraege(self) -> List[Eintrag]:
+    def bloecke(self) -> List[GleichungBlock | TextBlock]:
         """Wie das Thema dasteht, im Bericht und am Bildschirm: erst das Warum."""
-        return self.erklaerungen + self.formeln
+        return [*self.erklaerungen, *self.formeln]
 
 
 #: Eine Zahlenangabe in einem Titel: ``= -300.0 kN``. Die Herleitung nennt
@@ -81,8 +81,10 @@ _GRUNDZEICHEN = re.compile(r"^[^_^({]*")
 _FALLWERTE = re.compile(r"\([^()]*\\mathrm\{[^()]*\)")
 
 
-def _schluessel(block: GleichungBlock) -> Optional[tuple]:
-    """Woran dieselbe Formel wiederzuerkennen ist -- ``None``: es gibt keine Symbolfassung."""
+def _schluessel(block: GleichungBlock | TextBlock) -> Optional[tuple]:
+    """Woran derselbe Eintrag wiederzuerkennen ist -- ``None``: er gehoert nicht hinein."""
+    if isinstance(block, TextBlock):
+        return ("text", block.text) if block.erklaerung else None
     if block.ansatz:
         return ("ansatz", block.latex)
     zeile = block.formelzeile
@@ -107,41 +109,54 @@ def _symbolisch(block: GleichungBlock) -> GleichungBlock:
     return GleichungBlock(latex=latex, titel=_titel(block.titel), referenz=block.referenz)
 
 
-def _merken(eintraege: List[Eintrag], nach_schluessel: Dict[tuple, Eintrag],
-            schluessel: tuple, neu: Callable[[], GleichungBlock | TextBlock],
-            raum: str) -> None:
-    eintrag = nach_schluessel.get(schluessel)
-    if eintrag is None:
-        eintrag = nach_schluessel[schluessel] = Eintrag(neu())
-        eintraege.append(eintrag)
-    if raum and raum not in eintrag.raeume:
-        eintrag.raeume.append(raum)
-
-
 def formelsammlung(protokoll: Protokoll) -> List[Thema]:
     """Je Thema, in der Folge ihres ersten Auftretens, Erklaerungen und Formeln."""
     themen: Dict[str, Thema] = {}
-    gesehen: Dict[tuple, Eintrag] = {}
-    raum = ""
+    gesehen: Set[tuple] = set()
+    gesetzt: Set[str] = set()
     for block in protokoll.alle_bloecke():
-        if isinstance(block, TitelBlock) and block.raum:
-            raum = block.raum
         if not isinstance(block, (GleichungBlock, TextBlock)) or not block.thema:
             continue
         thema = themen.setdefault(block.thema, Thema(block.thema))
-        if isinstance(block, TextBlock):
-            if block.erklaerung:
-                _merken(thema.erklaerungen, gesehen, ("text", block.text),
-                        lambda: TextBlock(text=block.text), raum)
-            continue
         schluessel = _schluessel(block)
-        if schluessel is not None:
-            _merken(thema.formeln, gesehen, schluessel, lambda: _symbolisch(block), raum)
-    return [t for t in themen.values() if t.eintraege]
+        if schluessel is None or schluessel in gesehen:
+            continue
+        gesehen.add(schluessel)
+        if isinstance(block, TextBlock):
+            thema.erklaerungen.append(TextBlock(text=block.text))
+            continue
+        formel = _symbolisch(block)
+        if formel.latex not in gesetzt:
+            gesetzt.add(formel.latex)
+            thema.formeln.append(formel)
+    return [t for t in themen.values() if t.bloecke]
+
+
+def vollstaendig() -> List[Thema]:
+    """
+    Jede Formel des Werkzeugs, zum Nachschlagen -- gleich, welches Projekt
+    offen ist und welche Nachweise darin laufen.
+
+    Gesammelt aus :meth:`Projekt.beispiel` und :meth:`Projekt.jeder_nachweis`,
+    die zusammen jeden Nachweis laut fuehren, mit allen Kennwerten der
+    Baustoffe (``alle_ziele``: sonst fehlte etwa ε_yd). Im schnellen Aufbau:
+    die Grenzkraftsuche beim Knicken schreibt keine eigene Formel, und ganz
+    stille Nachweise schreiben nichts -- dieselbe Sammlung, Zeichen fuer
+    Zeichen, in einem Zehntel der Zeit.
+    """
+    # Erst hier: das Paket projekt laedt beim Import den Bericht und damit
+    # dieses Modul.
+    from opencivil.projekt import Projekt
+
+    protokoll = Protokoll()
+    for projekt in (Projekt.beispiel(), Projekt.jeder_nachweis()):
+        aufbau = projekt.aufbauen(schnell=True)
+        protokoll.anfuegen(*aufbau.werk.loese(*aufbau.alle_ziele()).protokoll.bloecke)
+    return formelsammlung(protokoll)
 
 
 def anfuegen(p: Protokoll, themen: List[Thema]) -> None:
     """Fuer den Bericht: je Thema ein Titel, die Erklaerungen, dann die Formeln."""
     for thema in themen:
         p.titel(thema.name)
-        p.anfuegen(*(e.block for e in thema.eintraege))
+        p.anfuegen(*thema.bloecke)

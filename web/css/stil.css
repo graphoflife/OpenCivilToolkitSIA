@@ -365,6 +365,8 @@ input[readonly], input:disabled, select:disabled {
 }
 .schalter-halb:hover { background: var(--flaeche-2); }
 .schalter-halb.ist-an { background: var(--blau); color: #fff; }
+/* Unsichtbar, aber mit seinem Platz: sonst sprängen die Reiter daneben. */
+.schalter.ist-verborgen { visibility: hidden; }
 .lage-y .schalter-halb.ist-an { background: var(--stahl); }
 
 /* Ein Posten auf einer Zeile: × Name ⌀ [d] @ [s] mm [Umschalter] */

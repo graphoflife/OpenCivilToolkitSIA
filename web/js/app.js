@@ -499,6 +499,9 @@ function allesZeichnen(anlass) {
   for (const k of knoten.reiterKnoepfe) {
     k.classList.toggle('ist-aktiv', k.dataset.reiter === zustand.reiter);
   }
+  // Die Formelsammlung zeigt immer alles -- dort gäbe es nichts umzuschalten.
+  document.getElementById('umfang').classList.toggle(
+    'ist-verborgen', zustand.reiter === 'formelsammlung');
   for (const k of document.querySelectorAll('#umfang .schalter-halb')) {
     k.classList.toggle('ist-an', k.dataset.umfang === zustand.umfang);
   }
