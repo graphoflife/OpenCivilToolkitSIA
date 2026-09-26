@@ -20,7 +20,9 @@ const KATEX_EINSTELLUNGEN = {
   throwOnError: false,
   displayMode: true,
   strict: false,
-  trust: true,
+  // Kein \href, kein \htmlClass: nichts im Bericht braucht sie, und ein
+  // Blatt trägt Getipptes bis hierher -- als Baum neu gesetzt, trotzdem.
+  trust: false,
   macros: {
     '\\diameter': '\\varnothing',
   },

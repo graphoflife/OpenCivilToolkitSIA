@@ -10,9 +10,9 @@ da wie eine des Werkzeugs: Symbol, Formel, Zahlen, Ergebnis.
 
 KEIN EVAL, KEIN ROHES LATEX:
 Gerechnet wird ueber den Baum, nie ueber ``eval``. Angezeigt wird nie, was
-der Benutzer geschrieben hat, sondern was der Baum daraus macht: KaTeX laeuft
-mit ``trust: true``, und ein fremdes ``\\href`` kaeme so nie durch -- der Baum
-kennt diesen Befehl nicht und lehnt die Zeile ab.
+der Benutzer geschrieben hat, sondern was der Baum daraus macht: ein fremdes
+``\\href`` kaeme so nie durch -- der Baum kennt diesen Befehl nicht und lehnt
+die Zeile ab. (KaTeX laeuft zudem ohne ``trust``.)
 
 WAS VERSTANDEN WIRD:
 Zahlen (``3.5``, ``3{,}5``), Variablen mit Index (``f_{cd}``, ``\\sigma_s``),

@@ -117,7 +117,7 @@ class TestFehler(unittest.TestCase):
         self.assertIn("unvollständig", self.fehler(r"3+"))
 
     def test_fremde_befehle_kommen_nicht_durch(self):
-        """KaTeX laeuft mit trust: true -- ein ``\\href`` darf es nie erreichen."""
+        """Ein ``\\href`` erreicht KaTeX nie -- der Leser weist es ab."""
         for latex in (r"\href{javascript:alert(1)}{x}", r"\htmlClass{a}{x}",
                       r"\includegraphics{x}", r"x=\url{y}"):
             with self.subTest(latex=latex):
