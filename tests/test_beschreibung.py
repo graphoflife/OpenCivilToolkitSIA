@@ -12,6 +12,8 @@ from opencivil.projekt import (
     LageEintrag, MaterialEintrag, ObergrenzeEintrag, PostenEintrag, Projekt,
     ProjektFehler, QuerkraftbewehrungEintrag, QuerschnittEintrag, SpannungsfallEintrag,
 )
+from opencivil.projekt.eintraege import Beschreibung
+from opencivil.projekt.gleichungen import GleichungsblattEintrag, GleichungszeileEintrag
 from opencivil.web import api, dienst
 
 
@@ -350,6 +352,54 @@ class TestVollstaendigeAblage(unittest.TestCase):
         eintrag = PostenEintrag.aus_dict({"durchmesser": 14.0, "abstand": None, "anzahl": 6.0})
         self.assertIsNone(eintrag.abstand)
         self.assertEqual(eintrag.anzahl, 6.0)
+
+
+class TestVorgabenAnEinerStelle(unittest.TestCase):
+    """
+    Jede Vorgabe steht in der Datenklasse und nur dort: ein Wörterbuch mit nur
+    den Pflichtfeldern liest sich genau wie die Klasse mit ihren Vorgaben.
+
+    Früher stand dieselbe Zahl im Feld, im Leser und in der Oberfläche. Wer
+    eine davon ändert und die andere vergisst, fällt hier auf.
+    """
+
+    #: Klasse, Wörterbuch mit den Pflichtfeldern, dieselben als Argumente.
+    FAELLE = [
+        (QuerschnittEintrag, {"kennung": "q", "beton": "b"},
+         {"kennung": "q", "name": "q", "beton": "b"}),
+        (MaterialEintrag, {"kennung": "m", "art": "beton", "sorte": "C30/37"},
+         {"kennung": "m", "art": "beton", "sorte": "C30/37"}),
+        (PostenEintrag, {}, {}),
+        (LageEintrag, {}, {}),
+        (ObergrenzeEintrag, {}, {}),
+        (QuerkraftbewehrungEintrag, {}, {}),
+        (KnickEintrag, {"name": "k"}, {"name": "k"}),
+        (SpannungsfallEintrag, {"name": "s"}, {"name": "s"}),
+        (GebrauchsfallEintrag, {"name": "g"}, {"name": "g"}),
+        (KombinationEintrag, {"name": "k"}, {"name": "k"}),
+        (GleichungszeileEintrag, {}, {}),
+        (GleichungsblattEintrag, {"kennung": "g"}, {"kennung": "g", "name": "g"}),
+        (Projekt, {}, {}),
+    ]
+
+    def test_ein_leeres_woerterbuch_liest_sich_wie_die_vorgaben(self):
+        for cls, roh, pflicht in self.FAELLE:
+            with self.subTest(klasse=cls.__name__):
+                self.assertEqual(cls.aus_dict(roh), cls(**pflicht))
+
+    def test_jede_eintragsklasse_ist_dabei(self):
+        """
+        Eine neue Klasse ohne Eintrag oben wäre ungeprüft. Ausgenommen die
+        Gebrauchsliste: ihr Anteil hängt an der Liste (häufig 70 %,
+        quasi-ständig 60 %) und kommt als Argument.
+        """
+        def unterklassen(k):
+            for u in k.__subclasses__():
+                yield u
+                yield from unterklassen(u)
+        geprueft = {cls for cls, _, _ in self.FAELLE}
+        self.assertEqual(set(unterklassen(Beschreibung)) - geprueft - {Gebrauchsliste},
+                         set())
 
 
 class TestNeuePlatteKommtAusDemKern(unittest.TestCase):

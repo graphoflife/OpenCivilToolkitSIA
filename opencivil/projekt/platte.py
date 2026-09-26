@@ -25,7 +25,7 @@ from opencivil.projekt.eintraege import (
 )
 from opencivil.projekt.lesen import (
     ProjektFehler, gebrauchsliste_roh, lagen_aus_altem_format, pflichtfeld,
-    rissanforderung_aus, schalter_aus, teilungen_aus, zahl,
+    rissanforderung_aus, schalter_aus, teilungen_aus, vorgabe, zahl,
 )
 
 
@@ -368,8 +368,8 @@ class QuerschnittEintrag(Beschreibung):
         if lagen is None and ("lagen_unten" in d or "lagen_oben" in d):
             lagen = lagen_aus_altem_format(d)
         kennung = pflichtfeld(d, "kennung", "Ein Querschnitt")
-        modus = str(d.get("automatik_modus") or "grund_ohne_zulage_mit")
-        dicke = bool(d.get("automatik_dicke", False))
+        modus = str(d.get("automatik_modus") or cls.automatik_modus)
+        dicke = bool(d.get("automatik_dicke", cls.automatik_dicke))
         # Altformat: die Dicke war einmal ein eigener Modus, «dicke_grund_mit»
         # hiess Grundbewehrung mit Kraeften und die Dicke dazu.
         if modus.startswith("dicke_"):
@@ -378,39 +378,44 @@ class QuerschnittEintrag(Beschreibung):
             kennung=kennung,
             name=str(d.get("name") or kennung),
             beton=pflichtfeld(d, "beton", f"Der Querschnitt '{kennung}'"),
-            h=zahl(d, "h", 300.0),
-            b=zahl(d, "b", 1000.0),
-            ueberdeckung_unten=zahl(d, "ueberdeckung_unten", 30.0),
-            ueberdeckung_oben=zahl(d, "ueberdeckung_oben", 30.0),
-            d_max=zahl(d, "d_max", 32.0),
-            einlagenhoehe=zahl(d, "einlagenhoehe", 0.0),
-            k_c=zahl(d, "k_c", K_C),
+            h=zahl(d, "h", cls.h),
+            b=zahl(d, "b", cls.b),
+            ueberdeckung_unten=zahl(d, "ueberdeckung_unten", cls.ueberdeckung_unten),
+            ueberdeckung_oben=zahl(d, "ueberdeckung_oben", cls.ueberdeckung_oben),
+            d_max=zahl(d, "d_max", cls.d_max),
+            einlagenhoehe=zahl(d, "einlagenhoehe", cls.einlagenhoehe),
+            k_c=zahl(d, "k_c", cls.k_c),
             querkraftbewehrung=QuerkraftbewehrungEintrag.aus_dict(
                 d.get("querkraftbewehrung") or {}),
-            duktilitaet=schalter_aus(d.get("duktilitaet")),
+            duktilitaet=schalter_aus(d.get("duktilitaet"), vorgabe=cls.duktilitaet),
             automatik_modus=modus,
             automatik_dicke=dicke,
-            automatik_y_wie_x=bool(d.get("automatik_y_wie_x", False)),
-            automatik_teilungen=teilungen_aus(d.get("automatik_teilungen"),
-                                               (150.0,)),
+            automatik_y_wie_x=bool(d.get("automatik_y_wie_x", cls.automatik_y_wie_x)),
+            automatik_teilungen=teilungen_aus(
+                d.get("automatik_teilungen"), vorgabe(cls, "automatik_teilungen")),
             automatik_mindestdurchmesser=zahl(
-                d, "automatik_mindestdurchmesser", 10.0),
+                d, "automatik_mindestdurchmesser", cls.automatik_mindestdurchmesser),
             automatik_grenze=ObergrenzeEintrag.aus_dict(d.get("automatik_grenze") or {}),
-            automatik_mindestdicke=zahl(d, "automatik_mindestdicke", 150.0),
-            automatik_querkraft=bool(d.get("automatik_querkraft", False)),
+            automatik_mindestdicke=zahl(d, "automatik_mindestdicke",
+                                        cls.automatik_mindestdicke),
+            automatik_querkraft=bool(d.get("automatik_querkraft", cls.automatik_querkraft)),
             automatik_querkraft_teilungen=teilungen_aus(
-                d.get("automatik_querkraft_teilungen"), (100.0, 150.0, 200.0)),
-            sproede=schalter_aus(d.get("sproede"), d.get("sproede_lagen")),
+                d.get("automatik_querkraft_teilungen"),
+                vorgabe(cls, "automatik_querkraft_teilungen")),
+            sproede=schalter_aus(d.get("sproede"), d.get("sproede_lagen"),
+                                 vorgabe=cls.sproede),
             zwaengung_biegung=schalter_aus(
-                d.get("zwaengung_biegung"), d.get("zwaengung_biegung_lagen")),
-            rissanforderung=rissanforderung_aus(d.get("rissanforderung")),
-            beschreibung=str(d.get("beschreibung") or ""),
-            kriechzahl=zahl(d, "kriechzahl", KRIECHZAHL),
-            x_d_max=zahl(d, "x_d_max", X_D_MAX),
+                d.get("zwaengung_biegung"), d.get("zwaengung_biegung_lagen"),
+                vorgabe=cls.zwaengung_biegung),
+            rissanforderung=rissanforderung_aus(d.get("rissanforderung"),
+                                                cls.rissanforderung),
+            beschreibung=str(d.get("beschreibung") or cls.beschreibung),
+            kriechzahl=zahl(d, "kriechzahl", cls.kriechzahl),
+            x_d_max=zahl(d, "x_d_max", cls.x_d_max),
             # Aus x und y wird einer: nachgewiesen wird nur noch x.
             zwaengung=schalter_aus(d.get("zwaengung"), d.get("zwaengung_x"),
-                                    d.get("zwaengung_y")),
-            zwaengung_begrenzt=bool(d.get("zwaengung_begrenzt", False)),
+                                    d.get("zwaengung_y"), vorgabe=cls.zwaengung),
+            zwaengung_begrenzt=bool(d.get("zwaengung_begrenzt", cls.zwaengung_begrenzt)),
             haeufig=Gebrauchsliste.aus_dict(
                 gebrauchsliste_roh(d, "haeufig", "haeufige"),
                 wort="häufige", vorgabe=HAEUFIG_ANTEIL),
@@ -421,8 +426,8 @@ class QuerschnittEintrag(Beschreibung):
                          for x in (d.get("knickfaelle") or [])],
             spannungsfaelle=[SpannungsfallEintrag.aus_dict(x)
                              for x in (d.get("spannungsfaelle") or [])],
-            richtung_lage1=str(d.get("richtung_lage1") or "y"),
-            richtung_lage4=str(d.get("richtung_lage4") or "y"),
+            richtung_lage1=str(d.get("richtung_lage1") or cls.richtung_lage1),
+            richtung_lage4=str(d.get("richtung_lage4") or cls.richtung_lage4),
             lagen=[LageEintrag.aus_dict(x) for x in (lagen or [])],
             kombinationen=[
                 KombinationEintrag.aus_dict(x) for x in (d.get("kombinationen") or [])],

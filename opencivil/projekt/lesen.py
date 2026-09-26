@@ -16,6 +16,7 @@ importiert.
 
 from __future__ import annotations
 
+import dataclasses
 from typing import Any, Dict, List, Mapping, Optional
 
 from opencivil.material.beton import BETONSORTEN
@@ -67,7 +68,25 @@ def sorten(art: str) -> Mapping[str, Any]:
     return BETONSORTEN if art == "beton" else STAHLSORTEN
 
 
-def rissanforderung_aus(wert: Any) -> str:
+def vorgabe(cls, feld: str) -> Any:
+    """
+    Die Vorgabe eines Feldes, wie die Datenklasse sie festlegt -- auch fuer
+    Felder mit ``default_factory``.
+
+    Die Leser nehmen ihre Vorgaben von der Klasse (``cls.h`` oder hier) und
+    schreiben sie nicht noch einmal hin. Stand die Zahl zweimal da -- im Feld
+    und im Leser, und ein drittes Mal in der Oberflaeche --, gab es drei
+    Vorgaben, die nur so lange uebereinstimmten, wie niemand eine aenderte.
+    """
+    f = next(f for f in dataclasses.fields(cls) if f.name == feld)
+    if f.default is not dataclasses.MISSING:
+        return f.default
+    if f.default_factory is not dataclasses.MISSING:
+        return f.default_factory()
+    raise KeyError(f"{cls.__name__}.{feld} hat keine Vorgabe.")
+
+
+def rissanforderung_aus(wert: Any, vorgabe: str) -> str:
     """
     Die Anforderung an die Rissbildung, oder die Vorgabe.
 
@@ -76,7 +95,7 @@ def rissanforderung_aus(wert: Any) -> str:
     genau das, was ein Nachweiswerkzeug nicht tun darf.
     """
     if wert in (None, ""):
-        return "normal"
+        return vorgabe
     text = str(wert)
     if text not in RISSANFORDERUNGEN:
         raise ProjektFehler(

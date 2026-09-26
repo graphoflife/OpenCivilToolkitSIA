@@ -26,7 +26,7 @@ from opencivil.querschnitt.platte import (
     ALPHA_MAX, ALPHA_MIN, Bewehrungsposten, Querkraftbewehrung,
 )
 from opencivil.projekt.lesen import (
-    ProjektFehler, nur_x, pflichtfeld, sorten, zahl,
+    ProjektFehler, nur_x, pflichtfeld, sorten, vorgabe, zahl,
 )
 
 
@@ -116,8 +116,8 @@ class MaterialEintrag(Beschreibung):
             kennung=kennung,
             art=pflichtfeld(d, "art", f"Das Material '{kennung}'"),
             sorte=str(d.get("sorte", "")),
-            name=str(d.get("name", "")),
-            eigenstaendig=bool(d.get("eigenstaendig", False)),
+            name=str(d.get("name", cls.name)),
+            eigenstaendig=bool(d.get("eigenstaendig", cls.eigenstaendig)),
             abweichungen={k: float(v) for k, v in (d.get("abweichungen") or {}).items()},
             ueberschreibungen={
                 k: float(v) for k, v in (d.get("ueberschreibungen") or {}).items()},
@@ -159,7 +159,7 @@ class PostenEintrag(Beschreibung):
         if abstand_wert is None and anzahl_wert is None:
             abstand_wert = cls.abstand
         return cls(
-            durchmesser=zahl(d, "durchmesser", 0.0),
+            durchmesser=zahl(d, "durchmesser", cls.durchmesser),
             abstand=abstand_wert,
             anzahl=anzahl_wert,
         )
@@ -199,13 +199,13 @@ class LageEintrag(Beschreibung):
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "LageEintrag":
         return cls(
-            stahl=str(d.get("stahl", "")),
-            grund=PostenEintrag.aus_dict(d.get("grund") or {}),
-            zulage=PostenEintrag.aus_dict(d.get("zulage") or {"durchmesser": 0.0}),
+            stahl=str(d.get("stahl", cls.stahl)),
+            grund=PostenEintrag.aus_dict(d.get("grund") or vorgabe(cls, "grund").als_dict()),
+            zulage=PostenEintrag.aus_dict(d.get("zulage") or vorgabe(cls, "zulage").als_dict()),
             # Alte Beschreibungen kennen das Feld nicht. Die unguenstige Lage
             # ist die Vorgabe -- auf der Baustelle laesst sich nicht steuern,
             # welche Kante fluchtet.
-            unguenstig=bool(d.get("unguenstig", True)),
+            unguenstig=bool(d.get("unguenstig", cls.unguenstig)),
         )
 
 
@@ -232,10 +232,9 @@ class ObergrenzeEintrag(Beschreibung):
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "ObergrenzeEintrag":
-        vorgabe = cls()
         return cls(
-            grund=PostenEintrag.aus_dict(d.get("grund") or vorgabe.grund.als_dict()),
-            zulage=PostenEintrag.aus_dict(d.get("zulage") or vorgabe.zulage.als_dict()),
+            grund=PostenEintrag.aus_dict(d.get("grund") or vorgabe(cls, "grund").als_dict()),
+            zulage=PostenEintrag.aus_dict(d.get("zulage") or vorgabe(cls, "zulage").als_dict()),
         )
 
 
@@ -278,13 +277,13 @@ class QuerkraftbewehrungEintrag(Beschreibung):
         if abstand_y is None and anzahl_y is None:
             abstand_y = cls.abstand_y
         return cls(
-            durchmesser=zahl(d, "durchmesser", 0.0),
-            stahl=str(d.get("stahl", "")),
+            durchmesser=zahl(d, "durchmesser", cls.durchmesser),
+            stahl=str(d.get("stahl", cls.stahl)),
             abstand_x=wahl("abstand_x") or cls.abstand_x,
             abstand_y=abstand_y,
             anzahl_y=anzahl_y,
-            alpha_min=int(zahl(d, "alpha_min", float(ALPHA_MIN))),
-            alpha_max=int(zahl(d, "alpha_max", float(ALPHA_MAX))),
+            alpha_min=int(zahl(d, "alpha_min", float(cls.alpha_min))),
+            alpha_max=int(zahl(d, "alpha_max", float(cls.alpha_max))),
         )
 
     def pruefen(self, wo: str) -> None:
@@ -344,11 +343,11 @@ class KnickEintrag(Beschreibung):
     def aus_dict(cls, d: Mapping[str, Any]) -> "KnickEintrag":
         return cls(
             name=pflichtfeld(d, "name", "Ein Knicknachweis"),
-            N_Ed=zahl(d, "N_Ed", 0.0),
-            M_Ed_1=zahl(d, "M_Ed_1", 0.0),
-            laenge=zahl(d, "laenge", 3.0),
-            knicklaenge=zahl(d, "knicklaenge", 3.0),
-            aktiv=bool(d.get("aktiv", True)),
+            N_Ed=zahl(d, "N_Ed", cls.N_Ed),
+            M_Ed_1=zahl(d, "M_Ed_1", cls.M_Ed_1),
+            laenge=zahl(d, "laenge", cls.laenge),
+            knicklaenge=zahl(d, "knicklaenge", cls.knicklaenge),
+            aktiv=bool(d.get("aktiv", cls.aktiv)),
         )
 
 
@@ -406,13 +405,13 @@ class SpannungsfallEintrag(Beschreibung):
     def aus_dict(cls, d: Mapping[str, Any]) -> "SpannungsfallEintrag":
         return cls(
             name=pflichtfeld(d, "name", "Eine Spannungsanalyse"),
-            art=str(d.get("art") or "schnittgroessen"),
-            richtung=str(d.get("richtung") or "x"),
-            N_Ed=zahl(d, "N_Ed", 0.0),
-            M_Ed=zahl(d, "M_Ed", 0.0),
-            eps_oben=zahl(d, "eps_oben", -1.0),
-            eps_unten=zahl(d, "eps_unten", 2.0),
-            aktiv=bool(d.get("aktiv", True)),
+            art=str(d.get("art") or cls.art),
+            richtung=str(d.get("richtung") or cls.richtung),
+            N_Ed=zahl(d, "N_Ed", cls.N_Ed),
+            M_Ed=zahl(d, "M_Ed", cls.M_Ed),
+            eps_oben=zahl(d, "eps_oben", cls.eps_oben),
+            eps_unten=zahl(d, "eps_unten", cls.eps_unten),
+            aktiv=bool(d.get("aktiv", cls.aktiv)),
         )
 
 
@@ -439,9 +438,9 @@ class GebrauchsfallEintrag(Beschreibung):
         nur_x(d, f"Der {wort} Lastfall '{d.get('name')}'")
         return cls(
             name=pflichtfeld(d, "name", f"Ein {wort}r Lastfall"),
-            M_Ed=zahl(d, "M_Ed", 0.0),
-            N_Ed=zahl(d, "N_Ed", 0.0),
-            aktiv=bool(d.get("aktiv", True)),
+            M_Ed=zahl(d, "M_Ed", cls.M_Ed),
+            N_Ed=zahl(d, "N_Ed", cls.N_Ed),
+            aktiv=bool(d.get("aktiv", cls.aktiv)),
         )
 
 
@@ -562,7 +561,7 @@ class Gebrauchsliste(Beschreibung):
                  vorgabe: float) -> "Gebrauchsliste":
         return cls(
             anteil=zahl(d, "anteil", vorgabe),
-            aus_tragsicherheit=bool(d.get("aus_tragsicherheit", False)),
+            aus_tragsicherheit=bool(d.get("aus_tragsicherheit", cls.aus_tragsicherheit)),
             faelle=[GebrauchsfallEintrag.aus_dict(x, wort)
                     for x in (d.get("faelle") or [])],
         )
@@ -588,11 +587,11 @@ class KombinationEintrag(Beschreibung):
         nur_x(d, f"Die Einwirkung '{d.get('name')}'")
         return cls(
             name=pflichtfeld(d, "name", "Eine Einwirkung"),
-            M_Ed=zahl(d, "M_Ed", 0.0),
-            N_Ed=zahl(d, "N_Ed", 0.0),
-            V_Ed=zahl(d, "V_Ed", 0.0),
-            art=str(d.get("art") or Erfuellungsart.AUTOMATISCH.value),
-            aktiv=bool(d.get("aktiv", True)),
+            M_Ed=zahl(d, "M_Ed", cls.M_Ed),
+            N_Ed=zahl(d, "N_Ed", cls.N_Ed),
+            V_Ed=zahl(d, "V_Ed", cls.V_Ed),
+            art=str(d.get("art") or cls.art),
+            aktiv=bool(d.get("aktiv", cls.aktiv)),
         )
 
 

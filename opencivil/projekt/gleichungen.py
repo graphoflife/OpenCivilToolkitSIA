@@ -41,13 +41,13 @@ class GleichungszeileEintrag(Beschreibung):
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "GleichungszeileEintrag":
-        art = str(d.get("art") or "formel")
+        art = str(d.get("art") or cls.art)
         if art not in ZEILENARTEN:
             raise ProjektFehler(
                 f"Eine Gleichungszeile der Art '{art}' gibt es nicht "
                 f"(möglich: {', '.join(ZEILENARTEN)}).")
         return cls(art=art,
-                   **{f: str(d.get(f) or "")
+                   **{f: str(d.get(f) or getattr(cls, f))
                       for f in ("latex", "einheit", "name", "wert_id", "text")})
 
 
