@@ -305,13 +305,13 @@ class TestStilleNachweiseImBericht(unittest.TestCase):
         text = self.text()
         abschnitt = text[text.index("\nNachweise\n"):]
         tabelle = abschnitt[:abschnitt.index("[i] Hinweis")]
-        self.assertNotIn("Zwängung auf Normalkraft", tabelle)
+        self.assertNotIn("Risse: Zwängung Normalkraft", tabelle)
         self.assertIn("Biegung und Normalkraft", tabelle)
         self.assertIn("Alle geführten Nachweise sind erfüllt.", abschnitt)
 
     def test_die_konsole_verschweigt_sie_aber_nicht(self):
         text = self.text()
-        self.assertRegex(text, r"\[i\] Hinweis: Zwängung auf Normalkraft – \d\. Lage: "
+        self.assertRegex(text, r"\[i\] Hinweis: Risse: Zwängung Normalkraft – \d\. Lage: "
                                r"nicht erfüllt")
         # Die Konsole bricht den Satz um; verglichen wird der Wortlaut.
         self.assertRegex(" ".join(text.split()),
@@ -322,7 +322,7 @@ class TestStilleNachweiseImBericht(unittest.TestCase):
         abschnitt = tex[tex.index(r"\section{Nachweise}"):]
         tabelle = abschnitt[abschnitt.index("Nachweis & Bezeichnung"):]
         tabelle = tabelle[:tabelle.index(r"\end{xltabular}")]
-        self.assertNotIn("Zwängung auf Normalkraft", tabelle)
+        self.assertNotIn("Risse: Zwängung Normalkraft", tabelle)
         self.assertNotIn("nicht erfüllt", tabelle)
         self.assertIn("Alle geführten Nachweise sind erfüllt.", abschnitt)
 
@@ -330,7 +330,7 @@ class TestStilleNachweiseImBericht(unittest.TestCase):
         tex = self.tex()
         abschnitt = tex[tex.index(r"\section{Nachweise}"):]
         hinweis = abschnitt[abschnitt.index(r"\end{xltabular}"):]
-        self.assertRegex(hinweis, r"\\hinweis\{Hinweis\}\{Zwängung auf Normalkraft – "
+        self.assertRegex(hinweis, r"\\hinweis\{Hinweis\}\{Risse: Zwängung Normalkraft – "
                                   r"\d\. Lage: nicht erfüllt")
 
 

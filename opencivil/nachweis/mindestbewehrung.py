@@ -216,6 +216,7 @@ class Rissnormalkraft(Nachweis):
     """
 
     THEMA = "Zwängung auf Normalkraft"
+    LANGNAME = "Risse: Zwängung Normalkraft"
 
     def __init__(
         self,
@@ -478,6 +479,7 @@ class ZwaengungBiegung(Nachweis):
     """
 
     THEMA = "Zwängung auf Biegung"
+    LANGNAME = "Risse: Zwängung Biegung"
 
     def __init__(
         self,

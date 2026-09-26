@@ -723,6 +723,21 @@ class Nachweis(Berechnung):
     erste trifft auf einen Schalter zu, den jemand umgelegt hat.
     """
 
+    LANGNAME: str = ""
+    """
+    Wie der Nachweis in der Zusammenfassung heisst, Spalte «Nachweis».
+    Leer: sein Thema.
+
+    Getrennt vom Thema, weil beide anders ordnen. Die Formelsammlung ordnet
+    nach dem, was gerechnet wird -- «Zwängung auf Biegung». Die
+    Zusammenfassung ordnet nach der Frage, die beantwortet wird -- «Risse:
+    Zwängung Biegung», bei den anderen Rissnachweisen.
+    """
+
+    @property
+    def langname(self) -> str:
+        return self.LANGNAME or self.thema
+
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.urteile: list[NachweisUrteil] = []
@@ -828,10 +843,10 @@ class Nachweis(Berechnung):
         groessen, urteile = self.pruefe(e, p)
         # Der Namensraum wird hier gestempelt und nicht von den Unterklassen
         # mitgegeben: er ist immer derselbe, naemlich der des Nachweises.
-        # Ebenso der Langname -- das Thema, wo die Pruefung keinen eigenen
-        # nennt. Still ist ein Urteil, wenn der ganze Nachweis es ist oder wenn
-        # die Pruefung es einzeln so gestempelt hat -- sie kennt ihre Faelle.
-        self.urteile = [replace(u, raum=self.id, langname=u.langname or self.thema,
+        # Ebenso der Langname, wo die Pruefung keinen eigenen nennt. Still ist
+        # ein Urteil, wenn der ganze Nachweis es ist oder wenn die Pruefung es
+        # einzeln so gestempelt hat -- sie kennt ihre Faelle.
+        self.urteile = [replace(u, raum=self.id, langname=u.langname or self.langname,
                                 still=self.still or u.still)
                         for u in urteile]
         return groessen

@@ -44,7 +44,7 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         aufbau, gefunden = urteile(self.projekt("normal"))
         self.assertEqual(aufbau.spannung, {})
         self.assertFalse([u for u in gefunden.values()
-                          if u.langname == "Stahlspannung gegen Fliessen"])
+                          if u.langname == "Risse: Häufige Lastfälle"])
 
     def test_bei_erhoehter_anforderung_laeuft_er(self):
         """
@@ -207,8 +207,8 @@ class TestStahlspannungAusRissbreite(unittest.TestCase):
                                quasistaendig__aus_tragsicherheit=True)
         aufbau, gefunden = urteile(projekt)
         namen = {u.langname for u in gefunden.values() if not u.still}
-        self.assertIn("Stahlspannung gegen Fliessen", namen)
-        self.assertIn("Stahlspannung aus Rissbreite", namen)
+        self.assertIn("Risse: Häufige Lastfälle", namen)
+        self.assertIn("Risse: Quasi-ständige Lastfälle", namen)
         self.assertNotEqual(aufbau.spannung["q1.x"].id,
                             aufbau.spannung_riss["q1.x"].id)
 

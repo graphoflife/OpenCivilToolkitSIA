@@ -190,7 +190,7 @@ class TestStilleNachweise(unittest.TestCase):
         """
         tabelle = self.antwort(Projekt.beispiel())
         knapp = [h for h in tabelle["stille"]
-                 if h["nachweis"].startswith("Zwängung auf Normalkraft")]
+                 if h["nachweis"].startswith("Risse: Zwängung Normalkraft")]
         self.assertTrue(knapp, tabelle["stille"])
         for hinweis in knapp:
             self.assertEqual(hinweis["grad"], "0.996")
@@ -469,7 +469,7 @@ class TestAngabengruppen(unittest.TestCase):
                  for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]
         self.assertTrue(namen)
         self.assertEqual(sorted(namen),
-                         ["Sprödes Versagen", "Zwängung auf Biegung"])
+                         ["Risse: Zwängung Biegung", "Sprödes Versagen"])
 
     def test_die_duktilitaet_laeuft_auch_ohne_schnittgroessen(self):
         projekt = Projekt.beispiel()

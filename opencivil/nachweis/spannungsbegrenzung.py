@@ -196,6 +196,8 @@ class Spannungsgrenze(ABC):
     art: str
     #: Spalte «Nachweis» der Zusammenfassung.
     langname: str
+    #: Thema in der Formelsammlung, und wovon der Erfuellungsgrad spricht.
+    thema: str
     #: «häufiger» / «quasi-ständiger» -- im Titel.
     einwirkung: str
     #: Index an M_Ed und N_Ed in der Herleitung.
@@ -267,7 +269,8 @@ class GrenzeGegenFliessen(Spannungsgrenze):
     symbolteil = r"\sigma"
     urteilsname = "Stahlspannung"
     art = "σ_s"
-    langname = "Stahlspannung gegen Fliessen"
+    langname = "Risse: Häufige Lastfälle"
+    thema = "Stahlspannung gegen Fliessen"
     einwirkung = "häufiger"
     lastindex = "häufig"
     fallwort = "Häufiger Lastfall"
@@ -326,7 +329,8 @@ class GrenzeAusRissbreite(Spannungsgrenze):
     symbolteil = r"\sigma,w"
     urteilsname = "Stahlspannung (Rissbreite)"
     art = "σ_s,w"
-    langname = "Stahlspannung aus Rissbreite"
+    langname = "Risse: Quasi-ständige Lastfälle"
+    thema = "Stahlspannung aus Rissbreite"
     einwirkung = "quasi-ständiger"
     lastindex = r"\text{quasi-ständig}"
     fallwort = "Quasi-ständiger Lastfall"
@@ -399,6 +403,10 @@ class Spannungsbegrenzung(Nachweis):
     @property
     def thema(self) -> str:
         """Je Grenze eines: gegen Fliessen oder aus der Rissbreite."""
+        return self.grenze.thema
+
+    @property
+    def langname(self) -> str:
         return self.grenze.langname
 
     def __init__(
@@ -424,7 +432,7 @@ class Spannungsbegrenzung(Nachweis):
             f.name: grad_def(
                 f"{basis}.{f.kennung}.erfuellungsgrad",
                 rf"\alpha_{{eff,{grenze.symbolteil},{r},{als_text(f.name)}}}",
-                (f"Erfüllungsgrad {grenze.langname} "
+                (f"Erfüllungsgrad {grenze.thema} "
                  f"{richtung.beschriftung} – {f.name}"),
                 grenze.referenz,
             )

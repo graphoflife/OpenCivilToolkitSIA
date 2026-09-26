@@ -194,7 +194,7 @@ class TestInDerZusammenfassung(unittest.TestCase):
         projekt = projekt_mit()
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         zeile = next(z for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]
-                     if z["zellen"][0] == {"text": "Zwängung auf Normalkraft"})
+                     if z["zellen"][0] == {"text": "Risse: Zwängung Normalkraft"})
         self.assertIn("N_{Riss}", zeile["zellen"][3]["mathe"])
         self.assertIn("N_{s,adm", zeile["zellen"][2]["mathe"])
         self.assertIn(r"\mathrm{kN}", zeile["zellen"][2]["mathe"])

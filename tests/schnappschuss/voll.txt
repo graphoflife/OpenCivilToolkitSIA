@@ -1986,27 +1986,27 @@ Bewehrung von oben nach unten
     Überdeckung unten   –         30\,\mathrm{mm}                          –
     Querkraftbewehrung  x/y       \varnothing 8@200@5\,\text{Stk}          B500B
 
-    Nachweis                      Bezeichnung                                                                                                Widerstand                                      Einwirkung  \alpha_{eff}
-    ----------------------------  ---------------------  ----------------------------------------------------------------------------------------------  ----------------------------------------------  ------------
-    Biegung und Normalkraft       Feld                                                          M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = 235.9\,\mathrm{kNm}                  M_{Ed,x} = 150.0\,\mathrm{kNm}          1.57
-    Biegung und Normalkraft       Feld mit Druck                                             M_{Rd,x}(N_{Ed} = -300\,\mathrm{kN}) = 253.8\,\mathrm{kNm}                  M_{Ed,x} = 120.0\,\mathrm{kNm}          2.12
-    Biegung und Normalkraft       Stütze                                                        M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = -79.9\,\mathrm{kNm}                  M_{Ed,x} = -60.0\,\mathrm{kNm}          1.33
-    Querkraft                     Feld                   V_{Rd,x}(M_{Ed} = 150\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 212.1\,\mathrm{kN}/\mathrm{m}         V_{Ed,x} = 80.0\,\mathrm{kN}/\mathrm{m}          2.65
-    Querkraft                     Stütze                 V_{Rd,x}(M_{Ed} = -60\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 214.6\,\mathrm{kN}/\mathrm{m}         V_{Ed,x} = 60.0\,\mathrm{kN}/\mathrm{m}          3.58
-    Duktilität                    2. Lage                                                                                 \left(x/d\right)_{max} = 0.35                    \left(x/d\right)_{2} = 0.253          1.39
-    Zwängung auf Normalkraft      3. Lage                                                                            N_{s,adm,3,x} = 351.6\,\mathrm{kN}                   N_{Riss} = 378.3\,\mathrm{kN}          0.93
-    Sprödes Versagen              3. Lage                                                                 M_{Rd,x}(N_{Ed} = 0)_{3} = 79.9\,\mathrm{kNm}                   M_{Riss} = 41.4\,\mathrm{kNm}          1.93
-    Zwängung auf Biegung          3. Lage                                                                            M_{s,adm,3,x} = 80.4\,\mathrm{kNm}                   M_{Riss} = 41.4\,\mathrm{kNm}          1.94
-    Stahlspannung aus Rissbreite  Feld (60 %)                                                          \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2}          2.18
-    Stahlspannung aus Rissbreite  Feld mit Druck (60 %)                                                \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_{s,x} = 106\,\mathrm{N}/\mathrm{mm}^{2}          3.60
-    Stahlspannung aus Rissbreite  Stütze (60 %)                                                        \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_{s,x} = 212\,\mathrm{N}/\mathrm{mm}^{2}          1.79
-    Stahlspannung aus Rissbreite  Dauerlast                                                            \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_{s,x} = 136\,\mathrm{N}/\mathrm{mm}^{2}          2.80
-    Stahlspannung gegen Fliessen  Feld (70 %)                                                          \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_{s,x} = 204\,\mathrm{N}/\mathrm{mm}^{2}          1.74
-    Stahlspannung gegen Fliessen  Feld mit Druck (70 %)                                                \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_{s,x} = 123\,\mathrm{N}/\mathrm{mm}^{2}          2.88
-    Stahlspannung gegen Fliessen  Stütze (70 %)                                                        \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_{s,x} = 248\,\mathrm{N}/\mathrm{mm}^{2}          1.43
-    Stahlspannung gegen Fliessen  Gebrauch                                                             \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2}          2.03
-    Knicken                       Wand                                                                                   N_{Rd,K} = 3900.6\,\mathrm{kN}                     N_{Ed} = 800.0\,\mathrm{kN}          4.88
-[!] Warnung: Zwängung auf Normalkraft – 3. Lage: nicht erfüllt. N_s,adm = 754 mm² · 466 N/mm² =
+    Nachweis                         Bezeichnung                                                                                                Widerstand                                      Einwirkung  \alpha_{eff}
+    -------------------------------  ---------------------  ----------------------------------------------------------------------------------------------  ----------------------------------------------  ------------
+    Biegung und Normalkraft          Feld                                                          M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = 235.9\,\mathrm{kNm}                  M_{Ed,x} = 150.0\,\mathrm{kNm}          1.57
+    Biegung und Normalkraft          Feld mit Druck                                             M_{Rd,x}(N_{Ed} = -300\,\mathrm{kN}) = 253.8\,\mathrm{kNm}                  M_{Ed,x} = 120.0\,\mathrm{kNm}          2.12
+    Biegung und Normalkraft          Stütze                                                        M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = -79.9\,\mathrm{kNm}                  M_{Ed,x} = -60.0\,\mathrm{kNm}          1.33
+    Querkraft                        Feld                   V_{Rd,x}(M_{Ed} = 150\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 212.1\,\mathrm{kN}/\mathrm{m}         V_{Ed,x} = 80.0\,\mathrm{kN}/\mathrm{m}          2.65
+    Querkraft                        Stütze                 V_{Rd,x}(M_{Ed} = -60\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 214.6\,\mathrm{kN}/\mathrm{m}         V_{Ed,x} = 60.0\,\mathrm{kN}/\mathrm{m}          3.58
+    Duktilität                       2. Lage                                                                                 \left(x/d\right)_{max} = 0.35                    \left(x/d\right)_{2} = 0.253          1.39
+    Risse: Zwängung Normalkraft      3. Lage                                                                            N_{s,adm,3,x} = 351.6\,\mathrm{kN}                   N_{Riss} = 378.3\,\mathrm{kN}          0.93
+    Sprödes Versagen                 3. Lage                                                                 M_{Rd,x}(N_{Ed} = 0)_{3} = 79.9\,\mathrm{kNm}                   M_{Riss} = 41.4\,\mathrm{kNm}          1.93
+    Risse: Zwängung Biegung          3. Lage                                                                            M_{s,adm,3,x} = 80.4\,\mathrm{kNm}                   M_{Riss} = 41.4\,\mathrm{kNm}          1.94
+    Risse: Quasi-ständige Lastfälle  Feld (60 %)                                                          \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2}          2.18
+    Risse: Quasi-ständige Lastfälle  Feld mit Druck (60 %)                                                \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_{s,x} = 106\,\mathrm{N}/\mathrm{mm}^{2}          3.60
+    Risse: Quasi-ständige Lastfälle  Stütze (60 %)                                                        \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_{s,x} = 212\,\mathrm{N}/\mathrm{mm}^{2}          1.79
+    Risse: Quasi-ständige Lastfälle  Dauerlast                                                            \sigma_{s,adm} = 381\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_{s,x} = 136\,\mathrm{N}/\mathrm{mm}^{2}          2.80
+    Risse: Häufige Lastfälle         Feld (70 %)                                                          \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_{s,x} = 204\,\mathrm{N}/\mathrm{mm}^{2}          1.74
+    Risse: Häufige Lastfälle         Feld mit Druck (70 %)                                                \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_{s,x} = 123\,\mathrm{N}/\mathrm{mm}^{2}          2.88
+    Risse: Häufige Lastfälle         Stütze (70 %)                                                        \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_{s,x} = 248\,\mathrm{N}/\mathrm{mm}^{2}          1.43
+    Risse: Häufige Lastfälle         Gebrauch                                                             \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2}          2.03
+    Knicken                          Wand                                                                                   N_{Rd,K} = 3900.6\,\mathrm{kN}                     N_{Ed} = 800.0\,\mathrm{kN}          4.88
+[!] Warnung: Risse: Zwängung Normalkraft – 3. Lage: nicht erfüllt. N_s,adm = 754 mm² · 466 N/mm² =
 351.6 kN < N_Riss = 378.3 kN.
 
 Dach
@@ -2025,17 +2025,17 @@ Bewehrung von oben nach unten
     1. Lage            x         \varnothing 10@150  B500B
     Überdeckung unten  –         30\,\mathrm{mm}     –
 
-    Nachweis                      Bezeichnung                                                                                     Widerstand                               Einwirkung  \alpha_{eff}
-    ----------------------------  -----------  ---------------------------------------------------------------------------------------------  ---------------------------------------  ------------
-    Biegung und Normalkraft       Feld                                                M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = 18.1\,\mathrm{kNm}            M_{Ed,x} = 40.0\,\mathrm{kNm}          0.45
-    Biegung und Normalkraft       Rand                                                M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = 18.1\,\mathrm{kNm}            M_{Ed,x} = 10.0\,\mathrm{kNm}          1.81
-    Querkraft                     Feld          V_{Rd,x}(M_{Ed} = 40\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 83.2\,\mathrm{kN}/\mathrm{m}  V_{Ed,x} = 40.0\,\mathrm{kN}/\mathrm{m}          2.08
-    Querkraft                     Rand         V_{Rd,x}(M_{Ed} = 10\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 110.7\,\mathrm{kN}/\mathrm{m}  V_{Ed,x} = 30.0\,\mathrm{kN}/\mathrm{m}          3.69
-    Stahlspannung aus Rissbreite  Dauerlast                                                             \varepsilon_{s,adm} = 2.50\,\text{‰}       \varepsilon_{s,x} = 4.67\,\text{‰}          0.54
+    Nachweis                         Bezeichnung                                                                                     Widerstand                               Einwirkung  \alpha_{eff}
+    -------------------------------  -----------  ---------------------------------------------------------------------------------------------  ---------------------------------------  ------------
+    Biegung und Normalkraft          Feld                                                M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = 18.1\,\mathrm{kNm}            M_{Ed,x} = 40.0\,\mathrm{kNm}          0.45
+    Biegung und Normalkraft          Rand                                                M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = 18.1\,\mathrm{kNm}            M_{Ed,x} = 10.0\,\mathrm{kNm}          1.81
+    Querkraft                        Feld          V_{Rd,x}(M_{Ed} = 40\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 83.2\,\mathrm{kN}/\mathrm{m}  V_{Ed,x} = 40.0\,\mathrm{kN}/\mathrm{m}          2.08
+    Querkraft                        Rand         V_{Rd,x}(M_{Ed} = 10\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 110.7\,\mathrm{kN}/\mathrm{m}  V_{Ed,x} = 30.0\,\mathrm{kN}/\mathrm{m}          3.69
+    Risse: Quasi-ständige Lastfälle  Dauerlast                                                             \varepsilon_{s,adm} = 2.50\,\text{‰}       \varepsilon_{s,x} = 4.67\,\text{‰}          0.54
 [!] Warnung: Biegung und Normalkraft – Feld: nicht erfüllt. M_Rd = 18.1 kNm bei N_Ed = 0 kN.
-[!] Warnung: Stahlspannung aus Rissbreite – Dauerlast: nicht erfüllt. ε_m = 2.3198 ‰, χ = 0.03612
+[!] Warnung: Risse: Quasi-ständige Lastfälle – Dauerlast: nicht erfüllt. ε_m = 2.3198 ‰, χ = 0.03612
 1/m. Stahl fliesst (ε_s = 4.67 ‰ > ε_y = 2.50 ‰): ε_s > ε_s,adm = 2.50 ‰.
-[i] Hinweis: Zwängung auf Normalkraft – 1. Lage: nicht erfüllt (α_eff = 0.99), ausgeschaltet.
+[i] Hinweis: Risse: Zwängung Normalkraft – 1. Lage: nicht erfüllt (α_eff = 0.99), ausgeschaltet.
 N_s,adm = 262 mm² · 500 N/mm² = 130.9 kN < N_Riss = 131.8 kN.
 
 Ohne x
