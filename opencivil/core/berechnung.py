@@ -514,17 +514,18 @@ class Prozedur(Berechnung):
 # ===========================================================================
 
 
-def grad_def(id: str, symbol: str, beschreibung: str, referenz: str = "") -> WertDef:
+def grad_def(id: str, symbol: str, beschreibung: str, referenz: str = "", *,
+             nur_ziel: bool = False) -> WertDef:
     """
     Die Definition eines Erfuellungsgrads -- fuer jeden Nachweis dieselbe.
 
     Frueher legte jeder Nachweis seine eigene an, mit eigener Stellenzahl, und
     die Werttabelle rundete an :func:`grad_als_text` vorbei: dort stand 0.996
-    als «1», neben «nicht erfuellt».
+    als «1», neben «nicht erfuellt». Zu ``nur_ziel`` siehe :class:`WertDef`.
     """
     return WertDef(id=id, symbol=symbol, einheit=EINHEITSLOS,
                    beschreibung=beschreibung, referenz=referenz,
-                   erfuellungsgrad=True)
+                   erfuellungsgrad=True, nur_ziel=nur_ziel)
 
 
 def grad_formel(

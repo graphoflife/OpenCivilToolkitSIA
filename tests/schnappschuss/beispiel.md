@@ -761,8 +761,6 @@ Alle geführten Nachweise sind erfüllt.
 | Grösste aufnehmbare Zugkraft (x-Richtung) | $N_{Rd,x}^{+}$ | $1393.2$ | kN | berechnet |
 | Momentenwiderstand bei N\_Ed (x-Richtung) – Stütze | $M_{Rd,x}(N_{Ed})_{\text{Stütze}}$ | $79.9$ | kNm | berechnet |
 | Erfüllungsgrad x-Richtung – Stütze | $\alpha_{eff,x,\text{Stütze}}$ | $1.60$ |  | berechnet |
-| Erfüllungsgrad Querkraft x-Richtung – ohne Einwirkung | $\alpha_{eff,V,x,\text{ohne Einwirkung}}$ | $\infty$ |  | berechnet |
-| Querkraftwiderstand x-Richtung – ohne Einwirkung | $V_{Rd,x}$ | $272.8$ | kN/m | berechnet |
 | Erfüllungsgrad Rissnormalkraft – 2. Lage x | $\alpha_{eff,NR,2,x}$ | $3.24$ |  | berechnet |
 | Erfüllungsgrad Rissnormalkraft – 3. Lage x | $\alpha_{eff,NR,3,x}$ | $0.996$ |  | berechnet |
 | Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %) | $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ | $4.29$ |  | berechnet |

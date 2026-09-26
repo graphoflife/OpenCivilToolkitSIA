@@ -221,7 +221,7 @@ die Oberfläche schon neu war. Ein schlichter statischer Server sagt nichts
   in `test_dienst` meldet, wenn `python3 -m opencivil.web.bruecke` vergessen
   ging.
 
-### Die Zeilen eines Blatts in der Werteliste
+### Ergebnisse statt Rechenziele in der Werteliste
 
 In der Werteliste des Berichts stand vom Blatt nur sein Ziel: «Zeilen ohne
 Fehler – Vorbemessung, n = 5». Die Zeilenwerte selbst fehlten.
@@ -240,13 +240,10 @@ Fehler – Vorbemessung, n = 5». Die Zeilenwerte selbst fehlten.
     Zeile 10 vor Zeile 2.
 * **Das Ziel:** Es trägt das neue Kennzeichen `WertDef.nur_ziel` und steht
   in keiner Werteliste mehr.
-
-### Offen
-
-* **Der Nullfall der Querkraft** (Diagramm ohne V_Ed) steht mit V_Rd und
-  Erfüllungsgrad «ohne Einwirkung» noch in der Werteliste. Er gehört zur
-  selben Art: nur Ziel, damit die Kurve entsteht. Mit `nur_ziel`
-  auszublenden, wenn gewünscht.
+* **Der Nullfall der Querkraft** (Diagramm ohne V_Ed) gehört zur selben Art:
+  V_Rd und Erfüllungsgrad «ohne Einwirkung» sind nur Ziel, damit die Kurve
+  entsteht. Sie tragen dasselbe Kennzeichen; aus der Werteliste von
+  «beispiel» fielen damit zwei Zeilen.
 
 ---
 

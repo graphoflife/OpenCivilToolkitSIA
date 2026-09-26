@@ -333,7 +333,8 @@ class Querkraftfall:
 #: Der Fall eines Querkraftnachweises ohne Querkraft: er rechnet still, nur
 #: fuer das Diagramm -- die M-V-Kurve und der Verlauf ueber die Neigung
 #: brauchen die Beiwerte, die erst im Lauf entstehen. Ohne Einwirkung kein
-#: Urteil und kein Punkt im Bild; M = 0 misst d fuer das positive Moment.
+#: Urteil, kein Punkt im Bild und keine Zeile in der Werteliste; M = 0 misst
+#: d fuer das positive Moment.
 NUR_KURVE = Querkraftfall(name="ohne Einwirkung", V_Ed=Groesse(0.0, KN_PRO_M),
                           M_Ed=Groesse(0.0, KNM), N_Ed=Groesse(0.0, KN))
 
@@ -452,12 +453,15 @@ class Querkraft(Nachweis):
 
         r = richtung.value
         basis = f"{querschnitt.id}.nachweis.querkraft.{r}"
+        # Die Ausgaben des Nullfalls sind nur Ziel (siehe NUR_KURVE) -- keine
+        # Ergebnisse zum Nachschlagen, darum in keiner Werteliste.
         self.d_ausnutzung: Dict[str, WertDef] = {
             f.name: grad_def(
                 f"{basis}.{f.kennung}.erfuellungsgrad",
                 rf"\alpha_{{eff,V,{r},{als_text(f.name)}}}",
                 f"Erfüllungsgrad Querkraft {richtung.beschriftung} – {f.name}",
                 "SIA 262:2025, 4.3.3.2",
+                nur_ziel=f is NUR_KURVE,
             )
             for f in self.faelle
         }
@@ -469,6 +473,7 @@ class Querkraft(Nachweis):
                 beschreibung=f"Querkraftwiderstand {richtung.beschriftung} – {f.name}",
                 referenz="SIA 262:2025, 4.3.3.2.1",
                 stellen=1,
+                nur_ziel=f is NUR_KURVE,
             )
             for f in self.faelle
         }
