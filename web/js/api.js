@@ -111,10 +111,9 @@ function ruf(name, rumpf) {
   if (kern === null) {
     throw new KernFehler('Rechenkern noch nicht bereit.');
   }
-  // Der Server antwortet mit einem Versprechen, Pyodide unmittelbar --
-  // Promise.resolve bügelt den Unterschied glatt, damit die Oberfläche
-  // durchgehend mit await arbeiten kann.
-  return Promise.resolve(kern.ruf(name, rumpf));
+  // Beide Wege antworten mit einem Versprechen: der Server über das Netz,
+  // Pyodide aus seinem eigenen Faden.
+  return kern.ruf(name, rumpf);
 }
 
 /** Ob gerade im Browser gerechnet wird (statt auf einem Server). */

@@ -24,9 +24,10 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](README.md).
                             │                 │
               ┌─────────────▼──────┐   ┌──────▼───────────────┐
               │ web/server.py      │   │ web/js/kern.js       │
-              │ HTTP, CPython      │   │ Pyodide im Browser   │
-              │ kann zusätzlich    │   │ lädt die .py-Dateien │
-              │ PDF übersetzen     │   │ übers Netz nach      │
+              │ HTTP, CPython      │   │ Pyodide im Browser,  │
+              │ kann zusätzlich    │   │ in eigenem Faden;    │
+              │ PDF übersetzen     │   │ lädt die .py-Dateien │
+              │                    │   │ übers Netz nach      │
               └─────────────┬──────┘   └──────┬───────────────┘
                             │                 │
                    ┌────────▼─────────────────▼────────┐
@@ -40,6 +41,60 @@ Wer das Werkzeug bloss benutzen will, liest [README.md](README.md).
 
 Der Knackpunkt ist die zweite Kiste. Alles darunter ist Transport, alles
 darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
+
+---
+
+## 2026-09-26 · Python in einem eigenen Faden
+
+Wunsch: Die Seite soll nicht mehr stillstehen, während der Browser rechnet.
+
+### Vorher und nachher
+
+Ohne Server rechnet Pyodide im Browser. Bisher tat es das im selben Faden wie
+die Oberfläche. Solange Python rechnete, ging nichts: kein Scrollen, kein
+Klick, kein Laufbalken. Jetzt rechnet es in einem Web Worker.
+
+Gemessen an der Dickensuche des Beispiels (sechs Suchen, 0.8 s). Gezählt
+wurden die Bilder, die die Seite in dieser Zeit zeichnet
+(`requestAnimationFrame`):
+
+| | längste Pause zwischen zwei Bildern |
+| --- | --- |
+| vorher, im Hauptfaden | ≈ 800 ms: die Seite steht die ganze Suche lang |
+| jetzt, im Web Worker | 22 ms: 62 Bilder je Sekunde, flüssig |
+
+Mit allen Nachweisen dauert eine Dickensuche bis zu einer halben Minute. So
+lange stand die Seite vorher still.
+
+### Wie es gebaut ist
+
+* **`web/js/kern_arbeiter.js` ist der Faden.** Er lädt Pyodide, hängt die
+  Quelldateien samt Versionsmarken ein und bindet `opencivil.web.dienst` ein.
+  Dann beantwortet er eine Nachricht nach der anderen mit `bearbeite_json`.
+  Das Einhängen ist unverändert aus `kern.js` herübergezogen.
+* **`web/js/kern.js` vermittelt nur noch.** Jede Anfrage bekommt eine Nummer.
+  Die Antwort mit derselben Nummer löst ihr Versprechen ein. Hinein und heraus
+  geht JSON als Zeichenkette, wie über HTTP.
+* **`api.js` sieht keinen Unterschied mehr.** Server und Browser antworten
+  beide mit einem Versprechen.
+* **Fehler kommen an wie bisher.** Wirft Python, erscheint die Meldung des
+  Kerns als `KernFehler`. Stirbt der Faden selbst, bekommt jede wartende
+  Anfrage einen Fehler. Keine wartet ewig.
+* **Der Ladeschirm meldet dasselbe:** «Python wird geladen …», dann
+  «Rechenkern wird eingelesen …».
+
+### Warum erst jetzt
+
+Beim Umzug in den Browser (2026-09-11) brauchte ein ganzer Durchgang 73 ms.
+Ein Worker lohnte damals nicht. Mit der Dickensuche rechnet ein Knopfdruck ein
+Vielfaches davon.
+
+### Nachgeprüft
+
+Im Browser ohne Server geprüft: Eingabe und Rechnen, das Auge, der Bericht und
+die Dickensuche. Ein absichtlicher Fehler kommt mit der Meldung des Kerns an.
+Die Konsole bleibt ohne Fehler. Mit Server ändert sich nichts, dort rechnet
+CPython ohnehin in einem anderen Prozess.
 
 ---
 
@@ -96,7 +151,8 @@ optimieren -- dazu eine Mindestdicke.
 * **Die blockierte Seite:** Im Browser ohne Server steht die Seite während
   der Suche still. Mit allen Nachweisen braucht eine einzelne Suche 2–3 s, die
   Dickensuche also bis zu einer halben Minute. Der nächste Schritt wäre ein
-  Web Worker für Pyodide.
+  Web Worker für Pyodide. **Erledigt** im Eintrag darüber: Python rechnet
+  jetzt in einem eigenen Faden.
 
 ---
 

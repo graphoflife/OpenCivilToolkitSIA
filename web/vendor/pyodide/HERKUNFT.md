@@ -1,6 +1,6 @@
 # Pyodide 314.0.6
 
-Python als WebAssembly. Damit läuft in `web/js/kern.js` derselbe Rechenkern im
+Python als WebAssembly. Damit läuft in `web/js/kern_arbeiter.js` derselbe Rechenkern im
 Browser, der auf dem Rechner unter CPython läuft — dieselben `.py`-Dateien,
 nicht eine Nachbildung in JavaScript.
 

@@ -103,7 +103,7 @@ Fertig und getestet (641 Tests):
 | `web/speicher.py` | Ergebnisse je Bauteil, damit nur Geändertes neu rechnet |
 | `web/dienst.py` | der Rechendienst, unabhängig vom Transportweg |
 | `web/server.py` | HTTP-Hülle darum (nur Standardbibliothek) |
-| `web/js/kern.js` | Pyodide-Hülle darum, für die Seite ohne Server |
+| `web/js/kern.js`, `kern_arbeiter.js` | Pyodide-Hülle darum, in einem eigenen Faden, für die Seite ohne Server |
 | `web/js/` | Oberfläche in reinem JavaScript, ohne Bauschritt |
 
 Wie das zusammenhängt und warum es so gebaut ist, steht in

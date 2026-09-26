@@ -1,8 +1,8 @@
 /**
  * kern.js -- Der Rechenkern im Browser, in Python.
  *
- * Startet Pyodide (Python als WebAssembly), lädt die Quelldateien aus
- * `opencivil/` nach und ruft darin `opencivil.web.dienst.bearbeite_json` auf.
+ * Startet Pyodide (Python als WebAssembly) mit den Quelldateien aus
+ * `opencivil/` und ruft darin `opencivil.web.dienst.bearbeite_json` auf.
  * Das ist derselbe Code, den `python3 start_ui.py` auf dem Rechner ausführt --
  * Zeile für Zeile dieselben Dateien, nicht eine Nachbildung in JavaScript.
  *
@@ -15,22 +15,13 @@
  * Gerechnet wird nichts, geprüft wird nichts, und keine Formel steht in dieser
  * Datei. Sie schaufelt Zeichenketten hin und her, mehr nicht.
  *
- * HAUPTFADEN:
- * Pyodide läuft im selben Faden wie die Oberfläche, ein Aufruf hält sie also
- * kurz an. Ein voller Durchgang des Beispielprojekts braucht in CPython 57 ms,
- * unter WebAssembly ein Mehrfaches davon -- spürbar, aber kein Grund für die
- * Umstände eines Arbeiterfadens. Sollte das Projekt einmal deutlich grösser
- * werden, wäre ein Web Worker der nächste Schritt.
+ * EIN EIGENER FADEN:
+ * Python läuft in einem Web Worker (`kern_arbeiter.js`). Im selben Faden wie
+ * die Oberfläche hielt jeder Aufruf die Seite an -- beim Beispiel für
+ * Zehntelsekunden, bei der Dickensuche einer Platte mit allen Nachweisen für
+ * bis zu eine halbe Minute. Hier bleibt die Vermittlung: jede Anfrage bekommt
+ * eine Nummer, und die Antwort mit derselben Nummer löst ihr Versprechen ein.
  */
-
-/** Verzeichnis, in das die Quelldateien im Dateisystem von Pyodide wandern. */
-const EINHAENGEPUNKT = '/kern';
-
-/** Das Projektverzeichnis, von dieser Datei aus gesehen (web/js/ -> ../../). */
-const WURZEL = new URL('../../', import.meta.url);
-
-const PYODIDE = new URL('../vendor/pyodide/', import.meta.url);
-const MANIFEST = new URL('../kern/dateien.json', import.meta.url);
 
 export class KernFehler extends Error {
   constructor(meldung, spur = '') {
@@ -41,124 +32,67 @@ export class KernFehler extends Error {
 }
 
 /**
- * Holt die Liste der Quelldateien und legt sie ins Dateisystem von Pyodide.
- *
- * Die Liste kommt aus `web/kern/dateien.json` und wird von
- * `opencivil/web/bruecke.py` geschrieben; ein Test wacht darüber, dass sie zu
- * den vorhandenen Dateien passt. Deshalb steht hier keine einzige
- * Dateiliste -- veraltete Abschriften wären genau die Art Fehler, die man erst
- * auf der veröffentlichten Seite bemerkt.
- *
- * VERSIONSMARKEN:
- * Jede Datei steht dort mit einer Marke (Prüfsumme ihres Inhalts) und wird als
- * `…py?v=Marke` geholt. Eine geänderte Datei hat so eine neue Adresse: der
- * Browser kann keine alte Fassung aus dem Zwischenspeicher nehmen, während die
- * übrigen schon neu sind.
- *
- * Das Verzeichnis selbst kommt dagegen wie jede andere Datei, auch aus dem
- * Zwischenspeicher. Es soll so alt sein wie die Oberfläche, die es liest --
- * GitHub Pages speichert beide zehn Minuten. An jedem Speicher vorbei geholt,
- * träfe nach einer Veröffentlichung eine noch gespeicherte alte Oberfläche
- * auf den neuen Kern.
- */
-async function quellenEinhaengen(pyodide) {
-  const antwort = await fetch(MANIFEST);
-  if (!antwort.ok) {
-    throw new KernFehler(
-      `Kernverzeichnis fehlt (${antwort.status}) → «python3 -m opencivil.web.bruecke».`);
-  }
-  const { dateien } = await antwort.json();
-  const eintraege = Object.entries(dateien || {});
-  if (!eintraege.length) throw new KernFehler('Kernverzeichnis leer.');
-
-  // Erst alle holen, dann alle schreiben: die Anfragen laufen so nebeneinander
-  // statt hintereinander, was bei gut fünfzig Dateien deutlich ausmacht.
-  const geladen = await Promise.all(eintraege.map(async ([name, marke]) => {
-    const datei = await fetch(new URL(`${name}?v=${marke}`, WURZEL));
-    if (!datei.ok) throw new KernFehler(`Kerndatei nicht erreichbar: ${name} (${datei.status})`);
-    return [name, await datei.text()];
-  }));
-
-  const kodierer = new TextEncoder();
-  for (const [name, inhalt] of geladen) {
-    const pfad = `${EINHAENGEPUNKT}/${name}`;
-    pyodide.FS.mkdirTree(pfad.slice(0, pfad.lastIndexOf('/')));
-    pyodide.FS.writeFile(pfad, kodierer.encode(inhalt));
-  }
-  return eintraege.length;
-}
-
-/**
- * Startet Python im Browser und liefert eine Schnittstelle zum Rechendienst.
+ * Startet Python in einem eigenen Faden und liefert eine Schnittstelle zum
+ * Rechendienst, sobald er bereit ist.
  *
  * @param {(text: string) => void} [fortschritt]  bekommt kurze Standmeldungen
  * @returns {Promise<{ruf: Function, art: string, fassung: string}>}
  */
-export async function kernStarten(fortschritt = () => {}) {
-  fortschritt('Python wird geladen …');
-
-  let loadPyodide;
-  try {
-    ({ loadPyodide } = await import(new URL('pyodide.mjs', PYODIDE).href));
-  } catch (ursache) {
-    throw new KernFehler(
-      'Pyodide nicht ladbar. Fehlt web/vendor/pyodide? → '
-      + '«python3 werkzeug/pyodide_holen.py».', String(ursache));
-  }
-
-  const pyodide = await loadPyodide({
-    indexURL: PYODIDE.href,
-    // Was Python ausgibt, gehört in die Entwicklerkonsole und nicht ins Nichts.
-    stdout: (zeile) => console.log('[Python]', zeile),
-    stderr: (zeile) => console.warn('[Python]', zeile),
-  });
-
-  fortschritt('Rechenkern wird eingelesen …');
-  const anzahl = await quellenEinhaengen(pyodide);
-
-  pyodide.runPython(`
-import sys
-if ${JSON.stringify(EINHAENGEPUNKT)} not in sys.path:
-    sys.path.insert(0, ${JSON.stringify(EINHAENGEPUNKT)})
-`);
-
-  let dienst;
-  try {
-    dienst = pyodide.pyimport('opencivil.web.dienst');
-  } catch (ursache) {
-    throw new KernFehler(
-      'Rechenkern nicht einbindbar.', String(ursache));
-  }
-
-  const fassung = pyodide.runPython('import sys; sys.version.split()[0]');
-  console.info(
-    `Rechenkern bereit: Python ${fassung} über Pyodide, ${anzahl} Quelldateien.`);
-  fortschritt('');
+export function kernStarten(fortschritt = () => {}) {
+  const arbeiter = new Worker(new URL('./kern_arbeiter.js', import.meta.url),
+    { type: 'module' });
+  /** Nummer der Anfrage -> ihr Versprechen, bis die Antwort da ist. */
+  const offen = new Map();
+  let nummer = 0;
 
   /**
-   * Führt eine Anfrage im Kern aus.
-   *
-   * Hinein und heraus geht JSON -- genau wie über HTTP. Dass beide Wege
-   * dieselbe Wandlung durchlaufen, ist Absicht: so bekommt die Oberfläche in
-   * beiden Fällen dieselben Daten, bis aufs Zeichen.
+   * Führt eine Anfrage im Kern aus. Hinein und heraus geht JSON -- genau wie
+   * über HTTP, damit die Oberfläche auf beiden Wegen dieselben Daten bekommt.
    */
   function ruf(name, rumpf = {}) {
-    let roh;
-    try {
-      roh = dienst.bearbeite_json(name, JSON.stringify(rumpf));
-    } catch (ursache) {
-      // Hierher kommt nur, was bearbeite_json selbst umbringt -- der Dienst
-      // fängt sonst alles ab und gibt es als Antwort zurück.
-      throw new KernFehler(`Rechenkern abgebrochen: ${ursache}`, String(ursache));
-    }
-
-    const umschlag = JSON.parse(roh);
-    if (umschlag.status >= 400) {
-      throw new KernFehler(
-        umschlag.daten.fehler || `Fehler ${umschlag.status}`, umschlag.daten.spur);
-    }
-    return umschlag.daten;
+    return new Promise((aufloesen, ablehnen) => {
+      nummer += 1;
+      offen.set(nummer, { aufloesen, ablehnen });
+      arbeiter.postMessage({ nr: nummer, name, rumpf: JSON.stringify(rumpf) });
+    });
   }
 
-  return { ruf, art: 'pyodide', fassung };
+  function beantworten({ nr, roh, absturz }) {
+    const anfrage = offen.get(nr);
+    offen.delete(nr);
+    if (!anfrage) return;
+    if (absturz !== undefined) {
+      anfrage.ablehnen(new KernFehler(`Rechenkern abgebrochen: ${absturz}`, absturz));
+      return;
+    }
+    const umschlag = JSON.parse(roh);
+    if (umschlag.status >= 400) {
+      anfrage.ablehnen(new KernFehler(
+        umschlag.daten.fehler || `Fehler ${umschlag.status}`, umschlag.daten.spur));
+    } else {
+      anfrage.aufloesen(umschlag.daten);
+    }
+  }
+
+  return new Promise((bereit, gescheitert) => {
+    arbeiter.onmessage = ({ data }) => {
+      if (data.art === 'antwort') beantworten(data);
+      else if (data.art === 'fortschritt') fortschritt(data.text);
+      else if (data.art === 'bereit') {
+        fortschritt('');
+        bereit({ ruf, art: 'pyodide', fassung: data.fassung });
+      } else if (data.art === 'gescheitert') {
+        gescheitert(new KernFehler(data.meldung, data.spur));
+      }
+    };
+    // Stirbt der Faden selbst -- etwa weil die Datei fehlt --, dann für alle,
+    // die noch warten: niemand soll auf eine Antwort warten, die nicht kommt.
+    arbeiter.onerror = (ereignis) => {
+      const fehler = new KernFehler(
+        `Rechenkern abgestürzt: ${ereignis.message || 'Faden nicht startbar'}`);
+      gescheitert(fehler);
+      for (const { ablehnen } of offen.values()) ablehnen(fehler);
+      offen.clear();
+    };
+  });
 }

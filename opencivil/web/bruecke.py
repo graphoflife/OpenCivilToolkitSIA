@@ -3,9 +3,9 @@ opencivil/web/bruecke.py -- Welche Dateien der Browser laden muss.
 
 VERANTWORTUNG:
 Fuehrt Buch darueber, aus welchen Quelldateien der Rechenkern besteht, und
-schreibt diese Liste nach ``web/kern/dateien.json``. Die Bruecke in
-``web/js/kern.js`` liest sie, holt die Dateien uebers Netz und legt sie ins
-Dateisystem von Pyodide -- danach ist ``import opencivil`` im Browser
+schreibt diese Liste nach ``web/kern/dateien.json``. Der Faden in
+``web/js/kern_arbeiter.js`` liest sie, holt die Dateien uebers Netz und legt
+sie ins Dateisystem von Pyodide -- danach ist ``import opencivil`` im Browser
 dasselbe wie auf dem Rechner.
 
 WARUM EINE LISTE UND KEIN ARCHIV:
