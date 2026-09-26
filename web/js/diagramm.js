@@ -11,7 +11,7 @@
  */
 
 import { achsenkreuz, NR, schrittweite } from './achsen.js';
-import { el, svgEl } from './dom.js';
+import { el, stilfarbe, svgEl } from './dom.js';
 
 const BREITE = 720;
 const HOEHE = 520;
@@ -179,7 +179,8 @@ export function querschnittZeichnen(eintrag, werte) {
     fill: '#eceff4', stroke: '#7b8794', 'stroke-width': 1.6,
   }));
 
-  const farbe = { x: '#1f6feb', y: '#b8622a' };
+  // Dieselben Farben wie die Lagen in der Maske -- aus dem Stil.
+  const farbe = { x: stilfarbe('richtung-x'), y: stilfarbe('richtung-y') };
   const zettel = [];
   // Schon gezeichnete Stäbe, in Millimetern -- damit die nächste Reihe weiss,
   // wem sie ausweichen muss.

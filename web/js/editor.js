@@ -381,7 +381,7 @@ function richtungsSchalter(querschnitt, nummer, richtung, partner) {
     title: `Tragrichtung der ${nummer}. Lage – die ${partner}. bekommt die Gegenrichtung`,
   }, ['x', 'y'].map((wert) => el('button.schalter-halb', {
     text: wert,
-    class: richtung === wert ? 'ist-an' : '',
+    class: `ist-${wert}${richtung === wert ? ' ist-an' : ''}`,
     on: { click: () => { if (richtung !== wert) setzen(wert); } },
   })));
 }
@@ -552,62 +552,66 @@ function plattenEditor(querschnitt) {
     el('div.zweispaltig', {}, [
       el('div.feldgruppe', {}, [
         el('h3', { text: 'Platte' }),
-        feld('Bezeichnung', el('input', {
-          type: 'text', value: querschnitt.name,
-          on: { change: (e) => aendern((q) => { q.name = e.target.value; }) },
-        })),
-        feld('Beton', auswahl({
-          werte: betone.map((b) => ({ wert: b.kennung, beschriftung: b.name || b.sorte })),
-          gewaehlt: querschnitt.beton,
-          beiAenderung: (v) => aendern((q) => { q.beton = v; }),
-        })),
-        feld('Dicke h', zahlfeld({
-          wert: querschnitt.h, schritt: 10, min: 10,
-          beiAenderung: (v) => aendern((q) => { q.h = v ?? 300; }),
-        }), 'mm'),
-        feld(['Breite ', span('b_x')], zahlfeld({
-          wert: querschnitt.b, schritt: 100, min: 10,
-          titel: 'Streifen in x: A_s, M und N je b. y: je 1000 mm',
-          beiAenderung: (v) => aendern((q) => { q.b = v ?? 1000; }),
-        }), 'mm'),
-        feld(['Grösstkorn ', span('D_{max}')], zahlfeld({
-          wert: querschnitt.d_max, schritt: 4, min: 1,
-          titel: 'Für k_g, Querkraft ohne Bügel',
-          beiAenderung: (v) => aendern((q) => { q.d_max = v ?? 32; }),
-        }), 'mm', 'Grösstkorn → k_g, Querkraft ohne Bügel'),
-        feld(['Druckdiagonale ', span('k_c')], zahlfeld({
-          wert: querschnitt.k_c ?? 0.55, schritt: 0.05, min: 0,
-          titel: 'Abminderung f_cd in der Druckdiagonalen; nur mit Bügeln',
-          beiAenderung: (v) => aendern((q) => { q.k_c = v ?? 0.55; }),
-        }), '', 'Abminderung f_cd in der Druckdiagonalen'),
-        feld('Einlagenhöhe', zahlfeld({
-          wert: querschnitt.einlagenhoehe, schritt: 5, min: 0,
-          titel: 'Verringert d_v, falls h/6 < e < d',
-          beiAenderung: (v) => aendern((q) => { q.einlagenhoehe = v ?? 0; }),
-        }), 'mm'),
-        feld(['Kriechzahl ', span(String.raw`\varphi`)], zahlfeld({
-          wert: querschnitt.kriechzahl ?? 2.0, schritt: 0.1, min: 0,
-          titel: 'n = E_s/E_cm · (1+φ), gerissener Zustand; grösser → sicherer',
-          beiAenderung: (v) => aendern((q) => { q.kriechzahl = v ?? 2.0; }),
-        }), '', 'Kriechzahl φ, gerissener Zustand'),
-        feld('Rissanforderung', auswahl({
-          werte: (zustand.katalog.rissanforderungen || []).map((r) => ({
-            wert: r.wert, beschriftung: r.beschriftung,
+        // Eine Karte mit blauer Kante wie die Lagen und die Nachweiskapitel:
+        // ohne sie stand die Platte als einzige blosse Feldliste da.
+        el('div.unterkapitel', {}, [
+          feld('Bezeichnung', el('input', {
+            type: 'text', value: querschnitt.name,
+            on: { change: (e) => aendern((q) => { q.name = e.target.value; }) },
           })),
-          gewaehlt: querschnitt.rissanforderung || 'normal',
-          titel: 'Bestimmt σ_s,adm (Tab. 17)',
-          beiAenderung: (v) => aendern((q) => { q.rissanforderung = v; }),
-        })),
-        // Freier Text, der in keine Rechnung eingeht. Ohne ein solches Feld
-        // landen solche Sätze im Namen der Platte.
-        el('div.beschreibung', {}, [
-          el('label', { text: 'Beschreibung' }),
-          el('textarea', {
-            rows: 3, value: querschnitt.beschreibung || '',
-            on: {
-              change: (e) => aendern((q) => { q.beschreibung = e.target.value; }),
-            },
-          }),
+          feld('Beton', auswahl({
+            werte: betone.map((b) => ({ wert: b.kennung, beschriftung: b.name || b.sorte })),
+            gewaehlt: querschnitt.beton,
+            beiAenderung: (v) => aendern((q) => { q.beton = v; }),
+          })),
+          feld('Dicke h', zahlfeld({
+            wert: querschnitt.h, schritt: 10, min: 10,
+            beiAenderung: (v) => aendern((q) => { q.h = v ?? 300; }),
+          }), 'mm'),
+          feld(['Breite ', span('b_x')], zahlfeld({
+            wert: querschnitt.b, schritt: 100, min: 10,
+            titel: 'Streifen in x: A_s, M und N je b. y: je 1000 mm',
+            beiAenderung: (v) => aendern((q) => { q.b = v ?? 1000; }),
+          }), 'mm'),
+          feld(['Grösstkorn ', span('D_{max}')], zahlfeld({
+            wert: querschnitt.d_max, schritt: 4, min: 1,
+            titel: 'Für k_g, Querkraft ohne Bügel',
+            beiAenderung: (v) => aendern((q) => { q.d_max = v ?? 32; }),
+          }), 'mm', 'Grösstkorn → k_g, Querkraft ohne Bügel'),
+          feld(['Druckdiagonale ', span('k_c')], zahlfeld({
+            wert: querschnitt.k_c ?? 0.55, schritt: 0.05, min: 0,
+            titel: 'Abminderung f_cd in der Druckdiagonalen; nur mit Bügeln',
+            beiAenderung: (v) => aendern((q) => { q.k_c = v ?? 0.55; }),
+          }), '', 'Abminderung f_cd in der Druckdiagonalen'),
+          feld('Einlagenhöhe', zahlfeld({
+            wert: querschnitt.einlagenhoehe, schritt: 5, min: 0,
+            titel: 'Verringert d_v, falls h/6 < e < d',
+            beiAenderung: (v) => aendern((q) => { q.einlagenhoehe = v ?? 0; }),
+          }), 'mm'),
+          feld(['Kriechzahl ', span(String.raw`\varphi`)], zahlfeld({
+            wert: querschnitt.kriechzahl ?? 2.0, schritt: 0.1, min: 0,
+            titel: 'n = E_s/E_cm · (1+φ), gerissener Zustand; grösser → sicherer',
+            beiAenderung: (v) => aendern((q) => { q.kriechzahl = v ?? 2.0; }),
+          }), '', 'Kriechzahl φ, gerissener Zustand'),
+          feld('Rissanforderung', auswahl({
+            werte: (zustand.katalog.rissanforderungen || []).map((r) => ({
+              wert: r.wert, beschriftung: r.beschriftung,
+            })),
+            gewaehlt: querschnitt.rissanforderung || 'normal',
+            titel: 'Bestimmt σ_s,adm (Tab. 17)',
+            beiAenderung: (v) => aendern((q) => { q.rissanforderung = v; }),
+          })),
+          // Freier Text, der in keine Rechnung eingeht. Ohne ein solches Feld
+          // landen solche Sätze im Namen der Platte.
+          el('div.beschreibung', {}, [
+            el('label', { text: 'Beschreibung' }),
+            el('textarea', {
+              rows: 3, value: querschnitt.beschreibung || '',
+              on: {
+                change: (e) => aendern((q) => { q.beschreibung = e.target.value; }),
+              },
+            }),
+          ]),
         ]),
       ]),
 
