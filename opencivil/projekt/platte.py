@@ -19,8 +19,8 @@ from typing import Any, List, Mapping, Optional
 from opencivil.querschnitt.platte import K_C, KRIECHZAHL, LAGENZAHL, Richtung
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste,
-    KnickEintrag, KombinationEintrag, LageEintrag, PostenEintrag,
-    QuerkraftbewehrungEintrag, SpannungsfallEintrag, eindeutig,
+    KnickEintrag, KombinationEintrag, LageEintrag, ObergrenzeEintrag,
+    PostenEintrag, QuerkraftbewehrungEintrag, SpannungsfallEintrag, eindeutig,
 )
 from opencivil.projekt.lesen import (
     ProjektFehler, gebrauchsliste_roh, lagen_aus_altem_format, pflichtfeld,
@@ -133,6 +133,15 @@ class QuerschnittEintrag(Beschreibung):
     erlaubt. Gemeint ist, dass ein *vorhandener* Stab nicht duenner wird als
     das, was man verlegen will.
     """
+
+    automatik_grenze: ObergrenzeEintrag = field(default_factory=ObergrenzeEintrag)
+    """
+    Mehr Querschnitt bekommt keine x-Lage von der Suche -- in allen Modi,
+    auch beim Optimieren der Plattendicke. Vorgabe ⌀30@150, 4712 mm²/m.
+    """
+
+    automatik_mindestdicke: float = 150.0
+    """Duenner sucht die Dickenoptimierung keine Platte -- in mm."""
 
     automatik_querkraft: bool = False
     """Ob auch die Buegel gesucht werden."""
@@ -357,6 +366,8 @@ class QuerschnittEintrag(Beschreibung):
                                                (150.0,)),
             automatik_mindestdurchmesser=zahl(
                 d, "automatik_mindestdurchmesser", 10.0),
+            automatik_grenze=ObergrenzeEintrag.aus_dict(d.get("automatik_grenze") or {}),
+            automatik_mindestdicke=zahl(d, "automatik_mindestdicke", 150.0),
             automatik_querkraft=bool(d.get("automatik_querkraft", False)),
             automatik_querkraft_teilungen=teilungen_aus(
                 d.get("automatik_querkraft_teilungen"), (100.0, 150.0, 200.0)),

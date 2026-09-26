@@ -235,6 +235,12 @@ Die Bewehrungssuche fasst die y-Lagen nicht an. In y wird nichts nachgewiesen,
 also gäbe es dort kein Mass, an dem sich ein Durchmesser bemessen liesse -- sie
 zöge ihn auf null, und genau das wäre falsch. Was in y liegt, sagt der Benutzer.
 
+Mehr als die **Obergrenze** bekommt keine x-Lage: eingegeben wie eine Lage,
+Grund ⌀@s plus Zulage ⌀@s (Vorgabe ⌀30@150 = 4712 mm²/m), und es zählt die
+Summe je Lage. Zwei Modi suchen dazu die **dünnste Platte**: halbieren oder
+verdoppeln, dann Bisektion auf den Zentimeter -- nie unter die Mindestdicke
+(Vorgabe 150 mm) und nicht über 2 m.
+
 Schnittgrössen gehören damit immer zu x. Eine ältere Datei mit einem Lastfall
 in y lässt sich nicht öffnen; sie meldet, was zu tun ist. Ihn stillschweigend
 auf x umzudeuten hiesse, eine Zahl an einem anderen Querschnitt anzusetzen als

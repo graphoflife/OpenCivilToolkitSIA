@@ -9,11 +9,12 @@ ehrlich Nein sagt, wo es keines gibt.
 """
 
 import copy
+import math
 import unittest
 from unittest import mock
 
 from opencivil import bewehrungssuche as suche
-from opencivil.projekt import KnickEintrag, Projekt
+from opencivil.projekt import KnickEintrag, ObergrenzeEintrag, PostenEintrag, Projekt
 from opencivil.web import dienst
 
 
@@ -567,6 +568,76 @@ class TestSchnellerKnicknachweis(unittest.TestCase):
                 self.assertEqual(
                     genau.knicken["q1"].ergebnisse[0].erfuellt,
                     kurz.knicken["q1"].ergebnisse[0].erfuellt)
+
+
+class TestObergrenze(unittest.TestCase):
+    """Mehr Querschnitt als die Obergrenze bekommt keine x-Lage -- in jedem Modus."""
+
+    def test_keine_lage_ueber_der_grenze(self):
+        projekt = platte()
+        q = projekt.querschnitt("q1")
+        for modus in (suche.Suchmodus.GRUND_MIT, suche.Suchmodus.GRUND_OHNE_ZULAGE_MIT):
+            with self.subTest(modus=modus.value):
+                fertig = copy.deepcopy(projekt)
+                suche.uebernehmen(fertig, "q1", suche.suche(projekt, "q1", modus=modus).beste)
+                self.assertFalse(suche._ueber_grenze(fertig.querschnitt("q1"),
+                                                     q.automatik_grenze.je_meter))
+
+    def test_zu_knapp_heisst_nein_mit_grund(self):
+        projekt = platte()
+        projekt.querschnitt("q1").automatik_grenze.grund.durchmesser = 10.0
+        ergebnis = suche.suche(projekt, "q1", modus=suche.Suchmodus.GRUND_MIT)
+        self.assertFalse(ergebnis.gefunden)
+        self.assertIn("Obergrenze 524 mm²/m je Lage erreicht",
+                      ergebnis.loesungen[0].begruendung)
+
+    def test_es_zaehlt_die_summe(self):
+        """Grund ⌀26 + Zulage ⌀20, je @150: 5634 mm²/m. Beide leer: keine Grenze."""
+        grenze = ObergrenzeEintrag(grund=PostenEintrag(26.0, 150.0),
+                                   zulage=PostenEintrag(20.0, 150.0))
+        self.assertAlmostEqual(grenze.je_meter, 5633.9, delta=0.1)
+        leer = ObergrenzeEintrag(grund=PostenEintrag(0.0), zulage=PostenEintrag(0.0))
+        self.assertEqual(leer.je_meter, math.inf)
+
+
+class TestPlattendicke(unittest.TestCase):
+    """Die dünnste Platte auf dem Zentimeter, bei der die Suche aufgeht."""
+
+    def dicke(self, h: float, **abweichungen) -> suche.Dickenergebnis:
+        return suche.dicke_suchen(platte(h=h, **abweichungen), "q1",
+                                  modus=suche.Suchmodus.DICKE_GRUND_MIT)
+
+    def test_von_oben_und_von_unten_dieselbe(self):
+        """Von 300 aus halbiert, von 120 aus verdoppelt -- dazwischen Bisektion."""
+        von_oben, von_unten = self.dicke(300.0), self.dicke(120.0)
+        self.assertEqual(von_oben.h, von_unten.h)
+        self.assertEqual(von_oben.h % suche.DICKENRASTER, 0.0)
+        # Die kleinste: einen Zentimeter dünner geht es nicht.
+        self.assertIn((von_oben.h - suche.DICKENRASTER, False),
+                      [(v.h, v.geht) for v in von_oben.versuche])
+
+    def test_nie_unter_die_mindestdicke(self):
+        self.assertEqual(self.dicke(300.0, automatik_mindestdicke=200.0).h, 200.0)
+        # Dünner eingegeben: gesucht wird ab der Mindestdicke.
+        self.assertEqual(self.dicke(120.0).versuche[0].h, 150.0)
+
+    def test_bis_zwei_meter_und_dann_nein(self):
+        projekt = platte()
+        for k in projekt.querschnitt("q1").kombinationen:
+            k.M_Ed = 5000.0
+        ergebnis = suche.dicke_suchen(projekt, "q1", modus=suche.Suchmodus.DICKE_GRUND_MIT)
+        self.assertFalse(ergebnis.gefunden)
+        self.assertEqual(max(v.h for v in ergebnis.versuche), suche.DICKE_HOECHSTENS)
+        self.assertIn("Bis 2000 mm keine Dicke", ergebnis.begruendung)
+
+    def test_der_dienst_uebernimmt_dicke_und_bewehrung(self):
+        antwort = dienst.bearbeite("bewehrung_suchen", {
+            "projekt": platte().als_dict(), "kennung": "q1",
+            "modus": "dicke_grund_ohne_zulage_mit"}).daten
+        fertig = Projekt.aus_dict(antwort["projekt"])
+        self.assertTrue(antwort["gefunden"])
+        self.assertEqual(fertig.querschnitt("q1").h, antwort["dicke"]["h"])
+        self.assertGreaterEqual(schlechtester(fertig), 1.0)
 
 
 if __name__ == "__main__":

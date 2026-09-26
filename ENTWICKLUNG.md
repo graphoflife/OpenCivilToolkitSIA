@@ -43,6 +43,63 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-26 · Eine Obergrenze der Bewehrung, und die dünnste Platte
+
+Wunsch: eine Obergrenze der Bewehrung und zwei Modi, die die Plattendicke
+optimieren -- dazu eine Mindestdicke.
+
+### Die Obergrenze
+
+* **Eingegeben wie eine Lage:** Grund ⌀@s plus Zulage ⌀@s
+  (`ObergrenzeEintrag`, zwei gewöhnliche `PostenEintrag`), Vorgabe ⌀30@150
+  = 4712 mm²/m. Beide leer heisst: keine Grenze.
+* **Es zählt die Summe je x-Lage** (auf Entscheid). Wie die Suche sie auf
+  Grund und Zulage verteilt, ist frei. Geprüft wird jede Lage für sich.
+* **Sie gilt in allen Modi** (auf Entscheid). Einen Schritt über die Grenze
+  rechnet die Suche gar nicht erst. Reicht es darunter nicht, meldet sie
+  «Obergrenze … mm²/m je Lage erreicht».
+* **Grössere Durchmesser:** Damit ⌀30@150 überhaupt erreichbar ist, kennt die
+  Längsbewehrung jetzt auch ⌀30, ⌀34 und ⌀40; die Grenze hält die Suche im
+  Zaum. Bügel bleiben bei höchstens ⌀26.
+* **Die Summe in mm²/m rechnet der Kern** (`api.obergrenzen`), mit derselben
+  Fläche je Posten wie die Lagen (`PostenEintrag.je_meter` über
+  `Bewehrungsposten.flaeche`). Die Oberfläche zeigt sie nur.
+
+### Die dünnste Platte
+
+* **So sucht `dicke_suchen`:** Je Dicke läuft die gewöhnliche
+  Bewehrungssuche.
+  - Von der eingegebenen Dicke aus wird halbiert, solange es geht, aber nie
+    unter die Mindestdicke (Vorgabe 150 mm). Geht es nicht, wird verdoppelt,
+    höchstens bis 2 m.
+  - Dazwischen läuft eine Bisektion auf dem Zentimeter. Das Ergebnis ist die
+    kleinste Dicke dieses Rasters, also auf den nächsten cm aufgerundet.
+  - Übernommen werden Dicke und Bewehrung.
+* **«Geht» heisst:** Die Suche findet eine Lösung unter der Obergrenze, und
+  die Duktilität geht auf, wenn sie eingeschaltet ist. Die Bewehrungssuche
+  selbst weicht der Duktilität aus, weil mehr Stahl sie verschlechtert. Bei
+  der Dicke ist sie dagegen gerade das Kriterium, das eine dickere Platte
+  verlangt.
+* **Beispiel:** Von 300 mm und von 120 mm aus ergibt sich dieselbe Dicke,
+  170 mm: 300 ✓, 150 ✗, 220 ✓, 180 ✓, 160 ✗, 170 ✓. Das sind sechs Suchen in
+  0.4 s, unter Pyodide 0.8 s.
+* **Bewusst begrenzt:** Dicker ist nicht immer leichter, denn die
+  Mindestbewehrung wächst mit der Dicke. Bei der Decke aus «voll» sind es
+  2723 mm² bei 300 mm und 7079 mm² bei 2400 mm. Mit einer Obergrenze kann
+  eine sehr dicke Platte also wieder durchfallen.
+  - Darum hört das Verdoppeln bei 2 m auf und meldet «keine Dicke».
+  - Die Bisektion setzt voraus, dass es innerhalb einer Verdopplung nur
+    einmal von «geht nicht» zu «geht» wechselt.
+
+### Offen
+
+* **Die blockierte Seite:** Im Browser ohne Server steht die Seite während
+  der Suche still. Mit allen Nachweisen braucht eine einzelne Suche 2–3 s, die
+  Dickensuche also bis zu einer halben Minute. Der nächste Schritt wäre ein
+  Web Worker für Pyodide.
+
+---
+
 ## 2026-09-26 · Aufgeräumte Oberfläche, eine Formelsammlung und ein Blatt wie Mathcad
 
 Eine Liste mit fünfzehn Punkten, abgearbeitet in vierzehn Schritten, jeder

@@ -17,16 +17,8 @@
  * Oberfläche nachgerechneter.
  */
 
-import { feld, richtungVon } from './bausteine.js';
+import { DURCHMESSER, feld, richtungVon } from './bausteine.js';
 import { auswahl, el, ersetzen, melden, zahlfeld } from './dom.js';
-
-/**
- * Lieferbare Stabdurchmesser in mm.
- *
- * Oberhalb von 22 mm wird die Reihe grober -- deshalb eine Liste und kein
- * gleichmässiger Schritt.
- */
-const DURCHMESSER = [6, 8, 10, 12, 14, 16, 18, 20, 22, 26, 30, 34, 40];
 import { span } from './mathe.js';
 import { analysenBlock, automatikBlock, nachweiseBlock } from './nachweise.js';
 import { blattZeichnen } from './gleichungen.js';

@@ -14,10 +14,11 @@ Die Platte, die diese Teile zusammenhaelt, steht in
 
 from __future__ import annotations
 
+import math
 from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Mapping, Optional
 
-from opencivil.core.einheiten import MM, Groesse
+from opencivil.core.einheiten import MM, MM2, Groesse
 from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import Baustoff
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
@@ -170,6 +171,13 @@ class PostenEintrag(Beschreibung):
             anzahl=self.anzahl if not self.abstand else None,
         )
 
+    def je_meter(self, b: float = 1000.0) -> float:
+        """
+        Bewehrungsquerschnitt in mm²/m. Ueber die Teilung haengt er an keiner
+        Breite; bei einer Stabzahl liegen die Staebe auf der Breite ``b`` (mm).
+        """
+        return self.als_posten().flaeche(Groesse(b, MM)).in_einheit(MM2) * 1000.0 / b
+
 
 @dataclass
 class LageEintrag(Beschreibung):
@@ -198,6 +206,36 @@ class LageEintrag(Beschreibung):
             # ist die Vorgabe -- auf der Baustelle laesst sich nicht steuern,
             # welche Kante fluchtet.
             unguenstig=bool(d.get("unguenstig", True)),
+        )
+
+
+@dataclass
+class ObergrenzeEintrag(Beschreibung):
+    """
+    Die Obergrenze der automatischen Bewehrung: keine Lage bekommt von der
+    Suche mehr Querschnitt als Grund und Zulage hier zusammen.
+
+    Eingegeben wie eine Lage, je als ⌀ @ Teilung -- es zaehlt aber nur die
+    Summe in mm²/m. Wie die Suche sie auf Grund und Zulage verteilt, ist frei:
+    bei ⌀26@150 + ⌀20@150 (5634 mm²/m) darf eine Lage auch ⌀30 + ⌀12 tragen.
+    Beide ohne Durchmesser heisst: keine Obergrenze.
+    """
+
+    grund: PostenEintrag = field(default_factory=lambda: PostenEintrag(durchmesser=30.0))
+    zulage: PostenEintrag = field(default_factory=lambda: PostenEintrag(durchmesser=0.0))
+
+    @property
+    def je_meter(self) -> float:
+        """Die Obergrenze in mm²/m -- unendlich, wenn keine gesetzt ist."""
+        summe = self.grund.je_meter() + self.zulage.je_meter()
+        return summe if summe > 0 else math.inf
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any]) -> "ObergrenzeEintrag":
+        vorgabe = cls()
+        return cls(
+            grund=PostenEintrag.aus_dict(d.get("grund") or vorgabe.grund.als_dict()),
+            zulage=PostenEintrag.aus_dict(d.get("zulage") or vorgabe.zulage.als_dict()),
         )
 
 

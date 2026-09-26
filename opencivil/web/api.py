@@ -119,13 +119,26 @@ def katalog() -> dict:
             for wert, text in RISSANFORDERUNGEN.items()
         ],
         "suchmodi": [
-            {"wert": m.value, "beschriftung": m.beschriftung} for m in Suchmodus
+            {"wert": m.value, "beschriftung": m.beschriftung, "dicke": m.mit_dicke}
+            for m in Suchmodus
         ],
         # Fuer das Blatt: die leere Zeile wie die frische Platte oben, und die
         # Einheiten, die der Leser in \mathrm{...} versteht.
         "neue_gleichungszeile": GleichungszeileEintrag().als_dict(),
         "einheiten": sorted(EINHEITENNAMEN),
     }
+
+
+def obergrenzen(projekt) -> Dict[str, str]:
+    """
+    Je Platte die Obergrenze der automatischen Bewehrung, fertig als Text --
+    «4712 mm²/m» oder «keine». Die Oberflaeche zeigt sie neben den Eingaben,
+    ohne selbst zu rechnen.
+    """
+    def text(grenze: float) -> str:
+        return f"{grenze:.0f} mm²/m" if math.isfinite(grenze) else "keine"
+
+    return {q.kennung: text(q.automatik_grenze.je_meter) for q in projekt.querschnitte}
 
 
 def _vorlage_dict(vorlage) -> dict:

@@ -144,9 +144,10 @@ def rechnen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
 
     if not aufbau.alle_ziele():
         # Kein Nachweis vorhanden -- dann wenigstens alle Materialkennwerte.
-        return api.loesung_dict(aufbau.werk.loese_alles(), aufbau)
-
-    return api.loesung_dict(_stromabwaerts(projekt, aufbau), aufbau)
+        loesung = aufbau.werk.loese_alles()
+    else:
+        loesung = _stromabwaerts(projekt, aufbau)
+    return {**api.loesung_dict(loesung, aufbau), "obergrenzen": api.obergrenzen(projekt)}
 
 
 def _stromabwaerts(projekt: Projekt, aufbau) -> Loesung:
@@ -266,7 +267,8 @@ def dateiname(name: str) -> str:
 
 def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
-    Sucht zu einer Platte die kleinste Bewehrung und gibt sie zurueck.
+    Sucht zu einer Platte die kleinste Bewehrung und gibt sie zurueck -- in den
+    Dicken-Modi auch die duennste Platte dazu.
 
     Gerechnet, nicht gesetzt: zurueck kommt das gefundene Projekt, und ob die
     Oberflaeche es uebernimmt, entscheidet sie. So bleibt der Knopf ein
@@ -292,15 +294,20 @@ def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
         raise DienstFehler(400, f"Unbekannter Suchmodus '{modus}'. "
                                 f"Möglich sind: {moeglich}.") from None
 
-    ergebnis = bewehrungssuche.suche(
-        projekt, kennung, modus=modus, teilungen=teilungen,
-        mindestdurchmesser=(rumpf.get("mindestdurchmesser")
-                            or eintrag.automatik_mindestdurchmesser))
+    wie = {"teilungen": teilungen,
+           "mindestdurchmesser": (rumpf.get("mindestdurchmesser")
+                                  or eintrag.automatik_mindestdurchmesser)}
+    dicke = None
+    if modus.mit_dicke:
+        dicke = bewehrungssuche.dicke_suchen(projekt, kennung, modus=modus, **wie)
+        ergebnis = dicke.suche or bewehrungssuche.Suchergebnis(modus=modus)
+    else:
+        ergebnis = bewehrungssuche.suche(projekt, kennung, modus=modus, **wie)
     antwort: Dict[str, Any] = {
-        "gefunden": ergebnis.gefunden,
+        "gefunden": ergebnis.gefunden and (dicke is None or dicke.gefunden),
         "modus": modus.value,
         "modus_text": modus.beschriftung,
-        "begruendung": ergebnis.begruendung,
+        "begruendung": (dicke or ergebnis).begruendung,
         # Gesucht wird ohne Duktilitaet -- sie wird durch mehr Stahl
         # schlechter. Verschwiegen wird sie darum nicht.
         "duktilitaet": ergebnis.duktilitaet,
@@ -314,7 +321,14 @@ def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
             for l in ergebnis.loesungen
         ],
     }
-    if ergebnis.beste:
+    if dicke is not None:
+        antwort["dicke"] = {
+            "h": dicke.h,
+            "versuche": [{"h": v.h, "geht": v.geht} for v in dicke.versuche],
+        }
+    if antwort["gefunden"]:
+        if dicke is not None:
+            eintrag.h = dicke.h
         bewehrungssuche.uebernehmen(projekt, kennung, ergebnis.beste)
 
     # Die Buegel erst danach: sie haengen an der Laengsbewehrung, weil die

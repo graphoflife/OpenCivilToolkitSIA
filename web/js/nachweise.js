@@ -16,7 +16,9 @@
  */
 
 import { api } from './api.js';
-import { erklaerung, feld, hakenSchalter, richtungVon, richtungsWahl } from './bausteine.js';
+import {
+  DURCHMESSER, erklaerung, feld, hakenSchalter, richtungVon, richtungsWahl,
+} from './bausteine.js';
 import { auswahl, el, melden, zahlfeld } from './dom.js';
 import { aendern, naechsterName, projektAendern, zustand } from './zustand.js';
 
@@ -541,6 +543,12 @@ function gebrauchsfallZeile(querschnitt, feld, wort, index) {
  * Gesucht wird gegen die Nachweise, die eingeschaltet sind. Die Schalter
  * weiter unten steuern damit unmittelbar, wonach gesucht wird.
  */
+/** Ob der gewählte Modus auch die Plattendicke sucht -- das sagt der Kern. */
+function mitDicke(querschnitt) {
+  return (zustand.katalog?.suchmodi || [])
+    .find((m) => m.wert === querschnitt.automatik_modus)?.dicke === true;
+}
+
 export function automatikBlock(querschnitt) {
   const aendern = (veraenderer) => projektAendern((p) => {
     veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
@@ -575,6 +583,11 @@ export function automatikBlock(querschnitt) {
       titel: 'Modus. Ohne Kräfte: Duktilität, sprödes Versagen, Riss unter Zwang',
       beiAenderung: (v) => aendern((q) => { q.automatik_modus = v; }),
     }),
+    ...(mitDicke(querschnitt) ? [feld('Mindestdicke', zahlfeld({
+      wert: querschnitt.automatik_mindestdicke ?? 150, schritt: 10, min: 10,
+      titel: 'Dünner sucht die Dickenoptimierung keine Platte',
+      beiAenderung: (v) => aendern((q) => { q.automatik_mindestdicke = v ?? 150; }),
+    }), 'mm')] : []),
     feld('Teilungen', teilungsfeld('automatik_teilungen',
       'mm, durch Komma getrennt. Grund und Zulage einer Lage: gleiche Teilung'), 'mm'),
     feld('Mindestdurchmesser', zahlfeld({
@@ -584,6 +597,7 @@ export function automatikBlock(querschnitt) {
         q.automatik_mindestdurchmesser = v ?? 10;
       }),
     }), 'mm'),
+    ...obergrenze(querschnitt, aendern),
     hakenzeile(querschnitt.automatik_y_wie_x === true, (wert) => aendern((q) => {
       q.automatik_y_wie_x = wert;
     }), 'y-Grundbew. wie x'),
@@ -593,16 +607,56 @@ export function automatikBlock(querschnitt) {
     ...(quer ? [feld('Bügelteilungen',
       teilungsfeld('automatik_querkraft_teilungen', 'mm, Raster quadratisch: s_x = s_y'),
       'mm')] : []),
-    automatikLeiste(querschnitt.kennung),
+    automatikLeiste(querschnitt),
   ]);
 }
 
-function automatikLeiste(kennung) {
+/**
+ * Die Obergrenze je Lage: Grund und Zulage je als ⌀ @ Teilung, gebaut wie
+ * die Lagenzeilen. Es zählt nur die Summe -- wie die Suche sie verteilt, ist
+ * frei. Die Summe rechnet der Kern (`obergrenzen` der Lösung).
+ */
+function obergrenze(querschnitt, aendern) {
+  const zeile = (welcher, name) => {
+    const posten = querschnitt.automatik_grenze[welcher];
+    const setzen = (feldname, wert) => aendern((q) => {
+      q.automatik_grenze[welcher][feldname] = wert;
+    });
+    return el('div.postenzeile', { class: posten.durchmesser > 0 ? '' : 'ist-leer' }, [
+      el('span'),
+      el('span.postenname', { text: name }),
+      el('span.zeichen', { text: '⌀' }),
+      zahlfeld({
+        wert: posten.durchmesser || null, stufen: DURCHMESSER, min: 0,
+        titel: '⌀ in mm; Grund und Zulage leer: keine Obergrenze',
+        beiAenderung: (v) => setzen('durchmesser', v ?? 0),
+      }),
+      el('span.zeichen', { text: '@' }),
+      zahlfeld({
+        wert: posten.abstand, schritt: 25, min: 25, titel: 'Teilung in mm',
+        beiAenderung: (v) => setzen('abstand', v ?? 150),
+      }),
+      el('span.einheit', { text: 'mm' }),
+    ]);
+  };
+  return [
+    feld('Obergrenze je Lage',
+      el('span.obergrenze', { text: zustand.loesung?.obergrenzen?.[querschnitt.kennung] ?? '…' }),
+      '', 'Grund + Zulage zusammen, in allen Modi; wie die Suche es verteilt, ist frei'),
+    zeile('grund', 'Grund'),
+    zeile('zulage', 'Zulage'),
+  ];
+}
+
+function automatikLeiste(querschnitt) {
+  const kennung = querschnitt.kennung;
   const laeuft = laufendeSuche.has(kennung);
+  const dicke = mitDicke(querschnitt);
   return el('div.automatik-leiste', {}, [
     el('button.knopf.knopf-haupt', {
       class: laeuft ? 'ist-am-suchen' : '',
-      title: 'Einmal suchen, Ergebnis in die Lagen',
+      title: dicke ? 'Dünnste Platte suchen, Dicke und Bewehrung übernehmen'
+        : 'Einmal suchen, Ergebnis in die Lagen',
       disabled: laeuft,
       on: { click: () => bewehrungErmitteln(kennung) },
     }, laeuft
@@ -610,7 +664,7 @@ function automatikLeiste(kennung) {
       // Zehntelsekunden bis zu Sekunden. Ein Knopf, der bloss grau wird,
       // sieht in dieser Zeit aus wie einer, der nichts getan hat.
       ? [el('span.laufbalken'), el('span', { text: 'sucht …' })]
-      : [el('span', { text: 'Bewehrung suchen' })]),
+      : [el('span', { text: dicke ? 'Dicke und Bewehrung suchen' : 'Bewehrung suchen' })]),
   ]);
 }
 
@@ -643,12 +697,15 @@ async function bewehrungErmitteln(kennung) {
     gefunden = antwort.gefunden;
     if (gefunden) {
       // Der Kern gibt das fertige Projekt zurück; übernommen wird die eine
-      // gesuchte Platte, damit die anderen unberührt bleiben.
+      // gesuchte Platte, damit die anderen unberührt bleiben -- mit der
+      // neuen Dicke, wenn der Modus sie gesucht hat.
       projektAendern((p) => {
         const alt = p.querschnitte.findIndex((x) => x.kennung === kennung);
         const neu = antwort.projekt?.querschnitte?.find((x) => x.kennung === kennung);
         if (alt >= 0 && neu) p.querschnitte[alt] = neu;
       });
+      // Welche Dicken geprüft wurden, sieht man sonst nirgends.
+      if (antwort.dicke) melden(antwort.begruendung);
     } else {
       // Nichts gefunden heisst: die Lagen kommen zurück, wie sie waren (unten).
       // Das sieht man nicht von selbst, also sagt es die Meldungszeile oben --

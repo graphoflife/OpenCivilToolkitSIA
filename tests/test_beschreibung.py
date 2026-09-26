@@ -9,8 +9,8 @@ from pathlib import Path
 from opencivil.core.einheiten import N_PRO_MM2
 from opencivil.projekt import (
     Aufbau, GebrauchsfallEintrag, Gebrauchsliste, KnickEintrag, KombinationEintrag,
-    LageEintrag, MaterialEintrag, PostenEintrag, Projekt, ProjektFehler,
-    QuerkraftbewehrungEintrag, QuerschnittEintrag, SpannungsfallEintrag,
+    LageEintrag, MaterialEintrag, ObergrenzeEintrag, PostenEintrag, Projekt,
+    ProjektFehler, QuerkraftbewehrungEintrag, QuerschnittEintrag, SpannungsfallEintrag,
 )
 from opencivil.web import api, dienst
 
@@ -98,7 +98,10 @@ class TestVollstaendigeAblage(unittest.TestCase):
                     spannungsfaelle=[SpannungsfallEintrag("Feld", M_Ed=80.0)],
                     automatik_modus="grund_mit", automatik_teilungen=[100.0, 200.0],
                     automatik_mindestdurchmesser=12.0, automatik_querkraft=True,
-                    automatik_y_wie_x=True,
+                    automatik_y_wie_x=True, automatik_mindestdicke=180.0,
+                    automatik_grenze=ObergrenzeEintrag(
+                        grund=PostenEintrag(durchmesser=26.0, abstand=150.0),
+                        zulage=PostenEintrag(durchmesser=20.0, abstand=150.0)),
                     automatik_querkraft_teilungen=[150.0],
                     sproede=True, zwaengung_biegung=True, duktilitaet=True,
                     querkraftbewehrung=QuerkraftbewehrungEintrag(
