@@ -86,7 +86,10 @@ class Gleichungsblatt(Prozedur):
                     if zeile.text.strip():
                         p.text(zeile.text.strip())
                 elif zeile.art == "projektwert":
-                    self._projektwert(nummer, zeile, e, p, werte, erg)
+                    # Leer ist sie still wie eine leere Formelzeile: frisch
+                    # angefuegt, der Wert noch nicht gewaehlt.
+                    if zeile.wert_id or zeile.name.strip():
+                        self._projektwert(nummer, zeile, e, p, werte, erg)
                 elif zeile.latex.strip():
                     self._formel(nummer, zeile, p, werte, fehlerhaft, erg)
             except AusdruckFehler as fehler:
@@ -140,12 +143,17 @@ class Gleichungsblatt(Prozedur):
 
     def _projektwert(self, nummer: int, zeile: GleichungszeileEintrag, e: Eingaben,
                      p: Protokoll, werte: Dict[str, Wert], erg: Zeilenergebnis) -> None:
+        # Den Namen zuerst: fehlt dann der Wert, verweisen die Zeilen, die ihn
+        # brauchen, auf diese hier.
         gelesen = lesen(zeile.name) if zeile.name.strip() else None
-        if gelesen is None or gelesen.name is not None or not isinstance(gelesen.ausdruck, Name):
-            raise AusdruckFehler("Name fehlt: Buchstabe mit Index, etwa f_{cd}.")
-        erg.name = gelesen.ausdruck.latex
+        if gelesen is not None and gelesen.name is None and isinstance(gelesen.ausdruck, Name):
+            erg.name = gelesen.ausdruck.latex
         lokal = f"p{nummer - 1}"
-        if not zeile.wert_id or not e.hat(lokal):
+        if not zeile.wert_id:
+            raise AusdruckFehler("Wert wählen.")
+        if not erg.name:
+            raise AusdruckFehler("Name fehlt: Buchstabe mit Index, etwa f_{cd}.")
+        if not e.hat(lokal):
             raise AusdruckFehler("Projektwert nicht verfügbar.")
         quelle = e[lokal]
         wert = self._wert(nummer, erg.name, quelle.groesse, quelle.einheit,

@@ -16,6 +16,7 @@
  */
 
 import { el, ersetzen, melden } from './dom.js';
+import { neueZeile } from './gleichungen.js';
 import {
   aendern, freieKennung, naechsterName, projektAendern, umschalten, zustand,
 } from './zustand.js';
@@ -25,6 +26,7 @@ const SINNBILD = {
   beton: '■',         // ■
   betonstahl: '≡',    // ≡
   platten: '▬',       // ▬
+  gleichungen: '∑',
 };
 
 // ===========================================================================
@@ -50,12 +52,21 @@ function kapitel({ schluessel, titel, klasse, anzahl, werkzeuge, kinder, oben })
   ]);
 }
 
+/** Was rechts im Eintrag steht und wie er aussieht -- je Art. */
+const ART = {
+  material: (m) => ({ klasse: m.art === 'beton' ? 'beton' : 'stahl', text: m.sorte }),
+  querschnitt: (q) => ({ klasse: 'platte', text: `${q.h}×${q.b} mm` }),
+  blatt: (b) => ({
+    klasse: 'blatt', text: `${b.zeilen.length} ${b.zeilen.length === 1 ? 'Zeile' : 'Zeilen'}`,
+  }),
+};
+
 function eintrag(m, art) {
   const aktiv = zustand.auswahl?.art === art && zustand.auswahl.kennung === m.kennung;
   const istMaterial = art === 'material';
+  const { klasse, text } = ART[art](m);
   return el('div.baum-eintrag', {
-    class: `${aktiv ? 'ist-aktiv' : ''} baum-eintrag-${
-      istMaterial ? (m.art === 'beton' ? 'beton' : 'stahl') : 'platte'}`,
+    class: `${aktiv ? 'ist-aktiv' : ''} baum-eintrag-${klasse}`,
     on: { click: () => aendern({ auswahl: { art, kennung: m.kennung } }, 'auswahl') },
   }, [
     el('span.name', {
@@ -66,13 +77,13 @@ function eintrag(m, art) {
     istMaterial && !m.eigenstaendig
       ? el('span.schloss', { text: '\u{1F512}', title: 'Normsorte – Kennwerte gesperrt' })
       : null,
-    el('span.art', { text: istMaterial ? m.sorte : `${m.h}×${m.b} mm` }),
+    el('span.art', { text }),
     el('button.knopf.knopf-zart.knopf-gefahr', {
       text: '×', title: 'Entfernen',
       on: {
         click: (e) => {
           e.stopPropagation();
-          istMaterial ? materialLoeschen(m) : platteLoeschen(m);
+          ({ material: materialLoeschen, querschnitt: platteLoeschen, blatt: blattLoeschen })[art](m);
         },
       },
     }),
@@ -101,6 +112,25 @@ function materialLoeschen(material) {
     p.materialien = p.materialien.filter((m) => m.kennung !== material.kennung);
   });
   if (zustand.auswahl?.kennung === material.kennung) aendern({ auswahl: null }, 'auswahl');
+}
+
+function blattLoeschen(blatt) {
+  projektAendern((p) => {
+    p.gleichungen = p.gleichungen.filter((b) => b.kennung !== blatt.kennung);
+  });
+  if (zustand.auswahl?.kennung === blatt.kennung) aendern({ auswahl: null }, 'auswahl');
+}
+
+function blattAnlegen() {
+  const kennung = freieKennung('g');
+  projektAendern((p) => {
+    p.gleichungen = p.gleichungen || [];
+    p.gleichungen.push({
+      kennung, name: naechsterName('Blatt', p.gleichungen),
+      zeilen: [neueZeile()],
+    });
+  });
+  aendern({ auswahl: { art: 'blatt', kennung } }, 'auswahl');
 }
 
 function platteLoeschen(platte) {
@@ -220,5 +250,16 @@ export function baumZeichnen(behaelter) {
       : [leerzeile('keine Platte')],
   });
 
-  ersetzen(behaelter, materialien, platten);
+  const blaetter = p.gleichungen || [];
+  const gleichungen = kapitel({
+    schluessel: 'gleichungen',
+    titel: 'Analytische Gleichungen',
+    klasse: 'baum-kopf-blatt',
+    anzahl: blaetter.length,
+    oben: true,
+    werkzeuge: knopf('+', 'Blatt hinzufügen', blattAnlegen),
+    kinder: blaetter.length ? blaetter.map((b) => eintrag(b, 'blatt')) : [leerzeile('kein Blatt')],
+  });
+
+  ersetzen(behaelter, materialien, platten, gleichungen);
 }

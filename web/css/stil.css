@@ -255,6 +255,8 @@ input.projektname:focus {
 .baum-eintrag-beton  { border-left-color: var(--beton); }
 .baum-eintrag-stahl  { border-left-color: var(--stahl); }
 .baum-eintrag-platte { border-left-color: var(--platte); }
+.baum-eintrag-blatt  { border-left-color: var(--beide); }
+.baum-kopf-blatt     { border-left-color: var(--beide); }
 
 .schloss { font-size: 11px; color: var(--schrift-zart); }
 .eigen   { font-size: 10px; font-weight: 700; color: var(--warn);
@@ -1140,3 +1142,51 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   .postenzeile .umschalter { justify-self: stretch; white-space: normal; }
 }
 
+/* ------------------------------------------------ Analytische Gleichungen -- */
+
+/* Das Raster über dem Blatt: Bausteine in Gruppen, klein und dicht. */
+.gl-name { margin-bottom: 8px; font-weight: 600; }
+.gl-raster {
+  display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px;
+  padding: 6px 8px; border: 1px solid var(--rand); border-radius: var(--radius);
+  background: var(--flaeche-2);
+}
+.gl-gruppe { display: flex; flex-wrap: wrap; align-items: center; gap: 3px; }
+.gl-gruppenname {
+  flex: 0 0 74px; font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .3px; color: var(--schrift-zart);
+}
+.gl-baustein {
+  min-width: 30px; height: 28px; padding: 0 5px; border-radius: 5px;
+  border: 1px solid var(--rand); background: var(--flaeche); cursor: pointer;
+  font-size: 12px; line-height: 1;
+}
+.gl-baustein:hover { background: var(--blau-hell); border-color: var(--blau); }
+.gl-baustein .katex { font-size: 1em; }
+
+/* Eine Zeile: Nummer, Eingabe, Ergebnis, Entfernen. */
+.gl-zeile {
+  display: grid; grid-template-columns: 22px minmax(0, 1fr) minmax(90px, auto) 18px;
+  gap: 6px; align-items: center; padding: 3px 0;
+  border-bottom: 1px dashed var(--rand);
+}
+.gl-nummer { font-size: 11px; color: var(--schrift-zart); text-align: right;
+             font-variant-numeric: tabular-nums; }
+.gl-eingabe { display: flex; gap: 6px; align-items: center; min-width: 0; }
+math-field.gl-feld {
+  flex: 1; min-width: 0; font-size: 17px; padding: 3px 8px; border-radius: 5px;
+  border: 1px solid var(--blau-rand); background: var(--blau-zart);
+  --caret-color: var(--blau); --selection-background-color: var(--blau-hell);
+  --contains-highlight-background-color: transparent;
+}
+math-field.gl-feld:focus-within { border-color: var(--blau); box-shadow: 0 0 0 2px var(--blau-hell); }
+math-field.gl-feld.ist-klein { flex: 0 0 90px; font-size: 15px; }
+math-field.gl-feld::part(virtual-keyboard-toggle),
+math-field.gl-feld::part(menu-toggle) { display: none; }
+.gl-einheit { flex: 0 0 70px; width: 70px; font-size: 12px; }
+.gl-projektwert { flex: 1; min-width: 0; font-size: 12px; }
+.gl-zeile.ist-text .gl-text { font-style: italic; }
+.gl-ergebnis { font-size: 14px; white-space: nowrap; overflow-x: auto; }
+.gl-ergebnis.ist-fehler { font-size: 11.5px; white-space: normal; color: var(--schlecht); }
+.gl-anfuegen { display: flex; gap: 6px; margin-top: 8px; }
+.gl-anfuegen .knopf-anfuegen { flex: 1; }

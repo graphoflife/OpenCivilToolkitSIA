@@ -204,11 +204,17 @@ class TestBlatt(unittest.TestCase):
             Zeile(art="projektwert", name=r"h", wert_id="querschnitt.q1.h"),
             Zeile(latex=r"N=f_{cd}\cdot h\cdot1\mathrm{m}", einheit="MN"),
             Zeile(art="projektwert", name=r"x", wert_id="gibt.es.nicht"),
-            Zeile(art="projektwert", name=r"a+b", wert_id="beton.b1.f_cd")))
+            Zeile(art="projektwert", name=r"a+b", wert_id="beton.b1.f_cd"),
+            Zeile(art="projektwert", name=r"y"), Zeile(latex=r"y="),
+            Zeile(art="projektwert")))
         self.assertEqual(zeilen[0]["ergebnis"], r"20\,\mathrm{N}/\mathrm{mm}^{2}")
         self.assertEqual(zeilen[2]["ergebnis"], r"6\,\mathrm{MN}")
         self.assertEqual(zeilen[3]["fehler"], "Projektwert nicht verfügbar.")
         self.assertIn("Name fehlt", zeilen[4]["fehler"])
+        self.assertEqual(zeilen[5]["fehler"], "Wert wählen.")
+        self.assertEqual(zeilen[6]["fehler"], "y: Fehler in Zeile 6.")
+        # Frisch angefuegt und leer: still, wie eine leere Formelzeile.
+        self.assertEqual((zeilen[7]["fehler"], zeilen[7]["ergebnis"]), ("", ""))
 
     def test_im_bericht_und_in_der_ablage(self):
         projekt = projekt_mit_blatt(Zeile(latex=r"a=3\mathrm{m}"),

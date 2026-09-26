@@ -29,9 +29,10 @@ import { auswahl, el, ersetzen, melden, zahlfeld } from './dom.js';
 const DURCHMESSER = [6, 8, 10, 12, 14, 16, 18, 20, 22, 26, 30, 34, 40];
 import { span } from './mathe.js';
 import { analysenBlock, automatikBlock, nachweiseBlock } from './nachweise.js';
+import { blattZeichnen } from './gleichungen.js';
 import {
-  aendern, gewaehltesMaterial, gewaehlterQuerschnitt, kennwertId, projektAendern,
-  zustand,
+  aendern, gewaehltesBlatt, gewaehltesMaterial, gewaehlterQuerschnitt, kennwertId,
+  projektAendern, zustand,
 } from './zustand.js';
 
 const ART_TEXT = { beton: 'Beton', betonstahl: 'Betonstahl' };
@@ -665,6 +666,12 @@ export function editorZeichnen(behaelter, titelKnoten, hinweisKnoten) {
     titelKnoten.textContent = querschnitt.name;
     hinweisKnoten.textContent = 'Stahlbeton-Platte';
     return ersetzen(behaelter, ...plattenEditor(querschnitt));
+  }
+  const blatt = gewaehltesBlatt();
+  if (blatt) {
+    titelKnoten.textContent = blatt.name;
+    hinweisKnoten.textContent = 'Analytische Gleichungen';
+    return blattZeichnen(behaelter, blatt);
   }
   titelKnoten.textContent = 'Eingaben';
   hinweisKnoten.textContent = '';

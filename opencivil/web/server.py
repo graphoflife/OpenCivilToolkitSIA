@@ -204,9 +204,10 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", art or "application/octet-stream")
         self.send_header("Content-Length", str(len(inhalt)))
         # Beim Entwickeln aendert sich die Oberflaeche laufend, also nicht
-        # zwischenspeichern. Ausgenommen ist, was sich nie aendert: Schriften
-        # und die Pyodide-Dateien -- 13 MB bei jedem Neuladen waeren laestig.
-        unveraenderlich = ziel.suffix == ".woff2" or "vendor/pyodide" in ziel.as_posix()
+        # zwischenspeichern. Ausgenommen ist, was sich nie aendert: die
+        # mitgelieferten Fremdpakete (KaTeX samt Schriften, MathLive, Pyodide)
+        # -- 13 MB bei jedem Neuladen waeren laestig.
+        unveraenderlich = "web/vendor/" in ziel.as_posix()
         self.send_header(
             "Cache-Control", "max-age=86400" if unveraenderlich else "no-cache")
         self.end_headers()

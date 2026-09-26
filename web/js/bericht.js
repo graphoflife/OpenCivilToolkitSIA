@@ -676,7 +676,7 @@ function raumDerAuswahl() {
     const m = zustand.projekt.materialien.find((x) => x.kennung === wahl.kennung);
     return m ? `${m.art}.${m.kennung}` : null;
   }
-  return `querschnitt.${wahl.kennung}`;
+  return wahl.art === 'blatt' ? `gleichungen.${wahl.kennung}` : `querschnitt.${wahl.kennung}`;
 }
 
 /**
