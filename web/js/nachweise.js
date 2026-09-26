@@ -590,11 +590,15 @@ export function automatikBlock(querschnitt) {
     }), 'mm')] : []),
     feld('Teilungen', teilungsfeld('automatik_teilungen',
       'mm, durch Komma getrennt. Grund und Zulage einer Lage: gleiche Teilung'), 'mm'),
+    // Leer heisst: kein Mindestdurchmesser -- dann darf eine Lage leer
+    // bleiben. Die Null zeigt das Feld darum als leer, und die Pfeile gehen
+    // wie bei der Obergrenze durch die Durchmesser: von leer aus auf 2 mm
+    // hiesse einen Stab, den es nicht gibt.
     feld('Mindestdurchmesser', zahlfeld({
-      wert: querschnitt.automatik_mindestdurchmesser ?? 10, schritt: 2, min: 0,
-      titel: 'Dünnster eingebauter Stab; ⌀ 0 (Lage weg) erlaubt',
+      wert: querschnitt.automatik_mindestdurchmesser || null, stufen: DURCHMESSER, min: 0,
+      titel: 'Grundbew. jeder Lage mindestens mit diesem ⌀; leer: Lage darf leer bleiben',
       beiAenderung: (v) => aendern((q) => {
-        q.automatik_mindestdurchmesser = v ?? 10;
+        q.automatik_mindestdurchmesser = v ?? 0;
       }),
     }), 'mm'),
     ...obergrenze(querschnitt, aendern),

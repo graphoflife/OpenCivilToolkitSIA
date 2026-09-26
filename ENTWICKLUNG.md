@@ -44,6 +44,43 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-26 · Der Mindestdurchmesser gilt für jede Lage
+
+Wunsch: Ist bei der automatischen Bewehrung ein Mindestdurchmesser gegeben,
+bekommt jede Lage mindestens ihn als Grundbewehrung.
+
+### Vorher und nachher
+
+Am Beispiel, Mindestdurchmesser ⌀10, Teilung 150:
+
+| Modus | vorher | nachher |
+| --- | --- | --- |
+| Grundbew. ohne Kräfte, Zulage mit Kräften | 2. Lage nur Zulage ⌀14, 3. Lage nur Zulage ⌀10 | 2. Lage ⌀10 + Zulage ⌀10, 3. Lage ⌀10 |
+| Grundbew. ohne Kräfte | beide x-Lagen leer | beide x-Lagen ⌀10 |
+| Grundbew. mit Kräften | ⌀14 und ⌀10 | unverändert |
+
+Vorher galt der Mindestdurchmesser nur für Stäbe, die die Suche überhaupt
+einbaute. Eine Lage, die kein Nachweis verlangte, blieb leer. Im Modus
+«ohne Kräfte» war das bei einer Platte ohne Zwängung jede x-Lage.
+
+### Wie es gebaut ist
+
+* **x-Lagen:** Die Grundbewehrung beginnt in der Suche beim
+  Mindestdurchmesser statt bei null. Beim Zurücknehmen geht sie nicht unter
+  ihn. Die Zulage beginnt weiter bei null und darf fehlen.
+* **y-Lagen:** Folgt y der x-Grundbewehrung, hat sie ihn damit schon. Sonst
+  hebt die Suche eine y-Lage, die dünner ist oder leer, auf den
+  Mindestdurchmesser mit der gesuchten Teilung (`_y_mindestens`). Eine
+  dickere y-Lage bleibt, wie sie ist. Gehoben wird vor dem Suchen, denn
+  liegt y aussen, kostet ihr Durchmesser x die statische Höhe.
+* **Leer heisst: kein Mindestdurchmesser.** Dann darf eine Lage leer
+  bleiben, wie bisher. Das Feld zeigt die Null als leer, und seine Pfeile
+  gehen durch die Durchmesser statt in 2-mm-Schritten.
+* **Obergrenze:** Liegt schon die Grundbewehrung mit Mindestdurchmesser
+  darüber, sagt die Suche das, statt erfolglos zu suchen.
+
+---
+
 ## 2026-09-26 · «Risse: …», Farben für die Tragrichtungen, kürzere Lastfallzeilen
 
 Wunsch: andere Namen in der Zusammenfassung, dunklere Ränder, neue Farben

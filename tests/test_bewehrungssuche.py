@@ -74,8 +74,10 @@ class TestSuche(unittest.TestCase):
         for marke, d in ergebnis.beste.durchmesser.items():
             # Eine Stufe kleiner -- in den Stufen der Suche und nicht in der
             # rohen Durchmesserliste. Sonst prüfte man einen Zwischenwert,
-            # den die Suche gar nicht anbietet.
-            kleiner = [x for x in STUFEN if x < d]
+            # den die Suche gar nicht anbietet. Die Grundbewehrung hat keine
+            # Null: unter den Mindestdurchmesser geht sie nicht.
+            stufen = STUFEN[1:] if marke.endswith("g") else STUFEN
+            kleiner = [x for x in stufen if x < d]
             if not kleiner:
                 continue
             probe = platte()
@@ -139,6 +141,9 @@ class TestSuche(unittest.TestCase):
         es dort auch kein Mass, an dem sich ein Durchmesser bemessen liesse --
         die Suche zöge ihn auf null, und genau das wäre falsch: die
         y-Bewehrung liegt aussen und kostet x seine statische Höhe.
+
+        Solange sie den Mindestdurchmesser hat -- sonst hebt die Suche sie an
+        (TestMindestdurchmesser).
         """
         projekt = platte()
         vorher = [l.grund.durchmesser for l in projekt.querschnitt("q1").lagen]
@@ -170,12 +175,16 @@ class TestSuche(unittest.TestCase):
         self.assertTrue(suche.bewerte(projekt).erfuellt())
 
     def test_kein_aktiver_stab_unter_dem_mindestdurchmesser(self):
+        """Die Grundbewehrung hat ihn immer, die Zulage, wo es eine gibt."""
         ergebnis = suche.suche(platte(), "q1", modus=suche.Suchmodus.GRUND_MIT,
                                mindestdurchmesser=16.0)
         self.assertTrue(ergebnis.gefunden, ergebnis.begruendung)
         for marke, d in ergebnis.beste.durchmesser.items():
             with self.subTest(posten=marke):
-                self.assertTrue(d == 0.0 or d >= 16.0)
+                if marke.endswith("g"):
+                    self.assertGreaterEqual(d, 16.0)
+                else:
+                    self.assertTrue(d == 0.0 or d >= 16.0)
 
     def test_die_suche_faengt_bei_null_an(self):
         """
@@ -189,6 +198,66 @@ class TestSuche(unittest.TestCase):
                 continue        # y bleibt stehen -- die sucht niemand
             self.assertEqual(lage.grund.durchmesser, 0)
             self.assertEqual(lage.zulage.durchmesser, 0)
+
+
+class TestMindestdurchmesser(unittest.TestCase):
+    """
+    Die Grundbewehrung jeder Lage hat mindestens den Mindestdurchmesser --
+    auch eine Lage, die kein Nachweis verlangt, und auch in y. Die Zulage
+    darf fehlen.
+    """
+
+    def ohne_obere_last(self) -> Projekt:
+        """Nur Feldmomente und kein Nachweis ohne Kräfte: oben braucht x nichts."""
+        projekt = platte(sproede=False, zwaengung=False, zwaengung_biegung=False)
+        q = projekt.querschnitt("q1")
+        q.kombinationen = [k for k in q.kombinationen if k.M_Ed > 0]
+        return projekt
+
+    def test_ohne_ihn_darf_eine_lage_leer_bleiben(self):
+        """Die Probe -- sonst prüfte der Rest nichts."""
+        ergebnis = suche.suche(self.ohne_obere_last(), "q1",
+                               modus=suche.Suchmodus.GRUND_MIT, mindestdurchmesser=0.0)
+        self.assertTrue(ergebnis.gefunden, ergebnis.begruendung)
+        self.assertEqual(ergebnis.beste.durchmesser["3g"], 0.0)
+
+    def test_jede_lage_hat_ihn_als_grundbewehrung(self):
+        for modus in (suche.Suchmodus.GRUND_OHNE, suche.Suchmodus.GRUND_MIT,
+                      suche.Suchmodus.GRUND_OHNE_ZULAGE_MIT):
+            with self.subTest(modus=modus.value):
+                projekt = self.ohne_obere_last()
+                ergebnis = suche.suche(projekt, "q1", modus=modus,
+                                       mindestdurchmesser=10.0)
+                self.assertTrue(ergebnis.gefunden, ergebnis.begruendung)
+                suche.uebernehmen(projekt, "q1", ergebnis.beste)
+                for nummer, lage in enumerate(projekt.querschnitt("q1").lagen, start=1):
+                    self.assertGreaterEqual(lage.grund.durchmesser, 10.0,
+                                            f"{nummer}. Lage")
+                    self.assertTrue(lage.zulage.durchmesser == 0
+                                    or lage.zulage.durchmesser >= 10.0)
+
+    def test_eine_duenne_y_lage_wird_angehoben(self):
+        """Mindestens heisst nicht genau: die dickere y-Lage bleibt, wie sie ist."""
+        projekt = self.ohne_obere_last()
+        q = projekt.querschnitt("q1")
+        q.lagen[0].grund.durchmesser, q.lagen[0].grund.abstand = 8.0, 200.0
+        dicker = copy.deepcopy(q.lagen[3].grund)
+        ergebnis = suche.suche(projekt, "q1", modus=suche.Suchmodus.GRUND_MIT,
+                               mindestdurchmesser=10.0)
+        self.assertTrue(ergebnis.gefunden, ergebnis.begruendung)
+        suche.uebernehmen(projekt, "q1", ergebnis.beste)
+        self.assertEqual((q.lagen[0].grund.durchmesser, q.lagen[0].grund.abstand),
+                         (10.0, 150.0))
+        self.assertEqual(q.lagen[3].grund, dicker)
+        # Gesucht hat die Suche schon damit -- das Ergebnis geht auf.
+        self.assertTrue(ohne_duktilitaet(projekt).erfuellt())
+
+    def test_ueber_der_obergrenze_heisst_nein_mit_grund(self):
+        ergebnis = suche.suche(self.ohne_obere_last(), "q1",
+                               modus=suche.Suchmodus.GRUND_MIT, mindestdurchmesser=40.0)
+        self.assertFalse(ergebnis.gefunden)
+        self.assertIn("Mindestdurchmesser liegt über der Obergrenze",
+                      ergebnis.loesungen[0].begruendung)
 
 
 class TestDieEbeneAufDerDieSucheStehenblieb(unittest.TestCase):

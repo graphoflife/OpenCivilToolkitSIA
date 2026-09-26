@@ -127,11 +127,10 @@ class QuerschnittEintrag(Beschreibung):
 
     automatik_mindestdurchmesser: float = 10.0
     """
-    Duennster Stab, den die Suche einbaut -- in mm.
+    Duennster Stab, den die Suche einbaut -- in mm. Die Grundbewehrung jeder
+    Lage hat ihn mindestens, in x wie in y; die Zulage darf fehlen.
 
-    Null bleibt davon unberuehrt: eine Lage ganz wegzulassen ist immer
-    erlaubt. Gemeint ist, dass ein *vorhandener* Stab nicht duenner wird als
-    das, was man verlegen will.
+    Null heisst: kein Mindestdurchmesser, eine Lage darf auch leer bleiben.
     """
 
     automatik_grenze: ObergrenzeEintrag = field(default_factory=ObergrenzeEintrag)
