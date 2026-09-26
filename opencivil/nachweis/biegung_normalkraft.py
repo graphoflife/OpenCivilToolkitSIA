@@ -404,7 +404,6 @@ class BiegungNormalkraft(Nachweis):
                 abs(bei_n.rd) if bei_n else 0.0, KNM)
             urteile.append(
                 NachweisUrteil(
-                    name=f"M-N-Nachweis {self.richtung.value} – {kombination.name}",
                     art="M-N",
                     ziel=self.d_ausnutzung[kombination.name].id,
                     fall=kombination.name,

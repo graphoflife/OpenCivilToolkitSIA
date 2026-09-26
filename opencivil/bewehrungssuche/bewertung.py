@@ -110,9 +110,7 @@ def bewerte(projekt) -> Bewertung:
         grad = u.erfuellungsgrad.si
         rueckstand += max(0.0, 1.0 - grad)
         if grad < schlechtester:
-            # Mit Gedankenstrich wie in der Zusammenfassung: «Risse: Zwängung
-            # Biegung: 3. Lage» läse sich wie zwei Überschriften.
-            schlechtester, name = grad, f"{u.langname or u.art} – {u.fall}"
+            schlechtester, name = grad, u.name
     return Bewertung(rueckstand, schlechtester, name, len(zaehlt))
 
 

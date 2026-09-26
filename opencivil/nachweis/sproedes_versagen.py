@@ -266,9 +266,7 @@ class SproedesVersagen(Nachweis):
 
     def _urteil(self, erg: Lagenergebnis) -> NachweisUrteil:
         nummer = erg.lage.nummer
-        r = self.richtung.value
         return NachweisUrteil(
-            name=f"Sprödes Versagen {r} – {nummer}. Lage",
             art="SV",
             ziel=self.d_ausnutzung[nummer].id,
             fall=f"{nummer}. Lage",

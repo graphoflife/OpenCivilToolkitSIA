@@ -168,7 +168,7 @@ class TestNachweis(unittest.TestCase):
         projekt.querschnitte[0].lagen[obere - 1].grund.durchmesser = 0.0
         projekt.querschnitte[0].lagen[obere - 1].zulage.durchmesser = 0.0
         _, gefunden = urteile(projekt)
-        urteil = gefunden[f"Rissnormalkraft x – {obere}. Lage"]
+        urteil = gefunden[f"Risse: Zwängung Normalkraft x – {obere}. Lage"]
         self.assertFalse(urteil.erfuellt)
         self.assertIn("ohne Bewehrung → kein Nachweis", urteil.hinweis)
         self.assertIsNone(urteil.einwirkung)
@@ -358,7 +358,7 @@ class TestZwaengungBiegung(unittest.TestCase):
         projekt.querschnitte[0].lagen[obere - 1].grund.durchmesser = 0.0
         projekt.querschnitte[0].lagen[obere - 1].zulage.durchmesser = 0.0
         _, gefunden = urteile(projekt)
-        urteil = gefunden[f"Zwängung Biegung x – {obere}. Lage"]
+        urteil = gefunden[f"Risse: Zwängung Biegung x – {obere}. Lage"]
         self.assertFalse(urteil.erfuellt)
         self.assertIn("ohne Bewehrung → kein Nachweis", urteil.hinweis)
         self.assertIsNone(urteil.einwirkung)
@@ -372,7 +372,7 @@ class TestZwaengungBiegung(unittest.TestCase):
         lage.zulage.durchmesser = 0.0
         projekt.querschnitte[0].h = 600.0
         _, gefunden = urteile(projekt)
-        self.assertFalse(gefunden[f"Zwängung Biegung x – {obere}. Lage"].erfuellt)
+        self.assertFalse(gefunden[f"Risse: Zwängung Biegung x – {obere}. Lage"].erfuellt)
 
     def test_die_herleitung_zeigt_beide_querschnitte(self):
         from opencivil.core.protokoll import GleichungBlock

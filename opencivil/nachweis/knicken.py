@@ -499,7 +499,6 @@ class Knicken(Nachweis):
             "N_Ed", "N_{Ed}", abs(erg.fall.N_Ed.si), "Einwirkung")
         widerstand = self._n_rd(erg)
         return NachweisUrteil(
-            name=f"Knicken – {erg.fall.name}",
             art="K",
             ziel=self.d_ausnutzung[erg.fall.name].id,
             fall=erg.fall.name,

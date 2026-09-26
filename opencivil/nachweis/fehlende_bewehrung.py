@@ -116,7 +116,6 @@ class FehlendeBewehrung(Nachweis):
         for fall in self.faelle:
             ergebnis[self.d_ausnutzung[fall.kennung].id] = Groesse(0.0, EINHEITSLOS)
             urteile.append(NachweisUrteil(
-                name=f"{fall.art} {self.richtung.value} – {fall.fall}",
                 art=fall.art,
                 ziel=self.d_ausnutzung[fall.kennung].id,
                 langname=fall.langname,

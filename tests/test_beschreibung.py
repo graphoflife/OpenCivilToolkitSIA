@@ -667,7 +667,7 @@ class TestNurDieTragrichtungX(unittest.TestCase):
         projekt = Projekt.beispiel()
         mn = [u for u in self._loesen(projekt).urteile if u.art == "M-N"]
         self.assertEqual(len(mn), len(projekt.querschnitt("q1").kombinationen))
-        self.assertTrue(all("Nachweis x" in u.name for u in mn))
+        self.assertTrue(all("Biegung und Normalkraft x" in u.name for u in mn))
 
     def test_in_y_entsteht_kein_nachweis(self):
         aufbau = Projekt.beispiel().aufbauen()

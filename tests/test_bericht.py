@@ -298,7 +298,7 @@ class TestStilleNachweiseImBericht(unittest.TestCase):
         _, loesung = self.aufbau_und_loesung()
         self.assertTrue(loesung.stille_maengel)
         self.assertTrue(loesung.alle_nachweise_erfuellt)
-        self.assertTrue(any(u.name.startswith("Rissnormalkraft")
+        self.assertTrue(any(u.name.startswith("Risse: Zwängung Normalkraft")
                             for u in loesung.stille_maengel))
 
     def test_die_konsole_zaehlt_nur_gefuehrte_auf(self):
@@ -351,7 +351,7 @@ class TestKnappVerfehlterGrad(unittest.TestCase):
         cls.aufbau = Projekt.beispiel().aufbauen()
         cls.loesung = cls.aufbau.werk.loese(*cls.aufbau.alle_nachweisziele())
         cls.urteil = next(u for u in cls.loesung.stille_maengel
-                          if u.name == "Rissnormalkraft x – 3. Lage")
+                          if u.name == "Risse: Zwängung Normalkraft x – 3. Lage")
 
     def test_die_probe_ist_knapp_verfehlt(self):
         """Sonst prüfte der Rest nichts."""
@@ -371,7 +371,7 @@ class TestKnappVerfehlterGrad(unittest.TestCase):
         aufbau = projekt.aufbauen()
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         urteil = next(u for u in loesung.gefuehrte_urteile
-                      if u.name == "Rissnormalkraft x – 3. Lage")
+                      if u.name == "Risse: Zwängung Normalkraft x – 3. Lage")
         self.assertFalse(urteil.erfuellt)
         grade = [b.latex for b in loesung.protokoll.alle_bloecke()
                  if isinstance(b, GleichungBlock) and b.titel == "Erfüllungsgrad"

@@ -610,7 +610,6 @@ class Querkraft(Nachweis):
             return
 
         urteile.append(NachweisUrteil(
-            name=f"Querkraft {self.richtung.value} – {fall.name}",
             art="V",
             ziel=self.d_ausnutzung[fall.name].id,
             fall=fall.name,

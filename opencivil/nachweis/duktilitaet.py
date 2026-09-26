@@ -287,7 +287,6 @@ class Duktilitaet(Nachweis):
             einheit=EINHEITSLOS, beschreibung="Einwirkung", stellen=3,
         ).belegen(Groesse(erg.verhaeltnis, EINHEITSLOS))
         return NachweisUrteil(
-            name=f"Duktilität – {nummer}. Lage",
             art="D",
             ziel=self.d_ausnutzung[nummer].id,
             fall=f"{nummer}. Lage",

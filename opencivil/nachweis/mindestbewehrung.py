@@ -359,10 +359,8 @@ class Rissnormalkraft(Nachweis):
 
     def _urteil(self, erg: Lagenergebnis) -> NachweisUrteil:
         nummer = erg.lage.nummer
-        r = self.richtung.value
         einwirkung, widerstand = self._n_riss(), self._n_s_adm(erg)
         return NachweisUrteil(
-            name=f"Rissnormalkraft {r} – {nummer}. Lage",
             art="N_Riss",
             ziel=self.d_ausnutzung[nummer].id,
             fall=f"{nummer}. Lage",
@@ -638,11 +636,9 @@ class ZwaengungBiegung(Nachweis):
 
     def _urteil(self, erg: Momentlagenergebnis) -> NachweisUrteil:
         nummer = erg.lage.nummer
-        r = self.richtung.value
         einwirkung = rissmoment_wert(self.id, self.groessen)
         widerstand = self._m_s_adm(erg)
         return NachweisUrteil(
-            name=f"Zwängung Biegung {r} – {nummer}. Lage",
             art="ZB",
             ziel=self.d_ausnutzung[nummer].id,
             fall=f"{nummer}. Lage",

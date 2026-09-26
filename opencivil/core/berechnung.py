@@ -563,9 +563,17 @@ class NachweisUrteil:
     und mitgelesen werden.
     """
 
-    name: str
     erfuellt: bool
     erfuellungsgrad: Groesse
+    name: str = ""
+    """
+    Wie das Urteil heisst: Langname, Richtung und Fall, «Biegung und
+    Normalkraft x – Feld». Gestempelt von :meth:`Nachweis.rechne` aus
+    :attr:`langname` und :attr:`fall` -- ein Nachweis baut ihn nicht selbst.
+    Frueher tat das jeder, und jeder etwas anders («M-N-Nachweis x – Feld»,
+    «Duktilität – 2. Lage», «Stahlspannung (Rissbreite) x – …»).
+    """
+
     begruendung: str = ""
     einwirkung: Optional[Wert] = None
     widerstand: Optional[Wert] = None
@@ -680,20 +688,6 @@ class NachweisUrteil:
         """
         return self.still and not self.erfuellt and self.widerstand is not None
 
-    @property
-    def kurzname(self) -> str:
-        """
-        Die knappe Bezeichnung, z.B. ``M-N: Fall 1``.
-
-        Fuer Meldungen und Protokolle. Die Zusammenfassung nimmt statt
-        dessen :attr:`langname` und :attr:`fall` in zwei Spalten -- ein
-        Kuerzel spart Platz, den man in einer Tabelle nicht braucht, und
-        kostet eine Legende, die es nicht gibt.
-        """
-        if self.art and self.fall:
-            return f"{self.art}: {self.fall}"
-        return self.name
-
     def gradtext(self, *, latex: bool = False) -> str:
         """Der Erfuellungsgrad als Text -- siehe :func:`grad_als_text`."""
         return grad_als_text(self.erfuellungsgrad.si, self.erfuellt, latex=latex)
@@ -737,6 +731,14 @@ class Nachweis(Berechnung):
     @property
     def langname(self) -> str:
         return self.LANGNAME or self.thema
+
+    richtung = None
+    """Die Tragrichtung, in der nachgewiesen wird -- ``None``, wo es keine gibt."""
+
+    def urteilsname(self, langname: str, fall: str) -> str:
+        """«Biegung und Normalkraft x – Feld»: Langname, Richtung, Fall."""
+        kopf = f"{langname} {self.richtung.value}" if self.richtung is not None else langname
+        return " – ".join(teil for teil in (kopf, fall) if teil)
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -843,12 +845,16 @@ class Nachweis(Berechnung):
         groessen, urteile = self.pruefe(e, p)
         # Der Namensraum wird hier gestempelt und nicht von den Unterklassen
         # mitgegeben: er ist immer derselbe, naemlich der des Nachweises.
-        # Ebenso der Langname, wo die Pruefung keinen eigenen nennt. Still ist
-        # ein Urteil, wenn der ganze Nachweis es ist oder wenn die Pruefung es
-        # einzeln so gestempelt hat -- sie kennt ihre Faelle.
-        self.urteile = [replace(u, raum=self.id, langname=u.langname or self.langname,
-                                still=self.still or u.still)
-                        for u in urteile]
+        # Ebenso Langname und Name, wo die Pruefung keine eigenen nennt. Still
+        # ist ein Urteil, wenn der ganze Nachweis es ist oder wenn die Pruefung
+        # es einzeln so gestempelt hat -- sie kennt ihre Faelle.
+        self.urteile = []
+        for u in urteile:
+            langname = u.langname or self.langname
+            self.urteile.append(replace(
+                u, raum=self.id, langname=langname,
+                name=u.name or self.urteilsname(langname, u.fall),
+                still=self.still or u.still))
         return groessen
 
     # Ein `alle_erfuellt` gab es hier einmal. Es hatte keinen Aufrufer und

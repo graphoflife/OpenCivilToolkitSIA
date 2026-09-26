@@ -190,8 +190,6 @@ class Spannungsgrenze(ABC):
     idteil: str
     #: Index am Erfuellungsgrad.
     symbolteil: str
-    #: Anfang des Urteilsnamens, vor Richtung und Fall.
-    urteilsname: str
     #: Kurzzeichen im Urteil.
     art: str
     #: Spalte «Nachweis» der Zusammenfassung.
@@ -267,7 +265,6 @@ class GrenzeGegenFliessen(Spannungsgrenze):
 
     idteil = "spannung"
     symbolteil = r"\sigma"
-    urteilsname = "Stahlspannung"
     art = "σ_s"
     langname = "Risse: Häufige Lastfälle"
     thema = "Stahlspannung gegen Fliessen"
@@ -327,7 +324,6 @@ class GrenzeAusRissbreite(Spannungsgrenze):
 
     idteil = "spannung_riss"
     symbolteil = r"\sigma,w"
-    urteilsname = "Stahlspannung (Rissbreite)"
     art = "σ_s,w"
     langname = "Risse: Quasi-ständige Lastfälle"
     thema = "Stahlspannung aus Rissbreite"
@@ -578,10 +574,8 @@ class Spannungsbegrenzung(Nachweis):
 
     def _urteil(self, erg: Fallergebnis, *, still: bool = False) -> NachweisUrteil:
         """Das Urteil eines Falls -- was gegeneinander steht, sagt der Vergleich."""
-        r = self.richtung.value
         vergleich = erg.vergleich
         return NachweisUrteil(
-            name=f"{self.grenze.urteilsname} {r} – {erg.fall.name}",
             art=self.grenze.art,
             ziel=self.d_ausnutzung[erg.fall.name].id,
             fall=erg.fall.name,

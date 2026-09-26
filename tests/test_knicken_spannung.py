@@ -54,7 +54,8 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         """
         aufbau, gefunden = urteile(self.projekt("erhoeht"))
         self.assertEqual(sorted(aufbau.spannung), ["q1.x"])
-        self.assertTrue([n for n in gefunden if n.startswith("Stahlspannung")])
+        # Am Kürzel und nicht am Namen: den liest man, das Kürzel bleibt.
+        self.assertTrue([u for u in gefunden.values() if u.art == "σ_s"])
         self.assertTrue(all(n.still for n in aufbau.spannung.values()))
 
     def test_mit_den_siebzig_prozent_wird_er_laut(self):
@@ -474,7 +475,7 @@ class TestKnicken(unittest.TestCase):
     def test_gedrungen_und_maessig_belastet_ist_stabil(self):
         erg = self.stabil
         self.assertTrue(erg.stabil)
-        self.assertTrue(self.gefunden["Knicken – Stütze"].erfuellt)
+        self.assertTrue(self.gefunden["Knicken x – Stütze"].erfuellt)
         # Die Probe: die gefundene Ebene erzeugt die Schnittgrössen.
         self.assertAlmostEqual(erg.N_int / 1e3, -800.0, delta=1.0)
         self.assertAlmostEqual(erg.M_int / 1e3, erg.M_ges / 1e3, delta=0.5)
@@ -491,7 +492,7 @@ class TestKnicken(unittest.TestCase):
         ziel = aufbau.knicken["q1"].d_ausnutzung["Stütze"].id
         teil = aufbau.werk.loese(ziel)
         self.assertAlmostEqual(teil.werte[ziel].groesse.si,
-                               self.gefunden["Knicken – Stütze"].erfuellungsgrad.si)
+                               self.gefunden["Knicken x – Stütze"].erfuellungsgrad.si)
 
     def test_ueberlastet_knickt(self):
         """
@@ -499,7 +500,7 @@ class TestKnicken(unittest.TestCase):
         Gleichgewichtslage mehr. Einen Grad bekommt er trotzdem -- ein
         Nachweis ohne Zahl sagt nicht, wie weit er danebenliegt.
         """
-        urteil = self.gefunden["Knicken – überlastet"]
+        urteil = self.gefunden["Knicken x – überlastet"]
         self.assertFalse(self.instabil.stabil)
         self.assertFalse(urteil.erfuellt)
         self.assertIn("keine Gleichgewichtslage", urteil.hinweis)
@@ -515,7 +516,7 @@ class TestKnicken(unittest.TestCase):
         Über Momente zu vergleichen ginge nur, solange es ein Gleichgewicht
         gibt; beim Knicken fehlt gerade das.
         """
-        urteil = self.gefunden["Knicken – Stütze"]
+        urteil = self.gefunden["Knicken x – Stütze"]
         self.assertEqual(urteil.einwirkung.groesse.si, 800e3)
         self.assertAlmostEqual(urteil.widerstand.groesse.si, self.stabil.N_Rd, delta=1.0)
         self.assertAlmostEqual(urteil.erfuellungsgrad.si, self.stabil.N_Rd / 800e3,
@@ -558,7 +559,7 @@ class TestKnicken(unittest.TestCase):
     def test_zug_braucht_keinen_knicknachweis(self):
         _, gefunden = urteile(self.projekt(
             KnickEintrag("Zug", N_Ed=200.0, M_Ed_1=20.0, laenge=4.0, knicklaenge=4.0)))
-        urteil = gefunden["Knicken – Zug"]
+        urteil = gefunden["Knicken x – Zug"]
         self.assertTrue(urteil.erfuellt)
         self.assertIn("kein Druck → kein Knicknachweis", urteil.hinweis)
 
