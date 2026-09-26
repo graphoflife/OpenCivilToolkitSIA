@@ -1,5 +1,5 @@
 """
-opencivil/bewehrungssuche.py -- die Bewehrung suchen statt sie zu setzen.
+opencivil/bewehrungssuche/laengs.py -- die Laengsbewehrung suchen.
 
 VERANTWORTUNG:
 Findet zu einer Platte die kleinste Bewehrung, mit der alle *eingeschalteten*
@@ -44,17 +44,6 @@ Mehr Querschnitt als ``automatik_grenze`` (Grund und Zulage zusammen, in
 mm²/m) bekommt keine x-Lage -- einen Schritt darueber nimmt die Suche gar
 nicht erst in Betracht. Damit auch ⌀30@150 erreichbar ist, reicht die Liste
 der Durchmesser bis ⌀40; die Grenze haelt die Suche im Zaum.
-
-DIE PLATTENDICKE:
-Zwei Modi suchen zusaetzlich die Dicke -- siehe :func:`dicke_suchen`. Je
-Dicke laeuft dieselbe Bewehrungssuche; gesucht wird die duennste Platte, bei
-der sie eine Loesung findet.
-
-WELCHE NACHWEISE ZAEHLEN:
-Die, die gebaut werden -- und gebaut wird nur, was eingeschaltet ist. Die
-Schalter der Oberflaeche steuern also unmittelbar die Suche, ohne dass hier
-eine zweite Liste gepflegt werden muesste. :class:`Suchmodus` nimmt zusaetzlich
-die Einwirkungen weg, wo ohne Kraefte gesucht werden soll.
 """
 
 from __future__ import annotations
@@ -65,16 +54,13 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional, Sequence, Tuple
 
+from opencivil.bewehrungssuche.bewertung import Bewertung, arbeitskopie, bewerte
 from opencivil.querschnitt.platte import Richtung
 
 #: Lieferbare Stabdurchmesser in mm, aufsteigend. Die Suche geht sie der
 #: Reihe nach durch; was nicht in der Liste steht, kommt nicht heraus. Wie
 #: dick es wird, begrenzt die Obergrenze der Platte (``automatik_grenze``).
 DURCHMESSER: Tuple[float, ...] = (8, 10, 12, 14, 16, 18, 20, 22, 26, 30, 34, 40)
-
-#: Buegel dicker als ⌀26 biegt niemand -- die Buegelsuche bleibt darunter.
-BUEGELDURCHMESSER: Tuple[float, ...] = (8, 10, 12, 14, 16, 18, 20, 22, 26)
-
 #: Teilungen in mm, die ohne eigene Angabe versucht werden. Die eine
 #: uebliche -- jede weitere kostet einen vollstaendigen Suchlauf.
 TEILUNGEN: Tuple[float, ...] = (150.0,)
@@ -325,155 +311,8 @@ def _flaeche(durchmesser: Dict[str, float], teilung: float,
 
 
 # ===========================================================================
-# Bewerten
-# ===========================================================================
-
-@dataclass
-class Bewertung:
-    """Wie weit eine Bewehrung von der Erfuellung entfernt ist."""
-
-    rueckstand: float
-    """
-    Summe der Fehlbetraege, ``sum(max(0, 1 - alpha))`` ueber alle Nachweise.
-
-    **Nicht** der schlechteste Grad. Der war die erste Fassung, und er hat die
-    Suche zum Stehen gebracht: halten zwei Nachweise gleichzeitig das Minimum
-    -- etwa sproedes Versagen in der 1. und in der 4. Lage bei gleicher
-    Bewehrung --, dann hebt kein einzelner Schritt es, weil der jeweils andere
-    stehen bleibt. Die Suche sah eine Ebene und gab auf, obwohl der naechste
-    Durchmesser offensichtlich geholfen haette.
-
-    Die Summe der Fehlbetraege kennt diese Ebene nicht: sie faellt, sobald
-    *irgendein* unerfuellter Nachweis besser wird. Null heisst genau, dass
-    alle aufgehen.
-    """
-
-    grad: float
-    """Der schlechteste Erfuellungsgrad -- nur zum Berichten."""
-
-    nachweis: str
-    anzahl: int
-    """
-    Wie viele *gefuehrte* Urteile gefaellt wurden.
-
-    Ohne die stillen: gegen einen Nachweis, den niemand fuehrt, sucht die
-    Suche nicht, also zaehlt sie ihn auch nicht mit -- sonst haette sie einen
-    Rueckstand aufzuholen, den niemand verlangt hat.
-    """
-
-    fehler: str = ""
-
-    def abstand(self, erwartet: int = 1) -> float:
-        """
-        Wie weit diese Bewehrung vom Ziel entfernt ist -- die eine Zahl, an
-        der sich die Suche ausrichtet.
-
-        Das ist der Rueckstand **plus ein voller Punkt fuer jeden Nachweis,
-        den es gar nicht gibt**. ``erwartet`` ist die Zahl der Urteile, die
-        die Platte voll bewehrt faellt; fehlt eines, ist die Lage, der es
-        gilt, unbewehrt -- und ein Nachweis, der sich nicht einmal aufstellen
-        laesst, ist so schlecht wie einer, der bei null steht.
-
-        Ohne diesen Zuschlag hat die Suche eine Abkuerzung: nimm allen Stahl
-        weg, dann gibt es keinen Nachweis mehr, und kein Nachweis heisst
-        Rueckstand null. Sie hat sie gefunden, kaum dass leere Lagen suchbar
-        waren -- und zwar nicht erst beim Annehmen des Ergebnisses, sondern
-        schon bei der Wahl des naechsten Schritts.
-        """
-        if self.fehler:
-            return math.inf
-        return self.rueckstand + max(0, erwartet - self.anzahl)
-
-    def erfuellt(self, erwartet: int = 1) -> bool:
-        """Ob alle erwarteten Nachweise da sind und alle aufgehen."""
-        return self.abstand(erwartet) <= 0.0
-
-
-def bewerte(projekt) -> Bewertung:
-    """
-    Rechnen und sagen, wie weit es noch ist.
-
-    Gezaehlt wird jedes Urteil, das nicht still ist -- still heisst
-    ausgeschaltet, und gegen einen Nachweis zu suchen, den niemand fuehrt,
-    hiesse dem Benutzer Bewehrung aufzudraengen, die er nicht verlangt hat.
-    Der Duktilitaetsnachweis faellt so von selbst heraus:
-    :func:`_arbeitskopie` schaltet ihn ab.
-    """
-    try:
-        aufbau = projekt.aufbauen(schnell=True)
-        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele(),
-                                    ohne_herleitung=True)
-    except Exception as fehler:      # Eine unmoegliche Bewehrung ist kein
-        return Bewertung(math.inf, 0.0, "", 0, str(fehler))  # Absturz, sondern ein Nein.
-
-    zaehlt = [u for u in loesung.urteile if not u.still]
-    rueckstand, schlechtester, name = 0.0, math.inf, ""
-    for u in zaehlt:
-        grad = u.erfuellungsgrad.si
-        rueckstand += max(0.0, 1.0 - grad)
-        if grad < schlechtester:
-            # Mit Gedankenstrich wie in der Zusammenfassung: «Risse: Zwängung
-            # Biegung: 3. Lage» läse sich wie zwei Überschriften.
-            schlechtester, name = grad, f"{u.langname or u.art} – {u.fall}"
-    return Bewertung(rueckstand, schlechtester, name, len(zaehlt))
-
-
-# ===========================================================================
 # Suchen
 # ===========================================================================
-
-def _arbeitskopie(projekt, kennung: str, *, kraefte: bool, leeren: bool = True):
-    """
-    Die Platte, gegen die gesucht wird -- ohne das, was die Suche nicht fuehren
-    kann.
-
-    **Ohne Duktilitaet, immer.** Sie ist der einzige Nachweis, der durch mehr
-    Bewehrung *schlechter* wird: er begrenzt die Druckzonenhoehe, und die
-    waechst mit der Stahlflaeche. Eine Suche, die von unten aufsteigt, kann ihn
-    darum nicht erfuellen, sondern nur verletzen -- sie haette gegen ihn kein
-    Mittel ausser aufzugeben. Also bleibt er draussen, und das Ergebnis sagt
-    hinterher, ob er mit der gefundenen Bewehrung noch aufgeht.
-
-    **Ohne Bewehrung, sofern ``leeren``.** Das Werkzeug *ermittelt* die
-    Bewehrung; es legt nicht zu dem dazu, was zufaellig dasteht. Die
-    Buegelsuche laeuft danach und braucht die gefundene Laengsbewehrung --
-    sie setzt ``leeren=False``, denn ohne statische Hoehe gibt es keinen
-    Querkraftwiderstand.
-
-    Ohne ``kraefte`` fallen zusaetzlich alle Lastfaelle weg -- Kombinationen,
-    Knickfaelle, haeufige und quasi-staendige. Uebrig bleiben die Nachweise, die eine Platte
-    unabhaengig von der Belastung erfuellen muss.
-
-    Abgeschaltet wird hier und nicht beim Bewerten: gebaut wird nur, was
-    eingeschaltet ist, und gezaehlt wird, was gebaut wurde. An dieser einen
-    Regel soll die Suche nichts vorbeischmuggeln.
-    """
-    kopie = copy.deepcopy(projekt)
-    # **Nur diese Platte.** Die anderen kann die Suche nicht beeinflussen; ihre
-    # Nachweise wuerden den Rueckstand trotzdem mittragen, und eine Platte, die
-    # aus ganz eigenen Gruenden nicht aufgeht, liesse jede Suche im Projekt
-    # scheitern. Genau daran ist die erste Fassung gestorben: an einer
-    # frischen Platte, neben der eine andere stand.
-    kopie.querschnitte = [q for q in kopie.querschnitte if q.kennung == kennung]
-    eintrag = kopie.querschnitt(kennung)
-    eintrag.duktilitaet = False
-    if leeren:
-        # Sonst kaeme bei einer Platte mit vorhandener Zulage eine
-        # Grundbewehrung von null heraus -- richtig gerechnet und trotzdem
-        # nicht die Antwort auf die gestellte Frage.
-        #
-        # Nur die x-Lagen: die y-Bewehrung sucht niemand, sie steht da, wo der
-        # Benutzer sie hingelegt hat, und die Suche muss mit ihr rechnen --
-        # sie kostet die x-Lagen ihre statische Hoehe.
-        for nummer, lage in enumerate(eintrag.lagen, start=1):
-            if eintrag.richtung_von(nummer) is not Richtung.X:
-                continue
-            lage.grund.durchmesser = 0
-            lage.zulage.durchmesser = 0
-    if not kraefte:
-        eintrag.ohne_lastfaelle()
-    return kopie
-
 
 def _eine_teilung(projekt, kennung: str, teilung: float,
                   posten: Sequence[Posten],
@@ -735,7 +574,7 @@ def _fuer_teilung(projekt, kennung: str, teilung: float, modus: Suchmodus,
                 if grund_ab else [])
 
     if modus in (Suchmodus.GRUND_MIT, Suchmodus.GRUND_OHNE):
-        arbeit = _arbeitskopie(projekt, kennung,
+        arbeit = arbeitskopie(projekt, kennung,
                                kraefte=modus is Suchmodus.GRUND_MIT)
         eintrag = arbeit.querschnitt(kennung)
         gehoben = y_mindestens(eintrag)
@@ -746,7 +585,7 @@ def _fuer_teilung(projekt, kennung: str, teilung: float, modus: Suchmodus,
 
     # Zwei Schritte: erst die Grundbewehrung ohne Kraefte, dann die Zulage
     # gegen alles. Der zweite Schritt uebernimmt die Durchmesser des ersten.
-    ohne = _arbeitskopie(projekt, kennung, kraefte=False)
+    ohne = arbeitskopie(projekt, kennung, kraefte=False)
     y_mindestens(ohne.querschnitt(kennung))
     grund_posten = _gesuchte(ohne.querschnitt(kennung), arten=("grund",))
     erst = _eine_teilung(ohne, kennung, teilung, grund_posten, durchmesser, grund_ab)
@@ -758,7 +597,7 @@ def _fuer_teilung(projekt, kennung: str, teilung: float, modus: Suchmodus,
 
     # Die Grundbewehrung aus dem ersten Schritt bleibt stehen; gesucht wird
     # jetzt nur noch die Zulage.
-    arbeit = _arbeitskopie(projekt, kennung, kraefte=True, leeren=False)
+    arbeit = arbeitskopie(projekt, kennung, kraefte=True, leeren=False)
     eintrag = arbeit.querschnitt(kennung)
     gehoben = y_mindestens(eintrag)
     for lage in eintrag.lagen:
@@ -775,226 +614,6 @@ def _fuer_teilung(projekt, kennung: str, teilung: float, modus: Suchmodus,
     zweit.durchmesser = {**erst.durchmesser, **zweit.durchmesser}
     zweit.schritte = erst.schritte + zweit.schritte
     return _vollstaendig(zweit, eintrag, gehoben)
-
-
-# ===========================================================================
-# Plattendicke
-# ===========================================================================
-
-#: Das Raster der Plattendicke in mm. Gefunden wird die kleinste Dicke auf
-#: diesem Raster, bei der alles aufgeht -- also auf den Zentimeter aufgerundet.
-DICKENRASTER = 10.0
-
-#: Bis wohin beim Verdoppeln gesucht wird, in mm. Dicker ist nicht immer
-#: leichter: die Mindestbewehrung waechst mit der Dicke, und mit einer
-#: Obergrenze kann eine sehr dicke Platte wieder durchfallen.
-DICKE_HOECHSTENS = 2000.0
-
-
-@dataclass
-class Dickenversuch:
-    """Eine gepruefte Dicke -- fuer die Meldung, welche es waren."""
-
-    h: float
-    """Plattendicke in mm."""
-
-    geht: bool
-
-
-@dataclass
-class Dickenergebnis:
-    """Die duennste Platte -- und die Bewehrungssuche bei ihr."""
-
-    modus: Suchmodus
-    h: Optional[float] = None
-    """Gefundene Dicke in mm -- ``None``: keine gefunden."""
-
-    suche: Optional[Suchergebnis] = None
-    """Die Bewehrungssuche bei der gefundenen Dicke, sonst bei der letzten."""
-
-    versuche: List[Dickenversuch] = field(default_factory=list)
-    begruendung: str = ""
-
-    @property
-    def gefunden(self) -> bool:
-        return self.h is not None
-
-
-def _auf_raster(h: float, *, auf: bool) -> float:
-    teile = h / DICKENRASTER
-    return (math.ceil(teile - 1e-9) if auf else math.floor(teile + 1e-9)) * DICKENRASTER
-
-
-def dicke_suchen(projekt, kennung: str, *, modus: Suchmodus,
-                 **wie) -> Dickenergebnis:
-    """
-    Die duennste Platte auf dem Zentimeter, bei der die Bewehrungssuche eine
-    Loesung findet -- mit allen eingeschalteten Nachweisen, innerhalb der
-    Obergrenze, und mit Duktilitaet, wenn sie eingeschaltet ist.
-
-    Von der eingegebenen Dicke aus: geht es, wird halbiert, bis es nicht mehr
-    geht -- nie unter die Mindestdicke der Platte (``automatik_mindestdicke``);
-    geht schon sie, ist sie das Ergebnis. Geht es nicht, wird verdoppelt, bis
-    es geht -- hoechstens bis :data:`DICKE_HOECHSTENS`. Eine Platte, die
-    duenner eingegeben ist als die Mindestdicke, beginnt bei ihr. Dazwischen
-    Bisektion auf dem Raster. Das setzt
-    voraus, dass es innerhalb einer Verdopplung nur einmal von «geht nicht»
-    zu «geht» wechselt: bei Biegung und Querkraft sicher, bei der
-    Mindestbewehrung, die mit der Dicke waechst, erst bei sehr dicken Platten
-    nicht mehr.
-
-    ``wie`` geht an :func:`suche` (Teilungen, Durchmesser); das Projekt
-    bleibt unberuehrt.
-    """
-    modus = Suchmodus(modus)
-    ergebnis = Dickenergebnis(modus=modus)
-    eintrag = projekt.querschnitt(kennung)
-    duktil = eintrag.duktilitaet
-    geprueft: Dict[float, bool] = {}
-    suchen: Dict[float, Suchergebnis] = {}
-
-    def geht(h: float) -> bool:
-        if h not in geprueft:
-            probe = copy.deepcopy(projekt)
-            probe.querschnitt(kennung).h = h
-            such = suche(probe, kennung, modus=modus.bewehrung, **wie)
-            # Die Suche geht der Duktilitaet aus dem Weg (sie wird mit mehr
-            # Stahl schlechter); hier zaehlt sie, wenn sie eingeschaltet ist --
-            # eine dickere Platte ist das Mittel gegen sie.
-            geprueft[h] = such.gefunden and not (duktil and such.duktilitaet_erfuellt is False)
-            suchen[h] = such
-            ergebnis.versuche.append(Dickenversuch(h, geprueft[h]))
-        return geprueft[h]
-
-    untergrenze = max(_auf_raster(eintrag.automatik_mindestdicke, auf=True), DICKENRASTER)
-    start = max(_auf_raster(eintrag.h, auf=True), untergrenze)
-    if geht(start):
-        oben = start
-        while oben > untergrenze:
-            kandidat = max(_auf_raster(oben / 2.0, auf=False), untergrenze)
-            if not geht(kandidat):
-                unten = kandidat
-                break
-            oben = kandidat
-        else:
-            # Schon die Mindestdicke geht -- duenner darf es nicht werden.
-            unten = oben - DICKENRASTER
-    else:
-        unten = start
-        while True:
-            oben = min(unten * 2.0, DICKE_HOECHSTENS)
-            if oben <= unten:
-                ergebnis.suche = suchen[unten]
-                ergebnis.begruendung = (
-                    f"Bis {DICKE_HOECHSTENS:.0f} mm keine Dicke, bei der alles "
-                    f"aufgeht ({_versuche_text(ergebnis)}).")
-                return ergebnis
-            if geht(oben):
-                break
-            unten = oben
-
-    while oben - unten > DICKENRASTER:
-        mitte = _auf_raster((unten + oben) / 2.0, auf=False)
-        if geht(mitte):
-            oben = mitte
-        else:
-            unten = mitte
-
-    ergebnis.h = oben
-    ergebnis.suche = suchen[oben]
-    ergebnis.begruendung = (f"h = {oben:.0f} mm ({_versuche_text(ergebnis)}). "
-                            + ergebnis.suche.begruendung)
-    return ergebnis
-
-
-def _versuche_text(ergebnis: Dickenergebnis) -> str:
-    """«300 ✓, 150 ✗, 220 ✓» -- die geprueften Dicken in mm, der Reihe nach."""
-    return ", ".join(f"{v.h:.0f} {'✓' if v.geht else '✗'}" for v in ergebnis.versuche)
-
-
-# ===========================================================================
-# Querkraftbewehrung
-# ===========================================================================
-
-@dataclass
-class Buegelloesung:
-    """Was die Suche nach den Buegeln gefunden hat."""
-
-    gefunden: bool = False
-    durchmesser: float = 0.0
-    teilung: float = 0.0
-    """Teilung in beiden Richtungen -- ein Buegelraster ist quadratisch."""
-
-    stahlvolumen: float = 0.0
-    """Buegelquerschnitt je Flaecheneinheit, in mm²/m² -- das Mass, nach dem
-    verglichen wird. Bei Buegeln zaehlt nicht die Flaeche je Streifen, sondern
-    wie dicht sie stehen."""
-
-    begruendung: str = ""
-
-
-def buegel_suchen(projekt, kennung: str, *,
-                  teilungen: Sequence[float] = TEILUNGEN,
-                  durchmesser: Sequence[float] = BUEGELDURCHMESSER) -> Buegelloesung:
-    """
-    Die duennsten Buegel, mit denen der Querkraftnachweis aufgeht.
-
-    Gesucht wird ueber Durchmesser und Rasterweite; das Raster ist quadratisch
-    (``s_x = s_y``), weil eine Platte in beiden Richtungen gleich durchstanzt
-    wird. Verglichen wird ueber den Buegelquerschnitt je Flaecheneinheit --
-    ein dicker Stab weit auseinander kann weniger Stahl sein als ein duenner
-    eng, und teurer ist er trotzdem seltener.
-
-    Geht es ohne Buegel, kommt das heraus: Durchmesser null.
-    """
-    teilungen = sorted(t for t in teilungen if t > 0) or list(TEILUNGEN)
-    durchmesser = sorted(d for d in durchmesser if d > 0) or list(BUEGELDURCHMESSER)
-
-    # Mit der vorhandenen Laengsbewehrung: die Buegel kommen danach, und ohne
-    # statische Hoehe gibt es keinen Querkraftwiderstand.
-    arbeit = _arbeitskopie(projekt, kennung, kraefte=True, leeren=False)
-    eintrag = arbeit.querschnitt(kennung)
-    buegel = eintrag.querkraftbewehrung
-
-    # Erst ohne: was man nicht braucht, soll nicht eingebaut werden.
-    buegel.durchmesser = 0
-    if bewerte(arbeit).erfuellt():
-        return Buegelloesung(
-            gefunden=True, durchmesser=0.0, teilung=0.0,
-            begruendung="Ohne Bügel erfüllt.")
-
-    beste: Optional[Buegelloesung] = None
-    for teilung in teilungen:
-        buegel.abstand_x = teilung
-        buegel.abstand_y = teilung
-        buegel.anzahl_y = None
-        for d in durchmesser:
-            buegel.durchmesser = d
-            if not bewerte(arbeit).erfuellt():
-                continue
-            volumen = math.pi * d * d / 4.0 / (teilung * teilung) * 1e6
-            if beste is None or volumen < beste.stahlvolumen:
-                beste = Buegelloesung(
-                    gefunden=True, durchmesser=d, teilung=teilung,
-                    stahlvolumen=volumen,
-                    begruendung=(f"⌀{d:.0f}@{teilung:.0f} – "
-                                 f"{volumen:.0f} mm²/m²."))
-            break        # Groessere Durchmesser bei derselben Teilung sind
-                         # nur mehr Stahl fuer dieselbe Aussage.
-    if beste is None:
-        return Buegelloesung(begruendung=(
-            "Kein Bügel aus Liste und Teilungen erfüllt den Querkraftnachweis."))
-    return beste
-
-
-def buegel_uebernehmen(projekt, kennung: str, loesung: Buegelloesung) -> None:
-    """Die gefundenen Buegel in die Platte schreiben."""
-    buegel = projekt.querschnitt(kennung).querkraftbewehrung
-    buegel.durchmesser = loesung.durchmesser
-    if loesung.teilung > 0:
-        buegel.abstand_x = loesung.teilung
-        buegel.abstand_y = loesung.teilung
-        buegel.anzahl_y = None
 
 
 def uebernehmen(projekt, kennung: str, loesung: Loesung) -> None:

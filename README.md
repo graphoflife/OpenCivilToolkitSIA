@@ -94,7 +94,7 @@ Fertig und getestet (641 Tests):
 | `nachweis/querschnittsloeser` | Dehnungsebene aus N und M, zwei Bisektionen |
 | `nachweis/` | M-N, Querkraft (mit Bügeln), Duktilität, sprödes Versagen, Zwängung auf Normalkraft und auf Biegung, Stahlspannung unter häufiger (gegen Fliessen) und quasi-ständiger Last (aus der Rissbreite), Knicken am verformten System |
 | `spannungsanalyse.py` | drei Bilder am Querschnitt — kein Nachweis |
-| `bewehrungssuche.py` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt |
+| `bewehrungssuche/` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt – Längsbewehrung, dünnste Platte, Bügel |
 | `bericht/` | der Bericht als Blöcke (`gliederung`), gesetzt als Konsolentext, LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) und Markdown; die Zusammenfassung je Platte |
 | `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `projekt`) und was daraus gebaut wird (`aufbau`) |
 | `ergebnis.py` | ein gerechnetes Projekt: Zusammenfassung, Bericht, LaTeX, Markdown, Analysen |

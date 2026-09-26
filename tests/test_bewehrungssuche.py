@@ -14,6 +14,8 @@ import unittest
 from unittest import mock
 
 from opencivil import bewehrungssuche as suche
+from opencivil.bewehrungssuche.bewertung import arbeitskopie
+from opencivil.bewehrungssuche.laengs import _ueber_grenze
 from opencivil.projekt import KnickEintrag, ObergrenzeEintrag, PostenEintrag, Projekt
 from opencivil.web import dienst
 
@@ -191,7 +193,7 @@ class TestSuche(unittest.TestCase):
         Auch wenn schon etwas eingetragen ist. Das Werkzeug *ermittelt* die
         Bewehrung; es legt nicht zu dem dazu, was zufällig dasteht.
         """
-        kopie = suche._arbeitskopie(platte(), "q1", kraefte=True)
+        kopie = arbeitskopie(platte(), "q1", kraefte=True)
         q = kopie.querschnitt("q1")
         for nummer, lage in enumerate(q.lagen, start=1):
             if q.richtung_von(nummer).value != "x":
@@ -316,7 +318,7 @@ class TestDieEbeneAufDerDieSucheStehenblieb(unittest.TestCase):
 
     def test_der_rueckstand_faellt_auch_wenn_der_schlechteste_steht(self):
         """Die Eigenschaft, auf der das Verfahren beruht -- also geprüft."""
-        projekt = suche._arbeitskopie(self.gleichstand(8.0), "q1", kraefte=False)
+        projekt = arbeitskopie(self.gleichstand(8.0), "q1", kraefte=False)
         q = projekt.querschnitt("q1")
         # Die Arbeitskopie fängt bei null an -- für diesen Test brauchen wir
         # aber genau den Gleichstand, also wird er eigens gesetzt.
@@ -384,7 +386,7 @@ class TestDuktilitaetBleibtDraussen(unittest.TestCase):
         und die Suche zählt nur, was laut ist: sonst suchte sie gegen einen
         Nachweis, gegen den sie kein Mittel hat.
         """
-        kopie = suche._arbeitskopie(platte(), "q1", kraefte=True, leeren=False)
+        kopie = arbeitskopie(platte(), "q1", kraefte=True, leeren=False)
         self.assertFalse(kopie.querschnitt("q1").duktilitaet)
         dukt = [u for u in _urteile(kopie) if u.art == "D"]
         self.assertTrue(dukt)
@@ -451,7 +453,8 @@ class TestYWieX(unittest.TestCase):
                            for y, x in ((1, 2), (4, 3)))
             return bewerte(projekt)
 
-        with mock.patch.object(suche, "bewerte", mitschreiben):
+        # Dort, wo die Suche nachschlägt -- im Modul der Längssuche.
+        with mock.patch("opencivil.bewehrungssuche.laengs.bewerte", mitschreiben):
             suche.suche(self.projekt, "q1",
                         modus=suche.Suchmodus.GRUND_OHNE_ZULAGE_MIT)
         self.assertTrue(gesehen)
@@ -663,7 +666,7 @@ class TestObergrenze(unittest.TestCase):
             with self.subTest(modus=modus.value):
                 fertig = copy.deepcopy(projekt)
                 suche.uebernehmen(fertig, "q1", suche.suche(projekt, "q1", modus=modus).beste)
-                self.assertFalse(suche._ueber_grenze(fertig.querschnitt("q1"),
+                self.assertFalse(_ueber_grenze(fertig.querschnitt("q1"),
                                                      q.automatik_grenze.je_meter))
 
     def test_zu_knapp_heisst_nein_mit_grund(self):

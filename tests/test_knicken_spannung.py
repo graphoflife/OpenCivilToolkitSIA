@@ -429,13 +429,13 @@ class TestGebrauchsfallPruefung(unittest.TestCase):
              if getattr(besitzer, feld)], [])
 
     def test_die_suche_nimmt_dieselbe_regel(self):
-        from opencivil.bewehrungssuche import _arbeitskopie
+        from opencivil.bewehrungssuche.bewertung import arbeitskopie
         from opencivil.projekt import GebrauchsfallEintrag
 
         projekt = Projekt.beispiel()
         projekt.querschnitte[0].quasistaendig.faelle = [
             GebrauchsfallEintrag("Dauer", M_Ed=40.0)]
-        kopie = _arbeitskopie(projekt, "q1", kraefte=False)
+        kopie = arbeitskopie(projekt, "q1", kraefte=False)
         self.assertEqual(kopie.querschnitte[0].quasistaendig.faelle, [])
         self.assertEqual(kopie.querschnitte[0].kombinationen, [])
 
