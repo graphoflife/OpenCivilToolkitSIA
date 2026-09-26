@@ -562,17 +562,12 @@ function gebrauchsfallZeile(querschnitt, feld, wort, index) {
  * Gesucht wird gegen die Nachweise, die eingeschaltet sind. Die Schalter
  * weiter unten steuern damit unmittelbar, wonach gesucht wird.
  */
-/** Ob der gewählte Modus auch die Plattendicke sucht -- das sagt der Kern. */
-function mitDicke(querschnitt) {
-  return (zustand.katalog?.suchmodi || [])
-    .find((m) => m.wert === querschnitt.automatik_modus)?.dicke === true;
-}
-
 export function automatikBlock(querschnitt) {
   const aendern = (veraenderer) => projektAendern((p) => {
     veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
   });
   const quer = querschnitt.automatik_querkraft === true;
+  const dicke = querschnitt.automatik_dicke === true;
 
   // Die Teilungen als Text: «100, 150» liest und tippt sich schneller als
   // eine Liste aus Zahlenfeldern mit Plus- und Minusknöpfen.
@@ -602,7 +597,12 @@ export function automatikBlock(querschnitt) {
       titel: 'Modus. Ohne Kräfte: Duktilität, sprödes Versagen, Riss unter Zwang',
       beiAenderung: (v) => aendern((q) => { q.automatik_modus = v; }),
     }),
-    ...(mitDicke(querschnitt) ? [feld('Mindestdicke', zahlfeld({
+    // Ein Schalter neben dem Modus: je Dicke sucht das Werkzeug im gewählten
+    // Modus. Die Mindestdicke gehört dazu und steht nur dann da.
+    hakenzeile(dicke, (wert) => aendern((q) => {
+      q.automatik_dicke = wert;
+    }), 'Plattendicke optimieren'),
+    ...(dicke ? [feld('Mindestdicke', zahlfeld({
       wert: querschnitt.automatik_mindestdicke ?? 150, schritt: 10, min: 10,
       titel: 'Dünner sucht die Dickenoptimierung keine Platte',
       beiAenderung: (v) => aendern((q) => { q.automatik_mindestdicke = v ?? 150; }),
@@ -674,7 +674,7 @@ function obergrenze(querschnitt, aendern) {
 function automatikLeiste(querschnitt) {
   const kennung = querschnitt.kennung;
   const laeuft = laufendeSuche.has(kennung);
-  const dicke = mitDicke(querschnitt);
+  const dicke = querschnitt.automatik_dicke === true;
   return el('div.automatik-leiste', {}, [
     el('button.knopf.knopf-haupt', {
       class: laeuft ? 'ist-am-suchen' : '',

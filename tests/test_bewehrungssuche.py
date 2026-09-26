@@ -692,7 +692,7 @@ class TestPlattendicke(unittest.TestCase):
 
     def dicke(self, h: float, **abweichungen) -> suche.Dickenergebnis:
         return suche.dicke_suchen(platte(h=h, **abweichungen), "q1",
-                                  modus=suche.Suchmodus.DICKE_GRUND_MIT)
+                                  modus=suche.Suchmodus.GRUND_MIT)
 
     def test_von_oben_und_von_unten_dieselbe(self):
         """Von 300 aus halbiert, von 120 aus verdoppelt -- dazwischen Bisektion."""
@@ -712,19 +712,32 @@ class TestPlattendicke(unittest.TestCase):
         projekt = platte()
         for k in projekt.querschnitt("q1").kombinationen:
             k.M_Ed = 5000.0
-        ergebnis = suche.dicke_suchen(projekt, "q1", modus=suche.Suchmodus.DICKE_GRUND_MIT)
+        ergebnis = suche.dicke_suchen(projekt, "q1", modus=suche.Suchmodus.GRUND_MIT)
         self.assertFalse(ergebnis.gefunden)
         self.assertEqual(max(v.h for v in ergebnis.versuche), suche.DICKE_HOECHSTENS)
         self.assertIn("Bis 2000 mm keine Dicke", ergebnis.begruendung)
 
     def test_der_dienst_uebernimmt_dicke_und_bewehrung(self):
         antwort = dienst.bearbeite("bewehrung_suchen", {
-            "projekt": platte(automatik_modus="dicke_grund_ohne_zulage_mit").als_dict(),
+            "projekt": platte(automatik_modus="grund_ohne_zulage_mit",
+                              automatik_dicke=True).als_dict(),
             "kennung": "q1"}).daten
         fertig = Projekt.aus_dict(antwort["projekt"])
         self.assertTrue(antwort["gefunden"])
         self.assertEqual(fertig.querschnitt("q1").h, antwort["dicke"]["h"])
         self.assertGreaterEqual(schlechtester(fertig), 1.0)
+
+
+    def test_eine_alte_datei_mit_dickenmodus(self):
+        """Die Dicke war einmal ein eigener Modus -- jetzt ein Schalter daneben."""
+        for alt, modus in (("dicke_grund_mit", "grund_mit"),
+                           ("dicke_grund_ohne_zulage_mit", "grund_ohne_zulage_mit")):
+            d = platte().als_dict()
+            d["querschnitte"][0]["automatik_modus"] = alt
+            d["querschnitte"][0].pop("automatik_dicke")
+            q = Projekt.aus_dict(d).querschnitt("q1")
+            with self.subTest(alt=alt):
+                self.assertEqual((q.automatik_modus, q.automatik_dicke), (modus, True))
 
 
 if __name__ == "__main__":

@@ -108,6 +108,13 @@ class QuerschnittEintrag(Beschreibung):
     automatik_modus: str = "grund_ohne_zulage_mit"
     """Wonach das Bewehrungswerkzeug sucht -- siehe ``bewehrungssuche.Suchmodus``."""
 
+    automatik_dicke: bool = False
+    """
+    Ob das Werkzeug dazu die duennste Plattendicke sucht («Plattendicke
+    optimieren»). Ein Schalter neben dem Modus und nicht ein eigener Modus:
+    je Dicke laeuft dieselbe Suche im gewaehlten Modus.
+    """
+
     automatik_y_wie_x: bool = False
     """
     Ob die y-Grundbewehrung jeder Seite der x-Grundbewehrung dieser Seite
@@ -361,6 +368,12 @@ class QuerschnittEintrag(Beschreibung):
         if lagen is None and ("lagen_unten" in d or "lagen_oben" in d):
             lagen = lagen_aus_altem_format(d)
         kennung = pflichtfeld(d, "kennung", "Ein Querschnitt")
+        modus = str(d.get("automatik_modus") or "grund_ohne_zulage_mit")
+        dicke = bool(d.get("automatik_dicke", False))
+        # Altformat: die Dicke war einmal ein eigener Modus, «dicke_grund_mit»
+        # hiess Grundbewehrung mit Kraeften und die Dicke dazu.
+        if modus.startswith("dicke_"):
+            modus, dicke = modus.removeprefix("dicke_"), True
         return cls(
             kennung=kennung,
             name=str(d.get("name") or kennung),
@@ -375,8 +388,8 @@ class QuerschnittEintrag(Beschreibung):
             querkraftbewehrung=QuerkraftbewehrungEintrag.aus_dict(
                 d.get("querkraftbewehrung") or {}),
             duktilitaet=schalter_aus(d.get("duktilitaet")),
-            automatik_modus=str(d.get("automatik_modus")
-                                 or "grund_ohne_zulage_mit"),
+            automatik_modus=modus,
+            automatik_dicke=dicke,
             automatik_y_wie_x=bool(d.get("automatik_y_wie_x", False)),
             automatik_teilungen=teilungen_aus(d.get("automatik_teilungen"),
                                                (150.0,)),

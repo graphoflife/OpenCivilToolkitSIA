@@ -120,7 +120,7 @@ def katalog() -> dict:
             for wert, text in RISSANFORDERUNGEN.items()
         ],
         "suchmodi": [
-            {"wert": m.value, "beschriftung": m.beschriftung, "dicke": m.mit_dicke}
+            {"wert": m.value, "beschriftung": m.beschriftung}
             for m in Suchmodus
         ],
         # Wie weit sich die Grenze x/d hoechstens setzen laesst -- fuer das

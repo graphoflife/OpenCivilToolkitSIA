@@ -101,11 +101,9 @@ class Suchmodus(str, Enum):
     Platte und die Zulage die der Belastung -- getrennt sichtbar.
     """
 
-    DICKE_GRUND_MIT = "dicke_grund_mit"
-    """Die duennste Platte, bei der :attr:`GRUND_MIT` eine Loesung findet."""
-
-    DICKE_GRUND_OHNE_ZULAGE_MIT = "dicke_grund_ohne_zulage_mit"
-    """Dasselbe mit :attr:`GRUND_OHNE_ZULAGE_MIT`."""
+    # Ob dazu die Plattendicke gesucht wird, ist keine vierte Art zu suchen,
+    # sondern ein Schalter daneben (``automatik_dicke``). Als Modus trug es
+    # einmal zwei Bedeutungen, und zwei Eigenschaften trennten sie wieder.
 
     @property
     def beschriftung(self) -> str:
@@ -114,24 +112,7 @@ class Suchmodus(str, Enum):
             Suchmodus.GRUND_MIT: "Grundbew. mit Kräften",
             Suchmodus.GRUND_OHNE_ZULAGE_MIT:
                 "Grundbew. ohne Kräfte, Zulage mit Kräften",
-            Suchmodus.DICKE_GRUND_MIT:
-                "Plattendicke optimieren, Grundbew. mit Kräften",
-            Suchmodus.DICKE_GRUND_OHNE_ZULAGE_MIT:
-                "Plattendicke optimieren, Grundbew. ohne Kräfte, Zulage mit Kräften",
         }[self]
-
-    @property
-    def bewehrung(self) -> "Suchmodus":
-        """Wonach je Dicke die Bewehrung gesucht wird -- sonst der Modus selbst."""
-        return {
-            Suchmodus.DICKE_GRUND_MIT: Suchmodus.GRUND_MIT,
-            Suchmodus.DICKE_GRUND_OHNE_ZULAGE_MIT: Suchmodus.GRUND_OHNE_ZULAGE_MIT,
-        }.get(self, self)
-
-    @property
-    def mit_dicke(self) -> bool:
-        """Ob auch die Plattendicke gesucht wird."""
-        return self.bewehrung is not self
 
 
 #: Ein gesuchter Posten: Lagennummer (1..4) und Art ('grund' oder 'zulage').
@@ -447,8 +428,7 @@ def suche(projekt, kennung: str, *,
     je_art = Stufen.aus(durchmesser, mindestdurchmesser)
 
     for teilung in sorted(teilungen):
-        loesung = _fuer_teilung(projekt, kennung, teilung,
-                                ergebnis.modus.bewehrung, je_art)
+        loesung = _fuer_teilung(projekt, kennung, teilung, ergebnis.modus, je_art)
         ergebnis.loesungen.append(loesung)
 
     gefunden = [l for l in ergebnis.loesungen if l.gefunden]

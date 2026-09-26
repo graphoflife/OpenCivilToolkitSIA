@@ -266,8 +266,8 @@ def dateiname(name: str) -> str:
 
 def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
-    Sucht zu einer Platte die kleinste Bewehrung und gibt sie zurueck -- in den
-    Dicken-Modi auch die duennste Platte dazu.
+    Sucht zu einer Platte die kleinste Bewehrung und gibt sie zurueck -- mit
+    «Plattendicke optimieren» auch die duennste Platte dazu.
 
     Gerechnet, nicht gesetzt: zurueck kommt das gefundene Projekt, und ob die
     Oberflaeche es uebernimmt, entscheidet sie. So bleibt der Knopf ein
@@ -301,7 +301,7 @@ def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     wie = {"teilungen": eintrag.automatik_teilungen,
            "mindestdurchmesser": eintrag.automatik_mindestdurchmesser}
     dicke = None
-    if modus.mit_dicke:
+    if eintrag.automatik_dicke:
         dicke = bewehrungssuche.dicke_suchen(projekt, kennung, modus=modus, **wie)
         ergebnis = dicke.suche or bewehrungssuche.Suchergebnis(modus=modus)
     else:

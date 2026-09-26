@@ -2,9 +2,10 @@
 opencivil/bewehrungssuche/dicke.py -- die duennste Platte suchen.
 
 VERANTWORTUNG:
-Zwei Modi suchen zusaetzlich die Dicke. Je Dicke laeuft dieselbe
-Bewehrungssuche (:func:`~opencivil.bewehrungssuche.laengs.suche`); gesucht
-wird die duennste Platte, bei der sie eine Loesung findet.
+Mit «Plattendicke optimieren» (``automatik_dicke``) wird zusaetzlich die
+Dicke gesucht. Je Dicke laeuft dieselbe Bewehrungssuche
+(:func:`~opencivil.bewehrungssuche.laengs.suche`) im gewaehlten Modus;
+gesucht wird die duennste Platte, bei der sie eine Loesung findet.
 """
 
 from __future__ import annotations
@@ -96,7 +97,7 @@ def dicke_suchen(projekt, kennung: str, *, modus: Suchmodus,
         if h not in geprueft:
             probe = copy.deepcopy(projekt)
             probe.querschnitt(kennung).h = h
-            such = suche(probe, kennung, modus=modus.bewehrung, **wie)
+            such = suche(probe, kennung, modus=modus, **wie)
             # Die Suche geht der Duktilitaet aus dem Weg (sie wird mit mehr
             # Stahl schlechter); hier zaehlt sie, wenn sie eingeschaltet ist --
             # eine dickere Platte ist das Mittel gegen sie.

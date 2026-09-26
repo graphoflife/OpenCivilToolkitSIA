@@ -96,7 +96,8 @@ class TestVollstaendigeAblage(unittest.TestCase):
                     knickfaelle=[KnickEintrag("Stütze", N_Ed=-900.0, M_Ed_1=25.0,
                                               laenge=5.0, knicklaenge=3.5)],
                     spannungsfaelle=[SpannungsfallEintrag("Feld", M_Ed=80.0)],
-                    automatik_modus="grund_mit", automatik_teilungen=[100.0, 200.0],
+                    automatik_modus="grund_mit", automatik_dicke=True,
+                    automatik_teilungen=[100.0, 200.0],
                     automatik_mindestdurchmesser=12.0, automatik_querkraft=True,
                     automatik_y_wie_x=True, automatik_mindestdicke=180.0,
                     automatik_grenze=ObergrenzeEintrag(
