@@ -626,18 +626,22 @@ async function bewehrungErmitteln(kennung) {
   //
   // In y nur die Grundbewehrung, und nur, wenn sie x folgt -- sonst sucht
   // die y-Lagen niemand, und sie bleiben wie eingetragen.
+  let vorher = null;
   projektAendern((p) => {
     const q = p.querschnitte.find((x) => x.kennung === kennung);
     if (!q) return;
+    vorher = q.lagen.map((lage) => [lage.grund.durchmesser, lage.zulage.durchmesser]);
     q.lagen.forEach((lage, i) => {
       const x = richtungVon(q, i + 1) === 'x';
       if (x || q.automatik_y_wie_x) lage.grund.durchmesser = 0;
       if (x) lage.zulage.durchmesser = 0;
     });
   });
+  let gefunden = false;
   try {
     const antwort = await api.bewehrungSuchen(zustand.projekt, kennung);
-    if (antwort.gefunden) {
+    gefunden = antwort.gefunden;
+    if (gefunden) {
       // Der Kern gibt das fertige Projekt zurück; übernommen wird die eine
       // gesuchte Platte, damit die anderen unberührt bleiben.
       projektAendern((p) => {
@@ -646,14 +650,26 @@ async function bewehrungErmitteln(kennung) {
         if (alt >= 0 && neu) p.querschnitte[alt] = neu;
       });
     } else {
-      // Nichts gefunden heisst: die Lagen bleiben, wie sie waren. Das sieht
-      // man nicht von selbst, also sagt es die Meldungszeile oben -- dort,
-      // wo auch sonst steht, was schiefging.
+      // Nichts gefunden heisst: die Lagen kommen zurück, wie sie waren (unten).
+      // Das sieht man nicht von selbst, also sagt es die Meldungszeile oben --
+      // dort, wo auch sonst steht, was schiefging.
       melden(antwort.begruendung, true);
     }
   } catch (fehler) {
     melden(String(fehler.message || fehler), true);
   } finally {
+    // Geleert waren die Lagen nur als Zeichen, dass gesucht wird. Ohne
+    // Ergebnis die Durchmesser von vorher -- wo das Feld noch leer ist; was
+    // jemand inzwischen eingetragen hat, bleibt.
+    if (!gefunden && vorher) {
+      projektAendern((p) => {
+        p.querschnitte.find((x) => x.kennung === kennung)?.lagen.forEach((lage, i) => {
+          const [grund, zulage] = vorher[i];
+          if (!lage.grund.durchmesser) lage.grund.durchmesser = grund;
+          if (!lage.zulage.durchmesser) lage.zulage.durchmesser = zulage;
+        });
+      });
+    }
     // Zuletzt und immer. Hing das Neuzeichnen am Zweig, blieb der Knopf auf
     // «sucht …» stehen, und man musste ein zweites Mal drücken.
     laufendeSuche.delete(kennung);
