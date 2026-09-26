@@ -156,7 +156,7 @@ export function querschnittZeichnen(eintrag, werte) {
   const zahl = (id) => (werte[id] ? werte[id].zahl : null);
   const h = zahl(eintrag.werte.h);
   const b = zahl(eintrag.werte.b);
-  if (!h || !b) return el('div.leer', { text: 'Geometrie noch nicht gerechnet.' });
+  if (!h || !b) return el('div.leer', { text: 'Geometrie fehlt.' });
 
   const BREITE = 660;
   const RAND = { oben: 26, unten: 40, links: 62, rechts: 168 };
@@ -303,7 +303,7 @@ export function querschnittZeichnen(eintrag, werte) {
 export function diagrammZeichnen(linie) {
   const punkte = linie.punkte;
   const hand = linie.handpunkte || [];
-  if (!punkte?.length) return el('div.leer', { text: 'Keine Resistenzlinie vorhanden.' });
+  if (!punkte?.length) return el('div.leer', { text: 'Keine Resistenzlinie.' });
 
   const alleM = [...punkte, ...hand].map((p) => p.M);
   const alleN = [...punkte, ...hand].map((p) => p.N);
@@ -599,8 +599,7 @@ export function querkraftkurveZeichnen(kurve) {
   const faelle = kurve.faelle || [];
   if (!aeste.length) {
     return el('div.leer', {
-      text: 'Bei dieser Normalkraft besteht kein Momentenwiderstand – '
-          + 'die Kurve lässt sich nicht bilden.',
+      text: 'Kein Momentenwiderstand bei diesem N → keine Kurve.',
     });
   }
 
@@ -748,7 +747,7 @@ export function neigungskurveZeichnen(kurve) {
   const punkte = kurve.punkte || [];
   const faelle = kurve.faelle || [];
   if (punkte.length < 2) {
-    return el('div.leer', { text: 'Kein Neigungsbereich, in dem sich rechnen liesse.' });
+    return el('div.leer', { text: 'Kein Neigungsbereich.' });
   }
 
   const BUEGEL = '#1f5fa8';

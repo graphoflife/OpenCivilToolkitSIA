@@ -1527,8 +1527,7 @@ Plattenanalyse: Ohne x
 Ohne Bewehrung – x-Richtung
 ---------------------------
 
-In x-Richtung ist keine Bewehrung definiert. Der Widerstand der Handrechnung ist damit null, der
-Nachweis nicht erfüllt.
+Keine Bewehrung in x-Richtung → Widerstand 0, nicht erfüllt.
 
 ====================================================================================================
 Formelsammlung
@@ -1998,8 +1997,8 @@ Bewehrung von oben nach unten
     Stahlspannung gegen Fliessen  Stütze (70 %)                                                        \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_{s,x} = 248\,\mathrm{N}/\mathrm{mm}^{2}          1.43
     Stahlspannung gegen Fliessen  Gebrauch                                                             \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2}          2.03
     Knicken                       Wand                                                                                   N_{Rd,K} = 3900.6\,\mathrm{kN}                     N_{Ed} = 800.0\,\mathrm{kN}          4.88
-[!] Warnung: Zwängung auf Normalkraft – 3. Lage: nicht erfüllt. A_s = 754 mm² bei σ_s,adm = 466
-N/mm² ergibt N_s,adm = 351.6 kN gegen N_Riss = 378.3 kN.
+[!] Warnung: Zwängung auf Normalkraft – 3. Lage: nicht erfüllt. N_s,adm = 754 mm² · 466 N/mm² =
+351.6 kN < N_Riss = 378.3 kN.
 
 Dach
 ----
@@ -2024,14 +2023,11 @@ Bewehrung von oben nach unten
     Querkraft                     Feld          V_{Rd,x}(M_{Ed} = 40\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 83.2\,\mathrm{kN}/\mathrm{m}  V_{Ed,x} = 40.0\,\mathrm{kN}/\mathrm{m}          2.08
     Querkraft                     Rand         V_{Rd,x}(M_{Ed} = 10\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 110.7\,\mathrm{kN}/\mathrm{m}  V_{Ed,x} = 30.0\,\mathrm{kN}/\mathrm{m}          3.69
     Stahlspannung aus Rissbreite  Dauerlast                                                             \varepsilon_{s,adm} = 2.50\,\text{‰}       \varepsilon_{s,x} = 4.67\,\text{‰}          0.54
-[!] Warnung: Biegung und Normalkraft – Feld: nicht erfüllt. Bei festgehaltenem N_Ed = 0 kN beträgt
-der Momentenwiderstand M_Rd = 18.1 kNm.
-[!] Warnung: Stahlspannung aus Rissbreite – Dauerlast: nicht erfüllt. Gerissener Querschnitt: ε_m =
-2.3198 ‰, χ = 0.03612 1/m. Die Bewehrung fliesst: ε_s = 4.67 ‰ über der Fliessdehnung 2.50 ‰, gegen
-ε_s,adm = 2.50 ‰ aus σ_s,adm = 500 N/mm².
-[i] Hinweis: Zwängung auf Normalkraft – 1. Lage: nicht erfüllt (α_eff = 0.99). Dieser Nachweis ist
-ausgeschaltet und steht nicht in der Herleitung. A_s = 262 mm² bei σ_s,adm = 500 N/mm² ergibt
-N_s,adm = 130.9 kN gegen N_Riss = 131.8 kN.
+[!] Warnung: Biegung und Normalkraft – Feld: nicht erfüllt. M_Rd = 18.1 kNm bei N_Ed = 0 kN.
+[!] Warnung: Stahlspannung aus Rissbreite – Dauerlast: nicht erfüllt. ε_m = 2.3198 ‰, χ = 0.03612
+1/m. Stahl fliesst (ε_s = 4.67 ‰ > ε_y = 2.50 ‰): ε_s > ε_s,adm = 2.50 ‰.
+[i] Hinweis: Zwängung auf Normalkraft – 1. Lage: nicht erfüllt (α_eff = 0.99), ausgeschaltet.
+N_s,adm = 262 mm² · 500 N/mm² = 130.9 kN < N_Riss = 131.8 kN.
 
 Ohne x
 ------
@@ -2053,8 +2049,8 @@ Bewehrung von oben nach unten
     -----------------------  -----------  --------------------------------------  ---------------------------------------  ------------
     Biegung und Normalkraft  Feld                   M_{Rd,x} = 0.0\,\mathrm{kNm}            M_{Ed,x} = 30.0\,\mathrm{kNm}          0.00
     Querkraft                Feld         V_{Rd,x} = 0.0\,\mathrm{kN}/\mathrm{m}  V_{Ed,x} = 20.0\,\mathrm{kN}/\mathrm{m}          0.00
-[i] Hinweis: Biegung und Normalkraft – Feld, Querkraft – Feld: In x-Richtung ist keine Bewehrung
-definiert. Der Widerstand der Handrechnung ist damit null, der Nachweis nicht erfüllt.
+[i] Hinweis: Biegung und Normalkraft – Feld, Querkraft – Feld: Keine Bewehrung in x-Richtung →
+Widerstand 0, nicht erfüllt.
 
 Konsole
 -------

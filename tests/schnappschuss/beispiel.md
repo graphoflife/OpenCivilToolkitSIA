@@ -686,7 +686,7 @@ $$
 | Biegung und Normalkraft | Feld mit Druck | $M_{Rd,x}(N_{Ed} = -300\,\mathrm{kN}) = 253.8\,\mathrm{kNm}$ | $M_{Ed,x} = 100.0\,\mathrm{kNm}$ | $2.54$ |
 | Biegung und Normalkraft | Stütze | $M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = -79.9\,\mathrm{kNm}$ | $M_{Ed,x} = -50.0\,\mathrm{kNm}$ | $1.60$ |
 
-> **Hinweis:** Zwängung auf Normalkraft – 3. Lage: nicht erfüllt (α\_eff = 0.996). Dieser Nachweis ist ausgeschaltet und steht nicht in der Herleitung. A\_s = 754 mm² bei σ\_s,adm = 500 N/mm² ergibt N\_s,adm = 377.0 kN gegen N\_Riss = 378.3 kN.
+> **Hinweis:** Zwängung auf Normalkraft – 3. Lage: nicht erfüllt (α\_eff = 0.996), ausgeschaltet. N\_s,adm = 754 mm² · 500 N/mm² = 377.0 kN \< N\_Riss = 378.3 kN.
 
 Alle geführten Nachweise sind erfüllt.
 

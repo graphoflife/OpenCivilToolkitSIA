@@ -207,8 +207,7 @@ def stiller_hinweis(zeile: Zeile) -> str:
     grad = zeile.urteil.gradtext()
     satz = (f"{zeile.bezeichnung}: nicht erfüllt"
             + (f" (α_eff = {grad})" if grad else "")
-            + ". Dieser Nachweis ist ausgeschaltet und steht nicht in der "
-              "Herleitung.")
+            + ", ausgeschaltet.")
     return f"{satz} {zeile.urteil.begruendung}".rstrip()
 
 

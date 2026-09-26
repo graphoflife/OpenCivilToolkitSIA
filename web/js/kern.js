@@ -53,12 +53,11 @@ async function quellenEinhaengen(pyodide) {
   const antwort = await fetch(MANIFEST);
   if (!antwort.ok) {
     throw new KernFehler(
-      `Das Verzeichnis der Kerndateien fehlt (${antwort.status}). ` +
-      'Wurde "python3 -m opencivil.web.bruecke" je ausgeführt?');
+      `Kernverzeichnis fehlt (${antwort.status}) → «python3 -m opencivil.web.bruecke».`);
   }
   const { dateien } = await antwort.json();
   if (!Array.isArray(dateien) || !dateien.length) {
-    throw new KernFehler('Das Verzeichnis der Kerndateien ist leer.');
+    throw new KernFehler('Kernverzeichnis leer.');
   }
 
   // Erst alle holen, dann alle schreiben: die Anfragen laufen so nebeneinander
@@ -92,8 +91,8 @@ export async function kernStarten(fortschritt = () => {}) {
     ({ loadPyodide } = await import(new URL('pyodide.mjs', PYODIDE).href));
   } catch (ursache) {
     throw new KernFehler(
-      'Pyodide liess sich nicht laden. Fehlt web/vendor/pyodide? ' +
-      'Dann hilft "python3 werkzeug/pyodide_holen.py".', String(ursache));
+      'Pyodide nicht ladbar. Fehlt web/vendor/pyodide? → '
+      + '«python3 werkzeug/pyodide_holen.py».', String(ursache));
   }
 
   const pyodide = await loadPyodide({
@@ -117,7 +116,7 @@ if ${JSON.stringify(EINHAENGEPUNKT)} not in sys.path:
     dienst = pyodide.pyimport('opencivil.web.dienst');
   } catch (ursache) {
     throw new KernFehler(
-      'Der Rechenkern liess sich nicht einbinden.', String(ursache));
+      'Rechenkern nicht einbindbar.', String(ursache));
   }
 
   const fassung = pyodide.runPython('import sys; sys.version.split()[0]');
@@ -139,7 +138,7 @@ if ${JSON.stringify(EINHAENGEPUNKT)} not in sys.path:
     } catch (ursache) {
       // Hierher kommt nur, was bearbeite_json selbst umbringt -- der Dienst
       // fängt sonst alles ab und gibt es als Antwort zurück.
-      throw new KernFehler(`Der Rechenkern brach ab: ${ursache}`, String(ursache));
+      throw new KernFehler(`Rechenkern abgebrochen: ${ursache}`, String(ursache));
     }
 
     const umschlag = JSON.parse(roh);

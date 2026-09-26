@@ -2406,7 +2406,7 @@ $$
 
 ### Ohne Bewehrung – x-Richtung
 
-In x-Richtung ist keine Bewehrung definiert. Der Widerstand der Handrechnung ist damit null, der Nachweis nicht erfüllt.
+Keine Bewehrung in x-Richtung → Widerstand 0, nicht erfüllt.
 
 ## Formelsammlung
 
@@ -3033,7 +3033,7 @@ $$
 | Stahlspannung gegen Fliessen | Gebrauch | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2}$ | $2.03$ |
 | Knicken | Wand | $N_{Rd,K} = 3900.6\,\mathrm{kN}$ | $N_{Ed} = 800.0\,\mathrm{kN}$ | $4.88$ |
 
-> **Warnung:** Zwängung auf Normalkraft – 3. Lage: nicht erfüllt. A\_s = 754 mm² bei σ\_s,adm = 466 N/mm² ergibt N\_s,adm = 351.6 kN gegen N\_Riss = 378.3 kN.
+> **Warnung:** Zwängung auf Normalkraft – 3. Lage: nicht erfüllt. N\_s,adm = 754 mm² · 466 N/mm² = 351.6 kN \< N\_Riss = 378.3 kN.
 
 ### Dach
 
@@ -3062,11 +3062,11 @@ $$
 | Querkraft | Rand | $V_{Rd,x}(M_{Ed} = 10\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 110.7\,\mathrm{kN}/\mathrm{m}$ | $V_{Ed,x} = 30.0\,\mathrm{kN}/\mathrm{m}$ | $3.69$ |
 | Stahlspannung aus Rissbreite | Dauerlast | $\varepsilon_{s,adm} = 2.50\,\text{‰}$ | $\varepsilon_{s,x} = 4.67\,\text{‰}$ | $0.54$ |
 
-> **Warnung:** Biegung und Normalkraft – Feld: nicht erfüllt. Bei festgehaltenem N\_Ed = 0 kN beträgt der Momentenwiderstand M\_Rd = 18.1 kNm.
+> **Warnung:** Biegung und Normalkraft – Feld: nicht erfüllt. M\_Rd = 18.1 kNm bei N\_Ed = 0 kN.
 
-> **Warnung:** Stahlspannung aus Rissbreite – Dauerlast: nicht erfüllt. Gerissener Querschnitt: ε\_m = 2.3198 ‰, χ = 0.03612 1/m. Die Bewehrung fliesst: ε\_s = 4.67 ‰ über der Fliessdehnung 2.50 ‰, gegen ε\_s,adm = 2.50 ‰ aus σ\_s,adm = 500 N/mm².
+> **Warnung:** Stahlspannung aus Rissbreite – Dauerlast: nicht erfüllt. ε\_m = 2.3198 ‰, χ = 0.03612 1/m. Stahl fliesst (ε\_s = 4.67 ‰ \> ε\_y = 2.50 ‰): ε\_s \> ε\_s,adm = 2.50 ‰.
 
-> **Hinweis:** Zwängung auf Normalkraft – 1. Lage: nicht erfüllt (α\_eff = 0.99). Dieser Nachweis ist ausgeschaltet und steht nicht in der Herleitung. A\_s = 262 mm² bei σ\_s,adm = 500 N/mm² ergibt N\_s,adm = 130.9 kN gegen N\_Riss = 131.8 kN.
+> **Hinweis:** Zwängung auf Normalkraft – 1. Lage: nicht erfüllt (α\_eff = 0.99), ausgeschaltet. N\_s,adm = 262 mm² · 500 N/mm² = 130.9 kN \< N\_Riss = 131.8 kN.
 
 ### Ohne x
 
@@ -3092,7 +3092,7 @@ $$
 | Biegung und Normalkraft | Feld | $M_{Rd,x} = 0.0\,\mathrm{kNm}$ | $M_{Ed,x} = 30.0\,\mathrm{kNm}$ | $0.00$ |
 | Querkraft | Feld | $V_{Rd,x} = 0.0\,\mathrm{kN}/\mathrm{m}$ | $V_{Ed,x} = 20.0\,\mathrm{kN}/\mathrm{m}$ | $0.00$ |
 
-> **Hinweis:** Biegung und Normalkraft – Feld, Querkraft – Feld: In x-Richtung ist keine Bewehrung definiert. Der Widerstand der Handrechnung ist damit null, der Nachweis nicht erfüllt.
+> **Hinweis:** Biegung und Normalkraft – Feld, Querkraft – Feld: Keine Bewehrung in x-Richtung → Widerstand 0, nicht erfüllt.
 
 ### Konsole
 

@@ -546,7 +546,7 @@ class TestKnicken(unittest.TestCase):
             KnickEintrag("Zug", N_Ed=200.0, M_Ed_1=20.0, laenge=4.0, knicklaenge=4.0)))
         urteil = gefunden["Knicken – Zug"]
         self.assertTrue(urteil.erfuellt)
-        self.assertIn("setzt eine Druckkraft voraus", urteil.hinweis)
+        self.assertIn("kein Druck → kein Knicknachweis", urteil.hinweis)
 
     def test_ohne_knickfall_laeuft_er_nicht(self):
         aufbau, gefunden = urteile(Projekt.beispiel())

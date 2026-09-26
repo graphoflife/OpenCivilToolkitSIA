@@ -170,7 +170,7 @@ class TestNachweis(unittest.TestCase):
         _, gefunden = urteile(projekt)
         urteil = gefunden[f"Rissnormalkraft x – {obere}. Lage"]
         self.assertFalse(urteil.erfuellt)
-        self.assertIn("nicht machbar", urteil.hinweis)
+        self.assertIn("ohne Bewehrung → kein Nachweis", urteil.hinweis)
         self.assertIsNone(urteil.einwirkung)
         self.assertIsNone(urteil.widerstand)
 
@@ -360,7 +360,7 @@ class TestZwaengungBiegung(unittest.TestCase):
         _, gefunden = urteile(projekt)
         urteil = gefunden[f"Zwängung Biegung x – {obere}. Lage"]
         self.assertFalse(urteil.erfuellt)
-        self.assertIn("nicht machbar", urteil.hinweis)
+        self.assertIn("ohne Bewehrung → kein Nachweis", urteil.hinweis)
         self.assertIsNone(urteil.einwirkung)
 
     def test_zu_wenig_bewehrung_faellt_durch(self):

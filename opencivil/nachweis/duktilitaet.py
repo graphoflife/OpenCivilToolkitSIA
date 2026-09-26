@@ -240,9 +240,7 @@ class Duktilitaet(Nachweis):
         erg.a_s = sum(a for a, _ in flaechen)
         if erg.a_s <= 0.0:
             erg.begruendung = erg.hinweis = (
-                f"Nachweis nicht machbar, weil die {lage.nummer}. Lage nicht "
-                f"definiert ist. Ohne Bewehrung gibt es keine Druckzone, "
-                f"deren Höhe sich begrenzen liesse.")
+                f"{lage.nummer}. Lage ohne Bewehrung → kein Nachweis.")
             return erg
 
         # Grundbewehrung und Zulage liegen auf leicht verschiedenen Hoehen --
@@ -262,9 +260,8 @@ class Duktilitaet(Nachweis):
         erg.erfuellungsgrad = (
             float("inf") if erg.verhaeltnis == 0 else GRENZE / erg.verhaeltnis)
         erg.begruendung = (
-            f"x = {erg.x * 1e3:.1f} mm bei d = {erg.d * 1e3:.1f} mm, "
-            f"also x/d = {erg.verhaeltnis:.3f} "
-            f"{'≤' if erg.erfuellt else '>'} {GRENZE:.2f}.")
+            f"x/d = {erg.x * 1e3:.1f} mm / {erg.d * 1e3:.1f} mm = "
+            f"{erg.verhaeltnis:.3f} {'≤' if erg.erfuellt else '>'} {GRENZE:.2f}.")
         return erg
 
     def _urteil(self, erg: Lagenergebnis) -> NachweisUrteil:

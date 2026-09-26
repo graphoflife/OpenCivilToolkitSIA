@@ -163,7 +163,7 @@ class TestNachweis(unittest.TestCase):
         aufbau, gefunden = urteile(projekt)
         urteil = gefunden[f"Duktilität – {untere}. Lage"]
         self.assertFalse(urteil.erfuellt)
-        self.assertIn(f"nicht machbar, weil die {untere}. Lage nicht definiert",
+        self.assertIn(f"{untere}. Lage ohne Bewehrung → kein Nachweis",
                       urteil.hinweis)
         # Ohne Verhaeltnis gibt es nichts zu vergleichen -- dann steht dort ein
         # Strich und nicht eine erfundene Null.
@@ -286,7 +286,7 @@ class TestInDerZusammenfassung(unittest.TestCase):
         betroffen = next(z for z in zeilen
                          if z["zellen"][0] == {"text": "Duktilität"})
         self.assertEqual(betroffen["zellen"][1], {"text": f"{untere}. Lage"})
-        self.assertIn("nicht machbar", betroffen["hinweis"])
+        self.assertIn("ohne Bewehrung → kein Nachweis", betroffen["hinweis"])
         # Widerstand und Einwirkung sind Striche, keine erfundenen Nullen.
         self.assertEqual(betroffen["zellen"][2], {"text": "–"})
         self.assertEqual(betroffen["zellen"][3], {"text": "–"})

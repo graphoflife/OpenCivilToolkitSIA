@@ -215,9 +215,8 @@ export function spannungsfallZeichnen(fall) {
       ]),
       k.punkte.length ? momentenlinie(k) : null,
       el('p.sd-legende', {
-        text: 'Durchgezogen: mit Zugversteifung. Lang gestrichelt: ungerissen '
-          + '(Zustand I). Kurz gestrichelt: gerissen ohne Betonzugfestigkeit '
-          + '(Zustand II).',
+        text: 'Durchgezogen: mit Zugversteifung · lang gestrichelt: ungerissen (I) '
+          + '· kurz gestrichelt: gerissen, ohne f_ct (II)',
       }),
       k.hinweis ? el('p.hinweis', { text: k.hinweis }) : null,
     ]);

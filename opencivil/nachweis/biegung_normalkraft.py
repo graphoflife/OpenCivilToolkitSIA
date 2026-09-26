@@ -518,8 +518,7 @@ class BiegungNormalkraft(Nachweis):
         if not gueltig:
             return Auswertung(
                 kombination, innerhalb, 0.0, None,
-                "In dieser Richtung schneidet die Resistenzlinie nicht – die "
-                "Einwirkung liegt ganz ausserhalb des aufnehmbaren Bereichs.",
+                "Kein Schnitt mit der Resistenzlinie → Einwirkung ausserhalb.",
                 massstab=(Erfuellungsart.NORMALKRAFT_KONSTANT
                           if art is Erfuellungsart.AUTOMATISCH else art))
         return min(gueltig, key=lambda g: g.erfuellungsgrad)
@@ -547,11 +546,8 @@ class BiegungNormalkraft(Nachweis):
         return Auswertung(
             kombination, innerhalb, grad,
             widerstand=(ed.N, rd) if achse is geo.MOMENT else (rd, ed.M),
-            begruendung=(
-                f"Bei festgehaltenem {achse.gegen.name}_Ed = "
-                f"{_in(fest, achse.gegen)} beträgt der "
-                f"{achse.widerstand} {achse.name}_Rd = "
-                f"{_in(rd, achse)}."),
+            begruendung=(f"{achse.name}_Rd = {_in(rd, achse)} bei "
+                         f"{achse.gegen.name}_Ed = {_in(fest, achse.gegen)}."),
             achse=achse, ed=gesucht, rd=rd,
             massstab=MASSSTAB[achse.name],
             kante=(a, b))
@@ -571,9 +567,8 @@ class BiegungNormalkraft(Nachweis):
         grad = float("inf") if laenge == 0 else rand / laenge
         return Auswertung(
             kombination, innerhalb, grad, stelle,
-            f"Kürzester Abstand zur Resistenzlinie im normierten Diagramm: "
-            f"{abstand:.3f}. Nächster Punkt: N = {_in(stelle[0], geo.NORMALKRAFT)}, "
-            f"M = {_in(stelle[1], geo.MOMENT)}.",
+            f"Kürzester Abstand (normiert) a = {abstand:.3f}; nächster Punkt "
+            f"N = {_in(stelle[0], geo.NORMALKRAFT)}, M = {_in(stelle[1], geo.MOMENT)}.",
             achse=geo.MOMENT, ed=M_Ed, rd=stelle[1],
             massstab=Erfuellungsart.NAECHSTER_PUNKT,
             normierung=Normierung(N_ref, M_ref, laenge, abstand, rand))

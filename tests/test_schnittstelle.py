@@ -636,7 +636,7 @@ class TestOhneBewehrungInX(unittest.TestCase):
             self.assertFalse(zeile["erfuellt"])
             self.assertEqual(zeile["zellen"][4], {"mathe": "0.00"})
             self.assertIn("0.0", zeile["zellen"][2]["mathe"])    # M_Rd = 0
-            self.assertIn("keine Bewehrung definiert", zeile["hinweis"])
+            self.assertIn("Keine Bewehrung in x-Richtung", zeile["hinweis"])
 
     def test_die_einwirkung_steht_trotzdem_da(self):
         """Ohne sie bliebe unklar, wogegen der Widerstand null nicht reicht."""

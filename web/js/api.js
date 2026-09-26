@@ -40,7 +40,7 @@ async function ueberHttp(name, rumpf = {}) {
       body: JSON.stringify(rumpf),
     });
   } catch (ursache) {
-    throw new KernFehler('Der Rechenkern ist nicht erreichbar.', String(ursache));
+    throw new KernFehler('Rechenkern nicht erreichbar.', String(ursache));
   }
 
   const text = await antwort.text();
@@ -109,7 +109,7 @@ export async function kernBereitstellen(fortschritt = () => {}) {
 
 function ruf(name, rumpf) {
   if (kern === null) {
-    throw new KernFehler('Der Rechenkern ist noch nicht bereit.');
+    throw new KernFehler('Rechenkern noch nicht bereit.');
   }
   // Der Server antwortet mit einem Versprechen, Pyodide unmittelbar --
   // Promise.resolve bügelt den Unterschied glatt, damit die Oberfläche

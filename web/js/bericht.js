@@ -55,7 +55,7 @@ function werkzeugleiste(block) {
       await (tabelle
         ? kopiereTabelleFuerWord(block.kopf, block.zeilen)
         : kopiereFuerWord(block.latex));
-      melden(`${was} kopiert – in Word mit Strg+V einfügen.`);
+      melden(`${was} kopiert → in Word Strg+V.`);
     }),
     werkzeugKnopf('TeX', 'LaTeX-Quelltext kopieren', async () => {
       await kopiereText(block.latex);
@@ -223,7 +223,7 @@ function lueckenBanner(loesung) {
   if (!loesung.fehlende?.length) return null;
   return el('div', { class: 'abstand-oben' }, [
     el('div.b-titel', { text: 'Fehlende Eingaben' }),
-    el('p.b-text', { text: 'Damit weitergerechnet werden kann, werden gebraucht:' }),
+    el('p.b-text', { text: 'Es fehlen:' }),
     ...loesung.fehlende.map((f) => el('div.luecke', {}, [
       el('div', {}, [
         el('b', { text: f.beschreibung }),
@@ -270,16 +270,15 @@ function herleitung(gesamt) {
   const verfolgung = zustand.verfolgung;
   const loesung = verfolgung?.loesung || gesamt;
   if (!loesung.protokoll?.length) {
-    return leerzustand('Noch nichts gerechnet.', 'Oben auf "Rechnen" klicken.');
+    return leerzustand('Noch nichts gerechnet.', 'Oben «Rechnen».');
   }
   const raum = verfolgung ? null : eingrenzung();
   if (!verfolgung && zustand.umfang === 'seite' && !raum) {
-    return leerzustand('Nichts ausgewählt.',
-      'Links einen Bestandteil wählen – oder oben auf "Gesamt" umschalten.');
+    return leerzustand('Nichts ausgewählt.', 'Links Bestandteil wählen oder oben «Gesamt».');
   }
   const bloecke = nurAbschnitt(loesung.protokoll, raum);
   if (!bloecke.length) {
-    return leerzustand('Für diesen Bestandteil wurde nichts gerechnet.');
+    return leerzustand('Nichts gerechnet für diesen Bestandteil.');
   }
 
   return el('div.blatt', {}, [
@@ -309,8 +308,7 @@ function herleitung(gesamt) {
 function formelsammlung(loesung) {
   const raum = eingrenzung();
   if (zustand.umfang === 'seite' && !raum) {
-    return leerzustand('Nichts ausgewählt.',
-      'Links einen Bestandteil wählen – oder oben auf "Gesamt" umschalten.');
+    return leerzustand('Nichts ausgewählt.', 'Links Bestandteil wählen oder oben «Gesamt».');
   }
   const dabei = (eintrag) => !raum || eintrag.raeume.some((r) => imRaum(raum, r));
   const themen = (loesung.formelsammlung || []).map((t) => ({
@@ -340,12 +338,11 @@ function zusammenfassung(loesung, verfolgen) {
   const gezeigt = Object.entries(querschnitte).filter(
     ([, eintrag]) => imRaum(raum, eintrag.namensraum));
   if (raum && !gezeigt.length) {
-    return leerzustand('Kein Querschnitt gewählt.',
-      'Links eine Platte wählen – oder oben auf "Gesamt" umschalten.');
+    return leerzustand('Keine Platte gewählt.', 'Links Platte wählen oder oben «Gesamt».');
   }
   if (!gezeigt.length) {
     return el('div.blatt', {}, [
-      leerzustand('Kein Querschnitt vorhanden.'),
+      leerzustand('Keine Platte vorhanden.'),
       lueckenBanner(loesung),
     ]);
   }
@@ -384,7 +381,7 @@ function zusammenfassung(loesung, verfolgen) {
           // steht es hier -- leise, denn geführt wird er ja nicht.
           ...(tabelle.stille || []).map((s) => el('p.stiller-hinweis', { text: s.text })),
         ])
-        : el('div.leer', { text: 'Für diese Platte wurde kein Nachweis gerechnet.' }),
+        : el('div.leer', { text: 'Kein Nachweis gerechnet.' }),
       plattenkennzahlen(eintrag, loesung),
     ]);
   });
@@ -628,13 +625,12 @@ function querkraftkurven(loesung, querschnitt) {
       el('span.kurvenfuss-name', { text: 'gilt für N_Ed =' }),
       zahlfeld({
         wert: kurve.N_Ed, schritt: 50,
-        titel: 'Normalkraft in kN – Zug positiv. Nur Bemessungspunkte mit '
-             + 'genau dieser Normalkraft liegen auf dieser Kurve.',
+        titel: 'N in kN, Zug positiv. Nur Punkte mit genau diesem N liegen auf der Kurve.',
         beiAenderung: (v) => normalkraftWaehlen(kennung, v ?? 0),
       }),
       el('span.einheit', { text: 'kN' }),
       el('span.kurvenhinweis', {
-        text: 'Punkte mit abweichender Normalkraft sind blass gezeichnet.',
+        text: 'Blass: Punkte mit anderem N.',
       }),
     ]),
   ]);
@@ -709,7 +705,7 @@ export function berichtZeichnen(behaelter, { verfolgen }) {
   if (!loesung) {
     return ersetzen(behaelter, leerzustand(
       'Noch nichts gerechnet.',
-      'Oben auf "Rechnen" klicken.'));
+      'Oben «Rechnen».'));
   }
 
   const sichten = {

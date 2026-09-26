@@ -335,8 +335,7 @@ def _platte(eintrag: QuerschnittEintrag, aufbau: Aufbau, eintragen: Eintragen,
                 querschnitt, richtung, _ausgefallene(aktiv, richtung)))
         if eintrag.knickfaelle:
             aufbau.warnungen.append(
-                f"Platte '{eintrag.name}': Knicken braucht Bewehrung in "
-                f"x-Richtung; ohne sie entfällt der Nachweis.")
+                f"Platte '{eintrag.name}': ohne x-Bewehrung kein Knicknachweis.")
     else:
         # Der M-N-Nachweis entsteht auch ohne Schnittgroessen: seine
         # Eckwerte gehoeren dem Querschnitt, nicht der Einwirkung, und der
@@ -381,8 +380,8 @@ def _platte(eintrag: QuerschnittEintrag, aufbau: Aufbau, eintragen: Eintragen,
 
     if not eintrag.kombinationen:
         aufbau.warnungen.append(
-            f"Platte '{eintrag.name}': keine Schnittgrössen angegeben, "
-            f"also kein Tragsicherheitsnachweis möglich.")
+            f"Platte '{eintrag.name}': keine Schnittgrössen → kein "
+            f"Tragsicherheitsnachweis.")
 
 
 def _lagennachweise(eintrag: QuerschnittEintrag, querschnitt: Plattenquerschnitt,
@@ -658,8 +657,8 @@ def _ueberschreibungen_setzen(projekt: "Projekt", werk: Rechenwerk,
         for kurzname, zahl in eintrag.ueberschreibungen.items():
             if kurzname not in baustoff.definitionen:
                 aufbau.warnungen.append(
-                    f"Material '{baustoff.name}': Kennwert '{kurzname}' ist "
-                    f"unbekannt, die Überschreibung wird übergangen.")
+                    f"Material '{baustoff.name}': Kennwert '{kurzname}' unbekannt "
+                    f"→ Überschreibung übergangen.")
                 continue
             definition = baustoff.definition(kurzname)
             werk.setze(definition.id, Groesse(zahl, definition.einheit))

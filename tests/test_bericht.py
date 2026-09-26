@@ -314,7 +314,8 @@ class TestStilleNachweiseImBericht(unittest.TestCase):
         self.assertRegex(text, r"\[i\] Hinweis: Zwängung auf Normalkraft – \d\. Lage: "
                                r"nicht erfüllt")
         # Die Konsole bricht den Satz um; verglichen wird der Wortlaut.
-        self.assertIn("Dieser Nachweis ist ausgeschaltet", " ".join(text.split()))
+        self.assertRegex(" ".join(text.split()),
+                         r"nicht erfüllt \(α_eff = [\d.]+\), ausgeschaltet\.")
 
     def test_das_latex_dokument_widerspricht_sich_nicht(self):
         tex = self.tex()
@@ -514,7 +515,7 @@ class TestBerichtWieBildschirm(unittest.TestCase):
     def test_was_nicht_aufgeht_steht_mit_begruendung_darunter(self):
         """Auf Papier gibt es weder rote Zeilen noch Tooltips."""
         self.assertIn("[!] Warnung: Biegung und Normalkraft – Feld: nicht erfüllt. "
-                      "Bei festgehaltenem N_Ed = 0 kN", self.text)
+                      "M_Rd = ", self.text)
         # Die Platte ohne Bewehrung erklaert schon der gebuendelte Hinweis.
         self.assertNotIn("Querkraft – Feld: nicht erfüllt.", self.text)
 

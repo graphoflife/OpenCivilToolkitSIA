@@ -706,7 +706,7 @@ class TestErfuellungsgrad(unittest.TestCase):
 
     def test_begruendung_nennt_den_widerstand(self):
         nachweis, loesung = self._pruefe([Schnittgroessen("Feld", M_Ed=Groesse(100, KNM))])
-        self.assertIn("Momentenwiderstand", loesung.urteile[0].begruendung)
+        self.assertTrue(loesung.urteile[0].begruendung.startswith("M_Rd = "))
 
     def test_normalkraft_ausserhalb_ist_nicht_erfuellt(self):
         nachweis, loesung = self._pruefe(

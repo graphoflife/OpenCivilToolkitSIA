@@ -91,7 +91,7 @@ function kennwertZeile(material, vorlage) {
 
   const zuruecksetzen = (istAbweichend && !vorlage.berechnet && !gesperrt)
     ? el('button.knopf.knopf-zart', {
-      text: '↺', title: 'Auf den Sorten- bzw. Normwert zurücksetzen',
+      text: '↺', title: 'Sortenwert zurücksetzen',
       on: {
         click: () => projektAendern((p) => {
           delete p.materialien.find((x) => x.kennung === material.kennung)
@@ -124,12 +124,11 @@ function materialEditor(material) {
     ? el('div.gesperrt-hinweis', {}, [
       el('div', { style: { flex: '1 1 220px' } }, [
         el('b', { text: `Normsorte ${material.sorte}` }),
-        'Sämtliche Kennwerte stammen aus der Norm und sind gesperrt. Nur so darf '
-        + 'diese Bezeichnung im Bericht stehen.',
+        ' · Kennwerte aus der Norm, gesperrt',
       ]),
       el('button.knopf', {
         text: 'Material modifizieren',
-        title: 'Macht daraus ein eigenständiges Material mit eigenem Namen',
+        title: 'Eigenständiges Material mit eigenem Namen',
         on: { click: () => materialLoesen(material) },
       }),
     ])
@@ -161,7 +160,7 @@ function materialEditor(material) {
 
     el('div.feldgruppe', {}, [
       el('h3', {}, [el('span', { text: 'Grundwerte' }),
-        el('span', { text: 'aus Sortentabelle und Norm' })]),
+        el('span', { text: 'Sortentabelle, Norm' })]),
       ...vorlagen.filter((v) => !v.berechnet).map((v) => kennwertZeile(material, v)),
     ]),
 
@@ -199,7 +198,7 @@ function materialLoesen(material) {
     m.eigenstaendig = true;
     m.name = name;
   });
-  melden(`Material ist jetzt eigenständig und heisst „${name}".`);
+  melden(`Eigenständig: „${name}".`);
 }
 
 function nameAendern(material, wunsch, feldKnoten) {
@@ -208,8 +207,8 @@ function nameAendern(material, wunsch, feldKnoten) {
     .some((m) => m.kennung !== material.kennung && (m.name || m.sorte) === name);
   if (!name || vergeben) {
     melden(vergeben
-      ? `Der Name „${name}" ist schon vergeben. Materialnamen müssen eindeutig sein.`
-      : 'Der Name darf nicht leer sein.', true);
+      ? `Name „${name}" schon vergeben.`
+      : 'Name leer.', true);
     feldKnoten.value = material.name;
     return;
   }
@@ -224,7 +223,7 @@ function sorteAendern(material, neu, vorlagen) {
     const vergeben = zustand.projekt.materialien
       .some((m) => m.kennung !== material.kennung && (m.name || m.sorte) === neu);
     if (vergeben) {
-      melden(`Die Normsorte „${neu}" ist bereits angelegt.`, true);
+      melden(`Normsorte „${neu}" schon angelegt.`, true);
       return;
     }
   }
@@ -275,7 +274,7 @@ function postenZeile(querschnitt, nummer, welcher, beschriftung) {
     el('span.zeichen', { text: '⌀' }),
     zahlfeld({
       wert: posten.durchmesser || null, stufen: DURCHMESSER, min: 0,
-      titel: 'Stabdurchmesser in mm – leer oder 0 bedeutet: keine Bewehrung',
+      titel: '⌀ in mm; leer oder 0: keine Bewehrung',
       beiAenderung: (v) => aendern((x) => { x.durchmesser = v ?? 0; }),
     }),
     el('span.zeichen', { text: ueberAbstand ? '@' : '×' }),
@@ -285,13 +284,13 @@ function postenZeile(querschnitt, nummer, welcher, beschriftung) {
         beiAenderung: (v) => aendern((x) => { x.abstand = v ?? 150; }),
       })
       : zahlfeld({
-        wert: posten.anzahl, schritt: 1, min: 1, titel: 'Stabzahl auf der Breite b',
+        wert: posten.anzahl, schritt: 1, min: 1, titel: 'Stabzahl je b',
         beiAenderung: (v) => aendern((x) => { x.anzahl = v ?? 1; }),
       }),
     el('span.einheit', { text: ueberAbstand ? 'mm' : 'Stk' }),
     el('button.knopf.knopf-zart.umschalter', {
       text: ueberAbstand ? 'Teilung' : 'Anzahl',
-      title: 'Zwischen Teilung und Stabzahl wechseln',
+      title: 'Teilung ↔ Stabzahl',
       on: {
         click: () => aendern((x) => {
           if (ueberAbstand) { x.anzahl = x.anzahl || 5; x.abstand = null; }
@@ -477,33 +476,31 @@ function querkraftBlock(querschnitt) {
       el('span.zeichen', { text: '⌀' }),
       zahlfeld({
         wert: buegel.durchmesser || null, stufen: DURCHMESSER, min: 0,
-        titel: 'Bügeldurchmesser in mm – leer oder 0 bedeutet: keine Querkraftbewehrung',
+        titel: 'Bügel-⌀ in mm; leer oder 0: keine Bügel',
         beiAenderung: (v) => aendern((x) => { x.durchmesser = v ?? 0; }),
       }),
       el('span.zeichen', { text: 'x:' }),
       zahlfeld({
         wert: buegel.abstand_x, schritt: 25, min: 25,
-        titel: 'Bügelteilung in x-Richtung, in mm',
+        titel: 'Bügelteilung x in mm',
         beiAenderung: (v) => aendern((x) => { x.abstand_x = v ?? 200; }),
       }),
       el('span.zeichen', { text: 'y:' }),
       ueberAbstand
         ? zahlfeld({
           wert: buegel.abstand_y, schritt: 25, min: 25,
-          titel: 'Bügelteilung in y-Richtung, in mm',
+          titel: 'Bügelteilung y in mm',
           beiAenderung: (v) => aendern((x) => { x.abstand_y = v ?? 200; }),
         })
         : zahlfeld({
           wert: buegel.anzahl_y, schritt: 1, min: 1,
-          titel: 'Bügelzahl über die Breite b – dann sind nur Nachweise in '
-               + 'x-Richtung möglich',
+          titel: 'Bügelzahl je b; dann nur Nachweise in x',
           beiAenderung: (v) => aendern((x) => { x.anzahl_y = v ?? 1; }),
         }),
       el('span.einheit', { text: ueberAbstand ? 'mm' : 'Stk/b' }),
       el('button.knopf.knopf-zart.umschalter', {
         text: ueberAbstand ? 'Teilung' : 'Anzahl',
-        title: 'In y-Richtung zwischen Teilung und Stabzahl wechseln. Eine '
-             + 'Stabzahl lässt nur Nachweise in x-Richtung zu.',
+        title: 'y: Teilung ↔ Stabzahl (Stabzahl: nur Nachweise in x)',
         on: {
           click: () => aendern((x) => {
             if (ueberAbstand) { x.anzahl_y = x.anzahl_y || 5; x.abstand_y = null; }
@@ -518,14 +515,14 @@ function querkraftBlock(querschnitt) {
       span(String.raw`\alpha_{min}`),
       zahlfeld({
         wert: buegel.alpha_min, schritt: 1, min: 1, max: 89,
-        titel: 'Kleinste Neigung der Druckdiagonalen in Grad (ganzzahlig)',
+        titel: 'Kleinste Neigung der Druckdiagonalen, ganze °',
         beiAenderung: (v) => aendern((x) => { x.alpha_min = Math.round(v ?? 30); }),
       }),
       el('span.einheit', { text: '°' }),
       span(String.raw`\alpha_{max}`),
       zahlfeld({
         wert: buegel.alpha_max, schritt: 1, min: 1, max: 89,
-        titel: 'Grösste Neigung der Druckdiagonalen in Grad (ganzzahlig)',
+        titel: 'Grösste Neigung der Druckdiagonalen, ganze °',
         beiAenderung: (v) => aendern((x) => { x.alpha_max = Math.round(v ?? 45); }),
       }),
       el('span.einheit', { text: '°' }),
@@ -582,32 +579,30 @@ function plattenEditor(querschnitt) {
         }), 'mm'),
         feld(['Grösstkorn ', span('D_{max}')], zahlfeld({
           wert: querschnitt.d_max, schritt: 4, min: 1,
-          titel: 'Geht in den Querkraftwiderstand ein',
+          titel: 'Für k_g, Querkraft ohne Bügel',
           beiAenderung: (v) => aendern((q) => { q.d_max = v ?? 32; }),
-        }), 'mm', 'Grösstkorndurchmesser – geht in den Querkraftwiderstand ein'),
+        }), 'mm', 'Grösstkorn → k_g, Querkraft ohne Bügel'),
         feld(['Druckdiagonale ', span('k_c')], zahlfeld({
           wert: querschnitt.k_c ?? 0.55, schritt: 0.05, min: 0,
-          titel: 'Abminderung der Betondruckfestigkeit in der Druckdiagonalen – '
-               + 'geht nur mit Querkraftbewehrung ein',
+          titel: 'Abminderung f_cd in der Druckdiagonalen; nur mit Bügeln',
           beiAenderung: (v) => aendern((q) => { q.k_c = v ?? 0.55; }),
-        }), '', 'Abminderung der Betondruckfestigkeit in der Druckdiagonalen'),
+        }), '', 'Abminderung f_cd in der Druckdiagonalen'),
         feld('Einlagenhöhe', zahlfeld({
           wert: querschnitt.einlagenhoehe, schritt: 5, min: 0,
-          titel: 'Verringert d_v, sofern h/6 < e < d',
+          titel: 'Verringert d_v, falls h/6 < e < d',
           beiAenderung: (v) => aendern((q) => { q.einlagenhoehe = v ?? 0; }),
         }), 'mm'),
         feld(['Kriechzahl ', span(String.raw`\varphi`)], zahlfeld({
           wert: querschnitt.kriechzahl ?? 2.0, schritt: 0.1, min: 0,
-          titel: 'Geht über n = (E_s/E_cm)·(1+φ) in den gerissenen Zustand ein. '
-               + 'Ein grösseres φ senkt den Hebelarm und liegt auf der sicheren Seite.',
+          titel: 'n = E_s/E_cm · (1+φ), gerissener Zustand; grösser → sicherer',
           beiAenderung: (v) => aendern((q) => { q.kriechzahl = v ?? 2.0; }),
-        }), '', 'Kriechzahl φ für den gerissenen Zustand'),
+        }), '', 'Kriechzahl φ, gerissener Zustand'),
         feld('Rissanforderung', auswahl({
           werte: (zustand.katalog.rissanforderungen || []).map((r) => ({
             wert: r.wert, beschriftung: r.beschriftung,
           })),
           gewaehlt: querschnitt.rissanforderung || 'normal',
-          titel: 'Bestimmt die zulässige Stahlspannung beim Mindestbewehrungsnachweis',
+          titel: 'Bestimmt σ_s,adm (Tab. 17)',
           beiAenderung: (v) => aendern((q) => { q.rissanforderung = v; }),
         })),
         // Freier Text, der in keine Rechnung eingeht. Ohne ein solches Feld
@@ -674,8 +669,8 @@ export function editorZeichnen(behaelter, titelKnoten, hinweisKnoten) {
   titelKnoten.textContent = 'Eingaben';
   hinweisKnoten.textContent = '';
   return ersetzen(behaelter, el('div.leer', {}, [
-    el('p', { text: 'Links einen Bestandteil auswählen.' }),
-    el('p', { text: 'Materialien und Platten legst du über das + im Kapitelkopf an.' }),
+    el('p', { text: 'Links Bestandteil wählen.' }),
+    el('p', { text: 'Neu: + im Kapitelkopf.' }),
   ]));
 }
 

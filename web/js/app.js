@@ -184,7 +184,7 @@ async function berichtErzeugen() {
 
     // Das .tex ist auf beiden Wegen dasselbe. Nur der Server kann es zusätzlich
     // ablegen und übersetzen -- im Browser gibt es keine TeX-Maschine.
-    let meldung = 'Der Bericht steht bereit: als LaTeX für Overleaf oder als Markdown.';
+    let meldung = 'Bericht bereit: LaTeX (Overleaf) oder Markdown.';
     if (antwort.pdf_pfad) meldung = `PDF erzeugt mit ${antwort.maschine}: ${antwort.pdf_pfad}`;
     else if (antwort.tex_pfad) meldung = `LaTeX geschrieben: ${antwort.tex_pfad}\n(${antwort.meldung})`;
 
@@ -192,11 +192,11 @@ async function berichtErzeugen() {
       el('p', { text: meldung, style: { whiteSpace: 'pre-wrap' } }),
       el('div.reihe', { style: { margin: '10px 0' } }, [
         el('button.knopf', {
-          text: 'LaTeX in die Zwischenablage',
+          text: 'LaTeX kopieren',
           on: {
             click: async () => {
               await navigator.clipboard.writeText(antwort.tex);
-              melden('LaTeX kopiert – lässt sich direkt in Overleaf einfügen.');
+              melden('LaTeX kopiert.');
             },
           },
         }),
@@ -210,7 +210,7 @@ async function berichtErzeugen() {
       // Formeln stehen darin als LaTeX-Mathe, wie es diese Leser erwarten.
       el('div.reihe', { style: { margin: '10px 0' } }, [
         el('button.knopf', {
-          text: 'Markdown in die Zwischenablage',
+          text: 'Markdown kopieren',
           on: {
             click: async () => {
               await navigator.clipboard.writeText(antwort.markdown);

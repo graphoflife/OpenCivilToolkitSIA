@@ -520,10 +520,8 @@ class Spannungsbegrenzung(Nachweis):
         erg.konvergiert = ebene.konvergiert
         if not ebene.konvergiert:
             erg.begruendung = erg.hinweis = (
-                f"Für {fall.name} lässt sich keine Dehnungsebene finden, die "
-                f"M = {fall.M_Ed.formatiert(1, KNM)} kNm und "
-                f"N = {fall.N_Ed.formatiert(1, KN)} kN im Gleichgewicht hält. "
-                f"Der Querschnitt kann diese Kombination nicht aufnehmen.")
+                f"Keine Dehnungsebene für M = {fall.M_Ed.formatiert(1, KNM)} kNm, "
+                f"N = {fall.N_Ed.formatiert(1, KN)} kN → nicht aufnehmbar.")
             return erg
 
         erg.eps_m, erg.chi = ebene.eps_m, ebene.chi
@@ -546,8 +544,8 @@ class Spannungsbegrenzung(Nachweis):
         erg.erfuellt = gedehnt <= sigma_adm
         erg.vergleich = self._vergleich(erg)
         erg.begruendung = (
-            f"Gerissener Querschnitt: ε_m = {erg.eps_m * 1e3:.4f} ‰, "
-            f"χ = {erg.chi:.5f} 1/m. {erg.vergleich.satz}")
+            f"ε_m = {erg.eps_m * 1e3:.4f} ‰, χ = {erg.chi:.5f} 1/m. "
+            f"{erg.vergleich.satz}")
         return erg
 
     def _vergleich(self, erg: Fallergebnis) -> Vergleich:
@@ -560,16 +558,15 @@ class Spannungsbegrenzung(Nachweis):
                     "eps_s", rf"\varepsilon_{{s,{r}}}", erg.eps_s, "Einwirkung"),
                 widerstand=Zwischenwerte(self.id).dehnung(
                     "eps_s_adm", r"\varepsilon_{s,adm}", erg.eps_s_adm, "Widerstand"),
-                satz=(f"Die Bewehrung fliesst: ε_s = {erg.eps_s * 1e3:.2f} ‰ "
-                      f"über der Fliessdehnung {erg.eps_y * 1e3:.2f} ‰, gegen "
-                      f"ε_s,adm = {erg.eps_s_adm * 1e3:.2f} ‰ aus σ_s,adm = "
-                      f"{erg.sigma_s_adm / 1e6:.0f} N/mm²."))
+                satz=(f"Stahl fliesst (ε_s = {erg.eps_s * 1e3:.2f} ‰ > ε_y = "
+                      f"{erg.eps_y * 1e3:.2f} ‰): ε_s {'≤' if erg.erfuellt else '>'} "
+                      f"ε_s,adm = {erg.eps_s_adm * 1e3:.2f} ‰."))
         return Vergleich(
             einwirkung=fall.spannung(
                 "sigma_s", rf"\sigma_{{s,{r}}}", erg.sigma_s, "Einwirkung"),
             widerstand=self.grenze.spannung(erg.sigma_s_adm),
-            satz=(f"Grösste Zugspannung σ_s = {erg.sigma_s / 1e6:.0f} N/mm² "
-                  f"gegen σ_s,adm = {erg.sigma_s_adm / 1e6:.0f} N/mm²."))
+            satz=(f"σ_s = {erg.sigma_s / 1e6:.0f} N/mm² {'≤' if erg.erfuellt else '>'} "
+                  f"σ_s,adm = {erg.sigma_s_adm / 1e6:.0f} N/mm²."))
 
     def _urteil(self, erg: Fallergebnis, *, still: bool = False) -> NachweisUrteil:
         """Das Urteil eines Falls -- was gegeneinander steht, sagt der Vergleich."""

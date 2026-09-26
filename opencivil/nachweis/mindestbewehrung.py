@@ -322,9 +322,7 @@ class Rissnormalkraft(Nachweis):
         erg.a_s = sum(e.g(f"a_s_{m}").si for m in marken)
         if erg.a_s <= 0.0:
             erg.begruendung = erg.hinweis = (
-                f"Nachweis nicht machbar, weil die {lage.nummer}. Lage nicht "
-                f"definiert ist. Ohne Bewehrung kann die Risskraft niemand "
-                f"übernehmen – gegen sprödes Versagen ist hier nichts vorhanden.")
+                f"{lage.nummer}. Lage ohne Bewehrung → kein Nachweis.")
             return erg
 
         # Der dickste Stab bestimmt die Rissbreite: er verteilt den Riss auf
@@ -343,9 +341,8 @@ class Rissnormalkraft(Nachweis):
                                else erg.N_s_adm / N_Riss)
         erg.erfuellt = erg.N_s_adm >= N_Riss
         erg.begruendung = (
-            f"A_s = {erg.a_s * 1e6:.0f} mm² bei σ_s,adm = "
-            f"{erg.sigma_s_adm / 1e6:.0f} N/mm² ergibt "
-            f"N_s,adm = {erg.N_s_adm / 1e3:.1f} kN gegen "
+            f"N_s,adm = {erg.a_s * 1e6:.0f} mm² · {erg.sigma_s_adm / 1e6:.0f} N/mm² "
+            f"= {erg.N_s_adm / 1e3:.1f} kN {'≥' if erg.erfuellt else '<'} "
             f"N_Riss = {N_Riss / 1e3:.1f} kN.")
         return erg
 
@@ -600,9 +597,7 @@ class ZwaengungBiegung(Nachweis):
         erg.a_s = sum(a for a, _ in flaechen)
         if erg.a_s <= 0.0:
             erg.begruendung = erg.hinweis = (
-                f"Nachweis nicht machbar, weil die {lage.nummer}. Lage nicht "
-                f"definiert ist. Ohne Bewehrung kann das Rissmoment niemand "
-                f"übernehmen – gegen sprödes Versagen ist hier nichts vorhanden.")
+                f"{lage.nummer}. Lage ohne Bewehrung → kein Nachweis.")
             return erg
 
         erg.z_s = sum(a * z for a, z in flaechen) / erg.a_s
@@ -630,10 +625,9 @@ class ZwaengungBiegung(Nachweis):
                                else erg.M_s_adm / M_Riss)
         erg.erfuellt = erg.M_s_adm >= M_Riss
         erg.begruendung = (
-            f"Im gerissenen Querschnitt x = {erg.x * 1e3:.1f} mm, "
-            f"z = {erg.hebelarm * 1e3:.1f} mm. Mit σ_s,adm = "
-            f"{erg.sigma_s_adm / 1e6:.0f} N/mm² ergibt das "
-            f"M_s,adm = {erg.M_s_adm / 1e3:.1f} kNm gegen "
+            f"Gerissen: x = {erg.x * 1e3:.1f} mm, z = {erg.hebelarm * 1e3:.1f} mm, "
+            f"σ_s,adm = {erg.sigma_s_adm / 1e6:.0f} N/mm² → "
+            f"M_s,adm = {erg.M_s_adm / 1e3:.1f} kNm {'≥' if erg.erfuellt else '<'} "
             f"M_Riss = {M_Riss / 1e3:.1f} kNm.")
         return erg
 

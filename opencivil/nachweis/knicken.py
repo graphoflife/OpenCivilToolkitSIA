@@ -348,9 +348,7 @@ class Knicken(Nachweis):
         l_cr = fall.knicklaenge.si
 
         if N_Ed >= 0.0:
-            erg.begruendung = erg.hinweis = (
-                "Knicken setzt eine Druckkraft voraus; hier ist N_Ed nicht "
-                "negativ. Der Nachweis entfällt.")
+            erg.begruendung = erg.hinweis = "N_Ed ≥ 0, kein Druck → kein Knicknachweis."
             erg.erfuellungsgrad = float("inf")
             erg.erfuellt = True
             return erg
@@ -392,22 +390,19 @@ class Knicken(Nachweis):
         erg.begruendung = self._begruendung(erg, bei_N_Ed)
         if not bei_N_Ed.stabil:
             erg.hinweis = (
-                f"Bei N_Ed = {fall.N_Ed.formatiert(1, KN)} kN stellt sich keine "
-                f"Gleichgewichtslage ein: die Ausmitte zweiter Ordnung läuft "
-                f"nicht ein. Das System knickt. N_Rd ist die grösste "
-                f"Druckkraft, bei der es noch steht.")
+                f"N_Ed = {fall.N_Ed.formatiert(1, KN)} kN: keine Gleichgewichtslage "
+                f"→ knickt. N_Rd = grösste Druckkraft, bei der der Stab steht.")
         return erg
 
     def _begruendung(self, erg: Knickergebnis, gg: Gleichgewicht) -> str:
-        grenze = (f"N_Rd = {erg.N_Rd / 1e3:.1f} kN gegen "
+        grenze = (f"N_Rd = {erg.N_Rd / 1e3:.1f} kN "
+                  f"{'≥' if erg.erfuellt else '<'} "
                   f"|N_Ed| = {abs(erg.fall.N_Ed.si) / 1e3:.1f} kN.")
         if not gg.stabil:
-            return (f"Die Ausmitte zweiter Ordnung läuft nicht ein – das "
-                    f"System knickt unter dieser Last. {grenze}")
+            return f"Ausmitte läuft nicht ein → knickt. {grenze}"
         return (f"Stabil nach {len(gg.schritte)} Durchläufen: "
-                f"e_0d = {erg.e_0d * 1e3:.1f} mm, e_1d = {erg.e_1d * 1e3:.1f} mm, "
-                f"e_2d = {erg.e_2d * 1e3:.1f} mm, also "
-                f"M_Ed,II = {erg.M_ges / 1e3:.1f} kNm gegen "
+                f"e_0d + e_1d + e_2d = {erg.e_0d * 1e3:.1f} + {erg.e_1d * 1e3:.1f} "
+                f"+ {erg.e_2d * 1e3:.1f} mm → M_Ed,II = {erg.M_ges / 1e3:.1f} kNm, "
                 f"M_Rd = {erg.M_Rd / 1e3:.1f} kNm. {grenze}")
 
     # -- Gleichgewicht bei einer Probekraft ---------------------------------

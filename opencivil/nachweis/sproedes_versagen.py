@@ -239,16 +239,15 @@ class SproedesVersagen(Nachweis):
             if erg.M_Rd <= 0.0:
                 seite = "unten" if lage.von_unten else "oben"
                 erg.begruendung = erg.hinweis = (
-                    f"Nachweis nicht machbar: auf der Seite der "
-                    f"{lage.nummer}. Lage ({seite}) hat die Handrechnung keinen "
-                    f"Biegewiderstand – dort liegt keine Bewehrung.")
+                    f"{lage.nummer}. Lage ({seite}) ohne Bewehrung → kein "
+                    f"Biegewiderstand, kein Nachweis.")
             else:
                 erg.erfuellungsgrad = (float("inf") if M_Riss == 0
                                        else erg.M_Rd / M_Riss)
                 erg.erfuellt = erg.M_Rd >= M_Riss
                 erg.begruendung = (
-                    f"M_Rd(N_Ed = 0) = {erg.M_Rd / 1e3:.1f} kNm gegen "
-                    f"M_Riss = {M_Riss / 1e3:.1f} kNm.")
+                    f"M_Rd(N_Ed = 0) = {erg.M_Rd / 1e3:.1f} kNm "
+                    f"{'≥' if erg.erfuellt else '<'} M_Riss = {M_Riss / 1e3:.1f} kNm.")
 
             self.ergebnisse.append(erg)
             self._protokoll_lage(p, erg)

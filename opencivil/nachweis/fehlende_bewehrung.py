@@ -104,8 +104,7 @@ class FehlendeBewehrung(Nachweis):
 
     @property
     def grund(self) -> str:
-        return (f"In {self.richtung.beschriftung} ist keine Bewehrung definiert. "
-                f"Der Widerstand der Handrechnung ist damit null, der Nachweis "
+        return (f"Keine Bewehrung in {self.richtung.beschriftung} → Widerstand 0, "
                 f"nicht erfüllt.")
 
     def pruefe(self, e: Eingaben, p: Protokoll):

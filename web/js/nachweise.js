@@ -243,9 +243,9 @@ function nachweiskapitel(querschnitt, { titel, feld }) {
       }), 'Nachweis'),
       el('span.richtung', {
         text: 'x', class: 'lage-x',
-        title: 'Nachgewiesen wird nur die Tragrichtung x',
+        title: 'Nur Tragrichtung x',
       }),
-      el('span.postenname', { text: 'Geführt für die ungünstigere x-Lage' }),
+      el('span.postenname', { text: 'Ungünstigere x-Lage' }),
       // Ein eingeschalteter Nachweis ohne Bewehrung ist kein Fehler der
       // Eingabe -- er wird geführt und meldet selbst, dass er nicht geht.
       // Hier steht es trotzdem, damit man es beim Einschalten sieht.
@@ -286,7 +286,7 @@ function knickBlock(querschnitt) {
       : null,
     ...(faelle.length
       ? faelle.map((_, i) => knickZeile(querschnitt, i))
-      : [el('div.leer', { text: 'Kein Knicknachweis – nur in x-Richtung möglich.' })]),
+      : [el('div.leer', { text: 'Kein Knicknachweis (nur x).' })]),
     anfuegenKnopf('Knicknachweis', () => aendern((q) => {
       q.knickfaelle = q.knickfaelle || [];
       q.knickfaelle.push({
@@ -347,12 +347,6 @@ function anforderung(querschnitt) {
     .find((r) => r.wert === (querschnitt.rissanforderung || 'normal'));
 }
 
-/** «normaler», «erhöhter» … -- klein geschrieben, für den Satz im Hinweis. */
-function anforderungstext(querschnitt) {
-  const a = anforderung(querschnitt);
-  return a ? `${a.beschriftung.toLowerCase()}er` : 'dieser';
-}
-
 function mindestbewehrungsBlock(querschnitt) {
   // Ob der Nachweis gegen Fliessen überhaupt gefordert ist, weiss der Kern.
   const gefordert = anforderung(querschnitt)?.fliessnachweis !== false;
@@ -372,7 +366,7 @@ function mindestbewehrungsBlock(querschnitt) {
       richtung
         ? el('span.richtung', {
           text: richtung, class: `lage-${richtung}`,
-          title: 'Nachgewiesen wird nur die Tragrichtung x',
+          title: 'Nur Tragrichtung x',
         })
         : null,
       el('span.postenname', { text: beschriftung }),
@@ -385,7 +379,7 @@ function mindestbewehrungsBlock(querschnitt) {
     ]),
 
     el('div.unterkapitel-kopf', { style: { marginTop: '8px' } }, [
-      el('span', { text: 'Rissbreiten Begrenzung bei Zwang' }),
+      el('span', { text: 'Rissbreitenbegrenzung bei Zwang' }),
       hilfe('zwang'),
     ]),
     zwaengung('zwaengung', 'Zwängung auf Normalkraft', 'x'),
@@ -412,11 +406,8 @@ function mindestbewehrungsBlock(querschnitt) {
       // über den Katalog; hier steht keine zweite Fassung der Norm. Nur
       // dieses Kapitel: das quasi-ständige darüber läuft immer.
       hinweis: gefordert ? null
-        : `Bei ${anforderungstext(querschnitt)} Rissanforderung verlangt `
-          + 'SIA 262 Tabelle 17 diesen Nachweis nicht. Er wird nicht geführt '
-          + '– weder die abgeleiteten noch eigene Lastfälle. Stelle die '
-          + 'Rissanforderung oben auf «Erhöht» oder «Hoch», wenn du ihn '
-          + 'brauchst.',
+        : `Rissanforderung «${anforderung(querschnitt)?.beschriftung ?? '–'}» → `
+          + 'Tab. 17: kein Nachweis. Für Nachweis: «Erhöht» oder «Hoch».',
     }),
   ]);
 }
@@ -462,7 +453,7 @@ function gebrauchsKapitel(querschnitt, {
       }), 'Ableitung'),
       zahlfeld({
         wert: liste.anteil, schritt: 5, min: 5, max: 100,
-        titel: `Welcher Anteil der Tragsicherheitseinwirkungen als ${wort} gilt, in %`,
+        titel: `Anteil der Tragsicherheitseinwirkungen als ${wort}, in %`,
         // Leer gelassen bleibt der bisherige Wert -- eine Null wäre kein
         // Anteil, und der Kern wiese sie ohnehin zurück.
         beiAenderung: (v) => aendern((l) => { if (v !== null) l.anteil = v; }),
@@ -588,7 +579,7 @@ export function automatikBlock(querschnitt) {
       'mm, durch Komma getrennt. Grund und Zulage einer Lage: gleiche Teilung'), 'mm'),
     feld('Mindestdurchmesser', zahlfeld({
       wert: querschnitt.automatik_mindestdurchmesser ?? 10, schritt: 2, min: 0,
-      titel: 'Dünnster eingebauter Stab. Lage weglassen (⌀ 0) bleibt erlaubt',
+      titel: 'Dünnster eingebauter Stab; ⌀ 0 (Lage weg) erlaubt',
       beiAenderung: (v) => aendern((q) => {
         q.automatik_mindestdurchmesser = v ?? 10;
       }),
@@ -611,7 +602,7 @@ function automatikLeiste(kennung) {
   return el('div.automatik-leiste', {}, [
     el('button.knopf.knopf-haupt', {
       class: laeuft ? 'ist-am-suchen' : '',
-      title: 'Sucht einmalig und schreibt das Ergebnis in die Lagen',
+      title: 'Einmal suchen, Ergebnis in die Lagen',
       disabled: laeuft,
       on: { click: () => bewehrungErmitteln(kennung) },
     }, laeuft
@@ -758,7 +749,7 @@ function spannungsZeile(querschnitt, index) {
         { wert: 'moment_kruemmung', beschriftung: 'M–χ' },
       ],
       gewaehlt: k.art || 'schnittgroessen',
-      titel: 'Was eingegeben wird – und damit, was herauskommt',
+      titel: 'Eingabeart',
       beiAenderung: (v) => aendern((x) => { x.art = v; }),
     }),
     // Beschriftung über dem Feld, nicht daneben: so bleibt das Raster der

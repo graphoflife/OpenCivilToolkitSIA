@@ -170,9 +170,8 @@ def widerstand(
     elif nenner <= 0.0:
         return Widerstandspunkt(
             m_Dd=m_Dd, eps_v=0.0, k_d=0.0, v_Rd=0.0,
-            grund=(f"m_Rd(N_Ed) = {m_Rd / 1e3:.1f} kNm liegt nicht über dem "
-                   f"Dekompressionsmoment m_Dd = {m_Dd / 1e3:.1f} kNm. "
-                   f"Der Querkraftwiderstand ist so nicht bestimmbar."))
+            grund=(f"m_Rd(N_Ed) = {m_Rd / 1e3:.1f} kNm ≤ m_Dd = {m_Dd / 1e3:.1f} kNm "
+                   f"→ V_Rd nicht bestimmbar."))
     elif abs(M_Ed) > m_Rd:
         eps_v = PLASTISCH * f_yd / E_s
         plastisch = True
@@ -701,10 +700,8 @@ class Querkraft(Nachweis):
         # laengs der Traglinie mit und die Formel haette keinen Bezug mehr.
         if not ueber_teilung and self.richtung is Richtung.Y:
             erg.begruendung = erg.hinweis = (
-                "Widerstand in y-Richtung nicht berechenbar, wegen "
-                "Bügeldefinition: in y ist eine Stabzahl über die betrachtete "
-                "Breite angegeben statt einer Teilung. Für einen Nachweis in "
-                "y-Richtung braucht es dort eine Teilung in mm.")
+                "Bügel in y als Stabzahl → kein Widerstand in y. Für y: Teilung "
+                "in mm.")
             return erg
 
         erg.zuglage = _zuglage(lagen, M_Ed >= 0)
@@ -712,9 +709,7 @@ class Querkraft(Nachweis):
         if hoehen is None:
             seite = "unten" if M_Ed >= 0 else "oben"
             erg.begruendung = erg.hinweis = (
-                f"Auf der gezogenen Seite ({seite}) liegt in dieser Richtung "
-                f"keine Bewehrung. Ohne statische Höhe gibt es keinen "
-                f"Querkraftwiderstand: V_Rd = 0.")
+                f"Zugseite ({seite}) ohne Bewehrung → kein d, V_Rd = 0.")
             return erg
         erg.d = erg.d_v = hoehen
 
@@ -729,13 +724,13 @@ class Querkraft(Nachweis):
 
         erg.erfuellungsgrad = float("inf") if V_Ed == 0 else abs(erg.v_Rd) / abs(V_Ed)
         erg.erfuellt = erg.erfuellungsgrad >= 1.0
-        massgebend = ("die Bügel" if erg.massgebend.V_Rd_s <= erg.massgebend.V_Rd_c
-                      else "die Druckdiagonale")
+        massgebend = ("Bügel" if erg.massgebend.V_Rd_s <= erg.massgebend.V_Rd_c
+                      else "Druckdiagonale")
         erg.begruendung = (
-            f"Günstigste Neigung α = {erg.massgebend.alpha}°: "
+            f"α = {erg.massgebend.alpha}°: "
             f"V_Rd,s = {erg.massgebend.V_Rd_s / 1e3:.1f} kN/m, "
-            f"V_Rd,c = {erg.massgebend.V_Rd_c / 1e3:.1f} kN/m. "
-            f"Massgebend {massgebend}.")
+            f"V_Rd,c = {erg.massgebend.V_Rd_c / 1e3:.1f} kN/m → massgebend "
+            f"{massgebend}.")
         return erg
 
     # -- Kurve --------------------------------------------------------------
@@ -848,9 +843,7 @@ class Querkraft(Nachweis):
             erg.erfuellungsgrad = 0.0
             erg.erfuellt = False
             erg.begruendung = erg.hinweis = (
-                f"Auf der gezogenen Seite ({seite}) liegt in dieser Richtung "
-                f"keine Bewehrung. Ohne statische Höhe gibt es keinen "
-                f"Querkraftwiderstand: V_Rd = 0.")
+                f"Zugseite ({seite}) ohne Bewehrung → kein d, V_Rd = 0.")
             return erg
         erg.d = hoehen
         erg.d_v = erg.d - einlage if (h / 6.0 < einlage < erg.d) else erg.d

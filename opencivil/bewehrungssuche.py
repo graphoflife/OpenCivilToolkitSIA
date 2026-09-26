@@ -403,9 +403,7 @@ def _eine_teilung(projekt, kennung: str, teilung: float,
     eintrag = projekt.querschnitt(kennung)
     loesung = Loesung(teilung=teilung)
     if not posten:
-        loesung.begruendung = (
-            "Keine Bewehrung zum Suchen: alle Lagen stehen auf null. Wer eine "
-            "Lage bewehrt haben will, gibt ihr einen Durchmesser.")
+        loesung.begruendung = "Keine x-Lage zum Suchen."
         return loesung
 
     # Wie viele Urteile die voll bewehrte Platte faellt. Weniger darf am Ende
@@ -465,16 +463,13 @@ def _eine_teilung(projekt, kennung: str, teilung: float,
 
         if bester is None:
             loesung.begruendung = bewertung.fehler or (
-                f"Alle Durchmesser der Liste ausgeschöpft; der schlechteste "
-                f"Erfüllungsgrad bleibt bei {bewertung.grad:.2f} "
-                f"({bewertung.nachweis}).")
+                f"Alle Durchmesser ausgeschöpft; schlechtester Grad "
+                f"{bewertung.grad:.2f} ({bewertung.nachweis}).")
             return loesung
         if bester[0] >= bewertung.abstand(erwartet):
             loesung.begruendung = (
-                f"Mehr Stahl bringt nichts mehr: «{bewertung.nachweis}» steht "
-                f"bei {bewertung.grad:.2f} und wird durch keinen grösseren "
-                f"Durchmesser besser. Hier hilft nur eine dickere Platte oder "
-                f"ein festerer Beton.")
+                f"Mehr Stahl hilft nicht: «{bewertung.nachweis}» bleibt bei "
+                f"{bewertung.grad:.2f} → dickere Platte oder festerer Beton.")
             loesung.schlechtester = bewertung.grad
             loesung.nachweis = bewertung.nachweis
             return loesung
@@ -511,46 +506,18 @@ def suche(projekt, kennung: str, *,
     gefunden = [l for l in ergebnis.loesungen if l.gefunden]
     if not gefunden:
         ergebnis.begruendung = (
-            "Mit keiner der angegebenen Teilungen gehen alle eingeschalteten "
-            "Nachweise auf." + _leere_lagen(projekt.querschnitt(kennung)))
+            "Mit keiner Teilung gehen alle eingeschalteten Nachweise auf.")
         return ergebnis
     if gefunden:
         # Kleinste Stahlflaeche gewinnt. Bei Gleichstand die groessere
         # Teilung: weniger Staebe bei gleichem Querschnitt ist weniger Arbeit.
         ergebnis.beste = min(gefunden, key=lambda l: (l.stahlflaeche, -l.teilung))
         ergebnis.begruendung = (
-            f"Teilung {ergebnis.beste.teilung:.0f} mm mit "
-            f"{ergebnis.beste.stahlflaeche:.0f} mm² – die kleinste "
-            f"Stahlfläche unter den {len(gefunden)} Lösungen.")
+            f"Teilung {ergebnis.beste.teilung:.0f} mm, "
+            f"{ergebnis.beste.stahlflaeche:.0f} mm² – kleinste Stahlfläche von "
+            f"{len(gefunden)} Lösungen.")
     ergebnis.duktilitaet = _duktilitaetsbefund(projekt, kennung, ergebnis.beste)
     return ergebnis
-
-
-def _leere_lagen(eintrag) -> str:
-    """
-    Der haeufigste Grund fuer ein Nein -- und einer, der nicht nach einem
-    Rechenproblem aussieht.
-
-    Wo kein Durchmesser steht, legt die Suche keinen an: welche Lage es gibt
-    und wohin sie traegt, ist eine Anordnung und keine Suche. Ein Nachweis in
-    einer unbewehrten Richtung kann darum nie aufgehen, und die Meldung soll
-    das sagen statt ueber Durchmesser zu klagen.
-    """
-    leer = [nummer for nummer in (1, 2, 3, 4)
-            if eintrag.lagen[nummer - 1].grund.durchmesser <= 0]
-    # Nur melden, wenn eine ganze Tragrichtung leer ist. Eine einzelne leere
-    # Lage neben einer bewehrten in derselben Richtung ist der Normalfall und
-    # kein Grund fuer irgendetwas.
-    ohne = [r for r in ("x", "y")
-            if all(eintrag.richtung_von(n).value != r or n in leer
-                   for n in (1, 2, 3, 4))]
-    if not ohne:
-        return ""
-    welche = " und ".join(ohne)
-    return (f" In {welche}-Richtung trägt keine Lage einen Durchmesser – dort "
-            f"legt die Suche keine Bewehrung an, weil die Anordnung eine "
-            f"Entscheidung ist und keine Rechnung. Ein Nachweis in dieser "
-            f"Richtung kann so nicht aufgehen.")
 
 
 def _duktilitaetsbefund(projekt, kennung: str, loesung: "Loesung") -> str:
@@ -575,11 +542,9 @@ def _duktilitaetsbefund(projekt, kennung: str, loesung: "Loesung") -> str:
     eintrag.ohne_lastfaelle()
     bewertung = bewerte(probe)
     if bewertung.erfuellt():
-        return "Der Duktilitätsnachweis geht damit auf."
-    return (f"Achtung: der Duktilitätsnachweis geht damit **nicht** auf – "
-            f"«{bewertung.nachweis}» bei {bewertung.grad:.2f}. Gegen ihn hilft "
-            f"keine stärkere Bewehrung, sondern nur eine dickere Platte; "
-            f"gesucht wurde deshalb ohne ihn.")
+        return "Duktilität erfüllt."
+    return (f"Duktilität nicht erfüllt: «{bewertung.nachweis}» bei "
+            f"{bewertung.grad:.2f} → dickere Platte; gesucht ohne Duktilität.")
 
 
 def _absteigen(projekt, posten, stand, durchmesser, setzen,
@@ -664,7 +629,7 @@ def _fuer_teilung(projekt, kennung: str, teilung: float, modus: Suchmodus,
     erst = _eine_teilung(ohne, kennung, teilung, grund_posten, durchmesser)
     if not erst.gefunden:
         erst.begruendung = (
-            "Schon die Grundbewehrung ohne Kräfte geht nicht auf: "
+            "Grundbewehrung ohne Kräfte geht nicht auf: "
             + erst.begruendung)
         return erst
 
@@ -737,7 +702,7 @@ def buegel_suchen(projekt, kennung: str, *,
     if bewerte(arbeit).erfuellt():
         return Buegelloesung(
             gefunden=True, durchmesser=0.0, teilung=0.0,
-            begruendung="Ohne Querkraftbewehrung geht es auf.")
+            begruendung="Ohne Bügel erfüllt.")
 
     beste: Optional[Buegelloesung] = None
     for teilung in teilungen:
@@ -759,8 +724,7 @@ def buegel_suchen(projekt, kennung: str, *,
                          # nur mehr Stahl fuer dieselbe Aussage.
     if beste is None:
         return Buegelloesung(begruendung=(
-            "Mit keinem Durchmesser der Liste und keiner der angegebenen "
-            "Teilungen geht der Querkraftnachweis auf."))
+            "Kein Bügel aus Liste und Teilungen erfüllt den Querkraftnachweis."))
     return beste
 
 

@@ -93,7 +93,7 @@ function materialLoeschen(material) {
   const benutztVon = zustand.projekt.querschnitte.filter((q) =>
     q.beton === material.kennung || q.lagen.some((l) => l.stahl === material.kennung));
   if (benutztVon.length) {
-    melden(`„${material.name || material.sorte}" wird noch verwendet von: `
+    melden(`„${material.name || material.sorte}" verwendet von: `
       + benutztVon.map((q) => q.name).join(', '), true);
     return;
   }
@@ -117,8 +117,8 @@ function materialAnlegen(art) {
   // Eine Normsorte darf es nur einmal geben -- der Name ist ihre Kennzeichnung.
   const frei = (liste || []).find((s) => !vergeben.has(s.sorte));
   if (!frei) {
-    melden('Alle Normsorten dieser Art sind bereits angelegt. Zum Abwandeln ein '
-      + 'bestehendes Material öffnen und „Material modifizieren" wählen.', true);
+    melden('Alle Normsorten angelegt. Abwandeln: Material öffnen → '
+      + '«Material modifizieren».', true);
     return;
   }
   projektAendern((p) => {
@@ -134,7 +134,7 @@ function platteAnlegen() {
   const beton = zustand.projekt.materialien.find((m) => m.art === 'beton');
   const stahl = zustand.projekt.materialien.find((m) => m.art === 'betonstahl');
   if (!beton || !stahl) {
-    melden('Zuerst je ein Beton- und ein Betonstahlmaterial anlegen.', true);
+    melden('Zuerst Beton und Betonstahl anlegen.', true);
     return;
   }
   // Die Vorlage kommt aus dem Kern. Sie stand einmal hier -- zwanzig Felder,
@@ -146,7 +146,7 @@ function platteAnlegen() {
   // im Projekt gibt.
   const vorlage = zustand.katalog?.neue_platte;
   if (!vorlage) {
-    melden('Der Katalog ist noch nicht geladen.', true);
+    melden('Katalog noch nicht geladen.', true);
     return;
   }
   const kennung = freieKennung('q');

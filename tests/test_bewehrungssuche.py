@@ -292,7 +292,7 @@ class TestDuktilitaetBleibtDraussen(unittest.TestCase):
 
     def test_wo_sie_aufgeht_steht_das_auch_da(self):
         ergebnis = suche.suche(platte(), "q1", modus=suche.Suchmodus.GRUND_MIT)
-        self.assertIn("geht damit auf", ergebnis.duktilitaet)
+        self.assertEqual("Duktilität erfüllt.", ergebnis.duktilitaet)
 
     def test_die_arbeitskopie_zaehlt_keinen_duktilitaetsnachweis(self):
         """

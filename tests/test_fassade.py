@@ -196,7 +196,7 @@ class TestRechnen(unittest.TestCase):
         projekt.platte("Leer")
         text = projekt.rechnen().zusammenfassung()
         self.assertIn("Kein Nachweis geführt.", text)
-        self.assertIn("keine Schnittgrössen angegeben", text)
+        self.assertIn("keine Schnittgrössen → kein Tragsicherheitsnachweis", text)
 
     def test_bericht_und_latex(self):
         self.assertIn("Herleitung", self.ergebnis.bericht())

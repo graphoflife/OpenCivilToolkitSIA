@@ -100,8 +100,8 @@ export async function projektHolen() {
         projekt: await api.beispiel(),
         gesichert: true,
         herkunft: 'beispiel',
-        hinweis: `Das abgelegte Projekt liess sich nicht lesen (${fehler.message}). `
-               + 'Es wurde nicht gelöscht; die Oberfläche startet mit dem Beispiel.',
+        hinweis: `Abgelegtes Projekt unlesbar (${fehler.message}). Nicht gelöscht; `
+               + 'Start mit dem Beispiel.',
       };
     }
   }
