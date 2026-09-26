@@ -443,7 +443,7 @@ def _lagennachweise(eintrag: QuerschnittEintrag, querschnitt: Plattenquerschnitt
     zwang.still = not schalter_aus(eintrag.zwaengung)
     eintragen("rissnormalkraft", kennung_x, zwang)
 
-    duktilitaet = Duktilitaet(querschnitt, lagen)
+    duktilitaet = Duktilitaet(querschnitt, lagen, grenze=eintrag.x_d_max)
     duktilitaet.still = not schalter_aus(eintrag.duktilitaet)
     eintragen("duktilitaet", eintrag.kennung, duktilitaet)
 

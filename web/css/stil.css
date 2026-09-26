@@ -364,14 +364,6 @@ input[readonly], input:disabled, select:disabled {
   display: flex; align-items: center; gap: 7px; margin-bottom: 4px;
   font-size: 12px; font-weight: 700; color: var(--schrift-matt);
 }
-.lage-kopf .richtung {
-  font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 9px;
-  background: var(--richtung-x-hell); color: var(--richtung-x-tief);
-  text-transform: uppercase;
-}
-.lage-y .lage-kopf .richtung {
-  background: var(--richtung-y-hell); color: var(--richtung-y-tief);
-}
 
 /* Zweistellungs-Schalter x|y und Gesamt|Seite -- mit dem Rand der
    Eingabefelder: auch ein Schalter ist etwas, das man anfasst. */
@@ -438,6 +430,8 @@ input[readonly], input:disabled, select:disabled {
 /* Der Anteil steht in der Zeile, die ihn verwendet: «[✓] [60] % der
    Tragsicherheitseinwirkungen» liest sich als ein Satz. */
 .duktilitaetszeile.ist-anteil { grid-template-columns: 46px 64px minmax(0, 1fr) auto; }
+/* Mit einem Feld hinter dem Namen: «[✓] x Max. x/d [0.35]». */
+.duktilitaetszeile.mit-feld { grid-template-columns: 46px 18px auto 72px minmax(0, 1fr); }
 .duktilitaetszeile .schalter-haken .schalter-halb { width: 22px; }
 .duktilitaetszeile .postenname {
   font-size: 11.5px; font-weight: 600; color: var(--schrift-matt);

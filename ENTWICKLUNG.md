@@ -44,6 +44,33 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-26 · Schalter an jeder Lage, eine eigene Grenze x/d
+
+Wunsch: x|y-Schalter auch an der 2. und 3. Lage, ein Feld «Max. x/d» beim
+Duktilitätsnachweis, «Rissmoment» beim spröden Versagen.
+
+* **Jede Lage hat ihren x|y-Schalter.** Gespeichert bleibt die Richtung der
+  äusseren Lage (1 und 4). Wer an der inneren schaltet, stellt die äussere
+  auf das Gegenteil. Beispiel: 2. Lage auf y → 1. Lage wird x.
+* **Max. x/d je Platte** (`QuerschnittEintrag.x_d_max`): Vorgabe 0.35,
+  höchstens 0.5. Die Zahlen stehen beim Nachweis (`duktilitaet.GRENZE`,
+  `HOECHSTENS`), die Oberfläche holt den Höchstwert über den Katalog.
+  - Ausserhalb von (0, 0.5] meldet der Kern beim Bauen: «max. x/d muss
+    grösser als null und höchstens 0.5 sein». Geprüft wird nicht beim
+    Öffnen, damit sich eine abgelegte Platte korrigieren lässt.
+  - Weicht die Grenze von 0.35 ab, sagt es die Herleitung: «Grenze
+    eingegeben: (x/d)_max = 0.45 statt der Vorgabe 0.35.» Eine andere
+    Grenze ist eine Annahme, die man im Bericht finden muss.
+  - Beispiel: ⌀26@150 + ⌀10@150 unten gibt x/d = 0.43. Bei 0.35 nicht
+    erfüllt, bei 0.5 erfüllt.
+* **Sprödes Versagen:** Die Zeile heisst «Rissmoment». «Ungünstigere
+  x-Lage» steht jetzt im Tooltip der x-Marke.
+* **Nebenbei:** Die Pfeile an Feldern mit Kommaschritt runden auf die
+  Stellen des Schritts. Vorher gab 0.35 − 0.05 im Feld 0.30000000000000004;
+  das betraf auch k_c und die Kriechzahl.
+
+---
+
 ## 2026-09-26 · Der Mindestdurchmesser gilt für jede Lage
 
 Wunsch: Ist bei der automatischen Bewehrung ein Mindestdurchmesser gegeben,

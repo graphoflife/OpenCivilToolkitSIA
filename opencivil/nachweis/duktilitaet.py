@@ -5,7 +5,7 @@ VERANTWORTUNG:
 Prueft je Bewehrungslage, ob die Druckzone schlank genug bleibt::
 
     0.85 * x * b * f_cd = A_s * f_sd        (Kraeftegleichgewicht, M_Ed = 0)
-    x / d <= 0.35
+    x / d <= (x/d)_max                      (Vorgabe 0.35, hoechstens 0.5)
 
 Eine flache Druckzone heisst: der Stahl fliesst lange, bevor der Beton
 versagt. Der Querschnitt kuendigt sein Versagen an, statt ploetzlich zu
@@ -35,7 +35,13 @@ Schwerpunkt von Grundbewehrung und Zulage -- sie gehoeren zur selben Lage.
 EINHEITEN:
 Alles in SI-Basis; ``x`` und ``d`` in m, Flaechen in m^2, Festigkeiten in Pa.
 Das Verhaeltnis ``x/d`` ist dimensionslos und wird als Einwirkung gegen die
-Grenze 0.35 gehalten.
+Grenze ``(x/d)_max`` gehalten.
+
+DIE GRENZE:
+Vorgabe ist 0.35. Sie laesst sich je Platte setzen, hoechstens auf 0.5
+(``QuerschnittEintrag.x_d_max``). Weicht sie von der Vorgabe ab, sagt das die
+Herleitung -- eine andere Grenze ist eine Annahme, die man im Bericht finden
+muss.
 """
 
 from __future__ import annotations
@@ -56,8 +62,11 @@ from opencivil.querschnitt.platte import (
     Bewehrungslage, Richtung, protokoll_lage,
 )
 
-#: Groesste zulaessige bezogene Druckzonenhoehe.
+#: Groesste zulaessige bezogene Druckzonenhoehe -- die Vorgabe.
 GRENZE = 0.35
+
+#: So weit laesst sich die Grenze hoechstens anheben.
+HOECHSTENS = 0.5
 
 
 @dataclass
@@ -112,7 +121,8 @@ class Duktilitaet(Nachweis):
     zwei Nachweise zu verteilen ergaebe zwei fast leere Abschnitte.
 
     Ob er ueberhaupt gefuehrt wird, entscheidet ein einziger Schalter am
-    Querschnitt; welche Lagen er ansieht, sagt der Aufbau.
+    Querschnitt; welche Lagen er ansieht, sagt der Aufbau, und wie tief die
+    Druckzone reichen darf, ``grenze``.
     """
 
     THEMA = "Duktilität"
@@ -121,7 +131,13 @@ class Duktilitaet(Nachweis):
         self,
         querschnitt,
         lagen: Sequence[int],
+        grenze: float = GRENZE,
     ) -> None:
+        if not 0.0 < grenze <= HOECHSTENS:
+            raise ValueError(
+                f"Die Grenze (x/d)_max muss grösser als null und höchstens "
+                f"{HOECHSTENS:g} sein, angegeben ist {grenze:g}.")
+        self.grenze = grenze
         gewaehlt = sorted(set(lagen))
         if not gewaehlt:
             raise ValueError("Der Duktilitätsnachweis braucht mindestens eine Lage.")
@@ -255,12 +271,12 @@ class Duktilitaet(Nachweis):
         erg.f_sd = e.g(f"f_yd__{kennung_aus(lage.stahl.id)}").si
         erg.x = druckzonenhoehe(a_s=erg.a_s, f_sd=erg.f_sd, b=b, f_cd=f_cd)
         erg.verhaeltnis = erg.x / erg.d if erg.d > 0 else float("inf")
-        erg.erfuellt = erg.verhaeltnis <= GRENZE
+        erg.erfuellt = erg.verhaeltnis <= self.grenze
         erg.erfuellungsgrad = (
-            float("inf") if erg.verhaeltnis == 0 else GRENZE / erg.verhaeltnis)
+            float("inf") if erg.verhaeltnis == 0 else self.grenze / erg.verhaeltnis)
         erg.begruendung = (
             f"x/d = {erg.x * 1e3:.1f} mm / {erg.d * 1e3:.1f} mm = "
-            f"{erg.verhaeltnis:.3f} {'≤' if erg.erfuellt else '>'} {GRENZE:.2f}.")
+            f"{erg.verhaeltnis:.3f} {'≤' if erg.erfuellt else '>'} {self.grenze:.2f}.")
         return erg
 
     def _urteil(self, erg: Lagenergebnis) -> NachweisUrteil:
@@ -291,7 +307,7 @@ class Duktilitaet(Nachweis):
             id=f"{self.id}.lage{nummer}.grenze",
             symbol=r"\left(x/d\right)_{max}",
             einheit=EINHEITSLOS, beschreibung="Widerstand", stellen=2,
-        ).belegen(Groesse(GRENZE, EINHEITSLOS))
+        ).belegen(Groesse(self.grenze, EINHEITSLOS))
 
     # -- Mitschrift ---------------------------------------------------------
 
@@ -312,8 +328,11 @@ class Duktilitaet(Nachweis):
             titel="Kräftegleichgewicht bei M_Ed = 0",
             referenz="SIA 262:2025, 4.1.4.2.5")
         p.ansatz(
-            rf"\frac{{x}}{{d}} \le {GRENZE:.2f}",
+            rf"\frac{{x}}{{d}} \le {self.grenze:.2f}",
             titel="Bedingung")
+        if abs(self.grenze - GRENZE) > 1e-12:
+            p.text(f"Grenze eingegeben: (x/d)_max = {self.grenze:.2f} statt der "
+                   f"Vorgabe {GRENZE:.2f}.")
         p.erklaerung(
             "d wird von der gedrückten Randfaser aus gemessen: bei den unteren "
             "Lagen von der Oberkante, bei den oberen von der Unterkante. "

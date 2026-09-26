@@ -16,6 +16,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, List, Mapping, Optional
 
+from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX, HOECHSTENS as X_D_HOECHSTENS
 from opencivil.querschnitt.platte import K_C, KRIECHZAHL, LAGENZAHL, Richtung
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste,
@@ -166,6 +167,14 @@ class QuerschnittEintrag(Beschreibung):
     beantwortet die schlechtere Lage.
     """
 
+    x_d_max: float = X_D_MAX
+    """
+    Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis.
+
+    Vorgabe 0.35, hoechstens 0.5 -- die Zahlen stehen beim Nachweis
+    (``duktilitaet.GRENZE``, ``duktilitaet.HOECHSTENS``).
+    """
+
     lagen: List[LageEintrag] = field(default_factory=list)
     """Genau vier, Index 0 = 1. Lage (unterste)."""
 
@@ -255,6 +264,14 @@ class QuerschnittEintrag(Beschreibung):
                 f"Platte '{name}': die Überdeckungen ergeben zusammen {zusammen:g} mm "
                 f"und lassen in einer {self.h:g} mm dicken Platte keinen Platz für "
                 f"Bewehrung.")
+
+        # Keine Abmessung, aber aus demselben Grund hier und nicht beim
+        # Oeffnen: eine abgelegte Platte mit einer zu hohen Grenze soll sich
+        # oeffnen und korrigieren lassen.
+        if not 0.0 < self.x_d_max <= X_D_HOECHSTENS:
+            raise ProjektFehler(
+                f"Platte '{name}': max. x/d muss grösser als null und höchstens "
+                f"{X_D_HOECHSTENS:g} sein, angegeben ist {self.x_d_max:g}.")
 
     def ohne_lastfaelle(self) -> None:
         """
@@ -376,6 +393,7 @@ class QuerschnittEintrag(Beschreibung):
             rissanforderung=rissanforderung_aus(d.get("rissanforderung")),
             beschreibung=str(d.get("beschreibung") or ""),
             kriechzahl=zahl(d, "kriechzahl", KRIECHZAHL),
+            x_d_max=zahl(d, "x_d_max", X_D_MAX),
             # Aus x und y wird einer: nachgewiesen wird nur noch x.
             zwaengung=schalter_aus(d.get("zwaengung"), d.get("zwaengung_x"),
                                     d.get("zwaengung_y")),

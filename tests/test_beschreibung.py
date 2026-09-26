@@ -103,7 +103,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
                         grund=PostenEintrag(durchmesser=26.0, abstand=150.0),
                         zulage=PostenEintrag(durchmesser=20.0, abstand=150.0)),
                     automatik_querkraft_teilungen=[150.0],
-                    sproede=True, zwaengung_biegung=True, duktilitaet=True,
+                    sproede=True, zwaengung_biegung=True, duktilitaet=True, x_d_max=0.42,
                     querkraftbewehrung=QuerkraftbewehrungEintrag(
                         durchmesser=10.0, stahl="s1", abstand_x=250.0,
                         abstand_y=None, anzahl_y=4.0,

@@ -297,7 +297,6 @@ function postenZeile(querschnitt, nummer, welcher, beschriftung) {
 function lagenBlock(querschnitt, nummer) {
   const lage = querschnitt.lagen[nummer - 1];
   const staehle = zustand.projekt.materialien.filter((m) => m.art === 'betonstahl');
-  const waehlbar = nummer === 1 || nummer === 4;
   const richtung = richtungVon(querschnitt, nummer);
   const partner = { 1: 2, 2: 1, 3: 4, 4: 3 }[nummer];
   const leer = !(lage.grund.durchmesser > 0 || lage.zulage.durchmesser > 0);
@@ -305,12 +304,7 @@ function lagenBlock(querschnitt, nummer) {
   return el('div.lage', { class: `lage-${richtung} ${leer ? 'ist-leer' : ''}` }, [
     el('div.lage-kopf', {}, [
       el('span', { text: `${nummer}. Lage` }),
-      waehlbar
-        ? richtungsSchalter(querschnitt, nummer, richtung, partner)
-        : el('span.richtung', {
-          text: richtung,
-          title: `Gegenrichtung zur ${partner}. Lage – dort einstellbar`,
-        }),
+      richtungsSchalter(querschnitt, nummer, richtung, partner),
       el('span', { style: { marginLeft: 'auto' } }),
       // Links vom Stahl: die Lage der Stäbe zueinander gehört zur Geometrie
       // der Lage, nicht zum Werkstoff.
@@ -371,10 +365,16 @@ function lageSchalter(querschnitt, nummer, lage) {
 
 /** Zweistellungs-Schalter x|y. Die Partnerlage folgt zwingend der Gegenrichtung. */
 function richtungsSchalter(querschnitt, nummer, richtung, partner) {
+  // Gespeichert ist die Richtung der äusseren Lage (1 und 4); die innere hat
+  // immer die Gegenrichtung. Wer an der inneren schaltet, stellt also die
+  // äussere auf das Gegenteil -- beide Schalter eines Paars zeigen dasselbe
+  // Paar, nur von der anderen Seite.
   const setzen = (wert) => projektAendern((p) => {
     const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
-    if (nummer === 1) q.richtung_lage1 = wert;
-    else q.richtung_lage4 = wert;
+    const aussen = nummer === 1 || nummer === 4;
+    const gespeichert = aussen ? wert : { x: 'y', y: 'x' }[wert];
+    if (nummer <= 2) q.richtung_lage1 = gespeichert;
+    else q.richtung_lage4 = gespeichert;
   });
 
   return el('span.schalter', {

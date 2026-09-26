@@ -3,8 +3,9 @@
 import unittest
 
 from opencivil.core.einheiten import EINHEITSLOS
+from opencivil.core.protokoll import TextBlock
 from opencivil.nachweis import duktilitaet
-from opencivil.projekt import Projekt
+from opencivil.projekt import Projekt, ProjektFehler
 from opencivil.web import dienst
 
 
@@ -232,6 +233,55 @@ class TestHerleitungAusVorlagen(unittest.TestCase):
                            if b.titel == "Gemeinsamer Schwerpunkt der Lage")
         # Beide Posten mit Querschnitt und Höhe, nicht nur das Resultat.
         self.assertIn(r"1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm}", schwerpunkt.latex)
+
+
+class TestEigeneGrenze(unittest.TestCase):
+    """(x/d)_max je Platte: Vorgabe 0.35, höchstens 0.5."""
+
+    def dicke_untere_lage(self, grenze: float) -> Projekt:
+        """⌀26@150 + ⌀10@150 unten: x/d = 0.43 -- über 0.35, unter 0.5."""
+        projekt = projekt_mit(x_d_max=grenze)
+        lage = projekt.querschnitte[0].lagen[x_lagen(projekt)[0] - 1]
+        lage.grund.durchmesser, lage.zulage.durchmesser = 26.0, 10.0
+        return projekt
+
+    def test_die_vorgabe_ist_die_des_nachweises(self):
+        self.assertEqual(Projekt.beispiel().querschnitt("q1").x_d_max,
+                         duktilitaet.GRENZE)
+
+    def test_sie_entscheidet_ueber_erfuellt(self):
+        for grenze, erfuellt in ((0.35, False), (0.5, True)):
+            aufbau, _ = urteile(self.dicke_untere_lage(grenze))
+            erg = aufbau.duktilitaet["q1"].ergebnisse[0]
+            with self.subTest(grenze=grenze):
+                self.assertAlmostEqual(erg.verhaeltnis, 0.426, delta=0.002)
+                self.assertIs(erg.erfuellt, erfuellt)
+                self.assertAlmostEqual(erg.erfuellungsgrad, grenze / erg.verhaeltnis)
+
+    def test_ausserhalb_ist_ein_fehler_mit_grund(self):
+        for grenze in (0.0, 0.6):
+            with self.subTest(grenze=grenze):
+                with self.assertRaises(ProjektFehler) as fehler:
+                    projekt_mit(x_d_max=grenze).aufbauen()
+                self.assertIn("max. x/d", str(fehler.exception))
+                self.assertIn("höchstens 0.5", str(fehler.exception))
+
+    def test_eine_andere_grenze_steht_in_der_herleitung(self):
+        """Eine geänderte Grenze ist eine Annahme -- die muss man finden."""
+        for grenze, steht_da in ((duktilitaet.GRENZE, False), (0.45, True)):
+            aufbau = projekt_mit(x_d_max=grenze).aufbauen()
+            loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+            texte = [b.text for b in loesung.protokoll.alle_bloecke()
+                     if isinstance(b, TextBlock)]
+            with self.subTest(grenze=grenze):
+                self.assertIs(any("Grenze eingegeben: (x/d)_max = 0.45" in text
+                                  for text in texte), steht_da)
+
+    def test_eine_alte_datei_bekommt_die_vorgabe(self):
+        d = Projekt.beispiel().als_dict()
+        d["querschnitte"][0].pop("x_d_max")
+        self.assertEqual(Projekt.aus_dict(d).querschnitt("q1").x_d_max,
+                         duktilitaet.GRENZE)
 
 
 class TestVorgabeUndAblage(unittest.TestCase):

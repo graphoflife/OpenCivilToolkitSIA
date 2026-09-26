@@ -37,6 +37,7 @@ from opencivil.gleichungen.ausdruck import EINHEITENNAMEN, blattname
 from opencivil.material.beton import BETON_VORLAGEN, BETONSORTEN
 from opencivil.material.betonstahl import STAHLSORTEN, STAHL_VORLAGEN
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
+from opencivil.nachweis.duktilitaet import HOECHSTENS as DUKTILITAET_HOECHSTENS
 from opencivil.nachweis.spannungsbegrenzung import GrenzeGegenFliessen
 from opencivil.projekt import (
     BEIDE_RICHTUNGEN, RISSANFORDERUNGEN, Aufbau, QuerschnittEintrag,
@@ -122,6 +123,9 @@ def katalog() -> dict:
             {"wert": m.value, "beschriftung": m.beschriftung, "dicke": m.mit_dicke}
             for m in Suchmodus
         ],
+        # Wie weit sich die Grenze x/d hoechstens setzen laesst -- fuer das
+        # Feld; geprueft wird beim Bauen der Platte.
+        "duktilitaet": {"hoechstens": DUKTILITAET_HOECHSTENS},
         # Fuer das Blatt: die leere Zeile wie die frische Platte oben, und die
         # Einheiten, die der Leser in \mathrm{...} versteht.
         "neue_gleichungszeile": GleichungszeileEintrag().als_dict(),

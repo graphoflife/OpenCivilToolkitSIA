@@ -176,8 +176,21 @@ export function nachweiseBlock(querschnitt) {
       }))),
     ]),
 
-    nachweiskapitel(querschnitt, { titel: 'Duktilitätsnachweis', feld: 'duktilitaet' }),
-    nachweiskapitel(querschnitt, { titel: 'Nachweis gegen sprödes Versagen', feld: 'sproede' }),
+    nachweiskapitel(querschnitt, {
+      titel: 'Duktilitätsnachweis', feld: 'duktilitaet', name: 'Max. x/d',
+      // Vorgabe und Höchstwert der Grenze kennt der Kern. Leer gelassen
+      // bleibt der bisherige Wert -- eine Grenze von null gäbe es nicht.
+      zusatz: zahlfeld({
+        wert: querschnitt.x_d_max, schritt: 0.05, min: 0.05,
+        max: zustand.katalog?.duktilitaet?.hoechstens,
+        titel: `Grenze der Druckzonenhöhe x/d; höchstens ${
+          zustand.katalog?.duktilitaet?.hoechstens ?? '–'}`,
+        beiAenderung: (v) => aendernAn((q) => { if (v !== null) q.x_d_max = v; }),
+      }),
+    }),
+    nachweiskapitel(querschnitt, {
+      titel: 'Nachweis gegen sprödes Versagen', feld: 'sproede', name: 'Rissmoment',
+    }),
 
     mindestbewehrungsBlock(querschnitt),
     knickBlock(querschnitt),
@@ -227,8 +240,13 @@ function einwirkungZeile(querschnitt, index) {
  *
  * Nachgewiesen wird nur x. Die y-Lagen stehen im Querschnitt, weil sie die
  * statische Höhe von x bestimmen; ein Nachweis fragt nicht nach ihnen.
+ *
+ * `name` sagt, woran gemessen wird; `zusatz` ist ein Feld dahinter, etwa die
+ * Grenze x/d der Duktilität.
  */
-function nachweiskapitel(querschnitt, { titel, feld }) {
+function nachweiskapitel(querschnitt, {
+  titel, feld, name, zusatz = null,
+}) {
   const an = !!querschnitt[feld];
   const leer = !xLagen(querschnitt).some(
     (n) => querschnitt.lagen[n - 1].grund.durchmesser > 0
@@ -239,15 +257,16 @@ function nachweiskapitel(querschnitt, { titel, feld }) {
       el('span', { text: titel }),
       hilfe(feld),
     ]),
-    el('div.duktilitaetszeile', {}, [
+    el(`div.duktilitaetszeile${zusatz ? '.mit-feld' : ''}`, {}, [
       hakenSchalter(an, (wert) => projektAendern((p) => {
         p.querschnitte.find((x) => x.kennung === querschnitt.kennung)[feld] = wert;
       }), 'Nachweis'),
       el('span.richtung', {
         text: 'x', class: 'lage-x',
-        title: 'Nur Tragrichtung x',
+        title: 'Nur Tragrichtung x; es zählt die ungünstigere x-Lage',
       }),
-      el('span.postenname', { text: 'Ungünstigere x-Lage' }),
+      el('span.postenname', { text: name }),
+      zusatz,
       // Ein eingeschalteter Nachweis ohne Bewehrung ist kein Fehler der
       // Eingabe -- er wird geführt und meldet selbst, dass er nicht geht.
       // Hier steht es trotzdem, damit man es beim Einschalten sieht.

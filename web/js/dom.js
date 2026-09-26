@@ -102,11 +102,14 @@ export function naechsteStufe(wert, richtung, { stufen, schritt = 1 } = {}) {
     return naechster ?? (richtung > 0 ? sortiert.at(-1) : sortiert[0]);
   }
 
-  // Auf das nächste Vielfache von `schritt` einrasten.
+  // Auf das nächste Vielfache von `schritt` einrasten -- gerundet auf die
+  // Stellen des Schritts: 6 · 0.05 ist in Gleitkomma 0.30000000000000004, und
+  // genau das stand dann im Feld.
   const stufe = richtung > 0
     ? Math.floor(jetzt / schritt + 1e-9) + 1
     : Math.ceil(jetzt / schritt - 1e-9) - 1;
-  return stufe * schritt;
+  const stellen = (String(schritt).split('.')[1] || '').length;
+  return Number((stufe * schritt).toFixed(stellen));
 }
 
 /**
