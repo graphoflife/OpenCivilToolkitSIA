@@ -32,11 +32,6 @@ def schlechtester(projekt) -> float:
     return suche.bewerte(projekt).grad
 
 
-#: Die Stufen, die die Suche voreingestellt zur Verfügung hat -- die Null
-#: vorneweg, darüber nichts unter dem Mindestdurchmesser.
-STUFEN = suche.stufen(suche.DURCHMESSER, suche.MINDESTDURCHMESSER)
-
-
 def ohne_duktilitaet(projekt) -> suche.Bewertung:
     """
     Bewerten wie die Suche selbst: ohne Duktilität.
@@ -73,21 +68,26 @@ class TestSuche(unittest.TestCase):
         ergebnis = suche.suche(projekt, "q1", modus=suche.Suchmodus.GRUND_MIT)
         self.assertTrue(ergebnis.gefunden)
 
-        for marke, d in ergebnis.beste.durchmesser.items():
-            # Eine Stufe kleiner -- in den Stufen der Suche und nicht in der
-            # rohen Durchmesserliste. Sonst prüfte man einen Zwischenwert,
-            # den die Suche gar nicht anbietet. Die Grundbewehrung hat keine
-            # Null: unter den Mindestdurchmesser geht sie nicht.
-            stufen = STUFEN[1:] if marke.endswith("g") else STUFEN
-            kleiner = [x for x in stufen if x < d]
-            if not kleiner:
-                continue
-            probe = platte()
-            suche.uebernehmen(probe, "q1", ergebnis.beste)
-            lage, art = int(marke[:-1]), ("grund" if marke[-1] == "g" else "zulage")
-            getattr(probe.querschnitt("q1").lagen[lage - 1], art).durchmesser = kleiner[-1]
-            with self.subTest(posten=marke):
-                self.assertFalse(ohne_duktilitaet(probe).erfuellt())
+        je_art = suche.Stufen.aus(suche.DURCHMESSER, suche.MINDESTDURCHMESSER)
+        q = projekt.querschnitt("q1")
+        for nummer, lage in enumerate(ergebnis.beste.lagen, start=1):
+            if q.richtung_von(nummer).value != "x":
+                continue        # y sucht niemand
+            for art in ("grund", "zulage"):
+                # Eine Stufe kleiner -- in den Stufen der Suche und nicht in
+                # der rohen Durchmesserliste. Sonst prüfte man einen
+                # Zwischenwert, den die Suche gar nicht anbietet. Die
+                # Grundbewehrung hat keine Null: unter den Mindestdurchmesser
+                # geht sie nicht.
+                d = getattr(lage, art).durchmesser
+                kleiner = [x for x in je_art.von((nummer, art)) if x < d]
+                if not kleiner:
+                    continue
+                probe = platte()
+                suche.uebernehmen(probe, "q1", ergebnis.beste)
+                getattr(probe.querschnitt("q1").lagen[nummer - 1], art).durchmesser = kleiner[-1]
+                with self.subTest(lage=nummer, art=art):
+                    self.assertFalse(ohne_duktilitaet(probe).erfuellt())
 
     def test_ohne_kraefte_bleibt_weniger_stahl(self):
         """
@@ -151,9 +151,10 @@ class TestSuche(unittest.TestCase):
         vorher = [l.grund.durchmesser for l in projekt.querschnitt("q1").lagen]
         ergebnis = suche.suche(projekt, "q1", modus=suche.Suchmodus.GRUND_MIT)
         self.assertTrue(ergebnis.gefunden, ergebnis.begruendung)
-        # Grund und Zulage der beiden x-Lagen -- und sonst nichts.
-        self.assertEqual(sorted(ergebnis.beste.durchmesser),
-                         ["2g", "2z", "3g", "3z"])
+        # Die y-Lagen stehen in der Lösung, wie sie eingegeben wurden.
+        for nummer in (1, 4):
+            self.assertEqual(ergebnis.beste.lagen[nummer - 1],
+                             projekt.querschnitt("q1").lagen[nummer - 1])
 
         suche.uebernehmen(projekt, "q1", ergebnis.beste)
         nachher = [l.grund.durchmesser for l in projekt.querschnitt("q1").lagen]
@@ -172,7 +173,8 @@ class TestSuche(unittest.TestCase):
             lage.grund.durchmesser = lage.zulage.durchmesser = 0
         ergebnis = suche.suche(projekt, "q1", modus=suche.Suchmodus.GRUND_MIT)
         self.assertTrue(ergebnis.gefunden, ergebnis.begruendung)
-        self.assertTrue(any(d > 0 for d in ergebnis.beste.durchmesser.values()))
+        self.assertTrue(any(l.grund.durchmesser > 0 or l.zulage.durchmesser > 0
+                            for l in ergebnis.beste.lagen))
         suche.uebernehmen(projekt, "q1", ergebnis.beste)
         self.assertTrue(suche.bewerte(projekt).erfuellt())
 
@@ -181,12 +183,11 @@ class TestSuche(unittest.TestCase):
         ergebnis = suche.suche(platte(), "q1", modus=suche.Suchmodus.GRUND_MIT,
                                mindestdurchmesser=16.0)
         self.assertTrue(ergebnis.gefunden, ergebnis.begruendung)
-        for marke, d in ergebnis.beste.durchmesser.items():
-            with self.subTest(posten=marke):
-                if marke.endswith("g"):
-                    self.assertGreaterEqual(d, 16.0)
-                else:
-                    self.assertTrue(d == 0.0 or d >= 16.0)
+        for nummer, lage in enumerate(ergebnis.beste.lagen, start=1):
+            with self.subTest(lage=nummer):
+                self.assertGreaterEqual(lage.grund.durchmesser, 16.0)
+                self.assertTrue(lage.zulage.durchmesser == 0.0
+                                or lage.zulage.durchmesser >= 16.0)
 
     def test_die_suche_faengt_bei_null_an(self):
         """
@@ -221,7 +222,7 @@ class TestMindestdurchmesser(unittest.TestCase):
         ergebnis = suche.suche(self.ohne_obere_last(), "q1",
                                modus=suche.Suchmodus.GRUND_MIT, mindestdurchmesser=0.0)
         self.assertTrue(ergebnis.gefunden, ergebnis.begruendung)
-        self.assertEqual(ergebnis.beste.durchmesser["3g"], 0.0)
+        self.assertEqual(ergebnis.beste.lagen[2].grund.durchmesser, 0.0)
 
     def test_jede_lage_hat_ihn_als_grundbewehrung(self):
         for modus in (suche.Suchmodus.GRUND_OHNE, suche.Suchmodus.GRUND_MIT,
@@ -403,7 +404,7 @@ class TestEineLageWirdNichtErfunden(unittest.TestCase):
         projekt = platte(zwaengung=True)
         ergebnis = suche.suche(projekt, "q1", modus=suche.Suchmodus.GRUND_OHNE)
         self.assertTrue(ergebnis.gefunden, ergebnis.begruendung)
-        self.assertGreater(ergebnis.beste.durchmesser["2g"], 0.0)
+        self.assertGreater(ergebnis.beste.lagen[1].grund.durchmesser, 0.0)
 
 
 class TestYWieX(unittest.TestCase):
@@ -515,7 +516,7 @@ class TestNurDieEigenePlatte(unittest.TestCase):
             with self.subTest(modus=modus.value):
                 self.assertTrue(allein.gefunden, allein.begruendung)
                 self.assertTrue(daneben.gefunden, daneben.begruendung)
-                self.assertEqual(daneben.beste.durchmesser, allein.beste.durchmesser)
+                self.assertEqual(daneben.beste.lagen, allein.beste.lagen)
                 self.assertEqual(daneben.beste.teilung, allein.beste.teilung)
 
     def test_auch_die_buegel_sehen_nur_ihre_platte(self):

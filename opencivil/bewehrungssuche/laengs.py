@@ -34,7 +34,7 @@ Duktilitaetsversagen in die falsche Richtung liefe.
 DER MINDESTDURCHMESSER:
 Die Grundbewehrung jeder Lage ist mindestens so dick -- in x beginnt die
 Suche dort und nicht bei null, und eine y-Lage, die duenner ist oder fehlt,
-hebt sie darauf an (:func:`_y_mindestens`). Eine Platte hat oben und unten
+hebt sie darauf an (:func:`_y_ableiten`). Eine Platte hat oben und unten
 in beiden Richtungen ein Netz; eine Lage, die kein Nachweis verlangt, blieb
 sonst leer. Die Zulage darf weiter fehlen. Ohne Mindestdurchmesser (null)
 darf auch eine Lage leer bleiben.
@@ -49,13 +49,15 @@ der Durchmesser bis ⌀40; die Grenze haelt die Suche im Zaum.
 from __future__ import annotations
 
 import copy
-import math
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import TYPE_CHECKING, List, Optional, Sequence, Tuple
 
 from opencivil.bewehrungssuche.bewertung import Bewertung, arbeitskopie, bewerte
 from opencivil.querschnitt.platte import Richtung
+
+if TYPE_CHECKING:
+    from opencivil.projekt import LageEintrag
 
 #: Lieferbare Stabdurchmesser in mm, aufsteigend. Die Suche geht sie der
 #: Reihe nach durch; was nicht in der Liste steht, kommt nicht heraus. Wie
@@ -137,36 +139,30 @@ Posten = Tuple[int, str]
 
 
 @dataclass
-class Schritt:
-    """Eine Runde der Suche -- fuer die Mitschrift in der Oberflaeche."""
-
-    runde: int
-    durchmesser: Dict[str, float]
-    schlechtester: float
-    """Kleinster Erfuellungsgrad dieser Runde."""
-
-    nachweis: str
-    """Welcher Nachweis ihn hatte."""
-
-
-@dataclass
 class Loesung:
     """Was fuer eine Teilung herauskam."""
 
     teilung: float
     gefunden: bool = False
-    durchmesser: Dict[str, float] = field(default_factory=dict)
-    """Posten (``'1g'``, ``'4z'``, …) auf Durchmesser in mm."""
+    lagen: List["LageEintrag"] = field(default_factory=list)
+    """
+    Die vier Lagen, wie die Suche sie hinterlaesst -- die Platte selbst,
+    nicht eine Beschreibung davon.
+
+    Frueher stand hier ein Woerterbuch aus Marken (``'2g'``, ``'3z'``) auf
+    Durchmesser. :func:`uebernehmen` musste die Marken wieder zerlegen, eine
+    eigene Funktion Luecken mit null fuellen, und jede Regel fuer die y-Lagen
+    -- «wie x», «mindestens» -- brauchte dort noch einmal einen Sonderfall.
+    Die Suche hat die fertige Platte aber ohnehin in der Hand.
+    """
 
     stahlflaeche: float = 0.0
-    """Summe der Bewehrungsquerschnitte in mm²/Streifen -- alles, was die
-    Loesung einbaut, auch die y-Grundbewehrung, die x folgt oder die sie auf
-    den Mindestdurchmesser hebt."""
+    """Summe der Bewehrungsquerschnitte aller Lagen, in mm² ueber die
+    Breite ``b`` -- das Mass, nach dem die Teilungen verglichen werden."""
 
     schlechtester: float = 0.0
     nachweis: str = ""
     begruendung: str = ""
-    schritte: List[Schritt] = field(default_factory=list)
 
 
 @dataclass
@@ -202,10 +198,6 @@ def _posten(eintrag, lage: int, art: str) -> dict:
     return getattr(eintrag.lagen[lage - 1], art)
 
 
-def _marke(lage: int, art: str) -> str:
-    return f"{lage}{'g' if art == 'grund' else 'z'}"
-
-
 def _gesuchte(eintrag, *, arten: Sequence[str]) -> List[Posten]:
     """
     Welche Posten die Suche anfasst: die der Tragrichtung x.
@@ -221,9 +213,8 @@ def _gesuchte(eintrag, *, arten: Sequence[str]) -> List[Posten]:
     -- die Suche wuerde sie auf null ziehen, und genau das waere falsch: die
     y-Bewehrung liegt aussen und bestimmt, wieviel statische Hoehe der
     x-Bewehrung bleibt. Was dort liegt, sagt der Benutzer -- oder er laesst
-    die y-Grundbewehrung der x-Grundbewehrung folgen (:func:`_y_folgt_x`).
-    Duenner als der Mindestdurchmesser bleibt sie aber nicht
-    (:func:`_y_mindestens`).
+    die y-Grundbewehrung der x-Grundbewehrung folgen. Duenner als der
+    Mindestdurchmesser bleibt sie aber nicht (beides :func:`_y_ableiten`).
 
     Null ist der Anfang der Zulage -- und der Grundbewehrung nur ohne
     Mindestdurchmesser (siehe :func:`suche`).
@@ -286,45 +277,32 @@ def _seiten(eintrag) -> List[Tuple[int, int]]:
             for a, b in ((1, 2), (3, 4))]
 
 
-def _y_folgt_x(eintrag) -> None:
+def _y_ableiten(eintrag, mindest: float, teilung: float) -> None:
     """
-    Die y-Grundbewehrung jeder Seite wie die x-Grundbewehrung dieser Seite.
+    Was die Suche an den y-Lagen tut -- die eine Regel dafuer.
 
-    Im Suchlauf nach jedem Setzen, nicht erst beim Uebernehmen: liegt y
-    aussen, kostet ihr Durchmesser x die statische Hoehe, und gesucht werden
-    soll mit der Bewehrung, die hinterher dasteht.
-    """
-    for x, y in _seiten(eintrag):
-        vorbild, folger = _posten(eintrag, x, "grund"), _posten(eintrag, y, "grund")
-        folger.durchmesser = vorbild.durchmesser
-        folger.abstand = vorbild.abstand
-        folger.anzahl = vorbild.anzahl
+    Folgt y der x-Grundbewehrung (``automatik_y_wie_x``), bekommt jede Seite
+    die x-Grundbewehrung dieser Seite. Sonst wird eine y-Grundbewehrung, die
+    duenner ist als der Mindestdurchmesser oder fehlt, auf ihn gehoben, mit
+    der gesuchten Teilung; eine dickere bleibt, wie sie ist -- mindestens
+    heisst nicht genau.
 
-
-def _y_mindestens(eintrag, durchmesser: float, teilung: float) -> List[int]:
-    """
-    Jede y-Grundbewehrung, die duenner ist als ``durchmesser`` oder fehlt,
-    auf ihn heben -- mit der gesuchten Teilung. Zurueck: welche Lagen.
-
-    Nicht, wenn y der x-Grundbewehrung folgt: dann ist sie so dick wie x, und
-    x hat den Mindestdurchmesser schon. Eine dickere y-Lage bleibt, wie sie
-    ist -- mindestens heisst nicht genau.
-
-    Vor dem Suchen und nicht erst beim Uebernehmen: liegt y aussen, kostet ihr
-    Durchmesser x die statische Hoehe.
+    Nach jedem Setzen und nicht erst beim Uebernehmen: liegt y aussen, kostet
+    ihr Durchmesser x die statische Hoehe, und gesucht werden soll mit der
+    Bewehrung, die hinterher dasteht.
     """
     if eintrag.automatik_y_wie_x:
-        return []
-    gehoben = []
+        for x, y in _seiten(eintrag):
+            vorbild, folger = _posten(eintrag, x, "grund"), _posten(eintrag, y, "grund")
+            folger.durchmesser = vorbild.durchmesser
+            folger.abstand = vorbild.abstand
+            folger.anzahl = vorbild.anzahl
+        return
     for nummer, lage in enumerate(eintrag.lagen, start=1):
-        if eintrag.richtung_von(nummer) is Richtung.X:
-            continue
-        if lage.grund.durchmesser < durchmesser:
-            lage.grund.durchmesser = durchmesser
+        if eintrag.richtung_von(nummer) is not Richtung.X and lage.grund.durchmesser < mindest:
+            lage.grund.durchmesser = mindest
             lage.grund.abstand = teilung
             lage.grund.anzahl = None
-            gehoben.append(nummer)
-    return gehoben
 
 
 def _ueber_grenze(eintrag, grenze: float) -> bool:
@@ -335,11 +313,10 @@ def _ueber_grenze(eintrag, grenze: float) -> bool:
         if eintrag.richtung_von(nummer) is Richtung.X)
 
 
-def _flaeche(durchmesser: Dict[str, float], teilung: float,
-             breite: float) -> float:
-    """Stahlquerschnitt aller Posten einer Loesung, in mm² je Streifen."""
-    return sum(math.pi * d * d / 4.0 * (breite / teilung)
-               for d in durchmesser.values() if d > 0)
+def _stahlflaeche(eintrag) -> float:
+    """Stahlquerschnitt aller Lagen, in mm² ueber die Breite ``b``."""
+    return sum(lage.grund.je_meter(eintrag.b) + lage.zulage.je_meter(eintrag.b)
+               for lage in eintrag.lagen) * eintrag.b / 1000.0
 
 
 # ===========================================================================
@@ -371,17 +348,15 @@ def _eine_teilung(projekt, kennung: str, teilung: float,
 
     def setzen() -> None:
         for (lage, art), i in stand.items():
-            eintrag_posten = _posten(eintrag, lage, art)
-            eintrag_posten.durchmesser = stufen.von((lage, art))[i]
-            # Die Teilung gilt fuer beide Posten einer Lage gleich -- sonst
-            # liessen sich Grundbewehrung und Zulage nicht gemeinsam verlegen.
-            eintrag_posten.abstand = teilung
-            eintrag_posten.anzahl = None
-        if eintrag.automatik_y_wie_x:
-            _y_folgt_x(eintrag)
-
-    def stand_als_dict() -> Dict[str, float]:
-        return {_marke(l, a): stufen.von((l, a))[i] for (l, a), i in stand.items()}
+            _posten(eintrag, lage, art).durchmesser = stufen.von((lage, art))[i]
+        # Die Teilung gilt fuer beide Posten einer gesuchten Lage gleich --
+        # sonst liessen sich Grundbewehrung und Zulage nicht gemeinsam
+        # verlegen. Auch fuer den, der gerade nicht gesucht wird.
+        for lage in {lage for lage, _ in posten}:
+            for art in ("grund", "zulage"):
+                _posten(eintrag, lage, art).abstand = teilung
+                _posten(eintrag, lage, art).anzahl = None
+        _y_ableiten(eintrag, stufen.mindest, teilung)
 
     setzen()
     erwartet = bewerte(projekt).anzahl
@@ -394,16 +369,13 @@ def _eine_teilung(projekt, kennung: str, teilung: float,
             f"Obergrenze {grenze:.0f} mm²/m je Lage.")
         return loesung
     bewertung = bewerte(projekt)
-    for runde in range(1, RUNDEN + 1):
-        loesung.schritte.append(Schritt(
-            runde=runde, durchmesser=stand_als_dict(),
-            schlechtester=bewertung.grad, nachweis=bewertung.nachweis))
-
+    for _ in range(RUNDEN):
         if bewertung.erfuellt(erwartet):
             bewertung = _absteigen(projekt, posten, stand,
                                    setzen, bewertung, erwartet)
             loesung.gefunden = True
-            loesung.durchmesser = stand_als_dict()
+            loesung.lagen = copy.deepcopy(eintrag.lagen)
+            loesung.stahlflaeche = _stahlflaeche(eintrag)
             loesung.schlechtester = bewertung.grad
             loesung.nachweis = bewertung.nachweis
             return loesung
@@ -557,63 +529,24 @@ def _absteigen(projekt, posten, stand, setzen,
     return bewertung
 
 
-def _vollstaendig(loesung: Loesung, eintrag,
-                  gehoben: Sequence[int] = ()) -> Loesung:
-    """
-    Jeden Posten in die Loesung schreiben, auch die nicht gesuchten -- und die
-    Stahlflaeche aus allem, was sie einbaut.
-
-    Die Suche raeumt die Platte leer und sucht dann eine Auswahl von Posten --
-    in den Grund-Modi etwa nur die Grundbewehrung. Stuende in der Loesung nur
-    diese Auswahl, schriebe :func:`uebernehmen` sie in eine Platte, in der die
-    Zulage noch steht: mehr Stahl, als die Suche angenommen hat. Gerechnet
-    waere richtig und die Platte trotzdem eine andere.
-
-    Was nicht gesucht wurde, ist darum ausdruecklich null. Folgt y der
-    x-Grundbewehrung oder hat die Suche sie auf den Mindestdurchmesser
-    gehoben (``gehoben``), steht auch sie darin: eingerechnet hat die Suche
-    sie schon, also baut :func:`uebernehmen` sie auch ein.
-    """
-    if not loesung.gefunden:
-        return loesung
-    for nummer in range(1, len(eintrag.lagen) + 1):
-        if eintrag.richtung_von(nummer) is not Richtung.X:
-            continue
-        for art in ("grund", "zulage"):
-            loesung.durchmesser.setdefault(_marke(nummer, art), 0.0)
-    if eintrag.automatik_y_wie_x:
-        for x, y in _seiten(eintrag):
-            loesung.durchmesser[_marke(y, "grund")] = (
-                loesung.durchmesser[_marke(x, "grund")])
-    for nummer in gehoben:
-        loesung.durchmesser[_marke(nummer, "grund")] = (
-            eintrag.lagen[nummer - 1].grund.durchmesser)
-    loesung.stahlflaeche = _flaeche(loesung.durchmesser, loesung.teilung,
-                                    eintrag.b)
-    return loesung
-
-
 def _fuer_teilung(projekt, kennung: str, teilung: float, modus: Suchmodus,
                   stufen: Stufen) -> Loesung:
-    """Eine Teilung, je nach Modus in einem oder zwei Schritten."""
-    def y_mindestens(eintrag) -> List[int]:
-        return (_y_mindestens(eintrag, stufen.mindest, teilung)
-                if stufen.mindest > 0 else [])
+    """
+    Eine Teilung, je nach Modus in einem oder zwei Schritten.
 
+    Die Arbeitsplatte hat die x-Lagen leer (siehe :func:`arbeitskopie`); was
+    nicht gesucht wird -- in den Grund-Modi die Zulage --, bleibt also
+    ausdruecklich null und steht so auch in der Loesung.
+    """
     if modus in (Suchmodus.GRUND_MIT, Suchmodus.GRUND_OHNE):
         arbeit = arbeitskopie(projekt, kennung,
                                kraefte=modus is Suchmodus.GRUND_MIT)
-        eintrag = arbeit.querschnitt(kennung)
-        gehoben = y_mindestens(eintrag)
-        posten = _gesuchte(eintrag, arten=("grund",))
-        return _vollstaendig(
-            _eine_teilung(arbeit, kennung, teilung, posten, stufen),
-            eintrag, gehoben)
+        posten = _gesuchte(arbeit.querschnitt(kennung), arten=("grund",))
+        return _eine_teilung(arbeit, kennung, teilung, posten, stufen)
 
     # Zwei Schritte: erst die Grundbewehrung ohne Kraefte, dann die Zulage
-    # gegen alles. Der zweite Schritt uebernimmt die Durchmesser des ersten.
+    # gegen alles. Der zweite Schritt uebernimmt die Grundbewehrung des ersten.
     ohne = arbeitskopie(projekt, kennung, kraefte=False)
-    y_mindestens(ohne.querschnitt(kennung))
     grund_posten = _gesuchte(ohne.querschnitt(kennung), arten=("grund",))
     erst = _eine_teilung(ohne, kennung, teilung, grund_posten, stufen)
     if not erst.gefunden:
@@ -626,30 +559,16 @@ def _fuer_teilung(projekt, kennung: str, teilung: float, modus: Suchmodus,
     # jetzt nur noch die Zulage.
     arbeit = arbeitskopie(projekt, kennung, kraefte=True, leeren=False)
     eintrag = arbeit.querschnitt(kennung)
-    gehoben = y_mindestens(eintrag)
     for lage in eintrag.lagen:
         lage.zulage.durchmesser = 0
-    for lage, art in grund_posten:
-        p = _posten(eintrag, lage, art)
-        p.durchmesser = erst.durchmesser[_marke(lage, art)]
-        p.abstand = teilung
-        p.anzahl = None
+    for lage, _ in grund_posten:
+        eintrag.lagen[lage - 1].grund = copy.deepcopy(erst.lagen[lage - 1].grund)
     # Eine Zulage gehoert zu einer bewehrten Lage, nicht zu einer leeren --
     # gesucht wird sie darum ueberall dort, wo Grundbewehrung liegen koennte.
     zulage_posten = [(lage, "zulage") for lage, _ in grund_posten]
-    zweit = _eine_teilung(arbeit, kennung, teilung, zulage_posten, stufen)
-    zweit.durchmesser = {**erst.durchmesser, **zweit.durchmesser}
-    zweit.schritte = erst.schritte + zweit.schritte
-    return _vollstaendig(zweit, eintrag, gehoben)
+    return _eine_teilung(arbeit, kennung, teilung, zulage_posten, stufen)
 
 
 def uebernehmen(projekt, kennung: str, loesung: Loesung) -> None:
-    """Die gefundenen Durchmesser und die Teilung in die Platte schreiben."""
-    eintrag = projekt.querschnitt(kennung)
-    for marke, d in loesung.durchmesser.items():
-        lage = int(marke[:-1])
-        art = "grund" if marke[-1] == "g" else "zulage"
-        p = _posten(eintrag, lage, art)
-        p.durchmesser = d
-        p.abstand = loesung.teilung
-        p.anzahl = None
+    """Die gefundenen Lagen in die Platte schreiben."""
+    projekt.querschnitt(kennung).lagen = copy.deepcopy(loesung.lagen)
