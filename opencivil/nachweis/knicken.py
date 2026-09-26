@@ -284,6 +284,11 @@ class Knicken(Nachweis):
             Eingabebezug("E_s", stahl.id_von("E_s")),
             Eingabebezug("f_yd", stahl.id_von(WERKSTOFFE.stahl)),
             Eingabebezug("eps_ud", stahl.id_von("eps_ud")),
+            # Das Moment bei N liest die Iteration vom Polygon des
+            # M-N-Nachweises (``self.mn.moment_bei``). Ein Eckwert davon als
+            # Eingang stellt die Abhaengigkeit in den Graphen -- sonst rechnete
+            # ein Teillauf (das Auge) das Knicken ohne Polygon.
+            Eingabebezug("N_Rd_druck", mn_nachweis.d_eckwerte["N_Rd_druck"].id),
         ]
 
         super().__init__(

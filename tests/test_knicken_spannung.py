@@ -479,6 +479,20 @@ class TestKnicken(unittest.TestCase):
         self.assertAlmostEqual(erg.N_int / 1e3, -800.0, delta=1.0)
         self.assertAlmostEqual(erg.M_int / 1e3, erg.M_ges / 1e3, delta=0.5)
 
+    def test_das_auge_rechnet_ihn_allein(self):
+        """
+        Der Teillauf des Auges: nur dieser Nachweis und was er braucht. Dazu
+        gehoert das Polygon des M-N-Nachweises -- stand es nicht im Graphen,
+        brach der Teillauf ab, und die Oberflaeche zeigte still alles.
+        """
+        stuetze = KnickEintrag("Stütze", N_Ed=-800.0, M_Ed_1=20.0, laenge=4.0,
+                               knicklaenge=4.0)
+        aufbau = self.projekt(stuetze).aufbauen()
+        ziel = aufbau.knicken["q1"].d_ausnutzung["Stütze"].id
+        teil = aufbau.werk.loese(ziel)
+        self.assertAlmostEqual(teil.werte[ziel].groesse.si,
+                               self.gefunden["Knicken – Stütze"].erfuellungsgrad.si)
+
     def test_ueberlastet_knickt(self):
         """
         Nicht erfüllt, und zwar nicht wegen einer Spannung: es gibt gar keine
