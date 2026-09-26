@@ -44,6 +44,66 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-09-26 · «Risse: …», Farben für die Tragrichtungen, kürzere Lastfallzeilen
+
+Wunsch: andere Namen in der Zusammenfassung, dunklere Ränder, neue Farben
+für x und y, Überdeckung und Platte als Karten, Lastfallzeilen nicht über
+die ganze Breite.
+
+### Namen in der Zusammenfassung
+
+| vorher | nachher |
+| --- | --- |
+| Stahlspannung aus Rissbreite | Risse: Quasi-ständige Lastfälle |
+| Stahlspannung gegen Fliessen | Risse: Häufige Lastfälle |
+| Zwängung auf Biegung | Risse: Zwängung Biegung |
+| Zwängung auf Normalkraft | Risse: Zwängung Normalkraft |
+
+* **Nur in der Zusammenfassung** und in den Hinweisen darunter, in der
+  Oberfläche wie im Bericht. Formelsammlung, Herleitung und die Schalter der
+  Eingabe heissen weiter wie bisher.
+* **Dafür hat jeder Nachweis einen eigenen Namen für die Zusammenfassung**
+  (`Nachweis.LANGNAME`, leer: sein Thema). Vorher war der Name das Thema
+  der Formelsammlung. Beide ordnen aber anders: die Formelsammlung nach dem,
+  was gerechnet wird, die Zusammenfassung nach der Frage, die beantwortet
+  wird.
+* «Quasi-ständige» mit kleinem s nach dem Bindestrich, wie sonst überall in
+  der Oberfläche.
+
+### Farben
+
+* **x saftgrün, y hellrot, Bügel violett** (wie «beide»). Vorher war x blau
+  und y kupfer. Kupfer ist aber auch die Farbe des Betonstahls. Jetzt trägt
+  jede Farbe nur eine Bedeutung.
+* **Heller und gelblicher als Grün und Rot der Urteile.** Eine y-Lage soll
+  nicht wie ein verfehlter Nachweis aussehen.
+* **Einmal festgelegt**, in `stil.css`. Das Querschnittsbild liest sie dort
+  (`stilfarbe`); vorher stand das Blau der x-Lagen ein zweites Mal im
+  JavaScript.
+
+### Ränder und Karten
+
+* **Eingaberand dunkler:** Zahlen- und Namensfelder, Auswahllisten,
+  Textkasten, Formelfelder und Schalter haben einen gemeinsamen Rand
+  (`--eingabe-rand`). Der Kontrast zu Weiss steigt von 1.7 auf 3.1; die
+  Richtlinie für barrierefreie Bedienelemente (WCAG) verlangt 3.
+* **Überdeckung:** eine weisse Karte mit blauer Kante wie die Lagen. Vorher
+  war sie grau und gestrichelt und ging zwischen den Lagen unter.
+* **Platte:** Die Angaben stehen in einer Karte mit blauer Kante wie die
+  Nachweiskapitel.
+
+### Lastfallzeilen
+
+* **Die Zeile steht links**, der Name ist höchstens drei Zahlenfelder breit
+  (240 px). Vorher füllte der Name die ganze Breite, und Name und Zahlen
+  standen weit auseinander.
+* In der schmalen Tafel bleiben die Felder 80 px breit. Der Name darüber ist
+  so breit wie die Felder unter ihm.
+* **Spaltenköpfe dunkler** (wie die Kapitelköpfe), «Bezeichnung»
+  linksbündig über dem Namen.
+
+---
+
 ## 2026-09-26 · Python in einem eigenen Faden
 
 Wunsch: Die Seite soll nicht mehr stillstehen, während der Browser rechnet.
