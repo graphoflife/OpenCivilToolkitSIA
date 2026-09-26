@@ -11,8 +11,8 @@ import unittest
 
 from opencivil.core.einheiten import GRAD, KN, M, MM, MPA, Groesse
 from opencivil.gleichungen.ausdruck import (
-    AusdruckFehler, anzeigeeinheit, einheit_aus_text, lesen, namen, rechnen,
-    setzen,
+    AusdruckFehler, anzeigeeinheit, blattname, einheit_aus_text, lesen, namen,
+    rechnen, setzen,
 )
 from opencivil.projekt import Projekt
 from opencivil.projekt.gleichungen import (
@@ -59,6 +59,13 @@ class TestLesenUndRechnen(unittest.TestCase):
         self.assertEqual(lesen(r"\sigma_{s,adm}=1").name.latex, r"\sigma_{s,adm}")
         self.assertEqual(namen(lesen(r"\alpha\cdot\beta_{1}").ausdruck),
                          [r"\alpha", r"\beta_{1}"])
+
+    def test_der_name_eines_projektwerts(self):
+        """Der Vorschlag im Blatt: ohne Sorte und Fall, und nur, was der Leser annimmt."""
+        self.assertEqual(blattname(r"f_{cd,\text{C30/37}}"), "f_{cd}")
+        self.assertEqual(blattname(r"k_{\sigma}"), r"k_{\sigma}")
+        self.assertEqual(blattname(r"\varnothing_{1,y,g}"), "")
+        self.assertEqual(blattname(r"M_{Rd,x}^{+}"), "")
 
     def test_einheiten(self):
         self.assertEqual(wert(r"3\mathrm{m}+20\mathrm{cm}").in_einheit(M), 3.2)
@@ -137,6 +144,8 @@ class TestEinheiten(unittest.TestCase):
             with self.subTest(text=text):
                 self.assertAlmostEqual(einheit_aus_text(text).faktor, erwartet)
         self.assertIsNone(einheit_aus_text(""))
+        # Aus dem Katalog, samt Beschriftung -- nicht «N/mm2».
+        self.assertEqual(einheit_aus_text("N/mm2").beschriftung, "N/mm²")
         with self.assertRaises(AusdruckFehler):
             einheit_aus_text("parsec")
 

@@ -51,8 +51,6 @@ _SONDERZEICHEN = {
     "~": r"\textasciitilde{}",
     "{": r"\{",
     "}": r"\}",
-    "~": r"\textasciitilde{}",
-    "^": r"\textasciicircum{}",
 }
 
 
@@ -81,6 +79,19 @@ def als_text(text: str) -> str:
     dann steht im Bericht der rohe Quelltext statt der Beschriftung.
     """
     return rf"\text{{{text_latex(text)}}}"
+
+
+#: Ein Name im Index: ``\alpha_{eff,x,\text{Feld}}``, ``f_{cd,\text{C30/37}}``.
+_NAME_IM_INDEX = re.compile(r",\\text\{[^{}]*\}")
+
+
+def ohne_namen_im_index(symbol: str) -> str:
+    """
+    Das Symbol ohne Sorte und Fall im Index: ``f_{cd,\text{C30/37}}`` ->
+    ``f_{cd}``. Das Gegenstueck zu :func:`opencivil.material.basis.mit_index`
+    und zu den Fallnamen, die ein Nachweis an seine Symbole haengt.
+    """
+    return _NAME_IM_INDEX.sub("", symbol)
 
 
 def platzhalter_namen(vorlage: str) -> list[str]:
@@ -368,7 +379,6 @@ class Formelzeile:
         if einheiten:
             trenner = r",\ "
             hinweis = rf"\quad \left({trenner.join(einheiten)}\right)"
-            nachsatz = f"{nachsatz} {hinweis}".strip()
         return cls(
             symbol=ergebnis.symbol,
             analytisch=einsetzen_symbolisch(vorlage, eingaben, kontext),
@@ -395,9 +405,13 @@ class Formelzeile:
         teile.append(self.ergebnis)
         return teile
 
+    def _schluss(self) -> str:
+        """Was hinter dem Resultat steht: Nachsatz, dann der Einheitenhinweis."""
+        return " ".join(filter(None, [self.nachsatz, self.einheiten]))
+
     def einzeilig(self) -> str:
         """``f_{cd} = \\frac{...} = \\frac{...} = 18.7\\,\\mathrm{MPa}``"""
-        return " ".join(filter(None, [" = ".join(self._teile()), self.nachsatz]))
+        return " ".join(filter(None, [" = ".join(self._teile()), self._schluss()]))
 
     def mehrzeilig(self) -> str:
         """Dieselbe Zeile als ``aligned``-Umgebung, fuer lange Formeln."""
@@ -406,8 +420,8 @@ class Formelzeile:
             return self.einzeilig()
         zeilen = [f"{teile[0]} &= {teile[1]}"]
         zeilen.extend(f"&= {t}" for t in teile[2:])
-        if self.nachsatz:
-            zeilen[-1] += f" {self.nachsatz}"
+        if self._schluss():
+            zeilen[-1] += f" {self._schluss()}"
         inhalt = " \\\\\n  ".join(zeilen)
         return f"\\begin{{aligned}}\n  {inhalt}\n\\end{{aligned}}"
 

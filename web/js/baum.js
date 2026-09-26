@@ -52,19 +52,24 @@ function kapitel({ schluessel, titel, klasse, anzahl, werkzeuge, kinder, oben })
   ]);
 }
 
-/** Was rechts im Eintrag steht und wie er aussieht -- je Art. */
+/** Was rechts im Eintrag steht, wie er aussieht und wie er weggeht -- je Art. */
 const ART = {
-  material: (m) => ({ klasse: m.art === 'beton' ? 'beton' : 'stahl', text: m.sorte }),
-  querschnitt: (q) => ({ klasse: 'platte', text: `${q.h}×${q.b} mm` }),
+  material: (m) => ({
+    klasse: m.art === 'beton' ? 'beton' : 'stahl', text: m.sorte, loeschen: materialLoeschen,
+  }),
+  querschnitt: (q) => ({
+    klasse: 'platte', text: `${q.h}×${q.b} mm`, loeschen: () => entfernen('querschnitte', q),
+  }),
   blatt: (b) => ({
     klasse: 'blatt', text: `${b.zeilen.length} ${b.zeilen.length === 1 ? 'Zeile' : 'Zeilen'}`,
+    loeschen: () => entfernen('gleichungen', b),
   }),
 };
 
 function eintrag(m, art) {
   const aktiv = zustand.auswahl?.art === art && zustand.auswahl.kennung === m.kennung;
   const istMaterial = art === 'material';
-  const { klasse, text } = ART[art](m);
+  const { klasse, text, loeschen } = ART[art](m);
   return el('div.baum-eintrag', {
     class: `${aktiv ? 'ist-aktiv' : ''} baum-eintrag-${klasse}`,
     on: { click: () => aendern({ auswahl: { art, kennung: m.kennung } }, 'auswahl') },
@@ -83,7 +88,7 @@ function eintrag(m, art) {
       on: {
         click: (e) => {
           e.stopPropagation();
-          ({ material: materialLoeschen, querschnitt: platteLoeschen, blatt: blattLoeschen })[art](m);
+          loeschen(m);
         },
       },
     }),
@@ -108,17 +113,15 @@ function materialLoeschen(material) {
       + benutztVon.map((q) => q.name).join(', '), true);
     return;
   }
-  projektAendern((p) => {
-    p.materialien = p.materialien.filter((m) => m.kennung !== material.kennung);
-  });
-  if (zustand.auswahl?.kennung === material.kennung) aendern({ auswahl: null }, 'auswahl');
+  entfernen('materialien', material);
 }
 
-function blattLoeschen(blatt) {
+/** Einen Eintrag aus einer Liste des Projekts -- und aus der Auswahl, wenn er gewählt war. */
+function entfernen(liste, eintrag) {
   projektAendern((p) => {
-    p.gleichungen = p.gleichungen.filter((b) => b.kennung !== blatt.kennung);
+    p[liste] = p[liste].filter((x) => x.kennung !== eintrag.kennung);
   });
-  if (zustand.auswahl?.kennung === blatt.kennung) aendern({ auswahl: null }, 'auswahl');
+  if (zustand.auswahl?.kennung === eintrag.kennung) aendern({ auswahl: null }, 'auswahl');
 }
 
 function blattAnlegen() {
@@ -131,13 +134,6 @@ function blattAnlegen() {
     });
   });
   aendern({ auswahl: { art: 'blatt', kennung } }, 'auswahl');
-}
-
-function platteLoeschen(platte) {
-  projektAendern((p) => {
-    p.querschnitte = p.querschnitte.filter((q) => q.kennung !== platte.kennung);
-  });
-  if (zustand.auswahl?.kennung === platte.kennung) aendern({ auswahl: null }, 'auswahl');
 }
 
 function materialAnlegen(art) {

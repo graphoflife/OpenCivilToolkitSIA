@@ -601,8 +601,7 @@ def lagen_zusammenfassen(posten: Sequence[Posten]) -> Dict[str, Lage]:
         # Nur eine Seite bewehrt -- die andere zaehlt mit null Flaeche, damit
         # die Formeln unveraendert gelten.
         vorhanden = buendeln(next(iter(gruppen.values())))
-        leer = Lage(0.0, 0.0 if vorhanden.z > 0 else 0.0,
-                    vorhanden.f_yd, vorhanden.E_s, "keine")
+        leer = Lage(0.0, 0.0, vorhanden.f_yd, vorhanden.E_s, "keine")
         return ({"unten": vorhanden, "oben": leer} if True in gruppen
                 else {"unten": leer, "oben": vorhanden})
 

@@ -407,7 +407,6 @@ class BiegungNormalkraft(Nachweis):
                     name=f"M-N-Nachweis {self.richtung.value} – {kombination.name}",
                     art="M-N",
                     ziel=self.d_ausnutzung[kombination.name].id,
-                    langname=self.thema,
                     fall=kombination.name,
                     erfuellt=auswertung.innerhalb,
                     erfuellungsgrad=Groesse(auswertung.erfuellungsgrad, EINHEITSLOS),

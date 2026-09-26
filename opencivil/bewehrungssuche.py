@@ -402,9 +402,6 @@ def _eine_teilung(projekt, kennung: str, teilung: float,
     """
     eintrag = projekt.querschnitt(kennung)
     loesung = Loesung(teilung=teilung)
-    if not posten:
-        loesung.begruendung = "Keine x-Lage zum Suchen."
-        return loesung
 
     # Wie viele Urteile die voll bewehrte Platte faellt. Weniger darf am Ende
     # nicht herauskommen -- siehe Bewertung.erfuellt.
@@ -508,14 +505,13 @@ def suche(projekt, kennung: str, *,
         ergebnis.begruendung = (
             "Mit keiner Teilung gehen alle eingeschalteten Nachweise auf.")
         return ergebnis
-    if gefunden:
-        # Kleinste Stahlflaeche gewinnt. Bei Gleichstand die groessere
-        # Teilung: weniger Staebe bei gleichem Querschnitt ist weniger Arbeit.
-        ergebnis.beste = min(gefunden, key=lambda l: (l.stahlflaeche, -l.teilung))
-        ergebnis.begruendung = (
-            f"Teilung {ergebnis.beste.teilung:.0f} mm, "
-            f"{ergebnis.beste.stahlflaeche:.0f} mm² – kleinste Stahlfläche von "
-            f"{len(gefunden)} Lösungen.")
+    # Kleinste Stahlflaeche gewinnt. Bei Gleichstand die groessere Teilung:
+    # weniger Staebe bei gleichem Querschnitt ist weniger Arbeit.
+    ergebnis.beste = min(gefunden, key=lambda l: (l.stahlflaeche, -l.teilung))
+    ergebnis.begruendung = (
+        f"Teilung {ergebnis.beste.teilung:.0f} mm, "
+        f"{ergebnis.beste.stahlflaeche:.0f} mm² – kleinste Stahlfläche von "
+        f"{len(gefunden)} Lösungen.")
     ergebnis.duktilitaet = _duktilitaetsbefund(projekt, kennung, ergebnis.beste)
     return ergebnis
 

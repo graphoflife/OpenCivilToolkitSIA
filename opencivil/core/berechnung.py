@@ -771,6 +771,11 @@ class Nachweis(Berechnung):
             p.text(f"Massgebend: {massgebend[0].fall} (kleinster Erfüllungsgrad).")
 
     @staticmethod
+    def ohne_bewehrung(nummer: int) -> str:
+        """Die Begruendung einer Lage ohne Stahl -- in jedem Lagennachweis dieselbe."""
+        return f"{nummer}. Lage ohne Bewehrung → kein Nachweis."
+
+    @staticmethod
     def teilurteile(
         urteile: Sequence[NachweisUrteil],
     ) -> List[NachweisUrteil]:
@@ -822,9 +827,11 @@ class Nachweis(Berechnung):
         groessen, urteile = self.pruefe(e, p)
         # Der Namensraum wird hier gestempelt und nicht von den Unterklassen
         # mitgegeben: er ist immer derselbe, naemlich der des Nachweises.
-        # Still ist ein Urteil, wenn der ganze Nachweis es ist oder wenn die
-        # Pruefung es einzeln so gestempelt hat -- sie kennt ihre Faelle.
-        self.urteile = [replace(u, raum=self.id, still=self.still or u.still)
+        # Ebenso der Langname -- das Thema, wo die Pruefung keinen eigenen
+        # nennt. Still ist ein Urteil, wenn der ganze Nachweis es ist oder wenn
+        # die Pruefung es einzeln so gestempelt hat -- sie kennt ihre Faelle.
+        self.urteile = [replace(u, raum=self.id, langname=u.langname or self.thema,
+                                still=self.still or u.still)
                         for u in urteile]
         return groessen
 

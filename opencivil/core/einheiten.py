@@ -291,10 +291,11 @@ CM = Einheit("cm", LAENGE, 1e-2)
 MM = Einheit("mm", LAENGE, 1e-3)
 KM = Einheit("km", LAENGE, 1e3)
 
-# Flaeche
+# Flaeche und Volumen
 M2 = Einheit("m^2", FLAECHE, 1.0)
 CM2 = Einheit("cm^2", FLAECHE, 1e-4)
 MM2 = Einheit("mm^2", FLAECHE, 1e-6)
+M3 = Einheit("m^3", VOLUMEN, 1.0)
 
 # Kraft
 N = Einheit("N", KRAFT, 1.0)
@@ -324,6 +325,12 @@ PRO_M = Einheit("1/m", KRUEMMUNG, 1.0, latex=r"\mathrm{m}^{-1}", beschriftung="1
 KG = Einheit("kg", MASSE, 1.0)
 T = Einheit("t", MASSE, 1e3)
 KG_PRO_M3 = Einheit("kg/m^3", DICHTE, 1.0, latex=r"\mathrm{kg}/\mathrm{m}^{3}")
+KN_PRO_M3 = Einheit("kN/m^3", KRAFT / VOLUMEN, 1e3, latex=r"\mathrm{kN}/\mathrm{m}^{3}")
+
+# Zeit
+S = Einheit("s", ZEIT, 1.0)
+MIN = Einheit("min", ZEIT, 60.0)
+H = Einheit("h", ZEIT, 3600.0)
 
 # Winkel (dimensionslos, aber mit Umrechnungsfaktor)
 RAD = Einheit("rad", DIMENSIONSLOS, 1.0)
@@ -341,12 +348,13 @@ EINHEITEN: Dict[str, Einheit] = {
     for e in (
         EINHEITSLOS, PROZENT, PROMILLE,
         M, DM, CM, MM, KM,
-        M2, CM2, MM2,
+        M2, CM2, MM2, M3,
         N, KN, MN,
         PA, KPA, MPA, GPA, N_PRO_MM2, KN_PRO_M2,
         NM, KNM, MNM,
         KN_PRO_M, KNM_PRO_M, MM2_PRO_M, PRO_M,
-        KG, T, KG_PRO_M3,
+        KG, T, KG_PRO_M3, KN_PRO_M3,
+        S, MIN, H,
         RAD, GRAD,
     )
 }

@@ -23,7 +23,7 @@ import {
 } from './diagramm.js';
 import { spannungsfallZeichnen } from './spannungsbild.js';
 import { api } from './api.js';
-import { aendern, zustand } from './zustand.js';
+import { aendern, namensraum, zustand } from './zustand.js';
 
 // ===========================================================================
 // Bausteine
@@ -268,14 +268,15 @@ function nurAbschnitt(bloecke, raum) {
  */
 function herleitung(gesamt) {
   const verfolgung = zustand.verfolgung;
+  // Gewählt, aber noch nicht (neu) gerechnet -- siehe `verfolgen` in app.js.
+  if (verfolgung && !verfolgung.loesung) return leerzustand('rechnet …', verfolgung.name);
   const loesung = verfolgung?.loesung || gesamt;
   if (!loesung.protokoll?.length) {
     return leerzustand('Noch nichts gerechnet.', 'Oben «Rechnen».');
   }
   const raum = verfolgung ? null : eingrenzung();
-  if (!verfolgung && zustand.umfang === 'seite' && !raum) {
-    return leerzustand('Nichts ausgewählt.', 'Links Bestandteil wählen oder oben «Gesamt».');
-  }
+  const leer = !verfolgung && ohneAuswahl();
+  if (leer) return leer;
   const bloecke = nurAbschnitt(loesung.protokoll, raum);
   if (!bloecke.length) {
     return leerzustand('Nichts gerechnet für diesen Bestandteil.');
@@ -306,20 +307,18 @@ function herleitung(gesamt) {
  * der Kern; «Aktuelle Seite» zeigt, was beim gewählten Bestandteil vorkam.
  */
 function formelsammlung(loesung) {
+  const leer = ohneAuswahl();
+  if (leer) return leer;
   const raum = eingrenzung();
-  if (zustand.umfang === 'seite' && !raum) {
-    return leerzustand('Nichts ausgewählt.', 'Links Bestandteil wählen oder oben «Gesamt».');
-  }
   const dabei = (eintrag) => !raum || eintrag.raeume.some((r) => imRaum(raum, r));
-  const themen = (loesung.formelsammlung || []).map((t) => ({
-    ...t, erklaerungen: t.erklaerungen.filter(dabei), formeln: t.formeln.filter(dabei),
-  })).filter((t) => t.erklaerungen.length || t.formeln.length);
+  const themen = (loesung.formelsammlung || [])
+    .map((t) => ({ thema: t.thema, eintraege: t.eintraege.filter(dabei) }))
+    .filter((t) => t.eintraege.length);
   if (!themen.length) return leerzustand('Keine Formeln für diesen Bestandteil.');
 
   return el('div.blatt', {}, themen.flatMap((t) => [
     el('div.b-untertitel', { text: t.thema }),
-    ...t.erklaerungen.map((e) => el('p.b-text', { text: e.text })),
-    ...t.formeln.map(gleichungBlock),
+    ...bloeckeZeichnen(t.eintraege),
   ]));
 }
 
@@ -421,15 +420,12 @@ function nachweistabelle(tabelle, verfolgen) {
     return [zelle(i === oben ? [inhalt, zellen[unten]] : [inhalt], art, i)];
   });
 
-  const auge = (zeile) => {
-    const name = zeile.zellen.slice(0, 2).map((z) => z.text).filter(Boolean).join(' – ');
-    return el('td.auge-zelle', {}, [el('button.auge', {
-      title: 'Spezifischen Nachweis zeigen',
-      'aria-label': `Spezifischen Nachweis zeigen: ${name}`,
-      class: zustand.verfolgung?.ziel === zeile.ziel ? 'ist-an' : '',
-      on: { click: () => verfolgen(zeile.ziel, name) },
-    }, [augenbild()])]);
-  };
+  const auge = (zeile) => el('td.auge-zelle', {}, [el('button.auge', {
+    title: 'Spezifischen Nachweis zeigen',
+    'aria-label': `Spezifischen Nachweis zeigen: ${zeile.bezeichnung}`,
+    class: zustand.verfolgung?.ziel === zeile.ziel ? 'ist-an' : '',
+    on: { click: () => verfolgen(zeile.ziel, zeile.bezeichnung) },
+  }, [augenbild()])]);
 
   return el('table.nachweis-tabelle', {}, [
     el('thead', {}, [el('tr', {}, [...reihe(tabelle.kopf, 'th'), el('th')])]),
@@ -674,9 +670,9 @@ function raumDerAuswahl() {
   if (!wahl) return null;
   if (wahl.art === 'material') {
     const m = zustand.projekt.materialien.find((x) => x.kennung === wahl.kennung);
-    return m ? `${m.art}.${m.kennung}` : null;
+    return m ? namensraum(m.art, m.kennung) : null;
   }
-  return wahl.art === 'blatt' ? `gleichungen.${wahl.kennung}` : `querschnitt.${wahl.kennung}`;
+  return namensraum(wahl.art === 'blatt' ? 'gleichungen' : 'querschnitt', wahl.kennung);
 }
 
 /**
@@ -690,6 +686,13 @@ function raumDerAuswahl() {
  */
 function eingrenzung() {
   return zustand.umfang === 'seite' ? raumDerAuswahl() : null;
+}
+
+/** «Aktuelle Seite», aber links nichts gewählt: der Hinweis dazu, sonst null. */
+function ohneAuswahl() {
+  return zustand.umfang === 'seite' && !raumDerAuswahl()
+    ? leerzustand('Nichts ausgewählt.', 'Links Bestandteil wählen oder oben «Gesamt».')
+    : null;
 }
 
 /** Gehört etwas mit diesem Namensraum in die Ansicht? */

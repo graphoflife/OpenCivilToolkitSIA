@@ -118,15 +118,13 @@ export function hakenSchalter(an, setzen, was = 'Nachweis') {
  * Attribut ist weg -- es zeigte dieselbe Erklärung ein zweites Mal, als
  * Systemblase über der eigenen.
  *
- * `inhalt` ist ein Satz oder Stichwortzeilen `[[schluessel, text], …]`,
- * `formel` die Bedingung in einer Zeile.
+ * `zeilen` sind Stichwortzeilen `[[schluessel, text], …]`, `formel` die
+ * Bedingung in einer Zeile.
  */
-export function erklaerung(inhalt, formel = '') {
+export function erklaerung(zeilen, formel = '') {
   const blase = el('span.erklaerung-blase', {}, [
-    Array.isArray(inhalt)
-      ? el('span.erklaerung-zeilen', {}, inhalt.map(([schluessel, text]) =>
-        el('span', {}, [el('b', { text: `${schluessel}: ` }), text])))
-      : el('span', { text: inhalt }),
+    el('span.erklaerung-zeilen', {}, zeilen.map(([schluessel, text]) =>
+      el('span', {}, [el('b', { text: `${schluessel}: ` }), text]))),
     formel ? el('code', { text: formel }) : null,
   ]);
   const zeichen = el('button.erklaerung-zeichen', {

@@ -21,18 +21,21 @@ Hoehe, der Querschnittsloeser, die Zugfestigkeit -- stehen beim ersten Thema,
 das sie braucht, und nicht bei jedem noch einmal.
 
 WOHER THEMA UND RAUM KOMMEN:
-Das Rechenwerk stempelt beides auf jeden Block, den eine Berechnung schreibt
-(:meth:`Protokoll.herkunft_stempeln`). Der Raum sagt, bei welchem Bestandteil
-eine Formel vorkam -- danach grenzt die Oberflaeche «Aktuelle Seite» ein.
+Das Thema stempelt das Rechenwerk auf jeden Block, den eine Berechnung
+schreibt (:meth:`Protokoll.herkunft_stempeln`). Der Raum ist der des
+Abschnitts, in dem der Block steht -- gelesen am Abschnittstitel, wie in
+:meth:`Protokoll.nach_abschnitten`. Er sagt, bei welchem Bestandteil eine
+Formel vorkam; danach grenzt die Oberflaeche «Aktuelle Seite» ein.
 """
 
 from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional
 
-from opencivil.core.protokoll import GleichungBlock, Protokoll, TextBlock
+from opencivil.core.latex import ohne_namen_im_index
+from opencivil.core.protokoll import GleichungBlock, Protokoll, TextBlock, TitelBlock
 
 
 @dataclass
@@ -48,6 +51,11 @@ class Thema:
     name: str
     erklaerungen: List[Eintrag] = field(default_factory=list)
     formeln: List[Eintrag] = field(default_factory=list)
+
+    @property
+    def eintraege(self) -> List[Eintrag]:
+        """Wie das Thema dasteht, im Bericht und am Bildschirm: erst das Warum."""
+        return self.erklaerungen + self.formeln
 
 
 #: Eine Zahlenangabe in einem Titel: ``= -300.0 kN``. Die Herleitung nennt
@@ -72,30 +80,39 @@ _GRUNDZEICHEN = re.compile(r"^[^_^({]*")
 #: Erkannt an der Einheit -- eine Bedingung wie ``(N_{Ed}=0)`` bleibt.
 _FALLWERTE = re.compile(r"\([^()]*\\mathrm\{[^()]*\)")
 
-#: Ein Name im Index: ``\alpha_{eff,x,\text{Feld}}``, ``f_{cd,\text{C30/37}}``.
-#: Die Sammlung meint die Formel, nicht den Fall und nicht die Sorte.
-_NAME_IM_INDEX = re.compile(r",\\text\{[^{}]*\}")
 
-
-def _symbolisch(block: GleichungBlock) -> Optional[Tuple[str, Tuple[str, ...]]]:
-    """Die Formel ohne Zahlen und ihr Schluessel -- ``None``, wo es keine gibt."""
+def _schluessel(block: GleichungBlock) -> Optional[tuple]:
+    """Woran dieselbe Formel wiederzuerkennen ist -- ``None``: es gibt keine Symbolfassung."""
     if block.ansatz:
-        return block.latex, ("ansatz", block.latex)
+        return ("ansatz", block.latex)
     zeile = block.formelzeile
-    if zeile is None or zeile.vorlage is None or zeile.analytisch is None:
+    if zeile is None or zeile.vorlage is None:
         return None
-    symbol = _FALLWERTE.sub("", zeile.symbol)
-    latex = " ".join(filter(None, [f"{symbol} = {zeile.analytisch}", zeile.einheiten]))
-    grund = _GRUNDZEICHEN.match(zeile.symbol).group(0)
-    return (_NAME_IM_INDEX.sub("", latex),
-            ("formel", grund, zeile.vorlage.removeprefix("-")))
+    return ("formel", _GRUNDZEICHEN.match(zeile.symbol).group(0),
+            zeile.vorlage.removeprefix("-"))
+
+
+def _symbolisch(block: GleichungBlock) -> GleichungBlock:
+    """
+    Die Formel ohne Zahlen, ``Symbol = Formel``. Gebaut erst fuer einen neuen
+    Schluessel -- neun von zehn Gleichungen sind Wiederholungen.
+    """
+    latex = block.latex
+    if not block.ansatz:
+        zeile = block.formelzeile
+        symbol = _FALLWERTE.sub("", zeile.symbol)
+        # Die Sammlung meint die Formel, nicht den Fall und nicht die Sorte.
+        latex = ohne_namen_im_index(" ".join(filter(None, [
+            f"{symbol} = {zeile.analytisch}", zeile.einheiten])))
+    return GleichungBlock(latex=latex, titel=_titel(block.titel), referenz=block.referenz)
 
 
 def _merken(eintraege: List[Eintrag], nach_schluessel: Dict[tuple, Eintrag],
-            schluessel: tuple, block, raum: str) -> None:
+            schluessel: tuple, neu: Callable[[], GleichungBlock | TextBlock],
+            raum: str) -> None:
     eintrag = nach_schluessel.get(schluessel)
     if eintrag is None:
-        eintrag = nach_schluessel[schluessel] = Eintrag(block)
+        eintrag = nach_schluessel[schluessel] = Eintrag(neu())
         eintraege.append(eintrag)
     if raum and raum not in eintrag.raeume:
         eintrag.raeume.append(raum)
@@ -105,31 +122,26 @@ def formelsammlung(protokoll: Protokoll) -> List[Thema]:
     """Je Thema, in der Folge ihres ersten Auftretens, Erklaerungen und Formeln."""
     themen: Dict[str, Thema] = {}
     gesehen: Dict[tuple, Eintrag] = {}
+    raum = ""
     for block in protokoll.alle_bloecke():
+        if isinstance(block, TitelBlock) and block.raum:
+            raum = block.raum
         if not isinstance(block, (GleichungBlock, TextBlock)) or not block.thema:
             continue
         thema = themen.setdefault(block.thema, Thema(block.thema))
         if isinstance(block, TextBlock):
             if block.erklaerung:
                 _merken(thema.erklaerungen, gesehen, ("text", block.text),
-                        TextBlock(text=block.text), block.raum)
+                        lambda: TextBlock(text=block.text), raum)
             continue
-        gefunden = _symbolisch(block)
-        if gefunden is None:
-            continue
-        latex, schluessel = gefunden
-        _merken(thema.formeln, gesehen, schluessel,
-                GleichungBlock(latex=latex, titel=_titel(block.titel),
-                               referenz=block.referenz),
-                block.raum)
-    return [t for t in themen.values() if t.formeln or t.erklaerungen]
+        schluessel = _schluessel(block)
+        if schluessel is not None:
+            _merken(thema.formeln, gesehen, schluessel, lambda: _symbolisch(block), raum)
+    return [t for t in themen.values() if t.eintraege]
 
 
-def als_protokoll(themen: List[Thema]) -> Protokoll:
+def anfuegen(p: Protokoll, themen: List[Thema]) -> None:
     """Fuer den Bericht: je Thema ein Titel, die Erklaerungen, dann die Formeln."""
-    p = Protokoll()
     for thema in themen:
         p.titel(thema.name)
-        p.anfuegen(*(e.block for e in thema.erklaerungen),
-                   *(e.block for e in thema.formeln))
-    return p
+        p.anfuegen(*(e.block for e in thema.eintraege))

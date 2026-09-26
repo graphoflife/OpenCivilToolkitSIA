@@ -28,15 +28,17 @@ from __future__ import annotations
 import math
 import re
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Dict, List, Mapping, Optional, Tuple, Union
 
 from opencivil.core.einheiten import (
-    DIMENSIONSLOS, EINHEITSLOS, FLAECHE, GRAD, KG_PRO_M3, KN, KN_PRO_M,
-    KN_PRO_M2, KNM, KNM_PRO_M, KRAFT, KRAFT_PRO_LAENGE, KRUEMMUNG, LAENGE,
-    M, M2, MASSE, MM, MM2, MOMENT, MOMENT_PRO_LAENGE, N_PRO_MM2, PRO_M,
-    PROMILLE, PROZENT, SPANNUNG, VOLUMEN, ZEIT, DICHTE, Dimension,
-    DimensionsFehler, Einheit, EINHEITEN, Groesse, KG,
+    DICHTE, DIMENSIONSLOS, EINHEITEN, EINHEITSLOS, FLAECHE, GRAD, KG, KG_PRO_M3,
+    KN, KN_PRO_M, KN_PRO_M2, KN_PRO_M3, KNM, KNM_PRO_M, KRAFT, KRAFT_PRO_LAENGE,
+    KRUEMMUNG, LAENGE, M, M2, M3, MASSE, MM, MM2, MOMENT, MOMENT_PRO_LAENGE,
+    N_PRO_MM2, PRO_M, PROZENT, S, SPANNUNG, VOLUMEN, ZEIT, Dimension,
+    DimensionsFehler, Einheit, Groesse,
 )
+from opencivil.core.latex import ohne_namen_im_index
 
 
 class AusdruckFehler(Exception):
@@ -47,19 +49,11 @@ class AusdruckFehler(Exception):
 # Einheiten
 # ===========================================================================
 
-S = Einheit("s", ZEIT, 1.0)
-MIN = Einheit("min", ZEIT, 60.0)
-H = Einheit("h", ZEIT, 3600.0)
-M3 = Einheit("m^3", VOLUMEN, 1.0)
-KN_PRO_M3 = Einheit("kN/m^3", KRAFT / VOLUMEN, 1e3,
-                    latex=r"\mathrm{kN}/\mathrm{m}^{3}")
-
 #: Was in ``\mathrm{...}`` stehen darf. Nur einfache Namen -- zusammengesetzte
 #: Einheiten entstehen im Ausdruck selbst: ``\mathrm{kN}/\mathrm{m}^{2}``.
 EINHEITENNAMEN: Dict[str, Einheit] = {
-    **{name: e for name, e in EINHEITEN.items()
-       if name.isalpha() and name not in ("promille", "Grad")},
-    "s": S, "min": MIN, "h": H,
+    name: e for name, e in EINHEITEN.items()
+    if name.isalpha() and name not in ("promille", "Grad")
 }
 
 #: Womit ein Ergebnis angezeigt wird, wenn die Zeile keine Einheit verlangt.
@@ -84,24 +78,20 @@ _VORZUG: Dict[Dimension, Union[Einheit, Tuple[float, Einheit, Einheit]]] = {
 
 
 def _si_einheit(dimension: Dimension) -> Einheit:
-    """Eine Einheit aus m, kg, s -- wo es keine gebraeuchliche gibt."""
-    teile = [("kg", dimension.masse), ("m", dimension.laenge), ("s", dimension.zeit)]
-    oben = [(n, e) for n, e in teile if e > 0]
-    unten = [(n, -e) for n, e in teile if e < 0]
-
-    def gesetzt(liste) -> str:
-        return r"\,".join(rf"\mathrm{{{n}}}" + ("" if e == 1 else f"^{{{e}}}")
-                          for n, e in liste)
-
-    def text(liste) -> str:
-        return "·".join(n + ("" if e == 1 else f"^{e}") for n, e in liste)
-
-    latex, beschriftung = gesetzt(oben) or "1", text(oben) or "1"
-    if unten:
-        latex += "/" + gesetzt(unten)
-        beschriftung += "/" + text(unten)
-    return Einheit(name=f"si:{dimension}", dimension=dimension, latex=latex,
-                   beschriftung=beschriftung)
+    """Eine Einheit aus kg, m, s -- wo es keine gebraeuchliche gibt."""
+    oben = unten = EINHEITSLOS
+    for basis, hoch in ((KG, dimension.masse), (M, dimension.laenge), (S, dimension.zeit)):
+        if hoch > 0:
+            oben = oben * basis ** hoch
+        elif hoch < 0:
+            unten = unten * basis ** -hoch
+    if unten is EINHEITSLOS:
+        return oben
+    if oben is EINHEITSLOS:
+        # EINHEITSLOS / m setzte «/m» ohne Zaehler.
+        return Einheit(f"1/{unten.name}", dimension, 1.0 / unten.faktor,
+                       latex=rf"1/{unten.latex}", beschriftung=f"1/{unten.beschriftung}")
+    return oben / unten
 
 
 def anzeigeeinheit(groesse: Groesse, gewuenscht: Optional[Einheit] = None) -> Einheit:
@@ -112,7 +102,7 @@ def anzeigeeinheit(groesse: Groesse, gewuenscht: Optional[Einheit] = None) -> Ei
                 f"Einheit {gewuenscht.beschriftung} passt nicht zum Ergebnis "
                 f"({_dimension_text(groesse.dimension)}).")
         return gewuenscht
-    if groesse.anzeige.name in EINHEITEN or groesse.anzeige in EINHEITENNAMEN.values():
+    if groesse.anzeige.name in EINHEITEN:
         return groesse.anzeige
     vorzug = _VORZUG.get(groesse.dimension)
     if isinstance(vorzug, tuple):
@@ -122,7 +112,7 @@ def anzeigeeinheit(groesse: Groesse, gewuenscht: Optional[Einheit] = None) -> Ei
 
 
 def _dimension_text(dimension: Dimension) -> str:
-    return _si_einheit(dimension).beschriftung or "1"
+    return "ohne Einheit" if dimension.ist_dimensionslos else _si_einheit(dimension).beschriftung
 
 
 def einheit_aus_text(text: str) -> Optional[Einheit]:
@@ -135,15 +125,14 @@ def einheit_aus_text(text: str) -> Optional[Einheit]:
     text = text.strip().replace("²", "^2").replace("³", "^3").replace(" ", "")
     if not text:
         return None
-    if text in ("°", "Grad"):
-        return GRAD
-    if text == "%":
-        return PROZENT
-    if text == "‰":
-        return PROMILLE
+    # Die Hochzahl auch ohne Dach: «N/mm2» ist N/mm^2 -- und damit die
+    # Einheit aus dem Katalog, mit ihrer Beschriftung N/mm².
+    text = re.sub(r"([A-Za-z])(-?\d+)", r"\1^\2", text)
+    benannt = EINHEITEN.get({"°": "Grad", "‰": "promille"}.get(text, text))
+    if benannt is not None:
+        return benannt
     ergebnis: Optional[Einheit] = None
-    for i, (zeichen, name, hoch) in enumerate(
-            re.findall(r"([*/·]?)([A-Za-z]+)(?:\^?(-?\d+))?", text)):
+    for zeichen, name, hoch in re.findall(r"([*/·]?)([A-Za-z]+)(?:\^(-?\d+))?", text):
         einheit = EINHEITENNAMEN.get(name)
         if einheit is None:
             raise AusdruckFehler(f"Einheit «{name}» unbekannt.")
@@ -153,10 +142,10 @@ def einheit_aus_text(text: str) -> Optional[Einheit]:
             ergebnis = einheit
         else:
             ergebnis = ergebnis / einheit if zeichen == "/" else ergebnis * einheit
-    if ergebnis is None or not re.fullmatch(r"(?:[*/·]?[A-Za-z]+(?:\^?-?\d+)?)+", text):
+    if ergebnis is None or not re.fullmatch(r"(?:[*/·]?[A-Za-z]+(?:\^-?\d+)?)+", text):
         raise AusdruckFehler(f"Einheit «{text}» nicht lesbar.")
     return Einheit(name=text, dimension=ergebnis.dimension, faktor=ergebnis.faktor,
-                   latex=ergebnis.latex)
+                   latex=ergebnis.latex, beschriftung=ergebnis.beschriftung)
 
 
 # ===========================================================================
@@ -427,13 +416,11 @@ class _Leser:
         """Nach ``^``: eine Gruppe ``{...}`` oder ein einzelnes Zeichen."""
         if self.ist("{"):
             return self.gruppe()
-        token = self.nehmen()
+        token = self.jetzt
         if token.art == "zahl" and len(token.text) > 1 and "." not in token.text:
             # ``x^23`` schreibt LaTeX als x hoch 2, gefolgt von 3.
-            self.i -= 1
             self.tokens[self.i] = Token("zahl", token.text[1:], token.stelle + 1)
             return Zahl(float(token.text[0]), token.text[0])
-        self.i -= 1
         return self.primaer()
 
     def gruppe(self) -> Knoten:
@@ -582,8 +569,8 @@ def lesen(latex: str) -> Zeile:
     teile: List[List[Token]] = [[]]
     tiefe = 0
     for token in tokens[:-1]:
-        if token.text in ("{", "(", "[", r"\left"):
-            tiefe += token.text != r"\left"
+        if token.text in ("{", "(", "["):
+            tiefe += 1
         elif token.text in ("}", ")", "]"):
             tiefe -= 1
         if tiefe == 0 and (token.text == "=" or token.text in _ZUWEISUNG):
@@ -637,9 +624,7 @@ def _ohne_einheit(groesse: Groesse, wo: str) -> float:
 
 
 def _rechnen(knoten: Knoten, werte: Mapping[str, Groesse]) -> Groesse:
-    if isinstance(knoten, Zahl):
-        return Groesse(knoten.wert)
-    if isinstance(knoten, Konstante):
+    if isinstance(knoten, (Zahl, Konstante)):
         return Groesse(knoten.wert)
     if isinstance(knoten, Masseinheit):
         return Groesse(1.0, knoten.einheit)
@@ -660,8 +645,6 @@ def _rechnen(knoten: Knoten, werte: Mapping[str, Groesse]) -> Groesse:
             return links - rechts
         if knoten.zeichen == "*":
             return links * rechts
-        if rechts.si == 0.0:
-            raise ZeroDivisionError
         return links / rechts
     if isinstance(knoten, Potenz):
         basis = _rechnen(knoten.basis, werte)
@@ -748,19 +731,16 @@ def _ist_einheit(knoten: Knoten) -> bool:
     return False
 
 
-def setzen(knoten: Knoten, platzhalter: Mapping[str, str]) -> str:
-    """
-    Der Baum als Vorlage fuer :meth:`Formelzeile.bauen` -- Namen als
-    ``@platzhalter``, alles andere aus dem Baum neu geschrieben.
-    """
-    return _setzen(knoten, platzhalter)
-
-
 def _klammer(text: str) -> str:
     return rf"\left({text}\right)"
 
 
-def _setzen(knoten: Knoten, ph: Mapping[str, str]) -> str:
+def setzen(knoten: Knoten, ph: Mapping[str, str]) -> str:
+    """
+    Der Baum als Vorlage fuer :meth:`Formelzeile.bauen` -- Namen als
+    ``@platzhalter`` (``ph``: Platzhalter je Name), alles andere aus dem Baum
+    neu geschrieben.
+    """
     if isinstance(knoten, Zahl):
         return knoten.text
     if isinstance(knoten, Konstante):
@@ -770,32 +750,30 @@ def _setzen(knoten: Knoten, ph: Mapping[str, str]) -> str:
     if isinstance(knoten, Name):
         return f"@{ph[knoten.latex]}"
     if isinstance(knoten, Gegenzahl):
-        inhalt = _setzen(knoten.inhalt, ph)
+        inhalt = setzen(knoten.inhalt, ph)
         return f"-{_klammer(inhalt) if _staerke(knoten.inhalt) <= _VORZEICHEN else inhalt}"
     if isinstance(knoten, Betrag):
-        return rf"\left|{_setzen(knoten.inhalt, ph)}\right|"
+        return rf"\left|{setzen(knoten.inhalt, ph)}\right|"
     if isinstance(knoten, Wurzel):
-        inhalt = _setzen(knoten.inhalt, ph)
+        inhalt = setzen(knoten.inhalt, ph)
         if knoten.grad is None:
             return rf"\sqrt{{{inhalt}}}"
-        return rf"\sqrt[{_setzen(knoten.grad, ph)}]{{{inhalt}}}"
+        return rf"\sqrt[{setzen(knoten.grad, ph)}]{{{inhalt}}}"
     if isinstance(knoten, Funktion):
-        argumente = r",\ ".join(_setzen(a, ph) for a in knoten.argumente)
+        argumente = r",\ ".join(setzen(a, ph) for a in knoten.argumente)
         return rf"{knoten.name}{_klammer(argumente)}"
     if isinstance(knoten, Potenz):
-        basis = _setzen(knoten.basis, ph)
-        if not isinstance(knoten.basis, (Name, Masseinheit)) and _staerke(knoten.basis) < _ATOM:
+        basis = setzen(knoten.basis, ph)
+        if _staerke(knoten.basis) < _ATOM:
             basis = _klammer(basis)
-        elif isinstance(knoten.basis, Zahl) and knoten.basis.wert < 0:
-            basis = _klammer(basis)
-        return f"{basis}^{{{_setzen(knoten.exponent, ph)}}}"
+        return f"{basis}^{{{setzen(knoten.exponent, ph)}}}"
     if isinstance(knoten, Operation):
         return _operation(knoten, ph)
     raise AusdruckFehler("Unbekannter Ausdruck.")
 
 
 def _operation(knoten: Operation, ph: Mapping[str, str]) -> str:
-    links, rechts = _setzen(knoten.links, ph), _setzen(knoten.rechts, ph)
+    links, rechts = setzen(knoten.links, ph), setzen(knoten.rechts, ph)
     if knoten.zeichen == "/":
         if _ist_einheit(knoten.rechts) and _ist_angabe(knoten.links):
             return f"{links}/{rechts}"
@@ -845,6 +823,25 @@ def namen(knoten: Knoten) -> List[str]:
 
     besuchen(knoten)
     return gefunden
+
+
+@lru_cache(maxsize=None)
+def blattname(symbol: str) -> str:
+    """
+    Unter welchem Namen ein Projektwert im Blatt steht: ``f_{cd}`` fuer
+    ``f_{cd,\\text{C30/37}}``. Leer, wo das Symbol kein Name ist, den dieser
+    Leser versteht -- ``\\varnothing_{1,y,g}`` etwa. Dieselbe Regel wie beim
+    Lesen einer Zeile, also nie ein Vorschlag, den das Blatt dann ablehnt.
+
+    Zwischengespeichert: die Symbole sind von Lauf zu Lauf dieselben.
+    """
+    try:
+        gelesen = lesen(ohne_namen_im_index(symbol))
+    except AusdruckFehler:
+        return ""
+    if gelesen.name is None and isinstance(gelesen.ausdruck, Name):
+        return gelesen.ausdruck.latex
+    return ""
 
 
 def stellen(groesse: Groesse, einheit: Einheit, signifikant: int = 4) -> int:

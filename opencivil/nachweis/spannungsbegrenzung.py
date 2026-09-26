@@ -576,7 +576,6 @@ class Spannungsbegrenzung(Nachweis):
             name=f"{self.grenze.urteilsname} {r} – {erg.fall.name}",
             art=self.grenze.art,
             ziel=self.d_ausnutzung[erg.fall.name].id,
-            langname=self.thema,
             fall=erg.fall.name,
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),

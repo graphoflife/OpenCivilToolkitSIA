@@ -310,6 +310,12 @@ def _zuglage(
     return (max if moment_positiv else min)(gezogen, key=lambda i: lagen[i][0])
 
 
+def _ohne_zugbewehrung(M_Ed: float) -> str:
+    """Die Begruendung, wenn die gezogene Seite keinen Stahl hat -- fuer beide Ansaetze."""
+    seite = "unten" if M_Ed >= 0 else "oben"
+    return f"Zugseite ({seite}) ohne Bewehrung → kein d, V_Rd = 0."
+
+
 @dataclass(frozen=True)
 class Querkraftfall:
     """Eine zu pruefende Kombination fuer den Querkraftnachweis."""
@@ -602,7 +608,6 @@ class Querkraft(Nachweis):
             name=f"Querkraft {self.richtung.value} – {fall.name}",
             art="V",
             ziel=self.d_ausnutzung[fall.name].id,
-            langname=self.thema,
             fall=fall.name,
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
@@ -712,9 +717,7 @@ class Querkraft(Nachweis):
         erg.zuglage = _zuglage(lagen, M_Ed >= 0)
         hoehen = _statische_hoehe(lagen, h, M_Ed >= 0)
         if hoehen is None:
-            seite = "unten" if M_Ed >= 0 else "oben"
-            erg.begruendung = erg.hinweis = (
-                f"Zugseite ({seite}) ohne Bewehrung → kein d, V_Rd = 0.")
+            erg.begruendung = erg.hinweis = _ohne_zugbewehrung(M_Ed)
             return erg
         erg.d = erg.d_v = hoehen
 
@@ -844,11 +847,9 @@ class Querkraft(Nachweis):
         erg.zuglage = _zuglage(lagen, M_Ed >= 0)
         hoehen = _statische_hoehe(lagen, h, M_Ed >= 0)
         if hoehen is None:
-            seite = "unten" if M_Ed >= 0 else "oben"
             erg.erfuellungsgrad = 0.0
             erg.erfuellt = False
-            erg.begruendung = erg.hinweis = (
-                f"Zugseite ({seite}) ohne Bewehrung → kein d, V_Rd = 0.")
+            erg.begruendung = erg.hinweis = _ohne_zugbewehrung(M_Ed)
             return erg
         erg.d = hoehen
         erg.d_v = erg.d - einlage if (h / 6.0 < einlage < erg.d) else erg.d

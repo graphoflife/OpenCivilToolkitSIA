@@ -271,7 +271,6 @@ class SproedesVersagen(Nachweis):
             name=f"Sprödes Versagen {r} – {nummer}. Lage",
             art="SV",
             ziel=self.d_ausnutzung[nummer].id,
-            langname=self.thema,
             fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),

@@ -641,7 +641,7 @@ def _ausgefallene(
     # gehoeren beieinander.
     return [
         Ausgefallen(
-            art="M-N", langname="Biegung und Normalkraft",
+            art="M-N", langname=BiegungNormalkraft.THEMA,
             fall=k.name,
             symbol=f"M_{{Rd,{r}}}",
             einwirkung_symbol=f"M_{{Ed,{r}}}",
@@ -649,7 +649,7 @@ def _ausgefallene(
         for k in kombinationen
     ] + [
         Ausgefallen(
-            art="V", langname="Querkraft", fall=k.name,
+            art="V", langname=Querkraft.THEMA, fall=k.name,
             symbol=f"V_{{Rd,{r}}}",
             einwirkung_symbol=f"V_{{Ed,{r}}}",
             einwirkung=Groesse(abs(k.V_Ed), KN_PRO_M), einheit=KN_PRO_M)

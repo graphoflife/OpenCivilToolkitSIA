@@ -493,6 +493,10 @@ class Lagenaufbau(Prozedur):
             if vorher is None or phi.si > vorher.si:
                 dickster[q.lage.nummer] = phi
 
+        # Die Breite je Zeile nur, wo sie sich unterscheidet: x gilt je b, y
+        # je Laufmeter. Bei b = 1000 mm stuende in jeder Zeile dieselbe Zahl.
+        mit_breite = len({breite_von(q.lage.richtung).si for q in self.posten}) > 1
+
         ergebnis: Dict[str, Groesse] = {}
         zeilen: List[List[str]] = []
         #: Je Lagennummer die Ober- und Unterkante des Stahls, in m ab Oberkante.
@@ -538,7 +542,7 @@ class Lagenaufbau(Prozedur):
                 q.lage.stahl.name if q.lage.stahl else "–",
                 Mathe(phi.formatiert(0, MM)),
                 menge,
-                Mathe(b_q.formatiert(0, MM)),
+                *([Mathe(b_q.formatiert(0, MM))] if mit_breite else []),
                 Mathe(rand.formatiert(1, MM)),
                 Mathe(z.formatiert(1, MM)),
                 Mathe(a_s.formatiert(0, MM2)),
@@ -553,21 +557,16 @@ class Lagenaufbau(Prozedur):
         else:
             mengenkopf = Mathe("n")
 
-        # Die Breite je Zeile nur, wo sie sich unterscheidet: x gilt je b, y
-        # je Laufmeter. Bei b = 1000 mm stuende in jeder Zeile dieselbe Zahl.
-        mit_breite = len({g.si for g in breiten.values()}) > 1
-        if not mit_breite:
-            for zeile in zeilen:
-                del zeile[5]
+        kopf = ["Bewehrung", "Richtung", "Stahl",
+                Mathe(r"\varnothing\ [\mathrm{mm}]"), mengenkopf,
+                *([Mathe(r"b\ [\mathrm{mm}]")] if mit_breite else []),
+                "Randabstand [mm]",
+                Mathe(r"z\ [\mathrm{mm}]"), Mathe(r"A_s\ [\mathrm{mm}^2]")]
         p.tabelle(
-            kopf=["Bewehrung", "Richtung", "Stahl",
-                  Mathe(r"\varnothing\ [\mathrm{mm}]"), mengenkopf]
-                 + ([Mathe(r"b\ [\mathrm{mm}]")] if mit_breite else [])
-                 + ["Randabstand [mm]",
-                    Mathe(r"z\ [\mathrm{mm}]"), Mathe(r"A_s\ [\mathrm{mm}^2]")],
+            kopf=kopf,
             zeilen=zeilen,
             titel="Randabstände, Tiefen ab Oberkante und Bewehrungsquerschnitte",
-            ausrichtung="lllrr" + "r" * (4 if mit_breite else 3),
+            ausrichtung="lll" + "r" * (len(kopf) - 3),
         )
         return ergebnis
 

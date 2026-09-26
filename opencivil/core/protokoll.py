@@ -130,9 +130,6 @@ class TextBlock(Block):
     thema: str = ""
     """Thema der Berechnung, die den Block schrieb -- vom Rechenwerk gestempelt."""
 
-    raum: str = ""
-    """Namensraum ihres Abschnitts -- ebenso gestempelt."""
-
 
 @dataclass
 class GleichungBlock(Block):
@@ -171,9 +168,6 @@ class GleichungBlock(Block):
 
     thema: str = ""
     """Thema der Berechnung, die den Block schrieb -- vom Rechenwerk gestempelt."""
-
-    raum: str = ""
-    """Namensraum ihres Abschnitts -- ebenso gestempelt."""
 
 
 @dataclass
@@ -349,20 +343,20 @@ class Protokoll:
         self._anfuegen(UnterprotokollBlock(titel=titel, protokoll=unter))
         return unter
 
-    def herkunft_stempeln(self, thema: str, raum: str, ab: int = 0) -> None:
+    def herkunft_stempeln(self, thema: str, ab: int = 0) -> None:
         """
-        Thema und Namensraum auf die Bloecke ab ``ab`` -- auch eingeschachtelte.
+        Das Thema auf die Bloecke ab ``ab`` -- auch eingeschachtelte.
 
         Das Rechenwerk ruft das nach jeder Berechnung fuer das, was sie
         geschrieben hat. Die Formelsammlung ordnet danach; die Berechnung
-        selbst muss nichts davon wissen.
+        selbst muss nichts davon wissen. (Den Raum braucht es nicht: er
+        steht am Titel des Abschnitts.)
         """
         for block in self.bloecke[ab:]:
             if isinstance(block, (GleichungBlock, TextBlock)):
                 block.thema = block.thema or thema
-                block.raum = block.raum or raum
             elif isinstance(block, UnterprotokollBlock):
-                block.protokoll.herkunft_stempeln(thema, raum)
+                block.protokoll.herkunft_stempeln(thema)
 
     # -- Auswerten ----------------------------------------------------------
 

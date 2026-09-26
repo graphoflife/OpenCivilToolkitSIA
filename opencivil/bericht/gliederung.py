@@ -27,7 +27,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional
 
-from opencivil.bericht.formelsammlung import als_protokoll, formelsammlung
+from opencivil.bericht.formelsammlung import anfuegen as formelsammlung_anfuegen
+from opencivil.bericht.formelsammlung import formelsammlung
 from opencivil.bericht.zusammenfassung import (
     Zusammenfassung, bewehrungsuebersicht, hinweise, nachweistabelle,
     plattenangaben, stiller_hinweis, zusammenfassen,
@@ -62,7 +63,7 @@ def bericht(
     themen = formelsammlung(loesung.protokoll)
     if themen:
         _abschnitt(p, "Formelsammlung")
-        p.anfuegen(*als_protokoll(themen).bloecke)
+        formelsammlung_anfuegen(p, themen)
     _nachweise(p, zusammenfassen(aufbau, loesung), aufbau)
     _werte(p, loesung)
     _luecken(p, loesung)

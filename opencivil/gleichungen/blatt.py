@@ -21,7 +21,7 @@ from typing import TYPE_CHECKING, Dict, List
 from opencivil.core.berechnung import Eingabebezug, Eingaben, Prozedur
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import einsetzen_symbolisch
-from opencivil.core.protokoll import Abschnitt, Protokoll
+from opencivil.core.protokoll import Abschnitt, Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
 from opencivil.gleichungen.ausdruck import (
     AusdruckFehler, Name, anzeigeeinheit, einheit_aus_text, lesen, namen,
@@ -73,6 +73,9 @@ class Gleichungsblatt(Prozedur):
                      for i, z in enumerate(eintrag.zeilen)
                      if z.art == "projektwert" and z.wert_id],
             titel=titel, abschnitt=Abschnitt(titel, basis))
+        #: Jede Zeile ein Wert ``z{Nummer}`` -- fuer die Herleitung, nie im
+        #: Rechenwerk angemeldet.
+        self.zeilenwerte = Zwischenwerte(basis)
         self.ergebnisse: List[Zeilenergebnis] = []
 
     def rechne(self, e: Eingaben, p: Protokoll):
@@ -106,14 +109,6 @@ class Gleichungsblatt(Prozedur):
 
     # -- Zeilen -------------------------------------------------------------
 
-    def _wert(self, nummer: int, symbol: str, groesse: Groesse, einheit,
-              beschreibung: str = "", stellen_: int = None) -> Wert:
-        return WertDef(
-            id=f"{self.id}.z{nummer}", symbol=symbol, einheit=einheit,
-            beschreibung=beschreibung,
-            stellen=stellen(groesse, einheit) if stellen_ is None else stellen_,
-        ).belegen(groesse.als(einheit))
-
     def _formel(self, nummer: int, zeile: GleichungszeileEintrag, p: Protokoll,
                 werte: Dict[str, Wert], fehlerhaft: Dict[str, int],
                 erg: Zeilenergebnis) -> None:
@@ -135,7 +130,8 @@ class Gleichungsblatt(Prozedur):
         # Ohne Namen steht die Formel selbst links: «a · b = 3 m · 7 m = 21 m²».
         symbol = (gelesen.name.latex if gelesen.name is not None
                   else einsetzen_symbolisch(vorlage, eingaben))
-        wert = self._wert(nummer, symbol, groesse, einheit)
+        wert = self.zeilenwerte.wert(f"z{nummer}", symbol, groesse.als(einheit),
+                                     stellen(groesse, einheit))
         p.formel(wert, vorlage, eingaben, titel="")
         erg.ergebnis = wert.zahl_latex()
         if gelesen.name is not None:
@@ -156,8 +152,9 @@ class Gleichungsblatt(Prozedur):
         if not e.hat(lokal):
             raise AusdruckFehler("Projektwert nicht verfügbar.")
         quelle = e[lokal]
-        wert = self._wert(nummer, erg.name, quelle.groesse, quelle.einheit,
-                          quelle.beschreibung, quelle.stellen)
+        wert = self.zeilenwerte.wert(f"z{nummer}", erg.name,
+                                     quelle.groesse.als(quelle.einheit), quelle.stellen,
+                                     quelle.beschreibung)
         p.wert(wert, titel=quelle.beschreibung)
         erg.ergebnis = wert.zahl_latex()
         werte[erg.name] = wert

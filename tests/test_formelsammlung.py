@@ -28,8 +28,12 @@ class TestFormelsammlung(unittest.TestCase):
         aufbau = projekt.aufbauen()
         cls.loesung = aufbau.werk.loese(*aufbau.alle_ziele())
 
-    def formeln(self):
-        return [f for t in self.daten["formelsammlung"] for f in t["formeln"]]
+    def eintraege(self, art, thema=None):
+        return [e for t in self.daten["formelsammlung"] if thema in (None, t["thema"])
+                for e in t["eintraege"] if e["art"] == art]
+
+    def formeln(self, thema=None):
+        return self.eintraege("gleichung", thema)
 
     def test_jede_formel_einmal(self):
         latex = [f["latex"] for f in self.formeln()]
@@ -47,16 +51,14 @@ class TestFormelsammlung(unittest.TestCase):
                         if isinstance(b, TextBlock) and b.erklaerung}
         self.assertTrue(erklaerungen)
         herleitung = {b.get("text") for b in self.daten["protokoll"]}
-        gesammelt = {e["text"] for t in self.daten["formelsammlung"]
-                     for e in t["erklaerungen"]}
+        gesammelt = {e["text"] for e in self.eintraege("text")}
         self.assertFalse(erklaerungen & herleitung)
         self.assertEqual(erklaerungen, gesammelt)
 
     def test_je_formel_die_raeume_in_denen_sie_vorkam(self):
         """Danach grenzt «Aktuelle Seite» ein: beide Platten, der Beton für sich."""
-        themen = {t["thema"]: t for t in self.daten["formelsammlung"]}
-        self.assertEqual(themen["Beton"]["formeln"][0]["raeume"], ["beton.b1"])
-        querkraft = {r for f in themen["Querkraft"]["formeln"] for r in f["raeume"]}
+        self.assertEqual(self.formeln("Beton")[0]["raeume"], ["beton.b1"])
+        querkraft = {r for f in self.formeln("Querkraft") for r in f["raeume"]}
         self.assertEqual(querkraft, {"querschnitt.q1", "querschnitt.q2"})
 
 

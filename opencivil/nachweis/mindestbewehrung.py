@@ -321,8 +321,7 @@ class Rissnormalkraft(Nachweis):
 
         erg.a_s = sum(e.g(f"a_s_{m}").si for m in marken)
         if erg.a_s <= 0.0:
-            erg.begruendung = erg.hinweis = (
-                f"{lage.nummer}. Lage ohne Bewehrung → kein Nachweis.")
+            erg.begruendung = erg.hinweis = self.ohne_bewehrung(lage.nummer)
             return erg
 
         # Der dickste Stab bestimmt die Rissbreite: er verteilt den Riss auf
@@ -365,7 +364,6 @@ class Rissnormalkraft(Nachweis):
             name=f"Rissnormalkraft {r} – {nummer}. Lage",
             art="N_Riss",
             ziel=self.d_ausnutzung[nummer].id,
-            langname=self.thema,
             fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
@@ -596,8 +594,7 @@ class ZwaengungBiegung(Nachweis):
         flaechen = [(e.g(f"a_s_{m}").si, e.g(f"z_{m}").si) for m in marken]
         erg.a_s = sum(a for a, _ in flaechen)
         if erg.a_s <= 0.0:
-            erg.begruendung = erg.hinweis = (
-                f"{lage.nummer}. Lage ohne Bewehrung → kein Nachweis.")
+            erg.begruendung = erg.hinweis = self.ohne_bewehrung(lage.nummer)
             return erg
 
         erg.z_s = sum(a * z for a, z in flaechen) / erg.a_s
@@ -646,7 +643,6 @@ class ZwaengungBiegung(Nachweis):
             name=f"Zwängung Biegung {r} – {nummer}. Lage",
             art="ZB",
             ziel=self.d_ausnutzung[nummer].id,
-            langname=self.thema,
             fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),

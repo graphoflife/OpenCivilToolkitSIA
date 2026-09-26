@@ -140,7 +140,7 @@ export function naechsterName(stamm, eintraege) {
   return `${stamm} ${i}`;
 }
 
-/** Der Namensraum eines Materials im Rechenwerk, z.B. `beton.b1`. */
+/** Der Namensraum eines Bestandteils im Rechenwerk: `beton.b1`, `querschnitt.q1`. */
 export function namensraum(art, kennung) {
   return `${art}.${kennung}`;
 }

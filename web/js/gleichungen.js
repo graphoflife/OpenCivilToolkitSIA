@@ -43,13 +43,16 @@ function mathliveLaden() {
 }
 
 /**
- * Kürzel beim Tippen: «kN» wird zur Einheit, nicht zu k mal N. Nur Namen aus
- * mehreren Buchstaben -- ein einzelnes m oder N bleibt eine Variable; dafür
- * gibt es das Raster.
+ * Kürzel beim Tippen: «kN» wird zur Einheit, nicht zu k mal N. Welche
+ * Einheiten es gibt, sagt der Kern. Nur Namen aus mehreren Buchstaben -- ein
+ * einzelnes m oder N bleibt eine Variable; dafür gibt es das Raster. Und
+ * nicht «min»: das ist in MathLive schon die Funktion.
  */
-const KUERZEL = Object.fromEntries(
-  ['mm', 'cm', 'dm', 'km', 'kN', 'MN', 'kNm', 'MNm', 'Nm', 'Pa', 'kPa', 'MPa', 'GPa', 'kg']
+function kuerzel() {
+  return Object.fromEntries((zustand.katalog?.einheiten || [])
+    .filter((e) => e.length > 1 && e !== 'min')
     .map((e) => [e, `\\mathrm{${e}}`]));
+}
 
 // ===========================================================================
 // Raster
@@ -93,10 +96,17 @@ let ansicht = null;
 let fokusWunsch = null;
 /** Das Formelfeld, in das das Raster einfügt. */
 let letztesFeld = null;
+/** Das Raster hängt an keiner Zeile: einmal gebaut, bei jedem Neubau wieder eingehängt. */
+let rasterKnoten = null;
 let uebernahmeUhr = null;
 
 function blattVon(kennung) {
   return zustand.projekt.gleichungen.find((b) => b.kennung === kennung);
+}
+
+/** Woran die Ansicht merkt, dass sie neu gebaut werden muss. */
+function strukturVon(blatt) {
+  return blatt.zeilen.map((z) => z.art).join('|');
 }
 
 /**
@@ -113,23 +123,19 @@ function sofortUebernehmen(veraenderer) {
   projektAendern(veraenderer);
 }
 
-/** Eine leere Zeile -- «formel», «projektwert» oder «text». */
+/** Eine leere Zeile -- «formel», «projektwert» oder «text»; die Felder sagt der Kern. */
 export function neueZeile(art = 'formel') {
-  return { art, latex: '', einheit: '', name: '', wert_id: '', text: '' };
+  return { ...zustand.katalog.neue_gleichungszeile, art };
 }
 
 function zeileEinfuegen(kennung, index, art = 'formel') {
   fokusWunsch = index;
-  sofortUebernehmen((p) => {
-    p.gleichungen.find((b) => b.kennung === kennung).zeilen.splice(index, 0, neueZeile(art));
-  });
+  sofortUebernehmen(() => blattVon(kennung).zeilen.splice(index, 0, neueZeile(art)));
 }
 
 function zeileEntfernen(kennung, index) {
   fokusWunsch = Math.max(0, index - 1);
-  sofortUebernehmen((p) => {
-    p.gleichungen.find((b) => b.kennung === kennung).zeilen.splice(index, 1);
-  });
+  sofortUebernehmen(() => blattVon(kennung).zeilen.splice(index, 1));
 }
 
 // ===========================================================================
@@ -147,15 +153,13 @@ function formelfeld(latex, beiEingabe, { klein = false } = {}) {
   feld.addEventListener('input', () => beiEingabe(feld.value));
   feld.addEventListener('focusin', () => { letztesFeld = feld; });
   customElements.whenDefined('math-field').then(() => {
-    feld.inlineShortcuts = { ...feld.inlineShortcuts, ...KUERZEL };
+    feld.inlineShortcuts = { ...feld.inlineShortcuts, ...kuerzel() };
     feld.menuItems = [];
   });
   return feld;
 }
 
-function formelzeile(blatt, index) {
-  const kennung = blatt.kennung;
-  const zeile = () => blattVon(kennung).zeilen[index];
+function formelzeile(zeile, kennung, index) {
   const feld = formelfeld(zeile().latex, (wert) => {
     zeile().latex = wert;
     spaeterUebernehmen();
@@ -180,9 +184,7 @@ function formelzeile(blatt, index) {
   return { art: 'formel', feld, einheit, knoten: [feld, einheit] };
 }
 
-function projektwertzeile(blatt, index) {
-  const kennung = blatt.kennung;
-  const zeile = () => blattVon(kennung).zeilen[index];
+function projektwertzeile(zeile) {
   const name = formelfeld(zeile().name, (wert) => {
     zeile().name = wert;
     spaeterUebernehmen();
@@ -199,15 +201,10 @@ function projektwertzeile(blatt, index) {
   return { art: 'projektwert', feld: name, auswahl, knoten: [auswahl, name] };
 }
 
-function textzeile(blatt, index) {
-  const kennung = blatt.kennung;
+function textzeile(zeile) {
   const text = el('input.gl-text', {
-    type: 'text', value: blattVon(kennung).zeilen[index].text, placeholder: 'Text',
-    on: {
-      change: (e) => sofortUebernehmen(() => {
-        blattVon(kennung).zeilen[index].text = e.target.value;
-      }),
-    },
+    type: 'text', value: zeile().text, placeholder: 'Text',
+    on: { change: (e) => sofortUebernehmen(() => { zeile().text = e.target.value; }) },
   });
   return { art: 'text', text, knoten: [text] };
 }
@@ -217,7 +214,7 @@ const BAUER = { formel: formelzeile, projektwert: projektwertzeile, text: textze
 function aufbauen(blatt) {
   const kennung = blatt.kennung;
   const zeilen = blatt.zeilen.map((z, i) => {
-    const teil = (BAUER[z.art] || formelzeile)(blatt, i);
+    const teil = (BAUER[z.art] || formelzeile)(() => blattVon(kennung).zeilen[i], kennung, i);
     teil.ergebnis = el('div.gl-ergebnis');
     teil.wurzel = el(`div.gl-zeile.ist-${z.art}`, {}, [
       el('span.gl-nummer', { text: String(i + 1) }),
@@ -245,7 +242,7 @@ function aufbauen(blatt) {
 
   return {
     kennung,
-    struktur: blatt.zeilen.map((z) => z.art).join('|'),
+    struktur: strukturVon(blatt),
     name,
     zeilen,
     wurzel: el('div.gl-blatt', {}, [
@@ -253,7 +250,7 @@ function aufbauen(blatt) {
         el('h3', {}, [el('span', { text: 'Blatt' }),
           el('span', { text: 'Enter: neue Zeile · kN, mm, MPa direkt tippen' })]),
         name,
-        raster(),
+        (rasterKnoten ??= raster()),
         el('div.gl-zeilen', {}, zeilen.map((z) => z.wurzel)),
         el('div.gl-anfuegen', {}, [
           anfuegen('Formel', 'formel'), anfuegen('Projektwert', 'projektwert'),
@@ -289,10 +286,9 @@ function raster() {
 // Auffrischen
 // ===========================================================================
 
-/** «f_{cd}» aus dem Symbol eines Werts -- ohne Sortennamen, sonst leer. */
+/** «f_{cd}» für f_cd des Betons -- der Kern schlägt nur vor, was er auch liest. */
 function namensvorschlag(id) {
-  const symbol = (zustand.loesung?.werte?.[id]?.symbol || '').replace(/,\\text\{[^}]*\}/g, '');
-  return /^(\\[A-Za-z]+|[A-Za-z])(_\{[A-Za-z0-9,]+\}|_[A-Za-z0-9])?$/.test(symbol) ? symbol : '';
+  return zustand.loesung?.werte?.[id]?.blattname || '';
 }
 
 /** Die Werte, die ein Blatt lesen kann -- nach Bestandteil gruppiert. */
@@ -343,21 +339,22 @@ function hatFokus(knoten) {
   return knoten === document.activeElement || knoten.contains(document.activeElement);
 }
 
+/** Ein Formelfeld auf den Stand des Projekts -- nicht, während jemand darin tippt. */
+function feldSetzen(feld, wert) {
+  if (!hatFokus(feld) && feld.value !== undefined && feld.value !== wert) feld.value = wert;
+}
+
 function auffrischen(blatt) {
   if (!hatFokus(ansicht.name)) ansicht.name.value = blatt.name;
   const ergebnisse = zustand.loesung?.gleichungen?.[blatt.kennung] || [];
   ansicht.zeilen.forEach((teil, i) => {
     const zeile = blatt.zeilen[i];
     if (teil.art === 'formel') {
-      if (!hatFokus(teil.feld) && teil.feld.value !== undefined && teil.feld.value !== zeile.latex) {
-        teil.feld.value = zeile.latex;
-      }
+      feldSetzen(teil.feld, zeile.latex);
       if (!hatFokus(teil.einheit)) teil.einheit.value = zeile.einheit;
     } else if (teil.art === 'projektwert') {
       auswahlFuellen(teil.auswahl, zeile.wert_id);
-      if (!hatFokus(teil.feld) && teil.feld.value !== undefined && teil.feld.value !== zeile.name) {
-        teil.feld.value = zeile.name;
-      }
+      feldSetzen(teil.feld, zeile.name);
     } else if (!hatFokus(teil.text)) {
       teil.text.value = zeile.text;
     }
@@ -398,8 +395,7 @@ function fokusNachholen() {
  */
 export function blattZeichnen(behaelter, blatt) {
   mathliveLaden();
-  const struktur = blatt.zeilen.map((z) => z.art).join('|');
-  if (!ansicht || ansicht.kennung !== blatt.kennung || ansicht.struktur !== struktur) {
+  if (!ansicht || ansicht.kennung !== blatt.kennung || ansicht.struktur !== strukturVon(blatt)) {
     loslassen();
     ansicht = aufbauen(blatt);
   }

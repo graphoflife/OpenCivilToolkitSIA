@@ -16,7 +16,7 @@ erfinden, sonst laufen Bericht und Bildschirm auseinander.
 from __future__ import annotations
 
 import math
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, List, Optional
 
 from opencivil.bewehrungssuche import Suchmodus
 from opencivil.core.einheiten import MM
@@ -33,6 +33,7 @@ from opencivil.core.protokoll import (
 )
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
+from opencivil.gleichungen.ausdruck import EINHEITENNAMEN, blattname
 from opencivil.material.beton import BETON_VORLAGEN, BETONSORTEN
 from opencivil.material.betonstahl import STAHLSORTEN, STAHL_VORLAGEN
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
@@ -40,6 +41,7 @@ from opencivil.nachweis.spannungsbegrenzung import GrenzeGegenFliessen
 from opencivil.projekt import (
     BEIDE_RICHTUNGEN, RISSANFORDERUNGEN, Aufbau, QuerschnittEintrag,
 )
+from opencivil.projekt.gleichungen import GleichungszeileEintrag
 from opencivil.web import diagrammdaten
 
 
@@ -119,6 +121,10 @@ def katalog() -> dict:
         "suchmodi": [
             {"wert": m.value, "beschriftung": m.beschriftung} for m in Suchmodus
         ],
+        # Fuer das Blatt: die leere Zeile wie die frische Platte oben, und die
+        # Einheiten, die der Leser in \mathrm{...} versteht.
+        "neue_gleichungszeile": GleichungszeileEintrag().als_dict(),
+        "einheiten": sorted(EINHEITENNAMEN),
     }
 
 
@@ -161,6 +167,9 @@ def wert_dict(wert: Wert) -> dict:
         "quelle_text": wert.quelle.beschriftung,
         "herkunft": wert.herkunft or "",
         "latex": wert.zahl_latex(),
+        # Unter welchem Namen der Wert in einem Blatt steht -- der Vorschlag,
+        # wenn ihn jemand dort als Projektwert waehlt. Leer: kein gueltiger Name.
+        "blattname": blattname(wert.symbol),
     }
 
 
@@ -244,17 +253,15 @@ def protokoll_liste(protokoll: Protokoll) -> List[dict]:
 
 def formelsammlung_liste(protokoll: Protokoll) -> List[dict]:
     """
-    Je Thema die Erklaerungen und die Formeln ohne Zahlen -- jede mit den
-    Raeumen, in denen sie vorkam, damit die Oberflaeche «Aktuelle Seite»
+    Je Thema die Eintraege wie im Bericht, als Bloecke derselben Tafel -- jeder
+    mit den Raeumen, in denen er vorkam, damit die Oberflaeche «Aktuelle Seite»
     eingrenzen kann.
     """
     return [
         {
             "thema": thema.name,
-            "erklaerungen": [{"text": e.block.text, "raeume": e.raeume}
-                             for e in thema.erklaerungen],
-            "formeln": [{**_gleichung_dict(e.block, 0), "raeume": e.raeume}
-                        for e in thema.formeln],
+            "eintraege": [{**TAFEL[type(e.block)](e.block, 0), "raeume": e.raeume}
+                          for e in thema.eintraege],
         }
         for thema in formelsammlung(protokoll)
     ]
@@ -334,7 +341,7 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None) -> dict:
         ergebnis["zuordnung"] = zuordnung(aufbau)
         # Je Blatt und Zeile, was neben der Zeile steht -- gesetzt vom Kern.
         ergebnis["gleichungen"] = {
-            kennung: [{"ergebnis": r.ergebnis, "fehler": r.fehler, "name": r.name}
+            kennung: [{"ergebnis": r.ergebnis, "fehler": r.fehler}
                       for r in blatt.ergebnisse]
             for kennung, blatt in aufbau.blaetter.items()
         }
@@ -370,8 +377,10 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
                     # Nur was die Pruefung ausdruecklich meldet -- siehe
                     # NachweisUrteil.hinweis.
                     "hinweis": z.urteil.hinweis,
-                    # Womit sich genau dieser Nachweis nachrechnen laesst.
+                    # Womit sich genau dieser Nachweis nachrechnen laesst --
+                    # und wie er dann heisst.
                     "ziel": z.urteil.ziel,
+                    "bezeichnung": z.bezeichnung,
                 }
                 for z, zellen in zip(platte.zeilen, tabelle.zeilen)
             ],
@@ -453,9 +462,5 @@ def zuordnung(aufbau: Aufbau) -> dict:
                 ],
             }
             for kennung, qs in aufbau.querschnitte.items()
-        },
-        "gleichungen": {
-            kennung: {"namensraum": blatt.id, "name": blatt.eintrag.name}
-            for kennung, blatt in aufbau.blaetter.items()
         },
     }

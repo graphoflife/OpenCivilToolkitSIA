@@ -60,12 +60,6 @@ class Projekt(Beschreibung):
                 return q
         raise ProjektFehler(f"Querschnitt '{kennung}' gibt es im Projekt nicht.")
 
-    def blatt(self, kennung: str) -> GleichungsblattEintrag:
-        for b in self.gleichungen:
-            if b.kennung == kennung:
-                return b
-        raise ProjektFehler(f"Gleichungsblatt '{kennung}' gibt es im Projekt nicht.")
-
     def freie_kennung(self, vorsilbe: str) -> str:
         vergeben = ({m.kennung for m in self.materialien}
                     | {q.kennung for q in self.querschnitte}

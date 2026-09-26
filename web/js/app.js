@@ -45,10 +45,17 @@ async function einDurchgang() {
   zustandsanzeige('rechnet …');
   try {
     const antwort = await api.rechnen(zustand.projekt);
-    aendern({ loesung: antwort }, 'loesung');
-    // Der gezeigte Einzelnachweis rechnet mit: sonst stünde in der
-    // Herleitung eine Zahl von vor der letzten Eingabe.
-    if (zustand.verfolgung) await verfolgen(zustand.verfolgung.ziel);
+    // Der gezeigte Einzelnachweis rechnet mit: sonst stünde in der Herleitung
+    // eine Zahl von vor der letzten Eingabe. Aber nur, wenn die Herleitung zu
+    // sehen ist -- sonst beim nächsten Blick darauf. Beides kommt in einem
+    // Zug an, statt die Tafeln zweimal zu zeichnen.
+    const v = zustand.verfolgung;
+    const verfolgung = !v ? null
+      : zustand.reiter === 'herleitung' ? await teillauf(v) : { ...v, loesung: null };
+    // Inzwischen aufgehoben oder ein anderes Auge gewählt: das gilt.
+    aendern({
+      loesung: antwort, verfolgung: zustand.verfolgung === v ? verfolgung : zustand.verfolgung,
+    }, 'loesung');
 
     if (!antwort.vollstaendig) {
       const fehlt = antwort.fehlende.length;
@@ -110,15 +117,20 @@ async function rechnen() {
  * Das Auge in der Zusammenfassung: genau diesen Nachweis mit allem, was er
  * braucht -- als Teillauf *neben* der Gesamtlösung. Zusammenfassung,
  * Diagramme und Bericht bleiben vollständig; nur die Herleitung zeigt ihn.
- * Gibt es das Ziel nicht mehr (Fall gelöscht), endet die Verfolgung still.
+ * Gibt es das Ziel nicht mehr (Fall gelöscht), endet die Verfolgung still: null.
  */
-async function verfolgen(ziel, name = zustand.verfolgung?.name) {
+async function teillauf({ ziel, name }) {
   try {
-    const loesung = await api.rechnen(zustand.projekt, [ziel]);
-    aendern({ verfolgung: { ziel, name, loesung } }, 'verfolgung');
+    return { ziel, name, loesung: await api.rechnen(zustand.projekt, [ziel]) };
   } catch {
-    aendern({ verfolgung: null }, 'verfolgung');
+    return null;
   }
+}
+
+async function verfolgen(ziel, name) {
+  const neu = await teillauf({ ziel, name });
+  // Inzwischen aufgehoben oder ein anderes Auge gewählt: dann nicht.
+  if (zustand.verfolgung?.ziel === ziel) aendern({ verfolgung: neu }, 'verfolgung');
 }
 
 /** Rechnet verzögert -- damit Tippen nicht jede Taste zu einem Nachweis macht. */
@@ -475,7 +487,9 @@ function allesZeichnen(anlass) {
     editorZeichnen(knoten.editor, knoten.editorTitel, knoten.editorHinweis);
     berichtZeichnen(knoten.bericht, {
       verfolgen: (ziel, name) => {
-        aendern({ reiter: 'herleitung' }, 'reiter');
+        // Reiter und Platzhalter in einem Zug: sonst zeichnete der Wechsel
+        // erst die ganze Herleitung, die der Teillauf gleich ersetzt.
+        aendern({ reiter: 'herleitung', verfolgung: { ziel, name, loesung: null } }, 'verfolgung');
         verfolgen(ziel, name);
       },
     });
@@ -543,7 +557,12 @@ async function starten() {
   });
 
   for (const k of knoten.reiterKnoepfe) {
-    k.addEventListener('click', () => aendern({ reiter: k.dataset.reiter }, 'reiter'));
+    k.addEventListener('click', () => {
+      aendern({ reiter: k.dataset.reiter }, 'reiter');
+      // Der Einzelnachweis rechnet erst nach, wenn die Herleitung zu sehen ist.
+      const v = zustand.verfolgung;
+      if (k.dataset.reiter === 'herleitung' && v && !v.loesung) verfolgen(v.ziel, v.name);
+    });
   }
   for (const k of document.querySelectorAll('#umfang .schalter-halb')) {
     k.addEventListener('click', () => aendern({ umfang: k.dataset.umfang }, 'umfang'));

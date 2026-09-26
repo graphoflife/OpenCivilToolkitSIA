@@ -563,8 +563,7 @@ class _Lauf:
 
         anfang = len(protokoll.bloecke)
         ergebnisse = berechnung.ausfuehren(eingaben, protokoll)
-        protokoll.herkunft_stempeln(berechnung.thema,
-                                    abschnitt.raum if abschnitt else "", ab=anfang)
+        protokoll.herkunft_stempeln(berechnung.thema, ab=anfang)
 
         # Erst rechnen, dann begruenden. Andersherum stand der Hinweis vor der
         # eigenen Gleichung und damit unmittelbar unter der vorherigen -- er las

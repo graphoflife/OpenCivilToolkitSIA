@@ -239,8 +239,7 @@ class Duktilitaet(Nachweis):
                     for _, art, _, _, _ in eintraege]
         erg.a_s = sum(a for a, _ in flaechen)
         if erg.a_s <= 0.0:
-            erg.begruendung = erg.hinweis = (
-                f"{lage.nummer}. Lage ohne Bewehrung → kein Nachweis.")
+            erg.begruendung = erg.hinweis = self.ohne_bewehrung(lage.nummer)
             return erg
 
         # Grundbewehrung und Zulage liegen auf leicht verschiedenen Hoehen --
@@ -275,7 +274,6 @@ class Duktilitaet(Nachweis):
             name=f"Duktilität – {nummer}. Lage",
             art="D",
             ziel=self.d_ausnutzung[nummer].id,
-            langname=self.thema,
             fall=f"{nummer}. Lage",
             erfuellt=erg.erfuellt,
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
