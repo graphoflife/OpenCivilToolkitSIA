@@ -233,6 +233,25 @@ class TestBlatt(unittest.TestCase):
         self.assertIn("Analytische Gleichungen – Vorbemessung", bericht)
         self.assertIn("Nur ein Satz.", bericht)
 
+    def test_die_zeilen_stehen_in_der_werteliste(self):
+        """
+        Was die Zeilen ergeben, steht in der Loesung und in der Werteliste --
+        das Ziel des Blatts, die Zahl der aufgegangenen Zeilen, nicht. Ein
+        Projektwert behaelt die Herkunft des Originals.
+        """
+        projekt = projekt_mit_blatt(
+            Zeile(latex=r"a=3\mathrm{m}"), Zeile(art="text", text="Satz."),
+            Zeile(art="projektwert", name=r"h", wert_id="querschnitt.q1.h"),
+            Zeile(latex=r"a+"))
+        ergebnis = projekt.rechnen()
+        werte = ergebnis.loesung.werte
+        self.assertEqual(werte["gleichungen.g1.z001"].beschreibung, "Vorbemessung, Zeile 1")
+        self.assertEqual(werte["gleichungen.g1.z003"].quelle, werte["querschnitt.q1.h"].quelle)
+        self.assertNotIn("gleichungen.g1.z004", werte)
+        bericht = ergebnis.bericht()
+        self.assertIn("Vorbemessung, Zeile 3", bericht)
+        self.assertNotIn("Zeilen ohne Fehler", bericht)
+
     def test_eine_neue_kennung_kennt_die_blaetter(self):
         projekt = projekt_mit_blatt()
         self.assertEqual(projekt.freie_kennung("g"), "g2")

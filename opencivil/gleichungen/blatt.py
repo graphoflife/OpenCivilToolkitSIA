@@ -11,12 +11,19 @@ JEDE ZEILE FUER SICH:
 Ein Fehler bleibt bei seiner Zeile -- und bei den Zeilen, die das dort
 Definierte brauchen. Er bricht weder das Blatt ab noch den Lauf der Platten.
 Eine Neudefinition gilt ab ihrer Zeile, wie beim Lesen von oben nach unten.
+
+DIE ZEILEN IN DER LOESUNG:
+Was eine Zeile ergibt, steht nach dem Lauf in der Loesung und damit in der
+Werteliste des Berichts: ``gleichungen.g1.z003`` heisst «Name, Zeile 3».
+Vorab erklaeren kann das Blatt diese Werte nicht -- welche Zeilen aufgehen
+und in welcher Einheit, steht erst nach dem Rechnen fest. Erklaert ist nur
+das Ziel, die Zahl der aufgegangenen Zeilen; es steht in keiner Werteliste.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import TYPE_CHECKING, Dict, List
+from dataclasses import dataclass, replace
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 from opencivil.core.berechnung import Eingabebezug, Eingaben, Prozedur
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
@@ -47,6 +54,9 @@ class Zeilenergebnis:
     name: str = ""
     """Was die Zeile definiert, als LaTeX -- leer bei Auswertung und Text."""
 
+    wert: Optional[Wert] = None
+    """Was die Zeile ergibt -- ``None`` bei Text, leeren Zeilen und Fehlern."""
+
 
 class Gleichungsblatt(Prozedur):
     """
@@ -60,10 +70,10 @@ class Gleichungsblatt(Prozedur):
         self.eintrag = eintrag
         basis = f"gleichungen.{eintrag.kennung}"
         # Ein Ziel braucht jede Berechnung; ein Blatt hat keines, das jemand
-        # anderes liest. Also die Zahl der aufgegangenen Zeilen.
+        # anderes liest. Also die Zahl der aufgegangenen Zeilen -- nur Ziel.
         self.d_zeilen = WertDef(id=f"{basis}.zeilen", symbol="n", einheit=EINHEITSLOS,
                                 beschreibung=f"Zeilen ohne Fehler – {eintrag.name}",
-                                stellen=0)
+                                stellen=0, nur_ziel=True)
         titel = f"Analytische Gleichungen – {eintrag.name}"
         super().__init__(
             basis, ausgaben=[self.d_zeilen],
@@ -73,8 +83,8 @@ class Gleichungsblatt(Prozedur):
                      for i, z in enumerate(eintrag.zeilen)
                      if z.art == "projektwert" and z.wert_id],
             titel=titel, abschnitt=Abschnitt(titel, basis))
-        #: Jede Zeile ein Wert ``z{Nummer}`` -- fuer die Herleitung, nie im
-        #: Rechenwerk angemeldet.
+        #: Jede Zeile ein Wert ``z001``, ``z002`` ... -- dreistellig, damit die
+        #: Werteliste Zeile 10 nicht vor Zeile 2 setzt.
         self.zeilenwerte = Zwischenwerte(basis)
         self.ergebnisse: List[Zeilenergebnis] = []
 
@@ -107,6 +117,22 @@ class Gleichungsblatt(Prozedur):
             self.ergebnisse.append(erg)
         return {self.d_zeilen.id: Groesse(sum(not r.fehler for r in self.ergebnisse))}
 
+    def ausfuehren(self, e: Eingaben, p: Protokoll) -> Dict[str, Wert]:
+        """
+        Wie jede Berechnung -- und dazu, was die Zeilen ergeben haben, damit es
+        in der Loesung steht (siehe oben). Die Beschreibung bekommen die Werte
+        erst hier: in der Herleitung stuende sie sonst als Titel ueber jeder
+        Zeile.
+        """
+        ergebnis = super().ausfuehren(e, p)
+        for nummer, zeile in enumerate(self.ergebnisse, start=1):
+            if zeile.wert is not None:
+                beschreibung = f"{self.eintrag.name}, Zeile {nummer}"
+                ergebnis[zeile.wert.id] = replace(
+                    zeile.wert, herkunft=self.id,
+                    definition=replace(zeile.wert.definition, beschreibung=beschreibung))
+        return ergebnis
+
     # -- Zeilen -------------------------------------------------------------
 
     def _formel(self, nummer: int, zeile: GleichungszeileEintrag, p: Protokoll,
@@ -130,9 +156,10 @@ class Gleichungsblatt(Prozedur):
         # Ohne Namen steht die Formel selbst links: «a · b = 3 m · 7 m = 21 m²».
         symbol = (gelesen.name.latex if gelesen.name is not None
                   else einsetzen_symbolisch(vorlage, eingaben))
-        wert = self.zeilenwerte.wert(f"z{nummer}", symbol, groesse.als(einheit),
+        wert = self.zeilenwerte.wert(f"z{nummer:03d}", symbol, groesse.als(einheit),
                                      stellen(groesse, einheit))
         p.formel(wert, vorlage, eingaben, titel="")
+        erg.wert = wert
         erg.ergebnis = wert.zahl_latex()
         if gelesen.name is not None:
             werte[gelesen.name.latex] = wert
@@ -152,9 +179,10 @@ class Gleichungsblatt(Prozedur):
         if not e.hat(lokal):
             raise AusdruckFehler("Projektwert nicht verfügbar.")
         quelle = e[lokal]
-        wert = self.zeilenwerte.wert(f"z{nummer}", erg.name,
-                                     quelle.groesse.als(quelle.einheit), quelle.stellen,
-                                     quelle.beschreibung)
+        wert = self.zeilenwerte.wert(f"z{nummer:03d}", erg.name,
+                                     quelle.groesse.als(quelle.einheit), quelle.stellen)
         p.wert(wert, titel=quelle.beschreibung)
+        # In der Werteliste mit der Herkunft des Originals: h bleibt Eingabe.
+        erg.wert = replace(wert, quelle=quelle.quelle)
         erg.ergebnis = wert.zahl_latex()
         werte[erg.name] = wert

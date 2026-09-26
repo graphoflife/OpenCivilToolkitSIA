@@ -135,6 +135,13 @@ class WertDef:
     """Ein Erfuellungsgrad: gesetzt nach :func:`grad_als_text` statt mit
     ``stellen`` -- in Herleitung, Werttabelle und Oberflaeche derselbe Text."""
 
+    nur_ziel: bool = False
+    """
+    Nur da, damit das Rechenwerk etwas zu rechnen hat -- kein Ergebnis zum
+    Nachschlagen, darum in keiner Werteliste. So das Ziel eines Blatts: seine
+    Ergebnisse sind die Zeilen, das Ziel zaehlt sie bloss.
+    """
+
     def __post_init__(self) -> None:
         if not self.id:
             raise ValueError("WertDef braucht eine id.")

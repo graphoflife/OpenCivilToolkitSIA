@@ -1,6 +1,6 @@
 # Voll
 
-104 Berechnungen ausgeführt, 197 Werte bestimmt.
+104 Berechnungen ausgeführt, 201 Werte bestimmt.
 
 ## Herleitung
 
@@ -3170,7 +3170,10 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Charakteristische Fliessgrenze | $f_{yk}$ | $500$ | N/mm² | Vorgabe |
 | Charakteristische Fliessgrenze auf Druck | $f_{yk}^{-}$ | $500$ | N/mm² | Vorgabe |
 | Teilsicherheitsbeiwert für Betonstahl | $\gamma_s$ | $1.15$ |  | Vorgabe |
-| Zeilen ohne Fehler – Vorbemessung | $n$ | $5$ |  | berechnet |
+| Vorbemessung, Zeile 2 | $a$ | $30$ | cm | berechnet |
+| Vorbemessung, Zeile 3 | $f_{cd}$ | $20$ | N/mm² | berechnet |
+| Vorbemessung, Zeile 4 | $N_{Rd}$ | $1800$ | kN | berechnet |
+| Vorbemessung, Zeile 5 | $\frac{N_{Rd}}{1.5\,\mathrm{m}}$ | $1200$ | kN/m | berechnet |
 | Betrachtete Breite (x) | $b$ | $1000$ | mm | Vorgabe |
 | Betrachtete Breite (y) | $b_y$ | $1000$ | mm | Vorgabe |
 | Bewehrungsmass je Kubikmeter Beton | $\mu_s$ | $123$ | kg/m³ | berechnet |

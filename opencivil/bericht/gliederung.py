@@ -127,17 +127,19 @@ def _nachweise(p: Protokoll, zusammenfassung: Zusammenfassung,
 
 
 def _werte(p: Protokoll, loesung: Loesung) -> None:
-    if not loesung.werte:
-        return
-    _abschnitt(p, "Werte")
     zeilen = []
     for wert_id in sorted(loesung.werte):
         wert = loesung.werte[wert_id]
+        if wert.definition.nur_ziel:
+            continue
         einheit = (wert.einheit.beschriftung
                    if wert.einheit.name not in ("", "-") else "")
         zeilen.append([wert.beschreibung or wert_id, Mathe(wert.symbol),
                        Mathe(wert.formatiert(latex=True)), einheit,
                        wert.quelle.beschriftung])
+    if not zeilen:
+        return
+    _abschnitt(p, "Werte")
     p.anfuegen(TabellenBlock(
         kopf=["Bezeichnung", "Symbol", "Wert", "Einheit", "Herkunft"],
         zeilen=zeilen,

@@ -221,12 +221,32 @@ die Oberfläche schon neu war. Ein schlichter statischer Server sagt nichts
   in `test_dienst` meldet, wenn `python3 -m opencivil.web.bruecke` vergessen
   ging.
 
+### Die Zeilen eines Blatts in der Werteliste
+
+In der Werteliste des Berichts stand vom Blatt nur sein Ziel: «Zeilen ohne
+Fehler – Vorbemessung, n = 5». Die Zeilenwerte selbst fehlten.
+
+* **Warum das Ziel bleibt:** Das Rechenwerk verlangt vorab erklärte
+  Ausgaben. Welche Zeilen aufgehen und in welcher Einheit, steht aber erst
+  nach dem Rechnen fest. Ein Ziel, das immer entsteht, braucht das Blatt
+  trotzdem, auch eines nur mit Text will in die Herleitung.
+* **Die Zeilen:** Das Blatt gibt nach dem Rechnen zusätzlich zurück, was
+  seine Zeilen ergeben haben (`Gleichungsblatt.ausfuehren`), und das
+  Rechenwerk legt es ab wie jede Ausgabe.
+  - Die Beschreibung «Vorbemessung, Zeile 4» bekommen die Werte erst dort.
+    In der Herleitung stünde sie sonst als Titel über jeder Zeile.
+  - Ein Projektwert behält die Herkunft des Originals: h bleibt Eingabe.
+  - Die Kennungen sind dreistellig (`z004`), sonst sortierte die Liste
+    Zeile 10 vor Zeile 2.
+* **Das Ziel:** Es trägt das neue Kennzeichen `WertDef.nur_ziel` und steht
+  in keiner Werteliste mehr.
+
 ### Offen
 
-* **Das Ziel eines Blatts** ist «Zeilen ohne Fehler», ein Platzhalter. Er
-  steht in der Werteliste des Berichts, die Zeilenwerte selbst nicht. Das
-  Rechenwerk verlangt vorab erklärte Ausgaben, aber die Einheit einer Zeile
-  steht erst nach dem Rechnen fest.
+* **Der Nullfall der Querkraft** (Diagramm ohne V_Ed) steht mit V_Rd und
+  Erfüllungsgrad «ohne Einwirkung» noch in der Werteliste. Er gehört zur
+  selben Art: nur Ziel, damit die Kurve entsteht. Mit `nur_ziel`
+  auszublenden, wenn gewünscht.
 
 ---
 
