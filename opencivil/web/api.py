@@ -332,6 +332,12 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None) -> dict:
         ergebnis["zusammenfassungen"] = zusammenfassungen(loesung, aufbau)
         ergebnis["warnungen"] = list(aufbau.warnungen)
         ergebnis["zuordnung"] = zuordnung(aufbau)
+        # Je Blatt und Zeile, was neben der Zeile steht -- gesetzt vom Kern.
+        ergebnis["gleichungen"] = {
+            kennung: [{"ergebnis": r.ergebnis, "fehler": r.fehler, "name": r.name}
+                      for r in blatt.ergebnisse]
+            for kennung, blatt in aufbau.blaetter.items()
+        }
     return ergebnis
 
 
@@ -447,5 +453,9 @@ def zuordnung(aufbau: Aufbau) -> dict:
                 ],
             }
             for kennung, qs in aufbau.querschnitte.items()
+        },
+        "gleichungen": {
+            kennung: {"namensraum": blatt.id, "name": blatt.eintrag.name}
+            for kennung, blatt in aufbau.blaetter.items()
         },
     }

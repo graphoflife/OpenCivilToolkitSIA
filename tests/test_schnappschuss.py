@@ -90,6 +90,19 @@ def _voll():
     konsole = p.platte("Konsole", h=250, x=[12, 12], y=[40, 10])
     konsole.einwirkung("Feld", M_Ed=40, V_Ed=50)
     konsole.einwirkung("Schräg", M_Ed=30, N_Ed=-500).art = "naechster_Punkt"
+
+    # Ein Blatt Gleichungen: Definition, Projektwert, Auswertung mit
+    # gewünschter Einheit, Text -- und eine Zeile mit Fehler.
+    from opencivil.projekt.gleichungen import (
+        GleichungsblattEintrag, GleichungszeileEintrag as Zeile)
+    p.gleichungen.append(GleichungsblattEintrag(p.freie_kennung("g"), "Vorbemessung", [
+        Zeile(art="text", text="Stütze 30 × 30 cm, zentrisch."),
+        Zeile(latex=r"a=30\mathrm{cm}"),
+        Zeile(art="projektwert", name=r"f_{cd}", wert_id="beton.b1.f_cd"),
+        Zeile(latex=r"N_{Rd}=a^{2}\cdot f_{cd}", einheit="kN"),
+        Zeile(latex=r"\frac{N_{Rd}}{1.5\mathrm{m}}="),
+        Zeile(latex=r"b=a+N_{Rd}"),
+    ]))
     return p
 
 
@@ -102,7 +115,7 @@ def projekte() -> dict:
 
 def _loesung(projekt):
     aufbau = projekt.aufbauen()
-    return aufbau, aufbau.werk.loese(*aufbau.alle_nachweisziele())
+    return aufbau, aufbau.werk.loese(*aufbau.berichtsziele())
 
 
 @functools.lru_cache(maxsize=None)

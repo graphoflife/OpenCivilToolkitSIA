@@ -191,6 +191,13 @@ def _stromabwaerts(projekt: Projekt, aufbau) -> Loesung:
         speicher.verschmelzen(gesamt, teil)
         bekannt.update(teil.werte)
 
+    # Die Blätter zuletzt und ohne Zwischenspeicher: sie lesen Werte der
+    # Platten, und ihre Zeilen rechnen sich in Augenblicken.
+    if aufbau.blattziele():
+        speicher.verschmelzen(
+            gesamt, speicher.als_teil(
+                aufbau.werk.loese(*aufbau.blattziele(), bekannt=bekannt), {},
+                ohne=bekannt))
     return gesamt
 
 
@@ -237,9 +244,7 @@ def bericht(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
     projekt = _projekt(rumpf)
     aufbau = projekt.aufbauen()
-    gewuenscht = list(rumpf.get("ziele") or []) or (
-        aufbau.alle_nachweisziele() + aufbau.eckwertziele()
-    )
+    gewuenscht = list(rumpf.get("ziele") or []) or aufbau.berichtsziele()
     loesung = (aufbau.werk.loese(*gewuenscht) if gewuenscht
                else aufbau.werk.loese_alles())
 

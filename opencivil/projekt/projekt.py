@@ -25,6 +25,7 @@ from opencivil.ergebnis import Ergebnis
 from opencivil.projekt.eintraege import (
     Beschreibung, MaterialEintrag, PostenEintrag,
 )
+from opencivil.projekt.gleichungen import GleichungsblattEintrag
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.aufbau import Aufbau, aufbauen
@@ -42,6 +43,8 @@ class Projekt(Beschreibung):
     name: str = "Neues Projekt"
     materialien: List[MaterialEintrag] = field(default_factory=list)
     querschnitte: List[QuerschnittEintrag] = field(default_factory=list)
+    gleichungen: List[GleichungsblattEintrag] = field(default_factory=list)
+    """Blätter analytischer Gleichungen -- Zeile für Zeile, wie in Mathcad."""
 
     # -- Zugriff ------------------------------------------------------------
 
@@ -57,9 +60,16 @@ class Projekt(Beschreibung):
                 return q
         raise ProjektFehler(f"Querschnitt '{kennung}' gibt es im Projekt nicht.")
 
+    def blatt(self, kennung: str) -> GleichungsblattEintrag:
+        for b in self.gleichungen:
+            if b.kennung == kennung:
+                return b
+        raise ProjektFehler(f"Gleichungsblatt '{kennung}' gibt es im Projekt nicht.")
+
     def freie_kennung(self, vorsilbe: str) -> str:
-        vergeben = {m.kennung for m in self.materialien} | {
-            q.kennung for q in self.querschnitte}
+        vergeben = ({m.kennung for m in self.materialien}
+                    | {q.kennung for q in self.querschnitte}
+                    | {b.kennung for b in self.gleichungen})
         i = 1
         while f"{vorsilbe}{i}" in vergeben:
             i += 1
@@ -274,6 +284,7 @@ class Projekt(Beschreibung):
             name=str(d.get("name") or "Neues Projekt"),
             materialien=[MaterialEintrag.aus_dict(x) for x in (d.get("materialien") or [])],
             querschnitte=[QuerschnittEintrag.aus_dict(x) for x in (d.get("querschnitte") or [])],
+            gleichungen=[GleichungsblattEintrag.aus_dict(x) for x in (d.get("gleichungen") or [])],
         )
 
     def speichern(self, pfad: str | Path) -> Path:

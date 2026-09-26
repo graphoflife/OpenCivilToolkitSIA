@@ -90,10 +90,9 @@ def _text(block: TextBlock, tiefe: int) -> List[str]:
 def _gleichung(block: GleichungBlock, tiefe: int) -> List[str]:
     vorspann = _vorspann(tiefe)
     zeilen = [""]
-    kopf = block.titel or block.wert_id
-    if kopf:
+    if block.titel:
         nachweis = f"   [{block.referenz}]" if block.referenz else ""
-        zeilen.append(f"{vorspann}{kopf}{nachweis}")
+        zeilen.append(f"{vorspann}{block.titel}{nachweis}")
     return zeilen + [f"{vorspann}    {teil}" for teil in block.latex.splitlines()]
 
 

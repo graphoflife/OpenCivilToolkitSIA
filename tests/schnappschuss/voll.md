@@ -1,6 +1,6 @@
 # Voll
 
-103 Berechnungen ausgeführt, 196 Werte bestimmt.
+104 Berechnungen ausgeführt, 197 Werte bestimmt.
 
 ## Herleitung
 
@@ -2408,6 +2408,30 @@ $$
 
 Keine Bewehrung in x-Richtung → Widerstand 0, nicht erfüllt.
 
+### Analytische Gleichungen – Vorbemessung
+
+Stütze 30 × 30 cm, zentrisch.
+
+$$
+a = 30\,\mathrm{cm}
+$$
+
+**Bemessungswert der Betondruckfestigkeit**
+
+$$
+f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+$$
+N_{Rd} = a^{2} \cdot f_{cd} = \left(30\,\mathrm{cm}\right)^{2} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} = 1800\,\mathrm{kN}
+$$
+
+$$
+\frac{N_{Rd}}{1.5\,\mathrm{m}} = \frac{1800\,\mathrm{kN}}{1.5\,\mathrm{m}} = 1200\,\mathrm{kN}/\mathrm{m}
+$$
+
+> **Warnung:** Zeile 6: Einheiten passen nicht zusammen.
+
 ## Formelsammlung
 
 ### Querschnitt
@@ -3146,6 +3170,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Charakteristische Fliessgrenze | $f_{yk}$ | $500$ | N/mm² | Vorgabe |
 | Charakteristische Fliessgrenze auf Druck | $f_{yk}^{-}$ | $500$ | N/mm² | Vorgabe |
 | Teilsicherheitsbeiwert für Betonstahl | $\gamma_s$ | $1.15$ |  | Vorgabe |
+| Zeilen ohne Fehler – Vorbemessung | $n$ | $5$ |  | berechnet |
 | Betrachtete Breite (x) | $b$ | $1000$ | mm | Vorgabe |
 | Betrachtete Breite (y) | $b_y$ | $1000$ | mm | Vorgabe |
 | Bewehrungsmass je Kubikmeter Beton | $\mu_s$ | $123$ | kg/m³ | berechnet |

@@ -27,6 +27,7 @@ from opencivil.core.einheiten import (
 )
 from opencivil.core.berechnung import Nachweis, NachweisUrteil
 from opencivil.core.rechenwerk import Rechenwerk
+from opencivil.gleichungen.blatt import Gleichungsblatt
 from opencivil.material.basis import Baustoff
 from opencivil.material.beton import beton
 from opencivil.material.betonstahl import betonstahl
@@ -121,6 +122,9 @@ class Aufbau:
     anderes brauchen koennte, und nichts haengt von ihnen ab.
     """
 
+    blaetter: Dict[str, Gleichungsblatt] = field(default_factory=dict)
+    """Die Blätter analytischer Gleichungen, nach Kennung."""
+
     warnungen: List[str] = field(default_factory=list)
 
     #: Die Felder, in denen die Nachweise einer Platte stehen -- die eine
@@ -205,7 +209,18 @@ class Aufbau:
         ziele = self.materialziele()
         for _, eigene in self.ziele_je_platte():
             ziele += eigene
-        return ziele
+        return ziele + self.blattziele()
+
+    def blattziele(self) -> List[str]:
+        """Die Blätter zuletzt -- sie lesen Werte der Platten, nie umgekehrt."""
+        return [b.d_zeilen.id for b in self.blaetter.values()]
+
+    def berichtsziele(self) -> List[str]:
+        """
+        Was im Bericht steht: Nachweise, Eckwerte, Blätter -- ohne die
+        Baustoffkennwerte, die niemand braucht.
+        """
+        return self.alle_nachweisziele() + self.eckwertziele() + self.blattziele()
 
     def urteile_von(self, kennung: str, urteile: Iterable[NachweisUrteil],
                     ) -> List[NachweisUrteil]:
@@ -298,6 +313,13 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
 
     for eintrag in projekt.querschnitte:
         _platte(eintrag, aufbau, eintragen, schnell=schnell)
+
+    # Die Bewehrungssuche braucht keine Blätter -- sie liest nur Urteile.
+    if not schnell:
+        for eintrag in projekt.gleichungen:
+            blatt = Gleichungsblatt(eintrag)
+            werk.registriere(blatt)
+            aufbau.blaetter[eintrag.kennung] = blatt
 
     for baustoff in aufbau.baustoffe.values():
         baustoff.ins_rechenwerk(werk)

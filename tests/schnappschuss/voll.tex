@@ -28,7 +28,7 @@
 \date{\today}
 \begin{document}
 \maketitle
-103 Berechnungen ausgeführt, 196 Werte bestimmt.
+104 Berechnungen ausgeführt, 197 Werte bestimmt.
 
 \section{Herleitung}
 \subsection{Plattenanalyse: Decke}
@@ -1770,6 +1770,23 @@ k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g} = \frac{1}{1 + 1.6\,\text{�
 \subsection{Ohne Bewehrung – x-Richtung}
 Keine Bewehrung in x-Richtung → Widerstand 0, nicht erfüllt.
 
+\subsection{Analytische Gleichungen – Vorbemessung}
+Stütze 30 × 30 cm, zentrisch.
+
+\begin{equation*}
+a = 30\,\mathrm{cm}
+\end{equation*}
+\noindent\textbf{Bemessungswert der Betondruckfestigkeit}
+\begin{equation*}
+f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2}
+\end{equation*}
+\begin{equation*}
+N_{Rd} = a^{2} \cdot f_{cd} = \left(30\,\mathrm{cm}\right)^{2} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} = 1800\,\mathrm{kN}
+\end{equation*}
+\begin{equation*}
+\frac{N_{Rd}}{1.5\,\mathrm{m}} = \frac{1800\,\mathrm{kN}}{1.5\,\mathrm{m}} = 1200\,\mathrm{kN}/\mathrm{m}
+\end{equation*}
+\hinweis{Warnung}{Zeile 6: Einheiten passen nicht zusammen.}
 \section{Formelsammlung}
 \subsection{Querschnitt}
 \noindent\textbf{Bewehrungsquerschnitt über die Breite b} \hfill \normref{SIA 262:2025, 5.5.2}
@@ -2343,6 +2360,7 @@ Bemessungswert der Fliessgrenze auf Druck & $f_{yd}^{-}$ & $435$ & N/mm² & bere
 Charakteristische Fliessgrenze & $f_{yk}$ & $500$ & N/mm² & Vorgabe \\
 Charakteristische Fliessgrenze auf Druck & $f_{yk}^{-}$ & $500$ & N/mm² & Vorgabe \\
 Teilsicherheitsbeiwert für Betonstahl & $\gamma_s$ & $1.15$ &  & Vorgabe \\
+Zeilen ohne Fehler – Vorbemessung & $n$ & $5$ &  & berechnet \\
 Betrachtete Breite (x) & $b$ & $1000$ & mm & Vorgabe \\
 Betrachtete Breite (y) & $b_y$ & $1000$ & mm & Vorgabe \\
 Bewehrungsmass je Kubikmeter Beton & $\mu_s$ & $123$ & kg/m³ & berechnet \\
