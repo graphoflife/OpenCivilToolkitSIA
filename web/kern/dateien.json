@@ -54,7 +54,7 @@
     "opencivil/web/api.py": "65edf4df4623",
     "opencivil/web/bruecke.py": "d8aeb4a299b7",
     "opencivil/web/diagrammdaten.py": "411a020372bb",
-    "opencivil/web/dienst.py": "4342c944af88",
+    "opencivil/web/dienst.py": "04f0e943b794",
     "opencivil/web/server.py": "43665395faca",
     "opencivil/web/speicher.py": "1bdcf27fa321"
   }

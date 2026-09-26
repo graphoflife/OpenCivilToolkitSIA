@@ -252,6 +252,20 @@ class TestMindestdurchmesser(unittest.TestCase):
         # Gesucht hat die Suche schon damit -- das Ergebnis geht auf.
         self.assertTrue(ohne_duktilitaet(projekt).erfuellt())
 
+    def test_auch_der_dienst_nimmt_die_null(self):
+        """
+        Null heisst «kein Minimum» -- auch über den Dienst. Er las die Zahl
+        einmal mit ``or`` und machte aus der Null still die Vorgabe.
+        """
+        projekt = self.ohne_obere_last()
+        q = projekt.querschnitt("q1")
+        q.automatik_modus, q.automatik_mindestdurchmesser = "grund_mit", 0.0
+        antwort = dienst.bearbeite("bewehrung_suchen", {
+            "projekt": projekt.als_dict(), "kennung": "q1"}).daten
+        self.assertTrue(antwort["gefunden"], antwort["begruendung"])
+        fertig = Projekt.aus_dict(antwort["projekt"]).querschnitt("q1")
+        self.assertEqual(fertig.lagen[2].grund.durchmesser, 0.0)
+
     def test_ueber_der_obergrenze_heisst_nein_mit_grund(self):
         ergebnis = suche.suche(self.ohne_obere_last(), "q1",
                                modus=suche.Suchmodus.GRUND_MIT, mindestdurchmesser=40.0)
@@ -528,8 +542,9 @@ class TestNurDieEigenePlatte(unittest.TestCase):
         """
         vorher = self.mit_nachbarn().als_dict()
         for modus in suche.Suchmodus:
+            vorher["querschnitte"][0]["automatik_modus"] = modus.value
             antwort = dienst.bearbeite("bewehrung_suchen", {
-                "projekt": vorher, "kennung": "q1", "modus": modus.value})
+                "projekt": vorher, "kennung": "q1"})
             nachher = antwort.daten["projekt"]
             geaendert = [neu["kennung"] for alt, neu
                          in zip(vorher["querschnitte"], nachher["querschnitte"])
@@ -584,8 +599,7 @@ class TestBuegel(unittest.TestCase):
 class TestUeberDenDienst(unittest.TestCase):
     def test_die_antwort_traegt_das_fertige_projekt(self):
         antwort = dienst.bearbeite("bewehrung_suchen", {
-            "projekt": platte().als_dict(), "kennung": "q1",
-            "modus": "grund_mit"})
+            "projekt": platte(automatik_modus="grund_mit").als_dict(), "kennung": "q1"})
         self.assertEqual(antwort.status, 200)
         self.assertTrue(antwort.daten["gefunden"])
         # Das Projekt kommt fertig zurück: die Oberfläche soll die gefundenen
@@ -600,7 +614,7 @@ class TestUeberDenDienst(unittest.TestCase):
 
     def test_ein_unbekannter_modus_nennt_die_moeglichen(self):
         antwort = dienst.bearbeite("bewehrung_suchen", {
-            "projekt": platte().als_dict(), "kennung": "q1", "modus": "raten"})
+            "projekt": platte(automatik_modus="raten").als_dict(), "kennung": "q1"})
         self.assertEqual(antwort.status, 400)
         self.assertIn("grund_ohne", antwort.daten["fehler"])
 
@@ -701,8 +715,8 @@ class TestPlattendicke(unittest.TestCase):
 
     def test_der_dienst_uebernimmt_dicke_und_bewehrung(self):
         antwort = dienst.bearbeite("bewehrung_suchen", {
-            "projekt": platte().als_dict(), "kennung": "q1",
-            "modus": "dicke_grund_ohne_zulage_mit"}).daten
+            "projekt": platte(automatik_modus="dicke_grund_ohne_zulage_mit").als_dict(),
+            "kennung": "q1"}).daten
         fertig = Projekt.aus_dict(antwort["projekt"])
         self.assertTrue(antwort["gefunden"])
         self.assertEqual(fertig.querschnitt("q1").h, antwort["dicke"]["h"])

@@ -27,7 +27,6 @@ EIGENSTAENDIG NUTZBAR::
 from __future__ import annotations
 
 import json
-import math
 import traceback
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Mapping
@@ -274,6 +273,13 @@ def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     Oberflaeche es uebernimmt, entscheidet sie. So bleibt der Knopf ein
     einzelner Schritt, den man sieht und rueckgaengig machen kann -- und
     nicht eine Bewehrung, die sich bei jeder Eingabe im Hintergrund aendert.
+
+    Wie gesucht wird, steht an der Platte und nur dort. Frueher liess sich
+    jede Einstellung mit dem Rumpf uebersteuern, per ``rumpf.get(...) or
+    eintrag...`` -- und das ``or`` las eine Null als «nicht angegeben»: ein
+    Mindestdurchmesser 0, also «kein Minimum», wurde still zur Vorgabe der
+    Platte. Zwei Quellen fuer dieselbe Zahl, und die Oberflaeche benutzte die
+    zweite ohnehin nie.
     """
     projekt = _projekt(rumpf)
     kennung = rumpf.get("kennung")
@@ -285,41 +291,29 @@ def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
         raise DienstFehler(404, f"Keine Platte mit der Kennung '{kennung}'.") from None
 
     eintrag = projekt.querschnitt(kennung)
-    modus = rumpf.get("modus") or eintrag.automatik_modus
-    teilungen = rumpf.get("teilungen") or eintrag.automatik_teilungen
     try:
-        modus = bewehrungssuche.Suchmodus(modus)
+        modus = bewehrungssuche.Suchmodus(eintrag.automatik_modus)
     except ValueError:
         moeglich = ", ".join(m.value for m in bewehrungssuche.Suchmodus)
-        raise DienstFehler(400, f"Unbekannter Suchmodus '{modus}'. "
+        raise DienstFehler(400, f"Unbekannter Suchmodus '{eintrag.automatik_modus}'. "
                                 f"Möglich sind: {moeglich}.") from None
 
-    wie = {"teilungen": teilungen,
-           "mindestdurchmesser": (rumpf.get("mindestdurchmesser")
-                                  or eintrag.automatik_mindestdurchmesser)}
+    wie = {"teilungen": eintrag.automatik_teilungen,
+           "mindestdurchmesser": eintrag.automatik_mindestdurchmesser}
     dicke = None
     if modus.mit_dicke:
         dicke = bewehrungssuche.dicke_suchen(projekt, kennung, modus=modus, **wie)
         ergebnis = dicke.suche or bewehrungssuche.Suchergebnis(modus=modus)
     else:
         ergebnis = bewehrungssuche.suche(projekt, kennung, modus=modus, **wie)
+    # Nur, was jemand liest: die Oberflaeche nimmt gefunden, Begruendung,
+    # Dicke und das fertige Projekt.
     antwort: Dict[str, Any] = {
         "gefunden": ergebnis.gefunden and (dicke is None or dicke.gefunden),
-        "modus": modus.value,
-        "modus_text": modus.beschriftung,
         "begruendung": (dicke or ergebnis).begruendung,
         # Gesucht wird ohne Duktilitaet -- sie wird durch mehr Stahl
         # schlechter. Verschwiegen wird sie darum nicht.
         "duktilitaet": ergebnis.duktilitaet,
-        "loesungen": [
-            {"teilung": l.teilung, "gefunden": l.gefunden,
-             "durchmesser": l.durchmesser, "stahlflaeche": l.stahlflaeche,
-             "schlechtester": (l.schlechtester
-                               if math.isfinite(l.schlechtester) else None),
-             "nachweis": l.nachweis, "begruendung": l.begruendung,
-             "runden": len(l.schritte)}
-            for l in ergebnis.loesungen
-        ],
     }
     if dicke is not None:
         antwort["dicke"] = {
@@ -335,9 +329,7 @@ def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     # statische Hoehe in den Querkraftwiderstand eingeht.
     if eintrag.automatik_querkraft:
         buegel = bewehrungssuche.buegel_suchen(
-            projekt, kennung,
-            teilungen=(rumpf.get("querkraft_teilungen")
-                       or eintrag.automatik_querkraft_teilungen))
+            projekt, kennung, teilungen=eintrag.automatik_querkraft_teilungen)
         antwort["buegel"] = {
             "gefunden": buegel.gefunden, "durchmesser": buegel.durchmesser,
             "teilung": buegel.teilung, "begruendung": buegel.begruendung,
