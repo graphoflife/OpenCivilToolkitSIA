@@ -21,6 +21,7 @@
 import { el, ersetzen, melden } from './dom.js';
 import { neueZeile } from './gleichungen.js';
 import { benutzteMaterialien } from './querschnittsanalyse.js';
+import { ansichtVergessen } from './zeichenfenster.js';
 import {
   aendern, ausVorlage, freieKennung, naechsterName, projektAendern, umschalten, zustand,
 } from './zustand.js';
@@ -231,6 +232,7 @@ function analyseAnlegen() {
     return;
   }
   const kennung = freieKennung('a');
+  ansichtVergessen(kennung);
   projektAendern((p) => {
     const analyse = structuredClone(vorlage);
     analyse.kennung = kennung;

@@ -481,11 +481,20 @@ function ohneSprung(zeichnen) {
   fokusZurueck(merkmal);
 }
 
+/**
+ * Anlässe, die nur die mittlere Tafel betreffen: eine Auswahl im
+ * Zeichenfenster, eine Antwort des Kerns zur Zeichnung. Baum und Bericht
+ * sähen danach aus wie vorher -- und die Herleitung neu zu setzen kostet
+ * mit jeder Formel mehr.
+ */
+const NUR_MITTE = new Set(['zeichnung']);
+
 function allesZeichnen(anlass) {
+  const nurMitte = NUR_MITTE.has(anlass);
   ohneSprung(() => {
-    baumZeichnen(knoten.baum);
+    if (!nurMitte) baumZeichnen(knoten.baum);
     editorZeichnen(knoten.editor, knoten.editorTitel, knoten.editorHinweis);
-    berichtZeichnen(knoten.bericht, {
+    if (!nurMitte) berichtZeichnen(knoten.bericht, {
       verfolgen: (ziel, name) => {
         // Reiter und Platzhalter in einem Zug: sonst zeichnete der Wechsel
         // erst die ganze Herleitung, die der Teillauf gleich ersetzt.

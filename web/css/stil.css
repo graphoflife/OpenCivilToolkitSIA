@@ -1304,3 +1304,164 @@ math-field.gl-feld::part(menu-toggle) { display: none; }
   .qa-fall > .qa-zahlen { grid-column: 3; grid-row: 1; }
   .qa-fall.ist-kopf .qa-name { display: block; padding-left: 7px; text-transform: uppercase; }
 }
+
+/* ------------------------------------------------------- Zeichenfenster -- */
+
+/* Das Fenster und was daneben steht. Im Vollbild liegt beides über allem,
+   die Zeichnung links, Koordinaten und Meldungen rechts. */
+.zeichenbereich { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 10px; }
+.zeichenfenster {
+  display: flex; flex-direction: column; min-height: 0;
+  border: 1px solid var(--rand-stark); border-radius: var(--radius);
+  background: var(--flaeche); overflow: hidden; user-select: none;
+}
+.zf-leiste {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 2px;
+  padding: 4px 5px; background: var(--flaeche-2); border-bottom: 1px solid var(--rand);
+}
+.zf-knopf {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 6px; border: 1px solid transparent; border-radius: 5px;
+  background: transparent; color: var(--schrift-matt); font-size: 12px; cursor: pointer;
+  white-space: nowrap;
+}
+.zf-knopf:hover:not(:disabled) { background: var(--blau-hell); color: var(--blau-tief); }
+.zf-knopf.ist-an { background: var(--blau); border-color: var(--blau); color: #fff; }
+.zf-knopf:disabled { opacity: .35; cursor: default; }
+.zf-zeichen { font-size: 13px; line-height: 1; }
+.zf-trenner { width: 1px; height: 18px; margin: 0 3px; background: var(--rand-stark); }
+.zf-wahl { display: inline-flex; align-items: center; gap: 4px; font-size: 12px;
+           color: var(--schrift-matt); padding: 0 4px; }
+.zf-wahl select { width: auto; padding: 1px 4px; font-size: 12px; }
+/* In einer schmalen Tafel stehen nur die Zeichen da -- die Wörter sagt der
+   Titel beim Darüberfahren. */
+@container (max-width: 520px) {
+  .zf-knopf .zf-text { display: none; }
+  .zf-knopf { padding: 3px 7px; }
+}
+
+.zf-optionen {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px;
+  padding: 4px 8px; border-bottom: 1px solid var(--rand); font-size: 12px;
+  background: var(--blau-zart);
+}
+.zf-optionen[hidden] { display: none; }
+.zf-optionstitel { font-weight: 700; color: var(--schrift-matt); }
+.zf-option { display: inline-flex; align-items: center; gap: 4px; }
+.zf-option .zahlfeld { width: 76px; }
+.zf-optionen select { width: auto; padding: 1px 4px; font-size: 12px; }
+.zf-optionen input[type="number"] { padding: 2px 4px; font-size: 12px; text-align: right; }
+.zf-option .einheit { font-size: 11px; color: var(--schrift-zart); }
+
+.zf-flaeche { position: relative; height: 360px; background: #fff; touch-action: none; }
+@container (max-width: 520px) { .zf-flaeche { height: 300px; } }
+.zf-bild { display: block; width: 100%; height: 100%; cursor: crosshair; }
+.zf-bild.ist-waehlen { cursor: default; }
+
+.zf-status {
+  display: flex; justify-content: space-between; gap: 10px;
+  padding: 3px 8px; font-size: 11.5px; color: var(--schrift-matt);
+  background: var(--flaeche-2); border-top: 1px solid var(--rand); min-height: 22px;
+}
+.zf-lage { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.zf-hinweis { text-align: right; }
+
+/* Die Zeichnung. Farben wie überall: Beton grau, Stahl kupfer, Bügel und
+   Schubwände violett, gewählt blau, eine Meldung rot. */
+.zf-raster-fein { stroke: #f0f2f6; stroke-width: 1; }
+.zf-raster-grob { stroke: #e0e5ec; stroke-width: 1; }
+.zf-achse { stroke: #b9c3d1; stroke-width: 1; }
+.zf-achstext { font-size: 11px; font-weight: 600; fill: var(--schrift-zart); }
+.zf-beton { fill: #d8dde3; stroke: var(--beton); stroke-width: 1.3; }
+.zf-loch { fill: #fff; stroke: var(--beton); stroke-width: 1.3; stroke-dasharray: 6 3; }
+.zf-zelle { stroke: none; }
+.zf-schraffurstrich { stroke: var(--beide); stroke-opacity: .35; stroke-width: 1.2; }
+.zf-wand { fill: var(--beide); fill-opacity: .16; stroke: var(--beide); stroke-opacity: .55; stroke-width: 1; }
+.zf-wandachse { fill: none; stroke: var(--beide); stroke-width: 1.6; stroke-dasharray: 9 3 2 3; }
+.zf-linie { fill: none; stroke: var(--stahl); stroke-width: 1; stroke-dasharray: 3 3; }
+.zf-linie-flaeche { fill: none; stroke: var(--stahl); stroke-width: 4; stroke-linecap: round; }
+.zf-stab { fill: var(--stahl); stroke: #7a3d14; stroke-width: .8; }
+.zf-geist { opacity: .45; }
+.zf-beschriftung {
+  font-size: 11px; fill: var(--schrift-matt);
+  paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round;
+}
+.zf-linientext { fill: var(--stahl); font-weight: 600; }
+.zf-mass { fill: none; stroke: var(--schrift-zart); stroke-width: 1; }
+.zf-masstext { font-size: 11px; fill: var(--schrift-matt); }
+.zf-schwerpunkt circle { fill: #fff; stroke: var(--schrift); stroke-width: 1.2; }
+.zf-schwerpunkt path { stroke: var(--schrift); stroke-width: 1; }
+.zf-schwerpunkttext { font-size: 11px; font-weight: 700; fill: var(--schrift); }
+
+.ist-gewaehlt.zf-beton, .ist-gewaehlt.zf-loch, .ist-gewaehlt.zf-wand,
+.ist-gewaehlt.zf-wandachse, .ist-gewaehlt.zf-linie, .ist-gewaehlt.zf-linie-flaeche {
+  stroke: var(--blau); stroke-opacity: 1; stroke-width: 2.4;
+}
+.ist-gewaehlt.zf-stab { stroke: var(--blau); stroke-width: 2; }
+.ist-fehler.zf-beton, .ist-fehler.zf-loch, .ist-fehler.zf-wand, .ist-fehler.zf-wandachse,
+.ist-fehler.zf-linie, .ist-fehler.zf-linie-flaeche { stroke: var(--schlecht); stroke-opacity: 1; stroke-width: 2.4; }
+.ist-fehler.zf-stab { fill: var(--schlecht); stroke: var(--schlecht); }
+.ist-fehler.zf-linientext { fill: var(--schlecht); }
+
+.zf-griff { fill: #fff; stroke: var(--blau); stroke-width: 1.5; }
+.zf-griff.ist-gewaehlt { fill: var(--blau); }
+.zf-mittelgriff { fill: var(--blau-hell); stroke: var(--blau); stroke-width: 1; }
+.zf-ring { fill: none; stroke: var(--blau); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.zf-entwurf { fill: var(--blau); fill-opacity: .07; stroke: var(--blau); stroke-width: 1.5; stroke-dasharray: 6 3; }
+.zf-entwurf-schluss { fill: none; stroke: var(--blau); stroke-opacity: .4; stroke-width: 1; stroke-dasharray: 2 3; }
+.zf-entwurfpunkt { fill: var(--blau); }
+.zf-zetteltext {
+  font-size: 11px; fill: var(--blau-tief); font-weight: 600;
+  paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round;
+}
+.zf-fang { fill: none; stroke: #e8590c; stroke-width: 1.6; }
+
+/* Die Vorlage: ein Zettel über der Zeichnung, oben links. */
+.zf-vorlage {
+  position: absolute; left: 8px; top: 8px; z-index: 2; width: 250px;
+  display: flex; flex-direction: column; gap: 5px; padding: 9px 10px;
+  border: 1px solid var(--rand-stark); border-radius: var(--radius);
+  background: var(--flaeche); box-shadow: 0 6px 18px rgba(20, 32, 48, .16);
+  font-size: 12px; user-select: auto;
+}
+.zf-vorlage[hidden] { display: none; }
+.zf-vorlagekopf { display: flex; align-items: center; gap: 8px; }
+.zf-vorlagekopf select { flex: 1; padding: 2px 5px; }
+.zf-vorlagezeile { display: grid; grid-template-columns: minmax(0, 1fr) 76px 26px; gap: 5px; align-items: center; }
+.zf-vorlagezeile input { padding: 2px 5px; text-align: right; }
+.zf-vorlagezeile .einheit { font-size: 11px; color: var(--schrift-zart); }
+.zf-vorlagehaken { display: flex; align-items: center; gap: 4px; }
+.zf-vorlagehinweis { margin: 0; font-size: 11px; color: var(--schrift-zart); }
+.zf-vorlageknoepfe { display: flex; justify-content: flex-end; gap: 6px; }
+
+/* Neben dem Fenster: Koordinaten, Eigenschaften, Meldungen. */
+.zf-seite { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.zf-meldungen { display: flex; flex-direction: column; gap: 3px; }
+.zf-meldung {
+  text-align: left; padding: 5px 8px; font-size: 12px; line-height: 1.4;
+  border: 1px solid var(--schlecht); border-left-width: 4px; border-radius: 5px;
+  background: var(--schlecht-hell); color: var(--schlecht); cursor: pointer;
+}
+.zf-meldung:hover:not(:disabled) { background: #fbd9d6; }
+
+.zeichenbereich.ist-vollbild {
+  /* Über Kopf- und Fussleiste, unter den Meldungen am unteren Rand. */
+  position: fixed; inset: 0; z-index: 30; margin: 0; padding: 10px;
+  background: var(--grund);
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 380px); gap: 10px;
+}
+.zeichenbereich.ist-vollbild .zeichenfenster { height: 100%; }
+.zeichenbereich.ist-vollbild .zf-flaeche { flex: 1 1 auto; height: auto; min-height: 0; }
+.zeichenbereich.ist-vollbild .zf-seite {
+  overflow-y: auto; min-height: 0; padding: 8px 10px;
+  background: var(--flaeche); border: 1px solid var(--rand); border-radius: var(--radius);
+  container-type: inline-size;
+}
+@media (max-width: 900px) {
+  .zeichenbereich.ist-vollbild { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+  .zeichenbereich.ist-vollbild .zf-seite { max-height: 38vh; }
+}
+/* Ein Container ist zugleich der Bezug für `position: fixed` -- das Vollbild
+   läge sonst in der Tafel statt über dem ganzen Fenster. Solange es offen
+   ist, ist die Tafel darum kein Container. */
+.tafel-inhalt:has(.zeichenbereich.ist-vollbild) { container-type: normal; }

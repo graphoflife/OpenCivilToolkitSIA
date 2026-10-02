@@ -21,6 +21,7 @@
 import { erklaerung, feld, hakenSchalter } from './bausteine.js';
 import { auswahl, el, svgEl, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
+import { meldungenBlock, zeichenbereich } from './zeichenfenster.js';
 import {
   ausVorlage, naechsterName, projektAendern, zustand,
 } from './zustand.js';
@@ -121,13 +122,14 @@ function querschnittGruppe(analyse) {
   return el('div.feldgruppe', {}, [
     el('h3', {}, [el('span', { text: 'Querschnitt' }),
       el('span', { text: 'y nach rechts, z nach oben, mm' })]),
+    feld('Bezeichnung', el('input', {
+      type: 'text', value: analyse.name,
+      on: { change: (e) => aendern((a) => { a.name = e.target.value; }) },
+    })),
+    zeichenbereich(analyse, [meldungenBlock(analyse)].filter(Boolean)),
     el('div.unterkapitel', {}, [
-      feld('Bezeichnung', el('input', {
-        type: 'text', value: analyse.name,
-        on: { change: (e) => aendern((a) => { a.name = e.target.value; }) },
-      })),
       // Freier Text, der in keine Rechnung eingeht -- wie bei der Platte.
-      el('div.beschreibung', {}, [
+      el('div.beschreibung', { style: { marginTop: 0 } }, [
         el('label', { text: 'Beschreibung' }),
         el('textarea', {
           rows: 2, value: analyse.beschreibung || '',
