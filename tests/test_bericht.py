@@ -490,11 +490,13 @@ class TestBerichtWieBildschirm(unittest.TestCase):
         # Die Konsole bricht lange Saetze um; verglichen wird der Wortlaut.
         cls.text = " ".join(als_text(cls.loesung, aufbau=cls.aufbau).split())
 
-    def test_jede_platte_hat_ihren_abschnitt(self):
-        self.assertEqual(len(self.web), 3)
-        for kennung in self.web:
-            name = self.aufbau.querschnitte[kennung].name
-            self.assertIn(f"{name} {'-' * len(name)} Angaben zur Platte", self.text)
+    def test_jedes_bauteil_hat_seinen_abschnitt(self):
+        # Drei Platten und der Unterzug des Beispiels.
+        self.assertEqual(sorted(self.web), ["a1", "q1", "q2", "q3"])
+        for bauteil in self.aufbau.bauteile():
+            titel = "Angaben zur Platte" if bauteil.art == "platte" else "Angaben zum Querschnitt"
+            name = bauteil.name
+            self.assertIn(f"{name} {'-' * len(name)} {titel}", self.text)
 
     def test_die_zellen_der_tabelle_stehen_im_bericht(self):
         for tabelle in self.web.values():

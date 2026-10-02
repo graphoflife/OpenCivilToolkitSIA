@@ -262,9 +262,9 @@ class Schubwandnachweis(Nachweis):
                  titel="Widerstand je Länge einer Wand (Fachwerk)",
                  referenz="SIA 262:2025, 4.3.3.4")
         p.tabelle(kopf=["Grenze", "Wert"], zeilen=[
-            [Mathe(r"\alpha_{min}"), Mathe(e["alpha_min"].formatiert(latex=True))],
-            [Mathe(r"\alpha_{max}"), Mathe(e["alpha_max"].formatiert(latex=True))],
-            [Mathe("k_c"), Mathe(e["k_c"].formatiert(latex=True))],
+            [Mathe(r"\alpha_{min}"), Mathe(e["alpha_min"].zahl_latex())],
+            [Mathe(r"\alpha_{max}"), Mathe(e["alpha_max"].zahl_latex())],
+            [Mathe("k_c"), Mathe(e["k_c"].zahl_latex())],
         ], titel="Druckfeld", ausrichtung="lr")
         if self.waende:
             zellen_von: Dict[int, List[int]] = {}

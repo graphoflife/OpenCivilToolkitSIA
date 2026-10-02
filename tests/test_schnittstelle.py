@@ -19,6 +19,9 @@ class TestUrteilsraum(unittest.TestCase):
 
     def zweiplattenprojekt(self) -> Projekt:
         projekt = Projekt.beispiel()
+        # Nur Platten: um sie geht es hier. Der Unterzug des Beispiels hat
+        # seinen eigenen Namensraum und zählte sonst bei keiner mit.
+        projekt.querschnittsanalysen = []
         zweite = Projekt.aus_dict(json.loads(json.dumps(projekt.als_dict()))).querschnitt("q1")
         zweite.kennung, zweite.name = "q2", "Decke über 1. OG"
         projekt.querschnitte.append(zweite)
@@ -308,7 +311,12 @@ class TestAngabengruppen(unittest.TestCase):
 
     def test_zwei_kaesten_statt_vier_zeilen(self):
         gruppen = self.gruppen()
-        self.assertEqual(sorted(gruppen), ["Abmessungen – Beton C30/37", "Überdeckungen"])
+        # Zwei Kästen der Platte, einer des Unterzugs.
+        self.assertEqual(sorted(gruppen),
+                         ["Abmessungen – Beton C30/37", "Bruttoquerschnitt", "Überdeckungen"])
+        self.assertEqual(gruppen["Bruttoquerschnitt"],
+                         ["Fläche des Bruttoquerschnitts", "Schwerpunkt, y", "Schwerpunkt, z",
+                          "Trägheitsmoment um y", "Trägheitsmoment um z", "Deviationsmoment"])
         self.assertEqual(gruppen["Abmessungen – Beton C30/37"],
                          ["Plattendicke", "Betrachtete Breite (x)",
                           "Betrachtete Breite (y)"])
@@ -488,6 +496,9 @@ class TestAngabengruppen(unittest.TestCase):
         self.assertEqual(ids, {
             "querschnitt.q1.h", "querschnitt.q1.b", "querschnitt.q1.b_y",
             "querschnitt.q1.c_nom_unten", "querschnitt.q1.c_nom_oben",
+            "querschnittsanalyse.a1.A", "querschnittsanalyse.a1.y_S",
+            "querschnittsanalyse.a1.z_S", "querschnittsanalyse.a1.I_y",
+            "querschnittsanalyse.a1.I_z", "querschnittsanalyse.a1.I_yz",
         })
 
 

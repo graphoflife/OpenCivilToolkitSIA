@@ -2523,8 +2523,8 @@ $$
 
 | Grenze | Wert |
 | :--- | ---: |
-| $\alpha_{min}$ | $30$ |
-| $\alpha_{max}$ | $45$ |
+| $\alpha_{min}$ | $30{}^{\circ}$ |
+| $\alpha_{max}$ | $45{}^{\circ}$ |
 | $k_c$ | $0.55$ |
 
 **Schubwände und ihre Steifigkeit**
@@ -2664,9 +2664,9 @@ $$
 
 | Kennwert | Wert |
 | :--- | ---: |
-| $f_{cd}$ | $20$ |
-| $\varepsilon_{c1d}$ | $2$ |
-| $\varepsilon_{c2d}$ | $3.5$ |
+| $f_{cd}$ | $20\,\mathrm{N}/\mathrm{mm}^{2}$ |
+| $\varepsilon_{c1d}$ | $2\,\text{‰}$ |
+| $\varepsilon_{c2d}$ | $3.5\,\text{‰}$ |
 
 **B500B: bilineare Beziehung, Bemessungswerte** *(SIA 262:2025, 4.2.2.4)*
 
@@ -2678,10 +2678,10 @@ $$
 
 | Kennwert | Wert |
 | :--- | ---: |
-| $f_{yd}$ | $435$ |
-| $f_{yd}^{-}$ | $435$ |
-| $E_s$ | $200000$ |
-| $\varepsilon_{ud}$ | $4.5$ |
+| $f_{yd}$ | $435\,\mathrm{N}/\mathrm{mm}^{2}$ |
+| $f_{yd}^{-}$ | $435\,\mathrm{N}/\mathrm{mm}^{2}$ |
+| $E_s$ | $200000\,\mathrm{N}/\mathrm{mm}^{2}$ |
+| $\varepsilon_{ud}$ | $4.5\,\%$ |
 
 **Reine Normalkraft**
 
@@ -3175,9 +3175,9 @@ $$
 
 | Kennwert | Wert |
 | :--- | ---: |
-| $f_{ck}$ | $30$ |
-| $\varepsilon_{c1d}$ | $2$ |
-| $\varepsilon_{c2d}$ | $3.5$ |
+| $f_{ck}$ | $30\,\mathrm{N}/\mathrm{mm}^{2}$ |
+| $\varepsilon_{c1d}$ | $2\,\text{‰}$ |
+| $\varepsilon_{c2d}$ | $3.5\,\text{‰}$ |
 
 **B500B: bilineare Beziehung, charakteristische Werte** *(SIA 262:2025, 4.2.2.4)*
 
@@ -3189,10 +3189,10 @@ $$
 
 | Kennwert | Wert |
 | :--- | ---: |
-| $f_{yk}$ | $500$ |
-| $f_{yk}^{-}$ | $500$ |
-| $E_s$ | $200000$ |
-| $\varepsilon_{ud}$ | $4.5$ |
+| $f_{yk}$ | $500\,\mathrm{N}/\mathrm{mm}^{2}$ |
+| $f_{yk}^{-}$ | $500\,\mathrm{N}/\mathrm{mm}^{2}$ |
+| $E_s$ | $200000\,\mathrm{N}/\mathrm{mm}^{2}$ |
+| $\varepsilon_{ud}$ | $4.5\,\%$ |
 
 **Reine Normalkraft**
 

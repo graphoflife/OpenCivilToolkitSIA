@@ -514,12 +514,14 @@ function flaechenZeichnen(a, analyse, daten, g, fehler) {
   for (const i of reihe) {
     const f = daten.flaechen[i];
     if (f.punkte.length < 2) continue;
+    const name = elementname(analyse, 'flaeche', i);
     const klassen = [
       f.material ? 'zf-beton' : 'zf-loch',
-      fehler.has(elementname(analyse, 'flaeche', i)) ? 'ist-fehler' : '',
+      fehler.has(name) ? 'ist-fehler' : '',
       istGewaehlt(a, 'flaeche', i) ? 'ist-gewaehlt' : '',
     ];
-    gruppe.append(svgEl('path', { d: pfad(a, f.punkte), class: klassen.join(' ') }));
+    gruppe.append(meldungAn(svgEl('path', { d: pfad(a, f.punkte), class: klassen.join(' ') }),
+      fehler.get(name)));
   }
   return gruppe;
 }
@@ -537,13 +539,22 @@ function zellenZeichnen(a, g) {
 function waendeZeichnen(a, analyse, daten, fehler) {
   const gruppe = svgEl('g');
   daten.schubwaende.forEach((w, i) => {
+    const name = elementname(analyse, 'wand', i);
     const ecken = band(w.von, w.bis, Math.max(w.dicke, 0));
-    const klasse = [
-      fehler.has(elementname(analyse, 'wand', i)) ? 'ist-fehler' : '',
-      istGewaehlt(a, 'wand', i) ? 'ist-gewaehlt' : '',
-    ].join(' ');
-    if (ecken) gruppe.append(svgEl('path', { d: pfad(a, ecken), class: `zf-wand ${klasse}` }));
+    const gewaehlt = istGewaehlt(a, 'wand', i);
+    const klasse = [fehler.has(name) ? 'ist-fehler' : '', gewaehlt ? 'ist-gewaehlt' : ''].join(' ');
+    if (ecken) {
+      gruppe.append(meldungAn(svgEl('path', { d: pfad(a, ecken), class: `zf-wand ${klasse}` }),
+        fehler.get(name)));
+    }
     gruppe.append(svgEl('path', { d: pfad(a, [w.von, w.bis], false), class: `zf-wandachse ${klasse}` }));
+    // Die gewählte Wand sagt, was sie ist -- die Teilung sieht man im
+    // Schnitt nicht.
+    if (gewaehlt) {
+      const [x, y] = nachBild(a, [(w.von[0] + w.bis[0]) / 2, (w.von[1] + w.bis[1]) / 2]);
+      gruppe.append(text(x, y - 8, `b_w ${zahlText(w.dicke)} · ⌀${zahlText(w.durchmesser)} @ ${
+        zahlText(w.teilung)} · ${w.schnitte}-schnittig`, 'zf-beschriftung zf-wandtext'));
+    }
   });
   return gruppe;
 }
@@ -586,10 +597,10 @@ function linienZeichnen(a, analyse, daten, fehler) {
       istGewaehlt(a, 'linie', i) ? 'ist-gewaehlt' : '',
     ].join(' ');
     const flaechig = l.art === 'flaeche';
-    gruppe.append(svgEl('path', {
+    gruppe.append(meldungAn(svgEl('path', {
       d: pfad(a, [l.von, l.bis], false),
       class: `${flaechig ? 'zf-linie-flaeche' : 'zf-linie'} ${klasse}`,
-    }));
+    }), fehler.get(name)));
     // Die Stäbe der Linie kennt nur der Kern. Seine Antwort gilt für diese
     // Linie, solange sie so aussieht wie beim Fragen -- auch während eine
     // andere gezogen wird.
@@ -618,12 +629,11 @@ function linienZeichnen(a, analyse, daten, fehler) {
 function staebeZeichnen(a, analyse, daten, fehler) {
   const gruppe = svgEl('g');
   daten.staebe.forEach((s, i) => {
+    const name = elementname(analyse, 'stab', i);
     const klasse = [
-      'zf-stab',
-      fehler.has(elementname(analyse, 'stab', i)) ? 'ist-fehler' : '',
-      istGewaehlt(a, 'stab', i) ? 'ist-gewaehlt' : '',
+      'zf-stab', fehler.has(name) ? 'ist-fehler' : '', istGewaehlt(a, 'stab', i) ? 'ist-gewaehlt' : '',
     ].join(' ');
-    gruppe.append(stabKreis(a, [s.y, s.z], s.durchmesser, klasse));
+    gruppe.append(meldungAn(stabKreis(a, [s.y, s.z], s.durchmesser, klasse), fehler.get(name)));
   });
   return gruppe;
 }
@@ -681,9 +691,12 @@ function griffe(a, daten) {
   if (!w) return [];
   if (w.art === 'flaeche') {
     const punkte = daten.flaechen[w.index]?.punkte || [];
+    // Kantenmitten nur bei wenigen Ecken: ein Kreis hätte sonst fast hundert
+    // Griffe, und keiner liesse sich mehr treffen.
+    const mitten = punkte.length <= 24 ? punkte : [];
     return [
       ...punkte.map((p, k) => ({ griff: 'ecke', ecke: k, p })),
-      ...punkte.map((p, k) => {
+      ...mitten.map((p, k) => {
         const q = punkte[(k + 1) % punkte.length];
         return { griff: 'mitte', ecke: k, p: [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2] };
       }),
@@ -788,9 +801,23 @@ function fangZeichnen(a) {
   return svgEl('path', { d: `M${x - 5} ${y} H${x + 5} M${x} ${y - 5} V${y + 5}`, class: 'zf-fang' });
 }
 
-/** Die Elemente, die eine Meldung nennt -- sie werden rot gezeichnet. */
+/** Je Element, das eine Meldung nennt, ihre Sätze -- es wird rot gezeichnet. */
 function fehlerhafte(g) {
-  return new Set((g?.meldungen || []).flatMap((m) => m.elemente));
+  const je = new Map();
+  for (const m of g?.meldungen || []) {
+    for (const name of m.elemente) je.set(name, [...(je.get(name) || []), m.text]);
+  }
+  return je;
+}
+
+/** Die Meldung als Zettel am Element: beim Darüberfahren steht da, was nicht stimmt. */
+function meldungAn(knoten, texte) {
+  if (texte?.length) {
+    const t = svgEl('title');
+    t.textContent = texte.join('\n');
+    knoten.append(t);
+  }
+  return knoten;
 }
 
 /** Zeichnet das Bild neu -- aus dem Projekt, der Ansicht und der passenden Antwort des Kerns. */

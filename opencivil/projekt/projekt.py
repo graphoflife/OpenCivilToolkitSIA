@@ -222,6 +222,38 @@ class Projekt(Beschreibung):
         self.querschnitte.append(eintrag)
         return eintrag
 
+    def analyse(
+        self,
+        name: str,
+        *,
+        beton: Union[str, MaterialEintrag, None] = None,
+        stahl: Union[str, MaterialEintrag, None] = None,
+        **felder: Any,
+    ) -> QuerschnittsanalyseEintrag:
+        """
+        Eine Querschnittsanalyse -- wie in der Oberflaeche ein Rechteck
+        300 × 600 mm mit drei Staeben unten und zwei oben, aber ohne
+        Startlast: wer rechnet, gibt seine Lastfaelle selbst an.
+
+        Gezeichnet wird danach an den Listen des Eintrags (``flaechen``,
+        ``staebe``, ``stablinien``, ``schubwaende``). Wie bei
+        :meth:`platte` geht alles Weitere als Stichwort an den Eintrag.
+        """
+        eintrag = QuerschnittsanalyseEintrag.neu(
+            kennung=self.freie_kennung("a"), name=name,
+            beton=self._einziges("beton", beton), stahl=self._einziges("betonstahl", stahl))
+        eintrag.lastfaelle = []
+        bekannt = {f.name for f in fields(QuerschnittsanalyseEintrag)}
+        for feld, wert in felder.items():
+            if feld not in bekannt:
+                aehnlich = difflib.get_close_matches(feld, bekannt, n=1)
+                raise ProjektFehler(
+                    f"Querschnittsanalyse '{name}': ein Feld '{feld}' gibt es nicht."
+                    + (f" Gemeint ist vielleicht '{aehnlich[0]}'?" if aehnlich else ""))
+            setattr(eintrag, feld, wert)
+        self.querschnittsanalysen.append(eintrag)
+        return eintrag
+
     def _einziges(self, art: str,
                   gewaehlt: Union[str, MaterialEintrag, None]) -> str:
         """Die Kennung des gewaehlten Materials -- oder des einzigen dieser Art."""
@@ -334,6 +366,17 @@ class Projekt(Beschreibung):
         platte.einwirkung("Feld", M_Ed=100.0)
         platte.einwirkung("Feld mit Druck", M_Ed=100.0, N_Ed=-300.0)
         platte.einwirkung("Stütze", M_Ed=-50.0)
+        # Ein gezeichneter Querschnitt: der Unterzug, 300 × 600 mm. Vier
+        # Schubwände auf der Bügelachse umschliessen eine Zelle -- so trägt
+        # er auch Torsion; jede Wand kreuzt ein Schenkel des Bügels.
+        unterzug = projekt.analyse("Unterzug")
+        stahl = unterzug.stablinien[0].stahl
+        unterzug.schubwaende = [
+            SchubwandEintrag(von=von, bis=bis, dicke=100.0, durchmesser=10.0,
+                             teilung=150.0, schnitte=1, stahl=stahl)
+            for von, bis in (([50.0, 50.0], [250.0, 50.0]), ([250.0, 50.0], [250.0, 550.0]),
+                             ([250.0, 550.0], [50.0, 550.0]), ([50.0, 550.0], [50.0, 50.0]))]
+        unterzug.lastfall("Feld", M_y_Ed=150.0, V_z_Ed=150.0, T_Ed=15.0)
         return projekt
 
     @classmethod

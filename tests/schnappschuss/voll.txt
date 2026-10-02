@@ -1597,11 +1597,11 @@ Widerstand je Länge einer Wand (Fachwerk)   [SIA 262:2025, 4.3.3.4]
     v_{Rd,s} = \frac{A_{sw}}{s}\, f_{sd} \cot\alpha \qquad v_{Rd,c} = b_w\, k_c\, f_{cd} \sin\alpha \cos\alpha \qquad v_{Rd} = \max_\alpha \min(v_{Rd,s};\ v_{Rd,c})
 
 Druckfeld
-    Grenze        Wert
-    ------------  ----
-    \alpha_{min}    30
-    \alpha_{max}    45
-    k_c           0.55
+    Grenze                Wert
+    ------------  ------------
+    \alpha_{min}  30{}^{\circ}
+    \alpha_{max}  45{}^{\circ}
+    k_c                   0.55
 
 Schubwände und ihre Steifigkeit
     Wand    l\ [\mathrm{mm}]  b_w\ [\mathrm{mm}]  k = b_w l\ [\mathrm{mm}^2]  A_{sw}/s\ [\mathrm{mm^2/m}]  Zelle
@@ -1703,22 +1703,22 @@ C30/37: Spannungsblock 0.85·x, Bemessungswerte
     \sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{cd} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \end{cases}
 
 Werte C30/37
-    Kennwert           Wert
-    -----------------  ----
-    f_{cd}               20
-    \varepsilon_{c1d}     2
-    \varepsilon_{c2d}   3.5
+    Kennwert                                     Wert
+    -----------------  ------------------------------
+    f_{cd}             20\,\mathrm{N}/\mathrm{mm}^{2}
+    \varepsilon_{c1d}                     2\,\text{‰}
+    \varepsilon_{c2d}                   3.5\,\text{‰}
 
 B500B: bilineare Beziehung, Bemessungswerte   [SIA 262:2025, 4.2.2.4]
     \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & \varepsilon_s \ge 0 \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & \varepsilon_s < 0 \end{cases} \qquad |\varepsilon_s| \le \varepsilon_{ud}
 
 Werte B500B
-    Kennwert            Wert
-    ----------------  ------
-    f_{yd}               435
-    f_{yd}^{-}           435
-    E_s               200000
-    \varepsilon_{ud}     4.5
+    Kennwert                                        Wert
+    ----------------  ----------------------------------
+    f_{yd}               435\,\mathrm{N}/\mathrm{mm}^{2}
+    f_{yd}^{-}           435\,\mathrm{N}/\mathrm{mm}^{2}
+    E_s               200000\,\mathrm{N}/\mathrm{mm}^{2}
+    \varepsilon_{ud}                             4.5\,\%
 
 Reine Normalkraft
     Grenze                                                   Wert
@@ -2036,22 +2036,22 @@ Krümmungsbeiwert mit charakteristischer Festigkeit   [SIA 262:2025, 4.2.1.6]
     k_{\sigma,k} = \frac{E_{cd}}{400 \cdot f_{ck}} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}} = 2.802
 
 Werte C30/37
-    Kennwert           Wert
-    -----------------  ----
-    f_{ck}               30
-    \varepsilon_{c1d}     2
-    \varepsilon_{c2d}   3.5
+    Kennwert                                     Wert
+    -----------------  ------------------------------
+    f_{ck}             30\,\mathrm{N}/\mathrm{mm}^{2}
+    \varepsilon_{c1d}                     2\,\text{‰}
+    \varepsilon_{c2d}                   3.5\,\text{‰}
 
 B500B: bilineare Beziehung, charakteristische Werte   [SIA 262:2025, 4.2.2.4]
     \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & \varepsilon_s \ge 0 \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & \varepsilon_s < 0 \end{cases} \qquad |\varepsilon_s| \le \varepsilon_{ud}
 
 Werte B500B
-    Kennwert            Wert
-    ----------------  ------
-    f_{yk}               500
-    f_{yk}^{-}           500
-    E_s               200000
-    \varepsilon_{ud}     4.5
+    Kennwert                                        Wert
+    ----------------  ----------------------------------
+    f_{yk}               500\,\mathrm{N}/\mathrm{mm}^{2}
+    f_{yk}^{-}           500\,\mathrm{N}/\mathrm{mm}^{2}
+    E_s               200000\,\mathrm{N}/\mathrm{mm}^{2}
+    \varepsilon_{ud}                             4.5\,\%
 
 Reine Normalkraft
     Grenze                                                   Wert

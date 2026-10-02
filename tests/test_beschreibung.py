@@ -26,15 +26,22 @@ class TestProjektBeschreibung(unittest.TestCase):
         aufbau = Projekt.beispiel().aufbauen()
         self.assertEqual(len(aufbau.baustoffe), 2)
         self.assertEqual(len(aufbau.querschnitte), 1)
+        self.assertEqual(len(aufbau.querschnittsanalysen), 1)
         self.assertEqual(sorted(aufbau.nachweise), ["q1.x"])
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         self.assertTrue(loesung.vollstaendig)
-        # Gefuehrt werden die 6 M-N-Nachweise. Die uebrigen rechnen still mit:
+        # Gefuehrt werden bei der Platte die 3 M-N-Nachweise, beim Unterzug
+        # Biegung und Querkraft mit Torsion. Die uebrigen rechnen still mit:
         # eingeschaltet hat sie niemand, und ungefragt in der Tabelle staenden
-        # sie sonst bei jeder Platte.
+        # sie sonst bei jedem Bauteil.
         laut = [u for u in loesung.urteile if not u.still]
-        self.assertEqual(len(laut), 3)
-        self.assertTrue(all(u.art == "M-N" for u in laut))
+        platte = [u for u in laut if u.raum.startswith("querschnitt.q1.")]
+        unterzug = [u for u in laut if u.raum.startswith("querschnittsanalyse.a1.")]
+        self.assertEqual(len(platte), 3)
+        self.assertTrue(all(u.art == "M-N" for u in platte))
+        self.assertEqual(sorted(u.art for u in unterzug), ["M-N", "V+T"])
+        self.assertEqual(len(laut), len(platte) + len(unterzug))
+        self.assertTrue(all(u.erfuellt for u in laut))
         self.assertTrue([u for u in loesung.urteile if u.still])
 
 
@@ -684,7 +691,8 @@ class TestNurDieTragrichtungX(unittest.TestCase):
 
     def test_jede_kombination_wirkt_in_x(self):
         projekt = Projekt.beispiel()
-        mn = [u for u in self._loesen(projekt).urteile if u.art == "M-N"]
+        mn = [u for u in self._loesen(projekt).urteile
+              if u.art == "M-N" and u.raum.startswith("querschnitt.q1.")]
         self.assertEqual(len(mn), len(projekt.querschnitt("q1").kombinationen))
         self.assertTrue(all("Biegung und Normalkraft x" in u.name for u in mn))
 
@@ -799,11 +807,11 @@ class TestNachweisfelder(unittest.TestCase):
                 self.aufbau()
         self.assertIn("'knicken'", str(fehler.exception))
 
-    def test_jeder_nachweis_gehoert_zu_genau_einer_platte(self):
+    def test_jeder_nachweis_gehoert_zu_genau_einem_bauteil(self):
         """Sonst käme ein Ergebnis beim Zwischenspeichern doppelt oder gar nicht."""
         aufbau = self.aufbau()
-        eigene = aufbau.ziele_von("q1")
-        self.assertEqual(sorted(eigene),
+        je_bauteil = [z for b in aufbau.bauteile() for z in aufbau.ziele_von(b.kennung)]
+        self.assertEqual(sorted(je_bauteil),
                          sorted(aufbau.eckwertziele() + aufbau.alle_nachweisziele()))
 
 

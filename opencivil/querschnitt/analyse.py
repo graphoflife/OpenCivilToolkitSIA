@@ -681,7 +681,7 @@ class Querschnittsanalyse:
                              titel="Krümmungsbeiwert mit charakteristischer Festigkeit",
                              referenz=_K_SIGMA.referenz)
                 p.tabelle(kopf=["Kennwert", "Wert"], zeilen=[
-                    [Mathe(symbol(k)), Mathe(e[self._name(stoff, k)].formatiert(latex=True))]
+                    [Mathe(symbol(k)), Mathe(e[self._name(stoff, k)].zahl_latex())]
                     for k in (f_c, "eps_c1d", "eps_c2d")], titel=f"Werte {stoff.name}",
                     ausrichtung="lr")
             else:
@@ -692,7 +692,7 @@ class Querschnittsanalyse:
                 p.ansatz(latex, titel=f"{stoff.name}: bilineare Beziehung, {satz}",
                          referenz="SIA 262:2025, 4.2.2.4")
                 p.tabelle(kopf=["Kennwert", "Wert"], zeilen=[
-                    [Mathe(symbol(k)), Mathe(e[self._name(stoff, k)].formatiert(latex=True))]
+                    [Mathe(symbol(k)), Mathe(e[self._name(stoff, k)].zahl_latex())]
                     for k in (f_s, f"{f_s}_druck", "E_s", "eps_ud")],
                     titel=f"Werte {stoff.name}", ausrichtung="lr")
 

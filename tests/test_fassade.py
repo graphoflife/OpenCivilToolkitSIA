@@ -179,17 +179,21 @@ class TestRechnen(unittest.TestCase):
         web = api.zusammenfassungen(loesung, aufbau)
         text = konsole.zusammenfassung(zusammenfassen(aufbau, loesung))
 
-        self.assertEqual(sorted(web), ["q1", "q2"])
+        self.assertEqual(sorted(web), ["a1", "q1", "q2"])
+        namen = {b.kennung: b.name for b in aufbau.bauteile()}
         for kennung, tabelle in web.items():
-            with self.subTest(platte=kennung):
-                name = projekt.querschnitt(kennung).name
+            with self.subTest(bauteil=kennung):
+                name = namen[kennung]
                 teil = text[text.index(f"{name}\n"):]
                 for zeile in tabelle["zeilen"]:
                     self.assertIn(zeile["zellen"][4]["mathe"], teil)
                 for still in tabelle["stille"]:
                     self.assertIn(f"{still['nachweis']} – {still['fall']}: "
                                   f"α_eff = {still['grad']}", teil)
-                self.assertTrue(tabelle["stille"], "die Probe braucht einen stillen")
+        # Die Platten tragen je einen stillen, der nicht aufgeht; beim
+        # Unterzug gehen auch die stillen auf.
+        for kennung in ("q1", "q2"):
+            self.assertTrue(web[kennung]["stille"], "die Probe braucht einen stillen")
 
     def test_eine_platte_ohne_einwirkung(self):
         projekt = einfach()

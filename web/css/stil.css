@@ -1387,6 +1387,7 @@ math-field.gl-feld::part(menu-toggle) { display: none; }
   paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round;
 }
 .zf-linientext { fill: var(--stahl); font-weight: 600; }
+.zf-wandtext { fill: var(--beide); font-weight: 600; }
 .zf-mass { fill: none; stroke: var(--schrift-zart); stroke-width: 1; }
 .zf-masstext { font-size: 11px; fill: var(--schrift-matt); }
 .zf-schwerpunkt circle { fill: #fff; stroke: var(--schrift); stroke-width: 1.2; }
