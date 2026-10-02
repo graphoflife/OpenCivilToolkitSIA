@@ -901,6 +901,7 @@ function werkzeugWaehlen(a, name) {
   vorlageZeichnen(a);
   optionenZeichnen(a);
   zeichnen(a);
+  aendern({}, 'zeichnung');
 }
 
 function leisteBauen(a) {
@@ -1389,6 +1390,8 @@ function klicken(a, bild, e) {
   }
   a.zeiger = { bild, fang: f };
   zeichnen(a);
+  // Die Koordinaten daneben zeigen den Entwurf -- auch sie sollen den Punkt sehen.
+  aendern({}, 'zeichnung');
 }
 
 function auswahlLoeschen(a) {
@@ -1547,8 +1550,10 @@ function taste(e) {
 
   switch (zeichen) {
     case 'Escape':
-      if (a.entwurf) a.entwurf = null;
-      else if (a.vorlageOffen) { a.vorlageOffen = false; vorlageZeichnen(a); } else if (a.auswahl) {
+      if (a.entwurf) {
+        a.entwurf = null;
+        aendern({}, 'zeichnung');
+      } else if (a.vorlageOffen) { a.vorlageOffen = false; vorlageZeichnen(a); } else if (a.auswahl) {
         a.auswahl = null;
         aendern({}, 'zeichnung');
       } else if (a.vollbild) {
@@ -1562,6 +1567,7 @@ function taste(e) {
       if (a.entwurf?.art === 'polygon') {
         a.entwurf.punkte.pop();
         if (!a.entwurf.punkte.length) a.entwurf = null;
+        aendern({}, 'zeichnung');
         break;
       }
       auswahlLoeschen(a);
@@ -1687,6 +1693,52 @@ export function zeichenbereich(analyse, seite = []) {
     el('div.zf-seite', {}, seite),
   ]);
 }
+
+// ===========================================================================
+// Für das Koordinatenfenster
+// ===========================================================================
+
+/** Ein neues Element nach den Vorgaben, an der angegebenen Lage -- danach gewählt. */
+export function anlegen(kennung, art, lage) {
+  const a = ansichtVon(kennung);
+  const neu = bauhelfer(a);
+  const element = {
+    flaeche: () => neu.flaeche(lage.punkte),
+    stab: () => neu.stab(lage.p),
+    linie: () => neu.linie(lage.von, lage.bis),
+    wand: () => neu.wand(lage.von, lage.bis),
+  }[art]();
+  anfuegen(a, art, element);
+}
+
+/** Der Entwurf eines Polygons, von den Koordinaten aus geändert. */
+export function entwurfSetzen(kennung, punkte) {
+  const a = ansichtVon(kennung);
+  a.entwurf = punkte.length ? { art: 'polygon', punkte } : null;
+  zeichnen(a);
+  aendern({}, 'zeichnung');
+}
+
+export function entwurfSchliessen(kennung) {
+  polygonSchliessen(ansichtVon(kennung));
+}
+
+/**
+ * Merkt sich eine Eigenschaft für das nächste neue Element derselben Art:
+ * wer einen Stab auf ⌀ 20 stellt, setzt den nächsten auch mit ⌀ 20.
+ */
+export function vorgabeMerken(kennung, art, feld, wert) {
+  const a = ansichtVon(kennung);
+  if (!a.vorgaben?.[art]) return;
+  a.vorgaben[art][feld] = wert;
+  optionenZeichnen(a);
+}
+
+/** Die Ecken eines Rechtecks und eines Kreises -- wie die Werkzeuge sie anlegen. */
+export function rechteckpunkte([y, z], b, h) {
+  return [[y, z], [y + b, z], [y + b, z + h], [y, z + h]];
+}
+export { kreispunkte };
 
 /** Die Meldungen des Kerns zur Zeichnung -- ein Klick wählt das Element. */
 export function meldungenBlock(analyse) {

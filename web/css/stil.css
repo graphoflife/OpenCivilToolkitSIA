@@ -1465,3 +1465,55 @@ math-field.gl-feld::part(menu-toggle) { display: none; }
    läge sonst in der Tafel statt über dem ganzen Fenster. Solange es offen
    ist, ist die Tafel darum kein Container. */
 .tafel-inhalt:has(.zeichenbereich.ist-vollbild) { container-type: normal; }
+
+/* ------------------------------------------------------- Koordinaten -- */
+
+.koordinaten {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 8px 10px; border: 1px solid var(--rand); border-left: 4px solid var(--analyse);
+  border-radius: var(--radius); background: var(--flaeche);
+}
+.ko-kopf { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 3px; }
+.ko-kopf b {
+  font-size: 11.5px; text-transform: uppercase; letter-spacing: .4px; color: var(--schrift-matt);
+}
+/* Ein Punkt: Name, y, z, Entfernen. Dieselben Spalten für jede Punktzeile,
+   damit y unter y steht, auch zwischen «Anfang» und «Ende». */
+.ko-punkt {
+  display: grid; grid-template-columns: 76px minmax(0, 1fr) minmax(0, 1fr) 18px;
+  gap: 4px; align-items: center;
+}
+.ko-punkt.ist-kopf {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .3px; color: var(--schrift-matt);
+}
+.ko-punkt.ist-kopf > span:not(:first-child) { text-align: right; padding-right: 22px; }
+.ko-punkt.ist-neu { grid-template-columns: 76px minmax(0, 1fr) minmax(0, 1fr) auto; margin-top: 2px; }
+.ko-punkt input[type="number"], .ko-zeile input[type="number"] { padding: 3px 5px; text-align: right; }
+.ko-name {
+  font-size: 12px; color: var(--schrift-matt);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ko-zeile {
+  display: grid; grid-template-columns: 76px minmax(0, 1fr) 36px; gap: 4px; align-items: center;
+}
+.ko-zeile.ist-haken { grid-template-columns: 76px auto minmax(0, 1fr); }
+.ko-zeile select { padding: 3px 6px; }
+.ko-zeile .einheit { font-size: 11px; color: var(--schrift-zart); }
+.ko-knoepfe { display: flex; justify-content: flex-end; gap: 6px; margin-top: 4px; }
+.ko-hinweis { margin: 2px 0; font-size: 12px; color: var(--schrift-zart); }
+.ko-info { margin: 2px 0 0; font-size: 12px; font-weight: 600; color: var(--stahl); }
+.ko-werte {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1px 10px; font-size: 12.5px; margin-bottom: 6px;
+}
+.ko-elemente { display: flex; flex-direction: column; gap: 1px; }
+.ko-element {
+  display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 6px;
+  padding: 3px 6px; border: none; border-radius: 5px; background: transparent;
+  text-align: left; font-size: 12px; color: var(--schrift); cursor: pointer;
+}
+.ko-element:hover { background: var(--blau-hell); }
+.ko-element > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--schrift-matt); }
+.ko-element.ist-fehler, .ko-element.ist-fehler > span:last-child { color: var(--schlecht); }
+.ko-element.ist-fehler { background: var(--schlecht-hell); }
+.ko-elementname { font-weight: 600; }

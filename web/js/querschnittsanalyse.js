@@ -21,6 +21,7 @@
 import { erklaerung, feld, hakenSchalter } from './bausteine.js';
 import { auswahl, el, svgEl, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
+import { koordinatenfenster } from './koordinaten.js';
 import { meldungenBlock, zeichenbereich } from './zeichenfenster.js';
 import {
   ausVorlage, naechsterName, projektAendern, zustand,
@@ -126,7 +127,7 @@ function querschnittGruppe(analyse) {
       type: 'text', value: analyse.name,
       on: { change: (e) => aendern((a) => { a.name = e.target.value; }) },
     })),
-    zeichenbereich(analyse, [meldungenBlock(analyse)].filter(Boolean)),
+    zeichenbereich(analyse, [meldungenBlock(analyse), koordinatenfenster(analyse)].filter(Boolean)),
     el('div.unterkapitel', {}, [
       // Freier Text, der in keine Rechnung eingeht -- wie bei der Platte.
       el('div.beschreibung', { style: { marginTop: 0 } }, [
