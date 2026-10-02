@@ -44,6 +44,73 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-02 · Interaktionsdiagramm mit wählbaren Achsen
+
+Wunsch: ein M-N-Interaktionsdiagramm auch für die Querschnittsanalyse, mit
+wählbaren Achsen. Auf x und y steht je eine von N, M_y und M_z; die dritte
+bekommt ihren Wert in einem Zahlenfeld.
+
+### Vorher und nachher
+
+| | vorher | nachher |
+| --- | --- | --- |
+| Interaktionsdiagramm | je Lastfall nur die Linie in seiner Ebene | eines je Analyse, Achsen frei wählbar |
+| Lastfälle im Bild | nur der eine Fall | alle; die in der Ebene kräftig, die übrigen blass |
+| Linie bei starker Druckkraft | eine gerade Sehne über ein Drittel der N-Spanne | durchgehend glatt, höchstens 0.14 % neben der genauen Suche |
+
+Beispiel am Unterzug:
+- x = M_y, y = N, M_z = 0: die bekannte M-N-Linie, «Feld» liegt darin, grün.
+- x = M_y, y = M_z, N = 0: der Umriss bei N = 0.
+- Mit x = M_z und M_y = 150 kNm steht «Feld» ebenfalls kräftig da, weil sein
+  M_y genau 150 ist.
+
+### Wie es gebaut ist
+
+* **Ein Schnitt durch die Fläche aller Bruchzustände**
+  (`Querschnitt.schnitt` in `opencivil/querschnitt/interaktion.py`). Im
+  Raum (N, M_y, M_z) bilden alle Bruchzustände eine geschlossene Fläche;
+  jeder Fächer ist eine Linie darauf.
+  * Bei festem N: je Neigung der Punkt mit diesem N, mit derselben Suche wie
+    im Nachweis.
+  * Bei festem Moment: die Fächer von 72 Neigungen, je auf 120 Stufen in N
+    gelesen. Auf jeder Stufe schneidet die Gerade des festen Moments den
+    Umriss in zwei Punkten. Gegen einen genauen Umriss aus 360 Neigungen
+    liegt das höchstens 0.4 % daneben.
+* **Die Fläche wird einmal je Querschnitt gerechnet** und bleibt an ihm.
+  Weil der Kern den Querschnitt nach einer Rechnung im Zwischenspeicher
+  hält, kostet erst der erste Schnitt etwas.
+  * Pyodide: 579 ms für den ersten Schnitt, danach 26–67 ms je Wert.
+* **Die Oberfläche wählt nur.** Die Punkte kommen mit allen drei Grössen; die
+  Oberfläche legt zwei davon auf die Achsen. Zwei Momente bekommen denselben
+  Massstab. Wird auf einer Achse gewählt, was schon auf der anderen steht,
+  tauschen die beiden.
+* **Einachsig** gibt es nur M_y über N, wie im Nachweis: die Nulllinie bleibt
+  waagrecht, M_z zählt nicht.
+
+### Nebenbei, ausserhalb des Wunsches
+
+* **Der Fächer hatte eine Sehne.** Seine Stützstellen lagen gleichmässig in
+  der Krümmung. Wo die Nulllinie den Rand erreicht, sprang N zwischen zwei
+  Stellen von −1762 auf −3267 kN, und die M-N-Linie war dort gerade. Jetzt
+  wird halbiert, bis die Mitte zweier Stützstellen auf ihrer Sehne liegt. Die
+  Nachweise waren nicht betroffen: sie suchen genau.
+* **Der Spannungsblock traf N_Ed nicht** (eigener Commit davor). Er springt
+  bei 0.15·ε_c2d von null auf f_cd; in der Fasermitte gelesen, sprang N mit.
+  Beim Kastenträger stand in der Probe 638.7 kN statt 664.0 kN. Jetzt wird
+  über die Faser gemittelt. Feld ging von 0.64 auf 0.62; Parabel-Rechteck,
+  Stahl und Platte rechnen wie vorher.
+
+### Nachgeprüft
+
+* **Tests:** 796. Neu sind der Schnitt gegen die genaue Suche (bei festem N
+  gleich, bei M_z = 0 und M_z = 40 kNm auf 0.3 bzw. 0.5 %), der Fächer ohne
+  Sehne, die Wahl in der Anfrage und der Spannungsblock: jede Normalkraft
+  wird getroffen. Ohne die Behebung verfehlt N bis 22 kN.
+* **Im Browser:** Achsen gewechselt und getauscht, Werte getippt, kräftig und
+  blass geprüft, einachsig und zurück; mit Server und mit Pyodide.
+
+---
+
 ## 2026-10-02 · Querschnittsanalyse: gezeichnete Querschnitte
 
 Wunsch: unter den Stahlbeton-Platten eine zweite «App». Statt ein paar Masse

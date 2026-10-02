@@ -36,6 +36,7 @@ from opencivil.bericht.latex_dokument import als_tex
 from opencivil.bericht.markdown import als_markdown
 from opencivil.core.rechenwerk import Loesung, RechenwerkFehler
 from opencivil.projekt import Projekt, ProjektFehler
+from opencivil.querschnitt.interaktion import GROESSEN
 from opencivil.web import api, diagrammdaten, speicher
 from opencivil.web.api import endlich
 
@@ -378,13 +379,23 @@ def analysediagramme(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
         projekt.querschnittsanalyse(kennung)
     except ProjektFehler as fehler:
         raise DienstFehler(400, str(fehler)) from None
+    # Wo das Interaktionsdiagramm schneidet: welche Groesse fest ist und mit
+    # welchem Wert, in kN bzw. kNm. Ohne Angabe bei M_z = 0.
+    wahl = rumpf.get("schnitt") or {}
+    fest = str(wahl.get("fest") or "M_z")
+    if fest not in GROESSEN:
+        raise DienstFehler(400, f"Geschnitten wird bei {', '.join(GROESSEN)}, nicht bei '{fest}'.")
+    try:
+        wert = float(wahl.get("wert") or 0.0)
+    except (TypeError, ValueError):
+        raise DienstFehler(400, f"Der Wert des Schnitts ist keine Zahl: {wahl.get('wert')!r}.") from None
     aufbau = projekt.aufbauen()
     teil = SPEICHER.hole(kennung, speicher.abdruck(projekt.als_dict(), kennung))
     if teil is not None:
         aufbau.teile_setzen(kennung, teil.teile)
     else:
         aufbau.werk.loese(*aufbau.materialziele(), *aufbau.ziele_von(kennung))
-    return {"diagramme": endlich(diagrammdaten.analyse(aufbau, kennung))}
+    return {"diagramme": endlich(diagrammdaten.analyse(aufbau, kennung, (fest, wert)))}
 
 
 #: Name der Anfrage -> Funktion. Diese Namen sind der ganze Vertrag zwischen

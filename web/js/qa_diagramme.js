@@ -1,7 +1,12 @@
 /**
  * qa_diagramme.js -- die Diagramme einer Querschnittsanalyse.
  *
- * Je Lastfall, umschaltbar:
+ * Oben das Interaktionsdiagramm: die Fläche aller Bruchzustände im Raum
+ * (N, M_y, M_z), geschnitten bei einem festen Wert einer Grösse. Welche zwei
+ * auf den Achsen stehen, wird gewählt; die dritte bekommt ihren Wert im
+ * Zahlenfeld. Lastfälle in dieser Ebene stehen kräftig, die übrigen blass.
+ *
+ * Darunter je Lastfall, umschaltbar:
  *
  *   Bruchzustand    der Schnitt mit Nulllinie, Druckzone und der Dehnung
  *                   jedes Stabs -- gezogen kupfer, gedrückt blau;
@@ -23,7 +28,9 @@
 
 import { achsenkreuz, NR } from './achsen.js';
 import { api } from './api.js';
-import { el, leerzustand, svgEl } from './dom.js';
+import {
+  auswahl, el, leerzustand, svgEl, zahlfeld,
+} from './dom.js';
 import { aendern, zustand } from './zustand.js';
 
 const BREITE = 640;
@@ -42,6 +49,32 @@ const vorrat = new Map();
 /** Kennung -> Name des gezeigten Lastfalls. Ansichtssache, nicht Teil des Projekts. */
 const gezeigt = new Map();
 
+/** Die drei Grössen des Interaktionsdiagramms: Achsentitel, Einheit, Feld im Lastfall. */
+const GROESSE = {
+  N: { titel: 'N [kN]   (Zug positiv)', einheit: 'kN', schritt: 50, feld: 'N_Ed' },
+  M_y: { titel: 'M_y [kNm]   (positiv: Zug unten)', einheit: 'kNm', schritt: 10, feld: 'M_y_Ed' },
+  M_z: { titel: 'M_z [kNm]   (positiv: Zug links)', einheit: 'kNm', schritt: 10, feld: 'M_z_Ed' },
+};
+
+/**
+ * Kennung -> was das Interaktionsdiagramm zeigt: die Achsen und je Grösse
+ * ihr Wert, wenn sie die feste ist. Ein Wert bleibt stehen, wenn die Achsen
+ * wechseln -- wer zurückschaltet, findet ihn wieder.
+ */
+const schnittwahl = new Map();
+
+function wahlVon(kennung) {
+  if (!schnittwahl.has(kennung)) {
+    schnittwahl.set(kennung, { x: 'M_y', y: 'N', werte: { N: 0, M_y: 0, M_z: 0 } });
+  }
+  return schnittwahl.get(kennung);
+}
+
+/** Die Grösse, die auf keiner Achse steht. */
+function festVon(wahl) {
+  return Object.keys(GROESSE).find((g) => g !== wahl.x && g !== wahl.y);
+}
+
 /** Woran die Diagramme hängen: die Analyse und die Materialien. */
 function abdruckVon(kennung) {
   const analyse = zustand.projekt.querschnittsanalysen?.find((a) => a.kennung === kennung);
@@ -53,7 +86,7 @@ function abdruckVon(kennung) {
  * Läuft die Rechnung noch, wartet die Anfrage; danach liegen die Nachweise
  * im Speicher des Kerns, und es kommen nur die Kurven dazu.
  */
-function anfordern(kennung, eintrag) {
+function anfordern(kennung, eintrag, verzug = 600) {
   clearTimeout(eintrag.uhr);
   eintrag.uhr = setTimeout(() => {
     if (vorrat.get(kennung) !== eintrag) return;
@@ -61,7 +94,7 @@ function anfordern(kennung, eintrag) {
       anfordern(kennung, eintrag);
       return;
     }
-    api.analysediagramme(zustand.projekt, kennung).then((antwort) => {
+    api.analysediagramme(zustand.projekt, kennung, eintrag.schnitt).then((antwort) => {
       if (vorrat.get(kennung) !== eintrag) return;
       eintrag.daten = antwort.diagramme;
       aendern({}, 'diagramm');
@@ -70,7 +103,7 @@ function anfordern(kennung, eintrag) {
       eintrag.fehler = fehler.message;
       aendern({}, 'diagramm');
     });
-  }, 600);
+  }, verzug);
 }
 
 // ===========================================================================
@@ -256,6 +289,132 @@ function schubbild(daten, fall) {
 }
 
 // ===========================================================================
+// Interaktionsdiagramm
+// ===========================================================================
+
+function achsenwahl(kennung, achse) {
+  const wahl = wahlVon(kennung);
+  return auswahl({
+    werte: Object.keys(GROESSE).map((g) => ({ wert: g, beschriftung: g })),
+    gewaehlt: wahl[achse],
+    titel: achse === 'x' ? 'Grösse auf der waagrechten Achse' : 'Grösse auf der senkrechten Achse',
+    beiAenderung: (neu) => {
+      // Steht die Grösse schon auf der anderen Achse, tauschen die beiden.
+      const andere = achse === 'x' ? 'y' : 'x';
+      if (wahl[andere] === neu) wahl[andere] = wahl[achse];
+      wahl[achse] = neu;
+      aendern({}, 'diagramm');
+    },
+  });
+}
+
+/** Wo das Diagramm schneidet: die Achsen und der Wert der dritten Grösse. */
+function schnittsteuerung(kennung, einachsig) {
+  if (einachsig) {
+    return el('p.qa-schnitthinweis', {
+      text: 'Einachsig: M_y über N, die Nulllinie bleibt waagrecht; M_z zählt nicht.',
+    });
+  }
+  const wahl = wahlVon(kennung);
+  const fest = festVon(wahl);
+  return el('div.qa-schnittwahl', {}, [
+    el('label', {}, ['x-Achse ', achsenwahl(kennung, 'x')]),
+    el('label', {}, ['y-Achse ', achsenwahl(kennung, 'y')]),
+    el('label', {}, [
+      `bei ${fest} = `,
+      zahlfeld({
+        wert: wahl.werte[fest], schritt: GROESSE[fest].schritt, leer: 0,
+        titel: `Fester Wert von ${fest} in ${GROESSE[fest].einheit}; die Fläche wird dort geschnitten`,
+        beiAenderung: (v) => { wahl.werte[fest] = v; aendern({}, 'diagramm'); },
+      }),
+      ` ${GROESSE[fest].einheit}`,
+    ]),
+  ]);
+}
+
+/**
+ * Das Bild: der Schnitt durch die Fläche, dazu jeder Lastfall. In dieser
+ * Ebene liegt einer, wenn seine feste Grösse den Wert hat -- dann kräftig,
+ * grün oder rot wie sein Nachweis. Sonst blass: er gehört zu einem anderen
+ * Schnitt. Zwei Momente auf den Achsen bekommen denselben Massstab.
+ */
+function interaktionsbild(i, faelle, x, y, einachsig) {
+  const wert = (f, g) => f[GROESSE[g].feld];
+  const punkte = i.punkte.map((p) => [p[x], p[y]]);
+  if (!punkte.length) {
+    return leerzustand(`Bei ${i.fest} = ${i.wert} ${GROESSE[i.fest].einheit} gibt es keinen Bruchzustand`,
+      'Die Ebene trifft die Fläche der Widerstände nicht.');
+  }
+  const passt = (f) => einachsig || Math.abs(wert(f, i.fest) - i.wert) < 1e-6;
+  const alleX = [...punkte.map((q) => q[0]), ...faelle.map((f) => wert(f, x))];
+  const alleY = [...punkte.map((q) => q[1]), ...faelle.map((f) => wert(f, y))];
+  let rx = bereich(alleX);
+  let ry = bereich(alleY);
+  let breite = BREITE;
+  if (x !== 'N' && y !== 'N') {
+    const r = Math.max(...alleX.map(Math.abs), ...alleY.map(Math.abs)) * 1.12 || 1;
+    rx = [-r, r];
+    ry = [-r, r];
+    breite = HOEHE + 52;
+  }
+  const { svg, daten: g, x: sx, y: sy } = achsenkreuz({
+    breite, hoehe: HOEHE, rand: RAND,
+    attribute: { class: 'mn', xmlns: NR, role: 'img', 'aria-label': `Interaktionsdiagramm ${y} über ${x}` },
+    x: { bereich: rx, teilung: {}, null: true, titel: GROESSE[x].titel },
+    y: { bereich: ry, teilung: {}, null: true, titel: GROESSE[y].titel },
+  });
+  g.append(svgEl('polygon', {
+    points: punkte.map(([a, b]) => `${sx(a).toFixed(2)},${sy(b).toFixed(2)}`).join(' '),
+    fill: 'rgba(31,95,168,.07)', stroke: '#1f5fa8', 'stroke-width': 2, 'stroke-linejoin': 'round',
+  }));
+  // Die blassen zuerst, damit die kräftigen obenauf liegen.
+  for (const f of [...faelle].sort((a, b) => passt(a) - passt(b))) {
+    const drin = passt(f);
+    const farbe = drin ? (f.erfuellt ? GUT : SCHLECHT) : '#8895a8';
+    const punkt = svgEl('circle', {
+      cx: sx(wert(f, x)), cy: sy(wert(f, y)), r: drin ? 6 : 5,
+      fill: farbe, stroke: '#fff', 'stroke-width': 2, opacity: drin ? 1 : 0.45,
+    });
+    const t = svgEl('title');
+    t.textContent = `${f.name}\nN = ${f.N_Ed.toFixed(1)} kN, M_y = ${f.M_y_Ed.toFixed(1)} kNm, `
+      + `M_z = ${f.M_z_Ed.toFixed(1)} kNm\n`
+      + (drin ? `α_eff = ${f.grad_text} – ${f.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`
+        : `liegt nicht in dieser Ebene (${i.fest} = ${wert(f, i.fest).toFixed(1)})`);
+    punkt.append(t);
+    g.append(punkt);
+    g.append(text(sx(wert(f, x)) + 9, sy(wert(f, y)) - 8, f.name, {
+      'font-weight': 600, fill: farbe, opacity: drin ? 1 : 0.6,
+    }));
+  }
+  return el('div.diagramm-huelle', {}, [
+    svg,
+    el('div.mn-legende', {}, [
+      el('span', {}, [el('i', { style: { background: '#1f5fa8' } }),
+        einachsig ? 'Bruchzustände, Nulllinie waagrecht'
+          : `Bruchzustände bei ${i.fest} = ${i.wert} ${GROESSE[i.fest].einheit}`]),
+      el('span', {}, [el('i', { style: { background: GUT } }), 'erfüllt']),
+      el('span', {}, [el('i', { style: { background: SCHLECHT } }), 'nicht erfüllt']),
+      einachsig ? null : el('span', {}, [el('i', { style: { background: '#8895a8', opacity: 0.45 } }),
+        `blass: anderes ${i.fest}`]),
+    ]),
+  ]);
+}
+
+function interaktionsblatt(kennung, name, daten, veraltet) {
+  const wahl = wahlVon(kennung);
+  const x = daten.einachsig ? 'M_y' : wahl.x;
+  const y = daten.einachsig ? 'N' : wahl.y;
+  return el('div.blatt', {}, [
+    el('div.b-titel', { text: `Interaktionsdiagramm – ${name}` }),
+    schnittsteuerung(kennung, daten.einachsig),
+    el('div', { class: veraltet ? 'ist-veraltet' : '' }, [
+      daten.interaktion ? interaktionsbild(daten.interaktion, daten.faelle, x, y, daten.einachsig)
+        : leerzustand('Kein Interaktionsdiagramm.'),
+    ]),
+  ]);
+}
+
+// ===========================================================================
 // Kurven
 // ===========================================================================
 
@@ -299,9 +458,9 @@ function mnBild(daten, fall) {
     attribute: { class: 'mn', xmlns: NR, role: 'img', 'aria-label': `M-N ${fall.name}` },
     x: {
       bereich: bereich(ms), teilung: {}, null: true,
-      titel: schief ? 'M in Richtung der Einwirkung [kNm]' : 'M_y [kNm]   (rechts Zug unten)',
+      titel: schief ? 'M in Richtung der Einwirkung [kNm]' : GROESSE.M_y.titel,
     },
-    y: { bereich: bereich(ns), teilung: {}, null: true, titel: 'N [kN]   (Zug positiv)' },
+    y: { bereich: bereich(ns), teilung: {}, null: true, titel: GROESSE.N.titel },
   });
   g.append(svgEl('polygon', {
     points: mn.punkte.map((p) => `${x(p.M).toFixed(2)},${y(p.N).toFixed(2)}`).join(' '),
@@ -368,13 +527,20 @@ function fallwahl(kennung, faelle, name) {
  * die gezeigten Daten nicht mehr zur Eingabe passen.
  */
 export function analyseBlaetter(kennung, name) {
-  const abdruck = abdruckVon(kennung);
+  const wahl = wahlVon(kennung);
+  const schnitt = { fest: festVon(wahl), wert: wahl.werte[festVon(wahl)] };
+  const projektabdruck = abdruckVon(kennung);
+  const abdruck = `${projektabdruck}|${schnitt.fest}|${schnitt.wert}`;
   let eintrag = vorrat.get(kennung);
   if (!eintrag || eintrag.abdruck !== abdruck) {
+    // Nur der Schnitt geändert: gleich fragen -- gerechnet ist schon alles.
+    const nurSchnitt = eintrag?.projektabdruck === projektabdruck;
     const alt = eintrag?.daten || eintrag?.alt || null;
-    eintrag = { abdruck, daten: null, alt, fehler: null, uhr: null };
+    eintrag = {
+      abdruck, projektabdruck, schnitt, daten: null, alt, fehler: null, uhr: null,
+    };
     vorrat.set(kennung, eintrag);
-    anfordern(kennung, eintrag);
+    anfordern(kennung, eintrag, nurSchnitt ? 80 : 600);
   }
   const daten = eintrag.daten || eintrag.alt;
   const titel = (t) => el('div.b-titel', { text: `${t} – ${name}` });
@@ -382,8 +548,9 @@ export function analyseBlaetter(kennung, name) {
     return [el('div.blatt', {}, [titel('Diagramme'), el('p.hinweis.hinweis-warnung', { text: eintrag.fehler })])];
   }
   if (!daten) return [el('div.blatt', {}, [titel('Diagramme'), leerzustand('Diagramme werden gerechnet …')])];
+  const interaktion = interaktionsblatt(kennung, name, daten, !eintrag.daten);
   if (!daten.faelle.length) {
-    return [el('div.blatt', {}, [titel('Diagramme'), leerzustand('Kein Lastfall -- nichts zu zeichnen.')])];
+    return [interaktion, el('div.blatt', {}, [titel('Lastfall'), leerzustand('Kein Lastfall.')])];
   }
 
   const gewaehlt = daten.faelle.find((f) => f.name === gezeigt.get(kennung)) || daten.faelle[0];
@@ -403,9 +570,10 @@ export function analyseBlaetter(kennung, name) {
     ]),
   ]);
   return [
+    interaktion,
     kopf,
     gewaehlt.bruch ? blatt('Bruchzustand', bruchbild(daten, gewaehlt)) : null,
-    blatt('M-N-Interaktion', mnBild(daten, gewaehlt)),
+    blatt('M-N in der Ebene des Lastfalls', mnBild(daten, gewaehlt)),
     gewaehlt.kontur ? blatt('M_y-M_z bei N_Ed', konturBild(daten, gewaehlt)) : null,
     gewaehlt.schub ? blatt('Schubfluss', schubbild(daten, gewaehlt)) : null,
   ].filter(Boolean);

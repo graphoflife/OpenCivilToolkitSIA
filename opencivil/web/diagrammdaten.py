@@ -450,16 +450,17 @@ def linie(nachweis, aufbau=None) -> dict:
 # Querschnittsanalyse
 # ===========================================================================
 
-#: Wie fein die M_y-M_z-Kurve bei N_Ed abgetastet wird: so viele Neigungen der
-#: Nulllinie rundum, alle 5°.
-KONTUR_NEIGUNGEN = 72
-
 Punkt = Tuple[float, float]
 
 
-def analyse(aufbau: Aufbau, kennung: str) -> dict:
+def analyse(aufbau: Aufbau, kennung: str, schnitt: Tuple[str, float] = ("M_z", 0.0)) -> dict:
     """
     Die Diagramme einer Querschnittsanalyse -- in mm, kN und kNm.
+
+    Das Interaktionsdiagramm: die Flaeche aller Bruchzustaende, geschnitten
+    bei ``schnitt`` -- der festen Groesse (N, M_y oder M_z) und ihrem Wert in
+    kN bzw. kNm. Welche beiden anderen auf welcher Achse stehen, waehlt die
+    Oberflaeche; die Punkte tragen alle drei.
 
     Je Lastfall der Bruchzustand im Schnitt (Nulllinie, Druckzone, die
     Dehnung jedes Stabs), die M-N-Linie in der Ebene des Lastfalls, bei
@@ -493,14 +494,41 @@ def analyse(aufbau: Aufbau, kennung: str) -> dict:
             "bruch": _bruch(q, bauteil, erg.punkt) if erg.punkt is not None else None,
             "schub": _schubfluss(schub, erg.fall) if schub is not None else None,
         })
+    einachsig = bool(biegung.einachsig) if biegung is not None else False
     return {
         "kennung": kennung,
         "name": bauteil.name,
-        "einachsig": bool(biegung.einachsig) if biegung is not None else False,
+        "einachsig": einachsig,
         "laengszug": biegung is not None and biegung.laengszug is not None,
         "zeichnung": _zeichnung(bauteil),
+        "interaktion": _interaktion(q, einachsig, *schnitt) if q is not None else None,
         "faelle": faelle,
     }
+
+
+def _als_kn(punkte) -> List[dict]:
+    """Punkte ``(N, M_y, M_z)`` in N und Nm -- fuer die Oberflaeche in kN und kNm."""
+    return [{"N": N / 1e3, "M_y": M_y / 1e3, "M_z": M_z / 1e3} for N, M_y, M_z in punkte]
+
+
+def _faecherpaar(q, psi: float):
+    """Der Faecher bei ψ und der gegenueber -- zusammen eine geschlossene Linie."""
+    return q.faecher(psi) + list(reversed(q.faecher(psi + math.pi)))
+
+
+def _interaktion(q, einachsig: bool, fest: str, wert: float) -> dict:
+    """
+    Das Interaktionsdiagramm der Analyse: die Flaeche der Bruchzustaende,
+    geschnitten bei ``fest = wert`` (kN bzw. kNm).
+
+    Einachsig gibt es nur die Linie um y: die Nulllinie bleibt waagrecht,
+    und das M_z, das ein unsymmetrischer Querschnitt dabei weckt, zaehlt
+    nicht -- dieselben Faecher wie im Nachweis.
+    """
+    if einachsig:
+        return {"fest": None, "wert": None,
+                "punkte": _als_kn((p.N, p.M_y, p.M_z) for p in _faecherpaar(q, -math.pi / 2.0))}
+    return {"fest": fest, "wert": wert, "punkte": _als_kn(q.schnitt(fest, wert * 1e3))}
 
 
 def _tiefe(eltern: Sequence[Optional[int]], i: int) -> int:
@@ -548,11 +576,8 @@ def _mn_linie(q, erg, einachsig: bool, moment: float) -> dict:
     def m(p) -> float:
         return (p.M_y * achse[0] + p.M_z * achse[1]) / 1e3
 
-    hin = q.faecher(psi)
-    her = q.faecher(psi + math.pi)
     return {
-        "punkte": ([{"N": p.N / 1e3, "M": m(p)} for p in hin]
-                   + [{"N": p.N / 1e3, "M": m(p)} for p in reversed(her)]),
+        "punkte": [{"N": p.N / 1e3, "M": m(p)} for p in _faecherpaar(q, psi)],
         "einwirkung": {"N": erg.N / 1e3,
                        "M": (erg.M_y * achse[0] + erg.M_z * achse[1]) / 1e3},
         "widerstand": (None if erg.punkt is None
@@ -569,11 +594,7 @@ def _kontur(q, erg, moment: float) -> Optional[dict]:
     zug, druck = q.normalkraft_grenzen()
     if not druck < erg.N < zug:
         return None
-    punkte = []
-    for k in range(KONTUR_NEIGUNGEN):
-        p = q.bei_normalkraft(2.0 * math.pi * k / KONTUR_NEIGUNGEN, erg.N)
-        if p is not None:
-            punkte.append({"M_y": p.M_y / 1e3, "M_z": p.M_z / 1e3})
+    punkte = [{"M_y": M_y / 1e3, "M_z": M_z / 1e3} for _, M_y, M_z in q.schnitt("N", erg.N)]
     return {"N": erg.N / 1e3, "punkte": punkte,
             "widerstand": (None if erg.punkt is None
                            else {"M_y": erg.punkt.M_y / 1e3, "M_z": erg.punkt.M_z / 1e3})}

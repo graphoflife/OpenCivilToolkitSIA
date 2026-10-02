@@ -429,3 +429,42 @@ class TestDiagramme(unittest.TestCase):
         antwort = dienst.bearbeite("analysediagramme", {
             "projekt": Projekt.beispiel().als_dict(), "kennung": "a9"})
         self.assertEqual(antwort.status, 400)
+
+    def test_interaktionsdiagramm_ohne_wahl_bei_m_z_null(self):
+        i = self.d["interaktion"]
+        self.assertEqual((i["fest"], i["wert"]), ("M_z", 0.0))
+        self.assertTrue(all(p["M_z"] == 0.0 for p in i["punkte"]))
+        # Bei N = 0 reicht er rechts bis zum Widerstand des Nachweises.
+        rechts = max(p["M_y"] for p in i["punkte"] if abs(p["N"]) < 40.0)
+        self.assertGreater(rechts, 200.0)
+
+    def test_interaktionsdiagramm_mit_wahl(self):
+        projekt = Projekt.beispiel().als_dict()
+        for fest, wert in (("N", -500.0), ("M_y", 100.0), ("M_z", 40.0)):
+            d = dienst.bearbeite("analysediagramme", {
+                "projekt": projekt, "kennung": "a1",
+                "schnitt": {"fest": fest, "wert": wert}}).daten["diagramme"]["interaktion"]
+            with self.subTest(fest=fest):
+                self.assertEqual((d["fest"], d["wert"]), (fest, wert))
+                self.assertTrue(d["punkte"])
+                self.assertTrue(all(abs(p[fest] - wert) < 1e-6 for p in d["punkte"]))
+
+    def test_interaktionsdiagramm_einachsig_ohne_wahl(self):
+        projekt = Projekt.beispiel()
+        projekt.querschnittsanalysen[0].einachsig = True
+        i = dienst.bearbeite("analysediagramme", {
+            "projekt": projekt.als_dict(), "kennung": "a1",
+            "schnitt": {"fest": "N", "wert": 100.0}}).daten["diagramme"]["interaktion"]
+        self.assertIsNone(i["fest"])
+        # Der rechte Ast bei N = 0 ist der Widerstand des Nachweises.
+        rechts = [p for p in i["punkte"] if p["M_y"] > 0]
+        oben = min((p for p in rechts if p["N"] >= 0), key=lambda p: p["N"])
+        unten = max((p for p in rechts if p["N"] < 0), key=lambda p: p["N"])
+        t = oben["N"] / (oben["N"] - unten["N"])
+        self.assertAlmostEqual(oben["M_y"] + t * (unten["M_y"] - oben["M_y"]), 211.8, delta=0.5)
+
+    def test_falscher_schnitt(self):
+        antwort = dienst.bearbeite("analysediagramme", {
+            "projekt": Projekt.beispiel().als_dict(), "kennung": "a1",
+            "schnitt": {"fest": "T", "wert": 0}})
+        self.assertEqual(antwort.status, 400)

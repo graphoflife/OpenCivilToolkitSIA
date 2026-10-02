@@ -91,7 +91,7 @@ zurück. Gelesen wird die Datei im Kern, mit denselben Prüfungen wie alles ande
 
 ## Stand
 
-Fertig und getestet (784 Tests):
+Fertig und getestet (796 Tests):
 
 | Baustein | Inhalt |
 |---|---|
@@ -165,9 +165,10 @@ einachsig» und die Nachweisschalter.
 * *Diagramme* -- Plattenquerschnitt, M-N-Resistenzlinie mit den
   Bemessungspunkten (die gestrichelte Strecke zeigt den Weg, in dem der
   Erfüllungsgrad gemessen wurde), Querkraftkurven, Spannungs-Dehnungs-Bilder;
-  bei einer Querschnittsanalyse je Lastfall der Bruchzustand im Schnitt, die
-  M-N-Linie in der Ebene des Lastfalls, die M_y-M_z-Kurve bei N_Ed und der
-  Schubfluss in den Wänden
+  bei einer Querschnittsanalyse das Interaktionsdiagramm mit wählbaren
+  Achsen (zwei von N, M_y, M_z, die dritte mit festem Wert), dazu je Lastfall
+  der Bruchzustand im Schnitt, die M-N-Linie in der Ebene des Lastfalls, die
+  M_y-M_z-Kurve bei N_Ed und der Schubfluss in den Wänden
 * *Herleitung* -- die Mitschrift, Formel für Formel, mit Normstelle
 
 **Kopieren nach Word, LaTeX und Markdown:** jede Formel und jede Tabelle hat

@@ -1525,3 +1525,15 @@ math-field.gl-feld::part(menu-toggle) { display: none; }
 .qa-fallwahl .schalter-halb { text-transform: none; font-size: 12px; padding: 2px 10px; }
 .qa-nachfuehren { color: var(--schrift-zart); font-style: italic; }
 .blatt.ist-veraltet { opacity: .55; }
+
+/* Das Interaktionsdiagramm der Analyse: die Achsen und der Wert der dritten
+   Grösse in einer Zeile über dem Bild. */
+.qa-schnittwahl {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px;
+  margin: 0 0 8px; font-size: 12.5px; color: var(--schrift-matt);
+}
+.qa-schnittwahl label { display: inline-flex; align-items: center; gap: 5px; }
+.qa-schnittwahl select { width: auto; padding: 2px 6px; }
+.qa-schnittwahl .zahlfeld { width: 104px; }
+.qa-schnittwahl input[type="number"] { text-align: right; }
+.qa-schnitthinweis { margin: 0 0 8px; font-size: 12.5px; color: var(--schrift-zart); }
