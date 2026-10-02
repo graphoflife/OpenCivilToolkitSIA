@@ -23,9 +23,10 @@ import { span } from './mathe.js';
 import { analysenBlock, automatikBlock, nachweiseBlock } from './nachweise.js';
 import { blattZeichnen } from './gleichungen.js';
 import { partnerVon, richtungSetzen, richtungVon } from './lagen.js';
+import { analyseEditor } from './querschnittsanalyse.js';
 import {
-  aendern, gewaehltesBlatt, gewaehltesMaterial, gewaehlterQuerschnitt, kennwertId,
-  projektAendern, zustand,
+  aendern, gewaehlteAnalyse, gewaehltesBlatt, gewaehltesMaterial, gewaehlterQuerschnitt,
+  kennwertId, projektAendern, zustand,
 } from './zustand.js';
 
 const ART_TEXT = { beton: 'Beton', betonstahl: 'Betonstahl' };
@@ -640,6 +641,12 @@ export function editorZeichnen(behaelter, titelKnoten, hinweisKnoten) {
     titelKnoten.textContent = querschnitt.name;
     hinweisKnoten.textContent = 'Stahlbeton-Platte';
     return ersetzen(behaelter, ...plattenEditor(querschnitt));
+  }
+  const analyse = gewaehlteAnalyse();
+  if (analyse) {
+    titelKnoten.textContent = analyse.name;
+    hinweisKnoten.textContent = 'Querschnittsanalyse';
+    return ersetzen(behaelter, ...analyseEditor(analyse));
   }
   const blatt = gewaehltesBlatt();
   if (blatt) {

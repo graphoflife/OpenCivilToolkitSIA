@@ -7,16 +7,20 @@
  *         Beton
  *         Betonstahl
  *     Stahlbeton-Platten
+ *     Querschnittsanalyse
+ *     Analytische Gleichungen
  *
  * Jedes Kapitel lässt sich zuklappen; die Werkzeuge sitzen rechts in der
- * Kapitelleiste. Beim Löschen eines Materials wird geprüft, ob eine Platte es
- * noch braucht -- sonst wäre die Beschreibung anschliessend widersprüchlich,
+ * Kapitelleiste. Beim Löschen eines Materials wird geprüft, ob eine Platte
+ * oder eine Querschnittsanalyse es noch braucht -- sonst wäre die
+ * Beschreibung anschliessend widersprüchlich,
  * und der Rechenkern müsste einen Fehler melden, den die Oberfläche hätte
  * verhindern können.
  */
 
 import { el, ersetzen, melden } from './dom.js';
 import { neueZeile } from './gleichungen.js';
+import { benutzteMaterialien } from './querschnittsanalyse.js';
 import {
   aendern, ausVorlage, freieKennung, naechsterName, projektAendern, umschalten, zustand,
 } from './zustand.js';
@@ -26,6 +30,7 @@ const SINNBILD = {
   beton: '■',         // ■
   betonstahl: '≡',    // ≡
   platten: '▬',       // ▬
+  analysen: '⊤',      // ⊤ -- ein Plattenbalken im Schnitt
   gleichungen: '∑',
 };
 
@@ -59,6 +64,9 @@ const ART = {
   }),
   querschnitt: (q) => ({
     klasse: 'platte', text: `${q.h}×${q.b} mm`, loeschen: () => entfernen('querschnitte', q),
+  }),
+  querschnittsanalyse: (a) => ({
+    klasse: 'analyse', text: umriss(a), loeschen: () => entfernen('querschnittsanalysen', a),
   }),
   blatt: (b) => ({
     klasse: 'blatt', text: `${b.zeilen.length} ${b.zeilen.length === 1 ? 'Zeile' : 'Zeilen'}`,
@@ -95,6 +103,18 @@ function eintrag(m, art) {
   ]);
 }
 
+/**
+ * «300×600 mm» -- Breite und Höhe dessen, was gezeichnet ist. Die
+ * Platte zeigt an derselben Stelle h × b; eine Analyse hat statt zweier
+ * Masse ihre Eckpunkte, und die äussersten davon sind dasselbe.
+ */
+function umriss(analyse) {
+  const punkte = analyse.flaechen.flatMap((f) => f.punkte);
+  if (!punkte.length) return 'leer';
+  const spanne = (i) => Math.max(...punkte.map((p) => p[i])) - Math.min(...punkte.map((p) => p[i]));
+  return `${Number(spanne(0).toFixed(1))}×${Number(spanne(1).toFixed(1))} mm`;
+}
+
 function leerzeile(text) {
   return el('div', {
     text, style: { padding: '5px 10px', color: 'var(--schrift-zart)', fontSize: '12.5px' },
@@ -106,8 +126,12 @@ function leerzeile(text) {
 // ===========================================================================
 
 function materialLoeschen(material) {
-  const benutztVon = zustand.projekt.querschnitte.filter((q) =>
-    q.beton === material.kennung || q.lagen.some((l) => l.stahl === material.kennung));
+  const benutztVon = [
+    ...zustand.projekt.querschnitte.filter((q) =>
+      q.beton === material.kennung || q.lagen.some((l) => l.stahl === material.kennung)),
+    ...(zustand.projekt.querschnittsanalysen || []).filter((a) =>
+      benutzteMaterialien(a).includes(material.kennung)),
+  ];
   if (benutztVon.length) {
     melden(`„${material.name || material.sorte}" verwendet von: `
       + benutztVon.map((q) => q.name).join(', '), true);
@@ -189,6 +213,38 @@ function platteAnlegen() {
   aendern({ auswahl: { art: 'querschnitt', kennung } }, 'auswahl');
 }
 
+/**
+ * Eine neue Querschnittsanalyse -- wie die Platte nach der Vorlage des Kerns:
+ * ein Rechteck mit Stäben und einem Lastfall. Gesetzt wird nur, was der Kern
+ * nicht wissen kann: Kennung, Name und die Materialien des Projekts.
+ */
+function analyseAnlegen() {
+  const beton = zustand.projekt.materialien.find((m) => m.art === 'beton');
+  const stahl = zustand.projekt.materialien.find((m) => m.art === 'betonstahl');
+  if (!beton || !stahl) {
+    melden('Zuerst Beton und Betonstahl anlegen.', true);
+    return;
+  }
+  const vorlage = zustand.katalog?.neue_querschnittsanalyse;
+  if (!vorlage) {
+    melden('Katalog noch nicht geladen.', true);
+    return;
+  }
+  const kennung = freieKennung('a');
+  projektAendern((p) => {
+    const analyse = structuredClone(vorlage);
+    analyse.kennung = kennung;
+    p.querschnittsanalysen = p.querschnittsanalysen || [];
+    analyse.name = naechsterName('Querschnitt', p.querschnittsanalysen);
+    analyse.flaechen.forEach((f) => { f.material = beton.kennung; });
+    for (const liste of [analyse.staebe, analyse.stablinien, analyse.schubwaende]) {
+      liste.forEach((x) => { x.stahl = stahl.kennung; });
+    }
+    p.querschnittsanalysen.push(analyse);
+  });
+  aendern({ auswahl: { art: 'querschnittsanalyse', kennung } }, 'auswahl');
+}
+
 // ===========================================================================
 
 export function baumZeichnen(behaelter) {
@@ -245,6 +301,19 @@ export function baumZeichnen(behaelter) {
       : [leerzeile('keine Platte')],
   });
 
+  const analysen = p.querschnittsanalysen || [];
+  const querschnittsanalysen = kapitel({
+    schluessel: 'analysen',
+    titel: 'Querschnittsanalyse',
+    klasse: 'baum-kopf-analyse',
+    anzahl: analysen.length,
+    oben: true,
+    werkzeuge: knopf('+', 'Querschnittsanalyse hinzufügen', analyseAnlegen),
+    kinder: analysen.length
+      ? analysen.map((a) => eintrag(a, 'querschnittsanalyse'))
+      : [leerzeile('keine Querschnittsanalyse')],
+  });
+
   const blaetter = p.gleichungen || [];
   const gleichungen = kapitel({
     schluessel: 'gleichungen',
@@ -256,5 +325,5 @@ export function baumZeichnen(behaelter) {
     kinder: blaetter.length ? blaetter.map((b) => eintrag(b, 'blatt')) : [leerzeile('kein Blatt')],
   });
 
-  ersetzen(behaelter, materialien, platten, gleichungen);
+  ersetzen(behaelter, materialien, platten, querschnittsanalysen, gleichungen);
 }

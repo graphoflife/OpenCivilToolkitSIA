@@ -2,7 +2,8 @@
    OpenCivilToolkitSIA -- Oberfläche
 
    Ruhige Grundfläche, farbige Leisten. Die Farbe trägt eine Aussage: Beton
-   grau, Betonstahl kupfer, Platte blau, erfüllt grün, nicht erfüllt rot,
+   grau, Betonstahl kupfer, Platte blau, Querschnittsanalyse türkis,
+   erfüllt grün, nicht erfüllt rot,
    überschrieben ocker; Tragrichtung x orange, y gelb, beide und die Bügel
    violett; Ja/Nein-Schalter grün und rot. Wo nichts auszusagen ist, bleibt
    es unbunt.
@@ -47,6 +48,7 @@
   --beton:        #7b8794;
   --stahl:        #b8622a;
   --platte:       var(--blau);
+  --analyse:      #0d9488;
 
   /* Die Tragrichtungen: x kräftig orange, y kräftig gelb -- so gelb, dass es
      auf Weiss noch zu sehen ist. Dieselben Farben an den Lagen, an den
@@ -275,6 +277,8 @@ input.projektname:focus {
 .baum-eintrag-platte { border-left-color: var(--platte); }
 .baum-eintrag-blatt  { border-left-color: var(--beide); }
 .baum-kopf-blatt     { border-left-color: var(--beide); }
+.baum-eintrag-analyse { border-left-color: var(--analyse); }
+.baum-kopf-analyse    { border-left-color: var(--analyse); }
 
 .schloss { font-size: 11px; color: var(--schrift-zart); }
 .eigen   { font-size: 10px; font-weight: 700; color: var(--warn);
@@ -432,6 +436,9 @@ input[readonly], input:disabled, select:disabled {
 .duktilitaetszeile.ist-anteil { grid-template-columns: 46px 64px minmax(0, 1fr) auto; }
 /* Mit einem Feld hinter dem Namen: «[✓] x Max. x/d [0.35]». */
 .duktilitaetszeile.mit-feld { grid-template-columns: 46px 18px auto 72px minmax(0, 1fr); }
+/* Dasselbe ohne Richtungsmarke -- die Querschnittsanalyse rechnet in jeder
+   Richtung, und welche es sind, steht im Hinweis dahinter. */
+.duktilitaetszeile.mit-grenze { grid-template-columns: 46px auto 72px minmax(0, 1fr); }
 .duktilitaetszeile .schalter-haken .schalter-halb { width: 22px; }
 .duktilitaetszeile .postenname {
   font-size: 11.5px; font-weight: 600; color: var(--schrift-matt);
@@ -1223,3 +1230,77 @@ math-field.gl-feld::part(menu-toggle) { display: none; }
 .gl-ergebnis.ist-fehler { font-size: 11.5px; white-space: normal; color: var(--schlecht); }
 .gl-anfuegen { display: flex; gap: 6px; margin-top: 8px; }
 .gl-anfuegen .knopf-anfuegen { flex: 1; }
+
+/* ------------------------------------------------- Querschnittsanalyse -- */
+
+/* Je Material im Querschnitt eine Zeile: Name, Rechenwerte, beim Beton das
+   Gesetz. Die Kante links in der Farbe des Materials, wie im Baum. */
+.werkstoffzeile {
+  display: grid; grid-template-columns: minmax(70px, 1fr) minmax(0, 150px) minmax(0, 180px);
+  gap: 6px; align-items: center; margin-bottom: 4px;
+  padding-left: 8px; border-left: 3px solid var(--rand-stark);
+}
+.werkstoffzeile.ist-beton { border-left-color: var(--beton); }
+.werkstoffzeile.ist-stahl { border-left-color: var(--stahl); }
+.werkstoffname {
+  font-size: 12.5px; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.werkstoffzeile select { padding: 3px 6px; font-size: 12.5px; }
+@container (max-width: 420px) {
+  .werkstoffzeile { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .werkstoffname { grid-column: 1 / -1; }
+}
+
+/* Über den Lastfällen: links der Schalter «nur einachsig», rechts das Bild
+   der Vorzeichen. In der schmalen Tafel rutscht das Bild darunter. */
+.qa-kopfzeile {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px;
+  margin-bottom: 8px;
+}
+.qa-schalter { flex: 1 1 200px; min-width: 0; }
+.qa-erlaeuterung { margin: 2px 0 0; font-size: 11.5px; color: var(--schrift-zart); }
+.vorzeichen { flex: none; }
+.vorzeichenbild { display: block; }
+.vorzeichenbild text { font-size: 9.5px; fill: var(--schrift-matt); font-family: inherit; }
+.vorzeichenbild .vz-flaeche { fill: var(--flaeche-2); stroke: var(--beton); stroke-width: 1; }
+.vorzeichenbild .vz-zug { stroke: var(--richtung-x); stroke-width: 4; stroke-linecap: round; }
+.vorzeichenbild .vz-zugtext { fill: var(--richtung-x-tief); font-weight: 600; }
+.vorzeichenbild .vz-achse line { stroke: var(--schrift); stroke-width: 1.3; }
+.vorzeichenbild .vz-achse polygon { fill: var(--schrift); }
+.vorzeichenbild .vz-achstext { fill: var(--schrift); font-weight: 600; }
+.vorzeichenbild .vz-drehung { fill: none; stroke: var(--beide); stroke-width: 1.5; }
+.vorzeichenbild .vz-drehspitze { fill: var(--beide); }
+.vorzeichenbild .vz-schwerpunkt { fill: var(--schrift); }
+
+/* Ein Lastfall: oben Schalter, Name und Entfernen, darunter die Zahlen in
+   gleich breiten Spalten. Sechs Zahlen neben einem Namen passen erst in eine
+   breite Tafel -- dann stehen sie in einer Zeile. */
+.qa-fall {
+  display: grid; grid-template-columns: 38px minmax(0, 1fr) 18px;
+  gap: 3px 4px; align-items: center; margin-bottom: 6px;
+}
+.qa-fall > .qa-zahlen { grid-column: 2; grid-row: 2; }
+.qa-zahlen {
+  display: grid; gap: 4px;
+  grid-template-columns: repeat(var(--felder, 6), minmax(0, 1fr));
+}
+.qa-fall .schalter-haken .schalter-halb { width: 18px; font-size: 11px; }
+.qa-fall.ist-aus { opacity: .5; }
+.qa-fall input[type="number"] { padding: 3px 5px; text-align: right; }
+.qa-fall .ew-name { padding: 3px 6px; font-weight: 500; }
+.qa-fall.ist-kopf {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .3px;
+  color: var(--schrift-matt); margin-bottom: 2px;
+}
+.qa-fall.ist-kopf .qa-name { display: none; }
+.qa-fall.ist-kopf > .qa-zahlen { grid-row: 1; }
+.qa-fall.ist-kopf .qa-zahlen > span { text-align: right; padding-right: 4px; }
+@container (min-width: 760px) {
+  .qa-fall {
+    grid-template-columns: 38px minmax(120px, 220px) calc(var(--felder, 6) * 78px) 18px;
+    justify-content: start;
+  }
+  .qa-fall > .qa-zahlen { grid-column: 3; grid-row: 1; }
+  .qa-fall.ist-kopf .qa-name { display: block; padding-left: 7px; text-transform: uppercase; }
+}

@@ -27,7 +27,10 @@ export const zustand = {
    * gebunden, einmal geladen (siehe `formelsammlung` in bericht.js).
    */
   formelsammlung: null,
-  /** Was links ausgewählt ist: {art: 'material'|'querschnitt', kennung}. */
+  /**
+   * Was links ausgewählt ist:
+   * {art: 'material'|'querschnitt'|'querschnittsanalyse'|'blatt', kennung}.
+   */
   auswahl: null,
   /** Welcher Reiter rechts offen ist. */
   reiter: 'nachweise',
@@ -41,7 +44,7 @@ export const zustand = {
   rechnetGerade: false,
   ungespeichert: false,
   /** Aufgeklappte Kapitel im Baum. */
-  offen: new Set(['materialien', 'beton', 'betonstahl', 'platten', 'gleichungen']),
+  offen: new Set(['materialien', 'beton', 'betonstahl', 'platten', 'analysen', 'gleichungen']),
   /**
    * Je M-V-Kurve die eingestellte Normalkraft in kN.
    *
@@ -112,6 +115,12 @@ export function gewaehlterQuerschnitt() {
   return zustand.projekt.querschnitte.find((q) => q.kennung === zustand.auswahl.kennung) || null;
 }
 
+export function gewaehlteAnalyse() {
+  if (zustand.auswahl?.art !== 'querschnittsanalyse') return null;
+  return zustand.projekt.querschnittsanalysen?.find(
+    (a) => a.kennung === zustand.auswahl.kennung) || null;
+}
+
 export function gewaehltesBlatt() {
   if (zustand.auswahl?.art !== 'blatt') return null;
   return zustand.projekt.gleichungen?.find((b) => b.kennung === zustand.auswahl.kennung) || null;
@@ -125,6 +134,7 @@ export function freieKennung(vorsilbe) {
   const vergeben = new Set([
     ...zustand.projekt.materialien.map((m) => m.kennung),
     ...zustand.projekt.querschnitte.map((q) => q.kennung),
+    ...(zustand.projekt.querschnittsanalysen || []).map((a) => a.kennung),
     ...(zustand.projekt.gleichungen || []).map((b) => b.kennung),
   ]);
   let i = 1;

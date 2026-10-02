@@ -340,25 +340,28 @@ function formelsammlung() {
 }
 
 /**
- * Die Zusammenfassung: je Plattenquerschnitt eine Tabelle.
+ * Die Zusammenfassung: je Bauteil eine Tabelle -- erst die Platten, dann die
+ * Querschnittsanalysen, wie im Bericht.
  *
- * Welche Platten erscheinen, steuert der Schalter *Gesamt / Aktuelle Seite*.
+ * Welche Bauteile erscheinen, steuert der Schalter *Gesamt / Aktuelle Seite*.
  * Ist ein Material gewählt und "Aktuelle Seite" aktiv, bleibt sie leer -- ein
- * Baustoff hat keine Nachweise, und eine willkürlich herausgegriffene Platte
+ * Baustoff hat keine Nachweise, und ein willkürlich herausgegriffenes Bauteil
  * zu zeigen wäre irreführend.
  */
 function zusammenfassung(loesung, verfolgen) {
-  const querschnitte = loesung.zuordnung?.querschnitte || {};
+  const zuordnung = loesung.zuordnung || {};
+  const bauteile = { ...zuordnung.querschnitte, ...zuordnung.querschnittsanalysen };
   const raum = eingrenzung();
 
-  const gezeigt = Object.entries(querschnitte).filter(
+  const gezeigt = Object.entries(bauteile).filter(
     ([, eintrag]) => imRaum(raum, eintrag.namensraum));
   if (raum && !gezeigt.length) {
-    return leerzustand('Keine Platte gewählt.', 'Links Platte wählen oder oben «Gesamt».');
+    return leerzustand('Kein Bauteil gewählt.',
+      'Links Platte oder Querschnittsanalyse wählen oder oben «Gesamt».');
   }
   if (!gezeigt.length) {
     return el('div.blatt', {}, [
-      leerzustand('Keine Platte vorhanden.'),
+      leerzustand('Kein Bauteil vorhanden.'),
       lueckenBanner(loesung),
     ]);
   }
@@ -373,7 +376,7 @@ function zusammenfassung(loesung, verfolgen) {
 
     return el('div.blatt', {}, [
       el('div.b-titel', { text: `Zusammenfassung – ${eintrag.name}` }),
-      // Was die Platte ist und wie sie bewehrt ist, steht über der Tabelle --
+      // Was das Bauteil ist und wie es bewehrt ist, steht über der Tabelle --
       // als gewöhnliche Gleichung und gewöhnliche Tabelle, mit denselben
       // Kopierknöpfen wie alles andere.
       tabelle?.angaben ? gleichungBlock(tabelle.angaben) : null,
@@ -681,7 +684,8 @@ function neigungskurven(loesung, querschnitt) {
 
 /**
  * Der Namensraum des links gewählten Bestandteils -- `beton.b1`,
- * `querschnitt.q1`. Null, wenn nichts gewählt ist.
+ * `querschnitt.q1`, `querschnittsanalyse.a1`. Null, wenn nichts gewählt ist.
+ * Platten und Analysen heissen im Rechenwerk wie ihre Art in der Auswahl.
  */
 function raumDerAuswahl() {
   const wahl = zustand.auswahl;
@@ -690,7 +694,7 @@ function raumDerAuswahl() {
     const m = zustand.projekt.materialien.find((x) => x.kennung === wahl.kennung);
     return m ? namensraum(m.art, m.kennung) : null;
   }
-  return namensraum(wahl.art === 'blatt' ? 'gleichungen' : 'querschnitt', wahl.kennung);
+  return namensraum(wahl.art === 'blatt' ? 'gleichungen' : wahl.art, wahl.kennung);
 }
 
 /**

@@ -135,6 +135,11 @@ export const api = {
   /** Sucht die kleinste Bewehrung und gibt das geänderte Projekt zurück. */
   bewehrungSuchen: (projekt, kennung) =>
     ruf('bewehrung_suchen', { projekt, kennung }),
+  /**
+   * Die Zeichnung einer Querschnittsanalyse, wie der Kern sie sieht: Stäbe
+   * der Linien, Schwerpunkt, Zellen und jede Meldung -- ohne Nachweise.
+   */
+  geometrie: (projekt, kennung) => ruf('geometrie', { projekt, kennung }),
 };
 
 export { KernFehler };
