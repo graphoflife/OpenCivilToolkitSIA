@@ -23,7 +23,6 @@ from opencivil.core.einheiten import KN, KNM, KN_PRO_M
 from opencivil.core.rechenwerk import Loesung
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL, Spannungsblock
 from opencivil.nachweis.querkraft import NUR_KURVE
-from opencivil.nachweis.schiefe_biegung import KEIN_MOMENT
 from opencivil.projekt import Aufbau
 from opencivil.querschnitt.platte import Richtung
 
@@ -460,14 +459,15 @@ def analyse(aufbau: Aufbau, kennung: str, schnitt: Tuple[str, float] = ("M_z", 0
     Das Interaktionsdiagramm: die Flaeche aller Bruchzustaende, geschnitten
     bei ``schnitt`` -- der festen Groesse (N, M_y oder M_z) und ihrem Wert in
     kN bzw. kNm. Welche beiden anderen auf welcher Achse stehen, waehlt die
-    Oberflaeche; die Punkte tragen alle drei.
+    Oberflaeche; die Punkte tragen alle drei. Es ist das einzige
+    Interaktionsdiagramm der Analyse: je Lastfall stehen darin seine
+    Einwirkung und der Widerstand seines Nachweises, ebenfalls mit allen
+    drei Groessen.
 
-    Je Lastfall der Bruchzustand im Schnitt (Nulllinie, Druckzone, die
-    Dehnung jedes Stabs), die M-N-Linie in der Ebene des Lastfalls, bei
-    schiefer Biegung die M_y-M_z-Kurve bei N_Ed und der Schubfluss in den
-    Waenden. Was die Nachweise schon wissen, kommt aus ihren Objekten; neu
-    gerechnet werden nur die Kurven, nach denen kein Nachweis fragt -- mit
-    demselben Querschnitt, an dem nachgewiesen wurde.
+    Je Lastfall ausserdem der Bruchzustand im Schnitt (Nulllinie, Druckzone,
+    die Dehnung jedes Stabs) und der Schubfluss in den Waenden. Was die
+    Nachweise schon wissen, kommt aus ihren Objekten; neu gerechnet wird nur
+    die Flaeche, nach der kein Nachweis fragt -- an demselben Querschnitt.
 
     Die Einwirkung steht so da, wie nachgewiesen: mit der Laengszugkraft aus
     Querkraft und Torsion, wo sie zugeschaltet ist.
@@ -479,9 +479,8 @@ def analyse(aufbau: Aufbau, kennung: str, schnitt: Tuple[str, float] = ("M_z", 0
 
     faelle = []
     for erg in (biegung.ergebnisse if q is not None else []):
-        einachsig = biegung.einachsig
-        moment = abs(erg.M_y) if einachsig else math.hypot(erg.M_y, erg.M_z)
         erfuellt = erg.erfuellungsgrad >= 1.0
+        p = erg.punkt
         faelle.append({
             "name": erg.fall.name,
             "N_Ed": erg.N / 1e3,
@@ -489,9 +488,10 @@ def analyse(aufbau: Aufbau, kennung: str, schnitt: Tuple[str, float] = ("M_z", 0
             "M_z_Ed": erg.M_z / 1e3,
             "erfuellt": erfuellt,
             "grad_text": grad_als_text(erg.erfuellungsgrad, erfuellt),
-            "mn": _mn_linie(q, erg, einachsig, moment),
-            "kontur": None if einachsig else _kontur(q, erg, moment),
-            "bruch": _bruch(q, bauteil, erg.punkt) if erg.punkt is not None else None,
+            # Der Bruchzustand, gegen den der Nachweis misst -- bei N_Ed, in
+            # der Richtung des Moments. Ohne Moment gibt es keinen.
+            "widerstand": None if p is None else _als_kn([(p.N, p.M_y, p.M_z)])[0],
+            "bruch": _bruch(q, bauteil, p) if p is not None else None,
             "schub": _schubfluss(schub, erg.fall) if schub is not None else None,
         })
     einachsig = bool(biegung.einachsig) if biegung is not None else False
@@ -554,50 +554,6 @@ def _zeichnung(bauteil) -> dict:
                    for w in bauteil.waende],
         "schwerpunkt": [bauteil.brutto.y_S, bauteil.brutto.z_S],
     }
-
-
-def _mn_linie(q, erg, einachsig: bool, moment: float) -> dict:
-    """
-    Die M-N-Linie in der Ebene des Lastfalls.
-
-    Einachsig -- oder ohne Moment -- ist das die Linie um y, rechts Zug unten,
-    links Zug oben, wie bei der Platte. Schief ist es der Faecher bei der
-    Neigung der Nulllinie, die der Bruchzustand des Lastfalls hat, und der
-    gegenueberliegende; aufgetragen ist das Moment in der Richtung der
-    Einwirkung. Bei N_Ed liegt darauf genau der Widerstand des Nachweises,
-    bei anderen N gilt die Linie fuer diese Neigung.
-    """
-    if einachsig or moment <= KEIN_MOMENT:
-        psi, achse = -math.pi / 2.0, (1.0, 0.0)
-    else:
-        psi = erg.punkt.psi if erg.punkt is not None else q.neigung_fuer(erg.M_y, erg.M_z)
-        achse = (erg.M_y / moment, erg.M_z / moment)
-
-    def m(p) -> float:
-        return (p.M_y * achse[0] + p.M_z * achse[1]) / 1e3
-
-    return {
-        "punkte": [{"N": p.N / 1e3, "M": m(p)} for p in _faecherpaar(q, psi)],
-        "einwirkung": {"N": erg.N / 1e3,
-                       "M": (erg.M_y * achse[0] + erg.M_z * achse[1]) / 1e3},
-        "widerstand": (None if erg.punkt is None
-                       else {"N": erg.punkt.N / 1e3, "M": m(erg.punkt)}),
-        "neigung": math.degrees(psi),
-        "richtung": None if achse == (1.0, 0.0) else math.degrees(math.atan2(achse[1], achse[0])),
-    }
-
-
-def _kontur(q, erg, moment: float) -> Optional[dict]:
-    """Der Widerstand rundum bei N_Ed: je Neigung der Nulllinie ein Paar M_y, M_z."""
-    if moment <= KEIN_MOMENT:
-        return None
-    zug, druck = q.normalkraft_grenzen()
-    if not druck < erg.N < zug:
-        return None
-    punkte = [{"M_y": M_y / 1e3, "M_z": M_z / 1e3} for _, M_y, M_z in q.schnitt("N", erg.N)]
-    return {"N": erg.N / 1e3, "punkte": punkte,
-            "widerstand": (None if erg.punkt is None
-                           else {"M_y": erg.punkt.M_y / 1e3, "M_z": erg.punkt.M_z / 1e3})}
 
 
 def _halbebene(punkte: Sequence[Punkt], innen: Callable[[Punkt], float]) -> List[List[float]]:

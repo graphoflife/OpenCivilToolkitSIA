@@ -1,29 +1,29 @@
 /**
  * qa_diagramme.js -- die Diagramme einer Querschnittsanalyse.
  *
- * Oben das Interaktionsdiagramm: die Fläche aller Bruchzustände im Raum
- * (N, M_y, M_z), geschnitten bei einem festen Wert einer Grösse. Welche zwei
- * auf den Achsen stehen, wird gewählt; die dritte bekommt ihren Wert im
- * Zahlenfeld. Lastfälle in dieser Ebene stehen kräftig, die übrigen blass.
+ * Oben das Interaktionsdiagramm -- das einzige: die Fläche aller
+ * Bruchzustände im Raum (N, M_y, M_z), geschnitten bei einem festen Wert
+ * einer Grösse. Welche zwei auf den Achsen stehen, wird gewählt; die dritte
+ * bekommt ihren Wert im Zahlenfeld. Lastfälle in dieser Ebene stehen
+ * kräftig, die übrigen blass; liegt auch der Widerstand des Nachweises in
+ * ihr, führt ein gestrichelter Weg dorthin. Ein Klick auf einen Lastfall
+ * legt den Schnitt durch ihn.
  *
  * Darunter je Lastfall, umschaltbar:
  *
  *   Bruchzustand    der Schnitt mit Nulllinie, Druckzone und der Dehnung
  *                   jedes Stabs -- gezogen kupfer, gedrückt blau;
- *   M-N             die Linie in der Ebene des Lastfalls, mit Einwirkung
- *                   und Widerstand bei N_Ed;
- *   M_y-M_z         bei schiefer Biegung: der Widerstand rundum bei N_Ed;
  *   Schubfluss      je Stück einer Wand ein Pfeil, so lang wie der Fluss.
  *
  * Die Daten kommen aus einer eigenen Anfrage (`analysediagramme`): die
- * Kurven brauchen Bruchzustände, die kein Nachweis braucht, und sollen nicht
+ * Fläche braucht Bruchzustände, die kein Nachweis braucht, und soll nicht
  * jede Rechnung verlangsamen. Gefragt wird erst, wenn die Rechnung zur
  * aktuellen Eingabe durch ist -- dann liegen die Nachweise im Speicher des
- * Kerns, und es kommen nur die Kurven dazu. Bis dahin bleiben die alten
+ * Kerns, und es kommt nur die Fläche dazu. Bis dahin bleiben die alten
  * Bilder stehen, blass.
  *
- * Gerechnet wird hier nichts: Nulllinie, Druckzone, Dehnungen, Flüsse und
- * Kurven kommen fertig aus dem Kern.
+ * Gerechnet wird hier nichts: Nulllinie, Druckzone, Dehnungen, Flüsse, die
+ * Fläche und die Widerstände kommen fertig aus dem Kern.
  */
 
 import { achsenkreuz, NR } from './achsen.js';
@@ -57,6 +57,14 @@ const GROESSE = {
 };
 
 /**
+ * Wie nah ein Wert dem festen kommen muss, damit sein Punkt in der Ebene
+ * liegt -- ein Tausendstel kN bzw. kNm, weit unter dem, was man sieht. Der
+ * Widerstand des Nachweises ist gesucht, nicht eingetippt: er trifft den
+ * Wert nur bis auf die Schranke der Suche.
+ */
+const IN_DER_EBENE = 1e-3;
+
+/**
  * Kennung -> was das Interaktionsdiagramm zeigt: die Achsen und je Grösse
  * ihr Wert, wenn sie die feste ist. Ein Wert bleibt stehen, wenn die Achsen
  * wechseln -- wer zurückschaltet, findet ihn wieder.
@@ -84,7 +92,7 @@ function abdruckVon(kennung) {
 /**
  * Fragt nach den Diagrammen -- aber erst, wenn gerade nicht gerechnet wird.
  * Läuft die Rechnung noch, wartet die Anfrage; danach liegen die Nachweise
- * im Speicher des Kerns, und es kommen nur die Kurven dazu.
+ * im Speicher des Kerns, und es kommt nur die Fläche dazu.
  */
 function anfordern(kennung, eintrag, verzug = 600) {
   clearTimeout(eintrag.uhr);
@@ -332,20 +340,38 @@ function schnittsteuerung(kennung, einachsig) {
   ]);
 }
 
+function bereich(werte, spiel = 0.08) {
+  const min = Math.min(...werte);
+  const max = Math.max(...werte);
+  const spanne = (max - min) || 1;
+  return [min - spanne * spiel, max + spanne * spiel];
+}
+
 /**
  * Das Bild: der Schnitt durch die Fläche, dazu jeder Lastfall. In dieser
  * Ebene liegt einer, wenn seine feste Grösse den Wert hat -- dann kräftig,
  * grün oder rot wie sein Nachweis. Sonst blass: er gehört zu einem anderen
- * Schnitt. Zwei Momente auf den Achsen bekommen denselben Massstab.
+ * Schnitt. Liegt auch sein Widerstand in der Ebene, zeigt ein gestrichelter
+ * Weg, wie der Nachweis gemessen hat: bei N_Ed, in Richtung des Moments.
+ * Zwei Momente auf den Achsen bekommen denselben Massstab.
  */
-function interaktionsbild(i, faelle, x, y, einachsig) {
+function interaktionsbild(kennung, i, faelle, x, y, einachsig) {
   const wert = (f, g) => f[GROESSE[g].feld];
   const punkte = i.punkte.map((p) => [p[x], p[y]]);
   if (!punkte.length) {
     return leerzustand(`Bei ${i.fest} = ${i.wert} ${GROESSE[i.fest].einheit} gibt es keinen Bruchzustand`,
       'Die Ebene trifft die Fläche der Widerstände nicht.');
   }
-  const passt = (f) => einachsig || Math.abs(wert(f, i.fest) - i.wert) < 1e-6;
+  const passt = (f) => einachsig || Math.abs(wert(f, i.fest) - i.wert) <= IN_DER_EBENE;
+  const mitWeg = (f) => passt(f) && f.widerstand
+    && (einachsig || Math.abs(f.widerstand[i.fest] - i.wert) <= IN_DER_EBENE);
+  // Ein Klick legt den Schnitt durch den Lastfall. Einachsig gibt es nur
+  // eine Ebene, und in ihr liegen alle.
+  const durchLegen = (f) => {
+    if (einachsig) return;
+    wahlVon(kennung).werte[i.fest] = wert(f, i.fest);
+    aendern({}, 'diagramm');
+  };
   const alleX = [...punkte.map((q) => q[0]), ...faelle.map((f) => wert(f, x))];
   const alleY = [...punkte.map((q) => q[1]), ...faelle.map((f) => wert(f, y))];
   let rx = bereich(alleX);
@@ -371,15 +397,28 @@ function interaktionsbild(i, faelle, x, y, einachsig) {
   for (const f of [...faelle].sort((a, b) => passt(a) - passt(b))) {
     const drin = passt(f);
     const farbe = drin ? (f.erfuellt ? GUT : SCHLECHT) : '#8895a8';
+    if (mitWeg(f)) {
+      g.append(svgEl('line', {
+        x1: sx(wert(f, x)), y1: sy(wert(f, y)), x2: sx(f.widerstand[x]), y2: sy(f.widerstand[y]),
+        stroke: farbe, 'stroke-width': 1.4, 'stroke-dasharray': '5 3', opacity: 0.75,
+      }));
+      g.append(svgEl('circle', {
+        cx: sx(f.widerstand[x]), cy: sy(f.widerstand[y]), r: 4,
+        fill: '#fff', stroke: farbe, 'stroke-width': 1.6,
+      }));
+    }
     const punkt = svgEl('circle', {
       cx: sx(wert(f, x)), cy: sy(wert(f, y)), r: drin ? 6 : 5,
       fill: farbe, stroke: '#fff', 'stroke-width': 2, opacity: drin ? 1 : 0.45,
+      style: einachsig ? null : 'cursor: pointer',
     });
+    punkt.addEventListener('click', () => durchLegen(f));
     const t = svgEl('title');
     t.textContent = `${f.name}\nN = ${f.N_Ed.toFixed(1)} kN, M_y = ${f.M_y_Ed.toFixed(1)} kNm, `
       + `M_z = ${f.M_z_Ed.toFixed(1)} kNm\n`
       + (drin ? `α_eff = ${f.grad_text} – ${f.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`
-        : `liegt nicht in dieser Ebene (${i.fest} = ${wert(f, i.fest).toFixed(1)})`);
+        : `liegt nicht in dieser Ebene (${i.fest} = ${wert(f, i.fest).toFixed(1)})`)
+      + (einachsig ? '' : `\nKlick: Schnitt durch diesen Lastfall (${i.fest} = ${wert(f, i.fest).toFixed(1)})`);
     punkt.append(t);
     g.append(punkt);
     g.append(text(sx(wert(f, x)) + 9, sy(wert(f, y)) - 8, f.name, {
@@ -395,7 +434,8 @@ function interaktionsbild(i, faelle, x, y, einachsig) {
       el('span', {}, [el('i', { style: { background: GUT } }), 'erfüllt']),
       el('span', {}, [el('i', { style: { background: SCHLECHT } }), 'nicht erfüllt']),
       einachsig ? null : el('span', {}, [el('i', { style: { background: '#8895a8', opacity: 0.45 } }),
-        `blass: anderes ${i.fest}`]),
+        `blass: anderes ${i.fest} – Klick legt den Schnitt durch ihn`]),
+      faelle.some(mitWeg) ? el('span', { text: '– – –  Weg zum Widerstand des Nachweises' }) : null,
     ]),
   ]);
 }
@@ -408,106 +448,9 @@ function interaktionsblatt(kennung, name, daten, veraltet) {
     el('div.b-titel', { text: `Interaktionsdiagramm – ${name}` }),
     schnittsteuerung(kennung, daten.einachsig),
     el('div', { class: veraltet ? 'ist-veraltet' : '' }, [
-      daten.interaktion ? interaktionsbild(daten.interaktion, daten.faelle, x, y, daten.einachsig)
+      daten.interaktion
+        ? interaktionsbild(kennung, daten.interaktion, daten.faelle, x, y, daten.einachsig)
         : leerzustand('Kein Interaktionsdiagramm.'),
-    ]),
-  ]);
-}
-
-// ===========================================================================
-// Kurven
-// ===========================================================================
-
-function bereich(werte, spiel = 0.08) {
-  const min = Math.min(...werte);
-  const max = Math.max(...werte);
-  const spanne = (max - min) || 1;
-  return [min - spanne * spiel, max + spanne * spiel];
-}
-
-/** Einwirkung und Widerstand bei N_Ed, mit dem Weg dazwischen. */
-function bemessungspunkt(daten, x, y, ed, rd, fall) {
-  const farbe = fall.erfuellt ? GUT : SCHLECHT;
-  if (rd) {
-    daten.append(svgEl('line', {
-      x1: x(ed[0]), y1: y(ed[1]), x2: x(rd[0]), y2: y(rd[1]),
-      stroke: farbe, 'stroke-width': 1.4, 'stroke-dasharray': '5 3', opacity: 0.75,
-    }));
-    daten.append(svgEl('circle', {
-      cx: x(rd[0]), cy: y(rd[1]), r: 4, fill: '#fff', stroke: farbe, 'stroke-width': 1.6,
-    }));
-  }
-  const punkt = svgEl('circle', {
-    cx: x(ed[0]), cy: y(ed[1]), r: 6, fill: farbe, stroke: '#fff', 'stroke-width': 2,
-  });
-  const t = svgEl('title');
-  t.textContent = `${fall.name}\nα_eff = ${fall.grad_text} – ${fall.erfuellt ? 'erfüllt' : 'NICHT erfüllt'}`;
-  punkt.append(t);
-  daten.append(punkt);
-  daten.append(text(x(ed[0]) + 9, y(ed[1]) - 8, fall.name, { 'font-weight': 600, fill: farbe }));
-}
-
-/** Die M-N-Linie in der Ebene des Lastfalls. */
-function mnBild(daten, fall) {
-  const mn = fall.mn;
-  const ms = [...mn.punkte.map((p) => p.M), mn.einwirkung.M];
-  const ns = [...mn.punkte.map((p) => p.N), mn.einwirkung.N];
-  const schief = mn.richtung !== null && mn.richtung !== undefined;
-  const { svg, daten: g, x, y } = achsenkreuz({
-    breite: BREITE, hoehe: HOEHE, rand: RAND,
-    attribute: { class: 'mn', xmlns: NR, role: 'img', 'aria-label': `M-N ${fall.name}` },
-    x: {
-      bereich: bereich(ms), teilung: {}, null: true,
-      titel: schief ? 'M in Richtung der Einwirkung [kNm]' : GROESSE.M_y.titel,
-    },
-    y: { bereich: bereich(ns), teilung: {}, null: true, titel: GROESSE.N.titel },
-  });
-  g.append(svgEl('polygon', {
-    points: mn.punkte.map((p) => `${x(p.M).toFixed(2)},${y(p.N).toFixed(2)}`).join(' '),
-    fill: 'rgba(31,95,168,.07)', stroke: '#1f5fa8', 'stroke-width': 2, 'stroke-linejoin': 'round',
-  }));
-  bemessungspunkt(g, x, y, [mn.einwirkung.M, mn.einwirkung.N],
-    mn.widerstand ? [mn.widerstand.M, mn.widerstand.N] : null, fall);
-  return el('div.diagramm-huelle', {}, [
-    svg,
-    el('div.mn-legende', {}, [
-      el('span', {}, [el('i', { style: { background: '#1f5fa8' } }),
-        schief ? `Dehnungsfächer bei ψ = ${mn.neigung.toFixed(1)}° und gegenüber`
-          : 'Dehnungsfächer, Nulllinie waagrecht']),
-      el('span', {}, [el('i', { style: { background: fall.erfuellt ? GUT : SCHLECHT } }),
-        `Einwirkung, α_eff = ${fall.grad_text}`]),
-      schief ? el('span', { text: `Momentenrichtung ${mn.richtung.toFixed(1)}° zur y-Achse` }) : null,
-    ]),
-  ]);
-}
-
-/**
- * Der Widerstand rundum bei N_Ed -- M_y waagrecht, M_z senkrecht, beide im
- * selben Massstab: ein Kreis bleibt ein Kreis.
- */
-function konturBild(daten, fall) {
-  const k = fall.kontur;
-  const alle = [...k.punkte.flatMap((p) => [p.M_y, p.M_z]), fall.M_y_Ed, fall.M_z_Ed];
-  const r = Math.max(...alle.map(Math.abs)) * 1.12 || 1;
-  const seite = 470;
-  const { svg, daten: g, x, y } = achsenkreuz({
-    breite: seite + 52, hoehe: seite, rand: { oben: 22, rechts: 22, unten: 46, links: 74 },
-    attribute: { class: 'mn', xmlns: NR, role: 'img', 'aria-label': `M_y-M_z ${fall.name}` },
-    x: { bereich: [-r, r], teilung: {}, null: true, titel: 'M_y [kNm]' },
-    y: { bereich: [-r, r], teilung: {}, null: true, titel: 'M_z [kNm]' },
-  });
-  g.append(svgEl('polygon', {
-    points: k.punkte.map((p) => `${x(p.M_y).toFixed(2)},${y(p.M_z).toFixed(2)}`).join(' '),
-    fill: 'rgba(31,95,168,.07)', stroke: '#1f5fa8', 'stroke-width': 2, 'stroke-linejoin': 'round',
-  }));
-  bemessungspunkt(g, x, y, [fall.M_y_Ed, fall.M_z_Ed],
-    k.widerstand ? [k.widerstand.M_y, k.widerstand.M_z] : null, fall);
-  return el('div.diagramm-huelle', {}, [
-    svg,
-    el('div.mn-legende', {}, [
-      el('span', {}, [el('i', { style: { background: '#1f5fa8' } }),
-        `Widerstand bei N = ${k.N.toFixed(1)} kN, je Neigung der Nulllinie`]),
-      el('span', { text: 'M_y > 0: Zug unten · M_z > 0: Zug links' }),
     ]),
   ]);
 }
@@ -573,8 +516,6 @@ export function analyseBlaetter(kennung, name) {
     interaktion,
     kopf,
     gewaehlt.bruch ? blatt('Bruchzustand', bruchbild(daten, gewaehlt)) : null,
-    blatt('M-N in der Ebene des Lastfalls', mnBild(daten, gewaehlt)),
-    gewaehlt.kontur ? blatt('M_y-M_z bei N_Ed', konturBild(daten, gewaehlt)) : null,
     gewaehlt.schub ? blatt('Schubfluss', schubbild(daten, gewaehlt)) : null,
   ].filter(Boolean);
 }

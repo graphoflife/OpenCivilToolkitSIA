@@ -165,10 +165,10 @@ einachsig» und die Nachweisschalter.
 * *Diagramme* -- Plattenquerschnitt, M-N-Resistenzlinie mit den
   Bemessungspunkten (die gestrichelte Strecke zeigt den Weg, in dem der
   Erfüllungsgrad gemessen wurde), Querkraftkurven, Spannungs-Dehnungs-Bilder;
-  bei einer Querschnittsanalyse das Interaktionsdiagramm mit wählbaren
-  Achsen (zwei von N, M_y, M_z, die dritte mit festem Wert), dazu je Lastfall
-  der Bruchzustand im Schnitt, die M-N-Linie in der Ebene des Lastfalls, die
-  M_y-M_z-Kurve bei N_Ed und der Schubfluss in den Wänden
+  bei einer Querschnittsanalyse ein einziges Interaktionsdiagramm mit
+  wählbaren Achsen (zwei von N, M_y, M_z, die dritte mit festem Wert; ein
+  Klick auf einen Lastfall legt den Schnitt durch ihn), dazu je Lastfall der
+  Bruchzustand im Schnitt und der Schubfluss in den Wänden
 * *Herleitung* -- die Mitschrift, Formel für Formel, mit Normstelle
 
 **Kopieren nach Word, LaTeX und Markdown:** jede Formel und jede Tabelle hat

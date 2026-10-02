@@ -359,28 +359,38 @@ class TestDiagramme(unittest.TestCase):
         self.assertEqual(len(z["waende"]), 4)
         self.assertEqual(z["schwerpunkt"], [150.0, 300.0])
 
-    def test_die_mn_linie_geht_durch_den_widerstand(self):
-        """Bei N_Ed liegt auf der Linie genau, was der Nachweis als M_Rd hat."""
-        mn = self.fall["mn"]
-        self.assertAlmostEqual(mn["einwirkung"]["M"], 150.0)
-        self.assertAlmostEqual(mn["widerstand"]["N"], 0.0, places=3)
-        self.assertAlmostEqual(mn["widerstand"]["M"], 211.8, places=1)
-        # Die Linie umschliesst den Nullpunkt: Zug oben und unten, Druck dazwischen.
-        ns = [p["N"] for p in mn["punkte"]]
-        ms = [p["M"] for p in mn["punkte"]]
-        self.assertLess(min(ns), 0.0)
-        self.assertGreater(max(ns), 0.0)
-        self.assertLess(min(ms), 0.0)
-        self.assertGreater(max(ms), 0.0)
+    def test_der_widerstand_des_nachweises(self):
+        """Je Lastfall der Bruchzustand, gegen den gemessen wurde -- alle drei Grössen."""
+        w = self.fall["widerstand"]
+        self.assertAlmostEqual(w["N"], 0.0, places=3)
+        self.assertAlmostEqual(w["M_y"], 211.8, places=1)
+        self.assertAlmostEqual(w["M_z"], 0.0, places=3)
 
-    def test_die_kurve_bei_n_ed_trifft_die_einachsige_richtung(self):
-        """Rundum bei N_Ed: Zug unten ergibt dasselbe M_y wie der Nachweis."""
-        kontur = self.fall["kontur"]
-        self.assertEqual(len(kontur["punkte"]), 72)
-        groesstes = max(p["M_y"] for p in kontur["punkte"])
-        self.assertAlmostEqual(groesstes, 211.8, places=1)
+    def test_der_widerstand_liegt_auf_dem_diagramm(self):
+        """
+        Bei M_z = 0 liegt er auf dem rechten Ast; der Ast bei N = 0 ist der
+        Widerstand des Nachweises. Und es gibt nur noch dieses eine
+        Interaktionsdiagramm -- je Lastfall keine eigene Linie mehr.
+        """
+        rechts = [p for p in self.d["interaktion"]["punkte"] if p["M_y"] > 0]
+        oben = min((p for p in rechts if p["N"] >= 0), key=lambda p: p["N"])
+        unten = max((p for p in rechts if p["N"] < 0), key=lambda p: p["N"])
+        t = oben["N"] / (oben["N"] - unten["N"])
+        self.assertAlmostEqual(oben["M_y"] + t * (unten["M_y"] - oben["M_y"]),
+                               self.fall["widerstand"]["M_y"], delta=0.5)
+        self.assertNotIn("mn", self.fall)
+        self.assertNotIn("kontur", self.fall)
+
+    def test_bei_festem_n_rundum_wie_der_nachweis(self):
+        """Bei N = N_Ed geschnitten: Zug unten ergibt dasselbe M_y wie der Nachweis."""
+        i = dienst.bearbeite("analysediagramme", {
+            "projekt": Projekt.beispiel().als_dict(), "kennung": "a1",
+            "schnitt": {"fest": "N", "wert": 0.0}}).daten["diagramme"]["interaktion"]
+        self.assertEqual(len(i["punkte"]), 72)
+        self.assertAlmostEqual(max(p["M_y"] for p in i["punkte"]),
+                               self.fall["widerstand"]["M_y"], places=6)
         # Symmetrisch: links wie rechts gleich viel M_z.
-        m_z = [p["M_z"] for p in kontur["punkte"]]
+        m_z = [p["M_z"] for p in i["punkte"]]
         self.assertAlmostEqual(max(m_z), -min(m_z), places=3)
 
     def test_der_bruchzustand_im_schnitt(self):
@@ -416,14 +426,14 @@ class TestDiagramme(unittest.TestCase):
         schwach = min(schub["waende"], key=lambda w: w["v_Rd"] / w["q_max"])
         self.assertEqual(schwach["grad_text"], "1.75")
 
-    def test_einachsig_ohne_kurve(self):
+    def test_einachsig(self):
         projekt = Projekt.beispiel()
         projekt.querschnittsanalysen[0].einachsig = True
         d = dienst.bearbeite("analysediagramme", {
             "projekt": projekt.als_dict(), "kennung": "a1"}).daten["diagramme"]
         self.assertTrue(d["einachsig"])
-        self.assertIsNone(d["faelle"][0]["kontur"])
-        self.assertAlmostEqual(d["faelle"][0]["mn"]["widerstand"]["M"], 211.8, places=1)
+        self.assertIsNone(d["interaktion"]["fest"])
+        self.assertAlmostEqual(d["faelle"][0]["widerstand"]["M_y"], 211.8, places=1)
 
     def test_unbekannte_analyse(self):
         antwort = dienst.bearbeite("analysediagramme", {

@@ -44,6 +44,38 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-02 · Nur noch ein Interaktionsdiagramm
+
+Wunsch: es soll nur ein Interaktionsdiagramm sichtbar sein.
+
+Vorher standen bei einer Analyse drei Bilder derselben Art:
+- das Interaktionsdiagramm mit wählbaren Achsen;
+- je Lastfall die M-N-Linie in seiner Ebene;
+- je Lastfall die M_y-M_z-Kurve bei N_Ed.
+
+Die beiden je Lastfall sind weg. Was nur sie zeigten -- wo der Nachweis
+seinen Widerstand misst --, steht jetzt im einen Diagramm:
+* **Der Widerstand reist mit.** Jeder Lastfall bringt den Bruchzustand
+  seines Nachweises mit, mit N, M_y und M_z. Liegen Einwirkung und
+  Widerstand beide in der gewählten Ebene, führt ein gestrichelter Weg vom
+  einen zum anderen. Am Unterzug, M_y über N bei M_z = 0: von «Feld»
+  (150 kNm) waagrecht zu 211.8 kNm auf der Linie.
+* **Ein Klick legt den Schnitt durch einen Lastfall.** Bei einem schiefen
+  Fall misst der Nachweis bei N_Ed; ein Klick in der Ansicht M_y über M_z
+  setzt N auf sein N_Ed, und der Weg erscheint. Kein Abtippen von Werten
+  mit Längszugkraft.
+
+Bruchzustand und Schubfluss sind keine Interaktionsdiagramme und bleiben.
+
+Nachgeprüft:
+* **Tests:** Der Widerstand liegt auf dem Diagramm. Bei N = N_Ed ergibt der
+  Schnitt rundum dasselbe M_y wie der Nachweis. Je Lastfall gibt es keine
+  eigene Linie mehr.
+* **Im Browser:** Weg sichtbar; ein Klick auf einen blassen Fall legt den
+  Schnitt durch ihn.
+
+---
+
 ## 2026-10-02 · Interaktionsdiagramm mit wählbaren Achsen
 
 Wunsch: ein M-N-Interaktionsdiagramm auch für die Querschnittsanalyse, mit

@@ -66,7 +66,7 @@
     "opencivil/web/__init__.py": "e3b0c44298fc",
     "opencivil/web/api.py": "cf9a35176705",
     "opencivil/web/bruecke.py": "24e1fcb0cd8c",
-    "opencivil/web/diagrammdaten.py": "0faf3f9e9c04",
+    "opencivil/web/diagrammdaten.py": "ab3146a3bf56",
     "opencivil/web/dienst.py": "ecb4707196b3",
     "opencivil/web/server.py": "43665395faca",
     "opencivil/web/speicher.py": "d000d8bff113"
