@@ -42,6 +42,13 @@ export const zustand = {
   /** Ob im Betondiagramm der vereinfachte Spannungsblock mitgezeichnet wird. */
   zeigeVereinfacht: true,
   rechnetGerade: false,
+  /**
+   * Warum die letzte Eingabe sich nicht rechnen liess -- oder null. Die
+   * Lösung bleibt dann die von davor, und die rechte Tafel sagt es dazu:
+   * ein Bauteil mit unfertiger Zeichnung soll nicht die Zahlen von vorher
+   * als gültig stehen lassen.
+   */
+  rechenfehler: null,
   ungespeichert: false,
   /** Aufgeklappte Kapitel im Baum. */
   offen: new Set(['materialien', 'beton', 'betonstahl', 'platten', 'analysen', 'gleichungen']),

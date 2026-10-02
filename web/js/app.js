@@ -54,7 +54,9 @@ async function einDurchgang() {
       : zustand.reiter === 'herleitung' ? await teillauf(v) : { ...v, loesung: null };
     // Inzwischen aufgehoben oder ein anderes Auge gewählt: das gilt.
     aendern({
-      loesung: antwort, verfolgung: zustand.verfolgung === v ? verfolgung : zustand.verfolgung,
+      loesung: antwort,
+      verfolgung: zustand.verfolgung === v ? verfolgung : zustand.verfolgung,
+      rechenfehler: null,
     }, 'loesung');
 
     if (!antwort.vollstaendig) {
@@ -74,6 +76,7 @@ async function einDurchgang() {
   } catch (fehler) {
     zustandsanzeige('Fehler', 'ist-fehler');
     melden(fehler.message, true);
+    aendern({ rechenfehler: fehler.message }, 'rechenfehler');
     if (fehler instanceof KernFehler && fehler.spur) console.error(fehler.spur);
   }
 }

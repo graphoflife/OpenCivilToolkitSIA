@@ -734,8 +734,17 @@ export function berichtZeichnen(behaelter, { verfolgen }) {
   };
   const sicht = sichten[zustand.reiter] || sichten.nachweise;
   // Die Formelsammlung hängt an keiner Rechnung, die übrigen Reiter schon.
-  if (!loesung && sicht !== formelsammlung) {
-    return ersetzen(behaelter, leerzustand('Noch nichts gerechnet.', 'Oben «Rechnen».'));
+  if (sicht === formelsammlung) return ersetzen(behaelter, sicht());
+  // Liess sich die letzte Eingabe nicht rechnen, steht es über allem: was
+  // darunter steht, gehört zur Eingabe davor.
+  const fehler = zustand.rechenfehler
+    ? el('div.hinweis.hinweis-warnung', {}, [
+      el('b', { text: 'Nicht gerechnet: ' }), zustand.rechenfehler,
+      loesung ? ' Darunter steht das Ergebnis zur Eingabe davor.' : '',
+    ])
+    : null;
+  if (!loesung) {
+    return ersetzen(behaelter, fehler, leerzustand('Noch nichts gerechnet.', 'Oben «Rechnen».'));
   }
-  return ersetzen(behaelter, sicht());
+  return ersetzen(behaelter, fehler, sicht());
 }
