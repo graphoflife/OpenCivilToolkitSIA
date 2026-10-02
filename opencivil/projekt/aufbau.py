@@ -57,6 +57,12 @@ from opencivil.projekt.eintraege import (
 )
 from opencivil.projekt.lesen import ProjektFehler, schalter_aus
 from opencivil.projekt.platte import QuerschnittEintrag
+from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
+from opencivil.nachweis.richtungsnachweise import DuktilitaetQA, SproedesVersagenQA
+from opencivil.nachweis.schiefe_biegung import SchiefeBiegung
+from opencivil.nachweis.schubwandnachweis import Schubwandnachweis
+from opencivil.querschnitt.analyse import Flaechenteil, Lastfall, Querschnittsanalyse
+from opencivil.querschnitt.geometrie import GeometrieFehler
 
 if TYPE_CHECKING:
     from opencivil.projekt.projekt import Projekt
@@ -128,6 +134,15 @@ class Aufbau:
     querschnittsanalysen: Dict[str, Any] = field(default_factory=dict)
     """Die gezeichneten Querschnitte, nach Kennung -- Bauteile wie die Platten."""
 
+    qa_biegung: Dict[str, SchiefeBiegung] = field(default_factory=dict)
+    """Biegung und Normalkraft je Querschnittsanalyse, nach ihrer Kennung."""
+
+    qa_schub: Dict[str, Schubwandnachweis] = field(default_factory=dict)
+    """Querkraft und Torsion je Querschnittsanalyse."""
+
+    qa_duktilitaet: Dict[str, DuktilitaetQA] = field(default_factory=dict)
+    qa_sproede: Dict[str, SproedesVersagenQA] = field(default_factory=dict)
+
     warnungen: List[str] = field(default_factory=list)
 
     #: Die Felder, in denen die Nachweise einer Platte stehen -- die eine
@@ -139,7 +154,8 @@ class Aufbau:
     #: finden.
     NACHWEISFELDER = ("nachweise", "querkraft", "duktilitaet", "fehlende",
                       "rissnormalkraft", "sproede", "zwaengung_biegung",
-                      "spannung_riss", "spannung", "knicken")
+                      "spannung_riss", "spannung", "knicken",
+                      "qa_biegung", "qa_schub", "qa_duktilitaet", "qa_sproede")
 
     def nachweise_je_feld(self):
         """Alle Nachweise, Feld fuer Feld und in der Reihenfolge der Liste."""
@@ -189,7 +205,13 @@ class Aufbau:
         return [z for z in alle if any(z.startswith(f"{r}.") for r in raeume)]
 
     def eckwertziele(self) -> List[str]:
-        return [d.id for n in self.nachweise.values() for d in n.d_eckwerte.values()]
+        """
+        Was ein Bauteil auch ohne Lastfall rechnet: die Eckwerte seines
+        M-N-Nachweises. Eine Analyse ohne Lastfall zeigt so trotzdem ihren
+        Querschnitt und ihre reine Normalkraft.
+        """
+        return [d.id for n in list(self.nachweise.values()) + list(self.qa_biegung.values())
+                for d in n.d_eckwerte.values()]
 
     def bauteile(self) -> List["Bauteilkopf"]:
         """
@@ -343,6 +365,9 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
     for eintrag in projekt.querschnitte:
         _platte(eintrag, aufbau, eintragen, schnell=schnell)
 
+    for eintrag in projekt.querschnittsanalysen:
+        _querschnittsanalyse(eintrag, aufbau, eintragen)
+
     # Die Bewehrungssuche braucht keine Blätter -- sie liest nur Urteile.
     if not schnell:
         for eintrag in projekt.gleichungen:
@@ -433,6 +458,98 @@ def _platte(eintrag: QuerschnittEintrag, aufbau: Aufbau, eintragen: Eintragen,
         aufbau.warnungen.append(
             f"Platte '{eintrag.name}': keine Schnittgrössen → kein "
             f"Tragsicherheitsnachweis.")
+
+
+def _querschnittsanalyse(eintrag: QuerschnittsanalyseEintrag, aufbau: Aufbau,
+                         eintragen: Eintragen) -> None:
+    """
+    Ein gezeichneter Querschnitt: das Bauteil und seine Nachweise.
+
+    Biegung und Normalkraft immer -- ihre Eckwerte gehoeren dem Querschnitt.
+    Querkraft und Torsion, sobald ein Lastfall sie hat oder die
+    Laengszugkraft zaehlt. Duktilitaet und sproedes Versagen immer, still,
+    wenn ausgeschaltet -- wie bei der Platte.
+    """
+    analyse = _analyse(eintrag, aufbau.baustoffe)
+    aufbau.querschnittsanalysen[eintrag.kennung] = analyse
+    analyse.ins_rechenwerk(aufbau.werk)
+
+    kN, kNm = 1e3, 1e3
+    lastfaelle = [
+        Lastfall(name=l.name, N=l.N_Ed * kN, M_y=l.M_y_Ed * kNm, M_z=l.M_z_Ed * kNm,
+                 V_y=l.V_y_Ed * kN, V_z=l.V_z_Ed * kN, T=l.T_Ed * kNm)
+        for l in eintrag.lastfaelle if l.aktiv]
+
+    schub = None
+    if any(l.V_z or l.T or (l.V_y and not eintrag.einachsig) for l in lastfaelle) \
+            or (eintrag.laengszugkraft and lastfaelle):
+        schub = Schubwandnachweis(analyse, lastfaelle, einachsig=eintrag.einachsig,
+                                  mit_laengszug=eintrag.laengszugkraft)
+        eintragen("qa_schub", eintrag.kennung, schub)
+    eintragen("qa_biegung", eintrag.kennung, SchiefeBiegung(
+        analyse, lastfaelle, einachsig=eintrag.einachsig,
+        laengszug=schub if eintrag.laengszugkraft else None))
+
+    duktilitaet = DuktilitaetQA(analyse, einachsig=eintrag.einachsig,
+                                grenze=eintrag.x_d_max)
+    duktilitaet.still = not eintrag.duktilitaet
+    eintragen("qa_duktilitaet", eintrag.kennung, duktilitaet)
+    sproede = SproedesVersagenQA(analyse, einachsig=eintrag.einachsig)
+    sproede.still = not eintrag.sproede
+    eintragen("qa_sproede", eintrag.kennung, sproede)
+
+
+def _analyse(eintrag: QuerschnittsanalyseEintrag,
+             baustoffe: Mapping[str, Baustoff]) -> Querschnittsanalyse:
+    """
+    Aus der Beschreibung das Bauteil -- und aus jedem Fehler der Zeichnung
+    einen Satz, der die Analyse nennt.
+    """
+    wo = f"Querschnittsanalyse '{eintrag.name}'"
+
+    def stoff(kennung: str, was: str, art: str) -> Baustoff:
+        gefunden = baustoffe.get(kennung)
+        if gefunden is None and not kennung:
+            # Kein Material angegeben -- wie bei den Lagen der Platte gilt
+            # dann das erste dieser Art im Projekt.
+            gefunden = next((s for s in baustoffe.values() if s.art.value == art), None)
+        if gefunden is None:
+            raise ProjektFehler(f"{wo}: {was} verweist auf das Material '{kennung}', "
+                                f"das es nicht (mehr) gibt.")
+        if gefunden.art.value != art:
+            raise ProjektFehler(f"{wo}: {was} braucht einen "
+                                f"{'Beton' if art == 'beton' else 'Betonstahl'}, "
+                                f"'{gefunden.name}' ist keiner.")
+        return gefunden
+
+    flaechen = []
+    for nummer, f in enumerate(eintrag.flaechen, start=1):
+        material = stoff(f.material, f"Polygon {nummer}", "beton") if f.material else None
+        flaechen.append(Flaechenteil(nummer=nummer, punkte=tuple(tuple(p) for p in f.punkte),
+                                     stoff=material))
+    staebe = [((s.y, s.z), s.durchmesser, stoff(s.stahl, f"Stab {nummer}", "betonstahl"))
+              for nummer, s in enumerate(eintrag.staebe, start=1)]
+    linien = [{"von": tuple(l.von), "bis": tuple(l.bis), "art": l.art,
+               "durchmesser": l.durchmesser, "flaeche": l.flaeche, "anzahl": l.anzahl,
+               "teilung": l.teilung, "starteisen": l.starteisen, "endeisen": l.endeisen,
+               "stahl": stoff(l.stahl, f"Linie {nummer}", "betonstahl")}
+              for nummer, l in enumerate(eintrag.stablinien, start=1)]
+    waende = [{"von": tuple(w.von), "bis": tuple(w.bis), "dicke": w.dicke,
+               "durchmesser": w.durchmesser, "teilung": w.teilung,
+               "schnitte": w.schnitte,
+               "stahl": stoff(w.stahl, f"Wand {nummer}", "betonstahl")
+               if w.durchmesser > 0 else None}
+              for nummer, w in enumerate(eintrag.schubwaende, start=1)]
+    wahl = {baustoffe[w.material].id: (w.satz, w.betongesetz)
+            for w in eintrag.werkstoffwahl if w.material in baustoffe}
+    try:
+        return Querschnittsanalyse(
+            name=eintrag.name, praefix=f"querschnittsanalyse.{eintrag.kennung}",
+            flaechen=flaechen, staebe=staebe, linien=linien, waende=waende,
+            alpha_min=eintrag.alpha_min, alpha_max=eintrag.alpha_max, k_c=eintrag.k_c,
+            wahl=wahl)
+    except GeometrieFehler as fehler:
+        raise ProjektFehler(f"{wo}: {fehler}") from None
 
 
 def _lagennachweise(eintrag: QuerschnittEintrag, querschnitt: Plattenquerschnitt,

@@ -297,6 +297,15 @@ CM2 = Einheit("cm^2", FLAECHE, 1e-4)
 MM2 = Einheit("mm^2", FLAECHE, 1e-6)
 M3 = Einheit("m^3", VOLUMEN, 1.0)
 
+#: Widerstandsmoment in Millionen mm^3 -- aus demselben Grund wie darunter.
+MIO_MM3 = Einheit("10^6 mm^3", LAENGE**3, 1e-3,
+                  latex=r"\cdot 10^{6}\,\mathrm{mm}^{3}", beschriftung="·10⁶ mm³")
+
+#: Flaechenmoment zweiten Grades in Millionen mm^4. Bei Betonquerschnitten
+#: stuende in mm^4 eine zehnstellige Zahl; so heisst es «5400 · 10⁶ mm⁴».
+MIO_MM4 = Einheit("10^6 mm^4", LAENGE**4, 1e-6,
+                  latex=r"\cdot 10^{6}\,\mathrm{mm}^{4}", beschriftung="·10⁶ mm⁴")
+
 # Kraft
 N = Einheit("N", KRAFT, 1.0)
 KN = Einheit("kN", KRAFT, 1e3)

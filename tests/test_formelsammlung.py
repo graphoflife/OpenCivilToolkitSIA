@@ -58,8 +58,12 @@ class TestFormelsammlung(unittest.TestCase):
         for name in ("Querschnitt", "Biegung und Normalkraft", "Querkraft", "Knicken"):
             with self.subTest(thema=name):
                 self.assertEqual(art[name], "querschnitt")
+        for name in ("Querschnittsanalyse", "Schiefe Biegung", "Querkraft und Torsion",
+                     "Duktilität je Richtung", "Sprödes Versagen je Richtung"):
+            with self.subTest(thema=name):
+                self.assertEqual(art[name], "querschnittsanalyse")
         self.assertEqual({t["art"] for t in api.formelsammlung_liste(self.alle)},
-                         {"beton", "betonstahl", "querschnitt"})
+                         {"beton", "betonstahl", "querschnitt", "querschnittsanalyse"})
 
     def test_die_erklaerungen_wandern_aus_der_herleitung(self):
         """Im Bericht unter «Verwendete Formeln»: die Erklärungen dieses Laufs, alle."""

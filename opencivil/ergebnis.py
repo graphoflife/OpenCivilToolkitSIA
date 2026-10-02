@@ -71,13 +71,13 @@ class Ergebnis:
         """Was beim Aufbau aufgefallen ist -- etwa eine Platte ohne Einwirkung."""
         return list(self.aufbau.warnungen)
 
-    def urteile_von(self, platte: str) -> List[NachweisUrteil]:
-        """Die gefuehrten Urteile einer Platte -- nach Name oder Kennung."""
-        for eintrag in self.projekt.querschnitte:
-            if platte in (eintrag.kennung, eintrag.name):
-                return self.aufbau.urteile_von(eintrag.kennung, self.urteile)
-        namen = ", ".join(f"'{q.name}'" for q in self.projekt.querschnitte)
-        raise KeyError(f"Eine Platte '{platte}' gibt es nicht. Vorhanden: {namen}.")
+    def urteile_von(self, bauteil: str) -> List[NachweisUrteil]:
+        """Die gefuehrten Urteile einer Platte oder Analyse -- nach Name oder Kennung."""
+        for b in self.aufbau.bauteile():
+            if bauteil in (b.kennung, b.name):
+                return self.aufbau.urteile_von(b.kennung, self.urteile)
+        namen = ", ".join(f"'{b.name}'" for b in self.aufbau.bauteile())
+        raise KeyError(f"Ein Bauteil '{bauteil}' gibt es nicht. Vorhanden: {namen}.")
 
     def wert(self, wert_id: str) -> Wert:
         """Ein einzelner gerechneter Wert, mit Einheit, Herkunft und Norm."""

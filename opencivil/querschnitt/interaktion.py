@@ -324,6 +324,11 @@ class Querschnitt:
         self.bezug = bezug
         self.streifen = streifen
         self._richtungen: Dict[float, Richtung] = {}
+        # Was schon gesucht wurde. Duktilitaet und sproedes Versagen fragen
+        # dieselben Richtungen bei N = 0 ab; ein zweites Mal kostete dieselbe
+        # Suche noch einmal.
+        self._bei_n: Dict[Tuple[float, float], Optional[Bruchpunkt]] = {}
+        self._in_richtung: Dict[Tuple[float, float], Optional[Bruchpunkt]] = {}
 
     # -- Je Neigung ---------------------------------------------------------
 
@@ -558,14 +563,34 @@ class Querschnitt:
         auf dem Faecher. ``None``, wenn N jenseits der reinen Zug- oder
         Druckkraft liegt.
         """
+        schluessel = (round(math.remainder(psi, 2.0 * math.pi), 12), N)
+        if schluessel not in self._bei_n:
+            self._bei_n[schluessel] = self._bei_normalkraft(psi, N)
+        return self._bei_n[schluessel]
+
+    def _bei_normalkraft(self, psi: float, N: float) -> Optional[Bruchpunkt]:
         r = self.richtung(psi)
         ebenen = self._faecherebenen(r, SUCHSCHRITTE)
-        werte = [r.fasern.kraefte(eps_m, chi).N for eps_m, chi in ebenen]
-        if not (werte[-1] <= N <= werte[0]):
+        gerechnet: Dict[int, float] = {}
+
+        def n_bei(i: int) -> float:
+            if i not in gerechnet:
+                gerechnet[i] = r.fasern.kraefte(*ebenen[i]).N
+            return gerechnet[i]
+
+        if not (n_bei(len(ebenen) - 1) <= N <= n_bei(0)):
             return None
-        for i in range(len(ebenen) - 1):
-            if werte[i] >= N >= werte[i + 1]:
-                break
+        # Eingrenzen durch Halbieren ueber die Stuetzstellen: N nimmt vom Zug
+        # zum Druck hin ab, also genuegen wenige Auswertungen statt aller.
+        unten, oben = 0, len(ebenen) - 1
+        while oben - unten > 1:
+            mitte = (unten + oben) // 2
+            if n_bei(mitte) >= N:
+                unten = mitte
+            else:
+                oben = mitte
+        i = unten
+        werte = {i: n_bei(i), i + 1: n_bei(i + 1)}
         a, b = ebenen[i], ebenen[i + 1]
         if werte[i] == N:
             return r.punkt(*a)
@@ -579,7 +604,7 @@ class Querschnitt:
             punkt = r.punkt(*ebene(anteil))
             return punkt.N - N, punkt
 
-        massstab = max(abs(werte[0]), abs(werte[-1]), 1.0)
+        massstab = max(abs(n_bei(0)), abs(n_bei(len(ebenen) - 1)), 1.0)
         return illinois(abweichung, 0.0, werte[i] - N, 1.0, werte[i + 1] - N,
                         schranke_x=1e-14, schranke_f=1e-11 * massstab)
 
@@ -610,7 +635,13 @@ class Querschnitt:
         liegt.
         """
         ziel = math.atan2(M_z, M_y)
+        schluessel = (N, round(ziel, 12))
+        if schluessel not in self._in_richtung:
+            self._in_richtung[schluessel] = self._in_richtung_suchen(N, M_y, M_z, ziel)
+        return self._in_richtung[schluessel]
 
+    def _in_richtung_suchen(self, N: float, M_y: float, M_z: float,
+                            ziel: float) -> Optional[Bruchpunkt]:
         def abweichung(psi: float):
             punkt = self.bei_normalkraft(psi, N)
             if punkt.moment == 0.0:
@@ -682,6 +713,17 @@ class Querschnitt:
         n = punkt.zugrichtung
         return punkt.eps_m + punkt.chi * (n[0] * (p[0] - self.bezug[0])
                                           + n[1] * (p[1] - self.bezug[1]))
+
+    def zugseite_bewehrt(self, punkt: Bruchpunkt) -> bool:
+        """
+        Ob auf der gezogenen Seite des Schwerpunkts Bewehrung liegt.
+
+        Die Frage der Platte nach der gezogenen Lage, fuer jede Form: ohne
+        obere Bewehrung haelt bei Zug oben nur der Stahl unten dagegen, kurz
+        ueber dem gedrueckten Rand -- das geht rechnerisch auf, sagt aber
+        weder ueber Duktilitaet noch ueber sproedes Versagen etwas.
+        """
+        return any(v > 0.0 for v in self.richtung(punkt.psi).staebe_v)
 
     def druckzone(self, punkt: Bruchpunkt) -> Tuple[float, float]:
         """

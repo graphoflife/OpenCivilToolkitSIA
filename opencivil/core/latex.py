@@ -448,6 +448,17 @@ class Formelzeile:
 # ===========================================================================
 
 
+def fest(zahl: float, stellen: int) -> str:
+    """
+    Eine Zahl mit fester Stellenzahl, fuer Tabellenspalten -- ohne «-0.0».
+
+    Was auf null rundet, hat kein Vorzeichen; ein Minus vor einer Null sieht
+    nach etwas aus, das es nicht gibt.
+    """
+    text = f"{zahl:.{stellen}f}"
+    return text[1:] if text.startswith("-") and not text.strip("-0.") else text
+
+
 def urteil(erfuellt: bool) -> str:
     """Das Urteil hinter einem Nachweis -- ein Wortlaut fuer alle."""
     return r"\text{erfüllt}" if erfuellt else r"\text{NICHT erfüllt}"

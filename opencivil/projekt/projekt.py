@@ -28,7 +28,10 @@ from opencivil.projekt.eintraege import (
 from opencivil.projekt.gleichungen import GleichungsblattEintrag, GleichungszeileEintrag
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.platte import QuerschnittEintrag
-from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
+from opencivil.projekt.querschnittsanalyse import (
+    FlaecheEintrag, QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag,
+    StablinieEintrag, WerkstoffwahlEintrag,
+)
 from opencivil.projekt.aufbau import Aufbau, aufbauen
 
 
@@ -400,4 +403,58 @@ class Projekt(Beschreibung):
             zeile(latex=r"\frac{N_{Rd}}{1.5\mathrm{m}}="),
             zeile(latex=r"b=a+N_{Rd}"),
         ]))
+
+        # Zwei gezeichnete Querschnitte. Ein Kastenträger mit Aussparung,
+        # Bewehrung in allen drei Arten, vier Schubwänden als Zelle, Torsion,
+        # schiefer Biegung und Längszugkraft, gerechnet mit dem
+        # Spannungsblock; dazu eine Stütze, einachsig und mit
+        # charakteristischen Werten -- so steht jede Wahl einmal da.
+        p.querschnittsanalysen.append(cls._kastentraeger(p.freie_kennung("a")))
+        p.querschnittsanalysen.append(cls._stuetze(p.freie_kennung("a")))
         return p
+
+    @staticmethod
+    def _kastentraeger(kennung: str) -> QuerschnittsanalyseEintrag:
+        a = QuerschnittsanalyseEintrag(
+            kennung=kennung, name="Kastenträger",
+            flaechen=[FlaecheEintrag(punkte=[[0, 0], [800, 0], [800, 600], [0, 600]],
+                                     material="b1"),
+                      FlaecheEintrag(punkte=[[150, 150], [650, 150], [650, 450],
+                                             [150, 450]])],
+            stablinien=[
+                StablinieEintrag(von=[50, 50], bis=[750, 50], art="teilung",
+                                 durchmesser=16, teilung=150, stahl="s1"),
+                StablinieEintrag(von=[60, 550], bis=[740, 550], art="anzahl",
+                                 durchmesser=12, anzahl=4, starteisen=False,
+                                 endeisen=False, stahl="s1"),
+                StablinieEintrag(von=[40, 150], bis=[40, 450], art="flaeche",
+                                 flaeche=400, stahl="s1"),
+            ],
+            staebe=[StabEintrag(y=760, z=300, durchmesser=20, stahl="s1")],
+            schubwaende=[SchubwandEintrag(von=e, bis=f, dicke=150, durchmesser=10,
+                                          teilung=150, schnitte=1, stahl="s1")
+                         for e, f in (([75, 75], [725, 75]), ([725, 75], [725, 525]),
+                                      ([725, 525], [75, 525]), ([75, 525], [75, 75]))],
+            werkstoffwahl=[WerkstoffwahlEintrag(material="b1", betongesetz="block")],
+            laengszugkraft=True, duktilitaet=True, sproede=True)
+        a.lastfall("Feld", M_y_Ed=300.0, V_z_Ed=250.0, T_Ed=60.0)
+        a.lastfall("Schief", N_Ed=-1500.0, M_y_Ed=250.0, M_z_Ed=150.0, V_y_Ed=100.0)
+        return a
+
+    @staticmethod
+    def _stuetze(kennung: str) -> QuerschnittsanalyseEintrag:
+        a = QuerschnittsanalyseEintrag.neu(kennung, "Stütze", "b1", "s1")
+        a.flaechen[0].punkte = [[0, 0], [400, 0], [400, 400], [0, 400]]
+        a.stablinien = [
+            StablinieEintrag(von=[50, 50], bis=[350, 50], art="anzahl", durchmesser=20,
+                             anzahl=3, stahl="s1"),
+            StablinieEintrag(von=[50, 350], bis=[350, 350], art="anzahl", durchmesser=20,
+                             anzahl=3, stahl="s1"),
+        ]
+        a.werkstoffwahl = [WerkstoffwahlEintrag(material="b1", satz="charakteristisch"),
+                           WerkstoffwahlEintrag(material="s1", satz="charakteristisch")]
+        a.einachsig = True
+        a.lastfaelle = []
+        a.lastfall("Druck", N_Ed=-2500.0, M_y_Ed=120.0)
+        a.lastfall("Zug", N_Ed=400.0)
+        return a

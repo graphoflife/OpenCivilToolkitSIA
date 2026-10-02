@@ -929,6 +929,312 @@
           "gruppe": ""
         }
       ]
+    },
+    {
+      "thema": "Querschnittsanalyse",
+      "art": "querschnittsanalyse",
+      "bloecke": [
+        {
+          "art": "text",
+          "text": "Der Querschnitt ist gezeichnet: Polygone, jedes mit seinem Material. Liegt ein Polygon ganz in einem anderen, ersetzt es dieses dort -- eine Aussparung nimmt die Fläche weg. y zeigt nach rechts, z nach oben; alle Masse in Millimetern."
+        },
+        {
+          "art": "gleichung",
+          "latex": "A = \\frac{1}{2} \\sum_i c_i \\qquad y_S = \\frac{1}{6A} \\sum_i (y_i + y_{i+1})\\, c_i \\qquad z_S = \\frac{1}{6A} \\sum_i (z_i + z_{i+1})\\, c_i \\qquad c_i = y_i\\, z_{i+1} - y_{i+1}\\, z_i",
+          "markdown": "**Fläche und Schwerpunkt eines Polygons (Satz von Gauss)**\n\n$$\nA = \\frac{1}{2} \\sum_i c_i \\qquad y_S = \\frac{1}{6A} \\sum_i (y_i + y_{i+1})\\, c_i \\qquad z_S = \\frac{1}{6A} \\sum_i (z_i + z_{i+1})\\, c_i \\qquad c_i = y_i\\, z_{i+1} - y_{i+1}\\, z_i\n$$",
+          "titel": "Fläche und Schwerpunkt eines Polygons (Satz von Gauss)",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "I_y = \\frac{1}{12} \\sum_i (z_i^2 + z_i z_{i+1} + z_{i+1}^2)\\, c_i - A\\, z_S^2\\qquad I_z = \\frac{1}{12} \\sum_i (y_i^2 + y_i y_{i+1} + y_{i+1}^2)\\, c_i - A\\, y_S^2",
+          "markdown": "**Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt**\n\n$$\nI_y = \\frac{1}{12} \\sum_i (z_i^2 + z_i z_{i+1} + z_{i+1}^2)\\, c_i - A\\, z_S^2\\qquad I_z = \\frac{1}{12} \\sum_i (y_i^2 + y_i y_{i+1} + y_{i+1}^2)\\, c_i - A\\, y_S^2\n$$",
+          "titel": "Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "s = \\frac{L}{m} \\qquad m = \\mathrm{runde}\\left(\\frac{L}{s_{gewählt}}\\right)",
+          "markdown": "**Teilung einer Stablinie: gleiche Felder, auf die Länge gerundet**\n\n$$\ns = \\frac{L}{m} \\qquad m = \\mathrm{runde}\\left(\\frac{L}{s_{gewählt}}\\right)\n$$",
+          "titel": "Teilung einer Stablinie: gleiche Felder, auf die Länge gerundet",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\frac{A_{sw}}{s} = \\frac{n \\cdot \\pi\\, \\varnothing^2 / 4}{s}",
+          "markdown": "**Bügelquerschnitt je Länge einer Schubwand (n Schnitte)**\n\n$$\n\\frac{A_{sw}}{s} = \\frac{n \\cdot \\pi\\, \\varnothing^2 / 4}{s}\n$$",
+          "titel": "Bügelquerschnitt je Länge einer Schubwand (n Schnitte)",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        }
+      ]
+    },
+    {
+      "thema": "Querkraft und Torsion",
+      "art": "querschnittsanalyse",
+      "bloecke": [
+        {
+          "art": "text",
+          "text": "Jede Schubwand trägt eine Kraft entlang ihrer Achse; ihre Länge ist der Hebelarm des Fachwerks. Verteilt wird elastisch: der Querschnitt verschiebt sich, und jede Wand wehrt sich wie eine Feder mit der Steifigkeit b_w·l. Das Moment dieser Querkraftanteile um den Schwerpunkt ist der Versatz ΔT; den Rest der Torsion tragen die geschlossenen Zellen als Umlauf-Schubfluss nach Bredt, mehrzellig mit gleicher Verdrillung aller Zellen. Ohne Zelle trägt die Torsion über dieselben Federn mit Drehung. Die Wandkräfte ergeben so immer V_y, V_z und um den Schwerpunkt T."
+        },
+        {
+          "art": "gleichung",
+          "latex": "k_i = b_{w,i} \\cdot l_i \\qquad \\sum_i k_i\\, e_i e_i^T\\, u = V \\qquad V_i = k_i\\, e_i \\cdot u \\qquad \\Delta T = \\sum_i V_i\\, r_i",
+          "markdown": "**Querkraft über die Federn der Wände**\n\n$$\nk_i = b_{w,i} \\cdot l_i \\qquad \\sum_i k_i\\, e_i e_i^T\\, u = V \\qquad V_i = k_i\\, e_i \\cdot u \\qquad \\Delta T = \\sum_i V_i\\, r_i\n$$",
+          "titel": "Querkraft über die Federn der Wände",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "T - \\Delta T = \\sum_k 2 A_k\\, q_k \\qquad \\oint_k \\frac{q}{b_w}\\, \\mathrm{d}s = 2 A_k\\, \\theta",
+          "markdown": "**Torsion in den Zellen (Bredt, mehrzellig)**\n\n$$\nT - \\Delta T = \\sum_k 2 A_k\\, q_k \\qquad \\oint_k \\frac{q}{b_w}\\, \\mathrm{d}s = 2 A_k\\, \\theta\n$$",
+          "titel": "Torsion in den Zellen (Bredt, mehrzellig)",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "v_{Rd,s} = \\frac{A_{sw}}{s}\\, f_{sd} \\cot\\alpha \\qquad v_{Rd,c} = b_w\\, k_c\\, f_{cd} \\sin\\alpha \\cos\\alpha \\qquad v_{Rd} = \\max_\\alpha \\min(v_{Rd,s};\\ v_{Rd,c})",
+          "markdown": "**Widerstand je Länge einer Wand (Fachwerk)** *(SIA 262:2025, 4.3.3.4)*\n\n$$\nv_{Rd,s} = \\frac{A_{sw}}{s}\\, f_{sd} \\cot\\alpha \\qquad v_{Rd,c} = b_w\\, k_c\\, f_{cd} \\sin\\alpha \\cos\\alpha \\qquad v_{Rd} = \\max_\\alpha \\min(v_{Rd,s};\\ v_{Rd,c})\n$$",
+          "titel": "Widerstand je Länge einer Wand (Fachwerk)",
+          "referenz": "SIA 262:2025, 4.3.3.4",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\Delta T = \\sum_i V_i \\cdot r_i",
+          "markdown": "**Versatz: Moment der Querkraftanteile um den Schwerpunkt**\n\n$$\n\\Delta T = \\sum_i V_i \\cdot r_i\n$$",
+          "titel": "Versatz: Moment der Querkraftanteile um den Schwerpunkt",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "T_{Zellen} = T_{Ed} - \\Delta T",
+          "markdown": "**Was die Zellen tragen**\n\n$$\nT_{Zellen} = T_{Ed} - \\Delta T\n$$",
+          "titel": "Was die Zellen tragen",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        }
+      ]
+    },
+    {
+      "thema": "Schiefe Biegung",
+      "art": "querschnittsanalyse",
+      "bloecke": [
+        {
+          "art": "text",
+          "text": "Der Querschnitt bleibt eben (Bernoulli). Die Dehnung hängt nur vom Abstand v in Zugrichtung n ab, gemessen ab dem Schwerpunkt; die Nulllinie steht senkrecht zu n und darf schräg liegen. Zu jeder Dehnungsebene ergeben sich N, M_y und M_z durch Integration über die Fläche -- als Summe über Streifen quer zu n, deren Grenzen auf jede Polygonecke fallen, und Stab für Stab."
+        },
+        {
+          "art": "text",
+          "text": "Der Bruchzustand: jede Dehnungsebene, bei der ein Werkstoff an seiner Grenze steht und keiner darüber. Der Beton wird an seinem gedrücktesten Punkt bis -ε_c2d gestaucht, ganz gedrückt am C-Punkt bis -ε_c1d; die Bewehrung bis ±ε_ud. Gesucht wird die Ebene mit N = N_Ed, deren Moment in die Richtung der Einwirkung zeigt. Nachgewiesen wird nicht die Suche, sondern ihre Probe: die Kräfte jedes Teils und ihre Summen."
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\varepsilon(y, z) = \\varepsilon_0 + \\kappa \\cdot v \\qquad v = n_y (y - y_S) + n_z (z - z_S) \\qquad N = \\int_A \\sigma\\,\\mathrm{d}A \\qquad M_y = -\\int_A \\sigma\\,(z - z_S)\\,\\mathrm{d}A \\qquad M_z = -\\int_A \\sigma\\,(y - y_S)\\,\\mathrm{d}A",
+          "markdown": "**Dehnungsebene und innere Kräfte**\n\n$$\n\\varepsilon(y, z) = \\varepsilon_0 + \\kappa \\cdot v \\qquad v = n_y (y - y_S) + n_z (z - z_S) \\qquad N = \\int_A \\sigma\\,\\mathrm{d}A \\qquad M_y = -\\int_A \\sigma\\,(z - z_S)\\,\\mathrm{d}A \\qquad M_z = -\\int_A \\sigma\\,(y - y_S)\\,\\mathrm{d}A\n$$",
+          "titel": "Dehnungsebene und innere Kräfte",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\alpha_{eff} = \\frac{M_{Rd}}{M_{Ed}} \\qquad M = \\sqrt{M_y^2 + M_z^2}",
+          "markdown": "**Erfüllungsgrad bei fester Normalkraft und fester Richtung**\n\n$$\n\\alpha_{eff} = \\frac{M_{Rd}}{M_{Ed}} \\qquad M = \\sqrt{M_y^2 + M_z^2}\n$$",
+          "titel": "Erfüllungsgrad bei fester Normalkraft und fester Richtung",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\sigma_c(\\varepsilon_c) = \\begin{cases} 0 & \\varepsilon_c > -(1 - 0.85) \\cdot \\varepsilon_{c2d} \\\\[1ex] -f_{cd} & -\\varepsilon_{c2d} \\le \\varepsilon_c \\le -(1 - 0.85) \\cdot \\varepsilon_{c2d} \\end{cases}",
+          "markdown": "**C30/37: Spannungsblock 0.85·x, Bemessungswerte**\n\n$$\n\\sigma_c(\\varepsilon_c) = \\begin{cases} 0 & \\varepsilon_c > -(1 - 0.85) \\cdot \\varepsilon_{c2d} \\\\[1ex] -f_{cd} & -\\varepsilon_{c2d} \\le \\varepsilon_c \\le -(1 - 0.85) \\cdot \\varepsilon_{c2d} \\end{cases}\n$$",
+          "titel": "C30/37: Spannungsblock 0.85·x, Bemessungswerte",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\sigma_s(\\varepsilon_s) = \\begin{cases} \\min(E_s\\,\\varepsilon_s;\\ f_{yd}) & \\varepsilon_s \\ge 0 \\\\[1ex] \\max(E_s\\,\\varepsilon_s;\\ -f_{yd}^{-}) & \\varepsilon_s < 0 \\end{cases} \\qquad |\\varepsilon_s| \\le \\varepsilon_{ud}",
+          "markdown": "**B500B: bilineare Beziehung, Bemessungswerte** *(SIA 262:2025, 4.2.2.4)*\n\n$$\n\\sigma_s(\\varepsilon_s) = \\begin{cases} \\min(E_s\\,\\varepsilon_s;\\ f_{yd}) & \\varepsilon_s \\ge 0 \\\\[1ex] \\max(E_s\\,\\varepsilon_s;\\ -f_{yd}^{-}) & \\varepsilon_s < 0 \\end{cases} \\qquad |\\varepsilon_s| \\le \\varepsilon_{ud}\n$$",
+          "titel": "B500B: bilineare Beziehung, Bemessungswerte",
+          "referenz": "SIA 262:2025, 4.2.2.4",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "N_{Rd} = \\sum F_i",
+          "markdown": "**Probe: Normalkraft**\n\n$$\nN_{Rd} = \\sum F_i\n$$",
+          "titel": "Probe: Normalkraft",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "M_{y,Rd} = -\\sum F_i \\cdot (z_i - z_S)",
+          "markdown": "**Probe: Moment um y**\n\n$$\nM_{y,Rd} = -\\sum F_i \\cdot (z_i - z_S)\n$$",
+          "titel": "Probe: Moment um y",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "M_{z,Rd} = -\\sum F_i \\cdot (y_i - y_S)",
+          "markdown": "**Probe: Moment um z**\n\n$$\nM_{z,Rd} = -\\sum F_i \\cdot (y_i - y_S)\n$$",
+          "titel": "Probe: Moment um z",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "M_{Rd} = \\sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}}",
+          "markdown": "**Widerstand in der Richtung der Einwirkung**\n\n$$\nM_{Rd} = \\sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}}\n$$",
+          "titel": "Widerstand in der Richtung der Einwirkung",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\sigma_c(\\varepsilon_c) = \\begin{cases} -f_{ck} \\cdot \\dfrac{k_\\sigma\\,\\eta - \\eta^2}{1 + (k_\\sigma - 2)\\,\\eta} & 0 \\le |\\varepsilon_c| \\le \\varepsilon_{c1d},\\ \\eta = \\dfrac{|\\varepsilon_c|}{\\varepsilon_{c1d}} \\\\[2ex] -f_{ck} & \\varepsilon_{c1d} < |\\varepsilon_c| \\le \\varepsilon_{c2d} \\\\[1ex] 0 & \\varepsilon_c > 0 \\quad (\\text{Zug, gerissen}) \\end{cases}",
+          "markdown": "**C30/37: Parabel-Rechteck-Beziehung, charakteristische Werte** *(SIA 262:2025, 4.2.1.6)*\n\n$$\n\\sigma_c(\\varepsilon_c) = \\begin{cases} -f_{ck} \\cdot \\dfrac{k_\\sigma\\,\\eta - \\eta^2}{1 + (k_\\sigma - 2)\\,\\eta} & 0 \\le |\\varepsilon_c| \\le \\varepsilon_{c1d},\\ \\eta = \\dfrac{|\\varepsilon_c|}{\\varepsilon_{c1d}} \\\\[2ex] -f_{ck} & \\varepsilon_{c1d} < |\\varepsilon_c| \\le \\varepsilon_{c2d} \\\\[1ex] 0 & \\varepsilon_c > 0 \\quad (\\text{Zug, gerissen}) \\end{cases}\n$$",
+          "titel": "C30/37: Parabel-Rechteck-Beziehung, charakteristische Werte",
+          "referenz": "SIA 262:2025, 4.2.1.6",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\sigma_s(\\varepsilon_s) = \\begin{cases} \\min(E_s\\,\\varepsilon_s;\\ f_{yk}) & \\varepsilon_s \\ge 0 \\\\[1ex] \\max(E_s\\,\\varepsilon_s;\\ -f_{yk}^{-}) & \\varepsilon_s < 0 \\end{cases} \\qquad |\\varepsilon_s| \\le \\varepsilon_{ud}",
+          "markdown": "**B500B: bilineare Beziehung, charakteristische Werte** *(SIA 262:2025, 4.2.2.4)*\n\n$$\n\\sigma_s(\\varepsilon_s) = \\begin{cases} \\min(E_s\\,\\varepsilon_s;\\ f_{yk}) & \\varepsilon_s \\ge 0 \\\\[1ex] \\max(E_s\\,\\varepsilon_s;\\ -f_{yk}^{-}) & \\varepsilon_s < 0 \\end{cases} \\qquad |\\varepsilon_s| \\le \\varepsilon_{ud}\n$$",
+          "titel": "B500B: bilineare Beziehung, charakteristische Werte",
+          "referenz": "SIA 262:2025, 4.2.2.4",
+          "wert_id": "",
+          "gruppe": ""
+        }
+      ]
+    },
+    {
+      "thema": "Duktilität je Richtung",
+      "art": "querschnittsanalyse",
+      "bloecke": [
+        {
+          "art": "text",
+          "text": "Ein Querschnitt kündigt sein Versagen an, wenn die Bewehrung fliesst, bevor der Beton bricht -- dann ist die Druckzone klein. Gemessen wird das an x/d bei reiner Biegung: x ist der Abstand der Nulllinie vom gedrücktesten Betonpunkt, d der des entferntesten gezogenen Stabs, beide senkrecht zur Nulllinie."
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\frac{x}{d} \\le \\left(\\frac{x}{d}\\right)_{max}",
+          "markdown": "**Duktilität** *(SIA 262:2025, 4.1.4.2.5)*\n\n$$\n\\frac{x}{d} \\le \\left(\\frac{x}{d}\\right)_{max}\n$$",
+          "titel": "Duktilität",
+          "referenz": "SIA 262:2025, 4.1.4.2.5",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "x/d = \\frac{x}{d}",
+          "markdown": "**Bezogene Druckzonenhöhe bei reiner Biegung**\n\n$$\nx/d = \\frac{x}{d}\n$$",
+          "titel": "Bezogene Druckzonenhöhe bei reiner Biegung",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        }
+      ]
+    },
+    {
+      "thema": "Sprödes Versagen je Richtung",
+      "art": "querschnittsanalyse",
+      "bloecke": [
+        {
+          "art": "text",
+          "text": "Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Darum muss der bewehrte Querschnitt mehr tragen als der unbewehrte im Augenblick des Risses: M_Rd bei N = 0 mindestens das Rissmoment. Das Rissmoment gehört dem ungerissenen Bruttoquerschnitt; bei unsymmetrischer Form mit dem Deviationsmoment."
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\sigma(y, z) = -\\frac{M_y\\,(I_z z' - I_{yz} y') + M_z\\,(I_y y' - I_{yz} z')}{I_y I_z - I_{yz}^2}\\qquad y' = y - y_S,\\ z' = z - z_S",
+          "markdown": "**Spannung im ungerissenen Querschnitt**\n\n$$\n\\sigma(y, z) = -\\frac{M_y\\,(I_z z' - I_{yz} y') + M_z\\,(I_y y' - I_{yz} z')}{I_y I_z - I_{yz}^2}\\qquad y' = y - y_S,\\ z' = z - z_S\n$$",
+          "titel": "Spannung im ungerissenen Querschnitt",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "M_{Rd}(N = 0) \\ge M_{Riss} = f_{ct,eff} \\cdot W",
+          "markdown": "**Sprödes Versagen** *(SIA 262:2025, 4.4.1.3)*\n\n$$\nM_{Rd}(N = 0) \\ge M_{Riss} = f_{ct,eff} \\cdot W\n$$",
+          "titel": "Sprödes Versagen",
+          "referenz": "SIA 262:2025, 4.4.1.3",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "W = \\frac{I_y \\cdot I_z - I_{yz}^{2}}{I_{yz} \\cdot y' - I_z \\cdot z'}",
+          "markdown": "**Widerstandsmoment zum gezogensten Betonpunkt**\n\n$$\nW = \\frac{I_y \\cdot I_z - I_{yz}^{2}}{I_{yz} \\cdot y' - I_z \\cdot z'}\n$$",
+          "titel": "Widerstandsmoment zum gezogensten Betonpunkt",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "M_{Riss} = f_{ct,eff} \\cdot W",
+          "markdown": "**Rissmoment des ungerissenen Querschnitts**\n\n$$\nM_{Riss} = f_{ct,eff} \\cdot W\n$$",
+          "titel": "Rissmoment des ungerissenen Querschnitts",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "W = \\frac{I_y \\cdot I_z - I_{yz}^{2}}{I_z \\cdot z' - I_{yz} \\cdot y'}",
+          "markdown": "**Widerstandsmoment zum gezogensten Betonpunkt**\n\n$$\nW = \\frac{I_y \\cdot I_z - I_{yz}^{2}}{I_z \\cdot z' - I_{yz} \\cdot y'}\n$$",
+          "titel": "Widerstandsmoment zum gezogensten Betonpunkt",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "W = \\frac{I_y \\cdot I_z - I_{yz}^{2}}{I_{yz} \\cdot z' - I_y \\cdot y'}",
+          "markdown": "**Widerstandsmoment zum gezogensten Betonpunkt**\n\n$$\nW = \\frac{I_y \\cdot I_z - I_{yz}^{2}}{I_{yz} \\cdot z' - I_y \\cdot y'}\n$$",
+          "titel": "Widerstandsmoment zum gezogensten Betonpunkt",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "W = \\frac{I_y \\cdot I_z - I_{yz}^{2}}{I_y \\cdot y' - I_{yz} \\cdot z'}",
+          "markdown": "**Widerstandsmoment zum gezogensten Betonpunkt**\n\n$$\nW = \\frac{I_y \\cdot I_z - I_{yz}^{2}}{I_y \\cdot y' - I_{yz} \\cdot z'}\n$$",
+          "titel": "Widerstandsmoment zum gezogensten Betonpunkt",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        }
+      ]
     }
   ]
 }
