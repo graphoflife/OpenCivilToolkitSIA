@@ -44,6 +44,105 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-02 · Querschnittsanalyse: gezeichnete Querschnitte
+
+Wunsch: unter den Stahlbeton-Platten eine zweite «App». Statt ein paar Masse
+einzugeben, zeichnet man den Querschnitt: Polygone mit Material, Bewehrung als
+Einzelstäbe oder Linien wie bei Fagus, Schubwände mit Bügeln. Nachgewiesen
+wird wie bei der Platte, aber in beide Richtungen: N, M_y und M_z gleichzeitig,
+dazu V_y, V_z und Torsion. Wahlweise nur einachsig.
+
+### Vorher und nachher
+
+| | Platte | Querschnittsanalyse |
+| --- | --- | --- |
+| Eingabe | h, b, vier Lagen | gezeichnet: Polygone, Aussparungen, Stäbe, Linien, Wände |
+| Biegung | M um y, Handrechnung gegen das Polygon | N, M_y, M_z zusammen, Nulllinie schräg, gegen den Dehnungsfächer |
+| Querkraft | je Laufmeter, eine Bügelschar | auf die Wände verteilt, mit Torsion und Zellen |
+| Werte | Bemessung | je Material Bemessung oder charakteristisch, Beton Parabel-Rechteck oder Block 0.85·x |
+
+Beispiel: der Unterzug im Beispielprojekt, 300 × 600 mm, vier Schubwände auf
+der Bügelachse. Für M_y = 150 kNm, V_z = 150 kN und T = 15 kNm steht in der
+Zusammenfassung Biegung 1.41 (M_Rd = 211.8 kNm) und Querkraft mit Torsion
+1.75. Die rechte Wand trägt 150 kN/m aus der Querkraft und 75 kN/m aus der
+Torsion, zusammen 225 kN/m gegen v_Rd = 394.3 kN/m.
+
+### Wie es gebaut ist
+
+* **Fünf neue Teile im Kern** unter `opencivil/querschnitt/`:
+  * `geometrie` -- Polygone (Fläche, Schwerpunkt, Trägheit nach Gauss),
+    Verschachtelung (ein Polygon in einem anderen ersetzt es dort), Stablinien,
+    Prüfungen.
+  * `fasern` -- Fasern und Dehnungsgrenzen. Der Löser der Platte rechnet jetzt
+    darüber; ihr Bericht ist Zeichen für Zeichen gleich geblieben.
+  * `interaktion` -- die zulässigen Dehnungsebenen als konvexes Vieleck. Sein
+    Rand ist der Dehnungsfächer, für jede Form ohne Sonderfälle. Je Neigung ψ
+    wird N = N_Ed gesucht, und ψ so, dass das Moment in Richtung der
+    Einwirkung zeigt.
+  * `schubwaende` -- Federn b_w·l für die Querkraft, das Versatzmoment, die
+    Zellen als Flächen des Wandgraphen, Bredt mehrzellig, Fachwerk je Wand,
+    die Längszugkraft.
+  * `analyse` -- das Bauteil: die Zeichnung mit allen Meldungen, die Werte,
+    die Werkstoffwahl.
+* **Vier Nachweise:** `schiefe_biegung`, `schubwandnachweis` und in
+  `richtungsnachweise` Duktilität und sprödes Versagen je Richtung.
+* **Aufbau je Bauteil statt je Platte.** Zwischenspeicher, Zusammenfassung und
+  Bericht gehen über `Aufbau.bauteile()`: erst die Platten, dann die Analysen.
+* **Die Oberfläche** (`web/js/`):
+  * `zeichenfenster.js` -- das Zeichenfenster. Es entsteht einmal je Analyse
+    und übersteht jeden Neubau der Tafel; ein halb gezeichnetes Polygon, der
+    Massstab und der Verlauf für «Rückgängig» bleiben, wenn nebenher eine
+    Rechnung fertig wird.
+  * `koordinaten.js` -- das Koordinatenfenster, absolut oder relativ.
+  * `querschnittsanalyse.js` -- die übrige Eingabe.
+  * `qa_diagramme.js` -- die Diagramme.
+* **Was gezeichnet wird, entscheidet der Kern.** Die Anfrage `geometrie`
+  liefert in ein paar Millisekunden die Stäbe der Linien mit tatsächlicher
+  Teilung, den Schwerpunkt, die Zellen und jede Meldung am Element. Die
+  Oberfläche rechnet nur Eingabehilfen: Raster, Fang, Zoom, Masslinien.
+* **Diagramme auf Nachfrage.** Die M_y-M_z-Kurven brauchen siebzig
+  Bruchzustände, die kein Nachweis braucht. Sie kommen aus einer eigenen
+  Anfrage (`analysediagramme`), erst wenn der Reiter offen ist und die
+  Rechnung durch ist.
+
+### Nebenbei, ausserhalb des Wunsches
+
+* **Die rechte Tafel sagt, wenn die letzte Eingabe nicht rechnet.** Vorher
+  blieb das Ergebnis von davor kommentarlos stehen; beim Zeichnen kommt eine
+  unfertige Eingabe oft vor.
+* **Werte in den Werkstofftabellen mit Einheit:** «ε_c1d = 2 ‰» statt «2».
+* **Zellen im Fenster in Metern gesucht**, wie im Nachweis. In Millimetern
+  hätte dieselbe Toleranz etwas anderes bedeutet, und ein Wandende 0.4 µm neben
+  der Ecke hätte im Bild keine Zelle gezeigt, im Nachweis aber eine.
+
+### Annahmen, nicht nachgeschlagen
+
+Stehen im Code als «nach Vorgabe, nicht nachgeschlagen» und in
+[TODO.md](TODO.md): die C-Punkt-Regel bei beliebiger Form, das Federmodell
+b_w·l mit Bredt, die Längszugkraft in der Wandmitte, k_t aus der Höhe in
+Biegerichtung, x/d senkrecht zur Nulllinie, die Normstelle des
+Spannungsblocks.
+
+### Nachgeprüft
+
+* **Tests:** 784, darunter die Fächer der Analyse gegen den der Platte (zwei
+  unabhängige Wege), Bredt am Kasten, zwei Zellen mit Mittelwand, das
+  Gleichgewicht der Wandflüsse und die Diagramme gegen die Nachweise.
+* **Schnappschüsse:** nach Durchsicht übernommen. Im Beispiel kommt der
+  Unterzug dazu, im vollen Bericht nur die Einheiten.
+* **Im eingebauten Browser**, mit Server und mit Pyodide:
+  * gezeichnet, verschoben, rückgängig gemacht;
+  * Koordinaten absolut und relativ getippt;
+  * Stab ausserhalb mit Meldung;
+  * Vorlage Hohlkasten mit Zelle;
+  * einachsig und schief, Längszugkraft;
+  * Vollbild und Telefonbreite ohne waagrechtes Rollen.
+* **Rechenzeit in Pyodide:** eine Analyse mit vier Lastfällen braucht
+  84–177 ms, mit allen Nachweisen 110 ms, ihre Diagramme 317 ms. Ziel war
+  unter einer Sekunde.
+
+---
+
 ## 2026-10-02 · Nachtrag zum Umbau: der Zeilenname ohne Rückfall
 
 Der letzte Rest aus Schritt 9 des Umbaus. Eine Zeile der Zusammenfassung

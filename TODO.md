@@ -13,7 +13,9 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
       gedruckte SIA 262 gehalten worden. Dasselbe gilt für sämtliche
       Normverweise. Vor ernsthaftem Gebrauch nachschlagen.
 - [ ] Normstelle für den vereinfachten Spannungsblock (0.15·ε_c2d … f_cd) fehlt
-      — bewusst leer gelassen, statt eine Ziffer zu erfinden.
+      — bewusst leer gelassen, statt eine Ziffer zu erfinden. Er ist jetzt
+      auch ein wählbares Gesetz der Querschnittsanalyse («Spannungsblock
+      0.85·x»).
 - [ ] Der Riegel `k_g ≥ 1.20` ist nach Vorgabe eingebaut, aber nicht gegen die
       Norm geprüft. Bei D_max = 32 mm und C30/37 greift er (roh 1.00 → 1.20)
       und senkt den Querkraftwiderstand um gut 4 %.
@@ -75,7 +77,49 @@ sie hier notiert; keine davon ist nachgeschlagen.
       (φ ja/nein, charakteristisch/Bemessung). Eingebaut ist je eine feste
       Annahme; die Schalter fehlen noch.
 
+### Querschnittsanalyse
+
+Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
+
+- [ ] **C-Punkt bei beliebiger Form.** Eingebaut: ganz gedrückt darf der
+      Beton am Punkt im Abstand `(1 − ε_c1d/ε_c2d)·h` vom gedrücktesten Rand
+      nicht über `ε_c1d` gestaucht werden, mit `h` als Ausdehnung des Betons
+      senkrecht zur Nulllinie. Bei der Platte ist das die bekannte Regel; ob
+      sie für L, T oder Kasten so gilt, steht dahin.
+- [ ] **Federmodell und Bredt.** Eingebaut: die Querkraft verteilt sich nach
+      der Steifigkeit `k = b_w·l` (reine Verschiebung), das Versatzmoment
+      tragen die Zellen nach Bredt, mehrzellig mit gleicher Verdrillung. Ohne
+      Zelle tragen die Federn die Torsion mit Drehung. Ein Modell, keine
+      Normregel.
+- [ ] **Längszugkraft in der Wandmitte.** Eingebaut: `ΔN = |q|·l·cot α` je
+      Stück einer Wand, angreifend in seiner Mitte; daraus `ΔN`, `ΔM_y`,
+      `ΔM_z`. Gleichwertig mit `V·cot α / 2` in jedem Gurt, aber nicht
+      nachgeschlagen.
+- [ ] **k_t bei beliebiger Form.** Eingebaut: wie bei der Platte mit `h/3`,
+      wobei `h` die Ausdehnung des Betons in Biegerichtung ist (z für M_y,
+      y für M_z).
+- [ ] **Duktilität in beliebiger Richtung.** Eingebaut: x und d senkrecht zur
+      Nulllinie, x ab dem gedrücktesten Betonpunkt, d bis zum entferntesten
+      gezogenen Stab -- in den Richtungen Zug unten, oben, links, rechts.
+- [ ] **Wanddicke im vollen Querschnitt.** Wie dick eine Schubwand in einem
+      Rechteck anzusetzen ist, sagt das Werkzeug nicht -- das gibt der
+      Benutzer ein. Das Beispiel nimmt 100 mm auf der Bügelachse; eine Regel
+      dafür ist nicht nachgeschlagen.
+
 ## Noch nicht gebaut
+
+- [ ] **Querschnittsanalyse, nächste Schritte** (je ein eigener Plan):
+      Baustahl (Sortentabelle, Gesetz, Verbundquerschnitt, Stahlwände mit
+      eigenem G), Holz (wie spröd Zug und Druck sind, legen wir vorher fest),
+      weitere Nachweise (Stahlspannung im Gebrauch, Spannungsanalyse,
+      Knicken, Wände ohne Bügel).
+- [ ] **Die genaue Linie der Platte über den neuen Fächer.** Die Platte hat
+      noch ihren eigenen `dehnungsfaecher`; der Fächer der Analyse kann
+      dasselbe für jede Form. Umstellen, sobald der Vergleich unter 0.1 %
+      bleibt.
+- [ ] **Ein Kreis ist ein 48-Eck.** Die Ecken liegen auf dem Kreis, die
+      Fläche ist darum 0.3 % kleiner als π·D²/4. Steht so in der Zeichnung;
+      wer es genauer will, zeichnet mehr Ecken.
 
 - [ ] **Neu gerechnet wird je Bauteil, nicht je Wert.** Eine Platte, deren
       Beschreibung sich nicht geändert hat, kommt aus dem Zwischenspeicher --

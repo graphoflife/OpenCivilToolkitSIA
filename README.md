@@ -63,6 +63,21 @@ ergebnis.analysen()                           # Spannungsbilder, M-κ-Linien
 p.speichern("decke.json")                     # lässt sich in der Oberfläche öffnen
 ```
 
+Ein gezeichneter Querschnitt geht genauso -- Masse in mm, y nach rechts, z
+nach oben:
+
+```python
+from opencivil.projekt import SchubwandEintrag
+
+u = p.analyse("Unterzug")                     # Rechteck 300 × 600, 3 ⌀20 unten, 2 ⌀12 oben
+ecken = [[50, 50], [250, 50], [250, 550], [50, 550]]
+u.schubwaende = [SchubwandEintrag(von=ecken[i], bis=ecken[(i + 1) % 4], dicke=100,
+                                  durchmesser=10, teilung=150, schnitte=1, stahl="s1")
+                 for i in range(4)]           # vier Wände: eine Zelle, sie trägt Torsion
+u.lastfall("Feld", M_y_Ed=150, V_z_Ed=150, T_Ed=15)   # kN, kNm
+u.einachsig = False                           # N, M_y, M_z zusammen, Nulllinie schräg
+```
+
 Es ist dieselbe Beschreibung, die die Oberfläche speichert, und dieselbe
 Rechnung: `p.rechnen()` liefert dieselben Urteile wie die Maske, und
 `Projekt.beispiel()` ist selbst so gebaut. Ein vertipptes Feld
@@ -76,7 +91,7 @@ zurück. Gelesen wird die Datei im Kern, mit denselben Prüfungen wie alles ande
 
 ## Stand
 
-Fertig und getestet (641 Tests):
+Fertig und getestet (784 Tests):
 
 | Baustein | Inhalt |
 |---|---|
@@ -87,16 +102,22 @@ Fertig und getestet (641 Tests):
 | `core/protokoll` | Mitschrift als Datenstruktur, `Zwischenwerte` für Vorlagen, ein Durchlauf mit einer Tafel je Darstellung, `StillesProtokoll` |
 | `core/rechenwerk` | Rückwärtsauflösung, Variantenwahl, fehlende Eingaben, Zyklen |
 | `material/` | Beton und Betonstahl nach SIA 262:2025 |
-| `querschnitt/` | Plattenquerschnitt, Lagenaufbau, Werkstoffgesetze |
+| `querschnitt/` | Plattenquerschnitt, Lagenaufbau, Werkstoffgesetze (dazu der Spannungsblock als Gesetz) |
+| `querschnitt/geometrie` | Polygone, Verschachtelung, Stablinien, Prüfungen der Zeichnung |
+| `querschnitt/fasern` | Fasern und Dehnungsgrenzen -- auch der Löser der Platte rechnet darüber |
+| `querschnitt/interaktion` | der Dehnungsfächer für jede Form, schiefe Biegung, Widerstand in Momentenrichtung |
+| `querschnitt/schubwaende` | Querkraft und Torsion auf die Wände: Federn, Zellen, Bredt, Fachwerk, Längszugkraft |
+| `querschnitt/analyse` | die Querschnittsanalyse als Bauteil: Zeichnung, Werte, Werkstoffwahl |
 | `nachweis/linie` | Geometrie einer M-N-Linie, `Achse` als Wert |
 | `nachweis/handrechnung` | die von Hand nachrechenbaren Eckpunkte |
 | `nachweis/dehnungsfaecher` | die präzise Linie -- nur für das Diagramm |
 | `nachweis/querschnittsloeser` | Dehnungsebene aus N und M, zwei Bisektionen |
 | `nachweis/` | M-N, Querkraft (mit Bügeln), Duktilität, sprödes Versagen, Zwängung auf Normalkraft und auf Biegung, Stahlspannung unter häufiger (gegen Fliessen) und quasi-ständiger Last (aus der Rissbreite), Knicken am verformten System |
+| `nachweis/schiefe_biegung`, `schubwandnachweis`, `richtungsnachweise` | die Nachweise der Querschnittsanalyse: N mit M_y und M_z, Querkraft mit Torsion, Duktilität und sprödes Versagen je Richtung |
 | `spannungsanalyse.py` | drei Bilder am Querschnitt — kein Nachweis |
 | `bewehrungssuche/` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt – Längsbewehrung, dünnste Platte, Bügel |
 | `bericht/` | der Bericht als Blöcke (`gliederung`), gesetzt als Konsolentext, LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) und Markdown; die Zusammenfassung je Platte |
-| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `projekt`) und was daraus gebaut wird (`aufbau`) |
+| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `projekt`) und was daraus gebaut wird (`aufbau`) |
 | `ergebnis.py` | ein gerechnetes Projekt: Zusammenfassung, Bericht, LaTeX, Markdown, Analysen |
 | `web/api.py` | Lösung, Mitschrift und Zusammenfassung als JSON |
 | `web/diagrammdaten.py` | die Punktfolgen der Diagramme als JSON |
@@ -105,6 +126,8 @@ Fertig und getestet (641 Tests):
 | `web/server.py` | HTTP-Hülle darum (nur Standardbibliothek) |
 | `web/js/kern.js`, `kern_arbeiter.js` | Pyodide-Hülle darum, in einem eigenen Faden, für die Seite ohne Server |
 | `web/js/` | Oberfläche in reinem JavaScript, ohne Bauschritt |
+| `web/js/zeichenfenster.js`, `koordinaten.js` | Zeichenfenster und Koordinatenfenster der Querschnittsanalyse |
+| `web/js/querschnittsanalyse.js`, `qa_diagramme.js` | ihre übrige Eingabe und ihre Diagramme |
 
 Wie das zusammenhängt und warum es so gebaut ist, steht in
 [ENTWICKLUNG.md](ENTWICKLUNG.md).
@@ -120,6 +143,18 @@ Die Oberfläche rechnet nichts. Sie schickt die Projektbeschreibung an den Kern
 und stellt dar, was zurückkommt -- fertige Zahlen und fertige LaTeX-Zeichen­ketten.
 Deshalb kann am Bildschirm gar nichts anderes stehen als im Bericht.
 
+**Querschnittsanalyse:** unter den Platten ein zweites Kapitel. Der
+Querschnitt wird gezeichnet -- Polygone (frei, Rechteck, Kreis oder aus einer
+Vorlage), Aussparungen, Stäbe, Stablinien nach Fläche, Anzahl oder Teilung,
+Schubwände mit Bügeln. Raster und Fang, Zoom am Mausrad, Rückgängig mit
+Strg+Z, Vollbild. Neben der Zeichnung stehen die Koordinaten, absolut oder
+relativ, und jede Zahl lässt sich tippen; ein ganzes Polygon geht ohne Maus.
+Was die Rechnung braucht -- die Stäbe einer Linie samt tatsächlicher
+Teilung, Schwerpunkt, Zellen, Meldungen am Element -- kommt vom Kern. Darunter
+je Material Bemessungs- oder charakteristische Werte und beim Beton das
+Gesetz, die Lastfälle mit N, M_y, M_z, V_y, V_z und T, der Schalter «nur
+einachsig» und die Nachweisschalter.
+
 **Rechte Tafel:**
 
 * *Zusammenfassung* -- je Platte eine Tabelle: Widerstand, Einwirkung und
@@ -129,7 +164,10 @@ Deshalb kann am Bildschirm gar nichts anderes stehen als im Bericht.
   rechnet nur das Nötige, und die Herleitung zeigt nur diese Schritte
 * *Diagramme* -- Plattenquerschnitt, M-N-Resistenzlinie mit den
   Bemessungspunkten (die gestrichelte Strecke zeigt den Weg, in dem der
-  Erfüllungsgrad gemessen wurde), Querkraftkurven, Spannungs-Dehnungs-Bilder
+  Erfüllungsgrad gemessen wurde), Querkraftkurven, Spannungs-Dehnungs-Bilder;
+  bei einer Querschnittsanalyse je Lastfall der Bruchzustand im Schnitt, die
+  M-N-Linie in der Ebene des Lastfalls, die M_y-M_z-Kurve bei N_Ed und der
+  Schubfluss in den Wänden
 * *Herleitung* -- die Mitschrift, Formel für Formel, mit Normstelle
 
 **Kopieren nach Word, LaTeX und Markdown:** jede Formel und jede Tabelle hat
@@ -270,6 +308,14 @@ sagt «interessiert mich gerade nicht» und nicht «gilt nicht».
 * `N > 0` = Zug, `M > 0` = Zug an der Unterseite, bezogen auf `h/2`
 * `N` und `M` gelten für die betrachtete Breite `b`; mit `b = 1 m` sind es die
   Werte pro Laufmeter
+
+In der Querschnittsanalyse:
+
+* `y` nach rechts, `z` nach oben, Bezugspunkt der Schwerpunkt des
+  Bruttoquerschnitts
+* `N > 0` = Zug. Ein positives Moment zieht auf der negativen Seite seiner
+  Achse: `M_y > 0` unten (wie bei der Platte), `M_z > 0` links
+* `V_y`, `V_z` in Achsrichtung, `T > 0` im Gegenuhrzeigersinn
 
 ## Erfüllungsgrad beim M-N-Nachweis
 
