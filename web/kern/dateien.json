@@ -42,7 +42,7 @@
     "opencivil/nachweis/querschnittsloeser.py": "9eba1677f0b6",
     "opencivil/nachweis/richtungsnachweise.py": "b9b4705d3130",
     "opencivil/nachweis/schiefe_biegung.py": "e0099eae24d2",
-    "opencivil/nachweis/schubwandnachweis.py": "b176aee97bfa",
+    "opencivil/nachweis/schubwandnachweis.py": "852a058e8522",
     "opencivil/nachweis/spannungsbegrenzung.py": "ee3246af0195",
     "opencivil/nachweis/sproedes_versagen.py": "0041cc18b4bc",
     "opencivil/nachweis/zustand2.py": "7ba9c5ef3a2c",
@@ -66,8 +66,8 @@
     "opencivil/web/__init__.py": "e3b0c44298fc",
     "opencivil/web/api.py": "cf9a35176705",
     "opencivil/web/bruecke.py": "24e1fcb0cd8c",
-    "opencivil/web/diagrammdaten.py": "69cdc2036f2f",
-    "opencivil/web/dienst.py": "60efca78fdfe",
+    "opencivil/web/diagrammdaten.py": "3c3ba959e033",
+    "opencivil/web/dienst.py": "a5b37c79fbc3",
     "opencivil/web/server.py": "43665395faca",
     "opencivil/web/speicher.py": "d000d8bff113"
   }

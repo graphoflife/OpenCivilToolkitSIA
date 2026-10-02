@@ -14,7 +14,8 @@ kNm und mm umgesetzt.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Mapping, Optional
+import math
+from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil import spannungsanalyse
 from opencivil.core.berechnung import grad_als_text
@@ -22,6 +23,7 @@ from opencivil.core.einheiten import KN, KNM, KN_PRO_M
 from opencivil.core.rechenwerk import Loesung
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL, Spannungsblock
 from opencivil.nachweis.querkraft import NUR_KURVE
+from opencivil.nachweis.schiefe_biegung import KEIN_MOMENT
 from opencivil.projekt import Aufbau
 from opencivil.querschnitt.platte import Richtung
 
@@ -442,3 +444,240 @@ def linie(nachweis, aufbau=None) -> dict:
         # Normalkraft gegen dieselbe Linie, nur mit einem groesseren Moment.
         "knickfaelle": _knickpunkte(aufbau, nachweis) if aufbau else [],
     }
+
+
+# ===========================================================================
+# Querschnittsanalyse
+# ===========================================================================
+
+#: Wie fein die M_y-M_z-Kurve bei N_Ed abgetastet wird: so viele Neigungen der
+#: Nulllinie rundum, alle 5°.
+KONTUR_NEIGUNGEN = 72
+
+Punkt = Tuple[float, float]
+
+
+def analyse(aufbau: Aufbau, kennung: str) -> dict:
+    """
+    Die Diagramme einer Querschnittsanalyse -- in mm, kN und kNm.
+
+    Je Lastfall der Bruchzustand im Schnitt (Nulllinie, Druckzone, die
+    Dehnung jedes Stabs), die M-N-Linie in der Ebene des Lastfalls, bei
+    schiefer Biegung die M_y-M_z-Kurve bei N_Ed und der Schubfluss in den
+    Waenden. Was die Nachweise schon wissen, kommt aus ihren Objekten; neu
+    gerechnet werden nur die Kurven, nach denen kein Nachweis fragt -- mit
+    demselben Querschnitt, an dem nachgewiesen wurde.
+
+    Die Einwirkung steht so da, wie nachgewiesen: mit der Laengszugkraft aus
+    Querkraft und Torsion, wo sie zugeschaltet ist.
+    """
+    bauteil = aufbau.querschnittsanalysen[kennung]
+    biegung = aufbau.qa_biegung.get(kennung)
+    schub = aufbau.qa_schub.get(kennung)
+    q = biegung.querschnitt if biegung is not None else None
+
+    faelle = []
+    for erg in (biegung.ergebnisse if q is not None else []):
+        einachsig = biegung.einachsig
+        moment = abs(erg.M_y) if einachsig else math.hypot(erg.M_y, erg.M_z)
+        erfuellt = erg.erfuellungsgrad >= 1.0
+        faelle.append({
+            "name": erg.fall.name,
+            "N_Ed": erg.N / 1e3,
+            "M_y_Ed": erg.M_y / 1e3,
+            "M_z_Ed": erg.M_z / 1e3,
+            "erfuellt": erfuellt,
+            "grad_text": grad_als_text(erg.erfuellungsgrad, erfuellt),
+            "mn": _mn_linie(q, erg, einachsig, moment),
+            "kontur": None if einachsig else _kontur(q, erg, moment),
+            "bruch": _bruch(q, bauteil, erg.punkt) if erg.punkt is not None else None,
+            "schub": _schubfluss(schub, erg.fall) if schub is not None else None,
+        })
+    return {
+        "kennung": kennung,
+        "name": bauteil.name,
+        "einachsig": bool(biegung.einachsig) if biegung is not None else False,
+        "laengszug": biegung is not None and biegung.laengszug is not None,
+        "zeichnung": _zeichnung(bauteil),
+        "faelle": faelle,
+    }
+
+
+def _tiefe(eltern: Sequence[Optional[int]], i: int) -> int:
+    """Wie oft ein Polygon in einem anderen liegt -- Eltern werden zuerst gezeichnet."""
+    t, j = 0, eltern[i]
+    while j is not None:
+        t, j = t + 1, eltern[j]
+    return t
+
+
+def _zeichnung(bauteil) -> dict:
+    """Was im Schnitt zu sehen ist, in mm -- die Stäbe der Linien schon aufgeloest."""
+    return {
+        "polygone": [
+            {"punkte": [list(p) for p in f.punkte], "material": f.stoff is not None,
+             "tiefe": _tiefe(bauteil.eltern, i)}
+            for i, f in enumerate(bauteil.flaechen)],
+        "staebe": [{"y": p[0], "z": p[1], "d": g.durchmesser}
+                   for g in bauteil.gruppen if g.art != "flaeche" for p in g.punkte],
+        "flaechenlinien": [{"von": list(g.von), "bis": list(g.bis)}
+                           for g in bauteil.gruppen if g.art == "flaeche"],
+        "waende": [{"name": w.name, "von": list(w.von), "bis": list(w.bis), "dicke": w.dicke}
+                   for w in bauteil.waende],
+        "schwerpunkt": [bauteil.brutto.y_S, bauteil.brutto.z_S],
+    }
+
+
+def _mn_linie(q, erg, einachsig: bool, moment: float) -> dict:
+    """
+    Die M-N-Linie in der Ebene des Lastfalls.
+
+    Einachsig -- oder ohne Moment -- ist das die Linie um y, rechts Zug unten,
+    links Zug oben, wie bei der Platte. Schief ist es der Faecher bei der
+    Neigung der Nulllinie, die der Bruchzustand des Lastfalls hat, und der
+    gegenueberliegende; aufgetragen ist das Moment in der Richtung der
+    Einwirkung. Bei N_Ed liegt darauf genau der Widerstand des Nachweises,
+    bei anderen N gilt die Linie fuer diese Neigung.
+    """
+    if einachsig or moment <= KEIN_MOMENT:
+        psi, achse = -math.pi / 2.0, (1.0, 0.0)
+    else:
+        psi = erg.punkt.psi if erg.punkt is not None else q.neigung_fuer(erg.M_y, erg.M_z)
+        achse = (erg.M_y / moment, erg.M_z / moment)
+
+    def m(p) -> float:
+        return (p.M_y * achse[0] + p.M_z * achse[1]) / 1e3
+
+    hin = q.faecher(psi)
+    her = q.faecher(psi + math.pi)
+    return {
+        "punkte": ([{"N": p.N / 1e3, "M": m(p)} for p in hin]
+                   + [{"N": p.N / 1e3, "M": m(p)} for p in reversed(her)]),
+        "einwirkung": {"N": erg.N / 1e3,
+                       "M": (erg.M_y * achse[0] + erg.M_z * achse[1]) / 1e3},
+        "widerstand": (None if erg.punkt is None
+                       else {"N": erg.punkt.N / 1e3, "M": m(erg.punkt)}),
+        "neigung": math.degrees(psi),
+        "richtung": None if achse == (1.0, 0.0) else math.degrees(math.atan2(achse[1], achse[0])),
+    }
+
+
+def _kontur(q, erg, moment: float) -> Optional[dict]:
+    """Der Widerstand rundum bei N_Ed: je Neigung der Nulllinie ein Paar M_y, M_z."""
+    if moment <= KEIN_MOMENT:
+        return None
+    zug, druck = q.normalkraft_grenzen()
+    if not druck < erg.N < zug:
+        return None
+    punkte = []
+    for k in range(KONTUR_NEIGUNGEN):
+        p = q.bei_normalkraft(2.0 * math.pi * k / KONTUR_NEIGUNGEN, erg.N)
+        if p is not None:
+            punkte.append({"M_y": p.M_y / 1e3, "M_z": p.M_z / 1e3})
+    return {"N": erg.N / 1e3, "punkte": punkte,
+            "widerstand": (None if erg.punkt is None
+                           else {"M_y": erg.punkt.M_y / 1e3, "M_z": erg.punkt.M_z / 1e3})}
+
+
+def _halbebene(punkte: Sequence[Punkt], innen: Callable[[Punkt], float]) -> List[List[float]]:
+    """
+    Das Stueck eines Polygons, auf dem ``innen(p) <= 0`` gilt -- nach
+    Sutherland und Hodgman, gegen eine einzige Gerade.
+    """
+    aus: List[List[float]] = []
+    for i, p in enumerate(punkte):
+        q = punkte[(i + 1) % len(punkte)]
+        a, b = innen(p), innen(q)
+        if a <= 0.0:
+            aus.append([p[0], p[1]])
+        if (a <= 0.0) != (b <= 0.0):
+            t = a / (a - b)
+            aus.append([p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1])])
+    return aus if len(aus) >= 3 else []
+
+
+def _gerade_im_rahmen(stuetz: Punkt, richtung: Punkt,
+                      rahmen: Tuple[float, float, float, float]) -> Optional[List[List[float]]]:
+    """Das Stueck der Geraden ``stuetz + s·richtung``, das im Rahmen liegt (Liang-Barsky)."""
+    y0, y1, z0, z1 = rahmen
+    von, bis = -math.inf, math.inf
+    for d, a, unten, oben in ((richtung[0], stuetz[0], y0, y1), (richtung[1], stuetz[1], z0, z1)):
+        if abs(d) < 1e-12:
+            if not unten <= a <= oben:
+                return None
+            continue
+        s1, s2 = (unten - a) / d, (oben - a) / d
+        von, bis = max(von, min(s1, s2)), min(bis, max(s1, s2))
+    if von >= bis:
+        return None
+    return [[stuetz[0] + von * richtung[0], stuetz[1] + von * richtung[1]],
+            [stuetz[0] + bis * richtung[0], stuetz[1] + bis * richtung[1]]]
+
+
+def _bruch(q, bauteil, punkt) -> dict:
+    """
+    Der Bruchzustand im Schnitt: die Nulllinie, die gedrueckte Flaeche je
+    Polygon und die Dehnung jedes Stabs -- in mm und ‰.
+
+    Gedrueckt ist die Seite kleiner v: die Kruemmung zeigt nie gegen die
+    Zugrichtung. Ohne Kruemmung ist alles gedrueckt oder nichts.
+    """
+    sy, sz = q.bezug[0] * 1e3, q.bezug[1] * 1e3
+    n = punkt.zugrichtung
+    punkte = [p for f in bauteil.flaechen for p in f.punkte]
+    rahmen = (min(p[0] for p in punkte), max(p[0] for p in punkte),
+              min(p[1] for p in punkte), max(p[1] for p in punkte))
+
+    def v(p: Punkt) -> float:
+        return n[0] * (p[0] - sy) + n[1] * (p[1] - sz)
+
+    if punkt.chi > 0.0:
+        v0 = -punkt.eps_m / punkt.chi * 1e3
+        nulllinie = _gerade_im_rahmen((sy + v0 * n[0], sz + v0 * n[1]), (-n[1], n[0]), rahmen)
+        druckzone = [_halbebene(f.punkte, lambda p, v0=v0: v(p) - v0) for f in bauteil.flaechen]
+    else:
+        nulllinie = None
+        druckzone = [[list(p) for p in f.punkte] if punkt.eps_m < 0.0 else []
+                     for f in bauteil.flaechen]
+    x, d = q.druckzone(punkt)
+    return {
+        "nulllinie": nulllinie,
+        "druckzone": [
+            {"punkte": zone, "material": f.stoff is not None,
+             "tiefe": _tiefe(bauteil.eltern, i)}
+            for i, (f, zone) in enumerate(zip(bauteil.flaechen, druckzone)) if zone],
+        "staebe": [
+            {"y": p[0], "z": p[1], "d": g.durchmesser,
+             "eps": q.dehnung(punkt, (p[0] * 1e-3, p[1] * 1e-3)) * 1e3}
+            for g in bauteil.gruppen if g.art != "flaeche" for p in g.punkte],
+        "x": x * 1e3,
+        "d": d * 1e3,
+        "neigung": math.degrees(punkt.psi),
+    }
+
+
+def _schubfluss(schub, fall) -> Optional[dict]:
+    """
+    Der Schubfluss je Stueck einer Wand, mit Vorzeichen entlang der Wand, in
+    kN/m -- und je Wand der Widerstand bei der Neigung, die der Nachweis
+    gewaehlt hat. Ohne Verteilung (keine Wand, keine Last) nichts.
+    """
+    v = schub.verteilungen.get(fall.name)
+    if v is None or schub.modell is None:
+        return None
+    widerstaende = schub.widerstaende.get(fall.name, [])
+    stuecke = [{"wand": schub.waende[s.wand].name,
+                "von": [s.von[0] * 1e3, s.von[1] * 1e3],
+                "bis": [s.bis[0] * 1e3, s.bis[1] * 1e3],
+                "q": fluss / 1e3}
+               for s, fluss in zip(schub.modell.stuecke, v.fluss)]
+    waende = []
+    for i, (w, r) in enumerate(zip(schub.waende, widerstaende)):
+        q_max = max((abs(f) for s, f in zip(schub.modell.stuecke, v.fluss) if s.wand == i),
+                    default=0.0)
+        grad = r.v_Rd / q_max if q_max > 1e-6 else math.inf
+        waende.append({"name": w.name, "q_max": q_max / 1e3, "v_Rd": r.v_Rd / 1e3,
+                       "alpha": r.alpha, "erfuellt": grad >= 1.0,
+                       "grad_text": grad_als_text(grad, grad >= 1.0)})
+    return {"stuecke": stuecke, "waende": waende,
+            "zellen": [q_k / 1e3 for q_k in v.zellenfluss]}

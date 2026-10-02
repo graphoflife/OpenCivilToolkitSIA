@@ -44,6 +44,8 @@ class Schubwandnachweis(Nachweis):
         self.einachsig = einachsig
         self.mit_laengszug = mit_laengszug
         self.verteilungen: Dict[str, Optional[sw.Verteilung]] = {}
+        self.widerstaende: Dict[str, List[sw.Wandwiderstand]] = {}
+        """Je Lastfall und Wand der Widerstand bei der gewählten Neigung -- für die Diagramme."""
         self.modell: Optional[sw.Zellenmodell] = None
         self.waende: List[sw.Wand] = []
 
@@ -184,10 +186,12 @@ class Schubwandnachweis(Nachweis):
         zeilen = []
         bester: Optional[tuple] = None
         neigungen: List[int] = []
+        self.widerstaende[fall.name] = []
         for i, w in enumerate(self.waende):
             fluss = [abs(q) for s, q in zip(self.modell.stuecke, v.fluss) if s.wand == i]
             q_ed = max(fluss) if fluss else 0.0
             r = sw.widerstand(w, alpha_min=alpha_min, alpha_max=alpha_max, zugkraft=zugkraft)
+            self.widerstaende[fall.name].append(r)
             neigungen.append(r.alpha)
             # Ein Fluss unter einem Millionstel N/m ist Rundungsrauschen der
             # Verteilung, keine Beanspruchung -- dort steht ∞, nicht 8·10¹⁶.

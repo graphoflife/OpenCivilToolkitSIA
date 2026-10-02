@@ -21,6 +21,7 @@ import {
   diagrammZeichnen, kurveZeichnen, neigungskurveZeichnen,
   querkraftkurveZeichnen, querschnittZeichnen,
 } from './diagramm.js';
+import { analyseBlaetter } from './qa_diagramme.js';
 import { spannungsfallZeichnen } from './spannungsbild.js';
 import { api } from './api.js';
 import { aendern, namensraum, zustand } from './zustand.js';
@@ -567,6 +568,12 @@ function diagrammSicht(loesung) {
       ...neigungskurven(loesung, kennung),
       ...(analysen[kennung] || []).map(spannungsfallZeichnen),
     ]));
+  }
+
+  // -- Querschnittsanalysen ------------------------------------------------
+  // Ihre Diagramme kommen aus einer eigenen Anfrage, siehe qa_diagramme.js.
+  for (const [kennung, eintrag] of Object.entries(loesung.zuordnung?.querschnittsanalysen || {})) {
+    if (imRaum(raum, eintrag.namensraum)) blaetter.push(...analyseBlaetter(kennung, eintrag.name));
   }
 
   if (!blaetter.length) return leerzustand('Noch nichts zu zeichnen.');

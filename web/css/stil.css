@@ -1518,3 +1518,10 @@ math-field.gl-feld::part(menu-toggle) { display: none; }
 .ko-element.ist-fehler, .ko-element.ist-fehler > span:last-child { color: var(--schlecht); }
 .ko-element.ist-fehler { background: var(--schlecht-hell); }
 .ko-elementname { font-weight: 600; }
+
+/* Diagramme der Querschnittsanalyse: oben der Lastfall, darunter seine Bilder.
+   Solange die Bilder zur Eingabe davor gehören, bleiben sie blass stehen. */
+.qa-fallkopf { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font-size: 12.5px; }
+.qa-fallwahl .schalter-halb { text-transform: none; font-size: 12px; padding: 2px 10px; }
+.qa-nachfuehren { color: var(--schrift-zart); font-style: italic; }
+.blatt.ist-veraltet { opacity: .55; }

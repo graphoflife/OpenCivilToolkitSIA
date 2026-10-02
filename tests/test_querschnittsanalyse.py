@@ -319,3 +319,100 @@ class TestGeometrieEndpunkt(unittest.TestCase):
 
     def test_unbekannte_analyse(self):
         self.assertEqual(self.frage(projekt(), "a9").status, 400)
+
+
+class TestDiagramme(unittest.TestCase):
+    """
+    Die Diagramme der Analyse: was sie zeigen, muss zu den Nachweisen passen.
+
+    Am Unterzug des Beispiels -- symmetrisch, mit einer Zelle aus vier
+    Wänden, M_y = 150 kNm, V_z = 150 kN, T = 15 kNm.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        projekt = Projekt.beispiel()
+        cls.antwort = dienst.bearbeite(
+            "analysediagramme", {"projekt": projekt.als_dict(), "kennung": "a1"})
+        cls.d = cls.antwort.daten["diagramme"]
+        cls.fall = cls.d["faelle"][0]
+
+    def test_antwort(self):
+        self.assertEqual(self.antwort.status, 200)
+        self.assertEqual(self.d["name"], "Unterzug")
+        z = self.d["zeichnung"]
+        self.assertEqual(len(z["polygone"]), 1)
+        self.assertEqual(len(z["staebe"]), 5)
+        self.assertEqual(len(z["waende"]), 4)
+        self.assertEqual(z["schwerpunkt"], [150.0, 300.0])
+
+    def test_die_mn_linie_geht_durch_den_widerstand(self):
+        """Bei N_Ed liegt auf der Linie genau, was der Nachweis als M_Rd hat."""
+        mn = self.fall["mn"]
+        self.assertAlmostEqual(mn["einwirkung"]["M"], 150.0)
+        self.assertAlmostEqual(mn["widerstand"]["N"], 0.0, places=3)
+        self.assertAlmostEqual(mn["widerstand"]["M"], 211.8, places=1)
+        # Die Linie umschliesst den Nullpunkt: Zug oben und unten, Druck dazwischen.
+        ns = [p["N"] for p in mn["punkte"]]
+        ms = [p["M"] for p in mn["punkte"]]
+        self.assertLess(min(ns), 0.0)
+        self.assertGreater(max(ns), 0.0)
+        self.assertLess(min(ms), 0.0)
+        self.assertGreater(max(ms), 0.0)
+
+    def test_die_kurve_bei_n_ed_trifft_die_einachsige_richtung(self):
+        """Rundum bei N_Ed: Zug unten ergibt dasselbe M_y wie der Nachweis."""
+        kontur = self.fall["kontur"]
+        self.assertEqual(len(kontur["punkte"]), 72)
+        groesstes = max(p["M_y"] for p in kontur["punkte"])
+        self.assertAlmostEqual(groesstes, 211.8, places=1)
+        # Symmetrisch: links wie rechts gleich viel M_z.
+        m_z = [p["M_z"] for p in kontur["punkte"]]
+        self.assertAlmostEqual(max(m_z), -min(m_z), places=3)
+
+    def test_der_bruchzustand_im_schnitt(self):
+        b = self.fall["bruch"]
+        # Nulllinie waagrecht über die ganze Breite, Druckzone oben.
+        (y0, z0), (y1, z1) = b["nulllinie"]
+        self.assertEqual(sorted([y0, y1]), [0.0, 300.0])
+        self.assertAlmostEqual(z0, z1)
+        self.assertAlmostEqual(600.0 - z0, b["x"], places=6)
+        self.assertAlmostEqual(b["d"], 550.0)
+        unten = [s["eps"] for s in b["staebe"] if s["z"] < 300.0]
+        self.assertTrue(all(e > 0.0 for e in unten))
+        zone = b["druckzone"][0]["punkte"]
+        self.assertTrue(all(p[1] >= z0 - 1e-9 for p in zone))
+
+    def test_der_schubfluss_haelt_das_gleichgewicht(self):
+        """Die Wandkräfte zusammen sind V_y, V_z und T um den Schwerpunkt."""
+        schub = self.fall["schub"]
+        f_y = f_z = moment = 0.0
+        for s in schub["stuecke"]:
+            dy, dz = s["bis"][0] - s["von"][0], s["bis"][1] - s["von"][1]
+            laenge = math.hypot(dy, dz)
+            kraft_y, kraft_z = s["q"] * dy / 1e3, s["q"] * dz / 1e3  # kN
+            f_y += kraft_y
+            f_z += kraft_z
+            my, mz = (s["von"][0] + s["bis"][0]) / 2 - 150.0, (s["von"][1] + s["bis"][1]) / 2 - 300.0
+            moment += (my * kraft_z - mz * kraft_y) / 1e3  # kNm
+            self.assertGreater(laenge, 0.0)
+        self.assertAlmostEqual(f_y, 0.0, places=6)
+        self.assertAlmostEqual(f_z, 150.0, places=6)
+        self.assertAlmostEqual(moment, 15.0, places=6)
+        # Dieselbe Wand wie im Nachweis ist massgebend.
+        schwach = min(schub["waende"], key=lambda w: w["v_Rd"] / w["q_max"])
+        self.assertEqual(schwach["grad_text"], "1.75")
+
+    def test_einachsig_ohne_kurve(self):
+        projekt = Projekt.beispiel()
+        projekt.querschnittsanalysen[0].einachsig = True
+        d = dienst.bearbeite("analysediagramme", {
+            "projekt": projekt.als_dict(), "kennung": "a1"}).daten["diagramme"]
+        self.assertTrue(d["einachsig"])
+        self.assertIsNone(d["faelle"][0]["kontur"])
+        self.assertAlmostEqual(d["faelle"][0]["mn"]["widerstand"]["M"], 211.8, places=1)
+
+    def test_unbekannte_analyse(self):
+        antwort = dienst.bearbeite("analysediagramme", {
+            "projekt": Projekt.beispiel().als_dict(), "kennung": "a9"})
+        self.assertEqual(antwort.status, 400)

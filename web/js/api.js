@@ -140,6 +140,8 @@ export const api = {
    * der Linien, Schwerpunkt, Zellen und jede Meldung -- ohne Nachweise.
    */
   geometrie: (projekt, kennung) => ruf('geometrie', { projekt, kennung }),
+  /** Die Diagramme einer Querschnittsanalyse -- erst, wenn jemand sie sehen will. */
+  analysediagramme: (projekt, kennung) => ruf('analysediagramme', { projekt, kennung }),
 };
 
 export { KernFehler };

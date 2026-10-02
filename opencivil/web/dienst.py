@@ -359,6 +359,34 @@ def geometrie(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     return api.geometrie(eintrag, projekt)
 
 
+def analysediagramme(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Die Diagramme einer Querschnittsanalyse -- erst, wenn jemand sie sehen will.
+
+    Die M_y-M_z-Kurven brauchen je Lastfall siebzig Bruchzustaende, die kein
+    Nachweis braucht. Mit jeder Rechnung mitgeliefert, machten sie jede
+    Eingabe langsamer, auch bei geschlossenem Reiter. Darum eine eigene
+    Anfrage, wie die M-V-Kurven.
+
+    Die Nachweise selbst rechnen nicht noch einmal, wenn der Zwischenspeicher
+    sie zu genau dieser Beschreibung noch hat -- nach einer Rechnung ist das
+    der Fall. Sonst wird das eine Bauteil gerechnet.
+    """
+    projekt = _projekt(rumpf)
+    kennung = str(rumpf.get("kennung") or "")
+    try:
+        projekt.querschnittsanalyse(kennung)
+    except ProjektFehler as fehler:
+        raise DienstFehler(400, str(fehler)) from None
+    aufbau = projekt.aufbauen()
+    teil = SPEICHER.hole(kennung, speicher.abdruck(projekt.als_dict(), kennung))
+    if teil is not None:
+        aufbau.teile_setzen(kennung, teil.teile)
+    else:
+        aufbau.werk.loese(*aufbau.materialziele(), *aufbau.ziele_von(kennung))
+    return {"diagramme": endlich(diagrammdaten.analyse(aufbau, kennung))}
+
+
 #: Name der Anfrage -> Funktion. Diese Namen sind der ganze Vertrag zwischen
 #: Oberflaeche und Kern; beide Huellen reichen sie unveraendert durch.
 ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
@@ -370,6 +398,7 @@ ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "bericht": bericht,
     "bewehrung_suchen": bewehrung_suchen,
     "geometrie": geometrie,
+    "analysediagramme": analysediagramme,
 }
 
 
