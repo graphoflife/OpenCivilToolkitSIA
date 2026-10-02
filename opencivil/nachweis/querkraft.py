@@ -209,31 +209,47 @@ class Buegelpunkt:
         return min(self.V_Rd_s, self.V_Rd_c)
 
 
+def fachwerk(
+    *, alpha: int, a_sw_s: float, z: float, b_w: float,
+    f_yd: float, f_cd: float, k_c: float,
+) -> Buegelpunkt:
+    """
+    Fachwerkmodell mit veraenderlicher Neigung der Druckdiagonalen -- fuer die
+    Buegel einer Platte wie fuer eine Schubwand der Querschnittsanalyse.
+
+    Alles in SI-Basis: Flaechen in m^2, Laengen in m, Festigkeiten in Pa::
+
+        V_Rd,s = A_sw/s · z · f_yd · cot(alpha)
+        V_Rd,c = b_w · z · k_c · f_cd · sin(alpha) · cos(alpha)
+
+    ``A_sw/s`` ist der Bewehrungsgehalt je Laenge in Laengsrichtung, ``z``
+    der Hebelarm der inneren Kraefte, ``b_w`` die Breite des Stegs.
+    """
+    bogen = math.radians(alpha)
+    return Buegelpunkt(
+        alpha=alpha,
+        V_Rd_s=a_sw_s * z * f_yd / math.tan(bogen),
+        V_Rd_c=b_w * z * k_c * f_cd * math.sin(bogen) * math.cos(bogen),
+    )
+
+
 def buegelwiderstand(
     *, alpha: int, a_s: float, s_x: float, s_y: float, d: float,
     f_yd: float, f_cd: float, k_c: float,
 ) -> Buegelpunkt:
     """
-    Fachwerkmodell mit veraenderlicher Neigung der Druckdiagonalen.
-
-    Alles in SI-Basis: Flaechen in m^2, Laengen in m, Festigkeiten in Pa.
-    Rueckgabe in N/m::
+    Das Fachwerk der Platte, je Laufmeter (Rueckgabe in N/m)::
 
         V_Rd,s = A_(⌀,V)/(s_x · s_y) · 0.9 · d · f_yd · cot(alpha)
         V_Rd,c = 0.9 · d · k_c · f_cd · sin(alpha) · cos(alpha)
 
     ``A_(⌀,V)/(s_x · s_y)`` ist der Bewehrungsgehalt: ein Buegelschenkel je
     Rasterfeld. Beide Groessen gelten **je Laufmeter** -- so wie ``V_Ed`` und
-    wie der Widerstand ohne Buegel. Die betrachtete Breite ``b`` steht deshalb
-    in keiner der beiden Formeln; sie ist der Bezug, auf den sich alle
-    Schnittgroessen ohnehin schon beziehen.
+    wie der Widerstand ohne Buegel. Darum ist die Stegbreite ein Meter, und der
+    Hebelarm ``0.9 · d``.
     """
-    bogen = math.radians(alpha)
-    return Buegelpunkt(
-        alpha=alpha,
-        V_Rd_s=a_s / (s_x * s_y) * 0.9 * d * f_yd / math.tan(bogen),
-        V_Rd_c=0.9 * d * k_c * f_cd * math.sin(bogen) * math.cos(bogen),
-    )
+    return fachwerk(alpha=alpha, a_sw_s=a_s / (s_x * s_y), z=0.9 * d, b_w=1.0,
+                    f_yd=f_yd, f_cd=f_cd, k_c=k_c)
 
 
 @dataclass(frozen=True)

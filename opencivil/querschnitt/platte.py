@@ -280,16 +280,23 @@ class Querkraftbewehrung:
                 f"x: {self.abstand_x.formatiert(0)} mm, y: {y}")
 
     def grenzen(self, zugkraft: bool) -> Tuple[int, int]:
-        """
-        Die beiden Grenzwinkel in Grad, angepasst an das Vorzeichen von ``N_Ed``.
+        """Die beiden Grenzwinkel in Grad -- siehe :func:`druckfeldgrenzen`."""
+        return druckfeldgrenzen(self.alpha_min, self.alpha_max, zugkraft)
 
-        Bei Normalzug steilt sich die Druckdiagonale auf: ``alpha_min`` wird auf
-        40° gesetzt und ``alpha_max`` notfalls mitgehoben, damit der Bereich
-        nicht leer wird.
-        """
-        if not zugkraft:
-            return self.alpha_min, self.alpha_max
-        return ALPHA_ZUG, max(self.alpha_max, ALPHA_ZUG)
+
+def druckfeldgrenzen(alpha_min: int, alpha_max: int, zugkraft: bool) -> Tuple[int, int]:
+    """
+    Die beiden Grenzwinkel der Druckdiagonalen in Grad, angepasst an das
+    Vorzeichen von ``N_Ed`` -- fuer die Buegel der Platte wie fuer die
+    Schubwaende der Querschnittsanalyse.
+
+    Bei Normalzug steilt sich die Druckdiagonale auf: ``alpha_min`` wird auf
+    40° gesetzt und ``alpha_max`` notfalls mitgehoben, damit der Bereich
+    nicht leer wird.
+    """
+    if not zugkraft:
+        return alpha_min, alpha_max
+    return ALPHA_ZUG, max(alpha_max, ALPHA_ZUG)
 
 
 # ===========================================================================
