@@ -51,6 +51,7 @@
     "opencivil/projekt/platte.py": "dece1fedf642",
     "opencivil/projekt/projekt.py": "168ac5bf1f30",
     "opencivil/querschnitt/__init__.py": "e3b0c44298fc",
+    "opencivil/querschnitt/geometrie.py": "9a9a16a9e06f",
     "opencivil/querschnitt/platte.py": "27951d3cde13",
     "opencivil/querschnitt/werkstoffgesetz.py": "7b425b08ac0a",
     "opencivil/spannungsanalyse.py": "f0a37d33b984",
