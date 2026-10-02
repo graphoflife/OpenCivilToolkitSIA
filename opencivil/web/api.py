@@ -43,6 +43,12 @@ from opencivil.projekt import (
     BEIDE_RICHTUNGEN, RISSANFORDERUNGEN, Aufbau, GebrauchsfallEintrag, KnickEintrag,
     KombinationEintrag, MaterialEintrag, QuerschnittEintrag, SpannungsfallEintrag,
 )
+from opencivil.projekt.querschnittsanalyse import (
+    BETONGESETZE, SCHNITTE, WERKSTOFFSAETZE, FlaecheEintrag, QALastfallEintrag,
+    QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
+    WerkstoffwahlEintrag,
+)
+from opencivil.querschnitt.geometrie import Linienart
 from opencivil.projekt.gleichungen import GleichungszeileEintrag
 from opencivil.web import diagrammdaten
 
@@ -109,6 +115,10 @@ def katalog() -> dict:
         # nur noch Kennung, Name und die beiden Materialien.
         "neue_platte": QuerschnittEintrag.neu(
             kennung="", name="", beton="", stahl="").als_dict(),
+        # Dasselbe fuer die Querschnittsanalyse: ein Rechteck mit Staeben zum
+        # Anfangen. Die Oberflaeche setzt Kennung, Name und die Materialien.
+        "neue_querschnittsanalyse": QuerschnittsanalyseEintrag.neu(
+            kennung="", name="", beton="", stahl="").als_dict(),
         # Dasselbe fuer jede Zeile, die man anfuegt -- mit den Startwerten, die
         # eine frische Zeile haben soll (eine Einwirkung von 30 kNm, ein
         # Knickfall unter Druck). Die Oberflaeche setzt nur den Namen und beim
@@ -119,6 +129,32 @@ def katalog() -> dict:
             "gebrauchsfall": GebrauchsfallEintrag(name="").als_dict(),
             "analyse": SpannungsfallEintrag(name="", M_Ed=30.0).als_dict(),
             "material": MaterialEintrag(kennung="", art="", sorte="").als_dict(),
+            # Die Teile der Querschnittsanalyse, wie das Zeichenfenster sie
+            # anlegt. Es setzt nur die Lage, die es gezeichnet hat, und die
+            # Materialien.
+            "qa_lastfall": QALastfallEintrag(name="", M_y_Ed=100.0).als_dict(),
+            "flaeche": FlaecheEintrag().als_dict(),
+            "stab": StabEintrag().als_dict(),
+            "stablinie": StablinieEintrag().als_dict(),
+            "schubwand": SchubwandEintrag().als_dict(),
+            "werkstoffwahl": WerkstoffwahlEintrag(material="").als_dict(),
+        },
+        # Die Wahlmoeglichkeiten der Querschnittsanalyse, mit Beschriftung.
+        "querschnittsanalyse": {
+            "linienarten": [
+                {"wert": Linienart.FLAECHE.value, "beschriftung": "Fläche"},
+                {"wert": Linienart.ANZAHL.value, "beschriftung": "Anzahl"},
+                {"wert": Linienart.TEILUNG.value, "beschriftung": "Teilung"},
+            ],
+            "werkstoffsaetze": [
+                {"wert": WERKSTOFFSAETZE[0], "beschriftung": "Bemessungswerte"},
+                {"wert": WERKSTOFFSAETZE[1], "beschriftung": "charakteristisch"},
+            ],
+            "betongesetze": [
+                {"wert": BETONGESETZE[0], "beschriftung": "Parabel-Rechteck"},
+                {"wert": BETONGESETZE[1], "beschriftung": "Spannungsblock 0.85·x"},
+            ],
+            "schnitte": list(SCHNITTE),
         },
         # `fliessnachweis` sagt, ob diese Anforderung den Nachweis gegen
         # das Fliessen unter haeufiger Einwirkung ueberhaupt verlangt -- bei

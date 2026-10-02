@@ -15,6 +15,9 @@ Aufgabe ein Modul::
                    samt den alten Formaten
     eintraege.py   die Teile: Material, Lagen, Buegel, Lastfaelle
     platte.py      eine Platte mit ihren vier Lagen und allen Schaltern
+    querschnittsanalyse.py
+                   ein gezeichneter Querschnitt: Polygone, Bewehrung,
+                   Schubwaende, Lastfaelle
     projekt.py     das Ganze: Zugriff, Rechnen ohne Oberflaeche, Pruefung,
                    Speichern, das Beispiel
     aufbau.py      aus der Beschreibung ein Rechenwerk
@@ -47,11 +50,17 @@ from opencivil.projekt.eintraege import (
     SpannungsfallEintrag, abgeleiteter_fallname,
 )
 from opencivil.projekt.platte import QuerschnittEintrag
+from opencivil.projekt.querschnittsanalyse import (
+    FlaecheEintrag, QALastfallEintrag, QuerschnittsanalyseEintrag,
+    SchubwandEintrag, StabEintrag, StablinieEintrag, WerkstoffwahlEintrag,
+)
 from opencivil.projekt.aufbau import Aufbau, aufbauen
 from opencivil.projekt.projekt import Projekt
 
 __all__ = [
-    "Aufbau", "BEIDE_RICHTUNGEN", "Beschreibung", "GebrauchsfallEintrag",
+    "Aufbau", "BEIDE_RICHTUNGEN", "Beschreibung", "FlaecheEintrag",
+    "GebrauchsfallEintrag", "QALastfallEintrag", "QuerschnittsanalyseEintrag",
+    "SchubwandEintrag", "StabEintrag", "StablinieEintrag", "WerkstoffwahlEintrag",
     "Gebrauchsliste",
     "HAEUFIG_ANTEIL", "KnickEintrag", "KombinationEintrag", "LageEintrag",
     "MaterialEintrag", "ObergrenzeEintrag", "PostenEintrag", "Projekt", "ProjektFehler",

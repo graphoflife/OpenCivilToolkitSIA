@@ -13,6 +13,10 @@ from opencivil.projekt import (
     ProjektFehler, QuerkraftbewehrungEintrag, QuerschnittEintrag, SpannungsfallEintrag,
 )
 from opencivil.projekt.eintraege import Beschreibung
+from opencivil.projekt.querschnittsanalyse import (
+    FlaecheEintrag, QALastfallEintrag, QuerschnittsanalyseEintrag,
+    SchubwandEintrag, StabEintrag, StablinieEintrag, WerkstoffwahlEintrag,
+)
 from opencivil.projekt.gleichungen import GleichungsblattEintrag, GleichungszeileEintrag
 from opencivil.web import api, dienst
 
@@ -379,6 +383,13 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
         (KombinationEintrag, {"name": "k"}, {"name": "k"}),
         (GleichungszeileEintrag, {}, {}),
         (GleichungsblattEintrag, {"kennung": "g"}, {"kennung": "g", "name": "g"}),
+        (FlaecheEintrag, {}, {}),
+        (StabEintrag, {}, {}),
+        (StablinieEintrag, {}, {}),
+        (SchubwandEintrag, {}, {}),
+        (QALastfallEintrag, {"name": "l"}, {"name": "l"}),
+        (WerkstoffwahlEintrag, {"material": "b1"}, {"material": "b1"}),
+        (QuerschnittsanalyseEintrag, {"kennung": "a"}, {"kennung": "a", "name": "a"}),
         (Projekt, {}, {}),
     ]
 
@@ -423,6 +434,14 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
         material = {**zeilen["material"], "kennung": "b9", "art": "beton",
                     "sorte": "C30/37", "name": "C30/37"}
         self.assertEqual(MaterialEintrag.aus_dict(material).als_dict(), material)
+        for art, cls, pflicht in (
+                ("qa_lastfall", QALastfallEintrag, {"name": "Neu"}),
+                ("flaeche", FlaecheEintrag, {}), ("stab", StabEintrag, {}),
+                ("stablinie", StablinieEintrag, {}), ("schubwand", SchubwandEintrag, {}),
+                ("werkstoffwahl", WerkstoffwahlEintrag, {"material": "b1"})):
+            with self.subTest(art=art):
+                roh = {**zeilen[art], **pflicht}
+                self.assertEqual(cls.aus_dict(roh).als_dict(), roh)
 
     def test_der_katalog_traegt_sie(self):
         vorlage = api.katalog()["neue_platte"]

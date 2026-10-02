@@ -444,7 +444,7 @@ class GebrauchsfallEintrag(Beschreibung):
         )
 
 
-def eindeutig(faelle, platte: str, was: str) -> None:
+def eindeutig(faelle, platte: str, was: str, *, bauteil: str = "Platte") -> None:
     """
     Lastfallnamen muessen je Platte und Liste eindeutig sein.
 
@@ -462,7 +462,7 @@ def eindeutig(faelle, platte: str, was: str) -> None:
     for f in faelle:
         if f.name in gesehen:
             raise ProjektFehler(
-                f"Platte '{platte}': der Name '{f.name}' ist zweimal als {was} "
+                f"{bauteil} '{platte}': der Name '{f.name}' ist zweimal als {was} "
                 f"vergeben. Die Nachweise legen ihre Ergebnisse unter dem "
                 f"Fallnamen ab -- zwei gleiche Namen ergeben eine Zeile statt "
                 f"zwei.")

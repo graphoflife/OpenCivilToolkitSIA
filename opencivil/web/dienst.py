@@ -86,7 +86,7 @@ def beispiel(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
 
 
 #: Woran eine Projektdatei zu erkennen ist. Mindestens eines davon muss da sein.
-KENNFELDER = ("name", "materialien", "querschnitte")
+KENNFELDER = ("name", "materialien", "querschnitte", "querschnittsanalysen")
 
 
 def pruefen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:

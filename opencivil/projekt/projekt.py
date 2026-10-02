@@ -28,6 +28,7 @@ from opencivil.projekt.eintraege import (
 from opencivil.projekt.gleichungen import GleichungsblattEintrag, GleichungszeileEintrag
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.platte import QuerschnittEintrag
+from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.projekt.aufbau import Aufbau, aufbauen
 
 
@@ -46,6 +47,9 @@ class Projekt(Beschreibung):
     gleichungen: List[GleichungsblattEintrag] = field(default_factory=list)
     """Blätter analytischer Gleichungen -- Zeile für Zeile, wie in Mathcad."""
 
+    querschnittsanalysen: List[QuerschnittsanalyseEintrag] = field(default_factory=list)
+    """Gezeichnete Querschnitte: Polygone, Bewehrung, Schubwände."""
+
     # -- Zugriff ------------------------------------------------------------
 
     def material(self, kennung: str) -> MaterialEintrag:
@@ -60,10 +64,17 @@ class Projekt(Beschreibung):
                 return q
         raise ProjektFehler(f"Querschnitt '{kennung}' gibt es im Projekt nicht.")
 
+    def querschnittsanalyse(self, kennung: str) -> QuerschnittsanalyseEintrag:
+        for a in self.querschnittsanalysen:
+            if a.kennung == kennung:
+                return a
+        raise ProjektFehler(f"Querschnittsanalyse '{kennung}' gibt es im Projekt nicht.")
+
     def freie_kennung(self, vorsilbe: str) -> str:
         vergeben = ({m.kennung for m in self.materialien}
                     | {q.kennung for q in self.querschnitte}
-                    | {b.kennung for b in self.gleichungen})
+                    | {b.kennung for b in self.gleichungen}
+                    | {a.kennung for a in self.querschnittsanalysen})
         i = 1
         while f"{vorsilbe}{i}" in vergeben:
             i += 1
@@ -257,6 +268,8 @@ class Projekt(Beschreibung):
 
         for eintrag in self.querschnitte:
             eintrag.pruefen()
+        for eintrag in self.querschnittsanalysen:
+            eintrag.pruefen()
 
     # -- Aufbau -------------------------------------------------------------
 
@@ -279,6 +292,8 @@ class Projekt(Beschreibung):
             materialien=[MaterialEintrag.aus_dict(x) for x in (d.get("materialien") or [])],
             querschnitte=[QuerschnittEintrag.aus_dict(x) for x in (d.get("querschnitte") or [])],
             gleichungen=[GleichungsblattEintrag.aus_dict(x) for x in (d.get("gleichungen") or [])],
+            querschnittsanalysen=[QuerschnittsanalyseEintrag.aus_dict(x)
+                                  for x in (d.get("querschnittsanalysen") or [])],
         )
 
     def speichern(self, pfad: str | Path) -> Path:
