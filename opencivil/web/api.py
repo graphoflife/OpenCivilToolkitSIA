@@ -48,6 +48,7 @@ from opencivil.projekt.querschnittsanalyse import (
     QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
     WerkstoffwahlEintrag,
 )
+from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.projekt.gleichungen import GleichungszeileEintrag
 from opencivil.web import diagrammdaten
@@ -468,6 +469,78 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
     return ergebnis
 
 
+def geometrie(eintrag, projekt) -> dict:
+    """
+    Die Zeichnung einer Querschnittsanalyse, wie der Kern sie sieht -- in mm.
+
+    Geprueft von :class:`~opencivil.querschnitt.analyse.Zeichnung`, denselben
+    Pruefungen, die das Bauteil vor dem Rechnen macht; hier aber alle
+    Meldungen auf einmal statt nur der ersten. Ein Material, das es nicht
+    gibt, oder ein Stahl als Polygon kommt dazu -- das kann nur das Projekt
+    wissen.
+    """
+    arten = {m.kennung: m.art for m in projekt.materialien}
+    vorab: List[dict] = []
+    polygone = []
+    for nummer, f in enumerate(eintrag.flaechen, start=1):
+        if f.material and arten.get(f.material) != "beton":
+            name = f"Polygon {nummer}"
+            vorab.append({"text": (f"{name}: das Material '{f.material}' gibt es nicht "
+                                   f"(mehr) oder es ist kein Beton."),
+                          "elemente": [name]})
+        polygone.append((f.punkte, bool(f.material)))
+    z = Zeichnung(
+        polygone=polygone,
+        staebe=[((s.y, s.z), s.durchmesser) for s in eintrag.staebe],
+        linien=[{k: getattr(l, k) for k in ("von", "bis", "art", "durchmesser", "flaeche",
+                                            "anzahl", "teilung", "starteisen", "endeisen")}
+                for l in eintrag.stablinien],
+        waende=[{k: getattr(w, k) for k in ("von", "bis", "dicke", "durchmesser", "teilung")}
+                for w in eintrag.schubwaende])
+    linien = []
+    for nummer, (l, linie) in enumerate(zip(eintrag.stablinien, z.linien), start=1):
+        if linie is None:
+            linien.append({"element": f"Linie {nummer}", "punkte": [], "teilung": None,
+                           "felder": 0, "flaeche": 0.0, "je_meter": 0.0, "laenge": 0.0})
+            continue
+        flaeche = (l.flaeche if l.art == "flaeche"
+                   else len(linie.punkte) * math.pi * l.durchmesser ** 2 / 4.0)
+        linien.append({
+            "element": f"Linie {nummer}",
+            "punkte": [list(p) for p in linie.punkte],
+            "teilung": linie.teilung,
+            "gewaehlt": l.teilung if l.art == "teilung" else None,
+            "felder": linie.felder,
+            "flaeche": flaeche,
+            "je_meter": flaeche / linie.laenge * 1000.0,
+            "laenge": linie.laenge,
+        })
+    b = z.brutto
+    return {
+        "gueltig": z.gueltig and not vorab,
+        "meldungen": vorab + [{"text": m.text, "elemente": list(m.elemente)}
+                              for m in z.meldungen],
+        "polygone": [
+            {"element": name, "eltern": (z.eltern[i] if z.eltern is not None else None),
+             "aussparung": not z.traegt[i]}
+            for i, name in enumerate(z.namen)],
+        "brutto": None if b is None else {
+            "A": b.A, "y_S": b.y_S, "z_S": b.z_S, "I_y": b.I_y, "I_z": b.I_z,
+            "I_yz": b.I_yz},
+        "staebe": [{"element": f"Stab {i}", "im_beton": gut}
+                   for i, gut in enumerate(z.staebe, start=1)],
+        "linien": linien,
+        "waende": [
+            {"element": f"Wand {i}", "gut": gut,
+             "laenge": math.hypot(w.bis[0] - w.von[0], w.bis[1] - w.von[1]),
+             "a_sw_s": (w.schnitte * math.pi * w.durchmesser ** 2 / 4.0 / w.teilung * 1000.0
+                        if w.durchmesser > 0 and w.teilung > 0 else 0.0)}
+            for i, (w, gut) in enumerate(zip(eintrag.schubwaende, z.waende), start=1)],
+        "zellen": [{"punkte": [list(p) for p in ecken], "flaeche": flaeche}
+                   for ecken, flaeche in z.zellen],
+    }
+
+
 def zuordnung(aufbau: Aufbau) -> dict:
     """Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks."""
     return {
@@ -525,5 +598,13 @@ def zuordnung(aufbau: Aufbau) -> dict:
                 ],
             }
             for kennung, qs in aufbau.querschnitte.items()
+        },
+        "querschnittsanalysen": {
+            kennung: {
+                "namensraum": analyse.id,
+                "name": analyse.name,
+                "werte": {k: d.id for k, d in analyse.definitionen.items()},
+            }
+            for kennung, analyse in aufbau.querschnittsanalysen.items()
         },
     }

@@ -342,6 +342,23 @@ def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     return antwort
 
 
+def geometrie(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Was das Zeichenfenster einer Querschnittsanalyse zeigt -- ohne Nachweise.
+
+    Stablagen und tatsaechliche Teilungen, Schwerpunkt, Zellen der
+    Schubwaende und jede Meldung zur Zeichnung, am Element, das sie betrifft.
+    Schnell genug fuer jede Aenderung: gerechnet wird nur Geometrie.
+    """
+    projekt = _projekt(rumpf)
+    kennung = str(rumpf.get("kennung") or "")
+    try:
+        eintrag = projekt.querschnittsanalyse(kennung)
+    except ProjektFehler as fehler:
+        raise DienstFehler(400, str(fehler)) from None
+    return api.geometrie(eintrag, projekt)
+
+
 #: Name der Anfrage -> Funktion. Diese Namen sind der ganze Vertrag zwischen
 #: Oberflaeche und Kern; beide Huellen reichen sie unveraendert durch.
 ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
@@ -352,6 +369,7 @@ ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "querkraftkurven": querkraftkurven,
     "bericht": bericht,
     "bewehrung_suchen": bewehrung_suchen,
+    "geometrie": geometrie,
 }
 
 

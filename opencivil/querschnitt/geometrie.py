@@ -45,7 +45,14 @@ TOLERANZ = 1e-6
 
 
 class GeometrieFehler(ValueError):
-    """Eine Zeichnung, aus der sich nichts rechnen laesst -- mit dem Grund."""
+    """
+    Eine Zeichnung, aus der sich nichts rechnen laesst -- mit dem Grund und
+    den Elementen, die er betrifft. Das Zeichenfenster faerbt sie ein.
+    """
+
+    def __init__(self, text: str, elemente: Sequence[str] = ()) -> None:
+        super().__init__(text)
+        self.elemente = tuple(elemente)
 
 
 # ===========================================================================
@@ -246,12 +253,13 @@ def polygon_pruefen(punkte: Sequence[Punkt], name: str) -> None:
     mit einem Satz, der sagt, was nicht stimmt.
     """
     if len(punkte) < 3:
-        raise GeometrieFehler(f"{name}: ein Polygon braucht mindestens drei Punkte.")
+        raise GeometrieFehler(f"{name}: ein Polygon braucht mindestens drei Punkte.",
+                              (name,))
     for i, (a, b) in enumerate(_kanten(punkte)):
         if math.hypot(b[0] - a[0], b[1] - a[1]) <= TOLERANZ:
             raise GeometrieFehler(
                 f"{name}: Punkt {i + 1} und Punkt {(i + 1) % len(punkte) + 1} "
-                f"liegen aufeinander.")
+                f"liegen aufeinander.", (name,))
     # Die Kreuzung vor der Flaeche: eine Fliege hat rechnerisch keine Flaeche,
     # weil sich ihre beiden Haelften aufheben -- «kreuzen sich» sagt mehr.
     kreuzung = selbstschnitt(punkte)
@@ -259,9 +267,9 @@ def polygon_pruefen(punkte: Sequence[Punkt], name: str) -> None:
         i, j = kreuzung
         raise GeometrieFehler(
             f"{name}: die Kanten {i + 1} und {j + 1} kreuzen sich. Ein Polygon "
-            f"darf sich nicht selbst überschneiden.")
+            f"darf sich nicht selbst überschneiden.", (name,))
     if abs(flaeche(punkte)) <= TOLERANZ:
-        raise GeometrieFehler(f"{name}: das Polygon hat keine Fläche.")
+        raise GeometrieFehler(f"{name}: das Polygon hat keine Fläche.", (name,))
 
 
 def schnitt_mit_gerade(
@@ -375,7 +383,7 @@ def verschachteln(
                 raise GeometrieFehler(
                     f"{namen[i]} und {namen[j]} überlappen sich teilweise. "
                     f"Polygone dürfen sich berühren oder ganz ineinander "
-                    f"liegen, aber nicht teilweise überlappen.")
+                    f"liegen, aber nicht teilweise überlappen.", (namen[i], namen[j]))
             if b is Beziehung.ERSTES_IM_ZWEITEN:
                 enthaelt[j][i] = True
             elif b is Beziehung.ZWEITES_IM_ERSTEN:

@@ -45,6 +45,7 @@ from opencivil.querschnitt.interaktion import (
     Bewehrung, Querschnitt, Teil, Werkstoff, linie_als_bewehrung,
 )
 from opencivil.querschnitt.schubwaende import Wand
+from opencivil.querschnitt.schubwaende import zellen as zellen_finden
 from opencivil.querschnitt.werkstoffgesetz import (
     Betongesetz, Spannungsblock, Stahlgesetz,
 )
@@ -150,6 +151,173 @@ class Wandangabe:
         return self.schnitte * math.pi * self.durchmesser ** 2 / 4.0 / self.teilung
 
 
+@dataclass(frozen=True)
+class Meldung:
+    """Was an der Zeichnung nicht stimmt, und welche Elemente es betrifft."""
+
+    text: str
+    elemente: Tuple[str, ...]
+
+
+class Zeichnung:
+    """
+    Die Zeichnung einer Analyse, geprueft -- in mm und ohne Rechenwerk.
+
+    Sammelt jede Meldung, statt bei der ersten abzubrechen: das Zeichenfenster
+    zeigt sie alle auf einmal, jede an ihrem Element. Das Bauteil
+    (:class:`Querschnittsanalyse`) baut darauf und bricht bei der ersten ab --
+    gerechnet wird nur, was ganz stimmt. Dieselben Pruefungen an einer Stelle.
+
+    ``polygone`` sind Paare aus Ecken und der Angabe, ob das Polygon Material
+    hat (ohne ist es eine Aussparung); ``staebe`` Paare aus Lage und ⌀;
+    ``linien`` und ``waende`` Woerterbuecher mit den Feldern der Beschreibung.
+    """
+
+    def __init__(self, *, polygone: Sequence[Tuple[Sequence[Punkt], bool]],
+                 staebe: Sequence[Tuple[Punkt, float]],
+                 linien: Sequence[Mapping], waende: Sequence[Mapping]) -> None:
+        self.punkte = [tuple(tuple(p) for p in ecken) for ecken, _ in polygone]
+        self.traegt = [mit for _, mit in polygone]
+        self.namen = [f"{'Polygon' if mit else 'Aussparung'} {i}"
+                      for i, (_, mit) in enumerate(polygone, start=1)]
+        self.meldungen: List[Meldung] = []
+        self.eltern: Optional[Tuple[Optional[int], ...]] = None
+        self.brutto: Optional[geo.Flaechenwerte] = None
+        self._polygone_pruefen()
+        self.staebe = [self._stab(i, tuple(lage), d)
+                       for i, (lage, d) in enumerate(staebe, start=1)]
+        self.linien = [self._linie(i, l) for i, l in enumerate(linien, start=1)]
+        self.waende = [self._wand(i, w) for i, w in enumerate(waende, start=1)]
+        self.zellen = self._zellen(waende) if all(self.waende) else []
+
+    @property
+    def gueltig(self) -> bool:
+        return not self.meldungen
+
+    def _melden(self, text: str, *elemente: str) -> None:
+        self.meldungen.append(Meldung(text=text, elemente=tuple(elemente)))
+
+    # -- Polygone -------------------------------------------------------------------
+
+    def _polygone_pruefen(self) -> None:
+        if not any(self.traegt):
+            self._melden("Es gibt kein Polygon mit Material -- nichts, was trägt.")
+        gut = True
+        for name, ecken in zip(self.namen, self.punkte):
+            try:
+                geo.polygon_pruefen(ecken, name)
+            except GeometrieFehler as fehler:
+                self._melden(str(fehler), *fehler.elemente)
+                gut = False
+        if not gut or not self.punkte:
+            return
+        try:
+            self.eltern = geo.verschachteln(self.punkte, self.namen)
+        except GeometrieFehler as fehler:
+            self._melden(str(fehler), *fehler.elemente)
+            return
+        for i, eltern in enumerate(self.eltern):
+            if not self.traegt[i] and (eltern is None or not self.traegt[eltern]):
+                self._melden(f"{self.namen[i]} liegt in keinem Polygon mit Material. "
+                             f"Eine Aussparung nimmt Fläche weg -- sie muss in "
+                             f"einer liegen.", self.namen[i])
+        if any(self.traegt) and not self.meldungen:
+            self.brutto = geo.summe([(self.gewicht(i), geo.flaechenwerte(p))
+                                     for i, p in enumerate(self.punkte)
+                                     if self.gewicht(i) != 0.0])
+
+    def gewicht(self, i: int) -> float:
+        """+1 fuer ein Polygon mit Material, -1 fuer eine Aussparung darin, sonst 0."""
+        eltern = self.eltern[i]
+        fremd = eltern is not None and self.traegt[eltern]
+        return float(self.traegt[i]) - float(fremd)
+
+    def _im_beton(self, p: Punkt, durchmesser: float) -> bool:
+        return geo.stab_liegt_in(p, durchmesser / 2.0, self.punkte, self.traegt)
+
+    def innerstes(self, p: Punkt) -> Optional[int]:
+        return geo.innerstes(p, self.punkte)
+
+    # -- Bewehrung ----------------------------------------------------------------------
+
+    def _stab(self, nummer: int, lage: Punkt, durchmesser: float) -> bool:
+        name = f"Stab {nummer}"
+        if durchmesser <= 0:
+            self._melden(f"{name}: der Durchmesser muss grösser als null sein.", name)
+            return False
+        if self.eltern is None:
+            return False
+        if not self._im_beton(lage, durchmesser):
+            self._melden(f"{name} (y = {lage[0]:g}, z = {lage[1]:g} mm) liegt nicht ganz "
+                         f"im Beton. Bewehrung muss im Beton liegen.", name)
+            return False
+        return True
+
+    def _linie(self, nummer: int, l: Mapping) -> Optional[geo.Stablinie]:
+        """Die aufgeloeste Linie -- auch wenn ein Stab danebenliegt, fuer die Zeichnung."""
+        name = f"Linie {nummer}"
+        art = Linienart(l["art"])
+        wert = {Linienart.FLAECHE: l["flaeche"], Linienart.ANZAHL: l["anzahl"],
+                Linienart.TEILUNG: l["teilung"]}[art]
+        try:
+            linie = geo.stablinie(tuple(l["von"]), tuple(l["bis"]), art, wert,
+                                  starteisen=l["starteisen"], endeisen=l["endeisen"])
+        except GeometrieFehler as fehler:
+            self._melden(f"{name}: {fehler}", name)
+            return None
+        if art is not Linienart.FLAECHE and l["durchmesser"] <= 0:
+            self._melden(f"{name}: der Durchmesser muss grösser als null sein.", name)
+            return linie
+        if self.eltern is None:
+            return linie
+        if art is Linienart.FLAECHE:
+            if not geo.strecke_liegt_in(linie.von, linie.bis, self.punkte, self.traegt):
+                self._melden(f"{name} liegt nicht ganz im Beton.", name)
+            return linie
+        for k, p in enumerate(linie.punkte, start=1):
+            if not self._im_beton(p, l["durchmesser"]):
+                self._melden(f"{name}, {k}. Stab (y = {p[0]:.1f}, z = {p[1]:.1f} mm) "
+                             f"liegt nicht ganz im Beton.", name)
+                break
+        return linie
+
+    # -- Schubwaende -------------------------------------------------------------------
+
+    def _wand(self, nummer: int, w: Mapping) -> bool:
+        name = f"Wand {nummer}"
+        von, bis = tuple(w["von"]), tuple(w["bis"])
+        if math.hypot(bis[0] - von[0], bis[1] - von[1]) <= geo.TOLERANZ:
+            self._melden(f"{name} hat keine Länge.", name)
+            return False
+        gut = True
+        if w["dicke"] <= 0:
+            self._melden(f"{name}: die Dicke muss grösser als null sein.", name)
+            gut = False
+        if w["durchmesser"] > 0 and w["teilung"] <= 0:
+            self._melden(f"{name}: die Bügelteilung muss grösser als null sein.", name)
+            gut = False
+        if self.eltern is not None and not geo.strecke_liegt_in(
+                von, bis, self.punkte, self.traegt):
+            self._melden(f"{name} liegt nicht ganz im Beton. Eine Schubwand wird von "
+                         f"Gurt zu Gurt im Beton gezeichnet.", name)
+            gut = False
+        return gut
+
+    def _zellen(self, waende: Sequence[Mapping]) -> List[Tuple[List[Punkt], float]]:
+        """Die geschlossenen Flaechen der Wandachsen, als Umriss und Flaeche, in mm."""
+        if not waende:
+            return []
+        achsen = [Wand(name="", von=tuple(w["von"]), bis=tuple(w["bis"]), b_w=1.0,
+                       a_sw_s=0.0, f_sd=0.0, f_cd=0.0, k_c=0.0) for w in waende]
+        modell = zellen_finden(achsen)
+        umrisse = []
+        for zelle in modell.zellen:
+            ecken = [(modell.stuecke[e].von if r > 0 else modell.stuecke[e].bis)
+                     for e, r in zelle.rand]
+            umrisse.append((ecken, zelle.flaeche))
+        return umrisse
+
+
 class QuerschnittsaufbauProzedur(Prozedur):
     """Polygone, Bruttoquerschnitt, Bewehrung und Schubwaende -- in Tabellen."""
 
@@ -182,106 +350,50 @@ class Querschnittsanalyse:
         self.berechnungen: List[Berechnung] = []
         self._interaktionen: Dict[tuple, Tuple[Querschnitt, List[str]]] = {}
 
-        self._zeichnung_pruefen()
+        self.zeichnung = Zeichnung(
+            polygone=[(f.punkte, f.stoff is not None) for f in self.flaechen],
+            staebe=[(lage, d) for lage, d, _ in staebe], linien=linien, waende=waende)
+        if not self.zeichnung.gueltig:
+            erste = self.zeichnung.meldungen[0]
+            raise GeometrieFehler(erste.text, erste.elemente)
+        self.eltern = self.zeichnung.eltern
+        self.brutto = self.zeichnung.brutto
         self.gruppen: List[Stabgruppe] = self._bewehrung(staebe, linien)
         self.waende: List[Wandangabe] = self._waende(waende)
-        self.brutto = geo.summe([
-            (self._gewicht(i), geo.flaechenwerte(f.punkte))
-            for i, f in enumerate(self.flaechen) if self._gewicht(i) != 0.0])
         self._aufbauen(alpha_min, alpha_max, k_c)
 
-    # -- Pruefen --------------------------------------------------------------
-
-    def _zeichnung_pruefen(self) -> None:
-        if not any(f.stoff is not None for f in self.flaechen):
-            raise GeometrieFehler("Es gibt kein Polygon mit Material -- nichts, was trägt.")
-        for f in self.flaechen:
-            geo.polygon_pruefen(f.punkte, f.name)
-        self.eltern = geo.verschachteln([f.punkte for f in self.flaechen],
-                                        [f.name for f in self.flaechen])
-        for f, eltern in zip(self.flaechen, self.eltern):
-            if f.stoff is None and (eltern is None or self.flaechen[eltern].stoff is None):
-                raise GeometrieFehler(
-                    f"{f.name} liegt in keinem Polygon mit Material. Eine "
-                    f"Aussparung nimmt Fläche weg -- sie muss in einer liegen.")
-        self._polygone = [f.punkte for f in self.flaechen]
-        self._traegt = [f.stoff is not None for f in self.flaechen]
+    # -- Aus der Zeichnung --------------------------------------------------------------
 
     def _gewicht(self, i: int) -> float:
-        """+1 fuer ein Polygon mit Material, -1 fuer eine Aussparung darin, sonst 0."""
-        eigen = self.flaechen[i].stoff is not None
-        eltern = self.eltern[i]
-        fremd = eltern is not None and self.flaechen[eltern].stoff is not None
-        return float(eigen) - float(fremd)
-
-    def _im_beton(self, p: Punkt, durchmesser: float) -> bool:
-        return geo.stab_liegt_in(p, durchmesser / 2.0, self._polygone, self._traegt)
+        return self.zeichnung.gewicht(i)
 
     def beton_an(self, p: Punkt) -> Optional[Baustoff]:
         """Der Werkstoff des innersten Polygons an dieser Stelle."""
-        innen = geo.innerstes(p, self._polygone)
+        innen = self.zeichnung.innerstes(p)
         return None if innen is None else self.flaechen[innen].stoff
 
     def _bewehrung(self, staebe, linien) -> List[Stabgruppe]:
         gruppen: List[Stabgruppe] = []
         for nummer, (lage, durchmesser, stahl) in enumerate(staebe, start=1):
-            name = f"Stab {nummer}"
-            if durchmesser <= 0:
-                raise GeometrieFehler(f"{name}: der Durchmesser muss grösser als null sein.")
-            if not self._im_beton(lage, durchmesser):
-                raise GeometrieFehler(
-                    f"{name} (y = {lage[0]:g}, z = {lage[1]:g} mm) liegt nicht ganz "
-                    f"im Beton. Bewehrung muss im Beton liegen.")
             gruppen.append(Stabgruppe(
-                name=name, art="stab", stahl=stahl, durchmesser=durchmesser,
-                punkte=(lage,), flaeche=math.pi * durchmesser ** 2 / 4.0,
-                von=lage, bis=lage))
-
-        for nummer, l in enumerate(linien, start=1):
-            name = f"Linie {nummer}"
+                name=f"Stab {nummer}", art="stab", stahl=stahl, durchmesser=durchmesser,
+                punkte=(tuple(lage),), flaeche=math.pi * durchmesser ** 2 / 4.0,
+                von=tuple(lage), bis=tuple(lage)))
+        for nummer, (l, linie) in enumerate(zip(linien, self.zeichnung.linien), start=1):
             art = Linienart(l["art"])
-            wert = {Linienart.FLAECHE: l["flaeche"], Linienart.ANZAHL: l["anzahl"],
-                    Linienart.TEILUNG: l["teilung"]}[art]
-            try:
-                aufgeloest = geo.stablinie(l["von"], l["bis"], art, wert,
-                                           starteisen=l["starteisen"], endeisen=l["endeisen"])
-            except GeometrieFehler as fehler:
-                raise GeometrieFehler(f"{name}: {fehler}") from None
-            if art is Linienart.FLAECHE:
-                if not geo.strecke_liegt_in(l["von"], l["bis"], self._polygone, self._traegt):
-                    raise GeometrieFehler(f"{name} liegt nicht ganz im Beton.")
-                flaeche = wert
-            else:
-                if l["durchmesser"] <= 0:
-                    raise GeometrieFehler(f"{name}: der Durchmesser muss grösser als null sein.")
-                for k, p in enumerate(aufgeloest.punkte, start=1):
-                    if not self._im_beton(p, l["durchmesser"]):
-                        raise GeometrieFehler(
-                            f"{name}, {k}. Stab (y = {p[0]:.1f}, z = {p[1]:.1f} mm) liegt "
-                            f"nicht ganz im Beton.")
-                flaeche = len(aufgeloest.punkte) * math.pi * l["durchmesser"] ** 2 / 4.0
+            flaeche = (l["flaeche"] if art is Linienart.FLAECHE
+                       else len(linie.punkte) * math.pi * l["durchmesser"] ** 2 / 4.0)
             gruppen.append(Stabgruppe(
-                name=name, art=art.value, stahl=l["stahl"], durchmesser=l["durchmesser"],
-                punkte=aufgeloest.punkte, flaeche=flaeche, von=tuple(l["von"]),
-                bis=tuple(l["bis"]), linie=aufgeloest,
-                gewaehlt=wert if art is Linienart.TEILUNG else None))
+                name=f"Linie {nummer}", art=art.value, stahl=l["stahl"],
+                durchmesser=l["durchmesser"], punkte=linie.punkte, flaeche=flaeche,
+                von=tuple(l["von"]), bis=tuple(l["bis"]), linie=linie,
+                gewaehlt=l["teilung"] if art is Linienart.TEILUNG else None))
         return gruppen
 
     def _waende(self, waende) -> List[Wandangabe]:
         ergebnis: List[Wandangabe] = []
         for nummer, w in enumerate(waende, start=1):
-            name = f"Wand {nummer}"
             von, bis = tuple(w["von"]), tuple(w["bis"])
-            if math.hypot(bis[0] - von[0], bis[1] - von[1]) <= geo.TOLERANZ:
-                raise GeometrieFehler(f"{name} hat keine Länge.")
-            if w["dicke"] <= 0:
-                raise GeometrieFehler(f"{name}: die Dicke muss grösser als null sein.")
-            if w["durchmesser"] > 0 and w["teilung"] <= 0:
-                raise GeometrieFehler(f"{name}: die Bügelteilung muss grösser als null sein.")
-            if not geo.strecke_liegt_in(von, bis, self._polygone, self._traegt):
-                raise GeometrieFehler(
-                    f"{name} liegt nicht ganz im Beton. Eine Schubwand wird von Gurt zu "
-                    f"Gurt im Beton gezeichnet.")
             mitte = ((von[0] + bis[0]) / 2.0, (von[1] + bis[1]) / 2.0)
             ergebnis.append(Wandangabe(
                 nummer=nummer, von=von, bis=bis, dicke=w["dicke"],

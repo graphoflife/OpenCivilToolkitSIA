@@ -279,3 +279,43 @@ class TestDienst(unittest.TestCase):
         raeume = {u["raum"] for u in antwort.daten["urteile"]}
         self.assertTrue(raeume and all(r.startswith("querschnittsanalyse.a1") for r in raeume))
         self.assertIn("a1", antwort.daten["zusammenfassungen"])
+
+
+class TestGeometrieEndpunkt(unittest.TestCase):
+    """Was das Zeichenfenster bekommt: alle Meldungen, jede am Element."""
+
+    def frage(self, p, kennung="a1"):
+        return dienst.bearbeite("geometrie", {"projekt": p.als_dict(), "kennung": kennung})
+
+    def test_gueltig(self):
+        d = self.frage(projekt()).daten
+        self.assertTrue(d["gueltig"])
+        self.assertEqual(d["meldungen"], [])
+        self.assertAlmostEqual(d["brutto"]["z_S"], 300.0)
+        # Unten drei Stäbe auf 200 mm: zwei Felder zu 100 mm.
+        self.assertEqual(d["linien"][0]["felder"], 2)
+        self.assertAlmostEqual(d["linien"][0]["teilung"], 100.0)
+
+    def test_alle_meldungen_auf_einmal(self):
+        p = projekt()
+        a = p.querschnittsanalysen[0]
+        a.staebe += [StabEintrag(y=5, z=300, durchmesser=20, stahl="s1"),
+                     StabEintrag(y=150, z=300, durchmesser=0, stahl="s1")]
+        d = self.frage(p).daten
+        self.assertFalse(d["gueltig"])
+        self.assertEqual([m["elemente"] for m in d["meldungen"]], [["Stab 1"], ["Stab 2"]])
+
+    def test_ueberlappung_nennt_beide(self):
+        p = projekt()
+        p.querschnittsanalysen[0].flaechen.append(
+            FlaecheEintrag(punkte=[[250, 0], [500, 0], [500, 100], [250, 100]], material="b1"))
+        d = self.frage(p).daten
+        self.assertEqual(d["meldungen"][0]["elemente"], ["Polygon 1", "Polygon 2"])
+
+    def test_zellen_der_waende(self):
+        d = self.frage(projekt(schubwaende=kastenwaende())).daten
+        self.assertEqual(len(d["zellen"]), 1)
+        self.assertAlmostEqual(d["zellen"][0]["flaeche"], 200 * 500)
+
+    def test_unbekannte_analyse(self):
+        self.assertEqual(self.frage(projekt(), "a9").status, 400)
