@@ -61,7 +61,8 @@ def abdruck(projekt_dict: Mapping[str, Any], kennung: str) -> str:
     Kennung wohin zeigt, waere genau die Stelle, an der man eines vergisst.
     Materialien sind ein paar Zeilen JSON; sie mitzuzaehlen kostet nichts.
     """
-    eintrag = next((q for q in projekt_dict.get("querschnitte") or []
+    eintrag = next((q for q in (projekt_dict.get("querschnitte") or [])
+                    + (projekt_dict.get("querschnittsanalysen") or [])
                     if q.get("kennung") == kennung), None)
     return json.dumps(
         {"querschnitt": eintrag, "materialien": projekt_dict.get("materialien")},

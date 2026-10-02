@@ -166,14 +166,15 @@ def _stromabwaerts(projekt: Projekt, aufbau) -> Loesung:
     verschoebe, aenderte den Bericht, und das waere keine Beschleunigung mehr,
     sondern eine andere Ausgabe.
     """
-    kennungen = [q.kennung for q in projekt.querschnitte]
+    kennungen = ([q.kennung for q in projekt.querschnitte]
+                 + [a.kennung for a in projekt.querschnittsanalysen])
     SPEICHER.aufraeumen(kennungen)
 
     materialziele = aufbau.materialziele()
     gesamt = aufbau.werk.loese(*materialziele)
     bekannt = dict(gesamt.werte)
 
-    for kennung, eigene in aufbau.ziele_je_platte():
+    for kennung, eigene in aufbau.ziele_je_bauteil():
         if not eigene:
             continue
         stempel = speicher.abdruck(projekt.als_dict(), kennung)

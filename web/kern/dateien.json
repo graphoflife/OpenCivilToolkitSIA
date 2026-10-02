@@ -4,11 +4,11 @@
     "opencivil/__init__.py": "6221ac8cbf06",
     "opencivil/bericht/__init__.py": "e3b0c44298fc",
     "opencivil/bericht/formelsammlung.py": "eea9eceef752",
-    "opencivil/bericht/gliederung.py": "8150a5e1527f",
-    "opencivil/bericht/konsole.py": "a08dfd774264",
+    "opencivil/bericht/gliederung.py": "fefaeb6ca558",
+    "opencivil/bericht/konsole.py": "9bc658c20513",
     "opencivil/bericht/latex_dokument.py": "9283b17b157a",
     "opencivil/bericht/markdown.py": "65df28faa908",
-    "opencivil/bericht/zusammenfassung.py": "97d3c5f6adad",
+    "opencivil/bericht/zusammenfassung.py": "bd9f1fce8dca",
     "opencivil/bewehrungssuche/__init__.py": "4aea6c041a45",
     "opencivil/bewehrungssuche/bewertung.py": "41288248ee6e",
     "opencivil/bewehrungssuche/buegel.py": "1d13ee2d95d6",
@@ -44,7 +44,7 @@
     "opencivil/nachweis/sproedes_versagen.py": "75b500f27fab",
     "opencivil/nachweis/zustand2.py": "7ba9c5ef3a2c",
     "opencivil/projekt/__init__.py": "5014733a9f9e",
-    "opencivil/projekt/aufbau.py": "c9f9b39d1669",
+    "opencivil/projekt/aufbau.py": "465cadd84d52",
     "opencivil/projekt/eintraege.py": "38862e4eae86",
     "opencivil/projekt/gleichungen.py": "64df41c84f4d",
     "opencivil/projekt/lesen.py": "7dd44d9b86ea",
@@ -60,11 +60,11 @@
     "opencivil/querschnitt/werkstoffgesetz.py": "8a2c8405ff02",
     "opencivil/spannungsanalyse.py": "f0a37d33b984",
     "opencivil/web/__init__.py": "e3b0c44298fc",
-    "opencivil/web/api.py": "76f92955f78c",
+    "opencivil/web/api.py": "b7b4537dbbf0",
     "opencivil/web/bruecke.py": "24e1fcb0cd8c",
     "opencivil/web/diagrammdaten.py": "69cdc2036f2f",
-    "opencivil/web/dienst.py": "de04e577e492",
+    "opencivil/web/dienst.py": "8658813f5cd9",
     "opencivil/web/server.py": "43665395faca",
-    "opencivil/web/speicher.py": "1bdcf27fa321"
+    "opencivil/web/speicher.py": "d000d8bff113"
   }
 }

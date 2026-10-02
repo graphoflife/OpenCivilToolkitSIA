@@ -23,8 +23,8 @@ from opencivil.core.einheiten import MM
 from opencivil.bericht.formelsammlung import Thema
 from opencivil.bericht.markdown import block_markdown
 from opencivil.bericht.zusammenfassung import (
-    GRAD_SPALTE, STAPEL_SPALTEN, bewehrungsuebersicht, hinweise, nachweistabelle,
-    plattenangaben, stiller_hinweis, zusammenfassen,
+    GRAD_SPALTE, STAPEL_SPALTEN, angaben, hinweise, nachweistabelle,
+    stiller_hinweis, zusammenfassen,
 )
 from opencivil.core.latex import Mathe, Zelle
 from opencivil.core.protokoll import (
@@ -422,13 +422,13 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
     Zeile.
     """
     ergebnis: Dict[str, Any] = {}
-    for platte in zusammenfassen(aufbau, loesung).platten:
-        # Eine Platte ohne jedes Urteil bekommt keine Tabelle -- die
+    for platte in zusammenfassen(aufbau, loesung).bauteile:
+        # Ein Bauteil ohne jedes Urteil bekommt keine Tabelle -- die
         # Oberflaeche zeigt dafuer ihren eigenen Leerzustand, der Bericht
         # «Kein Nachweis geführt».
         if platte.leer:
             continue
-        qs = aufbau.querschnitte[platte.kennung]
+        kopf_angaben, bewehrung = angaben(aufbau, platte.kennung)
         tabelle = nachweistabelle(platte)
         ergebnis[platte.kennung] = {
             "kopf": [zelle_dict(k) for k in tabelle.kopf],
@@ -453,8 +453,8 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
             "latex": tabelle.als_latex(),
             "markdown": block_markdown(tabelle),
             "hinweise": hinweise(platte),
-            "angaben": _gleichung_dict(plattenangaben(qs), 0),
-            "bewehrung": _tabelle_dict(bewehrungsuebersicht(qs), 0),
+            "angaben": _gleichung_dict(kopf_angaben, 0),
+            "bewehrung": _tabelle_dict(bewehrung, 0),
             # Der Grad kommt fertig gesetzt: welche Stelle noetig ist, damit
             # er dem Wort «nicht erfuellt» nicht widerspricht, weiss hier
             # dieselbe Stelle wie fuer die Tabelle.

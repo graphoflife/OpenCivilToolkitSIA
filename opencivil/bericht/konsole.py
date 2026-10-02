@@ -183,24 +183,24 @@ def zusammenfassung(zusammenfassung: "Zusammenfassung") -> str:
     als zwei gleiche Zeilen da.
     """
     zeilen: List[str] = []
-    for platte in zusammenfassung.platten:
-        zeilen += [platte.name, "-" * len(platte.name)]
-        if platte.zeilen:
+    for bauteil in zusammenfassung.bauteile:
+        zeilen += [bauteil.name, "-" * len(bauteil.name)]
+        if bauteil.zeilen:
             tabelle = TabellenBlock(
                 kopf=["Nachweis", "Fall", "Widerstand", "Einwirkung", "α_eff", ""],
                 zeilen=[[z.nachweis, z.fall or "–",
                          _wert_text(z.widerstand), _wert_text(z.einwirkung),
                          z.urteil.gradtext(),
                          "erfüllt" if z.urteil.erfuellt else "NICHT ERFÜLLT"]
-                        for z in platte.zeilen],
+                        for z in bauteil.zeilen],
                 ausrichtung="llrrrl")
             zeilen += _tabelle_zeilen(tabelle, 2)
         else:
             zeilen.append("  Kein Nachweis geführt.")
-        if platte.stille:
+        if bauteil.stille:
             zeilen += ["", "  Nicht geführt, geht aber nicht auf:"]
             zeilen += [f"    {z.nachweis}{f' – {z.fall}' if z.fall else ''}: "
-                       f"α_eff = {z.urteil.gradtext()}" for z in platte.stille]
+                       f"α_eff = {z.urteil.gradtext()}" for z in bauteil.stille]
         zeilen.append("")
 
     if zusammenfassung.gefuehrt:

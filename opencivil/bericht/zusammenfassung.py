@@ -2,9 +2,9 @@
 opencivil/bericht/zusammenfassung.py -- was in der Zusammenfassung steht.
 
 VERANTWORTUNG:
-Je Platte die gefuehrten Urteile und darunter die still verfehlten; dazu,
-was ueber der Nachweistabelle steht (Angaben zur Platte, Bewehrung) und was
-darunter (Hinweise, stille Maengel). Als Bloecke und Saetze, nicht als
+Je Bauteil -- Platte oder Querschnittsanalyse -- die gefuehrten Urteile und
+darunter die still verfehlten; dazu, was ueber der Nachweistabelle steht
+(Angaben zur Platte, Bewehrung) und was darunter (Hinweise, stille Maengel). Als Bloecke und Saetze, nicht als
 Aussehen: dieselben Stuecke setzt die Oberflaeche
 (:func:`opencivil.web.api.zusammenfassungen`) und der Bericht
 (:func:`opencivil.bericht.gliederung.bericht`), jede Darstellung auf ihre Art.
@@ -23,7 +23,7 @@ was unter der Tabelle steht, steht jetzt hier und nur hier.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 from opencivil.core.berechnung import NachweisUrteil
 from opencivil.core.einheiten import MM, Groesse
@@ -68,18 +68,22 @@ class Zeile:
 
 
 @dataclass(frozen=True)
-class Platte:
-    """Die Zusammenfassung einer Platte."""
+class Bauteil:
+    """Die Zusammenfassung eines Bauteils -- einer Platte oder einer Analyse."""
 
     kennung: str
     name: str
-    """Leer fuer die eine Gruppe eines Rechenwerks ohne Platten."""
+    """Leer fuer die eine Gruppe eines Rechenwerks ohne Bauteile."""
 
     zeilen: List[Zeile]
     """Die gefuehrten Urteile -- je Nachweis mit Lagen nur die schlechtere."""
 
     stille: List[Zeile]
     """Was ausgeschaltet ist und trotzdem nicht aufgeht."""
+
+    art: str = "platte"
+    """``platte`` oder ``querschnittsanalyse`` -- was ueber der Tabelle steht,
+    haengt daran."""
 
     @property
     def leer(self) -> bool:
@@ -88,9 +92,9 @@ class Platte:
 
 @dataclass(frozen=True)
 class Zusammenfassung:
-    """Alle Platten, das Gesamturteil und was beim Aufbau auffiel."""
+    """Alle Bauteile, das Gesamturteil und was beim Aufbau auffiel."""
 
-    platten: List[Platte]
+    bauteile: List[Bauteil]
     erfuellt: bool
     """Ob alle gefuehrten Nachweise aufgehen."""
 
@@ -102,35 +106,37 @@ class Zusammenfassung:
 
 def zusammenfassen(aufbau: Optional["Aufbau"], loesung: Loesung) -> Zusammenfassung:
     """
-    Die Zeilen je Platte, in der Reihenfolge der Beschreibung.
+    Die Zeilen je Bauteil, in der Reihenfolge der Beschreibung: erst die
+    Platten, dann die Querschnittsanalysen.
 
     Die Urteile kommen fertig aus der Loesung: ohne die stillen, und je
     Nachweis, der seine Lagen sammelt, nur die schlechteste. Hier zu filtern
     hiesse, diese Regel ein zweites Mal zu schreiben.
 
-    Ohne Aufbau -- ein Rechenwerk, das keine Platten kennt -- stehen alle
+    Ohne Aufbau -- ein Rechenwerk, das keine Bauteile kennt -- stehen alle
     Urteile in einer Gruppe ohne Namen. Ein Weg fuer beide Faelle, nicht zwei.
     """
     if aufbau is None:
-        platten = [Platte(
+        bauteile = [Bauteil(
             kennung="", name="",
             zeilen=[Zeile.aus(u) for u in loesung.gefuehrte_urteile],
             stille=[Zeile.aus(u) for u in loesung.stille_maengel],
         )]
     else:
-        platten = [
-            Platte(
-                kennung=kennung,
-                name=querschnitt.name,
+        bauteile = [
+            Bauteil(
+                kennung=b.kennung,
+                name=b.name,
                 zeilen=[Zeile.aus(u) for u in
-                        aufbau.urteile_von(kennung, loesung.gefuehrte_urteile)],
+                        aufbau.urteile_von(b.kennung, loesung.gefuehrte_urteile)],
                 stille=[Zeile.aus(u) for u in
-                        aufbau.urteile_von(kennung, loesung.stille_maengel)],
+                        aufbau.urteile_von(b.kennung, loesung.stille_maengel)],
+                art=b.art,
             )
-            for kennung, querschnitt in aufbau.querschnitte.items()
+            for b in aufbau.bauteile()
         ]
     return Zusammenfassung(
-        platten=platten,
+        bauteile=bauteile,
         erfuellt=loesung.alle_nachweise_erfuellt,
         gefuehrt=bool(loesung.gefuehrte_urteile),
         warnungen=list(aufbau.warnungen) if aufbau is not None else [],
@@ -172,18 +178,18 @@ def _groesse(wert: Optional[Wert]) -> Zelle:
                  rf"{wert.einheit.als_latex()}")
 
 
-def nachweistabelle(platte: Platte) -> TabellenBlock:
-    """Je gefuehrtes Urteil eine Zeile, in der Folge von :attr:`Platte.zeilen`."""
+def nachweistabelle(bauteil: Bauteil) -> TabellenBlock:
+    """Je gefuehrtes Urteil eine Zeile, in der Folge von :attr:`Bauteil.zeilen`."""
     return TabellenBlock(
         kopf=NACHWEISKOPF,
         zeilen=[[z.nachweis, z.fall or "–", _groesse(z.widerstand),
                  _groesse(z.einwirkung), Mathe(z.urteil.gradtext(latex=True))]
-                for z in platte.zeilen],
+                for z in bauteil.zeilen],
         ausrichtung=AUSRICHTUNG,
     )
 
 
-def hinweise(platte: Platte) -> List[str]:
+def hinweise(bauteil: Bauteil) -> List[str]:
     """
     Was unter der Tabelle stehen muss, nach Grund gebuendelt.
 
@@ -194,7 +200,7 @@ def hinweise(platte: Platte) -> List[str]:
     waere keine Erklaerung, sondern eine Wand.
     """
     nach_grund: Dict[str, List[str]] = {}
-    for zeile in platte.zeilen:
+    for zeile in bauteil.zeilen:
         if zeile.urteil.hinweis:
             nach_grund.setdefault(zeile.urteil.hinweis, []).append(zeile.bezeichnung)
     return [f"{', '.join(namen)}: {grund}" for grund, namen in nach_grund.items()]
@@ -217,6 +223,18 @@ def stiller_hinweis(zeile: Zeile) -> str:
 # ===========================================================================
 # Ueber der Tabelle
 # ===========================================================================
+
+
+def angaben(aufbau: "Aufbau", kennung: str) -> Tuple[GleichungBlock, TabellenBlock]:
+    """
+    Was ueber der Nachweistabelle eines Bauteils steht: eine Zeile mit den
+    Angaben und eine Tabelle der Bewehrung -- bei der Platte ihre Lagen, bei
+    der Querschnittsanalyse ihre Staebe und Schubwaende.
+    """
+    platte = aufbau.querschnitte.get(kennung)
+    if platte is not None:
+        return plattenangaben(platte), bewehrungsuebersicht(platte)
+    return aufbau.querschnittsanalysen[kennung].angaben()
 
 
 def plattenangaben(qs: "QuerschnittEintrag") -> GleichungBlock:

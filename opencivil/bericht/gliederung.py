@@ -30,8 +30,8 @@ from typing import TYPE_CHECKING, Optional
 from opencivil.bericht.formelsammlung import anfuegen as formelsammlung_anfuegen
 from opencivil.bericht.formelsammlung import formelsammlung
 from opencivil.bericht.zusammenfassung import (
-    Zusammenfassung, bewehrungsuebersicht, hinweise, nachweistabelle,
-    plattenangaben, stiller_hinweis, zusammenfassen,
+    Zusammenfassung, angaben, hinweise, nachweistabelle, stiller_hinweis,
+    zusammenfassen,
 )
 from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Protokoll, TabellenBlock
@@ -96,28 +96,27 @@ def _nachweise(p: Protokoll, zusammenfassung: Zusammenfassung,
     gibt es beides nicht. Darum steht jeder unter der Tabelle mit seiner
     Begruendung, sofern ihn nicht schon ein gebuendelter Hinweis erklaert.
     """
-    if all(platte.leer for platte in zusammenfassung.platten) \
+    if all(bauteil.leer for bauteil in zusammenfassung.bauteile) \
             and not zusammenfassung.warnungen:
         return
     _abschnitt(p, "Nachweise")
-    for platte in zusammenfassung.platten:
-        if platte.name:
-            p.titel(platte.name)
-        if platte.leer:
+    for bauteil in zusammenfassung.bauteile:
+        if bauteil.name:
+            p.titel(bauteil.name)
+        if bauteil.leer:
             p.text("Kein Nachweis geführt.")
             continue
         if aufbau is not None:
-            eintrag = aufbau.querschnitte[platte.kennung]
-            p.anfuegen(plattenangaben(eintrag), bewehrungsuebersicht(eintrag))
-        if platte.zeilen:
-            p.anfuegen(nachweistabelle(platte))
-        for text in hinweise(platte):
+            p.anfuegen(*angaben(aufbau, bauteil.kennung))
+        if bauteil.zeilen:
+            p.anfuegen(nachweistabelle(bauteil))
+        for text in hinweise(bauteil):
             p.hinweis(text)
-        for zeile in platte.zeilen:
+        for zeile in bauteil.zeilen:
             if not zeile.urteil.erfuellt and not zeile.urteil.hinweis:
                 p.warnung(f"{zeile.bezeichnung}: nicht erfüllt. "
                           f"{zeile.urteil.begruendung}".rstrip())
-        for zeile in platte.stille:
+        for zeile in bauteil.stille:
             p.hinweis(stiller_hinweis(zeile))
 
     if zusammenfassung.gefuehrt:

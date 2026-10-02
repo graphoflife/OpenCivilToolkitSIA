@@ -125,6 +125,9 @@ class Aufbau:
     blaetter: Dict[str, Gleichungsblatt] = field(default_factory=dict)
     """Die Blätter analytischer Gleichungen, nach Kennung."""
 
+    querschnittsanalysen: Dict[str, Any] = field(default_factory=dict)
+    """Die gezeichneten Querschnitte, nach Kennung -- Bauteile wie die Platten."""
+
     warnungen: List[str] = field(default_factory=list)
 
     #: Die Felder, in denen die Nachweise einer Platte stehen -- die eine
@@ -188,17 +191,30 @@ class Aufbau:
     def eckwertziele(self) -> List[str]:
         return [d.id for n in self.nachweise.values() for d in n.d_eckwerte.values()]
 
-    def ziele_je_platte(self) -> List[Tuple[str, List[str]]]:
+    def bauteile(self) -> List["Bauteilkopf"]:
         """
-        Die Rechenziele Platte fuer Platte, in der Reihenfolge der Beschreibung.
+        Jedes Bauteil, in der Reihenfolge der Beschreibung: erst die Platten,
+        dann die Querschnittsanalysen.
 
-        Die eine Stelle, die diese Reihenfolge festlegt. Die Oberflaeche geht
-        darueber, um je Platte zwischenzuspeichern
+        Die eine Stelle, die diese Reihenfolge festlegt -- fuer die Rechenziele,
+        den Zwischenspeicher und die Zusammenfassung.
+        """
+        return ([Bauteilkopf(k, q.name, q.id, "platte")
+                 for k, q in self.querschnitte.items()]
+                + [Bauteilkopf(k, a.name, a.id, "querschnittsanalyse")
+                   for k, a in self.querschnittsanalysen.items()])
+
+    def ziele_je_bauteil(self) -> List[Tuple[str, List[str]]]:
+        """
+        Die Rechenziele Bauteil fuer Bauteil, in der Reihenfolge von
+        :meth:`bauteile`.
+
+        Die Oberflaeche geht darueber, um je Bauteil zwischenzuspeichern
         (:func:`opencivil.web.dienst._stromabwaerts`); :meth:`alle_ziele`
         haengt sie aneinander. Vorher bildete jede der beiden die Folge
         selbst, und dass sie gleich war, stand nur im Docstring.
         """
-        return [(kennung, self.ziele_von(kennung)) for kennung in self.querschnitte]
+        return [(b.kennung, self.ziele_von(b.kennung)) for b in self.bauteile()]
 
     def alle_ziele(self) -> List[str]:
         """
@@ -207,7 +223,7 @@ class Aufbau:
         Nachweise. Wer ohne Oberflaeche rechnet, bekommt so denselben Bericht.
         """
         ziele = self.materialziele()
-        for _, eigene in self.ziele_je_platte():
+        for _, eigene in self.ziele_je_bauteil():
             ziele += eigene
         return ziele + self.blattziele()
 
@@ -230,7 +246,7 @@ class Aufbau:
         Nicht am Namen: den Anzeigetext zu zerlegen hat schon einmal die
         Nachweise mehrerer Platten in dieselbe Tabelle gepackt.
         """
-        raum = self.querschnitte[kennung].id
+        raum = next(b.raum for b in self.bauteile() if b.kennung == kennung)
         return [u for u in urteile
                 if u.raum == raum or u.raum.startswith(f"{raum}.")]
 
@@ -251,6 +267,19 @@ class Aufbau:
             nach_art.setdefault(stoff.art.value, []).extend(
                 d.id for d in stoff.definitionen.values())
         return nach_art["beton"] + nach_art["betonstahl"]
+
+
+@dataclass(frozen=True)
+class Bauteilkopf:
+    """Was man von einem Bauteil wissen muss, um seine Teile zu finden."""
+
+    kennung: str
+    name: str
+    raum: str
+    """Der Namensraum seiner Werte und Urteile."""
+
+    art: str
+    """``platte`` oder ``querschnittsanalyse``."""
 
 
 #: Wie ein fertig gebauter Nachweis angemeldet wird: Feld im
