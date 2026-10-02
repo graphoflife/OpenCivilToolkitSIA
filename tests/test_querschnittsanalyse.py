@@ -320,6 +320,19 @@ class TestGeometrieEndpunkt(unittest.TestCase):
     def test_unbekannte_analyse(self):
         self.assertEqual(self.frage(projekt(), "a9").status, 400)
 
+    def test_zellen_wie_im_nachweis(self):
+        """
+        Ein Wandende, das um 0.4 µm neben der Ecke liegt: der Nachweis sieht
+        eine Zelle (seine Toleranz ist 1 µm), also auch das Fenster. Gesucht
+        wurde dort einmal in Millimetern, und dann fehlte die Zelle im Bild.
+        """
+        waende = kastenwaende()
+        waende[3].bis = [50.0, 50.0004]
+        p = projekt(schubwaende=waende)
+        self.assertEqual(len(self.frage(p).daten["zellen"]), 1)
+        p.querschnittsanalysen[0].lastfall("Torsion", T_Ed=10.0)
+        self.assertTrue(urteile(p.rechnen(), "V+T")["Torsion"].erfuellt)
+
 
 class TestDiagramme(unittest.TestCase):
     """

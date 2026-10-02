@@ -304,17 +304,26 @@ class Zeichnung:
         return gut
 
     def _zellen(self, waende: Sequence[Mapping]) -> List[Tuple[List[Punkt], float]]:
-        """Die geschlossenen Flaechen der Wandachsen, als Umriss und Flaeche, in mm."""
+        """
+        Die geschlossenen Flaechen der Wandachsen, als Umriss und Flaeche, in mm.
+
+        Gesucht wird in Metern, wie im Nachweis: die Toleranz, ab der zwei
+        Wandenden ein Knoten sind, ist eine Laenge. In Millimetern gesucht,
+        hiesse sie hier etwas anderes als dort -- und das Fenster zeigte eine
+        Zelle nicht, mit der gerechnet wird.
+        """
         if not waende:
             return []
-        achsen = [Wand(name="", von=tuple(w["von"]), bis=tuple(w["bis"]), b_w=1.0,
+        m = 1e-3
+        achsen = [Wand(name="", von=(w["von"][0] * m, w["von"][1] * m),
+                       bis=(w["bis"][0] * m, w["bis"][1] * m), b_w=1.0,
                        a_sw_s=0.0, f_sd=0.0, f_cd=0.0, k_c=0.0) for w in waende]
         modell = zellen_finden(achsen)
         umrisse = []
         for zelle in modell.zellen:
             ecken = [(modell.stuecke[e].von if r > 0 else modell.stuecke[e].bis)
                      for e, r in zelle.rand]
-            umrisse.append((ecken, zelle.flaeche))
+            umrisse.append(([(y / m, z / m) for y, z in ecken], zelle.flaeche / (m * m)))
         return umrisse
 
 

@@ -55,7 +55,7 @@
     "opencivil/projekt/projekt.py": "b2e6fd989120",
     "opencivil/projekt/querschnittsanalyse.py": "898cd7b2a6ea",
     "opencivil/querschnitt/__init__.py": "e3b0c44298fc",
-    "opencivil/querschnitt/analyse.py": "3b63335d45a3",
+    "opencivil/querschnitt/analyse.py": "2b1b58c2beb0",
     "opencivil/querschnitt/fasern.py": "fef3030af601",
     "opencivil/querschnitt/geometrie.py": "c3afabf94ea9",
     "opencivil/querschnitt/interaktion.py": "78578de5ef12",
