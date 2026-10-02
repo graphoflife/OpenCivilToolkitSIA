@@ -566,5 +566,25 @@ class TestTafeln(unittest.TestCase):
         self.assertEqual(darstellen(p, tafel), [("aussen", 0), [("innen", 1)]])
 
 
+class TestJedesUrteilHatEinenLangnamen(unittest.TestCase):
+    """
+    Die Zusammenfassung nennt ein Urteil nur beim Langnamen -- ohne Rückfall
+    auf Kürzel oder Namen. ``Nachweis.rechne`` stempelt ihn auf, aus
+    ``LANGNAME`` oder dem Thema. Ein neuer Nachweis ohne beides stünde mit
+    leerer Zeile da; das meldet dieser Test.
+    """
+
+    def test_beispiel_und_jeder_nachweis(self):
+        from opencivil.projekt import Projekt
+
+        for name, projekt in (("beispiel", Projekt.beispiel()),
+                              ("jeder_nachweis", Projekt.jeder_nachweis())):
+            with self.subTest(projekt=name):
+                aufbau = projekt.aufbauen()
+                loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+                self.assertTrue(loesung.urteile)
+                self.assertEqual([u.name for u in loesung.urteile if not u.langname], [])
+
+
 if __name__ == "__main__":
     unittest.main()

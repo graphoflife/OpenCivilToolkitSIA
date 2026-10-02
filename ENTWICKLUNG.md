@@ -44,6 +44,27 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-02 · Nachtrag zum Umbau: der Zeilenname ohne Rückfall
+
+Der letzte Rest aus Schritt 9 des Umbaus. Eine Zeile der Zusammenfassung
+hiess bisher «Langname, sonst Kürzel, sonst Name»
+(`Zeile.aus` in `opencivil/bericht/zusammenfassung.py`). Jetzt heisst sie nur
+noch nach dem Langnamen.
+
+Die Rückfälle kamen nie zum Zug. Am Beispiel und am Projekt mit jedem
+Nachweis hatten alle 33 Urteile einen Langnamen; `Nachweis.rechne` stempelt
+ihn auf, aus `LANGNAME` oder dem Thema. Der Bericht bleibt Zeichen für
+Zeichen gleich.
+
+Ohne Rückfall stünde ein künftiger Nachweis ohne beides mit leerer Zeile da.
+Das meldet jetzt `TestJedesUrteilHatEinenLangnamen`. Gegenprobe: ohne
+Langnamen schlägt er an.
+
+Das Kürzel `art` am Urteil bleibt, wie beim Umbau entschieden: es ist der
+feste Schlüssel, nach dem die Tests filtern.
+
+---
+
 ## 2026-09-26 · Versionsmarken auch für JavaScript und CSS
 
 Wunsch: Nach einer Änderung soll der Browser nie mehr alte und neue Teile der

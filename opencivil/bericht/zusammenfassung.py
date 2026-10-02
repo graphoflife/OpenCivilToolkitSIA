@@ -42,7 +42,10 @@ class Zeile:
     """Ein Urteil, wie es in der Zusammenfassung steht."""
 
     nachweis: str
-    """Die Nachweisart ausgeschrieben -- faellt sie aus, das Kuerzel, dann der Name."""
+    """
+    Die Nachweisart ausgeschrieben. Jedes Urteil hat sie: :meth:`Nachweis.rechne`
+    stempelt sie auf, aus ``LANGNAME`` oder dem Thema des Nachweises.
+    """
 
     fall: str
     """Der Fall oder die Lage; leer, wo es keinen gibt."""
@@ -54,7 +57,7 @@ class Zeile:
 
     @classmethod
     def aus(cls, urteil: NachweisUrteil) -> "Zeile":
-        return cls(nachweis=urteil.langname or urteil.art or urteil.name,
+        return cls(nachweis=urteil.langname,
                    fall=urteil.fall, widerstand=urteil.widerstand,
                    einwirkung=urteil.einwirkung, urteil=urteil)
 
