@@ -55,6 +55,10 @@ from enum import Enum
 from typing import Callable, List, Optional, Sequence, Tuple
 
 from opencivil.core.protokoll import Zwischenwerte
+from opencivil.querschnitt.fasern import (
+    Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt,
+    Schnittkraefte, Stab,
+)
 
 #: Fasern ueber die Plattenhoehe. 60 reichen: die Betonspannung ist stetig,
 #: und der Fehler der Mittelpunktsregel faellt mit dem Quadrat der Faserdicke.
@@ -96,17 +100,6 @@ class Stahllage:
 
     nummer: int = 0
     """Nur zur Zuordnung in der Mitschrift."""
-
-
-@dataclass(frozen=True)
-class Schnittkraefte:
-    """Was eine Dehnungsebene an inneren Kraeften erzeugt."""
-
-    N: float
-    """in N, Zug positiv."""
-
-    M: float
-    """in Nm um die halbe Hoehe, Zug unten positiv."""
 
 
 @dataclass(frozen=True)
@@ -249,64 +242,44 @@ class Querschnittsloeser:
         self.fasern = fasern
         self.eps_druck = abs(eps_druck)
         self.eps_zug = abs(eps_zug)
-        # Hebelarme und Flaeche der Fasern -- einmal gerechnet, hunderttausendfach
-        # gebraucht. Gespeichert wird der Abstand zur Mittelebene und nicht die
-        # Lage ueber Unterkante: gebraucht wird in jedem Durchgang nur der Arm,
-        # und die Verschiebung jedesmal neu abzuziehen kostet bei sechzig
-        # Fasern mal tausend Aufrufen spuerbar Zeit.
-        self.dicke = h / fasern
-        self.mitten = [(i + 0.5) * self.dicke for i in range(fasern)]
-        self.arme = [z - h / 2.0 for z in self.mitten]
-        self.faserflaeche = self.dicke * b
-        self.stahlarme = [(l.z - h / 2.0) for l in self.lagen]
+        # Die Platte als Fasern: gleich dicke Scheiben ueber die Hoehe, der
+        # Arm ab der Mittelebene. Einmal gerechnet, hunderttausendfach
+        # gebraucht. Die Ausdruecke stehen genau so da wie vor dem Umbau --
+        # dieselben Zahlen bis aufs letzte Bit, und damit derselbe Bericht.
+        dicke = h / fasern
+        self.querschnitt = Faserquerschnitt(
+            gruppen=[Fasergruppe(
+                gesetz=beton,
+                arme=tuple((i + 0.5) * dicke - h / 2.0 for i in range(fasern)),
+                flaechen=dicke * b)],
+            # Netto: der Stahl ersetzt den Beton an seiner Stelle.
+            staebe=[Stab(arm=l.z - h / 2.0, flaeche=l.a_s, gesetz=stahl,
+                         verdraengt=beton) for l in self.lagen])
+        # Der gueltige Bereich der Gesetze gilt an beiden Raendern.
+        self.grenzen = Dehnungsgrenzen([
+            Dehnungsgrenze(arm=-h / 2.0, eps_min=-self.eps_druck, eps_max=self.eps_zug),
+            Dehnungsgrenze(arm=h / 2.0, eps_min=-self.eps_druck, eps_max=self.eps_zug),
+        ])
+        #: Die inneren Kraefte einer Dehnungsebene -- der Beton ueber Fasern,
+        #: der Stahl Lage fuer Lage, siehe :meth:`Faserquerschnitt.kraefte`.
+        #: Unmittelbar gebunden statt durch eine Methode gereicht: die
+        #: Bisektionen rufen sie hunderttausendfach, und jeder Umweg ist ein
+        #: Aufruf mehr.
+        self.kraefte = self.querschnitt.kraefte
 
-    # -- Vorwaerts ----------------------------------------------------------
+    # -- Vorwaerts: siehe ``self.kraefte`` oben ------------------------------
 
-    def kraefte(self, eps_m: float, chi: float) -> Schnittkraefte:
-        """
-        Die inneren Kraefte einer Dehnungsebene.
-
-        Der Beton wird ueber Fasern integriert, der Stahl Lage fuer Lage. Wo
-        Stahl liegt, wird die von ihm verdraengte Betonflaeche abgezogen --
-        sonst zaehlte dieselbe Flaeche zweimal.
-        """
-        N = 0.0
-        M = 0.0
-        # Ortsgebunden: diese Schleife laeuft in jedem Nachweis hunderttausende
-        # Male, und jeder Zugriff ueber self kostet darin eine Suche.
-        beton = self.beton
-        flaeche = self.faserflaeche
-
-        for arm in self.arme:
-            kraft = beton(eps_m + chi * arm) * flaeche
-            N += kraft
-            M += kraft * arm
-
-        stahl = self.stahl
-        for lage, arm in zip(self.lagen, self.stahlarme):
-            eps = eps_m + chi * arm
-            # Netto: der Stahl ersetzt den Beton an dieser Stelle.
-            kraft = (stahl(eps) - beton(eps)) * lage.a_s
-            N += kraft
-            M += kraft * arm
-
-        return Schnittkraefte(N=N, M=M)
 
     # -- Rueckwaerts --------------------------------------------------------
 
     def _fenster(self, chi: float) -> Optional[Tuple[float, float]]:
         """
         In welchem Bereich ``eps_m`` liegen darf, damit keine Faser aus dem
-        gueltigen Dehnungsbereich faellt.
-
-        Die Randdehnungen sind ``eps_m +- |chi|*h/2``. Beide muessen zwischen
-        ``-eps_druck`` und ``eps_zug`` bleiben. Ist das Fenster leer, ist die
-        Kruemmung fuer diesen Querschnitt zu gross.
+        gueltigen Dehnungsbereich faellt. Bei der Platte: beide Raender
+        zwischen ``-eps_druck`` und ``eps_zug``, siehe
+        :meth:`Dehnungsgrenzen.fenster`.
         """
-        rand = abs(chi) * self.h / 2.0
-        unten = -self.eps_druck + rand
-        oben = self.eps_zug - rand
-        return (unten, oben) if unten <= oben else None
+        return self.grenzen.fenster(chi)
 
     def _eps_zu_normalkraft(self, chi: float, N_ziel: float) -> Optional[float]:
         """
@@ -355,12 +328,14 @@ class Querschnittsloeser:
                 return None
             return self.kraefte(eps_m, chi).M
 
-        # Groesste Kruemmung, bei der ueberhaupt noch ein Fenster bleibt.
-        grenze = (self.eps_druck + self.eps_zug) / self.h
-        unten, oben = self._rand(-grenze, N_Ed, moment, M_Ed, nach_oben=False)
+        # Groesste Kruemmung je Richtung, bei der ueberhaupt noch ein Fenster
+        # bleibt. Bei der Platte beide (eps_druck + eps_zug) / h.
+        unten, oben = self._rand(-self.grenzen.kruemmungsgrenze(positiv=False),
+                                 N_Ed, moment, M_Ed, nach_oben=False)
         if unten is None:
             return self._ergebnis(0.0, 0.0, konvergiert=False)
-        oben = self._rand(grenze, N_Ed, moment, M_Ed, nach_oben=True)[0]
+        oben = self._rand(self.grenzen.kruemmungsgrenze(positiv=True),
+                          N_Ed, moment, M_Ed, nach_oben=True)[0]
         if oben is None:
             return self._ergebnis(0.0, 0.0, konvergiert=False)
 
@@ -410,13 +385,13 @@ class Querschnittsloeser:
 
     def _ergebnis(self, eps_m: float, chi: float, *,
                   konvergiert: bool = True) -> Ebene:
-        halb = self.h / 2.0
-        dehnungen = tuple(eps_m + chi * (l.z - halb) for l in self.lagen)
+        staebe = self.querschnitt.staebe
+        dehnungen = tuple(eps_m + chi * s.arm for s in staebe)
         kraefte = self.kraefte(eps_m, chi)
         return Ebene(
             eps_m=eps_m, chi=chi,
             N_int=kraefte.N, M_int=kraefte.M,
-            sigma_s=tuple(self.stahl(e) for e in dehnungen),
+            sigma_s=tuple(s.gesetz(e) for s, e in zip(staebe, dehnungen)),
             eps_s=dehnungen,
             konvergiert=konvergiert)
 
