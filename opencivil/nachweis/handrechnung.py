@@ -48,9 +48,8 @@ from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
 from opencivil.material.basis import mit_index
 from opencivil.querschnitt.platte import protokoll_statische_hoehe
-
-#: Anteil der Druckzonenhoehe, ueber den der Spannungsblock wirkt.
-BLOCKANTEIL = 0.85
+# Der Anteil des Spannungsblocks steht beim Gesetz; hier wird er nur benutzt.
+from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL
 
 
 @dataclass(frozen=True)

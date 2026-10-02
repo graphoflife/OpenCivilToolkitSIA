@@ -3,8 +3,8 @@ opencivil/querschnitt/werkstoffgesetz.py -- Spannungs-Dehnungs-Beziehungen.
 
 VERANTWORTUNG:
 Liefert zu einer Dehnung die zugehoerige Spannung -- fuer Beton nach der
-Parabel-Rechteck-Beziehung (SIA 262:2025, 4.2.1.6) und fuer Betonstahl nach der
-bilinearen Beziehung (4.2.2.4).
+Parabel-Rechteck-Beziehung (SIA 262:2025, 4.2.1.6) oder vereinfacht als
+Spannungsblock, und fuer Betonstahl nach der bilinearen Beziehung (4.2.2.4).
 
 VORZEICHEN (im ganzen Querschnittsmodul gleich):
     Dehnung   eps > 0  =  Zug
@@ -91,6 +91,56 @@ class Betongesetz:
             r"\eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex]"
             r" -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex]"
             r" 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen})"
+            r" \end{cases}"
+        )
+
+
+#: Anteil der Druckzonenhoehe, ueber den der Spannungsblock wirkt. Steht hier
+#: und nirgends sonst: die Handrechnung der Platte, ihr Duktilitaetsnachweis,
+#: das Diagramm der Werkstoffgesetze und der gezeichnete Querschnitt meinen
+#: alle denselben Block.
+BLOCKANTEIL = 0.85
+
+
+@dataclass(frozen=True)
+class Spannungsblock:
+    """
+    Der vereinfachte, rechteckige Spannungsverlauf des Betons.
+
+    Unterhalb von ``(1 - 0.85) * eps_c2d`` keine Spannung, darueber
+    durchgehend ``f_cd``. Liegt der gedrueckte Rand bei ``eps_c2d`` -- im
+    Bruchzustand --, ist das genau der Block der Hoehe ``0.85 x``, mit dem die
+    Handrechnung rechnet. Als Gesetz gilt er auch dort, wo der Rand nicht bei
+    ``eps_c2d`` liegt; so setzt ihn die Interaktionslinie des gezeichneten
+    Querschnitts ein.
+
+    Die Normstelle des Blocks ist offen (TODO.md); sie wird nicht erfunden.
+    """
+
+    f_cd: float
+    """Festigkeit des Blocks in N/m^2 (positiver Betrag) -- je nach
+    Werkstoffsatz ``f_cd`` oder ``f_ck``."""
+
+    eps_c2d: float
+    """Bruchdehnung (positiver Betrag)."""
+
+    @property
+    def eps_knick(self) -> float:
+        """Ab dieser Stauchung (Betrag) setzt der Block ein."""
+        return (1.0 - BLOCKANTEIL) * self.eps_c2d
+
+    def spannung(self, eps: float) -> float:
+        """Spannung in N/m^2 zur Dehnung ``eps``. Zug positiv, also hier <= 0."""
+        if eps > -self.eps_knick:
+            return 0.0  # Zug, oder zu wenig Stauchung fuer den Block
+        return -self.f_cd
+
+    def latex(self) -> str:
+        return (
+            r"\sigma_c(\varepsilon_c) = \begin{cases}"
+            r" 0 & \varepsilon_c > -(1 - " + f"{BLOCKANTEIL}" + r") \cdot \varepsilon_{c2d} \\[1ex]"
+            r" -f_{cd} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - "
+            + f"{BLOCKANTEIL}" + r") \cdot \varepsilon_{c2d}"
             r" \end{cases}"
         )
 

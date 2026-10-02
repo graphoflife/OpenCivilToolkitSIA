@@ -20,7 +20,7 @@ from opencivil import spannungsanalyse
 from opencivil.core.berechnung import grad_als_text
 from opencivil.core.einheiten import KN, KNM, KN_PRO_M
 from opencivil.core.rechenwerk import Loesung
-from opencivil.nachweis.handrechnung import BLOCKANTEIL
+from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL, Spannungsblock
 from opencivil.nachweis.querkraft import NUR_KURVE
 from opencivil.projekt import Aufbau
 from opencivil.querschnitt.platte import Richtung
@@ -309,12 +309,12 @@ def _spannungsblock(f_cd: float, eps_c2d: float) -> dict:
     Beide Bilder gehoeren zusammen, und genau deshalb steht die Stufe hier neben
     der Parabel: man sieht, was man aufgibt, wenn man von Hand rechnet.
     """
-    eps_knick = (1.0 - BLOCKANTEIL) * eps_c2d
+    block = Spannungsblock(f_cd=f_cd, eps_c2d=eps_c2d)
     ecken = [
         (0.0, 0.0),
-        (-eps_knick, 0.0),
-        (-eps_knick, -f_cd),
-        (-eps_c2d, -f_cd),
+        (-block.eps_knick, 0.0),
+        (-block.eps_knick, -block.f_cd),
+        (-eps_c2d, -block.f_cd),
     ]
     return {
         "punkte": [{"eps": e * 1e3, "sigma": s / 1e6} for e, s in ecken],

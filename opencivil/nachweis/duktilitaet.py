@@ -57,7 +57,7 @@ from opencivil.core.latex import angabe, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.material.basis import mit_index
-from opencivil.nachweis.handrechnung import BLOCKANTEIL
+from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL
 from opencivil.querschnitt.platte import (
     Bewehrungslage, Richtung, protokoll_lage,
 )
