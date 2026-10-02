@@ -23,6 +23,15 @@ also auf der Seite, auf die ``v`` waechst.
 Moment um die zweite Achse braucht -- die schiefe Biegung -- gibt sie an. Die
 Platte gibt sie nicht an, und ihre Schleife bleibt so schnell wie bisher.
 
+GESETZE MIT SPRUNG:
+Gelesen wird die Spannung in der Mitte jeder Faser. Bei einem stetigen Gesetz
+ist das genau genug. Springt es -- der Spannungsblock --, springt mit jeder
+Faser, die den Knick ueberschreitet, auch N, und keine Ebene trifft eine
+verlangte Normalkraft genau. Ein solches Gesetz hat darum ``mittel(eps_a,
+eps_b)``, die mittlere Spannung ueber einen linear verlaufenden Bereich. Wo
+eine Faser ihre Dicke kennt (``dicken``, beim Stab ``dicke`` fuer das
+verdraengte Material), wird damit gemittelt.
+
 DIE GRENZEN:
 Jede Grenze ist eine Stelle ``v`` mit einem zulaessigen Dehnungsbereich. Weil
 die Ebene linear ist, wird daraus in ``(eps_m, chi)`` je Grenze ein Streifen
@@ -73,6 +82,8 @@ class Fasergruppe:
     arme: Tuple[float, ...]
     flaechen: Union[float, Tuple[float, ...]]
     quer: Optional[Tuple[float, ...]] = None
+    dicken: Optional[Tuple[float, ...]] = None
+    """Ausdehnung jeder Faser in ``v`` -- gebraucht, wenn das Gesetz springt."""
 
 
 @dataclass(frozen=True)
@@ -90,6 +101,8 @@ class Stab:
     gesetz: Gesetz
     verdraengt: Optional[Gesetz] = None
     quer: float = 0.0
+    dicke: float = 0.0
+    """Ausdehnung in ``v`` fuer das verdraengte Material, wenn dessen Gesetz springt."""
 
 
 class Faserquerschnitt:
@@ -106,17 +119,31 @@ class Faserquerschnitt:
         # schon hier entschieden: Entpacken ist schneller als der Zugriff auf
         # die Felder einer Datenklasse, und die Schleife laeuft
         # hunderttausendfach.
-        self._gleich = tuple((g.gesetz, g.arme, g.flaechen) for g in self.gruppen
-                             if g.quer is None and not isinstance(g.flaechen, tuple))
-        self._einzeln = tuple(
-            (g.gesetz, tuple(zip(
+        def gemittelt(g: Fasergruppe) -> bool:
+            return g.dicken is not None and _mittel(g.gesetz) is not None
+
+        def einzeln(g: Fasergruppe):
+            n = len(g.arme)
+            return tuple(zip(
                 g.arme,
-                g.flaechen if isinstance(g.flaechen, tuple) else (g.flaechen,) * len(g.arme),
-                g.quer if g.quer is not None else (0.0,) * len(g.arme))))
-            for g in self.gruppen
-            if not (g.quer is None and not isinstance(g.flaechen, tuple)))
-        self._staebe = tuple((s.arm, s.flaeche, s.gesetz, s.verdraengt, s.quer)
-                             for s in self.staebe)
+                g.flaechen if isinstance(g.flaechen, tuple) else (g.flaechen,) * n,
+                g.quer if g.quer is not None else (0.0,) * n))
+
+        self._gleich = tuple((g.gesetz, g.arme, g.flaechen) for g in self.gruppen
+                             if g.quer is None and not isinstance(g.flaechen, tuple)
+                             and not gemittelt(g))
+        self._einzeln = tuple(
+            (g.gesetz, einzeln(g)) for g in self.gruppen
+            if not (g.quer is None and not isinstance(g.flaechen, tuple)) and not gemittelt(g))
+        self._gemittelt = tuple(
+            (_mittel(g.gesetz), tuple((arm, a, u, d / 2.0)
+                                      for (arm, a, u), d in zip(einzeln(g), g.dicken)))
+            for g in self.gruppen if gemittelt(g))
+        self._staebe = tuple(
+            (s.arm, s.flaeche, s.gesetz, s.verdraengt, s.quer,
+             _mittel(s.verdraengt) if s.verdraengt is not None and s.dicke > 0.0 else None,
+             s.dicke / 2.0)
+            for s in self.staebe)
 
     def kraefte(self, eps_m: float, chi: float) -> Schnittkraefte:
         """
@@ -140,19 +167,32 @@ class Faserquerschnitt:
                 N += kraft
                 M += kraft * arm
                 M_quer += kraft * u
+        for mittel, fasern in self._gemittelt:
+            for arm, flaeche, u, halb in fasern:
+                kraft = mittel(eps_m + chi * (arm - halb), eps_m + chi * (arm + halb)) * flaeche
+                N += kraft
+                M += kraft * arm
+                M_quer += kraft * u
 
         schief = self.schief
-        for arm, flaeche, gesetz, verdraengt, quer in self._staebe:
+        for arm, flaeche, gesetz, verdraengt, quer, mittel, halb in self._staebe:
             eps = eps_m + chi * arm
             if verdraengt is None:
                 kraft = gesetz(eps) * flaeche
-            else:
+            elif mittel is None:
                 kraft = (gesetz(eps) - verdraengt(eps)) * flaeche
+            else:
+                kraft = (gesetz(eps) - mittel(eps - chi * halb, eps + chi * halb)) * flaeche
             N += kraft
             M += kraft * arm
             if schief:
                 M_quer += kraft * quer
         return Schnittkraefte(N=N, M=M, M_quer=M_quer)
+
+
+def _mittel(gesetz: Optional[Gesetz]) -> Optional[Callable[[float, float], float]]:
+    """Die mittlere Spannung des Gesetzes ueber einen Bereich -- wenn es sie kennt."""
+    return getattr(gesetz, "mittel", None)
 
 
 # ===========================================================================

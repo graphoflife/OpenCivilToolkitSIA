@@ -379,7 +379,7 @@ class Querschnitt:
             if g:
                 gewichte.append((i, g))
 
-        sammlung: Dict[int, Tuple[List[float], List[float], List[float]]] = {}
+        sammlung: Dict[int, Tuple[List[float], List[float], List[float], List[float]]] = {}
         for v, d in zip(mitten, dicken):
             breite: Dict[int, float] = {}
             moment: Dict[int, float] = {}
@@ -396,18 +396,19 @@ class Querschnitt:
             for w, b_w in breite.items():
                 if b_w <= 1e-12:
                     continue
-                arme, flaechen, quer = sammlung.setdefault(w, ([], [], []))
+                arme, flaechen, quer, dicke = sammlung.setdefault(w, ([], [], [], []))
                 arme.append(v)
                 flaechen.append(b_w * d)
                 quer.append(moment[w] / b_w)
+                dicke.append(d)
 
         gruppen = []
         gruppen_werkstoff = []
         for w in sorted(sammlung):
-            arme, flaechen, quer = sammlung[w]
+            arme, flaechen, quer, dicke = sammlung[w]
             gruppen.append(Fasergruppe(gesetz=self.werkstoffe[w].gesetz,
                                        arme=tuple(arme), flaechen=tuple(flaechen),
-                                       quer=tuple(quer)))
+                                       quer=tuple(quer), dicken=tuple(dicke)))
             gruppen_werkstoff.append(w)
 
         staebe = []
@@ -418,9 +419,11 @@ class Querschnitt:
             verdraengt = (self.werkstoffe[s.verdraengt].gesetz
                           if s.verdraengt is not None
                           and self.werkstoffe[s.verdraengt].verdraengbar else None)
+            # Das verdraengte Material als Quadrat gleicher Flaeche: wenn sein
+            # Gesetz springt, wird ueber diese Ausdehnung gemittelt.
             staebe.append(Stab(arm=v, flaeche=s.flaeche,
                                gesetz=self.werkstoffe[s.werkstoff].gesetz,
-                               verdraengt=verdraengt, quer=u))
+                               verdraengt=verdraengt, quer=u, dicke=math.sqrt(s.flaeche)))
             staebe_v.append(v)
 
         grenzen, beton = self._grenzen(v_von)
@@ -692,11 +695,12 @@ class Querschnitt:
                                         teil.M_quer))
         for s, stab in zip(self.bewehrung, r.fasern.staebe):
             eps = punkt.eps_m + punkt.chi * stab.arm
-            sigma = stab.gesetz(eps)
-            kraft = (sigma - (stab.verdraengt(eps) if stab.verdraengt else 0.0)) * stab.flaeche
+            # Die Kraft aus derselben Summe wie N -- samt dem verdraengten
+            # Material, so wie es dort zaehlt.
+            kraft = Faserquerschnitt([], [stab]).kraefte(punkt.eps_m, punkt.chi).N
             anteile.append(Kraftanteil(name=self.werkstoffe[s.werkstoff].name,
                                        N=kraft, y=s.lage[0], z=s.lage[1],
-                                       eps=eps, sigma=sigma))
+                                       eps=eps, sigma=stab.gesetz(eps)))
         return anteile
 
     def _anteil(self, r: Richtung, name: str, N: float, M: float,

@@ -135,6 +135,27 @@ class Spannungsblock:
             return 0.0  # Zug, oder zu wenig Stauchung fuer den Block
         return -self.f_cd
 
+    __call__ = spannung
+
+    def mittel(self, eps_a: float, eps_b: float) -> float:
+        """
+        Die mittlere Spannung, wenn die Dehnung linear von ``eps_a`` nach
+        ``eps_b`` laeuft -- genau: ``f_cd`` mal der Anteil, der ueber dem Knick
+        liegt.
+
+        Der Block springt. In der Mitte einer Faser gelesen, springt darum auch
+        N, sobald eine Faser den Knick ueberschreitet -- am Kastentraeger um
+        gut 20 kN --, und keine Ebene trifft N_Ed genau. Ueber die Faser
+        gemittelt, waechst N stetig.
+        """
+        unten, oben = min(eps_a, eps_b), max(eps_a, eps_b)
+        knick = -self.eps_knick
+        if oben <= knick:
+            return -self.f_cd
+        if unten > knick or oben == unten:
+            return self.spannung(unten)
+        return -self.f_cd * (knick - unten) / (oben - unten)
+
     def latex(self) -> str:
         return (
             r"\sigma_c(\varepsilon_c) = \begin{cases}"

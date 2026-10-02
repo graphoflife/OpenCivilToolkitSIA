@@ -16,7 +16,7 @@ from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.interaktion import (
     Bewehrung, Querschnitt, Teil, Werkstoff, linie_als_bewehrung,
 )
-from opencivil.querschnitt.werkstoffgesetz import Betongesetz, Stahlgesetz
+from opencivil.querschnitt.werkstoffgesetz import Betongesetz, Spannungsblock, Stahlgesetz
 
 BETON = Betongesetz(f_cd=20e6, eps_c1d=0.002, eps_c2d=0.003, k_sigma=2.0)
 STAHL = Stahlgesetz(E_s=200e9, f_yd=435e6, f_yd_druck=435e6, eps_ud=0.045)
@@ -185,3 +185,49 @@ class TestVonHand(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestSpannungsblock(unittest.TestCase):
+    """
+    Der Block springt bei 0.15·ε_c2d von null auf f_cd. In der Mitte jeder
+    Faser gelesen, sprang darum auch N -- am Kastenträger des vollen Berichts
+    stand in der Probe 638.7 kN, nachgewiesen wurden 664.0 kN. Über die Faser
+    gemittelt, wächst N stetig, und jede verlangte Normalkraft wird getroffen.
+    """
+
+    def setUp(self):
+        block = Spannungsblock(f_cd=20e6, eps_c2d=0.003)
+        werkstoffe = [
+            Werkstoff("Beton", block, -0.003, math.inf, c_punkt=(0.002, 0.003),
+                      verdraengbar=True),
+            Werkstoff("Stahl", STAHL.spannung, -0.045, 0.045),
+        ]
+        # Ein Kasten mit Loch und Stäben im Beton: Fasern und verdrängtes
+        # Material springen beide.
+        teile = [Teil(rechteck(0, 0, 0.8, 0.6), 0, None),
+                 Teil(rechteck(0.15, 0.15, 0.5, 0.3), None, 0)]
+        staebe = [Bewehrung((y, z), 314e-6, 1, 0)
+                  for y in (0.05, 0.4, 0.75) for z in (0.05, 0.55)]
+        w = geo.summe([(1.0, geo.flaechenwerte(teile[0].punkte)),
+                       (-1.0, geo.flaechenwerte(teile[1].punkte))])
+        self.q = Querschnitt(werkstoffe=werkstoffe, teile=teile, bewehrung=staebe,
+                             bezug=(w.y_S, w.z_S))
+
+    def test_mittel_ist_der_anteil_ueber_dem_knick(self):
+        block = Spannungsblock(f_cd=20e6, eps_c2d=0.003)
+        knick = -block.eps_knick                       # -0.45 ‰
+        self.assertEqual(block.mittel(-0.001, -0.002), -20e6)
+        self.assertEqual(block.mittel(0.001, -0.0001), 0.0)
+        self.assertAlmostEqual(block.mittel(knick + 0.0001, knick - 0.0001), -10e6)
+        self.assertAlmostEqual(block.mittel(knick - 0.0003, knick + 0.0001), -15e6)
+        self.assertEqual(block.mittel(-0.001, -0.001), block(-0.001))
+
+    def test_jede_normalkraft_wird_getroffen(self):
+        zug, druck = self.q.normalkraft_grenzen()
+        for psi in (-math.pi / 2, -2.0, 0.3):
+            for anteil in (0.9, 0.5, 0.1, -0.2, -0.6, -0.95):
+                N = anteil * (zug if anteil > 0 else -druck)
+                punkt = self.q.bei_normalkraft(psi, N)
+                with self.subTest(psi=psi, N=N):
+                    self.assertAlmostEqual(punkt.N, N, delta=1e-3)
+                    self.assertAlmostEqual(sum(a.N for a in self.q.anteile(punkt)), N, delta=1e-3)

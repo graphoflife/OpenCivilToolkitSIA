@@ -641,7 +641,9 @@ class Querschnittsanalyse:
                 f_c = w("f_cd") if bemessung else w("f_ck")
                 eps_c1d, eps_c2d = w("eps_c1d"), w("eps_c2d")
                 if self.betongesetz(stoff) == "block":
-                    gesetz = Spannungsblock(f_cd=f_c, eps_c2d=eps_c2d).spannung
+                    # Das Gesetz selbst, nicht nur seine Spannung: es weiss
+                    # auch, wie es ueber eine Faser zu mitteln ist.
+                    gesetz = Spannungsblock(f_cd=f_c, eps_c2d=eps_c2d)
                 else:
                     k = (self.kennwert(e, stoff, "k_sigma") if bemessung
                          else _K_SIGMA.funktion(E_cd=w("E_cd"), f_cd=f_c))
