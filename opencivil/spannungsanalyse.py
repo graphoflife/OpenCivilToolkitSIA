@@ -9,7 +9,8 @@ Drei Auswertungen am selben Faserintegral, das auch die Nachweise benutzen:
 2. **Aus Dehnungen** -- Randdehnungen hinein, Spannungen und Schnittgroessen
    heraus. Die Umkehrung von 1, und ohne Suche: die Ebene steht ja schon da.
 3. **Momenten-Kruemmungs-Linie** -- eine Normalkraft hinein, der Verlauf
-   ``M(chi)`` von null bis ``M_Rd`` heraus, mit Zugversteifung.
+   ``M(chi)`` von null bis ``M_Rd`` heraus: ungerissen bis zum Rissmoment,
+   dort der Sprung, darueber gerissen.
 
 KEIN NACHWEIS:
 Hier wird nichts gegen etwas gehalten. Es gibt keinen Erfuellungsgrad und kein
@@ -18,24 +19,27 @@ Grund, warum die Auswertungen nicht im :class:`Rechenwerk` stehen. Sie
 beantworten eine Frage, die man beim Entwerfen stellt: *was passiert
 eigentlich im Querschnitt?*
 
-DIE ZUGVERSTEIFUNG:
-Unterhalb des Rissmoments ist der Querschnitt ungerissen und deutlich steifer,
-als die Nachweise ihn rechnen -- dort wird der Beton auf Zug grundsaetzlich
-nicht angesetzt. Fuer eine Verformungsbetrachtung waere das falsch herum: man
-bekaeme eine Kruemmung, die es bei kleinen Momenten gar nicht gibt.
+DIE MOMENTEN-KRUEMMUNGS-LINIE:
+Unterhalb des Rissmoments ist der Querschnitt ungerissen (Zustand I) und
+deutlich steifer, als die Nachweise ihn rechnen -- dort wird der Beton auf Zug
+grundsaetzlich nicht angesetzt. Erreicht das Moment das Rissmoment, reisst der
+Querschnitt: beim selben Moment springt die Kruemmung vom ungerissenen auf den
+gerissenen Wert (Zustand II), im Bild ein waagrechtes Stueck. Darueber gilt
+Zustand II bis ``M_Rd``.
 
-Gerechnet werden darum **beide** Zustaende, und zwar mit demselben Loeser und
-nur mit verschiedenen Betongesetzen -- Zustand I nimmt Zug linear auf,
-Zustand II gar nicht. Dazwischen wird interpoliert::
+Gerechnet werden beide Zustaende mit demselben Loeser und nur verschiedenen
+Betongesetzen -- Zustand I nimmt Zug linear auf, Zustand II gar nicht.
 
-    zeta = 0                        fuer M <= M_Riss   (ungerissen)
-    zeta = 1 - (M_Riss / M)^2       fuer M >  M_Riss
-    chi  = (1 - zeta) * chi_I + zeta * chi_II
+Das Rissmoment gilt bei der Normalkraft der Linie
+(:meth:`Loeserpaar.rissmoment_bei`). Vorher stand dort immer das bei N = 0,
+auch wenn die Linie mit Druck gerechnet wurde.
 
-Das ist die uebliche Form. Welcher Beiwert vor dem Quadrat steht -- 1.0 fuer
-kurzzeitige, 0.5 fuer dauernde oder wiederholte Einwirkung -- ist eine
-Normfrage, die hier offen bleibt; eingebaut ist 1.0, also der steifere und
-damit fuer eine Verformung *unguenstigere* Fall nicht. Siehe TODO.md.
+Gezeigt wird der Querschnitt, nicht das Bauteil: die Mitwirkung des Betons
+zwischen den Rissen (Zugversteifung) steckt nicht darin. Bis hierher stand
+sie drin, als ``chi = (1 - zeta)·chi_I + zeta·chi_II`` mit
+``zeta = 1 - (M_Riss/M)²`` -- das ist beim Rissmoment null, die Linie ging
+dort also ohne Sprung weiter, und gerade das Reissen war nicht zu sehen. Mit
+welcher Regel eine Linie des Bauteils zu rechnen waere, ist offen (TODO.md).
 """
 
 from __future__ import annotations
@@ -65,9 +69,6 @@ KURVENPUNKTE = 40
 
 #: Halbierungen bei der Suche nach ``M_Rd``.
 HALBIERUNGEN = 24
-
-#: Beiwert der Zugversteifung. 1.0 = kurzzeitige Einwirkung.
-ZUGVERSTEIFUNG = 1.0
 
 
 class Analyseart(str, Enum):
@@ -221,19 +222,18 @@ def aus_dehnungen(loeser: Querschnittsloeser, *,
 
 @dataclass(frozen=True)
 class Kurvenpunkt:
-    """Ein Moment und die drei Kruemmungen, die dazu gehoeren."""
+    """Ein Moment, die Kruemmung, die dort gilt, und beide Zustaende zum Vergleich."""
 
     M: float
+    chi: float
+    """Was gilt: ungerissen bis zum Rissmoment, darueber gerissen."""
+
+    gerissen: bool
     chi_I: Optional[float]
     """Ungerissen -- ``None``, wenn der Zustand dort keine Lösung hat."""
 
     chi_II: Optional[float]
     """Gerissen, ohne Zugfestigkeit des Betons."""
-
-    chi: float
-    """Was gilt: interpoliert über die Zugversteifung."""
-
-    zeta: float
 
 
 @dataclass
@@ -242,6 +242,8 @@ class Momentenkurve:
 
     N: float
     M_Riss: float
+    """Das Rissmoment bei dieser Normalkraft."""
+
     M_Rd: float
     punkte: List[Kurvenpunkt] = field(default_factory=list)
     hinweis: str = ""
@@ -249,6 +251,14 @@ class Momentenkurve:
     @property
     def tragfaehig(self) -> bool:
         return self.M_Rd > 0.0
+
+    @property
+    def riss(self) -> Optional[Tuple[Kurvenpunkt, Kurvenpunkt]]:
+        """Die beiden Punkte des Sprungs: vor und nach dem Reissen, beim selben Moment."""
+        for vor, nach in zip(self.punkte, self.punkte[1:]):
+            if not vor.gerissen and nach.gerissen:
+                return vor, nach
+        return None
 
 
 def _groesstes_moment(loeser: Querschnittsloeser, N: float) -> float:
@@ -274,15 +284,20 @@ def _groesstes_moment(loeser: Querschnittsloeser, N: float) -> float:
 
 def moment_kruemmung(gerissen: Querschnittsloeser,
                      ungerissen: Querschnittsloeser, *,
-                     N: float, M_Riss: float,
-                     beiwert: float = ZUGVERSTEIFUNG) -> Momentenkurve:
+                     N: float, M_Riss: float) -> Momentenkurve:
     """
-    Die Linie von null bis ``M_Rd``, mit Zugversteifung.
+    Die Linie von null bis ``M_Rd``: ungerissen bis ``M_Riss``, dort der
+    Sprung, darueber gerissen.
 
-    Zu jedem Moment werden beide Zustaende gerechnet und dann gemischt. Dass
-    dafuer zweimal derselbe Loeser laeuft und nur das Betongesetz wechselt,
-    ist Absicht: eine zweite, nachgebaute Formel fuer den ungerissenen
-    Zustand waere eine zweite Wahrheit ueber denselben Querschnitt.
+    ``M_Riss`` ist das Rissmoment bei dieser Normalkraft
+    (:meth:`Loeserpaar.rissmoment_bei`). Beim Rissmoment stehen zwei Punkte
+    beim selben Moment: der letzte ungerissene und der erste gerissene --
+    das waagrechte Stueck des Sprungs.
+
+    Dass fuer beide Zustaende derselbe Loeser laeuft und nur das Betongesetz
+    wechselt, ist Absicht: eine zweite, nachgebaute Formel fuer den
+    ungerissenen Zustand waere eine zweite Wahrheit ueber denselben
+    Querschnitt.
     """
     M_Rd = _groesstes_moment(gerissen, N)
     kurve = Momentenkurve(N=N, M_Riss=M_Riss, M_Rd=M_Rd)
@@ -292,22 +307,31 @@ def moment_kruemmung(gerissen: Querschnittsloeser,
             "Normalkraft allein übersteigt, was der Querschnitt aufnimmt.")
         return kurve
 
-    for i in range(KURVENPUNKTE + 1):
-        M = M_Rd * i / KURVENPUNKTE
-        chi_II = _kruemmung(gerissen, N, M)
+    # Je Stelle das Moment und ob der Querschnitt dort gerissen ist. Beim
+    # Rissmoment beide -- ungerissen zuerst.
+    stellen = [(M_Rd * i / KURVENPUNKTE, M_Rd * i / KURVENPUNKTE > M_Riss)
+               for i in range(KURVENPUNKTE + 1)]
+    if 0.0 < M_Riss < M_Rd:
+        stellen = [s for s in stellen if s[0] != M_Riss] + [(M_Riss, False), (M_Riss, True)]
+        stellen.sort()
+    for M, ist_gerissen in stellen:
         chi_I = _kruemmung(ungerissen, N, M)
-        zeta = 0.0 if M <= M_Riss else 1.0 - beiwert * (M_Riss / M) ** 2
-        zeta = min(max(zeta, 0.0), 1.0)
-        if chi_II is None:
+        chi_II = _kruemmung(gerissen, N, M)
+        chi = chi_II if ist_gerissen else chi_I
+        if chi is None:
             continue
-        chi = chi_II if chi_I is None else (1.0 - zeta) * chi_I + zeta * chi_II
-        kurve.punkte.append(Kurvenpunkt(M=M, chi_I=chi_I, chi_II=chi_II,
-                                        chi=chi, zeta=zeta))
+        kurve.punkte.append(Kurvenpunkt(M=M, chi=chi, gerissen=ist_gerissen,
+                                        chi_I=chi_I, chi_II=chi_II))
     if M_Riss >= M_Rd:
         kurve.hinweis = (
-            "Das Rissmoment liegt über dem Biegewiderstand: der Querschnitt "
-            "reisst und versagt im selben Augenblick. Genau das prüft der "
-            "Nachweis gegen sprödes Versagen.")
+            "Das Rissmoment liegt über dem Biegewiderstand: bis M_Rd bleibt der "
+            "Querschnitt ungerissen, und reisst er, trägt er das Rissmoment "
+            "nicht. Bei N = 0 prüft genau das der Nachweis gegen sprödes "
+            "Versagen.")
+    elif M_Riss <= 0.0:
+        kurve.hinweis = (
+            "Schon die Zugkraft allein reisst den Querschnitt auf: die ganze "
+            "Linie gilt gerissen.")
     return kurve
 
 
@@ -321,11 +345,11 @@ def beton_ungerissen(*, E_c: float) -> Callable[[float], float]:
     Beton linear in beiden Richtungen -- der ungerissene Vergleichszustand.
 
     Ohne Abminderung im Zug und ohne Abbruch bei ``f_ct``. Das ist Absicht:
-    gebraucht wird die *Steifigkeit* des ungerissenen Querschnitts, und
-    oberhalb des Rissmoments gilt dieser Zustand ohnehin nur noch als
-    Bezugsgroesse der Interpolation. Ein Gesetz, das bei ``f_ct`` abfiele,
-    waere ausserdem nicht mehr monoton, und die Bisektion des Loesers braucht
-    Monotonie.
+    gebraucht wird die *Steifigkeit* des ungerissenen Querschnitts, und wo er
+    reisst, sagt das Rissmoment -- oberhalb davon gilt die Linie gerissen,
+    dieser Zustand steht dort nur noch zum Vergleich. Ein Gesetz, das bei
+    ``f_ct`` abfiele, waere ausserdem nicht mehr monoton, und die Bisektion
+    des Loesers braucht Monotonie.
     """
     def sigma(eps: float) -> float:
         return E_c * eps
@@ -345,13 +369,31 @@ class Loeserpaar:
     Sie unterscheiden sich in genau einem Stueck, dem Betongesetz. Alles
     andere -- Hoehe, Breite, Lagen, Stahlgesetz, Suchfenster -- ist dasselbe,
     und das muss es sein: sonst verglichen die beiden Zustaende zwei
-    verschiedene Querschnitte. Dazu das Rissmoment, denn zwischen den beiden
-    wird darueber interpoliert.
+    verschiedene Querschnitte. Dazu das Rissmoment, denn es sagt, wo der eine
+    Zustand in den anderen springt.
     """
 
     gerissen: Querschnittsloeser
     ungerissen: Querschnittsloeser
     M_Riss: float
+    """Das Rissmoment ohne Normalkraft."""
+
+    def rissmoment_bei(self, N: float) -> float:
+        """
+        Das Rissmoment bei der Normalkraft ``N`` (Zug positiv), in Nm.
+
+        Am Bruttoquerschnitt reisst der Rand, wenn ``N/A + M/W = f_ct,eff``.
+        Mit ``A = b·h`` und ``W = b·h²/6`` -- denselben Werten, mit denen
+        :func:`~opencivil.nachweis.sproedes_versagen.rissmoment` das
+        Rissmoment ohne Normalkraft rechnet -- ist das
+        ``M_Riss(N) = M_Riss(0) - N·h/6``. Druck hebt es, Zug senkt es.
+
+        Annahme, nicht nachgeschlagen (TODO.md): der Bruttoquerschnitt ohne
+        Stahl, wie beim spröden Versagen. Der ungerissene Zustand daneben
+        rechnet mit Stahl und Kriechzahl und ist darum steifer; beim
+        Rissmoment steht sein Rand etwas unter ``f_ct,eff``.
+        """
+        return self.M_Riss - N * self.gerissen.h / 6.0
 
 
 def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
@@ -424,8 +466,9 @@ def auswerten(fall, art: Analyseart, paar: Loeserpaar) -> Tuple[
         return aus_dehnungen(paar.gerissen, eps_oben=fall.eps_oben / 1e3,
                              eps_unten=fall.eps_unten / 1e3), None
     if art is Analyseart.MOMENT_KRUEMMUNG:
+        N = fall.N_Ed * 1e3
         return None, moment_kruemmung(paar.gerissen, paar.ungerissen,
-                                      N=fall.N_Ed * 1e3, M_Riss=paar.M_Riss)
+                                      N=N, M_Riss=paar.rissmoment_bei(N))
     return aus_schnittgroessen(paar.gerissen, N=fall.N_Ed * 1e3,
                                M=fall.M_Ed * 1e3), None
 

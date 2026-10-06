@@ -15,6 +15,7 @@
  */
 
 import { achsenkreuz } from './achsen.js';
+import { beschriftungenEntzerren } from './diagramm.js';
 import { el, svgEl } from './dom.js';
 
 const BREITE = 300;
@@ -26,6 +27,15 @@ const DRUCK = '#1d4ed8';
 const STAHL = '#b45309';
 const ACHSE = '#8895a8';
 const SCHRIFT = '#1a1f27';
+
+/**
+ * So weit reicht der Wertebereich über den grössten Wert hinaus: Platz für
+ * seine Zahl daneben, auch bei «-435.0».
+ */
+const SPIELRAUM = 1.4;
+
+/** Weiss hinterlegt, damit eine Zahl auch über einem Strich lesbar bleibt. */
+const HOF = { 'paint-order': 'stroke', stroke: '#fff', 'stroke-width': 3 };
 
 /**
  * Ein Rahmen mit Nulllinie und den Grenzwerten an den Achsen -- beide Bilder
@@ -40,7 +50,7 @@ function tafel({ titel, einheit, werte, hoeheMm }) {
   const { svg, daten, x, y } = achsenkreuz({
     breite: BREITE, hoehe: HOEHE, rand: RAND, rahmen: true,
     attribute: { class: 'sd-bild', preserveAspectRatio: 'xMidYMid meet' },
-    x: { bereich: [-grenze * 1.15, grenze * 1.15] },
+    x: { bereich: [-grenze * SPIELRAUM, grenze * SPIELRAUM] },
     y: { bereich: [hoeheMm, 0] },
   });
   const hoehe = HOEHE - RAND.oben - RAND.unten;
@@ -95,8 +105,46 @@ function verlauf(svg, x, y, punkte, hol) {
   }
 }
 
+/** Eine Zahl ohne «-0.0». */
+function zahl(wert, stellen) {
+  return (Math.abs(wert) < 0.5 * 10 ** -stellen ? 0 : wert).toFixed(stellen);
+}
+
+/**
+ * Die Zahlen, nach denen man fragt: der Beton zuoberst und zuunterst, jede
+ * Stahllage. Neben den Punkt, auf die Seite seines Vorzeichens. Stehen zwei zu
+ * nah -- zwei Lagen wenige Millimeter übereinander --, rückt eine weg, und ein
+ * Strich zeigt, wohin sie gehört.
+ *
+ * Ein Zettel: `wert`, `punkt` (die Höhe des Punkts im Bild), `soll` (wo die
+ * Grundlinie der Zahl stehen möchte) und `farbe`.
+ */
+function anschreiben(daten, x, zettel, stellen) {
+  const oben = RAND.oben + 9;
+  const unten = HOEHE - RAND.unten - 3;
+  for (const seite of [-1, 1]) {
+    const teil = zettel.filter((z) => (zahl(z.wert, stellen) < 0 ? -1 : 1) === seite);
+    if (!teil.length) continue;
+    for (const z of beschriftungenEntzerren(teil, 11, oben, unten)) {
+      const px = x(z.wert) + seite * 5;
+      if (Math.abs(z.y - z.soll) > 2) {
+        daten.append(svgEl('line', {
+          x1: x(z.wert), y1: z.punkt, x2: px - seite * 1, y2: z.y - 3.5,
+          stroke: z.farbe, 'stroke-width': .8, 'stroke-opacity': .7,
+        }));
+      }
+      const t = svgEl('text', {
+        x: px, y: z.y, 'text-anchor': seite < 0 ? 'end' : 'start',
+        'font-size': 9.5, 'font-weight': 600, fill: z.farbe, ...HOF,
+      });
+      t.textContent = zahl(z.wert, stellen);
+      daten.append(t);
+    }
+  }
+}
+
 /** Dehnung oder Spannung über die Höhe, mit den Bewehrungslagen darin. */
-function ueberDieHoehe(bild, { titel, einheit, hol, stahlHol }) {
+function ueberDieHoehe(bild, { titel, einheit, hol, stahlHol, stellen }) {
   const werte = [...bild.beton.map(hol), ...bild.stahl.map(stahlHol)];
   const { svg, daten, x, y } = tafel({ titel, einheit, werte, hoeheMm: bild.h });
   verlauf(daten, x, y, bild.beton, hol);
@@ -132,10 +180,39 @@ function ueberDieHoehe(bild, { titel, einheit, hol, stahlHol }) {
     punkt.append(titelKnoten);
     daten.append(punkt);
   }
+
+  // Der Beton am Rand: zuoberst knapp unter, zuunterst knapp über der Kante.
+  const betonfarbe = (w) => (w < 0 ? DRUCK : w > 0 ? ZUG : ACHSE);
+  const kopfwert = hol(bild.beton[0]);
+  const fusswert = hol(bild.beton[bild.beton.length - 1]);
+  anschreiben(daten, x, [
+    { wert: kopfwert, punkt: y(0), soll: y(0) + 9, farbe: betonfarbe(kopfwert) },
+    { wert: fusswert, punkt: y(bild.h), soll: y(bild.h) - 3, farbe: betonfarbe(fusswert) },
+    ...bild.stahl.map((lage) => ({
+      wert: stahlHol(lage), punkt: y(lage.z), soll: y(lage.z) + 3.5, farbe: STAHL,
+    })),
+  ], stellen);
   return svg;
 }
 
-/** Die Momenten-Krümmungs-Linie: beide Zustände und was dazwischen gilt. */
+/** Ein Punkt der Linie mit seinem Namen daneben. */
+function marke(daten, px, py, inhalt, { farbe, dx, dy, anker }) {
+  daten.append(svgEl('circle', {
+    cx: px, cy: py, r: 3.2, fill: '#fff', stroke: farbe, 'stroke-width': 1.6,
+  }));
+  const t = svgEl('text', {
+    x: px + dx, y: py + dy, 'text-anchor': anker, 'font-size': 10.5,
+    'font-weight': 600, fill: farbe, ...HOF,
+  });
+  t.textContent = inhalt;
+  daten.append(t);
+}
+
+/**
+ * Die Momenten-Krümmungs-Linie: ungerissen bis M_Riss, dort waagrecht nach
+ * rechts -- der Querschnitt reisst, beim selben Moment krümmt er sich mehr --,
+ * darüber gerissen bis M_Rd. Gestrichelt die beiden Zustände je für sich.
+ */
 function momentenlinie(kurve) {
   const chiMax = Math.max(1e-9, ...kurve.punkte.map((p) => p.chi));
   const mMax = Math.max(1e-9, kurve.M_Rd);
@@ -160,17 +237,19 @@ function momentenlinie(kurve) {
   linie((p) => p.chi_II, ACHSE, 1.2, '2 3');
   linie((p) => p.chi, '#16794a', 2.2);
 
-  if (kurve.M_Riss > 0 && kurve.M_Riss < mMax) {
-    daten.append(svgEl('line', {
-      x1: feld.links, y1: y(kurve.M_Riss), x2: feld.rechts,
-      y2: y(kurve.M_Riss), stroke: ZUG, 'stroke-width': 1.2, 'stroke-dasharray': '5 3',
+  // Der Riss: unter dem waagrechten Stück, wo die Linie nicht hinkommt.
+  if (kurve.riss) {
+    const { M, chi_vor: vor, chi_nach: nach } = kurve.riss;
+    daten.append(svgEl('circle', {
+      cx: x(vor), cy: y(M), r: 2.4, fill: ZUG,
     }));
-    const marke = svgEl('text', {
-      x: feld.links + 4, y: y(kurve.M_Riss) - 4, 'font-size': 10, fill: ZUG,
-    });
-    marke.textContent = `M_Riss = ${kurve.M_Riss.toFixed(1)} kNm`;
-    daten.append(marke);
+    marke(daten, x(nach), y(M), `M_Riss = ${M.toFixed(1)} kNm`,
+      { farbe: ZUG, dx: 7, dy: 14, anker: 'start' });
   }
+  // Das Ende: M_Rd, darunter -- über der Linie bleibt bis zum Rahmen kein Platz.
+  const ende = kurve.punkte[kurve.punkte.length - 1];
+  marke(daten, x(ende.chi), y(ende.M), `M_Rd = ${ende.M.toFixed(1)} kNm`,
+    { farbe: '#16794a', dx: -4, dy: 16, anker: 'end' });
 
   // Ohne Gitter: an den Achsen stehen nur die Grösstwerte.
   for (const [wert, px, py, anker] of [
@@ -215,8 +294,9 @@ export function spannungsfallZeichnen(fall) {
       ]),
       k.punkte.length ? momentenlinie(k) : null,
       el('p.sd-legende', {
-        text: 'Durchgezogen: mit Zugversteifung · lang gestrichelt: ungerissen (I) '
-          + '· kurz gestrichelt: gerissen, ohne f_ct (II)',
+        text: 'Durchgezogen: der Querschnitt – ungerissen bis M_Riss, dann der Sprung, '
+          + 'darüber gerissen (ohne Zugversteifung) · lang gestrichelt: immer ungerissen (I) '
+          + '· kurz gestrichelt: immer gerissen, ohne f_ct (II)',
       }),
       k.hinweis ? el('p.hinweis', { text: k.hinweis }) : null,
     ]);
@@ -237,11 +317,11 @@ export function spannungsfallZeichnen(fall) {
     ]),
     el('div.sd-paar', {}, [
       ueberDieHoehe(b, {
-        titel: 'Dehnung ε [‰]', einheit: '‰',
+        titel: 'Dehnung ε [‰]', einheit: '‰', stellen: 2,
         hol: (p) => p.eps, stahlHol: (s) => s.eps,
       }),
       ueberDieHoehe(b, {
-        titel: 'Spannung σ [N/mm²]', einheit: 'N/mm²',
+        titel: 'Spannung σ [N/mm²]', einheit: 'N/mm²', stellen: 1,
         hol: (p) => p.sigma, stahlHol: (s) => s.sigma,
       }),
     ]),

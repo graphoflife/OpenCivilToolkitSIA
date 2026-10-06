@@ -28,12 +28,13 @@ def loeserpaar():
     loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
     paar = sa.loeserpaar(aufbau.querschnitte["q1"], Richtung.X,
                          lambda kid: loesung.werte[kid].groesse.si)
-    return paar.gerissen, paar.ungerissen, paar.M_Riss
+    return paar
 
 
 class TestDieDreiPassenZueinander(unittest.TestCase):
     def setUp(self):
-        self.gerissen, self.ungerissen, self.M_Riss = loeserpaar()
+        paar = loeserpaar()
+        self.gerissen, self.ungerissen = paar.gerissen, paar.ungerissen
 
     def test_die_ebene_erzeugt_die_eingegebenen_schnittgroessen(self):
         """Die Probe -- dieselbe, die auch in den Herleitungen steht."""
@@ -122,9 +123,15 @@ class TestMomentenKruemmung(unittest.TestCase):
     def setUpClass(cls):
         # Einmal für alle: die Linie kostet über eine Sekunde, und jeder Test
         # liest sie nur.
-        cls.gerissen, cls.ungerissen, cls.M_Riss = loeserpaar()
+        cls.paar = loeserpaar()
+        cls.gerissen, cls.ungerissen = cls.paar.gerissen, cls.paar.ungerissen
+        cls.M_Riss = cls.paar.M_Riss
         cls.kurve = sa.moment_kruemmung(
             cls.gerissen, cls.ungerissen, N=0.0, M_Riss=cls.M_Riss)
+
+    def kurve_bei(self, N):
+        return sa.moment_kruemmung(self.gerissen, self.ungerissen,
+                                   N=N, M_Riss=self.paar.rissmoment_bei(N))
 
     def test_sie_reicht_von_null_bis_zum_widerstand(self):
         self.assertTrue(self.kurve.punkte)
@@ -144,40 +151,92 @@ class TestMomentenKruemmung(unittest.TestCase):
                                delta=2.0)
 
     def test_die_kruemmung_waechst_mit_dem_moment(self):
-        chis = [p.chi for p in self.kurve.punkte]
-        self.assertEqual(chis, sorted(chis))
+        """Auch über den Sprung: Moment und Krümmung fallen nirgends zurück."""
+        for liste in ([p.M for p in self.kurve.punkte], [p.chi for p in self.kurve.punkte]):
+            self.assertEqual(liste, sorted(liste))
 
     def test_ungerissen_ist_steifer_als_gerissen(self):
-        """Der ganze Grund für die Zugversteifung: Zustand I krümmt sich weniger."""
+        """Zustand I krümmt sich weniger -- darum springt die Linie beim Reissen nach rechts."""
         for p in self.kurve.punkte[1:]:
             with self.subTest(M=round(p.M / 1e3)):
                 self.assertLessEqual(p.chi_I, p.chi_II + 1e-12)
 
     def test_unter_dem_rissmoment_gilt_der_ungerissene_zustand(self):
-        unten = [p for p in self.kurve.punkte if 0 < p.M <= self.M_Riss]
+        unten = [p for p in self.kurve.punkte if 0 < p.M < self.M_Riss]
         self.assertTrue(unten)
         for p in unten:
             with self.subTest(M=round(p.M / 1e3)):
-                self.assertEqual(p.zeta, 0.0)
-                self.assertAlmostEqual(p.chi, p.chi_I, places=12)
+                self.assertFalse(p.gerissen)
+                self.assertEqual(p.chi, p.chi_I)
 
-    def test_darueber_liegt_sie_zwischen_beiden(self):
-        oben = [p for p in self.kurve.punkte if p.M > self.M_Riss * 1.2]
+    def test_darueber_gilt_der_gerissene_zustand(self):
+        oben = [p for p in self.kurve.punkte if p.M > self.M_Riss]
         self.assertTrue(oben)
         for p in oben:
             with self.subTest(M=round(p.M / 1e3)):
-                self.assertGreater(p.zeta, 0.0)
-                self.assertLessEqual(p.chi, p.chi_II + 1e-12)
-                self.assertGreaterEqual(p.chi, p.chi_I - 1e-12)
+                self.assertTrue(p.gerissen)
+                self.assertEqual(p.chi, p.chi_II)
+
+    def test_beim_rissmoment_springt_die_kruemmung(self):
+        """
+        Das waagrechte Stück: zwei Punkte beim selben Moment, vorher
+        ungerissen, nachher gerissen. Vorher stand hier eine Linie mit
+        Zugversteifung, die beim Rissmoment ohne Sprung weiterlief.
+        """
+        vor, nach = self.kurve.riss
+        self.assertEqual(vor.M, self.M_Riss)
+        self.assertEqual(nach.M, self.M_Riss)
+        self.assertEqual(vor.chi, vor.chi_I)
+        self.assertEqual(nach.chi, nach.chi_II)
+        # Am Beispiel knapp das Doppelte: 0.00134 auf 0.00263 1/m.
+        self.assertGreater(nach.chi, 1.5 * vor.chi)
+        self.assertEqual(sum(1 for p in self.kurve.punkte if p.M == self.M_Riss), 2)
+
+    def test_das_rissmoment_gilt_bei_der_normalkraft_der_linie(self):
+        """
+        Beim Rissmoment erreicht der gezogene Rand des ungerissenen
+        Querschnitts seine Zugspannung -- bei jeder Normalkraft fast dieselbe.
+        Vorher galt immer das Rissmoment ohne Normalkraft: bei 200 kN Druck
+        stand der Rand dann bei 1.65 statt 2.17 N/mm².
+        """
+        def randspannung(N):
+            bild = sa.aus_schnittgroessen(self.ungerissen, N=N,
+                                          M=self.paar.rissmoment_bei(N))
+            return bild.beton[-1].sigma
+        ohne = randspannung(0.0)
+        for N in (-200e3, 100e3):
+            with self.subTest(N=N / 1e3):
+                self.assertAlmostEqual(randspannung(N) / ohne, 1.0, delta=0.05)
+        # Druck hebt das Rissmoment, Zug senkt es -- um N·h/6.
+        self.assertAlmostEqual(self.kurve_bei(-200e3).M_Riss - self.M_Riss,
+                               200e3 * self.gerissen.h / 6.0, places=6)
+
+    def test_reisst_schon_die_normalkraft_ist_alles_gerissen(self):
+        """
+        Am Beispiel erst ab gut 828 kN Zug, und schon ab rund 840 kN gibt es
+        gar keine Gleichgewichtslage mehr -- zu eng für einen Test über N.
+        Darum hier das Rissmoment direkt.
+        """
+        kurve = sa.moment_kruemmung(self.gerissen, self.ungerissen,
+                                    N=0.0, M_Riss=-1e3)
+        self.assertTrue(kurve.punkte)
+        self.assertTrue(all(p.gerissen for p in kurve.punkte))
+        self.assertIsNone(kurve.riss)
+        self.assertIn("gerissen", kurve.hinweis)
+
+    def test_liegt_das_rissmoment_ueber_m_rd_bleibt_alles_ungerissen(self):
+        kurve = sa.moment_kruemmung(self.gerissen, self.ungerissen,
+                                    N=0.0, M_Riss=10 * self.kurve.M_Rd)
+        self.assertTrue(kurve.punkte)
+        self.assertFalse(any(p.gerissen for p in kurve.punkte))
+        self.assertIsNone(kurve.riss)
+        self.assertIn("sprödes", kurve.hinweis)
 
     def test_druck_erhoeht_den_widerstand(self):
-        mit_druck = sa.moment_kruemmung(self.gerissen, self.ungerissen,
-                                        N=-300e3, M_Riss=self.M_Riss)
-        self.assertGreater(mit_druck.M_Rd, self.kurve.M_Rd)
+        self.assertGreater(self.kurve_bei(-300e3).M_Rd, self.kurve.M_Rd)
 
     def test_zu_viel_druck_laesst_nichts_uebrig(self):
-        kaputt = sa.moment_kruemmung(self.gerissen, self.ungerissen,
-                                     N=-1e8, M_Riss=self.M_Riss)
+        kaputt = self.kurve_bei(-1e8)
         self.assertFalse(kaputt.tragfaehig)
         self.assertIn("Gleichgewichtslage", kaputt.hinweis)
 
@@ -203,6 +262,12 @@ class TestUeberDenDienst(unittest.TestCase):
         # In Zeichengrössen: mm, Promille, kN.
         self.assertAlmostEqual(faelle[0]["bild"]["M"], 150.0, delta=0.5)
         self.assertAlmostEqual(faelle[0]["bild"]["h"], 300.0, delta=0.1)
+        # Das Rissmoment bei N = -200 kN: 41.4 + 200·0.3/6 = 51.4 kNm, und
+        # dort springt die Linie.
+        kurve = faelle[2]["kurve"]
+        self.assertAlmostEqual(kurve["M_Riss"], 51.4, delta=0.1)
+        self.assertEqual(kurve["riss"]["M"], kurve["M_Riss"])
+        self.assertGreater(kurve["riss"]["chi_nach"], kurve["riss"]["chi_vor"])
 
     def test_ein_ausgeschalteter_fall_wird_nicht_gerechnet(self):
         antwort = self.antwort(

@@ -229,12 +229,16 @@ def _analyse_dict(analyse) -> dict:
         return {**kopf, "moeglich": False, "hinweis": analyse.hinweis}
     if analyse.kurve is not None:
         kurve = analyse.kurve
+        riss = kurve.riss
         return {**kopf, "moeglich": True, "kurve": {
             "N": kurve.N / 1e3, "M_Riss": kurve.M_Riss / 1e3,
             "M_Rd": kurve.M_Rd / 1e3, "hinweis": kurve.hinweis,
-            "punkte": [{"M": p.M / 1e3, "chi": p.chi, "zeta": p.zeta,
+            "punkte": [{"M": p.M / 1e3, "chi": p.chi, "gerissen": p.gerissen,
                         "chi_I": p.chi_I, "chi_II": p.chi_II}
-                       for p in kurve.punkte]}}
+                       for p in kurve.punkte],
+            # Der Sprung beim Reissen: dasselbe Moment, zwei Kruemmungen.
+            "riss": (None if riss is None else
+                     {"M": riss[0].M / 1e3, "chi_vor": riss[0].chi, "chi_nach": riss[1].chi})}}
     return {**kopf, "moeglich": True, "bild": _bild_dict(analyse.bild, analyse.h)}
 
 

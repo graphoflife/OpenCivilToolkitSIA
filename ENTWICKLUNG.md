@@ -44,6 +44,67 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-06 · Spannung-Dehnung-Analyse: Zahlen am Bild, Sprung beim Riss
+
+Wünsche:
+* In den Bildern Dehnung und Spannung stehen die Zahlen: an jeder
+  Stahllage und am Beton zuoberst und zuunterst.
+* Die Momenten-Krümmungs-Linie springt beim Rissmoment waagrecht nach
+  rechts.
+* Das Rissmoment und M_Rd stehen an der Linie.
+
+**Die Zahlen** stehen neben dem Punkt, auf der Seite ihres Vorzeichens.
+Zwei Lagen wenige Millimeter übereinander, etwa 246 und 249 mm, kämen
+aufeinander zu liegen. Darum rückt eine weg, und ein kurzer Strich zeigt,
+wohin sie gehört. Damit neben dem grössten Wert Platz für seine Zahl bleibt,
+reicht der Bereich jetzt 40 % über ihn hinaus statt 15 %; die Verläufe sind
+etwas schmaler.
+
+**Der Sprung.** Die alte Linie war kein Rechenfehler, sondern ein anderes
+Modell. Sie mischte Zustand I und II mit Zugversteifung:
+`χ = (1 − ζ)·χ_I + ζ·χ_II` mit `ζ = 1 − (M_Riss/M)²`. Beim Rissmoment ist
+ζ = 0, darum lief sie dort ohne Sprung weiter. Der Querschnitt selbst
+springt aber: beim selben Moment von χ_I auf χ_II. Jetzt zeigt die Linie den
+Querschnitt – ungerissen bis M_Riss, beim Rissmoment zwei Punkte, darüber
+gerissen. Am Beispiel, Decke über EG, x-Richtung, N = 0:
+
+```
+vorher   M = 41.4 kNm   χ = 0.00134 1/m, danach ohne Knick weiter
+nachher  M = 41.4 kNm   χ = 0.00134 → 0.00263 1/m, knapp das Doppelte
+```
+
+Die Zugversteifung ist damit draussen. Ihr Beiwert war ohnehin offen; ob
+und mit welcher Regel eine Linie des Bauteils dazukommt, steht jetzt so in
+TODO.md.
+
+**Dabei gefunden: das Rissmoment hing nicht an N.** Die Linie nahm immer das
+Rissmoment ohne Normalkraft, auch mit Druck. Jetzt gilt
+`M_Riss(N) = M_Riss(0) − N·h/6`, am Bruttoquerschnitt wie beim spröden
+Versagen (Annahme, in TODO.md).
+
+```
+N = −200 kN   vorher M_Riss = 41.4 kNm   nachher 51.4 kNm
+```
+
+Ein Test prüft das an der Bedeutung, nicht an der Formel. Beim Rissmoment
+steht der gezogene Rand des ungerissenen Querschnitts bei jeder Normalkraft
+fast gleich: 2.14 N/mm² bei N = 0, 2.17 bei 200 kN Druck. Mit dem alten
+Rissmoment wären es bei 200 kN Druck 1.65 gewesen.
+
+Zwei Randfälle sagen, was sie sind:
+* Liegt das Rissmoment über M_Rd, bleibt die Linie bis M_Rd ungerissen.
+* Reisst schon die Zugkraft den Querschnitt, ist sie ganz gerissen.
+
+Nachgeprüft:
+* **Tests:** unter M_Riss ungerissen, darüber gerissen, zwei Punkte beim
+  Rissmoment; Moment und Krümmung fallen nirgends zurück; das Rissmoment
+  mit N; die beiden Randfälle. Die Schnappschüsse sind unverändert, denn die
+  Analyse steht in keinem Bericht.
+* **Im Browser:** Zahlen an allen Lagen, der Sprung sichtbar, Marken an
+  M_Riss und M_Rd.
+
+---
+
 ## 2026-10-02 · Nur noch ein Interaktionsdiagramm
 
 Wunsch: es soll nur ein Interaktionsdiagramm sichtbar sein.

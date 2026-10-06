@@ -131,15 +131,23 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Normalkraft denselben Bezugsgraphen wie vorher, und ein feiner Abdruck
       sähe den Unterschied nicht. Das wäre ein Umbau an jedem Nachweis, und der
       Fehlerfall wäre eine stillschweigend falsche Zahl.
-- [ ] **Der Beiwert der Zugversteifung steht fest auf 1.0.** Die
-      Momenten-Krümmungs-Linie mischt Zustand I und II über
-      `ζ = 1 − β·(M_Riss/M)²`. Üblich sind β = 1.0 für kurzzeitige und
-      β = 0.5 für dauernde oder wiederholte Einwirkung; eingebaut ist 1.0.
-      Welcher Wert nach SIA 262 wann gilt, ist nicht nachgeschlagen — und
-      welche Seite konservativ ist, hängt an der Frage: für eine Durchbiegung
-      ist der kleinere Beiwert (weicher) der ungünstige, für eine Zwängung
-      der grössere. Solange das offen ist, sollte der Wert nicht wählbar sein,
-      sondern nachgeschlagen werden.
+- [ ] **Die Momenten-Krümmungs-Linie zeigt den Querschnitt, ohne
+      Zugversteifung.** Ungerissen bis zum Rissmoment, dort der Sprung,
+      darüber gerissen. Für die Durchbiegung eines Bauteils fehlt die
+      Mitwirkung des Betons zwischen den Rissen. Bis 2026-10-06 stand sie als
+      `ζ = 1 − β·(M_Riss/M)²` mit β = 1.0 drin (üblich: 1.0 kurzzeitig, 0.5
+      dauernd oder wiederholt) -- dafür war der Sprung nicht zu sehen. Ob eine
+      Linie des Bauteils dazukommt, mit welcher Regel und welchem Beiwert nach
+      SIA 262, ist nicht nachgeschlagen. Für eine Durchbiegung ist der
+      kleinere Beiwert (weicher) der ungünstige, für eine Zwängung der
+      grössere.
+- [ ] **Das Rissmoment der Momenten-Krümmungs-Linie** gilt am
+      Bruttoquerschnitt ohne Stahl, `M_Riss(N) = M_Riss(0) − N·h/6` (Zug
+      positiv) -- Annahme, nicht nachgeschlagen. Der ungerissene Zustand
+      daneben rechnet mit Stahl und Kriechzahl und ist steifer: am Beispiel
+      steht sein gezogener Rand beim Rissmoment bei 2.14 statt
+      f_ct,eff = 2.76 N/mm². Ob für die Linie der ideelle Querschnitt gelten
+      soll, ist offen.
 - [ ] Die Normstelle für das Fachwerkmodell mit Bügeln (`SIA 262:2025, 4.3.3.4`)
       ist eingetragen, aber wie alle anderen Verweise nicht nachgeschlagen.
       Dasselbe gilt für die Vorgaben `α_min = 30°`, `α_max = 45°`, `k_c = 0.55`
