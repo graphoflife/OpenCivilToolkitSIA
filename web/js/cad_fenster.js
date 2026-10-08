@@ -35,7 +35,8 @@ import {
   klickPunkt, taste as eingabeTaste,
 } from './cad_eingabe.js';
 import {
-  knotenBefehl, kopierenBefehl, linienBefehl, polygonBefehl, verschiebenBefehl,
+  knotenBefehl, knotenEinfuegenBefehl, kopierenBefehl, linienBefehl, polygonBefehl,
+  verschiebenBefehl,
 } from './cad_befehle.js';
 import { klickWaehlen, leisteZeichnen, rahmenWaehlen, treffer } from './cad_auswahl.js';
 import { paletteBauen } from './cad_palette.js';
@@ -224,14 +225,61 @@ function punktLiefern(a, erg) {
   zeichnen(a);
 }
 
-/** Was neben einer Auswahl angeboten wird -- erst das Allgemeine, dann das der App. */
+/** Ändert jedes gewählte Element einer Form -- ein Schritt für Rückgängig. */
+function jedesGewaehlte(a, form, tun) {
+  const auswahl = new Set(a.auswahl);
+  const neu = [];
+  aendern(a, (z) => {
+    for (const { art, e } of [...a.modell.elemente(z)]) {
+      if (auswahl.has(e.kennung) && art.form === form) neu.push(tun(z, art, e));
+    }
+  }, { auswahl: () => [...auswahl, ...neu] });
+}
+
+/** Teilt jede gewählte Linie in der Mitte. */
+function teilen(a) {
+  jedesGewaehlte(a, 'linie', (z, art, e) => {
+    const lagen = a.modell.lagen(z);
+    const [p, q] = [lagen.get(e.von), lagen.get(e.bis)];
+    return p && q ? a.modell.linieTeilen(z, art, e, [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2]) : null;
+  });
+}
+
+/**
+ * Was neben einer Auswahl angeboten wird -- nur, was für sie geht: erst das
+ * Allgemeine, dann das der App, zuletzt Löschen.
+ */
 function aktionen(a) {
+  const z = a.adapter.zeichnung();
+  const m = a.modell;
+  const gewaehlt = [...m.elemente(z)].filter(({ e }) => a.auswahl.has(e.kennung));
+  const nurLinien = gewaehlt.length > 0 && gewaehlt.length === a.auswahl.size
+    && gewaehlt.every(({ art }) => art.form === 'linie');
+  const einzeln = gewaehlt.length === 1 && a.auswahl.size === 1 ? gewaehlt[0] : null;
+  const teilbar = (x) => x.art.form === 'flaeche' || (x.art.form === 'linie' && x.art.teilbar !== false);
   return [
     { zeichen: '⇢', text: 'Verschieben', taste: 'V', tun: () => starten(a, verschiebenBefehl()) },
     { zeichen: '⧉', text: 'Kopieren', taste: 'C', tun: () => starten(a, kopierenBefehl()) },
+    nurLinien && gewaehlt.every(teilbar) ? {
+      zeichen: '⫶', text: 'Teilen', titel: 'In der Mitte teilen: zwei Linien mit denselben Eigenschaften',
+      tun: () => teilen(a),
+    } : null,
+    einzeln && teilbar(einzeln) ? {
+      zeichen: '+', text: 'Knoten', titel: 'Einen Knoten in eine Kante einfügen',
+      tun: () => starten(a, knotenEinfuegenBefehl(einzeln.e.kennung)),
+    } : null,
+    nurLinien ? {
+      zeichen: '⇄', text: 'Umkehren', titel: 'Anfang und Ende tauschen',
+      tun: () => jedesGewaehlte(a, 'linie', (zz, art, e) => { m.umkehren(art, e); }),
+    } : null,
+    gewaehlt.length && m.geteilt(z, a.auswahl) ? {
+      zeichen: '⛓', text: 'Lösen',
+      titel: 'Eigene Knoten, wo die Auswahl einen mit anderen Elementen teilt -- danach bleibt beim Verschieben der Rest liegen',
+      tun: () => aendern(a, (zz) => m.loesen(zz, new Set(a.auswahl))),
+    } : null,
     ...(a.adapter.aktionen?.(a) || []),
     { zeichen: '✕', text: 'Löschen', taste: 'Entf', tun: () => loeschen(a) },
-  ];
+  ].filter(Boolean);
 }
 
 // ===========================================================================
@@ -303,8 +351,9 @@ function zeichnen(a) {
     hervorheben(a, a.auswahl, 'cad-auswahl'),
   );
   obenZeichnen(a);
-  leisteZeichnen(a);
+  // Erst das schwebende Fenster: die Leiste weicht ihm aus, in seiner neuen Grösse.
   paletteZeichnen(a);
+  leisteZeichnen(a);
   statusZeichnen(a);
   a.adapter.gezeichnet?.(a);
 }

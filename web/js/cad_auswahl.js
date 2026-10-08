@@ -155,12 +155,17 @@ export function leisteZeichnen(a) {
     ziel.hidden = true;
     return;
   }
-  const aktionen = a.aktionen();
-  ziel.replaceChildren(...aktionen.map((x) => el('button.cad-aktion', {
-    type: 'button', title: x.titel || x.text,
-    on: { click: (e) => { e.preventDefault(); x.tun(); } },
-  }, [el('span.cad-aktionszeichen', { text: x.zeichen }), el('span', { text: x.text }),
-    x.taste ? el('kbd', { text: x.taste }) : null])));
+  // Neu gebaut nur, wenn sich Zeichnung oder Auswahl geändert haben -- beim
+  // Verschieben der Ansicht wandert die Leiste bloss mit.
+  const schluessel = JSON.stringify([a.version, [...a.auswahl]]);
+  if (ziel.dataset.schluessel !== schluessel) {
+    ziel.dataset.schluessel = schluessel;
+    ziel.replaceChildren(...a.aktionen().map((x) => el('button.cad-aktion', {
+      type: 'button', title: x.titel || x.text,
+      on: { click: (e) => { e.preventDefault(); x.tun(); } },
+    }, [el('span.cad-aktionszeichen', { text: x.zeichen }), el('span', { text: x.text }),
+      x.taste ? el('kbd', { text: x.taste }) : null])));
+  }
   ziel.hidden = false;
   const breite = ziel.offsetWidth || 260;
   const hoehe = ziel.offsetHeight || 30;

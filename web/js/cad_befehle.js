@@ -25,7 +25,7 @@
 import {
   nachBild, pfad, text, zahlText,
 } from './cad_ansicht.js';
-import { abstand } from './cad_modell.js';
+import { abstand, aufStrecke } from './cad_modell.js';
 import { svgEl } from './dom.js';
 import { NAEHE } from './cad_eingabe.js';
 
@@ -274,3 +274,57 @@ function bewegungsBefehl(kopie) {
 
 export const verschiebenBefehl = () => bewegungsBefehl(false);
 export const kopierenBefehl = () => bewegungsBefehl(true);
+
+// ===========================================================================
+// Knoten einfügen -- in eine Kante der gewählten Fläche oder Linie
+// ===========================================================================
+
+/**
+ * Die Kante des Elements `kennung`, die `p` am nächsten liegt: ihr Index und
+ * der Punkt auf ihr. Bei einer Linie ist es die Linie selbst.
+ */
+function naechsteKante(a, z, kennung, p) {
+  const da = a.modell.verzeichnis(z).get(kennung);
+  if (!da?.art) return null;
+  const lagen = a.modell.lagen(z);
+  const orte = a.modell.verweise(da.art, da.e).map((k) => lagen.get(k));
+  if (orte.some((x) => !x)) return null;
+  const kanten = da.art.form === 'linie' ? [[orte[0], orte[1]]]
+    : orte.map((x, i) => [x, orte[(i + 1) % orte.length]]);
+  let beste = null;
+  kanten.forEach(([s, t], i) => {
+    const { q } = aufStrecke(p, s, t);
+    const d = abstand(p, q);
+    if (!beste || d < beste.d) beste = { i, q, d, s, t };
+  });
+  return { ...beste, ...da };
+}
+
+export function knotenEinfuegenBefehl(kennung) {
+  return {
+    name: 'einfuegen',
+    frage: () => 'Knoten einfügen: Punkt auf der Kante',
+    hinweis: 'Ein Punkt neben der Kante kommt senkrecht auf sie',
+    punkt(a, erg) {
+      let neu = null;
+      a.aendern((z) => {
+        const k = naechsteKante(a, z, kennung, erg.p);
+        if (!k) return;
+        if (k.art.form === 'linie') neu = a.modell.linieTeilen(z, k.art, k.e, k.q);
+        else a.modell.eckeEinfuegen(z, k.e, k.i, k.q);
+      }, { auswahl: () => [kennung, neu] });
+      a.ende();
+    },
+    vorschau(a, g) {
+      const f = a.zeiger?.fang;
+      if (!f) return;
+      const k = naechsteKante(a, a.adapter.zeichnung(), kennung, f.p);
+      if (!k) return;
+      g.append(svgEl('path', { d: pfad(a.v, [k.s, k.t], false), class: 'cad-streckenwahl' }));
+      const [x, y] = nachBild(a.v, k.q);
+      g.append(svgEl('circle', { cx: x, cy: y, r: 4, class: 'cad-entwurfpunkt' }));
+    },
+    enter: () => false,
+    zurueck: () => false,
+  };
+}

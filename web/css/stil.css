@@ -851,8 +851,12 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   max-height: 54vh; white-space: pre-wrap; word-break: break-word;
 }
 
-/* Die Formeln haben ihre eigene Schrift und erben die Angleichung nicht. */
-.katex { font-size: 1.04em; font-size-adjust: none; }
+/* Die Formeln haben ihre eigene Schrift und erben die Angleichung nicht.
+   `position: relative` hält den unsichtbaren MathML-Teil jeder Formel (bei
+   KaTeX absolut gesetzt) in ihr. Sonst lag er, aus einer gerollten Tafel
+   heraus, auf der Seite selbst: die Seite war 1800 statt 768 px hoch, und ein
+   Feld, das den Fokus bekam, rollte Kopfleiste und Knöpfe aus dem Bild. */
+.katex { position: relative; font-size: 1.04em; font-size-adjust: none; }
 .katex-display { margin: 0; }
 
 .reihe { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }

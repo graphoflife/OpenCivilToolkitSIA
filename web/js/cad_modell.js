@@ -12,7 +12,12 @@
  * Zwei Regeln gelten wie im Kern (`opencivil/projekt/netz.py`), damit das
  * Fenster nichts anlegt, was der Kern anders sähe: eine Kennung kommt nie
  * wieder (die grösste plus eins), und genau gleiche Koordinaten sind ein
- * Knoten. Der Kern hängt nicht von diesen Funktionen ab; sie sind Eingabehilfe.
+ * Knoten -- ausser man hat Elemente ausdrücklich gelöst (`loesen`). Der Kern
+ * hängt nicht von diesen Funktionen ab; sie sind Eingabehilfe.
+ *
+ * Eine Art kann sagen, was mit ihr nicht geht oder was dazugehört:
+ * `teilbar: false` (eine Linie, die man nicht teilen darf) und
+ * `umkehren(e)` (was beim Umkehren mit getauscht wird).
  *
  * Alles hier ändert die übergebene Zeichnung -- gerufen wird es in einem
  * `veraenderer`, der das Projekt ändert.
@@ -109,18 +114,22 @@ export function cadModell({ arten, achsen }) {
 
   /**
    * Führt Knoten mit genau gleichen Koordinaten zusammen: der erste bleibt,
-   * die anderen gehen, ihre Elemente hängen danach am ersten.
+   * die anderen gehen, ihre Elemente hängen danach am ersten. Mit `nur`
+   * bloss dort, wo einer davon liegt -- zwei gelöste Knoten anderswo bleiben
+   * zwei.
    */
-  function zusammenfuehren(z) {
-    const erster = new Map();
-    const weg = new Set();
+  function zusammenfuehren(z, nur = null) {
+    const orte = new Map();
     for (const k of z.knoten || []) {
       const schluessel = `${k[a]}|${k[b]}`;
-      if (!erster.has(schluessel)) {
-        erster.set(schluessel, k.kennung);
-      } else {
-        umhaengen(z, k.kennung, erster.get(schluessel));
-        weg.add(k.kennung);
+      orte.set(schluessel, [...(orte.get(schluessel) || []), k.kennung]);
+    }
+    const weg = new Set();
+    for (const [erster, ...andere] of orte.values()) {
+      if (!andere.length || (nur && ![erster, ...andere].some((k) => nur.has(k)))) continue;
+      for (const k of andere) {
+        umhaengen(z, k, erster);
+        weg.add(k);
       }
     }
     if (weg.size) z.knoten = z.knoten.filter((k) => !weg.has(k.kennung));
@@ -177,7 +186,77 @@ export function cadModell({ arten, achsen }) {
       k[a] = rund(k[a] + d[0]);
       k[b] = rund(k[b] + d[1]);
     }
-    zusammenfuehren(z);
+    zusammenfuehren(z, knoten);
+  }
+
+  /**
+   * Teilt eine Linie am Punkt `p`: sie endet dort, und eine zweite mit
+   * denselben Eigenschaften läuft von dort zum alten Ende. Die zweite kommt
+   * ans Ende der Liste -- die Namen der übrigen bleiben. Gibt ihre Kennung
+   * zurück, oder null, wenn `p` ein Ende ist.
+   */
+  function linieTeilen(z, art, e, p) {
+    const mitte = knotenAn(z, p);
+    if (mitte === e.von || mitte === e.bis) return null;
+    const zweite = { ...structuredClone(e), kennung: naechsteKennung(z, art.vorsilbe), von: mitte };
+    e.bis = mitte;
+    z[art.liste].push(zweite);
+    return zweite.kennung;
+  }
+
+  /** Eine Ecke mehr im Umriss: `p` zwischen Ecke `i` und der nächsten. Gibt den Knoten zurück. */
+  function eckeEinfuegen(z, e, i, p) {
+    const k = knotenAn(z, p);
+    if (e.knoten.includes(k)) return null;
+    e.knoten.splice(i + 1, 0, k);
+    return k;
+  }
+
+  /** Anfang und Ende einer Linie tauschen -- und was die App dazu tauscht (`art.umkehren`). */
+  function umkehren(art, e) {
+    [e.von, e.bis] = [e.bis, e.von];
+    art.umkehren?.(e);
+  }
+
+  /**
+   * Wo die gewählten Elemente einen Knoten mit einem anderen teilen, bekommen
+   * sie einen eigenen an derselben Stelle. Untereinander bleiben sie
+   * verbunden. Verschiebt man sie danach, bleibt der Rest liegen. Gibt
+   * zurück, wie viele Knoten neu sind.
+   */
+  function loesen(z, kennungen) {
+    const fremd = new Set();
+    for (const { art, e } of elemente(z)) {
+      if (!kennungen.has(e.kennung)) verweise(art, e).forEach((k) => fremd.add(k));
+    }
+    const neu = new Map();
+    const eigener = (k) => {
+      if (!fremd.has(k)) return k;
+      if (!neu.has(k)) {
+        const alt = z.knoten.find((x) => x.kennung === k);
+        const kennung = naechsteKennung(z, 'K');
+        z.knoten.push({ ...alt, kennung });
+        neu.set(k, kennung);
+      }
+      return neu.get(k);
+    };
+    for (const { art, e } of [...elemente(z)]) {
+      if (!kennungen.has(e.kennung)) continue;
+      if (art.form === 'punkt') e.knoten = eigener(e.knoten);
+      else if (art.form === 'linie') { e.von = eigener(e.von); e.bis = eigener(e.bis); }
+      else e.knoten = e.knoten.map(eigener);
+    }
+    return neu.size;
+  }
+
+  /** Teilen die gewählten Elemente einen Knoten mit einem, das nicht gewählt ist? */
+  function geteilt(z, kennungen) {
+    const fremd = new Set();
+    const eigen = new Set();
+    for (const { art, e } of elemente(z)) {
+      verweise(art, e).forEach((k) => (kennungen.has(e.kennung) ? eigen : fremd).add(k));
+    }
+    return [...eigen].some((k) => fremd.has(k));
   }
 
   /**
@@ -213,7 +292,7 @@ export function cadModell({ arten, achsen }) {
   return {
     arten, achsen, artVon, lage, elemente, verweise, lagen, verzeichnis,
     naechsteKennung, knotenAn, benutzung, umhaengen, zusammenfuehren, loeschen,
-    knotenDer, verschieben, kopieren,
+    knotenDer, verschieben, kopieren, linieTeilen, eckeEinfuegen, umkehren, loesen, geteilt,
   };
 }
 

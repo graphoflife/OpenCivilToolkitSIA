@@ -113,17 +113,41 @@ So bedient es sich:
   er schneidet. Er nimmt auch Knoten mit: wer die zwei Knoten der rechten
   Kante wählt und um 100 verschiebt, macht den Balken 100 breiter.
 * **Jede Aktion ist ein Schritt für Rückgängig,** nie ein Zwischenpunkt.
+* **Bearbeiten neben der Auswahl** (Schritt 7):
+  * *Teilen* halbiert eine Linie, *Knoten* fügt einen in eine Kante ein,
+    wo man klickt.
+  * *Umkehren* tauscht Anfang und Ende.
+  * *Lösen* gibt der Auswahl eigene Knoten, wo sie einen mit anderem teilt:
+    So verschiebt man die untere Bewehrung um 10 mm, ohne dass die Wände
+    mitgehen.
+  * Eine Bewehrung lässt sich **nicht teilen**: Bei zwei Hälften wären es
+    andere Stäbe als beim Ganzen, also n Stäbe je Hälfte oder ein doppelter
+    Stab in der Mitte. Beim Umkehren tauschen Start- und Endeisen mit, damit
+    die Stäbe bleiben, wo sie sind.
+* **Das Lot ⊥** (Schritt 6) fängt den Fusspunkt vom Bezugspunkt auf eine
+  Linie, wenn er auf ihr liegt.
+* **Verschmolzen wird nur, was bewegt wurde:** Landet ein verschobener Knoten
+  genau auf einem anderen, wird er eins mit ihm. Zwei gelöste Knoten anderswo
+  bleiben zwei.
 
 Nachgespielt im Browser, mit Server und mit Pyodide:
 * Stab 150 rechts von K3 (K, über K3, R, `150` Tab `0` Enter): Knoten genau
   bei (450, 600).
 * Linie von K1, dann Y, M, K5, K8: Ende genau bei (150, 0).
+* Linie von K1, P, die obere Bewehrung anklicken, über K8 klicken: Ende bei
+  (250, 0), K8 auf die Parallele projiziert.
+* Rahmen um die rechte Kante, V, `100` Tab `0`: der Balken ist 400 breit.
 * Je Änderung genau eine Anfrage `geometrie`.
 
 ### Nebenbei
 
 * **Der Baum las noch die alten Eckpunkte** und brach beim Start ab. Er
   misst jetzt die Ecken der Flächen über ihre Knoten.
+* **Die Seite war 1800 statt 768 px hoch.** Der unsichtbare MathML-Teil jeder
+  Formel ist bei KaTeX absolut gesetzt und lag ohne Bezug auf der Seite
+  statt in der Tafel. Bekam ein Feld weit unten den Fokus, rollte die ganze
+  Seite mit, samt Kopfleiste. `.katex { position: relative }` hält ihn in der
+  Formel. Der Fehler ist älter als das CAD; aufgefallen ist er beim Testen.
 
 ## 2026-10-08 · Zahlenfelder: eine Breite für «99999.99»
 

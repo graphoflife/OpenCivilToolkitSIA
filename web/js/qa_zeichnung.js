@@ -32,11 +32,20 @@ import {
 } from './dom.js';
 import { aendern, ausVorlage, projektAendern, zustand } from './zustand.js';
 
-/** Die Arten des Querschnitts, für das allgemeine Fenster. */
+/**
+ * Die Arten des Querschnitts, für das allgemeine Fenster. Eine Bewehrung
+ * lässt sich nicht teilen: die Stäbe zweier Hälften wären andere als die
+ * des Ganzen (n Stäbe je Hälfte, oder ein doppelter Stab in der Mitte).
+ * Umgekehrt tauschen Start- und Endeisen mit -- die Stäbe bleiben, wo sie
+ * sind.
+ */
 const ARTEN = [
   { liste: 'flaechen', form: 'flaeche', vorsilbe: 'F' },
   { liste: 'staebe', form: 'punkt', vorsilbe: 'S' },
-  { liste: 'stablinien', form: 'linie', vorsilbe: 'L' },
+  {
+    liste: 'stablinien', form: 'linie', vorsilbe: 'L', teilbar: false,
+    umkehren: (e) => { [e.starteisen, e.endeisen] = [e.endeisen, e.starteisen]; },
+  },
   { liste: 'schubwaende', form: 'linie', vorsilbe: 'L' },
   { liste: 'hilfslinien', form: 'linie', vorsilbe: 'L' },
 ];

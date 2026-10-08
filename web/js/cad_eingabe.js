@@ -4,8 +4,9 @@
  * Ob ein Knoten gesetzt, eine Linie gezogen oder etwas verschoben wird: jeder
  * Punkt kommt auf denselben Wegen zustande.
  *
- *   Maus       fängt an Knoten □, Linienmitte △, Schnittpunkt ×, Linie ◇,
- *              sonst am Raster +. Alt gedrückt: nicht fangen.
+ *   Maus       fängt an Knoten □, Linienmitte △, Schnittpunkt ×, am Lot ⊥
+ *              vom Bezugspunkt auf eine Linie, auf der Linie ◇, sonst am
+ *              Raster +. Alt gedrückt: nicht fangen.
  *   R          setzt den Bezugspunkt auf den gefangenen Punkt. Nach jedem
  *              gesetzten Punkt springt er von selbst dorthin.
  *   Ziffern    gehen ins schwebende Fenster: relativ zum Bezugspunkt,
@@ -169,6 +170,22 @@ export function fangen(a, bild, { frei = false, gerade = false } = {}) {
   const punkt = naechster([...z.schnitte.map((x) => ({ ...x, art2: 'schnitt' })),
     ...z.mitten.map((x) => ({ ...x, art2: 'mitte' })), ...z.extra.map((x) => ({ ...x, art2: 'punkt' }))], 'punkt');
   if (punkt) return { p: punkt.p, art: punkt.art2 };
+
+  // Das Lot vom Bezugspunkt auf eine Strecke -- nur, wo sein Fuss auf ihr liegt.
+  if (pe.bezug) {
+    let lot = null;
+    for (const st of z.strecken) {
+      const r = [st.e[0] - st.s[0], st.e[1] - st.s[1]];
+      const l2 = r[0] * r[0] + r[1] * r[1];
+      if (!l2) continue;
+      const t = ((pe.bezug[0] - st.s[0]) * r[0] + (pe.bezug[1] - st.s[1]) * r[1]) / l2;
+      if (t <= 1e-9 || t >= 1 - 1e-9) continue;
+      const fuss = [st.s[0] + t * r[0], st.s[1] + t * r[1]];
+      const d = abstand(welt, fuss);
+      if (d <= weit && abstand(fuss, pe.bezug) > 1e-9 && (!lot || d < lot.d)) lot = { p: fuss, d };
+    }
+    if (lot) return { p: lot.p, art: 'lot' };
+  }
 
   let bester = null;
   for (const st of z.strecken) {
@@ -350,6 +367,7 @@ const ZEICHEN = {
   mitte: (x, y) => svgEl('path', { d: `M${x} ${y - 6} L${x + 6} ${y + 5} L${x - 6} ${y + 5} Z`, class: 'cad-fang' }),
   schnitt: (x, y) => svgEl('path', { d: `M${x - 5} ${y - 5} L${x + 5} ${y + 5} M${x + 5} ${y - 5} L${x - 5} ${y + 5}`, class: 'cad-fang' }),
   linie: (x, y) => svgEl('path', { d: `M${x} ${y - 6} L${x + 6} ${y} L${x} ${y + 6} L${x - 6} ${y} Z`, class: 'cad-fang' }),
+  lot: (x, y) => svgEl('path', { d: `M${x - 6} ${y + 5} H${x + 6} M${x} ${y + 5} V${y - 6}`, class: 'cad-fang' }),
   projiziert: (x, y) => svgEl('path', { d: `M${x - 6} ${y} H${x + 6} M${x} ${y - 6} V${y} M${x - 6} ${y - 6} V${y}`, class: 'cad-fang' }),
   punkt: (x, y) => svgEl('circle', { cx: x, cy: y, r: 5, class: 'cad-fang' }),
   raster: (x, y) => svgEl('path', { d: `M${x - 5} ${y} H${x + 5} M${x} ${y - 5} V${y + 5}`, class: 'cad-fang' }),
