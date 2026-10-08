@@ -68,16 +68,19 @@ Ein gezeichneter Querschnitt geht genauso -- Masse in mm, y nach rechts, z
 nach oben:
 
 ```python
-from opencivil.projekt import SchubwandEintrag
-
 u = p.analyse("Unterzug")                     # Rechteck 300 × 600, 3 ⌀20 unten, 2 ⌀12 oben
 ecken = [[50, 50], [250, 50], [250, 550], [50, 550]]
-u.schubwaende = [SchubwandEintrag(von=ecken[i], bis=ecken[(i + 1) % 4], dicke=100,
-                                  durchmesser=10, teilung=150, schnitte=1, stahl="s1")
-                 for i in range(4)]           # vier Wände: eine Zelle, sie trägt Torsion
+for i in range(4):                            # vier Wände: eine Zelle, sie trägt Torsion
+    u.schubwand(ecken[i], ecken[(i + 1) % 4], dicke=100, durchmesser=10,
+                teilung=150, schnitte=1, stahl="s1")
+u.stab(150, 300, durchmesser=16, stahl="s1")  # ein Einzelstab bei y = 150, z = 300
 u.lastfall("Feld", M_y_Ed=150, V_z_Ed=150, T_Ed=15)   # kN, kNm
 u.einachsig = False                           # N, M_y, M_z zusammen, Nulllinie schräg
 ```
+
+Gezeichnet wird mit Knoten: gleiche Koordinaten sind ein Knoten, und die
+Wände oben teilen ihre Ecken mit der Bewehrungslinie unten. Dasselbe tut
+das Zeichenfenster.
 
 Es ist dieselbe Beschreibung, die die Oberfläche speichert, und dieselbe
 Rechnung: `p.rechnen()` liefert dieselben Urteile wie die Maske, und
@@ -127,7 +130,8 @@ Fertig und getestet (796 Tests):
 | `web/server.py` | HTTP-Hülle darum (nur Standardbibliothek) |
 | `web/js/kern.js`, `kern_arbeiter.js` | Pyodide-Hülle darum, in einem eigenen Faden, für die Seite ohne Server |
 | `web/js/` | Oberfläche in reinem JavaScript, ohne Bauschritt |
-| `web/js/zeichenfenster.js`, `koordinaten.js` | Zeichenfenster und Koordinatenfenster der Querschnittsanalyse |
+| `web/js/cad_*.js` | das Zeichenfenster, allgemein: Ansicht, Knoten und Elemente, Punkteingabe, Befehle, Auswahl, schwebendes Fenster |
+| `web/js/qa_zeichnung.js`, `qa_uebersicht.js` | was es in der Querschnittsanalyse zeichnet, und die Liste darunter |
 | `web/js/querschnittsanalyse.js`, `qa_diagramme.js` | ihre übrige Eingabe und ihre Diagramme |
 
 Wie das zusammenhängt und warum es so gebaut ist, steht in
@@ -145,11 +149,19 @@ und stellt dar, was zurückkommt -- fertige Zahlen und fertige LaTeX-Zeichen­ke
 Deshalb kann am Bildschirm gar nichts anderes stehen als im Bericht.
 
 **Querschnittsanalyse:** unter den Platten ein zweites Kapitel. Der
-Querschnitt wird gezeichnet -- Polygone (frei, Rechteck, Kreis oder aus einer
-Vorlage), Aussparungen, Stäbe, Stablinien nach Fläche, Anzahl oder Teilung,
-Schubwände mit Bügeln. Raster und Fang, Zoom am Mausrad, Rückgängig mit
-Strg+Z, Vollbild. Neben der Zeichnung stehen die Koordinaten, absolut oder
-relativ, und jede Zahl lässt sich tippen; ein ganzes Polygon geht ohne Maus.
+Querschnitt wird gezeichnet wie in einem kleinen CAD, aus Knoten, Linien und
+Flächen:
+* eine Fläche ist Beton oder eine Aussparung;
+* ein Knoten ist ein Punkt oder ein Stab;
+* eine Linie ist eine Bewehrung (nach Anzahl, Teilung oder verschmiert),
+  eine Schubwand mit Bügeln oder eine Hilfslinie.
+
+Gewählt wird per Klick oder Rahmen; verschoben und kopiert mit Basispunkt
+und Ziel. Jeder Punkt fängt an Knoten, Mitten, Schnittpunkten und am Raster.
+Genau setzen lässt er sich mit R (Bezugspunkt), Y/Z (Achse), P/S (parallel,
+senkrecht) und M (Mitte), die Zahlen getippt. Alle Eigenschaften stehen im
+schwebenden Fenster in der Zeichnung. Rückgängig mit Strg+Z, Vollbild.
+Darunter eine Liste: Meldungen, Querschnittswerte, je Element eine Zeile.
 Was die Rechnung braucht -- die Stäbe einer Linie samt tatsächlicher
 Teilung, Schwerpunkt, Zellen, Meldungen am Element -- kommt vom Kern. Darunter
 je Material Bemessungs- oder charakteristische Werte und beim Beton das

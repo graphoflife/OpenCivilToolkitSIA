@@ -1366,144 +1366,205 @@ math-field.gl-feld::part(menu-toggle) { display: none; }
 
 /* ------------------------------------------------------- Zeichenfenster -- */
 
-/* Das Fenster und was daneben steht. Im Vollbild liegt beides über allem,
-   die Zeichnung links, Koordinaten und Meldungen rechts. */
+/* Das Fenster und was darunter steht. Im Vollbild liegt beides über allem,
+   die Zeichnung links, die Liste rechts. */
 .zeichenbereich { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 10px; }
-.zeichenfenster {
+.cad {
   display: flex; flex-direction: column; min-height: 0;
   border: 1px solid var(--rand-stark); border-radius: var(--radius);
   background: var(--flaeche); overflow: hidden; user-select: none;
 }
-.zf-leiste {
+
+/* Oben wenige Knöpfe: zeichnen, zurück, alles zeigen, Vollbild. */
+.cad-knoepfe {
   display: flex; flex-wrap: wrap; align-items: center; gap: 2px;
   padding: 4px 5px; background: var(--flaeche-2); border-bottom: 1px solid var(--rand);
 }
-.zf-knopf {
-  display: inline-flex; align-items: center; gap: 3px;
-  padding: 2px 6px; border: 1px solid transparent; border-radius: 5px;
+.cad-knopf {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 7px; border: 1px solid transparent; border-radius: 5px;
   background: transparent; color: var(--schrift-matt); font-size: 12px; cursor: pointer;
   white-space: nowrap;
 }
-.zf-knopf:hover:not(:disabled) { background: var(--blau-hell); color: var(--blau-tief); }
-.zf-knopf.ist-an { background: var(--blau); border-color: var(--blau); color: #fff; }
-.zf-knopf:disabled { opacity: .35; cursor: default; }
-.zf-zeichen { font-size: 13px; line-height: 1; }
-.zf-trenner { width: 1px; height: 18px; margin: 0 3px; background: var(--rand-stark); }
-.zf-wahl { display: inline-flex; align-items: center; gap: 4px; font-size: 12px;
-           color: var(--schrift-matt); padding: 0 4px; }
-.zf-wahl select { width: auto; padding: 1px 4px; font-size: 12px; }
-/* In einer schmalen Tafel stehen nur die Zeichen da -- die Wörter sagt der
-   Titel beim Darüberfahren. */
-@container (max-width: 520px) {
-  .zf-knopf .zf-text { display: none; }
-  .zf-knopf { padding: 3px 7px; }
+.cad-knopf:hover:not(:disabled) { background: var(--blau-hell); color: var(--blau-tief); }
+.cad-knopf.ist-an { background: var(--blau); border-color: var(--blau); color: #fff; }
+.cad-knopf:disabled { opacity: .35; cursor: default; }
+.cad-zeichen { font-size: 13px; line-height: 1; }
+.cad-trenner { width: 1px; height: 18px; margin: 0 3px; background: var(--rand-stark); }
+.cad-luecke { flex: 1; }
+/* Im schmalen Panel tragen nur die Werkzeuge ein Wort -- bei der Ansicht
+   sagt es der Titel beim Darüberfahren. */
+@container (max-width: 460px) {
+  .cad-knopf.ist-ansicht .cad-text { display: none; }
 }
 
-.zf-optionen {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px;
-  padding: 4px 8px; border-bottom: 1px solid var(--rand); font-size: 12px;
-  background: var(--blau-zart);
-}
-.zf-optionen[hidden] { display: none; }
-.zf-optionstitel { font-weight: 700; color: var(--schrift-matt); }
-.zf-option { display: inline-flex; align-items: center; gap: 4px; }
-.zf-optionen select { width: auto; padding: 1px 4px; font-size: 12px; }
-/* Die Schriftgrösse auch am Rahmen: seine Breite rechnet in ihren Zeichen. */
-.zf-optionen .zahlfeld, .zf-optionen input[type="number"] { font-size: 12px; }
-.zf-optionen input[type="number"] { padding-block: 2px; }
-.zf-option .einheit { font-size: 11px; color: var(--schrift-zart); }
+.cad-flaeche { position: relative; height: 440px; background: #fff; touch-action: none; overflow: hidden; }
+.cad-bild { display: block; width: 100%; height: 100%; cursor: default; }
+.cad-bild.ist-befehl { cursor: crosshair; }
 
-.zf-flaeche { position: relative; height: 360px; background: #fff; touch-action: none; }
-@container (max-width: 520px) { .zf-flaeche { height: 300px; } }
-.zf-bild { display: block; width: 100%; height: 100%; cursor: crosshair; }
-.zf-bild.ist-waehlen { cursor: default; }
-
-.zf-status {
-  display: flex; justify-content: space-between; gap: 10px;
-  padding: 3px 8px; font-size: 11.5px; color: var(--schrift-matt);
+.cad-status {
+  display: flex; justify-content: flex-end; gap: 10px;
+  padding: 3px 8px; font-size: 11px; color: var(--schrift-matt);
   background: var(--flaeche-2); border-top: 1px solid var(--rand); min-height: 22px;
 }
-.zf-lage { white-space: nowrap; font-variant-numeric: tabular-nums; }
-.zf-hinweis { text-align: right; }
+.cad-hinweis { text-align: right; }
 
-/* Die Zeichnung. Farben wie überall: Beton grau, Stahl kupfer, Bügel und
-   Schubwände violett, gewählt blau, eine Meldung rot. */
-.zf-raster-fein { stroke: #f0f2f6; stroke-width: 1; }
-.zf-raster-grob { stroke: #e0e5ec; stroke-width: 1; }
-.zf-achse { stroke: #b9c3d1; stroke-width: 1; }
-.zf-achstext { font-size: 11px; font-weight: 600; fill: var(--schrift-zart); }
-.zf-beton { fill: #d8dde3; stroke: var(--beton); stroke-width: 1.3; }
-.zf-loch { fill: #fff; stroke: var(--beton); stroke-width: 1.3; stroke-dasharray: 6 3; }
-.zf-zelle { stroke: none; }
-.zf-schraffurstrich { stroke: var(--beide); stroke-opacity: .35; stroke-width: 1.2; }
-.zf-wand { fill: var(--beide); fill-opacity: .16; stroke: var(--beide); stroke-opacity: .55; stroke-width: 1; }
-.zf-wandachse { fill: none; stroke: var(--beide); stroke-width: 1.6; stroke-dasharray: 9 3 2 3; }
-.zf-linie { fill: none; stroke: var(--stahl); stroke-width: 1; stroke-dasharray: 3 3; }
-.zf-linie-flaeche { fill: none; stroke: var(--stahl); stroke-width: 4; stroke-linecap: round; }
-.zf-stab { fill: var(--stahl); stroke: #7a3d14; stroke-width: .8; }
-.zf-geist { opacity: .45; }
-.zf-beschriftung {
-  font-size: 11px; fill: var(--schrift-matt);
-  paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round;
-}
-.zf-linientext { fill: var(--stahl); font-weight: 600; }
-.zf-wandtext { fill: var(--beide); font-weight: 600; }
-.zf-mass { fill: none; stroke: var(--schrift-zart); stroke-width: 1; }
-.zf-masstext { font-size: 11px; fill: var(--schrift-matt); }
-.zf-schwerpunkt circle { fill: #fff; stroke: var(--schrift); stroke-width: 1.2; }
-.zf-schwerpunkt path { stroke: var(--schrift); stroke-width: 1; }
-.zf-schwerpunkttext { font-size: 11px; font-weight: 700; fill: var(--schrift); }
-
-.ist-gewaehlt.zf-beton, .ist-gewaehlt.zf-loch, .ist-gewaehlt.zf-wand,
-.ist-gewaehlt.zf-wandachse, .ist-gewaehlt.zf-linie, .ist-gewaehlt.zf-linie-flaeche {
-  stroke: var(--blau); stroke-opacity: 1; stroke-width: 2.4;
-}
-.ist-gewaehlt.zf-stab { stroke: var(--blau); stroke-width: 2; }
-.ist-fehler.zf-beton, .ist-fehler.zf-loch, .ist-fehler.zf-wand, .ist-fehler.zf-wandachse,
-.ist-fehler.zf-linie, .ist-fehler.zf-linie-flaeche { stroke: var(--schlecht); stroke-opacity: 1; stroke-width: 2.4; }
-.ist-fehler.zf-stab { fill: var(--schlecht); stroke: var(--schlecht); }
-.ist-fehler.zf-linientext { fill: var(--schlecht); }
-
-.zf-griff { fill: #fff; stroke: var(--blau); stroke-width: 1.5; }
-.zf-griff.ist-gewaehlt { fill: var(--blau); }
-.zf-mittelgriff { fill: var(--blau-hell); stroke: var(--blau); stroke-width: 1; }
-.zf-ring { fill: none; stroke: var(--blau); stroke-width: 1.5; stroke-dasharray: 3 2; }
-.zf-entwurf { fill: var(--blau); fill-opacity: .07; stroke: var(--blau); stroke-width: 1.5; stroke-dasharray: 6 3; }
-.zf-entwurf-schluss { fill: none; stroke: var(--blau); stroke-opacity: .4; stroke-width: 1; stroke-dasharray: 2 3; }
-.zf-entwurfpunkt { fill: var(--blau); }
-.zf-zetteltext {
-  font-size: 11px; fill: var(--blau-tief); font-weight: 600;
-  paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round;
-}
-.zf-fang { fill: none; stroke: #e8590c; stroke-width: 1.6; }
-
-/* Die Vorlage: ein Zettel über der Zeichnung, oben links. */
-.zf-vorlage {
-  position: absolute; left: 8px; top: 8px; z-index: 2; width: 250px;
-  display: flex; flex-direction: column; gap: 5px; padding: 9px 10px;
+/* Das schwebende Fenster: unten rechts in der Zeichnung, am Kopf zu
+   verschieben. Was darin steht, hängt davon ab, was gerade geschieht. */
+.cad-palette {
+  position: absolute; z-index: 3; width: 224px; max-height: calc(100% - 4px);
+  display: flex; flex-direction: column;
   border: 1px solid var(--rand-stark); border-radius: var(--radius);
   background: var(--flaeche); box-shadow: 0 6px 18px rgba(20, 32, 48, .16);
   font-size: 12px; user-select: auto;
 }
-.zf-vorlage[hidden] { display: none; }
-.zf-vorlagekopf { display: flex; align-items: center; gap: 8px; }
-.zf-vorlagekopf select { flex: 1; padding: 2px 5px; }
-.zf-vorlagezeile { display: grid; grid-template-columns: minmax(0, 1fr) auto 26px; gap: 5px; align-items: center; }
-.zf-vorlagezeile input { padding-block: 2px; }
-.zf-vorlagezeile .einheit { font-size: 11px; color: var(--schrift-zart); }
-.zf-vorlagehaken { display: flex; align-items: center; gap: 4px; }
-.zf-vorlagehinweis { margin: 0; font-size: 11px; color: var(--schrift-zart); }
-.zf-vorlageknoepfe { display: flex; justify-content: flex-end; gap: 6px; }
-
-/* Neben dem Fenster: Koordinaten, Eigenschaften, Meldungen. */
-.zf-seite { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-.zf-meldungen { display: flex; flex-direction: column; gap: 3px; }
-.zf-meldung {
-  text-align: left; padding: 5px 8px; font-size: 12px; line-height: 1.4;
-  border: 1px solid var(--schlecht); border-left-width: 4px; border-radius: 5px;
-  background: var(--schlecht-hell); color: var(--schlecht); cursor: pointer;
+.cad-palette-kopf {
+  display: flex; align-items: flex-start; gap: 6px; padding: 4px 4px 4px 6px;
+  background: var(--flaeche-2); border-bottom: 1px solid var(--rand);
+  border-radius: var(--radius) var(--radius) 0 0;
+  cursor: move; touch-action: none; user-select: none;
 }
-.zf-meldung:hover:not(:disabled) { background: #fbd9d6; }
+.cad-palette.ist-zu .cad-palette-kopf { border-bottom: 0; border-radius: var(--radius); }
+.cad-palette-griff { color: var(--schrift-zart); line-height: 18px; }
+.cad-palette-titel { flex: 1; min-width: 0; font-weight: 700; line-height: 18px; color: var(--schrift); }
+.cad-palette-zu {
+  width: 18px; height: 18px; padding: 0; border: none; border-radius: 4px;
+  background: transparent; color: var(--schrift-matt); font-weight: 700; cursor: pointer;
+}
+.cad-palette-zu:hover { background: var(--blau-hell); color: var(--blau-tief); }
+.cad-palette-koerper {
+  display: flex; flex-direction: column; gap: 5px; padding: 6px 8px 8px;
+  overflow-y: auto; min-height: 0;
+}
+.cad-palette.ist-zu .cad-palette-koerper { display: none; }
+
+.cad-lage { min-height: 1.3em; white-space: pre; font-variant-numeric: tabular-nums; }
+.cad-ruhe { display: flex; align-items: center; gap: 14px; color: var(--schrift-matt); }
+.cad-ruhe label { display: inline-flex; align-items: center; gap: 5px; }
+.cad-ruhe select { width: auto; padding: 1px 4px; font-size: 12px; }
+
+/* Die Punkteingabe: Modus, zwei Felder, die Hilfen R Y Z ∥ ⊥ M. */
+.cad-modus { align-self: flex-start; }
+.cad-modus .schalter-halb { text-transform: none; }
+.cad-felder { display: flex; align-items: center; gap: 4px; }
+.cad-felder .cad-eingabe {
+  width: calc(8ch + 12px); padding: 3px 5px; font-size: 12px;
+  text-align: right; font-variant-numeric: tabular-nums;
+}
+.cad-hilfen { display: flex; flex-wrap: wrap; gap: 3px; }
+.cad-hilfe {
+  min-width: 26px; height: 22px; padding: 0 5px;
+  border: 1px solid var(--rand-stark); border-radius: 5px;
+  background: var(--flaeche); color: var(--schrift-matt);
+  font: inherit; font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.cad-hilfe:hover { background: var(--blau-hell); border-color: var(--blau); color: var(--blau-tief); }
+.cad-hilfe.ist-an { background: var(--blau); border-color: var(--blau); color: #fff; }
+.cad-bindung-zeile { display: flex; align-items: center; gap: 6px; }
+.cad-bindungsmarke {
+  padding: 1px 8px; border-radius: 9px; font-weight: 700;
+  background: var(--blau-hell); color: var(--blau-tief);
+}
+
+/* Eigenschaften: Beschriftung, Eingabe, Einheit. */
+.cad-zeile { display: grid; grid-template-columns: 74px auto minmax(0, 1fr); gap: 5px; align-items: center; }
+.cad-zeile > span:first-child {
+  color: var(--schrift-matt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cad-zeile select { width: auto; max-width: 100%; padding: 2px 5px; font-size: 12px; }
+.cad-zeile .zahlfeld, .cad-zeile input[type="number"] { font-size: 12px; }
+.cad-zeile input[type="number"] { padding-block: 2px; }
+.cad-zeile .einheit { font-size: 11px; color: var(--schrift-zart); }
+.cad-neu { display: flex; flex-direction: column; gap: 4px; padding-top: 6px; border-top: 1px solid var(--rand); }
+.cad-neu-titel {
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px;
+  color: var(--schrift-zart);
+}
+.cad-hinweis-klein { margin: 0; font-size: 11px; color: var(--schrift-zart); }
+.cad-info { margin: 0; font-size: 11.5px; font-weight: 600; color: var(--stahl); }
+.cad-meldung {
+  margin: 0; padding: 3px 6px; font-size: 11.5px; border-radius: 4px;
+  background: var(--schlecht-hell); color: var(--schlecht);
+}
+
+/* Die Leiste neben der Auswahl: nur, was für sie geht. */
+.cad-leiste {
+  position: absolute; z-index: 2; display: flex; flex-wrap: wrap; gap: 2px; padding: 3px;
+  max-width: calc(100% - 8px);
+  border: 1px solid var(--rand-stark); border-radius: var(--radius);
+  background: var(--flaeche); box-shadow: 0 4px 12px rgba(20, 32, 48, .14);
+}
+.cad-leiste[hidden] { display: none; }
+.cad-aktion {
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px;
+  border: none; border-radius: 5px; background: transparent; color: var(--schrift);
+  font: inherit; font-size: 12px; cursor: pointer; white-space: nowrap;
+}
+.cad-aktion:hover { background: var(--blau-hell); color: var(--blau-tief); }
+.cad-aktionszeichen { font-size: 13px; line-height: 1; }
+.cad-aktion kbd {
+  font: inherit; font-size: 10px; color: var(--schrift-zart);
+  padding: 0 3px; border: 1px solid var(--rand); border-radius: 3px;
+}
+
+/* Die Zeichnung. Farben wie überall: Beton grau, Stahl kupfer, Bügel und
+   Schubwände violett, gewählt blau, eine Meldung rot. Was beim Zeichnen
+   hilft -- Fang, Mitte, die gewählte Kante --, ist orange. */
+.cad-raster-fein { stroke: #f0f2f6; stroke-width: 1; }
+.cad-raster-grob { stroke: #e0e5ec; stroke-width: 1; }
+.cad-achse { stroke: #b9c3d1; stroke-width: 1; }
+.cad-achstext { font-size: 11px; font-weight: 600; fill: var(--schrift-zart); }
+.cad-beton { fill: #d8dde3; stroke: var(--beton); stroke-width: 1.3; }
+.cad-loch { fill: #fff; stroke: var(--beton); stroke-width: 1.3; stroke-dasharray: 6 3; }
+.cad-zelle { stroke: none; }
+.cad-schraffurstrich { stroke: var(--beide); stroke-opacity: .35; stroke-width: 1.2; }
+.cad-wand { fill: var(--beide); fill-opacity: .16; stroke: var(--beide); stroke-opacity: .55; stroke-width: 1; }
+.cad-wandachse { fill: none; stroke: var(--beide); stroke-width: 1.6; stroke-dasharray: 9 3 2 3; }
+.cad-hilfslinie { fill: none; stroke: var(--schrift-matt); stroke-width: 1; stroke-dasharray: 2 3; }
+.cad-linie { fill: none; stroke: var(--stahl); stroke-width: 1; stroke-dasharray: 3 3; }
+.cad-linie-flaeche { fill: none; stroke: var(--stahl); stroke-width: 4; stroke-linecap: round; }
+.cad-stab { fill: var(--stahl); stroke: #7a3d14; stroke-width: .8; }
+.cad-geist { opacity: .45; }
+.cad-beschriftung {
+  font-size: 11px; fill: var(--schrift-matt);
+  paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round;
+}
+.cad-linientext { fill: var(--stahl); font-weight: 600; }
+.cad-mass { fill: none; stroke: var(--schrift-zart); stroke-width: 1; }
+.cad-masstext { font-size: 11px; fill: var(--schrift-matt); }
+.cad-schwerpunkt circle { fill: #fff; stroke: var(--schrift); stroke-width: 1.2; }
+.cad-schwerpunkt path { stroke: var(--schrift); stroke-width: 1; }
+.cad-schwerpunkttext { font-size: 11px; font-weight: 700; fill: var(--schrift); }
+.cad-knotenpunkte circle { fill: #fff; stroke: var(--schrift-matt); stroke-width: 1; }
+
+.ist-fehler.cad-beton, .ist-fehler.cad-loch, .ist-fehler.cad-wand, .ist-fehler.cad-wandachse,
+.ist-fehler.cad-linie, .ist-fehler.cad-linie-flaeche { stroke: var(--schlecht); stroke-opacity: 1; stroke-width: 2.4; }
+.ist-fehler.cad-stab { fill: var(--schlecht); stroke: var(--schlecht); }
+.ist-fehler.cad-linientext { fill: var(--schlecht); }
+
+/* Gewählt kräftig blau, unter dem Zeiger blass. */
+.cad-auswahl > * { fill: var(--blau); fill-opacity: .1; stroke: var(--blau); stroke-width: 2.4; }
+.cad-unter > * { fill: var(--blau); fill-opacity: .05; stroke: var(--blau); stroke-opacity: .5; stroke-width: 2; }
+
+.cad-entwurf { fill: var(--blau); fill-opacity: .07; stroke: var(--blau); stroke-width: 1.5; stroke-dasharray: 6 3; }
+.cad-entwurf-schluss { fill: none; stroke: var(--blau); stroke-opacity: .4; stroke-width: 1; stroke-dasharray: 2 3; }
+.cad-entwurfpunkt { fill: var(--blau); }
+.cad-verschoben { fill: none; stroke: var(--blau); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.cad-vektor { fill: none; stroke: var(--blau-tief); stroke-width: 1.2; stroke-dasharray: 5 3; }
+.cad-zetteltext {
+  font-size: 11px; fill: var(--blau-tief); font-weight: 600;
+  paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round;
+}
+.cad-fang { fill: none; stroke: #e8590c; stroke-width: 1.6; }
+.cad-bezug { stroke: var(--blau); stroke-width: 2; }
+.cad-bindung { stroke: var(--blau); stroke-opacity: .7; stroke-width: 1; stroke-dasharray: 8 4; }
+.cad-mittepunkt { fill: #e8590c; }
+.cad-mittelinie { stroke: #e8590c; stroke-width: 1; stroke-dasharray: 3 3; }
+.cad-streckenwahl { stroke: #e8590c; stroke-opacity: .45; stroke-width: 5; stroke-linecap: round; }
+/* Rahmen nach rechts: was ganz drin liegt, blau. Nach links: auch, was er
+   schneidet, grün und gestrichelt -- wie in AutoCAD und AxisVM. */
+.cad-rahmen { fill: var(--blau); fill-opacity: .06; stroke: var(--blau); stroke-width: 1; }
+.cad-rahmen.ist-kreuzend { fill: var(--gut); fill-opacity: .06; stroke: var(--gut); stroke-dasharray: 5 3; }
 
 .zeichenbereich.ist-vollbild {
   /* Über Kopf- und Fussleiste, unter den Meldungen am unteren Rand. */
@@ -1511,16 +1572,15 @@ math-field.gl-feld::part(menu-toggle) { display: none; }
   background: var(--grund);
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 380px); gap: 10px;
 }
-.zeichenbereich.ist-vollbild .zeichenfenster { height: 100%; }
-.zeichenbereich.ist-vollbild .zf-flaeche { flex: 1 1 auto; height: auto; min-height: 0; }
-.zeichenbereich.ist-vollbild .zf-seite {
+.zeichenbereich.ist-vollbild .cad { height: 100%; }
+.zeichenbereich.ist-vollbild .cad-flaeche { flex: 1 1 auto; height: auto; min-height: 0; }
+.zeichenbereich.ist-vollbild .cad-seite {
   overflow-y: auto; min-height: 0; padding: 8px 10px;
   background: var(--flaeche); border: 1px solid var(--rand); border-radius: var(--radius);
-  container-type: inline-size;
 }
 @media (max-width: 900px) {
   .zeichenbereich.ist-vollbild { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
-  .zeichenbereich.ist-vollbild .zf-seite { max-height: 38vh; }
+  .zeichenbereich.ist-vollbild .cad-seite { max-height: 38vh; }
 }
 /* Ein Container ist zugleich der Bezug für `position: fixed` -- das Vollbild
    läge sonst in der Tafel oder im Panel statt über dem ganzen Fenster.
@@ -1528,58 +1588,48 @@ math-field.gl-feld::part(menu-toggle) { display: none; }
 .tafel-inhalt:has(.zeichenbereich.ist-vollbild),
 .feldgruppe:has(.zeichenbereich.ist-vollbild) { container-type: normal; }
 
-/* ------------------------------------------------------- Koordinaten -- */
+/* ------------------------------------------- Liste unter der Zeichnung -- */
 
-.koordinaten {
-  display: flex; flex-direction: column; gap: 4px;
-  padding: 8px 10px; border: 1px solid var(--rand); border-left: 4px solid var(--analyse);
-  border-radius: var(--radius); background: var(--flaeche);
+/* Nur zum Lesen: Meldungen, Querschnittswerte, je Element eine Zeile. Ein
+   Klick wählt das Element im Fenster. */
+.cad-seite { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.qa-uebersicht-huelle { display: flex; flex-direction: column; gap: 8px; }
+.qa-meldungen { display: flex; flex-direction: column; gap: 3px; }
+.qa-meldung {
+  text-align: left; padding: 4px 8px; font: inherit; font-size: 12px; line-height: 1.4;
+  border: 1px solid var(--schlecht); border-left-width: 4px; border-radius: 5px;
+  background: var(--schlecht-hell); color: var(--schlecht); cursor: pointer;
 }
-.ko-kopf { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 3px; }
-.ko-kopf b {
-  font-size: 11.5px; text-transform: uppercase; letter-spacing: .4px; color: var(--schrift-matt);
+.qa-meldung:hover { background: #fbd9d6; }
+/* Zwei Spalten -- A, y_S, z_S und die Trägheitsmomente --, die Ziffern
+   rechtsbündig untereinander. */
+.qa-werte {
+  display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto auto auto;
+  gap: 1px 6px; align-items: baseline; padding: 5px 8px;
+  border-radius: 5px; background: var(--flaeche-2); font-size: 12px;
 }
-/* Ein Punkt: Name, y, z, Entfernen. Dieselben Spalten für jede Punktzeile,
-   damit y unter y steht, auch zwischen «Anfang» und «Ende». */
-.ko-punkt {
-  display: grid; grid-template-columns: 76px var(--zahlbreite) var(--zahlbreite) 18px;
-  justify-content: start; gap: 4px; align-items: center;
+.qa-wert-zahl { text-align: right; font-variant-numeric: tabular-nums; }
+.qa-wert-einheit { font-size: 11px; color: var(--schrift-zart); }
+.qa-elemente { display: flex; flex-direction: column; gap: 6px; }
+.qa-gruppe { display: flex; flex-direction: column; }
+.qa-gruppentitel {
+  padding: 0 6px 2px; font-size: 10.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .4px; color: var(--schrift-zart);
 }
-.ko-punkt.ist-kopf > span {
-  font-size: 10.5px; font-weight: 700; letter-spacing: .3px; color: var(--schrift-matt);
+.qa-element {
+  display: grid; grid-template-columns: 13ch minmax(0, 1fr) auto; gap: 8px; align-items: baseline;
+  padding: 2px 6px; border: none; border-radius: 4px; background: transparent;
+  text-align: left; font: inherit; font-size: 12px; color: var(--schrift); cursor: pointer;
 }
-.ko-punkt.ist-kopf > span:not(:first-child) { text-align: right; padding-right: calc(var(--pfeilspur) + 4px); }
-.ko-punkt.ist-neu { grid-template-columns: 76px var(--zahlbreite) var(--zahlbreite) auto; margin-top: 2px; }
-.ko-punkt input[type="number"], .ko-zeile input[type="number"] { padding-block: 3px; }
-.ko-name {
-  font-size: 12px; color: var(--schrift-matt);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.ko-zeile {
-  display: grid; grid-template-columns: 76px auto 36px; justify-content: start;
-  gap: 4px; align-items: center;
-}
-.ko-zeile.ist-haken { grid-template-columns: 76px auto minmax(0, 1fr); }
-.ko-zeile select { padding: 3px 6px; }
-.ko-zeile .einheit { font-size: 11px; color: var(--schrift-zart); }
-.ko-knoepfe { display: flex; justify-content: flex-end; gap: 6px; margin-top: 4px; }
-.ko-hinweis { margin: 2px 0; font-size: 12px; color: var(--schrift-zart); }
-.ko-info { margin: 2px 0 0; font-size: 12px; font-weight: 600; color: var(--stahl); }
-.ko-werte {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 1px 10px; font-size: 12.5px; margin-bottom: 6px;
-}
-.ko-elemente { display: flex; flex-direction: column; gap: 1px; }
-.ko-element {
-  display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 6px;
-  padding: 3px 6px; border: none; border-radius: 5px; background: transparent;
-  text-align: left; font-size: 12px; color: var(--schrift); cursor: pointer;
-}
-.ko-element:hover { background: var(--blau-hell); }
-.ko-element > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--schrift-matt); }
-.ko-element.ist-fehler, .ko-element.ist-fehler > span:last-child { color: var(--schlecht); }
-.ko-element.ist-fehler { background: var(--schlecht-hell); }
-.ko-elementname { font-weight: 600; }
+.qa-element:hover { background: var(--blau-hell); }
+.qa-element.ist-gewaehlt { background: var(--blau-hell); box-shadow: inset 3px 0 0 var(--blau); }
+.qa-element > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.qa-element-name { font-weight: 600; }
+.qa-element-was { color: var(--schrift-matt); }
+.qa-element-wert { text-align: right; font-variant-numeric: tabular-nums; color: var(--schrift-matt); }
+.qa-element.ist-fehler { background: var(--schlecht-hell); }
+.qa-element.ist-fehler > span { color: var(--schlecht); }
+.qa-leer { margin: 0; font-size: 12px; color: var(--schrift-zart); }
 
 /* Diagramme der Querschnittsanalyse: oben der Lastfall, darunter seine Bilder.
    Solange die Bilder zur Eingabe davor gehören, bleiben sie blass stehen. */

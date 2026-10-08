@@ -29,8 +29,7 @@ from opencivil.projekt.gleichungen import GleichungsblattEintrag, Gleichungszeil
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.querschnittsanalyse import (
-    FlaecheEintrag, QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag,
-    StablinieEintrag, WerkstoffwahlEintrag,
+    QuerschnittsanalyseEintrag, WerkstoffwahlEintrag,
 )
 from opencivil.projekt.aufbau import Aufbau, aufbauen
 
@@ -235,9 +234,10 @@ class Projekt(Beschreibung):
         300 × 600 mm mit drei Staeben unten und zwei oben, aber ohne
         Startlast: wer rechnet, gibt seine Lastfaelle selbst an.
 
-        Gezeichnet wird danach an den Listen des Eintrags (``flaechen``,
-        ``staebe``, ``stablinien``, ``schubwaende``). Wie bei
-        :meth:`platte` geht alles Weitere als Stichwort an den Eintrag.
+        Gezeichnet wird danach mit dem Baukasten des Eintrags --
+        ``polygon``, ``stab``, ``stablinie``, ``schubwand``, ``hilfslinie``,
+        Masse in mm. Wie bei :meth:`platte` geht alles Weitere als Stichwort
+        an den Eintrag.
         """
         eintrag = QuerschnittsanalyseEintrag.neu(
             kennung=self.freie_kennung("a"), name=name,
@@ -371,11 +371,10 @@ class Projekt(Beschreibung):
         # er auch Torsion; jede Wand kreuzt ein Schenkel des Bügels.
         unterzug = projekt.analyse("Unterzug")
         stahl = unterzug.stablinien[0].stahl
-        unterzug.schubwaende = [
-            SchubwandEintrag(von=von, bis=bis, dicke=100.0, durchmesser=10.0,
-                             teilung=150.0, schnitte=1, stahl=stahl)
-            for von, bis in (([50.0, 50.0], [250.0, 50.0]), ([250.0, 50.0], [250.0, 550.0]),
-                             ([250.0, 550.0], [50.0, 550.0]), ([50.0, 550.0], [50.0, 50.0]))]
+        for von, bis in (([50.0, 50.0], [250.0, 50.0]), ([250.0, 50.0], [250.0, 550.0]),
+                         ([250.0, 550.0], [50.0, 550.0]), ([50.0, 550.0], [50.0, 50.0])):
+            unterzug.schubwand(von, bis, dicke=100.0, durchmesser=10.0, teilung=150.0,
+                               schnitte=1, stahl=stahl)
         unterzug.lastfall("Feld", M_y_Ed=150.0, V_z_Ed=150.0, T_Ed=15.0)
         return projekt
 
@@ -460,44 +459,33 @@ class Projekt(Beschreibung):
     def _kastentraeger(kennung: str) -> QuerschnittsanalyseEintrag:
         a = QuerschnittsanalyseEintrag(
             kennung=kennung, name="Kastenträger",
-            flaechen=[FlaecheEintrag(punkte=[[0, 0], [800, 0], [800, 600], [0, 600]],
-                                     material="b1"),
-                      FlaecheEintrag(punkte=[[150, 150], [650, 150], [650, 450],
-                                             [150, 450]])],
-            stablinien=[
-                StablinieEintrag(von=[50, 50], bis=[750, 50], art="teilung",
-                                 durchmesser=16, teilung=150, stahl="s1"),
-                StablinieEintrag(von=[60, 550], bis=[740, 550], art="anzahl",
-                                 durchmesser=12, anzahl=4, starteisen=False,
-                                 endeisen=False, stahl="s1"),
-                StablinieEintrag(von=[40, 150], bis=[40, 450], art="flaeche",
-                                 flaeche=400, stahl="s1"),
-            ],
-            staebe=[StabEintrag(y=760, z=300, durchmesser=20, stahl="s1")],
-            schubwaende=[SchubwandEintrag(von=e, bis=f, dicke=150, durchmesser=10,
-                                          teilung=150, schnitte=1, stahl="s1")
-                         for e, f in (([75, 75], [725, 75]), ([725, 75], [725, 525]),
-                                      ([725, 525], [75, 525]), ([75, 525], [75, 75]))],
             werkstoffwahl=[WerkstoffwahlEintrag(material="b1", betongesetz="block")],
             laengszugkraft=True, duktilitaet=True, sproede=True)
+        a.polygon([[0, 0], [800, 0], [800, 600], [0, 600]], material="b1")
+        a.polygon([[150, 150], [650, 150], [650, 450], [150, 450]])
+        a.stablinie([50, 50], [750, 50], art="teilung", durchmesser=16, teilung=150,
+                    stahl="s1")
+        a.stablinie([60, 550], [740, 550], art="anzahl", durchmesser=12, anzahl=4,
+                    starteisen=False, endeisen=False, stahl="s1")
+        a.stablinie([40, 150], [40, 450], art="flaeche", flaeche=400, stahl="s1")
+        a.stab(760, 300, durchmesser=20, stahl="s1")
+        for e, f in (([75, 75], [725, 75]), ([725, 75], [725, 525]),
+                     ([725, 525], [75, 525]), ([75, 525], [75, 75])):
+            a.schubwand(e, f, dicke=150, durchmesser=10, teilung=150, schnitte=1, stahl="s1")
         a.lastfall("Feld", M_y_Ed=300.0, V_z_Ed=250.0, T_Ed=60.0)
         a.lastfall("Schief", N_Ed=-1500.0, M_y_Ed=250.0, M_z_Ed=150.0, V_y_Ed=100.0)
         return a
 
     @staticmethod
     def _stuetze(kennung: str) -> QuerschnittsanalyseEintrag:
-        a = QuerschnittsanalyseEintrag.neu(kennung, "Stütze", "b1", "s1")
-        a.flaechen[0].punkte = [[0, 0], [400, 0], [400, 400], [0, 400]]
-        a.stablinien = [
-            StablinieEintrag(von=[50, 50], bis=[350, 50], art="anzahl", durchmesser=20,
-                             anzahl=3, stahl="s1"),
-            StablinieEintrag(von=[50, 350], bis=[350, 350], art="anzahl", durchmesser=20,
-                             anzahl=3, stahl="s1"),
-        ]
-        a.werkstoffwahl = [WerkstoffwahlEintrag(material="b1", satz="charakteristisch"),
-                           WerkstoffwahlEintrag(material="s1", satz="charakteristisch")]
-        a.einachsig = True
-        a.lastfaelle = []
+        a = QuerschnittsanalyseEintrag(
+            kennung=kennung, name="Stütze",
+            werkstoffwahl=[WerkstoffwahlEintrag(material="b1", satz="charakteristisch"),
+                           WerkstoffwahlEintrag(material="s1", satz="charakteristisch")],
+            einachsig=True)
+        a.polygon([[0, 0], [400, 0], [400, 400], [0, 400]], material="b1")
+        for z in (50, 350):
+            a.stablinie([50, z], [350, z], art="anzahl", durchmesser=20, anzahl=3, stahl="s1")
         a.lastfall("Druck", N_Ed=-2500.0, M_y_Ed=120.0)
         a.lastfall("Zug", N_Ed=400.0)
         return a

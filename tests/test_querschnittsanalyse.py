@@ -7,8 +7,7 @@ Hier zuerst die Beschreibung -- was gespeichert wird und wie es sich liest.
 import unittest
 
 from opencivil.projekt import (
-    FlaecheEintrag, Projekt, ProjektFehler, QALastfallEintrag, QuerschnittsanalyseEintrag,
-    StabEintrag,
+    Projekt, ProjektFehler, QALastfallEintrag, QuerschnittsanalyseEintrag,
 )
 from opencivil.web import api
 
@@ -55,11 +54,11 @@ class TestBeschreibung(unittest.TestCase):
         with self.assertRaisesRegex(ProjektFehler, "Stablinie"):
             QuerschnittsanalyseEintrag.aus_dict(roh)
         roh = self.neu().als_dict()
-        roh["schubwaende"] = [{"von": [0, 0], "bis": [0, 500], "schnitte": 9}]
+        roh["schubwaende"] = [{"von": "K1", "bis": "K2", "schnitte": 9}]
         with self.assertRaisesRegex(ProjektFehler, "Schnitte"):
             QuerschnittsanalyseEintrag.aus_dict(roh)
-        roh = self.neu().als_dict()
-        roh["flaechen"][0]["punkte"][1] = [300.0]
+        # Im alten Format, mit eigenen Koordinaten: ein Punkt aus einer Zahl.
+        roh = {"kennung": "a1", "flaechen": [{"punkte": [[0, 0], [300.0], [300, 600]]}]}
         with self.assertRaisesRegex(ProjektFehler, "zwei Zahlen"):
             QuerschnittsanalyseEintrag.aus_dict(roh)
 
@@ -69,17 +68,85 @@ class TestBeschreibung(unittest.TestCase):
         vergeben: je Art ab 1, eine Aussparung heisst so statt «Polygon».
         """
         a = self.neu()
-        a.flaechen.append(FlaecheEintrag(punkte=[[100, 100], [200, 100], [200, 200]]))
-        a.staebe.append(StabEintrag(y=150, z=300))
+        a.polygon([[100, 100], [200, 100], [200, 200]])
+        a.stab(150, 300)
         e = a.elemente()
         self.assertEqual([f["name"] for f in e.polygone], ["Polygon 1", "Aussparung 2"])
         self.assertEqual([s["name"] for s in e.staebe], ["Stab 1"])
         self.assertEqual([l["name"] for l in e.linien], ["Linie 1", "Linie 2"])
         self.assertEqual(e.waende, [])
-        # Jedes Element trägt eine Kennung, über die die Oberfläche es findet.
-        for liste in (e.polygone, e.staebe, e.linien):
-            for element in liste:
-                self.assertTrue(element["kennung"])
+        # Die Kennung ist die des Elements: an ihr findet die Oberfläche es.
+        self.assertEqual([f["kennung"] for f in e.polygone], ["F1", "F2"])
+        self.assertEqual([s["kennung"] for s in e.staebe], ["S1"])
+        self.assertEqual([l["kennung"] for l in e.linien], ["L1", "L2"])
+
+
+class TestKnoten(unittest.TestCase):
+    """
+    Die Elemente hängen an Knoten. Gleiche Koordinaten sind ein Knoten, eine
+    Kennung kommt nie wieder, und ein Verweis ins Leere wird gemeldet statt
+    still übergangen.
+    """
+
+    def test_was_sich_trifft_teilt_den_knoten(self):
+        """Im Unterzug enden Wände und Bewehrungslinie in denselben Punkten."""
+        a = Projekt.beispiel().querschnittsanalysen[0]
+        linie = a.stablinien[0]
+        wand = a.schubwaende[0]
+        self.assertEqual((wand.von, wand.bis), (linie.von, linie.bis))
+        self.assertEqual(len({(k.y, k.z) for k in a.knoten}), len(a.knoten))
+
+    def test_alle_linien_zaehlen_gemeinsam(self):
+        a = QuerschnittsanalyseEintrag.neu("a1", "Balken", "b1", "s1")
+        w = a.schubwand([150, 50], [150, 550], stahl="s1")
+        h = a.hilfslinie([0, 300], [300, 300])
+        self.assertEqual((w.kennung, h.kennung), ("L3", "L4"))
+        a.stablinien.pop(0)
+        self.assertEqual(a.stablinie([60, 60], [240, 60]).kennung, "L5")
+
+    def test_ein_fehlender_knoten_wird_gemeldet(self):
+        p = projekt()
+        a = p.querschnittsanalysen[0]
+        a.stablinien[0].bis = "K99"
+        d = dienst.bearbeite("geometrie", {"projekt": p.als_dict(), "kennung": "a1"}).daten
+        self.assertFalse(d["gueltig"])
+        self.assertEqual(d["meldungen"][0]["elemente"], ["L1"])
+        self.assertIn("K99", d["meldungen"][0]["text"])
+        # Die übrigen Elemente heissen weiter wie vorher.
+        self.assertEqual([l["element"] for l in d["linien"]], ["Linie 2"])
+        with self.assertRaisesRegex(ProjektFehler, "K99"):
+            p.rechnen()
+
+    def test_doppelte_kennung_wird_gemeldet(self):
+        a = QuerschnittsanalyseEintrag.neu("a1", "Balken", "b1", "s1")
+        a.stablinien[1].kennung = "L1"
+        self.assertIn("dieselbe Kennung 'L1'", a.elemente().fehler[0]["text"])
+
+    def test_hilfslinien_heissen_wie_alles_andere_im_kern(self):
+        """Die Oberfläche nennt eine Hilfslinie so, wie die Antwort es sagt."""
+        p = projekt()
+        a = p.querschnittsanalysen[0]
+        h = a.hilfslinie([0, 300], [300, 300])
+        d = dienst.bearbeite("geometrie", {"projekt": p.als_dict(), "kennung": "a1"}).daten
+        self.assertEqual(d["hilfslinien"], [{"element": "Hilfslinie 1", "kennung": h.kennung}])
+
+    def test_altes_format_wird_umgewandelt(self):
+        alt = {"kennung": "a1", "name": "Alt",
+               "flaechen": [{"punkte": [[0, 0], [300, 0], [300, 600], [0, 600]],
+                             "material": "b1"}],
+               "staebe": [{"y": 150, "z": 300, "durchmesser": 20, "stahl": "s1"}],
+               "stablinien": [{"von": [50, 50], "bis": [250, 50], "art": "anzahl",
+                               "anzahl": 3, "durchmesser": 20, "stahl": "s1"}],
+               "schubwaende": [{"von": [50, 50], "bis": [50, 550], "stahl": "s1"}]}
+        a = QuerschnittsanalyseEintrag.aus_dict(alt)
+        self.assertEqual([f.knoten for f in a.flaechen], [["K1", "K2", "K3", "K4"]])
+        self.assertEqual(a.staebe[0].knoten, "K5")
+        self.assertEqual((a.stablinien[0].von, a.stablinien[0].bis), ("K6", "K7"))
+        # Die Wand beginnt, wo die Linie beginnt: derselbe Knoten.
+        self.assertEqual((a.schubwaende[0].kennung, a.schubwaende[0].von), ("L2", "K6"))
+        self.assertEqual(a.elemente().polygone[0]["punkte"][2], (300.0, 600.0))
+        # Und einmal umgewandelt, liest es sich wieder genau so.
+        self.assertEqual(QuerschnittsanalyseEintrag.aus_dict(a.als_dict()), a)
 
 
 if __name__ == "__main__":
@@ -92,10 +159,7 @@ if __name__ == "__main__":
 
 import math
 
-from opencivil.projekt import (
-    FlaecheEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
-    WerkstoffwahlEintrag,
-)
+from opencivil.projekt import WerkstoffwahlEintrag
 from opencivil.web import dienst
 
 
@@ -112,11 +176,14 @@ def projekt(**schalter) -> Projekt:
     return p
 
 
-def kastenwaende(dicke=80.0):
+def kasten(p, dicke=80.0, letztes_ende=(50, 50)):
+    """Vier Schubwände auf der Bügelachse der Analyse a1 -- eine Zelle."""
     ecken = [[50, 50], [250, 50], [250, 550], [50, 550]]
-    return [SchubwandEintrag(von=ecken[i], bis=ecken[(i + 1) % 4], dicke=dicke,
-                             durchmesser=10.0, teilung=150.0, schnitte=1, stahl="s1")
-            for i in range(4)]
+    enden = ecken[1:] + [list(letztes_ende)]
+    for von, bis in zip(ecken, enden):
+        p.querschnittsanalysen[0].schubwand(von, bis, dicke=dicke, durchmesser=10.0,
+                                            teilung=150.0, schnitte=1, stahl="s1")
+    return p
 
 
 def urteile(ergebnis, art):
@@ -134,8 +201,7 @@ class TestAufbau(unittest.TestCase):
 
     def test_aussparung(self):
         p = projekt()
-        p.querschnittsanalysen[0].flaechen.append(
-            FlaecheEintrag(punkte=[[100, 200], [200, 200], [200, 400], [100, 400]]))
+        p.querschnittsanalysen[0].polygon([[100, 200], [200, 200], [200, 400], [100, 400]])
         e = p.rechnen()
         self.assertAlmostEqual(e.wert("querschnittsanalyse.a1.A").groesse.si,
                                0.18 - 0.1 * 0.2)
@@ -147,8 +213,7 @@ class TestAufbau(unittest.TestCase):
 
     def test_stab_ausserhalb(self):
         p = projekt()
-        p.querschnittsanalysen[0].staebe.append(StabEintrag(y=5, z=300, durchmesser=20,
-                                                            stahl="s1"))
+        p.querschnittsanalysen[0].stab(5, 300, durchmesser=20, stahl="s1")
         text = self.meldung(p)
         self.assertIn("Querschnittsanalyse 'Balken'", text)
         self.assertIn("Stab 1", text)
@@ -156,14 +221,13 @@ class TestAufbau(unittest.TestCase):
 
     def test_ueberlappung(self):
         p = projekt()
-        p.querschnittsanalysen[0].flaechen.append(
-            FlaecheEintrag(punkte=[[250, 0], [500, 0], [500, 100], [250, 100]], material="b1"))
+        p.querschnittsanalysen[0].polygon([[250, 0], [500, 0], [500, 100], [250, 100]],
+                                          material="b1")
         self.assertIn("überlappen", self.meldung(p))
 
     def test_wand_ausserhalb(self):
         p = projekt()
-        p.querschnittsanalysen[0].schubwaende = [
-            SchubwandEintrag(von=[150, -50], bis=[150, 550], stahl="s1")]
+        p.querschnittsanalysen[0].schubwand([150, -50], [150, 550], stahl="s1")
         self.assertIn("Wand 1", self.meldung(p))
 
     def test_geloeschtes_material(self):
@@ -214,7 +278,7 @@ class TestBiegung(unittest.TestCase):
 
     def test_laengszugkraft_senkt_den_widerstand(self):
         def grad(laengs):
-            p = projekt(schubwaende=kastenwaende(), laengszugkraft=laengs)
+            p = kasten(projekt(laengszugkraft=laengs))
             p.querschnittsanalysen[0].lastfall("Feld", M_y_Ed=150.0, V_z_Ed=150.0)
             return urteile(p.rechnen(), "M-N")["Feld"].erfuellungsgrad.si
         self.assertLess(grad(True), grad(False))
@@ -238,7 +302,7 @@ class TestBiegung(unittest.TestCase):
 class TestSchub(unittest.TestCase):
 
     def test_zwei_stege_je_die_haelfte(self):
-        p = projekt(schubwaende=kastenwaende())
+        p = kasten(projekt())
         p.querschnittsanalysen[0].lastfall("Feld", V_z_Ed=150.0)
         u = urteile(p.rechnen(), "V+T")["Feld"]
         # Je Steg 75 kN auf 500 mm: 150 kN/m.
@@ -291,7 +355,7 @@ class TestRichtungen(unittest.TestCase):
 class TestDienst(unittest.TestCase):
 
     def test_rechnen_ueber_den_dienst(self):
-        p = projekt(schubwaende=kastenwaende(), duktilitaet=True, sproede=True)
+        p = kasten(projekt(duktilitaet=True, sproede=True))
         p.querschnittsanalysen[0].lastfall("Feld", M_y_Ed=120.0, V_z_Ed=80.0, T_Ed=10.0)
         antwort = dienst.bearbeite("rechnen", {"projekt": p.als_dict()})
         self.assertEqual(antwort.status, 200, antwort.daten)
@@ -318,21 +382,23 @@ class TestGeometrieEndpunkt(unittest.TestCase):
     def test_alle_meldungen_auf_einmal(self):
         p = projekt()
         a = p.querschnittsanalysen[0]
-        a.staebe += [StabEintrag(y=5, z=300, durchmesser=20, stahl="s1"),
-                     StabEintrag(y=150, z=300, durchmesser=0, stahl="s1")]
+        a.stab(5, 300, durchmesser=20, stahl="s1")
+        a.stab(150, 300, durchmesser=0, stahl="s1")
         d = self.frage(p).daten
         self.assertFalse(d["gueltig"])
-        self.assertEqual([m["elemente"] for m in d["meldungen"]], [["Stab 1"], ["Stab 2"]])
+        # Der Text nennt den Namen, die Meldung zeigt mit der Kennung aufs Element.
+        self.assertEqual([m["elemente"] for m in d["meldungen"]], [["S1"], ["S2"]])
+        self.assertTrue(d["meldungen"][0]["text"].startswith("Stab 1"))
 
     def test_ueberlappung_nennt_beide(self):
         p = projekt()
-        p.querschnittsanalysen[0].flaechen.append(
-            FlaecheEintrag(punkte=[[250, 0], [500, 0], [500, 100], [250, 100]], material="b1"))
+        p.querschnittsanalysen[0].polygon([[250, 0], [500, 0], [500, 100], [250, 100]],
+                                          material="b1")
         d = self.frage(p).daten
-        self.assertEqual(d["meldungen"][0]["elemente"], ["Polygon 1", "Polygon 2"])
+        self.assertEqual(d["meldungen"][0]["elemente"], ["F1", "F2"])
 
     def test_zellen_der_waende(self):
-        d = self.frage(projekt(schubwaende=kastenwaende())).daten
+        d = self.frage(kasten(projekt())).daten
         self.assertEqual(len(d["zellen"]), 1)
         self.assertAlmostEqual(d["zellen"][0]["flaeche"], 200 * 500)
 
@@ -345,9 +411,7 @@ class TestGeometrieEndpunkt(unittest.TestCase):
         eine Zelle (seine Toleranz ist 1 µm), also auch das Fenster. Gesucht
         wurde dort einmal in Millimetern, und dann fehlte die Zelle im Bild.
         """
-        waende = kastenwaende()
-        waende[3].bis = [50.0, 50.0004]
-        p = projekt(schubwaende=waende)
+        p = kasten(projekt(), letztes_ende=(50.0, 50.0004))
         self.assertEqual(len(self.frage(p).daten["zellen"]), 1)
         p.querschnittsanalysen[0].lastfall("Torsion", T_Ed=10.0)
         self.assertTrue(urteile(p.rechnen(), "V+T")["Torsion"].erfuellt)

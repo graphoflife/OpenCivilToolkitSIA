@@ -14,8 +14,9 @@ from opencivil.projekt import (
 )
 from opencivil.projekt.eintraege import Beschreibung
 from opencivil.projekt.querschnittsanalyse import (
-    FlaecheEintrag, QALastfallEintrag, QuerschnittsanalyseEintrag,
-    SchubwandEintrag, StabEintrag, StablinieEintrag, WerkstoffwahlEintrag,
+    FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QALastfallEintrag,
+    QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
+    WerkstoffwahlEintrag,
 )
 from opencivil.projekt.gleichungen import GleichungsblattEintrag, GleichungszeileEintrag
 from opencivil.web import api, dienst
@@ -390,10 +391,12 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
         (KombinationEintrag, {"name": "k"}, {"name": "k"}),
         (GleichungszeileEintrag, {}, {}),
         (GleichungsblattEintrag, {"kennung": "g"}, {"kennung": "g", "name": "g"}),
+        (KnotenEintrag, {}, {}),
         (FlaecheEintrag, {}, {}),
         (StabEintrag, {}, {}),
         (StablinieEintrag, {}, {}),
         (SchubwandEintrag, {}, {}),
+        (HilfslinieEintrag, {}, {}),
         (QALastfallEintrag, {"name": "l"}, {"name": "l"}),
         (WerkstoffwahlEintrag, {"material": "b1"}, {"material": "b1"}),
         (QuerschnittsanalyseEintrag, {"kennung": "a"}, {"kennung": "a", "name": "a"}),
@@ -443,8 +446,9 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
         self.assertEqual(MaterialEintrag.aus_dict(material).als_dict(), material)
         for art, cls, pflicht in (
                 ("qa_lastfall", QALastfallEintrag, {"name": "Neu"}),
-                ("flaeche", FlaecheEintrag, {}), ("stab", StabEintrag, {}),
-                ("stablinie", StablinieEintrag, {}), ("schubwand", SchubwandEintrag, {}),
+                ("knoten", KnotenEintrag, {}), ("flaeche", FlaecheEintrag, {}),
+                ("stab", StabEintrag, {}), ("stablinie", StablinieEintrag, {}),
+                ("schubwand", SchubwandEintrag, {}), ("hilfslinie", HilfslinieEintrag, {}),
                 ("werkstoffwahl", WerkstoffwahlEintrag, {"material": "b1"})):
             with self.subTest(art=art):
                 roh = {**zeilen[art], **pflicht}

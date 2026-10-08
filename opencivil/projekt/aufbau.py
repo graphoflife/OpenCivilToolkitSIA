@@ -523,6 +523,10 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag,
         return gefunden
 
     elemente = eintrag.elemente()
+    if elemente.fehler:
+        # Ein Element ohne Lage laesst sich nicht rechnen -- und es still
+        # wegzulassen hiesse, mit einem anderen Querschnitt zu rechnen.
+        raise ProjektFehler(f"{wo}: {elemente.fehler[0]['text']}")
     flaechen = [Flaechenteil(name=f["name"], kennung=f["kennung"], punkte=f["punkte"],
                              stoff=stoff(f["material"], f["name"], "beton")
                              if f["material"] else None)

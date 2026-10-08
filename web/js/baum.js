@@ -21,7 +21,7 @@
 import { el, ersetzen, melden } from './dom.js';
 import { neueZeile } from './gleichungen.js';
 import { benutzteMaterialien } from './querschnittsanalyse.js';
-import { ansichtVergessen } from './zeichenfenster.js';
+import { fensterVergessen } from './qa_zeichnung.js';
 import {
   aendern, ausVorlage, freieKennung, naechsterName, projektAendern, umschalten, zustand,
 } from './zustand.js';
@@ -107,10 +107,11 @@ function eintrag(m, art) {
 /**
  * «300×600 mm» -- Breite und Höhe dessen, was gezeichnet ist. Die
  * Platte zeigt an derselben Stelle h × b; eine Analyse hat statt zweier
- * Masse ihre Eckpunkte, und die äussersten davon sind dasselbe.
+ * Masse die Ecken ihrer Flächen, und die äussersten davon sind dasselbe.
  */
 function umriss(analyse) {
-  const punkte = analyse.flaechen.flatMap((f) => f.punkte);
+  const ecken = new Set(analyse.flaechen.flatMap((f) => f.knoten));
+  const punkte = (analyse.knoten || []).filter((k) => ecken.has(k.kennung)).map((k) => [k.y, k.z]);
   if (!punkte.length) return 'leer';
   const spanne = (i) => Math.max(...punkte.map((p) => p[i])) - Math.min(...punkte.map((p) => p[i]));
   return `${Number(spanne(0).toFixed(1))}×${Number(spanne(1).toFixed(1))} mm`;
@@ -232,7 +233,7 @@ function analyseAnlegen() {
     return;
   }
   const kennung = freieKennung('a');
-  ansichtVergessen(kennung);
+  fensterVergessen(kennung);
   projektAendern((p) => {
     const analyse = structuredClone(vorlage);
     analyse.kennung = kennung;

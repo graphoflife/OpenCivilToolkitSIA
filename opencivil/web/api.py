@@ -44,9 +44,9 @@ from opencivil.projekt import (
     KombinationEintrag, MaterialEintrag, QuerschnittEintrag, SpannungsfallEintrag,
 )
 from opencivil.projekt.querschnittsanalyse import (
-    BETONGESETZE, SCHNITTE, WERKSTOFFSAETZE, FlaecheEintrag, QALastfallEintrag,
-    QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
-    WerkstoffwahlEintrag,
+    BETONGESETZE, SCHNITTE, WERKSTOFFSAETZE, FlaecheEintrag, HilfslinieEintrag,
+    KnotenEintrag, QALastfallEintrag, QuerschnittsanalyseEintrag, SchubwandEintrag,
+    StabEintrag, StablinieEintrag, WerkstoffwahlEintrag,
 )
 from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.geometrie import Linienart
@@ -131,19 +131,22 @@ def katalog() -> dict:
             "analyse": SpannungsfallEintrag(name="", M_Ed=30.0).als_dict(),
             "material": MaterialEintrag(kennung="", art="", sorte="").als_dict(),
             # Die Teile der Querschnittsanalyse, wie das Zeichenfenster sie
-            # anlegt. Es setzt nur die Lage, die es gezeichnet hat, und die
-            # Materialien.
+            # anlegt. Es setzt nur Kennung, Knoten und die Materialien.
             "qa_lastfall": QALastfallEintrag(name="", M_y_Ed=100.0).als_dict(),
+            "knoten": KnotenEintrag().als_dict(),
             "flaeche": FlaecheEintrag().als_dict(),
             "stab": StabEintrag().als_dict(),
             "stablinie": StablinieEintrag().als_dict(),
             "schubwand": SchubwandEintrag().als_dict(),
+            "hilfslinie": HilfslinieEintrag().als_dict(),
             "werkstoffwahl": WerkstoffwahlEintrag(material="").als_dict(),
         },
         # Die Wahlmoeglichkeiten der Querschnittsanalyse, mit Beschriftung.
         "querschnittsanalyse": {
             "linienarten": [
-                {"wert": Linienart.FLAECHE.value, "beschriftung": "Fläche"},
+                # «Fläche» ist im Zeichenfenster die Betonfläche -- die
+                # Stahlfläche einer Linie heisst darum «verschmiert».
+                {"wert": Linienart.FLAECHE.value, "beschriftung": "verschmiert"},
                 {"wert": Linienart.ANZAHL.value, "beschriftung": "Anzahl"},
                 {"wert": Linienart.TEILUNG.value, "beschriftung": "Teilung"},
             ],
@@ -477,11 +480,11 @@ def geometrie(eintrag, projekt) -> dict:
     Pruefungen, die das Bauteil vor dem Rechnen macht; hier aber alle
     Meldungen auf einmal statt nur der ersten. Ein Material, das es nicht
     gibt, oder ein Stahl als Polygon kommt dazu -- das kann nur das Projekt
-    wissen.
+    wissen. Ebenso ein Verweis auf einen Knoten, den es nicht gibt.
     """
     arten = {m.kennung: m.art for m in projekt.materialien}
     elemente = eintrag.elemente()
-    vorab: List[dict] = []
+    vorab: List[dict] = list(elemente.fehler)
     for f in elemente.polygone:
         if f["material"] and arten.get(f["material"]) != "beton":
             vorab.append({"text": (f"{f['name']}: das Material '{f['material']}' gibt es "
@@ -534,6 +537,8 @@ def geometrie(eintrag, projekt) -> dict:
             for w, gut in zip(elemente.waende, z.waende)],
         "zellen": [{"punkte": [list(p) for p in ecken], "flaeche": flaeche}
                    for ecken, flaeche in z.zellen],
+        "hilfslinien": [{"element": h["name"], "kennung": h["kennung"]}
+                        for h in elemente.hilfslinien],
     }
 
 
