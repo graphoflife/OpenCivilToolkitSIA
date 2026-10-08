@@ -3,7 +3,7 @@
  *
  * Von oben nach unten:
  *
- *     Querschnitt     Bezeichnung, Zeichnung, Koordinaten, Beschreibung
+ *     Querschnitt     Bezeichnung, Zeichnung samt Liste, Beschreibung
  *     Werkstoffe      je Material im Querschnitt: Rechenwerte und Gesetz
  *     Schubwände      Neigungsgrenzen, k_c, Längszugkraft
  *     Nachweise       Lastfälle; Duktilität und sprödes Versagen
@@ -21,8 +21,8 @@
 import { erklaerung, feld, hakenSchalter, panel } from './bausteine.js';
 import { auswahl, el, svgEl, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
-import { koordinatenfenster } from './koordinaten.js';
-import { meldungenBlock, zeichenbereich } from './zeichenfenster.js';
+import { uebersicht } from './qa_uebersicht.js';
+import { zeichenbereich } from './qa_zeichnung.js';
 import {
   ausVorlage, naechsterName, projektAendern, zustand,
 } from './zustand.js';
@@ -122,12 +122,13 @@ function querschnittGruppe(analyse) {
   const aendern = (veraenderer) => aendernAn(analyse.kennung, veraenderer);
   return panel({
     schluessel: 'analyse/Querschnitt', titel: 'Querschnitt', zusatz: 'y nach rechts, z nach oben, mm',
+    breit: true,
   }, [
     feld('Bezeichnung', el('input', {
       type: 'text', value: analyse.name,
       on: { change: (e) => aendern((a) => { a.name = e.target.value; }) },
     })),
-    zeichenbereich(analyse, [meldungenBlock(analyse), koordinatenfenster(analyse)].filter(Boolean)),
+    zeichenbereich(analyse, uebersicht),
     el('div.unterkapitel', {}, [
       // Freier Text, der in keine Rechnung eingeht -- wie bei der Platte.
       el('div.beschreibung', { style: { marginTop: 0 } }, [

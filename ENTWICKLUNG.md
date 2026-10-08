@@ -44,6 +44,135 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-08 · Querschnittsanalyse: ein CAD aus Knoten, Linien und Flächen
+
+Wunsch: das Koordinatenfenster als kleines schwebendes Fenster, ein CAD wie
+Fagus oder AxisVM mit wenigen Knöpfen, allgemein genug für einen Grundriss.
+Linien verbinden Knoten, eine Schubwand ist auch nur eine Linie, bearbeitet
+wird über Auswahl und Menü statt durch Ziehen. Dieser Eintrag ist der
+Umstieg (Schritt 5 des Plans); Vorlagen und das breitere Panel folgen.
+
+### Im Kern: Knoten statt Koordinaten
+
+Vorher trug jedes Element seine Punkte selbst. Wo Wand und Bewehrungslinie
+zusammentreffen, standen dieselben Zahlen zweimal da -- wer eine Ecke
+verschob, musste beide treffen.
+
+Jetzt gibt es `knoten` mit Kennung und Lage, und die Elemente verweisen
+darauf:
+
+```
+vorher:  schubwaende: [{von: [50, 50], bis: [250, 50], …}]
+nachher: knoten:      [{kennung: "K5", y: 50, z: 50}, {kennung: "K6", …}]
+         schubwaende: [{kennung: "L3", von: "K5", bis: "K6", …}]
+```
+
+* **Kennungen** (`F1`, `S1`, `L1`, `K1`) kommen nie wieder: die nächste ist
+  die grösste plus eins. Die Linien zählen gemeinsam, weil eine Linie ihre
+  Art wechseln kann und ihre Kennung dabei behält.
+* **Namen in Berichten** bleiben, wie sie waren: «Polygon 1», «Wand 2», nur
+  vom Kern vergeben. Neu nennt er auch die Hilfslinien; vorher hätte die
+  Oberfläche sie selbst nummeriert.
+* **Alte Projekte** werden beim Öffnen umgewandelt; gleiche Koordinaten
+  werden ein Knoten. Die drei eingefrorenen Analysen geben dieselben
+  Erfüllungsgrade, und alle drei Berichte sind Zeichen für Zeichen gleich.
+* **Ein Verweis ins Leere** (ein Knoten, den es nicht gibt) wird eine
+  Meldung am Element, wie ein Geometriefehler. Rechnen lässt sich so nicht;
+  öffnen schon.
+* **Gebaut wird mit dem Baukasten** (`u.polygon`, `u.stab`, `u.stablinie`,
+  `u.schubwand`, `u.hilfslinie`). Er führt gleiche Knoten zusammen; `neu()`,
+  das Beispiel und die Tests benutzen ihn.
+
+### In der Oberfläche: ein allgemeines Fenster und ein Adapter
+
+Die beiden alten Dateien (`zeichenfenster.js`, `koordinaten.js`, zusammen
+rund 2300 Zeilen) sind weg. An ihrer Stelle:
+
+* **`cad_*.js`, allgemein.** Sie kennen nur Knoten und Elemente in drei
+  Formen -- Punkt, Linie, Fläche -- und wissen nichts von Beton. Ansicht,
+  Modell, Punkteingabe, Befehle, Auswahl, schwebendes Fenster, Rahmen.
+* **`qa_zeichnung.js`, der Adapter.** Er sagt, was die Formen im Querschnitt
+  sind, wie sie aussehen und welche Eigenschaften sie haben.
+* **`qa_uebersicht.js`, die Liste darunter.** Nur zum Lesen: Meldungen,
+  Querschnittswerte in zwei Spalten, je Element eine Zeile. Ein Klick wählt.
+
+So bedient es sich:
+* **Oben nur Polygon P, Linie L, Knoten K,** dazu Rückgängig, Wiederholen,
+  Alles zeigen F, Vollbild. Wählen ist der Grundzustand; Esc führt dorthin.
+* **Jeder Punkt entsteht gleich:** Fang an Knoten, Mitten, Schnittpunkten und
+  Raster; R setzt den Bezugspunkt; Ziffern gehen ins schwebende Fenster
+  (relativ, absolut oder Länge und Winkel); Y/Z binden an eine Achse, P/S an
+  eine Linie; M nimmt die Mitte zweier Punkte, auf die Bindung projiziert.
+  Gelesen wird die Taste selbst, darum stimmen Y und Z auch auf der
+  Schweizer Tastatur.
+* **Neben der Auswahl** steht eine kleine Leiste: Verschieben V, Kopieren C,
+  Löschen, und «Fläche bilden», wenn die gewählten Hilfslinien einen
+  geschlossenen Umriss bilden. Von selbst wird keine Fläche daraus: die vier
+  Wände des Unterzugs umschliessen eine Zelle, die kein Beton werden soll.
+* **Ein Rahmen nach rechts** wählt, was ganz drin liegt, nach links auch, was
+  er schneidet. Er nimmt auch Knoten mit: wer die zwei Knoten der rechten
+  Kante wählt und um 100 verschiebt, macht den Balken 100 breiter.
+* **Jede Aktion ist ein Schritt für Rückgängig,** nie ein Zwischenpunkt.
+* **Bearbeiten neben der Auswahl** (Schritt 7):
+  * *Teilen* halbiert eine Linie, *Knoten* fügt einen in eine Kante ein,
+    wo man klickt.
+  * *Umkehren* tauscht Anfang und Ende.
+  * *Lösen* gibt der Auswahl eigene Knoten, wo sie einen mit anderem teilt:
+    So verschiebt man die untere Bewehrung um 10 mm, ohne dass die Wände
+    mitgehen.
+  * Eine Bewehrung lässt sich **nicht teilen**: Bei zwei Hälften wären es
+    andere Stäbe als beim Ganzen, also n Stäbe je Hälfte oder ein doppelter
+    Stab in der Mitte. Beim Umkehren tauschen Start- und Endeisen mit, damit
+    die Stäbe bleiben, wo sie sind.
+* **Das Lot ⊥** (Schritt 6) fängt den Fusspunkt vom Bezugspunkt auf eine
+  Linie, wenn er auf ihr liegt.
+* **Vorlagen im Kern** (Schritt 8, `opencivil/querschnitt/vorlagen.py`):
+  Rechteck, T-Balken, Hohlkasten, Kreis. T öffnet ein Fenster mit kleinen
+  Bildern, den Massen als Felder und einer Skizze mit Masslinien, die sich
+  beim Tippen ändert (Anfrage `vorlage`, unter Pyodide rund 1 ms).
+  «Einsetzen» fragt nach dem Punkt für die Ecke unten links; Enter ohne
+  Zahlen heisst Ursprung. Eingesetzt wird mit dem Baukasten des Kerns
+  (`vorlage_einsetzen`), und die Vorlage kommt **dazu** -- vorher ersetzte
+  sie die ganze Zeichnung. Wo sie genau auf einen Knoten trifft, hängt sie
+  an ihm. `neu()` baut die frische Analyse aus dem Rechteck ohne Schubwand:
+  dieselben Knoten, Linien und Zahlen wie vorher. Vorher stand das Rechteck
+  zweimal da, in Python und in JS.
+* **Verschmolzen wird nur, was bewegt wurde:** Landet ein verschobener Knoten
+  genau auf einem anderen, wird er eins mit ihm. Zwei gelöste Knoten anderswo
+  bleiben zwei.
+
+Nachgespielt im Browser, mit Server und mit Pyodide:
+* Stab 150 rechts von K3 (K, über K3, R, `150` Tab `0` Enter): Knoten genau
+  bei (450, 600).
+* Linie von K1, dann Y, M, K5, K8: Ende genau bei (150, 0).
+* Linie von K1, P, die obere Bewehrung anklicken, über K8 klicken: Ende bei
+  (250, 0), K8 auf die Parallele projiziert.
+* Rahmen um die rechte Kante, V, `100` Tab `0`: der Balken ist 400 breit.
+* Je Änderung genau eine Anfrage `geometrie`.
+
+### Nebenbei
+
+* **Der Baum las noch die alten Eckpunkte** und brach beim Start ab. Er
+  misst jetzt die Ecken der Flächen über ihre Knoten.
+* **Das Panel der Zeichnung wächst mit** (Schritt 9): Es ist etwa halb so
+  breit wie der Platz rechts vom Baum und nie schmaler als 420 px. Bei
+  1280 px Fenster sind das 448 px, bei 2560 px 1088 px; alle anderen Panels
+  und die Zahlenfelder bleiben gleich. Die Höhe zieht man am Griff unter der
+  Zeichnung, und der Browser merkt sie sich.
+* **Statt der Palette weicht die Zeichnung aus:** «Alles zeigen» lässt die
+  Ecke des schwebenden Fensters frei. Daneben oder darüber, je nachdem, was
+  weniger Massstab kostet.
+  * Geplant war, dass das Fenster dem Zeiger ausweicht. Ein Fenster, das vor
+    der Maus flieht, lässt sich aber mit der Maus nicht mehr bedienen, und
+    während eines Befehls stehen darin die Eigenschaften des Neuen.
+* **Getippte Zahlen gingen verloren, wenn das schwebende Fenster zu war.**
+  Die erste Ziffer klappt es jetzt auf.
+* **Die Seite war 1800 statt 768 px hoch.** Der unsichtbare MathML-Teil jeder
+  Formel ist bei KaTeX absolut gesetzt und lag ohne Bezug auf der Seite
+  statt in der Tafel. Bekam ein Feld weit unten den Fokus, rollte die ganze
+  Seite mit, samt Kopfleiste. `.katex { position: relative }` hält ihn in der
+  Formel. Der Fehler ist älter als das CAD; aufgefallen ist er beim Testen.
+
 ## 2026-10-08 · Zahlenfelder: eine Breite für «99999.99»
 
 Wunsch: Zahlenfelder nicht zu gross. Wenn «99999.99» ganz sichtbar ist,

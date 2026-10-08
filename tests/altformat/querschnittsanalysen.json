@@ -1,0 +1,538 @@
+{
+ "projekt": {
+  "name": "Querschnittsanalysen vor den Knoten",
+  "materialien": [
+   {
+    "kennung": "b1",
+    "art": "beton",
+    "sorte": "C30/37",
+    "name": "C30/37",
+    "eigenstaendig": false,
+    "abweichungen": {},
+    "ueberschreibungen": {}
+   },
+   {
+    "kennung": "s1",
+    "art": "betonstahl",
+    "sorte": "B500B",
+    "name": "B500B",
+    "eigenstaendig": false,
+    "abweichungen": {},
+    "ueberschreibungen": {}
+   }
+  ],
+  "querschnitte": [],
+  "querschnittsanalysen": [
+   {
+    "kennung": "a1",
+    "name": "Unterzug",
+    "flaechen": [
+     {
+      "punkte": [
+       [
+        0.0,
+        0.0
+       ],
+       [
+        300.0,
+        0.0
+       ],
+       [
+        300.0,
+        600.0
+       ],
+       [
+        0.0,
+        600.0
+       ]
+      ],
+      "material": "b1"
+     }
+    ],
+    "staebe": [],
+    "stablinien": [
+     {
+      "von": [
+       50.0,
+       50.0
+      ],
+      "bis": [
+       250.0,
+       50.0
+      ],
+      "art": "anzahl",
+      "durchmesser": 20.0,
+      "flaeche": 1000.0,
+      "anzahl": 3.0,
+      "teilung": 150.0,
+      "starteisen": true,
+      "endeisen": true,
+      "stahl": "s1"
+     },
+     {
+      "von": [
+       50.0,
+       550.0
+      ],
+      "bis": [
+       250.0,
+       550.0
+      ],
+      "art": "anzahl",
+      "durchmesser": 12.0,
+      "flaeche": 1000.0,
+      "anzahl": 2.0,
+      "teilung": 150.0,
+      "starteisen": true,
+      "endeisen": true,
+      "stahl": "s1"
+     }
+    ],
+    "schubwaende": [
+     {
+      "von": [
+       50.0,
+       50.0
+      ],
+      "bis": [
+       250.0,
+       50.0
+      ],
+      "dicke": 100.0,
+      "durchmesser": 10.0,
+      "teilung": 150.0,
+      "schnitte": 1,
+      "stahl": "s1"
+     },
+     {
+      "von": [
+       250.0,
+       50.0
+      ],
+      "bis": [
+       250.0,
+       550.0
+      ],
+      "dicke": 100.0,
+      "durchmesser": 10.0,
+      "teilung": 150.0,
+      "schnitte": 1,
+      "stahl": "s1"
+     },
+     {
+      "von": [
+       250.0,
+       550.0
+      ],
+      "bis": [
+       50.0,
+       550.0
+      ],
+      "dicke": 100.0,
+      "durchmesser": 10.0,
+      "teilung": 150.0,
+      "schnitte": 1,
+      "stahl": "s1"
+     },
+     {
+      "von": [
+       50.0,
+       550.0
+      ],
+      "bis": [
+       50.0,
+       50.0
+      ],
+      "dicke": 100.0,
+      "durchmesser": 10.0,
+      "teilung": 150.0,
+      "schnitte": 1,
+      "stahl": "s1"
+     }
+    ],
+    "werkstoffwahl": [],
+    "lastfaelle": [
+     {
+      "name": "Feld",
+      "N_Ed": 0.0,
+      "M_y_Ed": 150.0,
+      "M_z_Ed": 0.0,
+      "V_y_Ed": 0.0,
+      "V_z_Ed": 150.0,
+      "T_Ed": 15.0,
+      "aktiv": true
+     }
+    ],
+    "einachsig": false,
+    "alpha_min": 30,
+    "alpha_max": 45,
+    "k_c": 0.55,
+    "laengszugkraft": false,
+    "duktilitaet": false,
+    "x_d_max": 0.35,
+    "sproede": false,
+    "beschreibung": ""
+   },
+   {
+    "kennung": "a2",
+    "name": "Kastenträger",
+    "flaechen": [
+     {
+      "punkte": [
+       [
+        0,
+        0
+       ],
+       [
+        800,
+        0
+       ],
+       [
+        800,
+        600
+       ],
+       [
+        0,
+        600
+       ]
+      ],
+      "material": "b1"
+     },
+     {
+      "punkte": [
+       [
+        150,
+        150
+       ],
+       [
+        650,
+        150
+       ],
+       [
+        650,
+        450
+       ],
+       [
+        150,
+        450
+       ]
+      ],
+      "material": ""
+     }
+    ],
+    "staebe": [
+     {
+      "y": 760,
+      "z": 300,
+      "durchmesser": 20,
+      "stahl": "s1"
+     }
+    ],
+    "stablinien": [
+     {
+      "von": [
+       50,
+       50
+      ],
+      "bis": [
+       750,
+       50
+      ],
+      "art": "teilung",
+      "durchmesser": 16,
+      "flaeche": 1000.0,
+      "anzahl": 5.0,
+      "teilung": 150,
+      "starteisen": true,
+      "endeisen": true,
+      "stahl": "s1"
+     },
+     {
+      "von": [
+       60,
+       550
+      ],
+      "bis": [
+       740,
+       550
+      ],
+      "art": "anzahl",
+      "durchmesser": 12,
+      "flaeche": 1000.0,
+      "anzahl": 4,
+      "teilung": 150.0,
+      "starteisen": false,
+      "endeisen": false,
+      "stahl": "s1"
+     },
+     {
+      "von": [
+       40,
+       150
+      ],
+      "bis": [
+       40,
+       450
+      ],
+      "art": "flaeche",
+      "durchmesser": 16.0,
+      "flaeche": 400,
+      "anzahl": 5.0,
+      "teilung": 150.0,
+      "starteisen": true,
+      "endeisen": true,
+      "stahl": "s1"
+     }
+    ],
+    "schubwaende": [
+     {
+      "von": [
+       75,
+       75
+      ],
+      "bis": [
+       725,
+       75
+      ],
+      "dicke": 150,
+      "durchmesser": 10,
+      "teilung": 150,
+      "schnitte": 1,
+      "stahl": "s1"
+     },
+     {
+      "von": [
+       725,
+       75
+      ],
+      "bis": [
+       725,
+       525
+      ],
+      "dicke": 150,
+      "durchmesser": 10,
+      "teilung": 150,
+      "schnitte": 1,
+      "stahl": "s1"
+     },
+     {
+      "von": [
+       725,
+       525
+      ],
+      "bis": [
+       75,
+       525
+      ],
+      "dicke": 150,
+      "durchmesser": 10,
+      "teilung": 150,
+      "schnitte": 1,
+      "stahl": "s1"
+     },
+     {
+      "von": [
+       75,
+       525
+      ],
+      "bis": [
+       75,
+       75
+      ],
+      "dicke": 150,
+      "durchmesser": 10,
+      "teilung": 150,
+      "schnitte": 1,
+      "stahl": "s1"
+     }
+    ],
+    "werkstoffwahl": [
+     {
+      "material": "b1",
+      "satz": "bemessung",
+      "betongesetz": "block"
+     }
+    ],
+    "lastfaelle": [
+     {
+      "name": "Feld",
+      "N_Ed": 0.0,
+      "M_y_Ed": 300.0,
+      "M_z_Ed": 0.0,
+      "V_y_Ed": 0.0,
+      "V_z_Ed": 250.0,
+      "T_Ed": 60.0,
+      "aktiv": true
+     },
+     {
+      "name": "Schief",
+      "N_Ed": -1500.0,
+      "M_y_Ed": 250.0,
+      "M_z_Ed": 150.0,
+      "V_y_Ed": 100.0,
+      "V_z_Ed": 0.0,
+      "T_Ed": 0.0,
+      "aktiv": true
+     }
+    ],
+    "einachsig": false,
+    "alpha_min": 30,
+    "alpha_max": 45,
+    "k_c": 0.55,
+    "laengszugkraft": true,
+    "duktilitaet": true,
+    "x_d_max": 0.35,
+    "sproede": true,
+    "beschreibung": ""
+   },
+   {
+    "kennung": "a3",
+    "name": "Stütze",
+    "flaechen": [
+     {
+      "punkte": [
+       [
+        0,
+        0
+       ],
+       [
+        400,
+        0
+       ],
+       [
+        400,
+        400
+       ],
+       [
+        0,
+        400
+       ]
+      ],
+      "material": "b1"
+     }
+    ],
+    "staebe": [],
+    "stablinien": [
+     {
+      "von": [
+       50,
+       50
+      ],
+      "bis": [
+       350,
+       50
+      ],
+      "art": "anzahl",
+      "durchmesser": 20,
+      "flaeche": 1000.0,
+      "anzahl": 3,
+      "teilung": 150.0,
+      "starteisen": true,
+      "endeisen": true,
+      "stahl": "s1"
+     },
+     {
+      "von": [
+       50,
+       350
+      ],
+      "bis": [
+       350,
+       350
+      ],
+      "art": "anzahl",
+      "durchmesser": 20,
+      "flaeche": 1000.0,
+      "anzahl": 3,
+      "teilung": 150.0,
+      "starteisen": true,
+      "endeisen": true,
+      "stahl": "s1"
+     }
+    ],
+    "schubwaende": [],
+    "werkstoffwahl": [
+     {
+      "material": "b1",
+      "satz": "charakteristisch",
+      "betongesetz": "parabel"
+     },
+     {
+      "material": "s1",
+      "satz": "charakteristisch",
+      "betongesetz": "parabel"
+     }
+    ],
+    "lastfaelle": [
+     {
+      "name": "Druck",
+      "N_Ed": -2500.0,
+      "M_y_Ed": 120.0,
+      "M_z_Ed": 0.0,
+      "V_y_Ed": 0.0,
+      "V_z_Ed": 0.0,
+      "T_Ed": 0.0,
+      "aktiv": true
+     },
+     {
+      "name": "Zug",
+      "N_Ed": 400.0,
+      "M_y_Ed": 0.0,
+      "M_z_Ed": 0.0,
+      "V_y_Ed": 0.0,
+      "V_z_Ed": 0.0,
+      "T_Ed": 0.0,
+      "aktiv": true
+     }
+    ],
+    "einachsig": true,
+    "alpha_min": 30,
+    "alpha_max": 45,
+    "k_c": 0.55,
+    "laengszugkraft": false,
+    "duktilitaet": false,
+    "x_d_max": 0.35,
+    "sproede": false,
+    "beschreibung": ""
+   }
+  ]
+ },
+ "erfuellungsgrade": {
+  "querschnittsanalyse.a1.nachweis.mn | Feld": "1.41",
+  "querschnittsanalyse.a1.nachweis.vt | Feld": "1.75",
+  "querschnittsanalyse.a2.nachweis.vt | Feld": "1.04",
+  "querschnittsanalyse.a2.nachweis.vt | Schief": "5.13",
+  "querschnittsanalyse.a2.nachweis.mn | Feld": "0.62",
+  "querschnittsanalyse.a2.nachweis.mn | Schief": "2.29",
+  "querschnittsanalyse.a2.nachweis.duktilitaet | Zug links": "2.59",
+  "querschnittsanalyse.a2.nachweis.sproede | Zug oben": "1.67",
+  "querschnittsanalyse.a3.nachweis.mn | Druck": "2.91",
+  "querschnittsanalyse.a3.nachweis.mn | Zug": "2.36"
+ },
+ "brutto": {
+  "a1": {
+   "A": 180000.0,
+   "y_S": 150.0,
+   "z_S": 300.0,
+   "I_y": 5400000000.0,
+   "I_z": 1350000000.0,
+   "I_yz": 0.0
+  },
+  "a2": {
+   "A": 330000.0,
+   "y_S": 400.0,
+   "z_S": 300.0,
+   "I_y": 13275000000.0,
+   "I_z": 22475000000.0,
+   "I_yz": 0.0
+  },
+  "a3": {
+   "A": 160000.0,
+   "y_S": 200.0,
+   "z_S": 200.0,
+   "I_y": 2133333333.333,
+   "I_z": 2133333333.333,
+   "I_yz": 0.0
+  }
+ }
+}

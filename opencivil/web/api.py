@@ -44,12 +44,13 @@ from opencivil.projekt import (
     KombinationEintrag, MaterialEintrag, QuerschnittEintrag, SpannungsfallEintrag,
 )
 from opencivil.projekt.querschnittsanalyse import (
-    BETONGESETZE, SCHNITTE, WERKSTOFFSAETZE, FlaecheEintrag, QALastfallEintrag,
-    QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
-    WerkstoffwahlEintrag,
+    BETONGESETZE, SCHNITTE, WERKSTOFFSAETZE, FlaecheEintrag, HilfslinieEintrag,
+    KnotenEintrag, QALastfallEintrag, QuerschnittsanalyseEintrag, SchubwandEintrag,
+    StabEintrag, StablinieEintrag, WerkstoffwahlEintrag,
 )
 from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.geometrie import Linienart
+from opencivil.querschnitt.vorlagen import VORLAGEN
 from opencivil.projekt.gleichungen import GleichungszeileEintrag
 from opencivil.web import diagrammdaten
 
@@ -131,19 +132,22 @@ def katalog() -> dict:
             "analyse": SpannungsfallEintrag(name="", M_Ed=30.0).als_dict(),
             "material": MaterialEintrag(kennung="", art="", sorte="").als_dict(),
             # Die Teile der Querschnittsanalyse, wie das Zeichenfenster sie
-            # anlegt. Es setzt nur die Lage, die es gezeichnet hat, und die
-            # Materialien.
+            # anlegt. Es setzt nur Kennung, Knoten und die Materialien.
             "qa_lastfall": QALastfallEintrag(name="", M_y_Ed=100.0).als_dict(),
+            "knoten": KnotenEintrag().als_dict(),
             "flaeche": FlaecheEintrag().als_dict(),
             "stab": StabEintrag().als_dict(),
             "stablinie": StablinieEintrag().als_dict(),
             "schubwand": SchubwandEintrag().als_dict(),
+            "hilfslinie": HilfslinieEintrag().als_dict(),
             "werkstoffwahl": WerkstoffwahlEintrag(material="").als_dict(),
         },
         # Die Wahlmoeglichkeiten der Querschnittsanalyse, mit Beschriftung.
         "querschnittsanalyse": {
             "linienarten": [
-                {"wert": Linienart.FLAECHE.value, "beschriftung": "Fläche"},
+                # «Fläche» ist im Zeichenfenster die Betonfläche -- die
+                # Stahlfläche einer Linie heisst darum «verschmiert».
+                {"wert": Linienart.FLAECHE.value, "beschriftung": "verschmiert"},
                 {"wert": Linienart.ANZAHL.value, "beschriftung": "Anzahl"},
                 {"wert": Linienart.TEILUNG.value, "beschriftung": "Teilung"},
             ],
@@ -156,6 +160,15 @@ def katalog() -> dict:
                 {"wert": BETONGESETZE[1], "beschriftung": "Spannungsblock 0.85·x"},
             ],
             "schnitte": list(SCHNITTE),
+            # Die Vorlagen mit ihren Massen -- und je eine Skizze nach
+            # Vorgabe fuer das Bildchen auf ihrem Knopf.
+            "vorlagen": [
+                {"schluessel": v.schluessel, "name": v.name, "hat_waende": v.hat_waende,
+                 "masse": [{"schluessel": m.schluessel, "beschriftung": m.beschriftung,
+                            "vorgabe": m.vorgabe} for m in v.masse],
+                 "skizze": v.bauen().als_dict()}
+                for v in VORLAGEN
+            ],
         },
         # `fliessnachweis` sagt, ob diese Anforderung den Nachweis gegen
         # das Fliessen unter haeufiger Einwirkung ueberhaupt verlangt -- bei
@@ -477,39 +490,33 @@ def geometrie(eintrag, projekt) -> dict:
     Pruefungen, die das Bauteil vor dem Rechnen macht; hier aber alle
     Meldungen auf einmal statt nur der ersten. Ein Material, das es nicht
     gibt, oder ein Stahl als Polygon kommt dazu -- das kann nur das Projekt
-    wissen.
+    wissen. Ebenso ein Verweis auf einen Knoten, den es nicht gibt.
     """
     arten = {m.kennung: m.art for m in projekt.materialien}
-    vorab: List[dict] = []
-    polygone = []
-    for nummer, f in enumerate(eintrag.flaechen, start=1):
-        if f.material and arten.get(f.material) != "beton":
-            name = f"Polygon {nummer}"
-            vorab.append({"text": (f"{name}: das Material '{f.material}' gibt es nicht "
-                                   f"(mehr) oder es ist kein Beton."),
-                          "elemente": [name]})
-        polygone.append((f.punkte, bool(f.material)))
+    elemente = eintrag.elemente()
+    vorab: List[dict] = list(elemente.fehler)
+    for f in elemente.polygone:
+        if f["material"] and arten.get(f["material"]) != "beton":
+            vorab.append({"text": (f"{f['name']}: das Material '{f['material']}' gibt es "
+                                   f"nicht (mehr) oder es ist kein Beton."),
+                          "elemente": [f["kennung"]]})
     z = Zeichnung(
-        polygone=polygone,
-        staebe=[((s.y, s.z), s.durchmesser) for s in eintrag.staebe],
-        linien=[{k: getattr(l, k) for k in ("von", "bis", "art", "durchmesser", "flaeche",
-                                            "anzahl", "teilung", "starteisen", "endeisen")}
-                for l in eintrag.stablinien],
-        waende=[{k: getattr(w, k) for k in ("von", "bis", "dicke", "durchmesser", "teilung")}
-                for w in eintrag.schubwaende])
+        polygone=[{**f, "traegt": bool(f["material"])} for f in elemente.polygone],
+        staebe=elemente.staebe, linien=elemente.linien, waende=elemente.waende)
     linien = []
-    for nummer, (l, linie) in enumerate(zip(eintrag.stablinien, z.linien), start=1):
+    for l, linie in zip(elemente.linien, z.linien):
+        kopf = {"element": l["name"], "kennung": l["kennung"]}
         if linie is None:
-            linien.append({"element": f"Linie {nummer}", "punkte": [], "teilung": None,
+            linien.append({**kopf, "punkte": [], "teilung": None,
                            "felder": 0, "flaeche": 0.0, "je_meter": 0.0, "laenge": 0.0})
             continue
-        flaeche = (l.flaeche if l.art == "flaeche"
-                   else len(linie.punkte) * math.pi * l.durchmesser ** 2 / 4.0)
+        flaeche = (l["flaeche"] if l["art"] == "flaeche"
+                   else len(linie.punkte) * math.pi * l["durchmesser"] ** 2 / 4.0)
         linien.append({
-            "element": f"Linie {nummer}",
+            **kopf,
             "punkte": [list(p) for p in linie.punkte],
             "teilung": linie.teilung,
-            "gewaehlt": l.teilung if l.art == "teilung" else None,
+            "gewaehlt": l["teilung"] if l["art"] == "teilung" else None,
             "felder": linie.felder,
             "flaeche": flaeche,
             "je_meter": flaeche / linie.laenge * 1000.0,
@@ -521,23 +528,27 @@ def geometrie(eintrag, projekt) -> dict:
         "meldungen": vorab + [{"text": m.text, "elemente": list(m.elemente)}
                               for m in z.meldungen],
         "polygone": [
-            {"element": name, "eltern": (z.eltern[i] if z.eltern is not None else None),
+            {"element": f["name"], "kennung": f["kennung"],
+             "eltern": (z.eltern[i] if z.eltern is not None else None),
              "aussparung": not z.traegt[i]}
-            for i, name in enumerate(z.namen)],
+            for i, f in enumerate(elemente.polygone)],
         "brutto": None if b is None else {
             "A": b.A, "y_S": b.y_S, "z_S": b.z_S, "I_y": b.I_y, "I_z": b.I_z,
             "I_yz": b.I_yz},
-        "staebe": [{"element": f"Stab {i}", "im_beton": gut}
-                   for i, gut in enumerate(z.staebe, start=1)],
+        "staebe": [{"element": s["name"], "kennung": s["kennung"], "im_beton": gut}
+                   for s, gut in zip(elemente.staebe, z.staebe)],
         "linien": linien,
         "waende": [
-            {"element": f"Wand {i}", "gut": gut,
-             "laenge": math.hypot(w.bis[0] - w.von[0], w.bis[1] - w.von[1]),
-             "a_sw_s": (w.schnitte * math.pi * w.durchmesser ** 2 / 4.0 / w.teilung * 1000.0
-                        if w.durchmesser > 0 and w.teilung > 0 else 0.0)}
-            for i, (w, gut) in enumerate(zip(eintrag.schubwaende, z.waende), start=1)],
+            {"element": w["name"], "kennung": w["kennung"], "gut": gut,
+             "laenge": math.hypot(w["bis"][0] - w["von"][0], w["bis"][1] - w["von"][1]),
+             "a_sw_s": (w["schnitte"] * math.pi * w["durchmesser"] ** 2 / 4.0
+                        / w["teilung"] * 1000.0
+                        if w["durchmesser"] > 0 and w["teilung"] > 0 else 0.0)}
+            for w, gut in zip(elemente.waende, z.waende)],
         "zellen": [{"punkte": [list(p) for p in ecken], "flaeche": flaeche}
                    for ecken, flaeche in z.zellen],
+        "hilfslinien": [{"element": h["name"], "kennung": h["kennung"]}
+                        for h in elemente.hilfslinien],
     }
 
 

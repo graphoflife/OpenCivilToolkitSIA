@@ -146,6 +146,16 @@ export const api = {
    */
   analysediagramme: (projekt, kennung, schnitt) =>
     ruf('analysediagramme', { projekt, kennung, schnitt }),
+  /**
+   * Die Teile einer Vorlage zu ihren Massen, für die Skizze --
+   * `wahl` = {art, masse, randabstand, bewehrung, schubwaende}.
+   */
+  vorlage: (wahl) => ruf('vorlage', { wahl }),
+  /** Setzt eine Vorlage ein; zurück kommen die Elementlisten der Analyse und was neu ist. */
+  vorlageEinsetzen: (projekt, kennung, wahl, ursprung, beton, stahl) =>
+    ruf('vorlage_einsetzen', {
+      projekt, kennung, wahl, ursprung, beton, stahl,
+    }),
 };
 
 export { KernFehler };

@@ -36,6 +36,7 @@ from opencivil.bericht.latex_dokument import als_tex
 from opencivil.bericht.markdown import als_markdown
 from opencivil.core.rechenwerk import Loesung, RechenwerkFehler
 from opencivil.projekt import Projekt, ProjektFehler
+from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.interaktion import GROESSEN
 from opencivil.web import api, diagrammdaten, speicher
 from opencivil.web.api import endlich
@@ -398,6 +399,71 @@ def analysediagramme(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     return {"diagramme": endlich(diagrammdaten.analyse(aufbau, kennung, (fest, wert)))}
 
 
+def _vorlagenwahl(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+    """Was die Oberflaeche zu einer Vorlage eingestellt hat -- Masse, Achsabstand, die zwei Haken."""
+    wahl = rumpf.get("wahl") or {}
+    try:
+        masse = {str(k): float(v) for k, v in (wahl.get("masse") or {}).items()
+                 if v is not None and v != ""}
+        randabstand = float(wahl.get("randabstand", 50.0))
+    except (TypeError, ValueError):
+        raise DienstFehler(400, "Die Masse einer Vorlage müssen Zahlen sein.") from None
+    return {"masse": masse, "randabstand": randabstand,
+            "bewehrung": bool(wahl.get("bewehrung", True)),
+            "schubwaende": bool(wahl.get("schubwaende", True))}
+
+
+def _vorlage(rumpf: Mapping[str, Any]) -> vorlagen.Vorlage:
+    try:
+        return vorlagen.vorlage(str((rumpf.get("wahl") or {}).get("art") or ""))
+    except ValueError as fehler:
+        raise DienstFehler(400, str(fehler)) from None
+
+
+def vorlage(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Die Teile einer Vorlage zu den eingestellten Massen -- fuer die Skizze,
+    waehrend man tippt. Passen die Masse nicht zueinander, steht der Grund in
+    ``fehler`` und es gibt keine Teile: das ist keine falsche Anfrage, nur
+    eine unfertige Eingabe.
+    """
+    try:
+        teile = _vorlage(rumpf).bauen(**_vorlagenwahl(rumpf))
+    except ValueError as fehler:
+        return {"fehler": str(fehler), "teile": None}
+    return {"fehler": None, "teile": teile.als_dict()}
+
+
+def vorlage_einsetzen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Setzt eine Vorlage in eine Querschnittsanalyse ein, mit dem Baukasten
+    des Kerns (:meth:`QuerschnittsanalyseEintrag.vorlage_einsetzen`). Zurueck
+    kommen ihre Elementlisten und die Kennungen der neuen Elemente -- die
+    Oberflaeche uebernimmt sie in einem Schritt, den man rueckgaengig machen
+    kann.
+    """
+    projekt = _projekt(rumpf)
+    kennung = str(rumpf.get("kennung") or "")
+    try:
+        eintrag = projekt.querschnittsanalyse(kennung)
+    except ProjektFehler as fehler:
+        raise DienstFehler(400, str(fehler)) from None
+    ursprung = rumpf.get("ursprung") or [0.0, 0.0]
+    try:
+        ursprung = (float(ursprung[0]), float(ursprung[1]))
+    except (TypeError, ValueError, IndexError):
+        raise DienstFehler(400, "Der Einsetzpunkt muss zwei Zahlen haben.") from None
+    try:
+        neu = eintrag.vorlage_einsetzen(
+            _vorlage(rumpf).schluessel, beton=str(rumpf.get("beton") or ""),
+            stahl=str(rumpf.get("stahl") or ""), ursprung=ursprung, **_vorlagenwahl(rumpf))
+    except ValueError as fehler:
+        raise DienstFehler(400, str(fehler)) from None
+    d = eintrag.als_dict()
+    listen = ("knoten", "flaechen", "staebe", "stablinien", "schubwaende", "hilfslinien")
+    return {"neu": neu, "elemente": {liste: d[liste] for liste in listen}}
+
+
 #: Name der Anfrage -> Funktion. Diese Namen sind der ganze Vertrag zwischen
 #: Oberflaeche und Kern; beide Huellen reichen sie unveraendert durch.
 ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
@@ -410,6 +476,8 @@ ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "bewehrung_suchen": bewehrung_suchen,
     "geometrie": geometrie,
     "analysediagramme": analysediagramme,
+    "vorlage": vorlage,
+    "vorlage_einsetzen": vorlage_einsetzen,
 }
 
 

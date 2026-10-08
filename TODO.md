@@ -22,6 +22,8 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
 - [ ] Keine Testumgebung für das JavaScript. `stabstellen`, `besterVersatz`,
       `naechsteStufe` und `beschriftungenEntzerren` sind rein und wären in
       wenigen Zeilen abgedeckt; geprüft wird bisher von Hand im Browser.
+      Dazu jetzt das Modell des Zeichenfensters (`cad_modell.js`: Knoten
+      anlegen, löschen, kopieren, lösen, zusammenführen) und das Fangen.
 - [ ] Momente stehen in der Mitschrift als `kNm`, gemeint ist `kNm/m` (die
       Platte wird je Laufmeter gerechnet). In der Eingabemaske steht es
       richtig. Einheitlich ziehen.
@@ -117,6 +119,10 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       noch ihren eigenen `dehnungsfaecher`; der Fächer der Analyse kann
       dasselbe für jede Form. Umstellen, sobald der Vergleich unter 0.1 %
       bleibt.
+- [ ] **Kriechzahl φ an den Flächen der Querschnittsanalyse.** Kommt mit der
+      ersten Rechnung, die sie braucht (Stahlspannung im Gebrauch, Knicken).
+      Die Eigenschaften einer Fläche stehen im schwebenden Fenster; φ kommt
+      dort ohne Umbau dazu.
 - [ ] **Ein Kreis ist ein 48-Eck.** Die Ecken liegen auf dem Kreis, die
       Fläche ist darum 0.3 % kleiner als π·D²/4. Steht so in der Zeichnung;
       wer es genauer will, zeichnet mehr Ecken.

@@ -51,15 +51,17 @@ from opencivil.projekt.eintraege import (
 )
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.querschnittsanalyse import (
-    FlaecheEintrag, QALastfallEintrag, QuerschnittsanalyseEintrag,
-    SchubwandEintrag, StabEintrag, StablinieEintrag, WerkstoffwahlEintrag,
+    FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QALastfallEintrag,
+    QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
+    WerkstoffwahlEintrag,
 )
 from opencivil.projekt.aufbau import Aufbau, aufbauen
 from opencivil.projekt.projekt import Projekt
 
 __all__ = [
     "Aufbau", "BEIDE_RICHTUNGEN", "Beschreibung", "FlaecheEintrag",
-    "GebrauchsfallEintrag", "QALastfallEintrag", "QuerschnittsanalyseEintrag",
+    "GebrauchsfallEintrag", "HilfslinieEintrag", "KnotenEintrag",
+    "QALastfallEintrag", "QuerschnittsanalyseEintrag",
     "SchubwandEintrag", "StabEintrag", "StablinieEintrag", "WerkstoffwahlEintrag",
     "Gebrauchsliste",
     "HAEUFIG_ANTEIL", "KnickEintrag", "KombinationEintrag", "LageEintrag",

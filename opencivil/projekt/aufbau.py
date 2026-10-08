@@ -522,24 +522,22 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag,
                                 f"'{gefunden.name}' ist keiner.")
         return gefunden
 
-    flaechen = []
-    for nummer, f in enumerate(eintrag.flaechen, start=1):
-        material = stoff(f.material, f"Polygon {nummer}", "beton") if f.material else None
-        flaechen.append(Flaechenteil(nummer=nummer, punkte=tuple(tuple(p) for p in f.punkte),
-                                     stoff=material))
-    staebe = [((s.y, s.z), s.durchmesser, stoff(s.stahl, f"Stab {nummer}", "betonstahl"))
-              for nummer, s in enumerate(eintrag.staebe, start=1)]
-    linien = [{"von": tuple(l.von), "bis": tuple(l.bis), "art": l.art,
-               "durchmesser": l.durchmesser, "flaeche": l.flaeche, "anzahl": l.anzahl,
-               "teilung": l.teilung, "starteisen": l.starteisen, "endeisen": l.endeisen,
-               "stahl": stoff(l.stahl, f"Linie {nummer}", "betonstahl")}
-              for nummer, l in enumerate(eintrag.stablinien, start=1)]
-    waende = [{"von": tuple(w.von), "bis": tuple(w.bis), "dicke": w.dicke,
-               "durchmesser": w.durchmesser, "teilung": w.teilung,
-               "schnitte": w.schnitte,
-               "stahl": stoff(w.stahl, f"Wand {nummer}", "betonstahl")
-               if w.durchmesser > 0 else None}
-              for nummer, w in enumerate(eintrag.schubwaende, start=1)]
+    elemente = eintrag.elemente()
+    if elemente.fehler:
+        # Ein Element ohne Lage laesst sich nicht rechnen -- und es still
+        # wegzulassen hiesse, mit einem anderen Querschnitt zu rechnen.
+        raise ProjektFehler(f"{wo}: {elemente.fehler[0]['text']}")
+    flaechen = [Flaechenteil(name=f["name"], kennung=f["kennung"], punkte=f["punkte"],
+                             stoff=stoff(f["material"], f["name"], "beton")
+                             if f["material"] else None)
+                for f in elemente.polygone]
+    staebe = [{**s, "stahl": stoff(s["stahl"], s["name"], "betonstahl")}
+              for s in elemente.staebe]
+    linien = [{**l, "stahl": stoff(l["stahl"], l["name"], "betonstahl")}
+              for l in elemente.linien]
+    waende = [{**w, "stahl": stoff(w["stahl"], w["name"], "betonstahl")
+               if w["durchmesser"] > 0 else None}
+              for w in elemente.waende]
     wahl = {baustoffe[w.material].id: (w.satz, w.betongesetz)
             for w in eintrag.werkstoffwahl if w.material in baustoffe}
     try:
