@@ -33,8 +33,9 @@ Der lokale Server startet ohne Ladezeit und kann den Bericht mit einer
 TeX-Maschine zu PDF übersetzen. Sonst ist er dasselbe: beide Wege rufen
 `opencivil/web/dienst.py` auf. Welcher gerade gilt, steht unten links im Fenster.
 
-Kein Fremdpaket, nirgends — es genügt ein `python3`. KaTeX und Pyodide liegen
-unter `web/vendor/` bei, damit die Seite ohne fremden Dienst auskommt.
+Kein Fremdpaket, nirgends — es genügt ein `python3`. KaTeX, MathLive, Pyodide
+und die Schrift JetBrains Mono liegen unter `web/vendor/` bei, damit die Seite
+ohne fremden Dienst auskommt.
 
 ## In Python, ohne Oberfläche
 

@@ -85,6 +85,18 @@
   --wahlhoehe: 0px;
 }
 
+/* Die Schrift: JetBrains Mono, mitgeliefert wie KaTeX (web/vendor/), damit
+   die Seite auch offline gleich aussieht. Eine Datei trägt alle Stärken von
+   100 bis 800. Jedes Zeichen gleich breit -- Zahlen stehen untereinander. Die
+   Formeln setzt KaTeX mit seiner eigenen Schrift; sie bleiben, wie sie sind. */
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("../vendor/jetbrains-mono/JetBrainsMono-Variable.woff2") format("woff2");
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 * { box-sizing: border-box; }
 
 html, body {
@@ -92,7 +104,15 @@ html, body {
   margin: 0;
   background: var(--grund);
   color: var(--schrift);
-  font: 14px/1.5 "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  font: 14px/1.5 "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas,
+    "DejaVu Sans Mono", monospace;
+  /* Gleich breite Zeichen brauchen Platz: bei derselben Grösse wäre der Text
+     ein Fünftel breiter als vorher, und JetBrains Mono wirkt dazu grösser
+     (Mittellänge 0.55 statt 0.50 der Schriftgrösse). Diese eine Zeile
+     gleicht die Mittellänge an die frühere Schrift an -- der Text wirkt so
+     gross wie vorher und wird nur noch etwa ein Zehntel breiter. Jede
+     einzelne Schriftgrösse im Stilblatt bleibt, wie sie ist. */
+  font-size-adjust: 0.5;
   overflow: hidden;
 }
 
@@ -311,6 +331,10 @@ input.projektname:focus {
 .feld { display: grid; grid-template-columns: minmax(0, 1fr) 112px 48px; gap: 6px; align-items: center; margin-bottom: 5px; }
 .feld > label { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .feld .einheit { font-size: 12px; color: var(--schrift-zart); }
+/* Ein Name hat keine Einheit: er bekommt ihren Platz dazu. In gleich breiter
+   Schrift passte «Decke über EG» sonst nicht mehr ganz in 112 Pixel. */
+.feld:has(> .einheit:empty) > input[type="text"] { grid-column: span 2; }
+.feld > .einheit:empty { display: none; }
 
 /* Alles, was man anfasst, sieht gleich aus: Zahlenfeld, Namensfeld,
    Auswahlliste, Textkasten. Vorher trugen nur die Zahlenfelder den blauen
@@ -801,7 +825,8 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   max-height: 54vh; white-space: pre-wrap; word-break: break-word;
 }
 
-.katex { font-size: 1.04em; }
+/* Die Formeln haben ihre eigene Schrift und erben die Angleichung nicht. */
+.katex { font-size: 1.04em; font-size-adjust: none; }
 .katex-display { margin: 0; }
 
 .reihe { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
@@ -1214,7 +1239,8 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
              font-variant-numeric: tabular-nums; }
 .gl-eingabe { display: flex; gap: 6px; align-items: center; min-width: 0; }
 math-field.gl-feld {
-  flex: 1; min-width: 0; font-size: 17px; padding: 3px 8px; border-radius: 5px;
+  flex: 1; min-width: 0; font-size: 17px; font-size-adjust: none;
+  padding: 3px 8px; border-radius: 5px;
   border: 1px solid var(--eingabe-rand); background: var(--blau-zart);
   --caret-color: var(--blau); --selection-background-color: var(--blau-hell);
   --contains-highlight-background-color: transparent;

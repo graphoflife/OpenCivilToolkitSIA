@@ -44,6 +44,54 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-08 · Die ganze Seite in JetBrains Mono
+
+Wunsch: Die Seite soll aussehen wie ein Code-Editor, mit gleich breiten
+Zeichen. Die Gleichungen sollen trotzdem schön bleiben.
+
+* **Die Schrift:** JetBrains Mono, mitgeliefert unter
+  `web/vendor/jetbrains-mono/`, wie KaTeX und Pyodide. So sieht die Seite auch
+  offline gleich aus. Es ist eine Datei mit 111 KB für alle Stärken. Von
+  Google Fonts geladen, meldete jeder Aufruf die Adresse des Besuchers an
+  Google.
+* **Die Gleichungen bleiben, wie sie sind.** KaTeX und der Formeleditor setzen
+  sie mit ihren eigenen Schriften.
+* **Eine Zeile gegen die Breite:** Bei gleicher Schriftgrösse wäre der Text ein
+  Fünftel breiter und wirkte grösser, denn die Mittellänge ist 0.55 statt 0.50
+  der Schriftgrösse. `font-size-adjust: 0.5` gleicht die Mittellänge an die
+  frühere Schrift an. Der Text wirkt so gross wie vorher und wird nur noch
+  etwa ein Zehntel breiter. Die 127 einzelnen Schriftgrössen im Stilblatt
+  bleiben unverändert. KaTeX und der Formeleditor sind davon ausgenommen,
+  sonst erbten sie die Angleichung und würden grösser.
+
+  ```
+  «Biegung und Normalkraft», 14 px:
+    frühere Schrift   160 px
+    JetBrains Mono    193 px
+    angeglichen       175 px
+  ```
+
+* **Was nicht mehr passte:** Der Name «Decke über EG» ragte 5 Pixel über sein
+  Feld von 112 Pixeln hinaus. Ein Feld ohne Einheit bekommt jetzt deren Platz
+  dazu.
+
+Nachgeprüft:
+* **Jede Ansicht**, mit alter und neuer Schrift verglichen, auf Text, der nicht
+  mehr in seinen Kasten passt: Platte, Querschnittsanalyse, Materialien,
+  Gleichungsblatt, alle Tafeln, «Gesamt», das Menü «Speichern» und der
+  Bericht. Neu sind nur zwei Kleinigkeiten:
+  - Eine Tabelle in der Herleitung der Querschnittsanalyse ist 4 Pixel zu
+    breit und rollt darum seitlich. Breite Tabellen rollen dort schon heute.
+  - In den Kennwerten des Betonstahls wird «ε_uk Dehnung bei Höchstlast»
+    gekürzt. Der ganze Text steht im Hinweis beim Darüberfahren.
+* **Die Zeichen:** JetBrains Mono hat die griechischen Buchstaben, ‰, ≤ ≥,
+  ✓ ✗ und die meisten Pfeile. Es fehlen ⌀ und einige Werkzeugzeichen der
+  Zeichenfläche. Die kommen aus einer Ersatzschrift des Systems, wie schon
+  vorher.
+* **Die Diagramme:** Keine Beschriftung überdeckt neu eine andere.
+
+---
+
 ## 2026-10-06 · Spannung-Dehnung-Analyse: Zahlen am Bild, Sprung beim Riss
 
 Wünsche:
