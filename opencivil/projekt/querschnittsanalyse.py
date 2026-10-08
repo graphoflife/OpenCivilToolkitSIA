@@ -243,6 +243,37 @@ class WerkstoffwahlEintrag(Beschreibung):
 
 
 # ===========================================================================
+# Die Elemente, wie der Kern sie sieht
+# ===========================================================================
+
+
+@dataclass(frozen=True)
+class Elemente:
+    """
+    Die Elemente einer Analyse, so wie der Kern sie prueft und rechnet:
+    Koordinaten in mm, und je Element ``name`` und ``kennung``.
+
+    Der Name zaehlt je Art ab 1 -- «Polygon 1», «Aussparung 2», «Stab 1»,
+    «Linie 1», «Wand 3» -- und steht so in Berichten und Meldungen. Die
+    Kennung sagt der Oberflaeche, welches Element gemeint ist; bis die
+    Elemente eigene Kennungen tragen, ist sie der Name. Vergeben werden beide
+    hier und nirgends sonst -- vorher entstanden die Namen an fuenf Stellen.
+    """
+
+    polygone: List[dict]
+    """Je Polygon ``punkte`` und ``material`` (leer: Aussparung)."""
+
+    staebe: List[dict]
+    """Je Stab ``lage``, ``durchmesser`` und ``stahl``."""
+
+    linien: List[dict]
+    """Je Stablinie die Felder der Beschreibung, ``von`` und ``bis`` als Punkte."""
+
+    waende: List[dict]
+    """Je Schubwand die Felder der Beschreibung, ``von`` und ``bis`` als Punkte."""
+
+
+# ===========================================================================
 # Die Analyse
 # ===========================================================================
 
@@ -305,6 +336,29 @@ class QuerschnittsanalyseEintrag(Beschreibung):
             if kennung and kennung not in gesehen:
                 gesehen.append(kennung)
         return gesehen
+
+    def elemente(self) -> Elemente:
+        """Die Elemente mit Name und Kennung, Koordinaten in mm -- siehe :class:`Elemente`."""
+        def benannt(name: str, **felder: Any) -> dict:
+            return {"name": name, "kennung": name, **felder}
+
+        return Elemente(
+            polygone=[benannt(f"{'Polygon' if f.material else 'Aussparung'} {i}",
+                              punkte=tuple(tuple(p) for p in f.punkte), material=f.material)
+                      for i, f in enumerate(self.flaechen, start=1)],
+            staebe=[benannt(f"Stab {i}", lage=(s.y, s.z), durchmesser=s.durchmesser,
+                            stahl=s.stahl)
+                    for i, s in enumerate(self.staebe, start=1)],
+            linien=[benannt(f"Linie {i}", von=tuple(l.von), bis=tuple(l.bis), art=l.art,
+                            durchmesser=l.durchmesser, flaeche=l.flaeche, anzahl=l.anzahl,
+                            teilung=l.teilung, starteisen=l.starteisen, endeisen=l.endeisen,
+                            stahl=l.stahl)
+                    for i, l in enumerate(self.stablinien, start=1)],
+            waende=[benannt(f"Wand {i}", von=tuple(w.von), bis=tuple(w.bis), dicke=w.dicke,
+                            durchmesser=w.durchmesser, teilung=w.teilung,
+                            schnitte=w.schnitte, stahl=w.stahl)
+                    for i, w in enumerate(self.schubwaende, start=1)],
+        )
 
     def pruefen(self) -> None:
         """Was sich schon an der Beschreibung pruefen laesst: eindeutige Lastfallnamen."""

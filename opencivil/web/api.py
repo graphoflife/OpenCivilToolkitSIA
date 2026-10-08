@@ -480,36 +480,30 @@ def geometrie(eintrag, projekt) -> dict:
     wissen.
     """
     arten = {m.kennung: m.art for m in projekt.materialien}
+    elemente = eintrag.elemente()
     vorab: List[dict] = []
-    polygone = []
-    for nummer, f in enumerate(eintrag.flaechen, start=1):
-        if f.material and arten.get(f.material) != "beton":
-            name = f"Polygon {nummer}"
-            vorab.append({"text": (f"{name}: das Material '{f.material}' gibt es nicht "
-                                   f"(mehr) oder es ist kein Beton."),
-                          "elemente": [name]})
-        polygone.append((f.punkte, bool(f.material)))
+    for f in elemente.polygone:
+        if f["material"] and arten.get(f["material"]) != "beton":
+            vorab.append({"text": (f"{f['name']}: das Material '{f['material']}' gibt es "
+                                   f"nicht (mehr) oder es ist kein Beton."),
+                          "elemente": [f["kennung"]]})
     z = Zeichnung(
-        polygone=polygone,
-        staebe=[((s.y, s.z), s.durchmesser) for s in eintrag.staebe],
-        linien=[{k: getattr(l, k) for k in ("von", "bis", "art", "durchmesser", "flaeche",
-                                            "anzahl", "teilung", "starteisen", "endeisen")}
-                for l in eintrag.stablinien],
-        waende=[{k: getattr(w, k) for k in ("von", "bis", "dicke", "durchmesser", "teilung")}
-                for w in eintrag.schubwaende])
+        polygone=[{**f, "traegt": bool(f["material"])} for f in elemente.polygone],
+        staebe=elemente.staebe, linien=elemente.linien, waende=elemente.waende)
     linien = []
-    for nummer, (l, linie) in enumerate(zip(eintrag.stablinien, z.linien), start=1):
+    for l, linie in zip(elemente.linien, z.linien):
+        kopf = {"element": l["name"], "kennung": l["kennung"]}
         if linie is None:
-            linien.append({"element": f"Linie {nummer}", "punkte": [], "teilung": None,
+            linien.append({**kopf, "punkte": [], "teilung": None,
                            "felder": 0, "flaeche": 0.0, "je_meter": 0.0, "laenge": 0.0})
             continue
-        flaeche = (l.flaeche if l.art == "flaeche"
-                   else len(linie.punkte) * math.pi * l.durchmesser ** 2 / 4.0)
+        flaeche = (l["flaeche"] if l["art"] == "flaeche"
+                   else len(linie.punkte) * math.pi * l["durchmesser"] ** 2 / 4.0)
         linien.append({
-            "element": f"Linie {nummer}",
+            **kopf,
             "punkte": [list(p) for p in linie.punkte],
             "teilung": linie.teilung,
-            "gewaehlt": l.teilung if l.art == "teilung" else None,
+            "gewaehlt": l["teilung"] if l["art"] == "teilung" else None,
             "felder": linie.felder,
             "flaeche": flaeche,
             "je_meter": flaeche / linie.laenge * 1000.0,
@@ -521,21 +515,23 @@ def geometrie(eintrag, projekt) -> dict:
         "meldungen": vorab + [{"text": m.text, "elemente": list(m.elemente)}
                               for m in z.meldungen],
         "polygone": [
-            {"element": name, "eltern": (z.eltern[i] if z.eltern is not None else None),
+            {"element": f["name"], "kennung": f["kennung"],
+             "eltern": (z.eltern[i] if z.eltern is not None else None),
              "aussparung": not z.traegt[i]}
-            for i, name in enumerate(z.namen)],
+            for i, f in enumerate(elemente.polygone)],
         "brutto": None if b is None else {
             "A": b.A, "y_S": b.y_S, "z_S": b.z_S, "I_y": b.I_y, "I_z": b.I_z,
             "I_yz": b.I_yz},
-        "staebe": [{"element": f"Stab {i}", "im_beton": gut}
-                   for i, gut in enumerate(z.staebe, start=1)],
+        "staebe": [{"element": s["name"], "kennung": s["kennung"], "im_beton": gut}
+                   for s, gut in zip(elemente.staebe, z.staebe)],
         "linien": linien,
         "waende": [
-            {"element": f"Wand {i}", "gut": gut,
-             "laenge": math.hypot(w.bis[0] - w.von[0], w.bis[1] - w.von[1]),
-             "a_sw_s": (w.schnitte * math.pi * w.durchmesser ** 2 / 4.0 / w.teilung * 1000.0
-                        if w.durchmesser > 0 and w.teilung > 0 else 0.0)}
-            for i, (w, gut) in enumerate(zip(eintrag.schubwaende, z.waende), start=1)],
+            {"element": w["name"], "kennung": w["kennung"], "gut": gut,
+             "laenge": math.hypot(w["bis"][0] - w["von"][0], w["bis"][1] - w["von"][1]),
+             "a_sw_s": (w["schnitte"] * math.pi * w["durchmesser"] ** 2 / 4.0
+                        / w["teilung"] * 1000.0
+                        if w["durchmesser"] > 0 and w["teilung"] > 0 else 0.0)}
+            for w, gut in zip(elemente.waende, z.waende)],
         "zellen": [{"punkte": [list(p) for p in ecken], "flaeche": flaeche}
                    for ecken, flaeche in z.zellen],
     }

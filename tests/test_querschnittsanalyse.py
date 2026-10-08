@@ -7,7 +7,8 @@ Hier zuerst die Beschreibung -- was gespeichert wird und wie es sich liest.
 import unittest
 
 from opencivil.projekt import (
-    Projekt, ProjektFehler, QALastfallEintrag, QuerschnittsanalyseEintrag,
+    FlaecheEintrag, Projekt, ProjektFehler, QALastfallEintrag, QuerschnittsanalyseEintrag,
+    StabEintrag,
 )
 from opencivil.web import api
 
@@ -61,6 +62,24 @@ class TestBeschreibung(unittest.TestCase):
         roh["flaechen"][0]["punkte"][1] = [300.0]
         with self.assertRaisesRegex(ProjektFehler, "zwei Zahlen"):
             QuerschnittsanalyseEintrag.aus_dict(roh)
+
+    def test_namen_zaehlen_je_art(self):
+        """
+        Die Namen stehen in Berichten und Meldungen und werden an einer Stelle
+        vergeben: je Art ab 1, eine Aussparung heisst so statt «Polygon».
+        """
+        a = self.neu()
+        a.flaechen.append(FlaecheEintrag(punkte=[[100, 100], [200, 100], [200, 200]]))
+        a.staebe.append(StabEintrag(y=150, z=300))
+        e = a.elemente()
+        self.assertEqual([f["name"] for f in e.polygone], ["Polygon 1", "Aussparung 2"])
+        self.assertEqual([s["name"] for s in e.staebe], ["Stab 1"])
+        self.assertEqual([l["name"] for l in e.linien], ["Linie 1", "Linie 2"])
+        self.assertEqual(e.waende, [])
+        # Jedes Element trägt eine Kennung, über die die Oberfläche es findet.
+        for liste in (e.polygone, e.staebe, e.linien):
+            for element in liste:
+                self.assertTrue(element["kennung"])
 
 
 if __name__ == "__main__":
