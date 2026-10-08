@@ -44,6 +44,51 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-08 · Zahlenfelder: eine Breite für «99999.99»
+
+Wunsch: Zahlenfelder nicht zu gross. Wenn «99999.99» ganz sichtbar ist,
+ist das als Daumenregel genug gross.
+
+Vorher hatte jede Zeile ihre eigene Breite:
+* die Felder der Platte 112 px;
+* die Lastfälle 80 px;
+* die Lagen 64 px, die Bügel 56 px;
+* die Koordinaten rund 137 px;
+* die Lastfälle der Analyse 49 px — von «-1500» sah man die Hälfte.
+
+Jetzt gibt es **eine** Grösse, `--zahlbreite = 8ch + Pfeile + Rand`, am
+Rahmen um Feld und Pfeile. `ch` ist ein Zeichen der Schrift des Feldes. In
+JetBrains Mono ist jede Ziffer und der Punkt genau eines, also passen acht
+Zeichen genau hinein. Bei 14 px sind das 86 px, auf dem Telefon bei 16 px
+und ohne Pfeile 80 px.
+
+Was das in den Zeilen heisst:
+* **Die Raster nehmen die Breite des Feldes** (`auto`) statt einer festen
+  Zahl. Wo ein Kopf über den Spalten steht, nehmen sie `--zahlbreite`
+  selbst; die Zeile steht dann in der Schrift der Felder, klein gesetzt sind
+  erst die Beschriftungen. Sonst rechnete der Kopf in kleineren Zeichen und
+  stünde schief.
+* **Zahlen stehen überall rechtsbündig,** damit die Stellen untereinander
+  stehen.
+* **Die Lastfälle der Analyse** stehen in Zeilen zu drei Zahlen: N, M_y, M_z,
+  darunter V_y, V_z, T.
+* **Die Bügelzeile** hat drei Felder und den Umschalter. Oben steht der
+  Durchmesser, darunter die beiden Teilungen.
+* **Auf dem Telefon** steht der Umschalter «Teilung» unter den Feldern statt
+  über den Rand hinaus.
+* **Wo vier Felder in einer Karte stehen** (Knicken, Spannungsanalyse), werden
+  sie etwas schmaler. Die Werte darin sind kurz.
+
+Aufgeräumt nebenbei: Die einzeilige Form der Lastfälle für breite Tafeln ist
+weg. Seit die Panels fest 420 px breit sind, kam sie nie mehr zum Zug.
+
+Nachgeprüft im Browser:
+* Jedes sichtbare Zahlenfeld der Platte, der Materialien, der Analyse und der
+  Diagramme zeigt «99999.99» ganz, am Schreibtisch und auf dem Telefon.
+* Keine Zeile ragt über ihre Karte hinaus.
+
+---
+
 ## 2026-10-08 · Panels untereinander, fest breit, einklappbar
 
 Wünsche, für alle Apps (Material, Platte, Querschnittsanalyse, Gleichungsblatt):
