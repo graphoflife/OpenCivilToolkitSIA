@@ -103,7 +103,6 @@ export function ziele(a) {
   }
   a.zielcache = {
     version: a.version, knoten, strecken, mitten, schnitte,
-    extra: a.adapter.fangpunkte?.(a) || [],
   };
   return a.zielcache;
 }
@@ -140,6 +139,9 @@ export function fangen(a, bild, { frei = false, gerade = false } = {}) {
   }
 
   const z = ohneFang ? null : ziele(a);
+  // Was die App dazu fangen lässt (der Schwerpunkt), je Mal neu: es kommt
+  // oft erst nach der Zeichnung an, aus einer Antwort des Kerns.
+  const extra = ohneFang ? [] : a.adapter.fangpunkte?.(a) || [];
   const naechster = (liste, art) => {
     let bester = null;
     for (const x of liste) {
@@ -152,7 +154,7 @@ export function fangen(a, bild, { frei = false, gerade = false } = {}) {
   if (linie) {
     // Was in der Nähe gefangen wird, wandert auf die Bindung.
     const punkt = z && (naechster(z.knoten, 'knoten')
-      || naechster([...z.mitten, ...z.schnitte, ...z.extra], 'punkt'));
+      || naechster([...z.mitten, ...z.schnitte, ...extra], 'punkt'));
     if (punkt) return { p: aufGerade(punkt.p, linie.durch, linie.r), art: 'projiziert', von: punkt.p };
     const fuss = aufGerade(welt, linie.durch, linie.r);
     if (ohneFang) return { p: fuss, art: 'frei' };
@@ -168,7 +170,7 @@ export function fangen(a, bild, { frei = false, gerade = false } = {}) {
   const knoten = naechster(z.knoten, 'knoten');
   if (knoten) return { p: knoten.p, art: 'knoten', knoten: knoten.kennung };
   const punkt = naechster([...z.schnitte.map((x) => ({ ...x, art2: 'schnitt' })),
-    ...z.mitten.map((x) => ({ ...x, art2: 'mitte' })), ...z.extra.map((x) => ({ ...x, art2: 'punkt' }))], 'punkt');
+    ...z.mitten.map((x) => ({ ...x, art2: 'mitte' })), ...extra.map((x) => ({ ...x, art2: 'punkt' }))], 'punkt');
   if (punkt) return { p: punkt.p, art: punkt.art2 };
 
   // Das Lot vom Bezugspunkt auf eine Strecke -- nur, wo sein Fuss auf ihr liegt.

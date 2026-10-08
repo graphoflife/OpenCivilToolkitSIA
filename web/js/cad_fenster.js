@@ -71,7 +71,7 @@ let aktive = null;
 export function cadFenster(schluessel, adapterBauen) {
   let a = fenster.get(schluessel);
   if (a && !a.adapter.gilt()) {
-    if (aktive === a) aktive = null;
+    abbauen(a);
     a = null;
   }
   if (!a) {
@@ -83,8 +83,16 @@ export function cadFenster(schluessel, adapterBauen) {
 
 /** Für eine neu angelegte Zeichnung: nichts von einer früheren mit demselben Schlüssel. */
 export function cadVergessen(schluessel) {
-  if (aktive === fenster.get(schluessel)) aktive = null;
+  const a = fenster.get(schluessel);
+  if (a) abbauen(a);
   fenster.delete(schluessel);
+}
+
+/** Ein Fenster, das nicht mehr gebraucht wird: seine Hörer am Browserfenster und sein Beobachter gehen mit. */
+function abbauen(a) {
+  if (aktive === a) aktive = null;
+  a.abbruch.abort();
+  a.beobachter.disconnect();
 }
 
 function neu(adapter) {
@@ -934,16 +942,19 @@ function bauen(a) {
 
   bild.addEventListener('pointerdown', (e) => druecken(a, e));
   // Bewegen und Loslassen am Browserfenster: das Bild wird bei jedem Neubau
-  // der Tafel kurz ab- und wieder eingehängt, und ein Rahmen soll das überstehen.
+  // der Tafel kurz ab- und wieder eingehängt, und ein Rahmen soll das
+  // überstehen. Abgemeldet werden sie mit dem Fenster (`abbauen`).
+  a.abbruch = new AbortController();
+  const nurSolange = { signal: a.abbruch.signal };
   window.addEventListener('pointermove', (e) => {
     if (a.druck || a.kneifen || e.target === bild || bild.contains(e.target)) bewegen(a, e);
-  });
-  window.addEventListener('pointerup', (e) => loslassen(a, e));
+  }, nurSolange);
+  window.addEventListener('pointerup', (e) => loslassen(a, e), nurSolange);
   window.addEventListener('pointercancel', (e) => {
     a.finger.delete(e.pointerId);
     if (!a.finger.size) a.kneifen = null;
     if (a.druck?.id === e.pointerId) { a.druck = null; zeichnen(a); }
-  });
+  }, nurSolange);
   bild.addEventListener('pointerleave', () => {
     if (!a.druck) { a.zeiger = null; obenBald(a); }
   });
