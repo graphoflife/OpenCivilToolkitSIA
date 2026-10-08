@@ -89,7 +89,7 @@ export function zeichenbereich(analyse, uebersichtBauen) {
   return bereich;
 }
 
-export function fensterVon(kennung) {
+function fensterVon(kennung) {
   const a = cadFenster(`qa:${kennung}`, () => adapter(kennung));
   // Was die Analyse an der Ansicht braucht: Vorgaben, Antwort des Kerns, Namen.
   a.qa = a.adapter.qa;

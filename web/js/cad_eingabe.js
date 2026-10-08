@@ -206,7 +206,7 @@ export function fangen(a, bild, { frei = false, gerade = false } = {}) {
 }
 
 /** Die Strecke unter dem Zeiger -- für P und S, und um eine Kante zu treffen. */
-export function streckeAn(a, bild) {
+function streckeAn(a, bild) {
   const welt = nachWelt(a.v, bild);
   const weit = NAEHE / a.v.massstab;
   let bester = null;

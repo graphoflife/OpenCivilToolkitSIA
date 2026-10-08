@@ -125,7 +125,7 @@ export function rahmenWaehlen(a, start, ende, dazu) {
 }
 
 /** Wo die Auswahl im Bild liegt -- [x0, y0, x1, y1] oder null. */
-export function auswahlRahmen(a) {
+function auswahlRahmen(a) {
   if (!a.auswahl.size) return null;
   const z = a.adapter.zeichnung();
   const m = a.modell;
