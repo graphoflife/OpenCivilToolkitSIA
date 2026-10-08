@@ -154,6 +154,17 @@ Nachgespielt im Browser, mit Server und mit Pyodide:
 
 * **Der Baum las noch die alten Eckpunkte** und brach beim Start ab. Er
   misst jetzt die Ecken der Flächen über ihre Knoten.
+* **Das Panel der Zeichnung wächst mit** (Schritt 9): Es ist etwa halb so
+  breit wie der Platz rechts vom Baum und nie schmaler als 420 px. Bei
+  1280 px Fenster sind das 448 px, bei 2560 px 1088 px; alle anderen Panels
+  und die Zahlenfelder bleiben gleich. Die Höhe zieht man am Griff unter der
+  Zeichnung, und der Browser merkt sie sich.
+* **Statt der Palette weicht die Zeichnung aus:** «Alles zeigen» lässt die
+  Ecke des schwebenden Fensters frei. Daneben oder darüber, je nachdem, was
+  weniger Massstab kostet.
+  * Geplant war, dass das Fenster dem Zeiger ausweicht. Ein Fenster, das vor
+    der Maus flieht, lässt sich aber mit der Maus nicht mehr bedienen, und
+    während eines Befehls stehen darin die Eigenschaften des Neuen.
 * **Getippte Zahlen gingen verloren, wenn das schwebende Fenster zu war.**
   Die erste Ziffer klappt es jetzt auf.
 * **Die Seite war 1800 statt 768 px hoch.** Der unsichtbare MathML-Teil jeder

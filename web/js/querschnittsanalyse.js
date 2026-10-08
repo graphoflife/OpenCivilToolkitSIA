@@ -122,6 +122,7 @@ function querschnittGruppe(analyse) {
   const aendern = (veraenderer) => aendernAn(analyse.kennung, veraenderer);
   return panel({
     schluessel: 'analyse/Querschnitt', titel: 'Querschnitt', zusatz: 'y nach rechts, z nach oben, mm',
+    breit: true,
   }, [
     feld('Bezeichnung', el('input', {
       type: 'text', value: analyse.name,

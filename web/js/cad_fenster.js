@@ -48,6 +48,8 @@ const RASTER = [1, 5, 10, 25, 50, 100];
 const ZITTERN = 4;
 /** Wie viele Schritte «Rückgängig» zurückreicht. */
 const VERLAUF = 100;
+/** Unter diesem Schlüssel merkt sich der Browser die Höhe der Zeichnung. */
+const HOEHE = 'opencivil.cad.hoehe';
 
 const WERKZEUGE = [
   { name: 'polygon', zeichen: '▱', text: 'Polygon', taste: 'p', bauen: polygonBefehl },
@@ -288,8 +290,25 @@ function aktionen(a) {
 // Zeichnen
 // ===========================================================================
 
+/**
+ * Passt alles ins Bild -- und lässt dabei die Ecke frei, in der das
+ * schwebende Fenster steht: daneben oder darüber, je nachdem, was weniger
+ * Massstab kostet. So liegt nach «Alles zeigen» nichts darunter.
+ */
 function allesZeigen(a) {
-  einpassen(a.v, a.adapter.umriss(a));
+  const umriss = a.adapter.umriss(a);
+  const pal = a.teile.palette.knoten;
+  let frei = [0, 0];
+  if (pal.offsetWidth && a.v.breite) {
+    const breit = a.v.breite - pal.offsetLeft;
+    const hoch = a.v.hoehe - pal.offsetTop;
+    const massstab = (f) => {
+      einpassen(a.v, umriss, { frei: f });
+      return a.v.massstab;
+    };
+    frei = massstab([breit, 0]) >= massstab([0, hoch]) ? [breit, 0] : [0, hoch];
+  }
+  einpassen(a.v, umriss, { frei });
   zeichnen(a);
 }
 
@@ -862,6 +881,39 @@ function groesseMessen(a) {
   }
 }
 
+/**
+ * Die Höhe der Zeichnung am Griff darunter -- gemerkt im Browser, für jede
+ * Zeichnung dieselbe. Gesetzt als Variable, nicht als Höhe: im Vollbild
+ * füllt die Zeichnung den Platz, und eine feste Höhe stünde dem im Weg.
+ */
+function hoeheEinrichten(flaeche, griff) {
+  const setzen = (h) => flaeche.style.setProperty('--cad-hoehe', `${Math.round(Math.min(1600, Math.max(240, h)))}px`);
+  try {
+    const gemerkt = Number(localStorage.getItem(HOEHE));
+    if (gemerkt) setzen(gemerkt);
+  } catch {
+    // Privater Modus: dann gilt die Vorgabe.
+  }
+  griff.addEventListener('pointerdown', (start) => {
+    start.preventDefault();
+    griff.classList.add('ist-aktiv');
+    const anfang = flaeche.getBoundingClientRect().height;
+    const bewegen = (e) => setzen(anfang + e.clientY - start.clientY);
+    const los = () => {
+      griff.classList.remove('ist-aktiv');
+      window.removeEventListener('pointermove', bewegen);
+      window.removeEventListener('pointerup', los);
+      try {
+        localStorage.setItem(HOEHE, String(parseFloat(flaeche.style.getPropertyValue('--cad-hoehe'))));
+      } catch {
+        // Privater Modus: dann gilt sie bis zum Neuladen.
+      }
+    };
+    window.addEventListener('pointermove', bewegen);
+    window.addEventListener('pointerup', los);
+  });
+}
+
 function bauen(a) {
   const bild = svgEl('svg', { class: 'cad-bild', role: 'img', 'aria-label': 'Zeichnung' });
   const modell = svgEl('g');
@@ -875,7 +927,9 @@ function bauen(a) {
   };
   a.teile.palette = paletteBauen(flaeche);
   const knoepfe = el('div.cad-knoepfe', {}, leisteBauen(a));
-  a.knoten = el('div.cad', {}, [knoepfe, flaeche, el('div.cad-status', {}, [hinweis])]);
+  const hoehengriff = el('div.cad-hoehengriff', { title: 'Höhe der Zeichnung ziehen' });
+  a.knoten = el('div.cad', {}, [knoepfe, flaeche, hoehengriff, el('div.cad-status', {}, [hinweis])]);
+  hoeheEinrichten(flaeche, hoehengriff);
   a.knoten.addEventListener('pointerdown', () => { aktive = a; });
 
   bild.addEventListener('pointerdown', (e) => druecken(a, e));

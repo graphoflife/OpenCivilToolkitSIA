@@ -22,15 +22,18 @@ import { panelUmschalten, zustand } from './zustand.js';
  * steht rechts im Kopf: ein kurzer Hinweis oder ein Knopf.
  *
  * Die Breite bestimmt nicht das Panel, sondern der Stapel, in dem es steht
- * (`.panelstapel` im Stilblatt).
+ * (`.panelstapel` im Stilblatt). Nur ein Panel mit `breit` -- das der
+ * Zeichnung -- wächst mit dem Fenster.
  */
-export function panel({ schluessel, titel, zusatz }, inhalt) {
+export function panel({
+  schluessel, titel, zusatz, breit = false,
+}, inhalt) {
   const knopf = el('button.panel-knopf', {
     type: 'button',
     'aria-expanded': String(!zustand.zugeklappt.has(schluessel)),
   }, [el('span.pfeil', { text: '▼' }), titel]);
   const gruppe = el('div.feldgruppe', {
-    class: zustand.zugeklappt.has(schluessel) ? 'ist-zu' : '',
+    class: [zustand.zugeklappt.has(schluessel) ? 'ist-zu' : '', breit ? 'ist-breit' : ''].join(' '),
   }, [
     el('h3', {
       on: {

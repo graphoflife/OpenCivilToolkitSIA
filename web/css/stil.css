@@ -78,6 +78,9 @@
      ist alles darin auf diese Breite: lange Beschreibungen brechen um, die
      Lastfälle stehen in zwei Zeilen. */
   --panelbreite: 420px;
+  /* Das Panel der Zeichnung wächst als einziges mit: etwa die Hälfte des
+     Platzes rechts vom Baum, nie schmaler als die anderen. */
+  --cadbreite: max(var(--panelbreite), calc((100vw - var(--breite-links) - 5px) / 2 - 40px));
   /* Ein Zahlenfeld ist überall gleich breit: «99999.99» passt ganz hinein,
      samt den Pfeilen daneben -- mehr nicht. In `ch` gerechnet, also in
      Zeichen der Schrift des Feldes: in der gleich breiten Schrift ist jede
@@ -342,6 +345,10 @@ input.projektname:focus {
      Panels weg, sobald sie erscheint: die Spalte misst ihre Breite ohne sie. */
   scrollbar-gutter: stable;
 }
+/* Steht die Zeichnung im Stapel, ist er so breit wie sie; die anderen
+   Panels bleiben bei ihrer Breite. Schmaler als der Platz wird keines. */
+.panelstapel:has(> .feldgruppe.ist-breit) { grid-template-columns: minmax(0, var(--cadbreite)); }
+.panelstapel > .feldgruppe:not(.ist-breit) { width: 100%; max-width: var(--panelbreite); }
 .feldgruppe {
   margin-bottom: 16px;
   border-left: 2px solid var(--rand);
@@ -1402,7 +1409,19 @@ math-field.gl-feld::part(menu-toggle) { display: none; }
   .cad-knopf.ist-ansicht .cad-text { display: none; }
 }
 
-.cad-flaeche { position: relative; height: 440px; background: #fff; touch-action: none; overflow: hidden; }
+.cad-flaeche {
+  position: relative; height: var(--cad-hoehe, 440px);
+  background: #fff; touch-action: none; overflow: hidden;
+}
+/* Am unteren Rand der Zeichnung zieht man ihre Höhe; sie bleibt gemerkt. */
+.cad-hoehengriff {
+  height: 7px; cursor: ns-resize; touch-action: none;
+  background: var(--flaeche-2); border-top: 1px solid var(--rand);
+  background-image: linear-gradient(var(--rand-stark), var(--rand-stark));
+  background-size: 28px 2px; background-position: center; background-repeat: no-repeat;
+}
+.cad-hoehengriff:hover, .cad-hoehengriff.ist-aktiv { background-color: var(--blau-hell); }
+.zeichenbereich.ist-vollbild .cad-hoehengriff { display: none; }
 .cad-bild { display: block; width: 100%; height: 100%; cursor: default; }
 .cad-bild.ist-befehl { cursor: crosshair; }
 
