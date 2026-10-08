@@ -39,14 +39,27 @@ WURZEL = Path(__file__).resolve().parents[1]
 BREITE = 100
 
 
+#: Querschnittsanalysen im Format vor den Knoten, eingefroren am 2026-10-08.
+ALTFORMAT = Path(__file__).parent / "altformat" / "querschnittsanalysen.json"
+
+
 def projekte() -> dict:
     """
     Name auf Projekt -- die Projekte, deren Bericht festgehalten wird. Das
     zweite führt jeden Nachweis laut (:meth:`Projekt.jeder_nachweis`).
+
+    Das dritte ist eine Datei im alten Format: Querschnittsanalysen, deren
+    Polygone, Stäbe und Linien noch eigene Koordinaten trugen. Wer sie öffnet,
+    bekommt sie umgewandelt -- und muss denselben Bericht bekommen wie damals,
+    Zeichen für Zeichen.
     """
+    import json
+
     from opencivil.projekt import Projekt
 
-    return {"beispiel": Projekt.beispiel(), "voll": Projekt.jeder_nachweis()}
+    alt = json.loads(ALTFORMAT.read_text(encoding="utf-8"))["projekt"]
+    return {"beispiel": Projekt.beispiel(), "voll": Projekt.jeder_nachweis(),
+            "altformat": Projekt.aus_dict(alt)}
 
 
 def _loesung(projekt):

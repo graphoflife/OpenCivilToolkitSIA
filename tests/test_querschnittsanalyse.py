@@ -497,3 +497,52 @@ class TestDiagramme(unittest.TestCase):
             "projekt": Projekt.beispiel().als_dict(), "kennung": "a1",
             "schnitt": {"fest": "T", "wert": 0}})
         self.assertEqual(antwort.status, 400)
+
+
+# ===========================================================================
+# Dateien im alten Format
+# ===========================================================================
+
+import json
+from pathlib import Path
+
+ALTFORMAT = Path(__file__).parent / "altformat" / "querschnittsanalysen.json"
+
+
+class TestAltesFormat(unittest.TestCase):
+    """
+    Analysen, wie sie bis zu den Knoten gespeichert wurden: Polygone mit
+    Ecken, Stäbe und Linien mit eigenen Koordinaten -- der Unterzug aus dem
+    Beispiel, Kastenträger und Stütze aus dem Projekt mit jedem Nachweis.
+    Eingefroren am 2026-10-08, mit den Erfüllungsgraden und Querschnittswerten
+    von damals. Wer eine solche Datei öffnet, muss dieselben Zahlen bekommen;
+    den ganzen Bericht prüft der Schnappschuss «altformat».
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.datei = json.loads(ALTFORMAT.read_text(encoding="utf-8"))
+
+    def test_rechnet_wie_damals(self):
+        antwort = dienst.bearbeite("rechnen", {"projekt": self.datei["projekt"]})
+        self.assertEqual(antwort.status, 200)
+        gerechnet = {f'{u["raum"]} | {u["fall"]}': u["erfuellungsgrad"]
+                     for u in antwort.daten["urteile"]
+                     if u["raum"].startswith("querschnittsanalyse.")}
+        self.assertEqual(gerechnet, self.datei["erfuellungsgrade"])
+
+    def test_zeichnet_wie_damals(self):
+        p = Projekt.aus_dict(self.datei["projekt"])
+        for a in p.querschnittsanalysen:
+            g = api.geometrie(a, p)
+            with self.subTest(analyse=a.name):
+                self.assertTrue(g["gueltig"], g["meldungen"])
+                for groesse, wert in self.datei["brutto"][a.kennung].items():
+                    self.assertAlmostEqual(g["brutto"][groesse], wert, delta=1e-3)
+
+    def test_oeffnen_ist_beim_zweiten_mal_dasselbe(self):
+        """Was das Öffnen liefert, öffnet sich wieder zu genau demselben."""
+        einmal = dienst.bearbeite("pruefen", {"projekt": self.datei["projekt"]})
+        self.assertEqual(einmal.status, 200)
+        zweimal = dienst.bearbeite("pruefen", {"projekt": einmal.daten["projekt"]})
+        self.assertEqual(zweimal.daten["projekt"], einmal.daten["projekt"])

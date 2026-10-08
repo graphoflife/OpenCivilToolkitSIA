@@ -51,6 +51,7 @@
     "opencivil/projekt/eintraege.py": "38862e4eae86",
     "opencivil/projekt/gleichungen.py": "64df41c84f4d",
     "opencivil/projekt/lesen.py": "7dd44d9b86ea",
+    "opencivil/projekt/netz.py": "bd3079a74ae3",
     "opencivil/projekt/platte.py": "dece1fedf642",
     "opencivil/projekt/projekt.py": "b2e6fd989120",
     "opencivil/projekt/querschnittsanalyse.py": "e0b7e3ec201b",
