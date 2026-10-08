@@ -1491,6 +1491,37 @@ math-field.gl-feld::part(menu-toggle) { display: none; }
   background: var(--schlecht-hell); color: var(--schlecht);
 }
 
+/* Ein Fenster der App in der Zeichnung, oben links -- etwa die Vorlagen. */
+.cad-dialog {
+  position: absolute; left: 8px; top: 8px; z-index: 4; width: 300px;
+  max-width: calc(100% - 16px); max-height: calc(100% - 16px); overflow-y: auto;
+  display: flex; flex-direction: column; gap: 6px; padding: 6px 10px 10px;
+  border: 1px solid var(--rand-stark); border-radius: var(--radius);
+  background: var(--flaeche); box-shadow: 0 6px 18px rgba(20, 32, 48, .16);
+  font-size: 12px; user-select: auto;
+}
+.cad-dialog-kopf { display: flex; align-items: center; justify-content: space-between; font-weight: 700; }
+.cad-dialog-fuss { display: flex; justify-content: flex-end; gap: 6px; }
+.cad-vorlagen { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+.cad-vorlagenknopf {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 2px 3px;
+  border: 1px solid var(--rand); border-radius: 5px; background: var(--flaeche);
+  font: inherit; font-size: 10.5px; color: var(--schrift-matt); cursor: pointer;
+  white-space: nowrap; overflow: hidden;
+}
+.cad-vorlagenknopf:hover { border-color: var(--blau); background: var(--blau-hell); }
+.cad-vorlagenknopf.ist-an { border-color: var(--blau); background: var(--blau-hell); color: var(--blau-tief); font-weight: 700; }
+.cad-dialog .cad-zeile { grid-template-columns: 112px auto minmax(0, 1fr); }
+.cad-vorlagenskizze {
+  display: flex; justify-content: center; min-height: 140px;
+  border: 1px solid var(--rand); border-radius: 5px; background: #fff;
+}
+.cad-vorlagenskizze.ist-alt { opacity: .4; }
+.cad-skizze { display: block; max-width: 100%; height: auto; }
+.cad-skizze-wand { stroke: var(--beide); stroke-opacity: .3; }
+.cad-wahlen { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.cad-wahl { display: inline-flex; align-items: center; gap: 5px; }
+
 /* Die Leiste neben der Auswahl: nur, was für sie geht. */
 .cad-leiste {
   position: absolute; z-index: 2; display: flex; flex-wrap: wrap; gap: 2px; padding: 3px;

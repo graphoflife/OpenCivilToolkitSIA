@@ -27,6 +27,7 @@ import {
 } from './cad_ansicht.js';
 import { cadBereich, cadFenster, cadVergessen, cadWaehlen } from './cad_fenster.js';
 import { abstand } from './cad_modell.js';
+import { vorlageOeffnen } from './qa_vorlagen.js';
 import {
   auswahl, el, melden, svgEl, zahlfeld,
 } from './dom.js';
@@ -184,6 +185,7 @@ function adapter(kennung) {
     eigenschaften,
     neuEigenschaften,
     aktionen,
+    vorlageOeffnen,
   };
 }
 

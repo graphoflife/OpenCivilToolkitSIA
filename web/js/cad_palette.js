@@ -88,6 +88,10 @@ export function paletteBauen(flaeche) {
   return {
     knoten,
     halten,
+    /** Auf, wenn es zu ist -- etwa, weil jemand Zahlen tippt, die hineingehören. */
+    aufklappen() {
+      if (lage.zu) zuklappen(false);
+    },
     /** Titel und Inhalt setzen -- Felder mit Fokus bleiben, wenn `schluessel` gleich ist. */
     setzen(text, inhalt, schluessel = null) {
       titel.textContent = text;

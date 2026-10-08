@@ -50,6 +50,7 @@ from opencivil.projekt.querschnittsanalyse import (
 )
 from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.geometrie import Linienart
+from opencivil.querschnitt.vorlagen import VORLAGEN
 from opencivil.projekt.gleichungen import GleichungszeileEintrag
 from opencivil.web import diagrammdaten
 
@@ -159,6 +160,15 @@ def katalog() -> dict:
                 {"wert": BETONGESETZE[1], "beschriftung": "Spannungsblock 0.85·x"},
             ],
             "schnitte": list(SCHNITTE),
+            # Die Vorlagen mit ihren Massen -- und je eine Skizze nach
+            # Vorgabe fuer das Bildchen auf ihrem Knopf.
+            "vorlagen": [
+                {"schluessel": v.schluessel, "name": v.name, "hat_waende": v.hat_waende,
+                 "masse": [{"schluessel": m.schluessel, "beschriftung": m.beschriftung,
+                            "vorgabe": m.vorgabe} for m in v.masse],
+                 "skizze": v.bauen().als_dict()}
+                for v in VORLAGEN
+            ],
         },
         # `fliessnachweis` sagt, ob diese Anforderung den Nachweis gegen
         # das Fliessen unter haeufiger Einwirkung ueberhaupt verlangt -- bei

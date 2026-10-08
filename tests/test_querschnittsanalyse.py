@@ -610,3 +610,103 @@ class TestAltesFormat(unittest.TestCase):
         self.assertEqual(einmal.status, 200)
         zweimal = dienst.bearbeite("pruefen", {"projekt": einmal.daten["projekt"]})
         self.assertEqual(zweimal.daten["projekt"], einmal.daten["projekt"])
+
+
+# ===========================================================================
+# Vorlagen
+# ===========================================================================
+
+from opencivil.querschnitt import vorlagen
+
+
+class TestVorlagen(unittest.TestCase):
+    """
+    Die Vorlagen stehen im Kern und nur dort. Jede ist nach Vorgabe gültig und
+    hat die Fläche, die man von Hand nachrechnet; eingesetzt kommt sie dazu.
+    """
+
+    #: Bruttofläche nach Vorgabe, von Hand: Rechteck 300·600; T-Balken
+    #: 1200·200 + 300·500; Hohlkasten 1200·800 − 800·400; Kreis als
+    #: 48-Eck mit r = 250: 24 · r² · sin(7.5°). Die Ecken des Kreises sind auf
+    #: Tausendstel gerundet -- das ändert seine Fläche um 0.25 mm².
+    FLAECHEN = {
+        "rechteck": 300 * 600,
+        "tbalken": 1200 * 200 + 300 * 500,
+        "hohlkasten": 1200 * 800 - 800 * 400,
+        "kreis": 24 * 250 ** 2 * math.sin(math.radians(7.5)),
+    }
+
+    def eingesetzt(self, schluessel, **wahl):
+        p = projekt()
+        a = p.querschnittsanalysen[0]
+        for liste in ("knoten", "flaechen", "staebe", "stablinien", "schubwaende"):
+            setattr(a, liste, [])
+        neu = a.vorlage_einsetzen(schluessel, beton="b1", stahl="s1", **wahl)
+        return p, a, neu
+
+    def test_jede_ist_gueltig_und_hat_ihre_flaeche(self):
+        self.assertEqual({v.schluessel for v in vorlagen.VORLAGEN}, set(self.FLAECHEN))
+        for v in vorlagen.VORLAGEN:
+            with self.subTest(vorlage=v.name):
+                p, a, _ = self.eingesetzt(v.schluessel)
+                g = api.geometrie(a, p)
+                self.assertTrue(g["gueltig"], g["meldungen"])
+                self.assertAlmostEqual(g["brutto"]["A"], self.FLAECHEN[v.schluessel], delta=0.5)
+
+    def test_neu_ist_das_rechteck_ohne_schubwand(self):
+        """Die frische Analyse wie vor den Vorlagen: dieselben Knoten, Linien und Werte."""
+        a = QuerschnittsanalyseEintrag.neu("a1", "Balken", "b1", "s1")
+        self.assertEqual([(k.kennung, k.y, k.z) for k in a.knoten], [
+            ("K1", 0.0, 0.0), ("K2", 300.0, 0.0), ("K3", 300.0, 600.0), ("K4", 0.0, 600.0),
+            ("K5", 50.0, 50.0), ("K6", 250.0, 50.0), ("K7", 50.0, 550.0), ("K8", 250.0, 550.0)])
+        self.assertEqual([(f.kennung, f.knoten, f.material) for f in a.flaechen],
+                         [("F1", ["K1", "K2", "K3", "K4"], "b1")])
+        self.assertEqual([(l.von, l.bis, l.art, l.anzahl, l.durchmesser, l.stahl)
+                          for l in a.stablinien],
+                         [("K5", "K6", "anzahl", 3.0, 20.0, "s1"),
+                          ("K7", "K8", "anzahl", 2.0, 12.0, "s1")])
+        self.assertEqual(a.schubwaende, [])
+
+    def test_kommt_dazu_und_teilt_knoten(self):
+        """Ein zweites Rechteck rechts daneben hängt an den zwei gemeinsamen Ecken."""
+        a = QuerschnittsanalyseEintrag.neu("a1", "Balken", "b1", "s1")
+        neu = a.vorlage_einsetzen("rechteck", beton="b1", stahl="s1", bewehrung=False,
+                                  schubwaende=False, ursprung=(300.0, 0.0))
+        self.assertEqual(neu, ["F2"])
+        self.assertEqual(len(a.flaechen), 2)
+        self.assertEqual(a.flaechen[1].knoten[0], "K2")
+        self.assertEqual(a.flaechen[1].knoten[3], "K3")
+
+    def test_haken_und_masse(self):
+        _, a, neu = self.eingesetzt("hohlkasten", masse={"t": 150.0}, bewehrung=False)
+        self.assertEqual(len(a.stablinien), 0)
+        self.assertEqual([w.dicke for w in a.schubwaende], [150.0] * 4)
+        self.assertEqual([f.material for f in a.flaechen], ["b1", ""])
+        self.assertEqual(len(neu), 6)
+        # Der Kreis hat keine Wände, auch wenn man sie will.
+        _, a, _ = self.eingesetzt("kreis", schubwaende=True)
+        self.assertEqual((len(a.staebe), a.schubwaende), (8, []))
+
+    def test_masse_die_nicht_passen(self):
+        with self.assertRaisesRegex(ValueError, "Steg"):
+            vorlagen.vorlage("tbalken").bauen({"b": 200.0, "b_w": 300.0})
+        with self.assertRaisesRegex(ValueError, "grösser als null"):
+            vorlagen.vorlage("rechteck").bauen({"h": 0.0})
+        d = dienst.bearbeite("vorlage", {"wahl": {"art": "hohlkasten", "masse": {"t": 700}}}).daten
+        self.assertIn("Wände", d["fehler"])
+        self.assertIsNone(d["teile"])
+        self.assertEqual(dienst.bearbeite("vorlage", {"wahl": {"art": "dreieck"}}).status, 400)
+
+    def test_einsetzen_ueber_den_dienst(self):
+        p = projekt()
+        d = dienst.bearbeite("vorlage_einsetzen", {
+            "projekt": p.als_dict(), "kennung": "a1", "beton": "b1", "stahl": "s1",
+            "wahl": {"art": "kreis", "masse": {"D": 400}}, "ursprung": [400, 0]}).daten
+        self.assertEqual(d["neu"][0], "F2")
+        self.assertEqual(len(d["neu"]), 9)
+        self.assertEqual(len(d["elemente"]["flaechen"]), 2)
+        # Der Katalog hat je Vorlage ihre Masse und eine Skizze.
+        katalog = api.katalog()["querschnittsanalyse"]["vorlagen"]
+        self.assertEqual([v["schluessel"] for v in katalog],
+                         ["rechteck", "tbalken", "hohlkasten", "kreis"])
+        self.assertEqual(len(katalog[0]["skizze"]["masslinien"]), 2)

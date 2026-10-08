@@ -112,6 +112,7 @@ Fertig und getestet (796 Tests):
 | `querschnitt/interaktion` | der Dehnungsfächer für jede Form, schiefe Biegung, Widerstand in Momentenrichtung |
 | `querschnitt/schubwaende` | Querkraft und Torsion auf die Wände: Federn, Zellen, Bredt, Fachwerk, Längszugkraft |
 | `querschnitt/analyse` | die Querschnittsanalyse als Bauteil: Zeichnung, Werte, Werkstoffwahl |
+| `querschnitt/vorlagen` | Rechteck, T-Balken, Hohlkasten, Kreis zum Anfangen |
 | `nachweis/linie` | Geometrie einer M-N-Linie, `Achse` als Wert |
 | `nachweis/handrechnung` | die von Hand nachrechenbaren Eckpunkte |
 | `nachweis/dehnungsfaecher` | die präzise Linie -- nur für das Diagramm |
@@ -131,7 +132,7 @@ Fertig und getestet (796 Tests):
 | `web/js/kern.js`, `kern_arbeiter.js` | Pyodide-Hülle darum, in einem eigenen Faden, für die Seite ohne Server |
 | `web/js/` | Oberfläche in reinem JavaScript, ohne Bauschritt |
 | `web/js/cad_*.js` | das Zeichenfenster, allgemein: Ansicht, Knoten und Elemente, Punkteingabe, Befehle, Auswahl, schwebendes Fenster |
-| `web/js/qa_zeichnung.js`, `qa_uebersicht.js` | was es in der Querschnittsanalyse zeichnet, und die Liste darunter |
+| `web/js/qa_zeichnung.js`, `qa_uebersicht.js`, `qa_vorlagen.js` | was es in der Querschnittsanalyse zeichnet, die Liste darunter und die Vorlagen |
 | `web/js/querschnittsanalyse.js`, `qa_diagramme.js` | ihre übrige Eingabe und ihre Diagramme |
 
 Wie das zusammenhängt und warum es so gebaut ist, steht in
@@ -160,7 +161,9 @@ Gewählt wird per Klick oder Rahmen; verschoben und kopiert mit Basispunkt
 und Ziel. Jeder Punkt fängt an Knoten, Mitten, Schnittpunkten und am Raster.
 Genau setzen lässt er sich mit R (Bezugspunkt), Y/Z (Achse), P/S (parallel,
 senkrecht) und M (Mitte), die Zahlen getippt. Alle Eigenschaften stehen im
-schwebenden Fenster in der Zeichnung. Rückgängig mit Strg+Z, Vollbild.
+schwebenden Fenster in der Zeichnung. Mit T kommt eine Vorlage dazu --
+Rechteck, T-Balken, Hohlkasten oder Kreis, die Skizze ändert sich beim
+Tippen der Masse. Rückgängig mit Strg+Z, Vollbild.
 Darunter eine Liste: Meldungen, Querschnittswerte, je Element eine Zeile.
 Was die Rechnung braucht -- die Stäbe einer Linie samt tatsächlicher
 Teilung, Schwerpunkt, Zellen, Meldungen am Element -- kommt vom Kern. Darunter

@@ -111,6 +111,7 @@ function neu(adapter) {
     knoten: null,
     teile: null,
     bildUhr: null,
+    dialog: null,        // ein Fenster der App in der Zeichnung, etwa die Vorlagen: {schliessen}
   };
   a.aendern = (veraenderer, optionen) => aendern(a, veraenderer, optionen);
   a.ende = () => befehlEnde(a);
@@ -203,6 +204,7 @@ function loeschen(a) {
 // ===========================================================================
 
 function starten(a, befehl) {
+  a.dialog?.schliessen();
   a.befehl = befehl;
   eingabeLeeren(a.eingabe);
   a.eingabe.bezug = null;
@@ -735,6 +737,11 @@ function rad(a, e) {
 function taste(e) {
   const a = aktive;
   if (!a || !a.knoten?.isConnected) return;
+  if (e.key === 'Escape' && a.dialog) {
+    e.preventDefault();
+    a.dialog.schliessen();
+    return;
+  }
   const imFeld = e.target.closest?.('input, select, textarea, [contenteditable]');
   const inPalette = e.target.closest?.('.cad-palette');
   if (imFeld && !inPalette) return;
@@ -774,8 +781,10 @@ function taste(e) {
       zeichnen(a);
       return;
     }
-    // Ziffern gehen ins erste Feld -- das Zeichen selbst landet dort.
+    // Ziffern gehen ins erste Feld -- das Zeichen selbst landet dort. Ist
+    // das schwebende Fenster zu, geht es dafür auf.
     if (/^[0-9.,-]$/.test(e.key)) {
+      a.teile.palette.aufklappen();
       a.teile.palette.koerper.querySelector('input[data-feld="0"]')?.focus();
       return;
     }

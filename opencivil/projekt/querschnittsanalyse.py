@@ -44,6 +44,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.platte import ALPHA_MAX, ALPHA_MIN, K_C
+from opencivil.querschnitt import vorlagen
 from opencivil.projekt.eintraege import Beschreibung, eindeutig
 from opencivil.projekt.lesen import ProjektFehler, pflichtfeld, zahl
 from opencivil.projekt.netz import Netz, naechste_kennung
@@ -555,6 +556,40 @@ class QuerschnittsanalyseEintrag(Beschreibung):
         """Wo ein Knoten liegt, in mm -- ``None``, wenn es ihn nicht gibt."""
         return self.netz().lage(kennung)
 
+    def vorlage_einsetzen(self, schluessel: str, *, beton: str, stahl: str,
+                          masse: Optional[Mapping[str, float]] = None,
+                          randabstand: float = 50.0, bewehrung: bool = True,
+                          schubwaende: bool = True,
+                          ursprung: Tuple[float, float] = (0.0, 0.0)) -> List[str]:
+        """
+        Setzt eine Vorlage ein (:mod:`opencivil.querschnitt.vorlagen`) -- dazu,
+        nicht anstatt: was schon gezeichnet ist, bleibt, und wo ein Punkt der
+        Vorlage genau auf einem Knoten liegt, haengt sie an ihm. ``ursprung``
+        ist, wohin ihre Ecke unten links kommt; die Lagen auf einen
+        Millionstel Millimeter wie im Zeichenfenster, damit die Summe keinen
+        Rundungsrest behaelt. Gibt die Kennungen der neuen Elemente zurueck.
+        Passen die Masse nicht zueinander, ein ``ValueError`` mit dem Grund.
+        """
+        teile = vorlagen.vorlage(schluessel).bauen(masse, randabstand, bewehrung, schubwaende)
+        dy, dz = float(ursprung[0]), float(ursprung[1])
+
+        def an(p: Sequence[float]) -> List[float]:
+            return [round(p[0] + dy, 6), round(p[1] + dz, 6)]
+
+        neu: List[str] = []
+        for f in teile.polygone:
+            neu.append(self.polygon([an(p) for p in f["punkte"]],
+                                    material="" if f["aussparung"] else beton).kennung)
+        for s in teile.staebe:
+            neu.append(self.stab(*an(s["lage"]), durchmesser=s["durchmesser"], stahl=stahl).kennung)
+        for l in teile.stablinien:
+            felder = {k: v for k, v in l.items() if k not in ("von", "bis")}
+            neu.append(self.stablinie(an(l["von"]), an(l["bis"]), stahl=stahl, **felder).kennung)
+        for w in teile.schubwaende:
+            neu.append(self.schubwand(an(w["von"]), an(w["bis"]), dicke=w["dicke"],
+                                      stahl=stahl).kennung)
+        return neu
+
     def pruefen(self) -> None:
         """Was sich schon an der Beschreibung pruefen laesst: eindeutige Lastfallnamen."""
         eindeutig(self.lastfaelle, self.name, "Lastfall", bauteil="Querschnitt")
@@ -576,11 +611,7 @@ class QuerschnittsanalyseEintrag(Beschreibung):
         """
         a = cls(kennung=kennung, name=name,
                 lastfaelle=[QALastfallEintrag(name="Tragsicherheit 1", M_y_Ed=100.0)])
-        a.polygon([[0.0, 0.0], [300.0, 0.0], [300.0, 600.0], [0.0, 600.0]], material=beton)
-        a.stablinie([50.0, 50.0], [250.0, 50.0], art=Linienart.ANZAHL.value,
-                    durchmesser=20.0, anzahl=3.0, stahl=stahl)
-        a.stablinie([50.0, 550.0], [250.0, 550.0], art=Linienart.ANZAHL.value,
-                    durchmesser=12.0, anzahl=2.0, stahl=stahl)
+        a.vorlage_einsetzen("rechteck", beton=beton, stahl=stahl, schubwaende=False)
         return a
 
     @classmethod

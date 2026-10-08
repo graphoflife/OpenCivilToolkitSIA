@@ -126,6 +126,17 @@ So bedient es sich:
     die Stäbe bleiben, wo sie sind.
 * **Das Lot ⊥** (Schritt 6) fängt den Fusspunkt vom Bezugspunkt auf eine
   Linie, wenn er auf ihr liegt.
+* **Vorlagen im Kern** (Schritt 8, `opencivil/querschnitt/vorlagen.py`):
+  Rechteck, T-Balken, Hohlkasten, Kreis. T öffnet ein Fenster mit kleinen
+  Bildern, den Massen als Felder und einer Skizze mit Masslinien, die sich
+  beim Tippen ändert (Anfrage `vorlage`, unter Pyodide rund 1 ms).
+  «Einsetzen» fragt nach dem Punkt für die Ecke unten links; Enter ohne
+  Zahlen heisst Ursprung. Eingesetzt wird mit dem Baukasten des Kerns
+  (`vorlage_einsetzen`), und die Vorlage kommt **dazu** -- vorher ersetzte
+  sie die ganze Zeichnung. Wo sie genau auf einen Knoten trifft, hängt sie
+  an ihm. `neu()` baut die frische Analyse aus dem Rechteck ohne Schubwand:
+  dieselben Knoten, Linien und Zahlen wie vorher. Vorher stand das Rechteck
+  zweimal da, in Python und in JS.
 * **Verschmolzen wird nur, was bewegt wurde:** Landet ein verschobener Knoten
   genau auf einem anderen, wird er eins mit ihm. Zwei gelöste Knoten anderswo
   bleiben zwei.
@@ -143,6 +154,8 @@ Nachgespielt im Browser, mit Server und mit Pyodide:
 
 * **Der Baum las noch die alten Eckpunkte** und brach beim Start ab. Er
   misst jetzt die Ecken der Flächen über ihre Knoten.
+* **Getippte Zahlen gingen verloren, wenn das schwebende Fenster zu war.**
+  Die erste Ziffer klappt es jetzt auf.
 * **Die Seite war 1800 statt 768 px hoch.** Der unsichtbare MathML-Teil jeder
   Formel ist bei KaTeX absolut gesetzt und lag ohne Bezug auf der Seite
   statt in der Tafel. Bekam ein Feld weit unten den Fokus, rollte die ganze
