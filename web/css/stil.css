@@ -74,7 +74,10 @@
   --schatten:     0 1px 2px rgba(16,24,40,.06), 0 2px 6px rgba(16,24,40,.08);
 
   --breite-links: 300px;
-  --breite-mitte: 440px;
+  /* So breit sind die Panels der Eingaben, in jeder App gleich. Ausgelegt
+     ist alles darin auf diese Breite: lange Beschreibungen brechen um, die
+     Lastfälle stehen in zwei Zeilen. */
+  --panelbreite: 420px;
 
   /* Die Kopfleiste steht fest; das Raster darunter zieht sie ab. Als
      Variable, weil sie auf schmalen Geraeten umbricht und dann hoeher ist --
@@ -184,9 +187,12 @@ input.projektname:focus {
 
 /* -------------------------------------------------------------- Raster -- */
 
+/* Die mittlere Spalte ist so breit wie ihre Panels (`auto`), die rechte
+   bekommt den Rest. Ein breiteres Fenster gibt also der Berechnung Platz,
+   nicht den Eingaben. */
 .raster {
   display: grid;
-  grid-template-columns: var(--breite-links) 5px var(--breite-mitte) 5px 1fr;
+  grid-template-columns: var(--breite-links) 5px auto 1fr;
   height: calc(100vh - var(--kopfhoehe));
   /* dvh statt vh: auf dem Telefon zaehlt vh die Adressleiste mit, die beim
      Scrollen verschwindet -- die Tafel waere unten abgeschnitten und der
@@ -216,6 +222,9 @@ input.projektname:focus {
   background: linear-gradient(var(--flaeche-2), var(--flaeche));
   flex: none;
 }
+/* Der Kopf der Eingaben bricht um, statt mit einem langen Namen die ganze
+   Spalte breiter zu machen. */
+.tafel-mitte .tafel-kopf { contain: inline-size; }
 .tafel-links  .tafel-kopf { border-top-color: var(--beton); }
 .tafel-mitte  .tafel-kopf { border-top-color: var(--stahl); }
 .tafel-rechts .tafel-kopf { border-top-color: var(--blau); }
@@ -311,10 +320,24 @@ input.projektname:focus {
    dann gilt sie fuer jedes Kapitel, ohne dass sieben Aufrufstellen davon
    wissen muessen. Die Ueberschrift holt sich die Einrueckung mit einem
    negativen Rand zurueck und steht buendig auf der Linie. */
+/* Die Panels stehen untereinander und sind alle gleich breit: so breit wie
+   `--panelbreite`, nicht wie die Tafel. Schmaler werden sie nur, wo das
+   Fenster selbst nicht reicht (Telefon).
+   Jedes Panel ist selbst der Bezug für die Umbrüche darin
+   (`container-type`). Sie richten sich damit nach seiner festen Breite --
+   nach der Tafel hätte ein breiteres Fenster sie wieder umgestellt. */
+.panelstapel {
+  display: grid; grid-template-columns: minmax(0, var(--panelbreite));
+  justify-content: start; align-content: start;
+  /* Die Rollleiste bekommt ihren Platz fest dazu. Sonst nähme sie ihn den
+     Panels weg, sobald sie erscheint: die Spalte misst ihre Breite ohne sie. */
+  scrollbar-gutter: stable;
+}
 .feldgruppe {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   border-left: 2px solid var(--rand);
   padding-left: 13px;
+  container-type: inline-size;
 }
 .feldgruppe > h3 {
   font-size: 12px; text-transform: uppercase; letter-spacing: .5px;
@@ -322,11 +345,27 @@ input.projektname:focus {
   padding: 6px 9px; border-radius: 5px; background: var(--flaeche-2);
   border-left: 3px solid var(--blau);
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  cursor: pointer; user-select: none;
 }
+.feldgruppe > h3:hover { background: var(--blau-hell); }
 .feldgruppe > h3 > span:last-child {
   font-weight: 400; text-transform: none; letter-spacing: 0;
   color: var(--schrift-zart);
 }
+/* Ein Klick auf den Kopf klappt das Panel zu und auf. Pfeil und Titel
+   sind ein Knopf, damit auch die Tastatur ihn erreicht; die Maus darf den
+   ganzen Kopf treffen. Derselbe Pfeil wie im Projektbaum. */
+.panel-knopf {
+  display: flex; align-items: center; gap: 7px;
+  padding: 0; border: 0; background: none; cursor: pointer;
+  font: inherit; color: inherit; text-transform: inherit; letter-spacing: inherit;
+}
+.panel-knopf:focus-visible { outline: 2px solid var(--blau); outline-offset: 3px; border-radius: 3px; }
+.panel-knopf .pfeil { font-size: 9px; width: 10px; color: var(--schrift-zart); transition: transform .12s; }
+.feldgruppe.ist-zu .panel-knopf .pfeil { transform: rotate(-90deg); }
+.feldgruppe.ist-zu > :not(h3) { display: none; }
+.feldgruppe.ist-zu > h3 { margin-bottom: 0; }
+.feldgruppe.ist-zu { margin-bottom: 8px; }
 
 .feld { display: grid; grid-template-columns: minmax(0, 1fr) 112px 48px; gap: 6px; align-items: center; margin-bottom: 5px; }
 .feld > label { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -374,7 +413,9 @@ input[readonly], input:disabled, select:disabled {
 }
 .kennwert:hover { background: var(--flaeche-2); }
 .kennwert.ist-ueberschrieben { background: var(--warn-hell); box-shadow: inset 3px 0 0 var(--warn); }
-.kennwert .bezeichnung { font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Die Beschreibung bricht um, statt abgeschnitten zu werden: das Panel ist
+   so breit wie alle anderen, nicht wie die längste Beschreibung. */
+.kennwert .bezeichnung { font-size: 12.5px; min-width: 0; overflow-wrap: break-word; }
 .kennwert .bezeichnung small { color: var(--schrift-zart); }
 .kennwert .einheit { font-size: 11.5px; color: var(--schrift-zart); }
 
@@ -536,15 +577,6 @@ input[readonly], input:disabled, select:disabled {
   border-left: 4px solid var(--blau);
 }
 .ueberdeckung .feld { margin-bottom: 0; }
-
-/* Platte und Bewehrung nebeneinander, sobald die Tafel breit genug ist. */
-.zweispaltig { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px;
-               align-items: start; }
-/* Zwei Spalten erst, wenn die *Tafel* sie trägt -- nicht, wenn das Fenster
-   breit ist. Eine Spalte braucht rund 340 px, dazu der Zwischenraum. */
-@container (min-width: 740px) {
-  .zweispaltig { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-}
 
 /* Ein Unterkapitel ist eine Karte wie eine Bewehrungslage -- gerahmt, mit
    farbiger Kante links. Vorher war es ein blosser Strich, und bei fuenf
@@ -1489,9 +1521,10 @@ math-field.gl-feld::part(menu-toggle) { display: none; }
   .zeichenbereich.ist-vollbild .zf-seite { max-height: 38vh; }
 }
 /* Ein Container ist zugleich der Bezug für `position: fixed` -- das Vollbild
-   läge sonst in der Tafel statt über dem ganzen Fenster. Solange es offen
-   ist, ist die Tafel darum kein Container. */
-.tafel-inhalt:has(.zeichenbereich.ist-vollbild) { container-type: normal; }
+   läge sonst in der Tafel oder im Panel statt über dem ganzen Fenster.
+   Solange es offen ist, sind beide darum keine Container. */
+.tafel-inhalt:has(.zeichenbereich.ist-vollbild),
+.feldgruppe:has(.zeichenbereich.ist-vollbild) { container-type: normal; }
 
 /* ------------------------------------------------------- Koordinaten -- */
 

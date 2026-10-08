@@ -17,7 +17,7 @@
 
 import { api } from './api.js';
 import {
-  erklaerung, feld, hakenSchalter, richtungsWahl,
+  erklaerung, feld, hakenSchalter, panel, richtungsWahl,
 } from './bausteine.js';
 import { auswahl, el, melden, zahlfeld } from './dom.js';
 import { xLagen } from './lagen.js';
@@ -132,11 +132,10 @@ function anfuegenKnopf(text, tun) {
  * Unterschied zu verwischen, um den es dabei geht.
  */
 export function analysenBlock(querschnitt) {
-  return el('div.feldgruppe', {}, [
-    el('h3', {}, [el('span', { text: 'Weitere Analysen' }),
-      el('span', { text: `kein Nachweis · ${jeB(querschnitt)}` })]),
-    spannungsBlock(querschnitt),
-  ]);
+  return panel({
+    schluessel: 'platte/Weitere Analysen', titel: 'Weitere Analysen',
+    zusatz: `kein Nachweis · ${jeB(querschnitt)}`,
+  }, [spannungsBlock(querschnitt)]);
 }
 
 /**
@@ -152,9 +151,9 @@ export function nachweiseBlock(querschnitt) {
   const aendernAn = (veraenderer) => projektAendern((p) => {
     veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
   });
-  return el('div.feldgruppe', {}, [
-    el('h3', {}, [el('span', { text: 'Nachweise' }),
-      el('span', { text: `${jeB(querschnitt)} · V je m` })]),
+  return panel({
+    schluessel: 'platte/Nachweise', titel: 'Nachweise', zusatz: `${jeB(querschnitt)} · V je m`,
+  }, [
     el('div.unterkapitel', {}, [
       el('div.unterkapitel-kopf', {}, [
         el('span', { text: 'Tragsicherheitsnachweise' }),

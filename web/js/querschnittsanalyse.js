@@ -18,7 +18,7 @@
  * Lastfällen zeigt es.
  */
 
-import { erklaerung, feld, hakenSchalter } from './bausteine.js';
+import { erklaerung, feld, hakenSchalter, panel } from './bausteine.js';
 import { auswahl, el, svgEl, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
 import { koordinatenfenster } from './koordinaten.js';
@@ -120,9 +120,9 @@ export function benutzteMaterialien(analyse) {
 
 function querschnittGruppe(analyse) {
   const aendern = (veraenderer) => aendernAn(analyse.kennung, veraenderer);
-  return el('div.feldgruppe', {}, [
-    el('h3', {}, [el('span', { text: 'Querschnitt' }),
-      el('span', { text: 'y nach rechts, z nach oben, mm' })]),
+  return panel({
+    schluessel: 'analyse/Querschnitt', titel: 'Querschnitt', zusatz: 'y nach rechts, z nach oben, mm',
+  }, [
     feld('Bezeichnung', el('input', {
       type: 'text', value: analyse.name,
       on: { change: (e) => aendern((a) => { a.name = e.target.value; }) },
@@ -188,9 +188,9 @@ function werkstoffGruppe(analyse) {
     ]);
   };
 
-  return el('div.feldgruppe', {}, [
-    el('h3', {}, [el('span', { text: 'Werkstoffe' }),
-      el('span', { text: 'je Material im Querschnitt' })]),
+  return panel({
+    schluessel: 'analyse/Werkstoffe', titel: 'Werkstoffe', zusatz: 'je Material im Querschnitt',
+  }, [
     el('div.unterkapitel', {}, kennungen.length
       ? kennungen.map(zeile)
       : [el('div.leer', { text: 'Noch kein Material im Querschnitt.' })]),
@@ -203,9 +203,9 @@ function werkstoffGruppe(analyse) {
 
 function schubwandGruppe(analyse) {
   const aendern = (veraenderer) => aendernAn(analyse.kennung, veraenderer);
-  return el('div.feldgruppe', {}, [
-    el('h3', {}, [el('span', { text: 'Schubwände' }),
-      el('span', { text: 'Querkraft und Torsion' })]),
+  return panel({
+    schluessel: 'analyse/Schubwände', titel: 'Schubwände', zusatz: 'Querkraft und Torsion',
+  }, [
     el('div.unterkapitel', {}, [
       el('div.unterkapitel-kopf', {}, [el('span', { text: 'Fachwerk je Wand' }),
         hilfe('schubwaende')]),
@@ -249,9 +249,9 @@ function nachweisGruppe(analyse) {
   const aendern = (veraenderer) => aendernAn(analyse.kennung, veraenderer);
   const faelle = analyse.lastfaelle;
 
-  return el('div.feldgruppe', {}, [
-    el('h3', {}, [el('span', { text: 'Nachweise' }),
-      el('span', { text: 'N, V in kN · M, T in kNm' })]),
+  return panel({
+    schluessel: 'analyse/Nachweise', titel: 'Nachweise', zusatz: 'N, V in kN · M, T in kNm',
+  }, [
 
     el('div.unterkapitel', {}, [
       el('div.unterkapitel-kopf', {}, [

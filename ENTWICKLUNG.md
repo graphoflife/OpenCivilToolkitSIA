@@ -44,6 +44,61 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-08 · Panels untereinander, fest breit, einklappbar
+
+Wünsche, für alle Apps (Material, Platte, Querschnittsanalyse, Gleichungsblatt):
+* Die Panels der Eingaben sollen nicht mehr mit dem Fenster breiter werden,
+  sondern gerade so gross sein, dass alles sichtbar ist.
+* Die Bewehrung steht nicht mehr neben der Platte. Alles steht untereinander,
+  schlank und kompakt.
+* Jedes Panel lässt sich einklappen.
+
+**Eine Breite für alle Panels: 420 px** (`--panelbreite`). Streng nach dem
+Inhalt wären die Panels verschieden breit geworden: beim Material rund 580 px
+wegen der langen Beschreibungen, bei der Querschnittsanalyse über 900 px, weil
+die Zeichenfläche keine natürliche Breite hat. Darum ist alles auf eine
+schlanke Breite ausgelegt:
+* Die Beschreibungen der Kennwerte brechen um, statt abgeschnitten zu werden.
+* Die Lastfälle stehen in zwei Zeilen: der Name oben, die Zahlen darunter.
+* Die mittlere Spalte ist so breit wie die Panels. Ein breiteres Fenster gibt
+  der Berechnung rechts Platz, nicht den Eingaben.
+* Auf dem Telefon werden die Panels schmaler, wo das Fenster nicht reicht.
+
+```
+Fenster 1280 px  vorher  Baum 300 · Eingaben 440 · Berechnung 530
+                 jetzt   Baum 300 · Eingaben 476 · Berechnung 499
+Fenster  800 px  vorher  Platte und Bewehrung nebeneinander, je rund 380 px
+                 jetzt   untereinander, je 420 px, rechts davon frei
+```
+
+**Die Umbrüche richten sich nach dem Panel, nicht mehr nach der Tafel.**
+Jedes Panel ist selbst der Bezug für die Container-Abfragen darin. Vorher war
+das die Tafel: ein breiteres Fenster stellte die Lastfälle auf eine Zeile um,
+und die Panels wurden breiter.
+
+**Einklappen:** Ein Klick auf den Kopf eines Panels klappt es zu oder auf.
+Der Browser merkt sich das je App und Panel, für alle Platten gleich und auch
+über ein Neuladen hinweg. Pfeil und Titel sind ein Knopf, damit auch die
+Tastatur ihn erreicht. Neu gezeichnet wird dafür nichts.
+
+**Ein Griff weniger:** Der Griff zwischen Eingaben und Berechnung ist weg.
+Breiter gäbe er nur leeren Platz, schmaler schnitte er die Panels ab. Der
+Griff links verstellt nur noch den Baum; was der Baum gewinnt, gibt die
+Berechnung her.
+
+Nachgeprüft im Browser:
+* **Alle vier Apps:** jedes Panel 420 px breit. Die mittlere Spalte bleibt
+  beim Wechseln gleich breit, und nichts wird neu abgeschnitten.
+* **Einklappen und Aufklappen,** auch nach dem Neuladen. Die Zeichenfläche
+  zeichnet nach dem Aufklappen richtig, und das Vollbild deckt weiterhin das
+  ganze Fenster.
+* **Schmales Fenster (800 px):** die Panels untereinander, 420 px breit.
+* **Telefon (375 px):** 351 px breit, nichts ragt hinaus.
+* **Der Griff links:** Baum 300 → 250 px, Eingaben bleiben 476 px, Berechnung
+  219 → 269 px.
+
+---
+
 ## 2026-10-08 · Die ganze Seite in JetBrains Mono
 
 Wunsch: Die Seite soll aussehen wie ein Code-Editor, mit gleich breiten

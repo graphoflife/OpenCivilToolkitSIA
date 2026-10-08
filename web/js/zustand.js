@@ -12,6 +12,18 @@
 
 const zuhoerer = new Set();
 
+/** Unter diesem Schlüssel merkt sich der Browser die zugeklappten Panels. */
+const ZUGEKLAPPT = 'opencivil.zugeklappt';
+
+/** Die zugeklappten Panels vom letzten Mal -- leer, wenn der Browser nichts hergibt. */
+function zugeklappteLesen() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(ZUGEKLAPPT)) || []);
+  } catch {
+    return new Set();
+  }
+}
+
 export const zustand = {
   projekt: null,
   katalog: null,
@@ -53,6 +65,15 @@ export const zustand = {
   /** Aufgeklappte Kapitel im Baum. */
   offen: new Set(['materialien', 'beton', 'betonstahl', 'platten', 'analysen', 'gleichungen']),
   /**
+   * Zugeklappte Panels der Eingaben, je App und Titel: «platte/Bewehrung».
+   *
+   * Ansichtssache wie `offen`, aber im Browser gemerkt: wer die Bewehrung
+   * zuklappt, will sie nach dem Neuladen nicht wieder offen finden. Es gilt
+   * für jede Platte gleich -- es sagt, was man sehen will, nicht welche
+   * Platte.
+   */
+  zugeklappt: zugeklappteLesen(),
+  /**
    * Je M-V-Kurve die eingestellte Normalkraft in kN.
    *
    * Ansichtssache, kein Teil des Projekts: sie sagt nichts über das
@@ -67,6 +88,26 @@ export function umschalten(kapitel) {
   if (zustand.offen.has(kapitel)) zustand.offen.delete(kapitel);
   else zustand.offen.add(kapitel);
   aendern({}, 'baum');
+}
+
+/**
+ * Klappt ein Panel der Eingaben auf oder zu und merkt es sich im Browser.
+ * Gibt zurück, ob es jetzt zu ist.
+ *
+ * Ohne `aendern()`: es ändert sich nur, ob ein Panel offen ist, und das setzt
+ * der Aufrufer gleich am Knoten. Neu zu zeichnen hiesse, den ganzen Editor
+ * und den Bericht wegen eines Pfeils neu zu bauen.
+ */
+export function panelUmschalten(schluessel) {
+  const zu = !zustand.zugeklappt.has(schluessel);
+  if (zu) zustand.zugeklappt.add(schluessel);
+  else zustand.zugeklappt.delete(schluessel);
+  try {
+    localStorage.setItem(ZUGEKLAPPT, JSON.stringify([...zustand.zugeklappt]));
+  } catch {
+    // Privater Modus oder voller Speicher: dann gilt es bis zum Neuladen.
+  }
+  return zu;
 }
 
 export function horchen(rueckruf) {

@@ -11,6 +11,45 @@
 
 import { el } from './dom.js';
 import { span } from './mathe.js';
+import { panelUmschalten, zustand } from './zustand.js';
+
+/**
+ * Ein Panel der Eingaben: Kopf mit Titel, darunter der Inhalt.
+ *
+ * Ein Klick auf den Kopf klappt es zu oder auf -- nur nicht auf einen Knopf
+ * darin, der hat seine eigene Aufgabe. `schluessel` sagt, unter welchem
+ * Namen das gemerkt wird, «App/Titel», etwa `platte/Bewehrung`. `zusatz`
+ * steht rechts im Kopf: ein kurzer Hinweis oder ein Knopf.
+ *
+ * Die Breite bestimmt nicht das Panel, sondern der Stapel, in dem es steht
+ * (`.panelstapel` im Stilblatt).
+ */
+export function panel({ schluessel, titel, zusatz }, inhalt) {
+  const knopf = el('button.panel-knopf', {
+    type: 'button',
+    'aria-expanded': String(!zustand.zugeklappt.has(schluessel)),
+  }, [el('span.pfeil', { text: '▼' }), titel]);
+  const gruppe = el('div.feldgruppe', {
+    class: zustand.zugeklappt.has(schluessel) ? 'ist-zu' : '',
+  }, [
+    el('h3', {
+      on: {
+        click: (e) => {
+          const anderes = e.target.closest('button, input, select, a');
+          if (anderes && anderes !== knopf) return;
+          const zu = panelUmschalten(schluessel);
+          gruppe.classList.toggle('ist-zu', zu);
+          knopf.setAttribute('aria-expanded', String(!zu));
+        },
+      },
+    }, [
+      knopf,
+      typeof zusatz === 'string' ? el('span', { text: zusatz }) : zusatz,
+    ]),
+    ...inhalt,
+  ]);
+  return gruppe;
+}
 
 /**
  * Eine Zeile Beschriftung – Eingabe – Einheit.

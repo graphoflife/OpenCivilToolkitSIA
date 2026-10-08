@@ -17,6 +17,7 @@
  * niemand braucht. Seine Schriften sind die von KaTeX, byte-gleich.
  */
 
+import { panel } from './bausteine.js';
 import { el, melden } from './dom.js';
 import { setzen, span } from './mathe.js';
 import { projektAendern, zustand } from './zustand.js';
@@ -246,9 +247,10 @@ function aufbauen(blatt) {
     name,
     zeilen,
     wurzel: el('div.gl-blatt', {}, [
-      el('div.feldgruppe', {}, [
-        el('h3', {}, [el('span', { text: 'Blatt' }),
-          el('span', { text: 'Enter: neue Zeile · kN, mm, MPa direkt tippen' })]),
+      panel({
+        schluessel: 'blatt/Blatt', titel: 'Blatt',
+        zusatz: 'Enter: neue Zeile · kN, mm, MPa direkt tippen',
+      }, [
         name,
         (rasterKnoten ??= raster()),
         el('div.gl-zeilen', {}, zeilen.map((z) => z.wurzel)),

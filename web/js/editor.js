@@ -17,7 +17,7 @@
  * Oberfläche nachgerechneter.
  */
 
-import { feld } from './bausteine.js';
+import { feld, panel } from './bausteine.js';
 import { auswahl, el, ersetzen, melden, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
 import { analysenBlock, automatikBlock, nachweiseBlock } from './nachweise.js';
@@ -141,8 +141,7 @@ function materialEditor(material) {
 
   return [
     kopf,
-    el('div.feldgruppe', {}, [
-      el('h3', { text: 'Material' }),
+    panel({ schluessel: 'material/Material', titel: 'Material' }, [
       feld('Bezeichnung', el('input', {
         type: 'text', value: material.name, disabled: gesperrt,
         title: gesperrt ? 'Eine Normsorte trägt zwingend ihre Sortenbezeichnung' : '',
@@ -155,28 +154,23 @@ function materialEditor(material) {
       })),
     ]),
 
-    el('div.feldgruppe', {}, [
-      el('h3', {}, [el('span', { text: 'Grundwerte' }),
-        el('span', { text: 'Sortentabelle, Norm' })]),
-      ...vorlagen.filter((v) => !v.berechnet).map((v) => kennwertZeile(material, v)),
-    ]),
+    panel({ schluessel: 'material/Grundwerte', titel: 'Grundwerte', zusatz: 'Sortentabelle, Norm' },
+      vorlagen.filter((v) => !v.berechnet).map((v) => kennwertZeile(material, v))),
 
-    el('div.feldgruppe', {}, [
-      el('h3', {}, [
-        el('span', { text: 'Abgeleitete Kennwerte' }),
-        anzahlUeberschrieben
-          ? el('button.knopf.knopf-zart', {
-            text: `${anzahlUeberschrieben} überschrieben — zurücksetzen`,
-            on: {
-              click: () => projektAendern((p) => {
-                p.materialien.find((x) => x.kennung === material.kennung).ueberschreibungen = {};
-              }),
-            },
-          })
-          : el('span', { text: gesperrt ? 'gesperrt' : 'Haken setzen zum Überschreiben' }),
-      ]),
-      ...vorlagen.filter((v) => v.berechnet).map((v) => kennwertZeile(material, v)),
-    ]),
+    panel({
+      schluessel: 'material/Abgeleitete Kennwerte',
+      titel: 'Abgeleitete Kennwerte',
+      zusatz: anzahlUeberschrieben
+        ? el('button.knopf.knopf-zart', {
+          text: `${anzahlUeberschrieben} überschrieben — zurücksetzen`,
+          on: {
+            click: () => projektAendern((p) => {
+              p.materialien.find((x) => x.kennung === material.kennung).ueberschreibungen = {};
+            }),
+          },
+        })
+        : (gesperrt ? 'gesperrt' : 'Haken setzen zum Überschreiben'),
+    }, vorlagen.filter((v) => v.berechnet).map((v) => kennwertZeile(material, v))),
   ];
 }
 
@@ -525,90 +519,83 @@ function plattenEditor(querschnitt) {
   });
 
   return [
-    // Platte und Bewehrung stehen nebeneinander -- beides gehört zur Geometrie
-    // und wird beim Bemessen gemeinsam gelesen.
-    el('div.zweispaltig', {}, [
-      el('div.feldgruppe', {}, [
-        el('h3', { text: 'Platte' }),
-        // Eine Karte mit blauer Kante wie die Lagen und die Nachweiskapitel:
-        // ohne sie stand die Platte als einzige blosse Feldliste da.
-        el('div.unterkapitel', {}, [
-          feld('Bezeichnung', el('input', {
-            type: 'text', value: querschnitt.name,
-            on: { change: (e) => aendern((q) => { q.name = e.target.value; }) },
+    panel({ schluessel: 'platte/Platte', titel: 'Platte' }, [
+      // Eine Karte mit blauer Kante wie die Lagen und die Nachweiskapitel:
+      // ohne sie stand die Platte als einzige blosse Feldliste da.
+      el('div.unterkapitel', {}, [
+        feld('Bezeichnung', el('input', {
+          type: 'text', value: querschnitt.name,
+          on: { change: (e) => aendern((q) => { q.name = e.target.value; }) },
+        })),
+        feld('Beton', auswahl({
+          werte: betone.map((b) => ({ wert: b.kennung, beschriftung: b.name || b.sorte })),
+          gewaehlt: querschnitt.beton,
+          beiAenderung: (v) => aendern((q) => { q.beton = v; }),
+        })),
+        feld('Dicke h', zahlfeld({
+          wert: querschnitt.h, schritt: 10, min: 10,
+          beiAenderung: (v) => aendern((q) => { q.h = v; }),
+        }), 'mm'),
+        feld(['Breite ', span('b_x')], zahlfeld({
+          wert: querschnitt.b, schritt: 100, min: 10,
+          titel: 'Streifen in x: A_s, M und N je b. y: je 1000 mm',
+          beiAenderung: (v) => aendern((q) => { q.b = v; }),
+        }), 'mm'),
+        feld(['Grösstkorn ', span('D_{max}')], zahlfeld({
+          wert: querschnitt.d_max, schritt: 4, min: 1,
+          titel: 'Für k_g, Querkraft ohne Bügel',
+          beiAenderung: (v) => aendern((q) => { q.d_max = v; }),
+        }), 'mm', 'Grösstkorn → k_g, Querkraft ohne Bügel'),
+        feld(['Druckdiagonale ', span('k_c')], zahlfeld({
+          wert: querschnitt.k_c, schritt: 0.05, min: 0,
+          titel: 'Abminderung f_cd in der Druckdiagonalen; nur mit Bügeln',
+          beiAenderung: (v) => aendern((q) => { q.k_c = v; }),
+        }), '', 'Abminderung f_cd in der Druckdiagonalen'),
+        feld('Einlagenhöhe', zahlfeld({
+          wert: querschnitt.einlagenhoehe, schritt: 5, min: 0,
+          titel: 'Verringert d_v, falls h/6 < e < d',
+          leer: 0,
+          beiAenderung: (v) => aendern((q) => { q.einlagenhoehe = v; }),
+        }), 'mm'),
+        feld(['Kriechzahl ', span(String.raw`\varphi`)], zahlfeld({
+          wert: querschnitt.kriechzahl, schritt: 0.1, min: 0,
+          titel: 'n = E_s/E_cm · (1+φ), gerissener Zustand; grösser → sicherer',
+          beiAenderung: (v) => aendern((q) => { q.kriechzahl = v; }),
+        }), '', 'Kriechzahl φ, gerissener Zustand'),
+        feld('Rissanforderung', auswahl({
+          werte: (zustand.katalog.rissanforderungen || []).map((r) => ({
+            wert: r.wert, beschriftung: r.beschriftung,
           })),
-          feld('Beton', auswahl({
-            werte: betone.map((b) => ({ wert: b.kennung, beschriftung: b.name || b.sorte })),
-            gewaehlt: querschnitt.beton,
-            beiAenderung: (v) => aendern((q) => { q.beton = v; }),
-          })),
-          feld('Dicke h', zahlfeld({
-            wert: querschnitt.h, schritt: 10, min: 10,
-            beiAenderung: (v) => aendern((q) => { q.h = v; }),
-          }), 'mm'),
-          feld(['Breite ', span('b_x')], zahlfeld({
-            wert: querschnitt.b, schritt: 100, min: 10,
-            titel: 'Streifen in x: A_s, M und N je b. y: je 1000 mm',
-            beiAenderung: (v) => aendern((q) => { q.b = v; }),
-          }), 'mm'),
-          feld(['Grösstkorn ', span('D_{max}')], zahlfeld({
-            wert: querschnitt.d_max, schritt: 4, min: 1,
-            titel: 'Für k_g, Querkraft ohne Bügel',
-            beiAenderung: (v) => aendern((q) => { q.d_max = v; }),
-          }), 'mm', 'Grösstkorn → k_g, Querkraft ohne Bügel'),
-          feld(['Druckdiagonale ', span('k_c')], zahlfeld({
-            wert: querschnitt.k_c, schritt: 0.05, min: 0,
-            titel: 'Abminderung f_cd in der Druckdiagonalen; nur mit Bügeln',
-            beiAenderung: (v) => aendern((q) => { q.k_c = v; }),
-          }), '', 'Abminderung f_cd in der Druckdiagonalen'),
-          feld('Einlagenhöhe', zahlfeld({
-            wert: querschnitt.einlagenhoehe, schritt: 5, min: 0,
-            titel: 'Verringert d_v, falls h/6 < e < d',
-            leer: 0,
-            beiAenderung: (v) => aendern((q) => { q.einlagenhoehe = v; }),
-          }), 'mm'),
-          feld(['Kriechzahl ', span(String.raw`\varphi`)], zahlfeld({
-            wert: querschnitt.kriechzahl, schritt: 0.1, min: 0,
-            titel: 'n = E_s/E_cm · (1+φ), gerissener Zustand; grösser → sicherer',
-            beiAenderung: (v) => aendern((q) => { q.kriechzahl = v; }),
-          }), '', 'Kriechzahl φ, gerissener Zustand'),
-          feld('Rissanforderung', auswahl({
-            werte: (zustand.katalog.rissanforderungen || []).map((r) => ({
-              wert: r.wert, beschriftung: r.beschriftung,
-            })),
-            gewaehlt: querschnitt.rissanforderung || 'normal',
-            titel: 'Bestimmt σ_s,adm (Tab. 17)',
-            beiAenderung: (v) => aendern((q) => { q.rissanforderung = v; }),
-          })),
-          // Freier Text, der in keine Rechnung eingeht. Ohne ein solches Feld
-          // landen solche Sätze im Namen der Platte.
-          el('div.beschreibung', {}, [
-            el('label', { text: 'Beschreibung' }),
-            el('textarea', {
-              rows: 3, value: querschnitt.beschreibung || '',
-              on: {
-                change: (e) => aendern((q) => { q.beschreibung = e.target.value; }),
-              },
-            }),
-          ]),
+          gewaehlt: querschnitt.rissanforderung || 'normal',
+          titel: 'Bestimmt σ_s,adm (Tab. 17)',
+          beiAenderung: (v) => aendern((q) => { q.rissanforderung = v; }),
+        })),
+        // Freier Text, der in keine Rechnung eingeht. Ohne ein solches Feld
+        // landen solche Sätze im Namen der Platte.
+        el('div.beschreibung', {}, [
+          el('label', { text: 'Beschreibung' }),
+          el('textarea', {
+            rows: 3, value: querschnitt.beschreibung || '',
+            on: {
+              change: (e) => aendern((q) => { q.beschreibung = e.target.value; }),
+            },
+          }),
         ]),
       ]),
+    ]),
 
-      el('div.feldgruppe', {}, [
-        el('h3', {}, [el('span', { text: 'Bewehrung' }),
-          el('span', { text: 'von unten nach oben' })]),
-        ueberdeckungsBlock(querschnitt, 'oben'),
-        lagenBlock(querschnitt, 4),
-        lagenBlock(querschnitt, 3),
-        lagenBlock(querschnitt, 2),
-        lagenBlock(querschnitt, 1),
-        ueberdeckungsBlock(querschnitt, 'unten'),
-        // Die Bügel stehen unter den Lagen: sie greifen über die ganze Höhe
-        // und gehören in keine davon.
-        querkraftBlock(querschnitt),
-        // Zuunterst das Werkzeug, das in die Lagen darüber schreibt.
-        automatikBlock(querschnitt),
-      ]),
+    panel({ schluessel: 'platte/Bewehrung', titel: 'Bewehrung', zusatz: 'von unten nach oben' }, [
+      ueberdeckungsBlock(querschnitt, 'oben'),
+      lagenBlock(querschnitt, 4),
+      lagenBlock(querschnitt, 3),
+      lagenBlock(querschnitt, 2),
+      lagenBlock(querschnitt, 1),
+      ueberdeckungsBlock(querschnitt, 'unten'),
+      // Die Bügel stehen unter den Lagen: sie greifen über die ganze Höhe
+      // und gehören in keine davon.
+      querkraftBlock(querschnitt),
+      // Zuunterst das Werkzeug, das in die Lagen darüber schreibt.
+      automatikBlock(querschnitt),
     ]),
 
     nachweiseBlock(querschnitt),

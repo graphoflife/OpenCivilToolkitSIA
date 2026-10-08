@@ -252,67 +252,56 @@ async function berichtErzeugen() {
 // Tafelbreiten
 // ===========================================================================
 
-/** Mindestbreite jeder Tafel in Pixeln. Darunter wird nichts mehr lesbar. */
-const MINDESTBREITE = { links: 200, mitte: 260, rechts: 280 };
+/** Mindestbreite der Tafeln links und rechts in Pixeln. Darunter wird nichts mehr lesbar. */
+const MINDESTBREITE = { links: 200, rechts: 280 };
 
 /**
- * Die beiden Griffe zwischen den Tafeln.
+ * Der Griff zwischen Projektbaum und Eingaben.
  *
- * Ein Griff bewegt **eine** Grenze: er nimmt der einen Tafel, was er der
- * anderen gibt. Die dritte bleibt, wo sie ist.
+ * Er verstellt nur den Baum. Die Eingaben sind so breit wie ihre Panels
+ * (`.panelstapel` im Stilblatt) und rücken mit; was der Baum gewinnt, gibt
+ * die Berechnung rechts her, die als `1fr` den Rest bekommt.
  *
- * Vorher zog der linke Griff nur `--breite-links` nach. Die mittlere Tafel
- * behielt ihre Pixelbreite und rutschte mit, also ging die Änderung zu Lasten
- * der rechten Tafel -- die als `1fr` schlicht den Rest bekommt. Wer die rechte
- * schmaler wollte, musste am linken Griff ziehen. Genau das soll nicht sein.
- *
- * Die rechte Tafel hat keine eigene Variable; ihre Breite ergibt sich. Der
- * rechte Griff begrenzt sich deshalb an dem, was übrig bliebe.
+ * Bis 2026-10-08 gab es einen zweiten Griff zwischen Eingaben und Berechnung,
+ * und dieser hier nahm der mittleren Tafel, was er der linken gab -- die
+ * rechte sollte bleiben, wo sie ist. Seit die Panels nicht mehr mit der Tafel
+ * wachsen, hat die mittlere Tafel keine Breite mehr, die man ziehen könnte:
+ * breiter gäbe nur leeren Platz, schmaler schnitte die Panels ab.
  */
-function griffeEinrichten() {
+function griffEinrichten() {
   const wurzel = document.documentElement;
+  const griff = document.querySelector('.griff');
+  if (!griff) return;
 
-  for (const griff of document.querySelectorAll('.griff')) {
-    const links = griff.dataset.griff === 'links';
+  griff.addEventListener('mousedown', (start) => {
+    start.preventDefault();
+    griff.classList.add('ist-aktiv');
 
-    griff.addEventListener('mousedown', (start) => {
-      start.preventDefault();
-      griff.classList.add('ist-aktiv');
+    // Gemessen statt gerechnet: die rechte Tafel hat keine eigene Variable.
+    // Was tatsächlich auf dem Schirm steht, weiss nur das Layout selbst.
+    const tafeln = [...document.querySelectorAll('.tafel')]
+      .map((t) => t.getBoundingClientRect().width);
+    const tLinks = tafeln[0];
+    const tRechts = tafeln[tafeln.length - 1];
 
-      // Gemessen statt gerechnet: die rechte Tafel hat keine eigene Variable,
-      // und zwischen den Tafeln liegen noch die Griffe. Was tatsächlich auf dem
-      // Schirm steht, weiss nur das Layout selbst.
-      const [tLinks, tMitte, tRechts] = [...document.querySelectorAll('.tafel')]
-        .map((t) => t.getBoundingClientRect().width);
+    // Wie weit der Griff nach links und rechts darf, bevor der Baum oder die
+    // Berechnung ihre Mindestbreite unterschreitet. Nie negativ: ist ohnehin
+    // kein Platz mehr, bewegt sich eben nichts.
+    const schrumpft = Math.max(0, tLinks - MINDESTBREITE.links);
+    const waechst = Math.max(0, tRechts - MINDESTBREITE.rechts);
 
-      // Wie weit der Griff nach links und rechts darf, bevor eine der beiden
-      // angrenzenden Tafeln ihre Mindestbreite unterschreitet. Nie negativ:
-      // ist ohnehin kein Platz mehr, bewegt sich eben nichts.
-      const luft = (breite, art) => Math.max(0, breite - MINDESTBREITE[art]);
-      const [schrumpft, waechst] = links
-        ? [luft(tLinks, 'links'), luft(tMitte, 'mitte')]
-        : [luft(tMitte, 'mitte'), luft(tRechts, 'rechts')];
-      const anfangLinks = tLinks;
-      const anfangMitte = tMitte;
-
-      const bewegen = (e) => {
-        const weg = Math.min(Math.max(e.clientX - start.clientX, -schrumpft), waechst);
-        if (links) {
-          wurzel.style.setProperty('--breite-links', `${anfangLinks + weg}px`);
-          wurzel.style.setProperty('--breite-mitte', `${anfangMitte - weg}px`);
-        } else {
-          wurzel.style.setProperty('--breite-mitte', `${anfangMitte + weg}px`);
-        }
-      };
-      const loslassen = () => {
-        griff.classList.remove('ist-aktiv');
-        document.removeEventListener('mousemove', bewegen);
-        document.removeEventListener('mouseup', loslassen);
-      };
-      document.addEventListener('mousemove', bewegen);
-      document.addEventListener('mouseup', loslassen);
-    });
-  }
+    const bewegen = (e) => {
+      const weg = Math.min(Math.max(e.clientX - start.clientX, -schrumpft), waechst);
+      wurzel.style.setProperty('--breite-links', `${tLinks + weg}px`);
+    };
+    const loslassen = () => {
+      griff.classList.remove('ist-aktiv');
+      document.removeEventListener('mousemove', bewegen);
+      document.removeEventListener('mouseup', loslassen);
+    };
+    document.addEventListener('mousemove', bewegen);
+    document.addEventListener('mouseup', loslassen);
+  });
 }
 
 /**
@@ -580,7 +569,7 @@ async function starten() {
     k.addEventListener('click', () => aendern({ umfang: k.dataset.umfang }, 'umfang'));
   }
 
-  griffeEinrichten();
+  griffEinrichten();
   tafelwahlEinrichten();
   ablageEinrichten(imBrowserAblegen);
   horchen(allesZeichnen);
