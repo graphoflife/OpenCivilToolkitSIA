@@ -417,6 +417,9 @@ class Projekt(Beschreibung):
         decke.quasistaendig.aus_tragsicherheit = True
         decke.quasistaendig.lastfall("Dauerlast", M_Ed=70)
         decke.knickfall("Wand", N_Ed=-800, M_Ed_1=20, laenge=3.0)
+        # Die Kapitel der Decke rechnen mit φ = 2, wie bis 2026-10-09 die
+        # Platte -- so bleiben ihre Zahlen im Bericht dieselben.
+        decke.zwaengung_biegung_kriechzahl = 2.0
         # Drei Linien der Spannung-Dehnung-Analyse -- sie schreiben ihre
         # Herleitung für die Formelsammlung: mit Parabel, mit Block und
         # charakteristischen Werten, und mit der Handrechnung.

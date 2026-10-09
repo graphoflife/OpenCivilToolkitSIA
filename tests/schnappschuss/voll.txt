@@ -2989,8 +2989,8 @@ Werte
     Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Rand (60 %)            \alpha_{eff,\sigma,w,x,\text{Rand (60 \%)}}               3.23            berechnet
     Erfüllungsgrad sprödes Versagen – 1. Lage x                                     \alpha_{eff,SV,1,x}                                       1.94            berechnet
     Erfüllungsgrad sprödes Versagen – 4. Lage x                                     \alpha_{eff,SV,4,x}                                       1.94            berechnet
-    Erfüllungsgrad Zwängung auf Biegung – 1. Lage x                                 \alpha_{eff,ZB,1,x}                                       2.09            berechnet
-    Erfüllungsgrad Zwängung auf Biegung – 4. Lage x                                 \alpha_{eff,ZB,4,x}                                       2.09            berechnet
+    Erfüllungsgrad Zwängung auf Biegung – 1. Lage x                                 \alpha_{eff,ZB,1,x}                                       2.17            berechnet
+    Erfüllungsgrad Zwängung auf Biegung – 4. Lage x                                 \alpha_{eff,ZB,4,x}                                       2.17            berechnet
     Erfüllungsgrad M-N x-Richtung – Feld (keine Bewehrung)                          \alpha_{eff,M-N,x,\text{Feld}}                            0.00            berechnet
     Erfüllungsgrad V x-Richtung – Feld (keine Bewehrung)                            \alpha_{eff,V,x,\text{Feld}}                              0.00            berechnet
     Grösstkorndurchmesser                                                           D_{max}                                                     32  mm        Vorgabe
@@ -3041,8 +3041,8 @@ Werte
     Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Schräg (60 %)          \alpha_{eff,\sigma,w,x,\text{Schräg (60 \%)}}           \infty            berechnet
     Erfüllungsgrad sprödes Versagen – 2. Lage x                                     \alpha_{eff,SV,2,x}                                       1.87            berechnet
     Erfüllungsgrad sprödes Versagen – 3. Lage x                                     \alpha_{eff,SV,3,x}                                       2.21            berechnet
-    Erfüllungsgrad Zwängung auf Biegung – 2. Lage x                                 \alpha_{eff,ZB,2,x}                                       2.02            berechnet
-    Erfüllungsgrad Zwängung auf Biegung – 3. Lage x                                 \alpha_{eff,ZB,3,x}                                       2.38            berechnet
+    Erfüllungsgrad Zwängung auf Biegung – 2. Lage x                                 \alpha_{eff,ZB,2,x}                                       2.11            berechnet
+    Erfüllungsgrad Zwängung auf Biegung – 3. Lage x                                 \alpha_{eff,ZB,3,x}                                       2.48            berechnet
     Fläche des Bruttoquerschnitts                                                   A                                                       330000  mm²       berechnet
     Stahlfläche der Bewehrung                                                       A_{s,tot}                                                 2373  mm²       berechnet
     Trägheitsmoment um y                                                            I_y                                                      13275  ·10⁶ mm⁴  berechnet

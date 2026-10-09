@@ -75,7 +75,7 @@ const HILFE = {
     zeilen: [
       ['Weg', 'Risskraft des ungerissenen Querschnitts gegen A_s bei σ_s,adm'],
       ['Werte', 'f_ctm, f_yk; σ_s,adm nach Tab. 17 und Rissanforderung'],
-      ['φ', '–'],
+      ['φ', 'Normalkraft: –; Biegung: eigenes φ → n = E_s/E_cm · (1 + φ)'],
     ],
     formel: 'σ_s,adm ≥ N_Riss / A_s    N_Riss = h_eff/2 · b · f_ct,eff',
   },
@@ -376,8 +376,8 @@ function mindestbewehrungsBlock(querschnitt) {
   // wiederholte das in einem ganzen Satz und machte die Tafel breit.
   // Mit Richtungsmarke wie die Lagenzeilen: dieselbe Angabe soll überall
   // gleich aussehen, sonst liest man sie zweimal verschieden.
-  const zwaengung = (feld, beschriftung, richtung = null) => el(
-    `div.duktilitaetszeile${richtung ? '' : '.ist-breit'}`, {}, [
+  const zwaengung = (feld, beschriftung, richtung = null, zusatz = null) => el(
+    `div.duktilitaetszeile${richtung ? '' : '.ist-breit'}${zusatz ? '.mit-feld' : ''}`, {}, [
       hakenSchalter(!!querschnitt[feld],
         (wert) => aendern((q) => { q[feld] = wert; }), 'Zwängung'),
       richtung
@@ -387,6 +387,7 @@ function mindestbewehrungsBlock(querschnitt) {
         })
         : null,
       el('span.postenname', { text: beschriftung }),
+      zusatz,
       el('span.kurvenhinweis', { text: '' }),
     ]);
 
@@ -400,7 +401,16 @@ function mindestbewehrungsBlock(querschnitt) {
       hilfe('zwang'),
     ]),
     zwaengung('zwaengung', 'Zwängung auf Normalkraft', 'x'),
-    zwaengung('zwaengung_biegung', 'Zwängung auf Biegung', 'x'),
+    // Die Zwängung auf Biegung rechnet am gerissenen Querschnitt mit
+    // n = E_s/E_cm · (1+φ) -- mit ihrem eigenen φ, nicht dem der Platte.
+    zwaengung('zwaengung_biegung', 'Zwängung auf Biegung', 'x', el('span.zeilenfeld', {}, [
+      el('span.zeichen', { text: 'φ' }),
+      zahlfeld({
+        wert: querschnitt.zwaengung_biegung_kriechzahl ?? 0, schritt: 0.1, min: 0, leer: 0,
+        titel: 'Kriechzahl φ der Zwängung auf Biegung: n = E_s/E_cm · (1 + φ)',
+        beiAenderung: (v) => aendern((q) => { q.zwaengung_biegung_kriechzahl = v; }),
+      }),
+    ])),
     zwaengung('zwaengung_begrenzt', 'Begrenzung auf 500 mm'),
 
     gebrauchsKapitel(querschnitt, {

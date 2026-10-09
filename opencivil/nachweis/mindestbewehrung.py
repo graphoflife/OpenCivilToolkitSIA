@@ -529,7 +529,6 @@ class ZwaengungBiegung(Nachweis):
             Eingabebezug("b", querschnitt.id_breite(richtung)),
             Eingabebezug("f_ctm", querschnitt.beton.id_von("f_ctm")),
             Eingabebezug("E_cm", querschnitt.beton.id_von("E_cm")),
-            Eingabebezug("phi", querschnitt.id_von("kriechzahl")),
         ]
         for nummer, eintraege in self.posten_je_lage.items():
             for lage, art, _, as_id, z_id in eintraege:
@@ -564,7 +563,7 @@ class ZwaengungBiegung(Nachweis):
         b = e.g("b").si
         f_ctm = e.g("f_ctm").si
         E_cm = e.g("E_cm").si
-        phi = e.g("phi").si
+        phi = self.kriechzahl
 
         self.groessen = rissmoment(h=h, b=b, f_ctm=f_ctm)
         self._protokoll_ansatz(p, e)
@@ -672,10 +671,12 @@ class ZwaengungBiegung(Nachweis):
         )
         E_s = _erster_E_s(e, self.lagen)
         if E_s is not None:
-            n = wertigkeit(E_s=E_s.groesse.si, E_cm=e.g("E_cm").si, phi=e.g("phi").si)
-            p.formel(Zwischenwerte(self.id).zahl("n", "n", n, stellen=2),
+            werte = Zwischenwerte(self.id)
+            n = wertigkeit(E_s=E_s.groesse.si, E_cm=e.g("E_cm").si, phi=self.kriechzahl)
+            p.formel(werte.zahl("n", "n", n, stellen=2),
                      r"\frac{@E_s}{@E_cm} \cdot \left(1 + @phi\right)",
-                     {"E_s": E_s, "E_cm": e["E_cm"], "phi": e["phi"]},
+                     {"E_s": E_s, "E_cm": e["E_cm"],
+                      "phi": werte.zahl("phi", r"\varphi", self.kriechzahl, stellen=2)},
                      titel="Wertigkeit im gerissenen Zustand")
         p.erklaerung(
             "Das Kriechen weicht den Beton auf: E_c,eff = E_cm/(1+φ), und die "

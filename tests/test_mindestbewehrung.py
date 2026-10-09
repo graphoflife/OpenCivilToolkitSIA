@@ -292,10 +292,11 @@ class TestRissmomentGroessen(unittest.TestCase):
 
 
 def projekt_zwang_biegung(**abweichungen) -> Projekt:
-    """Zwängung auf Biegung für alle vier Lagen eingeschaltet."""
+    """Zwängung auf Biegung für alle vier Lagen eingeschaltet, mit φ = 2."""
     projekt = Projekt.beispiel()
     q = projekt.querschnitte[0]
     q.zwaengung_biegung = True * 4
+    q.zwaengung_biegung_kriechzahl = 2.0
     for name, wert in abweichungen.items():
         setattr(q, name, wert)
     return projekt
@@ -343,14 +344,21 @@ class TestZwaengungBiegung(unittest.TestCase):
 
     def test_kriechen_macht_den_nachweis_schwerer(self):
         """Der Hebelarm schrumpft -- φ > 0 liegt auf der sicheren Seite."""
-        a, _ = urteile(projekt_zwang_biegung(kriechzahl=0.0))
-        b, _ = urteile(projekt_zwang_biegung(kriechzahl=2.0))
+        a, _ = urteile(projekt_zwang_biegung(zwaengung_biegung_kriechzahl=0.0))
+        b, _ = urteile(projekt_zwang_biegung(zwaengung_biegung_kriechzahl=2.0))
         trocken = a.zwaengung_biegung["q1.x"].ergebnisse[0]
         kriechend = b.zwaengung_biegung["q1.x"].ergebnisse[0]
 
         self.assertLess(trocken.x, kriechend.x)
         self.assertGreater(trocken.hebelarm, kriechend.hebelarm)
         self.assertGreater(trocken.erfuellungsgrad, kriechend.erfuellungsgrad)
+
+    def test_das_phi_der_platte_spielt_keine_rolle(self):
+        """Seit 2026-10-09 hat die Zwängung ihr eigenes φ."""
+        a, _ = urteile(projekt_zwang_biegung(kriechzahl=0.0))
+        b, _ = urteile(projekt_zwang_biegung(kriechzahl=5.0))
+        self.assertEqual(a.zwaengung_biegung["q1.x"].ergebnisse[0].erfuellungsgrad,
+                         b.zwaengung_biegung["q1.x"].ergebnisse[0].erfuellungsgrad)
 
     def test_eine_leere_lage_ist_nicht_machbar(self):
         projekt = projekt_zwang_biegung()

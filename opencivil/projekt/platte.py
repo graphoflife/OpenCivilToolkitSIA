@@ -24,8 +24,8 @@ from opencivil.projekt.eintraege import (
     PostenEintrag, QuerkraftbewehrungEintrag, SpannungsfallEintrag, eindeutig,
 )
 from opencivil.projekt.lesen import (
-    ProjektFehler, gebrauchsliste_roh, lagen_aus_altem_format, pflichtfeld,
-    rissanforderung_aus, schalter_aus, teilungen_aus, vorgabe, zahl,
+    ProjektFehler, gebrauchsliste_roh, kriechzahl_aus, lagen_aus_altem_format,
+    pflichtfeld, rissanforderung_aus, schalter_aus, teilungen_aus, vorgabe, zahl,
 )
 
 
@@ -161,6 +161,13 @@ class QuerschnittEintrag(Beschreibung):
 
     zwaengung_biegung: bool = False
     """Ob die Zwaengung auf Biegung nachgewiesen wird."""
+
+    zwaengung_biegung_kriechzahl: float = 0.0
+    """
+    Die Kriechzahl phi der Zwaengung auf Biegung: ``n = (E_s/E_cm)*(1+phi)``.
+    Bis 2026-10-09 galt dort die der Platte -- eine Datei von damals
+    uebernimmt sie beim Lesen.
+    """
 
     duktilitaet: bool = False
     """
@@ -419,6 +426,9 @@ class QuerschnittEintrag(Beschreibung):
             zwaengung_biegung=schalter_aus(
                 d.get("zwaengung_biegung"), d.get("zwaengung_biegung_lagen"),
                 vorgabe=cls.zwaengung_biegung),
+            zwaengung_biegung_kriechzahl=kriechzahl_aus(
+                d, "zwaengung_biegung_kriechzahl", alt=zahl(d, "kriechzahl", cls.kriechzahl),
+                wo=f"Platte '{kennung}', Zwängung auf Biegung"),
             rissanforderung=rissanforderung_aus(d.get("rissanforderung"),
                                                 cls.rissanforderung),
             beschreibung=str(d.get("beschreibung") or cls.beschreibung),

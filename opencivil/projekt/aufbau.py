@@ -576,7 +576,8 @@ def _lagennachweise(eintrag: QuerschnittEintrag, querschnitt: Plattenquerschnitt
 
     biegung = ZwaengungBiegung(
         querschnitt, richtung, lagen,
-        anforderung=eintrag.rissanforderung, kriechzahl=eintrag.kriechzahl)
+        anforderung=eintrag.rissanforderung,
+        kriechzahl=eintrag.zwaengung_biegung_kriechzahl)
     biegung.still = not schalter_aus(eintrag.zwaengung_biegung)
     eintragen("zwaengung_biegung", kennung_x, biegung)
 

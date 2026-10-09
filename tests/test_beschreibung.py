@@ -119,6 +119,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
                         zulage=PostenEintrag(durchmesser=20.0, abstand=150.0)),
                     automatik_querkraft_teilungen=[150.0],
                     sproede=True, zwaengung_biegung=True, duktilitaet=True, x_d_max=0.42,
+                    zwaengung_biegung_kriechzahl=1.2,
                     querkraftbewehrung=QuerkraftbewehrungEintrag(
                         durchmesser=10.0, stahl="s1", abstand_x=250.0,
                         abstand_y=None, anzahl_y=4.0,
@@ -377,8 +378,10 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
 
     #: Klasse, Wörterbuch mit den Pflichtfeldern, dieselben als Argumente.
     FAELLE = [
-        (QuerschnittEintrag, {"kennung": "q", "beton": "b"},
-         {"kennung": "q", "name": "q", "beton": "b"}),
+        # Mit φ = 0: ohne Kriechzahlen der Kapitel ist ein Wörterbuch eine
+        # Datei von vor 2026-10-09, und die Kapitel übernehmen das φ der Platte.
+        (QuerschnittEintrag, {"kennung": "q", "beton": "b", "kriechzahl": 0.0},
+         {"kennung": "q", "name": "q", "beton": "b", "kriechzahl": 0.0}),
         (MaterialEintrag, {"kennung": "m", "art": "beton", "sorte": "C30/37"},
          {"kennung": "m", "art": "beton", "sorte": "C30/37"}),
         (PostenEintrag, {}, {}),

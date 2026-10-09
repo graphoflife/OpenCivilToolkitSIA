@@ -543,6 +543,10 @@ input[readonly], input:disabled, select:disabled {
    Richtung, und welche es sind, steht im Hinweis dahinter. */
 .duktilitaetszeile.mit-grenze { grid-template-columns: 46px auto auto minmax(0, 1fr); }
 .duktilitaetszeile .schalter-haken .schalter-halb { width: 22px; }
+/* Ein Formelzeichen mit seinem Feld in einer Zeile: «φ [2.0]». Kursiv aus
+   der Formelschrift -- in JetBrains Mono gleichen manche Zeichen anderen. */
+.zeilenfeld { display: inline-flex; align-items: center; gap: 5px; }
+.zeichen { font: italic 14px/1 KaTeX_Math, serif; color: var(--schrift-matt); }
 .duktilitaetszeile .postenname {
   font-size: 11.5px; font-weight: 600; color: var(--schrift-matt);
 }
