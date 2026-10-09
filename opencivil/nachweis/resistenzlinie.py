@@ -60,9 +60,9 @@ from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
 AUF_DER_GRENZE = 1e-12
 
 #: Schritte des Goldenen Schnitts, der eine Spitze der Linie zwischen zwei
-#: Ebenen sucht: das Fenster schrumpft auf 1e-8 einer Schrittweite, und dort
-#: ist die Linie flach.
-GOLDSCHRITTE = 40
+#: Ebenen sucht: das Fenster schrumpft auf 1e-6 einer Schrittweite. An der
+#: Spitze ist die Linie flach -- der Fehler im Wert ist das Quadrat davon.
+GOLDSCHRITTE = 30
 
 
 @dataclass(frozen=True)

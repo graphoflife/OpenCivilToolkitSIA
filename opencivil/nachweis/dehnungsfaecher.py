@@ -65,6 +65,12 @@ from opencivil.querschnitt.werkstoffgesetz import Dehnungsebene, Stahlgesetz
 #: Schritten genau.
 SCHRITTE = 80
 
+#: Schritte fuer die Bewehrungssuche, die kein Diagramm zeichnet. Ihre Zahlen
+#: sind dieselben (auf 1e-9): die Linie sucht jeden Widerstand und jede Spitze
+#: zwischen zwei Schritten genau, der Faecher grenzt nur ein. Ein Viertel der
+#: Ebenen, ein Viertel der Zeit.
+SCHRITTE_SUCHE = 20
+
 #: Fasern ueber die Hoehe fuer die Betonintegration.
 FASERN = 200
 

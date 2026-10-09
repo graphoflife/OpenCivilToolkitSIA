@@ -46,6 +46,7 @@ from opencivil.nachweis.spannungsbegrenzung import (
     Gebrauchsfall, GrenzeAusRissbreite, GrenzeGegenFliessen,
     Spannungsbegrenzung,
 )
+from opencivil.nachweis import dehnungsfaecher
 from opencivil.nachweis.sproedes_versagen import SproedesVersagen
 from opencivil.nachweis.querkraft import Querkraft, Querkraftfall
 from opencivil.querschnitt.platte import (
@@ -422,7 +423,8 @@ def _platte(eintrag: QuerschnittEintrag, aufbau: Aufbau, eintragen: Eintragen,
         # Diagramm an.
         nachweis = BiegungNormalkraft(
             querschnitt, [_kombination(k) for k in aktiv], richtung,
-            wahl=eintrag.tragsicherheit_wahl.wahl, mit_vergleich=not schnell)
+            wahl=eintrag.tragsicherheit_wahl.wahl, mit_vergleich=not schnell,
+            schritte=dehnungsfaecher.SCHRITTE_SUCHE if schnell else dehnungsfaecher.SCHRITTE)
         eintragen("nachweise", kennung_x, nachweis)
 
         _lagennachweise(eintrag, querschnitt, richtung, nachweis, eintragen)
