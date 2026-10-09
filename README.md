@@ -53,6 +53,9 @@ q = p.platte("Decke", h=300, x=[18, 12], x_zulage=[12, 0], y=[12, 12],
 q.einwirkung("Feld", M_Ed=150, V_Ed=80)       # kNm, kN, kN/m; Zug positiv
 q.quasistaendig.lastfall("Dauerlast", M_Ed=80)
 q.duktilitaet = True                          # alles Weitere am Eintrag selbst
+q.spannungsfall("Biegung", art="moment_kruemmung", N_Ed=0)          # M-χ-Linie
+q.spannungsfall("Zug", art="normalkraft_dehnung", M_Ed=20,          # N-ε-Linie,
+                kriechzahl=1.0, betongesetz="block")                # eigene Wahl
 
 ergebnis = p.rechnen()
 print(ergebnis.zusammenfassung())             # je Platte eine Tabelle
@@ -60,7 +63,7 @@ ergebnis.erfuellt                             # True / False
 ergebnis.bericht()                            # der ganze Bericht mit Herleitung
 ergebnis.latex("ausgabe/decke")               # .tex, mit pdf=True auch PDF
 ergebnis.markdown("ausgabe/decke")            # .md, Formeln als LaTeX-Mathe
-ergebnis.analysen()                           # Spannungsbilder, M-κ-Linien
+ergebnis.analysen()                           # Spannungsbilder, M-χ- und N-ε-Linien
 p.speichern("decke.json")                     # lässt sich in der Oberfläche öffnen
 ```
 
@@ -124,7 +127,7 @@ Fertig und getestet (823 Tests):
 | `nachweis/querschnittsloeser` | Dehnungsebene aus N und M, zwei Bisektionen |
 | `nachweis/` | M-N, Querkraft (mit Bügeln), Duktilität, sprödes Versagen, Zwängung auf Normalkraft und auf Biegung, Stahlspannung unter häufiger (gegen Fliessen) und quasi-ständiger Last (aus der Rissbreite), Knicken am verformten System |
 | `nachweis/schiefe_biegung`, `schubwandnachweis`, `richtungsnachweise` | die Nachweise der Querschnittsanalyse: N mit M_y und M_z, Querkraft mit Torsion, Duktilität und sprödes Versagen je Richtung |
-| `spannungsanalyse.py` | drei Bilder am Querschnitt — kein Nachweis |
+| `spannungsanalyse.py` | vier Fragen an den Querschnitt: Bild aus N und M oder aus Dehnungen, M-χ- und N-ε-Linie — kein Nachweis |
 | `bewehrungssuche/` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt – Längsbewehrung, dünnste Platte, Bügel |
 | `bericht/` | der Bericht als Blöcke (`gliederung`), gesetzt als Konsolentext, LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) und Markdown; die Zusammenfassung je Platte |
 | `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `projekt`) und was daraus gebaut wird (`aufbau`) |
@@ -153,6 +156,20 @@ dieselbe Aufteilung, nur nacheinander.
 Die Oberfläche rechnet nichts. Sie schickt die Projektbeschreibung an den Kern
 und stellt dar, was zurückkommt -- fertige Zahlen und fertige LaTeX-Zeichen­ketten.
 Deshalb kann am Bildschirm gar nichts anderes stehen als im Bericht.
+
+**Spannung-Dehnung-Analyse:** bei jeder Platte unter «Weitere Analysen».
+Kein Nachweis, sondern die Frage, was im Querschnitt geschieht:
+* *N, M* oder *ε oben/unten* -- Dehnung und Spannung über die Höhe;
+* *M–χ* -- die Momenten-Krümmungs-Linie bei fester Normalkraft;
+* *N–ε* -- die Normalkraft-Dehnungs-Linie auf Zug bei festem Moment.
+
+Eine Linie ist ungerissen bis zum Riss, springt dort und ist darüber gerissen.
+Sie endet bei der ersten Grenzdehnung, wie im Dehnungsfächer. An den Ecken
+stehen Riss, Fliessbeginn und Ende (M_Rd,u, N_Rd,u), je mit Kraft und
+Verformung, am Ende auch die massgebende Grenze. Jede Analyse wählt selbst:
+* die Kriechzahl φ, leer gilt die der Platte;
+* Bemessungs- oder charakteristische Werte;
+* Parabel-Rechteck oder Spannungsblock.
 
 **Querschnittsanalyse:** unter den Platten ein zweites Kapitel. Der
 Querschnitt wird gezeichnet wie in einem kleinen CAD, aus Knoten, Linien und

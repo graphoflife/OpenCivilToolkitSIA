@@ -138,9 +138,9 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Normalkraft denselben Bezugsgraphen wie vorher, und ein feiner Abdruck
       sähe den Unterschied nicht. Das wäre ein Umbau an jedem Nachweis, und der
       Fehlerfall wäre eine stillschweigend falsche Zahl.
-- [ ] **Die Momenten-Krümmungs-Linie zeigt den Querschnitt, ohne
-      Zugversteifung.** Ungerissen bis zum Rissmoment, dort der Sprung,
-      darüber gerissen. Für die Durchbiegung eines Bauteils fehlt die
+- [ ] **Die M-χ- und die N-ε-Linie zeigen den Querschnitt, ohne
+      Zugversteifung.** Ungerissen bis zum Riss, dort der Sprung, darüber
+      gerissen. Für die Durchbiegung eines Bauteils fehlt die
       Mitwirkung des Betons zwischen den Rissen. Bis 2026-10-06 stand sie als
       `ζ = 1 − β·(M_Riss/M)²` mit β = 1.0 drin (üblich: 1.0 kurzzeitig, 0.5
       dauernd oder wiederholt) -- dafür war der Sprung nicht zu sehen. Ob eine
@@ -155,6 +155,17 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       steht sein gezogener Rand beim Rissmoment bei 2.14 statt
       f_ct,eff = 2.76 N/mm². Ob für die Linie der ideelle Querschnitt gelten
       soll, ist offen.
+- [ ] **Die Rissnormalkraft der N-ε-Linie** ist dieselbe Bedingung nach N
+      aufgelöst: `N_Riss(M) = f_ct,eff·b·h − 6·|M|/h`, am Bruttoquerschnitt
+      ohne Stahl -- nach Vorgabe, nicht nachgeschlagen. Ihr f_ct,eff ist das
+      des Rissmoments, mit k_t für die Dicke h/3. Die Zwängung auf Normalkraft
+      nimmt k_t für die ganze rissaktive Dicke; bei h = 300 mm wäre N_Riss
+      damit 9 % kleiner (k_t = 0.87 statt 0.95). Welches k_t bei Zug mit
+      Moment gilt, ist offen.
+- [ ] **Das Ende der Linien** liegt an den Grenzen des Dehnungsfächers:
+      Betonrand −ε_c2d, Stahllagen ±ε_ud, Punkt C −ε_c1d bei
+      `z_C = h·(1 − ε_c1d/ε_c2d)`. Dieselben Grenzen wie in
+      `nachweis/dehnungsfaecher.py`, nach Vorgabe, nicht nachgeschlagen.
 - [ ] Die Normstelle für das Fachwerkmodell mit Bügeln (`SIA 262:2025, 4.3.3.4`)
       ist eingetragen, aber wie alle anderen Verweise nicht nachgeschlagen.
       Dasselbe gilt für die Vorgaben `α_min = 30°`, `α_max = 45°`, `k_c = 0.55`

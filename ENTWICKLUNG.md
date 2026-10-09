@@ -44,6 +44,127 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-09 · Spannung-Dehnung-Analyse: Wahl je Analyse, M-χ bis zur Grenze, N-ε-Linie
+
+Wünsche:
+* Im Dehnungsbild steht die Krümmung als χ, nicht als x.
+* Jede Analyse wählt selbst: die Kriechzahl φ, Bemessungs- oder
+  charakteristische Werte, Parabel oder Spannungsblock für den Beton.
+* Die M-χ-Linie: M_Rd steht scheinbar am falschen Ort. Das oberste M heisst
+  M_Rd,u. An allen Eckpunkten stehen die Krümmungen. Die Formelsammlung
+  erklärt die Linie und die grösste Krümmung.
+* Neu eine N-ε-Linie auf Zug, mit N_Riss, N_Rd und der grössten Dehnung,
+  bei einstellbarem M_Ed.
+
+**χ sah aus wie x.** JetBrains Mono zeichnet χ fast wie x. Griechische
+Buchstaben in Bildern und Achsentiteln setzt jetzt `formelText` (in
+`achsen.js`) in die kursive Formelschrift von KaTeX, `_y` und `_{Rd,u}`
+tiefgestellt; das gilt für alle Diagramme. Die Zahlenzeile über den Bildern
+setzt KaTeX. In der Auswahl «M–χ» kommen nur die griechischen Buchstaben aus
+der Formelschrift (`@font-face` mit `unicode-range`).
+
+**Wahl je Analyse.** Drei neue Felder am `SpannungsfallEintrag`:
+
+| Feld | leer / Vorgabe | sonst |
+|---|---|---|
+| `kriechzahl` | die der Platte | eine eigene Zahl ≥ 0 |
+| `werkstoffsatz` | `bemessung` (f_cd, f_yd) | `charakteristisch` (f_ck, f_yk) |
+| `betongesetz` | `parabel` | `block` (0.85·x) |
+
+Eine alte Datei hat die Felder nicht und rechnet darum mit den Vorgaben wie
+bisher. Moduln und Grenzdehnungen sind in beiden Wertesätzen dieselben, wie
+überall im Werkzeug.
+
+**Das Ende der M-χ-Linie war falsch.** Am Beispiel, Decke über EG, x, N = 0:
+
+```
+vorher   Ende bei χ = 0.040 1/m, M = 234.6 kNm, Beton oben −2.7 ‰
+nachher  Ende bei χ = 0.057 1/m, M = 235.4 kNm, Beton oben −3.5 ‰ = −ε_c2d
+```
+
+Die Linie endete dort, wo die Suche des Lösers aufgab, nicht dort, wo der
+Querschnitt versagt (siehe unten). Jetzt rechnet sie den gerissenen Teil über
+die Krümmung, nicht über das Moment. Sie endet bei der grössten Krümmung, zu
+der es noch ein Gleichgewicht gibt. Das ist die erste erreichte Grenzdehnung,
+dieselbe wie im Dehnungsfächer der genauen M-N-Linie:
+* der Beton am Rand bei −ε_c2d;
+* jede Stahllage bei ±ε_ud (vorher galt ε_ud am Betonrand);
+* im Punkt C bei −ε_c1d.
+
+Welche Grenze massgebend ist, steht am Ende der Linie.
+
+**M_Rd gehört ans Ende, nicht an den Fliessbeginn.** Der Stahl fliesst bei
+M_y = 224.6 kNm (χ_y = 0.015 1/m). Danach wächst das Moment noch um 5 %: Die
+Druckzone wird kleiner, und der Beton füllt sein Gesetz. Die Linie zeigt
+beide Punkte, M_y und M_Rd,u (mit charakteristischen Werten M_Rk,u).
+
+**Warum M_Rd,u nicht genau das M_Rd des Nachweises ist.** Der Nachweis
+rechnet von Hand: Spannungsblock 0.85·x, ohne gedrückten Stahl, die Lagen je
+Seite zu einer zusammengefasst. Die Linie integriert genau, mit
+Druckbewehrung, und mit der kriechweichen Parabel (k_σ = 1.4 statt 4.2):
+
+```
+Handrechnung (Nachweis)                     235.9 kNm
+Linie, Bemessung + Block                    236.2 kNm   (Druckbewehrung trägt mit)
+Linie, Bemessung + Parabel                  235.4 kNm
+Platte ohne Druckbewehrung, Block           170.0 kNm, Handrechnung 170.1 kNm (−0.03 %)
+```
+
+**Die N-ε-Linie.** M_Ed bleibt fest, N wächst auf Zug, gezeichnet über ε_m,
+die Dehnung auf halber Höhe. Der Ablauf:
+* ungerissen bis N_Riss = f_ct,eff·b·h − 6·|M|/h, am Bruttoquerschnitt wie
+  M_Riss(N);
+* dort der Sprung;
+* gerissen bis zum Bruch, mit dem Fliessbeginn N_y.
+
+Wo sie endet, hängt an der Bewehrung. Symmetrisch bewehrt und ohne Moment
+trägt am Ende der ganze Stahl, N_Rd = Σ A_s·f_yd, und die Lagen stehen auf
+ε_ud. Das Beispiel ist unten stärker bewehrt (2450 mm²) als oben (754 mm²).
+Dort endet die Linie bei 20 kNm im Beton:
+
+```
+M_Ed = 20 kNm    N_Rd,u = 1030 kN   Beton am unteren Rand bei −3.5 ‰
+M_Ed = 71.5 kNm  N_Rd,u = 1390 kN   Stahl bei 45 ‰  (≈ Σ A_s·f_yd = 1393 kN)
+```
+
+Σ A_s·f_yd erreicht nur, wer das Moment des Stahlschwerpunkts mitbringt, hier
+rund 71 kNm. Bei kleinerem Moment muss der Beton unten drücken.
+
+**Die Karte.** Die Zeile einer Analyse ist eine kleine Karte. Sie hat drei
+Zeilen:
+1. Name und Richtung.
+2. Art, ihre Zahlen und φ. Das Feld φ zeigt leer blass die Kriechzahl der
+   Platte.
+3. Werte und Beton, mit kurzen Namen. In einer Spalte fehlten «charakteristisch»
+   80 px. Am Telefon stehen beide je auf einer eigenen Zeile.
+
+**Formelsammlung.** Die Linien schreiben ihre Herleitung selbst, wie jede
+Rechnung hier, unter dem Thema «Spannung-Dehnung-Analyse». Sie enthält:
+* E_c,eff und die beiden Betongesetze;
+* Zustand I und II;
+* M_Riss(N) und N_Riss(M);
+* den Fliessbeginn;
+* die Grenzdehnungen, χ_u und ε_m,u.
+
+`Projekt.jeder_nachweis()` führt dafür je eine M-χ- und eine N-ε-Analyse.
+Die Berichte bleiben zeichengleich, denn Analysen stehen nicht im Bericht.
+
+**Nebenbei: ein Fehler im gemeinsamen Löser.** `Querschnittsloeser.loese`
+meldete nahe am Widerstand «keine Gleichgewichtslage», obwohl es eine gab.
+Die Suche halbierte von der grössten Krümmung aus (0.16, 0.08, 0.04 1/m) und
+sah zwischen 0.04 und 0.08 nie nach:
+
+```
+vorher   M = 234.9 kNm → keine Gleichgewichtslage
+nachher  M = 234.9 kNm → χ = 0.046 1/m;  erst über 235.3 kNm wirklich keine
+```
+
+Jetzt sucht sie zuerst die grösste Krümmung mit Gleichgewicht und darunter
+die Lösung. Den Löser nutzen auch der Knicknachweis und «Aus N und M». An
+allen 41 Urteilen beider Prüfprojekte ändert sich nichts.
+
+---
+
 ## 2026-10-09 · Eine Ecke gehört ihrem Element
 
 Wunsch: Liegen Punkte aufeinander, soll ein Klick genau einen wählen. Eine
