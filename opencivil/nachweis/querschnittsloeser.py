@@ -160,20 +160,20 @@ def wirksamer_modul(E_cm: float, phi: float) -> float:
     return E_cm / (1.0 + phi)
 
 
-def protokoll_wirksamer_modul(p, e, basis: str, *, titel: str,
+def protokoll_wirksamer_modul(p, E_cm, phi, basis: str, *, titel: str,
                               nachsatz: str = "") -> None:
     """
-    Die Zeile zu :func:`wirksamer_modul`, aus den Eingaben ``E_cm`` und
+    Die Zeile zu :func:`wirksamer_modul`, aus den Werten ``E_cm`` und
     ``phi`` -- fuer jeden Nachweis, der mit dem aufgeweichten Beton rechnet.
     """
-    modul = wirksamer_modul(e.g("E_cm").si, e.g("phi").si)
+    modul = wirksamer_modul(E_cm.groesse.si, phi.groesse.si)
     p.formel(Zwischenwerte(basis).spannung("E_c_eff", "E_{c,eff}", modul),
-             r"\frac{@E_cm}{1 + @phi}", {"E_cm": e["E_cm"], "phi": e["phi"]},
+             r"\frac{@E_cm}{1 + @phi}", {"E_cm": E_cm, "phi": phi},
              titel=titel, nachsatz=nachsatz)
 
 
 def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float,
-                        fasern: int = FASERN) -> None:
+                        fasern: int = FASERN, verdraengt: bool = True) -> None:
     """
     Der Ablauf der Suche, in die Mitschrift geschrieben.
 
@@ -205,7 +205,10 @@ def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float,
         f"gleicher Dicke gebildet, jede mit der Spannung in ihrer Mitte; der "
         f"Stahl kommt Lage für Lage dazu, und die von ihm verdrängte "
         f"Betonfläche wird abgezogen, damit dieselbe Fläche nicht zweimal "
-        f"zählt."
+        f"zählt." if verdraengt else
+        f"Das Integral über den Beton wird als Summe über {fasern} Fasern "
+        f"gleicher Dicke gebildet; der Stahl kommt Lage für Lage dazu. Wie in "
+        f"der Handrechnung zählt der Beton auch dort, wo der Stahl liegt."
     )
     p.erklaerung(
         "Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer "

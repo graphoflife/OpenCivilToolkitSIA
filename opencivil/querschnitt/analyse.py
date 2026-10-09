@@ -681,16 +681,15 @@ class Querschnittsanalyse:
             symbol = lambda k: stoff.definition(k).symbol
             if stoff.art is Baustoffart.BETON:
                 f_c = "f_cd" if bemessung else "f_ck"
+                zeichen = "f_{cd}" if bemessung else "f_{ck}"
                 if self.betongesetz(stoff) == "block":
-                    latex = Spannungsblock(1.0, 1.0).latex()
+                    latex = Spannungsblock(1.0, 1.0).latex(zeichen)
                     titel = f"{stoff.name}: Spannungsblock 0.85·x, {satz}"
                     referenz = ""
                 else:
-                    latex = Betongesetz(1.0, 1.0, 1.0, 1.0).latex()
+                    latex = Betongesetz(1.0, 1.0, 1.0, 1.0).latex(zeichen)
                     titel = f"{stoff.name}: Parabel-Rechteck-Beziehung, {satz}"
                     referenz = "SIA 262:2025, 4.2.1.6"
-                if not bemessung:
-                    latex = latex.replace("f_{cd}", "f_{ck}")
                 p.ansatz(latex, titel=titel, referenz=referenz)
                 if not bemessung and self.betongesetz(stoff) != "block":
                     k = _K_SIGMA.funktion(E_cd=abs(self.kennwert(e, stoff, "E_cd")),
@@ -708,9 +707,8 @@ class Querschnittsanalyse:
                     ausrichtung="lr")
             else:
                 f_s = "f_yd" if bemessung else "f_yk"
-                latex = Stahlgesetz(1.0, 1.0, 1.0, 1.0).latex()
-                if not bemessung:
-                    latex = latex.replace("f_{yd}", "f_{yk}")
+                latex = (Stahlgesetz(1.0, 1.0, 1.0, 1.0).latex() if bemessung
+                         else Stahlgesetz(1.0, 1.0, 1.0, 1.0).latex("f_{yk}", "f_{yk}^{-}"))
                 p.ansatz(latex, titel=f"{stoff.name}: bilineare Beziehung, {satz}",
                          referenz="SIA 262:2025, 4.2.2.4")
                 p.tabelle(kopf=["Kennwert", "Wert"], zeilen=[

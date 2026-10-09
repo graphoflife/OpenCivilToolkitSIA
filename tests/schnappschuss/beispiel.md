@@ -1,6 +1,6 @@
 # Beispiel
 
-55 Berechnungen ausgeführt, 100 Werte bestimmt.
+54 Berechnungen ausgeführt, 99 Werte bestimmt.
 
 ## Herleitung
 
@@ -1138,7 +1138,6 @@ Alle geführten Nachweise sind erfüllt.
 | Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) | $h_{Dist}$ | $186$ | mm | berechnet |
 | Höhe der Einlage | $e_{Einlage}$ | $0$ | mm | Vorgabe |
 | Plattendicke | $h$ | $300$ | mm | Vorgabe |
-| Kriechzahl | $\varphi$ | $2$ |  | Vorgabe |
 | Bewehrungsquerschnitt 1. Lage Grundbewehrung | $A_{s,1,y,g}$ | $754$ | mm² | berechnet |
 | Stabdurchmesser 1. Lage Grundbewehrung | $\varnothing_{1,y,g}$ | $12$ | mm | Vorgabe |
 | Teilung 1. Lage Grundbewehrung | $s_{1,y,g}$ | $150$ | mm | Vorgabe |
@@ -1177,9 +1176,9 @@ Alle geführten Nachweise sind erfüllt.
 | Erfüllungsgrad x-Richtung – Stütze | $\alpha_{eff,x,\text{Stütze}}$ | $1.60$ |  | berechnet |
 | Erfüllungsgrad Rissnormalkraft – 2. Lage x | $\alpha_{eff,NR,2,x}$ | $3.24$ |  | berechnet |
 | Erfüllungsgrad Rissnormalkraft – 3. Lage x | $\alpha_{eff,NR,3,x}$ | $0.996$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %) | $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ | $4.29$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld mit Druck (60 %) | $\alpha_{eff,\sigma,w,x,\text{Feld mit Druck (60 \%)}}$ | $6.05$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Stütze (60 %) | $\alpha_{eff,\sigma,w,x,\text{Stütze (60 \%)}}$ | $2.82$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %) | $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ | $4.54$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld mit Druck (60 %) | $\alpha_{eff,\sigma,w,x,\text{Feld mit Druck (60 \%)}}$ | $6.80$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Stütze (60 %) | $\alpha_{eff,\sigma,w,x,\text{Stütze (60 \%)}}$ | $3.02$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – 2. Lage x | $\alpha_{eff,SV,2,x}$ | $5.69$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – 3. Lage x | $\alpha_{eff,SV,3,x}$ | $1.93$ |  | berechnet |
 | Erfüllungsgrad Zwängung auf Biegung – 2. Lage x | $\alpha_{eff,ZB,2,x}$ | $6.63$ |  | berechnet |

@@ -420,6 +420,7 @@ class Projekt(Beschreibung):
         # Die Kapitel der Decke rechnen mit φ = 2, wie bis 2026-10-09 die
         # Platte -- so bleiben ihre Zahlen im Bericht dieselben.
         decke.zwaengung_biegung_kriechzahl = 2.0
+        decke.haeufig.wahl.kriechzahl = decke.quasistaendig.wahl.kriechzahl = 2.0
         # Drei Linien der Spannung-Dehnung-Analyse -- sie schreiben ihre
         # Herleitung für die Formelsammlung: mit Parabel, mit Block und
         # charakteristischen Werten, und mit der Handrechnung.
@@ -439,6 +440,8 @@ class Projekt(Beschreibung):
         dach.einwirkung("Feld", M_Ed=40, V_Ed=40)
         dach.einwirkung("Rand", M_Ed=10, V_Ed=30)
         dach.quasistaendig.lastfall("Dauerlast", M_Ed=20)
+        # Mit φ = 2 fliesst hier der Stahl -- der Fall soll laut bleiben.
+        dach.quasistaendig.wahl.kriechzahl = 2.0
 
         ohne = p.platte("Ohne x", h=250, x=[0, 0], y=[12, 12])
         ohne.einwirkung("Feld", M_Ed=30, V_Ed=20)

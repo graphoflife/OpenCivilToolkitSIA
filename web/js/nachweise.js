@@ -81,17 +81,17 @@ const HILFE = {
   },
   quasistaendig: {
     zeilen: [
-      ['Weg', 'Stahlspannung am gerissenen Querschnitt, nur gezogene Bewehrung'],
-      ['Werte', 'charakteristisch (f_ck, f_yk)'],
-      ['φ', 'aus Eingabe → E_c,eff = E_cm / (1 + φ)'],
+      ['Weg', 'Stahlspannung am gerissenen Querschnitt, an der am stärksten gezogenen Lage'],
+      ['Werte', 'nach Rechenwahl; Vorgabe charakteristisch (f_ck, f_yk), elastisch'],
+      ['φ', 'nach Rechenwahl → E_c,eff = E_cm / (1 + φ), bei Parabel und elastisch'],
     ],
     formel: 'σ_s ≤ σ_s,adm (Tab. 17)',
   },
   haeufig: {
     zeilen: [
-      ['Weg', 'Stahlspannung am gerissenen Querschnitt, nur gezogene Bewehrung'],
-      ['Werte', 'charakteristisch (f_ck, f_yk), Grenze aus f_yd'],
-      ['φ', 'aus Eingabe → E_c,eff = E_cm / (1 + φ)'],
+      ['Weg', 'Stahlspannung am gerissenen Querschnitt, an der am stärksten gezogenen Lage'],
+      ['Werte', 'nach Rechenwahl; Vorgabe charakteristisch (f_ck, f_yk), elastisch; Grenze aus f_yd'],
+      ['φ', 'nach Rechenwahl → E_c,eff = E_cm / (1 + φ), bei Parabel und elastisch'],
     ],
     formel: 'σ_s ≤ f_yd − 80 N/mm²',
   },
@@ -473,6 +473,8 @@ function gebrauchsKapitel(querschnitt, {
       hilfe(feld),
     ]),
     hinweis ? el('p.hinweis.hinweis-annahme', { text: hinweis }) : null,
+    rechenwahlZeile('Rechenwahl', liste.wahl,
+      (veraenderer) => aendern((l) => veraenderer(l.wahl)), { arten: 'spannungsarten' }),
 
     el('div.duktilitaetszeile.ist-anteil', {}, [
       hakenSchalter(abgeleitet, (wert) => aendern((l) => {
@@ -805,6 +807,19 @@ function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten' } = {}) {
       beiAenderung: (v) => aendern((x) => { x.rechenart = v; }),
     })),
   ];
+}
+
+/**
+ * Eine Zeile «Rechenwahl» unter einem Kapitelkopf: ein kleiner Titel, darunter
+ * die drei Felder. Beim Knicken stehen zwei solche Zeilen, mit «Verformung»
+ * und «Widerstand» als Titel. `aendern` bekommt eine Funktion, die die Wahl
+ * selbst ändert.
+ */
+function rechenwahlZeile(titel, ziel, aendern, optionen) {
+  return el('div.rechenwahl', {}, [
+    el('span.rechenwahl-titel', { text: titel }),
+    ...rechenwahlFelder(ziel, aendern, optionen),
+  ]);
 }
 
 /**

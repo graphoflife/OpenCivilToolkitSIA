@@ -26,12 +26,17 @@ melden.
 WIE DIE SPANNUNG ENTSTEHT:
 Ueber :mod:`opencivil.nachweis.querschnittsloeser`: gesucht wird die
 Dehnungsebene, die ``M_Ed`` und ``N_Ed`` des Lastfalls im Gleichgewicht
-haelt. Der Beton nimmt keinen Zug auf, im Druck rechnet er linear mit dem
-wirksamen Modul ``E_cm/(1+phi)``. Die Plateaus liegen bei den
-**charakteristischen** Festigkeiten (:class:`Werkstoffsatz`): der Stahl
-fliesst bei ``f_yk``, der Beton traegt hoechstens ``f_ck``. **Nur gezogene
-Bewehrung zaehlt** -- eine gedrueckte Lage wuerde den Hebelarm vergroessern
-und den Nachweis guenstiger machen, als er ist.
+haelt. Der Beton nimmt keinen Zug auf. Womit gerechnet wird, waehlt das
+Kapitel (:class:`~opencivil.nachweis.rechenwahl.Rechenwahl`): die
+Kriechzahl, den Wertesatz und die Rechenart. Die Vorgabe ist, wie bis
+2026-10-09 fest: **elastisch** -- der Beton im Druck linear mit dem wirksamen
+Modul ``E_cm/(1+phi)`` -- mit den **charakteristischen** Festigkeiten: der
+Stahl fliesst bei ``f_yk``, der Beton traegt hoechstens ``f_ck``.
+
+Die gedrueckte Bewehrung wirkt mit, wie im Querschnitt -- nur in der
+Rechenart «Handrechnung» nicht. Gemessen wird an der am staerksten
+gezogenen Lage. (Bis 2026-10-09 stand hier, nur gezogene Bewehrung zaehle;
+gerechnet wurde aber schon damals mit beiden.)
 
 WENN DER STAHL FLIESST:
 Auf dem Plateau bleibt die Spannung bei ``f_yk`` stehen. Bei normaler
@@ -78,7 +83,8 @@ from opencivil.nachweis.querschnittsloeser import (
     Querschnittsloeser, Stahllage, Werkstoffsatz,
 )
 from opencivil.nachweis.rechenwahl import (
-    Kennwerte, Rechenart, Rechenwahl, bezuege_vereinen, gesetze, werkstoffbezuege,
+    Kennwerte, Rechenart, Rechenwahl, bezuege_vereinen, gesetze,
+    protokoll_gesetze, protokoll_rechenwahl, werkstoffbezuege,
 )
 from opencivil.nachweis.zustand2 import wertigkeit
 from opencivil.querschnitt.platte import Richtung
@@ -91,9 +97,10 @@ FLIESSABSTAND = 80e6
 #: :meth:`GrenzeGegenFliessen.gilt_bei` -- die Liste gehoert der Grenze.
 _GEFORDERT = ("erhoeht", "hoch")
 
-#: Womit die Werkstoffgesetze rechnen. Ein Gebrauchsnachweis fragt, was der
-#: Querschnitt tut, nicht was er darf.
-WERKSTOFFE = Werkstoffsatz.CHARAKTERISTISCH
+#: Womit die Stahlspannungen rechnen, wenn das Kapitel nichts anderes waehlt:
+#: elastisch, mit charakteristischen Werten -- ein Gebrauchsnachweis fragt,
+#: was der Querschnitt tut, nicht was er darf.
+VORGABE = Rechenwahl(satz=Werkstoffsatz.CHARAKTERISTISCH, art=Rechenart.ELASTISCH)
 
 
 @dataclass(frozen=True)
@@ -393,9 +400,8 @@ class Spannungsbegrenzung(Nachweis):
     """
     Stahlspannung unter Gebrauchslast, je Tragrichtung, gegen eine Grenze.
 
-    Ein Urteil je Lastfall. Gerechnet wird am gerissenen Querschnitt mit dem
-    wirksamen Elastizitätsmodul und charakteristischen Festigkeiten; gezählt
-    wird nur die gezogene Bewehrung. Wogegen gehalten wird, sagt ``grenze``.
+    Ein Urteil je Lastfall. Gerechnet wird am gerissenen Querschnitt, womit,
+    sagt ``wahl``; wogegen gehalten wird, sagt ``grenze``.
     """
 
     @property
@@ -412,6 +418,7 @@ class Spannungsbegrenzung(Nachweis):
         faelle: Sequence[Gebrauchsfall],
         *,
         grenze: Spannungsgrenze,
+        wahl: Rechenwahl = VORGABE,
     ) -> None:
         if not faelle:
             raise ValueError("Ohne Lastfall gibt es nichts zu begrenzen.")
@@ -422,6 +429,7 @@ class Spannungsbegrenzung(Nachweis):
         self.posten = grenze.posten
         self.faelle = list(faelle)
         self.grenze = grenze
+        self.wahl = wahl
         self.ergebnisse: List[Fallergebnis] = []
 
         r = richtung.value
@@ -441,8 +449,7 @@ class Spannungsbegrenzung(Nachweis):
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),
             Eingabebezug("b", querschnitt.id_breite(richtung)),
-            Eingabebezug("phi", querschnitt.id_von("kriechzahl")),
-        ] + werkstoffbezuege(WERKSTOFFE, querschnitt.beton, stahl)
+        ] + werkstoffbezuege(wahl.satz, querschnitt.beton, stahl)
         for lage, art, _, as_id, z_id in self.posten:
             marke = f"{lage.nummer}{art.kuerzel}"
             bezuege += [
@@ -469,8 +476,7 @@ class Spannungsbegrenzung(Nachweis):
     def pruefe(self, e: Eingaben, p: Protokoll):
         h = e.g("h").si
         b = e.g("b").si
-        wahl = Rechenwahl(kriechzahl=e.g("phi").si, satz=WERKSTOFFE,
-                          art=Rechenart.ELASTISCH)
+        wahl = self.wahl
         w = Kennwerte.aus_eingaben(e, wahl.satz)
         E_s, f_s = w.E_s, w.f_s
 
@@ -577,49 +583,64 @@ class Spannungsbegrenzung(Nachweis):
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, n: float) -> float:
         """Was fuer alle Faelle gilt -- und die Grenze, die dabei entsteht."""
         g = self.grenze
+        wahl = self.wahl
         p.titel(f"Stahlspannung unter {g.einwirkung} Einwirkung – "
                 f"{self.richtung.beschriftung}")
         p.erklaerung(
             f"{g.einleitung} Gerechnet wird am gerissenen Querschnitt: der "
-            f"Beton nimmt keinen Zug auf, im Druck rechnet er linear mit dem "
-            f"wirksamen Modul. Gezählt wird nur gezogene Bewehrung."
+            f"Beton nimmt keinen Zug auf. Die Bewehrung wirkt auf Zug und auf "
+            f"Druck – nur in der Handrechnung zählt die gedrückte nicht. "
+            f"Gemessen wird an der am stärksten gezogenen Lage."
         )
-        wertigkeit = Zwischenwerte(self.id).zahl("n", "n", n, stellen=2)
-        protokoll_wirksamer_modul(p, e, self.id, titel="Wirksamer Elastizitätsmodul",
-                                  nachsatz=rf"\qquad {angabe(wertigkeit)}")
+        phi = protokoll_rechenwahl(p, wahl, self.id)
+        if wahl.art.mit_kriechzahl:
+            nachsatz = ""
+            if wahl.art is Rechenart.ELASTISCH:
+                wertigkeit = Zwischenwerte(self.id).zahl("n", "n", n, stellen=2)
+                nachsatz = rf"\qquad {angabe(wertigkeit)}"
+            protokoll_wirksamer_modul(p, e["E_cm"], phi, self.id,
+                                      titel="Wirksamer Elastizitätsmodul", nachsatz=nachsatz)
         sigma_adm = g.bestimmen(e, p)
 
         p.titel("Welche Werte angesetzt werden", ebene=3)
         p.erklaerung(
             "Drei Festlegungen stecken in jeder Zahl unten, und alle drei "
             "sind Auslegung der Norm und nicht Rechnung. Erstens das "
-            "Kriechen: angesetzt wird dasselbe φ wie sonst, hier aus der "
-            "Eingabe. Das liegt auf der sicheren Seite – ein grösseres φ "
+            "Kriechen: angesetzt wird das φ dieses Kapitels. Ein grösseres φ "
             "weicht den Beton auf, die Druckzone wächst, der Hebelarm wird "
-            "kleiner und die Stahlspannung damit grösser. Wer φ = 0 setzte, "
-            "bekäme kleinere Spannungen und einen Nachweis, der leichter "
-            "aufgeht."
+            "kleiner und die Stahlspannung damit grösser; mit φ = 0 gehen die "
+            "Spannungen zurück, und der Nachweis geht leichter auf. Mit dem "
+            "Spannungsblock hängt kein Gesetz am Modul – dort wirkt φ nicht."
         )
-        p.erklaerung(
-            "Zweitens die Werkstoffgesetze: sie rechnen mit den "
-            "charakteristischen Festigkeiten. Der Stahl ist linear bis f_yk "
-            "und fliesst dann, der Beton linear bis f_ck. Ein "
-            "Gebrauchsnachweis fragt, was der Querschnitt tut, und nicht, was "
-            "er darf – der Teilsicherheitsbeiwert gehört in die "
-            "Tragsicherheit. Läge das Plateau bei f_yd, bliebe jede "
-            "Stahlspannung darunter, und eine Grenze darüber könnte nie "
-            "überschritten werden."
-        )
-        f_s, f_c = e[WERKSTOFFE.stahl], e[WERKSTOFFE.beton]
-        p.gleichung(
-            rf"\sigma_s = \min\left[E_s \cdot \varepsilon_s;\ {f_s.symbol}\right]"
-            rf" \quad {angabe(f_s)} \qquad "
-            rf"\sigma_c = \max\left[E_{{c,eff}} \cdot \varepsilon_c;\ -{f_c.symbol}\right]"
-            rf" \quad {angabe(f_c)}",
-            titel="Werkstoffgesetze im Gebrauchszustand")
+        if wahl.satz is Werkstoffsatz.CHARAKTERISTISCH:
+            p.erklaerung(
+                "Zweitens die Werkstoffgesetze: sie rechnen mit den "
+                "charakteristischen Festigkeiten. Der Stahl ist linear bis f_yk "
+                "und fliesst dann, der Beton trägt höchstens f_ck. Ein "
+                "Gebrauchsnachweis fragt, was der Querschnitt tut, und nicht, was "
+                "er darf – der Teilsicherheitsbeiwert gehört in die "
+                "Tragsicherheit. Läge das Plateau bei f_yd, bliebe jede "
+                "Stahlspannung darunter, und eine Grenze darüber könnte nie "
+                "überschritten werden."
+            )
+        else:
+            p.erklaerung(
+                "Zweitens die Werkstoffgesetze: sie rechnen hier mit den "
+                "Bemessungswerten f_cd und f_yd. Das Plateau des Stahls liegt "
+                "damit bei f_yd – eine Stahlspannung darüber gibt es nicht, und "
+                "eine Grenze darüber kann nicht überschritten werden."
+            )
+        if wahl.art.mit_block:
+            p.erklaerung(
+                "Mit dem Spannungsblock trägt der Beton unter (1 − 0.85)·ε_c2d "
+                "nichts. Unter Gebrauchslast liegt die Druckresultierende damit "
+                "am Rand, und der Hebelarm wird beinahe d – die Stahlspannung "
+                "kleiner, als der Querschnitt sie hat. Der Block ist ein Modell "
+                "für den Bruch.")
+        protokoll_gesetze(p, wahl, e, self.id, titel="Werkstoffgesetze im Gebrauchszustand")
         g.festlegung(p)
         p.erklaerung(
-            "Fliesst die Bewehrung, bleibt ihre Spannung bei f_yk stehen, "
+            "Fliesst die Bewehrung, bleibt ihre Spannung am Plateau stehen, "
             "während die Dehnung weiterwächst. Verglichen wird dann die "
             "Dehnung: ε_s gegen ε_s,adm = σ_s,adm / E_s. Solange der Stahl "
             "elastisch bleibt, ist das genau der Spannungsvergleich; fliesst "
@@ -627,7 +648,8 @@ class Spannungsbegrenzung(Nachweis):
             "weiter er gedehnt ist."
         )
         p.titel("Wie die Dehnungsebene gefunden wird", ebene=3)
-        protokoll_verfahren(p, eps_druck=EPS_DRUCK, eps_zug=EPS_ZUG)
+        protokoll_verfahren(p, eps_druck=EPS_DRUCK, eps_zug=EPS_ZUG,
+                            verdraengt=wahl.art is not Rechenart.HANDRECHNUNG)
         return sigma_adm
 
     def _protokoll_fall(self, p: Protokoll, e: Eingaben, erg: Fallergebnis) -> None:
@@ -671,7 +693,7 @@ class Spannungsbegrenzung(Nachweis):
         p.text(f"Stahl fliesst (σ_s = {erg.sigma_s / 1e6:.0f} N/mm²) → "
                f"Vergleich über die Dehnung.")
         p.formel(werte.dehnung("eps_y", r"\varepsilon_y", erg.eps_y),
-                 r"\frac{@f_s}{@E_s}", {"f_s": e[WERKSTOFFE.stahl], "E_s": e["E_s"]},
+                 r"\frac{@f_s}{@E_s}", {"f_s": e[self.wahl.satz.stahl], "E_s": e["E_s"]},
                  titel="Grösste Zugdehnung in der Bewehrung",
                  nachsatz=rf"\quad < \quad {angabe(wirkt)}")
         p.formel(grenze, r"\frac{@sigma}{@E_s}",

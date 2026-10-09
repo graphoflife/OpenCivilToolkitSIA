@@ -10,7 +10,8 @@ from opencivil.core.einheiten import N_PRO_MM2
 from opencivil.projekt import (
     Aufbau, GebrauchsfallEintrag, Gebrauchsliste, KnickEintrag, KombinationEintrag,
     LageEintrag, MaterialEintrag, ObergrenzeEintrag, PostenEintrag, Projekt,
-    ProjektFehler, QuerkraftbewehrungEintrag, QuerschnittEintrag, SpannungsfallEintrag,
+    ProjektFehler, QuerkraftbewehrungEintrag, QuerschnittEintrag, RechenwahlEintrag,
+    SpannungsfallEintrag,
 )
 from opencivil.projekt.eintraege import Beschreibung
 from opencivil.projekt.querschnittsanalyse import (
@@ -391,6 +392,7 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
         (KnickEintrag, {"name": "k"}, {"name": "k"}),
         (SpannungsfallEintrag, {"name": "s"}, {"name": "s"}),
         (GebrauchsfallEintrag, {"name": "g"}, {"name": "g"}),
+        (RechenwahlEintrag, {}, {}),
         (KombinationEintrag, {"name": "k"}, {"name": "k"}),
         (GleichungszeileEintrag, {}, {}),
         (GleichungsblattEintrag, {"kennung": "g"}, {"kennung": "g", "name": "g"}),

@@ -1,6 +1,6 @@
 # Voll
 
-116 Berechnungen ausgeführt, 246 Werte bestimmt.
+114 Berechnungen ausgeführt, 244 Werte bestimmt.
 
 ## Herleitung
 
@@ -891,6 +891,12 @@ Massgebend: 3. Lage (kleinster Erfüllungsgrad).
 
 ### Stahlspannung unter quasi-ständiger Einwirkung – x-Richtung
 
+**Rechenwahl**
+
+$$
+\varphi = 2 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{elastisch}
+$$
+
 **Wirksamer Elastizitätsmodul**
 
 $$
@@ -1058,6 +1064,12 @@ $$
 $$
 
 ### Stahlspannung unter häufiger Einwirkung – x-Richtung
+
+**Rechenwahl**
+
+$$
+\varphi = 2 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{elastisch}
+$$
 
 **Wirksamer Elastizitätsmodul**
 
@@ -1896,6 +1908,12 @@ $$
 $$
 
 ### Stahlspannung unter quasi-ständiger Einwirkung – x-Richtung
+
+**Rechenwahl**
+
+$$
+\varphi = 2 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{elastisch}
+$$
 
 **Wirksamer Elastizitätsmodul**
 
@@ -3739,15 +3757,15 @@ $$
 
 ### Stahlspannung aus Rissbreite
 
-Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf, im Druck rechnet er linear mit dem wirksamen Modul. Gezählt wird nur gezogene Bewehrung.
+Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf. Die Bewehrung wirkt auf Zug und auf Druck – nur in der Handrechnung zählt die gedrückte nicht. Gemessen wird an der am stärksten gezogenen Lage.
 
-Drei Festlegungen stecken in jeder Zahl unten, und alle drei sind Auslegung der Norm und nicht Rechnung. Erstens das Kriechen: angesetzt wird dasselbe φ wie sonst, hier aus der Eingabe. Das liegt auf der sicheren Seite – ein grösseres φ weicht den Beton auf, die Druckzone wächst, der Hebelarm wird kleiner und die Stahlspannung damit grösser. Wer φ = 0 setzte, bekäme kleinere Spannungen und einen Nachweis, der leichter aufgeht.
+Drei Festlegungen stecken in jeder Zahl unten, und alle drei sind Auslegung der Norm und nicht Rechnung. Erstens das Kriechen: angesetzt wird das φ dieses Kapitels. Ein grösseres φ weicht den Beton auf, die Druckzone wächst, der Hebelarm wird kleiner und die Stahlspannung damit grösser; mit φ = 0 gehen die Spannungen zurück, und der Nachweis geht leichter auf. Mit dem Spannungsblock hängt kein Gesetz am Modul – dort wirkt φ nicht.
 
-Zweitens die Werkstoffgesetze: sie rechnen mit den charakteristischen Festigkeiten. Der Stahl ist linear bis f\_yk und fliesst dann, der Beton linear bis f\_ck. Ein Gebrauchsnachweis fragt, was der Querschnitt tut, und nicht, was er darf – der Teilsicherheitsbeiwert gehört in die Tragsicherheit. Läge das Plateau bei f\_yd, bliebe jede Stahlspannung darunter, und eine Grenze darüber könnte nie überschritten werden.
+Zweitens die Werkstoffgesetze: sie rechnen mit den charakteristischen Festigkeiten. Der Stahl ist linear bis f\_yk und fliesst dann, der Beton trägt höchstens f\_ck. Ein Gebrauchsnachweis fragt, was der Querschnitt tut, und nicht, was er darf – der Teilsicherheitsbeiwert gehört in die Tragsicherheit. Läge das Plateau bei f\_yd, bliebe jede Stahlspannung darunter, und eine Grenze darüber könnte nie überschritten werden.
 
 Drittens die Grenze: dieselbe wie bei der Zwängung, mit f\_yk und bei erhöhter und hoher Anforderung zusätzlich begrenzt durch die Rissbreite. Massgebend ist der dickste Stab der Tragrichtung. Welche Lage die grösste Zugspannung trägt, wechselt mit dem Lastfall – bei einem Feldmoment die untere, bei einem Stützmoment die obere –, und der dickste Stab gibt die kleinste zulässige Spannung. Das liegt für beide auf der sicheren Seite.
 
-Fliesst die Bewehrung, bleibt ihre Spannung bei f\_yk stehen, während die Dehnung weiterwächst. Verglichen wird dann die Dehnung: ε\_s gegen ε\_s,adm = σ\_s,adm / E\_s. Solange der Stahl elastisch bleibt, ist das genau der Spannungsvergleich; fliesst er, fällt der Nachweis durch, und zwar um so deutlicher, je weiter er gedehnt ist.
+Fliesst die Bewehrung, bleibt ihre Spannung am Plateau stehen, während die Dehnung weiterwächst. Verglichen wird dann die Dehnung: ε\_s gegen ε\_s,adm = σ\_s,adm / E\_s. Solange der Stahl elastisch bleibt, ist das genau der Spannungsvergleich; fliesst er, fällt der Nachweis durch, und zwar um so deutlicher, je weiter er gedehnt ist.
 
 Die Dehnungsebene wird gesucht, nicht hergeleitet. Eine ebene Dehnungsverteilung hat zwei Unbekannte – die Dehnung in der Mittelebene ε\_m und die Krümmung χ – und ihnen stehen zwei Gleichgewichtsbedingungen gegenüber: N und M. Geschlossen auflösen lässt sich das nicht, weil die Werkstoffgesetze nichtlinear sind.
 
@@ -3791,7 +3809,7 @@ $$
 
 ### Stahlspannung gegen Fliessen
 
-Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst bleiben Risse und Durchbiegung dauerhaft. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf, im Druck rechnet er linear mit dem wirksamen Modul. Gezählt wird nur gezogene Bewehrung.
+Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst bleiben Risse und Durchbiegung dauerhaft. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf. Die Bewehrung wirkt auf Zug und auf Druck – nur in der Handrechnung zählt die gedrückte nicht. Gemessen wird an der am stärksten gezogenen Lage.
 
 Drittens die Grenze: sie rechnet mit dem Bemessungswert, σ\_s,adm = f\_yd − 80 N/mm², und nicht mit f\_yk − 80. Die Norm sagt an dieser Stelle nicht eindeutig, welcher Wert gemeint ist; f\_yd ist die strengere Wahl – die Grenze liegt rund 15 % tiefer –, gewählt ist deshalb die Seite, auf der man nicht danebenliegen kann. Das ist etwas anderes als das Fliessplateau oben: dort geht es darum, was der Stahl tut, hier darum, wie viel Abstand man davon verlangt.
 
@@ -4334,7 +4352,6 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) | $h_{Dist}$ | $104$ | mm | berechnet |
 | Höhe der Einlage | $e_{Einlage}$ | $40$ | mm | Vorgabe |
 | Plattendicke | $h$ | $200$ | mm | Vorgabe |
-| Kriechzahl | $\varphi$ | $2$ |  | Vorgabe |
 | Bewehrungsquerschnitt 1. Lage Grundbewehrung | $A_{s,1,x,g}$ | $262$ | mm² | berechnet |
 | Stabdurchmesser 1. Lage Grundbewehrung | $\varnothing_{1,x,g}$ | $10$ | mm | Vorgabe |
 | Teilung 1. Lage Grundbewehrung | $s_{1,x,g}$ | $150$ | mm | Vorgabe |
@@ -4389,7 +4406,6 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) | $h_{Dist}$ | $116$ | mm | berechnet |
 | Höhe der Einlage | $e_{Einlage}$ | $0$ | mm | Vorgabe |
 | Plattendicke | $h$ | $250$ | mm | Vorgabe |
-| Kriechzahl | $\varphi$ | $2$ |  | Vorgabe |
 | Bewehrungsquerschnitt 1. Lage Grundbewehrung | $A_{s,1,y,g}$ | $8378$ | mm² | berechnet |
 | Stabdurchmesser 1. Lage Grundbewehrung | $\varnothing_{1,y,g}$ | $40$ | mm | Vorgabe |
 | Teilung 1. Lage Grundbewehrung | $s_{1,y,g}$ | $150$ | mm | Vorgabe |
@@ -4424,7 +4440,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Querkraftwiderstand x-Richtung – Feld | $V_{Rd,x}$ | $142.9$ | kN/m | berechnet |
 | Erfüllungsgrad Rissnormalkraft – 2. Lage x | $\alpha_{eff,NR,2,x}$ | $1.17$ |  | berechnet |
 | Erfüllungsgrad Rissnormalkraft – 3. Lage x | $\alpha_{eff,NR,3,x}$ | $1.17$ |  | berechnet |
-| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %) | $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ | $2.42$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %) | $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ | $2.58$ |  | berechnet |
 | Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Schräg (60 %) | $\alpha_{eff,\sigma,w,x,\text{Schräg (60 \%)}}$ | $\infty$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – 2. Lage x | $\alpha_{eff,SV,2,x}$ | $1.87$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – 3. Lage x | $\alpha_{eff,SV,3,x}$ | $2.21$ |  | berechnet |

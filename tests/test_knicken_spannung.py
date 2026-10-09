@@ -26,11 +26,20 @@ def setzen(ziel, pfad: str, wert) -> None:
         raise AttributeError(f"{type(ziel).__name__} hat kein Feld '{letztes}'.")
     setattr(ziel, letztes, wert)
 
+def mit_kriechen(q) -> None:
+    """
+    φ = 2 in beiden Stahlspannungskapiteln -- wie bis 2026-10-09 das φ der
+    Platte. Die Zahlen in diesen Tests stammen aus jener Zeit.
+    """
+    q.haeufig.wahl.kriechzahl = q.quasistaendig.wahl.kriechzahl = 2.0
+
+
 class TestSpannungsbegrenzung(unittest.TestCase):
     def projekt(self, anforderung="hoch", **abweichungen) -> Projekt:
         projekt = Projekt.beispiel()
         q = projekt.querschnitte[0]
         q.rissanforderung = anforderung
+        mit_kriechen(q)
         for name, wert in abweichungen.items():
             setzen(q, name, wert)
         return projekt
@@ -141,6 +150,7 @@ class TestStahlspannungAusRissbreite(unittest.TestCase):
         q = projekt.querschnitte[0]
         q.rissanforderung = anforderung
         q.quasistaendig.faelle = list(eigene)
+        mit_kriechen(q)
         for name, wert in abweichungen.items():
             setzen(q, name, wert)
         return projekt

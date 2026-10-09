@@ -440,10 +440,12 @@ class QuerschnittEintrag(Beschreibung):
             zwaengung_begrenzt=bool(d.get("zwaengung_begrenzt", cls.zwaengung_begrenzt)),
             haeufig=Gebrauchsliste.aus_dict(
                 gebrauchsliste_roh(d, "haeufig", "haeufige"),
-                wort="häufige", vorgabe=HAEUFIG_ANTEIL),
+                wort="häufige", vorgabe=HAEUFIG_ANTEIL,
+                kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl)),
             quasistaendig=Gebrauchsliste.aus_dict(
                 gebrauchsliste_roh(d, "quasistaendig", "quasistaendige"),
-                wort="quasi-ständige", vorgabe=QUASISTAENDIG_ANTEIL),
+                wort="quasi-ständige", vorgabe=QUASISTAENDIG_ANTEIL,
+                kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl)),
             knickfaelle=[KnickEintrag.aus_dict(x)
                          for x in (d.get("knickfaelle") or [])],
             spannungsfaelle=[SpannungsfallEintrag.aus_dict(

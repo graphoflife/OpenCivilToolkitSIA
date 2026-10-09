@@ -103,13 +103,14 @@ class Betongesetz:
             return -self.f_cd
         return -self.f_cd * (k * eta - eta * eta) / nenner
 
-    def latex(self) -> str:
+    def latex(self, f: str = "f_{cd}") -> str:
+        """Als Formel -- ``f`` ist das Zeichen der Festigkeit, ``f_{ck}`` bei charakteristischen Werten."""
         return (
             r"\sigma_c(\varepsilon_c) = \begin{cases}"
-            r" -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta}"
+            rf" -{f} \cdot \dfrac{{k_\sigma\,\eta - \eta^2}}{{1 + (k_\sigma - 2)\,\eta}}"
             r" & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ "
             r"\eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex]"
-            r" -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex]"
+            rf" -{f} & \varepsilon_{{c1d}} < |\varepsilon_c| \le \varepsilon_{{c2d}} \\[1ex]"
             r" 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen})"
             r" \end{cases}"
         )
@@ -176,11 +177,12 @@ class Spannungsblock:
             return self.spannung(unten)
         return -self.f_cd * (knick - unten) / (oben - unten)
 
-    def latex(self) -> str:
+    def latex(self, f: str = "f_{cd}") -> str:
+        """Als Formel -- ``f`` ist das Zeichen der Festigkeit, ``f_{ck}`` bei charakteristischen Werten."""
         return (
             r"\sigma_c(\varepsilon_c) = \begin{cases}"
             r" 0 & \varepsilon_c > -(1 - " + f"{BLOCKANTEIL}" + r") \cdot \varepsilon_{c2d} \\[1ex]"
-            r" -f_{cd} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - "
+            rf" -{f} & -\varepsilon_{{c2d}} \le \varepsilon_c \le -(1 - "
             + f"{BLOCKANTEIL}" + r") \cdot \varepsilon_{c2d}"
             r" \end{cases}"
         )
@@ -227,11 +229,12 @@ class Stahlgesetz:
     def eps_yd(self) -> float:
         return self.f_yd / self.E_s
 
-    def latex(self) -> str:
+    def latex(self, zug: str = "f_{yd}", druck: str = "f_{yd}^{-}") -> str:
+        """Als Formel -- ``zug`` und ``druck`` sind die Zeichen der Plateaus."""
         return (
             r"\sigma_s(\varepsilon_s) = \begin{cases}"
-            r" \min(E_s\,\varepsilon_s;\ f_{yd}) & \varepsilon_s \ge 0 \\[1ex]"
-            r" \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & \varepsilon_s < 0"
+            rf" \min(E_s\,\varepsilon_s;\ {zug}) & \varepsilon_s \ge 0 \\[1ex]"
+            rf" \max(E_s\,\varepsilon_s;\ -{druck}) & \varepsilon_s < 0"
             r" \end{cases}"
             r" \qquad |\varepsilon_s| \le \varepsilon_{ud}"
         )

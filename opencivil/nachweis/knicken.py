@@ -533,7 +533,8 @@ class Knicken(Nachweis):
             r"\qquad M_{Ed,II} = \left|N_{Ed}\right| \cdot "
             r"\left(e_{0d} + e_{1d} + e_{2d}\right)",
             titel="Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein")
-        protokoll_wirksamer_modul(p, e, self.id, titel="Steifigkeit des Betons",
+        protokoll_wirksamer_modul(p, e["E_cm"], e["phi"], self.id,
+                                  titel="Steifigkeit des Betons",
                                   nachsatz=rf"\qquad {angabe(e['f_cd'])}")
         p.erklaerung(
             "Angesetzt wird das Kriechen mit demselben φ wie sonst, hier aus "

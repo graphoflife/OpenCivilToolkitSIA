@@ -47,7 +47,7 @@ from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, GebrauchsfallEintrag,
     Gebrauchsliste, KnickEintrag, KombinationEintrag, LageEintrag,
     MaterialEintrag, ObergrenzeEintrag, PostenEintrag, QuerkraftbewehrungEintrag,
-    SpannungsfallEintrag, abgeleiteter_fallname,
+    RechenwahlEintrag, SpannungsfallEintrag, abgeleiteter_fallname,
 )
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.querschnittsanalyse import (
@@ -67,6 +67,7 @@ __all__ = [
     "HAEUFIG_ANTEIL", "KnickEintrag", "KombinationEintrag", "LageEintrag",
     "MaterialEintrag", "ObergrenzeEintrag", "PostenEintrag", "Projekt", "ProjektFehler",
     "QUASISTAENDIG_ANTEIL", "QuerkraftbewehrungEintrag", "QuerschnittEintrag",
-    "RISSANFORDERUNGEN", "SpannungsfallEintrag", "abgeleiteter_fallname",
+    "RISSANFORDERUNGEN", "RechenwahlEintrag", "SpannungsfallEintrag",
+    "abgeleiteter_fallname",
     "aufbauen", "sorten",
 ]

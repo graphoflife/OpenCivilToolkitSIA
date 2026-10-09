@@ -33,12 +33,17 @@ from enum import Enum
 from typing import Callable, List, Sequence
 
 from opencivil.core.berechnung import Eingabebezug, Eingaben
+from opencivil.core.latex import angabe
+from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.wert import Wert
 from opencivil.nachweis.querschnittsloeser import (
     Querschnittsloeser, Stahllage, Werkstoffsatz, beton_elastisch,
     beton_nichtlinear, lagen_je_seite, stahl_bilinear, stahl_nur_zug,
     wirksamer_modul,
 )
-from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL, Spannungsblock
+from opencivil.querschnitt.werkstoffgesetz import (
+    BLOCKANTEIL, K_SIGMA_LATEX, Betongesetz, Spannungsblock, k_sigma,
+)
 
 Gesetz = Callable[[float], float]
 
@@ -68,6 +73,16 @@ class Rechenart(str, Enum):
             Rechenart.BLOCK: "Block genau",
             Rechenart.PARABEL: "Parabel",
             Rechenart.ELASTISCH: "elastisch",
+        }[self]
+
+    @property
+    def latex(self) -> str:
+        """Der Name als Formeltext -- fuer die Zeile «Rechenwahl» der Herleitung."""
+        return {
+            Rechenart.HANDRECHNUNG: rf"\text{{Handrechnung, Block }} {BLOCKANTEIL} \cdot x",
+            Rechenart.BLOCK: rf"\text{{Block }} {BLOCKANTEIL} \cdot x \text{{ genau}}",
+            Rechenart.PARABEL: r"\text{Parabel}",
+            Rechenart.ELASTISCH: r"\text{elastisch}",
         }[self]
 
     @property
@@ -231,6 +246,73 @@ class Gesetze:
             h=h, b=b, lagen=self.lagen(lagen, h), beton=beton or self.beton,
             stahl=self.stahl, gemittelt=self.gemittelt and beton is None,
             verdraengt=self.verdraengt, **fenster)
+
+
+def protokoll_rechenwahl(p: Protokoll, wahl: Rechenwahl, basis: str, *,
+                         titel: str = "Rechenwahl") -> Wert:
+    """
+    Womit das Kapitel rechnet, in einer Zeile: phi (nur wo es wirkt), Werte,
+    Rechenart. Zurueck kommt phi als Wert -- fuer die Formeln danach.
+    """
+    phi = Zwischenwerte(basis).zahl("phi", r"\varphi", wahl.kriechzahl, stellen=2)
+    satz = wahl.satz
+    teile = ([angabe(phi)] if wahl.art.mit_kriechzahl else []) + [
+        rf"\text{{{satz.beschriftung}}}\ {satz.beton_zeichen},\ {satz.stahl_zeichen}",
+        wahl.art.latex]
+    p.gleichung(r" \qquad ".join(teile), titel=titel)
+    return phi
+
+
+def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *,
+                      titel: str) -> None:
+    """
+    Die Werkstoffgesetze der Wahl, mit den Zeichen ihres Wertesatzes.
+
+    Der wirksame Modul steht nicht hier: wo er gebraucht wird, schreibt ihn
+    das Kapitel an der Stelle, an der er erklaert wird
+    (:func:`~opencivil.nachweis.querschnittsloeser.protokoll_wirksamer_modul`).
+    """
+    satz = wahl.satz
+    f_c, f_s = e[satz.beton], e[satz.stahl]
+    if wahl.art is Rechenart.ELASTISCH:
+        p.gleichung(
+            rf"\sigma_s = \min\left[E_s \cdot \varepsilon_s;\ {f_s.symbol}\right]"
+            rf" \quad {angabe(f_s)} \qquad "
+            rf"\sigma_c = \max\left[E_{{c,eff}} \cdot \varepsilon_c;\ -{f_c.symbol}\right]"
+            rf" \quad {angabe(f_c)}",
+            titel=titel)
+        return
+    werte = Zwischenwerte(basis)
+    if wahl.art is Rechenart.PARABEL:
+        E_c_eff = werte.spannung("E_c_eff", "E_{c,eff}",
+                                 wirksamer_modul(e.g("E_cm").si, wahl.kriechzahl))
+        p.formel(werte.zahl("k_sigma", r"k_{\sigma}", k_sigma(E_c_eff.groesse.si, f_c.groesse.si),
+                            stellen=2),
+                 K_SIGMA_LATEX, {"E_c": E_c_eff, "f_c": f_c},
+                 titel="Beiwert der Parabel, mit dem wirksamen Modul")
+        p.ansatz(Betongesetz(0.0, 1.0, 1.0, 0.0).latex(f_c.symbol),
+                 titel=f"{titel}: Beton, Parabel-Rechteck", referenz="SIA 262:2025, 4.2.1.6")
+    else:
+        if wahl.art is Rechenart.HANDRECHNUNG:
+            p.erklaerung(
+                "Mit der Handrechnung rechnet der Querschnitt wie die Resistenzlinie "
+                "aus Handrechnung: der Beton als Spannungsblock, die gedrückte "
+                "Bewehrung weggelassen, die Bewehrung jeder Seite zu einer Lage in "
+                "ihrem Schwerpunkt zusammengefasst, und der Beton auch dort gezählt, "
+                "wo der Stahl liegt.")
+        p.ansatz(Spannungsblock(0.0, 1.0).latex(f_c.symbol),
+                 titel=f"{titel}: Beton, Spannungsblock {BLOCKANTEIL}·x")
+    if wahl.art is Rechenart.HANDRECHNUNG:
+        p.ansatz(
+            r"\sigma_s = \begin{cases} \min\left(E_s \cdot \varepsilon_s;\ "
+            + f_s.symbol + r"\right) & \varepsilon_s > 0 \\[1ex]"
+            r" 0 & \varepsilon_s \le 0 \quad (\text{gedrückt: weggelassen})"
+            r" \end{cases}",
+            titel=f"{titel}: Stahl, nur auf Zug")
+    else:
+        p.gleichung(
+            rf"\sigma_s = \min\left[E_s \cdot \varepsilon_s;\ {f_s.symbol}\right]"
+            rf" \quad {angabe(f_s)}", titel=f"{titel}: Stahl")
 
 
 def gesetze(wahl: Rechenwahl, w: Kennwerte, *, eps_ud: float = 0.045) -> Gesetze:

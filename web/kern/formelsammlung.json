@@ -948,15 +948,15 @@
       "bloecke": [
         {
           "art": "text",
-          "text": "Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf, im Druck rechnet er linear mit dem wirksamen Modul. Gezählt wird nur gezogene Bewehrung."
+          "text": "Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf. Die Bewehrung wirkt auf Zug und auf Druck – nur in der Handrechnung zählt die gedrückte nicht. Gemessen wird an der am stärksten gezogenen Lage."
         },
         {
           "art": "text",
-          "text": "Drei Festlegungen stecken in jeder Zahl unten, und alle drei sind Auslegung der Norm und nicht Rechnung. Erstens das Kriechen: angesetzt wird dasselbe φ wie sonst, hier aus der Eingabe. Das liegt auf der sicheren Seite – ein grösseres φ weicht den Beton auf, die Druckzone wächst, der Hebelarm wird kleiner und die Stahlspannung damit grösser. Wer φ = 0 setzte, bekäme kleinere Spannungen und einen Nachweis, der leichter aufgeht."
+          "text": "Drei Festlegungen stecken in jeder Zahl unten, und alle drei sind Auslegung der Norm und nicht Rechnung. Erstens das Kriechen: angesetzt wird das φ dieses Kapitels. Ein grösseres φ weicht den Beton auf, die Druckzone wächst, der Hebelarm wird kleiner und die Stahlspannung damit grösser; mit φ = 0 gehen die Spannungen zurück, und der Nachweis geht leichter auf. Mit dem Spannungsblock hängt kein Gesetz am Modul – dort wirkt φ nicht."
         },
         {
           "art": "text",
-          "text": "Zweitens die Werkstoffgesetze: sie rechnen mit den charakteristischen Festigkeiten. Der Stahl ist linear bis f_yk und fliesst dann, der Beton linear bis f_ck. Ein Gebrauchsnachweis fragt, was der Querschnitt tut, und nicht, was er darf – der Teilsicherheitsbeiwert gehört in die Tragsicherheit. Läge das Plateau bei f_yd, bliebe jede Stahlspannung darunter, und eine Grenze darüber könnte nie überschritten werden."
+          "text": "Zweitens die Werkstoffgesetze: sie rechnen mit den charakteristischen Festigkeiten. Der Stahl ist linear bis f_yk und fliesst dann, der Beton trägt höchstens f_ck. Ein Gebrauchsnachweis fragt, was der Querschnitt tut, und nicht, was er darf – der Teilsicherheitsbeiwert gehört in die Tragsicherheit. Läge das Plateau bei f_yd, bliebe jede Stahlspannung darunter, und eine Grenze darüber könnte nie überschritten werden."
         },
         {
           "art": "text",
@@ -964,7 +964,7 @@
         },
         {
           "art": "text",
-          "text": "Fliesst die Bewehrung, bleibt ihre Spannung bei f_yk stehen, während die Dehnung weiterwächst. Verglichen wird dann die Dehnung: ε_s gegen ε_s,adm = σ_s,adm / E_s. Solange der Stahl elastisch bleibt, ist das genau der Spannungsvergleich; fliesst er, fällt der Nachweis durch, und zwar um so deutlicher, je weiter er gedehnt ist."
+          "text": "Fliesst die Bewehrung, bleibt ihre Spannung am Plateau stehen, während die Dehnung weiterwächst. Verglichen wird dann die Dehnung: ε_s gegen ε_s,adm = σ_s,adm / E_s. Solange der Stahl elastisch bleibt, ist das genau der Spannungsvergleich; fliesst er, fällt der Nachweis durch, und zwar um so deutlicher, je weiter er gedehnt ist."
         },
         {
           "art": "text",
@@ -1039,7 +1039,7 @@
       "bloecke": [
         {
           "art": "text",
-          "text": "Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst bleiben Risse und Durchbiegung dauerhaft. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf, im Druck rechnet er linear mit dem wirksamen Modul. Gezählt wird nur gezogene Bewehrung."
+          "text": "Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst bleiben Risse und Durchbiegung dauerhaft. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf. Die Bewehrung wirkt auf Zug und auf Druck – nur in der Handrechnung zählt die gedrückte nicht. Gemessen wird an der am stärksten gezogenen Lage."
         },
         {
           "art": "text",

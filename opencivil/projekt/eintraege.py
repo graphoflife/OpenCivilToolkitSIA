@@ -29,7 +29,7 @@ from opencivil.projekt.lesen import (
     ProjektFehler, kriechzahl_aus, nur_x, pflichtfeld, sorten, vorgabe, zahl,
 )
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
-from opencivil.nachweis.rechenwahl import RECHENARTEN, Rechenart
+from opencivil.nachweis.rechenwahl import RECHENARTEN, SPANNUNGSARTEN, Rechenart, Rechenwahl
 from opencivil.spannungsanalyse import Analyseart
 
 #: Mit welchen Festigkeiten ein Werkstoffgesetz rechnen kann, siehe
@@ -517,6 +517,70 @@ def eindeutig(faelle, platte: str, was: str, *, bauteil: str = "Platte") -> None
 
 
 @dataclass
+class RechenwahlEintrag(Beschreibung):
+    """
+    Womit ein Nachweis-Kapitel rechnet: Kriechzahl, Wertesatz, Rechenart --
+    siehe :class:`~opencivil.nachweis.rechenwahl.Rechenwahl`.
+
+    Jedes Kapitel hat seine eigene; die Kriechzahl der Platte gilt nur fuer
+    den Vergroesserungsfaktor w/w_c. In einer Datei von vor 2026-10-09 fehlt
+    die Wahl -- dann gilt, was damals fest galt: die Rechenart und der
+    Wertesatz des Kapitels (``vorgabe``) und das phi der Platte
+    (``kriechzahl_alt``).
+    """
+
+    kriechzahl: float = 0.0
+    werkstoffsatz: str = WERKSTOFFSAETZE[0]
+    rechenart: str = Rechenart.HANDRECHNUNG.value
+
+    @classmethod
+    def gebrauch(cls) -> "RechenwahlEintrag":
+        """Die Stahlspannungen: elastisch, mit charakteristischen Werten."""
+        return cls(werkstoffsatz=Werkstoffsatz.CHARAKTERISTISCH.value,
+                   rechenart=Rechenart.ELASTISCH.value)
+
+    @classmethod
+    def knicken_verformung(cls) -> "RechenwahlEintrag":
+        """Die Ausmitte e_2d: mit der Parabel und Bemessungswerten."""
+        return cls(rechenart=Rechenart.PARABEL.value)
+
+    @property
+    def wahl(self) -> Rechenwahl:
+        """Was der Kern daraus rechnet."""
+        return Rechenwahl.aus(self.kriechzahl, self.werkstoffsatz, self.rechenart)
+
+    def pruefen(self, wo: str, arten=RECHENARTEN) -> None:
+        """Was es nicht gibt, meldet sich -- ``arten`` sagt, welche Rechenarten gelten."""
+        if self.kriechzahl < 0.0:
+            raise ProjektFehler(f"{wo}: die Kriechzahl kann nicht negativ sein.")
+        if self.werkstoffsatz not in WERKSTOFFSAETZE:
+            raise ProjektFehler(f"{wo}: «{self.werkstoffsatz}» gibt es als Werte nicht. "
+                                f"Möglich sind: {', '.join(WERKSTOFFSAETZE)}.")
+        moeglich = [a.value for a in arten]
+        if self.rechenart not in moeglich:
+            raise ProjektFehler(f"{wo}: die Rechenart «{self.rechenart}» gibt es dort nicht. "
+                                f"Möglich sind: {', '.join(moeglich)}.")
+
+    @classmethod
+    def aus_dict(cls, d: Optional[Mapping[str, Any]], *,
+                 vorgabe: Optional["RechenwahlEintrag"] = None,
+                 kriechzahl_alt: Optional[float] = None,
+                 wo: str = "Rechenwahl", arten=RECHENARTEN) -> "RechenwahlEintrag":
+        """Fehlt ``d`` oder ein Feld darin, gilt ``vorgabe`` -- und fuer phi ``kriechzahl_alt``."""
+        vorgabe = vorgabe or cls()
+        d = d or {}
+        eintrag = cls(
+            kriechzahl=kriechzahl_aus(
+                d, "kriechzahl", wo=wo,
+                alt=vorgabe.kriechzahl if kriechzahl_alt is None else kriechzahl_alt),
+            werkstoffsatz=str(d.get("werkstoffsatz") or vorgabe.werkstoffsatz),
+            rechenart=str(d.get("rechenart") or vorgabe.rechenart),
+        )
+        eintrag.pruefen(wo, arten)
+        return eintrag
+
+
+@dataclass
 class Gebrauchsliste(Beschreibung):
     """
     Die Lastfaelle eines Stahlspannungsnachweises: eigene und abgeleitete.
@@ -547,6 +611,9 @@ class Gebrauchsliste(Beschreibung):
     faelle: List[GebrauchsfallEintrag] = field(default_factory=list)
     """Eigene Lastfaelle -- neben den abgeleiteten, nicht statt ihrer."""
 
+    wahl: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.gebrauch)
+    """Womit die Stahlspannung gerechnet wird -- Vorgabe elastisch, charakteristisch."""
+
     def lastfall(self, name: str, *, M_Ed: float = 0.0,
                  N_Ed: float = 0.0) -> GebrauchsfallEintrag:
         """Einen eigenen Lastfall anfuegen -- kNm und kN, Zug positiv."""
@@ -575,6 +642,7 @@ class Gebrauchsliste(Beschreibung):
                 f"{self.anteil:g} %.")
 
         eindeutig(self.faelle, platte, f"{wort}r Lastfall")
+        self.wahl.pruefen(f"Platte '{platte}', {wort} Lastfälle", SPANNUNGSARTEN)
 
         # Die abgeleiteten Faelle tragen den Namen ihrer Kombination mit
         # angehaengtem Anteil. Wer einen eigenen Lastfall genau so nennt,
@@ -604,13 +672,18 @@ class Gebrauchsliste(Beschreibung):
                     f"-- bitte einen davon anders benennen.")
 
     @classmethod
-    def aus_dict(cls, d: Mapping[str, Any], *, wort: str,
-                 vorgabe: float) -> "Gebrauchsliste":
+    def aus_dict(cls, d: Mapping[str, Any], *, wort: str, vorgabe: float,
+                 kriechzahl_alt: Optional[float] = None) -> "Gebrauchsliste":
+        """``kriechzahl_alt``: das phi der Platte, fuer eine Datei ohne Wahl."""
         return cls(
             anteil=zahl(d, "anteil", vorgabe),
             aus_tragsicherheit=bool(d.get("aus_tragsicherheit", cls.aus_tragsicherheit)),
             faelle=[GebrauchsfallEintrag.aus_dict(x, wort)
                     for x in (d.get("faelle") or [])],
+            wahl=RechenwahlEintrag.aus_dict(
+                d.get("wahl"), vorgabe=RechenwahlEintrag.gebrauch(),
+                kriechzahl_alt=kriechzahl_alt, arten=SPANNUNGSARTEN,
+                wo=f"Rechenwahl der {wort}n Lastfälle"),
         )
 
 
