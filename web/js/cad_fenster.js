@@ -29,7 +29,7 @@
 import {
   ansichtNeu, einpassen, nachBild, pfad, rasterZeichnen, zahlText, zoomen,
 } from './cad_ansicht.js';
-import { abstand, cadModell } from './cad_modell.js';
+import { abstand, auswahlTeil, cadModell } from './cad_modell.js';
 import {
   eingabeLeeren, eingabeNeu, fangen, feldnamen, felderLeeren, getipptPunkt, hilfenZeichnen, hilfstext,
   klickPunkt, taste as eingabeTaste,
@@ -196,8 +196,8 @@ function aktualisieren(a) {
   if (jetzt !== a.stand) {
     a.stand = jetzt;
     a.version += 1;
-    const da = a.modell.verzeichnis(a.adapter.zeichnung() || {});
-    a.auswahl = new Set([...a.auswahl].filter((k) => da.has(k)));
+    const z = a.adapter.zeichnung() || {};
+    a.auswahl = new Set([...a.auswahl].filter((k) => a.modell.gibt(z, k)));
     a.adapter.geaendert?.(a);
   }
   zeichnen(a);
@@ -257,6 +257,11 @@ function teilen(a) {
   });
 }
 
+/** Gibt es etwas zu kopieren -- ein ganzes Element oder einen Knoten? Einzelne Ecken kopiert es nicht. */
+function kopierbar(a) {
+  return [...a.auswahl].some((s) => auswahlTeil(s).i === null);
+}
+
 /**
  * Was neben einer Auswahl angeboten wird -- nur, was für sie geht: erst das
  * Allgemeine, dann das der App, zuletzt Löschen.
@@ -271,7 +276,7 @@ function aktionen(a) {
   const teilbar = (x) => x.art.form === 'flaeche' || (x.art.form === 'linie' && x.art.teilbar !== false);
   return [
     { zeichen: '⇢', text: 'Verschieben', taste: 'V', tun: () => starten(a, verschiebenBefehl()) },
-    { zeichen: '⧉', text: 'Kopieren', taste: 'C', tun: () => starten(a, kopierenBefehl()) },
+    kopierbar(a) ? { zeichen: '⧉', text: 'Kopieren', taste: 'C', tun: () => starten(a, kopierenBefehl()) } : null,
     nurLinien && gewaehlt.every(teilbar) ? {
       zeichen: '⫶', text: 'Teilen', titel: 'In der Mitte teilen: zwei Linien mit denselben Eigenschaften',
       tun: () => teilen(a),
@@ -283,11 +288,6 @@ function aktionen(a) {
     nurLinien ? {
       zeichen: '⇄', text: 'Umkehren', titel: 'Anfang und Ende tauschen',
       tun: () => jedesGewaehlte(a, 'linie', (zz, art, e) => { m.umkehren(art, e); }),
-    } : null,
-    gewaehlt.length && m.geteilt(z, a.auswahl) ? {
-      zeichen: '⛓', text: 'Lösen',
-      titel: 'Eigene Knoten, wo die Auswahl einen mit anderen Elementen teilt -- danach bleibt beim Verschieben der Rest liegen',
-      tun: () => aendern(a, (zz) => m.loesen(zz, new Set(a.auswahl))),
     } : null,
     ...(a.adapter.aktionen?.(a) || []),
     { zeichen: '✕', text: 'Löschen', taste: 'Entf', tun: () => loeschen(a) },
@@ -320,22 +320,39 @@ function allesZeigen(a) {
   zeichnen(a);
 }
 
-/** Die Auswahl, hervorgehoben: über dem Modell, unter dem Zeiger. */
+/**
+ * Die Auswahl, hervorgehoben: über dem Modell, unter dem Zeiger. Eine
+ * gewählte Ecke als volles Quadrat, und dünn gestrichelt das Element, dem
+ * sie gehört -- so sieht man, wessen Ecke es ist, wo mehrere aufeinander
+ * liegen.
+ */
 function hervorheben(a, kennungen, klasse) {
   const g = svgEl('g', { class: klasse });
   if (!kennungen.size) return g;
   const z = a.adapter.zeichnung();
   const m = a.modell;
   const lagen = m.lagen(z);
-  for (const k of z.knoten || []) {
-    if (!kennungen.has(k.kennung)) continue;
-    const [x, y] = nachBild(a.v, m.lage(k));
-    g.append(svgEl('rect', { x: x - 4.5, y: y - 4.5, width: 9, height: 9 }));
+  const quadrat = (p, extra = '') => {
+    const [x, y] = nachBild(a.v, p);
+    return svgEl('rect', { x: x - 4.5, y: y - 4.5, width: 9, height: 9, class: extra });
+  };
+  for (const k of z.knoten || []) if (kennungen.has(k.kennung)) g.append(quadrat(m.lage(k)));
+  const eigner = new Set();
+  for (const x of m.ecken(z)) {
+    const p = lagen.get(x.knoten);
+    if (!p || x.art.form === 'punkt' || !kennungen.has(x.schluessel)) continue;
+    g.append(quadrat(p, 'cad-ecke'));
+    eigner.add(x.e.kennung);
   }
   for (const { art, e } of m.elemente(z)) {
-    if (!kennungen.has(e.kennung)) continue;
+    const ganz = kennungen.has(e.kennung);
+    if (!ganz && !eigner.has(e.kennung)) continue;
     const orte = m.verweise(art, e).map((k) => lagen.get(k));
     if (orte.some((p) => !p)) continue;
+    if (!ganz) {
+      g.prepend(svgEl('path', { d: pfad(a.v, orte, art.form === 'flaeche'), class: 'cad-eigner' }));
+      continue;
+    }
     if (art.form === 'punkt') {
       const [x, y] = nachBild(a.v, orte[0]);
       const r = Math.max(5, (a.adapter.trefferradius?.(art, e) || 0) * a.v.massstab + 3);
@@ -839,7 +856,7 @@ function taste(e) {
       starten(a, verschiebenBefehl());
       break;
     case 'c':
-      if (!a.auswahl.size) return;
+      if (!kopierbar(a)) return;
       starten(a, kopierenBefehl());
       break;
     case 't':

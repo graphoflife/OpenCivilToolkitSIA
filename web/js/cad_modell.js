@@ -12,8 +12,16 @@
  * Zwei Regeln gelten wie im Kern (`opencivil/projekt/netz.py`), damit das
  * Fenster nichts anlegt, was der Kern anders sähe: eine Kennung kommt nie
  * wieder (die grösste plus eins), und genau gleiche Koordinaten sind ein
- * Knoten -- ausser man hat Elemente ausdrücklich gelöst (`loesen`). Der Kern
- * hängt nicht von diesen Funktionen ab; sie sind Eingabehilfe.
+ * Knoten. Der Kern hängt nicht von diesen Funktionen ab; sie sind
+ * Eingabehilfe.
+ *
+ * EINE ECKE GEHÖRT IHREM ELEMENT:
+ * Dass zwei Elemente sich einen Knoten teilen, ist Ablage, nicht Bedeutung.
+ * Gewählt wird eine Ecke eines Elements («F1#2», die dritte Ecke von F1),
+ * und verschoben wird, was gewählt ist: hängt an einem Knoten auch etwas,
+ * das nicht mitkommt, bekommt das Bewegte einen eigenen Knoten. Wer eine
+ * Bewehrungslinie verschiebt, deren Ende auf einer Polygonecke liegt, nimmt
+ * die Ecke also nicht mit. Wer beide will, wählt beide -- mit einem Rahmen.
  *
  * Eine Art kann sagen, was mit ihr nicht geht oder was dazugehört:
  * `teilbar: false` (eine Linie, die man nicht teilen darf) und
@@ -25,6 +33,18 @@
 
 /** Auf einen Millionstel Millimeter: getippte Abstände sollen keine Rundungsreste hinterlassen. */
 export const rund = (x) => Math.round(x * 1e6) / 1e6;
+
+/** Der Schlüssel einer Ecke in der Auswahl: Element und Nummer der Ecke, «F1#2». */
+export const eckeSchluessel = (kennung, i) => `${kennung}#${i}`;
+
+/**
+ * Was ein Schlüssel der Auswahl meint: `{kennung, i}` -- ein Element oder
+ * ein Knoten (`i` null), oder die Ecke `i` eines Elements.
+ */
+export function auswahlTeil(schluessel) {
+  const [kennung, i] = String(schluessel).split('#');
+  return { kennung, i: i === undefined ? null : Number(i) };
+}
 
 /** Die Zahl hinter der Vorsilbe -- oder null. */
 function nummer(kennung, vorsilbe) {
@@ -57,6 +77,29 @@ export function cadModell({ arten, achsen }) {
     return [...(e.knoten || [])];
   }
 
+  /** Setzt den `i`-ten Verweis eines Elements; ein Punkt hat nur den einen. */
+  function verweisSetzen(art, e, i, k) {
+    if (art.form === 'punkt') e.knoten = k;
+    else if (art.form === 'linie') {
+      if (i === 0) e.von = k; else e.bis = k;
+    } else e.knoten[i] = k;
+  }
+
+  /**
+   * Jede Ecke jedes Elements, mit ihrem Schlüssel für die Auswahl. Ein Punkt
+   * hat keine eigenen Ecken: wählt man ihn, ist er selbst gewählt.
+   */
+  function ecken(z) {
+    const liste = [];
+    for (const { art, e } of elemente(z)) {
+      verweise(art, e).forEach((k, i) => liste.push({
+        schluessel: art.form === 'punkt' ? e.kennung : eckeSchluessel(e.kennung, i),
+        art, e, i, knoten: k,
+      }));
+    }
+    return liste;
+  }
+
   /** Kennung -> [a, b] aller Knoten. */
   function lagen(z) {
     return new Map((z.knoten || []).map((k) => [k.kennung, lage(k)]));
@@ -67,6 +110,14 @@ export function cadModell({ arten, achsen }) {
     const v = new Map((z.knoten || []).map((k) => [k.kennung, { art: null, e: k }]));
     for (const x of elemente(z)) v.set(x.e.kennung, x);
     return v;
+  }
+
+  /** Gibt es noch, was der Schlüssel meint -- Element, Ecke oder Knoten? */
+  function gibt(z, schluessel) {
+    const { kennung, i } = auswahlTeil(schluessel);
+    const da = verzeichnis(z).get(kennung);
+    if (!da) return false;
+    return i === null || (da.art !== null && i < verweise(da.art, da.e).length);
   }
 
   function naechsteKennung(z, vorsilbe) {
@@ -114,11 +165,10 @@ export function cadModell({ arten, achsen }) {
 
   /**
    * Führt Knoten mit genau gleichen Koordinaten zusammen: der erste bleibt,
-   * die anderen gehen, ihre Elemente hängen danach am ersten. Mit `nur`
-   * bloss dort, wo einer davon liegt -- zwei gelöste Knoten anderswo bleiben
-   * zwei.
+   * die anderen gehen, ihre Elemente hängen danach am ersten. Ablage, nicht
+   * Bedeutung -- verschoben wird ohnehin je Element (`verschieben`).
    */
-  function zusammenfuehren(z, nur = null) {
+  function zusammenfuehren(z) {
     const orte = new Map();
     for (const k of z.knoten || []) {
       const schluessel = `${k[a]}|${k[b]}`;
@@ -126,7 +176,6 @@ export function cadModell({ arten, achsen }) {
     }
     const weg = new Set();
     for (const [erster, ...andere] of orte.values()) {
-      if (!andere.length || (nur && ![erster, ...andere].some((k) => nur.has(k)))) continue;
       for (const k of andere) {
         umhaengen(z, k, erster);
         weg.add(k);
@@ -136,32 +185,36 @@ export function cadModell({ arten, achsen }) {
   }
 
   /**
-   * Löscht Elemente und Knoten. Ein Knoten nimmt mit, was an ihm hängt: ein
-   * Punkt- oder Linienelement ganz, aus einem Umriss nur seine Ecke --
-   * solange drei bleiben. Ein gelöschtes Element nimmt seine Knoten mit,
-   * wenn sonst nichts mehr an ihnen hängt.
+   * Löscht, was gewählt ist (Schlüssel wie in der Auswahl). Ein Element geht
+   * ganz. Eine Ecke geht aus ihrem Umriss, solange drei bleiben; eine Linie
+   * ohne ihr Ende ist keine mehr und geht ganz. Ein Knoten nimmt mit, was an
+   * ihm hängt. Knoten, an denen danach nichts mehr hängt, gehen mit -- wenn
+   * vorher etwas an ihnen hing.
    */
-  function loeschen(z, kennungen) {
-    const knotenWeg = new Set((z.knoten || []).filter((k) => kennungen.has(k.kennung))
+  function loeschen(z, ziele) {
+    const knotenWeg = new Set((z.knoten || []).filter((k) => ziele.has(k.kennung))
       .map((k) => k.kennung));
+    const eckenWeg = new Map();
+    for (const s of ziele) {
+      const { kennung, i } = auswahlTeil(s);
+      if (i !== null) eckenWeg.set(kennung, new Set([...(eckenWeg.get(kennung) || []), i]));
+    }
     const frei = new Set();
     for (const art of arten) {
-      const liste = z[art.liste] || [];
-      z[art.liste] = liste.filter((e) => {
-        const ziele = verweise(art, e);
-        if (kennungen.has(e.kennung)) {
-          ziele.forEach((k) => frei.add(k));
+      z[art.liste] = (z[art.liste] || []).filter((e) => {
+        const ref = verweise(art, e);
+        const weg = (k, i) => knotenWeg.has(k) || Boolean(eckenWeg.get(e.kennung)?.has(i));
+        const betroffen = ref.some(weg);
+        if (ziele.has(e.kennung) || (betroffen && art.form !== 'flaeche')) {
+          ref.forEach((k) => frei.add(k));
           return false;
         }
-        if (art.form === 'flaeche') {
-          const rest = e.knoten.filter((k) => !knotenWeg.has(k));
-          if (rest.length !== e.knoten.length) {
-            e.knoten = rest;
-            return new Set(rest).size >= 3;
-          }
-          return true;
-        }
-        return !ziele.some((k) => knotenWeg.has(k));
+        if (!betroffen) return true;
+        ref.forEach((k, i) => { if (weg(k, i)) frei.add(k); });
+        e.knoten = ref.filter((k, i) => !weg(k, i));
+        if (new Set(e.knoten).size >= 3) return true;
+        e.knoten.forEach((k) => frei.add(k));
+        return false;
       });
     }
     const n = benutzung(z);
@@ -169,24 +222,40 @@ export function cadModell({ arten, achsen }) {
       && !(frei.has(k.kennung) && !n.get(k.kennung)));
   }
 
-  /** Die Knoten einer Auswahl: die gewählten und die der gewählten Elemente. */
-  function knotenDer(z, kennungen) {
-    const ziel = new Set();
-    for (const k of z.knoten || []) if (kennungen.has(k.kennung)) ziel.add(k.kennung);
-    for (const { art, e } of elemente(z)) {
-      if (kennungen.has(e.kennung)) verweise(art, e).forEach((k) => ziel.add(k));
+  /**
+   * Verschiebt, was gewählt ist, um `d` -- ganze Elemente, einzelne Ecken,
+   * freie Knoten (Schlüssel wie in der Auswahl). Bewegt wird je Element:
+   * hängt an einem Knoten auch etwas, das nicht mitkommt, bekommen die
+   * bewegten Ecken einen eigenen, und der alte bleibt liegen. Danach ist, was
+   * genau aufeinander liegt, wieder ein Knoten.
+   */
+  function verschieben(z, ziele, d) {
+    const nutzer = new Map();
+    const mit = new Map();
+    for (const x of ecken(z)) {
+      nutzer.set(x.knoten, (nutzer.get(x.knoten) || 0) + 1);
+      if (ziele.has(x.e.kennung) || ziele.has(x.schluessel)) mit.set(x.knoten, [...(mit.get(x.knoten) || []), x]);
     }
-    return ziel;
-  }
-
-  /** Verschiebt Knoten um `d`; was danach genau auf einem anderen liegt, wird eins mit ihm. */
-  function verschieben(z, knoten, d) {
-    for (const k of z.knoten || []) {
-      if (!knoten.has(k.kennung)) continue;
+    const knoten = new Map((z.knoten || []).map((k) => [k.kennung, k]));
+    // Ein gewählter Knoten geht ganz, mit allem, was an ihm hängt.
+    const bewegt = new Set([...ziele].filter((s) => knoten.has(s)).map((s) => knoten.get(s)));
+    for (const [kennung, ecke] of mit) {
+      const k = knoten.get(kennung);
+      if (!k || bewegt.has(k)) continue;
+      if (ecke.length === nutzer.get(kennung)) {
+        bewegt.add(k);
+        continue;
+      }
+      const eigener = { ...k, kennung: naechsteKennung(z, 'K') };
+      z.knoten.push(eigener);
+      ecke.forEach((x) => verweisSetzen(x.art, x.e, x.i, eigener.kennung));
+      bewegt.add(eigener);
+    }
+    for (const k of bewegt) {
       k[a] = rund(k[a] + d[0]);
       k[b] = rund(k[b] + d[1]);
     }
-    zusammenfuehren(z, knoten);
+    zusammenfuehren(z);
   }
 
   /**
@@ -219,50 +288,10 @@ export function cadModell({ arten, achsen }) {
   }
 
   /**
-   * Wo die gewählten Elemente einen Knoten mit einem anderen teilen, bekommen
-   * sie einen eigenen an derselben Stelle. Untereinander bleiben sie
-   * verbunden. Verschiebt man sie danach, bleibt der Rest liegen. Gibt
-   * zurück, wie viele Knoten neu sind.
-   */
-  function loesen(z, kennungen) {
-    const fremd = new Set();
-    for (const { art, e } of elemente(z)) {
-      if (!kennungen.has(e.kennung)) verweise(art, e).forEach((k) => fremd.add(k));
-    }
-    const neu = new Map();
-    const eigener = (k) => {
-      if (!fremd.has(k)) return k;
-      if (!neu.has(k)) {
-        const alt = z.knoten.find((x) => x.kennung === k);
-        const kennung = naechsteKennung(z, 'K');
-        z.knoten.push({ ...alt, kennung });
-        neu.set(k, kennung);
-      }
-      return neu.get(k);
-    };
-    for (const { art, e } of [...elemente(z)]) {
-      if (!kennungen.has(e.kennung)) continue;
-      if (art.form === 'punkt') e.knoten = eigener(e.knoten);
-      else if (art.form === 'linie') { e.von = eigener(e.von); e.bis = eigener(e.bis); }
-      else e.knoten = e.knoten.map(eigener);
-    }
-    return neu.size;
-  }
-
-  /** Teilen die gewählten Elemente einen Knoten mit einem, das nicht gewählt ist? */
-  function geteilt(z, kennungen) {
-    const fremd = new Set();
-    const eigen = new Set();
-    for (const { art, e } of elemente(z)) {
-      verweise(art, e).forEach((k) => (kennungen.has(e.kennung) ? eigen : fremd).add(k));
-    }
-    return [...eigen].some((k) => fremd.has(k));
-  }
-
-  /**
-   * Kopiert die gewählten Elemente `anzahl` mal, je um `d` weiter. Die Kopien
-   * bekommen eigene Knoten -- ausser dort, wo schon einer liegt. Gibt die
-   * Kennungen der Kopien zurück.
+   * Kopiert die gewählten Elemente und freien Knoten `anzahl` mal, je um `d`
+   * weiter; einzelne Ecken kopiert es nicht. Die Kopien bekommen eigene
+   * Knoten -- ausser dort, wo schon einer liegt. Gibt die Kennungen der
+   * Kopien zurück.
    */
   function kopieren(z, kennungen, d, anzahl = 1) {
     const neu = [];
@@ -292,7 +321,7 @@ export function cadModell({ arten, achsen }) {
   return {
     arten, achsen, artVon, lage, elemente, verweise, lagen, verzeichnis,
     naechsteKennung, knotenAn, benutzung, umhaengen, zusammenfuehren, loeschen,
-    knotenDer, verschieben, kopieren, linieTeilen, eckeEinfuegen, umkehren, loesen, geteilt,
+    verschieben, kopieren, linieTeilen, eckeEinfuegen, umkehren, ecken, gibt,
   };
 }
 

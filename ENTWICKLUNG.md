@@ -44,6 +44,65 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-09 · Eine Ecke gehört ihrem Element
+
+Wunsch: Liegen Punkte aufeinander, soll ein Klick genau einen wählen. Eine
+Bewehrungslinie, deren Anfang auf einer Polygonecke liegt, soll sich
+verschieben lassen, ohne die Ecke mitzunehmen. Wer gezielt wählen will,
+wählt zuerst das Polygon oder die Linie und dann die Ecke, mit Shift auch
+mehrere. Ohne Auswahl gilt: zuerst die zuletzt gesetzte Bewehrung, dann das
+zuletzt gezeichnete Polygon. Ein Rahmen wählt alle Punkte darin.
+
+Vorher: Ein Knoten gehörte allen Elementen, die an ihm hingen. Der Klick
+wählte den Knoten, und V verschob Polygon, Linie und Wände mit:
+
+```
+Linie von K1 gezeichnet, gewählt, V, 20 nach unten
+vorher:   Polygonecke (0, 0) -> (0, -20), das Polygon verzogen
+nachher:  Polygonecke bleibt bei (0, 0), nur die Linie wandert
+```
+
+Jetzt wählt man **Ecken von Elementen** («F1#2»: die dritte Ecke von F1):
+* **Ein Klick nimmt genau eine Ecke.** Wo mehrere aufeinander liegen, gilt:
+  1. die Ecke eines Elements, um das es gerade geht (es ist gewählt, oder
+     eine seiner Ecken);
+  2. sonst nach Art: Bewehrung (Linien, dann Stäbe), Schubwände,
+     Hilfslinien, zuletzt Flächen;
+  3. innerhalb einer Art das zuletzt gezeichnete, also die höchste Nummer.
+
+  Ein zweiter Klick an derselben Stelle nimmt die nächste Ecke. Der Zeiger
+  zeigt vorher, welche es wird: ein Quadrat und gestrichelt das Element, dem
+  sie gehört. Schubwände und Hilfslinien hattest du nicht genannt; sie
+  stehen als Linien vor den Flächen.
+* **Shift nimmt dazu.** Polygon wählen, eine Ecke klicken, die zweite mit
+  Shift: Es sind die zwei Ecken dieses Polygons, auch wo ein anderes
+  Polygon sie teilt.
+* **Ein Rahmen nach rechts** wählt, was ganz drin liegt, und jede Ecke im
+  Rahmen, auch die aufeinanderliegenden. So bleibt verbunden, was man
+  zusammen verschiebt.
+* **Verschoben wird, was gewählt ist.** Hängt an einem Knoten auch etwas,
+  das nicht mitkommt, bekommen die bewegten Ecken einen eigenen Knoten
+  (`verschieben` in `cad_modell.js`). Danach ist, was genau aufeinander
+  liegt, wieder ein Knoten: Das ist Ablage, keine Bedeutung. Kern und
+  Dateiformat bleiben darum, wie sie sind.
+* **«Lösen» ist weg.** Es tat von Hand, was jetzt jedes Verschieben tut.
+* **Eine gewählte Ecke** zeigt im schwebenden Fenster ihre Lage, etwa
+  «Linie 1 · Anfang». Geändert wird nur sie. Entf nimmt sie aus ihrem
+  Umriss, solange drei Ecken bleiben; eine Linie ohne ihr Ende geht ganz.
+  Kopieren gibt es nur für ganze Elemente.
+
+Nachgespielt im Browser, am Unterzug:
+* Linie von K1 nach (180, 120), gewählt, V, `0`, `-20`: Die Linie beginnt
+  bei (0, −20), die Polygonecke bleibt bei (0, 0).
+* Ohne Auswahl auf (0, 0): «Linie 3 · Anfang». Ein zweiter Klick: «Polygon 1
+  · Ecke 1».
+* Polygon, dann (0, 0), dann (300, 0) mit Shift, V um 30 nach unten: Nur die
+  beiden Polygonecken wandern, die Linie bleibt.
+* Rahmen um (0, 0): «2 Ecken». V verschiebt beide, und sie teilen danach
+  wieder einen Knoten.
+* Auf K5 klicken: «Linie 1 · Anfang». z = 40 im schwebenden Fenster: Nur die
+  Bewehrung rückt, die Wände bleiben.
+
 ## 2026-10-09 · Der Griff zwischen Eingaben und Berechnung ist zurück
 
 Wunsch: Die Panels behalten ihre feste Breite, aber ein Griff stellt ein, wie

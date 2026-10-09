@@ -23,7 +23,8 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
       `naechsteStufe` und `beschriftungenEntzerren` sind rein und wären in
       wenigen Zeilen abgedeckt; geprüft wird bisher von Hand im Browser.
       Dazu jetzt das Modell des Zeichenfensters (`cad_modell.js`: Knoten
-      anlegen, löschen, kopieren, lösen, zusammenführen) und das Fangen.
+      anlegen, löschen, kopieren, je Element verschieben, zusammenführen),
+      das Fangen und welche Ecke ein Klick nimmt.
 - [ ] Momente stehen in der Mitschrift als `kNm`, gemeint ist `kNm/m` (die
       Platte wird je Laufmeter gerechnet). In der Eingabemaske steht es
       richtig. Einheitlich ziehen.

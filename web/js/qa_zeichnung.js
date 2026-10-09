@@ -25,8 +25,9 @@ import { hakenSchalter } from './bausteine.js';
 import {
   nachBild, pfad, text, zahlText,
 } from './cad_ansicht.js';
+import { imSpiel } from './cad_auswahl.js';
 import { cadBereich, cadFenster, cadVergessen, cadWaehlen } from './cad_fenster.js';
-import { abstand } from './cad_modell.js';
+import { abstand, auswahlTeil } from './cad_modell.js';
 import { vorlageOeffnen } from './qa_vorlagen.js';
 import {
   auswahl, el, melden, svgEl, zahlfeld,
@@ -39,16 +40,20 @@ import { aendern, ausVorlage, projektAendern, zustand } from './zustand.js';
  * des Ganzen (n Stäbe je Hälfte, oder ein doppelter Stab in der Mitte).
  * Umgekehrt tauschen Start- und Endeisen mit -- die Stäbe bleiben, wo sie
  * sind.
+ *
+ * `rang`: welche Ecke ein Klick nimmt, wo mehrere aufeinander liegen und
+ * keines ihrer Elemente gewählt ist -- zuerst die Bewehrung, dann die
+ * anderen Linien, zuletzt die Flächen; je Art die zuletzt gezeichnete.
  */
 const ARTEN = [
-  { liste: 'flaechen', form: 'flaeche', vorsilbe: 'F' },
-  { liste: 'staebe', form: 'punkt', vorsilbe: 'S' },
+  { liste: 'flaechen', form: 'flaeche', vorsilbe: 'F', rang: 4 },
+  { liste: 'staebe', form: 'punkt', vorsilbe: 'S', rang: 1 },
   {
-    liste: 'stablinien', form: 'linie', vorsilbe: 'L', teilbar: false,
+    liste: 'stablinien', form: 'linie', vorsilbe: 'L', rang: 0, teilbar: false,
     umkehren: (e) => { [e.starteisen, e.endeisen] = [e.endeisen, e.starteisen]; },
   },
-  { liste: 'schubwaende', form: 'linie', vorsilbe: 'L' },
-  { liste: 'hilfslinien', form: 'linie', vorsilbe: 'L' },
+  { liste: 'schubwaende', form: 'linie', vorsilbe: 'L', rang: 2 },
+  { liste: 'hilfslinien', form: 'linie', vorsilbe: 'L', rang: 3 },
 ];
 
 /** Was eine Linie sein kann -- ihre Liste und ihre Vorlage im Katalog. */
@@ -126,8 +131,9 @@ function uebersichtZeichnen(a) {
 
 /** Markiert in der Liste, was im Fenster gewählt ist -- ohne sie neu zu bauen. */
 function auswahlMarkieren(a) {
+  const spiel = imSpiel(a);
   for (const z of a.qa.uebersichtKnoten?.querySelectorAll('[data-kennung]') || []) {
-    z.classList.toggle('ist-gewaehlt', a.auswahl.has(z.dataset.kennung));
+    z.classList.toggle('ist-gewaehlt', spiel.has(z.dataset.kennung));
   }
 }
 
@@ -641,8 +647,53 @@ function linienartWechseln(a, kennung, nach) {
 }
 
 /** Die Eigenschaften der Auswahl -- änderbar, bei mehreren gleicher Art für alle zugleich. */
+/** Wie eine Ecke heisst: Anfang und Ende einer Linie, sonst die Nummer der Ecke. */
+function eckeName(liste, i) {
+  if (LINIENLISTEN.includes(liste)) return i === 0 ? 'Anfang' : 'Ende';
+  return `Ecke ${i + 1}`;
+}
+
+/**
+ * Gewählte Ecken: eine zeigt ihre Lage als Felder -- geändert wird nur sie,
+ * was sonst am selben Punkt liegt, bleibt. Mehrere verschiebt man mit V.
+ */
+function eckenEigenschaften(a, z, teile) {
+  if (teile.length > 1) {
+    return {
+      titel: `${teile.length} Ecken`,
+      inhalt: [el('p.cad-hinweis-klein', { text: 'Verschieben mit V -- nur diese Ecken, was sonst dort liegt, bleibt.' })],
+    };
+  }
+  const [{ kennung, i }] = teile;
+  const da = finden(z, kennung);
+  const p = da && a.modell.lagen(z).get(a.modell.verweise(a.modell.artVon.get(da.liste), da.e)[i]);
+  if (!p) return { titel: '', inhalt: [] };
+  const schluessel = [...a.auswahl][0];
+  const lageSetzen = (achse) => (w) => a.aendern((zz) => {
+    const d = achse === 0 ? [w - p[0], 0] : [0, w - p[1]];
+    a.modell.verschieben(zz, new Set([schluessel]), d);
+  });
+  return {
+    titel: `${elementname(a, kennung)} · ${eckeName(da.liste, i)}`,
+    inhalt: [
+      zeile('y', zahlfeld({ wert: p[0], schritt: a.raster, beiAenderung: lageSetzen(0) }), 'mm'),
+      zeile('z', zahlfeld({ wert: p[1], schritt: a.raster, beiAenderung: lageSetzen(1) }), 'mm'),
+      el('p.cad-hinweis-klein', { text: 'Nur diese Ecke -- was sonst an diesem Punkt liegt, bleibt.' }),
+    ],
+  };
+}
+
 function eigenschaften(a) {
   const z = eintragVon(a.qa.kennung);
+  const teile = [...a.auswahl].map(auswahlTeil);
+  const ecken = teile.filter((t) => t.i !== null);
+  if (ecken.length && ecken.length === teile.length) return eckenEigenschaften(a, z, ecken);
+  if (ecken.length) {
+    return {
+      titel: `${teile.length} gewählt`,
+      inhalt: [el('p.cad-hinweis-klein', { text: 'Elemente und einzelne Ecken -- verschieben mit V.' })],
+    };
+  }
   const gewaehlt = [...a.auswahl].map((k) => finden(z, k)).filter(Boolean);
   if (!gewaehlt.length) return { titel: '', inhalt: [] };
   const listen = new Set(gewaehlt.map((x) => x.liste));
@@ -679,7 +730,6 @@ function eigenschaften(a) {
       inhalt: mehrere ? [el('p.cad-hinweis-klein', { text: 'Mehrere Knoten: verschieben mit V.' })] : [
         zeile('y', zahlfeld({ wert: e.y, schritt: a.raster, beiAenderung: lageSetzen(0) }), 'mm'),
         zeile('z', zahlfeld({ wert: e.z, schritt: a.raster, beiAenderung: lageSetzen(1) }), 'mm'),
-        el('p.cad-hinweis-klein', { text: 'Was an diesem Knoten hängt, geht mit.' }),
       ],
     };
   }

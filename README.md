@@ -80,7 +80,10 @@ u.einachsig = False                           # N, M_y, M_z zusammen, Nulllinie 
 
 Gezeichnet wird mit Knoten: gleiche Koordinaten sind ein Knoten, und die
 Wände oben teilen ihre Ecken mit der Bewehrungslinie unten. Dasselbe tut
-das Zeichenfenster. Eine Vorlage kommt dazu, wo man will:
+das Zeichenfenster -- verschoben wird dort aber nur, was gewählt ist: Wer
+die Bewehrungslinie verschiebt, nimmt die Wände nicht mit. Ein Klick wählt
+eine Ecke, wo mehrere aufeinander liegen, ein Rahmen alle. Eine Vorlage
+kommt dazu, wo man will:
 `u.vorlage_einsetzen("kreis", beton="b1", stahl="s1", masse={"D": 400},
 ursprung=(600, 0))` -- Rechteck, T-Balken, Hohlkasten oder Kreis.
 

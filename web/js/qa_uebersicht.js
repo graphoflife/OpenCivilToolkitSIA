@@ -13,6 +13,7 @@
  */
 
 import { zahlText } from './cad_ansicht.js';
+import { imSpiel } from './cad_auswahl.js';
 import { el } from './dom.js';
 import { span } from './mathe.js';
 import {
@@ -23,7 +24,7 @@ import {
 function zeile(a, fehler, kennung, was, wert = '') {
   return el('button.qa-element', {
     type: 'button',
-    class: [fehler.has(kennung) ? 'ist-fehler' : '', a.auswahl.has(kennung) ? 'ist-gewaehlt' : ''].join(' '),
+    class: [fehler.has(kennung) ? 'ist-fehler' : '', imSpiel(a).has(kennung) ? 'ist-gewaehlt' : ''].join(' '),
     dataset: { kennung },
     title: fehler.get(kennung)?.join('\n') || 'Im Zeichenfenster wählen',
     on: { click: () => waehlen(a.qa.kennung, [kennung]) },

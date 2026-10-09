@@ -5,24 +5,39 @@
  * mit einem Befehl, mit Basispunkt und Ziel. Wer eine Ecke an eine bestimmte
  * Stelle will, tippt sie ins schwebende Fenster.
  *
- *   Klick              wählt, was unter dem Zeiger liegt: Knoten vor
- *                      Punkten vor Linien vor Flächen, die kleinste zuerst
+ *   Klick              wählt, was unter dem Zeiger liegt: eine Ecke vor
+ *                      Punkten vor Linien vor Flächen, die kleinste zuerst.
+ *                      Liegen Ecken aufeinander, immer nur eine (`treffer`)
  *   noch ein Klick     an derselben Stelle: das nächste darunter
  *   Shift+Klick        nimmt dazu oder weg
- *   Rahmen ziehen      nach rechts: was ganz drin liegt; nach links: auch,
- *                      was er schneidet (wie in AxisVM und AutoCAD)
+ *   Rahmen ziehen      nach rechts: was ganz drin liegt, und jede Ecke im
+ *                      Rahmen; nach links: auch, was er schneidet (wie in
+ *                      AxisVM und AutoCAD)
  */
 
 import { nachBild, nachWelt } from './cad_ansicht.js';
 import {
-  abstand, aufStrecke, flaecheVon, innen, schnitt,
+  abstand, auswahlTeil, aufStrecke, flaecheVon, innen, schnitt,
 } from './cad_modell.js';
 import { NAEHE } from './cad_eingabe.js';
 import { el } from './dom.js';
 
+/** Die Elemente, um die es gerade geht: die gewählten, und wem eine gewählte Ecke gehört. */
+export function imSpiel(a) {
+  return new Set([...a.auswahl].map((s) => auswahlTeil(s).kennung));
+}
+
 /**
- * Alles unter dem Zeiger, in der Reihenfolge, in der es gewählt wird --
- * je Eintrag die Kennung.
+ * Alles unter dem Zeiger, in der Reihenfolge, in der es gewählt wird -- je
+ * Eintrag der Schlüssel der Auswahl.
+ *
+ * Zuerst die Ecken, die nächste Stelle zuerst. Liegen dort mehrere Ecken
+ * aufeinander, kommt zuerst die eines Elements, um das es gerade geht (es
+ * ist gewählt, oder eine seiner Ecken); sonst nach dem Rang seiner Art, den
+ * die App vorgibt (`art.rang`), und innerhalb der Art das zuletzt gezeichnete
+ * -- die höchste Nummer. Ein Klick wählt so immer genau eine Ecke; ein
+ * zweiter an derselben Stelle die nächste. Danach Punkte, Linien und Flächen
+ * unter dem Zeiger, das kleinste zuerst.
  */
 export function treffer(a, bild) {
   const z = a.adapter.zeichnung();
@@ -30,14 +45,27 @@ export function treffer(a, bild) {
   const lagen = m.lagen(z);
   const welt = nachWelt(a.v, bild);
   const weit = NAEHE / a.v.massstab;
-  const knoten = [];
+  const spiel = imSpiel(a);
+  const rang = (x) => x.art.rang ?? m.arten.indexOf(x.art);
+  const nummer = (x) => Number(String(x.e.kennung).replace(/^\D+/, '')) || 0;
+  const vorrang = (p, q) => (Number(spiel.has(q.e.kennung)) - Number(spiel.has(p.e.kennung)))
+    || (rang(p) - rang(q)) || (nummer(q) - nummer(p)) || (p.i - q.i);
+
+  const an = new Map();
+  for (const x of m.ecken(z)) an.set(x.knoten, [...(an.get(x.knoten) || []), x]);
+  const liste = [];
+  const nahe = (z.knoten || []).map((k) => ({ k, d: abstand(welt, m.lage(k)) }))
+    .filter((x) => x.d <= weit).sort((p, q) => p.d - q.d);
+  for (const { k } of nahe) {
+    const ecken = an.get(k.kennung) || [];
+    // Ein Knoten, an dem nichts hängt, ist selbst zu wählen.
+    if (!ecken.length) liste.push(k.kennung);
+    for (const x of [...ecken].sort(vorrang)) if (!liste.includes(x.schluessel)) liste.push(x.schluessel);
+  }
+
   const punkte = [];
   const linien = [];
   const flaechen = [];
-  for (const k of z.knoten || []) {
-    const d = abstand(welt, m.lage(k));
-    if (d <= weit) knoten.push({ kennung: k.kennung, d });
-  }
   for (const { art, e } of m.elemente(z)) {
     const orte = m.verweise(art, e).map((k) => lagen.get(k));
     if (orte.some((p) => !p)) continue;
@@ -53,7 +81,10 @@ export function treffer(a, bild) {
     }
   }
   const nach = (x, y) => x.d - y.d;
-  return [knoten, punkte, linien, flaechen].flatMap((liste) => liste.sort(nach).map((x) => x.kennung));
+  for (const gruppe of [punkte, linien, flaechen]) {
+    for (const x of gruppe.sort(nach)) if (!liste.includes(x.kennung)) liste.push(x.kennung);
+  }
+  return liste;
 }
 
 /** Ein Klick ohne Befehl: wählen, dazunehmen, durchschalten. */
@@ -68,7 +99,14 @@ export function klickWaehlen(a, bild, e) {
   a.letzterKlick = { bild, ziel };
   if (e.shiftKey) {
     if (ziel) {
-      if (a.auswahl.has(ziel)) a.auswahl.delete(ziel); else a.auswahl.add(ziel);
+      if (a.auswahl.has(ziel)) {
+        a.auswahl.delete(ziel);
+      } else {
+        a.auswahl.add(ziel);
+        // Eine Ecke eines ganz gewählten Elements: nun sind es seine Ecken.
+        const { kennung, i } = auswahlTeil(ziel);
+        if (i !== null) a.auswahl.delete(kennung);
+      }
     }
   } else {
     a.auswahl = new Set(ziel ? [ziel] : []);
@@ -86,10 +124,10 @@ function streckeImRechteck(p, q, [y0, z0, y1, z1], ganz) {
 
 /**
  * Was ein Rahmen wählt. `start` und `ende` in Bildpunkten: nach rechts
- * gezogen nur, was ganz drin liegt, nach links auch, was er schneidet.
- * Dazu die Knoten im Rahmen, die kein gewähltes Element schon mitbringt --
- * so zieht man etwa die rechte Kante eines Querschnitts auf, indem man ihre
- * beiden Knoten wählt und verschiebt.
+ * gezogen, was ganz drin liegt -- und jede Ecke im Rahmen, auch die, die
+ * genau aufeinander liegen. So zieht man die rechte Kante eines
+ * Querschnitts samt allem, was dort endet, mit einem Rahmen auf. Nach links
+ * gezogen jedes Element, das er schneidet. Dazu freie Knoten im Rahmen.
  */
 export function rahmenWaehlen(a, start, ende, dazu) {
   const ganz = ende[0] >= start[0];
@@ -100,7 +138,7 @@ export function rahmenWaehlen(a, start, ende, dazu) {
   const m = a.modell;
   const lagen = m.lagen(z);
   const neu = new Set(dazu ? a.auswahl : []);
-  const benutzt = new Set();
+  const ganzDrin = new Set();
   for (const { art, e } of m.elemente(z)) {
     const orte = m.verweise(art, e).map((k) => lagen.get(k));
     if (orte.some((x) => !x)) continue;
@@ -115,12 +153,17 @@ export function rahmenWaehlen(a, start, ende, dazu) {
     }
     if (gewaehlt) {
       neu.add(e.kennung);
-      m.verweise(art, e).forEach((k) => benutzt.add(k));
+      ganzDrin.add(e.kennung);
     }
   }
-  for (const k of z.knoten || []) {
-    if (!benutzt.has(k.kennung) && streckeImRechteck(m.lage(k), m.lage(k), rechteck, true)) neu.add(k.kennung);
+  const drin = (q) => q && streckeImRechteck(q, q, rechteck, true);
+  if (ganz) {
+    for (const x of m.ecken(z)) {
+      if (!ganzDrin.has(x.e.kennung) && drin(lagen.get(x.knoten))) neu.add(x.schluessel);
+    }
   }
+  const benutzung = m.benutzung(z);
+  for (const k of z.knoten || []) if (!benutzung.get(k.kennung) && drin(m.lage(k))) neu.add(k.kennung);
   a.auswahl = neu;
 }
 
@@ -132,9 +175,9 @@ function auswahlRahmen(a) {
   const lagen = m.lagen(z);
   const punkte = [];
   for (const k of z.knoten || []) if (a.auswahl.has(k.kennung)) punkte.push(m.lage(k));
-  for (const { art, e } of m.elemente(z)) {
-    if (!a.auswahl.has(e.kennung)) continue;
-    m.verweise(art, e).forEach((k) => { if (lagen.get(k)) punkte.push(lagen.get(k)); });
+  for (const x of m.ecken(z)) {
+    const p = lagen.get(x.knoten);
+    if (p && (a.auswahl.has(x.e.kennung) || a.auswahl.has(x.schluessel))) punkte.push(p);
   }
   if (!punkte.length) return null;
   const bild = punkte.map((p) => nachBild(a.v, p));

@@ -25,7 +25,7 @@
 import {
   nachBild, pfad, text, zahlText,
 } from './cad_ansicht.js';
-import { abstand, aufStrecke } from './cad_modell.js';
+import { abstand, aufStrecke, eckeSchluessel } from './cad_modell.js';
 import { svgEl } from './dom.js';
 import { NAEHE } from './cad_eingabe.js';
 
@@ -195,22 +195,29 @@ export function polygonBefehl() {
 // Verschieben und Kopieren -- Basispunkt, dann Ziel
 // ===========================================================================
 
-/** Die Geometrie einer Auswahl, um sie verschoben vorzuzeigen. */
-function auswahlGeometrie(a) {
+/**
+ * Was eine Auswahl bewegt, um es verschoben vorzuzeigen: je betroffenes
+ * Element seine Ecken, `[p, mit]` -- `mit`, wenn die Ecke mitkommt. Ein
+ * Element, von dem nur eine Ecke gewählt ist, zeigt sich so gedehnt. Beim
+ * Kopieren nur, was ganz gewählt ist: einzelne Ecken kopiert es nicht.
+ */
+function auswahlGeometrie(a, nurGanze) {
   const z = a.adapter.zeichnung();
   const m = a.modell;
   const lagen = m.lagen(z);
-  const strecken = [];
-  const punkte = [];
+  const formen = [];
   for (const { art, e } of m.elemente(z)) {
-    if (!a.auswahl.has(e.kennung)) continue;
-    const orte = m.verweise(art, e).map((k) => lagen.get(k)).filter(Boolean);
-    if (art.form === 'punkt') punkte.push(...orte);
-    else if (art.form === 'linie') strecken.push(orte);
-    else strecken.push([...orte, orte[0]]);
+    const ganz = a.auswahl.has(e.kennung);
+    if (nurGanze && !ganz) continue;
+    const ecken = m.verweise(art, e).map((k, i) => [lagen.get(k), ganz
+      || a.auswahl.has(art.form === 'punkt' ? e.kennung : eckeSchluessel(e.kennung, i))]);
+    if (ecken.some(([p]) => !p) || !ecken.some(([, mit]) => mit)) continue;
+    formen.push({ form: art.form, ecken });
   }
-  for (const k of z.knoten || []) if (a.auswahl.has(k.kennung)) punkte.push(m.lage(k));
-  return { strecken, punkte };
+  for (const k of z.knoten || []) {
+    if (a.auswahl.has(k.kennung)) formen.push({ form: 'punkt', ecken: [[m.lage(k), true]] });
+  }
+  return formen;
 }
 
 function bewegungsBefehl(kopie) {
@@ -236,7 +243,7 @@ function bewegungsBefehl(kopie) {
         if (kopie) {
           ergebnis = a.modell.kopieren(z, auswahl, d, Math.max(1, Math.round(this.anzahl) || 1));
         } else {
-          a.modell.verschieben(z, a.modell.knotenDer(z, auswahl), d);
+          a.modell.verschieben(z, auswahl, d);
           ergebnis = [...auswahl];
         }
       }, { auswahl: () => ergebnis });
@@ -248,16 +255,17 @@ function bewegungsBefehl(kopie) {
       const f = a.zeiger?.fang;
       if (!this.basis || !f) return;
       const d = [f.p[0] - this.basis[0], f.p[1] - this.basis[1]];
-      const { strecken, punkte } = auswahlGeometrie(a);
+      const formen = auswahlGeometrie(a, kopie);
       const n = kopie ? Math.max(1, Math.round(this.anzahl) || 1) : 1;
       for (let i = 1; i <= n; i += 1) {
-        const schieben = (p) => [p[0] + d[0] * i, p[1] + d[1] * i];
-        for (const s of strecken) {
-          g.append(svgEl('path', { d: pfad(a.v, s.map(schieben), false), class: 'cad-verschoben' }));
-        }
-        for (const p of punkte) {
-          const [x, y] = nachBild(a.v, schieben(p));
-          g.append(svgEl('circle', { cx: x, cy: y, r: 3.5, class: 'cad-verschoben' }));
+        const schieben = ([p, mit]) => (mit ? [p[0] + d[0] * i, p[1] + d[1] * i] : p);
+        for (const { form, ecken } of formen) {
+          if (form === 'punkt') {
+            const [x, y] = nachBild(a.v, schieben(ecken[0]));
+            g.append(svgEl('circle', { cx: x, cy: y, r: 3.5, class: 'cad-verschoben' }));
+          } else {
+            g.append(svgEl('path', { d: pfad(a.v, ecken.map(schieben), form === 'flaeche'), class: 'cad-verschoben' }));
+          }
         }
       }
       g.append(svgEl('path', { d: pfad(a.v, [this.basis, f.p], false), class: 'cad-vektor' }));
