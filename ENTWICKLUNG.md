@@ -56,6 +56,8 @@ Wünsche:
 * Neu eine N-ε-Linie auf Zug, mit N_Riss, N_Rd und der grössten Dehnung,
   bei einstellbarem M_Ed.
 * Nachgereicht: Der Fliessbeginn heisst im Bild M_Rd, nicht M_y.
+* Nachgereicht: N_Riss mit k_t für die ganze Dicke, `k_t = 1/(1 + 0.5·t)`
+  mit `t = h`.
 
 **χ sah aus wie x.** JetBrains Mono zeichnet χ fast wie x. Griechische
 Buchstaben in Bildern und Achsentiteln setzt jetzt `formelText` (in
@@ -123,8 +125,7 @@ Platte ohne Druckbewehrung, Block           170.0 kNm, Handrechnung 170.1 kNm (�
 
 **Die N-ε-Linie.** M_Ed bleibt fest, N wächst auf Zug, gezeichnet über ε_m,
 die Dehnung auf halber Höhe. Der Ablauf:
-* ungerissen bis N_Riss = f_ct,eff·b·h − 6·|M|/h, am Bruttoquerschnitt wie
-  M_Riss(N);
+* ungerissen bis N_Riss = f_ct,eff·b·h − 6·|M|/h, am Bruttoquerschnitt;
 * dort der Sprung;
 * gerissen bis zum Bruch, mit dem Fliessbeginn N_Rd.
 
@@ -140,6 +141,22 @@ M_Ed = 71.5 kNm  N_Rd,u = 1390 kN   Stahl bei 45 ‰  (≈ Σ A_s·f_yd = 1393 k
 
 Σ A_s·f_yd erreicht nur, wer das Moment des Stahlschwerpunkts mitbringt, hier
 rund 71 kNm. Bei kleinerem Moment muss der Beton unten drücken.
+
+**k_t für die ganze Dicke.** Zuerst rechnete N_Riss mit dem f_ct,eff des
+Rissmoments, also mit k_t für ein Drittel der Dicke. Unter Zug reisst aber
+der ganze Querschnitt. Jetzt gilt nach Vorgabe `k_t = 1/(1 + 0.5·t)` mit
+`t = h`, wie bei der Zwängung auf Normalkraft (`beiwert_dicke`,
+`protokoll_zugfestigkeit` mit `teiler=1`). Am Beispiel, h = 300 mm,
+f_ctm = 2.9 N/mm²:
+
+```
+                 k_t     f_ct,eff      N_Riss(0)   N_Riss(20 kNm)
+zuerst (h/3)     0.95    2.76 N/mm²    828.6 kN    428.6 kN
+jetzt  (h)       0.87    2.52 N/mm²    756.5 kN    356.5 kN
+```
+
+Das Rissmoment der M-χ-Linie bleibt bei h/3. Beim selben N und M reissen die
+beiden Linien darum nicht mehr am selben Punkt (TODO.md).
 
 **Die Karte.** Die Zeile einer Analyse ist eine kleine Karte. Sie hat drei
 Zeilen:

@@ -1275,7 +1275,7 @@
         },
         {
           "art": "text",
-          "text": "Dieselbe Rissbedingung, nach der Normalkraft aufgelöst: beim Moment M reisst der Querschnitt, wenn die Zugkraft N_Riss erreicht. Dort springt die Dehnung bei derselben Kraft vom ungerissenen auf den gerissenen Wert."
+          "text": "Dieselbe Rissbedingung, nach der Normalkraft aufgelöst: beim Moment M reisst der Querschnitt, wenn die Zugkraft N_Riss erreicht. Unter Zug reisst die ganze Dicke, darum gilt k_t für t = h und nicht für h/3 wie beim Rissmoment. Bei N_Riss springt die Dehnung bei derselben Kraft vom ungerissenen auf den gerissenen Wert."
         },
         {
           "art": "gleichung",

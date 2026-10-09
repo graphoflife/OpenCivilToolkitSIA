@@ -377,13 +377,28 @@ class TestNormalkraftDehnung(unittest.TestCase):
     def setUpClass(cls):
         # Symmetrisch bewehrt: ⌀18 aussen oben und unten, ⌀12 innen in y.
         # Mit ⌀12 aussen trüge der Stahl nur 656 kN, und der Querschnitt
-        # risse erst bei 829 kN -- er bliebe bis zum Bruch ungerissen.
+        # risse erst bei 757 kN -- er bliebe bis zum Bruch ungerissen.
         cls.sym = loeserpaar(platte("Symmetrisch", x=[18, 18], y=[12, 12]))
         cls.kurve = sa.normalkraft_dehnung(cls.sym, M=0.0)
 
     def test_ohne_moment_reisst_er_bei_f_ct_eff_mal_b_mal_h(self):
+        """
+        Mit k_t für die ganze Dicke, t = h: unter Zug reisst der ganze
+        Querschnitt. C30/37, f_ctm = 2.9 N/mm², h = 300 mm:
+        k_t = 1/(1 + 0.5·0.3) = 0.87, N_Riss = 2.52 N/mm² · 1000 · 300 mm²
+        = 756.5 kN. Bis 2026-10-09 galt k_t für h/3 wie beim Rissmoment:
+        828.6 kN.
+        """
         h, b = self.sym.gerissen.h, self.sym.gerissen.b
-        self.assertAlmostEqual(self.kurve.riss, self.sym.f_ct_eff * b * h, delta=1e-6)
+        self.assertAlmostEqual(self.sym.k_t_zug, 1.0 / (1.0 + 0.5 * h), places=12)
+        self.assertAlmostEqual(self.kurve.riss, 2.9e6 / (1.0 + 0.5 * h) * b * h, delta=1e-3)
+        self.assertAlmostEqual(self.kurve.riss / 1e3, 756.5, delta=0.1)
+
+    def test_das_rissmoment_bleibt_bei_einem_drittel_der_dicke(self):
+        """Unter Biegung reisst ein Drittel der Dicke -- dort bleibt k_t für h/3."""
+        h, b = self.sym.gerissen.h, self.sym.gerissen.b
+        self.assertAlmostEqual(self.sym.M_Riss, 2.9e6 / (1.0 + 0.5 * h / 3.0) * b * h * h / 6.0,
+                               delta=1e-3)
 
     def test_das_moment_senkt_die_rissnormalkraft(self):
         """Dieselbe Bedingung wie beim Rissmoment -- das Vorzeichen zählt nicht."""
@@ -484,9 +499,11 @@ class TestUeberDenDienst(unittest.TestCase):
         self.assertIn("massgebend", kurve["bruch"])
         self.assertEqual(faelle[2]["wahl"], {"phi": KRIECHZAHL, "phi_eigen": False,
                                              "satz": "bemessung", "gesetz": "parabel"})
-        # Die N-ε-Linie in kN und Promille: N_Riss(20 kNm) = (41.4 - 20)·6/0.3.
+        # Die N-ε-Linie in kN und Promille: N_Riss(20 kNm) mit k_t für die
+        # ganze Dicke, 2.9/1.15 N/mm² · 1000 · 300 mm² − 6·20/0.3 = 356.5 kN.
         kurve = faelle[3]["kurve"]
-        self.assertAlmostEqual(kurve["riss"], (41.43 - 20.0) * 20.0, delta=1.0)
+        self.assertAlmostEqual(kurve["riss"], 2.9 / 1.15 * 1000 * 300 / 1e3 - 6 * 20.0 / 0.3,
+                               delta=0.1)
         self.assertGreater(kurve["bruch"]["verformung"], 1.0)
         self.assertEqual(faelle[3]["wahl"]["phi"], 1.0)
         self.assertTrue(faelle[3]["wahl"]["phi_eigen"])

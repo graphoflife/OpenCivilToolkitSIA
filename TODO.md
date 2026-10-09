@@ -157,11 +157,12 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       soll, ist offen.
 - [ ] **Die Rissnormalkraft der N-ε-Linie** ist dieselbe Bedingung nach N
       aufgelöst: `N_Riss(M) = f_ct,eff·b·h − 6·|M|/h`, am Bruttoquerschnitt
-      ohne Stahl -- nach Vorgabe, nicht nachgeschlagen. Ihr f_ct,eff ist das
-      des Rissmoments, mit k_t für die Dicke h/3. Die Zwängung auf Normalkraft
-      nimmt k_t für die ganze rissaktive Dicke; bei h = 300 mm wäre N_Riss
-      damit 9 % kleiner (k_t = 0.87 statt 0.95). Welches k_t bei Zug mit
-      Moment gilt, ist offen.
+      ohne Stahl, mit `k_t = 1/(1 + 0.5·t)` für die ganze Dicke, `t = h` --
+      nach Vorgabe (2026-10-09), nicht nachgeschlagen. Das Rissmoment der
+      M-χ-Linie rechnet weiter mit `t = h/3`. Beim selben N und M reissen die
+      beiden Linien darum nicht am selben Punkt: am Beispiel reisst die M-χ-
+      Linie bei N = 300 kN bei 26.4 kNm, die N-ε-Linie bei M = 26.4 kNm
+      schon bei 228 kN.
 - [ ] **Das Ende der Linien** liegt an den Grenzen des Dehnungsfächers:
       Betonrand −ε_c2d, Stahllagen ±ε_ud, Punkt C −ε_c1d bei
       `z_C = h·(1 − ε_c1d/ε_c2d)`. Dieselben Grenzen wie in

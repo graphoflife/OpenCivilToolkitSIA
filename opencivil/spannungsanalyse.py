@@ -74,7 +74,9 @@ from opencivil.nachweis.querschnittsloeser import (
     Querschnittsloeser, Stahllage, Werkstoffsatz, beton_nichtlinear,
     stahl_bilinear, wirksamer_modul,
 )
-from opencivil.nachweis.sproedes_versagen import rissmoment
+from opencivil.nachweis.sproedes_versagen import (
+    beiwert_dicke, protokoll_zugfestigkeit, rissmoment,
+)
 from opencivil.querschnitt.fasern import Dehnungsgrenze
 from opencivil.querschnitt.platte import Richtung
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL, Betongesetz, Spannungsblock
@@ -317,9 +319,12 @@ class Loeserpaar:
     gerissen: Querschnittsloeser
     ungerissen: Querschnittsloeser
     M_Riss: float
-    """Das Rissmoment ohne Normalkraft."""
+    """Das Rissmoment ohne Normalkraft -- mit ``k_t`` fuer ein Drittel der Dicke."""
 
-    f_ct_eff: float = 0.0
+    k_t_zug: float = 1.0
+    f_ct_eff_zug: float = 0.0
+    """Fuer die Rissnormalkraft: ``k_t`` fuer die ganze Dicke und ``k_t·f_ctm``."""
+
     eps_y: float = math.inf
     """Wo der Stahl zu fliessen beginnt: ``f_s / E_s``."""
 
@@ -356,12 +361,18 @@ class Loeserpaar:
         """
         Die Zugkraft, bei der der Querschnitt mit dem Moment ``M`` reisst, in N.
 
-        Dieselbe Bedingung wie :meth:`rissmoment_bei`, nach ``N`` aufgeloest:
-        ``N_Riss(M) = (M_Riss(0) - |M|)·6/h = f_ct,eff·b·h - 6·|M|/h``. Das
-        Vorzeichen des Moments zaehlt nicht -- der Querschnitt ist oben wie
-        unten derselbe.
+        Am Bruttoquerschnitt reisst der Rand, wenn ``N/A + |M|/W = f_ct,eff``,
+        also ``N_Riss(M) = f_ct,eff·b·h - 6·|M|/h``. Das Vorzeichen des
+        Moments zaehlt nicht -- der Querschnitt ist oben wie unten derselbe.
+
+        ``f_ct,eff`` mit ``k_t = 1/(1 + 0.5·t)`` fuer die ganze Dicke,
+        ``t = h``: unter Zug reisst der ganze Querschnitt, nicht ein Drittel
+        wie unter Biegung. Nach Vorgabe, nicht nachgeschlagen (TODO.md). Bis
+        2026-10-09 galt das ``f_ct,eff`` des Rissmoments, mit ``t = h/3`` --
+        am Beispiel 829 statt 757 kN.
         """
-        return (self.M_Riss - abs(M)) * 6.0 / self.gerissen.h
+        h, b = self.gerissen.h, self.gerissen.b
+        return self.f_ct_eff_zug * b * h - 6.0 * abs(M) / h
 
 
 def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
@@ -413,10 +424,13 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
                else beton_nichtlinear(f_cd=f_c, E_c=E_c_eff, eps_c1d=eps_c1d, eps_c2d=eps_c2d)),
         gemittelt=block, **gemeinsam)
     ungerissen = Querschnittsloeser(beton=beton_ungerissen(E_c=E_c_eff), **gemeinsam)
-    riss = rissmoment(h=h, b=b, f_ctm=wert(ids["f_ctm"]))
+    f_ctm = wert(ids["f_ctm"])
+    k_t_zug = beiwert_dicke(h)
     return Loeserpaar(
-        gerissen=gerissen, ungerissen=ungerissen, M_Riss=riss.M_Riss,
-        f_ct_eff=riss.f_ct_eff, eps_y=wert(ids["f_s"]) / wert(ids["E_s"]),
+        gerissen=gerissen, ungerissen=ungerissen,
+        M_Riss=rissmoment(h=h, b=b, f_ctm=f_ctm).M_Riss,
+        k_t_zug=k_t_zug, f_ct_eff_zug=k_t_zug * f_ctm,
+        eps_y=wert(ids["f_s"]) / wert(ids["E_s"]),
         satz=satz, gesetz=gesetz, phi=kriechzahl, phi_eigen=phi is not None,
         grenznamen=namen, ids=ids)
 
@@ -786,13 +800,17 @@ def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
     else:
         p.erklaerung(
             "Dieselbe Rissbedingung, nach der Normalkraft aufgelöst: beim Moment M "
-            "reisst der Querschnitt, wenn die Zugkraft N_Riss erreicht. Dort springt "
-            "die Dehnung bei derselben Kraft vom ungerissenen auf den gerissenen "
-            "Wert.")
+            "reisst der Querschnitt, wenn die Zugkraft N_Riss erreicht. Unter Zug "
+            "reisst die ganze Dicke, darum gilt k_t für t = h und nicht für h/3 wie "
+            "beim Rissmoment. Bei N_Riss springt die Dehnung bei derselben Kraft vom "
+            "ungerissenen auf den gerissenen Wert.")
+        f_ct_eff = protokoll_zugfestigkeit(
+            p, w, k_t=paar.k_t_zug, f_ct_eff=paar.f_ct_eff_zug, h=h,
+            f_ctm=ein("f_ctm"), teiler=1, referenz="SIA 262:2025, 4.4.2")
         p.formel(w.kraft("N_Riss_M", "N_{Riss}(M)", linie.riss),
                  r"@f_ct_eff \cdot @b \cdot @h - \frac{6 \cdot \left|@M\right|}{@h}",
-                 {"f_ct_eff": w.spannung("f_ct_eff", "f_{ct,eff}", paar.f_ct_eff, stellen=2),
-                  "b": ein("b"), "h": h, "M": w.moment("M", "M", linie.fest)},
+                 {"f_ct_eff": f_ct_eff, "b": ein("b"), "h": h,
+                  "M": w.moment("M", "M", linie.fest)},
                  titel="Rissnormalkraft beim Moment")
 
     p.erklaerung(
