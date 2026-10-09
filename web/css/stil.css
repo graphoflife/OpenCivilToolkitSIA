@@ -111,6 +111,16 @@
   font-style: normal;
   font-display: swap;
 }
+/* Nur die griechischen Buchstaben, aus der Formelschrift von KaTeX: in
+   JetBrains Mono sieht χ aus wie x. Steht vor JetBrains Mono, wo eine
+   Auswahl «M–χ» zeigt -- dort setzt KaTeX nichts. Die Datei ist kursiv,
+   gilt hier aber für die gerade Schrift: so wird nichts schräg gerechnet. */
+@font-face {
+  font-family: "Formelzeichen";
+  src: url("../vendor/katex/fonts/KaTeX_Math-Italic.woff2") format("woff2");
+  font-style: normal;
+  unicode-range: U+0391-03A9, U+03B1-03C9, U+03D1, U+03D5, U+03F5;
+}
 
 * { box-sizing: border-box; }
 
@@ -1046,6 +1056,9 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   color: var(--schrift-matt); margin-bottom: 6px;
 }
 .sd-zahlen b { color: var(--schrift-zart); font-weight: 600; }
+/* KaTeX setzt eine Spur grösser als der Text -- in der Zeile eine zu viel. */
+.sd-zahlen .katex, .sd-wahl-text .katex { font-size: 1.08em; }
+.sd-wahl-text { font-size: 11px; color: var(--schrift-zart); margin: -2px 0 5px; }
 .sd-paar { display: flex; flex-wrap: wrap; gap: 10px; }
 .sd-bild { width: 300px; max-width: 100%; height: auto; }
 .sd-bild.sd-breit { width: 600px; }
@@ -1106,6 +1119,32 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .einwirkung.ist-spannung { align-items: end; }
+/* Eine Analyse als Karte in drei Zeilen: Name und Richtung; Art, ihre
+   Zahlen und die Kriechzahl; die Werte und der Beton, je zwei Spalten
+   breit -- in einer wären sie abgeschnitten. */
+.einwirkung.ist-spannung > :nth-child(2) { grid-column: 2 / 5; }
+.einwirkung.ist-spannung > :nth-child(7) { grid-column: 5; grid-row: 1; }
+.einwirkung.ist-spannung > :nth-child(8) { grid-column: 2 / 4; grid-row: 3; }
+.einwirkung.ist-spannung > :nth-child(9) { grid-column: 4 / 6; grid-row: 3; }
+.einwirkung.ist-spannung select {
+  min-width: 0; width: 100%;
+  font-family: "Formelzeichen", "JetBrains Mono", ui-monospace, monospace;
+}
+/* «charakteristisch» fehlten in 14 px zwei Pixel. Der Kopf steht über einer
+   Auswahl links, wie ihr Text -- über einer Zahl rechts. */
+.einwirkung.ist-spannung > :nth-child(n+8) select { font-size: 13px; }
+.einwirkung.ist-spannung > :nth-child(n+8) .spaltenkopf { text-align: left; }
+/* Am Telefon ist die Karte 70 px schmaler: Werte und Beton je auf einer
+   Zeile, und die Art rückt näher an ihren Pfeil, sonst stünde dort «N,». */
+@container (max-width: 380px) {
+  .einwirkung.ist-spannung > :nth-child(8) { grid-column: 2 / 6; }
+  .einwirkung.ist-spannung > :nth-child(9) { grid-column: 2 / 6; grid-row: 4; }
+  .einwirkung.ist-spannung > :nth-child(3) { font-size: 13px; padding-inline: 5px 2px; }
+}
+/* Ein Formelzeichen als Kopf: gross geschrieben würde aus φ ein Φ. */
+.spaltenkopf.ist-formel {
+  text-transform: none; font: italic 12px/1 KaTeX_Math, serif;
+}
 
 /* Fragezeichen mit Erklärung. Die Blase hängt am Zeichen und erscheint beim
    Darüberfahren -- sie nimmt keinen Platz in der Zeile, solange niemand

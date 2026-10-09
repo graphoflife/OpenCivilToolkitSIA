@@ -57,14 +57,16 @@ from opencivil.spannungsanalyse import Analyseart
 from opencivil.web import diagrammdaten
 
 #: Die Wertesaetze und Betongesetze mit Beschriftung -- dieselben in der
-#: Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse.
+#: Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse. ``kurz`` fuer
+#: die Karte einer Analyse, in der die lange nicht Platz hat.
 _WERKSTOFFSAETZE = [
-    {"wert": WERKSTOFFSAETZE[0], "beschriftung": "Bemessungswerte"},
-    {"wert": WERKSTOFFSAETZE[1], "beschriftung": "charakteristisch"},
+    {"wert": WERKSTOFFSAETZE[0], "beschriftung": "Bemessungswerte", "kurz": "Bemessung"},
+    {"wert": WERKSTOFFSAETZE[1], "beschriftung": "charakteristisch",
+     "kurz": "charakteristisch"},
 ]
 _BETONGESETZE = [
-    {"wert": BETONGESETZE[0], "beschriftung": "Parabel-Rechteck"},
-    {"wert": BETONGESETZE[1], "beschriftung": "Spannungsblock 0.85·x"},
+    {"wert": BETONGESETZE[0], "beschriftung": "Parabel-Rechteck", "kurz": "Parabel"},
+    {"wert": BETONGESETZE[1], "beschriftung": "Spannungsblock 0.85·x", "kurz": "Block 0.85·x"},
 ]
 
 

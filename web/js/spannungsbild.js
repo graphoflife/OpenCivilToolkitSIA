@@ -1,10 +1,11 @@
 /**
  * spannungsbild.js -- was im Querschnitt geschieht, gezeichnet.
  *
- * Drei Bilder zu den drei Fragen aus `opencivil/spannungsanalyse.py`:
+ * Bilder zu den vier Fragen aus `opencivil/spannungsanalyse.py`:
  *
  *   Dehnung und Spannung über die Höhe   -- für «aus N und M» und «aus Dehnungen»
- *   Momenten-Krümmungs-Linie             -- für die dritte
+ *   Momenten-Krümmungs-Linie M–χ         -- bei festgehaltener Normalkraft
+ *   Normalkraft-Dehnungs-Linie N–ε       -- bei festgehaltenem Moment
  *
  * Die Höhe läuft nach unten, wie man einen Schnitt zeichnet: z = 0 ist die
  * Oberkante. Das ist dieselbe Achse, die der Löser und der Lagenaufbau
@@ -14,9 +15,11 @@
  * Datei setzt Striche.
  */
 
-import { achsenkreuz } from './achsen.js';
+import { achsenkreuz, formelText } from './achsen.js';
 import { beschriftungenEntzerren } from './diagramm.js';
 import { el, svgEl } from './dom.js';
+import { span } from './mathe.js';
+import { zustand } from './zustand.js';
 
 const BREITE = 300;
 const HOEHE = 250;
@@ -60,11 +63,9 @@ function tafel({ titel, einheit, werte, hoeheMm }) {
     stroke: ACHSE, 'stroke-width': 1, 'stroke-dasharray': '3 3',
   }));
 
-  const kopf = svgEl('text', {
+  daten.append(formelText(svgEl('text', {
     x: RAND.links, y: 14, 'font-size': 11, 'font-weight': 600, fill: SCHRIFT,
-  });
-  kopf.textContent = titel;
-  daten.append(kopf);
+  }), titel));
 
   for (const [wert, anker] of [[-grenze, 'start'], [grenze, 'end']]) {
     const marke = svgEl('text', {
@@ -195,66 +196,168 @@ function ueberDieHoehe(bild, { titel, einheit, hol, stahlHol, stellen }) {
   return svg;
 }
 
-/** Ein Punkt der Linie mit seinem Namen daneben. */
-function marke(daten, px, py, inhalt, { farbe, dx, dy, anker }) {
-  daten.append(svgEl('circle', {
-    cx: px, cy: py, r: 3.2, fill: '#fff', stroke: farbe, 'stroke-width': 1.6,
-  }));
-  const t = svgEl('text', {
-    x: px + dx, y: py + dy, 'text-anchor': anker, 'font-size': 10.5,
-    'font-weight': 600, fill: farbe, ...HOF,
-  });
-  t.textContent = inhalt;
-  daten.append(t);
+/**
+ * Was eine Linie ausmacht, je Art: wie Kraft und Verformung heissen, in
+ * welcher Einheit sie stehen, und was festgehalten wird. Die Namen in der
+ * Schreibweise von `formelText`, für KaTeX daneben dieselben noch einmal.
+ */
+const LINIEN = {
+  moment_kruemmung: {
+    kraft: 'M', kraftEinheit: 'kNm', verformungEinheit: '1/m', stellen: 4,
+    verformung: (index) => (index ? `χ_{${index}}` : 'χ'),
+    latex: (index) => (index ? `\\chi_{${index}}` : '\\chi'),
+    fest: ['N', 'kN'], achse: 'χ [1/m]',
+  },
+  normalkraft_dehnung: {
+    kraft: 'N', kraftEinheit: 'kN', verformungEinheit: '‰', stellen: 2,
+    verformung: (index) => (index ? `ε_{m,${index}}` : 'ε_m'),
+    latex: (index) => (index ? `\\varepsilon_{m,${index}}` : '\\varepsilon_{m}'),
+    fest: ['M', 'kNm'], achse: 'ε_m [‰]   (auf halber Höhe)',
+  },
+};
+
+/** Zeilenabstand der Namen an den Eckpunkten. */
+const ZEILE = 12.5;
+
+/** Ungefähre Breite einer Zeile -- ohne Satzzeichen des Formelsatzes, ein Index schmaler. */
+function zeilenbreite(zeile) {
+  const index = [...zeile.matchAll(/_\{([^}]*)\}|_([A-Za-z0-9]+)/g)]
+    .reduce((summe, m) => summe + (m[1] ?? m[2]).length, 0);
+  const alles = zeile.replace(/[_{}]/g, '').length;
+  return 6.3 * (alles - index) + 4.8 * index;
 }
 
 /**
- * Die Momenten-Krümmungs-Linie: ungerissen bis M_Riss, dort waagrecht nach
- * rechts -- der Querschnitt reisst, beim selben Moment krümmt er sich mehr --,
- * darüber gerissen bis M_Rd. Gestrichelt die beiden Zustände je für sich.
+ * Die Namen der Eckpunkte, ohne dass sie einander decken. Jeder probiert der
+ * Reihe nach einige Lagen um seinen Punkt -- unten rechts, unten links, oben
+ * links, oben rechts, dann weiter unten -- und nimmt die erste, die im Feld
+ * liegt und keinen schon gesetzten Namen berührt. Passt keine, steht er an
+ * der ersten, ins Feld geschoben.
+ *
+ * Eine Ecke: `px`, `py`, `zeilen` (die erste in Farbe, die übrigen zart),
+ * `farbe`.
  */
-function momentenlinie(kurve) {
-  const chiMax = Math.max(1e-9, ...kurve.punkte.map((p) => p.chi));
-  const mMax = Math.max(1e-9, kurve.M_Rd);
+function eckenAnschreiben(daten, feld, ecken) {
+  const gesetzt = [];
+  const frei = (k) => k.links >= feld.links + 2 && k.rechts <= feld.rechts - 2
+    && k.oben >= feld.oben + 2 && k.unten <= feld.unten - 2
+    && gesetzt.every((g) => k.rechts + 3 < g.links || k.links - 3 > g.rechts
+      || k.unten + 2 < g.oben || k.oben - 2 > g.unten);
+  for (const { px, py, zeilen, farbe } of ecken) {
+    const breite = Math.max(...zeilen.map(zeilenbreite));
+    const hoehe = (zeilen.length - 1) * ZEILE + 11;
+    const lagen = [[1, 15], [-1, 15], [-1, -8 - hoehe + 11], [1, -8 - hoehe + 11],
+      [-1, 19 + hoehe], [1, 19 + hoehe], [-1, 23 + 2 * hoehe]];
+    const kasten = ([seite, dy]) => {
+      const x = px + seite * 7;
+      return {
+        x, y: py + dy, seite,
+        links: seite > 0 ? x : x - breite, rechts: seite > 0 ? x + breite : x,
+        oben: py + dy - 9, unten: py + dy - 9 + hoehe,
+      };
+    };
+    let k = lagen.map(kasten).find(frei);
+    if (!k) {
+      k = kasten(lagen[0]);
+      const schub = Math.min(0, feld.rechts - 2 - k.rechts) + Math.max(0, feld.links + 2 - k.links);
+      Object.assign(k, { x: k.x + schub, links: k.links + schub, rechts: k.rechts + schub });
+    }
+    gesetzt.push(k);
+    daten.append(svgEl('circle', {
+      cx: px, cy: py, r: 3.2, fill: '#fff', stroke: farbe, 'stroke-width': 1.6,
+    }));
+    zeilen.forEach((zeile, i) => {
+      daten.append(formelText(svgEl('text', {
+        x: k.x, y: k.y + i * ZEILE, 'text-anchor': k.seite > 0 ? 'start' : 'end',
+        'font-size': i ? 9.5 : 10.5, 'font-weight': i ? 400 : 600,
+        fill: i ? SCHRIFT : farbe, ...HOF,
+      }), zeile));
+    });
+  }
+}
+
+/** Eine Zahl mit Einheit, «-» als Minus. */
+function mitEinheit(wert, stellen, einheit) {
+  return `${zahl(wert, stellen).replace('-', '−')} ${einheit}`;
+}
+
+/**
+ * Eine Linie: ungerissen bis zum Riss, dort waagrecht nach rechts -- der
+ * Querschnitt reisst, bei derselben Kraft verformt er sich mehr --, darüber
+ * gerissen bis zum Bruch. Gestrichelt die beiden Zustände je für sich. An
+ * den Ecken Riss, Fliessbeginn und Ende, je mit Kraft und Verformung.
+ */
+function linienbild(fall) {
+  const k = fall.kurve;
+  const art = LINIEN[fall.art];
+  const ende = k.punkte[k.punkte.length - 1];
+  const verformungen = k.punkte.map((p) => p.verformung);
+  const vMin = Math.min(0, ...verformungen);
+  const vMax = Math.max(1e-9, ...verformungen);
+  const kMax = Math.max(1e-9, ...k.punkte.map((p) => p.kraft));
+  const spanne = vMax - vMin;
   const { svg, daten, x, y, feld } = achsenkreuz({
     breite: BREITE * 2, hoehe: HOEHE, rand: RAND, rahmen: true,
     attribute: { class: 'sd-bild sd-breit', preserveAspectRatio: 'xMidYMid meet' },
-    x: { bereich: [0, chiMax * 1.05], titel: 'χ [1/m]' },
-    y: { bereich: [0, mMax * 1.05], titel: 'M [kNm]' },
+    x: { bereich: [vMin - (vMin < 0 ? 0.05 * spanne : 0), vMax + 0.05 * spanne], titel: art.achse },
+    y: { bereich: [0, kMax * 1.05], titel: `${art.kraft} [${art.kraftEinheit}]` },
     schrift: { teilung: 9.5, titel: 11 }, titelLinks: 12,
   });
 
   const linie = (hol, farbe, breiteStrich, muster) => {
-    const punkte = kurve.punkte.filter((p) => hol(p) !== null && hol(p) !== undefined);
+    const punkte = k.punkte.filter((p) => hol(p) !== null && hol(p) !== undefined);
     if (punkte.length < 2) return;
     daten.append(svgEl('polyline', {
-      points: punkte.map((p) => `${x(hol(p)).toFixed(2)},${y(p.M).toFixed(2)}`).join(' '),
+      points: punkte.map((p) => `${x(hol(p)).toFixed(2)},${y(p.kraft).toFixed(2)}`).join(' '),
       fill: 'none', stroke: farbe, 'stroke-width': breiteStrich,
       'stroke-dasharray': muster || null,
     }));
   };
-  linie((p) => p.chi_I, ACHSE, 1.2, '4 3');
-  linie((p) => p.chi_II, ACHSE, 1.2, '2 3');
-  linie((p) => p.chi, '#16794a', 2.2);
+  linie((p) => p.verformung_I, ACHSE, 1.2, '4 3');
+  linie((p) => p.verformung_II, ACHSE, 1.2, '2 3');
+  linie((p) => p.verformung, '#16794a', 2.2);
 
-  // Der Riss: unter dem waagrechten Stück, wo die Linie nicht hinkommt.
-  if (kurve.riss) {
-    const { M, chi_vor: vor, chi_nach: nach } = kurve.riss;
-    daten.append(svgEl('circle', {
-      cx: x(vor), cy: y(M), r: 2.4, fill: ZUG,
-    }));
-    marke(daten, x(nach), y(M), `M_Riss = ${M.toFixed(1)} kNm`,
-      { farbe: ZUG, dx: 7, dy: 14, anker: 'start' });
+  const v = (wert) => mitEinheit(wert, art.stellen, art.verformungEinheit);
+  const f = (wert) => mitEinheit(wert, 1, art.kraftEinheit);
+  const kennwert = fall.wahl?.satz === 'charakteristisch' ? 'Rk' : 'Rd';
+  const ecken = [];
+  // Das Ende zuerst: es steht am Rand, und die anderen weichen ihm aus.
+  // Endet die Linie ungerissen, trägt der Querschnitt den Riss nicht; dann
+  // gilt dort ihre letzte Verformung, nicht die gerissene des Bruchs.
+  if (ende && k.bruch) {
+    ecken.push({
+      px: x(ende.verformung), py: y(ende.kraft), farbe: '#16794a',
+      zeilen: ende.gerissen
+        ? [`${art.kraft}_{${kennwert},u} = ${f(k.bruch.kraft)}`,
+          `${art.verformung('u')} = ${v(k.bruch.verformung)}`, k.bruch.massgebend]
+        : [`${art.kraft}_{${kennwert},u} = ${f(k.bruch.kraft)}`,
+          `${art.verformung('')} = ${v(ende.verformung)}`],
+    });
   }
-  // Das Ende: M_Rd, darunter -- über der Linie bleibt bis zum Rahmen kein Platz.
-  const ende = kurve.punkte[kurve.punkte.length - 1];
-  marke(daten, x(ende.chi), y(ende.M), `M_Rd = ${ende.M.toFixed(1)} kNm`,
-    { farbe: '#16794a', dx: -4, dy: 16, anker: 'end' });
+  if (k.fliessen) {
+    ecken.push({
+      px: x(k.fliessen.verformung), py: y(k.fliessen.kraft), farbe: STAHL,
+      zeilen: [`${art.kraft}_y = ${f(k.fliessen.kraft)}`,
+        `${art.verformung('y')} = ${v(k.fliessen.verformung)}`],
+    });
+  }
+  // Der Riss: ein Punkt vor dem waagrechten Stück, der Name an seinem Ende.
+  if (k.sprung) {
+    daten.append(svgEl('circle', {
+      cx: x(k.sprung.vor), cy: y(k.sprung.kraft), r: 2.4, fill: ZUG,
+    }));
+    ecken.push({
+      px: x(k.sprung.nach), py: y(k.sprung.kraft), farbe: ZUG,
+      zeilen: [`${art.kraft}_{Riss} = ${f(k.sprung.kraft)}`,
+        `${art.verformung('')} = ${zahl(k.sprung.vor, art.stellen)} → ${v(k.sprung.nach)}`],
+    });
+  }
+  eckenAnschreiben(daten, feld, ecken);
 
   // Ohne Gitter: an den Achsen stehen nur die Grösstwerte.
   for (const [wert, px, py, anker] of [
-    [chiMax.toFixed(4), feld.rechts, HOEHE - 22, 'end'],
-    [mMax.toFixed(0), feld.links - 5, feld.oben + 8, 'end'],
+    [vMax.toFixed(art.stellen), feld.rechts, HOEHE - 22, 'end'],
+    [kMax.toFixed(0), feld.links - 5, feld.oben + 8, 'end'],
   ]) {
     const t = svgEl('text', {
       x: px, y: py, 'text-anchor': anker, 'font-size': 9.5, fill: ACHSE,
@@ -265,9 +368,22 @@ function momentenlinie(kurve) {
   return svg;
 }
 
+/** Die Zahlen über dem Bild, die Namen als Formel: χ ist dort kein x. */
 function zahlenzeile(eintraege) {
-  return el('div.sd-zahlen', {}, eintraege.map(([name, wert]) =>
-    el('span', {}, [el('b', { text: `${name} ` }), wert])));
+  return el('div.sd-zahlen', {}, eintraege.map(([latex, wert]) =>
+    el('span', {}, [el('b', {}, [span(`${latex} =`)]), ` ${wert}`])));
+}
+
+/** Womit gerechnet wurde -- die Kriechzahl auch dann, wenn sie die der Platte ist. */
+function wahlzeile(wahl) {
+  if (!wahl) return null;
+  const katalog = zustand.katalog?.spannungsanalyse || {};
+  const name = (liste, wert) => (liste || []).find((e) => e.wert === wert)?.beschriftung ?? wert;
+  return el('div.sd-wahl-text', {}, [
+    span('\\varphi'),
+    ` = ${wahl.phi.toFixed(2)}${wahl.phi_eigen ? '' : ' (Platte)'} · `
+      + `${name(katalog.werkstoffsaetze, wahl.satz)} · ${name(katalog.betongesetze, wahl.gesetz)}`,
+  ]);
 }
 
 /** Ein Fall: Überschrift, Zahlen, Bilder. */
@@ -285,16 +401,24 @@ export function spannungsfallZeichnen(fall) {
 
   if (fall.kurve) {
     const k = fall.kurve;
+    const art = LINIEN[fall.art];
+    const K = art.kraft;
+    const kennwert = fall.wahl?.satz === 'charakteristisch' ? 'Rk' : 'Rd';
+    const kraft = (wert) => mitEinheit(wert, 1, art.kraftEinheit);
     return el('div.sd-fall', {}, [
       kopf,
+      wahlzeile(fall.wahl),
       zahlenzeile([
-        ['N =', `${k.N.toFixed(1)} kN`],
-        ['M_Riss =', `${k.M_Riss.toFixed(1)} kNm`],
-        ['M_Rd =', `${k.M_Rd.toFixed(1)} kNm`],
+        [art.fest[0], mitEinheit(k.fest, 1, art.fest[1])],
+        [`${K}_{Riss}`, kraft(k.riss)],
+        ...(k.fliessen ? [[`${K}_{y}`, kraft(k.fliessen.kraft)]] : []),
+        ...(k.bruch ? [[`${K}_{${kennwert},u}`, kraft(k.bruch.kraft)],
+          [art.latex('u'), mitEinheit(k.bruch.verformung, art.stellen, art.verformungEinheit)]]
+          : []),
       ]),
-      k.punkte.length ? momentenlinie(k) : null,
+      k.punkte.length ? linienbild(fall) : null,
       el('p.sd-legende', {
-        text: 'Durchgezogen: der Querschnitt – ungerissen bis M_Riss, dann der Sprung, '
+        text: 'Durchgezogen: der Querschnitt – ungerissen bis zum Riss, dann der Sprung, '
           + 'darüber gerissen (ohne Zugversteifung) · lang gestrichelt: immer ungerissen (I) '
           + '· kurz gestrichelt: immer gerissen, ohne f_ct (II)',
       }),
@@ -304,16 +428,17 @@ export function spannungsfallZeichnen(fall) {
 
   const b = fall.bild;
   if (!b.konvergiert) {
-    return el('div.sd-fall', {}, [kopf, el('p.hinweis', { text: b.hinweis })]);
+    return el('div.sd-fall', {}, [kopf, wahlzeile(fall.wahl), el('p.hinweis', { text: b.hinweis })]);
   }
   return el('div.sd-fall', {}, [
     kopf,
+    wahlzeile(fall.wahl),
     zahlenzeile([
-      ['N =', `${b.N.toFixed(1)} kN`],
-      ['M =', `${b.M.toFixed(1)} kNm`],
-      ['ε_m =', `${b.eps_m.toFixed(3)} ‰`],
-      ['χ =', `${b.chi.toFixed(5)} 1/m`],
-      ['x =', b.nulllinie === null ? '–' : `${b.nulllinie.toFixed(0)} mm`],
+      ['N', mitEinheit(b.N, 1, 'kN')],
+      ['M', mitEinheit(b.M, 1, 'kNm')],
+      ['\\varepsilon_{m}', mitEinheit(b.eps_m, 3, '‰')],
+      ['\\chi', mitEinheit(b.chi, 5, '1/m')],
+      ['x', b.nulllinie === null ? '–' : mitEinheit(b.nulllinie, 0, 'mm')],
     ]),
     el('div.sd-paar', {}, [
       ueberDieHoehe(b, {

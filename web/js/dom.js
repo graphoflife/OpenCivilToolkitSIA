@@ -128,9 +128,11 @@ export function naechsteStufe(wert, richtung, { stufen, schritt = 1 } = {}) {
  * @param {number[]} [stufen]  erlaubte Werte; sonst wird `schritt` verwendet
  * @param {number|null} [leer] was ein geleertes Feld meldet; fehlt es, bleibt
  *                             der bisherige Wert
+ * @param {string} [platzhalter] blass im leeren Feld -- was dann gilt, etwa
+ *                             die Kriechzahl der Platte
  */
 export function zahlfeld({
-  wert, schritt = 1, stufen, min, max, beiAenderung, titel, readonly, leer,
+  wert, schritt = 1, stufen, min, max, beiAenderung, titel, readonly, leer, platzhalter,
 }) {
   const melden = (neu) => beiAenderung(neu);
 
@@ -138,7 +140,7 @@ export function zahlfeld({
     type: 'number',
     value: wert ?? '',
     step: 'any',
-    min, max, title: titel, readOnly: !!readonly,
+    min, max, title: titel, readOnly: !!readonly, placeholder: platzhalter,
     on: {
       change: (e) => {
         const roh = e.target.value.trim();

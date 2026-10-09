@@ -723,7 +723,7 @@ async function bewehrungErmitteln(kennung) {
 }
 
 /**
- * Spannung-Dehnung-Analyse: drei Fragen an denselben Querschnitt.
+ * Spannung-Dehnung-Analyse: vier Fragen an denselben Querschnitt.
  *
  * Kein Nachweis -- es wird nichts gegen etwas gehalten. Darum auch keine
  * Erfüllungsgrade in der Zusammenfassung; die Bilder stehen im eigenen
@@ -752,7 +752,12 @@ function spannungsBlock(querschnitt) {
   ]);
 }
 
-/** Eine Analysezeile. Die Zahlenfelder richten sich nach der gewählten Art. */
+/**
+ * Eine Analyse als kleine Karte: oben Name, darunter Art, Zahlen und
+ * Richtung, zuunterst, womit gerechnet wird -- die Kriechzahl (leer: die der
+ * Platte), die Werte und das Betongesetz. Die Zahlenfelder richten sich nach
+ * der gewählten Art.
+ */
 function spannungsZeile(querschnitt, index) {
   const k = (querschnitt.spannungsfaelle || [])[index];
   const aendern = (veraenderer) => projektAendern((p) => {
@@ -789,10 +794,23 @@ function spannungsZeile(querschnitt, index) {
       kopf: ['N_Ed [kN]', ''],
       felder: () => [
         zahl('N_Ed', 'Normalkraft in kN – Zug positiv', 50),
-        el('span.kurvenhinweis', { text: '0 … M_Rd' }),
+        el('span.kurvenhinweis', { text: '0 … M_Rd,u' }),
+      ],
+    },
+    normalkraft_dehnung: {
+      kopf: ['M_Ed [kNm]', ''],
+      felder: () => [
+        zahl('M_Ed', 'Moment in kNm, festgehalten', 10),
+        el('span.kurvenhinweis', { text: '0 … N_Rd,u' }),
       ],
     },
   }[k.art] || { kopf: ['', ''], felder: () => [el('span'), el('span')] };
+  const katalog = zustand.katalog?.spannungsanalyse || {};
+  const mitKopf = (kopf, eingabe, formel = false) => el('div.mit-kopf', {}, [
+    el('span.spaltenkopf', { text: kopf, class: formel ? 'ist-formel' : '' }), eingabe,
+  ]);
+  // In der Karte stehen die kurzen Namen -- die langen haben dort nicht Platz.
+  const kurz = (liste) => (liste || []).map((e) => ({ wert: e.wert, beschriftung: e.kurz }));
 
   return el('div.einwirkung.ist-spannung', { class: aktiv ? '' : 'ist-aus' }, [
     hakenSchalter(aktiv, (wert) => aendern((x) => { x.aktiv = wert; }), 'Analyse'),
@@ -801,23 +819,36 @@ function spannungsZeile(querschnitt, index) {
       on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
     }),
     auswahl({
-      werte: [
-        { wert: 'schnittgroessen', beschriftung: 'N, M' },
-        { wert: 'dehnungen', beschriftung: 'ε oben/unten' },
-        { wert: 'moment_kruemmung', beschriftung: 'M–χ' },
-      ],
+      werte: katalog.arten || [],
       gewaehlt: k.art || 'schnittgroessen',
-      titel: 'Eingabeart',
+      titel: 'Was gefragt ist',
       beiAenderung: (v) => aendern((x) => { x.art = v; }),
     }),
     // Beschriftung über dem Feld, nicht daneben: so bleibt das Raster der
     // Zeile dasselbe, gleich welche Art gewählt ist.
-    ...bauplan.felder().map((eingabe, i) => el('div.mit-kopf', {}, [
-      el('span.spaltenkopf', { text: bauplan.kopf[i] || '' }),
-      eingabe,
-    ])),
+    ...bauplan.felder().map((eingabe, i) => mitKopf(bauplan.kopf[i] || '', eingabe)),
+    // Womit gerechnet wird -- je Analyse. Die Kriechzahl leer heisst: die
+    // der Platte; ihr Wert steht blass im Feld.
+    mitKopf('φ', zahlfeld({
+      wert: k.kriechzahl ?? null, schritt: 0.1, min: 0, leer: null,
+      platzhalter: String(querschnitt.kriechzahl ?? ''),
+      titel: 'Kriechzahl φ dieser Analyse – leer: die der Platte',
+      beiAenderung: (v) => aendern((x) => { x.kriechzahl = v; }),
+    }), true),
     richtungsWahl(k.richtung || 'x', (wert) => aendern((x) => { x.richtung = wert; }),
       ['x', 'y']),
+    mitKopf('Werte', auswahl({
+      werte: kurz(katalog.werkstoffsaetze),
+      gewaehlt: k.werkstoffsatz || 'bemessung',
+      titel: 'Bemessungswerte (f_cd, f_yd) oder charakteristische (f_ck, f_yk)',
+      beiAenderung: (v) => aendern((x) => { x.werkstoffsatz = v; }),
+    })),
+    mitKopf('Beton', auswahl({
+      werte: kurz(katalog.betongesetze),
+      gewaehlt: k.betongesetz || 'parabel',
+      titel: 'Beton im gerissenen Zustand: Parabel-Rechteck oder Spannungsblock 0.85·x',
+      beiAenderung: (v) => aendern((x) => { x.betongesetz = v; }),
+    })),
     el('button.weg', {
       text: '×', title: 'Analyse entfernen',
       on: {

@@ -45,6 +45,50 @@ function text(inhalt, attribute) {
   return knoten;
 }
 
+/** Griechische Buchstaben, gross und klein, dazu ϑ, ϕ und ϵ. */
+const GRIECHISCH = /([\u0391-\u03A9\u03B1-\u03C9\u03D1\u03D5\u03F5]+)/;
+
+/** Ein Index: so tief und so gross, gemessen an der Schrift daneben. */
+const INDEX = { tiefe: 0.3, groesse: 0.75 };
+
+/**
+ * Setzt `inhalt` in einen SVG-Textknoten -- als Formel, soweit es eine ist:
+ * griechische Buchstaben in der kursiven Formelschrift von KaTeX, `_y` und
+ * `_{Rd,u}` tiefgestellt. Gibt den Knoten zurück.
+ *
+ * JetBrains Mono zeichnet χ fast wie x. In einem Bild, in dem beide stehen --
+ * die Krümmung und die Druckzonenhöhe --, hiess das raten.
+ */
+export function formelText(knoten, inhalt) {
+  // Nach einem Index muss die Schrift wieder hoch -- mit dem Stück danach.
+  let hoch = false;
+  for (const teil of String(inhalt).split(/(_\{[^}]*\}|_[A-Za-z0-9]+)/)) {
+    if (!teil) continue;
+    const index = teil.startsWith('_');
+    let ziel = knoten;
+    if (index) {
+      ziel = svgEl('tspan', {
+        'font-size': `${INDEX.groesse * 100}%`, dy: `${INDEX.tiefe / INDEX.groesse}em`,
+      });
+    } else if (hoch) {
+      ziel = svgEl('tspan', { dy: `${-INDEX.tiefe}em` });
+    }
+    if (ziel !== knoten) knoten.append(ziel);
+    hoch = index;
+    (index ? teil.replace(/^_\{?|\}$/g, '') : teil).split(GRIECHISCH).forEach((stueck, i) => {
+      if (!stueck) return;
+      if (i % 2) {
+        const zeichen = svgEl('tspan', { 'font-family': 'KaTeX_Math', 'font-style': 'italic' });
+        zeichen.textContent = stueck;
+        ziel.append(zeichen);
+      } else {
+        ziel.append(document.createTextNode(stueck));
+      }
+    });
+  }
+  return knoten;
+}
+
 /**
  * Ein leeres Diagramm.
  *
@@ -141,15 +185,18 @@ export function achsenkreuz({
   const daten = svgEl('g');
   svg.append(daten);
 
+  // Die Titel als Formel: «χ [1/m]», «M_Ed [kNm]».
   const titel = { 'text-anchor': 'middle', 'font-size': schrift.titel, fill: TITEL, 'font-weight': 600 };
   if (xAchse.titel) {
-    svg.append(text(xAchse.titel, { ...titel, x: feld.links + feldBreite / 2, y: hoehe - 8 }));
+    svg.append(formelText(svgEl('text', {
+      ...titel, x: feld.links + feldBreite / 2, y: hoehe - 8,
+    }), xAchse.titel));
   }
   if (yAchse.titel) {
     const mitte = feld.oben + feldHoehe / 2;
-    svg.append(text(yAchse.titel, {
+    svg.append(formelText(svgEl('text', {
       ...titel, x: titelLinks, y: mitte, transform: `rotate(-90 ${titelLinks} ${mitte})`,
-    }));
+    }), yAchse.titel));
   }
 
   return { svg, daten, x, y, feld };
