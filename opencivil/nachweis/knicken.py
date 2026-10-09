@@ -71,8 +71,10 @@ from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.nachweis.querschnittsloeser import (
     EPS_DRUCK, EPS_ZUG, Querschnittsloeser, Stahllage, Werkstoffsatz,
-    beton_nichtlinear, protokoll_verfahren, protokoll_wirksamer_modul,
-    stahl_bilinear, wirksamer_modul,
+    protokoll_verfahren, protokoll_wirksamer_modul,
+)
+from opencivil.nachweis.rechenwahl import (
+    Kennwerte, Rechenart, Rechenwahl, gesetze, werkstoffbezuege,
 )
 from opencivil.querschnitt.platte import Richtung
 
@@ -264,25 +266,19 @@ class Knicken(Nachweis):
             for f in self.faelle
         }
 
+        stahl = self.posten[0][0].stahl
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),
             Eingabebezug("b", querschnitt.id_breite(self.richtung)),
-            Eingabebezug("f_cd", querschnitt.beton.id_von(WERKSTOFFE.beton)),
-            Eingabebezug("E_cm", querschnitt.beton.id_von("E_cm")),
-            Eingabebezug("eps_c1d", querschnitt.beton.id_von("eps_c1d")),
-            Eingabebezug("eps_c2d", querschnitt.beton.id_von("eps_c2d")),
             Eingabebezug("phi", querschnitt.id_von("kriechzahl")),
-        ]
+        ] + werkstoffbezuege(WERKSTOFFE, querschnitt.beton, stahl)
         for lage, art, _, as_id, z_id in self.posten:
             marke = f"{lage.nummer}{art.kuerzel}"
             bezuege += [
                 Eingabebezug(f"a_s_{marke}", as_id),
                 Eingabebezug(f"z_{marke}", z_id),
             ]
-        stahl = self.posten[0][0].stahl
         bezuege += [
-            Eingabebezug("E_s", stahl.id_von("E_s")),
-            Eingabebezug("f_yd", stahl.id_von(WERKSTOFFE.stahl)),
             Eingabebezug("eps_ud", stahl.id_von("eps_ud")),
             # Das Moment bei N liest die Iteration vom Polygon des
             # M-N-Nachweises (``self.mn.moment_bei``). Ein Eckwert davon als
@@ -305,27 +301,19 @@ class Knicken(Nachweis):
     def pruefe(self, e: Eingaben, p: Protokoll):
         h = e.g("h").si
         b = e.g("b").si
-        f_cd = e.g("f_cd").si
-        E_cm = e.g("E_cm").si
-        phi = e.g("phi").si
-        E_s = e.g("E_s").si
-        f_yd = e.g("f_yd").si
         eps_ud = e.g("eps_ud").si
-        eps_c1d = e.g("eps_c1d").si
-        eps_c2d = e.g("eps_c2d").si
+        wahl = Rechenwahl(kriechzahl=e.g("phi").si, satz=WERKSTOFFE,
+                          art=Rechenart.PARABEL)
+        w = Kennwerte.aus_eingaben(e, wahl.satz)
 
         lagen = [Stahllage(a_s=e.g(f"a_s_{l.nummer}{a.kuerzel}").si,
                            z=e.g(f"z_{l.nummer}{a.kuerzel}").si,
-                           nummer=l.nummer)
+                           nummer=l.nummer, von_unten=l.von_unten)
                  for l, a, _, _, _ in self.posten]
         # Kriechen weicht den Beton auf; das Gesetz rechnet mit dem wirksamen
         # Modul. eps_c1d und eps_c2d bleiben, wie die Norm sie angibt.
-        loeser = Querschnittsloeser(
-            h=h, b=b, lagen=lagen,
-            beton=beton_nichtlinear(f_cd=f_cd, E_c=wirksamer_modul(E_cm, phi),
-                                    eps_c1d=eps_c1d, eps_c2d=eps_c2d),
-            stahl=stahl_bilinear(E_s=E_s, f_sd=f_yd, eps_ud=eps_ud),
-            eps_druck=eps_c2d, eps_zug=eps_ud)
+        loeser = gesetze(wahl, w, eps_ud=eps_ud).loeser(
+            h=h, b=b, lagen=lagen, eps_druck=w.eps_c2d, eps_zug=eps_ud)
         # Aufgehoben wie self.ergebnisse: wer nachrechnen will, was bei einer
         # anderen Druckkraft herauskaeme, braucht denselben Loeser.
         self.loeser = loeser

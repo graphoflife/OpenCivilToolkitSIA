@@ -53,16 +53,17 @@ from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.vorlagen import VORLAGEN
 from opencivil.projekt.gleichungen import GleichungszeileEintrag
+from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
 from opencivil.spannungsanalyse import Analyseart
 from opencivil.web import diagrammdaten
 
 #: Die Wertesaetze und Betongesetze mit Beschriftung -- dieselben in der
 #: Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse. ``kurz`` fuer
-#: die Karte einer Analyse, in der die lange nicht Platz hat.
+#: die Karte einer Analyse, in der die lange nicht Platz hat. Die Woerter
+#: stehen beim Wertesatz selbst.
 _WERKSTOFFSAETZE = [
-    {"wert": WERKSTOFFSAETZE[0], "beschriftung": "Bemessungswerte", "kurz": "Bemessung"},
-    {"wert": WERKSTOFFSAETZE[1], "beschriftung": "charakteristisch",
-     "kurz": "charakteristisch"},
+    {"wert": s.value, "beschriftung": s.beschriftung, "kurz": s.kurz}
+    for s in map(Werkstoffsatz, WERKSTOFFSAETZE)
 ]
 _BETONGESETZE = [
     {"wert": BETONGESETZE[0], "beschriftung": "Parabel-Rechteck", "kurz": "Parabel"},

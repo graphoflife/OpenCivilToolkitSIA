@@ -71,9 +71,9 @@ from typing import (
 
 from opencivil.core.protokoll import Protokoll, StillesProtokoll, Zwischenwerte
 from opencivil.nachweis.querschnittsloeser import (
-    Querschnittsloeser, Stahllage, Werkstoffsatz, beton_nichtlinear,
-    stahl_bilinear, wirksamer_modul,
+    Querschnittsloeser, Stahllage, Werkstoffsatz, wirksamer_modul,
 )
+from opencivil.nachweis.rechenwahl import Kennwerte, Rechenart, Rechenwahl, gesetze
 from opencivil.nachweis.sproedes_versagen import (
     beiwert_dicke, protokoll_zugfestigkeit, rissmoment,
 )
@@ -401,7 +401,8 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
     posten = querschnitt.posten_in_richtung(richtung)
     if not posten:
         return None
-    lagen = [Stahllage(a_s=wert(as_id), z=wert(z_id), nummer=lage.nummer)
+    lagen = [Stahllage(a_s=wert(as_id), z=wert(z_id), nummer=lage.nummer,
+                       von_unten=lage.von_unten)
              for lage, _, _, as_id, z_id in posten]
     stahl = posten[0][0].stahl
     beton = querschnitt.beton
@@ -411,26 +412,28 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
         "eps_c1d": beton.id_von("eps_c1d"), "eps_c2d": beton.id_von("eps_c2d"),
         "f_ctm": beton.id_von("f_ctm"),
         "E_s": stahl.id_von("E_s"), "f_s": stahl.id_von(satz.stahl),
-        "eps_ud": stahl.id_von("eps_ud"),
+        "f_s_druck": stahl.id_von(satz.stahl_druck), "eps_ud": stahl.id_von("eps_ud"),
     }
     if phi is None:
         ids["phi"] = querschnitt.id_von("kriechzahl")
     kriechzahl = wert(ids["phi"]) if phi is None else phi
     h, b = wert(ids["h"]), wert(ids["b"])
     E_c_eff = wirksamer_modul(wert(ids["E_cm"]), kriechzahl)
-    f_c = wert(ids["f_c"])
-    eps_c1d, eps_c2d, eps_ud = wert(ids["eps_c1d"]), wert(ids["eps_c2d"]), wert(ids["eps_ud"])
-    block = gesetz == "block"
-    grenzen, namen = grenzen_des_faechers(h, lagen, eps_c1d=eps_c1d, eps_c2d=eps_c2d,
-                                          eps_ud=eps_ud)
-    gemeinsam = dict(
-        h=h, b=b, lagen=lagen, grenzen=grenzen, eps_druck=eps_c2d, eps_zug=eps_ud,
-        stahl=stahl_bilinear(E_s=wert(ids["E_s"]), f_sd=wert(ids["f_s"]), eps_ud=eps_ud))
-    gerissen = Querschnittsloeser(
-        beton=(Spannungsblock(f_cd=f_c, eps_c2d=eps_c2d) if block
-               else beton_nichtlinear(f_cd=f_c, E_c=E_c_eff, eps_c1d=eps_c1d, eps_c2d=eps_c2d)),
-        gemittelt=block, **gemeinsam)
-    ungerissen = Querschnittsloeser(beton=beton_ungerissen(E_c=E_c_eff), **gemeinsam)
+    eps_ud = wert(ids["eps_ud"])
+    w = Kennwerte(f_c=wert(ids["f_c"]), f_s=wert(ids["f_s"]), f_s_druck=wert(ids["f_s_druck"]),
+                  E_cm=wert(ids["E_cm"]), E_s=wert(ids["E_s"]),
+                  eps_c1d=wert(ids["eps_c1d"]), eps_c2d=wert(ids["eps_c2d"]))
+    g = gesetze(Rechenwahl(kriechzahl=kriechzahl, satz=satz, art=Rechenart(gesetz)), w,
+                eps_ud=eps_ud)
+    # Die Grenzen gelten an den Lagen, mit denen gerechnet wird -- in der
+    # Handrechnung den zusammengefassten.
+    grenzen, namen = grenzen_des_faechers(h, g.lagen(lagen, h), eps_c1d=w.eps_c1d,
+                                          eps_c2d=w.eps_c2d, eps_ud=eps_ud)
+    fenster = dict(grenzen=grenzen, eps_druck=w.eps_c2d, eps_zug=eps_ud)
+    gerissen = g.loeser(h=h, b=b, lagen=lagen, **fenster)
+    # Derselbe Querschnitt ungerissen: nur das Betongesetz ist ein anderes.
+    ungerissen = g.loeser(h=h, b=b, lagen=lagen, beton=beton_ungerissen(E_c=E_c_eff),
+                          **fenster)
     f_ctm = wert(ids["f_ctm"])
     k_t_zug = beiwert_dicke(h)
     return Loeserpaar(

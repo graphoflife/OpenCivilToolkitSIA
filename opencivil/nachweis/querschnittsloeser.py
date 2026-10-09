@@ -56,8 +56,7 @@ from typing import Callable, List, Optional, Sequence, Tuple
 
 from opencivil.core.protokoll import Zwischenwerte
 from opencivil.querschnitt.fasern import (
-    Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt,
-    Schnittkraefte, Stab,
+    Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt, Stab,
 )
 from opencivil.querschnitt.werkstoffgesetz import k_sigma as beiwert_parabel
 
@@ -101,6 +100,31 @@ class Stahllage:
 
     nummer: int = 0
     """Nur zur Zuordnung in der Mitschrift."""
+
+    von_unten: Optional[bool] = None
+    """
+    Ob die Lage zur unteren Seite gehoert -- bei der Platte die 1. und 2.
+    Lage (:attr:`Bewehrungslage.von_unten`). Die Handrechnung fasst je Seite
+    zusammen (:func:`lagen_je_seite`); ohne Angabe entscheidet die Tiefe.
+    """
+
+
+def lagen_je_seite(lagen: Sequence[Stahllage], h: float) -> List[Stahllage]:
+    """
+    Je Seite eine Lage, im Schwerpunkt ihrer Flaechen -- wie die Handrechnung.
+
+    Die Seite sagt :attr:`Stahllage.von_unten`, sonst die Tiefe gegen
+    ``h/2``. Unten zuerst; eine Seite ohne Flaeche faellt weg.
+    """
+    heraus = []
+    for unten in (True, False):
+        seite = [l for l in lagen
+                 if (l.von_unten if l.von_unten is not None else l.z > h / 2.0) is unten]
+        a_s = sum(l.a_s for l in seite)
+        if a_s > 0.0:
+            heraus.append(Stahllage(a_s=a_s, z=sum(l.a_s * l.z for l in seite) / a_s,
+                                    nummer=seite[0].nummer, von_unten=unten))
+    return heraus
 
 
 @dataclass(frozen=True)
@@ -227,7 +251,11 @@ class Querschnittsloeser:
     mit ``eps_ud`` am Stahl statt am Betonrand --, gibt sie mit.
     ``gemittelt`` laesst ein Gesetz, das springt (der Spannungsblock), ueber
     jede Faser mitteln statt in ihrer Mitte lesen: sonst springt mit ihm die
-    Normalkraft, und keine Ebene trifft sie genau.
+    Normalkraft, und keine Ebene trifft sie genau. Ohne ``verdraengt`` zaehlt
+    der Beton auch dort, wo der Stahl liegt -- so rechnet die Handrechnung.
+
+    Welche Gesetze zu welcher Wahl gehoeren, sagt
+    :func:`opencivil.nachweis.rechenwahl.gesetze`.
     """
 
     def __init__(
@@ -243,6 +271,7 @@ class Querschnittsloeser:
         eps_zug: float = EPS_ZUG,
         grenzen: Optional[Sequence[Dehnungsgrenze]] = None,
         gemittelt: bool = False,
+        verdraengt: bool = True,
     ) -> None:
         self.h = h
         self.b = b
@@ -263,9 +292,11 @@ class Querschnittsloeser:
                 arme=tuple((i + 0.5) * dicke - h / 2.0 for i in range(fasern)),
                 flaechen=dicke * b,
                 dicken=(dicke,) * fasern if gemittelt else None)],
-            # Netto: der Stahl ersetzt den Beton an seiner Stelle.
+            # Netto: der Stahl ersetzt den Beton an seiner Stelle -- ausser
+            # in der Handrechnung, die den Beton durchgehend zaehlt.
             staebe=[Stab(arm=l.z - h / 2.0, flaeche=l.a_s, gesetz=stahl,
-                         verdraengt=beton, dicke=dicke if gemittelt else 0.0)
+                         verdraengt=beton if verdraengt else None,
+                         dicke=dicke if gemittelt else 0.0)
                     for l in self.lagen])
         # Der gueltige Bereich der Gesetze gilt an beiden Raendern -- wenn
         # niemand andere Grenzen mitgibt.
@@ -509,6 +540,25 @@ class Werkstoffsatz(str, Enum):
     CHARAKTERISTISCH = "charakteristisch"
 
     @property
+    def beschriftung(self) -> str:
+        return "Bemessungswerte" if self is Werkstoffsatz.BEMESSUNG else "charakteristisch"
+
+    @property
+    def kurz(self) -> str:
+        """Fuer schmale Zeilen."""
+        return "Bemessung" if self is Werkstoffsatz.BEMESSUNG else "charakteristisch"
+
+    @property
+    def widerstandsindex(self) -> str:
+        """Der Index an einem Widerstand: ``M_{Rd}`` oder ``M_{Rk}``."""
+        return "Rd" if self is Werkstoffsatz.BEMESSUNG else "Rk"
+
+    @property
+    def stahl_druck(self) -> str:
+        """Kurzname der Stahlfestigkeit auf Druck -- dort beginnt das Plateau."""
+        return "f_yd_druck" if self is Werkstoffsatz.BEMESSUNG else "f_yk_druck"
+
+    @property
     def stahl(self) -> str:
         """Kurzname der Stahlfestigkeit -- dort beginnt das Fliessplateau."""
         return "f_yd" if self is Werkstoffsatz.BEMESSUNG else "f_yk"
@@ -583,16 +633,39 @@ def beton_nichtlinear(*, f_cd: float, E_c: float,
     return sigma
 
 
-def stahl_bilinear(*, E_s: float, f_sd: float,
-                   eps_ud: float = 0.045) -> Callable[[float], float]:
+def stahl_bilinear(*, E_s: float, f_sd: float, eps_ud: float = 0.045,
+                   f_sd_druck: Optional[float] = None) -> Callable[[float], float]:
     """
     Linear bis zur Fliessgrenze, dann waagrecht; jenseits von ``eps_ud`` null.
 
     ``f_sd`` ist die Grenze, ab der es waagrecht geht -- ``f_yd`` oder
-    ``f_yk``, je nach :class:`Werkstoffsatz`.
+    ``f_yk``, je nach :class:`Werkstoffsatz`. ``f_sd_druck`` die auf Druck;
+    ohne sie gilt dieselbe. Bei den Normsorten sind beide gleich.
     """
-    def sigma(eps: float) -> float:
+    if f_sd_druck is None or f_sd_druck == f_sd:
+        def sigma(eps: float) -> float:
+            if abs(eps) > eps_ud:
+                return 0.0
+            return math.copysign(min(abs(eps) * E_s, f_sd), eps)
+        return sigma
+
+    def sigma_getrennt(eps: float) -> float:
         if abs(eps) > eps_ud:
             return 0.0
-        return math.copysign(min(abs(eps) * E_s, f_sd), eps)
+        if eps >= 0.0:
+            return min(eps * E_s, f_sd)
+        return -min(-eps * E_s, f_sd_druck)
+    return sigma_getrennt
+
+
+def stahl_nur_zug(*, E_s: float, f_sd: float,
+                  eps_ud: float = 0.045) -> Callable[[float], float]:
+    """
+    Wie :func:`stahl_bilinear`, aber ohne Druck: gedrueckter Stahl traegt
+    nichts. So rechnet die Handrechnung -- sie laesst die Druckbewehrung weg.
+    """
+    def sigma(eps: float) -> float:
+        if eps <= 0.0 or eps > eps_ud:
+            return 0.0
+        return min(eps * E_s, f_sd)
     return sigma

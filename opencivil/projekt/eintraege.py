@@ -29,6 +29,7 @@ from opencivil.projekt.lesen import (
     ProjektFehler, nur_x, pflichtfeld, sorten, vorgabe, zahl,
 )
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
+from opencivil.nachweis.rechenwahl import Rechenart
 from opencivil.spannungsanalyse import Analyseart
 
 #: Mit welchen Festigkeiten ein Werkstoffgesetz rechnen kann, siehe
@@ -36,9 +37,10 @@ from opencivil.spannungsanalyse import Analyseart
 #: der Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse.
 WERKSTOFFSAETZE = tuple(s.value for s in Werkstoffsatz)
 
-#: Welche Spannungs-Dehnungs-Beziehung der Beton haben kann: Parabel-Rechteck
-#: oder der Spannungsblock 0.85·x.
-BETONGESETZE = ("parabel", "block")
+#: Welche Spannungs-Dehnungs-Beziehung der Beton der Querschnittsanalyse haben
+#: kann: Parabel-Rechteck oder der Spannungsblock 0.85·x -- die beiden genauen
+#: Rechenarten (:class:`~opencivil.nachweis.rechenwahl.Rechenart`).
+BETONGESETZE = (Rechenart.PARABEL.value, Rechenart.BLOCK.value)
 
 
 # ===========================================================================

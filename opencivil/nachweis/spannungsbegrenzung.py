@@ -74,9 +74,11 @@ from opencivil.nachweis.mindestbewehrung import (
     RISSBREITE, protokoll_zulaessige_stahlspannung, zulaessige_stahlspannung,
 )
 from opencivil.nachweis.querschnittsloeser import (
-    EPS_DRUCK, EPS_ZUG, protokoll_verfahren, protokoll_wirksamer_modul, wirksamer_modul,
-    Querschnittsloeser, Stahllage, Werkstoffsatz, beton_elastisch,
-    stahl_bilinear,
+    EPS_DRUCK, EPS_ZUG, protokoll_verfahren, protokoll_wirksamer_modul,
+    Querschnittsloeser, Stahllage, Werkstoffsatz,
+)
+from opencivil.nachweis.rechenwahl import (
+    Kennwerte, Rechenart, Rechenwahl, bezuege_vereinen, gesetze, werkstoffbezuege,
 )
 from opencivil.nachweis.zustand2 import wertigkeit
 from opencivil.querschnitt.platte import Richtung
@@ -436,16 +438,11 @@ class Spannungsbegrenzung(Nachweis):
         }
 
         stahl = self.posten[0][0].stahl
-        beton = querschnitt.beton
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),
             Eingabebezug("b", querschnitt.id_breite(richtung)),
-            Eingabebezug("E_cm", beton.id_von("E_cm")),
             Eingabebezug("phi", querschnitt.id_von("kriechzahl")),
-            Eingabebezug("E_s", stahl.id_von("E_s")),
-            Eingabebezug(WERKSTOFFE.stahl, stahl.id_von(WERKSTOFFE.stahl)),
-            Eingabebezug(WERKSTOFFE.beton, beton.id_von(WERKSTOFFE.beton)),
-        ]
+        ] + werkstoffbezuege(WERKSTOFFE, querschnitt.beton, stahl)
         for lage, art, _, as_id, z_id in self.posten:
             marke = f"{lage.nummer}{art.kuerzel}"
             bezuege += [
@@ -453,16 +450,9 @@ class Spannungsbegrenzung(Nachweis):
                 Eingabebezug(f"z_{marke}", z_id),
             ]
         # Was die Grenze braucht, kann schon dastehen -- E_s und f_yk braucht
-        # auch das Werkstoffgesetz. Doppelt anmelden ginge nicht, und dieselbe
-        # Zahl unter zwei Namen zu fuehren hiesse, sie zweimal zu lesen.
-        vorhanden = {b.name: b.wert_id for b in bezuege}
-        for b in grenze.bezuege():
-            if b.name not in vorhanden:
-                bezuege.append(b)
-            elif vorhanden[b.name] != b.wert_id:
-                raise ValueError(
-                    f"Die Grenze meldet '{b.name}' als {b.wert_id}, der "
-                    f"Nachweis führt denselben Namen als {vorhanden[b.name]}.")
+        # auch das Werkstoffgesetz. Dieselbe Zahl unter zwei Namen zu fuehren
+        # hiesse, sie zweimal zu lesen.
+        bezuege = bezuege_vereinen(bezuege, grenze.bezuege())
 
         super().__init__(
             basis,
@@ -479,23 +469,17 @@ class Spannungsbegrenzung(Nachweis):
     def pruefe(self, e: Eingaben, p: Protokoll):
         h = e.g("h").si
         b = e.g("b").si
-        E_cm = e.g("E_cm").si
-        phi = e.g("phi").si
-        E_s = e.g("E_s").si
-        f_s = e.g(WERKSTOFFE.stahl).si
-        f_c = e.g(WERKSTOFFE.beton).si
+        wahl = Rechenwahl(kriechzahl=e.g("phi").si, satz=WERKSTOFFE,
+                          art=Rechenart.ELASTISCH)
+        w = Kennwerte.aus_eingaben(e, wahl.satz)
+        E_s, f_s = w.E_s, w.f_s
 
         lagen = [Stahllage(a_s=e.g(f"a_s_{l.nummer}{a.kuerzel}").si,
                            z=e.g(f"z_{l.nummer}{a.kuerzel}").si,
-                           nummer=l.nummer)
+                           nummer=l.nummer, von_unten=l.von_unten)
                  for l, a, _, _, _ in self.posten]
-        n = wertigkeit(E_s=E_s, E_cm=E_cm, phi=phi)
-        E_c_eff = wirksamer_modul(E_cm, phi)
-
-        loeser = Querschnittsloeser(
-            h=h, b=b, lagen=lagen,
-            beton=beton_elastisch(E_c=E_c_eff, f_c=f_c),
-            stahl=stahl_bilinear(E_s=E_s, f_sd=f_s))
+        n = wertigkeit(E_s=E_s, E_cm=w.E_cm, phi=wahl.kriechzahl)
+        loeser = gesetze(wahl, w).loeser(h=h, b=b, lagen=lagen)
 
         sigma_adm = self._protokoll_ansatz(p, e, n)
 
