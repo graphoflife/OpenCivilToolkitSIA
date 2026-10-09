@@ -1,6 +1,6 @@
 # Voll
 
-113 Berechnungen ausgeführt, 243 Werte bestimmt.
+116 Berechnungen ausgeführt, 252 Werte bestimmt.
 
 ## Herleitung
 
@@ -67,6 +67,72 @@ $$
 | 2. Lage Zulage | x | B500B | $12$ | $150$ | $54$ | $246$ | $754$ |
 | 3. Lage Grundbewehrung | x | B500B | $12$ | $150$ | $48$ | $48$ | $754$ |
 | 4. Lage Grundbewehrung | y | B500B | $12$ | $150$ | $36$ | $36$ | $754$ |
+
+**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5)*
+
+$$
+\frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
+$$
+
+**x-Bewehrung unten, zusammen**
+
+$$
+A_{s,u} = A_{s,2,x,g} + A_{s,2,x,z} = 1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2} = 2450\,\mathrm{mm}^{2}
+$$
+
+**Schwerpunkt der x-Bewehrung unten**
+
+$$
+\begin{aligned}
+  z_{u} &= \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,u}} \\
+  &= \frac{1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 246\,\mathrm{mm}}{2450\,\mathrm{mm}^{2}} \\
+  &= 248.1\,\mathrm{mm}
+\end{aligned}
+$$
+
+**Statische Höhe der x-Bewehrung unten**
+
+$$
+d_{u} = z_{u} = 248.1\,\mathrm{mm}
+$$
+
+**Bewehrungsgehalt unten**
+
+$$
+\rho_{u} = \frac{A_{s,u}}{b \cdot d_{u}} = \frac{2450\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 248.1\,\mathrm{mm}} = 0.00988
+$$
+
+**Statische Höhe der x-Bewehrung oben**
+
+$$
+d_{o} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
+$$
+
+**Bewehrungsgehalt oben**
+
+$$
+\rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{o}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 252\,\mathrm{mm}} = 0.00299
+$$
+
+**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5)*
+
+$$
+\begin{aligned}
+  \left(\frac{w}{w_c}\right)_{u} &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00299}{10 \cdot 0.00988^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{248.1\,\mathrm{mm}}\right)^{3} \\
+  &= 4
+\end{aligned}
+$$
+
+**Vergrösserungsfaktor, Zug oben** *(SIA 262:2025, 4.4.3.2.5)*
+
+$$
+\begin{aligned}
+  \left(\frac{w}{w_c}\right)_{o} &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{o}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00988}{10 \cdot 0.00299^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{252\,\mathrm{mm}}\right)^{3} \\
+  &= 7.52
+\end{aligned}
+$$
 
 ### Resistenzlinie aus Handrechnung – x-Richtung
 
@@ -1559,6 +1625,56 @@ $$
 | 3. Lage Grundbewehrung | y | B500B | $8$ | $150$ | $1000$ | $44$ | $44$ | $335$ |
 | 4. Lage Grundbewehrung | x | B500B | $10$ | $150$ | $500$ | $35$ | $35$ | $262$ |
 
+**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5)*
+
+$$
+\frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
+$$
+
+**Statische Höhe der x-Bewehrung unten**
+
+$$
+d_{u} = z_{1,x,g} = 165\,\mathrm{mm}
+$$
+
+**Bewehrungsgehalt unten**
+
+$$
+\rho_{u} = \frac{A_{s,1,x,g}}{b \cdot d_{u}} = \frac{262\,\mathrm{mm}^{2}}{500\,\mathrm{mm} \cdot 165\,\mathrm{mm}} = 0.00317
+$$
+
+**Statische Höhe der x-Bewehrung oben**
+
+$$
+d_{o} = h - z_{4,x,g} = 200\,\mathrm{mm} - 35\,\mathrm{mm} = 165\,\mathrm{mm}
+$$
+
+**Bewehrungsgehalt oben**
+
+$$
+\rho_{o} = \frac{A_{s,4,x,g}}{b \cdot d_{o}} = \frac{262\,\mathrm{mm}^{2}}{500\,\mathrm{mm} \cdot 165\,\mathrm{mm}} = 0.00317
+$$
+
+**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5)*
+
+$$
+\begin{aligned}
+  \left(\frac{w}{w_c}\right)_{u} &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00317}{10 \cdot 0.00317^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{200\,\mathrm{mm}}{165\,\mathrm{mm}}\right)^{3} \\
+  &= 8.89
+\end{aligned}
+$$
+
+**Vergrösserungsfaktor, Zug oben** *(SIA 262:2025, 4.4.3.2.5)*
+
+$$
+\begin{aligned}
+  \left(\frac{w}{w_c}\right)_{o} &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{o}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00317}{10 \cdot 0.00317^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{200\,\mathrm{mm}}{165\,\mathrm{mm}}\right)^{3} \\
+  &= 8.89
+\end{aligned}
+$$
+
 ### Resistenzlinie aus Handrechnung – x-Richtung
 
 **Rechenwahl**
@@ -2097,6 +2213,56 @@ $$
 | 2. Lage Grundbewehrung | x | B500B | $12$ | $150$ | $76$ | $174$ | $754$ |
 | 3. Lage Grundbewehrung | x | B500B | $12$ | $150$ | $46$ | $46$ | $754$ |
 | 4. Lage Grundbewehrung | y | B500B | $10$ | $150$ | $35$ | $35$ | $524$ |
+
+**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5)*
+
+$$
+\frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
+$$
+
+**Statische Höhe der x-Bewehrung unten**
+
+$$
+d_{u} = z_{2,x,g} = 174\,\mathrm{mm}
+$$
+
+**Bewehrungsgehalt unten**
+
+$$
+\rho_{u} = \frac{A_{s,2,x,g}}{b \cdot d_{u}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 174\,\mathrm{mm}} = 0.00433
+$$
+
+**Statische Höhe der x-Bewehrung oben**
+
+$$
+d_{o} = h - z_{3,x,g} = 250\,\mathrm{mm} - 46\,\mathrm{mm} = 204\,\mathrm{mm}
+$$
+
+**Bewehrungsgehalt oben**
+
+$$
+\rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{o}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 204\,\mathrm{mm}} = 0.0037
+$$
+
+**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5)*
+
+$$
+\begin{aligned}
+  \left(\frac{w}{w_c}\right)_{u} &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.0037}{10 \cdot 0.00433^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{250\,\mathrm{mm}}{174\,\mathrm{mm}}\right)^{3} \\
+  &= 11.77
+\end{aligned}
+$$
+
+**Vergrösserungsfaktor, Zug oben** *(SIA 262:2025, 4.4.3.2.5)*
+
+$$
+\begin{aligned}
+  \left(\frac{w}{w_c}\right)_{o} &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{o}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00433}{10 \cdot 0.0037^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{250\,\mathrm{mm}}{204\,\mathrm{mm}}\right)^{3} \\
+  &= 8.05
+\end{aligned}
+$$
 
 ### Resistenzlinie aus Handrechnung – x-Richtung
 
@@ -3359,6 +3525,8 @@ $$
 
 ### Querschnitt
 
+Gerechnet in x, einmal mit Zug unten und einmal mit Zug oben. ρ gehört zur gezogenen Seite, ρ′ zur Gegenseite; d′ reicht vom gezogenen Rand bis zur Gegenlage und ist damit deren statische Höhe – ρ′ der einen Seite ist das ρ der anderen. Die x-Bewehrung einer Seite zählt zusammen, in ihrem Schwerpunkt. φ ist die Kriechzahl der Platte.
+
 **Bewehrungsquerschnitt über die Breite b** *(SIA 262:2025, 5.5.2)*
 
 $$
@@ -3375,6 +3543,48 @@ $$
 
 $$
 h_{Dist} = \text{OK innere untere Lage} - \text{UK innere obere Lage}
+$$
+
+**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5)*
+
+$$
+\frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
+$$
+
+**x-Bewehrung unten, zusammen**
+
+$$
+A_{s,u} = A_{s,2,x,g} + A_{s,2,x,z}
+$$
+
+**Schwerpunkt der x-Bewehrung unten**
+
+$$
+z_{u} = \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,u}}
+$$
+
+**Statische Höhe der x-Bewehrung unten**
+
+$$
+d_{u} = z_{u}
+$$
+
+**Bewehrungsgehalt unten**
+
+$$
+\rho_{u} = \frac{A_{s,u}}{b \cdot d_{u}}
+$$
+
+**Statische Höhe der x-Bewehrung oben**
+
+$$
+d_{o} = h - z_{3,x,g}
+$$
+
+**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5)*
+
+$$
+\left(\frac{w}{w_c}\right)_{u} = \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3}
 $$
 
 **Querschnitt eines Bügelschenkels** *(SIA 262:2025, 5.5.2)*
@@ -3451,12 +3661,6 @@ $$
 z_{2,x} = \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}}
 $$
 
-**Bewehrungsquerschnitt der zusammengefassten Lage**
-
-$$
-A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z}
-$$
-
 **Gleichmässiger Druck, ohne Bewehrung**
 
 $$
@@ -3473,12 +3677,6 @@ $$
 
 $$
 M_{Rd}(N_{Rd}^{+}) = A_{s,2,x} \cdot f_{yd} \cdot \left(z_{2,x} - \tfrac{h}{2}\right) + A_{s,3,x} \cdot f_{yd} \cdot \left(z_{3,x} - \tfrac{h}{2}\right)
-$$
-
-**Statische Höhe der Lage unten, ab dem gedrückten Rand oben**
-
-$$
-d_{2,x} = z_{2,x}
 $$
 
 **Druckzonenhöhe aus dem Kräftegleichgewicht**
@@ -3521,12 +3719,6 @@ $$
 
 $$
 M_{Rd}^{+} = \left[f_{cd} \cdot b \cdot 0.85 \cdot x^{+} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{+}}{2}\right) + A_{s,2,x} \cdot \sigma_{sd} \cdot \left(d_{2,x} - \tfrac{h}{2}\right)\right]
-$$
-
-**Statische Höhe der Lage oben, ab dem gedrückten Rand unten**
-
-$$
-d_{3,x} = h - z_{3,x}
 $$
 
 **Widerstand bei N\_Ed – ein Eckpunkt liegt genau dort**
@@ -3693,6 +3885,12 @@ $$
 
 $$
 \frac{x}{d} \le 0.35
+$$
+
+**Bewehrung der Lage**
+
+$$
+A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z}
 $$
 
 **Druckzonenhöhe bei reiner Biegung**
@@ -4347,6 +4545,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) | $h_{Dist}$ | $186$ | mm | berechnet |
 | Plattendicke | $h$ | $300$ | mm | Vorgabe |
 | Abminderung der Betondruckfestigkeit in der Druckdiagonalen | $k_c$ | $0.55$ |  | Vorgabe |
+| Kriechzahl | $\varphi$ | $2$ |  | Vorgabe |
 | Bewehrungsquerschnitt 1. Lage Grundbewehrung | $A_{s,1,y,g}$ | $754$ | mm² | berechnet |
 | Stabdurchmesser 1. Lage Grundbewehrung | $\varnothing_{1,y,g}$ | $12$ | mm | Vorgabe |
 | Teilung 1. Lage Grundbewehrung | $s_{1,y,g}$ | $150$ | mm | Vorgabe |
@@ -4408,6 +4607,8 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Bügelzahl über die betrachtete Breite | $n_{V,y}$ | $5$ |  | Vorgabe |
 | Bügeldurchmesser | $\varnothing_{V}$ | $8$ | mm | Vorgabe |
 | Bügelteilung in x-Richtung | $s_{V,x}$ | $200$ | mm | Vorgabe |
+| Vergrösserungsfaktor der Durchbiegung, Zug oben | $\left(\frac{w}{w_c}\right)_{o}$ | $7.52$ |  | berechnet |
+| Vergrösserungsfaktor der Durchbiegung, Zug unten | $\left(\frac{w}{w_c}\right)_{u}$ | $4$ |  | berechnet |
 | Grösstkorndurchmesser | $D_{max}$ | $32$ | mm | Vorgabe |
 | Betrachtete Breite (x) | $b$ | $500$ | mm | Vorgabe |
 | Betrachtete Breite (y) | $b_y$ | $1000$ | mm | Vorgabe |
@@ -4417,6 +4618,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) | $h_{Dist}$ | $104$ | mm | berechnet |
 | Höhe der Einlage | $e_{Einlage}$ | $40$ | mm | Vorgabe |
 | Plattendicke | $h$ | $200$ | mm | Vorgabe |
+| Kriechzahl | $\varphi$ | $2$ |  | Vorgabe |
 | Bewehrungsquerschnitt 1. Lage Grundbewehrung | $A_{s,1,x,g}$ | $262$ | mm² | berechnet |
 | Stabdurchmesser 1. Lage Grundbewehrung | $\varnothing_{1,x,g}$ | $10$ | mm | Vorgabe |
 | Teilung 1. Lage Grundbewehrung | $s_{1,x,g}$ | $150$ | mm | Vorgabe |
@@ -4460,6 +4662,8 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erfüllungsgrad sprödes Versagen – 4. Lage x | $\alpha_{eff,SV,4,x}$ | $1.94$ |  | berechnet |
 | Erfüllungsgrad Zwängung auf Biegung – 1. Lage x | $\alpha_{eff,ZB,1,x}$ | $2.17$ |  | berechnet |
 | Erfüllungsgrad Zwängung auf Biegung – 4. Lage x | $\alpha_{eff,ZB,4,x}$ | $2.17$ |  | berechnet |
+| Vergrösserungsfaktor der Durchbiegung, Zug oben | $\left(\frac{w}{w_c}\right)_{o}$ | $8.89$ |  | berechnet |
+| Vergrösserungsfaktor der Durchbiegung, Zug unten | $\left(\frac{w}{w_c}\right)_{u}$ | $8.89$ |  | berechnet |
 | Erfüllungsgrad M-N x-Richtung – Feld (keine Bewehrung) | $\alpha_{eff,M-N,x,\text{Feld}}$ | $0.00$ |  | berechnet |
 | Erfüllungsgrad V x-Richtung – Feld (keine Bewehrung) | $\alpha_{eff,V,x,\text{Feld}}$ | $0.00$ |  | berechnet |
 | Grösstkorndurchmesser | $D_{max}$ | $32$ | mm | Vorgabe |
@@ -4471,6 +4675,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) | $h_{Dist}$ | $116$ | mm | berechnet |
 | Höhe der Einlage | $e_{Einlage}$ | $0$ | mm | Vorgabe |
 | Plattendicke | $h$ | $250$ | mm | Vorgabe |
+| Kriechzahl | $\varphi$ | $2$ |  | Vorgabe |
 | Bewehrungsquerschnitt 1. Lage Grundbewehrung | $A_{s,1,y,g}$ | $8378$ | mm² | berechnet |
 | Stabdurchmesser 1. Lage Grundbewehrung | $\varnothing_{1,y,g}$ | $40$ | mm | Vorgabe |
 | Teilung 1. Lage Grundbewehrung | $s_{1,y,g}$ | $150$ | mm | Vorgabe |
@@ -4511,6 +4716,8 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erfüllungsgrad sprödes Versagen – 3. Lage x | $\alpha_{eff,SV,3,x}$ | $2.21$ |  | berechnet |
 | Erfüllungsgrad Zwängung auf Biegung – 2. Lage x | $\alpha_{eff,ZB,2,x}$ | $2.11$ |  | berechnet |
 | Erfüllungsgrad Zwängung auf Biegung – 3. Lage x | $\alpha_{eff,ZB,3,x}$ | $2.48$ |  | berechnet |
+| Vergrösserungsfaktor der Durchbiegung, Zug oben | $\left(\frac{w}{w_c}\right)_{o}$ | $8.05$ |  | berechnet |
+| Vergrösserungsfaktor der Durchbiegung, Zug unten | $\left(\frac{w}{w_c}\right)_{u}$ | $11.77$ |  | berechnet |
 | Fläche des Bruttoquerschnitts | $A$ | $330000$ | mm² | berechnet |
 | Stahlfläche der Bewehrung | $A_{s,tot}$ | $2373$ | mm² | berechnet |
 | Trägheitsmoment um y | $I_y$ | $13275$ | ·10⁶ mm⁴ | berechnet |

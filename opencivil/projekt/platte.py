@@ -69,11 +69,9 @@ class QuerschnittEintrag(Beschreibung):
 
     kriechzahl: float = KRIECHZAHL
     """
-    Kriechzahl phi fuer den gerissenen Zustand.
-
-    Geht ueber ``n = (E_s/E_cm)*(1+phi)`` in den Hebelarm ein. Ein groesseres
-    phi ist dabei **immer** der konservative Fall: die Nulllinie rutscht
-    tiefer, der Hebelarm schrumpft, der aufnehmbare Moment sinkt.
+    Kriechzahl phi der Platte -- nur fuer den Vergroesserungsfaktor w/w_c der
+    Durchbiegung (SIA 262:2025, 4.4.3.2.5). Die Nachweise waehlen ihr phi
+    selbst, jedes Kapitel in seiner Rechenwahl.
     """
 
     zwaengung: bool = False

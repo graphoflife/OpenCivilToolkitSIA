@@ -491,26 +491,37 @@ function zeilenVon(zelle) {
 }
 
 /**
- * Die beiden Angaben zur Ausführung unter der Tabelle.
+ * Die Angaben zur Platte unter der Tabelle: zwei zur Ausführung und der
+ * Vergrösserungsfaktor der Durchbiegung, je gezogene Seite.
  *
- * Beide kommen fertig aus dem Kern -- hier wird nichts gerechnet, auch nicht
- * "nur schnell" das Bewehrungsmass aus den Flächen.
+ * Alle kommen fertig aus dem Kern -- hier wird nichts gerechnet, auch nicht
+ * "nur schnell" das Bewehrungsmass aus den Flächen. Fehlt in x die
+ * Bewehrung einer Seite, gibt es dort keinen Faktor, und die Zeile entfällt.
+ * Der Faktor steht mit festen zwei Stellen, wie verlangt; die anderen ohne
+ * nachlaufende Nullen.
  */
 function plattenkennzahlen(eintrag, loesung) {
+  const wwc = 'Vergrösserungsfaktor w/w_c nach SIA 262:2025, 4.4.3.2.5, mit dem φ der Platte';
   const zeigen = [
     ['Bewehrungsmass', eintrag.werte?.bewehrungsmass, 'Stahldichte 7850 kg/m³'],
     ['Höhe der Distanzhalter', eintrag.werte?.distanzhalter,
       'OK innere untere Lage bis UK innere obere Lage'],
+    ['Vergrösserungsfaktor Zug unten', eintrag.werte?.w_wc_unten, wwc, true],
+    ['Vergrösserungsfaktor Zug oben', eintrag.werte?.w_wc_oben, wwc, true],
   ];
   const zeilen = zeigen
-    .map(([beschriftung, id, erklaerung]) => [beschriftung, loesung.werte?.[id], erklaerung])
+    .map(([beschriftung, id, erklaerung, fest]) => [
+      beschriftung, loesung.werte?.[id], erklaerung, fest])
     .filter(([, wert]) => wert);
   if (!zeilen.length) return null;
 
-  return el('div.kennzahlen', {}, zeilen.map(([beschriftung, wert, erklaerung]) =>
+  const zahl = (wert, fest) => (fest ? wert.zahl.toFixed(wert.stellen) : wert.wert);
+  return el('div.kennzahlen', {}, zeilen.map(([beschriftung, wert, erklaerung, fest]) =>
     el('div.kennzahl', { title: erklaerung }, [
       el('span.kennzahl-name', { text: beschriftung }),
-      el('span.kennzahl-wert', { text: `${wert.wert} ${wert.einheit}` }),
+      el('span.kennzahl-wert', {
+        text: wert.einheit ? `${zahl(wert, fest)} ${wert.einheit}` : zahl(wert, fest),
+      }),
     ])));
 }
 

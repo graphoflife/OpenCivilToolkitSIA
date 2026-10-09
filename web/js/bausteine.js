@@ -68,7 +68,12 @@ export function feld(beschriftung, eingabe, einheit, titel) {
       ? el('label', { text: beschriftung, title: titel || beschriftung })
       : el('label', { title: titel || '' }, beschriftung),
     eingabe,
-    el('span.einheit', { text: einheit || '' }),
+    // Statt einer Einheit darf hier ein Element stehen -- etwa ein «?». Im
+    // Label hätte es keinen Platz: das schneidet ab, was übersteht, und mit
+    // ihm die Blase der Erklärung.
+    einheit instanceof Node
+      ? el('span.einheit', {}, [einheit])
+      : el('span.einheit', { text: einheit || '' }),
   ]);
 }
 

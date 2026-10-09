@@ -17,7 +17,7 @@
  * Oberfläche nachgerechneter.
  */
 
-import { feld, panel } from './bausteine.js';
+import { erklaerung, feld, panel } from './bausteine.js';
 import { auswahl, el, ersetzen, melden, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
 import { analysenBlock, automatikBlock, nachweiseBlock } from './nachweise.js';
@@ -557,11 +557,17 @@ function plattenEditor(querschnitt) {
           leer: 0,
           beiAenderung: (v) => aendern((q) => { q.einlagenhoehe = v; }),
         }), 'mm'),
+        // Nur noch für den Vergrösserungsfaktor -- die Nachweise wählen ihr φ
+        // selbst, jedes Kapitel in seiner Zeile «Rechenwahl».
         feld(['Kriechzahl ', span(String.raw`\varphi`)], zahlfeld({
           wert: querschnitt.kriechzahl, schritt: 0.1, min: 0,
-          titel: 'n = E_s/E_cm · (1+φ), gerissener Zustand; grösser → sicherer',
+          titel: 'Kriechzahl φ für den Vergrösserungsfaktor w/w_c',
           beiAenderung: (v) => aendern((q) => { q.kriechzahl = v; }),
-        }), '', 'Kriechzahl φ, gerissener Zustand'),
+        }), erklaerung([
+          ['Wofür', 'nur für den Vergrösserungsfaktor w/w_c (SIA 262:2025, 4.4.3.2.5)'],
+          ['Nachweise', 'wählen ihr φ selbst, in der Zeile «Rechenwahl» jedes Kapitels'],
+        ], 'w/w_c = (1 − 20ρ′)/(10ρ^0.7) · (0.75 + 0.1φ) · (h/d)³'),
+        'Kriechzahl φ – nur für w/w_c'),
         feld('Rissanforderung', auswahl({
           werte: (zustand.katalog.rissanforderungen || []).map((r) => ({
             wert: r.wert, beschriftung: r.beschriftung,

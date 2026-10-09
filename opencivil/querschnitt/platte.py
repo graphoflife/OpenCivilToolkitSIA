@@ -444,6 +444,7 @@ class Lagenaufbau(Prozedur):
         posten: Sequence["Postenbezug"],
         d_bewehrungsmass: WertDef,
         d_distanzhalter: WertDef,
+        d_vergroesserung: Optional[Mapping[bool, WertDef]] = None,
         titel: str = "Bewehrungslagen",
         abschnitt: Optional[Abschnitt] = None,
     ) -> None:
@@ -452,6 +453,8 @@ class Lagenaufbau(Prozedur):
         self.posten = list(posten)
         self.d_bewehrungsmass = d_bewehrungsmass
         self.d_distanzhalter = d_distanzhalter
+        self.d_vergroesserung = dict(d_vergroesserung or {})
+        """Je gezogene Seite (unten: ``True``) der Faktor w/w_c -- nur, wo x-Bewehrung liegt."""
 
     def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
         h = e.g("h")
@@ -575,6 +578,99 @@ class Lagenaufbau(Prozedur):
             titel="Randabstände, Tiefen ab Oberkante und Bewehrungsquerschnitte",
             ausrichtung="lll" + "r" * (len(kopf) - 3),
         )
+        ergebnis.update(self._vergroesserung(p, e, ergebnis))
+        return ergebnis
+
+    def _vergroesserung(self, p: Protokoll, e: Eingaben,
+                        gerechnet: Mapping[str, Groesse]) -> Dict[str, Groesse]:
+        """
+        Der Vergroesserungsfaktor der Durchbiegung in x, Zug unten und Zug
+        oben -- SIA 262:2025, 4.4.3.2.5, nach Vorgabe des Benutzers::
+
+            w / w_c = (1 - 20 rho') / (10 rho^0.7) · (0.75 + 0.1 phi) · (h/d)^3
+
+        ``rho = A_s/(b·d)`` der gezogenen Seite, ``rho'`` der Gegenseite mit
+        ``d'`` vom gezogenen Rand bis zur Gegenlage -- und das ist deren
+        statische Hoehe: ``rho'`` der einen Seite ist das ``rho`` der anderen.
+        ``phi`` ist die Kriechzahl der Platte; die Nachweise waehlen ihre
+        eigene.
+
+        Die x-Posten einer Seite zaehlen zusammen, in ihrem Schwerpunkt. Fehlt
+        die Gegenseite, ist ``rho' = 0``; fehlt die gezogene Seite, gibt es
+        keinen Faktor.
+        """
+        if not self.d_vergroesserung:
+            return {}
+        werte = Zwischenwerte(self.id)
+        h, b, phi = e["h"], e["b"], e["phi"]
+        p.ansatz(
+            r"\frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot "
+            r"\left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3}"
+            r" \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}",
+            titel="Vergrösserungsfaktor der Durchbiegung – allgemein",
+            referenz="SIA 262:2025, 4.4.3.2.5")
+        p.erklaerung(
+            "Gerechnet in x, einmal mit Zug unten und einmal mit Zug oben. ρ gehört "
+            "zur gezogenen Seite, ρ′ zur Gegenseite; d′ reicht vom gezogenen Rand bis "
+            "zur Gegenlage und ist damit deren statische Höhe – ρ′ der einen Seite ist "
+            "das ρ der anderen. Die x-Bewehrung einer Seite zählt zusammen, in ihrem "
+            "Schwerpunkt. φ ist die Kriechzahl der Platte."
+        )
+
+        rho: Dict[bool, Wert] = {}
+        hoehe: Dict[bool, Wert] = {}
+        for unten in (True, False):
+            posten = [q for q in self.posten
+                      if q.lage.richtung is Richtung.X and q.lage.von_unten is unten]
+            a_s = sum(gerechnet[q.as_def.id].si for q in posten)
+            if a_s <= 0.0:
+                continue
+            k = "u" if unten else "o"
+            seite = "unten" if unten else "oben"
+            flaechen = [q.as_def.belegen(gerechnet[q.as_def.id]) for q in posten]
+            tiefen = [q.z_def.belegen(gerechnet[q.z_def.id]) for q in posten]
+            if len(posten) == 1:
+                A, z = flaechen[0], tiefen[0]
+            else:
+                A = werte.flaeche(f"A_s_{k}", f"A_{{s,{k}}}", a_s)
+                p.formel(A, " + ".join(f"@A{i}" for i in range(len(posten))),
+                         {f"A{i}": a for i, a in enumerate(flaechen)},
+                         titel=f"x-Bewehrung {seite}, zusammen")
+                z = werte.laenge(f"z_{k}", f"z_{{{k}}}",
+                                 sum(a.groesse.si * t.groesse.si
+                                     for a, t in zip(flaechen, tiefen)) / a_s)
+                p.formel(z, rf"\frac{{{' + '.join(f'@A{i} \\cdot @z{i}' for i in range(len(posten)))}}}"
+                            rf"{{@A}}",
+                         {"A": A, **{f"A{i}": a for i, a in enumerate(flaechen)},
+                          **{f"z{i}": t for i, t in enumerate(tiefen)}},
+                         titel=f"Schwerpunkt der x-Bewehrung {seite}")
+            d = werte.laenge(f"d_{k}", f"d_{{{k}}}",
+                             z.groesse.si if unten else h.groesse.si - z.groesse.si)
+            p.formel(d, "@z" if unten else "@h - @z", {"z": z, "h": h},
+                     titel=f"Statische Höhe der x-Bewehrung {seite}")
+            r = werte.zahl(f"rho_{k}", rf"\rho_{{{k}}}", a_s / (b.groesse.si * d.groesse.si),
+                           stellen=5)
+            p.formel(r, r"\frac{@A}{@b \cdot @d}", {"A": A, "b": b, "d": d},
+                     titel=f"Bewehrungsgehalt {seite}")
+            rho[unten], hoehe[unten] = r, d
+
+        ergebnis: Dict[str, Groesse] = {}
+        for unten, definition in self.d_vergroesserung.items():
+            if unten not in rho:
+                continue
+            gegen = rho.get(not unten) or werte.zahl(
+                f"rho_{'o' if unten else 'u'}", rf"\rho_{{{'o' if unten else 'u'}}}", 0.0,
+                stellen=5)
+            zahl = ((1.0 - 20.0 * gegen.groesse.si) / (10.0 * rho[unten].groesse.si ** 0.7)
+                    * (0.75 + 0.1 * phi.groesse.si)
+                    * (h.groesse.si / hoehe[unten].groesse.si) ** 3)
+            ergebnis[definition.id] = Groesse(zahl, EINHEITSLOS)
+            p.formel(
+                definition.belegen(ergebnis[definition.id]),
+                r"\frac{1 - 20 \cdot @rho_s}{10 \cdot @rho^{0.7}} \cdot "
+                r"\left(0.75 + 0.1 \cdot @phi\right) \cdot \left(\frac{@h}{@d}\right)^{3}",
+                {"rho_s": gegen, "rho": rho[unten], "phi": phi, "h": h, "d": hoehe[unten]},
+                titel=f"Vergrösserungsfaktor, Zug {'unten' if unten else 'oben'}")
         return ergebnis
 
     def _kennzahlen(
@@ -828,6 +924,7 @@ class Plattenquerschnitt:
             Eingabebezug("b_y", d_b_y.id),
             Eingabebezug("c_nom_unten", d_cu.id),
             Eingabebezug("c_nom_oben", d_co.id),
+            Eingabebezug("phi", self.definitionen["kriechzahl"].id),
         ]
 
         for lage in self.lagen:
@@ -875,6 +972,20 @@ class Plattenquerschnitt:
                 aufbau_posten.append(Postenbezug(lage, art, posten, marke, d_z, d_as))
                 self.posten_ids.append((lage, art, posten, d_as.id, d_z.id))
 
+        # Der Vergroesserungsfaktor je gezogene Seite -- nur, wo in x
+        # Bewehrung liegt; ohne sie gibt es keinen.
+        self.d_vergroesserung: Dict[bool, WertDef] = {
+            unten: self._def(
+                f"w_wc_{'unten' if unten else 'oben'}",
+                rf"\left(\frac{{w}}{{w_c}}\right)_{{{'u' if unten else 'o'}}}", EINHEITSLOS,
+                f"Vergrösserungsfaktor der Durchbiegung, Zug {'unten' if unten else 'oben'}",
+                2, referenz="SIA 262:2025, 4.4.3.2.5")
+            for unten in (True, False)
+            if any(q.lage.richtung is Richtung.X and q.lage.von_unten is unten
+                   for q in aufbau_posten)
+        }
+        aufbau_ausgaben += list(self.d_vergroesserung.values())
+
         self.berechnungen.append(
             Lagenaufbau(
                 id=f"{self.id}.lagenaufbau",
@@ -883,6 +994,7 @@ class Plattenquerschnitt:
                 posten=aufbau_posten,
                 d_bewehrungsmass=self.d_bewehrungsmass,
                 d_distanzhalter=self.d_distanzhalter,
+                d_vergroesserung=self.d_vergroesserung,
                 abschnitt=abschnitt,
             ))
 
@@ -911,8 +1023,8 @@ class Plattenquerschnitt:
         self.berechnungen += [
             Vorgabe(id=f"{self.id}.k_c", ausgabe=d_kc, groesse=self.k_c,
                     abschnitt=abschnitt, stumm=True),
-            # Wie k_c: sie steht dort, wo sie erklaert wird -- beim Nachweis,
-            # der mit ihr rechnet, nicht verwaist am Anfang der Plattenanalyse.
+            # Wie k_c: sie steht dort, wo sie erklaert wird -- beim
+            # Vergroesserungsfaktor, der als einziger mit ihr rechnet.
             Vorgabe(id=f"{self.id}.kriechzahl", ausgabe=d_phi,
                     groesse=self.kriechzahl, abschnitt=abschnitt, stumm=True),
         ]

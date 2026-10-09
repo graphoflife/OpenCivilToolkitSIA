@@ -108,6 +108,10 @@
       "art": "querschnitt",
       "bloecke": [
         {
+          "art": "text",
+          "text": "Gerechnet in x, einmal mit Zug unten und einmal mit Zug oben. ρ gehört zur gezogenen Seite, ρ′ zur Gegenseite; d′ reicht vom gezogenen Rand bis zur Gegenlage und ist damit deren statische Höhe – ρ′ der einen Seite ist das ρ der anderen. Die x-Bewehrung einer Seite zählt zusammen, in ihrem Schwerpunkt. φ ist die Kriechzahl der Platte."
+        },
+        {
           "art": "gleichung",
           "latex": "A_s = \\frac{\\pi \\cdot \\varnothing^{2}}{4} \\cdot \\frac{b}{s}",
           "markdown": "**Bewehrungsquerschnitt über die Breite b** *(SIA 262:2025, 5.5.2)*\n\n$$\nA_s = \\frac{\\pi \\cdot \\varnothing^{2}}{4} \\cdot \\frac{b}{s}\n$$",
@@ -131,6 +135,69 @@
           "markdown": "**Höhe der Distanzhalter**\n\n$$\nh_{Dist} = \\text{OK innere untere Lage} - \\text{UK innere obere Lage}\n$$",
           "titel": "Höhe der Distanzhalter",
           "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\frac{w}{w_c} = \\frac{1 - 20 \\cdot \\rho'}{10 \\cdot \\rho^{0.7}} \\cdot \\left(0.75 + 0.1 \\cdot \\varphi\\right) \\cdot \\left(\\frac{h}{d}\\right)^{3} \\qquad \\rho = \\frac{A_s}{b \\cdot d} \\qquad \\rho' = \\frac{A_s'}{b \\cdot d'}",
+          "markdown": "**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5)*\n\n$$\n\\frac{w}{w_c} = \\frac{1 - 20 \\cdot \\rho'}{10 \\cdot \\rho^{0.7}} \\cdot \\left(0.75 + 0.1 \\cdot \\varphi\\right) \\cdot \\left(\\frac{h}{d}\\right)^{3} \\qquad \\rho = \\frac{A_s}{b \\cdot d} \\qquad \\rho' = \\frac{A_s'}{b \\cdot d'}\n$$",
+          "titel": "Vergrösserungsfaktor der Durchbiegung – allgemein",
+          "referenz": "SIA 262:2025, 4.4.3.2.5",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "A_{s,u} = A_{s,2,x,g} + A_{s,2,x,z}",
+          "markdown": "**x-Bewehrung unten, zusammen**\n\n$$\nA_{s,u} = A_{s,2,x,g} + A_{s,2,x,z}\n$$",
+          "titel": "x-Bewehrung unten, zusammen",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "z_{u} = \\frac{A_{s,2,x,g} \\cdot z_{2,x,g} + A_{s,2,x,z} \\cdot z_{2,x,z}}{A_{s,u}}",
+          "markdown": "**Schwerpunkt der x-Bewehrung unten**\n\n$$\nz_{u} = \\frac{A_{s,2,x,g} \\cdot z_{2,x,g} + A_{s,2,x,z} \\cdot z_{2,x,z}}{A_{s,u}}\n$$",
+          "titel": "Schwerpunkt der x-Bewehrung unten",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "d_{u} = z_{u}",
+          "markdown": "**Statische Höhe der x-Bewehrung unten**\n\n$$\nd_{u} = z_{u}\n$$",
+          "titel": "Statische Höhe der x-Bewehrung unten",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\rho_{u} = \\frac{A_{s,u}}{b \\cdot d_{u}}",
+          "markdown": "**Bewehrungsgehalt unten**\n\n$$\n\\rho_{u} = \\frac{A_{s,u}}{b \\cdot d_{u}}\n$$",
+          "titel": "Bewehrungsgehalt unten",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "d_{o} = h - z_{3,x,g}",
+          "markdown": "**Statische Höhe der x-Bewehrung oben**\n\n$$\nd_{o} = h - z_{3,x,g}\n$$",
+          "titel": "Statische Höhe der x-Bewehrung oben",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\left(\\frac{w}{w_c}\\right)_{u} = \\frac{1 - 20 \\cdot \\rho_{o}}{10 \\cdot \\rho_{u}^{0.7}} \\cdot \\left(0.75 + 0.1 \\cdot \\varphi\\right) \\cdot \\left(\\frac{h}{d_{u}}\\right)^{3}",
+          "markdown": "**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5)*\n\n$$\n\\left(\\frac{w}{w_c}\\right)_{u} = \\frac{1 - 20 \\cdot \\rho_{o}}{10 \\cdot \\rho_{u}^{0.7}} \\cdot \\left(0.75 + 0.1 \\cdot \\varphi\\right) \\cdot \\left(\\frac{h}{d_{u}}\\right)^{3}\n$$",
+          "titel": "Vergrösserungsfaktor, Zug unten",
+          "referenz": "SIA 262:2025, 4.4.3.2.5",
           "wert_id": "",
           "gruppe": ""
         },
@@ -164,15 +231,6 @@
         },
         {
           "art": "gleichung",
-          "latex": "A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z}",
-          "markdown": "**Bewehrungsquerschnitt der zusammengefassten Lage**\n\n$$\nA_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z}\n$$",
-          "titel": "Bewehrungsquerschnitt der zusammengefassten Lage",
-          "referenz": "",
-          "wert_id": "",
-          "gruppe": ""
-        },
-        {
-          "art": "gleichung",
           "latex": "N_{Rd}^{-} = -b \\cdot h \\cdot f_{cd}",
           "markdown": "**Gleichmässiger Druck, ohne Bewehrung**\n\n$$\nN_{Rd}^{-} = -b \\cdot h \\cdot f_{cd}\n$$",
           "titel": "Gleichmässiger Druck, ohne Bewehrung",
@@ -194,15 +252,6 @@
           "latex": "M_{Rd}(N_{Rd}^{+}) = A_{s,2,x} \\cdot f_{yd} \\cdot \\left(z_{2,x} - \\tfrac{h}{2}\\right) + A_{s,3,x} \\cdot f_{yd} \\cdot \\left(z_{3,x} - \\tfrac{h}{2}\\right)",
           "markdown": "**Kräfte mal Hebelarm um die halbe Höhe**\n\n$$\nM_{Rd}(N_{Rd}^{+}) = A_{s,2,x} \\cdot f_{yd} \\cdot \\left(z_{2,x} - \\tfrac{h}{2}\\right) + A_{s,3,x} \\cdot f_{yd} \\cdot \\left(z_{3,x} - \\tfrac{h}{2}\\right)\n$$",
           "titel": "Kräfte mal Hebelarm um die halbe Höhe",
-          "referenz": "",
-          "wert_id": "",
-          "gruppe": ""
-        },
-        {
-          "art": "gleichung",
-          "latex": "d_{2,x} = z_{2,x}",
-          "markdown": "**Statische Höhe der Lage unten, ab dem gedrückten Rand oben**\n\n$$\nd_{2,x} = z_{2,x}\n$$",
-          "titel": "Statische Höhe der Lage unten, ab dem gedrückten Rand oben",
           "referenz": "",
           "wert_id": "",
           "gruppe": ""
@@ -266,15 +315,6 @@
           "latex": "M_{Rd}^{+} = \\left[f_{cd} \\cdot b \\cdot 0.85 \\cdot x^{+} \\cdot \\left(\\tfrac{h}{2} - \\tfrac{0.85 \\cdot x^{+}}{2}\\right) + A_{s,2,x} \\cdot \\sigma_{sd} \\cdot \\left(d_{2,x} - \\tfrac{h}{2}\\right)\\right]",
           "markdown": "**Momentengleichgewicht um die halbe Höhe**\n\n$$\nM_{Rd}^{+} = \\left[f_{cd} \\cdot b \\cdot 0.85 \\cdot x^{+} \\cdot \\left(\\tfrac{h}{2} - \\tfrac{0.85 \\cdot x^{+}}{2}\\right) + A_{s,2,x} \\cdot \\sigma_{sd} \\cdot \\left(d_{2,x} - \\tfrac{h}{2}\\right)\\right]\n$$",
           "titel": "Momentengleichgewicht um die halbe Höhe",
-          "referenz": "",
-          "wert_id": "",
-          "gruppe": ""
-        },
-        {
-          "art": "gleichung",
-          "latex": "d_{3,x} = h - z_{3,x}",
-          "markdown": "**Statische Höhe der Lage oben, ab dem gedrückten Rand unten**\n\n$$\nd_{3,x} = h - z_{3,x}\n$$",
-          "titel": "Statische Höhe der Lage oben, ab dem gedrückten Rand unten",
           "referenz": "",
           "wert_id": "",
           "gruppe": ""
@@ -750,6 +790,15 @@
           "latex": "\\frac{x}{d} \\le 0.35",
           "markdown": "**Bedingung**\n\n$$\n\\frac{x}{d} \\le 0.35\n$$",
           "titel": "Bedingung",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z}",
+          "markdown": "**Bewehrung der Lage**\n\n$$\nA_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z}\n$$",
+          "titel": "Bewehrung der Lage",
           "referenz": "",
           "wert_id": "",
           "gruppe": ""

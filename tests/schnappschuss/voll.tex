@@ -28,7 +28,7 @@
 \date{\today}
 \begin{document}
 \maketitle
-113 Berechnungen ausgeführt, 243 Werte bestimmt.
+116 Berechnungen ausgeführt, 252 Werte bestimmt.
 
 \section{Herleitung}
 \subsection{Plattenanalyse: Decke}
@@ -81,6 +81,54 @@ Bewehrung & Richtung & Stahl & $\varnothing\ [\mathrm{mm}]$ & $s\ [\mathrm{mm}]$
 4. Lage Grundbewehrung & y & B500B & $12$ & $150$ & $36$ & $36$ & $754$ \\
 \hline
 \end{longtable}
+\noindent\textbf{Vergrösserungsfaktor der Durchbiegung – allgemein} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
+\begin{equation*}
+\frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
+\end{equation*}
+\noindent\textbf{x-Bewehrung unten, zusammen}
+\begin{equation*}
+A_{s,u} = A_{s,2,x,g} + A_{s,2,x,z} = 1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2} = 2450\,\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Schwerpunkt der x-Bewehrung unten}
+\begin{equation*}
+\begin{aligned}
+  z_{u} &= \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,u}} \\
+  &= \frac{1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 246\,\mathrm{mm}}{2450\,\mathrm{mm}^{2}} \\
+  &= 248.1\,\mathrm{mm}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Statische Höhe der x-Bewehrung unten}
+\begin{equation*}
+d_{u} = z_{u} = 248.1\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Bewehrungsgehalt unten}
+\begin{equation*}
+\rho_{u} = \frac{A_{s,u}}{b \cdot d_{u}} = \frac{2450\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 248.1\,\mathrm{mm}} = 0.00988
+\end{equation*}
+\noindent\textbf{Statische Höhe der x-Bewehrung oben}
+\begin{equation*}
+d_{o} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Bewehrungsgehalt oben}
+\begin{equation*}
+\rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{o}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 252\,\mathrm{mm}} = 0.00299
+\end{equation*}
+\noindent\textbf{Vergrösserungsfaktor, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
+\begin{equation*}
+\begin{aligned}
+  \left(\frac{w}{w_c}\right)_{u} &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00299}{10 \cdot 0.00988^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{248.1\,\mathrm{mm}}\right)^{3} \\
+  &= 4
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Vergrösserungsfaktor, Zug oben} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
+\begin{equation*}
+\begin{aligned}
+  \left(\frac{w}{w_c}\right)_{o} &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{o}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00988}{10 \cdot 0.00299^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{252\,\mathrm{mm}}\right)^{3} \\
+  &= 7.52
+\end{aligned}
+\end{equation*}
 \subsection{Resistenzlinie aus Handrechnung – x-Richtung}
 \noindent\textbf{Rechenwahl}
 \begin{equation*}
@@ -1138,6 +1186,42 @@ Bewehrung & Richtung & Stahl & $\varnothing\ [\mathrm{mm}]$ & $s\ [\mathrm{mm}]$
 4. Lage Grundbewehrung & x & B500B & $10$ & $150$ & $500$ & $35$ & $35$ & $262$ \\
 \hline
 \end{longtable}
+\noindent\textbf{Vergrösserungsfaktor der Durchbiegung – allgemein} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
+\begin{equation*}
+\frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
+\end{equation*}
+\noindent\textbf{Statische Höhe der x-Bewehrung unten}
+\begin{equation*}
+d_{u} = z_{1,x,g} = 165\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Bewehrungsgehalt unten}
+\begin{equation*}
+\rho_{u} = \frac{A_{s,1,x,g}}{b \cdot d_{u}} = \frac{262\,\mathrm{mm}^{2}}{500\,\mathrm{mm} \cdot 165\,\mathrm{mm}} = 0.00317
+\end{equation*}
+\noindent\textbf{Statische Höhe der x-Bewehrung oben}
+\begin{equation*}
+d_{o} = h - z_{4,x,g} = 200\,\mathrm{mm} - 35\,\mathrm{mm} = 165\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Bewehrungsgehalt oben}
+\begin{equation*}
+\rho_{o} = \frac{A_{s,4,x,g}}{b \cdot d_{o}} = \frac{262\,\mathrm{mm}^{2}}{500\,\mathrm{mm} \cdot 165\,\mathrm{mm}} = 0.00317
+\end{equation*}
+\noindent\textbf{Vergrösserungsfaktor, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
+\begin{equation*}
+\begin{aligned}
+  \left(\frac{w}{w_c}\right)_{u} &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00317}{10 \cdot 0.00317^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{200\,\mathrm{mm}}{165\,\mathrm{mm}}\right)^{3} \\
+  &= 8.89
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Vergrösserungsfaktor, Zug oben} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
+\begin{equation*}
+\begin{aligned}
+  \left(\frac{w}{w_c}\right)_{o} &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{o}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00317}{10 \cdot 0.00317^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{200\,\mathrm{mm}}{165\,\mathrm{mm}}\right)^{3} \\
+  &= 8.89
+\end{aligned}
+\end{equation*}
 \subsection{Resistenzlinie aus Handrechnung – x-Richtung}
 \noindent\textbf{Rechenwahl}
 \begin{equation*}
@@ -1533,6 +1617,42 @@ Bewehrung & Richtung & Stahl & $\varnothing\ [\mathrm{mm}]$ & $s\ [\mathrm{mm}]$
 4. Lage Grundbewehrung & y & B500B & $10$ & $150$ & $35$ & $35$ & $524$ \\
 \hline
 \end{longtable}
+\noindent\textbf{Vergrösserungsfaktor der Durchbiegung – allgemein} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
+\begin{equation*}
+\frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
+\end{equation*}
+\noindent\textbf{Statische Höhe der x-Bewehrung unten}
+\begin{equation*}
+d_{u} = z_{2,x,g} = 174\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Bewehrungsgehalt unten}
+\begin{equation*}
+\rho_{u} = \frac{A_{s,2,x,g}}{b \cdot d_{u}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 174\,\mathrm{mm}} = 0.00433
+\end{equation*}
+\noindent\textbf{Statische Höhe der x-Bewehrung oben}
+\begin{equation*}
+d_{o} = h - z_{3,x,g} = 250\,\mathrm{mm} - 46\,\mathrm{mm} = 204\,\mathrm{mm}
+\end{equation*}
+\noindent\textbf{Bewehrungsgehalt oben}
+\begin{equation*}
+\rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{o}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 204\,\mathrm{mm}} = 0.0037
+\end{equation*}
+\noindent\textbf{Vergrösserungsfaktor, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
+\begin{equation*}
+\begin{aligned}
+  \left(\frac{w}{w_c}\right)_{u} &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.0037}{10 \cdot 0.00433^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{250\,\mathrm{mm}}{174\,\mathrm{mm}}\right)^{3} \\
+  &= 11.77
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Vergrösserungsfaktor, Zug oben} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
+\begin{equation*}
+\begin{aligned}
+  \left(\frac{w}{w_c}\right)_{o} &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{o}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00433}{10 \cdot 0.0037^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{250\,\mathrm{mm}}{204\,\mathrm{mm}}\right)^{3} \\
+  &= 8.05
+\end{aligned}
+\end{equation*}
 \subsection{Resistenzlinie aus Handrechnung – x-Richtung}
 \noindent\textbf{Rechenwahl}
 \begin{equation*}
@@ -2589,6 +2709,8 @@ N_{Rd} = a^{2} \cdot f_{cd} = \left(30\,\mathrm{cm}\right)^{2} \cdot 20\,\mathrm
 \hinweis{Warnung}{Zeile 6: Einheiten passen nicht zusammen.}
 \section{Verwendete Formeln}
 \subsection{Querschnitt}
+Gerechnet in x, einmal mit Zug unten und einmal mit Zug oben. ρ gehört zur gezogenen Seite, ρ′ zur Gegenseite; d′ reicht vom gezogenen Rand bis zur Gegenlage und ist damit deren statische Höhe – ρ′ der einen Seite ist das ρ der anderen. Die x-Bewehrung einer Seite zählt zusammen, in ihrem Schwerpunkt. φ ist die Kriechzahl der Platte.
+
 \noindent\textbf{Bewehrungsquerschnitt über die Breite b} \hfill \normref{SIA 262:2025, 5.5.2}
 \begin{equation*}
 A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
@@ -2600,6 +2722,34 @@ A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
 \noindent\textbf{Höhe der Distanzhalter}
 \begin{equation*}
 h_{Dist} = \text{OK innere untere Lage} - \text{UK innere obere Lage}
+\end{equation*}
+\noindent\textbf{Vergrösserungsfaktor der Durchbiegung – allgemein} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
+\begin{equation*}
+\frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
+\end{equation*}
+\noindent\textbf{x-Bewehrung unten, zusammen}
+\begin{equation*}
+A_{s,u} = A_{s,2,x,g} + A_{s,2,x,z}
+\end{equation*}
+\noindent\textbf{Schwerpunkt der x-Bewehrung unten}
+\begin{equation*}
+z_{u} = \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,u}}
+\end{equation*}
+\noindent\textbf{Statische Höhe der x-Bewehrung unten}
+\begin{equation*}
+d_{u} = z_{u}
+\end{equation*}
+\noindent\textbf{Bewehrungsgehalt unten}
+\begin{equation*}
+\rho_{u} = \frac{A_{s,u}}{b \cdot d_{u}}
+\end{equation*}
+\noindent\textbf{Statische Höhe der x-Bewehrung oben}
+\begin{equation*}
+d_{o} = h - z_{3,x,g}
+\end{equation*}
+\noindent\textbf{Vergrösserungsfaktor, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
+\begin{equation*}
+\left(\frac{w}{w_c}\right)_{u} = \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3}
 \end{equation*}
 \noindent\textbf{Querschnitt eines Bügelschenkels} \hfill \normref{SIA 262:2025, 5.5.2}
 \begin{equation*}
@@ -2650,10 +2800,6 @@ Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f\_cd; gedrückte
 \begin{equation*}
 z_{2,x} = \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}}
 \end{equation*}
-\noindent\textbf{Bewehrungsquerschnitt der zusammengefassten Lage}
-\begin{equation*}
-A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z}
-\end{equation*}
 \noindent\textbf{Gleichmässiger Druck, ohne Bewehrung}
 \begin{equation*}
 N_{Rd}^{-} = -b \cdot h \cdot f_{cd}
@@ -2665,10 +2811,6 @@ N_{Rd}^{+} = A_{s,2,x} \cdot f_{yd} + A_{s,3,x} \cdot f_{yd}
 \noindent\textbf{Kräfte mal Hebelarm um die halbe Höhe}
 \begin{equation*}
 M_{Rd}(N_{Rd}^{+}) = A_{s,2,x} \cdot f_{yd} \cdot \left(z_{2,x} - \tfrac{h}{2}\right) + A_{s,3,x} \cdot f_{yd} \cdot \left(z_{3,x} - \tfrac{h}{2}\right)
-\end{equation*}
-\noindent\textbf{Statische Höhe der Lage unten, ab dem gedrückten Rand oben}
-\begin{equation*}
-d_{2,x} = z_{2,x}
 \end{equation*}
 \noindent\textbf{Druckzonenhöhe aus dem Kräftegleichgewicht}
 \begin{equation*}
@@ -2697,10 +2839,6 @@ N_{Rd}^{+} = -f_{cd} \cdot b \cdot 0.85 \cdot x^{+} + A_{s,2,x} \cdot \sigma_{sd
 \noindent\textbf{Momentengleichgewicht um die halbe Höhe}
 \begin{equation*}
 M_{Rd}^{+} = \left[f_{cd} \cdot b \cdot 0.85 \cdot x^{+} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{+}}{2}\right) + A_{s,2,x} \cdot \sigma_{sd} \cdot \left(d_{2,x} - \tfrac{h}{2}\right)\right]
-\end{equation*}
-\noindent\textbf{Statische Höhe der Lage oben, ab dem gedrückten Rand unten}
-\begin{equation*}
-d_{3,x} = h - z_{3,x}
 \end{equation*}
 \noindent\textbf{Widerstand bei N\_Ed – ein Eckpunkt liegt genau dort}
 \begin{equation*}
@@ -2815,6 +2953,10 @@ d wird von der gedrückten Randfaser aus gemessen: bei den unteren Lagen von der
 \noindent\textbf{Bedingung}
 \begin{equation*}
 \frac{x}{d} \le 0.35
+\end{equation*}
+\noindent\textbf{Bewehrung der Lage}
+\begin{equation*}
+A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z}
 \end{equation*}
 \noindent\textbf{Druckzonenhöhe bei reiner Biegung}
 \begin{equation*}
@@ -3360,6 +3502,7 @@ Bewehrungsmass je Kubikmeter Beton & $\mu_s$ & $123$ & kg/m³ & berechnet \\
 Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) & $h_{Dist}$ & $186$ & mm & berechnet \\
 Plattendicke & $h$ & $300$ & mm & Vorgabe \\
 Abminderung der Betondruckfestigkeit in der Druckdiagonalen & $k_c$ & $0.55$ &  & Vorgabe \\
+Kriechzahl & $\varphi$ & $2$ &  & Vorgabe \\
 Bewehrungsquerschnitt 1. Lage Grundbewehrung & $A_{s,1,y,g}$ & $754$ & mm² & berechnet \\
 Stabdurchmesser 1. Lage Grundbewehrung & $\varnothing_{1,y,g}$ & $12$ & mm & Vorgabe \\
 Teilung 1. Lage Grundbewehrung & $s_{1,y,g}$ & $150$ & mm & Vorgabe \\
@@ -3421,6 +3564,8 @@ Kleinste Neigung der Druckdiagonalen & $\alpha_{min}$ & $30$ & ° & Vorgabe \\
 Bügelzahl über die betrachtete Breite & $n_{V,y}$ & $5$ &  & Vorgabe \\
 Bügeldurchmesser & $\varnothing_{V}$ & $8$ & mm & Vorgabe \\
 Bügelteilung in x-Richtung & $s_{V,x}$ & $200$ & mm & Vorgabe \\
+Vergrösserungsfaktor der Durchbiegung, Zug oben & $\left(\frac{w}{w_c}\right)_{o}$ & $7.52$ &  & berechnet \\
+Vergrösserungsfaktor der Durchbiegung, Zug unten & $\left(\frac{w}{w_c}\right)_{u}$ & $4$ &  & berechnet \\
 Grösstkorndurchmesser & $D_{max}$ & $32$ & mm & Vorgabe \\
 Betrachtete Breite (x) & $b$ & $500$ & mm & Vorgabe \\
 Betrachtete Breite (y) & $b_y$ & $1000$ & mm & Vorgabe \\
@@ -3430,6 +3575,7 @@ Bewehrungsmass je Kubikmeter Beton & $\mu_s$ & $67$ & kg/m³ & berechnet \\
 Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) & $h_{Dist}$ & $104$ & mm & berechnet \\
 Höhe der Einlage & $e_{Einlage}$ & $40$ & mm & Vorgabe \\
 Plattendicke & $h$ & $200$ & mm & Vorgabe \\
+Kriechzahl & $\varphi$ & $2$ &  & Vorgabe \\
 Bewehrungsquerschnitt 1. Lage Grundbewehrung & $A_{s,1,x,g}$ & $262$ & mm² & berechnet \\
 Stabdurchmesser 1. Lage Grundbewehrung & $\varnothing_{1,x,g}$ & $10$ & mm & Vorgabe \\
 Teilung 1. Lage Grundbewehrung & $s_{1,x,g}$ & $150$ & mm & Vorgabe \\
@@ -3473,6 +3619,8 @@ Erfüllungsgrad sprödes Versagen – 1. Lage x & $\alpha_{eff,SV,1,x}$ & $1.94$
 Erfüllungsgrad sprödes Versagen – 4. Lage x & $\alpha_{eff,SV,4,x}$ & $1.94$ &  & berechnet \\
 Erfüllungsgrad Zwängung auf Biegung – 1. Lage x & $\alpha_{eff,ZB,1,x}$ & $2.17$ &  & berechnet \\
 Erfüllungsgrad Zwängung auf Biegung – 4. Lage x & $\alpha_{eff,ZB,4,x}$ & $2.17$ &  & berechnet \\
+Vergrösserungsfaktor der Durchbiegung, Zug oben & $\left(\frac{w}{w_c}\right)_{o}$ & $8.89$ &  & berechnet \\
+Vergrösserungsfaktor der Durchbiegung, Zug unten & $\left(\frac{w}{w_c}\right)_{u}$ & $8.89$ &  & berechnet \\
 Erfüllungsgrad M-N x-Richtung – Feld (keine Bewehrung) & $\alpha_{eff,M-N,x,\text{Feld}}$ & $0.00$ &  & berechnet \\
 Erfüllungsgrad V x-Richtung – Feld (keine Bewehrung) & $\alpha_{eff,V,x,\text{Feld}}$ & $0.00$ &  & berechnet \\
 Grösstkorndurchmesser & $D_{max}$ & $32$ & mm & Vorgabe \\
@@ -3484,6 +3632,7 @@ Bewehrungsmass je Kubikmeter Beton & $\mu_s$ & $327$ & kg/m³ & berechnet \\
 Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) & $h_{Dist}$ & $116$ & mm & berechnet \\
 Höhe der Einlage & $e_{Einlage}$ & $0$ & mm & Vorgabe \\
 Plattendicke & $h$ & $250$ & mm & Vorgabe \\
+Kriechzahl & $\varphi$ & $2$ &  & Vorgabe \\
 Bewehrungsquerschnitt 1. Lage Grundbewehrung & $A_{s,1,y,g}$ & $8378$ & mm² & berechnet \\
 Stabdurchmesser 1. Lage Grundbewehrung & $\varnothing_{1,y,g}$ & $40$ & mm & Vorgabe \\
 Teilung 1. Lage Grundbewehrung & $s_{1,y,g}$ & $150$ & mm & Vorgabe \\
@@ -3524,6 +3673,8 @@ Erfüllungsgrad sprödes Versagen – 2. Lage x & $\alpha_{eff,SV,2,x}$ & $1.87$
 Erfüllungsgrad sprödes Versagen – 3. Lage x & $\alpha_{eff,SV,3,x}$ & $2.21$ &  & berechnet \\
 Erfüllungsgrad Zwängung auf Biegung – 2. Lage x & $\alpha_{eff,ZB,2,x}$ & $2.11$ &  & berechnet \\
 Erfüllungsgrad Zwängung auf Biegung – 3. Lage x & $\alpha_{eff,ZB,3,x}$ & $2.48$ &  & berechnet \\
+Vergrösserungsfaktor der Durchbiegung, Zug oben & $\left(\frac{w}{w_c}\right)_{o}$ & $8.05$ &  & berechnet \\
+Vergrösserungsfaktor der Durchbiegung, Zug unten & $\left(\frac{w}{w_c}\right)_{u}$ & $11.77$ &  & berechnet \\
 Fläche des Bruttoquerschnitts & $A$ & $330000$ & mm² & berechnet \\
 Stahlfläche der Bewehrung & $A_{s,tot}$ & $2373$ & mm² & berechnet \\
 Trägheitsmoment um y & $I_y$ & $13275$ & ·10⁶ mm⁴ & berechnet \\
