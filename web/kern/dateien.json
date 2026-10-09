@@ -64,7 +64,7 @@
     "opencivil/querschnitt/schubwaende.py": "b290fcb9d6e4",
     "opencivil/querschnitt/vorlagen.py": "38974f28f504",
     "opencivil/querschnitt/werkstoffgesetz.py": "e565b50d4fb1",
-    "opencivil/spannungsanalyse.py": "d1a43f6ec119",
+    "opencivil/spannungsanalyse.py": "6334e27c95d5",
     "opencivil/web/__init__.py": "e3b0c44298fc",
     "opencivil/web/api.py": "5f3be997ccba",
     "opencivil/web/bruecke.py": "24e1fcb0cd8c",

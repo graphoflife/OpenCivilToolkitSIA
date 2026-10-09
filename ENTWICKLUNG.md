@@ -155,8 +155,14 @@ zuerst (h/3)     0.95    2.76 N/mm²    828.6 kN    428.6 kN
 jetzt  (h)       0.87    2.52 N/mm²    756.5 kN    356.5 kN
 ```
 
-Das Rissmoment der M-χ-Linie bleibt bei h/3. Beim selben N und M reissen die
-beiden Linien darum nicht mehr am selben Punkt (TODO.md).
+Das Rissmoment der M-χ-Linie bleibt nach Vorgabe bei h/3, auch unter Zug:
+Biegung reisst über ein Drittel der Dicke. Beim selben N und M reissen die
+beiden Linien darum nicht mehr am selben Punkt:
+
+```
+M-χ-Linie bei N = 300 kN     reisst bei M = 26.4 kNm
+N-ε-Linie bei M = 26.4 kNm   reisst bei N = 228 kN
+```
 
 **Die Karte.** Die Zeile einer Analyse ist eine kleine Karte. Sie hat drei
 Zeilen:

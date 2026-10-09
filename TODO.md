@@ -150,7 +150,9 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       grössere.
 - [ ] **Das Rissmoment der Momenten-Krümmungs-Linie** gilt am
       Bruttoquerschnitt ohne Stahl, `M_Riss(N) = M_Riss(0) − N·h/6` (Zug
-      positiv) -- Annahme, nicht nachgeschlagen. Der ungerissene Zustand
+      positiv) -- Annahme, nicht nachgeschlagen. Sein f_ct,eff hat k_t für
+      `t = h/3`, auch unter Zug: Biegung bleibt bei h/3, nach Vorgabe
+      (2026-10-09). Der ungerissene Zustand
       daneben rechnet mit Stahl und Kriechzahl und ist steifer: am Beispiel
       steht sein gezogener Rand beim Rissmoment bei 2.14 statt
       f_ct,eff = 2.76 N/mm². Ob für die Linie der ideelle Querschnitt gelten
@@ -159,7 +161,7 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       aufgelöst: `N_Riss(M) = f_ct,eff·b·h − 6·|M|/h`, am Bruttoquerschnitt
       ohne Stahl, mit `k_t = 1/(1 + 0.5·t)` für die ganze Dicke, `t = h` --
       nach Vorgabe (2026-10-09), nicht nachgeschlagen. Das Rissmoment der
-      M-χ-Linie rechnet weiter mit `t = h/3`. Beim selben N und M reissen die
+      M-χ-Linie bleibt nach Vorgabe bei `t = h/3`. Beim selben N und M reissen die
       beiden Linien darum nicht am selben Punkt: am Beispiel reisst die M-χ-
       Linie bei N = 300 kN bei 26.4 kNm, die N-ε-Linie bei M = 26.4 kNm
       schon bei 228 kN.

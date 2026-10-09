@@ -354,6 +354,11 @@ class Loeserpaar:
         Stahl, wie beim spröden Versagen. Der ungerissene Zustand daneben
         rechnet mit Stahl und Kriechzahl und ist darum steifer; beim
         Rissmoment steht sein Rand etwas unter ``f_ct,eff``.
+
+        ``f_ct,eff`` mit ``k_t`` fuer ein Drittel der Dicke, auch unter Zug:
+        Biegung bleibt bei ``h/3``, nach Vorgabe. Die Rissnormalkraft nimmt die
+        ganze Dicke (:meth:`rissnormalkraft_bei`); beim selben N und M reissen
+        die beiden Linien darum nicht am selben Punkt.
         """
         return self.M_Riss - N * self.gerissen.h / 6.0
 
