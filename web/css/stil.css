@@ -1123,9 +1123,13 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
    Zahlen und die Kriechzahl; die Werte und der Beton, je zwei Spalten
    breit -- in einer wären sie abgeschnitten. */
 .einwirkung.ist-spannung > :nth-child(2) { grid-column: 2 / 5; }
-.einwirkung.ist-spannung > :nth-child(7) { grid-column: 5; grid-row: 1; }
+.einwirkung.ist-spannung > :nth-child(6) { grid-column: 5; grid-row: 1; }
+.einwirkung.ist-spannung > :nth-child(7) { grid-column: 5; grid-row: 2; }
 .einwirkung.ist-spannung > :nth-child(8) { grid-column: 2 / 4; grid-row: 3; }
 .einwirkung.ist-spannung > :nth-child(9) { grid-column: 4 / 6; grid-row: 3; }
+/* Ein Feld, das bei der gewählten Rechenart nichts ändert -- etwa φ beim
+   Spannungsblock. Es bleibt stehen, damit seine Zahl nicht verloren geht. */
+.ist-ohne-wirkung { opacity: .45; }
 .einwirkung.ist-spannung select {
   min-width: 0; width: 100%;
   font-family: "Formelzeichen", "JetBrains Mono", ui-monospace, monospace;

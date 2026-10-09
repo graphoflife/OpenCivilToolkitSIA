@@ -16,8 +16,9 @@ import unittest
 from opencivil import spannungsanalyse as sa
 from opencivil.core.protokoll import GleichungBlock, Protokoll, TitelBlock
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
+from opencivil.nachweis.rechenwahl import Rechenart, Rechenwahl
 from opencivil.projekt import Projekt, ProjektFehler, SpannungsfallEintrag
-from opencivil.querschnitt.platte import KRIECHZAHL, Richtung
+from opencivil.querschnitt.platte import Richtung
 from opencivil.web import dienst
 
 
@@ -27,17 +28,22 @@ def rechnen(projekt=None):
     return aufbau, aufbau.werk.loese(*aufbau.alle_nachweisziele())
 
 
-def loeserpaar(projekt=None, **wahl):
+def loeserpaar(projekt=None, *, kriechzahl=2.0, satz=Werkstoffsatz.BEMESSUNG,
+               art=Rechenart.PARABEL):
     """
     Die Platte q1 in x, zweimal -- gerissen und ungerissen.
 
     Ueber :func:`spannungsanalyse.loeserpaar`, dieselbe Funktion, die auch
     die Oberflaeche benutzt. Hier stand einmal eine eigene Kopie davon; der
     Test pruefte dann seine Kopie und nicht das, was gezeichnet wird.
+
+    Mit φ = 2: die Zahlen in diesen Tests stammen aus der Zeit, als die
+    Analyse das φ der Platte nahm, und das war 2.
     """
     aufbau, loesung = rechnen(projekt)
     return sa.loeserpaar(aufbau.querschnitte["q1"], Richtung.X,
-                         lambda kid: loesung.werte[kid].groesse.si, **wahl)
+                         lambda kid: loesung.werte[kid].groesse.si,
+                         wahl=Rechenwahl(kriechzahl, satz, art))
 
 
 def platte(name, **felder):
@@ -296,11 +302,12 @@ class TestGegenDieHandrechnung(unittest.TestCase):
     -- und muss dasselbe M_Rd(N = 0) finden.
     """
 
-    def widerstand(self, projekt):
+    def widerstand(self, projekt, art=Rechenart.BLOCK):
         aufbau, loesung = rechnen(projekt)
         eckwert = aufbau.nachweise["q1.x"].d_eckwerte["M_Rd_N0_pos"]
         paar = sa.loeserpaar(aufbau.querschnitte["q1"], Richtung.X,
-                             lambda kid: loesung.werte[kid].groesse.si, gesetz="block")
+                             lambda kid: loesung.werte[kid].groesse.si,
+                             wahl=Rechenwahl(art=art))
         return (sa.moment_kruemmung(paar, N=0.0).bruch.kraft,
                 loesung.werte[eckwert.id].groesse.si)
 
@@ -314,25 +321,39 @@ class TestGegenDieHandrechnung(unittest.TestCase):
         linie, hand = self.widerstand(None)
         self.assertGreater(linie, hand)
 
+    def test_die_handrechnung_trifft_sie_auch_mit_druckbewehrung(self):
+        """
+        Mit der Rechenart «Handrechnung» rechnet die Linie mit dem Querschnitt
+        der Handrechnung: ohne Druckstahl, je Seite eine Lage. Ihr Ende ist
+        dann das M_Rd(N = 0) des Nachweises -- auch am Beispiel, das oben
+        Bewehrung hat.
+        """
+        linie, hand = self.widerstand(None, Rechenart.HANDRECHNUNG)
+        self.assertAlmostEqual(linie / hand, 1.0, delta=0.001)
+
 
 class TestWahl(unittest.TestCase):
-    """Kriechzahl, Wertesatz und Betongesetz -- je Analyse gewählt."""
+    """Kriechzahl, Wertesatz und Rechenart -- je Analyse gewählt."""
 
     @classmethod
     def setUpClass(cls):
         cls.platte = loeserpaar()
 
-    def test_ohne_eigene_kriechzahl_gilt_die_der_platte(self):
-        self.assertEqual(self.platte.phi, KRIECHZAHL)
-        self.assertFalse(self.platte.phi_eigen)
-        self.assertIn("phi", self.platte.ids)
+    def test_die_kriechzahl_der_platte_spielt_keine_rolle(self):
+        """
+        Eine neue Analyse beginnt mit φ = 0 -- das φ der Platte gilt nur für
+        den Vergrösserungsfaktor w/w_c.
+        """
+        projekt = Projekt.beispiel()
+        projekt.querschnitte[0].spannungsfall("neu", art="moment_kruemmung")
+        analyse = projekt.rechnen().analysen()["q1"][0]
+        self.assertEqual(analyse.paar.wahl, Rechenwahl(0.0, Werkstoffsatz.BEMESSUNG,
+                                                       Rechenart.PARABEL))
 
     def test_die_kriechzahl_der_analyse_gilt(self):
         """Ohne Kriechen ist der Beton steifer, und die Linie krümmt sich weniger."""
-        eigen = loeserpaar(phi=0.0)
-        self.assertEqual(eigen.phi, 0.0)
-        self.assertTrue(eigen.phi_eigen)
-        self.assertNotIn("phi", eigen.ids)
+        eigen = loeserpaar(kriechzahl=0.0)
+        self.assertEqual(eigen.wahl.kriechzahl, 0.0)
         steif = eigen.ungerissen.loese(N_Ed=0.0, M_Ed=20e3).chi
         weich = self.platte.ungerissen.loese(N_Ed=0.0, M_Ed=20e3).chi
         self.assertLess(steif, 0.5 * weich)
@@ -354,32 +375,38 @@ class TestWahl(unittest.TestCase):
         self.assertTrue(bild.konvergiert)
         self.assertAlmostEqual(max(s.sigma for s in bild.stahl) / 1e6, 114.7, delta=0.1)
 
-    def test_eine_alte_datei_rechnet_wie_vorher(self):
-        """Ohne die neuen Felder: die Kriechzahl der Platte, Bemessungswerte, die Parabel."""
-        alt = SpannungsfallEintrag.aus_dict({"name": "alt", "art": "moment_kruemmung"})
-        self.assertIsNone(alt.kriechzahl)
-        self.assertEqual(alt.werkstoffsatz, "bemessung")
-        self.assertEqual(alt.betongesetz, "parabel")
-        projekt = Projekt.beispiel()
-        projekt.querschnitte[0].spannungsfaelle = [alt]
-        analyse = projekt.rechnen().analysen()["q1"][0]
-        self.assertFalse(analyse.paar.phi_eigen)
-        self.assertEqual(analyse.paar.phi, KRIECHZAHL)
-        self.assertIs(analyse.paar.satz, Werkstoffsatz.BEMESSUNG)
-        self.assertEqual(analyse.paar.gesetz, "parabel")
+    def test_eine_alte_datei_rechnet_wie_damals(self):
+        """
+        Bis 2026-10-09 hiess eine fehlende oder leere Kriechzahl «die der
+        Platte», und die Rechenart stand als ``betongesetz`` da. So wird eine
+        alte Datei gelesen -- und rechnet wie damals.
+        """
+        roh = Projekt.beispiel().als_dict()
+        platte = roh["querschnitte"][0]
+        platte["kriechzahl"] = 1.7
+        platte["spannungsfaelle"] = [
+            {"name": "ohne", "art": "moment_kruemmung"},
+            {"name": "leer", "art": "moment_kruemmung", "kriechzahl": None,
+             "betongesetz": "block"},
+            {"name": "eigen", "art": "moment_kruemmung", "kriechzahl": 0.5},
+        ]
+        faelle = Projekt.aus_dict(roh).querschnitte[0].spannungsfaelle
+        self.assertEqual([f.kriechzahl for f in faelle], [1.7, 1.7, 0.5])
+        self.assertEqual([f.rechenart for f in faelle], ["parabel", "block", "parabel"])
 
     def test_was_es_nicht_gibt_meldet_sich(self):
         for feld, wert in (("art", "kreis"), ("werkstoffsatz", "mittel"),
-                           ("betongesetz", "dreieck"), ("kriechzahl", -1.0)):
+                           ("rechenart", "dreieck"), ("betongesetz", "dreieck"),
+                           ("kriechzahl", -1.0)):
             with self.subTest(feld=feld):
                 with self.assertRaises(ProjektFehler):
                     SpannungsfallEintrag.aus_dict({"name": "x", feld: wert})
         with self.assertRaises(ProjektFehler):
-            Projekt.beispiel().querschnitte[0].spannungsfall("x", betongesetz="dreieck")
+            Projekt.beispiel().querschnitte[0].spannungsfall("x", rechenart="dreieck")
 
-    def test_eine_leere_kriechzahl_ist_die_der_platte(self):
-        """Die Oberfläche schickt ein leeres Feld als leeren Text."""
-        self.assertIsNone(SpannungsfallEintrag.aus_dict({"name": "x", "kriechzahl": ""}).kriechzahl)
+    def test_eine_leere_kriechzahl_ist_null(self):
+        """Ohne alte Platte dahinter heisst leer die Vorgabe, 0."""
+        self.assertEqual(SpannungsfallEintrag.aus_dict({"name": "x", "kriechzahl": ""}).kriechzahl, 0.0)
 
 
 class TestNormalkraftDehnung(unittest.TestCase):
@@ -490,7 +517,7 @@ class TestUeberDenDienst(unittest.TestCase):
                                  eps_oben=-1.5, eps_unten=3.0),
             SpannungsfallEintrag(name="C", art="moment_kruemmung", N_Ed=-200.0),
             SpannungsfallEintrag(name="D", art="normalkraft_dehnung", M_Ed=20.0,
-                                 kriechzahl=1.0, betongesetz="block"))
+                                 kriechzahl=1.0, rechenart="block"))
         self.assertEqual(antwort.status, 200)
         faelle = antwort.daten["spannungsanalysen"]["q1"]
         self.assertEqual([f["name"] for f in faelle], ["A", "B", "C", "D"])
@@ -507,8 +534,8 @@ class TestUeberDenDienst(unittest.TestCase):
         self.assertGreater(kurve["sprung"]["nach"], kurve["sprung"]["vor"])
         self.assertLess(kurve["fliessen"]["kraft"], kurve["bruch"]["kraft"])
         self.assertIn("massgebend", kurve["bruch"])
-        self.assertEqual(faelle[2]["wahl"], {"phi": KRIECHZAHL, "phi_eigen": False,
-                                             "satz": "bemessung", "gesetz": "parabel"})
+        self.assertEqual(faelle[2]["wahl"], {"phi": 0.0, "satz": "bemessung",
+                                             "rechenart": "parabel", "index": "Rd"})
         # Die N-ε-Linie in kN und Promille: N_Riss(20 kNm) mit k_t für die
         # ganze Dicke, 2.9/1.15 N/mm² · 1000 · 300 mm² − 6·20/0.3 = 356.5 kN.
         kurve = faelle[3]["kurve"]
@@ -516,8 +543,7 @@ class TestUeberDenDienst(unittest.TestCase):
                                delta=0.1)
         self.assertGreater(kurve["bruch"]["verformung"], 1.0)
         self.assertEqual(faelle[3]["wahl"]["phi"], 1.0)
-        self.assertTrue(faelle[3]["wahl"]["phi_eigen"])
-        self.assertEqual(faelle[3]["wahl"]["gesetz"], "block")
+        self.assertEqual(faelle[3]["wahl"]["rechenart"], "block")
 
     def test_ein_ausgeschalteter_fall_wird_nicht_gerechnet(self):
         antwort = self.antwort(

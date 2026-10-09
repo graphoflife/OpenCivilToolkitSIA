@@ -228,10 +228,11 @@ def _analyse_dict(analyse) -> dict:
     if not analyse.moeglich:
         return {**kopf, "moeglich": False, "hinweis": analyse.hinweis}
     paar = analyse.paar
-    # Womit gerechnet wurde -- die Kriechzahl auch dann, wenn sie die der
-    # Platte ist: so steht die Zahl beim Bild, die wirklich galt.
-    kopf["wahl"] = {"phi": paar.phi, "phi_eigen": paar.phi_eigen,
-                    "satz": paar.satz.value, "gesetz": paar.gesetz}
+    # Womit gerechnet wurde, beim Bild angeschrieben -- und wie ein Widerstand
+    # darum heisst: R_d oder R_k sagt der Kern, nicht die Oberflaeche.
+    wahl = paar.wahl
+    kopf["wahl"] = {"phi": wahl.kriechzahl, "satz": wahl.satz.value,
+                    "rechenart": wahl.art.value, "index": wahl.index}
     if analyse.kurve is not None:
         return {**kopf, "moeglich": True, "kurve": _linie_dict(analyse.kurve)}
     return {**kopf, "moeglich": True, "bild": _bild_dict(analyse.bild, analyse.h)}

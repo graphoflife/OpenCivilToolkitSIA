@@ -1251,11 +1251,11 @@
       "bloecke": [
         {
           "art": "text",
-          "text": "Eine Spannung-Dehnung-Analyse hält nichts gegen etwas: sie zeigt, was der Querschnitt tut. Gerechnet wird mit dem Faserintegral der Nachweise und mit der Kriechzahl, dem Wertesatz und dem Betongesetz, die die Analyse wählt. Ohne eigene Kriechzahl gilt die der Platte."
+          "text": "Eine Spannung-Dehnung-Analyse hält nichts gegen etwas: sie zeigt, was der Querschnitt tut. Gerechnet wird mit dem Faserintegral der Nachweise und mit der Kriechzahl, dem Wertesatz und der Rechenart, die die Analyse wählt."
         },
         {
           "art": "text",
-          "text": "Ungerissen (Zustand I) trägt der Beton Druck und Zug, linear mit E_c,eff und ohne Grenze: gebraucht wird hier die Steifigkeit, und wo der Querschnitt reisst, sagt die Rissbedingung am Bruttoquerschnitt. Gerissen (Zustand II) trägt er keinen Zug mehr, und im Druck gilt das gewählte Betongesetz."
+          "text": "Ungerissen (Zustand I) trägt der Beton Druck und Zug, linear mit E_c,eff und ohne Grenze: gebraucht wird hier die Steifigkeit, und wo der Querschnitt reisst, sagt die Rissbedingung am Bruttoquerschnitt. Gerissen (Zustand II) trägt er keinen Zug mehr, und im Druck gilt das Gesetz der gewählten Rechenart."
         },
         {
           "art": "text",
@@ -1280,6 +1280,10 @@
         {
           "art": "text",
           "text": "Dieselbe Rissbedingung, nach der Normalkraft aufgelöst: beim Moment M reisst der Querschnitt, wenn die Zugkraft N_Riss erreicht. Unter Zug reisst die ganze Dicke, darum gilt k_t für t = h und nicht für h/3 wie beim Rissmoment. Bei N_Riss springt die Dehnung bei derselben Kraft vom ungerissenen auf den gerissenen Wert."
+        },
+        {
+          "art": "text",
+          "text": "Mit der Handrechnung rechnet die Linie mit demselben Querschnitt wie die Resistenzlinie aus Handrechnung: der Beton als Spannungsblock, die gedrückte Bewehrung weggelassen, die Bewehrung jeder Seite zu einer Lage in ihrem Schwerpunkt zusammengefasst, und der Beton auch dort gezählt, wo der Stahl liegt. Am Ende der Linie steht darum der Widerstand der Handrechnung."
         },
         {
           "art": "gleichung",
@@ -1340,6 +1344,15 @@
           "latex": "\\varepsilon_{m,u} = \\frac{\\varepsilon_{oben} + \\varepsilon_{unten}}{2}",
           "markdown": "**Grösste Dehnung auf halber Höhe**\n\n$$\n\\varepsilon_{m,u} = \\frac{\\varepsilon_{oben} + \\varepsilon_{unten}}{2}\n$$",
           "titel": "Grösste Dehnung auf halber Höhe",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\sigma_s = \\begin{cases} \\min\\left(E_s \\cdot \\varepsilon_s;\\ f_{yd}\\right) & \\varepsilon_s > 0 \\\\[1ex] 0 & \\varepsilon_s \\le 0 \\quad (\\text{gedrückt: weggelassen}) \\end{cases}",
+          "markdown": "**Stahl in der Handrechnung: nur auf Zug**\n\n$$\n\\sigma_s = \\begin{cases} \\min\\left(E_s \\cdot \\varepsilon_s;\\ f_{yd}\\right) & \\varepsilon_s > 0 \\\\[1ex] 0 & \\varepsilon_s \\le 0 \\quad (\\text{gedrückt: weggelassen}) \\end{cases}\n$$",
+          "titel": "Stahl in der Handrechnung: nur auf Zug",
           "referenz": "",
           "wert_id": "",
           "gruppe": ""

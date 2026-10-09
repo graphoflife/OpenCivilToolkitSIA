@@ -26,10 +26,10 @@ from opencivil.querschnitt.platte import (
     ALPHA_MAX, ALPHA_MIN, Bewehrungsposten, Querkraftbewehrung,
 )
 from opencivil.projekt.lesen import (
-    ProjektFehler, nur_x, pflichtfeld, sorten, vorgabe, zahl,
+    ProjektFehler, kriechzahl_aus, nur_x, pflichtfeld, sorten, vorgabe, zahl,
 )
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
-from opencivil.nachweis.rechenwahl import Rechenart
+from opencivil.nachweis.rechenwahl import RECHENARTEN, Rechenart
 from opencivil.spannungsanalyse import Analyseart
 
 #: Mit welchen Festigkeiten ein Werkstoffgesetz rechnen kann, siehe
@@ -394,9 +394,10 @@ class SpannungsfallEintrag(Beschreibung):
     als Momenten-Kruemmungs- oder als Normalkraft-Dehnungs-Linie.
 
     Womit gerechnet wird, waehlt jede Analyse fuer sich: die Kriechzahl, den
-    Wertesatz und das Betongesetz. Fehlen die Angaben -- in Dateien von
-    vorher --, gilt, was vorher galt: die Kriechzahl der Platte,
-    Bemessungswerte, die Parabel.
+    Wertesatz und die Rechenart (:class:`~opencivil.nachweis.rechenwahl.Rechenwahl`).
+    In Dateien von vor 2026-10-09 fehlt die Kriechzahl oder steht leer --
+    sie hiess dort «die der Platte», und das bleibt sie beim Lesen
+    (``kriechzahl_alt``). Die Rechenart hiess dort ``betongesetz``.
     """
 
     name: str
@@ -418,34 +419,32 @@ class SpannungsfallEintrag(Beschreibung):
     eps_unten: float = 2.0
     """Randdehnungen in Promille -- nur fuer ``dehnungen``."""
 
-    kriechzahl: Optional[float] = None
-    """Die Kriechzahl φ dieser Analyse -- ``None``: die der Platte."""
+    kriechzahl: float = 0.0
+    """Die Kriechzahl φ dieser Analyse."""
 
     werkstoffsatz: str = WERKSTOFFSAETZE[0]
     """``bemessung`` (f_cd, f_yd) oder ``charakteristisch`` (f_ck, f_yk)."""
 
-    betongesetz: str = BETONGESETZE[0]
-    """``parabel`` (Parabel-Rechteck) oder ``block`` (Spannungsblock 0.85·x)."""
+    rechenart: str = Rechenart.PARABEL.value
+    """``handrechnung``, ``block`` oder ``parabel`` -- siehe
+    :class:`~opencivil.nachweis.rechenwahl.Rechenart`."""
 
     aktiv: bool = True
 
     @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "SpannungsfallEintrag":
+    def aus_dict(cls, d: Mapping[str, Any], *,
+                 kriechzahl_alt: float = 0.0) -> "SpannungsfallEintrag":
+        """``kriechzahl_alt`` gilt, wo die Kriechzahl fehlt -- siehe Klasse."""
         name = pflichtfeld(d, "name", "Eine Spannungsanalyse")
         wo = f"Spannung-Dehnung-Analyse '{name}'"
 
-        def gewaehlt(feld: str, vorgabe: str, moeglich) -> str:
-            wert = str(d.get(feld) or vorgabe)
+        def gewaehlt(feld: str, vorgabe: str, moeglich, roh: Any = None) -> str:
+            wert = str((roh if roh is not None else d.get(feld)) or vorgabe)
             if wert not in moeglich:
                 raise ProjektFehler(f"{wo}: «{wert}» gibt es als {feld} nicht. "
                                     f"Möglich sind: {', '.join(moeglich)}.")
             return wert
 
-        kriechzahl = None
-        if d.get("kriechzahl") not in (None, ""):
-            kriechzahl = zahl(d, "kriechzahl", 0.0)
-            if kriechzahl < 0.0:
-                raise ProjektFehler(f"{wo}: die Kriechzahl kann nicht negativ sein.")
         return cls(
             name=name,
             art=gewaehlt("art", cls.art, tuple(a.value for a in Analyseart)),
@@ -454,9 +453,11 @@ class SpannungsfallEintrag(Beschreibung):
             M_Ed=zahl(d, "M_Ed", cls.M_Ed),
             eps_oben=zahl(d, "eps_oben", cls.eps_oben),
             eps_unten=zahl(d, "eps_unten", cls.eps_unten),
-            kriechzahl=kriechzahl,
+            kriechzahl=kriechzahl_aus(d, "kriechzahl", alt=kriechzahl_alt, wo=wo),
             werkstoffsatz=gewaehlt("werkstoffsatz", cls.werkstoffsatz, WERKSTOFFSAETZE),
-            betongesetz=gewaehlt("betongesetz", cls.betongesetz, BETONGESETZE),
+            rechenart=gewaehlt("rechenart", cls.rechenart,
+                               tuple(a.value for a in RECHENARTEN),
+                               roh=d.get("rechenart") or d.get("betongesetz")),
             aktiv=bool(d.get("aktiv", cls.aktiv)),
         )
 

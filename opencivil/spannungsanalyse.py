@@ -20,12 +20,13 @@ Grund, warum die Auswertungen nicht im :class:`Rechenwerk` stehen. Sie
 beantworten eine Frage, die man beim Entwerfen stellt: *was passiert
 eigentlich im Querschnitt?*
 
-JE ANALYSE GEWAEHLT (:class:`~opencivil.projekt.SpannungsfallEintrag`):
-* die Kriechzahl -- ohne Angabe die der Platte;
+JE ANALYSE GEWAEHLT (:class:`~opencivil.projekt.SpannungsfallEintrag`, als
+:class:`~opencivil.nachweis.rechenwahl.Rechenwahl`):
+* die Kriechzahl;
 * der Wertesatz -- Bemessung (``f_cd``, ``f_yd``) oder charakteristisch
   (``f_ck``, ``f_yk``), siehe :class:`Werkstoffsatz`;
-* das Betongesetz -- Parabel-Rechteck mit ``E_c,eff`` oder der
-  Spannungsblock 0.85·x.
+* die Rechenart -- Handrechnung Block 0.85·x, Block 0.85·x genau oder die
+  Parabel mit ``E_c,eff``.
 Moduln und Grenzdehnungen sind in beiden Wertesaetzen dieselben, wie ueberall
 im Werkzeug.
 
@@ -330,11 +331,8 @@ class Loeserpaar:
     eps_y: float = math.inf
     """Wo der Stahl zu fliessen beginnt: ``f_s / E_s``."""
 
-    satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
-    gesetz: str = "parabel"
-    phi: float = 0.0
-    phi_eigen: bool = False
-    """Ob die Kriechzahl die der Analyse ist -- sonst die der Platte."""
+    wahl: Rechenwahl = Rechenwahl(art=Rechenart.PARABEL)
+    """Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart."""
 
     grenznamen: Tuple[str, ...] = ()
     """Je Grenze des gerissenen Loesers, was sie ist -- fuer «massgebend»."""
@@ -383,16 +381,14 @@ class Loeserpaar:
 
 
 def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
-               *, satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG,
-               gesetz: str = "parabel", phi: Optional[float] = None,
+               *, wahl: Rechenwahl = Rechenwahl(art=Rechenart.PARABEL),
                ) -> Optional[Loeserpaar]:
     """
     Das Loeserpaar einer Platte in einer Richtung -- ``None`` ohne Bewehrung.
 
     ``wert`` liefert zu einer Wert-ID die Zahl in SI, aus einer Loesung.
-    ``satz`` sagt, mit welchen Festigkeiten die Werkstoffgesetze rechnen,
-    ``gesetz`` welches der Beton hat -- ``parabel`` oder ``block`` --, und
-    ``phi`` die Kriechzahl; ohne sie gilt die der Platte.
+    ``wahl`` sagt, womit gerechnet wird: Kriechzahl, Wertesatz, Rechenart --
+    die Gesetze dazu baut :func:`~opencivil.nachweis.rechenwahl.gesetze`.
 
     Stand frueher in der Schnittstelle zur Oberflaeche. Dort war sie ohne
     Oberflaeche nicht erreichbar, und ein Test baute sie als eigene Kopie
@@ -406,6 +402,7 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
              for lage, _, _, as_id, z_id in posten]
     stahl = posten[0][0].stahl
     beton = querschnitt.beton
+    satz = wahl.satz
     ids = {
         "h": querschnitt.id_von("h"), "b": querschnitt.id_breite(richtung),
         "E_cm": beton.id_von("E_cm"), "f_c": beton.id_von(satz.beton),
@@ -414,17 +411,13 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
         "E_s": stahl.id_von("E_s"), "f_s": stahl.id_von(satz.stahl),
         "f_s_druck": stahl.id_von(satz.stahl_druck), "eps_ud": stahl.id_von("eps_ud"),
     }
-    if phi is None:
-        ids["phi"] = querschnitt.id_von("kriechzahl")
-    kriechzahl = wert(ids["phi"]) if phi is None else phi
     h, b = wert(ids["h"]), wert(ids["b"])
-    E_c_eff = wirksamer_modul(wert(ids["E_cm"]), kriechzahl)
+    E_c_eff = wirksamer_modul(wert(ids["E_cm"]), wahl.kriechzahl)
     eps_ud = wert(ids["eps_ud"])
     w = Kennwerte(f_c=wert(ids["f_c"]), f_s=wert(ids["f_s"]), f_s_druck=wert(ids["f_s_druck"]),
                   E_cm=wert(ids["E_cm"]), E_s=wert(ids["E_s"]),
                   eps_c1d=wert(ids["eps_c1d"]), eps_c2d=wert(ids["eps_c2d"]))
-    g = gesetze(Rechenwahl(kriechzahl=kriechzahl, satz=satz, art=Rechenart(gesetz)), w,
-                eps_ud=eps_ud)
+    g = gesetze(wahl, w, eps_ud=eps_ud)
     # Die Grenzen gelten an den Lagen, mit denen gerechnet wird -- in der
     # Handrechnung den zusammengefassten.
     grenzen, namen = grenzen_des_faechers(h, g.lagen(lagen, h), eps_c1d=w.eps_c1d,
@@ -441,8 +434,7 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
         M_Riss=rissmoment(h=h, b=b, f_ctm=f_ctm).M_Riss,
         k_t_zug=k_t_zug, f_ct_eff_zug=k_t_zug * f_ctm,
         eps_y=wert(ids["f_s"]) / wert(ids["E_s"]),
-        satz=satz, gesetz=gesetz, phi=kriechzahl, phi_eigen=phi is not None,
-        grenznamen=namen, ids=ids)
+        wahl=wahl, grenznamen=namen, ids=ids)
 
 
 # ===========================================================================
@@ -658,11 +650,13 @@ def _linie(paar: Loeserpaar, weg: _Weg, art: Analyseart, fest: float,
             kraft=kraft, verformung=verformung, gerissen=True,
             verformung_I=weg.verformung_bei(paar.ungerissen, kraft),
             verformung_II=verformung))
-    if paar.gesetz == "block":
+    if paar.wahl.art.mit_block:
+        ende = ("der Widerstand der Handrechnung"
+                if paar.wahl.art is Rechenart.HANDRECHNUNG else "der Widerstand mit dem Block")
         linie.hinweisen(
             f"Mit dem Spannungsblock trägt der Beton unter "
             f"{1.0 - BLOCKANTEIL:.2f}·ε_c2d nichts: über dem Riss ist die Linie "
-            f"weicher als der Querschnitt, ihr Ende ist der Widerstand mit dem Block.")
+            f"weicher als der Querschnitt, ihr Ende ist {ende}.")
     return linie
 
 
@@ -758,11 +752,12 @@ def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
     p.erklaerung(
         "Eine Spannung-Dehnung-Analyse hält nichts gegen etwas: sie zeigt, was "
         "der Querschnitt tut. Gerechnet wird mit dem Faserintegral der Nachweise "
-        "und mit der Kriechzahl, dem Wertesatz und dem Betongesetz, die die "
-        "Analyse wählt. Ohne eigene Kriechzahl gilt die der Platte.")
-    phi = (ein("phi") if "phi" in paar.ids
-           else w.zahl("phi", r"\varphi", paar.phi, stellen=2))
-    E_c_eff = w.spannung("E_c_eff", "E_{c,eff}", wirksamer_modul(ein("E_cm").groesse.si, paar.phi))
+        "und mit der Kriechzahl, dem Wertesatz und der Rechenart, die die "
+        "Analyse wählt.")
+    wahl = paar.wahl
+    phi = w.zahl("phi", r"\varphi", wahl.kriechzahl, stellen=2)
+    E_c_eff = w.spannung("E_c_eff", "E_{c,eff}",
+                         wirksamer_modul(ein("E_cm").groesse.si, wahl.kriechzahl))
     p.formel(E_c_eff, r"\frac{@E_cm}{1 + @phi}", {"E_cm": ein("E_cm"), "phi": phi},
              titel="Wirksamer Elastizitätsmodul")
 
@@ -770,12 +765,26 @@ def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
         "Ungerissen (Zustand I) trägt der Beton Druck und Zug, linear mit E_c,eff "
         "und ohne Grenze: gebraucht wird hier die Steifigkeit, und wo der "
         "Querschnitt reisst, sagt die Rissbedingung am Bruttoquerschnitt. Gerissen "
-        "(Zustand II) trägt er keinen Zug mehr, und im Druck gilt das gewählte "
-        "Betongesetz.")
+        "(Zustand II) trägt er keinen Zug mehr, und im Druck gilt das Gesetz der "
+        "gewählten Rechenart.")
     p.ansatz(r"\sigma_c = E_{c,eff} \cdot \varepsilon_c",
              titel="Beton ungerissen, in Druck und Zug")
     eps_c1d, eps_c2d = ein("eps_c1d"), ein("eps_c2d")
-    if paar.gesetz == "block":
+    if wahl.art is Rechenart.HANDRECHNUNG:
+        p.erklaerung(
+            "Mit der Handrechnung rechnet die Linie mit demselben Querschnitt wie "
+            "die Resistenzlinie aus Handrechnung: der Beton als Spannungsblock, die "
+            "gedrückte Bewehrung weggelassen, die Bewehrung jeder Seite zu einer "
+            "Lage in ihrem Schwerpunkt zusammengefasst, und der Beton auch dort "
+            "gezählt, wo der Stahl liegt. Am Ende der Linie steht darum der "
+            "Widerstand der Handrechnung.")
+        p.ansatz(
+            r"\sigma_s = \begin{cases} \min\left(E_s \cdot \varepsilon_s;\ "
+            + wahl.satz.stahl_zeichen + r"\right) & \varepsilon_s > 0 \\[1ex]"
+            r" 0 & \varepsilon_s \le 0 \quad (\text{gedrückt: weggelassen})"
+            r" \end{cases}",
+            titel="Stahl in der Handrechnung: nur auf Zug")
+    if wahl.art.mit_block:
         p.ansatz(Spannungsblock(f_cd=0.0, eps_c2d=eps_c2d.groesse.si).latex(),
                  titel=f"Beton gerissen: Spannungsblock {BLOCKANTEIL}·x")
         p.erklaerung(
@@ -796,7 +805,7 @@ def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
         p.ansatz(Betongesetz(f_cd=0.0, eps_c1d=eps_c1d.groesse.si,
                              eps_c2d=eps_c2d.groesse.si, k_sigma=0.0).latex(),
                  titel="Beton gerissen: Parabel-Rechteck")
-    if paar.satz is Werkstoffsatz.CHARAKTERISTISCH:
+    if wahl.satz is Werkstoffsatz.CHARAKTERISTISCH:
         p.text("Mit charakteristischen Werten: f_ck statt f_cd, f_yk statt f_yd.")
 
     h = ein("h")
@@ -944,13 +953,11 @@ def analysen(aufbau: "Aufbau", loesung: "Loesung",
                 richtung = Richtung(fall.richtung)
             except ValueError:
                 richtung = Richtung.X
-            satz = Werkstoffsatz(fall.werkstoffsatz)
-            schluessel = (richtung, satz, fall.betongesetz, fall.kriechzahl)
+            wahl = Rechenwahl.aus(fall.kriechzahl, fall.werkstoffsatz, fall.rechenart)
+            schluessel = (richtung, wahl)
             if schluessel not in paare:
                 try:
-                    paare[schluessel] = loeserpaar(querschnitt, richtung, wert, satz=satz,
-                                                   gesetz=fall.betongesetz,
-                                                   phi=fall.kriechzahl)
+                    paare[schluessel] = loeserpaar(querschnitt, richtung, wert, wahl=wahl)
                 except KeyError:
                     # Ein Wert dieser Richtung wurde nicht gerechnet -- dann
                     # gibt es fuer sie keinen Querschnitt zum Auswerten.

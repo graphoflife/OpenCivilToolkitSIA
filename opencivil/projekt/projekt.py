@@ -417,14 +417,16 @@ class Projekt(Beschreibung):
         decke.quasistaendig.aus_tragsicherheit = True
         decke.quasistaendig.lastfall("Dauerlast", M_Ed=70)
         decke.knickfall("Wand", N_Ed=-800, M_Ed_1=20, laenge=3.0)
-        # Zwei Linien der Spannung-Dehnung-Analyse -- sie schreiben ihre
-        # Herleitung für die Formelsammlung: die eine mit Parabel und der
-        # Kriechzahl der Platte, die andere mit Block, eigener Kriechzahl und
-        # charakteristischen Werten.
-        decke.spannungsfall("Biegung mit Druck", art="moment_kruemmung", N_Ed=-300)
+        # Drei Linien der Spannung-Dehnung-Analyse -- sie schreiben ihre
+        # Herleitung für die Formelsammlung: mit Parabel, mit Block und
+        # charakteristischen Werten, und mit der Handrechnung.
+        decke.spannungsfall("Biegung mit Druck", art="moment_kruemmung", N_Ed=-300,
+                            kriechzahl=2.0)
         decke.spannungsfall("Zug mit Moment", art="normalkraft_dehnung", M_Ed=30,
                             kriechzahl=1.0, werkstoffsatz="charakteristisch",
-                            betongesetz="block")
+                            rechenart="block")
+        decke.spannungsfall("Biegung von Hand", art="moment_kruemmung",
+                            rechenart="handrechnung")
 
         # Ein Streifen von 500 mm: M und N je b, V je Meter. Mit halben
         # Momenten sind es dieselben Grade wie bei 1000 mm -- nur die

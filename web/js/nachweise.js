@@ -752,11 +752,55 @@ function spannungsBlock(querschnitt) {
   ]);
 }
 
+/** Ein Feld mit seiner Beschriftung darüber -- eine Formel bleibt klein geschrieben. */
+function mitKopf(kopf, eingabe, formel = false) {
+  return el('div.mit-kopf', {}, [
+    el('span.spaltenkopf', { text: kopf, class: formel ? 'ist-formel' : '' }), eingabe,
+  ]);
+}
+
 /**
- * Eine Analyse als kleine Karte: oben Name, darunter Art, Zahlen und
- * Richtung, zuunterst, womit gerechnet wird -- die Kriechzahl (leer: die der
- * Platte), die Werte und das Betongesetz. Die Zahlenfelder richten sich nach
- * der gewählten Art.
+ * Die Felder einer Rechenwahl: Kriechzahl φ, Werte und Rechenart -- in jedem
+ * Kapitel und in jeder Analyse dieselben drei. `ziel` trägt die Felder
+ * `kriechzahl`, `werkstoffsatz` und `rechenart`, `aendern` ändert es im
+ * Projekt. `arten` sagt, welche Rechenarten gelten: `rechenarten` oder, bei
+ * den Stahlspannungen, `spannungsarten`. Wirkt φ bei der gewählten Art
+ * nicht, steht das Feld blass da -- es bleibt aber stehen, damit die Zahl
+ * nicht verloren geht, wenn man die Art wieder wechselt.
+ */
+function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten' } = {}) {
+  const katalog = zustand.katalog?.rechenwahl || {};
+  const liste = katalog[arten] || [];
+  const art = liste.find((a) => a.wert === ziel.rechenart);
+  // In schmalen Zeilen stehen die kurzen Namen; der lange steht im Titel.
+  const kurz = (l) => (l || []).map((e) => ({ wert: e.wert, beschriftung: e.kurz }));
+  const phi = mitKopf('φ', zahlfeld({
+    wert: ziel.kriechzahl ?? 0, schritt: 0.1, min: 0, leer: 0,
+    titel: 'Kriechzahl φ – wirkt bei der Parabel und elastisch',
+    beiAenderung: (v) => aendern((x) => { x.kriechzahl = v; }),
+  }), true);
+  if (art && !art.mit_kriechzahl) phi.classList.add('ist-ohne-wirkung');
+  return [
+    phi,
+    mitKopf('Werte', auswahl({
+      werte: kurz(katalog.werkstoffsaetze),
+      gewaehlt: ziel.werkstoffsatz,
+      titel: 'Bemessungswerte (f_cd, f_yd) oder charakteristische (f_ck, f_yk)',
+      beiAenderung: (v) => aendern((x) => { x.werkstoffsatz = v; }),
+    })),
+    mitKopf('Rechenart', auswahl({
+      werte: kurz(liste),
+      gewaehlt: ziel.rechenart,
+      titel: liste.map((a) => a.beschriftung).join(' · '),
+      beiAenderung: (v) => aendern((x) => { x.rechenart = v; }),
+    })),
+  ];
+}
+
+/**
+ * Eine Analyse als kleine Karte: oben Name und Richtung, darunter Art und
+ * Zahlen, zuunterst, womit gerechnet wird -- Kriechzahl, Werte, Rechenart.
+ * Die Zahlenfelder richten sich nach der gewählten Art.
  */
 function spannungsZeile(querschnitt, index) {
   const k = (querschnitt.spannungsfaelle || [])[index];
@@ -806,11 +850,6 @@ function spannungsZeile(querschnitt, index) {
     },
   }[k.art] || { kopf: ['', ''], felder: () => [el('span'), el('span')] };
   const katalog = zustand.katalog?.spannungsanalyse || {};
-  const mitKopf = (kopf, eingabe, formel = false) => el('div.mit-kopf', {}, [
-    el('span.spaltenkopf', { text: kopf, class: formel ? 'ist-formel' : '' }), eingabe,
-  ]);
-  // In der Karte stehen die kurzen Namen -- die langen haben dort nicht Platz.
-  const kurz = (liste) => (liste || []).map((e) => ({ wert: e.wert, beschriftung: e.kurz }));
 
   return el('div.einwirkung.ist-spannung', { class: aktiv ? '' : 'ist-aus' }, [
     hakenSchalter(aktiv, (wert) => aendern((x) => { x.aktiv = wert; }), 'Analyse'),
@@ -827,28 +866,10 @@ function spannungsZeile(querschnitt, index) {
     // Beschriftung über dem Feld, nicht daneben: so bleibt das Raster der
     // Zeile dasselbe, gleich welche Art gewählt ist.
     ...bauplan.felder().map((eingabe, i) => mitKopf(bauplan.kopf[i] || '', eingabe)),
-    // Womit gerechnet wird -- je Analyse. Die Kriechzahl leer heisst: die
-    // der Platte; ihr Wert steht blass im Feld.
-    mitKopf('φ', zahlfeld({
-      wert: k.kriechzahl ?? null, schritt: 0.1, min: 0, leer: null,
-      platzhalter: String(querschnitt.kriechzahl ?? ''),
-      titel: 'Kriechzahl φ dieser Analyse – leer: die der Platte',
-      beiAenderung: (v) => aendern((x) => { x.kriechzahl = v; }),
-    }), true),
     richtungsWahl(k.richtung || 'x', (wert) => aendern((x) => { x.richtung = wert; }),
       ['x', 'y']),
-    mitKopf('Werte', auswahl({
-      werte: kurz(katalog.werkstoffsaetze),
-      gewaehlt: k.werkstoffsatz || 'bemessung',
-      titel: 'Bemessungswerte (f_cd, f_yd) oder charakteristische (f_ck, f_yk)',
-      beiAenderung: (v) => aendern((x) => { x.werkstoffsatz = v; }),
-    })),
-    mitKopf('Beton', auswahl({
-      werte: kurz(katalog.betongesetze),
-      gewaehlt: k.betongesetz || 'parabel',
-      titel: 'Beton im gerissenen Zustand: Parabel-Rechteck oder Spannungsblock 0.85·x',
-      beiAenderung: (v) => aendern((x) => { x.betongesetz = v; }),
-    })),
+    // Womit gerechnet wird -- je Analyse, wie in den Kapiteln.
+    ...rechenwahlFelder(k, aendern),
     el('button.weg', {
       text: '×', title: 'Analyse entfernen',
       on: {

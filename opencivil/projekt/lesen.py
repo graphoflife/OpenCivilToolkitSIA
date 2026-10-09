@@ -50,6 +50,21 @@ def zahl(d: Mapping[str, Any], feld: str, vorgabe: float) -> float:
         ) from None
 
 
+def kriechzahl_aus(d: Mapping[str, Any], feld: str, *, alt: float, wo: str) -> float:
+    """
+    Die Kriechzahl eines Nachweis-Kapitels oder einer Analyse.
+
+    Fehlt sie oder steht sie leer -- in einer Datei von vor 2026-10-09 --,
+    gilt ``alt``: die Kriechzahl der Platte, mit der damals jedes Kapitel
+    rechnete. So rechnet eine alte Datei wie damals, und eine neue Platte
+    beginnt mit der Vorgabe ihrer Felder, 0. Die eine Stelle fuer diese Regel.
+    """
+    wert = zahl(d, feld, alt)
+    if wert < 0.0:
+        raise ProjektFehler(f"{wo}: die Kriechzahl kann nicht negativ sein.")
+    return wert
+
+
 def pflichtfeld(d: Mapping[str, Any], feld: str, wer: str) -> str:
     """
     Ein Feld, ohne das sich nichts zusammenbauen laesst.

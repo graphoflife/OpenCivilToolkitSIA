@@ -55,7 +55,7 @@ q.quasistaendig.lastfall("Dauerlast", M_Ed=80)
 q.duktilitaet = True                          # alles Weitere am Eintrag selbst
 q.spannungsfall("Biegung", art="moment_kruemmung", N_Ed=0)          # M-χ-Linie
 q.spannungsfall("Zug", art="normalkraft_dehnung", M_Ed=20,          # N-ε-Linie,
-                kriechzahl=1.0, betongesetz="block")                # eigene Wahl
+                kriechzahl=1.0, rechenart="block")                  # eigene Wahl
 
 ergebnis = p.rechnen()
 print(ergebnis.zusammenfassung())             # je Platte eine Tabelle

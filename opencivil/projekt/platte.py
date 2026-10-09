@@ -436,7 +436,8 @@ class QuerschnittEintrag(Beschreibung):
                 wort="quasi-ständige", vorgabe=QUASISTAENDIG_ANTEIL),
             knickfaelle=[KnickEintrag.aus_dict(x)
                          for x in (d.get("knickfaelle") or [])],
-            spannungsfaelle=[SpannungsfallEintrag.aus_dict(x)
+            spannungsfaelle=[SpannungsfallEintrag.aus_dict(
+                x, kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl))
                              for x in (d.get("spannungsfaelle") or [])],
             richtung_lage1=str(d.get("richtung_lage1") or cls.richtung_lage1),
             richtung_lage4=str(d.get("richtung_lage4") or cls.richtung_lage4),

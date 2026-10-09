@@ -319,7 +319,7 @@ function linienbild(fall) {
 
   const v = (wert) => mitEinheit(wert, art.stellen, art.verformungEinheit);
   const f = (wert) => mitEinheit(wert, 1, art.kraftEinheit);
-  const kennwert = fall.wahl?.satz === 'charakteristisch' ? 'Rk' : 'Rd';
+  const kennwert = fall.wahl?.index || 'Rd';
   const ecken = [];
   // Das Ende zuerst: es steht am Rand, und die anderen weichen ihm aus.
   // Endet die Linie ungerissen, trägt der Querschnitt den Riss nicht; dann
@@ -377,15 +377,15 @@ function zahlenzeile(eintraege) {
     el('span', {}, [el('b', {}, [span(`${latex} =`)]), ` ${wert}`])));
 }
 
-/** Womit gerechnet wurde -- die Kriechzahl auch dann, wenn sie die der Platte ist. */
+/** Womit gerechnet wurde: Kriechzahl, Werte, Rechenart. */
 function wahlzeile(wahl) {
   if (!wahl) return null;
-  const katalog = zustand.katalog?.spannungsanalyse || {};
+  const katalog = zustand.katalog?.rechenwahl || {};
   const name = (liste, wert) => (liste || []).find((e) => e.wert === wert)?.beschriftung ?? wert;
   return el('div.sd-wahl-text', {}, [
     span('\\varphi'),
-    ` = ${wahl.phi.toFixed(2)}${wahl.phi_eigen ? '' : ' (Platte)'} · `
-      + `${name(katalog.werkstoffsaetze, wahl.satz)} · ${name(katalog.betongesetze, wahl.gesetz)}`,
+    ` = ${wahl.phi.toFixed(2)} · `
+      + `${name(katalog.werkstoffsaetze, wahl.satz)} · ${name(katalog.rechenarten, wahl.rechenart)}`,
   ]);
 }
 
@@ -406,7 +406,7 @@ export function spannungsfallZeichnen(fall) {
     const k = fall.kurve;
     const art = LINIEN[fall.art];
     const K = art.kraft;
-    const kennwert = fall.wahl?.satz === 'charakteristisch' ? 'Rk' : 'Rd';
+    const kennwert = fall.wahl?.index || 'Rd';
     const kraft = (wert) => mitEinheit(wert, 1, art.kraftEinheit);
     return el('div.sd-fall', {}, [
       kopf,
