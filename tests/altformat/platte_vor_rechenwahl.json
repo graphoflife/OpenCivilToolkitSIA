@@ -1,0 +1,918 @@
+{
+ "beschreibung": "Eine Platte im Format vor der Rechenwahl, eingefroren am 2026-10-09: eine Kriechzahl je Platte (hier 1.5), feste Werkstoffsaetze und Betongesetze. Darunter jede Zahl der Loesung und der Analysen.",
+ "projekt": {
+  "name": "OCT Projekt",
+  "materialien": [
+   {
+    "kennung": "b1",
+    "art": "beton",
+    "sorte": "C30/37",
+    "name": "C30/37",
+    "eigenstaendig": false,
+    "abweichungen": {},
+    "ueberschreibungen": {}
+   },
+   {
+    "kennung": "s1",
+    "art": "betonstahl",
+    "sorte": "B500B",
+    "name": "B500B",
+    "eigenstaendig": false,
+    "abweichungen": {},
+    "ueberschreibungen": {}
+   }
+  ],
+  "querschnitte": [
+   {
+    "kennung": "q1",
+    "name": "Decke über EG",
+    "beton": "b1",
+    "h": 300.0,
+    "b": 1000.0,
+    "ueberdeckung_unten": 30.0,
+    "ueberdeckung_oben": 30.0,
+    "d_max": 32.0,
+    "einlagenhoehe": 0.0,
+    "k_c": 0.55,
+    "querkraftbewehrung": {
+     "durchmesser": 0.0,
+     "stahl": "s1",
+     "abstand_x": 200.0,
+     "abstand_y": 200.0,
+     "anzahl_y": null,
+     "alpha_min": 30,
+     "alpha_max": 45
+    },
+    "rissanforderung": "erhoeht",
+    "beschreibung": "",
+    "kriechzahl": 1.5,
+    "zwaengung": true,
+    "zwaengung_begrenzt": false,
+    "haeufig": {
+     "anteil": 70.0,
+     "aus_tragsicherheit": true,
+     "faelle": [
+      {
+       "name": "Gebrauch",
+       "M_Ed": 70.0,
+       "N_Ed": 0.0,
+       "aktiv": true
+      }
+     ]
+    },
+    "quasistaendig": {
+     "anteil": 60.0,
+     "aus_tragsicherheit": true,
+     "faelle": [
+      {
+       "name": "Dauer",
+       "M_Ed": 50.0,
+       "N_Ed": -100.0,
+       "aktiv": true
+      }
+     ]
+    },
+    "knickfaelle": [
+     {
+      "name": "Wand",
+      "N_Ed": -800.0,
+      "M_Ed_1": 20.0,
+      "laenge": 3.0,
+      "knicklaenge": 3.0,
+      "aktiv": true
+     }
+    ],
+    "spannungsfaelle": [
+     {
+      "name": "M-chi",
+      "art": "moment_kruemmung",
+      "richtung": "x",
+      "N_Ed": -100.0,
+      "M_Ed": 0.0,
+      "eps_oben": -1.0,
+      "eps_unten": 2.0,
+      "kriechzahl": null,
+      "werkstoffsatz": "bemessung",
+      "betongesetz": "parabel",
+      "aktiv": true
+     },
+     {
+      "name": "N-eps",
+      "art": "normalkraft_dehnung",
+      "richtung": "x",
+      "N_Ed": 0.0,
+      "M_Ed": 20.0,
+      "eps_oben": -1.0,
+      "eps_unten": 2.0,
+      "kriechzahl": null,
+      "werkstoffsatz": "bemessung",
+      "betongesetz": "parabel",
+      "aktiv": true
+     },
+     {
+      "name": "Bild",
+      "art": "schnittgroessen",
+      "richtung": "x",
+      "N_Ed": 0.0,
+      "M_Ed": 80.0,
+      "eps_oben": -1.0,
+      "eps_unten": 2.0,
+      "kriechzahl": null,
+      "werkstoffsatz": "charakteristisch",
+      "betongesetz": "block",
+      "aktiv": true
+     },
+     {
+      "name": "Dehnungen",
+      "art": "dehnungen",
+      "richtung": "x",
+      "N_Ed": 0.0,
+      "M_Ed": 0.0,
+      "eps_oben": -1.0,
+      "eps_unten": 2.0,
+      "kriechzahl": null,
+      "werkstoffsatz": "charakteristisch",
+      "betongesetz": "parabel",
+      "aktiv": true
+     }
+    ],
+    "automatik_modus": "grund_ohne_zulage_mit",
+    "automatik_dicke": false,
+    "automatik_y_wie_x": false,
+    "automatik_teilungen": [
+     150.0
+    ],
+    "automatik_mindestdurchmesser": 10.0,
+    "automatik_grenze": {
+     "grund": {
+      "durchmesser": 30.0,
+      "abstand": 150.0,
+      "anzahl": null
+     },
+     "zulage": {
+      "durchmesser": 0.0,
+      "abstand": 150.0,
+      "anzahl": null
+     }
+    },
+    "automatik_mindestdicke": 150.0,
+    "automatik_querkraft": false,
+    "automatik_querkraft_teilungen": [
+     100.0,
+     150.0,
+     200.0
+    ],
+    "sproede": true,
+    "zwaengung_biegung": true,
+    "duktilitaet": true,
+    "x_d_max": 0.35,
+    "lagen": [
+     {
+      "stahl": "s1",
+      "grund": {
+       "durchmesser": 12.0,
+       "abstand": 150.0,
+       "anzahl": null
+      },
+      "zulage": {
+       "durchmesser": 0.0,
+       "abstand": 150.0,
+       "anzahl": null
+      },
+      "unguenstig": true
+     },
+     {
+      "stahl": "s1",
+      "grund": {
+       "durchmesser": 18.0,
+       "abstand": 150.0,
+       "anzahl": null
+      },
+      "zulage": {
+       "durchmesser": 12.0,
+       "abstand": 150.0,
+       "anzahl": null
+      },
+      "unguenstig": true
+     },
+     {
+      "stahl": "s1",
+      "grund": {
+       "durchmesser": 12.0,
+       "abstand": 150.0,
+       "anzahl": null
+      },
+      "zulage": {
+       "durchmesser": 0.0,
+       "abstand": 150.0,
+       "anzahl": null
+      },
+      "unguenstig": true
+     },
+     {
+      "stahl": "s1",
+      "grund": {
+       "durchmesser": 12.0,
+       "abstand": 150.0,
+       "anzahl": null
+      },
+      "zulage": {
+       "durchmesser": 0.0,
+       "abstand": 150.0,
+       "anzahl": null
+      },
+      "unguenstig": true
+     }
+    ],
+    "richtung_lage1": "y",
+    "richtung_lage4": "y",
+    "kombinationen": [
+     {
+      "name": "Feld",
+      "M_Ed": 100.0,
+      "N_Ed": 0.0,
+      "V_Ed": 80.0,
+      "art": "automatisch",
+      "aktiv": true
+     },
+     {
+      "name": "Feld mit Druck",
+      "M_Ed": 100.0,
+      "N_Ed": -300.0,
+      "V_Ed": 0.0,
+      "art": "automatisch",
+      "aktiv": true
+     },
+     {
+      "name": "Stütze",
+      "M_Ed": -50.0,
+      "N_Ed": 0.0,
+      "V_Ed": 0.0,
+      "art": "automatisch",
+      "aktiv": true
+     }
+    ]
+   }
+  ],
+  "gleichungen": [],
+  "querschnittsanalysen": []
+ },
+ "werte": {
+  "beton.b1.E_cd": 33619754067.989635,
+  "beton.b1.E_cm": 33619754067.989635,
+  "beton.b1.eps_c1d": 0.002,
+  "beton.b1.eps_c2d": 0.0035,
+  "beton.b1.eta_fc": 1.0,
+  "beton.b1.f_cd": 20000000.0,
+  "beton.b1.f_ck": 30000000.0,
+  "beton.b1.f_cm": 38000000.0,
+  "beton.b1.f_ctm": 2900000.0,
+  "beton.b1.gamma_c": 1.5,
+  "beton.b1.gamma_cE": 1.0,
+  "beton.b1.k_e": 10000.0,
+  "beton.b1.k_sigma": 4.202469258498704,
+  "beton.b1.tau_cd": 1095445.115010332,
+  "betonstahl.s1.E_s": 200000000000.0,
+  "betonstahl.s1.eps_ud": 0.045,
+  "betonstahl.s1.f_yd": 434782608.6956522,
+  "betonstahl.s1.f_yd_druck": 434782608.6956522,
+  "betonstahl.s1.f_yk": 500000000.0,
+  "betonstahl.s1.f_yk_druck": 500000000.0,
+  "betonstahl.s1.gamma_s": 1.15,
+  "querschnitt.q1.D_max": 0.032,
+  "querschnitt.q1.b": 1.0,
+  "querschnitt.q1.b_y": 1.0,
+  "querschnitt.q1.bewehrungsmass": 123.3075116533994,
+  "querschnitt.q1.c_nom_oben": 0.03,
+  "querschnitt.q1.c_nom_unten": 0.03,
+  "querschnitt.q1.distanzhalter": 0.186,
+  "querschnitt.q1.einlagenhoehe": 0.0,
+  "querschnitt.q1.h": 0.3,
+  "querschnitt.q1.kriechzahl": 1.5,
+  "querschnitt.q1.lage.1g.a_s": 0.0007539822368615504,
+  "querschnitt.q1.lage.1g.phi": 0.012,
+  "querschnitt.q1.lage.1g.s": 0.15,
+  "querschnitt.q1.lage.1g.z": 0.264,
+  "querschnitt.q1.lage.2g.a_s": 0.0016964600329384889,
+  "querschnitt.q1.lage.2g.phi": 0.018000000000000002,
+  "querschnitt.q1.lage.2g.s": 0.15,
+  "querschnitt.q1.lage.2g.z": 0.249,
+  "querschnitt.q1.lage.2z.a_s": 0.0007539822368615504,
+  "querschnitt.q1.lage.2z.phi": 0.012,
+  "querschnitt.q1.lage.2z.s": 0.15,
+  "querschnitt.q1.lage.2z.z": 0.246,
+  "querschnitt.q1.lage.3g.a_s": 0.0007539822368615504,
+  "querschnitt.q1.lage.3g.phi": 0.012,
+  "querschnitt.q1.lage.3g.s": 0.15,
+  "querschnitt.q1.lage.3g.z": 0.047999999999999994,
+  "querschnitt.q1.lage.4g.a_s": 0.0007539822368615504,
+  "querschnitt.q1.lage.4g.phi": 0.012,
+  "querschnitt.q1.lage.4g.s": 0.15,
+  "querschnitt.q1.lage.4g.z": 0.036,
+  "querschnitt.q1.nachweis.duktilitaet.lage2.erfuellungsgrad": 1.3854367165257575,
+  "querschnitt.q1.nachweis.duktilitaet.lage2.x_zu_d": 0.25262792289617575,
+  "querschnitt.q1.nachweis.duktilitaet.lage3.erfuellungsgrad": 4.573874332046434,
+  "querschnitt.q1.nachweis.duktilitaet.lage3.x_zu_d": 0.07652156018974042,
+  "querschnitt.q1.nachweis.knicken.Wand.erfuellungsgrad": 4.88623046875,
+  "querschnitt.q1.nachweis.mn.x.Feld.M_Rd_bei_N_Ed": 235926.111066081,
+  "querschnitt.q1.nachweis.mn.x.Feld.erfuellungsgrad": 2.35926111066081,
+  "querschnitt.q1.nachweis.mn.x.Feld_mit_Druck.M_Rd_bei_N_Ed": 253810.53844716784,
+  "querschnitt.q1.nachweis.mn.x.Feld_mit_Druck.erfuellungsgrad": 2.5381053844716783,
+  "querschnitt.q1.nachweis.mn.x.M_Rd_N0_neg": -79923.60569893873,
+  "querschnitt.q1.nachweis.mn.x.M_Rd_N0_pos": 235926.111066081,
+  "querschnitt.q1.nachweis.mn.x.M_Rd_max": 324429.60347809526,
+  "querschnitt.q1.nachweis.mn.x.M_Rd_min": -253374.97311299047,
+  "querschnitt.q1.nachweis.mn.x.N_Rd_druck": -6000000.0,
+  "querschnitt.q1.nachweis.mn.x.N_Rd_zug": 1393228.0463746043,
+  "querschnitt.q1.nachweis.mn.x.Stütze.M_Rd_bei_N_Ed": 79923.60569893873,
+  "querschnitt.q1.nachweis.mn.x.Stütze.erfuellungsgrad": 1.5984721139787745,
+  "querschnitt.q1.nachweis.querkraft.x.Feld.erfuellungsgrad": 2.6734918929115876,
+  "querschnitt.q1.nachweis.querkraft.x.Feld.v_Rd": 213879.351432927,
+  "querschnitt.q1.nachweis.rissnormalkraft.x.lage2.erfuellungsgrad": 2.4668177225502914,
+  "querschnitt.q1.nachweis.rissnormalkraft.x.lage3.erfuellungsgrad": 0.9296068782619535,
+  "querschnitt.q1.nachweis.spannung.x.Feld__70___.erfuellungsgrad": 2.6363372807933154,
+  "querschnitt.q1.nachweis.spannung.x.Feld_mit_Druck__70___.erfuellungsgrad": 3.750159902031868,
+  "querschnitt.q1.nachweis.spannung.x.Gebrauch.erfuellungsgrad": 2.6363372807933154,
+  "querschnitt.q1.nachweis.spannung.x.Stütze__70___.erfuellungsgrad": 1.7372169318816189,
+  "querschnitt.q1.nachweis.spannung_riss.x.Dauer.erfuellungsgrad": 4.962129380596673,
+  "querschnitt.q1.nachweis.spannung_riss.x.Feld__60___.erfuellungsgrad": 3.301181770802359,
+  "querschnitt.q1.nachweis.spannung_riss.x.Feld_mit_Druck__60___.erfuellungsgrad": 4.695893644625223,
+  "querschnitt.q1.nachweis.spannung_riss.x.Stütze__60___.erfuellungsgrad": 2.1753168126388247,
+  "querschnitt.q1.nachweis.sproede.x.lage2.erfuellungsgrad": 5.694768198146783,
+  "querschnitt.q1.nachweis.sproede.x.lage3.erfuellungsgrad": 1.9291904823881763,
+  "querschnitt.q1.nachweis.zwang_biegung.x.lage2.erfuellungsgrad": 4.815108911663003,
+  "querschnitt.q1.nachweis.zwang_biegung.x.lage3.erfuellungsgrad": 1.9555834898135525
+ },
+ "analysen": [
+  {
+   "platte": "q1",
+   "name": "M-chi",
+   "kurve": {
+    "riss": 46428.57142857143,
+    "bruch": [
+     245397.9511958532,
+     0.05358573390644088,
+     -0.0034999999959071685,
+     0.012575720176025092
+    ],
+    "fliessen": [
+     235083.52213617638,
+     0.014689040629442592
+    ],
+    "punkte": [
+     [
+      0.0,
+      1.832816255752904e-05
+     ],
+     [
+      4642.857142857143,
+      0.00014761886049093973
+     ],
+     [
+      9285.714285714286,
+      0.00027690962591028344
+     ],
+     [
+      13928.57142857143,
+      0.00040620032384369416
+     ],
+     [
+      18571.428571428572,
+      0.0005354910892630379
+     ],
+     [
+      23214.285714285714,
+      0.0006647817871964486
+     ],
+     [
+      27857.14285714286,
+      0.0007940725526157924
+     ],
+     [
+      32500.0,
+      0.0009233633180351364
+     ],
+     [
+      37142.857142857145,
+      0.0010526540159685467
+     ],
+     [
+      41785.71428571428,
+      0.001181944781387891
+     ],
+     [
+      46428.57142857143,
+      0.0013112354793213012
+     ],
+     [
+      46428.57142857143,
+      0.0024784839999520535
+     ],
+     [
+      61696.5182723456,
+      0.0034177575868359414
+     ],
+     [
+      76862.54373661456,
+      0.004357031173719829
+     ],
+     [
+      91926.79421192591,
+      0.005296304760603716
+     ],
+     [
+      106881.9978111426,
+      0.006235578347487604
+     ],
+     [
+      121723.44462591861,
+      0.007174851934371492
+     ],
+     [
+      136442.74816417877,
+      0.008114125521255379
+     ],
+     [
+      151030.50738021138,
+      0.009053399108139267
+     ],
+     [
+      165476.12058806513,
+      0.009992672695023155
+     ],
+     [
+      179767.56731242774,
+      0.010931946281907043
+     ],
+     [
+      193891.12598035258,
+      0.01187121986879093
+     ],
+     [
+      207831.01737885448,
+      0.012810493455674818
+     ],
+     [
+      221568.94977229298,
+      0.013749767042558704
+     ],
+     [
+      235083.52213617638,
+      0.014689040629442592
+     ],
+     [
+      237676.4482839083,
+      0.016129658898961046
+     ],
+     [
+      238763.00140332457,
+      0.017570277168479503
+     ],
+     [
+      239704.2910069446,
+      0.019010895437997957
+     ],
+     [
+      240530.30041106374,
+      0.02045151370751641
+     ],
+     [
+      241204.55329655492,
+      0.02189213197703487
+     ],
+     [
+      241800.964655574,
+      0.023332750246553322
+     ],
+     [
+      242310.60812086187,
+      0.024773368516071776
+     ],
+     [
+      242707.34158119548,
+      0.026213986785590233
+     ],
+     [
+      243073.72650216482,
+      0.027654605055108687
+     ],
+     [
+      243402.14409811248,
+      0.02909522332462714
+     ],
+     [
+      243638.88792457638,
+      0.030535841594145595
+     ],
+     [
+      243858.31681509834,
+      0.031976459863664056
+     ],
+     [
+      244062.99705072734,
+      0.0334170781331825
+     ],
+     [
+      244256.74375040157,
+      0.03485769640270096
+     ],
+     [
+      244421.61143592373,
+      0.03629831467221942
+     ],
+     [
+      244540.37119104198,
+      0.03773893294173787
+     ],
+     [
+      244653.90882732611,
+      0.039179551211256325
+     ],
+     [
+      244762.09922777102,
+      0.04062016948077478
+     ],
+     [
+      244864.55752722672,
+      0.04206078775029323
+     ],
+     [
+      244960.9645212271,
+      0.04350140601981169
+     ],
+     [
+      245053.5111281414,
+      0.04494202428933014
+     ],
+     [
+      245143.1289714519,
+      0.046382642558848594
+     ],
+     [
+      245207.32021254426,
+      0.04782326082836705
+     ],
+     [
+      245258.61836231902,
+      0.049263879097885516
+     ],
+     [
+      245307.4862807484,
+      0.05070449736740397
+     ],
+     [
+      245353.7825737761,
+      0.05214511563692241
+     ],
+     [
+      245397.9511958532,
+      0.05358573390644088
+     ]
+    ]
+   }
+  },
+  {
+   "platte": "q1",
+   "name": "N-eps",
+   "kurve": {
+    "riss": 356521.7391304348,
+    "bruch": [
+     1030085.3108868285,
+     0.019266893119814138,
+     0.04203378623432745,
+     -0.0034999999946991704
+    ],
+    "fliessen": [
+     872721.8832266002,
+     0.0016324677571988924
+    ],
+    "punkte": [
+     [
+      0.0,
+      -3.6656318328343575e-06
+     ],
+     [
+      35652.17391304348,
+      4.074033278580008e-06
+     ],
+     [
+      71304.34782608696,
+      1.1813699241376776e-05
+     ],
+     [
+      106956.52173913045,
+      1.9553366042365066e-05
+     ],
+     [
+      142608.69565217392,
+      2.729303366835284e-05
+     ],
+     [
+      178260.8695652174,
+      3.503269664197777e-05
+     ],
+     [
+      213913.0434782609,
+      4.2772365878296745e-05
+     ],
+     [
+      249565.21739130438,
+      5.051203043568615e-05
+     ],
+     [
+      285217.39130434784,
+      5.8251696856750494e-05
+     ],
+     [
+      320869.5652173913,
+      6.599136294368667e-05
+     ],
+     [
+      356521.7391304348,
+      7.373102977628754e-05
+     ],
+     [
+      356521.7391304348,
+      0.0005362212758070069
+     ],
+     [
+      396229.4430985222,
+      0.0006205479282217674
+     ],
+     [
+      435937.1464694679,
+      0.0007048745806365278
+     ],
+     [
+      475644.8500314564,
+      0.0007892012330512881
+     ],
+     [
+      515352.5526765313,
+      0.0008735278854660486
+     ],
+     [
+      555060.2557539396,
+      0.0009578545378808091
+     ],
+     [
+      594767.9594585961,
+      0.0010421811902955693
+     ],
+     [
+      634475.6632133645,
+      0.00112650784271033
+     ],
+     [
+      674183.3664700412,
+      0.0012108344951250903
+     ],
+     [
+      713891.0710973755,
+      0.0012951611475398507
+     ],
+     [
+      753598.7743679588,
+      0.0013794877999546112
+     ],
+     [
+      793306.4779179684,
+      0.0014638144523693715
+     ],
+     [
+      833014.1798724569,
+      0.001548141104784132
+     ],
+     [
+      872721.8832266002,
+      0.0016324677571988924
+     ],
+     [
+      872785.6668967493,
+      0.0022855946224809385
+     ],
+     [
+      872849.4527651595,
+      0.0029387214877629846
+     ],
+     [
+      877058.5379941089,
+      0.0035918483530450306
+     ],
+     [
+      890621.4758248534,
+      0.004244975218327077
+     ],
+     [
+      906298.9080806801,
+      0.004898102083609123
+     ],
+     [
+      921905.1786795717,
+      0.005551228948891169
+     ],
+     [
+      937808.410248172,
+      0.006204355814173215
+     ],
+     [
+      953211.4658969063,
+      0.006857482679455262
+     ],
+     [
+      968014.1724587679,
+      0.007510609544737308
+     ],
+     [
+      982647.3688273348,
+      0.008163736410019353
+     ],
+     [
+      996551.5560634464,
+      0.008816863275301401
+     ],
+     [
+      1009141.3950330685,
+      0.009469990140583445
+     ],
+     [
+      1018336.9126282432,
+      0.010123117005865493
+     ],
+     [
+      1026556.3707155292,
+      0.010776243871147537
+     ],
+     [
+      1028683.5776605848,
+      0.011429370736429585
+     ],
+     [
+      1028858.8992431643,
+      0.012082497601711631
+     ],
+     [
+      1029022.8795966988,
+      0.012735624466993676
+     ],
+     [
+      1029174.0618912277,
+      0.013388751332275723
+     ],
+     [
+      1029310.7334770302,
+      0.01404187819755777
+     ],
+     [
+      1029430.8437623463,
+      0.014695005062839816
+     ],
+     [
+      1029533.516373636,
+      0.015348131928121862
+     ],
+     [
+      1029631.085680479,
+      0.01600125879340391
+     ],
+     [
+      1029726.6232624012,
+      0.016654385658685954
+     ],
+     [
+      1029819.9814386033,
+      0.017307512523967998
+     ],
+     [
+      1029910.9977820909,
+      0.017960639389250046
+     ],
+     [
+      1029999.5035325557,
+      0.018613766254532094
+     ],
+     [
+      1030085.3108868285,
+      0.019266893119814138
+     ]
+    ]
+   }
+  },
+  {
+   "platte": "q1",
+   "name": "Bild",
+   "bild": {
+    "eps_m": 0.00018982906405425263,
+    "chi": 0.005091464232577261,
+    "N": 0.01480552588327555,
+    "M": 79999.99506049551,
+    "stahl": [
+     138776804.6158803,
+     135721926.07633394,
+     -65900057.5337256
+    ],
+    "beton": [
+     -30000000.0,
+     -30000000.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  },
+  {
+   "platte": "q1",
+   "name": "Dehnungen",
+   "bild": {
+    "eps_m": 0.0005,
+    "chi": 0.01,
+    "N": -181132.06731756008,
+    "M": 175835.7517811359,
+    "stahl": [
+     298000000.0,
+     292000000.0,
+     -104000000.00000001
+    ],
+    "beton": [
+     -16615012.141672436,
+     -15391671.750035262,
+     -14162431.521401472,
+     -12928176.768248381,
+     -11689624.110962413,
+     -10447359.830219695,
+     -9201868.21108572,
+     -7953552.798842123,
+     -6702752.551861342,
+     -5449754.26580326,
+     -4194802.236100721,
+     -2938105.8493494326,
+     -1679845.6036531064,
+     -420177.9245940332,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  }
+ ]
+}
