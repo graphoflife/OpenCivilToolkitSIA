@@ -344,6 +344,16 @@ class TestWahl(unittest.TestCase):
         self.assertGreater(sa.moment_kruemmung(k, N=0.0).bruch.kraft,
                            sa.moment_kruemmung(self.platte, N=0.0).bruch.kraft)
 
+    def test_charakteristisch_mit_parabel_findet_das_gleichgewicht(self):
+        """
+        Mit dem φ der Platte, 2, war k_σ = 0.93 und die Parabel singulär: bei
+        60 kNm gab es keine Gleichgewichtslage. Bis 2026-10-09.
+        """
+        k = loeserpaar(satz=Werkstoffsatz.CHARAKTERISTISCH)
+        bild = sa.aus_schnittgroessen(k.gerissen, N=0.0, M=60e3)
+        self.assertTrue(bild.konvergiert)
+        self.assertAlmostEqual(max(s.sigma for s in bild.stahl) / 1e6, 114.7, delta=0.1)
+
     def test_eine_alte_datei_rechnet_wie_vorher(self):
         """Ohne die neuen Felder: die Kriechzahl der Platte, Bemessungswerte, die Parabel."""
         alt = SpannungsfallEintrag.aus_dict({"name": "alt", "art": "moment_kruemmung"})

@@ -59,6 +59,7 @@ from opencivil.querschnitt.fasern import (
     Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt,
     Schnittkraefte, Stab,
 )
+from opencivil.querschnitt.werkstoffgesetz import k_sigma as beiwert_parabel
 
 #: Fasern ueber die Plattenhoehe. 60 reichen: die Betonspannung ist stetig,
 #: und der Fehler der Mittelpunktsregel faellt mit dem Quadrat der Faserdicke.
@@ -566,9 +567,9 @@ def beton_nichtlinear(*, f_cd: float, E_c: float,
 
     Keine Zugfestigkeit, Plateau zwischen ``eps_c1d`` und ``eps_c2d``, danach
     Versagen (Spannung null). ``k_sigma = E_c/(400*f_cd)`` -- so steht es im
-    Vorbild.
+    Vorbild --, aber nie unter 1 (:func:`~opencivil.querschnitt.werkstoffgesetz.k_sigma`).
     """
-    k_sigma = E_c / (400.0 * f_cd) if f_cd > 0 else 0.0
+    k_sigma = beiwert_parabel(E_c, f_cd)
 
     def sigma(eps: float) -> float:
         if eps >= 0.0:

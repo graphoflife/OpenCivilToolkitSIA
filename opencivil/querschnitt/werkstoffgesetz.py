@@ -30,6 +30,24 @@ from opencivil.core.einheiten import EINHEITSLOS, N_PRO_MM2, Groesse
 from opencivil.core.wert import Wert
 
 
+#: Kleiner rechnet die Parabel ``k_sigma`` nicht. Darunter haette ihr Nenner
+#: ``1 + (k_sigma - 2)·eta`` im ansteigenden Ast eine Nullstelle, bei
+#: ``eta = 1/(2 - k_sigma)`` -- die Spannung spraenge dort ins Unendliche und
+#: wechselte das Vorzeichen. So weit kommt es mit dem kriechweichen Modul:
+#: ``E_cm/(1 + phi)`` mit charakteristischen Werten und ``phi = 2`` gibt
+#: ``k_sigma = 0.93``. Mit 1 ist der Beton bis ``f_c`` bei ``eps_c1d`` linear.
+#: Nach Vorgabe, nicht nachgeschlagen (TODO.md).
+K_SIGMA_MIN = 1.0
+
+#: Dieselbe Regel als Formel, fuer die Herleitung -- mit ``@E_c`` und ``@f_c``.
+K_SIGMA_LATEX = r"\max\left(1;\ \frac{@E_c}{400 \cdot @f_c}\right)"
+
+
+def k_sigma(E_c: float, f_c: float) -> float:
+    """Der Beiwert der Parabel zum Modul ``E_c``: ``E_c/(400·f_c)``, nie unter 1."""
+    return max(K_SIGMA_MIN, E_c / (400.0 * f_c)) if f_c > 0 else K_SIGMA_MIN
+
+
 @dataclass(frozen=True)
 class Betongesetz:
     """
@@ -54,6 +72,7 @@ class Betongesetz:
     """Bruchdehnung (positiver Betrag)."""
 
     k_sigma: float
+    """Gerechnet wird mit hoechstens :data:`K_SIGMA_MIN` -- siehe dort."""
 
     @classmethod
     def aus_werten(cls, werte: Mapping[str, Wert]) -> "Betongesetz":
@@ -78,10 +97,11 @@ class Betongesetz:
             # Auswertung verheerend, darum bleibt die Funktion hier stetig.
             return -self.f_cd
         eta = betrag / self.eps_c1d
-        nenner = 1.0 + (self.k_sigma - 2.0) * eta
+        k = max(K_SIGMA_MIN, self.k_sigma)
+        nenner = 1.0 + (k - 2.0) * eta
         if nenner == 0.0:
             return -self.f_cd
-        return -self.f_cd * (self.k_sigma * eta - eta * eta) / nenner
+        return -self.f_cd * (k * eta - eta * eta) / nenner
 
     def latex(self) -> str:
         return (

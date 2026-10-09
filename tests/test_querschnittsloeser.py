@@ -188,3 +188,17 @@ class TestGrenzen(unittest.TestCase):
         self.assertAlmostEqual(gesetz(0.001), 0.0)
         self.assertAlmostEqual(gesetz(-0.0025) / 1e6, -20.0)
         self.assertAlmostEqual(gesetz(-0.004), 0.0)
+
+    def test_die_parabel_rechnet_k_sigma_nicht_unter_eins(self):
+        """
+        Charakteristisch und kriechweich, f_ck = 30, E_cm/(1 + 2): k_σ wäre
+        0.93, und der Nenner der Parabel hätte bei η = 0.935 eine Nullstelle
+        -- dort sprang die Spannung ins Unendliche und wechselte das
+        Vorzeichen. Mit k_σ = 1 ist der Beton bis f_c bei ε_c1d linear.
+        """
+        gesetz = beton_nichtlinear(f_cd=30e6, E_c=33.62e9 / 3.0, eps_c1d=0.002, eps_c2d=0.0035)
+        werte = [gesetz(-i * 1e-5) for i in range(351)]
+        for vorher, nachher in zip(werte, werte[1:]):
+            self.assertLessEqual(nachher, vorher + 1e-6)
+        self.assertAlmostEqual(gesetz(-0.001) / 1e6, -15.0, places=9)
+        self.assertAlmostEqual(gesetz(-0.002) / 1e6, -30.0, places=9)

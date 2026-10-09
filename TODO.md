@@ -165,6 +165,13 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       beiden Linien darum nicht am selben Punkt: am Beispiel reisst die M-χ-
       Linie bei N = 300 kN bei 26.4 kNm, die N-ε-Linie bei M = 26.4 kNm
       schon bei 228 kN.
+- [ ] **k_σ der Parabel nie unter 1.** Mit dem kriechweichen Modul
+      `E_cm/(1+φ)` und charakteristischen Werten wird `E_c/(400·f_c)` kleiner
+      als 1 (C30/37, φ = 2: 0.93); dann hätte der Nenner der Parabel im
+      ansteigenden Ast eine Nullstelle. Angesetzt wird `max(1; E_c/(400·f_c))`:
+      der Beton ist dann bis f_c bei ε_c1d linear -- nach Vorgabe, nicht
+      nachgeschlagen. Ob die Norm das Kriechen über den Modul oder über die
+      Dehnungen (ε_c1d·(1+φ)) ansetzt, ist offen.
 - [ ] **Das Ende der Linien** liegt an den Grenzen des Dehnungsfächers:
       Betonrand −ε_c2d, Stahllagen ±ε_ud, Punkt C −ε_c1d bei
       `z_C = h·(1 − ε_c1d/ε_c2d)`. Dieselben Grenzen wie in

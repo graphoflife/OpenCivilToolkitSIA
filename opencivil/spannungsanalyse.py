@@ -79,7 +79,9 @@ from opencivil.nachweis.sproedes_versagen import (
 )
 from opencivil.querschnitt.fasern import Dehnungsgrenze
 from opencivil.querschnitt.platte import Richtung
-from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL, Betongesetz, Spannungsblock
+from opencivil.querschnitt.werkstoffgesetz import (
+    BLOCKANTEIL, K_SIGMA_LATEX, Betongesetz, Spannungsblock, k_sigma,
+)
 
 if TYPE_CHECKING:
     from opencivil.core.rechenwerk import Loesung
@@ -779,11 +781,15 @@ def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
             "Linie mit ihm darum weicher als der Querschnitt; ihr Ende ist der "
             "Widerstand mit dem Block.")
     else:
-        k_sigma = w.zahl("k_sigma", r"k_{\sigma}", E_c_eff.groesse.si / (400.0 * ein("f_c").groesse.si),
-                         stellen=2)
-        p.formel(k_sigma, r"\frac{@E_c_eff}{400 \cdot @f_c}",
-                 {"E_c_eff": E_c_eff, "f_c": ein("f_c")},
+        k = w.zahl("k_sigma", r"k_{\sigma}", k_sigma(E_c_eff.groesse.si, ein("f_c").groesse.si),
+                   stellen=2)
+        p.formel(k, K_SIGMA_LATEX, {"E_c": E_c_eff, "f_c": ein("f_c")},
                  titel="Beiwert der Parabel, mit dem wirksamen Modul")
+        p.erklaerung(
+            "Unter 1 rechnet die Parabel k_σ nicht: dort hätte ihr Nenner im "
+            "ansteigenden Ast eine Nullstelle. So weit kommt es mit dem kriechweichen "
+            "Modul und charakteristischen Werten; mit k_σ = 1 ist der Beton bis f_c "
+            "bei ε_c1d linear.")
         p.ansatz(Betongesetz(f_cd=0.0, eps_c1d=eps_c1d.groesse.si,
                              eps_c2d=eps_c2d.groesse.si, k_sigma=0.0).latex(),
                  titel="Beton gerissen: Parabel-Rechteck")

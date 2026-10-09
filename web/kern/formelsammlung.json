@@ -1259,6 +1259,10 @@
         },
         {
           "art": "text",
+          "text": "Unter 1 rechnet die Parabel k_σ nicht: dort hätte ihr Nenner im ansteigenden Ast eine Nullstelle. So weit kommt es mit dem kriechweichen Modul und charakteristischen Werten; mit k_σ = 1 ist der Beton bis f_c bei ε_c1d linear."
+        },
+        {
+          "art": "text",
           "text": "Am Bruttoquerschnitt reisst der Rand, wenn N/A + M/W = f_ct,eff. Mit A = b·h und W = b·h²/6 hebt Druck das Rissmoment, Zug senkt es. Beim Rissmoment springt die Krümmung bei demselben Moment vom ungerissenen auf den gerissenen Wert."
         },
         {
@@ -1288,8 +1292,8 @@
         },
         {
           "art": "gleichung",
-          "latex": "k_{\\sigma} = \\frac{E_{c,eff}}{400 \\cdot f_{cd}}",
-          "markdown": "**Beiwert der Parabel, mit dem wirksamen Modul**\n\n$$\nk_{\\sigma} = \\frac{E_{c,eff}}{400 \\cdot f_{cd}}\n$$",
+          "latex": "k_{\\sigma} = \\max\\left(1;\\ \\frac{E_{c,eff}}{400 \\cdot f_{cd}}\\right)",
+          "markdown": "**Beiwert der Parabel, mit dem wirksamen Modul**\n\n$$\nk_{\\sigma} = \\max\\left(1;\\ \\frac{E_{c,eff}}{400 \\cdot f_{cd}}\\right)\n$$",
           "titel": "Beiwert der Parabel, mit dem wirksamen Modul",
           "referenz": "",
           "wert_id": "",
