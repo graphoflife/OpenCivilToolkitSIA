@@ -8,14 +8,14 @@
   <link rel="stylesheet" href="vendor/katex/katex.min.css">
   <script defer src="vendor/katex/katex.min.js"></script>
   <!-- Versionsmarken: geschrieben von «python3 -m opencivil.web.bruecke», nicht von Hand ändern -->
-  <link rel="stylesheet" href="./css/stil.css?v=5ccd5f01aae6">
+  <link rel="stylesheet" href="./css/stil.css?v=166af6f96316">
   <script type="importmap">
   {
     "imports": {
       "./js/ablage.js": "./js/ablage.js?v=a67aeb3de570",
       "./js/achsen.js": "./js/achsen.js?v=1c4193618329",
       "./js/api.js": "./js/api.js?v=bd0cbd757304",
-      "./js/app.js": "./js/app.js?v=f8893bd4f1d9",
+      "./js/app.js": "./js/app.js?v=b2a92b5fa1ef",
       "./js/baum.js": "./js/baum.js?v=0ca19cebb2d1",
       "./js/bausteine.js": "./js/bausteine.js?v=d03d866c30e1",
       "./js/bericht.js": "./js/bericht.js?v=208b60c64fb2",
@@ -103,7 +103,8 @@
     <div class="tafel-inhalt" id="baum"></div>
   </section>
 
-  <div class="griff" data-griff="links" role="separator" aria-orientation="vertical"></div>
+  <div class="griff" data-griff="links" role="separator" aria-orientation="vertical"
+       title="Breite des Projektbaums ziehen"></div>
 
   <!-- ---------------------------------------------------------------- -->
   <section class="tafel tafel-mitte" id="tafel-editor">
@@ -113,6 +114,9 @@
     </div>
     <div class="tafel-inhalt panelstapel" id="editor"></div>
   </section>
+
+  <div class="griff" data-griff="mitte" role="separator" aria-orientation="vertical"
+       title="Breite der Eingaben ziehen"></div>
 
   <!-- ---------------------------------------------------------------- -->
   <section class="tafel tafel-rechts" id="tafel-bericht">

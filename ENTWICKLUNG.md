@@ -44,6 +44,34 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-09 · Der Griff zwischen Eingaben und Berechnung ist zurück
+
+Wunsch: Die Panels behalten ihre feste Breite, aber ein Griff stellt ein, wie
+breit die mittlere und die rechte Tafel sind. In der mittleren stehen die
+Panels dann in der Mitte.
+
+* **Zwei Griffe:** Der linke verstellt den Baum, der rechte die Eingaben. Was
+  eine der beiden gewinnt, gibt die Berechnung her.
+* **Die Panels bleiben 420 px** und stehen in der Mitte der Tafel. Am
+  2026-10-08 war der rechte Griff weggefallen, weil die Panels links standen:
+  breiter gab nur leeren Platz am rechten Rand.
+* **Die Zeichnung der Querschnittsanalyse füllt die Tafel aus,** sobald man
+  am Griff gezogen hat. Bis dahin ist sie wie vorher halb so breit wie der
+  Platz rechts vom Baum.
+* **Grenzen:** Schmaler als ein Panel lässt sich die mittlere Tafel nicht
+  ziehen, es würde abgeschnitten. Die Berechnung bleibt mindestens 280 px
+  breit.
+* **Die Breite gilt bis zum Neuladen,** wie beim linken Griff.
+
+Nachgemessen bei 1600 px Fenster:
+* Ohne Ziehen sind die Eingaben 476 px breit, wie vorher.
+* 300 px nach rechts: 776 px. Die Panels stehen 150 px vom Rand, also in der
+  Mitte.
+* Ganz nach links: 476 px, nichts abgeschnitten. Ganz nach rechts: Die
+  Berechnung hat noch 280 px.
+* In der Analyse: Die Zeichnung ist 754 px breit, die übrigen Panels 420 px,
+  in der Mitte.
+
 ## 2026-10-08 · Querschnittsanalyse: ein CAD aus Knoten, Linien und Flächen
 
 Wunsch: das Koordinatenfenster als kleines schwebendes Fenster, ein CAD wie

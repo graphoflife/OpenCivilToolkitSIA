@@ -201,10 +201,12 @@ input.projektname:focus {
 
 /* Die mittlere Spalte ist so breit wie ihre Panels (`auto`), die rechte
    bekommt den Rest. Ein breiteres Fenster gibt also der Berechnung Platz,
-   nicht den Eingaben. */
+   nicht den Eingaben. Am Griff zwischen beiden zieht man die mittlere
+   breiter oder schmaler (`--breite-mitte`); die Panels stehen dann in ihrer
+   Mitte. */
 .raster {
   display: grid;
-  grid-template-columns: var(--breite-links) 5px auto 1fr;
+  grid-template-columns: var(--breite-links) 5px var(--breite-mitte, auto) 5px 1fr;
   height: calc(100vh - var(--kopfhoehe));
   /* dvh statt vh: auf dem Telefon zaehlt vh die Adressleiste mit, die beim
      Scrollen verschwindet -- die Tafel waere unten abgeschnitten und der
@@ -340,15 +342,18 @@ input.projektname:focus {
    nach der Tafel hätte ein breiteres Fenster sie wieder umgestellt. */
 .panelstapel {
   display: grid; grid-template-columns: minmax(0, var(--panelbreite));
-  justify-content: start; align-content: start;
+  justify-content: center; align-content: start;
   /* Die Rollleiste bekommt ihren Platz fest dazu. Sonst nähme sie ihn den
      Panels weg, sobald sie erscheint: die Spalte misst ihre Breite ohne sie. */
   scrollbar-gutter: stable;
 }
 /* Steht die Zeichnung im Stapel, ist er so breit wie sie; die anderen
-   Panels bleiben bei ihrer Breite. Schmaler als der Platz wird keines. */
+   Panels bleiben bei ihrer Breite, in der Mitte. Schmaler als der Platz
+   wird keines. Hat man die mittlere Tafel von Hand gezogen, füllt die
+   Zeichnung sie aus. */
 .panelstapel:has(> .feldgruppe.ist-breit) { grid-template-columns: minmax(0, var(--cadbreite)); }
-.panelstapel > .feldgruppe:not(.ist-breit) { width: 100%; max-width: var(--panelbreite); }
+.raster[data-mitte="gezogen"] .panelstapel:has(> .feldgruppe.ist-breit) { grid-template-columns: minmax(0, 1fr); }
+.panelstapel > .feldgruppe:not(.ist-breit) { width: 100%; max-width: var(--panelbreite); justify-self: center; }
 .feldgruppe {
   margin-bottom: 16px;
   border-left: 2px solid var(--rand);

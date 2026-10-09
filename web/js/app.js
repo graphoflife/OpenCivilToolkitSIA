@@ -256,52 +256,70 @@ async function berichtErzeugen() {
 const MINDESTBREITE = { links: 200, rechts: 280 };
 
 /**
- * Der Griff zwischen Projektbaum und Eingaben.
- *
- * Er verstellt nur den Baum. Die Eingaben sind so breit wie ihre Panels
- * (`.panelstapel` im Stilblatt) und rücken mit; was der Baum gewinnt, gibt
- * die Berechnung rechts her, die als `1fr` den Rest bekommt.
- *
- * Bis 2026-10-08 gab es einen zweiten Griff zwischen Eingaben und Berechnung,
- * und dieser hier nahm der mittleren Tafel, was er der linken gab -- die
- * rechte sollte bleiben, wo sie ist. Seit die Panels nicht mehr mit der Tafel
- * wachsen, hat die mittlere Tafel keine Breite mehr, die man ziehen könnte:
- * breiter gäbe nur leeren Platz, schmaler schnitte die Panels ab.
+ * Wie breit die mittlere Tafel mindestens sein muss, damit ein Panel ganz
+ * hineinpasst: ihre Breite ohne den Platz für Inhalt, plus ein Panel.
  */
-function griffEinrichten() {
+function mindestensMitte(mitte) {
+  const stapel = document.getElementById('editor');
+  const stil = getComputedStyle(stapel);
+  const innen = stapel.clientWidth - parseFloat(stil.paddingLeft) - parseFloat(stil.paddingRight);
+  const panel = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--panelbreite')) || 420;
+  return mitte - innen + panel;
+}
+
+/**
+ * Die zwei Griffe zwischen den Tafeln.
+ *
+ * Der linke verstellt den Baum, der rechte die Eingaben. Was eine der beiden
+ * gewinnt, gibt die Berechnung rechts her: sie bekommt als `1fr` den Rest.
+ *
+ * Die Panels der Eingaben behalten ihre Breite. Zieht man die mittlere
+ * Tafel breiter, stehen sie in ihrer Mitte; nur die Zeichnung der
+ * Querschnittsanalyse füllt sie dann aus (`data-mitte` am Raster).
+ * Schmaler als ein Panel lässt sie sich nicht ziehen -- es würde
+ * abgeschnitten. Solange niemand an diesem Griff war, ist sie so breit wie
+ * ihre Panels.
+ *
+ * Bis 2026-10-08 gab es den rechten Griff schon einmal. Er fiel weg, als die
+ * Panels nicht mehr mit der Tafel wuchsen: breiter gab nur leeren Platz am
+ * rechten Rand. Seit die Panels in der Mitte stehen, ist er wieder da.
+ */
+function griffeEinrichten() {
   const wurzel = document.documentElement;
-  const griff = document.querySelector('.griff');
-  if (!griff) return;
+  const raster = document.getElementById('raster');
 
-  griff.addEventListener('mousedown', (start) => {
-    start.preventDefault();
-    griff.classList.add('ist-aktiv');
+  for (const griff of document.querySelectorAll('.griff')) {
+    griff.addEventListener('mousedown', (start) => {
+      start.preventDefault();
+      griff.classList.add('ist-aktiv');
 
-    // Gemessen statt gerechnet: die rechte Tafel hat keine eigene Variable.
-    // Was tatsächlich auf dem Schirm steht, weiss nur das Layout selbst.
-    const tafeln = [...document.querySelectorAll('.tafel')]
-      .map((t) => t.getBoundingClientRect().width);
-    const tLinks = tafeln[0];
-    const tRechts = tafeln[tafeln.length - 1];
+      // Gemessen statt gerechnet: die rechte Tafel hat keine eigene Variable.
+      // Was tatsächlich auf dem Schirm steht, weiss nur das Layout selbst.
+      const [links, mitte, rechts] = [...document.querySelectorAll('.tafel')]
+        .map((t) => t.getBoundingClientRect().width);
 
-    // Wie weit der Griff nach links und rechts darf, bevor der Baum oder die
-    // Berechnung ihre Mindestbreite unterschreitet. Nie negativ: ist ohnehin
-    // kein Platz mehr, bewegt sich eben nichts.
-    const schrumpft = Math.max(0, tLinks - MINDESTBREITE.links);
-    const waechst = Math.max(0, tRechts - MINDESTBREITE.rechts);
+      // Wie weit der Griff nach links und rechts darf, bevor eine Tafel ihre
+      // Mindestbreite unterschreitet. Nie negativ: ist ohnehin kein Platz
+      // mehr, bewegt sich eben nichts.
+      const waechst = Math.max(0, rechts - MINDESTBREITE.rechts);
+      const mittig = griff.dataset.griff === 'mitte';
+      const breite = mittig ? mitte : links;
+      const schrumpft = Math.max(0, breite - (mittig ? mindestensMitte(mitte) : MINDESTBREITE.links));
 
-    const bewegen = (e) => {
-      const weg = Math.min(Math.max(e.clientX - start.clientX, -schrumpft), waechst);
-      wurzel.style.setProperty('--breite-links', `${tLinks + weg}px`);
-    };
-    const loslassen = () => {
-      griff.classList.remove('ist-aktiv');
-      document.removeEventListener('mousemove', bewegen);
-      document.removeEventListener('mouseup', loslassen);
-    };
-    document.addEventListener('mousemove', bewegen);
-    document.addEventListener('mouseup', loslassen);
-  });
+      const bewegen = (e) => {
+        const weg = Math.min(Math.max(e.clientX - start.clientX, -schrumpft), waechst);
+        if (mittig) raster.dataset.mitte = 'gezogen';
+        wurzel.style.setProperty(mittig ? '--breite-mitte' : '--breite-links', `${breite + weg}px`);
+      };
+      const loslassen = () => {
+        griff.classList.remove('ist-aktiv');
+        document.removeEventListener('mousemove', bewegen);
+        document.removeEventListener('mouseup', loslassen);
+      };
+      document.addEventListener('mousemove', bewegen);
+      document.addEventListener('mouseup', loslassen);
+    });
+  }
 }
 
 /**
@@ -569,7 +587,7 @@ async function starten() {
     k.addEventListener('click', () => aendern({ umfang: k.dataset.umfang }, 'umfang'));
   }
 
-  griffEinrichten();
+  griffeEinrichten();
   tafelwahlEinrichten();
   ablageEinrichten(imBrowserAblegen);
   horchen(allesZeichnen);
