@@ -1244,6 +1244,103 @@
           "gruppe": ""
         }
       ]
+    },
+    {
+      "thema": "Spannung-Dehnung-Analyse",
+      "art": "querschnitt",
+      "bloecke": [
+        {
+          "art": "text",
+          "text": "Eine Spannung-Dehnung-Analyse hält nichts gegen etwas: sie zeigt, was der Querschnitt tut. Gerechnet wird mit dem Faserintegral der Nachweise und mit der Kriechzahl, dem Wertesatz und dem Betongesetz, die die Analyse wählt. Ohne eigene Kriechzahl gilt die der Platte."
+        },
+        {
+          "art": "text",
+          "text": "Ungerissen (Zustand I) trägt der Beton Druck und Zug, linear mit E_c,eff und ohne Grenze: gebraucht wird hier die Steifigkeit, und wo der Querschnitt reisst, sagt die Rissbedingung am Bruttoquerschnitt. Gerissen (Zustand II) trägt er keinen Zug mehr, und im Druck gilt das gewählte Betongesetz."
+        },
+        {
+          "art": "text",
+          "text": "Am Bruttoquerschnitt reisst der Rand, wenn N/A + M/W = f_ct,eff. Mit A = b·h und W = b·h²/6 hebt Druck das Rissmoment, Zug senkt es. Beim Rissmoment springt die Krümmung bei demselben Moment vom ungerissenen auf den gerissenen Wert."
+        },
+        {
+          "art": "text",
+          "text": "Der Fliessbeginn ist der Punkt, an dem die am stärksten gezogene Lage die Fliessdehnung erreicht. Danach wächst die Kraft nur noch wenig: die Druckzone wird kleiner, der Hebelarm grösser, und der Beton füllt sein Gesetz, bis eine Grenzdehnung erreicht ist."
+        },
+        {
+          "art": "text",
+          "text": "Den gerissenen Teil rechnet die Linie über die Verformung, nicht über die Kraft: zu jeder Krümmung (bei der N-ε-Linie: zu jeder Dehnung) wird die Ebene gesucht, die die festgehaltene Grösse trägt. Sie endet bei der grössten Verformung, zu der es noch ein Gleichgewicht gibt – dort ist die erste Grenzdehnung erreicht. Es sind dieselben Grenzen wie im Dehnungsfächer der genauen M-N-Linie."
+        },
+        {
+          "art": "text",
+          "text": "Der Spannungsblock ist ein Modell für den Bruch: unter (1 − 0.85)·ε_c2d trägt der Beton darin nichts. Über dem Riss ist die Linie mit ihm darum weicher als der Querschnitt; ihr Ende ist der Widerstand mit dem Block."
+        },
+        {
+          "art": "text",
+          "text": "Dieselbe Rissbedingung, nach der Normalkraft aufgelöst: beim Moment M reisst der Querschnitt, wenn die Zugkraft N_Riss erreicht. Dort springt die Dehnung bei derselben Kraft vom ungerissenen auf den gerissenen Wert."
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\sigma_c = E_{c,eff} \\cdot \\varepsilon_c",
+          "markdown": "**Beton ungerissen, in Druck und Zug**\n\n$$\n\\sigma_c = E_{c,eff} \\cdot \\varepsilon_c\n$$",
+          "titel": "Beton ungerissen, in Druck und Zug",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "k_{\\sigma} = \\frac{E_{c,eff}}{400 \\cdot f_{cd}}",
+          "markdown": "**Beiwert der Parabel, mit dem wirksamen Modul**\n\n$$\nk_{\\sigma} = \\frac{E_{c,eff}}{400 \\cdot f_{cd}}\n$$",
+          "titel": "Beiwert der Parabel, mit dem wirksamen Modul",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "M_{Riss}(N) = M_{Riss} - N \\cdot \\frac{h}{6}",
+          "markdown": "**Rissmoment bei der Normalkraft**\n\n$$\nM_{Riss}(N) = M_{Riss} - N \\cdot \\frac{h}{6}\n$$",
+          "titel": "Rissmoment bei der Normalkraft",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\varepsilon_{c,Rand} \\ge -\\varepsilon_{c2d} \\qquad -\\varepsilon_{ud} \\le \\varepsilon_{s,i} \\le \\varepsilon_{ud} \\qquad \\varepsilon\\left(z_C\\right) \\ge -\\varepsilon_{c1d}, \\quad z_C = h \\cdot \\left(1 - \\frac{\\varepsilon_{c1d}}{\\varepsilon_{c2d}}\\right)",
+          "markdown": "**Grenzdehnungen am Ende der Linie**\n\n$$\n\\varepsilon_{c,Rand} \\ge -\\varepsilon_{c2d} \\qquad -\\varepsilon_{ud} \\le \\varepsilon_{s,i} \\le \\varepsilon_{ud} \\qquad \\varepsilon\\left(z_C\\right) \\ge -\\varepsilon_{c1d}, \\quad z_C = h \\cdot \\left(1 - \\frac{\\varepsilon_{c1d}}{\\varepsilon_{c2d}}\\right)\n$$",
+          "titel": "Grenzdehnungen am Ende der Linie",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\chi_{u} = \\frac{\\varepsilon_{unten} - \\varepsilon_{oben}}{h}",
+          "markdown": "**Grösste Krümmung**\n\n$$\n\\chi_{u} = \\frac{\\varepsilon_{unten} - \\varepsilon_{oben}}{h}\n$$",
+          "titel": "Grösste Krümmung",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "N_{Riss}(M) = f_{ct,eff} \\cdot b \\cdot h - \\frac{6 \\cdot \\left|M\\right|}{h}",
+          "markdown": "**Rissnormalkraft beim Moment**\n\n$$\nN_{Riss}(M) = f_{ct,eff} \\cdot b \\cdot h - \\frac{6 \\cdot \\left|M\\right|}{h}\n$$",
+          "titel": "Rissnormalkraft beim Moment",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\varepsilon_{m,u} = \\frac{\\varepsilon_{oben} + \\varepsilon_{unten}}{2}",
+          "markdown": "**Grösste Dehnung auf halber Höhe**\n\n$$\n\\varepsilon_{m,u} = \\frac{\\varepsilon_{oben} + \\varepsilon_{unten}}{2}\n$$",
+          "titel": "Grösste Dehnung auf halber Höhe",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        }
+      ]
     }
   ]
 }

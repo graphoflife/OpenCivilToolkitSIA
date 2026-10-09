@@ -227,19 +227,49 @@ def _analyse_dict(analyse) -> dict:
             "titel": analyse.art.beschriftung}
     if not analyse.moeglich:
         return {**kopf, "moeglich": False, "hinweis": analyse.hinweis}
+    paar = analyse.paar
+    # Womit gerechnet wurde -- die Kriechzahl auch dann, wenn sie die der
+    # Platte ist: so steht die Zahl beim Bild, die wirklich galt.
+    kopf["wahl"] = {"phi": paar.phi, "phi_eigen": paar.phi_eigen,
+                    "satz": paar.satz.value, "gesetz": paar.gesetz}
     if analyse.kurve is not None:
-        kurve = analyse.kurve
-        riss = kurve.riss
-        return {**kopf, "moeglich": True, "kurve": {
-            "N": kurve.N / 1e3, "M_Riss": kurve.M_Riss / 1e3,
-            "M_Rd": kurve.M_Rd / 1e3, "hinweis": kurve.hinweis,
-            "punkte": [{"M": p.M / 1e3, "chi": p.chi, "gerissen": p.gerissen,
-                        "chi_I": p.chi_I, "chi_II": p.chi_II}
-                       for p in kurve.punkte],
-            # Der Sprung beim Reissen: dasselbe Moment, zwei Kruemmungen.
-            "riss": (None if riss is None else
-                     {"M": riss[0].M / 1e3, "chi_vor": riss[0].chi, "chi_nach": riss[1].chi})}}
+        return {**kopf, "moeglich": True, "kurve": _linie_dict(analyse.kurve)}
     return {**kopf, "moeglich": True, "bild": _bild_dict(analyse.bild, analyse.h)}
+
+
+def _linie_dict(linie) -> dict:
+    """
+    Eine Linie in Zeichengroessen: die Kraft in kNm bzw. kN, die Verformung
+    als Kruemmung in 1/m bzw. als Dehnung in Promille.
+    """
+    pro_mille = linie.art is spannungsanalyse.Analyseart.NORMALKRAFT_DEHNUNG
+    v = 1e3 if pro_mille else 1.0
+
+    def verformung(x: Optional[float]) -> Optional[float]:
+        return None if x is None else x * v
+
+    def eck(e) -> Optional[dict]:
+        return None if e is None else {"kraft": e.kraft / 1e3, "verformung": e.verformung * v}
+
+    sprung = linie.sprung
+    bruch = linie.bruch
+    return {
+        "fest": linie.fest / 1e3, "riss": linie.riss / 1e3,
+        "punkte": [{"kraft": p.kraft / 1e3, "verformung": p.verformung * v,
+                    "gerissen": p.gerissen, "verformung_I": verformung(p.verformung_I),
+                    "verformung_II": verformung(p.verformung_II)}
+                   for p in linie.punkte],
+        # Der Sprung beim Reissen: dieselbe Kraft, zwei Verformungen.
+        "sprung": (None if sprung is None else
+                   {"kraft": sprung[0].kraft / 1e3, "vor": sprung[0].verformung * v,
+                    "nach": sprung[1].verformung * v}),
+        "fliessen": eck(linie.fliessen),
+        "bruch": (None if bruch is None else
+                  {**eck(bruch), "eps_oben": bruch.eps_oben * 1e3,
+                   "eps_unten": bruch.eps_unten * 1e3, "massgebend": bruch.massgebend}),
+        "tragfaehig": linie.tragfaehig,
+        "hinweis": linie.hinweis,
+    }
 
 
 def werkstoffgesetze(aufbau: Aufbau, loesung: Loesung) -> dict:

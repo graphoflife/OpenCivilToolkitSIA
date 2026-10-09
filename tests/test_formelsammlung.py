@@ -55,7 +55,8 @@ class TestFormelsammlung(unittest.TestCase):
         art = {t.name: t.art for t in self.alle}
         self.assertEqual(art["Beton"], "beton")
         self.assertEqual(art["Betonstahl"], "betonstahl")
-        for name in ("Querschnitt", "Biegung und Normalkraft", "Querkraft", "Knicken"):
+        for name in ("Querschnitt", "Biegung und Normalkraft", "Querkraft", "Knicken",
+                     "Spannung-Dehnung-Analyse"):
             with self.subTest(thema=name):
                 self.assertEqual(art[name], "querschnitt")
         for name in ("Querschnittsanalyse", "Schiefe Biegung", "Querkraft und Torsion",
@@ -64,6 +65,19 @@ class TestFormelsammlung(unittest.TestCase):
                 self.assertEqual(art[name], "querschnittsanalyse")
         self.assertEqual({t["art"] for t in api.formelsammlung_liste(self.alle)},
                          {"beton", "betonstahl", "querschnitt", "querschnittsanalyse"})
+
+    def test_die_linien_der_analysen_stehen_darin(self):
+        """
+        Keine Nachweise, aber gerechnet wie sie: wie die M-χ- und die
+        N-ε-Linie entstehen und wo sie enden, bis zur grössten Krümmung.
+        """
+        thema = next(t for t in self.alle if t.name == "Spannung-Dehnung-Analyse")
+        latex = " ".join(f.latex for f in thema.formeln)
+        for teil in (r"\chi_{u} =", r"\varepsilon_{m,u} =", r"M_{Riss}(N) =",
+                     r"N_{Riss}(M) =", r"\varepsilon_{c2d}"):
+            with self.subTest(teil=teil):
+                self.assertIn(teil, latex)
+        self.assertTrue(any("grössten Verformung" in e.text for e in thema.erklaerungen))
 
     def test_die_erklaerungen_wandern_aus_der_herleitung(self):
         """Im Bericht unter «Verwendete Formeln»: die Erklärungen dieses Laufs, alle."""

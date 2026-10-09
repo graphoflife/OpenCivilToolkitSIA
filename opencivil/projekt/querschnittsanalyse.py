@@ -45,15 +45,11 @@ from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.platte import ALPHA_MAX, ALPHA_MIN, K_C
 from opencivil.querschnitt import vorlagen
-from opencivil.projekt.eintraege import Beschreibung, eindeutig
+from opencivil.projekt.eintraege import (
+    BETONGESETZE, WERKSTOFFSAETZE, Beschreibung, eindeutig,
+)
 from opencivil.projekt.lesen import ProjektFehler, pflichtfeld, zahl
 from opencivil.projekt.netz import Netz, naechste_kennung
-
-#: Wie die Rechenwerte eines Werkstoffs heissen koennen.
-WERKSTOFFSAETZE = ("bemessung", "charakteristisch")
-
-#: Welche Spannungs-Dehnungs-Beziehung der Beton haben kann.
-BETONGESETZE = ("parabel", "block")
 
 #: Schnitte eines Buegels durch eine Schubwand: so viele Schenkel kreuzen sie.
 SCHNITTE = range(1, 9)

@@ -321,6 +321,18 @@ class QuerschnittEintrag(Beschreibung):
         self.knickfaelle.append(eintrag)
         return eintrag
 
+    def spannungsfall(self, name: str, *, art: str = "schnittgroessen",
+                      **felder: Any) -> SpannungsfallEintrag:
+        """
+        Eine Spannung-Dehnung-Analyse -- Felder wie im Eintrag, in kN, kNm und
+        Promille. Gelesen wie aus einer Datei, also mit denselben Pruefungen:
+        eine Art oder ein Betongesetz, das es nicht gibt, meldet sich hier.
+        """
+        eintrag = SpannungsfallEintrag.aus_dict(
+            SpannungsfallEintrag(name=name, art=art, **felder).als_dict())
+        self.spannungsfaelle.append(eintrag)
+        return eintrag
+
 
     @classmethod
     def neu(cls, kennung: str, name: str, beton: str, stahl: str,

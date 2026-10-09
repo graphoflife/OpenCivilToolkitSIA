@@ -28,6 +28,17 @@ from opencivil.querschnitt.platte import (
 from opencivil.projekt.lesen import (
     ProjektFehler, nur_x, pflichtfeld, sorten, vorgabe, zahl,
 )
+from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
+from opencivil.spannungsanalyse import Analyseart
+
+#: Mit welchen Festigkeiten ein Werkstoffgesetz rechnen kann, siehe
+#: :class:`~opencivil.nachweis.querschnittsloeser.Werkstoffsatz`. Gewaehlt in
+#: der Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse.
+WERKSTOFFSAETZE = tuple(s.value for s in Werkstoffsatz)
+
+#: Welche Spannungs-Dehnungs-Beziehung der Beton haben kann: Parabel-Rechteck
+#: oder der Spannungsblock 0.85·x.
+BETONGESETZE = ("parabel", "block")
 
 
 # ===========================================================================
@@ -377,13 +388,19 @@ class SpannungsfallEintrag(Beschreibung):
 
     Es wird nichts gegen etwas gehalten: kein Erfuellungsgrad, kein Urteil.
     Gefragt wird, was im Querschnitt geschieht, und je nach :attr:`art` von
-    der einen oder der anderen Seite -- aus Schnittgroessen, aus Dehnungen
-    oder als ganze Momenten-Kruemmungs-Linie.
+    der einen oder der anderen Seite -- aus Schnittgroessen, aus Dehnungen,
+    als Momenten-Kruemmungs- oder als Normalkraft-Dehnungs-Linie.
+
+    Womit gerechnet wird, waehlt jede Analyse fuer sich: die Kriechzahl, den
+    Wertesatz und das Betongesetz. Fehlen die Angaben -- in Dateien von
+    vorher --, gilt, was vorher galt: die Kriechzahl der Platte,
+    Bemessungswerte, die Parabel.
     """
 
     name: str
     art: str = "schnittgroessen"
-    """``schnittgroessen``, ``dehnungen`` oder ``moment_kruemmung``."""
+    """``schnittgroessen``, ``dehnungen``, ``moment_kruemmung`` oder
+    ``normalkraft_dehnung`` -- siehe :class:`~opencivil.spannungsanalyse.Analyseart`."""
 
     richtung: str = "x"
     """Welche Bewehrung zaehlt. Hier keine Wahl ``beide``: ein Bild zeigt
@@ -393,24 +410,51 @@ class SpannungsfallEintrag(Beschreibung):
     """in kN, Zug positiv -- fuer ``schnittgroessen`` und ``moment_kruemmung``."""
 
     M_Ed: float = 0.0
-    """in kNm -- nur fuer ``schnittgroessen``."""
+    """in kNm -- fuer ``schnittgroessen`` und ``normalkraft_dehnung``."""
 
     eps_oben: float = -1.0
     eps_unten: float = 2.0
     """Randdehnungen in Promille -- nur fuer ``dehnungen``."""
 
+    kriechzahl: Optional[float] = None
+    """Die Kriechzahl φ dieser Analyse -- ``None``: die der Platte."""
+
+    werkstoffsatz: str = WERKSTOFFSAETZE[0]
+    """``bemessung`` (f_cd, f_yd) oder ``charakteristisch`` (f_ck, f_yk)."""
+
+    betongesetz: str = BETONGESETZE[0]
+    """``parabel`` (Parabel-Rechteck) oder ``block`` (Spannungsblock 0.85·x)."""
+
     aktiv: bool = True
 
     @classmethod
     def aus_dict(cls, d: Mapping[str, Any]) -> "SpannungsfallEintrag":
+        name = pflichtfeld(d, "name", "Eine Spannungsanalyse")
+        wo = f"Spannung-Dehnung-Analyse '{name}'"
+
+        def gewaehlt(feld: str, vorgabe: str, moeglich) -> str:
+            wert = str(d.get(feld) or vorgabe)
+            if wert not in moeglich:
+                raise ProjektFehler(f"{wo}: «{wert}» gibt es als {feld} nicht. "
+                                    f"Möglich sind: {', '.join(moeglich)}.")
+            return wert
+
+        kriechzahl = None
+        if d.get("kriechzahl") not in (None, ""):
+            kriechzahl = zahl(d, "kriechzahl", 0.0)
+            if kriechzahl < 0.0:
+                raise ProjektFehler(f"{wo}: die Kriechzahl kann nicht negativ sein.")
         return cls(
-            name=pflichtfeld(d, "name", "Eine Spannungsanalyse"),
-            art=str(d.get("art") or cls.art),
+            name=name,
+            art=gewaehlt("art", cls.art, tuple(a.value for a in Analyseart)),
             richtung=str(d.get("richtung") or cls.richtung),
             N_Ed=zahl(d, "N_Ed", cls.N_Ed),
             M_Ed=zahl(d, "M_Ed", cls.M_Ed),
             eps_oben=zahl(d, "eps_oben", cls.eps_oben),
             eps_unten=zahl(d, "eps_unten", cls.eps_unten),
+            kriechzahl=kriechzahl,
+            werkstoffsatz=gewaehlt("werkstoffsatz", cls.werkstoffsatz, WERKSTOFFSAETZE),
+            betongesetz=gewaehlt("betongesetz", cls.betongesetz, BETONGESETZE),
             aktiv=bool(d.get("aktiv", cls.aktiv)),
         )
 

@@ -152,15 +152,21 @@ def vollstaendig() -> List[Thema]:
     die Grenzkraftsuche beim Knicken schreibt keine eigene Formel, und ganz
     stille Nachweise schreiben nichts -- dieselbe Sammlung, Zeichen fuer
     Zeichen, in einem Zehntel der Zeit.
+
+    Dazu die Spannung-Dehnung-Analysen: sie sind kein Nachweis und laufen
+    nicht im Rechenwerk, schreiben aber ebenso auf, wie ihre Linien entstehen.
     """
     # Erst hier: das Paket projekt laedt beim Import den Bericht und damit
     # dieses Modul.
+    from opencivil import spannungsanalyse
     from opencivil.projekt import Projekt
 
     protokoll = Protokoll()
     for projekt in (Projekt.beispiel(), Projekt.jeder_nachweis()):
         aufbau = projekt.aufbauen(schnell=True)
-        protokoll.anfuegen(*aufbau.werk.loese(*aufbau.alle_ziele()).protokoll.bloecke)
+        loesung = aufbau.werk.loese(*aufbau.alle_ziele())
+        protokoll.anfuegen(*loesung.protokoll.bloecke)
+        spannungsanalyse.analysen(aufbau, loesung, protokoll)
     return formelsammlung(protokoll)
 
 

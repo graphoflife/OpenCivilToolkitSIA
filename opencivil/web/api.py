@@ -43,16 +43,29 @@ from opencivil.projekt import (
     BEIDE_RICHTUNGEN, RISSANFORDERUNGEN, Aufbau, GebrauchsfallEintrag, KnickEintrag,
     KombinationEintrag, MaterialEintrag, QuerschnittEintrag, SpannungsfallEintrag,
 )
+from opencivil.projekt.eintraege import BETONGESETZE, WERKSTOFFSAETZE
 from opencivil.projekt.querschnittsanalyse import (
-    BETONGESETZE, SCHNITTE, WERKSTOFFSAETZE, FlaecheEintrag, HilfslinieEintrag,
-    KnotenEintrag, QALastfallEintrag, QuerschnittsanalyseEintrag, SchubwandEintrag,
-    StabEintrag, StablinieEintrag, WerkstoffwahlEintrag,
+    SCHNITTE, FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QALastfallEintrag,
+    QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
+    WerkstoffwahlEintrag,
 )
 from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.vorlagen import VORLAGEN
 from opencivil.projekt.gleichungen import GleichungszeileEintrag
+from opencivil.spannungsanalyse import Analyseart
 from opencivil.web import diagrammdaten
+
+#: Die Wertesaetze und Betongesetze mit Beschriftung -- dieselben in der
+#: Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse.
+_WERKSTOFFSAETZE = [
+    {"wert": WERKSTOFFSAETZE[0], "beschriftung": "Bemessungswerte"},
+    {"wert": WERKSTOFFSAETZE[1], "beschriftung": "charakteristisch"},
+]
+_BETONGESETZE = [
+    {"wert": BETONGESETZE[0], "beschriftung": "Parabel-Rechteck"},
+    {"wert": BETONGESETZE[1], "beschriftung": "Spannungsblock 0.85·x"},
+]
 
 
 def endlich(daten: Any) -> Any:
@@ -151,14 +164,8 @@ def katalog() -> dict:
                 {"wert": Linienart.ANZAHL.value, "beschriftung": "Anzahl"},
                 {"wert": Linienart.TEILUNG.value, "beschriftung": "Teilung"},
             ],
-            "werkstoffsaetze": [
-                {"wert": WERKSTOFFSAETZE[0], "beschriftung": "Bemessungswerte"},
-                {"wert": WERKSTOFFSAETZE[1], "beschriftung": "charakteristisch"},
-            ],
-            "betongesetze": [
-                {"wert": BETONGESETZE[0], "beschriftung": "Parabel-Rechteck"},
-                {"wert": BETONGESETZE[1], "beschriftung": "Spannungsblock 0.85·x"},
-            ],
+            "werkstoffsaetze": _WERKSTOFFSAETZE,
+            "betongesetze": _BETONGESETZE,
             "schnitte": list(SCHNITTE),
             # Die Vorlagen mit ihren Massen -- und je eine Skizze nach
             # Vorgabe fuer das Bildchen auf ihrem Knopf.
@@ -169,6 +176,13 @@ def katalog() -> dict:
                  "skizze": v.bauen().als_dict()}
                 for v in VORLAGEN
             ],
+        },
+        # Die Fragen der Spannung-Dehnung-Analyse und was jede waehlt.
+        "spannungsanalyse": {
+            "arten": [{"wert": a.value, "beschriftung": a.kurz, "titel": a.beschriftung}
+                      for a in Analyseart],
+            "werkstoffsaetze": _WERKSTOFFSAETZE,
+            "betongesetze": _BETONGESETZE,
         },
         # `fliessnachweis` sagt, ob diese Anforderung den Nachweis gegen
         # das Fliessen unter haeufiger Einwirkung ueberhaupt verlangt -- bei

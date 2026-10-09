@@ -232,6 +232,28 @@ class Dehnungsgrenzen:
         oben = min(g.eps_max - chi * g.arm for g in self.grenzen)
         return (unten, oben) if unten <= oben else None
 
+    def kruemmungsfenster(self, eps_m: float) -> Optional[Tuple[float, float]]:
+        """
+        In welchem Bereich ``chi`` liegen darf, damit an keiner Grenze die
+        Dehnung aus ihrem Bereich faellt -- bei dieser Dehnung ``eps_m`` im
+        Bezugspunkt. Das Gegenstueck zu :meth:`fenster`, fuer Linien, die
+        ueber die Dehnung statt ueber die Kruemmung laufen.
+
+        Unbegrenzt bleibt eine Seite nie: dafuer sorgen zwei Grenzen auf
+        verschiedenen Seiten des Bezugspunkts, und jeder Querschnitt hat zwei
+        Raender.
+        """
+        unten, oben = -math.inf, math.inf
+        for g in self.grenzen:
+            tief, hoch = g.eps_min - eps_m, g.eps_max - eps_m
+            if g.arm > 0.0:
+                unten, oben = max(unten, tief / g.arm), min(oben, hoch / g.arm)
+            elif g.arm < 0.0:
+                unten, oben = max(unten, hoch / g.arm), min(oben, tief / g.arm)
+            elif not tief <= 0.0 <= hoch:
+                return None
+        return (unten, oben) if unten <= oben else None
+
     def kruemmungsgrenze(self, *, positiv: bool) -> float:
         """
         Die groesste Kruemmung (als Betrag), bei der noch ein Fenster bleibt.

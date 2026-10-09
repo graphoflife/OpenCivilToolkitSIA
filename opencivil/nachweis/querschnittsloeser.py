@@ -220,6 +220,13 @@ class Querschnittsloeser:
     und dort findet die Bisektion Scheinloesungen. Die Vorgaben passen zu
     :func:`beton_nichtlinear` und :func:`stahl_bilinear`; wer sie weitet, muss
     die Gesetze mitweiten.
+
+    Ohne ``grenzen`` gelten beide Werte an beiden Raendern. Wer andere
+    Grenzen braucht -- die Spannung-Dehnung-Analyse die des Dehnungsfaechers,
+    mit ``eps_ud`` am Stahl statt am Betonrand --, gibt sie mit.
+    ``gemittelt`` laesst ein Gesetz, das springt (der Spannungsblock), ueber
+    jede Faser mitteln statt in ihrer Mitte lesen: sonst springt mit ihm die
+    Normalkraft, und keine Ebene trifft sie genau.
     """
 
     def __init__(
@@ -233,6 +240,8 @@ class Querschnittsloeser:
         fasern: int = FASERN,
         eps_druck: float = EPS_DRUCK,
         eps_zug: float = EPS_ZUG,
+        grenzen: Optional[Sequence[Dehnungsgrenze]] = None,
+        gemittelt: bool = False,
     ) -> None:
         self.h = h
         self.b = b
@@ -251,12 +260,15 @@ class Querschnittsloeser:
             gruppen=[Fasergruppe(
                 gesetz=beton,
                 arme=tuple((i + 0.5) * dicke - h / 2.0 for i in range(fasern)),
-                flaechen=dicke * b)],
+                flaechen=dicke * b,
+                dicken=(dicke,) * fasern if gemittelt else None)],
             # Netto: der Stahl ersetzt den Beton an seiner Stelle.
             staebe=[Stab(arm=l.z - h / 2.0, flaeche=l.a_s, gesetz=stahl,
-                         verdraengt=beton) for l in self.lagen])
-        # Der gueltige Bereich der Gesetze gilt an beiden Raendern.
-        self.grenzen = Dehnungsgrenzen([
+                         verdraengt=beton, dicke=dicke if gemittelt else 0.0)
+                    for l in self.lagen])
+        # Der gueltige Bereich der Gesetze gilt an beiden Raendern -- wenn
+        # niemand andere Grenzen mitgibt.
+        self.grenzen = Dehnungsgrenzen(grenzen or [
             Dehnungsgrenze(arm=-h / 2.0, eps_min=-self.eps_druck, eps_max=self.eps_zug),
             Dehnungsgrenze(arm=h / 2.0, eps_min=-self.eps_druck, eps_max=self.eps_zug),
         ])
@@ -302,6 +314,44 @@ class Querschnittsloeser:
                 break
             mitte = 0.5 * (unten + oben)
             if self.kraefte(mitte, chi).N < N_ziel:
+                unten = mitte
+            else:
+                oben = mitte
+        return 0.5 * (unten + oben)
+
+    def mitteldehnung(self, chi: float, N: float) -> Optional[float]:
+        """
+        Die Dehnung auf halber Hoehe, bei der die Ebene mit der Kruemmung
+        ``chi`` die Normalkraft ``N`` traegt -- ``None``, wo es keine gibt.
+        Fuer Linien, die ueber die Kruemmung laufen statt ueber das Moment.
+        """
+        return self._eps_zu_normalkraft(chi, N)
+
+    def kruemmung(self, eps_m: float, M: float) -> Optional[float]:
+        """
+        Die Kruemmung, bei der die Ebene mit der Dehnung ``eps_m`` auf halber
+        Hoehe das Moment ``M`` traegt -- ``None``, wo es keine gibt.
+
+        Bei fester Dehnung waechst das Moment mit der Kruemmung: die eine
+        Seite wird mehr gedehnt, die andere mehr gestaucht. Gesucht wird darum
+        wie in :meth:`_eps_zu_normalkraft` durch Halbieren, innerhalb dessen,
+        was die Grenzen bei dieser Dehnung zulassen.
+        """
+        fenster = self.grenzen.kruemmungsfenster(eps_m)
+        if fenster is None:
+            return None
+        unten, oben = fenster
+        rand = self.grenzen.kruemmungsgrenze(positiv=True)
+        unten, oben = max(unten, -self.grenzen.kruemmungsgrenze(positiv=False)), min(oben, rand)
+        if unten > oben:
+            return None
+        if self.kraefte(eps_m, unten).M > M or self.kraefte(eps_m, oben).M < M:
+            return None
+        for _ in range(SCHRITTE):
+            if oben - unten <= CHI_SCHRANKE:
+                break
+            mitte = 0.5 * (unten + oben)
+            if self.kraefte(eps_m, mitte).M < M:
                 unten = mitte
             else:
                 oben = mitte
@@ -449,9 +499,9 @@ class Werkstoffsatz(str, Enum):
     als Name und nicht als zwei Zahlen an jeder Aufrufstelle: welche Werte ein
     Nachweis ansetzt, ist eine Entscheidung, und eine Entscheidung soll man
     lesen koennen, statt sie aus ``f_sd=...`` erschliessen zu muessen. Jeder
-    Nutzer des Loesers nennt darum seinen Satz -- der Knicknachweis und die
-    Spannung-Dehnung-Analyse ``BEMESSUNG``, die Spannungsbegrenzung
-    ``CHARAKTERISTISCH``.
+    Nutzer des Loesers nennt darum seinen Satz -- der Knicknachweis
+    ``BEMESSUNG``, die Spannungsbegrenzung ``CHARAKTERISTISCH``; die
+    Spannung-Dehnung-Analyse waehlt ihn je Analyse.
     """
 
     BEMESSUNG = "bemessung"
