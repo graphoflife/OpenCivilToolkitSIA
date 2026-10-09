@@ -123,3 +123,33 @@ class TestBezuege(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestJederNachweis(unittest.TestCase):
+    """
+    Im Prüfprojekt «Jeder Nachweis» kommt jede Rechenart und jeder
+    Wertesatz einmal laut vor -- so steht jede Herleitung im Schnappschuss
+    und in der Formelsammlung.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        from opencivil.projekt import Projekt
+        cls.projekt = Projekt.jeder_nachweis()
+
+    def test_tragsicherheit_jede_rechenart_und_beide_werte(self):
+        wahlen = [q.tragsicherheit_wahl.wahl for q in self.projekt.querschnitte
+                  if q.kombinationen]
+        self.assertEqual({w.art for w in wahlen}, set(RECHENARTEN))
+        self.assertEqual({w.satz for w in wahlen}, set(Werkstoffsatz))
+
+    def test_stahlspannung_jede_rechenart(self):
+        arten = {liste.wahl.wahl.art for q in self.projekt.querschnitte
+                 for liste in (q.haeufig, q.quasistaendig) if liste.faelle}
+        self.assertEqual(arten, set(SPANNUNGSARTEN))
+
+    def test_knicken_mit_geteilter_und_eigener_linie(self):
+        aufbau = self.projekt.aufbauen()
+        self.assertEqual({k.eigene_linie for k in aufbau.knicken.values()}, {True, False})
+        self.assertEqual({k.verformung.art for k in aufbau.knicken.values()},
+                         {Rechenart.PARABEL, Rechenart.BLOCK})

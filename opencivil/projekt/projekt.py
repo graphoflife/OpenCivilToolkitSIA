@@ -23,7 +23,7 @@ from typing import Any, Dict, List, Mapping, Sequence, Union
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
 from opencivil.ergebnis import Ergebnis
 from opencivil.projekt.eintraege import (
-    Beschreibung, MaterialEintrag, PostenEintrag,
+    Beschreibung, MaterialEintrag, PostenEintrag, RechenwahlEintrag,
 )
 from opencivil.projekt.gleichungen import GleichungsblattEintrag, GleichungszeileEintrag
 from opencivil.projekt.lesen import ProjektFehler
@@ -443,6 +443,39 @@ class Projekt(Beschreibung):
         dach.quasistaendig.lastfall("Dauerlast", M_Ed=20)
         # Mit φ = 2 fliesst hier der Stahl -- der Fall soll laut bleiben.
         dach.quasistaendig.wahl.kriechzahl = 2.0
+
+        # Jede Rechenwahl einmal laut. Die Platte «Parabel» haelt die
+        # Tragsicherheit mit der Parabel und charakteristischen Werten -- M_Rk,
+        # m_Rk in der Querkraft, sproedes Versagen --, rechnet die
+        # Stahlspannungen mit Block und Parabel und knickt mit eigener
+        # Linie: Verformung mit dem Block, Widerstand von Hand.
+        genau = p.platte("Parabel", h=250, x=[12, 10], y=[10, 10],
+                         rissanforderung="erhoeht", sproede=True)
+        genau.tragsicherheit_wahl = RechenwahlEintrag(
+            kriechzahl=1.0, werkstoffsatz="charakteristisch", rechenart="parabel")
+        genau.einwirkung("Feld", M_Ed=60, N_Ed=-200, V_Ed=50)
+        genau.quasistaendig.lastfall("Dauerlast", M_Ed=30)
+        genau.quasistaendig.wahl = RechenwahlEintrag(
+            kriechzahl=1.0, werkstoffsatz="charakteristisch", rechenart="block")
+        genau.haeufig.lastfall("Gebrauch", M_Ed=45)
+        genau.haeufig.wahl = RechenwahlEintrag(
+            kriechzahl=2.0, werkstoffsatz="charakteristisch", rechenart="parabel")
+        genau.knickfall("Stütze", N_Ed=-600, M_Ed_1=10, laenge=3.0)
+        genau.knicken_wahl_verformung = RechenwahlEintrag(rechenart="block")
+        genau.knicken_wahl_widerstand = RechenwahlEintrag(rechenart="handrechnung")
+
+        # Die Platte «Block» haelt die Tragsicherheit mit dem Block genau,
+        # einmal bei festem Moment -- dort zeigt die Probe die Normalkraft --,
+        # rechnet die Stahlspannung von Hand und knickt gegen dieselbe Linie.
+        block = p.platte("Block", h=220, x=[10, 10], y=[8, 8])
+        block.tragsicherheit_wahl = RechenwahlEintrag(rechenart="block")
+        block.einwirkung("Feld", M_Ed=25, V_Ed=30)
+        block.einwirkung("Rand", M_Ed=-15, N_Ed=-100).art = "M_konstant"
+        block.quasistaendig.lastfall("Dauerlast", M_Ed=12)
+        block.quasistaendig.wahl = RechenwahlEintrag(
+            werkstoffsatz="charakteristisch", rechenart="handrechnung")
+        block.knickfall("Wand", N_Ed=-400, M_Ed_1=5, laenge=2.5)
+        block.knicken_wahl_widerstand = RechenwahlEintrag(rechenart="block")
 
         ohne = p.platte("Ohne x", h=250, x=[0, 0], y=[12, 12])
         ohne.einwirkung("Feld", M_Ed=30, V_Ed=20)

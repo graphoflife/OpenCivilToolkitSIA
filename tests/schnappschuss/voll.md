@@ -1,6 +1,6 @@
 # Voll
 
-116 Berechnungen ausgeführt, 252 Werte bestimmt.
+167 Berechnungen ausgeführt, 359 Werte bestimmt.
 
 ## Herleitung
 
@@ -2151,6 +2151,1391 @@ $$
 \alpha_{eff,\sigma,w,x,\text{Dauerlast}} = \frac{\varepsilon_{s,adm}}{\varepsilon_{s,x}} = \frac{2.5\,\text{‰}}{4.67\,\text{‰}} = 0.54
 $$
 
+### Plattenanalyse: Parabel
+
+**Plattendicke**
+
+$$
+h = 250\,\mathrm{mm}
+$$
+
+**Betrachtete Breite (x)**
+
+$$
+b = 1000\,\mathrm{mm}
+$$
+
+**Betrachtete Breite (y)**
+
+$$
+b_y = 1000\,\mathrm{mm}
+$$
+
+**Überdeckung unten**
+
+$$
+c_{nom,u} = 30\,\mathrm{mm}
+$$
+
+**Überdeckung oben**
+
+$$
+c_{nom,o} = 30\,\mathrm{mm}
+$$
+
+**Bewehrungsquerschnitt über die Breite b** *(SIA 262:2025, 5.5.2)*
+
+$$
+A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
+$$
+
+**Bewehrungsmass je Kubikmeter Beton**
+
+$$
+\mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{b \cdot h} = \frac{2325\,\mathrm{mm}^{2} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{1000\,\mathrm{mm} \cdot 250\,\mathrm{mm}} = 73\,\mathrm{kg}/\mathrm{m}^{3}
+$$
+
+**Höhe der Distanzhalter**
+
+$$
+\begin{aligned}
+  h_{Dist} &= \text{OK innere untere Lage} - \text{UK innere obere Lage} \\
+  &= 198\,\mathrm{mm} - 50\,\mathrm{mm} \\
+  &= 148\,\mathrm{mm}
+\end{aligned}
+$$
+
+**Randabstände, Tiefen ab Oberkante und Bewehrungsquerschnitte**
+
+| Bewehrung | Richtung | Stahl | $\varnothing\ [\mathrm{mm}]$ | $s\ [\mathrm{mm}]$ | Randabstand [mm] | $z\ [\mathrm{mm}]$ | $A_s\ [\mathrm{mm}^2]$ |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: |
+| 1. Lage Grundbewehrung | y | B500B | $10$ | $150$ | $35$ | $215$ | $524$ |
+| 2. Lage Grundbewehrung | x | B500B | $12$ | $150$ | $46$ | $204$ | $754$ |
+| 3. Lage Grundbewehrung | x | B500B | $10$ | $150$ | $45$ | $45$ | $524$ |
+| 4. Lage Grundbewehrung | y | B500B | $10$ | $150$ | $35$ | $35$ | $524$ |
+
+**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5)*
+
+$$
+\frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
+$$
+
+**Statische Höhe der x-Bewehrung unten**
+
+$$
+d_{u} = z_{2,x,g} = 204\,\mathrm{mm}
+$$
+
+**Bewehrungsgehalt unten**
+
+$$
+\rho_{u} = \frac{A_{s,2,x,g}}{b \cdot d_{u}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 204\,\mathrm{mm}} = 0.0037
+$$
+
+**Statische Höhe der x-Bewehrung oben**
+
+$$
+d_{o} = h - z_{3,x,g} = 250\,\mathrm{mm} - 45\,\mathrm{mm} = 205\,\mathrm{mm}
+$$
+
+**Bewehrungsgehalt oben**
+
+$$
+\rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{o}} = \frac{524\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 205\,\mathrm{mm}} = 0.00255
+$$
+
+**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5)*
+
+$$
+\begin{aligned}
+  \left(\frac{w}{w_c}\right)_{u} &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00255}{10 \cdot 0.0037^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{250\,\mathrm{mm}}{204\,\mathrm{mm}}\right)^{3} \\
+  &= 8.37
+\end{aligned}
+$$
+
+**Vergrösserungsfaktor, Zug oben** *(SIA 262:2025, 4.4.3.2.5)*
+
+$$
+\begin{aligned}
+  \left(\frac{w}{w_c}\right)_{o} &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{o}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.0037}{10 \cdot 0.00255^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{250\,\mathrm{mm}}{205\,\mathrm{mm}}\right)^{3} \\
+  &= 10.42
+\end{aligned}
+$$
+
+### Resistenzlinie aus Dehnungsebenen – x-Richtung
+
+**Rechenwahl**
+
+$$
+\varphi = 1 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Parabel}
+$$
+
+**Wirksamer Modul der Parabel**
+
+$$
+E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 1} = 16810\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Beiwert der Parabel, mit dem wirksamen Modul**
+
+$$
+k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{ck}}\right) = \max\left(1;\ \frac{16810\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 1.4
+$$
+
+**Werkstoffgesetze: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.6)*
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+$$
+
+**Werkstoffgesetze: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
+
+$$
+\sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & \varepsilon_s \ge 0 \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & \varepsilon_s < 0 \end{cases} \qquad |\varepsilon_s| \le \varepsilon_{ud}
+$$
+
+**Schnittgrössen aus der Spannungsverteilung**
+
+$$
+N = \int_A \sigma\,\mathrm{d}A \qquad M = \int_A \sigma \cdot \left(z - \tfrac{h}{2}\right)\,\mathrm{d}A
+$$
+
+**Berücksichtigte Bewehrungslagen**
+
+| Lage | $a_s\ [\mathrm{mm}^2]$ | $z\ [\mathrm{mm}]$ | $f_{yk}\ [\mathrm{N/mm^2}]$ |
+| :--- | ---: | ---: | ---: |
+| 2. Lage Grundbewehrung | $754$ | $204.0$ | $500$ |
+| 3. Lage Grundbewehrung | $524$ | $45.0$ | $500$ |
+
+#### Nachweis – Feld
+
+**Einwirkung**
+
+$$
+M_{Ed} = 60\,\mathrm{kNm} \qquad N_{Ed} = -200\,\mathrm{kN}
+$$
+
+**Bruchzustand bei N\_Ed = -200.0 kN – die Dehnungsebene**
+
+$$
+\varepsilon_{oben} = -3.5\,\text{‰} \qquad \varepsilon_{unten} = 24.155\,\text{‰}
+$$
+
+**Kräfte in diesem Bruchzustand – Zug positiv, z ab Oberkante**
+
+| Teil | $\varepsilon\ [‰]$ | $\sigma\ [\mathrm{N/mm^2}]$ | $A\ [\mathrm{mm}^2]$ | $F\ [\mathrm{kN}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Beton, Resultierende | $–$ | $–$ | $–$ | $-731.8$ | $12.6$ |
+| 2. Lage Grundbewehrung | $19.066$ | $500.0$ | $754$ | $377.0$ | $204.0$ |
+| 3. Lage Grundbewehrung | $1.478$ | $295.6$ | $524$ | $154.8$ | $45.0$ |
+
+**Probe: die Ebene trägt genau die Einwirkung**
+
+$$
+\sum F_i = -200\,\mathrm{kN} = N_{Ed}
+$$
+
+**Momentenwiderstand aus den Teilkräften**
+
+$$
+M_{Rk} = \sum F_i \cdot \left(z_i - \tfrac{h}{2}\right) = 99.6\,\mathrm{kNm}
+$$
+
+Massgebend: Beton am oberen Rand auf der Grenzdehnung.
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,x,\text{Feld}} = \frac{M_{Rk}}{M_{Ed}} = \frac{99.6\,\mathrm{kNm}}{60\,\mathrm{kNm}} = 1.66 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+### Querkraft – x-Richtung
+
+**Ansatz** *(SIA 262:2025, 4.3.3.2.1)*
+
+$$
+V_{Rd} = k_d \cdot \tau_{cd} \cdot d_v \qquad k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g}
+$$
+
+**Dekompressionsmoment und Dehnung**
+
+$$
+m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} \qquad \varepsilon_v = \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| - m_{Dd}\right)}{E_s \cdot \left(\left|m_{Rd}(N_{Ed})\right| - m_{Dd}\right)}
+$$
+
+**Grösstkorndurchmesser**
+
+$$
+D_{max} = 32\,\mathrm{mm}
+$$
+
+**Höhe der Einlage**
+
+$$
+e_{Einlage} = 0\,\mathrm{mm}
+$$
+
+**Beiwert der Gesteinskörnung** *(SIA 262:2025, 4.3.3.2.1)*
+
+$$
+\begin{aligned}
+  k_g &= \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right] \\
+  &= \max\left[1.20;\ \frac{48}{16 + 32 \cdot \min\left[1.0;\ \left(\frac{60}{30}\right)^{2}\right]}\right] \\
+  &= 1.2 \quad \left(D_{max}\ \text{in}\ \mathrm{mm},\ f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+\end{aligned}
+$$
+
+#### Querkraftnachweis – Feld
+
+**Einwirkung**
+
+$$
+V_{Ed} = 50\,\mathrm{kN}/\mathrm{m} \qquad M_{Ed} = 60\,\mathrm{kNm} \qquad N_{Ed} = -200\,\mathrm{kN}
+$$
+
+**Statische Höhe der Lage unten, ab dem gedrückten Rand oben**
+
+$$
+d = z_{2,x,g} = 204\,\mathrm{mm}
+$$
+
+**Wirksame Höhe (Einlage nicht massgebend)**
+
+$$
+d_v = d = 204\,\mathrm{mm}
+$$
+
+**Dekompressionsmoment**
+
+$$
+m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} = \frac{\left|\min(-200\,\mathrm{kN};\ 0)\right| \cdot 250\,\mathrm{mm}}{6} = 8.3\,\mathrm{kNm}
+$$
+
+**Momentenwiderstand bei N\_Ed = -200.0 kN**
+
+$$
+\varepsilon_{oben} = -3.5\,\text{‰} \qquad \varepsilon_{unten} = 24.155\,\text{‰}
+$$
+
+**Kräfte in diesem Bruchzustand – Zug positiv, z ab Oberkante**
+
+| Teil | $\varepsilon\ [‰]$ | $\sigma\ [\mathrm{N/mm^2}]$ | $A\ [\mathrm{mm}^2]$ | $F\ [\mathrm{kN}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Beton, Resultierende | $–$ | $–$ | $–$ | $-731.8$ | $12.6$ |
+| 2. Lage Grundbewehrung | $19.066$ | $500.0$ | $754$ | $377.0$ | $204.0$ |
+| 3. Lage Grundbewehrung | $1.478$ | $295.6$ | $524$ | $154.8$ | $45.0$ |
+
+**Probe: die Ebene trägt genau die Einwirkung**
+
+$$
+\sum F_i = -200\,\mathrm{kN} = N_{Ed}
+$$
+
+**Momentenwiderstand aus den Teilkräften**
+
+$$
+M_{Rk} = \sum F_i \cdot \left(z_i - \tfrac{h}{2}\right) = 99.6\,\mathrm{kNm}
+$$
+
+Massgebend: Beton am oberen Rand auf der Grenzdehnung.
+
+**Dehnung auf halber Höhe**
+
+$$
+\begin{aligned}
+  \varepsilon_v &= \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| - m_{Dd}\right)}{E_s \cdot \left(\left|m_{Rk}(N_{Ed})\right| - m_{Dd}\right)} \\
+  &= \frac{435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(\left|60\,\mathrm{kNm}\right| - 8.3\,\mathrm{kNm}\right)}{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(\left|99.6\,\mathrm{kNm}\right| - 8.3\,\mathrm{kNm}\right)} \\
+  &= 1.23\,\text{‰}
+\end{aligned}
+$$
+
+**Beiwert für die statische Höhe**
+
+$$
+k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g} = \frac{1}{1 + 1.23\,\text{‰} \cdot 204 \cdot 1.2} = 0.7685 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
+$$
+
+**Querkraftwiderstand** *(SIA 262:2025, 4.3.3.2.1)*
+
+$$
+\begin{aligned}
+  V_{Rd,x}(M_{Ed} = 60\,\mathrm{kNm},\ N_{Ed} = -200\,\mathrm{kN}) &= k_d \cdot \tau_{cd} \cdot d_v \\
+  &= 0.7685 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 204\,\mathrm{mm} \\
+  &= 171.7\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,V,x,\text{Feld}} = \frac{V_{Rd,x}}{V_{Ed,x}} = \frac{171.7\,\mathrm{kN}/\mathrm{m}}{50\,\mathrm{kN}/\mathrm{m}} = 3.43 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+### Sprödes Versagen – x-Richtung
+
+**Beiwert für die Plattendicke** *(SIA 262:2025, 4.4.1.3)*
+
+$$
+k_t = \frac{1}{1 + 0.5 \cdot h/3} = \frac{1}{1 + 0.5 \cdot 0.25/3} = 0.96 \quad \left(h\ \text{in}\ \mathrm{m}\right)
+$$
+
+**Wirksame Zugfestigkeit**
+
+$$
+f_{ct,eff} = k_t \cdot f_{ctm} = 0.96 \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} = 2.78\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Rissmoment des ungerissenen Querschnitts**
+
+$$
+M_{Riss} = f_{ct,eff} \cdot \frac{h^{2} \cdot b}{6} = 2.78\,\mathrm{N}/\mathrm{mm}^{2} \cdot \frac{\left(250\,\mathrm{mm}\right)^{2} \cdot 1000\,\mathrm{mm}}{6} = 29\,\mathrm{kNm}
+$$
+
+#### Sprödes Versagen – 2. Lage x
+
+**Biegewiderstand gegen Rissmoment**
+
+$$
+M_{Rk,x}(N_{Ed} = 0)_{2} = 81.3\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 29\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,SV,2,x} = \frac{M_{Rk,x}(N_{Ed} = 0)_{2}}{M_{Riss}} = \frac{81.3\,\mathrm{kNm}}{29\,\mathrm{kNm}} = 2.80
+$$
+
+#### Sprödes Versagen – 3. Lage x
+
+**Biegewiderstand gegen Rissmoment**
+
+$$
+M_{Rk,x}(N_{Ed} = 0)_{3} = 63.7\,\mathrm{kNm} \quad \ge \quad M_{Riss} = 29\,\mathrm{kNm} \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,SV,3,x} = \frac{M_{Rk,x}(N_{Ed} = 0)_{3}}{M_{Riss}} = \frac{63.7\,\mathrm{kNm}}{29\,\mathrm{kNm}} = 2.20
+$$
+
+Massgebend: 3. Lage (kleinster Erfüllungsgrad).
+
+### Stahlspannung unter quasi-ständiger Einwirkung – x-Richtung
+
+**Rechenwahl**
+
+$$
+\text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Block } 0.85 \cdot x \text{ genau}
+$$
+
+**Dickster Stab der Tragrichtung**
+
+$$
+\varnothing_{max} = 12\,\mathrm{mm}
+$$
+
+**Zulässige Stahlspannung (Rissbreite w\_nom = 0.5 mm)** *(SIA 262:2025, 4.4.2)*
+
+$$
+\begin{aligned}
+  \sigma_{s,adm} &= \min\left[\sqrt{\frac{9 \cdot E_s \cdot f_{ctm} \cdot w_{nom}}{\varnothing_{max}}};\ f_{yk}\right] \\
+  &= \min\left[\sqrt{\frac{9 \cdot 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.9\,\mathrm{N}/\mathrm{mm}^{2} \cdot 0.5\,\mathrm{mm}}{12\,\mathrm{mm}}};\ 500\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+  &= 466\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+$$
+
+#### Welche Werte angesetzt werden
+
+**Werkstoffgesetze im Gebrauchszustand: Beton, Spannungsblock 0.85·x**
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{ck} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \end{cases}
+$$
+
+**Werkstoffgesetze im Gebrauchszustand: Stahl**
+
+$$
+\sigma_s = \min\left[E_s \cdot \varepsilon_s;\ f_{yk}\right] \quad f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+#### Wie die Dehnungsebene gefunden wird
+
+**Dehnungsebene und innere Kräfte**
+
+$$
+\varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \frac{h}{2}\right) \qquad N_{int} = \int_A \sigma\left(\varepsilon\right)\,\mathrm{d}A \qquad M_{int} = \int_A \sigma\left(\varepsilon\right) \cdot \left(z - \frac{h}{2}\right)\,\mathrm{d}A
+$$
+
+#### Quasi-ständiger Lastfall – Dauerlast
+
+**Einwirkung**
+
+$$
+M_{Ed,\text{quasi-ständig}} = 30\,\mathrm{kNm} \qquad N_{Ed,\text{quasi-ständig}} = 0\,\mathrm{kN}
+$$
+
+**Gefundene Dehnungsebene**
+
+$$
+\varepsilon_m = 0.4069\,\text{‰} \qquad \chi = 0.00773\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
+$$
+
+**Probe: die Ebene erzeugt die Einwirkung**
+
+$$
+N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 30\,\mathrm{kNm} \;\checkmark
+$$
+
+**Grösste Zugspannung in der Bewehrung**
+
+$$
+\sigma_{s,x} = 203\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 466\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\sigma,w,x,\text{Dauerlast}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{466\,\mathrm{N}/\mathrm{mm}^{2}}{203\,\mathrm{N}/\mathrm{mm}^{2}} = 2.29
+$$
+
+### Stahlspannung unter häufiger Einwirkung – x-Richtung
+
+**Rechenwahl**
+
+$$
+\varphi = 2 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Parabel}
+$$
+
+**Wirksamer Elastizitätsmodul**
+
+$$
+E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Zulässige Stahlspannung** *(SIA 262:2025, Tabelle 17)*
+
+$$
+\sigma_{s,adm} = f_{yd} - 80\,\mathrm{N}/\mathrm{mm}^{2} = 435\,\mathrm{N}/\mathrm{mm}^{2} - 80\,\mathrm{N}/\mathrm{mm}^{2} = 355\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+#### Welche Werte angesetzt werden
+
+**Beiwert der Parabel, mit dem wirksamen Modul**
+
+$$
+k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{ck}}\right) = \max\left(1;\ \frac{11207\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 1
+$$
+
+**Werkstoffgesetze im Gebrauchszustand: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.6)*
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+$$
+
+**Werkstoffgesetze im Gebrauchszustand: Stahl**
+
+$$
+\sigma_s = \min\left[E_s \cdot \varepsilon_s;\ f_{yk}\right] \quad f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+#### Wie die Dehnungsebene gefunden wird
+
+**Dehnungsebene und innere Kräfte**
+
+$$
+\varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \frac{h}{2}\right) \qquad N_{int} = \int_A \sigma\left(\varepsilon\right)\,\mathrm{d}A \qquad M_{int} = \int_A \sigma\left(\varepsilon\right) \cdot \left(z - \frac{h}{2}\right)\,\mathrm{d}A
+$$
+
+#### Häufiger Lastfall – Gebrauch
+
+**Einwirkung**
+
+$$
+M_{Ed,häufig} = 45\,\mathrm{kNm} \qquad N_{Ed,häufig} = 0\,\mathrm{kN}
+$$
+
+**Gefundene Dehnungsebene**
+
+$$
+\varepsilon_m = 0.7643\,\text{‰} \qquad \chi = 0.01075\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
+$$
+
+**Probe: die Ebene erzeugt die Einwirkung**
+
+$$
+N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 45\,\mathrm{kNm} \;\checkmark
+$$
+
+**Grösste Zugspannung in der Bewehrung**
+
+$$
+\sigma_{s,x} = 323\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\sigma,x,\text{Gebrauch}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{323\,\mathrm{N}/\mathrm{mm}^{2}} = 1.10
+$$
+
+### Knicken
+
+**Ungewollte Ausmitte – allgemein** *(SIA 262:2025, 4.3.7)*
+
+$$
+\alpha_i = \min\left[\max\left(\frac{0.01}{\sqrt{l}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \qquad e_{0d} = \max\left(\frac{d}{30};\ \frac{\alpha_i \cdot l_{cr}}{2}\right)
+$$
+
+**Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein**
+
+$$
+e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| \qquad e_{2d} = \left|\chi\right| \cdot \frac{l_{cr}^{2}}{\pi^{2}} \qquad M_{Ed,II} = \left|N_{Ed}\right| \cdot \left(e_{0d} + e_{1d} + e_{2d}\right)
+$$
+
+#### Verformung
+
+**Rechenwahl – Verformung (e\_2d)**
+
+$$
+\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Block } 0.85 \cdot x \text{ genau}
+$$
+
+**Werkstoffgesetze der Verformung: Beton, Spannungsblock 0.85·x**
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{cd} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \end{cases}
+$$
+
+**Werkstoffgesetze der Verformung: Stahl**
+
+$$
+\sigma_s = \min\left[E_s \cdot \varepsilon_s;\ f_{yd}\right] \quad f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+#### Wie die Dehnungsebene gefunden wird
+
+**Dehnungsebene und innere Kräfte**
+
+$$
+\varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \frac{h}{2}\right) \qquad N_{int} = \int_A \sigma\left(\varepsilon\right)\,\mathrm{d}A \qquad M_{int} = \int_A \sigma\left(\varepsilon\right) \cdot \left(z - \frac{h}{2}\right)\,\mathrm{d}A
+$$
+
+#### Widerstand: Resistenzlinie aus Handrechnung – x-Richtung
+
+**Rechenwahl – Widerstand (N\_Rd)**
+
+$$
+\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Handrechnung, Block } 0.85 \cdot x
+$$
+
+**Zusammengefasste Bewehrung**
+
+| Seite | $A_s\ [\mathrm{mm}^2]$ | $z\ [\mathrm{mm}]$ | $f_{yd}\ [\mathrm{N/mm^2}]$ |
+| :--- | ---: | ---: | ---: |
+| 2. Lage Grundbewehrung | $754$ | $204.0$ | $435$ |
+| 3. Lage Grundbewehrung | $524$ | $45.0$ | $435$ |
+
+#### Grösste Druckkraft
+
+**Gleichmässiger Druck, ohne Bewehrung**
+
+$$
+N_{Rd}^{-} = -b \cdot h \cdot f_{cd} = -1000\,\mathrm{mm} \cdot 250\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} = -5000\,\mathrm{kN}
+$$
+
+**Zugehöriges Moment**
+
+$$
+M_{Rd}(N_{Rd}^{-}) = 0\,\mathrm{kNm}
+$$
+
+#### Grösste Zugkraft
+
+**Beide Lagen fliessen auf Zug**
+
+$$
+\begin{aligned}
+  N_{Rd}^{+} &= A_{s,2,x} \cdot f_{yd} + A_{s,3,x} \cdot f_{yd} \\
+  &= 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} + 524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \\
+  &= 555.5\,\mathrm{kN}
+\end{aligned}
+$$
+
+**Kräfte mal Hebelarm um die halbe Höhe**
+
+$$
+\begin{aligned}
+  M_{Rd}(N_{Rd}^{+}) &= A_{s,2,x} \cdot f_{yd} \cdot \left(z_{2,x} - \tfrac{h}{2}\right) + A_{s,3,x} \cdot f_{yd} \cdot \left(z_{3,x} - \tfrac{h}{2}\right) \\
+  &= 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(204\,\mathrm{mm} - \tfrac{250\,\mathrm{mm}}{2}\right) + 524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(45\,\mathrm{mm} - \tfrac{250\,\mathrm{mm}}{2}\right) \\
+  &= 7.7\,\mathrm{kNm}
+\end{aligned}
+$$
+
+#### Positives Moment (Zug unten)
+
+**Statische Höhe der Lage unten, ab dem gedrückten Rand oben**
+
+$$
+d_{2,x} = z_{2,x} = 204\,\mathrm{mm}
+$$
+
+**Druckzonenhöhe aus dem Kräftegleichgewicht**
+
+$$
+x^{+} = \frac{A_{s,2,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} = \frac{754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 19.3\,\mathrm{mm}
+$$
+
+**Momentenwiderstand bei reiner Biegung**
+
+$$
+\begin{aligned}
+  M_{Rd}(N_{Ed}=0)^{+} &= A_{s,2,x} \cdot f_{yd} \cdot \left(d_{2,x} - \frac{0.85 \cdot x^{+}}{2}\right) \\
+  &= 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(204\,\mathrm{mm} - \frac{0.85 \cdot 19.3\,\mathrm{mm}}{2}\right) \\
+  &= 64.2\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Nulllinie auf halber Höhe**
+
+$$
+x^{+} = \frac{h}{2} = \frac{250\,\mathrm{mm}}{2} = 125\,\mathrm{mm}
+$$
+
+**Dehnung der Zugbewehrung**
+
+$$
+\varepsilon_s^{+} = \left(d_{2,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}} = \left(204\,\mathrm{mm} - 125\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{125\,\mathrm{mm}} = 2.21\,\text{‰}
+$$
+
+**Stahlspannung, höchstens die Fliessgrenze**
+
+$$
+\begin{aligned}
+  \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{+};\ f_{yd}\right] \\
+  &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.21\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+  &= 435\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+$$
+
+**Kräftegleichgewicht**
+
+$$
+\begin{aligned}
+  N_{Rd}^{+} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{+} + A_{s,2,x} \cdot \sigma_{sd} \\
+  &= -20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 125\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \\
+  &= -1797.2\,\mathrm{kN}
+\end{aligned}
+$$
+
+**Momentengleichgewicht um die halbe Höhe**
+
+$$
+\begin{aligned}
+  M_{Rd}^{+} &= \left[f_{cd} \cdot b \cdot 0.85 \cdot x^{+} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{+}}{2}\right) + A_{s,2,x} \cdot \sigma_{sd} \cdot \left(d_{2,x} - \tfrac{h}{2}\right)\right] \\
+  &= \left[20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 125\,\mathrm{mm} \cdot \left(\tfrac{250\,\mathrm{mm}}{2} - \tfrac{0.85 \cdot 125\,\mathrm{mm}}{2}\right) + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(204\,\mathrm{mm} - \tfrac{250\,\mathrm{mm}}{2}\right)\right] \\
+  &= 178.6\,\mathrm{kNm}
+\end{aligned}
+$$
+
+#### Negatives Moment (Zug oben)
+
+**Statische Höhe der Lage oben, ab dem gedrückten Rand unten**
+
+$$
+d_{3,x} = h - z_{3,x} = 250\,\mathrm{mm} - 45\,\mathrm{mm} = 205\,\mathrm{mm}
+$$
+
+**Druckzonenhöhe aus dem Kräftegleichgewicht**
+
+$$
+x^{-} = \frac{A_{s,3,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} = \frac{524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 13.4\,\mathrm{mm}
+$$
+
+**Momentenwiderstand bei reiner Biegung**
+
+$$
+\begin{aligned}
+  M_{Rd}(N_{Ed}=0)^{-} &= -A_{s,3,x} \cdot f_{yd} \cdot \left(d_{3,x} - \frac{0.85 \cdot x^{-}}{2}\right) \\
+  &= -524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(205\,\mathrm{mm} - \frac{0.85 \cdot 13.4\,\mathrm{mm}}{2}\right) \\
+  &= -45.4\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Nulllinie auf halber Höhe**
+
+$$
+x^{-} = \frac{h}{2} = \frac{250\,\mathrm{mm}}{2} = 125\,\mathrm{mm}
+$$
+
+**Dehnung der Zugbewehrung**
+
+$$
+\varepsilon_s^{-} = \left(d_{3,x} - x^{-}\right) \cdot \frac{\varepsilon_{c2d}}{x^{-}} = \left(205\,\mathrm{mm} - 125\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{125\,\mathrm{mm}} = 2.24\,\text{‰}
+$$
+
+**Stahlspannung, höchstens die Fliessgrenze**
+
+$$
+\begin{aligned}
+  \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{-};\ f_{yd}\right] \\
+  &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.24\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
+  &= 435\,\mathrm{N}/\mathrm{mm}^{2}
+\end{aligned}
+$$
+
+**Kräftegleichgewicht**
+
+$$
+\begin{aligned}
+  N_{Rd}^{-} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{-} + A_{s,3,x} \cdot \sigma_{sd} \\
+  &= -20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 125\,\mathrm{mm} + 524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \\
+  &= -1897.3\,\mathrm{kN}
+\end{aligned}
+$$
+
+**Momentengleichgewicht um die halbe Höhe**
+
+$$
+\begin{aligned}
+  M_{Rd}^{-} &= -\left[f_{cd} \cdot b \cdot 0.85 \cdot x^{-} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{-}}{2}\right) + A_{s,3,x} \cdot \sigma_{sd} \cdot \left(d_{3,x} - \tfrac{h}{2}\right)\right] \\
+  &= -\left[20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 125\,\mathrm{mm} \cdot \left(\tfrac{250\,\mathrm{mm}}{2} - \tfrac{0.85 \cdot 125\,\mathrm{mm}}{2}\right) + 524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(205\,\mathrm{mm} - \tfrac{250\,\mathrm{mm}}{2}\right)\right] \\
+  &= -170.9\,\mathrm{kNm}
+\end{aligned}
+$$
+
+**Eckpunkte der Resistenzlinie aus Handrechnung**
+
+| Eckpunkt | $N\ [\mathrm{kN}]$ | $M\ [\mathrm{kNm}]$ |
+| :--- | ---: | ---: |
+| $N_{Rd}^{-}$ | $-5000.0$ | $0.0$ |
+| $M_{Rd}(x=\tfrac{h}{2})^{+}$ | $-1797.2$ | $178.6$ |
+| $M_{Rd}(N_{Ed}=0)^{+}$ | $0.0$ | $64.2$ |
+| $N_{Rd}^{+}$ | $555.5$ | $7.7$ |
+| $M_{Rd}(N_{Ed}=0)^{-}$ | $0.0$ | $-45.4$ |
+| $M_{Rd}(x=\tfrac{h}{2})^{-}$ | $-1897.3$ | $-170.9$ |
+
+#### Knicken – Stütze
+
+**Einwirkung und System**
+
+$$
+N_{Ed} = -600\,\mathrm{kN} \qquad M_{Ed,1} = 10\,\mathrm{kNm} \qquad l = 3\,\mathrm{m} \qquad l_{cr} = 3\,\mathrm{m}
+$$
+
+**Schiefstellung** *(SIA 262:2025, 4.3.7)*
+
+$$
+\begin{aligned}
+  \alpha_i &= \min\left[\max\left(\frac{0.01}{\sqrt{l}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \\
+  &= \min\left[\max\left(\frac{0.01}{\sqrt{3}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \\
+  &= 0.005 \quad \left(l\ \text{in}\ \mathrm{m}\right)
+\end{aligned}
+$$
+
+**Ungewollte Ausmitte** *(SIA 262:2025, 4.3.7)*
+
+$$
+e_{0d} = \max\left(\frac{d}{30};\ \frac{\alpha_i \cdot l_{cr}}{2}\right) = \max\left(\frac{204\,\mathrm{mm}}{30};\ \frac{0.005 \cdot 3\,\mathrm{m}}{2}\right) = 7.5\,\mathrm{mm}
+$$
+
+**Gewollte Ausmitte**
+
+$$
+e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| = \left|\frac{10\,\mathrm{kNm}}{-600\,\mathrm{kN}}\right| = 16.7\,\mathrm{mm}
+$$
+
+**Das Verfahren** *(SIA 262:2025, 4.3.7)*
+
+$$
+e_{2d}^{(k)} = \left|\chi^{(k)}\right| \cdot \frac{l_{cr}^{2}}{\pi^{2}} \qquad M_{Ed,II}^{(k)} = \left|N_{Ed}\right| \cdot \left(e_{0d} + e_{1d} + e_{2d}^{(k-1)}\right)
+$$
+
+**Ausmitten-Iteration bei N\_Ed = 600.0 kN**
+
+| $k$ | $e_{2d}^{(k-1)}\ [\mathrm{mm}]$ | $M_{Ed,II}^{(k)}\ [\mathrm{kNm}]$ | $\chi^{(k)}\ [\mathrm{m}^{-1}]$ | $e_{2d}^{(k)}\ [\mathrm{mm}]$ |
+| ---: | ---: | ---: | ---: | ---: |
+| $1$ | $0.00$ | $14.50$ | $0.00000$ | $0.00$ |
+| $2$ | $0.00$ | $14.50$ | $0.00000$ | $0.00$ |
+
+**Probe: die gefundene Ebene erzeugt die Schnittgrössen**
+
+$$
+\varepsilon_m = -0.525\,\text{‰} \qquad \chi = 0\,\mathrm{m}^{-1} \qquad N_{int} = -1664.9\,\mathrm{kN} \;\checkmark \qquad M_{int} = 130.5\,\mathrm{kNm} \;\checkmark
+$$
+
+**Querschnitt am verformten System**
+
+$$
+M_{Rd,x}(N_{Ed}) = 102.4\,\mathrm{kNm} \quad \ge \quad M_{Ed,II} = 14.5\,\mathrm{kNm}
+$$
+
+**Grenzkraft des Stabes**
+
+$$
+N_{Rd,K} = 3488.4\,\mathrm{kN} \quad \ge \quad \left|N_{Ed}\right| = 600\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,K,\text{Stütze}} = \frac{N_{Rd,K}}{\left|N_{Ed}\right|} = \frac{3488.4\,\mathrm{kN}}{600\,\mathrm{kN}} = 5.81 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+### Plattenanalyse: Block
+
+**Plattendicke**
+
+$$
+h = 220\,\mathrm{mm}
+$$
+
+**Betrachtete Breite (x)**
+
+$$
+b = 1000\,\mathrm{mm}
+$$
+
+**Betrachtete Breite (y)**
+
+$$
+b_y = 1000\,\mathrm{mm}
+$$
+
+**Überdeckung unten**
+
+$$
+c_{nom,u} = 30\,\mathrm{mm}
+$$
+
+**Überdeckung oben**
+
+$$
+c_{nom,o} = 30\,\mathrm{mm}
+$$
+
+**Bewehrungsquerschnitt über die Breite b** *(SIA 262:2025, 5.5.2)*
+
+$$
+A_s = \frac{\pi \cdot \varnothing^{2}}{4} \cdot \frac{b}{s}
+$$
+
+**Bewehrungsmass je Kubikmeter Beton**
+
+$$
+\mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{b \cdot h} = \frac{1717\,\mathrm{mm}^{2} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{1000\,\mathrm{mm} \cdot 220\,\mathrm{mm}} = 61\,\mathrm{kg}/\mathrm{m}^{3}
+$$
+
+**Höhe der Distanzhalter**
+
+$$
+\begin{aligned}
+  h_{Dist} &= \text{OK innere untere Lage} - \text{UK innere obere Lage} \\
+  &= 172\,\mathrm{mm} - 48\,\mathrm{mm} \\
+  &= 124\,\mathrm{mm}
+\end{aligned}
+$$
+
+**Randabstände, Tiefen ab Oberkante und Bewehrungsquerschnitte**
+
+| Bewehrung | Richtung | Stahl | $\varnothing\ [\mathrm{mm}]$ | $s\ [\mathrm{mm}]$ | Randabstand [mm] | $z\ [\mathrm{mm}]$ | $A_s\ [\mathrm{mm}^2]$ |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: |
+| 1. Lage Grundbewehrung | y | B500B | $8$ | $150$ | $34$ | $186$ | $335$ |
+| 2. Lage Grundbewehrung | x | B500B | $10$ | $150$ | $43$ | $177$ | $524$ |
+| 3. Lage Grundbewehrung | x | B500B | $10$ | $150$ | $43$ | $43$ | $524$ |
+| 4. Lage Grundbewehrung | y | B500B | $8$ | $150$ | $34$ | $34$ | $335$ |
+
+**Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5)*
+
+$$
+\frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
+$$
+
+**Statische Höhe der x-Bewehrung unten**
+
+$$
+d_{u} = z_{2,x,g} = 177\,\mathrm{mm}
+$$
+
+**Bewehrungsgehalt unten**
+
+$$
+\rho_{u} = \frac{A_{s,2,x,g}}{b \cdot d_{u}} = \frac{524\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 177\,\mathrm{mm}} = 0.00296
+$$
+
+**Statische Höhe der x-Bewehrung oben**
+
+$$
+d_{o} = h - z_{3,x,g} = 220\,\mathrm{mm} - 43\,\mathrm{mm} = 177\,\mathrm{mm}
+$$
+
+**Bewehrungsgehalt oben**
+
+$$
+\rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{o}} = \frac{524\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 177\,\mathrm{mm}} = 0.00296
+$$
+
+**Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5)*
+
+$$
+\begin{aligned}
+  \left(\frac{w}{w_c}\right)_{u} &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00296}{10 \cdot 0.00296^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{220\,\mathrm{mm}}{177\,\mathrm{mm}}\right)^{3} \\
+  &= 10.11
+\end{aligned}
+$$
+
+**Vergrösserungsfaktor, Zug oben** *(SIA 262:2025, 4.4.3.2.5)*
+
+$$
+\begin{aligned}
+  \left(\frac{w}{w_c}\right)_{o} &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{o}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00296}{10 \cdot 0.00296^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{220\,\mathrm{mm}}{177\,\mathrm{mm}}\right)^{3} \\
+  &= 10.11
+\end{aligned}
+$$
+
+### Resistenzlinie aus Dehnungsebenen – x-Richtung
+
+**Rechenwahl**
+
+$$
+\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Block } 0.85 \cdot x \text{ genau}
+$$
+
+**Werkstoffgesetze: Beton, Spannungsblock 0.85·x**
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{cd} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \end{cases}
+$$
+
+**Werkstoffgesetze: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
+
+$$
+\sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & \varepsilon_s \ge 0 \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & \varepsilon_s < 0 \end{cases} \qquad |\varepsilon_s| \le \varepsilon_{ud}
+$$
+
+**Schnittgrössen aus der Spannungsverteilung**
+
+$$
+N = \int_A \sigma\,\mathrm{d}A \qquad M = \int_A \sigma \cdot \left(z - \tfrac{h}{2}\right)\,\mathrm{d}A
+$$
+
+**Berücksichtigte Bewehrungslagen**
+
+| Lage | $a_s\ [\mathrm{mm}^2]$ | $z\ [\mathrm{mm}]$ | $f_{yd}\ [\mathrm{N/mm^2}]$ |
+| :--- | ---: | ---: | ---: |
+| 2. Lage Grundbewehrung | $524$ | $177.0$ | $435$ |
+| 3. Lage Grundbewehrung | $524$ | $43.0$ | $435$ |
+
+#### Nachweis – Feld
+
+**Einwirkung**
+
+$$
+M_{Ed} = 25\,\mathrm{kNm} \qquad N_{Ed} = 0\,\mathrm{kN}
+$$
+
+**Bruchzustand bei N\_Ed = 0.0 kN – die Dehnungsebene**
+
+$$
+\varepsilon_{oben} = -3.5\,\text{‰} \qquad \varepsilon_{unten} = 25.408\,\text{‰}
+$$
+
+**Kräfte in diesem Bruchzustand – Zug positiv, z ab Oberkante**
+
+| Teil | $\varepsilon\ [‰]$ | $\sigma\ [\mathrm{N/mm^2}]$ | $A\ [\mathrm{mm}^2]$ | $F\ [\mathrm{kN}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Beton, Resultierende | $–$ | $–$ | $–$ | $-452.8$ | $11.3$ |
+| 2. Lage Grundbewehrung | $19.758$ | $434.8$ | $524$ | $227.7$ | $177.0$ |
+| 3. Lage Grundbewehrung | $2.150$ | $430.0$ | $524$ | $225.2$ | $43.0$ |
+
+**Probe: die Ebene trägt genau die Einwirkung**
+
+$$
+\sum F_i = 0\,\mathrm{kN} = N_{Ed}
+$$
+
+**Momentenwiderstand aus den Teilkräften**
+
+$$
+M_{Rd} = \sum F_i \cdot \left(z_i - \tfrac{h}{2}\right) = 44.8\,\mathrm{kNm}
+$$
+
+Massgebend: Beton am oberen Rand auf der Grenzdehnung.
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,x,\text{Feld}} = \frac{M_{Rd}}{M_{Ed}} = \frac{44.8\,\mathrm{kNm}}{25\,\mathrm{kNm}} = 1.79 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+#### Nachweis – Rand
+
+**Einwirkung**
+
+$$
+M_{Ed} = -15\,\mathrm{kNm} \qquad N_{Ed} = -100\,\mathrm{kN}
+$$
+
+**Bruchzustand bei M\_Ed = -15.0 kNm – die Dehnungsebene**
+
+$$
+\varepsilon_{oben} = -0.487\,\text{‰} \qquad \varepsilon_{unten} = -3.135\,\text{‰}
+$$
+
+**Kräfte in diesem Bruchzustand – Zug positiv, z ab Oberkante**
+
+| Teil | $\varepsilon\ [‰]$ | $\sigma\ [\mathrm{N/mm^2}]$ | $A\ [\mathrm{mm}^2]$ | $F\ [\mathrm{kN}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Beton, Resultierende | $–$ | $–$ | $–$ | $-4316.4$ | $111.6$ |
+| 2. Lage Grundbewehrung | $-2.617$ | $-434.8$ | $524$ | $-227.7$ | $177.0$ |
+| 3. Lage Grundbewehrung | $-1.005$ | $-200.9$ | $524$ | $-105.2$ | $43.0$ |
+
+**Probe: die Ebene trägt genau die Einwirkung**
+
+$$
+\sum F_i \cdot \left(z_i - \tfrac{h}{2}\right) = -15\,\mathrm{kNm} = M_{Ed}
+$$
+
+**Normalkraftwiderstand aus den Teilkräften**
+
+$$
+N_{Rd} = \sum F_i = -4649.2\,\mathrm{kN}
+$$
+
+Massgebend: Beton im Punkt C auf der Grenzdehnung.
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,x,\text{Rand}} = \frac{N_{Rd}}{N_{Ed}} = \frac{4649.2\,\mathrm{kN}}{100\,\mathrm{kN}} = 46.49 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+### Querkraft – x-Richtung
+
+**Ansatz** *(SIA 262:2025, 4.3.3.2.1)*
+
+$$
+V_{Rd} = k_d \cdot \tau_{cd} \cdot d_v \qquad k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g}
+$$
+
+**Dekompressionsmoment und Dehnung**
+
+$$
+m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} \qquad \varepsilon_v = \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| - m_{Dd}\right)}{E_s \cdot \left(\left|m_{Rd}(N_{Ed})\right| - m_{Dd}\right)}
+$$
+
+**Grösstkorndurchmesser**
+
+$$
+D_{max} = 32\,\mathrm{mm}
+$$
+
+**Höhe der Einlage**
+
+$$
+e_{Einlage} = 0\,\mathrm{mm}
+$$
+
+**Beiwert der Gesteinskörnung** *(SIA 262:2025, 4.3.3.2.1)*
+
+$$
+\begin{aligned}
+  k_g &= \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right] \\
+  &= \max\left[1.20;\ \frac{48}{16 + 32 \cdot \min\left[1.0;\ \left(\frac{60}{30}\right)^{2}\right]}\right] \\
+  &= 1.2 \quad \left(D_{max}\ \text{in}\ \mathrm{mm},\ f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+\end{aligned}
+$$
+
+#### Querkraftnachweis – Feld
+
+**Einwirkung**
+
+$$
+V_{Ed} = 30\,\mathrm{kN}/\mathrm{m} \qquad M_{Ed} = 25\,\mathrm{kNm} \qquad N_{Ed} = 0\,\mathrm{kN}
+$$
+
+**Statische Höhe der Lage unten, ab dem gedrückten Rand oben**
+
+$$
+d = z_{2,x,g} = 177\,\mathrm{mm}
+$$
+
+**Wirksame Höhe (Einlage nicht massgebend)**
+
+$$
+d_v = d = 177\,\mathrm{mm}
+$$
+
+**Dekompressionsmoment**
+
+$$
+m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} = \frac{\left|\min(0\,\mathrm{kN};\ 0)\right| \cdot 220\,\mathrm{mm}}{6} = 0\,\mathrm{kNm}
+$$
+
+**Momentenwiderstand bei N\_Ed = 0.0 kN**
+
+$$
+\varepsilon_{oben} = -3.5\,\text{‰} \qquad \varepsilon_{unten} = 25.408\,\text{‰}
+$$
+
+**Kräfte in diesem Bruchzustand – Zug positiv, z ab Oberkante**
+
+| Teil | $\varepsilon\ [‰]$ | $\sigma\ [\mathrm{N/mm^2}]$ | $A\ [\mathrm{mm}^2]$ | $F\ [\mathrm{kN}]$ | $z\ [\mathrm{mm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Beton, Resultierende | $–$ | $–$ | $–$ | $-452.8$ | $11.3$ |
+| 2. Lage Grundbewehrung | $19.758$ | $434.8$ | $524$ | $227.7$ | $177.0$ |
+| 3. Lage Grundbewehrung | $2.150$ | $430.0$ | $524$ | $225.2$ | $43.0$ |
+
+**Probe: die Ebene trägt genau die Einwirkung**
+
+$$
+\sum F_i = 0\,\mathrm{kN} = N_{Ed}
+$$
+
+**Momentenwiderstand aus den Teilkräften**
+
+$$
+M_{Rd} = \sum F_i \cdot \left(z_i - \tfrac{h}{2}\right) = 44.8\,\mathrm{kNm}
+$$
+
+Massgebend: Beton am oberen Rand auf der Grenzdehnung.
+
+**Dehnung auf halber Höhe**
+
+$$
+\begin{aligned}
+  \varepsilon_v &= \frac{f_{yd} \cdot \left(\left|m_{Ed}\right| - m_{Dd}\right)}{E_s \cdot \left(\left|m_{Rd}(N_{Ed})\right| - m_{Dd}\right)} \\
+  &= \frac{435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(\left|25\,\mathrm{kNm}\right| - 0\,\mathrm{kNm}\right)}{200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(\left|44.8\,\mathrm{kNm}\right| - 0\,\mathrm{kNm}\right)} \\
+  &= 1.212\,\text{‰}
+\end{aligned}
+$$
+
+**Beiwert für die statische Höhe**
+
+$$
+k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g} = \frac{1}{1 + 1.212\,\text{‰} \cdot 177 \cdot 1.2} = 0.7953 \quad \left(d\ \text{in}\ \mathrm{mm}\right)
+$$
+
+**Querkraftwiderstand** *(SIA 262:2025, 4.3.3.2.1)*
+
+$$
+\begin{aligned}
+  V_{Rd,x}(M_{Ed} = 25\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) &= k_d \cdot \tau_{cd} \cdot d_v \\
+  &= 0.7953 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 177\,\mathrm{mm} \\
+  &= 154.2\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,V,x,\text{Feld}} = \frac{V_{Rd,x}}{V_{Ed,x}} = \frac{154.2\,\mathrm{kN}/\mathrm{m}}{30\,\mathrm{kN}/\mathrm{m}} = 5.14 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+### Stahlspannung unter quasi-ständiger Einwirkung – x-Richtung
+
+**Rechenwahl**
+
+$$
+\text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Handrechnung, Block } 0.85 \cdot x
+$$
+
+**Zulässige Stahlspannung (normale Anforderung)** *(SIA 262:2025, 4.4.2)*
+
+$$
+\sigma_{s,adm} = f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+#### Welche Werte angesetzt werden
+
+**Werkstoffgesetze im Gebrauchszustand: Beton, Spannungsblock 0.85·x**
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{ck} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \end{cases}
+$$
+
+**Werkstoffgesetze im Gebrauchszustand: Stahl, nur auf Zug**
+
+$$
+\sigma_s = \begin{cases} \min\left(E_s \cdot \varepsilon_s;\ f_{yk}\right) & \varepsilon_s > 0 \\[1ex] 0 & \varepsilon_s \le 0 \quad (\text{gedrückt: weggelassen}) \end{cases}
+$$
+
+#### Wie die Dehnungsebene gefunden wird
+
+**Dehnungsebene und innere Kräfte**
+
+$$
+\varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \frac{h}{2}\right) \qquad N_{int} = \int_A \sigma\left(\varepsilon\right)\,\mathrm{d}A \qquad M_{int} = \int_A \sigma\left(\varepsilon\right) \cdot \left(z - \frac{h}{2}\right)\,\mathrm{d}A
+$$
+
+#### Quasi-ständiger Lastfall – Dauerlast
+
+**Einwirkung**
+
+$$
+M_{Ed,\text{quasi-ständig}} = 12\,\mathrm{kNm} \qquad N_{Ed,\text{quasi-ständig}} = 0\,\mathrm{kN}
+$$
+
+**Gefundene Dehnungsebene**
+
+$$
+\varepsilon_m = 0.202\,\text{‰} \qquad \chi = 0.00675\,\mathrm{m}^{-1} \qquad \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \tfrac{h}{2}\right)
+$$
+
+**Probe: die Ebene erzeugt die Einwirkung**
+
+$$
+N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 12\,\mathrm{kNm} \;\checkmark
+$$
+
+**Grösste Zugspannung in der Bewehrung**
+
+$$
+\sigma_{s,x} = 131\,\mathrm{N}/\mathrm{mm}^{2} \quad \le \quad \sigma_{s,adm} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,\sigma,w,x,\text{Dauerlast}} = \frac{\sigma_{s,adm}}{\sigma_{s,x}} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{131\,\mathrm{N}/\mathrm{mm}^{2}} = 3.82
+$$
+
+### Knicken
+
+**Ungewollte Ausmitte – allgemein** *(SIA 262:2025, 4.3.7)*
+
+$$
+\alpha_i = \min\left[\max\left(\frac{0.01}{\sqrt{l}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \qquad e_{0d} = \max\left(\frac{d}{30};\ \frac{\alpha_i \cdot l_{cr}}{2}\right)
+$$
+
+**Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein**
+
+$$
+e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| \qquad e_{2d} = \left|\chi\right| \cdot \frac{l_{cr}^{2}}{\pi^{2}} \qquad M_{Ed,II} = \left|N_{Ed}\right| \cdot \left(e_{0d} + e_{1d} + e_{2d}\right)
+$$
+
+#### Verformung
+
+**Rechenwahl – Verformung (e\_2d)**
+
+$$
+\varphi = 0 \qquad \text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Parabel}
+$$
+
+**Steifigkeit des Betons**
+
+$$
+E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \qquad f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Beiwert der Parabel, mit dem wirksamen Modul**
+
+$$
+k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{cd}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 4.2
+$$
+
+**Werkstoffgesetze der Verformung: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.6)*
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+$$
+
+**Werkstoffgesetze der Verformung: Stahl**
+
+$$
+\sigma_s = \min\left[E_s \cdot \varepsilon_s;\ f_{yd}\right] \quad f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+#### Wie die Dehnungsebene gefunden wird
+
+**Dehnungsebene und innere Kräfte**
+
+$$
+\varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \frac{h}{2}\right) \qquad N_{int} = \int_A \sigma\left(\varepsilon\right)\,\mathrm{d}A \qquad M_{int} = \int_A \sigma\left(\varepsilon\right) \cdot \left(z - \frac{h}{2}\right)\,\mathrm{d}A
+$$
+
+#### Widerstand
+
+**Rechenwahl – Widerstand (N\_Rd)**
+
+$$
+\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Block } 0.85 \cdot x \text{ genau}
+$$
+
+Dieselbe Wahl wie die Tragsicherheit: der Momentenwiderstand bei der Druckkraft kommt aus deren Resistenzlinie.
+
+#### Knicken – Wand
+
+**Einwirkung und System**
+
+$$
+N_{Ed} = -400\,\mathrm{kN} \qquad M_{Ed,1} = 5\,\mathrm{kNm} \qquad l = 2.5\,\mathrm{m} \qquad l_{cr} = 2.5\,\mathrm{m}
+$$
+
+**Schiefstellung** *(SIA 262:2025, 4.3.7)*
+
+$$
+\begin{aligned}
+  \alpha_i &= \min\left[\max\left(\frac{0.01}{\sqrt{l}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \\
+  &= \min\left[\max\left(\frac{0.01}{\sqrt{2.5}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \\
+  &= 0.005 \quad \left(l\ \text{in}\ \mathrm{m}\right)
+\end{aligned}
+$$
+
+**Ungewollte Ausmitte** *(SIA 262:2025, 4.3.7)*
+
+$$
+e_{0d} = \max\left(\frac{d}{30};\ \frac{\alpha_i \cdot l_{cr}}{2}\right) = \max\left(\frac{177\,\mathrm{mm}}{30};\ \frac{0.005 \cdot 2.5\,\mathrm{m}}{2}\right) = 6.2\,\mathrm{mm}
+$$
+
+**Gewollte Ausmitte**
+
+$$
+e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| = \left|\frac{5\,\mathrm{kNm}}{-400\,\mathrm{kN}}\right| = 12.5\,\mathrm{mm}
+$$
+
+**Das Verfahren** *(SIA 262:2025, 4.3.7)*
+
+$$
+e_{2d}^{(k)} = \left|\chi^{(k)}\right| \cdot \frac{l_{cr}^{2}}{\pi^{2}} \qquad M_{Ed,II}^{(k)} = \left|N_{Ed}\right| \cdot \left(e_{0d} + e_{1d} + e_{2d}^{(k-1)}\right)
+$$
+
+**Ausmitten-Iteration bei N\_Ed = 400.0 kN**
+
+| $k$ | $e_{2d}^{(k-1)}\ [\mathrm{mm}]$ | $M_{Ed,II}^{(k)}\ [\mathrm{kNm}]$ | $\chi^{(k)}\ [\mathrm{m}^{-1}]$ | $e_{2d}^{(k)}\ [\mathrm{mm}]$ |
+| ---: | ---: | ---: | ---: | ---: |
+| $1$ | $0.00$ | $7.50$ | $0.00022$ | $0.14$ |
+| $2$ | $0.14$ | $7.56$ | $0.00022$ | $0.14$ |
+| $3$ | $0.14$ | $7.56$ | $0.00022$ | $0.14$ |
+
+**Probe: die gefundene Ebene erzeugt die Schnittgrössen**
+
+$$
+\varepsilon_m = -0.045\,\text{‰} \qquad \chi = 0.00022\,\mathrm{m}^{-1} \qquad N_{int} = -400\,\mathrm{kN} \;\checkmark \qquad M_{int} = 7.6\,\mathrm{kNm} \;\checkmark
+$$
+
+**Querschnitt am verformten System**
+
+$$
+M_{Rd,x}(N_{Ed}) = 74.8\,\mathrm{kNm} \quad \ge \quad M_{Ed,II} = 7.6\,\mathrm{kNm}
+$$
+
+**Grenzkraft des Stabes**
+
+$$
+N_{Rd,K} = 3508.6\,\mathrm{kN} \quad \ge \quad \left|N_{Ed}\right| = 400\,\mathrm{kN}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,K,\text{Wand}} = \frac{N_{Rd,K}}{\left|N_{Ed}\right|} = \frac{3508.6\,\mathrm{kN}}{400\,\mathrm{kN}} = 8.77 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
 ### Plattenanalyse: Konsole
 
 **Plattendicke**
@@ -3655,6 +5040,12 @@ $$
 
 Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f\_cd; gedrückter Stahl bleibt unberücksichtigt. Die Bewehrung ist je Seite zu einer Lage zusammengefasst, das Moment bezieht sich auf die halbe Querschnittshöhe.
 
+Der Querschnitt bleibt eben (Bernoulli). Zu jeder Dehnungsebene ergeben sich Normalkraft und Moment aus den Spannungen über die Höhe; Zug ist positiv, das Moment bezieht sich auf die halbe Querschnittshöhe. Die Resistenzlinie ist der Rand aller zulässigen Ebenen: an ihm erreicht der Stahl ε\_ud, der Beton am gedrückten Rand −ε\_c2d oder, wenn der ganze Querschnitt gedrückt ist, im Punkt C −ε\_c1d.
+
+Der Beton ist in 200 Fasern über die Höhe geteilt, die Bewehrung zählt Lage für Lage, und an ihrer Stelle zählt der Stahl statt des Betons – auch die gedrückte Bewehrung wirkt mit. Den Widerstand bei einer Einwirkung sucht die Rechnung auf dem Rand selbst, zwischen zwei benachbarten Ebenen; was dort gilt, zeigt bei jeder Kombination die Probe.
+
+Der Beton ist in 200 Fasern über die Höhe geteilt, jede mit ihrer mittleren Spannung, die Bewehrung zählt Lage für Lage, und an ihrer Stelle zählt der Stahl statt des Betons – auch die gedrückte Bewehrung wirkt mit. Den Widerstand bei einer Einwirkung sucht die Rechnung auf dem Rand selbst, zwischen zwei benachbarten Ebenen; was dort gilt, zeigt bei jeder Kombination die Probe.
+
 **Schwerpunkt der zusammengefassten Lage – 2. Lage Grundbewehrung + 2. Lage Zulage**
 
 $$
@@ -3737,6 +5128,48 @@ $$
 
 $$
 M_{Rd} = M_1 + \frac{N_{Ed} - N_1}{N_2 - N_1} \cdot \left(M_2 - M_1\right)
+$$
+
+**Wirksamer Modul der Parabel**
+
+$$
+E_{c,eff} = \frac{E_{cm}}{1 + \varphi}
+$$
+
+**Beiwert der Parabel, mit dem wirksamen Modul**
+
+$$
+k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{ck}}\right)
+$$
+
+**Werkstoffgesetze: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.6)*
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+$$
+
+**Werkstoffgesetze: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
+
+$$
+\sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & \varepsilon_s \ge 0 \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & \varepsilon_s < 0 \end{cases} \qquad |\varepsilon_s| \le \varepsilon_{ud}
+$$
+
+**Schnittgrössen aus der Spannungsverteilung**
+
+$$
+N = \int_A \sigma\,\mathrm{d}A \qquad M = \int_A \sigma \cdot \left(z - \tfrac{h}{2}\right)\,\mathrm{d}A
+$$
+
+**Werkstoffgesetze: Beton, Spannungsblock 0.85·x**
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{cd} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \end{cases}
+$$
+
+**Werkstoffgesetze: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
+
+$$
+\sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & \varepsilon_s \ge 0 \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & \varepsilon_s < 0 \end{cases} \qquad |\varepsilon_s| \le \varepsilon_{ud}
 $$
 
 **Bezugsgrösse der Normalkraft**
@@ -3955,6 +5388,8 @@ $$
 
 Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Nachgewiesen wird deshalb, dass der bewehrte Querschnitt mehr trägt als der unbewehrte im Augenblick des Risses: M\_Rd(N\_Ed = 0) ≥ M\_Riss.
 
+Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Nachgewiesen wird deshalb, dass der bewehrte Querschnitt mehr trägt als der unbewehrte im Augenblick des Risses: M\_Rk(N\_Ed = 0) ≥ M\_Riss.
+
 **Beiwert für die Plattendicke** *(SIA 262:2025, 4.4.1.3)*
 
 $$
@@ -4029,11 +5464,11 @@ Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.0 ‰ bis 45.0 ‰
 
 Nachgewiesen wird deshalb nicht der Weg, sondern das Ergebnis: dass die gefundene Ebene genau die angegebenen Schnittgrössen erzeugt. Diese Probe steht bei jedem Fall.
 
-**Wirksamer Elastizitätsmodul**
+Mit dem Spannungsblock trägt der Beton unter (1 − 0.85)·ε\_c2d nichts. Unter Gebrauchslast liegt die Druckresultierende damit am Rand, und der Hebelarm wird beinahe d – die Stahlspannung kleiner, als der Querschnitt sie hat. Der Block ist ein Modell für den Bruch.
 
-$$
-E_{c,eff} = \frac{E_{cm}}{1 + \varphi}
-$$
+Mit der Handrechnung rechnet der Querschnitt wie die Resistenzlinie aus Handrechnung: der Beton als Spannungsblock, die gedrückte Bewehrung weggelassen, die Bewehrung jeder Seite zu einer Lage in ihrem Schwerpunkt zusammengefasst, und der Beton auch dort gezählt, wo der Stahl liegt.
+
+Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebildet; der Stahl kommt Lage für Lage dazu. Wie in der Handrechnung zählt der Beton auch dort, wo der Stahl liegt.
 
 **Dehnungsebene und innere Kräfte**
 
@@ -4057,6 +5492,18 @@ $$
 
 $$
 \varepsilon_{s,adm} = \frac{\sigma_{s,adm}}{E_s}
+$$
+
+**Werkstoffgesetze im Gebrauchszustand: Beton, Spannungsblock 0.85·x**
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{ck} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \end{cases}
+$$
+
+**Werkstoffgesetze im Gebrauchszustand: Stahl, nur auf Zug**
+
+$$
+\sigma_s = \begin{cases} \min\left(E_s \cdot \varepsilon_s;\ f_{yk}\right) & \varepsilon_s > 0 \\[1ex] 0 & \varepsilon_s \le 0 \quad (\text{gedrückt: weggelassen}) \end{cases}
 $$
 
 ### Stahlspannung gegen Fliessen
@@ -4097,12 +5544,6 @@ $$
 
 $$
 e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| \qquad e_{2d} = \left|\chi\right| \cdot \frac{l_{cr}^{2}}{\pi^{2}} \qquad M_{Ed,II} = \left|N_{Ed}\right| \cdot \left(e_{0d} + e_{1d} + e_{2d}\right)
-$$
-
-**Beiwert der Parabel, mit dem wirksamen Modul**
-
-$$
-k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{cd}}\right)
 $$
 
 **Werkstoffgesetze der Verformung: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.6)*
@@ -4215,18 +5656,6 @@ $$
 \alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
 $$
 
-**C30/37: Spannungsblock 0.85·x, Bemessungswerte**
-
-$$
-\sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{cd} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \end{cases}
-$$
-
-**B500B: bilineare Beziehung, Bemessungswerte** *(SIA 262:2025, 4.2.2.4)*
-
-$$
-\sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & \varepsilon_s \ge 0 \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & \varepsilon_s < 0 \end{cases} \qquad |\varepsilon_s| \le \varepsilon_{ud}
-$$
-
 **Probe: Normalkraft**
 
 $$
@@ -4249,18 +5678,6 @@ $$
 
 $$
 M_{Rd} = \sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}}
-$$
-
-**C30/37: Parabel-Rechteck-Beziehung, charakteristische Werte** *(SIA 262:2025, 4.2.1.6)*
-
-$$
-\sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
-$$
-
-**B500B: bilineare Beziehung, charakteristische Werte** *(SIA 262:2025, 4.2.2.4)*
-
-$$
-\sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & \varepsilon_s \ge 0 \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & \varepsilon_s < 0 \end{cases} \qquad |\varepsilon_s| \le \varepsilon_{ud}
 $$
 
 ### Duktilität je Richtung
@@ -4402,6 +5819,65 @@ $$
 > **Warnung:** Risse: Quasi-ständige Lastfälle – Dauerlast: nicht erfüllt. ε\_m = 2.3198 ‰, χ = 0.03612 1/m. Stahl fliesst (ε\_s = 4.67 ‰ \> ε\_y = 2.50 ‰): ε\_s \> ε\_s,adm = 2.50 ‰.
 
 > **Hinweis:** Risse: Zwängung Normalkraft – 1. Lage: nicht erfüllt (α\_eff = 0.99), ausgeschaltet. N\_s,adm = 262 mm² · 500 N/mm² = 130.9 kN \< N\_Riss = 131.8 kN.
+
+### Parabel
+
+**Angaben zur Platte**
+
+$$
+\text{Beton C30/37} \qquad h = 250\,\mathrm{mm} \qquad b_x = 1000\,\mathrm{mm}
+$$
+
+**Bewehrung von oben nach unten**
+
+| Lage | Richtung | Bewehrung | Stahl |
+| :--- | :--- | :--- | :--- |
+| Überdeckung oben | – | $30\,\mathrm{mm}$ | – |
+| 4. Lage | y | $\varnothing 10@150$ | B500B |
+| 3. Lage | x | $\varnothing 10@150$ | B500B |
+| 2. Lage | x | $\varnothing 12@150$ | B500B |
+| 1. Lage | y | $\varnothing 10@150$ | B500B |
+| Überdeckung unten | – | $30\,\mathrm{mm}$ | – |
+
+| Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Biegung und Normalkraft | Feld | $M_{Rk,x}(N_{Ed} = -200\,\mathrm{kN}) = 99.6\,\mathrm{kNm}$ | $M_{Ed,x} = 60.0\,\mathrm{kNm}$ | $1.66$ |
+| Querkraft | Feld | $V_{Rd,x}(M_{Ed} = 60\,\mathrm{kNm},\ N_{Ed} = -200\,\mathrm{kN}) = 171.7\,\mathrm{kN}/\mathrm{m}$ | $V_{Ed,x} = 50.0\,\mathrm{kN}/\mathrm{m}$ | $3.43$ |
+| Sprödes Versagen | 3. Lage | $M_{Rk,x}(N_{Ed} = 0)_{3} = 63.7\,\mathrm{kNm}$ | $M_{Riss} = 29.0\,\mathrm{kNm}$ | $2.20$ |
+| Risse: Quasi-ständige Lastfälle | Dauerlast | $\sigma_{s,adm} = 466\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 203\,\mathrm{N}/\mathrm{mm}^{2}$ | $2.29$ |
+| Risse: Häufige Lastfälle | Gebrauch | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 323\,\mathrm{N}/\mathrm{mm}^{2}$ | $1.10$ |
+| Knicken | Stütze | $N_{Rd,K} = 3488.4\,\mathrm{kN}$ | $N_{Ed} = 600.0\,\mathrm{kN}$ | $5.81$ |
+
+> **Hinweis:** Risse: Zwängung Normalkraft – 3. Lage: nicht erfüllt (α\_eff = 0.81), ausgeschaltet. N\_s,adm = 524 mm² · 500 N/mm² = 261.8 kN \< N\_Riss = 322.2 kN.
+
+### Block
+
+**Angaben zur Platte**
+
+$$
+\text{Beton C30/37} \qquad h = 220\,\mathrm{mm} \qquad b_x = 1000\,\mathrm{mm}
+$$
+
+**Bewehrung von oben nach unten**
+
+| Lage | Richtung | Bewehrung | Stahl |
+| :--- | :--- | :--- | :--- |
+| Überdeckung oben | – | $30\,\mathrm{mm}$ | – |
+| 4. Lage | y | $\varnothing 8@150$ | B500B |
+| 3. Lage | x | $\varnothing 10@150$ | B500B |
+| 2. Lage | x | $\varnothing 10@150$ | B500B |
+| 1. Lage | y | $\varnothing 8@150$ | B500B |
+| Überdeckung unten | – | $30\,\mathrm{mm}$ | – |
+
+| Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Biegung und Normalkraft | Feld | $M_{Rd,x}(N_{Ed} = 0\,\mathrm{kN}) = 44.8\,\mathrm{kNm}$ | $M_{Ed,x} = 25.0\,\mathrm{kNm}$ | $1.79$ |
+| Biegung und Normalkraft | Rand | $N_{Rd,x}(M_{Ed} = -15\,\mathrm{kNm}) = -4649.2\,\mathrm{kN}$ | $N_{Ed,x} = -100.0\,\mathrm{kN}$ | $46.49$ |
+| Querkraft | Feld | $V_{Rd,x}(M_{Ed} = 25\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) = 154.2\,\mathrm{kN}/\mathrm{m}$ | $V_{Ed,x} = 30.0\,\mathrm{kN}/\mathrm{m}$ | $5.14$ |
+| Risse: Quasi-ständige Lastfälle | Dauerlast | $\sigma_{s,adm} = 500\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 131\,\mathrm{N}/\mathrm{mm}^{2}$ | $3.82$ |
+| Knicken | Wand | $N_{Rd,K} = 3508.6\,\mathrm{kN}$ | $N_{Ed} = 400.0\,\mathrm{kN}$ | $8.77$ |
+
+> **Hinweis:** Risse: Zwängung Normalkraft – 2. Lage: nicht erfüllt (α\_eff = 0.91), ausgeschaltet. N\_s,adm = 524 mm² · 500 N/mm² = 261.8 kN \< N\_Riss = 287.4 kN.
 
 ### Ohne x
 
@@ -4664,6 +6140,113 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erfüllungsgrad Zwängung auf Biegung – 4. Lage x | $\alpha_{eff,ZB,4,x}$ | $2.17$ |  | berechnet |
 | Vergrösserungsfaktor der Durchbiegung, Zug oben | $\left(\frac{w}{w_c}\right)_{o}$ | $8.89$ |  | berechnet |
 | Vergrösserungsfaktor der Durchbiegung, Zug unten | $\left(\frac{w}{w_c}\right)_{u}$ | $8.89$ |  | berechnet |
+| Grösstkorndurchmesser | $D_{max}$ | $32$ | mm | Vorgabe |
+| Betrachtete Breite (x) | $b$ | $1000$ | mm | Vorgabe |
+| Betrachtete Breite (y) | $b_y$ | $1000$ | mm | Vorgabe |
+| Bewehrungsmass je Kubikmeter Beton | $\mu_s$ | $73$ | kg/m³ | berechnet |
+| Überdeckung oben | $c_{nom,o}$ | $30$ | mm | Vorgabe |
+| Überdeckung unten | $c_{nom,u}$ | $30$ | mm | Vorgabe |
+| Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) | $h_{Dist}$ | $148$ | mm | berechnet |
+| Höhe der Einlage | $e_{Einlage}$ | $0$ | mm | Vorgabe |
+| Plattendicke | $h$ | $250$ | mm | Vorgabe |
+| Kriechzahl | $\varphi$ | $2$ |  | Vorgabe |
+| Bewehrungsquerschnitt 1. Lage Grundbewehrung | $A_{s,1,y,g}$ | $524$ | mm² | berechnet |
+| Stabdurchmesser 1. Lage Grundbewehrung | $\varnothing_{1,y,g}$ | $10$ | mm | Vorgabe |
+| Teilung 1. Lage Grundbewehrung | $s_{1,y,g}$ | $150$ | mm | Vorgabe |
+| Tiefe 1. Lage Grundbewehrung ab Oberkante | $z_{1,y,g}$ | $215$ | mm | berechnet |
+| Bewehrungsquerschnitt 2. Lage Grundbewehrung | $A_{s,2,x,g}$ | $754$ | mm² | berechnet |
+| Stabdurchmesser 2. Lage Grundbewehrung | $\varnothing_{2,x,g}$ | $12$ | mm | Vorgabe |
+| Teilung 2. Lage Grundbewehrung | $s_{2,x,g}$ | $150$ | mm | Vorgabe |
+| Tiefe 2. Lage Grundbewehrung ab Oberkante | $z_{2,x,g}$ | $204$ | mm | berechnet |
+| Bewehrungsquerschnitt 3. Lage Grundbewehrung | $A_{s,3,x,g}$ | $524$ | mm² | berechnet |
+| Stabdurchmesser 3. Lage Grundbewehrung | $\varnothing_{3,x,g}$ | $10$ | mm | Vorgabe |
+| Teilung 3. Lage Grundbewehrung | $s_{3,x,g}$ | $150$ | mm | Vorgabe |
+| Tiefe 3. Lage Grundbewehrung ab Oberkante | $z_{3,x,g}$ | $45$ | mm | berechnet |
+| Bewehrungsquerschnitt 4. Lage Grundbewehrung | $A_{s,4,y,g}$ | $524$ | mm² | berechnet |
+| Stabdurchmesser 4. Lage Grundbewehrung | $\varnothing_{4,y,g}$ | $10$ | mm | Vorgabe |
+| Teilung 4. Lage Grundbewehrung | $s_{4,y,g}$ | $150$ | mm | Vorgabe |
+| Tiefe 4. Lage Grundbewehrung ab Oberkante | $z_{4,y,g}$ | $35$ | mm | berechnet |
+| Erfüllungsgrad Duktilität – 2. Lage | $\alpha_{eff,D,2}$ | $3.70$ |  | berechnet |
+| Bezogene Druckzonenhöhe – 2. Lage | $\left(x/d\right)_{2}$ | $0.095$ |  | berechnet |
+| Erfüllungsgrad Duktilität – 3. Lage | $\alpha_{eff,D,3}$ | $5.36$ |  | berechnet |
+| Bezogene Druckzonenhöhe – 3. Lage | $\left(x/d\right)_{3}$ | $0.065$ |  | berechnet |
+| Erfüllungsgrad Knicken – Stütze | $\alpha_{eff,K,\text{Stütze}}$ | $5.81$ |  | berechnet |
+| Momentenwiderstand bei N\_Ed (x-Richtung) – Feld | $M_{Rk,x}(N_{Ed})_{\text{Feld}}$ | $99.6$ | kNm | berechnet |
+| Erfüllungsgrad x-Richtung – Feld | $\alpha_{eff,x,\text{Feld}}$ | $1.66$ |  | berechnet |
+| Momentenwiderstand bei N = 0, negativ (x-Richtung) | $M_{Rk,x}(N=0)^{-}$ | $-63.7$ | kNm | berechnet |
+| Momentenwiderstand bei N = 0, positiv (x-Richtung) | $M_{Rk,x}(N=0)^{+}$ | $81.3$ | kNm | berechnet |
+| Grösster positiver Momentenwiderstand (x-Richtung) | $M_{Rk,x}^{+}$ | $261.6$ | kNm | berechnet |
+| Grösster negativer Momentenwiderstand (x-Richtung) | $M_{Rk,x}^{-}$ | $-263.9$ | kNm | berechnet |
+| Grösste aufnehmbare Druckkraft (x-Richtung) | $N_{Rk,x}^{-}$ | $-7972.7$ | kN | berechnet |
+| Grösste aufnehmbare Zugkraft (x-Richtung) | $N_{Rk,x}^{+}$ | $638.8$ | kN | berechnet |
+| Erfüllungsgrad Querkraft x-Richtung – Feld | $\alpha_{eff,V,x,\text{Feld}}$ | $3.43$ |  | berechnet |
+| Querkraftwiderstand x-Richtung – Feld | $V_{Rd,x}$ | $171.7$ | kN/m | berechnet |
+| Erfüllungsgrad Rissnormalkraft – 2. Lage x | $\alpha_{eff,NR,2,x}$ | $1.09$ |  | berechnet |
+| Erfüllungsgrad Rissnormalkraft – 3. Lage x | $\alpha_{eff,NR,3,x}$ | $0.81$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung gegen Fliessen x-Richtung – Feld (70 %) | $\alpha_{eff,\sigma,x,\text{Feld (70 \%)}}$ | $1.72$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung gegen Fliessen x-Richtung – Gebrauch | $\alpha_{eff,\sigma,x,\text{Gebrauch}}$ | $1.10$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Dauerlast | $\alpha_{eff,\sigma,w,x,\text{Dauerlast}}$ | $2.29$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %) | $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ | $3.11$ |  | berechnet |
+| Erfüllungsgrad sprödes Versagen – 2. Lage x | $\alpha_{eff,SV,2,x}$ | $2.80$ |  | berechnet |
+| Erfüllungsgrad sprödes Versagen – 3. Lage x | $\alpha_{eff,SV,3,x}$ | $2.20$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – 2. Lage x | $\alpha_{eff,ZB,2,x}$ | $2.32$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – 3. Lage x | $\alpha_{eff,ZB,3,x}$ | $1.75$ |  | berechnet |
+| Vergrösserungsfaktor der Durchbiegung, Zug oben | $\left(\frac{w}{w_c}\right)_{o}$ | $10.42$ |  | berechnet |
+| Vergrösserungsfaktor der Durchbiegung, Zug unten | $\left(\frac{w}{w_c}\right)_{u}$ | $8.37$ |  | berechnet |
+| Grösstkorndurchmesser | $D_{max}$ | $32$ | mm | Vorgabe |
+| Betrachtete Breite (x) | $b$ | $1000$ | mm | Vorgabe |
+| Betrachtete Breite (y) | $b_y$ | $1000$ | mm | Vorgabe |
+| Bewehrungsmass je Kubikmeter Beton | $\mu_s$ | $61$ | kg/m³ | berechnet |
+| Überdeckung oben | $c_{nom,o}$ | $30$ | mm | Vorgabe |
+| Überdeckung unten | $c_{nom,u}$ | $30$ | mm | Vorgabe |
+| Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) | $h_{Dist}$ | $124$ | mm | berechnet |
+| Höhe der Einlage | $e_{Einlage}$ | $0$ | mm | Vorgabe |
+| Plattendicke | $h$ | $220$ | mm | Vorgabe |
+| Kriechzahl | $\varphi$ | $2$ |  | Vorgabe |
+| Bewehrungsquerschnitt 1. Lage Grundbewehrung | $A_{s,1,y,g}$ | $335$ | mm² | berechnet |
+| Stabdurchmesser 1. Lage Grundbewehrung | $\varnothing_{1,y,g}$ | $8$ | mm | Vorgabe |
+| Teilung 1. Lage Grundbewehrung | $s_{1,y,g}$ | $150$ | mm | Vorgabe |
+| Tiefe 1. Lage Grundbewehrung ab Oberkante | $z_{1,y,g}$ | $186$ | mm | berechnet |
+| Bewehrungsquerschnitt 2. Lage Grundbewehrung | $A_{s,2,x,g}$ | $524$ | mm² | berechnet |
+| Stabdurchmesser 2. Lage Grundbewehrung | $\varnothing_{2,x,g}$ | $10$ | mm | Vorgabe |
+| Teilung 2. Lage Grundbewehrung | $s_{2,x,g}$ | $150$ | mm | Vorgabe |
+| Tiefe 2. Lage Grundbewehrung ab Oberkante | $z_{2,x,g}$ | $177$ | mm | berechnet |
+| Bewehrungsquerschnitt 3. Lage Grundbewehrung | $A_{s,3,x,g}$ | $524$ | mm² | berechnet |
+| Stabdurchmesser 3. Lage Grundbewehrung | $\varnothing_{3,x,g}$ | $10$ | mm | Vorgabe |
+| Teilung 3. Lage Grundbewehrung | $s_{3,x,g}$ | $150$ | mm | Vorgabe |
+| Tiefe 3. Lage Grundbewehrung ab Oberkante | $z_{3,x,g}$ | $43$ | mm | berechnet |
+| Bewehrungsquerschnitt 4. Lage Grundbewehrung | $A_{s,4,y,g}$ | $335$ | mm² | berechnet |
+| Stabdurchmesser 4. Lage Grundbewehrung | $\varnothing_{4,y,g}$ | $8$ | mm | Vorgabe |
+| Teilung 4. Lage Grundbewehrung | $s_{4,y,g}$ | $150$ | mm | Vorgabe |
+| Tiefe 4. Lage Grundbewehrung ab Oberkante | $z_{4,y,g}$ | $34$ | mm | berechnet |
+| Erfüllungsgrad Duktilität – 2. Lage | $\alpha_{eff,D,2}$ | $4.63$ |  | berechnet |
+| Bezogene Druckzonenhöhe – 2. Lage | $\left(x/d\right)_{2}$ | $0.076$ |  | berechnet |
+| Erfüllungsgrad Duktilität – 3. Lage | $\alpha_{eff,D,3}$ | $4.63$ |  | berechnet |
+| Bezogene Druckzonenhöhe – 3. Lage | $\left(x/d\right)_{3}$ | $0.076$ |  | berechnet |
+| Erfüllungsgrad Knicken – Wand | $\alpha_{eff,K,\text{Wand}}$ | $8.77$ |  | berechnet |
+| Momentenwiderstand bei N\_Ed (x-Richtung) – Feld | $M_{Rd,x}(N_{Ed})_{\text{Feld}}$ | $44.8$ | kNm | berechnet |
+| Erfüllungsgrad x-Richtung – Feld | $\alpha_{eff,x,\text{Feld}}$ | $1.79$ |  | berechnet |
+| Momentenwiderstand bei N = 0, negativ (x-Richtung) | $M_{Rd,x}(N=0)^{-}$ | $-44.8$ | kNm | berechnet |
+| Momentenwiderstand bei N = 0, positiv (x-Richtung) | $M_{Rd,x}(N=0)^{+}$ | $44.8$ | kNm | berechnet |
+| Grösster positiver Momentenwiderstand (x-Richtung) | $M_{Rd,x}^{+}$ | $147.5$ | kNm | berechnet |
+| Grösster negativer Momentenwiderstand (x-Richtung) | $M_{Rd,x}^{-}$ | $-147.5$ | kNm | berechnet |
+| Grösste aufnehmbare Druckkraft (x-Richtung) | $N_{Rd,x}^{-}$ | $-4797.9$ | kN | berechnet |
+| Grösste aufnehmbare Zugkraft (x-Richtung) | $N_{Rd,x}^{+}$ | $455.3$ | kN | berechnet |
+| Momentenwiderstand bei N\_Ed (x-Richtung) – Rand | $M_{Rd,x}(N_{Ed})_{\text{Rand}}$ | $52.4$ | kNm | berechnet |
+| Erfüllungsgrad x-Richtung – Rand | $\alpha_{eff,x,\text{Rand}}$ | $46.49$ |  | berechnet |
+| Erfüllungsgrad Querkraft x-Richtung – Feld | $\alpha_{eff,V,x,\text{Feld}}$ | $5.14$ |  | berechnet |
+| Querkraftwiderstand x-Richtung – Feld | $V_{Rd,x}$ | $154.2$ | kN/m | berechnet |
+| Erfüllungsgrad Rissnormalkraft – 2. Lage x | $\alpha_{eff,NR,2,x}$ | $0.91$ |  | berechnet |
+| Erfüllungsgrad Rissnormalkraft – 3. Lage x | $\alpha_{eff,NR,3,x}$ | $0.91$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Dauerlast | $\alpha_{eff,\sigma,w,x,\text{Dauerlast}}$ | $3.82$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Feld (60 %) | $\alpha_{eff,\sigma,w,x,\text{Feld (60 \%)}}$ | $3.06$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite x-Richtung – Rand (60 %) | $\alpha_{eff,\sigma,w,x,\text{Rand (60 \%)}}$ | $18.27$ |  | berechnet |
+| Erfüllungsgrad sprödes Versagen – 2. Lage x | $\alpha_{eff,SV,2,x}$ | $1.99$ |  | berechnet |
+| Erfüllungsgrad sprödes Versagen – 3. Lage x | $\alpha_{eff,SV,3,x}$ | $1.99$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – 2. Lage x | $\alpha_{eff,ZB,2,x}$ | $1.94$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – 3. Lage x | $\alpha_{eff,ZB,3,x}$ | $1.94$ |  | berechnet |
+| Vergrösserungsfaktor der Durchbiegung, Zug oben | $\left(\frac{w}{w_c}\right)_{o}$ | $10.11$ |  | berechnet |
+| Vergrösserungsfaktor der Durchbiegung, Zug unten | $\left(\frac{w}{w_c}\right)_{u}$ | $10.11$ |  | berechnet |
 | Erfüllungsgrad M-N x-Richtung – Feld (keine Bewehrung) | $\alpha_{eff,M-N,x,\text{Feld}}$ | $0.00$ |  | berechnet |
 | Erfüllungsgrad V x-Richtung – Feld (keine Bewehrung) | $\alpha_{eff,V,x,\text{Feld}}$ | $0.00$ |  | berechnet |
 | Grösstkorndurchmesser | $D_{max}$ | $32$ | mm | Vorgabe |

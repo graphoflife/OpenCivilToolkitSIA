@@ -221,6 +221,18 @@
           "text": "Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f_cd; gedrückter Stahl bleibt unberücksichtigt. Die Bewehrung ist je Seite zu einer Lage zusammengefasst, das Moment bezieht sich auf die halbe Querschnittshöhe."
         },
         {
+          "art": "text",
+          "text": "Der Querschnitt bleibt eben (Bernoulli). Zu jeder Dehnungsebene ergeben sich Normalkraft und Moment aus den Spannungen über die Höhe; Zug ist positiv, das Moment bezieht sich auf die halbe Querschnittshöhe. Die Resistenzlinie ist der Rand aller zulässigen Ebenen: an ihm erreicht der Stahl ε_ud, der Beton am gedrückten Rand −ε_c2d oder, wenn der ganze Querschnitt gedrückt ist, im Punkt C −ε_c1d."
+        },
+        {
+          "art": "text",
+          "text": "Der Beton ist in 200 Fasern über die Höhe geteilt, die Bewehrung zählt Lage für Lage, und an ihrer Stelle zählt der Stahl statt des Betons – auch die gedrückte Bewehrung wirkt mit. Den Widerstand bei einer Einwirkung sucht die Rechnung auf dem Rand selbst, zwischen zwei benachbarten Ebenen; was dort gilt, zeigt bei jeder Kombination die Probe."
+        },
+        {
+          "art": "text",
+          "text": "Der Beton ist in 200 Fasern über die Höhe geteilt, jede mit ihrer mittleren Spannung, die Bewehrung zählt Lage für Lage, und an ihrer Stelle zählt der Stahl statt des Betons – auch die gedrückte Bewehrung wirkt mit. Den Widerstand bei einer Einwirkung sucht die Rechnung auf dem Rand selbst, zwischen zwei benachbarten Ebenen; was dort gilt, zeigt bei jeder Kombination die Probe."
+        },
+        {
           "art": "gleichung",
           "latex": "z_{2,x} = \\frac{A_{s,2,x,g} \\cdot z_{2,x,g} + A_{s,2,x,z} \\cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}}",
           "markdown": "**Schwerpunkt der zusammengefassten Lage – 2. Lage Grundbewehrung + 2. Lage Zulage**\n\n$$\nz_{2,x} = \\frac{A_{s,2,x,g} \\cdot z_{2,x,g} + A_{s,2,x,z} \\cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}}\n$$",
@@ -342,6 +354,33 @@
           "latex": "M_{Rd} = M_1 + \\frac{N_{Ed} - N_1}{N_2 - N_1} \\cdot \\left(M_2 - M_1\\right)",
           "markdown": "**Widerstand bei festgehaltenem N\\_Ed**\n\n$$\nM_{Rd} = M_1 + \\frac{N_{Ed} - N_1}{N_2 - N_1} \\cdot \\left(M_2 - M_1\\right)\n$$",
           "titel": "Widerstand bei festgehaltenem N_Ed",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\sigma_c(\\varepsilon_c) = \\begin{cases} -f_{ck} \\cdot \\dfrac{k_\\sigma\\,\\eta - \\eta^2}{1 + (k_\\sigma - 2)\\,\\eta} & 0 \\le |\\varepsilon_c| \\le \\varepsilon_{c1d},\\ \\eta = \\dfrac{|\\varepsilon_c|}{\\varepsilon_{c1d}} \\\\[2ex] -f_{ck} & \\varepsilon_{c1d} < |\\varepsilon_c| \\le \\varepsilon_{c2d} \\\\[1ex] 0 & \\varepsilon_c > 0 \\quad (\\text{Zug, gerissen}) \\end{cases}",
+          "markdown": "**Werkstoffgesetze: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.6)*\n\n$$\n\\sigma_c(\\varepsilon_c) = \\begin{cases} -f_{ck} \\cdot \\dfrac{k_\\sigma\\,\\eta - \\eta^2}{1 + (k_\\sigma - 2)\\,\\eta} & 0 \\le |\\varepsilon_c| \\le \\varepsilon_{c1d},\\ \\eta = \\dfrac{|\\varepsilon_c|}{\\varepsilon_{c1d}} \\\\[2ex] -f_{ck} & \\varepsilon_{c1d} < |\\varepsilon_c| \\le \\varepsilon_{c2d} \\\\[1ex] 0 & \\varepsilon_c > 0 \\quad (\\text{Zug, gerissen}) \\end{cases}\n$$",
+          "titel": "Werkstoffgesetze: Beton, Parabel-Rechteck",
+          "referenz": "SIA 262:2025, 4.2.1.6",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\sigma_s(\\varepsilon_s) = \\begin{cases} \\min(E_s\\,\\varepsilon_s;\\ f_{yk}) & \\varepsilon_s \\ge 0 \\\\[1ex] \\max(E_s\\,\\varepsilon_s;\\ -f_{yk}^{-}) & \\varepsilon_s < 0 \\end{cases} \\qquad |\\varepsilon_s| \\le \\varepsilon_{ud}",
+          "markdown": "**Werkstoffgesetze: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*\n\n$$\n\\sigma_s(\\varepsilon_s) = \\begin{cases} \\min(E_s\\,\\varepsilon_s;\\ f_{yk}) & \\varepsilon_s \\ge 0 \\\\[1ex] \\max(E_s\\,\\varepsilon_s;\\ -f_{yk}^{-}) & \\varepsilon_s < 0 \\end{cases} \\qquad |\\varepsilon_s| \\le \\varepsilon_{ud}\n$$",
+          "titel": "Werkstoffgesetze: Stahl, bilinear",
+          "referenz": "SIA 262:2025, 4.2.2.4",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "N = \\int_A \\sigma\\,\\mathrm{d}A \\qquad M = \\int_A \\sigma \\cdot \\left(z - \\tfrac{h}{2}\\right)\\,\\mathrm{d}A",
+          "markdown": "**Schnittgrössen aus der Spannungsverteilung**\n\n$$\nN = \\int_A \\sigma\\,\\mathrm{d}A \\qquad M = \\int_A \\sigma \\cdot \\left(z - \\tfrac{h}{2}\\right)\\,\\mathrm{d}A\n$$",
+          "titel": "Schnittgrössen aus der Spannungsverteilung",
           "referenz": "",
           "wert_id": "",
           "gruppe": ""
@@ -520,33 +559,6 @@
           "markdown": "**Widerstand in der Richtung der Einwirkung**\n\n$$\nM_{Rd} = \\sqrt{M_{y,Rd}^{2} + M_{z,Rd}^{2}}\n$$",
           "titel": "Widerstand in der Richtung der Einwirkung",
           "referenz": "",
-          "wert_id": "",
-          "gruppe": ""
-        },
-        {
-          "art": "gleichung",
-          "latex": "\\sigma_c(\\varepsilon_c) = \\begin{cases} 0 & \\varepsilon_c > -(1 - 0.85) \\cdot \\varepsilon_{c2d} \\\\[1ex] -f_{cd} & -\\varepsilon_{c2d} \\le \\varepsilon_c \\le -(1 - 0.85) \\cdot \\varepsilon_{c2d} \\end{cases}",
-          "markdown": "**C30/37: Spannungsblock 0.85·x, Bemessungswerte**\n\n$$\n\\sigma_c(\\varepsilon_c) = \\begin{cases} 0 & \\varepsilon_c > -(1 - 0.85) \\cdot \\varepsilon_{c2d} \\\\[1ex] -f_{cd} & -\\varepsilon_{c2d} \\le \\varepsilon_c \\le -(1 - 0.85) \\cdot \\varepsilon_{c2d} \\end{cases}\n$$",
-          "titel": "C30/37: Spannungsblock 0.85·x, Bemessungswerte",
-          "referenz": "",
-          "wert_id": "",
-          "gruppe": ""
-        },
-        {
-          "art": "gleichung",
-          "latex": "\\sigma_c(\\varepsilon_c) = \\begin{cases} -f_{ck} \\cdot \\dfrac{k_\\sigma\\,\\eta - \\eta^2}{1 + (k_\\sigma - 2)\\,\\eta} & 0 \\le |\\varepsilon_c| \\le \\varepsilon_{c1d},\\ \\eta = \\dfrac{|\\varepsilon_c|}{\\varepsilon_{c1d}} \\\\[2ex] -f_{ck} & \\varepsilon_{c1d} < |\\varepsilon_c| \\le \\varepsilon_{c2d} \\\\[1ex] 0 & \\varepsilon_c > 0 \\quad (\\text{Zug, gerissen}) \\end{cases}",
-          "markdown": "**C30/37: Parabel-Rechteck-Beziehung, charakteristische Werte** *(SIA 262:2025, 4.2.1.6)*\n\n$$\n\\sigma_c(\\varepsilon_c) = \\begin{cases} -f_{ck} \\cdot \\dfrac{k_\\sigma\\,\\eta - \\eta^2}{1 + (k_\\sigma - 2)\\,\\eta} & 0 \\le |\\varepsilon_c| \\le \\varepsilon_{c1d},\\ \\eta = \\dfrac{|\\varepsilon_c|}{\\varepsilon_{c1d}} \\\\[2ex] -f_{ck} & \\varepsilon_{c1d} < |\\varepsilon_c| \\le \\varepsilon_{c2d} \\\\[1ex] 0 & \\varepsilon_c > 0 \\quad (\\text{Zug, gerissen}) \\end{cases}\n$$",
-          "titel": "C30/37: Parabel-Rechteck-Beziehung, charakteristische Werte",
-          "referenz": "SIA 262:2025, 4.2.1.6",
-          "wert_id": "",
-          "gruppe": ""
-        },
-        {
-          "art": "gleichung",
-          "latex": "\\sigma_s(\\varepsilon_s) = \\begin{cases} \\min(E_s\\,\\varepsilon_s;\\ f_{yk}) & \\varepsilon_s \\ge 0 \\\\[1ex] \\max(E_s\\,\\varepsilon_s;\\ -f_{yk}^{-}) & \\varepsilon_s < 0 \\end{cases} \\qquad |\\varepsilon_s| \\le \\varepsilon_{ud}",
-          "markdown": "**B500B: bilineare Beziehung, charakteristische Werte** *(SIA 262:2025, 4.2.2.4)*\n\n$$\n\\sigma_s(\\varepsilon_s) = \\begin{cases} \\min(E_s\\,\\varepsilon_s;\\ f_{yk}) & \\varepsilon_s \\ge 0 \\\\[1ex] \\max(E_s\\,\\varepsilon_s;\\ -f_{yk}^{-}) & \\varepsilon_s < 0 \\end{cases} \\qquad |\\varepsilon_s| \\le \\varepsilon_{ud}\n$$",
-          "titel": "B500B: bilineare Beziehung, charakteristische Werte",
-          "referenz": "SIA 262:2025, 4.2.2.4",
           "wert_id": "",
           "gruppe": ""
         }
@@ -905,6 +917,10 @@
           "text": "Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Nachgewiesen wird deshalb, dass der bewehrte Querschnitt mehr trägt als der unbewehrte im Augenblick des Risses: M_Rd(N_Ed = 0) ≥ M_Riss."
         },
         {
+          "art": "text",
+          "text": "Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Nachgewiesen wird deshalb, dass der bewehrte Querschnitt mehr trägt als der unbewehrte im Augenblick des Risses: M_Rk(N_Ed = 0) ≥ M_Riss."
+        },
+        {
           "art": "gleichung",
           "latex": "k_t = \\frac{1}{1 + 0.5 \\cdot h/3} \\quad \\left(h\\ \\text{in}\\ \\mathrm{m}\\right)",
           "markdown": "**Beiwert für die Plattendicke** *(SIA 262:2025, 4.4.1.3)*\n\n$$\nk_t = \\frac{1}{1 + 0.5 \\cdot h/3} \\quad \\left(h\\ \\text{in}\\ \\mathrm{m}\\right)\n$$",
@@ -1036,6 +1052,18 @@
           "text": "Nachgewiesen wird deshalb nicht der Weg, sondern das Ergebnis: dass die gefundene Ebene genau die angegebenen Schnittgrössen erzeugt. Diese Probe steht bei jedem Fall."
         },
         {
+          "art": "text",
+          "text": "Mit dem Spannungsblock trägt der Beton unter (1 − 0.85)·ε_c2d nichts. Unter Gebrauchslast liegt die Druckresultierende damit am Rand, und der Hebelarm wird beinahe d – die Stahlspannung kleiner, als der Querschnitt sie hat. Der Block ist ein Modell für den Bruch."
+        },
+        {
+          "art": "text",
+          "text": "Mit der Handrechnung rechnet der Querschnitt wie die Resistenzlinie aus Handrechnung: der Beton als Spannungsblock, die gedrückte Bewehrung weggelassen, die Bewehrung jeder Seite zu einer Lage in ihrem Schwerpunkt zusammengefasst, und der Beton auch dort gezählt, wo der Stahl liegt."
+        },
+        {
+          "art": "text",
+          "text": "Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebildet; der Stahl kommt Lage für Lage dazu. Wie in der Handrechnung zählt der Beton auch dort, wo der Stahl liegt."
+        },
+        {
           "art": "gleichung",
           "latex": "E_{c,eff} = \\frac{E_{cm}}{1 + \\varphi}",
           "markdown": "**Wirksamer Elastizitätsmodul**\n\n$$\nE_{c,eff} = \\frac{E_{cm}}{1 + \\varphi}\n$$",
@@ -1076,6 +1104,24 @@
           "latex": "\\varepsilon_{s,adm} = \\frac{\\sigma_{s,adm}}{E_s}",
           "markdown": "**Zulässige Dehnung**\n\n$$\n\\varepsilon_{s,adm} = \\frac{\\sigma_{s,adm}}{E_s}\n$$",
           "titel": "Zulässige Dehnung",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\sigma_c(\\varepsilon_c) = \\begin{cases} 0 & \\varepsilon_c > -(1 - 0.85) \\cdot \\varepsilon_{c2d} \\\\[1ex] -f_{ck} & -\\varepsilon_{c2d} \\le \\varepsilon_c \\le -(1 - 0.85) \\cdot \\varepsilon_{c2d} \\end{cases}",
+          "markdown": "**Werkstoffgesetze im Gebrauchszustand: Beton, Spannungsblock 0.85·x**\n\n$$\n\\sigma_c(\\varepsilon_c) = \\begin{cases} 0 & \\varepsilon_c > -(1 - 0.85) \\cdot \\varepsilon_{c2d} \\\\[1ex] -f_{ck} & -\\varepsilon_{c2d} \\le \\varepsilon_c \\le -(1 - 0.85) \\cdot \\varepsilon_{c2d} \\end{cases}\n$$",
+          "titel": "Werkstoffgesetze im Gebrauchszustand: Beton, Spannungsblock 0.85·x",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\sigma_s = \\begin{cases} \\min\\left(E_s \\cdot \\varepsilon_s;\\ f_{yk}\\right) & \\varepsilon_s > 0 \\\\[1ex] 0 & \\varepsilon_s \\le 0 \\quad (\\text{gedrückt: weggelassen}) \\end{cases}",
+          "markdown": "**Werkstoffgesetze im Gebrauchszustand: Stahl, nur auf Zug**\n\n$$\n\\sigma_s = \\begin{cases} \\min\\left(E_s \\cdot \\varepsilon_s;\\ f_{yk}\\right) & \\varepsilon_s > 0 \\\\[1ex] 0 & \\varepsilon_s \\le 0 \\quad (\\text{gedrückt: weggelassen}) \\end{cases}\n$$",
+          "titel": "Werkstoffgesetze im Gebrauchszustand: Stahl, nur auf Zug",
           "referenz": "",
           "wert_id": "",
           "gruppe": ""
@@ -1197,6 +1243,15 @@
           "markdown": "**Das Verfahren** *(SIA 262:2025, 4.3.7)*\n\n$$\ne_{2d}^{(k)} = \\left|\\chi^{(k)}\\right| \\cdot \\frac{l_{cr}^{2}}{\\pi^{2}} \\qquad M_{Ed,II}^{(k)} = \\left|N_{Ed}\\right| \\cdot \\left(e_{0d} + e_{1d} + e_{2d}^{(k-1)}\\right)\n$$",
           "titel": "Das Verfahren",
           "referenz": "SIA 262:2025, 4.3.7",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "\\sigma_c(\\varepsilon_c) = \\begin{cases} 0 & \\varepsilon_c > -(1 - 0.85) \\cdot \\varepsilon_{c2d} \\\\[1ex] -f_{cd} & -\\varepsilon_{c2d} \\le \\varepsilon_c \\le -(1 - 0.85) \\cdot \\varepsilon_{c2d} \\end{cases}",
+          "markdown": "**Werkstoffgesetze der Verformung: Beton, Spannungsblock 0.85·x**\n\n$$\n\\sigma_c(\\varepsilon_c) = \\begin{cases} 0 & \\varepsilon_c > -(1 - 0.85) \\cdot \\varepsilon_{c2d} \\\\[1ex] -f_{cd} & -\\varepsilon_{c2d} \\le \\varepsilon_c \\le -(1 - 0.85) \\cdot \\varepsilon_{c2d} \\end{cases}\n$$",
+          "titel": "Werkstoffgesetze der Verformung: Beton, Spannungsblock 0.85·x",
+          "referenz": "",
           "wert_id": "",
           "gruppe": ""
         }
