@@ -165,8 +165,9 @@ Kein Nachweis, sondern die Frage, was im Querschnitt geschieht:
 
 Eine Linie ist ungerissen bis zum Riss, springt dort und ist darüber gerissen.
 Sie endet bei der ersten Grenzdehnung, wie im Dehnungsfächer. An den Ecken
-stehen Riss, Fliessbeginn und Ende (M_Rd,u, N_Rd,u), je mit Kraft und
-Verformung, am Ende auch die massgebende Grenze. Jede Analyse wählt selbst:
+stehen Riss, Fliessbeginn (M_Rd, N_Rd) und Ende (M_Rd,u, N_Rd,u), je mit
+Kraft und Verformung, am Ende auch die massgebende Grenze. Jede Analyse
+wählt selbst:
 * die Kriechzahl φ, leer gilt die der Platte;
 * Bemessungs- oder charakteristische Werte;
 * Parabel-Rechteck oder Spannungsblock.

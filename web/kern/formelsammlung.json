@@ -1263,7 +1263,7 @@
         },
         {
           "art": "text",
-          "text": "Der Fliessbeginn ist der Punkt, an dem die am stärksten gezogene Lage die Fliessdehnung erreicht. Danach wächst die Kraft nur noch wenig: die Druckzone wird kleiner, der Hebelarm grösser, und der Beton füllt sein Gesetz, bis eine Grenzdehnung erreicht ist."
+          "text": "Der Fliessbeginn ist der Punkt, an dem die am stärksten gezogene Lage die Fliessdehnung erreicht. Danach wächst die Kraft nur noch wenig: die Druckzone wird kleiner, der Hebelarm grösser, und der Beton füllt sein Gesetz, bis eine Grenzdehnung erreicht ist. Im Bild heisst die Kraft beim Fliessbeginn M_Rd bzw. N_Rd, am Ende M_Rd,u bzw. N_Rd,u; mit charakteristischen Werten Rk statt Rd."
         },
         {
           "art": "text",

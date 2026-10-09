@@ -334,10 +334,13 @@ function linienbild(fall) {
           `${art.verformung('')} = ${v(ende.verformung)}`],
     });
   }
+  // Der Fliessbeginn heisst M_Rd bzw. N_Rd, das Ende M_Rd,u -- mit
+  // charakteristischen Werten Rk. Die Verformung behält ihr y: sie ist die
+  // beim Fliessen.
   if (k.fliessen) {
     ecken.push({
       px: x(k.fliessen.verformung), py: y(k.fliessen.kraft), farbe: STAHL,
-      zeilen: [`${art.kraft}_y = ${f(k.fliessen.kraft)}`,
+      zeilen: [`${art.kraft}_{${kennwert}} = ${f(k.fliessen.kraft)}`,
         `${art.verformung('y')} = ${v(k.fliessen.verformung)}`],
     });
   }
@@ -411,7 +414,7 @@ export function spannungsfallZeichnen(fall) {
       zahlenzeile([
         [art.fest[0], mitEinheit(k.fest, 1, art.fest[1])],
         [`${K}_{Riss}`, kraft(k.riss)],
-        ...(k.fliessen ? [[`${K}_{y}`, kraft(k.fliessen.kraft)]] : []),
+        ...(k.fliessen ? [[`${K}_{${kennwert}}`, kraft(k.fliessen.kraft)]] : []),
         ...(k.bruch ? [[`${K}_{${kennwert},u}`, kraft(k.bruch.kraft)],
           [art.latex('u'), mitEinheit(k.bruch.verformung, art.stellen, art.verformungEinheit)]]
           : []),

@@ -799,7 +799,9 @@ def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
         "Der Fliessbeginn ist der Punkt, an dem die am stärksten gezogene Lage die "
         "Fliessdehnung erreicht. Danach wächst die Kraft nur noch wenig: die "
         "Druckzone wird kleiner, der Hebelarm grösser, und der Beton füllt sein "
-        "Gesetz, bis eine Grenzdehnung erreicht ist.")
+        "Gesetz, bis eine Grenzdehnung erreicht ist. Im Bild heisst die Kraft beim "
+        "Fliessbeginn M_Rd bzw. N_Rd, am Ende M_Rd,u bzw. N_Rd,u; mit "
+        "charakteristischen Werten Rk statt Rd.")
     p.formel(w.dehnung("eps_y", r"\varepsilon_{y}", paar.eps_y),
              r"\frac{@f_s}{@E_s}", {"f_s": ein("f_s"), "E_s": ein("E_s")},
              titel="Dehnung bei Fliessbeginn")

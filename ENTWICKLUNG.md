@@ -55,6 +55,7 @@ Wünsche:
   erklärt die Linie und die grösste Krümmung.
 * Neu eine N-ε-Linie auf Zug, mit N_Riss, N_Rd und der grössten Dehnung,
   bei einstellbarem M_Ed.
+* Nachgereicht: Der Fliessbeginn heisst im Bild M_Rd, nicht M_y.
 
 **χ sah aus wie x.** JetBrains Mono zeichnet χ fast wie x. Griechische
 Buchstaben in Bildern und Achsentiteln setzt jetzt `formelText` (in
@@ -93,10 +94,20 @@ dieselbe wie im Dehnungsfächer der genauen M-N-Linie:
 
 Welche Grenze massgebend ist, steht am Ende der Linie.
 
-**M_Rd gehört ans Ende, nicht an den Fliessbeginn.** Der Stahl fliesst bei
-M_y = 224.6 kNm (χ_y = 0.015 1/m). Danach wächst das Moment noch um 5 %: Die
-Druckzone wird kleiner, und der Beton füllt sein Gesetz. Die Linie zeigt
-beide Punkte, M_y und M_Rd,u (mit charakteristischen Werten M_Rk,u).
+**Fliessbeginn und Ende.** Der Stahl fliesst bei 224.6 kNm
+(χ_y = 0.015 1/m). Danach wächst das Moment noch um 5 %: Die Druckzone wird
+kleiner, und der Beton füllt sein Gesetz. Die Linie zeigt beide Punkte. Im
+Bild heisst der Fliessbeginn, wie gewünscht, M_Rd und das Ende M_Rd,u:
+
+```
+zuerst   M_y  = 224.6 kNm   …   M_Rd,u = 235.4 kNm
+jetzt    M_Rd = 224.6 kNm   …   M_Rd,u = 235.4 kNm
+```
+
+Mit charakteristischen Werten heissen sie M_Rk und M_Rk,u, bei der N-ε-Linie
+N_Rd und N_Rd,u. Die Krümmung beim Fliessen behält ihr y. Das M_Rd des
+M-N-Nachweises ist ein anderes: Es rechnet den Bruch, nicht den
+Fliessbeginn, und entspricht darum M_Rd,u.
 
 **Warum M_Rd,u nicht genau das M_Rd des Nachweises ist.** Der Nachweis
 rechnet von Hand: Spannungsblock 0.85·x, ohne gedrückten Stahl, die Lagen je
@@ -115,7 +126,7 @@ die Dehnung auf halber Höhe. Der Ablauf:
 * ungerissen bis N_Riss = f_ct,eff·b·h − 6·|M|/h, am Bruttoquerschnitt wie
   M_Riss(N);
 * dort der Sprung;
-* gerissen bis zum Bruch, mit dem Fliessbeginn N_y.
+* gerissen bis zum Bruch, mit dem Fliessbeginn N_Rd.
 
 Wo sie endet, hängt an der Bewehrung. Symmetrisch bewehrt und ohne Moment
 trägt am Ende der ganze Stahl, N_Rd = Σ A_s·f_yd, und die Lagen stehen auf
