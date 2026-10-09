@@ -44,6 +44,122 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-09 · Rechenwahl je Kapitel, genaue Resistenzlinie, Vergrösserungsfaktor w/w_c
+
+Wünsche:
+* Tragsicherheit, Stahlspannung quasi-ständig, Fliessen häufig und Knicken
+  wählen je selbst: die Kriechzahl φ, die Werte (Bemessung → M_Rd,
+  charakteristisch → M_Rk) und die Rechenart -- Handrechnung Block 0.85·x,
+  Block 0.85·x genau (mit Druckstahl) oder Parabel.
+* Das Knicken zweimal: für die Verformung (e_2d) und für den Widerstand
+  N_Rd(M_Ed = N_Ed·e_tot).
+* Die Spannung-Dehnung-Analyse bekommt die Handrechnung als Rechenart.
+* Das φ der Platte bleibt, gilt aber nur für den Vergrösserungsfaktor w/w_c
+  nach SIA 262:2025, 4.4.3.2.5 -- in x, für Zug unten und Zug oben, auf zwei
+  Stellen, in der Zusammenfassung neben Bewehrungsmass und Distanzhalter.
+* Entschieden: jedes Kapitel hat sein eigenes φ, Vorgabe 0; «elastisch»
+  bleibt bei den Stahlspannungen als vierte Art und Vorgabe; Querkraft und
+  sprödes Versagen folgen der Tragsicherheit; ρ′ = A_s′/(b·d′) mit d′ vom
+  gezogenen Rand bis zur Gegenlage.
+* Nachgereicht: alte Speicherstände sind im Prototyp nicht wichtig.
+
+**Eine Stelle für die Gesetze.** `nachweis/rechenwahl.py` hat die
+`Rechenwahl` (φ, Wertesatz, Rechenart) und baut daraus Beton, Stahl, Lagen
+und Löser. Vorher baute jedes Kapitel seine Gesetze selbst, und die Parabel
+stand dreimal da. Die Rechenarten im Löser:
+
+| Rechenart | Beton | Stahl | Lagen |
+|---|---|---|---|
+| Handrechnung | Block, auch wo der Stahl liegt | nur Zug | je Seite eine, im Schwerpunkt |
+| Block genau | Block, über jede Faser gemittelt | Zug und Druck | jede für sich |
+| Parabel | k_σ aus E_cm/(1+φ), nie unter 1 | Zug und Druck | jede für sich |
+| elastisch | E_cm/(1+φ), höchstens f_c | Zug und Druck | jede für sich |
+
+Mit «Handrechnung» endet die M-χ-Linie der Analyse genau beim M_Rd der
+Handrechnung (am Beispiel auf 0.1 %, auch mit Druckbewehrung) -- das ist die
+Probe, dass Löser und Linie dasselbe Modell meinen.
+
+**Zwei Linien hinter einer Schnittstelle.** `nachweis/resistenzlinie.py`:
+die `Handlinie` (das Polygon der Handrechnung) und die `Ebenenlinie` (der
+Rand des Dehnungsfächers). Beide können dasselbe -- `innerhalb`, `kante`,
+`moment_bei`, `eckwerte`, `protokoll_treffer` --, und der M-N-Nachweis,
+die Querkraft, das spröde Versagen und das Knicken fragen nur noch die
+Schnittstelle. Die Linie entsteht in einer Funktion (`resistenzlinie`), die
+Tragsicherheit und Knicken teilen.
+
+**Genau statt auf der Sehne.** Die Ebenenlinie sucht ihren Widerstand bei
+N_Ed nicht auf der Geraden zwischen zwei Punkten des Fächers, sondern auf
+dem Fächer selbst: zwischen den beiden Ebenen, deren Punkte ihn
+einschliessen, mit dem Illinois-Verfahren. Zwei benachbarte Punkte liegen im
+selben Abschnitt, also ist jede Ebene dazwischen eine des Fächers. Damit
+hängt keine Zahl im Bericht an der Schrittweite der Zeichnung:
+
+```
+M_R bei N = −2000 … +300 kN, mit 20 und mit 160 Schritten gezeichnet:  Abweichung < 1e-9
+```
+
+Das Urteil fällt an denselben Rändern: drin ist, was bei dieser Normalkraft
+zwischen dem linken und dem rechten Rand liegt. So kann es dem
+Erfüllungsgrad nicht widersprechen. In die Herleitung kommt nicht die Suche,
+sondern ihre Probe: die Ebene, die Kraft jedes Teils (der Stahl mit voller
+Spannung, der Beton als Resultierende ohne die Fläche des Stahls), die
+Summen und welche Grenzdehnung erreicht ist. Am Beispiel, Feld, Parabel mit φ = 2,
+charakteristisch: ΣF = −1162.6 + 848.2 + 377.0 − 62.7 ≈ 0 kN,
+ΣF·(z − h/2) = 277.2 kNm, massgebend der Beton am oberen Rand.
+
+**Auch die Spitzen liegen zwischen den Ebenen.** Das grösste Moment sowieso
+-- aber auch die grösste Druckkraft liegt nicht beim gleichmässigen −ε_c1d:
+kippt die Ebene ein wenig um den Punkt C, fliesst die gedrückte Bewehrung und
+trägt mehr. Beide werden mit dem Goldenen Schnitt zwischen den Nachbarn des
+grössten Punkts gesucht.
+
+**Der Stahl der Linie fällt jenseits von ε_ud nicht auf null.** Die unterste
+Lage liegt im Fächer genau auf ε_ud. Ein Gesetz, das dort abbricht, kippte an
+der Rundung -- 1e-19 zu viel, und die halbe Zugkraft wäre weg.
+
+**Was die Wahl am Beispiel ändert** (Decke über EG, M_R bei N_Ed in kNm):
+
+| Fall | Handrechnung | Block genau | Parabel |
+|---|---|---|---|
+| Feld (N = 0) | 235.9 | 236.2 | 235.7 |
+| Feld mit Druck (N = −300 kN) | 253.8 | 265.3 | 264.5 |
+| Stütze (N = 0, Zug oben) | 79.9 | 90.1 | 90.0 |
+
+Block und Parabel liegen beisammen. Die Hand liegt an der Stütze 11 % tiefer,
+weil sie die 2450 mm² gedrückter Bewehrung unten weglässt. Höher als die
+genaue Linie liegt sie nur knapp: reisst der Stahl bei ε_ud, bevor der Beton
+ε_c2d erreicht, ist die Druckzone weniger voll als ihr Block (Feld, 235.9 gegen
+235.7).
+
+**Charakteristisch heisst R_k, die Kennungen bleiben.** M_Rk, N_Rk, m_Rk in
+der Querkraft, M_Rk(N_Ed = 0) im spröden Versagen, N_Rk,K beim Knicken. Die
+Wert-IDs heissen weiter `…M_Rd…`: wer sie liest, soll nicht je nach Wahl
+anders fragen müssen.
+
+**Das Knicken teilt die Linie, wenn es darf.** Gleiche Wahl für den
+Widerstand wie die Tragsicherheit -- die Kriechzahl zählt nur, wo sie wirkt --,
+dann ist es deren Linie, einmal gerechnet und einmal hergeleitet. Sonst baut
+es eine eigene, mit Herleitung, und im M-N-Diagramm steht sie gestrichelt
+neben der massgebenden; die Knickpunkte liegen auf ihr. Nebenbei korrigiert:
+die Herleitung nannte als Suchfenster −3.0 ‰, gerechnet wurde mit
+ε_c2d = −3.5 ‰.
+
+**w/w_c im Lagenaufbau.** Dort entstehen schon Flächen und Tiefen jeder
+Lage, Bewehrungsmass und Distanzhalter -- der Faktor steht in der Herleitung
+gleich daneben und braucht keine eigenen Rechenziele. d′ ist die statische
+Höhe der Gegenlage, also ist ρ′ das ρ der Gegenseite. Am Beispiel:
+
+```
+Zug unten  ρ = 2450/(1000·248.1) = 0.00988   ρ′ = 0.00299   w/w_c = 4.00
+Zug oben   ρ = 754/(1000·252)    = 0.00299   ρ′ = 0.00988   w/w_c = 7.52
+```
+
+**Alte Dateien.** Bis zur Nachricht, dass sie im Prototyp nicht zählen, hielt
+ein Test eine Datei von vor der Rechenwahl Zahl für Zahl fest; jedes Kapitel
+übernahm beim Öffnen das φ der Platte. Das Übernehmen bleibt, der Test ist
+weg: er verlangte bei jedem Umbau Ausnahmen für Werte, die niemand mehr
+braucht.
+
 ## 2026-10-09 · Spannung-Dehnung-Analyse: Wahl je Analyse, M-χ bis zur Grenze, N-ε-Linie
 
 Wünsche:

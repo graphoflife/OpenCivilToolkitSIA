@@ -57,6 +57,13 @@ q.spannungsfall("Biegung", art="moment_kruemmung", N_Ed=0)          # M-χ-Linie
 q.spannungsfall("Zug", art="normalkraft_dehnung", M_Ed=20,          # N-ε-Linie,
                 kriechzahl=1.0, rechenart="block")                  # eigene Wahl
 
+# Jedes Kapitel wählt, womit es rechnet: Kriechzahl, Werte, Rechenart.
+from opencivil.projekt import RechenwahlEintrag
+q.tragsicherheit_wahl = RechenwahlEintrag(rechenart="parabel")      # genaue Linie
+q.quasistaendig.wahl.kriechzahl = 2.0                               # φ der Stahlspannung
+q.knicken_wahl_widerstand = RechenwahlEintrag(werkstoffsatz="charakteristisch")
+q.kriechzahl = 2.0                            # φ der Platte: nur für w/w_c
+
 ergebnis = p.rechnen()
 print(ergebnis.zusammenfassung())             # je Platte eine Tabelle
 ergebnis.erfuellt                             # True / False
@@ -123,7 +130,9 @@ Fertig und getestet (823 Tests):
 | `querschnitt/vorlagen` | Rechteck, T-Balken, Hohlkasten, Kreis zum Anfangen |
 | `nachweis/linie` | Geometrie einer M-N-Linie, `Achse` als Wert |
 | `nachweis/handrechnung` | die von Hand nachrechenbaren Eckpunkte |
-| `nachweis/dehnungsfaecher` | die präzise Linie -- nur für das Diagramm |
+| `nachweis/dehnungsfaecher` | die Grenzen des Dehnungsfächers: als Ebenen für die genaue Linie, als Bedingungen für die Analyse |
+| `nachweis/resistenzlinie` | Handlinie und Ebenenlinie hinter einer Schnittstelle: Urteil, Widerstand bei N_Ed, Eckwerte, Probe |
+| `nachweis/rechenwahl` | Kriechzahl, Werte, Rechenart -- die eine Stelle, die daraus Gesetze und Löser baut |
 | `nachweis/querschnittsloeser` | Dehnungsebene aus N und M, zwei Bisektionen |
 | `nachweis/` | M-N, Querkraft (mit Bügeln), Duktilität, sprödes Versagen, Zwängung auf Normalkraft und auf Biegung, Stahlspannung unter häufiger (gegen Fliessen) und quasi-ständiger Last (aus der Rissbreite), Knicken am verformten System |
 | `nachweis/schiefe_biegung`, `schubwandnachweis`, `richtungsnachweise` | die Nachweise der Querschnittsanalyse: N mit M_y und M_z, Querkraft mit Torsion, Duktilität und sprödes Versagen je Richtung |
@@ -167,10 +176,26 @@ Eine Linie ist ungerissen bis zum Riss, springt dort und ist darüber gerissen.
 Sie endet bei der ersten Grenzdehnung, wie im Dehnungsfächer. An den Ecken
 stehen Riss, Fliessbeginn (M_Rd, N_Rd) und Ende (M_Rd,u, N_Rd,u), je mit
 Kraft und Verformung, am Ende auch die massgebende Grenze. Jede Analyse
-wählt selbst:
-* die Kriechzahl φ, leer gilt die der Platte;
-* Bemessungs- oder charakteristische Werte;
-* Parabel-Rechteck oder Spannungsblock.
+wählt selbst, wie die Nachweiskapitel (unten).
+
+**Rechenwahl:** Unter dem Kopf der Tragsicherheit, der beiden
+Stahlspannungskapitel und des Knickens steht eine Zeile «Rechenwahl», beim
+Knicken zwei -- «Verformung (e_2d)» und «Widerstand (N_Rd)». Gewählt werden:
+* die Kriechzahl φ, Vorgabe 0 -- sie wirkt nur bei der Parabel und
+  elastisch, sonst ist das Feld blass;
+* die Werte: Bemessung (f_cd, f_yd → M_Rd) oder charakteristisch
+  (f_ck, f_yk → M_Rk);
+* die Rechenart: *Handrechnung Block 0.85·x* (Druckstahl weggelassen, je
+  Seite eine Lage), *Block 0.85·x genau* (mit Druckstahl) oder *Parabel*;
+  bei den Stahlspannungen dazu *elastisch*, ihre Vorgabe.
+
+Mit Block oder Parabel hält die Tragsicherheit gegen den Rand des
+Dehnungsfächers; den Widerstand bei N_Ed sucht sie genau, und die Herleitung
+zeigt die Probe des Bruchzustands. Querkraft und sprödes Versagen lesen ihr
+m_R aus derselben Linie. Wählt das Knicken für den Widerstand dasselbe wie die
+Tragsicherheit, nimmt es deren Linie, sonst eine eigene. Die Kriechzahl der
+Platte dient nur noch dem Vergrösserungsfaktor w/w_c (SIA 262:2025,
+4.4.3.2.5); er steht je gezogene Seite in der Zusammenfassung.
 
 **Querschnittsanalyse:** unter den Platten ein zweites Kapitel. Der
 Querschnitt wird gezeichnet wie in einem kleinen CAD, aus Knoten, Linien und
@@ -203,7 +228,9 @@ einachsig» und die Nachweisschalter.
   rechnet nur das Nötige, und die Herleitung zeigt nur diese Schritte
 * *Diagramme* -- Plattenquerschnitt, M-N-Resistenzlinie mit den
   Bemessungspunkten (die gestrichelte Strecke zeigt den Weg, in dem der
-  Erfüllungsgrad gemessen wurde), Querkraftkurven, Spannungs-Dehnungs-Bilder;
+  Erfüllungsgrad gemessen wurde) -- massgebend die Linie der Rechenwahl,
+  daneben zum Vergleich die Parabel oder die Handrechnung, und eine eigene
+  Linie des Knickens --, Querkraftkurven, Spannungs-Dehnungs-Bilder;
   bei einer Querschnittsanalyse ein einziges Interaktionsdiagramm mit
   wählbaren Achsen (zwei von N, M_y, M_z, die dritte mit festem Wert; ein
   Klick auf einen Lastfall legt den Schnitt durch ihn), dazu je Lastfall der
@@ -359,8 +386,10 @@ In der Querschnittsanalyse:
 
 ## Erfüllungsgrad beim M-N-Nachweis
 
-Ob ein Punkt innerhalb der Resistenzlinie liegt, entscheidet immer derselbe
-Test. Nur *wie weit* er entfernt ist, hängt vom gewählten Massstab ab:
+Ob ein Punkt innerhalb der Resistenzlinie liegt, entscheidet die massgebende
+Linie der Rechenwahl -- bei Block und Parabel an ihren genau gesuchten Rändern
+bei dieser Normalkraft. Nur *wie weit* er entfernt ist, hängt vom gewählten
+Massstab ab:
 
 | `Erfuellungsart` | Messung |
 |---|---|

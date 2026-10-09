@@ -34,17 +34,11 @@ gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
 Diese Punkte sind **nicht** entschieden. Ich habe je eine Annahme eingebaut und
 sie hier notiert; keine davon ist nachgeschlagen.
 
-- [ ] **Wird bei den häufigen Lastfällen mit φ gerechnet?** Eingebaut: ja,
-      `E_c,eff = E_cm/(1+φ)` mit demselben φ wie überall. Begründung: häufige
-      Einwirkung ist Dauerlast, und Kriechen senkt den Hebelarm, liegt also auf
-      der sicheren Seite. Aber die Norm sagt es an dieser Stelle nicht.
-- [ ] **Charakteristische oder Bemessungs-Kennwerte für die Stahlspannung?**
-      Die Werkstoffgesetze sind entschieden (deine Vorgabe): charakteristisch,
-      das Fliessplateau bei `f_yk`, der Beton gedeckelt bei `f_ck`, dazu `E_s`
-      und `E_cm` als Mittelwerte (4.4.1.2). Offen bleibt nur die **Grenze** des
-      Nachweises gegen Fliessen: eingebaut `f_yd − 80 MPa`, weil Tabelle 17
-      ausdrücklich `f_yd` nennt — das mischt zwei Niveaus, ist aber die
-      strengere Seite.
+- [ ] **Die Grenze des Nachweises gegen Fliessen.** Eingebaut `f_yd − 80 MPa`,
+      weil Tabelle 17 ausdrücklich `f_yd` nennt — mit charakteristischen
+      Werten in der Rechnung mischt das zwei Niveaus, ist aber die strengere
+      Seite. Womit die Stahlspannung rechnet (φ, Werte, Rechenart), wählt
+      jedes Kapitel; Vorgabe elastisch, charakteristisch, φ = 0.
 - [ ] **Welcher Durchmesser bestimmt `σ_s,adm` unter quasi-ständiger Last?**
       Eingebaut: der dickste Stab der Tragrichtung. Die Spannung kommt aus dem
       ganzen Querschnitt, und welche Lage am stärksten gezogen ist, wechselt
@@ -71,14 +65,33 @@ sie hier notiert; keine davon ist nachgeschlagen.
       SIA 4.4.2, aber mit `k_c` und `k` statt `k_t`, und mit einer anderen
       Begründung für die wirksame Zugzone. Ein Vergleich würde zeigen, ob die
       Zahlen zusammenpassen.
-- [ ] **Steifigkeit beim Knicken: charakteristisch oder Bemessung?** Eingebaut:
-      Bemessung (`f_cd`, `f_yd`) mit `E_cm/(1+φ)`. Du vermutest dasselbe. Ob φ
-      dabei überhaupt gilt und ob `eps_c2d = 3‰` oder der Wert der Norm (3.5‰)
-      zu nehmen ist, ist offen — eingebaut sind die Werte des Betons aus dem
-      Katalog.
-- [ ] Alle diese Schalter sollen laut deiner Anmerkung **wählbar** sein
-      (φ ja/nein, charakteristisch/Bemessung). Eingebaut ist je eine feste
-      Annahme; die Schalter fehlen noch.
+- [ ] **k_σ der Parabel aus `E_cm/(1+φ)`.** Die Parabel rechnet überall --
+      Tragsicherheit, Knicken, Stahlspannung, Analyse -- mit
+      `k_σ = max(1; E_c,eff/(400·f_c))`, `E_c,eff = E_cm/(1+φ)` und `f_c` des
+      Wertesatzes. Der Beton hat daneben sein `k_σ = E_cd/(400·f_cd)`
+      (4.2.1.6); mit `γ_cE = 1` ist das bei φ = 0 dieselbe Zahl. Ob für
+      die Tragsicherheit `E_cd` und für das Kriechen der Modul der richtige
+      Ort ist, ist nach Vorgabe, nicht nachgeschlagen.
+- [ ] **Die Handrechnung als Rechenart im Löser.** Bei Stahlspannung,
+      Knicken (Verformung) und Analyse rechnet «Handrechnung Block 0.85·x»
+      wie die Resistenzlinie aus Handrechnung: Spannungsblock, gedrückter
+      Stahl weggelassen, je Seite eine Lage im Schwerpunkt, der Beton auch
+      dort gezählt, wo der Stahl liegt. Ein Modell, keine Normregel — nach
+      Vorgabe. Dazu bekommt der Stahl im Löser das Druckplateau `f_y,druck`
+      wie die genaue Linie; bei den Normsorten ist es gleich `f_y`.
+- [ ] **Querkraft mit `m_Rk`.** Rechnet die Tragsicherheit charakteristisch,
+      nimmt die Querkraft ohne Bügel ihr `m_Rk(N_Ed)` aus derselben Linie, ihr
+      eigenes `τ_cd` und `f_yd` bleiben aber Bemessungswerte. Das mischt zwei
+      Niveaus — nach Vorgabe, nicht nachgeschlagen.
+- [ ] **Der Vergrösserungsfaktor w/w_c** (SIA 262:2025, 4.4.3.2.5, Formel von
+      dir): `d′` reicht vom gezogenen Rand bis zur Gegenlage (deine
+      Festlegung), also ist `ρ′` das `ρ` der Gegenseite; ohne Gegenlage ist
+      `ρ′ = 0`. Gezählt wird nur die x-Bewehrung, Grund und Zulage einer Seite
+      im Schwerpunkt. Der Gültigkeitsbereich ist nicht geprüft — etwa
+      `1 − 20·ρ′ ≤ 0` ab `ρ′ = 5 %` gäbe einen negativen Faktor.
+- [ ] **Der kürzeste Abstand bei der genauen Linie** misst zum gezeichneten
+      Polygon des Fächers (80 Schritte je Abschnitt), nicht zum genau
+      gesuchten Rand wie Normalkraft und Moment konstant.
 
 ### Querschnittsanalyse
 
@@ -118,8 +131,9 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Knicken, Wände ohne Bügel).
 - [ ] **Die genaue Linie der Platte über den neuen Fächer.** Die Platte hat
       noch ihren eigenen `dehnungsfaecher`; der Fächer der Analyse kann
-      dasselbe für jede Form. Umstellen, sobald der Vergleich unter 0.1 %
-      bleibt.
+      dasselbe für jede Form. Seit beide ihren Widerstand genau suchen, liegen
+      sie unter 0.01 % beisammen (`tests/test_interaktion.py`) -- umstellen
+      ginge, die Fasern legen sie verschieden.
 - [ ] **Kriechzahl φ an den Flächen der Querschnittsanalyse.** Kommt mit der
       ersten Rechnung, die sie braucht (Stahlspannung im Gebrauch, Knicken).
       Die Eigenschaften einer Fläche stehen im schwebenden Fenster; φ kommt
@@ -190,6 +204,17 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Rechenwahl je Kapitel: Tragsicherheit, beide Stahlspannungen, Knicken
+(Verformung und Widerstand), Zwängung auf Biegung und jede Analyse wählen φ,
+Werte und Rechenart selbst, φ = 0 als Vorgabe · Die Tragsicherheit hält mit
+Block oder Parabel gegen den Rand des Dehnungsfächers, den Widerstand bei N_Ed
+genau gesucht, mit der Probe in der Herleitung; charakteristisch heissen die
+Widerstände M_Rk und N_Rk · Querkraft und sprödes Versagen lesen aus
+derselben Linie · Das Knicken teilt sie bei gleicher Wahl, sonst baut es eine
+eigene, die im Diagramm daneben steht · Der Vergrösserungsfaktor w/w_c je
+gezogene Seite, mit dem φ der Platte · k_σ nie unter 1 · Das Fenster des
+Knickens stand als −3.0 ‰ da, gerechnet wird mit −3.5 ‰ ·
 
 Stahlspannung unter quasi-ständiger Einwirkung: dieselbe Rechnung wie gegen
 Fliessen, mit 60 % statt 70 % und gegen `σ_s,adm` aus der Rissanforderung
