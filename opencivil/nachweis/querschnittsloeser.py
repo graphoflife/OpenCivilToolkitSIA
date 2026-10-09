@@ -369,19 +369,47 @@ class Querschnittsloeser:
         Von der theoretischen Grenze aus wird herangetastet: dort ist das
         Fenster leer oder die Normalkraft nicht erreichbar. Zwanzig
         Halbierungen genuegen, um auf eine loesbare Stelle zu kommen.
+
+        Nahe am Widerstand genuegen sie nicht. Zwischen der letzten Stufe
+        ohne Gleichgewicht und der ersten mit -- an der Platte des Beispiels
+        0.08 und 0.04 1/m -- liegen Kruemmungen, die das Moment noch
+        erreichen, und das Halbieren springt ueber sie hinweg: 234.9 kNm
+        hiessen dort «kein Gleichgewicht», obwohl der Querschnitt bis
+        235.4 kNm traegt. Trifft das Halbieren nicht, wird darum die Grenze
+        zwischen den beiden Stufen gesucht -- die groesste Kruemmung mit
+        Gleichgewicht -- und dort noch einmal gefragt. Wo das Halbieren
+        trifft, bleibt alles, wie es war.
         """
+        def trifft(m: Optional[float]) -> bool:
+            return m is not None and ((m >= M_Ed) if nach_oben else (m <= M_Ed))
+
         chi = start
+        ohne: Optional[float] = None   # die letzte Stufe ohne Gleichgewicht
+        mit: Optional[float] = None    # die erste mit
         for _ in range(SCHRITTE):
             m = moment(chi)
-            if m is not None and ((m >= M_Ed) if nach_oben else (m <= M_Ed)):
+            if trifft(m):
                 return chi, None
+            if m is None and mit is None:
+                ohne = chi
+            elif m is not None and mit is None:
+                mit = chi
             chi *= 0.5
             if abs(chi) < 1e-12:
                 break
-        m = moment(0.0)
-        if m is not None and ((m >= M_Ed) if nach_oben else (m <= M_Ed)):
+        if trifft(moment(0.0)):
             return 0.0, None
-        return None, None
+        if ohne is None or mit is None:
+            return None, None
+        for _ in range(SCHRITTE):
+            if abs(ohne - mit) <= CHI_SCHRANKE:
+                break
+            mitte = 0.5 * (ohne + mit)
+            if moment(mitte) is None:
+                ohne = mitte
+            else:
+                mit = mitte
+        return (mit, None) if trifft(moment(mit)) else (None, None)
 
     def _ergebnis(self, eps_m: float, chi: float, *,
                   konvergiert: bool = True) -> Ebene:

@@ -39,7 +39,7 @@
     "opencivil/nachweis/linie.py": "32572a90f27b",
     "opencivil/nachweis/mindestbewehrung.py": "494a6e1eca85",
     "opencivil/nachweis/querkraft.py": "b9d4d006689c",
-    "opencivil/nachweis/querschnittsloeser.py": "9eba1677f0b6",
+    "opencivil/nachweis/querschnittsloeser.py": "5691afb2b0d7",
     "opencivil/nachweis/richtungsnachweise.py": "b9b4705d3130",
     "opencivil/nachweis/schiefe_biegung.py": "e0099eae24d2",
     "opencivil/nachweis/schubwandnachweis.py": "852a058e8522",

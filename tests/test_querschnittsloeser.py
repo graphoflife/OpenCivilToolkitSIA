@@ -140,6 +140,29 @@ class TestGrenzen(unittest.TestCase):
         e = loeser.loese(N_Ed=0.0, M_Ed=5000e3)
         self.assertFalse(e.konvergiert)
 
+    def test_nahe_am_widerstand_findet_er_das_gleichgewicht(self):
+        """
+        Die Platte des Beispiels in x (φ = 2, Bemessungswerte) trägt bis
+        235.4 kNm, bei χ = 0.057 1/m. Die Suche halbierte von der Grenze aus
+        (0.16, 0.08, 0.04 1/m) und sprang über alles zwischen 0.04 und 0.08:
+        234.9 kNm hiessen «kein Gleichgewicht». Darüber bleibt es dabei.
+        """
+        loeser = Querschnittsloeser(
+            h=0.3, b=1.0,
+            lagen=[Stahllage(a_s=1696e-6, z=0.249, nummer=1),
+                   Stahllage(a_s=754e-6, z=0.246, nummer=2),
+                   Stahllage(a_s=754e-6, z=0.048, nummer=4)],
+            beton=beton_nichtlinear(f_cd=20e6, E_c=33.62e9 / 3.0,
+                                    eps_c1d=0.002, eps_c2d=0.0035),
+            stahl=stahl_bilinear(E_s=205e9, f_sd=434.78e6, eps_ud=0.045),
+            eps_druck=0.0035, eps_zug=0.045)
+        e = loeser.loese(N_Ed=0.0, M_Ed=234.9e3)
+        self.assertTrue(e.konvergiert)
+        self.assertGreater(e.chi, 0.04)
+        self.assertAlmostEqual(e.N_int / 1e3, 0.0, delta=0.01)
+        self.assertAlmostEqual(e.M_int / 1e3, 234.9, delta=0.01)
+        self.assertFalse(loeser.loese(N_Ed=0.0, M_Ed=236.0e3).konvergiert)
+
     def test_das_fenster_haengt_an_der_kruemmung(self):
         """
         Je stärker gekrümmt, desto enger der zulässige Bereich für eps_m --
