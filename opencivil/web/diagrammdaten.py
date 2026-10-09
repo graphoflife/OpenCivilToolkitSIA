@@ -410,10 +410,7 @@ def _knickpunkte(aufbau, nachweis) -> list:
 
     Nur in x-Richtung, denn nur dort gibt es einen Knicknachweis.
     """
-    if nachweis.richtung is not Richtung.X:
-        return []
-    kennung = nachweis.querschnitt.id.rsplit(".", 1)[-1]
-    knicken = (aufbau.knicken or {}).get(kennung)
+    knicken = _knicken(aufbau, nachweis)
     if knicken is None:
         return []
     punkte = []
@@ -434,6 +431,14 @@ def _knickpunkte(aufbau, nachweis) -> list:
             "begruendung": erg.begruendung,
         })
     return punkte
+
+
+def _knicken(aufbau, nachweis):
+    """Der Knicknachweis zu diesem M-N-Nachweis -- nur in x, nur wenn es ihn gibt."""
+    if aufbau is None or nachweis.richtung is not Richtung.X:
+        return None
+    kennung = nachweis.querschnitt.id.rsplit(".", 1)[-1]
+    return (aufbau.knicken or {}).get(kennung)
 
 
 def _linienzug(linie) -> Optional[dict]:
@@ -462,11 +467,16 @@ def linie(nachweis, aufbau=None) -> dict:
     So sieht man, was die gewaehlte Rechenart gegenueber der anderen kostet
     oder bringt.
     """
+    knicken = _knicken(aufbau, nachweis)
     return {
         "richtung": nachweis.richtung.value,
         "querschnitt": nachweis.querschnitt.name,
         "massgebend": _linienzug(nachweis.massgebend),
         "vergleich": _linienzug(nachweis.vergleich),
+        # Waehlt das Knicken fuer seinen Widerstand anders als die
+        # Tragsicherheit, liegen seine Punkte auf seiner eigenen Linie.
+        "knicklinie": _linienzug(knicken.linie if knicken is not None and knicken.eigene_linie
+                                 else None),
         "kombinationen": [
             {
                 "name": a.schnittgroessen.name,

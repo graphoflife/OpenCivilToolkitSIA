@@ -43,6 +43,17 @@ herauskommt, weil die Folge davonlaeuft. Dann steht da kein Widerstand,
 sondern nichts -- und ein Nachweis ohne Zahl sagt nicht, wie weit er daneben
 liegt. Die Normalkraft dagegen hat immer einen Grenzwert.
 
+ZWEI WAHLEN:
+Womit gerechnet wird, waehlt das Kapitel zweimal (:class:`Rechenwahl`):
+
+* **Verformung (e_2d)** -- die Gesetze des Loesers, der zu jedem Moment die
+  Kruemmung sucht. Vorgabe die Parabel mit Bemessungswerten; die Kriechzahl
+  weicht den Beton auf, und ein weicher Beton verformt sich mehr.
+* **Widerstand (N_Rd)** -- die Resistenzlinie, die sagt, ob der Querschnitt
+  das Moment am verformten System aufnimmt. Vorgabe die Handrechnung mit
+  Bemessungswerten. Waehlt das Kapitel dasselbe wie die Tragsicherheit, ist
+  es deren Linie; sonst baut es eine eigene, mit eigener Herleitung.
+
 NUR IN X-RICHTUNG:
 Ein Knicknachweis braucht eine Knicklaenge, und die gehoert zu einer
 Tragrichtung. Gerechnet wird darum nur mit der Bewehrung in x -- in y waere
@@ -69,17 +80,22 @@ from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, M, Groesse
 from opencivil.core.latex import Mathe, angabe, als_text, bedingung
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
+from opencivil.nachweis.biegung_normalkraft import (
+    gleiche_linie, linienbezuege, resistenzlinie,
+)
 from opencivil.nachweis.querschnittsloeser import (
-    EPS_DRUCK, EPS_ZUG, Querschnittsloeser, Stahllage, Werkstoffsatz,
-    protokoll_verfahren, protokoll_wirksamer_modul,
+    Querschnittsloeser, Stahllage, protokoll_verfahren, protokoll_wirksamer_modul,
 )
 from opencivil.nachweis.rechenwahl import (
-    Kennwerte, Rechenart, Rechenwahl, gesetze, werkstoffbezuege,
+    Kennwerte, Rechenart, Rechenwahl, bezuege_vereinen, gesetze, protokoll_gesetze,
+    protokoll_rechenwahl, werkstoffbezuege,
 )
+from opencivil.nachweis.resistenzlinie import Widerstandslinie
 from opencivil.querschnitt.platte import Richtung
 
-#: Womit die Werkstoffgesetze rechnen: ein Knicknachweis ist Tragsicherheit.
-WERKSTOFFE = Werkstoffsatz.BEMESSUNG
+#: Die Vorgaben der beiden Wahlen -- siehe Dateikopf.
+VERFORMUNG = Rechenwahl(art=Rechenart.PARABEL)
+WIDERSTAND = Rechenwahl(art=Rechenart.HANDRECHNUNG)
 
 #: Groesste Zahl an Durchlaeufen der Ausmitten-Iteration.
 DURCHLAEUFE = 40
@@ -225,6 +241,9 @@ class Knicken(Nachweis):
         querschnitt,
         faelle: Sequence[Knickfall],
         mn_nachweis,
+        *,
+        verformung: Rechenwahl = VERFORMUNG,
+        widerstand: Rechenwahl = WIDERSTAND,
         schnell: bool = False,
     ) -> None:
         if not faelle:
@@ -239,6 +258,16 @@ class Knicken(Nachweis):
         self.richtung = Richtung.X
         self.faelle = list(faelle)
         self.mn = mn_nachweis
+        self.verformung = verformung
+        self.widerstand = widerstand
+        self.eigene_linie = not gleiche_linie(widerstand, mn_nachweis.wahl)
+        """
+        Ob das Knicken seine eigene Resistenzlinie baut. Mit derselben Wahl
+        wie die Tragsicherheit ist es deren Linie -- einmal gerechnet und
+        einmal hergeleitet.
+        """
+        self.linie: Optional[Widerstandslinie] = None
+        """Die Linie des Widerstands -- nach dem Lauf."""
         self.schnell = schnell
         """
         Ob die Suche nach N_Rd uebersprungen wird.
@@ -270,22 +299,23 @@ class Knicken(Nachweis):
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),
             Eingabebezug("b", querschnitt.id_breite(self.richtung)),
-            Eingabebezug("phi", querschnitt.id_von("kriechzahl")),
-        ] + werkstoffbezuege(WERKSTOFFE, querschnitt.beton, stahl)
+        ] + werkstoffbezuege(verformung.satz, querschnitt.beton, stahl)
         for lage, art, _, as_id, z_id in self.posten:
             marke = f"{lage.nummer}{art.kuerzel}"
             bezuege += [
                 Eingabebezug(f"a_s_{marke}", as_id),
                 Eingabebezug(f"z_{marke}", z_id),
             ]
-        bezuege += [
-            Eingabebezug("eps_ud", stahl.id_von("eps_ud")),
-            # Das Moment bei N liest die Iteration vom Polygon des
-            # M-N-Nachweises (``self.mn.moment_bei``). Ein Eckwert davon als
-            # Eingang stellt die Abhaengigkeit in den Graphen -- sonst rechnete
-            # ein Teillauf (das Auge) das Knicken ohne Polygon.
-            Eingabebezug("N_Rd_druck", mn_nachweis.d_eckwerte["N_Rd_druck"].id),
-        ]
+        bezuege.append(Eingabebezug("eps_ud", stahl.id_von("eps_ud")))
+        if self.eigene_linie:
+            bezuege = bezuege_vereinen(
+                bezuege, linienbezuege(querschnitt, self.posten, self.richtung, widerstand.satz))
+        else:
+            # Das Moment bei N liest die Iteration von der Linie des
+            # M-N-Nachweises. Ein Eckwert davon als Eingang stellt die
+            # Abhaengigkeit in den Graphen -- sonst rechnete ein Teillauf (das
+            # Auge) das Knicken ohne Linie.
+            bezuege.append(Eingabebezug("N_Rd_druck", mn_nachweis.d_eckwerte["N_Rd_druck"].id))
 
         super().__init__(
             basis,
@@ -302,8 +332,7 @@ class Knicken(Nachweis):
         h = e.g("h").si
         b = e.g("b").si
         eps_ud = e.g("eps_ud").si
-        wahl = Rechenwahl(kriechzahl=e.g("phi").si, satz=WERKSTOFFE,
-                          art=Rechenart.PARABEL)
+        wahl = self.verformung
         w = Kennwerte.aus_eingaben(e, wahl.satz)
 
         lagen = [Stahllage(a_s=e.g(f"a_s_{l.nummer}{a.kuerzel}").si,
@@ -312,13 +341,25 @@ class Knicken(Nachweis):
                  for l, a, _, _, _ in self.posten]
         # Kriechen weicht den Beton auf; das Gesetz rechnet mit dem wirksamen
         # Modul. eps_c1d und eps_c2d bleiben, wie die Norm sie angibt.
-        loeser = gesetze(wahl, w, eps_ud=eps_ud).loeser(
-            h=h, b=b, lagen=lagen, eps_druck=w.eps_c2d, eps_zug=eps_ud)
+        g = gesetze(wahl, w, eps_ud=eps_ud)
+        loeser = g.loeser(h=h, b=b, lagen=lagen, eps_druck=w.eps_c2d, eps_zug=eps_ud)
         # Aufgehoben wie self.ergebnisse: wer nachrechnen will, was bei einer
         # anderen Druckkraft herauskaeme, braucht denselben Loeser.
         self.loeser = loeser
 
-        self._protokoll_ansatz(p, e)
+        self._protokoll_ansatz(p, e, eps_druck=w.eps_c2d, eps_zug=eps_ud,
+                               verdraengt=g.verdraengt)
+        self.linie = (resistenzlinie(
+            self.widerstand, e, p, querschnitt=self.querschnitt, posten=self.posten,
+            richtung=self.richtung, basis=f"{self.id}.widerstand",
+            vorsatz="Widerstand: ", ebene=3, wahltitel="Rechenwahl – Widerstand (N_Rd)")
+            if self.eigene_linie else self.mn.massgebend)
+        if not self.eigene_linie:
+            p.titel("Widerstand", ebene=3)
+            protokoll_rechenwahl(p, self.widerstand, f"{self.id}.widerstand",
+                                 titel="Rechenwahl – Widerstand (N_Rd)")
+            p.text("Dieselbe Wahl wie die Tragsicherheit: der Momentenwiderstand bei "
+                   "der Druckkraft kommt aus deren Resistenzlinie.")
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
@@ -384,11 +425,13 @@ class Knicken(Nachweis):
         if not bei_N_Ed.stabil:
             erg.hinweis = (
                 f"N_Ed = {fall.N_Ed.formatiert(1, KN)} kN: keine Gleichgewichtslage "
-                f"→ knickt. N_Rd = grösste Druckkraft, bei der der Stab steht.")
+                f"→ knickt. N_{self.widerstand.index} = grösste Druckkraft, bei der "
+                f"der Stab steht.")
         return erg
 
     def _begruendung(self, erg: Knickergebnis, gg: Gleichgewicht) -> str:
-        grenze = (f"N_Rd = {erg.N_Rd / 1e3:.1f} kN "
+        idx = self.widerstand.index
+        grenze = (f"N_{idx} = {erg.N_Rd / 1e3:.1f} kN "
                   f"{'≥' if erg.erfuellt else '<'} "
                   f"|N_Ed| = {abs(erg.fall.N_Ed.si) / 1e3:.1f} kN.")
         if not gg.stabil:
@@ -396,7 +439,7 @@ class Knicken(Nachweis):
         return (f"Stabil nach {len(gg.schritte)} Durchläufen: "
                 f"e_0d + e_1d + e_2d = {erg.e_0d * 1e3:.1f} + {erg.e_1d * 1e3:.1f} "
                 f"+ {erg.e_2d * 1e3:.1f} mm → M_Ed,II = {erg.M_ges / 1e3:.1f} kNm, "
-                f"M_Rd = {erg.M_Rd / 1e3:.1f} kNm. {grenze}")
+                f"M_{idx} = {erg.M_Rd / 1e3:.1f} kNm. {grenze}")
 
     # -- Gleichgewicht bei einer Probekraft ---------------------------------
 
@@ -438,7 +481,7 @@ class Knicken(Nachweis):
             return gg
 
         # Der Querschnitt muss das Moment am verformten System aufnehmen.
-        gg.M_Rd = self.mn.moment_bei(-N, positiv=gg.M_ges >= 0) or 0.0
+        gg.M_Rd = self.linie.moment_bei(-N, positiv=gg.M_ges >= 0) or 0.0
         gg.traegt = gg.M_Rd >= abs(gg.M_ges)
         return gg
 
@@ -501,11 +544,12 @@ class Knicken(Nachweis):
     def _n_rd(self, erg: Knickergebnis) -> Wert:
         """Die Grenzkraft -- der Widerstand in Tabelle und Herleitung."""
         return Zwischenwerte(f"{self.id}.{erg.fall.kennung}").kraft(
-            "N_Rd", "N_{Rd,K}", erg.N_Rd, "Widerstand")
+            "N_Rd", f"N_{{{self.widerstand.index},K}}", erg.N_Rd, "Widerstand")
 
     # -- Mitschrift ---------------------------------------------------------
 
-    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
+    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, *, eps_druck: float,
+                          eps_zug: float, verdraengt: bool) -> None:
         p.titel("Knicken")
         p.erklaerung(
             "Nachgewiesen wird am verformten System. Die Ausmitte zweiter "
@@ -533,26 +577,25 @@ class Knicken(Nachweis):
             r"\qquad M_{Ed,II} = \left|N_{Ed}\right| \cdot "
             r"\left(e_{0d} + e_{1d} + e_{2d}\right)",
             titel="Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein")
-        protokoll_wirksamer_modul(p, e["E_cm"], e["phi"], self.id,
-                                  titel="Steifigkeit des Betons",
-                                  nachsatz=rf"\qquad {angabe(e['f_cd'])}")
+        p.titel("Verformung", ebene=3)
+        wahl, basis = self.verformung, f"{self.id}.verformung"
+        phi = protokoll_rechenwahl(p, wahl, basis, titel="Rechenwahl – Verformung (e_2d)")
+        if wahl.art.mit_kriechzahl:
+            protokoll_wirksamer_modul(p, e["E_cm"], phi, basis,
+                                      titel="Steifigkeit des Betons",
+                                      nachsatz=rf"\qquad {angabe(e[wahl.satz.beton])}")
+        protokoll_gesetze(p, wahl, e, basis, titel="Werkstoffgesetze der Verformung")
         p.erklaerung(
-            "Angesetzt wird das Kriechen mit demselben φ wie sonst, hier aus "
-            "der Eingabe. Beim Knicken ist das nicht bloss zulässig, sondern "
-            "wesentlich: ein aufgeweichter Beton verformt sich mehr, die "
-            "Ausmitte zweiter Ordnung wächst, und der Stab knickt früher. "
-            "φ = 0 läge hier deutlich auf der unsicheren Seite."
-        )
-        p.erklaerung(
-            "Die Festigkeiten sind Bemessungswerte – f_cd und f_yd, nicht die "
-            "charakteristischen. Gerechnet wird mit dem nichtlinearen "
-            "Betongesetz; im Bereich der Gebrauchslasten unterscheidet es "
-            "sich kaum vom linearen, in der Nähe der Grenzlast erheblich, und "
-            "genau dort entscheidet sich, ob es noch eine "
-            "Gleichgewichtslage gibt."
+            "Womit die Verformung gerechnet wird, wählt das Kapitel: Kriechzahl, "
+            "Werte und Rechenart. Das Kriechen wirkt bei der Parabel und weicht den "
+            "Beton auf: er verformt sich mehr, die Ausmitte zweiter Ordnung wächst, "
+            "und der Stab knickt früher – φ = 0 läge dann auf der unsicheren Seite. "
+            "Im Bereich der Gebrauchslasten unterscheidet sich die Parabel kaum vom "
+            "linearen Gesetz, in der Nähe der Grenzlast erheblich, und genau dort "
+            "entscheidet sich, ob es noch eine Gleichgewichtslage gibt."
         )
         p.titel("Wie die Dehnungsebene gefunden wird", ebene=3)
-        protokoll_verfahren(p, eps_druck=EPS_DRUCK, eps_zug=EPS_ZUG)
+        protokoll_verfahren(p, eps_druck=eps_druck, eps_zug=eps_zug, verdraengt=verdraengt)
         p.erklaerung(
             "Die Ausmitten-Iteration darüber steht dagegen vollständig da, "
             "Durchlauf für Durchlauf: sie ist das Verfahren selbst, und dass "
@@ -608,7 +651,8 @@ class Knicken(Nachweis):
                 ]),
                 titel="Probe: die gefundene Ebene erzeugt die Schnittgrössen")
             p.gleichung(
-                bedingung(angabe(werte.moment("M_Rd", "M_{Rd,x}(N_{Ed})", erg.M_Rd)),
+                bedingung(angabe(werte.moment(
+                    "M_Rd", f"M_{{{self.widerstand.index},x}}(N_{{Ed}})", erg.M_Rd)),
                           r"\ge",
                           angabe(werte.moment("M_II", "M_{Ed,II}", abs(erg.M_ges))),
                           erg.M_Rd >= abs(erg.M_ges), mit_urteil=False),

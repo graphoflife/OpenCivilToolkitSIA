@@ -1070,11 +1070,11 @@
         },
         {
           "art": "text",
-          "text": "Angesetzt wird das Kriechen mit demselben φ wie sonst, hier aus der Eingabe. Beim Knicken ist das nicht bloss zulässig, sondern wesentlich: ein aufgeweichter Beton verformt sich mehr, die Ausmitte zweiter Ordnung wächst, und der Stab knickt früher. φ = 0 läge hier deutlich auf der unsicheren Seite."
+          "text": "Womit die Verformung gerechnet wird, wählt das Kapitel: Kriechzahl, Werte und Rechenart. Das Kriechen wirkt bei der Parabel und weicht den Beton auf: er verformt sich mehr, die Ausmitte zweiter Ordnung wächst, und der Stab knickt früher – φ = 0 läge dann auf der unsicheren Seite. Im Bereich der Gebrauchslasten unterscheidet sich die Parabel kaum vom linearen Gesetz, in der Nähe der Grenzlast erheblich, und genau dort entscheidet sich, ob es noch eine Gleichgewichtslage gibt."
         },
         {
           "art": "text",
-          "text": "Die Festigkeiten sind Bemessungswerte – f_cd und f_yd, nicht die charakteristischen. Gerechnet wird mit dem nichtlinearen Betongesetz; im Bereich der Gebrauchslasten unterscheidet es sich kaum vom linearen, in der Nähe der Grenzlast erheblich, und genau dort entscheidet sich, ob es noch eine Gleichgewichtslage gibt."
+          "text": "Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.5 ‰ bis 45.0 ‰). Jenseits davon geben die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Halbierung liefe auf eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine Gleichgewichtslage – dann sagt der Nachweis das und rät nicht."
         },
         {
           "art": "text",
@@ -1102,6 +1102,15 @@
           "latex": "e_{1d} = \\left|\\frac{M_{Ed,1}}{N_{Ed}}\\right| \\qquad e_{2d} = \\left|\\chi\\right| \\cdot \\frac{l_{cr}^{2}}{\\pi^{2}} \\qquad M_{Ed,II} = \\left|N_{Ed}\\right| \\cdot \\left(e_{0d} + e_{1d} + e_{2d}\\right)",
           "markdown": "**Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein**\n\n$$\ne_{1d} = \\left|\\frac{M_{Ed,1}}{N_{Ed}}\\right| \\qquad e_{2d} = \\left|\\chi\\right| \\cdot \\frac{l_{cr}^{2}}{\\pi^{2}} \\qquad M_{Ed,II} = \\left|N_{Ed}\\right| \\cdot \\left(e_{0d} + e_{1d} + e_{2d}\\right)\n$$",
           "titel": "Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "k_{\\sigma} = \\max\\left(1;\\ \\frac{E_{c,eff}}{400 \\cdot f_{cd}}\\right)",
+          "markdown": "**Beiwert der Parabel, mit dem wirksamen Modul**\n\n$$\nk_{\\sigma} = \\max\\left(1;\\ \\frac{E_{c,eff}}{400 \\cdot f_{cd}}\\right)\n$$",
+          "titel": "Beiwert der Parabel, mit dem wirksamen Modul",
           "referenz": "",
           "wert_id": "",
           "gruppe": ""
@@ -1290,15 +1299,6 @@
           "latex": "\\sigma_c = E_{c,eff} \\cdot \\varepsilon_c",
           "markdown": "**Beton ungerissen, in Druck und Zug**\n\n$$\n\\sigma_c = E_{c,eff} \\cdot \\varepsilon_c\n$$",
           "titel": "Beton ungerissen, in Druck und Zug",
-          "referenz": "",
-          "wert_id": "",
-          "gruppe": ""
-        },
-        {
-          "art": "gleichung",
-          "latex": "k_{\\sigma} = \\max\\left(1;\\ \\frac{E_{c,eff}}{400 \\cdot f_{cd}}\\right)",
-          "markdown": "**Beiwert der Parabel, mit dem wirksamen Modul**\n\n$$\nk_{\\sigma} = \\max\\left(1;\\ \\frac{E_{c,eff}}{400 \\cdot f_{cd}}\\right)\n$$",
-          "titel": "Beiwert der Parabel, mit dem wirksamen Modul",
           "referenz": "",
           "wert_id": "",
           "gruppe": ""

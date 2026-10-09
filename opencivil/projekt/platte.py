@@ -103,6 +103,16 @@ class QuerschnittEintrag(Beschreibung):
     knickfaelle: List[KnickEintrag] = field(default_factory=list)
     """Knicknachweise; leer heisst: keiner."""
 
+    knicken_wahl_verformung: RechenwahlEintrag = field(
+        default_factory=RechenwahlEintrag.knicken_verformung)
+    """Womit die Ausmitte e_2d gerechnet wird -- Vorgabe die Parabel, Bemessungswerte."""
+
+    knicken_wahl_widerstand: RechenwahlEintrag = field(default_factory=RechenwahlEintrag)
+    """
+    Womit N_Rd(M_Ed = N_Ed·e_tot) gerechnet wird -- Vorgabe die Handrechnung.
+    Mit derselben Wahl wie die Tragsicherheit ist es deren Linie.
+    """
+
     spannungsfaelle: List[SpannungsfallEintrag] = field(default_factory=list)
     """Auswertungen am Querschnitt -- Bilder, keine Nachweise."""
 
@@ -245,6 +255,8 @@ class QuerschnittEintrag(Beschreibung):
                             (self.quasistaendig, "quasi-ständige")):
             liste.pruefen(self.name, self.kombinationen, wort)
         self.tragsicherheit_wahl.pruefen(f"Platte '{self.name}', Tragsicherheit")
+        self.knicken_wahl_verformung.pruefen(f"Platte '{self.name}', Knicken, Verformung")
+        self.knicken_wahl_widerstand.pruefen(f"Platte '{self.name}', Knicken, Widerstand")
 
     def masse_pruefen(self) -> None:
         """
@@ -457,6 +469,14 @@ class QuerschnittEintrag(Beschreibung):
                 kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl)),
             knickfaelle=[KnickEintrag.aus_dict(x)
                          for x in (d.get("knickfaelle") or [])],
+            knicken_wahl_verformung=RechenwahlEintrag.aus_dict(
+                d.get("knicken_wahl_verformung"), vorgabe=RechenwahlEintrag.knicken_verformung(),
+                kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl),
+                wo=f"Platte '{kennung}', Knicken, Verformung"),
+            knicken_wahl_widerstand=RechenwahlEintrag.aus_dict(
+                d.get("knicken_wahl_widerstand"),
+                kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl),
+                wo=f"Platte '{kennung}', Knicken, Widerstand"),
             spannungsfaelle=[SpannungsfallEintrag.aus_dict(
                 x, kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl))
                              for x in (d.get("spannungsfaelle") or [])],

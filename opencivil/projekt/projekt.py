@@ -421,6 +421,7 @@ class Projekt(Beschreibung):
         # Platte -- so bleiben ihre Zahlen im Bericht dieselben.
         decke.zwaengung_biegung_kriechzahl = 2.0
         decke.haeufig.wahl.kriechzahl = decke.quasistaendig.wahl.kriechzahl = 2.0
+        decke.knicken_wahl_verformung.kriechzahl = 2.0
         # Drei Linien der Spannung-Dehnung-Analyse -- sie schreiben ihre
         # Herleitung für die Formelsammlung: mit Parabel, mit Block und
         # charakteristischen Werten, und mit der Handrechnung.

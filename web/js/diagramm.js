@@ -26,6 +26,9 @@ const VERGLEICH = '#8895a8';
 /** Die massgebende Resistenzlinie -- gegen sie wird nachgewiesen. */
 const MASSGEBEND = '#1f5fa8';
 
+/** Die eigene Linie des Knickens, wenn es anders wählt als die Tragsicherheit. */
+const KNICKLINIE = '#9a5b13';
+
 /**
  * Schiebt Beschriftungen so weit auseinander, dass sie sich nicht überdecken.
  *
@@ -362,8 +365,9 @@ export function querschnittZeichnen(eintrag, werte) {
 export function diagrammZeichnen(linie) {
   const massgebend = linie.massgebend;
   const vergleich = linie.vergleich;
+  const knicklinie = linie.knicklinie;
   if (!massgebend?.punkte?.length) return el('div.leer', { text: 'Keine Resistenzlinie.' });
-  const alle = [...massgebend.punkte, ...(vergleich?.punkte || [])];
+  const alle = [...massgebend.punkte, ...(vergleich?.punkte || []), ...(knicklinie?.punkte || [])];
 
   const alleM = alle.map((p) => p.M);
   const alleN = alle.map((p) => p.N);
@@ -402,6 +406,13 @@ export function diagrammZeichnen(linie) {
       points: zug(vergleich.punkte),
       fill: 'none', stroke: VERGLEICH, 'stroke-width': 1.3,
       'stroke-dasharray': '6 3', 'stroke-linejoin': 'round', opacity: 0.8,
+    }));
+  }
+  if (knicklinie?.punkte?.length) {
+    daten.append(svgEl('polygon', {
+      points: zug(knicklinie.punkte),
+      fill: 'none', stroke: KNICKLINIE, 'stroke-width': 1.4,
+      'stroke-dasharray': '2 3', 'stroke-linejoin': 'round', opacity: 0.9,
     }));
   }
   daten.append(svgEl('polygon', {
@@ -524,6 +535,9 @@ export function diagrammZeichnen(linie) {
       vergleich ? el('span', {}, [el('i', {
         style: { background: VERGLEICH, height: '3px', borderRadius: '1px' },
       }), `${vergleich.beschriftung} (nur Vergleich)`]) : null,
+      knicklinie ? el('span', {}, [el('i', {
+        style: { background: KNICKLINIE, height: '3px', borderRadius: '1px' },
+      }), `Knicken: ${knicklinie.beschriftung}`]) : null,
       el('span', {}, [el('i', { style: { background: '#1a7f45' } }), 'erfüllt']),
       el('span', {}, [el('i', { style: { background: '#b3261e' } }), 'nicht erfüllt']),
       el('span', { text: '– – –  gemessener Weg zur Linie' }),

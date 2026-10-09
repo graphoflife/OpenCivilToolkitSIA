@@ -99,8 +99,9 @@ const HILFE = {
     zeilen: [
       ['Weg', 'verformtes System: e_0d + e_1d + e_2d, iteriert über die Krümmung'],
       ['N_Rd', 'grösste Druckkraft mit Gleichgewichtslage'],
-      ['Werte', 'Bemessung (f_cd, f_yd)'],
-      ['φ', 'aus Eingabe → E_c,eff = E_cm / (1 + φ)'],
+      ['Verformung', 'Rechenwahl für e_2d; Vorgabe Parabel, Bemessung (f_cd, f_yd)'],
+      ['Widerstand', 'Rechenwahl für N_Rd(M_Ed = N_Ed·e_tot); Vorgabe Handrechnung, Bemessung; gleich wie die Tragsicherheit gewählt: deren Linie'],
+      ['φ', 'je Wahl, nur bei der Parabel → E_c,eff = E_cm / (1 + φ)'],
     ],
     formel: 'α_eff = N_Rd / |N_Ed|',
   },
@@ -293,6 +294,12 @@ function knickBlock(querschnitt) {
 
   return el('div.unterkapitel', {}, [
     el('div.unterkapitel-kopf', {}, [el('span', { text: 'Knicken' }), hilfe('knicken')]),
+    // Zwei Wahlen: womit die Verformung gerechnet wird und womit der
+    // Querschnitt widersteht.
+    rechenwahlZeile('Verformung (e_2d)', querschnitt.knicken_wahl_verformung,
+      (veraenderer) => aendern((q) => veraenderer(q.knicken_wahl_verformung))),
+    rechenwahlZeile('Widerstand (N_Rd)', querschnitt.knicken_wahl_widerstand,
+      (veraenderer) => aendern((q) => veraenderer(q.knicken_wahl_widerstand))),
     faelle.length
       ? el('div.einwirkung.ist-knick.ist-kopf', {}, [
         el('span'),

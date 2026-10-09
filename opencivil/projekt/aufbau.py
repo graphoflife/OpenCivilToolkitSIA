@@ -448,7 +448,8 @@ def _platte(eintrag: QuerschnittEintrag, aufbau: Aufbau, eintragen: Eintragen,
                            laenge=Groesse(k.laenge, M),
                            knicklaenge=Groesse(k.knicklaenge, M))
                  for k in knickfaelle],
-                nachweis, schnell=schnell))
+                nachweis, verformung=eintrag.knicken_wahl_verformung.wahl,
+                widerstand=eintrag.knicken_wahl_widerstand.wahl, schnell=schnell))
 
     aktive = [s for s in eintrag.spannungsfaelle if s.aktiv]
     if aktive:
