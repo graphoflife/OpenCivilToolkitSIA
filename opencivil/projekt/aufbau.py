@@ -422,7 +422,7 @@ def _platte(eintrag: QuerschnittEintrag, aufbau: Aufbau, eintragen: Eintragen,
         # Diagramm an.
         nachweis = BiegungNormalkraft(
             querschnitt, [_kombination(k) for k in aktiv], richtung,
-            mit_vergleich=not schnell)
+            wahl=eintrag.tragsicherheit_wahl.wahl, mit_vergleich=not schnell)
         eintragen("nachweise", kennung_x, nachweis)
 
         _lagennachweise(eintrag, querschnitt, richtung, nachweis, eintragen)

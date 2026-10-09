@@ -180,7 +180,7 @@ class Handrechnung:
     def __init__(
         self, *,
         h: float, b: float, f_cd: float, eps_c2d: float,
-        unten: Lage, oben: Lage, richtung: str, basis: str,
+        unten: Lage, oben: Lage, basis: str,
         beton_index: str = "", satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG,
     ) -> None:
         self.h = h
@@ -189,7 +189,6 @@ class Handrechnung:
         self.eps_c2d = abs(eps_c2d)
         self.unten = unten
         self.oben = oben
-        self.richtung = richtung
         self.satz = satz
         #: Wie die Eckpunkte heissen: ``R_d`` -- oder ``R_k`` mit
         #: charakteristischen Werten. Die Namen der Zwischenwerte bleiben.
@@ -244,7 +243,7 @@ class Handrechnung:
         return punkte
 
     def _ansatz(self, p: Protokoll) -> None:
-        p.titel(f"Resistenzlinie aus Handrechnung – {self.richtung}")
+        # Den Titel setzt der Nachweis, mit der Rechenwahl darunter.
         p.erklaerung(
             f"Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend "
             f"{self.satz.beton}; gedrückter Stahl bleibt unberücksichtigt. Die "

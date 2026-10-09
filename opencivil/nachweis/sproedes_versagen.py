@@ -18,8 +18,9 @@ jetzt in :mod:`opencivil.nachweis.mindestbewehrung`. Bei normaler Anforderung
 war er ausserdem *weniger* streng als ``M_Rd``: ``f_yk/f_yd = 1.15`` wiegt den
 kleineren Hebelarm des gerissenen Querschnitts mehr als auf.
 
-``M_Rd(N_Ed = 0)`` kommt aus der Handrechnung und ist dort vollstaendig
-hergeleitet; hier wird es nur noch gegenuebergestellt. Das Rissmoment gehoert
+``M_Rd(N_Ed = 0)`` kommt aus der Resistenzlinie der Tragsicherheit und ist
+dort hergeleitet; hier wird es nur noch gegenuebergestellt. Rechnet die
+Tragsicherheit mit charakteristischen Werten, heisst es ``M_Rk``. Das Rissmoment gehoert
 dem **ungerissenen** Bruttoquerschnitt::
 
     k_t      = 1 / (1 + 0.5 * h/3)            h in Metern
@@ -246,7 +247,7 @@ class SproedesVersagen(Nachweis):
                                        else erg.M_Rd / M_Riss)
                 erg.erfuellt = erg.M_Rd >= M_Riss
                 erg.begruendung = (
-                    f"M_Rd(N_Ed = 0) = {erg.M_Rd / 1e3:.1f} kNm "
+                    f"M_{self.mn.wahl.index}(N_Ed = 0) = {erg.M_Rd / 1e3:.1f} kNm "
                     f"{'≥' if erg.erfuellt else '<'} M_Riss = {M_Riss / 1e3:.1f} kNm.")
 
             self.ergebnisse.append(erg)
@@ -262,7 +263,8 @@ class SproedesVersagen(Nachweis):
         """Der Biegewiderstand der Lage -- der Widerstand in Tabelle und Herleitung."""
         nummer, r = erg.lage.nummer, self.richtung.value
         return Zwischenwerte(f"{self.id}.lage{nummer}").moment(
-            "M_Rd", rf"M_{{Rd,{r}}}(N_{{Ed}} = 0)_{{{nummer}}}", erg.M_Rd, "Widerstand")
+            "M_Rd", rf"M_{{{self.mn.wahl.index},{r}}}(N_{{Ed}} = 0)_{{{nummer}}}", erg.M_Rd,
+            "Widerstand")
 
     def _urteil(self, erg: Lagenergebnis) -> NachweisUrteil:
         nummer = erg.lage.nummer
@@ -286,7 +288,7 @@ class SproedesVersagen(Nachweis):
             "Ein zu schwach bewehrter Querschnitt reisst und versagt im selben "
             "Augenblick. Nachgewiesen wird deshalb, dass der bewehrte "
             "Querschnitt mehr trägt als der unbewehrte im Augenblick des "
-            "Risses: M_Rd(N_Ed = 0) ≥ M_Riss."
+            f"Risses: M_{self.mn.wahl.index}(N_Ed = 0) ≥ M_Riss."
         )
         protokoll_rissmoment(p, e, self.groessen, basis=self.id,
                              referenz="SIA 262:2025, 4.4.1.3")

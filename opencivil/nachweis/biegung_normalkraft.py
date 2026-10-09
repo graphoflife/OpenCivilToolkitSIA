@@ -61,7 +61,7 @@ from opencivil.nachweis.handrechnung import (
     Eckpunkt, Handrechnung, Posten as HandPosten, lagen_zusammenfassen,
 )
 from opencivil.nachweis.rechenwahl import (
-    RECHENARTEN, Rechenart, Rechenwahl, betongesetz,
+    RECHENARTEN, Rechenart, Rechenwahl, betongesetz, protokoll_rechenwahl,
 )
 from opencivil.nachweis.resistenzlinie import (
     Ebenenlinie, Handlinie, Treffer, Widerstandslinie,
@@ -414,14 +414,21 @@ class BiegungNormalkraft(Nachweis):
         return ergebnis, urteile
 
     def _linie(self, wahl: Rechenwahl, e: Eingaben, p: Protokoll) -> Widerstandslinie:
-        """Die Resistenzlinie einer Wahl -- und ihre Herleitung in ``p``."""
+        """
+        Die Resistenzlinie einer Wahl -- und ihre Herleitung in ``p``: unter
+        ihrem Titel zuerst, womit sie rechnet, dann wie sie entsteht.
+        """
+        hand = wahl.art is Rechenart.HANDRECHNUNG
+        p.titel(f"Resistenzlinie aus {'Handrechnung' if hand else 'Dehnungsebenen'} – "
+                f"{self.richtung.beschriftung}")
+        phi = protokoll_rechenwahl(p, wahl, self.id)
         satz = wahl.satz
         h, b = e.g("h").si, e.g("b").si
         f_c = abs(e.g(satz.beton).si)
         eps_c1d, eps_c2d = abs(e.g("eps_c1d").si), abs(e.g("eps_c2d").si)
         lagen = dehnungsfaecher.lagen_aus_eingaben(self.posten, e, satz)
 
-        if wahl.art is Rechenart.HANDRECHNUNG:
+        if hand:
             # Die Zugehoerigkeit zur unteren oder oberen Lage kommt aus dem
             # Modell (Lagen 1 und 2 liegen unten), nicht aus der Hoehenlage --
             # siehe lagen_zusammenfassen().
@@ -434,8 +441,7 @@ class BiegungNormalkraft(Nachweis):
             ])
             handrechnung = Handrechnung(
                 h=h, b=b, f_cd=f_c, eps_c2d=eps_c2d,
-                unten=seiten["unten"], oben=seiten["oben"],
-                richtung=self.richtung.beschriftung, basis=self.id,
+                unten=seiten["unten"], oben=seiten["oben"], basis=self.id,
                 beton_index=self.querschnitt.beton.symbol_index, satz=satz,
             )
             return Handlinie(wahl, handrechnung.rechnen(p))
@@ -445,9 +451,7 @@ class BiegungNormalkraft(Nachweis):
             beton=betongesetz(wahl, f_c=f_c, E_cm=e.g("E_cm").si,
                               eps_c1d=eps_c1d, eps_c2d=eps_c2d),
             schritte=self.schritte, fasern=self.fasern)
-        phi = Zwischenwerte(self.id).zahl("phi", r"\varphi", wahl.kriechzahl, stellen=2)
-        linie.protokoll_ansatz(p, f_c=e[satz.beton], E_cm=e["E_cm"], phi=phi,
-                               basis=self.id, richtung=self.richtung.beschriftung)
+        linie.protokoll_ansatz(p, f_c=e[satz.beton], E_cm=e["E_cm"], phi=phi, basis=self.id)
         return linie
 
     @property

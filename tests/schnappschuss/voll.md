@@ -70,6 +70,12 @@ $$
 
 ### Resistenzlinie aus Handrechnung – x-Richtung
 
+**Rechenwahl**
+
+$$
+\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Handrechnung, Block } 0.85 \cdot x
+$$
+
 **Schwerpunkt der zusammengefassten Lage – 2. Lage Grundbewehrung + 2. Lage Zulage**
 
 $$
@@ -1519,6 +1525,12 @@ $$
 
 ### Resistenzlinie aus Handrechnung – x-Richtung
 
+**Rechenwahl**
+
+$$
+\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Handrechnung, Block } 0.85 \cdot x
+$$
+
 **Zusammengefasste Bewehrung**
 
 | Seite | $A_s\ [\mathrm{mm}^2]$ | $z\ [\mathrm{mm}]$ | $f_{yd}\ [\mathrm{N/mm^2}]$ |
@@ -2051,6 +2063,12 @@ $$
 | 4. Lage Grundbewehrung | y | B500B | $10$ | $150$ | $35$ | $35$ | $524$ |
 
 ### Resistenzlinie aus Handrechnung – x-Richtung
+
+**Rechenwahl**
+
+$$
+\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Handrechnung, Block } 0.85 \cdot x
+$$
 
 **Zusammengefasste Bewehrung**
 

@@ -121,6 +121,8 @@ class TestVollstaendigeAblage(unittest.TestCase):
                     automatik_querkraft_teilungen=[150.0],
                     sproede=True, zwaengung_biegung=True, duktilitaet=True, x_d_max=0.42,
                     zwaengung_biegung_kriechzahl=1.2,
+                    tragsicherheit_wahl=RechenwahlEintrag(
+                        kriechzahl=1.5, werkstoffsatz="charakteristisch", rechenart="parabel"),
                     querkraftbewehrung=QuerkraftbewehrungEintrag(
                         durchmesser=10.0, stahl="s1", abstand_x=250.0,
                         abstand_y=None, anzahl_y=4.0,

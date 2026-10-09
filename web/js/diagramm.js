@@ -704,7 +704,7 @@ export function querkraftkurveZeichnen(kurve) {
       'text-anchor': ast.moment_positiv ? 'end' : 'start',
       'font-size': 11, 'font-weight': 600, fill: '#1f5fa8',
     });
-    marke.textContent = `m_Rd = ${ast.m_Rd.toFixed(1)}`;
+    marke.textContent = `${kurve.m_name || 'm_Rd'} = ${ast.m_Rd.toFixed(1)}`;
     daten.append(marke);
 
     // Zwei Züge: bis m_Rd durchgezogen, darüber gestrichelt.
@@ -728,7 +728,7 @@ export function querkraftkurveZeichnen(kurve) {
   for (const ast of aeste) {
     const elastisch = ast.punkte.filter((p) => !p.plastisch);
     const plastisch = ast.punkte.filter((p) => p.plastisch);
-    if (elastisch.length) marken.push([elastisch.at(-1), 'v_Rd bei m_Rd', true]);
+    if (elastisch.length) marken.push([elastisch.at(-1), `v_Rd bei ${kurve.m_name || 'm_Rd'}`, true]);
     if (plastisch.length) marken.push([plastisch[0], 'v_Rd nach Fliessbeginn', false]);
   }
   for (const [p, name, oben] of marken) {

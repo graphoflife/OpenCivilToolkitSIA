@@ -382,10 +382,12 @@ class Ebenenlinie(Widerstandslinie):
         return namen
 
     def protokoll_ansatz(self, p: Protokoll, *, f_c: Wert, E_cm: Wert, phi: Wert,
-                         basis: str, richtung: str) -> None:
-        """Wie die Linie entsteht -- einmal je Nachweis, vor den Kombinationen."""
+                         basis: str) -> None:
+        """
+        Wie die Linie entsteht -- einmal je Nachweis, vor den Kombinationen.
+        Den Titel setzt der Nachweis.
+        """
         wahl, satz = self.wahl, self.wahl.satz
-        p.titel(f"Resistenzlinie aus Dehnungsebenen – {richtung}")
         p.erklaerung(
             "Der Querschnitt bleibt eben (Bernoulli). Zu jeder Dehnungsebene ergeben "
             "sich Normalkraft und Moment aus den Spannungen über die Höhe; Zug ist "

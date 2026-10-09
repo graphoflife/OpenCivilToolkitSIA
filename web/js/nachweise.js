@@ -48,10 +48,10 @@ const laufendeSuche = new Set();
 const HILFE = {
   tragsicherheit: {
     zeilen: [
-      ['M-N', 'Resistenzlinie von Hand, Block 0.85·x mit f_cd, Druckstahl weggelassen'],
-      ['V', 'ohne Bügel k_d·τ_cd·d_v, mit Bügeln Fachwerk bei günstigster Neigung'],
-      ['Werte', 'Bemessung (f_cd, f_yd, τ_cd)'],
-      ['φ', '–'],
+      ['M-N', 'Resistenzlinie nach Rechenwahl; Vorgabe von Hand, Block 0.85·x, Druckstahl weggelassen'],
+      ['V', 'ohne Bügel k_d·τ_cd·d_v mit m_R aus derselben Linie, mit Bügeln Fachwerk bei günstigster Neigung'],
+      ['Werte', 'M-N nach Rechenwahl: Bemessung (f_cd, f_yd → M_Rd) oder charakteristisch (f_ck, f_yk → M_Rk); V mit τ_cd, f_yd'],
+      ['φ', 'nach Rechenwahl, nur bei der Parabel → E_c,eff = E_cm / (1 + φ)'],
     ],
     formel: 'α_eff = Widerstand / Einwirkung ≥ 1',
   },
@@ -65,8 +65,8 @@ const HILFE = {
   },
   sproede: {
     zeilen: [
-      ['Weg', 'M_Rd bei N = 0 gegen Rissmoment des ungerissenen Querschnitts'],
-      ['Werte', 'M_Rd Bemessung (f_cd, f_yd), M_Riss Mittelwert (f_ctm)'],
+      ['Weg', 'M_Rd bei N = 0 aus der Linie der Tragsicherheit gegen Rissmoment des ungerissenen Querschnitts'],
+      ['Werte', 'M_Rd wie die Tragsicherheit (charakteristisch: M_Rk), M_Riss Mittelwert (f_ctm)'],
       ['φ', '–'],
     ],
     formel: 'M_Rd(N_Ed = 0) ≥ M_Riss = f_ct,eff · h²·b / 6',
@@ -159,6 +159,8 @@ export function nachweiseBlock(querschnitt) {
         el('span', { text: 'Tragsicherheitsnachweise' }),
         hilfe('tragsicherheit'),
       ]),
+      rechenwahlZeile('Rechenwahl', querschnitt.tragsicherheit_wahl,
+        (veraenderer) => aendernAn((q) => veraenderer(q.tragsicherheit_wahl))),
       querschnitt.kombinationen.length
         ? el('div.einwirkung.ist-kopf', {}, [
           el('span'),

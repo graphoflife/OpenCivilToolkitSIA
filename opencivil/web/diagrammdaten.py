@@ -83,6 +83,9 @@ def querkraftkurven(
             "name": querschnitt.name if querschnitt else querschnitt_kennung,
             "richtung": nachweis.richtung.value,
             "N_Ed": n_ed,
+            # Wie der Momentenwiderstand heisst: m_Rd, oder m_Rk, wenn die
+            # Tragsicherheit mit charakteristischen Werten rechnet.
+            "m_name": f"m_{nachweis.mn.wahl.index}",
             "aeste": [
                 {
                     "moment_positiv": ast["moment_positiv"],

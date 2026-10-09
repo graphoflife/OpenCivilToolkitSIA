@@ -144,11 +144,14 @@ class Widerstandspunkt:
 def widerstand(
     *, M_Ed: float, N_Ed: float, h: float, d: float, d_v: float,
     tau_cd: float, f_yd: float, E_s: float, k_g: float, m_Rd: float,
+    index: str = "Rd",
 ) -> Widerstandspunkt:
     """
     Der Querkraftwiderstand bei diesem Moment und dieser Normalkraft.
 
     Alles in SI-Basis; ``tau_cd`` in Pa, ``m_Rd`` in Nm, Rueckgabe in N/m.
+    ``index`` ist der des Momentenwiderstands, ``Rd`` oder ``Rk`` -- je nach
+    der Linie, aus der er kommt; er steht nur im Text.
 
     DREI AESTE:
 
@@ -170,7 +173,7 @@ def widerstand(
     elif nenner <= 0.0:
         return Widerstandspunkt(
             m_Dd=m_Dd, eps_v=0.0, k_d=0.0, v_Rd=0.0,
-            grund=(f"m_Rd(N_Ed) = {m_Rd / 1e3:.1f} kNm ≤ m_Dd = {m_Dd / 1e3:.1f} kNm "
+            grund=(f"m_{index}(N_Ed) = {m_Rd / 1e3:.1f} kNm ≤ m_Dd = {m_Dd / 1e3:.1f} kNm "
                    f"→ V_Rd nicht bestimmbar."))
     elif abs(M_Ed) > m_Rd:
         eps_v = PLASTISCH * f_yd / E_s
@@ -824,7 +827,8 @@ class Querkraft(Nachweis):
             p = widerstand(
                 M_Ed=M_Ed, N_Ed=N_Ed, h=self.beiwerte.h, d=d, d_v=d_v,
                 tau_cd=self.beiwerte.tau_cd, f_yd=self.beiwerte.f_yd,
-                E_s=self.beiwerte.E_s, k_g=self.beiwerte.k_g, m_Rd=m_Rd)
+                E_s=self.beiwerte.E_s, k_g=self.beiwerte.k_g, m_Rd=m_Rd,
+                index=self.mn.wahl.index)
             punkte.append((vz * M_Ed, p.v_Rd, p.plastisch))
 
         return {"punkte": punkte, "m_Rd": vz * m_Rd, "d": d, "d_v": d_v,
@@ -880,7 +884,8 @@ class Querkraft(Nachweis):
         # frueher hier und setzte v_Rd kurzerhand auf null.
         punkt = widerstand(
             M_Ed=M_Ed, N_Ed=N_Ed, h=h, d=erg.d, d_v=erg.d_v,
-            tau_cd=tau_cd.si, f_yd=f_yd, E_s=E_s, k_g=k_g, m_Rd=m_Rd)
+            tau_cd=tau_cd.si, f_yd=f_yd, E_s=E_s, k_g=k_g, m_Rd=m_Rd,
+            index=self.mn.wahl.index)
         erg.m_Dd = punkt.m_Dd
         erg.eps_v = punkt.eps_v
         erg.k_d = punkt.k_d
@@ -1094,7 +1099,8 @@ class Querkraft(Nachweis):
                 titel=f"Momentenwiderstand bei N_Ed = {N_Ed / 1e3:.1f} kN")
 
         m_Ed = werte.moment("m_Ed", "m_{Ed}", M_Ed)
-        m_Rd = werte.moment("m_Rd", "m_{Rd}(N_{Ed})", erg.m_Rd)
+        idx = self.mn.wahl.index
+        m_Rd = werte.moment("m_Rd", f"m_{{{idx}}}(N_{{Ed}})", erg.m_Rd)
         eps_v = werte.dehnung("eps_v", r"\varepsilon_v", erg.eps_v, stellen=3)
         stahl = {"f_yd": e["f_yd"], "E_s": e["E_s"]}
         if erg.eps_v == 0.0:
@@ -1105,7 +1111,7 @@ class Querkraft(Nachweis):
             # Stünde die Formel mit den Zahlen da, ergäbe sie etwas anderes
             # als das Resultat daneben.
             p.text(f"|m_Ed| = {Groesse.aus_si(abs(M_Ed), KNM).formatiert(1)} kNm "
-                   f"> m_Rd(N_Ed) = {m_Rd.formatiert()} kNm → Bewehrung fliesst, "
+                   f"> m_{idx}(N_Ed) = {m_Rd.formatiert()} kNm → Bewehrung fliesst, "
                    f"ε_v fest.")
             p.formel(eps_v, rf"{PLASTISCH} \cdot \frac{{@f_yd}}{{@E_s}}", stahl,
                      titel="Dehnung auf halber Höhe")

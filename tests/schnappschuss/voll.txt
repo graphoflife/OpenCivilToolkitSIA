@@ -51,6 +51,9 @@ Randabstände, Tiefen ab Oberkante und Bewehrungsquerschnitte
 Resistenzlinie aus Handrechnung – x-Richtung
 --------------------------------------------
 
+Rechenwahl
+    \text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Handrechnung, Block } 0.85 \cdot x
+
 Schwerpunkt der zusammengefassten Lage – 2. Lage Grundbewehrung + 2. Lage Zulage
     \begin{aligned}
       z_{2,x} &= \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}} \\
@@ -950,6 +953,9 @@ Randabstände, Tiefen ab Oberkante und Bewehrungsquerschnitte
 Resistenzlinie aus Handrechnung – x-Richtung
 --------------------------------------------
 
+Rechenwahl
+    \text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Handrechnung, Block } 0.85 \cdot x
+
 Zusammengefasste Bewehrung
     Seite                   A_s\ [\mathrm{mm}^2]  z\ [\mathrm{mm}]  f_{yd}\ [\mathrm{N/mm^2}]
     ----------------------  --------------------  ----------------  -------------------------
@@ -1290,6 +1296,9 @@ Randabstände, Tiefen ab Oberkante und Bewehrungsquerschnitte
 
 Resistenzlinie aus Handrechnung – x-Richtung
 --------------------------------------------
+
+Rechenwahl
+    \text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Handrechnung, Block } 0.85 \cdot x
 
 Zusammengefasste Bewehrung
     Seite                   A_s\ [\mathrm{mm}^2]  z\ [\mathrm{mm}]  f_{yd}\ [\mathrm{N/mm^2}]

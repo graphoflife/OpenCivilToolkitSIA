@@ -21,7 +21,8 @@ from opencivil.querschnitt.platte import K_C, KRIECHZAHL, LAGENZAHL, Richtung
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste,
     KnickEintrag, KombinationEintrag, LageEintrag, ObergrenzeEintrag,
-    PostenEintrag, QuerkraftbewehrungEintrag, SpannungsfallEintrag, eindeutig,
+    PostenEintrag, QuerkraftbewehrungEintrag, RechenwahlEintrag, SpannungsfallEintrag,
+    eindeutig,
 )
 from opencivil.projekt.lesen import (
     ProjektFehler, gebrauchsliste_roh, kriechzahl_aus, lagen_aus_altem_format,
@@ -207,6 +208,13 @@ class QuerschnittEintrag(Beschreibung):
 
     kombinationen: List[KombinationEintrag] = field(default_factory=list)
 
+    tragsicherheit_wahl: RechenwahlEintrag = field(default_factory=RechenwahlEintrag)
+    """
+    Womit die Tragsicherheit rechnet -- Vorgabe die Handrechnung mit
+    Bemessungswerten. Die Querkraft und das sproede Versagen lesen ihren
+    Momentenwiderstand aus derselben Linie.
+    """
+
     def __post_init__(self) -> None:
         while len(self.lagen) < LAGENZAHL:
             self.lagen.append(LageEintrag())
@@ -236,6 +244,7 @@ class QuerschnittEintrag(Beschreibung):
         for liste, wort in ((self.haeufig, "häufige"),
                             (self.quasistaendig, "quasi-ständige")):
             liste.pruefen(self.name, self.kombinationen, wort)
+        self.tragsicherheit_wahl.pruefen(f"Platte '{self.name}', Tragsicherheit")
 
     def masse_pruefen(self) -> None:
         """
@@ -456,6 +465,9 @@ class QuerschnittEintrag(Beschreibung):
             lagen=[LageEintrag.aus_dict(x) for x in (lagen or [])],
             kombinationen=[
                 KombinationEintrag.aus_dict(x) for x in (d.get("kombinationen") or [])],
+            tragsicherheit_wahl=RechenwahlEintrag.aus_dict(
+                d.get("tragsicherheit_wahl"), kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl),
+                wo=f"Platte '{kennung}', Tragsicherheit"),
         )
 
 
