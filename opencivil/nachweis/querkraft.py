@@ -66,7 +66,7 @@ from opencivil.core.einheiten import (
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
-from opencivil.nachweis.biegung_normalkraft import protokoll_interpolation
+from opencivil.nachweis.biegung_normalkraft import protokoll_widerstand
 from opencivil.querschnitt.platte import (
     ALPHA_ZUG, Plattenquerschnitt, Richtung, protokoll_statische_hoehe,
 )
@@ -1089,7 +1089,7 @@ class Querkraft(Nachweis):
         # -- geschrieben vom M-N-Nachweis, der es gerechnet hat.
         bei_n = self.mn.widerstand_bei_n(fall.name)
         if bei_n is not None:
-            protokoll_interpolation(
+            protokoll_widerstand(
                 p, bei_n, basis=werte.basis,
                 titel=f"Momentenwiderstand bei N_Ed = {N_Ed / 1e3:.1f} kN")
 

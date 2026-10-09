@@ -6,17 +6,23 @@ Prueft beliebig viele Schnittgroessenkombinationen gegen die M-N-Interaktion
 eines Querschnitts.
 
 ZWEI LINIEN, EINE DAVON MASSGEBEND:
-* **Resistenzlinie aus Handrechnung** -- das Polygon aus wenigen Eckpunkten in
-  :mod:`opencivil.nachweis.handrechnung`. Dagegen wird nachgewiesen, und ihre
-  Herleitung steht vollstaendig in der Mitschrift.
-* **Praezise Resistenzlinie** -- die punktweise aus Dehnungsebenen aufgebaute
-  Linie, unten beschrieben. Sie wird weiterhin gerechnet und im Diagramm
-  gezeigt, aber **nicht mehr hergeleitet**: sie entsteht aus hunderten
-  Faserintegrationen, die niemand mit dem Taschenrechner nachvollzieht. Wer
-  sie herleiten liesse, lieferte Zeilen zum Glauben statt zum Pruefen.
+Welche massgebend ist, waehlt das Kapitel (:class:`Rechenwahl`):
 
-Wie sie entsteht und warum die Mitschrift dafuer stillgelegt ist, steht in
-:mod:`opencivil.nachweis.dehnungsfaecher`.
+* **Handrechnung Block 0.85·x** -- das Polygon aus wenigen Eckpunkten in
+  :mod:`opencivil.nachweis.handrechnung`. Seine Herleitung steht
+  vollstaendig in der Mitschrift.
+* **Block 0.85·x genau** oder **Parabel** -- der Rand des Dehnungsfaechers,
+  mit der gedrueckten Bewehrung. Den Widerstand bei der Einwirkung sucht er
+  genau; in die Mitschrift kommt die Probe dieses Bruchzustands, nicht die
+  Suche.
+
+Beide stehen hinter derselben Schnittstelle
+(:mod:`opencivil.nachweis.resistenzlinie`). Die andere Linie steht zum
+Vergleich im Diagramm: die Parabel neben der Handrechnung, sonst die
+Handrechnung.
+
+Mit charakteristischen Werten heissen die Widerstaende ``N_Rk`` und
+``M_Rk``; die Kennungen der Werte bleiben dieselben.
 
 VORZEICHEN:
     N > 0   Zug
@@ -28,10 +34,10 @@ N und M gelten fuer die betrachtete Breite ``b``. Mit ``b = 1 m`` sind es also
 unmittelbar die Werte pro Laufmeter.
 
 ERFUELLUNGSGRAD:
-Ob ein Punkt drin liegt oder nicht, entscheidet immer derselbe Test (Punkt in
-geschlossener Linie), angewandt auf das Polygon der Handrechnung. Nur *wie
-weit* er von der Linie entfernt ist, haengt vom gewaehlten Massstab ab --
-siehe :class:`Erfuellungsart` und :meth:`BiegungNormalkraft._auswerten`.
+Ob ein Punkt drin liegt oder nicht, entscheidet die massgebende Linie
+(:meth:`Widerstandslinie.innerhalb`). Nur *wie weit* er von ihr entfernt ist,
+haengt vom gewaehlten Massstab ab -- siehe :class:`Erfuellungsart` und
+:meth:`BiegungNormalkraft._auswerten`.
 """
 
 from __future__ import annotations
@@ -45,18 +51,24 @@ from opencivil.core.berechnung import (
     Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, Groesse
-from opencivil.core.latex import Mathe, als_text, angabe
-from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.latex import als_text, angabe
+from opencivil.core.protokoll import Protokoll, StillesProtokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
 from opencivil.core.wert import kennung_aus
 from opencivil.nachweis import dehnungsfaecher, linie as geo
+from opencivil.nachweis.dehnungsfaecher import Linienpunkt
 from opencivil.nachweis.handrechnung import (
     Eckpunkt, Handrechnung, Posten as HandPosten, lagen_zusammenfassen,
+)
+from opencivil.nachweis.rechenwahl import (
+    RECHENARTEN, Rechenart, Rechenwahl, betongesetz,
+)
+from opencivil.nachweis.resistenzlinie import (
+    Ebenenlinie, Handlinie, Treffer, Widerstandslinie,
 )
 from opencivil.querschnitt.platte import (
     Plattenquerschnitt, Richtung, posten_index,
 )
-from opencivil.querschnitt.werkstoffgesetz import Betongesetz
 
 
 class Erfuellungsart(str, Enum):
@@ -156,9 +168,13 @@ class Auswertung:
     massstab: Erfuellungsart = Erfuellungsart.NORMALKRAFT_KONSTANT
     """Welcher Massstab tatsaechlich gegriffen hat."""
 
-    kante: Optional[Tuple["Eckpunkt", "Eckpunkt"]] = None
-    """Zwischen welchen beiden Eckpunkten interpoliert wurde -- fuer die
-    Mitschrift, damit dort nicht bloss das Ergebnis steht."""
+    treffer: Optional[Treffer] = None
+    """Wo auf der Linie der Widerstand liegt -- zwischen welchen Stuetzpunkten,
+    bei der Ebenenlinie auch auf welcher Ebene. Fuer die Mitschrift, damit
+    dort nicht bloss das Ergebnis steht."""
+
+    linie: Optional[Widerstandslinie] = None
+    """Die Linie, die ihn geliefert hat -- sie schreibt, wie."""
 
     normierung: Optional[Normierung] = None
     """Nur beim kuerzesten Abstand: dort ist der Grad kein Verhaeltnis von
@@ -187,8 +203,8 @@ class BiegungNormalkraft(Nachweis):
     Nachweis der Biege- und Normalkrafttragfaehigkeit über die M-N-Interaktion.
 
     Erzeugt für jede Kombination einen Erfüllungsgrad und ein Urteil. Gemessen
-    wird gegen das Polygon aus der Handrechnung (:attr:`handlinie`); die genaue
-    Linie (:attr:`linie`) wird mitgerechnet und steht im Diagramm daneben.
+    wird gegen die Linie der Wahl (:attr:`massgebend`); die andere
+    (:attr:`vergleich`) steht im Diagramm daneben.
     """
 
     THEMA = "Biegung und Normalkraft"
@@ -199,14 +215,11 @@ class BiegungNormalkraft(Nachweis):
         kombinationen: Sequence[Schnittgroessen],
         richtung: Richtung = Richtung.X,
         *,
-        schritte: int = 80,
-        fasern: int = 200,
-        mit_linie: bool = True,
+        wahl: Rechenwahl = Rechenwahl(),
+        schritte: int = dehnungsfaecher.SCHRITTE,
+        fasern: int = dehnungsfaecher.FASERN,
+        mit_vergleich: bool = True,
     ) -> None:
-        # 80 Schritte je Abschnitt kosten rund 16 ms. Die Eckwerte sind schon bei
-        # 40 Schritten auf fuenf Stellen auskonvergiert; die feinere Teilung
-        # dient allein der Zeichnung, weil die Linie nahe dem reinen Druck
-        # schnell laeuft und sonst sichtbar eckig wuerde.
         # Ohne Kombinationen bleibt der Nachweis ohne Urteil -- die Eckwerte
         # der Resistenzlinie entstehen trotzdem. Sie sind eine Eigenschaft des
         # Querschnitts, keine der Einwirkung, und andere Nachweise brauchen
@@ -218,26 +231,35 @@ class BiegungNormalkraft(Nachweis):
                 f"Querschnitt '{querschnitt.name}': in {richtung.beschriftung} liegt "
                 f"keine Bewehrung, ein Nachweis ist dort nicht möglich."
             )
+        if wahl.art not in RECHENARTEN:
+            raise ValueError(
+                f"Eine Resistenzlinie gibt es mit "
+                f"{', '.join(a.beschriftung for a in RECHENARTEN)} – "
+                f"nicht mit «{wahl.art.beschriftung}».")
         self.querschnitt = querschnitt
         self.richtung = richtung
         self.kombinationen = list(kombinationen)
+        self.wahl = wahl
         self.schritte = schritte
         self.fasern = fasern
-        self.mit_linie = mit_linie
+        self.mit_vergleich = mit_vergleich
         """
-        Ob die genaue Resistenzlinie mitgerechnet wird.
+        Ob die Vergleichslinie mitgerechnet wird.
 
-        Sie kostet fast die ganze Rechenzeit dieses Nachweises -- 482
-        Dehnungsebenen mit je 200 Betonfasern, rund 46 ms von 48 -- und das
-        Urteil faellt ohne sie: nachgewiesen wird gegen das Polygon aus der
-        Handrechnung. Gebraucht wird sie allein im Diagramm.
-
-        Die Bewehrungssuche rechnet je Lauf ein paar Dutzend Mal und sieht
-        dabei kein Diagramm an. Sie baut darum ueber ``aufbauen(schnell=True)``
-        ohne Linie -- dieselben Zahlen, ein Bruchteil der Zeit.
+        Neben der Handrechnung ist das die Parabel, und die kostet fast die
+        ganze Rechenzeit dieses Nachweises -- 482 Dehnungsebenen mit je 200
+        Betonfasern. Gebraucht wird sie allein im Diagramm. Die
+        Bewehrungssuche rechnet je Lauf ein paar Dutzend Mal und sieht dabei
+        kein Diagramm an; sie baut darum ueber ``aufbauen(schnell=True)`` ohne
+        Vergleich -- dieselben Zahlen, ein Bruchteil der Zeit.
         """
 
-        self.linie: List[Linienpunkt] = []
+        self.massgebend: Optional[Widerstandslinie] = None
+        """Die Linie der Wahl -- gegen sie faellt das Urteil. Nach dem Lauf."""
+
+        self.vergleich: Optional[Widerstandslinie] = None
+        """Die andere Linie, fuer das Diagramm -- ohne Mitschrift."""
+
         self.auswertungen: List[Auswertung] = []
 
         self.bei_normalkraft: Dict[str, Optional[Auswertung]] = {}
@@ -251,6 +273,7 @@ class BiegungNormalkraft(Nachweis):
         """
 
         r = richtung.value
+        idx = wahl.index
         basis = f"{querschnitt.id}.nachweis.mn.{r}"
         self.d_ausnutzung: Dict[str, WertDef] = {
             k.name: grad_def(
@@ -267,7 +290,7 @@ class BiegungNormalkraft(Nachweis):
         self.d_m_rd: Dict[str, WertDef] = {
             k.name: WertDef(
                 id=f"{basis}.{k.kennung}.M_Rd_bei_N_Ed",
-                symbol=rf"M_{{Rd,{r}}}(N_{{Ed}})_{{{als_text(k.name)}}}",
+                symbol=rf"M_{{{idx},{r}}}(N_{{Ed}})_{{{als_text(k.name)}}}",
                 einheit=KNM,
                 beschreibung=(f"Momentenwiderstand bei N_Ed "
                               f"({richtung.beschriftung}) – {k.name}"),
@@ -277,35 +300,38 @@ class BiegungNormalkraft(Nachweis):
             for k in self.kombinationen
         }
         self.d_eckwerte = {
-            "N_Rd_zug": WertDef(f"{basis}.N_Rd_zug", f"N_{{Rd,{r}}}^{{+}}", KN,
+            "N_Rd_zug": WertDef(f"{basis}.N_Rd_zug", f"N_{{{idx},{r}}}^{{+}}", KN,
                                 f"Grösste aufnehmbare Zugkraft ({richtung.beschriftung})",
                                 stellen=1),
-            "N_Rd_druck": WertDef(f"{basis}.N_Rd_druck", f"N_{{Rd,{r}}}^{{-}}", KN,
+            "N_Rd_druck": WertDef(f"{basis}.N_Rd_druck", f"N_{{{idx},{r}}}^{{-}}", KN,
                                   f"Grösste aufnehmbare Druckkraft ({richtung.beschriftung})",
                                   stellen=1),
-            "M_Rd_max": WertDef(f"{basis}.M_Rd_max", f"M_{{Rd,{r}}}^{{+}}", KNM,
+            "M_Rd_max": WertDef(f"{basis}.M_Rd_max", f"M_{{{idx},{r}}}^{{+}}", KNM,
                                 f"Grösster positiver Momentenwiderstand ({richtung.beschriftung})",
                                 stellen=1),
-            "M_Rd_min": WertDef(f"{basis}.M_Rd_min", f"M_{{Rd,{r}}}^{{-}}", KNM,
+            "M_Rd_min": WertDef(f"{basis}.M_Rd_min", f"M_{{{idx},{r}}}^{{-}}", KNM,
                                 f"Grösster negativer Momentenwiderstand ({richtung.beschriftung})",
                                 stellen=1),
             # Wird vom Querkraftnachweis gebraucht -- darum eine eigene Ausgabe
             # und keine im Nachweis versteckte Zwischengrösse.
-            "M_Rd_N0_pos": WertDef(f"{basis}.M_Rd_N0_pos", f"M_{{Rd,{r}}}(N=0)^{{+}}", KNM,
+            "M_Rd_N0_pos": WertDef(f"{basis}.M_Rd_N0_pos", f"M_{{{idx},{r}}}(N=0)^{{+}}", KNM,
                                    f"Momentenwiderstand bei N = 0, positiv ({richtung.beschriftung})",
                                    stellen=1),
-            "M_Rd_N0_neg": WertDef(f"{basis}.M_Rd_N0_neg", f"M_{{Rd,{r}}}(N=0)^{{-}}", KNM,
+            "M_Rd_N0_neg": WertDef(f"{basis}.M_Rd_N0_neg", f"M_{{{idx},{r}}}(N=0)^{{-}}", KNM,
                                    f"Momentenwiderstand bei N = 0, negativ ({richtung.beschriftung})",
                                    stellen=1),
         }
 
+        # Die Festigkeiten des Wertesatzes: f_cd und f_yd oder f_ck und f_yk.
+        # E_cm fuer die Parabel -- auch als Vergleich neben der Handrechnung.
+        satz = wahl.satz
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),
             Eingabebezug("b", querschnitt.id_breite(richtung)),
-            Eingabebezug("f_cd", querschnitt.beton.id_von("f_cd")),
+            Eingabebezug(satz.beton, querschnitt.beton.id_von(satz.beton)),
             Eingabebezug("eps_c1d", querschnitt.beton.id_von("eps_c1d")),
             Eingabebezug("eps_c2d", querschnitt.beton.id_von("eps_c2d")),
-            Eingabebezug("k_sigma", querschnitt.beton.id_von("k_sigma")),
+            Eingabebezug("E_cm", querschnitt.beton.id_von("E_cm")),
         ]
         # Nur die Bewehrung dieser Richtung geht ein -- Querbewehrung traegt
         # nichts zum Momentenwiderstand um diese Achse bei.
@@ -317,7 +343,7 @@ class BiegungNormalkraft(Nachweis):
             ]
         for stahl in {l.stahl.id: l.stahl for l, _, _, _, _ in self.posten}.values():
             kurz = kennung_aus(stahl.id)
-            for kennwert in ("E_s", "f_yd", "f_yd_druck", "eps_ud"):
+            for kennwert in ("E_s", satz.stahl, satz.stahl_druck, "eps_ud"):
                 bezuege.append(
                     Eingabebezug(f"{kennwert}__{kurz}", stahl.id_von(kennwert))
                 )
@@ -337,48 +363,19 @@ class BiegungNormalkraft(Nachweis):
     # -- Querschnittswerte --------------------------------------------------
 
     def pruefe(self, e: Eingaben, p: Protokoll):
-        h = e.g("h").si
-        b = e.g("b").si
-        beton = Betongesetz.aus_werten({
-            k: e[k] for k in ("f_cd", "eps_c1d", "eps_c2d", "k_sigma")
-        })
-        lagen = dehnungsfaecher.lagen_aus_eingaben(self.posten, e)
+        wahl = self.wahl
+        self.massgebend = self._linie(wahl, e, p)
+        # Die andere Linie steht zum Vergleich im Diagramm, ohne Mitschrift:
+        # neben der Handrechnung die Parabel, sonst die Handrechnung.
+        self.vergleich = None
+        if self.mit_vergleich:
+            art = (Rechenart.PARABEL if wahl.art is Rechenart.HANDRECHNUNG
+                   else Rechenart.HANDRECHNUNG)
+            self.vergleich = self._linie(
+                Rechenwahl(kriechzahl=wahl.kriechzahl, satz=wahl.satz, art=art),
+                e, StillesProtokoll())
 
-        # Die genaue Linie: nur fuer das Diagramm, ohne Mitschrift. Sie steht
-        # zum Vergleich daneben -- das Urteil faellt ueber die Handrechnung.
-        # Wer sie nicht zeichnet, braucht sie nicht; siehe `mit_linie`.
-        self.linie = dehnungsfaecher.aufbauen(
-            h=h, b=b, lagen=lagen, beton=beton,
-            schritte=self.schritte, fasern=self.fasern) if self.mit_linie else []
-
-        # -- Die Handrechnung: das, wogegen nachgewiesen wird ----------------
-        # Die Zugehoerigkeit zur unteren oder oberen Lage kommt aus dem Modell
-        # (Lagen 1 und 2 liegen unten), nicht aus der Hoehenlage -- siehe
-        # lagen_zusammenfassen().
-        seiten = lagen_zusammenfassen([
-            HandPosten(a_s=a_s, z=z, f_yd=gesetz.f_yd, E_s=gesetz.E_s, text=text,
-                       index=posten_index(lage, art),
-                       stahl_index=lage.stahl.symbol_index,
-                       von_unten=lage.von_unten)
-            for (a_s, z, gesetz, text), (lage, art, *_) in zip(lagen, self.posten)
-        ])
-        self.handrechnung = Handrechnung(
-            h=h, b=b, f_cd=beton.f_cd, eps_c2d=beton.eps_c2d,
-            unten=seiten["unten"], oben=seiten["oben"],
-            richtung=self.richtung.beschriftung, basis=self.id,
-            beton_index=self.querschnitt.beton.symbol_index,
-        )
-        self.handlinie = self.handrechnung.rechnen(p)
-
-        bei_null = geo.schnitte(self.handlinie, geo.MOMENT, 0.0)
-        eckwerte = {
-            "N_Rd_zug": max(pt.N for pt in self.handlinie),
-            "N_Rd_druck": min(pt.N for pt in self.handlinie),
-            "M_Rd_max": max(pt.M for pt in self.handlinie),
-            "M_Rd_min": min(pt.M for pt in self.handlinie),
-            "M_Rd_N0_pos": max([m for m in bei_null if m >= 0] or [0.0]),
-            "M_Rd_N0_neg": min([m for m in bei_null if m <= 0] or [0.0]),
-        }
+        eckwerte = self.massgebend.eckwerte()
         # Achtung: die Eckwerte liegen in SI-Basis vor (N bzw. Nm), darum
         # aus_si() -- Groesse(x, KN) wuerde x als Kilonewton lesen.
         ergebnis: Dict[str, Groesse] = {
@@ -416,13 +413,62 @@ class BiegungNormalkraft(Nachweis):
             )
         return ergebnis, urteile
 
+    def _linie(self, wahl: Rechenwahl, e: Eingaben, p: Protokoll) -> Widerstandslinie:
+        """Die Resistenzlinie einer Wahl -- und ihre Herleitung in ``p``."""
+        satz = wahl.satz
+        h, b = e.g("h").si, e.g("b").si
+        f_c = abs(e.g(satz.beton).si)
+        eps_c1d, eps_c2d = abs(e.g("eps_c1d").si), abs(e.g("eps_c2d").si)
+        lagen = dehnungsfaecher.lagen_aus_eingaben(self.posten, e, satz)
+
+        if wahl.art is Rechenart.HANDRECHNUNG:
+            # Die Zugehoerigkeit zur unteren oder oberen Lage kommt aus dem
+            # Modell (Lagen 1 und 2 liegen unten), nicht aus der Hoehenlage --
+            # siehe lagen_zusammenfassen().
+            seiten = lagen_zusammenfassen([
+                HandPosten(a_s=a_s, z=z, f_yd=gesetz.f_yd, E_s=gesetz.E_s, text=text,
+                           index=posten_index(lage, art),
+                           stahl_index=lage.stahl.symbol_index,
+                           von_unten=lage.von_unten, satz=satz)
+                for (a_s, z, gesetz, text), (lage, art, *_) in zip(lagen, self.posten)
+            ])
+            handrechnung = Handrechnung(
+                h=h, b=b, f_cd=f_c, eps_c2d=eps_c2d,
+                unten=seiten["unten"], oben=seiten["oben"],
+                richtung=self.richtung.beschriftung, basis=self.id,
+                beton_index=self.querschnitt.beton.symbol_index, satz=satz,
+            )
+            return Handlinie(wahl, handrechnung.rechnen(p))
+
+        linie = Ebenenlinie(
+            wahl, h=h, b=b, lagen=lagen, eps_c1d=eps_c1d, eps_c2d=eps_c2d,
+            beton=betongesetz(wahl, f_c=f_c, E_cm=e.g("E_cm").si,
+                              eps_c1d=eps_c1d, eps_c2d=eps_c2d),
+            schritte=self.schritte, fasern=self.fasern)
+        phi = Zwischenwerte(self.id).zahl("phi", r"\varphi", wahl.kriechzahl, stellen=2)
+        linie.protokoll_ansatz(p, f_c=e[satz.beton], E_cm=e["E_cm"], phi=phi,
+                               basis=self.id, richtung=self.richtung.beschriftung)
+        return linie
+
+    @property
+    def handlinie(self) -> List[Eckpunkt]:
+        """Die Eckpunkte der Handrechnung, ob massgebend oder Vergleich -- sonst leer."""
+        return next((l.punkte for l in (self.massgebend, self.vergleich)
+                     if isinstance(l, Handlinie)), [])
+
+    @property
+    def linie(self) -> List[Linienpunkt]:
+        """Die Punkte der Linie aus Dehnungsebenen, ob massgebend oder Vergleich."""
+        return next((l.punkte for l in (self.massgebend, self.vergleich)
+                     if isinstance(l, Ebenenlinie)), [])
+
     def moment_bei(self, N_Ed: float, positiv: bool) -> Optional[float]:
         """
         Der Momentenwiderstand bei dieser Normalkraft, auf der gewaehlten Seite.
 
         Fuer beliebige Normalkraefte, nicht nur die der Kombinationen: die
         Querkraftkurve laesst den Benutzer ein N_Ed einstellen und braucht dann
-        den passenden Widerstand. Beide Seiten des Polygons sind moeglich --
+        den passenden Widerstand. Beide Seiten der Linie sind moeglich --
         positiv (Zug unten) und negativ (Zug oben).
 
         ``None``, wenn die Normalkraft ausserhalb der Resistenzlinie liegt.
@@ -430,8 +476,7 @@ class BiegungNormalkraft(Nachweis):
         :param N_Ed: Normalkraft in N, Zug positiv.
         :return: Moment in Nm, Betrag der gewaehlten Seite.
         """
-        treffer = geo.kante(self.handlinie, geo.MOMENT, N_Ed, positiv=positiv)
-        return None if treffer is None else abs(treffer[0])
+        return self.massgebend.moment_bei(N_Ed, positiv)
 
     def widerstand_bei_n(self, kombination: str) -> Optional[Auswertung]:
         """
@@ -468,7 +513,7 @@ class BiegungNormalkraft(Nachweis):
             ed = geo.Stelle(N=auswertung.schnittgroessen.N_Ed.si,
                             M=auswertung.schnittgroessen.M_Ed.si)
             fest = Groesse.aus_si(achse.gegen.von(ed), achse.gegen.einheit)
-            symbol = (rf"{achse.name}_{{Rd,{r}}}({achse.gegen.name}_{{Ed}} = "
+            symbol = (rf"{achse.name}_{{{self.wahl.index},{r}}}({achse.gegen.name}_{{Ed}} = "
                       rf"{fest.als_latex(1)})")
 
         definition = WertDef(
@@ -486,9 +531,8 @@ class BiegungNormalkraft(Nachweis):
         """
         Bestimmt den Erfuellungsgrad einer Kombination.
 
-        Gemessen wird gegen das Polygon aus der Handrechnung, nicht gegen die
-        genaue Linie -- damit die Zahl im Urteil dieselbe ist, die in der
-        Herleitung Schritt fuer Schritt hergeleitet wird.
+        Gemessen wird gegen die massgebende Linie -- damit die Zahl im Urteil
+        dieselbe ist, die in der Herleitung steht.
 
         Bei ``AUTOMATISCH`` werden **beide** Wege gerechnet -- der
         Momentenwiderstand bei festgehaltener Normalkraft und der
@@ -503,7 +547,7 @@ class BiegungNormalkraft(Nachweis):
         wird; was dann gerechnet wurde, steht vollstaendig da.
         """
         N_Ed, M_Ed = kombination.N_Ed.si, kombination.M_Ed.si
-        innerhalb = geo.innerhalb(N_Ed, M_Ed, self.handlinie)
+        innerhalb = self.massgebend.innerhalb(N_Ed, M_Ed)
 
         art = kombination.art
         if art is Erfuellungsart.NAECHSTER_PUNKT:
@@ -535,31 +579,36 @@ class BiegungNormalkraft(Nachweis):
         fest = achse.gegen.von(ed)
         gesucht = achse.von(ed)
 
-        treffer = geo.kante(self.handlinie, achse, fest, positiv=gesucht >= 0)
+        treffer = self.massgebend.kante(achse, fest, positiv=gesucht >= 0)
         if treffer is None:
             return None
-        rd, a, b = treffer
+        rd = treffer.wert
 
         grad = float("inf") if gesucht == 0 else abs(rd) / abs(gesucht)
         return Auswertung(
             kombination, innerhalb, grad,
             widerstand=(ed.N, rd) if achse is geo.MOMENT else (rd, ed.M),
-            begruendung=(f"{achse.name}_Rd = {_in(rd, achse)} bei "
+            begruendung=(f"{achse.name}_{self.wahl.index} = {_in(rd, achse)} bei "
                          f"{achse.gegen.name}_Ed = {_in(fest, achse.gegen)}."),
             achse=achse, ed=gesucht, rd=rd,
             massstab=MASSSTAB[achse.name],
-            kante=(a, b))
+            treffer=treffer, linie=self.massgebend)
 
     def _naechster(
         self, kombination: Schnittgroessen, eckwerte: Mapping[str, float],
         innerhalb: bool,
     ) -> Auswertung:
-        """Kuerzester Abstand, im auf die Eckwerte normierten Diagramm."""
+        """
+        Kuerzester Abstand, im auf die Eckwerte normierten Diagramm -- zum
+        Polygon der massgebenden Linie. Bei der Linie aus Dehnungsebenen ist
+        das ihr gezeichneter Rand: der naechste Punkt ist eine Frage der
+        Geometrie, nicht eines Bruchzustands.
+        """
         N_Ed, M_Ed = kombination.N_Ed.si, kombination.M_Ed.si
         N_ref = max(abs(eckwerte["N_Rd_zug"]), abs(eckwerte["N_Rd_druck"])) or 1.0
         M_ref = max(abs(eckwerte["M_Rd_max"]), abs(eckwerte["M_Rd_min"])) or 1.0
         abstand, stelle = geo.naechster_punkt(
-            N_Ed, M_Ed, self.handlinie, N_ref, M_ref)
+            N_Ed, M_Ed, self.massgebend.punkte, N_ref, M_ref)
         laenge = math.hypot(N_Ed / N_ref, M_Ed / M_ref)
         rand = max(laenge + abstand if innerhalb else laenge - abstand, 0.0)
         grad = float("inf") if laenge == 0 else rand / laenge
@@ -579,7 +628,8 @@ class BiegungNormalkraft(Nachweis):
         n, r = auswertung.normierung, self.richtung.value
         werte = Zwischenwerte(f"{self.id}.{auswertung.schnittgroessen.kennung}")
         return (werte.zahl("E_norm", rf"\bar{{E}}_{{d,{r}}}", n.laenge, "Einwirkung"),
-                werte.zahl("R_norm", rf"\bar{{R}}_{{d,{r}}}", n.rand, "Widerstand"))
+                werte.zahl("R_norm", rf"\bar{{R}}_{{{self.wahl.satz.kuerzel},{r}}}", n.rand,
+                           "Widerstand"))
 
     def _protokoll_kombination(self, p: Protokoll, auswertung: Auswertung,
                                eckwerte: Mapping[str, float]) -> None:
@@ -594,11 +644,12 @@ class BiegungNormalkraft(Nachweis):
         if auswertung.normierung is not None:
             ed, rd = self._protokoll_naechster(p, auswertung, eckwerte, basis)
         else:
-            protokoll_interpolation(p, auswertung, basis=basis)
+            protokoll_widerstand(p, auswertung, basis=basis)
             werte, achse = Zwischenwerte(basis), auswertung.achse
-            rd, ed = (werte.wert(name, f"{achse.name}_{{{name}}}",
+            rd, ed = (werte.wert(name, f"{achse.name}_{{{zeichen}}}",
                                  Groesse.aus_si(abs(si), achse.einheit))
-                      for name, si in (("Rd", auswertung.rd), ("Ed", auswertung.ed)))
+                      for name, zeichen, si in (("Rd", self.wahl.index, auswertung.rd),
+                                                ("Ed", "Ed", auswertung.ed)))
         grad_formel(p, self.d_ausnutzung[k.name], auswertung.erfuellungsgrad,
                     rd, ed, auswertung.innerhalb, mit_urteil=True)
 
@@ -651,100 +702,28 @@ class BiegungNormalkraft(Nachweis):
         return einwirkung, widerstand
 
 
-def protokoll_interpolation(
+def protokoll_widerstand(
     p: Protokoll, auswertung: Auswertung, titel: str = "",
     *, basis: str,
 ) -> None:
     """
-    Schreibt, wie der Widerstand auf dem Polygon gefunden wurde.
-
-    Ohne diesen Schritt stuende in der Mitschrift eine Zahl, die zwar aus
-    nachvollziehbaren Eckpunkten stammt, aber selbst vom Himmel faellt. Hier
-    steht, zwischen welchen beiden Punkten geradlinig interpoliert wurde und
-    mit welchem Anteil.
+    Schreibt, wie der Widerstand auf der Linie gefunden wurde -- die Linie,
+    die ihn geliefert hat, weiss wie: das Polygon zeigt seine Interpolation,
+    die Linie aus Dehnungsebenen die Probe ihres Bruchzustands.
 
     Frei und nicht an :class:`BiegungNormalkraft` gebunden: der
     Querkraftnachweis rechnet mit dem Momentenwiderstand bei der wirkenden
-    Normalkraft und muss dieselbe Interpolation zeigen. Zweimal geschrieben
+    Normalkraft und muss dieselbe Herleitung zeigen. Zweimal geschrieben
     liefe sie frueher oder spaeter auseinander.
-
-    Faellt die festgehaltene Groesse genau auf einen Eckpunkt -- der haeufige
-    Fall ``N_Ed = 0``, und ebenso ``M_Ed = 0`` bei reiner Normalkraft --, wird
-    nicht interpoliert. Dort stuende sonst ein Bruch mit null im Zaehler, der
-    nichts erklaert und nur so aussieht, als waere etwas gerechnet worden.
     """
-    if auswertung.kante is None:
+    if auswertung.treffer is None or auswertung.linie is None:
         p.text(auswertung.begruendung)
         return
-
-    a, b = auswertung.kante
-    ziel = auswertung.achse          # was gesucht wird
-    lauf = ziel.gegen                # was dabei festgehalten bleibt
     ed = geo.Stelle(N=auswertung.schnittgroessen.N_Ed.si,
                     M=auswertung.schnittgroessen.M_Ed.si)
-    fest = lauf.von(ed)
-
-    e_lauf = lauf.einheit.latex
-    e_ziel = ziel.einheit.latex
-
-    # Der Eckpunkt selbst, falls die Einwirkung genau auf ihm liegt. Geprueft
-    # wird auch der Zielwert: bei einer Kante laengs der festgehaltenen Achse
-    # traefen beide Stuetzpunkte zu, und nur einer davon ist der Widerstand.
-    treffer = next(
-        (q for q in (a, b)
-         if _trifft(lauf.von(q), fest) and _trifft(ziel.von(q), auswertung.rd)),
-        None)
-
-    werte = Zwischenwerte(basis)
-
-    def wert(name: str, symbol: str, si: float, achse: geo.Achse):
-        return werte.wert(name, symbol, Groesse.aus_si(si, achse.einheit))
-
-    rd = wert("Rd", f"{ziel.name}_{{Rd}}", auswertung.rd, ziel)
-    if treffer is not None:
-        p.formel(rd, "@P", {"P": wert("P", treffer.symbol, ziel.von(treffer), ziel)},
-                 titel=titel or (f"Widerstand bei {lauf.name}_Ed = "
-                                 f"{_k(fest)} {lauf.einheit.beschriftung} – "
-                                 f"ein Eckpunkt liegt genau dort"))
-        return
-
-    p.formel(
-        rd, r"@x_1 + \frac{@y_Ed - @y_1}{@y_2 - @y_1} \cdot \left(@x_2 - @x_1\right)",
-        {"x_1": wert("x_1", f"{ziel.name}_1", ziel.von(a), ziel),
-         "x_2": wert("x_2", f"{ziel.name}_2", ziel.von(b), ziel),
-         "y_1": wert("y_1", f"{lauf.name}_1", lauf.von(a), lauf),
-         "y_2": wert("y_2", f"{lauf.name}_2", lauf.von(b), lauf),
-         "y_Ed": wert("y_Ed", f"{lauf.name}_{{Ed}}", fest, lauf)},
-        titel=titel or (f"Widerstand bei festgehaltenem {lauf.name}_Ed = "
-                        f"{_k(fest)} {lauf.einheit.beschriftung}"),
-    )
-    p.tabelle(
-        kopf=["Punkt", Mathe(rf"{lauf.name}\ [{e_lauf}]"),
-              Mathe(rf"{ziel.name}\ [{e_ziel}]")],
-        zeilen=[
-            [Mathe(q.symbol), Mathe(_k(lauf.von(q))), Mathe(_k(ziel.von(q)))]
-            for q in (a, b)
-        ],
-        titel="Stützpunkte der Interpolation",
-        ausrichtung="lrr",
-    )
-
-
-
-def _trifft(a: float, b: float) -> bool:
-    """
-    Ob zwei SI-Werte fuer die Mitschrift als derselbe gelten.
-
-    Die Schranke haengt an der Groesse der Werte, nicht an einer festen Zahl:
-    Momente liegen im Bereich 1e5 Nm, und dort ist ein absoluter Abstand von
-    1e-9 unerreichbar streng.
-    """
-    return abs(a - b) <= 1e-9 * max(1.0, abs(a), abs(b))
-
-
-def _k(si_wert: float) -> str:
-    """Ein SI-Wert in Kilo-Einheiten, eine Nachkommastelle."""
-    return f"{si_wert / 1e3:.1f}"
+    auswertung.linie.protokoll_treffer(
+        p, auswertung.treffer, achse=auswertung.achse,
+        fest=auswertung.achse.gegen.von(ed), basis=basis, titel=titel)
 
 
 def _in(si_wert: float, achse: geo.Achse) -> str:

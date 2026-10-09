@@ -416,13 +416,13 @@ def _platte(eintrag: QuerschnittEintrag, aufbau: Aufbau, eintragen: Eintragen,
         # Der M-N-Nachweis entsteht auch ohne Schnittgroessen: seine
         # Eckwerte gehoeren dem Querschnitt, nicht der Einwirkung, und der
         # Nachweis gegen sproedes Versagen haelt M_Rd(N=0) dagegen. Ohne die
-        # genaue Resistenzlinie, wenn schnell gerechnet wird: sie kostet fast
-        # die ganze Zeit dieses Nachweises und wird allein im Diagramm
-        # gebraucht. Wer schnell rechnet, sucht eine Bewehrung und sieht
-        # dabei kein Diagramm an.
+        # Vergleichslinie, wenn schnell gerechnet wird: sie kostet fast die
+        # ganze Zeit dieses Nachweises und wird allein im Diagramm gebraucht.
+        # Wer schnell rechnet, sucht eine Bewehrung und sieht dabei kein
+        # Diagramm an.
         nachweis = BiegungNormalkraft(
             querschnitt, [_kombination(k) for k in aktiv], richtung,
-            mit_linie=not schnell)
+            mit_vergleich=not schnell)
         eintragen("nachweise", kennung_x, nachweis)
 
         _lagennachweise(eintrag, querschnitt, richtung, nachweis, eintragen)

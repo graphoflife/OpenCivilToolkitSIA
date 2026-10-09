@@ -20,8 +20,11 @@ const RAND = { oben: 22, rechts: 22, unten: 46, links: 74 };
 /** Farbe des vereinfachten Verlaufs -- grün, wie verlangt. */
 const GRUEN = '#16794a';
 
-/** Die genaue Resistenzlinie: zurückhaltend, sie ist nur Vergleich. */
-const GENAU = '#8895a8';
+/** Die Vergleichslinie: zurückhaltend, sie ist nur Vergleich. */
+const VERGLEICH = '#8895a8';
+
+/** Die massgebende Resistenzlinie -- gegen sie wird nachgewiesen. */
+const MASSGEBEND = '#1f5fa8';
 
 /**
  * Schiebt Beschriftungen so weit auseinander, dass sie sich nicht überdecken.
@@ -357,12 +360,13 @@ export function querschnittZeichnen(eintrag, werte) {
 }
 
 export function diagrammZeichnen(linie) {
-  const punkte = linie.punkte;
-  const hand = linie.handpunkte || [];
-  if (!punkte?.length) return el('div.leer', { text: 'Keine Resistenzlinie.' });
+  const massgebend = linie.massgebend;
+  const vergleich = linie.vergleich;
+  if (!massgebend?.punkte?.length) return el('div.leer', { text: 'Keine Resistenzlinie.' });
+  const alle = [...massgebend.punkte, ...(vergleich?.punkte || [])];
 
-  const alleM = [...punkte, ...hand].map((p) => p.M);
-  const alleN = [...punkte, ...hand].map((p) => p.N);
+  const alleM = alle.map((p) => p.M);
+  const alleN = alle.map((p) => p.N);
   for (const k of linie.kombinationen) { alleM.push(k.M_Ed); alleN.push(k.N_Ed); }
   // Auch die Knickpunkte: sonst liegt der mit dem grössten Moment zweiter
   // Ordnung ausserhalb des gezeichneten Bereichs.
@@ -389,24 +393,26 @@ export function diagrammZeichnen(linie) {
   });
 
   // -- Die beiden Resistenzlinien ------------------------------------------
-  // Die genaue Linie ist nur Vergleich: dünn, ohne Füllung. Gefüllt und kräftig
-  // ist das Polygon aus der Handrechnung -- das ist die Linie, gegen die
-  // nachgewiesen wird, und sie soll den Blick auf sich ziehen.
-  daten.append(svgEl('polygon', {
-    points: punkte.map((p) => `${x(p.M).toFixed(2)},${y(p.N).toFixed(2)}`).join(' '),
-    fill: 'none', stroke: GENAU, 'stroke-width': 1.3,
-    'stroke-dasharray': '6 3', 'stroke-linejoin': 'round', opacity: 0.8,
-  }));
-
-  if (hand.length) {
+  // Die Vergleichslinie: dünn, ohne Füllung. Gefüllt und kräftig ist die
+  // massgebende -- gegen sie wird nachgewiesen, und sie soll den Blick auf
+  // sich ziehen. Eckpunkte mit Namen hat nur das Polygon der Handrechnung.
+  const zug = (punkte) => punkte.map((p) => `${x(p.M).toFixed(2)},${y(p.N).toFixed(2)}`).join(' ');
+  if (vergleich?.punkte?.length) {
     daten.append(svgEl('polygon', {
-      points: hand.map((p) => `${x(p.M).toFixed(2)},${y(p.N).toFixed(2)}`).join(' '),
-      fill: 'rgba(31,95,168,.07)', stroke: '#1f5fa8', 'stroke-width': 2,
-      'stroke-linejoin': 'round',
+      points: zug(vergleich.punkte),
+      fill: 'none', stroke: VERGLEICH, 'stroke-width': 1.3,
+      'stroke-dasharray': '6 3', 'stroke-linejoin': 'round', opacity: 0.8,
     }));
-    for (const p of hand) {
+  }
+  daten.append(svgEl('polygon', {
+    points: zug(massgebend.punkte),
+    fill: 'rgba(31,95,168,.07)', stroke: MASSGEBEND, 'stroke-width': 2,
+    'stroke-linejoin': 'round',
+  }));
+  if (massgebend.ecken) {
+    for (const p of massgebend.punkte) {
       const ecke = svgEl('circle', {
-        cx: x(p.M), cy: y(p.N), r: 3, fill: '#1f5fa8',
+        cx: x(p.M), cy: y(p.N), r: 3, fill: MASSGEBEND,
         stroke: '#fff', 'stroke-width': 1.2,
       });
       const t = svgEl('title');
@@ -513,11 +519,11 @@ export function diagrammZeichnen(linie) {
   return el('div.diagramm-huelle', {}, [
     svg,
     el('div.mn-legende', {}, [
-      el('span', {}, [el('i', { style: { background: '#1f5fa8' } }),
-        'Resistenzlinie aus Handrechnung (massgebend)']),
-      el('span', {}, [el('i', {
-        style: { background: GENAU, height: '3px', borderRadius: '1px' },
-      }), 'Präzise Resistenzlinie (nur Vergleich)']),
+      el('span', {}, [el('i', { style: { background: MASSGEBEND } }),
+        `Resistenzlinie: ${massgebend.beschriftung} (massgebend)`]),
+      vergleich ? el('span', {}, [el('i', {
+        style: { background: VERGLEICH, height: '3px', borderRadius: '1px' },
+      }), `${vergleich.beschriftung} (nur Vergleich)`]) : null,
       el('span', {}, [el('i', { style: { background: '#1a7f45' } }), 'erfüllt']),
       el('span', {}, [el('i', { style: { background: '#b3261e' } }), 'nicht erfüllt']),
       el('span', { text: '– – –  gemessener Weg zur Linie' }),

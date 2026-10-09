@@ -71,6 +71,7 @@ from typing import (
 )
 
 from opencivil.core.protokoll import Protokoll, StillesProtokoll, Zwischenwerte
+from opencivil.nachweis import dehnungsfaecher
 from opencivil.nachweis.querschnittsloeser import (
     Querschnittsloeser, Stahllage, Werkstoffsatz, wirksamer_modul,
 )
@@ -78,7 +79,6 @@ from opencivil.nachweis.rechenwahl import Kennwerte, Rechenart, Rechenwahl, gese
 from opencivil.nachweis.sproedes_versagen import (
     beiwert_dicke, protokoll_zugfestigkeit, rissmoment,
 )
-from opencivil.querschnitt.fasern import Dehnungsgrenze
 from opencivil.querschnitt.platte import Richtung
 from opencivil.querschnitt.werkstoffgesetz import (
     BLOCKANTEIL, K_SIGMA_LATEX, Betongesetz, Spannungsblock, k_sigma,
@@ -283,30 +283,6 @@ def beton_ungerissen(*, E_c: float) -> Callable[[float], float]:
     return sigma
 
 
-def grenzen_des_faechers(h: float, lagen: List[Stahllage], *, eps_c1d: float,
-                         eps_c2d: float, eps_ud: float,
-                         ) -> Tuple[List[Dehnungsgrenze], Tuple[str, ...]]:
-    """
-    Die Grenzdehnungen des Dehnungsfaechers, samt Namen.
-
-    Der Beton an beiden Raendern bis ``-eps_c2d``; im Punkt C, im Abstand
-    ``h·(1 - eps_c1d/eps_c2d)`` vom gedrueckten Rand, bis ``-eps_c1d`` --
-    das zaehlt erst, wenn der ganze Querschnitt gedrueckt ist; jede Stahllage
-    bis ``±eps_ud``. So begrenzt :mod:`opencivil.nachweis.dehnungsfaecher` die
-    genaue M-N-Linie, und so endet darum auch jede Linie hier.
-    """
-    halb = h / 2.0
-    z_c = h * (1.0 - eps_c1d / eps_c2d)
-    paare = [
-        (Dehnungsgrenze(arm=-halb, eps_min=-eps_c2d, eps_max=math.inf), "Beton am oberen Rand"),
-        (Dehnungsgrenze(arm=halb, eps_min=-eps_c2d, eps_max=math.inf), "Beton am unteren Rand"),
-        (Dehnungsgrenze(arm=z_c - halb, eps_min=-eps_c1d, eps_max=math.inf), "Beton im Punkt C"),
-        (Dehnungsgrenze(arm=halb - z_c, eps_min=-eps_c1d, eps_max=math.inf), "Beton im Punkt C"),
-    ] + [(Dehnungsgrenze(arm=l.z - halb, eps_min=-eps_ud, eps_max=eps_ud),
-          f"Stahl der {l.nummer}. Lage") for l in lagen]
-    return [g for g, _ in paare], tuple(n for _, n in paare)
-
-
 @dataclass(frozen=True)
 class Loeserpaar:
     """
@@ -420,8 +396,9 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
     g = gesetze(wahl, w, eps_ud=eps_ud)
     # Die Grenzen gelten an den Lagen, mit denen gerechnet wird -- in der
     # Handrechnung den zusammengefassten.
-    grenzen, namen = grenzen_des_faechers(h, g.lagen(lagen, h), eps_c1d=w.eps_c1d,
-                                          eps_c2d=w.eps_c2d, eps_ud=eps_ud)
+    grenzen, namen = dehnungsfaecher.grenzen(
+        h, [(l.z, eps_ud, f"Stahl der {l.nummer}. Lage") for l in g.lagen(lagen, h)],
+        eps_c1d=w.eps_c1d, eps_c2d=w.eps_c2d)
     fenster = dict(grenzen=grenzen, eps_druck=w.eps_c2d, eps_zug=eps_ud)
     gerissen = g.loeser(h=h, b=b, lagen=lagen, **fenster)
     # Derselbe Querschnitt ungerissen: nur das Betongesetz ist ein anderes.

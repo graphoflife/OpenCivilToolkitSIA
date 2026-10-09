@@ -750,7 +750,7 @@ class TestRueckverfolgungNachweis(unittest.TestCase):
         for erwartet in (
             platte.beton.id_von("f_cd"),
             platte.beton.id_von("f_ck"),
-            platte.beton.id_von("k_sigma"),
+            platte.beton.id_von("E_cm"),
             platte.id_von("lage.1g.a_s"),
             platte.id_von("lage.1g.z"),
             platte.id_von("h"),
@@ -758,7 +758,7 @@ class TestRueckverfolgungNachweis(unittest.TestCase):
             self.assertIn(erwartet, benoetigt)
 
     def test_fehlender_kennwert_wird_benannt(self):
-        """Ohne k_sigma lässt sich die Interaktionslinie nicht aufbauen."""
+        """Ohne E_cm lässt sich die Parabel daneben nicht aufbauen."""
         platte = einfache_platte()
         werk = Rechenwerk()
         platte.ins_rechenwerk(werk)
@@ -766,12 +766,12 @@ class TestRueckverfolgungNachweis(unittest.TestCase):
             platte, [Schnittgroessen("Feld", M_Ed=Groesse(100, KNM))], Richtung.X
         )
         werk.registriere(nachweis)
-        # k_sigma braucht E_cd; dessen Kette wird gekappt.
-        werk._nach_ausgabe.pop(platte.beton.id_von("k_sigma"))
+        # Die Kette zu E_cm wird gekappt.
+        werk._nach_ausgabe.pop(platte.beton.id_von("E_cm"))
         loesung = werk.loese(nachweis.d_ausnutzung["Feld"].id)
         self.assertFalse(loesung.vollstaendig)
         self.assertIn(
-            platte.beton.id_von("k_sigma"), [f.id for f in loesung.fehlende]
+            platte.beton.id_von("E_cm"), [f.id for f in loesung.fehlende]
         )
 
 

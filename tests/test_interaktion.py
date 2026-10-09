@@ -3,15 +3,17 @@ Bruchzustand gezeichneter Querschnitte -- gerade und schief.
 
 Der wichtigste Prüfstein steht zuerst: ein Rechteck mit zwei Lagen ist eine
 Platte, und dafür gibt es schon eine genaue Linie
-(:mod:`opencivil.nachweis.dehnungsfaecher`). Zwei unabhängig gebaute Wege
-müssen dasselbe ergeben. Danach Symmetrie, die Probe jedes Bruchzustands und
+(:class:`~opencivil.nachweis.resistenzlinie.Ebenenlinie`). Zwei unabhängig
+gebaute Wege müssen dasselbe ergeben. Danach Symmetrie, die Probe jedes Bruchzustands und
 Fälle, die sich von Hand nachrechnen lassen.
 """
 
 import math
 import unittest
 
-from opencivil.nachweis import dehnungsfaecher, linie
+from opencivil.nachweis import linie
+from opencivil.nachweis.rechenwahl import Rechenart, Rechenwahl
+from opencivil.nachweis.resistenzlinie import Ebenenlinie
 from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.interaktion import (
     Bewehrung, Querschnitt, Teil, Werkstoff, _bei_n_gelesen, _schnittstellen,
@@ -46,9 +48,11 @@ class TestWieDiePlatte(unittest.TestCase):
     h, b = 0.25, 1.0
 
     def setUp(self):
-        self.platte = dehnungsfaecher.aufbauen(
-            h=self.h, b=self.b, beton=BETON,
-            lagen=[(1131e-6, 0.215, STAHL, "unten"), (565e-6, 0.035, STAHL, "oben")])
+        self.ebenen = Ebenenlinie(
+            Rechenwahl(art=Rechenart.PARABEL), h=self.h, b=self.b, beton=BETON.spannung,
+            lagen=[(1131e-6, 0.215, STAHL, "unten"), (565e-6, 0.035, STAHL, "oben")],
+            eps_c1d=BETON.eps_c1d, eps_c2d=BETON.eps_c2d)
+        self.platte = self.ebenen.punkte
         self.neu = querschnitt(
             [Teil(rechteck(0, 0, self.b, self.h), 0, None)],
             [Bewehrung((0.5, self.h - 0.215), 1131e-6, 1, 0),
@@ -68,12 +72,22 @@ class TestWieDiePlatte(unittest.TestCase):
         self.assertAlmostEqual(druck / min(p.N for p in self.platte), 1.0, delta=1e-9)
 
     def test_mit_druck_innert_einem_promille(self):
-        """Die alte Linie interpoliert zwischen Stützstellen, die neue sucht genau."""
+        """Das Polygon interpoliert zwischen Stützstellen, die Suche trifft genau."""
         for N in (-2000e3, -500e3, 300e3):
             alt = max(linie.schnitte(self.platte, linie.MOMENT, N))
             neu = self.neu.bei_normalkraft(-math.pi / 2, N)
             self.assertAlmostEqual(neu.N, N, delta=1e-3)
             self.assertAlmostEqual(neu.M_y / alt, 1.0, delta=1e-3, msg=f"N = {N}")
+
+    def test_beide_suchen_genau_treffen_sich(self):
+        """
+        Beide suchen auf dem Fächer, nicht auf der Sehne: dann bleibt nur, was
+        die Fasern unterscheidet -- je 200 über die Höhe, aber anders gelegt.
+        """
+        for N in (-2000e3, -500e3, 0.0, 300e3):
+            platte = self.ebenen.moment_bei(N, positiv=True)
+            neu = self.neu.bei_normalkraft(-math.pi / 2, N)
+            self.assertAlmostEqual(neu.M_y / platte, 1.0, delta=1e-4, msg=f"N = {N}")
 
     def test_faecher_von_zug_nach_druck(self):
         punkte = self.neu.faecher(-math.pi / 2)

@@ -1380,6 +1380,18 @@ $$
 E_{cm} = k_e \cdot \sqrt[3]{f_{cm}} = 10000 \cdot \sqrt[3]{38} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \quad \left(f_{cm}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
 $$
 
+**Bemessungswert der Schubspannungsgrenze** *(SIA 262:2025, 2.4.2.4)*
+
+$$
+\tau_{cd} = \frac{0.3 \cdot \sqrt{f_{ck}}}{\gamma_c} = \frac{0.3 \cdot \sqrt{30}}{1.5} = 1.1\,\mathrm{N}/\mathrm{mm}^{2} \quad \left(f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+$$
+
+**Mittelwert der Zugfestigkeit** *(SIA 262:2025, 3.1.2.2.7)*
+
+$$
+f_{ctm} = 2.9\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
 **Teilsicherheitsbeiwert für den Elastizitätsmodul** *(SIA 262:2025, 4.2.1.15)*
 
 $$
@@ -1396,18 +1408,6 @@ $$
 
 $$
 k_{\sigma} = \frac{E_{cd}}{400 \cdot f_{cd}} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 4.202
-$$
-
-**Bemessungswert der Schubspannungsgrenze** *(SIA 262:2025, 2.4.2.4)*
-
-$$
-\tau_{cd} = \frac{0.3 \cdot \sqrt{f_{ck}}}{\gamma_c} = \frac{0.3 \cdot \sqrt{30}}{1.5} = 1.1\,\mathrm{N}/\mathrm{mm}^{2} \quad \left(f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
-$$
-
-**Mittelwert der Zugfestigkeit** *(SIA 262:2025, 3.1.2.2.7)*
-
-$$
-f_{ctm} = 2.9\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 ### Betonstahl: B500B
@@ -3355,6 +3355,12 @@ $$
 E_{cm} = k_e \cdot \sqrt[3]{f_{cm}} \quad \left(f_{cm}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
 $$
 
+**Bemessungswert der Schubspannungsgrenze** *(SIA 262:2025, 2.4.2.4)*
+
+$$
+\tau_{cd} = \frac{0.3 \cdot \sqrt{f_{ck}}}{\gamma_c} \quad \left(f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+$$
+
 **Bemessungswert des Elastizitätsmoduls** *(SIA 262:2025, 4.2.1.15)*
 
 $$
@@ -3365,12 +3371,6 @@ $$
 
 $$
 k_{\sigma} = \frac{E_{cd}}{400 \cdot f_{cd}}
-$$
-
-**Bemessungswert der Schubspannungsgrenze** *(SIA 262:2025, 2.4.2.4)*
-
-$$
-\tau_{cd} = \frac{0.3 \cdot \sqrt{f_{ck}}}{\gamma_c} \quad \left(f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
 $$
 
 ### Betonstahl

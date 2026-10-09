@@ -122,6 +122,14 @@ class Rechenwahl:
         """``Rd`` oder ``Rk`` -- wie ein Widerstand dieser Wahl heisst."""
         return self.satz.widerstandsindex
 
+    @property
+    def beschriftung(self) -> str:
+        """Fuer Legenden: «Parabel, φ = 2, Bemessung» -- phi nur, wo es wirkt."""
+        teile = [self.art.beschriftung]
+        if self.art.mit_kriechzahl:
+            teile.append(f"φ = {self.kriechzahl:g}")
+        return ", ".join(teile + [self.satz.kurz])
+
 
 # ===========================================================================
 # Die Gesetze zu einer Wahl
@@ -193,14 +201,19 @@ def bezuege_vereinen(*listen: Sequence[Eingabebezug]) -> List[Eingabebezug]:
     return heraus
 
 
-def betongesetz(wahl: Rechenwahl, w: Kennwerte) -> Gesetz:
-    """Der Beton im gerissenen Zustand -- je Rechenart."""
+def betongesetz(wahl: Rechenwahl, *, f_c: float, E_cm: float, eps_c1d: float,
+                 eps_c2d: float) -> Gesetz:
+    """
+    Der Beton im gerissenen Zustand -- je Rechenart. Die eine Stelle fuer
+    die Parabel und den Block: der Loeser und die genaue Resistenzlinie
+    bekommen ihren Beton beide hier.
+    """
     if wahl.art is Rechenart.ELASTISCH:
-        return beton_elastisch(E_c=wirksamer_modul(w.E_cm, wahl.kriechzahl), f_c=w.f_c)
+        return beton_elastisch(E_c=wirksamer_modul(E_cm, wahl.kriechzahl), f_c=f_c)
     if wahl.art is Rechenart.PARABEL:
-        return beton_nichtlinear(f_cd=w.f_c, E_c=wirksamer_modul(w.E_cm, wahl.kriechzahl),
-                                 eps_c1d=w.eps_c1d, eps_c2d=w.eps_c2d)
-    return Spannungsblock(f_cd=w.f_c, eps_c2d=w.eps_c2d)
+        return beton_nichtlinear(f_cd=f_c, E_c=wirksamer_modul(E_cm, wahl.kriechzahl),
+                                 eps_c1d=eps_c1d, eps_c2d=eps_c2d)
+    return Spannungsblock(f_cd=f_c, eps_c2d=eps_c2d)
 
 
 def stahlgesetz(wahl: Rechenwahl, w: Kennwerte, *, eps_ud: float) -> Gesetz:
@@ -282,26 +295,14 @@ def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *
             rf" \quad {angabe(f_c)}",
             titel=titel)
         return
-    werte = Zwischenwerte(basis)
-    if wahl.art is Rechenart.PARABEL:
-        E_c_eff = werte.spannung("E_c_eff", "E_{c,eff}",
-                                 wirksamer_modul(e.g("E_cm").si, wahl.kriechzahl))
-        p.formel(werte.zahl("k_sigma", r"k_{\sigma}", k_sigma(E_c_eff.groesse.si, f_c.groesse.si),
-                            stellen=2),
-                 K_SIGMA_LATEX, {"E_c": E_c_eff, "f_c": f_c},
-                 titel="Beiwert der Parabel, mit dem wirksamen Modul")
-        p.ansatz(Betongesetz(0.0, 1.0, 1.0, 0.0).latex(f_c.symbol),
-                 titel=f"{titel}: Beton, Parabel-Rechteck", referenz="SIA 262:2025, 4.2.1.6")
-    else:
-        if wahl.art is Rechenart.HANDRECHNUNG:
-            p.erklaerung(
-                "Mit der Handrechnung rechnet der Querschnitt wie die Resistenzlinie "
-                "aus Handrechnung: der Beton als Spannungsblock, die gedrückte "
-                "Bewehrung weggelassen, die Bewehrung jeder Seite zu einer Lage in "
-                "ihrem Schwerpunkt zusammengefasst, und der Beton auch dort gezählt, "
-                "wo der Stahl liegt.")
-        p.ansatz(Spannungsblock(0.0, 1.0).latex(f_c.symbol),
-                 titel=f"{titel}: Beton, Spannungsblock {BLOCKANTEIL}·x")
+    if wahl.art is Rechenart.HANDRECHNUNG:
+        p.erklaerung(
+            "Mit der Handrechnung rechnet der Querschnitt wie die Resistenzlinie "
+            "aus Handrechnung: der Beton als Spannungsblock, die gedrückte "
+            "Bewehrung weggelassen, die Bewehrung jeder Seite zu einer Lage in "
+            "ihrem Schwerpunkt zusammengefasst, und der Beton auch dort gezählt, "
+            "wo der Stahl liegt.")
+    protokoll_betongesetz(p, wahl, f_c, e["E_cm"], basis, titel=titel)
     if wahl.art is Rechenart.HANDRECHNUNG:
         p.ansatz(
             r"\sigma_s = \begin{cases} \min\left(E_s \cdot \varepsilon_s;\ "
@@ -315,11 +316,34 @@ def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *
             rf" \quad {angabe(f_s)}", titel=f"{titel}: Stahl")
 
 
+def protokoll_betongesetz(p: Protokoll, wahl: Rechenwahl, f_c: Wert, E_cm: Wert, basis: str,
+                          *, titel: str) -> None:
+    """
+    Der Beton einer Wahl mit Block oder Parabel -- bei der Parabel samt ihrem
+    Beiwert aus dem wirksamen Modul ``E_cm/(1+phi)``. ``f_c`` ist die
+    Festigkeit des Wertesatzes, ``f_cd`` oder ``f_ck``.
+    """
+    if wahl.art is Rechenart.PARABEL:
+        werte = Zwischenwerte(basis)
+        E_c_eff = werte.spannung("E_c_eff", "E_{c,eff}",
+                                 wirksamer_modul(E_cm.groesse.si, wahl.kriechzahl))
+        p.formel(werte.zahl("k_sigma", r"k_{\sigma}", k_sigma(E_c_eff.groesse.si, f_c.groesse.si),
+                            stellen=2),
+                 K_SIGMA_LATEX, {"E_c": E_c_eff, "f_c": f_c},
+                 titel="Beiwert der Parabel, mit dem wirksamen Modul")
+        p.ansatz(Betongesetz(0.0, 1.0, 1.0, 0.0).latex(f_c.symbol),
+                 titel=f"{titel}: Beton, Parabel-Rechteck", referenz="SIA 262:2025, 4.2.1.6")
+    else:
+        p.ansatz(Spannungsblock(0.0, 1.0).latex(f_c.symbol),
+                 titel=f"{titel}: Beton, Spannungsblock {BLOCKANTEIL}·x")
+
+
 def gesetze(wahl: Rechenwahl, w: Kennwerte, *, eps_ud: float = 0.045) -> Gesetze:
     """
     Die Gesetze zu einer Wahl. ``eps_ud`` bringt der Nutzer mit: die
     Stahlspannungen rechnen bis heute mit 4.5 %, das Knicken und die Analysen
     mit dem Wert der Stahlsorte.
     """
-    return Gesetze(wahl=wahl, beton=betongesetz(wahl, w),
+    return Gesetze(wahl=wahl, beton=betongesetz(wahl, f_c=w.f_c, E_cm=w.E_cm,
+                                                eps_c1d=w.eps_c1d, eps_c2d=w.eps_c2d),
                    stahl=stahlgesetz(wahl, w, eps_ud=eps_ud))

@@ -232,6 +232,38 @@ def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float,
         "Diese Probe steht bei jedem Fall."
     )
 
+
+def plattenfasern(
+    *, h: float, b: float, beton: Callable[[float], float],
+    staebe: Sequence[Tuple[float, float, Callable[[float], float]]],
+    fasern: int = FASERN, gemittelt: bool = False, verdraengt: bool = True,
+) -> Faserquerschnitt:
+    """
+    Die Platte als Fasern: gleich dicke Scheiben ueber die Hoehe, der Arm ab
+    der Mittelebene, dazu je Lage ``(Flaeche, z, Gesetz)`` ein Stab.
+
+    Der Loeser und die genaue Resistenzlinie
+    (:class:`~opencivil.nachweis.resistenzlinie.Ebenenlinie`) rechnen mit
+    demselben Querschnitt -- darum steht er einmal da. ``gemittelt`` und
+    ``verdraengt`` wie bei :class:`Querschnittsloeser`. Die Ausdruecke
+    stehen genau so da wie vor dem Umbau: dieselben Zahlen bis aufs letzte
+    Bit, und damit derselbe Bericht.
+    """
+    dicke = h / fasern
+    return Faserquerschnitt(
+        gruppen=[Fasergruppe(
+            gesetz=beton,
+            arme=tuple((i + 0.5) * dicke - h / 2.0 for i in range(fasern)),
+            flaechen=dicke * b,
+            dicken=(dicke,) * fasern if gemittelt else None)],
+        # Netto: der Stahl ersetzt den Beton an seiner Stelle -- ausser
+        # in der Handrechnung, die den Beton durchgehend zaehlt.
+        staebe=[Stab(arm=z - h / 2.0, flaeche=a_s, gesetz=gesetz,
+                     verdraengt=beton if verdraengt else None,
+                     dicke=dicke if gemittelt else 0.0)
+                for a_s, z, gesetz in staebe])
+
+
 class Querschnittsloeser:
     """
     Der Querschnitt als Faserintegral, mit Suche nach der Dehnungsebene.
@@ -284,23 +316,9 @@ class Querschnittsloeser:
         self.fasern = fasern
         self.eps_druck = abs(eps_druck)
         self.eps_zug = abs(eps_zug)
-        # Die Platte als Fasern: gleich dicke Scheiben ueber die Hoehe, der
-        # Arm ab der Mittelebene. Einmal gerechnet, hunderttausendfach
-        # gebraucht. Die Ausdruecke stehen genau so da wie vor dem Umbau --
-        # dieselben Zahlen bis aufs letzte Bit, und damit derselbe Bericht.
-        dicke = h / fasern
-        self.querschnitt = Faserquerschnitt(
-            gruppen=[Fasergruppe(
-                gesetz=beton,
-                arme=tuple((i + 0.5) * dicke - h / 2.0 for i in range(fasern)),
-                flaechen=dicke * b,
-                dicken=(dicke,) * fasern if gemittelt else None)],
-            # Netto: der Stahl ersetzt den Beton an seiner Stelle -- ausser
-            # in der Handrechnung, die den Beton durchgehend zaehlt.
-            staebe=[Stab(arm=l.z - h / 2.0, flaeche=l.a_s, gesetz=stahl,
-                         verdraengt=beton if verdraengt else None,
-                         dicke=dicke if gemittelt else 0.0)
-                    for l in self.lagen])
+        self.querschnitt = plattenfasern(
+            h=h, b=b, beton=beton, staebe=[(l.a_s, l.z, stahl) for l in self.lagen],
+            fasern=fasern, gemittelt=gemittelt, verdraengt=verdraengt)
         # Der gueltige Bereich der Gesetze gilt an beiden Raendern -- wenn
         # niemand andere Grenzen mitgibt.
         self.grenzen = Dehnungsgrenzen(grenzen or [
@@ -550,6 +568,11 @@ class Werkstoffsatz(str, Enum):
     def kurz(self) -> str:
         """Fuer schmale Zeilen."""
         return "Bemessung" if self is Werkstoffsatz.BEMESSUNG else "charakteristisch"
+
+    @property
+    def kuerzel(self) -> str:
+        """Der Buchstabe am Index: ``d`` (design) oder ``k`` (charakteristisch)."""
+        return "d" if self is Werkstoffsatz.BEMESSUNG else "k"
 
     @property
     def widerstandsindex(self) -> str:

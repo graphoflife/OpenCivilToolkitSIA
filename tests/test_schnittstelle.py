@@ -236,7 +236,11 @@ class TestApiAbbildung(unittest.TestCase):
     def test_linie_wird_mitgeliefert(self):
         d = api.loesung_dict(self.loesung, self.aufbau)
         linie = d["linien"]["q1.x"]
-        self.assertGreater(len(linie["punkte"]), 100)
+        # Massgebend die Handrechnung mit ihren Eckpunkten, daneben die Parabel.
+        self.assertTrue(linie["massgebend"]["ecken"])
+        self.assertIn("Handrechnung", linie["massgebend"]["beschriftung"])
+        self.assertGreater(len(linie["vergleich"]["punkte"]), 100)
+        self.assertIn("Parabel", linie["vergleich"]["beschriftung"])
         self.assertEqual(len(linie["kombinationen"]), 3)
         self.assertIn("art_text", linie["kombinationen"][0])
 

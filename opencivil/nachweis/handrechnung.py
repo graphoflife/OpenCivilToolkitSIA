@@ -16,7 +16,9 @@ Werkzeug nicht verlangen. Die genaue Linie bleibt darum als Vergleich im
 Diagramm stehen, das Urteil faellt aber ueber die Handrechnung.
 
 ANSATZ:
-* Druckzone als Spannungsblock der Hoehe ``0.85 x`` mit durchgehend ``f_cd``.
+* Druckzone als Spannungsblock der Hoehe ``0.85 x`` mit durchgehend ``f_cd``
+  -- oder ``f_ck`` mit charakteristischen Werten (:class:`Werkstoffsatz`);
+  dann heissen die Eckpunkte ``R_k`` statt ``R_d``.
 * **Gedrueckter Stahl wird durchgehend vernachlaessigt.** Das liegt auf der
   sicheren Seite und erspart die Frage, ob er ueberhaupt fliesst.
 * Bewehrung je Richtung zu zwei Lagen zusammengefasst -- eine je Seite.
@@ -47,6 +49,7 @@ from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
 from opencivil.material.basis import mit_index
+from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
 from opencivil.querschnitt.platte import protokoll_statische_hoehe
 # Der Anteil des Spannungsblocks steht beim Gesetz; hier wird er nur benutzt.
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL
@@ -77,11 +80,14 @@ class Posten:
 
     von_unten: bool = True
 
+    satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
+    """Ob ``f_yd`` die Bemessungs- oder die charakteristische Fliessgrenze ist."""
+
     @property
     def symbol_f_yd(self) -> str:
         """``f_{yd,\text{B500B}}`` -- die Posten einer Lage koennen sich
         unterscheiden, darum je Posten."""
-        return mit_index("f_{yd}", self.stahl_index)
+        return mit_index(self.satz.stahl_zeichen, self.stahl_index)
 
 
 @dataclass(frozen=True)
@@ -107,6 +113,8 @@ class Lage:
     teile: Tuple[Posten, ...] = ()
     """Die Posten, aus denen sie entstanden ist -- fuer die Mitschrift."""
 
+    satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
+
     @property
     def symbol_flaeche(self) -> str:
         """``A_{s,1,x}`` -- oder schlicht ``A_s``, wenn es keinen Index gibt.
@@ -121,12 +129,12 @@ class Lage:
     @property
     def symbol_f_yd(self) -> str:
         """``f_{yd,\text{B500B}}`` -- oder ``f_{yd}``, solange es nur eine Sorte gibt."""
-        return mit_index("f_{yd}", self.stahl_index)
+        return mit_index(self.satz.stahl_zeichen, self.stahl_index)
 
     @property
     def symbol_sigma_sd(self) -> str:
         """Die angesetzte Stahlspannung; sie gehoert zur selben Sorte wie f_yd."""
-        return mit_index(r"\sigma_{sd}", self.stahl_index)
+        return mit_index(rf"\sigma_{{s{self.satz.kuerzel}}}", self.stahl_index)
 
     @property
     def symbol_E_s(self) -> str:
@@ -173,7 +181,7 @@ class Handrechnung:
         self, *,
         h: float, b: float, f_cd: float, eps_c2d: float,
         unten: Lage, oben: Lage, richtung: str, basis: str,
-        beton_index: str = "",
+        beton_index: str = "", satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG,
     ) -> None:
         self.h = h
         self.b = b
@@ -182,12 +190,16 @@ class Handrechnung:
         self.unten = unten
         self.oben = oben
         self.richtung = richtung
+        self.satz = satz
+        #: Wie die Eckpunkte heissen: ``R_d`` -- oder ``R_k`` mit
+        #: charakteristischen Werten. Die Namen der Zwischenwerte bleiben.
+        self.R = satz.widerstandsindex
         # Zwischenwerte der Mitschrift, unter der Kennung des Nachweises.
         self.werte = Zwischenwerte(f"{basis}.hand")
 
         # Symbole der Betonkennwerte: mit Sortenindex, sobald mehrere Betone
         # im Projekt sind. Sonst stuende f_cd zweimal mit anderen Zahlen da.
-        self.s_f_cd = mit_index("f_{cd}", beton_index)
+        self.s_f_cd = mit_index(satz.beton_zeichen, beton_index)
         self.s_eps_c2d = mit_index(r"\varepsilon_{c2d}", beton_index)
         # Eine Stelle wie in der Baustofftabelle: mit keiner stuende bei C25/30
         # «17» da, gerechnet wird mit 16.7 -- die Nachrechnung ginge daneben.
@@ -234,10 +246,10 @@ class Handrechnung:
     def _ansatz(self, p: Protokoll) -> None:
         p.titel(f"Resistenzlinie aus Handrechnung – {self.richtung}")
         p.erklaerung(
-            "Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend f_cd; "
-            "gedrückter Stahl bleibt unberücksichtigt. Die Bewehrung ist je Seite "
-            "zu einer Lage zusammengefasst, das Moment bezieht sich auf die halbe "
-            "Querschnittshöhe."
+            f"Druckzone als Spannungsblock der Höhe 0.85·x mit durchgehend "
+            f"{self.satz.beton}; gedrückter Stahl bleibt unberücksichtigt. Die "
+            f"Bewehrung ist je Seite zu einer Lage zusammengefasst, das Moment "
+            f"bezieht sich auf die halbe Querschnittshöhe."
         )
 
         # Wo eine Seite aus mehreren Posten besteht, muss dastehen, wie ihr
@@ -257,7 +269,7 @@ class Handrechnung:
             kopf=(["Seite"]
                   + (["Stahl"] if mit_stahl else [])
                   + [Mathe(r"A_s\ [\mathrm{mm}^2]"), Mathe(r"z\ [\mathrm{mm}]"),
-                     Mathe(r"f_{yd}\ [\mathrm{N/mm^2}]")]),
+                     Mathe(rf"{self.satz.stahl_zeichen}\ [\mathrm{{N/mm^2}}]")]),
             zeilen=[
                 [lage.text]
                 + ([lage.stahl_index or "–"] if mit_stahl else [])
@@ -298,7 +310,7 @@ class Handrechnung:
         N = -self.b * self.h * self.f_cd
         p.titel("Grösste Druckkraft", ebene=3)
         p.formel(
-            self.werte.kraft("N_Rd_druck", "N_{Rd}^{-}", N,
+            self.werte.kraft("N_Rd_druck", f"N_{{{self.R}}}^{{-}}", N,
                         "Grösste aufnehmbare Druckkraft"),
             r"-@b \cdot @h \cdot @f_cd",
             {
@@ -308,9 +320,9 @@ class Handrechnung:
             },
             titel="Gleichmässiger Druck, ohne Bewehrung",
         )
-        p.wert(self.werte.moment("M_druck", r"M_{Rd}(N_{Rd}^{-})", 0.0),
+        p.wert(self.werte.moment("M_druck", f"M_{{{self.R}}}(N_{{{self.R}}}^{{-}})", 0.0),
                titel="Zugehöriges Moment")
-        return Eckpunkt("druck", r"N_{Rd}^{-}", "grösste Druckkraft", N, 0.0)
+        return Eckpunkt("druck", f"N_{{{self.R}}}^{{-}}", "grösste Druckkraft", N, 0.0)
 
     def _groesste_zugkraft(self, p: Protokoll) -> Eckpunkt:
         """
@@ -333,13 +345,14 @@ class Handrechnung:
             "f_yd2": self.werte.spannung("fyd_o", o.symbol_f_yd, o.f_yd),
         }
         p.formel(
-            self.werte.kraft("N_Rd_zug", "N_{Rd}^{+}", N, "Grösste aufnehmbare Zugkraft"),
+            self.werte.kraft("N_Rd_zug", f"N_{{{self.R}}}^{{+}}", N,
+                             "Grösste aufnehmbare Zugkraft"),
             r"@A_s \cdot @f_yd + @A_s2 \cdot @f_yd2",
             eingaben,
             titel="Beide Lagen fliessen auf Zug",
         )
         p.formel(
-            self.werte.moment("M_Rd_zug", "M_{Rd}(N_{Rd}^{+})", M,
+            self.werte.moment("M_Rd_zug", f"M_{{{self.R}}}(N_{{{self.R}}}^{{+}})", M,
                          "Moment bei grösster Zugkraft"),
             r"@A_s \cdot @f_yd \cdot \left(@z - \tfrac{@h}{2}\right) "
             r"+ @A_s2 \cdot @f_yd2 \cdot \left(@z2 - \tfrac{@h}{2}\right)",
@@ -351,7 +364,7 @@ class Handrechnung:
             },
             titel="Kräfte mal Hebelarm um die halbe Höhe",
         )
-        return Eckpunkt("zug", r"N_{Rd}^{+}", "grösste Zugkraft", N, M)
+        return Eckpunkt("zug", f"N_{{{self.R}}}^{{+}}", "grösste Zugkraft", N, M)
 
     def _seite(self, p: Protokoll, *, positiv: bool) -> List[Eckpunkt]:
         """Die beiden Punkte eines Momentenvorzeichens."""
@@ -402,15 +415,15 @@ class Handrechnung:
             titel="Druckzonenhöhe aus dem Kräftegleichgewicht",
         )
         p.formel(
-            self.werte.moment(f"M_Rd_N0_{marke}", rf"M_{{Rd}}(N_{{Ed}}=0)^{{{hoch}}}",
+            self.werte.moment(f"M_Rd_N0_{marke}", rf"M_{{{self.R}}}(N_{{Ed}}=0)^{{{hoch}}}",
                          vz * M, "Momentenwiderstand bei N_Ed = 0"),
             rf"{minus}@A_s \cdot @f_yd \cdot "
             rf"\left(@d - \frac{{{BLOCKANTEIL} \cdot @x}}{{2}}\right)",
             {**eingaben, "d": d, "x": w_x},
             titel="Momentenwiderstand bei reiner Biegung",
         )
-        return Eckpunkt(f"n0_{marke}", rf"M_{{Rd}}(N_{{Ed}}=0)^{{{hoch}}}",
-                        f"M_Rd(N_Ed=0) {hoch}", 0.0, vz * M)
+        return Eckpunkt(f"n0_{marke}", rf"M_{{{self.R}}}(N_{{Ed}}=0)^{{{hoch}}}",
+                        f"M_{self.R}(N_Ed=0) {hoch}", 0.0, vz * M)
 
     def _halbe_hoehe(self, p: Protokoll, zug: Lage, w_d: Wert,
                      vz: float, marke: str) -> Optional[Eckpunkt]:
@@ -497,14 +510,14 @@ class Handrechnung:
             "sigma_sd": w_sigma,
         }
         p.formel(
-            self.werte.kraft(f"N_halb_{marke}", rf"N_{{Rd}}^{{{hoch}}}", N,
+            self.werte.kraft(f"N_halb_{marke}", rf"N_{{{self.R}}}^{{{hoch}}}", N,
                         "Normalkraft in diesem Punkt"),
             rf"-@f_cd \cdot @b \cdot {BLOCKANTEIL} \cdot @x + @A_s \cdot @sigma_sd",
             eingaben,
             titel="Kräftegleichgewicht",
         )
         p.formel(
-            self.werte.moment(f"M_halb_{marke}", rf"M_{{Rd}}^{{{hoch}}}", vz * M,
+            self.werte.moment(f"M_halb_{marke}", rf"M_{{{self.R}}}^{{{hoch}}}", vz * M,
                          "Moment in diesem Punkt"),
             rf"{minus}\left[@f_cd \cdot @b \cdot {BLOCKANTEIL} \cdot @x \cdot "
             rf"\left(\tfrac{{@h}}{{2}} - \tfrac{{{BLOCKANTEIL} \cdot @x}}{{2}}\right) "
@@ -516,7 +529,7 @@ class Handrechnung:
             },
             titel="Momentengleichgewicht um die halbe Höhe",
         )
-        return Eckpunkt(f"halb_{marke}", rf"M_{{Rd}}(x=\tfrac{{h}}{{2}})^{{{hoch}}}",
+        return Eckpunkt(f"halb_{marke}", rf"M_{{{self.R}}}(x=\tfrac{{h}}{{2}})^{{{hoch}}}",
                         f"x = h/2 {hoch}", N, vz * M)
 
     def _uebersicht(self, p: Protokoll, punkte: List[Eckpunkt]) -> None:
@@ -578,7 +591,7 @@ def lagen_zusammenfassen(posten: Sequence[Posten]) -> Dict[str, Lage]:
             erster = gruppe[0]
             return Lage(0.0, erster.z, erster.f_yd, erster.E_s, erster.text,
                         index=erster.index, stahl_index=erster.stahl_index,
-                        teile=(erster,))
+                        teile=(erster,), satz=erster.satz)
         schwerpunkt = sum(t.a_s * t.z for t in gruppe) / flaeche
         # Bei verschiedenen Stahlsorten in einer Lage zaehlt die schwaechere --
         # sonst rechnete man mit einer Festigkeit, die ein Teil nicht hat. Der
@@ -594,13 +607,15 @@ def lagen_zusammenfassen(posten: Sequence[Posten]) -> Dict[str, Lage]:
             index=gemeinsamer_index(beteiligt),
             stahl_index=massgebend.stahl_index,
             teile=beteiligt,
+            satz=massgebend.satz,
         )
 
     if True not in gruppen or False not in gruppen:
         # Nur eine Seite bewehrt -- die andere zaehlt mit null Flaeche, damit
         # die Formeln unveraendert gelten.
         vorhanden = buendeln(next(iter(gruppen.values())))
-        leer = Lage(0.0, 0.0, vorhanden.f_yd, vorhanden.E_s, "keine")
+        leer = Lage(0.0, 0.0, vorhanden.f_yd, vorhanden.E_s, "keine",
+                    satz=vorhanden.satz)
         return ({"unten": vorhanden, "oben": leer} if True in gruppen
                 else {"unten": leer, "oben": vorhanden})
 

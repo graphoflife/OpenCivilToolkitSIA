@@ -26,6 +26,13 @@ from opencivil.projekt import Projekt
 
 DATEI = Path(__file__).parent / "altformat" / "platte_vor_rechenwahl.json"
 
+#: Was in dieser Datei keine Rechnung mehr braucht. Die genaue Linie der
+#: Platte -- damals nur Vergleich im Diagramm -- las k_sigma des Betons, aus
+#: E_cd; seit der Rechenwahl rechnet die Parabel ueberall mit E_cm/(1 + phi)
+#: (mit gamma_cE = 1 dieselbe Zahl). Damit fragt hier niemand mehr nach
+#: diesen drei Werten. Jede andere Zahl steht da wie damals.
+ENTFALLEN = {"beton.b1.k_sigma", "beton.b1.E_cd", "beton.b1.gamma_cE"}
+
 
 def gerechnet():
     daten = json.loads(DATEI.read_text(encoding="utf-8"))
@@ -44,6 +51,8 @@ class TestAlteDateiRechnetWieDamals(unittest.TestCase):
         """Neue Werte dürfen dazukommen; jeder alte steht mit derselben Zahl da."""
         werte = self.ergebnis.loesung.werte
         for kid, soll in self.daten["werte"].items():
+            if kid in ENTFALLEN:
+                continue
             with self.subTest(wert=kid):
                 self.assertIn(kid, werte)
                 self.assertEqual(werte[kid].groesse.si, soll)

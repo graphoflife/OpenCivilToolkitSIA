@@ -23,16 +23,17 @@ from opencivil.core.einheiten import KN, KNM, KN_PRO_M
 from opencivil.core.rechenwerk import Loesung
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL, Spannungsblock
 from opencivil.nachweis.querkraft import NUR_KURVE
+from opencivil.nachweis.resistenzlinie import Handlinie
 from opencivil.projekt import Aufbau
 from opencivil.querschnitt.platte import Richtung
 
 
 def linien(aufbau: Aufbau) -> dict:
-    """Je M-N-Nachweis mit Linie ihre Punkte, dazu die Bemessungs- und Knickpunkte."""
+    """Je M-N-Nachweis seine Linien, dazu die Bemessungs- und Knickpunkte."""
     return {
         kennung: linie(nachweis, aufbau)
         for kennung, nachweis in aufbau.nachweise.items()
-        if nachweis.linie
+        if nachweis.massgebend is not None
     }
 
 
@@ -432,26 +433,37 @@ def _knickpunkte(aufbau, nachweis) -> list:
     return punkte
 
 
+def _linienzug(linie) -> Optional[dict]:
+    """
+    Eine Resistenzlinie zum Zeichnen. ``ecken``: ob ihre Punkte Eckpunkte mit
+    Namen sind -- beim Polygon der Handrechnung --, oder Stuetzstellen eines
+    Randes, die man nicht einzeln markiert.
+    """
+    if linie is None:
+        return None
+    ecken = isinstance(linie, Handlinie)
+    return {
+        "beschriftung": linie.beschriftung,
+        "ecken": ecken,
+        "punkte": [{"N": p.N / 1e3, "M": p.M / 1e3, **({"name": p.name} if ecken else {})}
+                   for p in linie.punkte],
+    }
+
+
 def linie(nachweis, aufbau=None) -> dict:
     """
     Die M-N-Interaktionslinien zum Zeichnen -- in kN und kNm.
 
-    Zwei Linien: die genaue aus Dehnungsebenen (``punkte``) und das Polygon aus
-    der Handrechnung (``handpunkte``). Nachgewiesen wird gegen das Polygon; die
-    genaue Linie steht daneben, damit man sieht, wie viel die Vereinfachung
-    kostet.
+    Die massgebende Linie, gegen die nachgewiesen wird, und daneben die zum
+    Vergleich: die Parabel neben der Handrechnung, sonst die Handrechnung.
+    So sieht man, was die gewaehlte Rechenart gegenueber der anderen kostet
+    oder bringt.
     """
     return {
         "richtung": nachweis.richtung.value,
         "querschnitt": nachweis.querschnitt.name,
-        "punkte": [
-            {"N": p.N / 1e3, "M": p.M / 1e3, "abschnitt": p.abschnitt}
-            for p in nachweis.linie
-        ],
-        "handpunkte": [
-            {"N": p.N / 1e3, "M": p.M / 1e3, "name": p.name}
-            for p in getattr(nachweis, "handlinie", [])
-        ],
+        "massgebend": _linienzug(nachweis.massgebend),
+        "vergleich": _linienzug(nachweis.vergleich),
         "kombinationen": [
             {
                 "name": a.schnittgroessen.name,
