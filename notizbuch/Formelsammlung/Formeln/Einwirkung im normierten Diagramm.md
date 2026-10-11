@@ -40,3 +40,9 @@ $$
 - [[Biegung und Normalkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Wie weit die Einwirkung vom Ursprung entfernt ist, im normierten Diagramm:
+die Länge des Vektors $(N_{Ed}/N_{ref},\ M_{Ed}/M_{ref})$. Sie ist der Nenner
+des Erfüllungsgrads beim kürzesten Abstand.

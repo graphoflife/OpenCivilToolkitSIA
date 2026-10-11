@@ -43,3 +43,11 @@ $$
 - [[Knicken]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Das Moment, das zum reinen Zug gehört. Jede Lage zieht mit $A_s f_{yd}$ an
+ihrem Abstand zur halben Höhe; ist die untere Lage stärker als die obere,
+bleibt ein positives Moment. Die Normalkraft greift im Werkzeug immer in der
+halben Höhe an, und alle Momente beziehen sich darauf -- sonst hinge die
+Linie davon ab, wo man die Kraft hinsetzt.

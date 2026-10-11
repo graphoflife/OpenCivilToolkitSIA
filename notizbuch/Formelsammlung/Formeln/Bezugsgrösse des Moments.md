@@ -43,3 +43,10 @@ $$
 - [[Biegung und Normalkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Das Gegenstück auf der Momentenachse: das grössere der beiden grössten
+Momente, positiv oder negativ. Mit beiden Bezugsgrössen passt die
+Resistenzlinie ungefähr in ein Quadrat der Seitenlänge 2, und Abstände in
+beide Richtungen sind vergleichbar.

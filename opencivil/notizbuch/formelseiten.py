@@ -175,7 +175,12 @@ def seiten(formeln: Optional[Dict[str, Formel]] = None,
 
 
 def _formelseite(formel: Formel, codestelle: Callable[[str], str]) -> Seite:
-    fassungen = list(formel.fassungen.values())
+    # Was ohne Zahlen gleich aussieht, ist dieselbe Formel -- wie in der
+    # Formelsammlung steht sie einmal da.
+    gesetzt: Dict[str, Fassung] = {}
+    for fassung in formel.fassungen.values():
+        gesetzt.setdefault(fs.symbolisch(fassung.block).latex, fassung)
+    fassungen = list(gesetzt.values())
     referenzen = formel.referenzen
     zeilen: List[str] = []
     if referenzen:

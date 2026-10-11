@@ -43,3 +43,11 @@ $$
 - [[Biegung und Normalkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Liegen Grundbewehrung und Zulage in derselben Lage, wirken sie wie ein
+gemeinsamer Querschnitt: ihre Flächen addieren sich. Wo die Rechnung nur
+eine Lage je Seite kennt -- in der Handrechnung und beim
+[[Vergrösserungsfaktor der Durchbiegung]] --, steht die Summe in ihrem
+[[Schwerpunkt der zusammengefassten Lage|Schwerpunkt]].

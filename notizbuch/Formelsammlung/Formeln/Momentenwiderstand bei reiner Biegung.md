@@ -41,3 +41,15 @@ $$
 - [[Knicken]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Mit der [[Druckzonenhöhe aus dem Kräftegleichgewicht|Druckzonenhöhe]] steht
+der innere Hebelarm fest: vom Schwerpunkt der Zugbewehrung bis zur Mitte des
+Spannungsblocks, $d - 0.85\,x/2$. Zugkraft mal Hebelarm ist das Moment, das
+der Querschnitt ohne Normalkraft aufnimmt -- der obere oder untere Eckpunkt
+der Handrechnung.
+
+Die Linie aus Dehnungsebenen gibt hier einen etwas anderen Wert: sie rechnet
+die gedrückte Bewehrung mit und, mit der Parabel, eine wirklichkeitsnähere
+Druckzone.

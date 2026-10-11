@@ -46,3 +46,35 @@ Der Beton ist in 200 Fasern über die Höhe geteilt, jede mit ihrer mittleren Sp
 26. [[Widerstand im normierten Diagramm]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Eine Platte unter Moment und Normalkraft trägt, solange der Punkt
+$(N_{Ed}, M_{Ed})$ innerhalb ihrer **Resistenzlinie** liegt -- der
+geschlossenen Linie aller Kombinationen, die der Querschnitt gerade noch
+aufnimmt. Rechts endet sie im reinen Zug, links im reinen Druck, oben und
+unten liegen die grössten Momente beider Vorzeichen.
+
+Das Werkzeug kennt zwei Linien:
+
+- **Die Handrechnung** verbindet wenige Eckpunkte mit Geraden: reiner Druck
+  ([[Gleichmässiger Druck, ohne Bewehrung]]), reiner Zug
+  ([[Beide Lagen fliessen auf Zug]]), reine Biegung
+  ([[Momentenwiderstand bei reiner Biegung]]) und die
+  [[Nulllinie auf halber Höhe]], je für beide Momentenvorzeichen. Der Beton
+  trägt als Spannungsblock, gedrückter Stahl zählt nicht, und die Bewehrung
+  jeder Seite ist in ihrem Schwerpunkt zusammengefasst. Jeder Punkt lässt
+  sich von Hand nachrechnen.
+- **Die Linie aus Dehnungsebenen** fährt den Rand aller zulässigen
+  Dehnungsebenen ab. Der Querschnitt bleibt eben, Beton und Stahl folgen
+  ihren Werkstoffgesetzen ([[Parabel-Rechteck-Beziehung des Betons]] oder
+  [[Spannungsblock des Betons]], [[Bilineare Beziehung des Betonstahls]]),
+  und jede Lage zählt für sich -- auch die gedrückte. Die
+  [[Schnittgrössen aus der Spannungsverteilung]] folgen durch Integration
+  über 200 Fasern.
+
+Welche Linie gilt, wählt das Kapitel mit seiner Rechenwahl; die andere steht
+zum Vergleich im Diagramm. Wie weit eine Einwirkung von der Linie entfernt
+ist, sagt der [[Erfüllungsgrad]] -- gemessen bei festgehaltener Normalkraft,
+bei festgehaltenem Moment oder als kürzester Abstand im normierten
+Diagramm.

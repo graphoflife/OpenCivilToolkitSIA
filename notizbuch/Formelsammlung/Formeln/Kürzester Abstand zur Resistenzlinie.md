@@ -46,3 +46,10 @@ $$
 - [[Biegung und Normalkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Der kleinste Abstand von der Einwirkung zur Resistenzlinie, im normierten
+Diagramm gemessen -- zum nächsten Punkt $P$ auf ihrem Rand. Er ist immer
+positiv; ob die Einwirkung innerhalb oder ausserhalb liegt, entscheidet der
+Punkt-in-Linie-Test getrennt davon.

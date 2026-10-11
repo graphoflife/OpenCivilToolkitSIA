@@ -46,3 +46,20 @@ $$
 - [[Sprödes Versagen je Richtung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Widerstand durch Einwirkung: 1 heisst gerade erfüllt, mehr heisst Reserve,
+weniger nicht erfüllt. Beim M-N-Nachweis kommt es darauf an, in welcher
+Richtung man misst:
+
+- bei festgehaltener Normalkraft waagrecht bis zur Linie --
+  $\alpha = M_{Rd}/M_{Ed}$;
+- bei festgehaltenem Moment senkrecht -- $\alpha = N_{Rd}/N_{Ed}$;
+- als kürzester Abstand im normierten Diagramm (siehe
+  [[Widerstand im normierten Diagramm]]).
+
+«Automatisch» rechnet beide ersten Wege und nimmt den kleineren Grad. Wird
+ein Fall vom Moment beherrscht, fällt der Grad bei festgehaltenem Moment
+gross aus: dort ist in Richtung der Normalkraft viel Platz. Das ist kein
+Fehler, sondern die Natur dieses Massstabs.

@@ -38,3 +38,10 @@ $$
 - [[Querschnitt]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Fläche eines Bügelstabs, $\pi \varnothing^2/4$. Ein Bügel mit zwei
+Schenkeln trägt mit beiden; wie viele Schenkel je Fläche stehen, sagt die
+Teilung in beiden Richtungen (siehe [[Teilung in y aus der Stabzahl]]). Daraus
+folgt der [[Widerstand der Bügel]].

@@ -33,3 +33,16 @@ $$
 - [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die vereinfachte Druckzone der Handrechnung, als Gesetz geschrieben: unter
+$(1 - 0.85)\,\varepsilon_{c2d}$ Stauchung keine Spannung, darüber durchgehend
+$f_{cd}$. Liegt der gedrückte Rand bei $\varepsilon_{c2d}$ -- im Bruchzustand
+--, ist das genau der Block der Höhe $0.85\,x$, mit dem man von Hand rechnet.
+
+Als Gesetz gilt er auch dort, wo der Rand nicht bei $\varepsilon_{c2d}$ liegt;
+so rechnen die Linie aus Dehnungsebenen, der Querschnittslöser und die
+Analysen mit der Rechenart «Block». Unter Gebrauchslast ist das ein grobes
+Bild: die Druckresultierende liegt dann am Rand. Die Normstelle des Blocks
+als Gesetz ist offen; sie wird nicht erfunden.

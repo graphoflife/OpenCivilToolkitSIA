@@ -45,3 +45,10 @@ $$
 - [[Knicken]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Aus der Dehnung die Spannung, nach der
+[[Bilineare Beziehung des Betonstahls|bilinearen Beziehung]]: elastisch
+$E_s \varepsilon_s$, höchstens aber $f_{yd}$. Ist die Dehnung grösser als die
+[[Fliessdehnung]], fliesst der Stahl.

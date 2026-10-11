@@ -34,3 +34,21 @@ $$
 - [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Wie der Beton auf Druck antwortet, wirklichkeitsnah: erst eine Parabel bis
+zur Festigkeit bei $\varepsilon_{c1d}$, dann ein Plateau bis zur
+Bruchstauchung $\varepsilon_{c2d}$. Auf Zug trägt er nichts -- gerechnet wird
+der gerissene Querschnitt. Druck ist negativ.
+
+Die Form der Parabel bestimmt der
+[[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung|Krümmungsbeiwert k_σ]];
+mit $k_\sigma = 2$ ist es die gewöhnliche Parabel. Mit Bemessungswerten ist
+die Höhe $f_{cd}$, charakteristisch $f_{ck}$.
+
+Gebraucht wird die Beziehung von der Linie aus Dehnungsebenen, vom
+Querschnittslöser bei den Stahlspannungen und beim Knicken, und von der
+Spannung-Dehnung-Analyse. Für den Bruchzustand gibt sie ähnliche
+Widerstände wie der [[Spannungsblock des Betons]]; dazwischen, unter
+Gebrauchslast, beschreibt nur sie die Druckzone richtig.

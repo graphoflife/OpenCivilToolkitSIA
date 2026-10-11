@@ -36,3 +36,10 @@ $$
 - [[Knicken]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Der linke Eckpunkt der Handrechnung: der ganze Querschnitt gedrückt, überall
+mit $f_{cd}$. Die Bewehrung zählt hier nicht mit -- die Handrechnung lässt
+gedrückten Stahl stets weg und bleibt damit auf der sicheren Seite. Die Linie
+aus Dehnungsebenen rechnet den Druckstahl mit und reicht entsprechend weiter.

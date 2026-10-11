@@ -44,3 +44,10 @@ $$
 - [[Knicken]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Das Moment des Eckpunkts, bezogen auf die halbe Höhe wie alle Momente der
+Linie: die Betondruckkraft mal ihr Abstand von der Mitte,
+$h/2 - 0.85\,x/2$, plus die Stahlkraft mal ihr Abstand, $d - h/2$. Beide
+drehen in dieselbe Richtung.

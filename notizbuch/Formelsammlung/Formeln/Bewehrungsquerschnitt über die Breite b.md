@@ -20,3 +20,10 @@ $$
 - [[Querschnitt]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Eine Lage besteht aus gleichen Stäben im Abstand $s$. Auf die Breite $b$
+fallen $b/s$ Stäbe, jeder mit der Kreisfläche $\pi \varnothing^2 / 4$. Bei
+$b$ = 1 m ist das der Querschnitt je Laufmeter, wie ihn Bewehrungstabellen
+nennen: ⌀12 alle 150 mm gibt 754 mm²/m.

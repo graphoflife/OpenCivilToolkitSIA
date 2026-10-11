@@ -40,3 +40,10 @@ $$
 - [[Knicken]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Der rechte Eckpunkt: der Beton ist ganz gerissen und trägt nichts, beide
+Bewehrungslagen fliessen. Die Zugkraft ist die Summe der Flächen mal $f_{yd}$.
+Sind die Lagen verschieden stark, liegt die Kraft nicht in der halben Höhe --
+dazu gehört ein Moment, siehe [[Kräfte mal Hebelarm um die halbe Höhe]].

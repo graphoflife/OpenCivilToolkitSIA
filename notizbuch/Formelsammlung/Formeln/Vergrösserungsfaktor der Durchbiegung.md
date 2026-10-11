@@ -50,3 +50,23 @@ $$
 - [[Querschnitt]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+$w_c$ ist die Durchbiegung, die man elastisch am ungerissenen Betonquerschnitt
+rechnet -- leicht zu bekommen, aber zu klein: die gerissene Platte ist
+weicher, und unter Dauerlast kriecht der Beton. Der Faktor $w/w_c$ schätzt,
+um wie viel beides die Durchbiegung vergrössert.
+
+- $\rho$, der Bewehrungsgehalt der gezogenen Seite, steht im Nenner: mehr
+  Zugbewehrung macht den gerissenen Querschnitt steifer.
+- $\rho'$ gehört zur Gegenseite und mindert den Faktor: gedrückte Bewehrung
+  hält die Druckzone gegen das Kriechen.
+- $0.75 + 0.1\,\varphi$ ist der Anteil des Kriechens, mit der Kriechzahl der
+  Platte.
+- $(h/d)^3$ rechnet die Steifigkeit von der statischen Höhe auf die ganze
+  Dicke um.
+
+Gerechnet wird in x, einmal mit Zug unten und einmal mit Zug oben; die
+Gegenseite der einen ist die gezogene der anderen. Eine Schätzung für den
+Entwurf, kein Nachweis.

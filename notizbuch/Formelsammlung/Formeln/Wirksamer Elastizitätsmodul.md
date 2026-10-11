@@ -43,3 +43,16 @@ $$
 - [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Unter Dauerlast kriecht Beton: die Dehnung wächst mit der Zeit auf das
+$(1+\varphi)$-fache der elastischen, bei gleicher Spannung. Wer mit einem
+einzigen Modul rechnen will, teilt ihn darum durch $1 + \varphi$ -- der
+wirksame Modul $E_{c,eff}$. Mit $\varphi = 2$ ist der Beton dreimal so weich
+wie unter kurzer Last.
+
+Die Kriechzahl wählt jedes Kapitel selbst. Sie wirkt dort, wo der Beton
+elastisch oder mit der Parabel rechnet -- bei den Stahlspannungen im
+Gebrauch, bei der Verformung des Knickens und in der
+Spannung-Dehnung-Analyse.

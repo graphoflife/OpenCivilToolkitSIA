@@ -41,3 +41,14 @@ $$
 - [[Knicken]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Bei reiner Biegung halten sich Druck im Beton und Zug im Stahl die Waage.
+Der Stahl fliesst und zieht mit $A_s \cdot f_{yd}$; der Beton drückt als
+Spannungsblock der Höhe $0.85\,x$ mit $f_{cd}$. Aus der Gleichheit beider
+Kräfte folgt $x$ -- die Lage der Nulllinie, ab dem gedrückten Rand.
+
+Dass der Stahl dabei fliesst, setzt die Rechnung voraus. Bei üblicher
+Bewehrung trifft das zu; ob die Druckzone dafür klein genug ist, prüft die
+[[Bedingung der Duktilität]].

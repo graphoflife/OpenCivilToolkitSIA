@@ -40,3 +40,11 @@ $$
 - [[Knicken]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Ein Eckpunkt zwischen reiner Biegung und reinem Druck: die Nulllinie liegt in
+der halben Höhe, der gedrückte Rand bei $\varepsilon_{c2d}$. In seiner Nähe
+liegt das grösste Moment, das der Querschnitt überhaupt aufnimmt -- mit
+etwas Druck trägt er mehr Moment als ohne. Die
+[[Dehnung der Zugbewehrung]] zeigt, ob der Stahl dort noch fliesst.

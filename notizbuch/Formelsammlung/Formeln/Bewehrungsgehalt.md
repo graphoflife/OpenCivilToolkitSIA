@@ -41,3 +41,11 @@ $$
 - [[Querschnitt]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Bewehrung im Verhältnis zur Betonfläche bis zur statischen Höhe,
+$\rho = A_s / (b \cdot d)$ -- eine dimensionslose Zahl, gewöhnlich zwischen
+0.2 % und 1.5 %. Sie sagt, wie stark der gerissene Querschnitt ist, und geht
+so in den [[Vergrösserungsfaktor der Durchbiegung]] ein: als $\rho$ der
+gezogenen Seite und als $\rho'$ der Gegenseite.

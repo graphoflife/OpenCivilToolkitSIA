@@ -61,3 +61,15 @@ $$
 - [[Querkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Wie viel Moment der Querschnitt bei der wirkenden Normalkraft aufnimmt. Die
+Handrechnung hat nur Eckpunkte; dazwischen ist ihre Linie gerade, und der
+Widerstand bei $N_{Ed}$ folgt durch lineare Interpolation zwischen den beiden
+Eckpunkten, zwischen denen $N_{Ed}$ liegt. Fällt $N_{Ed}$ genau auf einen
+Eckpunkt, ist es dessen Moment.
+
+Dieselbe Frage mit der Linie aus Dehnungsebenen beantwortet keine
+Interpolation: dort wird die Ebene gesucht, deren Normalkraft genau $N_{Ed}$
+ist, und die Probe zeigt sie.

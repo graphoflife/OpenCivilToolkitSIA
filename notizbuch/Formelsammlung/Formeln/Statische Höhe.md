@@ -71,3 +71,13 @@ $$
 - [[Knicken]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Der Abstand vom gedrückten Rand bis zum Schwerpunkt der gezogenen
+Bewehrung -- der Hebelarm, an dem die Stahlkraft gegen die Druckzone
+arbeitet. Eine untere Lage misst ab der Oberkante, $d = z$; eine obere ab der
+Unterkante, $d = h - z$, denn bei negativem Moment liegt die Druckzone unten.
+
+$d$ steckt in fast jedem Widerstand: im Momentenwiderstand, im
+Bewehrungsgehalt, in der Querkraft und in der Duktilität.
