@@ -852,35 +852,6 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .melder > div.ist-fehler { background: var(--schlecht); }
 @keyframes auftauchen { from { opacity: 0; transform: translateY(6px); } }
 
-.dialog {
-  border: none; border-radius: 9px; padding: 0; max-width: 90vw; width: 840px;
-  max-height: 84vh; box-shadow: 0 14px 44px rgba(16,24,40,.24);
-}
-.dialog::backdrop { background: rgba(16,24,40,.45); }
-.dialog-kopf {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 16px; background: var(--blau-leiste); color: #fff;
-}
-/* Eigener Knopf statt .knopf: der Dialogkopf setzt color auf #fff, und .knopf
-   bringt eine helle Fläche mit. Die Aufschrift war damit weiss auf weiss. */
-.dialog-schliessen {
-  flex: none; width: 26px; height: 26px; padding: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; line-height: 1;
-  border: 1px solid rgba(255,255,255,.3); border-radius: 5px;
-  background: rgba(255,255,255,.12); color: #fff; cursor: pointer;
-  transition: background .12s, border-color .12s;
-}
-.dialog-schliessen:hover { background: rgba(255,255,255,.28); border-color: #fff; }
-.dialog-schliessen:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
-
-.dialog-inhalt { padding: 16px; overflow: auto; max-height: calc(84vh - 58px); }
-.dialog-inhalt pre {
-  background: var(--flaeche-2); border: 1px solid var(--rand); border-radius: 5px;
-  padding: 12px; overflow: auto; font-size: 11.5px; line-height: 1.45;
-  max-height: 54vh; white-space: pre-wrap; word-break: break-word;
-}
-
 /* Die Formeln haben ihre eigene Schrift und erben die Angleichung nicht.
    `position: relative` hält den unsichtbaren MathML-Teil jeder Formel (bei
    KaTeX absolut gesetzt) in ihr. Sonst lag er, aus einer gerollten Tafel

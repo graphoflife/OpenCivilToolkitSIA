@@ -8,14 +8,14 @@
   <link rel="stylesheet" href="vendor/katex/katex.min.css">
   <script defer src="vendor/katex/katex.min.js"></script>
   <!-- Versionsmarken: geschrieben von «python3 -m opencivil.web.bruecke», nicht von Hand ändern -->
-  <link rel="stylesheet" href="./css/stil.css?v=0654b16b6f45">
+  <link rel="stylesheet" href="./css/stil.css?v=1365ab1870dd">
   <script type="importmap">
   {
     "imports": {
       "./js/ablage.js": "./js/ablage.js?v=a67aeb3de570",
       "./js/achsen.js": "./js/achsen.js?v=87b48bf3c1f9",
-      "./js/api.js": "./js/api.js?v=bd0cbd757304",
-      "./js/app.js": "./js/app.js?v=4b9ee3a46880",
+      "./js/api.js": "./js/api.js?v=228329c38efb",
+      "./js/app.js": "./js/app.js?v=c5616326e6a4",
       "./js/baum.js": "./js/baum.js?v=0ca19cebb2d1",
       "./js/bausteine.js": "./js/bausteine.js?v=5e4ad56bf79b",
       "./js/bericht.js": "./js/bericht.js?v=92ab342f64e2",
@@ -93,9 +93,6 @@
     <button id="btn-oeffnen" class="knopf" title="Projekt aus einer .json-Datei laden">
       Öffnen
     </button>
-    <button id="btn-bericht" class="knopf" title="LaTeX-Dokument erzeugen">
-      Bericht
-    </button>
   </div>
 
   <div id="zustandsanzeige" class="zustandsanzeige" role="status" aria-live="polite"></div>
@@ -167,15 +164,6 @@
 </footer>
 
 <div id="melder" class="melder" aria-live="polite"></div>
-
-<dialog id="dialog" class="dialog">
-  <div class="dialog-kopf">
-    <h3 id="dialog-titel"></h3>
-    <button class="dialog-schliessen" id="dialog-schliessen"
-            title="Schliessen" aria-label="Schliessen">&#215;</button>
-  </div>
-  <div class="dialog-inhalt" id="dialog-inhalt"></div>
-</dialog>
 
 </body>
 </html>

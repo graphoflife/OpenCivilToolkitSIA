@@ -16,7 +16,7 @@ import {
 import {
   alsDateiSichern, ausDateiLaden, imBrowserAblegen, projektHolen,
 } from './ablage.js';
-import { el, melden } from './dom.js';
+import { melden } from './dom.js';
 import { baumZeichnen } from './baum.js';
 import { berichtZeichnen } from './bericht.js';
 import { editorZeichnen } from './editor.js';
@@ -183,68 +183,6 @@ async function oeffnen() {
     melden(`Projekt «${projekt.name}» geöffnet.`);
     await rechnen();
   } catch (fehler) {
-    melden(fehler.message, true);
-  }
-}
-
-function dialogZeigen(titel, inhalt) {
-  knoten.dialogTitel.textContent = titel;
-  knoten.dialogInhalt.replaceChildren(inhalt);
-  knoten.dialog.showModal();
-}
-
-async function berichtErzeugen() {
-  zustandsanzeige('erzeuge Bericht …');
-  try {
-    const antwort = await api.bericht(zustand.projekt);
-
-    // Das .tex ist auf beiden Wegen dasselbe. Nur der Server kann es zusätzlich
-    // ablegen und übersetzen -- im Browser gibt es keine TeX-Maschine.
-    let meldung = 'Bericht bereit: LaTeX (Overleaf) oder Markdown.';
-    if (antwort.pdf_pfad) meldung = `PDF erzeugt mit ${antwort.maschine}: ${antwort.pdf_pfad}`;
-    else if (antwort.tex_pfad) meldung = `LaTeX geschrieben: ${antwort.tex_pfad}\n(${antwort.meldung})`;
-
-    dialogZeigen('Bericht', el('div', {}, [
-      el('p', { text: meldung, style: { whiteSpace: 'pre-wrap' } }),
-      el('div.reihe', { style: { margin: '10px 0' } }, [
-        el('button.knopf', {
-          text: 'LaTeX kopieren',
-          on: {
-            click: async () => {
-              await navigator.clipboard.writeText(antwort.tex);
-              melden('LaTeX kopiert.');
-            },
-          },
-        }),
-        el('a.knopf', {
-          text: '.tex herunterladen',
-          download: `${antwort.dateiname || 'bericht'}.tex`,
-          href: URL.createObjectURL(new Blob([antwort.tex], { type: 'application/x-tex' })),
-        }),
-      ]),
-      // Derselbe Bericht als Markdown -- für GitHub, Obsidian, ein Wiki. Die
-      // Formeln stehen darin als LaTeX-Mathe, wie es diese Leser erwarten.
-      el('div.reihe', { style: { margin: '10px 0' } }, [
-        el('button.knopf', {
-          text: 'Markdown kopieren',
-          on: {
-            click: async () => {
-              await navigator.clipboard.writeText(antwort.markdown);
-              melden('Markdown kopiert.');
-            },
-          },
-        }),
-        el('a.knopf', {
-          text: '.md herunterladen',
-          download: `${antwort.dateiname || 'bericht'}.md`,
-          href: URL.createObjectURL(new Blob([antwort.markdown], { type: 'text/markdown' })),
-        }),
-      ]),
-      el('pre', { text: antwort.tex }),
-    ]));
-    zustandsanzeige('Bericht bereit', 'ist-gut');
-  } catch (fehler) {
-    zustandsanzeige('Fehler', 'ist-fehler');
     melden(fehler.message, true);
   }
 }
@@ -556,10 +494,6 @@ async function starten() {
     btnRechnen: document.getElementById('btn-rechnen'),
     btnSpeichern: document.getElementById('btn-speichern'),
     btnOeffnen: document.getElementById('btn-oeffnen'),
-    btnBericht: document.getElementById('btn-bericht'),
-    dialog: document.getElementById('dialog'),
-    dialogTitel: document.getElementById('dialog-titel'),
-    dialogInhalt: document.getElementById('dialog-inhalt'),
     // Nur die Reiter der Berechnung -- die Tafelwahl unten sieht gleich aus,
     // trägt aber kein `data-reiter` und setzte den Reiter sonst auf nichts.
     reiterKnoepfe: [...document.querySelectorAll('#reiter .reiter-knopf')],
@@ -568,9 +502,6 @@ async function starten() {
   knoten.btnRechnen.addEventListener('click', () => rechnen());
   knoten.btnSpeichern.addEventListener('click', speichern);
   knoten.btnOeffnen.addEventListener('click', oeffnen);
-  knoten.btnBericht.addEventListener('click', berichtErzeugen);
-  document.getElementById('dialog-schliessen')
-    .addEventListener('click', () => knoten.dialog.close());
 
   knoten.projektname.addEventListener('change', (e) => {
     projektAendern((p) => { p.name = e.target.value; }, 'name');

@@ -131,7 +131,6 @@ export const api = {
   rechnen: (projekt, ziele) => ruf('rechnen', { projekt, ziele }),
   /** M-V-Kurven für selbst gewählte Normalkräfte: {Kennung: N_Ed in kN}. */
   querkraftkurven: (projekt, n_ed) => ruf('querkraftkurven', { projekt, n_ed }),
-  bericht: (projekt) => ruf('bericht', { projekt }),
   /** Sucht die kleinste Bewehrung und gibt das geänderte Projekt zurück. */
   bewehrungSuchen: (projekt, kennung) =>
     ruf('bewehrung_suchen', { projekt, kennung }),

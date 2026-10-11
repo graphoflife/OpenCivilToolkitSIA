@@ -29,8 +29,7 @@ python3 demo_nachweis.py     # Kern allein: Platte beschreiben, rechnen, Bericht
 python3 -m unittest discover -s tests -t .
 ```
 
-Der lokale Server startet ohne Ladezeit und kann den Bericht mit einer
-TeX-Maschine zu PDF übersetzen. Sonst ist er dasselbe: beide Wege rufen
+Der lokale Server startet ohne Ladezeit. Sonst ist er dasselbe: beide Wege rufen
 `opencivil/web/dienst.py` auf. Welcher gerade gilt, steht unten links im Fenster.
 
 Kein Fremdpaket, nirgends — es genügt ein `python3`. KaTeX, MathLive, Pyodide
@@ -268,13 +267,6 @@ fügt daraus eine richtige, weiter bearbeitbare Gleichung ein, kein Bild --
 und eine Tabelle als echte Tabelle, deren Formelzellen Gleichungen sind. *TeX*
 legt den LaTeX-Quelltext ab, für Overleaf oder den Formeleditor von Word 365.
 *MD* legt den Block so ab, wie er im Markdown-Bericht steht.
-
-**Bericht:** der Knopf oben rechts erzeugt den ganzen Bericht -- Herleitung,
-die Nachweise je Platte mit derselben Tabelle wie am Bildschirm, alle Werte,
-fehlende Eingaben -- als LaTeX (für Overleaf, auf dem eigenen Rechner auch
-als PDF) und als Markdown (für GitHub, Obsidian, ein Wiki). In Markdown
-stehen die Formeln als LaTeX-Mathe zwischen `$…$` und `$$…$$`; so lesen es
-alle, die Formeln darstellen können.
 
 **Überschreiben:** bei jedem gerechneten Kennwert steht ein Haken. Wird er
 gesetzt, gilt der eingetippte Wert, und der ganze Zweig dahinter entfällt --
