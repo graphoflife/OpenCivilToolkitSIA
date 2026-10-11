@@ -47,3 +47,19 @@ Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebil
 9. [[Betonstahl nur auf Zug]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Wie breit ein Riss wird, hängt an der Spannung des Stahls, der ihn
+überbrückt: je höher sie ist, desto mehr dehnt er sich zwischen den
+Rissen, und desto weiter öffnet sich der Riss. Die Rissbreite lässt sich
+darum über eine Grenze der Stahlspannung begrenzen -- unter
+quasi-ständiger Einwirkung, der Last, die dauernd wirkt.
+
+Die Spannung kommt aus einer Gebrauchsrechnung am gerissenen Querschnitt:
+gesucht wird die Dehnungsebene, die die Einwirkung im Gleichgewicht hält
+(siehe [[Dehnungsebene und innere Kräfte]]). Womit gerechnet wird -- elastisch
+mit dem [[Wirksamer Elastizitätsmodul|kriechweichen Modul]], mit der Parabel
+oder dem Block, mit welchen Werten --, wählt das Kapitel. Gemessen wird an
+der am stärksten gezogenen Lage; fliesst sie, vergleicht der Nachweis
+Dehnungen statt Spannungen (siehe [[Zulässige Dehnung]]).

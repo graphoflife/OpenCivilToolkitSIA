@@ -34,3 +34,11 @@ $$
 - [[Stahlspannung gegen Fliessen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Unter häufiger Einwirkung soll die Bewehrung mit Abstand unter dem Fliessen
+bleiben: die Grenze liegt 80 N/mm² unter der Fliessgrenze. Gerechnet wird
+mit dem Bemessungswert $f_{yd}$ und nicht mit $f_{yk}$ -- die strengere der
+beiden möglichen Lesarten; welche gemeint ist, sagt die Normstelle nicht
+eindeutig. Für B500B gibt das rund 355 N/mm².

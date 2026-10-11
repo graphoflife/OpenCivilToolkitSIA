@@ -34,3 +34,10 @@ $$
 - [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Das Gegenstück der grössten Krümmung für die $N$–$\varepsilon$-Linie: die
+mittlere Dehnung der Ebene am Ende, das Mittel aus oben und unten. Sie sagt,
+wie weit sich der Querschnitt unter Zug verlängert, bevor eine Grenzdehnung
+erreicht ist.

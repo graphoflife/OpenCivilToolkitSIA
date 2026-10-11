@@ -29,3 +29,15 @@ $$
 - [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Der Stahl, wie die Handrechnung ihn sieht: auf Zug bilinear bis zum Plateau,
+auf Druck gar nicht. Gedrückte Bewehrung wird weggelassen -- das ist die
+Vereinfachung, mit der die Resistenzlinie aus Handrechnung entsteht, und auf
+der sicheren Seite.
+
+Wählt ein Kapitel die Rechenart «Handrechnung», rechnet auch sein
+Querschnittslöser so: bei den Stahlspannungen im Gebrauch, beim Knicken und
+in der Analyse. Am Ende einer solchen Linie steht dann genau der Widerstand
+der Handrechnung.

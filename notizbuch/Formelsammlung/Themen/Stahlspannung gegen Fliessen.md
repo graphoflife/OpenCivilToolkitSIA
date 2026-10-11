@@ -22,3 +22,11 @@ Drittens die Grenze: sie rechnet mit dem Bemessungswert, σ\_s,adm = f\_yd − 8
 6. [[Parabel-Rechteck-Beziehung des Betons]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Unter häufiger Einwirkung -- Lasten, die oft, aber nicht dauernd wirken --
+darf die Bewehrung nicht fliessen. Fliesst sie, bleiben Risse und
+Durchbiegung, wenn die Last weg ist. Gerechnet wird wie bei der
+[[Stahlspannung aus Rissbreite]], nur gegen eine andere Grenze: einen festen
+Abstand unter der Fliessgrenze (siehe [[Zulässige Stahlspannung]]).

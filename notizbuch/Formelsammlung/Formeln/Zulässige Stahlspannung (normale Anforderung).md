@@ -38,3 +38,10 @@ $$
 - [[Stahlspannung aus Rissbreite]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Bei normaler Anforderung an die Rissbreite gilt die Fliessgrenze: der Stahl
+darf jede Spannung bis $f_{yk}$ haben, solange er nicht fliesst. Erst eine
+erhöhte oder hohe Anforderung begrenzt zusätzlich über den Durchmesser (siehe
+[[Zulässige Stahlspannung (Rissbreite w_nom)]]).

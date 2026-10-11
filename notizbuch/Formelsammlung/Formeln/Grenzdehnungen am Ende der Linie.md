@@ -19,3 +19,14 @@ $$
 - [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Wo eine Linie der Analyse endet: bei der grössten Verformung, zu der es noch
+ein Gleichgewicht gibt -- dort, wo die erste Grenzdehnung erreicht ist. Der
+Beton am gedrückten Rand bis $\varepsilon_{c2d}$, jede Stahllage bis
+$\pm\varepsilon_{ud}$, und, sobald der ganze Querschnitt gedrückt ist, der
+Beton im Punkt C bis $\varepsilon_{c1d}$. Es sind dieselben Grenzen wie im
+Dehnungsfächer der genauen Resistenzlinie (siehe
+[[opencivil.nachweis.dehnungsfaecher]]); die Linie endet darum dort, wo die
+Resistenzlinie liegt.

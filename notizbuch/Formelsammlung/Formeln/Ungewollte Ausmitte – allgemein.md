@@ -20,3 +20,11 @@ $$
 - [[Knicken]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Kein Stab steht genau senkrecht und keine Last greift genau dort an, wo sie
+soll. Der Nachweis setzt darum eine Ausmitte an, die niemand geplant hat:
+aus der [[Schiefstellung]] über die halbe Knicklänge, mindestens aber ein
+Bruchteil der Querschnittsabmessung. Sie wirkt immer, auch ohne Moment
+erster Ordnung, und immer in der ungünstigen Richtung.

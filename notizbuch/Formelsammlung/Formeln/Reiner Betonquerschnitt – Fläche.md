@@ -36,3 +36,9 @@ $$
 - [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Fläche des Rechtecks $b \times h$, ohne Bewehrung -- der
+Vergleichsquerschnitt für den
+[[Äquivalenter E-Modul über der Normalkraft|äquivalenten E-Modul unter Normalkraft]].

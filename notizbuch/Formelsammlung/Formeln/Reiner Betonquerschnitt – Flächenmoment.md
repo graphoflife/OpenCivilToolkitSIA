@@ -36,3 +36,10 @@ $$
 - [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Das Flächenmoment des Rechtecks $b \times h$, ohne Bewehrung -- der
+Vergleichsquerschnitt für den [[Äquivalenter E-Modul über dem Moment|äquivalenten E-Modul]].
+Mit ihm rechnet man, wenn man eine Platte als homogenes, elastisches
+Bauteil berechnet.

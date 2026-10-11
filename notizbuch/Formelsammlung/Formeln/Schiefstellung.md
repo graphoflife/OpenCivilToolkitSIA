@@ -42,3 +42,10 @@ $$
 - [[Knicken]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die ungewollte Neigung eines Stabs, als Winkel: kurze Stäbe dürfen
+verhältnismässig schiefer stehen als lange, darum der Faktor $1/\sqrt{l}$,
+begrenzt zwischen 1/300 und 1/200. Die Formel ist empirisch: $l$ geht in
+Metern ein.

@@ -34,3 +34,11 @@ $$
 - [[Knicken]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Ein Moment erster Ordnung, als Ausmitte der Normalkraft geschrieben: wie
+weit neben der Achse sie angreifen müsste, um dieses Moment zu erzeugen.
+Sie gehört zum System, nicht zur Last -- wächst die Normalkraft, wächst das
+Moment mit. So rechnet das Werkzeug auch, wenn es die grösste tragbare
+Druckkraft sucht.

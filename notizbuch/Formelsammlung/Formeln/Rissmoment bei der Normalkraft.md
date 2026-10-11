@@ -35,3 +35,14 @@ $$
 - [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Am Bruttoquerschnitt reisst der gezogene Rand, wenn $N/A + M/W$ die wirksame
+Zugfestigkeit erreicht. Mit $A = b h$ und $W = b h^2/6$ verschiebt eine
+Normalkraft das Rissmoment um $N \cdot h/6$: Druck hebt es, Zug senkt es.
+Beim Rissmoment springt die Krümmung bei demselben Moment vom ungerissenen auf
+den gerissenen Wert.
+
+Gerechnet wird wie beim [[Rissmoment des ungerissenen Querschnitts]] am
+Bruttoquerschnitt ohne Stahl -- nach Vorgabe, nicht nachgeschlagen.

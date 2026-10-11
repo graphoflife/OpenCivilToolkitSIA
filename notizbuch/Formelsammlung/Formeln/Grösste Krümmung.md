@@ -35,3 +35,10 @@ $$
 - [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Krümmung am Ende der $M$–$\chi$-Linie: Dehnung unten minus Dehnung oben,
+geteilt durch die Höhe -- die Neigung der Dehnungsebene. Das Verhältnis der
+grössten Krümmung zu der beim Fliessbeginn sagt, wie viel Verformung der
+Querschnitt nach dem Fliessen noch zulässt.

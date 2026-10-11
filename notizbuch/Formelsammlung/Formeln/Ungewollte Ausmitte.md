@@ -36,3 +36,10 @@ $$
 - [[Knicken]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Aus der [[Schiefstellung]]: ein Stab der Knicklänge $l_{cr}$, um $\alpha_i$
+geneigt, weicht in seiner Mitte um $\alpha_i \cdot l_{cr}/2$ ab. Bei kurzen
+Stäben ist das wenig; dann gilt eine Mindestausmitte aus der Abmessung des
+Querschnitts.

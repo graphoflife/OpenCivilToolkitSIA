@@ -31,3 +31,18 @@ $$
 - [[Knicken]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Der Querschnitt bleibt eben (Bernoulli): die Dehnung ist eine lineare
+Funktion der Lage. Bei der Platte hängt sie nur von der Tiefe $z$ ab -- zwei
+Unbekannte, die Dehnung $\varepsilon_m$ auf halber Höhe und die Krümmung
+$\chi$. Beim gezeichneten Querschnitt ist es eine schräge Ebene, mit der
+Richtung $n$ der Nulllinie als drittem Parameter.
+
+Aus der Ebene folgen über die Werkstoffgesetze die Spannungen, aus deren
+Integral Normalkraft und Moment. Gesucht wird die Ebene, deren innere Kräfte
+die Einwirkung treffen. Geschlossen geht das nicht, weil die Gesetze
+nichtlinear sind: das Werkzeug sucht in zwei geschachtelten Halbierungen,
+innen $\varepsilon_m$ zur Normalkraft, aussen $\chi$ zum Moment. Die Probe
+in der Herleitung zeigt, dass die gefundene Ebene die Einwirkung trägt.

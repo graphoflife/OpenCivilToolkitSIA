@@ -22,3 +22,18 @@ $$
 - [[Knicken]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Das Verfahren selbst. Begonnen wird ohne Verformung, $e_{2d} = 0$. Dann:
+
+1. das Moment aus der Normalkraft und allen Ausmitten des letzten
+   Durchlaufs;
+2. die Dehnungsebene, die dieses Moment trägt (siehe
+   [[Dehnungsebene und innere Kräfte]]), und ihre Krümmung;
+3. aus der Krümmung die neue Ausmitte zweiter Ordnung.
+
+Ändert sie sich nicht mehr, steht der Stab: das ist die Gleichgewichtslage.
+Wächst sie, bis der Querschnitt das Moment nicht mehr tragen kann, gibt es
+keine -- der Stab knickt. Die Herleitung zeigt die Folge Durchlauf für
+Durchlauf, weil ihr Einlaufen die Aussage des Nachweises ist.

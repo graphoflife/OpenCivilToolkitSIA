@@ -19,3 +19,10 @@ $$
 - [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Vor dem ersten Riss trägt der Beton auch Zug, und unter Gebrauchslast ist er
+linear: Spannung gleich wirksamer Modul mal Dehnung, ohne Grenze. Gebraucht
+wird hier nur die Steifigkeit; wo der Querschnitt reisst, sagt die
+Rissbedingung am Bruttoquerschnitt.

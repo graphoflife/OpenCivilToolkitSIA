@@ -49,3 +49,25 @@ Gesucht wird die grösste Druckkraft mit Gleichgewichtslage. Die gewollte Ausmit
 23. [[Momentengleichgewicht um die halbe Höhe]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Ein schlanker, gedrückter Stab biegt sich unter seiner Last aus. Die
+Ausbiegung vergrössert den Hebelarm der Normalkraft, das Moment wächst, der
+Stab krümmt sich mehr -- und so fort. Ob diese Folge zur Ruhe kommt, ist die
+Frage des Knicknachweises: kommt sie zur Ruhe, gibt es eine
+Gleichgewichtslage, und der Stab steht; wächst sie ohne Ende, knickt er.
+
+Das Moment am verformten System setzt sich aus drei Ausmitten zusammen:
+
+- der [[Ungewollte Ausmitte|ungewollten]], aus der unvermeidlichen
+  [[Schiefstellung]] und Massabweichung;
+- der [[Gewollte Ausmitte|gewollten]], aus dem Moment erster Ordnung;
+- der Ausmitte zweiter Ordnung, aus der Krümmung des Stabs.
+
+Die Krümmung kommt aus dem Querschnitt: zu jedem Moment die Dehnungsebene,
+die es hält, mit dem Werkstoffgesetz, das das Kapitel für die Verformung
+wählt. Gesucht wird schliesslich die grösste Druckkraft, unter der die
+[[Iteration der Ausmitte 2. Ordnung]] noch einläuft; der Erfüllungsgrad ist
+das Verhältnis dieser Kraft zur wirkenden. Den Widerstand des Querschnitts
+dabei gibt eine Resistenzlinie, die das Kapitel ebenfalls wählt.

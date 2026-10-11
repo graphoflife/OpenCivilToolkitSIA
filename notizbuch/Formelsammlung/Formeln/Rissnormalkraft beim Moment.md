@@ -40,3 +40,12 @@ $$
 - [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Dieselbe Rissbedingung wie beim Rissmoment, nach der Normalkraft aufgelöst:
+beim Moment $M$ reisst der Querschnitt, wenn die Zugkraft $N_{Riss}$
+erreicht. Unter Zug reisst die ganze Dicke, darum gilt der
+[[Beiwert für die Dicke]] mit der ganzen Höhe und nicht mit einem Drittel wie
+beim Rissmoment -- nach Vorgabe, nicht nachgeschlagen. Das Vorzeichen des
+Moments zählt nicht: der Querschnitt ist oben wie unten derselbe.

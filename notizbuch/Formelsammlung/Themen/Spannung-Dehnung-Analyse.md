@@ -50,3 +50,26 @@ Der äquivalente E-Modul ist der Modul, den ein reiner Betonquerschnitt bräucht
 18. [[Äquivalenter E-Modul über der Normalkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Kein Nachweis, sondern ein Blick in den Querschnitt: wie er sich unter
+wachsender Last verhält, von ungerissen bis zum Bruch. Die Linien zeigen das
+Moment über der Krümmung ($M$–$\chi$) bei fester Normalkraft, oder die
+Normalkraft über der Dehnung ($N$–$\varepsilon$) bei festem Moment.
+
+Die Linie hat drei Abschnitte:
+
+1. **Ungerissen** ist der Querschnitt steif: der Beton trägt Druck und Zug,
+   linear (siehe [[Beton ungerissen, in Druck und Zug]]).
+2. **Beim Riss** springt die Verformung bei derselben Kraft auf den
+   gerissenen Wert (siehe [[Rissmoment bei der Normalkraft]],
+   [[Rissnormalkraft beim Moment]]).
+3. **Gerissen** trägt der Beton keinen Zug mehr; die Linie steigt flacher,
+   knickt beim Fliessbeginn der Bewehrung ab (siehe [[Fliessdehnung]]) und
+   endet, wo die erste Grenzdehnung erreicht ist
+   (siehe [[Grenzdehnungen am Ende der Linie]]).
+
+Dazu zeigt der äquivalente E-Modul, wie steif der Querschnitt in jedem
+Zustand ist -- gemessen an einem reinen Betonquerschnitt (siehe
+[[Äquivalenter E-Modul über dem Moment]]).
