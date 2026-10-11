@@ -44,6 +44,77 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-11 · Das Notizbuch: Dokumentation in Obsidian und auf der Seite
+
+Wunsch: alle Notizen als Markdown, das Obsidian und die Seite lesen; die
+Formelsammlung als verlinktes Notizheft, jede Formel eine Seite mit Theorie
+und SIA-Verweis; global einsehbar über einen Knopf neben «Rechnen»; dazu,
+wie die Python-Bibliothek funktioniert -- und ein Notizbuch für Claude.
+
+**Ein Ordner, kein Plugin.** Obsidian liest einen gewöhnlichen Ordner als
+Tresor: `notizbuch/`. Darin [[Start]], die Formelsammlung (111 Formel-, 18
+Themenseiten, eine Übersicht), je Modul eine Python-Seite (80) und die
+Notizen -- [[Arbeitsweise]] (die Regeln, die vorher privat lagen),
+Entwicklung und TODO, mit `git mv` hierher verschoben. `CLAUDE.md` lädt die
+Arbeitsweise in jede Sitzung; `.obsidian/app.json` stellt strenge
+Zeilenumbrüche und Wikilinks ein.
+
+**Eine Seite je Formelname.** Gleich benannte Formeln sind Fassungen einer
+Seite (131 Formeln, 111 Seiten). Der Name ist der Titel ohne Zahlen, oder
+`GleichungBlock.name`, wo der Titel je nach Fall wechselt oder nichts sagt
+(«Ansatz», «C30/37: …», «Duktilität» wie das Thema). Er hängt nur an der
+Formel, nie an Reihenfolge oder Zähler -- sonst stünde die Theorie beim
+nächsten Lauf an der falschen Formel. Tests über die ganze Sammlung halten
+das: eine Formel ein Name, eine Seite eine Grösse, kein Name wie ein Thema,
+keine Sorte, jeder Name im Tresor einmal.
+
+**Oben erzeugt, unten von Hand.** Die Brücke schreibt den oberen Teil jeder
+Seite neu; unter der Linie `<!-- Ab hier von Hand … -->` bleibt die Theorie
+Zeichen für Zeichen. Die Prüfsumme `erzeugt:` verrät Handänderungen oben --
+dann schreibt die Brücke nichts und nennt die Datei. Notizen ohne
+`erzeugt:` fasst sie nie an; eine verwaiste Seite mit Theorie bleibt mit
+Hinweis stehen, ein Test ist rot, bis der Text umgezogen ist.
+
+**Woher eine Grösse kommt** sagt die Rechnung selbst: je Lauf merkt sich der
+Generator, welche Formel einen Wert zuletzt schrieb. Dafür trägt die
+Formelzeile ihre Eingänge (`Formelzeile.eingaben`) und jede Gleichung ihre
+Codestelle -- gefunden über den Aufrufstapel, weil viele Formeln von
+Hilfsfunktionen in anderen Modulen geschrieben werden. Gekostet hat das
+nichts Messbares.
+
+**Die Python-Seiten** liest `bibliothek.py` mit `ast`, ohne Import: Docstring,
+Klassen und Funktionen mit Signatur, Konstanten, Importe, Formeln. Zeilen in
+GROSSBUCHSTABEN werden Überschriften, Eingerücktes Code, Rollen wie
+`:class:` Links -- auch ohne vollen Namen, über die eigene Klasse und die
+Importe. Keine Rolle bleibt offen (Test). Die leeren Pakete bekamen einen
+Docstring, `opencivil` einen Abschnitt RECHENWEG.
+
+**Auf der Seite** öffnet «Dokumentation» die Ansicht -- auf dem Telefon die
+vierte Wahl «Doku» unten, weil die Kopfleiste voll ist. Den Markdown zerlegt
+ein eigenes Modul ohne fremde Bibliothek (`markdown.js`, rein, mit node
+über das ganze Notizbuch geprüft); `notizbuch_seite.js` baut daraus die Seite,
+nie über `innerHTML`. Die Adresse `#notizbuch/<Name>#<Abschnitt>` trägt
+Links, Zurück-Knopf und Lesezeichen. Seiten kommen ohne Zwischenspeicher:
+eine in Obsidian geänderte Notiz steht nach dem Hochladen gleich da; eine
+neue erst, wenn die Brücke sie ins Verzeichnis `web/kern/notizbuch.json`
+geschrieben hat.
+
+**Was wegfiel.** Der rechte Reiter «Formelsammlung» samt
+`formelsammlung.json` -- an jeder Gleichung der Herleitung führt jetzt
+«Formel» zur Seite. Und auf Wunsch der Knopf «Bericht» oben rechts.
+
+**Theorie** steht unter jeder Seite, von Claude geschrieben, ohne erfundene
+Normstelle: ein Test verlangt, dass jede «SIA 262 …»-Angabe darin auch im
+Code steht. Annahmen heissen «nach Vorgabe, nicht nachgeschlagen». 80 von
+111 Formeln haben noch keine Normstelle -- die Liste steht auf der Übersicht
+der Formelsammlung.
+
+**Unterwegs gefunden.** Der lokale Server dekodierte Adressen nicht: jede
+Datei mit Umlaut oder Leerzeichen gab 404. Und der Docstring von `tresor.py`
+zeigte die Trennlinie wörtlich -- auf seiner Modulseite hielt der Generator
+sie für die echte und meldete «von Hand geändert». Eine ganz erzeugte Seite
+darf die Linie jetzt nicht enthalten.
+
 ## 2026-10-11 · Spannung-Dehnung-Analyse: äquivalenter E-Modul über M und über N
 
 Wunsch: zwei weitere Arten neben M–χ und N–ε. Auf der y-Achse der

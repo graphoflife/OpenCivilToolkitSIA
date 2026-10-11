@@ -19,7 +19,22 @@ gelernt wurde, steht in [[Entwicklung]].
 - [ ] Der Riegel `k_g ≥ 1.20` ist nach Vorgabe eingebaut, aber nicht gegen die
       Norm geprüft. Bei D_max = 32 mm und C30/37 greift er (roh 1.00 → 1.20)
       und senkt den Querkraftwiderstand um gut 4 %.
-- [ ] Keine Testumgebung für das JavaScript. `stabstellen`, `besterVersatz`,
+- [ ] Normstellen für 80 von 111 Formeln fehlen noch -- die Liste samt
+      Stelle im Code steht auf der Übersicht der [[Formelsammlung]]. Sie
+      kommen vom Benutzer und werden im Code eingetragen (`referenz=`).
+- [ ] Auf dem Telefon (375 px) ist die Kopfleiste zu eng: die Marke steht
+      halb über dem oberen Rand, das Namensfeld ragt in die Tafel darunter,
+      und «Kern: lokaler Server» liegt über der unteren Tafelwahl. Schon vor
+      dem Notizbuch so.
+- [ ] Der Dienst «bericht» und das PDF des lokalen Servers haben seit dem
+      Wegfall des Knopfs «Bericht» keinen Weg mehr aus der Oberfläche.
+      Entfernen, oder wieder erreichbar machen.
+- [ ] Obsidian: einmal im Tresor prüfen, ob Seiten mit Punkt im Namen
+      (`opencivil.core.protokoll`) sauber verlinken. Sonst die Namen ohne
+      Punkt schreiben.
+- [ ] Keine Testumgebung für das JavaScript. Eine erste Brücke steht:
+      `tests/test_markdown_js.py` gibt ein Modul ohne Imports node als
+      `data:`-Adresse. Für die übrigen fehlt sie noch: `stabstellen`, `besterVersatz`,
       `naechsteStufe` und `beschriftungenEntzerren` sind rein und wären in
       wenigen Zeilen abgedeckt; geprüft wird bisher von Hand im Browser.
       Dazu jetzt das Modell des Zeichenfensters (`cad_modell.js`: Knoten
