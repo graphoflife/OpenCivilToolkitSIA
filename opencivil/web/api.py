@@ -20,7 +20,7 @@ from typing import Any, Dict, List, Optional
 
 from opencivil.bewehrungssuche import DURCHMESSER, Suchmodus
 from opencivil.core.einheiten import MM
-from opencivil.bericht.formelsammlung import Thema
+from opencivil.bericht.formelsammlung import Thema, formelname, in_sammlung
 from opencivil.bericht.markdown import block_markdown
 from opencivil.bericht.zusammenfassung import (
     GRAD_SPALTE, STAPEL_SPALTEN, angaben, hinweise, nachweistabelle,
@@ -304,6 +304,9 @@ def _gleichung_dict(block: GleichungBlock, tiefe: int) -> dict:
         "wert_id": block.wert_id,
         "gruppe": block.gruppe,
     }
+    # Die Seite der Formel im Notizbuch -- der Link «Formel» an der Gleichung.
+    if in_sammlung(block):
+        eintrag["formelseite"] = formelname(block)
     return eintrag
 
 

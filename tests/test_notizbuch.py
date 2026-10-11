@@ -395,5 +395,26 @@ class TestDasNotizbuchImRepo(unittest.TestCase):
                     self.assertIn(stelle, bekannt)
 
 
+
+class TestHerleitungZeigtAufDieSeite(unittest.TestCase):
+    """Der Link «Formel» an einer Gleichung der Herleitung fuehrt zu einer Seite."""
+
+    def test_jede_formelseite_gibt_es(self):
+        from opencivil.web.api import protokoll_liste
+
+        def gehen(bloecke):
+            for b in bloecke:
+                if b.get("formelseite"):
+                    yield b["formelseite"]
+                yield from gehen(b.get("bloecke", []))
+
+        aufbau = Projekt.beispiel().aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.berichtsziele())
+        gefunden = set(gehen(protokoll_liste(loesung.protokoll)))
+        namen = {e["name"] for e in bruecke.notizbuch_verzeichnis()["seiten"]}
+        self.assertGreater(len(gefunden), 30)
+        self.assertEqual(gefunden - namen, set())
+
+
 if __name__ == "__main__":
     unittest.main()

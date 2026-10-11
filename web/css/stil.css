@@ -195,6 +195,10 @@ input.projektname:focus {
 .knopf-haupt:hover:not(:disabled),
 .kopfleiste .knopf-haupt:hover:not(:disabled) { background: #3b82f6; border-color: #3b82f6; color: #fff; }
 
+/* Ein Link, der wie ein Knopf aussieht -- etwa «Formel» an einer Gleichung,
+   der ins Notizbuch führt. */
+a.knopf { display: inline-block; text-decoration: none; }
+
 .knopf-klein { padding: 3px 8px; font-size: 12px; }
 .knopf-zart {
   border-color: transparent; background: transparent; color: var(--schrift-matt);

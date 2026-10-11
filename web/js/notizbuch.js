@@ -34,6 +34,8 @@ const WURZEL = new URL('../../', import.meta.url);
 
 const knoten = {};
 let verzeichnis = null;
+/** Die Namen aller Seiten, sobald das Verzeichnis da ist -- für `seiteVorhanden`. */
+let bekannt = null;
 const texte = new Map();
 let offen = false;
 let angezeigt = null;
@@ -87,7 +89,18 @@ export function notizbuchEinrichten({ knoepfe, ansicht }) {
   });
   ansicht.addEventListener('keydown', taste);
   window.addEventListener('hashchange', folgen);
+  // Gleich laden, nicht erst beim Öffnen: die Herleitung fragt danach, ob
+  // es zu einer Formel eine Seite gibt. Es ist klein.
+  verzeichnisLaden().catch(() => {});
   folgen();
+}
+
+/**
+ * Ob es diese Seite gibt. Solange das Verzeichnis lädt: ja -- im Zweifel
+ * steht der Link da, und die Seite sagt, wenn sie fehlt.
+ */
+export function seiteVorhanden(name) {
+  return bekannt === null || bekannt.has(name.normalize('NFC').toLowerCase());
 }
 
 // ---------------------------------------------------------------------------
@@ -177,6 +190,7 @@ function verzeichnisLaden() {
     .then((v) => {
       v.nachName = new Map(v.seiten.map((s) => [s.name.normalize('NFC').toLowerCase(), s]));
       v.nachPfad = new Map(v.seiten.map((s) => [s.pfad, s]));
+      bekannt = new Set(v.nachName.keys());
       baumZeichnen(v);
       return v;
     })

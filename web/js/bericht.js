@@ -16,6 +16,7 @@
 import { el, ersetzen, leerzustand, melden, svgEl, zahlfeld } from './dom.js';
 import { setzen } from './mathe.js';
 import { werkzeugleiste } from './kopierleiste.js';
+import { adresse, seiteVorhanden } from './notizbuch.js';
 import {
   diagrammZeichnen, kurveZeichnen, neigungskurveZeichnen,
   querkraftkurveZeichnen, querschnittZeichnen,
@@ -46,6 +47,13 @@ function gleichungBlock(block) {
     el('div.gleichung-mathe'),
     werkzeugleiste(block),
   ]);
+  // Zur Seite der Formel im Notizbuch: Theorie, Normstelle, Grössen.
+  if (block.formelseite && seiteVorhanden(block.formelseite)) {
+    huelle.querySelector('.gleichung-werkzeug').prepend(el('a.knopf.knopf-zart', {
+      href: adresse(block.formelseite), text: 'Formel',
+      title: `In der Formelsammlung: ${block.formelseite}`,
+    }));
+  }
 
   setzen(latex, huelle.querySelector('.gleichung-mathe'));
   return huelle;
