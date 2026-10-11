@@ -89,6 +89,13 @@ sie hier notiert; keine davon ist nachgeschlagen.
       `ρ′ = 0`. Gezählt wird nur die x-Bewehrung, Grund und Zulage einer Seite
       im Schwerpunkt. Der Gültigkeitsbereich ist nicht geprüft — etwa
       `1 − 20·ρ′ ≤ 0` ab `ρ′ = 5 %` gäbe einen negativen Faktor.
+- [ ] **Der äquivalente E-Modul** (Spannung-Dehnung-Analyse, M–E_eq und
+      N–E_eq) zählt die Verformung ab dem Zustand ohne laufende Kraft (deine
+      Wahl, 2026-10-11): `E_eq = M/(I_c·(χ − χ_0))`. Ein Modell mit dem
+      ungerissenen Betonquerschnitt gibt damit die Verformung aus der
+      laufenden Kraft wieder, nicht, was die feste allein verformt. Er gilt
+      für den Querschnitt, ohne Zugversteifung -- für eine Durchbiegung liegt
+      er damit tief (sicher), für Zwangkräfte nicht. Keine Normstelle.
 - [ ] **Der kürzeste Abstand bei der genauen Linie** misst zum gezeichneten
       Polygon des Fächers (80 Schritte je Abschnitt), nicht zum genau
       gesuchten Rand wie Normalkraft und Moment konstant.

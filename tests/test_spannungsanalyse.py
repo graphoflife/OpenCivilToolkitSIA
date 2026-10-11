@@ -485,6 +485,115 @@ class TestNormalkraftDehnung(unittest.TestCase):
         self.assertIn("Moment allein", kurve.hinweis)
 
 
+class TestAequivalenterModul(unittest.TestCase):
+    """
+    E_eq: der Modul, den ein reiner Betonquerschnitt b·h -- ungerissen, ohne
+    Stahl, elastisch -- bräuchte, um sich gleich stark zu krümmen bzw. zu
+    dehnen. Ungerissen ist das von Hand nachzurechnen: der ideelle
+    Querschnitt mit (n − 1)·A_s, gegen den reinen Beton.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.paar = loeserpaar(kriechzahl=0.0, satz=Werkstoffsatz.CHARAKTERISTISCH)
+        b, h = cls.paar.gerissen.b, cls.paar.gerissen.h
+        cls.b, cls.h = b, h
+        cls.biegung = sa.aequivalenter_modul(sa.moment_kruemmung(cls.paar, N=0.0),
+                                             b=b, h=h, E_cm=cls.paar.E_cm)
+        cls.zug = sa.aequivalenter_modul(sa.normalkraft_dehnung(cls.paar, M=0.0),
+                                         b=b, h=h, E_cm=cls.paar.E_cm)
+
+    def ideell(self):
+        """Der ungerissene Querschnitt mit Stahl: Fläche, Schwerpunkt, Flächenmoment."""
+        E_c, b, h = self.paar.E_cm, self.b, self.h
+        n = self.paar.gerissen.stahl(1e-4) / 1e-4 / E_c
+        lagen = [(l.a_s, l.z) for l in self.paar.ungerissen.lagen]
+        A = b * h + (n - 1) * sum(a for a, _ in lagen)
+        z = (b * h * h / 2 + (n - 1) * sum(a * z for a, z in lagen)) / A
+        I = (b * h ** 3 / 12 + b * h * (h / 2 - z) ** 2
+             + (n - 1) * sum(a * (zs - z) ** 2 for a, zs in lagen))
+        return A, z, I
+
+    def test_ungerissen_von_hand_ueber_dem_moment(self):
+        """E_eq = E_c·I_id/I_c -- auf die Teilung in 60 Fasern genau."""
+        _, _, I_id = self.ideell()
+        erwartet = self.paar.E_cm * I_id / (self.b * self.h ** 3 / 12)
+        self.assertAlmostEqual(self.biegung.ungerissen / erwartet, 1.0, delta=5e-4)
+        self.assertGreater(self.biegung.ungerissen, self.paar.E_cm)
+
+    def test_ungerissen_von_hand_ueber_der_normalkraft(self):
+        """
+        N greift auf halber Höhe an, der ideelle Schwerpunkt liegt tiefer: die
+        Mitte dehnt sich um N/(E·A_id) + N·v²/(E·I_id).
+        """
+        A_id, z_id, I_id = self.ideell()
+        v = z_id - self.h / 2
+        erwartet = self.paar.E_cm / (self.b * self.h * (1 / A_id + v * v / I_id))
+        self.assertAlmostEqual(self.zug.ungerissen / erwartet, 1.0, delta=1e-6)
+
+    def test_jeder_punkt_erfuellt_die_formel(self):
+        """M = E_eq · I_c · (χ − χ_0) -- an jedem Punkt der Linie."""
+        for modul in (self.biegung, self.zug):
+            for p in modul.punkte[1:]:
+                vor = [q for q in modul.linie.punkte if q.kraft == p.kraft and q.gerissen == p.gerissen][0]
+                self.assertAlmostEqual(p.modul * modul.bezug * (vor.verformung - modul.null),
+                                       p.kraft, delta=1e-6 * max(1.0, abs(p.kraft)))
+
+    def test_der_riss_und_was_danach_kommt(self):
+        """Beim Riss springt der Modul hinunter, gerissen nimmt er nur noch ab."""
+        self.assertLess(self.biegung.riss, 0.3 * self.biegung.ungerissen)
+        gerissen = [p.modul for p in self.biegung.punkte if p.gerissen]
+        self.assertTrue(all(a >= b for a, b in zip(gerissen, gerissen[1:])))
+        self.assertLess(self.biegung.ende, self.biegung.fliessen)
+        self.assertLess(self.biegung.fliessen, self.biegung.riss)
+
+    def test_ab_dem_zustand_ohne_laufende_kraft(self):
+        """
+        Unter N = −300 kN krümmt die unsymmetrische Bewehrung schon ohne
+        Moment. Gezählt ab dort, ist ungerissen derselbe Modul wie bei N = 0
+        -- der Querschnitt ist linear -- und nahe null kein Ausreisser.
+        """
+        druck = sa.aequivalenter_modul(sa.moment_kruemmung(self.paar, N=-300e3),
+                                       b=self.b, h=self.h, E_cm=self.paar.E_cm)
+        self.assertNotEqual(druck.null, 0.0)
+        ungerissen = [p.modul for p in druck.punkte if not p.gerissen]
+        self.assertAlmostEqual(min(ungerissen) / self.biegung.ungerissen, 1.0, delta=1e-6)
+        self.assertAlmostEqual(max(ungerissen) / self.biegung.ungerissen, 1.0, delta=1e-6)
+        # Druck hält den Querschnitt länger zu und steifer, wenn er reisst.
+        self.assertGreater(druck.riss, self.biegung.riss)
+
+    def test_ueber_den_dienst(self):
+        projekt = Projekt.beispiel()
+        projekt.querschnitte[0].spannungsfaelle = [
+            SpannungsfallEintrag(name="M", art="moment_emodul", werkstoffsatz="charakteristisch"),
+            SpannungsfallEintrag(name="N", art="normalkraft_emodul", M_Ed=30.0)]
+        antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
+        self.assertEqual(antwort.status, 200)
+        biegung, zug = antwort.daten["spannungsanalysen"]["q1"]
+        kurve = biegung["kurve"]
+        self.assertEqual(biegung["titel"], "Äquivalenter E-Modul über dem Moment")
+        self.assertAlmostEqual(kurve["sprung"]["vor"], 35903, delta=1)
+        self.assertAlmostEqual(kurve["sprung"]["nach"], 8925, delta=1)
+        self.assertAlmostEqual(kurve["E_cm"], 33620, delta=1)
+        self.assertEqual(kurve["punkte"][0]["kraft"], 0.0)
+        self.assertIsNotNone(kurve["punkte"][0]["modul"])
+        self.assertIn("massgebend", kurve["bruch"])
+        self.assertEqual(zug["titel"], "Äquivalenter E-Modul über der Normalkraft")
+        self.assertAlmostEqual(zug["kurve"]["fest"], 30.0)
+
+    def test_die_herleitung(self):
+        projekt = Projekt.beispiel()
+        projekt.querschnitte[0].spannungsfall("Steif", art="moment_emodul")
+        projekt.querschnitte[0].spannungsfall("Zugsteif", art="normalkraft_emodul")
+        aufbau, loesung = rechnen(projekt)
+        p = Protokoll()
+        sa.analysen(aufbau, loesung, p)
+        latex = " ".join(b.latex for b in p.bloecke if isinstance(b, GleichungBlock))
+        self.assertIn(r"E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)}", latex)
+        self.assertIn(r"E_{eq} = \frac{N}{A_c", latex)
+        self.assertIn(r"I_c = \frac{b \cdot \left(h\right)^{3}}{12}", latex)
+
+
 class TestHerleitung(unittest.TestCase):
     def test_jede_linie_schreibt_wie_sie_entstand(self):
         projekt = Projekt.beispiel()

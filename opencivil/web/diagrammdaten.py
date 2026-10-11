@@ -237,6 +237,8 @@ def _analyse_dict(analyse) -> dict:
     wahl = paar.wahl
     kopf["wahl"] = {"phi": wahl.kriechzahl, "satz": wahl.satz.value,
                     "rechenart": wahl.art.value, "index": wahl.index}
+    if isinstance(analyse.kurve, spannungsanalyse.Modullinie):
+        return {**kopf, "moeglich": True, "kurve": _modul_dict(analyse.kurve)}
     if analyse.kurve is not None:
         return {**kopf, "moeglich": True, "kurve": _linie_dict(analyse.kurve)}
     return {**kopf, "moeglich": True, "bild": _bild_dict(analyse.bild, analyse.h)}
@@ -272,6 +274,38 @@ def _linie_dict(linie) -> dict:
         "bruch": (None if bruch is None else
                   {**eck(bruch), "eps_oben": bruch.eps_oben * 1e3,
                    "eps_unten": bruch.eps_unten * 1e3, "massgebend": bruch.massgebend}),
+        "tragfaehig": linie.tragfaehig,
+        "hinweis": linie.hinweis,
+    }
+
+
+def _modul_dict(modul) -> dict:
+    """
+    Der aequivalente E-Modul in Zeichengroessen: die laufende Kraft in kNm
+    bzw. kN, der Modul in N/mm², dazu E_cm, an dem er sich misst. Gerechnet
+    ist alles im Kern (:class:`~opencivil.spannungsanalyse.Modullinie`).
+    """
+    linie = modul.linie
+
+    def E(x: Optional[float]) -> Optional[float]:
+        return None if x is None else x / 1e6
+
+    sprung = linie.sprung
+    return {
+        "fest": linie.fest / 1e3, "riss": linie.riss / 1e3, "E_cm": modul.E_cm / 1e6,
+        "punkte": [{"kraft": p.kraft / 1e3, "modul": E(p.modul), "gerissen": p.gerissen,
+                    "modul_I": E(p.modul_I), "modul_II": E(p.modul_II)}
+                   for p in modul.punkte],
+        # Der Sprung beim Reissen: dieselbe Kraft, zwei Moduln.
+        "sprung": (None if sprung is None else
+                   {"kraft": sprung[0].kraft / 1e3,
+                    "vor": E(modul.modul(sprung[0].kraft, sprung[0].verformung)),
+                    "nach": E(modul.riss)}),
+        "fliessen": (None if linie.fliessen is None else
+                     {"kraft": linie.fliessen.kraft / 1e3, "modul": E(modul.fliessen)}),
+        "bruch": (None if linie.bruch is None else
+                  {"kraft": linie.bruch.kraft / 1e3, "modul": E(modul.ende),
+                   "massgebend": linie.bruch.massgebend}),
         "tragfaehig": linie.tragfaehig,
         "hinweis": linie.hinweis,
     }

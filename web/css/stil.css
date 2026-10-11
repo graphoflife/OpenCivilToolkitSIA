@@ -1159,13 +1159,15 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 /* «charakteristisch» fehlten in 14 px zwei Pixel. Der Kopf steht über einer
    Auswahl links, wie ihr Text -- über einer Zahl rechts. */
 .einwirkung.ist-spannung > :nth-child(n+8) select { font-size: 13px; }
+/* Die Art: «M–E_eq» braucht in 13 px 47 px, mit dem üblichen Innenabstand
+   blieben 41. Näher an ihren Pfeil gerückt, passt sie auf jeder Breite. */
+.einwirkung.ist-spannung > :nth-child(3) { font-size: 13px; padding-inline: 5px 2px; }
 .einwirkung.ist-spannung > :nth-child(n+8) .spaltenkopf { text-align: left; }
 /* Am Telefon ist die Karte 70 px schmaler: Werte und Beton je auf einer
-   Zeile, und die Art rückt näher an ihren Pfeil, sonst stünde dort «N,». */
+   Zeile. */
 @container (max-width: 380px) {
   .einwirkung.ist-spannung > :nth-child(8) { grid-column: 2 / 6; }
   .einwirkung.ist-spannung > :nth-child(9) { grid-column: 2 / 6; grid-row: 4; }
-  .einwirkung.ist-spannung > :nth-child(3) { font-size: 13px; padding-inline: 5px 2px; }
 }
 /* Ein Formelzeichen als Kopf: gross geschrieben würde aus φ ein Φ. */
 .spaltenkopf.ist-formel {

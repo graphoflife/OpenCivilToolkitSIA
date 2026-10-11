@@ -56,6 +56,8 @@ q.duktilitaet = True                          # alles Weitere am Eintrag selbst
 q.spannungsfall("Biegung", art="moment_kruemmung", N_Ed=0)          # M-χ-Linie
 q.spannungsfall("Zug", art="normalkraft_dehnung", M_Ed=20,          # N-ε-Linie,
                 kriechzahl=1.0, rechenart="block")                  # eigene Wahl
+q.spannungsfall("Steifigkeit", art="moment_emodul",                 # E_eq über M
+                werkstoffsatz="charakteristisch")
 
 # Jedes Kapitel wählt, womit es rechnet: Kriechzahl, Werte, Rechenart.
 from opencivil.projekt import RechenwahlEintrag
@@ -136,7 +138,7 @@ Fertig und getestet (823 Tests):
 | `nachweis/querschnittsloeser` | Dehnungsebene aus N und M, zwei Bisektionen |
 | `nachweis/` | M-N, Querkraft (mit Bügeln), Duktilität, sprödes Versagen, Zwängung auf Normalkraft und auf Biegung, Stahlspannung unter häufiger (gegen Fliessen) und quasi-ständiger Last (aus der Rissbreite), Knicken am verformten System |
 | `nachweis/schiefe_biegung`, `schubwandnachweis`, `richtungsnachweise` | die Nachweise der Querschnittsanalyse: N mit M_y und M_z, Querkraft mit Torsion, Duktilität und sprödes Versagen je Richtung |
-| `spannungsanalyse.py` | vier Fragen an den Querschnitt: Bild aus N und M oder aus Dehnungen, M-χ- und N-ε-Linie — kein Nachweis |
+| `spannungsanalyse.py` | sechs Fragen an den Querschnitt: Bild aus N und M oder aus Dehnungen, M-χ- und N-ε-Linie, äquivalenter E-Modul über M und über N — kein Nachweis |
 | `bewehrungssuche/` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt – Längsbewehrung, dünnste Platte, Bügel |
 | `bericht/` | der Bericht als Blöcke (`gliederung`), gesetzt als Konsolentext, LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) und Markdown; die Zusammenfassung je Platte |
 | `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `projekt`) und was daraus gebaut wird (`aufbau`) |
@@ -170,7 +172,14 @@ Deshalb kann am Bildschirm gar nichts anderes stehen als im Bericht.
 Kein Nachweis, sondern die Frage, was im Querschnitt geschieht:
 * *N, M* oder *ε oben/unten* -- Dehnung und Spannung über die Höhe;
 * *M–χ* -- die Momenten-Krümmungs-Linie bei fester Normalkraft;
-* *N–ε* -- die Normalkraft-Dehnungs-Linie auf Zug bei festem Moment.
+* *N–ε* -- die Normalkraft-Dehnungs-Linie auf Zug bei festem Moment;
+* *M–E_eq* und *N–E_eq* -- dieselben Linien, umgerechnet in den
+  äquivalenten E-Modul: den Modul, den ein reiner Betonquerschnitt b·h
+  (ungerissen, ohne Stahl, elastisch) bräuchte, um sich gleich stark zu
+  krümmen bzw. zu dehnen -- `E_eq = M/(I_c·(χ − χ_0))` mit `I_c = b·h³/12`,
+  `E_eq = N/(A_c·(ε_m − ε_0))` mit `A_c = b·h`, gezählt ab dem Zustand ohne
+  laufende Kraft. Ein Wert, den man in ein Modell mit ungerissenem Beton
+  eingeben kann.
 
 Eine Linie ist ungerissen bis zum Riss, springt dort und ist darüber gerissen.
 Sie endet bei der ersten Grenzdehnung, wie im Dehnungsfächer. An den Ecken

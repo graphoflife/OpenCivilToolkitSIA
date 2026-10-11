@@ -1,11 +1,12 @@
 /**
  * spannungsbild.js -- was im Querschnitt geschieht, gezeichnet.
  *
- * Bilder zu den vier Fragen aus `opencivil/spannungsanalyse.py`:
+ * Bilder zu den sechs Fragen aus `opencivil/spannungsanalyse.py`:
  *
  *   Dehnung und Spannung über die Höhe   -- für «aus N und M» und «aus Dehnungen»
  *   Momenten-Krümmungs-Linie M–χ         -- bei festgehaltener Normalkraft
  *   Normalkraft-Dehnungs-Linie N–ε       -- bei festgehaltenem Moment
+ *   Äquivalenter E-Modul M–E_eq, N–E_eq  -- dieselben Linien, umgerechnet
  *
  * Die Höhe läuft nach unten, wie man einen Schnitt zeichnet: z = 0 ist die
  * Oberkante. Das ist dieselbe Achse, die der Löser und der Lagenaufbau
@@ -231,8 +232,10 @@ function zeilenbreite(zeile) {
  * Die Namen der Eckpunkte, ohne dass sie einander decken. Jeder probiert der
  * Reihe nach einige Lagen um seinen Punkt -- unten rechts, unten links, oben
  * links, oben rechts, dann weiter unten -- und nimmt die erste, die im Feld
- * liegt und keinen schon gesetzten Namen berührt. Passt keine, steht er an
- * der ersten, ins Feld geschoben.
+ * liegt und keinen schon gesetzten Namen berührt. Sind die Lagen am Punkt
+ * besetzt -- zwei Ecken dicht beisammen --, rückt er schrittweise höher, und
+ * ein feiner Strich zeigt, wohin er gehört. Passt keine, steht er an der
+ * ersten, ins Feld geschoben.
  *
  * Eine Ecke: `px`, `py`, `zeilen` (die erste in Farbe, die übrigen zart),
  * `farbe`.
@@ -248,6 +251,12 @@ function eckenAnschreiben(daten, feld, ecken) {
     const hoehe = (zeilen.length - 1) * ZEILE + 11;
     const lagen = [[1, 15], [-1, 15], [-1, -8 - hoehe + 11], [1, -8 - hoehe + 11],
       [-1, 19 + hoehe], [1, 19 + hoehe], [-1, 23 + 2 * hoehe]];
+    // Weiter oben, je eine Höhe mehr -- mit Strich zum Punkt.
+    const nah = lagen.length;
+    for (let n = 1; n <= 8; n += 1) {
+      const dy = -8 - hoehe + 11 - n * (hoehe + 6);
+      lagen.push([-1, dy], [1, dy]);
+    }
     const kasten = ([seite, dy]) => {
       const x = px + seite * 7;
       return {
@@ -256,11 +265,17 @@ function eckenAnschreiben(daten, feld, ecken) {
         oben: py + dy - 9, unten: py + dy - 9 + hoehe,
       };
     };
-    let k = lagen.map(kasten).find(frei);
+    const wahl = lagen.findIndex((lage) => frei(kasten(lage)));
+    let k = wahl >= 0 ? kasten(lagen[wahl]) : null;
     if (!k) {
       k = kasten(lagen[0]);
       const schub = Math.min(0, feld.rechts - 2 - k.rechts) + Math.max(0, feld.links + 2 - k.links);
       Object.assign(k, { x: k.x + schub, links: k.links + schub, rechts: k.rechts + schub });
+    } else if (wahl >= nah) {
+      daten.append(svgEl('line', {
+        x1: px, y1: py, x2: k.seite > 0 ? k.links : k.rechts, y2: k.unten,
+        stroke: farbe, 'stroke-width': 0.8, opacity: 0.6,
+      }));
     }
     gesetzt.push(k);
     daten.append(svgEl('circle', {
@@ -371,6 +386,104 @@ function linienbild(fall) {
   return svg;
 }
 
+/**
+ * Was die Linie des äquivalenten Moduls ausmacht, je Art: die laufende Kraft,
+ * ihre Einheit und was festgehalten wird.
+ */
+const MODULE = {
+  moment_emodul: { kraft: 'M', kraftEinheit: 'kNm', fest: ['N', 'kN'], achse: 'M [kNm]' },
+  normalkraft_emodul: { kraft: 'N', kraftEinheit: 'kN', fest: ['M', 'kNm'], achse: 'N [kN]' },
+};
+
+/** Ein Modul in N/mm², dazu sein Verhältnis zu E_cm -- den Faktor, um den man E_cm abmindert. */
+function modulText(wert, E_cm) {
+  return `${zahl(wert, 0)} N/mm² = ${(wert / E_cm).toFixed(2)}·E_{cm}`;
+}
+
+/**
+ * Der äquivalente E-Modul über der laufenden Kraft: ungerissen fast
+ * waagrecht, beim Riss senkrecht hinunter -- bei derselben Kraft ein anderer
+ * Modul --, darüber gerissen bis zum Bruch. Gestrichelt die beiden Zustände
+ * je für sich. An den Ecken Riss, Fliessbeginn und Ende.
+ */
+function modulbild(fall) {
+  const k = fall.kurve;
+  const art = MODULE[fall.art];
+  const werte = k.punkte.flatMap((p) => [p.modul, p.modul_I, p.modul_II])
+    .filter((v) => v !== null && v !== undefined);
+  const eMax = Math.max(1e-9, ...werte);
+  const kMax = Math.max(1e-9, ...k.punkte.map((p) => p.kraft));
+  const { svg, daten, x, y, feld } = achsenkreuz({
+    breite: BREITE * 2, hoehe: HOEHE, rand: RAND, rahmen: true,
+    attribute: { class: 'sd-bild sd-breit', preserveAspectRatio: 'xMidYMid meet' },
+    x: { bereich: [0, kMax * 1.05], titel: art.achse },
+    y: { bereich: [0, eMax * 1.08], titel: 'E_eq [N/mm²]' },
+    schrift: { teilung: 9.5, titel: 11 }, titelLinks: 12,
+  });
+
+  const linie = (hol, farbe, breiteStrich, muster) => {
+    const punkte = k.punkte.filter((p) => hol(p) !== null && hol(p) !== undefined);
+    if (punkte.length < 2) return;
+    daten.append(svgEl('polyline', {
+      points: punkte.map((p) => `${x(p.kraft).toFixed(2)},${y(hol(p)).toFixed(2)}`).join(' '),
+      fill: 'none', stroke: farbe, 'stroke-width': breiteStrich,
+      'stroke-dasharray': muster || null,
+    }));
+  };
+  linie((p) => p.modul_I, ACHSE, 1.2, '4 3');
+  linie((p) => p.modul_II, ACHSE, 1.2, '2 3');
+  linie((p) => p.modul, '#16794a', 2.2);
+
+  const f = (wert) => mitEinheit(wert, 1, art.kraftEinheit);
+  const e = (wert) => modulText(wert, k.E_cm);
+  const kennwert = fall.wahl?.index || 'Rd';
+  const gueltig = k.punkte.filter((p) => p.modul !== null && p.modul !== undefined);
+  const ende = gueltig[gueltig.length - 1];
+  const ecken = [];
+  // Das Ende zuerst: es steht am Rand, und die anderen weichen ihm aus.
+  if (ende && k.bruch) {
+    ecken.push({
+      px: x(ende.kraft), py: y(ende.modul), farbe: '#16794a',
+      zeilen: ende.gerissen
+        ? [`${art.kraft}_{${kennwert},u} = ${f(k.bruch.kraft)}`, `E_{eq} = ${e(ende.modul)}`,
+          k.bruch.massgebend]
+        : [`${art.kraft}_{${kennwert},u} = ${f(k.bruch.kraft)}`, `E_{eq} = ${e(ende.modul)}`],
+    });
+  }
+  if (k.fliessen && k.fliessen.modul !== null) {
+    ecken.push({
+      px: x(k.fliessen.kraft), py: y(k.fliessen.modul), farbe: STAHL,
+      zeilen: [`${art.kraft}_{${kennwert}} = ${f(k.fliessen.kraft)}`,
+        `E_{eq} = ${e(k.fliessen.modul)}`],
+    });
+  }
+  // Der Riss: ein Punkt oben, der Name am unteren Ende des Sprungs.
+  if (k.sprung && k.sprung.vor !== null && k.sprung.nach !== null) {
+    daten.append(svgEl('circle', {
+      cx: x(k.sprung.kraft), cy: y(k.sprung.vor), r: 2.4, fill: ZUG,
+    }));
+    ecken.push({
+      px: x(k.sprung.kraft), py: y(k.sprung.nach), farbe: ZUG,
+      zeilen: [`${art.kraft}_{Riss} = ${f(k.sprung.kraft)}`,
+        `E_{eq} = ${zahl(k.sprung.vor, 0)} → ${e(k.sprung.nach)}`],
+    });
+  }
+  eckenAnschreiben(daten, feld, ecken);
+
+  // Ohne Gitter: an den Achsen stehen nur die Grösstwerte.
+  for (const [wert, px, py, anker] of [
+    [kMax.toFixed(0), feld.rechts, HOEHE - 22, 'end'],
+    [eMax.toFixed(0), feld.links - 5, feld.oben + 8, 'end'],
+  ]) {
+    const t = svgEl('text', {
+      x: px, y: py, 'text-anchor': anker, 'font-size': 9.5, fill: ACHSE,
+    });
+    t.textContent = wert;
+    svg.append(t);
+  }
+  return svg;
+}
+
 /** Die Zahlen über dem Bild, die Namen als Formel: χ ist dort kein x. */
 function zahlenzeile(eintraege) {
   return el('div.sd-zahlen', {}, eintraege.map(([latex, wert]) =>
@@ -401,6 +514,37 @@ export function spannungsfallZeichnen(fall) {
   const kopf = el('div.sd-kopf', {
     text: `${fall.name} – ${fall.titel} (${fall.richtung})`,
   });
+
+  if (fall.kurve && MODULE[fall.art]) {
+    const k = fall.kurve;
+    const art = MODULE[fall.art];
+    const K = art.kraft;
+    const kennwert = fall.wahl?.index || 'Rd';
+    const kraft = (wert) => mitEinheit(wert, 1, art.kraftEinheit);
+    const modul = (wert) => (wert === null ? '–' : mitEinheit(wert, 0, 'N/mm²'));
+    return el('div.sd-fall', {}, [
+      kopf,
+      wahlzeile(fall.wahl),
+      zahlenzeile([
+        [art.fest[0], mitEinheit(k.fest, 1, art.fest[1])],
+        [`${K}_{Riss}`, kraft(k.riss)],
+        ...(k.sprung ? [['E_{eq,I}', modul(k.sprung.vor)], ['E_{eq,II}', modul(k.sprung.nach)]]
+          : []),
+        ...(k.bruch ? [[`${K}_{${kennwert},u}`, kraft(k.bruch.kraft)],
+          ['E_{eq,u}', modul(k.bruch.modul)]] : []),
+        ['E_{cm}', mitEinheit(k.E_cm, 0, 'N/mm²')],
+      ]),
+      k.punkte.length ? modulbild(fall) : null,
+      el('p.sd-legende', {
+        text: 'E_eq: der E-Modul, den ein reiner Betonquerschnitt b·h – ungerissen, ohne '
+          + 'Stahl, elastisch – bräuchte, um sich gleich stark zu verformen; gezählt ab dem '
+          + 'Zustand ohne laufende Kraft. Durchgezogen: der Querschnitt – ungerissen bis zum '
+          + 'Riss, dann der Sprung, darüber gerissen (ohne Zugversteifung) · lang gestrichelt: '
+          + 'immer ungerissen (I) · kurz gestrichelt: immer gerissen (II)',
+      }),
+      k.hinweis ? el('p.hinweis', { text: k.hinweis }) : null,
+    ]);
+  }
 
   if (fall.kurve) {
     const k = fall.kurve;

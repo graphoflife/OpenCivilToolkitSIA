@@ -44,6 +44,61 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-11 · Spannung-Dehnung-Analyse: äquivalenter E-Modul über M und über N
+
+Wunsch: zwei weitere Arten neben M–χ und N–ε. Auf der y-Achse der
+äquivalente E-Modul -- der, den man einem reinen Betonquerschnitt geben
+müsste (ungerissen, ohne Stahl, elastisch) --, auf der x-Achse das Moment
+bei fester Normalkraft bis M_Rd,u, und ebenso die Normalkraft bei festem
+Moment.
+
+**Die Formel.** Aus M = E·I·χ und N = E·A·ε, mit dem reinen
+Betonquerschnitt eingesetzt und der echten Verformung des bewehrten:
+
+```
+E_eq = M / (I_c · (χ − χ_0))       I_c = b·h³/12
+E_eq = N / (A_c · (ε_m − ε_0))     A_c = b·h,  ε_m auf halber Höhe
+```
+
+χ und ε_m sind die Zahlen der M–χ- bzw. N–ε-Linie; gerechnet wird nichts
+Neues, jeder Punkt wird umgerechnet (`Modullinie` in `spannungsanalyse.py`).
+
+**Ab dem Zustand ohne laufende Kraft** -- deine Wahl. Was die feste Kraft
+allein verformt, kann ein gerader, ungerissener Betonquerschnitt nicht
+abbilden: bei unsymmetrischer Bewehrung krümmt schon eine Normalkraft, und
+gerissen dehnt schon das Moment die halbe Höhe. Ab null gezählt, ergäbe das
+nahe null Ausreisser:
+
+```
+N–E_eq bei M = 30 kNm, N = 16 kN
+ab null gezählt           99 510 N/mm²   (fast 3·E_cm)
+ab dem Zustand mit M      35 370 N/mm²   (wie bei M = 0)
+```
+
+Ist die feste Kraft null, sind beide gleich.
+
+**Am Beispiel** (Decke über EG, charakteristisch, Parabel, φ = 0, N = 0):
+
+| M | Zustand | E_eq | E_eq/E_cm |
+|---|---|---|---|
+| 0 … 41.4 kNm | ungerissen | 35 903 N/mm² | 1.07 |
+| 41.4 kNm | gleich nach dem Riss | 8 925 N/mm² | 0.27 |
+| 267.7 kNm | Stahl fliesst | 8 271 N/mm² | 0.25 |
+| 278.3 kNm | Ende | 1 714 N/mm² | 0.05 |
+
+Ungerissen von Hand: der ideelle Querschnitt mit (n − 1)·A_s gegen den
+reinen Beton, E_c·I_id/I_c = 35 912 N/mm² -- 0.03 % darüber, das ist die
+Teilung in 60 Fasern. Über N greift die Kraft auf halber Höhe an, der
+ideelle Schwerpunkt liegt tiefer: E_c/(A_c·(1/A_id + v²/I_id)) = 35 366 N/mm²,
+auf sechs Stellen wie die Linie.
+
+**Die Beschriftung.** Fliessbeginn und Ende liegen über M nur wenige kNm
+auseinander, ihre Namen fanden neben den Punkten keinen freien Platz und
+lagen übereinander. Ein Name rückt jetzt, wenn alles am Punkt besetzt ist,
+schrittweise höher und bekommt einen feinen Strich zum Punkt. Die neuen
+Lagen kommen nach den alten an die Reihe; was vorher Platz fand, steht wo
+es stand.
+
 ## 2026-10-09 · Rechenwahl je Kapitel, genaue Resistenzlinie, Vergrösserungsfaktor w/w_c
 
 Wünsche:

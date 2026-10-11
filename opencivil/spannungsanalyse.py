@@ -2,7 +2,7 @@
 opencivil/spannungsanalyse.py -- den Querschnitt ansehen, ohne ihn nachzuweisen.
 
 VERANTWORTUNG:
-Vier Auswertungen am selben Faserintegral, das auch die Nachweise benutzen:
+Sechs Auswertungen am selben Faserintegral, das auch die Nachweise benutzen:
 
 1. **Aus Schnittgroessen** -- ``N`` und ``M`` hinein, Dehnungsebene und
    Spannungsverteilung heraus.
@@ -12,6 +12,11 @@ Vier Auswertungen am selben Faserintegral, das auch die Nachweise benutzen:
    ``M(chi)`` von null bis zum Bruch heraus.
 4. **Normalkraft-Dehnungs-Linie** -- ein Moment hinein, der Verlauf
    ``N(eps_m)`` von null bis zum Bruch auf Zug heraus.
+5. **Aequivalenter E-Modul ueber dem Moment** -- die Linie aus 3,
+   umgerechnet in den Modul, den ein reiner, ungerissener, elastischer
+   Betonquerschnitt braeuchte, um sich gleich stark zu kruemmen.
+6. **Aequivalenter E-Modul ueber der Normalkraft** -- dasselbe aus der
+   Linie in 4, fuer die Dehnung.
 
 KEIN NACHWEIS:
 Hier wird nichts gegen etwas gehalten. Es gibt keinen Erfuellungsgrad und kein
@@ -67,9 +72,11 @@ import re
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import (
-    TYPE_CHECKING, Any, Callable, Dict, List, Mapping, Optional, Tuple,
+    TYPE_CHECKING, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union,
 )
 
+from opencivil.core.einheiten import MIO_MM4, Groesse
+from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Protokoll, StillesProtokoll, Zwischenwerte
 from opencivil.nachweis import dehnungsfaecher
 from opencivil.nachweis.querschnittsloeser import (
@@ -106,12 +113,14 @@ THEMA = "Spannung-Dehnung-Analyse"
 
 
 class Analyseart(str, Enum):
-    """Welche der vier Fragen gestellt wird."""
+    """Welche der sechs Fragen gestellt wird."""
 
     SCHNITTGROESSEN = "schnittgroessen"
     DEHNUNGEN = "dehnungen"
     MOMENT_KRUEMMUNG = "moment_kruemmung"
     NORMALKRAFT_DEHNUNG = "normalkraft_dehnung"
+    MOMENT_EMODUL = "moment_emodul"
+    NORMALKRAFT_EMODUL = "normalkraft_emodul"
 
     @property
     def beschriftung(self) -> str:
@@ -120,6 +129,8 @@ class Analyseart(str, Enum):
             Analyseart.DEHNUNGEN: "Aus Randdehnungen",
             Analyseart.MOMENT_KRUEMMUNG: "Momenten-Krümmungs-Linie",
             Analyseart.NORMALKRAFT_DEHNUNG: "Normalkraft-Dehnungs-Linie",
+            Analyseart.MOMENT_EMODUL: "Äquivalenter E-Modul über dem Moment",
+            Analyseart.NORMALKRAFT_EMODUL: "Äquivalenter E-Modul über der Normalkraft",
         }[self]
 
     @property
@@ -130,7 +141,27 @@ class Analyseart(str, Enum):
             Analyseart.DEHNUNGEN: "ε oben/unten",
             Analyseart.MOMENT_KRUEMMUNG: "M–χ",
             Analyseart.NORMALKRAFT_DEHNUNG: "N–ε",
+            Analyseart.MOMENT_EMODUL: "M–E_eq",
+            Analyseart.NORMALKRAFT_EMODUL: "N–E_eq",
         }[self]
+
+    @property
+    def linie(self) -> Optional["Analyseart"]:
+        """
+        Die Linie, auf der diese Frage laeuft: M-chi oder N-eps -- der Modul
+        ist dieselbe Linie, umgerechnet. ``None`` fuer die beiden Bilder.
+        """
+        return {
+            Analyseart.MOMENT_KRUEMMUNG: Analyseart.MOMENT_KRUEMMUNG,
+            Analyseart.MOMENT_EMODUL: Analyseart.MOMENT_KRUEMMUNG,
+            Analyseart.NORMALKRAFT_DEHNUNG: Analyseart.NORMALKRAFT_DEHNUNG,
+            Analyseart.NORMALKRAFT_EMODUL: Analyseart.NORMALKRAFT_DEHNUNG,
+        }.get(self)
+
+    @property
+    def modul(self) -> bool:
+        """Ob gefragt ist, welchen E-Modul ein reiner Betonquerschnitt braeuchte."""
+        return self in (Analyseart.MOMENT_EMODUL, Analyseart.NORMALKRAFT_EMODUL)
 
 
 # ===========================================================================
@@ -316,6 +347,9 @@ class Loeserpaar:
     ids: Mapping[str, str] = field(default_factory=dict)
     """Kurzname -> Wert-ID der Eingaben, fuer die Herleitung."""
 
+    E_cm: float = 0.0
+    """Der Modul des Betons -- daran misst sich der aequivalente Modul."""
+
     def rissmoment_bei(self, N: float) -> float:
         """
         Das Rissmoment bei der Normalkraft ``N`` (Zug positiv), in Nm.
@@ -411,7 +445,7 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
         M_Riss=rissmoment(h=h, b=b, f_ctm=f_ctm).M_Riss,
         k_t_zug=k_t_zug, f_ct_eff_zug=k_t_zug * f_ctm,
         eps_y=wert(ids["f_s"]) / wert(ids["E_s"]),
-        wahl=wahl, grenznamen=namen, ids=ids)
+        wahl=wahl, grenznamen=namen, ids=ids, E_cm=w.E_cm)
 
 
 # ===========================================================================
@@ -708,15 +742,160 @@ def normalkraft_dehnung(paar: Loeserpaar, *, M: float) -> Linie:
 
 
 # ===========================================================================
+# Der aequivalente E-Modul
+# ===========================================================================
+
+#: Unter diesem Anteil der groessten Kraft der Linie gilt eine Kraft als null --
+#: der erste Punkt einer gerissen beginnenden Linie traegt null bis auf die
+#: Schranke des Loesers.
+NULLKRAFT = 1e-6
+
+
+@dataclass(frozen=True)
+class Modulpunkt:
+    """
+    Ein Punkt der Linie des aequivalenten Moduls: die laufende Kraft und der
+    Modul, der dort gilt -- dazu beide Zustaende zum Vergleich, wie bei der
+    Linie, aus der er stammt.
+    """
+
+    kraft: float
+    modul: Optional[float]
+    """In Pa; ``None``, wo er nichts sagt."""
+
+    gerissen: bool
+    modul_I: Optional[float]
+    modul_II: Optional[float]
+
+
+@dataclass
+class Modullinie:
+    """
+    Der aequivalente E-Modul ueber dem Moment oder ueber der Normalkraft.
+
+    Der Modul, den ein reiner Betonquerschnitt braeuchte -- ungerissen, ohne
+    Stahl, elastisch --, um sich unter der laufenden Kraft gleich stark zu
+    kruemmen bzw. zu dehnen wie der bewehrte Querschnitt::
+
+        E_eq = M / (I_c · (chi - chi_0))       I_c = b·h³/12
+        E_eq = N / (A_c · (eps_m - eps_0))     A_c = b·h
+
+    Gezaehlt wird ab dem Zustand ohne laufende Kraft -- ``chi_0`` bei M = 0
+    unter der festen Normalkraft, ``eps_0`` bei N = 0 unter dem festen
+    Moment --, nach Vorgabe (2026-10-11). Was die festgehaltene Kraft allein
+    verformt, kann ein gerader, ungerissener Betonquerschnitt nicht abbilden:
+    bei unsymmetrischer Bewehrung kruemmt schon eine Normalkraft, und ein
+    gerissener Querschnitt dehnt sich schon unter dem Moment allein. Ab null
+    gezaehlt, ergaebe das nahe null Ausreisser -- am Beispiel bei M = 30 kNm
+    und N = 16 kN 99 500 N/mm², fast das Dreifache von E_cm. Ist die feste
+    Kraft null, ist es genau ``M = E·I·chi`` bzw. ``N = E·A·eps``.
+
+    Umgerechnet wird jeder Punkt der :class:`Linie`; gerechnet wird nichts
+    Neues. So kann diese Linie nichts anderes zeigen als die M-chi- oder
+    N-eps-Linie daneben.
+    """
+
+    art: Analyseart
+    linie: Linie
+    """Die M-chi- oder N-eps-Linie, aus der umgerechnet wird."""
+
+    bezug: float
+    """``I_c`` in m⁴ bzw. ``A_c`` in m² -- der reine Betonquerschnitt."""
+
+    null: float
+    """Die Verformung ohne laufende Kraft: ``chi_0`` bzw. ``eps_0``."""
+
+    E_cm: float
+    """Zum Vergleich: ``E_eq/E_cm`` ist der Faktor, um den man E_cm abmindert."""
+
+    punkte: List[Modulpunkt] = field(default_factory=list)
+
+    def modul(self, kraft: float, verformung: float) -> Optional[float]:
+        """``Kraft / (Bezug · (Verformung − null))`` -- ``None``, wo das nichts sagt."""
+        aenderung = verformung - self.null
+        if kraft == 0.0 or aenderung == 0.0:
+            return None
+        return kraft / (self.bezug * aenderung)
+
+    @property
+    def ungerissen(self) -> Optional[float]:
+        """Der Modul des ungerissenen Teils -- dort ist der Querschnitt linear."""
+        return next((p.modul for p in reversed(self.punkte)
+                     if not p.gerissen and p.modul is not None), None)
+
+    @property
+    def riss(self) -> Optional[float]:
+        """Der Modul gleich nach dem Riss, bei derselben Kraft."""
+        sprung = self.linie.sprung
+        return None if sprung is None else self.modul(sprung[1].kraft, sprung[1].verformung)
+
+    @property
+    def fliessen(self) -> Optional[float]:
+        f = self.linie.fliessen
+        return None if f is None else self.modul(f.kraft, f.verformung)
+
+    @property
+    def ende(self) -> Optional[float]:
+        """Der Modul am Ende der Linie -- beim Bruch, oder ungerissen, wenn sie es bleibt."""
+        return next((p.modul for p in reversed(self.punkte) if p.modul is not None), None)
+
+
+def aequivalenter_modul(linie: Linie, *, b: float, h: float, E_cm: float) -> Modullinie:
+    """
+    Die M-chi- oder N-eps-Linie als Linie des aequivalenten Moduls -- siehe
+    :class:`Modullinie`. Beide Vergleichszustaende zaehlen ab ihrer eigenen
+    Verformung ohne laufende Kraft.
+    """
+    momente = linie.art is Analyseart.MOMENT_KRUEMMUNG
+    art = Analyseart.MOMENT_EMODUL if momente else Analyseart.NORMALKRAFT_EMODUL
+    bezug = b * h ** 3 / 12.0 if momente else b * h
+    if not linie.punkte:
+        return Modullinie(art, linie, bezug, 0.0, E_cm)
+
+    # Der erste Punkt ist der Zustand ohne laufende Kraft -- ungerissen bei
+    # null, oder gerissen bis auf die Schranke des Loesers.
+    massstab = max(abs(p.kraft) for p in linie.punkte) or 1.0
+    erster = linie.punkte[0]
+    ohne = abs(erster.kraft) <= NULLKRAFT * massstab
+    null, null_I, null_II = ((erster.verformung, erster.verformung_I, erster.verformung_II)
+                             if ohne else (0.0, 0.0, 0.0))
+    modul = Modullinie(art, linie, bezug, null, E_cm)
+
+    def geteilt(kraft: float, verformung: Optional[float],
+                ab: Optional[float]) -> Optional[float]:
+        if verformung is None or ab is None or kraft == 0.0 or verformung == ab:
+            return None
+        return kraft / (bezug * (verformung - ab))
+
+    for p in (linie.punkte[1:] if ohne else linie.punkte):
+        modul.punkte.append(Modulpunkt(
+            kraft=p.kraft, modul=geteilt(p.kraft, p.verformung, null), gerissen=p.gerissen,
+            modul_I=geteilt(p.kraft, p.verformung_I, null_I),
+            modul_II=geteilt(p.kraft, p.verformung_II, null_II)))
+
+    # Bei null ist der Modul null durch null. Ungerissen ist der Querschnitt
+    # linear: dort gilt der Wert des naechsten Punkts genau, und die Linie
+    # beginnt bei null statt beim ersten Schritt.
+    if ohne and not erster.gerissen and modul.punkte and not modul.punkte[0].gerissen:
+        naechster = modul.punkte[0]
+        modul.punkte.insert(0, Modulpunkt(
+            kraft=0.0, modul=naechster.modul, gerissen=False,
+            modul_I=naechster.modul_I, modul_II=naechster.modul_II))
+    return modul
+
+
+# ===========================================================================
 # Herleitung -- fuer die Formelsammlung
 # ===========================================================================
 
 
 def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
-                werte: Mapping[str, "Wert"], raum: str) -> None:
+                werte: Mapping[str, "Wert"], raum: str,
+                modul: Optional[Modullinie] = None) -> None:
     """
     Wie die Linie entstand -- mit den Zahlen dieses Falls, und ohne sie in der
-    Formelsammlung, die daraus «Spannung-Dehnung-Analyse» bildet.
+    Formelsammlung, die daraus «Spannung-Dehnung-Analyse» bildet. Mit
+    ``modul`` dazu, wie aus ihr der aequivalente E-Modul wird.
     """
     ab = len(p.bloecke)
     w = Zwischenwerte(f"{raum}.analyse.{re.sub(r'[^0-9A-Za-z]+', '_', fall.name)}")
@@ -850,7 +1029,71 @@ def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
                      {"eps_oben": oben, "eps_unten": unten},
                      titel="Grösste Dehnung auf halber Höhe")
         p.text(f"Massgebend: {b.massgebend}.")
+    if modul is not None:
+        _herleitung_modul(p, w, modul, b=ein("b"), h=h)
     p.herkunft_stempeln(THEMA, ab=ab)
+
+
+def _herleitung_modul(p: Protokoll, w: Zwischenwerte, modul: Modullinie, *,
+                      b: "Wert", h: "Wert") -> None:
+    """
+    Der aequivalente Modul: der reine Betonquerschnitt, die Formel und der
+    Modul an den Ecken der Linie -- jede Zeile mit Kraft und Verformung, also
+    von Hand nachzurechnen.
+    """
+    momente = modul.art is Analyseart.MOMENT_EMODUL
+    p.erklaerung(
+        "Der äquivalente E-Modul ist der Modul, den ein reiner Betonquerschnitt "
+        "bräuchte – ungerissen, ohne Stahl, elastisch –, um sich unter der laufenden "
+        "Kraft gleich stark zu verformen wie der bewehrte Querschnitt. Gezählt wird "
+        "ab dem Zustand ohne laufende Kraft: was die festgehaltene Kraft allein "
+        "verformt, kann ein solcher Querschnitt nicht abbilden. Ist sie null, ist es "
+        "genau M = E·I·χ bzw. N = E·A·ε.")
+    if momente:
+        bezug = w.wert("I_c", "I_c", Groesse.aus_si(modul.bezug, MIO_MM4), stellen=1)
+        p.formel(bezug, r"\frac{@b \cdot \left(@h\right)^{3}}{12}", {"b": b, "h": h},
+                 titel="Reiner Betonquerschnitt: Flächenmoment")
+        p.ansatz(r"E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)}",
+                 titel="Äquivalenter E-Modul über dem Moment")
+        p.wert(w.kruemmung("chi_0", r"\chi_0", modul.null),
+               titel="Krümmung ohne Moment, unter der festen Normalkraft")
+        kopf = [Mathe(r"M\ [\mathrm{kNm}]"), Mathe(r"\chi - \chi_0\ [\mathrm{m}^{-1}]")]
+        verformung = lambda v: f"{v - modul.null:.5f}"
+    else:
+        bezug = w.flaeche("A_c", "A_c", modul.bezug)
+        p.formel(bezug, r"@b \cdot @h", {"b": b, "h": h},
+                 titel="Reiner Betonquerschnitt: Fläche")
+        p.ansatz(r"E_{eq} = \frac{N}{A_c \cdot \left(\varepsilon_m - \varepsilon_0\right)}",
+                 titel="Äquivalenter E-Modul über der Normalkraft")
+        p.wert(w.dehnung("eps_0", r"\varepsilon_0", modul.null, stellen=4),
+               titel="Dehnung auf halber Höhe ohne Normalkraft, unter dem festen Moment")
+        kopf = [Mathe(r"N\ [\mathrm{kN}]"), Mathe(r"\varepsilon_m - \varepsilon_0\ [‰]")]
+        verformung = lambda v: f"{(v - modul.null) * 1e3:.4f}"
+
+    linie = modul.linie
+    ecken: List[Tuple[str, float, float]] = []
+    if linie.sprung is not None:
+        vor, nach = linie.sprung
+        ecken += [("ungerissen, beim Riss", vor.kraft, vor.verformung),
+                  ("gerissen, beim Riss", nach.kraft, nach.verformung)]
+    elif linie.punkte and not linie.punkte[-1].gerissen:
+        ecken.append(("ungerissen", linie.punkte[-1].kraft, linie.punkte[-1].verformung))
+    if linie.fliessen is not None:
+        ecken.append(("Fliessbeginn", linie.fliessen.kraft, linie.fliessen.verformung))
+    if linie.punkte and linie.punkte[-1].gerissen:
+        ecken.append(("Ende", linie.punkte[-1].kraft, linie.punkte[-1].verformung))
+    zeilen = []
+    for name, kraft, v in ecken:
+        E = modul.modul(kraft, v)
+        if E is None:
+            continue
+        zeilen.append([name, Mathe(f"{kraft / 1e3:.1f}"), Mathe(verformung(v)),
+                       Mathe(f"{E / 1e6:.0f}"), Mathe(f"{E / modul.E_cm:.3f}")])
+    if zeilen:
+        p.tabelle(kopf=["Punkt", *kopf, Mathe(r"E_{eq}\ [\mathrm{N/mm^2}]"),
+                        Mathe(r"E_{eq}/E_{cm}")],
+                  zeilen=zeilen, titel="Der äquivalente Modul an den Ecken der Linie",
+                  ausrichtung="lrrrr")
 
 
 # ===========================================================================
@@ -871,8 +1114,8 @@ class Analyse:
     """Plattendicke in m -- fuer das Bild."""
 
     bild: Optional[Querschnittsbild] = None
-    kurve: Optional[Linie] = None
-    """Die M-chi- oder N-eps-Linie."""
+    kurve: Optional[Union[Linie, "Modullinie"]] = None
+    """Die M-chi- oder N-eps-Linie -- oder der aequivalente Modul daraus."""
 
     paar: Optional[Loeserpaar] = None
     """Womit gerechnet wurde -- Kriechzahl, Wertesatz, Betongesetz."""
@@ -886,17 +1129,22 @@ class Analyse:
 
 
 def auswerten(fall, art: Analyseart, paar: Loeserpaar) -> Tuple[
-        Optional[Querschnittsbild], Optional[Linie]]:
-    """Die eine der vier Fragen stellen, die dieser Fall stellt -- in SI."""
+        Optional[Querschnittsbild], Optional[Union[Linie, Modullinie]]]:
+    """Die eine der sechs Fragen stellen, die dieser Fall stellt -- in SI."""
     if art is Analyseart.DEHNUNGEN:
         return aus_dehnungen(paar.gerissen, eps_oben=fall.eps_oben / 1e3,
                              eps_unten=fall.eps_unten / 1e3), None
-    if art is Analyseart.MOMENT_KRUEMMUNG:
-        return None, moment_kruemmung(paar, N=fall.N_Ed * 1e3)
-    if art is Analyseart.NORMALKRAFT_DEHNUNG:
-        return None, normalkraft_dehnung(paar, M=fall.M_Ed * 1e3)
-    return aus_schnittgroessen(paar.gerissen, N=fall.N_Ed * 1e3,
-                               M=fall.M_Ed * 1e3), None
+    if art.linie is Analyseart.MOMENT_KRUEMMUNG:
+        linie = moment_kruemmung(paar, N=fall.N_Ed * 1e3)
+    elif art.linie is Analyseart.NORMALKRAFT_DEHNUNG:
+        linie = normalkraft_dehnung(paar, M=fall.M_Ed * 1e3)
+    else:
+        return aus_schnittgroessen(paar.gerissen, N=fall.N_Ed * 1e3,
+                                   M=fall.M_Ed * 1e3), None
+    if art.modul:
+        return None, aequivalenter_modul(linie, b=paar.gerissen.b, h=paar.gerissen.h,
+                                         E_cm=paar.E_cm)
+    return None, linie
 
 
 def analysen(aufbau: "Aufbau", loesung: "Loesung",
@@ -948,7 +1196,10 @@ def analysen(aufbau: "Aufbau", loesung: "Loesung",
             else:
                 analyse.h = paar.gerissen.h
                 analyse.bild, analyse.kurve = auswerten(fall, analyse.art, paar)
-                if analyse.kurve is not None:
+                if isinstance(analyse.kurve, Modullinie):
+                    _herleitung(p, fall, paar, analyse.kurve.linie, loesung.werte,
+                                querschnitt.id, modul=analyse.kurve)
+                elif analyse.kurve is not None:
                     _herleitung(p, fall, paar, analyse.kurve, loesung.werte, querschnitt.id)
             liste.append(analyse)
         ergebnis[kennung] = liste

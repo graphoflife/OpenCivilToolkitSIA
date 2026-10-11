@@ -432,6 +432,12 @@ class Projekt(Beschreibung):
                             rechenart="block")
         decke.spannungsfall("Biegung von Hand", art="moment_kruemmung",
                             rechenart="handrechnung")
+        # Der äquivalente E-Modul, einmal über dem Moment und einmal über der
+        # Normalkraft bei festem Moment -- dort zählt er ab dem Zustand ohne N.
+        decke.spannungsfall("Biegesteifigkeit", art="moment_emodul",
+                            werkstoffsatz="charakteristisch")
+        decke.spannungsfall("Dehnsteifigkeit", art="normalkraft_emodul", M_Ed=30,
+                            werkstoffsatz="charakteristisch")
 
         # Ein Streifen von 500 mm: M und N je b, V je Meter. Mit halben
         # Momenten sind es dieselben Grade wie bei 1000 mm -- nur die

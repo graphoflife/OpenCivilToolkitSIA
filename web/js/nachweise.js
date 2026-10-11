@@ -853,6 +853,20 @@ function spannungsZeile(querschnitt, index) {
   // Je Art andere Felder -- und andere Beschriftungen darüber. Ohne sie
   // stünden dort zwei namenlose Zahlen, und ob die erste eine Kraft oder
   // eine Dehnung ist, sähe man erst am Ergebnis.
+  const kruemmung = {
+    kopf: ['N_Ed [kN]', ''],
+    felder: () => [
+      zahl('N_Ed', 'Normalkraft in kN – Zug positiv', 50),
+      el('span.kurvenhinweis', { text: '0 … M_Rd,u' }),
+    ],
+  };
+  const dehnung = {
+    kopf: ['M_Ed [kNm]', ''],
+    felder: () => [
+      zahl('M_Ed', 'Moment in kNm, festgehalten', 10),
+      el('span.kurvenhinweis', { text: '0 … N_Rd,u' }),
+    ],
+  };
   const bauplan = {
     schnittgroessen: {
       kopf: ['N_Ed [kN]', 'M_Ed [kNm]'],
@@ -868,20 +882,11 @@ function spannungsZeile(querschnitt, index) {
         zahl('eps_unten', 'Randdehnung unten in ‰ – Zug positiv', 0.5),
       ],
     },
-    moment_kruemmung: {
-      kopf: ['N_Ed [kN]', ''],
-      felder: () => [
-        zahl('N_Ed', 'Normalkraft in kN – Zug positiv', 50),
-        el('span.kurvenhinweis', { text: '0 … M_Rd,u' }),
-      ],
-    },
-    normalkraft_dehnung: {
-      kopf: ['M_Ed [kNm]', ''],
-      felder: () => [
-        zahl('M_Ed', 'Moment in kNm, festgehalten', 10),
-        el('span.kurvenhinweis', { text: '0 … N_Rd,u' }),
-      ],
-    },
+    // Der äquivalente Modul läuft auf denselben Linien: dieselben Felder.
+    moment_kruemmung: kruemmung,
+    moment_emodul: kruemmung,
+    normalkraft_dehnung: dehnung,
+    normalkraft_emodul: dehnung,
   }[k.art] || { kopf: ['', ''], felder: () => [el('span'), el('span')] };
   const katalog = zustand.katalog?.spannungsanalyse || {};
 

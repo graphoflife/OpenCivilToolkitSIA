@@ -1399,6 +1399,10 @@
           "text": "Mit der Handrechnung rechnet die Linie mit demselben Querschnitt wie die Resistenzlinie aus Handrechnung: der Beton als Spannungsblock, die gedrückte Bewehrung weggelassen, die Bewehrung jeder Seite zu einer Lage in ihrem Schwerpunkt zusammengefasst, und der Beton auch dort gezählt, wo der Stahl liegt. Am Ende der Linie steht darum der Widerstand der Handrechnung."
         },
         {
+          "art": "text",
+          "text": "Der äquivalente E-Modul ist der Modul, den ein reiner Betonquerschnitt bräuchte – ungerissen, ohne Stahl, elastisch –, um sich unter der laufenden Kraft gleich stark zu verformen wie der bewehrte Querschnitt. Gezählt wird ab dem Zustand ohne laufende Kraft: was die festgehaltene Kraft allein verformt, kann ein solcher Querschnitt nicht abbilden. Ist sie null, ist es genau M = E·I·χ bzw. N = E·A·ε."
+        },
+        {
           "art": "gleichung",
           "latex": "\\sigma_c = E_{c,eff} \\cdot \\varepsilon_c",
           "markdown": "**Beton ungerissen, in Druck und Zug**\n\n$$\n\\sigma_c = E_{c,eff} \\cdot \\varepsilon_c\n$$",
@@ -1457,6 +1461,42 @@
           "latex": "\\sigma_s = \\begin{cases} \\min\\left(E_s \\cdot \\varepsilon_s;\\ f_{yd}\\right) & \\varepsilon_s > 0 \\\\[1ex] 0 & \\varepsilon_s \\le 0 \\quad (\\text{gedrückt: weggelassen}) \\end{cases}",
           "markdown": "**Stahl in der Handrechnung: nur auf Zug**\n\n$$\n\\sigma_s = \\begin{cases} \\min\\left(E_s \\cdot \\varepsilon_s;\\ f_{yd}\\right) & \\varepsilon_s > 0 \\\\[1ex] 0 & \\varepsilon_s \\le 0 \\quad (\\text{gedrückt: weggelassen}) \\end{cases}\n$$",
           "titel": "Stahl in der Handrechnung: nur auf Zug",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "I_c = \\frac{b \\cdot \\left(h\\right)^{3}}{12}",
+          "markdown": "**Reiner Betonquerschnitt: Flächenmoment**\n\n$$\nI_c = \\frac{b \\cdot \\left(h\\right)^{3}}{12}\n$$",
+          "titel": "Reiner Betonquerschnitt: Flächenmoment",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "E_{eq} = \\frac{M}{I_c \\cdot \\left(\\chi - \\chi_0\\right)}",
+          "markdown": "**Äquivalenter E-Modul über dem Moment**\n\n$$\nE_{eq} = \\frac{M}{I_c \\cdot \\left(\\chi - \\chi_0\\right)}\n$$",
+          "titel": "Äquivalenter E-Modul über dem Moment",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "A_c = b \\cdot h",
+          "markdown": "**Reiner Betonquerschnitt: Fläche**\n\n$$\nA_c = b \\cdot h\n$$",
+          "titel": "Reiner Betonquerschnitt: Fläche",
+          "referenz": "",
+          "wert_id": "",
+          "gruppe": ""
+        },
+        {
+          "art": "gleichung",
+          "latex": "E_{eq} = \\frac{N}{A_c \\cdot \\left(\\varepsilon_m - \\varepsilon_0\\right)}",
+          "markdown": "**Äquivalenter E-Modul über der Normalkraft**\n\n$$\nE_{eq} = \\frac{N}{A_c \\cdot \\left(\\varepsilon_m - \\varepsilon_0\\right)}\n$$",
+          "titel": "Äquivalenter E-Modul über der Normalkraft",
           "referenz": "",
           "wert_id": "",
           "gruppe": ""
