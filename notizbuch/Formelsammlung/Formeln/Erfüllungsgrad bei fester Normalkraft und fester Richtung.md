@@ -19,3 +19,11 @@ $$
 - [[Schiefe Biegung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Unter schiefer Biegung ist das Moment ein Vektor $(M_y, M_z)$. Gemessen wird
+bei festgehaltener Normalkraft und festgehaltener Richtung: wie weit lässt
+sich das Moment in seiner eigenen Richtung steigern, bis der Querschnitt
+bricht? Der Erfüllungsgrad ist das Verhältnis der Beträge -- dieselbe Idee
+wie bei der Platte bei festgehaltener Normalkraft, nur in der Ebene.

@@ -38,3 +38,10 @@ $$
 - [[Schiefe Biegung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Der Betrag des Momentenvektors der gefundenen Ebene. Weil die Ebene so
+gesucht ist, dass ihr Moment in dieselbe Richtung zeigt wie die Einwirkung,
+ist das der Widerstand in genau dieser Richtung -- und der Erfüllungsgrad das
+Verhältnis der Beträge.

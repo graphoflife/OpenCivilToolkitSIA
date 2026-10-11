@@ -20,3 +20,11 @@ $$
 - [[Querkraft und Torsion]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Dasselbe Fachwerk wie bei der Platte (siehe
+[[Querkraftwiderstand mit Querkraftbewehrung]]), je Länge der Wand
+geschrieben: die Bügel mit $A_{sw}/s \cdot f_{sd} \cot\alpha$, die
+Druckdiagonalen mit $b_w\, k_c f_{cd} \sin\alpha\cos\alpha$. Die Neigung wird
+so gewählt, dass das Kleinere der beiden am grössten ist.

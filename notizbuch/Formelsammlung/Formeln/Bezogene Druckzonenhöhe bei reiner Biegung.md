@@ -34,3 +34,10 @@ $$
 - [[Duktilität je Richtung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Druckzonenhöhe des gezeichneten Querschnitts im Verhältnis zur
+statischen Höhe, beide senkrecht zur Nulllinie gemessen, die unter schiefer
+Biegung schräg liegt. Gerechnet bei reiner Biegung, $N = 0$, wie bei der
+Platte. Sie prüft die [[Bedingung der Duktilität]].

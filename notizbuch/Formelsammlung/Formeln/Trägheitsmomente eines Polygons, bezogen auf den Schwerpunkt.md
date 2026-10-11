@@ -19,3 +19,11 @@ $$
 - [[Querschnittsanalyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Dieselbe Idee wie bei der Fläche: das Flächenmoment zweiten Grades als Summe
+über die Kanten, erst bezogen auf den Ursprung. Der Satz von Steiner rückt es
+dann auf den Schwerpunkt: $I = I_0 - A \cdot e^2$. Für schiefe Biegung und
+unsymmetrische Querschnitte kommt das Deviationsmoment $I_{yz}$ auf dieselbe
+Weise dazu.

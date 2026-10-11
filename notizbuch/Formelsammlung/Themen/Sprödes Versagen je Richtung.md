@@ -21,3 +21,14 @@ Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Da
 7. [[Erfüllungsgrad]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Dieselbe Frage wie bei der Platte (siehe [[Sprödes Versagen]]): trägt der
+bewehrte Querschnitt mehr, als der unbewehrte im Augenblick des Risses
+abgibt? Beim gezeichneten Querschnitt ist das Rissmoment nicht mehr
+$b h^2/6$ mal Zugfestigkeit: es hängt an der Form, an der Richtung des
+Moments und, bei unsymmetrischen Querschnitten, am Deviationsmoment. Der Riss
+beginnt am gezogensten Betonpunkt (siehe
+[[Spannung im ungerissenen Querschnitt]],
+[[Widerstandsmoment zum gezogensten Betonpunkt]]).

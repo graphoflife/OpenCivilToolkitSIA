@@ -29,3 +29,9 @@ $$
 - [[Schiefe Biegung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Kräfte aller Teile mal ihrem Abstand zum Schwerpunkt in $z$: das Moment um
+die $y$-Achse. Die Vorzeichen folgen der Konvention der Querschnittsanalyse --
+Zug positiv, $y$ nach rechts, $z$ nach oben; ein positives $M_y$ zieht unten.

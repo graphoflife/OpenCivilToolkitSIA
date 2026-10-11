@@ -27,3 +27,21 @@ Der Bruchzustand: jede Dehnungsebene, bei der ein Werkstoff an seiner Grenze ste
 11. [[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Wirken Momente um beide Achsen, liegt die Nulllinie schräg, und der
+Querschnitt dreht sich nicht mehr um eine seiner Achsen. Das Werkzeug rechnet
+darum mit einer Dehnungsebene beliebiger Richtung: die Dehnung hängt vom
+Abstand in der Zugrichtung $n$ ab, die Nulllinie steht senkrecht dazu.
+
+Der Bruchzustand ist dieselbe Idee wie beim Dehnungsfächer der Platte: der
+Beton am gedrücktesten Punkt bis $\varepsilon_{c2d}$, ganz gedrückt im Punkt
+C bis $\varepsilon_{c1d}$, jeder Stab bis $\pm\varepsilon_{ud}$. Gesucht wird
+die Ebene, deren Normalkraft $N_{Ed}$ ist und deren Moment in dieselbe
+Richtung zeigt wie die Einwirkung; ihr Betrag ist der
+[[Widerstand in der Richtung der Einwirkung]].
+
+Integriert wird über Streifen quer zur Zugrichtung, deren Grenzen auf jede
+Polygonecke fallen -- so ist die Summe für Polygone genau. Nachgewiesen wird
+nicht die Suche, sondern ihre Probe: die Kraft jedes Teils und die Summen.

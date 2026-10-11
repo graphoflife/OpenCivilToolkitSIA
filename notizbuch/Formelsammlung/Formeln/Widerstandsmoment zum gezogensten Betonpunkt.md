@@ -95,3 +95,12 @@ $$
 - [[Sprödes Versagen je Richtung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Das Rissmoment ist Zugfestigkeit mal Widerstandsmoment. Für den gezeichneten
+Querschnitt folgt das Widerstandsmoment aus der
+[[Spannung im ungerissenen Querschnitt]]: gesucht ist das Moment, bei dem der
+gezogenste Punkt gerade $f_{ct,eff}$ erreicht. Welche der vier Fassungen gilt,
+hängt davon ab, um welche Achse das Moment wirkt und mit welchem Vorzeichen --
+darum stehen hier vier.

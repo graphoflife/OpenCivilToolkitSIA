@@ -360,6 +360,16 @@ class TestDasNotizbuchImRepo(unittest.TestCase):
     def setUpClass(cls):
         cls.dateien = tresor.vorhandene(bruecke.NOTIZBUCH)
 
+    def test_jede_formel_und_jedes_thema_hat_theorie(self):
+        """
+        Unter der Linie steht die Theorie, von Hand. Kommt eine Formel neu dazu,
+        fehlt sie -- dann hier zuerst schreiben, ohne erfundene Normstelle.
+        """
+        ohne = [p for p, text in self.dateien.items()
+                if (d := tresor.zerlegen(text)).erzeugt and d.eigen is not None
+                and "## Theorie" not in d.eigen]
+        self.assertEqual(ohne, [])
+
     def test_keine_verwaisten_seiten(self):
         verwaist = [p for p, text in self.dateien.items()
                     if tresor.zerlegen(text).eigenschaften.get("verwaist") == "true"]

@@ -21,3 +21,10 @@ $$
 - [[Querschnittsanalyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Eine Stablinie verteilt Stäbe auf einer Strecke der Länge $L$. Gewünscht ist
+ein Abstand; damit beide Enden besetzt sind und alle Felder gleich, wird die
+Zahl der Felder gerundet und der Abstand daraus neu bestimmt. Er weicht vom
+gewünschten so wenig ab, wie die Rundung erlaubt.

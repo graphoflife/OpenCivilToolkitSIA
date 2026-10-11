@@ -29,3 +29,9 @@ $$
 - [[Schiefe Biegung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Das Gegenstück um die $z$-Achse: die Kräfte mal ihrem Abstand zum Schwerpunkt
+in $y$. Zusammen mit dem Moment um $y$ ergibt sich der Momentenvektor des
+Bruchzustands.

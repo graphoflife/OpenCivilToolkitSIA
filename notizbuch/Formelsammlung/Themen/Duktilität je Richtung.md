@@ -17,3 +17,11 @@ Ein Querschnitt kündigt sein Versagen an, wenn die Bewehrung fliesst, bevor der
 3. [[Erfüllungsgrad]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Dieselbe Bedingung wie bei der Platte (siehe [[Duktilität]]): die
+Druckzone muss klein bleiben, damit die Bewehrung fliesst, bevor der Beton
+bricht. Beim gezeichneten Querschnitt liegt die Nulllinie unter schiefer
+Biegung schräg; $x$ und $d$ werden darum senkrecht zu ihr gemessen -- $x$ bis
+zum gedrücktesten Betonpunkt, $d$ bis zum entferntesten gezogenen Stab.

@@ -19,3 +19,15 @@ $$
 - [[Querkraft und Torsion]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Das Federmodell: jede Wand $i$ trägt nur entlang ihrer Achse $e_i$, mit einer
+Steifigkeit proportional zu ihrer Dicke mal Länge, $k_i = b_{w,i} \cdot l_i$.
+Verschiebt sich der Querschnitt um $u$, nimmt jede Wand die Kraft
+$k_i\, e_i \cdot u$ auf. Die Verschiebung ist die, bei der die Summe aller
+Wandkräfte die Querkraft $V$ ergibt -- ein lineares Gleichungssystem mit zwei
+Unbekannten.
+
+Steife, lange Wände ziehen mehr Kraft an. Nach Vorgabe eingebaut, nicht
+nachgeschlagen.

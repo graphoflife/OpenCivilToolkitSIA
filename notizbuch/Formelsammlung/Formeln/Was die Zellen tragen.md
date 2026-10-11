@@ -34,3 +34,10 @@ $$
 - [[Querkraft und Torsion]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Torsion, die übrig bleibt: die einwirkende, vermindert um den
+[[Versatz – Moment der Querkraftanteile um den Schwerpunkt|Versatz]]. Sie
+verteilen die geschlossenen Zellen nach Bredt (siehe
+[[Torsion in den Zellen (Bredt, mehrzellig)]]).

@@ -33,3 +33,9 @@ $$
 - [[Querkraft und Torsion]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Wandkräfte aus der Querkraft gehen nicht durch den Schwerpunkt: jede hat
+um ihn ein Moment, Kraft mal Hebelarm. Ihre Summe ist der Versatz -- ein Teil
+der Torsion, den die Wände schon tragen, ohne dass eine Zelle mitwirkt.

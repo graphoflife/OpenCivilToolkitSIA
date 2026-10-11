@@ -22,3 +22,10 @@ $$
 - [[Sprödes Versagen je Richtung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Der Biegewiderstand ohne Normalkraft muss das Rissmoment übertreffen -- der
+bewehrte Querschnitt muss mehr tragen als der unbewehrte im Augenblick des
+Risses. Bei der Platte steht dasselbe als Nachweis des
+[[Sprödes Versagen|spröden Versagens]]; hier gilt es je Richtung des Moments.

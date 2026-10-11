@@ -19,3 +19,16 @@ $$
 - [[Sprödes Versagen je Richtung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Biegespannung im ungerissenen, elastischen Querschnitt unter Momenten um
+beide Achsen. Bei symmetrischen Querschnitten ist $I_{yz} = 0$, und die
+Formel zerfällt in die bekannte $\sigma = -M_y z'/I_y - M_z y'/I_z$ -- mit den
+Vorzeichen der Querschnittsanalyse zieht ein positives $M_y$ unten, wo $z'$
+negativ ist. Bei unsymmetrischen koppelt das
+Deviationsmoment beide Richtungen: ein Moment um $y$ allein biegt auch um
+$z$.
+
+Am gezogensten Betonpunkt beginnt der Riss; dort wird die Spannung gleich der
+wirksamen Zugfestigkeit gesetzt.
