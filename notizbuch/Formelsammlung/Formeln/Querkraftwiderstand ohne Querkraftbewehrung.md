@@ -49,3 +49,16 @@ $$
 - [[Querkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Ohne Bügel begrenzt der kritische Schubriss die Querkraft: über ihn muss die
+Kraft durch die Verzahnung der Rissufer, und die trägt umso weniger, je
+weiter sich der Riss öffnet. Die Rissöffnung wächst mit der Dehnung der
+Platte und mit ihrer Höhe -- das fasst der
+[[Beiwert für die statische Höhe]] $k_d$ zusammen. Der Widerstand ist dann
+$k_d \cdot \tau_{cd}$ über die wirksame Höhe $d_v$.
+
+Weil die Dehnung vom Moment abhängt, hängt auch der Widerstand von der
+Einwirkung ab: er wird für jede Kombination aus Moment und Normalkraft neu
+bestimmt, und im Diagramm steht er als Kurve über dem Moment.

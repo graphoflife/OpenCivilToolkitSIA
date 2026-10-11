@@ -49,3 +49,20 @@ $$
 - [[Stahlspannung aus Rissbreite]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Wie hoch der Stahl in einem Riss gespannt sein darf. Bei normaler Anforderung
+gilt die Fliessgrenze $f_{yk}$: die Bewehrung muss nur da sein, sie darf
+fliessen. Bei erhöhter Anforderung begrenzt zusätzlich eine nominelle
+Rissbreite von 0.5 mm, bei hoher von 0.2 mm.
+
+Die Wurzelformel verknüpft beides: eine Rissbreite $w$ entsteht aus der
+Stahldehnung über die Länge, auf der der Verbund die Kraft wieder in den
+Beton leitet -- und die wächst mit dem Durchmesser. Löst man nach der
+Spannung auf, steht der Durchmesser im Nenner. Dimensionell stimmt die
+Formel: $E_s \cdot f_{ctm}$ ist eine Spannung im Quadrat, $w/\varnothing$
+dimensionslos.
+
+Gerechnet wird mit $f_{yk}$, nicht $f_{yd}$: nachgewiesen wird, dass die
+Bewehrung den Riss übersteht, nicht die Tragfähigkeit.

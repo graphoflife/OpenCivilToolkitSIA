@@ -38,3 +38,10 @@ $$
 - [[Zwängung auf Biegung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Betondruckspannung verläuft im gerissenen, elastischen Querschnitt
+dreieckig -- null in der Nulllinie, am grössten an der gedrückten Kante. Ihre
+Resultierende liegt im Schwerpunkt des Dreiecks, bei $x/3$ vom Rand. Der
+Hebelarm zur Bewehrung ist darum $d - x/3$.

@@ -59,3 +59,14 @@ $$
 - [[Querkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Längsdehnung in der Mitte der Platte ist das Mass für die Öffnung des
+kritischen Schubrisses. Sie wächst mit dem Moment: über dem
+[[Dekompressionsmoment]] dehnt sich die Bewehrung linear, bis sie beim
+Biegewiderstand $m_{Rd}$ die Fliessdehnung $f_{yd}/E_s$ erreicht.
+
+Übersteigt das Moment den Widerstand -- etwa bei einer Kurve, die über
+$m_{Rd}$ hinaus gezeichnet wird --, gilt ein fester Wert: das 1.5-fache der
+Fliessdehnung, unabhängig vom Moment.

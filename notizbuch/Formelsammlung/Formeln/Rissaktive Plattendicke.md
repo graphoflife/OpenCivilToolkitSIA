@@ -38,3 +38,10 @@ $$
 - [[Zwängung auf Normalkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Dicke, über die eine Zwängung den Querschnitt reissen lässt. Ist die
+Begrenzung eingeschaltet, zählt höchstens 500 mm: dicke Bauteile reissen
+nicht über ihre ganze Dicke gleichzeitig, die Zwängung wirkt in einer
+Randzone. Ohne Begrenzung zählt die ganze Dicke.

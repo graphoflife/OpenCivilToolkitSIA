@@ -38,3 +38,12 @@ $$
 - [[Querkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Eine Normaldruckkraft $N_{Ed}$ in der halben Höhe drückt den Rand mit
+$N/A$. Ein Moment $m$ zieht ihn mit $m/W$, bei $W = h^2/6$ je Laufmeter --
+der Rand ist wieder spannungsfrei bei $m = |N| \cdot h/6$. Bis dahin reisst
+nichts, und die Bewehrung bekommt keine Dehnung.
+
+Nur Druck entlastet: eine Zugkraft bleibt hier unberücksichtigt.

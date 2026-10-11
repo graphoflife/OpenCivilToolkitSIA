@@ -34,3 +34,20 @@ Die Betondruckspannung verläuft dreieckig – null in der Nulllinie, am grösst
 14. [[Erfüllungsgrad]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Eine aufgezwungene Krümmung -- etwa ein Temperaturunterschied zwischen Ober-
+und Unterseite einer eingespannten Platte -- erzeugt ein Moment, ohne dass
+eine Last wirkt. Beim Riss geht es auf die Bewehrung über. Anders als beim
+spröden Versagen steht hier nicht der Biegewiderstand gegen das Rissmoment,
+sondern die Stahlspannung gegen ihre Grenze.
+
+Gerechnet wird am gerissenen Querschnitt, elastisch: der Beton nur auf Druck,
+linear, die Bewehrung mit der [[Wertigkeit im gerissenen Zustand]]. Daraus
+folgen die [[Nulllinie des gerissenen Querschnitts]], der
+[[Innerer Hebelarm|innere Hebelarm]] und das
+[[Aufnehmbares Moment der Bewehrung|Moment, das die Bewehrung bei ihrer zulässigen Spannung aufnimmt]].
+Es muss das Rissmoment des ungerissenen Querschnitts übertreffen -- zwei
+verschiedene Querschnitte, vor und nach dem Riss, und genau das ist die
+Frage.

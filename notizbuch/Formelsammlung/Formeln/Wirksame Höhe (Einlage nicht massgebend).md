@@ -37,3 +37,10 @@ $$
 - [[Querkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Ohne Einlage, oder mit einer Einlage, die zu klein ist, um zu stören, ist die
+wirksame Höhe für die Querkraft die statische Höhe der gezogenen
+Bewehrung. Mit einer störenden Einlage siehe
+[[Wirksame Höhe, um die Einlage vermindert]].

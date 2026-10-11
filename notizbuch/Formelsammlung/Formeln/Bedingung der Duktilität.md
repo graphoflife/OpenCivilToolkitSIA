@@ -30,3 +30,13 @@ $$
 - [[Duktilität je Richtung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Druckzone darf höchstens einen Bruchteil der statischen Höhe einnehmen
+-- im Werkzeug 0.35, anpassbar. Ist sie grösser, erreicht der Beton seine
+Bruchstauchung, bevor der Stahl weit genug fliesst, und der Querschnitt
+versagt ohne Vorwarnung.
+
+Für den gezeichneten Querschnitt gilt dieselbe Bedingung, nur gemessen
+senkrecht zur Nulllinie, die bei schiefer Biegung schräg liegt.

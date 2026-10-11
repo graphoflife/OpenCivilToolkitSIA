@@ -38,3 +38,9 @@ $$
 - [[Zwängung auf Normalkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Was eine Lage an Kraft aufnimmt, ohne die zulässige Spannung zu
+überschreiten: ihre Fläche mal $\sigma_{s,adm}$. Der Nachweis verlangt, dass
+sie die [[Risskraft der gezogenen Querschnittshälfte]] übertrifft.

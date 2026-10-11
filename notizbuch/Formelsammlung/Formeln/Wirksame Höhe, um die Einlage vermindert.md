@@ -38,3 +38,10 @@ $$
 - [[Querkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Liegt in der Platte eine Einlage -- ein Leitungsrohr, ein Kanal --, schwächt
+sie den Querschnitt dort, wo die Querkraft durch muss. Liegt ihre Höhe
+zwischen $h/6$ und $d$, wird die wirksame Höhe um sie vermindert; sonst gilt
+die [[Wirksame Höhe (Einlage nicht massgebend)]].

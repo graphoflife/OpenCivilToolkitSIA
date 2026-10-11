@@ -24,3 +24,17 @@ d wird von der gedrückten Randfaser aus gemessen: bei den unteren Lagen von der
 8. [[Erfüllungsgrad]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Ein Querschnitt soll sein Versagen ankündigen: erst fliesst der Stahl, die
+Platte verformt sich sichtbar, dann erst bricht der Beton. Dafür muss die
+Druckzone klein bleiben. Bei grosser Druckzone erreicht der Beton seine
+Bruchstauchung, bevor der Stahl weit genug gedehnt ist -- der Querschnitt
+versagt spröde, ohne Vorwarnung.
+
+Gemessen wird das an der [[Bezogene Druckzonenhöhe|bezogenen Druckzonenhöhe]]
+$x/d$ bei reiner Biegung, je Lage für sich: sie darf eine Grenze nicht
+überschreiten (siehe [[Bedingung der Duktilität]]). Zählt man die Dehnungen
+nach, heisst das: bei $x/d = 0.35$ und einer Randstauchung von 3.5 ‰ ist der
+Stahl um 6.5 ‰ gedehnt, ein Mehrfaches seiner [[Fliessdehnung]].

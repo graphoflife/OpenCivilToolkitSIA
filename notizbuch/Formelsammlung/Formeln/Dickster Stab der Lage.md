@@ -39,3 +39,10 @@ $$
 - [[Zwängung auf Biegung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die zulässige Stahlspannung bei begrenzter Rissbreite hängt am
+Stabdurchmesser: dicke Stäbe geben bei gleicher Fläche weniger Umfang für den
+Verbund und breitere Risse. Liegen Grundbewehrung und Zulage verschieden dick,
+zählt der dickere -- auf der sicheren Seite.

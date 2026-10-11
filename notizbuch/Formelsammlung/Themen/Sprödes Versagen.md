@@ -20,3 +20,14 @@ Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Na
 4. [[Erfüllungsgrad]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Derselbe Gedanke wie bei der Zwängung, für die Biegung: ein zu schwach
+bewehrter Querschnitt trägt ungerissen mehr als gerissen. Reisst er, fällt
+die Last auf eine Bewehrung, die sie nicht tragen kann -- er versagt ohne
+Vorwarnung.
+
+Nachgewiesen wird darum, dass der Biegewiderstand ohne Normalkraft das
+[[Rissmoment des ungerissenen Querschnitts]] übertrifft. Mit
+charakteristischen Werten gerechnet heisst er $M_{Rk}$ statt $M_{Rd}$.

@@ -48,3 +48,20 @@ $$
 - [[Querkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Das Fachwerkmodell: die Bügel ziehen, der Beton drückt in schrägen
+Diagonalen, die Längsbewehrung bildet den Gurt. Der innere Hebelarm ist
+$0.9\,d$. Die Neigung $\alpha$ der Diagonalen gegen die Plattenebene ist
+nicht vorgegeben:
+
+- je flacher die Diagonale, desto mehr Bügel schneidet ein Schnitt -- der
+  [[Widerstand der Bügel]] wächst mit $\cot\alpha$;
+- desto steiler und schmaler aber auch die Druckstrebe -- der
+  [[Widerstand der Druckdiagonalen]] fällt mit $\sin\alpha\,\cos\alpha$.
+
+Das Werkzeug sucht ganzgradig zwischen $\alpha_{min}$ und $\alpha_{max}$ die
+Neigung, bei der das Kleinere der beiden am grössten ist. Bei Normalzug
+steilt sich die Diagonale auf; die untere Grenze wird dann gehoben. Ein
+Betonanteil wie ohne Bügel kommt nicht hinzu.

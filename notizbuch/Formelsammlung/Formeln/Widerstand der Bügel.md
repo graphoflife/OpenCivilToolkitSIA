@@ -46,3 +46,12 @@ $$
 - [[Querkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Ein Schnitt längs der Druckdiagonalen schneidet auf der Länge
+$0.9\,d \cdot \cot\alpha$ Bügel; jeder zieht mit seiner Fläche mal $f_{yd}$.
+Je Quadratmeter Platte steht die Bügelfläche
+$A_{\varnothing,V} / (s_{V,x} \cdot s_{V,y})$, und so ergibt sich der
+Widerstand je Laufmeter. Flache Diagonalen nutzen die Bügel besser -- bis
+die Druckdiagonalen begrenzen.

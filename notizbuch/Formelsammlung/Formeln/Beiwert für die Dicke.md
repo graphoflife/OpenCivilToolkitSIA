@@ -57,3 +57,18 @@ $$
 - [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Zugfestigkeit, die beim Reissen wirkt, ist bei dicken Bauteilen kleiner
+als im Prüfkörper: Eigenspannungen aus dem Abfliessen der Hydratationswärme
+und aus ungleichem Schwinden nehmen einen Teil vorweg, und die Wahrscheinlichkeit
+einer schwachen Stelle wächst mit dem Volumen. $k_t$ mindert darum
+$f_{ctm}$ mit der Dicke $t$, die reisst -- in Metern eingesetzt.
+
+- Unter Normalkraft reisst die ganze rissaktive Dicke, $t = h_{eff}$.
+- Unter Biegung reisst nur die gezogene Randzone; angesetzt wird ein Drittel
+  der Höhe.
+- Beim gezeichneten Querschnitt zählt ein Drittel der Höhe in
+  Biegerichtung -- die Regel der Platte, übertragen, nach Vorgabe und nicht
+  nachgeschlagen.

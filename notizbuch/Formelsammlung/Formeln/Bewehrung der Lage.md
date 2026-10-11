@@ -43,3 +43,10 @@ $$
 - [[Zwängung auf Biegung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Grundbewehrung und Zulage einer Lage, zusammengezählt: sie fliessen gemeinsam
+und wirken als ein Querschnitt. In ihrem
+[[Schwerpunkt der zusammengefassten Lage|Schwerpunkt]] zählen sie als eine
+Lage.

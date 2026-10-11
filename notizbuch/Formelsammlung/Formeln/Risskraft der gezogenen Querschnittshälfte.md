@@ -35,3 +35,10 @@ $$
 - [[Zwängung auf Normalkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Zugkraft, bei der eine Zwängung den Querschnitt reissen lässt: die
+wirksame Zugfestigkeit über die halbe rissaktive Dicke. Jede der beiden
+Lagen, oben und unten, übernimmt die Hälfte -- die Kraft ihrer Seite. Diese
+Kraft muss die Lage aufnehmen können, siehe [[Aufnehmbare Risskraft]].

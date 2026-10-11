@@ -44,3 +44,10 @@ $$
 - [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Zugfestigkeit, mit der das Reissen gerechnet wird: der Mittelwert
+$f_{ctm}$, gemindert mit dem [[Beiwert für die Dicke]]. Der Mittelwert und
+nicht ein unterer Wert: gesucht ist die Kraft, die beim Reissen wirklich
+frei wird, und eine zu kleine Annahme läge auf der unsicheren Seite.

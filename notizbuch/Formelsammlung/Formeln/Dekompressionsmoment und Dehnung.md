@@ -19,3 +19,11 @@ $$
 - [[Querkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Der Ansatz, nach dem die [[Dehnung auf halber Höhe]] gerechnet wird. Eine
+Druckkraft drückt den Querschnitt vor, bevor er reissen kann: erst das
+[[Dekompressionsmoment]] $m_{Dd}$ hebt diesen Druck am Rand auf. Was an Moment
+darüber liegt, dehnt die Bewehrung -- linear bis zum Fliessen beim
+Biegewiderstand $m_{Rd}$.

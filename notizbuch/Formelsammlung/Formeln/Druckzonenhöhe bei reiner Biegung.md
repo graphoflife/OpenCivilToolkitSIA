@@ -40,3 +40,11 @@ $$
 - [[Duktilität]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Druckzonenhöhe, die die Duktilität prüft -- je Lage gerechnet, als trüge
+sie allein: ihre Fläche mal der Stahlspannung, im Gleichgewicht mit dem
+Spannungsblock. Dieselbe Rechnung wie die
+[[Druckzonenhöhe aus dem Kräftegleichgewicht]] der Handrechnung, hier für
+jede Lage einzeln.

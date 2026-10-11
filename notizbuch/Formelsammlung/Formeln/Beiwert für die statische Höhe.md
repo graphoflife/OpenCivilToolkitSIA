@@ -39,3 +39,12 @@ $$
 - [[Querkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Fasst zusammen, wie weit sich der kritische Schubriss öffnet: mit der
+[[Dehnung auf halber Höhe]], mit der statischen Höhe -- grosse Bauteile
+haben breitere Risse, der Massstabseffekt -- und mit der
+[[Beiwert der Gesteinskörnung|Gesteinskörnung]]. Je grösser das Produkt,
+desto kleiner $k_d$ und desto weniger Querkraft trägt der Beton. Wie bei
+$\tau_{cd}$ ist die Formel empirisch: $d$ geht in mm ein.

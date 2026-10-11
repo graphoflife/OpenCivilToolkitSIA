@@ -38,3 +38,11 @@ $$
 - [[Querkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Bügel stehen in zwei Richtungen verteilt: in Tragrichtung mit der Teilung
+$s_{V,x}$, quer dazu mit $n_{V,y}$ Bügeln über die betrachtete Breite. Daraus
+die Teilung quer, $s_{V,y} = b / n_{V,y}$. Zusammen sagen beide Teilungen, wie
+viel Bügelfläche je Quadratmeter Platte steht:
+$A_{\varnothing,V} / (s_{V,x} \cdot s_{V,y})$.

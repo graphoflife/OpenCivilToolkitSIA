@@ -42,3 +42,11 @@ $$
 - [[Zwängung auf Biegung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Im gerissenen Querschnitt trägt der Beton nur auf Druck, die Bewehrung auf
+Zug. Die Nulllinie liegt dort, wo das statische Moment des gedrückten
+Betons gleich dem der umgerechneten Bewehrung ist:
+$b\,x^2/2 = n A_s\,(d - x)$. Mit $\rho = n A_s / b$ ist das die quadratische
+Gleichung $x^2 + 2\rho x - 2\rho d = 0$, deren positive Lösung hier steht.

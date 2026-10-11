@@ -39,3 +39,10 @@ $$
 - [[Zwängung auf Biegung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Das Moment, das die Lage im gerissenen Zustand aufnimmt, wenn ihr Stahl bei
+der zulässigen Spannung steht: Stahlkraft mal innerem Hebelarm. Der Nachweis
+verlangt, dass es das Rissmoment übertrifft -- die Bewehrung muss das Moment
+übernehmen, das der Beton beim Reissen abgibt.

@@ -44,3 +44,11 @@ $$
 - [[Querkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Druckdiagonalen tragen die Querkraft schräg ab. Ihr Querschnitt je
+Laufmeter ist $0.9\,d \cdot \cos\alpha$, ihre Kraft wirkt unter $\alpha$ --
+daher $\sin\alpha \cdot \cos\alpha$, am grössten bei 45°. Der Beton in den
+Diagonalen ist durch die Risse quer dazu geschwächt; $k_c$ mindert seine
+Festigkeit entsprechend.

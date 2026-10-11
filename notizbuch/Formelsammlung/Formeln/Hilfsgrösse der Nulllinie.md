@@ -39,3 +39,10 @@ $$
 - [[Zwängung auf Biegung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Eine Länge, keine Bewehrungsquote: die in Beton umgerechnete Stahlfläche
+$n \cdot A_s$, verteilt auf die Breite $b$. Mit ihr wird die Gleichung für die
+[[Nulllinie des gerissenen Querschnitts]] kurz. Nicht zu verwechseln mit dem
+[[Bewehrungsgehalt]], der dasselbe Zeichen trägt.

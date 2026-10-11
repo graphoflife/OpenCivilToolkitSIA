@@ -53,3 +53,15 @@ $$
 - [[Sprödes Versagen je Richtung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Das Moment, bei dem der Beton am gezogenen Rand reisst: die wirksame
+Zugfestigkeit mal dem Widerstandsmoment des ungerissenen Bruttoquerschnitts,
+ohne Bewehrung. Bei der Platte ist das $b h^2/6$; beim gezeichneten
+Querschnitt das [[Widerstandsmoment zum gezogensten Betonpunkt]].
+
+Gerechnet wird mit dem Bruttoquerschnitt ohne Bewehrung -- es geht um den
+Zustand vor dem Riss. Mit der Bewehrung wäre der Querschnitt etwas steifer
+und risse etwas später; das bleibt hier unberücksichtigt, nach Vorgabe und
+nicht nachgeschlagen.
