@@ -20,6 +20,7 @@ import { el, melden } from './dom.js';
 import { baumZeichnen } from './baum.js';
 import { berichtZeichnen } from './bericht.js';
 import { editorZeichnen } from './editor.js';
+import { notizbuchEinrichten } from './notizbuch.js';
 
 const knoten = {};
 let rechenUhr = null;
@@ -591,6 +592,13 @@ async function starten() {
   tafelwahlEinrichten();
   ablageEinrichten(imBrowserAblegen);
   horchen(allesZeichnen);
+  // Vor dem Kern: das Notizbuch braucht ihn nicht, und eine Adresse
+  // #notizbuch/… soll auch dann aufgehen, wenn Pyodide noch lädt.
+  notizbuchEinrichten({
+    knoepfe: [document.getElementById('btn-formelsammlung'),
+      document.getElementById('tafel-notizbuch')],
+    ansicht: document.getElementById('notizbuch'),
+  });
 
   try {
     // Erst den Kern -- ohne ihn lässt sich nicht einmal die Beschreibung prüfen.

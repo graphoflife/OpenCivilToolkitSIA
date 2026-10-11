@@ -118,7 +118,13 @@ die [Entwicklung](notizbuch/Notizen/Entwicklung.md), was noch
 [offen](notizbuch/Notizen/TODO.md) ist, und die
 [Arbeitsweise](notizbuch/Notizen/Arbeitsweise.md) von Claude. Der Ordner ist
 ein Obsidian-Tresor: in Obsidian «Ordner als Tresor öffnen» und `notizbuch`
-wählen – ohne Plugin.
+wählen – ohne Plugin. Auf der Seite zeigt ihn der Knopf *Formelsammlung*
+neben *Rechnen*, auf dem Telefon die Wahl *Formeln* unten.
+
+Jede Formel steht dort auf einer eigenen Seite – mit Normstelle, Grössen,
+Zahlenbeispiel, der Stelle im Code und der Theorie. Diese Seiten schreibt
+`python3 -m opencivil.web.bruecke` aus dem Code; was unter ihrer Linie von
+Hand steht, bleibt dabei erhalten.
 
 ## Stand
 

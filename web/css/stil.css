@@ -1779,3 +1779,136 @@ math-field.gl-feld::part(menu-toggle) { display: none; }
 .qa-schnittwahl label { display: inline-flex; align-items: center; gap: 5px; }
 .qa-schnittwahl select { width: auto; padding: 2px 6px; }
 .qa-schnitthinweis { margin: 0 0 8px; font-size: 12.5px; color: var(--schrift-zart); }
+
+/* ------------------------------------------------------------ Notizbuch -- */
+/* Die Formelsammlung oben neben «Rechnen»: eine eigene Ansicht über den
+   Tafeln, unter der Kopfleiste -- über dem Vollbild des Zeichenfensters (30),
+   unter dem Melder (40). Links Suche und Inhalt, rechts die Seite in einer
+   Lesespalte. Formeln und Kopierknöpfe wie in der Herleitung. */
+
+.notizbuch {
+  position: fixed; top: var(--kopfhoehe); left: 0; right: 0; bottom: 0; z-index: 35;
+  display: grid; grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+  background: var(--grund);
+}
+.notizbuch[hidden] { display: none; }
+.notizbuch:focus { outline: none; }
+
+/* Solange der Kern lädt, liegt der Ladeschirm über allem. Eine Adresse ins
+   Notizbuch soll trotzdem aufgehen -- das Notizbuch braucht keinen Kern. Es
+   deckt dann auch die Kopfleiste, deren Knöpfe ohne Kern nichts täten. */
+body[data-notizbuch] .ladeschirm { display: none; }
+body:has(> .ladeschirm) .notizbuch { top: 0; }
+
+.kopfleiste #btn-formelsammlung.ist-aktiv { background: #fff; border-color: #fff; color: var(--blau-leiste); }
+
+.nb-leiste {
+  display: flex; flex-direction: column; min-height: 0;
+  background: var(--flaeche); border-right: 1px solid var(--rand);
+}
+.nb-leiste-kopf { display: flex; gap: 4px; padding: 10px 10px 8px; border-bottom: 1px solid var(--rand); }
+.nb-suche {
+  flex: 1; min-width: 0; padding: 6px 9px;
+  border: 1px solid var(--eingabe-rand); border-radius: var(--radius); background: var(--blau-zart);
+}
+.nb-schliessen { font-size: 16px; }
+.nb-baum { flex: 1; overflow-y: auto; padding: 6px 6px 18px; font-size: 13px; }
+.nb-baum details > details, .nb-baum details > .nb-eintrag { margin-left: 12px; }
+.nb-baum summary {
+  display: flex; align-items: center; gap: 6px; padding: 3px 4px;
+  cursor: pointer; border-radius: 5px; font-weight: 600; color: var(--schrift);
+}
+.nb-baum summary:hover { background: var(--flaeche-2); }
+.nb-baum summary .nb-eintrag { padding: 0; font-weight: 600; }
+.nb-ordnername { flex: 1; }
+.nb-anzahl { margin-left: auto; font-size: 11px; font-weight: 400; color: var(--schrift-zart); }
+.nb-eintrag {
+  display: flex; align-items: baseline; gap: 6px; padding: 3px 6px; border-radius: 5px;
+  color: var(--schrift-matt); text-decoration: none; overflow-wrap: anywhere;
+}
+.nb-eintrag:hover { background: var(--blau-hell); color: var(--blau-tief); }
+.nb-eintrag[aria-current="page"] { background: var(--blau); color: #fff; }
+.nb-art { margin-left: auto; font-size: 11px; color: var(--schrift-zart); }
+.nb-eintrag[aria-current="page"] .nb-art { color: #dbe7fb; }
+.nb-leer { padding: 10px; color: var(--schrift-zart); }
+
+.nb-lesespalte { overflow-y: auto; min-width: 0; padding: 22px 26px 60px; }
+.nb-inhalt-knopf { display: none; }
+.nb-seite {
+  max-width: 860px; margin: 0 auto; padding: 22px 30px 30px;
+  background: var(--flaeche); border: 1px solid var(--rand); border-radius: var(--radius);
+  box-shadow: var(--schatten); overflow-wrap: break-word;
+}
+.nb-pfad { font-size: 11.5px; color: var(--schrift-zart); }
+.nb-titel { font-size: 21px; margin: 2px 0 2px; }
+.nb-herkunft { font-size: 11.5px; color: var(--schrift-zart); margin-bottom: 14px; }
+.nb-seite h2, .nb-seite h3, .nb-seite h4, .nb-seite h5, .nb-seite h6 { margin: 22px 0 8px; scroll-margin-top: 12px; }
+.nb-seite h2 { font-size: 17px; padding-bottom: 4px; border-bottom: 2px solid var(--rand); }
+.nb-seite h3 { font-size: 15px; padding-left: 9px; border-left: 3px solid var(--unterakzent); }
+.nb-seite h4, .nb-seite h5, .nb-seite h6 { font-size: 13.5px; color: var(--schrift-matt); }
+.nb-seite p { margin: 8px 0; }
+.nb-seite ul, .nb-seite ol { margin: 6px 0; padding-left: 24px; }
+.nb-seite li { margin: 2px 0; }
+.nb-seite li > p:first-child { margin-top: 0; }
+.nb-aufgabe { list-style: none; margin-left: -20px; display: flex; gap: 6px; align-items: baseline; }
+.nb-link { color: var(--blau-tief); text-decoration: none; border-bottom: 1px solid var(--blau-hell); }
+.nb-link:hover { border-bottom-color: var(--blau); }
+.nb-aussen::after { content: " ↗"; font-size: .85em; }
+.nb-fehlt { color: var(--schlecht); border-bottom: 1px dashed var(--schlecht); cursor: help; }
+.nb-codestueck {
+  padding: 1px 4px; border-radius: 4px; background: var(--flaeche-2); font-size: .92em;
+}
+.nb-code {
+  margin: 10px 0; padding: 10px 12px; overflow-x: auto;
+  background: var(--flaeche-2); border: 1px solid var(--rand); border-radius: 5px;
+  font-size: 12px; line-height: 1.45;
+}
+.nb-formel { position: relative; margin: 10px 0; padding: 6px 10px; border-radius: 5px; }
+.nb-formel:hover { background: var(--flaeche-2); }
+.nb-formel:hover .gleichung-werkzeug { display: flex; }
+.nb-tabelle { overflow-x: auto; margin: 10px 0; }
+.nb-tabelle table { border-collapse: collapse; font-size: 13px; }
+.nb-tabelle th, .nb-tabelle td { padding: 4px 10px; border-bottom: 1px solid var(--rand); vertical-align: top; }
+.nb-tabelle th { text-align: left; color: var(--schrift-matt); border-bottom-width: 2px; }
+.nb-zitat { margin: 10px 0; padding: 2px 12px; border-left: 3px solid var(--rand-stark); color: var(--schrift-matt); }
+.nb-callout {
+  margin: 12px 0; padding: 8px 12px; border-radius: 5px;
+  border-left: 4px solid var(--blau); background: var(--blau-hell);
+}
+.nb-callout-titel { font-weight: 600; }
+details.nb-callout > summary { cursor: pointer; }
+.nb-callout-inhalt > :first-child { margin-top: 4px; }
+.nb-callout-inhalt > :last-child { margin-bottom: 0; }
+.nb-callout-warning, .nb-callout-caution, .nb-callout-attention {
+  border-left-color: var(--warn); background: var(--warn-hell);
+}
+.nb-callout-danger, .nb-callout-error, .nb-callout-bug { border-left-color: var(--schlecht); background: var(--schlecht-hell); }
+.nb-callout-success, .nb-callout-check, .nb-callout-done, .nb-callout-tip { border-left-color: var(--gut); background: var(--gut-hell); }
+.nb-callout-abstract, .nb-callout-summary, .nb-callout-quote, .nb-callout-example {
+  border-left-color: var(--analyse); background: var(--flaeche-2);
+}
+.nb-bild { max-width: 100%; height: auto; }
+.nb-seite hr { border: none; border-top: 1px solid var(--rand); margin: 18px 0; }
+.nb-seite mark { background: var(--richtung-y-hell); }
+
+@media (max-width: 900px) {
+  /* Die Kopfleiste ist voll: das Notizbuch ist unten die vierte Wahl, und es
+     lässt die Wahl frei. Solange es offen ist, gilt keine der drei Tafeln. */
+  #btn-formelsammlung { display: none; }
+  .notizbuch { grid-template-columns: minmax(0, 1fr); bottom: var(--wahlhoehe); }
+  body[data-notizbuch] .tafelwahl [data-tafel].ist-aktiv {
+    background: transparent; color: var(--schrift-matt); border-color: transparent; font-weight: 400;
+  }
+  /* Der Inhalt ist eine Schublade: über der Seite, bis eine Seite gewählt ist. */
+  .nb-leiste {
+    position: absolute; inset: 0 auto 0 0; width: min(320px, 88vw); z-index: 1;
+    transform: translateX(-102%); transition: transform .18s ease-out;
+    box-shadow: 0 0 24px rgba(16,24,40,.25);
+  }
+  .notizbuch.nb-leiste-offen .nb-leiste { transform: none; }
+  .nb-lesespalte { padding: 10px 10px 40px; }
+  .nb-inhalt-knopf { display: inline-block; margin-bottom: 8px; min-height: 34px; }
+  .nb-seite { padding: 14px 12px 20px; }
+  .nb-eintrag, .nb-baum summary { min-height: 34px; align-items: center; }
+  .nb-suche { font-size: 16px; min-height: 34px; }
+}

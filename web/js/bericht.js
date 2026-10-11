@@ -14,9 +14,8 @@
  */
 
 import { el, ersetzen, leerzustand, melden, svgEl, zahlfeld } from './dom.js';
-import {
-  kopiereFuerWord, kopiereTabelleFuerWord, kopiereText, setzen,
-} from './mathe.js';
+import { setzen } from './mathe.js';
+import { werkzeugleiste } from './kopierleiste.js';
 import {
   diagrammZeichnen, kurveZeichnen, neigungskurveZeichnen,
   querkraftkurveZeichnen, querschnittZeichnen,
@@ -29,47 +28,6 @@ import { aendern, namensraum, zustand } from './zustand.js';
 // ===========================================================================
 // Bausteine
 // ===========================================================================
-
-function werkzeugKnopf(text, titel, tun) {
-  return el('button.knopf.knopf-zart', {
-    text, title: titel,
-    on: {
-      click: async (e) => { e.stopPropagation(); await tun(); },
-    },
-  });
-}
-
-/**
- * Die drei Kopierknöpfe Word, TeX und MD. Stehen an jedem Block, der LaTeX
- * hergibt -- Gleichung wie Tabelle. Einmal geschrieben, damit sie überall
- * dieselben sind.
- *
- * @param block  `{latex, markdown}`, bei einer Tabelle dazu `{kopf, zeilen}`:
- *   Word bekommt dann eine echte Tabelle statt einer Formel. Das Markdown
- *   kommt fertig aus dem Kern -- der Block, wie er im Markdown-Bericht steht.
- */
-function werkzeugleiste(block) {
-  const tabelle = block.kopf !== undefined;
-  const was = tabelle ? 'Tabelle' : 'Formel';
-  return el('div.gleichung-werkzeug', {}, [
-    werkzeugKnopf('Word', `Als ${was} für Word kopieren`, async () => {
-      await (tabelle
-        ? kopiereTabelleFuerWord(block.kopf, block.zeilen)
-        : kopiereFuerWord(block.latex));
-      melden(`${was} kopiert → in Word Strg+V.`);
-    }),
-    werkzeugKnopf('TeX', 'LaTeX-Quelltext kopieren', async () => {
-      await kopiereText(block.latex);
-      melden('LaTeX kopiert.');
-    }),
-    block.markdown
-      ? werkzeugKnopf('MD', 'Als Markdown kopieren', async () => {
-        await kopiereText(block.markdown);
-        melden('Markdown kopiert.');
-      })
-      : null,
-  ]);
-}
 
 function gleichungBlock(block) {
   // Ein Block kann mehrere Werte tragen (siehe `gruppenBilden`).
