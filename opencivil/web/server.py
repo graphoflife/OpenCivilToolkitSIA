@@ -43,7 +43,7 @@ import traceback
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 
 from opencivil.bericht.latex_dokument import finde_tex_maschine, uebersetze
 from opencivil.web import dienst
@@ -52,8 +52,9 @@ WURZEL = Path(__file__).resolve().parents[2]
 AUSGABE_ORDNER = WURZEL / "ausgabe"
 
 #: Was aus dem Projektverzeichnis ins Netz darf. ``opencivil`` muss dabei sein:
-#: die Bruecke im Browser laedt von dort die Quelldateien des Rechenkerns.
-OEFFENTLICH = ("web", "opencivil")
+#: die Bruecke im Browser laedt von dort die Quelldateien des Rechenkerns;
+#: ``notizbuch`` zeigt die Oberflaeche unter «Formelsammlung».
+OEFFENTLICH = ("web", "opencivil", "notizbuch")
 
 #: Einzelne Dateien im Wurzelverzeichnis, die ebenfalls ausgeliefert werden.
 OEFFENTLICHE_DATEIEN = ("index.html", "favicon.ico")
@@ -66,6 +67,7 @@ mimetypes.add_type("application/javascript", ".mjs")
 mimetypes.add_type("application/wasm", ".wasm")
 mimetypes.add_type("font/woff2", ".woff2")
 mimetypes.add_type("text/x-python; charset=utf-8", ".py")
+mimetypes.add_type("text/markdown; charset=utf-8", ".md")
 
 
 # ===========================================================================
@@ -111,8 +113,12 @@ def aufloesen(pfad: str) -> Path | None:
     :data:`OEFFENTLICHE_DATEIEN` steht. Alles andere im Projektverzeichnis --
     ``daten/``, ``.git/``, ``tests/`` -- bleibt draussen, auch wenn der Server
     ohnehin nur auf 127.0.0.1 horcht.
+
+    Die Adresse kommt verschluesselt: «Statische Höhe.md» als
+    ``Statische%20H%C3%B6he.md``. Erst entschluesselt, dann geprueft -- sonst
+    fiele ein ``%2E%2E`` an der Pruefung auf ``..`` vorbei.
     """
-    teile = [t for t in pfad.split("/") if t not in ("", ".")]
+    teile = [t for t in unquote(pfad).split("/") if t not in ("", ".")]
     if not teile:
         teile = ["index.html"]
     if ".." in teile:

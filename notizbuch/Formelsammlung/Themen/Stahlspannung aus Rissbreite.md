@@ -1,0 +1,49 @@
+---
+erzeugt: 1fabe22efa9c
+art: thema
+tags: [thema]
+---
+> [!abstract] Platte
+> 9 Formeln, in der Folge, in der gerechnet wird.
+
+## Was die Rechnung dazu sagt
+
+Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf. Die Bewehrung wirkt auf Zug und auf Druck – nur in der Handrechnung zählt die gedrückte nicht. Gemessen wird an der am stärksten gezogenen Lage.
+
+Drei Festlegungen stecken in jeder Zahl unten, und alle drei sind Auslegung der Norm und nicht Rechnung. Erstens das Kriechen: angesetzt wird das φ dieses Kapitels. Ein grösseres φ weicht den Beton auf, die Druckzone wächst, der Hebelarm wird kleiner und die Stahlspannung damit grösser; mit φ = 0 gehen die Spannungen zurück, und der Nachweis geht leichter auf. Mit dem Spannungsblock hängt kein Gesetz am Modul – dort wirkt φ nicht.
+
+Zweitens die Werkstoffgesetze: sie rechnen mit den charakteristischen Festigkeiten. Der Stahl ist linear bis f\_yk und fliesst dann, der Beton trägt höchstens f\_ck. Ein Gebrauchsnachweis fragt, was der Querschnitt tut, und nicht, was er darf – der Teilsicherheitsbeiwert gehört in die Tragsicherheit. Läge das Plateau bei f\_yd, bliebe jede Stahlspannung darunter, und eine Grenze darüber könnte nie überschritten werden.
+
+Drittens die Grenze: dieselbe wie bei der Zwängung, mit f\_yk und bei erhöhter und hoher Anforderung zusätzlich begrenzt durch die Rissbreite. Massgebend ist der dickste Stab der Tragrichtung. Welche Lage die grösste Zugspannung trägt, wechselt mit dem Lastfall – bei einem Feldmoment die untere, bei einem Stützmoment die obere –, und der dickste Stab gibt die kleinste zulässige Spannung. Das liegt für beide auf der sicheren Seite.
+
+Fliesst die Bewehrung, bleibt ihre Spannung am Plateau stehen, während die Dehnung weiterwächst. Verglichen wird dann die Dehnung: ε\_s gegen ε\_s,adm = σ\_s,adm / E\_s. Solange der Stahl elastisch bleibt, ist das genau der Spannungsvergleich; fliesst er, fällt der Nachweis durch, und zwar um so deutlicher, je weiter er gedehnt ist.
+
+Die Dehnungsebene wird gesucht, nicht hergeleitet. Eine ebene Dehnungsverteilung hat zwei Unbekannte – die Dehnung in der Mittelebene ε\_m und die Krümmung χ – und ihnen stehen zwei Gleichgewichtsbedingungen gegenüber: N und M. Geschlossen auflösen lässt sich das nicht, weil die Werkstoffgesetze nichtlinear sind.
+
+Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebildet, jede mit der Spannung in ihrer Mitte; der Stahl kommt Lage für Lage dazu, und die von ihm verdrängte Betonfläche wird abgezogen, damit dieselbe Fläche nicht zweimal zählt.
+
+Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer festgehaltenen Krümmung χ wird ε\_m so lange halbiert, bis N\_int die verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung immer mehr Zug bedeutet. Aussen: mit diesem ε\_m bleibt ein Moment übrig, und χ wird so lange halbiert, bis auch M\_int stimmt – hier trägt die Monotonie, dass mehr Krümmung mehr Moment heisst.
+
+Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.0 ‰ bis 45.0 ‰). Jenseits davon geben die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Halbierung liefe auf eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine Gleichgewichtslage – dann sagt der Nachweis das und rät nicht.
+
+Nachgewiesen wird deshalb nicht der Weg, sondern das Ergebnis: dass die gefundene Ebene genau die angegebenen Schnittgrössen erzeugt. Diese Probe steht bei jedem Fall.
+
+Mit dem Spannungsblock trägt der Beton unter (1 − 0.85)·ε\_c2d nichts. Unter Gebrauchslast liegt die Druckresultierende damit am Rand, und der Hebelarm wird beinahe d – die Stahlspannung kleiner, als der Querschnitt sie hat. Der Block ist ein Modell für den Bruch.
+
+Mit der Handrechnung rechnet der Querschnitt wie die Resistenzlinie aus Handrechnung: der Beton als Spannungsblock, die gedrückte Bewehrung weggelassen, die Bewehrung jeder Seite zu einer Lage in ihrem Schwerpunkt zusammengefasst, und der Beton auch dort gezählt, wo der Stahl liegt.
+
+Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebildet; der Stahl kommt Lage für Lage dazu. Wie in der Handrechnung zählt der Beton auch dort, wo der Stahl liegt.
+
+## Formeln
+
+1. [[Wirksamer Elastizitätsmodul]]
+2. [[Zulässige Stahlspannung (Rissbreite w_nom)]]
+3. [[Dehnungsebene und innere Kräfte]]
+4. [[Erfüllungsgrad]]
+5. [[Zulässige Stahlspannung (normale Anforderung)]]
+6. [[Fliessdehnung]]
+7. [[Zulässige Dehnung]]
+8. [[Spannungsblock des Betons]]
+9. [[Betonstahl nur auf Zug]]
+
+<!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->

@@ -33,6 +33,16 @@ beim ersten Blick in den Reiter. Darum legt die Bruecke sie fertig ab,
 ``web/kern/formelsammlung.json``, und die Oberflaeche liest sie nur noch. Ein
 Test merkt, wenn sie nicht mehr zum Kern passt.
 
+UND DAS NOTIZBUCH:
+Die Seiten des Notizbuchs, die aus dem Code entstehen -- je Formel, je Thema
+--, schreibt die Bruecke in den Ordner ``notizbuch/``, ohne anzufassen, was
+dort von Hand steht (:mod:`opencivil.notizbuch.tresor`). Dazu das
+Verzeichnis aller Seiten, ``web/kern/notizbuch.json``: GitHub Pages zeigt
+keinen Ordnerinhalt, die Oberflaeche erfaehrt nur so, welche Seiten es gibt.
+Die Seiten selbst holt sie ohne Marke und ohne Zwischenspeicher -- eine in
+Obsidian geaenderte Notiz steht damit nach dem Hochladen gleich da; eine neue
+erst, wenn die Bruecke sie ins Verzeichnis geschrieben hat.
+
 MARKEN AUCH FUER DIE OBERFLAECHE:
 Dasselbe traf die Module der Oberflaeche: nach einer Aenderung kam einmal ein
 altes ``nachweise.js`` zum neuen Kern. Darum schreibt die Bruecke in
@@ -57,18 +67,21 @@ AUFRUF::
 
 from __future__ import annotations
 
-import hashlib
+import functools
 import json
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from opencivil.bericht.formelsammlung import vollstaendig
+from opencivil.notizbuch import formelseiten, tresor
 from opencivil.web.api import formelsammlung_liste
 
 WURZEL = Path(__file__).resolve().parents[2]
 PAKET = WURZEL / "opencivil"
 MANIFEST = WURZEL / "web" / "kern" / "dateien.json"
 FORMELSAMMLUNG = WURZEL / "web" / "kern" / "formelsammlung.json"
+NOTIZBUCH = WURZEL / "notizbuch"
+VERZEICHNIS = WURZEL / "web" / "kern" / "notizbuch.json"
 SEITE = WURZEL / "web" / "index.html"
 STILBLATT = WURZEL / "web" / "css" / "stil.css"
 
@@ -98,7 +111,7 @@ def marke(pfad: Path) -> str:
     ihren Inhalt. Windows-Zeilenenden zaehlen nicht -- sonst stimmte das
     Manifest nach einem Auschecken mit CRLF nicht mehr.
     """
-    return hashlib.sha256(pfad.read_bytes().replace(b"\r\n", b"\n")).hexdigest()[:12]
+    return tresor.pruefsumme(pfad.read_text(encoding="utf-8"))
 
 
 def manifest() -> dict:
@@ -160,6 +173,58 @@ def formelsammlung_schreiben(pfad: Path | None = None) -> Path:
                            formelsammlung())
 
 
+@functools.lru_cache(maxsize=1)
+def notizbuch_seiten() -> Tuple[tresor.Seite, ...]:
+    """Was der Code zum Notizbuch beitraegt -- einmal je Lauf gerechnet."""
+    return tuple(formelseiten.seiten())
+
+
+def notizbuch_plan(wurzel: Optional[Path] = None) -> tresor.Plan:
+    """Was ein Lauf im Notizbuch schriebe, loeschte oder beanstandete."""
+    return tresor.planen(notizbuch_seiten(), Path(wurzel) if wurzel else NOTIZBUCH)
+
+
+def notizbuch_verzeichnis(wurzel: Optional[Path] = None) -> dict:
+    """Das Verzeichnis aller Seiten, so wie die Oberflaeche es liest."""
+    wurzel = Path(wurzel) if wurzel else NOTIZBUCH
+    return {
+        "hinweis": (
+            "Erzeugt von opencivil/web/bruecke.py. Nicht von Hand ändern -- nach "
+            "einer neuen Seite im Notizbuch 'python3 -m opencivil.web.bruecke' "
+            "laufen lassen."
+        ),
+        "wurzel": "notizbuch/",
+        "start": "Formelsammlung",
+        "seiten": tresor.verzeichnis(notizbuch_seiten(), wurzel),
+        "anhaenge": tresor.anhaenge(wurzel),
+    }
+
+
+def notizbuch_schreiben(wurzel: Optional[Path] = None,
+                        verzeichnis: Optional[Path] = None) -> tresor.Plan:
+    """
+    Schreibt die erzeugten Seiten und das Verzeichnis. Beanstandet der Plan
+    etwas, bricht es ab, bevor eine Datei angefasst ist.
+    """
+    wurzel = Path(wurzel) if wurzel else NOTIZBUCH
+    plan = notizbuch_plan(wurzel)
+    tresor.ausfuehren(plan, wurzel)
+    _json_schreiben(Path(verzeichnis) if verzeichnis else VERZEICHNIS,
+                    notizbuch_verzeichnis(wurzel))
+    return plan
+
+
+def notizbuch_stimmt() -> bool:
+    """Ob Seiten und Verzeichnis dem entsprechen, was der Code heute ergibt."""
+    if not notizbuch_plan().nichts_zu_tun or not VERZEICHNIS.is_file():
+        return False
+    try:
+        abgelegt = json.loads(VERZEICHNIS.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return False
+    return abgelegt == json.loads(json.dumps(notizbuch_verzeichnis()))
+
+
 def _json_schreiben(ziel: Path, daten: dict) -> Path:
     ziel.parent.mkdir(parents=True, exist_ok=True)
     ziel.write_text(json.dumps(daten, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -169,9 +234,10 @@ def _json_schreiben(ziel: Path, daten: dict) -> Path:
 def tafeldateien() -> List[Path]:
     """
     Was ueber die Importtafel der Seite geht: jedes Modul der Oberflaeche und
-    die beiden Verzeichnisse unter ``web/kern/``.
+    die Verzeichnisse unter ``web/kern/``.
     """
-    return sorted([*(SEITE.parent / "js").glob("*.js"), MANIFEST, FORMELSAMMLUNG])
+    return sorted([*(SEITE.parent / "js").glob("*.js"), MANIFEST, FORMELSAMMLUNG,
+                   VERZEICHNIS])
 
 
 def versionsmarken() -> str:
@@ -234,6 +300,13 @@ if __name__ == "__main__":
     themen = json.loads(sammlung.read_text(encoding="utf-8"))["themen"]
     print(f"{sammlung.relative_to(WURZEL)}: {len(themen)} Themen, "
           f"{sum(len(t['bloecke']) for t in themen)} Einträge")
+    plan = notizbuch_schreiben()
+    print(f"{NOTIZBUCH.relative_to(WURZEL)}/: {len(plan.schreiben)} geschrieben, "
+          f"{len(plan.unveraendert)} unverändert, {len(plan.loeschen)} gelöscht"
+          + (f", {len(plan.verwaist)} verwaist: {', '.join(plan.verwaist)}"
+             if plan.verwaist else ""))
+    print(f"{VERZEICHNIS.relative_to(WURZEL)}: "
+          f"{len(notizbuch_verzeichnis()['seiten'])} Seiten")
     # Zuletzt: die Marken der beiden Verzeichnisse haengen an dem, was eben
     # geschrieben wurde.
     seite = versionsmarken_schreiben()

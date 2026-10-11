@@ -1,0 +1,1382 @@
+{
+  "hinweis": "Erzeugt von opencivil/web/bruecke.py. Nicht von Hand ändern -- nach einer neuen Seite im Notizbuch 'python3 -m opencivil.web.bruecke' laufen lassen.",
+  "wurzel": "notizbuch/",
+  "start": "Formelsammlung",
+  "seiten": [
+    {
+      "name": "Start",
+      "pfad": "Start.md",
+      "art": "notiz"
+    },
+    {
+      "name": "Formelsammlung",
+      "pfad": "Formelsammlung/Formelsammlung.md",
+      "art": "verzeichnis"
+    },
+    {
+      "name": "Beton",
+      "pfad": "Formelsammlung/Themen/Beton.md",
+      "art": "thema",
+      "bereich": "Baustoffe"
+    },
+    {
+      "name": "Betonstahl",
+      "pfad": "Formelsammlung/Themen/Betonstahl.md",
+      "art": "thema",
+      "bereich": "Baustoffe"
+    },
+    {
+      "name": "Querschnitt",
+      "pfad": "Formelsammlung/Themen/Querschnitt.md",
+      "art": "thema",
+      "bereich": "Platte"
+    },
+    {
+      "name": "Biegung und Normalkraft",
+      "pfad": "Formelsammlung/Themen/Biegung und Normalkraft.md",
+      "art": "thema",
+      "bereich": "Platte"
+    },
+    {
+      "name": "Querschnittsanalyse",
+      "pfad": "Formelsammlung/Themen/Querschnittsanalyse.md",
+      "art": "thema",
+      "bereich": "Querschnittsanalyse"
+    },
+    {
+      "name": "Schiefe Biegung",
+      "pfad": "Formelsammlung/Themen/Schiefe Biegung.md",
+      "art": "thema",
+      "bereich": "Querschnittsanalyse"
+    },
+    {
+      "name": "Querkraft und Torsion",
+      "pfad": "Formelsammlung/Themen/Querkraft und Torsion.md",
+      "art": "thema",
+      "bereich": "Querschnittsanalyse"
+    },
+    {
+      "name": "Querkraft",
+      "pfad": "Formelsammlung/Themen/Querkraft.md",
+      "art": "thema",
+      "bereich": "Platte"
+    },
+    {
+      "name": "Duktilität",
+      "pfad": "Formelsammlung/Themen/Duktilität.md",
+      "art": "thema",
+      "bereich": "Platte"
+    },
+    {
+      "name": "Zwängung auf Normalkraft",
+      "pfad": "Formelsammlung/Themen/Zwängung auf Normalkraft.md",
+      "art": "thema",
+      "bereich": "Platte"
+    },
+    {
+      "name": "Sprödes Versagen",
+      "pfad": "Formelsammlung/Themen/Sprödes Versagen.md",
+      "art": "thema",
+      "bereich": "Platte"
+    },
+    {
+      "name": "Zwängung auf Biegung",
+      "pfad": "Formelsammlung/Themen/Zwängung auf Biegung.md",
+      "art": "thema",
+      "bereich": "Platte"
+    },
+    {
+      "name": "Stahlspannung aus Rissbreite",
+      "pfad": "Formelsammlung/Themen/Stahlspannung aus Rissbreite.md",
+      "art": "thema",
+      "bereich": "Platte"
+    },
+    {
+      "name": "Stahlspannung gegen Fliessen",
+      "pfad": "Formelsammlung/Themen/Stahlspannung gegen Fliessen.md",
+      "art": "thema",
+      "bereich": "Platte"
+    },
+    {
+      "name": "Knicken",
+      "pfad": "Formelsammlung/Themen/Knicken.md",
+      "art": "thema",
+      "bereich": "Platte"
+    },
+    {
+      "name": "Duktilität je Richtung",
+      "pfad": "Formelsammlung/Themen/Duktilität je Richtung.md",
+      "art": "thema",
+      "bereich": "Querschnittsanalyse"
+    },
+    {
+      "name": "Sprödes Versagen je Richtung",
+      "pfad": "Formelsammlung/Themen/Sprödes Versagen je Richtung.md",
+      "art": "thema",
+      "bereich": "Querschnittsanalyse"
+    },
+    {
+      "name": "Spannung-Dehnung-Analyse",
+      "pfad": "Formelsammlung/Themen/Spannung-Dehnung-Analyse.md",
+      "art": "thema",
+      "bereich": "Platte"
+    },
+    {
+      "name": "Äquivalenter E-Modul über dem Moment",
+      "pfad": "Formelsammlung/Formeln/Äquivalenter E-Modul über dem Moment.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Äquivalenter E-Modul über der Normalkraft",
+      "pfad": "Formelsammlung/Formeln/Äquivalenter E-Modul über der Normalkraft.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Aufnehmbare Risskraft",
+      "pfad": "Formelsammlung/Formeln/Aufnehmbare Risskraft.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{s,adm,2,x}"
+      ],
+      "themen": [
+        "Zwängung auf Normalkraft"
+      ]
+    },
+    {
+      "name": "Aufnehmbares Moment der Bewehrung",
+      "pfad": "Formelsammlung/Formeln/Aufnehmbares Moment der Bewehrung.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{s,adm,2,x}"
+      ],
+      "themen": [
+        "Zwängung auf Biegung"
+      ]
+    },
+    {
+      "name": "Bedingung der Duktilität",
+      "pfad": "Formelsammlung/Formeln/Bedingung der Duktilität.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Duktilität",
+        "Duktilität je Richtung"
+      ]
+    },
+    {
+      "name": "Bedingung gegen sprödes Versagen",
+      "pfad": "Formelsammlung/Formeln/Bedingung gegen sprödes Versagen.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Sprödes Versagen je Richtung"
+      ]
+    },
+    {
+      "name": "Beide Lagen fliessen auf Zug",
+      "pfad": "Formelsammlung/Formeln/Beide Lagen fliessen auf Zug.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{Rd}^{+}"
+      ],
+      "themen": [
+        "Biegung und Normalkraft",
+        "Knicken"
+      ]
+    },
+    {
+      "name": "Beiwert der Gesteinskörnung",
+      "pfad": "Formelsammlung/Formeln/Beiwert der Gesteinskörnung.md",
+      "art": "formel",
+      "zeichen": [
+        "k_g"
+      ],
+      "themen": [
+        "Querkraft"
+      ]
+    },
+    {
+      "name": "Beiwert der Parabel, mit dem wirksamen Modul",
+      "pfad": "Formelsammlung/Formeln/Beiwert der Parabel, mit dem wirksamen Modul.md",
+      "art": "formel",
+      "zeichen": [
+        "k_{\\sigma}"
+      ],
+      "themen": [
+        "Knicken",
+        "Biegung und Normalkraft",
+        "Stahlspannung gegen Fliessen",
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Beiwert für die Dicke",
+      "pfad": "Formelsammlung/Formeln/Beiwert für die Dicke.md",
+      "art": "formel",
+      "zeichen": [
+        "k_t"
+      ],
+      "themen": [
+        "Zwängung auf Normalkraft",
+        "Sprödes Versagen",
+        "Zwängung auf Biegung",
+        "Sprödes Versagen je Richtung",
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Beiwert für die statische Höhe",
+      "pfad": "Formelsammlung/Formeln/Beiwert für die statische Höhe.md",
+      "art": "formel",
+      "zeichen": [
+        "k_d"
+      ],
+      "themen": [
+        "Querkraft"
+      ]
+    },
+    {
+      "name": "Beiwert zur Berücksichtigung der Festigkeitsminderung",
+      "pfad": "Formelsammlung/Formeln/Beiwert zur Berücksichtigung der Festigkeitsminderung.md",
+      "art": "formel",
+      "zeichen": [
+        "\\eta_{fc}"
+      ],
+      "themen": [
+        "Beton"
+      ]
+    },
+    {
+      "name": "Bemessungswert der Betondruckfestigkeit",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert der Betondruckfestigkeit.md",
+      "art": "formel",
+      "zeichen": [
+        "f_{cd}"
+      ],
+      "themen": [
+        "Beton"
+      ]
+    },
+    {
+      "name": "Bemessungswert der Fliessgrenze",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert der Fliessgrenze.md",
+      "art": "formel",
+      "zeichen": [
+        "f_{yd}"
+      ],
+      "themen": [
+        "Betonstahl"
+      ]
+    },
+    {
+      "name": "Bemessungswert der Fliessgrenze auf Druck",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert der Fliessgrenze auf Druck.md",
+      "art": "formel",
+      "zeichen": [
+        "f_{yd}^{-}"
+      ],
+      "themen": [
+        "Betonstahl"
+      ]
+    },
+    {
+      "name": "Bemessungswert der Schubspannungsgrenze",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert der Schubspannungsgrenze.md",
+      "art": "formel",
+      "zeichen": [
+        "\\tau_{cd}"
+      ],
+      "themen": [
+        "Beton"
+      ]
+    },
+    {
+      "name": "Bemessungswert des Elastizitätsmoduls",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert des Elastizitätsmoduls.md",
+      "art": "formel",
+      "zeichen": [
+        "E_{cd}"
+      ],
+      "themen": [
+        "Beton"
+      ]
+    },
+    {
+      "name": "Beton ungerissen, in Druck und Zug",
+      "pfad": "Formelsammlung/Formeln/Beton ungerissen, in Druck und Zug.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Betonstahl nur auf Zug",
+      "pfad": "Formelsammlung/Formeln/Betonstahl nur auf Zug.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Stahlspannung aus Rissbreite",
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Bewehrung der Lage",
+      "pfad": "Formelsammlung/Formeln/Bewehrung der Lage.md",
+      "art": "formel",
+      "zeichen": [
+        "A_{s,2,x}"
+      ],
+      "themen": [
+        "Duktilität",
+        "Zwängung auf Normalkraft",
+        "Zwängung auf Biegung"
+      ]
+    },
+    {
+      "name": "Bewehrungsgehalt",
+      "pfad": "Formelsammlung/Formeln/Bewehrungsgehalt.md",
+      "art": "formel",
+      "zeichen": [
+        "\\rho_{u}"
+      ],
+      "themen": [
+        "Querschnitt"
+      ]
+    },
+    {
+      "name": "Bewehrungsmass je Kubikmeter Beton",
+      "pfad": "Formelsammlung/Formeln/Bewehrungsmass je Kubikmeter Beton.md",
+      "art": "formel",
+      "zeichen": [
+        "\\mu_s"
+      ],
+      "themen": [
+        "Querschnitt"
+      ]
+    },
+    {
+      "name": "Bewehrungsquerschnitt der zusammengefassten Lage",
+      "pfad": "Formelsammlung/Formeln/Bewehrungsquerschnitt der zusammengefassten Lage.md",
+      "art": "formel",
+      "zeichen": [
+        "A_{s,u}"
+      ],
+      "themen": [
+        "Querschnitt",
+        "Biegung und Normalkraft"
+      ]
+    },
+    {
+      "name": "Bewehrungsquerschnitt über die Breite b",
+      "pfad": "Formelsammlung/Formeln/Bewehrungsquerschnitt über die Breite b.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Querschnitt"
+      ]
+    },
+    {
+      "name": "Bezogene Druckzonenhöhe",
+      "pfad": "Formelsammlung/Formeln/Bezogene Druckzonenhöhe.md",
+      "art": "formel",
+      "zeichen": [
+        "\\left(x/d\\right)_{2}"
+      ],
+      "themen": [
+        "Duktilität"
+      ]
+    },
+    {
+      "name": "Bezogene Druckzonenhöhe bei reiner Biegung",
+      "pfad": "Formelsammlung/Formeln/Bezogene Druckzonenhöhe bei reiner Biegung.md",
+      "art": "formel",
+      "zeichen": [
+        "x/d"
+      ],
+      "themen": [
+        "Duktilität je Richtung"
+      ]
+    },
+    {
+      "name": "Bezugsgrösse der Normalkraft",
+      "pfad": "Formelsammlung/Formeln/Bezugsgrösse der Normalkraft.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{ref}"
+      ],
+      "themen": [
+        "Biegung und Normalkraft"
+      ]
+    },
+    {
+      "name": "Bezugsgrösse des Moments",
+      "pfad": "Formelsammlung/Formeln/Bezugsgrösse des Moments.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{ref}"
+      ],
+      "themen": [
+        "Biegung und Normalkraft"
+      ]
+    },
+    {
+      "name": "Bilineare Beziehung des Betonstahls",
+      "pfad": "Formelsammlung/Formeln/Bilineare Beziehung des Betonstahls.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Schiefe Biegung",
+        "Biegung und Normalkraft"
+      ]
+    },
+    {
+      "name": "Bügelquerschnitt je Länge einer Schubwand (n Schnitte)",
+      "pfad": "Formelsammlung/Formeln/Bügelquerschnitt je Länge einer Schubwand (n Schnitte).md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Querschnittsanalyse"
+      ]
+    },
+    {
+      "name": "Dehnung auf halber Höhe",
+      "pfad": "Formelsammlung/Formeln/Dehnung auf halber Höhe.md",
+      "art": "formel",
+      "zeichen": [
+        "\\varepsilon_v"
+      ],
+      "themen": [
+        "Querkraft"
+      ]
+    },
+    {
+      "name": "Dehnung der Zugbewehrung",
+      "pfad": "Formelsammlung/Formeln/Dehnung der Zugbewehrung.md",
+      "art": "formel",
+      "zeichen": [
+        "\\varepsilon_s^{+}"
+      ],
+      "themen": [
+        "Biegung und Normalkraft",
+        "Knicken"
+      ]
+    },
+    {
+      "name": "Dehnungsebene und innere Kräfte",
+      "pfad": "Formelsammlung/Formeln/Dehnungsebene und innere Kräfte.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Schiefe Biegung",
+        "Stahlspannung aus Rissbreite",
+        "Stahlspannung gegen Fliessen",
+        "Knicken"
+      ]
+    },
+    {
+      "name": "Dekompressionsmoment",
+      "pfad": "Formelsammlung/Formeln/Dekompressionsmoment.md",
+      "art": "formel",
+      "zeichen": [
+        "m_{Dd}"
+      ],
+      "themen": [
+        "Querkraft"
+      ]
+    },
+    {
+      "name": "Dekompressionsmoment und Dehnung",
+      "pfad": "Formelsammlung/Formeln/Dekompressionsmoment und Dehnung.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Querkraft"
+      ]
+    },
+    {
+      "name": "Dickster Stab der Lage",
+      "pfad": "Formelsammlung/Formeln/Dickster Stab der Lage.md",
+      "art": "formel",
+      "zeichen": [
+        "\\varnothing_{2,x}"
+      ],
+      "themen": [
+        "Zwängung auf Normalkraft",
+        "Zwängung auf Biegung"
+      ]
+    },
+    {
+      "name": "Druckzonenhöhe aus dem Kräftegleichgewicht",
+      "pfad": "Formelsammlung/Formeln/Druckzonenhöhe aus dem Kräftegleichgewicht.md",
+      "art": "formel",
+      "zeichen": [
+        "x^{+}"
+      ],
+      "themen": [
+        "Biegung und Normalkraft",
+        "Knicken"
+      ]
+    },
+    {
+      "name": "Druckzonenhöhe bei reiner Biegung",
+      "pfad": "Formelsammlung/Formeln/Druckzonenhöhe bei reiner Biegung.md",
+      "art": "formel",
+      "zeichen": [
+        "x"
+      ],
+      "themen": [
+        "Duktilität"
+      ]
+    },
+    {
+      "name": "Einwirkung im normierten Diagramm",
+      "pfad": "Formelsammlung/Formeln/Einwirkung im normierten Diagramm.md",
+      "art": "formel",
+      "zeichen": [
+        "\\bar{E}_{d,x}"
+      ],
+      "themen": [
+        "Biegung und Normalkraft"
+      ]
+    },
+    {
+      "name": "Erfüllungsgrad",
+      "pfad": "Formelsammlung/Formeln/Erfüllungsgrad.md",
+      "art": "formel",
+      "zeichen": [
+        "\\alpha_{eff,x}"
+      ],
+      "themen": [
+        "Biegung und Normalkraft",
+        "Schiefe Biegung",
+        "Querkraft und Torsion",
+        "Querkraft",
+        "Duktilität",
+        "Zwängung auf Normalkraft",
+        "Sprödes Versagen",
+        "Zwängung auf Biegung",
+        "Stahlspannung aus Rissbreite",
+        "Stahlspannung gegen Fliessen",
+        "Knicken",
+        "Duktilität je Richtung",
+        "Sprödes Versagen je Richtung"
+      ]
+    },
+    {
+      "name": "Erfüllungsgrad bei fester Normalkraft und fester Richtung",
+      "pfad": "Formelsammlung/Formeln/Erfüllungsgrad bei fester Normalkraft und fester Richtung.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Schiefe Biegung"
+      ]
+    },
+    {
+      "name": "Fläche und Schwerpunkt eines Polygons (Satz von Gauss)",
+      "pfad": "Formelsammlung/Formeln/Fläche und Schwerpunkt eines Polygons (Satz von Gauss).md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Querschnittsanalyse"
+      ]
+    },
+    {
+      "name": "Fliessdehnung",
+      "pfad": "Formelsammlung/Formeln/Fliessdehnung.md",
+      "art": "formel",
+      "zeichen": [
+        "\\varepsilon_{yd}",
+        "\\varepsilon_y"
+      ],
+      "themen": [
+        "Betonstahl",
+        "Stahlspannung aus Rissbreite",
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Gewollte Ausmitte",
+      "pfad": "Formelsammlung/Formeln/Gewollte Ausmitte.md",
+      "art": "formel",
+      "zeichen": [
+        "e_{1d}"
+      ],
+      "themen": [
+        "Knicken"
+      ]
+    },
+    {
+      "name": "Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein",
+      "pfad": "Formelsammlung/Formeln/Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Knicken"
+      ]
+    },
+    {
+      "name": "Gleichmässiger Druck, ohne Bewehrung",
+      "pfad": "Formelsammlung/Formeln/Gleichmässiger Druck, ohne Bewehrung.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{Rd}^{-}"
+      ],
+      "themen": [
+        "Biegung und Normalkraft",
+        "Knicken"
+      ]
+    },
+    {
+      "name": "Grenzdehnungen am Ende der Linie",
+      "pfad": "Formelsammlung/Formeln/Grenzdehnungen am Ende der Linie.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Grösste Dehnung auf halber Höhe",
+      "pfad": "Formelsammlung/Formeln/Grösste Dehnung auf halber Höhe.md",
+      "art": "formel",
+      "zeichen": [
+        "\\varepsilon_{m,u}"
+      ],
+      "themen": [
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Grösste Krümmung",
+      "pfad": "Formelsammlung/Formeln/Grösste Krümmung.md",
+      "art": "formel",
+      "zeichen": [
+        "\\chi_{u}"
+      ],
+      "themen": [
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Hilfsgrösse der Nulllinie",
+      "pfad": "Formelsammlung/Formeln/Hilfsgrösse der Nulllinie.md",
+      "art": "formel",
+      "zeichen": [
+        "\\rho"
+      ],
+      "themen": [
+        "Zwängung auf Biegung"
+      ]
+    },
+    {
+      "name": "Höhe der Distanzhalter",
+      "pfad": "Formelsammlung/Formeln/Höhe der Distanzhalter.md",
+      "art": "formel",
+      "zeichen": [
+        "h_{Dist}"
+      ],
+      "themen": [
+        "Querschnitt"
+      ]
+    },
+    {
+      "name": "Innerer Hebelarm",
+      "pfad": "Formelsammlung/Formeln/Innerer Hebelarm.md",
+      "art": "formel",
+      "zeichen": [
+        "z"
+      ],
+      "themen": [
+        "Zwängung auf Biegung"
+      ]
+    },
+    {
+      "name": "Iteration der Ausmitte 2. Ordnung",
+      "pfad": "Formelsammlung/Formeln/Iteration der Ausmitte 2. Ordnung.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Knicken"
+      ]
+    },
+    {
+      "name": "Kräfte mal Hebelarm um die halbe Höhe",
+      "pfad": "Formelsammlung/Formeln/Kräfte mal Hebelarm um die halbe Höhe.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{Rd}(N_{Rd}^{+})"
+      ],
+      "themen": [
+        "Biegung und Normalkraft",
+        "Knicken"
+      ]
+    },
+    {
+      "name": "Kräftegleichgewicht",
+      "pfad": "Formelsammlung/Formeln/Kräftegleichgewicht.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{Rd}^{+}"
+      ],
+      "themen": [
+        "Biegung und Normalkraft",
+        "Knicken"
+      ]
+    },
+    {
+      "name": "Kräftegleichgewicht bei M_Ed = 0",
+      "pfad": "Formelsammlung/Formeln/Kräftegleichgewicht bei M_Ed = 0.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Duktilität"
+      ]
+    },
+    {
+      "name": "Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung",
+      "pfad": "Formelsammlung/Formeln/Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung.md",
+      "art": "formel",
+      "zeichen": [
+        "k_{\\sigma}"
+      ],
+      "themen": [
+        "Beton",
+        "Schiefe Biegung"
+      ]
+    },
+    {
+      "name": "Kürzester Abstand zur Resistenzlinie",
+      "pfad": "Formelsammlung/Formeln/Kürzester Abstand zur Resistenzlinie.md",
+      "art": "formel",
+      "zeichen": [
+        "a"
+      ],
+      "themen": [
+        "Biegung und Normalkraft"
+      ]
+    },
+    {
+      "name": "Mittelwert der Zylinderdruckfestigkeit",
+      "pfad": "Formelsammlung/Formeln/Mittelwert der Zylinderdruckfestigkeit.md",
+      "art": "formel",
+      "zeichen": [
+        "f_{cm}"
+      ],
+      "themen": [
+        "Beton"
+      ]
+    },
+    {
+      "name": "Mittelwert des Elastizitätsmoduls",
+      "pfad": "Formelsammlung/Formeln/Mittelwert des Elastizitätsmoduls.md",
+      "art": "formel",
+      "zeichen": [
+        "E_{cm}"
+      ],
+      "themen": [
+        "Beton"
+      ]
+    },
+    {
+      "name": "Momentengleichgewicht um die halbe Höhe",
+      "pfad": "Formelsammlung/Formeln/Momentengleichgewicht um die halbe Höhe.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{Rd}^{+}"
+      ],
+      "themen": [
+        "Biegung und Normalkraft",
+        "Knicken"
+      ]
+    },
+    {
+      "name": "Momentenwiderstand bei reiner Biegung",
+      "pfad": "Formelsammlung/Formeln/Momentenwiderstand bei reiner Biegung.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{Rd}(N_{Ed}=0)^{+}"
+      ],
+      "themen": [
+        "Biegung und Normalkraft",
+        "Knicken"
+      ]
+    },
+    {
+      "name": "Nulllinie auf halber Höhe",
+      "pfad": "Formelsammlung/Formeln/Nulllinie auf halber Höhe.md",
+      "art": "formel",
+      "zeichen": [
+        "x^{+}"
+      ],
+      "themen": [
+        "Biegung und Normalkraft",
+        "Knicken"
+      ]
+    },
+    {
+      "name": "Nulllinie des gerissenen Querschnitts",
+      "pfad": "Formelsammlung/Formeln/Nulllinie des gerissenen Querschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "x"
+      ],
+      "themen": [
+        "Zwängung auf Biegung"
+      ]
+    },
+    {
+      "name": "Parabel-Rechteck-Beziehung des Betons",
+      "pfad": "Formelsammlung/Formeln/Parabel-Rechteck-Beziehung des Betons.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Schiefe Biegung",
+        "Knicken",
+        "Biegung und Normalkraft",
+        "Stahlspannung gegen Fliessen",
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Probe – Moment um y",
+      "pfad": "Formelsammlung/Formeln/Probe – Moment um y.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{y,Rd}"
+      ],
+      "themen": [
+        "Schiefe Biegung"
+      ]
+    },
+    {
+      "name": "Probe – Moment um z",
+      "pfad": "Formelsammlung/Formeln/Probe – Moment um z.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{z,Rd}"
+      ],
+      "themen": [
+        "Schiefe Biegung"
+      ]
+    },
+    {
+      "name": "Probe – Normalkraft",
+      "pfad": "Formelsammlung/Formeln/Probe – Normalkraft.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{Rd}"
+      ],
+      "themen": [
+        "Schiefe Biegung"
+      ]
+    },
+    {
+      "name": "Querkraft über die Federn der Wände",
+      "pfad": "Formelsammlung/Formeln/Querkraft über die Federn der Wände.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Querkraft und Torsion"
+      ]
+    },
+    {
+      "name": "Querkraftwiderstand mit Querkraftbewehrung",
+      "pfad": "Formelsammlung/Formeln/Querkraftwiderstand mit Querkraftbewehrung.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{Rd,x}"
+      ],
+      "themen": [
+        "Querkraft"
+      ]
+    },
+    {
+      "name": "Querkraftwiderstand ohne Querkraftbewehrung",
+      "pfad": "Formelsammlung/Formeln/Querkraftwiderstand ohne Querkraftbewehrung.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{Rd,x}"
+      ],
+      "themen": [
+        "Querkraft"
+      ]
+    },
+    {
+      "name": "Querschnitt eines Bügelschenkels",
+      "pfad": "Formelsammlung/Formeln/Querschnitt eines Bügelschenkels.md",
+      "art": "formel",
+      "zeichen": [
+        "A_{\\varnothing,V}"
+      ],
+      "themen": [
+        "Querschnitt"
+      ]
+    },
+    {
+      "name": "Reiner Betonquerschnitt – Fläche",
+      "pfad": "Formelsammlung/Formeln/Reiner Betonquerschnitt – Fläche.md",
+      "art": "formel",
+      "zeichen": [
+        "A_c"
+      ],
+      "themen": [
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Reiner Betonquerschnitt – Flächenmoment",
+      "pfad": "Formelsammlung/Formeln/Reiner Betonquerschnitt – Flächenmoment.md",
+      "art": "formel",
+      "zeichen": [
+        "I_c"
+      ],
+      "themen": [
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Rissaktive Plattendicke",
+      "pfad": "Formelsammlung/Formeln/Rissaktive Plattendicke.md",
+      "art": "formel",
+      "zeichen": [
+        "h_{eff}"
+      ],
+      "themen": [
+        "Zwängung auf Normalkraft"
+      ]
+    },
+    {
+      "name": "Risskraft der gezogenen Querschnittshälfte",
+      "pfad": "Formelsammlung/Formeln/Risskraft der gezogenen Querschnittshälfte.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{Riss}"
+      ],
+      "themen": [
+        "Zwängung auf Normalkraft"
+      ]
+    },
+    {
+      "name": "Rissmoment bei der Normalkraft",
+      "pfad": "Formelsammlung/Formeln/Rissmoment bei der Normalkraft.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{Riss}(N)"
+      ],
+      "themen": [
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Rissmoment des ungerissenen Querschnitts",
+      "pfad": "Formelsammlung/Formeln/Rissmoment des ungerissenen Querschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{Riss}"
+      ],
+      "themen": [
+        "Sprödes Versagen",
+        "Zwängung auf Biegung",
+        "Sprödes Versagen je Richtung"
+      ]
+    },
+    {
+      "name": "Rissnormalkraft beim Moment",
+      "pfad": "Formelsammlung/Formeln/Rissnormalkraft beim Moment.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{Riss}(M)"
+      ],
+      "themen": [
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Schiefstellung",
+      "pfad": "Formelsammlung/Formeln/Schiefstellung.md",
+      "art": "formel",
+      "zeichen": [
+        "\\alpha_i"
+      ],
+      "themen": [
+        "Knicken"
+      ]
+    },
+    {
+      "name": "Schnittgrössen aus der Spannungsverteilung",
+      "pfad": "Formelsammlung/Formeln/Schnittgrössen aus der Spannungsverteilung.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Biegung und Normalkraft"
+      ]
+    },
+    {
+      "name": "Schwerpunkt der zusammengefassten Lage",
+      "pfad": "Formelsammlung/Formeln/Schwerpunkt der zusammengefassten Lage.md",
+      "art": "formel",
+      "zeichen": [
+        "z_{u}",
+        "z_{2,x}"
+      ],
+      "themen": [
+        "Querschnitt",
+        "Biegung und Normalkraft",
+        "Duktilität",
+        "Zwängung auf Biegung"
+      ]
+    },
+    {
+      "name": "Spannung im ungerissenen Querschnitt",
+      "pfad": "Formelsammlung/Formeln/Spannung im ungerissenen Querschnitt.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Sprödes Versagen je Richtung"
+      ]
+    },
+    {
+      "name": "Spannungsblock des Betons",
+      "pfad": "Formelsammlung/Formeln/Spannungsblock des Betons.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Stahlspannung aus Rissbreite",
+        "Knicken",
+        "Biegung und Normalkraft",
+        "Schiefe Biegung",
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Stahlspannung, höchstens die Fliessgrenze",
+      "pfad": "Formelsammlung/Formeln/Stahlspannung, höchstens die Fliessgrenze.md",
+      "art": "formel",
+      "zeichen": [
+        "\\sigma_{sd}"
+      ],
+      "themen": [
+        "Biegung und Normalkraft",
+        "Knicken"
+      ]
+    },
+    {
+      "name": "Statische Höhe",
+      "pfad": "Formelsammlung/Formeln/Statische Höhe.md",
+      "art": "formel",
+      "zeichen": [
+        "d_{u}",
+        "d_{o}"
+      ],
+      "themen": [
+        "Querschnitt",
+        "Biegung und Normalkraft",
+        "Querkraft",
+        "Duktilität",
+        "Zwängung auf Biegung",
+        "Knicken"
+      ]
+    },
+    {
+      "name": "Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet",
+      "pfad": "Formelsammlung/Formeln/Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Querschnittsanalyse"
+      ]
+    },
+    {
+      "name": "Teilung in y aus der Stabzahl",
+      "pfad": "Formelsammlung/Formeln/Teilung in y aus der Stabzahl.md",
+      "art": "formel",
+      "zeichen": [
+        "s_{V,y}"
+      ],
+      "themen": [
+        "Querkraft"
+      ]
+    },
+    {
+      "name": "Torsion in den Zellen (Bredt, mehrzellig)",
+      "pfad": "Formelsammlung/Formeln/Torsion in den Zellen (Bredt, mehrzellig).md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Querkraft und Torsion"
+      ]
+    },
+    {
+      "name": "Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt",
+      "pfad": "Formelsammlung/Formeln/Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Querschnittsanalyse"
+      ]
+    },
+    {
+      "name": "Ungewollte Ausmitte",
+      "pfad": "Formelsammlung/Formeln/Ungewollte Ausmitte.md",
+      "art": "formel",
+      "zeichen": [
+        "e_{0d}"
+      ],
+      "themen": [
+        "Knicken"
+      ]
+    },
+    {
+      "name": "Ungewollte Ausmitte – allgemein",
+      "pfad": "Formelsammlung/Formeln/Ungewollte Ausmitte – allgemein.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Knicken"
+      ]
+    },
+    {
+      "name": "Vergrösserungsfaktor der Durchbiegung",
+      "pfad": "Formelsammlung/Formeln/Vergrösserungsfaktor der Durchbiegung.md",
+      "art": "formel",
+      "zeichen": [
+        "\\left(\\frac{w}{w_c}\\right)_{u}"
+      ],
+      "themen": [
+        "Querschnitt"
+      ]
+    },
+    {
+      "name": "Versatz – Moment der Querkraftanteile um den Schwerpunkt",
+      "pfad": "Formelsammlung/Formeln/Versatz – Moment der Querkraftanteile um den Schwerpunkt.md",
+      "art": "formel",
+      "zeichen": [
+        "\\Delta T"
+      ],
+      "themen": [
+        "Querkraft und Torsion"
+      ]
+    },
+    {
+      "name": "Was die Zellen tragen",
+      "pfad": "Formelsammlung/Formeln/Was die Zellen tragen.md",
+      "art": "formel",
+      "zeichen": [
+        "T_{Zellen}"
+      ],
+      "themen": [
+        "Querkraft und Torsion"
+      ]
+    },
+    {
+      "name": "Wertigkeit im gerissenen Zustand",
+      "pfad": "Formelsammlung/Formeln/Wertigkeit im gerissenen Zustand.md",
+      "art": "formel",
+      "zeichen": [
+        "n"
+      ],
+      "themen": [
+        "Zwängung auf Biegung"
+      ]
+    },
+    {
+      "name": "Widerstand bei festgehaltenem N_Ed",
+      "pfad": "Formelsammlung/Formeln/Widerstand bei festgehaltenem N_Ed.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{Rd}"
+      ],
+      "themen": [
+        "Biegung und Normalkraft",
+        "Querkraft"
+      ]
+    },
+    {
+      "name": "Widerstand der Bügel",
+      "pfad": "Formelsammlung/Formeln/Widerstand der Bügel.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{Rd,s}"
+      ],
+      "themen": [
+        "Querkraft"
+      ]
+    },
+    {
+      "name": "Widerstand der Druckdiagonalen",
+      "pfad": "Formelsammlung/Formeln/Widerstand der Druckdiagonalen.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{Rd,c}"
+      ],
+      "themen": [
+        "Querkraft"
+      ]
+    },
+    {
+      "name": "Widerstand im normierten Diagramm",
+      "pfad": "Formelsammlung/Formeln/Widerstand im normierten Diagramm.md",
+      "art": "formel",
+      "zeichen": [
+        "\\bar{R}_{d,x}"
+      ],
+      "themen": [
+        "Biegung und Normalkraft"
+      ]
+    },
+    {
+      "name": "Widerstand in der Richtung der Einwirkung",
+      "pfad": "Formelsammlung/Formeln/Widerstand in der Richtung der Einwirkung.md",
+      "art": "formel",
+      "zeichen": [
+        "M_{Rd}"
+      ],
+      "themen": [
+        "Schiefe Biegung"
+      ]
+    },
+    {
+      "name": "Widerstand je Länge einer Wand (Fachwerk)",
+      "pfad": "Formelsammlung/Formeln/Widerstand je Länge einer Wand (Fachwerk).md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Querkraft und Torsion"
+      ]
+    },
+    {
+      "name": "Widerstandsmoment zum gezogensten Betonpunkt",
+      "pfad": "Formelsammlung/Formeln/Widerstandsmoment zum gezogensten Betonpunkt.md",
+      "art": "formel",
+      "zeichen": [
+        "W"
+      ],
+      "themen": [
+        "Sprödes Versagen je Richtung"
+      ]
+    },
+    {
+      "name": "Wirksame Höhe (Einlage nicht massgebend)",
+      "pfad": "Formelsammlung/Formeln/Wirksame Höhe (Einlage nicht massgebend).md",
+      "art": "formel",
+      "zeichen": [
+        "d_v"
+      ],
+      "themen": [
+        "Querkraft"
+      ]
+    },
+    {
+      "name": "Wirksame Höhe, um die Einlage vermindert",
+      "pfad": "Formelsammlung/Formeln/Wirksame Höhe, um die Einlage vermindert.md",
+      "art": "formel",
+      "zeichen": [
+        "d_v"
+      ],
+      "themen": [
+        "Querkraft"
+      ]
+    },
+    {
+      "name": "Wirksame Zugfestigkeit",
+      "pfad": "Formelsammlung/Formeln/Wirksame Zugfestigkeit.md",
+      "art": "formel",
+      "zeichen": [
+        "f_{ct,eff}"
+      ],
+      "themen": [
+        "Zwängung auf Normalkraft",
+        "Sprödes Versagen",
+        "Zwängung auf Biegung",
+        "Sprödes Versagen je Richtung",
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Wirksamer Elastizitätsmodul",
+      "pfad": "Formelsammlung/Formeln/Wirksamer Elastizitätsmodul.md",
+      "art": "formel",
+      "zeichen": [
+        "E_{c,eff}"
+      ],
+      "themen": [
+        "Stahlspannung aus Rissbreite",
+        "Stahlspannung gegen Fliessen",
+        "Knicken",
+        "Biegung und Normalkraft",
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Zulässige Dehnung",
+      "pfad": "Formelsammlung/Formeln/Zulässige Dehnung.md",
+      "art": "formel",
+      "zeichen": [
+        "\\varepsilon_{s,adm}"
+      ],
+      "themen": [
+        "Stahlspannung aus Rissbreite"
+      ]
+    },
+    {
+      "name": "Zulässige Stahlspannung",
+      "pfad": "Formelsammlung/Formeln/Zulässige Stahlspannung.md",
+      "art": "formel",
+      "zeichen": [
+        "\\sigma_{s,adm}"
+      ],
+      "themen": [
+        "Stahlspannung gegen Fliessen"
+      ]
+    },
+    {
+      "name": "Zulässige Stahlspannung (normale Anforderung)",
+      "pfad": "Formelsammlung/Formeln/Zulässige Stahlspannung (normale Anforderung).md",
+      "art": "formel",
+      "zeichen": [
+        "\\sigma_{s,adm}"
+      ],
+      "themen": [
+        "Stahlspannung aus Rissbreite"
+      ]
+    },
+    {
+      "name": "Zulässige Stahlspannung (Rissbreite w_nom)",
+      "pfad": "Formelsammlung/Formeln/Zulässige Stahlspannung (Rissbreite w_nom).md",
+      "art": "formel",
+      "zeichen": [
+        "\\sigma_{s,adm,2,x}"
+      ],
+      "themen": [
+        "Zwängung auf Normalkraft",
+        "Zwängung auf Biegung",
+        "Stahlspannung aus Rissbreite"
+      ]
+    },
+    {
+      "name": "Arbeitsweise",
+      "pfad": "Notizen/Arbeitsweise.md",
+      "art": "notiz"
+    },
+    {
+      "name": "Entwicklung",
+      "pfad": "Notizen/Entwicklung.md",
+      "art": "notiz"
+    },
+    {
+      "name": "TODO",
+      "pfad": "Notizen/TODO.md",
+      "art": "notiz"
+    }
+  ],
+  "anhaenge": []
+}

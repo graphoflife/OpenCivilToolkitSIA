@@ -1,0 +1,234 @@
+---
+erzeugt: 430c5b0e9c2e
+art: verzeichnis
+tags: [verzeichnis]
+---
+Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normstelle, die Grössen mit ihrer Herkunft, ein Zahlenbeispiel, die Stelle im Code – und darunter, von Hand, die Theorie. Gesammelt aus dem Beispielprojekt und dem Prüfprojekt «Jeder Nachweis», die zusammen jeden Nachweis rechnen; geschrieben von `python3 -m opencivil.web.bruecke`.
+
+## Themen
+
+**Baustoffe**
+
+- [[Beton]] · 7
+- [[Betonstahl]] · 3
+
+**Platte**
+
+- [[Querschnitt]] · 9
+- [[Biegung und Normalkraft]] · 26
+- [[Querkraft]] · 15
+- [[Duktilität]] · 8
+- [[Zwängung auf Normalkraft]] · 9
+- [[Sprödes Versagen]] · 4
+- [[Zwängung auf Biegung]] · 14
+- [[Stahlspannung aus Rissbreite]] · 9
+- [[Stahlspannung gegen Fliessen]] · 6
+- [[Knicken]] · 23
+- [[Spannung-Dehnung-Analyse]] · 18
+
+**Querschnittsanalyse**
+
+- [[Querschnittsanalyse]] · 4
+- [[Schiefe Biegung]] · 11
+- [[Querkraft und Torsion]] · 6
+- [[Duktilität je Richtung]] · 3
+- [[Sprödes Versagen je Richtung]] · 7
+
+## Formeln von A bis Z
+
+- [[Äquivalenter E-Modul über dem Moment]]
+- [[Äquivalenter E-Modul über der Normalkraft]]
+- [[Aufnehmbare Risskraft]] · $N_{s,adm,2,x}$
+- [[Aufnehmbares Moment der Bewehrung]] · $M_{s,adm,2,x}$
+- [[Bedingung der Duktilität]]
+- [[Bedingung gegen sprödes Versagen]]
+- [[Beide Lagen fliessen auf Zug]] · $N_{Rd}^{+}$
+- [[Beiwert der Gesteinskörnung]] · $k_g$
+- [[Beiwert der Parabel, mit dem wirksamen Modul]] · $k_{\sigma}$
+- [[Beiwert für die Dicke]] · $k_t$
+- [[Beiwert für die statische Höhe]] · $k_d$
+- [[Beiwert zur Berücksichtigung der Festigkeitsminderung]] · $\eta_{fc}$
+- [[Bemessungswert der Betondruckfestigkeit]] · $f_{cd}$
+- [[Bemessungswert der Fliessgrenze]] · $f_{yd}$
+- [[Bemessungswert der Fliessgrenze auf Druck]] · $f_{yd}^{-}$
+- [[Bemessungswert der Schubspannungsgrenze]] · $\tau_{cd}$
+- [[Bemessungswert des Elastizitätsmoduls]] · $E_{cd}$
+- [[Beton ungerissen, in Druck und Zug]]
+- [[Betonstahl nur auf Zug]]
+- [[Bewehrung der Lage]] · $A_{s,2,x}$
+- [[Bewehrungsgehalt]] · $\rho_{u}$
+- [[Bewehrungsmass je Kubikmeter Beton]] · $\mu_s$
+- [[Bewehrungsquerschnitt der zusammengefassten Lage]] · $A_{s,u}$
+- [[Bewehrungsquerschnitt über die Breite b]]
+- [[Bezogene Druckzonenhöhe]] · $\left(x/d\right)_{2}$
+- [[Bezogene Druckzonenhöhe bei reiner Biegung]] · $x/d$
+- [[Bezugsgrösse der Normalkraft]] · $N_{ref}$
+- [[Bezugsgrösse des Moments]] · $M_{ref}$
+- [[Bilineare Beziehung des Betonstahls]]
+- [[Bügelquerschnitt je Länge einer Schubwand (n Schnitte)]]
+- [[Dehnung auf halber Höhe]] · $\varepsilon_v$
+- [[Dehnung der Zugbewehrung]] · $\varepsilon_s^{+}$
+- [[Dehnungsebene und innere Kräfte]]
+- [[Dekompressionsmoment]] · $m_{Dd}$
+- [[Dekompressionsmoment und Dehnung]]
+- [[Dickster Stab der Lage]] · $\varnothing_{2,x}$
+- [[Druckzonenhöhe aus dem Kräftegleichgewicht]] · $x^{+}$
+- [[Druckzonenhöhe bei reiner Biegung]] · $x$
+- [[Einwirkung im normierten Diagramm]] · $\bar{E}_{d,x}$
+- [[Erfüllungsgrad]] · $\alpha_{eff,x}$
+- [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]]
+- [[Fläche und Schwerpunkt eines Polygons (Satz von Gauss)]]
+- [[Fliessdehnung]] · $\varepsilon_{yd}$
+- [[Gewollte Ausmitte]] · $e_{1d}$
+- [[Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein]]
+- [[Gleichmässiger Druck, ohne Bewehrung]] · $N_{Rd}^{-}$
+- [[Grenzdehnungen am Ende der Linie]]
+- [[Grösste Dehnung auf halber Höhe]] · $\varepsilon_{m,u}$
+- [[Grösste Krümmung]] · $\chi_{u}$
+- [[Hilfsgrösse der Nulllinie]] · $\rho$
+- [[Höhe der Distanzhalter]] · $h_{Dist}$
+- [[Innerer Hebelarm]] · $z$
+- [[Iteration der Ausmitte 2. Ordnung]]
+- [[Kräfte mal Hebelarm um die halbe Höhe]] · $M_{Rd}(N_{Rd}^{+})$
+- [[Kräftegleichgewicht]] · $N_{Rd}^{+}$
+- [[Kräftegleichgewicht bei M_Ed = 0]]
+- [[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]] · $k_{\sigma}$
+- [[Kürzester Abstand zur Resistenzlinie]] · $a$
+- [[Mittelwert der Zylinderdruckfestigkeit]] · $f_{cm}$
+- [[Mittelwert des Elastizitätsmoduls]] · $E_{cm}$
+- [[Momentengleichgewicht um die halbe Höhe]] · $M_{Rd}^{+}$
+- [[Momentenwiderstand bei reiner Biegung]] · $M_{Rd}(N_{Ed}=0)^{+}$
+- [[Nulllinie auf halber Höhe]] · $x^{+}$
+- [[Nulllinie des gerissenen Querschnitts]] · $x$
+- [[Parabel-Rechteck-Beziehung des Betons]]
+- [[Probe – Moment um y]] · $M_{y,Rd}$
+- [[Probe – Moment um z]] · $M_{z,Rd}$
+- [[Probe – Normalkraft]] · $N_{Rd}$
+- [[Querkraft über die Federn der Wände]]
+- [[Querkraftwiderstand mit Querkraftbewehrung]] · $V_{Rd,x}$
+- [[Querkraftwiderstand ohne Querkraftbewehrung]] · $V_{Rd,x}$
+- [[Querschnitt eines Bügelschenkels]] · $A_{\varnothing,V}$
+- [[Reiner Betonquerschnitt – Fläche]] · $A_c$
+- [[Reiner Betonquerschnitt – Flächenmoment]] · $I_c$
+- [[Rissaktive Plattendicke]] · $h_{eff}$
+- [[Risskraft der gezogenen Querschnittshälfte]] · $N_{Riss}$
+- [[Rissmoment bei der Normalkraft]] · $M_{Riss}(N)$
+- [[Rissmoment des ungerissenen Querschnitts]] · $M_{Riss}$
+- [[Rissnormalkraft beim Moment]] · $N_{Riss}(M)$
+- [[Schiefstellung]] · $\alpha_i$
+- [[Schnittgrössen aus der Spannungsverteilung]]
+- [[Schwerpunkt der zusammengefassten Lage]] · $z_{u}$
+- [[Spannung im ungerissenen Querschnitt]]
+- [[Spannungsblock des Betons]]
+- [[Stahlspannung, höchstens die Fliessgrenze]] · $\sigma_{sd}$
+- [[Statische Höhe]] · $d_{u}$
+- [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]]
+- [[Teilung in y aus der Stabzahl]] · $s_{V,y}$
+- [[Torsion in den Zellen (Bredt, mehrzellig)]]
+- [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]]
+- [[Ungewollte Ausmitte]] · $e_{0d}$
+- [[Ungewollte Ausmitte – allgemein]]
+- [[Vergrösserungsfaktor der Durchbiegung]] · $\left(\frac{w}{w_c}\right)_{u}$
+- [[Versatz – Moment der Querkraftanteile um den Schwerpunkt]] · $\Delta T$
+- [[Was die Zellen tragen]] · $T_{Zellen}$
+- [[Wertigkeit im gerissenen Zustand]] · $n$
+- [[Widerstand bei festgehaltenem N_Ed]] · $M_{Rd}$
+- [[Widerstand der Bügel]] · $V_{Rd,s}$
+- [[Widerstand der Druckdiagonalen]] · $V_{Rd,c}$
+- [[Widerstand im normierten Diagramm]] · $\bar{R}_{d,x}$
+- [[Widerstand in der Richtung der Einwirkung]] · $M_{Rd}$
+- [[Widerstand je Länge einer Wand (Fachwerk)]]
+- [[Widerstandsmoment zum gezogensten Betonpunkt]] · $W$
+- [[Wirksame Höhe (Einlage nicht massgebend)]] · $d_v$
+- [[Wirksame Höhe, um die Einlage vermindert]] · $d_v$
+- [[Wirksame Zugfestigkeit]] · $f_{ct,eff}$
+- [[Wirksamer Elastizitätsmodul]] · $E_{c,eff}$
+- [[Zulässige Dehnung]] · $\varepsilon_{s,adm}$
+- [[Zulässige Stahlspannung]] · $\sigma_{s,adm}$
+- [[Zulässige Stahlspannung (normale Anforderung)]] · $\sigma_{s,adm}$
+- [[Zulässige Stahlspannung (Rissbreite w_nom)]] · $\sigma_{s,adm,2,x}$
+
+## Normstelle fehlt noch
+
+80 von 111 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
+
+- [[Äquivalenter E-Modul über dem Moment]] · `opencivil.spannungsanalyse:_herleitung_modul`
+- [[Äquivalenter E-Modul über der Normalkraft]] · `opencivil.spannungsanalyse:_herleitung_modul`
+- [[Aufnehmbare Risskraft]] · `opencivil.nachweis.mindestbewehrung:Rissnormalkraft._protokoll_lage`
+- [[Aufnehmbares Moment der Bewehrung]] · `opencivil.nachweis.mindestbewehrung:ZwaengungBiegung._protokoll_lage`
+- [[Beide Lagen fliessen auf Zug]] · `opencivil.nachweis.handrechnung:Handrechnung._groesste_zugkraft`
+- [[Beiwert der Parabel, mit dem wirksamen Modul]] · `opencivil.nachweis.rechenwahl:protokoll_betongesetz`, `opencivil.spannungsanalyse:_herleitung`
+- [[Beiwert für die statische Höhe]] · `opencivil.nachweis.querkraft:Querkraft._protokoll_fall`
+- [[Beton ungerissen, in Druck und Zug]] · `opencivil.spannungsanalyse:_herleitung`
+- [[Betonstahl nur auf Zug]] · `opencivil.nachweis.rechenwahl:protokoll_gesetze`, `opencivil.spannungsanalyse:_herleitung`
+- [[Bewehrung der Lage]] · `opencivil.querschnitt.platte:protokoll_lage`
+- [[Bewehrungsgehalt]] · `opencivil.querschnitt.platte:Lagenaufbau._vergroesserung`
+- [[Bewehrungsmass je Kubikmeter Beton]] · `opencivil.querschnitt.platte:Lagenaufbau._kennzahlen`
+- [[Bewehrungsquerschnitt der zusammengefassten Lage]] · `opencivil.nachweis.handrechnung:Handrechnung._schwerpunkt`, `opencivil.querschnitt.platte:Lagenaufbau._vergroesserung`
+- [[Bezogene Druckzonenhöhe bei reiner Biegung]] · `opencivil.nachweis.richtungsnachweise:DuktilitaetQA.pruefe`
+- [[Bezugsgrösse der Normalkraft]] · `opencivil.nachweis.biegung_normalkraft:BiegungNormalkraft._protokoll_naechster`
+- [[Bezugsgrösse des Moments]] · `opencivil.nachweis.biegung_normalkraft:BiegungNormalkraft._protokoll_naechster`
+- [[Bügelquerschnitt je Länge einer Schubwand (n Schnitte)]] · `opencivil.querschnitt.analyse:Querschnittsanalyse._waende_protokollieren`
+- [[Dehnung auf halber Höhe]] · `opencivil.nachweis.querkraft:Querkraft._protokoll_fall`
+- [[Dehnung der Zugbewehrung]] · `opencivil.nachweis.handrechnung:Handrechnung._halbe_hoehe`
+- [[Dehnungsebene und innere Kräfte]] · `opencivil.nachweis.querschnittsloeser:protokoll_verfahren`, `opencivil.nachweis.schiefe_biegung:SchiefeBiegung._protokoll_ansatz`
+- [[Dekompressionsmoment]] · `opencivil.nachweis.querkraft:Querkraft._protokoll_fall`
+- [[Dekompressionsmoment und Dehnung]] · `opencivil.nachweis.querkraft:Querkraft._protokoll_ansatz`
+- [[Dickster Stab der Lage]] · `opencivil.nachweis.mindestbewehrung:_protokoll_stahlspannung`
+- [[Druckzonenhöhe aus dem Kräftegleichgewicht]] · `opencivil.nachweis.handrechnung:Handrechnung._bei_n_null`
+- [[Druckzonenhöhe bei reiner Biegung]] · `opencivil.nachweis.duktilitaet:Duktilitaet._protokoll_lage`
+- [[Einwirkung im normierten Diagramm]] · `opencivil.nachweis.biegung_normalkraft:BiegungNormalkraft._protokoll_naechster`
+- [[Erfüllungsgrad]] · `opencivil.core.berechnung:grad_formel`
+- [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]] · `opencivil.nachweis.schiefe_biegung:SchiefeBiegung._protokoll_ansatz`
+- [[Fläche und Schwerpunkt eines Polygons (Satz von Gauss)]] · `opencivil.querschnitt.analyse:Querschnittsanalyse.aufbau_protokollieren`
+- [[Gewollte Ausmitte]] · `opencivil.nachweis.knicken:Knicken._protokoll_fall`
+- [[Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein]] · `opencivil.nachweis.knicken:Knicken._protokoll_ansatz`
+- [[Gleichmässiger Druck, ohne Bewehrung]] · `opencivil.nachweis.handrechnung:Handrechnung._groesste_druckkraft`
+- [[Grenzdehnungen am Ende der Linie]] · `opencivil.spannungsanalyse:_herleitung`
+- [[Grösste Dehnung auf halber Höhe]] · `opencivil.spannungsanalyse:_herleitung`
+- [[Grösste Krümmung]] · `opencivil.spannungsanalyse:_herleitung`
+- [[Hilfsgrösse der Nulllinie]] · `opencivil.nachweis.mindestbewehrung:ZwaengungBiegung._protokoll_lage`
+- [[Höhe der Distanzhalter]] · `opencivil.querschnitt.platte:Lagenaufbau._kennzahlen`
+- [[Innerer Hebelarm]] · `opencivil.nachweis.mindestbewehrung:ZwaengungBiegung._protokoll_lage`
+- [[Kräfte mal Hebelarm um die halbe Höhe]] · `opencivil.nachweis.handrechnung:Handrechnung._groesste_zugkraft`
+- [[Kräftegleichgewicht]] · `opencivil.nachweis.handrechnung:Handrechnung._halbe_hoehe`
+- [[Kürzester Abstand zur Resistenzlinie]] · `opencivil.nachweis.biegung_normalkraft:BiegungNormalkraft._protokoll_naechster`
+- [[Momentengleichgewicht um die halbe Höhe]] · `opencivil.nachweis.handrechnung:Handrechnung._halbe_hoehe`
+- [[Momentenwiderstand bei reiner Biegung]] · `opencivil.nachweis.handrechnung:Handrechnung._bei_n_null`
+- [[Nulllinie auf halber Höhe]] · `opencivil.nachweis.handrechnung:Handrechnung._halbe_hoehe`
+- [[Nulllinie des gerissenen Querschnitts]] · `opencivil.nachweis.mindestbewehrung:ZwaengungBiegung._protokoll_lage`
+- [[Probe – Moment um y]] · `opencivil.nachweis.schiefe_biegung:SchiefeBiegung._protokoll_bruchzustand`
+- [[Probe – Moment um z]] · `opencivil.nachweis.schiefe_biegung:SchiefeBiegung._protokoll_bruchzustand`
+- [[Probe – Normalkraft]] · `opencivil.nachweis.schiefe_biegung:SchiefeBiegung._protokoll_bruchzustand`
+- [[Querkraft über die Federn der Wände]] · `opencivil.nachweis.schubwandnachweis:Schubwandnachweis._protokoll_ansatz`
+- [[Reiner Betonquerschnitt – Fläche]] · `opencivil.spannungsanalyse:_herleitung_modul`
+- [[Reiner Betonquerschnitt – Flächenmoment]] · `opencivil.spannungsanalyse:_herleitung_modul`
+- [[Rissaktive Plattendicke]] · `opencivil.nachweis.mindestbewehrung:Rissnormalkraft._protokoll_ansatz`
+- [[Risskraft der gezogenen Querschnittshälfte]] · `opencivil.nachweis.mindestbewehrung:Rissnormalkraft._protokoll_ansatz`
+- [[Rissmoment bei der Normalkraft]] · `opencivil.spannungsanalyse:_herleitung`
+- [[Rissmoment des ungerissenen Querschnitts]] · `opencivil.nachweis.richtungsnachweise:SproedesVersagenQA.pruefe`, `opencivil.nachweis.sproedes_versagen:protokoll_rissmoment`
+- [[Rissnormalkraft beim Moment]] · `opencivil.spannungsanalyse:_herleitung`
+- [[Schnittgrössen aus der Spannungsverteilung]] · `opencivil.nachweis.resistenzlinie:Ebenenlinie.protokoll_ansatz`
+- [[Schwerpunkt der zusammengefassten Lage]] · `opencivil.nachweis.handrechnung:Handrechnung._schwerpunkt`, `opencivil.querschnitt.platte:Lagenaufbau._vergroesserung`, `opencivil.querschnitt.platte:protokoll_lage`
+- [[Spannung im ungerissenen Querschnitt]] · `opencivil.nachweis.richtungsnachweise:SproedesVersagenQA.pruefe`
+- [[Spannungsblock des Betons]] · `opencivil.nachweis.rechenwahl:protokoll_betongesetz`, `opencivil.querschnitt.analyse:Querschnittsanalyse.werkstoffe_protokollieren`, `opencivil.spannungsanalyse:_herleitung`
+- [[Stahlspannung, höchstens die Fliessgrenze]] · `opencivil.nachweis.handrechnung:Handrechnung._halbe_hoehe`
+- [[Statische Höhe]] · `opencivil.querschnitt.platte:Lagenaufbau._vergroesserung`, `opencivil.querschnitt.platte:protokoll_statische_hoehe`
+- [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]] · `opencivil.querschnitt.analyse:Querschnittsanalyse._bewehrung_protokollieren`
+- [[Teilung in y aus der Stabzahl]] · `opencivil.nachweis.querkraft:Querkraft._protokoll_ansatz_buegel`
+- [[Torsion in den Zellen (Bredt, mehrzellig)]] · `opencivil.nachweis.schubwandnachweis:Schubwandnachweis._protokoll_ansatz`
+- [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]] · `opencivil.querschnitt.analyse:Querschnittsanalyse.aufbau_protokollieren`
+- [[Versatz – Moment der Querkraftanteile um den Schwerpunkt]] · `opencivil.nachweis.schubwandnachweis:Schubwandnachweis._ein_fall`
+- [[Was die Zellen tragen]] · `opencivil.nachweis.schubwandnachweis:Schubwandnachweis._ein_fall`
+- [[Wertigkeit im gerissenen Zustand]] · `opencivil.nachweis.mindestbewehrung:ZwaengungBiegung._protokoll_ansatz`
+- [[Widerstand bei festgehaltenem N_Ed]] · `opencivil.nachweis.resistenzlinie:Handlinie.protokoll_treffer`
+- [[Widerstand der Bügel]] · `opencivil.nachweis.querkraft:Querkraft._protokoll_fall_buegel`
+- [[Widerstand der Druckdiagonalen]] · `opencivil.nachweis.querkraft:Querkraft._protokoll_fall_buegel`
+- [[Widerstand im normierten Diagramm]] · `opencivil.nachweis.biegung_normalkraft:BiegungNormalkraft._protokoll_naechster`
+- [[Widerstand in der Richtung der Einwirkung]] · `opencivil.nachweis.schiefe_biegung:SchiefeBiegung._ein_fall`
+- [[Widerstandsmoment zum gezogensten Betonpunkt]] · `opencivil.nachweis.richtungsnachweise:SproedesVersagenQA.pruefe`
+- [[Wirksame Höhe (Einlage nicht massgebend)]] · `opencivil.nachweis.querkraft:Querkraft._protokoll_fall`
+- [[Wirksame Höhe, um die Einlage vermindert]] · `opencivil.nachweis.querkraft:Querkraft._protokoll_fall`
+- [[Wirksame Zugfestigkeit]] · `opencivil.nachweis.sproedes_versagen:protokoll_zugfestigkeit`
+- [[Wirksamer Elastizitätsmodul]] · `opencivil.nachweis.querschnittsloeser:protokoll_wirksamer_modul`, `opencivil.spannungsanalyse:_herleitung`
+- [[Zulässige Dehnung]] · `opencivil.nachweis.spannungsbegrenzung:Spannungsbegrenzung._protokoll_fliessen`

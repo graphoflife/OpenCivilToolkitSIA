@@ -106,6 +106,22 @@ def uebernehmen() -> None:
         ist.unlink()
 
 
+def nur_katex_in(inhalt: str) -> set:
+    """
+    Die Makros in ``inhalt``, die nur KaTeX auf der Oberflaeche kennt. Welche
+    das sind, sagt die Einstellung von KaTeX selbst -- dazu die, die erst
+    ``trust`` freischaltet. Auch das Notizbuch prueft damit: Obsidian setzt
+    mit MathJax.
+    """
+    einstellung = (WURZEL / "web" / "js" / "mathe.js").read_text(encoding="utf-8")
+    nur_katex = re.findall(r"'\\\\([a-zA-Z]+)':", einstellung)
+    if "diameter" not in nur_katex:
+        raise AssertionError("die Einstellung von KaTeX liess sich nicht lesen")
+    nur_katex += ["htmlClass", "htmlId", "htmlStyle", "htmlData", "href", "url",
+                  "includegraphics"]
+    return set(re.findall(r"\\([a-zA-Z]+)", inhalt)) & set(nur_katex)
+
+
 class TestSchnappschuss(unittest.TestCase):
     def test_die_projekte_zeigen_jeden_nachweis(self):
         """
@@ -126,20 +142,13 @@ class TestSchnappschuss(unittest.TestCase):
         """
         Markdown und LaTeX-Dokument gehen an Leser, die nicht KaTeX sind:
         GitHub, Pandoc, pdflatex. Ein Makro, das nur die Oberflaeche kennt,
-        stuende dort als Fehler. Welche das sind, sagt die Einstellung von
-        KaTeX selbst -- dazu die, die erst ``trust`` freischaltet.
+        stuende dort als Fehler.
         """
-        einstellung = (WURZEL / "web" / "js" / "mathe.js").read_text(encoding="utf-8")
-        nur_katex = re.findall(r"'\\\\([a-zA-Z]+)':", einstellung)
-        self.assertIn("diameter", nur_katex, "die Einstellung liess sich nicht lesen")
-        nur_katex += ["htmlClass", "htmlId", "htmlStyle", "htmlData", "href", "url",
-                      "includegraphics"]
         for name, inhalt in berichte().items():
             if name.endswith(".txt"):
                 continue
             with self.subTest(datei=name):
-                gefunden = set(re.findall(r"\\([a-zA-Z]+)", inhalt)) & set(nur_katex)
-                self.assertEqual(gefunden, set())
+                self.assertEqual(nur_katex_in(inhalt), set())
 
     def test_der_bericht_ist_unveraendert(self):
         for name, ist in berichte().items():

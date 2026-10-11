@@ -3,11 +3,11 @@
   "dateien": {
     "opencivil/__init__.py": "6221ac8cbf06",
     "opencivil/bericht/__init__.py": "e3b0c44298fc",
-    "opencivil/bericht/formelsammlung.py": "9d6d61582455",
+    "opencivil/bericht/formelsammlung.py": "7526c9d753f6",
     "opencivil/bericht/gliederung.py": "fefaeb6ca558",
     "opencivil/bericht/konsole.py": "9bc658c20513",
     "opencivil/bericht/latex_dokument.py": "9283b17b157a",
-    "opencivil/bericht/markdown.py": "65df28faa908",
+    "opencivil/bericht/markdown.py": "0fee701815b6",
     "opencivil/bericht/zusammenfassung.py": "bd9f1fce8dca",
     "opencivil/bewehrungssuche/__init__.py": "4aea6c041a45",
     "opencivil/bewehrungssuche/bewertung.py": "41288248ee6e",
@@ -49,7 +49,9 @@
     "opencivil/nachweis/sproedes_versagen.py": "359e510480ee",
     "opencivil/nachweis/zustand2.py": "7ba9c5ef3a2c",
     "opencivil/notizbuch/__init__.py": "ef0db86ead09",
+    "opencivil/notizbuch/formelseiten.py": "c836a5bac8e5",
     "opencivil/notizbuch/namen.py": "8ac48909c9f4",
+    "opencivil/notizbuch/tresor.py": "f63a61b655e2",
     "opencivil/projekt/__init__.py": "f627a5e8ce0b",
     "opencivil/projekt/aufbau.py": "beaf30d3b594",
     "opencivil/projekt/eintraege.py": "e1e25291b6a2",
@@ -71,10 +73,10 @@
     "opencivil/spannungsanalyse.py": "2ee63ff07337",
     "opencivil/web/__init__.py": "e3b0c44298fc",
     "opencivil/web/api.py": "fc4f6808d77c",
-    "opencivil/web/bruecke.py": "24e1fcb0cd8c",
+    "opencivil/web/bruecke.py": "719f2fb4427f",
     "opencivil/web/diagrammdaten.py": "56e4c1346817",
     "opencivil/web/dienst.py": "bc6a3d2372dd",
-    "opencivil/web/server.py": "43665395faca",
+    "opencivil/web/server.py": "b90e83b71dd4",
     "opencivil/web/speicher.py": "d000d8bff113"
   }
 }

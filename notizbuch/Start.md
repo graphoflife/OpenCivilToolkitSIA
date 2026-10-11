@@ -5,9 +5,9 @@ Obsidian liest ihn als Tresor, und GitHub zeigt die Dateien als Text.
 
 ## Was wo steht
 
-- **Formelsammlung** – jede Formel des Werkzeugs als eigene Seite: die Formel,
+- [[Formelsammlung]] – jede Formel des Werkzeugs als eigene Seite: die Formel,
   ihre Normstelle, die Grössen mit Links, ein Zahlenbeispiel, die Stelle im
-  Code und die Theorie. Dazu je Thema eine Seite. *Entsteht gerade.*
+  Code und die Theorie. Dazu je Thema eine Seite.
 - **Python** – je Modul der Bibliothek eine Seite, aus den Docstrings erzeugt.
   *Entsteht gerade.*
 - **Notizen**
@@ -25,3 +25,23 @@ Graph-Ansicht und Rückverweise gehen von selbst. Die Einstellungen liegen bei
 (`.obsidian/app.json`): strenge Zeilenumbrüche, Links als `[[Name]]` und
 Anhänge unter `Anhänge/`. Alles andere, was Obsidian in `.obsidian/` ablegt,
 bleibt auf dem eigenen Rechner.
+
+## Erzeugt und von Hand
+
+Die Seiten der Formelsammlung schreibt `python3 -m opencivil.web.bruecke` aus
+dem Code. Sie tragen oben die Eigenschaft `erzeugt` – eine Prüfsumme über
+alles bis zur Linie `<!-- Ab hier von Hand … -->`.
+
+- **Über der Linie** schreibt nur der Generator, bei jedem Lauf neu. Wer dort
+  etwas ändert, ändert die Prüfsumme: die Brücke schreibt dann gar nichts und
+  nennt die Datei.
+- **Unter der Linie** steht, was von Hand dazukommt – die Theorie. Es bleibt
+  beim Neuerzeugen Zeichen für Zeichen erhalten.
+- **Erzeugte Seiten nicht umbenennen.** Ihr Name kommt aus dem Code; Obsidian
+  führte sonst die Links in anderen erzeugten Seiten nach, und deren
+  Prüfsummen stimmten nicht mehr.
+- **Eigene Notizen** dürfen überall liegen. Dateien ohne `erzeugt` fasst der
+  Generator nie an. Auf der Seite erscheint eine neue Notiz, sobald die Brücke
+  gelaufen ist; eine geänderte gleich nach dem Hochladen.
+- **Normstellen** stehen im Code, nicht hier – der Bericht braucht sie auch.
+  Welche noch fehlen, sagt die [[Formelsammlung]].

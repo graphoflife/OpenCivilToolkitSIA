@@ -56,16 +56,20 @@ def absatz_markdown(text: str) -> str:
     return "\\" + text if text[:1] in ("-", "+", "#") else text
 
 
-def _zelle(zelle: Zelle) -> str:
+def formel_in_zelle(latex: str) -> str:
     """
-    Eine Tabellenzelle: Text maskiert, eine Formel zwischen ``$``.
+    Eine Formel fuer eine Tabellenzelle, zwischen ``$``.
 
     Ein ``|`` teilte die Zelle auch mitten in einer Formel -- die Tabelle wird
     zerlegt, bevor irgendwer die Formel liest. Darum als ``\\vert``.
     """
+    return "$" + latex.replace(r"\|", r"\Vert ").replace("|", r"\vert ") + "$"
+
+
+def _zelle(zelle: Zelle) -> str:
+    """Eine Tabellenzelle: Text maskiert, eine Formel zwischen ``$``."""
     if isinstance(zelle, Mathe):
-        latex = zelle.latex.replace(r"\|", r"\Vert ").replace("|", r"\vert ")
-        return f"${latex}$"
+        return formel_in_zelle(zelle.latex)
     return text_markdown(zelle)
 
 

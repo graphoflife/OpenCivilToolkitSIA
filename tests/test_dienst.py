@@ -194,6 +194,16 @@ class TestServerHuelle(unittest.TestCase):
             with self.subTest(pfad=pfad):
                 self.assertIsNotNone(server.aufloesen(pfad))
 
+    def test_das_notizbuch_wird_ausgeliefert(self):
+        """Auch Namen mit Leerzeichen und Umlaut -- der Browser schickt sie verschluesselt."""
+        self.assertIsNotNone(server.aufloesen("/notizbuch/Start.md"))
+        self.assertIsNotNone(server.aufloesen(
+            "/notizbuch/Formelsammlung/Formeln/Statische%20H%C3%B6he.md"))
+        self.assertIsNone(server.aufloesen("/notizbuch/%2E%2E/daten/projekt.json"))
+        self.assertIsNone(server.aufloesen("/notizbuch%2F..%2F.git%2Fconfig"))
+        import mimetypes
+        self.assertEqual(mimetypes.guess_type("x.md")[0], "text/markdown; charset=utf-8")
+
     def test_der_kern_ist_ueber_das_netz_erreichbar(self):
         """
         Die Brücke im Browser lädt den Rechenkern als ``.py``-Dateien nach.
@@ -226,6 +236,13 @@ class TestBruecke(unittest.TestCase):
             "web/kern/formelsammlung.json passt nicht mehr zum Kern. Bitte "
             "'python3 -m opencivil.web.bruecke' laufen lassen -- sonst zeigt die "
             "Oberfläche eine veraltete Formelsammlung.")
+
+    def test_notizbuch_ist_auf_dem_stand(self):
+        self.assertTrue(
+            bruecke.notizbuch_stimmt(),
+            "Das Notizbuch (notizbuch/, web/kern/notizbuch.json) passt nicht mehr "
+            "zum Kern oder zu den Notizen. Bitte 'python3 -m opencivil.web.bruecke' "
+            "laufen lassen -- sonst fehlen der Seite Formeln oder neue Notizen.")
 
     def test_der_dienst_ist_im_manifest(self):
         dateien = bruecke.kerndateien()
@@ -267,7 +284,8 @@ class TestBruecke(unittest.TestCase):
     def test_die_tafel_kennt_module_und_verzeichnisse(self):
         tafel = [p.relative_to(bruecke.WURZEL).as_posix() for p in bruecke.tafeldateien()]
         for datei in ("web/js/app.js", "web/js/kern_arbeiter.js",
-                      "web/kern/dateien.json", "web/kern/formelsammlung.json"):
+                      "web/kern/dateien.json", "web/kern/formelsammlung.json",
+                      "web/kern/notizbuch.json"):
             with self.subTest(datei=datei):
                 self.assertIn(datei, tafel)
 

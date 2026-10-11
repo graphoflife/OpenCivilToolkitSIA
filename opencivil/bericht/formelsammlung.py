@@ -80,7 +80,7 @@ class Thema:
 _ZAHLENANGABE = re.compile(r"\s*=\s*-?\d[\d,]*\.\d+(?:\s*[^\s–,;)]+)?")
 
 
-def _titel(titel: str) -> str:
+def ohne_zahlenangabe(titel: str) -> str:
     """«Widerstand bei festgehaltenem N_Ed = -300.0 kN» ohne die Zahl."""
     return _ZAHLENANGABE.sub("", titel)
 
@@ -97,7 +97,7 @@ _GRUNDZEICHEN = re.compile(r"^[^_^({]*")
 _FALLWERTE = re.compile(r"\([^()]*\\mathrm\{[^()]*\)")
 
 
-def _schluessel(block: GleichungBlock | TextBlock) -> Optional[tuple]:
+def schluessel(block: GleichungBlock | TextBlock) -> Optional[tuple]:
     """Woran derselbe Eintrag wiederzuerkennen ist -- ``None``: er gehoert nicht hinein."""
     if isinstance(block, TextBlock):
         return ("text", block.text) if block.erklaerung else None
@@ -113,7 +113,7 @@ def _schluessel(block: GleichungBlock | TextBlock) -> Optional[tuple]:
 def in_sammlung(block: Block) -> bool:
     """Gehoert diese Gleichung in die Formelsammlung -- und damit ins Notizbuch?"""
     return (isinstance(block, GleichungBlock) and bool(block.thema)
-            and _schluessel(block) is not None)
+            and schluessel(block) is not None)
 
 
 def formelname(block: GleichungBlock) -> str:
@@ -122,10 +122,20 @@ def formelname(block: GleichungBlock) -> str:
     ihr gibt, sonst ihr Titel ohne Zahlenangabe -- als Seitenname. Fuer die
     Formel in der Herleitung und fuer ihre symbolische Fassung derselbe.
     """
-    return seitenname(block.name or _titel(block.titel))
+    return seitenname(block.name or ohne_zahlenangabe(block.titel))
 
 
-def _symbolisch(block: GleichungBlock) -> GleichungBlock:
+def ergebniszeichen(block: GleichungBlock) -> str:
+    """
+    Was die Formel liefert, ohne Fall und Sorte: ``f_{cd}``. Leer bei einem
+    Ansatz -- der liefert keinen Wert.
+    """
+    if block.ansatz or block.formelzeile is None:
+        return ""
+    return ohne_namen_im_index(_FALLWERTE.sub("", block.formelzeile.symbol))
+
+
+def symbolisch(block: GleichungBlock) -> GleichungBlock:
     """
     Die Formel ohne Zahlen, ``Symbol = Formel``. Gebaut erst fuer einen neuen
     Schluessel -- neun von zehn Gleichungen sind Wiederholungen.
@@ -137,7 +147,7 @@ def _symbolisch(block: GleichungBlock) -> GleichungBlock:
         # Die Sammlung meint die Formel, nicht den Fall und nicht die Sorte.
         latex = ohne_namen_im_index(" ".join(filter(None, [
             f"{symbol} = {zeile.analytisch}", zeile.einheiten])))
-    return GleichungBlock(latex=latex, titel=_titel(block.titel), referenz=block.referenz,
+    return GleichungBlock(latex=latex, titel=ohne_zahlenangabe(block.titel), referenz=block.referenz,
                           thema=block.thema, name=block.name,
                           codestelle=block.codestelle)
 
@@ -154,14 +164,14 @@ def formelsammlung(protokoll: Protokoll) -> List[Thema]:
         if not isinstance(block, (GleichungBlock, TextBlock)) or not block.thema:
             continue
         thema = themen.setdefault(block.thema, Thema(block.thema, art))
-        schluessel = _schluessel(block)
-        if schluessel is None or schluessel in gesehen:
+        kennung = schluessel(block)
+        if kennung is None or kennung in gesehen:
             continue
-        gesehen.add(schluessel)
+        gesehen.add(kennung)
         if isinstance(block, TextBlock):
             thema.erklaerungen.append(TextBlock(text=block.text))
             continue
-        formel = _symbolisch(block)
+        formel = symbolisch(block)
         if formel.latex not in gesetzt:
             gesetzt.add(formel.latex)
             thema.formeln.append(formel)
@@ -181,6 +191,7 @@ def laeufe() -> Tuple[Protokoll, ...]:
     Nachweise schreiben nichts -- dieselbe Sammlung, Zeichen fuer Zeichen, in
     einem Zehntel der Zeit. Die Analysen sind kein Nachweis und laufen nicht
     im Rechenwerk, schreiben aber ebenso auf, wie ihre Linien entstehen.
+    Der Titel eines Protokolls sagt, aus welchem Projekt es stammt.
 
     Gerechnet wird einmal je Lauf des Programms, gut vier Sekunden; Bruecke
     und Tests fragen mehrmals. Getrennt je Projekt, weil eine Kennung wie
@@ -193,10 +204,11 @@ def laeufe() -> Tuple[Protokoll, ...]:
     from opencivil.projekt import Projekt
 
     heraus = []
-    for projekt in (Projekt.beispiel(), Projekt.jeder_nachweis()):
+    for titel, projekt in (("Beispielprojekt", Projekt.beispiel()),
+                           ("Prüfprojekt «Jeder Nachweis»", Projekt.jeder_nachweis())):
         aufbau = projekt.aufbauen(schnell=True)
         loesung = aufbau.werk.loese(*aufbau.alle_ziele())
-        protokoll = Protokoll()
+        protokoll = Protokoll(titel=titel)
         protokoll.anfuegen(*loesung.protokoll.bloecke)
         spannungsanalyse.analysen(aufbau, loesung, protokoll)
         heraus.append(protokoll)
