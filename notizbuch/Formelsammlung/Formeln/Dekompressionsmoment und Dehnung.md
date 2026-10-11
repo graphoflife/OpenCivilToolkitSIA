@@ -1,5 +1,5 @@
 ---
-erzeugt: e7048cbd39da
+erzeugt: 6df3825dd76c
 art: formel
 tags: [formel]
 ---
@@ -12,7 +12,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.querkraft:Querkraft._protokoll_ansatz`
+- [[opencivil.nachweis.querkraft#Querkraft|Querkraft._protokoll_ansatz]]
 
 ## Themen
 

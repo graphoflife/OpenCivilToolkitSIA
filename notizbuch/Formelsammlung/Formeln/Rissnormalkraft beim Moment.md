@@ -1,5 +1,5 @@
 ---
-erzeugt: 8c3b18e2458e
+erzeugt: 1d6483d81573
 art: formel
 tags: [formel]
 ---
@@ -33,7 +33,7 @@ $$
 
 ## Im Code
 
-- `opencivil.spannungsanalyse:_herleitung`
+- [[opencivil.spannungsanalyse#_herleitung|_herleitung]]
 
 ## Themen
 

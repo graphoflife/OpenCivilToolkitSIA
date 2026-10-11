@@ -1,5 +1,5 @@
 ---
-erzeugt: fd1193a05bdc
+erzeugt: 1d971637a1ee
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.3.4"
@@ -44,8 +44,8 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.querkraft:Querkraft._protokoll_ansatz_buegel`
-- `opencivil.nachweis.querkraft:Querkraft._protokoll_fall_buegel`
+- [[opencivil.nachweis.querkraft#Querkraft|Querkraft._protokoll_ansatz_buegel]]
+- [[opencivil.nachweis.querkraft#Querkraft|Querkraft._protokoll_fall_buegel]]
 
 ## Themen
 

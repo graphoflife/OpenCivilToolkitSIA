@@ -14,7 +14,7 @@ AUFBAU EINER ERZEUGTEN SEITE::
     tags: [formel]
     ---
     der erzeugte Teil
-    <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+    <!-- Ab hier von Hand: … -->            (die Linie, siehe LINIE)
     der eigene Teil, von Hand
 
 ``erzeugt`` ist die Pruefsumme ueber alles bis und mit der Linie, ohne die
@@ -156,7 +156,13 @@ def _wert(wert: Any) -> str:
 
 
 def text_der_seite(seite: Seite, eigen: str = "") -> str:
-    """Die Datei, wie sie geschrieben wird -- mit dem eigenen Teil, wo es einen gibt."""
+    """
+    Die Datei, wie sie geschrieben wird -- mit dem eigenen Teil, wo es einen
+    gibt. Die Linie darf sonst nirgends stehen, auch nicht in einem
+    Codeblock: wer die Datei liest, hielte sie fuer die Grenze.
+    """
+    if "\n" + LINIE + "\n" in "\n" + seite.rumpf + "\n":
+        raise TresorFehler(f"{seite.pfad}: der erzeugte Teil enthält die Linie selbst.")
     kopf = "\n".join([f"art: {_wert(seite.art)}", f"tags: {_wert([seite.art])}",
                       *(f"{k}: {_wert(v)}" for k, v in seite.eigenschaften)])
     rumpf = seite.rumpf.strip("\n") + "\n"

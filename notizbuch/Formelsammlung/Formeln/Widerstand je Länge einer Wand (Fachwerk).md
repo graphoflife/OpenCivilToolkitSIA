@@ -1,5 +1,5 @@
 ---
-erzeugt: c033af44adb6
+erzeugt: dd696c368dda
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.3.4"
@@ -13,7 +13,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.schubwandnachweis:Schubwandnachweis._protokoll_ansatz`
+- [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._protokoll_ansatz]]
 
 ## Themen
 

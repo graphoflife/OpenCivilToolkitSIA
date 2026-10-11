@@ -1,5 +1,5 @@
 ---
-erzeugt: 88cfb3df71d2
+erzeugt: c201d237240e
 art: formel
 tags: [formel]
 ---
@@ -31,7 +31,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.mindestbewehrung:Rissnormalkraft._protokoll_ansatz`
+- [[opencivil.nachweis.mindestbewehrung#Rissnormalkraft|Rissnormalkraft._protokoll_ansatz]]
 
 ## Themen
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 3c559105359d
+erzeugt: b28a2fe1bd33
 art: formel
 tags: [formel]
 ---
@@ -31,7 +31,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.schiefe_biegung:SchiefeBiegung._ein_fall`
+- [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._ein_fall]]
 
 ## Themen
 

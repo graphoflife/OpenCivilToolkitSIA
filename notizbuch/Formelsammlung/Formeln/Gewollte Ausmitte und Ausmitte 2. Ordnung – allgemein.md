@@ -1,5 +1,5 @@
 ---
-erzeugt: 08be2fa851e2
+erzeugt: a415b9cd79cf
 art: formel
 tags: [formel]
 ---
@@ -12,7 +12,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.knicken:Knicken._protokoll_ansatz`
+- [[opencivil.nachweis.knicken#Knicken|Knicken._protokoll_ansatz]]
 
 ## Themen
 

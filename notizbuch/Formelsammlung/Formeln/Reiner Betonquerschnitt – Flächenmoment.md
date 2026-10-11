@@ -1,5 +1,5 @@
 ---
-erzeugt: a174071d4dfa
+erzeugt: b133388cfe86
 art: formel
 tags: [formel]
 ---
@@ -29,7 +29,7 @@ $$
 
 ## Im Code
 
-- `opencivil.spannungsanalyse:_herleitung_modul`
+- [[opencivil.spannungsanalyse#_herleitung_modul|_herleitung_modul]]
 
 ## Themen
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: a1d22e3ec4a7
+erzeugt: c2922175116c
 art: formel
 tags: [formel]
 ---
@@ -27,7 +27,7 @@ $$
 
 ## Im Code
 
-- `opencivil.core.berechnung:grad_formel`
+- [[opencivil.core.berechnung#grad_formel|grad_formel]]
 
 ## Themen
 

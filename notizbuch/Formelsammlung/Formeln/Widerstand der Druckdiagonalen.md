@@ -1,5 +1,5 @@
 ---
-erzeugt: 25f03997df59
+erzeugt: 79d97ceb655f
 art: formel
 tags: [formel]
 ---
@@ -37,7 +37,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.querkraft:Querkraft._protokoll_fall_buegel`
+- [[opencivil.nachweis.querkraft#Querkraft|Querkraft._protokoll_fall_buegel]]
 
 ## Themen
 

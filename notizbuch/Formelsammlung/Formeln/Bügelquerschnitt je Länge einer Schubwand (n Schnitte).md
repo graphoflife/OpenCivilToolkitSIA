@@ -1,5 +1,5 @@
 ---
-erzeugt: 1dbe4463fa3b
+erzeugt: 2b025c9bd580
 art: formel
 tags: [formel]
 ---
@@ -12,7 +12,7 @@ $$
 
 ## Im Code
 
-- `opencivil.querschnitt.analyse:Querschnittsanalyse._waende_protokollieren`
+- [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse._waende_protokollieren]]
 
 ## Themen
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: a827224e7bc2
+erzeugt: b5db836ebf54
 art: formel
 tags: [formel]
 ---
@@ -31,7 +31,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.mindestbewehrung:_protokoll_stahlspannung`
+- [[opencivil.nachweis.mindestbewehrung#_protokoll_stahlspannung|_protokoll_stahlspannung]]
 
 ## Themen
 

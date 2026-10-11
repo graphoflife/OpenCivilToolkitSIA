@@ -1,5 +1,5 @@
 ---
-erzeugt: 088c292edc52
+erzeugt: 378937a708b1
 art: formel
 tags: [formel]
 ---
@@ -26,7 +26,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.schubwandnachweis:Schubwandnachweis._ein_fall`
+- [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._ein_fall]]
 
 ## Themen
 

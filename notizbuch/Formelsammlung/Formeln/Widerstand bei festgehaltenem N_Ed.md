@@ -1,5 +1,5 @@
 ---
-erzeugt: be28a2afea0d
+erzeugt: ed91bd71924c
 art: formel
 tags: [formel]
 ---
@@ -53,7 +53,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.resistenzlinie:Handlinie.protokoll_treffer`
+- [[opencivil.nachweis.resistenzlinie#Handlinie.protokoll_treffer|Handlinie.protokoll_treffer]]
 
 ## Themen
 

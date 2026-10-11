@@ -1,5 +1,5 @@
 ---
-erzeugt: c8b7c768bef1
+erzeugt: a144bc996239
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.4.3.2.5"
@@ -43,7 +43,7 @@ $$
 
 ## Im Code
 
-- `opencivil.querschnitt.platte:Lagenaufbau._vergroesserung`
+- [[opencivil.querschnitt.platte#Lagenaufbau._vergroesserung|Lagenaufbau._vergroesserung]]
 
 ## Themen
 

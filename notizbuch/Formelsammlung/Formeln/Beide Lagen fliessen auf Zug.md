@@ -1,5 +1,5 @@
 ---
-erzeugt: b97282e2bc96
+erzeugt: 7f5d1122460a
 art: formel
 tags: [formel]
 ---
@@ -32,7 +32,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.handrechnung:Handrechnung._groesste_zugkraft`
+- [[opencivil.nachweis.handrechnung#Handrechnung._groesste_zugkraft|Handrechnung._groesste_zugkraft]]
 
 ## Themen
 

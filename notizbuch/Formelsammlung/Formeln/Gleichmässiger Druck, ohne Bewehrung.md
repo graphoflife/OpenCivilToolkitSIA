@@ -1,5 +1,5 @@
 ---
-erzeugt: 5fa71468871a
+erzeugt: d58ab99c01ae
 art: formel
 tags: [formel]
 ---
@@ -28,7 +28,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.handrechnung:Handrechnung._groesste_druckkraft`
+- [[opencivil.nachweis.handrechnung#Handrechnung._groesste_druckkraft|Handrechnung._groesste_druckkraft]]
 
 ## Themen
 

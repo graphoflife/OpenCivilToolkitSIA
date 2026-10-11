@@ -1,5 +1,5 @@
 ---
-erzeugt: c6157d9f75d2
+erzeugt: a16d0839555c
 art: formel
 tags: [formel]
 ---
@@ -12,7 +12,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.richtungsnachweise:SproedesVersagenQA.pruefe`
+- [[opencivil.nachweis.richtungsnachweise#SproedesVersagenQA.pruefe|SproedesVersagenQA.pruefe]]
 
 ## Themen
 

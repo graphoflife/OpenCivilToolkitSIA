@@ -1,5 +1,5 @@
 ---
-erzeugt: 3645cf0caad4
+erzeugt: 46f4e5f3d037
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.4.1.3"
@@ -15,7 +15,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.richtungsnachweise:SproedesVersagenQA.pruefe`
+- [[opencivil.nachweis.richtungsnachweise#SproedesVersagenQA.pruefe|SproedesVersagenQA.pruefe]]
 
 ## Themen
 

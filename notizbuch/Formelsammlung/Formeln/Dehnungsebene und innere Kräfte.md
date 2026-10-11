@@ -1,5 +1,5 @@
 ---
-erzeugt: c595c61077c4
+erzeugt: 9b1bbe167dca
 art: formel
 tags: [formel]
 ---
@@ -20,8 +20,8 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.querschnittsloeser:protokoll_verfahren`
-- `opencivil.nachweis.schiefe_biegung:SchiefeBiegung._protokoll_ansatz`
+- [[opencivil.nachweis.querschnittsloeser#protokoll_verfahren|protokoll_verfahren]]
+- [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_ansatz]]
 
 ## Themen
 

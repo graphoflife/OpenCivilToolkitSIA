@@ -1,0 +1,86 @@
+---
+erzeugt: 06dd02e952cb
+art: verzeichnis
+tags: [verzeichnis]
+---
+Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es verantwortet, seine Klassen und Funktionen, was es braucht und wer es braucht, und welche Formeln es schreibt. Wie alles zusammen rechnet, sagt [[opencivil]].
+
+- [[opencivil]] – Nachweise nach SIA 262, jede Zahl mit ihrer Herleitung.
+- [[opencivil.bericht]] – was aus einer Loesung zu lesen ist.
+    - [[opencivil.bericht.formelsammlung]] – jede Formel einmal, ohne Zahlen.
+    - [[opencivil.bericht.gliederung]] – der ganze Bericht als Bloecke.
+    - [[opencivil.bericht.konsole]] – Ausgabe einer Loesung auf der Konsole.
+    - [[opencivil.bericht.latex_dokument]] – Ausgabe einer Loesung als LaTeX-Dokument.
+    - [[opencivil.bericht.markdown]] – Ausgabe einer Loesung als Markdown.
+    - [[opencivil.bericht.zusammenfassung]] – was in der Zusammenfassung steht.
+- [[opencivil.bewehrungssuche]] – die Bewehrung suchen statt sie zu setzen.
+    - [[opencivil.bewehrungssuche.bewertung]] – wie weit eine Bewehrung vom Ziel ist.
+    - [[opencivil.bewehrungssuche.buegel]] – die Querkraftbewehrung suchen.
+    - [[opencivil.bewehrungssuche.dicke]] – die duennste Platte suchen.
+    - [[opencivil.bewehrungssuche.laengs]] – die Laengsbewehrung suchen.
+- [[opencivil.core]] – das Geruest, auf dem jede Rechnung steht.
+    - [[opencivil.core.berechnung]] – Berechnungen als Objekte.
+    - [[opencivil.core.einheiten]] – Dimensionen, Einheiten und Groessen.
+    - [[opencivil.core.latex]] – Bausteine fuer die LaTeX-Ausgabe von Berechnungen.
+    - [[opencivil.core.protokoll]] – Mitschrift einer Berechnung.
+    - [[opencivil.core.rechenwerk]] – Registrierung und Aufloesung von Berechnungen.
+    - [[opencivil.core.wert]] – Benannte Werte im Rechenmodell.
+  - [[opencivil.ergebnis]] – ein gerechnetes Projekt, wie man es ohne Oberflaeche braucht.
+- [[opencivil.gleichungen]] – Analytische Gleichungen, Zeile fuer Zeile.
+    - [[opencivil.gleichungen.ausdruck]] – eine Zeile LaTeX: zerlegen, rechnen, setzen.
+    - [[opencivil.gleichungen.blatt]] – ein Blatt Gleichungen als Berechnung.
+- [[opencivil.material]] – die Baustoffe: Beton und Betonstahl.
+    - [[opencivil.material.basis]] – Gemeinsames Geruest fuer Baustoffe.
+    - [[opencivil.material.beton]] – Beton nach SIA 262:2025.
+    - [[opencivil.material.betonstahl]] – Betonstahl nach SIA 262:2025.
+- [[opencivil.nachweis]] – die Nachweise der Platte und des gezeichneten Querschnitts.
+    - [[opencivil.nachweis.biegung_normalkraft]] – Nachweis für Biegung mit Normalkraft.
+    - [[opencivil.nachweis.dehnungsfaecher]] – Die zulaessigen Dehnungsebenen einer Platte.
+    - [[opencivil.nachweis.duktilitaet]] – Duktilitaetsnachweis ueber die Druckzonenhoehe.
+    - [[opencivil.nachweis.fehlende_bewehrung]] – Nachweise, die mangels Bewehrung entfallen.
+    - [[opencivil.nachweis.handrechnung]] – Eckpunkte der Resistenzlinie von Hand.
+    - [[opencivil.nachweis.knicken]] – Nachweis am verformten System.
+    - [[opencivil.nachweis.linie]] – Geometrie einer geschlossenen M-N-Linie.
+    - [[opencivil.nachweis.mindestbewehrung]] – Nachweise gegen sprödes Versagen.
+    - [[opencivil.nachweis.querkraft]] – Querkraftnachweis.
+    - [[opencivil.nachweis.querschnittsloeser]] – Dehnungsebene zu gegebenen Schnittgrössen.
+    - [[opencivil.nachweis.rechenwahl]] – womit ein Kapitel rechnet.
+    - [[opencivil.nachweis.resistenzlinie]] – die Linie, gegen die der M-N-Nachweis haelt.
+    - [[opencivil.nachweis.richtungsnachweise]] – Duktilitaet und sproedes Versagen des gezeichneten Querschnitts.
+    - [[opencivil.nachweis.schiefe_biegung]] – Biegung und Normalkraft am gezeichneten Querschnitt.
+    - [[opencivil.nachweis.schubwandnachweis]] – Querkraft und Torsion am gezeichneten Querschnitt.
+    - [[opencivil.nachweis.spannungsbegrenzung]] – Stahlspannung unter Gebrauchslasten.
+    - [[opencivil.nachweis.sproedes_versagen]] – Mindestbewehrung gegen sprödes Versagen.
+    - [[opencivil.nachweis.zustand2]] – Der gerissene Querschnitt, linear elastisch.
+- [[opencivil.notizbuch]] – das Notizbuch: Formelsammlung und Python-Doku als Markdown.
+    - [[opencivil.notizbuch.bibliothek]] – die Python-Bibliothek als Seiten.
+    - [[opencivil.notizbuch.erzeugen]] – alle Seiten, die aus dem Code entstehen.
+    - [[opencivil.notizbuch.formelseiten]] – die Formelsammlung als Seiten.
+    - [[opencivil.notizbuch.namen]] – aus einem Namen wird ein Seitenname.
+    - [[opencivil.notizbuch.tresor]] – erzeugte Seiten in den Ordner `notizbuch/`.
+- [[opencivil.projekt]] – Serialisierbare Beschreibung eines ganzen Projekts.
+    - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
+    - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
+    - [[opencivil.projekt.gleichungen]] – ein Blatt analytischer Gleichungen, wie es
+    - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
+    - [[opencivil.projekt.netz]] – Knoten mit Kennungen, und wie neue dazukommen.
+    - [[opencivil.projekt.platte]] – eine Platte, wie die Oberflaeche sie beschreibt.
+    - [[opencivil.projekt.projekt]] – das Projekt als Ganzes.
+    - [[opencivil.projekt.querschnittsanalyse]] – ein gezeichneter Querschnitt, wie die Oberflaeche ihn beschreibt.
+- [[opencivil.querschnitt]] – die Querschnitte: die Platte und der gezeichnete.
+    - [[opencivil.querschnitt.analyse]] – der gezeichnete Querschnitt als Bauteil im Rechenwerk.
+    - [[opencivil.querschnitt.fasern]] – Der Querschnitt als Summe von Fasern.
+    - [[opencivil.querschnitt.geometrie]] – Ebene Geometrie eines gezeichneten Querschnitts.
+    - [[opencivil.querschnitt.interaktion]] – Bruchzustand gezeichneter Querschnitte, auch schief.
+    - [[opencivil.querschnitt.platte]] – Stahlbeton-Plattenquerschnitt.
+    - [[opencivil.querschnitt.schubwaende]] – Querkraft und Torsion auf Schubwaende verteilt.
+    - [[opencivil.querschnitt.vorlagen]] – Querschnitte zum Anfangen.
+    - [[opencivil.querschnitt.werkstoffgesetz]] – Spannungs-Dehnungs-Beziehungen.
+  - [[opencivil.spannungsanalyse]] – den Querschnitt ansehen, ohne ihn nachzuweisen.
+- [[opencivil.web]] – die Oberflaeche, von der Seite des Rechenkerns.
+    - [[opencivil.web.api]] – Uebersetzung der Rechenergebnisse nach JSON.
+    - [[opencivil.web.bruecke]] – Welche Dateien der Browser laden muss.
+    - [[opencivil.web.diagrammdaten]] – was die Oberflaeche zeichnet, als JSON.
+    - [[opencivil.web.dienst]] – Der Rechendienst, unabhaengig vom Transportweg.
+    - [[opencivil.web.server]] – Schlanker HTTP-Server fuer die Oberflaeche.
+    - [[opencivil.web.speicher]] – was vom letzten Lauf noch gilt.

@@ -1,5 +1,5 @@
 ---
-erzeugt: ff8ccd0bf29c
+erzeugt: 071b8dfe3cd8
 art: formel
 tags: [formel]
 ---
@@ -30,7 +30,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.querkraft:Querkraft._protokoll_fall`
+- [[opencivil.nachweis.querkraft#Querkraft._protokoll_fall|Querkraft._protokoll_fall]]
 
 ## Themen
 

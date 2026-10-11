@@ -1,5 +1,5 @@
 ---
-erzeugt: 917c7606105c
+erzeugt: f290d5ac5082
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 2.4.2.5"
@@ -35,7 +35,7 @@ $$
 
 ## Im Code
 
-- `opencivil.material.betonstahl`
+- [[opencivil.material.betonstahl]]
 
 ## Themen
 

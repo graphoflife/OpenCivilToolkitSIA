@@ -1,5 +1,5 @@
 ---
-erzeugt: 0c985aceb480
+erzeugt: dc82d1b4bf1d
 art: formel
 tags: [formel]
 ---
@@ -27,8 +27,8 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.rechenwahl:protokoll_betongesetz`
-- `opencivil.spannungsanalyse:_herleitung`
+- [[opencivil.nachweis.rechenwahl#protokoll_betongesetz|protokoll_betongesetz]]
+- [[opencivil.spannungsanalyse#_herleitung|_herleitung]]
 
 ## Themen
 

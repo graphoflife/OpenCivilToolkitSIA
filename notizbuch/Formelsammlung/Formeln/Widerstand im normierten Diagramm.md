@@ -1,5 +1,5 @@
 ---
-erzeugt: d6241e8d3bd0
+erzeugt: 396278c12075
 art: formel
 tags: [formel]
 ---
@@ -31,7 +31,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.biegung_normalkraft:BiegungNormalkraft._protokoll_naechster`
+- [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
 
 ## Themen
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 8b6cd8479fc4
+erzeugt: b2992a7a0602
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.1.4.2.5"
@@ -32,7 +32,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.duktilitaet:Duktilitaet._protokoll_lage`
+- [[opencivil.nachweis.duktilitaet#Duktilitaet._protokoll_lage|Duktilitaet._protokoll_lage]]
 
 ## Themen
 

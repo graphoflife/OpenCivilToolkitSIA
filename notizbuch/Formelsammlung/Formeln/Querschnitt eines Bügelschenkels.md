@@ -1,5 +1,5 @@
 ---
-erzeugt: 99c105db3af3
+erzeugt: 8b46a852d146
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 5.5.2"
@@ -31,7 +31,7 @@ $$
 
 ## Im Code
 
-- `opencivil.querschnitt.platte:Plattenquerschnitt._querkraftbewehrung_aufbauen`
+- [[opencivil.querschnitt.platte#Plattenquerschnitt._querkraftbewehrung_aufbauen|Plattenquerschnitt._querkraftbewehrung_aufbauen]]
 
 ## Themen
 

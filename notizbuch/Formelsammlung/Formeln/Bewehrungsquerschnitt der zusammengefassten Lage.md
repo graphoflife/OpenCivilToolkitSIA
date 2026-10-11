@@ -1,5 +1,5 @@
 ---
-erzeugt: f27c8f924840
+erzeugt: f2541154a2be
 art: formel
 tags: [formel]
 ---
@@ -34,8 +34,8 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.handrechnung:Handrechnung._schwerpunkt`
-- `opencivil.querschnitt.platte:Lagenaufbau._vergroesserung`
+- [[opencivil.nachweis.handrechnung#Handrechnung._schwerpunkt|Handrechnung._schwerpunkt]]
+- [[opencivil.querschnitt.platte#Lagenaufbau._vergroesserung|Lagenaufbau._vergroesserung]]
 
 ## Themen
 

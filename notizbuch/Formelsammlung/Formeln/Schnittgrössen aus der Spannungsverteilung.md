@@ -1,5 +1,5 @@
 ---
-erzeugt: cadc3378683d
+erzeugt: 90fe9dc13446
 art: formel
 tags: [formel]
 ---
@@ -12,7 +12,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.resistenzlinie:Ebenenlinie.protokoll_ansatz`
+- [[opencivil.nachweis.resistenzlinie#Ebenenlinie.protokoll_ansatz|Ebenenlinie.protokoll_ansatz]]
 
 ## Themen
 

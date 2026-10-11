@@ -337,8 +337,10 @@ class TestFormelseiten(unittest.TestCase):
                     self.assertIn(block.referenz, self.seiten[fs.formelname(block)].rumpf)
 
     def test_jeder_link_fuehrt_zu_einer_seite(self):
+        """Ausser in Code: ``Callable[[str], str]`` ist kein Link."""
         for name, seite in self.seiten.items():
-            for ziel in re.findall(r"\[\[([^\]|#]+)", seite.rumpf):
+            ohne_code = re.sub(r"`[^`\n]*`", "", re.sub(r"```.*?```", "", seite.rumpf, flags=re.S))
+            for ziel in re.findall(r"\[\[([^\]|#]+)", ohne_code):
                 with self.subTest(seite=name, ziel=ziel):
                     self.assertIn(ziel, self.namen)
 
@@ -414,6 +416,68 @@ class TestHerleitungZeigtAufDieSeite(unittest.TestCase):
         namen = {e["name"] for e in bruecke.notizbuch_verzeichnis()["seiten"]}
         self.assertGreater(len(gefunden), 30)
         self.assertEqual(gefunden - namen, set())
+
+
+
+class TestBibliothek(unittest.TestCase):
+    """Die Python-Seiten: aus den Docstrings, verlinkt, ohne offene Rolle."""
+
+    @classmethod
+    def setUpClass(cls):
+        from opencivil.notizbuch.bibliothek import Bibliothek
+        cls.bibliothek = Bibliothek.lesen()
+        cls.seiten = {s.name: s.rumpf for s in cls.bibliothek.seiten({})}
+
+    def test_jedes_modul_hat_seine_seite(self):
+        for pfad in (bruecke.WURZEL / "opencivil").rglob("*.py"):
+            if "__pycache__" in pfad.parts:
+                continue
+            teile = pfad.relative_to(bruecke.WURZEL).with_suffix("").parts
+            name = ".".join(teile[:-1] if teile[-1] == "__init__" else teile)
+            self.assertIn(name, self.seiten)
+
+    def test_keine_rolle_bleibt_offen(self):
+        self.assertEqual(self.bibliothek.offen, [],
+                         "Im Docstring den Namen voll angeben: :class:`~opencivil.x.Y`.")
+
+    def test_eingerueckt_unter_einer_ueberschrift_ist_code(self):
+        seite = self.seiten["opencivil.nachweis.dehnungsfaecher"]
+        self.assertIn("## VORZEICHEN\n\n```\nN > 0   Zug\n", seite)
+
+    def test_schwanz_einer_ueberschrift_beginnt_den_absatz(self):
+        seite = self.seiten["opencivil.nachweis.querkraft"]
+        self.assertIn("## MIT BUEGELN\n\nFachwerkmodell, siehe "
+                      "[[opencivil.nachweis.querkraft#buegelwiderstand|buegelwiderstand]]:\n\n```\n",
+                      seite)
+
+    def test_eingerueckt_nach_text_setzt_den_absatz_fort(self):
+        seite = self.seiten["opencivil.core.rechenwerk"]
+        self.assertIn("**Rueckwaerts** -- \"Ich will diesen Wert. Was ist dafuer noetig?\"\n"
+                      "[[opencivil.core.rechenwerk#Rechenwerk.loese|Rechenwerk.loese]] verfolgt",
+                      seite)
+
+    def test_klammer_gehoert_zur_ueberschrift(self):
+        self.assertIn("## VORZEICHEN (wie in der ganzen Querschnittsanalyse)",
+                      self.seiten["opencivil.querschnitt.interaktion"])
+
+    def test_nur_python_ist_python(self):
+        """Formeln in einem Docstring sind kein Python, ein Aufruf schon."""
+        querkraft = self.seiten["opencivil.nachweis.querkraft"]
+        self.assertIn("## OHNE BUEGEL\n\n\n```\nV_Rd = k_d", querkraft)
+        self.assertIn("```python\nwerk = Rechenwerk()", self.seiten["opencivil.core.rechenwerk"])
+
+    def test_maskiert_was_markdown_anders_liest(self):
+        from opencivil.notizbuch.bibliothek import _maskieren
+        self.assertEqual(_maskieren("a|b $5 <i> 50%% x==y [[z]]", am_anfang=False),
+                         "a\\|b \\$5 \\<i> 50\\%\\% x\\=\\=y \\[\\[z]]")
+        self.assertEqual(_maskieren("# kein Titel", am_anfang=True), "\\# kein Titel")
+
+    def test_formeln_stehen_bei_ihrem_modul(self):
+        alle = {s.name: s.rumpf for s in bruecke.notizbuch_seiten()}
+        self.assertIn("[[Bemessungswert der Betondruckfestigkeit]]",
+                      alle["opencivil.material.beton"])
+        self.assertIn("[[opencivil.querschnitt.platte#protokoll_statische_hoehe|"
+                      "protokoll_statische_hoehe]]", alle["Statische Höhe"])
 
 
 if __name__ == "__main__":

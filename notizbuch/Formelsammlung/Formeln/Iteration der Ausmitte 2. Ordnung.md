@@ -1,5 +1,5 @@
 ---
-erzeugt: 30acac283a41
+erzeugt: cae84df960a5
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.7"
@@ -15,7 +15,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.knicken:Knicken._protokoll_iteration`
+- [[opencivil.nachweis.knicken#Knicken._protokoll_iteration|Knicken._protokoll_iteration]]
 
 ## Themen
 

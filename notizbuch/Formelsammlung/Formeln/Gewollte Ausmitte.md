@@ -1,5 +1,5 @@
 ---
-erzeugt: 62cc2d0c4eb0
+erzeugt: f30337338021
 art: formel
 tags: [formel]
 ---
@@ -27,7 +27,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.knicken:Knicken._protokoll_fall`
+- [[opencivil.nachweis.knicken#Knicken|Knicken._protokoll_fall]]
 
 ## Themen
 

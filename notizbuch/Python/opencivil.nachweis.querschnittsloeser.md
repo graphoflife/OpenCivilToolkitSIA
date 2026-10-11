@@ -1,0 +1,482 @@
+---
+erzeugt: eb851c9abfb2
+art: modul
+tags: [modul]
+---
+> [!abstract] opencivil/nachweis/querschnittsloeser.py
+> Dehnungsebene zu gegebenen Schnittgrössen.
+> Paket [[opencivil.nachweis]] · [Quelltext](../../opencivil/nachweis/querschnittsloeser.py)
+
+## VERANTWORTUNG
+
+Sucht zu `(N_Ed, M_Ed)` die Dehnungsebene `(eps_m, chi)`, die den
+Querschnitt ins Gleichgewicht bringt -- und liefert damit die Spannungen in
+jeder Lage.
+
+
+## WARUM EIN EIGENER LOESER
+
+Mit Normalkraft gibt es keine geschlossene Loesung mehr. Zwei Unbekannte, zwei
+Gleichgewichtsbedingungen; das Werkstoffgesetz des Betons ist nichtlinear. Ein
+fremdes Paket kaeme dafuer nicht in Frage: dieses Werkzeug laeuft auch im
+Browser ueber Pyodide, ohne Abhaengigkeiten.
+
+
+## DAS VERFAHREN
+
+Zwei ineinandergeschachtelte Bisektionen. Bei festem `chi` waechst
+`N(eps_m)` monoton -- mehr Dehnung heisst mehr Zug --, also laesst sich
+`eps_m` eindeutig so waehlen, dass `N = N_Ed`. Damit wird `M` eine
+Funktion von `chi` allein, und die waechst ebenfalls monoton. Die aeussere
+Bisektion sucht darin die Kruemmung.
+
+**Beide Bisektionen brauchen einen gueltigen Dehnungsbereich.** Jenseits der
+Bruchdehnungen geben die Werkstoffgesetze null zurueck; dort ist nichts mehr
+monoton, und die Suche findet Scheinloesungen. Das Fenster fuer `eps_m`
+haengt darum von `chi` ab -- siehe [[opencivil.nachweis.querschnittsloeser#Querschnittsloeser._fenster|Querschnittsloeser._fenster]].
+
+Beide Bisektionen sind robust: kein Startwert kann danebenliegen, kein
+Newton-Schritt kann davonlaufen. Sie kosten mehr Auswertungen als ein
+Newton-Verfahren -- bei rund 60 Fasern und 60 Halbierungen ist das
+unbedeutend.
+
+
+## WAS IN DIE MITSCHRIFT GEHOERT
+
+Nicht die Suche, sondern die **Probe**. Geschrieben wird die gefundene Ebene
+und der Nachweis, dass mit ihr `N_int = N_Ed` und `M_int = M_Ed`
+herauskommt. Wer das nachrechnen will, integriert zwei Mal ueber die Hoehe --
+das geht von Hand. Den Weg dorthin muss er nicht nachvollziehen. Dasselbe
+Vorgehen wie bei der Neigungssuche des Querkraftnachweises.
+
+
+## VORZEICHEN
+
+```
+eps > 0   Zug
+N   > 0   Zug
+M   > 0   Zug unten
+```
+`chi` ist die Kruemmung: `eps(z) = eps_m + chi * (z - h/2)`, mit `z` ab
+Oberkante. Ein positives `chi` zieht also unten.
+
+
+## EINHEITEN
+
+Alles in SI-Basis.
+
+## Inhalt
+
+### Stahllage
+
+```python
+@dataclass(frozen=True)
+class Stahllage
+```
+
+Eine Bewehrungslage, wie der Loeser sie braucht.
+
+- `a_s: float` – Querschnitt in m^2, bezogen auf die betrachtete Breite.
+- `z: float` – Tiefenlage ab Oberkante, in m.
+- `nummer: int = 0` – Nur zur Zuordnung in der Mitschrift.
+- `von_unten: Optional[bool] = None` – Ob die Lage zur unteren Seite gehoert -- bei der Platte die 1. und 2. Lage ([[opencivil.nachweis.querschnittsloeser#Stahllage|Bewehrungslage.von_unten]]). Die Handrechnung fasst je Seite zusammen ([[opencivil.nachweis.querschnittsloeser#lagen_je_seite|lagen_je_seite]]); ohne Angabe entscheidet die Tiefe.
+
+### lagen_je_seite
+
+```python
+def lagen_je_seite(lagen: Sequence[Stahllage], h: float) -> List[Stahllage]
+```
+
+Je Seite eine Lage, im Schwerpunkt ihrer Flaechen -- wie die Handrechnung.
+
+Die Seite sagt [[opencivil.nachweis.querschnittsloeser#Stahllage|Stahllage.von_unten]], sonst die Tiefe gegen
+`h/2`. Unten zuerst; eine Seite ohne Flaeche faellt weg.
+
+### Ebene
+
+```python
+@dataclass(frozen=True)
+class Ebene
+```
+
+Die gefundene Dehnungsebene samt Proberechnung.
+
+- `eps_m: float` – Dehnung auf halber Hoehe.
+- `chi: float` – Kruemmung in 1/m.
+- `N_int: float`
+- `M_int: float` – Was die Ebene tatsaechlich erzeugt -- die Probe.
+- `sigma_s: Tuple[float, ...]` – Stahlspannung je Lage, in Pa.
+- `eps_s: Tuple[float, ...]` – Stahldehnung je Lage.
+- `konvergiert: bool = True`
+
+#### Ebene.bei
+
+```python
+def bei(self, z: float, h: float) -> float
+```
+
+Die Dehnung in der Tiefe `z`.
+
+### wirksamer_modul
+
+```python
+def wirksamer_modul(E_cm: float, phi: float) -> float
+```
+
+`E_c,eff = E_cm / (1 + phi)` -- das Kriechen weicht den Beton auf.
+
+### protokoll_wirksamer_modul
+
+```python
+def protokoll_wirksamer_modul(p, E_cm, phi, basis: str, *, titel: str, nachsatz: str='') -> None
+```
+
+Die Zeile zu [[opencivil.nachweis.querschnittsloeser#wirksamer_modul|wirksamer_modul]], aus den Werten `E_cm` und
+`phi` -- fuer jeden Nachweis, der mit dem aufgeweichten Beton rechnet.
+
+### protokoll_verfahren
+
+```python
+def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float, fasern: int=FASERN, verdraengt: bool=True) -> None
+```
+
+Der Ablauf der Suche, in die Mitschrift geschrieben.
+
+Steht hier und nicht bei den Nachweisen, die den Loeser benutzen: sonst
+stuende dieselbe Beschreibung zweimal da, und beim naechsten Eingriff in
+das Verfahren aendert man eine davon.
+
+Beschrieben wird der *Ablauf*, nicht jeder Zwischenwert. Die Halbierungen
+abzudrucken hiesse, hundert Zeilen zu zeigen, von denen nur die letzte
+etwas behauptet -- und die wird ohnehin durch die Probe belegt.
+
+### plattenfasern
+
+```python
+def plattenfasern(*, h: float, b: float, beton: Callable[[float], float], staebe: Sequence[Tuple[float, float, Callable[[float], float]]], fasern: int=FASERN, gemittelt: bool=False, verdraengt: bool=True) -> Faserquerschnitt
+```
+
+Die Platte als Fasern: gleich dicke Scheiben ueber die Hoehe, der Arm ab
+der Mittelebene, dazu je Lage `(Flaeche, z, Gesetz)` ein Stab.
+
+Der Loeser und die genaue Resistenzlinie
+([[opencivil.nachweis.resistenzlinie#Ebenenlinie|Ebenenlinie]]) rechnen mit
+demselben Querschnitt -- darum steht er einmal da. `gemittelt` und
+`verdraengt` wie bei [[opencivil.nachweis.querschnittsloeser#Querschnittsloeser|Querschnittsloeser]]. Die Ausdruecke
+stehen genau so da wie vor dem Umbau: dieselben Zahlen bis aufs letzte
+Bit, und damit derselbe Bericht.
+
+### Querschnittsloeser
+
+```python
+class Querschnittsloeser
+```
+
+Der Querschnitt als Faserintegral, mit Suche nach der Dehnungsebene.
+
+`beton` und `stahl` sind Funktionen `eps -> sigma` in SI. Damit
+bleibt der Loeser frei von Annahmen ueber das Werkstoffgesetz: die
+Spannungsbegrenzung rechnet elastisch mit Kriechen und charakteristischen
+Festigkeiten, der Knicknachweis mit dem nichtlinearen Gesetz der Norm und
+Bemessungswerten -- siehe [[opencivil.nachweis.querschnittsloeser#Werkstoffsatz|Werkstoffsatz]].
+
+**Das Suchfenster muss zu den Gesetzen passen.** `eps_druck` und
+`eps_zug` duerfen nicht weiter reichen als der Bereich, in dem beide
+Gesetze monoton sind -- jenseits ihrer Bruchdehnung geben sie null zurueck,
+und dort findet die Bisektion Scheinloesungen. Die Vorgaben passen zu
+[[opencivil.nachweis.querschnittsloeser#beton_nichtlinear|beton_nichtlinear]] und [[opencivil.nachweis.querschnittsloeser#stahl_bilinear|stahl_bilinear]]; wer sie weitet, muss
+die Gesetze mitweiten.
+
+Ohne `grenzen` gelten beide Werte an beiden Raendern. Wer andere
+Grenzen braucht -- die Spannung-Dehnung-Analyse die des Dehnungsfaechers,
+mit `eps_ud` am Stahl statt am Betonrand --, gibt sie mit.
+`gemittelt` laesst ein Gesetz, das springt (der Spannungsblock), ueber
+jede Faser mitteln statt in ihrer Mitte lesen: sonst springt mit ihm die
+Normalkraft, und keine Ebene trifft sie genau. Ohne `verdraengt` zaehlt
+der Beton auch dort, wo der Stahl liegt -- so rechnet die Handrechnung.
+
+Welche Gesetze zu welcher Wahl gehoeren, sagt
+[[opencivil.nachweis.rechenwahl#gesetze|opencivil.nachweis.rechenwahl.gesetze]].
+
+#### Querschnittsloeser._fenster
+
+```python
+def _fenster(self, chi: float) -> Optional[Tuple[float, float]]
+```
+
+In welchem Bereich `eps_m` liegen darf, damit keine Faser aus dem
+gueltigen Dehnungsbereich faellt. Bei der Platte: beide Raender
+zwischen `-eps_druck` und `eps_zug`, siehe
+[[opencivil.querschnitt.fasern#Dehnungsgrenzen.fenster|Dehnungsgrenzen.fenster]].
+
+#### Querschnittsloeser._eps_zu_normalkraft
+
+```python
+def _eps_zu_normalkraft(self, chi: float, N_ziel: float) -> Optional[float]
+```
+
+Die mittlere Dehnung, bei der `N = N_ziel` gilt -- bei festem `chi`.
+
+`N(eps_m)` waechst im gueltigen Bereich monoton: mehr Dehnung heisst
+mehr Zug. Eine Bisektion findet die Stelle also sicher, sofern sie im
+Fenster liegt.
+
+#### Querschnittsloeser.mitteldehnung
+
+```python
+def mitteldehnung(self, chi: float, N: float) -> Optional[float]
+```
+
+Die Dehnung auf halber Hoehe, bei der die Ebene mit der Kruemmung
+`chi` die Normalkraft `N` traegt -- `None`, wo es keine gibt.
+Fuer Linien, die ueber die Kruemmung laufen statt ueber das Moment.
+
+#### Querschnittsloeser.kruemmung
+
+```python
+def kruemmung(self, eps_m: float, M: float) -> Optional[float]
+```
+
+Die Kruemmung, bei der die Ebene mit der Dehnung `eps_m` auf halber
+Hoehe das Moment `M` traegt -- `None`, wo es keine gibt.
+
+Bei fester Dehnung waechst das Moment mit der Kruemmung: die eine
+Seite wird mehr gedehnt, die andere mehr gestaucht. Gesucht wird darum
+wie in [[opencivil.nachweis.querschnittsloeser#Querschnittsloeser._eps_zu_normalkraft|_eps_zu_normalkraft]] durch Halbieren, innerhalb dessen,
+was die Grenzen bei dieser Dehnung zulassen.
+
+#### Querschnittsloeser.loese
+
+```python
+def loese(self, *, N_Ed: float, M_Ed: float) -> Ebene
+```
+
+Die Dehnungsebene zu diesen Schnittgroessen.
+
+Aeussere Bisektion ueber `chi`: zu jedem `chi` wird `eps_m` so
+bestimmt, dass die Normalkraft stimmt, und das uebrig bleibende Moment
+gegen `M_Ed` gehalten. `M(chi)` waechst monoton -- mehr Kruemmung
+heisst mehr Moment --, solange der Querschnitt nicht versagt.
+
+#### Querschnittsloeser._rand
+
+```python
+def _rand(self, start: float, N_Ed: float, moment: Callable[[float], Optional[float]], M_Ed: float, *, nach_oben: bool) -> Tuple[Optional[float], None]
+```
+
+Eine Kruemmung, bei der das Moment `M_Ed` sicher ueber- bzw.
+unterschreitet -- der Startpunkt der aeusseren Bisektion.
+
+Von der theoretischen Grenze aus wird herangetastet: dort ist das
+Fenster leer oder die Normalkraft nicht erreichbar. Zwanzig
+Halbierungen genuegen, um auf eine loesbare Stelle zu kommen.
+
+Nahe am Widerstand genuegen sie nicht. Zwischen der letzten Stufe
+ohne Gleichgewicht und der ersten mit -- an der Platte des Beispiels
+0.08 und 0.04 1/m -- liegen Kruemmungen, die das Moment noch
+erreichen, und das Halbieren springt ueber sie hinweg: 234.9 kNm
+hiessen dort «kein Gleichgewicht», obwohl der Querschnitt bis
+235.4 kNm traegt. Trifft das Halbieren nicht, wird darum die Grenze
+zwischen den beiden Stufen gesucht -- die groesste Kruemmung mit
+Gleichgewicht -- und dort noch einmal gefragt. Wo das Halbieren
+trifft, bleibt alles, wie es war.
+
+### Werkstoffsatz
+
+```python
+class Werkstoffsatz(str, Enum)
+```
+
+Mit welchen Festigkeiten die Werkstoffgesetze rechnen.
+
+**Bemessung** -- `f_cd` und `f_yd`. Fuer die Tragsicherheit: gefragt
+ist, was der Querschnitt *darf*, und dahinein gehoert der
+Teilsicherheitsbeiwert.
+
+**Charakteristisch** -- `f_ck` und `f_yk`. Fuer die
+Gebrauchstauglichkeit: gefragt ist, was der Querschnitt *tut*, und Stahl
+fliesst bei `f_yk`, nicht bei `f_yd`. Mit dem Plateau bei `f_yd`
+laege jede Stahlspannung unter 435 N/mm², und eine Grenze darueber --
+`f_yk` bei normaler Rissanforderung -- waere nie zu ueberschreiten: ein
+Nachweis, der per Konstruktion immer aufgeht.
+
+Der Satz bestimmt, **wo die Plateaus liegen**, und sonst nichts. Die
+Moduln und Dehnungsgrenzen sind in beiden Saetzen dieselben. Er steht hier
+als Name und nicht als zwei Zahlen an jeder Aufrufstelle: welche Werte ein
+Nachweis ansetzt, ist eine Entscheidung, und eine Entscheidung soll man
+lesen koennen, statt sie aus `f_sd=...` erschliessen zu muessen. Jeder
+Nutzer des Loesers nennt darum seinen Satz -- der Knicknachweis
+`BEMESSUNG`, die Spannungsbegrenzung `CHARAKTERISTISCH`; die
+Spannung-Dehnung-Analyse waehlt ihn je Analyse.
+
+- `BEMESSUNG = 'bemessung'`
+- `CHARAKTERISTISCH = 'charakteristisch'`
+
+#### Werkstoffsatz.beschriftung
+
+```python
+@property
+def beschriftung(self) -> str
+```
+
+#### Werkstoffsatz.kurz
+
+```python
+@property
+def kurz(self) -> str
+```
+
+Fuer schmale Zeilen.
+
+#### Werkstoffsatz.kuerzel
+
+```python
+@property
+def kuerzel(self) -> str
+```
+
+Der Buchstabe am Index: `d` (design) oder `k` (charakteristisch).
+
+#### Werkstoffsatz.widerstandsindex
+
+```python
+@property
+def widerstandsindex(self) -> str
+```
+
+Der Index an einem Widerstand: `M_{Rd}` oder `M_{Rk}`.
+
+#### Werkstoffsatz.stahl_druck
+
+```python
+@property
+def stahl_druck(self) -> str
+```
+
+Kurzname der Stahlfestigkeit auf Druck -- dort beginnt das Plateau.
+
+#### Werkstoffsatz.stahl
+
+```python
+@property
+def stahl(self) -> str
+```
+
+Kurzname der Stahlfestigkeit -- dort beginnt das Fliessplateau.
+
+#### Werkstoffsatz.beton
+
+```python
+@property
+def beton(self) -> str
+```
+
+Kurzname der Betonfestigkeit -- dort endet der Anstieg im Druck.
+
+#### Werkstoffsatz.stahl_zeichen
+
+```python
+@property
+def stahl_zeichen(self) -> str
+```
+
+Das Formelzeichen dazu, fuer die Herleitung -- `f_{yd}`.
+
+#### Werkstoffsatz.beton_zeichen
+
+```python
+@property
+def beton_zeichen(self) -> str
+```
+
+Das Formelzeichen dazu, fuer die Herleitung -- `f_{cd}`.
+
+### beton_elastisch
+
+```python
+def beton_elastisch(*, E_c: float, f_c: float=math.inf) -> Callable[[float], float]
+```
+
+Beton ohne Zugfestigkeit, im Druck linear bis `f_c`, dann waagrecht.
+
+Fuer den gerissenen Gebrauchszustand. `E_c` ist bereits der wirksame
+Modul, also `E_cm/(1+phi)`, falls Kriechen zaehlt. `f_c` ist die
+Festigkeit aus dem [[opencivil.nachweis.querschnittsloeser#Werkstoffsatz|Werkstoffsatz]] -- im Gebrauchszustand `f_ck`.
+
+Linear und nicht als Parabel: im Gebrauchszustand liegt die
+Betonspannung weit unter der Festigkeit, und dort ist die Parabel eine
+Gerade. Die Grenze steht trotzdem da, damit eine Druckzone, die doch
+einmal so weit kommt, nicht mehr aufnimmt, als der Beton hergibt. Ohne
+`f_c` bleibt das Gesetz unbegrenzt linear -- fuer Rechnungen, die mit
+Festigkeiten nichts zu tun haben.
+
+Ein Vergleich und nicht `max()`: das Gesetz laeuft je Nachweisfall
+rund siebzigtausend Mal, und der Funktionsaufruf kostete doppelt so viel
+wie die Rechnung selbst -- gemessen 28 ms je Platte.
+
+### beton_nichtlinear
+
+```python
+def beton_nichtlinear(*, f_cd: float, E_c: float, eps_c1d: float=0.002, eps_c2d: float=0.003) -> Callable[[float], float]
+```
+
+Parabel-Rechteck-Beziehung nach SIA 262, als Funktion fuer den Loeser.
+
+Keine Zugfestigkeit, Plateau zwischen `eps_c1d` und `eps_c2d`, danach
+Versagen (Spannung null). `k_sigma = E_c/(400*f_cd)` -- so steht es im
+Vorbild --, aber nie unter 1 ([[opencivil.querschnitt.werkstoffgesetz#k_sigma|k_sigma]]).
+
+### stahl_bilinear
+
+```python
+def stahl_bilinear(*, E_s: float, f_sd: float, eps_ud: float=0.045, f_sd_druck: Optional[float]=None) -> Callable[[float], float]
+```
+
+Linear bis zur Fliessgrenze, dann waagrecht; jenseits von `eps_ud` null.
+
+`f_sd` ist die Grenze, ab der es waagrecht geht -- `f_yd` oder
+`f_yk`, je nach [[opencivil.nachweis.querschnittsloeser#Werkstoffsatz|Werkstoffsatz]]. `f_sd_druck` die auf Druck;
+ohne sie gilt dieselbe. Bei den Normsorten sind beide gleich.
+
+### stahl_nur_zug
+
+```python
+def stahl_nur_zug(*, E_s: float, f_sd: float, eps_ud: float=0.045) -> Callable[[float], float]
+```
+
+Wie [[opencivil.nachweis.querschnittsloeser#stahl_bilinear|stahl_bilinear]], aber ohne Druck: gedrueckter Stahl traegt
+nichts. So rechnet die Handrechnung -- sie laesst die Druckbewehrung weg.
+
+
+## Konstanten
+
+- `FASERN = 60` – Fasern ueber die Plattenhoehe. 60 reichen: die Betonspannung ist stetig, und der Fehler der Mittelpunktsregel faellt mit dem Quadrat der Faserdicke.
+- `SCHRITTE = 60` – Obergrenze der Halbierungen je Bisektion. Erreicht wird sie fast nie -- abgebrochen wird ueber die Schranken darunter, sobald das Fenster eng genug ist. Die Zahl steht nur da, damit keine Schleife ewig laeuft.
+- `EPS_SCHRANKE = 1e-11` – Wann das Dehnungsfenster eng genug ist. Der Startbereich ist rund 0.05 breit; 1e-11 ist ein Zehntausendstel eines Promille und liegt weit unter allem, was eine Eingabe hergibt. Ohne diese Schranke lief die Bisektion stur sechzig Mal -- die letzten zehn Durchlaeufe aendern in doppelter Genauigkeit nichts mehr und kosten doch jedesmal einen Faserdurchgang.
+- `CHI_SCHRANKE = 1e-10` – Dasselbe fuer die Kruemmung, in 1/m.
+- `EPS_DRUCK = 0.003` – Aeusserste Dehnungen, innerhalb derer gesucht wird -- Stauchung und Dehnung. **Der Suchbereich muss im gueltigen Bereich beider Gesetze bleiben:** jenseits der Bruchdehnung geben sie null zurueck, und damit waere `N(eps_m)` nicht mehr monoton. Genau daran scheiterte die erste Fassung -- die Bisektion sah bei -0.5 dieselbe Normalkraft wie bei 0.
+- `EPS_ZUG = 0.045`
+
+## Braucht
+
+- [[opencivil.core.protokoll]]
+- [[opencivil.querschnitt.fasern]]
+- [[opencivil.querschnitt.werkstoffgesetz]]
+
+## Gebraucht von
+
+- [[opencivil.nachweis.biegung_normalkraft]]
+- [[opencivil.nachweis.dehnungsfaecher]]
+- [[opencivil.nachweis.handrechnung]]
+- [[opencivil.nachweis.knicken]]
+- [[opencivil.nachweis.rechenwahl]]
+- [[opencivil.nachweis.resistenzlinie]]
+- [[opencivil.nachweis.spannungsbegrenzung]]
+- [[opencivil.projekt.eintraege]]
+- [[opencivil.spannungsanalyse]]
+- [[opencivil.web.api]]
+
+## Formeln aus diesem Modul
+
+- [[Dehnungsebene und innere Kräfte]] · `protokoll_verfahren`
+- [[Wirksamer Elastizitätsmodul]] · `protokoll_wirksamer_modul`

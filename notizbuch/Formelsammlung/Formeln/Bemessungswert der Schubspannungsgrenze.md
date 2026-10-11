@@ -1,5 +1,5 @@
 ---
-erzeugt: b986480e28ab
+erzeugt: e3dcf06c882c
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 2.4.2.4"
@@ -28,7 +28,7 @@ $$
 
 ## Im Code
 
-- `opencivil.material.beton:_tau_cd`
+- [[opencivil.material.beton#_tau_cd|_tau_cd]]
 
 ## Themen
 

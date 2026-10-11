@@ -1,5 +1,5 @@
 ---
-erzeugt: d403b1c0bb70
+erzeugt: 5ec1389d646c
 art: formel
 tags: [formel]
 ---
@@ -33,7 +33,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.handrechnung:Handrechnung._bei_n_null`
+- [[opencivil.nachweis.handrechnung#Handrechnung._bei_n_null|Handrechnung._bei_n_null]]
 
 ## Themen
 

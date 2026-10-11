@@ -1,5 +1,5 @@
 ---
-erzeugt: b0d3dda5632b
+erzeugt: 3c9c1392136d
 art: formel
 tags: [formel]
 ---
@@ -31,8 +31,8 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.querschnittsloeser:protokoll_wirksamer_modul`
-- `opencivil.spannungsanalyse:_herleitung`
+- [[opencivil.nachweis.querschnittsloeser#protokoll_wirksamer_modul|protokoll_wirksamer_modul]]
+- [[opencivil.spannungsanalyse#_herleitung|_herleitung]]
 
 ## Themen
 

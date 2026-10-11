@@ -1,5 +1,5 @@
 ---
-erzeugt: 2cd8e2de3ed0
+erzeugt: e0b9716b4ac5
 art: formel
 tags: [formel]
 ---
@@ -31,7 +31,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.mindestbewehrung:ZwaengungBiegung._protokoll_lage`
+- [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung|ZwaengungBiegung._protokoll_lage]]
 
 ## Themen
 

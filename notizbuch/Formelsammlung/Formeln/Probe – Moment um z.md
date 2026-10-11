@@ -1,5 +1,5 @@
 ---
-erzeugt: 065355244416
+erzeugt: 7e4215fdbffc
 art: formel
 tags: [formel]
 ---
@@ -22,7 +22,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.schiefe_biegung:SchiefeBiegung._protokoll_bruchzustand`
+- [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 
 ## Themen
 

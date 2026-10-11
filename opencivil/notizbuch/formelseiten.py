@@ -25,7 +25,7 @@ andere Platte.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 
 from opencivil.bericht import formelsammlung as fs
 from opencivil.bericht.markdown import absatz_markdown, formel_in_zelle, text_markdown
@@ -50,7 +50,7 @@ ANGABEN = {Quelle.EINGABE: "Eingabe", Quelle.UEBERSCHRIEBEN: "Eingabe",
 
 
 @dataclass
-class Groesse:
+class Groessenzeile:
     """Eine Zeile der Tabelle «Groessen»."""
 
     zeichen: str
@@ -66,7 +66,7 @@ class Fassung:
 
     block: GleichungBlock
     projekt: str
-    groessen: Dict[str, Groesse] = field(default_factory=dict)
+    groessen: Dict[str, Groessenzeile] = field(default_factory=dict)
     """Je Platzhalter der Vorlage."""
 
 
@@ -133,7 +133,7 @@ def _vorkommen(block: GleichungBlock, projekt: str, formeln: Dict[str, Formel],
     if block.formelzeile is None:
         return
     for platzhalter, wert in block.formelzeile.eingaben:
-        groesse = fassung.groessen.setdefault(platzhalter, Groesse(
+        groesse = fassung.groessen.setdefault(platzhalter, Groessenzeile(
             ohne_namen_im_index(wert.symbol), einheit=wert.einheit.beschriftung or ""))
         groesse.bedeutung = groesse.bedeutung or wert.beschreibung
         quelle = zuletzt.get(wert.id, "")
@@ -155,16 +155,24 @@ def _angabe(wert: Wert) -> str:
 # ---------------------------------------------------------------------------
 
 
-def seiten() -> List[Seite]:
-    """Die Uebersicht, je Thema eine Seite und je Formel eine."""
-    formeln, themen = sammeln()
-    heraus = [_uebersicht(formeln, themen)]
+def seiten(formeln: Optional[Dict[str, Formel]] = None,
+           themen: Optional[Dict[str, Thema]] = None,
+           codestelle: Optional[Callable[[str], str]] = None) -> List[Seite]:
+    """
+    Die Uebersicht, je Thema eine Seite und je Formel eine. ``codestelle``
+    macht aus ``modul:Funktion`` einen Link auf die Seite des Moduls -- ohne
+    steht die Stelle als Code da.
+    """
+    if formeln is None or themen is None:
+        formeln, themen = sammeln()
+    codestelle = codestelle or (lambda stelle: f"`{stelle}`")
+    heraus = [_uebersicht(formeln, themen, codestelle)]
     heraus += [_themenseite(t, rang) for rang, t in enumerate(themen.values())]
-    heraus += [_formelseite(f) for f in formeln.values()]
+    heraus += [_formelseite(f, codestelle) for f in formeln.values()]
     return heraus
 
 
-def _formelseite(formel: Formel) -> Seite:
+def _formelseite(formel: Formel, codestelle: Callable[[str], str]) -> Seite:
     fassungen = list(formel.fassungen.values())
     referenzen = formel.referenzen
     zeilen: List[str] = []
@@ -198,7 +206,7 @@ def _formelseite(formel: Formel) -> Seite:
         zeilen += ["## Gebraucht von", "",
                    *(f"- [[{n}]]" for n in sorted(formel.gebraucht_von, key=sortierschluessel)),
                    ""]
-    zeilen += ["## Im Code", "", *(f"- `{c}`" for c in sorted(formel.codestellen)), ""]
+    zeilen += ["## Im Code", "", *(f"- {codestelle(c)}" for c in sorted(formel.codestellen)), ""]
     zeilen += ["## Themen", "", *(f"- [[{t}]]" for t in formel.themen), ""]
 
     eigenschaften = []
@@ -212,11 +220,11 @@ def _formelseite(formel: Formel) -> Seite:
 
 
 def _groessen(fassungen: List[Fassung]) -> List[str]:
-    """Die Zeilen der Tabelle -- dieselbe Groesse in mehreren Fassungen einmal."""
-    zeilen: Dict[str, Groesse] = {}
+    """Die Zeilen der Tabelle -- dieselbe Groessenzeile in mehreren Fassungen einmal."""
+    zeilen: Dict[str, Groessenzeile] = {}
     for fassung in fassungen:
         for groesse in fassung.groessen.values():
-            ziel = zeilen.setdefault(groesse.zeichen, Groesse(groesse.zeichen,
+            ziel = zeilen.setdefault(groesse.zeichen, Groessenzeile(groesse.zeichen,
                                                               einheit=groesse.einheit))
             ziel.bedeutung = ziel.bedeutung or groesse.bedeutung
             ziel.woher.update(groesse.woher)
@@ -225,7 +233,7 @@ def _groessen(fassungen: List[Fassung]) -> List[str]:
             for g in zeilen.values()]
 
 
-def _woher(groesse: Groesse) -> str:
+def _woher(groesse: Groessenzeile) -> str:
     teile = [f"[[{wert}]]" if art == "seite" else wert for art, wert in groesse.woher]
     return ", ".join(teile) or "–"
 
@@ -246,7 +254,8 @@ def _themenseite(thema: Thema, rang: int) -> Seite:
                  verzeichnis=(("bereich", thema.bereich),))
 
 
-def _uebersicht(formeln: Dict[str, Formel], themen: Dict[str, Thema]) -> Seite:
+def _uebersicht(formeln: Dict[str, Formel], themen: Dict[str, Thema],
+                codestelle: Callable[[str], str]) -> Seite:
     zeilen = [
         "Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre "
         "Normstelle, die Grössen mit ihrer Herkunft, ein Zahlenbeispiel, die Stelle "
@@ -275,6 +284,6 @@ def _uebersicht(formeln: Dict[str, Formel], themen: Dict[str, Thema]) -> Seite:
                "Code, an der genannten Stelle – von dort kommen sie in Bericht und "
                "Notizbuch.", ""]
     for formel in sorted(offen, key=lambda f: sortierschluessel(f.name)):
-        stellen = ", ".join(f"`{c}`" for c in sorted(formel.codestellen))
+        stellen = ", ".join(codestelle(c) for c in sorted(formel.codestellen))
         zeilen.append(f"- [[{formel.name}]] · {stellen}")
     return Seite(pfad=UEBERSICHT, art="verzeichnis", rumpf="\n".join(zeilen))

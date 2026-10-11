@@ -1,5 +1,5 @@
 ---
-erzeugt: 91e3e97c926d
+erzeugt: 19ac978982b1
 art: formel
 tags: [formel]
 ---
@@ -20,8 +20,8 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.rechenwahl:protokoll_gesetze`
-- `opencivil.spannungsanalyse:_herleitung`
+- [[opencivil.nachweis.rechenwahl#protokoll_gesetze|protokoll_gesetze]]
+- [[opencivil.spannungsanalyse#_herleitung|_herleitung]]
 
 ## Themen
 

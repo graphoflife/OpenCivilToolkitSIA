@@ -1,5 +1,5 @@
 ---
-erzeugt: b14396695edc
+erzeugt: db81d1c442ad
 art: formel
 tags: [formel]
 ---
@@ -35,7 +35,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.spannungsbegrenzung:Spannungsbegrenzung._protokoll_fliessen`
+- [[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung._protokoll_fliessen|Spannungsbegrenzung._protokoll_fliessen]]
 
 ## Themen
 

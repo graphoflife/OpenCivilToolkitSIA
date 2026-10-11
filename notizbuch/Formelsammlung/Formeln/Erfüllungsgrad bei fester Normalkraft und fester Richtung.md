@@ -1,5 +1,5 @@
 ---
-erzeugt: bb539cc8779a
+erzeugt: 4b69bee9c970
 art: formel
 tags: [formel]
 ---
@@ -12,7 +12,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.schiefe_biegung:SchiefeBiegung._protokoll_ansatz`
+- [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_ansatz]]
 
 ## Themen
 

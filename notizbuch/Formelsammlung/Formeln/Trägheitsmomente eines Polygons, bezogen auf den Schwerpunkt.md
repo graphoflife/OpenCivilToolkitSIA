@@ -1,5 +1,5 @@
 ---
-erzeugt: ad9c171c8e11
+erzeugt: 231244a1a16e
 art: formel
 tags: [formel]
 ---
@@ -12,7 +12,7 @@ $$
 
 ## Im Code
 
-- `opencivil.querschnitt.analyse:Querschnittsanalyse.aufbau_protokollieren`
+- [[opencivil.querschnitt.analyse#Querschnittsanalyse.aufbau_protokollieren|Querschnittsanalyse.aufbau_protokollieren]]
 
 ## Themen
 

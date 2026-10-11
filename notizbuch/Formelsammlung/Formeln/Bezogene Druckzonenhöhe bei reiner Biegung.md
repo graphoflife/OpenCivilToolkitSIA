@@ -1,5 +1,5 @@
 ---
-erzeugt: e2339fb38a40
+erzeugt: 3713191ba27e
 art: formel
 tags: [formel]
 ---
@@ -31,7 +31,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.richtungsnachweise:DuktilitaetQA.pruefe`
+- [[opencivil.nachweis.richtungsnachweise#DuktilitaetQA.pruefe|DuktilitaetQA.pruefe]]
 
 ## Themen
 

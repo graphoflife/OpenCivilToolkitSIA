@@ -1,5 +1,5 @@
 ---
-erzeugt: e141375e56fa
+erzeugt: ad9917a4cb59
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.4.2"
@@ -41,7 +41,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.mindestbewehrung:protokoll_zulaessige_stahlspannung`
+- [[opencivil.nachweis.mindestbewehrung#protokoll_zulaessige_stahlspannung|protokoll_zulaessige_stahlspannung]]
 
 ## Themen
 

@@ -8,8 +8,8 @@ Obsidian liest ihn als Tresor, und GitHub zeigt die Dateien als Text.
 - [[Formelsammlung]] – jede Formel des Werkzeugs als eigene Seite: die Formel,
   ihre Normstelle, die Grössen mit Links, ein Zahlenbeispiel, die Stelle im
   Code und die Theorie. Dazu je Thema eine Seite.
-- **Python** – je Modul der Bibliothek eine Seite, aus den Docstrings erzeugt.
-  *Entsteht gerade.*
+- [[Python]] – je Modul der Bibliothek eine Seite, aus den Docstrings erzeugt;
+  wie alles zusammen rechnet, sagt [[opencivil]].
 - **Notizen**
   - [[Arbeitsweise]] – wie Claude an diesem Projekt arbeitet.
   - [[Entwicklung]] – was gebaut wurde und warum, neueste Einträge oben.
@@ -28,8 +28,8 @@ bleibt auf dem eigenen Rechner.
 
 ## Erzeugt und von Hand
 
-Die Seiten der Formelsammlung schreibt `python3 -m opencivil.web.bruecke` aus
-dem Code. Sie tragen oben die Eigenschaft `erzeugt` – eine Prüfsumme über
+Die Seiten der Formelsammlung und der Python-Doku schreibt
+`python3 -m opencivil.web.bruecke` aus dem Code. Sie tragen oben die Eigenschaft `erzeugt` – eine Prüfsumme über
 alles bis zur Linie `<!-- Ab hier von Hand … -->`.
 
 - **Über der Linie** schreibt nur der Generator, bei jedem Lauf neu. Wer dort

@@ -1,5 +1,5 @@
 ---
-erzeugt: 88f2a22b91fe
+erzeugt: 6102ad2455e1
 art: formel
 tags: [formel]
 ---
@@ -12,7 +12,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.schubwandnachweis:Schubwandnachweis._protokoll_ansatz`
+- [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._protokoll_ansatz]]
 
 ## Themen
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 4edc60977a18
+erzeugt: 7e07ca1fadfe
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.2.4"
@@ -21,8 +21,8 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.resistenzlinie:Ebenenlinie.protokoll_ansatz`
-- `opencivil.querschnitt.analyse:Querschnittsanalyse.werkstoffe_protokollieren`
+- [[opencivil.nachweis.resistenzlinie#Ebenenlinie.protokoll_ansatz|Ebenenlinie.protokoll_ansatz]]
+- [[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe_protokollieren|Querschnittsanalyse.werkstoffe_protokollieren]]
 
 ## Themen
 

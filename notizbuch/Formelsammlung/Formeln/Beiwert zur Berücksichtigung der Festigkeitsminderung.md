@@ -1,5 +1,5 @@
 ---
-erzeugt: 6600dcabfa13
+erzeugt: 04549ac11fbb
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 2.4.2.3"
@@ -31,7 +31,7 @@ $$
 
 ## Im Code
 
-- `opencivil.material.beton:_eta_fc`
+- [[opencivil.material.beton#_eta_fc|_eta_fc]]
 
 ## Themen
 

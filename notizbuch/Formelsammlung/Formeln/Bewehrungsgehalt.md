@@ -1,5 +1,5 @@
 ---
-erzeugt: 33e8ded0c6ef
+erzeugt: 987be9ea5fc2
 art: formel
 tags: [formel]
 ---
@@ -34,7 +34,7 @@ $$
 
 ## Im Code
 
-- `opencivil.querschnitt.platte:Lagenaufbau._vergroesserung`
+- [[opencivil.querschnitt.platte#Lagenaufbau._vergroesserung|Lagenaufbau._vergroesserung]]
 
 ## Themen
 

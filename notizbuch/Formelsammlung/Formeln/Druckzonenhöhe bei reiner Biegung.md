@@ -1,5 +1,5 @@
 ---
-erzeugt: b0f3d3db20e8
+erzeugt: 5f45298ba542
 art: formel
 tags: [formel]
 ---
@@ -33,7 +33,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.duktilitaet:Duktilitaet._protokoll_lage`
+- [[opencivil.nachweis.duktilitaet#Duktilitaet._protokoll_lage|Duktilitaet._protokoll_lage]]
 
 ## Themen
 

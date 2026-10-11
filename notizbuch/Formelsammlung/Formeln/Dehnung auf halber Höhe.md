@@ -1,5 +1,5 @@
 ---
-erzeugt: 573ad2959984
+erzeugt: 2bb9ba75286f
 art: formel
 tags: [formel]
 ---
@@ -52,7 +52,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.querkraft:Querkraft._protokoll_fall`
+- [[opencivil.nachweis.querkraft#Querkraft._protokoll_fall|Querkraft._protokoll_fall]]
 
 ## Themen
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 44dc3188bb73
+erzeugt: a82d12767e1f
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.3.2.1"
@@ -36,7 +36,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.querkraft:Querkraft._protokoll_k_g`
+- [[opencivil.nachweis.querkraft#Querkraft|Querkraft._protokoll_k_g]]
 
 ## Themen
 

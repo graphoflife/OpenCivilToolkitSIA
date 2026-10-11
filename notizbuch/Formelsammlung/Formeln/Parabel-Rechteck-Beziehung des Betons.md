@@ -1,5 +1,5 @@
 ---
-erzeugt: 723f567f1e9e
+erzeugt: ba05f04a3d73
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.1.6"
@@ -21,9 +21,9 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.rechenwahl:protokoll_betongesetz`
-- `opencivil.querschnitt.analyse:Querschnittsanalyse.werkstoffe_protokollieren`
-- `opencivil.spannungsanalyse:_herleitung`
+- [[opencivil.nachweis.rechenwahl#protokoll_betongesetz|protokoll_betongesetz]]
+- [[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe_protokollieren|Querschnittsanalyse.werkstoffe_protokollieren]]
+- [[opencivil.spannungsanalyse#_herleitung|_herleitung]]
 
 ## Themen
 

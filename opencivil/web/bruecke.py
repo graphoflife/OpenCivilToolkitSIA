@@ -73,7 +73,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 from opencivil.bericht.formelsammlung import vollstaendig
-from opencivil.notizbuch import formelseiten, tresor
+from opencivil.notizbuch import erzeugen, tresor
 from opencivil.web.api import formelsammlung_liste
 
 WURZEL = Path(__file__).resolve().parents[2]
@@ -176,7 +176,7 @@ def formelsammlung_schreiben(pfad: Path | None = None) -> Path:
 @functools.lru_cache(maxsize=1)
 def notizbuch_seiten() -> Tuple[tresor.Seite, ...]:
     """Was der Code zum Notizbuch beitraegt -- einmal je Lauf gerechnet."""
-    return tuple(formelseiten.seiten())
+    return tuple(erzeugen.seiten())
 
 
 def notizbuch_plan(wurzel: Optional[Path] = None) -> tresor.Plan:

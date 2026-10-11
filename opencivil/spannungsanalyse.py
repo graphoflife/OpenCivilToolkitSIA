@@ -25,13 +25,16 @@ Grund, warum die Auswertungen nicht im :class:`Rechenwerk` stehen. Sie
 beantworten eine Frage, die man beim Entwerfen stellt: *was passiert
 eigentlich im Querschnitt?*
 
-JE ANALYSE GEWAEHLT (:class:`~opencivil.projekt.SpannungsfallEintrag`, als
-:class:`~opencivil.nachweis.rechenwahl.Rechenwahl`):
+JE ANALYSE GEWAEHLT:
+Jede Analyse (:class:`~opencivil.projekt.SpannungsfallEintrag`) waehlt als
+:class:`~opencivil.nachweis.rechenwahl.Rechenwahl`
+
 * die Kriechzahl;
 * der Wertesatz -- Bemessung (``f_cd``, ``f_yd``) oder charakteristisch
   (``f_ck``, ``f_yk``), siehe :class:`Werkstoffsatz`;
 * die Rechenart -- Handrechnung Block 0.85·x, Block 0.85·x genau oder die
   Parabel mit ``E_c,eff``.
+
 Moduln und Grenzdehnungen sind in beiden Wertesaetzen dieselben, wie ueberall
 im Werkzeug.
 

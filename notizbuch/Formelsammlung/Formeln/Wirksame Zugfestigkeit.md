@@ -1,5 +1,5 @@
 ---
-erzeugt: bc86a30a793c
+erzeugt: ec43b7dd4dcc
 art: formel
 tags: [formel]
 ---
@@ -33,7 +33,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.sproedes_versagen:protokoll_zugfestigkeit`
+- [[opencivil.nachweis.sproedes_versagen#protokoll_zugfestigkeit|protokoll_zugfestigkeit]]
 
 ## Themen
 

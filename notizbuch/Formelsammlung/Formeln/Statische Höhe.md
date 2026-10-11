@@ -1,5 +1,5 @@
 ---
-erzeugt: 316d865b0fcf
+erzeugt: 7ee9d2ddc42d
 art: formel
 tags: [formel]
 ---
@@ -58,8 +58,8 @@ $$
 
 ## Im Code
 
-- `opencivil.querschnitt.platte:Lagenaufbau._vergroesserung`
-- `opencivil.querschnitt.platte:protokoll_statische_hoehe`
+- [[opencivil.querschnitt.platte#Lagenaufbau._vergroesserung|Lagenaufbau._vergroesserung]]
+- [[opencivil.querschnitt.platte#protokoll_statische_hoehe|protokoll_statische_hoehe]]
 
 ## Themen
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: baaa02eff020
+erzeugt: 9c92f496fd7b
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.1.6"
@@ -28,8 +28,8 @@ $$
 
 ## Im Code
 
-- `opencivil.material.beton`
-- `opencivil.querschnitt.analyse:Querschnittsanalyse.werkstoffe_protokollieren`
+- [[opencivil.material.beton]]
+- [[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe_protokollieren|Querschnittsanalyse.werkstoffe_protokollieren]]
 
 ## Themen
 

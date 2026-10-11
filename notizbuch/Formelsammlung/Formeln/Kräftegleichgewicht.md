@@ -1,5 +1,5 @@
 ---
-erzeugt: 57eab855a4bf
+erzeugt: 828f557c2ff5
 art: formel
 tags: [formel]
 ---
@@ -34,7 +34,7 @@ $$
 
 ## Im Code
 
-- `opencivil.nachweis.handrechnung:Handrechnung._halbe_hoehe`
+- [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
 
 ## Themen
 
