@@ -1,5 +1,5 @@
 ---
-erzeugt: db81d1c442ad
+erzeugt: 2bcfe9152f6f
 art: formel
 tags: [formel]
 ---
@@ -28,10 +28,6 @@ $$
   &= 2.5\,\text{‰} \quad < \quad \varepsilon_{s,x} = 4.67\,\text{‰} \quad \Rightarrow \quad \text{NICHT erfüllt}
 \end{aligned}
 $$
-
-## Gebraucht von
-
-- [[Erfüllungsgrad]]
 
 ## Im Code
 

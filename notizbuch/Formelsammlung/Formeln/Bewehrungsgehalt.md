@@ -1,5 +1,5 @@
 ---
-erzeugt: 987be9ea5fc2
+erzeugt: cea65d3de375
 art: formel
 tags: [formel]
 ---
@@ -16,7 +16,7 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $A_{s,u}$ | Bewehrungsquerschnitt 3. Lage Grundbewehrung | mm² | [[Bewehrungsquerschnitt der zusammengefassten Lage]], Zwischenwert |
+| $A_{s,u}$ | – | mm² | [[Bewehrungsquerschnitt der zusammengefassten Lage]] |
 | $b$ | Betrachtete Breite (x) | mm | Vorgabe |
 | $d_{u}$ | – | mm | [[Statische Höhe]] |
 

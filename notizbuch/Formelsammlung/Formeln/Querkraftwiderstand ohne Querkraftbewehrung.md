@@ -1,5 +1,5 @@
 ---
-erzeugt: 99e02e33e228
+erzeugt: 80f97ad24d6e
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.3.2.1"
@@ -38,10 +38,6 @@ $$
   &= 83.2\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
 $$
-
-## Gebraucht von
-
-- [[Erfüllungsgrad]]
 
 ## Im Code
 

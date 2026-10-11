@@ -1,5 +1,5 @@
 ---
-erzeugt: d4ef45bbee95
+erzeugt: 5c4587a9f424
 art: formel
 tags: [formel]
 ---
@@ -14,7 +14,7 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $A_{s,2,x}$ | – | mm² | [[Bewehrung der Lage]], Zwischenwert |
+| $A_{s,2,x}$ | – | mm² | [[Bewehrung der Lage]] |
 | $\sigma_{s,adm,2,x}$ | – | N/mm² | [[Zulässige Stahlspannung (Rissbreite w_nom)]] |
 
 ## Beispiel
@@ -28,10 +28,6 @@ $$
   &= 933.1\,\mathrm{kN} \quad \ge \quad N_{Riss} = 378.3\,\mathrm{kN} \quad \Rightarrow \quad \text{erfüllt}
 \end{aligned}
 $$
-
-## Gebraucht von
-
-- [[Erfüllungsgrad]]
 
 ## Im Code
 

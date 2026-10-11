@@ -1,5 +1,5 @@
 ---
-erzeugt: 63624a380ff9
+erzeugt: 7e8544182388
 art: formel
 tags: [formel]
 ---
@@ -25,10 +25,6 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 N_{Riss} = \frac{h_{eff}}{2} \cdot b \cdot f_{ct,eff} = \frac{300\,\mathrm{mm}}{2} \cdot 1000\,\mathrm{mm} \cdot 2.52\,\mathrm{N}/\mathrm{mm}^{2} = 378.3\,\mathrm{kN}
 $$
-
-## Gebraucht von
-
-- [[Erfüllungsgrad]]
 
 ## Im Code
 

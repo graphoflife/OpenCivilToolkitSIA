@@ -1,5 +1,5 @@
 ---
-erzeugt: 7ee9d2ddc42d
+erzeugt: 9b9c3512d0eb
 art: formel
 tags: [formel]
 ---
@@ -22,7 +22,7 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $z_{u}$ | Tiefe 2. Lage Grundbewehrung ab Oberkante | mm | [[Schwerpunkt der zusammengefassten Lage]], Zwischenwert |
+| $z_{u}$ | – | mm | [[Schwerpunkt der zusammengefassten Lage]] |
 | $h$ | Plattendicke | mm | Vorgabe, Zwischenwert |
 | $z_{3,x,g}$ | Tiefe 3. Lage Grundbewehrung ab Oberkante | mm | Zwischenwert |
 

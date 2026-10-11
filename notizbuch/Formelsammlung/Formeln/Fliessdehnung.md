@@ -1,5 +1,5 @@
 ---
-erzeugt: d1a2ec570732
+erzeugt: be9d0783684a
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.2.4"
@@ -25,7 +25,7 @@ $$
 | --- | --- | --- | --- |
 | $f_{yd}$ | Bemessungswert der Fliessgrenze | N/mm² | [[Bemessungswert der Fliessgrenze]] |
 | $E_s$ | Elastizitätsmodul des Betonstahls | N/mm² | Vorgabe |
-| $f_{yk}$ | Charakteristische Fliessgrenze | N/mm² | Vorgabe, [[Bemessungswert der Fliessgrenze]] |
+| $f_{yk}$ | Charakteristische Fliessgrenze | N/mm² | Vorgabe |
 
 ## Beispiel
 

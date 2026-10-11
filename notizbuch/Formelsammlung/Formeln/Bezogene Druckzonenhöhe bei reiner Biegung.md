@@ -1,5 +1,5 @@
 ---
-erzeugt: 3713191ba27e
+erzeugt: 35f74b4a9256
 art: formel
 tags: [formel]
 ---
@@ -24,10 +24,6 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 x/d = \frac{x}{d} = \frac{64.8\,\mathrm{mm}}{560.3\,\mathrm{mm}} = 0.116 \quad \le \quad 0.35 \quad \Rightarrow \quad \text{erfüllt}
 $$
-
-## Gebraucht von
-
-- [[Erfüllungsgrad]]
 
 ## Im Code
 

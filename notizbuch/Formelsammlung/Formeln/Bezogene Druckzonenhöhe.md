@@ -1,5 +1,5 @@
 ---
-erzeugt: b2992a7a0602
+erzeugt: 4f6971dced7c
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.1.4.2.5"
@@ -25,10 +25,6 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 \left(x/d\right)_{2} = \frac{x}{d_{2,x}} = \frac{62.7\,\mathrm{mm}}{248.1\,\mathrm{mm}} = 0.253 \quad \le \quad \left(x/d\right)_{max} = 0.35 \quad \Rightarrow \quad \text{erfüllt}
 $$
-
-## Gebraucht von
-
-- [[Erfüllungsgrad]]
 
 ## Im Code
 

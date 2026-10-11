@@ -1,5 +1,5 @@
 ---
-erzeugt: dc82d1b4bf1d
+erzeugt: 31b3a695c712
 art: formel
 tags: [formel]
 ---
@@ -15,7 +15,7 @@ $$
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
 | $E_{c,eff}$ | – | N/mm² | [[Wirksamer Elastizitätsmodul]] |
-| $f_{cd}$ | Bemessungswert der Betondruckfestigkeit | N/mm² | [[Bemessungswert der Betondruckfestigkeit]], Vorgabe |
+| $f_{cd}$ | Bemessungswert der Betondruckfestigkeit | N/mm² | [[Bemessungswert der Betondruckfestigkeit]] |
 
 ## Beispiel
 

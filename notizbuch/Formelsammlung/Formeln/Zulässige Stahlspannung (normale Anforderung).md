@@ -1,5 +1,5 @@
 ---
-erzeugt: 1f95912a393e
+erzeugt: 1f47f8f4797d
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.4.2"
@@ -27,7 +27,6 @@ $$
 
 ## Gebraucht von
 
-- [[Erfüllungsgrad]]
 - [[Zulässige Dehnung]]
 
 ## Im Code

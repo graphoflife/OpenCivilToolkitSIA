@@ -1,5 +1,5 @@
 ---
-erzeugt: 9b75ea67e57e
+erzeugt: 146e8003e49c
 art: formel
 tags: [formel]
 ---
@@ -15,7 +15,7 @@ $$
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
 | $n$ | – | – | Zwischenwert |
-| $A_{s,2,x}$ | – | mm² | [[Bewehrung der Lage]], Zwischenwert |
+| $A_{s,2,x}$ | – | mm² | [[Bewehrung der Lage]] |
 | $b$ | Betrachtete Breite (x) | mm | Vorgabe |
 
 ## Beispiel

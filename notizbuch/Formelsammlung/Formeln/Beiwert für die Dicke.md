@@ -1,5 +1,5 @@
 ---
-erzeugt: fa6a8cedbe81
+erzeugt: c55aa611209b
 art: formel
 tags: [formel]
 normstelle: ["SIA 262:2025, 4.4.2", "SIA 262:2025, 4.4.1.3"]
@@ -23,7 +23,7 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $h_{eff}$ | Plattendicke | mm | [[Rissaktive Plattendicke]], Vorgabe |
+| $h_{eff}$ | – | mm | [[Rissaktive Plattendicke]] |
 | $h$ | Plattendicke | mm | Vorgabe, Zwischenwert |
 
 ## Beispiel

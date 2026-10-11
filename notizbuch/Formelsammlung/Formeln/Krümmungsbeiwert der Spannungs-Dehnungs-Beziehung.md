@@ -1,5 +1,5 @@
 ---
-erzeugt: 9c92f496fd7b
+erzeugt: 62e6c77f6e5f
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.1.6"
@@ -16,7 +16,7 @@ $$
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
 | $E_{cd}$ | Bemessungswert des Elastizitätsmoduls | N/mm² | [[Bemessungswert des Elastizitätsmoduls]] |
-| $f_{cd}$ | Bemessungswert der Betondruckfestigkeit | N/mm² | [[Bemessungswert der Betondruckfestigkeit]], Vorgabe |
+| $f_{cd}$ | Bemessungswert der Betondruckfestigkeit | N/mm² | [[Bemessungswert der Betondruckfestigkeit]] |
 
 ## Beispiel
 

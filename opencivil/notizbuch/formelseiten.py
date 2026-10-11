@@ -133,6 +133,10 @@ def _vorkommen(block: GleichungBlock, projekt: str, formeln: Dict[str, Formel],
     for platzhalter, wert in block.formelzeile.eingaben:
         groesse = fassung.groessen.setdefault(platzhalter, Groessenzeile(
             ohne_namen_im_index(wert.symbol), einheit=wert.einheit.beschriftung or ""))
+        if ohne_namen_im_index(wert.symbol) != groesse.zeichen:
+            # Derselbe Platzhalter mit einem anderen Wert -- f_yd statt f_yk:
+            # die Zeile spricht vom gezeigten Zeichen.
+            continue
         groesse.bedeutung = groesse.bedeutung or wert.beschreibung
         quelle = zuletzt.get(wert.id, "")
         if quelle == name:

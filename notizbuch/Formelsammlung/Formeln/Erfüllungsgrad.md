@@ -1,5 +1,5 @@
 ---
-erzeugt: c2922175116c
+erzeugt: 34c01048e273
 art: formel
 tags: [formel]
 ---
@@ -14,8 +14,8 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $M_{Rd}$ | Querkraftwiderstand x-Richtung – Feld | kNm | [[Widerstand bei festgehaltenem N_Ed]], [[Widerstand in der Richtung der Einwirkung]], Zwischenwert, [[Querkraftwiderstand mit Querkraftbewehrung]], [[Aufnehmbare Risskraft]], [[Aufnehmbares Moment der Bewehrung]], [[Zulässige Stahlspannung (Rissbreite w_nom)]], [[Zulässige Stahlspannung]], [[Querkraftwiderstand ohne Querkraftbewehrung]], [[Zulässige Dehnung]], [[Zulässige Stahlspannung (normale Anforderung)]], [[Widerstand im normierten Diagramm]] |
-| $M_{Ed}$ | Einwirkung | kNm | Zwischenwert, [[Bezogene Druckzonenhöhe]], [[Risskraft der gezogenen Querschnittshälfte]], [[Rissmoment des ungerissenen Querschnitts]], [[Einwirkung im normierten Diagramm]], [[Bezogene Druckzonenhöhe bei reiner Biegung]] |
+| $M_{Rd}$ | – | kNm | [[Widerstand bei festgehaltenem N_Ed]], [[Widerstand in der Richtung der Einwirkung]], Zwischenwert |
+| $M_{Ed}$ | – | kNm | Zwischenwert |
 
 ## Beispiel
 

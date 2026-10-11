@@ -1,5 +1,5 @@
 ---
-erzeugt: 2f34e920be73
+erzeugt: d88504eae0a8
 art: formel
 tags: [formel]
 ---
@@ -29,7 +29,6 @@ $$
 
 ## Gebraucht von
 
-- [[Erfüllungsgrad]]
 - [[Widerstand im normierten Diagramm]]
 
 ## Im Code

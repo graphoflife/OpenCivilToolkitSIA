@@ -1,5 +1,5 @@
 ---
-erzeugt: 5f45298ba542
+erzeugt: 0dd75bcdf367
 art: formel
 tags: [formel]
 ---
@@ -14,7 +14,7 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $A_{s,2,x}$ | – | mm² | [[Bewehrung der Lage]], Zwischenwert |
+| $A_{s,2,x}$ | – | mm² | [[Bewehrung der Lage]] |
 | $f_{sd}$ | – | N/mm² | Zwischenwert |
 | $b$ | Betrachtete Breite (x) | mm | Vorgabe |
 | $f_{cd}$ | Bemessungswert der Betondruckfestigkeit | N/mm² | [[Bemessungswert der Betondruckfestigkeit]] |

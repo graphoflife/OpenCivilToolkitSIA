@@ -1,5 +1,5 @@
 ---
-erzeugt: ad9917a4cb59
+erzeugt: a4490f8d3d59
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.4.2"
@@ -18,7 +18,7 @@ $$
 | $E_s$ | Elastizitätsmodul des Betonstahls | N/mm² | Vorgabe |
 | $f_{ctm}$ | Mittelwert der Zugfestigkeit | N/mm² | Vorgabe |
 | $w_{nom}$ | – | mm | Zwischenwert |
-| $\varnothing_{2,x}$ | Stabdurchmesser 3. Lage Grundbewehrung | mm | [[Dickster Stab der Lage]], Vorgabe, Zwischenwert |
+| $\varnothing_{2,x}$ | – | mm | [[Dickster Stab der Lage]] |
 | $f_{yk}$ | Charakteristische Fliessgrenze | N/mm² | Vorgabe |
 
 ## Beispiel
@@ -37,7 +37,6 @@ $$
 
 - [[Aufnehmbare Risskraft]]
 - [[Aufnehmbares Moment der Bewehrung]]
-- [[Erfüllungsgrad]]
 
 ## Im Code
 
