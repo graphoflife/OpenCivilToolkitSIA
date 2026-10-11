@@ -194,7 +194,7 @@ def notizbuch_verzeichnis(wurzel: Optional[Path] = None) -> dict:
             "laufen lassen."
         ),
         "wurzel": "notizbuch/",
-        "start": "Formelsammlung",
+        "start": "Start",
         "seiten": tresor.verzeichnis(notizbuch_seiten(), wurzel),
         "anhaenge": tresor.anhaenge(wurzel),
     }

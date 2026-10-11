@@ -1,5 +1,5 @@
 /**
- * notizbuch.js -- die Formelsammlung oben neben «Rechnen»: das Notizbuch.
+ * notizbuch.js -- die Dokumentation oben neben «Rechnen»: das Notizbuch.
  *
  * VERANTWORTUNG:
  * Zeigt den Ordner notizbuch/ als eigene Ansicht über den Tafeln: links Suche
@@ -311,7 +311,8 @@ function baumZeichnen(v) {
     const eigene = ort.seiten.find((s) => s.name === ort.name);
     const uebrige = ort.seiten.filter((s) => s !== eigene);
     const anzahl = uebrige.length + [...ort.kinder.values()].reduce((n, k) => n + k.seiten.length, 0);
-    return el('details.nb-ordner', { open: tiefe === 0, dataset: { ordner: ort.name } }, [
+    // Zu, bis eine Seite darin gezeigt wird: Python allein hat achtzig.
+    return el('details.nb-ordner', { dataset: { ordner: ort.name, tiefe: String(tiefe) } }, [
       el('summary', {}, [
         eigene ? eintrag(eigene) : el('span.nb-ordnername', { text: ort.name }),
         el('span.nb-anzahl', { text: String(anzahl) }),

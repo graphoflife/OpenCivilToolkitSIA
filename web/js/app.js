@@ -595,8 +595,8 @@ async function starten() {
   // Vor dem Kern: das Notizbuch braucht ihn nicht, und eine Adresse
   // #notizbuch/… soll auch dann aufgehen, wenn Pyodide noch lädt.
   notizbuchEinrichten({
-    knoepfe: [document.getElementById('btn-formelsammlung'),
-      document.getElementById('tafel-notizbuch')],
+    knoepfe: [document.getElementById('btn-dokumentation'),
+      document.getElementById('tafel-dokumentation')],
     ansicht: document.getElementById('notizbuch'),
   });
 

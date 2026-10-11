@@ -8,14 +8,14 @@
   <link rel="stylesheet" href="vendor/katex/katex.min.css">
   <script defer src="vendor/katex/katex.min.js"></script>
   <!-- Versionsmarken: geschrieben von «python3 -m opencivil.web.bruecke», nicht von Hand ändern -->
-  <link rel="stylesheet" href="./css/stil.css?v=014beac7d399">
+  <link rel="stylesheet" href="./css/stil.css?v=0654b16b6f45">
   <script type="importmap">
   {
     "imports": {
       "./js/ablage.js": "./js/ablage.js?v=a67aeb3de570",
       "./js/achsen.js": "./js/achsen.js?v=87b48bf3c1f9",
       "./js/api.js": "./js/api.js?v=bd0cbd757304",
-      "./js/app.js": "./js/app.js?v=6b7a0f2ea37a",
+      "./js/app.js": "./js/app.js?v=4b9ee3a46880",
       "./js/baum.js": "./js/baum.js?v=0ca19cebb2d1",
       "./js/bausteine.js": "./js/bausteine.js?v=5e4ad56bf79b",
       "./js/bericht.js": "./js/bericht.js?v=eed1edc960d0",
@@ -37,7 +37,7 @@
       "./js/markdown.js": "./js/markdown.js?v=8ba5c35bcb37",
       "./js/mathe.js": "./js/mathe.js?v=fa933d1b76f8",
       "./js/nachweise.js": "./js/nachweise.js?v=0400a5730b6e",
-      "./js/notizbuch.js": "./js/notizbuch.js?v=13d0434d8e62",
+      "./js/notizbuch.js": "./js/notizbuch.js?v=18958bac8115",
       "./js/notizbuch_seite.js": "./js/notizbuch_seite.js?v=639209806e79",
       "./js/qa_diagramme.js": "./js/qa_diagramme.js?v=399f79cbd2fb",
       "./js/qa_uebersicht.js": "./js/qa_uebersicht.js?v=e1334817f2c1",
@@ -46,9 +46,9 @@
       "./js/querschnittsanalyse.js": "./js/querschnittsanalyse.js?v=d524f5aa5c3d",
       "./js/spannungsbild.js": "./js/spannungsbild.js?v=e7c5bfe8964d",
       "./js/zustand.js": "./js/zustand.js?v=474e82c0a02a",
-      "./kern/dateien.json": "./kern/dateien.json?v=1810e1db5464",
+      "./kern/dateien.json": "./kern/dateien.json?v=3b29c4e69fb1",
       "./kern/formelsammlung.json": "./kern/formelsammlung.json?v=029277efc78e",
-      "./kern/notizbuch.json": "./kern/notizbuch.json?v=887f94c6022a"
+      "./kern/notizbuch.json": "./kern/notizbuch.json?v=834fb6520e43"
     }
   }
   </script>
@@ -83,9 +83,9 @@
     <button id="btn-rechnen" class="knopf knopf-haupt" title="Alle Nachweise rechnen">
       Rechnen
     </button>
-    <button id="btn-formelsammlung" class="knopf" aria-pressed="false"
+    <button id="btn-dokumentation" class="knopf" aria-pressed="false"
             title="Formelsammlung, Python-Doku und Notizen -- das Notizbuch">
-      Formelsammlung
+      Dokumentation
     </button>
     <button id="btn-speichern" class="knopf"
             title="Projekt als .json-Datei herunterladen (im Browser liegt es ohnehin)">
@@ -149,7 +149,7 @@
 
 <!-- Das Notizbuch: liegt über den Tafeln, solange die Adresse #notizbuch… lautet.
      Den Inhalt baut notizbuch.js; hier steht nur der Platz dafür. -->
-<section id="notizbuch" class="notizbuch" hidden tabindex="-1" aria-label="Formelsammlung"></section>
+<section id="notizbuch" class="notizbuch" hidden tabindex="-1" aria-label="Dokumentation"></section>
 
 <!-- Nur auf schmalen Geräten sichtbar: dort steht immer eine Tafel allein, und
      hiermit wechselt man zwischen ihnen. Dasselbe Reiter-Muster wie oben
@@ -161,7 +161,7 @@
   <button class="reiter-knopf" data-tafel="rechts">Berechnung</button>
   <!-- Auf dem Telefon hat die Kopfleiste keinen Platz für einen fünften Knopf:
        das Notizbuch steht hier, als vierte Wahl. -->
-  <button class="reiter-knopf" id="tafel-notizbuch" aria-pressed="false">Formeln</button>
+  <button class="reiter-knopf" id="tafel-dokumentation" aria-pressed="false">Doku</button>
 </nav>
 
 <footer class="fussleiste">

@@ -75,7 +75,7 @@
     "opencivil/spannungsanalyse.py": "d7f1ac274ca9",
     "opencivil/web/__init__.py": "fe0264cdd7ac",
     "opencivil/web/api.py": "3a74a44ccc37",
-    "opencivil/web/bruecke.py": "af70f65f4e64",
+    "opencivil/web/bruecke.py": "0a506775d921",
     "opencivil/web/diagrammdaten.py": "56e4c1346817",
     "opencivil/web/dienst.py": "bc6a3d2372dd",
     "opencivil/web/server.py": "b90e83b71dd4",

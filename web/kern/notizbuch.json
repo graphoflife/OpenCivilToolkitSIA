@@ -1,7 +1,7 @@
 {
   "hinweis": "Erzeugt von opencivil/web/bruecke.py. Nicht von Hand ändern -- nach einer neuen Seite im Notizbuch 'python3 -m opencivil.web.bruecke' laufen lassen.",
   "wurzel": "notizbuch/",
-  "start": "Formelsammlung",
+  "start": "Start",
   "seiten": [
     {
       "name": "Start",
