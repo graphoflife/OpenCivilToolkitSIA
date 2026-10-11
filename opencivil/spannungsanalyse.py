@@ -83,11 +83,14 @@ from opencivil.nachweis import dehnungsfaecher
 from opencivil.nachweis.querschnittsloeser import (
     Querschnittsloeser, Stahllage, Werkstoffsatz, wirksamer_modul,
 )
-from opencivil.nachweis.rechenwahl import Kennwerte, Rechenart, Rechenwahl, gesetze
+from opencivil.nachweis.rechenwahl import (
+    STAHL_NUR_ZUG, Kennwerte, Rechenart, Rechenwahl, gesetze,
+)
 from opencivil.nachweis.sproedes_versagen import (
     beiwert_dicke, protokoll_zugfestigkeit, rissmoment,
 )
 from opencivil.querschnitt.platte import Richtung
+from opencivil.material.betonstahl import FLIESSDEHNUNG
 from opencivil.querschnitt.werkstoffgesetz import (
     BLOCKANTEIL, K_SIGMA_LATEX, Betongesetz, Spannungsblock, k_sigma,
 )
@@ -941,10 +944,11 @@ def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
             + wahl.satz.stahl_zeichen + r"\right) & \varepsilon_s > 0 \\[1ex]"
             r" 0 & \varepsilon_s \le 0 \quad (\text{gedrückt: weggelassen})"
             r" \end{cases}",
-            titel="Stahl in der Handrechnung: nur auf Zug")
+            titel="Stahl in der Handrechnung: nur auf Zug", name=STAHL_NUR_ZUG)
     if wahl.art.mit_block:
         p.ansatz(Spannungsblock(f_cd=0.0, eps_c2d=eps_c2d.groesse.si).latex(),
-                 titel=f"Beton gerissen: Spannungsblock {BLOCKANTEIL}·x")
+                 titel=f"Beton gerissen: Spannungsblock {BLOCKANTEIL}·x",
+                 name=Spannungsblock.NAME)
         p.erklaerung(
             "Der Spannungsblock ist ein Modell für den Bruch: unter "
             "(1 − 0.85)·ε_c2d trägt der Beton darin nichts. Über dem Riss ist die "
@@ -962,7 +966,7 @@ def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
             "bei ε_c1d linear.")
         p.ansatz(Betongesetz(f_cd=0.0, eps_c1d=eps_c1d.groesse.si,
                              eps_c2d=eps_c2d.groesse.si, k_sigma=0.0).latex(),
-                 titel="Beton gerissen: Parabel-Rechteck")
+                 titel="Beton gerissen: Parabel-Rechteck", name=Betongesetz.NAME)
     if wahl.satz is Werkstoffsatz.CHARAKTERISTISCH:
         p.text("Mit charakteristischen Werten: f_ck statt f_cd, f_yk statt f_yd.")
 
@@ -1003,7 +1007,7 @@ def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
         "charakteristischen Werten Rk statt Rd.")
     p.formel(w.dehnung("eps_y", r"\varepsilon_{y}", paar.eps_y),
              r"\frac{@f_s}{@E_s}", {"f_s": ein("f_s"), "E_s": ein("E_s")},
-             titel="Dehnung bei Fliessbeginn")
+             titel="Dehnung bei Fliessbeginn", name=FLIESSDEHNUNG)
     p.erklaerung(
         "Den gerissenen Teil rechnet die Linie über die Verformung, nicht über die "
         "Kraft: zu jeder Krümmung (bei der N-ε-Linie: zu jeder Dehnung) wird die "

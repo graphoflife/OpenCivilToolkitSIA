@@ -102,6 +102,9 @@ RECHENARTEN = (Rechenart.HANDRECHNUNG, Rechenart.BLOCK, Rechenart.PARABEL)
 #: Die Stahlspannungen zusaetzlich elastisch.
 SPANNUNGSARTEN = RECHENARTEN + (Rechenart.ELASTISCH,)
 
+#: Die Seite im Notizbuch fuer den Stahl der Handrechnung, der nur Zug traegt.
+STAHL_NUR_ZUG = "Betonstahl nur auf Zug"
+
 
 @dataclass(frozen=True)
 class Rechenwahl:
@@ -309,7 +312,7 @@ def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *
             + f_s.symbol + r"\right) & \varepsilon_s > 0 \\[1ex]"
             r" 0 & \varepsilon_s \le 0 \quad (\text{gedrückt: weggelassen})"
             r" \end{cases}",
-            titel=f"{titel}: Stahl, nur auf Zug")
+            titel=f"{titel}: Stahl, nur auf Zug", name=STAHL_NUR_ZUG)
     else:
         p.gleichung(
             rf"\sigma_s = \min\left[E_s \cdot \varepsilon_s;\ {f_s.symbol}\right]"
@@ -332,10 +335,12 @@ def protokoll_betongesetz(p: Protokoll, wahl: Rechenwahl, f_c: Wert, E_cm: Wert,
                  K_SIGMA_LATEX, {"E_c": E_c_eff, "f_c": f_c},
                  titel="Beiwert der Parabel, mit dem wirksamen Modul")
         p.ansatz(Betongesetz(0.0, 1.0, 1.0, 0.0).latex(f_c.symbol),
-                 titel=f"{titel}: Beton, Parabel-Rechteck", referenz="SIA 262:2025, 4.2.1.6")
+                 titel=f"{titel}: Beton, Parabel-Rechteck", referenz="SIA 262:2025, 4.2.1.6",
+                 name=Betongesetz.NAME)
     else:
         p.ansatz(Spannungsblock(0.0, 1.0).latex(f_c.symbol),
-                 titel=f"{titel}: Beton, Spannungsblock {BLOCKANTEIL}·x")
+                 titel=f"{titel}: Beton, Spannungsblock {BLOCKANTEIL}·x",
+                 name=Spannungsblock.NAME)
 
 
 def gesetze(wahl: Rechenwahl, w: Kennwerte, *, eps_ud: float = 0.045) -> Gesetze:

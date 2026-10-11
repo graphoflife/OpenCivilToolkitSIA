@@ -26,6 +26,10 @@ from typing import Dict, Mapping, Optional
 from opencivil.core.einheiten import EINHEITSLOS, N_PRO_MM2, PROZENT, Groesse
 from opencivil.material.basis import Baustoff, Baustoffart, KennwertVorlage, erzeuge
 
+#: Die Seite im Notizbuch fuer die Dehnung, bei der der Stahl zu fliessen
+#: beginnt -- mit Bemessungswert oder charakteristisch, wo immer sie steht.
+FLIESSDEHNUNG = "Fliessdehnung"
+
 
 @dataclass(frozen=True)
 class Stahlsorte:
@@ -142,6 +146,7 @@ STAHL_VORLAGEN: tuple[KennwertVorlage, ...] = (
         einheit=PROZENT,
         beschreibung="Fliessdehnung (Bemessungswert)",
         referenz="SIA 262:2025, 4.2.2.4",
+        name=FLIESSDEHNUNG,
         stellen=3,
         eingaben=("f_yd", "E_s"),
         vorlage_latex=r"\frac{@f_yd}{@E_s}",

@@ -106,7 +106,8 @@ def protokoll_zugfestigkeit(
     anteil = "@h" if teiler == 1 else rf"@h/{teiler:.0f}"
     beiwert = werte.zahl("k_t", "k_t", k_t)
     p.formel(beiwert, rf"\frac{{1}}{{1 + 0.5 \cdot {anteil}}}", {"h": h},
-             titel=titel, referenz=referenz, empirisch={"h": M})
+             titel=titel, referenz=referenz, empirisch={"h": M},
+             name="Beiwert für die Dicke")
     wirksam = werte.spannung("f_ct_eff", "f_{ct,eff}", f_ct_eff, stellen=2)
     p.formel(wirksam, r"@k_t \cdot @f_ctm", {"k_t": beiwert, "f_ctm": f_ctm},
              titel="Wirksame Zugfestigkeit")

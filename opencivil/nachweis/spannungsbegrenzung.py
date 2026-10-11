@@ -75,6 +75,7 @@ from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, N_PRO_MM2, Groesse
 from opencivil.core.latex import als_text, angabe, bedingung, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
+from opencivil.material.betonstahl import FLIESSDEHNUNG
 from opencivil.nachweis.mindestbewehrung import (
     RISSBREITE, protokoll_zulaessige_stahlspannung, zulaessige_stahlspannung,
 )
@@ -694,7 +695,7 @@ class Spannungsbegrenzung(Nachweis):
                f"Vergleich über die Dehnung.")
         p.formel(werte.dehnung("eps_y", r"\varepsilon_y", erg.eps_y),
                  r"\frac{@f_s}{@E_s}", {"f_s": e[self.wahl.satz.stahl], "E_s": e["E_s"]},
-                 titel="Grösste Zugdehnung in der Bewehrung",
+                 titel="Grösste Zugdehnung in der Bewehrung", name=FLIESSDEHNUNG,
                  nachsatz=rf"\quad < \quad {angabe(wirkt)}")
         p.formel(grenze, r"\frac{@sigma}{@E_s}",
                  {"sigma": self.grenze.spannung(erg.sigma_s_adm), "E_s": e["E_s"]},

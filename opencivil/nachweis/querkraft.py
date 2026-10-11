@@ -78,6 +78,11 @@ K_G_MINDEST = 1.20
 #: ``eps_v = PLASTISCH * f_yd / E_s`` -- fest, nicht vom Moment abhaengig.
 PLASTISCH = 1.5
 
+#: Die Seiten der beiden Widerstaende im Notizbuch -- Ansatz und Rechnung
+#: stehen je auf derselben.
+OHNE_BUEGEL = "Querkraftwiderstand ohne Querkraftbewehrung"
+MIT_BUEGELN = "Querkraftwiderstand mit Querkraftbewehrung"
+
 #: Stuetzstellen der M_Ed-v_Rd-Kurve.
 KURVENPUNKTE = 50
 
@@ -926,7 +931,8 @@ class Querkraft(Nachweis):
             rf"\cdot 0.9 \cdot d \cdot {s['f_yd_V']} \cdot \cot\alpha \qquad "
             rf"V_{{Rd,c}} = 0.9 \cdot d \cdot {s['k_c']} \cdot {s['f_cd']} "
             r"\cdot \sin\alpha \cdot \cos\alpha",
-            titel="Ansatz", referenz="SIA 262:2025, 4.3.3.4")
+            titel="Ansatz", referenz="SIA 262:2025, 4.3.3.4",
+            name=MIT_BUEGELN)
         p.erklaerung(
             "Beide Anteile gelten je Laufmeter, wie die Querkraft selbst. "
             "Gesucht wird ganzgradig zwischen α_min und α_max die Neigung mit "
@@ -975,7 +981,8 @@ class Querkraft(Nachweis):
             {"d": d, "k_c": e["k_c"], "f_cd": e["f_cd"], "alpha": alpha},
             titel="Widerstand der Druckdiagonalen")
         p.formel(self._widerstand(erg), r"\min\left[@s;\ @c\right]",
-                 {"s": buegel, "c": diagonale}, titel="Querkraftwiderstand")
+                 {"s": buegel, "c": diagonale}, titel="Querkraftwiderstand",
+                 name=MIT_BUEGELN)
 
         self._protokoll_grad(p, erg)
 
@@ -1018,7 +1025,7 @@ class Querkraft(Nachweis):
         p.ansatz(
             rf"V_{{Rd}} = k_d \cdot {s['tau_cd']} \cdot d_v \qquad "
             r"k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g}",
-            titel="Ansatz", referenz="SIA 262:2025, 4.3.3.2.1")
+            titel="Ansatz", referenz="SIA 262:2025, 4.3.3.2.1", name=OHNE_BUEGEL)
         p.ansatz(
             r"m_{Dd} = \frac{\left|\min(N_{Ed};\ 0)\right| \cdot h}{6} \qquad "
             rf"\varepsilon_v = \frac{{{s['f_yd']} \cdot \left(\left|m_{{Ed}}\right| "
@@ -1134,6 +1141,7 @@ class Querkraft(Nachweis):
         p.formel(self._widerstand(erg), r"@k_d \cdot @tau_cd \cdot @d_v",
                  {"k_d": k_d, "tau_cd": werte.wert("tau_cd", tau.symbol, tau.groesse, 4),
                   "d_v": d_v},
-                 titel="Querkraftwiderstand", referenz="SIA 262:2025, 4.3.3.2.1")
+                 titel="Querkraftwiderstand", referenz="SIA 262:2025, 4.3.3.2.1",
+                 name=OHNE_BUEGEL)
 
         self._protokoll_grad(p, erg)

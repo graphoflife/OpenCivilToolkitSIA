@@ -675,7 +675,8 @@ class Knicken(Nachweis):
             r"\frac{l_{cr}^{2}}{\pi^{2}} \qquad "
             r"M_{Ed,II}^{(k)} = \left|N_{Ed}\right| \cdot \left(e_{0d} + "
             r"e_{1d} + e_{2d}^{(k-1)}\right)",
-            titel="Das Verfahren", referenz="SIA 262:2025, 4.3.7")
+            titel="Das Verfahren", referenz="SIA 262:2025, 4.3.7",
+            name="Iteration der Ausmitte 2. Ordnung")
         p.erklaerung(
             "Zu jedem Moment wird die Dehnungsebene gesucht, die es im "
             "Gleichgewicht hält; aus deren Krümmung folgt die nächste "

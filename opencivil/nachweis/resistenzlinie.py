@@ -189,11 +189,13 @@ class Handlinie(Widerstandslinie):
             return werte.wert(name, symbol, Groesse.aus_si(si, achse.einheit))
 
         rd = wert("Rd", f"{ziel.name}_{{{self.wahl.index}}}", treffer.wert, ziel)
+        # Eine Seite im Notizbuch, gleich welcher Titel und welcher Fall.
+        name = f"Widerstand bei festgehaltenem {lauf.name}_Ed"
         if genau is not None:
             p.formel(rd, "@P", {"P": wert("P", genau.symbol, ziel.von(genau), ziel)},
                      titel=titel or (f"Widerstand bei {lauf.name}_Ed = "
                                      f"{_k(fest)} {lauf.einheit.beschriftung} – "
-                                     f"ein Eckpunkt liegt genau dort"))
+                                     f"ein Eckpunkt liegt genau dort"), name=name)
             return
 
         p.formel(
@@ -205,6 +207,7 @@ class Handlinie(Widerstandslinie):
              "y_Ed": wert("y_Ed", f"{lauf.name}_{{Ed}}", fest, lauf)},
             titel=titel or (f"Widerstand bei festgehaltenem {lauf.name}_Ed = "
                             f"{_k(fest)} {lauf.einheit.beschriftung}"),
+            name=name,
         )
         p.tabelle(
             kopf=["Punkt", Mathe(rf"{lauf.name}\ [{e_lauf}]"),
@@ -402,7 +405,8 @@ class Ebenenlinie(Widerstandslinie):
         protokoll_betongesetz(p, wahl, f_c, E_cm, basis, titel="Werkstoffgesetze")
         p.ansatz(Stahlgesetz(0.0, 0.0, 0.0, 0.0).latex(satz.stahl_zeichen,
                                                        f"{satz.stahl_zeichen}^{{-}}"),
-                 titel="Werkstoffgesetze: Stahl, bilinear", referenz="SIA 262:2025, 4.2.2.4")
+                 titel="Werkstoffgesetze: Stahl, bilinear", referenz="SIA 262:2025, 4.2.2.4",
+                 name=Stahlgesetz.NAME)
         p.ansatz(
             r"N = \int_A \sigma\,\mathrm{d}A \qquad "
             r"M = \int_A \sigma \cdot \left(z - \tfrac{h}{2}\right)\,\mathrm{d}A",

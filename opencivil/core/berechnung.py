@@ -43,7 +43,7 @@ from typing import (
 
 from opencivil.core import latex as tex
 from opencivil.core.einheiten import EINHEITSLOS, EmpirischesErgebnis, Groesse
-from opencivil.core.protokoll import Abschnitt, Protokoll
+from opencivil.core.protokoll import Abschnitt, Protokoll, codestelle_aus
 from opencivil.core.wert import Quelle, Wert, WertDef, grad_als_text
 
 
@@ -352,6 +352,7 @@ class Formel(Berechnung):
         begruendung: str = "",
         abschnitt: Optional[Abschnitt] = None,
         bedingung: Optional[Callable[[Eingaben], Tuple[bool, str]]] = None,
+        name: str = "",
     ) -> None:
         bezuege = [Eingabebezug(name, wid) for name, wid in (eingaben or {}).items()]
         bezuege += [
@@ -372,6 +373,8 @@ class Formel(Berechnung):
         self.funktion = funktion
         self.vorlage = vorlage
         self._bedingung = bedingung
+        self.name = name
+        """Name im Notizbuch, wo der Titel nicht taugt (siehe ``GleichungBlock.name``)."""
 
     def anwendbar(self, eingaben: Eingaben) -> Tuple[bool, str]:
         if self._bedingung is None:
@@ -397,13 +400,17 @@ class Formel(Berechnung):
             )
 
         wert = self.ausgabe.belegen(groesse, Quelle.BERECHNET, herkunft=self.id)
+        # Geschrieben wird hier, gemeint ist die Funktion: dort steht die Formel.
+        stelle = codestelle_aus(getattr(self.funktion, "__module__", "") or "",
+                                getattr(self.funktion, "__qualname__", ""))
         if self.vorlage:
             # Nur die in der Vorlage benutzten Eingaben werden eingesetzt --
             # optionale, die diesmal fehlen, stoeren so nicht.
             p.formel(wert, self.vorlage, e, titel=self.titel, referenz=self.referenz,
-                     empirisch=empirisch)
+                     empirisch=empirisch, name=self.name, codestelle=stelle)
         else:
-            p.wert(wert, titel=self.titel, referenz=self.referenz)
+            p.wert(wert, titel=self.titel, referenz=self.referenz, name=self.name,
+                   codestelle=stelle)
         # Die Begruendung schreibt der Loeser -- er weiss als einziger, ob es
         # ueberhaupt eine Variante zu waehlen gab.
         return {self.ausgabe.id: groesse}

@@ -31,8 +31,8 @@ from __future__ import annotations
 
 import math
 import re
-from dataclasses import dataclass
-from typing import Iterable, Mapping, Optional, Sequence, Union
+from dataclasses import dataclass, field
+from typing import Iterable, Mapping, Optional, Sequence, Tuple, Union
 
 from opencivil.core.einheiten import EINHEITSLOS, Einheit
 from opencivil.core.wert import Wert
@@ -343,6 +343,14 @@ class Formelzeile:
     einheiten: str = ""
     """Bei empirischen Formeln: in welchen Einheiten die Zahlen eingehen."""
 
+    eingaben: Tuple[Tuple[str, Wert], ...] = field(
+        default=(), compare=False, repr=False)
+    """
+    Was die Vorlage einsetzt, je ``(Platzhalter, Wert)`` -- nur ihre
+    Platzhalter, nicht jede Eingabe der Berechnung. Fuer das Notizbuch: welche
+    Groessen eine Formel braucht, und welche Formel sie liefert.
+    """
+
     @classmethod
     def bauen(
         cls,
@@ -388,6 +396,8 @@ class Formelzeile:
             nachsatz=nachsatz,
             vorlage=vorlage,
             einheiten=hinweis,
+            eingaben=tuple((name, eingaben[name])
+                           for name in platzhalter_namen(vorlage)),
         )
 
     # -- Darstellung --------------------------------------------------------

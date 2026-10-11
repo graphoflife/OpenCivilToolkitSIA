@@ -298,7 +298,8 @@ class Handrechnung:
         p.formel(
             self.werte.laenge(f"z_{lage.index}", lage.symbol_z, lage.z),
             rf"\frac{{{momente}}}{{{summe}}}",
-            eingaben, titel=f"Schwerpunkt der zusammengefassten Lage – {lage.text}")
+            eingaben, titel=f"Schwerpunkt der zusammengefassten Lage – {lage.text}",
+            name="Schwerpunkt der zusammengefassten Lage")
         p.formel(
             self.werte.flaeche(f"A_s_{lage.index}", lage.symbol_flaeche, lage.a_s),
             summe, eingaben,

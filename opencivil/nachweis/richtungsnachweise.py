@@ -32,6 +32,7 @@ from opencivil.core.einheiten import EINHEITSLOS, MIO_MM3, MIO_MM4, MM, Groesse
 from opencivil.core.latex import Mathe, als_text, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import WertDef, kennung_aus
+from opencivil.nachweis.duktilitaet import DUKTILITAETSBEDINGUNG
 from opencivil.nachweis.sproedes_versagen import (
     MOMENTENTEILER, beiwert_dicke, protokoll_zugfestigkeit,
 )
@@ -96,7 +97,8 @@ class DuktilitaetQA(Nachweis):
             "gedrücktesten Betonpunkt, d der des entferntesten gezogenen Stabs, "
             "beide senkrecht zur Nulllinie.")
         p.ansatz(r"\frac{x}{d} \le \left(\frac{x}{d}\right)_{max}",
-                 titel="Duktilität", referenz="SIA 262:2025, 4.1.4.2.5")
+                 titel="Duktilität", referenz="SIA 262:2025, 4.1.4.2.5",
+                 name=DUKTILITAETSBEDINGUNG)
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
         for name, M_y, M_z in richtungen(self.einachsig):
@@ -166,7 +168,8 @@ class SproedesVersagenQA(Nachweis):
                  r"\qquad y' = y - y_S,\ z' = z - z_S",
                  titel="Spannung im ungerissenen Querschnitt")
         p.ansatz(r"M_{Rd}(N = 0) \ge M_{Riss} = f_{ct,eff} \cdot W",
-                 titel="Sprödes Versagen", referenz="SIA 262:2025, 4.4.1.3")
+                 titel="Sprödes Versagen", referenz="SIA 262:2025, 4.4.1.3",
+                 name="Bedingung gegen sprödes Versagen")
 
         ecken = self.analyse.beton_ecken
         ergebnis: Dict[str, Groesse] = {}

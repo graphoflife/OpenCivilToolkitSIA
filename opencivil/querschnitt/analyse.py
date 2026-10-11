@@ -682,7 +682,9 @@ class Querschnittsanalyse:
             if stoff.art is Baustoffart.BETON:
                 f_c = "f_cd" if bemessung else "f_ck"
                 zeichen = "f_{cd}" if bemessung else "f_{ck}"
-                if self.betongesetz(stoff) == "block":
+                gesetz = (Spannungsblock if self.betongesetz(stoff) == "block"
+                          else Betongesetz)
+                if gesetz is Spannungsblock:
                     latex = Spannungsblock(1.0, 1.0).latex(zeichen)
                     titel = f"{stoff.name}: Spannungsblock 0.85·x, {satz}"
                     referenz = ""
@@ -690,7 +692,7 @@ class Querschnittsanalyse:
                     latex = Betongesetz(1.0, 1.0, 1.0, 1.0).latex(zeichen)
                     titel = f"{stoff.name}: Parabel-Rechteck-Beziehung, {satz}"
                     referenz = "SIA 262:2025, 4.2.1.6"
-                p.ansatz(latex, titel=titel, referenz=referenz)
+                p.ansatz(latex, titel=titel, referenz=referenz, name=gesetz.NAME)
                 if not bemessung and self.betongesetz(stoff) != "block":
                     k = _K_SIGMA.funktion(E_cd=abs(self.kennwert(e, stoff, "E_cd")),
                                           f_cd=abs(self.kennwert(e, stoff, "f_ck")))
@@ -700,7 +702,7 @@ class Querschnittsanalyse:
                              {"E_cd": e[self._name(stoff, "E_cd")],
                               "f_cd": e[self._name(stoff, "f_ck")]},
                              titel="Krümmungsbeiwert mit charakteristischer Festigkeit",
-                             referenz=_K_SIGMA.referenz)
+                             referenz=_K_SIGMA.referenz, name=_K_SIGMA.beschreibung)
                 p.tabelle(kopf=["Kennwert", "Wert"], zeilen=[
                     [Mathe(symbol(k)), Mathe(e[self._name(stoff, k)].zahl_latex())]
                     for k in (f_c, "eps_c1d", "eps_c2d")], titel=f"Werte {stoff.name}",
@@ -710,7 +712,7 @@ class Querschnittsanalyse:
                 latex = (Stahlgesetz(1.0, 1.0, 1.0, 1.0).latex() if bemessung
                          else Stahlgesetz(1.0, 1.0, 1.0, 1.0).latex("f_{yk}", "f_{yk}^{-}"))
                 p.ansatz(latex, titel=f"{stoff.name}: bilineare Beziehung, {satz}",
-                         referenz="SIA 262:2025, 4.2.2.4")
+                         referenz="SIA 262:2025, 4.2.2.4", name=Stahlgesetz.NAME)
                 p.tabelle(kopf=["Kennwert", "Wert"], zeilen=[
                     [Mathe(symbol(k)), Mathe(e[self._name(stoff, k)].zahl_latex())]
                     for k in (f_s, f"{f_s}_druck", "E_s", "eps_ud")],

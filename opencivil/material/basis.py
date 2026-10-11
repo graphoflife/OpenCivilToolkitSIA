@@ -122,6 +122,12 @@ class KennwertVorlage:
 
     begruendung: str = ""
 
+    name: str = ""
+    """
+    Name der Formel im Notizbuch, wo die Beschreibung nicht taugt -- siehe
+    ``GleichungBlock.name``.
+    """
+
     @property
     def ist_berechnet(self) -> bool:
         return self.funktion is not None
@@ -279,6 +285,7 @@ def erzeuge(
                     funktion=vorlage.funktion,
                     begruendung=vorlage.begruendung,
                     abschnitt=abschnitt,
+                    name=vorlage.name,
                 )
             )
             continue

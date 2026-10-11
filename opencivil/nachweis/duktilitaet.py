@@ -65,6 +65,10 @@ from opencivil.querschnitt.platte import (
 #: Groesste zulaessige bezogene Druckzonenhoehe -- die Vorgabe.
 GRENZE = 0.35
 
+#: Die Seite im Notizbuch: die Bedingung der Platte und die des gezeichneten
+#: Querschnitts sind dieselbe.
+DUKTILITAETSBEDINGUNG = "Bedingung der Duktilität"
+
 #: So weit laesst sich die Grenze hoechstens anheben.
 HOECHSTENS = 0.5
 
@@ -328,7 +332,7 @@ class Duktilitaet(Nachweis):
             referenz="SIA 262:2025, 4.1.4.2.5")
         p.ansatz(
             rf"\frac{{x}}{{d}} \le {self.grenze:.2f}",
-            titel="Bedingung")
+            titel="Bedingung", name=DUKTILITAETSBEDINGUNG)
         if abs(self.grenze - GRENZE) > 1e-12:
             p.text(f"Grenze eingegeben: (x/d)_max = {self.grenze:.2f} statt der "
                    f"Vorgabe {GRENZE:.2f}.")

@@ -169,7 +169,7 @@ def protokoll_wirksamer_modul(p, E_cm, phi, basis: str, *, titel: str,
     modul = wirksamer_modul(E_cm.groesse.si, phi.groesse.si)
     p.formel(Zwischenwerte(basis).spannung("E_c_eff", "E_{c,eff}", modul),
              r"\frac{@E_cm}{1 + @phi}", {"E_cm": E_cm, "phi": phi},
-             titel=titel, nachsatz=nachsatz)
+             titel=titel, nachsatz=nachsatz, name="Wirksamer Elastizitätsmodul")
 
 
 def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float,

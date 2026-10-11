@@ -31,6 +31,12 @@ Einmal im ganzen Lauf, nicht je Thema: gemeinsame Bausteine -- die statische
 Hoehe, der Querschnittsloeser, die Zugfestigkeit -- stehen beim ersten Thema,
 das sie braucht, und nicht bei jedem noch einmal.
 
+WIE EINE FORMEL HEISST:
+Im Notizbuch steht jede Formel auf einer Seite, und die Seite heisst wie die
+Formel (:func:`formelname`): ihr Titel ohne Zahlenangabe, oder der Name, den
+der Code ihr gibt, wo der Titel je nach Fall wechselt oder fuer sich nichts
+sagt. Formeln mit gleichem Namen sind Fassungen derselben Seite.
+
 WOHER DAS THEMA KOMMT:
 Das Rechenwerk stempelt es auf jeden Block, den eine Berechnung schreibt
 (:meth:`Protokoll.herkunft_stempeln`). Zu welchem Bestandteil ein Thema
@@ -41,12 +47,16 @@ zeigt die Oberflaeche je Bestandteil nur seine Formeln.
 
 from __future__ import annotations
 
+import functools
 import re
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Tuple
 
 from opencivil.core.latex import ohne_namen_im_index
-from opencivil.core.protokoll import GleichungBlock, Protokoll, TextBlock, TitelBlock
+from opencivil.core.protokoll import (
+    Block, GleichungBlock, Protokoll, TextBlock, TitelBlock,
+)
+from opencivil.notizbuch.namen import seitenname
 
 
 @dataclass
@@ -100,6 +110,21 @@ def _schluessel(block: GleichungBlock | TextBlock) -> Optional[tuple]:
             zeile.vorlage.removeprefix("-"))
 
 
+def in_sammlung(block: Block) -> bool:
+    """Gehoert diese Gleichung in die Formelsammlung -- und damit ins Notizbuch?"""
+    return (isinstance(block, GleichungBlock) and bool(block.thema)
+            and _schluessel(block) is not None)
+
+
+def formelname(block: GleichungBlock) -> str:
+    """
+    Unter welchem Namen die Formel im Notizbuch steht: der Name, den der Code
+    ihr gibt, sonst ihr Titel ohne Zahlenangabe -- als Seitenname. Fuer die
+    Formel in der Herleitung und fuer ihre symbolische Fassung derselbe.
+    """
+    return seitenname(block.name or _titel(block.titel))
+
+
 def _symbolisch(block: GleichungBlock) -> GleichungBlock:
     """
     Die Formel ohne Zahlen, ``Symbol = Formel``. Gebaut erst fuer einen neuen
@@ -112,7 +137,9 @@ def _symbolisch(block: GleichungBlock) -> GleichungBlock:
         # Die Sammlung meint die Formel, nicht den Fall und nicht die Sorte.
         latex = ohne_namen_im_index(" ".join(filter(None, [
             f"{symbol} = {zeile.analytisch}", zeile.einheiten])))
-    return GleichungBlock(latex=latex, titel=_titel(block.titel), referenz=block.referenz)
+    return GleichungBlock(latex=latex, titel=_titel(block.titel), referenz=block.referenz,
+                          thema=block.thema, name=block.name,
+                          codestelle=block.codestelle)
 
 
 def formelsammlung(protokoll: Protokoll) -> List[Thema]:
@@ -141,32 +168,49 @@ def formelsammlung(protokoll: Protokoll) -> List[Thema]:
     return [t for t in themen.values() if t.bloecke]
 
 
-def vollstaendig() -> List[Thema]:
+@functools.lru_cache(maxsize=1)
+def laeufe() -> Tuple[Protokoll, ...]:
     """
-    Jede Formel des Werkzeugs, zum Nachschlagen -- gleich, welches Projekt
-    offen ist und welche Nachweise darin laufen.
+    Die Laeufe, aus denen die ganze Sammlung entsteht -- je Projekt ein
+    Protokoll, samt seinen Spannung-Dehnung-Analysen.
 
-    Gesammelt aus :meth:`Projekt.beispiel` und :meth:`Projekt.jeder_nachweis`,
-    die zusammen jeden Nachweis laut fuehren, mit allen Kennwerten der
-    Baustoffe (``alle_ziele``: sonst fehlte etwa ε_yd). Im schnellen Aufbau:
-    die Grenzkraftsuche beim Knicken schreibt keine eigene Formel, und ganz
-    stille Nachweise schreiben nichts -- dieselbe Sammlung, Zeichen fuer
-    Zeichen, in einem Zehntel der Zeit.
+    :meth:`Projekt.beispiel` und :meth:`Projekt.jeder_nachweis` fuehren
+    zusammen jeden Nachweis laut, mit allen Kennwerten der Baustoffe
+    (``alle_ziele``: sonst fehlte etwa ε_yd). Im schnellen Aufbau: die
+    Grenzkraftsuche beim Knicken schreibt keine eigene Formel, und ganz stille
+    Nachweise schreiben nichts -- dieselbe Sammlung, Zeichen fuer Zeichen, in
+    einem Zehntel der Zeit. Die Analysen sind kein Nachweis und laufen nicht
+    im Rechenwerk, schreiben aber ebenso auf, wie ihre Linien entstehen.
 
-    Dazu die Spannung-Dehnung-Analysen: sie sind kein Nachweis und laufen
-    nicht im Rechenwerk, schreiben aber ebenso auf, wie ihre Linien entstehen.
+    Gerechnet wird einmal je Lauf des Programms, gut vier Sekunden; Bruecke
+    und Tests fragen mehrmals. Getrennt je Projekt, weil eine Kennung wie
+    ``querschnitt.q1`` in beiden vorkommt und je etwas anderes meint. Die
+    Protokolle werden geteilt -- nicht veraendern.
     """
     # Erst hier: das Paket projekt laedt beim Import den Bericht und damit
     # dieses Modul.
     from opencivil import spannungsanalyse
     from opencivil.projekt import Projekt
 
-    protokoll = Protokoll()
+    heraus = []
     for projekt in (Projekt.beispiel(), Projekt.jeder_nachweis()):
         aufbau = projekt.aufbauen(schnell=True)
         loesung = aufbau.werk.loese(*aufbau.alle_ziele())
+        protokoll = Protokoll()
         protokoll.anfuegen(*loesung.protokoll.bloecke)
         spannungsanalyse.analysen(aufbau, loesung, protokoll)
+        heraus.append(protokoll)
+    return tuple(heraus)
+
+
+def vollstaendig() -> List[Thema]:
+    """
+    Jede Formel des Werkzeugs, zum Nachschlagen -- gleich, welches Projekt
+    offen ist und welche Nachweise darin laufen. Aus :func:`laeufe`.
+    """
+    protokoll = Protokoll()
+    for lauf in laeufe():
+        protokoll.anfuegen(*lauf.bloecke)
     return formelsammlung(protokoll)
 
 

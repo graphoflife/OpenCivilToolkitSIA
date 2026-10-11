@@ -376,7 +376,8 @@ def protokoll_lage(
         eingaben.update({f"z{i}": e[f"z_{m}"] for i, m in enumerate(marken)})
         momente = " + ".join(rf"@a{i} \cdot @z{i}" for i in range(len(marken)))
         p.formel(tiefe, rf"\frac{{{momente}}}{{{summe}}}", eingaben,
-                 titel="Gemeinsamer Schwerpunkt der Lage")
+                 titel="Gemeinsamer Schwerpunkt der Lage",
+                 name="Schwerpunkt der zusammengefassten Lage")
     else:
         tiefe = e[f"z_{marken[0]}"]
     hoehe = werte.laenge("d", f"d_{{{index}}}", d)
@@ -398,7 +399,8 @@ def protokoll_statische_hoehe(
     vorlage, eingaben = (("@z", {"z": z}) if von_unten
                          else ("@h - @z", {"h": h, "z": z}))
     p.formel(d, vorlage, eingaben,
-             titel=f"Statische Höhe der Lage {seite}, ab dem gedrückten Rand {rand}")
+             titel=f"Statische Höhe der Lage {seite}, ab dem gedrückten Rand {rand}",
+             name="Statische Höhe")
 
 
 @dataclass(frozen=True)
@@ -608,7 +610,7 @@ class Lagenaufbau(Prozedur):
             r"\left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3}"
             r" \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}",
             titel="Vergrösserungsfaktor der Durchbiegung – allgemein",
-            referenz="SIA 262:2025, 4.4.3.2.5")
+            referenz="SIA 262:2025, 4.4.3.2.5", name="Vergrösserungsfaktor der Durchbiegung")
         p.erklaerung(
             "Gerechnet in x, einmal mit Zug unten und einmal mit Zug oben. ρ gehört "
             "zur gezogenen Seite, ρ′ zur Gegenseite; d′ reicht vom gezogenen Rand bis "
@@ -635,7 +637,8 @@ class Lagenaufbau(Prozedur):
                 A = werte.flaeche(f"A_s_{k}", f"A_{{s,{k}}}", a_s)
                 p.formel(A, " + ".join(f"@A{i}" for i in range(len(posten))),
                          {f"A{i}": a for i, a in enumerate(flaechen)},
-                         titel=f"x-Bewehrung {seite}, zusammen")
+                         titel=f"x-Bewehrung {seite}, zusammen",
+                         name="Bewehrungsquerschnitt der zusammengefassten Lage")
                 z = werte.laenge(f"z_{k}", f"z_{{{k}}}",
                                  sum(a.groesse.si * t.groesse.si
                                      for a, t in zip(flaechen, tiefen)) / a_s)
@@ -643,15 +646,16 @@ class Lagenaufbau(Prozedur):
                             rf"{{@A}}",
                          {"A": A, **{f"A{i}": a for i, a in enumerate(flaechen)},
                           **{f"z{i}": t for i, t in enumerate(tiefen)}},
-                         titel=f"Schwerpunkt der x-Bewehrung {seite}")
+                         titel=f"Schwerpunkt der x-Bewehrung {seite}",
+                         name="Schwerpunkt der zusammengefassten Lage")
             d = werte.laenge(f"d_{k}", f"d_{{{k}}}",
                              z.groesse.si if unten else h.groesse.si - z.groesse.si)
             p.formel(d, "@z" if unten else "@h - @z", {"z": z, "h": h},
-                     titel=f"Statische Höhe der x-Bewehrung {seite}")
+                     titel=f"Statische Höhe der x-Bewehrung {seite}", name="Statische Höhe")
             r = werte.zahl(f"rho_{k}", rf"\rho_{{{k}}}", a_s / (b.groesse.si * d.groesse.si),
                            stellen=5)
             p.formel(r, r"\frac{@A}{@b \cdot @d}", {"A": A, "b": b, "d": d},
-                     titel=f"Bewehrungsgehalt {seite}")
+                     titel=f"Bewehrungsgehalt {seite}", name="Bewehrungsgehalt")
             rho[unten], hoehe[unten] = r, d
 
         ergebnis: Dict[str, Groesse] = {}
@@ -670,7 +674,8 @@ class Lagenaufbau(Prozedur):
                 r"\frac{1 - 20 \cdot @rho_s}{10 \cdot @rho^{0.7}} \cdot "
                 r"\left(0.75 + 0.1 \cdot @phi\right) \cdot \left(\frac{@h}{@d}\right)^{3}",
                 {"rho_s": gegen, "rho": rho[unten], "phi": phi, "h": h, "d": hoehe[unten]},
-                titel=f"Vergrösserungsfaktor, Zug {'unten' if unten else 'oben'}")
+                titel=f"Vergrösserungsfaktor, Zug {'unten' if unten else 'oben'}",
+                name="Vergrösserungsfaktor der Durchbiegung")
         return ergebnis
 
     def _kennzahlen(

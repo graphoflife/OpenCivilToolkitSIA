@@ -24,7 +24,8 @@ mit hunderten Dehnungsebenen) will man nichts mitschreiben. Dafuer gibt es
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+import sys
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import (
     Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Type,
@@ -169,6 +170,21 @@ class GleichungBlock(Block):
     thema: str = ""
     """Thema der Berechnung, die den Block schrieb -- vom Rechenwerk gestempelt."""
 
+    name: str = field(default="", compare=False)
+    """
+    Name der Formel im Notizbuch -- nie Fall, Sorte, Lage oder Richtung. Leer
+    heisst: ihr Titel ohne Zahlenangabe (siehe
+    :func:`opencivil.bericht.formelsammlung.formelname`). Gesetzt wird er, wo
+    der Titel je nach Fall wechselt oder fuer sich nichts sagt («Ansatz»).
+    """
+
+    codestelle: str = field(default="", compare=False)
+    """
+    Wo im Code die Gleichung geschrieben wird, als ``modul:Funktion`` -- das
+    Notizbuch verlinkt damit Formel und Modul. Selbst ermittelt (siehe
+    :func:`codestelle_aus`), nur die allgemeine Formel gibt sie mit.
+    """
+
 
 @dataclass
 class TabellenBlock(Block):
@@ -248,12 +264,15 @@ class Protokoll:
 
     def gleichung(self, latex: str, titel: str = "", referenz: str = "") -> None:
         """Setzt beliebiges, bereits fertiges LaTeX."""
-        self._anfuegen(GleichungBlock(latex=latex, titel=titel, referenz=referenz))
+        self._anfuegen(GleichungBlock(latex=latex, titel=titel, referenz=referenz,
+                                      codestelle=_codestelle()))
 
-    def ansatz(self, latex: str, titel: str = "", referenz: str = "") -> None:
+    def ansatz(self, latex: str, titel: str = "", referenz: str = "", *,
+               name: str = "") -> None:
         """Eine Gleichung ohne Zahlen -- sie kommt auch in die Formelsammlung."""
         self._anfuegen(GleichungBlock(latex=latex, titel=titel, referenz=referenz,
-                                      ansatz=True))
+                                      ansatz=True, name=name,
+                                      codestelle=_codestelle()))
 
     def formel(
         self,
@@ -265,6 +284,8 @@ class Protokoll:
         *,
         empirisch: Optional[Mapping[str, Einheit]] = None,
         nachsatz: str = "",
+        name: str = "",
+        codestelle: str = "",
     ) -> None:
         """
         Der Regelfall: ``Symbol = analytische Formel = Formel mit Zahlen = Resultat``.
@@ -278,6 +299,9 @@ class Protokoll:
         Normformel mit der Einheit, in der sie als blanke Zahl eingehen
         (:func:`latex.einsetzen_numerisch`). ``nachsatz`` steht hinter dem
         Resultat, etwa ein Vergleich (:func:`latex.vergleich`).
+
+        ``name`` und ``codestelle`` sind fuer das Notizbuch (siehe
+        :class:`GleichungBlock`); die Codestelle ermittelt sich selbst.
         """
         zeile = tex.Formelzeile.bauen(ergebnis, vorlage, eingaben,
                                       empirisch=empirisch, nachsatz=nachsatz)
@@ -288,11 +312,13 @@ class Protokoll:
                 referenz=ergebnis.referenz if referenz is None else referenz,
                 wert_id=ergebnis.id,
                 formelzeile=zeile,
+                name=name,
+                codestelle=codestelle or _codestelle(),
             )
         )
 
     def wert(self, ergebnis: Wert, titel: str = "", referenz: Optional[str] = None,
-             gruppe: str = "") -> None:
+             gruppe: str = "", *, name: str = "", codestelle: str = "") -> None:
         """Schlichte Form ``Symbol = Wert`` -- fuer Eingaben und Vorgaben."""
         zeile = tex.Formelzeile.bauen(ergebnis)
         self._anfuegen(
@@ -303,6 +329,8 @@ class Protokoll:
                 wert_id=ergebnis.id,
                 gruppe=gruppe,
                 formelzeile=zeile,
+                name=name,
+                codestelle=codestelle or _codestelle(),
             )
         )
 
@@ -431,6 +459,39 @@ class Protokoll:
 
     def __repr__(self) -> str:
         return f"Protokoll({self.kopftitel!r}, {len(self.bloecke)} Bloecke)"
+
+
+def codestelle_aus(modul: str, qualname: str) -> str:
+    """
+    ``modul:Klasse.methode`` -- so nennt das Notizbuch eine Stelle im Code.
+
+    Ohne das, was nur in einer Funktion lebt (``<locals>``, ``<lambda>``):
+    gemeint ist die Funktion, in der es steht. Eine Lambda auf Modulebene
+    heisst schlicht wie ihr Modul.
+    """
+    teile = [t for t in qualname.split(".<locals>", 1)[0].split(".")
+             if t and not t.startswith("<")]
+    return f"{modul}:{'.'.join(teile)}" if teile else modul
+
+
+def _codestelle() -> str:
+    """
+    Die Codestelle dessen, der gerade ins Protokoll schreibt: der erste
+    Aufrufer ausserhalb dieses Moduls.
+
+    Gefragt wird den Aufrufstapel und nicht die Berechnung, die laeuft: viele
+    Formeln schreibt eine Hilfsfunktion in einem anderen Modul, und die
+    Spannung-Dehnung-Analyse laeuft ganz ohne Rechenwerk. Das stille Protokoll
+    fragt gar nicht -- es schreibt ja nichts.
+    """
+    rahmen = sys._getframe(1)
+    while rahmen is not None and rahmen.f_globals.get("__name__") == __name__:
+        rahmen = rahmen.f_back
+    if rahmen is None:
+        return ""
+    code = rahmen.f_code
+    return codestelle_aus(rahmen.f_globals.get("__name__", ""),
+                          getattr(code, "co_qualname", code.co_name))
 
 
 class StillesProtokoll(Protokoll):

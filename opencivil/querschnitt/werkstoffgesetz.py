@@ -62,6 +62,10 @@ class Betongesetz:
         sig = f_cd                              für eps_c1d < |eps| <= eps_c2d
     """
 
+    #: Die Seite im Notizbuch -- gleich, wer das Gesetz unter welchem Titel
+    #: aufschreibt.
+    NAME = "Parabel-Rechteck-Beziehung des Betons"
+
     f_cd: float
     """Bemessungsdruckfestigkeit in N/m^2 (positiver Betrag)."""
 
@@ -139,6 +143,9 @@ class Spannungsblock:
     wird nicht erfunden.
     """
 
+    #: Die Seite im Notizbuch, wie bei :attr:`Betongesetz.NAME`.
+    NAME = "Spannungsblock des Betons"
+
     f_cd: float
     """Festigkeit des Blocks in N/m^2 (positiver Betrag) -- je nach
     Werkstoffsatz ``f_cd`` oder ``f_ck``."""
@@ -197,6 +204,9 @@ class Stahlgesetz:
     Zug und Druck werden getrennt begrenzt, weil ``f_yd`` und ``f_yd^-`` in der
     Sortentabelle unterschiedlich sein duerfen.
     """
+
+    #: Die Seite im Notizbuch, wie bei :attr:`Betongesetz.NAME`.
+    NAME = "Bilineare Beziehung des Betonstahls"
 
     E_s: float
     """Elastizitaetsmodul in N/m^2."""
