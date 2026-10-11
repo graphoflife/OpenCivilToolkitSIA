@@ -1,12 +1,12 @@
 /**
  * bericht.js -- Rechte Tafel: das Rechenergebnis.
  *
- * Vier Sichten auf dieselbe Lösung:
+ * Drei Sichten auf dieselbe Lösung:
  *   Zusammenfassung  je Platte eine Tabelle mit Urteilen und Erfüllungsgraden;
  *                    das Auge je Zeile zeigt genau diesen Nachweis
  *   Diagramme        Interaktionslinien, Kurven, Querschnitt
- *   Herleitung       die Mitschrift des Rechenkerns, Formel für Formel
- *   Formelsammlung   jede Formel einmal, ohne Zahlen, mit Erklärung
+ *   Herleitung       die Mitschrift des Rechenkerns, Formel für Formel; jede
+ *                    Formel führt zu ihrer Seite in der Dokumentation
  *
  * Sämtliche Zahlen und Formeln stammen unverändert aus der Lösung. Die
  * Oberfläche formatiert nichts nach -- sonst stünde am Bildschirm etwas
@@ -266,44 +266,6 @@ function herleitung(gesamt) {
     ...bloeckeZeichnen(bloecke),
     lueckenBanner(loesung),
   ]);
-}
-
-/** Das Laden der Formelsammlung -- einmal, beim ersten Blick in den Reiter. */
-let formelsammlungLaden = null;
-
-/**
- * Die Formelsammlung: jede Formel des Werkzeugs einmal, ohne Zahlen, mit den
- * Erklärungen und denselben Kopierknöpfen wie in der Herleitung -- zum
- * Nachschlagen, gleich welches Projekt offen ist und welche Nachweise darin
- * laufen. Der Kern legt sie fertig ab (`python3 -m opencivil.web.bruecke`);
- * hier wird sie nur gelesen.
- *
- * Je Bestandteil seine Formeln: bei einem Beton die des Betons, bei einer
- * Platte die der Platte. Zu welchem ein Thema gehört, sagt der Kern (`art`);
- * «Gesamt» zeigt alle.
- */
-function formelsammlung() {
-  if (!zustand.formelsammlung) {
-    formelsammlungLaden ??= fetch(import.meta.resolve('../kern/formelsammlung.json'))
-      .then((antwort) => {
-        if (!antwort.ok) throw new Error(`Status ${antwort.status}`);
-        return antwort.json();
-      })
-      .then(({ themen }) => aendern({ formelsammlung: themen }, 'formelsammlung'))
-      .catch((fehler) => melden(`Formelsammlung nicht ladbar: ${fehler.message}`, true));
-    return leerzustand('Formelsammlung wird geladen …');
-  }
-  const leer = ohneAuswahl();
-  if (leer) return leer;
-  const art = eingrenzung()?.split('.')[0];
-  const themen = zustand.formelsammlung.filter((t) => !art || t.art === art);
-  if (!themen.length) {
-    return leerzustand('Keine Formeln für diesen Bestandteil.', 'Oben «Gesamt»: alle.');
-  }
-  return el('div.blatt', {}, themen.flatMap((t) => [
-    el('div.b-untertitel', { text: t.thema }),
-    ...bloeckeZeichnen(t.bloecke),
-  ]));
 }
 
 /**
@@ -714,11 +676,8 @@ export function berichtZeichnen(behaelter, { verfolgen }) {
     nachweise: () => zusammenfassung(loesung, verfolgen),
     diagramm: () => diagrammSicht(loesung),
     herleitung: () => herleitung(loesung),
-    formelsammlung,
   };
   const sicht = sichten[zustand.reiter] || sichten.nachweise;
-  // Die Formelsammlung hängt an keiner Rechnung, die übrigen Reiter schon.
-  if (sicht === formelsammlung) return ersetzen(behaelter, sicht());
   // Liess sich die letzte Eingabe nicht rechnen, steht es über allem: was
   // darunter steht, gehört zur Eingabe davor.
   const fehler = zustand.rechenfehler

@@ -63,7 +63,7 @@ class TestFormelsammlung(unittest.TestCase):
                      "Duktilität je Richtung", "Sprödes Versagen je Richtung"):
             with self.subTest(thema=name):
                 self.assertEqual(art[name], "querschnittsanalyse")
-        self.assertEqual({t["art"] for t in api.formelsammlung_liste(self.alle)},
+        self.assertEqual({t.art for t in self.alle},
                          {"beton", "betonstahl", "querschnitt", "querschnittsanalyse"})
 
     def test_die_linien_der_analysen_stehen_darin(self):

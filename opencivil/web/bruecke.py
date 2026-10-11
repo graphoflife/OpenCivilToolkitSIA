@@ -25,18 +25,13 @@ zwischenspeichern -- so kam einmal ``blatt.py`` nach einer Aenderung noch alt.
 Das Manifest aendert sich darum mit jeder Aenderung am Kern; der Test merkt,
 wenn das Neuschreiben vergessen ging.
 
-UND DIE FORMELSAMMLUNG:
-Die ganze Formelsammlung (:func:`opencivil.bericht.formelsammlung.vollstaendig`)
-haengt an keinem Projekt -- rechnen muss man sie trotzdem: zwei Projekte, die
-zusammen jeden Nachweis fuehren. Unter Pyodide dauerte das Sekunden, jedesmal
-beim ersten Blick in den Reiter. Darum legt die Bruecke sie fertig ab,
-``web/kern/formelsammlung.json``, und die Oberflaeche liest sie nur noch. Ein
-Test merkt, wenn sie nicht mehr zum Kern passt.
-
 UND DAS NOTIZBUCH:
-Die Seiten des Notizbuchs, die aus dem Code entstehen -- je Formel, je Thema
---, schreibt die Bruecke in den Ordner ``notizbuch/``, ohne anzufassen, was
-dort von Hand steht (:mod:`opencivil.notizbuch.tresor`). Dazu das
+Die ganze Formelsammlung (:func:`opencivil.bericht.formelsammlung.laeufe`)
+haengt an keinem Projekt -- rechnen muss man sie trotzdem: zwei Projekte, die
+zusammen jeden Nachweis fuehren. Unter Pyodide dauerte das Sekunden. Darum
+rechnet sie die Bruecke und legt sie fertig ab, als Seiten des Notizbuchs: je
+Formel, je Thema, je Modul eine, im Ordner ``notizbuch/`` -- ohne
+anzufassen, was dort von Hand steht (:mod:`opencivil.notizbuch.tresor`). Dazu das
 Verzeichnis aller Seiten, ``web/kern/notizbuch.json``: GitHub Pages zeigt
 keinen Ordnerinhalt, die Oberflaeche erfaehrt nur so, welche Seiten es gibt.
 Die Seiten selbst holt sie ohne Marke und ohne Zwischenspeicher -- eine in
@@ -72,14 +67,11 @@ import json
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-from opencivil.bericht.formelsammlung import vollstaendig
 from opencivil.notizbuch import erzeugen, tresor
-from opencivil.web.api import formelsammlung_liste
 
 WURZEL = Path(__file__).resolve().parents[2]
 PAKET = WURZEL / "opencivil"
 MANIFEST = WURZEL / "web" / "kern" / "dateien.json"
-FORMELSAMMLUNG = WURZEL / "web" / "kern" / "formelsammlung.json"
 NOTIZBUCH = WURZEL / "notizbuch"
 VERZEICHNIS = WURZEL / "web" / "kern" / "notizbuch.json"
 SEITE = WURZEL / "web" / "index.html"
@@ -145,34 +137,6 @@ def schreiben(pfad: Path | None = None) -> Path:
     return _json_schreiben(Path(pfad) if pfad is not None else MANIFEST, manifest())
 
 
-def formelsammlung() -> dict:
-    """Die ganze Formelsammlung, so wie die Oberflaeche sie liest."""
-    return {
-        "hinweis": (
-            "Erzeugt von opencivil/web/bruecke.py aus Projekt.beispiel und "
-            "Projekt.jeder_nachweis. Nicht von Hand ändern."
-        ),
-        "themen": formelsammlung_liste(vollstaendig()),
-    }
-
-
-def formelsammlung_stimmt() -> bool:
-    """Ob die abgelegte Formelsammlung der entspricht, die der Kern heute ergibt."""
-    if not FORMELSAMMLUNG.is_file():
-        return False
-    try:
-        abgelegt = json.loads(FORMELSAMMLUNG.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return False
-    # Durch JSON hin und zurueck, damit beide Seiten dieselben Typen haben.
-    return abgelegt.get("themen") == json.loads(json.dumps(formelsammlung()["themen"]))
-
-
-def formelsammlung_schreiben(pfad: Path | None = None) -> Path:
-    return _json_schreiben(Path(pfad) if pfad is not None else FORMELSAMMLUNG,
-                           formelsammlung())
-
-
 @functools.lru_cache(maxsize=1)
 def notizbuch_seiten() -> Tuple[tresor.Seite, ...]:
     """Was der Code zum Notizbuch beitraegt -- einmal je Lauf gerechnet."""
@@ -236,8 +200,7 @@ def tafeldateien() -> List[Path]:
     Was ueber die Importtafel der Seite geht: jedes Modul der Oberflaeche und
     die Verzeichnisse unter ``web/kern/``.
     """
-    return sorted([*(SEITE.parent / "js").glob("*.js"), MANIFEST, FORMELSAMMLUNG,
-                   VERZEICHNIS])
+    return sorted([*(SEITE.parent / "js").glob("*.js"), MANIFEST, VERZEICHNIS])
 
 
 def versionsmarken() -> str:
@@ -296,10 +259,6 @@ def _zerlegen(seite: Path) -> Tuple[str, str, str]:
 if __name__ == "__main__":
     geschrieben = schreiben()
     print(f"{geschrieben.relative_to(WURZEL)}: {len(kerndateien())} Dateien")
-    sammlung = formelsammlung_schreiben()
-    themen = json.loads(sammlung.read_text(encoding="utf-8"))["themen"]
-    print(f"{sammlung.relative_to(WURZEL)}: {len(themen)} Themen, "
-          f"{sum(len(t['bloecke']) for t in themen)} Einträge")
     plan = notizbuch_schreiben()
     print(f"{NOTIZBUCH.relative_to(WURZEL)}/: {len(plan.schreiben)} geschrieben, "
           f"{len(plan.unveraendert)} unverändert, {len(plan.loeschen)} gelöscht"

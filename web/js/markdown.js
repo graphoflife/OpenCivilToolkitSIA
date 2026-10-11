@@ -2,7 +2,7 @@
  * markdown.js -- Markdown in einen Baum zerlegen, so wie Obsidian es liest.
  *
  * Die Seiten des Notizbuchs (notizbuch/) sind Markdown: Obsidian liest den
- * Ordner als Tresor, die Oberfläche zeigt ihn unter «Formelsammlung». Eine
+ * Ordner als Tresor, die Oberfläche zeigt ihn unter «Dokumentation». Eine
  * fremde Bibliothek gibt es dafür nicht; dieses Modul zerlegt, was der
  * Generator schreibt und was man in Obsidian gewöhnlich tippt:
  *

@@ -30,7 +30,7 @@ from typing import Callable, Dict, List, Optional, Tuple
 from opencivil.bericht import formelsammlung as fs
 from opencivil.bericht.markdown import absatz_markdown, formel_in_zelle, text_markdown
 from opencivil.core.latex import ohne_namen_im_index
-from opencivil.core.protokoll import GleichungBlock, TitelBlock
+from opencivil.core.protokoll import GleichungBlock
 from opencivil.core.wert import Quelle, Wert
 from opencivil.notizbuch.namen import sortierschluessel
 from opencivil.notizbuch.tresor import Seite
@@ -39,8 +39,8 @@ FORMELN = "Formelsammlung/Formeln"
 THEMEN = "Formelsammlung/Themen"
 UEBERSICHT = "Formelsammlung/Formelsammlung.md"
 
-#: Wie die Uebersicht die Themen gruppiert -- nach dem Bestandteil, unter dem
-#: sie zuerst stehen.
+#: Wie die Uebersicht die Themen gruppiert -- nach dem Bestandteil, zu dem
+#: sie gehoeren (``Thema.art`` der Formelsammlung).
 BEREICHE = {"beton": "Baustoffe", "betonstahl": "Baustoffe", "querschnitt": "Platte",
             "querschnittsanalyse": "Querschnittsanalyse"}
 
@@ -105,20 +105,18 @@ def sammeln() -> Tuple[Dict[str, Formel], Dict[str, Thema]]:
     themen: Dict[str, Thema] = {}
     for lauf in fs.laeufe():
         zuletzt: Dict[str, str] = {}
-        bereich = ""
         for block in lauf.alle_bloecke():
-            if isinstance(block, TitelBlock) and block.raum:
-                bereich = BEREICHE.get(block.raum.split(".", 1)[0], "")
             if not isinstance(block, GleichungBlock):
                 continue
             if fs.in_sammlung(block):
                 _vorkommen(block, lauf.kopftitel, formeln, zuletzt)
-                thema = themen.setdefault(block.thema, Thema(block.thema, bereich))
+                thema = themen.setdefault(block.thema, Thema(block.thema, ""))
                 thema.formeln[fs.formelname(block)] = None
             if block.wert_id:
                 zuletzt[block.wert_id] = fs.formelname(block) if fs.in_sammlung(block) else ""
     for thema in fs.vollstaendig():
         if thema.name in themen:
+            themen[thema.name].bereich = BEREICHE.get(thema.art, "")
             themen[thema.name].erklaerungen = [e.text for e in thema.erklaerungen]
     return formeln, themen
 

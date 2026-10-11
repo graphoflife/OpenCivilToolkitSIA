@@ -1,5 +1,5 @@
 ---
-erzeugt: 95d195961212
+erzeugt: 77274405e8ac
 art: modul
 tags: [modul]
 ---
@@ -85,15 +85,6 @@ aus LaTeX zurueckzulesen, wie sie es frueher musste, entfaellt.
 def protokoll_liste(protokoll: Protokoll) -> List[dict]
 ```
 
-### formelsammlung_liste
-
-```python
-def formelsammlung_liste(themen: List[Thema]) -> List[dict]
-```
-
-Je Thema die Bloecke wie im Bericht, als Bloecke derselben Tafel -- und
-der Bestandteil, zu dem es gehoert: danach grenzt die Oberflaeche ein.
-
 ### loesung_dict
 
 ```python
@@ -176,5 +167,4 @@ Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks.
 
 ## Gebraucht von
 
-- [[opencivil.web.bruecke]]
 - [[opencivil.web.dienst]]

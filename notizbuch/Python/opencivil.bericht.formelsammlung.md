@@ -1,5 +1,5 @@
 ---
-erzeugt: 0f3e568e68f9
+erzeugt: 0fecdc5ad631
 art: modul
 tags: [modul]
 ---
@@ -20,7 +20,8 @@ dafuer das Warum.
 
 * Die ganze, zum Nachschlagen ([[opencivil.bericht.formelsammlung#vollstaendig|vollstaendig]]): jede Formel des
   Werkzeugs, gleich welches Projekt offen ist und welche Nachweise darin
-  laufen. Die Oberflaeche zeigt sie; vorab erzeugt von
+  laufen. Das Notizbuch zeigt sie, je Formel eine Seite
+  ([[opencivil.notizbuch.formelseiten]]), vorab geschrieben von
   `python3 -m opencivil.web.bruecke`.
 * Die eines Laufs ([[opencivil.bericht.formelsammlung#formelsammlung|formelsammlung]]): im Bericht als «Verwendete
   Formeln» -- die Erklaerungen zu dem, was er rechnet, und nicht zu allem.
@@ -57,7 +58,7 @@ Das Rechenwerk stempelt es auf jeden Block, den eine Berechnung schreibt
 ([[opencivil.core.protokoll#Protokoll.herkunft_stempeln|Protokoll.herkunft_stempeln]]). Zu welchem Bestandteil ein Thema
 gehoert -- Beton, Betonstahl, Platte --, sagt der Abschnitt, unter dem es zum
 ersten Mal steht: sein Namensraum beginnt mit der Art (`beton.b1`). Danach
-zeigt die Oberflaeche je Bestandteil nur seine Formeln.
+ordnet die Uebersicht des Notizbuchs die Themen.
 
 ## Inhalt
 
@@ -203,4 +204,3 @@ Fuer den Bericht: je Thema ein Titel, die Erklaerungen, dann die Formeln.
 - [[opencivil.bericht.gliederung]]
 - [[opencivil.notizbuch.formelseiten]]
 - [[opencivil.web.api]]
-- [[opencivil.web.bruecke]]

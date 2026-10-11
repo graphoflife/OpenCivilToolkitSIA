@@ -35,11 +35,6 @@ export const zustand = {
    */
   verfolgung: null,
   /**
-   * Die ganze Formelsammlung, `[{thema, bloecke}]` -- an kein Projekt
-   * gebunden, einmal geladen (siehe `formelsammlung` in bericht.js).
-   */
-  formelsammlung: null,
-  /**
    * Was links ausgewählt ist:
    * {art: 'material'|'querschnitt'|'querschnittsanalyse'|'blatt', kennung}.
    */

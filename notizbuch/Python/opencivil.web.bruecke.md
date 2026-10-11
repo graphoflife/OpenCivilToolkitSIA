@@ -1,5 +1,5 @@
 ---
-erzeugt: 7a0b8abfa8d7
+erzeugt: 8451e9246b52
 art: modul
 tags: [modul]
 ---
@@ -37,21 +37,14 @@ Das Manifest aendert sich darum mit jeder Aenderung am Kern; der Test merkt,
 wenn das Neuschreiben vergessen ging.
 
 
-## UND DIE FORMELSAMMLUNG
-
-Die ganze Formelsammlung ([[opencivil.bericht.formelsammlung#vollstaendig|opencivil.bericht.formelsammlung.vollstaendig]])
-haengt an keinem Projekt -- rechnen muss man sie trotzdem: zwei Projekte, die
-zusammen jeden Nachweis fuehren. Unter Pyodide dauerte das Sekunden, jedesmal
-beim ersten Blick in den Reiter. Darum legt die Bruecke sie fertig ab,
-`web/kern/formelsammlung.json`, und die Oberflaeche liest sie nur noch. Ein
-Test merkt, wenn sie nicht mehr zum Kern passt.
-
-
 ## UND DAS NOTIZBUCH
 
-Die Seiten des Notizbuchs, die aus dem Code entstehen -- je Formel, je Thema
---, schreibt die Bruecke in den Ordner `notizbuch/`, ohne anzufassen, was
-dort von Hand steht ([[opencivil.notizbuch.tresor]]). Dazu das
+Die ganze Formelsammlung ([[opencivil.bericht.formelsammlung#laeufe|opencivil.bericht.formelsammlung.laeufe]])
+haengt an keinem Projekt -- rechnen muss man sie trotzdem: zwei Projekte, die
+zusammen jeden Nachweis fuehren. Unter Pyodide dauerte das Sekunden. Darum
+rechnet sie die Bruecke und legt sie fertig ab, als Seiten des Notizbuchs: je
+Formel, je Thema, je Modul eine, im Ordner `notizbuch/` -- ohne
+anzufassen, was dort von Hand steht ([[opencivil.notizbuch.tresor]]). Dazu das
 Verzeichnis aller Seiten, `web/kern/notizbuch.json`: GitHub Pages zeigt
 keinen Ordnerinhalt, die Oberflaeche erfaehrt nur so, welche Seiten es gibt.
 Die Seiten selbst holt sie ohne Marke und ohne Zwischenspeicher -- eine in
@@ -136,28 +129,6 @@ Ob das abgelegte Manifest den vorhandenen Dateien entspricht -- samt Marken.
 
 ```python
 def schreiben(pfad: Path | None=None) -> Path
-```
-
-### formelsammlung
-
-```python
-def formelsammlung() -> dict
-```
-
-Die ganze Formelsammlung, so wie die Oberflaeche sie liest.
-
-### formelsammlung_stimmt
-
-```python
-def formelsammlung_stimmt() -> bool
-```
-
-Ob die abgelegte Formelsammlung der entspricht, die der Kern heute ergibt.
-
-### formelsammlung_schreiben
-
-```python
-def formelsammlung_schreiben(pfad: Path | None=None) -> Path
 ```
 
 ### notizbuch_seiten
@@ -260,7 +231,6 @@ schreiben hiesse, die alten Marken blieben stehen.
 - `WURZEL = Path(__file__).resolve().parents[2]`
 - `PAKET = WURZEL / 'opencivil'`
 - `MANIFEST = WURZEL / 'web' / 'kern' / 'dateien.json'`
-- `FORMELSAMMLUNG = WURZEL / 'web' / 'kern' / 'formelsammlung.json'`
 - `NOTIZBUCH = WURZEL / 'notizbuch'`
 - `VERZEICHNIS = WURZEL / 'web' / 'kern' / 'notizbuch.json'`
 - `SEITE = WURZEL / 'web' / 'index.html'`
@@ -270,7 +240,5 @@ schreiben hiesse, die alten Marken blieben stehen.
 
 ## Braucht
 
-- [[opencivil.bericht.formelsammlung]]
 - [[opencivil.notizbuch.erzeugen]]
 - [[opencivil.notizbuch.tresor]]
-- [[opencivil.web.api]]

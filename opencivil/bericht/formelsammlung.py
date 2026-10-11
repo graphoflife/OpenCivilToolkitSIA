@@ -11,7 +11,8 @@ dafuer das Warum.
 ZWEI SAMMLUNGEN:
 * Die ganze, zum Nachschlagen (:func:`vollstaendig`): jede Formel des
   Werkzeugs, gleich welches Projekt offen ist und welche Nachweise darin
-  laufen. Die Oberflaeche zeigt sie; vorab erzeugt von
+  laufen. Das Notizbuch zeigt sie, je Formel eine Seite
+  (:mod:`opencivil.notizbuch.formelseiten`), vorab geschrieben von
   ``python3 -m opencivil.web.bruecke``.
 * Die eines Laufs (:func:`formelsammlung`): im Bericht als «Verwendete
   Formeln» -- die Erklaerungen zu dem, was er rechnet, und nicht zu allem.
@@ -42,7 +43,7 @@ Das Rechenwerk stempelt es auf jeden Block, den eine Berechnung schreibt
 (:meth:`Protokoll.herkunft_stempeln`). Zu welchem Bestandteil ein Thema
 gehoert -- Beton, Betonstahl, Platte --, sagt der Abschnitt, unter dem es zum
 ersten Mal steht: sein Namensraum beginnt mit der Art (``beton.b1``). Danach
-zeigt die Oberflaeche je Bestandteil nur seine Formeln.
+ordnet die Uebersicht des Notizbuchs die Themen.
 """
 
 from __future__ import annotations

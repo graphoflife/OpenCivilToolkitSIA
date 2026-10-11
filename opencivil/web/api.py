@@ -20,7 +20,7 @@ from typing import Any, Dict, List, Optional
 
 from opencivil.bewehrungssuche import DURCHMESSER, Suchmodus
 from opencivil.core.einheiten import MM
-from opencivil.bericht.formelsammlung import Thema, formelname, in_sammlung
+from opencivil.bericht.formelsammlung import formelname, in_sammlung
 from opencivil.bericht.markdown import block_markdown
 from opencivil.bericht.zusammenfassung import (
     GRAD_SPALTE, STAPEL_SPALTEN, angaben, hinweise, nachweistabelle,
@@ -363,18 +363,6 @@ def zelle_dict(zelle: Zelle) -> dict:
 
 def protokoll_liste(protokoll: Protokoll) -> List[dict]:
     return darstellen(protokoll, TAFEL)
-
-
-def formelsammlung_liste(themen: List[Thema]) -> List[dict]:
-    """
-    Je Thema die Bloecke wie im Bericht, als Bloecke derselben Tafel -- und
-    der Bestandteil, zu dem es gehoert: danach grenzt die Oberflaeche ein.
-    """
-    return [
-        {"thema": thema.name, "art": thema.art,
-         "bloecke": [TAFEL[type(b)](b, 0) for b in thema.bloecke]}
-        for thema in themen
-    ]
 
 
 # ===========================================================================

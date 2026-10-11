@@ -230,13 +230,6 @@ class TestBruecke(unittest.TestCase):
             "opencivil/. Bitte 'python3 -m opencivil.web.bruecke' laufen lassen -- "
             "sonst lädt die Seite einen veralteten Kern.")
 
-    def test_formelsammlung_ist_auf_dem_stand(self):
-        self.assertTrue(
-            bruecke.formelsammlung_stimmt(),
-            "web/kern/formelsammlung.json passt nicht mehr zum Kern. Bitte "
-            "'python3 -m opencivil.web.bruecke' laufen lassen -- sonst zeigt die "
-            "Oberfläche eine veraltete Formelsammlung.")
-
     def test_notizbuch_ist_auf_dem_stand(self):
         self.assertTrue(
             bruecke.notizbuch_stimmt(),
@@ -284,8 +277,7 @@ class TestBruecke(unittest.TestCase):
     def test_die_tafel_kennt_module_und_verzeichnisse(self):
         tafel = [p.relative_to(bruecke.WURZEL).as_posix() for p in bruecke.tafeldateien()]
         for datei in ("web/js/app.js", "web/js/kern_arbeiter.js",
-                      "web/kern/dateien.json", "web/kern/formelsammlung.json",
-                      "web/kern/notizbuch.json"):
+                      "web/kern/dateien.json", "web/kern/notizbuch.json"):
             with self.subTest(datei=datei):
                 self.assertIn(datei, tafel)
 

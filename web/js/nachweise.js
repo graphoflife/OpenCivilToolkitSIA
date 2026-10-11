@@ -43,7 +43,7 @@ const laufendeSuche = new Set();
  * Was hinter jedem Fragezeichen steht: Rechenweg, Werte (Bemessung oder
  * charakteristisch), φ -- als Stichworte, dazu die Bedingung. Alle an einer
  * Stelle, damit sie gleich gebaut sind. Die Begründungen stehen in der
- * Formelsammlung, nicht hier.
+ * Dokumentation, nicht hier.
  */
 const HILFE = {
   tragsicherheit: {
