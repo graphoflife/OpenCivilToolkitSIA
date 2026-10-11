@@ -43,3 +43,16 @@ $$
 - [[Beton]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Festigkeit, mit der die Tragsicherheit rechnet. Die charakteristische
+Festigkeit $f_{ck}$ ist ein 5-%-Fraktil aus Zylinderprüfungen; sie wird mit dem
+[[Beiwert zur Berücksichtigung der Festigkeitsminderung]] gemindert und durch
+den Teilsicherheitsbeiwert $\gamma_c$ geteilt. Der deckt ab, was die Prüfung
+nicht erfasst: die Festigkeit im Bauwerk gegenüber der im Prüfkörper,
+Abweichungen der Abmessungen, die Ungenauigkeit des Modells.
+
+$f_{cd}$ ist die Spannung im [[Spannungsblock des Betons]] und das Plateau der
+[[Parabel-Rechteck-Beziehung des Betons]]. Rechnet ein Kapitel mit
+charakteristischen Werten, steht an seiner Stelle $f_{ck}$.

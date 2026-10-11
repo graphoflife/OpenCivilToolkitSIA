@@ -35,3 +35,13 @@ $$
 - [[Betonstahl]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Auf Druck kann ein Stahl anders fliessen als auf Zug, und die Sortentabelle
+darf beide getrennt nennen. Gebraucht wird $f_{yd}^{-}$ überall dort, wo
+gedrückte Bewehrung mitträgt: in der Resistenzlinie aus Dehnungsebenen und im
+Querschnittslöser. Die Handrechnung lässt gedrückte Bewehrung weg und braucht
+sie nicht (siehe [[Betonstahl nur auf Zug]]).
+
+Für die Sorten der Tabelle ist sie gleich $f_{yd}$.

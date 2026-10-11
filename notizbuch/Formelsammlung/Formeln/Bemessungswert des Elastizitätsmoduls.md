@@ -39,3 +39,13 @@ $$
 - [[Beton]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Wo die Steifigkeit des Betons in die Tragsicherheit eingeht, wäre ein zu hoher
+Modul unsicher: eine zu steife Druckzone unterschätzte die Verformung, beim
+Knicken die Ausmitte zweiter Ordnung. Darum wird der Mittelwert durch den
+Teilsicherheitsbeiwert $\gamma_{cE}$ geteilt.
+
+$E_{cd}$ bestimmt den [[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]] und
+damit, wie steil die Parabel des Betons beginnt.

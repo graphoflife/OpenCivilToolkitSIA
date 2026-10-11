@@ -54,3 +54,19 @@ $$
 - [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Die Dehnung, bei der der Stahl zu fliessen beginnt: Fliessgrenze geteilt durch
+den Elastizitätsmodul. Für B500B mit Bemessungswerten rund 2.17 ‰,
+charakteristisch 2.5 ‰. Darunter ist die Stahlspannung $E_s \cdot
+\varepsilon_s$, darüber bleibt sie am Plateau.
+
+Gebraucht wird sie an drei Stellen:
+
+- als Kennwert des Betonstahls, mit Bemessungswerten;
+- in der Spannung-Dehnung-Analyse als Fliessbeginn: erreicht die am stärksten
+  gezogene Lage diese Dehnung, knickt die Linie ab;
+- in der Stahlspannungsbegrenzung: fliesst der Stahl unter der Einwirkung,
+  bliebe seine Spannung am Plateau stehen und sagte nichts mehr -- verglichen
+  wird dann über die Dehnung (siehe [[Zulässige Dehnung]]).

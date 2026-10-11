@@ -38,3 +38,14 @@ $$
 - [[Beton]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Je fester ein Beton, desto spröder bricht er: nach dem Höchstwert der Spannung
+fällt sie steiler ab, und die Druckzone kann weniger umlagern. Der Beiwert
+$\eta_{fc}$ trägt dem Rechnung, indem er die Bemessungsfestigkeit hochfester
+Betone mindert.
+
+Bis $f_{ck} = 40\,\mathrm{N/mm^2}$ ist er 1, darüber fällt er mit der dritten
+Wurzel -- bei $f_{ck} = 80\,\mathrm{N/mm^2}$ auf rund 0.79. Er geht als Faktor
+in den [[Bemessungswert der Betondruckfestigkeit]] ein.

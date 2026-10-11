@@ -41,3 +41,15 @@ $$
 - [[Beton]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+Der Elastizitätsmodul des Betons hängt an der Festigkeit und an der
+Gesteinskörnung: steifere Körner geben einen steiferen Beton. Die Formel nimmt
+ihn proportional zur dritten Wurzel der mittleren Festigkeit an; der Beiwert
+$k_e$ trägt die Gesteinskörnung, im Beispielprojekt 10 000. Wie bei $\tau_{cd}$
+geht die Festigkeit als blosse Zahl in N/mm² ein.
+
+$E_{cm}$ ist der Modul des ungerissenen Betons unter kurzer Last. Unter Dauerlast
+kriecht der Beton und wird weicher -- siehe [[Wirksamer Elastizitätsmodul]].
+Für die Tragsicherheit wird er zum [[Bemessungswert des Elastizitätsmoduls]].

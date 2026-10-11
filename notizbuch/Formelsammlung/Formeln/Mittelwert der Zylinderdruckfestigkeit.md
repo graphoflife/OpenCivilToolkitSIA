@@ -38,3 +38,13 @@ $$
 - [[Beton]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
+
+## Theorie
+
+$f_{ck}$ ist ein Fraktilwert: 95 % der Prüfkörper sind fester. Für das
+Verhalten im Mittel -- Steifigkeit, Verformung, Rissbildung -- zählt der
+Mittelwert. Der feste Zuschlag von $8\,\mathrm{N/mm^2}$ entspricht bei normal
+verteilter Festigkeit dem 1.645-fachen einer Standardabweichung von knapp
+$5\,\mathrm{N/mm^2}$.
+
+Das Werkzeug braucht $f_{cm}$ für den [[Mittelwert des Elastizitätsmoduls]].
