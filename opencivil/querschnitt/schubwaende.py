@@ -55,7 +55,7 @@ Anfangs- zum Endpunkt. Einheiten in SI-Basis.
 
 ANNAHMEN:
 Federmodell, Bredt-Verteilung und die Laengszugkraft in der Wandmitte sind
-nach Vorgabe eingebaut, nicht nachgeschlagen (TODO.md).
+nach Vorgabe eingebaut, nicht nachgeschlagen (``notizbuch/Notizen/TODO.md``).
 """
 
 from __future__ import annotations

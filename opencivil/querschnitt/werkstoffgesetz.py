@@ -36,7 +36,7 @@ from opencivil.core.wert import Wert
 #: wechselte das Vorzeichen. So weit kommt es mit dem kriechweichen Modul:
 #: ``E_cm/(1 + phi)`` mit charakteristischen Werten und ``phi = 2`` gibt
 #: ``k_sigma = 0.93``. Mit 1 ist der Beton bis ``f_c`` bei ``eps_c1d`` linear.
-#: Nach Vorgabe, nicht nachgeschlagen (TODO.md).
+#: Nach Vorgabe, nicht nachgeschlagen (``notizbuch/Notizen/TODO.md``).
 K_SIGMA_MIN = 1.0
 
 #: Dieselbe Regel als Formel, fuer die Herleitung -- mit ``@E_c`` und ``@f_c``.
@@ -135,7 +135,8 @@ class Spannungsblock:
     ``eps_c2d`` liegt; so setzt ihn die Interaktionslinie des gezeichneten
     Querschnitts ein.
 
-    Die Normstelle des Blocks ist offen (TODO.md); sie wird nicht erfunden.
+    Die Normstelle des Blocks ist offen (``notizbuch/Notizen/TODO.md``); sie
+    wird nicht erfunden.
     """
 
     f_cd: float

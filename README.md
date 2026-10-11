@@ -110,6 +110,16 @@ Jede Eingabe liegt sofort im Browser; ein geschlossenes Fenster kostet nichts.
 *Speichern* legt das Projekt als `.json` auf die Platte, *Öffnen* liest es
 zurück. Gelesen wird die Datei im Kern, mit denselben Prüfungen wie alles andere.
 
+## Notizbuch und Obsidian
+
+Wie gerechnet wird, wie die Bibliothek gebaut ist und was beim Bauen gelernt
+wurde, steht als Markdown im Ordner [`notizbuch/`](notizbuch/Start.md):
+die [Entwicklung](notizbuch/Notizen/Entwicklung.md), was noch
+[offen](notizbuch/Notizen/TODO.md) ist, und die
+[Arbeitsweise](notizbuch/Notizen/Arbeitsweise.md) von Claude. Der Ordner ist
+ein Obsidian-Tresor: in Obsidian «Ordner als Tresor öffnen» und `notizbuch`
+wählen – ohne Plugin.
+
 ## Stand
 
 Fertig und getestet (823 Tests):
@@ -155,7 +165,7 @@ Fertig und getestet (823 Tests):
 | `web/js/querschnittsanalyse.js`, `qa_diagramme.js` | ihre übrige Eingabe und ihre Diagramme |
 
 Wie das zusammenhängt und warum es so gebaut ist, steht in
-[ENTWICKLUNG.md](ENTWICKLUNG.md).
+[Entwicklung](notizbuch/Notizen/Entwicklung.md).
 
 ## Oberfläche
 

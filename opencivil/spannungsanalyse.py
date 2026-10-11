@@ -62,7 +62,8 @@ Betonrand statt am Stahl.
 
 Gezeigt wird der Querschnitt, nicht das Bauteil: die Mitwirkung des Betons
 zwischen den Rissen (Zugversteifung) steckt nicht darin. Mit welcher Regel
-eine Linie des Bauteils zu rechnen waere, ist offen (TODO.md).
+eine Linie des Bauteils zu rechnen waere, ist offen
+(``notizbuch/Notizen/TODO.md``).
 """
 
 from __future__ import annotations
@@ -360,10 +361,11 @@ class Loeserpaar:
         Rissmoment ohne Normalkraft rechnet -- ist das
         ``M_Riss(N) = M_Riss(0) - N·h/6``. Druck hebt es, Zug senkt es.
 
-        Annahme, nicht nachgeschlagen (TODO.md): der Bruttoquerschnitt ohne
-        Stahl, wie beim spröden Versagen. Der ungerissene Zustand daneben
-        rechnet mit Stahl und Kriechzahl und ist darum steifer; beim
-        Rissmoment steht sein Rand etwas unter ``f_ct,eff``.
+        Annahme, nicht nachgeschlagen (``notizbuch/Notizen/TODO.md``): der
+        Bruttoquerschnitt ohne Stahl, wie beim spröden Versagen. Der
+        ungerissene Zustand daneben rechnet mit Stahl und Kriechzahl und ist
+        darum steifer; beim Rissmoment steht sein Rand etwas unter
+        ``f_ct,eff``.
 
         ``f_ct,eff`` mit ``k_t`` fuer ein Drittel der Dicke, auch unter Zug:
         Biegung bleibt bei ``h/3``, nach Vorgabe. Die Rissnormalkraft nimmt die
@@ -382,9 +384,9 @@ class Loeserpaar:
 
         ``f_ct,eff`` mit ``k_t = 1/(1 + 0.5·t)`` fuer die ganze Dicke,
         ``t = h``: unter Zug reisst der ganze Querschnitt, nicht ein Drittel
-        wie unter Biegung. Nach Vorgabe, nicht nachgeschlagen (TODO.md). Bis
-        2026-10-09 galt das ``f_ct,eff`` des Rissmoments, mit ``t = h/3`` --
-        am Beispiel 829 statt 757 kN.
+        wie unter Biegung. Nach Vorgabe, nicht nachgeschlagen
+        (``notizbuch/Notizen/TODO.md``). Bis 2026-10-09 galt das ``f_ct,eff``
+        des Rissmoments, mit ``t = h/3`` -- am Beispiel 829 statt 757 kN.
         """
         h, b = self.gerissen.h, self.gerissen.b
         return self.f_ct_eff_zug * b * h - 6.0 * abs(M) / h

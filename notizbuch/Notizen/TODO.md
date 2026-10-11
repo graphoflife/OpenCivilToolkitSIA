@@ -1,7 +1,7 @@
 # Was noch offen ist
 
 Reihenfolge ungefähr nach Dringlichkeit. Erledigtes wandert raus — was dabei
-gelernt wurde, steht in [ENTWICKLUNG.md](ENTWICKLUNG.md).
+gelernt wurde, steht in [[Entwicklung]].
 
 ---
 

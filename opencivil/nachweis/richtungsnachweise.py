@@ -17,7 +17,7 @@ ANNAHMEN:
 Das Rissmoment gehoert dem ungerissenen Bruttoquerschnitt, gerechnet mit
 ``I_yz`` fuer die unsymmetrische Biegung; ``k_t`` mit einem Drittel der Hoehe
 in Biegerichtung -- die Regel der Platte, uebertragen. Nach Vorgabe, nicht
-nachgeschlagen (TODO.md).
+nachgeschlagen (``notizbuch/Notizen/TODO.md``).
 """
 
 from __future__ import annotations

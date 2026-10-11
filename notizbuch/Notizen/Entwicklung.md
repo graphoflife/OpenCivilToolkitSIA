@@ -3,7 +3,7 @@
 Was gebaut wurde, und vor allem **warum es so gebaut ist**. Das Was steht im
 Code; das Warum geht sonst verloren. Neueste Einträge oben.
 
-Wer das Werkzeug bloss benutzen will, liest [README.md](README.md).
+Wer das Werkzeug bloss benutzen will, liest [README.md](../../README.md).
 
 ---
 
@@ -968,7 +968,7 @@ Torsion, zusammen 225 kN/m gegen v_Rd = 394.3 kN/m.
 ### Annahmen, nicht nachgeschlagen
 
 Stehen im Code als «nach Vorgabe, nicht nachgeschlagen» und in
-[TODO.md](TODO.md): die C-Punkt-Regel bei beliebiger Form, das Federmodell
+[[TODO]]: die C-Punkt-Regel bei beliebiger Form, das Federmodell
 b_w·l mit Bredt, die Längszugkraft in der Wandmitte, k_t aus der Höhe in
 Biegerichtung, x/d senkrecht zur Nulllinie, die Normstelle des
 Spannungsblocks.
