@@ -1,5 +1,5 @@
 ---
-erzeugt: b696eb72c098
+erzeugt: ab9283d3b3c7
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -82,6 +82,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.stabwerk.modell]] – was gerechnet wird: das ebene Stabwerk in SI.
     - [[opencivil.stabwerk.stab]] – der ebene Stab: Steifigkeit, Lasten, Bettung.
     - [[opencivil.stabwerk.system]] – das ganze Stabwerk: Unbekannte, Zusammenbau, Loesen.
+    - [[opencivil.stabwerk.verlauf]] – Schnittgroessen und Biegelinie laengs eines Stabs.
 - [[opencivil.web]] – die Oberflaeche, von der Seite des Rechenkerns.
     - [[opencivil.web.api]] – Uebersetzung der Rechenergebnisse nach JSON.
     - [[opencivil.web.bruecke]] – Welche Dateien der Browser laden muss.

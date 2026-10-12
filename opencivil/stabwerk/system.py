@@ -139,6 +139,9 @@ class Teilstab:
     b: Ort
     c: float
     s: float
+    L_stab: float = 0.0
+    """Die Laenge des ganzen Stabs."""
+
     k_quer: float = 0.0
     k_laengs: float = 0.0
     biegung: bool = True
@@ -431,7 +434,7 @@ class _Rechnung:
                 for (p0, q0), (p1, q1) in zip(punkte, punkte[1:]):
                     self.ergebnis.teilstaebe.append(Teilstab(
                         stab=stab_, nummer=nummer, x0=p0, x1=p1, a=q0, b=q1, c=c, s=s,
-                        k_quer=k_quer, k_laengs=k_laengs,
+                        L_stab=L, k_quer=k_quer, k_laengs=k_laengs,
                         biegung=stab_.quer != FEST, laengs=stab_.laengs != FEST,
                         gelenk_a=stab_.gelenk_a and p0 == 0.0,
                         gelenk_b=stab_.gelenk_b and p1 == L))
@@ -628,9 +631,8 @@ class _Rechnung:
         melde = self._melden if melden else (lambda *_, **__: None)
         teile_f = []
         for t in self.ergebnis.teilstaebe:
-            L_stab = _laenge(self.knoten[t.stab.a], self.knoten[t.stab.b])
             lasten = st.aufteilen(je_stab.get(t.stab.name, []), t.x0, t.x1,
-                                  ende=abs(t.x1 - L_stab) <= 1e-12)
+                                  ende=t.x1 == t.L_stab)
             f = st.knotenlasten(t.L, lasten)
             if not t.biegung:
                 for i in (1, 2, 4, 5):

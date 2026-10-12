@@ -1,5 +1,5 @@
 ---
-erzeugt: 0ff658dbb07c
+erzeugt: 706326d19bea
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,7 @@ Aus dem [[opencivil.stabwerk.modell#System|System]] die Unbekannten, die
 Steifigkeitsmatrix und je Lastfall und Kombination die rechte Seite -- und
 nach dem Loesen Verschiebungen, Stabendkraefte und Lagerkraefte. Wie die
 Schnittgroessen laengs der Staebe verlaufen, rechnet
-[[opencivil.stabwerk|verlauf]] aus dem, was hier herauskommt.
+[[opencivil.stabwerk.verlauf|verlauf]] aus dem, was hier herauskommt.
 
 
 ## ORTE UND TEILSTAEBE
@@ -138,6 +138,7 @@ Ein Stueck eines Stabs zwischen zwei Orten.
 - `b: Ort`
 - `c: float`
 - `s: float`
+- `L_stab: float = 0.0` – Die Laenge des ganzen Stabs.
 - `k_quer: float = 0.0`
 - `k_laengs: float = 0.0`
 - `biegung: bool = True` – Ob er sich biegt -- nicht, wenn er quer fest aufliegt.

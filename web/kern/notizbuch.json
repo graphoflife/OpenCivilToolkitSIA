@@ -3144,6 +3144,32 @@
       ]
     },
     {
+      "name": "opencivil.stabwerk.verlauf",
+      "pfad": "Python/opencivil.stabwerk.verlauf.md",
+      "art": "modul",
+      "kurz": "Schnittgroessen und Biegelinie laengs eines Stabs.",
+      "stichworte": [
+        "Polynom",
+        "Polynom.durch",
+        "Polynom.stammfunktion",
+        "Polynom.ableitung",
+        "Polynom.nullstellen",
+        "Intervall",
+        "Extrem",
+        "Stabverlauf",
+        "Stabverlauf.bei",
+        "Stabverlauf.sehne",
+        "Stabverlauf.proben",
+        "Stabverlauf.extremstellen",
+        "Stabverlauf.extrem",
+        "verlaeufe",
+        "teilverlauf",
+        "_hermite",
+        "_verschoben",
+        "_schieben"
+      ]
+    },
+    {
       "name": "opencivil.web",
       "pfad": "Python/opencivil.web.md",
       "art": "modul",

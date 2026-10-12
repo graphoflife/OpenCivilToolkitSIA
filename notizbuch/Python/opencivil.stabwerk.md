@@ -1,5 +1,5 @@
 ---
-erzeugt: ff323ff0c941
+erzeugt: 6d4eebf3c267
 art: modul
 tags: [modul]
 ---
@@ -21,7 +21,7 @@ Lagerkraefte -- je Lastfall und je Kombination.
   Staebe, Lager, Lasten.
 * [[opencivil.stabwerk.system|system]] -- das ganze System: Unbekannte,
   Zusammenbau, Loesen, Lagerkraefte.
-* [[opencivil.stabwerk|verlauf]] -- Schnittgroessen und Biegelinie
+* [[opencivil.stabwerk.verlauf|verlauf]] -- Schnittgroessen und Biegelinie
   laengs jedes Stabs.
 
 Nur die Standardbibliothek: das Werkzeug rechnet auch im Browser.
@@ -32,3 +32,4 @@ Nur die Standardbibliothek: das Werkzeug rechnet auch im Browser.
 - [[opencivil.stabwerk.modell]] – was gerechnet wird: das ebene Stabwerk in SI.
 - [[opencivil.stabwerk.stab]] – der ebene Stab: Steifigkeit, Lasten, Bettung.
 - [[opencivil.stabwerk.system]] – das ganze Stabwerk: Unbekannte, Zusammenbau, Loesen.
+- [[opencivil.stabwerk.verlauf]] – Schnittgroessen und Biegelinie laengs eines Stabs.

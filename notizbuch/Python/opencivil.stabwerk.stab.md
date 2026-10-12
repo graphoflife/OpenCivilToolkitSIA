@@ -1,5 +1,5 @@
 ---
-erzeugt: 0d609620f65e
+erzeugt: 9518a32d68d1
 art: modul
 tags: [modul]
 ---
@@ -22,7 +22,7 @@ Gegenuhrzeigersinn gedreht --, Drehungen zaehlen im Gegenuhrzeigersinn. In
 diesen Achsen ist die Steifigkeitsmatrix die des Lehrbuchs. Die gestrichelte
 Faser liegt auf der anderen Seite, bei `-y`: dorthin zeigt `z` der
 Baustatik, und dort zieht ein positives Moment
-([[opencivil.stabwerk|verlauf]]).
+([[opencivil.stabwerk.verlauf|verlauf]]).
 
 Je Ende drei Unbekannte, in dieser Folge:
 
@@ -208,3 +208,4 @@ Die arbeitsgleichen Knotenkraefte `f` (6) in den Achsen des Stabs --
 ## Gebraucht von
 
 - [[opencivil.stabwerk.system]]
+- [[opencivil.stabwerk.verlauf]]
