@@ -44,6 +44,85 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-12 · 2D Balkensysteme: ein ebener Rahmen nach der Steifigkeitsmethode
+
+Wunsch des Benutzers: unter der Querschnittsanalyse eine App für ebene
+Balkensysteme -- gezeichnet wie der Querschnitt, Stäbe mit Querschnitt und
+Material, Lager und Federn, Gelenke, Lastfälle und Kombinationen, gerechnet
+nach der Steifigkeitsmethode. Er wählte den ebenen Rahmen: Normalkraft statt
+Torsion.
+
+**Ein eigener Rechenkern, `opencivil/stabwerk/`, ohne Projekt und ohne
+Rechenwerk.** Gleichungslöser, Stab, System, Verläufe und Querschnitte
+kennen nur Zahlen in SI. So lassen sie sich gegen Handrechnungen prüfen --
+Einfeldträger, Kragarm, Zweifeldträger, Dreigelenkrahmen, Fachwerk, Bettung
+nach Hetényi --, bevor irgendetwas anderes daran hängt. Erst
+`stabwerk/rechnung.py` meldet ein System im Rechenwerk an.
+
+**Gelöst wird im Profil, nicht dicht.** LDLᵀ mit umgekehrter
+Cuthill-McKee-Nummerierung: ein gebetteter Stab wird in bis zu 64 Stücke
+geteilt, und mit hunderten Unbekannten wäre eine dichte Matrix in Pyodide
+spürbar. Ein Pivot unter 1e-10 · K_ii heisst beweglich; dann wird die
+Unbekannte festgehalten, zu Ende zerlegt und die freie Bewegung gelöst -- so
+kann die Meldung sagen, *was* sich bewegt, statt nur «singulär».
+
+**Eine Drehung ohne Steifigkeit wird gestrichen, erkannt an der Verbindung.**
+Hängt ein Knoten nur an Gelenken, wäre seine Zeile in K null. Statt sie mit
+einer kleinen Feder zu verstecken, fällt sie weg, ist null und heisst
+«Verdrehung nicht bestimmbar, da keine Steifigkeit» -- so verlangt es der
+Benutzer, und eine erfundene Feder wäre eine Zahl, die niemand eingegeben hat.
+
+**Ein Gelenk ist eine eigene Drehung des Stabendes.** Die Alternative, die
+Stabmatrix zu kondensieren, hätte für jede Gelenkkombination eine eigene
+Matrix gebraucht und die Drehung des Endes verloren, die die Biegelinie
+braucht.
+
+**Ein festes Linienlager ist exakt, nicht steif.** Liegt ein Stab quer fest
+auf, biegt er sich nicht, und seine Last geht geradewegs ins Lager. Eine sehr
+steife Bettung hätte dasselbe genähert und die Matrix verdorben.
+
+**Nichts Unmögliches wirft.** Ein bewegliches System, ein Stab ohne
+Querschnitt, eine Last hinter dem Stabende sind Meldungen am Ergebnis: der
+Rest des Projekts rechnet weiter. Hart scheitert nur ein Verweis auf ein
+Material, eine Platte oder Analyse, die es nicht gibt -- und das verhindert
+schon der Baum, der nichts löschen lässt, was ein System braucht.
+
+**Die Prozedur liefert nur die Zahl der Unbekannten.** Das Rechenwerk will
+für jede Ausgabe einen Wert, auch wenn das System beweglich ist. Extremwerte
+je Fall gäbe es dann nicht. Das Ergebnis bleibt darum am Objekt, und
+Zusammenfassung, Bilder und Zwischenspeicher lesen es dort; der Abdruck im
+Speicher zählt die Platten und Analysen mit, aus denen ein System liest.
+
+**Lasten stehen an ihrer Linie, Lager und Knotenlasten neben den Knoten.**
+So gehen Stablasten mit, wenn eine Linie kopiert, gelöscht oder rückgängig
+gemacht wird. Ein Lager als Feld am Knoten ginge verloren, sobald das
+Zeichenfenster zwei Knoten zusammenführt.
+
+**Teilen und Umkehren rechnet der Kern.** Dabei entstehen Lastwerte -- der
+Wert einer Trapezlast am Schnitt, gespiegelte Stellen, ein umgekehrtes
+Vorzeichen bei quer und längs. Das wäre Rechnung in der Oberfläche. Ein Test
+hält fest, dass beides die Lagerkräfte nicht ändert.
+
+**Das Zeichenfenster kann «verbunden».** In der Querschnittsanalyse gehört
+eine Ecke ihrem Element; ein Rahmen hängt an seinen Knoten. Statt die
+Mechanik zu kopieren, stellt der Adapter das ein, dazu Einheit, Raster,
+Werkzeuge und Zoomgrenzen -- die Querschnittsanalyse bleibt, wie sie war.
+
+**Die Bilder kommen aus einer eigenen Anfrage**, wie die Diagramme der
+Querschnittsanalyse: Verläufe sind gross, und die Rechnung bei jeder Eingabe
+soll sie nicht mitschleppen. Die Oberfläche zeichnet nur, und zwischen den
+dichten Proben des Kerns verbindet sie für die Anzeige gerade.
+
+**Steifigkeit nach Vorgabe, nicht nachgeschlagen:** E_cm für Beton, E_s für
+Stahl, am ungerissenen Bruttoquerschnitt, ohne Schubverformung, Theorie
+1. Ordnung. Die Herleitung sagt es, das [[TODO]] führt es.
+
+Die Rechteckformeln der Spannung-Dehnung-Analyse und der Stabquerschnitte
+sind dieselbe Formel und heissen jetzt gleich -- «Fläche eines Rechtecks»,
+«Flächenträgheitsmoment eines Rechtecks»; ihre Theorie ist dorthin gezogen.
+
+---
+
 ## 2026-10-12 · Platte: M_Rd im M-χ-Bild, Rechenarten, Linie I bis zum Riss
 
 Frage des Benutzers: Die M_Rd im M-χ-Bild stimmen nicht immer mit dem M_Rd

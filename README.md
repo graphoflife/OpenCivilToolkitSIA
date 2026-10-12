@@ -99,6 +99,34 @@ kommt dazu, wo man will:
 `u.vorlage_einsetzen("kreis", beton="b1", stahl="s1", masse={"D": 400},
 ursprung=(600, 0))` -- Rechteck, T-Balken, Hohlkasten oder Kreis.
 
+Ein ebener Rahmen ebenso -- Koordinaten in m, x nach rechts, z nach oben:
+
+```python
+r = p.balkensystem("Rahmen")                  # leer; gezeichnet wird wie beim Querschnitt
+stuetze = r.querschnitt("Stütze", "rechteck", b=300, h=300)   # Masse in mm
+riegel = r.querschnitt_aus("Unterzug", "analyse", u)          # A und I_y der Analyse
+links = r.linie((0, 0), (0, 4), querschnitt=stuetze, material="b1")
+balken = r.linie((0, 4), (6, 4), querschnitt=riegel, material="b1")
+r.linie((6, 4), (6, 0), querschnitt=stuetze, material="b1", gelenk_anfang=True)
+r.lager_an((0, 0), "eingespannt")             # gelenkig, verschieblich oder je Richtung
+r.lager_an((6, 0), "gelenkig")
+g = r.lastfall("Eigengewicht")
+w = r.lastfall("Wind")
+r.stablast(g, balken, wert=25.0)              # kN/m, senkrecht nach unten positiv
+r.stablast(w, links, wert=3.0, richtung="waagrecht")
+r.knotenlast(w, (0, 4), 10.0, richtung="waagrecht")          # kN
+r.kombination("Tragsicherheit", (g, 1.35), (w, 1.5))
+
+system = p.rechnen().balkensystem("Rahmen")
+system.ergebnis.meldungen                     # leer -- oder warum nicht gerechnet wird
+system.verlaeufe("Tragsicherheit")["L2"].extrem("M")         # in SI: Stelle, Wert
+```
+
+Linien- und Dreieckslasten (`wert_b`), Einzellasten, Momente und verteilte
+Momente gehen mit `art=`; Federn, Bettung und feste Linienlager mit den
+Feldern der Linie (`quer`, `k_quer`, `laengs`, `k_laengs`). `r.teilen("L2",
+2.5)` teilt eine Linie samt ihren Lasten, `r.umkehren("L2")` kehrt sie um.
+
 Es ist dieselbe Beschreibung, die die Oberfläche speichert, und dieselbe
 Rechnung: `p.rechnen()` liefert dieselben Urteile wie die Maske, und
 `Projekt.beispiel()` ist selbst so gebaut. Ein vertipptes Feld
@@ -128,7 +156,7 @@ Hand steht, bleibt dabei erhalten.
 
 ## Stand
 
-Fertig und getestet (970 Tests):
+Fertig und getestet (1091 Tests):
 
 | Baustein | Inhalt |
 |---|---|
@@ -146,6 +174,12 @@ Fertig und getestet (970 Tests):
 | `querschnitt/schubwaende` | Querkraft und Torsion auf die Wände: Federn, Zellen, Bredt, Fachwerk, Längszugkraft |
 | `querschnitt/analyse` | die Querschnittsanalyse als Bauteil: Zeichnung, Werte, Werkstoffwahl |
 | `querschnitt/vorlagen` | Rechteck, T-Balken, Hohlkasten, Kreis zum Anfangen |
+| `stabwerk/matrix` | Gleichungslöser im Profil (LDLᵀ), Nummerierung nach Cuthill-McKee, die freie Bewegung eines beweglichen Systems |
+| `stabwerk/stab`, `modell` | der ebene Stab: Steifigkeit, Drehung, Bettung, arbeitsgleiche Lasten; das Stabwerk in SI |
+| `stabwerk/system` | das ganze System: Unbekannte, Gelenke, Federn, Linienlager, Knoten auf Stäben, Kombinationen, Lagerkräfte, Gleichgewichtsprobe |
+| `stabwerk/verlauf` | N, V, M und Biegelinie längs der Stäbe als Polynome, mit Extremwerten |
+| `stabwerk/querschnitte` | die Querschnitte der Stäbe nach Vorlage, mit ihren Formeln |
+| `stabwerk/rechnung`, `herleitung` | das Balkensystem im Rechenwerk und wie es seine Rechnung aufschreibt |
 | `nachweis/linie` | Geometrie einer M-N-Linie, `Achse` als Wert |
 | `nachweis/handrechnung` | die von Hand nachrechenbaren Eckpunkte |
 | `nachweis/dehnungsfaecher` | die Grenzen des Dehnungsfächers: als Ebenen für die genaue Linie, als Bedingungen für die Analyse |
@@ -157,12 +191,13 @@ Fertig und getestet (970 Tests):
 | `spannungsanalyse.py` | sechs Fragen an den Querschnitt: Bild aus N und M oder aus Dehnungen, M-χ- und N-ε-Linie, äquivalenter E-Modul über M und über N — kein Nachweis |
 | `bewehrungssuche/` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt – Längsbewehrung, dünnste Platte, Bügel |
 | `bericht/` | der Bericht als Blöcke (`gliederung`), gesetzt als Konsolentext, LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) und Markdown; die Zusammenfassung je Platte |
-| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `projekt`) und was daraus gebaut wird (`aufbau`) |
+| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `balkensystem`, `projekt`) und was daraus gebaut wird (`aufbau`) |
 | `ergebnis.py` | ein gerechnetes Projekt: Zusammenfassung, Bericht, LaTeX, Markdown, Analysen |
 | `notizbuch/` | das Notizbuch: Formel-, Themen- und Python-Seiten für Obsidian und die Dokumentation der Seite (`formelseiten`, `bibliothek`), geschrieben ohne Handgeschriebenes anzufassen (`tresor`) |
 | `web/bruecke.py` | was der Browser lädt: das Verzeichnis des Kerns, die Seiten des Notizbuchs, die Versionsmarken |
 | `web/api.py` | Lösung, Mitschrift und Zusammenfassung als JSON |
 | `web/diagrammdaten.py` | die Punktfolgen der Diagramme als JSON |
+| `web/balkendaten.py` | was die Oberfläche von einem Balkensystem zeigt: Übersicht und Verläufe |
 | `web/speicher.py` | Ergebnisse je Bauteil, damit nur Geändertes neu rechnet |
 | `web/dienst.py` | der Rechendienst, unabhängig vom Transportweg |
 | `web/server.py` | HTTP-Hülle darum (nur Standardbibliothek) |
@@ -171,6 +206,8 @@ Fertig und getestet (970 Tests):
 | `web/js/cad_*.js` | das Zeichenfenster, allgemein: Ansicht, Knoten und Elemente, Punkteingabe, Befehle, Auswahl, schwebendes Fenster |
 | `web/js/qa_zeichnung.js`, `qa_uebersicht.js`, `qa_vorlagen.js` | was es in der Querschnittsanalyse zeichnet, die Liste darunter und die Vorlagen |
 | `web/js/querschnittsanalyse.js`, `qa_diagramme.js` | ihre übrige Eingabe und ihre Diagramme |
+| `web/js/bs_zeichnung.js`, `bs_symbole.js` | was es im Balkensystem zeichnet: Stäbe, Lager, Federn, Gelenke, Lasten |
+| `web/js/balkensystem.js`, `bs_diagramme.js` | die übrige Eingabe des Balkensystems und seine Ergebnisse |
 
 Wie das zusammenhängt und warum es so gebaut ist, steht in
 [Entwicklung](notizbuch/Notizen/Entwicklung.md).
@@ -256,6 +293,23 @@ je Material Bemessungs- oder charakteristische Werte und beim Beton das
 Gesetz, die Lastfälle mit N, M_y, M_z, V_y, V_z und T, der Schalter «nur
 einachsig» und die Nachweisschalter.
 
+**2D Balkensysteme:** unter der Querschnittsanalyse ein drittes Kapitel,
+ein ebener Rahmen nach der Steifigkeitsmethode. Gezeichnet wird mit
+demselben Fenster, in Metern: Linien werden Stäbe mit Querschnitt und
+Material, Knoten bekommen ein Lager (gelenkig, verschieblich, eingespannt
+oder je Richtung frei, fest, Feder), Stabenden ein Gelenk, Linien ein
+Linienlager oder eine Bettung. Die Lasten des Lastfalls, der über der
+Zeichnung gewählt ist, stehen in der Zeichnung und im schwebenden Fenster.
+Anders als im Querschnitt hängt ein Rahmen an seinen Knoten: ein Klick an
+einem Knoten wählt ihn, ein verschobener Stab nimmt seine Knoten mit.
+Teilen und Umkehren rechnet der Kern -- dabei entstehen Lastwerte. Ist das
+System beweglich, sagt es eine Meldung und markiert, was sich bewegt; eine
+Drehung ohne Steifigkeit, an einem Knoten, an dem nur Gelenke hängen, ist
+gestrichen und trägt ein Fragezeichen. Die Querschnitte kommen aus einer
+Vorlage, von Hand, aus einer Platte oder aus einer Querschnittsanalyse; die
+Steifigkeit nach Vorgabe, nicht nachgeschlagen: E_cm bzw. E_s am
+ungerissenen Bruttoquerschnitt, ohne Schubverformung, Theorie 1. Ordnung.
+
 **Rechte Tafel:**
 
 * *Zusammenfassung* -- je Platte eine Tabelle: Widerstand, Einwirkung und
@@ -271,7 +325,10 @@ einachsig» und die Nachweisschalter.
   bei einer Querschnittsanalyse ein einziges Interaktionsdiagramm mit
   wählbaren Achsen (zwei von N, M_y, M_z, die dritte mit festem Wert; ein
   Klick auf einen Lastfall legt den Schnitt durch ihn), dazu je Lastfall der
-  Bruchzustand im Schnitt und der Schubfluss in den Wänden
+  Bruchzustand im Schnitt und der Schubfluss in den Wänden; bei einem
+  Balkensystem je Fall Verformung, N, V, M und Lagerkräfte -- mit der Maus
+  darüber (auf dem Telefon: tippen) der Wert an der Stelle, an einem Knoten
+  seine Verschiebung
 * *Herleitung* -- die Mitschrift, Formel für Formel, mit Normstelle
 
 **Kopieren nach Word, LaTeX und Markdown:** jede Formel und jede Tabelle hat
@@ -414,6 +471,19 @@ In der Querschnittsanalyse:
   Achse: `M_y > 0` unten (wie bei der Platte), `M_z > 0` links
 * `V_y`, `V_z` in Achsrichtung, `T > 0` im Gegenuhrzeigersinn
 
+Im Balkensystem:
+
+* `x` nach rechts, `z` nach oben, in m; Verschiebungen und Lagerkräfte
+  positiv entlang der Achsen, eine Lagerkraft nach oben also positiv
+* Drehungen und Momentlasten im Gegenuhrzeigersinn positiv
+* Kraftlasten positiv in Pfeilrichtung: *senkrecht* nach unten, *waagrecht*
+  nach rechts, *quer* zur gestrichelten Faser, *längs* vom Anfang zum Ende
+* Schnittgrössen nach Baustatik: `N > 0` Zug, `M > 0` zieht an der
+  gestrichelten Faser -- rechts der Laufrichtung, bei einem Stab von links
+  nach rechts also unten --, `dM/dx = V − m`
+* Querschnittsmasse in mm, Lasten in kN, kN/m, kNm, kNm/m; Federn in kN/m und
+  kNm/rad, Bettung in kN/m²
+
 ## Erfüllungsgrad beim M-N-Nachweis
 
 Ob ein Punkt innerhalb der Resistenzlinie liegt, entscheidet die massgebende
@@ -439,6 +509,9 @@ Massstab ab:
   Rissbegrenzung und Knicken sind gebaut.
 * **Schiefe Lagen** im Lagenaufbau (die alte Fassung konnte das). Zulagen gibt
   es.
+* **Balkensysteme**: Eigengewicht aus dem Querschnitt, Umhüllende der
+  Kombinationen, Theorie 2. Ordnung, Schubverformung, schiefe Lager und die
+  Übergabe der Schnittgrössen an die Querschnittsnachweise fehlen noch.
 * **Normwerte prüfen**: die Sortentabellen in `material/beton.py` und
   `material/betonstahl.py` sind aus der Vorgängerfassung übernommen und vor dem
   produktiven Einsatz gegen die gedruckte Norm abzugleichen.

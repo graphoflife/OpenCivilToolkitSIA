@@ -47,6 +47,12 @@ gelernt wurde, steht in [[Entwicklung]].
       nimmt ein ε_ud für alle Lagen (das der ersten Sorte), die
       Tragsicherheit je Sorte. Bei den Normsorten des Beispiels gleich; siehe
       [[Prüfung M_Rd der Platte]].
+- [ ] Balkensystem im schmalen Fenster: das schwebende Fenster eines Knotens
+      oder Stabs deckt die halbe Zeichnung. Zuklappen geht, aber bei Lasten
+      mit vielen Feldern wird es lang.
+- [ ] Keine Testumgebung für die Zeichenhilfen des Balkensystems
+      (`bs_symbole.js`, die verbundene Zeichnung in `cad_modell.js`) --
+      geprüft von Hand im Browser.
 
 ## Offene Normfragen — deine Fragen, unbeantwortet
 
@@ -148,7 +154,25 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Benutzer ein. Das Beispiel nimmt 100 mm auf der Bügelachse; eine Regel
       dafür ist nicht nachgeschlagen.
 
+### Balkensysteme
+
+Im Code mit «nach Vorgabe, nicht nachgeschlagen».
+
+- [ ] **Welche Steifigkeit?** Eingebaut: E_cm für Beton, E_s für Betonstahl,
+      am ungerissenen Bruttoquerschnitt, ohne Schubverformung, Theorie
+      1. Ordnung (`stabwerk/rechnung.py`, `E_MODUL`). Für Verformungen im
+      Gebrauch ist ein gerissener Stahlbetonbalken weicher, unter Dauerlast
+      kriecht er; die Schnittgrössen eines unbestimmten Systems hängen daran.
+- [ ] **Platte als Stabquerschnitt.** Eingebaut: ein Streifen b × h mit den
+      Formeln des Rechtecks, ohne Bewehrung -- b ist die betrachtete Breite
+      der Platte.
+
 ## Noch nicht gebaut
+
+- [ ] **Balkensysteme, nächste Schritte:** Eigengewicht aus Querschnitt und
+      Wichte, Umhüllende der Kombinationen, Theorie 2. Ordnung,
+      Schubverformung, schiefe Lager, und die Schnittgrössen eines Stabs als
+      Einwirkung einer Platte oder Querschnittsanalyse.
 
 - [ ] **Querschnittsanalyse, nächste Schritte** (je ein eigener Plan):
       Baustahl (Sortentabelle, Gesetz, Verbundquerschnitt, Stahlwände mit
@@ -230,6 +254,15 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+2D Balkensysteme: ebener Rahmen nach der Steifigkeitsmethode im eigenen
+Kern `stabwerk/` · Gelenke, Federn, Bettung, feste Linienlager, Knoten auf
+Stäben, Kombinationen · bewegliches System als Meldung, gestrichene
+Drehung ohne Steifigkeit · Querschnitte nach Vorlage, von Hand, aus Platte
+oder Analyse · Herleitung mit Matrizen und Gleichgewichtsprobe ·
+Zeichenfenster verbunden, Teilen und Umkehren im Kern · Bilder mit Werten
+beim Darüberfahren ·
+
 
 Platte geprüft ([[Prüfung M_Rd der Platte]]): im M-χ-Bild heisst der
 Fliessbeginn M_y und das Ende M_Rd, wie der Tragwiderstand · Rechenarten
