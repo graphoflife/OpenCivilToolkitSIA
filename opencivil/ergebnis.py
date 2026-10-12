@@ -39,6 +39,7 @@ from opencivil.spannungsanalyse import Analyse
 
 if TYPE_CHECKING:
     from opencivil.projekt import Aufbau, Projekt
+    from opencivil.stabwerk.rechnung import Balkensystem
 
 
 @dataclass
@@ -82,6 +83,19 @@ class Ergebnis:
     def wert(self, wert_id: str) -> Wert:
         """Ein einzelner gerechneter Wert, mit Einheit, Herkunft und Norm."""
         return self.loesung.wert(wert_id)
+
+    def balkensystem(self, bauteil: str) -> "Balkensystem":
+        """
+        Ein gerechnetes Balkensystem -- nach Name oder Kennung. Am Objekt
+        stehen das Ergebnis (``ergebnis``: Meldungen, Faelle mit
+        Verschiebungen und Lagerkraeften) und je Fall die Verlaeufe der
+        Schnittgroessen (``verlaeufe("Eigengewicht")``), in SI.
+        """
+        for kennung, system in self.aufbau.balkensysteme.items():
+            if bauteil in (kennung, system.name):
+                return system
+        namen = ", ".join(f"'{s.name}'" for s in self.aufbau.balkensysteme.values())
+        raise KeyError(f"Ein Balkensystem '{bauteil}' gibt es nicht. Vorhanden: {namen or 'keines'}.")
 
     def analysen(self) -> Dict[str, List[Analyse]]:
         """

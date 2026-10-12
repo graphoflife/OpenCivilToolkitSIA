@@ -42,12 +42,18 @@ import math
 from dataclasses import dataclass, field, replace
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
-from opencivil.core.einheiten import KN, KN_PRO_M, KN_PRO_M2, KNM, KNM_PRO_M, KNM_PRO_RAD
+from opencivil.core.einheiten import (
+    KN, KN_PRO_M, KN_PRO_M2, KNM, KNM_PRO_M, KNM_PRO_RAD, Groesse,
+)
 from opencivil.projekt.eintraege import Beschreibung, eindeutig
 from opencivil.projekt.lesen import ProjektFehler, pflichtfeld, zahl
 from opencivil.projekt.netz import Netz, naechste_kennung
 from opencivil.stabwerk import querschnitte as qs
-from opencivil.stabwerk.modell import Lastart, Lastrichtung
+from opencivil.stabwerk.modell import (
+    FEST, Kombination, Knoten, Knotenlast, Lager, Lastart, Lastfall, Lastrichtung, Stab,
+    Stablast, System,
+)
+from opencivil.stabwerk.system import Meldung
 
 #: Wie ein Lager oder Linienlager je Richtung haelt.
 HALT = ("frei", "fest", "feder")
@@ -290,6 +296,15 @@ class StabquerschnittEintrag(Beschreibung):
         """Die Masse der Vorlage -- was fehlt, mit ihrer Vorgabe."""
         return {**self.stabvorlage().vorgaben(), **self.masse}
 
+    def fehler(self) -> Optional[str]:
+        """Was an Massen oder Kennwerten nicht geht -- ``None``, wenn alles geht."""
+        if self.art == "vorlage":
+            return self.stabvorlage().pruefen(self.masse_mit_vorgaben())
+        if self.art == "kennwerte" and not (self.masse.get("A", 0.0) > 0.0
+                                            and self.masse.get("I", 0.0) > 0.0):
+            return "A und I müssen grösser als null sein."
+        return None
+
 
 @dataclass
 class LastfallEintrag(Beschreibung):
@@ -323,6 +338,26 @@ class LastkombinationEintrag(Beschreibung):
 # ===========================================================================
 # Das System
 # ===========================================================================
+
+
+@dataclass
+class Modell:
+    """
+    Das Stabwerk der Beschreibung, in N, m und rad -- noch ohne
+    Steifigkeiten: ``EA`` und ``EI`` jedes Stabs kommen aus dem Rechenwerk,
+    je Paar aus Querschnitt und Material (``paare``). Was sich nicht
+    uebersetzen laesst, steht in ``meldungen``, wie die des Rechenkerns.
+    """
+
+    system: System
+    paare: Dict[str, Tuple[str, str]] = field(default_factory=dict)
+    """Je tragenden Stab die Kennungen seines Querschnitts und seines Materials."""
+
+    meldungen: List[Meldung] = field(default_factory=list)
+
+    @property
+    def gueltig(self) -> bool:
+        return not any(m.fehler for m in self.meldungen)
 
 
 @dataclass
@@ -403,6 +438,119 @@ class BalkensystemEintrag(Beschreibung):
     def laenge(self, linie: SystemlinieEintrag) -> float:
         (xa, za), (xb, zb) = self.enden(linie)
         return math.hypot(xb - xa, zb - za)
+
+    def stelle_auf(self, kennung: str, punkt: Sequence[float]) -> float:
+        """Wo ein Punkt auf einer Linie liegt, in m ab ihrem Anfang -- auf die Linie gelotet."""
+        (xa, za), (xb, zb) = self.enden(self.linie_von(kennung))
+        L = math.hypot(xb - xa, zb - za)
+        return ((punkt[0] - xa) * (xb - xa) + (punkt[1] - za) * (zb - za)) / L if L else 0.0
+
+    # -- Zum Rechnen ------------------------------------------------------------
+
+    def modell(self) -> Modell:
+        """
+        Das Stabwerk zum Rechnen, in SI (:mod:`opencivil.stabwerk.modell`).
+
+        Ein Stab ohne Querschnitt oder Material, ein Querschnitt mit
+        unmoeglichen Massen und eine Feder ohne Steifigkeit sind Fehler, die
+        die Meldungen nennen: gerechnet wird dann nicht -- und nicht etwa mit
+        einem Stab weniger. Eine Last, deren Lastfall es nicht gibt, und ein
+        Beiwert dafuer bleiben mit einem Hinweis weg.
+        """
+        meldungen: List[Meldung] = []
+
+        def melden(text: str, *elemente: str, fehler: bool = True) -> None:
+            meldungen.append(Meldung(text, tuple(elemente), fehler))
+
+        def halt(art: str, k: float, feld: str, wo: str) -> Optional[float]:
+            if art == "frei":
+                return None
+            if art == "fest":
+                return FEST
+            if k <= 0.0:
+                melden(f"{wo}: eine Feder braucht eine Steifigkeit grösser als null.", wo)
+                return None
+            return Groesse(k, EINHEIT_DER_FEDER[feld]).si
+
+        querschnitte = {q.kennung: q for q in self.querschnitte}
+        unmoeglich = set()
+        for q in self.querschnitte:
+            grund = q.fehler()
+            if grund:
+                unmoeglich.add(q.kennung)
+                melden(f"Querschnitt «{q.name}»: {grund}", q.kennung,
+                       *[l.kennung for l in self.linien if l.stab and l.querschnitt == q.kennung])
+
+        staebe, paare = [], {}
+        for l in self.linien:
+            if l.stab:
+                q = querschnitte.get(l.querschnitt)
+                if q is None:
+                    melden(f"{l.kennung} ist ein Stab, hat aber "
+                           + (f"keinen Querschnitt «{l.querschnitt}»." if l.querschnitt
+                              else "keinen Querschnitt."), l.kennung)
+                elif q.kennung in unmoeglich:
+                    pass
+                elif not l.material:
+                    melden(f"{l.kennung} ist ein Stab, hat aber kein Material.", l.kennung)
+                else:
+                    paare[l.kennung] = (q.kennung, l.material)
+            staebe.append(Stab(
+                name=l.kennung, a=l.von, b=l.bis, traegt=l.stab,
+                gelenk_a=l.gelenk_anfang, gelenk_b=l.gelenk_ende,
+                quer=halt(l.quer, l.k_quer, "k_quer", l.kennung),
+                laengs=halt(l.laengs, l.k_laengs, "k_laengs", l.kennung)))
+
+        lager = [Lager(name=a.kennung, knoten=a.knoten,
+                       x=halt(a.x, a.k_x, "k_x", a.kennung),
+                       z=halt(a.z, a.k_z, "k_z", a.kennung),
+                       phi=halt(a.phi, a.k_phi, "k_phi", a.kennung))
+                 for a in self.lager]
+
+        name_von = {lf.kennung: lf.name for lf in self.lastfaelle}
+        lasten: Dict[str, List[Any]] = {lf.kennung: [] for lf in self.lastfaelle}
+        for l in self.linien:
+            for last in l.lasten:
+                if last.lastfall not in name_von:
+                    melden(f"{l.kennung}: eine Last gehört zu keinem Lastfall – sie wird "
+                           f"nicht gerechnet.", l.kennung, fehler=False)
+                    continue
+                einheit = EINHEIT_DER_LAST[last.art]
+                lasten[last.lastfall].append(Stablast(
+                    stab=l.kennung, art=Lastart(last.art),
+                    wert_a=Groesse(last.wert_a, einheit).si,
+                    wert_b=None if last.wert_b is None else Groesse(last.wert_b, einheit).si,
+                    richtung=Lastrichtung(last.richtung), von=last.von, bis=last.bis,
+                    projiziert=last.projiziert))
+        for p in self.knotenlasten:
+            if p.lastfall not in name_von:
+                melden(f"{p.kennung}: die Last gehört zu keinem Lastfall – sie wird nicht "
+                       f"gerechnet.", p.kennung, fehler=False)
+                continue
+            wert = Groesse(p.wert, EINHEIT_DER_LAST[p.art]).si
+            if p.art == "moment":
+                last = Knotenlast(p.knoten, M=wert)
+            elif p.richtung == Lastrichtung.WAAGRECHT.value:
+                last = Knotenlast(p.knoten, Fx=wert)
+            else:
+                last = Knotenlast(p.knoten, Fz=-wert)
+            lasten[p.lastfall].append(last)
+
+        kombinationen = []
+        for k in self.kombinationen:
+            fremd = [lf for lf in k.faktoren if lf not in name_von]
+            if fremd:
+                melden(f"Kombination «{k.name}»: einen Lastfall «{fremd[0]}» gibt es nicht – "
+                       f"sein Beiwert zählt nicht.", fehler=False)
+            kombinationen.append(Kombination(k.name, {name_von[lf]: beiwert for lf, beiwert
+                                                      in k.faktoren.items() if lf in name_von}))
+
+        system = System(
+            knoten=[Knoten(k.kennung, k.x, k.z) for k in self.knoten],
+            staebe=staebe, lager=lager,
+            lastfaelle=[Lastfall(lf.name, lasten[lf.kennung]) for lf in self.lastfaelle],
+            kombinationen=kombinationen)
+        return Modell(system=system, paare=paare, meldungen=meldungen)
 
     # -- Zeichnen ohne Oberflaeche --------------------------------------------
 

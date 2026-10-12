@@ -107,7 +107,9 @@ class Zusammenfassung:
 def zusammenfassen(aufbau: Optional["Aufbau"], loesung: Loesung) -> Zusammenfassung:
     """
     Die Zeilen je Bauteil, in der Reihenfolge der Beschreibung: erst die
-    Platten, dann die Querschnittsanalysen.
+    Platten, dann die Querschnittsanalysen. Ein Balkensystem fuehrt keine
+    Nachweise und hat darum hier keine Gruppe -- seine Ergebnisse stehen in
+    seiner Herleitung.
 
     Die Urteile kommen fertig aus der Loesung: ohne die stillen, und je
     Nachweis, der seine Lagen sammelt, nur die schlechteste. Hier zu filtern
@@ -133,7 +135,7 @@ def zusammenfassen(aufbau: Optional["Aufbau"], loesung: Loesung) -> Zusammenfass
                         aufbau.urteile_von(b.kennung, loesung.stille_maengel)],
                 art=b.art,
             )
-            for b in aufbau.bauteile()
+            for b in aufbau.bauteile() if b.nachweise
         ]
     return Zusammenfassung(
         bauteile=bauteile,

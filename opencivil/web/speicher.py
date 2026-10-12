@@ -39,7 +39,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Mapping, Optional, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.protokoll import Block
 from opencivil.core.rechenwerk import Loesung
@@ -52,20 +52,26 @@ from opencivil.projekt import BAUTEILE
 PLAETZE = 32
 
 
-def abdruck(projekt_dict: Mapping[str, Any], kennung: str) -> str:
+def abdruck(projekt_dict: Mapping[str, Any], kennung: str,
+            bezuege: Sequence[str] = ()) -> str:
     """
-    Der Fingerabdruck einer Platte: woran sich entscheidet, ob sie noch gilt.
+    Der Fingerabdruck eines Bauteils: woran sich entscheidet, ob es noch gilt.
 
-    Enthalten ist ihr ganzer Eintrag und *alle* Materialien. Nicht nur die
+    Enthalten ist sein ganzer Eintrag und *alle* Materialien. Nicht nur die
     verwendeten: welches Material eine Lage benutzt, steht in derselben
     Beschreibung, und ein Vergleich, der erst herausfinden muss, welche
     Kennung wohin zeigt, waere genau die Stelle, an der man eines vergisst.
     Materialien sind ein paar Zeilen JSON; sie mitzuzaehlen kostet nichts.
+
+    Dazu die Eintraege der Bauteile, deren Werte es liest (``bezuege``,
+    :attr:`Bauteilkopf.bezuege`): ein Balkensystem rechnet mit der Dicke
+    einer Platte, also gilt es nicht mehr, wenn sie sich aendert.
     """
-    eintrag = next((e for liste in BAUTEILE for e in (projekt_dict.get(liste) or [])
-                    if e.get("kennung") == kennung), None)
+    eintraege = {e.get("kennung"): e for liste in BAUTEILE
+                 for e in (projekt_dict.get(liste) or [])}
     return json.dumps(
-        {"querschnitt": eintrag, "materialien": projekt_dict.get("materialien")},
+        {"querschnitt": eintraege.get(kennung), "materialien": projekt_dict.get("materialien"),
+         "bezuege": [eintraege.get(b) for b in bezuege]},
         sort_keys=True, ensure_ascii=False, default=str)
 
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: cf90be9f6b2c
+erzeugt: ec4a4b898ee3
 art: modul
 tags: [modul]
 ---
@@ -52,16 +52,20 @@ waere leer.
 ### abdruck
 
 ```python
-def abdruck(projekt_dict: Mapping[str, Any], kennung: str) -> str
+def abdruck(projekt_dict: Mapping[str, Any], kennung: str, bezuege: Sequence[str]=()) -> str
 ```
 
-Der Fingerabdruck einer Platte: woran sich entscheidet, ob sie noch gilt.
+Der Fingerabdruck eines Bauteils: woran sich entscheidet, ob es noch gilt.
 
-Enthalten ist ihr ganzer Eintrag und *alle* Materialien. Nicht nur die
+Enthalten ist sein ganzer Eintrag und *alle* Materialien. Nicht nur die
 verwendeten: welches Material eine Lage benutzt, steht in derselben
 Beschreibung, und ein Vergleich, der erst herausfinden muss, welche
 Kennung wohin zeigt, waere genau die Stelle, an der man eines vergisst.
 Materialien sind ein paar Zeilen JSON; sie mitzuzaehlen kostet nichts.
+
+Dazu die Eintraege der Bauteile, deren Werte es liest (`bezuege`,
+[[opencivil.projekt.aufbau#Bauteilkopf|Bauteilkopf.bezuege]]): ein Balkensystem rechnet mit der Dicke
+einer Platte, also gilt es nicht mehr, wenn sie sich aendert.
 
 ### Teilergebnis
 

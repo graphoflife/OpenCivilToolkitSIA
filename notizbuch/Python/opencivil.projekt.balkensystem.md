@@ -1,5 +1,5 @@
 ---
-erzeugt: b68b076a9c8f
+erzeugt: 1fbeb3d1e706
 art: modul
 tags: [modul]
 ---
@@ -224,6 +224,14 @@ def masse_mit_vorgaben(self) -> Dict[str, float]
 
 Die Masse der Vorlage -- was fehlt, mit ihrer Vorgabe.
 
+#### StabquerschnittEintrag.fehler
+
+```python
+def fehler(self) -> Optional[str]
+```
+
+Was an Massen oder Kennwerten nicht geht -- `None`, wenn alles geht.
+
 ### LastfallEintrag
 
 ```python
@@ -261,6 +269,29 @@ Eine Kombination: je Lastfall (Kennung) ein Beiwert, von Hand.
 ```python
 @classmethod
 def aus_dict(cls, d: Mapping[str, Any]) -> 'LastkombinationEintrag'
+```
+
+### Modell
+
+```python
+@dataclass
+class Modell
+```
+
+Das Stabwerk der Beschreibung, in N, m und rad -- noch ohne
+Steifigkeiten: `EA` und `EI` jedes Stabs kommen aus dem Rechenwerk,
+je Paar aus Querschnitt und Material (`paare`). Was sich nicht
+uebersetzen laesst, steht in `meldungen`, wie die des Rechenkerns.
+
+- `system: System`
+- `paare: Dict[str, Tuple[str, str]] = field(default_factory=dict)` – Je tragenden Stab die Kennungen seines Querschnitts und seines Materials.
+- `meldungen: List[Meldung] = field(default_factory=list)`
+
+#### Modell.gueltig
+
+```python
+@property
+def gueltig(self) -> bool
 ```
 
 ### BalkensystemEintrag
@@ -333,6 +364,28 @@ Anfang und Ende einer Linie, in m.
 ```python
 def laenge(self, linie: SystemlinieEintrag) -> float
 ```
+
+#### BalkensystemEintrag.stelle_auf
+
+```python
+def stelle_auf(self, kennung: str, punkt: Sequence[float]) -> float
+```
+
+Wo ein Punkt auf einer Linie liegt, in m ab ihrem Anfang -- auf die Linie gelotet.
+
+#### BalkensystemEintrag.modell
+
+```python
+def modell(self) -> Modell
+```
+
+Das Stabwerk zum Rechnen, in SI ([[opencivil.stabwerk.modell]]).
+
+Ein Stab ohne Querschnitt oder Material, ein Querschnitt mit
+unmoeglichen Massen und eine Feder ohne Steifigkeit sind Fehler, die
+die Meldungen nennen: gerechnet wird dann nicht -- und nicht etwa mit
+einem Stab weniger. Eine Last, deren Lastfall es nicht gibt, und ein
+Beiwert dafuer bleiben mit einem Hinweis weg.
 
 #### BalkensystemEintrag.netz
 
@@ -468,9 +521,11 @@ Vorgabe.
 - [[opencivil.projekt.netz]]
 - [[opencivil.stabwerk.modell]]
 - [[opencivil.stabwerk.querschnitte]]
+- [[opencivil.stabwerk.system]]
 
 ## Gebraucht von
 
 - [[opencivil.projekt]]
+- [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.web.api]]

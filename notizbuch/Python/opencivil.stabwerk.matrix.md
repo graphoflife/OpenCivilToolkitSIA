@@ -1,5 +1,5 @@
 ---
-erzeugt: 8cfc44618c67
+erzeugt: f1f41968484a
 art: modul
 tags: [modul]
 ---
@@ -191,4 +191,5 @@ Die volle Matrix -- fuer die Herleitung kleiner Systeme und fuer Proben.
 
 ## Gebraucht von
 
+- [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.system]]

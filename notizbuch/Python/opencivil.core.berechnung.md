@@ -1,5 +1,5 @@
 ---
-erzeugt: 750571164c92
+erzeugt: 023e7a8c8f8c
 art: modul
 tags: [modul]
 ---
@@ -558,6 +558,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.platte]]
+- [[opencivil.stabwerk.rechnung]]
 - [[opencivil.web.diagrammdaten]]
 
 ## Formeln aus diesem Modul

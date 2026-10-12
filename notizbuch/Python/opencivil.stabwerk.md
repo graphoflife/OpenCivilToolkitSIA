@@ -1,5 +1,5 @@
 ---
-erzeugt: 67d5c55f332d
+erzeugt: c9b5829e6a27
 art: modul
 tags: [modul]
 ---
@@ -28,9 +28,11 @@ Nur die Standardbibliothek: das Werkzeug rechnet auch im Browser.
 
 ## Module
 
+- [[opencivil.stabwerk.herleitung]] – wie ein Balkensystem seine Rechnung aufschreibt.
 - [[opencivil.stabwerk.matrix]] – das Gleichungssystem eines Stabwerks.
 - [[opencivil.stabwerk.modell]] – was gerechnet wird: das ebene Stabwerk in SI.
 - [[opencivil.stabwerk.querschnitte]] – die Querschnitte der Staebe, nach Vorlage.
+- [[opencivil.stabwerk.rechnung]] – das Balkensystem im Rechenwerk.
 - [[opencivil.stabwerk.stab]] – der ebene Stab: Steifigkeit, Lasten, Bettung.
 - [[opencivil.stabwerk.system]] – das ganze Stabwerk: Unbekannte, Zusammenbau, Loesen.
 - [[opencivil.stabwerk.verlauf]] – Schnittgroessen und Biegelinie laengs eines Stabs.

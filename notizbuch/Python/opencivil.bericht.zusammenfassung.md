@@ -1,5 +1,5 @@
 ---
-erzeugt: aa0b799d962e
+erzeugt: cd7222fd0714
 art: modul
 tags: [modul]
 ---
@@ -104,7 +104,9 @@ def zusammenfassen(aufbau: Optional['Aufbau'], loesung: Loesung) -> Zusammenfass
 ```
 
 Die Zeilen je Bauteil, in der Reihenfolge der Beschreibung: erst die
-Platten, dann die Querschnittsanalysen.
+Platten, dann die Querschnittsanalysen. Ein Balkensystem fuehrt keine
+Nachweise und hat darum hier keine Gruppe -- seine Ergebnisse stehen in
+seiner Herleitung.
 
 Die Urteile kommen fertig aus der Loesung: ohne die stillen, und je
 Nachweis, der seine Lagen sammelt, nur die schlechteste. Hier zu filtern

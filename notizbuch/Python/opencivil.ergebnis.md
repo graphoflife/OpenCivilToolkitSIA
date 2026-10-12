@@ -1,5 +1,5 @@
 ---
-erzeugt: 66524f6d9938
+erzeugt: 4a200f6a0bdf
 art: modul
 tags: [modul]
 ---
@@ -98,6 +98,17 @@ def wert(self, wert_id: str) -> Wert
 
 Ein einzelner gerechneter Wert, mit Einheit, Herkunft und Norm.
 
+#### Ergebnis.balkensystem
+
+```python
+def balkensystem(self, bauteil: str) -> 'Balkensystem'
+```
+
+Ein gerechnetes Balkensystem -- nach Name oder Kennung. Am Objekt
+stehen das Ergebnis (`ergebnis`: Meldungen, Faelle mit
+Verschiebungen und Lagerkraeften) und je Fall die Verlaeufe der
+Schnittgroessen (`verlaeufe("Eigengewicht")`), in SI.
+
 #### Ergebnis.analysen
 
 ```python
@@ -160,6 +171,7 @@ was auf dem Rechner an TeX liegt, und das ist nicht ueberall etwas.
 - [[opencivil.core.wert]]
 - [[opencivil.projekt]]
 - [[opencivil.spannungsanalyse]]
+- [[opencivil.stabwerk.rechnung]]
 
 ## Gebraucht von
 

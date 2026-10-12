@@ -59,7 +59,7 @@ from opencivil.nachweis.rechenwahl import FASERARTEN, RECHENARTEN, SPANNUNGSARTE
 from opencivil.spannungsanalyse import Analyseart
 from opencivil.stabwerk import querschnitte as stabquerschnitte
 from opencivil.stabwerk.modell import Lastart, Lastrichtung
-from opencivil.web import diagrammdaten
+from opencivil.web import balkendaten, diagrammdaten
 
 #: Die Wertesaetze und Betongesetze mit Beschriftung -- dieselben in der
 #: Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse. ``kurz`` fuer
@@ -486,6 +486,11 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None) -> dict:
         ergebnis["neigungskurven"] = diagrammdaten.neigungskurven(aufbau)
         ergebnis["spannungsanalysen"] = diagrammdaten.spannungsanalysen(aufbau, loesung)
         ergebnis["zusammenfassungen"] = zusammenfassungen(loesung, aufbau)
+        # Je Balkensystem die knappe Uebersicht; die Verlaeufe fuer die
+        # Bilder holt eine eigene Anfrage (dienst.balkensystem_verlauf).
+        ergebnis["balkensysteme"] = endlich({
+            kennung: balkendaten.uebersicht(system)
+            for kennung, system in aufbau.balkensysteme.items()})
         ergebnis["warnungen"] = list(aufbau.warnungen)
         ergebnis["zuordnung"] = zuordnung(aufbau)
         # Je Blatt und Zeile, was neben der Zeile steht -- gesetzt vom Kern.
@@ -689,5 +694,17 @@ def zuordnung(aufbau: Aufbau) -> dict:
                 "werte": {k: d.id for k, d in analyse.definitionen.items()},
             }
             for kennung, analyse in aufbau.querschnittsanalysen.items()
+        },
+        # Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus
+        # Querschnitt und Material EA und EI.
+        "balkensysteme": {
+            kennung: {
+                "namensraum": system.id,
+                "name": system.name,
+                "querschnitte": {q: {"A": A, "I": I} for q, (A, I) in system.flaechen.items()},
+                "steifigkeiten": [{"querschnitt": s.querschnitt, "material": s.material,
+                                   "EA": s.EA, "EI": s.EI} for s in system.steifigkeiten],
+            }
+            for kennung, system in aufbau.balkensysteme.items()
         },
     }

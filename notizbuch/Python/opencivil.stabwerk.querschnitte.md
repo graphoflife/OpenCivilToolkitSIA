@@ -1,5 +1,5 @@
 ---
-erzeugt: de8571e8b9bb
+erzeugt: 542b546246fd
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,7 @@ Was ein Stab des ebenen Rahmens von seinem Querschnitt braucht: die Flaeche
 `A` und das Flaechentraegheitsmoment `I` um die Achse senkrecht zur
 Ebene des Rahmens. Je Vorlage stehen die Formeln hier -- als Vorlage in
 Zeichen und als Rechnung --, und aus ihnen entstehen im Rechenwerk die
-Formeln mit Zahlen ([[opencivil.stabwerk|opencivil.stabwerk.rechnung]]).
+Formeln mit Zahlen ([[opencivil.stabwerk.rechnung]]).
 
 
 ## DIE VORLAGEN
@@ -131,4 +131,5 @@ def vorlage(schluessel: str) -> Stabvorlage
 ## Gebraucht von
 
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.stabwerk.rechnung]]
 - [[opencivil.web.api]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: e1431434f7cd
+erzeugt: 9a96fcbe8391
 art: modul
 tags: [modul]
 ---
@@ -271,5 +271,7 @@ Beiwerten gewichteten Lastfaelle.
 ## Gebraucht von
 
 - [[opencivil.projekt.balkensystem]]
+- [[opencivil.stabwerk.herleitung]]
+- [[opencivil.stabwerk.rechnung]]
 - [[opencivil.stabwerk.system]]
 - [[opencivil.web.api]]

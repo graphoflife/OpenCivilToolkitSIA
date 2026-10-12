@@ -1,5 +1,5 @@
 ---
-erzeugt: fde83e9c5936
+erzeugt: 3c6aeddea60e
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -79,14 +79,17 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.querschnitt.werkstoffgesetz]] – Spannungs-Dehnungs-Beziehungen.
   - [[opencivil.spannungsanalyse]] – den Querschnitt ansehen, ohne ihn nachzuweisen.
 - [[opencivil.stabwerk]] – ebene Stabwerke nach der Steifigkeitsmethode.
+    - [[opencivil.stabwerk.herleitung]] – wie ein Balkensystem seine Rechnung aufschreibt.
     - [[opencivil.stabwerk.matrix]] – das Gleichungssystem eines Stabwerks.
     - [[opencivil.stabwerk.modell]] – was gerechnet wird: das ebene Stabwerk in SI.
     - [[opencivil.stabwerk.querschnitte]] – die Querschnitte der Staebe, nach Vorlage.
+    - [[opencivil.stabwerk.rechnung]] – das Balkensystem im Rechenwerk.
     - [[opencivil.stabwerk.stab]] – der ebene Stab: Steifigkeit, Lasten, Bettung.
     - [[opencivil.stabwerk.system]] – das ganze Stabwerk: Unbekannte, Zusammenbau, Loesen.
     - [[opencivil.stabwerk.verlauf]] – Schnittgroessen und Biegelinie laengs eines Stabs.
 - [[opencivil.web]] – die Oberflaeche, von der Seite des Rechenkerns.
     - [[opencivil.web.api]] – Uebersetzung der Rechenergebnisse nach JSON.
+    - [[opencivil.web.balkendaten]] – was die Oberflaeche von einem Balkensystem zeigt.
     - [[opencivil.web.bruecke]] – Welche Dateien der Browser laden muss.
     - [[opencivil.web.diagrammdaten]] – was die Oberflaeche zeichnet, als JSON.
     - [[opencivil.web.dienst]] – Der Rechendienst, unabhaengig vom Transportweg.

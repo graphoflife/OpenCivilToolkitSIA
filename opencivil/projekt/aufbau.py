@@ -2,11 +2,11 @@
 opencivil/projekt/aufbau.py -- aus der Beschreibung ein Rechenwerk.
 
 VERANTWORTUNG:
-:func:`aufbauen` macht aus einem :class:`Projekt` Baustoffe, Querschnitte und
-Nachweise und meldet sie in einem :class:`Rechenwerk` an. Heraus kommt ein
-:class:`Aufbau` -- das Werk samt allen Nachweisobjekten, nach Platte und Art
-abgelegt, damit Schnittstelle, Zwischenspeicher und Bewehrungssuche sie
-wiederfinden.
+:func:`aufbauen` macht aus einem :class:`Projekt` Baustoffe, Querschnitte,
+Nachweise und Balkensysteme und meldet sie in einem :class:`Rechenwerk` an.
+Heraus kommt ein :class:`Aufbau` -- das Werk samt allen Nachweisobjekten und
+Systemen, nach Bauteil und Art abgelegt, damit Schnittstelle,
+Zwischenspeicher und Bewehrungssuche sie wiederfinden.
 
 Die Beschreibung selbst rechnet nichts; hier wird sie zum ersten Mal
 Rechnung. Darum stehen auch die Pruefungen hier, die erst beim Bauen
@@ -18,8 +18,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import (
-    TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Mapping, Sequence,
-    Tuple,
+    TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Mapping, Optional,
+    Sequence, Tuple,
 )
 
 from opencivil.core.einheiten import (
@@ -56,6 +56,7 @@ from opencivil.projekt.eintraege import (
     Gebrauchsliste, KombinationEintrag, MaterialEintrag, SpannungsfallEintrag,
     abgeleiteter_fallname,
 )
+from opencivil.projekt.balkensystem import BalkensystemEintrag, StabquerschnittEintrag
 from opencivil.projekt.lesen import ProjektFehler, schalter_aus
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
@@ -64,6 +65,7 @@ from opencivil.nachweis.schiefe_biegung import SchiefeBiegung
 from opencivil.nachweis.schubwandnachweis import Schubwandnachweis
 from opencivil.querschnitt.analyse import Flaechenteil, Lastfall, Querschnittsanalyse
 from opencivil.querschnitt.geometrie import GeometrieFehler
+from opencivil.stabwerk.rechnung import Balkensystem, Stabquerschnitt
 
 if TYPE_CHECKING:
     from opencivil.projekt.projekt import Projekt
@@ -144,6 +146,9 @@ class Aufbau:
     qa_duktilitaet: Dict[str, DuktilitaetQA] = field(default_factory=dict)
     qa_sproede: Dict[str, SproedesVersagenQA] = field(default_factory=dict)
 
+    balkensysteme: Dict[str, Balkensystem] = field(default_factory=dict)
+    """Die Balkensysteme, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis."""
+
     warnungen: List[str] = field(default_factory=list)
 
     #: Die Felder, in denen die Nachweise einer Platte stehen -- die eine
@@ -157,6 +162,11 @@ class Aufbau:
                       "rissnormalkraft", "sproede", "zwaengung_biegung",
                       "spannung_riss", "spannung", "knicken",
                       "qa_biegung", "qa_schub", "qa_duktilitaet", "qa_sproede")
+
+    #: Was zu einem Bauteil gehoert und mit ihm zwischengespeichert wird: die
+    #: Nachweise und die Balkensysteme. Ein System urteilt nicht, aber sein
+    #: Ergebnis steht am Objekt, und die Bilder lesen es dort.
+    TEILEFELDER = NACHWEISFELDER + ("balkensysteme",)
 
     def nachweise_je_feld(self):
         """Alle Nachweise, Feld fuer Feld und in der Reihenfolge der Liste."""
@@ -186,9 +196,9 @@ class Aufbau:
         Iterationsschritte. Die Schnittstelle liest das aus den Objekten, also
         muessen die Objekte mitwandern und nicht bloss ihre Ausgabewerte.
         """
-        return {feld: {s: w for s, w in eintraege.items()
+        return {feld: {s: w for s, w in getattr(self, feld).items()
                        if self.gehoert_zu(s, kennung)}
-                for feld, eintraege in self.nachweise_je_feld()}
+                for feld in self.TEILEFELDER}
 
     def teile_setzen(self, kennung: str, teile: Mapping[str, Dict[str, Any]]) -> None:
         """Die Nachweisobjekte einer Platte durch frueher gerechnete ersetzen."""
@@ -199,11 +209,17 @@ class Aufbau:
             ziel.update(eintraege)
 
     def ziele_von(self, kennung: str) -> List[str]:
-        """Die Rechenziele einer einzelnen Platte -- Eckwerte und Nachweise."""
+        """Die Rechenziele eines einzelnen Bauteils -- Eckwerte und Nachweise, oder sein System."""
         alle = self.eckwertziele() + self.alle_nachweisziele()
         raeume = {w.id for _, eintraege in self.nachweise_je_feld()
                   for s, w in eintraege.items() if self.gehoert_zu(s, kennung)}
-        return [z for z in alle if any(z.startswith(f"{r}.") for r in raeume)]
+        return ([z for z in alle if any(z.startswith(f"{r}.") for r in raeume)]
+                + self.systemziele(kennung))
+
+    def systemziele(self, kennung: Optional[str] = None) -> List[str]:
+        """Was die Balkensysteme rechnen -- alle, oder das eine mit dieser Kennung."""
+        return [z for k, s in self.balkensysteme.items() if kennung in (None, k)
+                for z in s.ziele()]
 
     def eckwertziele(self) -> List[str]:
         """
@@ -217,7 +233,8 @@ class Aufbau:
     def bauteile(self) -> List["Bauteilkopf"]:
         """
         Jedes Bauteil, in der Reihenfolge der Beschreibung: erst die Platten,
-        dann die Querschnittsanalysen.
+        dann die Querschnittsanalysen, dann die Balkensysteme -- sie lesen
+        Werte der beiden anderen.
 
         Die eine Stelle, die diese Reihenfolge festlegt -- fuer die Rechenziele,
         den Zwischenspeicher und die Zusammenfassung.
@@ -225,7 +242,10 @@ class Aufbau:
         return ([Bauteilkopf(k, q.name, q.id, "platte")
                  for k, q in self.querschnitte.items()]
                 + [Bauteilkopf(k, a.name, a.id, "querschnittsanalyse")
-                   for k, a in self.querschnittsanalysen.items()])
+                   for k, a in self.querschnittsanalysen.items()]
+                + [Bauteilkopf(k, s.name, s.id, "balkensystem", nachweise=False,
+                               bezuege=tuple(s.bezuege))
+                   for k, s in self.balkensysteme.items()])
 
     def ziele_je_bauteil(self) -> List[Tuple[str, List[str]]]:
         """
@@ -256,10 +276,11 @@ class Aufbau:
 
     def berichtsziele(self) -> List[str]:
         """
-        Was im Bericht steht: Nachweise, Eckwerte, Blätter -- ohne die
-        Baustoffkennwerte, die niemand braucht.
+        Was im Bericht steht: Nachweise, Eckwerte, Systeme, Blätter -- ohne
+        die Baustoffkennwerte, die niemand braucht.
         """
-        return self.alle_nachweisziele() + self.eckwertziele() + self.blattziele()
+        return (self.alle_nachweisziele() + self.eckwertziele() + self.systemziele()
+                + self.blattziele())
 
     def urteile_von(self, kennung: str, urteile: Iterable[NachweisUrteil],
                     ) -> List[NachweisUrteil]:
@@ -302,7 +323,13 @@ class Bauteilkopf:
     """Der Namensraum seiner Werte und Urteile."""
 
     art: str
-    """``platte`` oder ``querschnittsanalyse``."""
+    """``platte``, ``querschnittsanalyse`` oder ``balkensystem``."""
+
+    nachweise: bool = True
+    """Ob es Nachweise fuehrt -- ein Balkensystem rechnet nur, es urteilt nicht."""
+
+    bezuege: Tuple[str, ...] = ()
+    """Die Bauteile, deren Werte es liest: Platten und Analysen, aus denen ein System Querschnitte nimmt."""
 
 
 #: Wie ein fertig gebauter Nachweis angemeldet wird: Feld im
@@ -368,6 +395,12 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
 
     for eintrag in projekt.querschnittsanalysen:
         _querschnittsanalyse(eintrag, aufbau, eintragen)
+
+    # Auch im schnellen Aufbau: die Formelsammlung entsteht aus ihm. Die
+    # Bewehrungssuche loest nur Nachweisziele, ein System kostet sie also
+    # nur das Anmelden.
+    for eintrag in projekt.balkensysteme:
+        _balkensystem(eintrag, aufbau)
 
     # Die Bewehrungssuche braucht keine Blätter -- sie liest nur Urteile.
     if not schnell:
@@ -500,6 +533,57 @@ def _querschnittsanalyse(eintrag: QuerschnittsanalyseEintrag, aufbau: Aufbau,
     sproede = SproedesVersagenQA(analyse, einachsig=eintrag.einachsig)
     sproede.still = not eintrag.sproede
     eintragen("qa_sproede", eintrag.kennung, sproede)
+
+
+def _balkensystem(eintrag: BalkensystemEintrag, aufbau: Aufbau) -> None:
+    """
+    Ein Balkensystem: das Stabwerk der Beschreibung, seine Querschnitte
+    aufgeloest. Hart scheitert nur ein Verweis, den es nicht gibt -- ein
+    Material, eine Platte, eine Querschnittsanalyse --; was dem System selbst
+    fehlt, steht in seinen Meldungen, und der Rest des Projekts rechnet.
+    """
+    wo = f"Balkensystem '{eintrag.name}'"
+    modell = eintrag.modell()
+    stoffe: Dict[str, Baustoff] = {}
+    for _, material in modell.paare.values():
+        stoff = aufbau.baustoffe.get(material)
+        if stoff is None:
+            raise ProjektFehler(f"{wo}: das Material '{material}' gibt es im Projekt nicht.")
+        stoffe[material] = stoff
+    system = Balkensystem(
+        name=eintrag.name, kennung=eintrag.kennung, praefix=f"balkensystem.{eintrag.kennung}",
+        system=modell.system, paare=modell.paare, meldungen=modell.meldungen,
+        querschnitte=[_stabquerschnitt(q, aufbau, wo) for q in eintrag.querschnitte],
+        stoffe=stoffe)
+    aufbau.balkensysteme[eintrag.kennung] = system
+    system.ins_rechenwerk(aufbau.werk)
+
+
+def _stabquerschnitt(q: StabquerschnittEintrag, aufbau: Aufbau, wo: str) -> Stabquerschnitt:
+    """Woher A und I eines Querschnitts kommen -- die Platte oder Analyse dazu muss es geben."""
+    if q.art == "vorlage":
+        vorlage = q.stabvorlage()
+        return Stabquerschnitt(q.kennung, q.name, q.art, vorlage=vorlage,
+                               masse=q.masse_mit_vorgaben(), herkunft=vorlage.name,
+                               fehler=q.fehler() or "")
+    if q.art == "kennwerte":
+        return Stabquerschnitt(q.kennung, q.name, q.art, masse=dict(q.masse),
+                               herkunft="von Hand", fehler=q.fehler() or "")
+    if q.art == "platte":
+        platte = aufbau.querschnitte.get(q.bezug)
+        if platte is None:
+            raise ProjektFehler(f"{wo}: der Querschnitt «{q.name}» nimmt die Platte "
+                                f"'{q.bezug}', die es im Projekt nicht gibt.")
+        return Stabquerschnitt(q.kennung, q.name, q.art, bezug=q.bezug,
+                               quelle={"b": platte.id_von("b"), "h": platte.id_von("h")},
+                               herkunft=f"Platte «{platte.name}»")
+    analyse = aufbau.querschnittsanalysen.get(q.bezug)
+    if analyse is None:
+        raise ProjektFehler(f"{wo}: der Querschnitt «{q.name}» nimmt die Querschnittsanalyse "
+                            f"'{q.bezug}', die es im Projekt nicht gibt.")
+    return Stabquerschnitt(q.kennung, q.name, q.art, bezug=q.bezug,
+                           quelle={"A": analyse.id_von("A"), "I": analyse.id_von("I_y")},
+                           herkunft=f"Querschnittsanalyse «{analyse.name}»")
 
 
 def _analyse(eintrag: QuerschnittsanalyseEintrag,

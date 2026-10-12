@@ -1826,6 +1826,7 @@
         "Ergebnis.warnungen",
         "Ergebnis.urteile_von",
         "Ergebnis.wert",
+        "Ergebnis.balkensystem",
         "Ergebnis.analysen",
         "Ergebnis.zusammenfassung",
         "Ergebnis.bericht",
@@ -2495,6 +2496,7 @@
         "Aufbau.teile_von",
         "Aufbau.teile_setzen",
         "Aufbau.ziele_von",
+        "Aufbau.systemziele",
         "Aufbau.eckwertziele",
         "Aufbau.bauteile",
         "Aufbau.ziele_je_bauteil",
@@ -2507,6 +2509,8 @@
         "aufbauen",
         "_platte",
         "_querschnittsanalyse",
+        "_balkensystem",
+        "_stabquerschnitt",
         "_analyse",
         "_lagennachweise",
         "_spannungsnachweise",
@@ -2535,10 +2539,13 @@
         "StabquerschnittEintrag.aus_dict",
         "StabquerschnittEintrag.stabvorlage",
         "StabquerschnittEintrag.masse_mit_vorgaben",
+        "StabquerschnittEintrag.fehler",
         "LastfallEintrag",
         "LastfallEintrag.aus_dict",
         "LastkombinationEintrag",
         "LastkombinationEintrag.aus_dict",
+        "Modell",
+        "Modell.gueltig",
         "BalkensystemEintrag",
         "BalkensystemEintrag.aus_dict",
         "BalkensystemEintrag.pruefen",
@@ -2547,6 +2554,8 @@
         "BalkensystemEintrag.linie_von",
         "BalkensystemEintrag.enden",
         "BalkensystemEintrag.laenge",
+        "BalkensystemEintrag.stelle_auf",
+        "BalkensystemEintrag.modell",
         "BalkensystemEintrag.netz",
         "BalkensystemEintrag.linie",
         "BalkensystemEintrag.lager_an",
@@ -3093,6 +3102,18 @@
       "stichworte": []
     },
     {
+      "name": "opencivil.stabwerk.herleitung",
+      "pfad": "Python/opencivil.stabwerk.herleitung.md",
+      "art": "modul",
+      "kurz": "wie ein Balkensystem seine Rechnung aufschreibt.",
+      "stichworte": [
+        "schreiben",
+        "_teilname",
+        "_gleichgewicht",
+        "_zahl"
+      ]
+    },
+    {
       "name": "opencivil.stabwerk.matrix",
       "pfad": "Python/opencivil.stabwerk.matrix.md",
       "art": "modul",
@@ -3156,6 +3177,27 @@
         "Stabvorlage.pruefen",
         "Stabvorlage.kennwerte",
         "vorlage"
+      ]
+    },
+    {
+      "name": "opencivil.stabwerk.rechnung",
+      "pfad": "Python/opencivil.stabwerk.rechnung.md",
+      "art": "modul",
+      "kurz": "das Balkensystem im Rechenwerk.",
+      "stichworte": [
+        "Stabquerschnitt",
+        "Steifigkeit",
+        "SteifigkeitsmethodeProzedur",
+        "SteifigkeitsmethodeProzedur.rechne",
+        "Balkensystem",
+        "Balkensystem.abschnitt",
+        "Balkensystem.bezuege",
+        "Balkensystem._querschnitt",
+        "Balkensystem._steifigkeit",
+        "Balkensystem.ins_rechenwerk",
+        "Balkensystem.ziele",
+        "Balkensystem.rechnen_und_schreiben",
+        "Balkensystem.verlaeufe"
       ]
     },
     {
@@ -3265,6 +3307,17 @@
       ]
     },
     {
+      "name": "opencivil.web.balkendaten",
+      "pfad": "Python/opencivil.web.balkendaten.md",
+      "art": "modul",
+      "kurz": "was die Oberflaeche von einem Balkensystem zeigt.",
+      "stichworte": [
+        "uebersicht",
+        "verlauf",
+        "faelle"
+      ]
+    },
+    {
       "name": "opencivil.web.bruecke",
       "pfad": "Python/opencivil.web.bruecke.md",
       "art": "modul",
@@ -3337,12 +3390,16 @@
         "pruefen",
         "rechnen",
         "_stromabwaerts",
+        "_abdruck",
+        "_bauteil_rechnen",
         "querkraftkurven",
         "bericht",
         "dateiname",
         "bewehrung_suchen",
         "geometrie",
         "analysediagramme",
+        "balkensystem_verlauf",
+        "balkensystem_bearbeiten",
         "_vorlagenwahl",
         "vorlage",
         "vorlage_einsetzen",

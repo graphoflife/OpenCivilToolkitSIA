@@ -35,10 +35,10 @@ from opencivil import bewehrungssuche
 from opencivil.bericht.latex_dokument import als_tex
 from opencivil.bericht.markdown import als_markdown
 from opencivil.core.rechenwerk import Loesung, RechenwerkFehler
-from opencivil.projekt import BAUTEILE, Projekt, ProjektFehler
+from opencivil.projekt import BAUTEILE, BalkensystemEintrag, Projekt, ProjektFehler
 from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.interaktion import GROESSEN
-from opencivil.web import api, diagrammdaten, speicher
+from opencivil.web import api, balkendaten, diagrammdaten, speicher
 from opencivil.web.api import endlich
 
 #: Das Gedaechtnis zwischen zwei Anfragen -- siehe :mod:`opencivil.web.speicher`.
@@ -173,11 +173,12 @@ def _stromabwaerts(projekt: Projekt, aufbau) -> Loesung:
     materialziele = aufbau.materialziele()
     gesamt = aufbau.werk.loese(*materialziele)
     bekannt = dict(gesamt.werte)
+    beschreibung = projekt.als_dict()
 
     for kennung, eigene in aufbau.ziele_je_bauteil():
         if not eigene:
             continue
-        stempel = speicher.abdruck(projekt.als_dict(), kennung)
+        stempel = _abdruck(beschreibung, aufbau, kennung)
         teil = SPEICHER.hole(kennung, stempel)
         if teil is None:
             lauf = aufbau.werk.loese(*eigene, bekannt=bekannt)
@@ -200,6 +201,25 @@ def _stromabwaerts(projekt: Projekt, aufbau) -> Loesung:
             gesamt, speicher.als_teil(
                 aufbau.werk.loese(*blattziele, bekannt=bekannt), {}, ohne=bekannt))
     return gesamt
+
+
+def _abdruck(beschreibung: Mapping[str, Any], aufbau, kennung: str) -> str:
+    """Der Fingerabdruck eines Bauteils -- mit den Bauteilen, deren Werte es liest."""
+    kopf = next(b for b in aufbau.bauteile() if b.kennung == kennung)
+    return speicher.abdruck(beschreibung, kennung, kopf.bezuege)
+
+
+def _bauteil_rechnen(projekt: Projekt, aufbau, kennung: str) -> None:
+    """
+    Ein Bauteil gerechnet: aus dem Zwischenspeicher, wenn er es zu genau
+    dieser Beschreibung noch hat -- nach einer Rechnung ist das der Fall --,
+    sonst dieses eine.
+    """
+    teil = SPEICHER.hole(kennung, _abdruck(projekt.als_dict(), aufbau, kennung))
+    if teil is not None:
+        aufbau.teile_setzen(kennung, teil.teile)
+    else:
+        aufbau.werk.loese(*aufbau.materialziele(), *aufbau.ziele_von(kennung))
 
 
 def querkraftkurven(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
@@ -389,12 +409,82 @@ def analysediagramme(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     except (TypeError, ValueError):
         raise DienstFehler(400, f"Der Wert des Schnitts ist keine Zahl: {wahl.get('wert')!r}.") from None
     aufbau = projekt.aufbauen()
-    teil = SPEICHER.hole(kennung, speicher.abdruck(projekt.als_dict(), kennung))
-    if teil is not None:
-        aufbau.teile_setzen(kennung, teil.teile)
-    else:
-        aufbau.werk.loese(*aufbau.materialziele(), *aufbau.ziele_von(kennung))
+    _bauteil_rechnen(projekt, aufbau, kennung)
     return {"diagramme": endlich(diagrammdaten.analyse(aufbau, kennung, (fest, wert)))}
+
+
+def _balkensystem(projekt: Projekt, rumpf: Mapping[str, Any]) -> BalkensystemEintrag:
+    kennung = str(rumpf.get("kennung") or "")
+    try:
+        eintrag = projekt.bauteil(kennung)
+    except ProjektFehler as fehler:
+        raise DienstFehler(400, str(fehler)) from None
+    if not isinstance(eintrag, BalkensystemEintrag):
+        raise DienstFehler(400, f"'{kennung}' ist kein Balkensystem.")
+    return eintrag
+
+
+def balkensystem_verlauf(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Die Bilder eines Balkensystems in einem Fall: je Stab N, V, M und die
+    Verschiebung, je Knoten seine Verschiebung. Eine eigene Anfrage wie die
+    Diagramme der Querschnittsanalyse -- gross, und nur gebraucht, wenn
+    jemand hinsieht. Gerechnet wird aus dem Zwischenspeicher, wenn er das
+    System zu dieser Beschreibung noch hat.
+
+    Ein System, das sich nicht rechnen laesst, ist keine falsche Anfrage:
+    dann ist ``verlauf`` leer, und die Uebersicht sagt warum.
+    """
+    projekt = _projekt(rumpf)
+    eintrag = _balkensystem(projekt, rumpf)
+    aufbau = projekt.aufbauen()
+    _bauteil_rechnen(projekt, aufbau, eintrag.kennung)
+    system = aufbau.balkensysteme[eintrag.kennung]
+    uebersicht = endlich(balkendaten.uebersicht(system))
+    fall = str(rumpf.get("fall") or "")
+    if not system.ergebnis.faelle:
+        return {"verlauf": None, "uebersicht": uebersicht}
+    if fall not in balkendaten.faelle(system):
+        raise DienstFehler(400, f"Einen Fall «{fall}» gibt es in «{eintrag.name}» nicht. "
+                                f"Gerechnet sind: {', '.join(balkendaten.faelle(system))}.")
+    return {"verlauf": endlich(balkendaten.verlauf(system, fall)), "uebersicht": uebersicht}
+
+
+def balkensystem_bearbeiten(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Teilt eine Linie oder kehrt Linien um -- im Kern, weil dabei Lastwerte
+    entstehen: der Wert einer Trapezlast am Schnitt, gespiegelte Stellen.
+    Zurueck kommt das ganze System und die Kennung einer neuen Linie; die
+    Oberflaeche uebernimmt es in einem Schritt, den man rueckgaengig machen
+    kann.
+
+    ``teilen``: ``linie`` und die Stelle -- ``stelle`` in m ab dem Anfang
+    oder ein ``punkt`` [x, z], der auf die Linie gelotet wird.
+    ``umkehren``: ``linien``, eine oder mehrere.
+    """
+    projekt = _projekt(rumpf)
+    eintrag = _balkensystem(projekt, rumpf)
+    aktion = str(rumpf.get("aktion") or "")
+    neu = []
+    try:
+        if aktion == "teilen":
+            linie = str(rumpf.get("linie") or "")
+            if rumpf.get("punkt") is not None:
+                punkt = rumpf["punkt"]
+                stelle = eintrag.stelle_auf(linie, (float(punkt[0]), float(punkt[1])))
+            else:
+                stelle = float(rumpf.get("stelle"))
+            neu.append(eintrag.teilen(linie, stelle).kennung)
+        elif aktion == "umkehren":
+            for linie in rumpf.get("linien") or []:
+                eintrag.umkehren(str(linie))
+        else:
+            raise DienstFehler(400, f"Ein Balkensystem lässt sich «teilen» oder «umkehren», "
+                                    f"nicht «{aktion}».")
+    except (TypeError, ValueError, IndexError):
+        raise DienstFehler(400, "Die Stelle zum Teilen muss eine Zahl sein oder ein Punkt "
+                                "mit zwei Zahlen.") from None
+    return {"balkensystem": eintrag.als_dict(), "neu": neu}
 
 
 def _vorlagenwahl(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
@@ -474,6 +564,8 @@ ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "bewehrung_suchen": bewehrung_suchen,
     "geometrie": geometrie,
     "analysediagramme": analysediagramme,
+    "balkensystem_verlauf": balkensystem_verlauf,
+    "balkensystem_bearbeiten": balkensystem_bearbeiten,
     "vorlage": vorlage,
     "vorlage_einsetzen": vorlage_einsetzen,
 }

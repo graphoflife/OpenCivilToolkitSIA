@@ -1,5 +1,5 @@
 ---
-erzeugt: a7f406f3d45f
+erzeugt: b3699a0f36f4
 art: modul
 tags: [modul]
 ---
@@ -143,6 +143,24 @@ Aufbau des Protokolls. Ein Zwischenspeicher, der die Reihenfolge
 verschoebe, aenderte den Bericht, und das waere keine Beschleunigung mehr,
 sondern eine andere Ausgabe.
 
+### _abdruck
+
+```python
+def _abdruck(beschreibung: Mapping[str, Any], aufbau, kennung: str) -> str
+```
+
+Der Fingerabdruck eines Bauteils -- mit den Bauteilen, deren Werte es liest.
+
+### _bauteil_rechnen
+
+```python
+def _bauteil_rechnen(projekt: Projekt, aufbau, kennung: str) -> None
+```
+
+Ein Bauteil gerechnet: aus dem Zwischenspeicher, wenn er es zu genau
+dieser Beschreibung noch hat -- nach einer Rechnung ist das der Fall --,
+sonst dieses eine.
+
 ### querkraftkurven
 
 ```python
@@ -229,6 +247,37 @@ Anfrage, wie die M-V-Kurven.
 Die Nachweise selbst rechnen nicht noch einmal, wenn der Zwischenspeicher
 sie zu genau dieser Beschreibung noch hat -- nach einer Rechnung ist das
 der Fall. Sonst wird das eine Bauteil gerechnet.
+
+### balkensystem_verlauf
+
+```python
+def balkensystem_verlauf(rumpf: Mapping[str, Any]) -> Dict[str, Any]
+```
+
+Die Bilder eines Balkensystems in einem Fall: je Stab N, V, M und die
+Verschiebung, je Knoten seine Verschiebung. Eine eigene Anfrage wie die
+Diagramme der Querschnittsanalyse -- gross, und nur gebraucht, wenn
+jemand hinsieht. Gerechnet wird aus dem Zwischenspeicher, wenn er das
+System zu dieser Beschreibung noch hat.
+
+Ein System, das sich nicht rechnen laesst, ist keine falsche Anfrage:
+dann ist `verlauf` leer, und die Uebersicht sagt warum.
+
+### balkensystem_bearbeiten
+
+```python
+def balkensystem_bearbeiten(rumpf: Mapping[str, Any]) -> Dict[str, Any]
+```
+
+Teilt eine Linie oder kehrt Linien um -- im Kern, weil dabei Lastwerte
+entstehen: der Wert einer Trapezlast am Schnitt, gespiegelte Stellen.
+Zurueck kommt das ganze System und die Kennung einer neuen Linie; die
+Oberflaeche uebernimmt es in einem Schritt, den man rueckgaengig machen
+kann.
+
+`teilen`: `linie` und die Stelle -- `stelle` in m ab dem Anfang
+oder ein `punkt` [x, z], der auf die Linie gelotet wird.
+`umkehren`: `linien`, eine oder mehrere.
 
 ### _vorlagenwahl
 
@@ -319,6 +368,7 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.web.api]]
+- [[opencivil.web.balkendaten]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.speicher]]
 

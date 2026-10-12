@@ -116,8 +116,7 @@ def _flaeche(name: str, vorlage: str, funktion) -> Kennformel:
 
 
 def _traegheit(name: str, vorlage: str, funktion) -> Kennformel:
-    return Kennformel("I", "I", MIO_MM4, 2, "Flächenträgheitsmoment um die Achse senkrecht "
-                      "zur Ebene des Rahmens", vorlage, funktion,
+    return Kennformel("I", "I", MIO_MM4, 2, "Flächenträgheitsmoment", vorlage, funktion,
                       f"Flächenträgheitsmoment eines {name}")
 
 

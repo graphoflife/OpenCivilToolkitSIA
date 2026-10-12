@@ -1,5 +1,5 @@
 ---
-erzeugt: 30c671794c82
+erzeugt: c06f6548d00b
 art: modul
 tags: [modul]
 ---
@@ -9,11 +9,11 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-[[opencivil.projekt.aufbau#aufbauen|aufbauen]] macht aus einem [[opencivil.projekt.projekt#Projekt|Projekt]] Baustoffe, Querschnitte und
-Nachweise und meldet sie in einem [[opencivil.core.rechenwerk#Rechenwerk|Rechenwerk]] an. Heraus kommt ein
-[[opencivil.projekt.aufbau#Aufbau|Aufbau]] -- das Werk samt allen Nachweisobjekten, nach Platte und Art
-abgelegt, damit Schnittstelle, Zwischenspeicher und Bewehrungssuche sie
-wiederfinden.
+[[opencivil.projekt.aufbau#aufbauen|aufbauen]] macht aus einem [[opencivil.projekt.projekt#Projekt|Projekt]] Baustoffe, Querschnitte,
+Nachweise und Balkensysteme und meldet sie in einem [[opencivil.core.rechenwerk#Rechenwerk|Rechenwerk]] an.
+Heraus kommt ein [[opencivil.projekt.aufbau#Aufbau|Aufbau]] -- das Werk samt allen Nachweisobjekten und
+Systemen, nach Bauteil und Art abgelegt, damit Schnittstelle,
+Zwischenspeicher und Bewehrungssuche sie wiederfinden.
 
 Die Beschreibung selbst rechnet nichts; hier wird sie zum ersten Mal
 Rechnung. Darum stehen auch die Pruefungen hier, die erst beim Bauen
@@ -51,8 +51,10 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `qa_schub: Dict[str, Schubwandnachweis] = field(default_factory=dict)` – Querkraft und Torsion je Querschnittsanalyse.
 - `qa_duktilitaet: Dict[str, DuktilitaetQA] = field(default_factory=dict)`
 - `qa_sproede: Dict[str, SproedesVersagenQA] = field(default_factory=dict)`
+- `balkensysteme: Dict[str, Balkensystem] = field(default_factory=dict)` – Die Balkensysteme, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis.
 - `warnungen: List[str] = field(default_factory=list)`
 - `NACHWEISFELDER = ('nachweise', 'querkraft', 'duktilitaet', 'fehlende', 'rissnormalkraf…` – Die Felder, in denen die Nachweise einer Platte stehen -- die eine Stelle, an der ein neuer Nachweis eingetragen wird. Alle sind nach Kennung geschluesselt (`q1` oder `q1.x`) und alle tragen Nachweise mit `d_ausnutzung`. Daraus ergeben sich Rechenziele, Aufteilen nach Platte und Zwischenspeichern von selbst; frueher stand dieselbe Liste viermal da, und wer einen Nachweis hinzufuegte, musste alle vier finden.
+- `TEILEFELDER = NACHWEISFELDER + ('balkensysteme',)` – Was zu einem Bauteil gehoert und mit ihm zwischengespeichert wird: die Nachweise und die Balkensysteme. Ein System urteilt nicht, aber sein Ergebnis steht am Objekt, und die Bilder lesen es dort.
 
 #### Aufbau.nachweise_je_feld
 
@@ -112,7 +114,15 @@ Die Nachweisobjekte einer Platte durch frueher gerechnete ersetzen.
 def ziele_von(self, kennung: str) -> List[str]
 ```
 
-Die Rechenziele einer einzelnen Platte -- Eckwerte und Nachweise.
+Die Rechenziele eines einzelnen Bauteils -- Eckwerte und Nachweise, oder sein System.
+
+#### Aufbau.systemziele
+
+```python
+def systemziele(self, kennung: Optional[str]=None) -> List[str]
+```
+
+Was die Balkensysteme rechnen -- alle, oder das eine mit dieser Kennung.
 
 #### Aufbau.eckwertziele
 
@@ -131,7 +141,8 @@ def bauteile(self) -> List['Bauteilkopf']
 ```
 
 Jedes Bauteil, in der Reihenfolge der Beschreibung: erst die Platten,
-dann die Querschnittsanalysen.
+dann die Querschnittsanalysen, dann die Balkensysteme -- sie lesen
+Werte der beiden anderen.
 
 Die eine Stelle, die diese Reihenfolge festlegt -- fuer die Rechenziele,
 den Zwischenspeicher und die Zusammenfassung.
@@ -174,8 +185,8 @@ Die Blätter zuletzt -- sie lesen Werte der Platten, nie umgekehrt.
 def berichtsziele(self) -> List[str]
 ```
 
-Was im Bericht steht: Nachweise, Eckwerte, Blätter -- ohne die
-Baustoffkennwerte, die niemand braucht.
+Was im Bericht steht: Nachweise, Eckwerte, Systeme, Blätter -- ohne
+die Baustoffkennwerte, die niemand braucht.
 
 #### Aufbau.urteile_von
 
@@ -216,7 +227,9 @@ Was man von einem Bauteil wissen muss, um seine Teile zu finden.
 - `kennung: str`
 - `name: str`
 - `raum: str` – Der Namensraum seiner Werte und Urteile.
-- `art: str` – `platte` oder `querschnittsanalyse`.
+- `art: str` – `platte`, `querschnittsanalyse` oder `balkensystem`.
+- `nachweise: bool = True` – Ob es Nachweise fuehrt -- ein Balkensystem rechnet nur, es urteilt nicht.
+- `bezuege: Tuple[str, ...] = ()` – Die Bauteile, deren Werte es liest: Platten und Analysen, aus denen ein System Querschnitte nimmt.
 
 ### aufbauen
 
@@ -263,6 +276,25 @@ Biegung und Normalkraft immer -- ihre Eckwerte gehoeren dem Querschnitt.
 Querkraft und Torsion, sobald ein Lastfall sie hat oder die
 Laengszugkraft zaehlt. Duktilitaet und sproedes Versagen immer, still,
 wenn ausgeschaltet -- wie bei der Platte.
+
+### _balkensystem
+
+```python
+def _balkensystem(eintrag: BalkensystemEintrag, aufbau: Aufbau) -> None
+```
+
+Ein Balkensystem: das Stabwerk der Beschreibung, seine Querschnitte
+aufgeloest. Hart scheitert nur ein Verweis, den es nicht gibt -- ein
+Material, eine Platte, eine Querschnittsanalyse --; was dem System selbst
+fehlt, steht in seinen Meldungen, und der Rest des Projekts rechnet.
+
+### _stabquerschnitt
+
+```python
+def _stabquerschnitt(q: StabquerschnittEintrag, aufbau: Aufbau, wo: str) -> Stabquerschnitt
+```
+
+Woher A und I eines Querschnitts kommen -- die Platte oder Analyse dazu muss es geben.
 
 ### _analyse
 
@@ -373,6 +405,7 @@ Haelfte zu schliessen.
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.sproedes_versagen]]
+- [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.platte]]
@@ -381,6 +414,7 @@ Haelfte zu schliessen.
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.platte]]
+- [[opencivil.stabwerk.rechnung]]
 
 ## Gebraucht von
 
