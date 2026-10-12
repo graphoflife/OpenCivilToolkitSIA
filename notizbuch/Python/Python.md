@@ -1,5 +1,5 @@
 ---
-erzeugt: ab9283d3b3c7
+erzeugt: 41b1ae746c83
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -80,6 +80,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
 - [[opencivil.stabwerk]] – ebene Stabwerke nach der Steifigkeitsmethode.
     - [[opencivil.stabwerk.matrix]] – das Gleichungssystem eines Stabwerks.
     - [[opencivil.stabwerk.modell]] – was gerechnet wird: das ebene Stabwerk in SI.
+    - [[opencivil.stabwerk.querschnitte]] – die Querschnitte der Staebe, nach Vorlage.
     - [[opencivil.stabwerk.stab]] – der ebene Stab: Steifigkeit, Lasten, Bettung.
     - [[opencivil.stabwerk.system]] – das ganze Stabwerk: Unbekannte, Zusammenbau, Loesen.
     - [[opencivil.stabwerk.verlauf]] – Schnittgroessen und Biegelinie laengs eines Stabs.

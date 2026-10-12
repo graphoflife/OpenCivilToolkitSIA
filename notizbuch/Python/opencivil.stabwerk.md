@@ -1,5 +1,5 @@
 ---
-erzeugt: 6d4eebf3c267
+erzeugt: 67d5c55f332d
 art: modul
 tags: [modul]
 ---
@@ -30,6 +30,7 @@ Nur die Standardbibliothek: das Werkzeug rechnet auch im Browser.
 
 - [[opencivil.stabwerk.matrix]] – das Gleichungssystem eines Stabwerks.
 - [[opencivil.stabwerk.modell]] – was gerechnet wird: das ebene Stabwerk in SI.
+- [[opencivil.stabwerk.querschnitte]] – die Querschnitte der Staebe, nach Vorlage.
 - [[opencivil.stabwerk.stab]] – der ebene Stab: Steifigkeit, Lasten, Bettung.
 - [[opencivil.stabwerk.system]] – das ganze Stabwerk: Unbekannte, Zusammenbau, Loesen.
 - [[opencivil.stabwerk.verlauf]] – Schnittgroessen und Biegelinie laengs eines Stabs.

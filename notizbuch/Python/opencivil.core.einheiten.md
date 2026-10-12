@@ -1,5 +1,5 @@
 ---
-erzeugt: 9cbfe9d56fce
+erzeugt: 7bb21652d438
 art: modul
 tags: [modul]
 ---
@@ -417,6 +417,8 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - `KNM_PRO_M = Einheit('kNm/m', MOMENT_PRO_LAENGE, 1000.0, latex='\\mathrm{kNm}/\\ma…`
 - `MM2_PRO_M = Einheit('mm^2/m', FLAECHE_PRO_LAENGE, 1e-06, latex='\\mathrm{mm}^{2}/…`
 - `PRO_M = Einheit('1/m', KRUEMMUNG, 1.0, latex='\\mathrm{m}^{-1}', beschriftung…`
+- `KNM2 = Einheit('kNm^2', MOMENT * LAENGE, 1000.0, latex='\\mathrm{kNm}^{2}', …`
+- `KNM_PRO_RAD = Einheit('kNm/rad', MOMENT, 1000.0, latex='\\mathrm{kNm}/\\mathrm{rad}…`
 - `KG = Einheit('kg', MASSE, 1.0)`
 - `T = Einheit('t', MASSE, 1000.0)`
 - `KG_PRO_M3 = Einheit('kg/m^3', DICHTE, 1.0, latex='\\mathrm{kg}/\\mathrm{m}^{3}')`
@@ -426,6 +428,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - `H = Einheit('h', ZEIT, 3600.0)`
 - `RAD = Einheit('rad', DIMENSIONSLOS, 1.0)`
 - `GRAD = Einheit('Grad', DIMENSIONSLOS, math.pi / 180.0, latex='{}^{\\circ}', …`
+- `MRAD = Einheit('mrad', DIMENSIONSLOS, 0.001)` – Tausendstel Radiant -- die Drehungen eines Stabwerks.
 - `EINHEITEN = {e.name: e for e in (EINHEITSLOS, PROZENT, PROMILLE, M, DM, CM, MM, K…` – Alle benannten Einheiten, nach Namen auffindbar.
 
 ## Gebraucht von
@@ -460,5 +463,6 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.spannungsanalyse]]
+- [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.web.api]]
 - [[opencivil.web.diagrammdaten]]

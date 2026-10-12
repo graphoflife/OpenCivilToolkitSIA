@@ -3090,6 +3090,21 @@
       ]
     },
     {
+      "name": "opencivil.stabwerk.querschnitte",
+      "pfad": "Python/opencivil.stabwerk.querschnitte.md",
+      "art": "modul",
+      "kurz": "die Querschnitte der Staebe, nach Vorlage.",
+      "stichworte": [
+        "Mass",
+        "Kennformel",
+        "Stabvorlage",
+        "Stabvorlage.vorgaben",
+        "Stabvorlage.pruefen",
+        "Stabvorlage.kennwerte",
+        "vorlage"
+      ]
+    },
+    {
       "name": "opencivil.stabwerk.stab",
       "pfad": "Python/opencivil.stabwerk.stab.md",
       "art": "modul",

@@ -330,6 +330,12 @@ KNM_PRO_M = Einheit("kNm/m", MOMENT_PRO_LAENGE, 1e3, latex=r"\mathrm{kNm}/\mathr
 MM2_PRO_M = Einheit("mm^2/m", FLAECHE_PRO_LAENGE, 1e-6, latex=r"\mathrm{mm}^{2}/\mathrm{m}")
 PRO_M = Einheit("1/m", KRUEMMUNG, 1.0, latex=r"\mathrm{m}^{-1}", beschriftung="1/m")
 
+# Steifigkeiten der Stabwerke: Biegesteifigkeit EI, Drehfeder. Die Dehnsteifigkeit
+# EA ist eine Kraft (kN), eine Feder eine Kraft je Laenge (kN/m), eine Bettung
+# eine Kraft je Laenge und Meter (kN/m², wie eine Spannung).
+KNM2 = Einheit("kNm^2", MOMENT * LAENGE, 1e3, latex=r"\mathrm{kNm}^{2}", beschriftung="kNm²")
+KNM_PRO_RAD = Einheit("kNm/rad", MOMENT, 1e3, latex=r"\mathrm{kNm}/\mathrm{rad}")
+
 # Masse und Dichte
 KG = Einheit("kg", MASSE, 1.0)
 T = Einheit("t", MASSE, 1e3)
@@ -350,6 +356,8 @@ RAD = Einheit("rad", DIMENSIONSLOS, 1.0)
 # Gradzeichen ohnehin nicht hingehoert.
 GRAD = Einheit("Grad", DIMENSIONSLOS, math.pi / 180.0,
                latex=r"{}^{\circ}", beschriftung="°", klebt=True)
+#: Tausendstel Radiant -- die Drehungen eines Stabwerks.
+MRAD = Einheit("mrad", DIMENSIONSLOS, 1e-3)
 
 #: Alle benannten Einheiten, nach Namen auffindbar.
 EINHEITEN: Dict[str, Einheit] = {
@@ -362,9 +370,10 @@ EINHEITEN: Dict[str, Einheit] = {
         PA, KPA, MPA, GPA, N_PRO_MM2, KN_PRO_M2,
         NM, KNM, MNM,
         KN_PRO_M, KNM_PRO_M, MM2_PRO_M, PRO_M,
+        KNM2, KNM_PRO_RAD,
         KG, T, KG_PRO_M3, KN_PRO_M3,
         S, MIN, H,
-        RAD, GRAD,
+        RAD, GRAD, MRAD,
     )
 }
 
