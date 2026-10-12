@@ -13,6 +13,11 @@
  *   Rahmen ziehen      nach rechts: was ganz drin liegt, und jede Ecke im
  *                      Rahmen; nach links: auch, was er schneidet (wie in
  *                      AxisVM und AutoCAD)
+ *
+ * In einer verbundenen Zeichnung (`a.einstellung.verbunden`, ein Rahmen)
+ * gibt es keine Ecken: an einem Knoten wird der Knoten gewählt, und ein
+ * Rahmen nimmt die Knoten darin. Was der Adapter nicht wählbar nennt
+ * (`waehlbar`), trifft weder Klick noch Rahmen.
  */
 
 import { nachBild, nachWelt } from './cad_ansicht.js';
@@ -42,6 +47,7 @@ export function imSpiel(a) {
 export function treffer(a, bild) {
   const z = a.adapter.zeichnung();
   const m = a.modell;
+  const waehlbar = (art, e) => a.adapter.waehlbar?.(art, e) ?? true;
   const lagen = m.lagen(z);
   const welt = nachWelt(a.v, bild);
   const weit = NAEHE / a.v.massstab;
@@ -52,14 +58,20 @@ export function treffer(a, bild) {
     || (rang(p) - rang(q)) || (nummer(q) - nummer(p)) || (p.i - q.i);
 
   const an = new Map();
-  for (const x of m.ecken(z)) an.set(x.knoten, [...(an.get(x.knoten) || []), x]);
+  for (const x of m.ecken(z)) {
+    if (waehlbar(x.art, x.e)) an.set(x.knoten, [...(an.get(x.knoten) || []), x]);
+  }
   const liste = [];
   const nahe = (z.knoten || []).map((k) => ({ k, d: abstand(welt, m.lage(k)) }))
     .filter((x) => x.d <= weit).sort((p, q) => p.d - q.d);
   for (const { k } of nahe) {
     const ecken = an.get(k.kennung) || [];
-    // Ein Knoten, an dem nichts hängt, ist selbst zu wählen.
-    if (!ecken.length) liste.push(k.kennung);
+    // Ein Knoten, an dem nichts hängt, ist selbst zu wählen -- in einer
+    // verbundenen Zeichnung jeder.
+    if (!ecken.length || a.einstellung.verbunden) {
+      liste.push(k.kennung);
+      continue;
+    }
     for (const x of [...ecken].sort(vorrang)) if (!liste.includes(x.schluessel)) liste.push(x.schluessel);
   }
 
@@ -68,14 +80,14 @@ export function treffer(a, bild) {
   const flaechen = [];
   for (const { art, e } of m.elemente(z)) {
     const orte = m.verweise(art, e).map((k) => lagen.get(k));
-    if (orte.some((p) => !p)) continue;
+    if (orte.some((p) => !p) || !waehlbar(art, e)) continue;
     if (art.form === 'punkt') {
-      const r = Math.max(weit, a.adapter.trefferradius?.(art, e) || 0);
+      const r = Math.max(weit, a.adapter.trefferradius?.(a, art, e) || 0);
       const d = abstand(welt, orte[0]);
       if (d <= r) punkte.push({ kennung: e.kennung, d });
     } else if (art.form === 'linie') {
       const d = abstand(welt, aufStrecke(welt, orte[0], orte[1]).q);
-      if (d <= Math.max(weit, a.adapter.trefferradius?.(art, e) || 0)) linien.push({ kennung: e.kennung, d });
+      if (d <= Math.max(weit, a.adapter.trefferradius?.(a, art, e) || 0)) linien.push({ kennung: e.kennung, d });
     } else if (orte.length >= 3 && innen(welt, orte)) {
       flaechen.push({ kennung: e.kennung, d: Math.abs(flaecheVon(orte)) });
     }
@@ -139,9 +151,10 @@ export function rahmenWaehlen(a, start, ende, dazu) {
   const lagen = m.lagen(z);
   const neu = new Set(dazu ? a.auswahl : []);
   const ganzDrin = new Set();
+  const verbunden = a.einstellung.verbunden;
   for (const { art, e } of m.elemente(z)) {
     const orte = m.verweise(art, e).map((k) => lagen.get(k));
-    if (orte.some((x) => !x)) continue;
+    if (orte.some((x) => !x) || !(a.adapter.waehlbar?.(art, e) ?? true)) continue;
     let gewaehlt;
     if (art.form === 'punkt') gewaehlt = streckeImRechteck(orte[0], orte[0], rechteck, true);
     else if (art.form === 'linie') gewaehlt = streckeImRechteck(orte[0], orte[1], rechteck, ganz);
@@ -157,13 +170,16 @@ export function rahmenWaehlen(a, start, ende, dazu) {
     }
   }
   const drin = (q) => q && streckeImRechteck(q, q, rechteck, true);
-  if (ganz) {
+  if (ganz && !verbunden) {
     for (const x of m.ecken(z)) {
       if (!ganzDrin.has(x.e.kennung) && drin(lagen.get(x.knoten))) neu.add(x.schluessel);
     }
   }
+  // Freie Knoten im Rahmen -- in einer verbundenen Zeichnung jeder.
   const benutzung = m.benutzung(z);
-  for (const k of z.knoten || []) if (!benutzung.get(k.kennung) && drin(m.lage(k))) neu.add(k.kennung);
+  for (const k of z.knoten || []) {
+    if ((verbunden || !benutzung.get(k.kennung)) && drin(m.lage(k))) neu.add(k.kennung);
+  }
   a.auswahl = neu;
 }
 

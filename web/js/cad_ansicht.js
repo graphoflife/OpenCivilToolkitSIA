@@ -2,9 +2,9 @@
  * cad_ansicht.js -- Massstab, Ausschnitt und Raster eines Zeichenfensters.
  *
  * Allgemein: kennt weder Beton noch Querschnitt, nur eine Ebene mit zwei
- * Achsen in Millimetern, die erste nach rechts, die zweite nach oben. Welche
- * Namen sie tragen, sagt die App (der Querschnitt «y» und «z», ein Grundriss
- * hätte «x» und «y»).
+ * Achsen, die erste nach rechts, die zweite nach oben. Welche Namen sie
+ * tragen und in welcher Einheit gezeichnet wird, sagt die App (der
+ * Querschnitt «y» und «z» in mm, das Balkensystem «x» und «z» in m).
  *
  * Gerechnet wird im Bild in Pixeln: die viewBox des SVG ist so gross wie das
  * Bild selbst, und alles Umrechnen geschieht hier. So bleiben Striche und
@@ -13,20 +13,23 @@
 
 import { svgEl } from './dom.js';
 
-/** Eine leere Ansicht: noch nie gemessen, noch nie eingepasst. */
-export function ansichtNeu() {
-  return { massstab: null, ursprung: [0, 0], breite: 0, hoehe: 0 };
+/**
+ * Eine leere Ansicht: noch nie gemessen, noch nie eingepasst. `grenzen`:
+ * kleinster und grösster Massstab, in Bildpunkten je Einheit der Zeichnung.
+ */
+export function ansichtNeu(grenzen = [1e-3, 80]) {
+  return { massstab: null, ursprung: [0, 0], breite: 0, hoehe: 0, grenzen };
 }
 
-/** Welt (mm) -> Bild (px). */
+/** Welt -> Bild (px). */
 export const nachBild = (v, [a, b]) => [v.ursprung[0] + v.massstab * a, v.ursprung[1] - v.massstab * b];
 
-/** Bild (px) -> Welt (mm). */
+/** Bild (px) -> Welt. */
 export const nachWelt = (v, [x, h]) => [(x - v.ursprung[0]) / v.massstab, (v.ursprung[1] - h) / v.massstab];
 
 /** Zoomt um `faktor` und hält dabei den Weltpunkt unter `bild` fest. */
 export function zoomen(v, faktor, bild) {
-  const neu = Math.min(80, Math.max(1e-3, v.massstab * faktor));
+  const neu = Math.min(v.grenzen[1], Math.max(v.grenzen[0], v.massstab * faktor));
   const f = neu / v.massstab;
   v.ursprung = [bild[0] - (bild[0] - v.ursprung[0]) * f, bild[1] - (bild[1] - v.ursprung[1]) * f];
   v.massstab = neu;
@@ -43,7 +46,7 @@ export function einpassen(v, [[a0, b0], [a1, b1]], { rand = 46, frei = [0, 0] } 
   const h = Math.max(b1 - b0, 1);
   const nutzbreite = Math.max(40, v.breite - 2 * rand - frei[0]);
   const nutzhoehe = Math.max(40, v.hoehe - 2 * rand - frei[1]);
-  v.massstab = Math.max(1e-3, Math.min(nutzbreite / b, nutzhoehe / h));
+  v.massstab = Math.min(v.grenzen[1], Math.max(v.grenzen[0], Math.min(nutzbreite / b, nutzhoehe / h)));
   v.ursprung = [
     rand + nutzbreite / 2 - v.massstab * (a0 + a1) / 2,
     rand + nutzhoehe / 2 + v.massstab * (b0 + b1) / 2,

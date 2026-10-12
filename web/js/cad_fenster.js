@@ -2,10 +2,22 @@
  * cad_fenster.js -- das Zeichenfenster: Rahmen, Knöpfe, Tasten, Rückgängig.
  *
  * Allgemein gebaut: was gezeichnet wird, sagt eine App über ihren «Adapter»
- * (für den Querschnitt `qa_zeichnung.js`). Das Fenster kennt nur Knoten und
- * Elemente in drei Formen -- Punkt, Linie, Fläche -- und die Mechanik, mit
- * der man sie zeichnet, wählt und ändert. Ein Grundriss bekäme einen anderen
- * Adapter und dasselbe Fenster.
+ * (für den Querschnitt `qa_zeichnung.js`, für das Balkensystem
+ * `bs_zeichnung.js`). Das Fenster kennt nur Knoten und Elemente in drei
+ * Formen -- Punkt, Linie, Fläche -- und die Mechanik, mit der man sie
+ * zeichnet, wählt und ändert.
+ *
+ * WAS DER ADAPTER EINSTELLT (mit Vorgabe, siehe `EINSTELLUNG`):
+ * die Werkzeuge, die Einheit und die Stufen des Rasters, wie viele
+ * Nachkommastellen eine Lage zeigt, die Grenzen des Massstabs -- und ob die
+ * Zeichnung «verbunden» ist. Im Querschnitt gehört eine Ecke ihrem Element:
+ * wer eine Bewehrungslinie verschiebt, nimmt die Polygonecke darunter nicht
+ * mit. Ein Rahmen dagegen hängt an seinen Knoten: ein Klick an einem Knoten
+ * wählt den Knoten, und ein verschobener Stab nimmt seine Knoten mit -- und
+ * mit ihnen, was an ihnen hängt. Dazu kann der Adapter sagen, was sich nicht
+ * wählen lässt (`waehlbar`), und Teilen und Umkehren selbst übernehmen
+ * (`teilen`, `umkehren`, `linieTeilen`) -- etwa, weil der Kern dabei
+ * Lastwerte rechnet.
  *
  * WENIGE KNÖPFE:
  * Oben stehen Polygon P, Linie L, Knoten K und, wenn die App welche hat,
@@ -42,8 +54,19 @@ import { klickWaehlen, leisteZeichnen, rahmenWaehlen, treffer } from './cad_ausw
 import { paletteBauen } from './cad_palette.js';
 import { el, svgEl } from './dom.js';
 
-/** Die Raster, die zur Wahl stehen. */
-const RASTER = [1, 5, 10, 25, 50, 100];
+/**
+ * Was ein Adapter einstellen kann, und was gilt, wenn er nichts sagt -- die
+ * Werte der Querschnittsanalyse. `massstab`: kleinster und grösster, in
+ * Bildpunkten je Einheit.
+ */
+const EINSTELLUNG = {
+  werkzeuge: ['polygon', 'linie', 'knoten'],
+  einheit: 'mm',
+  raster: { stufen: [1, 5, 10, 25, 50, 100], vorgabe: 10 },
+  stellen: 1,
+  massstab: [1e-3, 80],
+  verbunden: false,
+};
 /** Ab wie viel Bewegung ein Druck ein Ziehen ist und kein Klick -- px. */
 const ZITTERN = 4;
 /** Wie viele Schritte «Rückgängig» zurückreicht. */
@@ -96,12 +119,14 @@ function abbauen(a) {
 }
 
 function neu(adapter) {
+  const einstellung = { ...EINSTELLUNG, ...adapter.einstellung };
   const a = {
     adapter,
-    modell: cadModell(adapter),
+    einstellung,
+    modell: cadModell({ ...adapter, verbunden: einstellung.verbunden }),
     listen: ['knoten', ...adapter.arten.map((x) => x.liste)],
-    v: ansichtNeu(),
-    raster: 10,
+    v: ansichtNeu(einstellung.massstab),
+    raster: einstellung.raster.vorgabe,
     fang: true,
     befehl: null,
     auswahl: new Set(),
@@ -248,8 +273,12 @@ function jedesGewaehlte(a, form, tun) {
   }, { auswahl: () => [...auswahl, ...neu] });
 }
 
-/** Teilt jede gewählte Linie in der Mitte. */
+/** Teilt jede gewählte Linie in der Mitte -- oder lässt es den Adapter tun. */
 function teilen(a) {
+  if (a.adapter.teilen) {
+    a.adapter.teilen(a, [...a.auswahl]);
+    return;
+  }
   jedesGewaehlte(a, 'linie', (z, art, e) => {
     const lagen = a.modell.lagen(z);
     const [p, q] = [lagen.get(e.von), lagen.get(e.bis)];
@@ -287,7 +316,9 @@ function aktionen(a) {
     } : null,
     nurLinien ? {
       zeichen: '⇄', text: 'Umkehren', titel: 'Anfang und Ende tauschen',
-      tun: () => jedesGewaehlte(a, 'linie', (zz, art, e) => { m.umkehren(art, e); }),
+      tun: () => (a.adapter.umkehren
+        ? a.adapter.umkehren(a, [...a.auswahl])
+        : jedesGewaehlte(a, 'linie', (zz, art, e) => { m.umkehren(art, e); })),
     } : null,
     ...(a.adapter.aktionen?.(a) || []),
     { zeichen: '✕', text: 'Löschen', taste: 'Entf', tun: () => loeschen(a) },
@@ -355,7 +386,7 @@ function hervorheben(a, kennungen, klasse) {
     }
     if (art.form === 'punkt') {
       const [x, y] = nachBild(a.v, orte[0]);
-      const r = Math.max(5, (a.adapter.trefferradius?.(art, e) || 0) * a.v.massstab + 3);
+      const r = Math.max(5, (a.adapter.trefferradius?.(a, art, e) || 0) * a.v.massstab + 3);
       g.append(svgEl('circle', { cx: x, cy: y, r }));
     } else {
       g.append(svgEl('path', { d: pfad(a.v, orte, art.form === 'flaeche') }));
@@ -446,7 +477,8 @@ function lageZeichnen(a) {
   if (!ziel) return;
   const f = a.zeiger?.fang || (a.zeiger?.bild && fangen(a, a.zeiger.bild));
   const [x, y] = a.adapter.achsen;
-  ziel.textContent = f ? `${x} ${zahlText(f.p[0])}   ${y} ${zahlText(f.p[1])}` : '';
+  const s = a.einstellung.stellen;
+  ziel.textContent = f ? `${x} ${zahlText(f.p[0], s)}   ${y} ${zahlText(f.p[1], s)}` : '';
 }
 
 /** Ein Feld der Punkteingabe: schmal, rechtsbündig, ohne Pfeile. */
@@ -561,7 +593,9 @@ function paletteZeichnen(a) {
   const raster = el('select.cad-raster', {
     title: 'Raster: daran fängt der Zeiger',
     on: { change: (e) => { a.raster = Number(e.target.value); zeichnen(a); } },
-  }, RASTER.map((r) => el('option', { value: r, text: `${r} mm`, selected: r === a.raster })));
+  }, a.einstellung.raster.stufen.map((r) => el('option', {
+    value: r, text: `${r} ${a.einstellung.einheit}`, selected: r === a.raster,
+  })));
   const fang = el('input', {
     type: 'checkbox', checked: a.fang, title: 'Fang an Knoten, Linien und Raster (Alt hält ihn an)',
     on: { change: (e) => { a.fang = e.target.checked; zeichnen(a); } },
@@ -581,7 +615,8 @@ function paletteZeichnen(a) {
 function statusZeichnen(a) {
   let satz;
   if (a.befehl) {
-    satz = `${a.befehl.hinweis ? `${a.befehl.hinweis} · ` : ''}R Bezugspunkt · Y/Z Achse · `
+    const achsen = a.adapter.achsen.map((x) => x.toUpperCase()).join('/');
+    satz = `${a.befehl.hinweis ? `${a.befehl.hinweis} · ` : ''}R Bezugspunkt · ${achsen} Achse · `
       + 'P/S parallel/senkrecht · M Mitte · Ziffern tippen · Esc zurück';
   } else if (a.auswahl.size) {
     satz = 'V verschieben · C kopieren · Entf löschen · Shift+Klick nimmt dazu · Esc wählt ab';
@@ -614,8 +649,13 @@ function vollbildSetzen(a, an) {
   a.adapter.tafelNeu();
 }
 
+/** Die Werkzeuge, die der Adapter anbietet -- in der Reihenfolge der Liste. */
+function werkzeugeVon(a) {
+  return WERKZEUGE.filter((w) => a.einstellung.werkzeuge.includes(w.name));
+}
+
 function leisteBauen(a) {
-  const werkzeuge = WERKZEUGE.map((w) => {
+  const werkzeuge = werkzeugeVon(a).map((w) => {
     const k = knopf(w.zeichen, w.text, `${w.text} (${w.taste.toUpperCase()})`, () => starten(a, w.bauen()));
     k.dataset.werkzeug = w.name;
     return k;
@@ -864,7 +904,7 @@ function taste(e) {
       a.adapter.vorlageOeffnen(a);
       break;
     default: {
-      const w = WERKZEUGE.find((x) => x.taste === k);
+      const w = werkzeugeVon(a).find((x) => x.taste === k);
       if (!w) return;
       starten(a, w.bauen());
     }

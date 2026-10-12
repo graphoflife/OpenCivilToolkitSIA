@@ -181,7 +181,7 @@ function adapter(kennung) {
       const g = passendeGeometrie(a);
       return g?.brutto ? [{ p: [g.brutto.y_S, g.brutto.z_S] }] : [];
     },
-    trefferradius: (art, e) => {
+    trefferradius: (a, art, e) => {
       if (art.liste === 'staebe' || art.liste === 'stablinien') return (e.durchmesser || 0) / 2;
       return 0;
     },

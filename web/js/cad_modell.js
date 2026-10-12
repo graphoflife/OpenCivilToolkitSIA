@@ -27,6 +27,11 @@
  * `teilbar: false` (eine Linie, die man nicht teilen darf) und
  * `umkehren(e)` (was beim Umkehren mit getauscht wird).
  *
+ * VERBUNDEN:
+ * In einem Rahmen gilt das Gegenteil: die Elemente hängen an ihren Knoten,
+ * und wer einen Stab verschiebt, verschiebt seine Knoten -- die Stäbe daneben
+ * bleiben angeschlossen und dehnen sich mit (`verbunden: true`).
+ *
  * Alles hier ändert die übergebene Zeichnung -- gerufen wird es in einem
  * `veraenderer`, der das Projekt ändert.
  */
@@ -57,7 +62,7 @@ function nummer(kennung, vorsilbe) {
  * Die Werkzeuge auf einer Zeichnung, für die Arten und Achsen einer App.
  * `achsen` sind die Feldnamen der Koordinaten eines Knotens, etwa ['y', 'z'].
  */
-export function cadModell({ arten, achsen }) {
+export function cadModell({ arten, achsen, verbunden = false }) {
   const [a, b] = achsen;
   const artVon = new Map(arten.map((x) => [x.liste, x]));
 
@@ -230,6 +235,16 @@ export function cadModell({ arten, achsen }) {
    * genau aufeinander liegt, wieder ein Knoten.
    */
   function verschieben(z, ziele, d) {
+    if (verbunden) {
+      const bewegt = bewegteKnoten(z, ziele);
+      for (const k of z.knoten || []) {
+        if (!bewegt.has(k.kennung)) continue;
+        k[a] = rund(k[a] + d[0]);
+        k[b] = rund(k[b] + d[1]);
+      }
+      zusammenfuehren(z);
+      return;
+    }
     const nutzer = new Map();
     const mit = new Map();
     for (const x of ecken(z)) {
@@ -256,6 +271,18 @@ export function cadModell({ arten, achsen }) {
       k[b] = rund(k[b] + d[1]);
     }
     zusammenfuehren(z);
+  }
+
+  /**
+   * Die Knoten, die eine Auswahl in einer verbundenen Zeichnung bewegt: die
+   * gewählten und die der gewählten Elemente -- je ganz, mit allem daran.
+   */
+  function bewegteKnoten(z, ziele) {
+    const knoten = new Set((z.knoten || []).filter((k) => ziele.has(k.kennung)).map((k) => k.kennung));
+    for (const { art, e } of elemente(z)) {
+      if (ziele.has(e.kennung)) verweise(art, e).forEach((k) => knoten.add(k));
+    }
+    return knoten;
   }
 
   /**
@@ -319,9 +346,9 @@ export function cadModell({ arten, achsen }) {
   }
 
   return {
-    arten, achsen, artVon, lage, elemente, verweise, lagen, verzeichnis,
+    arten, achsen, verbunden, artVon, lage, elemente, verweise, lagen, verzeichnis,
     naechsteKennung, knotenAn, benutzung, umhaengen, zusammenfuehren, loeschen,
-    verschieben, kopieren, linieTeilen, eckeEinfuegen, umkehren, ecken, gibt,
+    verschieben, bewegteKnoten, kopieren, linieTeilen, eckeEinfuegen, umkehren, ecken, gibt,
   };
 }
 

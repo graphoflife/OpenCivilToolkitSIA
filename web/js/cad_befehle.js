@@ -36,9 +36,10 @@ function zettel(g, [x, y], zeilen) {
 
 function streckenzettel(a, g, p, q) {
   const [x, y] = a.adapter.achsen;
+  const s = a.einstellung.stellen;
   zettel(g, nachBild(a.v, q), [
-    `L = ${zahlText(abstand(p, q))}`,
-    `Δ${x} = ${zahlText(q[0] - p[0])}  Δ${y} = ${zahlText(q[1] - p[1])}`,
+    `L = ${zahlText(abstand(p, q), s)}`,
+    `Δ${x} = ${zahlText(q[0] - p[0], s)}  Δ${y} = ${zahlText(q[1] - p[1], s)}`,
   ]);
 }
 
@@ -199,18 +200,21 @@ export function polygonBefehl() {
  * Was eine Auswahl bewegt, um es verschoben vorzuzeigen: je betroffenes
  * Element seine Ecken, `[p, mit]` -- `mit`, wenn die Ecke mitkommt. Ein
  * Element, von dem nur eine Ecke gewählt ist, zeigt sich so gedehnt. Beim
- * Kopieren nur, was ganz gewählt ist: einzelne Ecken kopiert es nicht.
+ * Kopieren nur, was ganz gewählt ist: einzelne Ecken kopiert es nicht. In
+ * einer verbundenen Zeichnung kommt jede Ecke an einem bewegten Knoten mit --
+ * die Stäbe daneben dehnen sich.
  */
 function auswahlGeometrie(a, nurGanze) {
   const z = a.adapter.zeichnung();
   const m = a.modell;
   const lagen = m.lagen(z);
   const formen = [];
+  const bewegt = m.verbunden && !nurGanze ? m.bewegteKnoten(z, a.auswahl) : null;
   for (const { art, e } of m.elemente(z)) {
     const ganz = a.auswahl.has(e.kennung);
     if (nurGanze && !ganz) continue;
-    const ecken = m.verweise(art, e).map((k, i) => [lagen.get(k), ganz
-      || a.auswahl.has(art.form === 'punkt' ? e.kennung : eckeSchluessel(e.kennung, i))]);
+    const ecken = m.verweise(art, e).map((k, i) => [lagen.get(k), bewegt ? bewegt.has(k) : (ganz
+      || a.auswahl.has(art.form === 'punkt' ? e.kennung : eckeSchluessel(e.kennung, i)))]);
     if (ecken.some(([p]) => !p) || !ecken.some(([, mit]) => mit)) continue;
     formen.push({ form: art.form, ecken });
   }
@@ -314,6 +318,13 @@ export function knotenEinfuegenBefehl(kennung) {
     frage: () => 'Knoten einfügen: Punkt auf der Kante',
     hinweis: 'Ein Punkt neben der Kante kommt senkrecht auf sie',
     punkt(a, erg) {
+      // Eine Linie teilt der Adapter, wenn er es selbst tun will.
+      const kante = naechsteKante(a, a.adapter.zeichnung(), kennung, erg.p);
+      if (kante?.art.form === 'linie' && a.adapter.linieTeilen) {
+        a.adapter.linieTeilen(a, kennung, kante.q);
+        a.ende();
+        return;
+      }
       let neu = null;
       a.aendern((z) => {
         const k = naechsteKante(a, z, kennung, erg.p);
