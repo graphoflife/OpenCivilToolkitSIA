@@ -150,6 +150,12 @@ gemischten Stahlsorten, ist behoben (siehe [[Entwicklung]]).
       Fachwerk, ohne Bügel, mit Bügeln; die Regel für d_v steht in Kurve und
       Nachweis je einmal), `spannungsanalyse.py` und `platte.py` (entlang
       ihrer Abschnittsmarken), `stil.css` (ein Blatt je App).
+- [ ] **Der Posten als `Postenbezug` statt als 5-Tupel.** Ein
+      Bewehrungsposten reist als `(Lage, Art, Posten, ID von A_s, ID von z)`
+      und wird rund zwanzigmal nach Position zerlegt; die Marke
+      `f"{lage.nummer}{art.kuerzel}"` wird an neun Stellen neu gebaut, obwohl
+      `Postenbezug` daneben schon entsteht (`platte.py`, `_aufbauen`). Rest von
+      Befund 1 -- der Stahl je Lage ist behoben, die Gestalt des Postens nicht.
 - [ ] **Kleineres:** die Regel für einachsige Biegung steht in drei Modulen
       und ist auseinandergelaufen (`M_y > 0` in `richtungsnachweise.py`,
       `M_y >= 0` in `schiefe_biegung.py`) · `print(ergebnis)` hat eine
