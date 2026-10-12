@@ -1,5 +1,5 @@
 ---
-erzeugt: 06dd02e952cb
+erzeugt: ad9332291e90
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -77,6 +77,8 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.querschnitt.vorlagen]] – Querschnitte zum Anfangen.
     - [[opencivil.querschnitt.werkstoffgesetz]] – Spannungs-Dehnungs-Beziehungen.
   - [[opencivil.spannungsanalyse]] – den Querschnitt ansehen, ohne ihn nachzuweisen.
+- [[opencivil.stabwerk]] – ebene Stabwerke nach der Steifigkeitsmethode.
+    - [[opencivil.stabwerk.matrix]] – das Gleichungssystem eines Stabwerks.
 - [[opencivil.web]] – die Oberflaeche, von der Seite des Rechenkerns.
     - [[opencivil.web.api]] – Uebersetzung der Rechenergebnisse nach JSON.
     - [[opencivil.web.bruecke]] – Welche Dateien der Browser laden muss.

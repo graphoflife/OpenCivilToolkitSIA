@@ -1,5 +1,5 @@
 ---
-erzeugt: 1f2f8282d02a
+erzeugt: 90f00118135c
 art: modul
 tags: [modul]
 ---
@@ -60,6 +60,7 @@ alldem die Formelsammlung und diese Seiten.
 - [[opencivil.projekt]] – Serialisierbare Beschreibung eines ganzen Projekts.
 - [[opencivil.querschnitt]] – die Querschnitte: die Platte und der gezeichnete.
 - [[opencivil.spannungsanalyse]] – den Querschnitt ansehen, ohne ihn nachzuweisen.
+- [[opencivil.stabwerk]] – ebene Stabwerke nach der Steifigkeitsmethode.
 - [[opencivil.web]] – die Oberflaeche, von der Seite des Rechenkerns.
 
 ## Braucht

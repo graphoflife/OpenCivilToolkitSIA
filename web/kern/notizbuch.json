@@ -3034,6 +3034,36 @@
       ]
     },
     {
+      "name": "opencivil.stabwerk",
+      "pfad": "Python/opencivil.stabwerk.md",
+      "art": "modul",
+      "kurz": "ebene Stabwerke nach der Steifigkeitsmethode.",
+      "stichworte": []
+    },
+    {
+      "name": "opencivil.stabwerk.matrix",
+      "pfad": "Python/opencivil.stabwerk.matrix.md",
+      "art": "modul",
+      "kurz": "das Gleichungssystem eines Stabwerks.",
+      "stichworte": [
+        "Profilmatrix",
+        "Profilmatrix.aus_gruppen",
+        "Profilmatrix.addiere",
+        "Profilmatrix.addiere_block",
+        "Profilmatrix.wert",
+        "Profilmatrix.diagonale",
+        "Profilmatrix.mal",
+        "Profilmatrix.eintraege",
+        "Bewegung",
+        "Zerlegung",
+        "Zerlegung.loese",
+        "Zerlegung.bewegung",
+        "_ebenen",
+        "nummerierung",
+        "dicht"
+      ]
+    },
+    {
       "name": "opencivil.web",
       "pfad": "Python/opencivil.web.md",
       "art": "modul",
