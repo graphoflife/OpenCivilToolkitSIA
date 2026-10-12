@@ -1,5 +1,5 @@
 ---
-erzeugt: c06f6548d00b
+erzeugt: 6491c437fcfa
 art: modul
 tags: [modul]
 ---
@@ -54,7 +54,6 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `balkensysteme: Dict[str, Balkensystem] = field(default_factory=dict)` – Die Balkensysteme, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis.
 - `warnungen: List[str] = field(default_factory=list)`
 - `NACHWEISFELDER = ('nachweise', 'querkraft', 'duktilitaet', 'fehlende', 'rissnormalkraf…` – Die Felder, in denen die Nachweise einer Platte stehen -- die eine Stelle, an der ein neuer Nachweis eingetragen wird. Alle sind nach Kennung geschluesselt (`q1` oder `q1.x`) und alle tragen Nachweise mit `d_ausnutzung`. Daraus ergeben sich Rechenziele, Aufteilen nach Platte und Zwischenspeichern von selbst; frueher stand dieselbe Liste viermal da, und wer einen Nachweis hinzufuegte, musste alle vier finden.
-- `TEILEFELDER = NACHWEISFELDER + ('balkensysteme',)` – Was zu einem Bauteil gehoert und mit ihm zwischengespeichert wird: die Nachweise und die Balkensysteme. Ein System urteilt nicht, aber sein Ergebnis steht am Objekt, und die Bilder lesen es dort.
 
 #### Aufbau.nachweise_je_feld
 
@@ -85,28 +84,6 @@ def gehoert_zu(self, schluessel: str, kennung: str) -> bool
 ```
 
 Ob ein Feldschluessel (`q1` oder `q1.x`) zu dieser Platte gehoert.
-
-#### Aufbau.teile_von
-
-```python
-def teile_von(self, kennung: str) -> Dict[str, Dict[str, Any]]
-```
-
-Alle Nachweisobjekte einer Platte, nach Feld geordnet.
-
-Gebraucht vom Zwischenspeicher: ein uebernommenes Ergebnis besteht
-nicht nur aus Zahlen, sondern auch aus dem, was die Nachweise sich
-beim Rechnen gemerkt haben -- Interaktionslinien, Fallergebnisse,
-Iterationsschritte. Die Schnittstelle liest das aus den Objekten, also
-muessen die Objekte mitwandern und nicht bloss ihre Ausgabewerte.
-
-#### Aufbau.teile_setzen
-
-```python
-def teile_setzen(self, kennung: str, teile: Mapping[str, Dict[str, Any]]) -> None
-```
-
-Die Nachweisobjekte einer Platte durch frueher gerechnete ersetzen.
 
 #### Aufbau.ziele_von
 

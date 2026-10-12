@@ -1,5 +1,5 @@
 ---
-erzeugt: 6df39cc4302e
+erzeugt: 6458b0041fae
 art: modul
 tags: [modul]
 ---
@@ -9,9 +9,9 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Behaelt die Ergebnisse je Bauteil ueber Anfragen hinweg und gibt sie zurueck,
-solange die Eingaben dieses Bauteils unveraendert sind. Wer eine Zahl an
-Platte 2 aendert, soll nicht Platte 1 mitrechnen.
+Behaelt je Bauteil die Loesung seines Laufs ueber Anfragen hinweg und gibt
+sie zurueck, solange die Eingaben dieses Bauteils unveraendert sind. Wer eine
+Zahl an Platte 2 aendert, soll nicht Platte 1 mitrechnen.
 
 
 ## WARUM DAS NICHT DAS RECHENWERK MACHT
@@ -41,11 +41,11 @@ verwirft, kostet Zeit. Von beiden Fehlern ist nur einer hinnehmbar.
 
 ## WAS AUFBEWAHRT WIRD
 
-Nicht nur die Zahlen. Die Nachweise merken sich beim Rechnen einiges, was die
-Schnittstelle spaeter ausliest -- Interaktionslinien, Fallergebnisse,
-Iterationsschritte. Ein uebernommenes Bauteil bringt deshalb seine
-*Nachweisobjekte* mit; sonst staende die Zusammenfassung da und das Diagramm
-waere leer.
+Die ganze [[opencivil.core.rechenwerk#Loesung|Loesung]] des Bauteils: Werte,
+Herleitung, Urteile und die Befunde -- Interaktionslinien, Fallergebnisse,
+das Ergebnis eines Balkensystems. Die Bilder lesen dort, nicht an den
+Rechenobjekten; die eines frischen Aufbaus taugen darum so gut wie die von
+damals.
 
 ## Inhalt
 
@@ -67,45 +67,6 @@ Dazu die Eintraege der Bauteile, deren Werte es liest (`bezuege`,
 [[opencivil.projekt.aufbau#Bauteilkopf|Bauteilkopf.bezuege]]): ein Balkensystem rechnet mit der Dicke
 einer Platte, also gilt es nicht mehr, wenn sie sich aendert.
 
-### Teilergebnis
-
-```python
-@dataclass
-class Teilergebnis
-```
-
-Was ein Bauteil beigetragen hat -- vollstaendig genug zum Wiederholen.
-
-- `werte: Dict[str, Wert] = field(default_factory=dict)`
-- `bloecke: List[Block] = field(default_factory=list)`
-- `reihenfolge: List[str] = field(default_factory=list)`
-- `graph: Dict[str, Any] = field(default_factory=dict)`
-- `urteile: List[Any] = field(default_factory=list)`
-- `nicht_berechenbar: Dict[str, Any] = field(default_factory=dict)`
-- `fehlende: List[Any] = field(default_factory=list)`
-- `befunde: Dict[str, Any] = field(default_factory=dict)`
-- `teile: Dict[str, Dict[str, Any]] = field(default_factory=dict)` – Die Nachweisobjekte, nach Feld von [[opencivil.web.speicher#Teilergebnis|Aufbau]] geordnet.
-
-### als_teil
-
-```python
-def als_teil(loesung: Loesung, teile: Mapping[str, Dict[str, Any]], *, ohne: Mapping[str, Wert]) -> Teilergebnis
-```
-
-Aus einem Lauf das herausloesen, was dieses Bauteil beigetragen hat.
-
-`ohne` sind die Werte, die schon vorher bekannt waren -- die Baustoffe
-etwa. Sie gehoeren zum Lauf, aber nicht zu diesem Bauteil, und beim
-naechsten Mal bringt sie wieder jemand anderes mit.
-
-### verschmelzen
-
-```python
-def verschmelzen(ziel: Loesung, teil: Teilergebnis) -> None
-```
-
-Ein Teilergebnis in die Gesamtloesung einhaengen, in dieser Reihenfolge.
-
 ### Ergebnisspeicher
 
 ```python
@@ -114,21 +75,23 @@ class Ergebnisspeicher
 
 Das Gedaechtnis zwischen zwei Anfragen.
 
-Ein Eintrag je Platte, geschluesselt nach Kennung und nur gueltig, solange
-der Abdruck stimmt. Der Speicher liegt im Modul und damit im Prozess: beim
+Ein Eintrag je Bauteil, geschluesselt nach Kennung und nur gueltig,
+solange der Abdruck stimmt. Die Loesung darin ist die eines Laufs, der
+die Baustoffe mitgebracht bekam -- sie enthaelt nur, was das Bauteil
+selbst gerechnet hat. Der Speicher liegt im Modul und damit im Prozess: beim
 Server ist das die laufende Sitzung, im Browser der offene Reiter. Eine
 Ablage auf der Platte waere ein zweiter Ort fuer dieselbe Wahrheit.
 
 #### Ergebnisspeicher.hole
 
 ```python
-def hole(self, kennung: str, stempel: str) -> Optional[Teilergebnis]
+def hole(self, kennung: str, stempel: str) -> Optional[Loesung]
 ```
 
 #### Ergebnisspeicher.merken
 
 ```python
-def merken(self, kennung: str, stempel: str, teil: Teilergebnis) -> None
+def merken(self, kennung: str, stempel: str, teil: Loesung) -> None
 ```
 
 #### Ergebnisspeicher.aufraeumen
@@ -159,9 +122,7 @@ def belegt(self) -> int
 
 ## Braucht
 
-- [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
-- [[opencivil.core.wert]]
 - [[opencivil.projekt]]
 
 ## Gebraucht von

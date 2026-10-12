@@ -15,6 +15,7 @@ import dataclasses
 import json
 import unittest
 
+from opencivil.core.rechenwerk import Loesung
 from opencivil.projekt import KnickEintrag, Projekt, QuerschnittEintrag
 from opencivil.web import dienst, speicher
 
@@ -171,6 +172,33 @@ class TestWasUebernommenWird(unittest.TestCase):
         self.assertEqual(dienst.SPEICHER.belegt, 0)
 
 
+class TestBilderAusDemSpeicher(unittest.TestCase):
+    """
+    Die Bilder lesen die Befunde der Lösung, nicht die Rechenobjekte. Aus dem
+    Speicher müssen sie dieselben sein wie frisch gerechnet -- obwohl jede
+    Anfrage den Aufbau neu baut und keines seiner Objekte je gerechnet hat.
+    """
+
+    ANFRAGEN = [
+        ("analysediagramme", {"kennung": "a1"}),
+        ("balkensystem_verlauf", {"kennung": "r1", "fall": "Tragsicherheit"}),
+    ]
+
+    def test_warm_wie_kalt(self):
+        beschreibung = projekt_mit_zwei_platten()
+        for art, rumpf in self.ANFRAGEN:
+            rumpf = {"projekt": beschreibung, **rumpf}
+            dienst.SPEICHER.leeren()
+            kalt = dienst.bearbeite(art, copy.deepcopy(rumpf))
+            rechnen(beschreibung, frisch=True)
+            dienst.SPEICHER.treffer = 0
+            warm = dienst.bearbeite(art, copy.deepcopy(rumpf))
+            with self.subTest(anfrage=art):
+                self.assertEqual(dienst.SPEICHER.treffer, 1)    # wirklich aus dem Speicher
+                self.assertEqual(kalt.status, 200)
+                self.assertEqual(als_text(warm), als_text(kalt))
+
+
 class TestAbdruck(unittest.TestCase):
     def test_gleiche_beschreibung_gleicher_abdruck(self):
         d = projekt_mit_zwei_platten()
@@ -218,7 +246,7 @@ class TestPlaetze(unittest.TestCase):
     def test_der_speicher_waechst_nicht_ohne_ende(self):
         s = speicher.Ergebnisspeicher(plaetze=2)
         for i in range(5):
-            s.merken(f"q{i}", "a", speicher.Teilergebnis())
+            s.merken(f"q{i}", "a", Loesung())
         self.assertEqual(s.belegt, 2)
         self.assertIsNone(s.hole("q0", "a"))
         self.assertIsNotNone(s.hole("q4", "a"))

@@ -163,11 +163,6 @@ class Aufbau:
                       "spannung_riss", "spannung", "knicken",
                       "qa_biegung", "qa_schub", "qa_duktilitaet", "qa_sproede")
 
-    #: Was zu einem Bauteil gehoert und mit ihm zwischengespeichert wird: die
-    #: Nachweise und die Balkensysteme. Ein System urteilt nicht, aber sein
-    #: Ergebnis steht am Objekt, und die Bilder lesen es dort.
-    TEILEFELDER = NACHWEISFELDER + ("balkensysteme",)
-
     def nachweise_je_feld(self):
         """Alle Nachweise, Feld fuer Feld und in der Reihenfolge der Liste."""
         for feld in self.NACHWEISFELDER:
@@ -185,28 +180,6 @@ class Aufbau:
     def gehoert_zu(self, schluessel: str, kennung: str) -> bool:
         """Ob ein Feldschluessel (``q1`` oder ``q1.x``) zu dieser Platte gehoert."""
         return schluessel == kennung or schluessel.startswith(f"{kennung}.")
-
-    def teile_von(self, kennung: str) -> Dict[str, Dict[str, Any]]:
-        """
-        Alle Nachweisobjekte einer Platte, nach Feld geordnet.
-
-        Gebraucht vom Zwischenspeicher: ein uebernommenes Ergebnis besteht
-        nicht nur aus Zahlen, sondern auch aus dem, was die Nachweise sich
-        beim Rechnen gemerkt haben -- Interaktionslinien, Fallergebnisse,
-        Iterationsschritte. Die Schnittstelle liest das aus den Objekten, also
-        muessen die Objekte mitwandern und nicht bloss ihre Ausgabewerte.
-        """
-        return {feld: {s: w for s, w in getattr(self, feld).items()
-                       if self.gehoert_zu(s, kennung)}
-                for feld in self.TEILEFELDER}
-
-    def teile_setzen(self, kennung: str, teile: Mapping[str, Dict[str, Any]]) -> None:
-        """Die Nachweisobjekte einer Platte durch frueher gerechnete ersetzen."""
-        for feld, eintraege in teile.items():
-            ziel = getattr(self, feld)
-            for schluessel in [s for s in ziel if self.gehoert_zu(s, kennung)]:
-                del ziel[schluessel]
-            ziel.update(eintraege)
 
     def ziele_von(self, kennung: str) -> List[str]:
         """Die Rechenziele eines einzelnen Bauteils -- Eckwerte und Nachweise, oder sein System."""

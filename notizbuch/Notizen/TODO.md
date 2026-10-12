@@ -57,22 +57,15 @@ Code nachgeprüft. Reihenfolge nach Empfehlung. Ziel jedes Punkts ist, dass
 etwas wegfällt, nicht dass es umzieht. Der dringendste Befund, die
 gemischten Stahlsorten, ist behoben (siehe [[Entwicklung]]).
 
-- [ ] **Ergebnisse in den Rechenlauf, nicht an die Rechenobjekte.**
-      `rechne()` gibt nur Zahlen zurück; Urteile, Linien, Fallergebnisse und
-      das Systemergebnis legen die Nachweise auf sich selbst ab
-      (`berechnung.py` `self.urteile`, `rechenwerk.py` `isinstance(…,
-      Nachweis)`). Daran hängen: der Zwischenspeicher hängt ganze Objekte um
-      (`TEILEFELDER`, `teile_von`, `teile_setzen`); `Teilergebnis` bildet die
-      Felder der `Loesung` von Hand nach -- ein neues Feld fehlt nach jedem
-      Speichertreffer still; zwei Läufe nur für den Nebeneffekt
-      (`dienst.py` `_bauteil_rechnen`, `querkraftkurven`), darum speichert
-      `_bauteil_rechnen` nie, und `bs_diagramme.js` wartet mit einem
-      Zeitgeber; erfundene Ziele, damit gerechnet wird (`d_n` des
-      Balkensystems, `d_zeilen` des Blatts, `NUR_KURVE` der Querkraft mit
-      sieben Weichen, `nur_ziel`). Besser: `ausfuehren` gibt Werte, Urteile
-      und einen Befund zurück, die Lösung hält `befunde[berechnung_id]`, der
-      Speicher legt ein Stück Lösung ab (`Loesung.anhaengen` im Kern), Ziele
-      dürfen eine Berechnung nennen.
+- [ ] **Ergebnisse in den Rechenlauf -- der Rest.** Erledigt am
+      2026-10-13: Urteile und Befunde kommen mit der Ausführung, die Lösung
+      hält `befunde[berechnung_id]`, kein Nachweis legt mehr etwas auf sich
+      ab, und der Speicher legt je Bauteil seine Lösung ab
+      (`Loesung.anhaengen`); `TEILEFELDER`, `teile_von`, `teile_setzen` und
+      `Teilergebnis` sind fort. Offen: erfundene Ziele, damit gerechnet wird
+      (`d_n` des Balkensystems, `d_zeilen` des Blatts, `NUR_KURVE` der
+      Querkraft, `nur_ziel`) -- Ziele sollen eine Berechnung nennen dürfen.
+      Der Zeitgeber in `bs_diagramme.js` gehört zu Befund 2 (`nachgefragt`).
 - [ ] **Ein Steckbrief je Bauteilart, in Python und JavaScript.** Platte,
       Analyse und System stehen an rund 30 Stellen einzeln, obwohl
       `projekt.py` bei `BAUTEILE` sagt «hier dazu und nirgends sonst»:

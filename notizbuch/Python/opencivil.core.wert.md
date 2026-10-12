@@ -1,5 +1,5 @@
 ---
-erzeugt: bed370595566
+erzeugt: 99ec236b7f76
 art: modul
 tags: [modul]
 ---
@@ -301,4 +301,3 @@ def beschreibung(self) -> str
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.web.api]]
-- [[opencivil.web.speicher]]

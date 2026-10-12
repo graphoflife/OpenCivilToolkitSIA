@@ -1,5 +1,5 @@
 ---
-erzeugt: c99f0a1a7161
+erzeugt: 3689b4fefda8
 art: modul
 tags: [modul]
 ---
@@ -616,4 +616,3 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.web.api]]
-- [[opencivil.web.speicher]]

@@ -19,7 +19,7 @@
     "opencivil/core/einheiten.py": "fea61bf8b06a",
     "opencivil/core/latex.py": "44ce1d0a06c3",
     "opencivil/core/protokoll.py": "7d3c17db31f9",
-    "opencivil/core/rechenwerk.py": "558a2381756a",
+    "opencivil/core/rechenwerk.py": "dc9b7e4f6982",
     "opencivil/core/wert.py": "1ce18ec39f6b",
     "opencivil/ergebnis.py": "e09b30f5e5e6",
     "opencivil/gleichungen/__init__.py": "94642d0674fb",
@@ -55,7 +55,7 @@
     "opencivil/notizbuch/namen.py": "8ac48909c9f4",
     "opencivil/notizbuch/tresor.py": "987e99d482af",
     "opencivil/projekt/__init__.py": "2f7f79ce11cf",
-    "opencivil/projekt/aufbau.py": "4ad498ea879f",
+    "opencivil/projekt/aufbau.py": "fbc63766f627",
     "opencivil/projekt/balkensystem.py": "4d84c13a82a0",
     "opencivil/projekt/eintraege.py": "a85f2e91c207",
     "opencivil/projekt/gleichungen.py": "64df41c84f4d",
@@ -88,8 +88,8 @@
     "opencivil/web/balkendaten.py": "08893e1c2127",
     "opencivil/web/bruecke.py": "519499df5799",
     "opencivil/web/diagrammdaten.py": "d7cdc03bfbc6",
-    "opencivil/web/dienst.py": "f384bfcdbd79",
+    "opencivil/web/dienst.py": "19f519fef833",
     "opencivil/web/server.py": "b90e83b71dd4",
-    "opencivil/web/speicher.py": "632c81e2aa1a"
+    "opencivil/web/speicher.py": "24fdba86db12"
   }
 }

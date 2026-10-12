@@ -181,25 +181,16 @@ def _stromabwaerts(projekt: Projekt, aufbau) -> Loesung:
         stempel = _abdruck(beschreibung, aufbau, kennung)
         teil = SPEICHER.hole(kennung, stempel)
         if teil is None:
-            lauf = aufbau.werk.loese(*eigene, bekannt=bekannt)
-            teil = speicher.als_teil(lauf, aufbau.teile_von(kennung),
-                                     ohne=bekannt)
+            teil = aufbau.werk.loese(*eigene, bekannt=bekannt)
             SPEICHER.merken(kennung, stempel, teil)
-        else:
-            # Die Nachweise haben sich beim Rechnen mehr gemerkt als ihre
-            # Ausgabewerte; die Schnittstelle liest es aus den Objekten. Also
-            # wandern die Objekte von damals zurueck in den Aufbau.
-            aufbau.teile_setzen(kennung, teil.teile)
-        speicher.verschmelzen(gesamt, teil)
+        gesamt.anhaengen(teil)
         bekannt.update(teil.werte)
 
     # Die Blätter zuletzt und ohne Zwischenspeicher: sie lesen Werte der
     # Platten, und ihre Zeilen rechnen sich in Augenblicken.
     blattziele = aufbau.blattziele()
     if blattziele:
-        speicher.verschmelzen(
-            gesamt, speicher.als_teil(
-                aufbau.werk.loese(*blattziele, bekannt=bekannt), {}, ohne=bekannt))
+        gesamt.anhaengen(aufbau.werk.loese(*blattziele, bekannt=bekannt))
     return gesamt
 
 
@@ -218,10 +209,7 @@ def _bauteil_rechnen(projekt: Projekt, aufbau, kennung: str) -> Loesung:
     teil = SPEICHER.hole(kennung, _abdruck(projekt.als_dict(), aufbau, kennung))
     if teil is None:
         return aufbau.werk.loese(*aufbau.materialziele(), *aufbau.ziele_von(kennung))
-    aufbau.teile_setzen(kennung, teil.teile)
-    loesung = Loesung()
-    speicher.verschmelzen(loesung, teil)
-    return loesung
+    return teil
 
 
 def querkraftkurven(rumpf: Mapping[str, Any]) -> Dict[str, Any]:

@@ -138,6 +138,23 @@ class Loesung:
     :class:`~opencivil.core.berechnung.Ausfuehrung`). Nach Berechnungs-ID.
     """
 
+    # -- Zusammensetzen ------------------------------------------------------
+
+    def anhaengen(self, teil: "Loesung") -> None:
+        """
+        Einen weiteren Lauf anhaengen, in dieser Reihenfolge -- so setzt der
+        Dienst die Bauteile zusammen, jedes aus seinem eigenen Lauf oder aus
+        dem Zwischenspeicher. ``teil`` bleibt dabei, wie es ist.
+        """
+        self.werte.update(teil.werte)
+        self.protokoll.bloecke.extend(teil.protokoll.bloecke)
+        self.reihenfolge.extend(r for r in teil.reihenfolge if r not in self.reihenfolge)
+        self.graph.update(teil.graph)
+        self.fehlende.extend(teil.fehlende)
+        self.nicht_berechenbar.update(teil.nicht_berechenbar)
+        self.urteile.extend(teil.urteile)
+        self.befunde.update(teil.befunde)
+
     # -- Zugriff ------------------------------------------------------------
 
     def befund(self, berechnung: Union[str, Berechnung]) -> Any:

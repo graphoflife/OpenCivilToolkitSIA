@@ -1,5 +1,5 @@
 ---
-erzeugt: fb35411a7450
+erzeugt: d27d078db438
 art: modul
 tags: [modul]
 ---
@@ -125,6 +125,16 @@ Ergebnis eines Rechenlaufs.
 - `nicht_berechenbar: Dict[str, NichtBerechenbar] = field(default_factory=dict)`
 - `urteile: List[NachweisUrteil] = field(default_factory=list)`
 - `befunde: Dict[str, Any] = field(default_factory=dict)` – Je Berechnung, was sie ueber ihre Ausgaben hinaus festgehalten hat -- Linien, Fallergebnisse, das Ergebnis eines Systems (siehe [[opencivil.core.berechnung#Ausfuehrung|Ausfuehrung]]). Nach Berechnungs-ID.
+
+#### Loesung.anhaengen
+
+```python
+def anhaengen(self, teil: 'Loesung') -> None
+```
+
+Einen weiteren Lauf anhaengen, in dieser Reihenfolge -- so setzt der
+Dienst die Bauteile zusammen, jedes aus seinem eigenen Lauf oder aus
+dem Zwischenspeicher. `teil` bleibt dabei, wie es ist.
 
 #### Loesung.befund
 
