@@ -442,6 +442,17 @@ class TestBearbeiten(unittest.TestCase):
         linien = antwort.daten["balkensystem"]["linien"]
         self.assertEqual([(l["von"], l["bis"]) for l in linien], [("K3", "K1"), ("K2", "K3")])
 
+    def test_teilen_in_der_mitte_und_uebersicht_ohne_fall(self):
+        d = traeger().als_dict()
+        antwort = dienst.bearbeite("balkensystem_bearbeiten", {
+            "projekt": d, "kennung": "r1", "aktion": "teilen", "linie": "L1", "anteil": 0.5})
+        knoten = {k["kennung"]: (k["x"], k["z"]) for k in antwort.daten["balkensystem"]["knoten"]}
+        self.assertEqual(knoten["K3"], (3.0, 0.0))
+        antwort = dienst.bearbeite("balkensystem_verlauf", {"projekt": d, "kennung": "r1"})
+        self.assertEqual(antwort.status, 200)
+        self.assertIsNone(antwort.daten["verlauf"])
+        self.assertTrue(antwort.daten["uebersicht"]["gueltig"])
+
     def test_falsche_anfragen(self):
         d = traeger().als_dict()
         for rumpf in ({"kennung": "q1", "aktion": "umkehren"},

@@ -36,7 +36,7 @@ export const zustand = {
   verfolgung: null,
   /**
    * Was links ausgewählt ist:
-   * {art: 'material'|'querschnitt'|'querschnittsanalyse'|'blatt', kennung}.
+   * {art: 'material'|'querschnitt'|'querschnittsanalyse'|'balkensystem'|'blatt', kennung}.
    */
   auswahl: null,
   /** Welcher Reiter rechts offen ist. */
@@ -58,7 +58,8 @@ export const zustand = {
   rechenfehler: null,
   ungespeichert: false,
   /** Aufgeklappte Kapitel im Baum. */
-  offen: new Set(['materialien', 'beton', 'betonstahl', 'platten', 'analysen', 'gleichungen']),
+  offen: new Set(['materialien', 'beton', 'betonstahl', 'platten', 'analysen', 'balkensysteme',
+    'gleichungen']),
   /**
    * Zugeklappte Panels der Eingaben, je App und Titel: «platte/Bewehrung».
    *
@@ -164,6 +165,11 @@ export function gewaehlteAnalyse() {
     (a) => a.kennung === zustand.auswahl.kennung) || null;
 }
 
+export function gewaehltesBalkensystem() {
+  if (zustand.auswahl?.art !== 'balkensystem') return null;
+  return zustand.projekt.balkensysteme?.find((s) => s.kennung === zustand.auswahl.kennung) || null;
+}
+
 export function gewaehltesBlatt() {
   if (zustand.auswahl?.art !== 'blatt') return null;
   return zustand.projekt.gleichungen?.find((b) => b.kennung === zustand.auswahl.kennung) || null;
@@ -178,6 +184,7 @@ export function freieKennung(vorsilbe) {
     ...zustand.projekt.materialien.map((m) => m.kennung),
     ...zustand.projekt.querschnitte.map((q) => q.kennung),
     ...(zustand.projekt.querschnittsanalysen || []).map((a) => a.kennung),
+    ...(zustand.projekt.balkensysteme || []).map((s) => s.kennung),
     ...(zustand.projekt.gleichungen || []).map((b) => b.kennung),
   ]);
   let i = 1;

@@ -155,6 +155,15 @@ export const api = {
     ruf('vorlage_einsetzen', {
       projekt, kennung, wahl, ursprung, beton, stahl,
     }),
+  /**
+   * Ein Balkensystem: ohne `fall` die Übersicht -- Meldungen, Knoten ohne
+   * Drehsteifigkeit, was sich bewegt --, mit `fall` dazu dessen Verläufe.
+   */
+  balkensystemVerlauf: (projekt, kennung, fall = '') =>
+    ruf('balkensystem_verlauf', { projekt, kennung, fall }),
+  /** Teilt Linien oder kehrt sie um -- `auftrag` = {aktion, linie, anteil|punkt|stelle} oder {aktion, linien}. */
+  balkensystemBearbeiten: (projekt, kennung, auftrag) =>
+    ruf('balkensystem_bearbeiten', { projekt, kennung, ...auftrag }),
 };
 
 export { KernFehler };

@@ -433,7 +433,9 @@ def balkensystem_verlauf(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     System zu dieser Beschreibung noch hat.
 
     Ein System, das sich nicht rechnen laesst, ist keine falsche Anfrage:
-    dann ist ``verlauf`` leer, und die Uebersicht sagt warum.
+    dann ist ``verlauf`` leer, und die Uebersicht sagt warum. Ohne ``fall``
+    kommt nur die Uebersicht -- was das Zeichenfenster nach jeder Aenderung
+    braucht: Meldungen, Knoten ohne Drehsteifigkeit, was sich bewegt.
     """
     projekt = _projekt(rumpf)
     eintrag = _balkensystem(projekt, rumpf)
@@ -442,7 +444,7 @@ def balkensystem_verlauf(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     system = aufbau.balkensysteme[eintrag.kennung]
     uebersicht = endlich(balkendaten.uebersicht(system))
     fall = str(rumpf.get("fall") or "")
-    if not system.ergebnis.faelle:
+    if not fall or not system.ergebnis.faelle:
         return {"verlauf": None, "uebersicht": uebersicht}
     if fall not in balkendaten.faelle(system):
         raise DienstFehler(400, f"Einen Fall «{fall}» gibt es in «{eintrag.name}» nicht. "
@@ -458,8 +460,9 @@ def balkensystem_bearbeiten(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     Oberflaeche uebernimmt es in einem Schritt, den man rueckgaengig machen
     kann.
 
-    ``teilen``: ``linie`` und die Stelle -- ``stelle`` in m ab dem Anfang
-    oder ein ``punkt`` [x, z], der auf die Linie gelotet wird.
+    ``teilen``: ``linie`` und die Stelle -- ``stelle`` in m ab dem Anfang,
+    ein ``anteil`` der Laenge (0.5: in der Mitte) oder ein ``punkt`` [x, z],
+    der auf die Linie gelotet wird.
     ``umkehren``: ``linien``, eine oder mehrere.
     """
     projekt = _projekt(rumpf)
@@ -472,6 +475,8 @@ def balkensystem_bearbeiten(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
             if rumpf.get("punkt") is not None:
                 punkt = rumpf["punkt"]
                 stelle = eintrag.stelle_auf(linie, (float(punkt[0]), float(punkt[1])))
+            elif rumpf.get("anteil") is not None:
+                stelle = float(rumpf["anteil"]) * eintrag.laenge(eintrag.linie_von(linie))
             else:
                 stelle = float(rumpf.get("stelle"))
             neu.append(eintrag.teilen(linie, stelle).kennung)

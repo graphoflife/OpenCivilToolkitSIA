@@ -24,8 +24,10 @@ import { analysenBlock, automatikBlock, nachweiseBlock } from './nachweise.js';
 import { blattZeichnen } from './gleichungen.js';
 import { partnerVon, richtungSetzen, richtungVon } from './lagen.js';
 import { analyseEditor } from './querschnittsanalyse.js';
+import { balkensystemEditor } from './balkensystem.js';
 import {
-  aendern, gewaehlteAnalyse, gewaehltesBlatt, gewaehltesMaterial, gewaehlterQuerschnitt,
+  aendern, gewaehlteAnalyse, gewaehltesBalkensystem, gewaehltesBlatt, gewaehltesMaterial,
+  gewaehlterQuerschnitt,
   kennwertId, projektAendern, zustand,
 } from './zustand.js';
 
@@ -640,6 +642,12 @@ export function editorZeichnen(behaelter, titelKnoten, hinweisKnoten) {
     titelKnoten.textContent = analyse.name;
     hinweisKnoten.textContent = 'Querschnittsanalyse';
     return ersetzen(behaelter, ...analyseEditor(analyse));
+  }
+  const system = gewaehltesBalkensystem();
+  if (system) {
+    titelKnoten.textContent = system.name;
+    hinweisKnoten.textContent = '2D-Balkensystem';
+    return ersetzen(behaelter, ...balkensystemEditor(system));
   }
   const blatt = gewaehltesBlatt();
   if (blatt) {

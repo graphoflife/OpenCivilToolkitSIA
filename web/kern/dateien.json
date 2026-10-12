@@ -88,7 +88,7 @@
     "opencivil/web/balkendaten.py": "b7c5c3f42cbb",
     "opencivil/web/bruecke.py": "519499df5799",
     "opencivil/web/diagrammdaten.py": "56e4c1346817",
-    "opencivil/web/dienst.py": "662c8af18f82",
+    "opencivil/web/dienst.py": "e0963985ecaa",
     "opencivil/web/server.py": "b90e83b71dd4",
     "opencivil/web/speicher.py": "2c040ea3f0c1"
   }

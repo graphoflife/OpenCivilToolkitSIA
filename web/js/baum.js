@@ -8,20 +8,24 @@
  *         Betonstahl
  *     Stahlbeton-Platten
  *     Querschnittsanalyse
+ *     2D Balkensysteme
  *     Analytische Gleichungen
  *
  * Jedes Kapitel lässt sich zuklappen; die Werkzeuge sitzen rechts in der
- * Kapitelleiste. Beim Löschen eines Materials wird geprüft, ob eine Platte
- * oder eine Querschnittsanalyse es noch braucht -- sonst wäre die
- * Beschreibung anschliessend widersprüchlich,
- * und der Rechenkern müsste einen Fehler melden, den die Oberfläche hätte
- * verhindern können.
+ * Kapitelleiste. Beim Löschen eines Materials wird geprüft, ob eine Platte,
+ * eine Querschnittsanalyse oder ein Balkensystem es noch braucht -- und beim
+ * Löschen einer Platte oder Analyse, ob ein Balkensystem ihren Querschnitt
+ * nimmt. Sonst wäre die Beschreibung anschliessend widersprüchlich, und der
+ * Rechenkern müsste einen Fehler melden, den die Oberfläche hätte verhindern
+ * können.
  */
 
 import { el, ersetzen, melden } from './dom.js';
 import { neueZeile } from './gleichungen.js';
 import { benutzteMaterialien } from './querschnittsanalyse.js';
 import { fensterVergessen } from './qa_zeichnung.js';
+import { benutzteBauteile, benutzteMaterialien as systemMaterialien } from './balkensystem.js';
+import { fensterVergessen as systemfensterVergessen } from './bs_zeichnung.js';
 import {
   aendern, ausVorlage, freieKennung, naechsterName, projektAendern, umschalten, zustand,
 } from './zustand.js';
@@ -32,6 +36,7 @@ const SINNBILD = {
   betonstahl: '≡',    // ≡
   platten: '▬',       // ▬
   analysen: '⊤',      // ⊤ -- ein Plattenbalken im Schnitt
+  balkensysteme: '⊓',  // ⊓ -- ein Rahmen
   gleichungen: '∑',
 };
 
@@ -64,10 +69,15 @@ const ART = {
     klasse: m.art === 'beton' ? 'beton' : 'stahl', text: m.sorte, loeschen: materialLoeschen,
   }),
   querschnitt: (q) => ({
-    klasse: 'platte', text: `${q.h}×${q.b} mm`, loeschen: () => entfernen('querschnitte', q),
+    klasse: 'platte', text: `${q.h}×${q.b} mm`, loeschen: () => bauteilLoeschen('querschnitte', q),
   }),
   querschnittsanalyse: (a) => ({
-    klasse: 'analyse', text: umriss(a), loeschen: () => entfernen('querschnittsanalysen', a),
+    klasse: 'analyse', text: umriss(a), loeschen: () => bauteilLoeschen('querschnittsanalysen', a),
+  }),
+  balkensystem: (s) => ({
+    klasse: 'system',
+    text: `${s.linien.filter((l) => l.stab).length} ${s.linien.filter((l) => l.stab).length === 1 ? 'Stab' : 'Stäbe'}`,
+    loeschen: () => entfernen('balkensysteme', s),
   }),
   blatt: (b) => ({
     klasse: 'blatt', text: `${b.zeilen.length} ${b.zeilen.length === 1 ? 'Zeile' : 'Zeilen'}`,
@@ -133,6 +143,8 @@ function materialLoeschen(material) {
       q.beton === material.kennung || q.lagen.some((l) => l.stahl === material.kennung)),
     ...(zustand.projekt.querschnittsanalysen || []).filter((a) =>
       benutzteMaterialien(a).includes(material.kennung)),
+    ...(zustand.projekt.balkensysteme || []).filter((s) =>
+      systemMaterialien(s).includes(material.kennung)),
   ];
   if (benutztVon.length) {
     melden(`„${material.name || material.sorte}" verwendet von: `
@@ -140,6 +152,17 @@ function materialLoeschen(material) {
     return;
   }
   entfernen('materialien', material);
+}
+
+/** Eine Platte oder Analyse -- ausser ein Balkensystem nimmt noch ihren Querschnitt. */
+function bauteilLoeschen(liste, eintrag) {
+  const benutztVon = (zustand.projekt.balkensysteme || []).filter((s) =>
+    benutzteBauteile(s).includes(eintrag.kennung));
+  if (benutztVon.length) {
+    melden(`„${eintrag.name}" ist Querschnitt in: ${benutztVon.map((s) => s.name).join(', ')}`, true);
+    return;
+  }
+  entfernen(liste, eintrag);
 }
 
 /** Einen Eintrag aus einer Liste des Projekts -- und aus der Auswahl, wenn er gewählt war. */
@@ -248,6 +271,35 @@ function analyseAnlegen() {
   aendern({ auswahl: { art: 'querschnittsanalyse', kennung } }, 'auswahl');
 }
 
+/**
+ * Ein neues Balkensystem -- nach der Vorlage des Kerns ein Einfeldträger
+ * mit einem Lastfall. Gesetzt wird nur, was der Kern nicht wissen kann:
+ * Kennung, Name und der Beton der Linien.
+ */
+function systemAnlegen() {
+  const beton = zustand.projekt.materialien.find((m) => m.art === 'beton');
+  if (!beton) {
+    melden('Zuerst einen Beton anlegen.', true);
+    return;
+  }
+  const vorlage = zustand.katalog?.neues_balkensystem;
+  if (!vorlage) {
+    melden('Katalog noch nicht geladen.', true);
+    return;
+  }
+  const kennung = freieKennung('r');
+  systemfensterVergessen(kennung);
+  projektAendern((p) => {
+    const system = structuredClone(vorlage);
+    system.kennung = kennung;
+    p.balkensysteme = p.balkensysteme || [];
+    system.name = naechsterName('System', p.balkensysteme);
+    system.linien.forEach((l) => { if (l.stab) l.material = beton.kennung; });
+    p.balkensysteme.push(system);
+  });
+  aendern({ auswahl: { art: 'balkensystem', kennung } }, 'auswahl');
+}
+
 // ===========================================================================
 
 export function baumZeichnen(behaelter) {
@@ -317,6 +369,19 @@ export function baumZeichnen(behaelter) {
       : [leerzeile('keine Querschnittsanalyse')],
   });
 
+  const systeme = p.balkensysteme || [];
+  const balkensysteme = kapitel({
+    schluessel: 'balkensysteme',
+    titel: '2D Balkensysteme',
+    klasse: 'baum-kopf-system',
+    anzahl: systeme.length,
+    oben: true,
+    werkzeuge: knopf('+', 'Balkensystem hinzufügen', systemAnlegen),
+    kinder: systeme.length
+      ? systeme.map((s) => eintrag(s, 'balkensystem'))
+      : [leerzeile('kein Balkensystem')],
+  });
+
   const blaetter = p.gleichungen || [];
   const gleichungen = kapitel({
     schluessel: 'gleichungen',
@@ -328,5 +393,5 @@ export function baumZeichnen(behaelter) {
     kinder: blaetter.length ? blaetter.map((b) => eintrag(b, 'blatt')) : [leerzeile('kein Blatt')],
   });
 
-  ersetzen(behaelter, materialien, platten, querschnittsanalysen, gleichungen);
+  ersetzen(behaelter, materialien, platten, querschnittsanalysen, balkensysteme, gleichungen);
 }

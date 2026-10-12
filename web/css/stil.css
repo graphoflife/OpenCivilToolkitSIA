@@ -49,6 +49,9 @@
   --stahl:        #b8622a;
   --platte:       var(--blau);
   --analyse:      #0d9488;
+  --system:       #7048e8;
+  /* Die Lasten im Balkensystem: kräftig, aber nicht das Rot eines Fehlers. */
+  --last:         #c2410c;
 
   /* Die Tragrichtungen: x kräftig orange, y kräftig gelb -- so gelb, dass es
      auf Weiss noch zu sehen ist. Dieselben Farben an den Lagen, an den
@@ -336,6 +339,8 @@ a.knopf { display: inline-block; text-decoration: none; }
 .baum-kopf-blatt     { border-left-color: var(--beide); }
 .baum-eintrag-analyse { border-left-color: var(--analyse); }
 .baum-kopf-analyse    { border-left-color: var(--analyse); }
+.baum-eintrag-system  { border-left-color: var(--system); }
+.baum-kopf-system     { border-left-color: var(--system); }
 
 .schloss { font-size: 11px; color: var(--schrift-zart); }
 .eigen   { font-size: 10px; font-weight: 700; color: var(--warn);
@@ -1887,3 +1892,80 @@ details.nb-callout > summary { cursor: pointer; }
   .nb-eintrag, .nb-baum summary { min-height: 34px; align-items: center; }
   .nb-suche { font-size: 16px; min-height: 34px; }
 }
+
+/* ------------------------------------------------------ Balkensysteme -- */
+
+/* Ein Stab kräftig, eine Linie ohne Stab dünn gestrichelt, daneben die
+   gestrichelte Faser. Lager, Federn und Gelenke in Schrift, die Lasten in
+   ihrer eigenen Farbe. */
+.bs-stab { fill: none; stroke: var(--schrift); stroke-width: 3; stroke-linecap: round; }
+.bs-linie { fill: none; stroke: var(--schrift-matt); stroke-width: 1.3; stroke-dasharray: 7 4; }
+.ist-fehler.bs-stab, .ist-fehler.bs-linie { stroke: var(--schlecht); }
+.bs-faser { stroke: var(--schrift-matt); stroke-width: 1; stroke-dasharray: 4 3; }
+.bs-gelenk { fill: #fff; stroke: var(--schrift); stroke-width: 1.4; }
+.bs-dreieck { fill: #fff; stroke: var(--schrift); stroke-width: 1.3; }
+.bs-boden { fill: none; stroke: var(--schrift); stroke-width: 1.3; }
+.bs-einspannung { fill: none; stroke: var(--schrift); stroke-width: 2.6; }
+.bs-schraffur { stroke: var(--schrift-matt); stroke-width: 1; }
+.bs-feder { fill: none; stroke: var(--schrift); stroke-width: 1.2; }
+.bs-laengslager { stroke: var(--schrift-matt); stroke-width: 1.4; }
+.bs-lager.ist-fehler .bs-dreieck, .bs-lager.ist-fehler .bs-boden { stroke: var(--schlecht); }
+.bs-last { fill: none; stroke: var(--last); stroke-width: 1.3; }
+.bs-lastpfeil { stroke-width: 1; }
+.bs-umriss { stroke-width: 1.5; }
+.bs-spitze { fill: var(--last); stroke: none; }
+.bs-klein { stroke-width: 1; }
+.bs-lasttext {
+  font-size: 11px; font-weight: 600; fill: var(--last);
+  paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round;
+}
+.bs-unbestimmt circle { fill: none; stroke: var(--warn); stroke-width: 1.6; stroke-dasharray: 2 2; }
+.bs-unbestimmt-text { font-size: 12px; font-weight: 700; fill: var(--warn); }
+.bs-beweglich { fill: var(--schlecht); fill-opacity: .15; stroke: var(--schlecht); stroke-width: 1.6; }
+
+/* Im schwebenden Fenster: je Last ein Block, darunter die Knöpfe für neue. */
+.bs-lastblock {
+  display: flex; flex-direction: column; gap: 3px; padding: 4px 0 6px;
+  border-bottom: 1px dashed var(--rand);
+}
+.bs-lastkopf { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; font-weight: 600; }
+.bs-lastzeile { display: flex; align-items: center; gap: 4px; }
+.bs-lastzeile .cad-zeile { flex: 1; min-width: 0; }
+.bs-neue-lasten { display: flex; flex-wrap: wrap; gap: 4px; }
+.bs-neue-lasten .knopf { padding: 2px 6px; font-size: 11.5px; }
+
+/* Unter der Zeichnung: je Linie und Lager eine Zeile; ein Klick wählt. */
+.bs-elemente { display: flex; flex-direction: column; gap: 1px; font-size: 12px; }
+.bs-elemente-titel {
+  font-size: 11px; font-weight: 700; color: var(--schrift-zart);
+  text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px;
+}
+.bs-element {
+  display: grid; grid-template-columns: 34px auto minmax(0, 1fr); gap: 8px;
+  padding: 2px 6px; border-radius: 4px; cursor: pointer;
+}
+.bs-element:hover { background: var(--blau-hell); }
+.bs-element.ist-gewaehlt { background: var(--blau-hell); box-shadow: inset 3px 0 0 var(--blau); }
+.bs-element-name { font-weight: 700; }
+.bs-element-zusatz { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--schrift-matt); }
+.qa-meldung.ist-hinweis { border-color: var(--rand-stark); background: var(--flaeche-2); color: var(--schrift-matt); }
+.bs-leer { font-size: 12px; color: var(--schrift-zart); }
+
+.bs-vorzeichen-huelle summary { cursor: pointer; font-size: 12px; color: var(--schrift-matt); }
+.bs-vorzeichen { display: block; width: 100%; max-width: 380px; height: auto; margin-top: 4px; }
+.bs-vz-pfeil { fill: none; stroke: var(--schrift); stroke-width: 1.3; }
+.bs-vz-stab { stroke: var(--schrift); stroke-width: 3; }
+.bs-vz-faser { stroke: var(--schrift-matt); stroke-width: 1; stroke-dasharray: 4 3; }
+.bs-vz-text { font-size: 10px; fill: var(--schrift-matt); }
+
+/* Querschnitte, Lastfälle, Kombinationen. */
+.bs-querschnitt { display: flex; flex-direction: column; gap: 4px; padding: 6px 0; border-bottom: 1px solid var(--rand); }
+.bs-querschnitt-kopf { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 6px; align-items: center; }
+.bs-kennwerte { margin: 0; font-size: 12px; font-weight: 600; color: var(--stahl); }
+.bs-benutzt { margin: 0; font-size: 11px; color: var(--schrift-zart); }
+.bs-fall { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 6px; align-items: center; margin-bottom: 4px; }
+.bs-fall-zahl { font-size: 11px; color: var(--schrift-zart); }
+.bs-kombinationen { border-collapse: collapse; font-size: 12px; margin: 6px 0; }
+.bs-kombinationen th { text-align: left; font-weight: 600; color: var(--schrift-matt); padding: 2px 4px; }
+.bs-kombinationen td { padding: 2px 4px; }
+.bs-kombinationen .zahlfeld { width: 84px; }

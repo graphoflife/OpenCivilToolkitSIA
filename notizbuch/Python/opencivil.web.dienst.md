@@ -1,5 +1,5 @@
 ---
-erzeugt: b3699a0f36f4
+erzeugt: a6e6c3e65b4e
 art: modul
 tags: [modul]
 ---
@@ -261,7 +261,9 @@ jemand hinsieht. Gerechnet wird aus dem Zwischenspeicher, wenn er das
 System zu dieser Beschreibung noch hat.
 
 Ein System, das sich nicht rechnen laesst, ist keine falsche Anfrage:
-dann ist `verlauf` leer, und die Uebersicht sagt warum.
+dann ist `verlauf` leer, und die Uebersicht sagt warum. Ohne `fall`
+kommt nur die Uebersicht -- was das Zeichenfenster nach jeder Aenderung
+braucht: Meldungen, Knoten ohne Drehsteifigkeit, was sich bewegt.
 
 ### balkensystem_bearbeiten
 
@@ -275,8 +277,9 @@ Zurueck kommt das ganze System und die Kennung einer neuen Linie; die
 Oberflaeche uebernimmt es in einem Schritt, den man rueckgaengig machen
 kann.
 
-`teilen`: `linie` und die Stelle -- `stelle` in m ab dem Anfang
-oder ein `punkt` [x, z], der auf die Linie gelotet wird.
+`teilen`: `linie` und die Stelle -- `stelle` in m ab dem Anfang,
+ein `anteil` der Laenge (0.5: in der Mitte) oder ein `punkt` [x, z],
+der auf die Linie gelotet wird.
 `umkehren`: `linien`, eine oder mehrere.
 
 ### _vorlagenwahl
