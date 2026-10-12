@@ -31,6 +31,12 @@ def gerechnet(*, verformung=None, widerstand=None, tragsicherheit=None):
     return aufbau, knicken, loesung
 
 
+def diagramm(aufbau) -> dict:
+    """Das M-N-Bild der Platte -- nach einem ganzen Lauf, wie in der Oberflaeche."""
+    loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+    return diagrammdaten.linie(aufbau.nachweise["q1.x"], loesung, aufbau)
+
+
 def text(loesung) -> str:
     return " ".join(getattr(b, "text", "") + getattr(b, "latex", "")
                     for b in loesung.protokoll.alle_bloecke())
@@ -54,7 +60,7 @@ class TestVorgabe(unittest.TestCase):
     def test_der_widerstand_mit_der_vereinfachung(self):
         self.assertIs(self.knicken.widerstand.art, Rechenart.BLOCK)
         self.assertTrue(self.knicken.eigene_linie)
-        self.assertIsInstance(self.knicken.linie, Ebenenlinie)
+        self.assertIsInstance(self.loesung.befund(self.knicken).linie, Ebenenlinie)
         self.assertIn(r"x\text{-Vereinfachung}", text(self.loesung))
 
     def test_das_fenster_steht_wie_gerechnet(self):
@@ -62,7 +68,7 @@ class TestVorgabe(unittest.TestCase):
         self.assertIn("-3.5 ‰ bis 45.0 ‰", text(self.loesung))
 
     def test_im_diagramm_daneben(self):
-        linie = diagrammdaten.linie(self.aufbau.nachweise["q1.x"], self.aufbau)
+        linie = diagramm(self.aufbau)
         self.assertIn("0.85·x-Vereinfachung", linie["knicklinie"]["beschriftung"])
 
 
@@ -76,12 +82,12 @@ class TestGeteilteLinie(unittest.TestCase):
 
     def test_der_widerstand_ist_die_linie_der_tragsicherheit(self):
         self.assertFalse(self.knicken.eigene_linie)
-        self.assertIs(self.knicken.linie, self.aufbau.nachweise["q1.x"].massgebend)
+        self.assertIs(self.loesung.befund(self.knicken).linie,
+                      self.loesung.befund(self.aufbau.nachweise["q1.x"]).massgebend)
         self.assertIn("Dieselbe Wahl wie die Tragsicherheit", text(self.loesung))
 
     def test_im_diagramm_keine_eigene_linie(self):
-        linie = diagrammdaten.linie(self.aufbau.nachweise["q1.x"], self.aufbau)
-        self.assertIsNone(linie["knicklinie"])
+        self.assertIsNone(diagramm(self.aufbau)["knicklinie"])
 
 
 class TestEigeneLinie(unittest.TestCase):
@@ -92,19 +98,19 @@ class TestEigeneLinie(unittest.TestCase):
 
     def test_mit_eigener_herleitung(self):
         self.assertTrue(self.knicken.eigene_linie)
-        self.assertIsInstance(self.knicken.linie, Ebenenlinie)
+        self.assertIsInstance(self.loesung.befund(self.knicken).linie, Ebenenlinie)
         t = text(self.loesung)
         self.assertIn("Widerstand: Resistenzlinie aus Dehnungsebenen", t)
         self.assertIn(r"\text{charakteristisch}", t)
 
     def test_die_zeichen_folgen_dem_widerstand(self):
-        erg = self.knicken.ergebnisse[0]
+        erg = self.loesung.befund(self.knicken).ergebnisse[0]
         urteil = next(u for u in self.loesung.urteile if u.fall == "Stütze")
         self.assertIn("N_{Rk,K}", urteil.widerstand.symbol)
         self.assertIn("N_Rk", erg.begruendung)
 
     def test_im_diagramm_daneben(self):
-        linie = diagrammdaten.linie(self.aufbau.nachweise["q1.x"], self.aufbau)
+        linie = diagramm(self.aufbau)
         self.assertIn("Präzise", linie["knicklinie"]["beschriftung"])
         self.assertGreater(len(linie["knicklinie"]["punkte"]), 100)
 
@@ -114,8 +120,9 @@ class TestEigeneLinie(unittest.TestCase):
         der Punkt auf der Linie; beim schlanken Stab ist es die Stabilität --
         die Folge läuft knapp darüber nicht mehr ein --, und er liegt darin.
         """
-        erg = self.knicken.ergebnisse[0]
-        self.assertLessEqual(erg.M_bei_N_Rd, self.knicken.linie.moment_bei(-erg.N_Rd, True))
+        befund = self.loesung.befund(self.knicken)
+        erg = befund.ergebnisse[0]
+        self.assertLessEqual(erg.M_bei_N_Rd, befund.linie.moment_bei(-erg.N_Rd, True))
 
 
 class TestGleicheWahl(unittest.TestCase):
@@ -137,14 +144,14 @@ class TestVerformung(unittest.TestCase):
     def test_mehr_kriechen_mehr_ausmitte(self):
         e_2d = {}
         for phi in (0.0, 2.0):
-            _, knicken, _ = gerechnet(
+            _, knicken, loesung = gerechnet(
                 verformung=RechenwahlEintrag(kriechzahl=phi, rechenart="parabel"))
-            e_2d[phi] = knicken.ergebnisse[0].e_2d
+            e_2d[phi] = loesung.befund(knicken).ergebnisse[0].e_2d
         self.assertGreater(e_2d[2.0], e_2d[0.0])
 
     def test_block_rechnet_auch(self):
         _, knicken, loesung = gerechnet(verformung=RechenwahlEintrag(rechenart="block"))
-        self.assertTrue(knicken.ergebnisse[0].stabil)
+        self.assertTrue(loesung.befund(knicken).ergebnisse[0].stabil)
         self.assertIn(r"x\text{-Vereinfachung}", text(loesung))
 
 

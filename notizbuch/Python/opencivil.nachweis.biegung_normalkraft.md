@@ -1,5 +1,5 @@
 ---
-erzeugt: cface1426591
+erzeugt: a4e15bec1b7d
 art: modul
 tags: [modul]
 ---
@@ -142,35 +142,23 @@ Ergebnis der Prüfung einer Kombination.
 - `linie: Optional[Widerstandslinie] = None` – Die Linie, die ihn geliefert hat -- sie schreibt, wie.
 - `normierung: Optional[Normierung] = None` – Nur beim kuerzesten Abstand: dort ist der Grad kein Verhaeltnis von Momenten, sondern von Laengen im normierten Diagramm.
 
-### BiegungNormalkraft
+### MNBefund
 
 ```python
-class BiegungNormalkraft(Nachweis)
+@dataclass
+class MNBefund
 ```
 
-Nachweis der Biege- und Normalkrafttragfaehigkeit über die M-N-Interaktion.
+Was der M-N-Nachweis festhaelt: seine Linien und je Kombination die
+Auswertung. Steht nach dem Lauf in der Loesung
+([[opencivil.core.rechenwerk#Loesung.befund|befund]]), nicht am Nachweis.
 
-Erzeugt für jede Kombination einen Erfüllungsgrad und ein Urteil. Gemessen
-wird gegen die Linie der Wahl ([[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft|massgebend]]); die andere
-([[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft|vergleich]]) steht im Diagramm daneben.
+- `massgebend: Widerstandslinie` – Die Linie der Wahl -- gegen sie faellt das Urteil.
+- `vergleich: Optional[Widerstandslinie] = None` – Die andere Linie, fuer das Diagramm -- ohne Mitschrift.
+- `auswertungen: List[Auswertung] = field(default_factory=list)`
+- `bei_normalkraft: Dict[str, Optional[Auswertung]] = field(default_factory=dict)` – Je Kombination der Momentenwiderstand bei der wirkenden Normalkraft -- samt der Interpolation, aus der er stammt. Der Querkraftnachweis rechnet mit genau dieser Groesse und soll sie herleiten, statt eine Zahl hinzuschreiben. Er holt sie ueber [[opencivil.nachweis.biegung_normalkraft#MNBefund.widerstand_bei_n|widerstand_bei_n]].
 
-- `THEMA = 'Biegung und Normalkraft'`
-
-#### BiegungNormalkraft.pruefe
-
-```python
-def pruefe(self, e: Eingaben, p: Protokoll)
-```
-
-#### BiegungNormalkraft._linie
-
-```python
-def _linie(self, wahl: Rechenwahl, e: Eingaben, p: Protokoll) -> Widerstandslinie
-```
-
-Die Resistenzlinie einer Wahl -- und ihre Herleitung in `p`.
-
-#### BiegungNormalkraft.handlinie
+#### MNBefund.handlinie
 
 ```python
 @property
@@ -179,7 +167,7 @@ def handlinie(self) -> List[Eckpunkt]
 
 Die Eckpunkte der Handrechnung, ob massgebend oder Vergleich -- sonst leer.
 
-#### BiegungNormalkraft.linie
+#### MNBefund.linie
 
 ```python
 @property
@@ -188,7 +176,7 @@ def linie(self) -> List[Linienpunkt]
 
 Die Punkte der Linie aus Dehnungsebenen, ob massgebend oder Vergleich.
 
-#### BiegungNormalkraft.moment_bei
+#### MNBefund.moment_bei
 
 ```python
 def moment_bei(self, N_Ed: float, positiv: bool) -> Optional[float]
@@ -206,7 +194,7 @@ positiv (Zug unten) und negativ (Zug oben).
 :param N_Ed: Normalkraft in N, Zug positiv.
 :return: Moment in Nm, Betrag der gewaehlten Seite.
 
-#### BiegungNormalkraft.widerstand_bei_n
+#### MNBefund.widerstand_bei_n
 
 ```python
 def widerstand_bei_n(self, kombination: str) -> Optional[Auswertung]
@@ -214,9 +202,33 @@ def widerstand_bei_n(self, kombination: str) -> Optional[Auswertung]
 
 Der Momentenwiderstand bei der Normalkraft dieser Kombination.
 
-Liegt erst nach dem Lauf vor. Der Querkraftnachweis darf sich darauf
-verlassen: er fuehrt `d_m_rd` als Eingang, und damit steht die
-Reihenfolge im Graphen statt in einer Annahme.
+### BiegungNormalkraft
+
+```python
+class BiegungNormalkraft(Nachweis)
+```
+
+Nachweis der Biege- und Normalkrafttragfaehigkeit über die M-N-Interaktion.
+
+Erzeugt für jede Kombination einen Erfüllungsgrad und ein Urteil. Gemessen
+wird gegen die Linie der Wahl ([[opencivil.nachweis.biegung_normalkraft#MNBefund|MNBefund.massgebend]]); die andere
+([[opencivil.nachweis.biegung_normalkraft#MNBefund|MNBefund.vergleich]]) steht im Diagramm daneben.
+
+- `THEMA = 'Biegung und Normalkraft'`
+
+#### BiegungNormalkraft.pruefe
+
+```python
+def pruefe(self, e: Eingaben, p: Protokoll)
+```
+
+#### BiegungNormalkraft._linie
+
+```python
+def _linie(self, wahl: Rechenwahl, e: Eingaben, p: Protokoll) -> Widerstandslinie
+```
+
+Die Resistenzlinie einer Wahl -- und ihre Herleitung in `p`.
 
 #### BiegungNormalkraft._als_wert
 
@@ -235,7 +247,7 @@ stuenden zwei Momente da, deren Quotient nicht der Grad ist.
 #### BiegungNormalkraft._auswerten
 
 ```python
-def _auswerten(self, kombination: Schnittgroessen, eckwerte: Mapping[str, float]) -> Auswertung
+def _auswerten(self, linie: Widerstandslinie, kombination: Schnittgroessen, eckwerte: Mapping[str, float]) -> Auswertung
 ```
 
 Bestimmt den Erfuellungsgrad einer Kombination.
@@ -258,7 +270,7 @@ wird; was dann gerechnet wurde, steht vollstaendig da.
 #### BiegungNormalkraft._messen
 
 ```python
-def _messen(self, kombination: Schnittgroessen, achse: geo.Achse, innerhalb: bool) -> Optional[Auswertung]
+def _messen(self, linie: Widerstandslinie, kombination: Schnittgroessen, achse: geo.Achse, innerhalb: bool) -> Optional[Auswertung]
 ```
 
 Widerstand auf einer Achse, bei festgehaltener Gegenachse.
@@ -270,7 +282,7 @@ Ebene gelesen; damit fallen die Sonderfaelle weg.
 #### BiegungNormalkraft._naechster
 
 ```python
-def _naechster(self, kombination: Schnittgroessen, eckwerte: Mapping[str, float], innerhalb: bool) -> Auswertung
+def _naechster(self, linie: Widerstandslinie, kombination: Schnittgroessen, eckwerte: Mapping[str, float], innerhalb: bool) -> Auswertung
 ```
 
 Kuerzester Abstand, im auf die Eckwerte normierten Diagramm -- zum

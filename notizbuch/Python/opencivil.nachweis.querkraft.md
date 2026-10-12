@@ -1,5 +1,5 @@
 ---
-erzeugt: bd8b9e394511
+erzeugt: 6da3b7cd8c02
 art: modul
 tags: [modul]
 ---
@@ -283,6 +283,76 @@ def _ohne_zugbewehrung(M_Ed: float) -> str
 
 Die Begruendung, wenn die gezogene Seite keinen Stahl hat -- fuer beide Ansaetze.
 
+### Querkraftbefund
+
+```python
+@dataclass
+class Querkraftbefund
+```
+
+Was der Querkraftnachweis festhaelt: je Fall die Zwischenwerte, dazu die
+geloesten Eingaenge seines Ansatzes. Daraus zeichnet sich die Kurve ueber
+dem Moment (ohne Buegel) oder ueber der Neigung (mit Buegeln), ohne dass
+die Oberflaeche die Formel ein zweites Mal enthaelt. Steht nach dem Lauf
+in der Loesung, nicht am Nachweis.
+
+- `ergebnisse: List['Querkraftergebnis'] = field(default_factory=list)`
+- `beiwerte: Optional[Kurvenbeiwerte] = None` – Die geloesten Eingaenge ohne Buegel -- fuer [[opencivil.nachweis.querkraft#Querkraftbefund.kurve|kurve]].
+- `buegelwerte: Optional[Buegelwerte] = None` – Die geloesten Eingaenge des Buegelansatzes -- fuer [[opencivil.nachweis.querkraft#Querkraftbefund.neigungsverlauf|neigungsverlauf]].
+- `mn: Optional[MNBefund] = None` – Der Befund des M-N-Nachweises: aus seiner Linie kommt `m_Rd(N_Ed)` der Kurve.
+- `index: str = 'Rd'` – Wie der Momentenwiderstand heisst -- `Rd`, oder `Rk` mit charakteristischen Werten.
+
+#### Querkraftbefund.kurve
+
+```python
+def kurve(self, N_Ed: float) -> dict
+```
+
+Der Querkraftwiderstand ueber dem Moment, bei festgehaltener Normalkraft.
+
+**Ein** Diagramm je Tragrichtung, mit vorzeichenbehafteter Waagrechten:
+rechts das positive Moment (Zug unten), links das negative (Zug oben).
+Frueher waren das zwei Bilder; nebeneinander liessen sie sich schlecht
+vergleichen, obwohl sie dieselbe Platte beschreiben.
+
+Die beiden Aeste sind getrennte Linienzuege und treffen sich bei
+`M_Ed = 0` nicht unbedingt: sie haben verschiedene statische Hoehen,
+also auch verschiedene Widerstaende bei verschiedwindendem Moment. Das
+ist kein Zeichenfehler, sondern die Platte.
+
+Je Ast fuenfzig Stuetzstellen von null bis `m_Rd + 20 kNm`. Der
+Bereich jenseits von `m_Rd` ist der eigentliche Zweck: dort faellt der
+Widerstand, weil die Bewehrung fliesst (siehe [[opencivil.nachweis.querkraft#widerstand|widerstand]]).
+
+Gerechnet wird mit derselben Funktion wie im Nachweis. Die Kurve kann
+also nicht etwas anderes zeigen als die Punkte, die darauf liegen.
+
+:param N_Ed: eingestellte Normalkraft in N, Zug positiv.
+
+#### Querkraftbefund._ast
+
+```python
+def _ast(self, N_Ed: float, moment_positiv: bool) -> Optional[dict]
+```
+
+Ein Ast der Kurve. `None`, wenn es ihn nicht gibt.
+
+Es gibt ihn nicht, wenn auf der gezogenen Seite keine Bewehrung liegt
+oder die Normalkraft ausserhalb der Resistenzlinie faellt -- in beiden
+Faellen waere jeder gezeichnete Widerstand erfunden.
+
+#### Querkraftbefund.neigungsverlauf
+
+```python
+def neigungsverlauf(self, d: float, von: int, bis: int) -> List[Buegelpunkt]
+```
+
+Der Widerstand ueber der Neigung -- fuer das Diagramm.
+
+Ueber dieselbe Funktion wie der Nachweis selbst, nur ueber einen
+weiteren Bereich: gezeichnet wird auch ausserhalb der beiden Grenzen,
+dort blass. Zwei Rechenwege fuer dieselbe Kurve liefen auseinander.
+
 ### Querkraftfall
 
 ```python
@@ -422,57 +492,6 @@ Der Betonanteil des bügellosen Ansatzes entfällt hier vollständig --
 beides zu addieren wäre ein anderes Modell, und dieses Werkzeug rechnet
 nur, was es auch herleitet.
 
-#### Querkraft.kurve
-
-```python
-def kurve(self, N_Ed: float) -> dict
-```
-
-Der Querkraftwiderstand ueber dem Moment, bei festgehaltener Normalkraft.
-
-**Ein** Diagramm je Tragrichtung, mit vorzeichenbehafteter Waagrechten:
-rechts das positive Moment (Zug unten), links das negative (Zug oben).
-Frueher waren das zwei Bilder; nebeneinander liessen sie sich schlecht
-vergleichen, obwohl sie dieselbe Platte beschreiben.
-
-Die beiden Aeste sind getrennte Linienzuege und treffen sich bei
-`M_Ed = 0` nicht unbedingt: sie haben verschiedene statische Hoehen,
-also auch verschiedene Widerstaende bei verschiedwindendem Moment. Das
-ist kein Zeichenfehler, sondern die Platte.
-
-Je Ast fuenfzig Stuetzstellen von null bis `m_Rd + 20 kNm`. Der
-Bereich jenseits von `m_Rd` ist der eigentliche Zweck: dort faellt der
-Widerstand, weil die Bewehrung fliesst (siehe [[opencivil.nachweis.querkraft#widerstand|widerstand]]).
-
-Gerechnet wird mit derselben Funktion wie im Nachweis. Die Kurve kann
-also nicht etwas anderes zeigen als die Punkte, die darauf liegen.
-
-:param N_Ed: eingestellte Normalkraft in N, Zug positiv.
-
-#### Querkraft._ast
-
-```python
-def _ast(self, N_Ed: float, moment_positiv: bool) -> Optional[dict]
-```
-
-Ein Ast der Kurve. `None`, wenn es ihn nicht gibt.
-
-Es gibt ihn nicht, wenn auf der gezogenen Seite keine Bewehrung liegt
-oder die Normalkraft ausserhalb der Resistenzlinie faellt -- in beiden
-Faellen waere jeder gezeichnete Widerstand erfunden.
-
-#### Querkraft.neigungsverlauf
-
-```python
-def neigungsverlauf(self, d: float, von: int, bis: int) -> List[Buegelpunkt]
-```
-
-Der Widerstand ueber der Neigung -- fuer das Diagramm.
-
-Ueber dieselbe Funktion wie der Nachweis selbst, nur ueber einen
-weiteren Bereich: gezeichnet wird auch ausserhalb der beiden Grenzen,
-dort blass. Zwei Rechenwege fuer dieselbe Kurve liefen auseinander.
-
 #### Querkraft._widerstandssymbol
 
 ```python
@@ -500,7 +519,7 @@ Die letzte Zeile jedes Falls -- für beide Ansätze dieselbe.
 #### Querkraft._protokoll_fall
 
 ```python
-def _protokoll_fall(self, p: Protokoll, e: Eingaben, erg: Querkraftergebnis, k_g: Wert) -> None
+def _protokoll_fall(self, p: Protokoll, e: Eingaben, erg: Querkraftergebnis, k_g: Wert, mn: MNBefund) -> None
 ```
 
 Die vollstaendige Rechnung eines Falls, mit Zahlen in jeder Zeile.

@@ -1,5 +1,5 @@
 ---
-erzeugt: efced104c35e
+erzeugt: 4ce1d882cc66
 art: modul
 tags: [modul]
 ---
@@ -23,15 +23,15 @@ kNm und mm umgesetzt.
 ### linien
 
 ```python
-def linien(aufbau: Aufbau) -> dict
+def linien(aufbau: Aufbau, loesung: Loesung) -> dict
 ```
 
-Je M-N-Nachweis seine Linien, dazu die Bemessungs- und Knickpunkte.
+Je gerechneter M-N-Nachweis seine Linien, dazu die Bemessungs- und Knickpunkte.
 
 ### querkraftkurven
 
 ```python
-def querkraftkurven(aufbau: Aufbau, gewaehlt: Optional[Mapping[str, float]]=None) -> dict
+def querkraftkurven(aufbau: Aufbau, loesung: Loesung, gewaehlt: Optional[Mapping[str, float]]=None) -> dict
 ```
 
 Der Querkraftwiderstand ueber dem Moment -- eine Kurve je Tragrichtung.
@@ -54,7 +54,7 @@ Einheiten wie in den anderen Diagrammen: kNm und kN/m.
 ### neigungskurven
 
 ```python
-def neigungskurven(aufbau: Aufbau) -> dict
+def neigungskurven(aufbau: Aufbau, loesung: Loesung) -> dict
 ```
 
 Der Querkraftwiderstand ueber der Neigung der Druckdiagonalen.
@@ -160,7 +160,7 @@ wuerden nur vortaeuschen, dass etwas gekruemmt waere.
 ### _knickpunkte
 
 ```python
-def _knickpunkte(aufbau, nachweis) -> list
+def _knickpunkte(aufbau, nachweis, loesung) -> list
 ```
 
 Die Knicknachweise als Punktepaare fuer das M-N-Diagramm.
@@ -193,7 +193,7 @@ Randes, die man nicht einzeln markiert.
 ### linie
 
 ```python
-def linie(nachweis, aufbau=None) -> dict
+def linie(nachweis, loesung: Loesung, aufbau=None) -> dict
 ```
 
 Die M-N-Interaktionslinien zum Zeichnen -- in kN und kNm.

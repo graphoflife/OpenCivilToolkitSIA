@@ -53,11 +53,12 @@ in Millimeter ein, ``f_ck`` in N/mm^2. ``k_g`` laeuft deshalb ueber
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    Ausfuehrung, Befundbezug, Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
+    grad_def, grad_formel,
 )
 from opencivil.core.einheiten import (
     EINHEITSLOS, GRAD, KN, KN_PRO_M, KNM, MM, N_PRO_MM2, EmpirischesErgebnis,
@@ -66,7 +67,7 @@ from opencivil.core.einheiten import (
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
-from opencivil.nachweis.biegung_normalkraft import protokoll_widerstand
+from opencivil.nachweis.biegung_normalkraft import MNBefund, protokoll_widerstand
 from opencivil.nachweis.rechenwahl import stahlbezuege, stahlname, staehle
 from opencivil.querschnitt.platte import (
     ALPHA_ZUG, Plattenquerschnitt, Richtung, protokoll_statische_hoehe,
@@ -346,6 +347,116 @@ def _ohne_zugbewehrung(M_Ed: float) -> str:
     return f"Zugseite ({seite}) ohne Bewehrung → kein d, V_Rd = 0."
 
 
+@dataclass
+class Querkraftbefund:
+    """
+    Was der Querkraftnachweis festhaelt: je Fall die Zwischenwerte, dazu die
+    geloesten Eingaenge seines Ansatzes. Daraus zeichnet sich die Kurve ueber
+    dem Moment (ohne Buegel) oder ueber der Neigung (mit Buegeln), ohne dass
+    die Oberflaeche die Formel ein zweites Mal enthaelt. Steht nach dem Lauf
+    in der Loesung, nicht am Nachweis.
+    """
+
+    ergebnisse: List["Querkraftergebnis"] = field(default_factory=list)
+
+    beiwerte: Optional[Kurvenbeiwerte] = None
+    """Die geloesten Eingaenge ohne Buegel -- fuer :meth:`kurve`."""
+
+    buegelwerte: Optional[Buegelwerte] = None
+    """Die geloesten Eingaenge des Buegelansatzes -- fuer :meth:`neigungsverlauf`."""
+
+    mn: Optional[MNBefund] = None
+    """Der Befund des M-N-Nachweises: aus seiner Linie kommt ``m_Rd(N_Ed)`` der Kurve."""
+
+    index: str = "Rd"
+    """Wie der Momentenwiderstand heisst -- ``Rd``, oder ``Rk`` mit charakteristischen Werten."""
+
+    def kurve(self, N_Ed: float) -> dict:
+        """
+        Der Querkraftwiderstand ueber dem Moment, bei festgehaltener Normalkraft.
+
+        **Ein** Diagramm je Tragrichtung, mit vorzeichenbehafteter Waagrechten:
+        rechts das positive Moment (Zug unten), links das negative (Zug oben).
+        Frueher waren das zwei Bilder; nebeneinander liessen sie sich schlecht
+        vergleichen, obwohl sie dieselbe Platte beschreiben.
+
+        Die beiden Aeste sind getrennte Linienzuege und treffen sich bei
+        ``M_Ed = 0`` nicht unbedingt: sie haben verschiedene statische Hoehen,
+        also auch verschiedene Widerstaende bei verschiedwindendem Moment. Das
+        ist kein Zeichenfehler, sondern die Platte.
+
+        Je Ast fuenfzig Stuetzstellen von null bis ``m_Rd + 20 kNm``. Der
+        Bereich jenseits von ``m_Rd`` ist der eigentliche Zweck: dort faellt der
+        Widerstand, weil die Bewehrung fliesst (siehe :func:`widerstand`).
+
+        Gerechnet wird mit derselben Funktion wie im Nachweis. Die Kurve kann
+        also nicht etwas anderes zeigen als die Punkte, die darauf liegen.
+
+        :param N_Ed: eingestellte Normalkraft in N, Zug positiv.
+        """
+        return {"N_Ed": N_Ed,
+                "aeste": [ast for ast in (self._ast(N_Ed, True),
+                                          self._ast(N_Ed, False)) if ast]}
+
+    def _ast(self, N_Ed: float, moment_positiv: bool) -> Optional[dict]:
+        """
+        Ein Ast der Kurve. ``None``, wenn es ihn nicht gibt.
+
+        Es gibt ihn nicht, wenn auf der gezogenen Seite keine Bewehrung liegt
+        oder die Normalkraft ausserhalb der Resistenzlinie faellt -- in beiden
+        Faellen waere jeder gezeichnete Widerstand erfunden.
+        """
+        if self.beiwerte is None or self.mn is None:
+            return None
+        hoehen = self.beiwerte.hoehen(moment_positiv)
+        if hoehen is None:
+            return None
+        m_Rd = self.mn.moment_bei(N_Ed, positiv=moment_positiv)
+        if not m_Rd or m_Rd <= 0.0:
+            return None
+
+        d, d_v = hoehen
+        f_yd, E_s = self.beiwerte.zugstahl[moment_positiv]
+        bis = m_Rd + KURVENZUGABE
+
+        # Die fuenfzig Stellen liegen gleichmaessig, treffen ``m_Rd`` aber nur
+        # zufaellig. Beide Seiten des Sprungs kommen darum eigens dazu: sonst
+        # zeigte die Marke «v_Rd bei M_Ed = m_Rd» den Wert des Nachbarpunkts,
+        # und der Absatz waere schraeg statt senkrecht.
+        stellen = sorted(
+            {bis * i / (KURVENPUNKTE - 1) for i in range(KURVENPUNKTE)}
+            | {m_Rd, m_Rd + SPRUNGSCHRITT})
+
+        vz = 1.0 if moment_positiv else -1.0
+        punkte = []
+        for M_Ed in stellen:
+            p = widerstand(
+                M_Ed=M_Ed, N_Ed=N_Ed, h=self.beiwerte.h, d=d, d_v=d_v,
+                tau_cd=self.beiwerte.tau_cd, f_yd=f_yd,
+                E_s=E_s, k_g=self.beiwerte.k_g, m_Rd=m_Rd,
+                index=self.index)
+            punkte.append((vz * M_Ed, p.v_Rd, p.plastisch))
+
+        return {"punkte": punkte, "m_Rd": vz * m_Rd, "d": d, "d_v": d_v,
+                "moment_positiv": moment_positiv}
+
+    def neigungsverlauf(self, d: float, von: int, bis: int) -> List[Buegelpunkt]:
+        """
+        Der Widerstand ueber der Neigung -- fuer das Diagramm.
+
+        Ueber dieselbe Funktion wie der Nachweis selbst, nur ueber einen
+        weiteren Bereich: gezeichnet wird auch ausserhalb der beiden Grenzen,
+        dort blass. Zwei Rechenwege fuer dieselbe Kurve liefen auseinander.
+        """
+        if self.buegelwerte is None:
+            return []
+        w = self.buegelwerte
+        return neigungen(
+            alpha_min=von, alpha_max=bis, d=d,
+            a_s=w.a_s, s_x=w.s_x, s_y=w.s_y,
+            f_yd=w.f_yd, f_cd=w.f_cd, k_c=w.k_c)
+
+
 @dataclass(frozen=True)
 class Querkraftfall:
     """Eine zu pruefende Kombination fuer den Querkraftnachweis."""
@@ -452,33 +563,19 @@ class Querkraft(Nachweis):
         self.richtung = richtung
         # Ohne Fall still und mit dem Nullfall -- siehe NUR_KURVE.
         self.faelle = list(faelle) or [NUR_KURVE]
-        self.ergebnisse: List[Querkraftergebnis] = []
 
         self.buegel = (querschnitt.querkraftbewehrung
                        if querschnitt.hat_buegel else None)
         """Die Bügel dieser Platte -- ``None`` heisst: der Ansatz ohne."""
-
-        self.buegelwerte: Optional[Buegelwerte] = None
-        """Die geloesten Eingaenge des Bügelansatzes, nach dem Lauf."""
-
-        self.beiwerte: Optional[Kurvenbeiwerte] = None
-        """
-        Die geloesten Eingaenge, nach dem Lauf. Fuer :meth:`kurve`.
-
-        Ein Ergebnis des Laufs, das ein anderer braucht -- wie
-        :attr:`BiegungNormalkraft.bei_normalkraft`. Nicht zu verwechseln mit
-        Zwischenwerten, die zwischen eigenen Methoden gereicht werden; die
-        gehen durch die Argumentliste.
-        """
 
         self.mn = mn_nachweis
         """
         Der M-N-Nachweis derselben Richtung.
 
         Gebraucht fuer die Herleitung von ``m_Rd(N_Ed)``: die Zahl kommt als
-        Eingang aus dem Graphen, die Interpolation dahinter aber liegt beim
-        Nachweis, der das Polygon gerechnet hat. Sie hier nachzubauen hiesse,
-        dieselbe Rechnung ein zweites Mal zu schreiben.
+        Eingang aus dem Graphen, die Interpolation dahinter aber liegt in dessen
+        Befund (:class:`MNBefund`), den dieser Nachweis ohne Buegel liest. Sie
+        hier nachzubauen hiesse, dieselbe Rechnung ein zweites Mal zu schreiben.
         """
 
         r = richtung.value
@@ -561,6 +658,8 @@ class Querkraft(Nachweis):
             basis,
             ausgaben=list(self.d_ausnutzung.values()) + list(self.d_v_rd.values()),
             bezuege=bezuege,
+            # Ohne Buegel kommt m_Rd(N_Ed) samt Herleitung aus dem M-N-Nachweis.
+            befunde=[Befundbezug("mn", mn_nachweis.id)] if self.buegel is None else [],
             titel=f"Querkraftnachweis {richtung.beschriftung} – {querschnitt.name}",
             referenz="SIA 262:2025, 4.3.3.2",
             # Der Nachweis gehoert zu seiner Platte. Ohne diese Angabe stuende
@@ -605,22 +704,23 @@ class Querkraft(Nachweis):
         k_g = k_g_erg.wert.si
         beiwert = self._protokoll_k_g(p, e, k_g_erg)
 
-        self.beiwerte = Kurvenbeiwerte(
-            h=h, lagen=tuple(lagen), einlage=einlage, tau_cd=tau_cd.si,
-            zugstahl=zugstahl, k_g=k_g)
+        mn = e.befund("mn")
+        befund = Querkraftbefund(
+            beiwerte=Kurvenbeiwerte(h=h, lagen=tuple(lagen), einlage=einlage,
+                                    tau_cd=tau_cd.si, zugstahl=zugstahl, k_g=k_g),
+            mn=mn, index=self.mn.wahl.index)
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
-        self.ergebnisse = []
 
         for fall in self.faelle:
             erg = self._einen_fall(fall, h, tau_cd, zugstahl, einlage, k_g,
                                    m_rd[fall.name], lagen)
-            self.ergebnisse.append(erg)
-            self._protokoll_fall(p, e, erg, beiwert)
+            befund.ergebnisse.append(erg)
+            self._protokoll_fall(p, e, erg, beiwert, mn)
             self._eintragen(erg, ergebnis, urteile)
 
-        return Ausfuehrung(ergebnis, urteile)
+        return Ausfuehrung(ergebnis, urteile, befund)
 
     def _eintragen(
         self, erg: Querkraftergebnis, ergebnis: Dict[str, Groesse],
@@ -714,8 +814,8 @@ class Querkraft(Nachweis):
         ueber_teilung = self.buegel.ueber_abstand_y
         s_y = menge_y.si if ueber_teilung else (b / menge_y.si if menge_y.si else 0.0)
 
-        self.buegelwerte = Buegelwerte(
-            a_s=a_s, s_x=s_x, s_y=s_y, f_yd=f_yd, f_cd=f_cd, k_c=k_c)
+        befund = Querkraftbefund(buegelwerte=Buegelwerte(
+            a_s=a_s, s_x=s_x, s_y=s_y, f_yd=f_yd, f_cd=f_cd, k_c=k_c))
 
         teilung_y = (e["menge_y"] if ueber_teilung else
                      Zwischenwerte(self.id).laenge("s_y", "s_{V,y}", s_y))
@@ -723,17 +823,16 @@ class Querkraft(Nachweis):
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
-        self.ergebnisse = []
 
         for fall in self.faelle:
             erg = self._einen_fall_buegel(
                 fall, h=h, lagen=lagen, a_s=a_s, s_x=s_x, s_y=s_y,
                 f_yd=f_yd, f_cd=f_cd, k_c=k_c, ueber_teilung=ueber_teilung)
-            self.ergebnisse.append(erg)
+            befund.ergebnisse.append(erg)
             self._protokoll_fall_buegel(p, e, erg, teilung_y)
             self._eintragen(erg, ergebnis, urteile)
 
-        return Ausfuehrung(ergebnis, urteile)
+        return Ausfuehrung(ergebnis, urteile, befund)
 
     def _einen_fall_buegel(
         self, fall: Querkraftfall, *, h: float,
@@ -780,91 +879,6 @@ class Querkraft(Nachweis):
         return erg
 
     # -- Kurve --------------------------------------------------------------
-
-    def kurve(self, N_Ed: float) -> dict:
-        """
-        Der Querkraftwiderstand ueber dem Moment, bei festgehaltener Normalkraft.
-
-        **Ein** Diagramm je Tragrichtung, mit vorzeichenbehafteter Waagrechten:
-        rechts das positive Moment (Zug unten), links das negative (Zug oben).
-        Frueher waren das zwei Bilder; nebeneinander liessen sie sich schlecht
-        vergleichen, obwohl sie dieselbe Platte beschreiben.
-
-        Die beiden Aeste sind getrennte Linienzuege und treffen sich bei
-        ``M_Ed = 0`` nicht unbedingt: sie haben verschiedene statische Hoehen,
-        also auch verschiedene Widerstaende bei verschiedwindendem Moment. Das
-        ist kein Zeichenfehler, sondern die Platte.
-
-        Je Ast fuenfzig Stuetzstellen von null bis ``m_Rd + 20 kNm``. Der
-        Bereich jenseits von ``m_Rd`` ist der eigentliche Zweck: dort faellt der
-        Widerstand, weil die Bewehrung fliesst (siehe :func:`widerstand`).
-
-        Gerechnet wird mit derselben Funktion wie im Nachweis. Die Kurve kann
-        also nicht etwas anderes zeigen als die Punkte, die darauf liegen.
-
-        :param N_Ed: eingestellte Normalkraft in N, Zug positiv.
-        """
-        return {"N_Ed": N_Ed,
-                "aeste": [ast for ast in (self._ast(N_Ed, True),
-                                          self._ast(N_Ed, False)) if ast]}
-
-    def _ast(self, N_Ed: float, moment_positiv: bool) -> Optional[dict]:
-        """
-        Ein Ast der Kurve. ``None``, wenn es ihn nicht gibt.
-
-        Es gibt ihn nicht, wenn auf der gezogenen Seite keine Bewehrung liegt
-        oder die Normalkraft ausserhalb der Resistenzlinie faellt -- in beiden
-        Faellen waere jeder gezeichnete Widerstand erfunden.
-        """
-        if self.beiwerte is None:
-            return None
-        hoehen = self.beiwerte.hoehen(moment_positiv)
-        if hoehen is None:
-            return None
-        m_Rd = self.mn.moment_bei(N_Ed, positiv=moment_positiv)
-        if not m_Rd or m_Rd <= 0.0:
-            return None
-
-        d, d_v = hoehen
-        f_yd, E_s = self.beiwerte.zugstahl[moment_positiv]
-        bis = m_Rd + KURVENZUGABE
-
-        # Die fuenfzig Stellen liegen gleichmaessig, treffen ``m_Rd`` aber nur
-        # zufaellig. Beide Seiten des Sprungs kommen darum eigens dazu: sonst
-        # zeigte die Marke «v_Rd bei M_Ed = m_Rd» den Wert des Nachbarpunkts,
-        # und der Absatz waere schraeg statt senkrecht.
-        stellen = sorted(
-            {bis * i / (KURVENPUNKTE - 1) for i in range(KURVENPUNKTE)}
-            | {m_Rd, m_Rd + SPRUNGSCHRITT})
-
-        vz = 1.0 if moment_positiv else -1.0
-        punkte = []
-        for M_Ed in stellen:
-            p = widerstand(
-                M_Ed=M_Ed, N_Ed=N_Ed, h=self.beiwerte.h, d=d, d_v=d_v,
-                tau_cd=self.beiwerte.tau_cd, f_yd=f_yd,
-                E_s=E_s, k_g=self.beiwerte.k_g, m_Rd=m_Rd,
-                index=self.mn.wahl.index)
-            punkte.append((vz * M_Ed, p.v_Rd, p.plastisch))
-
-        return {"punkte": punkte, "m_Rd": vz * m_Rd, "d": d, "d_v": d_v,
-                "moment_positiv": moment_positiv}
-
-    def neigungsverlauf(self, d: float, von: int, bis: int) -> List[Buegelpunkt]:
-        """
-        Der Widerstand ueber der Neigung -- fuer das Diagramm.
-
-        Ueber dieselbe Funktion wie der Nachweis selbst, nur ueber einen
-        weiteren Bereich: gezeichnet wird auch ausserhalb der beiden Grenzen,
-        dort blass. Zwei Rechenwege fuer dieselbe Kurve liefen auseinander.
-        """
-        if self.buegelwerte is None:
-            return []
-        w = self.buegelwerte
-        return neigungen(
-            alpha_min=von, alpha_max=bis, d=d,
-            a_s=w.a_s, s_x=w.s_x, s_y=w.s_y,
-            f_yd=w.f_yd, f_cd=w.f_cd, k_c=w.k_c)
 
     def _widerstandssymbol(self, fall: Querkraftfall) -> str:
         """``V_Rd(M_Ed = 100 kNm, N_Ed = -300 kN)`` -- der Widerstand ist bedingt."""
@@ -1074,6 +1088,7 @@ class Querkraft(Nachweis):
 
     def _protokoll_fall(
         self, p: Protokoll, e: Eingaben, erg: Querkraftergebnis, k_g: Wert,
+        mn: MNBefund,
     ) -> None:
         """
         Die vollstaendige Rechnung eines Falls, mit Zahlen in jeder Zeile.
@@ -1116,7 +1131,7 @@ class Querkraft(Nachweis):
         # Der Momentenwiderstand, mit dem gleich gerechnet wird, hängt von der
         # wirkenden Normalkraft ab. Wo er auf dem Polygon herkommt, steht hier
         # -- geschrieben vom M-N-Nachweis, der es gerechnet hat.
-        bei_n = self.mn.widerstand_bei_n(fall.name)
+        bei_n = mn.widerstand_bei_n(fall.name)
         if bei_n is not None:
             protokoll_widerstand(
                 p, bei_n, basis=werte.basis,

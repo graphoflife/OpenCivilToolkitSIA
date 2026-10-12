@@ -79,7 +79,7 @@ class TestGemischteSorten(unittest.TestCase):
         E_s = self.loesung.groesse("betonstahl.s1.E_s").si
         erwartet = {"Feld": F_YD_B700B, "Stütze": F_YD_B500B}
         geprueft = set()
-        for erg in self.aufbau.querkraft["q1.x"].ergebnisse:
+        for erg in self.loesung.befund(self.aufbau.querkraft["q1.x"]).ergebnisse:
             if erg.fall.name not in erwartet:
                 continue
             with self.subTest(fall=erg.fall.name):
@@ -90,7 +90,7 @@ class TestGemischteSorten(unittest.TestCase):
         self.assertEqual(geprueft, set(erwartet))
 
     def test_das_knicken_rechnet_jede_lage_mit_ihrem_stahl(self):
-        loeser = self.aufbau.knicken["q1"].loeser
+        loeser = self.loesung.befund(self.aufbau.knicken["q1"]).loeser
         for lage, stab in zip(loeser.lagen, loeser.querschnitt.staebe):
             with self.subTest(z=lage.z):
                 erwartet = F_YD_B700B if unten(lage.z, loeser.h) else F_YD_B500B

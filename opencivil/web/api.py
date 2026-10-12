@@ -480,10 +480,10 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None) -> dict:
         "alle_nachweise_erfuellt": loesung.alle_nachweise_erfuellt,
     }
     if aufbau is not None:
-        ergebnis["linien"] = diagrammdaten.linien(aufbau)
+        ergebnis["linien"] = diagrammdaten.linien(aufbau, loesung)
         ergebnis["werkstoffgesetze"] = diagrammdaten.werkstoffgesetze(aufbau, loesung)
-        ergebnis["querkraftkurven"] = diagrammdaten.querkraftkurven(aufbau)
-        ergebnis["neigungskurven"] = diagrammdaten.neigungskurven(aufbau)
+        ergebnis["querkraftkurven"] = diagrammdaten.querkraftkurven(aufbau, loesung)
+        ergebnis["neigungskurven"] = diagrammdaten.neigungskurven(aufbau, loesung)
         ergebnis["spannungsanalysen"] = diagrammdaten.spannungsanalysen(aufbau, loesung)
         ergebnis["zusammenfassungen"] = zusammenfassungen(loesung, aufbau)
         # Je Balkensystem die knappe Uebersicht; die Verlaeufe fuer die

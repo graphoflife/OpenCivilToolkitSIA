@@ -82,7 +82,8 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    Ausfuehrung, Befundbezug, Eingabebezug, Eingaben, Nachweis, NachweisUrteil,
+    grad_def, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, M, Groesse
 from opencivil.core.latex import Mathe, angabe, als_text, bedingung
@@ -228,6 +229,25 @@ class Knickergebnis:
     hinweis: str = ""
 
 
+@dataclass
+class Knickbefund:
+    """
+    Was der Knicknachweis festhaelt: die Linie seines Widerstands, je Fall
+    die Zwischenwerte und den Loeser -- wer nachrechnen will, was bei einer
+    anderen Druckkraft herauskaeme, braucht denselben. Steht nach dem Lauf in
+    der Loesung, nicht am Nachweis.
+    """
+
+    linie: Widerstandslinie
+    """
+    Die Linie des Widerstands: die eigene, oder mit derselben Wahl die der
+    Tragsicherheit -- dasselbe Objekt, einmal gerechnet.
+    """
+
+    loeser: Querschnittsloeser
+    ergebnisse: List[Knickergebnis] = field(default_factory=list)
+
+
 def schiefstellung(laenge: float) -> float:
     """``alpha_i = min[ max(0.01/sqrt(l); 1/300) ; 1/200 ]``, ``l`` in m."""
     if laenge <= 0.0:
@@ -275,8 +295,6 @@ class Knicken(Nachweis):
         wie die Tragsicherheit ist es deren Linie -- einmal gerechnet und
         einmal hergeleitet.
         """
-        self.linie: Optional[Widerstandslinie] = None
-        """Die Linie des Widerstands -- nach dem Lauf."""
         self.schnell = schnell
         """
         Ob die Suche nach N_Rd uebersprungen wird.
@@ -291,7 +309,6 @@ class Knicken(Nachweis):
         Eingeschaltet wird das vom Bewehrungswerkzeug, das hunderte Male
         rechnet und nur wissen muss, ob es aufgeht.
         """
-        self.ergebnisse: List[Knickergebnis] = []
 
         basis = f"{querschnitt.id}.nachweis.knicken"
         self.d_ausnutzung: Dict[str, WertDef] = {
@@ -309,20 +326,22 @@ class Knicken(Nachweis):
             Eingabebezug("b", querschnitt.id_breite(self.richtung)),
         ] + betonbezuege(verformung.satz, querschnitt.beton) + lagenbezuege(
             self.posten, verformung.satz)
+        befunde = []
         if self.eigene_linie:
             bezuege = bezuege_vereinen(
                 bezuege, linienbezuege(querschnitt, self.posten, self.richtung, widerstand.satz))
         else:
             # Das Moment bei N liest die Iteration von der Linie des
-            # M-N-Nachweises. Ein Eckwert davon als Eingang stellt die
-            # Abhaengigkeit in den Graphen -- sonst rechnete ein Teillauf (das
-            # Auge) das Knicken ohne Linie.
-            bezuege.append(Eingabebezug("N_Rd_druck", mn_nachweis.d_eckwerte["N_Rd_druck"].id))
+            # M-N-Nachweises -- als dessen Befund, damit die Abhaengigkeit im
+            # Graphen steht. Sonst rechnete ein Teillauf (das Auge) das
+            # Knicken ohne Linie.
+            befunde.append(Befundbezug("mn", mn_nachweis.id))
 
         super().__init__(
             basis,
             ausgaben=list(self.d_ausnutzung.values()),
             bezuege=bezuege,
+            befunde=befunde,
             titel=f"Knicknachweis – {querschnitt.name}",
             referenz="SIA 262:2025, 4.3.7",
             abschnitt=querschnitt.abschnitt,
@@ -343,9 +362,6 @@ class Knicken(Nachweis):
         # Modul. eps_c1d und eps_c2d bleiben, wie die Norm sie angibt.
         g = gesetze(wahl, w)
         loeser = g.loeser(h=h, b=b, lagen=lagen, eps_druck=w.eps_c2d)
-        # Aufgehoben wie self.ergebnisse: wer nachrechnen will, was bei einer
-        # anderen Druckkraft herauskaeme, braucht denselben Loeser.
-        self.loeser = loeser
 
         self._protokoll_ansatz(p, e, eps_druck=w.eps_c2d, eps_zug=loeser.eps_zug,
                                verdraengt=g.verdraengt)
@@ -353,13 +369,14 @@ class Knicken(Nachweis):
         # der Tragsicherheit: sonst zahlte die Bewehrungssuche fuer jede Platte
         # mit Knickfall eine ganze genaue Linie, seit die Handrechnung hier
         # nicht mehr zur Wahl steht.
-        self.linie = (resistenzlinie(
+        linie = (resistenzlinie(
             self.widerstand, e, p, querschnitt=self.querschnitt, posten=self.posten,
             richtung=self.richtung, basis=f"{self.id}.widerstand",
             vorsatz="Widerstand: ", ebene=3, wahltitel="Rechenwahl – Widerstand (N_Rd)",
             schritte=(dehnungsfaecher.SCHRITTE_SUCHE if self.schnell
                       else dehnungsfaecher.SCHRITTE))
-            if self.eigene_linie else self.mn.massgebend)
+            if self.eigene_linie else e.befund("mn").massgebend)
+        befund = Knickbefund(linie=linie, loeser=loeser)
         if not self.eigene_linie:
             p.titel("Widerstand", ebene=3)
             protokoll_rechenwahl(p, self.widerstand, f"{self.id}.widerstand",
@@ -369,20 +386,19 @@ class Knicken(Nachweis):
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
-        self.ergebnisse = []
 
         for fall in self.faelle:
-            erg = self._einen_fall(loeser, fall, h)
-            self.ergebnisse.append(erg)
+            erg = self._einen_fall(loeser, linie, fall, h)
+            befund.ergebnisse.append(erg)
             self._protokoll_fall(p, erg)
             ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(
                 erg.erfuellungsgrad, EINHEITSLOS)
             urteile.append(self._urteil(erg))
 
-        return Ausfuehrung(ergebnis, urteile)
+        return Ausfuehrung(ergebnis, urteile, befund)
 
-    def _einen_fall(self, loeser: Querschnittsloeser, fall: Knickfall,
-                    h: float) -> Knickergebnis:
+    def _einen_fall(self, loeser: Querschnittsloeser, linie: Widerstandslinie,
+                    fall: Knickfall, h: float) -> Knickergebnis:
         erg = Knickergebnis(fall=fall)
         N_Ed = fall.N_Ed.si
         l_cr = fall.knicklaenge.si
@@ -401,7 +417,7 @@ class Knicken(Nachweis):
         # bei der Suche nach N_Rd fest -- M_Ed,1 waechst mit der Last.
         erg.e_1d = abs(fall.M_Ed_1.si / N_Ed)
 
-        bei_N_Ed = self._gleichgewicht(loeser, abs(N_Ed), erg, l_cr)
+        bei_N_Ed = self._gleichgewicht(loeser, linie, abs(N_Ed), erg, l_cr)
         erg.schritte = bei_N_Ed.schritte
         erg.durchlaeufe = len(bei_N_Ed.schritte)
         erg.stabil = bei_N_Ed.stabil
@@ -419,11 +435,11 @@ class Knicken(Nachweis):
             erg.N_Rd = abs(N_Ed) * verhaeltnis
             erg.M_bei_N_Rd = bei_N_Ed.M_Rd
         else:
-            erg.N_Rd = self._grenzkraft(loeser, abs(N_Ed), erg, l_cr,
+            erg.N_Rd = self._grenzkraft(loeser, linie, abs(N_Ed), erg, l_cr,
                                         traegt=bei_N_Ed.traegt)
             # Bei N_Rd steht der Stab an seiner Grenze: das Moment am
             # verformten System *ist* dort der Widerstand.
-            grenze = self._gleichgewicht(loeser, erg.N_Rd, erg, l_cr)
+            grenze = self._gleichgewicht(loeser, linie, erg.N_Rd, erg, l_cr)
             erg.M_bei_N_Rd = abs(grenze.M_ges) if grenze.stabil else grenze.M_Rd
         erg.erfuellungsgrad = erg.N_Rd / abs(N_Ed)
         erg.erfuellt = bei_N_Ed.traegt
@@ -449,8 +465,8 @@ class Knicken(Nachweis):
 
     # -- Gleichgewicht bei einer Probekraft ---------------------------------
 
-    def _gleichgewicht(self, loeser: Querschnittsloeser, N: float,
-                       erg: Knickergebnis, l_cr: float) -> Gleichgewicht:
+    def _gleichgewicht(self, loeser: Querschnittsloeser, linie: Widerstandslinie,
+                       N: float, erg: Knickergebnis, l_cr: float) -> Gleichgewicht:
         """
         Die Ausmitten-Iteration bei der Druckkraft ``N`` (Betrag).
 
@@ -487,12 +503,13 @@ class Knicken(Nachweis):
             return gg
 
         # Der Querschnitt muss das Moment am verformten System aufnehmen.
-        gg.M_Rd = self.linie.moment_bei(-N, positiv=gg.M_ges >= 0) or 0.0
+        gg.M_Rd = linie.moment_bei(-N, positiv=gg.M_ges >= 0) or 0.0
         gg.traegt = gg.M_Rd >= abs(gg.M_ges)
         return gg
 
-    def _grenzkraft(self, loeser: Querschnittsloeser, N_Ed: float,
-                    erg: Knickergebnis, l_cr: float, *, traegt: bool) -> float:
+    def _grenzkraft(self, loeser: Querschnittsloeser, linie: Widerstandslinie,
+                    N_Ed: float, erg: Knickergebnis, l_cr: float, *,
+                    traegt: bool) -> float:
         """
         Die groesste getragene Druckkraft, durch Halbieren.
 
@@ -501,7 +518,7 @@ class Knicken(Nachweis):
         das Halbieren braucht -- sie muss nicht gesucht werden.
         """
         def traegt_bei(N: float) -> bool:
-            return self._gleichgewicht(loeser, N, erg, l_cr).traegt
+            return self._gleichgewicht(loeser, linie, N, erg, l_cr).traegt
 
         if traegt:
             # Oben suchen: verdoppeln, bis es nicht mehr traegt.

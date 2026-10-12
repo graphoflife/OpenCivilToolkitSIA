@@ -195,6 +195,65 @@ MASSSTAB: Dict[str, Erfuellungsart] = {
 }
 
 
+@dataclass
+class MNBefund:
+    """
+    Was der M-N-Nachweis festhaelt: seine Linien und je Kombination die
+    Auswertung. Steht nach dem Lauf in der Loesung
+    (:meth:`~opencivil.core.rechenwerk.Loesung.befund`), nicht am Nachweis.
+    """
+
+    massgebend: Widerstandslinie
+    """Die Linie der Wahl -- gegen sie faellt das Urteil."""
+
+    vergleich: Optional[Widerstandslinie] = None
+    """Die andere Linie, fuer das Diagramm -- ohne Mitschrift."""
+
+    auswertungen: List[Auswertung] = field(default_factory=list)
+
+    bei_normalkraft: Dict[str, Optional[Auswertung]] = field(default_factory=dict)
+    """
+    Je Kombination der Momentenwiderstand bei der wirkenden Normalkraft --
+    samt der Interpolation, aus der er stammt.
+
+    Der Querkraftnachweis rechnet mit genau dieser Groesse und soll sie
+    herleiten, statt eine Zahl hinzuschreiben. Er holt sie ueber
+    :meth:`widerstand_bei_n`.
+    """
+
+    @property
+    def handlinie(self) -> List[Eckpunkt]:
+        """Die Eckpunkte der Handrechnung, ob massgebend oder Vergleich -- sonst leer."""
+        return next((l.punkte for l in (self.massgebend, self.vergleich)
+                     if isinstance(l, Handlinie)), [])
+
+    @property
+    def linie(self) -> List[Linienpunkt]:
+        """Die Punkte der Linie aus Dehnungsebenen, ob massgebend oder Vergleich."""
+        return next((l.punkte for l in (self.massgebend, self.vergleich)
+                     if isinstance(l, Ebenenlinie)), [])
+
+    def moment_bei(self, N_Ed: float, positiv: bool) -> Optional[float]:
+        """
+        Der Momentenwiderstand bei dieser Normalkraft, auf der gewaehlten Seite.
+
+        Fuer beliebige Normalkraefte, nicht nur die der Kombinationen: die
+        Querkraftkurve laesst den Benutzer ein N_Ed einstellen und braucht dann
+        den passenden Widerstand. Beide Seiten der Linie sind moeglich --
+        positiv (Zug unten) und negativ (Zug oben).
+
+        ``None``, wenn die Normalkraft ausserhalb der Resistenzlinie liegt.
+
+        :param N_Ed: Normalkraft in N, Zug positiv.
+        :return: Moment in Nm, Betrag der gewaehlten Seite.
+        """
+        return self.massgebend.moment_bei(N_Ed, positiv)
+
+    def widerstand_bei_n(self, kombination: str) -> Optional[Auswertung]:
+        """Der Momentenwiderstand bei der Normalkraft dieser Kombination."""
+        return self.bei_normalkraft.get(kombination)
+
+
 # ===========================================================================
 # Nachweis
 # ===========================================================================
@@ -205,8 +264,8 @@ class BiegungNormalkraft(Nachweis):
     Nachweis der Biege- und Normalkrafttragfaehigkeit über die M-N-Interaktion.
 
     Erzeugt für jede Kombination einen Erfüllungsgrad und ein Urteil. Gemessen
-    wird gegen die Linie der Wahl (:attr:`massgebend`); die andere
-    (:attr:`vergleich`) steht im Diagramm daneben.
+    wird gegen die Linie der Wahl (:attr:`MNBefund.massgebend`); die andere
+    (:attr:`MNBefund.vergleich`) steht im Diagramm daneben.
     """
 
     THEMA = "Biegung und Normalkraft"
@@ -254,24 +313,6 @@ class BiegungNormalkraft(Nachweis):
         Bewehrungssuche rechnet je Lauf ein paar Dutzend Mal und sieht dabei
         kein Diagramm an; sie baut darum ueber ``aufbauen(schnell=True)`` ohne
         Vergleich -- dieselben Zahlen, ein Bruchteil der Zeit.
-        """
-
-        self.massgebend: Optional[Widerstandslinie] = None
-        """Die Linie der Wahl -- gegen sie faellt das Urteil. Nach dem Lauf."""
-
-        self.vergleich: Optional[Widerstandslinie] = None
-        """Die andere Linie, fuer das Diagramm -- ohne Mitschrift."""
-
-        self.auswertungen: List[Auswertung] = []
-
-        self.bei_normalkraft: Dict[str, Optional[Auswertung]] = {}
-        """
-        Je Kombination der Momentenwiderstand bei der wirkenden Normalkraft --
-        samt der Interpolation, aus der er stammt.
-
-        Der Querkraftnachweis rechnet mit genau dieser Groesse und soll sie
-        herleiten, statt eine Zahl hinzuschreiben. Er holt sie ueber
-        :meth:`widerstand_bei_n`.
         """
 
         r = richtung.value
@@ -340,18 +381,18 @@ class BiegungNormalkraft(Nachweis):
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         wahl = self.wahl
-        self.massgebend = self._linie(wahl, e, p)
+        befund = MNBefund(massgebend=self._linie(wahl, e, p))
         # Die andere Linie steht zum Vergleich im Diagramm, ohne Mitschrift:
         # neben der Handrechnung die Parabel, sonst die Handrechnung.
-        self.vergleich = None
         if self.mit_vergleich:
             art = (Rechenart.PARABEL if wahl.art is Rechenart.HANDRECHNUNG
                    else Rechenart.HANDRECHNUNG)
-            self.vergleich = self._linie(
+            befund.vergleich = self._linie(
                 Rechenwahl(kriechzahl=wahl.kriechzahl, satz=wahl.satz, art=art),
                 e, StillesProtokoll())
 
-        eckwerte = self.massgebend.eckwerte()
+        linie = befund.massgebend
+        eckwerte = linie.eckwerte()
         # Achtung: die Eckwerte liegen in SI-Basis vor (N bzw. Nm), darum
         # aus_si() -- Groesse(x, KN) wuerde x als Kilonewton lesen.
         ergebnis: Dict[str, Groesse] = {
@@ -359,20 +400,18 @@ class BiegungNormalkraft(Nachweis):
             for k, v in eckwerte.items()
         }
 
-        self.auswertungen = []
-        self.bei_normalkraft = {}
         urteile: List[NachweisUrteil] = []
         for kombination in self.kombinationen:
-            auswertung = self._auswerten(kombination, eckwerte)
-            self.auswertungen.append(auswertung)
+            auswertung = self._auswerten(linie, kombination, eckwerte)
+            befund.auswertungen.append(auswertung)
             self._protokoll_kombination(p, auswertung, eckwerte)
             ergebnis[self.d_ausnutzung[kombination.name].id] = Groesse(
                 auswertung.erfuellungsgrad, EINHEITSLOS
             )
             # Unabhaengig vom gewaehlten Massstab: der Momentenwiderstand bei
             # dieser Normalkraft, denn der Querkraftnachweis rechnet damit.
-            bei_n = self._messen(kombination, geo.MOMENT, auswertung.innerhalb)
-            self.bei_normalkraft[kombination.name] = bei_n
+            bei_n = self._messen(linie, kombination, geo.MOMENT, auswertung.innerhalb)
+            befund.bei_normalkraft[kombination.name] = bei_n
             ergebnis[self.d_m_rd[kombination.name].id] = Groesse.aus_si(
                 abs(bei_n.rd) if bei_n else 0.0, KNM)
             urteile.append(
@@ -387,51 +426,13 @@ class BiegungNormalkraft(Nachweis):
                     widerstand=self._als_wert(auswertung, "Rd"),
                 )
             )
-        return Ausfuehrung(ergebnis, urteile)
+        return Ausfuehrung(ergebnis, urteile, befund)
 
     def _linie(self, wahl: Rechenwahl, e: Eingaben, p: Protokoll) -> Widerstandslinie:
         """Die Resistenzlinie einer Wahl -- und ihre Herleitung in ``p``."""
         return resistenzlinie(wahl, e, p, querschnitt=self.querschnitt, posten=self.posten,
                               richtung=self.richtung, basis=self.id,
                               schritte=self.schritte, fasern=self.fasern)
-
-    @property
-    def handlinie(self) -> List[Eckpunkt]:
-        """Die Eckpunkte der Handrechnung, ob massgebend oder Vergleich -- sonst leer."""
-        return next((l.punkte for l in (self.massgebend, self.vergleich)
-                     if isinstance(l, Handlinie)), [])
-
-    @property
-    def linie(self) -> List[Linienpunkt]:
-        """Die Punkte der Linie aus Dehnungsebenen, ob massgebend oder Vergleich."""
-        return next((l.punkte for l in (self.massgebend, self.vergleich)
-                     if isinstance(l, Ebenenlinie)), [])
-
-    def moment_bei(self, N_Ed: float, positiv: bool) -> Optional[float]:
-        """
-        Der Momentenwiderstand bei dieser Normalkraft, auf der gewaehlten Seite.
-
-        Fuer beliebige Normalkraefte, nicht nur die der Kombinationen: die
-        Querkraftkurve laesst den Benutzer ein N_Ed einstellen und braucht dann
-        den passenden Widerstand. Beide Seiten der Linie sind moeglich --
-        positiv (Zug unten) und negativ (Zug oben).
-
-        ``None``, wenn die Normalkraft ausserhalb der Resistenzlinie liegt.
-
-        :param N_Ed: Normalkraft in N, Zug positiv.
-        :return: Moment in Nm, Betrag der gewaehlten Seite.
-        """
-        return self.massgebend.moment_bei(N_Ed, positiv)
-
-    def widerstand_bei_n(self, kombination: str) -> Optional[Auswertung]:
-        """
-        Der Momentenwiderstand bei der Normalkraft dieser Kombination.
-
-        Liegt erst nach dem Lauf vor. Der Querkraftnachweis darf sich darauf
-        verlassen: er fuehrt ``d_m_rd`` als Eingang, und damit steht die
-        Reihenfolge im Graphen statt in einer Annahme.
-        """
-        return self.bei_normalkraft.get(kombination)
 
     def _als_wert(self, auswertung: Auswertung, seite: str):
         """
@@ -471,7 +472,8 @@ class BiegungNormalkraft(Nachweis):
         return definition.belegen(Groesse.aus_si(zahl, einheit))
 
     def _auswerten(
-        self, kombination: Schnittgroessen, eckwerte: Mapping[str, float]
+        self, linie: Widerstandslinie, kombination: Schnittgroessen,
+        eckwerte: Mapping[str, float],
     ) -> Auswertung:
         """
         Bestimmt den Erfuellungsgrad einer Kombination.
@@ -492,15 +494,15 @@ class BiegungNormalkraft(Nachweis):
         wird; was dann gerechnet wurde, steht vollstaendig da.
         """
         N_Ed, M_Ed = kombination.N_Ed.si, kombination.M_Ed.si
-        innerhalb = self.massgebend.innerhalb(N_Ed, M_Ed)
+        innerhalb = linie.innerhalb(N_Ed, M_Ed)
 
         art = kombination.art
         if art is Erfuellungsart.NAECHSTER_PUNKT:
-            return self._naechster(kombination, eckwerte, innerhalb)
+            return self._naechster(linie, kombination, eckwerte, innerhalb)
 
         achsen = ((geo.MOMENT, geo.NORMALKRAFT) if art is Erfuellungsart.AUTOMATISCH
                   else (ACHSE_ZU[art],))
-        gemessen = [self._messen(kombination, achse, innerhalb) for achse in achsen]
+        gemessen = [self._messen(linie, kombination, achse, innerhalb) for achse in achsen]
         gueltig = [g for g in gemessen if g is not None]
         if not gueltig:
             return Auswertung(
@@ -511,7 +513,8 @@ class BiegungNormalkraft(Nachweis):
         return min(gueltig, key=lambda g: g.erfuellungsgrad)
 
     def _messen(
-        self, kombination: Schnittgroessen, achse: geo.Achse, innerhalb: bool
+        self, linie: Widerstandslinie, kombination: Schnittgroessen, achse: geo.Achse,
+        innerhalb: bool,
     ) -> Optional[Auswertung]:
         """
         Widerstand auf einer Achse, bei festgehaltener Gegenachse.
@@ -524,7 +527,7 @@ class BiegungNormalkraft(Nachweis):
         fest = achse.gegen.von(ed)
         gesucht = achse.von(ed)
 
-        treffer = self.massgebend.kante(achse, fest, positiv=gesucht >= 0)
+        treffer = linie.kante(achse, fest, positiv=gesucht >= 0)
         if treffer is None:
             return None
         rd = treffer.wert
@@ -537,11 +540,11 @@ class BiegungNormalkraft(Nachweis):
                          f"{achse.gegen.name}_Ed = {_in(fest, achse.gegen)}."),
             achse=achse, ed=gesucht, rd=rd,
             massstab=MASSSTAB[achse.name],
-            treffer=treffer, linie=self.massgebend)
+            treffer=treffer, linie=linie)
 
     def _naechster(
-        self, kombination: Schnittgroessen, eckwerte: Mapping[str, float],
-        innerhalb: bool,
+        self, linie: Widerstandslinie, kombination: Schnittgroessen,
+        eckwerte: Mapping[str, float], innerhalb: bool,
     ) -> Auswertung:
         """
         Kuerzester Abstand, im auf die Eckwerte normierten Diagramm -- zum
@@ -553,7 +556,7 @@ class BiegungNormalkraft(Nachweis):
         N_ref = max(abs(eckwerte["N_Rd_zug"]), abs(eckwerte["N_Rd_druck"])) or 1.0
         M_ref = max(abs(eckwerte["M_Rd_max"]), abs(eckwerte["M_Rd_min"])) or 1.0
         abstand, stelle = geo.naechster_punkt(
-            N_Ed, M_Ed, self.massgebend.punkte, N_ref, M_ref)
+            N_Ed, M_Ed, linie.punkte, N_ref, M_ref)
         laenge = math.hypot(N_Ed / N_ref, M_Ed / M_ref)
         rand = max(laenge + abstand if innerhalb else laenge - abstand, 0.0)
         grad = float("inf") if laenge == 0 else rand / laenge

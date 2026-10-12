@@ -497,13 +497,15 @@ class TestKnicken(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.aufbau, cls.gefunden = urteile(cls.projekt(
+        cls.aufbau, loesung = rechnen(cls.projekt(
             KnickEintrag("Stütze", N_Ed=-800.0, M_Ed_1=20.0, laenge=4.0, knicklaenge=4.0),
             # Instabil, ohne zwölf Meter Stab: die Grenzkraftsuche dauert
             # dann eine Sekunde statt fünf.
             KnickEintrag("überlastet", N_Ed=-8000.0, M_Ed_1=30.0,
                          laenge=3.0, knicklaenge=3.0)))
-        cls.stabil, cls.instabil = cls.aufbau.knicken["q1"].ergebnisse
+        cls.gefunden = {u.name: u for u in loesung.urteile}
+        cls.befund = loesung.befund(cls.aufbau.knicken["q1"])
+        cls.stabil, cls.instabil = cls.befund.ergebnisse
 
     def test_gedrungen_und_maessig_belastet_ist_stabil(self):
         erg = self.stabil
@@ -557,10 +559,10 @@ class TestKnicken(unittest.TestCase):
 
     def test_die_grenzkraft_traegt_und_ein_bisschen_mehr_nicht(self):
         """Die Probe auf die Halbierung: bei N_Rd steht er, knapp darüber nicht."""
-        nachweis, erg = self.aufbau.knicken["q1"], self.stabil
-        self.assertTrue(nachweis._gleichgewicht(nachweis.loeser, erg.N_Rd * 0.999,
+        nachweis, erg, befund = self.aufbau.knicken["q1"], self.stabil, self.befund
+        self.assertTrue(nachweis._gleichgewicht(befund.loeser, befund.linie, erg.N_Rd * 0.999,
                                                 erg, 4.0).traegt)
-        self.assertFalse(nachweis._gleichgewicht(nachweis.loeser, erg.N_Rd * 1.02,
+        self.assertFalse(nachweis._gleichgewicht(befund.loeser, befund.linie, erg.N_Rd * 1.02,
                                                  erg, 4.0).traegt)
 
     def test_die_iteration_steht_schritt_fuer_schritt_da(self):
@@ -584,8 +586,8 @@ class TestKnicken(unittest.TestCase):
             aufbau = self.projekt(KnickEintrag(
                 "k", N_Ed=-800.0, M_Ed_1=20.0, laenge=laenge,
                 knicklaenge=laenge)).aufbauen(schnell=True)
-            aufbau.werk.loese(*aufbau.alle_nachweisziele(), ohne_herleitung=True)
-            return aufbau.knicken["q1"].ergebnisse[0].e_2d
+            loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele(), ohne_herleitung=True)
+            return loesung.befund(aufbau.knicken["q1"]).ergebnisse[0].e_2d
 
         self.assertLess(e_2d(3.0), e_2d(7.0))
 

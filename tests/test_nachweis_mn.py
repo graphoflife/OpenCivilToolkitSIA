@@ -283,8 +283,8 @@ class TestQuerschnitt(unittest.TestCase):
             nachweis = BiegungNormalkraft(
                 qs, [Schnittgroessen("F", M_Ed=Groesse(1, KNM))], Richtung.X)
             werk.registriere(nachweis)
-            werk.loese(nachweis.d_eckwerte["M_Rd_max"].id)
-            return max(schnitte(nachweis.linie, MOMENT, 0.0))
+            befund = werk.loese(nachweis.d_eckwerte["M_Rd_max"].id).befund(nachweis)
+            return max(schnitte(befund.linie, MOMENT, 0.0))
 
         ohne = m_rd(platte([
             lage(1, Richtung.X, phi=18.0), lage(2, Richtung.Y),
@@ -322,6 +322,7 @@ class TestResistenzlinie(unittest.TestCase):
             self.nachweis.d_eckwerte["M_Rd_max"].id,
             self.nachweis.d_ausnutzung["Feld"].id,
         )
+        self.befund = self.loesung.befund(self.nachweis)
 
     def eck(self, name: str) -> Groesse:
         return self.loesung.groesse(self.nachweis.d_eckwerte[name].id)
@@ -332,16 +333,16 @@ class TestResistenzlinie(unittest.TestCase):
         sie sich, stimmt weder der Punkt-in-Linie-Test noch die Schnittsuche --
         und beides trägt jedes Urteil dieses Nachweises.
         """
-        linie = self.nachweis.linie
+        linie = self.befund.linie
         self.assertEqual([(f"{linie[i].abschnitt} × {linie[j].abschnitt}")
                           for i, j in kreuzungen([(p.M, p.N) for p in linie])], [])
 
     def test_keine_faser_ueberschreitet_die_bruchdehnung(self):
-        for p in self.nachweis.linie:
+        for p in self.befund.linie:
             self.assertGreaterEqual(min(p.eps_oben, p.eps_unten), -0.0035 - 1e-12)
 
     def test_keine_doppelten_punkte(self):
-        linie = self.nachweis.linie
+        linie = self.befund.linie
         for i in range(len(linie)):
             a, b = linie[i], linie[(i + 1) % len(linie)]
             with self.subTest(i=i):
@@ -365,7 +366,7 @@ class TestResistenzlinie(unittest.TestCase):
         erwartet = -(20e6 * (1.0 * 0.3 - a_s) + a_s * sigma_s) / 1e3
 
         gleichmaessig = [
-            p for p in self.nachweis.linie if abs(p.eps_oben - p.eps_unten) < 1e-9
+            p for p in self.befund.linie if abs(p.eps_oben - p.eps_unten) < 1e-9
         ]
         druckpunkt = min(gleichmaessig, key=lambda p: p.N)
         self.assertAlmostEqual(druckpunkt.eps_oben * 1000, -2.0, places=6)
@@ -377,9 +378,9 @@ class TestResistenzlinie(unittest.TestCase):
         auf: eine leicht geneigte Ebene staucht die untere Bewehrung über
         eps_yd hinaus, sodass sie mit f_yd statt mit E_s*eps mitträgt.
         """
-        extrem = min(self.nachweis.linie, key=lambda p: p.N)
+        extrem = min(self.befund.linie, key=lambda p: p.N)
         gleichmaessig = min(
-            (p for p in self.nachweis.linie if abs(p.eps_oben - p.eps_unten) < 1e-9),
+            (p for p in self.befund.linie if abs(p.eps_oben - p.eps_unten) < 1e-9),
             key=lambda p: p.N)
         self.assertLess(extrem.N, gleichmaessig.N)
         self.assertGreater(extrem.N, gleichmaessig.N * 1.02)
@@ -394,12 +395,12 @@ class TestResistenzlinie(unittest.TestCase):
             x_eff = 737e3 / (20 * 1000)       = 36.9 mm
             M_Rd  = 737 * (261 - 36.9/2)      ≈ 179 kNm
         """
-        momente = schnitte(self.nachweis.linie, MOMENT, 0.0)
+        momente = schnitte(self.befund.linie, MOMENT, 0.0)
         m_rd = max(momente) / 1e3
         self.assertAlmostEqual(m_rd, 179.0, delta=8.0)
 
     def test_nur_untere_bewehrung_gibt_bei_n_null_kaum_negatives_moment(self):
-        momente = schnitte(self.nachweis.linie, MOMENT, 0.0)
+        momente = schnitte(self.befund.linie, MOMENT, 0.0)
         self.assertLess(abs(min(momente)) / 1e3, 20.0)
 
     def test_groesstes_moment_liegt_beim_balancepunkt(self):
@@ -409,9 +410,9 @@ class TestResistenzlinie(unittest.TestCase):
         Druckzone zu gross wird. Das ist die charakteristische Bauchform des
         Interaktionsdiagramms.
         """
-        bester = max(self.nachweis.linie, key=lambda punkt: punkt.M)
+        bester = max(self.befund.linie, key=lambda punkt: punkt.M)
         self.assertLess(bester.N, 0.0)
-        m_bei_null = max(schnitte(self.nachweis.linie, MOMENT, 0.0))
+        m_bei_null = max(schnitte(self.befund.linie, MOMENT, 0.0))
         self.assertGreater(bester.M, m_bei_null)
 
     def test_protokoll_zeigt_die_handrechnung(self):
@@ -584,9 +585,10 @@ class TestErfuellungsgrad(unittest.TestCase):
         """
         from opencivil.nachweis.biegung_normalkraft import geo
 
-        nachweis, _ = self._pruefe([Schnittgroessen("x", M_Ed=Groesse(100, KNM))])
-        N_zug = max(p.N for p in nachweis.handlinie)
-        N_druck = min(p.N for p in nachweis.handlinie)
+        nachweis, loesung = self._pruefe([Schnittgroessen("x", M_Ed=Groesse(100, KNM))])
+        befund = loesung.befund(nachweis)
+        N_zug = max(p.N for p in befund.handlinie)
+        N_druck = min(p.N for p in befund.handlinie)
 
         for anteil, N_grenze, was in [
             (0.20, N_zug, "wenig Zug"), (0.30, N_zug, "viel Zug"),
@@ -596,10 +598,10 @@ class TestErfuellungsgrad(unittest.TestCase):
                 kombination = Schnittgroessen(
                     "x", M_Ed=Groesse(100, KNM),
                     N_Ed=Groesse.aus_si(N_grenze * anteil, KN))
-                beide = [nachweis._messen(kombination, achse, True)
+                beide = [nachweis._messen(befund.massgebend, kombination, achse, True)
                          for achse in (geo.MOMENT, geo.NORMALKRAFT)]
                 grade = [g.erfuellungsgrad for g in beide if g is not None]
-                gewaehlt = nachweis._auswerten(kombination, {})
+                gewaehlt = nachweis._auswerten(befund.massgebend, kombination, {})
                 self.assertAlmostEqual(gewaehlt.erfuellungsgrad, min(grade))
 
     def test_ein_vorgegebener_massstab_bleibt_stehen(self):
@@ -609,13 +611,14 @@ class TestErfuellungsgrad(unittest.TestCase):
         Der Vergleich gilt nur für `automatisch`; sonst liesse sich ein
         Zwischenwert gar nicht mehr gezielt nachrechnen.
         """
-        nachweis, _ = self._pruefe([
+        nachweis, loesung = self._pruefe([
             Schnittgroessen("N_fest", M_Ed=Groesse(100, KNM), N_Ed=Groesse(-200, KN),
                             art=Erfuellungsart.NORMALKRAFT_KONSTANT),
             Schnittgroessen("M_fest", M_Ed=Groesse(100, KNM), N_Ed=Groesse(-200, KN),
                             art=Erfuellungsart.MOMENT_KONSTANT),
         ])
-        nach_name = {a.schnittgroessen.name: a for a in nachweis.auswertungen}
+        nach_name = {a.schnittgroessen.name: a
+                     for a in loesung.befund(nachweis).auswertungen}
         self.assertIs(nach_name["N_fest"].massstab, Erfuellungsart.NORMALKRAFT_KONSTANT)
         self.assertIs(nach_name["M_fest"].massstab, Erfuellungsart.MOMENT_KONSTANT)
 
@@ -634,11 +637,12 @@ class TestErfuellungsgrad(unittest.TestCase):
         der Parabel-Rechteck-Beziehung liegt (das hebt). Welcher Einfluss
         überwiegt, hängt vom Querschnitt ab.
         """
-        nachweis, _ = self._pruefe(
+        nachweis, loesung = self._pruefe(
             [Schnittgroessen("Druck", M_Ed=Groesse(100, KNM), N_Ed=Groesse(-200, KN))])
 
-        genau = max(nachweis.linie, key=lambda punkt: punkt.M)
-        hand = max(nachweis.handlinie, key=lambda punkt: punkt.M)
+        befund = loesung.befund(nachweis)
+        genau = max(befund.linie, key=lambda punkt: punkt.M)
+        hand = max(befund.handlinie, key=lambda punkt: punkt.M)
         self.assertLess(genau.N, 0.0, "die genaue Linie hat ihren Bauch unter Druck")
         self.assertLess(hand.N, 0.0, "das Polygon auch")
         self.assertAlmostEqual(hand.M / genau.M, 1.0, delta=0.10)
@@ -655,15 +659,16 @@ class TestErfuellungsgrad(unittest.TestCase):
         querschnitt = platte(
             [lage(1, Richtung.Y, phi=40.0), lage(2, Richtung.X, phi=16.0),
              lage(3, Richtung.X, phi=12.0), lage(4, Richtung.Y, phi=12.0)])
-        nachweis, _ = self._pruefe(
+        nachweis, loesung = self._pruefe(
             [Schnittgroessen("Druck", M_Ed=Groesse(200, KNM), N_Ed=Groesse(-2000, KN))],
             querschnitt=querschnitt)
 
+        befund = loesung.befund(nachweis)
         self.assertEqual(
-            2, sum(1 for q in nachweis.handlinie if q.name.startswith("x = h/2")))
-        self.assertEqual(kreuzungen([(q.M, q.N) for q in nachweis.handlinie]), [])
-        hand = max(schnitte(nachweis.handlinie, MOMENT, -2000e3))
-        genau = max(schnitte(nachweis.linie, MOMENT, -2000e3))
+            2, sum(1 for q in befund.handlinie if q.name.startswith("x = h/2")))
+        self.assertEqual(kreuzungen([(q.M, q.N) for q in befund.handlinie]), [])
+        hand = max(schnitte(befund.handlinie, MOMENT, -2000e3))
+        genau = max(schnitte(befund.linie, MOMENT, -2000e3))
         # Innerhalb der genauen Linie, aber nicht mehr weit davon.
         self.assertLess(hand, genau)
         self.assertGreater(hand / genau, 0.8)
@@ -851,23 +856,23 @@ class TestOhneZugbewehrung(unittest.TestCase):
         ])
 
     def linie(self, qs):
+        """Der Befund des M-N-Nachweises an diesem Querschnitt."""
         werk = Rechenwerk()
         qs.ins_rechenwerk(werk)
         nachweis = BiegungNormalkraft(
             qs, [Schnittgroessen("Feld", M_Ed=Groesse(100, KNM))], Richtung.X)
         werk.registriere(nachweis)
-        werk.loese(nachweis.d_ausnutzung["Feld"].id)
-        return nachweis
+        return werk.loese(nachweis.d_ausnutzung["Feld"].id).befund(nachweis)
 
     def test_kein_eckpunkt_ohne_zugbewehrung(self):
-        nachweis = self.linie(self.nur_unten())
-        namen = [q.name for q in nachweis.handlinie]
+        befund = self.linie(self.nur_unten())
+        namen = [q.name for q in befund.handlinie]
         self.assertIn("x = h/2 +", namen)       # unten ist bewehrt
         self.assertNotIn("x = h/2 -", namen)    # oben nicht
 
     def test_kein_negatives_moment_ohne_obere_bewehrung(self):
-        nachweis = self.linie(self.nur_unten())
-        self.assertAlmostEqual(min(q.M for q in nachweis.handlinie), 0.0, places=6)
+        befund = self.linie(self.nur_unten())
+        self.assertAlmostEqual(min(q.M for q in befund.handlinie), 0.0, places=6)
 
     def test_mit_oberer_bewehrung_gibt_es_den_eckpunkt(self):
         beidseitig = platte([
@@ -910,8 +915,7 @@ class TestPolygonreihenfolge(unittest.TestCase):
         nachweis = BiegungNormalkraft(
             qs, [Schnittgroessen("Feld", M_Ed=Groesse(50, KNM))], Richtung.X)
         werk.registriere(nachweis)
-        werk.loese(nachweis.d_ausnutzung["Feld"].id)
-        return nachweis.handlinie
+        return werk.loese(nachweis.d_ausnutzung["Feld"].id).befund(nachweis).handlinie
 
     def test_der_fall_tritt_ueberhaupt_ein(self):
         """Ohne eine Zugkraft bei x = h/2 prüfte der Test nichts."""

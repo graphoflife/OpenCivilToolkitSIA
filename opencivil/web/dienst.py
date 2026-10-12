@@ -235,7 +235,7 @@ def querkraftkurven(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     Kurve selbst zu zeichnen. Gerechnet wird an genau einer Stelle.
     """
     aufbau = _projekt(rumpf).aufbauen()
-    aufbau.werk.loese(*aufbau.alle_nachweisziele(), ohne_herleitung=True)
+    loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele(), ohne_herleitung=True)
 
     gewaehlt = {}
     for kennung, wert in (rumpf.get("n_ed") or {}).items():
@@ -251,7 +251,7 @@ def querkraftkurven(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
                 400, f"Die Normalkraft der Kurve '{kennung}' ist keine Zahl, "
                      f"sondern {wert!r}.")
 
-    return {"querkraftkurven": diagrammdaten.querkraftkurven(aufbau, gewaehlt)}
+    return {"querkraftkurven": diagrammdaten.querkraftkurven(aufbau, loesung, gewaehlt)}
 
 
 def bericht(rumpf: Mapping[str, Any]) -> Dict[str, Any]:

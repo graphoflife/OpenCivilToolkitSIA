@@ -1,5 +1,5 @@
 ---
-erzeugt: 58a93fc4ab70
+erzeugt: 1e70a5cf090b
 art: modul
 tags: [modul]
 ---
@@ -186,6 +186,22 @@ Alle Zwischenwerte eines Knickfalls.
 - `begruendung: str = ''`
 - `hinweis: str = ''`
 
+### Knickbefund
+
+```python
+@dataclass
+class Knickbefund
+```
+
+Was der Knicknachweis festhaelt: die Linie seines Widerstands, je Fall
+die Zwischenwerte und den Loeser -- wer nachrechnen will, was bei einer
+anderen Druckkraft herauskaeme, braucht denselben. Steht nach dem Lauf in
+der Loesung, nicht am Nachweis.
+
+- `linie: Widerstandslinie` – Die Linie des Widerstands: die eigene, oder mit derselben Wahl die der Tragsicherheit -- dasselbe Objekt, einmal gerechnet.
+- `loeser: Querschnittsloeser`
+- `ergebnisse: List[Knickergebnis] = field(default_factory=list)`
+
 ### schiefstellung
 
 ```python
@@ -216,7 +232,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 #### Knicken._gleichgewicht
 
 ```python
-def _gleichgewicht(self, loeser: Querschnittsloeser, N: float, erg: Knickergebnis, l_cr: float) -> Gleichgewicht
+def _gleichgewicht(self, loeser: Querschnittsloeser, linie: Widerstandslinie, N: float, erg: Knickergebnis, l_cr: float) -> Gleichgewicht
 ```
 
 Die Ausmitten-Iteration bei der Druckkraft `N` (Betrag).
@@ -229,7 +245,7 @@ Querschnitt aufreisst.
 #### Knicken._grenzkraft
 
 ```python
-def _grenzkraft(self, loeser: Querschnittsloeser, N_Ed: float, erg: Knickergebnis, l_cr: float, *, traegt: bool) -> float
+def _grenzkraft(self, loeser: Querschnittsloeser, linie: Widerstandslinie, N_Ed: float, erg: Knickergebnis, l_cr: float, *, traegt: bool) -> float
 ```
 
 Die groesste getragene Druckkraft, durch Halbieren.

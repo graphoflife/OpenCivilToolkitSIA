@@ -28,17 +28,17 @@ from opencivil.projekt import Aufbau
 from opencivil.querschnitt.platte import Richtung
 
 
-def linien(aufbau: Aufbau) -> dict:
-    """Je M-N-Nachweis seine Linien, dazu die Bemessungs- und Knickpunkte."""
+def linien(aufbau: Aufbau, loesung: Loesung) -> dict:
+    """Je gerechneter M-N-Nachweis seine Linien, dazu die Bemessungs- und Knickpunkte."""
     return {
-        kennung: linie(nachweis, aufbau)
+        kennung: linie(nachweis, loesung, aufbau)
         for kennung, nachweis in aufbau.nachweise.items()
-        if nachweis.massgebend is not None
+        if nachweis.id in loesung.befunde
     }
 
 
 def querkraftkurven(
-    aufbau: Aufbau, gewaehlt: Optional[Mapping[str, float]] = None
+    aufbau: Aufbau, loesung: Loesung, gewaehlt: Optional[Mapping[str, float]] = None
 ) -> dict:
     """
     Der Querkraftwiderstand ueber dem Moment -- eine Kurve je Tragrichtung.
@@ -62,7 +62,8 @@ def querkraftkurven(
     kurven: Dict[str, Any] = {}
 
     for kennung, nachweis in aufbau.querkraft.items():
-        if not nachweis.ergebnisse:
+        befund = loesung.befunde.get(nachweis.id)
+        if befund is None or not befund.ergebnisse:
             continue
         # Mit Buegeln haengt der Widerstand nicht mehr am Moment, sondern an
         # der Neigung der Druckdiagonalen. Dann steht dort das andere Bild --
@@ -74,8 +75,8 @@ def querkraftkurven(
 
         n_ed = gewaehlt.get(kennung)
         if n_ed is None:
-            n_ed = nachweis.ergebnisse[0].fall.N_Ed.in_einheit(KN)
-        kurve = nachweis.kurve(n_ed * 1e3)
+            n_ed = befund.ergebnisse[0].fall.N_Ed.in_einheit(KN)
+        kurve = befund.kurve(n_ed * 1e3)
 
         kurven[kennung] = {
             "querschnitt": querschnitt_kennung,
@@ -114,7 +115,7 @@ def querkraftkurven(
                     "plastisch": erg.plastisch,
                     "begruendung": erg.begruendung,
                 }
-                for erg in nachweis.ergebnisse if erg.fall is not NUR_KURVE
+                for erg in befund.ergebnisse if erg.fall is not NUR_KURVE
             ],
         }
     return kurven
@@ -128,7 +129,7 @@ NEIGUNG_VON = 25
 NEIGUNG_BIS = 45
 
 
-def neigungskurven(aufbau: Aufbau) -> dict:
+def neigungskurven(aufbau: Aufbau, loesung: Loesung) -> dict:
     """
     Der Querkraftwiderstand ueber der Neigung der Druckdiagonalen.
 
@@ -147,7 +148,8 @@ def neigungskurven(aufbau: Aufbau) -> dict:
     kurven: Dict[str, Any] = {}
 
     for kennung, nachweis in aufbau.querkraft.items():
-        if nachweis.buegel is None or not nachweis.ergebnisse:
+        befund = loesung.befunde.get(nachweis.id)
+        if nachweis.buegel is None or befund is None or not befund.ergebnisse:
             continue
         querschnitt_kennung = kennung.split(".", 1)[0]
         querschnitt = aufbau.querschnitte.get(querschnitt_kennung)
@@ -155,7 +157,7 @@ def neigungskurven(aufbau: Aufbau) -> dict:
         # Nach (statischer Hoehe, Grenzen) gruppieren -- in dieser Reihenfolge
         # gefunden, damit die Bilder in der Reihenfolge der Faelle stehen.
         gruppen: Dict[tuple, List[Any]] = {}
-        for erg in nachweis.ergebnisse:
+        for erg in befund.ergebnisse:
             if erg.massgebend is None:
                 continue
             gruppen.setdefault(
@@ -164,7 +166,7 @@ def neigungskurven(aufbau: Aufbau) -> dict:
         for nummer, ((d, a_min, a_max), gruppe) in enumerate(gruppen.items(), start=1):
             von = min(NEIGUNG_VON, a_min)
             bis = max(NEIGUNG_BIS, a_max)
-            punkte = nachweis.neigungsverlauf(d, von, bis)
+            punkte = befund.neigungsverlauf(d, von, bis)
             kurven[f"{kennung}.{nummer}"] = {
                 "querschnitt": querschnitt_kennung,
                 "namensraum": querschnitt.id if querschnitt else "",
@@ -433,7 +435,7 @@ def _stahlkurve(stoff, wert) -> Optional[dict]:
     }
 
 
-def _knickpunkte(aufbau, nachweis) -> list:
+def _knickpunkte(aufbau, nachweis, loesung) -> list:
     """
     Die Knicknachweise als Punktepaare fuer das M-N-Diagramm.
 
@@ -445,10 +447,11 @@ def _knickpunkte(aufbau, nachweis) -> list:
     Nur in x-Richtung, denn nur dort gibt es einen Knicknachweis.
     """
     knicken = _knicken(aufbau, nachweis)
-    if knicken is None:
+    befund = loesung.befunde.get(knicken.id) if knicken is not None else None
+    if befund is None:
         return []
     punkte = []
-    for erg in knicken.ergebnisse:
+    for erg in befund.ergebnisse:
         if erg.fall.N_Ed.si >= 0.0:
             continue
         punkte.append({
@@ -492,7 +495,7 @@ def _linienzug(linie) -> Optional[dict]:
     }
 
 
-def linie(nachweis, aufbau=None) -> dict:
+def linie(nachweis, loesung: Loesung, aufbau=None) -> dict:
     """
     Die M-N-Interaktionslinien zum Zeichnen -- in kN und kNm.
 
@@ -501,16 +504,18 @@ def linie(nachweis, aufbau=None) -> dict:
     So sieht man, was die gewaehlte Rechenart gegenueber der anderen kostet
     oder bringt.
     """
+    befund = loesung.befund(nachweis)
     knicken = _knicken(aufbau, nachweis)
+    knickbefund = loesung.befunde.get(knicken.id) if knicken is not None else None
     return {
         "richtung": nachweis.richtung.value,
         "querschnitt": nachweis.querschnitt.name,
-        "massgebend": _linienzug(nachweis.massgebend),
-        "vergleich": _linienzug(nachweis.vergleich),
+        "massgebend": _linienzug(befund.massgebend),
+        "vergleich": _linienzug(befund.vergleich),
         # Waehlt das Knicken fuer seinen Widerstand anders als die
         # Tragsicherheit, liegen seine Punkte auf seiner eigenen Linie.
-        "knicklinie": _linienzug(knicken.linie if knicken is not None and knicken.eigene_linie
-                                 else None),
+        "knicklinie": _linienzug(knickbefund.linie if knickbefund is not None
+                                 and knicken.eigene_linie else None),
         "kombinationen": [
             {
                 "name": a.schnittgroessen.name,
@@ -531,11 +536,11 @@ def linie(nachweis, aufbau=None) -> dict:
                 ),
                 "begruendung": a.begruendung,
             }
-            for a in nachweis.auswertungen
+            for a in befund.auswertungen
         ],
         # Die Knickfaelle gehoeren in dasselbe Bild: sie tragen dieselbe
         # Normalkraft gegen dieselbe Linie, nur mit einem groesseren Moment.
-        "knickfaelle": _knickpunkte(aufbau, nachweis) if aufbau else [],
+        "knickfaelle": _knickpunkte(aufbau, nachweis, loesung) if aufbau else [],
     }
 
 

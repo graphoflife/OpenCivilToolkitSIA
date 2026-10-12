@@ -649,12 +649,10 @@ class TestSchnellerKnicknachweis(unittest.TestCase):
             projekt = platte(knickfaelle=[fall])
             with self.subTest(fall=name):
                 genau = projekt.aufbauen()
-                genau.werk.loese(*genau.alle_nachweisziele())
                 kurz = projekt.aufbauen(schnell=True)
-                kurz.werk.loese(*kurz.alle_nachweisziele())
-                self.assertEqual(
-                    genau.knicken["q1"].ergebnisse[0].erfuellt,
-                    kurz.knicken["q1"].ergebnisse[0].erfuellt)
+                erfuellt = [aufbau.werk.loese(*aufbau.alle_nachweisziele()).befund(
+                    aufbau.knicken["q1"]).ergebnisse[0].erfuellt for aufbau in (genau, kurz)]
+                self.assertEqual(erfuellt[0], erfuellt[1])
 
 
 class TestObergrenze(unittest.TestCase):

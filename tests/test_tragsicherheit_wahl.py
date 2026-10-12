@@ -41,10 +41,11 @@ class TestVorgabe(unittest.TestCase):
         aufbau, loesung = gerechnet()
         mn = aufbau.nachweise[KENNUNG]
         self.assertEqual(mn.wahl, Rechenwahl())
-        self.assertIsInstance(mn.massgebend, Handlinie)
+        befund = loesung.befund(mn)
+        self.assertIsInstance(befund.massgebend, Handlinie)
         # Daneben die Parabel, zum Vergleich.
-        self.assertIsInstance(mn.vergleich, Ebenenlinie)
-        self.assertIs(mn.vergleich.wahl.art, Rechenart.PARABEL)
+        self.assertIsInstance(befund.vergleich, Ebenenlinie)
+        self.assertIs(befund.vergleich.wahl.art, Rechenart.PARABEL)
         self.assertIn(r"\text{Handrechnung}", text(loesung))
 
     def test_die_neue_platte_bringt_die_vorgabe_mit(self):
@@ -92,7 +93,7 @@ class TestGenaueLinie(unittest.TestCase):
             for satz in ("bemessung", "charakteristisch"):
                 with self.subTest(art=art, satz=satz):
                     aufbau, loesung = gerechnet(art, satz)
-                    mn = aufbau.nachweise[KENNUNG]
+                    mn = loesung.befund(aufbau.nachweise[KENNUNG])
                     self.assertIs(mn.massgebend.wahl.art, Rechenart(art))
                     # Die Vergleichslinie: Parabel neben der Hand, sonst die Hand.
                     erwartet = Rechenart.PARABEL if art == "handrechnung" else Rechenart.HANDRECHNUNG
@@ -140,7 +141,9 @@ class TestGenaueLinie(unittest.TestCase):
 
     def test_querkraft_liest_aus_derselben_linie(self):
         aufbau, loesung = gerechnet("parabel")
-        mn, qk = aufbau.nachweise[KENNUNG], aufbau.querkraft[KENNUNG]
+        mn = loesung.befund(aufbau.nachweise[KENNUNG])
+        qk = loesung.befund(aufbau.querkraft[KENNUNG])
+        self.assertIs(qk.mn, mn)
         self.assertEqual(qk.mn.moment_bei(-300e3, True), mn.massgebend.moment_bei(-300e3, True))
 
 

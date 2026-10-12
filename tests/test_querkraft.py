@@ -24,6 +24,13 @@ def urteile(projekt: Projekt):
     return aufbau, {u.name: u for u in loesung.urteile}
 
 
+def querkraftbefund(projekt: Projekt):
+    """Der Befund der Querkraft in x -- aus dem Lauf, nicht vom Nachweis."""
+    aufbau = projekt.aufbauen()
+    loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+    return loesung.befund(aufbau.querkraft["q1.x"])
+
+
 class TestQuerkraft(unittest.TestCase):
     def test_handrechnung(self):
         """
@@ -40,8 +47,7 @@ class TestQuerkraft(unittest.TestCase):
             tau_cd= 0.3·sqrt(30)/1.5          = 1.0954 N/mm²
             v_Rd  = 0.7841·1.0954·249         = 213.9 kN/m
         """
-        aufbau, _ = urteile(projekt_mit_querkraft())
-        erg = aufbau.querkraft["q1.x"].ergebnisse[0]
+        erg = querkraftbefund(projekt_mit_querkraft()).ergebnisse[0]
         self.assertAlmostEqual(erg.d * 1e3, 249.0, places=6)
         self.assertAlmostEqual(erg.eps_v * 1e3, 0.9214, places=4)
         self.assertAlmostEqual(erg.k_d, 0.7841, places=4)
@@ -57,10 +63,8 @@ class TestQuerkraft(unittest.TestCase):
         """
         from opencivil.nachweis.querkraft import K_G_MINDEST
 
-        aufbau, _ = urteile(projekt_mit_querkraft())
-        nachweis = aufbau.querkraft["q1.x"]
         # Der Beiwert steckt in k_d; rückgerechnet muss er den Riegel treffen.
-        erg = nachweis.ergebnisse[0]
+        erg = querkraftbefund(projekt_mit_querkraft()).ergebnisse[0]
         k_g = (1.0 / erg.k_d - 1.0) / (erg.eps_v * erg.d * 1e3)
         self.assertAlmostEqual(k_g, K_G_MINDEST, places=6)
         self.assertAlmostEqual(K_G_MINDEST, 1.20)
@@ -69,8 +73,7 @@ class TestQuerkraft(unittest.TestCase):
         """Der Querkraftfall 'Feld' bei dieser Normalkraft in kN."""
         projekt = projekt_mit_querkraft()
         projekt.querschnitte[0].kombinationen[0].N_Ed = N_Ed
-        aufbau, _ = urteile(projekt)
-        return aufbau.querkraft["q1.x"].ergebnisse[0]
+        return querkraftbefund(projekt).ergebnisse[0]
 
     def test_zug_zaehlt_beim_dekompressionsmoment_nicht(self):
         """m_Dd = |min(N_Ed; 0)| · h/6 -- entlastend wirkt nur Druck."""
@@ -108,8 +111,9 @@ class TestQuerkraft(unittest.TestCase):
         """
         projekt = projekt_mit_querkraft()
         projekt.querschnitte[0].kombinationen[0].N_Ed = -300.0
-        aufbau, _ = urteile(projekt)
-        erg = aufbau.querkraft["q1.x"].ergebnisse[0]
+        aufbau = projekt.aufbauen()
+        erg = aufbau.werk.loese(*aufbau.alle_nachweisziele()).befund(
+            aufbau.querkraft["q1.x"]).ergebnisse[0]
 
         nachweis = aufbau.nachweise["q1.x"]
         loesung = aufbau.werk.loese(
@@ -125,7 +129,7 @@ class TestQuerkraft(unittest.TestCase):
         # der Querkraftnachweis rechnet damit auf derselben Linie wie der
         # M-N-Nachweis, nicht auf einer eigenen.
         from opencivil.nachweis.linie import MOMENT, schnitte
-        erwartet = max(schnitte(nachweis.handlinie, MOMENT, -300e3))
+        erwartet = max(schnitte(loesung.befund(nachweis).handlinie, MOMENT, -300e3))
         self.assertAlmostEqual(erg.m_Rd, erwartet, delta=1.0)
 
     def test_m_rd_wird_im_querkraftnachweis_hergeleitet(self):
@@ -142,7 +146,7 @@ class TestQuerkraft(unittest.TestCase):
         projekt.querschnitte[0].kombinationen[0].N_Ed = -300.0
         aufbau = projekt.aufbauen()
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-        erg = aufbau.querkraft["q1.x"].ergebnisse[0]
+        erg = loesung.befund(aufbau.querkraft["q1.x"]).ergebnisse[0]
 
         # Nur der Abschnitt des Querkraftnachweises, ab seinem ersten Fall.
         bloecke = loesung.protokoll.nach_abschnitten()
@@ -189,8 +193,7 @@ class TestQuerkraft(unittest.TestCase):
         projekt = projekt_mit_querkraft()
         k = projekt.querschnitte[0].kombinationen[0]
         k.M_Ed, k.N_Ed = 5.0, -2000.0      # m_Dd = 100 kNm > m_Ed
-        aufbau, _ = urteile(projekt)
-        erg = aufbau.querkraft["q1.x"].ergebnisse[0]
+        erg = querkraftbefund(projekt).ergebnisse[0]
         self.assertEqual(erg.eps_v, 0.0)
         self.assertAlmostEqual(erg.k_d, 1.0, places=9)
 
@@ -199,30 +202,24 @@ class TestQuerkraft(unittest.TestCase):
         ohne = projekt_mit_querkraft()
         mit = projekt_mit_querkraft()
         mit.querschnitte[0].kombinationen[0].N_Ed = -300.0
-        a1, _ = urteile(ohne)
-        a2, _ = urteile(mit)
-        self.assertGreater(a2.querkraft["q1.x"].ergebnisse[0].v_Rd,
-                           a1.querkraft["q1.x"].ergebnisse[0].v_Rd)
+        self.assertGreater(querkraftbefund(mit).ergebnisse[0].v_Rd,
+                           querkraftbefund(ohne).ergebnisse[0].v_Rd)
 
     def test_einlagenhoehe_wirkt_nur_im_fenster(self):
         """d_v = d - e nur, wenn h/6 < e < d. Sonst bleibt d_v = d."""
         klein = projekt_mit_querkraft(einlagenhoehe=20.0)     # < h/6 = 50
         drin = projekt_mit_querkraft(einlagenhoehe=80.0)      # 50 < 80 < 264
-        a1, _ = urteile(klein)
-        a2, _ = urteile(drin)
-        e1 = a1.querkraft["q1.x"].ergebnisse[0]
-        e2 = a2.querkraft["q1.x"].ergebnisse[0]
+        e1 = querkraftbefund(klein).ergebnisse[0]
+        e2 = querkraftbefund(drin).ergebnisse[0]
         self.assertAlmostEqual(e1.d_v, e1.d)
         self.assertAlmostEqual(e2.d_v * 1e3, e2.d * 1e3 - 80.0, places=6)
 
     def test_groesstkorn_wirkt(self):
         klein = projekt_mit_querkraft(d_max=16.0)
         gross = projekt_mit_querkraft(d_max=32.0)
-        a1, _ = urteile(klein)
-        a2, _ = urteile(gross)
         # Grösseres Korn -> kleineres k_g -> grösseres k_d -> mehr Widerstand
-        self.assertGreater(a2.querkraft["q1.x"].ergebnisse[0].v_Rd,
-                           a1.querkraft["q1.x"].ergebnisse[0].v_Rd)
+        self.assertGreater(querkraftbefund(gross).ergebnisse[0].v_Rd,
+                           querkraftbefund(klein).ergebnisse[0].v_Rd)
 
     def test_ohne_v_ed_rechnet_er_still_nur_fuer_das_diagramm(self):
         """
@@ -247,7 +244,7 @@ class TestQuerkraft(unittest.TestCase):
                 nullfall = querkraft.NUR_KURVE.name
                 self.assertTrue(nachweis.d_ausnutzung[nullfall].nur_ziel)
                 self.assertTrue(nachweis.d_v_rd[nullfall].nur_ziel)
-                kurven = bild(aufbau)
+                kurven = bild(aufbau, loesung)
                 self.assertTrue(kurven)
                 self.assertTrue(all(k["faelle"] == [] for k in kurven.values()))
 
@@ -269,9 +266,10 @@ class TestQuerkraft(unittest.TestCase):
         self.assertFalse([u for u in loesung.urteile if u.art == "V"])
 
     def test_erfuellungsgrad_ist_widerstand_durch_einwirkung(self):
-        aufbau, gefunden = urteile(projekt_mit_querkraft())
-        urteil = gefunden["Querkraft x – Feld"]
-        erg = aufbau.querkraft["q1.x"].ergebnisse[0]
+        aufbau = projekt_mit_querkraft().aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        urteil = next(u for u in loesung.urteile if u.name == "Querkraft x – Feld")
+        erg = loesung.befund(aufbau.querkraft["q1.x"]).ergebnisse[0]
         self.assertAlmostEqual(
             urteil.erfuellungsgrad.in_einheit(EINHEITSLOS), erg.v_Rd / 120e3, places=6)
 
@@ -289,22 +287,19 @@ class TestQuerkraftkurve(unittest.TestCase):
     Punkten herläuft, wäre schlimmer als keine.
     """
 
-    def aufbau(self, **abweichungen):
-        projekt = projekt_mit_querkraft(**abweichungen)
-        a = projekt.aufbauen()
-        a.werk.loese(*a.alle_nachweisziele())
-        return a
+    def befund(self, **abweichungen):
+        return querkraftbefund(projekt_mit_querkraft(**abweichungen))
 
     def ast(self, kurve, positiv):
         return next((a for a in kurve["aeste"] if a["moment_positiv"] is positiv), None)
 
     def test_beide_aeste_in_einem_bild(self):
         """Das Beispiel hat Feld und Stütze, also Zug unten und Zug oben."""
-        kurve = self.aufbau().querkraft["q1.x"].kurve(0.0)
+        kurve = self.befund().kurve(0.0)
         self.assertEqual([a["moment_positiv"] for a in kurve["aeste"]], [True, False])
 
     def test_der_negative_ast_liegt_links(self):
-        kurve = self.aufbau().querkraft["q1.x"].kurve(0.0)
+        kurve = self.befund().kurve(0.0)
         for ast in kurve["aeste"]:
             vz = 1 if ast["moment_positiv"] else -1
             self.assertTrue(all(M * vz >= 0 for M, _, _ in ast["punkte"]))
@@ -315,7 +310,7 @@ class TestQuerkraftkurve(unittest.TestCase):
         Zug unten misst zur untersten Lage, Zug oben zur obersten. Beide aus
         derselben Richtung, aber von verschiedenen Seiten.
         """
-        kurve = self.aufbau().querkraft["q1.x"].kurve(0.0)
+        kurve = self.befund().kurve(0.0)
         unten = self.ast(kurve, True)["d"]
         oben = self.ast(kurve, False)["d"]
         self.assertAlmostEqual(unten, 0.249, places=6)    # untere x-Lage, ⌀18
@@ -329,13 +324,13 @@ class TestQuerkraftkurve(unittest.TestCase):
         """
         from opencivil.nachweis.querkraft import KURVENPUNKTE, KURVENZUGABE
 
-        ast = self.ast(self.aufbau().querkraft["q1.x"].kurve(0.0), True)
+        ast = self.ast(self.befund().kurve(0.0), True)
         self.assertEqual(len(ast["punkte"]), KURVENPUNKTE + 2)
         self.assertAlmostEqual(ast["punkte"][0][0], 0.0)
         self.assertAlmostEqual(ast["punkte"][-1][0], ast["m_Rd"] + KURVENZUGABE)
 
     def test_der_sprung_liegt_genau_auf_m_rd(self):
-        ast = self.ast(self.aufbau().querkraft["q1.x"].kurve(0.0), True)
+        ast = self.ast(self.befund().kurve(0.0), True)
         letzter_elastisch = [M for M, _, p in ast["punkte"] if not p][-1]
         erster_plastisch = [M for M, _, p in ast["punkte"] if p][0]
         self.assertAlmostEqual(letzter_elastisch, ast["m_Rd"], places=9)
@@ -346,8 +341,7 @@ class TestQuerkraftkurve(unittest.TestCase):
         Der Bemessungspunkt liegt auf der Kurve -- nicht ungefähr, sondern
         weil beide dieselbe Funktion rufen.
         """
-        a = self.aufbau()
-        qk = a.querkraft["q1.x"]
+        qk = self.befund()
         erg = qk.ergebnisse[0]                       # Feld: M_Ed = 100, N_Ed = 0
         ast = self.ast(qk.kurve(erg.fall.N_Ed.si), True)
 
@@ -364,7 +358,7 @@ class TestQuerkraftkurve(unittest.TestCase):
         Über m_Rd fliesst die Bewehrung: eps_v springt auf 1.5·f_yd/E_s und
         bleibt dort. Der Widerstand fällt einmal und läuft dann waagrecht.
         """
-        ast = self.ast(self.aufbau().querkraft["q1.x"].kurve(0.0), True)
+        ast = self.ast(self.befund().kurve(0.0), True)
         elastisch = [v for _, v, plastisch in ast["punkte"] if not plastisch]
         plastisch = [v for _, v, p in ast["punkte"] if p]
 
@@ -378,7 +372,7 @@ class TestQuerkraftkurve(unittest.TestCase):
         """eps_v = 1.5 · f_yd/E_s, von Hand nachgerechnet."""
         from opencivil.nachweis.querkraft import PLASTISCH
 
-        qk = self.aufbau().querkraft["q1.x"]
+        qk = self.befund()
         ast = self.ast(qk.kurve(0.0), True)
         d, d_v = qk.beiwerte.hoehen(True)
 
@@ -391,13 +385,13 @@ class TestQuerkraftkurve(unittest.TestCase):
         self.assertAlmostEqual(plastisch[0], erwartet, places=6)
 
     def test_ohne_moment_ist_der_widerstand_am_groessten(self):
-        ast = self.ast(self.aufbau().querkraft["q1.x"].kurve(0.0), True)
+        ast = self.ast(self.befund().kurve(0.0), True)
         werte = [v for _, v, _ in ast["punkte"]]
         self.assertEqual(werte[0], max(werte))
 
     def test_druck_hebt_die_ganze_kurve(self):
         """Eine Normaldruckkraft entlastet über m_Dd und hebt m_Rd."""
-        qk = self.aufbau().querkraft["q1.x"]
+        qk = self.befund()
         ohne = self.ast(qk.kurve(0.0), True)
         mit = self.ast(qk.kurve(-300e3), True)
         self.assertGreater(mit["m_Rd"], ohne["m_Rd"])
@@ -411,14 +405,11 @@ class TestQuerkraftkurve(unittest.TestCase):
         for lage in nur_unten.querschnitte[0].lagen[2:]:
             lage.grund.durchmesser = 0.0
             lage.zulage.durchmesser = 0.0
-        a = nur_unten.aufbauen()
-        a.werk.loese(*a.alle_nachweisziele())
-
-        kurve = a.querkraft["q1.x"].kurve(0.0)
+        kurve = querkraftbefund(nur_unten).kurve(0.0)
         self.assertEqual([ast["moment_positiv"] for ast in kurve["aeste"]], [True])
 
     def test_ausserhalb_der_resistenzlinie_gibt_es_keinen_ast(self):
-        kurve = self.aufbau().querkraft["q1.x"].kurve(99_000e3)
+        kurve = self.befund().kurve(99_000e3)
         self.assertEqual(kurve["aeste"], [])
 
 
@@ -433,7 +424,7 @@ class TestVorzeichenDerQuerkraft(unittest.TestCase):
         projekt.querschnitte[0].kombinationen[0].V_Ed = V_Ed
         aufbau = projekt.aufbauen()
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-        erg = aufbau.querkraft["q1.x"].ergebnisse[0]
+        erg = loesung.befund(aufbau.querkraft["q1.x"]).ergebnisse[0]
         urteil = next(u for u in loesung.urteile
                       if u.name == f"Querkraft x – {erg.fall.name}")
         return erg, urteil
@@ -533,8 +524,7 @@ class TestBuegelformeln(unittest.TestCase):
 
 class TestNachweisMitBuegeln(unittest.TestCase):
     def test_der_widerstand_kommt_aus_dem_fachwerkmodell(self):
-        aufbau, gefunden = urteile(projekt_mit_buegeln())
-        erg = aufbau.querkraft["q1.x"].ergebnisse[0]
+        erg = querkraftbefund(projekt_mit_buegeln()).ergebnisse[0]
         self.assertIsNotNone(erg.massgebend)
         self.assertAlmostEqual(erg.d * 1e3, 249.0, places=6)
         self.assertAlmostEqual(erg.v_Rd, erg.massgebend.V_Rd)
@@ -557,8 +547,7 @@ class TestNachweisMitBuegeln(unittest.TestCase):
         """
         projekt = projekt_mit_buegeln(alpha_min=30, alpha_max=35)
         projekt.querschnitte[0].kombinationen[0].N_Ed = 400.0
-        aufbau, _ = urteile(projekt)
-        ergebnisse = {e.fall.name: e for e in aufbau.querkraft["q1.x"].ergebnisse}
+        ergebnisse = {e.fall.name: e for e in querkraftbefund(projekt).ergebnisse}
 
         mit_zug = ergebnisse["Feld"]
         self.assertTrue(mit_zug.zug_hebt_alpha)
@@ -570,8 +559,7 @@ class TestNachweisMitBuegeln(unittest.TestCase):
 
     def test_die_statische_hoehe_folgt_dem_momentenvorzeichen(self):
         """Zug oben bei M < 0 -- dann zählt die obere Lage dieser Richtung."""
-        aufbau, _ = urteile(projekt_mit_buegeln())
-        ergebnisse = {e.fall.name: e for e in aufbau.querkraft["q1.x"].ergebnisse}
+        ergebnisse = {e.fall.name: e for e in querkraftbefund(projekt_mit_buegeln()).ergebnisse}
         self.assertGreater(ergebnisse["Feld"].fall.M_Ed.si, 0)
         self.assertLess(ergebnisse["Stütze"].fall.M_Ed.si, 0)
         self.assertNotAlmostEqual(
@@ -581,10 +569,8 @@ class TestNachweisMitBuegeln(unittest.TestCase):
         """s_V,y = b / n -- fünf Bügel auf 1000 mm sind 200 mm Teilung."""
         mit_teilung = projekt_mit_buegeln()
         mit_zahl = projekt_mit_buegeln(abstand_y=None, anzahl_y=5.0)
-        a, _ = urteile(mit_teilung)
-        b, _ = urteile(mit_zahl)
-        self.assertAlmostEqual(a.querkraft["q1.x"].ergebnisse[0].v_Rd,
-                               b.querkraft["q1.x"].ergebnisse[0].v_Rd,
+        self.assertAlmostEqual(querkraftbefund(mit_teilung).ergebnisse[0].v_Rd,
+                               querkraftbefund(mit_zahl).ergebnisse[0].v_Rd,
                                places=6)
 
     def test_die_herleitung_zeigt_beide_anteile(self):

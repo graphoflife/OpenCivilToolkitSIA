@@ -1,5 +1,5 @@
 ---
-erzeugt: ec4a4b898ee3
+erzeugt: 6df39cc4302e
 art: modul
 tags: [modul]
 ---
@@ -83,6 +83,7 @@ Was ein Bauteil beigetragen hat -- vollstaendig genug zum Wiederholen.
 - `urteile: List[Any] = field(default_factory=list)`
 - `nicht_berechenbar: Dict[str, Any] = field(default_factory=dict)`
 - `fehlende: List[Any] = field(default_factory=list)`
+- `befunde: Dict[str, Any] = field(default_factory=dict)`
 - `teile: Dict[str, Dict[str, Any]] = field(default_factory=dict)` – Die Nachweisobjekte, nach Feld von [[opencivil.web.speicher#Teilergebnis|Aufbau]] geordnet.
 
 ### als_teil

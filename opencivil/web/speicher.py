@@ -86,6 +86,7 @@ class Teilergebnis:
     urteile: List[Any] = field(default_factory=list)
     nicht_berechenbar: Dict[str, Any] = field(default_factory=dict)
     fehlende: List[Any] = field(default_factory=list)
+    befunde: Dict[str, Any] = field(default_factory=dict)
     teile: Dict[str, Dict[str, Any]] = field(default_factory=dict)
     """Die Nachweisobjekte, nach Feld von :class:`Aufbau` geordnet."""
 
@@ -107,6 +108,7 @@ def als_teil(loesung: Loesung, teile: Mapping[str, Dict[str, Any]],
         urteile=list(loesung.urteile),
         nicht_berechenbar=dict(loesung.nicht_berechenbar),
         fehlende=list(loesung.fehlende),
+        befunde=dict(loesung.befunde),
         teile={feld: dict(eintraege) for feld, eintraege in teile.items()},
     )
 
@@ -120,6 +122,7 @@ def verschmelzen(ziel: Loesung, teil: Teilergebnis) -> None:
     ziel.urteile.extend(teil.urteile)
     ziel.nicht_berechenbar.update(teil.nicht_berechenbar)
     ziel.fehlende.extend(teil.fehlende)
+    ziel.befunde.update(teil.befunde)
 
 
 class Ergebnisspeicher:
