@@ -201,9 +201,14 @@ Kein Nachweis, sondern die Frage, was im Querschnitt geschieht:
 
 Eine Linie ist ungerissen bis zum Riss, springt dort und ist darüber gerissen.
 Sie endet bei der ersten Grenzdehnung, wie im Dehnungsfächer. An den Ecken
-stehen Riss, Fliessbeginn (M_Rd, N_Rd) und Ende (M_Rd,u, N_Rd,u), je mit
-Kraft und Verformung, am Ende auch die massgebende Grenze. Jede Analyse
-wählt selbst, wie die Nachweiskapitel (unten).
+stehen Riss, Fliessbeginn (M_y, N_y) und Ende (M_Rd, N_Rd), je mit Kraft und
+Verformung, am Ende auch die massgebende Grenze; im E_eq-Bild an jeder Ecke
+der Modul und sein Vielfaches von E_cm. Das Ende ist der Widerstand: bei
+derselben Rechenwahl dieselbe Zahl wie in der Tragsicherheit. Gestrichelt
+stehen zum Vergleich der ungerissene Zustand, nur bis zum Riss, und der
+gerissene. Die Zugfestigkeit des Betons zählt nur für den Riss. Jede Analyse
+wählt selbst, wie die Nachweiskapitel (unten), aber ohne Handrechnung; φ
+wirkt dort immer auf den ungerissenen Teil.
 
 **Rechenwahl:** Unter dem Kopf der Tragsicherheit, der beiden
 Stahlspannungskapitel und des Knickens steht eine Zeile «Rechenwahl», beim

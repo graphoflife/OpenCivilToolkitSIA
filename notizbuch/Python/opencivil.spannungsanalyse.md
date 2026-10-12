@@ -1,5 +1,5 @@
 ---
-erzeugt: 23bfb2862362
+erzeugt: 11143c8a8d84
 art: modul
 tags: [modul]
 ---
@@ -61,6 +61,21 @@ grundsaetzlich nicht angesetzt. Beim Riss springt die Verformung bei
 derselben Kraft vom ungerissenen auf den gerissenen Wert (Zustand II), im
 Bild ein waagrechtes Stueck. Darueber gilt Zustand II bis zum Bruch. Beide
 Zustaende rechnet derselbe Loeser, nur mit verschiedenem Betongesetz.
+
+Die Zugfestigkeit des Betons zaehlt nur bis zum Riss: der ungerissene
+Zustand steht zum Vergleich darum nur bis `M_Riss` bzw. `N_Riss` da,
+nicht darueber hinaus -- dort haette der Beton Zug ohne Grenze (Benutzer,
+2026-10-12). Der gerissene Zustand steht zum Vergleich auf der ganzen Linie.
+
+
+## DIE NAMEN AN DER LINIE
+
+Ihr Ende heisst `M_Rd` bzw. `N_Rd` (`R_k` mit charakteristischen
+Werten), wie der Widerstand der Tragsicherheit: bei derselben Rechenwahl ist
+es dieselbe Zahl, bis auf die Schranke der Suche. Der Fliessbeginn heisst
+`M_y` bzw. `N_y`, wie seine Kruemmung `chi_y`. Bis 2026-10-12 hiess er
+`M_Rd` und das Ende `M_Rd,u` -- und wer im Bild nach dem Widerstand
+suchte, fand den Fliessbeginn.
 
 Den gerissenen Teil rechnet die Linie ueber die Verformung -- die Kruemmung
 bzw. die Dehnung --, nicht ueber die Kraft. Nach dem Fliessen waechst die
@@ -341,7 +356,7 @@ Vergleich.
 - `kraft: float`
 - `verformung: float` – Was gilt: ungerissen bis zum Riss, darueber gerissen.
 - `gerissen: bool`
-- `verformung_I: Optional[float]` – Ungerissen -- `None`, wenn der Zustand dort keine Loesung hat.
+- `verformung_I: Optional[float]` – Ungerissen -- `None` ueber dem Riss, wo der Beton dafuer Zug ohne Grenze braeuchte, und wo der Zustand keine Loesung hat.
 - `verformung_II: Optional[float]` – Gerissen, ohne Zugfestigkeit des Betons.
 
 ### Eckpunkt

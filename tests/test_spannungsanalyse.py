@@ -17,7 +17,9 @@ from opencivil import spannungsanalyse as sa
 from opencivil.core.protokoll import GleichungBlock, Protokoll, TitelBlock
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import Rechenart, Rechenwahl
-from opencivil.projekt import Projekt, ProjektFehler, SpannungsfallEintrag
+from opencivil.projekt import (
+    Projekt, ProjektFehler, RechenwahlEintrag, SpannungsfallEintrag,
+)
 from opencivil.querschnitt.platte import Richtung
 from opencivil.web import dienst
 
@@ -321,6 +323,22 @@ class TestGegenDieHandrechnung(unittest.TestCase):
         linie, hand = self.widerstand(None)
         self.assertGreater(linie, hand)
 
+    def test_die_handrechnung_laesst_die_druckbewehrung_weg(self):
+        """
+        Unter negativem Moment ist die starke untere Lage gedrückt: die
+        Handrechnung lässt sie weg, die 0.85·x-Vereinfachung zählt sie --
+        am Beispiel 79.9 statt 90.1 kNm.
+        """
+        def m_rd_negativ(rechenart):
+            projekt = Projekt.beispiel()
+            projekt.querschnitte[0].tragsicherheit_wahl = RechenwahlEintrag(rechenart=rechenart)
+            aufbau, loesung = rechnen(projekt)
+            eckwert = aufbau.nachweise["q1.x"].d_eckwerte["M_Rd_N0_neg"]
+            return -loesung.werte[eckwert.id].groesse.si / 1e3
+        hand, block = m_rd_negativ("handrechnung"), m_rd_negativ("block")
+        self.assertAlmostEqual(hand, 79.9, delta=0.1)
+        self.assertAlmostEqual(block, 90.1, delta=0.1)
+
     def test_die_handrechnung_gibt_es_in_der_analyse_nicht(self):
         """
         Seit 2026-10-12 rechnet eine Analyse ohne Handrechnung: die Linie
@@ -331,6 +349,80 @@ class TestGegenDieHandrechnung(unittest.TestCase):
             {"name": "x", "rechenart": "handrechnung"}).rechenart, "block")
         self.assertEqual(SpannungsfallEintrag.aus_dict(
             {"name": "x", "betongesetz": "handrechnung"}).rechenart, "block")
+
+
+class TestEndeIstTragwiderstand(unittest.TestCase):
+    """
+    Bei derselben Rechenwahl ist das Ende einer Linie der Widerstand der
+    Tragsicherheit: M_Rd bei der Normalkraft der M-χ-Linie, N_Rd beim Moment
+    der N-ε-Linie. Geprüft an der Platte des Beispiels unter Druck, für die
+    0.85·x-Vereinfachung und präzise, φ = 0 und 2, beide Wertesätze.
+
+    Bis 2026-10-12 hiess im Bild der Fliessbeginn M_Rd, und wer dort den
+    Widerstand suchte, fand ihn nicht (Notizbuch: «Prüfung M_Rd der Platte»).
+    Der Rest liegt an der Rechnung selbst: 60 statt 200 Fasern und die
+    Schranke der Suche.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        projekt = Projekt(name="Ende ist Widerstand")
+        projekt.beton("C30/37")
+        projekt.stahl("B500B")
+        cls.wahlen = []
+        for art in ("block", "parabel"):
+            for phi in (0.0, 2.0):
+                for satz in ("bemessung", "charakteristisch"):
+                    q = projekt.platte(f"{art} {phi} {satz}", h=300, x=[18, 12],
+                                       x_zulage=[12, 0], y=[12, 12])
+                    q.tragsicherheit_wahl = RechenwahlEintrag(
+                        kriechzahl=phi, werkstoffsatz=satz, rechenart=art)
+                    q.einwirkung("Druck", M_Ed=50.0, N_Ed=-300.0)
+                    q.einwirkung("Zug", N_Ed=200.0).art = "M_konstant"
+                    wahl = dict(kriechzahl=phi, werkstoffsatz=satz, rechenart=art)
+                    q.spannungsfall("M-χ", art="moment_kruemmung", N_Ed=-300.0, **wahl)
+                    q.spannungsfall("N-ε", art="normalkraft_dehnung", M_Ed=0.0, **wahl)
+                    cls.wahlen.append((q.kennung, art, phi, satz))
+        cls.aufbau = projekt.aufbauen()
+        cls.loesung = cls.aufbau.werk.loese(*cls.aufbau.alle_ziele())
+        cls.analysen = sa.analysen(cls.aufbau, cls.loesung)
+
+    def test_m_rd_ist_das_ende_der_m_chi_linie(self):
+        for kennung, art, phi, satz in self.wahlen:
+            with self.subTest(art=art, phi=phi, satz=satz):
+                nachweis = self.aufbau.nachweise[f"{kennung}.x"]
+                m_rd = self.loesung.werte[nachweis.d_m_rd["Druck"].id].groesse.si
+                linie = self.analysen[kennung][0].kurve
+                self.assertAlmostEqual(linie.bruch.kraft / m_rd, 1.0, delta=0.001)
+                # Der Fliessbeginn liegt darunter -- er ist nicht der Widerstand.
+                if linie.fliessen is not None:
+                    self.assertLess(linie.fliessen.kraft, linie.bruch.kraft)
+
+    def test_n_rd_ist_das_ende_der_n_eps_linie(self):
+        """
+        Das N_Rd der Tragsicherheit bei festem Moment -- nicht N_Rd,zug: der
+        Zugpunkt der Interaktionslinie liegt bei seinem eigenen Moment, hier
+        1393 statt 874 kN.
+        """
+        for kennung, art, phi, satz in self.wahlen:
+            with self.subTest(art=art, phi=phi, satz=satz):
+                nachweis = self.aufbau.nachweise[f"{kennung}.x"]
+                urteil = next(u for u in self.loesung.urteile
+                              if u.raum == nachweis.id and u.fall == "Zug")
+                linie = self.analysen[kennung][1].kurve
+                self.assertAlmostEqual(linie.bruch.kraft / urteil.widerstand.groesse.si,
+                                       1.0, delta=0.001)
+
+    def test_ungerissen_nur_bis_zum_riss(self):
+        """Darüber hätte der Beton Zug ohne Grenze -- die Linie I endet beim Riss."""
+        linie = self.analysen[self.wahlen[0][0]][0].kurve
+        self.assertTrue(linie.sprung)
+        for punkt in linie.punkte:
+            with self.subTest(kraft=punkt.kraft):
+                if punkt.kraft <= linie.riss:
+                    self.assertIsNotNone(punkt.verformung_I)
+                else:
+                    self.assertIsNone(punkt.verformung_I)
 
 
 class TestWahl(unittest.TestCase):

@@ -343,19 +343,19 @@ function linienbild(fall) {
     ecken.push({
       px: x(ende.verformung), py: y(ende.kraft), farbe: '#16794a',
       zeilen: ende.gerissen
-        ? [`${art.kraft}_{${kennwert},u} = ${f(k.bruch.kraft)}`,
+        ? [`${art.kraft}_{${kennwert}} = ${f(k.bruch.kraft)}`,
           `${art.verformung('u')} = ${v(k.bruch.verformung)}`, k.bruch.massgebend]
-        : [`${art.kraft}_{${kennwert},u} = ${f(k.bruch.kraft)}`,
+        : [`${art.kraft}_{${kennwert}} = ${f(k.bruch.kraft)}`,
           `${art.verformung('')} = ${v(ende.verformung)}`],
     });
   }
-  // Der Fliessbeginn heisst M_Rd bzw. N_Rd, das Ende M_Rd,u -- mit
-  // charakteristischen Werten Rk. Die Verformung behält ihr y: sie ist die
-  // beim Fliessen.
+  // Der Fliessbeginn heisst M_y bzw. N_y, wie seine Verformung; das Ende
+  // M_Rd bzw. N_Rd -- mit charakteristischen Werten Rk --, wie der
+  // Widerstand der Tragsicherheit bei derselben Rechenwahl.
   if (k.fliessen) {
     ecken.push({
       px: x(k.fliessen.verformung), py: y(k.fliessen.kraft), farbe: STAHL,
-      zeilen: [`${art.kraft}_{${kennwert}} = ${f(k.fliessen.kraft)}`,
+      zeilen: [`${art.kraft}_{y} = ${f(k.fliessen.kraft)}`,
         `${art.verformung('y')} = ${v(k.fliessen.verformung)}`],
     });
   }
@@ -395,16 +395,23 @@ const MODULE = {
   normalkraft_emodul: { kraft: 'N', kraftEinheit: 'kN', fest: ['M', 'kNm'], achse: 'N [kN]' },
 };
 
-/** Ein Modul in N/mm², dazu sein Verhältnis zu E_cm -- den Faktor, um den man E_cm abmindert. */
+/** Das Vielfache von E_cm -- der Faktor, um den man E_cm abmindert. */
+function vielfaches(wert, E_cm) {
+  return (wert / E_cm).toFixed(2);
+}
+
+/** Ein Modul in N/mm², dazu sein Vielfaches von E_cm -- für die Namen an den Ecken. */
 function modulText(wert, E_cm) {
-  return `${zahl(wert, 0)} N/mm² = ${(wert / E_cm).toFixed(2)}·E_{cm}`;
+  return `${zahl(wert, 0)} N/mm² = ${vielfaches(wert, E_cm)}·E_{cm}`;
 }
 
 /**
  * Der äquivalente E-Modul über der laufenden Kraft: ungerissen fast
  * waagrecht, beim Riss senkrecht hinunter -- bei derselben Kraft ein anderer
  * Modul --, darüber gerissen bis zum Bruch. Gestrichelt die beiden Zustände
- * je für sich. An den Ecken Riss, Fliessbeginn und Ende.
+ * je für sich, der ungerissene nur bis zum Riss. An jeder Ecke der Modul und
+ * sein Vielfaches von E_cm: am Anfang, vor und nach dem Riss, beim
+ * Fliessbeginn und am Ende.
  */
 function modulbild(fall) {
   const k = fall.kurve;
@@ -439,33 +446,44 @@ function modulbild(fall) {
   const kennwert = fall.wahl?.index || 'Rd';
   const gueltig = k.punkte.filter((p) => p.modul !== null && p.modul !== undefined);
   const ende = gueltig[gueltig.length - 1];
+  const anfang = gueltig[0];
   const ecken = [];
   // Das Ende zuerst: es steht am Rand, und die anderen weichen ihm aus.
   if (ende && k.bruch) {
     ecken.push({
       px: x(ende.kraft), py: y(ende.modul), farbe: '#16794a',
       zeilen: ende.gerissen
-        ? [`${art.kraft}_{${kennwert},u} = ${f(k.bruch.kraft)}`, `E_{eq} = ${e(ende.modul)}`,
+        ? [`${art.kraft}_{${kennwert}} = ${f(k.bruch.kraft)}`, `E_{eq} = ${e(ende.modul)}`,
           k.bruch.massgebend]
-        : [`${art.kraft}_{${kennwert},u} = ${f(k.bruch.kraft)}`, `E_{eq} = ${e(ende.modul)}`],
+        : [`${art.kraft}_{${kennwert}} = ${f(k.bruch.kraft)}`, `E_{eq} = ${e(ende.modul)}`],
     });
   }
   if (k.fliessen && k.fliessen.modul !== null) {
     ecken.push({
       px: x(k.fliessen.kraft), py: y(k.fliessen.modul), farbe: STAHL,
-      zeilen: [`${art.kraft}_{${kennwert}} = ${f(k.fliessen.kraft)}`,
+      zeilen: [`${art.kraft}_{y} = ${f(k.fliessen.kraft)}`,
         `E_{eq} = ${e(k.fliessen.modul)}`],
     });
   }
-  // Der Riss: ein Punkt oben, der Name am unteren Ende des Sprungs.
+  // Der Riss hat zwei Ecken bei derselben Kraft: ungerissen davor, gerissen
+  // danach -- jede mit ihrem Modul.
   if (k.sprung && k.sprung.vor !== null && k.sprung.nach !== null) {
-    daten.append(svgEl('circle', {
-      cx: x(k.sprung.kraft), cy: y(k.sprung.vor), r: 2.4, fill: ZUG,
-    }));
     ecken.push({
       px: x(k.sprung.kraft), py: y(k.sprung.nach), farbe: ZUG,
       zeilen: [`${art.kraft}_{Riss} = ${f(k.sprung.kraft)}`,
-        `E_{eq} = ${zahl(k.sprung.vor, 0)} → ${e(k.sprung.nach)}`],
+        `E_{eq,II} = ${e(k.sprung.nach)}`],
+    });
+    ecken.push({
+      px: x(k.sprung.kraft), py: y(k.sprung.vor), farbe: ZUG,
+      zeilen: [`E_{eq,I} = ${e(k.sprung.vor)}`],
+    });
+  }
+  // Der Anfang: ungerissen der Modul ohne laufende Kraft, gerissen der des
+  // ersten Punkts.
+  if (anfang && anfang !== ende) {
+    ecken.push({
+      px: x(anfang.kraft), py: y(anfang.modul), farbe: anfang.gerissen ? '#16794a' : ACHSE,
+      zeilen: [`${art.kraft} = ${f(anfang.kraft)}`, `E_{eq} = ${e(anfang.modul)}`],
     });
   }
   eckenAnschreiben(daten, feld, ecken);
@@ -521,7 +539,8 @@ export function spannungsfallZeichnen(fall) {
     const K = art.kraft;
     const kennwert = fall.wahl?.index || 'Rd';
     const kraft = (wert) => mitEinheit(wert, 1, art.kraftEinheit);
-    const modul = (wert) => (wert === null ? '–' : mitEinheit(wert, 0, 'N/mm²'));
+    const modul = (wert) => (wert === null || wert === undefined ? '–'
+      : `${mitEinheit(wert, 0, 'N/mm²')} = ${vielfaches(wert, k.E_cm)}·E_cm`);
     return el('div.sd-fall', {}, [
       kopf,
       wahlzeile(fall.wahl),
@@ -530,7 +549,9 @@ export function spannungsfallZeichnen(fall) {
         [`${K}_{Riss}`, kraft(k.riss)],
         ...(k.sprung ? [['E_{eq,I}', modul(k.sprung.vor)], ['E_{eq,II}', modul(k.sprung.nach)]]
           : []),
-        ...(k.bruch ? [[`${K}_{${kennwert},u}`, kraft(k.bruch.kraft)],
+        ...(k.fliessen ? [[`${K}_{y}`, kraft(k.fliessen.kraft)],
+          ['E_{eq,y}', modul(k.fliessen.modul)]] : []),
+        ...(k.bruch ? [[`${K}_{${kennwert}}`, kraft(k.bruch.kraft)],
           ['E_{eq,u}', modul(k.bruch.modul)]] : []),
         ['E_{cm}', mitEinheit(k.E_cm, 0, 'N/mm²')],
       ]),
@@ -540,7 +561,7 @@ export function spannungsfallZeichnen(fall) {
           + 'Stahl, elastisch – bräuchte, um sich gleich stark zu verformen; gezählt ab dem '
           + 'Zustand ohne laufende Kraft. Durchgezogen: der Querschnitt – ungerissen bis zum '
           + 'Riss, dann der Sprung, darüber gerissen (ohne Zugversteifung) · lang gestrichelt: '
-          + 'immer ungerissen (I) · kurz gestrichelt: immer gerissen (II)',
+          + 'ungerissen (I), bis zum Riss · kurz gestrichelt: immer gerissen (II)',
       }),
       k.hinweis ? el('p.hinweis', { text: k.hinweis }) : null,
     ]);
@@ -558,16 +579,18 @@ export function spannungsfallZeichnen(fall) {
       zahlenzeile([
         [art.fest[0], mitEinheit(k.fest, 1, art.fest[1])],
         [`${K}_{Riss}`, kraft(k.riss)],
-        ...(k.fliessen ? [[`${K}_{${kennwert}}`, kraft(k.fliessen.kraft)]] : []),
-        ...(k.bruch ? [[`${K}_{${kennwert},u}`, kraft(k.bruch.kraft)],
+        ...(k.fliessen ? [[`${K}_{y}`, kraft(k.fliessen.kraft)]] : []),
+        ...(k.bruch ? [[`${K}_{${kennwert}}`, kraft(k.bruch.kraft)],
           [art.latex('u'), mitEinheit(k.bruch.verformung, art.stellen, art.verformungEinheit)]]
           : []),
       ]),
       k.punkte.length ? linienbild(fall) : null,
       el('p.sd-legende', {
         text: 'Durchgezogen: der Querschnitt – ungerissen bis zum Riss, dann der Sprung, '
-          + 'darüber gerissen (ohne Zugversteifung) · lang gestrichelt: immer ungerissen (I) '
-          + '· kurz gestrichelt: immer gerissen, ohne f_ct (II)',
+          + 'darüber gerissen (ohne Zugversteifung) · lang gestrichelt: ungerissen (I), bis '
+          + `zum Riss · kurz gestrichelt: immer gerissen, ohne f_ct (II) · ${K}_y: Fliessbeginn · `
+          + `${K}_${kennwert}: Ende der Linie, der Widerstand – derselbe wie in der `
+          + 'Tragsicherheit, wenn sie gleich wählt',
       }),
       k.hinweis ? el('p.hinweis', { text: k.hinweis }) : null,
     ]);

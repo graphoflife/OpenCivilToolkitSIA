@@ -791,9 +791,11 @@ function mitKopf(kopf, eingabe, formel = false) {
  * Stahlspannungen `spannungsarten`, beim Knicken und in den Analysen
  * `faserarten` (ohne Handrechnung). Wirkt φ bei der gewählten Art
  * nicht, steht das Feld blass da -- es bleibt aber stehen, damit die Zahl
- * nicht verloren geht, wenn man die Art wieder wechselt.
+ * nicht verloren geht, wenn man die Art wieder wechselt. `phiImmer`: in den
+ * Analysen rechnet der ungerissene Teil immer mit E_cm/(1+φ), dort wirkt φ
+ * bei jeder Art.
  */
-function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten' } = {}) {
+function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten', phiImmer = false } = {}) {
   const katalog = zustand.katalog?.rechenwahl || {};
   const liste = katalog[arten] || [];
   const art = liste.find((a) => a.wert === ziel.rechenart);
@@ -801,10 +803,12 @@ function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten' } = {}) {
   const kurz = (l) => (l || []).map((e) => ({ wert: e.wert, beschriftung: e.kurz }));
   const phi = mitKopf('φ', zahlfeld({
     wert: ziel.kriechzahl ?? 0, schritt: 0.1, min: 0, leer: 0,
-    titel: 'Kriechzahl φ – wirkt präzise und elastisch',
+    titel: phiImmer
+      ? 'Kriechzahl φ – wirkt auf den ungerissenen Teil, präzise auch auf den gerissenen'
+      : 'Kriechzahl φ – wirkt präzise und elastisch',
     beiAenderung: (v) => aendern((x) => { x.kriechzahl = v; }),
   }), true);
-  if (art && !art.mit_kriechzahl) phi.classList.add('ist-ohne-wirkung');
+  if (art && !art.mit_kriechzahl && !phiImmer) phi.classList.add('ist-ohne-wirkung');
   return [
     phi,
     mitKopf('Werte', auswahl({
@@ -861,14 +865,14 @@ function spannungsZeile(querschnitt, index) {
     kopf: ['N_Ed [kN]', ''],
     felder: () => [
       zahl('N_Ed', 'Normalkraft in kN – Zug positiv', 50),
-      el('span.kurvenhinweis', { text: '0 … M_Rd,u' }),
+      el('span.kurvenhinweis', { text: '0 … M_Rd' }),
     ],
   };
   const dehnung = {
     kopf: ['M_Ed [kNm]', ''],
     felder: () => [
       zahl('M_Ed', 'Moment in kNm, festgehalten', 10),
-      el('span.kurvenhinweis', { text: '0 … N_Rd,u' }),
+      el('span.kurvenhinweis', { text: '0 … N_Rd' }),
     ],
   };
   const bauplan = {
@@ -913,7 +917,7 @@ function spannungsZeile(querschnitt, index) {
       ['x', 'y']),
     // Womit gerechnet wird -- je Analyse, wie in den Kapiteln, aber ohne
     // Handrechnung: eine Linie rechnet die Normalkraft genau.
-    ...rechenwahlFelder(k, aendern, { arten: 'faserarten' }),
+    ...rechenwahlFelder(k, aendern, { arten: 'faserarten', phiImmer: true }),
     el('button.weg', {
       text: '×', title: 'Analyse entfernen',
       on: {

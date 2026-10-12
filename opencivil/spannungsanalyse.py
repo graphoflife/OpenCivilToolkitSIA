@@ -49,6 +49,19 @@ derselben Kraft vom ungerissenen auf den gerissenen Wert (Zustand II), im
 Bild ein waagrechtes Stueck. Darueber gilt Zustand II bis zum Bruch. Beide
 Zustaende rechnet derselbe Loeser, nur mit verschiedenem Betongesetz.
 
+Die Zugfestigkeit des Betons zaehlt nur bis zum Riss: der ungerissene
+Zustand steht zum Vergleich darum nur bis ``M_Riss`` bzw. ``N_Riss`` da,
+nicht darueber hinaus -- dort haette der Beton Zug ohne Grenze (Benutzer,
+2026-10-12). Der gerissene Zustand steht zum Vergleich auf der ganzen Linie.
+
+DIE NAMEN AN DER LINIE:
+Ihr Ende heisst ``M_Rd`` bzw. ``N_Rd`` (``R_k`` mit charakteristischen
+Werten), wie der Widerstand der Tragsicherheit: bei derselben Rechenwahl ist
+es dieselbe Zahl, bis auf die Schranke der Suche. Der Fliessbeginn heisst
+``M_y`` bzw. ``N_y``, wie seine Kruemmung ``chi_y``. Bis 2026-10-12 hiess er
+``M_Rd`` und das Ende ``M_Rd,u`` -- und wer im Bild nach dem Widerstand
+suchte, fand den Fliessbeginn.
+
 Den gerissenen Teil rechnet die Linie ueber die Verformung -- die Kruemmung
 bzw. die Dehnung --, nicht ueber die Kraft. Nach dem Fliessen waechst die
 Kraft kaum noch, die Verformung aber stark; ueber die Kraft gerechnet laegen
@@ -478,7 +491,10 @@ class Linienpunkt:
 
     gerissen: bool
     verformung_I: Optional[float]
-    """Ungerissen -- ``None``, wenn der Zustand dort keine Loesung hat."""
+    """
+    Ungerissen -- ``None`` ueber dem Riss, wo der Beton dafuer Zug ohne
+    Grenze braeuchte, und wo der Zustand keine Loesung hat.
+    """
 
     verformung_II: Optional[float]
     """Gerissen, ohne Zugfestigkeit des Betons."""
@@ -618,7 +634,9 @@ def _linie(paar: Loeserpaar, weg: _Weg, art: Analyseart, fest: float,
     def kraftpunkte(bis: float) -> List[Linienpunkt]:
         punkte = []
         for i in range(PUNKTE_UNGERISSEN + 1):
-            kraft = bis * i / PUNKTE_UNGERISSEN
+            # Der letzte genau bei ``bis``: bis * 10 / 10 liegt sonst eine
+            # Rundung darueber, beim Riss also schon jenseits des Risses.
+            kraft = bis if i == PUNKTE_UNGERISSEN else bis * i / PUNKTE_UNGERISSEN
             v_I = weg.verformung_bei(paar.ungerissen, kraft)
             if v_I is not None:
                 punkte.append(Linienpunkt(kraft=kraft, verformung=v_I, gerissen=False,
@@ -668,16 +686,20 @@ def _linie(paar: Loeserpaar, weg: _Weg, art: Analyseart, fest: float,
         # Verformung gesucht, also traegt er sie -- genau, nicht bis auf die
         # Schranke der Suche.
         kraft = risskraft if verformung == anfang and risskraft is not None else weg.kraft(e)
+        # Ungerissen nur bis zum Riss: darueber haette der Beton Zug ohne
+        # Grenze. Der erste Punkt nach dem Sprung traegt genau die Risskraft.
         linie.punkte.append(Linienpunkt(
             kraft=kraft, verformung=verformung, gerissen=True,
-            verformung_I=weg.verformung_bei(paar.ungerissen, kraft),
+            verformung_I=(weg.verformung_bei(paar.ungerissen, kraft)
+                          if kraft <= riss else None),
             verformung_II=verformung))
     if paar.wahl.art.mit_block:
         linie.hinweisen(
             f"Mit der {BLOCKANTEIL}·x-Vereinfachung trägt der Beton unter "
             f"{1.0 - BLOCKANTEIL:.2f}·ε_c2d nichts: über dem Riss ist die Linie "
             f"weicher als der Querschnitt, ihr Ende ist der Widerstand der "
-            f"Vereinfachung.")
+            f"Vereinfachung. Die Kriechzahl wirkt bei ihr nur auf den "
+            f"ungerissenen Teil.")
     return linie
 
 
@@ -929,9 +951,10 @@ def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
 
     p.erklaerung(
         "Ungerissen (Zustand I) trägt der Beton Druck und Zug, linear mit E_c,eff "
-        "und ohne Grenze: gebraucht wird hier die Steifigkeit, und wo der "
-        "Querschnitt reisst, sagt die Rissbedingung am Bruttoquerschnitt. Gerissen "
-        "(Zustand II) trägt er keinen Zug mehr, und im Druck gilt das Gesetz der "
+        "– bis zum Riss: wo der Querschnitt reisst, sagt die Rissbedingung am "
+        "Bruttoquerschnitt, und nur dort zählt die Zugfestigkeit. Darüber gilt "
+        "der ungerissene Zustand nicht mehr, auch nicht zum Vergleich. Gerissen "
+        "(Zustand II) trägt der Beton keinen Zug, und im Druck gilt das Gesetz der "
         "gewählten Rechenart.")
     p.ansatz(r"\sigma_c = E_{c,eff} \cdot \varepsilon_c",
              titel="Beton ungerissen, in Druck und Zug")
@@ -944,7 +967,8 @@ def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
             "Der Spannungsblock ist ein Modell für den Bruch: unter "
             "(1 − 0.85)·ε_c2d trägt der Beton darin nichts. Über dem Riss ist die "
             "Linie mit ihm darum weicher als der Querschnitt; ihr Ende ist der "
-            "Widerstand mit dem Block.")
+            "Widerstand der 0.85·x-Vereinfachung. Ein Modul hängt an ihm nicht: "
+            "die Kriechzahl wirkt nur auf den ungerissenen Teil.")
     else:
         k = w.zahl("k_sigma", r"k_{\sigma}", k_sigma(E_c_eff.groesse.si, ein("f_c").groesse.si),
                    stellen=2)
@@ -994,8 +1018,9 @@ def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
         "Fliessdehnung erreicht. Danach wächst die Kraft nur noch wenig: die "
         "Druckzone wird kleiner, der Hebelarm grösser, und der Beton füllt sein "
         "Gesetz, bis eine Grenzdehnung erreicht ist. Im Bild heisst die Kraft beim "
-        "Fliessbeginn M_Rd bzw. N_Rd, am Ende M_Rd,u bzw. N_Rd,u; mit "
-        "charakteristischen Werten Rk statt Rd.")
+        "Fliessbeginn M_y bzw. N_y, am Ende M_Rd bzw. N_Rd – mit "
+        "charakteristischen Werten Rk statt Rd. Das Ende ist der Widerstand der "
+        "Tragsicherheit, wenn sie dieselbe Rechenwahl trifft.")
     p.formel(w.dehnung("eps_y", r"\varepsilon_{y}", paar.eps_y),
              r"\frac{@f_s}{@E_s}", {"f_s": ein("f_s"), "E_s": ein("E_s")},
              titel="Dehnung bei Fliessbeginn", name=FLIESSDEHNUNG)

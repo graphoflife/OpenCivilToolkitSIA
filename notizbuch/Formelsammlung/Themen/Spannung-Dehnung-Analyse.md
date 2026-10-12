@@ -1,5 +1,5 @@
 ---
-erzeugt: 2656318104c9
+erzeugt: 1eddccd46a7c
 art: thema
 tags: [thema]
 ---
@@ -10,17 +10,17 @@ tags: [thema]
 
 Eine Spannung-Dehnung-Analyse hält nichts gegen etwas: sie zeigt, was der Querschnitt tut. Gerechnet wird mit dem Faserintegral der Nachweise und mit der Kriechzahl, dem Wertesatz und der Rechenart, die die Analyse wählt.
 
-Ungerissen (Zustand I) trägt der Beton Druck und Zug, linear mit E\_c,eff und ohne Grenze: gebraucht wird hier die Steifigkeit, und wo der Querschnitt reisst, sagt die Rissbedingung am Bruttoquerschnitt. Gerissen (Zustand II) trägt er keinen Zug mehr, und im Druck gilt das Gesetz der gewählten Rechenart.
+Ungerissen (Zustand I) trägt der Beton Druck und Zug, linear mit E\_c,eff – bis zum Riss: wo der Querschnitt reisst, sagt die Rissbedingung am Bruttoquerschnitt, und nur dort zählt die Zugfestigkeit. Darüber gilt der ungerissene Zustand nicht mehr, auch nicht zum Vergleich. Gerissen (Zustand II) trägt der Beton keinen Zug, und im Druck gilt das Gesetz der gewählten Rechenart.
 
 Unter 1 rechnet die Parabel k\_σ nicht: dort hätte ihr Nenner im ansteigenden Ast eine Nullstelle. So weit kommt es mit dem kriechweichen Modul und charakteristischen Werten; mit k\_σ = 1 ist der Beton bis f\_c bei ε\_c1d linear.
 
 Am Bruttoquerschnitt reisst der Rand, wenn N/A + M/W = f\_ct,eff. Mit A = b·h und W = b·h²/6 hebt Druck das Rissmoment, Zug senkt es. Beim Rissmoment springt die Krümmung bei demselben Moment vom ungerissenen auf den gerissenen Wert.
 
-Der Fliessbeginn ist der Punkt, an dem die am stärksten gezogene Lage die Fliessdehnung erreicht. Danach wächst die Kraft nur noch wenig: die Druckzone wird kleiner, der Hebelarm grösser, und der Beton füllt sein Gesetz, bis eine Grenzdehnung erreicht ist. Im Bild heisst die Kraft beim Fliessbeginn M\_Rd bzw. N\_Rd, am Ende M\_Rd,u bzw. N\_Rd,u; mit charakteristischen Werten Rk statt Rd.
+Der Fliessbeginn ist der Punkt, an dem die am stärksten gezogene Lage die Fliessdehnung erreicht. Danach wächst die Kraft nur noch wenig: die Druckzone wird kleiner, der Hebelarm grösser, und der Beton füllt sein Gesetz, bis eine Grenzdehnung erreicht ist. Im Bild heisst die Kraft beim Fliessbeginn M\_y bzw. N\_y, am Ende M\_Rd bzw. N\_Rd – mit charakteristischen Werten Rk statt Rd. Das Ende ist der Widerstand der Tragsicherheit, wenn sie dieselbe Rechenwahl trifft.
 
 Den gerissenen Teil rechnet die Linie über die Verformung, nicht über die Kraft: zu jeder Krümmung (bei der N-ε-Linie: zu jeder Dehnung) wird die Ebene gesucht, die die festgehaltene Grösse trägt. Sie endet bei der grössten Verformung, zu der es noch ein Gleichgewicht gibt – dort ist die erste Grenzdehnung erreicht. Es sind dieselben Grenzen wie im Dehnungsfächer der genauen M-N-Linie.
 
-Der Spannungsblock ist ein Modell für den Bruch: unter (1 − 0.85)·ε\_c2d trägt der Beton darin nichts. Über dem Riss ist die Linie mit ihm darum weicher als der Querschnitt; ihr Ende ist der Widerstand mit dem Block.
+Der Spannungsblock ist ein Modell für den Bruch: unter (1 − 0.85)·ε\_c2d trägt der Beton darin nichts. Über dem Riss ist die Linie mit ihm darum weicher als der Querschnitt; ihr Ende ist der Widerstand der 0.85·x-Vereinfachung. Ein Modul hängt an ihm nicht: die Kriechzahl wirkt nur auf den ungerissenen Teil.
 
 Dieselbe Rissbedingung, nach der Normalkraft aufgelöst: beim Moment M reisst der Querschnitt, wenn die Zugkraft N\_Riss erreicht. Unter Zug reisst die ganze Dicke, darum gilt k\_t für t = h und nicht für h/3 wie beim Rissmoment. Bei N\_Riss springt die Dehnung bei derselben Kraft vom ungerissenen auf den gerissenen Wert.
 
