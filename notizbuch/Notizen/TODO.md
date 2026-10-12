@@ -8,6 +8,18 @@ gelernt wurde, steht in [[Entwicklung]].
 ## Offen
 
 
+- [ ] **Gemischte Stahlsorten rechnen still mit einer Sorte** (Durchsicht
+      2026-10-12, nachgerechnet). Stahlspannung, Knicken (Verformung),
+      Querkraft ohne Bügel und die Spannung-Dehnung-Analyse nehmen den Stahl
+      der ersten Lage für alle Lagen (`posten[0][0].stahl`); nur die
+      Tragsicherheit rechnet je Sorte. Unten B700B, oben B500B: die
+      Stahlspannung liest nur B700B, die obere Lage rechnet mit
+      f_yd = 609 statt 435 N/mm² -- auf der unsicheren Seite, ohne Meldung.
+      Die Wurzel: eine Lage hat drei Gestalten (`Stahllage` ohne Gesetz, das
+      Tupel `(a_s, z, Gesetz, Text)`, die Lage der Handrechnung), der Löser
+      kennt nur einen Stahl, und ein Posten reist als 5-Tupel. Besser: die
+      Lage trägt ihr Gesetz, gebaut und angemeldet von einer Funktion; der
+      Posten wird zum `Postenbezug`.
 - [ ] **Die Sortentabellen sind ungeprüft.** `BETONSORTEN` und `STAHLSORTEN` in
       `material/` stammen aus der Vorgängerfassung und sind nie gegen die
       gedruckte SIA 262 gehalten worden. Dasselbe gilt für sämtliche
@@ -43,16 +55,123 @@ gelernt wurde, steht in [[Entwicklung]].
 - [ ] Momente stehen in der Mitschrift als `kNm`, gemeint ist `kNm/m` (die
       Platte wird je Laufmeter gerechnet). In der Eingabemaske steht es
       richtig. Einheitlich ziehen.
-- [ ] Gemischte Stahlsorten in einer Richtung: die Spannung-Dehnung-Analyse
-      nimmt ein ε_ud für alle Lagen (das der ersten Sorte), die
-      Tragsicherheit je Sorte. Bei den Normsorten des Beispiels gleich; siehe
-      [[Prüfung M_Rd der Platte]].
 - [ ] Balkensystem im schmalen Fenster: das schwebende Fenster eines Knotens
       oder Stabs deckt die halbe Zeichnung. Zuklappen geht, aber bei Lasten
       mit vielen Feldern wird es lang.
 - [ ] Keine Testumgebung für die Zeichenhilfen des Balkensystems
       (`bs_symbole.js`, die verbundene Zeichnung in `cad_modell.js`) --
       geprüft von Hand im Browser.
+
+## Umbau: Befunde der Strukturdurchsicht (2026-10-12)
+
+Neun Durchsichten haben je einen Bereich ganz gelesen; jeder Punkt ist am
+Code nachgeprüft. Reihenfolge nach Empfehlung. Ziel jedes Punkts ist, dass
+etwas wegfällt, nicht dass es umzieht. Der dringendste Befund, die
+gemischten Stahlsorten, steht oben unter «Offen».
+
+- [ ] **Ergebnisse in den Rechenlauf, nicht an die Rechenobjekte.**
+      `rechne()` gibt nur Zahlen zurück; Urteile, Linien, Fallergebnisse und
+      das Systemergebnis legen die Nachweise auf sich selbst ab
+      (`berechnung.py` `self.urteile`, `rechenwerk.py` `isinstance(…,
+      Nachweis)`). Daran hängen: der Zwischenspeicher hängt ganze Objekte um
+      (`TEILEFELDER`, `teile_von`, `teile_setzen`); `Teilergebnis` bildet die
+      Felder der `Loesung` von Hand nach -- ein neues Feld fehlt nach jedem
+      Speichertreffer still; zwei Läufe nur für den Nebeneffekt
+      (`dienst.py` `_bauteil_rechnen`, `querkraftkurven`), darum speichert
+      `_bauteil_rechnen` nie, und `bs_diagramme.js` wartet mit einem
+      Zeitgeber; erfundene Ziele, damit gerechnet wird (`d_n` des
+      Balkensystems, `d_zeilen` des Blatts, `NUR_KURVE` der Querkraft mit
+      sieben Weichen, `nur_ziel`). Besser: `ausfuehren` gibt Werte, Urteile
+      und einen Befund zurück, die Lösung hält `befunde[berechnung_id]`, der
+      Speicher legt ein Stück Lösung ab (`Loesung.anhaengen` im Kern), Ziele
+      dürfen eine Berechnung nennen.
+- [ ] **Ein Steckbrief je Bauteilart, in Python und JavaScript.** Platte,
+      Analyse und System stehen an rund 30 Stellen einzeln, obwohl
+      `projekt.py` bei `BAUTEILE` sagt «hier dazu und nirgends sonst»:
+      `Aufbau.bauteile()` zählt sie ein zweites Mal auf, dazu
+      `Projekt.aus_dict`, `eckwertziele`, `systemziele`, `BEREICHE`
+      (`formelseiten.py`), `zustand.js` (fünf `gewaehlteX`, `freieKennung`),
+      `baum.js`, `editor.js`, `bericht.js`. Viele schweigen, wenn man sie
+      vergisst (Einträge gehen verloren, Nachweise werden nie gerechnet,
+      doppelte Kennungen). Der Aufbau findet über Textpräfixe zurück, wem ein
+      Nachweis gehört (`gehoert_zu`, «q1.x» wird an sechs Stellen zerlegt).
+      Besser: ein Datensatz je Bauteil (Objekt, Nachweise, Ziele, Bezüge),
+      gebaut über eine Tabelle Eintragstyp → Baufunktion; im JS eine Tabelle
+      `ARTEN`. Zusammen mit dem Punkt darüber umbauen.
+- [ ] **Ein Querschnittsmodell statt zweier.** Gerechnet wird mit den
+      Closures in `querschnittsloeser.py` (`beton_nichtlinear`,
+      `stahl_bilinear`, `stahl_nur_zug`), gedruckt mit den Klassen in
+      `werkstoffgesetz.py` -- `rechenwahl.py` baut dafür ein
+      Platzhalter-`Betongesetz(0.0, 1.0, 1.0, 0.0)` nur fürs LaTeX. Jenseits
+      ε_c2d und beim gedrückten Stahl unterscheiden sie sich schon; k_σ steht
+      dreimal. Der Dehnungsfächer steht zweimal (`dehnungsfaecher.faecher`
+      von Hand, `interaktion.py` aus den Dehnungsgrenzen), Punkt C dreimal.
+      Die Rechenart wird in sieben Modulen einzeln abgefragt, die Analyse
+      vergleicht rohe Texte («block», «bemessung»). Besser: ein Gesetz ist
+      ein Objekt mit `__call__` und `latex()` wie `Spannungsblock`, der Fächer
+      kommt aus `Dehnungsgrenzen`, je Rechenart eine Tabellenzeile. Vorher
+      die Geschwindigkeit der Closures messen.
+- [ ] **Eine Grundlage für die Apps mit Zeichenfenster.** `bs_zeichnung.js`
+      ist aus `qa_zeichnung.js` kopiert, rund 150 Zeilen wortgleich bis auf
+      `a.qa`/`a.bs`, und läuft schon auseinander (Fehler des Kerns: kurze
+      Meldung gegen Text unter der Zeichnung). Dazu vier selbstgebaute
+      Zwischenspeicher für Nebenanfragen mit vier Fehlerregeln
+      (`bs_diagramme.js`, `qa_diagramme.js`, `app.js`, `bericht.js`).
+      Besser: `cadApp({…})` liefert Lesen, Schreiben, Fenster, Liste,
+      Markierung und eine `kernAntwort`; `nachgefragt(schluessel, holen)`
+      merkt sich Antworten bis zur nächsten Lösung.
+- [ ] **Keine Rechnung und keine Norm in der Oberfläche.** Beim
+      Darüberfahren verbindet `bs_diagramme.js` zwei Proben gerade, obwohl
+      der Kern den Wert genau kennt; Grenzwerte und grösste Durchbiegung
+      wählt das JS selbst (dieselbe Regel in `stabwerk/herleitung.py`).
+      Bericht und Bildschirm stellen die Lagerkräfte verschieden zusammen:
+      beim gebetteten Balken fehlt am Bildschirm die Bettung, die Kräfte gehen
+      dort nicht auf. Hilfetexte wiederholen Regeln des Kerns -- «x/d ≤ 0.35»
+      steht neben einem Feld bis 0.5 (`nachweise.js`) --, eine Normstelle
+      steht in `editor.js`, Wert-IDs werden aus Text nachgebaut
+      (`zustand.js` `namensraum`). Besser: eine `Fallauswertung` im
+      Stabwerk für Herleitung und Bildschirm, Anzeige auf der nächsten
+      Probe, Hilfetexte und Formeln aus denselben Konstanten über den
+      Katalog.
+- [ ] **Geprüft wird nur beim Lesen.** 33 `aus_dict` von Hand, die
+      Fassade geht an ihren Prüfungen vorbei: `quer="festt"` wird still zur
+      Bettung. `abstand_x=wahl("abstand_x") or cls.abstand_x` liest 0 als
+      200 (`eintraege.py`). Die Rissanforderung ist ein Text in vier
+      Tabellen, ein Tippfehler wird über `.get` zur mildesten Stufe. Besser:
+      ein Leser aus den Feldern der Datenklassen, erlaubte Werte am Feld,
+      geprüft einmal in `Projekt.pruefen()`; die Leser alter Formate weg
+      (seit 2026-10-11 erlaubt).
+- [ ] **Balkensystem: Kennung statt Name.** Ein Fall wird an seinem Namen
+      erkannt; heissen Kombination und Lastfall gleich, scheitert das ganze
+      Projekt, auch jede Platte. «Fest» reist als `math.inf` und wird in
+      `system.py` an 17 Stellen zurückübersetzt; Stäbe und Lasten werden in
+      vier Durchgängen aufgelöst, mit einem Schalter `melden`; die
+      Querschnittsart wird in drei Schichten verzweigt. Besser: LF1/LK1 als
+      Identität, `Halt(fest, feder)`, Lasten einmal je Fall auflösen,
+      `_stabquerschnitt` liefert Eingaben und Formeln.
+- [ ] **Varianten im Kern -- deine Entscheidung.** `prioritaet`,
+      `bedingung`, `anwendbar`, `verworfene_varianten` benutzt ausserhalb des
+      Kerns niemand. Wer zwei Berechnungen für denselben Wert anmeldet
+      (kopierter Namensraum), bekommt keinen Fehler, sondern still eine
+      Variante; die zuerst angemeldete gewinnt. Empfehlung: ein Erzeuger je
+      Wert, `registriere` wirft beim zweiten. War eine Gründungsentscheidung.
+- [ ] **Dateien über 1000 Zeilen**, je entlang einer Naht, die schon da ist:
+      `cad_fenster.js` (Bedienung, Rückgängig, Punkteingabe auslagern; die
+      Befehle stehen in vier Listen, Knöpfe täuschen Tastendrücke vor),
+      `querkraft.py` (zwei Nachweise hinter `if self.buegel is not None`:
+      Fachwerk, ohne Bügel, mit Bügeln; die Regel für d_v steht in Kurve und
+      Nachweis je einmal), `spannungsanalyse.py` und `platte.py` (entlang
+      ihrer Abschnittsmarken), `stil.css` (ein Blatt je App).
+- [ ] **Kleineres:** die Regel für einachsige Biegung steht in drei Modulen
+      und ist auseinandergelaufen (`M_y > 0` in `richtungsnachweise.py`,
+      `M_y >= 0` in `schiefe_biegung.py`) · `print(ergebnis)` hat eine
+      dritte, abweichende Zusammenfassung (`konsole.py`) · die Herleitung am
+      Bildschirm lässt unbekannte Blockarten still weg (`bericht.js`) ·
+      `Unterprotokoll` ruft keine Rechnung auf, sein `tiefe` läuft durch 24
+      Darstellungsfunktionen · `BEREICHE.get(…, "")` legt eine neue Art
+      still unter «Weitere» · neun Nachweise bauen ihr Urteil je selbst und
+      nennen jeden Erfüllungsgrad zweimal · der Schalter `schnell` bündelt
+      vier Verhalten für zwei Nutzer.
 
 ## Offene Normfragen — deine Fragen, unbeantwortet
 
