@@ -2552,6 +2552,7 @@
       "kurz": "Biegung und Normalkraft am gezeichneten Querschnitt.",
       "stichworte": [
         "Fallergebnis",
+        "Bruchbefund",
         "SchiefeBiegung",
         "SchiefeBiegung.pruefe"
       ]
@@ -2562,6 +2563,7 @@
       "art": "modul",
       "kurz": "Querkraft und Torsion am gezeichneten Querschnitt.",
       "stichworte": [
+        "Schubbefund",
         "Schubwandnachweis",
         "Schubwandnachweis.pruefe"
       ]
@@ -3448,6 +3450,8 @@
       "stichworte": [
         "Stabquerschnitt",
         "Steifigkeit",
+        "Systembefund",
+        "Systembefund.verlaeufe",
         "SteifigkeitsmethodeProzedur",
         "SteifigkeitsmethodeProzedur.rechne",
         "Balkensystem",
@@ -3457,8 +3461,7 @@
         "Balkensystem._steifigkeit",
         "Balkensystem.ins_rechenwerk",
         "Balkensystem.ziele",
-        "Balkensystem.rechnen_und_schreiben",
-        "Balkensystem.verlaeufe"
+        "Balkensystem.rechnen_und_schreiben"
       ]
     },
     {

@@ -1,5 +1,5 @@
 ---
-erzeugt: 4ce1d882cc66
+erzeugt: 8ab2e231fc9f
 art: modul
 tags: [modul]
 ---
@@ -206,7 +206,7 @@ oder bringt.
 ### analyse
 
 ```python
-def analyse(aufbau: Aufbau, kennung: str, schnitt: Tuple[str, float]=('M_z', 0.0)) -> dict
+def analyse(aufbau: Aufbau, loesung: Loesung, kennung: str, schnitt: Tuple[str, float]=('M_z', 0.0)) -> dict
 ```
 
 Die Diagramme einer Querschnittsanalyse -- in mm, kN und kNm.
@@ -221,8 +221,9 @@ drei Groessen.
 
 Je Lastfall ausserdem der Bruchzustand im Schnitt (Nulllinie, Druckzone,
 die Dehnung jedes Stabs) und der Schubfluss in den Waenden. Was die
-Nachweise schon wissen, kommt aus ihren Objekten; neu gerechnet wird nur
-die Flaeche, nach der kein Nachweis fragt -- an demselben Querschnitt.
+Nachweise schon wissen, kommt aus ihren Befunden in `loesung`; neu
+gerechnet wird nur die Flaeche, nach der kein Nachweis fragt -- an
+demselben Querschnitt.
 
 Die Einwirkung steht so da, wie nachgewiesen: mit der Laengszugkraft aus
 Querkraft und Torsion, wo sie zugeschaltet ist.
@@ -304,7 +305,7 @@ Zugrichtung. Ohne Kruemmung ist alles gedrueckt oder nichts.
 ### _schubfluss
 
 ```python
-def _schubfluss(schub, fall) -> Optional[dict]
+def _schubfluss(schub: Schubbefund, fall) -> Optional[dict]
 ```
 
 Der Schubfluss je Stueck einer Wand, mit Vorzeichen entlang der Wand, in
@@ -324,6 +325,7 @@ gewaehlt hat. Ohne Verteilung (keine Wand, keine Last) nichts.
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.resistenzlinie]]
+- [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.projekt]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.werkstoffgesetz]]

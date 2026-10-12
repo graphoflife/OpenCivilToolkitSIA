@@ -489,14 +489,14 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None) -> dict:
         # Je Balkensystem die knappe Uebersicht; die Verlaeufe fuer die
         # Bilder holt eine eigene Anfrage (dienst.balkensystem_verlauf).
         ergebnis["balkensysteme"] = endlich({
-            kennung: balkendaten.uebersicht(system)
+            kennung: balkendaten.uebersicht(loesung.befunde.get(system.rechnung.id))
             for kennung, system in aufbau.balkensysteme.items()})
         ergebnis["warnungen"] = list(aufbau.warnungen)
         ergebnis["zuordnung"] = zuordnung(aufbau)
         # Je Blatt und Zeile, was neben der Zeile steht -- gesetzt vom Kern.
         ergebnis["gleichungen"] = {
             kennung: [{"ergebnis": r.ergebnis, "fehler": r.fehler}
-                      for r in blatt.ergebnisse]
+                      for r in loesung.befunde.get(blatt.id, [])]
             for kennung, blatt in aufbau.blaetter.items()
         }
     return ergebnis

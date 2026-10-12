@@ -1,5 +1,5 @@
 ---
-erzeugt: fad0d6b58f9e
+erzeugt: 88b928917ba6
 art: modul
 tags: [modul]
 ---
@@ -35,7 +35,7 @@ Vorzeichen der Baustatik ([[opencivil.stabwerk.verlauf|verlauf]]).
 ### schreiben
 
 ```python
-def schreiben(p: Protokoll, system: 'Balkensystem') -> None
+def schreiben(p: Protokoll, system: 'Balkensystem', befund: 'Systembefund') -> None
 ```
 
 Die ganze Herleitung eines gerechneten Systems.
@@ -43,7 +43,7 @@ Die ganze Herleitung eines gerechneten Systems.
 ### _teilname
 
 ```python
-def _teilname(system: 'Balkensystem', teil) -> str
+def _teilname(e: Ergebnis, teil) -> str
 ```
 
 Der Name eines Teilstabs: der seines Stabs -- mit Nummer, wenn dieser geteilt ist.

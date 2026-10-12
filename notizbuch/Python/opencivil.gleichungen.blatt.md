@@ -1,5 +1,5 @@
 ---
-erzeugt: e6b3bca920a7
+erzeugt: c82813edb327
 art: modul
 tags: [modul]
 ---
@@ -26,6 +26,8 @@ Eine Neudefinition gilt ab ihrer Zeile, wie beim Lesen von oben nach unten.
 
 Was eine Zeile ergibt, steht nach dem Lauf in der Loesung und damit in der
 Werteliste des Berichts: `gleichungen.g1.z003` heisst «Name, Zeile 3».
+Was neben jeder Zeile steht -- Ergebnis oder Fehler --, ist der Befund des
+Blatts: je Zeile ein [[opencivil.gleichungen.blatt#Zeilenergebnis|Zeilenergebnis]].
 Vorab erklaeren kann das Blatt diese Werte nicht -- welche Zeilen aufgehen
 und in welcher Einheit, steht erst nach dem Rechnen fest. Erklaert ist nur
 das Ziel, die Zahl der aufgegangenen Zeilen; es steht in keiner Werteliste.
@@ -60,7 +62,7 @@ Liste da -- die Formelsammlung sammelt die des Werkzeugs.
 #### Gleichungsblatt.rechne
 
 ```python
-def rechne(self, e: Eingaben, p: Protokoll)
+def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ```
 
 #### Gleichungsblatt.ausfuehren

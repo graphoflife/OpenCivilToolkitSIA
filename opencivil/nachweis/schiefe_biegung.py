@@ -32,7 +32,7 @@ N > 0 Zug; M_y > 0 zieht unten, M_z > 0 links.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
@@ -64,6 +64,18 @@ class Fallergebnis:
     erfuellungsgrad: float
 
 
+@dataclass
+class Bruchbefund:
+    """
+    Was der Nachweis im Lauf fand: den Querschnitt mit seinen
+    Bruchzustaenden -- das Interaktionsdiagramm schneidet ihn -- und je
+    Lastfall das Ergebnis.
+    """
+
+    querschnitt: Querschnitt
+    ergebnisse: List[Fallergebnis] = field(default_factory=list)
+
+
 class SchiefeBiegung(Nachweis):
     """Biegung und Normalkraft, je Lastfall gegen den Dehnungsfaecher."""
 
@@ -80,9 +92,6 @@ class SchiefeBiegung(Nachweis):
         self.einachsig = einachsig
         self.laengszug = laengszug
         """Der Nachweis der Schubwaende, wenn die Laengszugkraft zaehlt."""
-
-        self.querschnitt: Optional[Querschnitt] = None
-        self.ergebnisse: List[Fallergebnis] = []
 
         basis = f"{analyse.id}.nachweis.mn"
         self.d_ausnutzung: Dict[str, WertDef] = {
@@ -116,7 +125,7 @@ class SchiefeBiegung(Nachweis):
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         q, herkunft = self.analyse.interaktion(e)
-        self.querschnitt = q
+        befund = Bruchbefund(q)
         self._protokoll_ansatz(p, e, q)
 
         zug, druck = q.normalkraft_grenzen()
@@ -130,14 +139,15 @@ class SchiefeBiegung(Nachweis):
             self.d_eckwerte["N_Rd_druck"].id: Groesse.aus_si(druck, KN),
         }
 
-        self.ergebnisse = []
         urteile: List[NachweisUrteil] = []
         for fall in self.lastfaelle:
-            urteil, grad = self._ein_fall(p, e, q, herkunft, fall, zug, druck)
-            ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(grad, EINHEITSLOS)
+            urteil, erg = self._ein_fall(p, e, q, herkunft, fall, zug, druck)
+            befund.ergebnisse.append(erg)
+            ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(erg.erfuellungsgrad,
+                                                                EINHEITSLOS)
             if urteil is not None:
                 urteile.append(urteil)
-        return Ausfuehrung(ergebnis, urteile)
+        return Ausfuehrung(ergebnis, urteile, befund)
 
     def _einwirkung(self, e: Eingaben, fall: Lastfall) -> Tuple[float, float, float]:
         N, M_y, M_z = fall.N, fall.M_y, 0.0 if self.einachsig else fall.M_z
@@ -150,7 +160,7 @@ class SchiefeBiegung(Nachweis):
 
     def _ein_fall(self, p: Protokoll, e: Eingaben, q: Querschnitt, herkunft: Sequence[str],
                   fall: Lastfall, zug: float, druck: float
-                  ) -> Tuple[Optional[NachweisUrteil], float]:
+                  ) -> Tuple[Optional[NachweisUrteil], Fallergebnis]:
         werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
         d_grad = self.d_ausnutzung[fall.name]
         N, M_y, M_z = self._einwirkung(e, fall)
@@ -164,19 +174,17 @@ class SchiefeBiegung(Nachweis):
         if moment <= KEIN_MOMENT:
             if N == 0.0:
                 p.text("Keine Einwirkung → kein Nachweis.")
-                self.ergebnisse.append(Fallergebnis(fall, N, M_y, M_z, None, math.inf))
-                return None, math.inf
+                return None, Fallergebnis(fall, N, M_y, M_z, None, math.inf)
             grenze = zug if N > 0 else druck
             grad = grenze / N if grenze * N > 0 else 0.0
             N_Rd = werte.kraft("N_Rd", "N_{Rd}^{+}" if N > 0 else "N_{Rd}^{-}", grenze)
             erfuellt = grad >= 1.0
             grad_formel(p, d_grad, grad, N_Rd, N_Ed, erfuellt, mit_urteil=True)
-            self.ergebnisse.append(Fallergebnis(fall, N, M_y, M_z, None, grad))
             return NachweisUrteil(
                 art="M-N", ziel=d_grad.id, fall=fall.name, erfuellt=erfuellt,
                 erfuellungsgrad=Groesse(grad, EINHEITSLOS),
                 begruendung="Reine Normalkraft: gegen die gleichmässige Dehnung.",
-                einwirkung=N_Ed, widerstand=N_Rd), grad
+                einwirkung=N_Ed, widerstand=N_Rd), Fallergebnis(fall, N, M_y, M_z, None, grad)
 
         M_Ed = werte.moment("M_Ed", "M_{Ed}", moment)
 
@@ -189,12 +197,11 @@ class SchiefeBiegung(Nachweis):
                    "mit diesem N.")
             N_Rd = werte.kraft("N_Rd", "N_{Rd}^{+}" if N > 0 else "N_{Rd}^{-}", grenze)
             grad_formel(p, d_grad, grad, N_Rd, N_Ed, False, mit_urteil=True)
-            self.ergebnisse.append(Fallergebnis(fall, N, M_y, M_z, None, grad))
             return NachweisUrteil(
                 art="M-N", ziel=d_grad.id, fall=fall.name, erfuellt=False,
                 erfuellungsgrad=Groesse(grad, EINHEITSLOS),
                 begruendung="N_Ed jenseits der reinen Normalkraft-Tragfähigkeit.",
-                einwirkung=N_Ed, widerstand=N_Rd), grad
+                einwirkung=N_Ed, widerstand=N_Rd), Fallergebnis(fall, N, M_y, M_z, None, grad)
 
         # -- Der Bruchzustand -------------------------------------------------
         if self.einachsig:
@@ -221,12 +228,11 @@ class SchiefeBiegung(Nachweis):
         grad = M_Rd_si / moment
         erfuellt = grad >= 1.0
         grad_formel(p, d_grad, grad, M_Rd, M_Ed, erfuellt, mit_urteil=True)
-        self.ergebnisse.append(Fallergebnis(fall, N, M_y, M_z, punkt, grad))
         return NachweisUrteil(
             art="M-N", ziel=d_grad.id, fall=fall.name, erfuellt=erfuellt,
             erfuellungsgrad=Groesse(grad, EINHEITSLOS),
             begruendung=(f"Bei N_Ed = {N / 1e3:.1f} kN, in der Richtung des Moments."),
-            einwirkung=M_Ed, widerstand=M_Rd), grad
+            einwirkung=M_Ed, widerstand=M_Rd), Fallergebnis(fall, N, M_y, M_z, punkt, grad)
 
     # -- Mitschrift ----------------------------------------------------------------
 

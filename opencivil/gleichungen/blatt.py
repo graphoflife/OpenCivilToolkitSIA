@@ -15,6 +15,8 @@ Eine Neudefinition gilt ab ihrer Zeile, wie beim Lesen von oben nach unten.
 DIE ZEILEN IN DER LOESUNG:
 Was eine Zeile ergibt, steht nach dem Lauf in der Loesung und damit in der
 Werteliste des Berichts: ``gleichungen.g1.z003`` heisst «Name, Zeile 3».
+Was neben jeder Zeile steht -- Ergebnis oder Fehler --, ist der Befund des
+Blatts: je Zeile ein :class:`Zeilenergebnis`.
 Vorab erklaeren kann das Blatt diese Werte nicht -- welche Zeilen aufgehen
 und in welcher Einheit, steht erst nach dem Rechnen fest. Erklaert ist nur
 das Ziel, die Zahl der aufgegangenen Zeilen; es steht in keiner Werteliste.
@@ -86,12 +88,11 @@ class Gleichungsblatt(Prozedur):
         #: Jede Zeile ein Wert ``z001``, ``z002`` ... -- dreistellig, damit die
         #: Werteliste Zeile 10 nicht vor Zeile 2 setzt.
         self.zeilenwerte = Zwischenwerte(basis)
-        self.ergebnisse: List[Zeilenergebnis] = []
 
-    def rechne(self, e: Eingaben, p: Protokoll):
+    def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
         werte: Dict[str, Wert] = {}
         fehlerhaft: Dict[str, int] = {}
-        self.ergebnisse = []
+        zeilen: List[Zeilenergebnis] = []
         for nummer, zeile in enumerate(self.eintrag.zeilen, start=1):
             erg = Zeilenergebnis()
             try:
@@ -114,8 +115,9 @@ class Gleichungsblatt(Prozedur):
                 if erg.name:
                     werte.pop(erg.name, None)
                     fehlerhaft[erg.name] = nummer
-            self.ergebnisse.append(erg)
-        return {self.d_zeilen.id: Groesse(sum(not r.fehler for r in self.ergebnisse))}
+            zeilen.append(erg)
+        return Ausfuehrung({self.d_zeilen.id: Groesse(sum(not r.fehler for r in zeilen))},
+                           befund=zeilen)
 
     def ausfuehren(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
         """
@@ -126,7 +128,7 @@ class Gleichungsblatt(Prozedur):
         """
         ergebnis = super().ausfuehren(e, p)
         ausgaben = dict(ergebnis.ausgaben)
-        for nummer, zeile in enumerate(self.ergebnisse, start=1):
+        for nummer, zeile in enumerate(ergebnis.befund, start=1):
             if zeile.wert is not None:
                 beschreibung = f"{self.eintrag.name}, Zeile {nummer}"
                 ausgaben[zeile.wert.id] = replace(

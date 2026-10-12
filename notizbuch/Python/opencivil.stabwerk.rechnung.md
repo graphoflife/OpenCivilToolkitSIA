@@ -1,5 +1,5 @@
 ---
-erzeugt: 3c413f093704
+erzeugt: 3dc38943433d
 art: modul
 tags: [modul]
 ---
@@ -40,11 +40,11 @@ unverformten System. Die Herleitung sagt es, das TODO fuehrt es.
 
 ## DAS ERGEBNIS
 
-bleibt am Objekt ([[opencivil.stabwerk.rechnung#Balkensystem|Balkensystem.ergebnis]]); Zusammenfassung, Bilder
-und Zwischenspeicher lesen es dort. Als Wert des Rechenwerks liefert die
-Prozedur nur die Zahl der Unbekannten -- die gibt es immer, auch bei einem
-beweglichen System. Das ist ein Ergebnis mit Meldung und keine Ausnahme:
-der Rest des Projekts rechnet weiter.
+kommt als Befund in die Loesung ([[opencivil.stabwerk.rechnung#Systembefund|Systembefund]]); Zusammenfassung,
+Bilder und Zwischenspeicher lesen es dort. Als Wert des Rechenwerks liefert
+die Prozedur nur die Zahl der Unbekannten -- die gibt es immer, auch bei
+einem beweglichen System. Das ist ein Ergebnis mit Meldung und keine
+Ausnahme: der Rest des Projekts rechnet weiter.
 
 ## Inhalt
 
@@ -81,6 +81,30 @@ Ein Paar aus Querschnitt und Material und die Wert-IDs seiner Steifigkeiten.
 - `EA: str`
 - `EI: str`
 
+### Systembefund
+
+```python
+@dataclass
+class Systembefund
+```
+
+Was die Steifigkeitsmethode im Lauf fand: das System mit seinen
+Steifigkeiten, wie es gerechnet wurde, und sein Ergebnis -- Meldungen,
+Faelle mit Verschiebungen und Lagerkraeften, in SI. Die Verlaeufe eines
+Falls rechnet [[opencivil.stabwerk.rechnung#Systembefund.verlaeufe|verlaeufe]] einmal, wenn jemand sie braucht.
+
+- `gerechnet: System`
+- `ergebnis: Ergebnis`
+- `_verlaeufe: Dict[str, Dict[str, Stabverlauf]] = field(default_factory=dict, repr=False)`
+
+#### Systembefund.verlaeufe
+
+```python
+def verlaeufe(self, fall: str) -> Dict[str, Stabverlauf]
+```
+
+Je Stab der Verlauf der Schnittgroessen und der Biegelinie in einem Fall -- einmal gerechnet.
+
 ### SteifigkeitsmethodeProzedur
 
 ```python
@@ -94,7 +118,7 @@ Das ganze System, gerechnet und aufgeschrieben.
 #### SteifigkeitsmethodeProzedur.rechne
 
 ```python
-def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]
+def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ```
 
 ### Balkensystem
@@ -155,20 +179,12 @@ Was ein Lauf rechnen muss: jeder Querschnitt -- auch einer, den kein Stab nimmt 
 #### Balkensystem.rechnen_und_schreiben
 
 ```python
-def rechnen_und_schreiben(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
+def rechnen_und_schreiben(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ```
 
 Die Steifigkeiten in die Staebe, das System gerechnet, die Herleitung
 geschrieben. Haelt eine Meldung der Beschreibung die Rechnung auf,
 bleibt es bei ihr.
-
-#### Balkensystem.verlaeufe
-
-```python
-def verlaeufe(self, fall: str) -> Dict[str, Stabverlauf]
-```
-
-Je Stab der Verlauf der Schnittgroessen und der Biegelinie in einem Fall -- einmal gerechnet.
 
 
 ## Konstanten

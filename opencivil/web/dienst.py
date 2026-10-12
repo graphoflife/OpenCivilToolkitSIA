@@ -209,17 +209,19 @@ def _abdruck(beschreibung: Mapping[str, Any], aufbau, kennung: str) -> str:
     return speicher.abdruck(beschreibung, kennung, kopf.bezuege)
 
 
-def _bauteil_rechnen(projekt: Projekt, aufbau, kennung: str) -> None:
+def _bauteil_rechnen(projekt: Projekt, aufbau, kennung: str) -> Loesung:
     """
     Ein Bauteil gerechnet: aus dem Zwischenspeicher, wenn er es zu genau
     dieser Beschreibung noch hat -- nach einer Rechnung ist das der Fall --,
     sonst dieses eine.
     """
     teil = SPEICHER.hole(kennung, _abdruck(projekt.als_dict(), aufbau, kennung))
-    if teil is not None:
-        aufbau.teile_setzen(kennung, teil.teile)
-    else:
-        aufbau.werk.loese(*aufbau.materialziele(), *aufbau.ziele_von(kennung))
+    if teil is None:
+        return aufbau.werk.loese(*aufbau.materialziele(), *aufbau.ziele_von(kennung))
+    aufbau.teile_setzen(kennung, teil.teile)
+    loesung = Loesung()
+    speicher.verschmelzen(loesung, teil)
+    return loesung
 
 
 def querkraftkurven(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
@@ -409,8 +411,8 @@ def analysediagramme(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     except (TypeError, ValueError):
         raise DienstFehler(400, f"Der Wert des Schnitts ist keine Zahl: {wahl.get('wert')!r}.") from None
     aufbau = projekt.aufbauen()
-    _bauteil_rechnen(projekt, aufbau, kennung)
-    return {"diagramme": endlich(diagrammdaten.analyse(aufbau, kennung, (fest, wert)))}
+    loesung = _bauteil_rechnen(projekt, aufbau, kennung)
+    return {"diagramme": endlich(diagrammdaten.analyse(aufbau, loesung, kennung, (fest, wert)))}
 
 
 def _balkensystem(projekt: Projekt, rumpf: Mapping[str, Any]) -> BalkensystemEintrag:
@@ -440,16 +442,17 @@ def balkensystem_verlauf(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     projekt = _projekt(rumpf)
     eintrag = _balkensystem(projekt, rumpf)
     aufbau = projekt.aufbauen()
-    _bauteil_rechnen(projekt, aufbau, eintrag.kennung)
-    system = aufbau.balkensysteme[eintrag.kennung]
-    uebersicht = endlich(balkendaten.uebersicht(system))
+    loesung = _bauteil_rechnen(projekt, aufbau, eintrag.kennung)
+    befund = loesung.befunde.get(aufbau.balkensysteme[eintrag.kennung].rechnung.id)
+    uebersicht = endlich(balkendaten.uebersicht(befund))
     fall = str(rumpf.get("fall") or "")
-    if not fall or not system.ergebnis.faelle:
+    gerechnet = balkendaten.faelle(befund)
+    if not fall or not gerechnet:
         return {"verlauf": None, "uebersicht": uebersicht}
-    if fall not in balkendaten.faelle(system):
+    if fall not in gerechnet:
         raise DienstFehler(400, f"Einen Fall «{fall}» gibt es in «{eintrag.name}» nicht. "
-                                f"Gerechnet sind: {', '.join(balkendaten.faelle(system))}.")
-    return {"verlauf": endlich(balkendaten.verlauf(system, fall)), "uebersicht": uebersicht}
+                                f"Gerechnet sind: {', '.join(gerechnet)}.")
+    return {"verlauf": endlich(balkendaten.verlauf(befund, fall)), "uebersicht": uebersicht}
 
 
 def balkensystem_bearbeiten(rumpf: Mapping[str, Any]) -> Dict[str, Any]:

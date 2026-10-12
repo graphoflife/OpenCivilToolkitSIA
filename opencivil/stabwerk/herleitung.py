@@ -29,11 +29,11 @@ from opencivil.core.latex import Mathe, fest, text_latex
 from opencivil.core.protokoll import Protokoll
 from opencivil.stabwerk import stab as st
 from opencivil.stabwerk.matrix import dicht
-from opencivil.stabwerk.modell import FEST, Stablast
-from opencivil.stabwerk.system import UNBESTIMMT, Fall
+from opencivil.stabwerk.modell import FEST, Stablast, System
+from opencivil.stabwerk.system import UNBESTIMMT, Ergebnis, Fall
 
 if TYPE_CHECKING:
-    from opencivil.stabwerk.rechnung import Balkensystem
+    from opencivil.stabwerk.rechnung import Balkensystem, Systembefund
 
 #: Bis zu so vielen Teilstaeben steht die Matrix jedes einzelnen mit Zahlen da.
 STAEBE_MIT_MATRIX = 6
@@ -63,22 +63,22 @@ SCHNITTGROESSEN_LATEX = (
 BIEGELINIE_LATEX = r"v'' = \frac{M}{EI} \qquad u' = \frac{N}{EA}"
 
 
-def schreiben(p: Protokoll, system: "Balkensystem") -> None:
+def schreiben(p: Protokoll, system: "Balkensystem", befund: "Systembefund") -> None:
     """Die ganze Herleitung eines gerechneten Systems."""
-    e = system.ergebnis
+    e = befund.ergebnis
     p.annahme(ANNAHME)
-    _staebe(p, system)
-    _lager(p, system)
+    _staebe(p, system, befund.gerechnet)
+    _lager(p, befund.gerechnet)
     for m in e.meldungen:
         (p.warnung if m.fehler else p.hinweis)(m.text)
     if e.K is None:
         return
-    _ansaetze(p, system)
-    _unbekannte(p, system)
+    _ansaetze(p, befund)
+    _unbekannte(p, e)
     if not e.faelle:
         return
     for fall in e.faelle:
-        _fall(p, system, fall)
+        _fall(p, befund, fall)
 
 
 # ===========================================================================
@@ -86,8 +86,7 @@ def schreiben(p: Protokoll, system: "Balkensystem") -> None:
 # ===========================================================================
 
 
-def _staebe(p: Protokoll, system: "Balkensystem") -> None:
-    modell = system.gerechnet
+def _staebe(p: Protokoll, system: "Balkensystem", modell: System) -> None:
     knoten = {k.name: k for k in modell.knoten}
     name = {q.kennung: q.name for q in system.querschnitte}
     zeilen = []
@@ -129,8 +128,8 @@ def _linienlager(quer, laengs) -> str:
     return ", ".join(teile) or "–"
 
 
-def _lager(p: Protokoll, system: "Balkensystem") -> None:
-    lager = system.gerechnet.lager
+def _lager(p: Protokoll, modell: System) -> None:
+    lager = modell.lager
     if not lager:
         return
     p.tabelle(["Lager", "Knoten", Mathe("x"), Mathe("z"), Mathe(r"\varphi")],
@@ -138,8 +137,8 @@ def _lager(p: Protokoll, system: "Balkensystem") -> None:
                 _halt(l.phi, "kNm/rad")] for l in lager], titel="Lager")
 
 
-def _ansaetze(p: Protokoll, system: "Balkensystem") -> None:
-    e, modell = system.ergebnis, system.gerechnet
+def _ansaetze(p: Protokoll, befund: "Systembefund") -> None:
+    e, modell = befund.ergebnis, befund.gerechnet
     p.ansatz(st.STEIFIGKEIT_LATEX, titel="Steifigkeitsmatrix eines Stabs, in seinen Achsen",
              name="Steifigkeitsmatrix eines Stabs")
     p.ansatz(st.DREHUNG_LATEX, titel="Von den Achsen des Systems in die des Stabs",
@@ -161,9 +160,9 @@ def _ansaetze(p: Protokoll, system: "Balkensystem") -> None:
                   f"angeschlossen; die Drehung ist gestrichen und null gesetzt.")
     if len(e.teilstaebe) <= STAEBE_MIT_MATRIX:
         for t in e.teilstaebe:
-            p.gleichung(rf"\mathbf{{k}}_{{\text{{{text_latex(_teilname(system, t))}}}}} = "
+            p.gleichung(rf"\mathbf{{k}}_{{\text{{{text_latex(_teilname(e, t))}}}}} = "
                         + _matrix(t.k, 1e-3),
-                        titel=f"Steifigkeitsmatrix {_teilname(system, t)}, L = {t.L:.3f} m "
+                        titel=f"Steifigkeitsmatrix {_teilname(e, t)}, L = {t.L:.3f} m "
                               f"(kN, m)")
     p.ansatz(SCHNITTGROESSEN_LATEX, titel="Schnittgrössen aus den Kräften an den Stabenden",
              name="Schnittgrössen längs eines Stabs")
@@ -171,14 +170,13 @@ def _ansaetze(p: Protokoll, system: "Balkensystem") -> None:
              name="Biegelinie eines Stabs")
 
 
-def _teilname(system: "Balkensystem", teil) -> str:
+def _teilname(e: Ergebnis, teil) -> str:
     """Der Name eines Teilstabs: der seines Stabs -- mit Nummer, wenn dieser geteilt ist."""
-    stuecke = sum(1 for t in system.ergebnis.teilstaebe if t.stab.name == teil.stab.name)
+    stuecke = sum(1 for t in e.teilstaebe if t.stab.name == teil.stab.name)
     return teil.stab.name if stuecke == 1 else f"{teil.stab.name}.{teil.nummer + 1}"
 
 
-def _unbekannte(p: Protokoll, system: "Balkensystem") -> None:
-    e = system.ergebnis
+def _unbekannte(p: Protokoll, e: Ergebnis) -> None:
     n = len(e.unbekannte)
     if n > UNBEKANNTE_MIT_MATRIX:
         p.text(f"{n} Unbekannte.")
@@ -194,31 +192,31 @@ def _unbekannte(p: Protokoll, system: "Balkensystem") -> None:
 # ===========================================================================
 
 
-def _fall(p: Protokoll, system: "Balkensystem", fall: Fall) -> None:
-    modell = system.gerechnet
+def _fall(p: Protokoll, befund: "Systembefund", fall: Fall) -> None:
+    modell = befund.gerechnet
     p.titel(f"{'Kombination' if fall.kombination else 'Lastfall'} «{fall.name}»", ebene=3)
     if fall.kombination:
         k = next(k for k in modell.kombinationen if k.name == fall.name)
         p.text(" + ".join(f"{beiwert:g} · {lf}" for lf, beiwert in k.faktoren.items())
                or "Keine Beiwerte – die Kombination ist leer.")
-    e = system.ergebnis
+    e = befund.ergebnis
     if len(e.unbekannte) <= UNBEKANNTE_MIT_MATRIX:
         p.gleichung(r"\mathbf{F} = " + _matrix([[f] for f in fall.F], 1e-3)
                     + r" \qquad \mathbf{x} = \mathbf{K}^{-1} \cdot \mathbf{F} = "
                     + _matrix([[x] for x in fall.x], 1.0),
                     titel="Lastvektor (kN, kNm) und Lösung (m, rad)")
-    _verschiebungen(p, system, fall)
-    verlaeufe = system.verlaeufe(fall.name)
+    _verschiebungen(p, befund, fall)
+    verlaeufe = befund.verlaeufe(fall.name)
     _stabenden(p, verlaeufe)
-    _lagerkraefte(p, system, fall)
+    _lagerkraefte(p, befund, fall)
     _extremwerte(p, verlaeufe)
     _gleichgewicht(p, fall)
 
 
-def _verschiebungen(p: Protokoll, system: "Balkensystem", fall: Fall) -> None:
-    orte = system.ergebnis.orte
+def _verschiebungen(p: Protokoll, befund: "Systembefund", fall: Fall) -> None:
+    orte = befund.ergebnis.orte
     zeilen = []
-    for k in system.gerechnet.knoten:
+    for k in befund.gerechnet.knoten:
         ort = orte.get(k.name)
         if ort is None:
             continue
@@ -242,10 +240,10 @@ def _stabenden(p: Protokoll, verlaeufe) -> None:
     p.tabelle(kopf, zeilen, titel="Schnittgrössen an den Stabenden")
 
 
-def _lagerkraefte(p: Protokoll, system: "Balkensystem", fall: Fall) -> None:
-    orte = system.ergebnis.orte
+def _lagerkraefte(p: Protokoll, befund: "Systembefund", fall: Fall) -> None:
+    orte = befund.ergebnis.orte
     lager_an: Dict[str, List[str]] = {}
-    for l in system.gerechnet.lager:
+    for l in befund.gerechnet.lager:
         lager_an.setdefault(l.knoten, []).append(l.name)
     zeilen = []
     for name, (rx, rz, rm) in fall.lagerkraefte.items():

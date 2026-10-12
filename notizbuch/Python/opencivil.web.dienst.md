@@ -1,5 +1,5 @@
 ---
-erzeugt: a6e6c3e65b4e
+erzeugt: bbd6370184ca
 art: modul
 tags: [modul]
 ---
@@ -154,7 +154,7 @@ Der Fingerabdruck eines Bauteils -- mit den Bauteilen, deren Werte es liest.
 ### _bauteil_rechnen
 
 ```python
-def _bauteil_rechnen(projekt: Projekt, aufbau, kennung: str) -> None
+def _bauteil_rechnen(projekt: Projekt, aufbau, kennung: str) -> Loesung
 ```
 
 Ein Bauteil gerechnet: aus dem Zwischenspeicher, wenn er es zu genau

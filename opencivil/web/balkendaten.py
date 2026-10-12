@@ -2,8 +2,8 @@
 opencivil/web/balkendaten.py -- was die Oberflaeche von einem Balkensystem zeigt.
 
 VERANTWORTUNG:
-Aus einem gerechneten System (:class:`~opencivil.stabwerk.rechnung.Balkensystem`)
-die Daten fuer die Oberflaeche, in den Einheiten der Anzeige -- kN, kNm, mm,
+Aus dem Befund eines gerechneten Systems
+(:class:`~opencivil.stabwerk.rechnung.Systembefund`) die Daten fuer die Oberflaeche, in den Einheiten der Anzeige -- kN, kNm, mm,
 mrad, Stellen in m:
 
 * mit jeder Rechnung eine knappe Uebersicht (:func:`uebersicht`): die
@@ -21,9 +21,9 @@ umgerechnet und in Listen gelegt.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
-from opencivil.stabwerk.rechnung import Balkensystem
+from opencivil.stabwerk.rechnung import Systembefund
 from opencivil.stabwerk.system import UNBESTIMMT, Fall
 
 #: Wie viele Stuecke ein Stab im Bild mindestens hat -- dazu jede Grenze und jeder Extremwert.
@@ -32,11 +32,14 @@ PROBEN_JE_STAB = 24
 kN, mm, mrad = 1e-3, 1e3, 1e3
 
 
-def uebersicht(system: Balkensystem) -> Dict[str, Any]:
-    """Was die Oberflaeche nach jeder Rechnung von einem System weiss -- ohne die Verlaeufe."""
-    e = system.ergebnis
-    if e is None:
+def uebersicht(befund: Optional[Systembefund]) -> Dict[str, Any]:
+    """
+    Was die Oberflaeche nach jeder Rechnung von einem System weiss -- ohne
+    die Verlaeufe. Ohne Befund lief es nicht, etwa weil ein Baustoff fehlt.
+    """
+    if befund is None:
         return {"gerechnet": False}
+    e = befund.ergebnis
     return {
         "gerechnet": True,
         "gueltig": e.gueltig,
@@ -46,20 +49,20 @@ def uebersicht(system: Balkensystem) -> Dict[str, Any]:
         "unbestimmt_text": UNBESTIMMT,
         "beweglich": list(e.beweglich),
         "unbekannte": len(e.unbekannte),
-        "faelle": [_fall(system, f) for f in e.faelle],
+        "faelle": [_fall(befund, f) for f in e.faelle],
     }
 
 
-def _fall(system: Balkensystem, fall: Fall) -> Dict[str, Any]:
+def _fall(befund: Systembefund, fall: Fall) -> Dict[str, Any]:
     staebe = {}
-    for name, v in system.verlaeufe(fall.name).items():
+    for name, v in befund.verlaeufe(fall.name).items():
         extrem = {}
         for groesse, faktor in (("N", kN), ("V", kN), ("M", kN), ("w", mm)):
             e = v.extrem(groesse)
             extrem[groesse] = {"kleinst": [e.kleinst[0], e.kleinst[1] * faktor],
                                "groesst": [e.groesst[0], e.groesst[1] * faktor]}
         staebe[name] = extrem
-    orte = system.ergebnis.orte
+    orte = befund.ergebnis.orte
     return {
         "name": fall.name,
         "kombination": fall.kombination,
@@ -71,11 +74,11 @@ def _fall(system: Balkensystem, fall: Fall) -> Dict[str, Any]:
     }
 
 
-def verlauf(system: Balkensystem, name: str) -> Dict[str, Any]:
+def verlauf(befund: Systembefund, name: str) -> Dict[str, Any]:
     """Die Bilder eines Falls: je Stab die Proben, je Knoten die Verschiebung."""
-    fall = system.ergebnis.fall(name)
+    fall = befund.ergebnis.fall(name)
     staebe = {}
-    for stab, v in system.verlaeufe(name).items():
+    for stab, v in befund.verlaeufe(name).items():
         staebe[stab] = {
             "L": v.L, "c": v.c, "s": v.s, "x_a": v.x_a, "z_a": v.z_a,
             "proben": [{"x": w["x"], "N": w["N"] * kN, "V": w["V"] * kN, "M": w["M"] * kN,
@@ -83,7 +86,7 @@ def verlauf(system: Balkensystem, name: str) -> Dict[str, Any]:
                        for w in v.proben(PROBEN_JE_STAB)],
         }
     knoten = {}
-    for ort in system.ergebnis.orte.values():
+    for ort in befund.ergebnis.orte.values():
         if not ort.knoten:
             continue
         ux, uz, phi = fall.verschiebungen[ort.name]
@@ -95,6 +98,6 @@ def verlauf(system: Balkensystem, name: str) -> Dict[str, Any]:
             "knoten": knoten, "unbestimmt_text": UNBESTIMMT}
 
 
-def faelle(system: Balkensystem) -> List[str]:
+def faelle(befund: Optional[Systembefund]) -> List[str]:
     """Die Namen der gerechneten Faelle, Lastfaelle zuerst."""
-    return [f.name for f in system.ergebnis.faelle] if system.ergebnis else []
+    return [f.name for f in befund.ergebnis.faelle] if befund is not None else []

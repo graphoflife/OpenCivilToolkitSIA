@@ -18,6 +18,7 @@ ist die schwaechste Wand.
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import (
@@ -32,6 +33,21 @@ from opencivil.querschnitt import schubwaende as sw
 from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse, Wandangabe
 
 
+@dataclass
+class Schubbefund:
+    """
+    Was der Nachweis im Lauf fand: die Waende und ihre Zellen, je Lastfall
+    die Verteilung des Schubflusses und je Wand den Widerstand bei der
+    gewaehlten Neigung -- fuer die Diagramme. Ein Lastfall ohne Verteilung
+    (keine Last, keine Wand) fehlt in beiden.
+    """
+
+    waende: List[sw.Wand]
+    modell: sw.Zellenmodell
+    verteilungen: Dict[str, sw.Verteilung] = field(default_factory=dict)
+    widerstaende: Dict[str, List[sw.Wandwiderstand]] = field(default_factory=dict)
+
+
 class Schubwandnachweis(Nachweis):
     """Querkraft und Torsion, je Lastfall auf die Schubwaende verteilt."""
 
@@ -43,11 +59,6 @@ class Schubwandnachweis(Nachweis):
         self.lastfaelle = list(lastfaelle)
         self.einachsig = einachsig
         self.mit_laengszug = mit_laengszug
-        self.verteilungen: Dict[str, Optional[sw.Verteilung]] = {}
-        self.widerstaende: Dict[str, List[sw.Wandwiderstand]] = {}
-        """Je Lastfall und Wand der Widerstand bei der gewählten Neigung -- für die Diagramme."""
-        self.modell: Optional[sw.Zellenmodell] = None
-        self.waende: List[sw.Wand] = []
 
         basis = f"{analyse.id}.nachweis.vt"
         self.d_ausnutzung: Dict[str, WertDef] = {
@@ -100,25 +111,24 @@ class Schubwandnachweis(Nachweis):
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         bezug = (e.g("y_S").si, e.g("z_S").si)
-        self.waende = self.analyse.schubwaende(
+        waende = self.analyse.schubwaende(
             f_sd=lambda w: self._f_sd(e, w), f_cd=lambda w: self._f_cd(e, w),
             k_c=e.g("k_c").si)
-        self.modell = sw.zellen(self.waende) if self.waende else sw.Zellenmodell((), ())
+        befund = Schubbefund(waende, sw.zellen(waende) if waende else sw.Zellenmodell((), ()))
         alpha_min = int(round(e.g("alpha_min").si * 180.0 / math.pi))
         alpha_max = int(round(e.g("alpha_max").si * 180.0 / math.pi))
-        self._protokoll_ansatz(p, e)
+        self._protokoll_ansatz(p, e, befund)
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
         for fall in self.lastfaelle:
             V_y = 0.0 if self.einachsig else fall.V_y
             if not self._belastet(fall):
-                self.verteilungen[fall.name] = None
                 self._laengszug_null(ergebnis, fall)
                 continue
             p.titel(fall.name, ebene=3)
             urteil, grad, laengs = self._ein_fall(
-                p, fall, V_y, bezug, alpha_min, alpha_max)
+                p, befund, fall, V_y, bezug, alpha_min, alpha_max)
             ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(grad, EINHEITSLOS)
             urteile.append(urteil)
             if self.mit_laengszug:
@@ -127,7 +137,7 @@ class Schubwandnachweis(Nachweis):
                 ergebnis[d["N"].id] = Groesse.aus_si(laengs.N, KN)
                 ergebnis[d["M_y"].id] = Groesse.aus_si(laengs.M_y, KNM)
                 ergebnis[d["M_z"].id] = Groesse.aus_si(laengs.M_z, KNM)
-        return Ausfuehrung(ergebnis, urteile)
+        return Ausfuehrung(ergebnis, urteile, befund)
 
     def _laengszug_null(self, ergebnis: Dict[str, Groesse], fall: Lastfall) -> None:
         if self.mit_laengszug:
@@ -137,29 +147,28 @@ class Schubwandnachweis(Nachweis):
     def _ohne(self, p: Protokoll, fall: Lastfall, grund: str):
         p.warnung(grund)
         d = self.d_ausnutzung[fall.name]
-        self.verteilungen[fall.name] = None
         return NachweisUrteil(
             art="V+T", ziel=d.id, fall=fall.name, erfuellt=False,
             erfuellungsgrad=Groesse(0.0, EINHEITSLOS), begruendung=grund,
             hinweis=grund), 0.0, None
 
-    def _ein_fall(self, p: Protokoll, fall: Lastfall, V_y: float, bezug,
-                  alpha_min: int, alpha_max: int):
+    def _ein_fall(self, p: Protokoll, befund: Schubbefund, fall: Lastfall, V_y: float,
+                  bezug, alpha_min: int, alpha_max: int):
         werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
         p.tabelle(kopf=["Einwirkung", "Wert", ""], zeilen=[
             ["V_y,Ed", Mathe(fest(V_y / 1e3, 1)), "kN"],
             ["V_z,Ed", Mathe(fest(fall.V_z / 1e3, 1)), "kN"],
             ["T_Ed", Mathe(fest(fall.T / 1e3, 1)), "kNm"],
         ], titel="Einwirkung", ausrichtung="lrl")
-        if not self.waende:
+        if not befund.waende:
             return self._ohne(p, fall, "Es gibt keine Schubwand, die Querkraft oder "
                                        "Torsion aufnehmen könnte.")
         try:
-            v = sw.verteilen(self.waende, self.modell, V_y=V_y, V_z=fall.V_z, T=fall.T,
+            v = sw.verteilen(befund.waende, befund.modell, V_y=V_y, V_z=fall.V_z, T=fall.T,
                              bezug=bezug)
         except sw.WandFehler as fehler:
             return self._ohne(p, fall, str(fehler))
-        self.verteilungen[fall.name] = v
+        befund.verteilungen[fall.name] = v
 
         # -- Verteilung ---------------------------------------------------------
         if v.mit_drehung:
@@ -177,7 +186,7 @@ class Schubwandnachweis(Nachweis):
                             Mathe(r"q_k\ [\mathrm{kN/m}]")],
                       zeilen=[[f"Zelle {k + 1}", Mathe(fest(z.flaeche * 1e6, 0)),
                                Mathe(fest(q / 1e3, 1))]
-                              for k, (z, q) in enumerate(zip(self.modell.zellen,
+                              for k, (z, q) in enumerate(zip(befund.modell.zellen,
                                                              v.zellenfluss))],
                       titel="Umlauf-Schubfluss der Zellen (Bredt)", ausrichtung="lrr")
 
@@ -186,12 +195,13 @@ class Schubwandnachweis(Nachweis):
         zeilen = []
         bester: Optional[tuple] = None
         neigungen: List[int] = []
-        self.widerstaende[fall.name] = []
-        for i, w in enumerate(self.waende):
-            fluss = [abs(q) for s, q in zip(self.modell.stuecke, v.fluss) if s.wand == i]
+        widerstaende: List[sw.Wandwiderstand] = []
+        befund.widerstaende[fall.name] = widerstaende
+        for i, w in enumerate(befund.waende):
+            fluss = [abs(q) for s, q in zip(befund.modell.stuecke, v.fluss) if s.wand == i]
             q_ed = max(fluss) if fluss else 0.0
             r = sw.widerstand(w, alpha_min=alpha_min, alpha_max=alpha_max, zugkraft=zugkraft)
-            self.widerstaende[fall.name].append(r)
+            widerstaende.append(r)
             neigungen.append(r.alpha)
             # Ein Fluss unter einem Millionstel N/m ist Rundungsrauschen der
             # Verteilung, keine Beanspruchung -- dort steht ∞, nicht 8·10¹⁶.
@@ -225,7 +235,7 @@ class Schubwandnachweis(Nachweis):
 
         laengs = None
         if self.mit_laengszug:
-            laengs = sw.laengszug(self.modell, v, neigungen, bezug)
+            laengs = sw.laengszug(befund.modell, v, neigungen, bezug)
             p.tabelle(kopf=["Längszugkraft", "Wert", ""], zeilen=[
                 [Mathe(r"\Delta N = \sum |q|\, l \cot\alpha"), Mathe(fest(laengs.N / 1e3, 1)), "kN"],
                 [Mathe(r"\Delta M_y = -\sum \Delta N_i (z_i - z_S)"),
@@ -243,7 +253,7 @@ class Schubwandnachweis(Nachweis):
 
     # -- Mitschrift ----------------------------------------------------------------
 
-    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
+    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, befund: Schubbefund) -> None:
         p.erklaerung(
             "Jede Schubwand trägt eine Kraft entlang ihrer Achse; ihre Länge ist "
             "der Hebelarm des Fachwerks. Verteilt wird elastisch: der Querschnitt "
@@ -270,11 +280,11 @@ class Schubwandnachweis(Nachweis):
             [Mathe(r"\alpha_{max}"), Mathe(e["alpha_max"].zahl_latex())],
             [Mathe("k_c"), Mathe(e["k_c"].zahl_latex())],
         ], titel="Druckfeld", ausrichtung="lr")
-        if self.waende:
+        if befund.waende:
             zellen_von: Dict[int, List[int]] = {}
-            for k, z in enumerate(self.modell.zellen):
+            for k, z in enumerate(befund.modell.zellen):
                 for stueck, _ in z.rand:
-                    zellen_von.setdefault(self.modell.stuecke[stueck].wand, []).append(k + 1)
+                    zellen_von.setdefault(befund.modell.stuecke[stueck].wand, []).append(k + 1)
             p.tabelle(
                 kopf=["Wand", Mathe(r"l\ [\mathrm{mm}]"), Mathe(r"b_w\ [\mathrm{mm}]"),
                       Mathe(r"k = b_w l\ [\mathrm{mm}^2]"),
@@ -282,5 +292,5 @@ class Schubwandnachweis(Nachweis):
                 zeilen=[[w.name, Mathe(fest(w.laenge * 1e3, 0)), Mathe(fest(w.b_w * 1e3, 0)),
                          Mathe(fest(w.steifigkeit * 1e6, 0)), Mathe(fest(w.a_sw_s * 1e6, 0)),
                          ", ".join(str(k) for k in sorted(set(zellen_von.get(i, [])))) or "–"]
-                        for i, w in enumerate(self.waende)],
+                        for i, w in enumerate(befund.waende)],
                 titel="Schubwände und ihre Steifigkeit", ausrichtung="lrrrrl")

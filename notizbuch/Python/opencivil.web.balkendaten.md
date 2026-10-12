@@ -1,5 +1,5 @@
 ---
-erzeugt: 21888f8fa3f0
+erzeugt: dbf9fc60504a
 art: modul
 tags: [modul]
 ---
@@ -9,8 +9,8 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Aus einem gerechneten System ([[opencivil.stabwerk.rechnung#Balkensystem|Balkensystem]])
-die Daten fuer die Oberflaeche, in den Einheiten der Anzeige -- kN, kNm, mm,
+Aus dem Befund eines gerechneten Systems
+([[opencivil.stabwerk.rechnung#Systembefund|Systembefund]]) die Daten fuer die Oberflaeche, in den Einheiten der Anzeige -- kN, kNm, mm,
 mrad, Stellen in m:
 
 * mit jeder Rechnung eine knappe Uebersicht ([[opencivil.web.balkendaten#uebersicht|uebersicht]]): die
@@ -30,15 +30,16 @@ umgerechnet und in Listen gelegt.
 ### uebersicht
 
 ```python
-def uebersicht(system: Balkensystem) -> Dict[str, Any]
+def uebersicht(befund: Optional[Systembefund]) -> Dict[str, Any]
 ```
 
-Was die Oberflaeche nach jeder Rechnung von einem System weiss -- ohne die Verlaeufe.
+Was die Oberflaeche nach jeder Rechnung von einem System weiss -- ohne
+die Verlaeufe. Ohne Befund lief es nicht, etwa weil ein Baustoff fehlt.
 
 ### verlauf
 
 ```python
-def verlauf(system: Balkensystem, name: str) -> Dict[str, Any]
+def verlauf(befund: Systembefund, name: str) -> Dict[str, Any]
 ```
 
 Die Bilder eines Falls: je Stab die Proben, je Knoten die Verschiebung.
@@ -46,7 +47,7 @@ Die Bilder eines Falls: je Stab die Proben, je Knoten die Verschiebung.
 ### faelle
 
 ```python
-def faelle(system: Balkensystem) -> List[str]
+def faelle(befund: Optional[Systembefund]) -> List[str]
 ```
 
 Die Namen der gerechneten Faelle, Lastfaelle zuerst.

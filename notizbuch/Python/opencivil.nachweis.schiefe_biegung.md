@@ -1,5 +1,5 @@
 ---
-erzeugt: c2c070f0eeb1
+erzeugt: 41c42faa209f
 art: modul
 tags: [modul]
 ---
@@ -60,6 +60,20 @@ Was ein Lastfall ergab -- fuer die Diagramme nach dem Lauf.
 - `M_z: float` – Die Einwirkung, wie nachgewiesen -- mit Laengszugkraft, wo zugeschaltet.
 - `punkt: Optional[Bruchpunkt]`
 - `erfuellungsgrad: float`
+
+### Bruchbefund
+
+```python
+@dataclass
+class Bruchbefund
+```
+
+Was der Nachweis im Lauf fand: den Querschnitt mit seinen
+Bruchzustaenden -- das Interaktionsdiagramm schneidet ihn -- und je
+Lastfall das Ergebnis.
+
+- `querschnitt: Querschnitt`
+- `ergebnisse: List[Fallergebnis] = field(default_factory=list)`
 
 ### SchiefeBiegung
 

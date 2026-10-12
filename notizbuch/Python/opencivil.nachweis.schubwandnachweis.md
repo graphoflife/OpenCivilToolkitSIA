@@ -1,5 +1,5 @@
 ---
-erzeugt: 1d9a7d5f712c
+erzeugt: 4a62aa822101
 art: modul
 tags: [modul]
 ---
@@ -24,6 +24,23 @@ Je Wand `v_Rd / |q_Ed|`, gemessen am staerksten Stueck der Wand; massgebend
 ist die schwaechste Wand.
 
 ## Inhalt
+
+### Schubbefund
+
+```python
+@dataclass
+class Schubbefund
+```
+
+Was der Nachweis im Lauf fand: die Waende und ihre Zellen, je Lastfall
+die Verteilung des Schubflusses und je Wand den Widerstand bei der
+gewaehlten Neigung -- fuer die Diagramme. Ein Lastfall ohne Verteilung
+(keine Last, keine Wand) fehlt in beiden.
+
+- `waende: List[sw.Wand]`
+- `modell: sw.Zellenmodell`
+- `verteilungen: Dict[str, sw.Verteilung] = field(default_factory=dict)`
+- `widerstaende: Dict[str, List[sw.Wandwiderstand]] = field(default_factory=dict)`
 
 ### Schubwandnachweis
 
@@ -56,6 +73,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 ## Gebraucht von
 
 - [[opencivil.projekt.aufbau]]
+- [[opencivil.web.diagrammdaten]]
 
 ## Formeln aus diesem Modul
 

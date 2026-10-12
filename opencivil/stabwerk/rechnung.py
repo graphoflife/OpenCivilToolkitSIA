@@ -27,11 +27,11 @@ ungerissenen Bruttoquerschnitt, ohne Schubverformung, Gleichgewicht am
 unverformten System. Die Herleitung sagt es, das TODO fuehrt es.
 
 DAS ERGEBNIS:
-bleibt am Objekt (:attr:`Balkensystem.ergebnis`); Zusammenfassung, Bilder
-und Zwischenspeicher lesen es dort. Als Wert des Rechenwerks liefert die
-Prozedur nur die Zahl der Unbekannten -- die gibt es immer, auch bei einem
-beweglichen System. Das ist ein Ergebnis mit Meldung und keine Ausnahme:
-der Rest des Projekts rechnet weiter.
+kommt als Befund in die Loesung (:class:`Systembefund`); Zusammenfassung,
+Bilder und Zwischenspeicher lesen es dort. Als Wert des Rechenwerks liefert
+die Prozedur nur die Zahl der Unbekannten -- die gibt es immer, auch bei
+einem beweglichen System. Das ist ein Ergebnis mit Meldung und keine
+Ausnahme: der Rest des Projekts rechnet weiter.
 """
 
 from __future__ import annotations
@@ -39,7 +39,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field, replace
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
-from opencivil.core.berechnung import Berechnung, Eingabebezug, Eingaben, Formel, Prozedur, Vorgabe
+from opencivil.core.berechnung import (
+    Ausfuehrung, Berechnung, Eingabebezug, Eingaben, Formel, Prozedur, Vorgabe,
+)
 from opencivil.core.einheiten import EINHEITSLOS, KNM2, MIO_MM4, MM, MM2, MN, Groesse
 from opencivil.core.latex import platzhalter_namen
 from opencivil.core.protokoll import Abschnitt, Protokoll
@@ -98,6 +100,26 @@ class Steifigkeit:
     EI: str
 
 
+@dataclass
+class Systembefund:
+    """
+    Was die Steifigkeitsmethode im Lauf fand: das System mit seinen
+    Steifigkeiten, wie es gerechnet wurde, und sein Ergebnis -- Meldungen,
+    Faelle mit Verschiebungen und Lagerkraeften, in SI. Die Verlaeufe eines
+    Falls rechnet :meth:`verlaeufe` einmal, wenn jemand sie braucht.
+    """
+
+    gerechnet: System
+    ergebnis: Ergebnis
+    _verlaeufe: Dict[str, Dict[str, Stabverlauf]] = field(default_factory=dict, repr=False)
+
+    def verlaeufe(self, fall: str) -> Dict[str, Stabverlauf]:
+        """Je Stab der Verlauf der Schnittgroessen und der Biegelinie in einem Fall -- einmal gerechnet."""
+        if fall not in self._verlaeufe:
+            self._verlaeufe[fall] = verlaeufe(self.ergebnis.fall(fall))
+        return self._verlaeufe[fall]
+
+
 class SteifigkeitsmethodeProzedur(Prozedur):
     """Das ganze System, gerechnet und aufgeschrieben."""
 
@@ -107,7 +129,7 @@ class SteifigkeitsmethodeProzedur(Prozedur):
         super().__init__(**kwargs)
         self.system = system
 
-    def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
+    def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
         return self.system.rechnen_und_schreiben(e, p)
 
 
@@ -137,11 +159,6 @@ class Balkensystem:
         """Je Querschnitt die Wert-IDs von ``A`` und ``I``."""
 
         self.steifigkeiten: List[Steifigkeit] = []
-        self.ergebnis: Optional[Ergebnis] = None
-        self.gerechnet: Optional[System] = None
-        """Das System mit seinen Steifigkeiten, wie es gerechnet wurde."""
-
-        self._verlaeufe: Dict[str, Dict[str, Stabverlauf]] = {}
         self._aufbauen()
 
     # -- Rechenwerk ------------------------------------------------------------
@@ -180,11 +197,13 @@ class Balkensystem:
             self.steifigkeiten.append(self._steifigkeit(q, m, ",".join(teile)))
 
         self.d_n = self._def("n", "n", EINHEITSLOS, "Anzahl der Unbekannten", 0)
-        self.berechnungen.append(SteifigkeitsmethodeProzedur(
+        self.rechnung = SteifigkeitsmethodeProzedur(
             self, id=f"{self.id}.rechnung", ausgaben=[self.d_n],
             bezuege=[Eingabebezug(f"{groesse}_{i}", getattr(s, groesse))
                      for i, s in enumerate(self.steifigkeiten) for groesse in ("EA", "EI")],
-            titel="Steifigkeitsmethode", abschnitt=self.abschnitt()))
+            titel="Steifigkeitsmethode", abschnitt=self.abschnitt())
+        """Die Prozedur, die das System rechnet -- ihr Befund ist der :class:`Systembefund`."""
+        self.berechnungen.append(self.rechnung)
 
     def _querschnitt(self, q: Stabquerschnitt, index: str) -> Tuple[str, str]:
         """Die Berechnungen fuer A und I eines Querschnitts -- und ihre Wert-IDs."""
@@ -278,7 +297,7 @@ class Balkensystem:
 
     # -- Rechnen ----------------------------------------------------------------
 
-    def rechnen_und_schreiben(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]:
+    def rechnen_und_schreiben(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
         """
         Die Steifigkeiten in die Staebe, das System gerechnet, die Herleitung
         geschrieben. Haelt eine Meldung der Beschreibung die Rechnung auf,
@@ -293,21 +312,16 @@ class Balkensystem:
                 EA, EI = steif[paar]
                 stab = replace(stab, EA=EA, EI=EI)
             staebe.append(stab)
-        self.gerechnet = replace(self.system, staebe=staebe)
-        self._verlaeufe = {}
+        gerechnet = replace(self.system, staebe=staebe)
         if any(m.fehler for m in self.meldungen):
-            self.ergebnis = Ergebnis(meldungen=list(self.meldungen))
+            ergebnis = Ergebnis(meldungen=list(self.meldungen))
         else:
-            self.ergebnis = rechnen(self.gerechnet)
-            self.ergebnis.meldungen[:0] = self.meldungen
-        herleitung.schreiben(p, self)
-        return {self.d_n.id: Groesse(len(self.ergebnis.unbekannte), EINHEITSLOS)}
-
-    def verlaeufe(self, fall: str) -> Dict[str, Stabverlauf]:
-        """Je Stab der Verlauf der Schnittgroessen und der Biegelinie in einem Fall -- einmal gerechnet."""
-        if fall not in self._verlaeufe:
-            self._verlaeufe[fall] = verlaeufe(self.ergebnis.fall(fall))
-        return self._verlaeufe[fall]
+            ergebnis = rechnen(gerechnet)
+            ergebnis.meldungen[:0] = self.meldungen
+        befund = Systembefund(gerechnet, ergebnis)
+        herleitung.schreiben(p, self, befund)
+        return Ausfuehrung({self.d_n.id: Groesse(len(ergebnis.unbekannte), EINHEITSLOS)},
+                           befund=befund)
 
 
 def _derselbe(wert: Groesse) -> Groesse:

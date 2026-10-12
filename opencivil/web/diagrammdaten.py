@@ -24,6 +24,7 @@ from opencivil.core.rechenwerk import Loesung
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL, Spannungsblock
 from opencivil.nachweis.querkraft import NUR_KURVE
 from opencivil.nachweis.resistenzlinie import Handlinie
+from opencivil.nachweis.schubwandnachweis import Schubbefund
 from opencivil.projekt import Aufbau
 from opencivil.querschnitt.platte import Richtung
 
@@ -551,7 +552,8 @@ def linie(nachweis, loesung: Loesung, aufbau=None) -> dict:
 Punkt = Tuple[float, float]
 
 
-def analyse(aufbau: Aufbau, kennung: str, schnitt: Tuple[str, float] = ("M_z", 0.0)) -> dict:
+def analyse(aufbau: Aufbau, loesung: Loesung, kennung: str,
+            schnitt: Tuple[str, float] = ("M_z", 0.0)) -> dict:
     """
     Die Diagramme einer Querschnittsanalyse -- in mm, kN und kNm.
 
@@ -565,8 +567,9 @@ def analyse(aufbau: Aufbau, kennung: str, schnitt: Tuple[str, float] = ("M_z", 0
 
     Je Lastfall ausserdem der Bruchzustand im Schnitt (Nulllinie, Druckzone,
     die Dehnung jedes Stabs) und der Schubfluss in den Waenden. Was die
-    Nachweise schon wissen, kommt aus ihren Objekten; neu gerechnet wird nur
-    die Flaeche, nach der kein Nachweis fragt -- an demselben Querschnitt.
+    Nachweise schon wissen, kommt aus ihren Befunden in ``loesung``; neu
+    gerechnet wird nur die Flaeche, nach der kein Nachweis fragt -- an
+    demselben Querschnitt.
 
     Die Einwirkung steht so da, wie nachgewiesen: mit der Laengszugkraft aus
     Querkraft und Torsion, wo sie zugeschaltet ist.
@@ -574,10 +577,13 @@ def analyse(aufbau: Aufbau, kennung: str, schnitt: Tuple[str, float] = ("M_z", 0
     bauteil = aufbau.querschnittsanalysen[kennung]
     biegung = aufbau.qa_biegung.get(kennung)
     schub = aufbau.qa_schub.get(kennung)
-    q = biegung.querschnitt if biegung is not None else None
+    # Ohne Befund lief der Nachweis nicht -- etwa, weil ein Baustoff fehlt.
+    gebogen = loesung.befunde.get(biegung.id) if biegung is not None else None
+    geschoben = loesung.befunde.get(schub.id) if schub is not None else None
+    q = gebogen.querschnitt if gebogen is not None else None
 
     faelle = []
-    for erg in (biegung.ergebnisse if q is not None else []):
+    for erg in (gebogen.ergebnisse if gebogen is not None else []):
         erfuellt = erg.erfuellungsgrad >= 1.0
         p = erg.punkt
         faelle.append({
@@ -591,7 +597,7 @@ def analyse(aufbau: Aufbau, kennung: str, schnitt: Tuple[str, float] = ("M_z", 0
             # der Richtung des Moments. Ohne Moment gibt es keinen.
             "widerstand": None if p is None else _als_kn([(p.N, p.M_y, p.M_z)])[0],
             "bruch": _bruch(q, bauteil, p) if p is not None else None,
-            "schub": _schubfluss(schub, erg.fall) if schub is not None else None,
+            "schub": _schubfluss(geschoben, erg.fall) if geschoben is not None else None,
         })
     einachsig = bool(biegung.einachsig) if biegung is not None else False
     return {
@@ -732,16 +738,16 @@ def _bruch(q, bauteil, punkt) -> dict:
     }
 
 
-def _schubfluss(schub, fall) -> Optional[dict]:
+def _schubfluss(schub: Schubbefund, fall) -> Optional[dict]:
     """
     Der Schubfluss je Stueck einer Wand, mit Vorzeichen entlang der Wand, in
     kN/m -- und je Wand der Widerstand bei der Neigung, die der Nachweis
     gewaehlt hat. Ohne Verteilung (keine Wand, keine Last) nichts.
     """
     v = schub.verteilungen.get(fall.name)
-    if v is None or schub.modell is None:
+    if v is None:
         return None
-    widerstaende = schub.widerstaende.get(fall.name, [])
+    widerstaende = schub.widerstaende[fall.name]
     stuecke = [{"wand": schub.waende[s.wand].name,
                 "von": [s.von[0] * 1e3, s.von[1] * 1e3],
                 "bis": [s.bis[0] * 1e3, s.bis[1] * 1e3],
