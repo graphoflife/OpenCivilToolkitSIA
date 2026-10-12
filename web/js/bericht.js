@@ -22,6 +22,7 @@ import {
   querkraftkurveZeichnen, querschnittZeichnen,
 } from './diagramm.js';
 import { analyseBlaetter } from './qa_diagramme.js';
+import { systemBlaetter, systemZusammenfassung } from './bs_diagramme.js';
 import { spannungsfallZeichnen } from './spannungsbild.js';
 import { api } from './api.js';
 import { aendern, namensraum, zustand } from './zustand.js';
@@ -284,11 +285,15 @@ function zusammenfassung(loesung, verfolgen) {
 
   const gezeigt = Object.entries(bauteile).filter(
     ([, eintrag]) => imRaum(raum, eintrag.namensraum));
-  if (raum && !gezeigt.length) {
+  // Die Balkensysteme danach -- sie führen keine Nachweise, aber ihre
+  // Grenzwerte und Lagerkräfte gehören in die Übersicht.
+  const systeme = Object.entries(zuordnung.balkensysteme || {}).filter(
+    ([, eintrag]) => imRaum(raum, eintrag.namensraum));
+  if (raum && !gezeigt.length && !systeme.length) {
     return leerzustand('Kein Bauteil gewählt.',
-      'Links Platte oder Querschnittsanalyse wählen oder oben «Gesamt».');
+      'Links Platte, Querschnittsanalyse oder Balkensystem wählen oder oben «Gesamt».');
   }
-  if (!gezeigt.length) {
+  if (!gezeigt.length && !systeme.length) {
     return el('div.blatt', {}, [
       leerzustand('Kein Bauteil vorhanden.'),
       lueckenBanner(loesung),
@@ -334,7 +339,9 @@ function zusammenfassung(loesung, verfolgen) {
     ]);
   });
 
-  return el('div', {}, blaetter.concat([lueckenBanner(loesung)].filter(Boolean)));
+  return el('div', {}, blaetter
+    .concat(systeme.map(([kennung, eintrag]) => systemZusammenfassung(kennung, eintrag.name)))
+    .concat([lueckenBanner(loesung)].filter(Boolean)));
 }
 
 /**
@@ -513,6 +520,12 @@ function diagrammSicht(loesung) {
   // Ihre Diagramme kommen aus einer eigenen Anfrage, siehe qa_diagramme.js.
   for (const [kennung, eintrag] of Object.entries(loesung.zuordnung?.querschnittsanalysen || {})) {
     if (imRaum(raum, eintrag.namensraum)) blaetter.push(...analyseBlaetter(kennung, eintrag.name));
+  }
+
+  // -- Balkensysteme -------------------------------------------------------
+  // Ihre Verläufe kommen ebenso aus einer eigenen Anfrage, siehe bs_diagramme.js.
+  for (const [kennung, eintrag] of Object.entries(loesung.zuordnung?.balkensysteme || {})) {
+    if (imRaum(raum, eintrag.namensraum)) blaetter.push(...systemBlaetter(kennung, eintrag.name));
   }
 
   if (!blaetter.length) return leerzustand('Noch nichts zu zeichnen.');

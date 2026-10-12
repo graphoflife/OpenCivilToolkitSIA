@@ -1969,3 +1969,40 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-kombinationen th { text-align: left; font-weight: 600; color: var(--schrift-matt); padding: 2px 4px; }
 .bs-kombinationen td { padding: 2px 4px; }
 .bs-kombinationen .zahlfeld { width: 84px; }
+
+/* Die Ergebnisse rechts: je Bild ein Blatt, Werte beim Darüberfahren. */
+.bs-diagramm-huelle { position: relative; }
+.bs-diagramm { display: block; width: 100%; height: auto; touch-action: manipulation; }
+.bs-d-system { stroke: var(--rand-stark); stroke-width: 2; fill: none; }
+.bs-d-flaeche { stroke: none; fill-opacity: .18; }
+.bs-d-kurve { fill: none; stroke-width: 1.6; }
+.bs-d-n.bs-d-flaeche { fill: #1f5fa8; } .bs-d-n.bs-d-kurve { stroke: #1f5fa8; }
+.bs-d-v.bs-d-flaeche { fill: #0d9488; } .bs-d-v.bs-d-kurve { stroke: #0d9488; }
+.bs-d-m.bs-d-flaeche { fill: var(--system); } .bs-d-m.bs-d-kurve { stroke: var(--system); }
+.bs-d-verformt { fill: none; stroke: var(--blau); stroke-width: 2; }
+.bs-d-knoten { fill: #fff; stroke: var(--blau); stroke-width: 1.2; }
+.bs-d-knoten.ist-unbestimmt { stroke: var(--warn); stroke-dasharray: 2 2; }
+.bs-d-text {
+  font-size: 13px; fill: var(--schrift);
+  paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round;
+}
+.bs-d-zusatz { fill: var(--schrift-matt); }
+.bs-d-marke { fill: var(--blau); stroke: #fff; stroke-width: 1.5; pointer-events: none; }
+.bs-reaktion { stroke: #16794a; }
+.bs-reaktion.bs-spitze { fill: #16794a; }
+.bs-reaktion.bs-lasttext { fill: #16794a; }
+.bs-zettel {
+  position: absolute; z-index: 5; pointer-events: none; min-width: 150px; max-width: 240px;
+  padding: 5px 8px; border: 1px solid var(--rand-stark); border-radius: 6px;
+  background: var(--flaeche); box-shadow: 0 3px 10px rgba(16, 32, 44, .16);
+  font-size: 11.5px; line-height: 1.45; font-variant-numeric: tabular-nums;
+}
+.bs-zettel[hidden] { display: none; }
+.bs-zettel div:first-child { font-weight: 700; }
+.bs-tabelle { border-collapse: collapse; font-size: 12px; width: 100%; }
+.bs-tabelle th { text-align: right; font-weight: 600; color: var(--schrift-matt); padding: 3px 6px; border-bottom: 1px solid var(--rand); }
+.bs-tabelle th:first-child { text-align: left; }
+.bs-tabelle td { padding: 3px 6px; border-bottom: 1px solid var(--rand); }
+.bs-zahl { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bs-wo { font-size: 10px; color: var(--schrift-zart); }
+.bs-einheiten { margin: 0 0 6px; font-size: 11px; color: var(--schrift-zart); }
