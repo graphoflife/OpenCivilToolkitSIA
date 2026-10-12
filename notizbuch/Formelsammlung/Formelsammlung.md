@@ -1,5 +1,5 @@
 ---
-erzeugt: 876fbd3fb2f0
+erzeugt: 562dba7fc29f
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -23,8 +23,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Zwängung auf Biegung]] · 14
 - [[Stahlspannung aus Rissbreite]] · 9
 - [[Stahlspannung gegen Fliessen]] · 6
-- [[Knicken]] · 23
-- [[Spannung-Dehnung-Analyse]] · 18
+- [[Knicken]] · 14
+- [[Spannung-Dehnung-Analyse]] · 17
 
 **Querschnittsanalyse**
 
@@ -160,7 +160,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Beiwert der Parabel, mit dem wirksamen Modul]] · [[opencivil.nachweis.rechenwahl#protokoll_betongesetz|protokoll_betongesetz]], [[opencivil.spannungsanalyse#_herleitung|_herleitung]]
 - [[Beiwert für die statische Höhe]] · [[opencivil.nachweis.querkraft#Querkraft._protokoll_fall|Querkraft._protokoll_fall]]
 - [[Beton ungerissen, in Druck und Zug]] · [[opencivil.spannungsanalyse#_herleitung|_herleitung]]
-- [[Betonstahl nur auf Zug]] · [[opencivil.nachweis.rechenwahl#protokoll_gesetze|protokoll_gesetze]], [[opencivil.spannungsanalyse#_herleitung|_herleitung]]
+- [[Betonstahl nur auf Zug]] · [[opencivil.nachweis.rechenwahl#protokoll_gesetze|protokoll_gesetze]]
 - [[Bewehrung der Lage]] · [[opencivil.querschnitt.platte#protokoll_lage|protokoll_lage]]
 - [[Bewehrungsgehalt]] · [[opencivil.querschnitt.platte#Lagenaufbau._vergroesserung|Lagenaufbau._vergroesserung]]
 - [[Bewehrungsmass je Kubikmeter Beton]] · [[opencivil.querschnitt.platte#Lagenaufbau._kennzahlen|Lagenaufbau._kennzahlen]]

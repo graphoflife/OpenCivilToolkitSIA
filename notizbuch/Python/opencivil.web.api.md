@@ -1,5 +1,5 @@
 ---
-erzeugt: 77274405e8ac
+erzeugt: 9e64f0792e8e
 art: modul
 tags: [modul]
 ---
@@ -133,7 +133,7 @@ Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks.
 ## Konstanten
 
 - `_WERKSTOFFSAETZE = [{'wert': s.value, 'beschriftung': s.beschriftung, 'kurz': s.kurz} fo…` – Die Wertesaetze und Betongesetze mit Beschriftung -- dieselben in der Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse. `kurz` fuer die Karte einer Analyse, in der die lange nicht Platz hat. Die Woerter stehen beim Wertesatz selbst.
-- `_BETONGESETZE = [{'wert': BETONGESETZE[0], 'beschriftung': 'Parabel-Rechteck', 'kurz'…`
+- `_BETONGESETZE = [{'wert': wert, 'beschriftung': Rechenart(wert).beschriftung, 'kurz':…` – Die Betongesetze heissen wie die Rechenarten, deren Werte sie sind.
 - `TAFEL = {TitelBlock: _titel_dict, TextBlock: _text_dict, GleichungBlock: _gle…` – Je Blockart, wie die Oberflaeche sie bekommt -- jede als JSON-Objekt.
 
 ## Braucht

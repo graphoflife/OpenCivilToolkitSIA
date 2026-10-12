@@ -62,7 +62,8 @@ q.spannungsfall("Steifigkeit", art="moment_emodul",                 # E_eq über
 from opencivil.projekt import RechenwahlEintrag
 q.tragsicherheit_wahl = RechenwahlEintrag(rechenart="parabel")      # genaue Linie
 q.quasistaendig.wahl.kriechzahl = 2.0                               # φ der Stahlspannung
-q.knicken_wahl_widerstand = RechenwahlEintrag(werkstoffsatz="charakteristisch")
+q.knicken_wahl_widerstand = RechenwahlEintrag(werkstoffsatz="charakteristisch",
+                                               rechenart="parabel")
 q.kriechzahl = 2.0                            # φ der Platte: nur für w/w_c
 
 ergebnis = p.rechnen()
@@ -207,15 +208,20 @@ wählt selbst, wie die Nachweiskapitel (unten).
 **Rechenwahl:** Unter dem Kopf der Tragsicherheit, der beiden
 Stahlspannungskapitel und des Knickens steht eine Zeile «Rechenwahl», beim
 Knicken zwei -- «Verformung (e_2d)» und «Widerstand (N_Rd)». Gewählt werden:
-* die Kriechzahl φ, Vorgabe 0 -- sie wirkt nur bei der Parabel und
-  elastisch, sonst ist das Feld blass;
+* die Kriechzahl φ, Vorgabe 0 -- sie wirkt nur präzise und elastisch,
+  sonst ist das Feld blass;
 * die Werte: Bemessung (f_cd, f_yd → M_Rd) oder charakteristisch
   (f_ck, f_yk → M_Rk);
-* die Rechenart: *Handrechnung Block 0.85·x* (Druckstahl weggelassen, je
-  Seite eine Lage), *Block 0.85·x genau* (mit Druckstahl) oder *Parabel*;
-  bei den Stahlspannungen dazu *elastisch*, ihre Vorgabe.
+* die Rechenart: *Handrechnung* (Spannungsblock 0.85·x, Druckstahl
+  weggelassen, je Seite eine Lage), *0.85·x-Vereinfachung* (derselbe Block,
+  mit Druckstahl, über die Fasern gerechnet) oder *Präzise ohne
+  Vereinfachung* (Parabel-Rechteck); bei den Stahlspannungen dazu
+  *elastisch*, ihre Vorgabe. Das Knicken und die Analysen bieten keine
+  Handrechnung an: dort wird die Normalkraft Ebene für Ebene genau
+  gerechnet. Der Widerstand beim Knicken rechnet darum, wenn nichts anderes
+  gewählt ist, mit der 0.85·x-Vereinfachung.
 
-Mit Block oder Parabel hält die Tragsicherheit gegen den Rand des
+Mit 0.85·x oder präzise hält die Tragsicherheit gegen den Rand des
 Dehnungsfächers; den Widerstand bei N_Ed sucht sie genau, und die Herleitung
 zeigt die Probe des Bruchzustands. Querkraft und sprödes Versagen lesen ihr
 m_R aus derselben Linie. Wählt das Knicken für den Widerstand dasselbe wie die
@@ -255,7 +261,7 @@ einachsig» und die Nachweisschalter.
 * *Diagramme* -- Plattenquerschnitt, M-N-Resistenzlinie mit den
   Bemessungspunkten (die gestrichelte Strecke zeigt den Weg, in dem der
   Erfüllungsgrad gemessen wurde) -- massgebend die Linie der Rechenwahl,
-  daneben zum Vergleich die Parabel oder die Handrechnung, und eine eigene
+  daneben zum Vergleich präzise oder die Handrechnung, und eine eigene
   Linie des Knickens --, Querkraftkurven, Spannungs-Dehnungs-Bilder;
   bei einer Querschnittsanalyse ein einziges Interaktionsdiagramm mit
   wählbaren Achsen (zwei von N, M_y, M_z, die dritte mit festem Wert; ein
@@ -406,7 +412,7 @@ In der Querschnittsanalyse:
 ## Erfüllungsgrad beim M-N-Nachweis
 
 Ob ein Punkt innerhalb der Resistenzlinie liegt, entscheidet die massgebende
-Linie der Rechenwahl -- bei Block und Parabel an ihren genau gesuchten Rändern
+Linie der Rechenwahl -- bei 0.85·x und präzise an ihren genau gesuchten Rändern
 bei dieser Normalkraft. Nur *wie weit* er entfernt ist, hängt vom gewählten
 Massstab ab:
 

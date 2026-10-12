@@ -321,15 +321,16 @@ class TestGegenDieHandrechnung(unittest.TestCase):
         linie, hand = self.widerstand(None)
         self.assertGreater(linie, hand)
 
-    def test_die_handrechnung_trifft_sie_auch_mit_druckbewehrung(self):
+    def test_die_handrechnung_gibt_es_in_der_analyse_nicht(self):
         """
-        Mit der Rechenart «Handrechnung» rechnet die Linie mit dem Querschnitt
-        der Handrechnung: ohne Druckstahl, je Seite eine Lage. Ihr Ende ist
-        dann das M_Rd(N = 0) des Nachweises -- auch am Beispiel, das oben
-        Bewehrung hat.
+        Seit 2026-10-12 rechnet eine Analyse ohne Handrechnung: die Linie
+        rechnet N Ebene fuer Ebene genau. Eine alte Datei liest sich als
+        0.85·x-Vereinfachung.
         """
-        linie, hand = self.widerstand(None, Rechenart.HANDRECHNUNG)
-        self.assertAlmostEqual(linie / hand, 1.0, delta=0.001)
+        self.assertEqual(SpannungsfallEintrag.aus_dict(
+            {"name": "x", "rechenart": "handrechnung"}).rechenart, "block")
+        self.assertEqual(SpannungsfallEintrag.aus_dict(
+            {"name": "x", "betongesetz": "handrechnung"}).rechenart, "block")
 
 
 class TestWahl(unittest.TestCase):

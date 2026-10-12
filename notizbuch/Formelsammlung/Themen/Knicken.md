@@ -1,10 +1,10 @@
 ---
-erzeugt: c255413b916d
+erzeugt: b2758bc9cf7a
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 23 Formeln, in der Folge, in der gerechnet wird.
+> 14 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -18,6 +18,10 @@ Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.5 ‰ bis 45.0 ‰
 
 Die Ausmitten-Iteration darüber steht dagegen vollständig da, Durchlauf für Durchlauf: sie ist das Verfahren selbst, und dass sie einläuft, ist die Aussage des Nachweises.
 
+Der Querschnitt bleibt eben (Bernoulli). Zu jeder Dehnungsebene ergeben sich Normalkraft und Moment aus den Spannungen über die Höhe; Zug ist positiv, das Moment bezieht sich auf die halbe Querschnittshöhe. Die Resistenzlinie ist der Rand aller zulässigen Ebenen: an ihm erreicht der Stahl ε\_ud, der Beton am gedrückten Rand −ε\_c2d oder, wenn der ganze Querschnitt gedrückt ist, im Punkt C −ε\_c1d.
+
+Der Beton ist in 200 Fasern über die Höhe geteilt, jede mit ihrer mittleren Spannung, die Bewehrung zählt Lage für Lage, und an ihrer Stelle zählt der Stahl statt des Betons – auch die gedrückte Bewehrung wirkt mit. Den Widerstand bei einer Einwirkung sucht die Rechnung auf dem Rand selbst, zwischen zwei benachbarten Ebenen; was dort gilt, zeigt bei jeder Kombination die Probe.
+
 Zu jedem Moment wird die Dehnungsebene gesucht, die es im Gleichgewicht hält; aus deren Krümmung folgt die nächste Ausmitte. Begonnen wird mit e\_2d = 0, also ohne Verformung.
 
 Gesucht wird die grösste Druckkraft mit Gleichgewichtslage. Die gewollte Ausmitte e\_1d bleibt dabei fest – sie gehört zum System und nicht zur Last, M\_Ed,1 wächst also mit. Bei N = 0 trägt der Stab immer; von dort aus wird das Fenster halbiert, bis getragene und nicht getragene Kraft zusammenfallen.
@@ -30,23 +34,14 @@ Gesucht wird die grösste Druckkraft mit Gleichgewichtslage. Die gewollte Ausmit
 4. [[Beiwert der Parabel, mit dem wirksamen Modul]]
 5. [[Parabel-Rechteck-Beziehung des Betons]]
 6. [[Dehnungsebene und innere Kräfte]]
-7. [[Schiefstellung]]
-8. [[Ungewollte Ausmitte]]
-9. [[Gewollte Ausmitte]]
-10. [[Iteration der Ausmitte 2. Ordnung]]
-11. [[Erfüllungsgrad]]
-12. [[Spannungsblock des Betons]]
-13. [[Gleichmässiger Druck, ohne Bewehrung]]
-14. [[Beide Lagen fliessen auf Zug]]
-15. [[Kräfte mal Hebelarm um die halbe Höhe]]
-16. [[Statische Höhe]]
-17. [[Druckzonenhöhe aus dem Kräftegleichgewicht]]
-18. [[Momentenwiderstand bei reiner Biegung]]
-19. [[Nulllinie auf halber Höhe]]
-20. [[Dehnung der Zugbewehrung]]
-21. [[Stahlspannung, höchstens die Fliessgrenze]]
-22. [[Kräftegleichgewicht]]
-23. [[Momentengleichgewicht um die halbe Höhe]]
+7. [[Spannungsblock des Betons]]
+8. [[Bilineare Beziehung des Betonstahls]]
+9. [[Schnittgrössen aus der Spannungsverteilung]]
+10. [[Schiefstellung]]
+11. [[Ungewollte Ausmitte]]
+12. [[Gewollte Ausmitte]]
+13. [[Iteration der Ausmitte 2. Ordnung]]
+14. [[Erfüllungsgrad]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

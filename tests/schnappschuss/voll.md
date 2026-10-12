@@ -139,7 +139,7 @@ $$
 **Rechenwahl**
 
 $$
-\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Handrechnung, Block } 0.85 \cdot x
+\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Handrechnung}
 $$
 
 **Schwerpunkt der zusammengefassten Lage – 2. Lage Grundbewehrung + 2. Lage Zulage**
@@ -1318,7 +1318,7 @@ $$
 **Rechenwahl – Verformung (e\_2d)**
 
 $$
-\varphi = 2 \qquad \text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Parabel}
+\varphi = 2 \qquad \text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Präzise ohne Vereinfachung}
 $$
 
 **Steifigkeit des Betons**
@@ -1353,15 +1353,39 @@ $$
 \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \frac{h}{2}\right) \qquad N_{int} = \int_A \sigma\left(\varepsilon\right)\,\mathrm{d}A \qquad M_{int} = \int_A \sigma\left(\varepsilon\right) \cdot \left(z - \frac{h}{2}\right)\,\mathrm{d}A
 $$
 
-#### Widerstand
+#### Widerstand: Resistenzlinie aus Dehnungsebenen – x-Richtung
 
 **Rechenwahl – Widerstand (N\_Rd)**
 
 $$
-\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Handrechnung, Block } 0.85 \cdot x
+\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad 0.85 \cdot x\text{-Vereinfachung}
 $$
 
-Dieselbe Wahl wie die Tragsicherheit: der Momentenwiderstand bei der Druckkraft kommt aus deren Resistenzlinie.
+**Werkstoffgesetze: Beton, Spannungsblock 0.85·x**
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{cd} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \end{cases}
+$$
+
+**Werkstoffgesetze: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
+
+$$
+\sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & \varepsilon_s \ge 0 \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & \varepsilon_s < 0 \end{cases} \qquad |\varepsilon_s| \le \varepsilon_{ud}
+$$
+
+**Schnittgrössen aus der Spannungsverteilung**
+
+$$
+N = \int_A \sigma\,\mathrm{d}A \qquad M = \int_A \sigma \cdot \left(z - \tfrac{h}{2}\right)\,\mathrm{d}A
+$$
+
+**Berücksichtigte Bewehrungslagen**
+
+| Lage | $a_s\ [\mathrm{mm}^2]$ | $z\ [\mathrm{mm}]$ | $f_{yd}\ [\mathrm{N/mm^2}]$ |
+| :--- | ---: | ---: | ---: |
+| 2. Lage Grundbewehrung | $1696$ | $249.0$ | $435$ |
+| 2. Lage Zulage | $754$ | $246.0$ | $435$ |
+| 3. Lage Grundbewehrung | $754$ | $48.0$ | $435$ |
 
 #### Knicken – Wand
 
@@ -1417,19 +1441,19 @@ $$
 **Querschnitt am verformten System**
 
 $$
-M_{Rd,x}(N_{Ed}) = 283.6\,\mathrm{kNm} \quad \ge \quad M_{Ed,II} = 27.3\,\mathrm{kNm}
+M_{Rd,x}(N_{Ed}) = 307\,\mathrm{kNm} \quad \ge \quad M_{Ed,II} = 27.3\,\mathrm{kNm}
 $$
 
 **Grenzkraft des Stabes**
 
 $$
-N_{Rd,K} = 3900.6\,\mathrm{kN} \quad \ge \quad \left|N_{Ed}\right| = 800\,\mathrm{kN}
+N_{Rd,K} = 4496.7\,\mathrm{kN} \quad \ge \quad \left|N_{Ed}\right| = 800\,\mathrm{kN}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,K,\text{Wand}} = \frac{N_{Rd,K}}{\left|N_{Ed}\right|} = \frac{3900.6\,\mathrm{kN}}{800\,\mathrm{kN}} = 4.88 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,K,\text{Wand}} = \frac{N_{Rd,K}}{\left|N_{Ed}\right|} = \frac{4496.7\,\mathrm{kN}}{800\,\mathrm{kN}} = 5.62 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Beton: C30/37
@@ -1680,7 +1704,7 @@ $$
 **Rechenwahl**
 
 $$
-\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Handrechnung, Block } 0.85 \cdot x
+\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Handrechnung}
 $$
 
 **Zusammengefasste Bewehrung**
@@ -2269,7 +2293,7 @@ $$
 **Rechenwahl**
 
 $$
-\varphi = 1 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Parabel}
+\varphi = 1 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Präzise ohne Vereinfachung}
 $$
 
 **Wirksamer Modul der Parabel**
@@ -2528,7 +2552,7 @@ Massgebend: 3. Lage (kleinster Erfüllungsgrad).
 **Rechenwahl**
 
 $$
-\text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Block } 0.85 \cdot x \text{ genau}
+\text{charakteristisch}\ f_{ck},\ f_{yk} \qquad 0.85 \cdot x\text{-Vereinfachung}
 $$
 
 **Dickster Stab der Tragrichtung**
@@ -2606,7 +2630,7 @@ $$
 **Rechenwahl**
 
 $$
-\varphi = 2 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Parabel}
+\varphi = 2 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Präzise ohne Vereinfachung}
 $$
 
 **Wirksamer Elastizitätsmodul**
@@ -2700,7 +2724,7 @@ $$
 **Rechenwahl – Verformung (e\_2d)**
 
 $$
-\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Block } 0.85 \cdot x \text{ genau}
+\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad 0.85 \cdot x\text{-Vereinfachung}
 $$
 
 **Werkstoffgesetze der Verformung: Beton, Spannungsblock 0.85·x**
@@ -2723,199 +2747,50 @@ $$
 \varepsilon(z) = \varepsilon_m + \chi \cdot \left(z - \frac{h}{2}\right) \qquad N_{int} = \int_A \sigma\left(\varepsilon\right)\,\mathrm{d}A \qquad M_{int} = \int_A \sigma\left(\varepsilon\right) \cdot \left(z - \frac{h}{2}\right)\,\mathrm{d}A
 $$
 
-#### Widerstand: Resistenzlinie aus Handrechnung – x-Richtung
+#### Widerstand: Resistenzlinie aus Dehnungsebenen – x-Richtung
 
 **Rechenwahl – Widerstand (N\_Rd)**
 
 $$
-\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Handrechnung, Block } 0.85 \cdot x
+\varphi = 0 \qquad \text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Präzise ohne Vereinfachung}
 $$
 
-**Zusammengefasste Bewehrung**
+**Wirksamer Modul der Parabel**
 
-| Seite | $A_s\ [\mathrm{mm}^2]$ | $z\ [\mathrm{mm}]$ | $f_{yd}\ [\mathrm{N/mm^2}]$ |
+$$
+E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Beiwert der Parabel, mit dem wirksamen Modul**
+
+$$
+k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{cd}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 4.2
+$$
+
+**Werkstoffgesetze: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.6)*
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+$$
+
+**Werkstoffgesetze: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
+
+$$
+\sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & \varepsilon_s \ge 0 \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & \varepsilon_s < 0 \end{cases} \qquad |\varepsilon_s| \le \varepsilon_{ud}
+$$
+
+**Schnittgrössen aus der Spannungsverteilung**
+
+$$
+N = \int_A \sigma\,\mathrm{d}A \qquad M = \int_A \sigma \cdot \left(z - \tfrac{h}{2}\right)\,\mathrm{d}A
+$$
+
+**Berücksichtigte Bewehrungslagen**
+
+| Lage | $a_s\ [\mathrm{mm}^2]$ | $z\ [\mathrm{mm}]$ | $f_{yd}\ [\mathrm{N/mm^2}]$ |
 | :--- | ---: | ---: | ---: |
 | 2. Lage Grundbewehrung | $754$ | $204.0$ | $435$ |
 | 3. Lage Grundbewehrung | $524$ | $45.0$ | $435$ |
-
-#### Grösste Druckkraft
-
-**Gleichmässiger Druck, ohne Bewehrung**
-
-$$
-N_{Rd}^{-} = -b \cdot h \cdot f_{cd} = -1000\,\mathrm{mm} \cdot 250\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} = -5000\,\mathrm{kN}
-$$
-
-**Zugehöriges Moment**
-
-$$
-M_{Rd}(N_{Rd}^{-}) = 0\,\mathrm{kNm}
-$$
-
-#### Grösste Zugkraft
-
-**Beide Lagen fliessen auf Zug**
-
-$$
-\begin{aligned}
-  N_{Rd}^{+} &= A_{s,2,x} \cdot f_{yd} + A_{s,3,x} \cdot f_{yd} \\
-  &= 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} + 524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \\
-  &= 555.5\,\mathrm{kN}
-\end{aligned}
-$$
-
-**Kräfte mal Hebelarm um die halbe Höhe**
-
-$$
-\begin{aligned}
-  M_{Rd}(N_{Rd}^{+}) &= A_{s,2,x} \cdot f_{yd} \cdot \left(z_{2,x} - \tfrac{h}{2}\right) + A_{s,3,x} \cdot f_{yd} \cdot \left(z_{3,x} - \tfrac{h}{2}\right) \\
-  &= 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(204\,\mathrm{mm} - \tfrac{250\,\mathrm{mm}}{2}\right) + 524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(45\,\mathrm{mm} - \tfrac{250\,\mathrm{mm}}{2}\right) \\
-  &= 7.7\,\mathrm{kNm}
-\end{aligned}
-$$
-
-#### Positives Moment (Zug unten)
-
-**Statische Höhe der Lage unten, ab dem gedrückten Rand oben**
-
-$$
-d_{2,x} = z_{2,x} = 204\,\mathrm{mm}
-$$
-
-**Druckzonenhöhe aus dem Kräftegleichgewicht**
-
-$$
-x^{+} = \frac{A_{s,2,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} = \frac{754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 19.3\,\mathrm{mm}
-$$
-
-**Momentenwiderstand bei reiner Biegung**
-
-$$
-\begin{aligned}
-  M_{Rd}(N_{Ed}=0)^{+} &= A_{s,2,x} \cdot f_{yd} \cdot \left(d_{2,x} - \frac{0.85 \cdot x^{+}}{2}\right) \\
-  &= 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(204\,\mathrm{mm} - \frac{0.85 \cdot 19.3\,\mathrm{mm}}{2}\right) \\
-  &= 64.2\,\mathrm{kNm}
-\end{aligned}
-$$
-
-**Nulllinie auf halber Höhe**
-
-$$
-x^{+} = \frac{h}{2} = \frac{250\,\mathrm{mm}}{2} = 125\,\mathrm{mm}
-$$
-
-**Dehnung der Zugbewehrung**
-
-$$
-\varepsilon_s^{+} = \left(d_{2,x} - x^{+}\right) \cdot \frac{\varepsilon_{c2d}}{x^{+}} = \left(204\,\mathrm{mm} - 125\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{125\,\mathrm{mm}} = 2.21\,\text{‰}
-$$
-
-**Stahlspannung, höchstens die Fliessgrenze**
-
-$$
-\begin{aligned}
-  \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{+};\ f_{yd}\right] \\
-  &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.21\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
-  &= 435\,\mathrm{N}/\mathrm{mm}^{2}
-\end{aligned}
-$$
-
-**Kräftegleichgewicht**
-
-$$
-\begin{aligned}
-  N_{Rd}^{+} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{+} + A_{s,2,x} \cdot \sigma_{sd} \\
-  &= -20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 125\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \\
-  &= -1797.2\,\mathrm{kN}
-\end{aligned}
-$$
-
-**Momentengleichgewicht um die halbe Höhe**
-
-$$
-\begin{aligned}
-  M_{Rd}^{+} &= \left[f_{cd} \cdot b \cdot 0.85 \cdot x^{+} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{+}}{2}\right) + A_{s,2,x} \cdot \sigma_{sd} \cdot \left(d_{2,x} - \tfrac{h}{2}\right)\right] \\
-  &= \left[20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 125\,\mathrm{mm} \cdot \left(\tfrac{250\,\mathrm{mm}}{2} - \tfrac{0.85 \cdot 125\,\mathrm{mm}}{2}\right) + 754\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(204\,\mathrm{mm} - \tfrac{250\,\mathrm{mm}}{2}\right)\right] \\
-  &= 178.6\,\mathrm{kNm}
-\end{aligned}
-$$
-
-#### Negatives Moment (Zug oben)
-
-**Statische Höhe der Lage oben, ab dem gedrückten Rand unten**
-
-$$
-d_{3,x} = h - z_{3,x} = 250\,\mathrm{mm} - 45\,\mathrm{mm} = 205\,\mathrm{mm}
-$$
-
-**Druckzonenhöhe aus dem Kräftegleichgewicht**
-
-$$
-x^{-} = \frac{A_{s,3,x} \cdot f_{yd}}{0.85 \cdot b \cdot f_{cd}} = \frac{524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 13.4\,\mathrm{mm}
-$$
-
-**Momentenwiderstand bei reiner Biegung**
-
-$$
-\begin{aligned}
-  M_{Rd}(N_{Ed}=0)^{-} &= -A_{s,3,x} \cdot f_{yd} \cdot \left(d_{3,x} - \frac{0.85 \cdot x^{-}}{2}\right) \\
-  &= -524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(205\,\mathrm{mm} - \frac{0.85 \cdot 13.4\,\mathrm{mm}}{2}\right) \\
-  &= -45.4\,\mathrm{kNm}
-\end{aligned}
-$$
-
-**Nulllinie auf halber Höhe**
-
-$$
-x^{-} = \frac{h}{2} = \frac{250\,\mathrm{mm}}{2} = 125\,\mathrm{mm}
-$$
-
-**Dehnung der Zugbewehrung**
-
-$$
-\varepsilon_s^{-} = \left(d_{3,x} - x^{-}\right) \cdot \frac{\varepsilon_{c2d}}{x^{-}} = \left(205\,\mathrm{mm} - 125\,\mathrm{mm}\right) \cdot \frac{3.5\,\text{‰}}{125\,\mathrm{mm}} = 2.24\,\text{‰}
-$$
-
-**Stahlspannung, höchstens die Fliessgrenze**
-
-$$
-\begin{aligned}
-  \sigma_{sd} &= \min\left[E_s \cdot \varepsilon_s^{-};\ f_{yd}\right] \\
-  &= \min\left[200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 2.24\,\text{‰};\ 435\,\mathrm{N}/\mathrm{mm}^{2}\right] \\
-  &= 435\,\mathrm{N}/\mathrm{mm}^{2}
-\end{aligned}
-$$
-
-**Kräftegleichgewicht**
-
-$$
-\begin{aligned}
-  N_{Rd}^{-} &= -f_{cd} \cdot b \cdot 0.85 \cdot x^{-} + A_{s,3,x} \cdot \sigma_{sd} \\
-  &= -20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 125\,\mathrm{mm} + 524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \\
-  &= -1897.3\,\mathrm{kN}
-\end{aligned}
-$$
-
-**Momentengleichgewicht um die halbe Höhe**
-
-$$
-\begin{aligned}
-  M_{Rd}^{-} &= -\left[f_{cd} \cdot b \cdot 0.85 \cdot x^{-} \cdot \left(\tfrac{h}{2} - \tfrac{0.85 \cdot x^{-}}{2}\right) + A_{s,3,x} \cdot \sigma_{sd} \cdot \left(d_{3,x} - \tfrac{h}{2}\right)\right] \\
-  &= -\left[20\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1000\,\mathrm{mm} \cdot 0.85 \cdot 125\,\mathrm{mm} \cdot \left(\tfrac{250\,\mathrm{mm}}{2} - \tfrac{0.85 \cdot 125\,\mathrm{mm}}{2}\right) + 524\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \left(205\,\mathrm{mm} - \tfrac{250\,\mathrm{mm}}{2}\right)\right] \\
-  &= -170.9\,\mathrm{kNm}
-\end{aligned}
-$$
-
-**Eckpunkte der Resistenzlinie aus Handrechnung**
-
-| Eckpunkt | $N\ [\mathrm{kN}]$ | $M\ [\mathrm{kNm}]$ |
-| :--- | ---: | ---: |
-| $N_{Rd}^{-}$ | $-5000.0$ | $0.0$ |
-| $M_{Rd}(x=\tfrac{h}{2})^{+}$ | $-1797.2$ | $178.6$ |
-| $M_{Rd}(N_{Ed}=0)^{+}$ | $0.0$ | $64.2$ |
-| $N_{Rd}^{+}$ | $555.5$ | $7.7$ |
-| $M_{Rd}(N_{Ed}=0)^{-}$ | $0.0$ | $-45.4$ |
-| $M_{Rd}(x=\tfrac{h}{2})^{-}$ | $-1897.3$ | $-170.9$ |
 
 #### Knicken – Stütze
 
@@ -2969,19 +2844,19 @@ $$
 **Querschnitt am verformten System**
 
 $$
-M_{Rd,x}(N_{Ed}) = 102.4\,\mathrm{kNm} \quad \ge \quad M_{Ed,II} = 14.5\,\mathrm{kNm}
+M_{Rd,x}(N_{Ed}) = 120\,\mathrm{kNm} \quad \ge \quad M_{Ed,II} = 14.5\,\mathrm{kNm}
 $$
 
 **Grenzkraft des Stabes**
 
 $$
-N_{Rd,K} = 3488.4\,\mathrm{kN} \quad \ge \quad \left|N_{Ed}\right| = 600\,\mathrm{kN}
+N_{Rd,K} = 4099.5\,\mathrm{kN} \quad \ge \quad \left|N_{Ed}\right| = 600\,\mathrm{kN}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,K,\text{Stütze}} = \frac{N_{Rd,K}}{\left|N_{Ed}\right|} = \frac{3488.4\,\mathrm{kN}}{600\,\mathrm{kN}} = 5.81 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,K,\text{Stütze}} = \frac{N_{Rd,K}}{\left|N_{Ed}\right|} = \frac{4099.5\,\mathrm{kN}}{600\,\mathrm{kN}} = 6.83 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Plattenanalyse: Block
@@ -3102,7 +2977,7 @@ $$
 **Rechenwahl**
 
 $$
-\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Block } 0.85 \cdot x \text{ genau}
+\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad 0.85 \cdot x\text{-Vereinfachung}
 $$
 
 **Werkstoffgesetze: Beton, Spannungsblock 0.85·x**
@@ -3341,7 +3216,7 @@ $$
 **Rechenwahl**
 
 $$
-\text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Handrechnung, Block } 0.85 \cdot x
+\text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Handrechnung}
 $$
 
 **Zulässige Stahlspannung (normale Anforderung)** *(SIA 262:2025, 4.4.2)*
@@ -3423,7 +3298,7 @@ $$
 **Rechenwahl – Verformung (e\_2d)**
 
 $$
-\varphi = 0 \qquad \text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Parabel}
+\varphi = 0 \qquad \text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Präzise ohne Vereinfachung}
 $$
 
 **Steifigkeit des Betons**
@@ -3463,7 +3338,7 @@ $$
 **Rechenwahl – Widerstand (N\_Rd)**
 
 $$
-\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Block } 0.85 \cdot x \text{ genau}
+\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad 0.85 \cdot x\text{-Vereinfachung}
 $$
 
 Dieselbe Wahl wie die Tragsicherheit: der Momentenwiderstand bei der Druckkraft kommt aus deren Resistenzlinie.
@@ -3654,7 +3529,7 @@ $$
 **Rechenwahl**
 
 $$
-\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Handrechnung, Block } 0.85 \cdot x
+\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Handrechnung}
 $$
 
 **Zusammengefasste Bewehrung**
@@ -5783,7 +5658,7 @@ $$
 | Risse: Häufige Lastfälle | Feld mit Druck (70 %) | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 123\,\mathrm{N}/\mathrm{mm}^{2}$ | $2.88$ |
 | Risse: Häufige Lastfälle | Stütze (70 %) | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 248\,\mathrm{N}/\mathrm{mm}^{2}$ | $1.43$ |
 | Risse: Häufige Lastfälle | Gebrauch | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 175\,\mathrm{N}/\mathrm{mm}^{2}$ | $2.03$ |
-| Knicken | Wand | $N_{Rd,K} = 3900.6\,\mathrm{kN}$ | $N_{Ed} = 800.0\,\mathrm{kN}$ | $4.88$ |
+| Knicken | Wand | $N_{Rd,K} = 4496.7\,\mathrm{kN}$ | $N_{Ed} = 800.0\,\mathrm{kN}$ | $5.62$ |
 
 > **Warnung:** Risse: Zwängung Normalkraft – 3. Lage: nicht erfüllt. N\_s,adm = 754 mm² · 466 N/mm² = 351.6 kN \< N\_Riss = 378.3 kN.
 
@@ -5846,7 +5721,7 @@ $$
 | Sprödes Versagen | 3. Lage | $M_{Rk,x}(N_{Ed} = 0)_{3} = 63.7\,\mathrm{kNm}$ | $M_{Riss} = 29.0\,\mathrm{kNm}$ | $2.20$ |
 | Risse: Quasi-ständige Lastfälle | Dauerlast | $\sigma_{s,adm} = 466\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 203\,\mathrm{N}/\mathrm{mm}^{2}$ | $2.29$ |
 | Risse: Häufige Lastfälle | Gebrauch | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 323\,\mathrm{N}/\mathrm{mm}^{2}$ | $1.10$ |
-| Knicken | Stütze | $N_{Rd,K} = 3488.4\,\mathrm{kN}$ | $N_{Ed} = 600.0\,\mathrm{kN}$ | $5.81$ |
+| Knicken | Stütze | $N_{Rd,K} = 4099.5\,\mathrm{kN}$ | $N_{Ed} = 600.0\,\mathrm{kN}$ | $6.83$ |
 
 > **Hinweis:** Risse: Zwängung Normalkraft – 3. Lage: nicht erfüllt (α\_eff = 0.81), ausgeschaltet. N\_s,adm = 524 mm² · 500 N/mm² = 261.8 kN \< N\_Riss = 322.2 kN.
 
@@ -6046,7 +5921,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Bezogene Druckzonenhöhe – 2. Lage | $\left(x/d\right)_{2}$ | $0.253$ |  | berechnet |
 | Erfüllungsgrad Duktilität – 3. Lage | $\alpha_{eff,D,3}$ | $4.57$ |  | berechnet |
 | Bezogene Druckzonenhöhe – 3. Lage | $\left(x/d\right)_{3}$ | $0.077$ |  | berechnet |
-| Erfüllungsgrad Knicken – Wand | $\alpha_{eff,K,\text{Wand}}$ | $4.88$ |  | berechnet |
+| Erfüllungsgrad Knicken – Wand | $\alpha_{eff,K,\text{Wand}}$ | $5.62$ |  | berechnet |
 | Momentenwiderstand bei N\_Ed (x-Richtung) – Feld | $M_{Rd,x}(N_{Ed})_{\text{Feld}}$ | $235.9$ | kNm | berechnet |
 | Erfüllungsgrad x-Richtung – Feld | $\alpha_{eff,x,\text{Feld}}$ | $1.57$ |  | berechnet |
 | Momentenwiderstand bei N\_Ed (x-Richtung) – Feld mit Druck | $M_{Rd,x}(N_{Ed})_{\text{Feld mit Druck}}$ | $253.8$ | kNm | berechnet |
@@ -6170,7 +6045,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Bezogene Druckzonenhöhe – 2. Lage | $\left(x/d\right)_{2}$ | $0.095$ |  | berechnet |
 | Erfüllungsgrad Duktilität – 3. Lage | $\alpha_{eff,D,3}$ | $5.36$ |  | berechnet |
 | Bezogene Druckzonenhöhe – 3. Lage | $\left(x/d\right)_{3}$ | $0.065$ |  | berechnet |
-| Erfüllungsgrad Knicken – Stütze | $\alpha_{eff,K,\text{Stütze}}$ | $5.81$ |  | berechnet |
+| Erfüllungsgrad Knicken – Stütze | $\alpha_{eff,K,\text{Stütze}}$ | $6.83$ |  | berechnet |
 | Momentenwiderstand bei N\_Ed (x-Richtung) – Feld | $M_{Rk,x}(N_{Ed})_{\text{Feld}}$ | $99.6$ | kNm | berechnet |
 | Erfüllungsgrad x-Richtung – Feld | $\alpha_{eff,x,\text{Feld}}$ | $1.66$ |  | berechnet |
 | Momentenwiderstand bei N = 0, negativ (x-Richtung) | $M_{Rk,x}(N=0)^{-}$ | $-63.7$ | kNm | berechnet |

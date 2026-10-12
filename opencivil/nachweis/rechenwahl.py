@@ -8,19 +8,31 @@ Querschnittsloeser baut. Die Kapitel der Platte und die
 Spannung-Dehnung-Analyse fragen hier, keines baut seine Gesetze selbst.
 
 DIE RECHENARTEN:
-* **Handrechnung Block 0.85·x** -- im Loeser derselbe Querschnitt wie in der
+* **Handrechnung** -- im Loeser derselbe Querschnitt wie in der
   Resistenzlinie aus Handrechnung: der Spannungsblock, die Bewehrung nur auf
   Zug, je Seite zu einer Lage im Schwerpunkt zusammengefasst, und der Beton
-  auch dort gezaehlt, wo der Stahl liegt.
-* **Block 0.85·x genau** -- derselbe Spannungsblock, ueber die Hoehe
+  auch dort gezaehlt, wo der Stahl liegt. Die gedrueckte Bewehrung zaehlt
+  nicht -- in keiner anderen Rechenart fehlt sie.
+* **0.85·x-Vereinfachung** -- derselbe Spannungsblock, ueber die Hoehe
   integriert, jede Faser mit ihrer mittleren Spannung. Die gedrueckte
   Bewehrung wirkt mit und verdraengt den Beton an ihrer Stelle.
-* **Parabel** -- die Parabel-Rechteck-Beziehung, ihr Anstieg mit dem
-  wirksamen Modul ``E_cm/(1+phi)``, ``k_sigma`` nie unter 1.
+* **Praezise ohne Vereinfachung** -- die Parabel-Rechteck-Beziehung, ihr
+  Anstieg mit dem wirksamen Modul ``E_cm/(1+phi)``, ``k_sigma`` nie unter 1.
 * **elastisch** -- nur fuer die Stahlspannungen: der Beton linear mit
   ``E_cm/(1+phi)``, hoechstens ``f_c``. So rechneten sie bis 2026-10-09 fest.
 
-Die Kriechzahl wirkt nur bei Parabel und elastisch: an den anderen Gesetzen
+Die Namen hat der Benutzer am 2026-10-12 gewaehlt; vorher hiessen sie
+«Handrechnung Block 0.85·x», «Block 0.85·x genau» und «Parabel».
+
+WER WAS ANBIETET:
+Die Handrechnung gibt es nur, wo ein Polygon aus Eckpunkten Sinn ergibt: in
+der Tragsicherheit und bei den Stahlspannungen. Beim Knicken und in den
+Spannung-Dehnung-Analysen wird die Normalkraft genau gerechnet, Ebene fuer
+Ebene -- dort waere die Handrechnung nur der Spannungsblock mit
+weggelassener Druckbewehrung, also eine schlechtere 0.85·x-Vereinfachung
+(:data:`FASERARTEN`).
+
+Die Kriechzahl wirkt nur bei praezise und elastisch: an den anderen Gesetzen
 haengt kein Modul. Der Wertesatz bestimmt, wo die Plateaus liegen
 (:class:`Werkstoffsatz`), und wie ein Widerstand heisst -- ``R_d`` oder
 ``R_k``.
@@ -59,19 +71,19 @@ class Rechenart(str, Enum):
     @property
     def beschriftung(self) -> str:
         return {
-            Rechenart.HANDRECHNUNG: f"Handrechnung Block {BLOCKANTEIL}·x",
-            Rechenart.BLOCK: f"Block {BLOCKANTEIL}·x genau",
-            Rechenart.PARABEL: "Parabel",
+            Rechenart.HANDRECHNUNG: "Handrechnung",
+            Rechenart.BLOCK: f"{BLOCKANTEIL}·x-Vereinfachung",
+            Rechenart.PARABEL: "Präzise ohne Vereinfachung",
             Rechenart.ELASTISCH: "elastisch",
         }[self]
 
     @property
     def kurz(self) -> str:
-        """Fuer schmale Zeilen."""
+        """Fuer schmale Zeilen -- etwa die Auswahl auf der Karte einer Analyse."""
         return {
-            Rechenart.HANDRECHNUNG: f"Hand {BLOCKANTEIL}·x",
-            Rechenart.BLOCK: "Block genau",
-            Rechenart.PARABEL: "Parabel",
+            Rechenart.HANDRECHNUNG: "Hand",
+            Rechenart.BLOCK: f"{BLOCKANTEIL}·x",
+            Rechenart.PARABEL: "präzise",
             Rechenart.ELASTISCH: "elastisch",
         }[self]
 
@@ -79,9 +91,9 @@ class Rechenart(str, Enum):
     def latex(self) -> str:
         """Der Name als Formeltext -- fuer die Zeile «Rechenwahl» der Herleitung."""
         return {
-            Rechenart.HANDRECHNUNG: rf"\text{{Handrechnung, Block }} {BLOCKANTEIL} \cdot x",
-            Rechenart.BLOCK: rf"\text{{Block }} {BLOCKANTEIL} \cdot x \text{{ genau}}",
-            Rechenart.PARABEL: r"\text{Parabel}",
+            Rechenart.HANDRECHNUNG: r"\text{Handrechnung}",
+            Rechenart.BLOCK: rf"{BLOCKANTEIL} \cdot x\text{{-Vereinfachung}}",
+            Rechenart.PARABEL: r"\text{Präzise ohne Vereinfachung}",
             Rechenart.ELASTISCH: r"\text{elastisch}",
         }[self]
 
@@ -96,11 +108,22 @@ class Rechenart(str, Enum):
         return self in (Rechenart.HANDRECHNUNG, Rechenart.BLOCK)
 
 
-#: Was die Tragsicherheit, das Knicken und die Analysen anbieten.
+#: Was die Tragsicherheit anbietet.
 RECHENARTEN = (Rechenart.HANDRECHNUNG, Rechenart.BLOCK, Rechenart.PARABEL)
 
 #: Die Stahlspannungen zusaetzlich elastisch.
 SPANNUNGSARTEN = RECHENARTEN + (Rechenart.ELASTISCH,)
+
+#: Was das Knicken und die Spannung-Dehnung-Analysen anbieten: nur, was ueber
+#: die Fasern rechnet -- siehe «Wer was anbietet» oben.
+FASERARTEN = (Rechenart.BLOCK, Rechenart.PARABEL)
+
+#: Was eine Datei von vor 2026-10-12 dort noch waehlen durfte, wo es die Wahl
+#: heute nicht mehr gibt -- und was daraus wird: aus der Handrechnung beim
+#: Knicken und in den Analysen derselbe Spannungsblock, ueber die Fasern
+#: gerechnet. Die Druckbewehrung zaehlt dann mit; der Widerstand steigt
+#: darum leicht.
+ERSATZ_ALTER_WAHL = {Rechenart.HANDRECHNUNG.value: Rechenart.BLOCK.value}
 
 #: Die Seite im Notizbuch fuer den Stahl der Handrechnung, der nur Zug traegt.
 STAHL_NUR_ZUG = "Betonstahl nur auf Zug"
@@ -127,7 +150,7 @@ class Rechenwahl:
 
     @property
     def beschriftung(self) -> str:
-        """Fuer Legenden: «Parabel, φ = 2, Bemessung» -- phi nur, wo es wirkt."""
+        """Fuer Legenden: «Präzise ohne Vereinfachung, φ = 2, Bemessung» -- phi nur, wo es wirkt."""
         teile = [self.art.beschriftung]
         if self.art.mit_kriechzahl:
             teile.append(f"φ = {self.kriechzahl:g}")

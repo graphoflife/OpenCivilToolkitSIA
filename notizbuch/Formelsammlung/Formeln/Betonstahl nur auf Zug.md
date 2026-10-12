@@ -1,5 +1,5 @@
 ---
-erzeugt: 19ac978982b1
+erzeugt: 471ee123299c
 art: formel
 tags: [formel]
 ---
@@ -12,21 +12,13 @@ $$
 \sigma_s = \begin{cases} \min\left(E_s \cdot \varepsilon_s;\ f_{yk}\right) & \varepsilon_s > 0 \\[1ex] 0 & \varepsilon_s \le 0 \quad (\text{gedrückt: weggelassen}) \end{cases}
 $$
 
-*In der Herleitung: «Stahl in der Handrechnung: nur auf Zug»*
-
-$$
-\sigma_s = \begin{cases} \min\left(E_s \cdot \varepsilon_s;\ f_{yd}\right) & \varepsilon_s > 0 \\[1ex] 0 & \varepsilon_s \le 0 \quad (\text{gedrückt: weggelassen}) \end{cases}
-$$
-
 ## Im Code
 
 - [[opencivil.nachweis.rechenwahl#protokoll_gesetze|protokoll_gesetze]]
-- [[opencivil.spannungsanalyse#_herleitung|_herleitung]]
 
 ## Themen
 
 - [[Stahlspannung aus Rissbreite]]
-- [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -38,6 +30,8 @@ Vereinfachung, mit der die Resistenzlinie aus Handrechnung entsteht, und auf
 der sicheren Seite.
 
 Wählt ein Kapitel die Rechenart «Handrechnung», rechnet auch sein
-Querschnittslöser so: bei den Stahlspannungen im Gebrauch, beim Knicken und
-in der Analyse. Am Ende einer solchen Linie steht dann genau der Widerstand
-der Handrechnung.
+Querschnittslöser so -- das gibt es nur bei den Stahlspannungen im Gebrauch.
+Beim Knicken und in den Spannung-Dehnung-Analysen steht die Handrechnung seit
+2026-10-12 nicht mehr zur Wahl: dort wird die Normalkraft Ebene für Ebene
+genau gerechnet, und ein Polygon aus Eckpunkten wäre nur eine schlechtere
+0.85·x-Vereinfachung.

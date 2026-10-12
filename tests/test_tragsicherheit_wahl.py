@@ -45,7 +45,7 @@ class TestVorgabe(unittest.TestCase):
         # Daneben die Parabel, zum Vergleich.
         self.assertIsInstance(mn.vergleich, Ebenenlinie)
         self.assertIs(mn.vergleich.wahl.art, Rechenart.PARABEL)
-        self.assertIn(r"\text{Handrechnung, Block }", text(loesung))
+        self.assertIn(r"\text{Handrechnung}", text(loesung))
 
     def test_die_neue_platte_bringt_die_vorgabe_mit(self):
         q = Projekt.beispiel().querschnitte[0]

@@ -1,10 +1,10 @@
 ---
-erzeugt: a39307c00cdb
+erzeugt: 2656318104c9
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 18 Formeln, in der Folge, in der gerechnet wird.
+> 17 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -24,8 +24,6 @@ Der Spannungsblock ist ein Modell für den Bruch: unter (1 − 0.85)·ε\_c2d tr
 
 Dieselbe Rissbedingung, nach der Normalkraft aufgelöst: beim Moment M reisst der Querschnitt, wenn die Zugkraft N\_Riss erreicht. Unter Zug reisst die ganze Dicke, darum gilt k\_t für t = h und nicht für h/3 wie beim Rissmoment. Bei N\_Riss springt die Dehnung bei derselben Kraft vom ungerissenen auf den gerissenen Wert.
 
-Mit der Handrechnung rechnet die Linie mit demselben Querschnitt wie die Resistenzlinie aus Handrechnung: der Beton als Spannungsblock, die gedrückte Bewehrung weggelassen, die Bewehrung jeder Seite zu einer Lage in ihrem Schwerpunkt zusammengefasst, und der Beton auch dort gezählt, wo der Stahl liegt. Am Ende der Linie steht darum der Widerstand der Handrechnung.
-
 Der äquivalente E-Modul ist der Modul, den ein reiner Betonquerschnitt bräuchte – ungerissen, ohne Stahl, elastisch –, um sich unter der laufenden Kraft gleich stark zu verformen wie der bewehrte Querschnitt. Gezählt wird ab dem Zustand ohne laufende Kraft: was die festgehaltene Kraft allein verformt, kann ein solcher Querschnitt nicht abbilden. Ist sie null, ist es genau M = E·I·χ bzw. N = E·A·ε.
 
 ## Formeln
@@ -43,11 +41,10 @@ Der äquivalente E-Modul ist der Modul, den ein reiner Betonquerschnitt bräucht
 11. [[Wirksame Zugfestigkeit]]
 12. [[Rissnormalkraft beim Moment]]
 13. [[Grösste Dehnung auf halber Höhe]]
-14. [[Betonstahl nur auf Zug]]
-15. [[Reiner Betonquerschnitt – Flächenmoment]]
-16. [[Äquivalenter E-Modul über dem Moment]]
-17. [[Reiner Betonquerschnitt – Fläche]]
-18. [[Äquivalenter E-Modul über der Normalkraft]]
+14. [[Reiner Betonquerschnitt – Flächenmoment]]
+15. [[Äquivalenter E-Modul über dem Moment]]
+16. [[Reiner Betonquerschnitt – Fläche]]
+17. [[Äquivalenter E-Modul über der Normalkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

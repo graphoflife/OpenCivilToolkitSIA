@@ -1,5 +1,5 @@
 ---
-erzeugt: 2687d83deea5
+erzeugt: 54f76ada428d
 art: modul
 tags: [modul]
 ---
@@ -315,7 +315,7 @@ sie hiess dort «die der Platte», und das bleibt sie beim Lesen
 - `eps_unten: float = 2.0` – Randdehnungen in Promille -- nur fuer `dehnungen`.
 - `kriechzahl: float = 0.0` – Die Kriechzahl φ dieser Analyse.
 - `werkstoffsatz: str = WERKSTOFFSAETZE[0]` – `bemessung` (f_cd, f_yd) oder `charakteristisch` (f_ck, f_yk).
-- `rechenart: str = Rechenart.PARABEL.value` – `handrechnung`, `block` oder `parabel` -- siehe [[opencivil.nachweis.rechenwahl#Rechenart|Rechenart]].
+- `rechenart: str = Rechenart.PARABEL.value` – `block` oder `parabel` -- siehe [[opencivil.nachweis.rechenwahl#Rechenart|Rechenart]]. Die Handrechnung gibt es hier nicht ([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]); eine Datei von vor 2026-10-12, die sie noch waehlt, liest sich als `block`.
 - `aktiv: bool = True`
 
 #### SpannungsfallEintrag.aus_dict
@@ -408,7 +408,18 @@ Die Stahlspannungen: elastisch, mit charakteristischen Werten.
 def knicken_verformung(cls) -> 'RechenwahlEintrag'
 ```
 
-Die Ausmitte e_2d: mit der Parabel und Bemessungswerten.
+Die Ausmitte e_2d: praezise ohne Vereinfachung, mit Bemessungswerten.
+
+#### RechenwahlEintrag.knicken_widerstand
+
+```python
+@classmethod
+def knicken_widerstand(cls) -> 'RechenwahlEintrag'
+```
+
+Der Widerstand beim Knicken: die 0.85·x-Vereinfachung, mit
+Bemessungswerten. Bis 2026-10-12 war es die Handrechnung, die es dort
+nicht mehr gibt; die Vereinfachung kommt ihr am naechsten.
 
 #### RechenwahlEintrag.wahl
 
@@ -435,6 +446,17 @@ def aus_dict(cls, d: Optional[Mapping[str, Any]], *, vorgabe: Optional['Rechenwa
 ```
 
 Fehlt `d` oder ein Feld darin, gilt `vorgabe` -- und fuer phi `kriechzahl_alt`.
+
+### _ersetzt
+
+```python
+def _ersetzt(rechenart: Any, arten) -> Any
+```
+
+Die Rechenart, wie sie heute heisst: was eine alte Datei dort waehlt, wo
+es die Wahl nicht mehr gibt, wird zu ihrem Ersatz
+([[opencivil.nachweis.rechenwahl#Konstanten|ERSATZ_ALTER_WAHL]]). Alles andere
+bleibt -- auch Unbekanntes, das die Pruefung danach meldet.
 
 ### Gebrauchsliste
 

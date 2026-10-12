@@ -54,7 +54,7 @@ from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.vorlagen import VORLAGEN
 from opencivil.projekt.gleichungen import GleichungszeileEintrag
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
-from opencivil.nachweis.rechenwahl import RECHENARTEN, SPANNUNGSARTEN
+from opencivil.nachweis.rechenwahl import FASERARTEN, RECHENARTEN, SPANNUNGSARTEN, Rechenart
 from opencivil.spannungsanalyse import Analyseart
 from opencivil.web import diagrammdaten
 
@@ -66,9 +66,10 @@ _WERKSTOFFSAETZE = [
     {"wert": s.value, "beschriftung": s.beschriftung, "kurz": s.kurz}
     for s in map(Werkstoffsatz, WERKSTOFFSAETZE)
 ]
+#: Die Betongesetze heissen wie die Rechenarten, deren Werte sie sind.
 _BETONGESETZE = [
-    {"wert": BETONGESETZE[0], "beschriftung": "Parabel-Rechteck", "kurz": "Parabel"},
-    {"wert": BETONGESETZE[1], "beschriftung": "Spannungsblock 0.85·x", "kurz": "Block 0.85·x"},
+    {"wert": wert, "beschriftung": Rechenart(wert).beschriftung, "kurz": Rechenart(wert).kurz}
+    for wert in BETONGESETZE
 ]
 
 
@@ -193,11 +194,13 @@ def katalog() -> dict:
                       for a in Analyseart],
         },
         # Was ein Nachweis-Kapitel und eine Analyse waehlen: Wertesatz und
-        # Rechenart -- die Stahlspannungen dazu «elastisch».
+        # Rechenart -- die Stahlspannungen dazu «elastisch», das Knicken und
+        # die Analysen ohne Handrechnung.
         "rechenwahl": {
             "werkstoffsaetze": _WERKSTOFFSAETZE,
             "rechenarten": _rechenarten(RECHENARTEN),
             "spannungsarten": _rechenarten(SPANNUNGSARTEN),
+            "faserarten": _rechenarten(FASERARTEN),
         },
         # `fliessnachweis` sagt, ob diese Anforderung den Nachweis gegen
         # das Fliessen unter haeufiger Einwirkung ueberhaupt verlangt -- bei

@@ -188,8 +188,7 @@
         "N_{Rd}^{+}"
       ],
       "themen": [
-        "Biegung und Normalkraft",
-        "Knicken"
+        "Biegung und Normalkraft"
       ]
     },
     {
@@ -324,8 +323,7 @@
       "art": "formel",
       "zeichen": [],
       "themen": [
-        "Stahlspannung aus Rissbreite",
-        "Spannung-Dehnung-Analyse"
+        "Stahlspannung aus Rissbreite"
       ]
     },
     {
@@ -435,6 +433,7 @@
       "zeichen": [],
       "themen": [
         "Schiefe Biegung",
+        "Knicken",
         "Biegung und Normalkraft"
       ]
     },
@@ -466,8 +465,7 @@
         "\\varepsilon_s^{+}"
       ],
       "themen": [
-        "Biegung und Normalkraft",
-        "Knicken"
+        "Biegung und Normalkraft"
       ]
     },
     {
@@ -522,8 +520,7 @@
         "x^{+}"
       ],
       "themen": [
-        "Biegung und Normalkraft",
-        "Knicken"
+        "Biegung und Normalkraft"
       ]
     },
     {
@@ -631,8 +628,7 @@
         "N_{Rd}^{-}"
       ],
       "themen": [
-        "Biegung und Normalkraft",
-        "Knicken"
+        "Biegung und Normalkraft"
       ]
     },
     {
@@ -716,8 +712,7 @@
         "M_{Rd}(N_{Rd}^{+})"
       ],
       "themen": [
-        "Biegung und Normalkraft",
-        "Knicken"
+        "Biegung und Normalkraft"
       ]
     },
     {
@@ -728,8 +723,7 @@
         "N_{Rd}^{+}"
       ],
       "themen": [
-        "Biegung und Normalkraft",
-        "Knicken"
+        "Biegung und Normalkraft"
       ]
     },
     {
@@ -794,8 +788,7 @@
         "M_{Rd}^{+}"
       ],
       "themen": [
-        "Biegung und Normalkraft",
-        "Knicken"
+        "Biegung und Normalkraft"
       ]
     },
     {
@@ -806,8 +799,7 @@
         "M_{Rd}(N_{Ed}=0)^{+}"
       ],
       "themen": [
-        "Biegung und Normalkraft",
-        "Knicken"
+        "Biegung und Normalkraft"
       ]
     },
     {
@@ -818,8 +810,7 @@
         "x^{+}"
       ],
       "themen": [
-        "Biegung und Normalkraft",
-        "Knicken"
+        "Biegung und Normalkraft"
       ]
     },
     {
@@ -1017,6 +1008,7 @@
       "art": "formel",
       "zeichen": [],
       "themen": [
+        "Knicken",
         "Biegung und Normalkraft"
       ]
     },
@@ -1050,8 +1042,8 @@
       "art": "formel",
       "zeichen": [],
       "themen": [
-        "Stahlspannung aus Rissbreite",
         "Knicken",
+        "Stahlspannung aus Rissbreite",
         "Biegung und Normalkraft",
         "Schiefe Biegung",
         "Spannung-Dehnung-Analyse"
@@ -1065,8 +1057,7 @@
         "\\sigma_{sd}"
       ],
       "themen": [
-        "Biegung und Normalkraft",
-        "Knicken"
+        "Biegung und Normalkraft"
       ]
     },
     {
@@ -1082,8 +1073,7 @@
         "Biegung und Normalkraft",
         "Querkraft",
         "Duktilität",
-        "Zwängung auf Biegung",
-        "Knicken"
+        "Zwängung auf Biegung"
       ]
     },
     {
@@ -2564,9 +2554,11 @@
         "RechenwahlEintrag",
         "RechenwahlEintrag.gebrauch",
         "RechenwahlEintrag.knicken_verformung",
+        "RechenwahlEintrag.knicken_widerstand",
         "RechenwahlEintrag.wahl",
         "RechenwahlEintrag.pruefen",
         "RechenwahlEintrag.aus_dict",
+        "_ersetzt",
         "Gebrauchsliste",
         "Gebrauchsliste.lastfall",
         "Gebrauchsliste.pruefen",

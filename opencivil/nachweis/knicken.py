@@ -47,12 +47,20 @@ ZWEI WAHLEN:
 Womit gerechnet wird, waehlt das Kapitel zweimal (:class:`Rechenwahl`):
 
 * **Verformung (e_2d)** -- die Gesetze des Loesers, der zu jedem Moment die
-  Kruemmung sucht. Vorgabe die Parabel mit Bemessungswerten; die Kriechzahl
-  weicht den Beton auf, und ein weicher Beton verformt sich mehr.
+  Kruemmung sucht. Vorgabe praezise ohne Vereinfachung, mit
+  Bemessungswerten; die Kriechzahl weicht den Beton auf, und ein weicher
+  Beton verformt sich mehr.
 * **Widerstand (N_Rd)** -- die Resistenzlinie, die sagt, ob der Querschnitt
-  das Moment am verformten System aufnimmt. Vorgabe die Handrechnung mit
-  Bemessungswerten. Waehlt das Kapitel dasselbe wie die Tragsicherheit, ist
-  es deren Linie; sonst baut es eine eigene, mit eigener Herleitung.
+  das Moment am verformten System aufnimmt. Vorgabe die
+  0.85·x-Vereinfachung mit Bemessungswerten. Waehlt das Kapitel dasselbe wie
+  die Tragsicherheit, ist es deren Linie; sonst baut es eine eigene, mit
+  eigener Herleitung.
+
+Die Handrechnung steht bei keiner der beiden zur Wahl
+(:data:`~opencivil.nachweis.rechenwahl.FASERARTEN`): beim Knicken zaehlt
+die Normalkraft genau, Ebene fuer Ebene, und ein Polygon aus Eckpunkten
+waere hier nur eine schlechtere Vereinfachung. Bis 2026-10-12 war sie die
+Vorgabe des Widerstands.
 
 NUR IN X-RICHTUNG:
 Ein Knicknachweis braucht eine Knicklaenge, und die gehoert zu einer
@@ -80,6 +88,7 @@ from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, M, Groesse
 from opencivil.core.latex import Mathe, angabe, als_text, bedingung
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
+from opencivil.nachweis import dehnungsfaecher
 from opencivil.nachweis.biegung_normalkraft import (
     gleiche_linie, linienbezuege, resistenzlinie,
 )
@@ -95,7 +104,7 @@ from opencivil.querschnitt.platte import Richtung
 
 #: Die Vorgaben der beiden Wahlen -- siehe Dateikopf.
 VERFORMUNG = Rechenwahl(art=Rechenart.PARABEL)
-WIDERSTAND = Rechenwahl(art=Rechenart.HANDRECHNUNG)
+WIDERSTAND = Rechenwahl(art=Rechenart.BLOCK)
 
 #: Groesste Zahl an Durchlaeufen der Ausmitten-Iteration.
 DURCHLAEUFE = 40
@@ -349,10 +358,16 @@ class Knicken(Nachweis):
 
         self._protokoll_ansatz(p, e, eps_druck=w.eps_c2d, eps_zug=eps_ud,
                                verdraengt=g.verdraengt)
+        # Schnell rechnet die eigene Linie mit den Schritten der Suche, wie die
+        # der Tragsicherheit: sonst zahlte die Bewehrungssuche fuer jede Platte
+        # mit Knickfall eine ganze genaue Linie, seit die Handrechnung hier
+        # nicht mehr zur Wahl steht.
         self.linie = (resistenzlinie(
             self.widerstand, e, p, querschnitt=self.querschnitt, posten=self.posten,
             richtung=self.richtung, basis=f"{self.id}.widerstand",
-            vorsatz="Widerstand: ", ebene=3, wahltitel="Rechenwahl – Widerstand (N_Rd)")
+            vorsatz="Widerstand: ", ebene=3, wahltitel="Rechenwahl – Widerstand (N_Rd)",
+            schritte=(dehnungsfaecher.SCHRITTE_SUCHE if self.schnell
+                      else dehnungsfaecher.SCHRITTE))
             if self.eigene_linie else self.mn.massgebend)
         if not self.eigene_linie:
             p.titel("Widerstand", ebene=3)

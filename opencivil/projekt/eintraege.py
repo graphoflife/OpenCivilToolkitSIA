@@ -29,7 +29,9 @@ from opencivil.projekt.lesen import (
     ProjektFehler, kriechzahl_aus, nur_x, pflichtfeld, sorten, vorgabe, zahl,
 )
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
-from opencivil.nachweis.rechenwahl import RECHENARTEN, SPANNUNGSARTEN, Rechenart, Rechenwahl
+from opencivil.nachweis.rechenwahl import (
+    ERSATZ_ALTER_WAHL, FASERARTEN, RECHENARTEN, SPANNUNGSARTEN, Rechenart, Rechenwahl,
+)
 from opencivil.spannungsanalyse import Analyseart
 
 #: Mit welchen Festigkeiten ein Werkstoffgesetz rechnen kann, siehe
@@ -426,8 +428,10 @@ class SpannungsfallEintrag(Beschreibung):
     """``bemessung`` (f_cd, f_yd) oder ``charakteristisch`` (f_ck, f_yk)."""
 
     rechenart: str = Rechenart.PARABEL.value
-    """``handrechnung``, ``block`` oder ``parabel`` -- siehe
-    :class:`~opencivil.nachweis.rechenwahl.Rechenart`."""
+    """``block`` oder ``parabel`` -- siehe
+    :class:`~opencivil.nachweis.rechenwahl.Rechenart`. Die Handrechnung gibt
+    es hier nicht (:data:`~opencivil.nachweis.rechenwahl.FASERARTEN`); eine
+    Datei von vor 2026-10-12, die sie noch waehlt, liest sich als ``block``."""
 
     aktiv: bool = True
 
@@ -456,8 +460,9 @@ class SpannungsfallEintrag(Beschreibung):
             kriechzahl=kriechzahl_aus(d, "kriechzahl", alt=kriechzahl_alt, wo=wo),
             werkstoffsatz=gewaehlt("werkstoffsatz", cls.werkstoffsatz, WERKSTOFFSAETZE),
             rechenart=gewaehlt("rechenart", cls.rechenart,
-                               tuple(a.value for a in RECHENARTEN),
-                               roh=d.get("rechenart") or d.get("betongesetz")),
+                               tuple(a.value for a in FASERARTEN),
+                               roh=_ersetzt(d.get("rechenart") or d.get("betongesetz"),
+                                            FASERARTEN)),
             aktiv=bool(d.get("aktiv", cls.aktiv)),
         )
 
@@ -541,8 +546,17 @@ class RechenwahlEintrag(Beschreibung):
 
     @classmethod
     def knicken_verformung(cls) -> "RechenwahlEintrag":
-        """Die Ausmitte e_2d: mit der Parabel und Bemessungswerten."""
+        """Die Ausmitte e_2d: praezise ohne Vereinfachung, mit Bemessungswerten."""
         return cls(rechenart=Rechenart.PARABEL.value)
+
+    @classmethod
+    def knicken_widerstand(cls) -> "RechenwahlEintrag":
+        """
+        Der Widerstand beim Knicken: die 0.85·x-Vereinfachung, mit
+        Bemessungswerten. Bis 2026-10-12 war es die Handrechnung, die es dort
+        nicht mehr gibt; die Vereinfachung kommt ihr am naechsten.
+        """
+        return cls(rechenart=Rechenart.BLOCK.value)
 
     @property
     def wahl(self) -> Rechenwahl:
@@ -574,10 +588,22 @@ class RechenwahlEintrag(Beschreibung):
                 d, "kriechzahl", wo=wo,
                 alt=vorgabe.kriechzahl if kriechzahl_alt is None else kriechzahl_alt),
             werkstoffsatz=str(d.get("werkstoffsatz") or vorgabe.werkstoffsatz),
-            rechenart=str(d.get("rechenart") or vorgabe.rechenart),
+            rechenart=_ersetzt(d.get("rechenart") or vorgabe.rechenart, arten),
         )
         eintrag.pruefen(wo, arten)
         return eintrag
+
+
+def _ersetzt(rechenart: Any, arten) -> Any:
+    """
+    Die Rechenart, wie sie heute heisst: was eine alte Datei dort waehlt, wo
+    es die Wahl nicht mehr gibt, wird zu ihrem Ersatz
+    (:data:`~opencivil.nachweis.rechenwahl.ERSATZ_ALTER_WAHL`). Alles andere
+    bleibt -- auch Unbekanntes, das die Pruefung danach meldet.
+    """
+    if rechenart is None or rechenart in {a.value for a in arten}:
+        return rechenart
+    return ERSATZ_ALTER_WAHL.get(str(rechenart), rechenart)
 
 
 @dataclass

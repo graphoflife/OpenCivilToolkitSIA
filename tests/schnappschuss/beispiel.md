@@ -139,7 +139,7 @@ $$
 **Rechenwahl**
 
 $$
-\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Handrechnung, Block } 0.85 \cdot x
+\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Handrechnung}
 $$
 
 **Schwerpunkt der zusammengefassten Lage – 2. Lage Grundbewehrung + 2. Lage Zulage**

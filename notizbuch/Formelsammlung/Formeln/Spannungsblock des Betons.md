@@ -1,21 +1,21 @@
 ---
-erzeugt: 5b6c1080c109
+erzeugt: 4401890563e3
 art: formel
 tags: [formel]
 ---
 > [!warning] Normstelle fehlt noch
 > Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
 
+*In der Herleitung: «Werkstoffgesetze: Beton, Spannungsblock 0.85·x»*
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{cd} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \end{cases}
+$$
+
 *In der Herleitung: «Werkstoffgesetze im Gebrauchszustand: Beton, Spannungsblock 0.85·x»*
 
 $$
 \sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{ck} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \end{cases}
-$$
-
-*In der Herleitung: «Werkstoffgesetze der Verformung: Beton, Spannungsblock 0.85·x»*
-
-$$
-\sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{cd} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \end{cases}
 $$
 
 ## Im Code
@@ -26,8 +26,8 @@ $$
 
 ## Themen
 
-- [[Stahlspannung aus Rissbreite]]
 - [[Knicken]]
+- [[Stahlspannung aus Rissbreite]]
 - [[Biegung und Normalkraft]]
 - [[Schiefe Biegung]]
 - [[Spannung-Dehnung-Analyse]]
@@ -43,6 +43,6 @@ $f_{cd}$. Liegt der gedrückte Rand bei $\varepsilon_{c2d}$ -- im Bruchzustand
 
 Als Gesetz gilt er auch dort, wo der Rand nicht bei $\varepsilon_{c2d}$ liegt;
 so rechnen die Linie aus Dehnungsebenen, der Querschnittslöser und die
-Analysen mit der Rechenart «Block». Unter Gebrauchslast ist das ein grobes
+Analysen mit der Rechenart «0.85·x-Vereinfachung». Unter Gebrauchslast ist das ein grobes
 Bild: die Druckresultierende liegt dann am Rand. Die Normstelle des Blocks
 als Gesetz ist offen; sie wird nicht erfunden.

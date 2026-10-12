@@ -87,12 +87,12 @@ sie hier notiert; keine davon ist nachgeschlagen.
       (4.2.1.6); mit `γ_cE = 1` ist das bei φ = 0 dieselbe Zahl. Ob für
       die Tragsicherheit `E_cd` und für das Kriechen der Modul der richtige
       Ort ist, ist nach Vorgabe, nicht nachgeschlagen.
-- [ ] **Die Handrechnung als Rechenart im Löser.** Bei Stahlspannung,
-      Knicken (Verformung) und Analyse rechnet «Handrechnung Block 0.85·x»
-      wie die Resistenzlinie aus Handrechnung: Spannungsblock, gedrückter
-      Stahl weggelassen, je Seite eine Lage im Schwerpunkt, der Beton auch
-      dort gezählt, wo der Stahl liegt. Ein Modell, keine Normregel — nach
-      Vorgabe. Dazu bekommt der Stahl im Löser das Druckplateau `f_y,druck`
+- [ ] **Die Handrechnung als Rechenart im Löser.** Bei der Stahlspannung
+      rechnet «Handrechnung» wie die Resistenzlinie aus Handrechnung
+      (Knicken und Analysen bieten sie seit 2026-10-12 nicht mehr an):
+      Spannungsblock, gedrückter Stahl weggelassen, je Seite eine Lage im
+      Schwerpunkt, der Beton auch dort gezählt, wo der Stahl liegt. Ein
+      Modell, keine Normregel — nach Vorgabe. Dazu bekommt der Stahl im Löser das Druckplateau `f_y,druck`
       wie die genaue Linie; bei den Normsorten ist es gleich `f_y`.
 - [ ] **Querkraft mit `m_Rk`.** Rechnet die Tragsicherheit charakteristisch,
       nimmt die Querkraft ohne Bügel ihr `m_Rk(N_Ed)` aus derselben Linie, ihr

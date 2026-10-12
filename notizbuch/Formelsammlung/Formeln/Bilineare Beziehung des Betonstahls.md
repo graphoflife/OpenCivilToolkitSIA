@@ -1,5 +1,5 @@
 ---
-erzeugt: 7e07ca1fadfe
+erzeugt: b67e8cdf19c8
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.2.4"
@@ -27,6 +27,7 @@ $$
 ## Themen
 
 - [[Schiefe Biegung]]
+- [[Knicken]]
 - [[Biegung und Normalkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->

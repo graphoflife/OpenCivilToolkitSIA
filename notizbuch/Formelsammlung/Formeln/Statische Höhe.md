@@ -1,5 +1,5 @@
 ---
-erzeugt: 9b9c3512d0eb
+erzeugt: 8fcb2e1d445f
 art: formel
 tags: [formel]
 ---
@@ -68,7 +68,6 @@ $$
 - [[Querkraft]]
 - [[Duktilität]]
 - [[Zwängung auf Biegung]]
-- [[Knicken]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

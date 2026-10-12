@@ -32,8 +32,11 @@ Jede Analyse (:class:`~opencivil.projekt.SpannungsfallEintrag`) waehlt als
 * die Kriechzahl;
 * der Wertesatz -- Bemessung (``f_cd``, ``f_yd``) oder charakteristisch
   (``f_ck``, ``f_yk``), siehe :class:`Werkstoffsatz`;
-* die Rechenart -- Handrechnung Block 0.85·x, Block 0.85·x genau oder die
-  Parabel mit ``E_c,eff``.
+* die Rechenart -- die 0.85·x-Vereinfachung oder praezise ohne Vereinfachung,
+  die Parabel mit ``E_c,eff``. Die Handrechnung gibt es hier nicht
+  (:data:`~opencivil.nachweis.rechenwahl.FASERARTEN`): eine Linie rechnet die
+  Normalkraft Ebene fuer Ebene genau, ein Polygon aus Eckpunkten haette dort
+  nichts zu suchen.
 
 Moduln und Grenzdehnungen sind in beiden Wertesaetzen dieselben, wie ueberall
 im Werkzeug.
@@ -87,7 +90,7 @@ from opencivil.nachweis.querschnittsloeser import (
     Querschnittsloeser, Stahllage, Werkstoffsatz, wirksamer_modul,
 )
 from opencivil.nachweis.rechenwahl import (
-    STAHL_NUR_ZUG, Kennwerte, Rechenart, Rechenwahl, gesetze,
+    Kennwerte, Rechenart, Rechenwahl, gesetze,
 )
 from opencivil.nachweis.sproedes_versagen import (
     beiwert_dicke, protokoll_zugfestigkeit, rissmoment,
@@ -670,12 +673,11 @@ def _linie(paar: Loeserpaar, weg: _Weg, art: Analyseart, fest: float,
             verformung_I=weg.verformung_bei(paar.ungerissen, kraft),
             verformung_II=verformung))
     if paar.wahl.art.mit_block:
-        ende = ("der Widerstand der Handrechnung"
-                if paar.wahl.art is Rechenart.HANDRECHNUNG else "der Widerstand mit dem Block")
         linie.hinweisen(
-            f"Mit dem Spannungsblock trägt der Beton unter "
+            f"Mit der {BLOCKANTEIL}·x-Vereinfachung trägt der Beton unter "
             f"{1.0 - BLOCKANTEIL:.2f}·ε_c2d nichts: über dem Riss ist die Linie "
-            f"weicher als der Querschnitt, ihr Ende ist {ende}.")
+            f"weicher als der Querschnitt, ihr Ende ist der Widerstand der "
+            f"Vereinfachung.")
     return linie
 
 
@@ -934,20 +936,6 @@ def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
     p.ansatz(r"\sigma_c = E_{c,eff} \cdot \varepsilon_c",
              titel="Beton ungerissen, in Druck und Zug")
     eps_c1d, eps_c2d = ein("eps_c1d"), ein("eps_c2d")
-    if wahl.art is Rechenart.HANDRECHNUNG:
-        p.erklaerung(
-            "Mit der Handrechnung rechnet die Linie mit demselben Querschnitt wie "
-            "die Resistenzlinie aus Handrechnung: der Beton als Spannungsblock, die "
-            "gedrückte Bewehrung weggelassen, die Bewehrung jeder Seite zu einer "
-            "Lage in ihrem Schwerpunkt zusammengefasst, und der Beton auch dort "
-            "gezählt, wo der Stahl liegt. Am Ende der Linie steht darum der "
-            "Widerstand der Handrechnung.")
-        p.ansatz(
-            r"\sigma_s = \begin{cases} \min\left(E_s \cdot \varepsilon_s;\ "
-            + wahl.satz.stahl_zeichen + r"\right) & \varepsilon_s > 0 \\[1ex]"
-            r" 0 & \varepsilon_s \le 0 \quad (\text{gedrückt: weggelassen})"
-            r" \end{cases}",
-            titel="Stahl in der Handrechnung: nur auf Zug", name=STAHL_NUR_ZUG)
     if wahl.art.mit_block:
         p.ansatz(Spannungsblock(f_cd=0.0, eps_c2d=eps_c2d.groesse.si).latex(),
                  titel=f"Beton gerissen: Spannungsblock {BLOCKANTEIL}·x",

@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 from typing import Any, List, Mapping, Optional
 
 from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX, HOECHSTENS as X_D_HOECHSTENS
+from opencivil.nachweis.rechenwahl import FASERARTEN
 from opencivil.querschnitt.platte import K_C, KRIECHZAHL, LAGENZAHL, Richtung
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste,
@@ -103,12 +104,18 @@ class QuerschnittEintrag(Beschreibung):
 
     knicken_wahl_verformung: RechenwahlEintrag = field(
         default_factory=RechenwahlEintrag.knicken_verformung)
-    """Womit die Ausmitte e_2d gerechnet wird -- Vorgabe die Parabel, Bemessungswerte."""
-
-    knicken_wahl_widerstand: RechenwahlEintrag = field(default_factory=RechenwahlEintrag)
     """
-    Womit N_Rd(M_Ed = N_Ed·e_tot) gerechnet wird -- Vorgabe die Handrechnung.
-    Mit derselben Wahl wie die Tragsicherheit ist es deren Linie.
+    Womit die Ausmitte e_2d gerechnet wird -- Vorgabe praezise ohne
+    Vereinfachung, Bemessungswerte. Ohne Handrechnung
+    (:data:`~opencivil.nachweis.rechenwahl.FASERARTEN`).
+    """
+
+    knicken_wahl_widerstand: RechenwahlEintrag = field(
+        default_factory=RechenwahlEintrag.knicken_widerstand)
+    """
+    Womit N_Rd(M_Ed = N_Ed·e_tot) gerechnet wird -- Vorgabe die
+    0.85·x-Vereinfachung, ohne Handrechnung. Mit derselben Wahl wie die
+    Tragsicherheit ist es deren Linie.
     """
 
     spannungsfaelle: List[SpannungsfallEintrag] = field(default_factory=list)
@@ -253,8 +260,10 @@ class QuerschnittEintrag(Beschreibung):
                             (self.quasistaendig, "quasi-ständige")):
             liste.pruefen(self.name, self.kombinationen, wort)
         self.tragsicherheit_wahl.pruefen(f"Platte '{self.name}', Tragsicherheit")
-        self.knicken_wahl_verformung.pruefen(f"Platte '{self.name}', Knicken, Verformung")
-        self.knicken_wahl_widerstand.pruefen(f"Platte '{self.name}', Knicken, Widerstand")
+        self.knicken_wahl_verformung.pruefen(f"Platte '{self.name}', Knicken, Verformung",
+                                             FASERARTEN)
+        self.knicken_wahl_widerstand.pruefen(f"Platte '{self.name}', Knicken, Widerstand",
+                                             FASERARTEN)
 
     def masse_pruefen(self) -> None:
         """
@@ -470,11 +479,11 @@ class QuerschnittEintrag(Beschreibung):
             knicken_wahl_verformung=RechenwahlEintrag.aus_dict(
                 d.get("knicken_wahl_verformung"), vorgabe=RechenwahlEintrag.knicken_verformung(),
                 kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl),
-                wo=f"Platte '{kennung}', Knicken, Verformung"),
+                wo=f"Platte '{kennung}', Knicken, Verformung", arten=FASERARTEN),
             knicken_wahl_widerstand=RechenwahlEintrag.aus_dict(
-                d.get("knicken_wahl_widerstand"),
+                d.get("knicken_wahl_widerstand"), vorgabe=RechenwahlEintrag.knicken_widerstand(),
                 kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl),
-                wo=f"Platte '{kennung}', Knicken, Widerstand"),
+                wo=f"Platte '{kennung}', Knicken, Widerstand", arten=FASERARTEN),
             spannungsfaelle=[SpannungsfallEintrag.aus_dict(
                 x, kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl))
                              for x in (d.get("spannungsfaelle") or [])],

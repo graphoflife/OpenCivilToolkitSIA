@@ -1,5 +1,5 @@
 ---
-erzeugt: 3bc645e1903e
+erzeugt: 58a93fc4ab70
 art: modul
 tags: [modul]
 ---
@@ -64,12 +64,20 @@ liegt. Die Normalkraft dagegen hat immer einen Grenzwert.
 Womit gerechnet wird, waehlt das Kapitel zweimal ([[opencivil.nachweis.rechenwahl#Rechenwahl|Rechenwahl]]):
 
 * **Verformung (e_2d)** -- die Gesetze des Loesers, der zu jedem Moment die
-  Kruemmung sucht. Vorgabe die Parabel mit Bemessungswerten; die Kriechzahl
-  weicht den Beton auf, und ein weicher Beton verformt sich mehr.
+  Kruemmung sucht. Vorgabe praezise ohne Vereinfachung, mit
+  Bemessungswerten; die Kriechzahl weicht den Beton auf, und ein weicher
+  Beton verformt sich mehr.
 * **Widerstand (N_Rd)** -- die Resistenzlinie, die sagt, ob der Querschnitt
-  das Moment am verformten System aufnimmt. Vorgabe die Handrechnung mit
-  Bemessungswerten. Waehlt das Kapitel dasselbe wie die Tragsicherheit, ist
-  es deren Linie; sonst baut es eine eigene, mit eigener Herleitung.
+  das Moment am verformten System aufnimmt. Vorgabe die
+  0.85·x-Vereinfachung mit Bemessungswerten. Waehlt das Kapitel dasselbe wie
+  die Tragsicherheit, ist es deren Linie; sonst baut es eine eigene, mit
+  eigener Herleitung.
+
+Die Handrechnung steht bei keiner der beiden zur Wahl
+([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]): beim Knicken zaehlt
+die Normalkraft genau, Ebene fuer Ebene, und ein Polygon aus Eckpunkten
+waere hier nur eine schlechtere Vereinfachung. Bis 2026-10-12 war sie die
+Vorgabe des Widerstands.
 
 
 ## NUR IN X-RICHTUNG
@@ -267,7 +275,7 @@ dreissig Tabellen fuer eine einzige Zahl zu zeigen.
 ## Konstanten
 
 - `VERFORMUNG = Rechenwahl(art=Rechenart.PARABEL)` – Die Vorgaben der beiden Wahlen -- siehe Dateikopf.
-- `WIDERSTAND = Rechenwahl(art=Rechenart.HANDRECHNUNG)`
+- `WIDERSTAND = Rechenwahl(art=Rechenart.BLOCK)`
 - `DURCHLAEUFE = 40` – Groesste Zahl an Durchlaeufen der Ausmitten-Iteration.
 - `SCHRANKE = 0.0001` – Wann die Iteration als eingelaufen gilt -- Aenderung des Moments.
 - `HALBIERUNGEN = 14` – Durchlaeufe der Halbierung, die N_Rd sucht. Das Fenster ist so breit wie die getragene Kraft selbst; 14 Schritte bringen es auf deren Sechzehntausendstel, bei 2000 kN also auf ein Zehntel Kilonewton. Jeder weitere Schritt kostet eine vollstaendige Ausmitten-Iteration und aendert nichts mehr an der Zahl, die in der Tabelle steht.
@@ -283,6 +291,7 @@ dreissig Tabellen fuer eine einzige Zahl zu zeigen.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.nachweis.biegung_normalkraft]]
+- [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: fa658898a2d3
+erzeugt: 23bfb2862362
 art: modul
 tags: [modul]
 ---
@@ -43,8 +43,11 @@ Jede Analyse ([[opencivil.projekt.eintraege#SpannungsfallEintrag|SpannungsfallEi
 * die Kriechzahl;
 * der Wertesatz -- Bemessung (`f_cd`, `f_yd`) oder charakteristisch
   (`f_ck`, `f_yk`), siehe [[opencivil.nachweis.querschnittsloeser#Werkstoffsatz|Werkstoffsatz]];
-* die Rechenart -- Handrechnung Block 0.85·x, Block 0.85·x genau oder die
-  Parabel mit `E_c,eff`.
+* die Rechenart -- die 0.85·x-Vereinfachung oder praezise ohne Vereinfachung,
+  die Parabel mit `E_c,eff`. Die Handrechnung gibt es hier nicht
+  ([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]): eine Linie rechnet die
+  Normalkraft Ebene fuer Ebene genau, ein Polygon aus Eckpunkten haette dort
+  nichts zu suchen.
 
 Moduln und Grenzdehnungen sind in beiden Wertesaetzen dieselben, wie ueberall
 im Werkzeug.
@@ -690,7 +693,6 @@ sammelt die Formelsammlung ihr Thema.
 - [[Äquivalenter E-Modul über der Normalkraft]] · `_herleitung_modul`
 - [[Beiwert der Parabel, mit dem wirksamen Modul]] · `_herleitung`
 - [[Beton ungerissen, in Druck und Zug]] · `_herleitung`
-- [[Betonstahl nur auf Zug]] · `_herleitung`
 - [[Fliessdehnung]] · `_herleitung`
 - [[Grenzdehnungen am Ende der Linie]] · `_herleitung`
 - [[Grösste Dehnung auf halber Höhe]] · `_herleitung`

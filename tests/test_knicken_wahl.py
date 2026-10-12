@@ -9,7 +9,8 @@ mit eigener Herleitung, und im Diagramm steht sie neben der massgebenden.
 
 import unittest
 
-from opencivil.nachweis.resistenzlinie import Ebenenlinie, Handlinie
+from opencivil.nachweis.rechenwahl import Rechenart
+from opencivil.nachweis.resistenzlinie import Ebenenlinie
 from opencivil.projekt import KnickEintrag, Projekt, RechenwahlEintrag
 from opencivil.web import diagrammdaten
 
@@ -36,23 +37,47 @@ def text(loesung) -> str:
 
 
 class TestVorgabe(unittest.TestCase):
+    """
+    Verformung präzise, Widerstand mit der 0.85·x-Vereinfachung -- gegen die
+    Handrechnung der Tragsicherheit also eine eigene Linie. Die Handrechnung
+    gibt es beim Knicken nicht mehr (2026-10-12).
+    """
+
     @classmethod
     def setUpClass(cls):
         cls.aufbau, cls.knicken, cls.loesung = gerechnet()
 
-    def test_parabel_fuer_die_verformung(self):
+    def test_praezise_fuer_die_verformung(self):
         self.assertEqual(self.knicken.verformung.art.value, "parabel")
-        self.assertIn(r"\text{Parabel}", text(self.loesung))
+        self.assertIn(r"\text{Präzise ohne Vereinfachung}", text(self.loesung))
 
-    def test_der_widerstand_ist_die_linie_der_tragsicherheit(self):
-        self.assertFalse(self.knicken.eigene_linie)
-        self.assertIs(self.knicken.linie, self.aufbau.nachweise["q1.x"].massgebend)
-        self.assertIsInstance(self.knicken.linie, Handlinie)
-        self.assertIn("Dieselbe Wahl wie die Tragsicherheit", text(self.loesung))
+    def test_der_widerstand_mit_der_vereinfachung(self):
+        self.assertIs(self.knicken.widerstand.art, Rechenart.BLOCK)
+        self.assertTrue(self.knicken.eigene_linie)
+        self.assertIsInstance(self.knicken.linie, Ebenenlinie)
+        self.assertIn(r"x\text{-Vereinfachung}", text(self.loesung))
 
     def test_das_fenster_steht_wie_gerechnet(self):
         """Gerechnet wird bis eps_c2d = 3.5 ‰ -- so steht es auch da."""
         self.assertIn("-3.5 ‰ bis 45.0 ‰", text(self.loesung))
+
+    def test_im_diagramm_daneben(self):
+        linie = diagrammdaten.linie(self.aufbau.nachweise["q1.x"], self.aufbau)
+        self.assertIn("0.85·x-Vereinfachung", linie["knicklinie"]["beschriftung"])
+
+
+class TestGeteilteLinie(unittest.TestCase):
+    """Rechnet die Tragsicherheit mit der 0.85·x-Vereinfachung, ist es deren Linie."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.aufbau, cls.knicken, cls.loesung = gerechnet(
+            tragsicherheit=RechenwahlEintrag(rechenart="block"))
+
+    def test_der_widerstand_ist_die_linie_der_tragsicherheit(self):
+        self.assertFalse(self.knicken.eigene_linie)
+        self.assertIs(self.knicken.linie, self.aufbau.nachweise["q1.x"].massgebend)
+        self.assertIn("Dieselbe Wahl wie die Tragsicherheit", text(self.loesung))
 
     def test_im_diagramm_keine_eigene_linie(self):
         linie = diagrammdaten.linie(self.aufbau.nachweise["q1.x"], self.aufbau)
@@ -80,7 +105,7 @@ class TestEigeneLinie(unittest.TestCase):
 
     def test_im_diagramm_daneben(self):
         linie = diagrammdaten.linie(self.aufbau.nachweise["q1.x"], self.aufbau)
-        self.assertIn("Parabel", linie["knicklinie"]["beschriftung"])
+        self.assertIn("Präzise", linie["knicklinie"]["beschriftung"])
         self.assertGreater(len(linie["knicklinie"]["punkte"]), 100)
 
     def test_der_grenzpunkt_liegt_in_ihr(self):
@@ -101,9 +126,11 @@ class TestGleicheWahl(unittest.TestCase):
         _, anders, _ = gerechnet(widerstand=RechenwahlEintrag(kriechzahl=2.0, rechenart="parabel"),
                                  tragsicherheit=parabel)
         self.assertTrue(anders.eigene_linie)
-        # Bei der Handrechnung wirkt phi nicht: dieselbe Linie.
-        _, hand, _ = gerechnet(widerstand=RechenwahlEintrag(kriechzahl=3.0))
-        self.assertFalse(hand.eigene_linie)
+        # Bei der 0.85·x-Vereinfachung wirkt phi nicht: dieselbe Linie.
+        block = RechenwahlEintrag(rechenart="block")
+        _, gleich, _ = gerechnet(widerstand=RechenwahlEintrag(kriechzahl=3.0, rechenart="block"),
+                                 tragsicherheit=block)
+        self.assertFalse(gleich.eigene_linie)
 
 
 class TestVerformung(unittest.TestCase):
@@ -118,7 +145,7 @@ class TestVerformung(unittest.TestCase):
     def test_block_rechnet_auch(self):
         _, knicken, loesung = gerechnet(verformung=RechenwahlEintrag(rechenart="block"))
         self.assertTrue(knicken.ergebnisse[0].stabil)
-        self.assertIn(r"\text{Block }", text(loesung))
+        self.assertIn(r"x\text{-Vereinfachung}", text(loesung))
 
 
 class TestDatei(unittest.TestCase):
@@ -128,6 +155,22 @@ class TestDatei(unittest.TestCase):
         daten["querschnitte"][0]["knicken_wahl_verformung"] = {"rechenart": "elastisch"}
         with self.assertRaises(ProjektFehler):
             Projekt.aus_dict(daten)
+
+    def test_die_handrechnung_einer_alten_datei_wird_die_vereinfachung(self):
+        """Bis 2026-10-12 gab es sie beim Knicken -- gelesen wird sie als 0.85·x."""
+        daten = Projekt.beispiel().als_dict()
+        for feld in ("knicken_wahl_verformung", "knicken_wahl_widerstand"):
+            daten["querschnitte"][0][feld] = {"rechenart": "handrechnung"}
+        q = Projekt.aus_dict(daten).querschnitte[0]
+        self.assertEqual(q.knicken_wahl_verformung.rechenart, "block")
+        self.assertEqual(q.knicken_wahl_widerstand.rechenart, "block")
+
+    def test_von_hand_gesetzt_meldet_sich(self):
+        from opencivil.projekt import ProjektFehler
+        q = Projekt.beispiel().querschnitte[0]
+        q.knicken_wahl_widerstand = RechenwahlEintrag(rechenart="handrechnung")
+        with self.assertRaises(ProjektFehler):
+            q.pruefen()
 
 
 if __name__ == "__main__":

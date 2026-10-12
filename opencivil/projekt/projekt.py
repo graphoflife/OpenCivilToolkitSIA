@@ -422,16 +422,15 @@ class Projekt(Beschreibung):
         decke.zwaengung_biegung_kriechzahl = 2.0
         decke.haeufig.wahl.kriechzahl = decke.quasistaendig.wahl.kriechzahl = 2.0
         decke.knicken_wahl_verformung.kriechzahl = 2.0
-        # Drei Linien der Spannung-Dehnung-Analyse -- sie schreiben ihre
-        # Herleitung für die Formelsammlung: mit Parabel, mit Block und
-        # charakteristischen Werten, und mit der Handrechnung.
+        # Zwei Linien der Spannung-Dehnung-Analyse -- sie schreiben ihre
+        # Herleitung für die Formelsammlung: präzise, und mit der
+        # 0.85·x-Vereinfachung und charakteristischen Werten. Eine
+        # Handrechnung gibt es dort nicht mehr (2026-10-12).
         decke.spannungsfall("Biegung mit Druck", art="moment_kruemmung", N_Ed=-300,
                             kriechzahl=2.0)
         decke.spannungsfall("Zug mit Moment", art="normalkraft_dehnung", M_Ed=30,
                             kriechzahl=1.0, werkstoffsatz="charakteristisch",
                             rechenart="block")
-        decke.spannungsfall("Biegung von Hand", art="moment_kruemmung",
-                            rechenart="handrechnung")
         # Der äquivalente E-Modul, einmal über dem Moment und einmal über der
         # Normalkraft bei festem Moment -- dort zählt er ab dem Zustand ohne N.
         decke.spannungsfall("Biegesteifigkeit", art="moment_emodul",
@@ -451,10 +450,12 @@ class Projekt(Beschreibung):
         dach.quasistaendig.wahl.kriechzahl = 2.0
 
         # Jede Rechenwahl einmal laut. Die Platte «Parabel» haelt die
-        # Tragsicherheit mit der Parabel und charakteristischen Werten -- M_Rk,
+        # Tragsicherheit praezise mit charakteristischen Werten -- M_Rk,
         # m_Rk in der Querkraft, sproedes Versagen --, rechnet die
-        # Stahlspannungen mit Block und Parabel und knickt mit eigener
-        # Linie: Verformung mit dem Block, Widerstand von Hand.
+        # Stahlspannungen mit 0.85·x und praezise und knickt mit eigener
+        # Linie: Verformung mit 0.85·x, Widerstand praezise mit
+        # Bemessungswerten. Die «Decke» knickt mit der Vorgabe 0.85·x gegen
+        # ihre Handrechnung, also ebenfalls mit eigener Linie.
         genau = p.platte("Parabel", h=250, x=[12, 10], y=[10, 10],
                          rissanforderung="erhoeht", sproede=True)
         genau.tragsicherheit_wahl = RechenwahlEintrag(
@@ -468,9 +469,9 @@ class Projekt(Beschreibung):
             kriechzahl=2.0, werkstoffsatz="charakteristisch", rechenart="parabel")
         genau.knickfall("Stütze", N_Ed=-600, M_Ed_1=10, laenge=3.0)
         genau.knicken_wahl_verformung = RechenwahlEintrag(rechenart="block")
-        genau.knicken_wahl_widerstand = RechenwahlEintrag(rechenart="handrechnung")
+        genau.knicken_wahl_widerstand = RechenwahlEintrag(rechenart="parabel")
 
-        # Die Platte «Block» haelt die Tragsicherheit mit dem Block genau,
+        # Die Platte «Block» haelt die Tragsicherheit mit der 0.85·x-Vereinfachung,
         # einmal bei festem Moment -- dort zeigt die Probe die Normalkraft --,
         # rechnet die Stahlspannung von Hand und knickt gegen dieselbe Linie.
         block = p.platte("Block", h=220, x=[10, 10], y=[8, 8])

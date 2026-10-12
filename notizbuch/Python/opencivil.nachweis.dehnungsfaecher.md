@@ -1,5 +1,5 @@
 ---
-erzeugt: 639ad495c279
+erzeugt: 1bfbc1fa4afe
 art: modul
 tags: [modul]
 ---
@@ -138,6 +138,7 @@ Hoehe, wie in [[opencivil.querschnitt.fasern]].
 ## Gebraucht von
 
 - [[opencivil.nachweis.biegung_normalkraft]]
+- [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.spannungsanalyse]]

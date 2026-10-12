@@ -48,10 +48,10 @@ const laufendeSuche = new Set();
 const HILFE = {
   tragsicherheit: {
     zeilen: [
-      ['M-N', 'Resistenzlinie nach Rechenwahl; Vorgabe von Hand, Block 0.85·x, Druckstahl weggelassen'],
+      ['M-N', 'Resistenzlinie nach Rechenwahl; Vorgabe Handrechnung: Block 0.85·x, Druckstahl weggelassen'],
       ['V', 'ohne Bügel k_d·τ_cd·d_v mit m_R aus derselben Linie, mit Bügeln Fachwerk bei günstigster Neigung'],
       ['Werte', 'M-N nach Rechenwahl: Bemessung (f_cd, f_yd → M_Rd) oder charakteristisch (f_ck, f_yk → M_Rk); V mit τ_cd, f_yd'],
-      ['φ', 'nach Rechenwahl, nur bei der Parabel → E_c,eff = E_cm / (1 + φ)'],
+      ['φ', 'nach Rechenwahl, nur präzise → E_c,eff = E_cm / (1 + φ)'],
     ],
     formel: 'α_eff = Widerstand / Einwirkung ≥ 1',
   },
@@ -83,7 +83,7 @@ const HILFE = {
     zeilen: [
       ['Weg', 'Stahlspannung am gerissenen Querschnitt, an der am stärksten gezogenen Lage'],
       ['Werte', 'nach Rechenwahl; Vorgabe charakteristisch (f_ck, f_yk), elastisch'],
-      ['φ', 'nach Rechenwahl → E_c,eff = E_cm / (1 + φ), bei Parabel und elastisch'],
+      ['φ', 'nach Rechenwahl → E_c,eff = E_cm / (1 + φ), präzise und elastisch'],
     ],
     formel: 'σ_s ≤ σ_s,adm (Tab. 17)',
   },
@@ -91,7 +91,7 @@ const HILFE = {
     zeilen: [
       ['Weg', 'Stahlspannung am gerissenen Querschnitt, an der am stärksten gezogenen Lage'],
       ['Werte', 'nach Rechenwahl; Vorgabe charakteristisch (f_ck, f_yk), elastisch; Grenze aus f_yd'],
-      ['φ', 'nach Rechenwahl → E_c,eff = E_cm / (1 + φ), bei Parabel und elastisch'],
+      ['φ', 'nach Rechenwahl → E_c,eff = E_cm / (1 + φ), präzise und elastisch'],
     ],
     formel: 'σ_s ≤ f_yd − 80 N/mm²',
   },
@@ -99,9 +99,9 @@ const HILFE = {
     zeilen: [
       ['Weg', 'verformtes System: e_0d + e_1d + e_2d, iteriert über die Krümmung'],
       ['N_Rd', 'grösste Druckkraft mit Gleichgewichtslage'],
-      ['Verformung', 'Rechenwahl für e_2d; Vorgabe Parabel, Bemessung (f_cd, f_yd)'],
-      ['Widerstand', 'Rechenwahl für N_Rd(M_Ed = N_Ed·e_tot); Vorgabe Handrechnung, Bemessung; gleich wie die Tragsicherheit gewählt: deren Linie'],
-      ['φ', 'je Wahl, nur bei der Parabel → E_c,eff = E_cm / (1 + φ)'],
+      ['Verformung', 'Rechenwahl für e_2d, ohne Handrechnung; Vorgabe präzise, Bemessung (f_cd, f_yd)'],
+      ['Widerstand', 'Rechenwahl für N_Rd(M_Ed = N_Ed·e_tot), ohne Handrechnung; Vorgabe 0.85·x, Bemessung; gleich wie die Tragsicherheit gewählt: deren Linie'],
+      ['φ', 'je Wahl, nur präzise → E_c,eff = E_cm / (1 + φ)'],
     ],
     formel: 'α_eff = N_Rd / |N_Ed|',
   },
@@ -296,10 +296,13 @@ function knickBlock(querschnitt) {
     el('div.unterkapitel-kopf', {}, [el('span', { text: 'Knicken' }), hilfe('knicken')]),
     // Zwei Wahlen: womit die Verformung gerechnet wird und womit der
     // Querschnitt widersteht.
+    // Ohne Handrechnung: beim Knicken zählt die Normalkraft genau.
     rechenwahlZeile('Verformung (e_2d)', querschnitt.knicken_wahl_verformung,
-      (veraenderer) => aendern((q) => veraenderer(q.knicken_wahl_verformung))),
+      (veraenderer) => aendern((q) => veraenderer(q.knicken_wahl_verformung)),
+      { arten: 'faserarten' }),
     rechenwahlZeile('Widerstand (N_Rd)', querschnitt.knicken_wahl_widerstand,
-      (veraenderer) => aendern((q) => veraenderer(q.knicken_wahl_widerstand))),
+      (veraenderer) => aendern((q) => veraenderer(q.knicken_wahl_widerstand)),
+      { arten: 'faserarten' }),
     faelle.length
       ? el('div.einwirkung.ist-knick.ist-kopf', {}, [
         el('span'),
@@ -784,8 +787,9 @@ function mitKopf(kopf, eingabe, formel = false) {
  * Die Felder einer Rechenwahl: Kriechzahl φ, Werte und Rechenart -- in jedem
  * Kapitel und in jeder Analyse dieselben drei. `ziel` trägt die Felder
  * `kriechzahl`, `werkstoffsatz` und `rechenart`, `aendern` ändert es im
- * Projekt. `arten` sagt, welche Rechenarten gelten: `rechenarten` oder, bei
- * den Stahlspannungen, `spannungsarten`. Wirkt φ bei der gewählten Art
+ * Projekt. `arten` sagt, welche Rechenarten gelten: `rechenarten`, bei den
+ * Stahlspannungen `spannungsarten`, beim Knicken und in den Analysen
+ * `faserarten` (ohne Handrechnung). Wirkt φ bei der gewählten Art
  * nicht, steht das Feld blass da -- es bleibt aber stehen, damit die Zahl
  * nicht verloren geht, wenn man die Art wieder wechselt.
  */
@@ -797,7 +801,7 @@ function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten' } = {}) {
   const kurz = (l) => (l || []).map((e) => ({ wert: e.wert, beschriftung: e.kurz }));
   const phi = mitKopf('φ', zahlfeld({
     wert: ziel.kriechzahl ?? 0, schritt: 0.1, min: 0, leer: 0,
-    titel: 'Kriechzahl φ – wirkt bei der Parabel und elastisch',
+    titel: 'Kriechzahl φ – wirkt präzise und elastisch',
     beiAenderung: (v) => aendern((x) => { x.kriechzahl = v; }),
   }), true);
   if (art && !art.mit_kriechzahl) phi.classList.add('ist-ohne-wirkung');
@@ -907,8 +911,9 @@ function spannungsZeile(querschnitt, index) {
     ...bauplan.felder().map((eingabe, i) => mitKopf(bauplan.kopf[i] || '', eingabe)),
     richtungsWahl(k.richtung || 'x', (wert) => aendern((x) => { x.richtung = wert; }),
       ['x', 'y']),
-    // Womit gerechnet wird -- je Analyse, wie in den Kapiteln.
-    ...rechenwahlFelder(k, aendern),
+    // Womit gerechnet wird -- je Analyse, wie in den Kapiteln, aber ohne
+    // Handrechnung: eine Linie rechnet die Normalkraft genau.
+    ...rechenwahlFelder(k, aendern, { arten: 'faserarten' }),
     el('button.weg', {
       text: '×', title: 'Analyse entfernen',
       on: {

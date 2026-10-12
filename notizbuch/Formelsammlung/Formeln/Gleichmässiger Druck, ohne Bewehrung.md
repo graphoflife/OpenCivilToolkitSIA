@@ -1,5 +1,5 @@
 ---
-erzeugt: d58ab99c01ae
+erzeugt: 4d420cc18f1c
 art: formel
 tags: [formel]
 ---
@@ -33,7 +33,6 @@ $$
 ## Themen
 
 - [[Biegung und Normalkraft]]
-- [[Knicken]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
