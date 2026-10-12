@@ -1,5 +1,5 @@
 ---
-erzeugt: ef15e627394c
+erzeugt: 1af4b3c9b481
 art: modul
 tags: [modul]
 ---
@@ -163,6 +163,18 @@ die Objekte umzuhaengen, die sie hervorgebracht haben.
 - `ausgaben: Mapping[str, Any]`
 - `urteile: Tuple['NachweisUrteil', ...] = ()`
 - `befund: Any = None`
+
+### Fallbefund
+
+```python
+@dataclass
+class Fallbefund
+```
+
+Der Befund eines Nachweises, der je Fall oder je Lage rechnet: was er
+dabei fand, in der Reihenfolge seiner Urteile.
+
+- `ergebnisse: list = field(default_factory=list)`
 
 ### Berechnung
 

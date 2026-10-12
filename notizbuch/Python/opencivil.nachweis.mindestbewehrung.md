@@ -1,5 +1,5 @@
 ---
-erzeugt: 5a1a71ee8c01
+erzeugt: b65241ffc5c4
 art: modul
 tags: [modul]
 ---
@@ -176,7 +176,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 #### Rissnormalkraft._n_riss
 
 ```python
-def _n_riss(self) -> Wert
+def _n_riss(self, groessen: Rissgroessen) -> Wert
 ```
 
 Die Risskraft -- die Einwirkung in Tabelle und Herleitung.

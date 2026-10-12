@@ -30,6 +30,10 @@ class Gelaufen:
     def urteile(self):
         return [u for u in self.loesung.urteile if u.raum == self.nachweis.id]
 
+    @property
+    def ergebnisse(self):
+        return self.loesung.befund(self.nachweis).ergebnisse
+
     def __getattr__(self, name):
         return getattr(self.nachweis, name)
 
@@ -65,6 +69,10 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         for name, wert in abweichungen.items():
             setzen(q, name, wert)
         return projekt
+
+    def nachweis(self, projekt):
+        aufbau, loesung = rechnen(projekt)
+        return Gelaufen(aufbau.spannung["q1.x"], loesung)
 
     def test_bei_normaler_anforderung_entfaellt_er(self):
         """
@@ -104,8 +112,7 @@ class TestSpannungsbegrenzung(unittest.TestCase):
 
     def test_die_ebene_erzeugt_die_einwirkung(self):
         """Das ist die Aussage der Mitschrift -- also wird sie geprüft."""
-        aufbau, _ = urteile(self.projekt("hoch"))
-        for erg in aufbau.spannung["q1.x"].ergebnisse:
+        for erg in self.nachweis(self.projekt("hoch")).ergebnisse:
             with self.subTest(fall=erg.fall.name):
                 self.assertTrue(erg.konvergiert)
                 self.assertAlmostEqual(erg.N_int, erg.fall.N_Ed.si,
@@ -114,8 +121,7 @@ class TestSpannungsbegrenzung(unittest.TestCase):
                                        delta=max(1.0, abs(erg.fall.M_Ed.si) * 1e-5))
 
     def test_die_siebzig_prozent_kommen_aus_dem_kern(self):
-        aufbau, _ = urteile(self.projekt("hoch"))
-        faelle = {e.fall.name: e.fall for e in aufbau.spannung["q1.x"].ergebnisse}
+        faelle = {e.fall.name: e.fall for e in self.nachweis(self.projekt("hoch")).ergebnisse}
         self.assertIn("Feld (70 %)", faelle)
         self.assertAlmostEqual(faelle["Feld (70 %)"].M_Ed.si / 1e3, 70.0, delta=0.01)
 
@@ -145,8 +151,7 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         q = projekt.querschnitte[0]
         q.haeufig.aus_tragsicherheit = False
         q.haeufig.faelle = [GebrauchsfallEintrag("Leer", M_Ed=0.0, N_Ed=0.0)]
-        aufbau, _ = urteile(projekt)
-        leer = next(e for e in aufbau.spannung["q1.x"].ergebnisse if e.fall.name == "Leer")
+        leer = next(e for e in self.nachweis(projekt).ergebnisse if e.fall.name == "Leer")
         self.assertEqual(leer.erfuellungsgrad, float("inf"))
         self.assertTrue(leer.erfuellt)
 
@@ -155,10 +160,8 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         viel = self.projekt("hoch")
         for k in viel.querschnitte[0].kombinationen:
             k.M_Ed *= 1.5
-        a, _ = urteile(wenig)
-        b, _ = urteile(viel)
-        self.assertLess(a.spannung["q1.x"].ergebnisse[0].sigma_s,
-                        b.spannung["q1.x"].ergebnisse[0].sigma_s)
+        self.assertLess(self.nachweis(wenig).ergebnisse[0].sigma_s,
+                        self.nachweis(viel).ergebnisse[0].sigma_s)
 
 
 
@@ -213,8 +216,9 @@ class TestStahlspannungAusRissbreite(unittest.TestCase):
 
     def test_der_haeufige_anteil_ist_einstellbar(self):
         projekt = self.projekt("hoch", haeufig__anteil=80.0)
-        aufbau, _ = urteile(projekt)
-        faelle = {e.fall.name: e.fall for e in aufbau.spannung["q1.x"].ergebnisse}
+        aufbau, loesung = rechnen(projekt)
+        faelle = {e.fall.name: e.fall
+                  for e in Gelaufen(aufbau.spannung["q1.x"], loesung).ergebnisse}
         self.assertAlmostEqual(faelle["Feld (80 %)"].M_Ed.si / 1e3, 80.0)
 
     def test_ohne_schalter_still_mit_schalter_laut(self):
@@ -362,10 +366,10 @@ class TestGebrauchsfallPruefung(unittest.TestCase):
         q.rissanforderung = "hoch"
         q.haeufig.faelle = [GebrauchsfallEintrag("Dauer", M_Ed=50.0)]
         q.quasistaendig.faelle = [GebrauchsfallEintrag("Dauer", M_Ed=40.0)]
-        aufbau, _ = urteile(projekt)
-        self.assertIn("Dauer", [e.fall.name for e in aufbau.spannung["q1.x"].ergebnisse])
-        self.assertIn("Dauer", [e.fall.name
-                                for e in aufbau.spannung_riss["q1.x"].ergebnisse])
+        aufbau, loesung = rechnen(projekt)
+        for nachweis in (aufbau.spannung["q1.x"], aufbau.spannung_riss["q1.x"]):
+            self.assertIn("Dauer", [e.fall.name
+                                    for e in Gelaufen(nachweis, loesung).ergebnisse])
 
     def test_namen_die_auf_dieselbe_kennung_fallen(self):
         """«Feld A» und «Feld-A» werden beide zu Feld_A."""

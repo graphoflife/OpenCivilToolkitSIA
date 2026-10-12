@@ -44,7 +44,8 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    Ausfuehrung, Eingabebezug, Eingaben, Fallbefund, Nachweis, NachweisUrteil, grad_def,
+    grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, MM, Groesse
 from opencivil.core.latex import angabe, vergleich
@@ -234,8 +235,6 @@ class Rissnormalkraft(Nachweis):
         self.richtung = richtung
         self.anforderung = anforderung
         self.begrenzt = begrenzt
-        self.ergebnisse: List[Lagenergebnis] = []
-        self.groessen: Optional[Rissgroessen] = None
 
         # Genau zwei Lagen je Richtung -- auch die leeren, denn gerade sie
         # fallen durch und sollen es sichtbar tun.
@@ -295,27 +294,26 @@ class Rissnormalkraft(Nachweis):
         b = e.g("b").si
         f_ctm = e.g("f_ctm").si
 
-        self.groessen = rissnormalkraft(h=h, b=b, f_ctm=f_ctm,
-                                        begrenzt=self.begrenzt)
-        self._protokoll_ansatz(p, e)
+        groessen = rissnormalkraft(h=h, b=b, f_ctm=f_ctm, begrenzt=self.begrenzt)
+        self._protokoll_ansatz(p, e, groessen)
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
-        self.ergebnisse = []
+        befund = Fallbefund()
 
         for lage in self.lagen:
-            erg = self._eine_lage(e, lage, f_ctm=f_ctm)
-            self.ergebnisse.append(erg)
-            self._protokoll_lage(p, e, erg)
+            erg = self._eine_lage(e, lage, f_ctm=f_ctm, groessen=groessen)
+            befund.ergebnisse.append(erg)
+            self._protokoll_lage(p, e, erg, groessen)
             ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
                 erg.erfuellungsgrad, EINHEITSLOS)
-            urteile.append(self._urteil(erg))
+            urteile.append(self._urteil(erg, groessen))
 
         self.protokoll_massgebend(p, urteile)
-        return Ausfuehrung(ergebnis, self.teilurteile(urteile))
+        return Ausfuehrung(ergebnis, self.teilurteile(urteile), befund)
 
     def _eine_lage(self, e: Eingaben, lage: Bewehrungslage, *,
-                   f_ctm: float) -> Lagenergebnis:
+                   f_ctm: float, groessen: Rissgroessen) -> Lagenergebnis:
         erg = Lagenergebnis(lage=lage)
         eintraege = self.posten_je_lage[lage.nummer]
         marken = [f"{lage.nummer}{art.kuerzel}" for _, art, _, _, _ in eintraege]
@@ -336,7 +334,7 @@ class Rissnormalkraft(Nachweis):
             durchmesser=erg.durchmesser)
         erg.N_s_adm = erg.a_s * erg.sigma_s_adm
 
-        N_Riss = self.groessen.N_Riss
+        N_Riss = groessen.N_Riss
         erg.erfuellungsgrad = (float("inf") if N_Riss == 0
                                else erg.N_s_adm / N_Riss)
         erg.erfuellt = erg.N_s_adm >= N_Riss
@@ -346,9 +344,9 @@ class Rissnormalkraft(Nachweis):
             f"N_Riss = {N_Riss / 1e3:.1f} kN.")
         return erg
 
-    def _n_riss(self) -> Wert:
+    def _n_riss(self, groessen: Rissgroessen) -> Wert:
         """Die Risskraft -- die Einwirkung in Tabelle und Herleitung."""
-        return Zwischenwerte(self.id).kraft("N_Riss", "N_{Riss}", self.groessen.N_Riss,
+        return Zwischenwerte(self.id).kraft("N_Riss", "N_{Riss}", groessen.N_Riss,
                                             "Einwirkung")
 
     def _n_s_adm(self, erg: Lagenergebnis) -> Wert:
@@ -357,9 +355,9 @@ class Rissnormalkraft(Nachweis):
         return Zwischenwerte(f"{self.id}.lage{nummer}").kraft(
             "N_s_adm", rf"N_{{s,adm,{nummer},{r}}}", erg.N_s_adm, "Widerstand")
 
-    def _urteil(self, erg: Lagenergebnis) -> NachweisUrteil:
+    def _urteil(self, erg: Lagenergebnis, groessen: Rissgroessen) -> NachweisUrteil:
         nummer = erg.lage.nummer
-        einwirkung, widerstand = self._n_riss(), self._n_s_adm(erg)
+        einwirkung, widerstand = self._n_riss(groessen), self._n_s_adm(erg)
         return NachweisUrteil(
             art="N_Riss",
             ziel=self.d_ausnutzung[nummer].id,
@@ -374,8 +372,7 @@ class Rissnormalkraft(Nachweis):
 
     # -- Mitschrift ---------------------------------------------------------
 
-    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
-        g = self.groessen
+    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, g: Rissgroessen) -> None:
         werte = Zwischenwerte(self.id)
         p.titel(f"Sprödes Versagen unter Zwängung – {self.richtung.beschriftung}")
         p.erklaerung(
@@ -396,12 +393,12 @@ class Rissnormalkraft(Nachweis):
         f_ct_eff = protokoll_zugfestigkeit(
             p, werte, k_t=g.k_t, f_ct_eff=g.f_ct_eff, h=h_eff, f_ctm=e["f_ctm"],
             teiler=1, referenz="SIA 262:2025, 4.4.2")
-        p.formel(self._n_riss(), r"\frac{@h_eff}{2} \cdot @b \cdot @f_ct_eff",
+        p.formel(self._n_riss(g), r"\frac{@h_eff}{2} \cdot @b \cdot @f_ct_eff",
                  {"h_eff": h_eff, "b": e["b"], "f_ct_eff": f_ct_eff},
                  titel="Risskraft der gezogenen Querschnittshälfte")
 
-    def _protokoll_lage(self, p: Protokoll, e: Eingaben,
-                        erg: Lagenergebnis) -> None:
+    def _protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Lagenergebnis,
+                        groessen: Rissgroessen) -> None:
         nummer = erg.lage.nummer
         p.titel(f"Rissnormalkraft – {nummer}. Lage {self.richtung.value}", ebene=3)
 
@@ -415,7 +412,7 @@ class Rissnormalkraft(Nachweis):
         sigma = _protokoll_stahlspannung(p, e, werte, erg, eintraege=eintraege,
                                          anforderung=self.anforderung)
 
-        n_s_adm, n_riss = self._n_s_adm(erg), self._n_riss()
+        n_s_adm, n_riss = self._n_s_adm(erg), self._n_riss(groessen)
         p.formel(n_s_adm, r"@A_s \cdot @sigma", {"A_s": a_s, "sigma": sigma},
                  titel="Aufnehmbare Risskraft",
                  nachsatz=vergleich(r"\ge", angabe(n_riss), erg.erfuellt))
@@ -496,8 +493,6 @@ class ZwaengungBiegung(Nachweis):
         self.richtung = richtung
         self.anforderung = anforderung
         self.kriechzahl = kriechzahl
-        self.ergebnisse: List[Momentlagenergebnis] = []
-        self.groessen: Optional[Momentgroessen] = None
 
         gewaehlt = sorted(set(lagen))
         self.lagen = [l for l in querschnitt.lagen
@@ -565,27 +560,28 @@ class ZwaengungBiegung(Nachweis):
         E_cm = e.g("E_cm").si
         phi = self.kriechzahl
 
-        self.groessen = rissmoment(h=h, b=b, f_ctm=f_ctm)
-        self._protokoll_ansatz(p, e)
+        groessen = rissmoment(h=h, b=b, f_ctm=f_ctm)
+        self._protokoll_ansatz(p, e, groessen)
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
-        self.ergebnisse = []
+        befund = Fallbefund()
 
         for lage in self.lagen:
-            erg = self._eine_lage(e, lage, h=h, b=b, f_ctm=f_ctm, E_cm=E_cm, phi=phi)
-            self.ergebnisse.append(erg)
-            self._protokoll_lage(p, e, erg)
+            erg = self._eine_lage(e, lage, h=h, b=b, f_ctm=f_ctm, E_cm=E_cm, phi=phi,
+                                  M_Riss=groessen.M_Riss)
+            befund.ergebnisse.append(erg)
+            self._protokoll_lage(p, e, erg, groessen)
             ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
                 erg.erfuellungsgrad, EINHEITSLOS)
-            urteile.append(self._urteil(erg))
+            urteile.append(self._urteil(erg, groessen))
 
         self.protokoll_massgebend(p, urteile)
-        return Ausfuehrung(ergebnis, self.teilurteile(urteile))
+        return Ausfuehrung(ergebnis, self.teilurteile(urteile), befund)
 
     def _eine_lage(self, e: Eingaben, lage: Bewehrungslage, *, h: float,
-                   b: float, f_ctm: float, E_cm: float,
-                   phi: float) -> Momentlagenergebnis:
+                   b: float, f_ctm: float, E_cm: float, phi: float,
+                   M_Riss: float) -> Momentlagenergebnis:
         erg = Momentlagenergebnis(lage=lage)
         eintraege = self.posten_je_lage[lage.nummer]
         marken = [f"{lage.nummer}{art.kuerzel}" for _, art, _, _, _ in eintraege]
@@ -616,7 +612,6 @@ class ZwaengungBiegung(Nachweis):
         erg.hebelarm = riss.z
         erg.M_s_adm = erg.sigma_s_adm * erg.a_s * erg.hebelarm
 
-        M_Riss = self.groessen.M_Riss
         erg.erfuellungsgrad = (float("inf") if M_Riss == 0
                                else erg.M_s_adm / M_Riss)
         erg.erfuellt = erg.M_s_adm >= M_Riss
@@ -633,9 +628,9 @@ class ZwaengungBiegung(Nachweis):
         return Zwischenwerte(f"{self.id}.lage{nummer}").moment(
             "M_s_adm", rf"M_{{s,adm,{nummer},{r}}}", erg.M_s_adm, "Widerstand")
 
-    def _urteil(self, erg: Momentlagenergebnis) -> NachweisUrteil:
+    def _urteil(self, erg: Momentlagenergebnis, groessen: Momentgroessen) -> NachweisUrteil:
         nummer = erg.lage.nummer
-        einwirkung = rissmoment_wert(self.id, self.groessen)
+        einwirkung = rissmoment_wert(self.id, groessen)
         widerstand = self._m_s_adm(erg)
         return NachweisUrteil(
             art="ZB",
@@ -651,7 +646,8 @@ class ZwaengungBiegung(Nachweis):
 
     # -- Mitschrift ---------------------------------------------------------
 
-    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
+    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben,
+                          groessen: Momentgroessen) -> None:
         p.titel(f"Zwängung auf Biegung – {self.richtung.beschriftung}")
         p.erklaerung(
             "Eine aufgezwungene Krümmung erzeugt beim Reissen ein Moment, das "
@@ -660,7 +656,7 @@ class ZwaengungBiegung(Nachweis):
             "gegen sprödes Versagen: dort steht der Biegewiderstand gegen das "
             "Rissmoment, hier die Stahlspannung gegen ihre Grenze."
         )
-        protokoll_rissmoment(p, e, self.groessen, basis=self.id,
+        protokoll_rissmoment(p, e, groessen, basis=self.id,
                              referenz="SIA 262:2025, 4.4.2")
         p.erklaerung(
             "Das Rissmoment gilt für den ungerissenen Bruttoquerschnitt – den "
@@ -684,8 +680,8 @@ class ZwaengungBiegung(Nachweis):
             "Hebelarm und liegt auf der sicheren Seite."
         )
 
-    def _protokoll_lage(self, p: Protokoll, e: Eingaben,
-                        erg: Momentlagenergebnis) -> None:
+    def _protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Momentlagenergebnis,
+                        groessen: Momentgroessen) -> None:
         nummer = erg.lage.nummer
         p.titel(f"Zwängung auf Biegung – {nummer}. Lage {self.richtung.value}", ebene=3)
 
@@ -715,7 +711,7 @@ class ZwaengungBiegung(Nachweis):
             "deshalb bei x/3 von dieser Kante."
         )
 
-        m_s_adm, m_riss = self._m_s_adm(erg), rissmoment_wert(self.id, self.groessen)
+        m_s_adm, m_riss = self._m_s_adm(erg), rissmoment_wert(self.id, groessen)
         p.formel(m_s_adm, r"@sigma \cdot @A_s \cdot @z",
                  {"sigma": sigma, "A_s": a_s, "z": hebelarm},
                  titel="Aufnehmbares Moment der Bewehrung",

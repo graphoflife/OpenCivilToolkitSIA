@@ -69,7 +69,8 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    Ausfuehrung, Eingabebezug, Eingaben, Fallbefund, Nachweis, NachweisUrteil, grad_def,
+    grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, N_PRO_MM2, Groesse
 from opencivil.core.latex import als_text, angabe, bedingung, vergleich
@@ -462,7 +463,6 @@ class Spannungsbegrenzung(Nachweis):
         self.faelle = list(faelle)
         self.grenze = grenze
         self.wahl = wahl
-        self.ergebnisse: List[Fallergebnis] = []
         self.staehle = {kennung_aus(s.id): s for s in grenze.staehle}
         """Die Staehle dieser Richtung, nach Kennung -- wie die Lagen sie nennen."""
 
@@ -512,20 +512,20 @@ class Spannungsbegrenzung(Nachweis):
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
-        self.ergebnisse = []
+        befund = Fallbefund()
 
         for fall in self.faelle:
             # Ausgeschaltete Lastfaelle rechnen mit und schweigen dabei.
             leise = self.leise(fall.name)
             erg = self._einen_fall(loeser, fall, sigma_adm)
-            self.ergebnisse.append(erg)
+            befund.ergebnisse.append(erg)
             if not leise:
                 self._protokoll_fall(p, e, erg)
             ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(
                 erg.erfuellungsgrad, EINHEITSLOS)
             urteile.append(self._urteil(erg, still=leise))
 
-        return Ausfuehrung(ergebnis, urteile)
+        return Ausfuehrung(ergebnis, urteile, befund)
 
     def _einen_fall(self, loeser: Querschnittsloeser, fall: Gebrauchsfall,
                     sigma_adm: Dict[str, float]) -> Fallergebnis:

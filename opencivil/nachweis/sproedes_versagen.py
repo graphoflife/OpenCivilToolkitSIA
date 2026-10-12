@@ -34,10 +34,11 @@ die halbe Hoehe wie beim Zwang (SIA 262:2025, 4.4.1.3).
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, List, Sequence
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    Ausfuehrung, Eingabebezug, Eingaben, Fallbefund, Nachweis, NachweisUrteil, grad_def,
+    grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, M, Groesse
 from opencivil.core.latex import angabe, bedingung
@@ -181,8 +182,6 @@ class SproedesVersagen(Nachweis):
         self.querschnitt = querschnitt
         self.richtung = richtung
         self.mn = mn_nachweis
-        self.ergebnisse: List[Lagenergebnis] = []
-        self.groessen: Optional[Rissgroessen] = None
 
         r = richtung.value
         basis = f"{querschnitt.id}.nachweis.sproede.{r}"
@@ -226,17 +225,17 @@ class SproedesVersagen(Nachweis):
         b = e.g("b").si
         f_ctm = e.g("f_ctm").si
 
-        self.groessen = rissmoment(h=h, b=b, f_ctm=f_ctm)
-        self._protokoll_ansatz(p, e)
+        groessen = rissmoment(h=h, b=b, f_ctm=f_ctm)
+        self._protokoll_ansatz(p, e, groessen)
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
-        self.ergebnisse = []
+        befund = Fallbefund()
 
         for lage in self.lagen:
             erg = Lagenergebnis(lage=lage)
             erg.M_Rd = abs(e.g(f"M_Rd_{lage.nummer}").si)
-            M_Riss = self.groessen.M_Riss
+            M_Riss = groessen.M_Riss
 
             if erg.M_Rd <= 0.0:
                 seite = "unten" if lage.von_unten else "oben"
@@ -251,14 +250,14 @@ class SproedesVersagen(Nachweis):
                     f"M_{self.mn.wahl.index}(N_Ed = 0) = {erg.M_Rd / 1e3:.1f} kNm "
                     f"{'≥' if erg.erfuellt else '<'} M_Riss = {M_Riss / 1e3:.1f} kNm.")
 
-            self.ergebnisse.append(erg)
-            self._protokoll_lage(p, erg)
+            befund.ergebnisse.append(erg)
+            self._protokoll_lage(p, erg, groessen)
             ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
                 erg.erfuellungsgrad, EINHEITSLOS)
-            urteile.append(self._urteil(erg))
+            urteile.append(self._urteil(erg, groessen))
 
         self.protokoll_massgebend(p, urteile)
-        return Ausfuehrung(ergebnis, self.teilurteile(urteile))
+        return Ausfuehrung(ergebnis, self.teilurteile(urteile), befund)
 
     def _m_rd(self, erg: Lagenergebnis) -> Wert:
         """Der Biegewiderstand der Lage -- der Widerstand in Tabelle und Herleitung."""
@@ -267,7 +266,7 @@ class SproedesVersagen(Nachweis):
             "M_Rd", rf"M_{{{self.mn.wahl.index},{r}}}(N_{{Ed}} = 0)_{{{nummer}}}", erg.M_Rd,
             "Widerstand")
 
-    def _urteil(self, erg: Lagenergebnis) -> NachweisUrteil:
+    def _urteil(self, erg: Lagenergebnis, groessen: Rissgroessen) -> NachweisUrteil:
         nummer = erg.lage.nummer
         return NachweisUrteil(
             art="SV",
@@ -277,13 +276,13 @@ class SproedesVersagen(Nachweis):
             erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
             begruendung=erg.begruendung,
             hinweis=erg.hinweis,
-            einwirkung=rissmoment_wert(self.id, self.groessen) if erg.machbar else None,
+            einwirkung=rissmoment_wert(self.id, groessen) if erg.machbar else None,
             widerstand=self._m_rd(erg) if erg.machbar else None,
         )
 
     # -- Mitschrift ---------------------------------------------------------
 
-    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
+    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, groessen: Rissgroessen) -> None:
         p.titel(f"Sprödes Versagen – {self.richtung.beschriftung}")
         p.erklaerung(
             "Ein zu schwach bewehrter Querschnitt reisst und versagt im selben "
@@ -291,10 +290,11 @@ class SproedesVersagen(Nachweis):
             "Querschnitt mehr trägt als der unbewehrte im Augenblick des "
             f"Risses: M_{self.mn.wahl.index}(N_Ed = 0) ≥ M_Riss."
         )
-        protokoll_rissmoment(p, e, self.groessen, basis=self.id,
+        protokoll_rissmoment(p, e, groessen, basis=self.id,
                              referenz="SIA 262:2025, 4.4.1.3")
 
-    def _protokoll_lage(self, p: Protokoll, erg: Lagenergebnis) -> None:
+    def _protokoll_lage(self, p: Protokoll, erg: Lagenergebnis,
+                        groessen: Rissgroessen) -> None:
         nummer = erg.lage.nummer
         r = self.richtung.value
         p.titel(f"Sprödes Versagen – {nummer}. Lage {r}", ebene=3)
@@ -303,7 +303,7 @@ class SproedesVersagen(Nachweis):
             p.text(erg.begruendung)
             return
 
-        m_rd, m_riss = self._m_rd(erg), rissmoment_wert(self.id, self.groessen)
+        m_rd, m_riss = self._m_rd(erg), rissmoment_wert(self.id, groessen)
         p.gleichung(bedingung(angabe(m_rd), r"\ge", angabe(m_riss), erg.erfuellt),
                     titel="Biegewiderstand gegen Rissmoment")
         grad_formel(p, self.d_ausnutzung[nummer], erg.erfuellungsgrad,

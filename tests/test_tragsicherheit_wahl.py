@@ -82,7 +82,7 @@ class TestCharakteristisch(unittest.TestCase):
         self.assertIn("m_{Rk}(N_{Ed})", t)
         sv = self.aufbau.sproede[KENNUNG]
         M = self.loesung.werte[f"{BASIS}.M_Rd_N0_pos"].groesse.si
-        unten = next(e for e in sv.ergebnisse if e.lage.von_unten)
+        unten = next(e for e in self.loesung.befund(sv).ergebnisse if e.lage.von_unten)
         self.assertEqual(unten.M_Rd, M)
         self.assertIn("M_Rk(N_Ed = 0)", unten.begruendung)
 

@@ -888,12 +888,13 @@ class TestEinUrteilJeLagennachweis(unittest.TestCase):
         for schalter, (feld, art) in TestAusgeschaltetHeisstStill.SCHALTER.items():
             with self.subTest(schalter=schalter):
                 nachweis, = getattr(aufbau, feld).values()
-                self.assertEqual(len(nachweis.ergebnisse), 2)       # beide x-Lagen
+                lagen = loesung.befund(nachweis).ergebnisse
+                self.assertEqual(len(lagen), 2)                     # beide x-Lagen
                 laut = [u for u in loesung.gefuehrte_urteile if u.art == art]
                 self.assertEqual(len(laut), 1)
                 self.assertAlmostEqual(
                     laut[0].erfuellungsgrad.si,
-                    min(e.erfuellungsgrad for e in nachweis.ergebnisse), places=9)
+                    min(e.erfuellungsgrad for e in lagen), places=9)
 
 
 class TestMindestbewehrungsEingaben(unittest.TestCase):

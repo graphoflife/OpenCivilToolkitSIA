@@ -26,7 +26,8 @@ def x_lagen(projekt: Projekt):
 
 def urteile(projekt: Projekt):
     """
-    Aufbau und die Urteile, wie sie in der Tabelle stehen.
+    Was der Nachweis je Lage fand, und die Urteile, wie sie in der Tabelle
+    stehen.
 
     `gefuehrte_urteile` und nicht `urteile`: gerechnet wird jede Lage, und
     die rohe Liste traegt sie auch. In die Zusammenfassung kommt je Nachweis
@@ -34,7 +35,8 @@ def urteile(projekt: Projekt):
     """
     aufbau = projekt.aufbauen()
     loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-    return aufbau, {u.name: u for u in loesung.gefuehrte_urteile}
+    return (loesung.befund(aufbau.duktilitaet["q1"]).ergebnisse,
+            {u.name: u for u in loesung.gefuehrte_urteile})
 
 
 def alle_urteile(projekt: Projekt):
@@ -76,8 +78,8 @@ class TestNachweis(unittest.TestCase):
             x/d = 0.253 ≤ 0.35     -> erfüllt
             α   = 0.35/0.253 = 1.39
         """
-        aufbau, gefunden = urteile(projekt_mit())
-        erg = aufbau.duktilitaet["q1"].ergebnisse[0]
+        lagen, gefunden = urteile(projekt_mit())
+        erg = lagen[0]
         self.assertEqual(erg.lage.nummer, 2)
         self.assertAlmostEqual(erg.a_s * 1e6, 2450.0, delta=2.0)
         self.assertAlmostEqual(erg.d * 1e3, 248.1, delta=0.2)
@@ -87,8 +89,8 @@ class TestNachweis(unittest.TestCase):
         self.assertAlmostEqual(erg.erfuellungsgrad, 1.39, delta=0.02)
 
     def test_der_erfuellungsgrad_ist_die_grenze_durch_das_verhaeltnis(self):
-        aufbau, _ = urteile(projekt_mit())
-        for erg in aufbau.duktilitaet["q1"].ergebnisse:
+        lagen, _ = urteile(projekt_mit())
+        for erg in lagen:
             if not erg.machbar:
                 continue
             with self.subTest(lage=erg.lage.nummer):
@@ -103,8 +105,8 @@ class TestNachweis(unittest.TestCase):
         Querkraftnachweis einmal d = 39 mm lieferte.
         """
         projekt = projekt_mit()
-        aufbau, _ = urteile(projekt)
-        nach_lage = {e.lage.nummer: e for e in aufbau.duktilitaet["q1"].ergebnisse}
+        lagen, _ = urteile(projekt)
+        nach_lage = {e.lage.nummer: e for e in lagen}
         h = 0.300
         untere, obere = x_lagen(projekt)
 
@@ -126,10 +128,8 @@ class TestNachweis(unittest.TestCase):
         ohne.querschnitte[0].lagen[untere - 1].zulage.durchmesser = 0.0
         mit = projekt_mit()
 
-        a, _ = urteile(ohne)
-        b, _ = urteile(mit)
-        nur_grund = a.duktilitaet["q1"].ergebnisse[0]
-        beide = b.duktilitaet["q1"].ergebnisse[0]
+        nur_grund = urteile(ohne)[0][0]
+        beide = urteile(mit)[0][0]
 
         self.assertGreater(beide.a_s, nur_grund.a_s)
         # Die Zulage liegt weiter innen, zieht den Schwerpunkt also nach oben.
@@ -143,8 +143,8 @@ class TestNachweis(unittest.TestCase):
         lage = projekt.querschnitte[0].lagen[untere - 1]
         lage.grund.durchmesser = 34.0
         lage.grund.abstand = 75.0
-        aufbau, gefunden = urteile(projekt)
-        erg = aufbau.duktilitaet["q1"].ergebnisse[0]
+        lagen, gefunden = urteile(projekt)
+        erg = lagen[0]
         self.assertGreater(erg.verhaeltnis, duktilitaet.GRENZE)
         self.assertFalse(erg.erfuellt)
         self.assertLess(
@@ -161,7 +161,7 @@ class TestNachweis(unittest.TestCase):
         lage.grund.durchmesser = 0.0
         lage.zulage.durchmesser = 0.0
 
-        aufbau, gefunden = urteile(projekt)
+        _, gefunden = urteile(projekt)
         urteil = gefunden[f"Duktilität – {untere}. Lage"]
         self.assertFalse(urteil.erfuellt)
         self.assertIn(f"{untere}. Lage ohne Bewehrung → kein Nachweis",
@@ -204,6 +204,7 @@ class TestHerleitungAusVorlagen(unittest.TestCase):
         cls.bloecke = [b for b in loesung.protokoll.alle_bloecke()
                        if isinstance(b, GleichungBlock)]
         cls.nachweis = next(iter(cls.aufbau.duktilitaet.values()))
+        cls.befund = loesung.befund(cls.nachweis)
 
     def block(self, wert_id):
         return next(b for b in self.bloecke if b.wert_id == wert_id)
@@ -222,7 +223,7 @@ class TestHerleitungAusVorlagen(unittest.TestCase):
         """Gesetzt wie in der Tabelle -- nicht mit der Stellenzahl des Werts."""
         from opencivil.core.berechnung import grad_als_text
 
-        for erg in self.nachweis.ergebnisse:
+        for erg in self.befund.ergebnisse:
             grad = self.block(self.nachweis.d_ausnutzung[erg.lage.nummer].id)
             self.assertEqual(
                 grad.formelzeile.ergebnis,
@@ -251,8 +252,7 @@ class TestEigeneGrenze(unittest.TestCase):
 
     def test_sie_entscheidet_ueber_erfuellt(self):
         for grenze, erfuellt in ((0.35, False), (0.5, True)):
-            aufbau, _ = urteile(self.dicke_untere_lage(grenze))
-            erg = aufbau.duktilitaet["q1"].ergebnisse[0]
+            erg = urteile(self.dicke_untere_lage(grenze))[0][0]
             with self.subTest(grenze=grenze):
                 self.assertAlmostEqual(erg.verhaeltnis, 0.426, delta=0.002)
                 self.assertIs(erg.erfuellt, erfuellt)

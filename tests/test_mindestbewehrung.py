@@ -30,6 +30,16 @@ def urteile(projekt: Projekt):
     return aufbau, {u.name: u for u in loesung.gefuehrte_urteile}
 
 
+def befund(projekt: Projekt, nachweise: str):
+    """
+    Was ein Nachweis der x-Richtung im Lauf fand. ``nachweise`` ist der Name
+    seiner Liste im Aufbau, etwa ``"sproede"``.
+    """
+    aufbau = projekt.aufbauen()
+    loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+    return loesung.befund(getattr(aufbau, nachweise)["q1.x"])
+
+
 def alle_urteile(projekt: Projekt):
     """Jede Lage einzeln -- so, wie die Bewehrungssuche sie zaehlt."""
     aufbau = projekt.aufbauen()
@@ -134,8 +144,7 @@ class TestNachweis(unittest.TestCase):
             α       = 3.24
         """
         projekt = projekt_mit()
-        aufbau, gefunden = urteile(projekt)
-        erg = aufbau.rissnormalkraft["q1.x"].ergebnisse[0]
+        erg = befund(projekt, "rissnormalkraft").ergebnisse[0]
         self.assertEqual(erg.lage.nummer, x_lagen(projekt)[0])
         self.assertAlmostEqual(erg.a_s * 1e6, 2450.0, delta=2.0)
         self.assertAlmostEqual(erg.sigma_s_adm / 1e6, 500.0)
@@ -148,16 +157,15 @@ class TestNachweis(unittest.TestCase):
         Er verteilt den Riss auf die wenigsten Stäbe und bekommt damit die
         grösste Spannung -- also ist er massgebend.
         """
-        aufbau, _ = urteile(projekt_mit(rissanforderung="hoch"))
-        erg = aufbau.rissnormalkraft["q1.x"].ergebnisse[0]
+        erg = befund(projekt_mit(rissanforderung="hoch"), "rissnormalkraft").ergebnisse[0]
         # Grund ⌀18, Zulage ⌀12 -> der Grundstab bestimmt.
         self.assertAlmostEqual(erg.durchmesser * 1e3, 18.0)
 
     def test_eine_haertere_anforderung_macht_den_nachweis_schwerer(self):
         grade = {}
         for anforderung in ("normal", "erhoeht", "hoch"):
-            aufbau, _ = urteile(projekt_mit(rissanforderung=anforderung))
-            grade[anforderung] = aufbau.rissnormalkraft["q1.x"].ergebnisse[0].erfuellungsgrad
+            grade[anforderung] = befund(projekt_mit(rissanforderung=anforderung),
+                                        "rissnormalkraft").ergebnisse[0].erfuellungsgrad
         self.assertGreater(grade["normal"], grade["erhoeht"])
         self.assertGreater(grade["erhoeht"], grade["hoch"])
 
@@ -322,8 +330,7 @@ class TestZwaengungBiegung(unittest.TestCase):
             α       = 6.25
         """
         projekt = projekt_zwang_biegung()
-        aufbau, _ = urteile(projekt)
-        erg = aufbau.zwaengung_biegung["q1.x"].ergebnisse[0]
+        erg = befund(projekt, "zwaengung_biegung").ergebnisse[0]
         self.assertEqual(erg.lage.nummer, x_lagen(projekt)[0])
         self.assertAlmostEqual(erg.n, 17.85, delta=0.02)
         self.assertAlmostEqual(erg.x * 1e3, 109.9, delta=0.3)
@@ -334,9 +341,8 @@ class TestZwaengungBiegung(unittest.TestCase):
 
     def test_bei_den_oberen_lagen_wird_von_unten_gemessen(self):
         projekt = projekt_zwang_biegung()
-        aufbau, _ = urteile(projekt)
         nach_lage = {e.lage.nummer: e
-                     for e in aufbau.zwaengung_biegung["q1.x"].ergebnisse}
+                     for e in befund(projekt, "zwaengung_biegung").ergebnisse}
         h = 0.300
         untere, obere = x_lagen(projekt)
         self.assertAlmostEqual(nach_lage[untere].d, nach_lage[untere].z_s)
@@ -344,10 +350,10 @@ class TestZwaengungBiegung(unittest.TestCase):
 
     def test_kriechen_macht_den_nachweis_schwerer(self):
         """Der Hebelarm schrumpft -- φ > 0 liegt auf der sicheren Seite."""
-        a, _ = urteile(projekt_zwang_biegung(zwaengung_biegung_kriechzahl=0.0))
-        b, _ = urteile(projekt_zwang_biegung(zwaengung_biegung_kriechzahl=2.0))
-        trocken = a.zwaengung_biegung["q1.x"].ergebnisse[0]
-        kriechend = b.zwaengung_biegung["q1.x"].ergebnisse[0]
+        trocken = befund(projekt_zwang_biegung(zwaengung_biegung_kriechzahl=0.0),
+                         "zwaengung_biegung").ergebnisse[0]
+        kriechend = befund(projekt_zwang_biegung(zwaengung_biegung_kriechzahl=2.0),
+                           "zwaengung_biegung").ergebnisse[0]
 
         self.assertLess(trocken.x, kriechend.x)
         self.assertGreater(trocken.hebelarm, kriechend.hebelarm)
@@ -355,10 +361,9 @@ class TestZwaengungBiegung(unittest.TestCase):
 
     def test_das_phi_der_platte_spielt_keine_rolle(self):
         """Seit 2026-10-09 hat die Zwängung ihr eigenes φ."""
-        a, _ = urteile(projekt_zwang_biegung(kriechzahl=0.0))
-        b, _ = urteile(projekt_zwang_biegung(kriechzahl=5.0))
-        self.assertEqual(a.zwaengung_biegung["q1.x"].ergebnisse[0].erfuellungsgrad,
-                         b.zwaengung_biegung["q1.x"].ergebnisse[0].erfuellungsgrad)
+        a = befund(projekt_zwang_biegung(kriechzahl=0.0), "zwaengung_biegung")
+        b = befund(projekt_zwang_biegung(kriechzahl=5.0), "zwaengung_biegung")
+        self.assertEqual(a.ergebnisse[0].erfuellungsgrad, b.ergebnisse[0].erfuellungsgrad)
 
     def test_eine_leere_lage_ist_nicht_machbar(self):
         projekt = projekt_zwang_biegung()
@@ -416,20 +421,23 @@ class TestSproedesVersagen(unittest.TestCase):
         M_Riss = 41.4 kNm, α = 5.70.
         """
         projekt = Projekt.beispiel()
-        aufbau, _ = urteile(projekt)
-        erg = aufbau.sproede["q1.x"].ergebnisse[0]
+        aufbau = projekt.aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        nachweis = aufbau.sproede["q1.x"]
+        erg = loesung.befund(nachweis).ergebnisse[0]
         self.assertEqual(erg.lage.nummer, x_lagen(projekt)[0])
         self.assertAlmostEqual(erg.M_Rd / 1e3, 235.9, delta=0.5)
-        self.assertAlmostEqual(aufbau.sproede["q1.x"].groessen.M_Riss / 1e3,
-                               41.4, delta=0.1)
+        # M_Riss steht als Einwirkung im Urteil -- dort, wo man es liest.
+        urteil = next(u for u in loesung.urteile
+                      if u.raum == nachweis.id and u.fall == f"{erg.lage.nummer}. Lage")
+        self.assertAlmostEqual(urteil.einwirkung.groesse.si / 1e3, 41.4, delta=0.1)
         self.assertAlmostEqual(erg.erfuellungsgrad, 5.70, delta=0.05)
         self.assertTrue(erg.erfuellt)
 
     def test_die_obere_lage_nimmt_den_negativen_eckwert(self):
         projekt = Projekt.beispiel()
         projekt.querschnitte[0].sproede = True
-        aufbau, _ = urteile(projekt)
-        nach_lage = {e.lage.nummer: e for e in aufbau.sproede["q1.x"].ergebnisse}
+        nach_lage = {e.lage.nummer: e for e in befund(projekt, "sproede").ergebnisse}
         untere, obere = x_lagen(projekt)
         # Die obere x-Lage traegt weniger -- ⌀12 gegen ⌀18+⌀12.
         self.assertLess(nach_lage[obere].M_Rd, nach_lage[untere].M_Rd)

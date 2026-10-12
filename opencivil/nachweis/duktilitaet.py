@@ -50,7 +50,8 @@ from dataclasses import dataclass
 from typing import Dict, List, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    Ausfuehrung, Eingabebezug, Eingaben, Fallbefund, Nachweis, NachweisUrteil, grad_def,
+    grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import angabe, vergleich
@@ -154,7 +155,6 @@ class Duktilitaet(Nachweis):
 
         self.querschnitt = querschnitt
         self.lagen = [l for l in querschnitt.lagen if l.nummer in gewaehlt]
-        self.ergebnisse: List[Lagenergebnis] = []
 
         # Je Lage ihre Posten -- Grundbewehrung und Zulage, soweit vorhanden.
         self.posten_je_lage: Dict[int, List[Tuple]] = {
@@ -229,13 +229,13 @@ class Duktilitaet(Nachweis):
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
-        self.ergebnisse = []
+        befund = Fallbefund()
 
         for lage in self.lagen:
             # Die Breite in der Richtung der Lage.
             breite = "b" if lage.richtung is Richtung.X else "b_y"
             erg = self._eine_lage(e, lage, h=h, b=e.g(breite).si, f_cd=f_cd)
-            self.ergebnisse.append(erg)
+            befund.ergebnisse.append(erg)
             self._protokoll_lage(p, e, erg, breite)
 
             ergebnis[self.d_ausnutzung[lage.nummer].id] = Groesse(
@@ -245,7 +245,7 @@ class Duktilitaet(Nachweis):
             urteile.append(self._urteil(erg))
 
         self.protokoll_massgebend(p, urteile)
-        return Ausfuehrung(ergebnis, self.teilurteile(urteile))
+        return Ausfuehrung(ergebnis, self.teilurteile(urteile), befund)
 
     def _eine_lage(
         self, e: Eingaben, lage: Bewehrungslage, *,

@@ -35,7 +35,7 @@ Ursache erhalten.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from typing import (
     Any, Callable, Dict, Iterable, Iterator, Mapping, Optional, Sequence,
     Tuple, Union,
@@ -173,6 +173,16 @@ class Ausfuehrung:
     ausgaben: Mapping[str, Any]
     urteile: Tuple["NachweisUrteil", ...] = ()
     befund: Any = None
+
+
+@dataclass
+class Fallbefund:
+    """
+    Der Befund eines Nachweises, der je Fall oder je Lage rechnet: was er
+    dabei fand, in der Reihenfolge seiner Urteile.
+    """
+
+    ergebnisse: list = field(default_factory=list)
 
 
 # ===========================================================================
