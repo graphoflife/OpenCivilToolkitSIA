@@ -43,6 +43,10 @@ gelernt wurde, steht in [[Entwicklung]].
 - [ ] Momente stehen in der Mitschrift als `kNm`, gemeint ist `kNm/m` (die
       Platte wird je Laufmeter gerechnet). In der Eingabemaske steht es
       richtig. Einheitlich ziehen.
+- [ ] Gemischte Stahlsorten in einer Richtung: die Spannung-Dehnung-Analyse
+      nimmt ein ε_ud für alle Lagen (das der ersten Sorte), die
+      Tragsicherheit je Sorte. Bei den Normsorten des Beispiels gleich; siehe
+      [[Prüfung M_Rd der Platte]].
 
 ## Offene Normfragen — deine Fragen, unbeantwortet
 
@@ -226,6 +230,12 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Platte geprüft ([[Prüfung M_Rd der Platte]]): im M-χ-Bild heisst der
+Fliessbeginn M_y und das Ende M_Rd, wie der Tragwiderstand · Rechenarten
+heissen Handrechnung, 0.85·x-Vereinfachung und Präzise ohne Vereinfachung ·
+Handrechnung nur noch in Tragsicherheit und Stahlspannungen · Linie
+«ungerissen» nur bis zum Riss · E_eq-Ecken mit Vielfachem von E_cm ·
 
 Rechenwahl je Kapitel: Tragsicherheit, beide Stahlspannungen, Knicken
 (Verformung und Widerstand), Zwängung auf Biegung und jede Analyse wählen φ,

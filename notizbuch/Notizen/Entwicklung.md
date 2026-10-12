@@ -44,6 +44,50 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-12 · Platte: M_Rd im M-χ-Bild, Rechenarten, Linie I bis zum Riss
+
+Frage des Benutzers: Die M_Rd im M-χ-Bild stimmen nicht immer mit dem M_Rd
+des Tragwiderstands überein. Die ganze Prüfung mit Zahlen steht in
+[[Prüfung M_Rd der Platte]]; hier, was daraus folgte und warum.
+
+**Der Name war falsch, nicht die Zahl.** Das Bild nannte den Fliessbeginn
+«M_Rd» und das Ende «M_Rd,u». Wer den Widerstand suchte, fand den
+Fliessbeginn, präzise bei N = 0 228.1 statt 235.7 kNm. Das Ende der Linie
+und der Tragwiderstand stimmen bei gleicher Rechenwahl auf 0.05 %; ein Test
+hält das für 0.85·x und präzise, φ 0 und 2 und beide Wertesätze fest. Jetzt
+heisst der Fliessbeginn M_y, wie seine Krümmung χ_y, und das Ende M_Rd.
+
+**Handrechnung nur, wo ein Polygon Sinn ergibt.** Der Tragwiderstand mit
+Handrechnung ist ein Polygon durch vier Eckpunkte, dazwischen gerade -- unter
+Druck bis 18 % unter der genauen Linie desselben Modells. Die M-χ-Linie und
+das Knicken rechnen die Normalkraft aber Ebene für Ebene genau; dort war die
+«Handrechnung» nur ein Spannungsblock ohne Druckstahl, also eine schlechtere
+0.85·x-Vereinfachung. Sie fällt dort weg (`FASERARTEN`). Eine alte Datei
+liest sich als 0.85·x (`ERSATZ_ALTER_WAHL`); die Zahlen steigen dann leicht,
+weil die Druckbewehrung mitzählt -- im Prüfprojekt N_Rd,K 3900.6 → 4496.7 kN.
+Die eigene Linie des Knickens rechnet schnell mit den Schritten der Suche,
+sonst zahlte die Bewehrungssuche jetzt öfter eine ganze genaue Linie.
+
+**Namen nach Wunsch.** «Handrechnung», «0.85·x-Vereinfachung», «Präzise ohne
+Vereinfachung» -- an einer Stelle (`Rechenart.beschriftung`, `kurz`,
+`latex`), auch für die Betongesetze der Querschnittsanalyse.
+
+**Zugfestigkeit nur für den Riss.** Die gestrichelte Vergleichslinie
+«ungerissen» lief über den Riss hinaus bis zum Bruch -- dort mit Betonzug
+ohne Grenze. Sie endet jetzt beim Riss. Kein Betongesetz und kein Widerstand
+zählt die Zugfestigkeit; sie steckt in M_Riss und N_Riss und in den
+Nachweisen, die vom Reissen handeln.
+
+**φ in der Analyse.** Der ungerissene Teil rechnet immer mit E_cm/(1+φ),
+auch bei 0.85·x -- das Feld war dort grau, obwohl φ wirkte. Es ist in den
+Analysen jetzt immer aktiv, und bei 0.85·x sagt ein Hinweis, dass φ nur auf
+den ungerissenen Teil wirkt. Die 0.85·x-Vereinfachung bleibt in den Analysen
+wählbar (Benutzer), mit dem Hinweis, dass die Linie im Gebrauchsbereich zu
+weich ist.
+
+**E_eq-Bild.** Jede Ecke trägt ihren Modul und das Vielfache von E_cm: am
+Anfang, vor und nach dem Riss, beim Fliessbeginn, am Ende.
+
 ## 2026-10-11 · Das Notizbuch: Dokumentation in Obsidian und auf der Seite
 
 Wunsch: alle Notizen als Markdown, das Obsidian und die Seite lesen; die
