@@ -1,5 +1,5 @@
 ---
-erzeugt: 84581e4e7811
+erzeugt: ff323ff0c941
 art: modul
 tags: [modul]
 ---
@@ -15,11 +15,11 @@ Lagerkraefte -- je Lastfall und je Kombination.
 * [[opencivil.stabwerk.matrix|matrix]] -- das Gleichungssystem: im Profil
   gespeichert, umgekehrt nach Cuthill-McKee nummeriert, und was geschieht,
   wenn es singulaer ist.
-* [[opencivil.stabwerk|stab]] -- der einzelne Stab: Steifigkeit,
+* [[opencivil.stabwerk.stab|stab]] -- der einzelne Stab: Steifigkeit,
   arbeitsgleiche Lasten, Bettung.
-* [[opencivil.stabwerk|modell]] -- was gerechnet wird, in SI: Knoten,
+* [[opencivil.stabwerk.modell|modell]] -- was gerechnet wird, in SI: Knoten,
   Staebe, Lager, Lasten.
-* [[opencivil.stabwerk|system]] -- das ganze System: Unbekannte,
+* [[opencivil.stabwerk.system|system]] -- das ganze System: Unbekannte,
   Zusammenbau, Loesen, Lagerkraefte.
 * [[opencivil.stabwerk|verlauf]] -- Schnittgroessen und Biegelinie
   laengs jedes Stabs.
@@ -29,3 +29,6 @@ Nur die Standardbibliothek: das Werkzeug rechnet auch im Browser.
 ## Module
 
 - [[opencivil.stabwerk.matrix]] – das Gleichungssystem eines Stabwerks.
+- [[opencivil.stabwerk.modell]] – was gerechnet wird: das ebene Stabwerk in SI.
+- [[opencivil.stabwerk.stab]] – der ebene Stab: Steifigkeit, Lasten, Bettung.
+- [[opencivil.stabwerk.system]] – das ganze Stabwerk: Unbekannte, Zusammenbau, Loesen.

@@ -1,5 +1,5 @@
 ---
-erzeugt: 897f3188c2b5
+erzeugt: 8cfc44618c67
 art: modul
 tags: [modul]
 ---
@@ -188,3 +188,7 @@ Die volle Matrix -- fuer die Herleitung kleiner Systeme und fuer Proben.
 
 - `SCHRANKE = 1e-10` – Unter diesem Anteil seiner eigenen Steifigkeit gilt ein Pivot als null. Zehn Groessenordnungen: so weit liegen Dehn- und Biegesteifigkeit eines schlanken Stabs nie auseinander, eine echte Bewegung aber immer -- dort bleibt nur die Rundung, rund 1e-16.
 - `H = TypeVar('H', bound=Hashable)`
+
+## Gebraucht von
+
+- [[opencivil.stabwerk.system]]
