@@ -44,7 +44,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, MM, Groesse
 from opencivil.core.latex import angabe, vergleich
@@ -312,7 +312,7 @@ class Rissnormalkraft(Nachweis):
             urteile.append(self._urteil(erg))
 
         self.protokoll_massgebend(p, urteile)
-        return ergebnis, self.teilurteile(urteile)
+        return Ausfuehrung(ergebnis, self.teilurteile(urteile))
 
     def _eine_lage(self, e: Eingaben, lage: Bewehrungslage, *,
                    f_ctm: float) -> Lagenergebnis:
@@ -581,7 +581,7 @@ class ZwaengungBiegung(Nachweis):
             urteile.append(self._urteil(erg))
 
         self.protokoll_massgebend(p, urteile)
-        return ergebnis, self.teilurteile(urteile)
+        return Ausfuehrung(ergebnis, self.teilurteile(urteile))
 
     def _eine_lage(self, e: Eingaben, lage: Bewehrungslage, *, h: float,
                    b: float, f_ctm: float, E_cm: float,

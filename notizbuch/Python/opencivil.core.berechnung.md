@@ -1,5 +1,5 @@
 ---
-erzeugt: 281598c372b9
+erzeugt: ef15e627394c
 art: modul
 tags: [modul]
 ---
@@ -68,6 +68,25 @@ Bindet einen lokalen Formelnamen an eine globale Wert-ID.
 - `wert_id: str` – Globale ID des Wertes, z.B. `beton.C30_37.f_ck`.
 - `optional: bool = False` – Wenn True, darf der Wert fehlen; die Berechnung prueft mit `hat()`.
 
+### Befundbezug
+
+```python
+@dataclass(frozen=True)
+class Befundbezug
+```
+
+Bindet einen lokalen Namen an den Befund einer anderen Berechnung.
+
+Fuer eine Rechnung, die mehr als eine Zahl einer anderen braucht: die
+Querkraft den Momentenwiderstand bei ihrer Normalkraft samt seiner
+Herleitung, das Knicken die Resistenzlinie der Tragsicherheit. Der
+Loeser rechnet die andere Berechnung vorher und reicht ihren Befund
+durch ([[opencivil.core.berechnung#Eingaben.befund|Eingaben.befund]]) -- die Abhaengigkeit steht so im Graphen,
+wie ein Wert es tut.
+
+- `name: str`
+- `berechnung_id: str`
+
 ### Eingaben
 
 ```python
@@ -77,7 +96,16 @@ class Eingaben(Mapping[str, Wert])
 Die aufgeloesten Eingaben einer Berechnung, unter ihren lokalen Namen.
 
 Ist selbst eine `Mapping`, damit sie direkt an die LaTeX-Hilfen
-weitergereicht werden kann.
+weitergereicht werden kann. Die Befunde anderer Berechnungen
+([[opencivil.core.berechnung#Befundbezug|Befundbezug]]) stehen daneben, unter [[opencivil.core.berechnung#Eingaben.befund|befund]].
+
+#### Eingaben.befund
+
+```python
+def befund(self, name: str) -> Any
+```
+
+Der Befund einer anderen Berechnung, unter seinem lokalen Namen.
 
 #### Eingaben.hat
 
@@ -110,6 +138,31 @@ def teilmenge(self, *namen: str) -> 'Eingaben'
 ```
 
 Auswahl einzelner Eingaben -- praktisch fuer LaTeX-Vorlagen.
+
+### Ausfuehrung
+
+```python
+@dataclass(frozen=True)
+class Ausfuehrung
+```
+
+Was eine Berechnung in einem Lauf liefert: ihre Ausgaben -- und, wo es
+mehr gibt, ihre Urteile und ihren Befund.
+
+Der **Befund** ist alles, was ueber die Ausgabewerte hinausgeht und
+spaeter jemand lesen will: Resistenzlinien, Fallergebnisse, das Ergebnis
+eines Balkensystems. Er steht nach dem Lauf in der Loesung
+([[opencivil.core.rechenwerk#Loesung|befunde]]), nicht am Objekt.
+Ein Objekt beschreibt eine Rechnung, eine Loesung haelt fest, was sie
+ergab -- so laesst sich eine Loesung aufheben und wiederverwenden, ohne
+die Objekte umzuhaengen, die sie hervorgebracht haben.
+
+[[opencivil.core.berechnung#Berechnung.rechne|Berechnung.rechne]] liefert die Ausgaben als Groessen,
+[[opencivil.core.berechnung#Berechnung.ausfuehren|Berechnung.ausfuehren]] daraus Werte.
+
+- `ausgaben: Mapping[str, Any]`
+- `urteile: Tuple['NachweisUrteil', ...] = ()`
+- `befund: Any = None`
 
 ### Berechnung
 
@@ -203,25 +256,28 @@ def anwendbar(self, e):
 
 ```python
 @abstractmethod
-def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]
+def rechne(self, e: Eingaben, p: Protokoll) -> Union[Mapping[str, Groesse], Ausfuehrung]
 ```
 
 Fuehrt die Rechnung aus und schreibt sie ins Protokoll.
 
 :param e: aufgeloeste Eingaben unter ihren lokalen Namen
 :param p: Mitschrift -- hier wird die Herleitung festgehalten
-:return: `{Wert-ID: Groesse}` fuer jede deklarierte Ausgabe
+:return: `{Wert-ID: Groesse}` fuer jede deklarierte Ausgabe --
+oder eine [[opencivil.core.berechnung#Ausfuehrung|Ausfuehrung]] mit diesen Groessen, wo es dazu
+Urteile oder einen Befund gibt
 
 #### Berechnung.ausfuehren
 
 ```python
-def ausfuehren(self, e: Eingaben, p: Protokoll) -> Dict[str, Wert]
+def ausfuehren(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ```
 
 Ruft [[opencivil.core.berechnung#Berechnung.rechne|rechne]] auf und prueft dessen Ergebnis.
 
 Verpackt jede Groesse in einen [[opencivil.core.wert#Wert|Wert]] mit der deklarierten
-Definition -- dabei wird auch die Dimension geprueft.
+Definition -- dabei wird auch die Dimension geprueft. Urteile und
+Befund reicht es unveraendert durch.
 
 ### Formel
 
@@ -412,8 +468,10 @@ class Nachweis(Berechnung)
 Vergleicht Einwirkung und Widerstand und faellt ein Urteil.
 
 Unterklassen implementieren [[opencivil.core.berechnung#Nachweis.pruefe|pruefe]] statt [[opencivil.core.berechnung#Nachweis.rechne|rechne]]. Die
-Urteile werden gesammelt und stehen nach dem Lauf unter [[opencivil.core.berechnung#Nachweis|urteile]]
-zur Verfuegung -- der Bericht kann daraus die Nachweistabelle bauen.
+Urteile gehen mit der [[opencivil.core.berechnung#Ausfuehrung|Ausfuehrung]] in die Loesung
+([[opencivil.core.rechenwerk#Loesung|urteile]]) -- der Bericht baut
+daraus die Nachweistabelle. Am Objekt bleibt nichts: es beschreibt den
+Nachweis, die Loesung haelt fest, wie er ausging.
 
 - `still: bool = False` – Ob der Nachweis mitrechnet, ohne in die Herleitung zu kommen. Ausgeschaltete Nachweise verschwinden nicht, sie werden still: gerechnet wird weiter, in der Zusammenfassung stehen sie nicht, und wenn einer von ihnen nicht aufgeht, steht darunter ein Hinweis. Das ist der Unterschied zwischen «interessiert mich gerade nicht» und «gilt nicht» -- und nur das erste trifft auf einen Schalter zu, den jemand umgelegt hat.
 - `LANGNAME: str = ''` – Wie der Nachweis in der Zusammenfassung heisst, Spalte «Nachweis». Leer: sein Thema. Getrennt vom Thema, weil beide anders ordnen. Die Formelsammlung ordnet nach dem, was gerechnet wird -- «Zwängung auf Biegung». Die Zusammenfassung ordnet nach der Frage, die beantwortet wird -- «Risse: Zwängung Biegung», bei den anderen Rissnachweisen.
@@ -510,17 +568,19 @@ und gesucht wuerde er dann beim Nachweis und nicht beim Tippfehler.
 
 ```python
 @abstractmethod
-def pruefe(self, e: Eingaben, p: Protokoll) -> Tuple[Mapping[str, Groesse], Sequence[NachweisUrteil]]
+def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ```
 
-Fuehrt den Nachweis und liefert Ausgabewerte samt Urteilen.
+Fuehrt den Nachweis und liefert Ausgabewerte samt Urteilen -- und
+einen Befund, wo jemand nach dem Lauf mehr lesen will als Zahlen.
 
-:return: (`{Wert-ID: Groesse}`, Liste der Urteile)
+:return: [[opencivil.core.berechnung#Ausfuehrung|Ausfuehrung]] mit `{Wert-ID: Groesse}`, den Urteilen
+und dem Befund
 
 #### Nachweis.rechne
 
 ```python
-def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]
+def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ```
 
 

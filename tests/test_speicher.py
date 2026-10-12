@@ -235,8 +235,10 @@ class TestMitgebrachteWerte(unittest.TestCase):
 
         nochmal = aufbau.werk.loese(ziel, bekannt=einmal.werte)
         self.assertEqual(nochmal.protokoll.bloecke, [])
-        self.assertEqual(nochmal.werte[ziel].groesse.si,
-                         einmal.werte[ziel].groesse.si)
+        # Und er steht auch nicht in der Loesung: sie haelt fest, was dieser
+        # Lauf gerechnet hat -- den mitgebrachten hat der Aufrufer schon.
+        self.assertEqual(nochmal.werte, {})
+        self.assertFalse(nochmal.nicht_berechenbar)
 
 
 if __name__ == "__main__":

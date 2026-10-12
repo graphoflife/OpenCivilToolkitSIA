@@ -25,7 +25,7 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Dict, List, Optional
 
-from opencivil.core.berechnung import Eingabebezug, Eingaben, Prozedur
+from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben, Prozedur
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import einsetzen_symbolisch
 from opencivil.core.protokoll import Abschnitt, Protokoll, Zwischenwerte
@@ -117,7 +117,7 @@ class Gleichungsblatt(Prozedur):
             self.ergebnisse.append(erg)
         return {self.d_zeilen.id: Groesse(sum(not r.fehler for r in self.ergebnisse))}
 
-    def ausfuehren(self, e: Eingaben, p: Protokoll) -> Dict[str, Wert]:
+    def ausfuehren(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
         """
         Wie jede Berechnung -- und dazu, was die Zeilen ergeben haben, damit es
         in der Loesung steht (siehe oben). Die Beschreibung bekommen die Werte
@@ -125,13 +125,14 @@ class Gleichungsblatt(Prozedur):
         Zeile.
         """
         ergebnis = super().ausfuehren(e, p)
+        ausgaben = dict(ergebnis.ausgaben)
         for nummer, zeile in enumerate(self.ergebnisse, start=1):
             if zeile.wert is not None:
                 beschreibung = f"{self.eintrag.name}, Zeile {nummer}"
-                ergebnis[zeile.wert.id] = replace(
+                ausgaben[zeile.wert.id] = replace(
                     zeile.wert, herkunft=self.id,
                     definition=replace(zeile.wert.definition, beschreibung=beschreibung))
-        return ergebnis
+        return replace(ergebnis, ausgaben=ausgaben)
 
     # -- Zeilen -------------------------------------------------------------
 

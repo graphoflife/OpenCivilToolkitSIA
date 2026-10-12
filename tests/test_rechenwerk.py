@@ -9,7 +9,7 @@ import unittest
 from typing import Mapping
 
 from opencivil.core.berechnung import (
-    Berechnung, BerechnungsFehler, Eingabebezug, Eingaben, Formel, Nachweis,
+    Ausfuehrung, Berechnung, BerechnungsFehler, Eingabebezug, Eingaben, Formel, Nachweis,
     NachweisUrteil, Prozedur, Vorgabe, grad_def,
 )
 from opencivil.core.einheiten import (
@@ -291,7 +291,7 @@ class TestFormel(unittest.TestCase):
             "gamma_c": D_GAMMA_C.belegen(Groesse(1.5, EINHEITSLOS)),
         })
         p = Protokoll()
-        ergebnis = formel.ausfuehren(eingaben, p)
+        ergebnis = formel.ausfuehren(eingaben, p).ausgaben
         self.assertAlmostEqual(ergebnis[D_F_CD.id].in_einheit(MPA), 0.933 * 30 / 1.5)
         gleichungen = p.gleichungen()
         self.assertEqual(len(gleichungen), 1)
@@ -679,7 +679,7 @@ class TestProzedur(unittest.TestCase):
         d_x, d_i, prozedur = self._iterations_prozedur()
         eingaben = Eingaben({"h": D_H.belegen(Groesse(300, MM))})
         still = StillesProtokoll()
-        ergebnis = prozedur.ausfuehren(eingaben, still)
+        ergebnis = prozedur.ausfuehren(eingaben, still).ausgaben
         self.assertAlmostEqual(ergebnis[d_x.id].in_einheit(MM), 150, places=1)
         self.assertTrue(still.ist_leer)
 
@@ -696,15 +696,15 @@ class TestNachweis(unittest.TestCase):
                 grad = m_rd / m_ed
                 erfuellt = grad >= Groesse(1.0, EINHEITSLOS)
                 p.formel(d_ausn.belegen(grad), r"\frac{@M_Rd}{@M_Ed}", e)
-                return {d_ausn.id: grad}, [
+                return Ausfuehrung({d_ausn.id: grad}, (
                     NachweisUrteil(
                         name="Biegewiderstand",
                         erfuellt=erfuellt,
                         erfuellungsgrad=grad,
                         einwirkung=e["M_Ed"],
                         widerstand=e["M_Rd"],
-                    )
-                ]
+                    ),
+                ))
 
         werk = Rechenwerk()
         werk.definiere(d_m_ed, d_m_rd)
@@ -789,7 +789,7 @@ class TestStillstellen(unittest.TestCase):
 
         class Probe(Nachweis):
             def pruefe(self, e, p):
-                return {}, []
+                return Ausfuehrung({})
 
         return Probe("probe", ausgaben=[WertDef(
             id="probe.wert", symbol="x", einheit=EINHEITSLOS,

@@ -67,7 +67,8 @@ class TestGemischteSorten(unittest.TestCase):
 
     def test_die_grenze_gegen_fliessen_gilt_je_lage(self):
         """Feld: gezogen ist unten (B700B). Stütze: oben (B500B)."""
-        urteile = {u.fall: u for u in self.aufbau.spannung["q1.x"].urteile}
+        urteile = {u.fall: u for u in self.loesung.urteile
+                   if u.raum == self.aufbau.spannung["q1.x"].id}
         self.assertAlmostEqual(urteile["Feld (70 %)"].widerstand.groesse.si,
                                F_YD_B700B - 80e6, delta=1e4)
         self.assertAlmostEqual(urteile["Stütze (70 %)"].widerstand.groesse.si,

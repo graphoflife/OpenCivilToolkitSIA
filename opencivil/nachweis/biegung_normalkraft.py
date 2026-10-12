@@ -48,7 +48,7 @@ from enum import Enum
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, Groesse
 from opencivil.core.latex import als_text, angabe
@@ -387,7 +387,7 @@ class BiegungNormalkraft(Nachweis):
                     widerstand=self._als_wert(auswertung, "Rd"),
                 )
             )
-        return ergebnis, urteile
+        return Ausfuehrung(ergebnis, urteile)
 
     def _linie(self, wahl: Rechenwahl, e: Eingaben, p: Protokoll) -> Widerstandslinie:
         """Die Resistenzlinie einer Wahl -- und ihre Herleitung in ``p``."""

@@ -27,7 +27,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Sequence
 
-from opencivil.core.berechnung import Eingaben, Nachweis, NachweisUrteil, grad_def
+from opencivil.core.berechnung import Ausfuehrung, Eingaben, Nachweis, NachweisUrteil, grad_def
 from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
@@ -137,4 +137,4 @@ class FehlendeBewehrung(Nachweis):
                     einheit=fall.einheit, beschreibung="Widerstand", stellen=1,
                 ).belegen(Groesse(0.0, fall.einheit)),
             ))
-        return ergebnis, urteile
+        return Ausfuehrung(ergebnis, urteile)

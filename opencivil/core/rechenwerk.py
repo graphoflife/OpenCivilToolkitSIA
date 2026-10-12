@@ -37,10 +37,10 @@ EIGENSTAENDIG NUTZBAR::
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Mapping, Optional, Sequence, Set, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Set, Tuple, Union
 
 from opencivil.core.berechnung import (
-    Berechnung, Eingaben, Nachweis, NachweisUrteil,
+    Berechnung, Eingaben, NachweisUrteil,
 )
 from opencivil.core.einheiten import Groesse
 from opencivil.core.protokoll import Protokoll, StillesProtokoll
@@ -131,8 +131,23 @@ class Loesung:
     fehlende: List[FehlendeEingabe] = field(default_factory=list)
     nicht_berechenbar: Dict[str, NichtBerechenbar] = field(default_factory=dict)
     urteile: List[NachweisUrteil] = field(default_factory=list)
+    befunde: Dict[str, Any] = field(default_factory=dict)
+    """
+    Je Berechnung, was sie ueber ihre Ausgaben hinaus festgehalten hat --
+    Linien, Fallergebnisse, das Ergebnis eines Systems (siehe
+    :class:`~opencivil.core.berechnung.Ausfuehrung`). Nach Berechnungs-ID.
+    """
 
     # -- Zugriff ------------------------------------------------------------
+
+    def befund(self, berechnung: Union[str, Berechnung]) -> Any:
+        """Der Befund einer Berechnung -- nach ihrer ID oder ihr selbst."""
+        bid = berechnung if isinstance(berechnung, str) else berechnung.id
+        try:
+            return self.befunde[bid]
+        except KeyError:
+            raise KeyError(f"'{bid}' hat in diesem Lauf keinen Befund hinterlassen -- "
+                           f"sie lief nicht, oder sie haelt keinen fest.") from None
 
     def wert(self, wert_id: str) -> Wert:
         try:
@@ -421,14 +436,11 @@ class _Lauf:
         self.werk = werk
         self.loesung = (Loesung(protokoll=StillesProtokoll()) if ohne_herleitung
                         else Loesung())
-        # Mitgebrachte Werte stehen im Zwischenspeicher, als waeren sie eben
-        # gerechnet worden. aufloesen() findet sie in Schritt 1 und geht
-        # darueber hinweg -- ohne Rechnung und ohne Protokollblock.
-        if bekannt:
-            self.loesung.werte.update(bekannt)
-            self._mitgebracht = set(bekannt)
-        else:
-            self._mitgebracht = set()
+        # Mitgebrachte Werte gelten als gerechnet: aufloesen() findet sie in
+        # Schritt 1 und geht darueber hinweg -- ohne Rechnung und ohne
+        # Protokollblock. In die Loesung kommen sie nicht; sie haelt fest, was
+        # dieser Lauf gerechnet hat, und die mitgebrachten hat der Aufrufer.
+        self._bekannt: Dict[str, Wert] = dict(bekannt or {})
         self._stapel: List[str] = []
         self._gescheitert: Dict[str, NichtBerechenbar] = {}
         self._ziele: List[str] = []
@@ -445,9 +457,11 @@ class _Lauf:
 
     def aufloesen(self, ziel: str, pfad: Tuple[str, ...]) -> Optional[Wert]:
         """Liefert den Wert oder None, wenn er nicht beschaffbar ist."""
-        # 1. Bereits gerechnet?
+        # 1. Bereits gerechnet -- oder mitgebracht?
         if (vorhanden := self.loesung.werte.get(ziel)) is not None:
             return vorhanden
+        if (mitgebracht := self._bekannt.get(ziel)) is not None:
+            return mitgebracht
 
         # 2. Vom Benutzer gesetzt oder ueberschrieben?
         if (gesetzt := self.werk._vorgegeben.get(ziel)) is not None:
@@ -533,7 +547,28 @@ class _Lauf:
                         definition=self.werk.definition(bezug.wert_id),
                     )
                 )
-        return Eingaben(gesammelt), fehlend
+
+        befunde: Dict[str, Any] = {}
+        for bezug in berechnung.befundbezuege:
+            quelle = self.werk._berechnungen.get(bezug.berechnung_id)
+            if quelle is None:
+                raise RechenwerkFehler(
+                    f"'{berechnung.id}' liest den Befund von '{bezug.berechnung_id}', "
+                    f"die es im Rechenwerk nicht gibt.")
+            # Gerechnet wird sie wie jede andere: ueber eine ihrer Ausgaben.
+            if bezug.berechnung_id not in self.loesung.befunde:
+                if self.aufloesen(quelle.ausgaben[0].id, pfad) is None:
+                    fehlend.append(FehlendeEingabe(
+                        id=quelle.ausgaben[0].id, benoetigt_von=berechnung.id, pfad=pfad,
+                        definition=quelle.ausgaben[0]))
+                    continue
+            if bezug.berechnung_id not in self.loesung.befunde:
+                raise RechenwerkFehler(
+                    f"'{berechnung.id}' liest den Befund von '{bezug.berechnung_id}', "
+                    f"die in diesem Lauf nicht gerechnet hat -- ihre Ausgaben waren "
+                    f"schon bekannt oder von Hand gesetzt.")
+            befunde[bezug.name] = self.loesung.befunde[bezug.berechnung_id]
+        return Eingaben(gesammelt, befunde), fehlend
 
     def _ausfuehren(
         self,
@@ -562,7 +597,7 @@ class _Lauf:
             self._abschnitt = abschnitt.raum
 
         anfang = len(protokoll.bloecke)
-        ergebnisse = berechnung.ausfuehren(eingaben, protokoll)
+        ausfuehrung = berechnung.ausfuehren(eingaben, protokoll)
         protokoll.herkunft_stempeln(berechnung.thema, ab=anfang)
 
         # Erst rechnen, dann begruenden. Andersherum stand der Hinweis vor der
@@ -577,7 +612,7 @@ class _Lauf:
             )
 
         eingang_ids = tuple(w.id for w in eingaben.values())
-        for wert_id, wert in ergebnisse.items():
+        for wert_id, wert in ausfuehrung.ausgaben.items():
             self.loesung.werte[wert_id] = wert
             self.loesung.graph[wert_id] = Herkunft(
                 wert_id=wert_id,
@@ -585,8 +620,9 @@ class _Lauf:
                 eingaben=eingang_ids,
             )
         self.loesung.reihenfolge.append(berechnung.id)
-        if isinstance(berechnung, Nachweis):
-            self.loesung.urteile.extend(berechnung.urteile)
+        self.loesung.urteile.extend(ausfuehrung.urteile)
+        if ausfuehrung.befund is not None:
+            self.loesung.befunde[berechnung.id] = ausfuehrung.befund
 
     # -- Abschluss ----------------------------------------------------------
 
@@ -635,14 +671,14 @@ class _Lauf:
         for ziel in self._ziele:
             # Ein Ziel kann anfangs scheitern und spaeter doch entstehen --
             # als Nebenausgabe einer Berechnung, die fuer ein anderes lief.
-            if ziel in self.loesung.werte:
+            if ziel in self.loesung.werte or ziel in self._bekannt:
                 continue
             scheitern = self._gescheitert.get(ziel)
             if scheitern is None:
                 continue
             self.loesung.nicht_berechenbar[ziel] = scheitern
             for fehlend in self._bis_zur_wurzel(ziel, gesehen_ziele):
-                if fehlend.id in self.loesung.werte:
+                if fehlend.id in self.loesung.werte or fehlend.id in self._bekannt:
                     continue
                 eindeutig.setdefault((fehlend.id, fehlend.benoetigt_von), fehlend)
 

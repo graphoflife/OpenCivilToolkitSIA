@@ -82,7 +82,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, M, Groesse
 from opencivil.core.latex import Mathe, angabe, als_text, bedingung
@@ -379,7 +379,7 @@ class Knicken(Nachweis):
                 erg.erfuellungsgrad, EINHEITSLOS)
             urteile.append(self._urteil(erg))
 
-        return ergebnis, urteile
+        return Ausfuehrung(ergebnis, urteile)
 
     def _einen_fall(self, loeser: Querschnittsloeser, fall: Knickfall,
                     h: float) -> Knickergebnis:

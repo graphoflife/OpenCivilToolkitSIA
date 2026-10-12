@@ -21,7 +21,7 @@ import math
 from typing import Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KN_PRO_M, KNM, Groesse
 from opencivil.core.latex import Mathe, als_text, fest
@@ -127,7 +127,7 @@ class Schubwandnachweis(Nachweis):
                 ergebnis[d["N"].id] = Groesse.aus_si(laengs.N, KN)
                 ergebnis[d["M_y"].id] = Groesse.aus_si(laengs.M_y, KNM)
                 ergebnis[d["M_z"].id] = Groesse.aus_si(laengs.M_z, KNM)
-        return ergebnis, urteile
+        return Ausfuehrung(ergebnis, urteile)
 
     def _laengszug_null(self, ergebnis: Dict[str, Groesse], fall: Lastfall) -> None:
         if self.mit_laengszug:

@@ -36,7 +36,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, Groesse
 from opencivil.core.latex import Mathe, als_text, fest
@@ -137,7 +137,7 @@ class SchiefeBiegung(Nachweis):
             ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(grad, EINHEITSLOS)
             if urteil is not None:
                 urteile.append(urteil)
-        return ergebnis, urteile
+        return Ausfuehrung(ergebnis, urteile)
 
     def _einwirkung(self, e: Eingaben, fall: Lastfall) -> Tuple[float, float, float]:
         N, M_y, M_z = fall.N, fall.M_y, 0.0 if self.einachsig else fall.M_z

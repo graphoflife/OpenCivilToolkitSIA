@@ -1,5 +1,5 @@
 ---
-erzeugt: 71cd7f109505
+erzeugt: e6b3bca920a7
 art: modul
 tags: [modul]
 ---
@@ -66,7 +66,7 @@ def rechne(self, e: Eingaben, p: Protokoll)
 #### Gleichungsblatt.ausfuehren
 
 ```python
-def ausfuehren(self, e: Eingaben, p: Protokoll) -> Dict[str, Wert]
+def ausfuehren(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ```
 
 Wie jede Berechnung -- und dazu, was die Zeilen ergeben haben, damit es

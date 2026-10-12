@@ -74,16 +74,45 @@ class Eingabebezug:
     """Wenn True, darf der Wert fehlen; die Berechnung prueft mit ``hat()``."""
 
 
+@dataclass(frozen=True)
+class Befundbezug:
+    """
+    Bindet einen lokalen Namen an den Befund einer anderen Berechnung.
+
+    Fuer eine Rechnung, die mehr als eine Zahl einer anderen braucht: die
+    Querkraft den Momentenwiderstand bei ihrer Normalkraft samt seiner
+    Herleitung, das Knicken die Resistenzlinie der Tragsicherheit. Der
+    Loeser rechnet die andere Berechnung vorher und reicht ihren Befund
+    durch (:meth:`Eingaben.befund`) -- die Abhaengigkeit steht so im Graphen,
+    wie ein Wert es tut.
+    """
+
+    name: str
+    berechnung_id: str
+
+
 class Eingaben(Mapping[str, Wert]):
     """
     Die aufgeloesten Eingaben einer Berechnung, unter ihren lokalen Namen.
 
     Ist selbst eine ``Mapping``, damit sie direkt an die LaTeX-Hilfen
-    weitergereicht werden kann.
+    weitergereicht werden kann. Die Befunde anderer Berechnungen
+    (:class:`Befundbezug`) stehen daneben, unter :meth:`befund`.
     """
 
-    def __init__(self, werte: Mapping[str, Wert]) -> None:
+    def __init__(self, werte: Mapping[str, Wert],
+                 befunde: Optional[Mapping[str, Any]] = None) -> None:
         self._werte: Dict[str, Wert] = dict(werte)
+        self._befunde: Dict[str, Any] = dict(befunde or {})
+
+    def befund(self, name: str) -> Any:
+        """Der Befund einer anderen Berechnung, unter seinem lokalen Namen."""
+        try:
+            return self._befunde[name]
+        except KeyError:
+            raise KeyError(
+                f"Befund '{name}' wurde nicht deklariert. Vorhanden: "
+                f"{sorted(self._befunde)}.") from None
 
     # -- Mapping ------------------------------------------------------------
 
@@ -123,6 +152,29 @@ class Eingaben(Mapping[str, Wert]):
         return f"Eingaben({', '.join(sorted(self._werte))})"
 
 
+@dataclass(frozen=True)
+class Ausfuehrung:
+    """
+    Was eine Berechnung in einem Lauf liefert: ihre Ausgaben -- und, wo es
+    mehr gibt, ihre Urteile und ihren Befund.
+
+    Der **Befund** ist alles, was ueber die Ausgabewerte hinausgeht und
+    spaeter jemand lesen will: Resistenzlinien, Fallergebnisse, das Ergebnis
+    eines Balkensystems. Er steht nach dem Lauf in der Loesung
+    (:attr:`~opencivil.core.rechenwerk.Loesung.befunde`), nicht am Objekt.
+    Ein Objekt beschreibt eine Rechnung, eine Loesung haelt fest, was sie
+    ergab -- so laesst sich eine Loesung aufheben und wiederverwenden, ohne
+    die Objekte umzuhaengen, die sie hervorgebracht haben.
+
+    :meth:`Berechnung.rechne` liefert die Ausgaben als Groessen,
+    :meth:`Berechnung.ausfuehren` daraus Werte.
+    """
+
+    ausgaben: Mapping[str, Any]
+    urteile: Tuple["NachweisUrteil", ...] = ()
+    befund: Any = None
+
+
 # ===========================================================================
 # Berechnung
 # ===========================================================================
@@ -157,12 +209,15 @@ class Berechnung(ABC):
         prioritaet: int = 0,
         begruendung: str = "",
         abschnitt: Optional[Abschnitt] = None,
+        befunde: Sequence[Befundbezug] = (),
     ) -> None:
         if not ausgaben:
             raise ValueError(f"Berechnung '{id}' liefert keine Ausgaben.")
         self.id = id
         self.ausgaben: Tuple[WertDef, ...] = tuple(ausgaben)
         self.bezuege: Tuple[Eingabebezug, ...] = tuple(bezuege)
+        self.befundbezuege: Tuple[Befundbezug, ...] = tuple(befunde)
+        """Die Befunde anderer Berechnungen, die diese liest -- siehe :class:`Befundbezug`."""
         self.abschnitt = abschnitt
         """
         Ueberschrift, unter die diese Berechnung gehoert.
@@ -180,7 +235,7 @@ class Berechnung(ABC):
         self.begruendung = begruendung
         """Warum es diese Variante gibt -- erscheint im Protokoll."""
 
-        namen = [b.name for b in self.bezuege]
+        namen = [b.name for b in self.bezuege] + [b.name for b in self.befundbezuege]
         doppelt = {n for n in namen if namen.count(n) > 1}
         if doppelt:
             raise ValueError(f"Berechnung '{id}': doppelte Eingabenamen {sorted(doppelt)}.")
@@ -241,21 +296,24 @@ class Berechnung(ABC):
     # -- Rechnen ------------------------------------------------------------
 
     @abstractmethod
-    def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
+    def rechne(self, e: Eingaben, p: Protokoll) -> Union[Mapping[str, Groesse], Ausfuehrung]:
         """
         Fuehrt die Rechnung aus und schreibt sie ins Protokoll.
 
         :param e: aufgeloeste Eingaben unter ihren lokalen Namen
         :param p: Mitschrift -- hier wird die Herleitung festgehalten
-        :return: ``{Wert-ID: Groesse}`` fuer jede deklarierte Ausgabe
+        :return: ``{Wert-ID: Groesse}`` fuer jede deklarierte Ausgabe --
+            oder eine :class:`Ausfuehrung` mit diesen Groessen, wo es dazu
+            Urteile oder einen Befund gibt
         """
 
-    def ausfuehren(self, e: Eingaben, p: Protokoll) -> Dict[str, Wert]:
+    def ausfuehren(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
         """
         Ruft :meth:`rechne` auf und prueft dessen Ergebnis.
 
         Verpackt jede Groesse in einen :class:`Wert` mit der deklarierten
-        Definition -- dabei wird auch die Dimension geprueft.
+        Definition -- dabei wird auch die Dimension geprueft. Urteile und
+        Befund reicht es unveraendert durch.
         """
         try:
             roh = self.rechne(e, p)
@@ -264,10 +322,16 @@ class Berechnung(ABC):
         except Exception as exc:
             raise BerechnungsFehler(self.id, f"{type(exc).__name__}: {exc}") from exc
 
-        if not isinstance(roh, Mapping):
+        if isinstance(roh, Ausfuehrung):
+            ausfuehrung = roh
+        elif isinstance(roh, Mapping):
+            ausfuehrung = Ausfuehrung(roh)
+        else:
             raise BerechnungsFehler(
-                self.id, f"rechne() muss ein Mapping liefern, erhalten: {type(roh).__name__}."
+                self.id, f"rechne() muss ein Mapping oder eine Ausfuehrung liefern, "
+                         f"erhalten: {type(roh).__name__}."
             )
+        roh = ausfuehrung.ausgaben
 
         erwartet = set(self.ausgabe_ids)
         geliefert = set(roh)
@@ -297,7 +361,7 @@ class Berechnung(ABC):
                 )
             except Exception as exc:
                 raise BerechnungsFehler(self.id, f"Ausgabe '{wert_id}': {exc}") from exc
-        return ergebnis
+        return replace(ausfuehrung, ausgaben=ergebnis, urteile=tuple(ausfuehrung.urteile))
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}({self.id!r} -> {list(self.ausgabe_ids)})"
@@ -709,8 +773,10 @@ class Nachweis(Berechnung):
     Vergleicht Einwirkung und Widerstand und faellt ein Urteil.
 
     Unterklassen implementieren :meth:`pruefe` statt :meth:`rechne`. Die
-    Urteile werden gesammelt und stehen nach dem Lauf unter :attr:`urteile`
-    zur Verfuegung -- der Bericht kann daraus die Nachweistabelle bauen.
+    Urteile gehen mit der :class:`Ausfuehrung` in die Loesung
+    (:attr:`~opencivil.core.rechenwerk.Loesung.urteile`) -- der Bericht baut
+    daraus die Nachweistabelle. Am Objekt bleibt nichts: es beschreibt den
+    Nachweis, die Loesung haelt fest, wie er ausging.
     """
 
     still: bool = False
@@ -749,7 +815,6 @@ class Nachweis(Berechnung):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self.urteile: list[NachweisUrteil] = []
         self.stille_faelle: set = set()
         """
         Welche einzelnen Faelle still bleiben, obwohl der Nachweis laeuft.
@@ -841,28 +906,30 @@ class Nachweis(Berechnung):
         self.still = not (alle & laut)
 
     @abstractmethod
-    def pruefe(self, e: Eingaben, p: Protokoll) -> Tuple[Mapping[str, Groesse], Sequence[NachweisUrteil]]:
+    def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
         """
-        Fuehrt den Nachweis und liefert Ausgabewerte samt Urteilen.
+        Fuehrt den Nachweis und liefert Ausgabewerte samt Urteilen -- und
+        einen Befund, wo jemand nach dem Lauf mehr lesen will als Zahlen.
 
-        :return: (``{Wert-ID: Groesse}``, Liste der Urteile)
+        :return: :class:`Ausfuehrung` mit ``{Wert-ID: Groesse}``, den Urteilen
+            und dem Befund
         """
 
-    def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]:
-        groessen, urteile = self.pruefe(e, p)
+    def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
+        pruefung = self.pruefe(e, p)
         # Der Namensraum wird hier gestempelt und nicht von den Unterklassen
         # mitgegeben: er ist immer derselbe, naemlich der des Nachweises.
         # Ebenso Langname und Name, wo die Pruefung keine eigenen nennt. Still
         # ist ein Urteil, wenn der ganze Nachweis es ist oder wenn die Pruefung
         # es einzeln so gestempelt hat -- sie kennt ihre Faelle.
-        self.urteile = []
-        for u in urteile:
+        urteile = []
+        for u in pruefung.urteile:
             langname = u.langname or self.langname
-            self.urteile.append(replace(
+            urteile.append(replace(
                 u, raum=self.id, langname=langname,
                 name=u.name or self.urteilsname(langname, u.fall),
                 still=self.still or u.still))
-        return groessen
+        return replace(pruefung, urteile=tuple(urteile))
 
     # Ein `alle_erfuellt` gab es hier einmal. Es hatte keinen Aufrufer und
     # zaehlte die stillen Urteile mit -- also das Gegenteil von dem, was

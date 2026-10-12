@@ -69,7 +69,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, N_PRO_MM2, Groesse
 from opencivil.core.latex import als_text, angabe, bedingung, vergleich
@@ -525,7 +525,7 @@ class Spannungsbegrenzung(Nachweis):
                 erg.erfuellungsgrad, EINHEITSLOS)
             urteile.append(self._urteil(erg, still=leise))
 
-        return ergebnis, urteile
+        return Ausfuehrung(ergebnis, urteile)
 
     def _einen_fall(self, loeser: Querschnittsloeser, fall: Gebrauchsfall,
                     sigma_adm: Dict[str, float]) -> Fallergebnis:

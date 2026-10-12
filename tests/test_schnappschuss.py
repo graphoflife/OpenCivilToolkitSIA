@@ -132,9 +132,10 @@ class TestSchnappschuss(unittest.TestCase):
         from opencivil.projekt import Aufbau
 
         gezeigt = set()
-        for aufbau, _ in _gerechnet().values():
+        for aufbau, loesung in _gerechnet().values():
             for feld, eintraege in aufbau.nachweise_je_feld():
-                if any(not u.still for n in eintraege.values() for u in n.urteile):
+                raeume = {n.id for n in eintraege.values()}
+                if any(not u.still for u in loesung.urteile if u.raum in raeume):
                     gezeigt.add(feld)
         self.assertEqual(set(Aufbau.NACHWEISFELDER) - gezeigt, set())
 

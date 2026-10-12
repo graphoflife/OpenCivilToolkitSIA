@@ -1,5 +1,5 @@
 ---
-erzeugt: 9d56114c3f3c
+erzeugt: fb35411a7450
 art: modul
 tags: [modul]
 ---
@@ -124,6 +124,15 @@ Ergebnis eines Rechenlaufs.
 - `fehlende: List[FehlendeEingabe] = field(default_factory=list)`
 - `nicht_berechenbar: Dict[str, NichtBerechenbar] = field(default_factory=dict)`
 - `urteile: List[NachweisUrteil] = field(default_factory=list)`
+- `befunde: Dict[str, Any] = field(default_factory=dict)` – Je Berechnung, was sie ueber ihre Ausgaben hinaus festgehalten hat -- Linien, Fallergebnisse, das Ergebnis eines Systems (siehe [[opencivil.core.berechnung#Ausfuehrung|Ausfuehrung]]). Nach Berechnungs-ID.
+
+#### Loesung.befund
+
+```python
+def befund(self, berechnung: Union[str, Berechnung]) -> Any
+```
+
+Der Befund einer Berechnung -- nach ihrer ID oder ihr selbst.
 
 #### Loesung.wert
 

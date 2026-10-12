@@ -6,10 +6,32 @@ from opencivil.nachweis import knicken as knick_modul
 from opencivil.projekt import KnickEintrag, Projekt
 
 
-def urteile(projekt: Projekt):
+def rechnen(projekt: Projekt):
     aufbau = projekt.aufbauen()
-    loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+    return aufbau, aufbau.werk.loese(*aufbau.alle_nachweisziele())
+
+
+def urteile(projekt: Projekt):
+    aufbau, loesung = rechnen(projekt)
     return aufbau, {u.name: u for u in loesung.urteile}
+
+
+class Gelaufen:
+    """
+    Ein Nachweis samt dem Lauf, in dem er rechnete. Was er ergab, steht in
+    der Loesung und nicht am Objekt; fuer die Tests hier sieht es aus wie
+    frueher am Objekt.
+    """
+
+    def __init__(self, nachweis, loesung) -> None:
+        self.nachweis, self.loesung = nachweis, loesung
+
+    @property
+    def urteile(self):
+        return [u for u in self.loesung.urteile if u.raum == self.nachweis.id]
+
+    def __getattr__(self, name):
+        return getattr(self.nachweis, name)
 
 
 
@@ -68,14 +90,15 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         self.assertTrue(all(n.still for n in aufbau.spannung.values()))
 
     def test_mit_den_siebzig_prozent_wird_er_laut(self):
-        aufbau, _ = urteile(
+        aufbau, loesung = rechnen(
             self.projekt("erhoeht", haeufig__aus_tragsicherheit=True))
-        laut = [u.fall for u in aufbau.spannung["q1.x"].urteile if not u.still]
+        laut = [u.fall for u in Gelaufen(aufbau.spannung["q1.x"], loesung).urteile
+                if not u.still]
         self.assertIn("Feld (70 %)", laut)
 
     def test_die_grenze_ist_f_yd_minus_80(self):
-        aufbau, _ = urteile(self.projekt("hoch"))
-        urteil = aufbau.spannung["q1.x"].urteile[0]
+        aufbau, loesung = rechnen(self.projekt("hoch"))
+        urteil = Gelaufen(aufbau.spannung["q1.x"], loesung).urteile[0]
         # B500B: f_yd = 434.8, minus 80 -> 354.8 N/mm²
         self.assertAlmostEqual(urteil.widerstand.groesse.si / 1e6, 354.8, delta=0.5)
 
@@ -108,8 +131,8 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         q = projekt.querschnitte[0]
         q.haeufig.aus_tragsicherheit = False
         q.haeufig.faelle = [GebrauchsfallEintrag("Gebrauch", M_Ed=60.0, N_Ed=0.0)]
-        aufbau, _ = urteile(projekt)
-        spannung = aufbau.spannung["q1.x"]
+        aufbau, loesung = rechnen(projekt)
+        spannung = Gelaufen(aufbau.spannung["q1.x"], loesung)
         self.assertEqual([u.fall for u in spannung.urteile if not u.still],
                          ["Gebrauch"])
         self.assertIn("Feld (70 %)", [e.fall.name for e in spannung.ergebnisse])
@@ -156,8 +179,8 @@ class TestStahlspannungAusRissbreite(unittest.TestCase):
         return projekt
 
     def nachweis(self, projekt):
-        aufbau, _ = urteile(projekt)
-        return aufbau.spannung_riss["q1.x"]
+        aufbau, loesung = rechnen(projekt)
+        return Gelaufen(aufbau.spannung_riss["q1.x"], loesung)
 
     def test_er_laeuft_auch_bei_normaler_anforderung(self):
         """Dort ist die Grenze f_yk -- auch dann darf nichts fliessen."""

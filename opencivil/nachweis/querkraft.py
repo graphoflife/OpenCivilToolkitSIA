@@ -57,7 +57,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import (
     EINHEITSLOS, GRAD, KN, KN_PRO_M, KNM, MM, N_PRO_MM2, EmpirischesErgebnis,
@@ -620,7 +620,7 @@ class Querkraft(Nachweis):
             self._protokoll_fall(p, e, erg, beiwert)
             self._eintragen(erg, ergebnis, urteile)
 
-        return ergebnis, urteile
+        return Ausfuehrung(ergebnis, urteile)
 
     def _eintragen(
         self, erg: Querkraftergebnis, ergebnis: Dict[str, Groesse],
@@ -733,7 +733,7 @@ class Querkraft(Nachweis):
             self._protokoll_fall_buegel(p, e, erg, teilung_y)
             self._eintragen(erg, ergebnis, urteile)
 
-        return ergebnis, urteile
+        return Ausfuehrung(ergebnis, urteile)
 
     def _einen_fall_buegel(
         self, fall: Querkraftfall, *, h: float,

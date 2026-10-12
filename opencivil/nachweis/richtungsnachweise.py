@@ -26,7 +26,7 @@ import math
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, MIO_MM3, MIO_MM4, MM, Groesse
 from opencivil.core.latex import Mathe, als_text, vergleich
@@ -130,7 +130,7 @@ class DuktilitaetQA(Nachweis):
                 begruendung=f"x/d = {verhaeltnis:.3f} gegen {self.grenze:g}.",
                 einwirkung=x_d, widerstand=grenze))
         self.protokoll_massgebend(p, urteile)
-        return ergebnis, self.teilurteile(urteile)
+        return Ausfuehrung(ergebnis, self.teilurteile(urteile))
 
 
 class SproedesVersagenQA(Nachweis):
@@ -230,7 +230,7 @@ class SproedesVersagenQA(Nachweis):
                 begruendung="M_Rd bei N = 0 gegen das Rissmoment.",
                 einwirkung=M_Riss, widerstand=M_Rd))
         self.protokoll_massgebend(p, urteile)
-        return ergebnis, self.teilurteile(urteile)
+        return Ausfuehrung(ergebnis, self.teilurteile(urteile))
 
     def _hoehe(self, um_y: bool) -> float:
         """Die Ausdehnung des Betons in Biegerichtung, in m: z bei M_y, y bei M_z."""
