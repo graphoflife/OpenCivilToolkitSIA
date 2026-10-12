@@ -20,8 +20,10 @@ class TestUrteilsraum(unittest.TestCase):
     def zweiplattenprojekt(self) -> Projekt:
         projekt = Projekt.beispiel()
         # Nur Platten: um sie geht es hier. Der Unterzug des Beispiels hat
-        # seinen eigenen Namensraum und zählte sonst bei keiner mit.
+        # seinen eigenen Namensraum und zählte sonst bei keiner mit -- und der
+        # Rahmen, der seinen Querschnitt nimmt, geht mit ihm.
         projekt.querschnittsanalysen = []
+        projekt.balkensysteme = []
         zweite = Projekt.aus_dict(json.loads(json.dumps(projekt.als_dict()))).querschnitt("q1")
         zweite.kennung, zweite.name = "q2", "Decke über 1. OG"
         projekt.querschnitte.append(zweite)

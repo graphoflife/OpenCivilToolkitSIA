@@ -2,7 +2,7 @@
 Voll
 ====================================================================================================
 
-167 Berechnungen ausgeführt, 359 Werte bestimmt.
+229 Berechnungen ausgeführt, 421 Werte bestimmt.
 
 ====================================================================================================
 Herleitung
@@ -3019,6 +3019,499 @@ Einwirkung
 Erfüllungsgrad
     \alpha_{eff,\text{Zug}} = \frac{N_{Rd}^{+}}{N_{Ed}} = \frac{942.5\,\mathrm{kN}}{400\,\mathrm{kN}} = 2.36 \quad \Rightarrow \quad \text{erfüllt}
 
+Balkensystem: Alles einmal
+--------------------------
+
+Querschnittsfläche, «Balken 300×500» (Rechteck)
+    A_{\text{Q1}} = b_{\text{Q1}} \cdot h_{\text{Q1}} = 300\,\mathrm{mm} \cdot 500\,\mathrm{mm} = 150000\,\mathrm{mm}^{2}
+
+Flächenträgheitsmoment, «Balken 300×500» (Rechteck)
+    I_{\text{Q1}} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12} = \frac{300\,\mathrm{mm} \cdot \left(500\,\mathrm{mm}\right)^{3}}{12} = 3125\,\cdot 10^{6}\,\mathrm{mm}^{4}
+
+Querschnittsfläche, «Rundstütze» (Kreis)
+    A_{\text{Q2}} = \frac{\pi \cdot \left(d_{\text{Q2}}\right)^{2}}{4} = \frac{\pi \cdot \left(400\,\mathrm{mm}\right)^{2}}{4} = 125664\,\mathrm{mm}^{2}
+
+Flächenträgheitsmoment, «Rundstütze» (Kreis)
+    I_{\text{Q2}} = \frac{\pi \cdot \left(d_{\text{Q2}}\right)^{4}}{64} = \frac{\pi \cdot \left(400\,\mathrm{mm}\right)^{4}}{64} = 1256.64\,\cdot 10^{6}\,\mathrm{mm}^{4}
+
+Querschnittsfläche, «Rohr» (Kreisring)
+    \begin{aligned}
+      A_{\text{Q3}} &= \frac{\pi \cdot \left(\left(D_{\text{Q3}}\right)^{2} - \left(D_{\text{Q3}} - 2 \cdot t_{\text{Q3}}\right)^{2}\right)}{4} \\
+      &= \frac{\pi \cdot \left(\left(168.3\,\mathrm{mm}\right)^{2} - \left(168.3\,\mathrm{mm} - 2 \cdot 10\,\mathrm{mm}\right)^{2}\right)}{4} \\
+      &= 4973\,\mathrm{mm}^{2}
+    \end{aligned}
+
+Flächenträgheitsmoment, «Rohr» (Kreisring)
+    \begin{aligned}
+      I_{\text{Q3}} &= \frac{\pi \cdot \left(\left(D_{\text{Q3}}\right)^{4} - \left(D_{\text{Q3}} - 2 \cdot t_{\text{Q3}}\right)^{4}\right)}{64} \\
+      &= \frac{\pi \cdot \left(\left(168.3\,\mathrm{mm}\right)^{4} - \left(168.3\,\mathrm{mm} - 2 \cdot 10\,\mathrm{mm}\right)^{4}\right)}{64} \\
+      &= 15.64\,\cdot 10^{6}\,\mathrm{mm}^{4}
+    \end{aligned}
+
+Querschnittsfläche, «Hohlprofil» (Rechteckrohr)
+    \begin{aligned}
+      A_{\text{Q4}} &= b_{\text{Q4}} \cdot h_{\text{Q4}} - \left(b_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right) \cdot \left(h_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right) \\
+      &= 200\,\mathrm{mm} \cdot 300\,\mathrm{mm} - \left(200\,\mathrm{mm} - 2 \cdot 12.5\,\mathrm{mm}\right) \cdot \left(300\,\mathrm{mm} - 2 \cdot 12.5\,\mathrm{mm}\right) \\
+      &= 11875\,\mathrm{mm}^{2}
+    \end{aligned}
+
+Flächenträgheitsmoment, «Hohlprofil» (Rechteckrohr)
+    \begin{aligned}
+      I_{\text{Q4}} &= \frac{b_{\text{Q4}} \cdot \left(h_{\text{Q4}}\right)^{3} - \left(b_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right) \cdot \left(h_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right)^{3}}{12} \\
+      &= \frac{200\,\mathrm{mm} \cdot \left(300\,\mathrm{mm}\right)^{3} - \left(200\,\mathrm{mm} - 2 \cdot 12.5\,\mathrm{mm}\right) \cdot \left(300\,\mathrm{mm} - 2 \cdot 12.5\,\mathrm{mm}\right)^{3}}{12} \\
+      &= 146.71\,\cdot 10^{6}\,\mathrm{mm}^{4}
+    \end{aligned}
+
+Querschnittsfläche, «Plattenbalken» (T-Querschnitt)
+    \begin{aligned}
+      A_{\text{Q5}} &= b_{\text{Q5}} \cdot h_{f,\text{Q5}} + b_{w,\text{Q5}} \cdot \left(h_{\text{Q5}} - h_{f,\text{Q5}}\right) \\
+      &= 1200\,\mathrm{mm} \cdot 200\,\mathrm{mm} + 300\,\mathrm{mm} \cdot \left(600\,\mathrm{mm} - 200\,\mathrm{mm}\right) \\
+      &= 360000\,\mathrm{mm}^{2}
+    \end{aligned}
+
+Abstand des Schwerpunkts vom oberen Rand, «Plattenbalken» (T-Querschnitt)
+    \begin{aligned}
+      z_{S,\text{Q5}} &= \frac{b_{\text{Q5}} \cdot \left(h_{f,\text{Q5}}\right)^{2} / 2 + b_{w,\text{Q5}} \cdot \left(h_{\text{Q5}} - h_{f,\text{Q5}}\right) \cdot \left(h_{\text{Q5}} + h_{f,\text{Q5}}\right) / 2}{A_{\text{Q5}}} \\
+      &= \frac{1200\,\mathrm{mm} \cdot \left(200\,\mathrm{mm}\right)^{2} / 2 + 300\,\mathrm{mm} \cdot \left(600\,\mathrm{mm} - 200\,\mathrm{mm}\right) \cdot \left(600\,\mathrm{mm} + 200\,\mathrm{mm}\right) / 2}{360000\,\mathrm{mm}^{2}} \\
+      &= 200\,\mathrm{mm}
+    \end{aligned}
+
+Flächenträgheitsmoment, «Plattenbalken» (T-Querschnitt)
+    \begin{aligned}
+      I_{\text{Q5}} &= \frac{b_{\text{Q5}} \cdot \left(h_{f,\text{Q5}}\right)^{3}}{12} + b_{\text{Q5}} \cdot h_{f,\text{Q5}} \cdot \left(z_{S,\text{Q5}} - \frac{h_{f,\text{Q5}}}{2}\right)^{2} + \frac{b_{w,\text{Q5}} \cdot \left(h_{\text{Q5}} - h_{f,\text{Q5}}\right)^{3}}{12} + b_{w,\text{Q5}} \cdot \left(h_{\text{Q5}} - h_{f,\text{Q5}}\right) \cdot \left(\frac{h_{\text{Q5}} + h_{f,\text{Q5}}}{2} - z_{S,\text{Q5}}\right)^{2} \\
+      &= \frac{1200\,\mathrm{mm} \cdot \left(200\,\mathrm{mm}\right)^{3}}{12} + 1200\,\mathrm{mm} \cdot 200\,\mathrm{mm} \cdot \left(200\,\mathrm{mm} - \frac{200\,\mathrm{mm}}{2}\right)^{2} + \frac{300\,\mathrm{mm} \cdot \left(600\,\mathrm{mm} - 200\,\mathrm{mm}\right)^{3}}{12} + 300\,\mathrm{mm} \cdot \left(600\,\mathrm{mm} - 200\,\mathrm{mm}\right) \cdot \left(\frac{600\,\mathrm{mm} + 200\,\mathrm{mm}}{2} - 200\,\mathrm{mm}\right)^{2} \\
+      &= 9600\,\cdot 10^{6}\,\mathrm{mm}^{4}
+    \end{aligned}
+
+Querschnittsfläche, «Walzprofil» (Doppel-T)
+    \begin{aligned}
+      A_{\text{Q6}} &= 2 \cdot b_{\text{Q6}} \cdot t_{f,\text{Q6}} + t_{w,\text{Q6}} \cdot \left(h_{\text{Q6}} - 2 \cdot t_{f,\text{Q6}}\right) \\
+      &= 2 \cdot 300\,\mathrm{mm} \cdot 19\,\mathrm{mm} + 11\,\mathrm{mm} \cdot \left(300\,\mathrm{mm} - 2 \cdot 19\,\mathrm{mm}\right) \\
+      &= 14282\,\mathrm{mm}^{2}
+    \end{aligned}
+
+Flächenträgheitsmoment, «Walzprofil» (Doppel-T)
+    \begin{aligned}
+      I_{\text{Q6}} &= \frac{b_{\text{Q6}} \cdot \left(h_{\text{Q6}}\right)^{3} - \left(b_{\text{Q6}} - t_{w,\text{Q6}}\right) \cdot \left(h_{\text{Q6}} - 2 \cdot t_{f,\text{Q6}}\right)^{3}}{12} \\
+      &= \frac{300\,\mathrm{mm} \cdot \left(300\,\mathrm{mm}\right)^{3} - \left(300\,\mathrm{mm} - 11\,\mathrm{mm}\right) \cdot \left(300\,\mathrm{mm} - 2 \cdot 19\,\mathrm{mm}\right)^{3}}{12} \\
+      &= 241.87\,\cdot 10^{6}\,\mathrm{mm}^{4}
+    \end{aligned}
+
+Querschnittsfläche, «Fundamentbalken» (Trapez)
+    A_{\text{Q7}} = \frac{\left(b_{o,\text{Q7}} + b_{u,\text{Q7}}\right) \cdot h_{\text{Q7}}}{2} = \frac{\left(600\,\mathrm{mm} + 400\,\mathrm{mm}\right) \cdot 500\,\mathrm{mm}}{2} = 250000\,\mathrm{mm}^{2}
+
+Flächenträgheitsmoment, «Fundamentbalken» (Trapez)
+    \begin{aligned}
+      I_{\text{Q7}} &= \frac{\left(h_{\text{Q7}}\right)^{3} \cdot \left(\left(b_{o,\text{Q7}}\right)^{2} + 4 \cdot b_{o,\text{Q7}} \cdot b_{u,\text{Q7}} + \left(b_{u,\text{Q7}}\right)^{2}\right)}{36 \cdot \left(b_{o,\text{Q7}} + b_{u,\text{Q7}}\right)} \\
+      &= \frac{\left(500\,\mathrm{mm}\right)^{3} \cdot \left(\left(600\,\mathrm{mm}\right)^{2} + 4 \cdot 600\,\mathrm{mm} \cdot 400\,\mathrm{mm} + \left(400\,\mathrm{mm}\right)^{2}\right)}{36 \cdot \left(600\,\mathrm{mm} + 400\,\mathrm{mm}\right)} \\
+      &= 5138.89\,\cdot 10^{6}\,\mathrm{mm}^{4}
+    \end{aligned}
+
+Querschnittsfläche, «Von Hand» (von Hand)
+    A_{\text{Q8}} = 15000\,\mathrm{mm}^{2}
+
+Flächenträgheitsmoment, «Von Hand» (von Hand)
+    I_{\text{Q8}} = 120\,\cdot 10^{6}\,\mathrm{mm}^{4}
+
+Querschnittsfläche, «Deckenstreifen» (Platte «Decke»)
+    A_{\text{Q9}} = b \cdot h = 1000\,\mathrm{mm} \cdot 300\,\mathrm{mm} = 300000\,\mathrm{mm}^{2}
+
+Flächenträgheitsmoment, «Deckenstreifen» (Platte «Decke»)
+    I_{\text{Q9}} = \frac{b \cdot \left(h\right)^{3}}{12} = \frac{1000\,\mathrm{mm} \cdot \left(300\,\mathrm{mm}\right)^{3}}{12} = 2250\,\cdot 10^{6}\,\mathrm{mm}^{4}
+
+Querschnittsfläche, «Kasten» (Bruttoquerschnitt der Querschnittsanalyse «Kastenträger»)
+    A_{\text{Q10}} = 330000\,\mathrm{mm}^{2}
+
+Flächenträgheitsmoment, «Kasten» (Bruttoquerschnitt der Querschnittsanalyse «Kastenträger»)
+    I_{\text{Q10}} = 13275\,\cdot 10^{6}\,\mathrm{mm}^{4}
+
+Dehnsteifigkeit, «Balken 300×500» aus C30/37
+    EA_{\text{Q1,C30/37}} = E_{cm} \cdot A_{\text{Q1}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 150000\,\mathrm{mm}^{2} = 5043\,\mathrm{MN}
+
+Biegesteifigkeit, «Balken 300×500» aus C30/37
+    EI_{\text{Q1,C30/37}} = E_{cm} \cdot I_{\text{Q1}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 3125\,\cdot 10^{6}\,\mathrm{mm}^{4} = 105062\,\mathrm{kNm}^{2}
+
+Dehnsteifigkeit, «Rundstütze» aus C30/37
+    EA_{\text{Q2,C30/37}} = E_{cm} \cdot A_{\text{Q2}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 125664\,\mathrm{mm}^{2} = 4225\,\mathrm{MN}
+
+Biegesteifigkeit, «Rundstütze» aus C30/37
+    EI_{\text{Q2,C30/37}} = E_{cm} \cdot I_{\text{Q2}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 1256.64\,\cdot 10^{6}\,\mathrm{mm}^{4} = 42248\,\mathrm{kNm}^{2}
+
+Dehnsteifigkeit, «Plattenbalken» aus C30/37
+    EA_{\text{Q5,C30/37}} = E_{cm} \cdot A_{\text{Q5}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 360000\,\mathrm{mm}^{2} = 12103\,\mathrm{MN}
+
+Biegesteifigkeit, «Plattenbalken» aus C30/37
+    EI_{\text{Q5,C30/37}} = E_{cm} \cdot I_{\text{Q5}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 9600\,\cdot 10^{6}\,\mathrm{mm}^{4} = 322750\,\mathrm{kNm}^{2}
+
+Dehnsteifigkeit, «Rohr» aus B500B
+    EA_{\text{Q3,B500B}} = E_s \cdot A_{\text{Q3}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 4973\,\mathrm{mm}^{2} = 995\,\mathrm{MN}
+
+Biegesteifigkeit, «Rohr» aus B500B
+    EI_{\text{Q3,B500B}} = E_s \cdot I_{\text{Q3}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 15.64\,\cdot 10^{6}\,\mathrm{mm}^{4} = 3128\,\mathrm{kNm}^{2}
+
+Dehnsteifigkeit, «Walzprofil» aus B500B
+    EA_{\text{Q6,B500B}} = E_s \cdot A_{\text{Q6}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 14282\,\mathrm{mm}^{2} = 2856\,\mathrm{MN}
+
+Biegesteifigkeit, «Walzprofil» aus B500B
+    EI_{\text{Q6,B500B}} = E_s \cdot I_{\text{Q6}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 241.87\,\cdot 10^{6}\,\mathrm{mm}^{4} = 48374\,\mathrm{kNm}^{2}
+
+Dehnsteifigkeit, «Fundamentbalken» aus C30/37
+    EA_{\text{Q7,C30/37}} = E_{cm} \cdot A_{\text{Q7}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 250000\,\mathrm{mm}^{2} = 8405\,\mathrm{MN}
+
+Biegesteifigkeit, «Fundamentbalken» aus C30/37
+    EI_{\text{Q7,C30/37}} = E_{cm} \cdot I_{\text{Q7}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 5138.89\,\cdot 10^{6}\,\mathrm{mm}^{4} = 172768\,\mathrm{kNm}^{2}
+
+Dehnsteifigkeit, «Hohlprofil» aus B500B
+    EA_{\text{Q4,B500B}} = E_s \cdot A_{\text{Q4}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 11875\,\mathrm{mm}^{2} = 2375\,\mathrm{MN}
+
+Biegesteifigkeit, «Hohlprofil» aus B500B
+    EI_{\text{Q4,B500B}} = E_s \cdot I_{\text{Q4}} = 200000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 146.71\,\cdot 10^{6}\,\mathrm{mm}^{4} = 29342\,\mathrm{kNm}^{2}
+[*] Annahme: Steifigkeit nach Vorgabe, nicht nachgeschlagen: E_cm für Beton und E_s für Betonstahl,
+am ungerissenen Bruttoquerschnitt, ohne Schubverformung; Gleichgewicht am unverformten System
+(Theorie 1. Ordnung).
+
+Stäbe
+    Stab   Knoten  L\ [\mathrm{m}]  \alpha\ [°]      Querschnitt  EA\ [\mathrm{MN}]  EI\ [\mathrm{kNm}^{2}]  Gelenk               Linienlager
+    ----  -------  ---------------  -----------  ---------------  -----------------  ----------------------  ------  ------------------------
+      L1  K1 – K2            8.000          0.0   Balken 300×500               5043                  105062       –  quer Bettung 20000 kN/m²
+      L2  K2 – K3            3.000         90.0       Rundstütze               4225                   42248       –                         –
+      L3  K3 – K4            4.472         26.6    Plattenbalken              12103                  322750       –                         –
+      L4  K4 – K5            5.000        -90.0             Rohr                995                    3128   beide                         –
+      L5  K5 – K6            3.000          0.0       Walzprofil               2856                   48374  Anfang                         –
+      L6  K6 – K7            2.000          0.0  Fundamentbalken               8405                  172768       –                 quer fest
+      L7  K7 – K8            1.000        -90.0        kein Stab                  –                       –       –                 quer fest
+      L8  K6 – K9            2.000         90.0       Hohlprofil               2375                   29342       –                         –
+
+Lager
+    Lager  Knoten     x                 z              \varphi
+    -----  ------  ----  ----------------  -------------------
+       A1      K1  fest  Feder 50000 kN/m  Feder 10000 kNm/rad
+       A2      K5  fest              fest                 frei
+
+Steifigkeitsmatrix eines Stabs, in seinen Achsen
+    \mathbf{k} = \begin{bmatrix} \frac{EA}{L} & 0 & 0 & -\frac{EA}{L} & 0 & 0 \\ 0 & \frac{12EI}{L^3} & \frac{6EI}{L^2} & 0 & -\frac{12EI}{L^3} & \frac{6EI}{L^2} \\ 0 & \frac{6EI}{L^2} & \frac{4EI}{L} & 0 & -\frac{6EI}{L^2} & \frac{2EI}{L} \\ -\frac{EA}{L} & 0 & 0 & \frac{EA}{L} & 0 & 0 \\ 0 & -\frac{12EI}{L^3} & -\frac{6EI}{L^2} & 0 & \frac{12EI}{L^3} & -\frac{6EI}{L^2} \\ 0 & \frac{6EI}{L^2} & \frac{2EI}{L} & 0 & -\frac{6EI}{L^2} & \frac{4EI}{L} \end{bmatrix}
+
+Von den Achsen des Systems in die des Stabs
+    \mathbf{d} = \mathbf{T} \cdot \mathbf{d}_{glob} \qquad \mathbf{T} = \begin{bmatrix} \mathbf{R} & \mathbf{0} \\ \mathbf{0} & \mathbf{R} \end{bmatrix} \qquad \mathbf{R} = \begin{bmatrix} \cos\alpha & \sin\alpha & 0 \\ -\sin\alpha & \cos\alpha & 0 \\ 0 & 0 & 1 \end{bmatrix}
+
+Bettung eines Stabs, quer und längs
+    \mathbf{k}_{b} = \frac{k_{\perp} \cdot L}{420} \begin{bmatrix} 156 & 22L & 54 & -13L \\ 22L & 4L^2 & 13L & -3L^2 \\ 54 & 13L & 156 & -22L \\ -13L & -3L^2 & -22L & 4L^2 \end{bmatrix} \qquad \mathbf{k}_{b,\parallel} = \frac{k_{\parallel} \cdot L}{6} \begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix}
+
+Arbeitsgleiche Knotenkräfte der Lasten auf einem Stab
+    f_i = \int_0^L N_i(x) \cdot p(x)\,\mathrm{d}x + \int_0^L N_i'(x) \cdot m(x)\,\mathrm{d}x + \sum_j N_i(a_j) \cdot P_j + \sum_j N_i'(a_j) \cdot M_j
+
+Gesamtsteifigkeitsmatrix und Gleichungssystem
+    \mathbf{K} = \sum_{\text{Stäbe}} \mathbf{T}^{\mathsf{T}} \cdot \mathbf{k} \cdot \mathbf{T} \qquad \mathbf{K} \cdot \mathbf{x} = \mathbf{F}
+
+Ein Gelenk gibt dem Stabende eine eigene Drehung als Unbekannte; der Knoten dreht sich unabhängig
+davon.
+[i] Hinweis: Verdrehung nicht bestimmbar, da keine Steifigkeit: K5. Alle Stäbe sind dort gelenkig
+angeschlossen; die Drehung ist gestrichen und null gesetzt.
+
+Schnittgrössen aus den Kräften an den Stabenden
+    N(0) = -s_{u,a} \qquad V(0) = s_{v,a} \qquad M(0) = -s_{\theta,a} \qquad \frac{\mathrm{d}N}{\mathrm{d}x} = -p_x \qquad \frac{\mathrm{d}V}{\mathrm{d}x} = p_y \qquad \frac{\mathrm{d}M}{\mathrm{d}x} = V - m
+
+Biegelinie und Längsverschiebung
+    v'' = \frac{M}{EI} \qquad u' = \frac{N}{EA}
+
+39 Unbekannte.
+
+Lastfall «Eigengewicht»
+-----------------------
+
+Verschiebungen der Knoten
+    Knoten  u_x\ [\mathrm{mm}]  u_z\ [\mathrm{mm}]  \varphi\ [\mathrm{mrad}]
+    ------  ------------------  ------------------  ------------------------
+        K1                0.00               -0.09                    -0.129
+        K2                0.00               -1.03                    -0.151
+        K3               -0.08               -1.04                     0.207
+        K4               -0.58               -0.05                     0.290
+        K5                0.00                0.00          nicht bestimmbar
+        K6                0.00                0.00                     0.000
+        K7                0.00                0.00                     0.000
+        K9                0.00                0.00                     0.000
+
+Schnittgrössen an den Stabenden
+    Stab  N_{a}\ [\mathrm{kN}]  V_{a}\ [\mathrm{kN}]  M_{a}\ [\mathrm{kNm}]  N_{b}\ [\mathrm{kN}]  V_{b}\ [\mathrm{kN}]  M_{b}\ [\mathrm{kNm}]
+    ----  --------------------  --------------------  ---------------------  --------------------  --------------------  ---------------------
+      L1                   0.0                   4.4                   -1.3                   0.0                   8.9                    5.1
+      L2                  -8.9                   0.0                    5.1                  -8.9                   0.0                    5.1
+      L3                  -4.0                   8.0                    0.1                   4.0                  -8.0                    0.0
+      L4                  -9.0                   0.0                    0.0                  -9.0                   0.0                    0.0
+      L5                   0.0                   0.0                    0.0                   0.0                   0.0                    0.0
+      L6                   0.0                   0.0                    0.0                   0.0                   0.0                    0.0
+      L8                   0.0                   0.0                    0.0                   0.0                   0.0                    0.0
+
+Lagerkräfte, auf das Tragwerk
+                                    Lager  R_x\ [\mathrm{kN}]  R_z\ [\mathrm{kN}]  M\ [\mathrm{kNm}]
+    -------------------------------------  ------------------  ------------------  -----------------
+                                  A1 (K1)                 0.0                 4.4                1.3
+                                  A2 (K5)                 0.0                 9.0                0.0
+                                       K6                 0.0                 0.0                0.0
+                                       K7                 0.0                 0.0                0.0
+    L6: Lasten geradewegs ins Linienlager                 0.0                20.0              320.0
+                       L1: Bettung, Summe                 0.0                84.5              430.4
+
+Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
+
+Extremwerte
+    Stab  Grösse             kleinst  x\ [\mathrm{m}]             grösst  x\ [\mathrm{m}]
+    ----  ------  ------------------  ---------------  -----------------  ---------------
+      L1       N    0.0\ \mathrm{kN}             3.00   0.0\ \mathrm{kN}             4.00
+      L1       V   -0.1\ \mathrm{kN}             3.68   8.9\ \mathrm{kN}             8.00
+      L1       M  -4.1\ \mathrm{kNm}             6.00  5.1\ \mathrm{kNm}             8.00
+      L1       w  -0.09\ \mathrm{mm}             5.49  0.01\ \mathrm{mm}             1.37
+      L2       N   -8.9\ \mathrm{kN}             0.00  -8.9\ \mathrm{kN}             0.00
+      L2       V    0.0\ \mathrm{kN}             0.00   0.0\ \mathrm{kN}             0.00
+      L2       M   5.1\ \mathrm{kNm}             0.00  5.1\ \mathrm{kNm}             3.00
+      L2       w   0.00\ \mathrm{mm}             0.00  0.13\ \mathrm{mm}             1.50
+      L3       N   -4.0\ \mathrm{kN}             0.00   4.0\ \mathrm{kN}             4.47
+      L3       V   -8.0\ \mathrm{kN}             4.47   8.0\ \mathrm{kN}             0.00
+      L3       M   0.0\ \mathrm{kNm}             4.47  9.0\ \mathrm{kNm}             2.23
+      L3       w   0.00\ \mathrm{mm}             0.00  0.06\ \mathrm{mm}             2.23
+      L4       N   -9.0\ \mathrm{kN}             0.00  -9.0\ \mathrm{kN}             0.00
+      L4       V    0.0\ \mathrm{kN}             0.00   0.0\ \mathrm{kN}             0.00
+      L4       M   0.0\ \mathrm{kNm}             5.00  0.0\ \mathrm{kNm}             0.00
+      L4       w   0.00\ \mathrm{mm}             0.00  0.00\ \mathrm{mm}             2.52
+      L5       N    0.0\ \mathrm{kN}             0.00   0.0\ \mathrm{kN}             0.00
+      L5       V    0.0\ \mathrm{kN}             0.00   0.0\ \mathrm{kN}             0.00
+      L5       M   0.0\ \mathrm{kNm}             0.00  0.0\ \mathrm{kNm}             0.00
+      L5       w   0.00\ \mathrm{mm}             0.00  0.00\ \mathrm{mm}             0.00
+      L6       N    0.0\ \mathrm{kN}             0.00   0.0\ \mathrm{kN}             0.00
+      L6       V    0.0\ \mathrm{kN}             0.00   0.0\ \mathrm{kN}             0.00
+      L6       M   0.0\ \mathrm{kNm}             0.00  0.0\ \mathrm{kNm}             0.00
+      L6       w   0.00\ \mathrm{mm}             0.00  0.00\ \mathrm{mm}             0.00
+      L8       N    0.0\ \mathrm{kN}             0.00   0.0\ \mathrm{kN}             0.00
+      L8       V    0.0\ \mathrm{kN}             0.00   0.0\ \mathrm{kN}             0.00
+      L8       M   0.0\ \mathrm{kNm}             0.00  0.0\ \mathrm{kNm}             0.00
+      L8       w   0.00\ \mathrm{mm}             0.00  0.00\ \mathrm{mm}             0.00
+
+Grösste Durchbiegung gegen die Sehne: L2, w = 0.13 mm bei x = 1.50 m, L/w = 22301.
+
+Gleichgewichtsprobe (Moment um den Ursprung)
+                Lasten    Lager  Summe
+    --------  --------  -------  -----  ---
+    \sum F_x     0.000    0.000  0.000   kN
+    \sum F_z  -117.889  117.889  0.000   kN
+    \sum M_0  -859.219  859.219  0.000  kNm
+
+Lastfall «Schnee und Wind»
+--------------------------
+
+Verschiebungen der Knoten
+    Knoten  u_x\ [\mathrm{mm}]  u_z\ [\mathrm{mm}]  \varphi\ [\mathrm{mrad}]
+    ------  ------------------  ------------------  ------------------------
+        K1                0.00               -0.01                     0.017
+        K2                0.03               -0.43                    -0.394
+        K3                1.43               -0.43                    -0.042
+        K4                1.24               -0.06                     0.173
+        K5                0.00                0.00          nicht bestimmbar
+        K6                0.00                0.00                     0.000
+        K7                0.00                0.00                     0.000
+        K9                0.00                0.00                     0.000
+
+Schnittgrössen an den Stabenden
+    Stab  N_{a}\ [\mathrm{kN}]  V_{a}\ [\mathrm{kN}]  M_{a}\ [\mathrm{kNm}]  N_{b}\ [\mathrm{kN}]  V_{b}\ [\mathrm{kN}]  M_{b}\ [\mathrm{kNm}]
+    ----  --------------------  --------------------  ---------------------  --------------------  --------------------  ---------------------
+      L1                  18.0                   0.3                    0.2                  18.0                   0.3                  -19.0
+      L2                  -0.3                  18.0                  -19.0                  -0.3                  10.0                   23.0
+      L3                  -0.1                   0.2                   23.0                   5.3                 -10.5                    0.0
+      L4                 -11.7                   0.0                    0.0                 -11.7                   0.0                    0.0
+      L5                   0.0                   1.5                    0.0                   0.0                   1.5                    0.5
+      L6                   0.0                   0.0                    0.0                   0.0                   0.0                    0.0
+      L8                   0.0                   0.0                    0.0                   0.0                   0.0                    0.0
+
+Lagerkräfte, auf das Tragwerk
+                 Lager  R_x\ [\mathrm{kN}]  R_z\ [\mathrm{kN}]  M\ [\mathrm{kNm}]
+    ------------------  ------------------  ------------------  -----------------
+               A1 (K1)               -18.0                 0.3               -0.2
+               A2 (K5)                 0.0                13.2                0.0
+                    K6                 0.0                -1.5                0.5
+                    K7                 0.0                 0.0                0.0
+    L1: Bettung, Summe                 0.0                 0.0               21.3
+
+Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
+
+Extremwerte
+    Stab  Grösse              kleinst  x\ [\mathrm{m}]              grösst  x\ [\mathrm{m}]
+    ----  ------  -------------------  ---------------  ------------------  ---------------
+      L1       N    18.0\ \mathrm{kN}             4.00   18.0\ \mathrm{kN}             0.00
+      L1       V    -5.7\ \mathrm{kN}             6.29    0.3\ \mathrm{kN}             0.33
+      L1       M  -19.0\ \mathrm{kNm}             7.97   0.5\ \mathrm{kNm}             1.58
+      L1       w   -0.36\ \mathrm{mm}             5.53   0.00\ \mathrm{mm}             0.00
+      L2       N    -0.3\ \mathrm{kN}             0.00   -0.3\ \mathrm{kN}             0.00
+      L2       V    10.0\ \mathrm{kN}             1.50   18.0\ \mathrm{kN}             0.00
+      L2       M  -19.0\ \mathrm{kNm}             0.00  23.0\ \mathrm{kNm}             3.00
+      L2       w   -0.01\ \mathrm{mm}             0.17   0.19\ \mathrm{mm}             2.00
+      L3       N    -0.1\ \mathrm{kN}             0.00    5.3\ \mathrm{kN}             4.47
+      L3       V   -10.5\ \mathrm{kN}             4.47    0.2\ \mathrm{kN}             0.00
+      L3       M    0.0\ \mathrm{kNm}             4.47  23.0\ \mathrm{kNm}             0.10
+      L3       w    0.00\ \mathrm{mm}             0.00   0.13\ \mathrm{mm}             2.00
+      L4       N   -11.7\ \mathrm{kN}             0.00  -11.7\ \mathrm{kN}             0.00
+      L4       V     0.0\ \mathrm{kN}             0.00    0.0\ \mathrm{kN}             0.00
+      L4       M    0.0\ \mathrm{kNm}             5.00   0.0\ \mathrm{kNm}             0.00
+      L4       w    0.00\ \mathrm{mm}             2.60   0.00\ \mathrm{mm}             0.00
+      L5       N     0.0\ \mathrm{kN}             0.00    0.0\ \mathrm{kN}             0.00
+      L5       V     1.5\ \mathrm{kN}             0.00    1.5\ \mathrm{kN}             0.00
+      L5       M   -1.8\ \mathrm{kNm}             1.50   2.2\ \mathrm{kNm}             1.50
+      L5       w    0.00\ \mathrm{mm}             2.33   0.01\ \mathrm{mm}             1.00
+      L6       N     0.0\ \mathrm{kN}             0.00    0.0\ \mathrm{kN}             0.00
+      L6       V     0.0\ \mathrm{kN}             0.00    0.0\ \mathrm{kN}             0.00
+      L6       M    0.0\ \mathrm{kNm}             0.00   0.0\ \mathrm{kNm}             0.00
+      L6       w    0.00\ \mathrm{mm}             0.00   0.00\ \mathrm{mm}             0.00
+      L8       N     0.0\ \mathrm{kN}             0.00    0.0\ \mathrm{kN}             0.00
+      L8       V     0.0\ \mathrm{kN}             0.00    0.0\ \mathrm{kN}             0.00
+      L8       M    0.0\ \mathrm{kNm}             0.00   0.0\ \mathrm{kNm}             0.00
+      L8       w    0.00\ \mathrm{mm}             0.00   0.00\ \mathrm{mm}             0.00
+
+Grösste Durchbiegung gegen die Sehne: L1, w = -0.36 mm bei x = 5.53 m, L/w = 22002.
+
+Gleichgewichtsprobe (Moment um den Ursprung)
+                Lasten    Lager  Summe
+    --------  --------  -------  -----  ---
+    \sum F_x    18.000  -18.000  0.000   kN
+    \sum F_z   -12.000   12.000  0.000   kN
+    \sum M_0  -158.000  158.000  0.000  kNm
+
+Kombination «Tragsicherheit»
+----------------------------
+
+1.35 · Eigengewicht + 1.5 · Schnee und Wind
+
+Verschiebungen der Knoten
+    Knoten  u_x\ [\mathrm{mm}]  u_z\ [\mathrm{mm}]  \varphi\ [\mathrm{mrad}]
+    ------  ------------------  ------------------  ------------------------
+        K1                0.00               -0.13                    -0.150
+        K2                0.04               -2.04                    -0.796
+        K3                2.03               -2.05                     0.217
+        K4                1.08               -0.15                     0.651
+        K5                0.00                0.00          nicht bestimmbar
+        K6                0.00                0.00                     0.000
+        K7                0.00                0.00                     0.000
+        K9                0.00                0.00                     0.000
+
+Schnittgrössen an den Stabenden
+    Stab  N_{a}\ [\mathrm{kN}]  V_{a}\ [\mathrm{kN}]  M_{a}\ [\mathrm{kNm}]  N_{b}\ [\mathrm{kN}]  V_{b}\ [\mathrm{kN}]  M_{b}\ [\mathrm{kNm}]
+    ----  --------------------  --------------------  ---------------------  --------------------  --------------------  ---------------------
+      L1                  27.0                   6.4                   -1.5                  27.0                  12.4                  -21.7
+      L2                 -12.4                  27.0                  -21.7                 -12.4                  15.0                   41.3
+      L3                  -5.6                  11.1                   34.5                  13.3                 -26.6                    0.0
+      L4                 -29.7                   0.0                    0.0                 -29.7                   0.0                    0.0
+      L5                   0.0                   2.2                    0.0                   0.0                   2.2                    0.8
+      L6                   0.0                   0.0                    0.0                   0.0                   0.0                    0.0
+      L8                   0.0                   0.0                    0.0                   0.0                   0.0                    0.0
+
+Lagerkräfte, auf das Tragwerk
+                                    Lager  R_x\ [\mathrm{kN}]  R_z\ [\mathrm{kN}]  M\ [\mathrm{kNm}]
+    -------------------------------------  ------------------  ------------------  -----------------
+                                  A1 (K1)               -27.0                 6.4                1.5
+                                  A2 (K5)                 0.0                32.0                0.0
+                                       K6                 0.0                -2.2                0.8
+                                       K7                 0.0                 0.0                0.0
+    L6: Lasten geradewegs ins Linienlager                 0.0                27.0              432.0
+                       L1: Bettung, Summe                 0.0               114.1              613.0
+
+Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
+
+Extremwerte
+    Stab  Grösse              kleinst  x\ [\mathrm{m}]              grösst  x\ [\mathrm{m}]
+    ----  ------  -------------------  ---------------  ------------------  ---------------
+      L1       N    27.0\ \mathrm{kN}             5.00   27.0\ \mathrm{kN}             2.00
+      L1       V    -6.6\ \mathrm{kN}             5.63   12.4\ \mathrm{kN}             8.00
+      L1       M  -26.3\ \mathrm{kNm}             7.18   4.5\ \mathrm{kNm}             2.00
+      L1       w   -0.66\ \mathrm{mm}             5.52   0.00\ \mathrm{mm}             0.00
+      L2       N   -12.4\ \mathrm{kN}             0.00  -12.4\ \mathrm{kN}             0.00
+      L2       V    15.0\ \mathrm{kN}             1.50   27.0\ \mathrm{kN}             0.00
+      L2       M  -21.7\ \mathrm{kNm}             0.00  41.3\ \mathrm{kNm}             3.00
+      L2       w    0.00\ \mathrm{mm}             0.00   0.46\ \mathrm{mm}             1.87
+      L3       N    -5.6\ \mathrm{kN}             0.00   13.3\ \mathrm{kN}             4.47
+      L3       V   -26.6\ \mathrm{kN}             4.47   11.1\ \mathrm{kN}             0.00
+      L3       M    0.0\ \mathrm{kNm}             4.47  41.9\ \mathrm{kNm}             1.32
+      L3       w    0.00\ \mathrm{mm}             0.00   0.27\ \mathrm{mm}             2.07
+      L4       N   -29.7\ \mathrm{kN}             0.00  -29.7\ \mathrm{kN}             0.00
+      L4       V     0.0\ \mathrm{kN}             0.00    0.0\ \mathrm{kN}             0.00
+      L4       M    0.0\ \mathrm{kNm}             0.00   0.0\ \mathrm{kNm}             0.00
+      L4       w    0.00\ \mathrm{mm}             2.24   0.00\ \mathrm{mm}             0.00
+      L5       N     0.0\ \mathrm{kN}             0.00    0.0\ \mathrm{kN}             0.00
+      L5       V     2.2\ \mathrm{kN}             0.00    2.2\ \mathrm{kN}             0.00
+      L5       M   -2.6\ \mathrm{kNm}             1.50   3.4\ \mathrm{kNm}             1.50
+      L5       w    0.00\ \mathrm{mm}             2.33   0.02\ \mathrm{mm}             1.00
+      L6       N     0.0\ \mathrm{kN}             0.00    0.0\ \mathrm{kN}             0.00
+      L6       V     0.0\ \mathrm{kN}             0.00    0.0\ \mathrm{kN}             0.00
+      L6       M    0.0\ \mathrm{kNm}             0.00   0.0\ \mathrm{kNm}             0.00
+      L6       w    0.00\ \mathrm{mm}             0.00   0.00\ \mathrm{mm}             0.00
+      L8       N     0.0\ \mathrm{kN}             0.00    0.0\ \mathrm{kN}             0.00
+      L8       V     0.0\ \mathrm{kN}             0.00    0.0\ \mathrm{kN}             0.00
+      L8       M    0.0\ \mathrm{kNm}             0.00   0.0\ \mathrm{kNm}             0.00
+      L8       w    0.00\ \mathrm{mm}             0.00   0.00\ \mathrm{mm}             0.00
+
+Grösste Durchbiegung gegen die Sehne: L1, w = -0.66 mm bei x = 5.52 m, L/w = 12114.
+
+Gleichgewichtsprobe (Moment um den Ursprung)
+                 Lasten     Lager  Summe
+    --------  ---------  --------  -----  ---
+    \sum F_x     27.000   -27.000  0.000   kN
+    \sum F_z   -177.150   177.150  0.000   kN
+    \sum M_0  -1396.945  1396.945  0.000  kNm
+
+Balkensystem: Beweglich
+-----------------------
+
+Querschnittsfläche, «Rechteck» (Rechteck)
+    A = b \cdot h = 300\,\mathrm{mm} \cdot 600\,\mathrm{mm} = 180000\,\mathrm{mm}^{2}
+
+Flächenträgheitsmoment, «Rechteck» (Rechteck)
+    I = \frac{b \cdot \left(h\right)^{3}}{12} = \frac{300\,\mathrm{mm} \cdot \left(600\,\mathrm{mm}\right)^{3}}{12} = 5400\,\cdot 10^{6}\,\mathrm{mm}^{4}
+
+Dehnsteifigkeit, «Rechteck» aus C30/37
+    EA = E_{cm} \cdot A = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 180000\,\mathrm{mm}^{2} = 6052\,\mathrm{MN}
+
+Biegesteifigkeit, «Rechteck» aus C30/37
+    EI = E_{cm} \cdot I = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 5400\,\cdot 10^{6}\,\mathrm{mm}^{4} = 181547\,\mathrm{kNm}^{2}
+[*] Annahme: Steifigkeit nach Vorgabe, nicht nachgeschlagen: E_cm für Beton und E_s für Betonstahl,
+am ungerissenen Bruttoquerschnitt, ohne Schubverformung; Gleichgewicht am unverformten System
+(Theorie 1. Ordnung).
+
+Stäbe
+    Stab   Knoten  L\ [\mathrm{m}]  \alpha\ [°]  Querschnitt  EA\ [\mathrm{MN}]  EI\ [\mathrm{kNm}^{2}]  Gelenk  Linienlager
+    ----  -------  ---------------  -----------  -----------  -----------------  ----------------------  ------  -----------
+      L1  K1 – K2            5.000          0.0     Rechteck               6052                  181547       –            –
+
+Lager
+    Lager  Knoten     x     z  \varphi
+    -----  ------  ----  ----  -------
+       A1      K1  frei  fest     frei
+       A2      K2  frei  fest     frei
+[!] Warnung: Das System ist beweglich – die Steifigkeitsmatrix ist singulär und lässt sich nicht
+invertieren. Ohne Widerstand bewegen sich: K1 und K2. Es fehlt ein Lager, ein Stab oder ein Gelenk
+ist zu viel.
+
+Steifigkeitsmatrix eines Stabs, in seinen Achsen
+    \mathbf{k} = \begin{bmatrix} \frac{EA}{L} & 0 & 0 & -\frac{EA}{L} & 0 & 0 \\ 0 & \frac{12EI}{L^3} & \frac{6EI}{L^2} & 0 & -\frac{12EI}{L^3} & \frac{6EI}{L^2} \\ 0 & \frac{6EI}{L^2} & \frac{4EI}{L} & 0 & -\frac{6EI}{L^2} & \frac{2EI}{L} \\ -\frac{EA}{L} & 0 & 0 & \frac{EA}{L} & 0 & 0 \\ 0 & -\frac{12EI}{L^3} & -\frac{6EI}{L^2} & 0 & \frac{12EI}{L^3} & -\frac{6EI}{L^2} \\ 0 & \frac{6EI}{L^2} & \frac{2EI}{L} & 0 & -\frac{6EI}{L^2} & \frac{4EI}{L} \end{bmatrix}
+
+Von den Achsen des Systems in die des Stabs
+    \mathbf{d} = \mathbf{T} \cdot \mathbf{d}_{glob} \qquad \mathbf{T} = \begin{bmatrix} \mathbf{R} & \mathbf{0} \\ \mathbf{0} & \mathbf{R} \end{bmatrix} \qquad \mathbf{R} = \begin{bmatrix} \cos\alpha & \sin\alpha & 0 \\ -\sin\alpha & \cos\alpha & 0 \\ 0 & 0 & 1 \end{bmatrix}
+
+Arbeitsgleiche Knotenkräfte der Lasten auf einem Stab
+    f_i = \int_0^L N_i(x) \cdot p(x)\,\mathrm{d}x + \int_0^L N_i'(x) \cdot m(x)\,\mathrm{d}x + \sum_j N_i(a_j) \cdot P_j + \sum_j N_i'(a_j) \cdot M_j
+
+Gesamtsteifigkeitsmatrix und Gleichungssystem
+    \mathbf{K} = \sum_{\text{Stäbe}} \mathbf{T}^{\mathsf{T}} \cdot \mathbf{k} \cdot \mathbf{T} \qquad \mathbf{K} \cdot \mathbf{x} = \mathbf{F}
+
+Steifigkeitsmatrix L1, L = 5.000 m (kN, m)
+    \mathbf{k}_{\text{L1}} = \begin{bmatrix} 1.210 \cdot 10^{6} & 0 & 0 & -1.210 \cdot 10^{6} & 0 & 0 \\ 0 & 17428 & 43571 & 0 & -17428 & 43571 \\ 0 & 43571 & 145237 & 0 & -43571 & 72619 \\ -1.210 \cdot 10^{6} & 0 & 0 & 1.210 \cdot 10^{6} & 0 & 0 \\ 0 & -17428 & -43571 & 0 & 17428 & -43571 \\ 0 & 43571 & 72619 & 0 & -43571 & 145237 \end{bmatrix}
+
+Schnittgrössen aus den Kräften an den Stabenden
+    N(0) = -s_{u,a} \qquad V(0) = s_{v,a} \qquad M(0) = -s_{\theta,a} \qquad \frac{\mathrm{d}N}{\mathrm{d}x} = -p_x \qquad \frac{\mathrm{d}V}{\mathrm{d}x} = p_y \qquad \frac{\mathrm{d}M}{\mathrm{d}x} = V - m
+
+Biegelinie und Längsverschiebung
+    v'' = \frac{M}{EI} \qquad u' = \frac{N}{EA}
+
+4 Unbekannte: 1. u_x(K1), 2. φ(K1), 3. u_x(K2), 4. φ(K2).
+
+Gesamtsteifigkeitsmatrix (kN, m)
+    \mathbf{K} = \begin{bmatrix} 1.210 \cdot 10^{6} & 0 & -1.210 \cdot 10^{6} & 0 \\ 0 & 145237 & 0 & 72619 \\ -1.210 \cdot 10^{6} & 0 & 1.210 \cdot 10^{6} & 0 \\ 0 & 72619 & 0 & 145237 \end{bmatrix}
+
 Analytische Gleichungen – Vorbemessung
 --------------------------------------
 
@@ -3655,6 +4148,84 @@ Widerstandsmoment zum gezogensten Betonpunkt
 Widerstandsmoment zum gezogensten Betonpunkt
     W = \frac{I_y \cdot I_z - I_{yz}^{2}}{I_y \cdot y' - I_{yz} \cdot z'}
 
+Stabquerschnitte
+----------------
+
+Querschnittsfläche, «Balken 300×500» (Rechteck)
+    A_{\text{Q1}} = b_{\text{Q1}} \cdot h_{\text{Q1}}
+
+Flächenträgheitsmoment, «Balken 300×500» (Rechteck)
+    I_{\text{Q1}} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12}
+
+Querschnittsfläche, «Rundstütze» (Kreis)
+    A_{\text{Q2}} = \frac{\pi \cdot \left(d_{\text{Q2}}\right)^{2}}{4}
+
+Flächenträgheitsmoment, «Rundstütze» (Kreis)
+    I_{\text{Q2}} = \frac{\pi \cdot \left(d_{\text{Q2}}\right)^{4}}{64}
+
+Querschnittsfläche, «Rohr» (Kreisring)
+    A_{\text{Q3}} = \frac{\pi \cdot \left(\left(D_{\text{Q3}}\right)^{2} - \left(D_{\text{Q3}} - 2 \cdot t_{\text{Q3}}\right)^{2}\right)}{4}
+
+Flächenträgheitsmoment, «Rohr» (Kreisring)
+    I_{\text{Q3}} = \frac{\pi \cdot \left(\left(D_{\text{Q3}}\right)^{4} - \left(D_{\text{Q3}} - 2 \cdot t_{\text{Q3}}\right)^{4}\right)}{64}
+
+Querschnittsfläche, «Hohlprofil» (Rechteckrohr)
+    A_{\text{Q4}} = b_{\text{Q4}} \cdot h_{\text{Q4}} - \left(b_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right) \cdot \left(h_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right)
+
+Flächenträgheitsmoment, «Hohlprofil» (Rechteckrohr)
+    I_{\text{Q4}} = \frac{b_{\text{Q4}} \cdot \left(h_{\text{Q4}}\right)^{3} - \left(b_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right) \cdot \left(h_{\text{Q4}} - 2 \cdot t_{\text{Q4}}\right)^{3}}{12}
+
+Querschnittsfläche, «Plattenbalken» (T-Querschnitt)
+    A_{\text{Q5}} = b_{\text{Q5}} \cdot h_{f} + b_{w} \cdot \left(h_{\text{Q5}} - h_{f}\right)
+
+Abstand des Schwerpunkts vom oberen Rand, «Plattenbalken» (T-Querschnitt)
+    z_{S} = \frac{b_{\text{Q5}} \cdot \left(h_{f}\right)^{2} / 2 + b_{w} \cdot \left(h_{\text{Q5}} - h_{f}\right) \cdot \left(h_{\text{Q5}} + h_{f}\right) / 2}{A_{\text{Q5}}}
+
+Flächenträgheitsmoment, «Plattenbalken» (T-Querschnitt)
+    I_{\text{Q5}} = \frac{b_{\text{Q5}} \cdot \left(h_{f}\right)^{3}}{12} + b_{\text{Q5}} \cdot h_{f} \cdot \left(z_{S} - \frac{h_{f}}{2}\right)^{2} + \frac{b_{w} \cdot \left(h_{\text{Q5}} - h_{f}\right)^{3}}{12} + b_{w} \cdot \left(h_{\text{Q5}} - h_{f}\right) \cdot \left(\frac{h_{\text{Q5}} + h_{f}}{2} - z_{S}\right)^{2}
+
+Querschnittsfläche, «Walzprofil» (Doppel-T)
+    A_{\text{Q6}} = 2 \cdot b_{\text{Q6}} \cdot t_{f} + t_{w} \cdot \left(h_{\text{Q6}} - 2 \cdot t_{f}\right)
+
+Flächenträgheitsmoment, «Walzprofil» (Doppel-T)
+    I_{\text{Q6}} = \frac{b_{\text{Q6}} \cdot \left(h_{\text{Q6}}\right)^{3} - \left(b_{\text{Q6}} - t_{w}\right) \cdot \left(h_{\text{Q6}} - 2 \cdot t_{f}\right)^{3}}{12}
+
+Querschnittsfläche, «Fundamentbalken» (Trapez)
+    A_{\text{Q7}} = \frac{\left(b_{o} + b_{u}\right) \cdot h_{\text{Q7}}}{2}
+
+Flächenträgheitsmoment, «Fundamentbalken» (Trapez)
+    I_{\text{Q7}} = \frac{\left(h_{\text{Q7}}\right)^{3} \cdot \left(\left(b_{o}\right)^{2} + 4 \cdot b_{o} \cdot b_{u} + \left(b_{u}\right)^{2}\right)}{36 \cdot \left(b_{o} + b_{u}\right)}
+
+Dehnsteifigkeit, «Balken 300×500» aus C30/37
+    EA_{\text{Q1,C30/37}} = E_{cm} \cdot A_{\text{Q1}}
+
+Biegesteifigkeit, «Balken 300×500» aus C30/37
+    EI_{\text{Q1,C30/37}} = E_{cm} \cdot I_{\text{Q1}}
+
+Steifigkeitsmethode
+-------------------
+
+Steifigkeitsmatrix eines Stabs, in seinen Achsen
+    \mathbf{k} = \begin{bmatrix} \frac{EA}{L} & 0 & 0 & -\frac{EA}{L} & 0 & 0 \\ 0 & \frac{12EI}{L^3} & \frac{6EI}{L^2} & 0 & -\frac{12EI}{L^3} & \frac{6EI}{L^2} \\ 0 & \frac{6EI}{L^2} & \frac{4EI}{L} & 0 & -\frac{6EI}{L^2} & \frac{2EI}{L} \\ -\frac{EA}{L} & 0 & 0 & \frac{EA}{L} & 0 & 0 \\ 0 & -\frac{12EI}{L^3} & -\frac{6EI}{L^2} & 0 & \frac{12EI}{L^3} & -\frac{6EI}{L^2} \\ 0 & \frac{6EI}{L^2} & \frac{2EI}{L} & 0 & -\frac{6EI}{L^2} & \frac{4EI}{L} \end{bmatrix}
+
+Von den Achsen des Systems in die des Stabs
+    \mathbf{d} = \mathbf{T} \cdot \mathbf{d}_{glob} \qquad \mathbf{T} = \begin{bmatrix} \mathbf{R} & \mathbf{0} \\ \mathbf{0} & \mathbf{R} \end{bmatrix} \qquad \mathbf{R} = \begin{bmatrix} \cos\alpha & \sin\alpha & 0 \\ -\sin\alpha & \cos\alpha & 0 \\ 0 & 0 & 1 \end{bmatrix}
+
+Bettung eines Stabs, quer und längs
+    \mathbf{k}_{b} = \frac{k_{\perp} \cdot L}{420} \begin{bmatrix} 156 & 22L & 54 & -13L \\ 22L & 4L^2 & 13L & -3L^2 \\ 54 & 13L & 156 & -22L \\ -13L & -3L^2 & -22L & 4L^2 \end{bmatrix} \qquad \mathbf{k}_{b,\parallel} = \frac{k_{\parallel} \cdot L}{6} \begin{bmatrix} 2 & 1 \\ 1 & 2 \end{bmatrix}
+
+Arbeitsgleiche Knotenkräfte der Lasten auf einem Stab
+    f_i = \int_0^L N_i(x) \cdot p(x)\,\mathrm{d}x + \int_0^L N_i'(x) \cdot m(x)\,\mathrm{d}x + \sum_j N_i(a_j) \cdot P_j + \sum_j N_i'(a_j) \cdot M_j
+
+Gesamtsteifigkeitsmatrix und Gleichungssystem
+    \mathbf{K} = \sum_{\text{Stäbe}} \mathbf{T}^{\mathsf{T}} \cdot \mathbf{k} \cdot \mathbf{T} \qquad \mathbf{K} \cdot \mathbf{x} = \mathbf{F}
+
+Schnittgrössen aus den Kräften an den Stabenden
+    N(0) = -s_{u,a} \qquad V(0) = s_{v,a} \qquad M(0) = -s_{\theta,a} \qquad \frac{\mathrm{d}N}{\mathrm{d}x} = -p_x \qquad \frac{\mathrm{d}V}{\mathrm{d}x} = p_y \qquad \frac{\mathrm{d}M}{\mathrm{d}x} = V - m
+
+Biegelinie und Längsverschiebung
+    v'' = \frac{M}{EI} \qquad u' = \frac{N}{EA}
+
 ====================================================================================================
 Nachweise
 ====================================================================================================
@@ -3880,6 +4451,68 @@ Werte
 
     Bezeichnung                                                                     Symbol                                                    Wert  Einheit   Herkunft
     ------------------------------------------------------------------------------  -----------------------------------------------------  -------  --------  ---------
+    Querschnittsfläche, Balken 300×500                                              A_{\text{Q1}}                                           150000  mm²       berechnet
+    Flächenträgheitsmoment, Balken 300×500                                          I_{\text{Q1}}                                             3125  ·10⁶ mm⁴  berechnet
+    Breite, Balken 300×500                                                          b_{\text{Q1}}                                              300  mm        Vorgabe
+    Dehnsteifigkeit, Balken 300×500, C30/37                                         EA_{\text{Q1,C30/37}}                                     5043  MN        berechnet
+    Biegesteifigkeit, Balken 300×500, C30/37                                        EI_{\text{Q1,C30/37}}                                   105062  kNm²      berechnet
+    Höhe, Balken 300×500                                                            h_{\text{Q1}}                                              500  mm        Vorgabe
+    Querschnittsfläche, Kasten                                                      A_{\text{Q10}}                                          330000  mm²       berechnet
+    Flächenträgheitsmoment, Kasten                                                  I_{\text{Q10}}                                           13275  ·10⁶ mm⁴  berechnet
+    Querschnittsfläche, Rundstütze                                                  A_{\text{Q2}}                                           125664  mm²       berechnet
+    Flächenträgheitsmoment, Rundstütze                                              I_{\text{Q2}}                                          1256.64  ·10⁶ mm⁴  berechnet
+    Dehnsteifigkeit, Rundstütze, C30/37                                             EA_{\text{Q2,C30/37}}                                     4225  MN        berechnet
+    Biegesteifigkeit, Rundstütze, C30/37                                            EI_{\text{Q2,C30/37}}                                    42248  kNm²      berechnet
+    Durchmesser, Rundstütze                                                         d_{\text{Q2}}                                              400  mm        Vorgabe
+    Querschnittsfläche, Rohr                                                        A_{\text{Q3}}                                             4973  mm²       berechnet
+    Aussendurchmesser, Rohr                                                         D_{\text{Q3}}                                            168.3  mm        Vorgabe
+    Flächenträgheitsmoment, Rohr                                                    I_{\text{Q3}}                                            15.64  ·10⁶ mm⁴  berechnet
+    Dehnsteifigkeit, Rohr, B500B                                                    EA_{\text{Q3,B500B}}                                       995  MN        berechnet
+    Biegesteifigkeit, Rohr, B500B                                                   EI_{\text{Q3,B500B}}                                      3128  kNm²      berechnet
+    Wanddicke, Rohr                                                                 t_{\text{Q3}}                                               10  mm        Vorgabe
+    Querschnittsfläche, Hohlprofil                                                  A_{\text{Q4}}                                            11875  mm²       berechnet
+    Flächenträgheitsmoment, Hohlprofil                                              I_{\text{Q4}}                                           146.71  ·10⁶ mm⁴  berechnet
+    Breite, Hohlprofil                                                              b_{\text{Q4}}                                              200  mm        Vorgabe
+    Höhe, Hohlprofil                                                                h_{\text{Q4}}                                              300  mm        Vorgabe
+    Dehnsteifigkeit, Hohlprofil, B500B                                              EA_{\text{Q4,B500B}}                                      2375  MN        berechnet
+    Biegesteifigkeit, Hohlprofil, B500B                                             EI_{\text{Q4,B500B}}                                     29342  kNm²      berechnet
+    Wanddicke, Hohlprofil                                                           t_{\text{Q4}}                                             12.5  mm        Vorgabe
+    Querschnittsfläche, Plattenbalken                                               A_{\text{Q5}}                                           360000  mm²       berechnet
+    Flächenträgheitsmoment, Plattenbalken                                           I_{\text{Q5}}                                             9600  ·10⁶ mm⁴  berechnet
+    Flanschbreite, Plattenbalken                                                    b_{\text{Q5}}                                             1200  mm        Vorgabe
+    Dehnsteifigkeit, Plattenbalken, C30/37                                          EA_{\text{Q5,C30/37}}                                    12103  MN        berechnet
+    Biegesteifigkeit, Plattenbalken, C30/37                                         EI_{\text{Q5,C30/37}}                                   322750  kNm²      berechnet
+    Stegbreite, Plattenbalken                                                       b_{w,\text{Q5}}                                            300  mm        Vorgabe
+    Höhe, Plattenbalken                                                             h_{\text{Q5}}                                              600  mm        Vorgabe
+    Flanschdicke, Plattenbalken                                                     h_{f,\text{Q5}}                                            200  mm        Vorgabe
+    Abstand des Schwerpunkts vom oberen Rand, Plattenbalken                         z_{S,\text{Q5}}                                            200  mm        berechnet
+    Querschnittsfläche, Walzprofil                                                  A_{\text{Q6}}                                            14282  mm²       berechnet
+    Flächenträgheitsmoment, Walzprofil                                              I_{\text{Q6}}                                           241.87  ·10⁶ mm⁴  berechnet
+    Flanschbreite, Walzprofil                                                       b_{\text{Q6}}                                              300  mm        Vorgabe
+    Höhe, Walzprofil                                                                h_{\text{Q6}}                                              300  mm        Vorgabe
+    Dehnsteifigkeit, Walzprofil, B500B                                              EA_{\text{Q6,B500B}}                                      2856  MN        berechnet
+    Biegesteifigkeit, Walzprofil, B500B                                             EI_{\text{Q6,B500B}}                                     48374  kNm²      berechnet
+    Flanschdicke, Walzprofil                                                        t_{f,\text{Q6}}                                             19  mm        Vorgabe
+    Stegdicke, Walzprofil                                                           t_{w,\text{Q6}}                                             11  mm        Vorgabe
+    Querschnittsfläche, Fundamentbalken                                             A_{\text{Q7}}                                           250000  mm²       berechnet
+    Flächenträgheitsmoment, Fundamentbalken                                         I_{\text{Q7}}                                          5138.89  ·10⁶ mm⁴  berechnet
+    Dehnsteifigkeit, Fundamentbalken, C30/37                                        EA_{\text{Q7,C30/37}}                                     8405  MN        berechnet
+    Biegesteifigkeit, Fundamentbalken, C30/37                                       EI_{\text{Q7,C30/37}}                                   172768  kNm²      berechnet
+    Breite oben, Fundamentbalken                                                    b_{o,\text{Q7}}                                            600  mm        Vorgabe
+    Breite unten, Fundamentbalken                                                   b_{u,\text{Q7}}                                            400  mm        Vorgabe
+    Höhe, Fundamentbalken                                                           h_{\text{Q7}}                                              500  mm        Vorgabe
+    Querschnittsfläche, Von Hand                                                    A_{\text{Q8}}                                            15000  mm²       Eingabe
+    Flächenträgheitsmoment, Von Hand                                                I_{\text{Q8}}                                              120  ·10⁶ mm⁴  Eingabe
+    Querschnittsfläche, Deckenstreifen                                              A_{\text{Q9}}                                           300000  mm²       berechnet
+    Flächenträgheitsmoment, Deckenstreifen                                          I_{\text{Q9}}                                             2250  ·10⁶ mm⁴  berechnet
+    Anzahl der Unbekannten                                                          n                                                           39            berechnet
+    Querschnittsfläche, Rechteck                                                    A                                                       180000  mm²       berechnet
+    Flächenträgheitsmoment, Rechteck                                                I                                                         5400  ·10⁶ mm⁴  berechnet
+    Breite, Rechteck                                                                b                                                          300  mm        Vorgabe
+    Dehnsteifigkeit, Rechteck, C30/37                                               EA                                                        6052  MN        berechnet
+    Biegesteifigkeit, Rechteck, C30/37                                              EI                                                      181547  kNm²      berechnet
+    Höhe, Rechteck                                                                  h                                                          600  mm        Vorgabe
+    Anzahl der Unbekannten                                                          n                                                            4            berechnet
     Bemessungswert des Elastizitätsmoduls                                           E_{cd}                                                   33620  N/mm²     berechnet
     Mittelwert des Elastizitätsmoduls                                               E_{cm}                                                   33620  N/mm²     berechnet
     Dehnung am Ende des ansteigenden Astes                                          \varepsilon_{c1d}                                            2  ‰         Vorgabe

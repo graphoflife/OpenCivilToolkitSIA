@@ -1,5 +1,5 @@
 ---
-erzeugt: 56d1e6195777
+erzeugt: 3c413f093704
 art: modul
 tags: [modul]
 ---
@@ -197,3 +197,8 @@ Je Stab der Verlauf der Schnittgroessen und der Biegelinie in einem Fall -- einm
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.web.balkendaten]]
+
+## Formeln aus diesem Modul
+
+- [[Biegesteifigkeit]] · `_biegesteifigkeit`
+- [[Dehnsteifigkeit]] · `_dehnsteifigkeit`

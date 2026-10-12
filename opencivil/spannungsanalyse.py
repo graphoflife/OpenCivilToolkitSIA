@@ -1074,7 +1074,8 @@ def _herleitung_modul(p: Protokoll, w: Zwischenwerte, modul: Modullinie, *,
     if momente:
         bezug = w.wert("I_c", "I_c", Groesse.aus_si(modul.bezug, MIO_MM4), stellen=1)
         p.formel(bezug, r"\frac{@b \cdot \left(@h\right)^{3}}{12}", {"b": b, "h": h},
-                 titel="Reiner Betonquerschnitt: Flächenmoment")
+                 titel="Reiner Betonquerschnitt: Flächenmoment",
+                 name="Flächenträgheitsmoment eines Rechtecks")
         p.ansatz(r"E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)}",
                  titel="Äquivalenter E-Modul über dem Moment")
         p.wert(w.kruemmung("chi_0", r"\chi_0", modul.null),
@@ -1084,7 +1085,7 @@ def _herleitung_modul(p: Protokoll, w: Zwischenwerte, modul: Modullinie, *,
     else:
         bezug = w.flaeche("A_c", "A_c", modul.bezug)
         p.formel(bezug, r"@b \cdot @h", {"b": b, "h": h},
-                 titel="Reiner Betonquerschnitt: Fläche")
+                 titel="Reiner Betonquerschnitt: Fläche", name="Fläche eines Rechtecks")
         p.ansatz(r"E_{eq} = \frac{N}{A_c \cdot \left(\varepsilon_m - \varepsilon_0\right)}",
                  titel="Äquivalenter E-Modul über der Normalkraft")
         p.wert(w.dehnung("eps_0", r"\varepsilon_0", modul.null, stellen=4),

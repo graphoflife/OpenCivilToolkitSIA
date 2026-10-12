@@ -1,5 +1,5 @@
 ---
-erzeugt: 1eddccd46a7c
+erzeugt: 13726a1ff78f
 art: thema
 tags: [thema]
 ---
@@ -41,9 +41,9 @@ Der äquivalente E-Modul ist der Modul, den ein reiner Betonquerschnitt bräucht
 11. [[Wirksame Zugfestigkeit]]
 12. [[Rissnormalkraft beim Moment]]
 13. [[Grösste Dehnung auf halber Höhe]]
-14. [[Reiner Betonquerschnitt – Flächenmoment]]
+14. [[Flächenträgheitsmoment eines Rechtecks]]
 15. [[Äquivalenter E-Modul über dem Moment]]
-16. [[Reiner Betonquerschnitt – Fläche]]
+16. [[Fläche eines Rechtecks]]
 17. [[Äquivalenter E-Modul über der Normalkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->

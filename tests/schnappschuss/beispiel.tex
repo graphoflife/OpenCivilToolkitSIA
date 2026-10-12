@@ -28,7 +28,7 @@
 \date{\today}
 \begin{document}
 \maketitle
-55 Berechnungen ausgeführt, 102 Werte bestimmt.
+66 Berechnungen ausgeführt, 113 Werte bestimmt.
 
 \section{Herleitung}
 \subsection{Plattenanalyse: Decke über EG}
@@ -694,6 +694,320 @@ Massgebend: Wand 2.
 \begin{equation*}
 \alpha_{eff,V,\text{Feld}} = \frac{v_{Rd}}{q_{Ed}} = \frac{394.3\,\mathrm{kN}/\mathrm{m}}{225\,\mathrm{kN}/\mathrm{m}} = 1.75 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
+\subsection{Balkensystem: Rahmen}
+\noindent\textbf{Querschnittsfläche, «Stütze 300×300» (Rechteck)}
+\begin{equation*}
+A_{\text{Q1}} = b_{\text{Q1}} \cdot h_{\text{Q1}} = 300\,\mathrm{mm} \cdot 300\,\mathrm{mm} = 90000\,\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Flächenträgheitsmoment, «Stütze 300×300» (Rechteck)}
+\begin{equation*}
+I_{\text{Q1}} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12} = \frac{300\,\mathrm{mm} \cdot \left(300\,\mathrm{mm}\right)^{3}}{12} = 675\,\cdot 10^{6}\,\mathrm{mm}^{4}
+\end{equation*}
+\noindent\textbf{Querschnittsfläche, «Unterzug» (Bruttoquerschnitt der Querschnittsanalyse «Unterzug»)}
+\begin{equation*}
+A_{\text{Q2}} = 180000\,\mathrm{mm}^{2}
+\end{equation*}
+\noindent\textbf{Flächenträgheitsmoment, «Unterzug» (Bruttoquerschnitt der Querschnittsanalyse «Unterzug»)}
+\begin{equation*}
+I_{\text{Q2}} = 5400\,\cdot 10^{6}\,\mathrm{mm}^{4}
+\end{equation*}
+\noindent\textbf{Dehnsteifigkeit, «Stütze 300×300» aus C30/37}
+\begin{equation*}
+EA_{\text{Q1}} = E_{cm} \cdot A_{\text{Q1}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 90000\,\mathrm{mm}^{2} = 3026\,\mathrm{MN}
+\end{equation*}
+\noindent\textbf{Biegesteifigkeit, «Stütze 300×300» aus C30/37}
+\begin{equation*}
+EI_{\text{Q1}} = E_{cm} \cdot I_{\text{Q1}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 675\,\cdot 10^{6}\,\mathrm{mm}^{4} = 22693\,\mathrm{kNm}^{2}
+\end{equation*}
+\noindent\textbf{Dehnsteifigkeit, «Unterzug» aus C30/37}
+\begin{equation*}
+EA_{\text{Q2}} = E_{cm} \cdot A_{\text{Q2}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 180000\,\mathrm{mm}^{2} = 6052\,\mathrm{MN}
+\end{equation*}
+\noindent\textbf{Biegesteifigkeit, «Unterzug» aus C30/37}
+\begin{equation*}
+EI_{\text{Q2}} = E_{cm} \cdot I_{\text{Q2}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 5400\,\cdot 10^{6}\,\mathrm{mm}^{4} = 181547\,\mathrm{kNm}^{2}
+\end{equation*}
+\hinweis{Annahme}{Steifigkeit nach Vorgabe, nicht nachgeschlagen: E\_cm für Beton und E\_s für Betonstahl, am ungerissenen Bruttoquerschnitt, ohne Schubverformung; Gleichgewicht am unverformten System (Theorie 1. Ordnung).}
+\noindent\textbf{Stäbe}
+\begin{longtable}{rrrrrrrrr}
+\hline
+Stab & Knoten & $L\ [\mathrm{m}]$ & $\alpha\ [°]$ & Querschnitt & $EA\ [\mathrm{MN}]$ & $EI\ [\mathrm{kNm}^{2}]$ & Gelenk & Linienlager \\
+\hline
+\endhead
+L1 & K1 – K2 & $4.000$ & $90.0$ & Stütze 300×300 & $3026$ & $22693$ & – & – \\
+L2 & K2 – K3 & $6.000$ & $0.0$ & Unterzug & $6052$ & $181547$ & – & – \\
+L3 & K3 – K4 & $4.000$ & $-90.0$ & Stütze 300×300 & $3026$ & $22693$ & Anfang & – \\
+\hline
+\end{longtable}
+\noindent\textbf{Lager}
+\begin{longtable}{rrrrr}
+\hline
+Lager & Knoten & $x$ & $z$ & $\varphi$ \\
+\hline
+\endhead
+A1 & K1 & fest & fest & fest \\
+A2 & K4 & fest & fest & frei \\
+\hline
+\end{longtable}
+\noindent\textbf{Steifigkeitsmatrix eines Stabs, in seinen Achsen}
+\begin{equation*}
+\mathbf{k} = \begin{bmatrix} \frac{EA}{L} & 0 & 0 & -\frac{EA}{L} & 0 & 0 \\ 0 & \frac{12EI}{L^3} & \frac{6EI}{L^2} & 0 & -\frac{12EI}{L^3} & \frac{6EI}{L^2} \\ 0 & \frac{6EI}{L^2} & \frac{4EI}{L} & 0 & -\frac{6EI}{L^2} & \frac{2EI}{L} \\ -\frac{EA}{L} & 0 & 0 & \frac{EA}{L} & 0 & 0 \\ 0 & -\frac{12EI}{L^3} & -\frac{6EI}{L^2} & 0 & \frac{12EI}{L^3} & -\frac{6EI}{L^2} \\ 0 & \frac{6EI}{L^2} & \frac{2EI}{L} & 0 & -\frac{6EI}{L^2} & \frac{4EI}{L} \end{bmatrix}
+\end{equation*}
+\noindent\textbf{Von den Achsen des Systems in die des Stabs}
+\begin{equation*}
+\mathbf{d} = \mathbf{T} \cdot \mathbf{d}_{glob} \qquad \mathbf{T} = \begin{bmatrix} \mathbf{R} & \mathbf{0} \\ \mathbf{0} & \mathbf{R} \end{bmatrix} \qquad \mathbf{R} = \begin{bmatrix} \cos\alpha & \sin\alpha & 0 \\ -\sin\alpha & \cos\alpha & 0 \\ 0 & 0 & 1 \end{bmatrix}
+\end{equation*}
+\noindent\textbf{Arbeitsgleiche Knotenkräfte der Lasten auf einem Stab}
+\begin{equation*}
+f_i = \int_0^L N_i(x) \cdot p(x)\,\mathrm{d}x + \int_0^L N_i'(x) \cdot m(x)\,\mathrm{d}x + \sum_j N_i(a_j) \cdot P_j + \sum_j N_i'(a_j) \cdot M_j
+\end{equation*}
+\noindent\textbf{Gesamtsteifigkeitsmatrix und Gleichungssystem}
+\begin{equation*}
+\mathbf{K} = \sum_{\text{Stäbe}} \mathbf{T}^{\mathsf{T}} \cdot \mathbf{k} \cdot \mathbf{T} \qquad \mathbf{K} \cdot \mathbf{x} = \mathbf{F}
+\end{equation*}
+Ein Gelenk gibt dem Stabende eine eigene Drehung als Unbekannte; der Knoten dreht sich unabhängig davon.
+
+\noindent\textbf{Steifigkeitsmatrix L1, L = 4.000 m (kN, m)}
+\begin{equation*}
+\mathbf{k}_{\text{L1}} = \begin{bmatrix} 756444 & 0 & 0 & -756444 & 0 & 0 \\ 0 & 4255 & 8510 & 0 & -4255 & 8510 \\ 0 & 8510 & 22693 & 0 & -8510 & 11347 \\ -756444 & 0 & 0 & 756444 & 0 & 0 \\ 0 & -4255 & -8510 & 0 & 4255 & -8510 \\ 0 & 8510 & 11347 & 0 & -8510 & 22693 \end{bmatrix}
+\end{equation*}
+\noindent\textbf{Steifigkeitsmatrix L2, L = 6.000 m (kN, m)}
+\begin{equation*}
+\mathbf{k}_{\text{L2}} = \begin{bmatrix} 1.009 \cdot 10^{6} & 0 & 0 & -1.009 \cdot 10^{6} & 0 & 0 \\ 0 & 10086 & 30258 & 0 & -10086 & 30258 \\ 0 & 30258 & 121031 & 0 & -30258 & 60516 \\ -1.009 \cdot 10^{6} & 0 & 0 & 1.009 \cdot 10^{6} & 0 & 0 \\ 0 & -10086 & -30258 & 0 & 10086 & -30258 \\ 0 & 30258 & 60516 & 0 & -30258 & 121031 \end{bmatrix}
+\end{equation*}
+\noindent\textbf{Steifigkeitsmatrix L3, L = 4.000 m (kN, m)}
+\begin{equation*}
+\mathbf{k}_{\text{L3}} = \begin{bmatrix} 756444 & 0 & 0 & -756444 & 0 & 0 \\ 0 & 4255 & 8510 & 0 & -4255 & 8510 \\ 0 & 8510 & 22693 & 0 & -8510 & 11347 \\ -756444 & 0 & 0 & 756444 & 0 & 0 \\ 0 & -4255 & -8510 & 0 & 4255 & -8510 \\ 0 & 8510 & 11347 & 0 & -8510 & 22693 \end{bmatrix}
+\end{equation*}
+\noindent\textbf{Schnittgrössen aus den Kräften an den Stabenden}
+\begin{equation*}
+N(0) = -s_{u,a} \qquad V(0) = s_{v,a} \qquad M(0) = -s_{\theta,a} \qquad \frac{\mathrm{d}N}{\mathrm{d}x} = -p_x \qquad \frac{\mathrm{d}V}{\mathrm{d}x} = p_y \qquad \frac{\mathrm{d}M}{\mathrm{d}x} = V - m
+\end{equation*}
+\noindent\textbf{Biegelinie und Längsverschiebung}
+\begin{equation*}
+v'' = \frac{M}{EI} \qquad u' = \frac{N}{EA}
+\end{equation*}
+8 Unbekannte: 1. u\_x(K2), 2. u\_z(K2), 3. φ(K2), 4. u\_x(K3), 5. u\_z(K3), 6. φ(K3), 7. φ(L3, Anfang), 8. φ(K4).
+
+\noindent\textbf{Gesamtsteifigkeitsmatrix (kN, m)}
+\begin{equation*}
+\mathbf{K} = \begin{bmatrix} 1.013 \cdot 10^{6} & 0 & 8510 & -1.009 \cdot 10^{6} & 0 & 0 & 0 & 0 \\ 0 & 766530 & 30258 & 0 & -10086 & 30258 & 0 & 0 \\ 8510 & 30258 & 143724 & 0 & -30258 & 60516 & 0 & 0 \\ -1.009 \cdot 10^{6} & 0 & 0 & 1.013 \cdot 10^{6} & 0 & 0 & 8510 & 8510 \\ 0 & -10086 & -30258 & 0 & 766530 & -30258 & 0 & 0 \\ 0 & 30258 & 60516 & 0 & -30258 & 121031 & 0 & 0 \\ 0 & 0 & 0 & 8510 & 0 & 0 & 22693 & 11347 \\ 0 & 0 & 0 & 8510 & 0 & 0 & 11347 & 22693 \end{bmatrix}
+\end{equation*}
+\subsubsection{Lastfall «Eigengewicht»}
+\noindent\textbf{Lastvektor (kN, kNm) und Lösung (m, rad)}
+\begin{equation*}
+\mathbf{F} = \begin{bmatrix} 0 \\ -75.00 \\ -75.00 \\ 0 \\ -75.00 \\ 75.00 \\ 0 \\ 0 \end{bmatrix} \qquad \mathbf{x} = \mathbf{K}^{-1} \cdot \mathbf{F} = \begin{bmatrix} 0.002332 \\ -1.006 \cdot 10^{-4} \\ -0.001166 \\ 0.002332 \\ -9.769 \cdot 10^{-5} \\ 0.001203 \\ -5.830 \cdot 10^{-4} \\ -5.830 \cdot 10^{-4} \end{bmatrix}
+\end{equation*}
+\noindent\textbf{Verschiebungen der Knoten}
+\begin{longtable}{rrrr}
+\hline
+Knoten & $u_x\ [\mathrm{mm}]$ & $u_z\ [\mathrm{mm}]$ & $\varphi\ [\mathrm{mrad}]$ \\
+\hline
+\endhead
+K1 & $0.00$ & $0.00$ & $0.000$ \\
+K2 & $2.33$ & $-0.10$ & $-1.166$ \\
+K3 & $2.33$ & $-0.10$ & $1.203$ \\
+K4 & $0.00$ & $0.00$ & $-0.583$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Schnittgrössen an den Stabenden}
+\begin{longtable}{rrrrrrr}
+\hline
+Stab & $N_{a}\ [\mathrm{kN}]$ & $V_{a}\ [\mathrm{kN}]$ & $M_{a}\ [\mathrm{kNm}]$ & $N_{b}\ [\mathrm{kN}]$ & $V_{b}\ [\mathrm{kN}]$ & $M_{b}\ [\mathrm{kNm}]$ \\
+\hline
+\endhead
+L1 & $-76.1$ & $0.0$ & $-6.6$ & $-76.1$ & $0.0$ & $-6.6$ \\
+L2 & $0.0$ & $76.1$ & $-6.6$ & $0.0$ & $-73.9$ & $0.0$ \\
+L3 & $-73.9$ & $0.0$ & $0.0$ & $-73.9$ & $0.0$ & $0.0$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Lagerkräfte, auf das Tragwerk}
+\begin{longtable}{rrrr}
+\hline
+Lager & $R_x\ [\mathrm{kN}]$ & $R_z\ [\mathrm{kN}]$ & $M\ [\mathrm{kNm}]$ \\
+\hline
+\endhead
+A1 (K1) & $0.0$ & $76.1$ & $6.6$ \\
+A2 (K4) & $0.0$ & $73.9$ & $0.0$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Extremwerte}
+\begin{longtable}{rrrrrr}
+\hline
+Stab & Grösse & kleinst & $x\ [\mathrm{m}]$ & grösst & $x\ [\mathrm{m}]$ \\
+\hline
+\endhead
+L1 & $N$ & $-76.1\ \mathrm{kN}$ & $0.00$ & $-76.1\ \mathrm{kN}$ & $0.00$ \\
+L1 & $V$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
+L1 & $M$ & $-6.6\ \mathrm{kNm}$ & $0.00$ & $-6.6\ \mathrm{kNm}$ & $4.00$ \\
+L1 & $w$ & $-0.58\ \mathrm{mm}$ & $2.00$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
+L2 & $N$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
+L2 & $V$ & $-73.9\ \mathrm{kN}$ & $6.00$ & $76.1\ \mathrm{kN}$ & $0.00$ \\
+L2 & $M$ & $-6.6\ \mathrm{kNm}$ & $0.00$ & $109.2\ \mathrm{kNm}$ & $3.04$ \\
+L2 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $2.24\ \mathrm{mm}$ & $3.02$ \\
+L3 & $N$ & $-73.9\ \mathrm{kN}$ & $0.00$ & $-73.9\ \mathrm{kN}$ & $0.00$ \\
+L3 & $V$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
+L3 & $M$ & $0.0\ \mathrm{kNm}$ & $0.00$ & $0.0\ \mathrm{kNm}$ & $4.00$ \\
+L3 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
+\hline
+\end{longtable}
+Grösste Durchbiegung gegen die Sehne: L2, w = 2.24 mm bei x = 3.02 m, L/w = 2676.
+
+\noindent\textbf{Gleichgewichtsprobe (Moment um den Ursprung)}
+\begin{longtable}{rrrrr}
+\hline
+ & Lasten & Lager & Summe &  \\
+\hline
+\endhead
+$\sum F_x$ & $0.000$ & $0.000$ & $0.000$ & kN \\
+$\sum F_z$ & $-150.000$ & $150.000$ & $0.000$ & kN \\
+$\sum M_0$ & $-450.000$ & $450.000$ & $0.000$ & kNm \\
+\hline
+\end{longtable}
+\subsubsection{Lastfall «Wind»}
+\noindent\textbf{Lastvektor (kN, kNm) und Lösung (m, rad)}
+\begin{equation*}
+\mathbf{F} = \begin{bmatrix} 6.000 \\ 0 \\ 4.000 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 \end{bmatrix} \qquad \mathbf{x} = \mathbf{K}^{-1} \cdot \mathbf{F} = \begin{bmatrix} 0.001577 \\ 1.658 \cdot 10^{-6} \\ -8.347 \cdot 10^{-5} \\ 0.001577 \\ -1.658 \cdot 10^{-6} \\ 4.090 \cdot 10^{-5} \\ -3.943 \cdot 10^{-4} \\ -3.943 \cdot 10^{-4} \end{bmatrix}
+\end{equation*}
+\noindent\textbf{Verschiebungen der Knoten}
+\begin{longtable}{rrrr}
+\hline
+Knoten & $u_x\ [\mathrm{mm}]$ & $u_z\ [\mathrm{mm}]$ & $\varphi\ [\mathrm{mrad}]$ \\
+\hline
+\endhead
+K1 & $0.00$ & $0.00$ & $0.000$ \\
+K2 & $1.58$ & $0.00$ & $-0.083$ \\
+K3 & $1.58$ & $0.00$ & $0.041$ \\
+K4 & $0.00$ & $0.00$ & $-0.394$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Schnittgrössen an den Stabenden}
+\begin{longtable}{rrrrrrr}
+\hline
+Stab & $N_{a}\ [\mathrm{kN}]$ & $V_{a}\ [\mathrm{kN}]$ & $M_{a}\ [\mathrm{kNm}]$ & $N_{b}\ [\mathrm{kN}]$ & $V_{b}\ [\mathrm{kN}]$ & $M_{b}\ [\mathrm{kNm}]$ \\
+\hline
+\endhead
+L1 & $1.3$ & $12.0$ & $-16.5$ & $1.3$ & $0.0$ & $7.5$ \\
+L2 & $0.0$ & $-1.3$ & $7.5$ & $0.0$ & $-1.3$ & $0.0$ \\
+L3 & $-1.3$ & $0.0$ & $0.0$ & $-1.3$ & $0.0$ & $0.0$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Lagerkräfte, auf das Tragwerk}
+\begin{longtable}{rrrr}
+\hline
+Lager & $R_x\ [\mathrm{kN}]$ & $R_z\ [\mathrm{kN}]$ & $M\ [\mathrm{kNm}]$ \\
+\hline
+\endhead
+A1 (K1) & $-12.0$ & $-1.3$ & $16.5$ \\
+A2 (K4) & $0.0$ & $1.3$ & $0.0$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Extremwerte}
+\begin{longtable}{rrrrrr}
+\hline
+Stab & Grösse & kleinst & $x\ [\mathrm{m}]$ & grösst & $x\ [\mathrm{m}]$ \\
+\hline
+\endhead
+L1 & $N$ & $1.3\ \mathrm{kN}$ & $0.00$ & $1.3\ \mathrm{kN}$ & $0.00$ \\
+L1 & $V$ & $0.0\ \mathrm{kN}$ & $4.00$ & $12.0\ \mathrm{kN}$ & $0.00$ \\
+L1 & $M$ & $-16.5\ \mathrm{kNm}$ & $0.00$ & $7.5\ \mathrm{kNm}$ & $4.00$ \\
+L1 & $w$ & $-0.13\ \mathrm{mm}$ & $0.72$ & $0.15\ \mathrm{mm}$ & $3.00$ \\
+L2 & $N$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
+L2 & $V$ & $-1.3\ \mathrm{kN}$ & $0.00$ & $-1.3\ \mathrm{kN}$ & $0.00$ \\
+L2 & $M$ & $0.0\ \mathrm{kNm}$ & $6.00$ & $7.5\ \mathrm{kNm}$ & $0.00$ \\
+L2 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.10\ \mathrm{mm}$ & $2.54$ \\
+L3 & $N$ & $-1.3\ \mathrm{kN}$ & $0.00$ & $-1.3\ \mathrm{kN}$ & $0.00$ \\
+L3 & $V$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
+L3 & $M$ & $0.0\ \mathrm{kNm}$ & $0.00$ & $0.0\ \mathrm{kNm}$ & $0.00$ \\
+L3 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
+\hline
+\end{longtable}
+Grösste Durchbiegung gegen die Sehne: L1, w = 0.15 mm bei x = 3.00 m, L/w = 26583.
+
+\noindent\textbf{Gleichgewichtsprobe (Moment um den Ursprung)}
+\begin{longtable}{rrrrr}
+\hline
+ & Lasten & Lager & Summe &  \\
+\hline
+\endhead
+$\sum F_x$ & $12.000$ & $-12.000$ & $0.000$ & kN \\
+$\sum F_z$ & $0.000$ & $0.000$ & $0.000$ & kN \\
+$\sum M_0$ & $-24.000$ & $24.000$ & $0.000$ & kNm \\
+\hline
+\end{longtable}
+\subsubsection{Kombination «Tragsicherheit»}
+1.35 · Eigengewicht + 1.5 · Wind
+
+\noindent\textbf{Lastvektor (kN, kNm) und Lösung (m, rad)}
+\begin{equation*}
+\mathbf{F} = \begin{bmatrix} 9.000 \\ -101.2 \\ -95.25 \\ 0 \\ -101.3 \\ 101.3 \\ 0 \\ 0 \end{bmatrix} \qquad \mathbf{x} = \mathbf{K}^{-1} \cdot \mathbf{F} = \begin{bmatrix} 0.005514 \\ -1.333 \cdot 10^{-4} \\ -0.001699 \\ 0.005514 \\ -1.344 \cdot 10^{-4} \\ 0.001686 \\ -0.001378 \\ -0.001378 \end{bmatrix}
+\end{equation*}
+\noindent\textbf{Verschiebungen der Knoten}
+\begin{longtable}{rrrr}
+\hline
+Knoten & $u_x\ [\mathrm{mm}]$ & $u_z\ [\mathrm{mm}]$ & $\varphi\ [\mathrm{mrad}]$ \\
+\hline
+\endhead
+K1 & $0.00$ & $0.00$ & $0.000$ \\
+K2 & $5.51$ & $-0.13$ & $-1.699$ \\
+K3 & $5.51$ & $-0.13$ & $1.686$ \\
+K4 & $0.00$ & $0.00$ & $-1.378$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Schnittgrössen an den Stabenden}
+\begin{longtable}{rrrrrrr}
+\hline
+Stab & $N_{a}\ [\mathrm{kN}]$ & $V_{a}\ [\mathrm{kN}]$ & $M_{a}\ [\mathrm{kNm}]$ & $N_{b}\ [\mathrm{kN}]$ & $V_{b}\ [\mathrm{kN}]$ & $M_{b}\ [\mathrm{kNm}]$ \\
+\hline
+\endhead
+L1 & $-100.9$ & $18.0$ & $-33.6$ & $-100.9$ & $0.0$ & $2.4$ \\
+L2 & $0.0$ & $100.9$ & $2.4$ & $0.0$ & $-101.6$ & $0.0$ \\
+L3 & $-101.6$ & $0.0$ & $0.0$ & $-101.6$ & $0.0$ & $0.0$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Lagerkräfte, auf das Tragwerk}
+\begin{longtable}{rrrr}
+\hline
+Lager & $R_x\ [\mathrm{kN}]$ & $R_z\ [\mathrm{kN}]$ & $M\ [\mathrm{kNm}]$ \\
+\hline
+\endhead
+A1 (K1) & $-18.0$ & $100.9$ & $33.6$ \\
+A2 (K4) & $0.0$ & $101.6$ & $0.0$ \\
+\hline
+\end{longtable}
+\noindent\textbf{Extremwerte}
+\begin{longtable}{rrrrrr}
+\hline
+Stab & Grösse & kleinst & $x\ [\mathrm{m}]$ & grösst & $x\ [\mathrm{m}]$ \\
+\hline
+\endhead
+L1 & $N$ & $-100.9\ \mathrm{kN}$ & $0.00$ & $-100.9\ \mathrm{kN}$ & $0.00$ \\
+L1 & $V$ & $0.0\ \mathrm{kN}$ & $4.00$ & $18.0\ \mathrm{kN}$ & $0.00$ \\
+L1 & $M$ & $-33.6\ \mathrm{kNm}$ & $0.00$ & $2.4\ \mathrm{kNm}$ & $4.00$ \\
+L1 & $w$ & $-0.81\ \mathrm{mm}$ & $1.38$ & $0.00\ \mathrm{mm}$ & $0.00$ \\
+L2 & $N$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
+L2 & $V$ & $-101.6\ \mathrm{kN}$ & $6.00$ & $100.9\ \mathrm{kN}$ & $0.00$ \\
+L2 & $M$ & $0.0\ \mathrm{kNm}$ & $6.00$ & $153.1\ \mathrm{kNm}$ & $2.99$ \\
+L2 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $3.17\ \mathrm{mm}$ & $3.00$ \\
+L3 & $N$ & $-101.6\ \mathrm{kN}$ & $0.00$ & $-101.6\ \mathrm{kN}$ & $0.00$ \\
+L3 & $V$ & $0.0\ \mathrm{kN}$ & $0.00$ & $0.0\ \mathrm{kN}$ & $0.00$ \\
+L3 & $M$ & $0.0\ \mathrm{kNm}$ & $0.00$ & $0.0\ \mathrm{kNm}$ & $4.00$ \\
+L3 & $w$ & $0.00\ \mathrm{mm}$ & $0.00$ & $0.00\ \mathrm{mm}$ & $2.44$ \\
+\hline
+\end{longtable}
+Grösste Durchbiegung gegen die Sehne: L2, w = 3.17 mm bei x = 3.00 m, L/w = 1895.
+
+\noindent\textbf{Gleichgewichtsprobe (Moment um den Ursprung)}
+\begin{longtable}{rrrrr}
+\hline
+ & Lasten & Lager & Summe &  \\
+\hline
+\endhead
+$\sum F_x$ & $18.000$ & $-18.000$ & $0.000$ & kN \\
+$\sum F_z$ & $-202.500$ & $202.500$ & $0.000$ & kN \\
+$\sum M_0$ & $-643.500$ & $643.500$ & $0.000$ & kNm \\
+\hline
+\end{longtable}
 \section{Verwendete Formeln}
 \subsection{Querschnitt}
 Gerechnet in x, einmal mit Zug unten und einmal mit Zug oben. ρ gehört zur gezogenen Seite, ρ′ zur Gegenseite; d′ reicht vom gezogenen Rand bis zur Gegenlage und ist damit deren statische Höhe – ρ′ der einen Seite ist das ρ der anderen. Die x-Bewehrung einer Seite zählt zusammen, in ihrem Schwerpunkt. φ ist die Kriechzahl der Platte.
@@ -914,6 +1228,48 @@ v_{Rd,s} = \frac{A_{sw}}{s}\, f_{sd} \cot\alpha \qquad v_{Rd,c} = b_w\, k_c\, f_
 \begin{equation*}
 T_{Zellen} = T_{Ed} - \Delta T
 \end{equation*}
+\subsection{Stabquerschnitte}
+\noindent\textbf{Querschnittsfläche, «Stütze 300×300» (Rechteck)}
+\begin{equation*}
+A_{\text{Q1}} = b_{\text{Q1}} \cdot h_{\text{Q1}}
+\end{equation*}
+\noindent\textbf{Flächenträgheitsmoment, «Stütze 300×300» (Rechteck)}
+\begin{equation*}
+I_{\text{Q1}} = \frac{b_{\text{Q1}} \cdot \left(h_{\text{Q1}}\right)^{3}}{12}
+\end{equation*}
+\noindent\textbf{Dehnsteifigkeit, «Stütze 300×300» aus C30/37}
+\begin{equation*}
+EA_{\text{Q1}} = E_{cm} \cdot A_{\text{Q1}}
+\end{equation*}
+\noindent\textbf{Biegesteifigkeit, «Stütze 300×300» aus C30/37}
+\begin{equation*}
+EI_{\text{Q1}} = E_{cm} \cdot I_{\text{Q1}}
+\end{equation*}
+\subsection{Steifigkeitsmethode}
+\noindent\textbf{Steifigkeitsmatrix eines Stabs, in seinen Achsen}
+\begin{equation*}
+\mathbf{k} = \begin{bmatrix} \frac{EA}{L} & 0 & 0 & -\frac{EA}{L} & 0 & 0 \\ 0 & \frac{12EI}{L^3} & \frac{6EI}{L^2} & 0 & -\frac{12EI}{L^3} & \frac{6EI}{L^2} \\ 0 & \frac{6EI}{L^2} & \frac{4EI}{L} & 0 & -\frac{6EI}{L^2} & \frac{2EI}{L} \\ -\frac{EA}{L} & 0 & 0 & \frac{EA}{L} & 0 & 0 \\ 0 & -\frac{12EI}{L^3} & -\frac{6EI}{L^2} & 0 & \frac{12EI}{L^3} & -\frac{6EI}{L^2} \\ 0 & \frac{6EI}{L^2} & \frac{2EI}{L} & 0 & -\frac{6EI}{L^2} & \frac{4EI}{L} \end{bmatrix}
+\end{equation*}
+\noindent\textbf{Von den Achsen des Systems in die des Stabs}
+\begin{equation*}
+\mathbf{d} = \mathbf{T} \cdot \mathbf{d}_{glob} \qquad \mathbf{T} = \begin{bmatrix} \mathbf{R} & \mathbf{0} \\ \mathbf{0} & \mathbf{R} \end{bmatrix} \qquad \mathbf{R} = \begin{bmatrix} \cos\alpha & \sin\alpha & 0 \\ -\sin\alpha & \cos\alpha & 0 \\ 0 & 0 & 1 \end{bmatrix}
+\end{equation*}
+\noindent\textbf{Arbeitsgleiche Knotenkräfte der Lasten auf einem Stab}
+\begin{equation*}
+f_i = \int_0^L N_i(x) \cdot p(x)\,\mathrm{d}x + \int_0^L N_i'(x) \cdot m(x)\,\mathrm{d}x + \sum_j N_i(a_j) \cdot P_j + \sum_j N_i'(a_j) \cdot M_j
+\end{equation*}
+\noindent\textbf{Gesamtsteifigkeitsmatrix und Gleichungssystem}
+\begin{equation*}
+\mathbf{K} = \sum_{\text{Stäbe}} \mathbf{T}^{\mathsf{T}} \cdot \mathbf{k} \cdot \mathbf{T} \qquad \mathbf{K} \cdot \mathbf{x} = \mathbf{F}
+\end{equation*}
+\noindent\textbf{Schnittgrössen aus den Kräften an den Stabenden}
+\begin{equation*}
+N(0) = -s_{u,a} \qquad V(0) = s_{v,a} \qquad M(0) = -s_{\theta,a} \qquad \frac{\mathrm{d}N}{\mathrm{d}x} = -p_x \qquad \frac{\mathrm{d}V}{\mathrm{d}x} = p_y \qquad \frac{\mathrm{d}M}{\mathrm{d}x} = V - m
+\end{equation*}
+\noindent\textbf{Biegelinie und Längsverschiebung}
+\begin{equation*}
+v'' = \frac{M}{EI} \qquad u' = \frac{N}{EA}
+\end{equation*}
 \section{Nachweise}
 \subsection{Decke über EG}
 \noindent\textbf{Angaben zur Platte}
@@ -981,6 +1337,17 @@ Alle geführten Nachweise sind erfüllt.
 Bezeichnung & Symbol & Wert & Einheit & Herkunft \\
 \hline
 \endhead
+Querschnittsfläche, Stütze 300×300 & $A_{\text{Q1}}$ & $90000$ & mm² & berechnet \\
+Flächenträgheitsmoment, Stütze 300×300 & $I_{\text{Q1}}$ & $675$ & ·10⁶ mm⁴ & berechnet \\
+Breite, Stütze 300×300 & $b_{\text{Q1}}$ & $300$ & mm & Vorgabe \\
+Dehnsteifigkeit, Stütze 300×300, C30/37 & $EA_{\text{Q1}}$ & $3026$ & MN & berechnet \\
+Biegesteifigkeit, Stütze 300×300, C30/37 & $EI_{\text{Q1}}$ & $22693$ & kNm² & berechnet \\
+Höhe, Stütze 300×300 & $h_{\text{Q1}}$ & $300$ & mm & Vorgabe \\
+Querschnittsfläche, Unterzug & $A_{\text{Q2}}$ & $180000$ & mm² & berechnet \\
+Flächenträgheitsmoment, Unterzug & $I_{\text{Q2}}$ & $5400$ & ·10⁶ mm⁴ & berechnet \\
+Dehnsteifigkeit, Unterzug, C30/37 & $EA_{\text{Q2}}$ & $6052$ & MN & berechnet \\
+Biegesteifigkeit, Unterzug, C30/37 & $EI_{\text{Q2}}$ & $181547$ & kNm² & berechnet \\
+Anzahl der Unbekannten & $n$ & $8$ &  & berechnet \\
 Bemessungswert des Elastizitätsmoduls & $E_{cd}$ & $33620$ & N/mm² & berechnet \\
 Mittelwert des Elastizitätsmoduls & $E_{cm}$ & $33620$ & N/mm² & berechnet \\
 Dehnung am Ende des ansteigenden Astes & $\varepsilon_{c1d}$ & $2$ & ‰ & Vorgabe \\

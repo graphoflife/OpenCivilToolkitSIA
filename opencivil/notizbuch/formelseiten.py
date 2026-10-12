@@ -42,7 +42,7 @@ UEBERSICHT = "Formelsammlung/Formelsammlung.md"
 #: Wie die Uebersicht die Themen gruppiert -- nach dem Bestandteil, zu dem
 #: sie gehoeren (``Thema.art`` der Formelsammlung).
 BEREICHE = {"beton": "Baustoffe", "betonstahl": "Baustoffe", "querschnitt": "Platte",
-            "querschnittsanalyse": "Querschnittsanalyse"}
+            "querschnittsanalyse": "Querschnittsanalyse", "balkensystem": "Balkensysteme"}
 
 #: Woher ein Wert kommt, den keine Formel der Sammlung geschrieben hat.
 ANGABEN = {Quelle.EINGABE: "Eingabe", Quelle.UEBERSCHRIEBEN: "Eingabe",

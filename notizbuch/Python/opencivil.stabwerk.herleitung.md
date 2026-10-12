@@ -1,5 +1,5 @@
 ---
-erzeugt: 728584531c91
+erzeugt: fad0d6b58f9e
 art: modul
 tags: [modul]
 ---
@@ -87,3 +87,13 @@ Vier gueltige Ziffern -- ab einer Million und unter einem Tausendstel mit Zehner
 ## Gebraucht von
 
 - [[opencivil.stabwerk.rechnung]]
+
+## Formeln aus diesem Modul
+
+- [[Arbeitsgleiche Knotenkräfte]] · `_ansaetze`
+- [[Bettung eines Stabs]] · `_ansaetze`
+- [[Biegelinie eines Stabs]] · `_ansaetze`
+- [[Drehung in die Achsen des Stabs]] · `_ansaetze`
+- [[Gleichungssystem der Steifigkeitsmethode]] · `_ansaetze`
+- [[Schnittgrössen längs eines Stabs]] · `_ansaetze`
+- [[Steifigkeitsmatrix eines Stabs]] · `_ansaetze`

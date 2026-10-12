@@ -833,11 +833,13 @@ class TestNachweisfelder(unittest.TestCase):
         self.assertIn("'knicken'", str(fehler.exception))
 
     def test_jeder_nachweis_gehoert_zu_genau_einem_bauteil(self):
-        """Sonst käme ein Ergebnis beim Zwischenspeichern doppelt oder gar nicht."""
+        """Sonst käme ein Ergebnis beim Zwischenspeichern doppelt oder gar nicht -- auch ein System."""
         aufbau = self.aufbau()
         je_bauteil = [z for b in aufbau.bauteile() for z in aufbau.ziele_von(b.kennung)]
+        self.assertTrue(aufbau.systemziele())
         self.assertEqual(sorted(je_bauteil),
-                         sorted(aufbau.eckwertziele() + aufbau.alle_nachweisziele()))
+                         sorted(aufbau.eckwertziele() + aufbau.alle_nachweisziele()
+                                + aufbau.systemziele()))
 
 
 class TestAusgeschaltetHeisstStill(unittest.TestCase):

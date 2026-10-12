@@ -1,5 +1,5 @@
 ---
-erzeugt: 8e76f9b7b44b
+erzeugt: 866b6fe4c6dc
 art: modul
 tags: [modul]
 ---
@@ -280,6 +280,27 @@ Querkraft ohne Einlage, einer Einwirkung, die am kürzesten Abstand
 gemessen wird, und ⌀40 in y unter der x-Bewehrung -- die fliesst bei
 x = h/2 nicht. Dazu ein Blatt Gleichungen. Gebaut über die Fassade, wie
 ein Benutzer es in Python täte.
+
+#### Projekt._alles_einmal
+
+```python
+@staticmethod
+def _alles_einmal(p: 'Projekt', decke: QuerschnittEintrag, analyse: QuerschnittsanalyseEintrag) -> None
+```
+
+Jede Vorlage, Kennwerte von Hand, Platte und Analyse als
+Querschnitt; Beton und Stahl; Gelenke und ein Knoten, dessen Drehung
+keine Steifigkeit hat; Federn am Lager, Bettung, feste Linienlager
+mit und ohne Stab; jede Lastart, auch projiziert.
+
+#### Projekt._beweglich
+
+```python
+@staticmethod
+def _beweglich(p: 'Projekt') -> None
+```
+
+Ein Träger auf zwei Rollen: nichts hält ihn waagrecht -- eine Meldung statt einer Zahl.
 
 ### _felder_setzen
 

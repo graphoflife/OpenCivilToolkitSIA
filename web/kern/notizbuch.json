@@ -56,6 +56,18 @@
       "bereich": "Querschnittsanalyse"
     },
     {
+      "name": "Stabquerschnitte",
+      "pfad": "Formelsammlung/Themen/Stabquerschnitte.md",
+      "art": "thema",
+      "bereich": "Balkensysteme"
+    },
+    {
+      "name": "Steifigkeitsmethode",
+      "pfad": "Formelsammlung/Themen/Steifigkeitsmethode.md",
+      "art": "thema",
+      "bereich": "Balkensysteme"
+    },
+    {
       "name": "Querkraft",
       "pfad": "Formelsammlung/Themen/Querkraft.md",
       "art": "thema",
@@ -137,6 +149,15 @@
       "zeichen": [],
       "themen": [
         "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Arbeitsgleiche Knotenkräfte",
+      "pfad": "Formelsammlung/Formeln/Arbeitsgleiche Knotenkräfte.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Steifigkeitsmethode"
       ]
     },
     {
@@ -327,6 +348,15 @@
       ]
     },
     {
+      "name": "Bettung eines Stabs",
+      "pfad": "Formelsammlung/Formeln/Bettung eines Stabs.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Steifigkeitsmethode"
+      ]
+    },
+    {
       "name": "Bewehrung der Lage",
       "pfad": "Formelsammlung/Formeln/Bewehrung der Lage.md",
       "art": "formel",
@@ -427,6 +457,26 @@
       ]
     },
     {
+      "name": "Biegelinie eines Stabs",
+      "pfad": "Formelsammlung/Formeln/Biegelinie eines Stabs.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Steifigkeitsmethode"
+      ]
+    },
+    {
+      "name": "Biegesteifigkeit",
+      "pfad": "Formelsammlung/Formeln/Biegesteifigkeit.md",
+      "art": "formel",
+      "zeichen": [
+        "EI_{\\text{Q1}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
       "name": "Bilineare Beziehung des Betonstahls",
       "pfad": "Formelsammlung/Formeln/Bilineare Beziehung des Betonstahls.md",
       "art": "formel",
@@ -444,6 +494,17 @@
       "zeichen": [],
       "themen": [
         "Querschnittsanalyse"
+      ]
+    },
+    {
+      "name": "Dehnsteifigkeit",
+      "pfad": "Formelsammlung/Formeln/Dehnsteifigkeit.md",
+      "art": "formel",
+      "zeichen": [
+        "EA_{\\text{Q1}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
       ]
     },
     {
@@ -513,6 +574,15 @@
       ]
     },
     {
+      "name": "Drehung in die Achsen des Stabs",
+      "pfad": "Formelsammlung/Formeln/Drehung in die Achsen des Stabs.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Steifigkeitsmethode"
+      ]
+    },
+    {
       "name": "Druckzonenhöhe aus dem Kräftegleichgewicht",
       "pfad": "Formelsammlung/Formeln/Druckzonenhöhe aus dem Kräftegleichgewicht.md",
       "art": "formel",
@@ -578,12 +648,168 @@
       ]
     },
     {
+      "name": "Fläche eines Doppel-T-Querschnitts",
+      "pfad": "Formelsammlung/Formeln/Fläche eines Doppel-T-Querschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "A_{\\text{Q6}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Fläche eines Kreises",
+      "pfad": "Formelsammlung/Formeln/Fläche eines Kreises.md",
+      "art": "formel",
+      "zeichen": [
+        "A_{\\text{Q2}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Fläche eines Kreisrings",
+      "pfad": "Formelsammlung/Formeln/Fläche eines Kreisrings.md",
+      "art": "formel",
+      "zeichen": [
+        "A_{\\text{Q3}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Fläche eines Rechteckrohrs",
+      "pfad": "Formelsammlung/Formeln/Fläche eines Rechteckrohrs.md",
+      "art": "formel",
+      "zeichen": [
+        "A_{\\text{Q4}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Fläche eines Rechtecks",
+      "pfad": "Formelsammlung/Formeln/Fläche eines Rechtecks.md",
+      "art": "formel",
+      "zeichen": [
+        "A_{\\text{Q1}}"
+      ],
+      "themen": [
+        "Stabquerschnitte",
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Fläche eines T-Querschnitts",
+      "pfad": "Formelsammlung/Formeln/Fläche eines T-Querschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "A_{\\text{Q5}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Fläche eines Trapezes",
+      "pfad": "Formelsammlung/Formeln/Fläche eines Trapezes.md",
+      "art": "formel",
+      "zeichen": [
+        "A_{\\text{Q7}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
       "name": "Fläche und Schwerpunkt eines Polygons (Satz von Gauss)",
       "pfad": "Formelsammlung/Formeln/Fläche und Schwerpunkt eines Polygons (Satz von Gauss).md",
       "art": "formel",
       "zeichen": [],
       "themen": [
         "Querschnittsanalyse"
+      ]
+    },
+    {
+      "name": "Flächenträgheitsmoment eines Doppel-T-Querschnitts",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines Doppel-T-Querschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{\\text{Q6}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Flächenträgheitsmoment eines Kreises",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines Kreises.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{\\text{Q2}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Flächenträgheitsmoment eines Kreisrings",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines Kreisrings.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{\\text{Q3}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Flächenträgheitsmoment eines Rechteckrohrs",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines Rechteckrohrs.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{\\text{Q4}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Flächenträgheitsmoment eines Rechtecks",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines Rechtecks.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{\\text{Q1}}"
+      ],
+      "themen": [
+        "Stabquerschnitte",
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Flächenträgheitsmoment eines T-Querschnitts",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines T-Querschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{\\text{Q5}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Flächenträgheitsmoment eines Trapezes",
+      "pfad": "Formelsammlung/Formeln/Flächenträgheitsmoment eines Trapezes.md",
+      "art": "formel",
+      "zeichen": [
+        "I_{\\text{Q7}}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
       ]
     },
     {
@@ -629,6 +855,15 @@
       ],
       "themen": [
         "Biegung und Normalkraft"
+      ]
+    },
+    {
+      "name": "Gleichungssystem der Steifigkeitsmethode",
+      "pfad": "Formelsammlung/Formeln/Gleichungssystem der Steifigkeitsmethode.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Steifigkeitsmethode"
       ]
     },
     {
@@ -913,28 +1148,6 @@
       ]
     },
     {
-      "name": "Reiner Betonquerschnitt – Fläche",
-      "pfad": "Formelsammlung/Formeln/Reiner Betonquerschnitt – Fläche.md",
-      "art": "formel",
-      "zeichen": [
-        "A_c"
-      ],
-      "themen": [
-        "Spannung-Dehnung-Analyse"
-      ]
-    },
-    {
-      "name": "Reiner Betonquerschnitt – Flächenmoment",
-      "pfad": "Formelsammlung/Formeln/Reiner Betonquerschnitt – Flächenmoment.md",
-      "art": "formel",
-      "zeichen": [
-        "I_c"
-      ],
-      "themen": [
-        "Spannung-Dehnung-Analyse"
-      ]
-    },
-    {
       "name": "Rissaktive Plattendicke",
       "pfad": "Formelsammlung/Formeln/Rissaktive Plattendicke.md",
       "art": "formel",
@@ -1013,6 +1226,15 @@
       ]
     },
     {
+      "name": "Schnittgrössen längs eines Stabs",
+      "pfad": "Formelsammlung/Formeln/Schnittgrössen längs eines Stabs.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Steifigkeitsmethode"
+      ]
+    },
+    {
       "name": "Schwerpunkt der zusammengefassten Lage",
       "pfad": "Formelsammlung/Formeln/Schwerpunkt der zusammengefassten Lage.md",
       "art": "formel",
@@ -1025,6 +1247,17 @@
         "Biegung und Normalkraft",
         "Duktilität",
         "Zwängung auf Biegung"
+      ]
+    },
+    {
+      "name": "Schwerpunkt eines T-Querschnitts",
+      "pfad": "Formelsammlung/Formeln/Schwerpunkt eines T-Querschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "z_{S}"
+      ],
+      "themen": [
+        "Stabquerschnitte"
       ]
     },
     {
@@ -1074,6 +1307,15 @@
         "Querkraft",
         "Duktilität",
         "Zwängung auf Biegung"
+      ]
+    },
+    {
+      "name": "Steifigkeitsmatrix eines Stabs",
+      "pfad": "Formelsammlung/Formeln/Steifigkeitsmatrix eines Stabs.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Steifigkeitsmethode"
       ]
     },
     {
@@ -2718,6 +2960,8 @@
         "Projekt.laden",
         "Projekt.beispiel",
         "Projekt.jeder_nachweis",
+        "Projekt._alles_einmal",
+        "Projekt._beweglich",
         "_felder_setzen"
       ]
     },

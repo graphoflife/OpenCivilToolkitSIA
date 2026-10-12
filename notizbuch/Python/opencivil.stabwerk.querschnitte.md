@@ -1,5 +1,5 @@
 ---
-erzeugt: 542b546246fd
+erzeugt: d68bee6ab1cd
 art: modul
 tags: [modul]
 ---
@@ -133,3 +133,21 @@ def vorlage(schluessel: str) -> Stabvorlage
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.web.api]]
+
+## Formeln aus diesem Modul
+
+- [[Fläche eines Doppel-T-Querschnitts]]
+- [[Fläche eines Kreises]]
+- [[Fläche eines Kreisrings]]
+- [[Fläche eines Rechteckrohrs]]
+- [[Fläche eines Rechtecks]]
+- [[Fläche eines T-Querschnitts]]
+- [[Fläche eines Trapezes]]
+- [[Flächenträgheitsmoment eines Doppel-T-Querschnitts]]
+- [[Flächenträgheitsmoment eines Kreises]]
+- [[Flächenträgheitsmoment eines Kreisrings]]
+- [[Flächenträgheitsmoment eines Rechteckrohrs]]
+- [[Flächenträgheitsmoment eines Rechtecks]]
+- [[Flächenträgheitsmoment eines T-Querschnitts]]
+- [[Flächenträgheitsmoment eines Trapezes]]
+- [[Schwerpunkt eines T-Querschnitts]]

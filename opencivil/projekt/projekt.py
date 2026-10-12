@@ -396,6 +396,23 @@ class Projekt(Beschreibung):
             unterzug.schubwand(von, bis, dicke=100.0, durchmesser=10.0, teilung=150.0,
                                schnitte=1, stahl=stahl)
         unterzug.lastfall("Feld", M_y_Ed=150.0, V_z_Ed=150.0, T_Ed=15.0)
+        # Ein Rahmen: zwei Stützen von 4 m und ein Riegel von 6 m mit dem
+        # Querschnitt des Unterzugs. Links eingespannt, rechts eine
+        # Pendelstütze; Eigengewicht auf dem Riegel, Wind auf der linken
+        # Stütze, und beides kombiniert.
+        rahmen = projekt.balkensystem("Rahmen")
+        stuetze = rahmen.querschnitt("Stütze 300×300", "rechteck", b=300.0, h=300.0)
+        riegel = rahmen.querschnitt_aus("Unterzug", "analyse", unterzug)
+        links = rahmen.linie((0, 0), (0, 4), querschnitt=stuetze, material="b1")
+        balken = rahmen.linie((0, 4), (6, 4), querschnitt=riegel, material="b1")
+        rahmen.linie((6, 4), (6, 0), querschnitt=stuetze, material="b1", gelenk_anfang=True)
+        rahmen.lager_an((0, 0), "eingespannt")
+        rahmen.lager_an((6, 0), "gelenkig")
+        eigengewicht = rahmen.lastfall("Eigengewicht")
+        wind = rahmen.lastfall("Wind")
+        rahmen.stablast(eigengewicht, balken, wert=25.0)
+        rahmen.stablast(wind, links, wert=3.0, richtung="waagrecht")
+        rahmen.kombination("Tragsicherheit", (eigengewicht, 1.35), (wind, 1.5))
         return projekt
 
     @classmethod
@@ -530,7 +547,72 @@ class Projekt(Beschreibung):
         # charakteristischen Werten -- so steht jede Wahl einmal da.
         p.querschnittsanalysen.append(cls._kastentraeger(p.freie_kennung("a")))
         p.querschnittsanalysen.append(cls._stuetze(p.freie_kennung("a")))
+
+        # Zwei Balkensysteme: eines, das alles einmal braucht, und eines, das
+        # sich nicht rechnen lässt.
+        cls._alles_einmal(p, decke, p.querschnittsanalysen[0])
+        cls._beweglich(p)
         return p
+
+    @staticmethod
+    def _alles_einmal(p: "Projekt", decke: QuerschnittEintrag,
+                      analyse: QuerschnittsanalyseEintrag) -> None:
+        """
+        Jede Vorlage, Kennwerte von Hand, Platte und Analyse als
+        Querschnitt; Beton und Stahl; Gelenke und ein Knoten, dessen Drehung
+        keine Steifigkeit hat; Federn am Lager, Bettung, feste Linienlager
+        mit und ohne Stab; jede Lastart, auch projiziert.
+        """
+        s = p.balkensystem("Alles einmal")
+        q = {
+            "rechteck": s.querschnitt("Balken 300×500", "rechteck", b=300.0, h=500.0),
+            "kreis": s.querschnitt("Rundstütze", "kreis", d=400.0),
+            "kreisring": s.querschnitt("Rohr", "kreisring", D=168.3, t=10.0),
+            "rechteckrohr": s.querschnitt("Hohlprofil", "rechteckrohr", b=200.0, h=300.0, t=12.5),
+            "t": s.querschnitt("Plattenbalken", "t", b=1200.0, h=600.0, b_w=300.0, h_f=200.0),
+            "doppel_t": s.querschnitt("Walzprofil", "doppel_t", b=300.0, h=300.0,
+                                      t_f=19.0, t_w=11.0),
+            "trapez": s.querschnitt("Fundamentbalken", "trapez", b_o=600.0, b_u=400.0, h=500.0),
+        }
+        s.querschnitt_mit_kennwerten("Von Hand", A=15000.0, I=120.0)
+        s.querschnitt_aus("Deckenstreifen", "platte", decke)
+        s.querschnitt_aus("Kasten", "analyse", analyse)
+        gebettet = s.linie((0, 0), (8, 0), querschnitt=q["rechteck"], material="b1",
+                           quer="feder", k_quer=20000.0)
+        stuetze = s.linie((8, 0), (8, 3), querschnitt=q["kreis"], material="b1")
+        sparren = s.linie((8, 3), (12, 5), querschnitt=q["t"], material="b1")
+        s.linie((12, 5), (12, 0), querschnitt=q["kreisring"], material="s1",
+                gelenk_anfang=True, gelenk_ende=True)
+        stahl = s.linie((12, 0), (15, 0), querschnitt=q["doppel_t"], material="s1",
+                        gelenk_anfang=True)
+        aufgelegt = s.linie((15, 0), (17, 0), querschnitt=q["trapez"], material="b1",
+                            quer="fest")
+        s.linie((17, 0), (17, -1), stab=False, quer="fest")
+        s.linie((15, 0), (15, 2), querschnitt=q["rechteckrohr"], material="s1")
+        s.lager_an((0, 0), "gelenkig", z="feder", k_z=50000.0, phi="feder", k_phi=10000.0)
+        s.lager_an((12, 0), "gelenkig")
+        g = s.lastfall("Eigengewicht")
+        w = s.lastfall("Schnee und Wind")
+        s.stablast(g, gebettet, wert=5.0, wert_b=15.0)
+        s.stablast(g, gebettet, art="linienmoment", wert=2.0, von=2.0, bis=6.0)
+        s.stablast(g, sparren, wert=4.0)
+        s.stablast(g, aufgelegt, wert=10.0)
+        s.knotenlast(g, (8, 3), 5.0, art="moment")
+        s.stablast(w, sparren, wert=3.0, projiziert=True)
+        s.stablast(w, stuetze, art="einzellast", wert=8.0, von=1.5, richtung="quer")
+        s.stablast(w, stahl, art="moment", wert=4.0, von=1.5)
+        s.knotenlast(w, (8, 3), 10.0, richtung="waagrecht")
+        s.kombination("Tragsicherheit", (g, 1.35), (w, 1.5))
+
+    @staticmethod
+    def _beweglich(p: "Projekt") -> None:
+        """Ein Träger auf zwei Rollen: nichts hält ihn waagrecht -- eine Meldung statt einer Zahl."""
+        s = p.balkensystem("Beweglich")
+        traeger = s.linie((0, 0), (5, 0), querschnitt=s.querschnitt("Rechteck", "rechteck"),
+                          material="b1")
+        s.lager_an((0, 0), "verschieblich")
+        s.lager_an((5, 0), "verschieblich")
+        s.stablast(s.lastfall("Last"), traeger, wert=10.0)
 
     @staticmethod
     def _kastentraeger(kennung: str) -> QuerschnittsanalyseEintrag:

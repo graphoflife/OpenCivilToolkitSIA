@@ -224,10 +224,10 @@ DOPPEL_T = Stabvorlage(
     masse=(Mass("b", "b", "Flanschbreite", 200.0), Mass("h", "h", "Höhe", 400.0),
            Mass("t_f", "t_f", "Flanschdicke", 16.0), Mass("t_w", "t_w", "Stegdicke", 9.0)),
     formeln=(
-        _flaeche("Doppel-T",
+        _flaeche("Doppel-T-Querschnitts",
                  r"2 \cdot @b \cdot @t_f + @t_w \cdot \left(@h - 2 \cdot @t_f\right)",
                  lambda b, h, t_f, t_w: 2.0 * b * t_f + t_w * (h - 2.0 * t_f)),
-        _traegheit("Doppel-T",
+        _traegheit("Doppel-T-Querschnitts",
                    r"\frac{@b \cdot \left(@h\right)^{3} - \left(@b - @t_w\right) \cdot "
                    r"\left(@h - 2 \cdot @t_f\right)^{3}}{12}",
                    lambda b, h, t_f, t_w: (b * h ** 3 - (b - t_w) * (h - 2.0 * t_f) ** 3) / 12.0),

@@ -1,5 +1,5 @@
 ---
-erzeugt: b88dc0f78d23
+erzeugt: 481809791069
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 3.1.2.3.3"
@@ -29,6 +29,8 @@ $$
 ## Gebraucht von
 
 - [[Bemessungswert des Elastizitätsmoduls]]
+- [[Biegesteifigkeit]]
+- [[Dehnsteifigkeit]]
 - [[Wertigkeit im gerissenen Zustand]]
 - [[Wirksamer Elastizitätsmodul]]
 
