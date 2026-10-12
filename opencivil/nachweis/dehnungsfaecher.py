@@ -51,13 +51,10 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Dict, List, Sequence, Tuple
+from typing import List, Sequence, Tuple
 
-from opencivil.core.berechnung import Eingaben
-from opencivil.core.wert import kennung_aus
-from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
 from opencivil.querschnitt.fasern import Dehnungsgrenze
-from opencivil.querschnitt.werkstoffgesetz import Dehnungsebene, Stahlgesetz
+from opencivil.querschnitt.werkstoffgesetz import Dehnungsebene
 
 #: Schritte je Faecherabschnitt. Die Linie nahe dem reinen Druck laeuft
 #: schnell und waere mit weniger sichtbar eckig. Die Zahlen im Bericht haengen
@@ -88,38 +85,6 @@ class Linienpunkt:
     eps_oben: float
     eps_unten: float
     abschnitt: str = ""
-
-
-def lagen_aus_eingaben(
-    posten, e: Eingaben, satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG,
-) -> List[Tuple[float, float, Stahlgesetz, str]]:
-    """
-    Je Bewehrungsposten dieser Richtung: (Fläche m^2, z m, Gesetz, Text).
-
-    Die Plateaus des Gesetzes liegen, wo der Wertesatz sie hinlegt -- bei
-    ``f_yd`` oder ``f_yk``. Die Eingaben heissen je Sorte
-    ``{kennwert}__{sorte}``, mit dem Kurznamen des Wertesatzes.
-    """
-    gesetze: Dict[str, Stahlgesetz] = {}
-    for stahl in {l.stahl.id: l.stahl for l, _, _, _, _ in posten}.values():
-        kurz = kennung_aus(stahl.id)
-        gesetze[stahl.id] = Stahlgesetz.aus_werten({
-            "E_s": e[f"E_s__{kurz}"],
-            "f_yd": e[f"{satz.stahl}__{kurz}"],
-            "f_yd_druck": e[f"{satz.stahl_druck}__{kurz}"],
-            "eps_ud": e[f"eps_ud__{kurz}"],
-        })
-
-    lagen = []
-    for lage, art, _, _, _ in posten:
-        marke = f"{lage.nummer}{art.kuerzel}"
-        lagen.append((
-            e.g(f"a_s_{marke}").si,
-            e.g(f"z_{marke}").si,
-            gesetze[lage.stahl.id],
-            f"{lage.nummer}. Lage {art.beschriftung}",
-        ))
-    return lagen
 
 
 def faecher(

@@ -1,5 +1,5 @@
 ---
-erzeugt: 264f824c3922
+erzeugt: 2745880cff37
 art: modul
 tags: [modul]
 ---
@@ -10,9 +10,19 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Was ein Nachweis-Kapitel waehlt -- die Kriechzahl, den Wertesatz und die
-Rechenart -- und die eine Stelle, die daraus die Werkstoffgesetze und den
-Querschnittsloeser baut. Die Kapitel der Platte und die
-Spannung-Dehnung-Analyse fragen hier, keines baut seine Gesetze selbst.
+Rechenart -- und die eine Stelle, die daraus die Werkstoffgesetze, die
+Bewehrungslagen und den Querschnittsloeser baut. Die Kapitel der Platte und
+die Spannung-Dehnung-Analyse fragen hier, keines baut seine Gesetze oder
+Lagen selbst.
+
+
+## JEDE LAGE MIT IHREM STAHL
+
+Der Editor laesst je Seite einen eigenen Stahl waehlen. Jede Lage traegt
+darum ihren Stahl ([[opencivil.nachweis.querschnittsloeser#Stahllage|Stahllage]]), angemeldet wird je Sorte unter
+`{kennwert}__{sorte}` ([[opencivil.nachweis.rechenwahl#lagenbezuege|lagenbezuege]]), gebaut von
+[[opencivil.nachweis.rechenwahl#stahllagen|stahllagen]]. Bis 2026-10-12 nahmen Stahlspannung, Knicken, Querkraft
+und Analyse den Stahl der ersten Lage fuer alle.
 
 
 ## DIE RECHENARTEN
@@ -146,41 +156,94 @@ def beschriftung(self) -> str
 
 Fuer Legenden: «Präzise ohne Vereinfachung, φ = 2, Bemessung» -- phi nur, wo es wirkt.
 
-### Kennwerte
+### Betonkennwerte
 
 ```python
 @dataclass(frozen=True)
-class Kennwerte
+class Betonkennwerte
 ```
 
-Die Zahlen, aus denen die Gesetze entstehen -- SI, im Wertesatz der Wahl.
+Die Zahlen, aus denen das Betongesetz entsteht -- SI, im Wertesatz der
+Wahl. Den Stahl traegt jede Lage selbst ([[opencivil.nachweis.rechenwahl#stahllagen|stahllagen]]).
 
 - `f_c: float` – `f_cd` oder `f_ck`.
-- `f_s: float` – `f_yd` oder `f_yk` -- dort beginnt das Plateau im Zug.
-- `f_s_druck: float` – Dasselbe im Druck.
 - `E_cm: float`
-- `E_s: float`
 - `eps_c1d: float`
 - `eps_c2d: float`
 
-#### Kennwerte.aus_eingaben
+#### Betonkennwerte.aus_eingaben
 
 ```python
 @classmethod
-def aus_eingaben(cls, e: Eingaben, satz: Werkstoffsatz) -> 'Kennwerte'
+def aus_eingaben(cls, e: Eingaben, satz: Werkstoffsatz) -> 'Betonkennwerte'
 ```
 
-Aus den Eingaben, die [[opencivil.nachweis.rechenwahl#werkstoffbezuege|werkstoffbezuege]] anmeldet.
+Aus den Eingaben, die [[opencivil.nachweis.rechenwahl#betonbezuege|betonbezuege]] anmeldet.
 
-### werkstoffbezuege
+### betonbezuege
 
 ```python
-def werkstoffbezuege(satz: Werkstoffsatz, beton, stahl) -> List[Eingabebezug]
+def betonbezuege(satz: Werkstoffsatz, beton) -> List[Eingabebezug]
 ```
 
-Was die Gesetze einer Wahl brauchen -- unter den Kurznamen des Wertesatzes,
-`f_cd` oder `f_ck` usw. So steht in der Herleitung das Zeichen, mit dem
-gerechnet wird.
+Was das Betongesetz einer Wahl braucht -- unter den Kurznamen des
+Wertesatzes, `f_cd` oder `f_ck`. So steht in der Herleitung das
+Zeichen, mit dem gerechnet wird. Die Reihenfolge ist die, in der die
+Werte in der Herleitung der Baustoffe erscheinen.
+
+### staehle
+
+```python
+def staehle(posten) -> List
+```
+
+Die Staehle der Posten, jeder einmal, in der Reihenfolge der Posten.
+
+### stahlname
+
+```python
+def stahlname(kennwert: str, stahl) -> str
+```
+
+Der Name, unter dem ein Kennwert dieses Stahls eingeht: `E_s__s1`.
+
+### stahlbezuege
+
+```python
+def stahlbezuege(posten, kennwerte: Sequence[str]) -> List[Eingabebezug]
+```
+
+Je Stahl der Posten diese Kennwerte, unter [[opencivil.nachweis.rechenwahl#stahlname|stahlname]].
+
+### lagenbezuege
+
+```python
+def lagenbezuege(posten, satz: Werkstoffsatz) -> List[Eingabebezug]
+```
+
+Was [[opencivil.nachweis.rechenwahl#stahllagen|stahllagen]] liest: je Posten Flaeche und Tiefe, je Stahl
+seine Kennwerte im Wertesatz der Wahl.
+
+### werte_nach_id
+
+```python
+def werte_nach_id(e: Eingaben) -> Callable[[str], float]
+```
+
+Die Zahl einer Eingabe in SI, nach ihrer Wert-ID -- fuer [[opencivil.nachweis.rechenwahl#stahllagen|stahllagen]].
+
+### stahllagen
+
+```python
+def stahllagen(posten, satz: Werkstoffsatz, wert: Callable[[str], float]) -> List[Stahllage]
+```
+
+Je Bewehrungsposten eine Lage, mit dem Stahl ihrer Lage im Wertesatz der
+Wahl -- die eine Stelle, die Lagen baut.
+
+`wert` liefert zu einer Wert-ID die Zahl in SI: in einem Nachweis aus
+seinen Eingaben ([[opencivil.nachweis.rechenwahl#werte_nach_id|werte_nach_id]] ueber [[opencivil.nachweis.rechenwahl#lagenbezuege|lagenbezuege]]), in
+der Spannung-Dehnung-Analyse aus der Loesung.
 
 ### bezuege_vereinen
 
@@ -204,14 +267,6 @@ Der Beton im gerissenen Zustand -- je Rechenart. Die eine Stelle fuer
 die Parabel und den Block: der Loeser und die genaue Resistenzlinie
 bekommen ihren Beton beide hier.
 
-### stahlgesetz
-
-```python
-def stahlgesetz(wahl: Rechenwahl, w: Kennwerte, *, eps_ud: float) -> Gesetz
-```
-
-Der Stahl -- in der Handrechnung nur auf Zug.
-
 ### Gesetze
 
 ```python
@@ -223,7 +278,14 @@ Was zu einer Wahl gehoert -- Gesetze, Lagen, und wie die Fasern rechnen.
 
 - `wahl: Rechenwahl`
 - `beton: Gesetz`
-- `stahl: Gesetz`
+
+#### Gesetze.stahl
+
+```python
+def stahl(self, s: Stahlgesetz) -> Gesetz
+```
+
+Der Stahl einer Lage, wie der Loeser ihn rechnet -- in der Handrechnung nur auf Zug.
 
 #### Gesetze.gemittelt
 
@@ -274,10 +336,14 @@ Rechenart. Zurueck kommt phi als Wert -- fuer die Formeln danach.
 ### protokoll_gesetze
 
 ```python
-def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *, titel: str) -> None
+def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *, titel: str, posten) -> None
 ```
 
 Die Werkstoffgesetze der Wahl, mit den Zeichen ihres Wertesatzes.
+
+Der Stahl steht mit der Festigkeit jeder Sorte der Posten da; bei einer
+Sorte mit ihrem Zeichen, bei mehreren mit dem allgemeinen und je Sorte
+einer Angabe dahinter.
 
 Der wirksame Modul steht nicht hier: wo er gebraucht wird, schreibt ihn
 das Kapitel an der Stelle, an der er erklaert wird
@@ -296,12 +362,12 @@ Festigkeit des Wertesatzes, `f_cd` oder `f_ck`.
 ### gesetze
 
 ```python
-def gesetze(wahl: Rechenwahl, w: Kennwerte, *, eps_ud: float=0.045) -> Gesetze
+def gesetze(wahl: Rechenwahl, w: Betonkennwerte) -> Gesetze
 ```
 
-Die Gesetze zu einer Wahl. `eps_ud` bringt der Nutzer mit: die
-Stahlspannungen rechnen bis heute mit 4.5 %, das Knicken und die Analysen
-mit dem Wert der Stahlsorte.
+Die Gesetze zu einer Wahl. Der Stahl kommt je Lage dazu, samt seinem
+`eps_ud` -- bis 2026-10-12 rechneten die Stahlspannungen fest mit 4.5 %,
+das Knicken und die Analysen mit dem der ersten Lage.
 
 
 ## Konstanten
@@ -325,6 +391,7 @@ mit dem Wert der Stahlsorte.
 
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.knicken]]
+- [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.projekt.eintraege]]

@@ -8,18 +8,6 @@ gelernt wurde, steht in [[Entwicklung]].
 ## Offen
 
 
-- [ ] **Gemischte Stahlsorten rechnen still mit einer Sorte** (Durchsicht
-      2026-10-12, nachgerechnet). Stahlspannung, Knicken (Verformung),
-      Querkraft ohne Bügel und die Spannung-Dehnung-Analyse nehmen den Stahl
-      der ersten Lage für alle Lagen (`posten[0][0].stahl`); nur die
-      Tragsicherheit rechnet je Sorte. Unten B700B, oben B500B: die
-      Stahlspannung liest nur B700B, die obere Lage rechnet mit
-      f_yd = 609 statt 435 N/mm² -- auf der unsicheren Seite, ohne Meldung.
-      Die Wurzel: eine Lage hat drei Gestalten (`Stahllage` ohne Gesetz, das
-      Tupel `(a_s, z, Gesetz, Text)`, die Lage der Handrechnung), der Löser
-      kennt nur einen Stahl, und ein Posten reist als 5-Tupel. Besser: die
-      Lage trägt ihr Gesetz, gebaut und angemeldet von einer Funktion; der
-      Posten wird zum `Postenbezug`.
 - [ ] **Die Sortentabellen sind ungeprüft.** `BETONSORTEN` und `STAHLSORTEN` in
       `material/` stammen aus der Vorgängerfassung und sind nie gegen die
       gedruckte SIA 262 gehalten worden. Dasselbe gilt für sämtliche
@@ -67,7 +55,7 @@ gelernt wurde, steht in [[Entwicklung]].
 Neun Durchsichten haben je einen Bereich ganz gelesen; jeder Punkt ist am
 Code nachgeprüft. Reihenfolge nach Empfehlung. Ziel jedes Punkts ist, dass
 etwas wegfällt, nicht dass es umzieht. Der dringendste Befund, die
-gemischten Stahlsorten, steht oben unter «Offen».
+gemischten Stahlsorten, ist behoben (siehe [[Entwicklung]]).
 
 - [ ] **Ergebnisse in den Rechenlauf, nicht an die Rechenobjekte.**
       `rechne()` gibt nur Zahlen zurück; Urteile, Linien, Fallergebnisse und
@@ -373,6 +361,12 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Gemischte Stahlsorten: Stahlspannung, Knicken, Querkraft und Analyse
+nahmen den Stahl der ersten Lage für alle Lagen -- jetzt trägt jede Lage
+ihren Stahl, gebaut an einer Stelle (`stahllagen`) · Stahlspannung je Stahl
+mit eigener Grenze, massgebend der kleinste Erfüllungsgrad · Querkraft mit
+dem Stahl der gezogenen Seite · Fliessbeginn der Analyse je Lage ·
 
 2D Balkensysteme: ebener Rahmen nach der Steifigkeitsmethode im eigenen
 Kern `stabwerk/` · Gelenke, Federn, Bettung, feste Linienlager, Knoten auf

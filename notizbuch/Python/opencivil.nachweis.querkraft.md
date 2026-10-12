@@ -1,5 +1,5 @@
 ---
-erzeugt: 0a2294aca71c
+erzeugt: bd8b9e394511
 art: modul
 tags: [modul]
 ---
@@ -90,8 +90,7 @@ die Oberflaeche die Formel ein zweites Mal enthaelt.
 - `lagen: Tuple[Tuple[float, bool], ...]` – Je vorhandener Posten: `(z ab Oberkante, liegt unten)`.
 - `einlage: float`
 - `tau_cd: float`
-- `f_yd: float`
-- `E_s: float`
+- `zugstahl: Mapping[bool, Tuple[float, float]]` – Je Momentenrichtung (`True`: Zug unten) `(f_yd, E_s)` des Stahls der gezogenen Seite -- unten und oben duerfen verschiedene Staehle liegen. Fehlt eine Richtung, liegt auf ihrer Zugseite keine Bewehrung.
 - `k_g: float`
 
 #### Kurvenbeiwerte.hoehen
@@ -530,6 +529,7 @@ nicht nachrechnen konnte.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.nachweis.biegung_normalkraft]]
+- [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.querschnitt.platte]]
 
 ## Gebraucht von

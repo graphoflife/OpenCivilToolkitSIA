@@ -1,5 +1,5 @@
 ---
-erzeugt: 023e7a8c8f8c
+erzeugt: 281598c372b9
 art: modul
 tags: [modul]
 ---
@@ -543,7 +543,6 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]
 - [[opencivil.gleichungen.blatt]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
-- [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.fehlende_bewehrung]]
 - [[opencivil.nachweis.knicken]]

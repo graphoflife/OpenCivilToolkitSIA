@@ -1,5 +1,5 @@
 ---
-erzeugt: 9c3181ca3a9f
+erzeugt: 7941a42baa76
 art: modul
 tags: [modul]
 ---
@@ -277,7 +277,7 @@ gerechnet wird.
 - `M_Riss: float` – Das Rissmoment ohne Normalkraft -- mit `k_t` fuer ein Drittel der Dicke.
 - `k_t_zug: float = 1.0`
 - `f_ct_eff_zug: float = 0.0` – Fuer die Rissnormalkraft: `k_t` fuer die ganze Dicke und `k_t·f_ctm`.
-- `eps_y: float = math.inf` – Wo der Stahl zu fliessen beginnt: `f_s / E_s`.
+- `staehle: Tuple[Any, ...] = ()` – Die Staehle der Lagen, jeder einmal -- fuer die Fliessdehnung in der Herleitung. Fliessen beginnt, wo die erste Lage die Fliessdehnung ihres eigenen Stahls erreicht ([[opencivil.spannungsanalyse#Loeserpaar|Stahlgesetz.eps_yd]] der Lage).
 - `wahl: Rechenwahl = Rechenwahl(art=Rechenart.PARABEL)` – Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart.
 - `grenznamen: Tuple[str, ...] = ()` – Je Grenze des gerissenen Loesers, was sie ist -- fuer «massgebend».
 - `ids: Mapping[str, str] = field(default_factory=dict)` – Kurzname -> Wert-ID der Eingaben, fuer die Herleitung.
@@ -685,6 +685,7 @@ sammelt die Formelsammlung ihr Thema.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
+- [[opencivil.material.basis]]
 - [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.querschnittsloeser]]

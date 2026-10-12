@@ -12,6 +12,7 @@ import math
 import unittest
 
 from opencivil.nachweis import linie
+from opencivil.nachweis.querschnittsloeser import Stahllage
 from opencivil.nachweis.rechenwahl import Rechenart, Rechenwahl
 from opencivil.nachweis.resistenzlinie import Ebenenlinie
 from opencivil.querschnitt import geometrie as geo
@@ -50,7 +51,8 @@ class TestWieDiePlatte(unittest.TestCase):
     def setUp(self):
         self.ebenen = Ebenenlinie(
             Rechenwahl(art=Rechenart.PARABEL), h=self.h, b=self.b, beton=BETON.spannung,
-            lagen=[(1131e-6, 0.215, STAHL, "unten"), (565e-6, 0.035, STAHL, "oben")],
+            lagen=[Stahllage(a_s=1131e-6, z=0.215, stahl=STAHL, text="unten"),
+                   Stahllage(a_s=565e-6, z=0.035, stahl=STAHL, text="oben")],
             eps_c1d=BETON.eps_c1d, eps_c2d=BETON.eps_c2d)
         self.platte = self.ebenen.punkte
         self.neu = querschnitt(

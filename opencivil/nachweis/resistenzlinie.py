@@ -47,7 +47,9 @@ from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
 from opencivil.nachweis import dehnungsfaecher, linie as geo
 from opencivil.nachweis.dehnungsfaecher import Linienpunkt
-from opencivil.nachweis.querschnittsloeser import plattenfasern, protokoll_wirksamer_modul
+from opencivil.nachweis.querschnittsloeser import (
+    Stahllage, plattenfasern, protokoll_wirksamer_modul,
+)
 from opencivil.nachweis.rechenwahl import (
     Rechenart, Rechenwahl, protokoll_betongesetz,
 )
@@ -232,14 +234,15 @@ class Ebenenlinie(Widerstandslinie):
 
     ``beton`` ist das Gesetz der Wahl
     (:func:`~opencivil.nachweis.rechenwahl.betongesetz`). Der Stahl kommt je
-    Lage als :class:`Stahlgesetz` -- ohne Abfall jenseits von ``eps_ud``: die
-    unterste Lage liegt im Faecher genau auf dieser Grenze, und ein Gesetz,
-    das dort auf null faellt, kippte an der Rundung.
+    Lage mit ihrer :class:`Stahllage` -- als :class:`Stahlgesetz`, ohne
+    Abfall jenseits von ``eps_ud``: die unterste Lage liegt im Faecher genau
+    auf dieser Grenze, und ein Gesetz, das dort auf null faellt, kippte an
+    der Rundung.
     """
 
     def __init__(self, wahl: Rechenwahl, *, h: float, b: float,
                  beton: Callable[[float], float],
-                 lagen: Sequence[Tuple[float, float, Stahlgesetz, str]],
+                 lagen: Sequence[Stahllage],
                  eps_c1d: float, eps_c2d: float,
                  schritte: int = dehnungsfaecher.SCHRITTE,
                  fasern: int = dehnungsfaecher.FASERN) -> None:
@@ -253,17 +256,17 @@ class Ebenenlinie(Widerstandslinie):
         self.schritte = schritte
         self.querschnitt = plattenfasern(
             h=h, b=b, beton=beton,
-            staebe=[(a_s, z, gesetz.spannung) for a_s, z, gesetz, _ in self.lagen],
+            staebe=[(l.a_s, l.z, l.stahl.spannung) for l in self.lagen],
             fasern=fasern, gemittelt=wahl.art.mit_block, verdraengt=True)
         self.grenzen, self.grenznamen = dehnungsfaecher.grenzen(
-            h, [(z, gesetz.eps_ud, f"Stahl der {text}") for _, z, gesetz, text in self.lagen],
+            h, [(l.z, l.stahl.eps_ud, f"Stahl der {l.text}") for l in self.lagen],
             eps_c1d=eps_c1d, eps_c2d=eps_c2d)
         self.punkte: List[Linienpunkt] = geo.ohne_wiederholungen([
             Linienpunkt(*self.kraefte(ebene.eps_oben, ebene.eps_unten),
                         eps_oben=ebene.eps_oben, eps_unten=ebene.eps_unten,
                         abschnitt=marke)
             for marke, ebene in dehnungsfaecher.faecher(
-                h, [(z, gesetz.eps_ud) for _, z, gesetz, _ in self.lagen], schritte,
+                h, [(l.z, l.stahl.eps_ud) for l in self.lagen], schritte,
                 eps_c1d=eps_c1d, eps_c2d=eps_c2d)])
         #: Je Achse die groesste Zahl darauf -- der Massstab, an dem die Suche
         #: «genau genug» misst.
@@ -423,9 +426,9 @@ class Ebenenlinie(Widerstandslinie):
         p.tabelle(
             kopf=["Lage", Mathe(r"a_s\ [\mathrm{mm}^2]"), Mathe(r"z\ [\mathrm{mm}]"),
                   Mathe(rf"{satz.stahl_zeichen}\ [\mathrm{{N/mm^2}}]")],
-            zeilen=[[text, Mathe(f"{a_s * 1e6:.0f}"), Mathe(f"{z * 1e3:.1f}"),
-                     Mathe(f"{gesetz.f_yd / 1e6:.0f}")]
-                    for a_s, z, gesetz, text in self.lagen],
+            zeilen=[[l.text, Mathe(f"{l.a_s * 1e6:.0f}"), Mathe(f"{l.z * 1e3:.1f}"),
+                     Mathe(f"{l.stahl.f_yd / 1e6:.0f}")]
+                    for l in self.lagen],
             titel="Berücksichtigte Bewehrungslagen",
             ausrichtung="lrrr",
         )
@@ -454,10 +457,10 @@ class Ebenenlinie(Widerstandslinie):
         chi = (treffer.eps_unten - treffer.eps_oben) / self.h
         N, M = self.kraefte(treffer.eps_oben, treffer.eps_unten)
         stahl = []
-        for a_s, z, gesetz, text in self.lagen:
-            eps = eps_m + chi * (z - self.h / 2.0)
-            sigma = gesetz.spannung(eps)
-            stahl.append((text, eps, sigma, a_s, sigma * a_s, z))
+        for l in self.lagen:
+            eps = eps_m + chi * (l.z - self.h / 2.0)
+            sigma = l.stahl.spannung(eps)
+            stahl.append((l.text, eps, sigma, l.a_s, sigma * l.a_s, l.z))
         F_c = N - sum(s[4] for s in stahl)
         M_c = M - sum(s[4] * (s[5] - self.h / 2.0) for s in stahl)
         z_c = self.h / 2.0 + M_c / F_c if F_c else float("nan")

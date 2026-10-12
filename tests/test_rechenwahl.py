@@ -14,17 +14,17 @@ from opencivil.nachweis.querschnittsloeser import (
     Stahllage, Werkstoffsatz, lagen_je_seite, stahl_bilinear, stahl_nur_zug,
 )
 from opencivil.nachweis.rechenwahl import (
-    RECHENARTEN, SPANNUNGSARTEN, Kennwerte, Rechenart, Rechenwahl,
+    RECHENARTEN, SPANNUNGSARTEN, Betonkennwerte, Rechenart, Rechenwahl,
     bezuege_vereinen, gesetze,
 )
-from opencivil.querschnitt.werkstoffgesetz import Spannungsblock
+from opencivil.querschnitt.werkstoffgesetz import Spannungsblock, Stahlgesetz
 
-W = Kennwerte(f_c=20e6, f_s=435e6, f_s_druck=435e6, E_cm=33.6e9, E_s=200e9,
-              eps_c1d=0.002, eps_c2d=0.0035)
+W = Betonkennwerte(f_c=20e6, E_cm=33.6e9, eps_c1d=0.002, eps_c2d=0.0035)
+STAHL = Stahlgesetz(E_s=200e9, f_yd=435e6, f_yd_druck=435e6, eps_ud=0.045)
 
-LAGEN = [Stahllage(a_s=1696e-6, z=0.249, nummer=2, von_unten=True),
-         Stahllage(a_s=754e-6, z=0.243, nummer=2, von_unten=True),
-         Stahllage(a_s=754e-6, z=0.048, nummer=3, von_unten=False)]
+LAGEN = [Stahllage(a_s=1696e-6, z=0.249, stahl=STAHL, nummer=2, von_unten=True),
+         Stahllage(a_s=754e-6, z=0.243, stahl=STAHL, nummer=2, von_unten=True),
+         Stahllage(a_s=754e-6, z=0.048, stahl=STAHL, nummer=3, von_unten=False)]
 
 
 class TestRechenarten(unittest.TestCase):
@@ -50,8 +50,8 @@ class TestGesetze(unittest.TestCase):
     def test_handrechnung_block_stahl_nur_auf_zug_je_seite_eine_lage(self):
         g = gesetze(Rechenwahl(art=Rechenart.HANDRECHNUNG), W)
         self.assertIsInstance(g.beton, Spannungsblock)
-        self.assertEqual(g.stahl(-0.01), 0.0)
-        self.assertAlmostEqual(g.stahl(0.01), 435e6)
+        self.assertEqual(g.stahl(STAHL)(-0.01), 0.0)
+        self.assertAlmostEqual(g.stahl(STAHL)(0.01), 435e6)
         self.assertTrue(g.gemittelt)
         self.assertFalse(g.verdraengt)
         lagen = g.lagen(LAGEN, 0.3)
@@ -62,7 +62,7 @@ class TestGesetze(unittest.TestCase):
     def test_block_genau_mit_druckstahl(self):
         g = gesetze(Rechenwahl(art=Rechenart.BLOCK), W)
         self.assertIsInstance(g.beton, Spannungsblock)
-        self.assertAlmostEqual(g.stahl(-0.01), -435e6)
+        self.assertAlmostEqual(g.stahl(STAHL)(-0.01), -435e6)
         self.assertTrue(g.gemittelt)
         self.assertTrue(g.verdraengt)
         self.assertEqual(g.lagen(LAGEN, 0.3), LAGEN)
@@ -79,7 +79,8 @@ class TestGesetze(unittest.TestCase):
         g = gesetze(Rechenwahl(art=Rechenart.HANDRECHNUNG), W)
         loeser = g.loeser(h=0.3, b=1.0, lagen=LAGEN, beton=lambda eps: 1e10 * eps)
         self.assertEqual(len(loeser.lagen), 2)
-        self.assertIs(loeser.stahl, g.stahl)
+        # Der Stahl bleibt der der Wahl: nur auf Zug.
+        self.assertEqual([s.gesetz(-0.01) for s in loeser.querschnitt.staebe], [0.0, 0.0])
 
 
 class TestStahl(unittest.TestCase):
@@ -105,7 +106,8 @@ class TestStahl(unittest.TestCase):
 
     def test_je_seite_eine_lage_auch_ohne_angabe_der_seite(self):
         """Ohne ``von_unten`` entscheidet die Tiefe gegen h/2."""
-        lagen = lagen_je_seite([Stahllage(a_s=1e-3, z=0.25), Stahllage(a_s=5e-4, z=0.05)], 0.3)
+        lagen = lagen_je_seite([Stahllage(a_s=1e-3, z=0.25, stahl=STAHL),
+                                Stahllage(a_s=5e-4, z=0.05, stahl=STAHL)], 0.3)
         self.assertEqual([l.von_unten for l in lagen], [True, False])
 
 

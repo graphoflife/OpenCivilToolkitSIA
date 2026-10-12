@@ -1,5 +1,5 @@
 ---
-erzeugt: 1abd150da462
+erzeugt: edd74a9ebe96
 art: modul
 tags: [modul]
 ---
@@ -141,6 +141,7 @@ Was der Nachweis fuer einen Lastfall gefunden hat.
 - `sigma_s_adm: float = 0.0`
 - `eps_s_adm: float = 0.0` – `sigma_s_adm / E_s` -- dagegen wird gemessen, wenn der Stahl fliesst.
 - `eps_y: float = 0.0` – Die Fliessdehnung `f_yk / E_s`.
+- `stahl: Optional[Baustoff] = None` – Der Stahl der massgebenden Lage -- seine Grenze, sein `E_s` und seine Fliessdehnung gelten. Mit verschiedenen Staehlen unten und oben ist massgebend die gezogene Lage mit dem kleinsten Erfuellungsgrad, nicht die am staerksten gedehnte.
 - `erfuellungsgrad: float = 0.0`
 - `erfuellt: bool = False`
 - `konvergiert: bool = True`
@@ -195,10 +196,19 @@ def id(self) -> str
 
 Die Kennung des Nachweises, zu dem die Grenze gehoert.
 
+#### Spannungsgrenze.je_stahl
+
+```python
+def je_stahl(self, name: str, symbol: str, stahl: Baustoff) -> Tuple[str, str]
+```
+
+Name und Zeichen eines Werts, der zu einem Stahl gehoert -- mit dem
+Stahl daran, sobald die Richtung mehr als einen hat.
+
 #### Spannungsgrenze.spannung
 
 ```python
-def spannung(self, sigma_adm: float) -> Wert
+def spannung(self, sigma_adm: float, stahl: Baustoff) -> Wert
 ```
 
 `sigma_s,adm` als Wert -- in Herleitung, Vergleich und Tabelle derselbe.
@@ -225,10 +235,11 @@ Was nur diese Grenze braucht, zusaetzlich zur gemeinsamen Rechnung.
 
 ```python
 @abstractmethod
-def bestimmen(self, e: Eingaben, p: Protokoll) -> float
+def bestimmen(self, e: Eingaben, p: Protokoll) -> Dict[str, float]
 ```
 
-Die zulaessige Stahlspannung in Pa -- gerechnet und mitgeschrieben.
+Die zulaessige Stahlspannung in Pa, je Stahl unter seiner Kennung --
+gerechnet und mitgeschrieben.
 
 #### Spannungsgrenze.festlegung
 
@@ -278,7 +289,7 @@ def bezuege(self) -> List[Eingabebezug]
 #### GrenzeGegenFliessen.bestimmen
 
 ```python
-def bestimmen(self, e: Eingaben, p: Protokoll) -> float
+def bestimmen(self, e: Eingaben, p: Protokoll) -> Dict[str, float]
 ```
 
 #### GrenzeGegenFliessen.festlegung
@@ -329,7 +340,7 @@ def bezuege(self) -> List[Eingabebezug]
 #### GrenzeAusRissbreite.bestimmen
 
 ```python
-def bestimmen(self, e: Eingaben, p: Protokoll) -> float
+def bestimmen(self, e: Eingaben, p: Protokoll) -> Dict[str, float]
 ```
 
 #### GrenzeAusRissbreite.festlegung
@@ -390,10 +401,19 @@ Das Urteil eines Falls -- was gegeneinander steht, sagt der Vergleich.
 #### Spannungsbegrenzung._protokoll_ansatz
 
 ```python
-def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, n: float) -> float
+def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, w: Betonkennwerte, loeser: Querschnittsloeser) -> Dict[str, float]
 ```
 
-Was fuer alle Faelle gilt -- und die Grenze, die dabei entsteht.
+Was fuer alle Faelle gilt -- und die Grenzen, die dabei entstehen.
+
+#### Spannungsbegrenzung._wertigkeiten
+
+```python
+def _wertigkeiten(self, w: Betonkennwerte, loeser: Querschnittsloeser) -> str
+```
+
+`n = E_s / E_c,eff` hinter dem wirksamen Modul -- einmal, solange
+alle Staehle denselben Modul haben, sonst je Stahl.
 
 #### Spannungsbegrenzung._protokoll_fliessen
 
@@ -417,6 +437,7 @@ Der Fall, in dem die Spannung am Plateau stehen bleibt.
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.material.basis]]
 - [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.querschnittsloeser]]

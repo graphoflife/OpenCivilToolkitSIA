@@ -1,5 +1,5 @@
 ---
-erzeugt: eb851c9abfb2
+erzeugt: faf247156d27
 art: modul
 tags: [modul]
 ---
@@ -74,12 +74,19 @@ Alles in SI-Basis.
 class Stahllage
 ```
 
-Eine Bewehrungslage, wie der Loeser sie braucht.
+Eine Bewehrungslage samt ihrem Stahl -- die eine Gestalt, in der jede
+Rechnung am Plattenquerschnitt eine Lage sieht: der Loeser, die genaue
+Resistenzlinie, die Handrechnung, die Spannung-Dehnung-Analyse. Gebaut
+wird sie an einer Stelle,
+[[opencivil.nachweis.rechenwahl#stahllagen|stahllagen]].
 
 - `a_s: float` – Querschnitt in m^2, bezogen auf die betrachtete Breite.
 - `z: float` – Tiefenlage ab Oberkante, in m.
+- `stahl: Stahlgesetz` – Der Stahl dieser Lage, mit den Festigkeiten des Wertesatzes -- `f_yd` oder `f_yk` im Feld `f_yd`. Jede Lage traegt ihren eigenen: der Editor laesst je Seite einen anderen Stahl waehlen. Bis 2026-10-12 bekam der Loeser einen einzigen, den der ersten Lage, und unten B700B mit oben B500B rechnete die obere Lage mit f_yd = 609 statt 435 N/mm².
+- `sorte: str = ''` – Die Kennung des Stahls (`s1`) -- unter ihr heissen seine Eingaben.
 - `nummer: int = 0` – Nur zur Zuordnung in der Mitschrift.
 - `von_unten: Optional[bool] = None` – Ob die Lage zur unteren Seite gehoert -- bei der Platte die 1. und 2. Lage ([[opencivil.nachweis.querschnittsloeser#Stahllage|Bewehrungslage.von_unten]]). Die Handrechnung fasst je Seite zusammen ([[opencivil.nachweis.querschnittsloeser#lagen_je_seite|lagen_je_seite]]); ohne Angabe entscheidet die Tiefe.
+- `text: str = ''` – Wie die Lage in Tabellen heisst -- «2. Lage Grundbewehrung».
 
 ### lagen_je_seite
 
@@ -90,7 +97,23 @@ def lagen_je_seite(lagen: Sequence[Stahllage], h: float) -> List[Stahllage]
 Je Seite eine Lage, im Schwerpunkt ihrer Flaechen -- wie die Handrechnung.
 
 Die Seite sagt [[opencivil.nachweis.querschnittsloeser#Stahllage|Stahllage.von_unten]], sonst die Tiefe gegen
-`h/2`. Unten zuerst; eine Seite ohne Flaeche faellt weg.
+`h/2`. Unten zuerst; eine Seite ohne Flaeche faellt weg. Die
+zusammengefasste Lage behaelt den Stahl ihrer Seite. Zwei verschiedene
+Staehle auf einer Seite liessen sich nicht zu einer Lage machen -- die
+Platte hat sie nicht, je Seite und Richtung liegt eine Lage, und Grund-
+und Zulage teilen ihren Stahl.
+
+### bruchdehnung
+
+```python
+def bruchdehnung(lagen: Sequence[Stahllage]) -> float
+```
+
+Wie weit das Suchfenster im Zug reicht: bis zur kleinsten Bruchdehnung
+der Lagen. Jenseits davon gaebe das Gesetz dieser Lage null zurueck, und
+die Bisektion faende Scheinloesungen. Bei einer Sorte ist es ihr
+`eps_ud`; bei zweien die kleinere -- das Fenster gilt an beiden
+Raendern. Ohne Lage gilt [[opencivil.nachweis.querschnittsloeser#Konstanten|EPS_ZUG]].
 
 ### Ebene
 
@@ -174,18 +197,21 @@ class Querschnittsloeser
 
 Der Querschnitt als Faserintegral, mit Suche nach der Dehnungsebene.
 
-`beton` und `stahl` sind Funktionen `eps -> sigma` in SI. Damit
-bleibt der Loeser frei von Annahmen ueber das Werkstoffgesetz: die
-Spannungsbegrenzung rechnet elastisch mit Kriechen und charakteristischen
-Festigkeiten, der Knicknachweis mit dem nichtlinearen Gesetz der Norm und
-Bemessungswerten -- siehe [[opencivil.nachweis.querschnittsloeser#Werkstoffsatz|Werkstoffsatz]].
+`beton` ist eine Funktion `eps -> sigma` in SI, `stahl` macht aus
+dem Stahl einer Lage eine solche -- ohne Angabe [[opencivil.nachweis.querschnittsloeser#bilinear|bilinear]]; die
+Handrechnung gibt ihren Stahl nur auf Zug mit. Damit bleibt der Loeser
+frei von Annahmen ueber das Werkstoffgesetz: die Spannungsbegrenzung rechnet
+elastisch mit Kriechen und charakteristischen Festigkeiten, der
+Knicknachweis mit dem nichtlinearen Gesetz der Norm und Bemessungswerten
+-- siehe [[opencivil.nachweis.querschnittsloeser#Werkstoffsatz|Werkstoffsatz]].
 
 **Das Suchfenster muss zu den Gesetzen passen.** `eps_druck` und
 `eps_zug` duerfen nicht weiter reichen als der Bereich, in dem beide
 Gesetze monoton sind -- jenseits ihrer Bruchdehnung geben sie null zurueck,
-und dort findet die Bisektion Scheinloesungen. Die Vorgaben passen zu
-[[opencivil.nachweis.querschnittsloeser#beton_nichtlinear|beton_nichtlinear]] und [[opencivil.nachweis.querschnittsloeser#stahl_bilinear|stahl_bilinear]]; wer sie weitet, muss
-die Gesetze mitweiten.
+und dort findet die Bisektion Scheinloesungen. Ohne `eps_zug` reicht das
+Fenster darum bis zur kleinsten Bruchdehnung der Lagen; `eps_druck`
+passt zu [[opencivil.nachweis.querschnittsloeser#beton_nichtlinear|beton_nichtlinear]], wer es weitet, muss das Gesetz
+mitweiten.
 
 Ohne `grenzen` gelten beide Werte an beiden Raendern. Wer andere
 Grenzen braucht -- die Spannung-Dehnung-Analyse die des Dehnungsfaechers,
@@ -438,6 +464,16 @@ Linear bis zur Fliessgrenze, dann waagrecht; jenseits von `eps_ud` null.
 `f_yk`, je nach [[opencivil.nachweis.querschnittsloeser#Werkstoffsatz|Werkstoffsatz]]. `f_sd_druck` die auf Druck;
 ohne sie gilt dieselbe. Bei den Normsorten sind beide gleich.
 
+### bilinear
+
+```python
+def bilinear(s: Stahlgesetz) -> Callable[[float], float]
+```
+
+Der Stahl einer Lage, wie der Loeser ihn rechnet: [[opencivil.nachweis.querschnittsloeser#stahl_bilinear|stahl_bilinear]]
+mit den Werten der Lage -- jenseits ihres `eps_ud` null, damit das
+Suchfenster nicht ueber den gueltigen Bereich hinausgreift.
+
 ### stahl_nur_zug
 
 ```python
@@ -466,7 +502,6 @@ nichts. So rechnet die Handrechnung -- sie laesst die Druckbewehrung weg.
 ## Gebraucht von
 
 - [[opencivil.nachweis.biegung_normalkraft]]
-- [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.rechenwahl]]

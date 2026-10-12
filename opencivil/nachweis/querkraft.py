@@ -54,7 +54,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
     Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
@@ -67,6 +67,7 @@ from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.nachweis.biegung_normalkraft import protokoll_widerstand
+from opencivil.nachweis.rechenwahl import stahlbezuege, stahlname, staehle
 from opencivil.querschnitt.platte import (
     ALPHA_ZUG, Plattenquerschnitt, Richtung, protokoll_statische_hoehe,
 )
@@ -110,8 +111,13 @@ class Kurvenbeiwerte:
 
     einlage: float
     tau_cd: float
-    f_yd: float
-    E_s: float
+    zugstahl: Mapping[bool, Tuple[float, float]]
+    """
+    Je Momentenrichtung (``True``: Zug unten) ``(f_yd, E_s)`` des Stahls der
+    gezogenen Seite -- unten und oben duerfen verschiedene Staehle liegen.
+    Fehlt eine Richtung, liegt auf ihrer Zugseite keine Bewehrung.
+    """
+
     k_g: float
 
     def hoehen(self, moment_positiv: bool) -> Optional[Tuple[float, float]]:
@@ -509,15 +515,14 @@ class Querkraft(Nachweis):
             bezuege.append(Eingabebezug(f"z_{lage.nummer}{art.kuerzel}", z_id))
 
         if self.buegel is None:
-            stahl = self.posten[0][0].stahl
+            # Die Dehnung eps_v rechnet mit dem Stahl der gezogenen Seite --
+            # unten und oben duerfen verschiedene liegen, also je Stahl.
             bezuege += [
                 Eingabebezug("D_max", querschnitt.id_von("D_max")),
                 Eingabebezug("einlagenhoehe", querschnitt.id_von("einlagenhoehe")),
                 Eingabebezug("f_ck", querschnitt.beton.id_von("f_ck")),
                 Eingabebezug("tau_cd", querschnitt.beton.id_von("tau_cd")),
-                Eingabebezug("f_yd", stahl.id_von("f_yd")),
-                Eingabebezug("E_s", stahl.id_von("E_s")),
-            ]
+            ] + stahlbezuege(self.posten, ("f_yd", "E_s"))
             # Der Momentenwiderstand bei der wirkenden Normalkraft kommt aus dem
             # M-N-Nachweis -- je Fall einer. Als Eingang statt als mitgegebene Zahl,
             # damit die Abhaengigkeit im Graphen steht und die Rueckverfolgung sie
@@ -575,11 +580,16 @@ class Querkraft(Nachweis):
     def _ohne_buegel(self, e: Eingaben, p: Protokoll):
         h = e.g("h").si
         tau_cd = e.g("tau_cd")
-        f_yd = e.g("f_yd").si
-        E_s = e.g("E_s").si
         einlage = e.g("einlagenhoehe").si
         m_rd = {f.name: abs(e.g(f"m_Rd_{f.kennung}").si) for f in self.faelle}
         lagen = self._lagen(e)
+        zugstahl = {}
+        for positiv in (True, False):
+            i = _zuglage(lagen, positiv)
+            if i is not None:
+                stahl = self.posten[i][0].stahl
+                zugstahl[positiv] = (e.g(stahlname("f_yd", stahl)).si,
+                                     e.g(stahlname("E_s", stahl)).si)
 
         self._protokoll_ansatz(p, e)
 
@@ -597,14 +607,14 @@ class Querkraft(Nachweis):
 
         self.beiwerte = Kurvenbeiwerte(
             h=h, lagen=tuple(lagen), einlage=einlage, tau_cd=tau_cd.si,
-            f_yd=f_yd, E_s=E_s, k_g=k_g)
+            zugstahl=zugstahl, k_g=k_g)
 
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
         self.ergebnisse = []
 
         for fall in self.faelle:
-            erg = self._einen_fall(fall, h, tau_cd, f_yd, E_s, einlage, k_g,
+            erg = self._einen_fall(fall, h, tau_cd, zugstahl, einlage, k_g,
                                    m_rd[fall.name], lagen)
             self.ergebnisse.append(erg)
             self._protokoll_fall(p, e, erg, beiwert)
@@ -816,6 +826,7 @@ class Querkraft(Nachweis):
             return None
 
         d, d_v = hoehen
+        f_yd, E_s = self.beiwerte.zugstahl[moment_positiv]
         bis = m_Rd + KURVENZUGABE
 
         # Die fuenfzig Stellen liegen gleichmaessig, treffen ``m_Rd`` aber nur
@@ -831,8 +842,8 @@ class Querkraft(Nachweis):
         for M_Ed in stellen:
             p = widerstand(
                 M_Ed=M_Ed, N_Ed=N_Ed, h=self.beiwerte.h, d=d, d_v=d_v,
-                tau_cd=self.beiwerte.tau_cd, f_yd=self.beiwerte.f_yd,
-                E_s=self.beiwerte.E_s, k_g=self.beiwerte.k_g, m_Rd=m_Rd,
+                tau_cd=self.beiwerte.tau_cd, f_yd=f_yd,
+                E_s=E_s, k_g=self.beiwerte.k_g, m_Rd=m_Rd,
                 index=self.mn.wahl.index)
             punkte.append((vz * M_Ed, p.v_Rd, p.plastisch))
 
@@ -863,7 +874,7 @@ class Querkraft(Nachweis):
 
     def _einen_fall(
         self, fall: Querkraftfall, h: float, tau_cd: Groesse,
-        f_yd: float, E_s: float, einlage: float, k_g: float,
+        zugstahl: Mapping[bool, Tuple[float, float]], einlage: float, k_g: float,
         m_Rd: float, lagen: Sequence[Tuple[float, bool]],
     ) -> Querkraftergebnis:
         erg = Querkraftergebnis(fall=fall)
@@ -882,6 +893,7 @@ class Querkraft(Nachweis):
             return erg
         erg.d = hoehen
         erg.d_v = erg.d - einlage if (h / 6.0 < einlage < erg.d) else erg.d
+        f_yd, E_s = zugstahl[M_Ed >= 0]
 
         # Nur Druck entlastet: bei Zug liefert min(N_Ed; 0) null, das
         # Dekompressionsmoment entfaellt und der Nachweis laeuft unveraendert
@@ -1021,7 +1033,12 @@ class Querkraft(Nachweis):
             "statische Höhe der gezogenen Bewehrung, die Grösstkorngrösse und "
             "die Dehnung auf halber Höhe."
         )
-        s = {name: e[name].symbol for name in ("tau_cd", "f_yd", "E_s")}
+        # Bei einem Stahl mit seinem Zeichen; bei zweien das allgemeine --
+        # welcher gilt, steht bei jedem Fall.
+        s = {"tau_cd": e["tau_cd"].symbol}
+        for kennwert, allgemein in (("f_yd", "f_{yd}"), ("E_s", "E_s")):
+            zeichen = {e[stahlname(kennwert, st)].symbol for st in staehle(self.posten)}
+            s[kennwert] = zeichen.pop() if len(zeichen) == 1 else allgemein
         p.ansatz(
             rf"V_{{Rd}} = k_d \cdot {s['tau_cd']} \cdot d_v \qquad "
             r"k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g}",
@@ -1109,7 +1126,8 @@ class Querkraft(Nachweis):
         idx = self.mn.wahl.index
         m_Rd = werte.moment("m_Rd", f"m_{{{idx}}}(N_{{Ed}})", erg.m_Rd)
         eps_v = werte.dehnung("eps_v", r"\varepsilon_v", erg.eps_v, stellen=3)
-        stahl = {"f_yd": e["f_yd"], "E_s": e["E_s"]}
+        zugseite = self.posten[erg.zuglage][0].stahl
+        stahl = {"f_yd": e[stahlname("f_yd", zugseite)], "E_s": e[stahlname("E_s", zugseite)]}
         if erg.eps_v == 0.0:
             p.text(f"|m_Ed| = {Groesse.aus_si(abs(M_Ed), KNM).formatiert(1)} kNm "
                    f"≤ m_Dd = {m_Dd.formatiert()} kNm → ungerissen, ε_v = 0.")

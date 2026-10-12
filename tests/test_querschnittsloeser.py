@@ -8,14 +8,23 @@ from opencivil.nachweis.querschnittsloeser import (
     stahl_bilinear,
 )
 from opencivil.nachweis.zustand2 import gerissen, wertigkeit
+from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
+
+
+def stahl(*, E_s: float, f_sd: float, eps_ud: float = 0.045) -> Stahlgesetz:
+    """Der Stahl einer Lage -- auf Zug und Druck dieselbe Grenze."""
+    return Stahlgesetz(E_s=E_s, f_yd=f_sd, f_yd_druck=f_sd, eps_ud=eps_ud)
+
+
+#: Ein Stahl, der nie fliesst -- fuer die Faelle mit geschlossener Loesung.
+ELASTISCH = stahl(E_s=200e9, f_sd=1e12)
 
 
 def elastischer_loeser(a_s=2450e-6, d=0.2601, phi=2.0, h=0.3, b=1.0):
     """Gerissen, linear elastisch -- der Fall mit geschlossener Lösung."""
     return Querschnittsloeser(
-        h=h, b=b, lagen=[Stahllage(a_s=a_s, z=d, nummer=1)],
-        beton=beton_elastisch(E_c=33.62e9 / (1.0 + phi)),
-        stahl=stahl_bilinear(E_s=200e9, f_sd=1e12))
+        h=h, b=b, lagen=[Stahllage(a_s=a_s, z=d, stahl=ELASTISCH, nummer=1)],
+        beton=beton_elastisch(E_c=33.62e9 / (1.0 + phi)))
 
 
 class TestGegenDieGeschlosseneLoesung(unittest.TestCase):
@@ -82,10 +91,9 @@ class TestProbe(unittest.TestCase):
         """
         loeser = Querschnittsloeser(
             h=0.3, b=1.0,
-            lagen=[Stahllage(a_s=1200e-6, z=0.26, nummer=1),
-                   Stahllage(a_s=1200e-6, z=0.04, nummer=4)],
-            beton=beton_elastisch(E_c=33.62e9 / 3.0),
-            stahl=stahl_bilinear(E_s=200e9, f_sd=1e12))
+            lagen=[Stahllage(a_s=1200e-6, z=0.26, stahl=ELASTISCH, nummer=1),
+                   Stahllage(a_s=1200e-6, z=0.04, stahl=ELASTISCH, nummer=4)],
+            beton=beton_elastisch(E_c=33.62e9 / 3.0))
         for N_Ed, M_Ed in [(200e3, 0.0), (200e3, 10e3), (500e3, -15e3)]:
             with self.subTest(N=N_Ed, M=M_Ed):
                 e = loeser.loese(N_Ed=N_Ed, M_Ed=M_Ed)
@@ -100,12 +108,12 @@ class TestProbe(unittest.TestCase):
         """
         d, d_u = 0.3 - 0.030 - 0.010 - 0.013, 0.030 + 0.010 + 0.013
         a_s = 5 * math.pi * 0.026 ** 2 / 4
+        s = stahl(E_s=205e9, f_sd=300e6)
         loeser = Querschnittsloeser(
             h=0.3, b=1.0,
-            lagen=[Stahllage(a_s=a_s, z=d, nummer=1),
-                   Stahllage(a_s=a_s, z=d_u, nummer=4)],
-            beton=beton_nichtlinear(f_cd=28.1e6, E_c=39e9 / 2.0),
-            stahl=stahl_bilinear(E_s=205e9, f_sd=300e6))
+            lagen=[Stahllage(a_s=a_s, z=d, stahl=s, nummer=1),
+                   Stahllage(a_s=a_s, z=d_u, stahl=s, nummer=4)],
+            beton=beton_nichtlinear(f_cd=28.1e6, E_c=39e9 / 2.0))
 
         e = loeser.loese(N_Ed=-3000e3, M_Ed=150e3)
         self.assertTrue(e.konvergiert)
@@ -134,9 +142,9 @@ class TestGrenzen(unittest.TestCase):
         möglich ist, sagt der Löser das.
         """
         loeser = Querschnittsloeser(
-            h=0.3, b=1.0, lagen=[Stahllage(a_s=200e-6, z=0.26)],
-            beton=beton_nichtlinear(f_cd=20e6, E_c=33e9),
-            stahl=stahl_bilinear(E_s=200e9, f_sd=435e6))
+            h=0.3, b=1.0,
+            lagen=[Stahllage(a_s=200e-6, z=0.26, stahl=stahl(E_s=200e9, f_sd=435e6))],
+            beton=beton_nichtlinear(f_cd=20e6, E_c=33e9))
         e = loeser.loese(N_Ed=0.0, M_Ed=5000e3)
         self.assertFalse(e.konvergiert)
 
@@ -147,14 +155,14 @@ class TestGrenzen(unittest.TestCase):
         (0.16, 0.08, 0.04 1/m) und sprang über alles zwischen 0.04 und 0.08:
         234.9 kNm hiessen «kein Gleichgewicht». Darüber bleibt es dabei.
         """
+        s = stahl(E_s=205e9, f_sd=434.78e6, eps_ud=0.045)
         loeser = Querschnittsloeser(
             h=0.3, b=1.0,
-            lagen=[Stahllage(a_s=1696e-6, z=0.249, nummer=1),
-                   Stahllage(a_s=754e-6, z=0.246, nummer=2),
-                   Stahllage(a_s=754e-6, z=0.048, nummer=4)],
+            lagen=[Stahllage(a_s=1696e-6, z=0.249, stahl=s, nummer=1),
+                   Stahllage(a_s=754e-6, z=0.246, stahl=s, nummer=2),
+                   Stahllage(a_s=754e-6, z=0.048, stahl=s, nummer=4)],
             beton=beton_nichtlinear(f_cd=20e6, E_c=33.62e9 / 3.0,
                                     eps_c1d=0.002, eps_c2d=0.0035),
-            stahl=stahl_bilinear(E_s=205e9, f_sd=434.78e6, eps_ud=0.045),
             eps_druck=0.0035, eps_zug=0.045)
         e = loeser.loese(N_Ed=0.0, M_Ed=234.9e3)
         self.assertTrue(e.konvergiert)
@@ -170,9 +178,9 @@ class TestGrenzen(unittest.TestCase):
         ist nichts mehr monoton.
         """
         loeser = Querschnittsloeser(
-            h=0.3, b=1.0, lagen=[Stahllage(a_s=2450e-6, z=0.26)],
-            beton=beton_nichtlinear(f_cd=20e6, E_c=33e9),
-            stahl=stahl_bilinear(E_s=200e9, f_sd=435e6))
+            h=0.3, b=1.0,
+            lagen=[Stahllage(a_s=2450e-6, z=0.26, stahl=stahl(E_s=200e9, f_sd=435e6))],
+            beton=beton_nichtlinear(f_cd=20e6, E_c=33e9))
         weit = loeser._fenster(0.0)
         eng = loeser._fenster(0.1)
         self.assertGreater(weit[1] - weit[0], eng[1] - eng[0])

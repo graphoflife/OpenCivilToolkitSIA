@@ -1,5 +1,5 @@
 ---
-erzeugt: 1bfbc1fa4afe
+erzeugt: 6495c643db77
 art: modul
 tags: [modul]
 ---
@@ -80,18 +80,6 @@ Ein Punkt der Resistenzlinie samt der Dehnungsebene, die ihn erzeugt.
 - `eps_unten: float`
 - `abschnitt: str = ''`
 
-### lagen_aus_eingaben
-
-```python
-def lagen_aus_eingaben(posten, e: Eingaben, satz: Werkstoffsatz=Werkstoffsatz.BEMESSUNG) -> List[Tuple[float, float, Stahlgesetz, str]]
-```
-
-Je Bewehrungsposten dieser Richtung: (Fläche m^2, z m, Gesetz, Text).
-
-Die Plateaus des Gesetzes liegen, wo der Wertesatz sie hinlegt -- bei
-`f_yd` oder `f_yk`. Die Eingaben heissen je Sorte
-`{kennwert}__{sorte}`, mit dem Kurznamen des Wertesatzes.
-
 ### faecher
 
 ```python
@@ -129,9 +117,6 @@ Hoehe, wie in [[opencivil.querschnitt.fasern]].
 
 ## Braucht
 
-- [[opencivil.core.berechnung]]
-- [[opencivil.core.wert]]
-- [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 

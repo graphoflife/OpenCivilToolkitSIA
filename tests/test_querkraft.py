@@ -352,10 +352,11 @@ class TestQuerkraftkurve(unittest.TestCase):
         ast = self.ast(qk.kurve(erg.fall.N_Ed.si), True)
 
         d, d_v = qk.beiwerte.hoehen(True)
+        f_yd, E_s = qk.beiwerte.zugstahl[True]
         punkt = querkraft.widerstand(
             M_Ed=erg.fall.M_Ed.si, N_Ed=erg.fall.N_Ed.si, h=qk.beiwerte.h,
-            d=d, d_v=d_v, tau_cd=qk.beiwerte.tau_cd, f_yd=qk.beiwerte.f_yd,
-            E_s=qk.beiwerte.E_s, k_g=qk.beiwerte.k_g, m_Rd=abs(ast["m_Rd"]))
+            d=d, d_v=d_v, tau_cd=qk.beiwerte.tau_cd, f_yd=f_yd,
+            E_s=E_s, k_g=qk.beiwerte.k_g, m_Rd=abs(ast["m_Rd"]))
         self.assertAlmostEqual(punkt.v_Rd, erg.v_Rd, places=6)
 
     def test_jenseits_des_widerstands_faellt_die_kurve(self):
@@ -381,7 +382,8 @@ class TestQuerkraftkurve(unittest.TestCase):
         ast = self.ast(qk.kurve(0.0), True)
         d, d_v = qk.beiwerte.hoehen(True)
 
-        eps_v = PLASTISCH * qk.beiwerte.f_yd / qk.beiwerte.E_s
+        f_yd, E_s = qk.beiwerte.zugstahl[True]
+        eps_v = PLASTISCH * f_yd / E_s
         k_d = 1.0 / (1.0 + eps_v * d * 1e3 * qk.beiwerte.k_g)
         erwartet = k_d * (qk.beiwerte.tau_cd / 1e6) * d_v * 1e3 * 1e3
 

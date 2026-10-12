@@ -44,6 +44,48 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-12 · Gemischte Stahlsorten: jede Lage rechnet mit ihrem Stahl
+
+Gefunden in der Strukturdurchsicht (siehe [[TODO]], «Umbau»), nachgerechnet:
+Der Editor lässt je Seite einen eigenen Stahl wählen, aber Stahlspannung,
+Knicken, Querkraft ohne Bügel und die Spannung-Dehnung-Analyse nahmen den
+Stahl der ersten Lage für alle Lagen (`posten[0][0].stahl`). Unten B700B und
+oben B500B: die Stahlspannung rechnete die obere Lage mit f_yd = 609 statt
+435 N/mm², die Querkraft las nur B500B. Nur die Tragsicherheit rechnete je
+Sorte -- sie baute ihre Lagen auf einem zweiten Weg.
+
+**Die Lage trägt ihren Stahl.** `Stahllage` hat jetzt ein Feld `stahl`
+(ein `Stahlgesetz` mit den Festigkeiten des Wertesatzes) und `sorte`.
+Gebaut wird sie an einer Stelle, `rechenwahl.stahllagen()`, angemeldet über
+`lagenbezuege()` unter `{kennwert}__{sorte}` -- genau so, wie die M-N-Linie
+es schon tat. Ihr Tupel `(a_s, z, Gesetz, Text)` und
+`dehnungsfaecher.lagen_aus_eingaben` sind weg: Löser, genaue Linie,
+Handrechnung und Analyse sehen eine Lage jetzt in derselben Gestalt. Der
+Löser bekommt keinen Stahl mehr, sondern macht aus dem Stahl jeder Lage ihr
+Gesetz (`bilinear`, in der Handrechnung nur auf Zug).
+
+**Wo es auf die Seite ankommt, entscheidet die Seite:**
+
+- Stahlspannung: je Stahl eine Grenze (`f_yd − 80`, bzw. aus der
+  Rissbreite mit `f_yk` und `E_s` der Sorte). Massgebend ist die gezogene
+  Lage mit dem kleinsten Erfüllungsgrad -- bei einem Stahl dieselbe wie
+  bisher, die am stärksten gedehnte.
+- Querkraft: `ε_v` mit `f_yd` und `E_s` der gezogenen Seite, je Fall und
+  in der M-V-Kurve je Momentenrichtung.
+- Analyse: Fliessbeginn, wo die erste Lage die Fliessdehnung *ihres*
+  Stahls erreicht; die Grenzen des Fächers je Lage mit ihrem `ε_ud`; in der
+  Herleitung `ε_y` je Stahl.
+- Knicken: das Suchfenster reicht im Zug bis zur kleinsten Bruchdehnung der
+  Lagen, an beiden Rändern. Das ist die vorsichtige Lesart des Fensters
+  am Rand, das schon vorher eine Vereinfachung war -- ob Knicken die
+  Grenzen des Fächers bekommt, steht im TODO beim Querschnittsmodell.
+
+**Mit einem Stahl ändert sich nichts** -- auch nicht im Bericht: gleiche
+Zeichen, gleiche Zahlen, gleiche Sätze. Neue Sätze und Indizes erscheinen
+nur, wo eine Richtung zwei Stähle hat. Einzige Ausnahme in der Sache: die
+Stahlspannungen rechneten fest mit `ε_ud = 4.5 %` statt mit dem der Sorte;
+bei B500B ist das dasselbe, bei B500A und B500C gilt jetzt die Sorte.
+
 ## 2026-10-12 · 2D Balkensysteme: ein ebener Rahmen nach der Steifigkeitsmethode
 
 Wunsch des Benutzers: unter der Querschnittsanalyse eine App für ebene

@@ -58,7 +58,7 @@ from opencivil.core.protokoll import Zwischenwerte
 from opencivil.querschnitt.fasern import (
     Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt, Stab,
 )
-from opencivil.querschnitt.werkstoffgesetz import k_sigma as beiwert_parabel
+from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz, k_sigma as beiwert_parabel
 
 #: Fasern ueber die Plattenhoehe. 60 reichen: die Betonspannung ist stetig,
 #: und der Fehler der Mittelpunktsregel faellt mit dem Quadrat der Faserdicke.
@@ -90,13 +90,31 @@ EPS_ZUG = 0.045
 
 @dataclass(frozen=True)
 class Stahllage:
-    """Eine Bewehrungslage, wie der Loeser sie braucht."""
+    """
+    Eine Bewehrungslage samt ihrem Stahl -- die eine Gestalt, in der jede
+    Rechnung am Plattenquerschnitt eine Lage sieht: der Loeser, die genaue
+    Resistenzlinie, die Handrechnung, die Spannung-Dehnung-Analyse. Gebaut
+    wird sie an einer Stelle,
+    :func:`~opencivil.nachweis.rechenwahl.stahllagen`.
+    """
 
     a_s: float
     """Querschnitt in m^2, bezogen auf die betrachtete Breite."""
 
     z: float
     """Tiefenlage ab Oberkante, in m."""
+
+    stahl: Stahlgesetz
+    """
+    Der Stahl dieser Lage, mit den Festigkeiten des Wertesatzes -- ``f_yd``
+    oder ``f_yk`` im Feld ``f_yd``. Jede Lage traegt ihren eigenen: der Editor
+    laesst je Seite einen anderen Stahl waehlen. Bis 2026-10-12 bekam der
+    Loeser einen einzigen, den der ersten Lage, und unten B700B mit oben
+    B500B rechnete die obere Lage mit f_yd = 609 statt 435 N/mm².
+    """
+
+    sorte: str = ""
+    """Die Kennung des Stahls (``s1``) -- unter ihr heissen seine Eingaben."""
 
     nummer: int = 0
     """Nur zur Zuordnung in der Mitschrift."""
@@ -108,23 +126,47 @@ class Stahllage:
     zusammen (:func:`lagen_je_seite`); ohne Angabe entscheidet die Tiefe.
     """
 
+    text: str = ""
+    """Wie die Lage in Tabellen heisst -- «2. Lage Grundbewehrung»."""
+
 
 def lagen_je_seite(lagen: Sequence[Stahllage], h: float) -> List[Stahllage]:
     """
     Je Seite eine Lage, im Schwerpunkt ihrer Flaechen -- wie die Handrechnung.
 
     Die Seite sagt :attr:`Stahllage.von_unten`, sonst die Tiefe gegen
-    ``h/2``. Unten zuerst; eine Seite ohne Flaeche faellt weg.
+    ``h/2``. Unten zuerst; eine Seite ohne Flaeche faellt weg. Die
+    zusammengefasste Lage behaelt den Stahl ihrer Seite. Zwei verschiedene
+    Staehle auf einer Seite liessen sich nicht zu einer Lage machen -- die
+    Platte hat sie nicht, je Seite und Richtung liegt eine Lage, und Grund-
+    und Zulage teilen ihren Stahl.
     """
     heraus = []
     for unten in (True, False):
         seite = [l for l in lagen
                  if (l.von_unten if l.von_unten is not None else l.z > h / 2.0) is unten]
         a_s = sum(l.a_s for l in seite)
-        if a_s > 0.0:
-            heraus.append(Stahllage(a_s=a_s, z=sum(l.a_s * l.z for l in seite) / a_s,
-                                    nummer=seite[0].nummer, von_unten=unten))
+        if a_s <= 0.0:
+            continue
+        if any(l.stahl != seite[0].stahl for l in seite):
+            raise ValueError(
+                f"Auf der {'unteren' if unten else 'oberen'} Seite liegen verschiedene "
+                f"Stähle -- je Seite eine Lage im Schwerpunkt gibt es nur mit einem.")
+        heraus.append(Stahllage(a_s=a_s, z=sum(l.a_s * l.z for l in seite) / a_s,
+                                stahl=seite[0].stahl, sorte=seite[0].sorte,
+                                nummer=seite[0].nummer, von_unten=unten))
     return heraus
+
+
+def bruchdehnung(lagen: Sequence[Stahllage]) -> float:
+    """
+    Wie weit das Suchfenster im Zug reicht: bis zur kleinsten Bruchdehnung
+    der Lagen. Jenseits davon gaebe das Gesetz dieser Lage null zurueck, und
+    die Bisektion faende Scheinloesungen. Bei einer Sorte ist es ihr
+    ``eps_ud``; bei zweien die kleinere -- das Fenster gilt an beiden
+    Raendern. Ohne Lage gilt :data:`EPS_ZUG`.
+    """
+    return min((l.stahl.eps_ud for l in lagen), default=EPS_ZUG)
 
 
 @dataclass(frozen=True)
@@ -268,18 +310,21 @@ class Querschnittsloeser:
     """
     Der Querschnitt als Faserintegral, mit Suche nach der Dehnungsebene.
 
-    ``beton`` und ``stahl`` sind Funktionen ``eps -> sigma`` in SI. Damit
-    bleibt der Loeser frei von Annahmen ueber das Werkstoffgesetz: die
-    Spannungsbegrenzung rechnet elastisch mit Kriechen und charakteristischen
-    Festigkeiten, der Knicknachweis mit dem nichtlinearen Gesetz der Norm und
-    Bemessungswerten -- siehe :class:`Werkstoffsatz`.
+    ``beton`` ist eine Funktion ``eps -> sigma`` in SI, ``stahl`` macht aus
+    dem Stahl einer Lage eine solche -- ohne Angabe :func:`bilinear`; die
+    Handrechnung gibt ihren Stahl nur auf Zug mit. Damit bleibt der Loeser
+    frei von Annahmen ueber das Werkstoffgesetz: die Spannungsbegrenzung rechnet
+    elastisch mit Kriechen und charakteristischen Festigkeiten, der
+    Knicknachweis mit dem nichtlinearen Gesetz der Norm und Bemessungswerten
+    -- siehe :class:`Werkstoffsatz`.
 
     **Das Suchfenster muss zu den Gesetzen passen.** ``eps_druck`` und
     ``eps_zug`` duerfen nicht weiter reichen als der Bereich, in dem beide
     Gesetze monoton sind -- jenseits ihrer Bruchdehnung geben sie null zurueck,
-    und dort findet die Bisektion Scheinloesungen. Die Vorgaben passen zu
-    :func:`beton_nichtlinear` und :func:`stahl_bilinear`; wer sie weitet, muss
-    die Gesetze mitweiten.
+    und dort findet die Bisektion Scheinloesungen. Ohne ``eps_zug`` reicht das
+    Fenster darum bis zur kleinsten Bruchdehnung der Lagen; ``eps_druck``
+    passt zu :func:`beton_nichtlinear`, wer es weitet, muss das Gesetz
+    mitweiten.
 
     Ohne ``grenzen`` gelten beide Werte an beiden Raendern. Wer andere
     Grenzen braucht -- die Spannung-Dehnung-Analyse die des Dehnungsfaechers,
@@ -300,10 +345,10 @@ class Querschnittsloeser:
         b: float,
         lagen: Sequence[Stahllage],
         beton: Callable[[float], float],
-        stahl: Callable[[float], float],
+        stahl: Optional[Callable[[Stahlgesetz], Callable[[float], float]]] = None,
         fasern: int = FASERN,
         eps_druck: float = EPS_DRUCK,
-        eps_zug: float = EPS_ZUG,
+        eps_zug: Optional[float] = None,
         grenzen: Optional[Sequence[Dehnungsgrenze]] = None,
         gemittelt: bool = False,
         verdraengt: bool = True,
@@ -312,12 +357,13 @@ class Querschnittsloeser:
         self.b = b
         self.lagen = list(lagen)
         self.beton = beton
-        self.stahl = stahl
         self.fasern = fasern
         self.eps_druck = abs(eps_druck)
-        self.eps_zug = abs(eps_zug)
+        self.eps_zug = abs(eps_zug if eps_zug is not None else bruchdehnung(self.lagen))
+        stahl = stahl or bilinear
         self.querschnitt = plattenfasern(
-            h=h, b=b, beton=beton, staebe=[(l.a_s, l.z, stahl) for l in self.lagen],
+            h=h, b=b, beton=beton,
+            staebe=[(l.a_s, l.z, stahl(l.stahl)) for l in self.lagen],
             fasern=fasern, gemittelt=gemittelt, verdraengt=verdraengt)
         # Der gueltige Bereich der Gesetze gilt an beiden Raendern -- wenn
         # niemand andere Grenzen mitgibt.
@@ -682,6 +728,15 @@ def stahl_bilinear(*, E_s: float, f_sd: float, eps_ud: float = 0.045,
             return min(eps * E_s, f_sd)
         return -min(-eps * E_s, f_sd_druck)
     return sigma_getrennt
+
+
+def bilinear(s: Stahlgesetz) -> Callable[[float], float]:
+    """
+    Der Stahl einer Lage, wie der Loeser ihn rechnet: :func:`stahl_bilinear`
+    mit den Werten der Lage -- jenseits ihres ``eps_ud`` null, damit das
+    Suchfenster nicht ueber den gueltigen Bereich hinausgreift.
+    """
+    return stahl_bilinear(E_s=s.E_s, f_sd=s.f_yd, eps_ud=s.eps_ud, f_sd_druck=s.f_yd_druck)
 
 
 def stahl_nur_zug(*, E_s: float, f_sd: float,

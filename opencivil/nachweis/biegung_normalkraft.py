@@ -62,7 +62,8 @@ from opencivil.nachweis.handrechnung import (
 )
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
-    RECHENARTEN, Rechenart, Rechenwahl, betongesetz, protokoll_rechenwahl,
+    RECHENARTEN, Rechenart, Rechenwahl, betonbezuege, betongesetz, lagenbezuege,
+    protokoll_rechenwahl, stahllagen, werte_nach_id,
 )
 from opencivil.nachweis.resistenzlinie import (
     Ebenenlinie, Handlinie, Treffer, Widerstandslinie,
@@ -654,27 +655,12 @@ def linienbezuege(querschnitt: Plattenquerschnitt, posten, richtung: Richtung,
     und ``f_yd`` oder ``f_ck`` und ``f_yk``, ``E_cm`` fuer die Parabel, die
     Bewehrung dieser Richtung und je Stahlsorte ihre Kennwerte.
     """
-    bezuege = [
-        Eingabebezug("h", querschnitt.id_von("h")),
-        Eingabebezug("b", querschnitt.id_breite(richtung)),
-        Eingabebezug(satz.beton, querschnitt.beton.id_von(satz.beton)),
-        Eingabebezug("eps_c1d", querschnitt.beton.id_von("eps_c1d")),
-        Eingabebezug("eps_c2d", querschnitt.beton.id_von("eps_c2d")),
-        Eingabebezug("E_cm", querschnitt.beton.id_von("E_cm")),
-    ]
     # Nur die Bewehrung dieser Richtung geht ein -- Querbewehrung traegt
     # nichts zum Momentenwiderstand um diese Achse bei.
-    for lage, art, _, as_id, z_id in posten:
-        marke = f"{lage.nummer}{art.kuerzel}"
-        bezuege += [
-            Eingabebezug(f"a_s_{marke}", as_id),
-            Eingabebezug(f"z_{marke}", z_id),
-        ]
-    for stahl in {l.stahl.id: l.stahl for l, _, _, _, _ in posten}.values():
-        kurz = kennung_aus(stahl.id)
-        for kennwert in ("E_s", satz.stahl, satz.stahl_druck, "eps_ud"):
-            bezuege.append(Eingabebezug(f"{kennwert}__{kurz}", stahl.id_von(kennwert)))
-    return bezuege
+    return [
+        Eingabebezug("h", querschnitt.id_von("h")),
+        Eingabebezug("b", querschnitt.id_breite(richtung)),
+    ] + betonbezuege(satz, querschnitt.beton) + lagenbezuege(posten, satz)
 
 
 def resistenzlinie(
@@ -697,18 +683,18 @@ def resistenzlinie(
     h, b = e.g("h").si, e.g("b").si
     f_c = abs(e.g(satz.beton).si)
     eps_c1d, eps_c2d = abs(e.g("eps_c1d").si), abs(e.g("eps_c2d").si)
-    lagen = dehnungsfaecher.lagen_aus_eingaben(posten, e, satz)
+    lagen = stahllagen(posten, satz, werte_nach_id(e))
 
     if hand:
         # Die Zugehoerigkeit zur unteren oder oberen Lage kommt aus dem
         # Modell (Lagen 1 und 2 liegen unten), nicht aus der Hoehenlage --
         # siehe lagen_zusammenfassen().
         seiten = lagen_zusammenfassen([
-            HandPosten(a_s=a_s, z=z, f_yd=gesetz.f_yd, E_s=gesetz.E_s, text=text,
+            HandPosten(a_s=l.a_s, z=l.z, f_yd=l.stahl.f_yd, E_s=l.stahl.E_s, text=l.text,
                        index=posten_index(lage, art),
                        stahl_index=lage.stahl.symbol_index,
                        von_unten=lage.von_unten, satz=satz)
-            for (a_s, z, gesetz, text), (lage, art, *_) in zip(lagen, posten)
+            for l, (lage, art, *_) in zip(lagen, posten)
         ])
         handrechnung = Handrechnung(
             h=h, b=b, f_cd=f_c, eps_c2d=eps_c2d,

@@ -191,8 +191,10 @@ class TestMomentenKruemmung(unittest.TestCase):
         chi = fliessen.verformung
         eps_m = self.paar.gerissen.mitteldehnung(chi, 0.0)
         halb = self.paar.gerissen.h / 2.0
-        eps_s = max(eps_m + chi * (l.z - halb) for l in self.paar.gerissen.lagen)
-        self.assertAlmostEqual(eps_s, self.paar.eps_y, delta=1e-9)
+        # Die am stärksten gezogene Lage, an der Fliessdehnung ihres Stahls.
+        eps_s, i = max((eps_m + chi * (l.z - halb), i)
+                       for i, l in enumerate(self.paar.gerissen.lagen))
+        self.assertAlmostEqual(eps_s, self.paar.gerissen.lagen[i].stahl.eps_yd, delta=1e-9)
         self.assertLess(fliessen.kraft, self.kurve.bruch.kraft)
         self.assertIn(chi, [p.verformung for p in self.kurve.punkte])
         # Am Beispiel 224.6 kNm bei 0.0147 1/m.
@@ -454,7 +456,8 @@ class TestWahl(unittest.TestCase):
     def test_charakteristisch_traegt_mehr(self):
         """f_ck und f_yk statt f_cd und f_yd: Widerstand und Fliessbeginn liegen höher."""
         k = loeserpaar(satz=Werkstoffsatz.CHARAKTERISTISCH)
-        self.assertGreater(k.eps_y, self.platte.eps_y)
+        self.assertGreater(k.gerissen.lagen[0].stahl.eps_yd,
+                           self.platte.gerissen.lagen[0].stahl.eps_yd)
         self.assertGreater(sa.moment_kruemmung(k, N=0.0).bruch.kraft,
                            sa.moment_kruemmung(self.platte, N=0.0).bruch.kraft)
 
@@ -540,7 +543,7 @@ class TestNormalkraftDehnung(unittest.TestCase):
 
     def test_symmetrisch_traegt_am_ende_der_ganze_stahl(self):
         """N_Rd = Σ A_s · f_yd -- und die Lagen stehen auf ε_ud."""
-        f_yd = self.sym.gerissen.stahl(0.01)
+        f_yd = self.sym.gerissen.querschnitt.staebe[0].gesetz(0.01)
         summe = sum(l.a_s for l in self.sym.gerissen.lagen) * f_yd
         bruch = self.kurve.bruch
         self.assertAlmostEqual(bruch.kraft / summe, 1.0, delta=1e-6)
@@ -599,7 +602,7 @@ class TestAequivalenterModul(unittest.TestCase):
     def ideell(self):
         """Der ungerissene Querschnitt mit Stahl: Fläche, Schwerpunkt, Flächenmoment."""
         E_c, b, h = self.paar.E_cm, self.b, self.h
-        n = self.paar.gerissen.stahl(1e-4) / 1e-4 / E_c
+        n = self.paar.gerissen.querschnitt.staebe[0].gesetz(1e-4) / 1e-4 / E_c
         lagen = [(l.a_s, l.z) for l in self.paar.ungerissen.lagen]
         A = b * h + (n - 1) * sum(a for a, _ in lagen)
         z = (b * h * h / 2 + (n - 1) * sum(a * z for a, z in lagen)) / A

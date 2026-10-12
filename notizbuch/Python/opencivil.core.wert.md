@@ -1,5 +1,5 @@
 ---
-erzeugt: d23d982c6b65
+erzeugt: bed370595566
 art: modul
 tags: [modul]
 ---
@@ -280,7 +280,6 @@ def beschreibung(self) -> str
 - [[opencivil.gleichungen.blatt]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
-- [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.fehlende_bewehrung]]
 - [[opencivil.nachweis.handrechnung]]

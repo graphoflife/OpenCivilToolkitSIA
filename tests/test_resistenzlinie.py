@@ -12,6 +12,7 @@ import unittest
 
 from opencivil.core.protokoll import Protokoll
 from opencivil.nachweis import linie as geo
+from opencivil.nachweis.querschnittsloeser import Stahllage
 from opencivil.nachweis.rechenwahl import Rechenart, Rechenwahl, betongesetz
 from opencivil.nachweis.resistenzlinie import Ebenenlinie
 from opencivil.querschnitt.interaktion import Bewehrung, Querschnitt, Teil, Werkstoff
@@ -21,7 +22,8 @@ H, B = 0.25, 1.0
 F_C, E_CM = 20e6, 32000e6
 EPS_C1D, EPS_C2D = 0.002, 0.0035
 STAHL = Stahlgesetz(E_s=205e9, f_yd=435e6, f_yd_druck=435e6, eps_ud=0.045)
-LAGEN = [(1131e-6, 0.215, STAHL, "1. Lage unten"), (565e-6, 0.035, STAHL, "3. Lage oben")]
+LAGEN = [Stahllage(a_s=1131e-6, z=0.215, stahl=STAHL, text="1. Lage unten"),
+         Stahllage(a_s=565e-6, z=0.035, stahl=STAHL, text="3. Lage oben")]
 
 
 def ebenenlinie(art=Rechenart.PARABEL, *, schritte=80, phi=0.0):
@@ -73,7 +75,7 @@ class TestGenau(unittest.TestCase):
         Druckkraft liegt darum etwas daneben, und sie wird dort gesucht.
         """
         sigma_s = min(STAHL.E_s * EPS_C1D, STAHL.f_yd_druck)
-        a_s = sum(l[0] for l in LAGEN)
+        a_s = sum(l.a_s for l in LAGEN)
         gleichmaessig = -B * H * F_C - a_s * (sigma_s - F_C)
         for art in (Rechenart.PARABEL, Rechenart.BLOCK):
             fein = ebenenlinie(art).eckwerte()["N_Rd_druck"]
@@ -83,7 +85,7 @@ class TestGenau(unittest.TestCase):
             self.assertAlmostEqual(grob / fein, 1.0, delta=1e-9)
 
     def test_reiner_zug_von_hand(self):
-        erwartet = sum(l[0] for l in LAGEN) * STAHL.f_yd
+        erwartet = sum(l.a_s for l in LAGEN) * STAHL.f_yd
         self.assertAlmostEqual(self.parabel.eckwerte()["N_Rd_zug"] / erwartet, 1.0, delta=1e-12)
 
     def test_groesstes_moment_zwischen_den_ebenen(self):

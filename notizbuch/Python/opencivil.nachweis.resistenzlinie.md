@@ -1,5 +1,5 @@
 ---
-erzeugt: 1c2488554d9f
+erzeugt: 1e355307caba
 art: modul
 tags: [modul]
 ---
@@ -182,9 +182,10 @@ Der Rand des Dehnungsfaechers -- genau nachgeschaerft, siehe Dateikopf.
 
 `beton` ist das Gesetz der Wahl
 ([[opencivil.nachweis.rechenwahl#betongesetz|betongesetz]]). Der Stahl kommt je
-Lage als [[opencivil.querschnitt.werkstoffgesetz#Stahlgesetz|Stahlgesetz]] -- ohne Abfall jenseits von `eps_ud`: die
-unterste Lage liegt im Faecher genau auf dieser Grenze, und ein Gesetz,
-das dort auf null faellt, kippte an der Rundung.
+Lage mit ihrer [[opencivil.nachweis.querschnittsloeser#Stahllage|Stahllage]] -- als [[opencivil.querschnitt.werkstoffgesetz#Stahlgesetz|Stahlgesetz]], ohne
+Abfall jenseits von `eps_ud`: die unterste Lage liegt im Faecher genau
+auf dieser Grenze, und ein Gesetz, das dort auf null faellt, kippte an
+der Rundung.
 
 #### Ebenenlinie.kraefte
 

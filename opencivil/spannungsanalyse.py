@@ -98,12 +98,14 @@ from typing import (
 from opencivil.core.einheiten import MIO_MM4, Groesse
 from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Protokoll, StillesProtokoll, Zwischenwerte
+from opencivil.core.wert import kennung_aus
 from opencivil.nachweis import dehnungsfaecher
+from opencivil.material.basis import mit_index
 from opencivil.nachweis.querschnittsloeser import (
-    Querschnittsloeser, Stahllage, Werkstoffsatz, wirksamer_modul,
+    Querschnittsloeser, Werkstoffsatz, wirksamer_modul,
 )
 from opencivil.nachweis.rechenwahl import (
-    Kennwerte, Rechenart, Rechenwahl, gesetze,
+    Betonkennwerte, Rechenart, Rechenwahl, gesetze, stahllagen, staehle,
 )
 from opencivil.nachweis.sproedes_versagen import (
     beiwert_dicke, protokoll_zugfestigkeit, rissmoment,
@@ -263,9 +265,9 @@ def _bild(loeser: Querschnittsloeser, eps_m: float, chi: float) -> Querschnittsb
         beton.append(Faserpunkt(z=z, eps=eps, sigma=loeser.beton(eps)))
 
     stahl = []
-    for lage in loeser.lagen:
+    for lage, stab in zip(loeser.lagen, loeser.querschnitt.staebe):
         eps = eps_m + chi * (lage.z - halb)
-        sigma = loeser.stahl(eps)
+        sigma = stab.gesetz(eps)
         stahl.append(Stahlpunkt(z=lage.z, eps=eps, sigma=sigma,
                                 nummer=lage.nummer, a_s=lage.a_s,
                                 kraft=sigma * lage.a_s))
@@ -358,8 +360,12 @@ class Loeserpaar:
     f_ct_eff_zug: float = 0.0
     """Fuer die Rissnormalkraft: ``k_t`` fuer die ganze Dicke und ``k_t·f_ctm``."""
 
-    eps_y: float = math.inf
-    """Wo der Stahl zu fliessen beginnt: ``f_s / E_s``."""
+    staehle: Tuple[Any, ...] = ()
+    """
+    Die Staehle der Lagen, jeder einmal -- fuer die Fliessdehnung in der
+    Herleitung. Fliessen beginnt, wo die erste Lage die Fliessdehnung ihres
+    eigenen Stahls erreicht (:attr:`Stahlgesetz.eps_yd` der Lage).
+    """
 
     wahl: Rechenwahl = Rechenwahl(art=Rechenart.PARABEL)
     """Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart."""
@@ -431,33 +437,26 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
     posten = querschnitt.posten_in_richtung(richtung)
     if not posten:
         return None
-    lagen = [Stahllage(a_s=wert(as_id), z=wert(z_id), nummer=lage.nummer,
-                       von_unten=lage.von_unten)
-             for lage, _, _, as_id, z_id in posten]
-    stahl = posten[0][0].stahl
-    beton = querschnitt.beton
     satz = wahl.satz
+    lagen = stahllagen(posten, satz, wert)
+    beton = querschnitt.beton
     ids = {
         "h": querschnitt.id_von("h"), "b": querschnitt.id_breite(richtung),
         "E_cm": beton.id_von("E_cm"), "f_c": beton.id_von(satz.beton),
         "eps_c1d": beton.id_von("eps_c1d"), "eps_c2d": beton.id_von("eps_c2d"),
         "f_ctm": beton.id_von("f_ctm"),
-        "E_s": stahl.id_von("E_s"), "f_s": stahl.id_von(satz.stahl),
-        "f_s_druck": stahl.id_von(satz.stahl_druck), "eps_ud": stahl.id_von("eps_ud"),
     }
     h, b = wert(ids["h"]), wert(ids["b"])
     E_c_eff = wirksamer_modul(wert(ids["E_cm"]), wahl.kriechzahl)
-    eps_ud = wert(ids["eps_ud"])
-    w = Kennwerte(f_c=wert(ids["f_c"]), f_s=wert(ids["f_s"]), f_s_druck=wert(ids["f_s_druck"]),
-                  E_cm=wert(ids["E_cm"]), E_s=wert(ids["E_s"]),
-                  eps_c1d=wert(ids["eps_c1d"]), eps_c2d=wert(ids["eps_c2d"]))
-    g = gesetze(wahl, w, eps_ud=eps_ud)
+    w = Betonkennwerte(f_c=wert(ids["f_c"]), E_cm=wert(ids["E_cm"]),
+                       eps_c1d=wert(ids["eps_c1d"]), eps_c2d=wert(ids["eps_c2d"]))
+    g = gesetze(wahl, w)
     # Die Grenzen gelten an den Lagen, mit denen gerechnet wird -- in der
-    # Handrechnung den zusammengefassten.
+    # Handrechnung den zusammengefassten --, jede mit dem eps_ud ihres Stahls.
     grenzen, namen = dehnungsfaecher.grenzen(
-        h, [(l.z, eps_ud, f"Stahl der {l.nummer}. Lage") for l in g.lagen(lagen, h)],
+        h, [(l.z, l.stahl.eps_ud, f"Stahl der {l.nummer}. Lage") for l in g.lagen(lagen, h)],
         eps_c1d=w.eps_c1d, eps_c2d=w.eps_c2d)
-    fenster = dict(grenzen=grenzen, eps_druck=w.eps_c2d, eps_zug=eps_ud)
+    fenster = dict(grenzen=grenzen, eps_druck=w.eps_c2d)
     gerissen = g.loeser(h=h, b=b, lagen=lagen, **fenster)
     # Derselbe Querschnitt ungerissen: nur das Betongesetz ist ein anderes.
     ungerissen = g.loeser(h=h, b=b, lagen=lagen, beton=beton_ungerissen(E_c=E_c_eff),
@@ -468,7 +467,7 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
         gerissen=gerissen, ungerissen=ungerissen,
         M_Riss=rissmoment(h=h, b=b, f_ctm=f_ctm).M_Riss,
         k_t_zug=k_t_zug, f_ct_eff_zug=k_t_zug * f_ctm,
-        eps_y=wert(ids["f_s"]) / wert(ids["E_s"]),
+        staehle=tuple(staehle(posten)),
         wahl=wahl, grenznamen=namen, ids=ids, E_cm=w.E_cm)
 
 
@@ -649,11 +648,12 @@ def _linie(paar: Loeserpaar, weg: _Weg, art: Analyseart, fest: float,
         linie.punkte = kraftpunkte(kraft_u)
         return linie
 
-    arme = [l.z - halb for l in paar.gerissen.lagen]
+    arme = [(l.z - halb, l.stahl.eps_yd) for l in paar.gerissen.lagen]
 
     def fliesst(verformung: float) -> bool:
+        # Jede Lage an der Fliessdehnung ihres eigenen Stahls.
         e = weg.ebene(verformung)
-        return e is not None and max(e[0] + e[1] * a for a in arme) >= paar.eps_y
+        return e is not None and any(e[0] + e[1] * a >= eps_y for a, eps_y in arme)
 
     anfang, risskraft = start, None
     if riss > 0.0:
@@ -1021,9 +1021,15 @@ def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
         "Fliessbeginn M_y bzw. N_y, am Ende M_Rd bzw. N_Rd – mit "
         "charakteristischen Werten Rk statt Rd. Das Ende ist der Widerstand der "
         "Tragsicherheit, wenn sie dieselbe Rechenwahl trifft.")
-    p.formel(w.dehnung("eps_y", r"\varepsilon_{y}", paar.eps_y),
-             r"\frac{@f_s}{@E_s}", {"f_s": ein("f_s"), "E_s": ein("E_s")},
-             titel="Dehnung bei Fliessbeginn", name=FLIESSDEHNUNG)
+    # Je Stahl seine Fliessdehnung -- unten und oben duerfen verschiedene liegen.
+    for stahl in paar.staehle:
+        f_s, E_s = werte[stahl.id_von(wahl.satz.stahl)], werte[stahl.id_von("E_s")]
+        name, symbol = (("eps_y", r"\varepsilon_{y}") if len(paar.staehle) == 1 else
+                        (f"eps_y_{kennung_aus(stahl.id)}",
+                         mit_index(r"\varepsilon_{y}", stahl.symbol_index)))
+        p.formel(w.dehnung(name, symbol, f_s.groesse.si / E_s.groesse.si),
+                 r"\frac{@f_s}{@E_s}", {"f_s": f_s, "E_s": E_s},
+                 titel="Dehnung bei Fliessbeginn", name=FLIESSDEHNUNG)
     p.erklaerung(
         "Den gerissenen Teil rechnet die Linie über die Verformung, nicht über die "
         "Kraft: zu jeder Krümmung (bei der N-ε-Linie: zu jeder Dehnung) wird die "

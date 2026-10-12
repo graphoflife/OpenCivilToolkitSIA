@@ -93,11 +93,11 @@ from opencivil.nachweis.biegung_normalkraft import (
     gleiche_linie, linienbezuege, resistenzlinie,
 )
 from opencivil.nachweis.querschnittsloeser import (
-    Querschnittsloeser, Stahllage, protokoll_verfahren, protokoll_wirksamer_modul,
+    Querschnittsloeser, protokoll_verfahren, protokoll_wirksamer_modul,
 )
 from opencivil.nachweis.rechenwahl import (
-    Kennwerte, Rechenart, Rechenwahl, bezuege_vereinen, gesetze, protokoll_gesetze,
-    protokoll_rechenwahl, werkstoffbezuege,
+    Betonkennwerte, Rechenart, Rechenwahl, betonbezuege, bezuege_vereinen, gesetze,
+    lagenbezuege, protokoll_gesetze, protokoll_rechenwahl, stahllagen, werte_nach_id,
 )
 from opencivil.nachweis.resistenzlinie import Widerstandslinie
 from opencivil.querschnitt.platte import Richtung
@@ -304,18 +304,11 @@ class Knicken(Nachweis):
             for f in self.faelle
         }
 
-        stahl = self.posten[0][0].stahl
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),
             Eingabebezug("b", querschnitt.id_breite(self.richtung)),
-        ] + werkstoffbezuege(verformung.satz, querschnitt.beton, stahl)
-        for lage, art, _, as_id, z_id in self.posten:
-            marke = f"{lage.nummer}{art.kuerzel}"
-            bezuege += [
-                Eingabebezug(f"a_s_{marke}", as_id),
-                Eingabebezug(f"z_{marke}", z_id),
-            ]
-        bezuege.append(Eingabebezug("eps_ud", stahl.id_von("eps_ud")))
+        ] + betonbezuege(verformung.satz, querschnitt.beton) + lagenbezuege(
+            self.posten, verformung.satz)
         if self.eigene_linie:
             bezuege = bezuege_vereinen(
                 bezuege, linienbezuege(querschnitt, self.posten, self.richtung, widerstand.satz))
@@ -340,23 +333,21 @@ class Knicken(Nachweis):
     def pruefe(self, e: Eingaben, p: Protokoll):
         h = e.g("h").si
         b = e.g("b").si
-        eps_ud = e.g("eps_ud").si
         wahl = self.verformung
-        w = Kennwerte.aus_eingaben(e, wahl.satz)
+        w = Betonkennwerte.aus_eingaben(e, wahl.satz)
 
-        lagen = [Stahllage(a_s=e.g(f"a_s_{l.nummer}{a.kuerzel}").si,
-                           z=e.g(f"z_{l.nummer}{a.kuerzel}").si,
-                           nummer=l.nummer, von_unten=l.von_unten)
-                 for l, a, _, _, _ in self.posten]
+        # Jede Lage mit ihrem Stahl; das Fenster reicht im Zug bis zur
+        # kleinsten Bruchdehnung der Lagen, an beiden Raendern.
+        lagen = stahllagen(self.posten, wahl.satz, werte_nach_id(e))
         # Kriechen weicht den Beton auf; das Gesetz rechnet mit dem wirksamen
         # Modul. eps_c1d und eps_c2d bleiben, wie die Norm sie angibt.
-        g = gesetze(wahl, w, eps_ud=eps_ud)
-        loeser = g.loeser(h=h, b=b, lagen=lagen, eps_druck=w.eps_c2d, eps_zug=eps_ud)
+        g = gesetze(wahl, w)
+        loeser = g.loeser(h=h, b=b, lagen=lagen, eps_druck=w.eps_c2d)
         # Aufgehoben wie self.ergebnisse: wer nachrechnen will, was bei einer
         # anderen Druckkraft herauskaeme, braucht denselben Loeser.
         self.loeser = loeser
 
-        self._protokoll_ansatz(p, e, eps_druck=w.eps_c2d, eps_zug=eps_ud,
+        self._protokoll_ansatz(p, e, eps_druck=w.eps_c2d, eps_zug=loeser.eps_zug,
                                verdraengt=g.verdraengt)
         # Schnell rechnet die eigene Linie mit den Schritten der Suche, wie die
         # der Tragsicherheit: sonst zahlte die Bewehrungssuche fuer jede Platte
@@ -599,7 +590,8 @@ class Knicken(Nachweis):
             protokoll_wirksamer_modul(p, e["E_cm"], phi, basis,
                                       titel="Steifigkeit des Betons",
                                       nachsatz=rf"\qquad {angabe(e[wahl.satz.beton])}")
-        protokoll_gesetze(p, wahl, e, basis, titel="Werkstoffgesetze der Verformung")
+        protokoll_gesetze(p, wahl, e, basis, titel="Werkstoffgesetze der Verformung",
+                          posten=self.posten)
         p.erklaerung(
             "Womit die Verformung gerechnet wird, wählt das Kapitel: Kriechzahl, "
             "Werte und Rechenart. Das Kriechen wirkt bei der Parabel und weicht den "
