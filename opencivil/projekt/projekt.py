@@ -2,7 +2,7 @@
 opencivil/projekt/projekt.py -- das Projekt als Ganzes.
 
 VERANTWORTUNG:
-Das :class:`Projekt` haelt Materialien und Platten zusammen und ist das, was
+Das :class:`Projekt` haelt Materialien und Bauteile zusammen und ist das, was
 gespeichert, geoeffnet und gerechnet wird. Hier stehen der Zugriff auf die
 Teile, die Methoden fuer das Rechnen ohne Oberflaeche, die Pruefungen ueber
 mehrere Teile hinweg (eindeutige Namen, Anteile), Speichern und Laden -- und
@@ -26,6 +26,7 @@ from opencivil.projekt.eintraege import (
     Beschreibung, MaterialEintrag, PostenEintrag, RechenwahlEintrag,
 )
 from opencivil.projekt.gleichungen import GleichungsblattEintrag, GleichungszeileEintrag
+from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.querschnittsanalyse import (
@@ -37,6 +38,13 @@ from opencivil.projekt.aufbau import Aufbau, aufbauen
 # ===========================================================================
 # Projekt
 # ===========================================================================
+
+#: Die Listen der Bauteile: Eintraege mit Kennung, je ein Kapitel im Baum und
+#: im Bericht -- Platten, gezeichnete Querschnitte, Balkensysteme. Wer alle
+#: Bauteile durchgeht (Kennungen, Pruefung, Zwischenspeicher, Erkennen einer
+#: Datei), geht diese Liste durch; ein neues Bauteil kommt hier dazu und
+#: nirgends sonst.
+BAUTEILE = ("querschnitte", "querschnittsanalysen", "balkensysteme")
 
 
 @dataclass
@@ -51,6 +59,9 @@ class Projekt(Beschreibung):
 
     querschnittsanalysen: List[QuerschnittsanalyseEintrag] = field(default_factory=list)
     """Gezeichnete Querschnitte: Polygone, Bewehrung, Schubwände."""
+
+    balkensysteme: List[BalkensystemEintrag] = field(default_factory=list)
+    """Ebene Rahmen: Knoten, Stäbe, Lager, Lasten, Lastfälle."""
 
     # -- Zugriff ------------------------------------------------------------
 
@@ -72,11 +83,21 @@ class Projekt(Beschreibung):
                 return a
         raise ProjektFehler(f"Querschnittsanalyse '{kennung}' gibt es im Projekt nicht.")
 
+    def bauteile(self) -> List[Any]:
+        """Alle Bauteile in der Reihenfolge der Beschreibung -- siehe :data:`BAUTEILE`."""
+        return [eintrag for liste in BAUTEILE for eintrag in getattr(self, liste)]
+
+    def bauteil(self, kennung: str) -> Any:
+        """Ein Bauteil gleich welcher Art -- eine Platte, eine Analyse, ein System."""
+        for eintrag in self.bauteile():
+            if eintrag.kennung == kennung:
+                return eintrag
+        raise ProjektFehler(f"Ein Bauteil '{kennung}' gibt es im Projekt nicht.")
+
     def freie_kennung(self, vorsilbe: str) -> str:
         vergeben = ({m.kennung for m in self.materialien}
-                    | {q.kennung for q in self.querschnitte}
                     | {b.kennung for b in self.gleichungen}
-                    | {a.kennung for a in self.querschnittsanalysen})
+                    | {e.kennung for e in self.bauteile()})
         i = 1
         while f"{vorsilbe}{i}" in vergeben:
             i += 1
@@ -209,15 +230,7 @@ class Projekt(Beschreibung):
                 lage.grund = PostenEintrag(durchmesser=float(d), abstand=teilung)
                 lage.zulage = PostenEintrag(durchmesser=float(dz), abstand=teilung)
 
-        bekannt = {f.name for f in fields(QuerschnittEintrag)}
-        for feld, wert in felder.items():
-            if feld not in bekannt:
-                aehnlich = difflib.get_close_matches(feld, bekannt, n=1)
-                raise ProjektFehler(
-                    f"Platte '{name}': ein Feld '{feld}' gibt es nicht."
-                    + (f" Gemeint ist vielleicht '{aehnlich[0]}'?" if aehnlich else ""))
-            setattr(eintrag, feld, wert)
-
+        _felder_setzen(eintrag, felder, f"Platte '{name}'")
         self.querschnitte.append(eintrag)
         return eintrag
 
@@ -243,15 +256,22 @@ class Projekt(Beschreibung):
             kennung=self.freie_kennung("a"), name=name,
             beton=self._einziges("beton", beton), stahl=self._einziges("betonstahl", stahl))
         eintrag.lastfaelle = []
-        bekannt = {f.name for f in fields(QuerschnittsanalyseEintrag)}
-        for feld, wert in felder.items():
-            if feld not in bekannt:
-                aehnlich = difflib.get_close_matches(feld, bekannt, n=1)
-                raise ProjektFehler(
-                    f"Querschnittsanalyse '{name}': ein Feld '{feld}' gibt es nicht."
-                    + (f" Gemeint ist vielleicht '{aehnlich[0]}'?" if aehnlich else ""))
-            setattr(eintrag, feld, wert)
+        _felder_setzen(eintrag, felder, f"Querschnittsanalyse '{name}'")
         self.querschnittsanalysen.append(eintrag)
+        return eintrag
+
+    def balkensystem(self, name: str, **felder: Any) -> BalkensystemEintrag:
+        """
+        Ein leeres Balkensystem, ein ebener Rahmen. Gezeichnet wird danach
+        mit dem Baukasten des Eintrags -- ``querschnitt``, ``linie``,
+        ``lager_an``, ``lastfall``, ``stablast``, ``knotenlast``,
+        ``kombination`` --, Koordinaten in m. Leer und nicht wie in der
+        Oberflaeche mit einem Einfeldtraeger: wer in Python zeichnet, zeichnet
+        sein eigenes System.
+        """
+        eintrag = BalkensystemEintrag(kennung=self.freie_kennung("r"), name=name)
+        _felder_setzen(eintrag, felder, f"Balkensystem '{name}'")
+        self.balkensysteme.append(eintrag)
         return eintrag
 
     def _einziges(self, art: str,
@@ -301,9 +321,7 @@ class Projekt(Beschreibung):
                     f"erkennen, welches gemeint ist.")
             gesehen[m.anzeigename] = m.kennung
 
-        for eintrag in self.querschnitte:
-            eintrag.pruefen()
-        for eintrag in self.querschnittsanalysen:
+        for eintrag in self.bauteile():
             eintrag.pruefen()
 
     # -- Aufbau -------------------------------------------------------------
@@ -329,6 +347,8 @@ class Projekt(Beschreibung):
             gleichungen=[GleichungsblattEintrag.aus_dict(x) for x in (d.get("gleichungen") or [])],
             querschnittsanalysen=[QuerschnittsanalyseEintrag.aus_dict(x)
                                   for x in (d.get("querschnittsanalysen") or [])],
+            balkensysteme=[BalkensystemEintrag.aus_dict(x)
+                           for x in (d.get("balkensysteme") or [])],
         )
 
     def speichern(self, pfad: str | Path) -> Path:
@@ -546,3 +566,18 @@ class Projekt(Beschreibung):
         a.lastfall("Druck", N_Ed=-2500.0, M_y_Ed=120.0)
         a.lastfall("Zug", N_Ed=400.0)
         return a
+
+
+def _felder_setzen(eintrag: Any, felder: Mapping[str, Any], wo: str) -> None:
+    """
+    Die Stichworte einer Fassade an den Eintrag -- ein unbekanntes wird
+    gemeldet, mit dem aehnlichsten Feld, statt still zu verschwinden.
+    """
+    bekannt = {f.name for f in fields(eintrag)}
+    for feld, wert in felder.items():
+        if feld not in bekannt:
+            aehnlich = difflib.get_close_matches(feld, bekannt, n=1)
+            raise ProjektFehler(
+                f"{wo}: ein Feld '{feld}' gibt es nicht."
+                + (f" Gemeint ist vielleicht '{aehnlich[0]}'?" if aehnlich else ""))
+        setattr(eintrag, feld, wert)

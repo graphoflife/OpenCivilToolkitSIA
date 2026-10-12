@@ -1,5 +1,5 @@
 ---
-erzeugt: 8f3c05a2d733
+erzeugt: a3ce3594341c
 art: modul
 tags: [modul]
 ---
@@ -28,6 +28,10 @@ platte.py      eine Platte mit ihren vier Lagen und allen Schaltern
 querschnittsanalyse.py
                ein gezeichneter Querschnitt: Polygone, Bewehrung,
                Schubwaende, Lastfaelle
+balkensystem.py
+               ein ebener Rahmen: Knoten, Linien als Staebe und
+               Linienlager, Lager, Lasten, Lastfaelle, Kombinationen
+netz.py        Knoten mit Kennungen, fuer beide Zeichnungen
 projekt.py     das Ganze: Zugriff, Rechnen ohne Oberflaeche, Pruefung,
                Speichern, das Beispiel
 aufbau.py      aus der Beschreibung ein Rechenwerk
@@ -57,6 +61,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 ## Module
 
 - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
+- [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
 - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
 - [[opencivil.projekt.gleichungen]] – ein Blatt analytischer Gleichungen, wie es
 - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
@@ -68,6 +73,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 ## Braucht
 
 - [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.platte]]
@@ -89,3 +95,4 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.web.api]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.dienst]]
+- [[opencivil.web.speicher]]

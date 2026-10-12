@@ -47,6 +47,15 @@ class Lastrichtung(str, Enum):
     LAENGS = "laengs"
 
     @property
+    def beschriftung(self) -> str:
+        return {
+            Lastrichtung.SENKRECHT: "↓ senkrecht",
+            Lastrichtung.WAAGRECHT: "→ waagrecht",
+            Lastrichtung.QUER: "quer zum Stab",
+            Lastrichtung.LAENGS: "längs zum Stab",
+        }[self]
+
+    @property
     def im_system(self) -> bool:
         """Ob sie in den Achsen des Systems liegt -- und nicht in denen des Stabs."""
         return self in (Lastrichtung.SENKRECHT, Lastrichtung.WAAGRECHT)
@@ -81,6 +90,15 @@ class Lastart(str, Enum):
 
     LINIENMOMENT = "linienmoment"
     """Moment je Laenge, linear."""
+
+    @property
+    def beschriftung(self) -> str:
+        return {
+            Lastart.LINIENLAST: "Linienlast",
+            Lastart.EINZELLAST: "Einzellast",
+            Lastart.MOMENT: "Einzelmoment",
+            Lastart.LINIENMOMENT: "Linienmoment",
+        }[self]
 
     @property
     def verteilt(self) -> bool:

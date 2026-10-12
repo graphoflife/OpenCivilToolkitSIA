@@ -8,10 +8,12 @@ from pathlib import Path
 
 from opencivil.core.einheiten import N_PRO_MM2
 from opencivil.projekt import (
-    Aufbau, GebrauchsfallEintrag, Gebrauchsliste, KnickEintrag, KombinationEintrag,
-    LageEintrag, MaterialEintrag, ObergrenzeEintrag, PostenEintrag, Projekt,
+    Aufbau, BalkensystemEintrag, GebrauchsfallEintrag, Gebrauchsliste, KnickEintrag,
+    KnotenlastEintrag, KombinationEintrag, LageEintrag, LagerEintrag, LastfallEintrag,
+    LastkombinationEintrag, MaterialEintrag, ObergrenzeEintrag, PostenEintrag, Projekt,
     ProjektFehler, QuerkraftbewehrungEintrag, QuerschnittEintrag, RechenwahlEintrag,
-    SpannungsfallEintrag,
+    SpannungsfallEintrag, StablastEintrag, StabquerschnittEintrag, SystemknotenEintrag,
+    SystemlinieEintrag,
 )
 from opencivil.projekt.eintraege import Beschreibung
 from opencivil.projekt.querschnittsanalyse import (
@@ -410,6 +412,15 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
         (QALastfallEintrag, {"name": "l"}, {"name": "l"}),
         (WerkstoffwahlEintrag, {"material": "b1"}, {"material": "b1"}),
         (QuerschnittsanalyseEintrag, {"kennung": "a"}, {"kennung": "a", "name": "a"}),
+        (SystemknotenEintrag, {}, {}),
+        (SystemlinieEintrag, {}, {}),
+        (StablastEintrag, {}, {}),
+        (LagerEintrag, {}, {}),
+        (KnotenlastEintrag, {}, {}),
+        (StabquerschnittEintrag, {}, {}),
+        (LastfallEintrag, {}, {}),
+        (LastkombinationEintrag, {}, {}),
+        (BalkensystemEintrag, {"kennung": "r"}, {"kennung": "r", "name": "r"}),
         (Projekt, {}, {}),
     ]
 

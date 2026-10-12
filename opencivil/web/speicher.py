@@ -44,6 +44,7 @@ from typing import Any, Dict, List, Mapping, Optional, Tuple
 from opencivil.core.protokoll import Block
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
+from opencivil.projekt import BAUTEILE
 
 #: Wie viele Bauteile hoechstens aufbewahrt werden. Ein Projekt mit mehr
 #: Platten als das laeuft nicht langsamer als ohne Speicher -- es gewinnt nur
@@ -61,9 +62,8 @@ def abdruck(projekt_dict: Mapping[str, Any], kennung: str) -> str:
     Kennung wohin zeigt, waere genau die Stelle, an der man eines vergisst.
     Materialien sind ein paar Zeilen JSON; sie mitzuzaehlen kostet nichts.
     """
-    eintrag = next((q for q in (projekt_dict.get("querschnitte") or [])
-                    + (projekt_dict.get("querschnittsanalysen") or [])
-                    if q.get("kennung") == kennung), None)
+    eintrag = next((e for liste in BAUTEILE for e in (projekt_dict.get(liste) or [])
+                    if e.get("kennung") == kennung), None)
     return json.dumps(
         {"querschnitt": eintrag, "materialien": projekt_dict.get("materialien")},
         sort_keys=True, ensure_ascii=False, default=str)

@@ -1,5 +1,5 @@
 ---
-erzeugt: cac5b12a3606
+erzeugt: de8571e8b9bb
 art: modul
 tags: [modul]
 ---
@@ -26,7 +26,7 @@ Schwerpunkt; `h` ist die Hoehe in der Ebene des Rahmens.
 Daneben: Kennwerte von Hand, der Streifen einer Platte (`b × h`, mit den
 Formeln des Rechtecks) und der Bruttoquerschnitt einer Querschnittsanalyse
 (`A` und `I_y`). Das waehlt die Beschreibung
-([[opencivil.projekt|opencivil.projekt.balkensystem]]); hier stehen nur die Formeln.
+([[opencivil.projekt.balkensystem]]); hier stehen nur die Formeln.
 
 
 ## EINHEITEN
@@ -127,3 +127,8 @@ def vorlage(schluessel: str) -> Stabvorlage
 
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
+
+## Gebraucht von
+
+- [[opencivil.projekt.balkensystem]]
+- [[opencivil.web.api]]

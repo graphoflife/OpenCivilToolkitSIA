@@ -1,0 +1,605 @@
+"""
+opencivil/projekt/balkensystem.py -- ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
+
+VERANTWORTUNG:
+Der :class:`BalkensystemEintrag`: ein ebener Rahmen aus Knoten und Linien,
+Lagern und Lasten, mit seinen Querschnitten, Lastfaellen und Kombinationen
+-- als speicherbare Datenklasse wie die Querschnittsanalyse
+(:mod:`opencivil.projekt.querschnittsanalyse`). Dazu der Baukasten, der ohne
+Oberflaeche zeichnet, und was beim Teilen und Umkehren einer Linie mit ihren
+Lasten geschieht. Gerechnet wird in :mod:`opencivil.stabwerk`.
+
+ZUERST GEOMETRIE:
+Gezeichnet werden Knoten und Linien. Eine Linie wird zum Stab, sobald sie
+Querschnitt und Material hat (``stab``); sie kann daneben -- oder statt dessen
+-- ein Linienlager sein, quer und laengs je frei, fest oder federnd. Ein
+Knoten wird zum Lager durch ein :class:`LagerEintrag` an ihm, nicht durch ein
+Feld am Knoten: das Zeichenfenster fuehrt Knoten zusammen und legt neue an,
+und ein Feld daran ginge dabei verloren.
+
+LASTEN AN IHREN ELEMENTEN:
+Eine Last auf einem Stab steht an seiner Linie (``lasten``), mit dem
+Lastfall, zu dem sie gehoert. So bleibt sie bei der Linie, wenn diese
+kopiert, geloescht oder rueckgaengig gemacht wird. Eine Last an einem Knoten
+ist -- wie ein Lager -- ein eigener Eintrag an ihm.
+
+KOORDINATEN UND EINHEITEN:
+x nach rechts, z nach oben, in m; Stellen auf einem Stab in m ab seinem
+Anfang. Querschnittsmasse in mm, A in mm², I in 10⁶ mm⁴. Lasten in kN, kN/m,
+kNm und kNm/m; Federn in kN/m und kNm/rad, Bettung in kN/m². Umgerechnet
+wird beim Bauen.
+
+VORZEICHEN:
+Eine Kraftlast ist positiv in ihrer Richtung: «senkrecht» nach unten,
+«waagrecht» nach rechts, «quer» zur gestrichelten Faser, «laengs» vom Anfang
+zum Ende. Momente drehen im Gegenuhrzeigersinn (:mod:`opencivil.stabwerk.modell`).
+"""
+
+from __future__ import annotations
+
+import copy
+import math
+from dataclasses import dataclass, field, replace
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
+
+from opencivil.core.einheiten import KN, KN_PRO_M, KN_PRO_M2, KNM, KNM_PRO_M, KNM_PRO_RAD
+from opencivil.projekt.eintraege import Beschreibung, eindeutig
+from opencivil.projekt.lesen import ProjektFehler, pflichtfeld, zahl
+from opencivil.projekt.netz import Netz, naechste_kennung
+from opencivil.stabwerk import querschnitte as qs
+from opencivil.stabwerk.modell import Lastart, Lastrichtung
+
+#: Wie ein Lager oder Linienlager je Richtung haelt.
+HALT = ("frei", "fest", "feder")
+
+#: Die Einheit jeder Last in der Beschreibung, nach ihrer Art -- an einem
+#: Stab oder Knoten. Umgerechnet wird beim Bauen, mit diesen.
+EINHEIT_DER_LAST = {
+    Lastart.LINIENLAST.value: KN_PRO_M, Lastart.EINZELLAST.value: KN,
+    Lastart.MOMENT.value: KNM, Lastart.LINIENMOMENT.value: KNM_PRO_M, "kraft": KN,
+}
+
+#: Die Einheit jeder Feder, nach ihrem Feld: Lager in kN/m und kNm/rad,
+#: Bettung in kN/m je m Stab.
+EINHEIT_DER_FEDER = {"k_x": KN_PRO_M, "k_z": KN_PRO_M, "k_phi": KNM_PRO_RAD,
+                     "k_quer": KN_PRO_M2, "k_laengs": KN_PRO_M2}
+
+#: Was fuer Lasten auf einem Stab liegen koennen -- und an einem Knoten.
+STABLASTEN = tuple(a.value for a in Lastart)
+KNOTENLASTEN = ("kraft", "moment")
+
+#: Wohin eine Kraft zeigt -- an einem Knoten nur senkrecht oder waagrecht.
+RICHTUNGEN = tuple(r.value for r in Lastrichtung)
+KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT.value, Lastrichtung.WAAGRECHT.value)
+
+#: Woher ein Querschnitt kommt.
+QUERSCHNITTSARTEN = ("vorlage", "kennwerte", "platte", "analyse")
+
+#: Die Vorwahlen eines Lagers -- je Richtung frei oder fest.
+LAGERARTEN = {
+    "gelenkig": ("fest", "fest", "frei"),
+    "verschieblich": ("frei", "fest", "frei"),
+    "eingespannt": ("fest", "fest", "fest"),
+}
+
+#: Ein Punkt in m -- oder die Kennung eines Knotens, der dort liegt.
+Ort = Union[str, Sequence[float]]
+
+
+def _gewaehlt(d: Mapping[str, Any], feld: str, vorgabe: str, moeglich: Sequence[str],
+              wo: str) -> str:
+    wert = str(d.get(feld) or vorgabe)
+    if wert not in moeglich:
+        raise ProjektFehler(f"{wo}: «{wert}» gibt es als {feld} nicht. "
+                            f"Möglich sind: {', '.join(moeglich)}.")
+    return wert
+
+
+def _kennung_von(eintrag: Any) -> str:
+    return eintrag if isinstance(eintrag, str) else eintrag.kennung
+
+
+# ===========================================================================
+# Die Teile
+# ===========================================================================
+
+
+@dataclass
+class SystemknotenEintrag(Beschreibung):
+    """Ein Punkt des Systems, in m."""
+
+    kennung: str = ""
+    x: float = 0.0
+    z: float = 0.0
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any]) -> "SystemknotenEintrag":
+        return cls(kennung=str(d.get("kennung") or cls.kennung),
+                   x=zahl(d, "x", cls.x), z=zahl(d, "z", cls.z))
+
+
+@dataclass
+class StablastEintrag(Beschreibung):
+    """
+    Eine Last auf einem Stab, in einem Lastfall -- in der Einheit ihrer Art
+    (:data:`EINHEIT_DER_LAST`). ``wert_b`` gilt am Ende des belasteten
+    Bereichs, leer: wie ``wert_a``. ``bis`` leer: bis zum Ende des Stabs.
+    Einzellast und Einzelmoment stehen bei ``von``.
+    """
+
+    lastfall: str = ""
+    art: str = Lastart.LINIENLAST.value
+    richtung: str = Lastrichtung.SENKRECHT.value
+    wert_a: float = 10.0
+    wert_b: Optional[float] = None
+    von: float = 0.0
+    bis: Optional[float] = None
+    projiziert: bool = False
+    """Senkrecht und waagrecht je Meter Projektion statt je Meter Stab."""
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any]) -> "StablastEintrag":
+        wo = "Eine Stablast"
+        return cls(
+            lastfall=str(d.get("lastfall") or cls.lastfall),
+            art=_gewaehlt(d, "art", cls.art, STABLASTEN, wo),
+            richtung=_gewaehlt(d, "richtung", cls.richtung, RICHTUNGEN, wo),
+            wert_a=zahl(d, "wert_a", cls.wert_a),
+            wert_b=zahl(d, "wert_b", cls.wert_b),
+            von=zahl(d, "von", cls.von),
+            bis=zahl(d, "bis", cls.bis),
+            projiziert=bool(d.get("projiziert", cls.projiziert)),
+        )
+
+    @property
+    def verteilt(self) -> bool:
+        return Lastart(self.art).verteilt
+
+
+@dataclass
+class SystemlinieEintrag(Beschreibung):
+    """
+    Eine Linie des Systems: ein Stab, wenn ``stab``; dazu, oder ohne Stab,
+    ein Linienlager quer und laengs.
+    """
+
+    kennung: str = ""
+    von: str = ""
+    bis: str = ""
+    stab: bool = False
+    querschnitt: str = ""
+    """Kennung des Querschnitts im System (``Q1``)."""
+
+    material: str = ""
+    """Kennung des Materials im Projekt (``b1``)."""
+
+    gelenk_anfang: bool = False
+    gelenk_ende: bool = False
+    quer: str = "frei"
+    k_quer: float = 0.0
+    """Bettung quer, kN/m²."""
+
+    laengs: str = "frei"
+    k_laengs: float = 0.0
+    lasten: List[StablastEintrag] = field(default_factory=list)
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any]) -> "SystemlinieEintrag":
+        wo = f"Linie {d.get('kennung') or ''}".strip()
+        return cls(
+            kennung=str(d.get("kennung") or cls.kennung),
+            von=str(d.get("von") or cls.von), bis=str(d.get("bis") or cls.bis),
+            stab=bool(d.get("stab", cls.stab)),
+            querschnitt=str(d.get("querschnitt") or cls.querschnitt),
+            material=str(d.get("material") or cls.material),
+            gelenk_anfang=bool(d.get("gelenk_anfang", cls.gelenk_anfang)),
+            gelenk_ende=bool(d.get("gelenk_ende", cls.gelenk_ende)),
+            quer=_gewaehlt(d, "quer", cls.quer, HALT, wo),
+            k_quer=zahl(d, "k_quer", cls.k_quer),
+            laengs=_gewaehlt(d, "laengs", cls.laengs, HALT, wo),
+            k_laengs=zahl(d, "k_laengs", cls.k_laengs),
+            lasten=[StablastEintrag.aus_dict(x) for x in (d.get("lasten") or [])],
+        )
+
+
+@dataclass
+class LagerEintrag(Beschreibung):
+    """Ein Lager an einem Knoten: je Richtung frei, fest oder Feder."""
+
+    kennung: str = ""
+    knoten: str = ""
+    x: str = "fest"
+    k_x: float = 0.0
+    """kN/m."""
+
+    z: str = "fest"
+    k_z: float = 0.0
+    phi: str = "frei"
+    k_phi: float = 0.0
+    """kNm/rad."""
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any]) -> "LagerEintrag":
+        wo = f"Lager {d.get('kennung') or ''}".strip()
+        return cls(
+            kennung=str(d.get("kennung") or cls.kennung),
+            knoten=str(d.get("knoten") or cls.knoten),
+            x=_gewaehlt(d, "x", cls.x, HALT, wo), k_x=zahl(d, "k_x", cls.k_x),
+            z=_gewaehlt(d, "z", cls.z, HALT, wo), k_z=zahl(d, "k_z", cls.k_z),
+            phi=_gewaehlt(d, "phi", cls.phi, HALT, wo), k_phi=zahl(d, "k_phi", cls.k_phi),
+        )
+
+
+@dataclass
+class KnotenlastEintrag(Beschreibung):
+    """Eine Last an einem Knoten, in einem Lastfall: eine Kraft mit Richtung oder ein Moment."""
+
+    kennung: str = ""
+    knoten: str = ""
+    lastfall: str = ""
+    art: str = "kraft"
+    richtung: str = Lastrichtung.SENKRECHT.value
+    wert: float = 10.0
+    """kN oder kNm."""
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any]) -> "KnotenlastEintrag":
+        wo = f"Knotenlast {d.get('kennung') or ''}".strip()
+        return cls(
+            kennung=str(d.get("kennung") or cls.kennung),
+            knoten=str(d.get("knoten") or cls.knoten),
+            lastfall=str(d.get("lastfall") or cls.lastfall),
+            art=_gewaehlt(d, "art", cls.art, KNOTENLASTEN, wo),
+            richtung=_gewaehlt(d, "richtung", cls.richtung, KNOTENRICHTUNGEN, wo),
+            wert=zahl(d, "wert", cls.wert),
+        )
+
+
+@dataclass
+class StabquerschnittEintrag(Beschreibung):
+    """
+    Ein Querschnitt der Staebe: nach Vorlage mit Massen in mm, mit Kennwerten
+    von Hand (``A`` in mm², ``I`` in 10⁶ mm⁴), oder aus einer Platte oder
+    einer Querschnittsanalyse des Projekts (``bezug``).
+    """
+
+    kennung: str = ""
+    name: str = ""
+    art: str = "vorlage"
+    vorlage: str = qs.RECHTECK.schluessel
+    masse: Dict[str, float] = field(default_factory=dict)
+    bezug: str = ""
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any]) -> "StabquerschnittEintrag":
+        kennung = str(d.get("kennung") or cls.kennung)
+        wo = f"Querschnitt {d.get('name') or kennung}".strip()
+        art = _gewaehlt(d, "art", cls.art, QUERSCHNITTSARTEN, wo)
+        vorlage = _gewaehlt(d, "vorlage", cls.vorlage,
+                            [v.schluessel for v in qs.VORLAGEN], wo)
+        masse = {}
+        for schluessel, wert in (d.get("masse") or {}).items():
+            masse[str(schluessel)] = zahl({"wert": wert}, "wert", 0.0)
+        return cls(kennung=kennung, name=str(d.get("name") or kennung), art=art,
+                   vorlage=vorlage, masse=masse, bezug=str(d.get("bezug") or cls.bezug))
+
+    def stabvorlage(self) -> qs.Stabvorlage:
+        return qs.vorlage(self.vorlage)
+
+    def masse_mit_vorgaben(self) -> Dict[str, float]:
+        """Die Masse der Vorlage -- was fehlt, mit ihrer Vorgabe."""
+        return {**self.stabvorlage().vorgaben(), **self.masse}
+
+
+@dataclass
+class LastfallEintrag(Beschreibung):
+    """Ein Lastfall des Systems: eine Kennung, auf die die Lasten zeigen, und ein Name."""
+
+    kennung: str = ""
+    name: str = ""
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any]) -> "LastfallEintrag":
+        kennung = str(d.get("kennung") or cls.kennung)
+        return cls(kennung=kennung, name=str(d.get("name") or kennung))
+
+
+@dataclass
+class LastkombinationEintrag(Beschreibung):
+    """Eine Kombination: je Lastfall (Kennung) ein Beiwert, von Hand."""
+
+    kennung: str = ""
+    name: str = ""
+    faktoren: Dict[str, float] = field(default_factory=dict)
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any]) -> "LastkombinationEintrag":
+        kennung = str(d.get("kennung") or cls.kennung)
+        faktoren = {str(k): zahl({"wert": v}, "wert", 0.0)
+                    for k, v in (d.get("faktoren") or {}).items()}
+        return cls(kennung=kennung, name=str(d.get("name") or kennung), faktoren=faktoren)
+
+
+# ===========================================================================
+# Das System
+# ===========================================================================
+
+
+@dataclass
+class BalkensystemEintrag(Beschreibung):
+    """Ein ebener Rahmen: Knoten, Linien, Lager, Lasten, Querschnitte, Lastfaelle, Kombinationen."""
+
+    kennung: str
+    name: str
+    knoten: List[SystemknotenEintrag] = field(default_factory=list)
+    linien: List[SystemlinieEintrag] = field(default_factory=list)
+    lager: List[LagerEintrag] = field(default_factory=list)
+    knotenlasten: List[KnotenlastEintrag] = field(default_factory=list)
+    querschnitte: List[StabquerschnittEintrag] = field(default_factory=list)
+    lastfaelle: List[LastfallEintrag] = field(default_factory=list)
+    kombinationen: List[LastkombinationEintrag] = field(default_factory=list)
+    beschreibung: str = ""
+    """Freier Text -- geht in keine Rechnung ein."""
+
+    # -- Lesen ---------------------------------------------------------------
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any]) -> "BalkensystemEintrag":
+        kennung = pflichtfeld(d, "kennung", "Ein Balkensystem")
+        return cls(
+            kennung=kennung,
+            name=str(d.get("name") or kennung),
+            knoten=[SystemknotenEintrag.aus_dict(x) for x in (d.get("knoten") or [])],
+            linien=[SystemlinieEintrag.aus_dict(x) for x in (d.get("linien") or [])],
+            lager=[LagerEintrag.aus_dict(x) for x in (d.get("lager") or [])],
+            knotenlasten=[KnotenlastEintrag.aus_dict(x) for x in (d.get("knotenlasten") or [])],
+            querschnitte=[StabquerschnittEintrag.aus_dict(x)
+                          for x in (d.get("querschnitte") or [])],
+            lastfaelle=[LastfallEintrag.aus_dict(x) for x in (d.get("lastfaelle") or [])],
+            kombinationen=[LastkombinationEintrag.aus_dict(x)
+                           for x in (d.get("kombinationen") or [])],
+            beschreibung=str(d.get("beschreibung") or ""),
+        )
+
+    def pruefen(self) -> None:
+        """Was sich an der Beschreibung pruefen laesst: eindeutige Namen."""
+        eindeutig(self.lastfaelle, self.name, "Lastfall", bauteil="Balkensystem")
+        eindeutig(self.kombinationen, self.name, "Kombination", bauteil="Balkensystem")
+        doppelt = {lf.name for lf in self.lastfaelle} & {k.name for k in self.kombinationen}
+        if doppelt:
+            raise ProjektFehler(f"Balkensystem '{self.name}': «{sorted(doppelt)[0]}» heisst "
+                                f"ein Lastfall und eine Kombination.")
+
+    # -- Zugriff -------------------------------------------------------------
+
+    def materialien(self) -> List[str]:
+        """Die Materialien der Staebe -- fuer den Baum, der keines loeschen laesst, das gebraucht wird."""
+        gesehen: List[str] = []
+        for l in self.linien:
+            if l.stab and l.material and l.material not in gesehen:
+                gesehen.append(l.material)
+        return gesehen
+
+    def bezuege(self) -> List[str]:
+        """Die Platten und Querschnittsanalysen, deren Querschnitt ein Stab nimmt."""
+        return sorted({q.bezug for q in self.querschnitte
+                       if q.art in ("platte", "analyse") and q.bezug})
+
+    def linie_von(self, kennung: str) -> SystemlinieEintrag:
+        for l in self.linien:
+            if l.kennung == kennung:
+                return l
+        raise ProjektFehler(f"Balkensystem '{self.name}': eine Linie «{kennung}» gibt es nicht.")
+
+    def enden(self, linie: SystemlinieEintrag) -> Tuple[Tuple[float, float], Tuple[float, float]]:
+        """Anfang und Ende einer Linie, in m."""
+        netz = self.netz()
+        a, b = netz.lage(linie.von), netz.lage(linie.bis)
+        if a is None or b is None:
+            raise ProjektFehler(f"Balkensystem '{self.name}': {linie.kennung} verweist auf "
+                                f"einen Knoten, den es nicht gibt.")
+        return a, b
+
+    def laenge(self, linie: SystemlinieEintrag) -> float:
+        (xa, za), (xb, zb) = self.enden(linie)
+        return math.hypot(xb - xa, zb - za)
+
+    # -- Zeichnen ohne Oberflaeche --------------------------------------------
+
+    def netz(self) -> Netz:
+        return Netz(self.knoten, neu=lambda kennung, x, z: SystemknotenEintrag(kennung, x, z),
+                    achsen=("x", "z"))
+
+    def _knoten(self, netz: Netz, ort: Ort) -> str:
+        if isinstance(ort, str):
+            return ort
+        x, z = ort
+        return netz.an(float(x), float(z))
+
+    def _neue_kennung(self, liste: Sequence[Any], vorsilbe: str) -> str:
+        return naechste_kennung((e.kennung for e in liste), vorsilbe)
+
+    def linie(self, von: Ort, bis: Ort, *, querschnitt: Any = None, material: Any = None,
+              **felder: Any) -> SystemlinieEintrag:
+        """
+        Eine Linie von ``von`` nach ``bis`` -- ein Stab, sobald ``querschnitt``
+        und ``material`` dastehen. Weitere Felder wie :class:`SystemlinieEintrag`.
+        """
+        netz = self.netz()
+        eintrag = SystemlinieEintrag(
+            kennung=self._neue_kennung(self.linien, "L"),
+            von=self._knoten(netz, von), bis=self._knoten(netz, bis),
+            stab=felder.pop("stab", querschnitt is not None),
+            querschnitt=_kennung_von(querschnitt) if querschnitt is not None else "",
+            material=_kennung_von(material) if material is not None else "", **felder)
+        self.linien.append(eintrag)
+        return eintrag
+
+    def lager_an(self, ort: Ort, art: str = "gelenkig", **felder: Any) -> LagerEintrag:
+        """Ein Lager -- ``gelenkig``, ``verschieblich`` oder ``eingespannt``, Felder darueber."""
+        if art not in LAGERARTEN:
+            raise ProjektFehler(f"Eine Lagerart «{art}» gibt es nicht. Möglich sind: "
+                                f"{', '.join(LAGERARTEN)}.")
+        x, z, phi = LAGERARTEN[art]
+        eintrag = LagerEintrag(kennung=self._neue_kennung(self.lager, "A"),
+                               knoten=self._knoten(self.netz(), ort),
+                               **{"x": x, "z": z, "phi": phi, **felder})
+        self.lager.append(eintrag)
+        return eintrag
+
+    def querschnitt(self, name: str, vorlage: str = qs.RECHTECK.schluessel,
+                    **masse: float) -> StabquerschnittEintrag:
+        """Ein Querschnitt nach Vorlage -- Masse in mm, was fehlt nach ihrer Vorgabe."""
+        try:
+            qs.vorlage(vorlage)
+        except KeyError as fehler:
+            raise ProjektFehler(fehler.args[0]) from None
+        eintrag = StabquerschnittEintrag(kennung=self._neue_kennung(self.querschnitte, "Q"),
+                                         name=name, vorlage=vorlage, masse=dict(masse))
+        self.querschnitte.append(eintrag)
+        return eintrag
+
+    def querschnitt_aus(self, name: str, art: str, bezug: Any) -> StabquerschnittEintrag:
+        """Ein Querschnitt aus einer Platte (``platte``) oder einer Querschnittsanalyse (``analyse``)."""
+        if art not in ("platte", "analyse"):
+            raise ProjektFehler(f"Ein Querschnitt kommt aus einer «platte» oder einer «analyse», "
+                                f"nicht aus «{art}».")
+        eintrag = StabquerschnittEintrag(kennung=self._neue_kennung(self.querschnitte, "Q"),
+                                         name=name, art=art, bezug=_kennung_von(bezug))
+        self.querschnitte.append(eintrag)
+        return eintrag
+
+    def querschnitt_mit_kennwerten(self, name: str, *, A: float, I: float) -> StabquerschnittEintrag:
+        """Ein Querschnitt mit Kennwerten von Hand -- A in mm², I in 10⁶ mm⁴."""
+        eintrag = StabquerschnittEintrag(kennung=self._neue_kennung(self.querschnitte, "Q"),
+                                         name=name, art="kennwerte", masse={"A": A, "I": I})
+        self.querschnitte.append(eintrag)
+        return eintrag
+
+    def lastfall(self, name: str) -> LastfallEintrag:
+        eintrag = LastfallEintrag(kennung=self._neue_kennung(self.lastfaelle, "LF"), name=name)
+        self.lastfaelle.append(eintrag)
+        return eintrag
+
+    def kombination(self, name: str, *faktoren: Tuple[Any, float]) -> LastkombinationEintrag:
+        """Eine Kombination -- je Lastfall (Eintrag oder Kennung) ein Beiwert: ``(g, 1.35), (w, 1.5)``."""
+        eintrag = LastkombinationEintrag(
+            kennung=self._neue_kennung(self.kombinationen, "LK"), name=name,
+            faktoren={_kennung_von(lf): float(beiwert) for lf, beiwert in faktoren})
+        self.kombinationen.append(eintrag)
+        return eintrag
+
+    def stablast(self, lastfall: Any, linie: Any, art: str = Lastart.LINIENLAST.value,
+                 wert: float = 10.0, **felder: Any) -> StablastEintrag:
+        """Eine Last auf einer Linie -- ``wert`` ist ``wert_a``; Felder wie :class:`StablastEintrag`."""
+        eintrag = StablastEintrag.aus_dict({"lastfall": _kennung_von(lastfall), "art": art,
+                                            "wert_a": wert, **felder})
+        self.linie_von(_kennung_von(linie)).lasten.append(eintrag)
+        return eintrag
+
+    def knotenlast(self, lastfall: Any, ort: Ort, wert: float = 10.0, *, art: str = "kraft",
+                   richtung: str = Lastrichtung.SENKRECHT.value) -> KnotenlastEintrag:
+        eintrag = KnotenlastEintrag.aus_dict({
+            "kennung": self._neue_kennung(self.knotenlasten, "P"),
+            "knoten": self._knoten(self.netz(), ort), "lastfall": _kennung_von(lastfall),
+            "art": art, "richtung": richtung, "wert": wert})
+        self.knotenlasten.append(eintrag)
+        return eintrag
+
+    # -- Teilen und Umkehren ----------------------------------------------------
+
+    def teilen(self, kennung: str, stelle: float) -> SystemlinieEintrag:
+        """
+        Teilt eine Linie bei ``stelle`` m ab ihrem Anfang: sie endet dort, und
+        eine neue laeuft weiter zum alten Ende -- mit ihren Eigenschaften. Die
+        Lasten gehen mit, je auf ihre Haelfte: eine Strecke ueber den Schnitt
+        wird zwei, mit dem Wert an der Schnittstelle; eine Einzellast bleibt
+        dort, wo sie steht. Das Gelenk am Ende wandert mit ans neue Ende; an
+        der Schnittstelle ist die Linie durchlaufend.
+        """
+        linie = self.linie_von(kennung)
+        (xa, za), (xb, zb) = self.enden(linie)
+        L = math.hypot(xb - xa, zb - za)
+        if not 0.0 < stelle < L:
+            raise ProjektFehler(f"{linie.kennung} ist {L:.3f} m lang -- geteilt werden kann nur "
+                                f"dazwischen, nicht bei {stelle:g} m.")
+        mitte = self._knoten(self.netz(), (xa + (xb - xa) * stelle / L,
+                                           za + (zb - za) * stelle / L))
+        zweite = copy.deepcopy(linie)
+        zweite.kennung = self._neue_kennung(self.linien, "L")
+        zweite.von, zweite.gelenk_anfang = mitte, False
+        linie.bis, linie.gelenk_ende = mitte, False
+        erste_lasten, zweite_lasten = [], []
+        for last in linie.lasten:
+            if not last.verteilt:
+                if last.von <= stelle:
+                    erste_lasten.append(last)
+                else:
+                    zweite_lasten.append(replace(last, von=last.von - stelle))
+                continue
+            a, b = last.von, L if last.bis is None else last.bis
+            wb = last.wert_a if last.wert_b is None else last.wert_b
+
+            def wert(x: float) -> float:
+                return last.wert_a if b == a else last.wert_a + (wb - last.wert_a) * (x - a) / (b - a)
+
+            konstant = last.wert_b is None
+            if a < stelle:
+                ende = min(b, stelle)
+                erste_lasten.append(replace(
+                    last, bis=None if ende >= stelle else ende,
+                    wert_b=None if konstant else wert(ende)))
+            if b > stelle:
+                anfang = max(a, stelle)
+                zweite_lasten.append(replace(
+                    last, von=anfang - stelle, bis=None if last.bis is None else b - stelle,
+                    wert_a=wert(anfang), wert_b=None if konstant else wb))
+        linie.lasten, zweite.lasten = erste_lasten, zweite_lasten
+        self.linien.insert(self.linien.index(linie) + 1, zweite)
+        return zweite
+
+    def umkehren(self, kennung: str) -> None:
+        """
+        Tauscht Anfang und Ende einer Linie. Die gestrichelte Faser liegt
+        danach auf der anderen Seite, die Lasten bleiben, wo sie wirken: ihre
+        Stellen gespiegelt, Anfangs- und Endwert getauscht, und quer und
+        laengs mit umgekehrtem Vorzeichen -- diese Richtungen haengen an der
+        Linie. Senkrecht, waagrecht und Momente aendern sich nicht.
+        """
+        linie = self.linie_von(kennung)
+        L = self.laenge(linie)
+        linie.von, linie.bis = linie.bis, linie.von
+        linie.gelenk_anfang, linie.gelenk_ende = linie.gelenk_ende, linie.gelenk_anfang
+        neu = []
+        for last in linie.lasten:
+            vorzeichen = -1.0 if last.richtung in (Lastrichtung.QUER.value, Lastrichtung.LAENGS.value) \
+                and Lastart(last.art).kraft else 1.0
+            if not last.verteilt:
+                neu.append(replace(last, von=L - last.von, wert_a=vorzeichen * last.wert_a))
+                continue
+            a, b = last.von, L if last.bis is None else last.bis
+            wb = last.wert_a if last.wert_b is None else last.wert_b
+            neu.append(replace(
+                last, von=L - b, bis=None if a == 0.0 else L - a,
+                wert_a=vorzeichen * wb,
+                wert_b=None if last.wert_b is None else vorzeichen * last.wert_a))
+        linie.lasten = neu
+
+    # -- Die frische Anlage -------------------------------------------------------
+
+    @classmethod
+    def neu(cls, kennung: str, name: str, material: str) -> "BalkensystemEintrag":
+        """
+        Ein frisches System, wie der Benutzer es angelegt bekommt: ein
+        Einfeldtraeger von 6 m, Rechteck 300 × 600 mm, links gelenkig, rechts
+        verschieblich, ein Lastfall mit 10 kN/m. Zum Anfangen, nicht als
+        Vorgabe.
+        """
+        s = cls(kennung=kennung, name=name)
+        q = s.querschnitt("Rechteck 300×600", "rechteck", b=300.0, h=600.0)
+        linie = s.linie((0.0, 0.0), (6.0, 0.0), querschnitt=q, material=material)
+        s.lager_an((0.0, 0.0), "gelenkig")
+        s.lager_an((6.0, 0.0), "verschieblich")
+        lf = s.lastfall("Lastfall 1")
+        s.stablast(lf, linie, wert=10.0)
+        return s

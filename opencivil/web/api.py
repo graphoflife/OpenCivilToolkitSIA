@@ -43,6 +43,7 @@ from opencivil.projekt import (
     BEIDE_RICHTUNGEN, RISSANFORDERUNGEN, Aufbau, GebrauchsfallEintrag, KnickEintrag,
     KombinationEintrag, MaterialEintrag, QuerschnittEintrag, SpannungsfallEintrag,
 )
+from opencivil.projekt import balkensystem as bs
 from opencivil.projekt.eintraege import BETONGESETZE, WERKSTOFFSAETZE
 from opencivil.projekt.querschnittsanalyse import (
     SCHNITTE, FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QALastfallEintrag,
@@ -56,6 +57,8 @@ from opencivil.projekt.gleichungen import GleichungszeileEintrag
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import FASERARTEN, RECHENARTEN, SPANNUNGSARTEN, Rechenart
 from opencivil.spannungsanalyse import Analyseart
+from opencivil.stabwerk import querschnitte as stabquerschnitte
+from opencivil.stabwerk.modell import Lastart, Lastrichtung
 from opencivil.web import diagrammdaten
 
 #: Die Wertesaetze und Betongesetze mit Beschriftung -- dieselben in der
@@ -145,6 +148,10 @@ def katalog() -> dict:
         # Anfangen. Die Oberflaeche setzt Kennung, Name und die Materialien.
         "neue_querschnittsanalyse": QuerschnittsanalyseEintrag.neu(
             kennung="", name="", beton="", stahl="").als_dict(),
+        # Und fuer das Balkensystem: ein Einfeldtraeger. Die Oberflaeche setzt
+        # Kennung, Name und das Material der Linien.
+        "neues_balkensystem": bs.BalkensystemEintrag.neu(
+            kennung="", name="", material="").als_dict(),
         # Dasselbe fuer jede Zeile, die man anfuegt -- mit den Startwerten, die
         # eine frische Zeile haben soll (eine Einwirkung von 30 kNm, ein
         # Knickfall unter Druck). Die Oberflaeche setzt nur den Namen und beim
@@ -165,6 +172,17 @@ def katalog() -> dict:
             "schubwand": SchubwandEintrag().als_dict(),
             "hilfslinie": HilfslinieEintrag().als_dict(),
             "werkstoffwahl": WerkstoffwahlEintrag(material="").als_dict(),
+            # Die Teile eines Balkensystems, wie Zeichenfenster und Panels sie
+            # anlegen -- der Querschnitt mit den Massen seiner Vorlage.
+            "systemknoten": bs.SystemknotenEintrag().als_dict(),
+            "systemlinie": bs.SystemlinieEintrag().als_dict(),
+            "lager": bs.LagerEintrag().als_dict(),
+            "knotenlast": bs.KnotenlastEintrag().als_dict(),
+            "stablast": bs.StablastEintrag().als_dict(),
+            "stabquerschnitt": bs.StabquerschnittEintrag(
+                masse=stabquerschnitte.RECHTECK.vorgaben()).als_dict(),
+            "lastfall": bs.LastfallEintrag().als_dict(),
+            "lastkombination": bs.LastkombinationEintrag().als_dict(),
         },
         # Die Wahlmoeglichkeiten der Querschnittsanalyse, mit Beschriftung.
         "querschnittsanalyse": {
@@ -187,6 +205,37 @@ def katalog() -> dict:
                  "skizze": v.bauen().als_dict()}
                 for v in VORLAGEN
             ],
+        },
+        # Die Wahlmoeglichkeiten des Balkensystems, mit Beschriftung und
+        # Einheit -- die Einheiten aus der Beschreibung, die mit ihnen rechnet.
+        "balkensystem": {
+            "vorlagen": [
+                {"schluessel": v.schluessel, "name": v.name,
+                 "masse": [{"schluessel": m.schluessel, "symbol": m.symbol,
+                            "beschriftung": m.beschriftung, "vorgabe": m.vorgabe}
+                           for m in v.masse],
+                 "skizze": [[[round(y, 1), round(z, 1)] for y, z in umriss]
+                            for umriss in v.umriss(v.vorgaben())]}
+                for v in stabquerschnitte.VORLAGEN
+            ],
+            "querschnittsarten": [
+                {"wert": "vorlage", "beschriftung": "nach Vorlage"},
+                {"wert": "kennwerte", "beschriftung": "Kennwerte von Hand"},
+                {"wert": "platte", "beschriftung": "aus einer Platte"},
+                {"wert": "analyse", "beschriftung": "aus einer Querschnittsanalyse"},
+            ],
+            "lastarten": [
+                {"wert": a.value, "beschriftung": a.beschriftung, "verteilt": a.verteilt,
+                 "kraft": a.kraft, "einheit": bs.EINHEIT_DER_LAST[a.value].beschriftung}
+                for a in Lastart
+            ],
+            "richtungen": [{"wert": r.value, "beschriftung": r.beschriftung}
+                           for r in Lastrichtung],
+            "knotenrichtungen": list(bs.KNOTENRICHTUNGEN),
+            "halt": list(bs.HALT),
+            "federeinheiten": {feld: e.beschriftung for feld, e in bs.EINHEIT_DER_FEDER.items()},
+            "lagerarten": [{"wert": art, "x": x, "z": z, "phi": phi}
+                           for art, (x, z, phi) in bs.LAGERARTEN.items()],
         },
         # Die Fragen der Spannung-Dehnung-Analyse.
         "spannungsanalyse": {

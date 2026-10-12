@@ -1,5 +1,5 @@
 ---
-erzeugt: d0039fc44d23
+erzeugt: cf90be9f6b2c
 art: modul
 tags: [modul]
 ---
@@ -157,6 +157,7 @@ def belegt(self) -> int
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
+- [[opencivil.projekt]]
 
 ## Gebraucht von
 

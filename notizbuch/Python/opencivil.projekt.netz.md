@@ -1,5 +1,5 @@
 ---
-erzeugt: 5acd2280f9ae
+erzeugt: 19bc3d086840
 art: modul
 tags: [modul]
 ---
@@ -57,17 +57,19 @@ class Netz
 Die Knoten einer Zeichnung -- mit dem Zusammenfuehren gleicher Koordinaten.
 
 `knoten` ist die Liste der Beschreibung; neue Knoten werden an sie
-angehaengt. Jeder Knoten hat `kennung`, `y` und `z`. `neu` baut
-einen aus Kennung und Lage -- so bleibt der Baukasten bei der Klasse, die
-die Beschreibung speichert, ohne sie zu kennen.
+angehaengt. Jeder Knoten hat `kennung` und zwei Koordinaten -- wie sie
+heissen, sagt `achsen`: `y` und `z` im Querschnitt, `x` und `z`
+im Balkensystem. `neu` baut einen aus Kennung und Lage -- so bleibt der
+Baukasten bei der Klasse, die die Beschreibung speichert, ohne sie zu
+kennen.
 
 #### Netz.an
 
 ```python
-def an(self, y: float, z: float) -> str
+def an(self, a: float, b: float) -> str
 ```
 
-Die Kennung des Knotens an `(y, z)` -- angelegt, wenn es dort noch keinen gibt.
+Die Kennung des Knotens an `(a, b)` -- angelegt, wenn es dort noch keinen gibt.
 
 #### Netz.lage
 
@@ -80,4 +82,5 @@ Wo der Knoten liegt -- `None`, wenn es ihn nicht gibt.
 
 ## Gebraucht von
 
+- [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.querschnittsanalyse]]

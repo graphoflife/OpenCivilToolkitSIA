@@ -1,5 +1,5 @@
 ---
-erzeugt: 29ea952dc4f3
+erzeugt: 8d8c72ca2cb7
 art: modul
 tags: [modul]
 ---
@@ -195,6 +195,7 @@ nachsehen.
 
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.gleichungen]]
 - [[opencivil.projekt.platte]]

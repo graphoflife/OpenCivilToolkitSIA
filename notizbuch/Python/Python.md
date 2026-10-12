@@ -1,5 +1,5 @@
 ---
-erzeugt: 41b1ae746c83
+erzeugt: fde83e9c5936
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -60,6 +60,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.notizbuch.tresor]] – erzeugte Seiten in den Ordner `notizbuch/`.
 - [[opencivil.projekt]] – Serialisierbare Beschreibung eines ganzen Projekts.
     - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
+    - [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
     - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
     - [[opencivil.projekt.gleichungen]] – ein Blatt analytischer Gleichungen, wie es
     - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.

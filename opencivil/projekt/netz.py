@@ -47,16 +47,20 @@ class Netz:
     Die Knoten einer Zeichnung -- mit dem Zusammenfuehren gleicher Koordinaten.
 
     ``knoten`` ist die Liste der Beschreibung; neue Knoten werden an sie
-    angehaengt. Jeder Knoten hat ``kennung``, ``y`` und ``z``. ``neu`` baut
-    einen aus Kennung und Lage -- so bleibt der Baukasten bei der Klasse, die
-    die Beschreibung speichert, ohne sie zu kennen.
+    angehaengt. Jeder Knoten hat ``kennung`` und zwei Koordinaten -- wie sie
+    heissen, sagt ``achsen``: ``y`` und ``z`` im Querschnitt, ``x`` und ``z``
+    im Balkensystem. ``neu`` baut einen aus Kennung und Lage -- so bleibt der
+    Baukasten bei der Klasse, die die Beschreibung speichert, ohne sie zu
+    kennen.
     """
 
     def __init__(self, knoten: List[Any],
-                 neu: Callable[[str, float, float], Any], vorsilbe: str = "K") -> None:
+                 neu: Callable[[str, float, float], Any], vorsilbe: str = "K",
+                 achsen: Tuple[str, str] = ("y", "z")) -> None:
         self.knoten = knoten
         self.neu = neu
         self.vorsilbe = vorsilbe
+        self.achsen = achsen
         self._an: Dict[Tuple[float, float], str] = {}
         self._lage: Dict[str, Tuple[float, float]] = {}
         self._groesste = 0
@@ -64,16 +68,16 @@ class Netz:
             self._merken(k)
 
     def _merken(self, k: Any) -> None:
-        lage = (float(k.y), float(k.z))
+        lage = (float(getattr(k, self.achsen[0])), float(getattr(k, self.achsen[1])))
         self._an.setdefault(lage, k.kennung)
         self._lage[k.kennung] = lage
         n = nummer(k.kennung, self.vorsilbe)
         if n is not None:
             self._groesste = max(self._groesste, n)
 
-    def an(self, y: float, z: float) -> str:
-        """Die Kennung des Knotens an ``(y, z)`` -- angelegt, wenn es dort noch keinen gibt."""
-        lage = (float(y), float(z))
+    def an(self, a: float, b: float) -> str:
+        """Die Kennung des Knotens an ``(a, b)`` -- angelegt, wenn es dort noch keinen gibt."""
+        lage = (float(a), float(b))
         if lage not in self._an:
             self._groesste += 1
             k = self.neu(f"{self.vorsilbe}{self._groesste}", lage[0], lage[1])

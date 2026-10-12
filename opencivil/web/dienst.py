@@ -35,7 +35,7 @@ from opencivil import bewehrungssuche
 from opencivil.bericht.latex_dokument import als_tex
 from opencivil.bericht.markdown import als_markdown
 from opencivil.core.rechenwerk import Loesung, RechenwerkFehler
-from opencivil.projekt import Projekt, ProjektFehler
+from opencivil.projekt import BAUTEILE, Projekt, ProjektFehler
 from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.interaktion import GROESSEN
 from opencivil.web import api, diagrammdaten, speicher
@@ -88,7 +88,7 @@ def beispiel(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
 
 
 #: Woran eine Projektdatei zu erkennen ist. Mindestens eines davon muss da sein.
-KENNFELDER = ("name", "materialien", "querschnitte", "querschnittsanalysen")
+KENNFELDER = ("name", "materialien", *BAUTEILE)
 
 
 def pruefen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
@@ -168,9 +168,7 @@ def _stromabwaerts(projekt: Projekt, aufbau) -> Loesung:
     verschoebe, aenderte den Bericht, und das waere keine Beschleunigung mehr,
     sondern eine andere Ausgabe.
     """
-    kennungen = ([q.kennung for q in projekt.querschnitte]
-                 + [a.kennung for a in projekt.querschnittsanalysen])
-    SPEICHER.aufraeumen(kennungen)
+    SPEICHER.aufraeumen([e.kennung for e in projekt.bauteile()])
 
     materialziele = aufbau.materialziele()
     gesamt = aufbau.werk.loese(*materialziele)

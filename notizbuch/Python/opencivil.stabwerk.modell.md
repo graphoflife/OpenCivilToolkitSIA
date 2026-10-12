@@ -1,5 +1,5 @@
 ---
-erzeugt: 3b22d6ec0087
+erzeugt: e1431434f7cd
 art: modul
 tags: [modul]
 ---
@@ -12,7 +12,7 @@ tags: [modul]
 Die Eingabe des Rechenkerns, ohne Oberflaeche und ohne Projekt: Knoten,
 Staebe, Lager, Lasten, Lastfaelle und Kombinationen, alles in N, m und rad.
 Aus der Beschreibung eines Balkensystems baut sie
-[[opencivil.projekt|opencivil.projekt.balkensystem]]; gerechnet wird in
+[[opencivil.projekt.balkensystem]]; gerechnet wird in
 [[opencivil.stabwerk.system|system]].
 
 
@@ -54,6 +54,13 @@ Wohin eine Kraftlast zeigt, wenn ihr Wert positiv ist.
 - `QUER = 'quer'`
 - `LAENGS = 'laengs'`
 
+#### Lastrichtung.beschriftung
+
+```python
+@property
+def beschriftung(self) -> str
+```
+
 #### Lastrichtung.im_system
 
 ```python
@@ -93,6 +100,13 @@ Was fuer eine Last auf einem Stab liegt.
 - `EINZELLAST = 'einzellast'`
 - `MOMENT = 'moment'` – Ein Einzelmoment, im Gegenuhrzeigersinn.
 - `LINIENMOMENT = 'linienmoment'` – Moment je Laenge, linear.
+
+#### Lastart.beschriftung
+
+```python
+@property
+def beschriftung(self) -> str
+```
 
 #### Lastart.verteilt
 
@@ -256,4 +270,6 @@ Beiwerten gewichteten Lastfaelle.
 
 ## Gebraucht von
 
+- [[opencivil.projekt.balkensystem]]
 - [[opencivil.stabwerk.system]]
+- [[opencivil.web.api]]

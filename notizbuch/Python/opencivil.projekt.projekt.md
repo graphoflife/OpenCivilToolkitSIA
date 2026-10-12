@@ -1,5 +1,5 @@
 ---
-erzeugt: 3500fc4e36c4
+erzeugt: 8e76f9b7b44b
 art: modul
 tags: [modul]
 ---
@@ -9,7 +9,7 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Das [[opencivil.projekt.projekt#Projekt|Projekt]] haelt Materialien und Platten zusammen und ist das, was
+Das [[opencivil.projekt.projekt#Projekt|Projekt]] haelt Materialien und Bauteile zusammen und ist das, was
 gespeichert, geoeffnet und gerechnet wird. Hier stehen der Zugriff auf die
 Teile, die Methoden fuer das Rechnen ohne Oberflaeche, die Pruefungen ueber
 mehrere Teile hinweg (eindeutige Namen, Anteile), Speichern und Laden -- und
@@ -34,6 +34,7 @@ Die vollstaendige, speicherbare Beschreibung eines Projekts.
 - `querschnitte: List[QuerschnittEintrag] = field(default_factory=list)`
 - `gleichungen: List[GleichungsblattEintrag] = field(default_factory=list)` – Blätter analytischer Gleichungen -- Zeile für Zeile, wie in Mathcad.
 - `querschnittsanalysen: List[QuerschnittsanalyseEintrag] = field(default_factory=list)` – Gezeichnete Querschnitte: Polygone, Bewehrung, Schubwände.
+- `balkensysteme: List[BalkensystemEintrag] = field(default_factory=list)` – Ebene Rahmen: Knoten, Stäbe, Lager, Lasten, Lastfälle.
 
 #### Projekt.material
 
@@ -52,6 +53,22 @@ def querschnitt(self, kennung: str) -> QuerschnittEintrag
 ```python
 def querschnittsanalyse(self, kennung: str) -> QuerschnittsanalyseEintrag
 ```
+
+#### Projekt.bauteile
+
+```python
+def bauteile(self) -> List[Any]
+```
+
+Alle Bauteile in der Reihenfolge der Beschreibung -- siehe [[opencivil.projekt.projekt#Konstanten|BAUTEILE]].
+
+#### Projekt.bauteil
+
+```python
+def bauteil(self, kennung: str) -> Any
+```
+
+Ein Bauteil gleich welcher Art -- eine Platte, eine Analyse, ein System.
 
 #### Projekt.freie_kennung
 
@@ -153,6 +170,19 @@ Gezeichnet wird danach mit dem Baukasten des Eintrags --
 Masse in mm. Wie bei [[opencivil.projekt.projekt#Projekt.platte|platte]] geht alles Weitere als Stichwort
 an den Eintrag.
 
+#### Projekt.balkensystem
+
+```python
+def balkensystem(self, name: str, **felder: Any) -> BalkensystemEintrag
+```
+
+Ein leeres Balkensystem, ein ebener Rahmen. Gezeichnet wird danach
+mit dem Baukasten des Eintrags -- `querschnitt`, `linie`,
+`lager_an`, `lastfall`, `stablast`, `knotenlast`,
+`kombination` --, Koordinaten in m. Leer und nicht wie in der
+Oberflaeche mit einem Einfeldtraeger: wer in Python zeichnet, zeichnet
+sein eigenes System.
+
 #### Projekt._einziges
 
 ```python
@@ -251,11 +281,25 @@ gemessen wird, und ⌀40 in y unter der x-Bewehrung -- die fliesst bei
 x = h/2 nicht. Dazu ein Blatt Gleichungen. Gebaut über die Fassade, wie
 ein Benutzer es in Python täte.
 
+### _felder_setzen
+
+```python
+def _felder_setzen(eintrag: Any, felder: Mapping[str, Any], wo: str) -> None
+```
+
+Die Stichworte einer Fassade an den Eintrag -- ein unbekanntes wird
+gemeldet, mit dem aehnlichsten Feld, statt still zu verschwinden.
+
+
+## Konstanten
+
+- `BAUTEILE = ('querschnitte', 'querschnittsanalysen', 'balkensysteme')` – Die Listen der Bauteile: Eintraege mit Kennung, je ein Kapitel im Baum und im Bericht -- Platten, gezeichnete Querschnitte, Balkensysteme. Wer alle Bauteile durchgeht (Kennungen, Pruefung, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch; ein neues Bauteil kommt hier dazu und nirgends sonst.
 
 ## Braucht
 
 - [[opencivil.ergebnis]]
 - [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.gleichungen]]
 - [[opencivil.projekt.lesen]]
