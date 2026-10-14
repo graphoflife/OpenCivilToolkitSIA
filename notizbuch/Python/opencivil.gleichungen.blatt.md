@@ -1,5 +1,5 @@
 ---
-erzeugt: c82813edb327
+erzeugt: 2d2f673d87c3
 art: modul
 tags: [modul]
 ---
@@ -29,8 +29,8 @@ Werteliste des Berichts: `gleichungen.g1.z003` heisst «Name, Zeile 3».
 Was neben jeder Zeile steht -- Ergebnis oder Fehler --, ist der Befund des
 Blatts: je Zeile ein [[opencivil.gleichungen.blatt#Zeilenergebnis|Zeilenergebnis]].
 Vorab erklaeren kann das Blatt diese Werte nicht -- welche Zeilen aufgehen
-und in welcher Einheit, steht erst nach dem Rechnen fest. Erklaert ist nur
-das Ziel, die Zahl der aufgegangenen Zeilen; es steht in keiner Werteliste.
+und in welcher Einheit, steht erst nach dem Rechnen fest. Ziel ist darum das
+Blatt selbst, unter seiner ID.
 
 ## Inhalt
 
@@ -80,7 +80,6 @@ Zeile.
 ## Braucht
 
 - [[opencivil.core.berechnung]]
-- [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]

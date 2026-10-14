@@ -9,8 +9,8 @@ import unittest
 from typing import Mapping
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Berechnung, BerechnungsFehler, Eingabebezug, Eingaben, Formel, Nachweis,
-    NachweisUrteil, Prozedur, Vorgabe, grad_def,
+    Ausfuehrung, Befundbezug, Berechnung, BerechnungsFehler, Eingabebezug, Eingaben, Formel,
+    Nachweis, NachweisUrteil, Prozedur, Vorgabe, grad_def,
 )
 from opencivil.core.einheiten import (
     EINHEITSLOS, KN, KNM, M, MM, MM2, MPA, N_PRO_MM2, DimensionsFehler, Groesse,
@@ -682,6 +682,65 @@ class TestProzedur(unittest.TestCase):
         ergebnis = prozedur.ausfuehren(eingaben, still).ausgaben
         self.assertAlmostEqual(ergebnis[d_x.id].in_einheit(MM), 150, places=1)
         self.assertTrue(still.ist_leer)
+
+
+class TestBerechnungAlsZiel(unittest.TestCase):
+    """
+    Ein Ziel darf eine Berechnung sein -- auch eine ohne Ausgabe, deren
+    Ergebnis allein ihr Befund ist. Vorher brauchte sie dafuer einen Wert,
+    den niemand las.
+    """
+
+    def werk(self, gezaehlt):
+        class Verdoppeln(Prozedur):
+            def rechne(self, e, p):
+                gezaehlt.append(1)
+                p.text("Verdoppelt.")
+                return Ausfuehrung({}, befund=2 * e.g("h").si)
+
+        werk = Rechenwerk()
+        werk.definiere(D_H)
+        werk.registriere(Verdoppeln("p.doppelt", ausgaben=[], titel="Verdoppeln",
+                                    bezuege=[Eingabebezug("h", D_H.id)]))
+        return werk
+
+    def test_sie_laeuft_einmal_und_haelt_ihren_befund(self):
+        gezaehlt = []
+        werk = self.werk(gezaehlt)
+        werk.setze(D_H.id, Groesse(300, MM))
+        loesung = werk.loese("p.doppelt", "p.doppelt")
+        self.assertEqual(len(gezaehlt), 1)
+        self.assertAlmostEqual(loesung.befund("p.doppelt"), 0.6)
+        self.assertEqual(loesung.reihenfolge, ["p.doppelt"])
+        self.assertTrue(loesung.vollstaendig)
+
+    def test_fehlt_eine_eingabe_steht_sie_unter_ihrer_id(self):
+        loesung = self.werk([]).loese("p.doppelt")
+        self.assertIn("p.doppelt", loesung.nicht_berechenbar)
+        self.assertEqual([f.id for f in loesung.fehlende], [D_H.id])
+
+    def test_ihr_befund_laesst_sich_lesen(self):
+        """Wer ihren Befund liest, stoesst sie an -- ohne Umweg ueber einen Wert."""
+        werk = self.werk([])
+        d_y = WertDef("p.y", "y", MM, "Doppelte Höhe", stellen=0)
+
+        class Lesen(Prozedur):
+            def rechne(self, e, p):
+                return {d_y.id: Groesse(e.befund("doppelt") * 1e3, MM)}
+
+        werk.registriere(Lesen("p.lesen", ausgaben=[d_y],
+                               befunde=[Befundbezug("doppelt", "p.doppelt")]))
+        werk.setze(D_H.id, Groesse(300, MM))
+        loesung = werk.loese(d_y.id)
+        self.assertAlmostEqual(loesung.groesse(d_y.id).in_einheit(MM), 600)
+        self.assertEqual(loesung.reihenfolge, ["p.doppelt", "p.lesen"])
+
+    def test_alles_erreichbare_schliesst_sie_ein(self):
+        gezaehlt = []
+        werk = self.werk(gezaehlt)
+        werk.setze(D_H.id, Groesse(300, MM))
+        werk.loese_alles()
+        self.assertEqual(len(gezaehlt), 1)
 
 
 class TestNachweis(unittest.TestCase):

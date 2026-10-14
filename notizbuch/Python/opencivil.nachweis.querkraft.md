@@ -1,5 +1,5 @@
 ---
-erzeugt: 6da3b7cd8c02
+erzeugt: c9defa4c9767
 art: modul
 tags: [modul]
 ---
@@ -301,6 +301,7 @@ in der Loesung, nicht am Nachweis.
 - `buegelwerte: Optional[Buegelwerte] = None` – Die geloesten Eingaenge des Buegelansatzes -- fuer [[opencivil.nachweis.querkraft#Querkraftbefund.neigungsverlauf|neigungsverlauf]].
 - `mn: Optional[MNBefund] = None` – Der Befund des M-N-Nachweises: aus seiner Linie kommt `m_Rd(N_Ed)` der Kurve.
 - `index: str = 'Rd'` – Wie der Momentenwiderstand heisst -- `Rd`, oder `Rk` mit charakteristischen Werten.
+- `ohne_einwirkung: Optional['Querkraftergebnis'] = None` – Mit Buegeln und ohne Lastfall: der Ast ueber der Neigung bei M = 0 und N = 0, damit das Bild auch ohne Fall dasteht. Kein Fall des Nachweises -- ohne Ausgabe, Urteil und Herleitung.
 
 #### Querkraftbefund.kurve
 
@@ -538,7 +539,7 @@ nicht nachrechnen konnte.
 - `KURVENPUNKTE = 50` – Stuetzstellen der M_Ed-v_Rd-Kurve.
 - `KURVENZUGABE = 20000.0` – Wie weit die Kurve ueber `m_Rd` hinaus gezeichnet wird, in Nm.
 - `SPRUNGSCHRITT = 0.001` – Abstand der beiden Stellen, zwischen denen der Sprung bei `m_Rd` liegt, in Nm. Nur damit der Absatz senkrecht gezeichnet wird -- 1 mNm.
-- `NUR_KURVE = Querkraftfall(name='ohne Einwirkung', V_Ed=Groesse(0.0, KN_PRO_M), M_…` – Der Fall eines Querkraftnachweises ohne Querkraft: er rechnet still, nur fuer das Diagramm -- die M-V-Kurve und der Verlauf ueber die Neigung brauchen die Beiwerte, die erst im Lauf entstehen. Ohne Einwirkung kein Urteil, kein Punkt im Bild und keine Zeile in der Werteliste; M = 0 misst d fuer das positive Moment.
+- `OHNE_EINWIRKUNG = Querkraftfall(name='ohne Einwirkung', V_Ed=Groesse(0.0, KN_PRO_M), M_…` – Was der Nachweis mit Buegeln ohne Lastfall rechnet, nur fuer sein Bild (siehe [[opencivil.nachweis.querkraft#Querkraftbefund|Querkraftbefund.ohne_einwirkung]]).
 
 ## Braucht
 
@@ -555,7 +556,6 @@ nicht nachrechnen konnte.
 
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.querschnitt.schubwaende]]
-- [[opencivil.web.diagrammdaten]]
 
 ## Formeln aus diesem Modul
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 3dc38943433d
+erzeugt: 948087583a17
 art: modul
 tags: [modul]
 ---
@@ -41,10 +41,9 @@ unverformten System. Die Herleitung sagt es, das TODO fuehrt es.
 ## DAS ERGEBNIS
 
 kommt als Befund in die Loesung ([[opencivil.stabwerk.rechnung#Systembefund|Systembefund]]); Zusammenfassung,
-Bilder und Zwischenspeicher lesen es dort. Als Wert des Rechenwerks liefert
-die Prozedur nur die Zahl der Unbekannten -- die gibt es immer, auch bei
-einem beweglichen System. Das ist ein Ergebnis mit Meldung und keine
-Ausnahme: der Rest des Projekts rechnet weiter.
+Bilder und Zwischenspeicher lesen es dort. Einen Wert liefert die Prozedur
+nicht: sie ist Ziel unter ihrer ID. Ein bewegliches System ist ein Ergebnis
+mit Meldung und keine Ausnahme: der Rest des Projekts rechnet weiter.
 
 ## Inhalt
 

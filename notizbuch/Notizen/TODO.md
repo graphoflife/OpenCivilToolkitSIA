@@ -54,18 +54,10 @@ gelernt wurde, steht in [[Entwicklung]].
 
 Neun Durchsichten haben je einen Bereich ganz gelesen; jeder Punkt ist am
 Code nachgeprüft. Reihenfolge nach Empfehlung. Ziel jedes Punkts ist, dass
-etwas wegfällt, nicht dass es umzieht. Der dringendste Befund, die
-gemischten Stahlsorten, ist behoben (siehe [[Entwicklung]]).
+etwas wegfällt, nicht dass es umzieht. Behoben sind der dringendste
+Befund, die gemischten Stahlsorten, und «Ergebnisse in den Rechenlauf»
+(siehe [[Entwicklung]]).
 
-- [ ] **Ergebnisse in den Rechenlauf -- der Rest.** Erledigt am
-      2026-10-13: Urteile und Befunde kommen mit der Ausführung, die Lösung
-      hält `befunde[berechnung_id]`, kein Nachweis legt mehr etwas auf sich
-      ab, und der Speicher legt je Bauteil seine Lösung ab
-      (`Loesung.anhaengen`); `TEILEFELDER`, `teile_von`, `teile_setzen` und
-      `Teilergebnis` sind fort. Offen: erfundene Ziele, damit gerechnet wird
-      (`d_n` des Balkensystems, `d_zeilen` des Blatts, `NUR_KURVE` der
-      Querkraft, `nur_ziel`) -- Ziele sollen eine Berechnung nennen dürfen.
-      Der Zeitgeber in `bs_diagramme.js` gehört zu Befund 2 (`nachgefragt`).
 - [ ] **Ein Steckbrief je Bauteilart, in Python und JavaScript.** Platte,
       Analyse und System stehen an rund 30 Stellen einzeln, obwohl
       `projekt.py` bei `BAUTEILE` sagt «hier dazu und nirgends sonst»:
@@ -360,6 +352,11 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Ergebnisse in den Rechenlauf: Urteile und Befunde kommen mit der Ausführung,
+kein Nachweis legt mehr etwas auf sich ab · der Speicher legt je Bauteil
+seine Lösung ab · ein Ziel darf eine Berechnung sein -- die Zahl der
+Unbekannten, die Zeilenzahl des Blatts und der Querkraft-Nullfall sind fort ·
 
 Gemischte Stahlsorten: Stahlspannung, Knicken, Querkraft und Analyse
 nahmen den Stahl der ersten Lage für alle Lagen -- jetzt trägt jede Lage

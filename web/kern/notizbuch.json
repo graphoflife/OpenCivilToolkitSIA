@@ -2025,6 +2025,7 @@
         "Rechenwerk.loese_alles",
         "_Lauf",
         "_Lauf.ziel",
+        "_Lauf.rechnen",
         "_Lauf.aufloesen",
         "_Lauf._als_fehlend_vermerken",
         "_Lauf._bis_zur_wurzel",

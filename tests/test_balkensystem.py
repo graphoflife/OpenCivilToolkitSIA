@@ -284,7 +284,7 @@ class TestRechnen(unittest.TestCase):
         E = e.wert("beton.b1.E_cm").groesse.si
         self.assertAlmostEqual(e.wert("balkensystem.r1.Q1.b1.EI").groesse.si,
                                E * 0.3 * 0.6 ** 3 / 12, delta=1e-6 * E)
-        self.assertEqual(e.wert("balkensystem.r1.n").groesse.si, 3)
+        self.assertEqual(len(system.ergebnis.unbekannte), 3)
 
     def test_stahl_mit_E_s(self):
         p = traeger()

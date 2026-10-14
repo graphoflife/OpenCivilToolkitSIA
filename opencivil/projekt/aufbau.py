@@ -174,8 +174,8 @@ class Aufbau:
             yield from eintraege.values()
 
     def alle_nachweisziele(self) -> List[str]:
-        return [d.id for n in self.alle_nachweise()
-                for d in n.d_ausnutzung.values()]
+        """Jeden Nachweis als Ziel -- auch einen ohne Lastfall, der nur fuer sein Bild rechnet."""
+        return [n.id for n in self.alle_nachweise()]
 
     def gehoert_zu(self, schluessel: str, kennung: str) -> bool:
         """Ob ein Feldschluessel (``q1`` oder ``q1.x``) zu dieser Platte gehoert."""
@@ -183,10 +183,10 @@ class Aufbau:
 
     def ziele_von(self, kennung: str) -> List[str]:
         """Die Rechenziele eines einzelnen Bauteils -- Eckwerte und Nachweise, oder sein System."""
-        alle = self.eckwertziele() + self.alle_nachweisziele()
         raeume = {w.id for _, eintraege in self.nachweise_je_feld()
                   for s, w in eintraege.items() if self.gehoert_zu(s, kennung)}
-        return ([z for z in alle if any(z.startswith(f"{r}.") for r in raeume)]
+        return ([z for z in self.eckwertziele() if any(z.startswith(f"{r}.") for r in raeume)]
+                + [z for z in self.alle_nachweisziele() if z in raeume]
                 + self.systemziele(kennung))
 
     def systemziele(self, kennung: Optional[str] = None) -> List[str]:
@@ -245,7 +245,7 @@ class Aufbau:
 
     def blattziele(self) -> List[str]:
         """Die Blätter zuletzt -- sie lesen Werte der Platten, nie umgekehrt."""
-        return [b.d_zeilen.id for b in self.blaetter.values()]
+        return [b.id for b in self.blaetter.values()]
 
     def berichtsziele(self) -> List[str]:
         """

@@ -1,6 +1,6 @@
 # Beispiel
 
-66 Berechnungen ausgeführt, 113 Werte bestimmt.
+66 Berechnungen ausgeführt, 110 Werte bestimmt.
 
 ## Herleitung
 
@@ -1590,7 +1590,6 @@ Alle geführten Nachweise sind erfüllt.
 | Flächenträgheitsmoment, Unterzug | $I_{\text{Q2}}$ | $5400$ | ·10⁶ mm⁴ | berechnet |
 | Dehnsteifigkeit, Unterzug, C30/37 | $EA_{\text{Q2}}$ | $6052$ | MN | berechnet |
 | Biegesteifigkeit, Unterzug, C30/37 | $EI_{\text{Q2}}$ | $181547$ | kNm² | berechnet |
-| Anzahl der Unbekannten | $n$ | $8$ |  | berechnet |
 | Bemessungswert des Elastizitätsmoduls | $E_{cd}$ | $33620$ | N/mm² | berechnet |
 | Mittelwert des Elastizitätsmoduls | $E_{cm}$ | $33620$ | N/mm² | berechnet |
 | Dehnung am Ende des ansteigenden Astes | $\varepsilon_{c1d}$ | $2$ | ‰ | Vorgabe |

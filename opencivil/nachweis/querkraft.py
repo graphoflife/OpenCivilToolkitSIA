@@ -371,6 +371,13 @@ class Querkraftbefund:
     index: str = "Rd"
     """Wie der Momentenwiderstand heisst -- ``Rd``, oder ``Rk`` mit charakteristischen Werten."""
 
+    ohne_einwirkung: Optional["Querkraftergebnis"] = None
+    """
+    Mit Buegeln und ohne Lastfall: der Ast ueber der Neigung bei M = 0 und
+    N = 0, damit das Bild auch ohne Fall dasteht. Kein Fall des Nachweises --
+    ohne Ausgabe, Urteil und Herleitung.
+    """
+
     def kurve(self, N_Ed: float) -> dict:
         """
         Der Querkraftwiderstand ueber dem Moment, bei festgehaltener Normalkraft.
@@ -471,13 +478,12 @@ class Querkraftfall:
         return kennung_aus(self.name)
 
 
-#: Der Fall eines Querkraftnachweises ohne Querkraft: er rechnet still, nur
-#: fuer das Diagramm -- die M-V-Kurve und der Verlauf ueber die Neigung
-#: brauchen die Beiwerte, die erst im Lauf entstehen. Ohne Einwirkung kein
-#: Urteil, kein Punkt im Bild und keine Zeile in der Werteliste; M = 0 misst
-#: d fuer das positive Moment.
-NUR_KURVE = Querkraftfall(name="ohne Einwirkung", V_Ed=Groesse(0.0, KN_PRO_M),
-                          M_Ed=Groesse(0.0, KNM), N_Ed=Groesse(0.0, KN))
+
+
+#: Was der Nachweis mit Buegeln ohne Lastfall rechnet, nur fuer sein Bild
+#: (siehe :attr:`Querkraftbefund.ohne_einwirkung`).
+OHNE_EINWIRKUNG = Querkraftfall(name="ohne Einwirkung", V_Ed=Groesse(0.0, KN_PRO_M),
+                                M_Ed=Groesse(0.0, KNM), N_Ed=Groesse(0.0, KN))
 
 
 @dataclass
@@ -561,8 +567,10 @@ class Querkraft(Nachweis):
                 f"keine Bewehrung.")
         self.querschnitt = querschnitt
         self.richtung = richtung
-        # Ohne Fall still und mit dem Nullfall -- siehe NUR_KURVE.
-        self.faelle = list(faelle) or [NUR_KURVE]
+        # Ohne Fall rechnet er still, nur fuer das Bild: die M-V-Kurve und
+        # der Verlauf ueber die Neigung brauchen die Beiwerte, die erst im Lauf
+        # entstehen. Er hat dann keine Ausgabe und ist Ziel unter seiner ID.
+        self.faelle = list(faelle)
 
         self.buegel = (querschnitt.querkraftbewehrung
                        if querschnitt.hat_buegel else None)
@@ -580,15 +588,12 @@ class Querkraft(Nachweis):
 
         r = richtung.value
         basis = f"{querschnitt.id}.nachweis.querkraft.{r}"
-        # Die Ausgaben des Nullfalls sind nur Ziel (siehe NUR_KURVE) -- keine
-        # Ergebnisse zum Nachschlagen, darum in keiner Werteliste.
         self.d_ausnutzung: Dict[str, WertDef] = {
             f.name: grad_def(
                 f"{basis}.{f.kennung}.erfuellungsgrad",
                 rf"\alpha_{{eff,V,{r},{als_text(f.name)}}}",
                 f"Erfüllungsgrad Querkraft {richtung.beschriftung} – {f.name}",
                 "SIA 262:2025, 4.3.3.2",
-                nur_ziel=f is NUR_KURVE,
             )
             for f in self.faelle
         }
@@ -600,7 +605,6 @@ class Querkraft(Nachweis):
                 beschreibung=f"Querkraftwiderstand {richtung.beschriftung} – {f.name}",
                 referenz="SIA 262:2025, 4.3.3.2.1",
                 stellen=1,
-                nur_ziel=f is NUR_KURVE,
             )
             for f in self.faelle
         }
@@ -625,12 +629,8 @@ class Querkraft(Nachweis):
             # damit die Abhaengigkeit im Graphen steht und die Rueckverfolgung sie
             # zeigt. Mit Buegeln geht er nicht ein; ihn trotzdem anzufordern
             # haenge eine Interpolation in die Herleitung, die dort nichts erklaert.
-            # Der Nullfall hat keine Kombination; ohne Normalkraft gilt der
-            # Eckwert M_Rd(N = 0).
             for f in self.faelle:
-                m_rd = (mn_nachweis.d_eckwerte["M_Rd_N0_pos"] if f == NUR_KURVE
-                        else mn_nachweis.d_m_rd[f.name])
-                bezuege.append(Eingabebezug(f"m_Rd_{f.kennung}", m_rd.id))
+                bezuege.append(Eingabebezug(f"m_Rd_{f.kennung}", mn_nachweis.d_m_rd[f.name].id))
         else:
             # Die Reihenfolge der Eingaenge ist die Reihenfolge, in der der
             # Loeser sie beschafft -- und damit die Reihenfolge der Bloecke in
@@ -737,12 +737,6 @@ class Querkraft(Nachweis):
         ergebnis[self.d_v_rd[fall.name].id] = Groesse.aus_si(erg.v_Rd, KN_PRO_M)
         ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(
             erg.erfuellungsgrad, EINHEITSLOS)
-        # Der Nullfall ist nur das Ziel des Laufs. Ein Urteil von ihm meldete
-        # die Zusammenfassung als ausgeschalteten Mangel, sobald V_Rd = 0 ist
-        # (Zugseite ohne Bewehrung) -- ohne dass es eine Querkraft gibt.
-        if fall is NUR_KURVE:
-            return
-
         urteile.append(NachweisUrteil(
             art="V",
             ziel=self.d_ausnutzung[fall.name].id,
@@ -831,6 +825,10 @@ class Querkraft(Nachweis):
             befund.ergebnisse.append(erg)
             self._protokoll_fall_buegel(p, e, erg, teilung_y)
             self._eintragen(erg, ergebnis, urteile)
+        if not self.faelle:
+            befund.ohne_einwirkung = self._einen_fall_buegel(
+                OHNE_EINWIRKUNG, h=h, lagen=lagen, a_s=a_s, s_x=s_x, s_y=s_y,
+                f_yd=f_yd, f_cd=f_cd, k_c=k_c, ueber_teilung=ueber_teilung)
 
         return Ausfuehrung(ergebnis, urteile, befund)
 

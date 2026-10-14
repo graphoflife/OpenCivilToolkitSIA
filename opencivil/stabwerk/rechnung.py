@@ -28,10 +28,9 @@ unverformten System. Die Herleitung sagt es, das TODO fuehrt es.
 
 DAS ERGEBNIS:
 kommt als Befund in die Loesung (:class:`Systembefund`); Zusammenfassung,
-Bilder und Zwischenspeicher lesen es dort. Als Wert des Rechenwerks liefert
-die Prozedur nur die Zahl der Unbekannten -- die gibt es immer, auch bei
-einem beweglichen System. Das ist ein Ergebnis mit Meldung und keine
-Ausnahme: der Rest des Projekts rechnet weiter.
+Bilder und Zwischenspeicher lesen es dort. Einen Wert liefert die Prozedur
+nicht: sie ist Ziel unter ihrer ID. Ein bewegliches System ist ein Ergebnis
+mit Meldung und keine Ausnahme: der Rest des Projekts rechnet weiter.
 """
 
 from __future__ import annotations
@@ -42,7 +41,7 @@ from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 from opencivil.core.berechnung import (
     Ausfuehrung, Berechnung, Eingabebezug, Eingaben, Formel, Prozedur, Vorgabe,
 )
-from opencivil.core.einheiten import EINHEITSLOS, KNM2, MIO_MM4, MM, MM2, MN, Groesse
+from opencivil.core.einheiten import KNM2, MIO_MM4, MM, MM2, MN, Groesse
 from opencivil.core.latex import platzhalter_namen
 from opencivil.core.protokoll import Abschnitt, Protokoll
 from opencivil.core.wert import Quelle, WertDef
@@ -196,9 +195,8 @@ class Balkensystem:
                 teile.append(self.stoffe[m].name)
             self.steifigkeiten.append(self._steifigkeit(q, m, ",".join(teile)))
 
-        self.d_n = self._def("n", "n", EINHEITSLOS, "Anzahl der Unbekannten", 0)
         self.rechnung = SteifigkeitsmethodeProzedur(
-            self, id=f"{self.id}.rechnung", ausgaben=[self.d_n],
+            self, id=f"{self.id}.rechnung", ausgaben=[],
             bezuege=[Eingabebezug(f"{groesse}_{i}", getattr(s, groesse))
                      for i, s in enumerate(self.steifigkeiten) for groesse in ("EA", "EI")],
             titel="Steifigkeitsmethode", abschnitt=self.abschnitt())
@@ -293,7 +291,7 @@ class Balkensystem:
 
     def ziele(self) -> List[str]:
         """Was ein Lauf rechnen muss: jeder Querschnitt -- auch einer, den kein Stab nimmt -- und das System."""
-        return [i for paar in self.flaechen.values() for i in paar] + [self.d_n.id]
+        return [i for paar in self.flaechen.values() for i in paar] + [self.rechnung.id]
 
     # -- Rechnen ----------------------------------------------------------------
 
@@ -320,8 +318,7 @@ class Balkensystem:
             ergebnis.meldungen[:0] = self.meldungen
         befund = Systembefund(gerechnet, ergebnis)
         herleitung.schreiben(p, self, befund)
-        return Ausfuehrung({self.d_n.id: Groesse(len(ergebnis.unbekannte), EINHEITSLOS)},
-                           befund=befund)
+        return Ausfuehrung({}, befund=befund)
 
 
 def _derselbe(wert: Groesse) -> Groesse:

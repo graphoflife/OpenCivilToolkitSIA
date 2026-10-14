@@ -1,5 +1,5 @@
 ---
-erzeugt: 1af4b3c9b481
+erzeugt: 36815ad47378
 art: modul
 tags: [modul]
 ---
@@ -186,6 +186,11 @@ Basisklasse aller Rechenschritte.
 
 Unterklassen implementieren [[opencivil.core.berechnung#Berechnung.rechne|rechne]]. Aufgerufen wird immer
 [[opencivil.core.berechnung#Berechnung.ausfuehren|ausfuehren]], das die Ergebnisse prueft und in [[opencivil.core.wert#Wert|Wert]] verpackt.
+
+Eine Berechnung darf ohne Ausgabe sein -- ein Nachweis ohne Lastfall, ein
+Balkensystem: was sie findet, steht dann allein in ihrem Befund. Zum
+Rechnen nennt man sie unter ihrer ID als Ziel (siehe
+[[opencivil.core.rechenwerk#Rechenwerk.loese|loese]]).
 
 - `THEMA: str = ''` – Unter welchem Thema ihre Formeln in der Formelsammlung stehen -- ein Nachweis nennt sich selbst. Leer: das Thema ihres Abschnitts.
 
@@ -392,14 +397,14 @@ class Nulllinienlage(Prozedur):
 ### grad_def
 
 ```python
-def grad_def(id: str, symbol: str, beschreibung: str, referenz: str='', *, nur_ziel: bool=False) -> WertDef
+def grad_def(id: str, symbol: str, beschreibung: str, referenz: str='') -> WertDef
 ```
 
 Die Definition eines Erfuellungsgrads -- fuer jeden Nachweis dieselbe.
 
 Frueher legte jeder Nachweis seine eigene an, mit eigener Stellenzahl, und
 die Werttabelle rundete an [[opencivil.core.wert#grad_als_text|grad_als_text]] vorbei: dort stand 0.996
-als «1», neben «nicht erfuellt». Zu `nur_ziel` siehe [[opencivil.core.wert#WertDef|WertDef]].
+als «1», neben «nicht erfuellt».
 
 ### grad_formel
 

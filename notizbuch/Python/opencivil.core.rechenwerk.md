@@ -1,5 +1,5 @@
 ---
-erzeugt: d27d078db438
+erzeugt: 36bf73c952ee
 art: modul
 tags: [modul]
 ---
@@ -20,6 +20,10 @@ Eingabe, die dafuer fehlt -- samt der Kette, ueber die sie gebraucht wird.
 **Vorwaerts** -- "Was laesst sich mit dem, was ich habe, ueberhaupt rechnen?"
 [[opencivil.core.rechenwerk#Rechenwerk.loese_alles|Rechenwerk.loese_alles]] berechnet alles Erreichbare und listet fuer
 den Rest auf, woran es scheitert.
+
+Ein Ziel ist ein Wert -- oder eine Berechnung unter ihrer ID. Dann laeuft
+sie, auch wenn sie keine Ausgabe hat: ein Nachweis ohne Lastfall, ein
+Balkensystem. Was sie findet, steht in ihrem Befund.
 
 
 ## AUFLOESEN UND RECHNEN GESCHEHEN GEMEINSAM
@@ -328,7 +332,8 @@ Alle Berechnungen, die diesen Wert liefern koennen (Varianten).
 def moegliche_ziele(self) -> Tuple[str, ...]
 ```
 
-Alle Werte, die ueberhaupt berechenbar waeren.
+Alle Werte, die ueberhaupt berechenbar waeren -- und die Berechnungen
+ohne Ausgabe, nach denen sonst kein Wert fragte.
 
 #### Rechenwerk.loese
 
@@ -337,6 +342,11 @@ def loese(self, *ziele: str, bekannt: Optional[Mapping[str, Wert]]=None, ohne_he
 ```
 
 Berechnet die angegebenen Ziele und alles, was dafuer noetig ist.
+
+Ein Ziel ist die ID eines Werts oder einer Berechnung. Eine Berechnung
+laeuft dann als Ganzes, einmal -- auch ohne Ausgabe, wie ein Nachweis
+ohne Lastfall. Eine Formel traegt die ID ihres Ergebnisses; dort ist
+der Wert gemeint, was auf dasselbe hinauslaeuft.
 
 Nicht mehr: Werte, die kein Ziel braucht, werden nicht angefasst.
 Laesst sich ein Ziel nicht aufloesen, bricht der Lauf nicht ab -- das
@@ -383,10 +393,24 @@ die Quere kommen.
 #### _Lauf.ziel
 
 ```python
-def ziel(self, ziel: str) -> Optional[Wert]
+def ziel(self, ziel: str) -> None
 ```
 
-Loest ein angefordertes Ziel auf und merkt es sich als solches.
+Loest ein angefordertes Ziel auf -- Wert oder Berechnung -- und merkt es sich.
+
+#### _Lauf.rechnen
+
+```python
+def rechnen(self, berechnung_id: str, pfad: Tuple[str, ...]) -> bool
+```
+
+Eine Berechnung als Ganzes, einmal je Lauf -- ob sie Ausgaben hat oder
+nicht. `False`, wenn ihr Eingaben fehlen oder sie nicht anwendbar
+ist; der Grund steht dann unter ihrer ID.
+
+Brachte der Aufrufer ihre Ausgaben schon mit, lief sie in einem
+frueheren Lauf: dann gilt sie als gerechnet, wie ein mitgebrachter
+Wert.
 
 #### _Lauf.aufloesen
 

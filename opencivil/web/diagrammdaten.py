@@ -22,7 +22,6 @@ from opencivil.core.berechnung import grad_als_text
 from opencivil.core.einheiten import KN, KNM, KN_PRO_M
 from opencivil.core.rechenwerk import Loesung
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL, Spannungsblock
-from opencivil.nachweis.querkraft import NUR_KURVE
 from opencivil.nachweis.resistenzlinie import Handlinie
 from opencivil.nachweis.schubwandnachweis import Schubbefund
 from opencivil.projekt import Aufbau
@@ -64,19 +63,19 @@ def querkraftkurven(
 
     for kennung, nachweis in aufbau.querkraft.items():
         befund = loesung.befunde.get(nachweis.id)
-        if befund is None or not befund.ergebnisse:
-            continue
         # Mit Buegeln haengt der Widerstand nicht mehr am Moment, sondern an
         # der Neigung der Druckdiagonalen. Dann steht dort das andere Bild --
         # siehe neigungskurven().
-        if nachweis.buegel is not None:
+        if befund is None or nachweis.buegel is not None:
             continue
         querschnitt_kennung = kennung.split(".", 1)[0]
         querschnitt = aufbau.querschnitte.get(querschnitt_kennung)
 
         n_ed = gewaehlt.get(kennung)
         if n_ed is None:
-            n_ed = befund.ergebnisse[0].fall.N_Ed.in_einheit(KN)
+            # Die Normalkraft des ersten Falls -- ohne Fall N = 0.
+            n_ed = (befund.ergebnisse[0].fall.N_Ed.in_einheit(KN)
+                    if befund.ergebnisse else 0.0)
         kurve = befund.kurve(n_ed * 1e3)
 
         kurven[kennung] = {
@@ -104,7 +103,6 @@ def querkraftkurven(
             # Moment vorzeichenbehaftet -- der Fall gehoert auf die Seite, auf
             # der er wirkt. Die Querkraft dagegen als Betrag: ihr Vorzeichen
             # spielt keine Rolle, gerechnet wird ohnehin mit |V_Ed|.
-            # Der Nullfall ist keine Einwirkung und kein Punkt im Bild.
             "faelle": [
                 {
                     "name": erg.fall.name,
@@ -116,7 +114,7 @@ def querkraftkurven(
                     "plastisch": erg.plastisch,
                     "begruendung": erg.begruendung,
                 }
-                for erg in befund.ergebnisse if erg.fall is not NUR_KURVE
+                for erg in befund.ergebnisse
             ],
         }
     return kurven
@@ -150,16 +148,17 @@ def neigungskurven(aufbau: Aufbau, loesung: Loesung) -> dict:
 
     for kennung, nachweis in aufbau.querkraft.items():
         befund = loesung.befunde.get(nachweis.id)
-        if nachweis.buegel is None or befund is None or not befund.ergebnisse:
+        if nachweis.buegel is None or befund is None:
             continue
         querschnitt_kennung = kennung.split(".", 1)[0]
         querschnitt = aufbau.querschnitte.get(querschnitt_kennung)
 
         # Nach (statischer Hoehe, Grenzen) gruppieren -- in dieser Reihenfolge
         # gefunden, damit die Bilder in der Reihenfolge der Faelle stehen.
+        # Ohne Fall der Ast ohne Einwirkung: ein Bild ohne Punkt darauf.
         gruppen: Dict[tuple, List[Any]] = {}
-        for erg in befund.ergebnisse:
-            if erg.massgebend is None:
+        for erg in befund.ergebnisse or [befund.ohne_einwirkung]:
+            if erg is None or erg.massgebend is None:
                 continue
             gruppen.setdefault(
                 (round(erg.d, 9), erg.alpha_min, erg.alpha_max), []).append(erg)
@@ -194,7 +193,7 @@ def neigungskurven(aufbau: Aufbau, loesung: Loesung) -> dict:
                         "erfuellt": erg.erfuellt,
                         "begruendung": erg.begruendung,
                     }
-                    for erg in gruppe if erg.fall is not NUR_KURVE
+                    for erg in gruppe if erg is not befund.ohne_einwirkung
                 ],
             }
     return kurven

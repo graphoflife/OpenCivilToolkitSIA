@@ -196,6 +196,11 @@ class Berechnung(ABC):
 
     Unterklassen implementieren :meth:`rechne`. Aufgerufen wird immer
     :meth:`ausfuehren`, das die Ergebnisse prueft und in :class:`Wert` verpackt.
+
+    Eine Berechnung darf ohne Ausgabe sein -- ein Nachweis ohne Lastfall, ein
+    Balkensystem: was sie findet, steht dann allein in ihrem Befund. Zum
+    Rechnen nennt man sie unter ihrer ID als Ziel (siehe
+    :meth:`~opencivil.core.rechenwerk.Rechenwerk.loese`).
     """
 
     THEMA: str = ""
@@ -221,8 +226,6 @@ class Berechnung(ABC):
         abschnitt: Optional[Abschnitt] = None,
         befunde: Sequence[Befundbezug] = (),
     ) -> None:
-        if not ausgaben:
-            raise ValueError(f"Berechnung '{id}' liefert keine Ausgaben.")
         self.id = id
         self.ausgaben: Tuple[WertDef, ...] = tuple(ausgaben)
         self.bezuege: Tuple[Eingabebezug, ...] = tuple(bezuege)
@@ -595,18 +598,17 @@ class Prozedur(Berechnung):
 # ===========================================================================
 
 
-def grad_def(id: str, symbol: str, beschreibung: str, referenz: str = "", *,
-             nur_ziel: bool = False) -> WertDef:
+def grad_def(id: str, symbol: str, beschreibung: str, referenz: str = "") -> WertDef:
     """
     Die Definition eines Erfuellungsgrads -- fuer jeden Nachweis dieselbe.
 
     Frueher legte jeder Nachweis seine eigene an, mit eigener Stellenzahl, und
     die Werttabelle rundete an :func:`grad_als_text` vorbei: dort stand 0.996
-    als «1», neben «nicht erfuellt». Zu ``nur_ziel`` siehe :class:`WertDef`.
+    als «1», neben «nicht erfuellt».
     """
     return WertDef(id=id, symbol=symbol, einheit=EINHEITSLOS,
                    beschreibung=beschreibung, referenz=referenz,
-                   erfuellungsgrad=True, nur_ziel=nur_ziel)
+                   erfuellungsgrad=True)
 
 
 def grad_formel(

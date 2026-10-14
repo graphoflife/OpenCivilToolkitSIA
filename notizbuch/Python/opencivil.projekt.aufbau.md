@@ -1,5 +1,5 @@
 ---
-erzeugt: 6491c437fcfa
+erzeugt: 0c3b6b563995
 art: modul
 tags: [modul]
 ---
@@ -76,6 +76,8 @@ Jeden Nachweis einmal, in derselben Reihenfolge wie im Protokoll.
 ```python
 def alle_nachweisziele(self) -> List[str]
 ```
+
+Jeden Nachweis als Ziel -- auch einen ohne Lastfall, der nur fuer sein Bild rechnet.
 
 #### Aufbau.gehoert_zu
 

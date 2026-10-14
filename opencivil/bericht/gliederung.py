@@ -131,8 +131,6 @@ def _werte(p: Protokoll, loesung: Loesung) -> None:
     zeilen = []
     for wert_id in sorted(loesung.werte):
         wert = loesung.werte[wert_id]
-        if wert.definition.nur_ziel:
-            continue
         einheit = (wert.einheit.beschriftung
                    if wert.einheit.name not in ("", "-") else "")
         zeilen.append([wert.beschreibung or wert_id, Mathe(wert.symbol),

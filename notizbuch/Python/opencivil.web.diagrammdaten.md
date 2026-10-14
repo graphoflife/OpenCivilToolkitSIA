@@ -1,5 +1,5 @@
 ---
-erzeugt: 8ab2e231fc9f
+erzeugt: 1345b72e9c42
 art: modul
 tags: [modul]
 ---
@@ -323,7 +323,6 @@ gewaehlt hat. Ohne Verteilung (keine Wand, keine Last) nichts.
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.rechenwerk]]
-- [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.projekt]]

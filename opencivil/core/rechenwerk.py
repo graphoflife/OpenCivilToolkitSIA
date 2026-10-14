@@ -14,6 +14,10 @@ Es beantwortet die beiden Fragen, um die es in diesem Werkzeug geht:
     :meth:`Rechenwerk.loese_alles` berechnet alles Erreichbare und listet fuer
     den Rest auf, woran es scheitert.
 
+Ein Ziel ist ein Wert -- oder eine Berechnung unter ihrer ID. Dann laeuft
+sie, auch wenn sie keine Ausgabe hat: ein Nachweis ohne Lastfall, ein
+Balkensystem. Was sie findet, steht in ihrem Befund.
+
 AUFLOESEN UND RECHNEN GESCHEHEN GEMEINSAM.
 Welche Formelvariante gilt, kann von den Zahlenwerten abhaengen (siehe
 ``Berechnung.anwendbar``). Ein rein struktureller Plan koennte das nicht
@@ -379,8 +383,12 @@ class Rechenwerk:
         return tuple(self._nach_ausgabe.get(wert_id, ()))
 
     def moegliche_ziele(self) -> Tuple[str, ...]:
-        """Alle Werte, die ueberhaupt berechenbar waeren."""
-        return tuple(sorted(self._nach_ausgabe))
+        """
+        Alle Werte, die ueberhaupt berechenbar waeren -- und die Berechnungen
+        ohne Ausgabe, nach denen sonst kein Wert fragte.
+        """
+        return (tuple(sorted(self._nach_ausgabe))
+                + tuple(sorted(b.id for b in self._berechnungen.values() if not b.ausgaben)))
 
     # -- Aufloesen ----------------------------------------------------------
 
@@ -389,6 +397,11 @@ class Rechenwerk:
               ohne_herleitung: bool = False) -> Loesung:
         """
         Berechnet die angegebenen Ziele und alles, was dafuer noetig ist.
+
+        Ein Ziel ist die ID eines Werts oder einer Berechnung. Eine Berechnung
+        laeuft dann als Ganzes, einmal -- auch ohne Ausgabe, wie ein Nachweis
+        ohne Lastfall. Eine Formel traegt die ID ihres Ergebnisses; dort ist
+        der Wert gemeint, was auf dasselbe hinauslaeuft.
 
         Nicht mehr: Werte, die kein Ziel braucht, werden nicht angefasst.
         Laesst sich ein Ziel nicht aufloesen, bricht der Lauf nicht ab -- das
@@ -461,16 +474,61 @@ class _Lauf:
         self._stapel: List[str] = []
         self._gescheitert: Dict[str, NichtBerechenbar] = {}
         self._ziele: List[str] = []
+        self._laufend: List[str] = []
+        """Die Berechnungen, die gerade ihre Eingaben sammeln -- gegen Kreise ueber Befunde."""
         self._abschnitt = ""
         """Welche Ueberschrift zuletzt gesetzt wurde -- siehe ausfuehren()."""
 
     # -- Kern ---------------------------------------------------------------
 
-    def ziel(self, ziel: str) -> Optional[Wert]:
-        """Loest ein angefordertes Ziel auf und merkt es sich als solches."""
+    def ziel(self, ziel: str) -> None:
+        """Loest ein angefordertes Ziel auf -- Wert oder Berechnung -- und merkt es sich."""
         if ziel not in self._ziele:
             self._ziele.append(ziel)
-        return self.aufloesen(ziel, pfad=())
+        if ziel in self.werk._berechnungen and ziel not in self.werk._nach_ausgabe:
+            self.rechnen(ziel, pfad=())
+        else:
+            self.aufloesen(ziel, pfad=())
+
+    def rechnen(self, berechnung_id: str, pfad: Tuple[str, ...]) -> bool:
+        """
+        Eine Berechnung als Ganzes, einmal je Lauf -- ob sie Ausgaben hat oder
+        nicht. ``False``, wenn ihr Eingaben fehlen oder sie nicht anwendbar
+        ist; der Grund steht dann unter ihrer ID.
+
+        Brachte der Aufrufer ihre Ausgaben schon mit, lief sie in einem
+        frueheren Lauf: dann gilt sie als gerechnet, wie ein mitgebrachter
+        Wert.
+        """
+        berechnung = self.werk._berechnungen[berechnung_id]
+        if berechnung_id in self.loesung.reihenfolge:
+            return True
+        if berechnung.ausgaben and all(a.id in self._bekannt for a in berechnung.ausgaben):
+            return True
+        if berechnung_id in self._gescheitert:
+            return False
+        if berechnung_id in self._laufend:
+            kreis = " -> ".join(self._laufend[self._laufend.index(berechnung_id):]
+                                + [berechnung_id])
+            raise ZyklusFehler(f"Kreisbezug im Rechengraphen: {kreis}")
+
+        self._laufend.append(berechnung_id)
+        try:
+            eingaben, fehlend = self._eingaben_sammeln(berechnung, pfad + (berechnung_id,))
+        finally:
+            self._laufend.pop()
+        if fehlend:
+            self._gescheitert[berechnung_id] = NichtBerechenbar(
+                ziel=berechnung_id, fehlende=fehlend)
+            return False
+        anwendbar, grund = berechnung.anwendbar(eingaben)
+        if not anwendbar:
+            self._gescheitert[berechnung_id] = NichtBerechenbar(
+                ziel=berechnung_id,
+                verworfene_varianten=[(berechnung_id, grund or "nicht anwendbar")])
+            return False
+        self._ausfuehren(berechnung, eingaben, grund, echte_wahl=False)
+        return True
 
     def aufloesen(self, ziel: str, pfad: Tuple[str, ...]) -> Optional[Wert]:
         """Liefert den Wert oder None, wenn er nicht beschaffbar ist."""
@@ -567,23 +625,20 @@ class _Lauf:
 
         befunde: Dict[str, Any] = {}
         for bezug in berechnung.befundbezuege:
-            quelle = self.werk._berechnungen.get(bezug.berechnung_id)
-            if quelle is None:
+            if bezug.berechnung_id not in self.werk._berechnungen:
                 raise RechenwerkFehler(
                     f"'{berechnung.id}' liest den Befund von '{bezug.berechnung_id}', "
                     f"die es im Rechenwerk nicht gibt.")
-            # Gerechnet wird sie wie jede andere: ueber eine ihrer Ausgaben.
-            if bezug.berechnung_id not in self.loesung.befunde:
-                if self.aufloesen(quelle.ausgaben[0].id, pfad) is None:
-                    fehlend.append(FehlendeEingabe(
-                        id=quelle.ausgaben[0].id, benoetigt_von=berechnung.id, pfad=pfad,
-                        definition=quelle.ausgaben[0]))
-                    continue
+            if not self.rechnen(bezug.berechnung_id, pfad):
+                # Woran sie scheitert, findet abschliessen() unter ihrer ID.
+                fehlend.append(FehlendeEingabe(
+                    id=bezug.berechnung_id, benoetigt_von=berechnung.id, pfad=pfad))
+                continue
             if bezug.berechnung_id not in self.loesung.befunde:
                 raise RechenwerkFehler(
                     f"'{berechnung.id}' liest den Befund von '{bezug.berechnung_id}', "
-                    f"die in diesem Lauf nicht gerechnet hat -- ihre Ausgaben waren "
-                    f"schon bekannt oder von Hand gesetzt.")
+                    f"die in diesem Lauf keinen hinterlassen hat -- ihre Ausgaben "
+                    f"waren schon bekannt, oder sie haelt keinen fest.")
             befunde[bezug.name] = self.loesung.befunde[bezug.berechnung_id]
         return Eingaben(gesammelt, befunde), fehlend
 
@@ -688,7 +743,8 @@ class _Lauf:
         for ziel in self._ziele:
             # Ein Ziel kann anfangs scheitern und spaeter doch entstehen --
             # als Nebenausgabe einer Berechnung, die fuer ein anderes lief.
-            if ziel in self.loesung.werte or ziel in self._bekannt:
+            if (ziel in self.loesung.werte or ziel in self._bekannt
+                    or ziel in self.loesung.reihenfolge):
                 continue
             scheitern = self._gescheitert.get(ziel)
             if scheitern is None:

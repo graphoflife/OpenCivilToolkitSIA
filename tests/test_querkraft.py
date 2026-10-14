@@ -240,10 +240,10 @@ class TestQuerkraft(unittest.TestCase):
                 nachweis = aufbau.querkraft["q1.x"]
                 self.assertTrue(nachweis.still)
                 self.assertFalse([u for u in loesung.gefuehrte_urteile if u.art == "V"])
-                # Nur Ziel, damit die Kurve entsteht: in keiner Werteliste.
-                nullfall = querkraft.NUR_KURVE.name
-                self.assertTrue(nachweis.d_ausnutzung[nullfall].nur_ziel)
-                self.assertTrue(nachweis.d_v_rd[nullfall].nur_ziel)
+                # Ohne Fall keine Ausgabe: gerechnet wird er als Ziel unter
+                # seiner ID, fuer den Befund, aus dem die Kurve kommt.
+                self.assertEqual(nachweis.ausgaben, ())
+                self.assertIn(nachweis.id, loesung.befunde)
                 kurven = bild(aufbau, loesung)
                 self.assertTrue(kurven)
                 self.assertTrue(all(k["faelle"] == [] for k in kurven.values()))

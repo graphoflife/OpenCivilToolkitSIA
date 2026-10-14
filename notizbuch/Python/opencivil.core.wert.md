@@ -1,5 +1,5 @@
 ---
-erzeugt: 99ec236b7f76
+erzeugt: d265eb6fad5b
 art: modul
 tags: [modul]
 ---
@@ -118,7 +118,6 @@ Unveraenderlich, damit Definitionen gefahrlos geteilt werden koennen.
 - `referenz: str = ''` – Normstelle, z.B. 'SIA 262:2025, 2.4.2.3'.
 - `stellen: int = 2` – Nachkommastellen fuer die Darstellung.
 - `erfuellungsgrad: bool = False` – Ein Erfuellungsgrad: gesetzt nach [[opencivil.core.wert#grad_als_text|grad_als_text]] statt mit `stellen` -- in Herleitung, Werttabelle und Oberflaeche derselbe Text.
-- `nur_ziel: bool = False` – Nur da, damit das Rechenwerk etwas zu rechnen hat -- kein Ergebnis zum Nachschlagen, darum in keiner Werteliste. So das Ziel eines Blatts: seine Ergebnisse sind die Zeilen, das Ziel zaehlt sie bloss.
 
 #### WertDef.kurzname
 

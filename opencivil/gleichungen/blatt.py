@@ -18,8 +18,8 @@ Werteliste des Berichts: ``gleichungen.g1.z003`` heisst «Name, Zeile 3».
 Was neben jeder Zeile steht -- Ergebnis oder Fehler --, ist der Befund des
 Blatts: je Zeile ein :class:`Zeilenergebnis`.
 Vorab erklaeren kann das Blatt diese Werte nicht -- welche Zeilen aufgehen
-und in welcher Einheit, steht erst nach dem Rechnen fest. Erklaert ist nur
-das Ziel, die Zahl der aufgegangenen Zeilen; es steht in keiner Werteliste.
+und in welcher Einheit, steht erst nach dem Rechnen fest. Ziel ist darum das
+Blatt selbst, unter seiner ID.
 """
 
 from __future__ import annotations
@@ -28,10 +28,9 @@ from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, Dict, List, Optional
 
 from opencivil.core.berechnung import Ausfuehrung, Eingabebezug, Eingaben, Prozedur
-from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import einsetzen_symbolisch
 from opencivil.core.protokoll import Abschnitt, Protokoll, Zwischenwerte
-from opencivil.core.wert import Wert, WertDef
+from opencivil.core.wert import Wert
 from opencivil.gleichungen.ausdruck import (
     AusdruckFehler, Name, anzeigeeinheit, einheit_aus_text, lesen, namen,
     rechnen, setzen, stellen,
@@ -71,14 +70,9 @@ class Gleichungsblatt(Prozedur):
     def __init__(self, eintrag: GleichungsblattEintrag) -> None:
         self.eintrag = eintrag
         basis = f"gleichungen.{eintrag.kennung}"
-        # Ein Ziel braucht jede Berechnung; ein Blatt hat keines, das jemand
-        # anderes liest. Also die Zahl der aufgegangenen Zeilen -- nur Ziel.
-        self.d_zeilen = WertDef(id=f"{basis}.zeilen", symbol="n", einheit=EINHEITSLOS,
-                                beschreibung=f"Zeilen ohne Fehler – {eintrag.name}",
-                                stellen=0, nur_ziel=True)
         titel = f"Analytische Gleichungen – {eintrag.name}"
         super().__init__(
-            basis, ausgaben=[self.d_zeilen],
+            basis, ausgaben=[],
             # Optional: ein Projektwert, den es nicht mehr gibt, ist ein
             # Fehler seiner Zeile und kein Grund, das Blatt nicht zu rechnen.
             bezuege=[Eingabebezug(f"p{i}", z.wert_id, optional=True)
@@ -116,8 +110,7 @@ class Gleichungsblatt(Prozedur):
                     werte.pop(erg.name, None)
                     fehlerhaft[erg.name] = nummer
             zeilen.append(erg)
-        return Ausfuehrung({self.d_zeilen.id: Groesse(sum(not r.fehler for r in zeilen))},
-                           befund=zeilen)
+        return Ausfuehrung({}, befund=zeilen)
 
     def ausfuehren(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
         """

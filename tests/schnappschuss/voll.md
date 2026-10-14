@@ -1,6 +1,6 @@
 # Voll
 
-229 Berechnungen ausgeführt, 421 Werte bestimmt.
+229 Berechnungen ausgeführt, 418 Werte bestimmt.
 
 ## Herleitung
 
@@ -6730,14 +6730,12 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Flächenträgheitsmoment, Von Hand | $I_{\text{Q8}}$ | $120$ | ·10⁶ mm⁴ | Eingabe |
 | Querschnittsfläche, Deckenstreifen | $A_{\text{Q9}}$ | $300000$ | mm² | berechnet |
 | Flächenträgheitsmoment, Deckenstreifen | $I_{\text{Q9}}$ | $2250$ | ·10⁶ mm⁴ | berechnet |
-| Anzahl der Unbekannten | $n$ | $39$ |  | berechnet |
 | Querschnittsfläche, Rechteck | $A$ | $180000$ | mm² | berechnet |
 | Flächenträgheitsmoment, Rechteck | $I$ | $5400$ | ·10⁶ mm⁴ | berechnet |
 | Breite, Rechteck | $b$ | $300$ | mm | Vorgabe |
 | Dehnsteifigkeit, Rechteck, C30/37 | $EA$ | $6052$ | MN | berechnet |
 | Biegesteifigkeit, Rechteck, C30/37 | $EI$ | $181547$ | kNm² | berechnet |
 | Höhe, Rechteck | $h$ | $600$ | mm | Vorgabe |
-| Anzahl der Unbekannten | $n$ | $4$ |  | berechnet |
 | Bemessungswert des Elastizitätsmoduls | $E_{cd}$ | $33620$ | N/mm² | berechnet |
 | Mittelwert des Elastizitätsmoduls | $E_{cm}$ | $33620$ | N/mm² | berechnet |
 | Dehnung am Ende des ansteigenden Astes | $\varepsilon_{c1d}$ | $2$ | ‰ | Vorgabe |
