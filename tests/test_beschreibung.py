@@ -836,10 +836,12 @@ class TestNachweisfelder(unittest.TestCase):
         """Sonst käme ein Ergebnis beim Zwischenspeichern doppelt oder gar nicht -- auch ein System."""
         aufbau = self.aufbau()
         je_bauteil = [z for b in aufbau.bauteile() for z in aufbau.ziele_von(b.kennung)]
-        self.assertTrue(aufbau.systemziele())
-        self.assertEqual(sorted(je_bauteil),
-                         sorted(aufbau.eckwertziele() + aufbau.alle_nachweisziele()
-                                + aufbau.systemziele()))
+        systeme = [z for b in aufbau.bauteile() for z in b.weitere_ziele]
+        self.assertTrue(systeme)
+        self.assertEqual(sorted(je_bauteil), sorted(aufbau.alle_nachweisziele() + systeme))
+        for b in aufbau.bauteile():
+            for _, nachweis in b.nachweise:
+                self.assertIs(aufbau.bauteil_von(nachweis), b)
 
 
 class TestAusgeschaltetHeisstStill(unittest.TestCase):

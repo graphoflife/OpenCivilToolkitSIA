@@ -12,14 +12,21 @@ Die Beschreibung selbst rechnet nichts; hier wird sie zum ersten Mal
 Rechnung. Darum stehen auch die Pruefungen hier, die erst beim Bauen
 auffallen koennen -- ein Verweis auf ein geloeschtes Material, eine Platte
 ohne Bewehrung.
+
+DIE BAUTEILARTEN:
+Platte, Querschnittsanalyse und Balkensystem haben je einen Steckbrief
+(:class:`Bauteilart`) in :data:`BAUTEILE` -- Liste in der Datei, Klasse der
+Eintraege, Vorsilbe der Kennungen, Namensraum, Baufunktion. Wer alle
+Bauteile durchgeht, geht diese Liste durch; eine neue Art kommt dort dazu
+und nirgends sonst. Gebaut wird je Eintrag ein :class:`Bauteil`, das seine
+Nachweise, Ziele und Bezuege selbst fuehrt.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import (
-    TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Mapping, Optional,
-    Sequence, Tuple,
+    TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Mapping, Sequence, Tuple,
 )
 
 from opencivil.core.einheiten import (
@@ -81,6 +88,12 @@ class Aufbau:
     """Was beim Zusammenbauen eines Projekts entsteht."""
 
     werk: Rechenwerk
+    schnell: bool = False
+    """Fuer die Bewehrungssuche gebaut -- siehe :func:`aufbauen`."""
+
+    teile: Dict[str, "Bauteil"] = field(default_factory=dict)
+    """Jedes Bauteil nach Kennung, in der Reihenfolge von :data:`BAUTEILE` und der Beschreibung."""
+
     baustoffe: Dict[str, Baustoff] = field(default_factory=dict)
     querschnitte: Dict[str, Plattenquerschnitt] = field(default_factory=dict)
     nachweise: Dict[str, BiegungNormalkraft] = field(default_factory=dict)
@@ -151,13 +164,11 @@ class Aufbau:
 
     warnungen: List[str] = field(default_factory=list)
 
-    #: Die Felder, in denen die Nachweise einer Platte stehen -- die eine
-    #: Stelle, an der ein neuer Nachweis eingetragen wird. Alle sind nach
-    #: Kennung geschluesselt (``q1`` oder ``q1.x``) und alle tragen Nachweise
-    #: mit ``d_ausnutzung``. Daraus ergeben sich Rechenziele, Aufteilen nach
-    #: Platte und Zwischenspeichern von selbst; frueher stand dieselbe Liste
-    #: viermal da, und wer einen Nachweis hinzufuegte, musste alle vier
-    #: finden.
+    #: Die Felder, in denen die Nachweise stehen -- die eine Stelle, an der
+    #: ein neuer Nachweis eingetragen wird. Alle sind nach Kennung
+    #: geschluesselt (``q1`` oder ``q1.x``) und alle tragen Nachweise mit
+    #: ``d_ausnutzung``. Ihre Reihenfolge ist die der Herleitung: in ihr
+    #: rechnet ein Bauteil seine Nachweise (:meth:`Bauteil.ziele`).
     NACHWEISFELDER = ("nachweise", "querkraft", "duktilitaet", "fehlende",
                       "rissnormalkraft", "sproede", "zwaengung_biegung",
                       "spannung_riss", "spannung", "knicken",
@@ -177,48 +188,61 @@ class Aufbau:
         """Jeden Nachweis als Ziel -- auch einen ohne Lastfall, der nur fuer sein Bild rechnet."""
         return [n.id for n in self.alle_nachweise()]
 
-    def gehoert_zu(self, schluessel: str, kennung: str) -> bool:
-        """Ob ein Feldschluessel (``q1`` oder ``q1.x``) zu dieser Platte gehoert."""
-        return schluessel == kennung or schluessel.startswith(f"{kennung}.")
-
-    def ziele_von(self, kennung: str) -> List[str]:
-        """Die Rechenziele eines einzelnen Bauteils -- Eckwerte und Nachweise, oder sein System."""
-        raeume = {w.id for _, eintraege in self.nachweise_je_feld()
-                  for s, w in eintraege.items() if self.gehoert_zu(s, kennung)}
-        return ([z for z in self.eckwertziele() if any(z.startswith(f"{r}.") for r in raeume)]
-                + [z for z in self.alle_nachweisziele() if z in raeume]
-                + self.systemziele(kennung))
-
-    def systemziele(self, kennung: Optional[str] = None) -> List[str]:
-        """Was die Balkensysteme rechnen -- alle, oder das eine mit dieser Kennung."""
-        return [z for k, s in self.balkensysteme.items() if kennung in (None, k)
-                for z in s.ziele()]
-
-    def eckwertziele(self) -> List[str]:
+    def eintragen(self, teil: "Bauteil", feld: str, schluessel: str,
+                  nachweis: Nachweis) -> None:
         """
-        Was ein Bauteil auch ohne Lastfall rechnet: die Eckwerte seines
-        M-N-Nachweises. Eine Analyse ohne Lastfall zeigt so trotzdem ihren
-        Querschnitt und ihre reine Normalkraft.
-        """
-        return [d.id for n in list(self.nachweise.values()) + list(self.qa_biegung.values())
-                for d in n.d_eckwerte.values()]
+        Einen Nachweis anmelden: im Rechenwerk, in seinem Feld und bei seinem
+        Bauteil -- ausser er ist ganz still, und es wird schnell gerechnet.
 
-    def bauteile(self) -> List["Bauteilkopf"]:
+        Den schnellen Weg nimmt nur die Bewehrungssuche, und die zaehlt
+        stille Urteile nicht (:func:`bewehrungssuche.bewerte`). Ein ganz
+        stiller Nachweis kann ihr Ergebnis also nicht aendern, er kostet
+        nur Zeit -- und bei der Stahlspannung, die immer mitlaeuft, ist
+        das der groessere Teil der ganzen Rechnung. Exakt und nicht
+        genaehert: gezaehlt wird dasselbe wie vorher.
+
+        Jeder Nachweis geht hier durch, auch die, die nie still sind -- ein
+        Weg zum Anmelden, nicht zwei.
         """
-        Jedes Bauteil, in der Reihenfolge der Beschreibung: erst die Platten,
-        dann die Querschnittsanalysen, dann die Balkensysteme -- sie lesen
-        Werte der beiden anderen.
+        if feld not in self.NACHWEISFELDER:
+            # Sonst waere der Nachweis angemeldet, aber kein Ziel: niemand
+            # rechnete ihn, und er fehlte in jeder Tabelle -- still.
+            raise ValueError(
+                f"'{feld}' steht nicht in Aufbau.NACHWEISFELDER. Ein Nachweis "
+                f"in diesem Feld waere kein Ziel und fehlte still.")
+        if self.schnell and nachweis.still:
+            return
+        self.werk.registriere(nachweis)
+        getattr(self, feld)[schluessel] = nachweis
+        teil.nachweise.append((feld, nachweis))
+
+    def bauteile(self) -> List["Bauteil"]:
+        """
+        Jedes Bauteil, in der Reihenfolge von :data:`BAUTEILE` und der
+        Beschreibung: erst die Platten, dann die Querschnittsanalysen, dann
+        die Balkensysteme -- sie lesen Werte der beiden anderen.
 
         Die eine Stelle, die diese Reihenfolge festlegt -- fuer die Rechenziele,
         den Zwischenspeicher und die Zusammenfassung.
         """
-        return ([Bauteilkopf(k, q.name, q.id, "platte")
-                 for k, q in self.querschnitte.items()]
-                + [Bauteilkopf(k, a.name, a.id, "querschnittsanalyse")
-                   for k, a in self.querschnittsanalysen.items()]
-                + [Bauteilkopf(k, s.name, s.id, "balkensystem", nachweise=False,
-                               bezuege=tuple(s.bezuege))
-                   for k, s in self.balkensysteme.items()])
+        return list(self.teile.values())
+
+    def bauteil(self, kennung: str) -> "Bauteil":
+        try:
+            return self.teile[kennung]
+        except KeyError:
+            raise ProjektFehler(f"Ein Bauteil '{kennung}' gibt es im Aufbau nicht.") from None
+
+    def bauteil_von(self, nachweis: Nachweis) -> "Bauteil":
+        """Das Bauteil, bei dem ein Nachweis angemeldet ist."""
+        for teil in self.teile.values():
+            if any(n is nachweis for _, n in teil.nachweise):
+                return teil
+        raise ProjektFehler(f"Der Nachweis '{nachweis.id}' gehoert zu keinem Bauteil.")
+
+    def ziele_von(self, kennung: str) -> List[str]:
+        """Die Rechenziele eines einzelnen Bauteils -- siehe :meth:`Bauteil.ziele`."""
+        return self.bauteil(kennung).ziele()
 
     def ziele_je_bauteil(self) -> List[Tuple[str, List[str]]]:
         """
@@ -249,23 +273,24 @@ class Aufbau:
 
     def berichtsziele(self) -> List[str]:
         """
-        Was im Bericht steht: Nachweise, Eckwerte, Systeme, Blätter -- ohne
-        die Baustoffkennwerte, die niemand braucht.
+        Was im Bericht steht: Nachweise, was die Bauteile sonst rechnen, Blätter
+        -- ohne die Baustoffkennwerte, die niemand braucht.
         """
-        return (self.alle_nachweisziele() + self.eckwertziele() + self.systemziele()
+        return (self.alle_nachweisziele()
+                + [z for teil in self.bauteile() for z in teil.weitere_ziele]
                 + self.blattziele())
 
     def urteile_von(self, kennung: str, urteile: Iterable[NachweisUrteil],
                     ) -> List[NachweisUrteil]:
         """
-        Die Urteile einer Platte -- erkannt am Namensraum ihres Nachweises.
+        Die Urteile eines Bauteils -- erkannt an den Nachweisen, die bei ihm
+        angemeldet sind.
 
         Nicht am Namen: den Anzeigetext zu zerlegen hat schon einmal die
         Nachweise mehrerer Platten in dieselbe Tabelle gepackt.
         """
-        raum = next(b.raum for b in self.bauteile() if b.kennung == kennung)
-        return [u for u in urteile
-                if u.raum == raum or u.raum.startswith(f"{raum}.")]
+        eigene = {n.id for _, n in self.bauteil(kennung).nachweise}
+        return [u for u in urteile if u.raum in eigene]
 
     def materialziele(self) -> List[str]:
         """
@@ -286,28 +311,45 @@ class Aufbau:
         return nach_art["beton"] + nach_art["betonstahl"]
 
 
-@dataclass(frozen=True)
-class Bauteilkopf:
-    """Was man von einem Bauteil wissen muss, um seine Teile zu finden."""
+@dataclass
+class Bauteil:
+    """
+    Ein gebautes Bauteil und was zu ihm gehoert. Wem ein Nachweis gehoert,
+    steht hier -- niemand muss es aus einer Kennung wie «q1.x» zurueckgewinnen.
+    """
 
     kennung: str
     name: str
-    raum: str
-    """Der Namensraum seiner Werte und Urteile."""
+    art: "Bauteilart"
+    objekt: Any
+    """Der Plattenquerschnitt, die Querschnittsanalyse oder das Balkensystem."""
 
-    art: str
-    """``platte``, ``querschnittsanalyse`` oder ``balkensystem``."""
+    nachweise: List[Tuple[str, Nachweis]] = field(default_factory=list)
+    """Feld im :class:`Aufbau` und Nachweis, angemeldet ueber :meth:`Aufbau.eintragen`."""
 
-    nachweise: bool = True
-    """Ob es Nachweise fuehrt -- ein Balkensystem rechnet nur, es urteilt nicht."""
+    weitere_ziele: List[str] = field(default_factory=list)
+    """Was es ausser seinen Nachweisen rechnet -- ein Balkensystem seine Querschnitte und sich."""
 
     bezuege: Tuple[str, ...] = ()
     """Die Bauteile, deren Werte es liest: Platten und Analysen, aus denen ein System Querschnitte nimmt."""
 
+    @property
+    def raum(self) -> str:
+        """Der Namensraum seiner Werte und Urteile."""
+        return self.objekt.id
 
-#: Wie ein fertig gebauter Nachweis angemeldet wird: Feld im
-#: :class:`Aufbau`, Schluessel darin, Nachweis.
-Eintragen = Callable[[str, str, Nachweis], None]
+    def im_feld(self, feld: str) -> List[Nachweis]:
+        """Seine Nachweise in einem Feld des :class:`Aufbau`, in der Folge der Anmeldung."""
+        return [n for f, n in self.nachweise if f == feld]
+
+    def ziele(self) -> List[str]:
+        """
+        Was ein Lauf fuer dieses Bauteil rechnet: die Nachweise in der Folge
+        von :attr:`Aufbau.NACHWEISFELDER`, dann die weiteren Ziele.
+        """
+        folge = {feld: i for i, feld in enumerate(Aufbau.NACHWEISFELDER)}
+        return ([n.id for _, n in sorted(self.nachweise, key=lambda e: folge[e[0]])]
+                + self.weitere_ziele)
 
 
 def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
@@ -326,33 +368,7 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
     """
     projekt.pruefen()
     werk = Rechenwerk()
-    aufbau = Aufbau(werk=werk)
-
-    def eintragen(feld: str, schluessel: str, nachweis: Nachweis) -> None:
-        """
-        Einen Nachweis anmelden -- ausser er ist ganz still, und es wird
-        schnell gerechnet.
-
-        Den schnellen Weg nimmt nur die Bewehrungssuche, und die zaehlt
-        stille Urteile nicht (:func:`bewehrungssuche.bewerte`). Ein ganz
-        stiller Nachweis kann ihr Ergebnis also nicht aendern, er kostet
-        nur Zeit -- und bei der Stahlspannung, die immer mitlaeuft, ist
-        das der groessere Teil der ganzen Rechnung. Exakt und nicht
-        genaehert: gezaehlt wird dasselbe wie vorher.
-
-        Jeder Nachweis geht hier durch, auch die, die nie still sind -- ein
-        Weg zum Anmelden, nicht zwei.
-        """
-        if feld not in Aufbau.NACHWEISFELDER:
-            # Sonst waere der Nachweis angemeldet, aber kein Ziel: niemand
-            # rechnete ihn, und er fehlte in jeder Tabelle -- still.
-            raise ValueError(
-                f"'{feld}' steht nicht in Aufbau.NACHWEISFELDER. Ein Nachweis "
-                f"in diesem Feld waere kein Ziel und fehlte still.")
-        if schnell and nachweis.still:
-            return
-        werk.registriere(nachweis)
-        getattr(aufbau, feld)[schluessel] = nachweis
+    aufbau = Aufbau(werk=werk, schnell=schnell)
 
     # Nur wenn mehrere Materialien derselben Art vorkommen, braucht es
     # Indizes an den Symbolen -- sonst waere f_{cd,C30/37} bloss Ballast.
@@ -363,17 +379,12 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
         index = eintrag.anzeigename if je_art[eintrag.art] > 1 else ""
         aufbau.baustoffe[eintrag.kennung] = _baustoff(eintrag, index)
 
-    for eintrag in projekt.querschnitte:
-        _platte(eintrag, aufbau, eintragen, schnell=schnell)
-
-    for eintrag in projekt.querschnittsanalysen:
-        _querschnittsanalyse(eintrag, aufbau, eintragen)
-
-    # Auch im schnellen Aufbau: die Formelsammlung entsteht aus ihm. Die
-    # Bewehrungssuche loest nur Nachweisziele, ein System kostet sie also
-    # nur das Anmelden.
-    for eintrag in projekt.balkensysteme:
-        _balkensystem(eintrag, aufbau)
+    # Auch im schnellen Aufbau jedes Bauteil: die Formelsammlung entsteht aus
+    # ihm. Die Bewehrungssuche loest nur Nachweisziele, ein System kostet sie
+    # also nur das Anmelden.
+    for art in BAUTEILE:
+        for eintrag in getattr(projekt, art.liste):
+            aufbau.teile[eintrag.kennung] = art.bauen(art, eintrag, aufbau)
 
     # Die Bewehrungssuche braucht keine Blätter -- sie liest nur Urteile.
     if not schnell:
@@ -389,8 +400,7 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
     return aufbau
 
 
-def _platte(eintrag: QuerschnittEintrag, aufbau: Aufbau, eintragen: Eintragen,
-            *, schnell: bool) -> None:
+def _platte(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bauteil:
     """
     Eine Platte: der Querschnitt und alle Nachweise, die an ihm haengen.
 
@@ -401,9 +411,11 @@ def _platte(eintrag: QuerschnittEintrag, aufbau: Aufbau, eintragen: Eintragen,
     Tabelle handelte von einer Richtung, fuer die niemand Schnittgroessen
     hatte.
     """
-    querschnitt = _querschnitt(eintrag, aufbau.baustoffe)
+    querschnitt = _querschnitt(eintrag, aufbau.baustoffe, praefix=f"{art.raum}.{eintrag.kennung}")
     aufbau.querschnitte[eintrag.kennung] = querschnitt
     querschnitt.ins_rechenwerk(aufbau.werk)
+    teil = Bauteil(eintrag.kennung, eintrag.name, art, querschnitt)
+    schnell = aufbau.schnell
 
     richtung = Richtung.X
     kennung_x = f"{eintrag.kennung}.x"
@@ -414,7 +426,7 @@ def _platte(eintrag: QuerschnittEintrag, aufbau: Aufbau, eintragen: Eintragen,
             # Ohne Bewehrung laesst sich hier nichts aufstellen. Der
             # Nachweis entfiel frueher stillschweigend; wer eine Einwirkung
             # angegeben hatte, fand sie nirgends wieder.
-            eintragen("fehlende", kennung_x, FehlendeBewehrung(
+            aufbau.eintragen(teil, "fehlende", kennung_x, FehlendeBewehrung(
                 querschnitt, richtung, _ausgefallene(aktiv, richtung)))
         if eintrag.knickfaelle:
             aufbau.warnungen.append(
@@ -431,13 +443,13 @@ def _platte(eintrag: QuerschnittEintrag, aufbau: Aufbau, eintragen: Eintragen,
             querschnitt, [_kombination(k) for k in aktiv], richtung,
             wahl=eintrag.tragsicherheit_wahl.wahl, mit_vergleich=not schnell,
             schritte=dehnungsfaecher.SCHRITTE_SUCHE if schnell else dehnungsfaecher.SCHRITTE)
-        eintragen("nachweise", kennung_x, nachweis)
+        aufbau.eintragen(teil, "nachweise", kennung_x, nachweis)
 
-        _lagennachweise(eintrag, querschnitt, richtung, nachweis, eintragen)
-        _spannungsnachweise(eintrag, querschnitt, richtung, eintragen)
+        _lagennachweise(eintrag, querschnitt, richtung, nachweis, aufbau, teil)
+        _spannungsnachweise(eintrag, querschnitt, richtung, aufbau, teil)
 
         # Auch ohne V_Ed: dann still, nur fuer das Diagramm.
-        eintragen("querkraft", kennung_x, Querkraft(
+        aufbau.eintragen(teil, "querkraft", kennung_x, Querkraft(
             querschnitt,
             [Querkraftfall(name=k.name,
                            V_Ed=Groesse(k.V_Ed, KN_PRO_M),
@@ -448,7 +460,7 @@ def _platte(eintrag: QuerschnittEintrag, aufbau: Aufbau, eintragen: Eintragen,
 
         knickfaelle = [k for k in eintrag.knickfaelle if k.aktiv]
         if knickfaelle:
-            eintragen("knicken", eintrag.kennung, Knicken(
+            aufbau.eintragen(teil, "knicken", eintrag.kennung, Knicken(
                 querschnitt,
                 [Knickfall(name=k.name,
                            N_Ed=Groesse(k.N_Ed, KN),
@@ -467,10 +479,11 @@ def _platte(eintrag: QuerschnittEintrag, aufbau: Aufbau, eintragen: Eintragen,
         aufbau.warnungen.append(
             f"Platte '{eintrag.name}': keine Schnittgrössen → kein "
             f"Tragsicherheitsnachweis.")
+    return teil
 
 
-def _querschnittsanalyse(eintrag: QuerschnittsanalyseEintrag, aufbau: Aufbau,
-                         eintragen: Eintragen) -> None:
+def _querschnittsanalyse(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
+                         aufbau: Aufbau) -> Bauteil:
     """
     Ein gezeichneter Querschnitt: das Bauteil und seine Nachweise.
 
@@ -479,9 +492,10 @@ def _querschnittsanalyse(eintrag: QuerschnittsanalyseEintrag, aufbau: Aufbau,
     Laengszugkraft zaehlt. Duktilitaet und sproedes Versagen immer, still,
     wenn ausgeschaltet -- wie bei der Platte.
     """
-    analyse = _analyse(eintrag, aufbau.baustoffe)
+    analyse = _analyse(eintrag, aufbau.baustoffe, praefix=f"{art.raum}.{eintrag.kennung}")
     aufbau.querschnittsanalysen[eintrag.kennung] = analyse
     analyse.ins_rechenwerk(aufbau.werk)
+    teil = Bauteil(eintrag.kennung, eintrag.name, art, analyse)
 
     kN, kNm = 1e3, 1e3
     lastfaelle = [
@@ -494,21 +508,22 @@ def _querschnittsanalyse(eintrag: QuerschnittsanalyseEintrag, aufbau: Aufbau,
             or (eintrag.laengszugkraft and lastfaelle):
         schub = Schubwandnachweis(analyse, lastfaelle, einachsig=eintrag.einachsig,
                                   mit_laengszug=eintrag.laengszugkraft)
-        eintragen("qa_schub", eintrag.kennung, schub)
-    eintragen("qa_biegung", eintrag.kennung, SchiefeBiegung(
+        aufbau.eintragen(teil, "qa_schub", eintrag.kennung, schub)
+    aufbau.eintragen(teil, "qa_biegung", eintrag.kennung, SchiefeBiegung(
         analyse, lastfaelle, einachsig=eintrag.einachsig,
         laengszug=schub if eintrag.laengszugkraft else None))
 
     duktilitaet = DuktilitaetQA(analyse, einachsig=eintrag.einachsig,
                                 grenze=eintrag.x_d_max)
     duktilitaet.still = not eintrag.duktilitaet
-    eintragen("qa_duktilitaet", eintrag.kennung, duktilitaet)
+    aufbau.eintragen(teil, "qa_duktilitaet", eintrag.kennung, duktilitaet)
     sproede = SproedesVersagenQA(analyse, einachsig=eintrag.einachsig)
     sproede.still = not eintrag.sproede
-    eintragen("qa_sproede", eintrag.kennung, sproede)
+    aufbau.eintragen(teil, "qa_sproede", eintrag.kennung, sproede)
+    return teil
 
 
-def _balkensystem(eintrag: BalkensystemEintrag, aufbau: Aufbau) -> None:
+def _balkensystem(art: "Bauteilart", eintrag: BalkensystemEintrag, aufbau: Aufbau) -> Bauteil:
     """
     Ein Balkensystem: das Stabwerk der Beschreibung, seine Querschnitte
     aufgeloest. Hart scheitert nur ein Verweis, den es nicht gibt -- ein
@@ -524,12 +539,14 @@ def _balkensystem(eintrag: BalkensystemEintrag, aufbau: Aufbau) -> None:
             raise ProjektFehler(f"{wo}: das Material '{material}' gibt es im Projekt nicht.")
         stoffe[material] = stoff
     system = Balkensystem(
-        name=eintrag.name, kennung=eintrag.kennung, praefix=f"balkensystem.{eintrag.kennung}",
+        name=eintrag.name, kennung=eintrag.kennung, praefix=f"{art.raum}.{eintrag.kennung}",
         system=modell.system, paare=modell.paare, meldungen=modell.meldungen,
         querschnitte=[_stabquerschnitt(q, aufbau, wo) for q in eintrag.querschnitte],
         stoffe=stoffe)
     aufbau.balkensysteme[eintrag.kennung] = system
     system.ins_rechenwerk(aufbau.werk)
+    return Bauteil(eintrag.kennung, eintrag.name, art, system,
+                   weitere_ziele=system.ziele(), bezuege=tuple(system.bezuege))
 
 
 def _stabquerschnitt(q: StabquerschnittEintrag, aufbau: Aufbau, wo: str) -> Stabquerschnitt:
@@ -559,8 +576,8 @@ def _stabquerschnitt(q: StabquerschnittEintrag, aufbau: Aufbau, wo: str) -> Stab
                            herkunft=f"Querschnittsanalyse «{analyse.name}»")
 
 
-def _analyse(eintrag: QuerschnittsanalyseEintrag,
-             baustoffe: Mapping[str, Baustoff]) -> Querschnittsanalyse:
+def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Baustoff],
+             *, praefix: str) -> Querschnittsanalyse:
     """
     Aus der Beschreibung das Bauteil -- und aus jedem Fehler der Zeichnung
     einen Satz, der die Analyse nennt.
@@ -602,7 +619,7 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag,
             for w in eintrag.werkstoffwahl if w.material in baustoffe}
     try:
         return Querschnittsanalyse(
-            name=eintrag.name, praefix=f"querschnittsanalyse.{eintrag.kennung}",
+            name=eintrag.name, praefix=praefix,
             flaechen=flaechen, staebe=staebe, linien=linien, waende=waende,
             alpha_min=eintrag.alpha_min, alpha_max=eintrag.alpha_max, k_c=eintrag.k_c,
             wahl=wahl)
@@ -612,7 +629,7 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag,
 
 def _lagennachweise(eintrag: QuerschnittEintrag, querschnitt: Plattenquerschnitt,
                     richtung: Richtung, nachweis: BiegungNormalkraft,
-                    eintragen: Eintragen) -> None:
+                    aufbau: Aufbau, teil: Bauteil) -> None:
     """
     Die Nachweise je x-Lage: sproedes Versagen, Zwaengung auf Biegung und
     auf Normalkraft, Duktilitaet.
@@ -632,30 +649,30 @@ def _lagennachweise(eintrag: QuerschnittEintrag, querschnitt: Plattenquerschnitt
     # stuende dann eingeschaltet da, obwohl jeder einzelne Haken aus ist.
     sproede = SproedesVersagen(querschnitt, richtung, lagen, nachweis)
     sproede.still = not schalter_aus(eintrag.sproede)
-    eintragen("sproede", kennung_x, sproede)
+    aufbau.eintragen(teil, "sproede", kennung_x, sproede)
 
     biegung = ZwaengungBiegung(
         querschnitt, richtung, lagen,
         anforderung=eintrag.rissanforderung,
         kriechzahl=eintrag.zwaengung_biegung_kriechzahl)
     biegung.still = not schalter_aus(eintrag.zwaengung_biegung)
-    eintragen("zwaengung_biegung", kennung_x, biegung)
+    aufbau.eintragen(teil, "zwaengung_biegung", kennung_x, biegung)
 
     zwang = Rissnormalkraft(
         querschnitt, richtung,
         anforderung=eintrag.rissanforderung,
         begrenzt=eintrag.zwaengung_begrenzt)
     zwang.still = not schalter_aus(eintrag.zwaengung)
-    eintragen("rissnormalkraft", kennung_x, zwang)
+    aufbau.eintragen(teil, "rissnormalkraft", kennung_x, zwang)
 
     duktilitaet = Duktilitaet(querschnitt, lagen, grenze=eintrag.x_d_max)
     duktilitaet.still = not schalter_aus(eintrag.duktilitaet)
-    eintragen("duktilitaet", eintrag.kennung, duktilitaet)
+    aufbau.eintragen(teil, "duktilitaet", eintrag.kennung, duktilitaet)
 
 
 def _spannungsnachweise(eintrag: QuerschnittEintrag,
                         querschnitt: Plattenquerschnitt, richtung: Richtung,
-                        eintragen: Eintragen) -> None:
+                        aufbau: Aufbau, teil: Bauteil) -> None:
     """
     Die Stahlspannung, zweimal: aus der Rissbreite unter quasi-staendiger
     Einwirkung (bei jeder Anforderung) und gegen Fliessen unter haeufiger
@@ -673,7 +690,7 @@ def _spannungsnachweise(eintrag: QuerschnittEintrag,
             faelle, grenze=grenze(querschnitt, richtung, eintrag.rissanforderung),
             wahl=liste.wahl.wahl)
         spannung.stillstellen([f.name for f in faelle], laute)
-        eintragen(feld, f"{eintrag.kennung}.x", spannung)
+        aufbau.eintragen(teil, feld, f"{eintrag.kennung}.x", spannung)
 
 
 def _baustoff(eintrag: MaterialEintrag, symbol_index: str) -> Baustoff:
@@ -707,7 +724,7 @@ def _baustoff(eintrag: MaterialEintrag, symbol_index: str) -> Baustoff:
 
 
 def _querschnitt(
-    eintrag: QuerschnittEintrag, baustoffe: Mapping[str, Baustoff]
+    eintrag: QuerschnittEintrag, baustoffe: Mapping[str, Baustoff], *, praefix: str
 ) -> Plattenquerschnitt:
     beton_stoff = baustoffe.get(eintrag.beton)
     if beton_stoff is None:
@@ -770,7 +787,7 @@ def _querschnitt(
         kriechzahl=Groesse(eintrag.kriechzahl, EINHEITSLOS),
         querkraftbewehrung=(buegel.als_bewehrung(buegelstahl)
                             if buegel.vorhanden else None),
-        praefix=f"querschnitt.{eintrag.kennung}",
+        praefix=praefix,
     )
 
 
@@ -891,3 +908,53 @@ def _ueberschreibungen_setzen(projekt: "Projekt", werk: Rechenwerk,
             definition = baustoff.definition(kurzname)
             werk.setze(definition.id, Groesse(zahl, definition.einheit))
 
+
+
+# ===========================================================================
+# Die Bauteilarten
+# ===========================================================================
+
+
+@dataclass(frozen=True)
+class Bauteilart:
+    """
+    Der Steckbrief einer Bauteilart: was ausserhalb ihres Eintrags und ihrer
+    Baufunktion von ihr bekannt sein muss. Eine neue Art kommt in
+    :data:`BAUTEILE` dazu und nirgends sonst.
+    """
+
+    name: str
+    """Wie sie im Aufbau, im Bericht und in der Oberflaeche heisst: ``platte``."""
+
+    liste: str
+    """Ihre Liste im :class:`Projekt` und in der Datei: ``querschnitte``."""
+
+    eintrag: type
+    """Die Klasse ihrer Eintraege -- sie liest einen Eintrag aus der Datei."""
+
+    vorsilbe: str
+    """Womit ihre Kennungen beginnen: ``q`` fuer q1, q2 ..."""
+
+    raum: str
+    """Womit ihre Namensraeume beginnen: ``querschnitt`` fuer querschnitt.q1."""
+
+    bereich: str
+    """Wie ihr Abschnitt in der Formelsammlung heisst."""
+
+    bauen: Callable[["Bauteilart", Any, Aufbau], Bauteil]
+    """Aus dem Eintrag das Bauteil -- Objekt und Nachweise, angemeldet im Werk."""
+
+
+PLATTE = Bauteilart("platte", "querschnitte", QuerschnittEintrag, "q",
+                    "querschnitt", "Platte", _platte)
+ANALYSE = Bauteilart("querschnittsanalyse", "querschnittsanalysen",
+                     QuerschnittsanalyseEintrag, "a", "querschnittsanalyse",
+                     "Querschnittsanalyse", _querschnittsanalyse)
+BALKENSYSTEM = Bauteilart("balkensystem", "balkensysteme", BalkensystemEintrag, "r",
+                          "balkensystem", "Balkensysteme", _balkensystem)
+
+#: Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung -- ein
+#: Balkensystem liest Werte der Platten und Analysen, also kommt es zuletzt.
+#: Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher,
+#: Erkennen einer Datei), geht diese Liste durch.
+BAUTEILE: Tuple[Bauteilart, ...] = (PLATTE, ANALYSE, BALKENSYSTEM)

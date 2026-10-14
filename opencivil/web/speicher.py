@@ -61,11 +61,12 @@ def abdruck(projekt_dict: Mapping[str, Any], kennung: str,
     Materialien sind ein paar Zeilen JSON; sie mitzuzaehlen kostet nichts.
 
     Dazu die Eintraege der Bauteile, deren Werte es liest (``bezuege``,
-    :attr:`Bauteilkopf.bezuege`): ein Balkensystem rechnet mit der Dicke
-    einer Platte, also gilt es nicht mehr, wenn sie sich aendert.
+    :attr:`~opencivil.projekt.aufbau.Bauteil.bezuege`): ein Balkensystem
+    rechnet mit der Dicke einer Platte, also gilt es nicht mehr, wenn sie
+    sich aendert.
     """
-    eintraege = {e.get("kennung"): e for liste in BAUTEILE
-                 for e in (projekt_dict.get(liste) or [])}
+    eintraege = {e.get("kennung"): e for art in BAUTEILE
+                 for e in (projekt_dict.get(art.liste) or [])}
     return json.dumps(
         {"querschnitt": eintraege.get(kennung), "materialien": projekt_dict.get("materialien"),
          "bezuege": [eintraege.get(b) for b in bezuege]},

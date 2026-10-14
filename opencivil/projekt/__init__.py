@@ -64,11 +64,12 @@ from opencivil.projekt.querschnittsanalyse import (
     QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
     WerkstoffwahlEintrag,
 )
-from opencivil.projekt.aufbau import Aufbau, aufbauen
-from opencivil.projekt.projekt import BAUTEILE, Projekt
+from opencivil.projekt.aufbau import BAUTEILE, Aufbau, Bauteil, Bauteilart, aufbauen
+from opencivil.projekt.projekt import Projekt
 
 __all__ = [
-    "Aufbau", "BAUTEILE", "BEIDE_RICHTUNGEN", "BalkensystemEintrag", "Beschreibung",
+    "Aufbau", "BAUTEILE", "BEIDE_RICHTUNGEN", "BalkensystemEintrag", "Bauteil",
+    "Bauteilart", "Beschreibung",
     "FlaecheEintrag", "KnotenlastEintrag", "LagerEintrag", "LastfallEintrag",
     "LastkombinationEintrag", "StablastEintrag", "StabquerschnittEintrag",
     "SystemknotenEintrag", "SystemlinieEintrag",

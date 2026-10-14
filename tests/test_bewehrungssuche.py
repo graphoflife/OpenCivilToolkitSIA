@@ -14,7 +14,7 @@ import unittest
 from unittest import mock
 
 from opencivil import bewehrungssuche as suche
-from opencivil.bewehrungssuche.bewertung import arbeitskopie
+from opencivil.bewehrungssuche.bewertung import arbeitskopie, bewerte
 from opencivil.bewehrungssuche.laengs import _ueber_grenze
 from opencivil.projekt import KnickEintrag, ObergrenzeEintrag, PostenEintrag, Projekt
 from opencivil.web import dienst
@@ -740,3 +740,25 @@ class TestPlattendicke(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestNurDiesesBauteil(unittest.TestCase):
+    """
+    Die Suche rechnet nur die Platte, die sie bewehrt -- kein anderes Bauteil,
+    gleich welcher Art. Bis 2026-10-14 blieben Querschnittsanalysen und
+    Balkensysteme in der Arbeitskopie: ihre Urteile zaehlten mit, und ein
+    System, das eine andere Platte nimmt, liess die Bewertung scheitern.
+    """
+
+    def test_es_zaehlen_nur_die_urteile_der_platte(self):
+        kopie = arbeitskopie(Projekt.beispiel(), "q1", kraefte=True, leeren=False)
+        self.assertEqual([b.kennung for b in kopie.bauteile()], ["q1"])
+        bewertung = bewerte(kopie)
+        self.assertEqual(bewertung.fehler, "")
+        self.assertEqual(bewertung.anzahl, 3)          # M-N: Feld, Feld mit Druck, Stütze
+
+    def test_ein_system_auf_einer_anderen_platte_stoert_nicht(self):
+        bewertung = bewerte(arbeitskopie(Projekt.jeder_nachweis(), "q2",
+                                         kraefte=True, leeren=False))
+        self.assertEqual(bewertung.fehler, "")
+        self.assertTrue(math.isfinite(bewertung.rueckstand))

@@ -1,5 +1,5 @@
 ---
-erzeugt: bbd6370184ca
+erzeugt: ea5adc1456c4
 art: modul
 tags: [modul]
 ---
@@ -358,7 +358,7 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 ## Konstanten
 
 - `SPEICHER = speicher.Ergebnisspeicher()` – Das Gedaechtnis zwischen zwei Anfragen -- siehe [[opencivil.web.speicher]]. Im Modul und damit im Prozess: beim Server die laufende Sitzung, im Browser der offene Reiter.
-- `KENNFELDER = ('name', 'materialien', *BAUTEILE)` – Woran eine Projektdatei zu erkennen ist. Mindestens eines davon muss da sein.
+- `KENNFELDER = ('name', 'materialien', *(art.liste for art in BAUTEILE))` – Woran eine Projektdatei zu erkennen ist. Mindestens eines davon muss da sein.
 - `ANFRAGEN = {'katalog': katalog, 'beispiel': beispiel, 'pruefen': pruefen, 'rechn…` – Name der Anfrage -> Funktion. Diese Namen sind der ganze Vertrag zwischen Oberflaeche und Kern; beide Huellen reichen sie unveraendert durch.
 
 ## Braucht

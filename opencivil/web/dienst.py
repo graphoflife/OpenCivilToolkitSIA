@@ -88,7 +88,7 @@ def beispiel(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
 
 
 #: Woran eine Projektdatei zu erkennen ist. Mindestens eines davon muss da sein.
-KENNFELDER = ("name", "materialien", *BAUTEILE)
+KENNFELDER = ("name", "materialien", *(art.liste for art in BAUTEILE))
 
 
 def pruefen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
@@ -196,8 +196,7 @@ def _stromabwaerts(projekt: Projekt, aufbau) -> Loesung:
 
 def _abdruck(beschreibung: Mapping[str, Any], aufbau, kennung: str) -> str:
     """Der Fingerabdruck eines Bauteils -- mit den Bauteilen, deren Werte es liest."""
-    kopf = next(b for b in aufbau.bauteile() if b.kennung == kennung)
-    return speicher.abdruck(beschreibung, kennung, kopf.bezuege)
+    return speicher.abdruck(beschreibung, kennung, aufbau.bauteil(kennung).bezuege)
 
 
 def _bauteil_rechnen(projekt: Projekt, aufbau, kennung: str) -> Loesung:

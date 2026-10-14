@@ -497,7 +497,8 @@ class TestBerichtWieBildschirm(unittest.TestCase):
         for bauteil in self.aufbau.bauteile():
             if not bauteil.nachweise:
                 continue
-            titel = "Angaben zur Platte" if bauteil.art == "platte" else "Angaben zum Querschnitt"
+            titel = ("Angaben zur Platte" if bauteil.art.name == "platte"
+                     else "Angaben zum Querschnitt")
             name = bauteil.name
             self.assertIn(f"{name} {'-' * len(name)} {titel}", self.text)
 

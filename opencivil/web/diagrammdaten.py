@@ -68,8 +68,7 @@ def querkraftkurven(
         # siehe neigungskurven().
         if befund is None or nachweis.buegel is not None:
             continue
-        querschnitt_kennung = kennung.split(".", 1)[0]
-        querschnitt = aufbau.querschnitte.get(querschnitt_kennung)
+        teil = aufbau.bauteil_von(nachweis)
 
         n_ed = gewaehlt.get(kennung)
         if n_ed is None:
@@ -79,9 +78,9 @@ def querkraftkurven(
         kurve = befund.kurve(n_ed * 1e3)
 
         kurven[kennung] = {
-            "querschnitt": querschnitt_kennung,
-            "namensraum": querschnitt.id if querschnitt else "",
-            "name": querschnitt.name if querschnitt else querschnitt_kennung,
+            "querschnitt": teil.kennung,
+            "namensraum": teil.raum,
+            "name": teil.name,
             "richtung": nachweis.richtung.value,
             "N_Ed": n_ed,
             # Wie der Momentenwiderstand heisst: m_Rd, oder m_Rk, wenn die
@@ -150,8 +149,7 @@ def neigungskurven(aufbau: Aufbau, loesung: Loesung) -> dict:
         befund = loesung.befunde.get(nachweis.id)
         if nachweis.buegel is None or befund is None:
             continue
-        querschnitt_kennung = kennung.split(".", 1)[0]
-        querschnitt = aufbau.querschnitte.get(querschnitt_kennung)
+        teil = aufbau.bauteil_von(nachweis)
 
         # Nach (statischer Hoehe, Grenzen) gruppieren -- in dieser Reihenfolge
         # gefunden, damit die Bilder in der Reihenfolge der Faelle stehen.
@@ -168,9 +166,9 @@ def neigungskurven(aufbau: Aufbau, loesung: Loesung) -> dict:
             bis = max(NEIGUNG_BIS, a_max)
             punkte = befund.neigungsverlauf(d, von, bis)
             kurven[f"{kennung}.{nummer}"] = {
-                "querschnitt": querschnitt_kennung,
-                "namensraum": querschnitt.id if querschnitt else "",
-                "name": querschnitt.name if querschnitt else querschnitt_kennung,
+                "querschnitt": teil.kennung,
+                "namensraum": teil.raum,
+                "name": teil.name,
                 "richtung": nachweis.richtung.value,
                 "d": d * 1e3,
                 "alpha_min": a_min,
@@ -474,8 +472,8 @@ def _knicken(aufbau, nachweis):
     """Der Knicknachweis zu diesem M-N-Nachweis -- nur in x, nur wenn es ihn gibt."""
     if aufbau is None or nachweis.richtung is not Richtung.X:
         return None
-    kennung = nachweis.querschnitt.id.rsplit(".", 1)[-1]
-    return (aufbau.knicken or {}).get(kennung)
+    knicken = aufbau.bauteil_von(nachweis).im_feld("knicken")
+    return knicken[0] if knicken else None
 
 
 def _linienzug(linie) -> Optional[dict]:

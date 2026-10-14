@@ -15,7 +15,6 @@ die Einwirkungen weg (siehe :func:`arbeitskopie`).
 
 from __future__ import annotations
 
-import copy
 import math
 from dataclasses import dataclass
 
@@ -144,13 +143,13 @@ def arbeitskopie(projekt, kennung: str, *, kraefte: bool, leeren: bool = True):
     eingeschaltet ist, und gezaehlt wird, was gebaut wurde. An dieser einen
     Regel soll die Suche nichts vorbeischmuggeln.
     """
-    kopie = copy.deepcopy(projekt)
-    # **Nur diese Platte.** Die anderen kann die Suche nicht beeinflussen; ihre
-    # Nachweise wuerden den Rueckstand trotzdem mittragen, und eine Platte, die
-    # aus ganz eigenen Gruenden nicht aufgeht, liesse jede Suche im Projekt
-    # scheitern. Genau daran ist die erste Fassung gestorben: an einer
-    # frischen Platte, neben der eine andere stand.
-    kopie.querschnitte = [q for q in kopie.querschnitte if q.kennung == kennung]
+    # **Nur diese Platte** -- kein anderes Bauteil, gleich welcher Art. Die
+    # anderen kann die Suche nicht beeinflussen; ihre Nachweise wuerden den
+    # Rueckstand trotzdem mittragen, und ein Bauteil, das aus ganz eigenen
+    # Gruenden nicht aufgeht, liesse jede Suche im Projekt scheitern. Genau
+    # daran ist die erste Fassung gestorben: an einer frischen Platte, neben
+    # der eine andere stand.
+    kopie = projekt.nur(kennung)
     eintrag = kopie.querschnitt(kennung)
     eintrag.duktilitaet = False
     if leeren:

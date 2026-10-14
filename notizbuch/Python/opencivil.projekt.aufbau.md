@@ -1,5 +1,5 @@
 ---
-erzeugt: 0c3b6b563995
+erzeugt: dd185a5a24e3
 art: modul
 tags: [modul]
 ---
@@ -20,6 +20,16 @@ Rechnung. Darum stehen auch die Pruefungen hier, die erst beim Bauen
 auffallen koennen -- ein Verweis auf ein geloeschtes Material, eine Platte
 ohne Bewehrung.
 
+
+## DIE BAUTEILARTEN
+
+Platte, Querschnittsanalyse und Balkensystem haben je einen Steckbrief
+([[opencivil.projekt.aufbau#Bauteilart|Bauteilart]]) in [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] -- Liste in der Datei, Klasse der
+Eintraege, Vorsilbe der Kennungen, Namensraum, Baufunktion. Wer alle
+Bauteile durchgeht, geht diese Liste durch; eine neue Art kommt dort dazu
+und nirgends sonst. Gebaut wird je Eintrag ein [[opencivil.projekt.aufbau#Bauteil|Bauteil]], das seine
+Nachweise, Ziele und Bezuege selbst fuehrt.
+
 ## Inhalt
 
 ### Aufbau
@@ -32,6 +42,8 @@ class Aufbau
 Was beim Zusammenbauen eines Projekts entsteht.
 
 - `werk: Rechenwerk`
+- `schnell: bool = False` – Fuer die Bewehrungssuche gebaut -- siehe [[opencivil.projekt.aufbau#aufbauen|aufbauen]].
+- `teile: Dict[str, 'Bauteil'] = field(default_factory=dict)` – Jedes Bauteil nach Kennung, in der Reihenfolge von [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] und der Beschreibung.
 - `baustoffe: Dict[str, Baustoff] = field(default_factory=dict)`
 - `querschnitte: Dict[str, Plattenquerschnitt] = field(default_factory=dict)`
 - `nachweise: Dict[str, BiegungNormalkraft] = field(default_factory=dict)` – Schluessel ist `<querschnitt>.x`. Die Richtung steht noch im Schluessel, obwohl es nur eine gibt -- sie sagt dem Leser einer Wert-ID, welcher Querschnitt gemeint ist, und die Wert-IDs in abgelegten Berichten sollen nicht bei jeder Umstellung wechseln.
@@ -53,7 +65,7 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `qa_sproede: Dict[str, SproedesVersagenQA] = field(default_factory=dict)`
 - `balkensysteme: Dict[str, Balkensystem] = field(default_factory=dict)` – Die Balkensysteme, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis.
 - `warnungen: List[str] = field(default_factory=list)`
-- `NACHWEISFELDER = ('nachweise', 'querkraft', 'duktilitaet', 'fehlende', 'rissnormalkraf…` – Die Felder, in denen die Nachweise einer Platte stehen -- die eine Stelle, an der ein neuer Nachweis eingetragen wird. Alle sind nach Kennung geschluesselt (`q1` oder `q1.x`) und alle tragen Nachweise mit `d_ausnutzung`. Daraus ergeben sich Rechenziele, Aufteilen nach Platte und Zwischenspeichern von selbst; frueher stand dieselbe Liste viermal da, und wer einen Nachweis hinzufuegte, musste alle vier finden.
+- `NACHWEISFELDER = ('nachweise', 'querkraft', 'duktilitaet', 'fehlende', 'rissnormalkraf…` – Die Felder, in denen die Nachweise stehen -- die eine Stelle, an der ein neuer Nachweis eingetragen wird. Alle sind nach Kennung geschluesselt (`q1` oder `q1.x`) und alle tragen Nachweise mit `d_ausnutzung`. Ihre Reihenfolge ist die der Herleitung: in ihr rechnet ein Bauteil seine Nachweise ([[opencivil.projekt.aufbau#Bauteil.ziele|Bauteil.ziele]]).
 
 #### Aufbau.nachweise_je_feld
 
@@ -79,13 +91,51 @@ def alle_nachweisziele(self) -> List[str]
 
 Jeden Nachweis als Ziel -- auch einen ohne Lastfall, der nur fuer sein Bild rechnet.
 
-#### Aufbau.gehoert_zu
+#### Aufbau.eintragen
 
 ```python
-def gehoert_zu(self, schluessel: str, kennung: str) -> bool
+def eintragen(self, teil: 'Bauteil', feld: str, schluessel: str, nachweis: Nachweis) -> None
 ```
 
-Ob ein Feldschluessel (`q1` oder `q1.x`) zu dieser Platte gehoert.
+Einen Nachweis anmelden: im Rechenwerk, in seinem Feld und bei seinem
+Bauteil -- ausser er ist ganz still, und es wird schnell gerechnet.
+
+Den schnellen Weg nimmt nur die Bewehrungssuche, und die zaehlt
+stille Urteile nicht ([[opencivil.projekt.aufbau#Aufbau|bewehrungssuche.bewerte]]). Ein ganz
+stiller Nachweis kann ihr Ergebnis also nicht aendern, er kostet
+nur Zeit -- und bei der Stahlspannung, die immer mitlaeuft, ist
+das der groessere Teil der ganzen Rechnung. Exakt und nicht
+genaehert: gezaehlt wird dasselbe wie vorher.
+
+Jeder Nachweis geht hier durch, auch die, die nie still sind -- ein
+Weg zum Anmelden, nicht zwei.
+
+#### Aufbau.bauteile
+
+```python
+def bauteile(self) -> List['Bauteil']
+```
+
+Jedes Bauteil, in der Reihenfolge von [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] und der
+Beschreibung: erst die Platten, dann die Querschnittsanalysen, dann
+die Balkensysteme -- sie lesen Werte der beiden anderen.
+
+Die eine Stelle, die diese Reihenfolge festlegt -- fuer die Rechenziele,
+den Zwischenspeicher und die Zusammenfassung.
+
+#### Aufbau.bauteil
+
+```python
+def bauteil(self, kennung: str) -> 'Bauteil'
+```
+
+#### Aufbau.bauteil_von
+
+```python
+def bauteil_von(self, nachweis: Nachweis) -> 'Bauteil'
+```
+
+Das Bauteil, bei dem ein Nachweis angemeldet ist.
 
 #### Aufbau.ziele_von
 
@@ -93,38 +143,7 @@ Ob ein Feldschluessel (`q1` oder `q1.x`) zu dieser Platte gehoert.
 def ziele_von(self, kennung: str) -> List[str]
 ```
 
-Die Rechenziele eines einzelnen Bauteils -- Eckwerte und Nachweise, oder sein System.
-
-#### Aufbau.systemziele
-
-```python
-def systemziele(self, kennung: Optional[str]=None) -> List[str]
-```
-
-Was die Balkensysteme rechnen -- alle, oder das eine mit dieser Kennung.
-
-#### Aufbau.eckwertziele
-
-```python
-def eckwertziele(self) -> List[str]
-```
-
-Was ein Bauteil auch ohne Lastfall rechnet: die Eckwerte seines
-M-N-Nachweises. Eine Analyse ohne Lastfall zeigt so trotzdem ihren
-Querschnitt und ihre reine Normalkraft.
-
-#### Aufbau.bauteile
-
-```python
-def bauteile(self) -> List['Bauteilkopf']
-```
-
-Jedes Bauteil, in der Reihenfolge der Beschreibung: erst die Platten,
-dann die Querschnittsanalysen, dann die Balkensysteme -- sie lesen
-Werte der beiden anderen.
-
-Die eine Stelle, die diese Reihenfolge festlegt -- fuer die Rechenziele,
-den Zwischenspeicher und die Zusammenfassung.
+Die Rechenziele eines einzelnen Bauteils -- siehe [[opencivil.projekt.aufbau#Bauteil.ziele|Bauteil.ziele]].
 
 #### Aufbau.ziele_je_bauteil
 
@@ -164,8 +183,8 @@ Die Blätter zuletzt -- sie lesen Werte der Platten, nie umgekehrt.
 def berichtsziele(self) -> List[str]
 ```
 
-Was im Bericht steht: Nachweise, Eckwerte, Systeme, Blätter -- ohne
-die Baustoffkennwerte, die niemand braucht.
+Was im Bericht steht: Nachweise, was die Bauteile sonst rechnen, Blätter
+-- ohne die Baustoffkennwerte, die niemand braucht.
 
 #### Aufbau.urteile_von
 
@@ -173,7 +192,8 @@ die Baustoffkennwerte, die niemand braucht.
 def urteile_von(self, kennung: str, urteile: Iterable[NachweisUrteil]) -> List[NachweisUrteil]
 ```
 
-Die Urteile einer Platte -- erkannt am Namensraum ihres Nachweises.
+Die Urteile eines Bauteils -- erkannt an den Nachweisen, die bei ihm
+angemeldet sind.
 
 Nicht am Namen: den Anzeigetext zu zerlegen hat schon einmal die
 Nachweise mehrerer Platten in dieselbe Tabelle gepackt.
@@ -194,21 +214,49 @@ Die Reihenfolge bestimmt zugleich den Aufbau der Herleitung: der Loeser
 arbeitet die Ziele der Reihe nach ab, und das Protokoll folgt ihm. So
 stehen im Bericht erst die Baustoffe und dann die Bauteile.
 
-### Bauteilkopf
+### Bauteil
 
 ```python
-@dataclass(frozen=True)
-class Bauteilkopf
+@dataclass
+class Bauteil
 ```
 
-Was man von einem Bauteil wissen muss, um seine Teile zu finden.
+Ein gebautes Bauteil und was zu ihm gehoert. Wem ein Nachweis gehoert,
+steht hier -- niemand muss es aus einer Kennung wie «q1.x» zurueckgewinnen.
 
 - `kennung: str`
 - `name: str`
-- `raum: str` – Der Namensraum seiner Werte und Urteile.
-- `art: str` – `platte`, `querschnittsanalyse` oder `balkensystem`.
-- `nachweise: bool = True` – Ob es Nachweise fuehrt -- ein Balkensystem rechnet nur, es urteilt nicht.
+- `art: 'Bauteilart'`
+- `objekt: Any` – Der Plattenquerschnitt, die Querschnittsanalyse oder das Balkensystem.
+- `nachweise: List[Tuple[str, Nachweis]] = field(default_factory=list)` – Feld im [[opencivil.projekt.aufbau#Aufbau|Aufbau]] und Nachweis, angemeldet ueber [[opencivil.projekt.aufbau#Aufbau.eintragen|Aufbau.eintragen]].
+- `weitere_ziele: List[str] = field(default_factory=list)` – Was es ausser seinen Nachweisen rechnet -- ein Balkensystem seine Querschnitte und sich.
 - `bezuege: Tuple[str, ...] = ()` – Die Bauteile, deren Werte es liest: Platten und Analysen, aus denen ein System Querschnitte nimmt.
+
+#### Bauteil.raum
+
+```python
+@property
+def raum(self) -> str
+```
+
+Der Namensraum seiner Werte und Urteile.
+
+#### Bauteil.im_feld
+
+```python
+def im_feld(self, feld: str) -> List[Nachweis]
+```
+
+Seine Nachweise in einem Feld des [[opencivil.projekt.aufbau#Aufbau|Aufbau]], in der Folge der Anmeldung.
+
+#### Bauteil.ziele
+
+```python
+def ziele(self) -> List[str]
+```
+
+Was ein Lauf fuer dieses Bauteil rechnet: die Nachweise in der Folge
+von [[opencivil.projekt.aufbau#Aufbau|Aufbau.NACHWEISFELDER]], dann die weiteren Ziele.
 
 ### aufbauen
 
@@ -231,7 +279,7 @@ das nichts: dort soll die Zahl stehen, die auch in der Tabelle steht.
 ### _platte
 
 ```python
-def _platte(eintrag: QuerschnittEintrag, aufbau: Aufbau, eintragen: Eintragen, *, schnell: bool) -> None
+def _platte(art: 'Bauteilart', eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bauteil
 ```
 
 Eine Platte: der Querschnitt und alle Nachweise, die an ihm haengen.
@@ -246,7 +294,7 @@ hatte.
 ### _querschnittsanalyse
 
 ```python
-def _querschnittsanalyse(eintrag: QuerschnittsanalyseEintrag, aufbau: Aufbau, eintragen: Eintragen) -> None
+def _querschnittsanalyse(art: 'Bauteilart', eintrag: QuerschnittsanalyseEintrag, aufbau: Aufbau) -> Bauteil
 ```
 
 Ein gezeichneter Querschnitt: das Bauteil und seine Nachweise.
@@ -259,7 +307,7 @@ wenn ausgeschaltet -- wie bei der Platte.
 ### _balkensystem
 
 ```python
-def _balkensystem(eintrag: BalkensystemEintrag, aufbau: Aufbau) -> None
+def _balkensystem(art: 'Bauteilart', eintrag: BalkensystemEintrag, aufbau: Aufbau) -> Bauteil
 ```
 
 Ein Balkensystem: das Stabwerk der Beschreibung, seine Querschnitte
@@ -278,7 +326,7 @@ Woher A und I eines Querschnitts kommen -- die Platte oder Analyse dazu muss es 
 ### _analyse
 
 ```python
-def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Baustoff]) -> Querschnittsanalyse
+def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Baustoff], *, praefix: str) -> Querschnittsanalyse
 ```
 
 Aus der Beschreibung das Bauteil -- und aus jedem Fehler der Zeichnung
@@ -287,7 +335,7 @@ einen Satz, der die Analyse nennt.
 ### _lagennachweise
 
 ```python
-def _lagennachweise(eintrag: QuerschnittEintrag, querschnitt: Plattenquerschnitt, richtung: Richtung, nachweis: BiegungNormalkraft, eintragen: Eintragen) -> None
+def _lagennachweise(eintrag: QuerschnittEintrag, querschnitt: Plattenquerschnitt, richtung: Richtung, nachweis: BiegungNormalkraft, aufbau: Aufbau, teil: Bauteil) -> None
 ```
 
 Die Nachweise je x-Lage: sproedes Versagen, Zwaengung auf Biegung und
@@ -300,7 +348,7 @@ gerechnet wird trotzdem, damit ein Hinweis stehen kann.
 ### _spannungsnachweise
 
 ```python
-def _spannungsnachweise(eintrag: QuerschnittEintrag, querschnitt: Plattenquerschnitt, richtung: Richtung, eintragen: Eintragen) -> None
+def _spannungsnachweise(eintrag: QuerschnittEintrag, querschnitt: Plattenquerschnitt, richtung: Richtung, aufbau: Aufbau, teil: Bauteil) -> None
 ```
 
 Die Stahlspannung, zweimal: aus der Rissbreite unter quasi-staendiger
@@ -358,10 +406,32 @@ Hoehe, also auch keinen Querkraftwiderstand. Beide Zeilen gehoeren in
 die Tabelle -- eine davon wegzulassen hiesse, die Luecke nur zur
 Haelfte zu schliessen.
 
+### Bauteilart
+
+```python
+@dataclass(frozen=True)
+class Bauteilart
+```
+
+Der Steckbrief einer Bauteilart: was ausserhalb ihres Eintrags und ihrer
+Baufunktion von ihr bekannt sein muss. Eine neue Art kommt in
+[[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] dazu und nirgends sonst.
+
+- `name: str` – Wie sie im Aufbau, im Bericht und in der Oberflaeche heisst: `platte`.
+- `liste: str` – Ihre Liste im [[opencivil.projekt.projekt#Projekt|Projekt]] und in der Datei: `querschnitte`.
+- `eintrag: type` – Die Klasse ihrer Eintraege -- sie liest einen Eintrag aus der Datei.
+- `vorsilbe: str` – Womit ihre Kennungen beginnen: `q` fuer q1, q2 ...
+- `raum: str` – Womit ihre Namensraeume beginnen: `querschnitt` fuer querschnitt.q1.
+- `bereich: str` – Wie ihr Abschnitt in der Formelsammlung heisst.
+- `bauen: Callable[['Bauteilart', Any, Aufbau], Bauteil]` – Aus dem Eintrag das Bauteil -- Objekt und Nachweise, angemeldet im Werk.
+
 
 ## Konstanten
 
-- `Eintragen = Callable[[str, str, Nachweis], None]` – Wie ein fertig gebauter Nachweis angemeldet wird: Feld im [[opencivil.projekt.aufbau#Aufbau|Aufbau]], Schluessel darin, Nachweis.
+- `PLATTE = Bauteilart('platte', 'querschnitte', QuerschnittEintrag, 'q', 'quersc…`
+- `ANALYSE = Bauteilart('querschnittsanalyse', 'querschnittsanalysen', Querschnitt…`
+- `BALKENSYSTEM = Bauteilart('balkensystem', 'balkensysteme', BalkensystemEintrag, 'r',…`
+- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM)` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung -- ein Balkensystem liest Werte der Platten und Analysen, also kommt es zuletzt. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
 
 ## Braucht
 
@@ -397,5 +467,6 @@ Haelfte zu schliessen.
 
 ## Gebraucht von
 
+- [[opencivil.notizbuch.formelseiten]]
 - [[opencivil.projekt]]
 - [[opencivil.projekt.projekt]]

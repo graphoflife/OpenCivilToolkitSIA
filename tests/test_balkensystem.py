@@ -65,7 +65,7 @@ class TestBeschreibung(unittest.TestCase):
         self.assertEqual(s.linien[0].lasten[0].lastfall, s.lastfaelle[0].kennung)
 
     def test_eine_datei_nur_mit_systemen_ist_ein_projekt(self):
-        self.assertIn("balkensysteme", BAUTEILE)
+        self.assertIn("balkensysteme", [art.liste for art in BAUTEILE])
         roh = {"balkensysteme": [BalkensystemEintrag.neu("r1", "T", "").als_dict()]}
         self.assertEqual(len(dienst.pruefen({"projekt": roh})["projekt"]["balkensysteme"]), 1)
 

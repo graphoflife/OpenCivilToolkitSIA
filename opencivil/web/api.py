@@ -656,12 +656,11 @@ def zuordnung(aufbau: Aufbau) -> dict:
                     for kurzname, definition in qs.definitionen.items()
                 },
                 "nachweise": {
-                    schluessel.split(".", 1)[1]: {
+                    nw.richtung.value: {
                         "ziele": {n: d.id for n, d in nw.d_ausnutzung.items()},
                         "eckwerte": {n: d.id for n, d in nw.d_eckwerte.items()},
                     }
-                    for schluessel, nw in aufbau.nachweise.items()
-                    if schluessel.split(".", 1)[0] == kennung
+                    for nw in aufbau.bauteil(kennung).im_feld("nachweise")
                 },
                 # Durchmesser, Teilung und Stabzahl als Zahlen, nicht nur als
                 # Text: das Querschnittsbild soll die tatsaechliche Teilung

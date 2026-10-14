@@ -133,7 +133,7 @@ def zusammenfassen(aufbau: Optional["Aufbau"], loesung: Loesung) -> Zusammenfass
                         aufbau.urteile_von(b.kennung, loesung.gefuehrte_urteile)],
                 stille=[Zeile.aus(u) for u in
                         aufbau.urteile_von(b.kennung, loesung.stille_maengel)],
-                art=b.art,
+                art=b.art.name,
             )
             for b in aufbau.bauteile() if b.nachweise
         ]

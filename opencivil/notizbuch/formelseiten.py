@@ -34,15 +34,17 @@ from opencivil.core.protokoll import GleichungBlock
 from opencivil.core.wert import Quelle, Wert
 from opencivil.notizbuch.namen import sortierschluessel
 from opencivil.notizbuch.tresor import Seite
+from opencivil.projekt.aufbau import BAUTEILE
 
 FORMELN = "Formelsammlung/Formeln"
 THEMEN = "Formelsammlung/Themen"
 UEBERSICHT = "Formelsammlung/Formelsammlung.md"
 
 #: Wie die Uebersicht die Themen gruppiert -- nach dem Bestandteil, zu dem
-#: sie gehoeren (``Thema.art`` der Formelsammlung).
-BEREICHE = {"beton": "Baustoffe", "betonstahl": "Baustoffe", "querschnitt": "Platte",
-            "querschnittsanalyse": "Querschnittsanalyse", "balkensystem": "Balkensysteme"}
+#: sie gehoeren (``Thema.art`` der Formelsammlung: der Anfang des
+#: Namensraums). Die Bauteile nennen ihren Abschnitt im Steckbrief.
+BEREICHE = {"beton": "Baustoffe", "betonstahl": "Baustoffe",
+            **{art.raum: art.bereich for art in BAUTEILE}}
 
 #: Woher ein Wert kommt, den keine Formel der Sammlung geschrieben hat.
 ANGABEN = {Quelle.EINGABE: "Eingabe", Quelle.UEBERSCHRIEBEN: "Eingabe",

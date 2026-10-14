@@ -451,9 +451,8 @@ def suche(projekt, kennung: str, *,
 def _duktilitaetsbefund(projekt, kennung: str,
                         loesung: "Loesung") -> Tuple[str, Optional[bool]]:
     """Ob die gefundene Bewehrung die Druckzone noch genuegend begrenzt."""
-    probe = copy.deepcopy(projekt)
+    probe = projekt.nur(kennung)
     uebernehmen(probe, kennung, loesung)
-    probe.querschnitte = [q for q in probe.querschnitte if q.kennung == kennung]
     eintrag = probe.querschnitt(kennung)
     # Unabhaengig vom Schalter: die Suche geht dem Nachweis aus dem Weg, also
     # schuldet sie eine Auskunft ueber ihn -- auch dort, wo er gerade nicht

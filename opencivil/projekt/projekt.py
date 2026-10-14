@@ -14,6 +14,7 @@ reicht nur weiter.
 
 from __future__ import annotations
 
+import copy
 import difflib
 import json
 from dataclasses import dataclass, field, fields
@@ -32,20 +33,14 @@ from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.querschnittsanalyse import (
     QuerschnittsanalyseEintrag, WerkstoffwahlEintrag,
 )
-from opencivil.projekt.aufbau import Aufbau, aufbauen
+from opencivil.projekt.aufbau import (
+    ANALYSE, BALKENSYSTEM, BAUTEILE, PLATTE, Aufbau, aufbauen,
+)
 
 
 # ===========================================================================
 # Projekt
 # ===========================================================================
-
-#: Die Listen der Bauteile: Eintraege mit Kennung, je ein Kapitel im Baum und
-#: im Bericht -- Platten, gezeichnete Querschnitte, Balkensysteme. Wer alle
-#: Bauteile durchgeht (Kennungen, Pruefung, Zwischenspeicher, Erkennen einer
-#: Datei), geht diese Liste durch; ein neues Bauteil kommt hier dazu und
-#: nirgends sonst.
-BAUTEILE = ("querschnitte", "querschnittsanalysen", "balkensysteme")
-
 
 @dataclass
 class Projekt(Beschreibung):
@@ -85,7 +80,21 @@ class Projekt(Beschreibung):
 
     def bauteile(self) -> List[Any]:
         """Alle Bauteile in der Reihenfolge der Beschreibung -- siehe :data:`BAUTEILE`."""
-        return [eintrag for liste in BAUTEILE for eintrag in getattr(self, liste)]
+        return [eintrag for art in BAUTEILE for eintrag in getattr(self, art.liste)]
+
+    def nur(self, kennung: str) -> "Projekt":
+        """
+        Eine Kopie, in der von den Bauteilen nur dieses eine steht --
+        Materialien und Blätter bleiben. So rechnet die Bewehrungssuche: die
+        anderen Bauteile kann sie nicht beeinflussen, und ihre Urteile
+        zaehlten sonst mit.
+        """
+        self.bauteil(kennung)
+        kopie = copy.deepcopy(self)
+        for art in BAUTEILE:
+            setattr(kopie, art.liste,
+                    [e for e in getattr(kopie, art.liste) if e.kennung == kennung])
+        return kopie
 
     def bauteil(self, kennung: str) -> Any:
         """Ein Bauteil gleich welcher Art -- eine Platte, eine Analyse, ein System."""
@@ -208,7 +217,7 @@ class Projekt(Beschreibung):
         beton_kennung = self._einziges("beton", beton)
         stahl_kennung = self._einziges("betonstahl", stahl)
         eintrag = QuerschnittEintrag.neu(
-            kennung=self.freie_kennung("q"), name=name,
+            kennung=self.freie_kennung(PLATTE.vorsilbe), name=name,
             beton=beton_kennung, stahl=stahl_kennung)
         eintrag.h = float(h)
         eintrag.kombinationen = []
@@ -253,7 +262,7 @@ class Projekt(Beschreibung):
         an den Eintrag.
         """
         eintrag = QuerschnittsanalyseEintrag.neu(
-            kennung=self.freie_kennung("a"), name=name,
+            kennung=self.freie_kennung(ANALYSE.vorsilbe), name=name,
             beton=self._einziges("beton", beton), stahl=self._einziges("betonstahl", stahl))
         eintrag.lastfaelle = []
         _felder_setzen(eintrag, felder, f"Querschnittsanalyse '{name}'")
@@ -269,7 +278,8 @@ class Projekt(Beschreibung):
         Oberflaeche mit einem Einfeldtraeger: wer in Python zeichnet, zeichnet
         sein eigenes System.
         """
-        eintrag = BalkensystemEintrag(kennung=self.freie_kennung("r"), name=name)
+        eintrag = BalkensystemEintrag(kennung=self.freie_kennung(BALKENSYSTEM.vorsilbe),
+                                      name=name)
         _felder_setzen(eintrag, felder, f"Balkensystem '{name}'")
         self.balkensysteme.append(eintrag)
         return eintrag
@@ -343,12 +353,9 @@ class Projekt(Beschreibung):
         return cls(
             name=str(d.get("name") or "Neues Projekt"),
             materialien=[MaterialEintrag.aus_dict(x) for x in (d.get("materialien") or [])],
-            querschnitte=[QuerschnittEintrag.aus_dict(x) for x in (d.get("querschnitte") or [])],
             gleichungen=[GleichungsblattEintrag.aus_dict(x) for x in (d.get("gleichungen") or [])],
-            querschnittsanalysen=[QuerschnittsanalyseEintrag.aus_dict(x)
-                                  for x in (d.get("querschnittsanalysen") or [])],
-            balkensysteme=[BalkensystemEintrag.aus_dict(x)
-                           for x in (d.get("balkensysteme") or [])],
+            **{art.liste: [art.eintrag.aus_dict(x) for x in (d.get(art.liste) or [])]
+               for art in BAUTEILE},
         )
 
     def speichern(self, pfad: str | Path) -> Path:

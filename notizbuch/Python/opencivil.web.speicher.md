@@ -1,5 +1,5 @@
 ---
-erzeugt: 6458b0041fae
+erzeugt: b6f7277eb5cc
 art: modul
 tags: [modul]
 ---
@@ -64,8 +64,9 @@ Kennung wohin zeigt, waere genau die Stelle, an der man eines vergisst.
 Materialien sind ein paar Zeilen JSON; sie mitzuzaehlen kostet nichts.
 
 Dazu die Eintraege der Bauteile, deren Werte es liest (`bezuege`,
-[[opencivil.projekt.aufbau#Bauteilkopf|Bauteilkopf.bezuege]]): ein Balkensystem rechnet mit der Dicke
-einer Platte, also gilt es nicht mehr, wenn sie sich aendert.
+[[opencivil.projekt.aufbau#Bauteil|bezuege]]): ein Balkensystem
+rechnet mit der Dicke einer Platte, also gilt es nicht mehr, wenn sie
+sich aendert.
 
 ### Ergebnisspeicher
 

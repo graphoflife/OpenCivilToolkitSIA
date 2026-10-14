@@ -1,5 +1,5 @@
 ---
-erzeugt: 3c6a834b7de9
+erzeugt: 71c069e3244d
 art: modul
 tags: [modul]
 ---
@@ -134,7 +134,7 @@ Die Zeilen der Tabelle -- dieselbe Groessenzeile in mehreren Fassungen einmal.
 - `FORMELN = 'Formelsammlung/Formeln'`
 - `THEMEN = 'Formelsammlung/Themen'`
 - `UEBERSICHT = 'Formelsammlung/Formelsammlung.md'`
-- `BEREICHE = {'beton': 'Baustoffe', 'betonstahl': 'Baustoffe', 'querschnitt': 'Pla…` – Wie die Uebersicht die Themen gruppiert -- nach dem Bestandteil, zu dem sie gehoeren (`Thema.art` der Formelsammlung).
+- `BEREICHE = {'beton': 'Baustoffe', 'betonstahl': 'Baustoffe', **{art.raum: art.be…` – Wie die Uebersicht die Themen gruppiert -- nach dem Bestandteil, zu dem sie gehoeren (`Thema.art` der Formelsammlung: der Anfang des Namensraums). Die Bauteile nennen ihren Abschnitt im Steckbrief.
 - `ANGABEN = {Quelle.EINGABE: 'Eingabe', Quelle.UEBERSCHRIEBEN: 'Eingabe', Quelle.…` – Woher ein Wert kommt, den keine Formel der Sammlung geschrieben hat.
 
 ## Braucht
@@ -146,6 +146,7 @@ Die Zeilen der Tabelle -- dieselbe Groessenzeile in mehreren Fassungen einmal.
 - [[opencivil.core.wert]]
 - [[opencivil.notizbuch.namen]]
 - [[opencivil.notizbuch.tresor]]
+- [[opencivil.projekt.aufbau]]
 
 ## Gebraucht von
 

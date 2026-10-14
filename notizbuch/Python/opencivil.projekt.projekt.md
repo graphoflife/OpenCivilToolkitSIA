@@ -1,5 +1,5 @@
 ---
-erzeugt: 866b6fe4c6dc
+erzeugt: 08d138546c4e
 art: modul
 tags: [modul]
 ---
@@ -60,7 +60,18 @@ def querschnittsanalyse(self, kennung: str) -> QuerschnittsanalyseEintrag
 def bauteile(self) -> List[Any]
 ```
 
-Alle Bauteile in der Reihenfolge der Beschreibung -- siehe [[opencivil.projekt.projekt#Konstanten|BAUTEILE]].
+Alle Bauteile in der Reihenfolge der Beschreibung -- siehe [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]].
+
+#### Projekt.nur
+
+```python
+def nur(self, kennung: str) -> 'Projekt'
+```
+
+Eine Kopie, in der von den Bauteilen nur dieses eine steht --
+Materialien und Blätter bleiben. So rechnet die Bewehrungssuche: die
+anderen Bauteile kann sie nicht beeinflussen, und ihre Urteile
+zaehlten sonst mit.
 
 #### Projekt.bauteil
 
@@ -311,10 +322,6 @@ def _felder_setzen(eintrag: Any, felder: Mapping[str, Any], wo: str) -> None
 Die Stichworte einer Fassade an den Eintrag -- ein unbekanntes wird
 gemeldet, mit dem aehnlichsten Feld, statt still zu verschwinden.
 
-
-## Konstanten
-
-- `BAUTEILE = ('querschnitte', 'querschnittsanalysen', 'balkensysteme')` – Die Listen der Bauteile: Eintraege mit Kennung, je ein Kapitel im Baum und im Bericht -- Platten, gezeichnete Querschnitte, Balkensysteme. Wer alle Bauteile durchgeht (Kennungen, Pruefung, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch; ein neues Bauteil kommt hier dazu und nirgends sonst.
 
 ## Braucht
 
