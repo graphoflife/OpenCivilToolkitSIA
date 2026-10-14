@@ -55,22 +55,9 @@ gelernt wurde, steht in [[Entwicklung]].
 Neun Durchsichten haben je einen Bereich ganz gelesen; jeder Punkt ist am
 Code nachgeprüft. Reihenfolge nach Empfehlung. Ziel jedes Punkts ist, dass
 etwas wegfällt, nicht dass es umzieht. Behoben sind der dringendste
-Befund, die gemischten Stahlsorten, und «Ergebnisse in den Rechenlauf»
-(siehe [[Entwicklung]]).
+Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»
+und «Ein Steckbrief je Bauteilart» (siehe [[Entwicklung]]).
 
-- [ ] **Ein Steckbrief je Bauteilart, in Python und JavaScript.** Platte,
-      Analyse und System stehen an rund 30 Stellen einzeln, obwohl
-      `projekt.py` bei `BAUTEILE` sagt «hier dazu und nirgends sonst»:
-      `Aufbau.bauteile()` zählt sie ein zweites Mal auf, dazu
-      `Projekt.aus_dict`, `eckwertziele`, `systemziele`, `BEREICHE`
-      (`formelseiten.py`), `zustand.js` (fünf `gewaehlteX`, `freieKennung`),
-      `baum.js`, `editor.js`, `bericht.js`. Viele schweigen, wenn man sie
-      vergisst (Einträge gehen verloren, Nachweise werden nie gerechnet,
-      doppelte Kennungen). Der Aufbau findet über Textpräfixe zurück, wem ein
-      Nachweis gehört (`gehoert_zu`, «q1.x» wird an sechs Stellen zerlegt).
-      Besser: ein Datensatz je Bauteil (Objekt, Nachweise, Ziele, Bezüge),
-      gebaut über eine Tabelle Eintragstyp → Baufunktion; im JS eine Tabelle
-      `ARTEN`. Zusammen mit dem Punkt darüber umbauen.
 - [ ] **Ein Querschnittsmodell statt zweier.** Gerechnet wird mit den
       Closures in `querschnittsloeser.py` (`beton_nichtlinear`,
       `stahl_bilinear`, `stahl_nur_zug`), gedruckt mit den Klassen in
@@ -352,6 +339,11 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Ein Steckbrief je Bauteilart: `BAUTEILE` im Kern und `ARTEN` in der
+Oberfläche, ein Test hält beide gleich · je Bauteil ein Datensatz mit
+Nachweisen, Zielen und Bezügen statt Kennungen wie «q1.x» zu zerlegen ·
+die Bewehrungssuche rechnet nur ihr Bauteil ·
 
 Ergebnisse in den Rechenlauf: Urteile und Befunde kommen mit der Ausführung,
 kein Nachweis legt mehr etwas auf sich ab · der Speicher legt je Bauteil

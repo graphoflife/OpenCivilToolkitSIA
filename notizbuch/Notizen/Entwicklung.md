@@ -44,6 +44,60 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-14 · Umbau: Ergebnisse im Rechenlauf, ein Steckbrief je Bauteilart
+
+Zwei Befunde der Strukturdurchsicht (siehe [[TODO]], «Umbau»). Kein Ergebnis
+hat sich geändert; im Bericht fehlt einzig die Zeile «Anzahl der
+Unbekannten» in der Werteliste -- die Zahl steht weiter in der Herleitung.
+
+**Ergebnisse stehen in der Lösung, nicht am Objekt.** Bisher legten die
+Nachweise, das Balkensystem und das Gleichungsblatt beim Rechnen auf sich
+selbst ab, was sie fanden -- Interaktionslinie, Werte je Lage und Fall,
+Wände und Schubfluss, das Systemergebnis --, und jeder Lauf überschrieb es.
+Wer las, musste wissen, welcher Lauf zuletzt war. Der Zwischenspeicher
+hängte darum ganze Objekte zwischen zwei Aufbauten um (`TEILEFELDER`,
+`teile_von`, `teile_setzen`) und bildete die Felder der Lösung in
+`Teilergebnis` von Hand nach. Jetzt gibt `rechne()` eine `Ausfuehrung`
+zurück: Ausgaben, Urteile und einen Befund. Die Lösung hält
+`befunde[berechnung_id]`; Diagramme, Zusammenfassung und Fassade lesen
+dort. Wer den Befund einer anderen Berechnung braucht -- Knicken und
+Querkraft die Linie der Tragsicherheit --, meldet einen `Befundbezug` an,
+und der Löser rechnet sie zuerst. Der Speicher legt je Bauteil seine Lösung
+ab (`Loesung.anhaengen`).
+
+Das ersetzt «Das Ergebnis bleibt darum am Objekt» aus dem Eintrag zu den
+Balkensystemen: `p.rechnen().balkensystem("Rahmen")` liefert jetzt den
+`Systembefund`, mit `ergebnis` und `verlaeufe()` wie vorher.
+
+**Ein Ziel darf eine Berechnung sein.** Wer eine Berechnung rechnen wollte,
+musste einen ihrer Werte als Ziel nennen. Darum gab es Werte, die niemand
+las: die Zahl der Unbekannten, die Zeilenzahl eines Blatts und den
+Querkraftfall «ohne Einwirkung» mit sieben Weichen und `nur_ziel`. Jetzt ist
+die ID einer Berechnung selbst ein Ziel; sie läuft einmal, auch ohne
+Ausgabe. Nachweise, Systeme und Blätter sind Ziele unter ihrer ID. Ein
+Querkraftnachweis ohne Lastfall rechnet so still für sein Bild; mit Bügeln
+hält sein Befund den Ast bei M = 0 und N = 0 (`ohne_einwirkung`), damit das
+Bild auch ohne Fall dasteht.
+
+**Ein Steckbrief je Bauteilart.** Platte, Querschnittsanalyse und
+Balkensystem standen an rund dreissig Stellen einzeln, und viele schwiegen,
+wenn man eine vergass: ein Eintrag ging beim Öffnen verloren, ein Nachweis
+wurde nie gerechnet, eine Kennung kam doppelt vor. Jetzt hat jede Art ihre
+`Bauteilart` in `BAUTEILE` (`projekt/aufbau.py`): Liste in der Datei, Klasse
+der Einträge, Vorsilbe, Namensraum, Abschnitt der Formelsammlung,
+Baufunktion. Gebaut wird je Eintrag ein `Bauteil`, bei dem seine Nachweise
+angemeldet werden (`Aufbau.eintragen`); Ziele, Urteile und Bezüge kommen von
+dort, und niemand liest mehr aus «q1.x» zurück, wem ein Nachweis gehört. In
+der Oberfläche steht dasselbe in `ARTEN` (`web/js/arten.js`): Baum, Editor,
+Zusammenfassung und Diagramme gehen sie durch. Liste, Vorsilbe und
+Namensraum stehen an beiden Orten; ein Test hält sie gleich
+(`tests/test_arten_js.py`).
+
+**Dabei gefunden:** Die Bewehrungssuche behielt in ihrer Arbeitskopie alle
+Querschnittsanalysen und Balkensysteme. Im Beispiel zählte sie deren Urteile
+mit; im Prüfprojekt scheiterte die Bewertung an einem System, das eine
+andere Platte nimmt. Jetzt rechnet sie nur ihr Bauteil (`Projekt.nur`).
+
 ## 2026-10-12 · Gemischte Stahlsorten: jede Lage rechnet mit ihrem Stahl
 
 Gefunden in der Strukturdurchsicht (siehe [[TODO]], «Umbau»), nachgerechnet:

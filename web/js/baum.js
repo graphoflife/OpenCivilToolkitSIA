@@ -20,6 +20,7 @@
  * können.
  */
 
+import { ARTEN } from './arten.js';
 import { el, ersetzen, melden } from './dom.js';
 import { neueZeile } from './gleichungen.js';
 import { benutzteMaterialien } from './querschnittsanalyse.js';
@@ -34,10 +35,8 @@ const SINNBILD = {
   materialien: '▣',   // ▣
   beton: '■',         // ■
   betonstahl: '≡',    // ≡
-  platten: '▬',       // ▬
-  analysen: '⊤',      // ⊤ -- ein Plattenbalken im Schnitt
-  balkensysteme: '⊓',  // ⊓ -- ein Rahmen
   gleichungen: '∑',
+  ...Object.fromEntries(ARTEN.map((a) => [a.kapitel, a.sinnbild])),
 };
 
 // ===========================================================================
@@ -63,26 +62,45 @@ function kapitel({ schluessel, titel, klasse, anzahl, werkzeuge, kinder, oben })
   ]);
 }
 
+/** Was rechts im Eintrag eines Bauteils steht -- je Bauteilart (ARTEN). */
+const KURZTEXT = {
+  querschnitt: (q) => `${q.h}×${q.b} mm`,
+  querschnittsanalyse: umriss,
+  balkensystem: (s) => {
+    const staebe = s.linien.filter((l) => l.stab).length;
+    return `${staebe} ${staebe === 1 ? 'Stab' : 'Stäbe'}`;
+  },
+};
+
+/** Welche Materialien ein Bauteil braucht -- je Bauteilart. */
+const MATERIALIEN = {
+  querschnitt: (q) => [q.beton, ...q.lagen.map((l) => l.stahl)],
+  querschnittsanalyse: benutzteMaterialien,
+  balkensystem: systemMaterialien,
+};
+
+/** Welche Bauteile ein Bauteil als Querschnitt nimmt -- das tut nur ein Balkensystem. */
+const BEZUEGE = { balkensystem: benutzteBauteile };
+
+/** Wie ein neues Bauteil entsteht -- je Bauteilart. */
+const ANLEGEN = {
+  querschnitt: platteAnlegen,
+  querschnittsanalyse: analyseAnlegen,
+  balkensystem: systemAnlegen,
+};
+
 /** Was rechts im Eintrag steht, wie er aussieht und wie er weggeht -- je Art. */
 const ART = {
   material: (m) => ({
     klasse: m.art === 'beton' ? 'beton' : 'stahl', text: m.sorte, loeschen: materialLoeschen,
   }),
-  querschnitt: (q) => ({
-    klasse: 'platte', text: `${q.h}×${q.b} mm`, loeschen: () => bauteilLoeschen('querschnitte', q),
-  }),
-  querschnittsanalyse: (a) => ({
-    klasse: 'analyse', text: umriss(a), loeschen: () => bauteilLoeschen('querschnittsanalysen', a),
-  }),
-  balkensystem: (s) => ({
-    klasse: 'system',
-    text: `${s.linien.filter((l) => l.stab).length} ${s.linien.filter((l) => l.stab).length === 1 ? 'Stab' : 'Stäbe'}`,
-    loeschen: () => entfernen('balkensysteme', s),
-  }),
   blatt: (b) => ({
     klasse: 'blatt', text: `${b.zeilen.length} ${b.zeilen.length === 1 ? 'Zeile' : 'Zeilen'}`,
     loeschen: () => entfernen('gleichungen', b),
   }),
+  ...Object.fromEntries(ARTEN.map((a) => [a.art, (e) => ({
+    klasse: a.klasse, text: KURZTEXT[a.art](e), loeschen: () => bauteilLoeschen(a, e),
+  })])),
 };
 
 function eintrag(m, art) {
@@ -138,14 +156,8 @@ function leerzeile(text) {
 // ===========================================================================
 
 function materialLoeschen(material) {
-  const benutztVon = [
-    ...zustand.projekt.querschnitte.filter((q) =>
-      q.beton === material.kennung || q.lagen.some((l) => l.stahl === material.kennung)),
-    ...(zustand.projekt.querschnittsanalysen || []).filter((a) =>
-      benutzteMaterialien(a).includes(material.kennung)),
-    ...(zustand.projekt.balkensysteme || []).filter((s) =>
-      systemMaterialien(s).includes(material.kennung)),
-  ];
+  const benutztVon = ARTEN.flatMap((a) => (zustand.projekt[a.liste] || []).filter((e) =>
+    MATERIALIEN[a.art](e).includes(material.kennung)));
   if (benutztVon.length) {
     melden(`„${material.name || material.sorte}" verwendet von: `
       + benutztVon.map((q) => q.name).join(', '), true);
@@ -154,15 +166,15 @@ function materialLoeschen(material) {
   entfernen('materialien', material);
 }
 
-/** Eine Platte oder Analyse -- ausser ein Balkensystem nimmt noch ihren Querschnitt. */
-function bauteilLoeschen(liste, eintrag) {
-  const benutztVon = (zustand.projekt.balkensysteme || []).filter((s) =>
-    benutzteBauteile(s).includes(eintrag.kennung));
+/** Ein Bauteil -- ausser ein Balkensystem nimmt noch seinen Querschnitt. */
+function bauteilLoeschen(art, eintrag) {
+  const benutztVon = ARTEN.flatMap((a) => (zustand.projekt[a.liste] || []).filter((e) =>
+    (BEZUEGE[a.art]?.(e) || []).includes(eintrag.kennung)));
   if (benutztVon.length) {
     melden(`„${eintrag.name}" ist Querschnitt in: ${benutztVon.map((s) => s.name).join(', ')}`, true);
     return;
   }
-  entfernen(liste, eintrag);
+  entfernen(art.liste, eintrag);
 }
 
 /** Einen Eintrag aus einer Liste des Projekts -- und aus der Auswahl, wenn er gewählt war. */
@@ -204,7 +216,7 @@ function materialAnlegen(art) {
   aendern({ auswahl: { art: 'material', kennung } }, 'auswahl');
 }
 
-function platteAnlegen() {
+function platteAnlegen(art) {
   const beton = zustand.projekt.materialien.find((m) => m.art === 'beton');
   const stahl = zustand.projekt.materialien.find((m) => m.art === 'betonstahl');
   if (!beton || !stahl) {
@@ -223,19 +235,19 @@ function platteAnlegen() {
     melden('Katalog noch nicht geladen.', true);
     return;
   }
-  const kennung = freieKennung('q');
+  const kennung = freieKennung(art.vorsilbe);
   projektAendern((p) => {
     // Kopie, nicht die Vorlage selbst: sonst teilten sich alle neuen Platten
     // dieselben Lagen, und die zweite änderte die erste mit.
     const platte = structuredClone(vorlage);
     platte.kennung = kennung;
-    platte.name = naechsterName('Platte', p.querschnitte);
+    platte.name = naechsterName(art.stamm, p[art.liste]);
     platte.beton = beton.kennung;
     platte.querkraftbewehrung.stahl = stahl.kennung;
     platte.lagen.forEach((l) => { l.stahl = stahl.kennung; });
-    p.querschnitte.push(platte);
+    p[art.liste].push(platte);
   });
-  aendern({ auswahl: { art: 'querschnitt', kennung } }, 'auswahl');
+  aendern({ auswahl: { art: art.art, kennung } }, 'auswahl');
 }
 
 /**
@@ -243,7 +255,7 @@ function platteAnlegen() {
  * ein Rechteck mit Stäben und einem Lastfall. Gesetzt wird nur, was der Kern
  * nicht wissen kann: Kennung, Name und die Materialien des Projekts.
  */
-function analyseAnlegen() {
+function analyseAnlegen(art) {
   const beton = zustand.projekt.materialien.find((m) => m.art === 'beton');
   const stahl = zustand.projekt.materialien.find((m) => m.art === 'betonstahl');
   if (!beton || !stahl) {
@@ -255,20 +267,20 @@ function analyseAnlegen() {
     melden('Katalog noch nicht geladen.', true);
     return;
   }
-  const kennung = freieKennung('a');
+  const kennung = freieKennung(art.vorsilbe);
   fensterVergessen(kennung);
   projektAendern((p) => {
     const analyse = structuredClone(vorlage);
     analyse.kennung = kennung;
-    p.querschnittsanalysen = p.querschnittsanalysen || [];
-    analyse.name = naechsterName('Querschnitt', p.querschnittsanalysen);
+    p[art.liste] = p[art.liste] || [];
+    analyse.name = naechsterName(art.stamm, p[art.liste]);
     analyse.flaechen.forEach((f) => { f.material = beton.kennung; });
     for (const liste of [analyse.staebe, analyse.stablinien, analyse.schubwaende]) {
       liste.forEach((x) => { x.stahl = stahl.kennung; });
     }
-    p.querschnittsanalysen.push(analyse);
+    p[art.liste].push(analyse);
   });
-  aendern({ auswahl: { art: 'querschnittsanalyse', kennung } }, 'auswahl');
+  aendern({ auswahl: { art: art.art, kennung } }, 'auswahl');
 }
 
 /**
@@ -276,7 +288,7 @@ function analyseAnlegen() {
  * mit einem Lastfall. Gesetzt wird nur, was der Kern nicht wissen kann:
  * Kennung, Name und der Beton der Linien.
  */
-function systemAnlegen() {
+function systemAnlegen(art) {
   const beton = zustand.projekt.materialien.find((m) => m.art === 'beton');
   if (!beton) {
     melden('Zuerst einen Beton anlegen.', true);
@@ -287,17 +299,17 @@ function systemAnlegen() {
     melden('Katalog noch nicht geladen.', true);
     return;
   }
-  const kennung = freieKennung('r');
+  const kennung = freieKennung(art.vorsilbe);
   systemfensterVergessen(kennung);
   projektAendern((p) => {
     const system = structuredClone(vorlage);
     system.kennung = kennung;
-    p.balkensysteme = p.balkensysteme || [];
-    system.name = naechsterName('System', p.balkensysteme);
+    p[art.liste] = p[art.liste] || [];
+    system.name = naechsterName(art.stamm, p[art.liste]);
     system.linien.forEach((l) => { if (l.stab) l.material = beton.kennung; });
-    p.balkensysteme.push(system);
+    p[art.liste].push(system);
   });
-  aendern({ auswahl: { art: 'balkensystem', kennung } }, 'auswahl');
+  aendern({ auswahl: { art: art.art, kennung } }, 'auswahl');
 }
 
 // ===========================================================================
@@ -344,42 +356,20 @@ export function baumZeichnen(behaelter) {
     ],
   });
 
-  const platten = kapitel({
-    schluessel: 'platten',
-    titel: 'Stahlbeton-Platten',
-    klasse: 'baum-kopf-platte',
-    anzahl: p.querschnitte.length,
-    oben: true,
-    werkzeuge: knopf('+', 'Platte hinzufügen', platteAnlegen),
-    kinder: p.querschnitte.length
-      ? p.querschnitte.map((q) => eintrag(q, 'querschnitt'))
-      : [leerzeile('keine Platte')],
-  });
-
-  const analysen = p.querschnittsanalysen || [];
-  const querschnittsanalysen = kapitel({
-    schluessel: 'analysen',
-    titel: 'Querschnittsanalyse',
-    klasse: 'baum-kopf-analyse',
-    anzahl: analysen.length,
-    oben: true,
-    werkzeuge: knopf('+', 'Querschnittsanalyse hinzufügen', analyseAnlegen),
-    kinder: analysen.length
-      ? analysen.map((a) => eintrag(a, 'querschnittsanalyse'))
-      : [leerzeile('keine Querschnittsanalyse')],
-  });
-
-  const systeme = p.balkensysteme || [];
-  const balkensysteme = kapitel({
-    schluessel: 'balkensysteme',
-    titel: '2D Balkensysteme',
-    klasse: 'baum-kopf-system',
-    anzahl: systeme.length,
-    oben: true,
-    werkzeuge: knopf('+', 'Balkensystem hinzufügen', systemAnlegen),
-    kinder: systeme.length
-      ? systeme.map((s) => eintrag(s, 'balkensystem'))
-      : [leerzeile('kein Balkensystem')],
+  // Je Bauteilart ein Kapitel, in der Reihenfolge von ARTEN.
+  const bauteile = ARTEN.map((a) => {
+    const eintraege = p[a.liste] || [];
+    return kapitel({
+      schluessel: a.kapitel,
+      titel: a.titel,
+      klasse: `baum-kopf-${a.klasse}`,
+      anzahl: eintraege.length,
+      oben: true,
+      werkzeuge: knopf('+', `${a.einzahl} hinzufügen`, () => ANLEGEN[a.art](a)),
+      kinder: eintraege.length
+        ? eintraege.map((e) => eintrag(e, a.art))
+        : [leerzeile(a.leer)],
+    });
   });
 
   const blaetter = p.gleichungen || [];
@@ -393,5 +383,5 @@ export function baumZeichnen(behaelter) {
     kinder: blaetter.length ? blaetter.map((b) => eintrag(b, 'blatt')) : [leerzeile('kein Blatt')],
   });
 
-  ersetzen(behaelter, materialien, platten, querschnittsanalysen, balkensysteme, gleichungen);
+  ersetzen(behaelter, materialien, ...bauteile, gleichungen);
 }

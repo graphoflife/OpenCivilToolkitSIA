@@ -1,0 +1,71 @@
+/**
+ * arten.js -- die Bauteilarten der Oberfläche, je einmal.
+ *
+ * Was man von einer Art wissen muss, ohne ihre App zu kennen: ihre Liste im
+ * Projekt, wie Auswahl und Rechenkern sie nennen, ihr Kapitel im Baum und
+ * wie ein neuer Eintrag heisst. Wer alle Bauteile durchgeht -- Kennungen,
+ * Baum, Editor, Zusammenfassung, Diagramme --, geht diese Liste durch; eine
+ * neue Art kommt hier dazu und in ihre eigenen Module.
+ *
+ * Liste, Vorsilbe und Namensraum stehen ebenso im Kern, im Steckbrief
+ * `BAUTEILE` (opencivil/projekt/aufbau.py); tests/test_arten_js.py hält
+ * beide gleich. Ohne Imports, damit der Test das Modul in node laden kann.
+ */
+
+export const ARTEN = [
+  {
+    /** Wie die Auswahl sie nennt -- und der Anfang ihres Namensraums: querschnitt.q1. */
+    art: 'querschnitt',
+    /** Ihre Liste im Projekt. */
+    liste: 'querschnitte',
+    /** Womit ihre Kennungen beginnen. */
+    vorsilbe: 'q',
+    /** Ihr Kapitel im Baum -- zugleich der Schlüssel, unter dem es aufgeklappt ist. */
+    kapitel: 'platten',
+    titel: 'Stahlbeton-Platten',
+    /** Was über ihrem Editor steht. */
+    bezeichnung: 'Stahlbeton-Platte',
+    einzahl: 'Platte',
+    /** Wie ein neuer Eintrag heisst: «Platte 3». */
+    stamm: 'Platte',
+    leer: 'keine Platte',
+    /** Die Klasse im Stilblatt: baum-kopf-platte, baum-eintrag-platte. */
+    klasse: 'platte',
+    sinnbild: '▬', // ▬
+    /** Ob sie Nachweise führt -- dann steht in der Zusammenfassung ihre Tabelle. */
+    nachweise: true,
+  },
+  {
+    art: 'querschnittsanalyse',
+    liste: 'querschnittsanalysen',
+    vorsilbe: 'a',
+    kapitel: 'analysen',
+    titel: 'Querschnittsanalyse',
+    bezeichnung: 'Querschnittsanalyse',
+    einzahl: 'Querschnittsanalyse',
+    stamm: 'Querschnitt',
+    leer: 'keine Querschnittsanalyse',
+    klasse: 'analyse',
+    sinnbild: '⊤', // ⊤ -- ein Plattenbalken im Schnitt
+    nachweise: true,
+  },
+  {
+    art: 'balkensystem',
+    liste: 'balkensysteme',
+    vorsilbe: 'r',
+    kapitel: 'balkensysteme',
+    titel: '2D Balkensysteme',
+    bezeichnung: '2D-Balkensystem',
+    einzahl: 'Balkensystem',
+    stamm: 'System',
+    leer: 'kein Balkensystem',
+    klasse: 'system',
+    sinnbild: '⊓', // ⊓ -- ein Rahmen
+    nachweise: false,
+  },
+];
+
+/** Die Art, die die Auswahl so nennt -- `undefined` bei Material und Blatt. */
+export function artVon(name) {
+  return ARTEN.find((a) => a.art === name);
+}

@@ -26,12 +26,18 @@ import { partnerVon, richtungSetzen, richtungVon } from './lagen.js';
 import { analyseEditor } from './querschnittsanalyse.js';
 import { balkensystemEditor } from './balkensystem.js';
 import {
-  aendern, gewaehlteAnalyse, gewaehltesBalkensystem, gewaehltesBlatt, gewaehltesMaterial,
-  gewaehlterQuerschnitt,
-  kennwertId, projektAendern, zustand,
+  aendern, gewaehltesBauteil, gewaehltesBlatt, gewaehltesMaterial, kennwertId,
+  projektAendern, zustand,
 } from './zustand.js';
 
 const ART_TEXT = { beton: 'Beton', betonstahl: 'Betonstahl' };
+
+/** Der Editor jeder Bauteilart (ARTEN, arten.js) -- fehlt einer, scheitert es laut. */
+const EDITOREN = {
+  querschnitt: plattenEditor,
+  querschnittsanalyse: analyseEditor,
+  balkensystem: balkensystemEditor,
+};
 
 function gerechnet(id) {
   return zustand.loesung?.werte?.[id] || null;
@@ -624,30 +630,17 @@ function plattenEditor(querschnitt) {
 
 export function editorZeichnen(behaelter, titelKnoten, hinweisKnoten) {
   const material = gewaehltesMaterial();
-  const querschnitt = gewaehlterQuerschnitt();
-
   if (material) {
     titelKnoten.textContent = material.name || material.sorte;
     hinweisKnoten.textContent = `${ART_TEXT[material.art] || ''}`
       + (material.eigenstaendig ? ' · eigenständig' : ' · Normsorte');
     return ersetzen(behaelter, ...materialEditor(material));
   }
-  if (querschnitt) {
-    titelKnoten.textContent = querschnitt.name;
-    hinweisKnoten.textContent = 'Stahlbeton-Platte';
-    return ersetzen(behaelter, ...plattenEditor(querschnitt));
-  }
-  const analyse = gewaehlteAnalyse();
-  if (analyse) {
-    titelKnoten.textContent = analyse.name;
-    hinweisKnoten.textContent = 'Querschnittsanalyse';
-    return ersetzen(behaelter, ...analyseEditor(analyse));
-  }
-  const system = gewaehltesBalkensystem();
-  if (system) {
-    titelKnoten.textContent = system.name;
-    hinweisKnoten.textContent = '2D-Balkensystem';
-    return ersetzen(behaelter, ...balkensystemEditor(system));
+  const bauteil = gewaehltesBauteil();
+  if (bauteil) {
+    titelKnoten.textContent = bauteil.eintrag.name;
+    hinweisKnoten.textContent = bauteil.art.bezeichnung;
+    return ersetzen(behaelter, ...EDITOREN[bauteil.art.art](bauteil.eintrag));
   }
   const blatt = gewaehltesBlatt();
   if (blatt) {

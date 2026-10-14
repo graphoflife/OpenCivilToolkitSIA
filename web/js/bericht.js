@@ -25,6 +25,7 @@ import { analyseBlaetter } from './qa_diagramme.js';
 import { systemBlaetter, systemZusammenfassung } from './bs_diagramme.js';
 import { spannungsfallZeichnen } from './spannungsbild.js';
 import { api } from './api.js';
+import { ARTEN } from './arten.js';
 import { aendern, namensraum, zustand } from './zustand.js';
 
 // ===========================================================================
@@ -270,8 +271,14 @@ function herleitung(gesamt) {
 }
 
 /**
- * Die Zusammenfassung: je Bauteil eine Tabelle -- erst die Platten, dann die
- * Querschnittsanalysen, wie im Bericht.
+ * Was eine Bauteilart ohne Nachweise in der Zusammenfassung zeigt -- je Art
+ * (ARTEN, arten.js).
+ */
+const UEBERSICHTEN = { balkensystem: systemZusammenfassung };
+
+/**
+ * Die Zusammenfassung: je Bauteil eine Tabelle, in der Reihenfolge von ARTEN
+ * -- wie im Bericht.
  *
  * Welche Bauteile erscheinen, steuert der Schalter *Gesamt / Aktuelle Seite*.
  * Ist ein Material gewählt und "Aktuelle Seite" aktiv, bleibt sie leer -- ein
@@ -280,20 +287,22 @@ function herleitung(gesamt) {
  */
 function zusammenfassung(loesung, verfolgen) {
   const zuordnung = loesung.zuordnung || {};
-  const bauteile = { ...zuordnung.querschnitte, ...zuordnung.querschnittsanalysen };
   const raum = eingrenzung();
+  const bauteile = (mitNachweisen) => ARTEN.filter((a) => a.nachweise === mitNachweisen)
+    .flatMap((a) => Object.entries(zuordnung[a.liste] || {}).map(([kennung, eintrag]) => (
+      { art: a, kennung, eintrag })))
+    .filter(({ eintrag }) => imRaum(raum, eintrag.namensraum));
 
-  const gezeigt = Object.entries(bauteile).filter(
-    ([, eintrag]) => imRaum(raum, eintrag.namensraum));
-  // Die Balkensysteme danach -- sie führen keine Nachweise, aber ihre
-  // Grenzwerte und Lagerkräfte gehören in die Übersicht.
-  const systeme = Object.entries(zuordnung.balkensysteme || {}).filter(
-    ([, eintrag]) => imRaum(raum, eintrag.namensraum));
-  if (raum && !gezeigt.length && !systeme.length) {
+  const gezeigt = bauteile(true);
+  // Die Bauteile ohne Nachweise danach -- ein Balkensystem führt keine, aber
+  // seine Grenzwerte und Lagerkräfte gehören in die Übersicht.
+  const ohne = bauteile(false);
+  if (raum && !gezeigt.length && !ohne.length) {
+    const arten = ARTEN.map((a) => a.einzahl);
     return leerzustand('Kein Bauteil gewählt.',
-      'Links Platte, Querschnittsanalyse oder Balkensystem wählen oder oben «Gesamt».');
+      `Links ${arten.slice(0, -1).join(', ')} oder ${arten.at(-1)} wählen oder oben «Gesamt».`);
   }
-  if (!gezeigt.length && !systeme.length) {
+  if (!gezeigt.length && !ohne.length) {
     return el('div.blatt', {}, [
       leerzustand('Kein Bauteil vorhanden.'),
       lueckenBanner(loesung),
@@ -302,7 +311,7 @@ function zusammenfassung(loesung, verfolgen) {
 
   const tabellen = loesung.zusammenfassungen || {};
 
-  const blaetter = gezeigt.map(([kennung, eintrag]) => {
+  const blaetter = gezeigt.map(({ kennung, eintrag }) => {
     // Zeilen und LaTeX kommen fertig aus dem Kern. Sie hier ein zweites Mal
     // zusammenzustellen hiesse, dieselbe Tabelle zweimal zu pflegen -- einmal
     // fürs Auge, einmal für den Kopierknopf.
@@ -340,7 +349,7 @@ function zusammenfassung(loesung, verfolgen) {
   });
 
   return el('div', {}, blaetter
-    .concat(systeme.map(([kennung, eintrag]) => systemZusammenfassung(kennung, eintrag.name)))
+    .concat(ohne.map(({ art, kennung, eintrag }) => UEBERSICHTEN[art.art](kennung, eintrag.name)))
     .concat([lueckenBanner(loesung)].filter(Boolean)));
 }
 
@@ -470,10 +479,40 @@ function plattenkennzahlen(eintrag, loesung) {
  * hier bewusst ein leerer Platz und keine erfundene Darstellung.
  */
 
+/**
+ * Das Blatt einer Platte: ihr Querschnitt, die Interaktionslinien, die
+ * Querkraftkurven und die Spannungsbilder.
+ */
+function plattenblatt(kennung, eintrag, loesung) {
+  const eigene = Object.values(loesung.linien || {}).filter((linie) => linie.bauteil === kennung);
+  return el('div.blatt', {}, [
+    el('div.b-titel', { text: `Querschnitt – ${eintrag.name}` }),
+    querschnittZeichnen(eintrag, loesung.werte || {}),
+    ...eigene.flatMap((linie) => [
+      el('div.b-titel', {
+        text: `M-N-Interaktionsdiagramm – ${eintrag.name}`,
+      }),
+      diagrammZeichnen(linie),
+    ]),
+    ...querkraftkurven(loesung, kennung),
+    ...neigungskurven(loesung, kennung),
+    ...((loesung.spannungsanalysen || {})[kennung] || []).map(spannungsfallZeichnen),
+  ]);
+}
+
+/**
+ * Die Diagrammblätter je Bauteilart (ARTEN, arten.js). Die der
+ * Querschnittsanalysen und Balkensysteme kommen aus eigenen Anfragen, siehe
+ * qa_diagramme.js und bs_diagramme.js.
+ */
+const DIAGRAMME = {
+  querschnitt: (kennung, eintrag, loesung) => [plattenblatt(kennung, eintrag, loesung)],
+  querschnittsanalyse: (kennung, eintrag) => analyseBlaetter(kennung, eintrag.name),
+  balkensystem: (kennung, eintrag) => systemBlaetter(kennung, eintrag.name),
+};
+
 function diagrammSicht(loesung) {
   const raum = eingrenzung();
-  const linien = loesung.linien || {};
-  const querschnitte = loesung.zuordnung?.querschnitte || {};
   const gesetze = loesung.werkstoffgesetze || {};
   const blaetter = [];
 
@@ -495,37 +534,13 @@ function diagrammSicht(loesung) {
     ]));
   }
 
-  // -- Querschnitt, Interaktionslinien und Spannungsbilder ----------------
-  const analysen = loesung.spannungsanalysen || {};
-  for (const [kennung, eintrag] of Object.entries(querschnitte)) {
-    if (!imRaum(raum, eintrag.namensraum)) continue;
-    const eigene = Object.entries(linien)
-      .filter(([schluessel]) => schluessel.split('.')[0] === kennung);
-    blaetter.push(el('div.blatt', {}, [
-      el('div.b-titel', { text: `Querschnitt – ${eintrag.name}` }),
-      querschnittZeichnen(eintrag, loesung.werte || {}),
-      ...eigene.flatMap(([, linie]) => [
-        el('div.b-titel', {
-          text: `M-N-Interaktionsdiagramm – ${eintrag.name}`,
-        }),
-        diagrammZeichnen(linie),
-      ]),
-      ...querkraftkurven(loesung, kennung),
-      ...neigungskurven(loesung, kennung),
-      ...(analysen[kennung] || []).map(spannungsfallZeichnen),
-    ]));
-  }
-
-  // -- Querschnittsanalysen ------------------------------------------------
-  // Ihre Diagramme kommen aus einer eigenen Anfrage, siehe qa_diagramme.js.
-  for (const [kennung, eintrag] of Object.entries(loesung.zuordnung?.querschnittsanalysen || {})) {
-    if (imRaum(raum, eintrag.namensraum)) blaetter.push(...analyseBlaetter(kennung, eintrag.name));
-  }
-
-  // -- Balkensysteme -------------------------------------------------------
-  // Ihre Verläufe kommen ebenso aus einer eigenen Anfrage, siehe bs_diagramme.js.
-  for (const [kennung, eintrag] of Object.entries(loesung.zuordnung?.balkensysteme || {})) {
-    if (imRaum(raum, eintrag.namensraum)) blaetter.push(...systemBlaetter(kennung, eintrag.name));
+  // -- Die Bauteile, Art für Art -------------------------------------------
+  for (const art of ARTEN) {
+    for (const [kennung, eintrag] of Object.entries(loesung.zuordnung?.[art.liste] || {})) {
+      if (imRaum(raum, eintrag.namensraum)) {
+        blaetter.push(...DIAGRAMME[art.art](kennung, eintrag, loesung));
+      }
+    }
   }
 
   if (!blaetter.length) return leerzustand('Noch nichts zu zeichnen.');
@@ -644,7 +659,7 @@ function neigungskurven(loesung, querschnitt) {
 /**
  * Der Namensraum des links gewählten Bestandteils -- `beton.b1`,
  * `querschnitt.q1`, `querschnittsanalyse.a1`. Null, wenn nichts gewählt ist.
- * Platten und Analysen heissen im Rechenwerk wie ihre Art in der Auswahl.
+ * Bauteile heissen im Rechenwerk wie ihre Art in der Auswahl (ARTEN).
  */
 function raumDerAuswahl() {
   const wahl = zustand.auswahl;

@@ -29,9 +29,14 @@ from opencivil.querschnitt.platte import Richtung
 
 
 def linien(aufbau: Aufbau, loesung: Loesung) -> dict:
-    """Je gerechneter M-N-Nachweis seine Linien, dazu die Bemessungs- und Knickpunkte."""
+    """
+    Je gerechneter M-N-Nachweis seine Linien, dazu die Bemessungs- und
+    Knickpunkte -- und die Kennung seines Bauteils, damit niemand sie aus
+    dem Schluessel lesen muss.
+    """
     return {
-        kennung: linie(nachweis, loesung, aufbau)
+        kennung: {**linie(nachweis, loesung, aufbau),
+                  "bauteil": aufbau.bauteil_von(nachweis).kennung}
         for kennung, nachweis in aufbau.nachweise.items()
         if nachweis.id in loesung.befunde
     }

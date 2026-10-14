@@ -26,6 +26,7 @@
  */
 
 import { api } from './api.js';
+import { ARTEN } from './arten.js';
 import { kraftpfeil, momentSymbol } from './bs_symbole.js';
 import {
   auswahl, el, leerzustand, svgEl,
@@ -60,7 +61,7 @@ const fest = (x, n) => (Math.abs(x) < 0.5 * 10 ** -n ? 0 : x).toFixed(n);
 function abdruckVon(kennung) {
   const system = zustand.projekt.balkensysteme?.find((s) => s.kennung === kennung);
   const bezuege = (system?.querschnitte || []).map((q) => q.bezug).filter(Boolean);
-  const bauteile = [...zustand.projekt.querschnitte, ...(zustand.projekt.querschnittsanalysen || [])]
+  const bauteile = ARTEN.flatMap((a) => zustand.projekt[a.liste] || [])
     .filter((b) => bezuege.includes(b.kennung));
   return JSON.stringify([system, zustand.projekt.materialien, bauteile]);
 }

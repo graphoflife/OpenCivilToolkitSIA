@@ -1,5 +1,5 @@
 ---
-erzeugt: 1345b72e9c42
+erzeugt: 30dc800fad08
 art: modul
 tags: [modul]
 ---
@@ -26,7 +26,9 @@ kNm und mm umgesetzt.
 def linien(aufbau: Aufbau, loesung: Loesung) -> dict
 ```
 
-Je gerechneter M-N-Nachweis seine Linien, dazu die Bemessungs- und Knickpunkte.
+Je gerechneter M-N-Nachweis seine Linien, dazu die Bemessungs- und
+Knickpunkte -- und die Kennung seines Bauteils, damit niemand sie aus
+dem Schluessel lesen muss.
 
 ### querkraftkurven
 

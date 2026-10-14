@@ -10,6 +10,8 @@
  * nachgerechnet.
  */
 
+import { ARTEN, artVon } from './arten.js';
+
 const zuhoerer = new Set();
 
 /** Unter diesem Schlüssel merkt sich der Browser die zugeklappten Panels. */
@@ -35,8 +37,8 @@ export const zustand = {
    */
   verfolgung: null,
   /**
-   * Was links ausgewählt ist:
-   * {art: 'material'|'querschnitt'|'querschnittsanalyse'|'balkensystem'|'blatt', kennung}.
+   * Was links ausgewählt ist: {art, kennung} -- `art` ist 'material',
+   * 'blatt' oder die einer Bauteilart (ARTEN, arten.js).
    */
   auswahl: null,
   /** Welcher Reiter rechts offen ist. */
@@ -58,7 +60,7 @@ export const zustand = {
   rechenfehler: null,
   ungespeichert: false,
   /** Aufgeklappte Kapitel im Baum. */
-  offen: new Set(['materialien', 'beton', 'betonstahl', 'platten', 'analysen', 'balkensysteme',
+  offen: new Set(['materialien', 'beton', 'betonstahl', ...ARTEN.map((a) => a.kapitel),
     'gleichungen']),
   /**
    * Zugeklappte Panels der Eingaben, je App und Titel: «platte/Bewehrung».
@@ -154,20 +156,12 @@ export function gewaehltesMaterial() {
   return zustand.projekt.materialien.find((m) => m.kennung === zustand.auswahl.kennung) || null;
 }
 
-export function gewaehlterQuerschnitt() {
-  if (zustand.auswahl?.art !== 'querschnitt') return null;
-  return zustand.projekt.querschnitte.find((q) => q.kennung === zustand.auswahl.kennung) || null;
-}
-
-export function gewaehlteAnalyse() {
-  if (zustand.auswahl?.art !== 'querschnittsanalyse') return null;
-  return zustand.projekt.querschnittsanalysen?.find(
-    (a) => a.kennung === zustand.auswahl.kennung) || null;
-}
-
-export function gewaehltesBalkensystem() {
-  if (zustand.auswahl?.art !== 'balkensystem') return null;
-  return zustand.projekt.balkensysteme?.find((s) => s.kennung === zustand.auswahl.kennung) || null;
+/** Das gewählte Bauteil samt seiner Art -- `{art, eintrag}`, oder null. */
+export function gewaehltesBauteil() {
+  const art = artVon(zustand.auswahl?.art);
+  const eintrag = art && (zustand.projekt[art.liste] || []).find(
+    (e) => e.kennung === zustand.auswahl.kennung);
+  return eintrag ? { art, eintrag } : null;
 }
 
 export function gewaehltesBlatt() {
@@ -182,9 +176,7 @@ export function materialien(art) {
 export function freieKennung(vorsilbe) {
   const vergeben = new Set([
     ...zustand.projekt.materialien.map((m) => m.kennung),
-    ...zustand.projekt.querschnitte.map((q) => q.kennung),
-    ...(zustand.projekt.querschnittsanalysen || []).map((a) => a.kennung),
-    ...(zustand.projekt.balkensysteme || []).map((s) => s.kennung),
+    ...ARTEN.flatMap((a) => (zustand.projekt[a.liste] || []).map((e) => e.kennung)),
     ...(zustand.projekt.gleichungen || []).map((b) => b.kennung),
   ]);
   let i = 1;
