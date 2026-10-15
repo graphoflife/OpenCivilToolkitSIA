@@ -1,16 +1,16 @@
 /**
  * querschnittsanalyse.js -- Mittlere Tafel: Eingaben einer Querschnittsanalyse.
  *
- * Von oben nach unten:
+ * Oben der Querschnitt: Bezeichnung, Zeichnung samt Liste, Beschreibung.
+ * Darunter die Kapitel als Knöpfe, wie bei der Platte (`kapitel.js`); ein
+ * Klick öffnet das Fenster mit den Eingaben. Ins Fenster der Tragsicherheit
+ * gehört, womit sie rechnet: die Rechenwerte je Material, die Lastfälle und
+ * die Angaben der Schubwände -- Duktilität und sprödes Versagen rechnen am
+ * selben Querschnitt.
  *
- *     Querschnitt     Bezeichnung, Zeichnung samt Liste, Beschreibung
- *     Werkstoffe      je Material im Querschnitt: Rechenwerte und Gesetz
- *     Schubwände      Neigungsgrenzen, k_c, Längszugkraft
- *     Nachweise       Lastfälle; Duktilität und sprödes Versagen
- *
- * Wie bei der Platte steht hier oben, was der Querschnitt *ist*, und unten,
- * was von ihm *verlangt* wird. Gerechnet wird nichts: jede Zeile beschreibt
- * eine Eingabe, die Zahlen dazu bildet der Kern.
+ * Wie bei der Platte steht oben, was der Querschnitt *ist*, und in den
+ * Fenstern, was von ihm *verlangt* wird. Gerechnet wird nichts: jede Zeile
+ * beschreibt eine Eingabe, die Zahlen dazu bildet der Kern.
  *
  * VORZEICHEN: N > 0 Zug. Ein positives Moment zieht auf der negativen Seite
  * seiner Achse -- M_y > 0 unten, M_z > 0 links. V_y und V_z wirken in
@@ -20,6 +20,9 @@
 
 import { erklaerung, feld, hakenSchalter, panel } from './bausteine.js';
 import { auswahl, el, svgEl, zahlfeld } from './dom.js';
+import {
+  anzahl, eingeschaltet, kapitelFenster, kapitelPanel, schalter,
+} from './kapitel.js';
 import { span } from './mathe.js';
 import { uebersicht } from './qa_uebersicht.js';
 import { zeichenbereich } from './qa_zeichnung.js';
@@ -33,7 +36,7 @@ const HILFE = {
     zeilen: [
       ['M-N', 'Dehnungsebene über Fasern; schief: die Nulllinie dreht, bis M_Rd in Richtung M_Ed zeigt'],
       ['V+T', 'elastisch auf die Schubwände verteilt (Federn b_w·l), Zellen nach Bredt; je Wand Fachwerk'],
-      ['Werte', 'je Material nach Wahl unter «Werkstoffe»'],
+      ['Werte', 'je Material nach Wahl, oben in diesem Fenster'],
     ],
     formel: 'α_eff = Widerstand / Einwirkung ≥ 1',
   },
@@ -62,9 +65,10 @@ const HILFE = {
   },
 };
 
+/** Das Fragezeichen eines Kapitels -- null, wo es keines hat. */
 function hilfe(schluessel) {
-  const { zeilen, formel } = HILFE[schluessel];
-  return erklaerung(zeilen, formel);
+  const eintrag = HILFE[schluessel];
+  return eintrag ? erklaerung(eintrag.zeilen, eintrag.formel) : null;
 }
 
 /**
@@ -143,15 +147,17 @@ function querschnittGruppe(analyse) {
 }
 
 // ===========================================================================
-// Werkstoffe
+// Tragsicherheit
 // ===========================================================================
 
 /**
  * Je Material im Querschnitt eine Zeile: Bemessungs- oder charakteristische
  * Werte, beim Beton dazu das Gesetz. Die Beschriftungen kommen aus dem Kern,
- * die Vorgaben einer fehlenden Wahl aus seiner Vorlage.
+ * die Vorgaben einer fehlenden Wahl aus seiner Vorlage. Es ist die Wahl der
+ * Tragsicherheit; Duktilität und sprödes Versagen rechnen am selben
+ * Querschnitt.
  */
-function werkstoffGruppe(analyse) {
+function werkstoffwahl(analyse) {
   const kennungen = benutzteMaterialien(analyse);
   const wahlen = zustand.katalog?.querschnittsanalyse || {};
   const vorgabe = zustand.katalog?.neue_zeilen?.werkstoffwahl || {};
@@ -189,134 +195,130 @@ function werkstoffGruppe(analyse) {
     ]);
   };
 
-  return panel({
-    schluessel: 'analyse/Werkstoffe', titel: 'Werkstoffe', zusatz: 'je Material im Querschnitt',
-  }, [
-    el('div.unterkapitel', {}, kennungen.length
+  return [
+    el('span.rechenwahl-titel', { text: 'Rechenwerte je Material' }),
+    ...(kennungen.length
       ? kennungen.map(zeile)
       : [el('div.leer', { text: 'Noch kein Material im Querschnitt.' })]),
-  ]);
+  ];
 }
 
-// ===========================================================================
-// Schubwände
-// ===========================================================================
-
-function schubwandGruppe(analyse) {
+/**
+ * Was allein Querkraft und Torsion brauchen -- die Schubwände rechnen damit,
+ * und mit ihnen die Längszugkraft, wenn sie zählt.
+ */
+function schubwandAngaben(analyse) {
   const aendern = (veraenderer) => aendernAn(analyse.kennung, veraenderer);
-  return panel({
-    schluessel: 'analyse/Schubwände', titel: 'Schubwände', zusatz: 'Querkraft und Torsion',
-  }, [
-    el('div.unterkapitel', {}, [
-      el('div.unterkapitel-kopf', {}, [el('span', { text: 'Fachwerk je Wand' }),
-        hilfe('schubwaende')]),
-      el('div.neigungszeile', {}, [
-        el('span.postenname', { text: 'Neigung' }),
-        span(String.raw`\alpha_{min}`),
-        zahlfeld({
-          wert: analyse.alpha_min, schritt: 1, min: 1, max: 89,
-          titel: 'Kleinste Neigung der Druckdiagonalen, ganze °; bei Normalzug 40°',
-          beiAenderung: (v) => aendern((a) => { a.alpha_min = Math.round(v); }),
-        }),
-        el('span.einheit', { text: '°' }),
-        span(String.raw`\alpha_{max}`),
-        zahlfeld({
-          wert: analyse.alpha_max, schritt: 1, min: 1, max: 89,
-          titel: 'Grösste Neigung der Druckdiagonalen, ganze °',
-          beiAenderung: (v) => aendern((a) => { a.alpha_max = Math.round(v); }),
-        }),
-        el('span.einheit', { text: '°' }),
-      ]),
-      feld(['Druckdiagonale ', span('k_c')], zahlfeld({
-        wert: analyse.k_c, schritt: 0.05, min: 0,
-        titel: 'Abminderung f_cd in der Druckdiagonalen',
-        beiAenderung: (v) => aendern((a) => { a.k_c = v; }),
-      }), '', 'Abminderung f_cd in der Druckdiagonalen'),
-      el('div.duktilitaetszeile.ist-breit', {}, [
-        hakenSchalter(!!analyse.laengszugkraft,
-          (wert) => aendern((a) => { a.laengszugkraft = wert; }), 'Längszugkraft'),
-        el('span.postenname', { text: 'Längszugkraft aus Querkraft und Torsion berücksichtigen' }),
-        el('span'),
-      ]),
+  return el('div.unterkapitel', {}, [
+    el('div.unterkapitel-kopf', {}, [el('span', { text: 'Querkraft und Torsion: Fachwerk je Wand' }),
+      hilfe('schubwaende')]),
+    el('div.neigungszeile', {}, [
+      el('span.postenname', { text: 'Neigung' }),
+      span(String.raw`\alpha_{min}`),
+      zahlfeld({
+        wert: analyse.alpha_min, schritt: 1, min: 1, max: 89,
+        titel: 'Kleinste Neigung der Druckdiagonalen, ganze °; bei Normalzug 40°',
+        beiAenderung: (v) => aendern((a) => { a.alpha_min = Math.round(v); }),
+      }),
+      el('span.einheit', { text: '°' }),
+      span(String.raw`\alpha_{max}`),
+      zahlfeld({
+        wert: analyse.alpha_max, schritt: 1, min: 1, max: 89,
+        titel: 'Grösste Neigung der Druckdiagonalen, ganze °',
+        beiAenderung: (v) => aendern((a) => { a.alpha_max = Math.round(v); }),
+      }),
+      el('span.einheit', { text: '°' }),
+    ]),
+    feld(['Druckdiagonale ', span('k_c')], zahlfeld({
+      wert: analyse.k_c, schritt: 0.05, min: 0,
+      titel: 'Abminderung f_cd in der Druckdiagonalen',
+      beiAenderung: (v) => aendern((a) => { a.k_c = v; }),
+    }), '', 'Abminderung f_cd in der Druckdiagonalen'),
+    el('div.duktilitaetszeile.ist-breit', {}, [
+      hakenSchalter(!!analyse.laengszugkraft,
+        (wert) => aendern((a) => { a.laengszugkraft = wert; }), 'Längszugkraft'),
+      el('span.postenname', { text: 'Längszugkraft aus Querkraft und Torsion berücksichtigen' }),
+      el('span'),
     ]),
   ]);
 }
 
-// ===========================================================================
-// Nachweise
-// ===========================================================================
-
-function nachweisGruppe(analyse) {
+/**
+ * Tragsicherheit: womit gerechnet wird, die Lastfälle und was Querkraft und
+ * Torsion brauchen.
+ */
+function tragsicherheitInhalt(analyse) {
   const aendern = (veraenderer) => aendernAn(analyse.kennung, veraenderer);
   const faelle = analyse.lastfaelle;
-
-  return panel({
-    schluessel: 'analyse/Nachweise', titel: 'Nachweise', zusatz: 'N, V in kN · M, T in kNm',
-  }, [
-
-    el('div.unterkapitel', {}, [
-      el('div.unterkapitel-kopf', {}, [
-        el('span', { text: 'Tragsicherheitsnachweise' }),
-        hilfe('tragsicherheit'),
-      ]),
-      el('div.qa-kopfzeile', {}, [
-        el('div.qa-schalter', {}, [
-          el('div.duktilitaetszeile.ist-breit', {}, [
-            hakenSchalter(!!analyse.einachsig,
-              (wert) => aendern((a) => { a.einachsig = wert; }), 'Einachsige Biegung'),
-            el('span.postenname', { text: 'nur einachsig (Biegung um y)' }),
-            el('span'),
-          ]),
-          el('p.qa-erlaeuterung', {
-            text: analyse.einachsig
-              ? 'Nulllinie waagrecht; M_z und V_y zählen nicht.'
-              : 'N, M_y und M_z gleichzeitig; die Nulllinie liegt schief.',
-          }),
+  return [
+    ...werkstoffwahl(analyse),
+    el('div.qa-kopfzeile', {}, [
+      el('div.qa-schalter', {}, [
+        el('div.duktilitaetszeile.ist-breit', {}, [
+          hakenSchalter(!!analyse.einachsig,
+            (wert) => aendern((a) => { a.einachsig = wert; }), 'Einachsige Biegung'),
+          el('span.postenname', { text: 'nur einachsig (Biegung um y)' }),
+          el('span'),
         ]),
-        vorzeichenbild(analyse.einachsig),
-      ]),
-      faelle.length ? lastfallKopf(analyse) : null,
-      ...(faelle.length
-        ? faelle.map((_, i) => lastfallZeile(analyse, i))
-        : [el('div.leer', { text: 'Ohne Lastfall kein Nachweis.' })]),
-      el('button.knopf-anfuegen', {
-        text: '+ Lastfall',
-        on: {
-          click: () => aendern((a) => a.lastfaelle.push(
-            ausVorlage('qa_lastfall', { name: naechsterName('Tragsicherheit', a.lastfaelle) }))),
-        },
-      }),
-    ]),
-
-    el('div.unterkapitel', {}, [
-      el('div.unterkapitel-kopf', {}, [el('span', { text: 'Duktilitätsnachweis' }),
-        hilfe('duktilitaet')]),
-      el('div.duktilitaetszeile.mit-grenze', {}, [
-        hakenSchalter(!!analyse.duktilitaet,
-          (wert) => aendern((a) => { a.duktilitaet = wert; }), 'Nachweis'),
-        el('span.postenname', { text: 'Max. x/d' }),
-        zahlfeld({
-          wert: analyse.x_d_max, schritt: 0.05, min: 0.05,
-          max: zustand.katalog?.duktilitaet?.hoechstens,
-          titel: `Grenze der Druckzonenhöhe x/d; höchstens ${
-            zustand.katalog?.duktilitaet?.hoechstens ?? '–'}`,
-          beiAenderung: (v) => aendern((a) => { a.x_d_max = v; }),
+        el('p.qa-erlaeuterung', {
+          text: analyse.einachsig
+            ? 'Nulllinie waagrecht; M_z und V_y zählen nicht.'
+            : 'N, M_y und M_z gleichzeitig; die Nulllinie liegt schief.',
         }),
-        el('span.kurvenhinweis', { text: richtungstext(analyse) }),
       ]),
+      vorzeichenbild(analyse.einachsig),
     ]),
+    faelle.length ? lastfallKopf(analyse) : null,
+    ...(faelle.length
+      ? faelle.map((_, i) => lastfallZeile(analyse, i))
+      : [el('div.leer', { text: 'Ohne Lastfall kein Nachweis.' })]),
+    el('button.knopf-anfuegen', {
+      text: '+ Lastfall',
+      on: {
+        click: () => aendern((a) => a.lastfaelle.push(
+          ausVorlage('qa_lastfall', { name: naechsterName('Tragsicherheit', a.lastfaelle) }))),
+      },
+    }),
+    schubwandAngaben(analyse),
+  ];
+}
 
-    el('div.unterkapitel', {}, [
-      el('div.unterkapitel-kopf', {}, [el('span', { text: 'Nachweis gegen sprödes Versagen' }),
-        hilfe('sproede')]),
-      el('div.duktilitaetszeile.ist-breit', {}, [
-        hakenSchalter(!!analyse.sproede,
-          (wert) => aendern((a) => { a.sproede = wert; }), 'Nachweis'),
-        el('span.postenname', { text: 'Rissmoment' }),
-        el('span.kurvenhinweis', { text: richtungstext(analyse) }),
-      ]),
+/** Gerechnet am Querschnitt der Tragsicherheit -- mit ihren Rechenwerten. */
+const WIE_TRAGSICHERHEIT = 'Gerechnet mit den Rechenwerten der Tragsicherheit.';
+
+/** Duktilität: ein Schalter und die Grenze x/d. */
+function duktilitaetInhalt(analyse) {
+  const aendern = (veraenderer) => aendernAn(analyse.kennung, veraenderer);
+  return [
+    el('div.duktilitaetszeile.mit-grenze', {}, [
+      hakenSchalter(!!analyse.duktilitaet,
+        (wert) => aendern((a) => { a.duktilitaet = wert; }), 'Nachweis'),
+      el('span.postenname', { text: 'Max. x/d' }),
+      zahlfeld({
+        wert: analyse.x_d_max, schritt: 0.05, min: 0.05,
+        max: zustand.katalog?.duktilitaet?.hoechstens,
+        titel: `Grenze der Druckzonenhöhe x/d; höchstens ${
+          zustand.katalog?.duktilitaet?.hoechstens ?? '–'}`,
+        beiAenderung: (v) => aendern((a) => { a.x_d_max = v; }),
+      }),
+      el('span.kurvenhinweis', { text: richtungstext(analyse) }),
     ]),
-  ]);
+    el('p.qa-erlaeuterung', { text: WIE_TRAGSICHERHEIT }),
+  ];
+}
+
+/** Sprödes Versagen: ein Schalter. */
+function sproedeInhalt(analyse) {
+  const aendern = (veraenderer) => aendernAn(analyse.kennung, veraenderer);
+  return [
+    el('div.duktilitaetszeile.ist-breit', {}, [
+      hakenSchalter(!!analyse.sproede,
+        (wert) => aendern((a) => { a.sproede = wert; }), 'Nachweis'),
+      el('span.postenname', { text: 'Rissmoment' }),
+      el('span.kurvenhinweis', { text: richtungstext(analyse) }),
+    ]),
+    el('p.qa-erlaeuterung', { text: WIE_TRAGSICHERHEIT }),
+  ];
 }
 
 /** In welchen Richtungen Duktilität und sprödes Versagen geführt werden. */
@@ -439,13 +441,47 @@ function vorzeichenbild(einachsig) {
 }
 
 // ===========================================================================
+// Die Kapitel -- je ein Knopf, die Eingaben im Fenster (kapitel.js)
+// ===========================================================================
 
-/** Die mittlere Tafel für eine Querschnittsanalyse. */
+const NACHWEISE = [
+  {
+    schluessel: 'tragsicherheit',
+    name: 'Trag\u00adsicherheit', titel: 'Tragsicherheitsnachweise',
+    bezug: () => 'N, V in kN · M, T in kNm',
+    inhalt: tragsicherheitInhalt,
+    stand: (a) => {
+      const n = eingeschaltet(a.lastfaelle);
+      return { an: n > 0, text: n ? anzahl(n, 'Lastfall', 'Lastfälle') : 'kein Lastfall' };
+    },
+  },
+  {
+    schluessel: 'duktilitaet',
+    name: 'Duktilität', titel: 'Duktilitätsnachweis',
+    inhalt: duktilitaetInhalt,
+    stand: (a) => schalter(!!a.duktilitaet),
+  },
+  {
+    schluessel: 'sproede',
+    name: 'Sprödes Versagen', titel: 'Nachweis gegen sprödes Versagen',
+    inhalt: sproedeInhalt,
+    stand: (a) => schalter(!!a.sproede),
+  },
+];
+
+function kapitel() {
+  return [{ titel: 'Nachweise', kapitel: NACHWEISE }];
+}
+
+/** Die mittlere Tafel für eine Querschnittsanalyse: oben der Querschnitt, darunter die Knöpfe. */
 export function analyseEditor(analyse) {
   return [
     querschnittGruppe(analyse),
-    werkstoffGruppe(analyse),
-    schubwandGruppe(analyse),
-    nachweisGruppe(analyse),
+    kapitelPanel(analyse, kapitel(), { schluessel: 'analyse/Kapitel', titel: 'Nachweise' }),
   ];
+}
+
+/** Das offene Fenster einer Querschnittsanalyse -- oder null. */
+export function analyseFenster(analyse, schluessel) {
+  return kapitelFenster(analyse, kapitel(), schluessel, hilfe);
 }

@@ -44,6 +44,20 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-15 · Querschnittsanalyse: Kapitel als Knöpfe
+
+Wie bei der Platte: oben der Querschnitt mit dem Zeichenfenster, darunter je
+Kapitel ein Knopf, die Eingaben im Fenster. Die drei Panels Werkstoffe,
+Schubwände und Nachweise sind weg. Die Rechenwerte je Material und die
+Angaben der Schubwände stehen im Fenster der Tragsicherheit: die Werkstoffwahl
+ist ihre Rechenwahl -- Duktilität und sprödes Versagen rechnen am selben
+Querschnitt, ihre Fenster sagen es --, und Neigung, k_c und Längszugkraft
+braucht allein die Querkraft mit Torsion.
+
+`kapitel.js` ist dafür allgemein geworden: Knopf, Panel und Fenster für
+jedes Bauteil. Welche Kapitel eine Art hat, steht bei ihrem Editor -- die der
+Platte in `editor.js`, die der Analyse in `querschnittsanalyse.js`.
+
 ## 2026-10-15 · Zeichenfenster: der Vektor beginnt am angeklickten Knoten
 
 Verschieben und Kopieren fragten zuerst nach einem Basispunkt, dann nach dem

@@ -301,9 +301,12 @@ Tippen der Masse. Rückgängig mit Strg+Z, Vollbild.
 Darunter eine Liste: Meldungen, Querschnittswerte, je Element eine Zeile.
 Was die Rechnung braucht -- die Stäbe einer Linie samt tatsächlicher
 Teilung, Schwerpunkt, Zellen, Meldungen am Element -- kommt vom Kern. Darunter
-je Material Bemessungs- oder charakteristische Werte und beim Beton das
-Gesetz, die Lastfälle mit N, M_y, M_z, V_y, V_z und T, der Schalter «nur
-einachsig» und die Nachweisschalter.
+die Kapitel als Knöpfe mit Fenster, wie bei der Platte. Im Fenster der
+Tragsicherheit: je Material Bemessungs- oder charakteristische Werte und beim
+Beton das Gesetz, der Schalter «nur einachsig», die Lastfälle mit N, M_y,
+M_z, V_y, V_z und T und die Angaben der Schubwände (Neigung, k_c,
+Längszugkraft). Duktilität und sprödes Versagen rechnen am selben
+Querschnitt.
 
 **2D Balkensysteme:** unter der Querschnittsanalyse ein drittes Kapitel,
 ein ebener Rahmen nach der Steifigkeitsmethode. Gezeichnet wird mit
