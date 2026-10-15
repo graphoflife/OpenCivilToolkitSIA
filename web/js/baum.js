@@ -28,7 +28,7 @@ import { fensterVergessen } from './qa_zeichnung.js';
 import { benutzteBauteile, benutzteMaterialien as systemMaterialien } from './balkensystem.js';
 import { fensterVergessen as systemfensterVergessen } from './bs_zeichnung.js';
 import {
-  aendern, ausVorlage, freieKennung, naechsterName, projektAendern, umschalten, zustand,
+  ausVorlage, freieKennung, naechsterName, projektAendern, umschalten, waehlen, zustand,
 } from './zustand.js';
 
 // ===========================================================================
@@ -98,7 +98,7 @@ function eintrag(m, art) {
   const { text, loeschen } = ART[art](m);
   return el('div.baum-eintrag', {
     class: aktiv ? 'ist-aktiv' : '',
-    on: { click: () => aendern({ auswahl: { art, kennung: m.kennung } }, 'auswahl') },
+    on: { click: () => waehlen({ art, kennung: m.kennung }) },
   }, [
     el('span.name', {
       text: istMaterial ? (m.name || m.sorte) : m.name,
@@ -171,7 +171,7 @@ function entfernen(liste, eintrag) {
   projektAendern((p) => {
     p[liste] = p[liste].filter((x) => x.kennung !== eintrag.kennung);
   });
-  if (zustand.auswahl?.kennung === eintrag.kennung) aendern({ auswahl: null }, 'auswahl');
+  if (zustand.auswahl?.kennung === eintrag.kennung) waehlen(null);
 }
 
 function blattAnlegen() {
@@ -183,7 +183,7 @@ function blattAnlegen() {
       zeilen: [neueZeile()],
     });
   });
-  aendern({ auswahl: { art: 'blatt', kennung } }, 'auswahl');
+  waehlen({ art: 'blatt', kennung });
 }
 
 function materialAnlegen(art) {
@@ -202,7 +202,7 @@ function materialAnlegen(art) {
       kennung, art, sorte: frei.sorte, name: frei.sorte,
     }));
   });
-  aendern({ auswahl: { art: 'material', kennung } }, 'auswahl');
+  waehlen({ art: 'material', kennung });
 }
 
 function platteAnlegen(art) {
@@ -236,7 +236,7 @@ function platteAnlegen(art) {
     platte.lagen.forEach((l) => { l.stahl = stahl.kennung; });
     p[art.liste].push(platte);
   });
-  aendern({ auswahl: { art: art.art, kennung } }, 'auswahl');
+  waehlen({ art: art.art, kennung });
 }
 
 /**
@@ -269,7 +269,7 @@ function analyseAnlegen(art) {
     }
     p[art.liste].push(analyse);
   });
-  aendern({ auswahl: { art: art.art, kennung } }, 'auswahl');
+  waehlen({ art: art.art, kennung });
 }
 
 /**
@@ -298,7 +298,7 @@ function systemAnlegen(art) {
     system.linien.forEach((l) => { if (l.stab) l.material = beton.kennung; });
     p[art.liste].push(system);
   });
-  aendern({ auswahl: { art: art.art, kennung } }, 'auswahl');
+  waehlen({ art: art.art, kennung });
 }
 
 // ===========================================================================

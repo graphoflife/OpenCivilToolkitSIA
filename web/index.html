@@ -8,17 +8,17 @@
   <link rel="stylesheet" href="vendor/katex/katex.min.css">
   <script defer src="vendor/katex/katex.min.js"></script>
   <!-- Versionsmarken: geschrieben von «python3 -m opencivil.web.bruecke», nicht von Hand ändern -->
-  <link rel="stylesheet" href="./css/stil.css?v=1e29863070db">
+  <link rel="stylesheet" href="./css/stil.css?v=f8c1cd741da1">
   <script type="importmap">
   {
     "imports": {
       "./js/ablage.js": "./js/ablage.js?v=a67aeb3de570",
       "./js/achsen.js": "./js/achsen.js?v=87b48bf3c1f9",
       "./js/api.js": "./js/api.js?v=7a369d6df9f2",
-      "./js/app.js": "./js/app.js?v=c5616326e6a4",
+      "./js/app.js": "./js/app.js?v=e54b42aaec71",
       "./js/arten.js": "./js/arten.js?v=e1da8ebcec1f",
       "./js/balkensystem.js": "./js/balkensystem.js?v=58a3e65dbb2e",
-      "./js/baum.js": "./js/baum.js?v=3fe562556a22",
+      "./js/baum.js": "./js/baum.js?v=f959f994e6c5",
       "./js/bausteine.js": "./js/bausteine.js?v=5e4ad56bf79b",
       "./js/bericht.js": "./js/bericht.js?v=dc98e0c9484d",
       "./js/bs_diagramme.js": "./js/bs_diagramme.js?v=8c926719734b",
@@ -33,15 +33,17 @@
       "./js/cad_palette.js": "./js/cad_palette.js?v=d4ec92ee6165",
       "./js/diagramm.js": "./js/diagramm.js?v=afc3acde6f3a",
       "./js/dom.js": "./js/dom.js?v=c25fa011a69f",
-      "./js/editor.js": "./js/editor.js?v=f7ffc82806fa",
+      "./js/editor.js": "./js/editor.js?v=a9c6ba676409",
+      "./js/fenster.js": "./js/fenster.js?v=eeecf68a8192",
       "./js/gleichungen.js": "./js/gleichungen.js?v=df80597c166a",
+      "./js/kapitel.js": "./js/kapitel.js?v=4761b6ccf18e",
       "./js/kern.js": "./js/kern.js?v=dc39e6201373",
       "./js/kern_arbeiter.js": "./js/kern_arbeiter.js?v=7a1bf252b89f",
       "./js/kopierleiste.js": "./js/kopierleiste.js?v=5f7cd5851fbf",
       "./js/lagen.js": "./js/lagen.js?v=d1de89b1b40b",
       "./js/markdown.js": "./js/markdown.js?v=95b8ac3d60df",
       "./js/mathe.js": "./js/mathe.js?v=fa933d1b76f8",
-      "./js/nachweise.js": "./js/nachweise.js?v=ee9360591d56",
+      "./js/nachweise.js": "./js/nachweise.js?v=523e19e21242",
       "./js/notizbuch.js": "./js/notizbuch.js?v=18958bac8115",
       "./js/notizbuch_seite.js": "./js/notizbuch_seite.js?v=639209806e79",
       "./js/qa_diagramme.js": "./js/qa_diagramme.js?v=399f79cbd2fb",
@@ -49,8 +51,9 @@
       "./js/qa_vorlagen.js": "./js/qa_vorlagen.js?v=bcb219f987e3",
       "./js/qa_zeichnung.js": "./js/qa_zeichnung.js?v=ab90188de64f",
       "./js/querschnittsanalyse.js": "./js/querschnittsanalyse.js?v=d524f5aa5c3d",
+      "./js/sinnbilder.js": "./js/sinnbilder.js?v=110934c37585",
       "./js/spannungsbild.js": "./js/spannungsbild.js?v=fcbfaa243dc3",
-      "./js/zustand.js": "./js/zustand.js?v=230e70804f35",
+      "./js/zustand.js": "./js/zustand.js?v=701a06113c16",
       "./kern/dateien.json": "./kern/dateien.json?v=2ed2b723e61c",
       "./kern/notizbuch.json": "./kern/notizbuch.json?v=84b09dca4798"
     }
@@ -123,6 +126,7 @@
       <span class="tafel-hinweis" id="editor-hinweis"></span>
     </div>
     <div class="tafel-inhalt panelstapel" id="editor"></div>
+    <div class="fenster-grund" id="fenster" hidden></div>
   </section>
 
   <div class="griff" data-griff="mitte" role="separator" aria-orientation="vertical"

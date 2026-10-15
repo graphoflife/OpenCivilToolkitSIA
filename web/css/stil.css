@@ -250,6 +250,8 @@ a.knopf { display: inline-block; text-decoration: none; }
   border-right: 1px solid var(--rand);
 }
 .tafel-rechts { border-right: none; background: var(--grund); }
+/* Bezug für das Fenster, das sich über die Eingaben legt. */
+.tafel-mitte { position: relative; }
 
 .tafel-kopf {
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
@@ -723,6 +725,78 @@ input[readonly], input:disabled, select:disabled {
 .einwirkung .ew-name { padding: 3px 6px; font-weight: 500; }
 .einwirkung .schalter-richtung { justify-self: stretch; }
 
+/* ------------------------------------------------- Kapitel und Fenster -- */
+
+/* Die Kapitel einer Platte als Knöpfe, vier in einer Reihe: Zeichen, Name
+   und darunter klein, was eingestellt ist. Weiss auf dem grauen Panel wie
+   die Lagen; ein Kapitel, das etwas rechnet, trägt sein Zeichen in Blau. */
+.kachel-gruppe {
+  margin: 6px 0 5px; font-size: 10.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .4px; color: var(--schrift-matt);
+}
+/* Alle Reihen einer Gruppe gleich hoch: ein Knopf mit zweizeiligem Namen
+   macht nicht nur seine Reihe höher. */
+.kacheln {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 1fr;
+  gap: 6px; margin-bottom: 10px;
+}
+@container (max-width: 360px) {
+  .kacheln { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.kachel {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  min-height: 78px; padding: 8px 4px 6px;
+  font: inherit; text-align: center; cursor: pointer;
+  color: var(--schrift); background: var(--flaeche);
+  border: 1px solid var(--rand); border-radius: 7px;
+}
+.kachel:hover { border-color: var(--blau); background: var(--blau-hell); }
+.kachel .sinnbild { width: 24px; height: 24px; flex: none; color: var(--schrift-zart); }
+.kachel.ist-an .sinnbild { color: var(--blau); }
+.kachel-name { font-size: 11.5px; font-weight: 600; line-height: 1.2; hyphens: manual; }
+.kachel-stand { margin-top: auto; font-size: 10.5px; color: var(--schrift-zart); }
+.kachel.ist-an .kachel-stand { color: var(--blau-tief); }
+
+/* Das Fenster legt sich über die ganze mittlere Tafel. Der Grund rollt,
+   nicht die Karte: so bleibt er beim Neuzeichnen stehen, und mit ihm die
+   Stelle, an der man war. */
+.fenster-grund {
+  position: absolute; inset: 0; z-index: 20;
+  overflow-y: auto; overscroll-behavior: contain;
+  padding: 12px 12px 48px;
+  background: rgba(16, 24, 40, .3);
+}
+.fenster-grund[hidden] { display: none; }
+/* So breit wie ein Panel, damit darin alles steht wie dort. */
+.fenster {
+  max-width: calc(var(--panelbreite) + 2px); margin: 0 auto;
+  background: var(--panel); border: 1px solid var(--rand-stark); border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(16, 24, 40, .22), 0 2px 6px rgba(16, 24, 40, .1);
+}
+/* Den Fokus bekommt es beim Öffnen nur, damit Tab hineinführt -- ein Rahmen
+   darum sagte nichts. */
+.fenster:focus { outline: none; }
+/* Der Kopf bleibt oben stehen, wenn man im Fenster rollt. */
+.fenster-kopf {
+  position: sticky; top: -12px; z-index: 2;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-bottom: 1px solid var(--rand);
+  background: var(--panel); border-radius: 10px 10px 0 0;
+}
+.fenster-kopf .sinnbild { width: 26px; height: 26px; flex: none; color: var(--blau); }
+.fenster-titel { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.fenster-titel > span:first-child { font-size: 14px; font-weight: 700; line-height: 1.25; }
+.fenster-zusatz { font-size: 11.5px; color: var(--schrift-zart); }
+.fenster-zu {
+  flex: none; width: 30px; height: 30px; padding: 0;
+  font-size: 19px; line-height: 1; cursor: pointer; color: var(--schrift-matt);
+  background: var(--flaeche); border: 1px solid var(--rand); border-radius: 50%;
+}
+.fenster-zu:hover { background: var(--schlecht); border-color: var(--schlecht); color: #fff; }
+/* Bezugsgrösse für die Umbrüche der Zeilen darin, wie im Panel. */
+.fenster-inhalt { padding: 10px 12px 8px; container-type: inline-size; }
+.fenster-inhalt > .unterkapitel { margin-top: 12px; }
+
 /* ------------------------------------------------------------ Bericht -- */
 
 .reiter { display: flex; gap: 3px; margin-left: auto; flex-wrap: wrap; }
@@ -1007,10 +1081,9 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .kennzahl-wert { font-weight: 600; }
 
 
-/* «Automatische Bewehrung» -- eine Karte unter den Bügeln. Die Moduswahl
+/* «Automatische Bewehrung» -- im eigenen Fenster. Die Moduswahl
    nimmt die ganze Zeile: «Grundbew. ohne Kräfte, Zulage mit Kräften» passt
    in keine Zahlenspalte. */
-.automatik { margin-top: 10px; }
 .automatik > select { width: 100%; margin-bottom: 6px; }
 
 /* Der Knopf, der die Bewehrung sucht. Ohne Meldung daneben: das Ergebnis
@@ -1112,14 +1185,12 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .einwirkung.ist-spannung { align-items: end; }
-/* Eine Analyse als Karte in drei Zeilen: Name und Richtung; Art, ihre
-   Zahlen und die Kriechzahl; die Werte und der Beton, je zwei Spalten
-   breit -- in einer wären sie abgeschnitten. */
-.einwirkung.ist-spannung > :nth-child(2) { grid-column: 2 / 5; }
-.einwirkung.ist-spannung > :nth-child(6) { grid-column: 5; grid-row: 1; }
-.einwirkung.ist-spannung > :nth-child(7) { grid-column: 5; grid-row: 2; }
-.einwirkung.ist-spannung > :nth-child(8) { grid-column: 2 / 4; grid-row: 3; }
-.einwirkung.ist-spannung > :nth-child(9) { grid-column: 4 / 6; grid-row: 3; }
+/* Eine Analyse als Karte in drei Zeilen: der Name; ihre Zahlen, die
+   Kriechzahl und die Richtung; die Werte und der Beton, je zwei Spalten
+   breit -- in einer wären sie abgeschnitten. Die Art steht über dem
+   Fenster. */
+.einwirkung.ist-spannung > :nth-child(7) { grid-column: 2 / 4; grid-row: 3; }
+.einwirkung.ist-spannung > :nth-child(8) { grid-column: 4 / 6; grid-row: 3; }
 /* Ein Feld, das bei der gewählten Rechenart nichts ändert -- etwa φ beim
    Spannungsblock. Es bleibt stehen, damit seine Zahl nicht verloren geht. */
 .ist-ohne-wirkung { opacity: .45; }
@@ -1147,16 +1218,13 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 }
 /* «charakteristisch» fehlten in 14 px zwei Pixel. Der Kopf steht über einer
    Auswahl links, wie ihr Text -- über einer Zahl rechts. */
-.einwirkung.ist-spannung > :nth-child(n+8) select { font-size: 13px; }
-/* Die Art: «M–E_eq» braucht in 13 px 47 px, mit dem üblichen Innenabstand
-   blieben 41. Näher an ihren Pfeil gerückt, passt sie auf jeder Breite. */
-.einwirkung.ist-spannung > :nth-child(3) { font-size: 13px; padding-inline: 5px 2px; }
-.einwirkung.ist-spannung > :nth-child(n+8) .spaltenkopf { text-align: left; }
+.einwirkung.ist-spannung > :nth-child(n+7) select { font-size: 13px; }
+.einwirkung.ist-spannung > :nth-child(n+7) .spaltenkopf { text-align: left; }
 /* Am Telefon ist die Karte 70 px schmaler: Werte und Beton je auf einer
    Zeile. */
 @container (max-width: 380px) {
-  .einwirkung.ist-spannung > :nth-child(8) { grid-column: 2 / 6; }
-  .einwirkung.ist-spannung > :nth-child(9) { grid-column: 2 / 6; grid-row: 4; }
+  .einwirkung.ist-spannung > :nth-child(7) { grid-column: 2 / 6; }
+  .einwirkung.ist-spannung > :nth-child(8) { grid-column: 2 / 6; grid-row: 4; }
 }
 /* Ein Formelzeichen als Kopf: gross geschrieben würde aus φ ein Φ. */
 .spaltenkopf.ist-formel {
@@ -1270,7 +1338,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
      was man antippen soll, ist hier mindestens 34 px hoch. Gilt für alles,
      was tippbar ist, damit nicht der nächste Knopf wieder zu klein anfängt. */
   .weg, .knopf-zart, .reiter-knopf, .erklaerung-zeichen,
-  .baum-eintrag > button {
+  .baum-eintrag > button, .fenster-zu {
     min-height: 34px; min-width: 34px;
   }
   /* Die Halbschalter stehen paarweise in engen Zeilen -- ihnen genügt die

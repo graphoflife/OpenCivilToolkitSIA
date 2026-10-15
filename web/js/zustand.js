@@ -41,6 +41,12 @@ export const zustand = {
    * 'blatt' oder die einer Bauteilart (ARTEN, arten.js).
    */
   auswahl: null,
+  /**
+   * Welches Fenster über den Eingaben offen ist -- der Schlüssel eines
+   * Kapitels (kapitel.js) oder null. Ansichtssache; es gehört zum gewählten
+   * Bauteil und geht zu, sobald ein anderes gewählt wird (`waehlen`).
+   */
+  fenster: null,
   /** Welcher Reiter rechts offen ist. */
   reiter: 'nachweise',
   /** 'gesamt' oder 'seite' -- ob nur der gewählte Bestandteil gezeigt wird. */
@@ -106,6 +112,14 @@ export function panelUmschalten(schluessel) {
     // Privater Modus oder voller Speicher: dann gilt es bis zum Neuladen.
   }
   return zu;
+}
+
+/**
+ * Wählt einen Bestandteil -- `{art, kennung}` oder null. Ein offenes Fenster
+ * gehört zum bisher gewählten und geht dabei zu.
+ */
+export function waehlen(auswahl) {
+  aendern({ auswahl, fenster: null }, 'auswahl');
 }
 
 export function horchen(rueckruf) {

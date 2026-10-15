@@ -20,6 +20,7 @@ import { melden } from './dom.js';
 import { baumZeichnen } from './baum.js';
 import { berichtZeichnen } from './bericht.js';
 import { editorZeichnen } from './editor.js';
+import { fensterEinrichten } from './fenster.js';
 import { notizbuchEinrichten } from './notizbuch.js';
 
 const knoten = {};
@@ -177,6 +178,7 @@ async function oeffnen() {
       projekt,
       ungespeichert: false,
       auswahl: null,
+      fenster: null,
       loesung: null,
       verfolgung: null,
     }, 'start');
@@ -296,9 +298,9 @@ function tafelwahlEinrichten() {
 // Zeichnen
 // ===========================================================================
 
-/** Die drei scrollbaren Tafeln. */
+/** Was beim Neuzeichnen rollt: die drei Tafeln und das Fenster über den Eingaben. */
 function tafeln() {
-  return [knoten.baum, knoten.editor, knoten.bericht];
+  return [knoten.baum, knoten.editor, knoten.fenster, knoten.bericht];
 }
 
 /**
@@ -436,13 +438,13 @@ function ohneSprung(zeichnen) {
  * sähen danach aus wie vorher -- und die Herleitung neu zu setzen kostet
  * mit jeder Formel mehr.
  */
-const NUR_MITTE = new Set(['zeichnung']);
+const NUR_MITTE = new Set(['zeichnung', 'fenster']);
 
 function allesZeichnen(anlass) {
   const nurMitte = NUR_MITTE.has(anlass);
   ohneSprung(() => {
     if (!nurMitte) baumZeichnen(knoten.baum);
-    editorZeichnen(knoten.editor, knoten.editorTitel, knoten.editorHinweis);
+    editorZeichnen(knoten.editor, knoten.editorTitel, knoten.editorHinweis, knoten.fenster);
     if (!nurMitte) berichtZeichnen(knoten.bericht, {
       verfolgen: (ziel, name) => {
         // Reiter und Platzhalter in einem Zug: sonst zeichnete der Wechsel
@@ -487,6 +489,7 @@ async function starten() {
     editor: document.getElementById('editor'),
     editorTitel: document.getElementById('editor-titel'),
     editorHinweis: document.getElementById('editor-hinweis'),
+    fenster: document.getElementById('fenster'),
     bericht: document.getElementById('bericht'),
     projektname: document.getElementById('projektname'),
     zustandsanzeige: document.getElementById('zustandsanzeige'),
@@ -521,6 +524,7 @@ async function starten() {
 
   griffeEinrichten();
   tafelwahlEinrichten();
+  fensterEinrichten(knoten.fenster);
   ablageEinrichten(imBrowserAblegen);
   horchen(allesZeichnen);
   // Vor dem Kern: das Notizbuch braucht ihn nicht, und eine Adresse

@@ -44,6 +44,49 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-15 · Oberfläche: Kapitel als Knöpfe, kompakte Bewehrung
+
+Auf Wunsch übersichtlicher, in drei Schritten. Gerechnet wird dasselbe.
+
+**Graue Panels, schlichter Baum.** Ein Panel ist eine graue Fläche mit Rand:
+man sieht, wo eines aufhört. Die Karten darin -- Lagen, Einwirkungen --
+bleiben weiss. Der Baum links trägt keine Zeichen und keine farbigen Kanten
+mehr.
+
+**Die Bewehrung braucht gut die Hälfte der Höhe.** Eine Lage ist so hoch wie
+ihre zwei Zeilen Grund und Zulage, 68 statt rund 110 px: Nummer und Richtung
+stehen links daneben statt in einer eigenen Kopfzeile, der Stahl am Ende der
+Grundzeile, «ungünstig/günstig» als ein Knopf am Ende der Zulage. Ob die
+Zahl eine Teilung oder eine Stabzahl ist, schaltet die Einheit selbst
+(«mm» ↔ «Stk») -- ein eigener Knopf kostete jede Zeile eine Spalte. Die
+Zahlenfelder der Lagen sind auf vier Ziffern bemessen statt auf acht. Die
+Bügel sind gebaut wie eine Lage.
+
+**Die Kapitel sind Knöpfe, ihre Eingaben stehen in einem Fenster.** Unter der
+Bewehrung stand bisher alles offen untereinander -- sieben Nachweise, die
+Analysen, die Suche --, und wer die Bewehrung neben einer Einwirkung sehen
+wollte, rollte weit. Jetzt steht jedes Kapitel als Knopf da, mit Zeichen und
+einer kleinen Zeile, was eingestellt ist; ein Klick öffnet die Eingaben in
+einem Fenster über der mittleren Tafel. Baum und Ergebnis bleiben sichtbar,
+damit man sieht, was eine Eingabe bewirkt. Jede der sechs Analysearten hat
+ihren Knopf; im Fenster wird die Art darum nicht mehr gewählt, ein neues
+Bild bekommt sie mit. Jedes Kapitel steht einmal in `kapitel.js`, was in
+den Fenstern steht, liefert `nachweise.js`.
+
+Welches Fenster offen ist, ist Ansichtssache (`zustand.fenster`) wie die
+offenen Kapitel im Baum. Es gehört zum gewählten Bauteil: wer ein anderes
+wählt, schliesst es -- alle Wahlen gehen dafür durch `waehlen`. Gezeichnet
+wird es mit dem Editor neu. Der graue Grund darunter bleibt dabei stehen und
+ist der Knoten, der rollt; so retten Bildlauf und Fokus wie bei den Tafeln.
+
+**Was nur die Querkraft braucht, steht bei ihr.** Grösstkorn und
+Einlagenhöhe (ohne Bügel), k_c und die Grenzen der Neigung (mit Bügeln) gehen
+in keinen anderen Nachweis ein. Sie standen bei der Platte und bei den Bügeln
+und stehen jetzt im Fenster der Tragsicherheit.
+
+**Die Zeichen** sind eigene Linienbilder (`sinnbilder.js`), im Stil wie bei
+Fagus, aber nicht von dort übernommen.
+
 ## 2026-10-15 · Bügelteilung, gleiche Fallnamen, Lagerkräfte am Bildschirm
 
 Vier Punkte, die man sieht -- drei behoben, einer bestätigt.

@@ -20,8 +20,9 @@
 import { erklaerung, feld, panel } from './bausteine.js';
 import { auswahl, el, ersetzen, melden, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
-import { analysenBlock, automatikBlock, nachweiseBlock } from './nachweise.js';
+import { fensterZeigen } from './fenster.js';
 import { blattZeichnen } from './gleichungen.js';
+import { kapitelPanel, plattenFenster } from './kapitel.js';
 import { partnerVon, richtungSetzen, richtungVon } from './lagen.js';
 import { analyseEditor } from './querschnittsanalyse.js';
 import { balkensystemEditor } from './balkensystem.js';
@@ -402,7 +403,9 @@ function richtungsSchalter(querschnitt, nummer, richtung, partner) {
  *
  *     Bügel  ×  x  ⌀ [10] @ [200] mm    [B500B]
  *                y         @ [200] mm
- *     Neigung  α_min [30]°   α_max [45]°
+ *
+ * Die Neigung der Druckdiagonalen und k_c stehen im Fenster der
+ * Tragsicherheit: sie gehören zur Rechnung, nicht zur Bewehrung.
  *
  * In y darf statt der Teilung eine Stabzahl über die betrachtete Breite
  * stehen, in x nicht: der Widerstand gilt je Laufmeter, und eine Stabzahl
@@ -480,24 +483,6 @@ function querkraftBlock(querschnitt) {
       })),
       el('span'),
     ]),
-
-    el('div.neigungszeile', {}, [
-      el('span.postenname', { text: 'Neigung' }),
-      span(String.raw`\alpha_{min}`),
-      zahlfeld({
-        wert: buegel.alpha_min, schritt: 1, min: 1, max: 89,
-        titel: 'Kleinste Neigung der Druckdiagonalen, ganze °',
-        beiAenderung: (v) => aendern((x) => { x.alpha_min = Math.round(v); }),
-      }),
-      el('span.einheit', { text: '°' }),
-      span(String.raw`\alpha_{max}`),
-      zahlfeld({
-        wert: buegel.alpha_max, schritt: 1, min: 1, max: 89,
-        titel: 'Grösste Neigung der Druckdiagonalen, ganze °',
-        beiAenderung: (v) => aendern((x) => { x.alpha_max = Math.round(v); }),
-      }),
-      el('span.einheit', { text: '°' }),
-    ]),
   ]);
 }
 
@@ -547,22 +532,8 @@ function plattenEditor(querschnitt) {
           titel: 'Streifen in x: A_s, M und N je b. y: je 1000 mm',
           beiAenderung: (v) => aendern((q) => { q.b = v; }),
         }), 'mm'),
-        feld(['Grösstkorn ', span('D_{max}')], zahlfeld({
-          wert: querschnitt.d_max, schritt: 4, min: 1,
-          titel: 'Für k_g, Querkraft ohne Bügel',
-          beiAenderung: (v) => aendern((q) => { q.d_max = v; }),
-        }), 'mm', 'Grösstkorn → k_g, Querkraft ohne Bügel'),
-        feld(['Druckdiagonale ', span('k_c')], zahlfeld({
-          wert: querschnitt.k_c, schritt: 0.05, min: 0,
-          titel: 'Abminderung f_cd in der Druckdiagonalen; nur mit Bügeln',
-          beiAenderung: (v) => aendern((q) => { q.k_c = v; }),
-        }), '', 'Abminderung f_cd in der Druckdiagonalen'),
-        feld('Einlagenhöhe', zahlfeld({
-          wert: querschnitt.einlagenhoehe, schritt: 5, min: 0,
-          titel: 'Verringert d_v, falls h/6 < e < d',
-          leer: 0,
-          beiAenderung: (v) => aendern((q) => { q.einlagenhoehe = v; }),
-        }), 'mm'),
+        // Grösstkorn, k_c und Einlagenhöhe stehen im Fenster der
+        // Tragsicherheit: nur die Querkraft braucht sie.
         // Nur noch für den Vergrösserungsfaktor -- die Nachweise wählen ihr φ
         // selbst, jedes Kapitel in seiner Zeile «Rechenwahl».
         feld(['Kriechzahl ', span(String.raw`\varphi`)], zahlfeld({
@@ -606,27 +577,30 @@ function plattenEditor(querschnitt) {
       // Die Bügel stehen unter den Lagen: sie greifen über die ganze Höhe
       // und gehören in keine davon.
       querkraftBlock(querschnitt),
-      // Zuunterst das Werkzeug, das in die Lagen darüber schreibt.
-      automatikBlock(querschnitt),
     ]),
 
-    nachweiseBlock(querschnitt),
-    analysenBlock(querschnitt),
+    // Nachweise, Analysen und die Suche der Bewehrung: je ein Knopf, die
+    // Eingaben im Fenster.
+    kapitelPanel(querschnitt),
   ];
 }
 
-
-
-
-
-
-
-
-
-
 // ===========================================================================
 
-export function editorZeichnen(behaelter, titelKnoten, hinweisKnoten) {
+/** Die Fenster jeder Bauteilart -- bisher hat nur die Platte welche. */
+const FENSTER = {
+  querschnitt: plattenFenster,
+};
+
+/**
+ * Zeichnet die mittlere Tafel: den Editor des gewählten Bestandteils und,
+ * wenn eines offen ist, sein Fenster darüber.
+ */
+export function editorZeichnen(behaelter, titelKnoten, hinweisKnoten, fensterGrund) {
+  const bauteil = gewaehltesBauteil();
+  fensterZeigen(fensterGrund, bauteil && zustand.fenster
+    ? FENSTER[bauteil.art.art]?.(bauteil.eintrag, zustand.fenster) : null);
+
   const material = gewaehltesMaterial();
   if (material) {
     titelKnoten.textContent = material.name || material.sorte;
@@ -634,7 +608,6 @@ export function editorZeichnen(behaelter, titelKnoten, hinweisKnoten) {
       + (material.eigenstaendig ? ' · eigenständig' : ' · Normsorte');
     return ersetzen(behaelter, ...materialEditor(material));
   }
-  const bauteil = gewaehltesBauteil();
   if (bauteil) {
     titelKnoten.textContent = bauteil.eintrag.name;
     hinweisKnoten.textContent = bauteil.art.bezeichnung;

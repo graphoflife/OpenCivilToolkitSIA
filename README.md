@@ -203,6 +203,7 @@ Fertig und getestet (1091 Tests):
 | `web/server.py` | HTTP-Hülle darum (nur Standardbibliothek) |
 | `web/js/kern.js`, `kern_arbeiter.js` | Pyodide-Hülle darum, in einem eigenen Faden, für die Seite ohne Server |
 | `web/js/` | Oberfläche in reinem JavaScript, ohne Bauschritt |
+| `web/js/kapitel.js`, `fenster.js`, `sinnbilder.js`, `nachweise.js` | die Kapitel der Platte als Knöpfe mit Zeichen, ihre Eingaben in einem Fenster über der Tafel |
 | `web/js/cad_*.js` | das Zeichenfenster, allgemein: Ansicht, Knoten und Elemente, Punkteingabe, Befehle, Auswahl, schwebendes Fenster |
 | `web/js/qa_zeichnung.js`, `qa_uebersicht.js`, `qa_vorlagen.js` | was es in der Querschnittsanalyse zeichnet, die Liste darunter und die Vorlagen |
 | `web/js/querschnittsanalyse.js`, `qa_diagramme.js` | ihre übrige Eingabe und ihre Diagramme |
@@ -223,8 +224,18 @@ Die Oberfläche rechnet nichts. Sie schickt die Projektbeschreibung an den Kern
 und stellt dar, was zurückkommt -- fertige Zahlen und fertige LaTeX-Zeichen­ketten.
 Deshalb kann am Bildschirm gar nichts anderes stehen als im Bericht.
 
-**Spannung-Dehnung-Analyse:** bei jeder Platte unter «Weitere Analysen».
-Kein Nachweis, sondern die Frage, was im Querschnitt geschieht:
+**Platte:** drei Panels -- die Platte selbst, die Bewehrung (vier Lagen mit
+Grund und Zulage, darunter die Bügel) und «Nachweise und Analysen». Dort steht
+jedes Kapitel als Knopf: die sieben Nachweise, die sechs
+Spannung-Dehnung-Analysen und die Suche nach der Bewehrung, darunter klein,
+was eingestellt ist («3 Einwirkungen», «aus»). Ein Klick öffnet die Eingaben
+in einem Fenster über der mittleren Tafel; Baum und Ergebnis bleiben daneben
+sichtbar. Es schliesst mit ×, mit Escape oder mit einem Klick daneben. Was
+nur die Querkraft braucht -- Grösstkorn, Einlagenhöhe, k_c und die Neigung
+der Druckdiagonalen --, steht im Fenster der Tragsicherheit.
+
+**Spannung-Dehnung-Analyse:** bei jeder Platte unter «Nachweise und
+Analysen», je Art ein Knopf. Kein Nachweis, sondern die Frage, was im Querschnitt geschieht:
 * *N, M* oder *ε oben/unten* -- Dehnung und Spannung über die Höhe;
 * *M–χ* -- die Momenten-Krümmungs-Linie bei fester Normalkraft;
 * *N–ε* -- die Normalkraft-Dehnungs-Linie auf Zug bei festem Moment;
@@ -247,9 +258,8 @@ gerissene. Die Zugfestigkeit des Betons zählt nur für den Riss. Jede Analyse
 wählt selbst, wie die Nachweiskapitel (unten), aber ohne Handrechnung; φ
 wirkt dort immer auf den ungerissenen Teil.
 
-**Rechenwahl:** Unter dem Kopf der Tragsicherheit, der beiden
-Stahlspannungskapitel und des Knickens steht eine Zeile «Rechenwahl», beim
-Knicken zwei -- «Verformung (e_2d)» und «Widerstand (N_Rd)». Gewählt werden:
+**Rechenwahl:** Im Fenster der Tragsicherheit, der beiden Stahlspannungen
+und des Knickens steht zuoberst eine Zeile «Rechenwahl», beim Knicken zwei -- «Verformung (e_2d)» und «Widerstand (N_Rd)». Gewählt werden:
 * die Kriechzahl φ, Vorgabe 0 -- sie wirkt nur präzise und elastisch,
   sonst ist das Feld blass;
 * die Werte: Bemessung (f_cd, f_yd → M_Rd) oder charakteristisch
