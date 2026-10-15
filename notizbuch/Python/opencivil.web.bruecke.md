@@ -1,5 +1,5 @@
 ---
-erzeugt: 8451e9246b52
+erzeugt: 7d16a45d362c
 art: modul
 tags: [modul]
 ---
@@ -65,6 +65,16 @@ Stand. Ohne Marke bleiben nur die Fremdbibliotheken unter `web/vendor/`;
 die aendern sich nur, wenn jemand bewusst eine neue Fassung einlegt.
 
 
+## UND DIE FREMDPAKETE
+
+Im Manifest steht auch, welche Fremdpakete unter `web/vendor/pyodide/`
+beiliegen ([[opencivil.web.bruecke#mitgelieferte_pakete|mitgelieferte_pakete]]): Importname -> Paketname, gelesen aus
+den Dateien, die dort liegen, und aus `pyodide-lock.json`. Die App «Python»
+laedt nur diese ([[opencivil|opencivil.konsole.pakete]]). Eine zweite, von Hand
+gefuehrte Liste gibt es nicht: was `werkzeug/pyodide_holen.py` hinlegt,
+steht nach dem naechsten Lauf der Bruecke im Manifest.
+
+
 ## WARUM ALLE DATEIEN UND NICHT NUR DIE GEBRAUCHTEN
 
 Man koennte die Liste auf das beschraenken, was [[opencivil.web.dienst]]
@@ -108,6 +118,16 @@ Manifest nach einem Auschecken mit CRLF nicht mehr.
 ```python
 def manifest() -> dict
 ```
+
+### mitgelieferte_pakete
+
+```python
+def mitgelieferte_pakete() -> Dict[str, str]
+```
+
+Importname -> Paketname, fuer jedes Fremdpaket, dessen Datei beiliegt --
+`dateutil` -> `python-dateutil`. Sortiert, damit das Manifest bei
+gleichem Stand gleich herauskommt.
 
 ### _mit_marken
 
@@ -231,6 +251,7 @@ schreiben hiesse, die alten Marken blieben stehen.
 - `WURZEL = Path(__file__).resolve().parents[2]`
 - `PAKET = WURZEL / 'opencivil'`
 - `MANIFEST = WURZEL / 'web' / 'kern' / 'dateien.json'`
+- `PYODIDE = WURZEL / 'web' / 'vendor' / 'pyodide'`
 - `NOTIZBUCH = WURZEL / 'notizbuch'`
 - `VERZEICHNIS = WURZEL / 'web' / 'kern' / 'notizbuch.json'`
 - `SEITE = WURZEL / 'web' / 'index.html'`

@@ -49,6 +49,14 @@ So haengt alles an der Seite: wer sie neu laedt, bekommt den Rest im selben
 Stand. Ohne Marke bleiben nur die Fremdbibliotheken unter ``web/vendor/``;
 die aendern sich nur, wenn jemand bewusst eine neue Fassung einlegt.
 
+UND DIE FREMDPAKETE:
+Im Manifest steht auch, welche Fremdpakete unter ``web/vendor/pyodide/``
+beiliegen (:func:`mitgelieferte_pakete`): Importname -> Paketname, gelesen aus
+den Dateien, die dort liegen, und aus ``pyodide-lock.json``. Die App «Python»
+laedt nur diese (:mod:`opencivil.konsole.pakete`). Eine zweite, von Hand
+gefuehrte Liste gibt es nicht: was ``werkzeug/pyodide_holen.py`` hinlegt,
+steht nach dem naechsten Lauf der Bruecke im Manifest.
+
 WARUM ALLE DATEIEN UND NICHT NUR DIE GEBRAUCHTEN:
 Man koennte die Liste auf das beschraenken, was :mod:`opencivil.web.dienst`
 einbindet. Dann muesste die Regel aber bei jeder neuen Einbindung nachgezogen
@@ -72,6 +80,7 @@ from opencivil.notizbuch import erzeugen, tresor
 WURZEL = Path(__file__).resolve().parents[2]
 PAKET = WURZEL / "opencivil"
 MANIFEST = WURZEL / "web" / "kern" / "dateien.json"
+PYODIDE = WURZEL / "web" / "vendor" / "pyodide"
 NOTIZBUCH = WURZEL / "notizbuch"
 VERZEICHNIS = WURZEL / "web" / "kern" / "notizbuch.json"
 SEITE = WURZEL / "web" / "index.html"
@@ -114,7 +123,26 @@ def manifest() -> dict:
             "opencivil.web.bruecke' laufen lassen."
         ),
         "dateien": _mit_marken(),
+        "pakete": mitgelieferte_pakete(),
     }
+
+
+def mitgelieferte_pakete() -> Dict[str, str]:
+    """
+    Importname -> Paketname, fuer jedes Fremdpaket, dessen Datei beiliegt --
+    ``dateutil`` -> ``python-dateutil``. Sortiert, damit das Manifest bei
+    gleichem Stand gleich herauskommt.
+    """
+    try:
+        pakete = json.loads((PYODIDE / "pyodide-lock.json").read_text(encoding="utf-8"))["packages"]
+    except (OSError, KeyError, ValueError):
+        return {}
+    heraus = {}
+    for name, eintrag in pakete.items():
+        if (PYODIDE / eintrag["file_name"]).is_file():
+            for modul in eintrag.get("imports") or [name]:
+                heraus[modul] = name
+    return dict(sorted(heraus.items()))
 
 
 def _mit_marken() -> Dict[str, str]:
@@ -130,7 +158,8 @@ def stimmt_ueberein() -> bool:
         abgelegt = json.loads(MANIFEST.read_text(encoding="utf-8"))
     except json.JSONDecodeError:
         return False
-    return abgelegt.get("dateien") == _mit_marken()
+    return (abgelegt.get("dateien") == _mit_marken()
+            and abgelegt.get("pakete") == mitgelieferte_pakete())
 
 
 def schreiben(pfad: Path | None = None) -> Path:

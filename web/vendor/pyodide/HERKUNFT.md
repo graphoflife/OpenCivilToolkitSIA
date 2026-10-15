@@ -35,11 +35,35 @@ nehmen das Modul), `*.d.ts` (Typangaben für TypeScript).
 Fremdpakete braucht der Kern keine — er kommt mit der Standardbibliothek aus.
 `pyodide-lock.json` liegt trotzdem hier, weil `loadPyodide` es beim Start liest.
 
+## Fremdpakete für die App «Python»
+
+Was ein Skript dort einbinden kann, liegt als Rad daneben — numpy und pandas,
+mit allem, was pandas braucht. Freigegeben vom Benutzer am 2026-10-15, Datei
+für Datei; ein weiteres Paket nur mit seiner Erlaubnis. Geholt aus der vollen
+Verteilung derselben Fassung,
+<https://cdn.jsdelivr.net/pyodide/v314.0.6/full/>, und jede Datei gegen ihre
+Prüfsumme in `pyodide-lock.json` gehalten:
+
+| Datei                                                       | Grösse  | Lizenz       |
+| ----------------------------------------------------------- | ------- | ------------ |
+| `numpy-2.4.6-cp314-cp314-pyemscripten_2026_0_wasm32.whl`    | 2.92 MB | BSD-3-Clause |
+| `pandas-3.0.2-cp314-cp314-pyemscripten_2026_0_wasm32.whl`   | 4.18 MB | BSD-3-Clause |
+| `python_dateutil-2.9.0.post0-py2.py3-none-any.whl`          | 0.23 MB | Apache-2.0, BSD |
+| `pytz-2026.1.post1-py2.py3-none-any.whl`                    | 0.51 MB | MIT          |
+| `six-1.17.0-py2.py3-none-any.whl`                           | 0.01 MB | MIT          |
+
+Der Browser lädt ein Rad erst, wenn ein Skript das Paket mit `import`
+einbindet. Welche beiliegen, schreibt `python3 -m opencivil.web.bruecke` aus
+den Dateien hier ins Kernverzeichnis (`web/kern/dateien.json`, `pakete`).
+
 ## Erneuern
 
 ```bash
 python3 werkzeug/pyodide_holen.py 314.0.7
 ```
+
+Das holt auch die Fremdpakete in der neuen Fassung und räumt die alten weg;
+nur sie allein: `python3 werkzeug/pyodide_holen.py --pakete`.
 
 Danach die Oberfläche einmal aufrufen und prüfen, dass unten links
 „Kern bereit" steht.

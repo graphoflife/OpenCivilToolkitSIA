@@ -44,6 +44,23 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-15 · numpy und pandas liegen bei
+
+Für die App «Python», die als Nächstes kommt, liegen numpy und pandas samt
+dem, was pandas braucht, unter `web/vendor/pyodide/` (5 Dateien, 7.85 MB).
+Der Benutzer hat sie Datei für Datei freigegeben; SciPy (14 MB) und
+matplotlib (9.6 MB) wollte er nicht -- Diagramme macht ein eigenes Modul.
+Seaborn wäre keine leichtere Wahl gewesen, es baut auf matplotlib; Plotly
+gehört nicht zur Pyodide-Verteilung und wäre mit plotly.js grösser.
+
+- `werkzeug/pyodide_holen.py --pakete` holt sie aus der vollen Verteilung
+  derselben Fassung und hält jede Datei gegen ihre Prüfsumme in
+  `pyodide-lock.json`; beim Wechsel der Fassung kommen sie mit.
+- Welche beiliegen, schreibt die Brücke aus den Dateien ins Kernverzeichnis
+  (`pakete` in `web/kern/dateien.json`) -- keine zweite Liste.
+- Geladen wird ein Rad erst, wenn ein Skript es einbindet: wer die Seite nur
+  zum Rechnen öffnet, lädt nichts davon.
+
 ## 2026-10-15 · Links Knöpfe je App
 
 Die linke Tafel zeigt die Apps als Knöpfe mit Zeichen, wie die Kapitel einer

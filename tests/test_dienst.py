@@ -237,6 +237,15 @@ class TestBruecke(unittest.TestCase):
             "zum Kern oder zu den Notizen. Bitte 'python3 -m opencivil.web.bruecke' "
             "laufen lassen -- sonst fehlen der Seite Formeln oder neue Notizen.")
 
+    def test_die_beiliegenden_pakete_stehen_im_manifest(self):
+        """
+        numpy und pandas samt dem, was pandas braucht (Benutzer, 2026-10-15) --
+        gelesen aus den Dateien unter web/vendor/pyodide/, Importname zu Paket.
+        """
+        self.assertEqual(bruecke.mitgelieferte_pakete(), {
+            "dateutil": "python-dateutil", "numpy": "numpy", "pandas": "pandas",
+            "pytz": "pytz", "six": "six"})
+
     def test_der_dienst_ist_im_manifest(self):
         dateien = bruecke.kerndateien()
         self.assertIn("opencivil/web/dienst.py", dateien)
