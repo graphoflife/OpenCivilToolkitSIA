@@ -1,5 +1,5 @@
 ---
-erzeugt: 7941a42baa76
+erzeugt: 0c073c542e3d
 art: modul
 tags: [modul]
 ---
@@ -101,6 +101,16 @@ zwischen den Rissen (Zugversteifung) steckt nicht darin. Mit welcher Regel
 eine Linie des Bauteils zu rechnen waere, ist offen
 (`notizbuch/Notizen/TODO.md`).
 
+
+## PLATTE UND GEZEICHNETER QUERSCHNITT
+
+Die Fragen selbst -- Bild, Linie, Modul -- kennen nur einen
+[[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]] und ein Paar
+daraus: gerissen und ungerissen, dazu Riss, Bezugsflaeche des Moduls und
+Rechenwahl. Hier steht das Paar der Platte ([[opencivil.spannungsanalyse#Loeserpaar|Loeserpaar]]); das des
+gezeichneten Querschnitts, je Zugseite, steht in
+[[opencivil.querschnitt.schnittanalyse]].
+
 ## Inhalt
 
 ### Analyseart
@@ -162,7 +172,7 @@ class Faserpunkt
 
 Eine Stelle ueber die Hoehe, mit dem, was dort geschieht.
 
-- `z: float` – Abstand von der **Oberkante**, in m. Dieselbe Achse, die der Loeser und der Lagenaufbau benutzen: dort ist `z` der Abstand von der gedrueckten Randfaser bei positivem Moment, und fuer eine Platte ist das die Oberkante. Die 1. Lage liegt damit bei `z = h - Randabstand` und die 4. bei `z = Randabstand`. Wer hier umdrehte, bekaeme ein Bild, das zum Nachweis nicht passt.
+- `z: float` – Abstand vom **oberen Rand**, in m -- dem gedrueckten bei positivem Moment. Dieselbe Achse, die der Loeser und der Lagenaufbau benutzen. Fuer eine Platte ist es die Oberkante: die 1. Lage liegt bei `z = h - Randabstand` und die 4. bei `z = Randabstand`. Wer hier umdrehte, bekaeme ein Bild, das zum Nachweis nicht passt. Beim gezeichneten Querschnitt der Rand gegenueber der Zugseite.
 - `eps: float`
 - `sigma: float` – in Pa, Zug positiv.
 
@@ -178,6 +188,7 @@ Dasselbe fuer eine Bewehrungslage.
 - `nummer: int`
 - `a_s: float`
 - `kraft: float` – `sigma * a_s` in N -- was die Lage traegt.
+- `name: str = ''` – Wie die Lage heisst -- «2. Lage Grundbewehrung», «Linie 1».
 
 ### Querschnittsbild
 
@@ -213,7 +224,7 @@ zeigen, die es nicht gibt.
 ### _bild
 
 ```python
-def _bild(loeser: Querschnittsloeser, eps_m: float, chi: float) -> Querschnittsbild
+def _bild(loeser: Faserloeser, eps_m: float, chi: float) -> Querschnittsbild
 ```
 
 Dehnungen und Spannungen zu einer gegebenen Ebene -- ohne jede Suche.
@@ -221,7 +232,7 @@ Dehnungen und Spannungen zu einer gegebenen Ebene -- ohne jede Suche.
 ### aus_schnittgroessen
 
 ```python
-def aus_schnittgroessen(loeser: Querschnittsloeser, *, N: float, M: float) -> Querschnittsbild
+def aus_schnittgroessen(loeser: Faserloeser, *, N: float, M: float) -> Querschnittsbild
 ```
 
 Die Dehnungsebene zu `N` und `M`, samt allem, was darauf steht.
@@ -233,7 +244,7 @@ nicht.
 ### aus_dehnungen
 
 ```python
-def aus_dehnungen(loeser: Querschnittsloeser, *, eps_oben: float, eps_unten: float) -> Querschnittsbild
+def aus_dehnungen(loeser: Faserloeser, *, eps_oben: float, eps_unten: float) -> Querschnittsbild
 ```
 
 Der umgekehrte Weg: die Ebene ist gegeben, gesucht sind die Kraefte.
@@ -282,6 +293,7 @@ gerechnet wird.
 - `grenznamen: Tuple[str, ...] = ()` – Je Grenze des gerissenen Loesers, was sie ist -- fuer «massgebend».
 - `ids: Mapping[str, str] = field(default_factory=dict)` – Kurzname -> Wert-ID der Eingaben, fuer die Herleitung.
 - `E_cm: float = 0.0` – Der Modul des Betons -- daran misst sich der aequivalente Modul.
+- `bezugsort = 'auf halber Höhe'` – Wo die Mitteldehnung gilt -- dort greift N an.
 
 #### Loeserpaar.rissmoment_bei
 
@@ -325,6 +337,56 @@ Moments zaehlt nicht -- der Querschnitt ist oben wie unten derselbe.
 wie unter Biegung. Nach Vorgabe, nicht nachgeschlagen
 (`notizbuch/Notizen/TODO.md`). Bis 2026-10-09 galt das `f_ct,eff`
 des Rissmoments, mit `t = h/3` -- am Beispiel 829 statt 757 kN.
+
+#### Loeserpaar.I_c
+
+```python
+@property
+def I_c(self) -> float
+```
+
+Der reine Betonquerschnitt fuer den aequivalenten Modul: `b·h³/12`.
+
+#### Loeserpaar.A_c
+
+```python
+@property
+def A_c(self) -> float
+```
+
+Dasselbe fuer die Normalkraft: `b·h`.
+
+#### Loeserpaar.tiefe
+
+```python
+def tiefe(self, w: Zwischenwerte, ein: Callable[[str], 'Wert']) -> 'Wert'
+```
+
+Die Dicke, ueber die die Linie laeuft -- ein Wert der Platte.
+
+#### Loeserpaar.herleitung_riss
+
+```python
+def herleitung_riss(self, p: Protokoll, w: Zwischenwerte, linie: Linie, ein: Callable[[str], 'Wert'], h: 'Wert') -> None
+```
+
+Wo die Linie reisst: das Rissmoment bei N, oder die Rissnormalkraft bei M.
+
+#### Loeserpaar.herleitung_dehnung_am_ende
+
+```python
+def herleitung_dehnung_am_ende(self, p: Protokoll, w: Zwischenwerte, bruch: 'Grenzzustand', oben: 'Wert', unten: 'Wert') -> None
+```
+
+Die Dehnung, ueber die die N-eps-Linie laeuft, am Ende -- auf halber Hoehe.
+
+#### Loeserpaar.herleitung_bezug
+
+```python
+def herleitung_bezug(self, p: Protokoll, w: Zwischenwerte, momente: bool, ein: Callable[[str], 'Wert'], h: 'Wert') -> 'Wert'
+```
+
+Der reine Betonquerschnitt des aequivalenten Moduls -- ein Rechteck b·h.
 
 ### loeserpaar
 
@@ -442,7 +504,7 @@ die Verformung, mit einem der beiden Loeser.
 
 - `ebene: Callable[[float], Optional[Tuple[float, float]]]`
 - `kraft: Callable[[Tuple[float, float]], float]`
-- `verformung_bei: Callable[[Querschnittsloeser, float], Optional[float]]`
+- `verformung_bei: Callable[[Faserloeser, float], Optional[float]]`
 - `obergrenze: float` – Eine Verformung, ueber der es sicher kein Gleichgewicht mehr gibt.
 
 ### _grenze
@@ -489,7 +551,8 @@ def normalkraft_dehnung(paar: Loeserpaar, *, M: float) -> Linie
 
 Die Normalkraft-Dehnungs-Linie beim Moment `M`, auf Zug: ungerissen
 bis `N_Riss(M)`, dort der Sprung, darueber gerissen bis zum Bruch.
-Die Dehnung ist die auf halber Hoehe -- dort greift `N` an.
+Die Dehnung ist die am Arm null -- dort greift `N` an: bei der Platte
+auf halber Hoehe, beim gezeichneten Querschnitt im Schwerpunkt.
 
 ### Modulpunkt
 
@@ -592,32 +655,41 @@ Der Modul am Ende der Linie -- beim Bruch, oder ungerissen, wenn sie es bleibt.
 ### aequivalenter_modul
 
 ```python
-def aequivalenter_modul(linie: Linie, *, b: float, h: float, E_cm: float) -> Modullinie
+def aequivalenter_modul(linie: Linie, *, I_c: float, A_c: float, E_cm: float) -> Modullinie
 ```
 
 Die M-chi- oder N-eps-Linie als Linie des aequivalenten Moduls -- siehe
 [[opencivil.spannungsanalyse#Modullinie|Modullinie]]. Beide Vergleichszustaende zaehlen ab ihrer eigenen
-Verformung ohne laufende Kraft.
+Verformung ohne laufende Kraft. `I_c` und `A_c` sind der reine
+Betonquerschnitt, an dem sich der Modul misst.
 
-### _herleitung
+### herleitung
 
 ```python
-def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie, werte: Mapping[str, 'Wert'], raum: str, modul: Optional[Modullinie]=None) -> None
+def herleitung(p: Protokoll, fall, paar, linie: Linie, werte: Mapping[str, 'Wert'], raum: str, modul: Optional[Modullinie]=None) -> None
 ```
 
 Wie die Linie entstand -- mit den Zahlen dieses Falls, und ohne sie in der
 Formelsammlung, die daraus «Spannung-Dehnung-Analyse» bildet. Mit
 `modul` dazu, wie aus ihr der aequivalente E-Modul wird.
 
+`paar` ist das Loeserpaar einer Platte oder eines gezeichneten
+Querschnitts. Was nur die Art des Bauteils weiss -- die Tiefe, der Riss,
+die Dehnung am Ende, der reine Betonquerschnitt --, schreibt es selbst
+(`tiefe`, `herleitung_riss`, `herleitung_dehnung_am_ende`,
+`herleitung_bezug`); der Rest ist derselbe Text.
+
 ### _herleitung_modul
 
 ```python
-def _herleitung_modul(p: Protokoll, w: Zwischenwerte, modul: Modullinie, *, b: 'Wert', h: 'Wert') -> None
+def _herleitung_modul(p: Protokoll, w: Zwischenwerte, modul: Modullinie, *, bezug: Callable[[], 'Wert'], bezugsort: str) -> None
 ```
 
 Der aequivalente Modul: der reine Betonquerschnitt, die Formel und der
 Modul an den Ecken der Linie -- jede Zeile mit Kraft und Verformung, also
-von Hand nachzurechnen.
+von Hand nachzurechnen. `bezug` schreibt den reinen Betonquerschnitt
+hin, wie ihn die Art des Bauteils kennt, und gibt ihn zurueck;
+`bezugsort` sagt, wo die Mitteldehnung gilt.
 
 ### Analyse
 
@@ -630,11 +702,12 @@ Ein Spannungsfall der Beschreibung -- und was die Auswertung ergab.
 
 - `fall: Any` – Der [[opencivil.spannungsanalyse#Analyse|SpannungsfallEintrag]], wie er in der Beschreibung steht.
 - `art: Analyseart`
-- `richtung: Richtung`
-- `h: float = 0.0` – Plattendicke in m -- fuer das Bild.
+- `richtung: Any` – Die Tragrichtung einer Platte ([[opencivil.querschnitt.platte#Richtung|Richtung]]) oder die Zugseite eines gezeichneten Querschnitts ([[opencivil.querschnitt.schnittanalyse#Zugseite|Zugseite]]).
+- `richtung_text: str = ''` – Wie sie neben dem Titel steht -- «x», «Zug unten».
+- `h: float = 0.0` – Die Tiefe in m -- fuer das Bild: die Dicke der Platte, beim gezeichneten Querschnitt die Ausdehnung des Betons in Zugrichtung.
 - `bild: Optional[Querschnittsbild] = None`
 - `kurve: Optional[Union[Linie, 'Modullinie']] = None` – Die M-chi- oder N-eps-Linie -- oder der aequivalente Modul daraus.
-- `paar: Optional[Loeserpaar] = None` – Womit gerechnet wurde -- Kriechzahl, Wertesatz, Betongesetz.
+- `paar: Any = None` – Womit gerechnet wurde -- das Loeserpaar mit Kriechzahl, Wertesatz, Betongesetz: [[opencivil.spannungsanalyse#Loeserpaar|Loeserpaar]] bei der Platte, sonst das des gezeichneten Querschnitts.
 - `hinweis: str = ''` – Warum es nichts auszuwerten gab, falls es nichts gab.
 
 #### Analyse.moeglich
@@ -647,10 +720,13 @@ def moeglich(self) -> bool
 ### auswerten
 
 ```python
-def auswerten(fall, art: Analyseart, paar: Loeserpaar) -> Tuple[Optional[Querschnittsbild], Optional[Union[Linie, Modullinie]]]
+def auswerten(fall, art: Analyseart, paar) -> Tuple[Optional[Querschnittsbild], Optional[Union[Linie, Modullinie]]]
 ```
 
-Die eine der sechs Fragen stellen, die dieser Fall stellt -- in SI.
+Die eine der sechs Fragen stellen, die dieser Fall stellt -- in SI. `paar`
+ist das Loeserpaar einer Platte oder eines gezeichneten Querschnitts:
+beide haben `gerissen` und `ungerissen`, den Riss und den reinen
+Betonquerschnitt `I_c`, `A_c`.
 
 ### analysen
 
@@ -658,7 +734,7 @@ Die eine der sechs Fragen stellen, die dieser Fall stellt -- in SI.
 def analysen(aufbau: 'Aufbau', loesung: 'Loesung', protokoll: Optional[Protokoll]=None) -> Dict[str, List[Analyse]]
 ```
 
-Die Auswertungen am Querschnitt, je Platte.
+Die Auswertungen am Querschnitt, je Platte und je gezeichnetem Querschnitt.
 
 Kein Nachweis: hier steht kein Erfuellungsgrad und kein Urteil, sondern
 eine Antwort auf die Frage, was im Querschnitt geschieht. Gerechnet wird
@@ -693,6 +769,7 @@ sammelt die Formelsammlung ihr Thema.
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.projekt]]
 - [[opencivil.querschnitt.platte]]
+- [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 
 ## Gebraucht von
@@ -700,6 +777,7 @@ sammelt die Formelsammlung ihr Thema.
 - [[opencivil.bericht.formelsammlung]]
 - [[opencivil.ergebnis]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.web.api]]
 - [[opencivil.web.diagrammdaten]]
 
@@ -707,16 +785,16 @@ sammelt die Formelsammlung ihr Thema.
 
 - [[Äquivalenter E-Modul über dem Moment]] · `_herleitung_modul`
 - [[Äquivalenter E-Modul über der Normalkraft]] · `_herleitung_modul`
-- [[Beiwert der Parabel, mit dem wirksamen Modul]] · `_herleitung`
-- [[Beton ungerissen, in Druck und Zug]] · `_herleitung`
-- [[Fläche eines Rechtecks]] · `_herleitung_modul`
-- [[Flächenträgheitsmoment eines Rechtecks]] · `_herleitung_modul`
-- [[Fliessdehnung]] · `_herleitung`
-- [[Grenzdehnungen am Ende der Linie]] · `_herleitung`
-- [[Grösste Dehnung auf halber Höhe]] · `_herleitung`
-- [[Grösste Krümmung]] · `_herleitung`
-- [[Parabel-Rechteck-Beziehung des Betons]] · `_herleitung`
-- [[Rissmoment bei der Normalkraft]] · `_herleitung`
-- [[Rissnormalkraft beim Moment]] · `_herleitung`
-- [[Spannungsblock des Betons]] · `_herleitung`
-- [[Wirksamer Elastizitätsmodul]] · `_herleitung`
+- [[Beiwert der Parabel, mit dem wirksamen Modul]] · `herleitung`
+- [[Beton ungerissen, in Druck und Zug]] · `herleitung`
+- [[Fläche eines Rechtecks]] · `Loeserpaar.herleitung_bezug`
+- [[Flächenträgheitsmoment eines Rechtecks]] · `Loeserpaar.herleitung_bezug`
+- [[Fliessdehnung]] · `herleitung`
+- [[Grenzdehnungen am Ende der Linie]] · `herleitung`
+- [[Grösste Dehnung auf halber Höhe]] · `Loeserpaar.herleitung_dehnung_am_ende`
+- [[Grösste Krümmung]] · `herleitung`
+- [[Parabel-Rechteck-Beziehung des Betons]] · `herleitung`
+- [[Rissmoment bei der Normalkraft]] · `Loeserpaar.herleitung_riss`
+- [[Rissnormalkraft beim Moment]] · `Loeserpaar.herleitung_riss`
+- [[Spannungsblock des Betons]] · `herleitung`
+- [[Wirksamer Elastizitätsmodul]] · `herleitung`

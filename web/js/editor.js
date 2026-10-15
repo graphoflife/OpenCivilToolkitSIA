@@ -23,7 +23,7 @@ import { span } from './mathe.js';
 import { fensterZeigen } from './fenster.js';
 import { blattZeichnen } from './gleichungen.js';
 import {
-  anzahl, eingeschaltet, gebrauchsstand, kapitelFenster, kapitelPanel, schalter,
+  analysenKapitel, anzahl, eingeschaltet, gebrauchsstand, kapitelFenster, kapitelPanel, schalter,
 } from './kapitel.js';
 import { partnerVon, richtungSetzen, richtungVon } from './lagen.js';
 import {
@@ -576,23 +576,6 @@ const NACHWEISE = [
   },
 ];
 
-/**
- * Die Analysen, je Art aus dem Katalog: der Name auf dem Knopf kurz, über
- * dem Fenster lang, und darunter, wozu es gehört.
- */
-function analysen() {
-  return (zustand.katalog?.spannungsanalyse?.arten || []).map((a) => ({
-    schluessel: a.wert,
-    name: a.beschriftung, titel: a.titel,
-    bezug: (q) => `Spannung-Dehnung-Analyse · ${jeB(q)}`,
-    inhalt: (q) => analyseInhalt(q, a.wert),
-    stand: (q) => {
-      const n = eingeschaltet((q.spannungsfaelle || []).filter((k) => k.art === a.wert));
-      return { an: n > 0, text: n ? anzahl(n, 'Bild', 'Bilder') : 'kein Bild' };
-    },
-  }));
-}
-
 const SUCHE = {
   schluessel: 'automatik',
   name: 'Bewehrung suchen', titel: 'Automatische Bewehrung',
@@ -604,7 +587,7 @@ const SUCHE = {
 function plattenKapitel() {
   return [
     { titel: 'Nachweise', kapitel: NACHWEISE },
-    { titel: 'Spannung-Dehnung-Analysen', kapitel: analysen() },
+    { titel: 'Spannung-Dehnung-Analysen', kapitel: analysenKapitel({ inhalt: analyseInhalt, bezug: jeB }) },
     { titel: 'Werkzeug', kapitel: [SUCHE] },
   ];
 }

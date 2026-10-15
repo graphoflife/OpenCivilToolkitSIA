@@ -1,5 +1,5 @@
 ---
-erzeugt: 2745880cff37
+erzeugt: 440a77df6b4a
 art: modul
 tags: [modul]
 ---
@@ -396,6 +396,7 @@ das Knicken und die Analysen mit dem der ersten Lage.
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.platte]]
+- [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.web.api]]
 

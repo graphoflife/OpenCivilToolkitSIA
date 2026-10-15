@@ -27,6 +27,7 @@ import { panel } from './bausteine.js';
 import { el } from './dom.js';
 import { fenster, fensterOeffnen } from './fenster.js';
 import { sinnbild } from './sinnbilder.js';
+import { zustand } from './zustand.js';
 
 /** «1 Einwirkung», «3 Einwirkungen». */
 export function anzahl(n, eins, mehr) {
@@ -50,6 +51,24 @@ export function gebrauchsstand(liste) {
     eigene ? anzahl(eigene, 'Fall', 'Fälle') : null,
   ].filter(Boolean);
   return { an: teile.length > 0, text: teile.join(' + ') || 'kein Fall' };
+}
+
+/**
+ * Die sechs Spannung-Dehnung-Analysen als Kapitel, je Art aus dem Katalog:
+ * der Name auf dem Knopf kurz, über dem Fenster lang. `inhalt(e, art)` baut
+ * das Fenster, `bezug(e)` steht unter seinem Titel.
+ */
+export function analysenKapitel({ inhalt, bezug }) {
+  return (zustand.katalog?.spannungsanalyse?.arten || []).map((a) => ({
+    schluessel: a.wert,
+    name: a.beschriftung, titel: a.titel,
+    bezug: (e) => `Spannung-Dehnung-Analyse · ${bezug(e)}`,
+    inhalt: (e) => inhalt(e, a.wert),
+    stand: (e) => {
+      const n = eingeschaltet((e.spannungsfaelle || []).filter((k) => k.art === a.wert));
+      return { an: n > 0, text: n ? anzahl(n, 'Bild', 'Bilder') : 'kein Bild' };
+    },
+  }));
 }
 
 /**

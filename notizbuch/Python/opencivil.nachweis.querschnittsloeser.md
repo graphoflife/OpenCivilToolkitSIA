@@ -1,5 +1,5 @@
 ---
-erzeugt: faf247156d27
+erzeugt: 5fc21ccec7f0
 art: modul
 tags: [modul]
 ---
@@ -33,7 +33,7 @@ Bisektion sucht darin die Kruemmung.
 **Beide Bisektionen brauchen einen gueltigen Dehnungsbereich.** Jenseits der
 Bruchdehnungen geben die Werkstoffgesetze null zurueck; dort ist nichts mehr
 monoton, und die Suche findet Scheinloesungen. Das Fenster fuer `eps_m`
-haengt darum von `chi` ab -- siehe [[opencivil.nachweis.querschnittsloeser#Querschnittsloeser._fenster|Querschnittsloeser._fenster]].
+haengt darum von `chi` ab -- siehe [[opencivil.nachweis.querschnittsloeser#Querschnittsloeser|Querschnittsloeser._fenster]].
 
 Beide Bisektionen sind robust: kein Startwert kann danebenliegen, kein
 Newton-Schritt kann davonlaufen. Sie kosten mehr Auswertungen als ein
@@ -59,6 +59,17 @@ M   > 0   Zug unten
 ```
 `chi` ist die Kruemmung: `eps(z) = eps_m + chi * (z - h/2)`, mit `z` ab
 Oberkante. Ein positives `chi` zieht also unten.
+
+
+## JEDER QUERSCHNITT AUS FASERN
+
+Die Suche braucht nur zweierlei: die Fasern mit ihren Kraeften und die
+Dehnungsgrenzen, in denen jede gilt. Das steht in [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]]. Die
+Platte baut beides aus Hoehe, Breite und Lagen ([[opencivil.nachweis.querschnittsloeser#Querschnittsloeser|Querschnittsloeser]]),
+der gezeichnete Querschnitt je Zugseite aus seinen Polygonen
+([[opencivil.querschnitt.schnittanalyse]]). Dort ist `eps_m` die Dehnung
+im Schwerpunkt statt auf halber Hoehe; `oben` und `unten` sagen, wo die
+Raender liegen.
 
 
 ## EINHEITEN
@@ -189,13 +200,116 @@ demselben Querschnitt -- darum steht er einmal da. `gemittelt` und
 stehen genau so da wie vor dem Umbau: dieselben Zahlen bis aufs letzte
 Bit, und damit derselbe Bericht.
 
+### Faserloeser
+
+```python
+class Faserloeser
+```
+
+Ein Querschnitt aus Fasern, mit Suche nach der Dehnungsebene.
+
+`querschnitt` sind die Fasern samt Staeben, `grenzen` die
+Dehnungsgrenzen, innerhalb derer jedes Gesetz gilt. Dazu, was Bilder und
+Linien vom Querschnitt wissen muessen: die Arme der Raender `oben` und
+`unten` -- oben ist gedrueckt, wenn ein positives Moment wirkt --, die
+Lagen mit ihrem Stahl, eine je Stab der Fasern, und die Spannung des
+Betons an einer Stelle (`beton(arm, eps)`). `eps_druck` und
+`eps_zug` sind die aeussersten Dehnungen, fuer die die Gesetze gelten.
+
+Eine Lage liegt in der Tiefe `z` unter dem oberen Rand; ihr Arm ist
+`z + oben`.
+
+#### Faserloeser._fenster
+
+```python
+def _fenster(self, chi: float) -> Optional[Tuple[float, float]]
+```
+
+In welchem Bereich `eps_m` liegen darf, damit keine Faser aus dem
+gueltigen Dehnungsbereich faellt. Bei der Platte: beide Raender
+zwischen `-eps_druck` und `eps_zug`, siehe
+[[opencivil.querschnitt.fasern#Dehnungsgrenzen.fenster|Dehnungsgrenzen.fenster]].
+
+#### Faserloeser._eps_zu_normalkraft
+
+```python
+def _eps_zu_normalkraft(self, chi: float, N_ziel: float) -> Optional[float]
+```
+
+Die mittlere Dehnung, bei der `N = N_ziel` gilt -- bei festem `chi`.
+
+`N(eps_m)` waechst im gueltigen Bereich monoton: mehr Dehnung heisst
+mehr Zug. Eine Bisektion findet die Stelle also sicher, sofern sie im
+Fenster liegt.
+
+#### Faserloeser.mitteldehnung
+
+```python
+def mitteldehnung(self, chi: float, N: float) -> Optional[float]
+```
+
+Die Dehnung auf halber Hoehe, bei der die Ebene mit der Kruemmung
+`chi` die Normalkraft `N` traegt -- `None`, wo es keine gibt.
+Fuer Linien, die ueber die Kruemmung laufen statt ueber das Moment.
+
+#### Faserloeser.kruemmung
+
+```python
+def kruemmung(self, eps_m: float, M: float) -> Optional[float]
+```
+
+Die Kruemmung, bei der die Ebene mit der Dehnung `eps_m` auf halber
+Hoehe das Moment `M` traegt -- `None`, wo es keine gibt.
+
+Bei fester Dehnung waechst das Moment mit der Kruemmung: die eine
+Seite wird mehr gedehnt, die andere mehr gestaucht. Gesucht wird darum
+wie in [[opencivil.nachweis.querschnittsloeser#Faserloeser._eps_zu_normalkraft|_eps_zu_normalkraft]] durch Halbieren, innerhalb dessen,
+was die Grenzen bei dieser Dehnung zulassen.
+
+#### Faserloeser.loese
+
+```python
+def loese(self, *, N_Ed: float, M_Ed: float) -> Ebene
+```
+
+Die Dehnungsebene zu diesen Schnittgroessen.
+
+Aeussere Bisektion ueber `chi`: zu jedem `chi` wird `eps_m` so
+bestimmt, dass die Normalkraft stimmt, und das uebrig bleibende Moment
+gegen `M_Ed` gehalten. `M(chi)` waechst monoton -- mehr Kruemmung
+heisst mehr Moment --, solange der Querschnitt nicht versagt.
+
+#### Faserloeser._rand
+
+```python
+def _rand(self, start: float, N_Ed: float, moment: Callable[[float], Optional[float]], M_Ed: float, *, nach_oben: bool) -> Tuple[Optional[float], None]
+```
+
+Eine Kruemmung, bei der das Moment `M_Ed` sicher ueber- bzw.
+unterschreitet -- der Startpunkt der aeusseren Bisektion.
+
+Von der theoretischen Grenze aus wird herangetastet: dort ist das
+Fenster leer oder die Normalkraft nicht erreichbar. Zwanzig
+Halbierungen genuegen, um auf eine loesbare Stelle zu kommen.
+
+Nahe am Widerstand genuegen sie nicht. Zwischen der letzten Stufe
+ohne Gleichgewicht und der ersten mit -- an der Platte des Beispiels
+0.08 und 0.04 1/m -- liegen Kruemmungen, die das Moment noch
+erreichen, und das Halbieren springt ueber sie hinweg: 234.9 kNm
+hiessen dort «kein Gleichgewicht», obwohl der Querschnitt bis
+235.4 kNm traegt. Trifft das Halbieren nicht, wird darum die Grenze
+zwischen den beiden Stufen gesucht -- die groesste Kruemmung mit
+Gleichgewicht -- und dort noch einmal gefragt. Wo das Halbieren
+trifft, bleibt alles, wie es war.
+
 ### Querschnittsloeser
 
 ```python
-class Querschnittsloeser
+class Querschnittsloeser(Faserloeser)
 ```
 
-Der Querschnitt als Faserintegral, mit Suche nach der Dehnungsebene.
+Der Querschnitt einer Platte als Faserintegral -- aus Hoehe, Breite und
+Lagen gebaut, gesucht wird wie bei jedem [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]].
 
 `beton` ist eine Funktion `eps -> sigma` in SI, `stahl` macht aus
 dem Stahl einer Lage eine solche -- ohne Angabe [[opencivil.nachweis.querschnittsloeser#bilinear|bilinear]]; die
@@ -223,89 +337,6 @@ der Beton auch dort, wo der Stahl liegt -- so rechnet die Handrechnung.
 
 Welche Gesetze zu welcher Wahl gehoeren, sagt
 [[opencivil.nachweis.rechenwahl#gesetze|opencivil.nachweis.rechenwahl.gesetze]].
-
-#### Querschnittsloeser._fenster
-
-```python
-def _fenster(self, chi: float) -> Optional[Tuple[float, float]]
-```
-
-In welchem Bereich `eps_m` liegen darf, damit keine Faser aus dem
-gueltigen Dehnungsbereich faellt. Bei der Platte: beide Raender
-zwischen `-eps_druck` und `eps_zug`, siehe
-[[opencivil.querschnitt.fasern#Dehnungsgrenzen.fenster|Dehnungsgrenzen.fenster]].
-
-#### Querschnittsloeser._eps_zu_normalkraft
-
-```python
-def _eps_zu_normalkraft(self, chi: float, N_ziel: float) -> Optional[float]
-```
-
-Die mittlere Dehnung, bei der `N = N_ziel` gilt -- bei festem `chi`.
-
-`N(eps_m)` waechst im gueltigen Bereich monoton: mehr Dehnung heisst
-mehr Zug. Eine Bisektion findet die Stelle also sicher, sofern sie im
-Fenster liegt.
-
-#### Querschnittsloeser.mitteldehnung
-
-```python
-def mitteldehnung(self, chi: float, N: float) -> Optional[float]
-```
-
-Die Dehnung auf halber Hoehe, bei der die Ebene mit der Kruemmung
-`chi` die Normalkraft `N` traegt -- `None`, wo es keine gibt.
-Fuer Linien, die ueber die Kruemmung laufen statt ueber das Moment.
-
-#### Querschnittsloeser.kruemmung
-
-```python
-def kruemmung(self, eps_m: float, M: float) -> Optional[float]
-```
-
-Die Kruemmung, bei der die Ebene mit der Dehnung `eps_m` auf halber
-Hoehe das Moment `M` traegt -- `None`, wo es keine gibt.
-
-Bei fester Dehnung waechst das Moment mit der Kruemmung: die eine
-Seite wird mehr gedehnt, die andere mehr gestaucht. Gesucht wird darum
-wie in [[opencivil.nachweis.querschnittsloeser#Querschnittsloeser._eps_zu_normalkraft|_eps_zu_normalkraft]] durch Halbieren, innerhalb dessen,
-was die Grenzen bei dieser Dehnung zulassen.
-
-#### Querschnittsloeser.loese
-
-```python
-def loese(self, *, N_Ed: float, M_Ed: float) -> Ebene
-```
-
-Die Dehnungsebene zu diesen Schnittgroessen.
-
-Aeussere Bisektion ueber `chi`: zu jedem `chi` wird `eps_m` so
-bestimmt, dass die Normalkraft stimmt, und das uebrig bleibende Moment
-gegen `M_Ed` gehalten. `M(chi)` waechst monoton -- mehr Kruemmung
-heisst mehr Moment --, solange der Querschnitt nicht versagt.
-
-#### Querschnittsloeser._rand
-
-```python
-def _rand(self, start: float, N_Ed: float, moment: Callable[[float], Optional[float]], M_Ed: float, *, nach_oben: bool) -> Tuple[Optional[float], None]
-```
-
-Eine Kruemmung, bei der das Moment `M_Ed` sicher ueber- bzw.
-unterschreitet -- der Startpunkt der aeusseren Bisektion.
-
-Von der theoretischen Grenze aus wird herangetastet: dort ist das
-Fenster leer oder die Normalkraft nicht erreichbar. Zwanzig
-Halbierungen genuegen, um auf eine loesbare Stelle zu kommen.
-
-Nahe am Widerstand genuegen sie nicht. Zwischen der letzten Stufe
-ohne Gleichgewicht und der ersten mit -- an der Platte des Beispiels
-0.08 und 0.04 1/m -- liegen Kruemmungen, die das Moment noch
-erreichen, und das Halbieren springt ueber sie hinweg: 234.9 kNm
-hiessen dort «kein Gleichgewicht», obwohl der Querschnitt bis
-235.4 kNm traegt. Trifft das Halbieren nicht, wird darum die Grenze
-zwischen den beiden Stufen gesucht -- die groesste Kruemmung mit
-Gleichgewicht -- und dort noch einmal gefragt. Wo das Halbieren
-trifft, bleibt alles, wie es war.
 
 ### Werkstoffsatz
 
@@ -508,6 +539,7 @@ nichts. So rechnet die Handrechnung -- sie laesst die Druckbewehrung weg.
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.web.api]]
 

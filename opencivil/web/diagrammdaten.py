@@ -213,7 +213,8 @@ def _bild_dict(bild, h: float) -> dict:
         "beton": [{"z": f.z * 1e3, "eps": f.eps * 1e3, "sigma": f.sigma / 1e6}
                   for f in bild.beton],
         "stahl": [{"z": s.z * 1e3, "eps": s.eps * 1e3, "sigma": s.sigma / 1e6,
-                   "nummer": s.nummer, "a_s": s.a_s * 1e6, "kraft": s.kraft / 1e3}
+                   "nummer": s.nummer, "name": s.name, "a_s": s.a_s * 1e6,
+                   "kraft": s.kraft / 1e3}
                   for s in bild.stahl],
         "konvergiert": bild.konvergiert, "hinweis": bild.hinweis,
     }
@@ -221,7 +222,8 @@ def _bild_dict(bild, h: float) -> dict:
 
 def spannungsanalysen(aufbau: Aufbau, loesung: Loesung) -> dict:
     """
-    Die Auswertungen am Querschnitt, je Platte -- fertig zum Zeichnen.
+    Die Auswertungen am Querschnitt, je Platte und je gezeichnetem Querschnitt
+    -- fertig zum Zeichnen.
 
     Gerechnet wird in :func:`opencivil.spannungsanalyse.analysen`; hier wird
     nur in Zeichengroessen abgebildet.
@@ -232,11 +234,13 @@ def spannungsanalysen(aufbau: Aufbau, loesung: Loesung) -> dict:
 
 def _analyse_dict(analyse) -> dict:
     kopf = {"name": analyse.fall.name, "art": analyse.art.value,
-            "richtung": analyse.richtung.value,
+            "richtung": analyse.richtung.value, "richtung_text": analyse.richtung_text,
             "titel": analyse.art.beschriftung}
     if not analyse.moeglich:
         return {**kopf, "moeglich": False, "hinweis": analyse.hinweis}
     paar = analyse.paar
+    # Wo die Mitteldehnung gilt -- an der Achse der N-eps-Linie.
+    kopf["bezugsort"] = paar.bezugsort
     # Womit gerechnet wurde, beim Bild angeschrieben -- und wie ein Widerstand
     # darum heisst: R_d oder R_k sagt der Kern, nicht die Oberflaeche.
     wahl = paar.wahl

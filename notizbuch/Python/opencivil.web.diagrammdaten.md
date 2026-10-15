@@ -1,5 +1,5 @@
 ---
-erzeugt: 30dc800fad08
+erzeugt: faf01d00515f
 art: modul
 tags: [modul]
 ---
@@ -87,7 +87,8 @@ Ein Querschnittsbild in Zeichengroessen: mm, Promille, N/mm², kN.
 def spannungsanalysen(aufbau: Aufbau, loesung: Loesung) -> dict
 ```
 
-Die Auswertungen am Querschnitt, je Platte -- fertig zum Zeichnen.
+Die Auswertungen am Querschnitt, je Platte und je gezeichnetem Querschnitt
+-- fertig zum Zeichnen.
 
 Gerechnet wird in [[opencivil.spannungsanalyse#analysen|opencivil.spannungsanalyse.analysen]]; hier wird
 nur in Zeichengroessen abgebildet.

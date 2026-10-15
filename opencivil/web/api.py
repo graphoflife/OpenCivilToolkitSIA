@@ -47,10 +47,11 @@ from opencivil.projekt import balkensystem as bs
 from opencivil.projekt.eintraege import BETONGESETZE, WERKSTOFFSAETZE
 from opencivil.projekt.querschnittsanalyse import (
     SCHNITTE, FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QALastfallEintrag,
-    QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
-    WerkstoffwahlEintrag,
+    QASpannungsfallEintrag, QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag,
+    StablinieEintrag, WerkstoffwahlEintrag,
 )
 from opencivil.querschnitt.analyse import Zeichnung
+from opencivil.querschnitt.schnittanalyse import Zugseite
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.vorlagen import VORLAGEN
 from opencivil.projekt.gleichungen import GleichungszeileEintrag
@@ -165,6 +166,7 @@ def katalog() -> dict:
             # Die Teile der Querschnittsanalyse, wie das Zeichenfenster sie
             # anlegt. Es setzt nur Kennung, Knoten und die Materialien.
             "qa_lastfall": QALastfallEintrag(name="", M_y_Ed=100.0).als_dict(),
+            "qa_analyse": QASpannungsfallEintrag(name="", M_Ed=30.0).als_dict(),
             "knoten": KnotenEintrag().als_dict(),
             "flaeche": FlaecheEintrag().als_dict(),
             "stab": StabEintrag().als_dict(),
@@ -196,6 +198,10 @@ def katalog() -> dict:
             "werkstoffsaetze": _WERKSTOFFSAETZE,
             "betongesetze": _BETONGESETZE,
             "schnitte": list(SCHNITTE),
+            # Die Seiten, die ein positives Moment einer Analyse zieht -- und
+            # wie dann ihre Raender heissen: der gedrueckte, der gezogene.
+            "zugseiten": [{"wert": z.value, "beschriftung": z.beschriftung,
+                           "raender": list(z.raender)} for z in Zugseite],
             # Die Vorlagen mit ihren Massen -- und je eine Skizze nach
             # Vorgabe fuer das Bildchen auf ihrem Knopf.
             "vorlagen": [

@@ -1,10 +1,10 @@
 ---
-erzeugt: 13726a1ff78f
+erzeugt: f04d035aeae6
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 17 Formeln, in der Folge, in der gerechnet wird.
+> 19 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -26,6 +26,18 @@ Dieselbe Rissbedingung, nach der Normalkraft aufgelöst: beim Moment M reisst de
 
 Der äquivalente E-Modul ist der Modul, den ein reiner Betonquerschnitt bräuchte – ungerissen, ohne Stahl, elastisch –, um sich unter der laufenden Kraft gleich stark zu verformen wie der bewehrte Querschnitt. Gezählt wird ab dem Zustand ohne laufende Kraft: was die festgehaltene Kraft allein verformt, kann ein solcher Querschnitt nicht abbilden. Ist sie null, ist es genau M = E·I·χ bzw. N = E·A·ε.
 
+Die Nulllinie bleibt parallel zur Achse der Biegung: gezogen wird der Rand links, gedrückt der Rand rechts. Das Moment um die andere Achse, das ein unsymmetrischer Querschnitt dabei weckt, zählt nicht. Am Bruttoquerschnitt reisst der gezogene Rand, wenn N/A + M/W = f\_ct,eff; W gehört zu diesem Rand, v\_z ist sein Abstand vom Schwerpunkt.
+
+Die Nulllinie bleibt parallel zur Achse der Biegung: gezogen wird der Rand unten, gedrückt der Rand oben. Das Moment um die andere Achse, das ein unsymmetrischer Querschnitt dabei weckt, zählt nicht. Am Bruttoquerschnitt reisst der gezogene Rand, wenn N/A + M/W = f\_ct,eff; W gehört zu diesem Rand, v\_z ist sein Abstand vom Schwerpunkt.
+
+Dieselbe Rissbedingung, nach der Normalkraft aufgelöst. Unter Zug reisst die ganze Tiefe, darum gilt k\_t für t = h und nicht für h/3 wie beim Rissmoment. Ein negatives Moment zieht den anderen Rand: dann gilt dessen Abstand.
+
+Der reine Betonquerschnitt ist der Bruttoquerschnitt: A\_c = A.
+
+Die Nulllinie bleibt parallel zur Achse der Biegung: gezogen wird der Rand oben, gedrückt der Rand unten. Das Moment um die andere Achse, das ein unsymmetrischer Querschnitt dabei weckt, zählt nicht. Am Bruttoquerschnitt reisst der gezogene Rand, wenn N/A + M/W = f\_ct,eff; W gehört zu diesem Rand, v\_z ist sein Abstand vom Schwerpunkt.
+
+Der reine Betonquerschnitt ist der Bruttoquerschnitt, um die Achse der Biegung: I\_c = Iy.
+
 ## Formeln
 
 1. [[Wirksamer Elastizitätsmodul]]
@@ -45,6 +57,8 @@ Der äquivalente E-Modul ist der Modul, den ein reiner Betonquerschnitt bräucht
 15. [[Äquivalenter E-Modul über dem Moment]]
 16. [[Fläche eines Rechtecks]]
 17. [[Äquivalenter E-Modul über der Normalkraft]]
+18. [[Widerstandsmoment zum gezogenen Rand]]
+19. [[Grösste Dehnung im Schwerpunkt]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

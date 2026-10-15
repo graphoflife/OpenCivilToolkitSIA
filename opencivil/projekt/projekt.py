@@ -640,6 +640,14 @@ class Projekt(Beschreibung):
             a.schubwand(e, f, dicke=150, durchmesser=10, teilung=150, schnitte=1, stahl="s1")
         a.lastfall("Feld", M_y_Ed=300.0, V_z_Ed=250.0, T_Ed=60.0)
         a.lastfall("Schief", N_Ed=-1500.0, M_y_Ed=250.0, M_z_Ed=150.0, V_y_Ed=100.0)
+        # Spannung-Dehnung-Analysen, je Zugseite: ein Bild und eine Linie mit
+        # ihrer Herleitung -- um z unter Druck, und der Modul unter Zug bei
+        # negativem Moment, wo der gedrückte Rand reisst.
+        a.spannungsfall("Schnitt", art="schnittgroessen", N_Ed=-500.0, M_Ed=200.0)
+        a.spannungsfall("Seitlich", art="moment_kruemmung", N_Ed=-500.0, richtung="links",
+                        kriechzahl=1.0)
+        a.spannungsfall("Zugsteifigkeit", art="normalkraft_emodul", M_Ed=-50.0,
+                        werkstoffsatz="charakteristisch", rechenart="block")
         return a
 
     @staticmethod
@@ -654,6 +662,10 @@ class Projekt(Beschreibung):
             a.stablinie([50, z], [350, z], art="anzahl", durchmesser=20, anzahl=3, stahl="s1")
         a.lastfall("Druck", N_Ed=-2500.0, M_y_Ed=120.0)
         a.lastfall("Zug", N_Ed=400.0)
+        a.spannungsfall("Randdehnungen", art="dehnungen", eps_oben=-2.0, eps_unten=5.0,
+                        richtung="oben")
+        a.spannungsfall("Biegesteifigkeit", art="moment_emodul", N_Ed=-800.0,
+                        richtung="oben", werkstoffsatz="charakteristisch")
         return a
 
 

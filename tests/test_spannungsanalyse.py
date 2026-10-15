@@ -595,9 +595,11 @@ class TestAequivalenterModul(unittest.TestCase):
         b, h = cls.paar.gerissen.b, cls.paar.gerissen.h
         cls.b, cls.h = b, h
         cls.biegung = sa.aequivalenter_modul(sa.moment_kruemmung(cls.paar, N=0.0),
-                                             b=b, h=h, E_cm=cls.paar.E_cm)
+                                             I_c=cls.paar.I_c, A_c=cls.paar.A_c,
+                                             E_cm=cls.paar.E_cm)
         cls.zug = sa.aequivalenter_modul(sa.normalkraft_dehnung(cls.paar, M=0.0),
-                                         b=b, h=h, E_cm=cls.paar.E_cm)
+                                         I_c=cls.paar.I_c, A_c=cls.paar.A_c,
+                                         E_cm=cls.paar.E_cm)
 
     def ideell(self):
         """Der ungerissene Querschnitt mit Stahl: Fläche, Schwerpunkt, Flächenmoment."""
@@ -650,7 +652,8 @@ class TestAequivalenterModul(unittest.TestCase):
         -- der Querschnitt ist linear -- und nahe null kein Ausreisser.
         """
         druck = sa.aequivalenter_modul(sa.moment_kruemmung(self.paar, N=-300e3),
-                                       b=self.b, h=self.h, E_cm=self.paar.E_cm)
+                                       I_c=self.paar.I_c, A_c=self.paar.A_c,
+                                       E_cm=self.paar.E_cm)
         self.assertNotEqual(druck.null, 0.0)
         ungerissen = [p.modul for p in druck.punkte if not p.gerissen]
         self.assertAlmostEqual(min(ungerissen) / self.biegung.ungerissen, 1.0, delta=1e-6)

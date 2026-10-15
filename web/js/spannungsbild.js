@@ -176,7 +176,7 @@ function ueberDieHoehe(bild, { titel, einheit, hol, stahlHol, stellen }) {
     });
     const titelKnoten = svgEl('title');
     titelKnoten.textContent =
-      `${lage.nummer}. Lage – ${lage.a_s.toFixed(0)} mm²\n`
+      `${lage.name || `${lage.nummer}. Lage`} – ${lage.a_s.toFixed(0)} mm²\n`
       + `ε = ${lage.eps.toFixed(3)} ‰, σ = ${lage.sigma.toFixed(0)} N/mm²\n`
       + `F = ${lage.kraft.toFixed(1)} kN`;
     punkt.append(titelKnoten);
@@ -207,13 +207,13 @@ const LINIEN = {
     kraft: 'M', kraftEinheit: 'kNm', verformungEinheit: '1/m', stellen: 4,
     verformung: (index) => (index ? `χ_{${index}}` : 'χ'),
     latex: (index) => (index ? `\\chi_{${index}}` : '\\chi'),
-    fest: ['N', 'kN'], achse: 'χ [1/m]',
+    fest: ['N', 'kN'], achse: () => 'χ [1/m]',
   },
   normalkraft_dehnung: {
     kraft: 'N', kraftEinheit: 'kN', verformungEinheit: '‰', stellen: 2,
     verformung: (index) => (index ? `ε_{m,${index}}` : 'ε_m'),
     latex: (index) => (index ? `\\varepsilon_{m,${index}}` : '\\varepsilon_{m}'),
-    fest: ['M', 'kNm'], achse: 'ε_m [‰]   (auf halber Höhe)',
+    fest: ['M', 'kNm'], achse: (ort) => `ε_m [‰]   (${ort})`,
   },
 };
 
@@ -314,7 +314,10 @@ function linienbild(fall) {
   const { svg, daten, x, y, feld } = achsenkreuz({
     breite: BREITE * 2, hoehe: HOEHE, rand: RAND, rahmen: true,
     attribute: { class: 'sd-bild sd-breit', preserveAspectRatio: 'xMidYMid meet' },
-    x: { bereich: [vMin - (vMin < 0 ? 0.05 * spanne : 0), vMax + 0.05 * spanne], titel: art.achse },
+    x: {
+      bereich: [vMin - (vMin < 0 ? 0.05 * spanne : 0), vMax + 0.05 * spanne],
+      titel: art.achse(fall.bezugsort),
+    },
     y: { bereich: [0, kMax * 1.05], titel: `${art.kraft} [${art.kraftEinheit}]` },
     schrift: { teilung: 9.5, titel: 11 }, titelLinks: 12,
   });
@@ -530,7 +533,7 @@ export function spannungsfallZeichnen(fall) {
   }
 
   const kopf = el('div.sd-kopf', {
-    text: `${fall.name} – ${fall.titel} (${fall.richtung})`,
+    text: `${fall.name} – ${fall.titel} (${fall.richtung_text})`,
   });
 
   if (fall.kurve && MODULE[fall.art]) {
@@ -557,7 +560,7 @@ export function spannungsfallZeichnen(fall) {
       ]),
       k.punkte.length ? modulbild(fall) : null,
       el('p.sd-legende', {
-        text: 'E_eq: der E-Modul, den ein reiner Betonquerschnitt b·h – ungerissen, ohne '
+        text: 'E_eq: der E-Modul, den der reine Betonquerschnitt – ungerissen, ohne '
           + 'Stahl, elastisch – bräuchte, um sich gleich stark zu verformen; gezählt ab dem '
           + 'Zustand ohne laufende Kraft. Durchgezogen: der Querschnitt – ungerissen bis zum '
           + 'Riss, dann der Sprung, darüber gerissen (ohne Zugversteifung) · lang gestrichelt: '

@@ -45,8 +45,9 @@ from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.platte import ALPHA_MAX, ALPHA_MIN, K_C
 from opencivil.querschnitt import vorlagen
+from opencivil.querschnitt.schnittanalyse import Zugseite
 from opencivil.projekt.eintraege import (
-    BETONGESETZE, WERKSTOFFSAETZE, Beschreibung, eindeutig,
+    BETONGESETZE, WERKSTOFFSAETZE, Beschreibung, SpannungsfallEintrag, eindeutig,
 )
 from opencivil.projekt.lesen import ProjektFehler, pflichtfeld, zahl
 from opencivil.projekt.netz import Netz, naechste_kennung
@@ -308,6 +309,27 @@ class WerkstoffwahlEintrag(Beschreibung):
                    satz=satz, betongesetz=gesetz)
 
 
+@dataclass
+class QASpannungsfallEintrag(SpannungsfallEintrag):
+    """
+    Eine Spannung-Dehnung-Analyse des gezeichneten Querschnitts -- dieselben
+    Felder wie bei der Platte. Die Richtung ist hier die Zugseite: die Seite,
+    die ein positives Moment zieht (:class:`~opencivil.querschnitt.schnittanalyse.Zugseite`).
+    """
+
+    richtung: str = Zugseite.UNTEN.value
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any], **_: Any) -> "QASpannungsfallEintrag":
+        eintrag = super().aus_dict(d)
+        moeglich = [z.value for z in Zugseite]
+        if eintrag.richtung not in moeglich:
+            raise ProjektFehler(
+                f"Spannung-Dehnung-Analyse '{eintrag.name}': die Zugseite "
+                f"«{eintrag.richtung}» gibt es nicht. Möglich sind: {', '.join(moeglich)}.")
+        return eintrag
+
+
 # ===========================================================================
 # Die Elemente, wie der Kern sie sieht
 # ===========================================================================
@@ -393,6 +415,9 @@ class QuerschnittsanalyseEintrag(Beschreibung):
     duktilitaet: bool = False
     x_d_max: float = X_D_MAX
     sproede: bool = False
+
+    spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)
+    """Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt."""
 
     beschreibung: str = ""
     """Freier Text -- geht in keine Rechnung ein, wie bei der Platte."""
@@ -587,13 +612,27 @@ class QuerschnittsanalyseEintrag(Beschreibung):
         return neu
 
     def pruefen(self) -> None:
-        """Was sich schon an der Beschreibung pruefen laesst: eindeutige Lastfallnamen."""
+        """Was sich schon an der Beschreibung pruefen laesst: eindeutige Namen der Faelle."""
         eindeutig(self.lastfaelle, self.name, "Lastfall", bauteil="Querschnitt")
+        eindeutig(self.spannungsfaelle, self.name, "Spannung-Dehnung-Analyse",
+                  bauteil="Querschnitt")
 
     def lastfall(self, name: str, **werte: float) -> QALastfallEintrag:
         """Einen Lastfall anfuegen, ohne Oberflaeche -- kN und kNm."""
         eintrag = QALastfallEintrag(name=name, **werte)
         self.lastfaelle.append(eintrag)
+        return eintrag
+
+    def spannungsfall(self, name: str, *, art: str = "schnittgroessen",
+                      **felder: Any) -> QASpannungsfallEintrag:
+        """
+        Eine Spannung-Dehnung-Analyse -- Felder wie bei der Platte, die
+        Richtung als Zugseite (``unten``, ``oben``, ``links``, ``rechts``).
+        Gelesen wie aus einer Datei, also mit denselben Pruefungen.
+        """
+        eintrag = QASpannungsfallEintrag.aus_dict(
+            QASpannungsfallEintrag(name=name, art=art, **felder).als_dict())
+        self.spannungsfaelle.append(eintrag)
         return eintrag
 
     @classmethod
@@ -628,6 +667,8 @@ class QuerschnittsanalyseEintrag(Beschreibung):
             duktilitaet=bool(d.get("duktilitaet", cls.duktilitaet)),
             x_d_max=zahl(d, "x_d_max", cls.x_d_max),
             sproede=bool(d.get("sproede", cls.sproede)),
+            spannungsfaelle=[QASpannungsfallEintrag.aus_dict(x)
+                             for x in (d.get("spannungsfaelle") or [])],
             beschreibung=str(d.get("beschreibung") or cls.beschreibung),
         )
         a._elemente_lesen(d)

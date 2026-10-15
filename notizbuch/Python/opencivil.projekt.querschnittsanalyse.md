@@ -1,5 +1,5 @@
 ---
-erzeugt: 7a48d7f01118
+erzeugt: 9a9f848bc056
 art: modul
 tags: [modul]
 ---
@@ -276,6 +276,26 @@ vereinfachte Spannungsblock 0.85·x.
 def aus_dict(cls, d: Mapping[str, Any]) -> 'WerkstoffwahlEintrag'
 ```
 
+### QASpannungsfallEintrag
+
+```python
+@dataclass
+class QASpannungsfallEintrag(SpannungsfallEintrag)
+```
+
+Eine Spannung-Dehnung-Analyse des gezeichneten Querschnitts -- dieselben
+Felder wie bei der Platte. Die Richtung ist hier die Zugseite: die Seite,
+die ein positives Moment zieht ([[opencivil.querschnitt.schnittanalyse#Zugseite|Zugseite]]).
+
+- `richtung: str = Zugseite.UNTEN.value`
+
+#### QASpannungsfallEintrag.aus_dict
+
+```python
+@classmethod
+def aus_dict(cls, d: Mapping[str, Any], **_: Any) -> 'QASpannungsfallEintrag'
+```
+
 ### Elemente
 
 ```python
@@ -330,6 +350,7 @@ Ein gezeichneter Querschnitt mit Bewehrung, Schubwaenden und Lastfaellen.
 - `duktilitaet: bool = False`
 - `x_d_max: float = X_D_MAX`
 - `sproede: bool = False`
+- `spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)` – Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt.
 - `beschreibung: str = ''` – Freier Text -- geht in keine Rechnung ein, wie bei der Platte.
 
 #### QuerschnittsanalyseEintrag.wahl
@@ -448,7 +469,7 @@ Passen die Masse nicht zueinander, ein `ValueError` mit dem Grund.
 def pruefen(self) -> None
 ```
 
-Was sich schon an der Beschreibung pruefen laesst: eindeutige Lastfallnamen.
+Was sich schon an der Beschreibung pruefen laesst: eindeutige Namen der Faelle.
 
 #### QuerschnittsanalyseEintrag.lastfall
 
@@ -457,6 +478,16 @@ def lastfall(self, name: str, **werte: float) -> QALastfallEintrag
 ```
 
 Einen Lastfall anfuegen, ohne Oberflaeche -- kN und kNm.
+
+#### QuerschnittsanalyseEintrag.spannungsfall
+
+```python
+def spannungsfall(self, name: str, *, art: str='schnittgroessen', **felder: Any) -> QASpannungsfallEintrag
+```
+
+Eine Spannung-Dehnung-Analyse -- Felder wie bei der Platte, die
+Richtung als Zugseite (`unten`, `oben`, `links`, `rechts`).
+Gelesen wie aus einer Datei, also mit denselben Pruefungen.
 
 #### QuerschnittsanalyseEintrag.neu
 
@@ -504,6 +535,7 @@ und mit ihr jeder Name im Bericht.
 - [[opencivil.projekt.netz]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.platte]]
+- [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.querschnitt.vorlagen]]
 
 ## Gebraucht von

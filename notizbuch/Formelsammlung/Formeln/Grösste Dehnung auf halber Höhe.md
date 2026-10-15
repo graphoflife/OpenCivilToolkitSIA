@@ -1,5 +1,5 @@
 ---
-erzeugt: 848e57eb27a5
+erzeugt: 7da185ef33ca
 art: formel
 tags: [formel]
 ---
@@ -27,7 +27,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.spannungsanalyse#_herleitung|_herleitung]]
+- [[opencivil.spannungsanalyse#Loeserpaar.herleitung_dehnung_am_ende|Loeserpaar.herleitung_dehnung_am_ende]]
 
 ## Themen
 

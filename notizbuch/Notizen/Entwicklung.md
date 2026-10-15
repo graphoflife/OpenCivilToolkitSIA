@@ -44,6 +44,41 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-15 · Spannung-Dehnung-Analysen am gezeichneten Querschnitt
+
+Die sechs Analysen der Platte gibt es jetzt auch für den gezeichneten
+Querschnitt, je Zugseite -- unten, oben, links, rechts. Gerechnet wird mit
+denselben Funktionen; neu ist nur, wie der Querschnitt zu ihnen kommt.
+
+**Ein Löser für jeden Faserquerschnitt.** `Querschnittsloeser` baute seine
+Fasern aus Höhe, Breite und Lagen und suchte darin die Ebene. Die Suche
+braucht davon nichts als die Fasern und die Dehnungsgrenzen. Sie steht jetzt
+in `Faserloeser`; die Platte baut ihn wie bisher, der gezeichnete Querschnitt
+aus `Querschnitt.richtung(psi)` -- den Fasern, mit denen schon seine
+Tragsicherheit rechnet. Bilder und Linien lesen vom Löser die Ränder (`oben`,
+`unten`), die Lagen und die Spannung des Betons an einer Stelle; das sagt
+jeder Querschnitt selbst. Bei der Platte liegt die Mitteldehnung auf halber
+Höhe, beim gezeichneten Querschnitt im Schwerpunkt, wo N angreift.
+
+**Ein Paar je Art.** Das Löserpaar der Platte (`Loeserpaar`) und das des
+gezeichneten Querschnitts (`Schnittpaar`) haben dieselben Glieder: gerissen,
+ungerissen, Riss, Bezugsfläche des Moduls. Was nur eine Art weiss -- wie
+sie reisst, woran sich der Modul misst, wo die Mitteldehnung gilt --,
+schreibt jedes Paar in die Herleitung selbst; der übrige Text ist derselbe.
+Bei der Platte ist `W/A = h/6`, also derselbe Riss wie bisher.
+
+**Annahmen**, im Code «nach Vorgabe, nicht nachgeschlagen», in [[TODO]]: die
+Nulllinie bleibt parallel zur Achse; der Riss am Bruttoquerschnitt mit `k_t`
+wie bei der Platte, `f_ctm` vom Beton am gezogenen Rand; der äquivalente
+Modul am Bruttoquerschnitt.
+
+**Dabei:** Stäbe in derselben Tiefe, aus demselben Stahl, sind im Bild eine
+Lage -- sie haben dieselbe Dehnung, und dreissig Punkte übereinander liest
+niemand. Die Analysen zerlegen in 60 Streifen statt der 200 der
+Tragsicherheit: eine Linie rechnet viele Ebenen, und M_Rd ändert sich dabei um
+zwei Zehntelpromille. Jede Dehnungsgrenze trägt jetzt ihren Namen mit Seite
+(«Beton C30/37, Rand oben»), damit «massgebend» sagt, wo.
+
 ## 2026-10-15 · Querschnittsanalyse: Kapitel als Knöpfe
 
 Wie bei der Platte: oben der Querschnitt mit dem Zeichenfenster, darunter je

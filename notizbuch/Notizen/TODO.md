@@ -234,6 +234,14 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Rechteck anzusetzen ist, sagt das Werkzeug nicht -- das gibt der
       Benutzer ein. Das Beispiel nimmt 100 mm auf der Bügelachse; eine Regel
       dafür ist nicht nachgeschlagen.
+- [ ] **Spannung-Dehnung-Analyse je Zugseite.** Eingebaut
+      (`querschnitt/schnittanalyse.py`): die Nulllinie bleibt parallel zur
+      Achse, wie einachsig -- das Moment um die andere Achse, das ein
+      unsymmetrischer Querschnitt dabei weckt, zählt nicht. Der Riss am
+      ungerissenen Bruttoquerschnitt, `M_Riss(N) = (f_ct,eff − N/A)·W` und
+      `N_Riss(M) = (f_ct,eff,t − M·v/I)·A`, mit `k_t` für ein Drittel der
+      Tiefe bzw. die ganze, wie bei der Platte; `f_ctm` und `E_cm` vom Beton
+      am gezogenen Rand. Der äquivalente Modul am Bruttoquerschnitt (`I`, `A`).
 
 ### Balkensysteme
 

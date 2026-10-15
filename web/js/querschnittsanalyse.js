@@ -21,9 +21,10 @@
 import { erklaerung, feld, hakenSchalter, panel } from './bausteine.js';
 import { auswahl, el, svgEl, zahlfeld } from './dom.js';
 import {
-  anzahl, eingeschaltet, kapitelFenster, kapitelPanel, schalter,
+  analysenKapitel, anzahl, eingeschaltet, kapitelFenster, kapitelPanel, schalter,
 } from './kapitel.js';
 import { span } from './mathe.js';
+import { analyseInhalt, mitKopf } from './nachweise.js';
 import { uebersicht } from './qa_uebersicht.js';
 import { zeichenbereich } from './qa_zeichnung.js';
 import {
@@ -469,15 +470,49 @@ const NACHWEISE = [
   },
 ];
 
+/** Die Zugseiten einer Analyse aus dem Katalog -- und wie dann ihre Ränder heissen. */
+function zugseite(wert) {
+  return (zustand.katalog?.querschnittsanalyse?.zugseiten || []).find((z) => z.wert === wert);
+}
+
+/**
+ * Wo die Analysen eines gezeichneten Querschnitts stehen (vgl. `PLATTE` in
+ * nachweise.js): die Richtung ist die Zugseite, die Seite, die ein positives
+ * Moment zieht. «oben» heisst dann der Rand gegenüber.
+ */
+const ORT = {
+  liste: 'querschnittsanalysen',
+  vorlage: 'qa_analyse',
+  // «Zug» steht darüber, in der Auswahl nur die Seite: «Zug rechts» passt
+  // nicht in die Spalte.
+  richtung: (k, setzen) => mitKopf('Zug', auswahl({
+    werte: (zustand.katalog?.querschnittsanalyse?.zugseiten || [])
+      .map((z) => ({ wert: z.wert, beschriftung: z.wert })),
+    gewaehlt: k.richtung,
+    titel: 'Zugseite: die Seite, die ein positives Moment zieht',
+    beiAenderung: setzen,
+  })),
+  raender: (k) => zugseite(k.richtung)?.raender || ['oben', 'unten'],
+};
+
 function kapitel() {
-  return [{ titel: 'Nachweise', kapitel: NACHWEISE }];
+  return [
+    { titel: 'Nachweise', kapitel: NACHWEISE },
+    {
+      titel: 'Spannung-Dehnung-Analysen',
+      kapitel: analysenKapitel({
+        inhalt: (a, art) => analyseInhalt(a, art, ORT), bezug: () => 'N in kN · M in kNm',
+      }),
+    },
+  ];
 }
 
 /** Die mittlere Tafel für eine Querschnittsanalyse: oben der Querschnitt, darunter die Knöpfe. */
 export function analyseEditor(analyse) {
   return [
     querschnittGruppe(analyse),
-    kapitelPanel(analyse, kapitel(), { schluessel: 'analyse/Kapitel', titel: 'Nachweise' }),
+    kapitelPanel(analyse, kapitel(),
+      { schluessel: 'analyse/Kapitel', titel: 'Nachweise und Analysen' }),
   ];
 }
 

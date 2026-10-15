@@ -306,7 +306,11 @@ Tragsicherheit: je Material Bemessungs- oder charakteristische Werte und beim
 Beton das Gesetz, der Schalter «nur einachsig», die Lastfälle mit N, M_y,
 M_z, V_y, V_z und T und die Angaben der Schubwände (Neigung, k_c,
 Längszugkraft). Duktilität und sprödes Versagen rechnen am selben
-Querschnitt.
+Querschnitt. Dazu die sechs Spannung-Dehnung-Analysen wie bei der Platte, je
+Zugseite: unten, oben, links oder rechts -- die Seite, die ein positives
+Moment zieht. Die Nulllinie bleibt dabei parallel zur Achse; ε_m gilt im
+Schwerpunkt, der Riss und der äquivalente Modul am Bruttoquerschnitt. Die
+Bilder stehen im Reiter Diagramme unter «Spannung-Dehnung-Analysen».
 
 **2D Balkensysteme:** unter der Querschnittsanalyse ein drittes Kapitel,
 ein ebener Rahmen nach der Steifigkeitsmethode. Gezeichnet wird mit

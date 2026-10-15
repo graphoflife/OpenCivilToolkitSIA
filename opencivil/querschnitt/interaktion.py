@@ -281,6 +281,9 @@ class Richtung:
     staebe_v: Tuple[float, ...]
     """Je Bewehrung ihr v."""
 
+    grenznamen: Tuple[str, ...] = ()
+    """Je Dehnungsgrenze, was sie ist -- «Beton C30/37 am gezogenen Rand»."""
+
     def momente(self, N: float, M: float, M_quer: float) -> Tuple[float, float]:
         """
         Aus ``Σ F·v`` und ``Σ F·u`` die Momente um die Achsen.
@@ -461,17 +464,24 @@ class Querschnitt:
                                verdraengt=verdraengt, quer=u, dicke=math.sqrt(s.flaeche)))
             staebe_v.append(v)
 
-        grenzen, beton = self._grenzen(v_von)
+        grenzen, beton, namen = self._grenzen(v_von, n)
         return Richtung(
             psi=psi, n=n, t=t, fasern=Faserquerschnitt(gruppen, staebe),
             grenzen=Dehnungsgrenzen(grenzen), gruppen_werkstoff=tuple(gruppen_werkstoff),
-            beton=beton, staebe_v=tuple(staebe_v))
+            beton=beton, staebe_v=tuple(staebe_v), grenznamen=tuple(namen))
 
-    def _grenzen(self, v_von) -> Tuple[List[Dehnungsgrenze], Optional[Tuple[float, float]]]:
+    def _grenzen(self, v_von, n: Punkt) -> Tuple[List[Dehnungsgrenze],
+                                                 Optional[Tuple[float, float]], List[str]]:
         """
         Die Dehnungsgrenzen fuer diese Neigung: je Werkstoff an seinen
-        aeussersten Punkten, beim Beton dazu die C-Punkte.
+        aeussersten Punkten, beim Beton dazu die C-Punkte -- und je Grenze
+        ihr Name, mit der Seite, auf der sie liegt. Die Seite grosser v ist
+        die, auf die die Zugrichtung ``n`` zeigt.
         """
+        if abs(n[1]) >= abs(n[0]):
+            seiten = ("oben", "unten") if n[1] < 0 else ("unten", "oben")
+        else:
+            seiten = ("rechts", "links") if n[0] < 0 else ("links", "rechts")
         lagen: Dict[int, List[float]] = {}
         for teil in self.teile:
             if teil.werkstoff is not None:
@@ -481,20 +491,27 @@ class Querschnitt:
                 v_von(p) for p in (s.grenzpunkte or (s.lage,)))
 
         grenzen: List[Dehnungsgrenze] = []
+        namen: List[str] = []
         beton: Optional[Tuple[float, float]] = None
         for w, vs in sorted(lagen.items()):
             stoff = self.werkstoffe[w]
+            ist_beton = stoff.c_punkt is not None
+            art = f"Beton {stoff.name}" if ist_beton else f"Stahl {stoff.name}"
             v_min, v_max = min(vs), max(vs)
             for v in {v_min, v_max}:
                 grenzen.append(Dehnungsgrenze(arm=v, eps_min=stoff.eps_min,
                                               eps_max=stoff.eps_max))
-            if stoff.c_punkt is not None:
+                seite = seiten[0] if v == v_min else seiten[1]
+                namen.append(f"{art}, Rand {seite}" if ist_beton
+                             else f"{art}, äusserste Lage {seite}")
+            if ist_beton:
                 eps_c1d, eps_c2d = stoff.c_punkt
                 anteil = 1.0 - eps_c1d / eps_c2d
                 hoehe = v_max - v_min
                 for v in (v_min + anteil * hoehe, v_max - anteil * hoehe):
                     grenzen.append(Dehnungsgrenze(arm=v, eps_min=-eps_c1d,
                                                   eps_max=math.inf))
+                    namen.append(f"{art}, Punkt C")
                 beton = (v_min, v_max) if beton is None else (
                     min(beton[0], v_min), max(beton[1], v_max))
 
@@ -505,7 +522,8 @@ class Querschnitt:
             for v in {min(alle), max(alle)}:
                 grenzen.append(Dehnungsgrenze(arm=v, eps_min=-math.inf,
                                               eps_max=EPS_ZUG_OHNE_GRENZE))
-        return grenzen, beton
+                namen.append("Rand ohne Bewehrung")
+        return grenzen, beton, namen
 
     # -- Der Faecher ----------------------------------------------------------
 

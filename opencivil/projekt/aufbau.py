@@ -520,6 +520,10 @@ def _querschnittsanalyse(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     sproede = SproedesVersagenQA(analyse, einachsig=eintrag.einachsig)
     sproede.still = not eintrag.sproede
     aufbau.eintragen(teil, "qa_sproede", eintrag.kennung, sproede)
+
+    aktive = [s for s in eintrag.spannungsfaelle if s.aktiv]
+    if aktive:
+        aufbau.spannungsfaelle[eintrag.kennung] = aktive
     return teil
 
 

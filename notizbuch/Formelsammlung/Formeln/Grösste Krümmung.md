@@ -1,5 +1,5 @@
 ---
-erzeugt: 8e90f0206985
+erzeugt: 5f3c36775dc2
 art: formel
 tags: [formel]
 ---
@@ -16,7 +16,7 @@ $$
 | --- | --- | --- | --- |
 | $\varepsilon_{unten}$ | – | ‰ | Zwischenwert |
 | $\varepsilon_{oben}$ | – | ‰ | Zwischenwert |
-| $h$ | Plattendicke | mm | Vorgabe |
+| $h$ | Plattendicke | mm | Vorgabe, Zwischenwert |
 
 ## Beispiel
 
@@ -28,7 +28,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.spannungsanalyse#_herleitung|_herleitung]]
+- [[opencivil.spannungsanalyse#herleitung|herleitung]]
 
 ## Themen
 

@@ -18,8 +18,8 @@ from opencivil.projekt import (
 from opencivil.projekt.eintraege import Beschreibung
 from opencivil.projekt.querschnittsanalyse import (
     FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QALastfallEintrag,
-    QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
-    WerkstoffwahlEintrag,
+    QASpannungsfallEintrag, QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag,
+    StablinieEintrag, WerkstoffwahlEintrag,
 )
 from opencivil.projekt.gleichungen import GleichungsblattEintrag, GleichungszeileEintrag
 from opencivil.web import api, dienst
@@ -410,6 +410,7 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
         (SchubwandEintrag, {}, {}),
         (HilfslinieEintrag, {}, {}),
         (QALastfallEintrag, {"name": "l"}, {"name": "l"}),
+        (QASpannungsfallEintrag, {"name": "s"}, {"name": "s"}),
         (WerkstoffwahlEintrag, {"material": "b1"}, {"material": "b1"}),
         (QuerschnittsanalyseEintrag, {"kennung": "a"}, {"kennung": "a", "name": "a"}),
         (SystemknotenEintrag, {}, {}),
@@ -467,6 +468,7 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
         self.assertEqual(MaterialEintrag.aus_dict(material).als_dict(), material)
         for art, cls, pflicht in (
                 ("qa_lastfall", QALastfallEintrag, {"name": "Neu"}),
+                ("qa_analyse", QASpannungsfallEintrag, {"name": "Neu"}),
                 ("knoten", KnotenEintrag, {}), ("flaeche", FlaecheEintrag, {}),
                 ("stab", StabEintrag, {}), ("stablinie", StablinieEintrag, {}),
                 ("schubwand", SchubwandEintrag, {}), ("hilfslinie", HilfslinieEintrag, {}),

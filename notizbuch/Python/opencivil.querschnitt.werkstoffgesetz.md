@@ -1,5 +1,5 @@
 ---
-erzeugt: 49f1f283d8b3
+erzeugt: 13efa0aa3d6b
 art: modul
 tags: [modul]
 ---
@@ -279,5 +279,6 @@ Ergebnis unendlich, was die Auswertung sauber ueberspringt.
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.web.diagrammdaten]]

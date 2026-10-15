@@ -1,5 +1,5 @@
 ---
-erzeugt: 3c6aeddea60e
+erzeugt: 61b0381f1604
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -74,6 +74,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.querschnitt.geometrie]] – Ebene Geometrie eines gezeichneten Querschnitts.
     - [[opencivil.querschnitt.interaktion]] – Bruchzustand gezeichneter Querschnitte, auch schief.
     - [[opencivil.querschnitt.platte]] – Stahlbeton-Plattenquerschnitt.
+    - [[opencivil.querschnitt.schnittanalyse]] – Spannung-Dehnung-Analyse am gezeichneten Querschnitt.
     - [[opencivil.querschnitt.schubwaende]] – Querkraft und Torsion auf Schubwaende verteilt.
     - [[opencivil.querschnitt.vorlagen]] – Querschnitte zum Anfangen.
     - [[opencivil.querschnitt.werkstoffgesetz]] – Spannungs-Dehnungs-Beziehungen.

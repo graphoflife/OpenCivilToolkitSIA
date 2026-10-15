@@ -757,6 +757,21 @@ async function bewehrungErmitteln(kennung) {
 }
 
 /**
+ * Wo die Analysen eines Bauteils stehen und was bei ihm anders ist: die
+ * Liste im Projekt, die Vorlage einer neuen Zeile und die Richtung -- bei der
+ * Platte die Tragrichtung x oder y. Der gezeichnete Querschnitt hat seinen
+ * eigenen Ort (`querschnittsanalyse.js`): dort ist die Richtung die Zugseite.
+ * `raender(k)` sagt, wie die beiden Ränder einer Analyse heissen -- der
+ * gedrückte und der gezogene.
+ */
+export const PLATTE = {
+  liste: 'querschnitte',
+  vorlage: 'analyse',
+  richtung: (k, setzen) => richtungsWahl(k.richtung || 'x', setzen, ['x', 'y']),
+  raender: () => ['oben', 'unten'],
+};
+
+/**
  * Eine Art der Spannung-Dehnung-Analyse: die Bilder dieser Art, und ein
  * Knopf für ein weiteres.
  *
@@ -767,25 +782,26 @@ async function bewehrungErmitteln(kennung) {
  * Dehnungsfelder zeigen, die sie nicht liest. Die Bilder aller Arten
  * stehen in einer Liste der Platte; jede Zeile behält ihre Stelle darin.
  */
-export function analyseInhalt(querschnitt, art) {
-  const stellen = (querschnitt.spannungsfaelle || [])
+export function analyseInhalt(eintrag, art, ort = PLATTE) {
+  const stellen = (eintrag.spannungsfaelle || [])
     .map((k, i) => (k.art === art ? i : -1))
     .filter((i) => i >= 0);
 
   return [
     ...(stellen.length
-      ? stellen.map((i) => spannungsZeile(querschnitt, i))
+      ? stellen.map((i) => spannungsZeile(eintrag, i, ort))
       : [el('div.leer', { text: 'Noch kein Bild.' })]),
-    anfuegenKnopf('Bild', () => anPlatte(querschnitt)((q) => {
-      q.spannungsfaelle = q.spannungsfaelle || [];
-      q.spannungsfaelle.push(
-        ausVorlage('analyse', { name: naechsterName('Bild', q.spannungsfaelle), art }));
+    anfuegenKnopf('Bild', () => projektAendern((p) => {
+      const e = p[ort.liste].find((x) => x.kennung === eintrag.kennung);
+      e.spannungsfaelle = e.spannungsfaelle || [];
+      e.spannungsfaelle.push(
+        ausVorlage(ort.vorlage, { name: naechsterName('Bild', e.spannungsfaelle), art }));
     })),
   ];
 }
 
 /** Ein Feld mit seiner Beschriftung darüber -- eine Formel bleibt klein geschrieben. */
-function mitKopf(kopf, eingabe, formel = false) {
+export function mitKopf(kopf, eingabe, formel = false) {
   return el('div.mit-kopf', {}, [
     el('span.spaltenkopf', { text: kopf, class: formel ? 'ist-formel' : '' }), eingabe,
   ]);
@@ -852,12 +868,11 @@ function rechenwahlZeile(titel, ziel, aendern, optionen) {
  * die Richtung, zuunterst Werte und Rechenart. Die Zahlenfelder richten sich
  * nach der Art -- die steht über dem Fenster und wird hier nicht gewählt.
  */
-function spannungsZeile(querschnitt, index) {
-  const k = (querschnitt.spannungsfaelle || [])[index];
-  const aendern = (veraenderer) => projektAendern((p) => {
-    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
-      .spannungsfaelle[index]);
-  });
+function spannungsZeile(eintrag, index, ort) {
+  const k = (eintrag.spannungsfaelle || [])[index];
+  const liste = (p) => p[ort.liste].find((x) => x.kennung === eintrag.kennung).spannungsfaelle;
+  const aendern = (veraenderer) => projektAendern((p) => veraenderer(liste(p)[index]));
+  const [oben, unten] = ort.raender(k);
   const zahl = (feld, titel, schritt) => zahlfeld({
     wert: k[feld], schritt, titel, leer: 0,
     beiAenderung: (v) => aendern((x) => { x[feld] = v; }),
@@ -892,10 +907,10 @@ function spannungsZeile(querschnitt, index) {
       ],
     },
     dehnungen: {
-      kopf: ['ε oben [‰]', 'ε unten [‰]'],
+      kopf: [`ε ${oben} [‰]`, `ε ${unten} [‰]`],
       felder: () => [
-        zahl('eps_oben', 'Randdehnung oben in ‰ – Zug positiv', 0.5),
-        zahl('eps_unten', 'Randdehnung unten in ‰ – Zug positiv', 0.5),
+        zahl('eps_oben', `Randdehnung ${oben} in ‰ – Zug positiv`, 0.5),
+        zahl('eps_unten', `Randdehnung ${unten} in ‰ – Zug positiv`, 0.5),
       ],
     },
     // Der äquivalente Modul läuft auf denselben Linien: dieselben Felder.
@@ -919,18 +934,12 @@ function spannungsZeile(querschnitt, index) {
     // Zeile dasselbe, gleich welche Art es ist.
     ...bauplan.felder().map((eingabe, i) => mitKopf(bauplan.kopf[i] || '', eingabe)),
     phi,
-    richtungsWahl(k.richtung || 'x', (wert) => aendern((x) => { x.richtung = wert; }),
-      ['x', 'y']),
+    ort.richtung(k, (wert) => aendern((x) => { x.richtung = wert; })),
     werte,
     rechenart,
     el('button.weg', {
       text: '×', title: 'Analyse entfernen',
-      on: {
-        click: () => projektAendern((p) => {
-          p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
-            .spannungsfaelle.splice(index, 1);
-        }),
-      },
+      on: { click: () => projektAendern((p) => { liste(p).splice(index, 1); }) },
     }),
   ]);
 }

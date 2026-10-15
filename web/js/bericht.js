@@ -501,13 +501,28 @@ function plattenblatt(kennung, eintrag, loesung) {
 }
 
 /**
- * Die Diagrammblätter je Bauteilart (ARTEN, arten.js). Die der
- * Querschnittsanalysen und Balkensysteme kommen aus eigenen Anfragen, siehe
- * qa_diagramme.js und bs_diagramme.js.
+ * Die Spannung-Dehnung-Analysen eines gezeichneten Querschnitts, auf einem
+ * eigenen Blatt -- sie kommen mit der Rechnung, nicht mit den Diagrammen der
+ * Analyse.
+ */
+function analysenblatt(kennung, eintrag, loesung) {
+  const faelle = (loesung.spannungsanalysen || {})[kennung] || [];
+  if (!faelle.length) return [];
+  return [el('div.blatt', {}, [
+    el('div.b-titel', { text: `Spannung-Dehnung-Analysen – ${eintrag.name}` }),
+    ...faelle.map(spannungsfallZeichnen),
+  ])];
+}
+
+/**
+ * Die Diagrammblätter je Bauteilart (ARTEN, arten.js). Die Diagramme der
+ * Querschnittsanalysen und der Balkensysteme kommen aus eigenen Anfragen,
+ * siehe qa_diagramme.js und bs_diagramme.js.
  */
 const DIAGRAMME = {
   querschnitt: (kennung, eintrag, loesung) => [plattenblatt(kennung, eintrag, loesung)],
-  querschnittsanalyse: (kennung, eintrag) => analyseBlaetter(kennung, eintrag.name),
+  querschnittsanalyse: (kennung, eintrag, loesung) => [
+    ...analyseBlaetter(kennung, eintrag.name), ...analysenblatt(kennung, eintrag, loesung)],
   balkensystem: (kennung, eintrag) => systemBlaetter(kennung, eintrag.name),
 };
 

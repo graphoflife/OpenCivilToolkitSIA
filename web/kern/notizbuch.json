@@ -887,6 +887,17 @@
       ]
     },
     {
+      "name": "Grösste Dehnung im Schwerpunkt",
+      "pfad": "Formelsammlung/Formeln/Grösste Dehnung im Schwerpunkt.md",
+      "art": "formel",
+      "zeichen": [
+        "\\varepsilon_{m,u}"
+      ],
+      "themen": [
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
       "name": "Grösste Krümmung",
       "pfad": "Formelsammlung/Formeln/Grösste Krümmung.md",
       "art": "formel",
@@ -1483,6 +1494,17 @@
       "zeichen": [],
       "themen": [
         "Querkraft und Torsion"
+      ]
+    },
+    {
+      "name": "Widerstandsmoment zum gezogenen Rand",
+      "pfad": "Formelsammlung/Formeln/Widerstandsmoment zum gezogenen Rand.md",
+      "art": "formel",
+      "zeichen": [
+        "W"
+      ],
+      "themen": [
+        "Spannung-Dehnung-Analyse"
       ]
     },
     {
@@ -2435,13 +2457,14 @@
         "protokoll_wirksamer_modul",
         "protokoll_verfahren",
         "plattenfasern",
+        "Faserloeser",
+        "Faserloeser._fenster",
+        "Faserloeser._eps_zu_normalkraft",
+        "Faserloeser.mitteldehnung",
+        "Faserloeser.kruemmung",
+        "Faserloeser.loese",
+        "Faserloeser._rand",
         "Querschnittsloeser",
-        "Querschnittsloeser._fenster",
-        "Querschnittsloeser._eps_zu_normalkraft",
-        "Querschnittsloeser.mitteldehnung",
-        "Querschnittsloeser.kruemmung",
-        "Querschnittsloeser.loese",
-        "Querschnittsloeser._rand",
         "Werkstoffsatz",
         "Werkstoffsatz.beschriftung",
         "Werkstoffsatz.kurz",
@@ -3016,6 +3039,8 @@
         "QALastfallEintrag.aus_dict",
         "WerkstoffwahlEintrag",
         "WerkstoffwahlEintrag.aus_dict",
+        "QASpannungsfallEintrag",
+        "QASpannungsfallEintrag.aus_dict",
         "Elemente",
         "QuerschnittsanalyseEintrag",
         "QuerschnittsanalyseEintrag.wahl",
@@ -3033,6 +3058,7 @@
         "QuerschnittsanalyseEintrag.vorlage_einsetzen",
         "QuerschnittsanalyseEintrag.pruefen",
         "QuerschnittsanalyseEintrag.lastfall",
+        "QuerschnittsanalyseEintrag.spannungsfall",
         "QuerschnittsanalyseEintrag.neu",
         "QuerschnittsanalyseEintrag.aus_dict",
         "QuerschnittsanalyseEintrag._elemente_lesen"
@@ -3234,6 +3260,35 @@
       ]
     },
     {
+      "name": "opencivil.querschnitt.schnittanalyse",
+      "pfad": "Python/opencivil.querschnitt.schnittanalyse.md",
+      "art": "modul",
+      "kurz": "Spannung-Dehnung-Analyse am gezeichneten Querschnitt.",
+      "stichworte": [
+        "Zugseite",
+        "Zugseite.beschriftung",
+        "Zugseite.psi",
+        "Zugseite.um_y",
+        "Zugseite.raender",
+        "_werkstoffe",
+        "_betonspannung",
+        "_loeser",
+        "Schnittpaar",
+        "Schnittpaar.W",
+        "Schnittpaar.M_Riss",
+        "Schnittpaar.rissmoment_bei",
+        "Schnittpaar.rissnormalkraft_bei",
+        "Schnittpaar.I_c",
+        "Schnittpaar.A_c",
+        "Schnittpaar.tiefe",
+        "Schnittpaar.herleitung_riss",
+        "Schnittpaar.herleitung_dehnung_am_ende",
+        "Schnittpaar.herleitung_bezug",
+        "schnittpaar",
+        "analysen"
+      ]
+    },
+    {
       "name": "opencivil.querschnitt.schubwaende",
       "pfad": "Python/opencivil.querschnitt.schubwaende.md",
       "art": "modul",
@@ -3333,6 +3388,12 @@
         "Loeserpaar",
         "Loeserpaar.rissmoment_bei",
         "Loeserpaar.rissnormalkraft_bei",
+        "Loeserpaar.I_c",
+        "Loeserpaar.A_c",
+        "Loeserpaar.tiefe",
+        "Loeserpaar.herleitung_riss",
+        "Loeserpaar.herleitung_dehnung_am_ende",
+        "Loeserpaar.herleitung_bezug",
         "loeserpaar",
         "Linienpunkt",
         "Eckpunkt",
@@ -3355,7 +3416,7 @@
         "Modullinie.fliessen",
         "Modullinie.ende",
         "aequivalenter_modul",
-        "_herleitung",
+        "herleitung",
         "_herleitung_modul",
         "Analyse",
         "Analyse.moeglich",

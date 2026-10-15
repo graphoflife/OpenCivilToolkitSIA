@@ -83,6 +83,14 @@ Gezeigt wird der Querschnitt, nicht das Bauteil: die Mitwirkung des Betons
 zwischen den Rissen (Zugversteifung) steckt nicht darin. Mit welcher Regel
 eine Linie des Bauteils zu rechnen waere, ist offen
 (``notizbuch/Notizen/TODO.md``).
+
+PLATTE UND GEZEICHNETER QUERSCHNITT:
+Die Fragen selbst -- Bild, Linie, Modul -- kennen nur einen
+:class:`~opencivil.nachweis.querschnittsloeser.Faserloeser` und ein Paar
+daraus: gerissen und ungerissen, dazu Riss, Bezugsflaeche des Moduls und
+Rechenwahl. Hier steht das Paar der Platte (:class:`Loeserpaar`); das des
+gezeichneten Querschnitts, je Zugseite, steht in
+:mod:`opencivil.querschnitt.schnittanalyse`.
 """
 
 from __future__ import annotations
@@ -102,7 +110,7 @@ from opencivil.core.wert import kennung_aus
 from opencivil.nachweis import dehnungsfaecher
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.querschnittsloeser import (
-    Querschnittsloeser, Werkstoffsatz, wirksamer_modul,
+    Faserloeser, Querschnittsloeser, Werkstoffsatz, wirksamer_modul,
 )
 from opencivil.nachweis.rechenwahl import (
     Betonkennwerte, Rechenart, Rechenwahl, gesetze, stahllagen, staehle,
@@ -199,13 +207,13 @@ class Faserpunkt:
 
     z: float
     """
-    Abstand von der **Oberkante**, in m.
+    Abstand vom **oberen Rand**, in m -- dem gedrueckten bei positivem Moment.
 
-    Dieselbe Achse, die der Loeser und der Lagenaufbau benutzen: dort ist
-    ``z`` der Abstand von der gedrueckten Randfaser bei positivem Moment, und
-    fuer eine Platte ist das die Oberkante. Die 1. Lage liegt damit bei
-    ``z = h - Randabstand`` und die 4. bei ``z = Randabstand``. Wer hier
-    umdrehte, bekaeme ein Bild, das zum Nachweis nicht passt.
+    Dieselbe Achse, die der Loeser und der Lagenaufbau benutzen. Fuer eine
+    Platte ist es die Oberkante: die 1. Lage liegt bei ``z = h -
+    Randabstand`` und die 4. bei ``z = Randabstand``. Wer hier umdrehte,
+    bekaeme ein Bild, das zum Nachweis nicht passt. Beim gezeichneten
+    Querschnitt der Rand gegenueber der Zugseite.
     """
 
     eps: float
@@ -221,6 +229,9 @@ class Stahlpunkt(Faserpunkt):
     a_s: float
     kraft: float
     """``sigma * a_s`` in N -- was die Lage traegt."""
+
+    name: str = ""
+    """Wie die Lage heisst -- «2. Lage Grundbewehrung», «Linie 1»."""
 
 
 @dataclass
@@ -253,30 +264,30 @@ class Querschnittsbild:
         return oben.z - oben.eps / self.chi
 
 
-def _bild(loeser: Querschnittsloeser, eps_m: float, chi: float) -> Querschnittsbild:
+def _bild(loeser: Faserloeser, eps_m: float, chi: float) -> Querschnittsbild:
     """Dehnungen und Spannungen zu einer gegebenen Ebene -- ohne jede Suche."""
     kraefte = loeser.kraefte(eps_m, chi)
-    halb = loeser.h / 2.0
+    oben = loeser.oben
 
     beton = []
     for i in range(STUETZSTELLEN):
         z = loeser.h * i / (STUETZSTELLEN - 1)    # von oben nach unten
-        eps = eps_m + chi * (z - halb)
-        beton.append(Faserpunkt(z=z, eps=eps, sigma=loeser.beton(eps)))
+        eps = eps_m + chi * (z + oben)
+        beton.append(Faserpunkt(z=z, eps=eps, sigma=loeser.betonspannung(z + oben, eps)))
 
     stahl = []
     for lage, stab in zip(loeser.lagen, loeser.querschnitt.staebe):
-        eps = eps_m + chi * (lage.z - halb)
+        eps = eps_m + chi * (lage.z + oben)
         sigma = stab.gesetz(eps)
         stahl.append(Stahlpunkt(z=lage.z, eps=eps, sigma=sigma,
                                 nummer=lage.nummer, a_s=lage.a_s,
-                                kraft=sigma * lage.a_s))
+                                kraft=sigma * lage.a_s, name=lage.text))
 
     return Querschnittsbild(eps_m=eps_m, chi=chi, N=kraefte.N, M=kraefte.M,
                             beton=beton, stahl=stahl)
 
 
-def aus_schnittgroessen(loeser: Querschnittsloeser, *,
+def aus_schnittgroessen(loeser: Faserloeser, *,
                         N: float, M: float) -> Querschnittsbild:
     """
     Die Dehnungsebene zu ``N`` und ``M``, samt allem, was darauf steht.
@@ -294,7 +305,7 @@ def aus_schnittgroessen(loeser: Querschnittsloeser, *,
     return _bild(loeser, ebene.eps_m, ebene.chi)
 
 
-def aus_dehnungen(loeser: Querschnittsloeser, *,
+def aus_dehnungen(loeser: Faserloeser, *,
                   eps_oben: float, eps_unten: float) -> Querschnittsbild:
     """
     Der umgekehrte Weg: die Ebene ist gegeben, gesucht sind die Kraefte.
@@ -303,10 +314,12 @@ def aus_dehnungen(loeser: Querschnittsloeser, *,
     Mitteldehnung und Kruemmung unmittelbar, und das Faserintegral liefert
     Normalkraft und Moment in einem Durchgang.
     """
-    # z laeuft von der Oberkante nach unten, also ist die Randdehnung unten
-    # die bei z = h und die obere die bei z = 0.
-    eps_m = 0.5 * (eps_oben + eps_unten)
+    # z laeuft vom oberen Rand nach unten, also ist die Randdehnung unten die
+    # bei z = h und die obere die bei z = 0. Die Mitteldehnung gilt am Arm
+    # null: bei der Platte auf halber Hoehe, beim gezeichneten Querschnitt im
+    # Schwerpunkt.
     chi = (eps_unten - eps_oben) / loeser.h if loeser.h > 0 else 0.0
+    eps_m = eps_oben - chi * loeser.oben
     bild = _bild(loeser, eps_m, chi)
     aussen = max(abs(eps_oben), abs(eps_unten))
     if aussen > max(loeser.eps_druck, loeser.eps_zug):
@@ -418,6 +431,78 @@ class Loeserpaar:
         """
         h, b = self.gerissen.h, self.gerissen.b
         return self.f_ct_eff_zug * b * h - 6.0 * abs(M) / h
+
+    @property
+    def I_c(self) -> float:
+        """Der reine Betonquerschnitt fuer den aequivalenten Modul: ``b·h³/12``."""
+        return self.gerissen.b * self.gerissen.h ** 3 / 12.0
+
+    @property
+    def A_c(self) -> float:
+        """Dasselbe fuer die Normalkraft: ``b·h``."""
+        return self.gerissen.b * self.gerissen.h
+
+    # -- Was die Herleitung nur von der Platte weiss --------------------------
+
+    #: Wo die Mitteldehnung gilt -- dort greift N an.
+    bezugsort = "auf halber Höhe"
+
+    def tiefe(self, w: Zwischenwerte, ein: Callable[[str], "Wert"]) -> "Wert":
+        """Die Dicke, ueber die die Linie laeuft -- ein Wert der Platte."""
+        return ein("h")
+
+    def herleitung_riss(self, p: Protokoll, w: Zwischenwerte, linie: Linie,
+                        ein: Callable[[str], "Wert"], h: "Wert") -> None:
+        """Wo die Linie reisst: das Rissmoment bei N, oder die Rissnormalkraft bei M."""
+        if linie.art is Analyseart.MOMENT_KRUEMMUNG:
+            p.erklaerung(
+                "Am Bruttoquerschnitt reisst der Rand, wenn N/A + M/W = f_ct,eff. Mit "
+                "A = b·h und W = b·h²/6 hebt Druck das Rissmoment, Zug senkt es. Beim "
+                "Rissmoment springt die Krümmung bei demselben Moment vom ungerissenen "
+                "auf den gerissenen Wert.")
+            p.formel(w.moment("M_Riss_N", "M_{Riss}(N)", linie.riss),
+                     r"@M_Riss - @N \cdot \frac{@h}{6}",
+                     {"M_Riss": w.moment("M_Riss", "M_{Riss}", self.M_Riss),
+                      "N": w.kraft("N", "N", linie.fest), "h": h},
+                     titel="Rissmoment bei der Normalkraft")
+            return
+        p.erklaerung(
+            "Dieselbe Rissbedingung, nach der Normalkraft aufgelöst: beim Moment M "
+            "reisst der Querschnitt, wenn die Zugkraft N_Riss erreicht. Unter Zug "
+            "reisst die ganze Dicke, darum gilt k_t für t = h und nicht für h/3 wie "
+            "beim Rissmoment. Bei N_Riss springt die Dehnung bei derselben Kraft vom "
+            "ungerissenen auf den gerissenen Wert.")
+        f_ct_eff = protokoll_zugfestigkeit(
+            p, w, k_t=self.k_t_zug, f_ct_eff=self.f_ct_eff_zug, h=h,
+            f_ctm=ein("f_ctm"), teiler=1, referenz="SIA 262:2025, 4.4.2")
+        p.formel(w.kraft("N_Riss_M", "N_{Riss}(M)", linie.riss),
+                 r"@f_ct_eff \cdot @b \cdot @h - \frac{6 \cdot \left|@M\right|}{@h}",
+                 {"f_ct_eff": f_ct_eff, "b": ein("b"), "h": h,
+                  "M": w.moment("M", "M", linie.fest)},
+                 titel="Rissnormalkraft beim Moment")
+
+    def herleitung_dehnung_am_ende(self, p: Protokoll, w: Zwischenwerte, bruch: "Grenzzustand",
+                                   oben: "Wert", unten: "Wert") -> None:
+        """Die Dehnung, ueber die die N-eps-Linie laeuft, am Ende -- auf halber Hoehe."""
+        p.formel(w.dehnung("eps_mu", r"\varepsilon_{m,u}", bruch.verformung),
+                 r"\frac{@eps_oben + @eps_unten}{2}",
+                 {"eps_oben": oben, "eps_unten": unten},
+                 titel="Grösste Dehnung auf halber Höhe")
+
+    def herleitung_bezug(self, p: Protokoll, w: Zwischenwerte, momente: bool,
+                         ein: Callable[[str], "Wert"], h: "Wert") -> "Wert":
+        """Der reine Betonquerschnitt des aequivalenten Moduls -- ein Rechteck b·h."""
+        if momente:
+            bezug = w.wert("I_c", "I_c", Groesse.aus_si(self.I_c, MIO_MM4), stellen=1)
+            p.formel(bezug, r"\frac{@b \cdot \left(@h\right)^{3}}{12}",
+                     {"b": ein("b"), "h": h},
+                     titel="Reiner Betonquerschnitt: Flächenmoment",
+                     name="Flächenträgheitsmoment eines Rechtecks")
+            return bezug
+        bezug = w.flaeche("A_c", "A_c", self.A_c)
+        p.formel(bezug, r"@b \cdot @h", {"b": ein("b"), "h": h},
+                 titel="Reiner Betonquerschnitt: Fläche", name="Fläche eines Rechtecks")
+        return bezug
 
 
 def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
@@ -567,7 +652,7 @@ class _Weg:
 
     ebene: Callable[[float], Optional[Tuple[float, float]]]
     kraft: Callable[[Tuple[float, float]], float]
-    verformung_bei: Callable[[Querschnittsloeser, float], Optional[float]]
+    verformung_bei: Callable[[Faserloeser, float], Optional[float]]
     obergrenze: float
     """Eine Verformung, ueber der es sicher kein Gleichgewicht mehr gibt."""
 
@@ -622,10 +707,10 @@ def _linie(paar: Loeserpaar, weg: _Weg, art: Analyseart, fest: float,
     if ebene is None:
         return linie
     eps_m, chi = ebene
-    halb = paar.gerissen.h / 2.0
+    g = paar.gerissen
     linie.bruch = Grenzzustand(
-        kraft=weg.kraft(ebene), verformung=ende, eps_oben=eps_m - chi * halb,
-        eps_unten=eps_m + chi * halb, massgebend=_massgebend(paar, eps_m, chi))
+        kraft=weg.kraft(ebene), verformung=ende, eps_oben=eps_m + chi * g.oben,
+        eps_unten=eps_m + chi * g.unten, massgebend=_massgebend(paar, eps_m, chi))
     kraft_u = linie.bruch.kraft
     if kraft_u <= 0.0:
         return linie
@@ -648,7 +733,7 @@ def _linie(paar: Loeserpaar, weg: _Weg, art: Analyseart, fest: float,
         linie.punkte = kraftpunkte(kraft_u)
         return linie
 
-    arme = [(l.z - halb, l.stahl.eps_yd) for l in paar.gerissen.lagen]
+    arme = [(l.z + g.oben, l.stahl.eps_yd) for l in g.lagen]
 
     def fliesst(verformung: float) -> bool:
         # Jede Lage an der Fliessdehnung ihres eigenen Stahls.
@@ -715,7 +800,7 @@ def moment_kruemmung(paar: Loeserpaar, *, N: float) -> Linie:
         eps_m = gerissen.mitteldehnung(chi, N)
         return None if eps_m is None else (eps_m, chi)
 
-    def verformung_bei(loeser: Querschnittsloeser, M: float) -> Optional[float]:
+    def verformung_bei(loeser: Faserloeser, M: float) -> Optional[float]:
         e = loeser.loese(N_Ed=N, M_Ed=M)
         return e.chi if e.konvergiert else None
 
@@ -742,7 +827,8 @@ def normalkraft_dehnung(paar: Loeserpaar, *, M: float) -> Linie:
     """
     Die Normalkraft-Dehnungs-Linie beim Moment ``M``, auf Zug: ungerissen
     bis ``N_Riss(M)``, dort der Sprung, darueber gerissen bis zum Bruch.
-    Die Dehnung ist die auf halber Hoehe -- dort greift ``N`` an.
+    Die Dehnung ist die am Arm null -- dort greift ``N`` an: bei der Platte
+    auf halber Hoehe, beim gezeichneten Querschnitt im Schwerpunkt.
     """
     gerissen = paar.gerissen
 
@@ -750,7 +836,7 @@ def normalkraft_dehnung(paar: Loeserpaar, *, M: float) -> Linie:
         chi = gerissen.kruemmung(eps_m, M)
         return None if chi is None else (eps_m, chi)
 
-    def verformung_bei(loeser: Querschnittsloeser, N: float) -> Optional[float]:
+    def verformung_bei(loeser: Faserloeser, N: float) -> Optional[float]:
         e = loeser.loese(N_Ed=N, M_Ed=M)
         return e.eps_m if e.konvergiert else None
 
@@ -872,15 +958,16 @@ class Modullinie:
         return next((p.modul for p in reversed(self.punkte) if p.modul is not None), None)
 
 
-def aequivalenter_modul(linie: Linie, *, b: float, h: float, E_cm: float) -> Modullinie:
+def aequivalenter_modul(linie: Linie, *, I_c: float, A_c: float, E_cm: float) -> Modullinie:
     """
     Die M-chi- oder N-eps-Linie als Linie des aequivalenten Moduls -- siehe
     :class:`Modullinie`. Beide Vergleichszustaende zaehlen ab ihrer eigenen
-    Verformung ohne laufende Kraft.
+    Verformung ohne laufende Kraft. ``I_c`` und ``A_c`` sind der reine
+    Betonquerschnitt, an dem sich der Modul misst.
     """
     momente = linie.art is Analyseart.MOMENT_KRUEMMUNG
     art = Analyseart.MOMENT_EMODUL if momente else Analyseart.NORMALKRAFT_EMODUL
-    bezug = b * h ** 3 / 12.0 if momente else b * h
+    bezug = I_c if momente else A_c
     if not linie.punkte:
         return Modullinie(art, linie, bezug, 0.0, E_cm)
 
@@ -921,13 +1008,19 @@ def aequivalenter_modul(linie: Linie, *, b: float, h: float, E_cm: float) -> Mod
 # ===========================================================================
 
 
-def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
+def herleitung(p: Protokoll, fall, paar, linie: Linie,
                 werte: Mapping[str, "Wert"], raum: str,
                 modul: Optional[Modullinie] = None) -> None:
     """
     Wie die Linie entstand -- mit den Zahlen dieses Falls, und ohne sie in der
     Formelsammlung, die daraus «Spannung-Dehnung-Analyse» bildet. Mit
     ``modul`` dazu, wie aus ihr der aequivalente E-Modul wird.
+
+    ``paar`` ist das Loeserpaar einer Platte oder eines gezeichneten
+    Querschnitts. Was nur die Art des Bauteils weiss -- die Tiefe, der Riss,
+    die Dehnung am Ende, der reine Betonquerschnitt --, schreibt es selbst
+    (``tiefe``, ``herleitung_riss``, ``herleitung_dehnung_am_ende``,
+    ``herleitung_bezug``); der Rest ist derselbe Text.
     """
     ab = len(p.bloecke)
     w = Zwischenwerte(f"{raum}.analyse.{re.sub(r'[^0-9A-Za-z]+', '_', fall.name)}")
@@ -985,33 +1078,8 @@ def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
     if wahl.satz is Werkstoffsatz.CHARAKTERISTISCH:
         p.text("Mit charakteristischen Werten: f_ck statt f_cd, f_yk statt f_yd.")
 
-    h = ein("h")
-    if momente:
-        p.erklaerung(
-            "Am Bruttoquerschnitt reisst der Rand, wenn N/A + M/W = f_ct,eff. Mit "
-            "A = b·h und W = b·h²/6 hebt Druck das Rissmoment, Zug senkt es. Beim "
-            "Rissmoment springt die Krümmung bei demselben Moment vom ungerissenen "
-            "auf den gerissenen Wert.")
-        p.formel(w.moment("M_Riss_N", "M_{Riss}(N)", linie.riss),
-                 r"@M_Riss - @N \cdot \frac{@h}{6}",
-                 {"M_Riss": w.moment("M_Riss", "M_{Riss}", paar.M_Riss),
-                  "N": w.kraft("N", "N", linie.fest), "h": h},
-                 titel="Rissmoment bei der Normalkraft")
-    else:
-        p.erklaerung(
-            "Dieselbe Rissbedingung, nach der Normalkraft aufgelöst: beim Moment M "
-            "reisst der Querschnitt, wenn die Zugkraft N_Riss erreicht. Unter Zug "
-            "reisst die ganze Dicke, darum gilt k_t für t = h und nicht für h/3 wie "
-            "beim Rissmoment. Bei N_Riss springt die Dehnung bei derselben Kraft vom "
-            "ungerissenen auf den gerissenen Wert.")
-        f_ct_eff = protokoll_zugfestigkeit(
-            p, w, k_t=paar.k_t_zug, f_ct_eff=paar.f_ct_eff_zug, h=h,
-            f_ctm=ein("f_ctm"), teiler=1, referenz="SIA 262:2025, 4.4.2")
-        p.formel(w.kraft("N_Riss_M", "N_{Riss}(M)", linie.riss),
-                 r"@f_ct_eff \cdot @b \cdot @h - \frac{6 \cdot \left|@M\right|}{@h}",
-                 {"f_ct_eff": f_ct_eff, "b": ein("b"), "h": h,
-                  "M": w.moment("M", "M", linie.fest)},
-                 titel="Rissnormalkraft beim Moment")
+    h = paar.tiefe(w, ein)
+    paar.herleitung_riss(p, w, linie, ein, h)
 
     p.erklaerung(
         "Der Fliessbeginn ist der Punkt, an dem die am stärksten gezogene Lage die "
@@ -1052,22 +1120,23 @@ def _herleitung(p: Protokoll, fall, paar: Loeserpaar, linie: Linie,
                      {"eps_unten": unten, "eps_oben": oben, "h": h},
                      titel="Grösste Krümmung")
         else:
-            p.formel(w.dehnung("eps_mu", r"\varepsilon_{m,u}", b.verformung),
-                     r"\frac{@eps_oben + @eps_unten}{2}",
-                     {"eps_oben": oben, "eps_unten": unten},
-                     titel="Grösste Dehnung auf halber Höhe")
+            paar.herleitung_dehnung_am_ende(p, w, b, oben, unten)
         p.text(f"Massgebend: {b.massgebend}.")
     if modul is not None:
-        _herleitung_modul(p, w, modul, b=ein("b"), h=h)
+        _herleitung_modul(p, w, modul,
+                          bezug=lambda: paar.herleitung_bezug(p, w, momente, ein, h),
+                          bezugsort=paar.bezugsort)
     p.herkunft_stempeln(THEMA, ab=ab)
 
 
 def _herleitung_modul(p: Protokoll, w: Zwischenwerte, modul: Modullinie, *,
-                      b: "Wert", h: "Wert") -> None:
+                      bezug: Callable[[], "Wert"], bezugsort: str) -> None:
     """
     Der aequivalente Modul: der reine Betonquerschnitt, die Formel und der
     Modul an den Ecken der Linie -- jede Zeile mit Kraft und Verformung, also
-    von Hand nachzurechnen.
+    von Hand nachzurechnen. ``bezug`` schreibt den reinen Betonquerschnitt
+    hin, wie ihn die Art des Bauteils kennt, und gibt ihn zurueck;
+    ``bezugsort`` sagt, wo die Mitteldehnung gilt.
     """
     momente = modul.art is Analyseart.MOMENT_EMODUL
     p.erklaerung(
@@ -1078,10 +1147,7 @@ def _herleitung_modul(p: Protokoll, w: Zwischenwerte, modul: Modullinie, *,
         "verformt, kann ein solcher Querschnitt nicht abbilden. Ist sie null, ist es "
         "genau M = E·I·χ bzw. N = E·A·ε.")
     if momente:
-        bezug = w.wert("I_c", "I_c", Groesse.aus_si(modul.bezug, MIO_MM4), stellen=1)
-        p.formel(bezug, r"\frac{@b \cdot \left(@h\right)^{3}}{12}", {"b": b, "h": h},
-                 titel="Reiner Betonquerschnitt: Flächenmoment",
-                 name="Flächenträgheitsmoment eines Rechtecks")
+        bezug()
         p.ansatz(r"E_{eq} = \frac{M}{I_c \cdot \left(\chi - \chi_0\right)}",
                  titel="Äquivalenter E-Modul über dem Moment")
         p.wert(w.kruemmung("chi_0", r"\chi_0", modul.null),
@@ -1089,13 +1155,11 @@ def _herleitung_modul(p: Protokoll, w: Zwischenwerte, modul: Modullinie, *,
         kopf = [Mathe(r"M\ [\mathrm{kNm}]"), Mathe(r"\chi - \chi_0\ [\mathrm{m}^{-1}]")]
         verformung = lambda v: f"{v - modul.null:.5f}"
     else:
-        bezug = w.flaeche("A_c", "A_c", modul.bezug)
-        p.formel(bezug, r"@b \cdot @h", {"b": b, "h": h},
-                 titel="Reiner Betonquerschnitt: Fläche", name="Fläche eines Rechtecks")
+        bezug()
         p.ansatz(r"E_{eq} = \frac{N}{A_c \cdot \left(\varepsilon_m - \varepsilon_0\right)}",
                  titel="Äquivalenter E-Modul über der Normalkraft")
         p.wert(w.dehnung("eps_0", r"\varepsilon_0", modul.null, stellen=4),
-               titel="Dehnung auf halber Höhe ohne Normalkraft, unter dem festen Moment")
+               titel=f"Dehnung {bezugsort} ohne Normalkraft, unter dem festen Moment")
         kopf = [Mathe(r"N\ [\mathrm{kN}]"), Mathe(r"\varepsilon_m - \varepsilon_0\ [‰]")]
         verformung = lambda v: f"{(v - modul.null) * 1e3:.4f}"
 
@@ -1138,16 +1202,25 @@ class Analyse:
     """Der :class:`SpannungsfallEintrag`, wie er in der Beschreibung steht."""
 
     art: Analyseart
-    richtung: Richtung
+    richtung: Any
+    """Die Tragrichtung einer Platte (:class:`Richtung`) oder die Zugseite eines
+    gezeichneten Querschnitts (:class:`~opencivil.querschnitt.schnittanalyse.Zugseite`)."""
+
+    richtung_text: str = ""
+    """Wie sie neben dem Titel steht -- «x», «Zug unten»."""
+
     h: float = 0.0
-    """Plattendicke in m -- fuer das Bild."""
+    """Die Tiefe in m -- fuer das Bild: die Dicke der Platte, beim gezeichneten
+    Querschnitt die Ausdehnung des Betons in Zugrichtung."""
 
     bild: Optional[Querschnittsbild] = None
     kurve: Optional[Union[Linie, "Modullinie"]] = None
     """Die M-chi- oder N-eps-Linie -- oder der aequivalente Modul daraus."""
 
-    paar: Optional[Loeserpaar] = None
-    """Womit gerechnet wurde -- Kriechzahl, Wertesatz, Betongesetz."""
+    paar: Any = None
+    """Womit gerechnet wurde -- das Loeserpaar mit Kriechzahl, Wertesatz,
+    Betongesetz: :class:`Loeserpaar` bei der Platte, sonst das des
+    gezeichneten Querschnitts."""
 
     hinweis: str = ""
     """Warum es nichts auszuwerten gab, falls es nichts gab."""
@@ -1157,9 +1230,14 @@ class Analyse:
         return self.bild is not None or self.kurve is not None
 
 
-def auswerten(fall, art: Analyseart, paar: Loeserpaar) -> Tuple[
+def auswerten(fall, art: Analyseart, paar) -> Tuple[
         Optional[Querschnittsbild], Optional[Union[Linie, Modullinie]]]:
-    """Die eine der sechs Fragen stellen, die dieser Fall stellt -- in SI."""
+    """
+    Die eine der sechs Fragen stellen, die dieser Fall stellt -- in SI. ``paar``
+    ist das Loeserpaar einer Platte oder eines gezeichneten Querschnitts:
+    beide haben ``gerissen`` und ``ungerissen``, den Riss und den reinen
+    Betonquerschnitt ``I_c``, ``A_c``.
+    """
     if art is Analyseart.DEHNUNGEN:
         return aus_dehnungen(paar.gerissen, eps_oben=fall.eps_oben / 1e3,
                              eps_unten=fall.eps_unten / 1e3), None
@@ -1171,15 +1249,14 @@ def auswerten(fall, art: Analyseart, paar: Loeserpaar) -> Tuple[
         return aus_schnittgroessen(paar.gerissen, N=fall.N_Ed * 1e3,
                                    M=fall.M_Ed * 1e3), None
     if art.modul:
-        return None, aequivalenter_modul(linie, b=paar.gerissen.b, h=paar.gerissen.h,
-                                         E_cm=paar.E_cm)
+        return None, aequivalenter_modul(linie, I_c=paar.I_c, A_c=paar.A_c, E_cm=paar.E_cm)
     return None, linie
 
 
 def analysen(aufbau: "Aufbau", loesung: "Loesung",
              protokoll: Optional[Protokoll] = None) -> Dict[str, List[Analyse]]:
     """
-    Die Auswertungen am Querschnitt, je Platte.
+    Die Auswertungen am Querschnitt, je Platte und je gezeichnetem Querschnitt.
 
     Kein Nachweis: hier steht kein Erfuellungsgrad und kein Urteil, sondern
     eine Antwort auf die Frage, was im Querschnitt geschieht. Gerechnet wird
@@ -1217,7 +1294,8 @@ def analysen(aufbau: "Aufbau", loesung: "Loesung",
                     # gibt es fuer sie keinen Querschnitt zum Auswerten.
                     paare[schluessel] = None
             paar = paare[schluessel]
-            analyse = Analyse(fall=fall, art=Analyseart(fall.art), richtung=richtung, paar=paar)
+            analyse = Analyse(fall=fall, art=Analyseart(fall.art), richtung=richtung,
+                              richtung_text=richtung.value, paar=paar)
             if paar is None:
                 analyse.hinweis = (
                     f"In {richtung.beschriftung} liegt keine Bewehrung – ohne "
@@ -1226,10 +1304,14 @@ def analysen(aufbau: "Aufbau", loesung: "Loesung",
                 analyse.h = paar.gerissen.h
                 analyse.bild, analyse.kurve = auswerten(fall, analyse.art, paar)
                 if isinstance(analyse.kurve, Modullinie):
-                    _herleitung(p, fall, paar, analyse.kurve.linie, loesung.werte,
+                    herleitung(p, fall, paar, analyse.kurve.linie, loesung.werte,
                                 querschnitt.id, modul=analyse.kurve)
                 elif analyse.kurve is not None:
-                    _herleitung(p, fall, paar, analyse.kurve, loesung.werte, querschnitt.id)
+                    herleitung(p, fall, paar, analyse.kurve, loesung.werte, querschnitt.id)
             liste.append(analyse)
         ergebnis[kennung] = liste
+    # Die gezeichneten Querschnitte, je Zugseite -- dort gebaut. Erst hier
+    # geladen: jenes Modul baut auf diesem.
+    from opencivil.querschnitt import schnittanalyse
+    ergebnis.update(schnittanalyse.analysen(aufbau, loesung, p))
     return ergebnis

@@ -1,5 +1,5 @@
 ---
-erzeugt: 4401890563e3
+erzeugt: 121afa165065
 art: formel
 tags: [formel]
 ---
@@ -22,7 +22,7 @@ $$
 
 - [[opencivil.nachweis.rechenwahl#protokoll_betongesetz|protokoll_betongesetz]]
 - [[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe_protokollieren|Querschnittsanalyse.werkstoffe_protokollieren]]
-- [[opencivil.spannungsanalyse#_herleitung|_herleitung]]
+- [[opencivil.spannungsanalyse#herleitung|herleitung]]
 
 ## Themen
 
