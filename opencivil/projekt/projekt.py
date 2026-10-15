@@ -497,9 +497,9 @@ class Projekt(Beschreibung):
         # Tragsicherheit praezise mit charakteristischen Werten -- M_Rk,
         # m_Rk in der Querkraft, sproedes Versagen --, rechnet die
         # Stahlspannungen mit 0.85·x und praezise und knickt mit eigener
-        # Linie: Verformung mit 0.85·x, Widerstand praezise mit
-        # Bemessungswerten. Die «Decke» knickt mit der Vorgabe 0.85·x gegen
-        # ihre Handrechnung, also ebenfalls mit eigener Linie.
+        # Linie: Verformung mit charakteristischen Werten, Widerstand praezise
+        # mit Bemessungswerten. Die «Decke» knickt mit der Vorgabe 0.85·x
+        # gegen ihre Handrechnung, also ebenfalls mit eigener Linie.
         genau = p.platte("Parabel", h=250, x=[12, 10], y=[10, 10],
                          rissanforderung="erhoeht", sproede=True)
         genau.tragsicherheit_wahl = RechenwahlEintrag(
@@ -512,7 +512,8 @@ class Projekt(Beschreibung):
         genau.haeufig.wahl = RechenwahlEintrag(
             kriechzahl=2.0, werkstoffsatz="charakteristisch", rechenart="parabel")
         genau.knickfall("Stütze", N_Ed=-600, M_Ed_1=10, laenge=3.0)
-        genau.knicken_wahl_verformung = RechenwahlEintrag(rechenart="block")
+        genau.knicken_wahl_verformung = RechenwahlEintrag(
+            werkstoffsatz="charakteristisch", rechenart="parabel")
         genau.knicken_wahl_widerstand = RechenwahlEintrag(rechenart="parabel")
 
         # Die Platte «Block» haelt die Tragsicherheit mit der 0.85·x-Vereinfachung,

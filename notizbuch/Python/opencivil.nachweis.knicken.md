@@ -1,5 +1,5 @@
 ---
-erzeugt: f8a4b4a09527
+erzeugt: 6f10af0aa953
 art: modul
 tags: [modul]
 ---
@@ -64,9 +64,12 @@ liegt. Die Normalkraft dagegen hat immer einen Grenzwert.
 Womit gerechnet wird, waehlt das Kapitel zweimal ([[opencivil.nachweis.rechenwahl#Rechenwahl|Rechenwahl]]):
 
 * **Verformung (e_2d)** -- die Gesetze des Loesers, der zu jedem Moment die
-  Kruemmung sucht. Vorgabe praezise ohne Vereinfachung, mit
-  Bemessungswerten; die Kriechzahl weicht den Beton auf, und ein weicher
-  Beton verformt sich mehr.
+  Kruemmung sucht. Immer praezise ohne Vereinfachung, gewaehlt werden
+  Kriechzahl und Werte (Vorgabe Bemessungswerte); die Kriechzahl weicht den
+  Beton auf, und ein weicher Beton verformt sich mehr. Den Spannungsblock
+  gibt es hier nicht mehr ([[opencivil.nachweis.rechenwahl#Konstanten|VERFORMUNGSARTEN]],
+  Benutzer, 2026-10-15): mit ihm hat das Moment ueber der Kruemmung flache
+  Stuecke, und die Ausmitte ist nahe der Grenzkraft nicht eindeutig.
 * **Widerstand (N_Rd)** -- die Resistenzlinie, die sagt, ob der Querschnitt
   das Moment am verformten System aufnimmt. Vorgabe die
   0.85·x-Vereinfachung mit Bemessungswerten. Waehlt das Kapitel dasselbe wie
@@ -94,8 +97,9 @@ wenig verschiedenen Schnittgroessen. Gesucht werden sie darum mit Illinois,
 von der zuletzt gefundenen Ebene aus
 ([[opencivil.nachweis.querschnittsloeser#QuerschnittsloeserIllinois|QuerschnittsloeserIllinois]]):
 an den Pruefprojekten ein Drittel der Faserdurchlaeufe, dieselben
-Grenzkraefte auf 0.01 kN. Rechnet die Verformung mit dem Spannungsblock,
-wird halbiert wie vorher -- dort ist die Ebene nicht eindeutig.
+Grenzkraefte auf 0.01 kN. Wo ein Gesetz springt, halbiert der Loeser wie
+vorher -- dort ist die Ebene nicht eindeutig; die Verformung rechnet seit
+2026-10-15 ohnehin nur noch praezise.
 
 
 ## DAS VERFAHREN GEHOERT KEINEM QUERSCHNITT
@@ -372,7 +376,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - `OBERGRENZE = 64.0` – Wie weit die Suche nach oben gehen darf, als Vielfaches von \|N_Ed\|. Wer einen Stab mit alpha_eff > 64 baut, hat kein Knickproblem.
 - `ALPHA_UNTEN = 1.0 / 300.0` – Riegel der Schiefstellung, SIA 262:2025, 4.3.7.
 - `ALPHA_OBEN = 1.0 / 200.0`
-- `VERFORMUNG_NACH_WAHL = 'Womit die Verformung gerechnet wird, wählt das Kapitel: Kriechzahl, …` – Warum die Wahl der Verformung zaehlt -- fuer jeden Knicknachweis derselbe Satz.
+- `VERFORMUNG_NACH_WAHL = 'Die Verformung rechnet präzise, mit der Parabel; Kriechzahl und Wert…` – Warum die Wahl der Verformung zaehlt -- fuer jeden Knicknachweis derselbe Satz.
 
 ## Braucht
 

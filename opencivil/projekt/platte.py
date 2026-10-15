@@ -17,7 +17,7 @@ from dataclasses import dataclass, field
 from typing import Any, List, Mapping, Optional
 
 from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX, HOECHSTENS as X_D_HOECHSTENS
-from opencivil.nachweis.rechenwahl import FASERARTEN
+from opencivil.nachweis.rechenwahl import FASERARTEN, VERFORMUNGSARTEN
 from opencivil.querschnitt.platte import K_C, KRIECHZAHL, LAGENZAHL, Richtung
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste,
@@ -105,9 +105,10 @@ class QuerschnittEintrag(Beschreibung):
     knicken_wahl_verformung: RechenwahlEintrag = field(
         default_factory=RechenwahlEintrag.knicken_verformung)
     """
-    Womit die Ausmitte e_2d gerechnet wird -- Vorgabe praezise ohne
-    Vereinfachung, Bemessungswerte. Ohne Handrechnung
-    (:data:`~opencivil.nachweis.rechenwahl.FASERARTEN`).
+    Womit die Ausmitte e_2d gerechnet wird -- immer praezise ohne
+    Vereinfachung (:data:`~opencivil.nachweis.rechenwahl.VERFORMUNGSARTEN`),
+    Vorgabe Bemessungswerte. Eine alte Datei mit dem Spannungsblock oder der
+    Handrechnung liest sich als praezise.
     """
 
     knicken_wahl_widerstand: RechenwahlEintrag = field(
@@ -261,7 +262,7 @@ class QuerschnittEintrag(Beschreibung):
             liste.pruefen(self.name, self.kombinationen, wort)
         self.tragsicherheit_wahl.pruefen(f"Platte '{self.name}', Tragsicherheit")
         self.knicken_wahl_verformung.pruefen(f"Platte '{self.name}', Knicken, Verformung",
-                                             FASERARTEN)
+                                             VERFORMUNGSARTEN)
         self.knicken_wahl_widerstand.pruefen(f"Platte '{self.name}', Knicken, Widerstand",
                                              FASERARTEN)
 
@@ -479,7 +480,7 @@ class QuerschnittEintrag(Beschreibung):
             knicken_wahl_verformung=RechenwahlEintrag.aus_dict(
                 d.get("knicken_wahl_verformung"), vorgabe=RechenwahlEintrag.knicken_verformung(),
                 kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl),
-                wo=f"Platte '{kennung}', Knicken, Verformung", arten=FASERARTEN),
+                wo=f"Platte '{kennung}', Knicken, Verformung", arten=VERFORMUNGSARTEN),
             knicken_wahl_widerstand=RechenwahlEintrag.aus_dict(
                 d.get("knicken_wahl_widerstand"), vorgabe=RechenwahlEintrag.knicken_widerstand(),
                 kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl),

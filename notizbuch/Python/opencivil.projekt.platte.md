@@ -1,5 +1,5 @@
 ---
-erzeugt: 0f7dd6da213b
+erzeugt: d8a736ce3936
 art: modul
 tags: [modul]
 ---
@@ -47,7 +47,7 @@ Eine Stahlbeton-Platte mit genau vier Bewehrungslagen.
 - `haeufig: Gebrauchsliste = field(default_factory=lambda: Gebrauchsliste(anteil=HAEUFIG_ANTEIL))` – Die haeufigen Lastfaelle -- fuer den Nachweis gegen Fliessen.
 - `quasistaendig: Gebrauchsliste = field(default_factory=lambda: Gebrauchsliste(anteil=QUASISTAENDIG_ANT…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
 - `knickfaelle: List[KnickEintrag] = field(default_factory=list)` – Knicknachweise; leer heisst: keiner.
-- `knicken_wahl_verformung: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.knicken_verformung)` – Womit die Ausmitte e_2d gerechnet wird -- Vorgabe praezise ohne Vereinfachung, Bemessungswerte. Ohne Handrechnung ([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]).
+- `knicken_wahl_verformung: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.knicken_verformung)` – Womit die Ausmitte e_2d gerechnet wird -- immer praezise ohne Vereinfachung ([[opencivil.nachweis.rechenwahl#Konstanten|VERFORMUNGSARTEN]]), Vorgabe Bemessungswerte. Eine alte Datei mit dem Spannungsblock oder der Handrechnung liest sich als praezise.
 - `knicken_wahl_widerstand: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.knicken_widerstand)` – Womit N_Rd(M_Ed = N_Ed·e_tot) gerechnet wird -- Vorgabe die 0.85·x-Vereinfachung, ohne Handrechnung. Mit derselben Wahl wie die Tragsicherheit ist es deren Linie.
 - `spannungsfaelle: List[SpannungsfallEintrag] = field(default_factory=list)` – Auswertungen am Querschnitt -- Bilder, keine Nachweise.
 - `automatik_modus: str = 'grund_ohne_zulage_mit'` – Wonach das Bewehrungswerkzeug sucht -- siehe `bewehrungssuche.Suchmodus`.

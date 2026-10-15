@@ -1,5 +1,5 @@
 ---
-erzeugt: 765d99c63f47
+erzeugt: 3beb8d0459a9
 art: modul
 tags: [modul]
 ---
@@ -54,6 +54,13 @@ weggelassener Druckbewehrung, also eine schlechtere 0.85·x-Vereinfachung
 ([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]). Der gezeichnete Querschnitt rechnet immer ueber die
 Fasern: seine Stahlspannungen bieten darum die Fasern und «elastisch» an,
 ohne Handrechnung ([[opencivil.nachweis.rechenwahl#Konstanten|FASERSPANNUNGSARTEN]]).
+
+Die Verformung beim Knicken rechnet nur praezise ([[opencivil.nachweis.rechenwahl#Konstanten|VERFORMUNGSARTEN]],
+Benutzer, 2026-10-15). Mit dem Spannungsblock hat das Moment ueber der
+Kruemmung flache Stuecke: dort traegt jede Kruemmung dasselbe Moment, die
+Ausmitte zweiter Ordnung ist nicht eindeutig, und nahe der Grenzkraft hing
+N_Rd davon ab, wie gesucht wurde -- an der Stuetze des Pruefprojekts
+4099.5 kN halbiert, 4200 kN mit Warmstart.
 
 Die Kriechzahl wirkt nur bei praezise und elastisch: an den anderen Gesetzen
 haengt kein Modul. Der Wertesatz bestimmt, wo die Plateaus liegen
@@ -380,7 +387,8 @@ das Knicken und die Analysen mit dem der ersten Lage.
 - `SPANNUNGSARTEN = RECHENARTEN + (Rechenart.ELASTISCH,)` – Die Stahlspannungen zusaetzlich elastisch.
 - `FASERARTEN = (Rechenart.BLOCK, Rechenart.PARABEL)` – Was das Knicken und die Spannung-Dehnung-Analysen anbieten: nur, was ueber die Fasern rechnet -- siehe «Wer was anbietet» oben.
 - `FASERSPANNUNGSARTEN = FASERARTEN + (Rechenart.ELASTISCH,)` – Die Stahlspannungen des gezeichneten Querschnitts: ueber die Fasern, dazu elastisch -- eine Handrechnung gibt es dort nicht.
-- `ERSATZ_ALTER_WAHL = {Rechenart.HANDRECHNUNG.value: Rechenart.BLOCK.value}` – Was eine Datei von vor 2026-10-12 dort noch waehlen durfte, wo es die Wahl heute nicht mehr gibt -- und was daraus wird: aus der Handrechnung beim Knicken und in den Analysen derselbe Spannungsblock, ueber die Fasern gerechnet. Die Druckbewehrung zaehlt dann mit; der Widerstand steigt darum leicht.
+- `VERFORMUNGSARTEN = (Rechenart.PARABEL,)` – Was die Verformung beim Knicken anbietet: nur praezise -- siehe «Wer was anbietet» oben.
+- `ERSATZ_ALTER_WAHL = {Rechenart.HANDRECHNUNG.value: Rechenart.BLOCK.value, Rechenart.BLOCK…` – Was eine alte Datei dort noch waehlen durfte, wo es die Wahl heute nicht mehr gibt -- und was daraus wird, Schritt fuer Schritt zur genaueren, bis es die Wahl gibt: aus der Handrechnung beim Knicken und in den Analysen der Spannungsblock, ueber die Fasern gerechnet (seit 2026-10-12); die Druckbewehrung zaehlt dann mit, der Widerstand steigt darum leicht. Aus dem Spannungsblock bei der Verformung des Knickens die Parabel (seit 2026-10-15), aus der Handrechnung dort also auch.
 - `STAHL_NUR_ZUG = 'Betonstahl nur auf Zug'` – Die Seite im Notizbuch fuer den Stahl der Handrechnung, der nur Zug traegt.
 
 ## Braucht

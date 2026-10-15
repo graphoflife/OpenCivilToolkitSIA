@@ -14,7 +14,7 @@ from opencivil.nachweis.querschnittsloeser import (
     Stahllage, Werkstoffsatz, lagen_je_seite, stahl_bilinear, stahl_nur_zug,
 )
 from opencivil.nachweis.rechenwahl import (
-    RECHENARTEN, SPANNUNGSARTEN, Betonkennwerte, Rechenart, Rechenwahl,
+    RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN, Betonkennwerte, Rechenart, Rechenwahl,
     bezuege_vereinen, gesetze,
 )
 from opencivil.querschnitt.werkstoffgesetz import Spannungsblock, Stahlgesetz
@@ -153,5 +153,8 @@ class TestJederNachweis(unittest.TestCase):
     def test_knicken_mit_geteilter_und_eigener_linie(self):
         aufbau = self.projekt.aufbauen()
         self.assertEqual({k.eigene_linie for k in aufbau.knicken.values()}, {True, False})
+        # Die Verformung kennt nur eine Rechenart, darum beide Wertesaetze.
         self.assertEqual({k.verformung.art for k in aufbau.knicken.values()},
-                         {Rechenart.PARABEL, Rechenart.BLOCK})
+                         set(VERFORMUNGSARTEN))
+        self.assertEqual({k.verformung.satz for k in aufbau.knicken.values()},
+                         set(Werkstoffsatz))

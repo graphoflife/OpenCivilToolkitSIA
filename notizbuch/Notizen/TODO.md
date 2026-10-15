@@ -8,13 +8,6 @@ gelernt wurde, steht in [[Entwicklung]].
 ## Offen
 
 
-- [ ] **Verformung beim Knicken mit 0.85·x?** Mit dem Spannungsblock hat das
-      Moment über der Krümmung flache Stücke; nahe der Grenzkraft ist die
-      Ebene dort nicht eindeutig, und N_Rd hängt davon ab, wie gesucht wird
-      (Stütze q3 des Prüfprojekts: 4099.5 kN halbiert, 4200 kN mit
-      Warmstart). Gerechnet wird darum halbiert, wie immer. Zu entscheiden:
-      die Wahl «0.85·x» für die Verformung behalten oder nur noch «präzise»
-      anbieten. Vorgabe ist schon «präzise».
 - [ ] **Die Sortentabellen sind ungeprüft.** `BETONSORTEN` und `STAHLSORTEN` in
       `material/` stammen aus der Vorgängerfassung und sind nie gegen die
       gedruckte SIA 262 gehalten worden. Dasselbe gilt für sämtliche

@@ -47,9 +47,12 @@ ZWEI WAHLEN:
 Womit gerechnet wird, waehlt das Kapitel zweimal (:class:`Rechenwahl`):
 
 * **Verformung (e_2d)** -- die Gesetze des Loesers, der zu jedem Moment die
-  Kruemmung sucht. Vorgabe praezise ohne Vereinfachung, mit
-  Bemessungswerten; die Kriechzahl weicht den Beton auf, und ein weicher
-  Beton verformt sich mehr.
+  Kruemmung sucht. Immer praezise ohne Vereinfachung, gewaehlt werden
+  Kriechzahl und Werte (Vorgabe Bemessungswerte); die Kriechzahl weicht den
+  Beton auf, und ein weicher Beton verformt sich mehr. Den Spannungsblock
+  gibt es hier nicht mehr (:data:`~opencivil.nachweis.rechenwahl.VERFORMUNGSARTEN`,
+  Benutzer, 2026-10-15): mit ihm hat das Moment ueber der Kruemmung flache
+  Stuecke, und die Ausmitte ist nahe der Grenzkraft nicht eindeutig.
 * **Widerstand (N_Rd)** -- die Resistenzlinie, die sagt, ob der Querschnitt
   das Moment am verformten System aufnimmt. Vorgabe die
   0.85·x-Vereinfachung mit Bemessungswerten. Waehlt das Kapitel dasselbe wie
@@ -73,8 +76,9 @@ wenig verschiedenen Schnittgroessen. Gesucht werden sie darum mit Illinois,
 von der zuletzt gefundenen Ebene aus
 (:class:`~opencivil.nachweis.querschnittsloeser.QuerschnittsloeserIllinois`):
 an den Pruefprojekten ein Drittel der Faserdurchlaeufe, dieselben
-Grenzkraefte auf 0.01 kN. Rechnet die Verformung mit dem Spannungsblock,
-wird halbiert wie vorher -- dort ist die Ebene nicht eindeutig.
+Grenzkraefte auf 0.01 kN. Wo ein Gesetz springt, halbiert der Loeser wie
+vorher -- dort ist die Ebene nicht eindeutig; die Verformung rechnet seit
+2026-10-15 ohnehin nur noch praezise.
 
 DAS VERFAHREN GEHOERT KEINEM QUERSCHNITT:
 Die Iteration und die Suche nach ``N_Rd`` brauchen vom Stab nur dreierlei:
@@ -148,13 +152,15 @@ ALPHA_OBEN = 1.0 / 200.0
 
 #: Warum die Wahl der Verformung zaehlt -- fuer jeden Knicknachweis derselbe Satz.
 VERFORMUNG_NACH_WAHL = (
-    "Womit die Verformung gerechnet wird, wählt das Kapitel: Kriechzahl, "
-    "Werte und Rechenart. Das Kriechen wirkt bei der Parabel und weicht den "
-    "Beton auf: er verformt sich mehr, die Ausmitte zweiter Ordnung wächst, "
-    "und der Stab knickt früher – φ = 0 läge dann auf der unsicheren Seite. "
-    "Im Bereich der Gebrauchslasten unterscheidet sich die Parabel kaum vom "
-    "linearen Gesetz, in der Nähe der Grenzlast erheblich, und genau dort "
-    "entscheidet sich, ob es noch eine Gleichgewichtslage gibt."
+    "Die Verformung rechnet präzise, mit der Parabel; Kriechzahl und Werte "
+    "wählt das Kapitel. Das Kriechen weicht den Beton auf: er verformt sich "
+    "mehr, die Ausmitte zweiter Ordnung wächst, und der Stab knickt früher – "
+    "φ = 0 läge dann auf der unsicheren Seite. Im Bereich der Gebrauchslasten "
+    "unterscheidet sich die Parabel kaum vom linearen Gesetz, in der Nähe der "
+    "Grenzlast erheblich, und genau dort entscheidet sich, ob es noch eine "
+    "Gleichgewichtslage gibt. Den Spannungsblock gibt es hier nicht: mit ihm "
+    "trüge auf flachen Stücken jede Krümmung dasselbe Moment, und die "
+    "Ausmitte wäre nicht eindeutig."
 )
 
 

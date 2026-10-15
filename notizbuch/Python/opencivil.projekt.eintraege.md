@@ -1,5 +1,5 @@
 ---
-erzeugt: 7e412d31863c
+erzeugt: 1f2e63b05885
 art: modul
 tags: [modul]
 ---
@@ -469,7 +469,8 @@ def _ersetzt(rechenart: Any, arten) -> Any
 ```
 
 Die Rechenart, wie sie heute heisst: was eine alte Datei dort waehlt, wo
-es die Wahl nicht mehr gibt, wird zu ihrem Ersatz
+es die Wahl nicht mehr gibt, wird zu ihrem Ersatz -- und der, wo es auch
+ihn nicht gibt, zu seinem
 ([[opencivil.nachweis.rechenwahl#Konstanten|ERSATZ_ALTER_WAHL]]). Alles andere
 bleibt -- auch Unbekanntes, das die Pruefung danach meldet.
 

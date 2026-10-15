@@ -1,5 +1,5 @@
 ---
-erzeugt: 559cdac7b5fb
+erzeugt: e826ba87cc20
 art: modul
 tags: [modul]
 ---
@@ -422,7 +422,7 @@ Ein gezeichneter Querschnitt mit Bewehrung, Schubwaenden und Lastfaellen.
 - `haeufig: QAGebrauchsliste = field(default_factory=lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL))` – Die haeufigen Lastfaelle -- gegen das Fliessen, bei erhoehter und hoher Anforderung.
 - `knickfaelle: List[QAKnickEintrag] = field(default_factory=list)` – Knicknachweise, je in einer Richtung; leer heisst: keiner.
 - `knicken_wahl_verformung: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.knicken_verformung)`
-- `knicken_wahl_widerstand: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.knicken_widerstand)` – Womit das Knicken die Ausmitte e_2d und den Widerstand rechnet -- wie bei der Platte.
+- `knicken_wahl_widerstand: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.knicken_widerstand)` – Womit das Knicken die Ausmitte e_2d und den Widerstand rechnet -- wie bei der Platte: die Verformung immer praezise, der Widerstand mit 0.85·x oder praezise.
 - `spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)` – Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt.
 - `beschreibung: str = ''` – Freier Text -- geht in keine Rechnung ein, wie bei der Platte.
 

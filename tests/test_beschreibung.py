@@ -126,7 +126,8 @@ class TestVollstaendigeAblage(unittest.TestCase):
                     zwaengung_biegung_kriechzahl=1.2,
                     tragsicherheit_wahl=RechenwahlEintrag(
                         kriechzahl=1.5, werkstoffsatz="charakteristisch", rechenart="parabel"),
-                    knicken_wahl_verformung=RechenwahlEintrag(kriechzahl=2.5, rechenart="block"),
+                    knicken_wahl_verformung=RechenwahlEintrag(
+                        kriechzahl=2.5, werkstoffsatz="charakteristisch", rechenart="parabel"),
                     knicken_wahl_widerstand=RechenwahlEintrag(
                         kriechzahl=0.5, werkstoffsatz="charakteristisch", rechenart="parabel"),
                     querkraftbewehrung=QuerkraftbewehrungEintrag(

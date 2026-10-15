@@ -273,7 +273,9 @@ und des Knickens steht zuoberst eine Zeile «Rechenwahl», beim Knicken zwei -- 
   *elastisch*, ihre Vorgabe. Das Knicken und die Analysen bieten keine
   Handrechnung an: dort wird die Normalkraft Ebene für Ebene genau
   gerechnet. Der Widerstand beim Knicken rechnet darum, wenn nichts anderes
-  gewählt ist, mit der 0.85·x-Vereinfachung.
+  gewählt ist, mit der 0.85·x-Vereinfachung. Die Verformung beim Knicken
+  rechnet immer präzise: mit dem Spannungsblock wäre die Ausmitte nahe der
+  Grenzkraft nicht eindeutig.
 
 Mit 0.85·x oder präzise hält die Tragsicherheit gegen den Rand des
 Dehnungsfächers; den Widerstand bei N_Ed sucht sie genau, und die Herleitung

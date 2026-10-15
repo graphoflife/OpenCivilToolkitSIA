@@ -2724,19 +2724,31 @@ $$
 **Rechenwahl – Verformung (e\_2d)**
 
 $$
-\text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad 0.85 \cdot x\text{-Vereinfachung}
+\varphi = 0 \qquad \text{charakteristisch}\ f_{ck},\ f_{yk} \qquad \text{Präzise ohne Vereinfachung}
 $$
 
-**Werkstoffgesetze der Verformung: Beton, Spannungsblock 0.85·x**
+**Steifigkeit des Betons**
 
 $$
-\sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{cd} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \end{cases}
+E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \qquad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
+**Beiwert der Parabel, mit dem wirksamen Modul**
+
+$$
+k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{ck}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 2.8
+$$
+
+**Werkstoffgesetze der Verformung: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.6)*
+
+$$
+\sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
 **Werkstoffgesetze der Verformung: Stahl**
 
 $$
-\sigma_s = \min\left[E_s \cdot \varepsilon_s;\ f_{yd}\right] \quad f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2}
+\sigma_s = \min\left[E_s \cdot \varepsilon_s;\ f_{yk}\right] \quad f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 #### Wie die Dehnungsebene gefunden wird
@@ -2832,31 +2844,33 @@ $$
 
 | $k$ | $e_{2d}^{(k-1)}\ [\mathrm{mm}]$ | $M_{Ed,II}^{(k)}\ [\mathrm{kNm}]$ | $\chi^{(k)}\ [\mathrm{m}^{-1}]$ | $e_{2d}^{(k)}\ [\mathrm{mm}]$ |
 | ---: | ---: | ---: | ---: | ---: |
-| $1$ | $0.00$ | $14.50$ | $0.00000$ | $0.00$ |
-| $2$ | $0.00$ | $14.50$ | $0.00000$ | $0.00$ |
+| $1$ | $0.00$ | $14.50$ | $0.00028$ | $0.25$ |
+| $2$ | $0.25$ | $14.65$ | $0.00028$ | $0.26$ |
+| $3$ | $0.26$ | $14.65$ | $0.00028$ | $0.26$ |
+| $4$ | $0.26$ | $14.65$ | $0.00028$ | $0.26$ |
 
 **Probe: die gefundene Ebene erzeugt die Schnittgrössen**
 
 $$
-\varepsilon_m = -0.525\,\text{‰} \qquad \chi = 0\,\mathrm{m}^{-1} \qquad N_{int} = -1664.9\,\mathrm{kN} \;\checkmark \qquad M_{int} = 130.5\,\mathrm{kNm} \;\checkmark
+\varepsilon_m = -0.0582\,\text{‰} \qquad \chi = 0.00028\,\mathrm{m}^{-1} \qquad N_{int} = -600\,\mathrm{kN} \;\checkmark \qquad M_{int} = 14.7\,\mathrm{kNm} \;\checkmark
 $$
 
 **Querschnitt am verformten System**
 
 $$
-M_{Rd,x}(N_{Ed}) = 120\,\mathrm{kNm} \quad \ge \quad M_{Ed,II} = 14.5\,\mathrm{kNm}
+M_{Rd,x}(N_{Ed}) = 120\,\mathrm{kNm} \quad \ge \quad M_{Ed,II} = 14.7\,\mathrm{kNm}
 $$
 
 **Grenzkraft des Stabes**
 
 $$
-N_{Rd,K} = 4099.5\,\mathrm{kN} \quad \ge \quad \left|N_{Ed}\right| = 600\,\mathrm{kN}
+N_{Rd,K} = 4156.2\,\mathrm{kN} \quad \ge \quad \left|N_{Ed}\right| = 600\,\mathrm{kN}
 $$
 
 **Erfüllungsgrad**
 
 $$
-\alpha_{eff,K,\text{Stütze}} = \frac{N_{Rd,K}}{\left|N_{Ed}\right|} = \frac{4099.5\,\mathrm{kN}}{600\,\mathrm{kN}} = 6.83 \quad \Rightarrow \quad \text{erfüllt}
+\alpha_{eff,K,\text{Stütze}} = \frac{N_{Rd,K}}{\left|N_{Ed}\right|} = \frac{4156.2\,\mathrm{kN}}{600\,\mathrm{kN}} = 6.93 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
 ### Plattenanalyse: Block
@@ -7235,7 +7249,7 @@ Nachgewiesen wird am verformten System. Die Ausmitte zweiter Ordnung hängt von 
 
 Der Erfüllungsgrad ist ein Verhältnis von Normalkräften: N\_Rd ist die grösste Druckkraft, unter der der Stab noch steht. Über Momente zu vergleichen ginge nur, solange es ein Gleichgewicht gibt – beim Knicken ist gerade das der Fall, der fehlt.
 
-Womit die Verformung gerechnet wird, wählt das Kapitel: Kriechzahl, Werte und Rechenart. Das Kriechen wirkt bei der Parabel und weicht den Beton auf: er verformt sich mehr, die Ausmitte zweiter Ordnung wächst, und der Stab knickt früher – φ = 0 läge dann auf der unsicheren Seite. Im Bereich der Gebrauchslasten unterscheidet sich die Parabel kaum vom linearen Gesetz, in der Nähe der Grenzlast erheblich, und genau dort entscheidet sich, ob es noch eine Gleichgewichtslage gibt.
+Die Verformung rechnet präzise, mit der Parabel; Kriechzahl und Werte wählt das Kapitel. Das Kriechen weicht den Beton auf: er verformt sich mehr, die Ausmitte zweiter Ordnung wächst, und der Stab knickt früher – φ = 0 läge dann auf der unsicheren Seite. Im Bereich der Gebrauchslasten unterscheidet sich die Parabel kaum vom linearen Gesetz, in der Nähe der Grenzlast erheblich, und genau dort entscheidet sich, ob es noch eine Gleichgewichtslage gibt. Den Spannungsblock gibt es hier nicht: mit ihm trüge auf flachen Stücken jede Krümmung dasselbe Moment, und die Ausmitte wäre nicht eindeutig.
 
 Gesucht wird in zwei geschachtelten Suchen. Innen: zu einer festgehaltenen Krümmung χ wird ε\_m gesucht, bis N\_int die verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung immer mehr Zug bedeutet. Aussen: mit diesem ε\_m bleibt ein Moment übrig, und χ wird gesucht, bis auch M\_int stimmt – hier trägt die Monotonie, dass mehr Krümmung mehr Moment heisst. Beide Suchen beginnen bei der Ebene, die zuletzt gefunden wurde, grenzen die Stelle mit wachsenden Schritten ein und treffen sie dann mit dem Illinois-Verfahren: einer Sekante, die abwechselnd von beiden Seiten herankommt.
 
@@ -7713,7 +7727,7 @@ $$
 | Sprödes Versagen | 3. Lage | $M_{Rk,x}(N_{Ed} = 0)_{3} = 63.7\,\mathrm{kNm}$ | $M_{Riss} = 29.0\,\mathrm{kNm}$ | $2.20$ |
 | Risse: Quasi-ständige Lastfälle | Dauerlast | $\sigma_{s,adm} = 466\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 203\,\mathrm{N}/\mathrm{mm}^{2}$ | $2.29$ |
 | Risse: Häufige Lastfälle | Gebrauch | $\sigma_{s,adm} = 355\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_{s,x} = 323\,\mathrm{N}/\mathrm{mm}^{2}$ | $1.10$ |
-| Knicken | Stütze | $N_{Rd,K} = 4099.5\,\mathrm{kN}$ | $N_{Ed} = 600.0\,\mathrm{kN}$ | $6.83$ |
+| Knicken | Stütze | $N_{Rd,K} = 4156.2\,\mathrm{kN}$ | $N_{Ed} = 600.0\,\mathrm{kN}$ | $6.93$ |
 
 > **Hinweis:** Risse: Zwängung Normalkraft – 3. Lage: nicht erfüllt (α\_eff = 0.81), ausgeschaltet. N\_s,adm = 524 mm² · 500 N/mm² = 261.8 kN \< N\_Riss = 322.2 kN.
 
@@ -8107,7 +8121,7 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Bezogene Druckzonenhöhe – 2. Lage | $\left(x/d\right)_{2}$ | $0.095$ |  | berechnet |
 | Erfüllungsgrad Duktilität – 3. Lage | $\alpha_{eff,D,3}$ | $5.36$ |  | berechnet |
 | Bezogene Druckzonenhöhe – 3. Lage | $\left(x/d\right)_{3}$ | $0.065$ |  | berechnet |
-| Erfüllungsgrad Knicken – Stütze | $\alpha_{eff,K,\text{Stütze}}$ | $6.83$ |  | berechnet |
+| Erfüllungsgrad Knicken – Stütze | $\alpha_{eff,K,\text{Stütze}}$ | $6.93$ |  | berechnet |
 | Momentenwiderstand bei N\_Ed (x-Richtung) – Feld | $M_{Rk,x}(N_{Ed})_{\text{Feld}}$ | $99.6$ | kNm | berechnet |
 | Erfüllungsgrad x-Richtung – Feld | $\alpha_{eff,x,\text{Feld}}$ | $1.66$ |  | berechnet |
 | Momentenwiderstand bei N = 0, negativ (x-Richtung) | $M_{Rk,x}(N=0)^{-}$ | $-63.7$ | kNm | berechnet |

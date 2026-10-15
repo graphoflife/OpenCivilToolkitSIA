@@ -42,7 +42,7 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX
-from opencivil.nachweis.rechenwahl import FASERARTEN, FASERSPANNUNGSARTEN
+from opencivil.nachweis.rechenwahl import FASERARTEN, FASERSPANNUNGSARTEN, VERFORMUNGSARTEN
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.platte import ALPHA_MAX, ALPHA_MIN, K_C
 from opencivil.querschnitt import vorlagen
@@ -514,7 +514,11 @@ class QuerschnittsanalyseEintrag(Beschreibung):
         default_factory=RechenwahlEintrag.knicken_verformung)
     knicken_wahl_widerstand: RechenwahlEintrag = field(
         default_factory=RechenwahlEintrag.knicken_widerstand)
-    """Womit das Knicken die Ausmitte e_2d und den Widerstand rechnet -- wie bei der Platte."""
+    """
+    Womit das Knicken die Ausmitte e_2d und den Widerstand rechnet -- wie bei
+    der Platte: die Verformung immer praezise, der Widerstand mit 0.85·x oder
+    praezise.
+    """
 
     spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)
     """Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt."""
@@ -723,9 +727,9 @@ class QuerschnittsanalyseEintrag(Beschreibung):
         for liste, wort in ((self.haeufig, "häufige"), (self.quasistaendig, "quasi-ständige")):
             liste.pruefen(self.name, self.lastfaelle, wort)
         eindeutig(self.knickfaelle, self.name, "Knicknachweis", bauteil="Querschnitt")
-        for wahl, was in ((self.knicken_wahl_verformung, "Verformung"),
-                          (self.knicken_wahl_widerstand, "Widerstand")):
-            wahl.pruefen(f"Querschnitt '{self.name}', Knicken, {was}", FASERARTEN)
+        for wahl, was, arten in ((self.knicken_wahl_verformung, "Verformung", VERFORMUNGSARTEN),
+                                 (self.knicken_wahl_widerstand, "Widerstand", FASERARTEN)):
+            wahl.pruefen(f"Querschnitt '{self.name}', Knicken, {was}", arten)
 
     def lastfall(self, name: str, **werte: float) -> QALastfallEintrag:
         """Einen Lastfall anfuegen, ohne Oberflaeche -- kN und kNm."""
@@ -804,7 +808,7 @@ class QuerschnittsanalyseEintrag(Beschreibung):
             knickfaelle=[QAKnickEintrag.aus_dict(x) for x in (d.get("knickfaelle") or [])],
             knicken_wahl_verformung=RechenwahlEintrag.aus_dict(
                 d.get("knicken_wahl_verformung"), vorgabe=RechenwahlEintrag.knicken_verformung(),
-                wo=f"Querschnitt '{kennung}', Knicken, Verformung", arten=FASERARTEN),
+                wo=f"Querschnitt '{kennung}', Knicken, Verformung", arten=VERFORMUNGSARTEN),
             knicken_wahl_widerstand=RechenwahlEintrag.aus_dict(
                 d.get("knicken_wahl_widerstand"), vorgabe=RechenwahlEintrag.knicken_widerstand(),
                 wo=f"Querschnitt '{kennung}', Knicken, Widerstand", arten=FASERARTEN),

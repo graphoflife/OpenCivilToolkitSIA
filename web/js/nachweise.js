@@ -103,7 +103,7 @@ const HILFE = {
     zeilen: [
       ['Weg', 'verformtes System: e_0d + e_1d + e_2d, iteriert über die Krümmung'],
       ['N_Rd', 'grösste Druckkraft mit Gleichgewichtslage'],
-      ['Verformung', 'Rechenwahl für e_2d, ohne Handrechnung; Vorgabe präzise, Bemessung (f_cd, f_yd)'],
+      ['Verformung', 'e_2d immer präzise; φ und Werte nach Wahl, Vorgabe Bemessung (f_cd, f_yd)'],
       ['Widerstand', 'Rechenwahl für N_Rd(M_Ed = N_Ed·e_tot), ohne Handrechnung; Vorgabe 0.85·x, Bemessung; gleich wie die Tragsicherheit gewählt: deren Linie'],
       ['φ', 'je Wahl, nur präzise → E_c,eff = E_cm / (1 + φ)'],
     ],
@@ -335,11 +335,12 @@ export function knickInhalt(eintrag, ort = PLATTE) {
 
   return [
     // Zwei Wahlen: womit die Verformung gerechnet wird und womit der
-    // Querschnitt widersteht.
-    // Ohne Handrechnung: beim Knicken zählt die Normalkraft genau.
+    // Querschnitt widersteht. Ohne Handrechnung: beim Knicken zählt die
+    // Normalkraft genau. Die Verformung nur präzise -- mit dem
+    // Spannungsblock wäre die Ausmitte nahe der Grenzkraft nicht eindeutig.
     rechenwahlZeile('Verformung (e_2d)', eintrag.knicken_wahl_verformung,
       (veraenderer) => aendern((q) => veraenderer(q.knicken_wahl_verformung)),
-      { arten: 'faserarten' }),
+      { arten: 'verformungsarten' }),
     rechenwahlZeile('Widerstand (N_Rd)', eintrag.knicken_wahl_widerstand,
       (veraenderer) => aendern((q) => veraenderer(q.knicken_wahl_widerstand)),
       { arten: 'faserarten' }),
@@ -853,7 +854,8 @@ export function mitKopf(kopf, eingabe, formel = false) {
  * `kriechzahl`, `werkstoffsatz` und `rechenart`, `aendern` ändert es im
  * Projekt. `arten` sagt, welche Rechenarten gelten: `rechenarten`, bei den
  * Stahlspannungen `spannungsarten`, beim Knicken und in den Analysen
- * `faserarten` (ohne Handrechnung). Wirkt φ bei der gewählten Art
+ * `faserarten` (ohne Handrechnung), bei der Verformung des Knickens
+ * `verformungsarten` (nur präzise). Wirkt φ bei der gewählten Art
  * nicht, steht das Feld blass da -- es bleibt aber stehen, damit die Zahl
  * nicht verloren geht, wenn man die Art wieder wechselt. `phiImmer`: in den
  * Analysen rechnet der ungerissene Teil immer mit E_cm/(1+φ), dort wirkt φ

@@ -149,10 +149,25 @@ class TestVerformung(unittest.TestCase):
             e_2d[phi] = loesung.befund(knicken).ergebnisse[0].e_2d
         self.assertGreater(e_2d[2.0], e_2d[0.0])
 
-    def test_block_rechnet_auch(self):
-        _, knicken, loesung = gerechnet(verformung=RechenwahlEintrag(rechenart="block"))
-        self.assertTrue(loesung.befund(knicken).ergebnisse[0].stabil)
-        self.assertIn(r"x\text{-Vereinfachung}", text(loesung))
+    def test_den_block_gibt_es_fuer_die_verformung_nicht(self):
+        """
+        Mit ihm trüge auf flachen Stücken jede Krümmung dasselbe Moment, und
+        nahe der Grenzkraft hinge N_Rd an der Suche (2026-10-15).
+        """
+        from opencivil.projekt import ProjektFehler
+        q = Projekt.beispiel().querschnitte[0]
+        q.knicken_wahl_verformung = RechenwahlEintrag(rechenart="block")
+        with self.assertRaises(ProjektFehler):
+            q.pruefen()
+
+    def test_die_werte_sind_waehlbar(self):
+        """Charakteristisch ist der Beton steifer begrenzt: weniger Ausmitte als mit f_cd."""
+        e_2d = {}
+        for satz in ("bemessung", "charakteristisch"):
+            _, knicken, loesung = gerechnet(
+                verformung=RechenwahlEintrag(werkstoffsatz=satz, rechenart="parabel"))
+            e_2d[satz] = loesung.befund(knicken).ergebnisse[0].e_2d
+        self.assertLess(e_2d["charakteristisch"], e_2d["bemessung"])
 
 
 class TestDatei(unittest.TestCase):
@@ -163,14 +178,26 @@ class TestDatei(unittest.TestCase):
         with self.assertRaises(ProjektFehler):
             Projekt.aus_dict(daten)
 
-    def test_die_handrechnung_einer_alten_datei_wird_die_vereinfachung(self):
-        """Bis 2026-10-12 gab es sie beim Knicken -- gelesen wird sie als 0.85·x."""
+    def test_die_handrechnung_einer_alten_datei(self):
+        """
+        Bis 2026-10-12 gab es sie beim Knicken: im Widerstand wird sie 0.85·x,
+        in der Verformung -- wo es seit 2026-10-15 auch 0.85·x nicht mehr
+        gibt -- präzise.
+        """
         daten = Projekt.beispiel().als_dict()
         for feld in ("knicken_wahl_verformung", "knicken_wahl_widerstand"):
             daten["querschnitte"][0][feld] = {"rechenart": "handrechnung"}
         q = Projekt.aus_dict(daten).querschnitte[0]
-        self.assertEqual(q.knicken_wahl_verformung.rechenart, "block")
+        self.assertEqual(q.knicken_wahl_verformung.rechenart, "parabel")
         self.assertEqual(q.knicken_wahl_widerstand.rechenart, "block")
+
+    def test_der_block_einer_alten_datei_wird_in_der_verformung_praezise(self):
+        daten = Projekt.beispiel().als_dict()
+        daten["querschnitte"][0]["knicken_wahl_verformung"] = {
+            "rechenart": "block", "kriechzahl": 1.5, "werkstoffsatz": "charakteristisch"}
+        wahl = Projekt.aus_dict(daten).querschnitte[0].knicken_wahl_verformung
+        self.assertEqual((wahl.rechenart, wahl.kriechzahl, wahl.werkstoffsatz),
+                         ("parabel", 1.5, "charakteristisch"))
 
     def test_von_hand_gesetzt_meldet_sich(self):
         from opencivil.projekt import ProjektFehler

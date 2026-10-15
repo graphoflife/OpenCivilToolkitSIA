@@ -44,6 +44,24 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-15 · Verformung beim Knicken nur noch präzise
+
+Die Verformung beim Knicken -- die Ausmitte e_2d -- rechnet nur noch präzise,
+mit der Parabel; Kriechzahl und Werte bleiben wählbar (Benutzer). Den
+Spannungsblock gibt es dort nicht mehr: mit ihm hat das Moment über der
+Krümmung flache Stücke, auf denen jede Krümmung dasselbe Moment trägt, und
+nahe der Grenzkraft hing N_Rd davon ab, wie gesucht wurde (siehe den Eintrag
+darunter). Der Widerstand beim Knicken bleibt bei 0.85·x oder präzise.
+
+Was erlaubt ist, steht einmal: `VERFORMUNGSARTEN` in `nachweis/rechenwahl.py`,
+gelesen von Platte, Querschnittsanalyse und Katalog. Eine alte Datei mit 0.85·x
+oder Handrechnung für die Verformung liest sich als präzise:
+`ERSATZ_ALTER_WAHL` ist dafür eine Kette geworden -- Handrechnung → 0.85·x →
+präzise --, und gelesen wird, bis es die Wahl gibt. Im Widerstand wird die
+Handrechnung damit weiter 0.85·x, in der Verformung präzise. Die Platte
+«Parabel» des Prüfprojekts knickt jetzt präzise mit charakteristischen
+Werten; ihre Grenzkraft ändert sich damit, sonst keine Zahl.
+
 ## 2026-10-15 · Knicken der Platte mit Illinois und Warmstart
 
 Das Knicken der Platte sucht seine Ebenen jetzt wie das am gezeichneten

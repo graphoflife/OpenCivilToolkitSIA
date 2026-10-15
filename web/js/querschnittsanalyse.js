@@ -64,7 +64,7 @@ const HILFE = {
     zeilen: [
       ['Weg', 'verformtes System: e_0d + e_1d + e_2d, iteriert über die Krümmung – je Fall zur gewählten Zugseite'],
       ['N_Rd', 'grösste Druckkraft mit Gleichgewichtslage'],
-      ['Verformung', 'Rechenwahl für e_2d; Vorgabe präzise, Bemessung'],
+      ['Verformung', 'e_2d immer präzise; φ und Werte nach Wahl, Vorgabe Bemessung'],
       ['Widerstand', 'Rechenwahl für den Bruchzustand bei N; Vorgabe 0.85·x, Bemessung'],
       ['d', 'vom gedrückten Rand bis zum entferntesten Stab in Zugrichtung'],
     ],

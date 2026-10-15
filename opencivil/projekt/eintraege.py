@@ -621,13 +621,18 @@ class RechenwahlEintrag(Beschreibung):
 def _ersetzt(rechenart: Any, arten) -> Any:
     """
     Die Rechenart, wie sie heute heisst: was eine alte Datei dort waehlt, wo
-    es die Wahl nicht mehr gibt, wird zu ihrem Ersatz
+    es die Wahl nicht mehr gibt, wird zu ihrem Ersatz -- und der, wo es auch
+    ihn nicht gibt, zu seinem
     (:data:`~opencivil.nachweis.rechenwahl.ERSATZ_ALTER_WAHL`). Alles andere
     bleibt -- auch Unbekanntes, das die Pruefung danach meldet.
     """
-    if rechenart is None or rechenart in {a.value for a in arten}:
-        return rechenart
-    return ERSATZ_ALTER_WAHL.get(str(rechenart), rechenart)
+    moeglich = {a.value for a in arten}
+    while rechenart is not None and rechenart not in moeglich:
+        ersatz = ERSATZ_ALTER_WAHL.get(str(rechenart))
+        if ersatz is None:
+            break
+        rechenart = ersatz
+    return rechenart
 
 
 @dataclass

@@ -57,7 +57,7 @@ from opencivil.querschnitt.vorlagen import VORLAGEN
 from opencivil.projekt.gleichungen import GleichungszeileEintrag
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
-    FASERARTEN, FASERSPANNUNGSARTEN, RECHENARTEN, SPANNUNGSARTEN, Rechenart,
+    FASERARTEN, FASERSPANNUNGSARTEN, RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN, Rechenart,
 )
 from opencivil.spannungsanalyse import Analyseart
 from opencivil.stabwerk import querschnitte as stabquerschnitte
@@ -255,13 +255,14 @@ def katalog() -> dict:
         # Was ein Nachweis-Kapitel und eine Analyse waehlen: Wertesatz und
         # Rechenart -- die Stahlspannungen dazu «elastisch», das Knicken und
         # die Analysen ohne Handrechnung, die Stahlspannungen des gezeichneten
-        # Querschnitts beides.
+        # Querschnitts beides, die Verformung beim Knicken nur praezise.
         "rechenwahl": {
             "werkstoffsaetze": _WERKSTOFFSAETZE,
             "rechenarten": _rechenarten(RECHENARTEN),
             "spannungsarten": _rechenarten(SPANNUNGSARTEN),
             "faserarten": _rechenarten(FASERARTEN),
             "faserspannungsarten": _rechenarten(FASERSPANNUNGSARTEN),
+            "verformungsarten": _rechenarten(VERFORMUNGSARTEN),
         },
         # `fliessnachweis` sagt, ob diese Anforderung den Nachweis gegen
         # das Fliessen unter haeufiger Einwirkung ueberhaupt verlangt -- bei
