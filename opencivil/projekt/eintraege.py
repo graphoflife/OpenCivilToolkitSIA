@@ -275,10 +275,17 @@ class QuerkraftbewehrungEintrag(Beschreibung):
 
     @property
     def vorhanden(self) -> bool:
-        if self.durchmesser <= 0 or not (self.abstand_x and self.abstand_x > 0):
-            return False
-        return bool(self.abstand_y and self.abstand_y > 0) or bool(
-            self.anzahl_y and self.anzahl_y > 0)
+        """
+        Ob Buegel liegen -- das sagt allein der Durchmesser. Eine Teilung von
+        null heisst nicht «keine Buegel», sondern ist ein Fehler, und
+        :meth:`pruefen` sagt es.
+        """
+        return self.durchmesser > 0
+
+    @property
+    def ueber_teilung_y(self) -> bool:
+        """In y eine Teilung -- sonst eine Stabzahl. Wie in der Maske: es zaehlt, was dasteht."""
+        return self.abstand_y is not None
 
 
     @classmethod
@@ -287,6 +294,7 @@ class QuerkraftbewehrungEintrag(Beschreibung):
             wert = d.get(name)
             return None if wert in (None, "") else float(wert)
 
+        abstand_x = wahl("abstand_x")
         abstand_y, anzahl_y = wahl("abstand_y"), wahl("anzahl_y")
         # Wie bei den Lagen: steht keines von beiden da, gilt die Teilung.
         if abstand_y is None and anzahl_y is None:
@@ -294,7 +302,9 @@ class QuerkraftbewehrungEintrag(Beschreibung):
         return cls(
             durchmesser=zahl(d, "durchmesser", cls.durchmesser),
             stahl=str(d.get("stahl", cls.stahl)),
-            abstand_x=wahl("abstand_x") or cls.abstand_x,
+            # Nur was fehlt, bekommt die Vorgabe. Eine Null bleibt eine Null --
+            # pruefen() meldet sie; frueher wurde sie still zu 200 mm.
+            abstand_x=cls.abstand_x if abstand_x is None else abstand_x,
             abstand_y=abstand_y,
             anzahl_y=anzahl_y,
             alpha_min=int(zahl(d, "alpha_min", float(cls.alpha_min))),
@@ -305,6 +315,20 @@ class QuerkraftbewehrungEintrag(Beschreibung):
         """Was nicht stimmen kann, soll als Satz beim Benutzer ankommen."""
         if not self.vorhanden:
             return
+        angegeben = (lambda wert, einheit="":
+                     "nichts" if wert is None else f"{wert:g}{einheit}")
+        if self.abstand_x is None or self.abstand_x <= 0:
+            raise ProjektFehler(
+                f"{wo}: die Bügelteilung in x muss grösser als null sein, "
+                f"angegeben ist {angegeben(self.abstand_x, ' mm')}.")
+        if self.ueber_teilung_y and self.abstand_y <= 0:
+            raise ProjektFehler(
+                f"{wo}: die Bügelteilung in y muss grösser als null sein, "
+                f"angegeben ist {angegeben(self.abstand_y, ' mm')}.")
+        if not self.ueber_teilung_y and (self.anzahl_y is None or self.anzahl_y <= 0):
+            raise ProjektFehler(
+                f"{wo}: die Bügelzahl in y muss grösser als null sein, "
+                f"angegeben ist {angegeben(self.anzahl_y)}.")
         if not 1 <= self.alpha_min <= 89 or not 1 <= self.alpha_max <= 89:
             raise ProjektFehler(
                 f"{wo}: die Neigung der Druckdiagonalen muss zwischen 1° und "
@@ -317,13 +341,13 @@ class QuerkraftbewehrungEintrag(Beschreibung):
                 f"keine Neigung, für die sich ein Widerstand rechnen liesse.")
 
     def als_bewehrung(self, stahl: Optional[Baustoff]) -> Querkraftbewehrung:
-        ueber_teilung = bool(self.abstand_y and self.abstand_y > 0)
+        """Die Buegel fuer den Querschnitt -- erst nach :meth:`pruefen`."""
         return Querkraftbewehrung(
             durchmesser=Groesse(self.durchmesser, MM),
             stahl=stahl,
-            abstand_x=Groesse(self.abstand_x, MM) if self.abstand_x else None,
-            abstand_y=Groesse(self.abstand_y, MM) if ueber_teilung else None,
-            anzahl_y=None if ueber_teilung else self.anzahl_y,
+            abstand_x=Groesse(self.abstand_x, MM),
+            abstand_y=Groesse(self.abstand_y, MM) if self.ueber_teilung_y else None,
+            anzahl_y=None if self.ueber_teilung_y else self.anzahl_y,
             alpha_min=self.alpha_min,
             alpha_max=self.alpha_max,
         )

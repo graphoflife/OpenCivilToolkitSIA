@@ -1,5 +1,5 @@
 ---
-erzeugt: e1c6c5ccb5d9
+erzeugt: 105ddff871e5
 art: modul
 tags: [modul]
 ---
@@ -227,6 +227,19 @@ stehen; in x nicht. Siehe
 def vorhanden(self) -> bool
 ```
 
+Ob Buegel liegen -- das sagt allein der Durchmesser. Eine Teilung von
+null heisst nicht «keine Buegel», sondern ist ein Fehler, und
+[[opencivil.projekt.eintraege#QuerkraftbewehrungEintrag.pruefen|pruefen]] sagt es.
+
+#### QuerkraftbewehrungEintrag.ueber_teilung_y
+
+```python
+@property
+def ueber_teilung_y(self) -> bool
+```
+
+In y eine Teilung -- sonst eine Stabzahl. Wie in der Maske: es zaehlt, was dasteht.
+
 #### QuerkraftbewehrungEintrag.aus_dict
 
 ```python
@@ -247,6 +260,8 @@ Was nicht stimmen kann, soll als Satz beim Benutzer ankommen.
 ```python
 def als_bewehrung(self, stahl: Optional[Baustoff]) -> Querkraftbewehrung
 ```
+
+Die Buegel fuer den Querschnitt -- erst nach [[opencivil.projekt.eintraege#QuerkraftbewehrungEintrag.pruefen|pruefen]].
 
 ### KnickEintrag
 

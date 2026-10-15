@@ -941,5 +941,51 @@ class TestMindestbewehrungsEingaben(unittest.TestCase):
                          ["Normal", "Erhöht", "Hoch"])
 
 
+
+class TestBuegelteilung(unittest.TestCase):
+    """
+    Eine Bügelteilung von null ist ein Fehler und wird gemeldet. Bis
+    2026-10-15 wurde sie beim Lesen still zu 200 mm -- die Maske zeigte 0,
+    gerechnet wurde mit 200.
+    """
+
+    def buegel(self, **felder):
+        d = Projekt.beispiel().als_dict()
+        d["querschnitte"][0]["querkraftbewehrung"].update(
+            {"durchmesser": 10.0, **felder})
+        return d
+
+    def fehler(self, d) -> str:
+        antwort = dienst.bearbeite("rechnen", {"projekt": d})
+        self.assertEqual(antwort.status, 400)
+        return antwort.daten["fehler"]
+
+    def test_eine_null_bleibt_beim_lesen_eine_null(self):
+        d = self.buegel(abstand_x=0)
+        self.assertEqual(Projekt.aus_dict(d).querschnitt("q1").querkraftbewehrung.abstand_x, 0.0)
+
+    def test_nur_was_fehlt_bekommt_die_vorgabe(self):
+        d = self.buegel()
+        d["querschnitte"][0]["querkraftbewehrung"].pop("abstand_x")
+        self.assertEqual(Projekt.aus_dict(d).querschnitt("q1").querkraftbewehrung.abstand_x,
+                         200.0)
+
+    def test_teilung_in_x(self):
+        self.assertIn("Bügelteilung in x muss grösser als null sein, angegeben ist 0 mm",
+                      self.fehler(self.buegel(abstand_x=0)))
+
+    def test_teilung_in_y(self):
+        self.assertIn("Bügelteilung in y muss grösser als null sein",
+                      self.fehler(self.buegel(abstand_y=0, anzahl_y=None)))
+
+    def test_stabzahl_in_y(self):
+        self.assertIn("Bügelzahl in y muss grösser als null sein",
+                      self.fehler(self.buegel(abstand_y=None, anzahl_y=0)))
+
+    def test_ohne_buegel_spielt_die_teilung_keine_rolle(self):
+        d = self.buegel(durchmesser=0.0, abstand_x=0)
+        self.assertEqual(dienst.bearbeite("rechnen", {"projekt": d}).status, 200)
+
+
 if __name__ == "__main__":
     unittest.main()

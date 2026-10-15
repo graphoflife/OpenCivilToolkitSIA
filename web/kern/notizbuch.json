@@ -2862,6 +2862,7 @@
         "ObergrenzeEintrag.aus_dict",
         "QuerkraftbewehrungEintrag",
         "QuerkraftbewehrungEintrag.vorhanden",
+        "QuerkraftbewehrungEintrag.ueber_teilung_y",
         "QuerkraftbewehrungEintrag.aus_dict",
         "QuerkraftbewehrungEintrag.pruefen",
         "QuerkraftbewehrungEintrag.als_bewehrung",
