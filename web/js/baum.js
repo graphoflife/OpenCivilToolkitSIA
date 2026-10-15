@@ -31,29 +31,20 @@ import {
   aendern, ausVorlage, freieKennung, naechsterName, projektAendern, umschalten, zustand,
 } from './zustand.js';
 
-const SINNBILD = {
-  materialien: '▣',   // ▣
-  beton: '■',         // ■
-  betonstahl: '≡',    // ≡
-  gleichungen: '∑',
-  ...Object.fromEntries(ARTEN.map((a) => [a.kapitel, a.sinnbild])),
-};
-
 // ===========================================================================
 // Bausteine
 // ===========================================================================
 
-function kapitel({ schluessel, titel, klasse, anzahl, werkzeuge, kinder, oben }) {
+function kapitel({ schluessel, titel, anzahl, werkzeuge, kinder, oben }) {
   const zu = !zustand.offen.has(schluessel);
   return el('div.baum-gruppe', {}, [
     el('div.baum-kopf', {
-      class: `${klasse || ''} ${zu ? 'ist-zu' : ''} ${oben ? 'baum-kopf-oben' : ''}`,
+      class: `${zu ? 'ist-zu' : ''} ${oben ? 'baum-kopf-oben' : ''}`,
       on: { click: () => umschalten(schluessel) },
     }, [
       el('span.pfeil', { text: '▼' }),
       el('span.titel', { text: titel }),
       anzahl !== undefined ? el('span.zaehler', { text: String(anzahl) }) : null,
-      el('span.sinnbild', { text: SINNBILD[schluessel] || '' }),
       werkzeuge ? el('span.werkzeuge', {
         on: { click: (e) => e.stopPropagation() },
       }, [].concat(werkzeuge)) : null,
@@ -91,24 +82,22 @@ const ANLEGEN = {
 
 /** Was rechts im Eintrag steht, wie er aussieht und wie er weggeht -- je Art. */
 const ART = {
-  material: (m) => ({
-    klasse: m.art === 'beton' ? 'beton' : 'stahl', text: m.sorte, loeschen: materialLoeschen,
-  }),
+  material: (m) => ({ text: m.sorte, loeschen: materialLoeschen }),
   blatt: (b) => ({
-    klasse: 'blatt', text: `${b.zeilen.length} ${b.zeilen.length === 1 ? 'Zeile' : 'Zeilen'}`,
+    text: `${b.zeilen.length} ${b.zeilen.length === 1 ? 'Zeile' : 'Zeilen'}`,
     loeschen: () => entfernen('gleichungen', b),
   }),
   ...Object.fromEntries(ARTEN.map((a) => [a.art, (e) => ({
-    klasse: a.klasse, text: KURZTEXT[a.art](e), loeschen: () => bauteilLoeschen(a, e),
+    text: KURZTEXT[a.art](e), loeschen: () => bauteilLoeschen(a, e),
   })])),
 };
 
 function eintrag(m, art) {
   const aktiv = zustand.auswahl?.art === art && zustand.auswahl.kennung === m.kennung;
   const istMaterial = art === 'material';
-  const { klasse, text, loeschen } = ART[art](m);
+  const { text, loeschen } = ART[art](m);
   return el('div.baum-eintrag', {
-    class: `${aktiv ? 'ist-aktiv' : ''} baum-eintrag-${klasse}`,
+    class: aktiv ? 'ist-aktiv' : '',
     on: { click: () => aendern({ auswahl: { art, kennung: m.kennung } }, 'auswahl') },
   }, [
     el('span.name', {
@@ -335,7 +324,6 @@ export function baumZeichnen(behaelter) {
         kapitel({
           schluessel: 'beton',
           titel: 'Beton',
-          klasse: 'baum-kopf-beton',
           anzahl: betone.length,
           werkzeuge: knopf('+', 'Beton hinzufügen', () => materialAnlegen('beton')),
           kinder: betone.length
@@ -345,7 +333,6 @@ export function baumZeichnen(behaelter) {
         kapitel({
           schluessel: 'betonstahl',
           titel: 'Betonstahl',
-          klasse: 'baum-kopf-stahl',
           anzahl: staehle.length,
           werkzeuge: knopf('+', 'Betonstahl hinzufügen', () => materialAnlegen('betonstahl')),
           kinder: staehle.length
@@ -362,7 +349,6 @@ export function baumZeichnen(behaelter) {
     return kapitel({
       schluessel: a.kapitel,
       titel: a.titel,
-      klasse: `baum-kopf-${a.klasse}`,
       anzahl: eintraege.length,
       oben: true,
       werkzeuge: knopf('+', `${a.einzahl} hinzufügen`, () => ANLEGEN[a.art](a)),
@@ -376,7 +362,6 @@ export function baumZeichnen(behaelter) {
   const gleichungen = kapitel({
     schluessel: 'gleichungen',
     titel: 'Analytische Gleichungen',
-    klasse: 'baum-kopf-blatt',
     anzahl: blaetter.length,
     oben: true,
     werkzeuge: knopf('+', 'Blatt hinzufügen', blattAnlegen),

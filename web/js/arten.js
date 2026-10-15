@@ -29,9 +29,6 @@ export const ARTEN = [
     /** Wie ein neuer Eintrag heisst: «Platte 3». */
     stamm: 'Platte',
     leer: 'keine Platte',
-    /** Die Klasse im Stilblatt: baum-kopf-platte, baum-eintrag-platte. */
-    klasse: 'platte',
-    sinnbild: '▬', // ▬
     /** Ob sie Nachweise führt -- dann steht in der Zusammenfassung ihre Tabelle. */
     nachweise: true,
   },
@@ -45,8 +42,6 @@ export const ARTEN = [
     einzahl: 'Querschnittsanalyse',
     stamm: 'Querschnitt',
     leer: 'keine Querschnittsanalyse',
-    klasse: 'analyse',
-    sinnbild: '⊤', // ⊤ -- ein Plattenbalken im Schnitt
     nachweise: true,
   },
   {
@@ -59,8 +54,6 @@ export const ARTEN = [
     einzahl: 'Balkensystem',
     stamm: 'System',
     leer: 'kein Balkensystem',
-    klasse: 'system',
-    sinnbild: '⊓', // ⊓ -- ein Rahmen
     nachweise: false,
   },
 ];
