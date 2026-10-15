@@ -165,6 +165,57 @@ class TestSpannungsbegrenzung(unittest.TestCase):
 
 
 
+class TestVerfehlteEbene(unittest.TestCase):
+    """
+    Mit dem Spannungsblock gibt es bei viel Druck und wenig Moment keine
+    Ebene. Statt der Probe steht das da, und der Fall ist nicht erfüllt --
+    bis 2026-10-15 stand die Probe mit Häkchen, für eine Ebene mit -170 statt
+    -600 kN.
+    """
+
+    def gerechnet(self, rechenart):
+        from opencivil.projekt import RechenwahlEintrag
+
+        projekt = Projekt(name="Wand")
+        projekt.beton("C30/37")
+        projekt.stahl("B500B")
+        wand = projekt.platte("Wand", h=250, x=[12, 12], y=[10, 10])
+        wand.einwirkung("Feld", M_Ed=20, V_Ed=10)
+        wand.quasistaendig.lastfall("Wenig Moment", M_Ed=14.5, N_Ed=-600)
+        wand.quasistaendig.lastfall("Mehr Moment", M_Ed=80, N_Ed=-600)
+        wand.quasistaendig.wahl = RechenwahlEintrag(werkstoffsatz="charakteristisch",
+                                                    rechenart=rechenart)
+        aufbau, loesung = rechnen(projekt)
+        return Gelaufen(aufbau.spannung_riss["q1.x"], loesung)
+
+    def test_statt_der_probe_steht_die_wahl(self):
+        for rechenart, wort in (("block", "der 0.85·x-Vereinfachung"),
+                                ("handrechnung", "der Handrechnung")):
+            with self.subTest(rechenart=rechenart):
+                spannung = self.gerechnet(rechenart)
+                wenig = next(u for u in spannung.urteile if u.fall == "Wenig Moment")
+                self.assertFalse(wenig.erfuellt)
+                self.assertEqual(wenig.begruendung,
+                                 f"Mit {wort} gibt es zu dieser Einwirkung keine "
+                                 f"Dehnungsebene – präzise rechnen.")
+                text = " ".join(getattr(b, "text", "") or "" for b in
+                                spannung.loesung.protokoll.alle_bloecke())
+                self.assertIn(wenig.begruendung, text)
+
+    def test_mit_mehr_moment_gibt_es_die_ebene(self):
+        spannung = self.gerechnet("block")
+        mehr = next(e for e in spannung.ergebnisse if e.fall.name == "Mehr Moment")
+        self.assertTrue(mehr.konvergiert)
+        self.assertAlmostEqual(mehr.N_int, -600e3, delta=1.0)
+        self.assertAlmostEqual(mehr.M_int, 80e3, delta=1.0)
+
+    def test_praezise_gibt_es_sie_auch_mit_wenig_moment(self):
+        spannung = self.gerechnet("parabel")
+        wenig = next(e for e in spannung.ergebnisse if e.fall.name == "Wenig Moment")
+        self.assertTrue(wenig.konvergiert)
+        self.assertAlmostEqual(wenig.N_int, -600e3, delta=1.0)
+
+
 class TestStahlspannungAusRissbreite(unittest.TestCase):
     """
     Der Nachweis unter quasi-ständiger Einwirkung: dieselbe Rechnung wie

@@ -1,5 +1,5 @@
 ---
-erzeugt: a837913a9148
+erzeugt: 9feacc655de5
 art: modul
 tags: [modul]
 ---
@@ -233,6 +233,7 @@ findet, liegt jenseits der Grenze: der Stahl fliesst dort laengst.
 - [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.gebrauchsebene]]
 - [[opencivil.nachweis.mindestbewehrung]]
+- [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.schiefe_biegung]]

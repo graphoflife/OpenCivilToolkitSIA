@@ -1,5 +1,5 @@
 ---
-erzeugt: 6ee73fa111e1
+erzeugt: 6872ed3f2221
 art: modul
 tags: [modul]
 ---
@@ -59,17 +59,19 @@ Die Dehnungsebene zu einem Lastfall -- und was sie erzeugt.
 - `eps_s: Tuple[float, ...]`
 - `sigma_s: Tuple[float, ...]` – Dehnung und Spannung je Bewehrung des Querschnitts.
 - `konvergiert: bool = True`
+- `verfehlt: bool = False` – Ob die Suche an einem Sprung haengen blieb, statt eine Ebene zu finden -- wie [[opencivil.nachweis.querschnittsloeser#Ebene|verfehlt]].
 
 ### _bei_neigung
 
 ```python
-def _bei_neigung(q: Querschnitt, psi: float, N: float, M_y: float, M_z: float) -> Optional[Tuple[Gebrauchsebene, float]]
+def _bei_neigung(q: Querschnitt, psi: float, N: float, M_y: float, M_z: float) -> Tuple[Gebrauchsebene, float]
 ```
 
 Die Ebene bei dieser Neigung, die N und das Moment in Zugrichtung traegt
 -- und was ihr am Moment entlang der Nulllinie noch fehlt. Mit
 `M = -(n_z·M_y + n_y·M_z)` und `M_quer = -(n_y·M_y - n_z·M_z)`, den
 Umkehrungen von [[opencivil.querschnitt.interaktion#Richtung.momente|momente]].
+Ohne Ebene [[opencivil.nachweis.gebrauchsebene#Konstanten|KEINE]] oder [[opencivil.nachweis.gebrauchsebene#Konstanten|VERFEHLT]], und es fehlt `nan`.
 
 ### gebrauchsebene
 
@@ -87,6 +89,8 @@ die Abweichung das Vorzeichen wechselt, dann Illinois. Laeuft die Sekante
 weg, wird nach beiden Seiten mit wachsenden Schritten eingegrenzt
 ([[opencivil.nachweis.gebrauchsebene#Konstanten|NEIGUNGSSCHRITTE]]), wie beim Widerstand in einer Momentenrichtung
 ([[opencivil.querschnitt.interaktion#Querschnitt.in_richtung|in_richtung]]).
+Ohne Ebene [[opencivil.nachweis.gebrauchsebene#Konstanten|KEINE]] -- oder [[opencivil.nachweis.gebrauchsebene#Konstanten|VERFEHLT]], wo die Suche an einem
+Sprung haengen blieb.
 
 ### protokoll_ebene
 
@@ -102,6 +106,7 @@ Die gefundene Ebene und ihre Probe.
 - `NEIGUNGSSCHRITTE = (2.0, 5.0, 10.0, 20.0, 35.0, 55.0, 75.0, 90.0)` – Wie weit sich die Neigung ψ der Ebene unter Gebrauchslast von der entfernen darf, die bei Symmetrie gaelte -- nach jeder Seite, in Grad. Weiter als 90° laege die Gegenrichtung, und die gehoert zur negativen Kruemmung.
 - `QUER_SCHRANKE = 1e-07` – Wann das Moment entlang der Nulllinie als getroffen gilt, als Teil der groessten Schnittgroesse -- N mit einem Hebel von einem Meter gezaehlt.
 - `KEINE = Gebrauchsebene(psi=0.0, eps_m=0.0, chi=0.0, N=0.0, M_y=0.0, M_z=0.0, …` – Wenn sich keine Ebene findet.
+- `VERFEHLT = replace(KEINE, verfehlt=True)` – Wenn die Suche ihre Ebene verfehlt -- mit dem Spannungsblock bei viel Druck und wenig Moment.
 - `SUCHE_DER_EBENE = 'Gesucht wird die Ebene, die N, M_y und M_z zugleich trägt. Zu einer …` – Wie die Ebene unter Gebrauchslast gefunden wird -- bei schiefer Biegung.
 - `EINACHSIG = 'Einachsig bleibt die Nulllinie waagrecht, und M_z zählt nicht – wie …` – Dasselbe, einachsig.
 

@@ -617,6 +617,7 @@ class Spannungsbegrenzung(Nachweis):
         erg.konvergiert = ebene.konvergiert
         if not ebene.konvergiert:
             erg.begruendung = erg.hinweis = (
+                self.wahl.art.ohne_ebene if ebene.verfehlt else
                 f"Keine Dehnungsebene für M = {fall.M_Ed.formatiert(1, KNM)} kNm, "
                 f"N = {fall.N_Ed.formatiert(1, KN)} kN → nicht aufnehmbar.")
             return erg

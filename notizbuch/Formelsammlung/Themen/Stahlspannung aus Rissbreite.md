@@ -1,5 +1,5 @@
 ---
-erzeugt: 5213b9a1e472
+erzeugt: f07757af6c6f
 art: thema
 tags: [thema]
 ---
@@ -27,6 +27,8 @@ Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer festgehaltenen
 Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.0 ‰ bis 45.0 ‰). Jenseits davon geben die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Halbierung liefe auf eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine Gleichgewichtslage – dann sagt der Nachweis das und rät nicht.
 
 Nachgewiesen wird deshalb nicht der Weg, sondern das Ergebnis: dass die gefundene Ebene genau die angegebenen Schnittgrössen erzeugt. Diese Probe steht bei jedem Fall.
+
+Erzeugt die gefundene Ebene die Einwirkung nicht, gibt es zu ihr keine Ebene, und der Nachweis sagt das, statt die Probe abzuhaken. Das kommt vor, wo ein Gesetz springt wie der Spannungsblock: bei viel Druck und wenig Moment liegt der Block immer ganz an einem Rand und gibt mehr Moment, als einwirkt.
 
 Mit dem Spannungsblock trägt der Beton unter (1 − 0.85)·ε\_c2d nichts. Unter Gebrauchslast liegt die Druckresultierende damit am Rand, und der Hebelarm wird beinahe d – die Stahlspannung kleiner, als der Querschnitt sie hat. Der Block ist ein Modell für den Bruch.
 

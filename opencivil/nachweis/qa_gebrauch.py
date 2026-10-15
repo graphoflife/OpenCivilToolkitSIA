@@ -71,6 +71,7 @@ from opencivil.nachweis.gebrauchsebene import (
     EINACHSIG, KEINE, SUCHE_DER_EBENE, Gebrauchsebene, gebrauchsebene, protokoll_ebene,
 )
 from opencivil.nachweis.mindestbewehrung import DICKENGRENZE, RISSBREITE
+from opencivil.nachweis.querschnittsloeser import VERFEHLTE_EBENE
 from opencivil.nachweis.rechenwahl import Rechenwahl, protokoll_rechenwahl, werte_nach_id
 from opencivil.nachweis.richtungsnachweise import (
     protokoll_rissmoment, protokoll_spannung_ungerissen, richtungen, rissbezuege, rissmoment,
@@ -201,6 +202,7 @@ class SpannungsbegrenzungQA(Nachweis):
                                            einachsig=self.einachsig)
         if not ebene.konvergiert:
             erg.begruendung = erg.hinweis = (
+                self.wahl.art.ohne_ebene if ebene.verfehlt else
                 f"Keine Dehnungsebene für N = {fall.N / 1e3:.1f} kN, "
                 f"M_y = {fall.M_y / 1e3:.1f} kNm"
                 + ("" if self.einachsig else f", M_z = {fall.M_z / 1e3:.1f} kNm")
@@ -285,6 +287,7 @@ class SpannungsbegrenzungQA(Nachweis):
         p.titel("Wie die Dehnungsebene gefunden wird", ebene=3)
         protokoll_dehnungsebene(p)
         p.erklaerung(EINACHSIG if self.einachsig else SUCHE_DER_EBENE)
+        p.erklaerung(VERFEHLTE_EBENE)
 
     def _protokoll_fall(self, p: Protokoll, e: Eingaben, staebe: Sequence[Stabangabe],
                         grenzen: Grenzen, erg: Fallergebnis) -> None:

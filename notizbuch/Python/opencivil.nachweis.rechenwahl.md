@@ -1,5 +1,5 @@
 ---
-erzeugt: 3beb8d0459a9
+erzeugt: 6c72e4308e2e
 art: modul
 tags: [modul]
 ---
@@ -124,6 +124,18 @@ def mit_block(self) -> bool
 ```
 
 Ob der Beton als Spannungsblock rechnet.
+
+#### Rechenart.ohne_ebene
+
+```python
+@property
+def ohne_ebene(self) -> str
+```
+
+Was statt der Probe dasteht, wenn die Suche ihre Ebene verfehlt
+([[opencivil.nachweis.querschnittsloeser#Ebene|verfehlt]]) --
+mit dem Spannungsblock bei viel Druck und wenig Moment. Mit der
+Parabel gibt es die Ebene dort.
 
 ### Rechenwahl
 

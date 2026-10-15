@@ -15,10 +15,11 @@ import unittest
 
 from opencivil.nachweis.gebrauchsebene import gebrauchsebene
 from opencivil.nachweis.mindestbewehrung import zulaessige_stahlspannung
-from opencivil.nachweis.rechenwahl import Rechenart
+from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
+from opencivil.nachweis.rechenwahl import Rechenart, Rechenwahl
 from opencivil.nachweis.spannungsbegrenzung import VORGABE
 from opencivil.nachweis.zustand2 import gerissen
-from opencivil.projekt import Projekt, ProjektFehler
+from opencivil.projekt import Projekt, ProjektFehler, RechenwahlEintrag
 from opencivil.projekt.querschnittsanalyse import (
     QAGebrauchsfallEintrag, QAGebrauchsliste, QuerschnittsanalyseEintrag,
 )
@@ -78,6 +79,51 @@ class TestFiktiverDurchmesser(unittest.TestCase):
         linie = aufbau.querschnittsanalysen["a1"].gruppen[0]
         self.assertAlmostEqual(fiktiver_durchmesser(linie) * 1e3,
                                math.sqrt(4.0 / math.pi * 150.0), places=9)
+
+
+class TestVerfehlteEbene(unittest.TestCase):
+    """
+    Wie bei der Platte: mit der 0.85·x-Vereinfachung gibt es bei viel Druck
+    und wenig Moment keine Ebene -- einachsig wie schief. Der Nachweis sagt
+    das, statt eine verfehlte Ebene abzuhaken.
+    """
+
+    BLOCK = Rechenwahl(satz=Werkstoffsatz.CHARAKTERISTISCH, art=Rechenart.BLOCK)
+
+    def stuetze(self):
+        """400 × 400, je drei ⌀16 oben und unten."""
+        return rechteck(unten=((50, 16, 3),), oben=((50, 16, 3),), b=400, h=400)
+
+    def test_die_ebene_ist_verfehlt(self):
+        p, _ = self.stuetze()
+        q = querschnitt(p, self.BLOCK)
+        for N, M_y, M_z, einachsig in ((-600e3, 10e3, 0.0, True),
+                                       (-1500e3, 10e3, 5e3, False)):
+            with self.subTest(N=N, einachsig=einachsig):
+                ebene = gebrauchsebene(q, N=N, M_y=M_y, M_z=M_z, einachsig=einachsig)
+                self.assertFalse(ebene.konvergiert)
+                self.assertTrue(ebene.verfehlt)
+
+    def test_mit_mehr_moment_gibt_es_sie(self):
+        p, _ = self.stuetze()
+        ebene = gebrauchsebene(querschnitt(p, self.BLOCK), N=-600e3, M_y=120e3, M_z=60e3,
+                               einachsig=False)
+        self.assertTrue(ebene.konvergiert)
+        self.assertAlmostEqual(ebene.N, -600e3, delta=1.0)
+        self.assertAlmostEqual(ebene.M_y, 120e3, delta=1.0)
+        self.assertAlmostEqual(ebene.M_z, 60e3, delta=1.0)
+
+    def test_der_nachweis_sagt_es(self):
+        p, a = self.stuetze()
+        a.quasistaendig.wahl = RechenwahlEintrag(werkstoffsatz="charakteristisch",
+                                                 rechenart="block")
+        a.quasistaendig.lastfall("Wenig Moment", N_Ed=-600.0, M_y_Ed=10.0)
+        aufbau, loesung = rechnen(p)
+        urteil = urteil_zu(loesung, aufbau.qa_spannung_riss["a1"], "Wenig Moment")
+        self.assertFalse(urteil.erfuellt)
+        self.assertEqual(urteil.begruendung,
+                         "Mit der 0.85·x-Vereinfachung gibt es zu dieser Einwirkung keine "
+                         "Dehnungsebene – präzise rechnen.")
 
 
 class TestDieEbene(unittest.TestCase):

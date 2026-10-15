@@ -110,7 +110,7 @@ from opencivil.core.wert import kennung_aus
 from opencivil.nachweis import dehnungsfaecher
 from opencivil.material.basis import mit_index
 from opencivil.nachweis.querschnittsloeser import (
-    Faserloeser, Querschnittsloeser, Werkstoffsatz, wirksamer_modul,
+    Ebene, Faserloeser, Querschnittsloeser, Werkstoffsatz, wirksamer_modul,
 )
 from opencivil.nachweis.rechenwahl import (
     Betonkennwerte, Rechenart, Rechenwahl, gesetze, stahllagen, staehle,
@@ -287,20 +287,22 @@ def _bild(loeser: Faserloeser, eps_m: float, chi: float) -> Querschnittsbild:
                             beton=beton, stahl=stahl)
 
 
-def aus_schnittgroessen(loeser: Faserloeser, *,
-                        N: float, M: float) -> Querschnittsbild:
+def aus_schnittgroessen(loeser: Faserloeser, *, N: float, M: float,
+                        art: Rechenart) -> Querschnittsbild:
     """
     Die Dehnungsebene zu ``N`` und ``M``, samt allem, was darauf steht.
 
     Gesucht wird mit demselben Verfahren wie in den Nachweisen. Findet sich
     keine Ebene, kommt das Bild leer zurueck und sagt warum -- geraten wird
-    nicht.
+    nicht. Verfehlt die Suche ihre Ebene, sagt es die Rechenart ``art``
+    (:attr:`Rechenart.ohne_ebene`).
     """
     ebene = loeser.loese(N_Ed=N, M_Ed=M)
     if not ebene.konvergiert:
         return Querschnittsbild(
             eps_m=0.0, chi=0.0, N=N, M=M, konvergiert=False,
-            hinweis=("Zu dieser Kombination gibt es keine Gleichgewichtslage: "
+            hinweis=(art.ohne_ebene if ebene.verfehlt else
+                     "Zu dieser Kombination gibt es keine Gleichgewichtslage: "
                      "der Querschnitt nimmt sie nicht auf."))
     return _bild(loeser, ebene.eps_m, ebene.chi)
 
@@ -788,6 +790,17 @@ def _linie(paar: Loeserpaar, weg: _Weg, art: Analyseart, fest: float,
     return linie
 
 
+def _durchlaufen(e: Ebene) -> bool:
+    """
+    Ob eine Linie die Ebene nimmt: gefunden -- oder verfehlt an einem Sprung
+    des Spannungsblocks (:attr:`Ebene.verfehlt`). Eine Linie fragt nach der
+    Verformung, bei der ihre Kraft einen Wert durchlaeuft; am Sprung ist das
+    seine Stelle, auch wenn dort keine Ebene die Kraft genau erzeugt. Ein
+    Nachweis dagegen braucht die Ebene selbst.
+    """
+    return e.konvergiert or e.verfehlt
+
+
 def moment_kruemmung(paar: Loeserpaar, *, N: float) -> Linie:
     """
     Die Momenten-Kruemmungs-Linie bei der Normalkraft ``N`` (Zug positiv):
@@ -802,7 +815,7 @@ def moment_kruemmung(paar: Loeserpaar, *, N: float) -> Linie:
 
     def verformung_bei(loeser: Faserloeser, M: float) -> Optional[float]:
         e = loeser.loese(N_Ed=N, M_Ed=M)
-        return e.chi if e.konvergiert else None
+        return e.chi if _durchlaufen(e) else None
 
     weg = _Weg(ebene=ebene, kraft=lambda e: gerissen.kraefte(*e).M,
                verformung_bei=verformung_bei,
@@ -838,7 +851,7 @@ def normalkraft_dehnung(paar: Loeserpaar, *, M: float) -> Linie:
 
     def verformung_bei(loeser: Faserloeser, N: float) -> Optional[float]:
         e = loeser.loese(N_Ed=N, M_Ed=M)
-        return e.eps_m if e.konvergiert else None
+        return e.eps_m if _durchlaufen(e) else None
 
     obergrenze = max(g.eps_max for g in gerissen.grenzen.grenzen if math.isfinite(g.eps_max))
     weg = _Weg(ebene=ebene, kraft=lambda e: gerissen.kraefte(*e).N,
@@ -1247,7 +1260,7 @@ def auswerten(fall, art: Analyseart, paar) -> Tuple[
         linie = normalkraft_dehnung(paar, M=fall.M_Ed * 1e3)
     else:
         return aus_schnittgroessen(paar.gerissen, N=fall.N_Ed * 1e3,
-                                   M=fall.M_Ed * 1e3), None
+                                   M=fall.M_Ed * 1e3, art=paar.wahl.art), None
     if art.modul:
         return None, aequivalenter_modul(linie, I_c=paar.I_c, A_c=paar.A_c, E_cm=paar.E_cm)
     return None, linie

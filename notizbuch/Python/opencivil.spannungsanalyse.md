@@ -1,5 +1,5 @@
 ---
-erzeugt: 0c073c542e3d
+erzeugt: 659d83247b13
 art: modul
 tags: [modul]
 ---
@@ -232,14 +232,15 @@ Dehnungen und Spannungen zu einer gegebenen Ebene -- ohne jede Suche.
 ### aus_schnittgroessen
 
 ```python
-def aus_schnittgroessen(loeser: Faserloeser, *, N: float, M: float) -> Querschnittsbild
+def aus_schnittgroessen(loeser: Faserloeser, *, N: float, M: float, art: Rechenart) -> Querschnittsbild
 ```
 
 Die Dehnungsebene zu `N` und `M`, samt allem, was darauf steht.
 
 Gesucht wird mit demselben Verfahren wie in den Nachweisen. Findet sich
 keine Ebene, kommt das Bild leer zurueck und sagt warum -- geraten wird
-nicht.
+nicht. Verfehlt die Suche ihre Ebene, sagt es die Rechenart `art`
+([[opencivil.nachweis.rechenwahl#Rechenart.ohne_ebene|Rechenart.ohne_ebene]]).
 
 ### aus_dehnungen
 
@@ -532,6 +533,18 @@ def _linie(paar: Loeserpaar, weg: _Weg, art: Analyseart, fest: float, riss: floa
 Die Linie von null bis zum Bruch: ungerissen bis `riss`, dort der
 Sprung, darueber gerissen -- ueber die Verformung gerechnet, mit dem
 Fliessbeginn als Punkt der Linie.
+
+### _durchlaufen
+
+```python
+def _durchlaufen(e: Ebene) -> bool
+```
+
+Ob eine Linie die Ebene nimmt: gefunden -- oder verfehlt an einem Sprung
+des Spannungsblocks ([[opencivil.nachweis.querschnittsloeser#Ebene|Ebene.verfehlt]]). Eine Linie fragt nach der
+Verformung, bei der ihre Kraft einen Wert durchlaeuft; am Sprung ist das
+seine Stelle, auch wenn dort keine Ebene die Kraft genau erzeugt. Ein
+Nachweis dagegen braucht die Ebene selbst.
 
 ### moment_kruemmung
 

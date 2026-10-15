@@ -44,6 +44,36 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-15 · Die Suche prüft ihre Ebene selbst
+
+Mit dem Spannungsblock -- Handrechnung und 0.85·x -- gibt es bei viel Druck
+und wenig Moment keine Dehnungsebene: der Block liegt immer ganz an einem
+Rand und gibt mehr Moment, als einwirkt. Die Suche endete dann an einem
+Sprung, meldete «gefunden», und die Mitschrift hakte die Probe ab. An einer
+Platte h = 250, ⌀12 oben und unten, quasi-ständig N = -600 kN, M = 14.5 kNm
+stand «N_int = -170.1 kN ✓, M_int = 1.4 kNm ✓»; das Bild «N, M» der Analyse
+zeigte eine Ebene mit -2490 kN. Präzise gibt es die Ebene. Gefunden bei der
+Durchsicht nach dem Knicken (siehe darunter), der Benutzer wählte die
+Abhilfe: die Suche prüft sich selbst.
+
+- **Eine Stelle:** `Faserloeser._mit_probe` hält N_int und M_int gegen das
+  Ziel. Die Schranke hängt am Querschnitt, nicht an der Last
+  (`probenschranken`): ein Millionstel der Druckkraft des ganzen
+  Querschnitts bei seiner Grenzstauchung, das Moment mal seiner Höhe. An
+  beiden Prüfprojekten bleiben 1684 gefundene Ebenen unter 0.4 % davon; eine
+  verfehlte liegt um Hunderte Kilonewton daneben. Trifft sie nicht, ist die
+  Ebene verfehlt (`Ebene.verfehlt`), nicht gefunden.
+- **Was dasteht:** `Rechenart.ohne_ebene` -- «Mit der 0.85·x-Vereinfachung
+  gibt es zu dieser Einwirkung keine Dehnungsebene – präzise rechnen.», bei
+  der Handrechnung entsprechend. Die Stahlspannungen der Platte und des
+  gezeichneten Querschnitts schreiben es statt der Probe, der Fall ist nicht
+  erfüllt; das Bild «N, M» sagt dasselbe. Die schiefe Biegung prüft am Ende
+  auch ihre Neigung, an M_y und M_z.
+- **Die Linien bleiben, wie sie waren:** eine M-χ-Linie fragt nur, bei
+  welcher Krümmung das Moment seinen Wert durchläuft -- am Sprung ist das
+  seine Stelle (`spannungsanalyse._durchlaufen`). Ihre Zahlen sind
+  unverändert.
+
 ## 2026-10-15 · Verformung beim Knicken nur noch präzise
 
 Die Verformung beim Knicken -- die Ausmitte e_2d -- rechnet nur noch präzise,

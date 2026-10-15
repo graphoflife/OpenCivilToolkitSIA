@@ -54,7 +54,7 @@ class TestBildUndDehnungen(unittest.TestCase):
                             (Zugseite.OBEN, 0.0, 40e3)):
             paar = paar_von(p, "a1", seite)
             g = paar.gerissen
-            hin = sa.aus_schnittgroessen(g, N=N, M=M)
+            hin = sa.aus_schnittgroessen(g, N=N, M=M, art=paar.wahl.art)
             with self.subTest(seite=seite.value):
                 self.assertTrue(hin.konvergiert)
                 zurueck = sa.aus_dehnungen(g, eps_oben=hin.eps_m + hin.chi * g.oben,

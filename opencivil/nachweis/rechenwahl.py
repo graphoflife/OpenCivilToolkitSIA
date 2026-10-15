@@ -123,6 +123,19 @@ class Rechenart(str, Enum):
         """Ob der Beton als Spannungsblock rechnet."""
         return self in (Rechenart.HANDRECHNUNG, Rechenart.BLOCK)
 
+    @property
+    def ohne_ebene(self) -> str:
+        """
+        Was statt der Probe dasteht, wenn die Suche ihre Ebene verfehlt
+        (:attr:`~opencivil.nachweis.querschnittsloeser.Ebene.verfehlt`) --
+        mit dem Spannungsblock bei viel Druck und wenig Moment. Mit der
+        Parabel gibt es die Ebene dort.
+        """
+        if self.mit_block:
+            return (f"Mit der {self.beschriftung} gibt es zu dieser Einwirkung keine "
+                    f"Dehnungsebene – präzise rechnen.")
+        return "Die gefundene Dehnungsebene erzeugt diese Einwirkung nicht."
+
 
 #: Was die Tragsicherheit anbietet.
 RECHENARTEN = (Rechenart.HANDRECHNUNG, Rechenart.BLOCK, Rechenart.PARABEL)

@@ -38,6 +38,19 @@ class TestRechenarten(unittest.TestCase):
         wahl = Rechenwahl.aus(1.5, "charakteristisch", "parabel")
         self.assertEqual(wahl, Rechenwahl(1.5, Werkstoffsatz.CHARAKTERISTISCH, Rechenart.PARABEL))
 
+    def test_ohne_ebene_nennt_die_wahl(self):
+        """Verfehlt die Suche ihre Ebene, steht da, womit -- und was hilft."""
+        self.assertEqual(Rechenart.BLOCK.ohne_ebene,
+                         "Mit der 0.85·x-Vereinfachung gibt es zu dieser Einwirkung keine "
+                         "Dehnungsebene – präzise rechnen.")
+        self.assertEqual(Rechenart.HANDRECHNUNG.ohne_ebene,
+                         "Mit der Handrechnung gibt es zu dieser Einwirkung keine "
+                         "Dehnungsebene – präzise rechnen.")
+        # Ohne Sprung gibt es die Ebene; verfehlt die Suche sie trotzdem, steht
+        # kein Rat da, der nicht hilft.
+        for art in (Rechenart.PARABEL, Rechenart.ELASTISCH):
+            self.assertNotIn("präzise rechnen", art.ohne_ebene)
+
     def test_nur_parabel_und_elastisch_haengen_an_der_kriechzahl(self):
         for art in SPANNUNGSARTEN:
             with self.subTest(art=art.value):

@@ -5,7 +5,7 @@ import unittest
 
 from opencivil.nachweis.querschnittsloeser import (
     Querschnittsloeser, QuerschnittsloeserIllinois, Stahllage, beton_elastisch,
-    beton_nichtlinear, stahl_bilinear,
+    beton_nichtlinear, probenschranken, stahl_bilinear,
 )
 from opencivil.nachweis.zustand2 import gerissen, wertigkeit
 from opencivil.querschnitt.werkstoffgesetz import Spannungsblock, Stahlgesetz
@@ -210,6 +210,64 @@ class TestGrenzen(unittest.TestCase):
             self.assertLessEqual(nachher, vorher + 1e-6)
         self.assertAlmostEqual(gesetz(-0.001) / 1e6, -15.0, places=9)
         self.assertAlmostEqual(gesetz(-0.002) / 1e6, -30.0, places=9)
+
+
+class TestVerfehlteEbene(unittest.TestCase):
+    """
+    Mit dem Spannungsblock gibt es bei viel Druck und wenig Moment keine
+    Ebene: der Block liegt immer ganz an einem Rand und gibt mehr Moment, als
+    einwirkt. Die Suche endet dann an einem Sprung. Bis 2026-10-15 kam ihre
+    Ebene als gefunden zurück -- mit -219 statt -600 kN, und die Mitschrift
+    hakte die Probe ab.
+    """
+
+    STAHL = stahl(E_s=200e9, f_sd=435e6)
+    BLOCK = Spannungsblock(f_cd=20e6, eps_c2d=0.003)
+
+    def loeser(self, klasse=Querschnittsloeser, beton=None):
+        """h = 250 mm, b = 1 m, je 1131 mm² oben und unten."""
+        return klasse(
+            h=0.25, b=1.0,
+            lagen=[Stahllage(a_s=1131e-6, z=0.025, stahl=self.STAHL, nummer=1),
+                   Stahllage(a_s=1131e-6, z=0.225, stahl=self.STAHL, nummer=2)],
+            beton=beton or self.BLOCK, gemittelt=beton is None)
+
+    def test_viel_druck_und_wenig_moment_ist_verfehlt(self):
+        for klasse in (Querschnittsloeser, QuerschnittsloeserIllinois):
+            with self.subTest(klasse=klasse.__name__):
+                ebene = self.loeser(klasse).loese(N_Ed=-600e3, M_Ed=14.5e3)
+                self.assertFalse(ebene.konvergiert)
+                self.assertTrue(ebene.verfehlt)
+                # Was die verfehlte Ebene erzeugt: weit weg von der Einwirkung.
+                self.assertGreater(abs(ebene.N_int + 600e3), 100e3)
+
+    def test_wo_es_die_ebene_gibt_trifft_sie(self):
+        loeser = self.loeser()
+        for N, M in ((-600e3, 80e3), (0.0, 20e3), (-100e3, 0.0)):
+            with self.subTest(N=N, M=M):
+                ebene = loeser.loese(N_Ed=N, M_Ed=M)
+                self.assertTrue(ebene.konvergiert)
+                self.assertFalse(ebene.verfehlt)
+                self.assertAlmostEqual(ebene.N_int, N, delta=1.0)
+                self.assertAlmostEqual(ebene.M_int, M, delta=1.0)
+
+    def test_mit_der_parabel_gibt_es_sie(self):
+        parabel = beton_nichtlinear(f_cd=20e6, E_c=33.62e9, eps_c1d=0.002, eps_c2d=0.003)
+        ebene = self.loeser(beton=parabel).loese(N_Ed=-600e3, M_Ed=14.5e3)
+        self.assertTrue(ebene.konvergiert)
+        self.assertAlmostEqual(ebene.N_int, -600e3, delta=1.0)
+        self.assertAlmostEqual(ebene.M_int, 14.5e3, delta=1.0)
+
+    def test_die_schranken_haengen_am_querschnitt(self):
+        """
+        Ein Millionstel der Druckkraft bei der Grenzstauchung -- Beton ohne
+        die Fläche der Stäbe, Stahl an der Fliessgrenze --, das Moment mal h.
+        """
+        loeser = self.loeser()
+        druck = 20e6 * (0.25 - 2 * 1131e-6) + 435e6 * 2 * 1131e-6
+        dN, dM = probenschranken(loeser.querschnitt, loeser.grenzen)
+        self.assertAlmostEqual(dN, 1e-6 * druck, delta=1e-9)
+        self.assertAlmostEqual(dM, 1e-6 * druck * 0.25, delta=1e-9)
 
 
 class TestIllinoisMitWarmstart(unittest.TestCase):

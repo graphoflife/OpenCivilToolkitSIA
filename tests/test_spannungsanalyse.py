@@ -63,6 +63,36 @@ def ebene_am_ende(paar, linie):
     return paar.gerissen.mitteldehnung(chi, linie.fest), chi
 
 
+class TestVerfehlteEbene(unittest.TestCase):
+    """
+    Mit der 0.85·x-Vereinfachung gibt es bei viel Druck und wenig Moment
+    keine Ebene. Das Bild sagt es; bis 2026-10-15 zeigte es eine Ebene mit
+    -2490 statt -600 kN. Die Linie dagegen läuft durch den Sprung wie bisher:
+    sie fragt nur, bei welcher Krümmung das Moment seinen Wert durchläuft.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.paar = loeserpaar(art=Rechenart.BLOCK)
+
+    def test_das_bild_sagt_es(self):
+        bild = sa.aus_schnittgroessen(self.paar.gerissen, N=-1500e3, M=10e3,
+                                      art=self.paar.wahl.art)
+        self.assertFalse(bild.konvergiert)
+        self.assertEqual(bild.hinweis, Rechenart.BLOCK.ohne_ebene)
+
+    def test_mit_mehr_moment_gibt_es_das_bild(self):
+        bild = sa.aus_schnittgroessen(self.paar.gerissen, N=-1500e3, M=200e3,
+                                      art=self.paar.wahl.art)
+        self.assertTrue(bild.konvergiert)
+        self.assertAlmostEqual(bild.N, -1500e3, delta=1.0)
+
+    def test_die_linie_laeuft_durch_den_sprung(self):
+        linie = sa.moment_kruemmung(self.paar, N=-1500e3)
+        self.assertIsNotNone(linie.bruch)
+        self.assertTrue(any(p.gerissen for p in linie.punkte))
+
+
 class TestDieDreiPassenZueinander(unittest.TestCase):
     def setUp(self):
         paar = loeserpaar()
@@ -71,7 +101,7 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
     def test_die_ebene_erzeugt_die_eingegebenen_schnittgroessen(self):
         """Die Probe -- dieselbe, die auch in den Herleitungen steht."""
         for N, M in ((0.0, 150e3), (-500e3, 120e3), (200e3, 60e3), (0.0, -60e3)):
-            bild = sa.aus_schnittgroessen(self.gerissen, N=N, M=M)
+            bild = sa.aus_schnittgroessen(self.gerissen, N=N, M=M, art=Rechenart.PARABEL)
             with self.subTest(N=N / 1e3, M=M / 1e3):
                 self.assertTrue(bild.konvergiert)
                 self.assertAlmostEqual(bild.N, N, delta=max(500.0, abs(N) * 1e-4))
@@ -82,7 +112,7 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
         Aus N und M eine Ebene, aus deren Randdehnungen wieder N und M. Das
         ist die Zusage, die die beiden Richtungen überhaupt verbindet.
         """
-        hin = sa.aus_schnittgroessen(self.gerissen, N=-300e3, M=140e3)
+        hin = sa.aus_schnittgroessen(self.gerissen, N=-300e3, M=140e3, art=Rechenart.PARABEL)
         zurueck = sa.aus_dehnungen(
             self.gerissen,
             eps_oben=hin.beton[0].eps, eps_unten=hin.beton[-1].eps)
@@ -96,7 +126,7 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
         z = 0 ist die Oberkante -- dieselbe Achse wie im Lagenaufbau. Wäre sie
         gedreht, stünde das Bild kopf und passte nicht zum Nachweis daneben.
         """
-        bild = sa.aus_schnittgroessen(self.gerissen, N=0.0, M=150e3)
+        bild = sa.aus_schnittgroessen(self.gerissen, N=0.0, M=150e3, art=Rechenart.PARABEL)
         oben, unten = bild.beton[0], bild.beton[-1]
         self.assertEqual(oben.z, 0.0)
         self.assertGreater(unten.z, oben.z)
@@ -109,13 +139,13 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
         self.assertGreater(erste.sigma, 0.0)
 
     def test_der_beton_traegt_keinen_zug(self):
-        bild = sa.aus_schnittgroessen(self.gerissen, N=0.0, M=150e3)
+        bild = sa.aus_schnittgroessen(self.gerissen, N=0.0, M=150e3, art=Rechenart.PARABEL)
         gezogen = [f for f in bild.beton if f.eps > 0]
         self.assertTrue(gezogen)
         self.assertTrue(all(f.sigma == 0.0 for f in gezogen))
 
     def test_die_nulllinie_liegt_zwischen_den_raendern(self):
-        bild = sa.aus_schnittgroessen(self.gerissen, N=0.0, M=150e3)
+        bild = sa.aus_schnittgroessen(self.gerissen, N=0.0, M=150e3, art=Rechenart.PARABEL)
         self.assertIsNotNone(bild.nulllinie)
         self.assertGreater(bild.nulllinie, 0.0)
         self.assertLess(bild.nulllinie, self.gerissen.h)
@@ -141,7 +171,7 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
         self.assertGreater(abs(unten.kraft), abs(oben.kraft))
 
     def test_eine_unmoegliche_kombination_sagt_das(self):
-        bild = sa.aus_schnittgroessen(self.gerissen, N=0.0, M=5000e3)
+        bild = sa.aus_schnittgroessen(self.gerissen, N=0.0, M=5000e3, art=Rechenart.PARABEL)
         self.assertFalse(bild.konvergiert)
         self.assertIn("Gleichgewichtslage", bild.hinweis)
 
@@ -258,7 +288,8 @@ class TestMomentenKruemmung(unittest.TestCase):
         """
         def randspannung(N):
             bild = sa.aus_schnittgroessen(self.paar.ungerissen, N=N,
-                                          M=self.paar.rissmoment_bei(N))
+                                          M=self.paar.rissmoment_bei(N),
+                                          art=self.paar.wahl.art)
             return bild.beton[-1].sigma
         ohne = randspannung(0.0)
         for N in (-200e3, 100e3):
@@ -467,7 +498,7 @@ class TestWahl(unittest.TestCase):
         60 kNm gab es keine Gleichgewichtslage. Bis 2026-10-09.
         """
         k = loeserpaar(satz=Werkstoffsatz.CHARAKTERISTISCH)
-        bild = sa.aus_schnittgroessen(k.gerissen, N=0.0, M=60e3)
+        bild = sa.aus_schnittgroessen(k.gerissen, N=0.0, M=60e3, art=k.wahl.art)
         self.assertTrue(bild.konvergiert)
         self.assertAlmostEqual(max(s.sigma for s in bild.stahl) / 1e6, 114.7, delta=0.1)
 

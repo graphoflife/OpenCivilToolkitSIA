@@ -30,12 +30,12 @@ SI-Basis.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Optional, Tuple
 
 from opencivil.core.latex import angabe, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.nachweis.querschnittsloeser import FaserloeserIllinois
+from opencivil.nachweis.querschnittsloeser import FaserloeserIllinois, probenschranken
 from opencivil.querschnitt.interaktion import Querschnitt, illinois
 
 #: Wie weit sich die Neigung ψ der Ebene unter Gebrauchslast von der
@@ -73,26 +73,37 @@ class Gebrauchsebene:
 
     konvergiert: bool = True
 
+    verfehlt: bool = False
+    """
+    Ob die Suche an einem Sprung haengen blieb, statt eine Ebene zu finden --
+    wie :attr:`~opencivil.nachweis.querschnittsloeser.Ebene.verfehlt`.
+    """
+
 
 #: Wenn sich keine Ebene findet.
 KEINE = Gebrauchsebene(psi=0.0, eps_m=0.0, chi=0.0, N=0.0, M_y=0.0, M_z=0.0,
                        eps_s=(), sigma_s=(), konvergiert=False)
 
+#: Wenn die Suche ihre Ebene verfehlt -- mit dem Spannungsblock bei viel
+#: Druck und wenig Moment.
+VERFEHLT = replace(KEINE, verfehlt=True)
+
 
 def _bei_neigung(q: Querschnitt, psi: float, N: float, M_y: float,
-                 M_z: float) -> Optional[Tuple[Gebrauchsebene, float]]:
+                 M_z: float) -> Tuple[Gebrauchsebene, float]:
     """
     Die Ebene bei dieser Neigung, die N und das Moment in Zugrichtung traegt
     -- und was ihr am Moment entlang der Nulllinie noch fehlt. Mit
     ``M = -(n_z·M_y + n_y·M_z)`` und ``M_quer = -(n_y·M_y - n_z·M_z)``, den
     Umkehrungen von :meth:`~opencivil.querschnitt.interaktion.Richtung.momente`.
+    Ohne Ebene :data:`KEINE` oder :data:`VERFEHLT`, und es fehlt ``nan``.
     """
     r = q.richtung(psi)
     n_y, n_z = r.n
     loesung = FaserloeserIllinois(querschnitt=r.fasern, grenzen=r.grenzen).loese(
         N_Ed=N, M_Ed=-(n_z * M_y + n_y * M_z))
     if not loesung.konvergiert:
-        return None
+        return (VERFEHLT if loesung.verfehlt else KEINE), math.nan
     k = r.fasern.kraefte(loesung.eps_m, loesung.chi)
     m_y, m_z = r.momente(k.N, k.M, k.M_quer)
     ebene = Gebrauchsebene(psi=r.psi, eps_m=loesung.eps_m, chi=loesung.chi, N=k.N,
@@ -113,26 +124,43 @@ def gebrauchsebene(q: Querschnitt, *, N: float, M_y: float, M_z: float,
     weg, wird nach beiden Seiten mit wachsenden Schritten eingegrenzt
     (:data:`NEIGUNGSSCHRITTE`), wie beim Widerstand in einer Momentenrichtung
     (:meth:`~opencivil.querschnitt.interaktion.Querschnitt.in_richtung`).
+    Ohne Ebene :data:`KEINE` -- oder :data:`VERFEHLT`, wo die Suche an einem
+    Sprung haengen blieb.
     """
     if einachsig:
-        gefunden = _bei_neigung(q, -math.pi / 2.0 if M_y >= 0.0 else math.pi / 2.0,
-                                N, M_y, 0.0)
-        return gefunden[0] if gefunden else KEINE
+        return _bei_neigung(q, -math.pi / 2.0 if M_y >= 0.0 else math.pi / 2.0,
+                            N, M_y, 0.0)[0]
 
     schranke = QUER_SCHRANKE * max(abs(M_y), abs(M_z), abs(N) * 1.0, 1.0)
+    # Was am Ende ohne Ebene dasteht: verfehlt, sobald eine Neigung an einem
+    # Sprung haengen blieb.
+    ohne = KEINE
 
     def abweichung(psi: float):
-        gefunden = _bei_neigung(q, psi, N, M_y, M_z)
-        return (math.nan, None) if gefunden is None else (gefunden[1], gefunden[0])
+        nonlocal ohne
+        ebene, fehlt = _bei_neigung(q, psi, N, M_y, M_z)
+        if not ebene.konvergiert:
+            ohne = VERFEHLT if ebene.verfehlt else ohne
+            return math.nan, None
+        return fehlt, ebene
 
     def eingegrenzt(a: float, fa: float, b: float, fb: float) -> Gebrauchsebene:
-        return illinois(abweichung, a, fa, b, fb, schranke_x=1e-12,
-                        schranke_f=schranke) or KEINE
+        ebene = illinois(abweichung, a, fa, b, fb, schranke_x=1e-12, schranke_f=schranke)
+        if ebene is None:
+            return ohne
+        # Auch die Neigung hat ihre Probe, an dem, was dasteht: endet die
+        # Suche an einem Sprung, verfehlt die Ebene M_y oder M_z um mehr, als
+        # Neigung und Ebene verfehlen duerfen.
+        r = q.richtung(ebene.psi)
+        erlaubt = schranke + probenschranken(r.fasern, r.grenzen)[1]
+        if abs(ebene.M_y - M_y) <= erlaubt and abs(ebene.M_z - M_z) <= erlaubt:
+            return ebene
+        return VERFEHLT
 
     mitte = Querschnitt.neigung_fuer(M_y, M_z) if start is None else start
     fa, ebene = abweichung(mitte)
     if ebene is None:
-        return KEINE
+        return ohne
     if abs(fa) <= schranke:
         return ebene
 
@@ -167,7 +195,7 @@ def gebrauchsebene(q: Querschnitt, *, N: float, M_y: float, M_z: float,
             if (fb > 0.0) != (fx > 0.0):
                 return eingegrenzt(x, fx, b, fb)
             zuletzt[seite] = (b, fb)
-    return KEINE
+    return ohne
 
 
 #: Wie die Ebene unter Gebrauchslast gefunden wird -- bei schiefer Biegung.

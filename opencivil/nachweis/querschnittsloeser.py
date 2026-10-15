@@ -36,6 +36,16 @@ herauskommt. Wer das nachrechnen will, integriert zwei Mal ueber die Hoehe --
 das geht von Hand. Den Weg dorthin muss er nicht nachvollziehen. Dasselbe
 Vorgehen wie bei der Neigungssuche des Querkraftnachweises.
 
+Die Probe rechnet der Loeser auch selbst (:meth:`Faserloeser._mit_probe`):
+die Suchen enden, wo ihr Fenster eng genug ist, und erst die Probe sagt, ob
+dort ``N_Ed`` und ``M_Ed`` herauskommen. Springt ein Gesetz -- der
+Spannungsblock --, endet eine Suche auch an einem Sprung, wo es keine Ebene
+gibt. Dann ist sie verfehlt (:attr:`Ebene.verfehlt`), und der Nachweis sagt
+das statt der Probe. Bis 2026-10-15 stand die Probe dort trotzdem, mit
+Haekchen: an einer Platte h = 250 mm, ⌀12 oben und unten, unter
+N = -600 kN und M = 14.5 kNm erzeugte die Ebene der 0.85·x-Vereinfachung
+mit charakteristischen Werten -170 kN und 1.4 kNm.
+
 VORZEICHEN:
     eps > 0   Zug
     N   > 0   Zug
@@ -59,8 +69,9 @@ Alles in SI-Basis.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import Enum
+from functools import cached_property
 from typing import Callable, List, Optional, Sequence, Tuple
 
 from opencivil.core.protokoll import Zwischenwerte
@@ -87,6 +98,14 @@ EPS_SCHRANKE = 1e-11
 
 #: Dasselbe fuer die Kruemmung, in 1/m.
 CHI_SCHRANKE = 1e-10
+
+#: Wie genau die gefundene Ebene ihre Schnittgroessen treffen muss -- als Teil
+#: der Druckkraft des ganzen Querschnitts bei seiner Grenzstauchung, beim
+#: Moment mal seiner Hoehe (:func:`probenschranken`). Die Suchen treffen weit
+#: genauer: in den beiden Pruefprojekten bleiben 1684 Ebenen unter 0.4 % der
+#: Schranke (2026-10-15). Eine Ebene, die an einem Sprung des Spannungsblocks
+#: haengen bleibt, liegt um Hunderte Kilonewton daneben.
+PROBE_SCHRANKE = 1e-6
 
 #: Aeusserste Dehnungen, innerhalb derer gesucht wird -- Stauchung und
 #: Dehnung. **Der Suchbereich muss im gueltigen Bereich beider Gesetze
@@ -200,6 +219,17 @@ class Ebene:
 
     konvergiert: bool = True
 
+    verfehlt: bool = False
+    """
+    Die Suche lief zu Ende, aber ihre Ebene erzeugt die Einwirkung nicht: sie
+    blieb an einem Sprung haengen, wie ihn der Spannungsblock hat. Bei viel
+    Druck und wenig Moment liegt der Block immer ganz an einem Rand und gibt
+    mehr Moment, als einwirkt -- dazwischen gibt es keine Ebene. Dann ist
+    ``konvergiert`` falsch, und ``eps_m`` und ``chi`` sind die Stelle des
+    Sprungs, durch die eine Linie laeuft
+    (:func:`~opencivil.spannungsanalyse.moment_kruemmung`).
+    """
+
     def bei(self, z: float, h: float) -> float:
         """Die Dehnung in der Tiefe ``z``."""
         return self.eps_m + self.chi * (z - h / 2.0)
@@ -278,6 +308,35 @@ def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float,
         "die gefundene Ebene genau die angegebenen Schnittgrössen erzeugt. "
         "Diese Probe steht bei jedem Fall."
     )
+    p.erklaerung(VERFEHLTE_EBENE)
+
+
+#: Was die Mitschrift ueber eine verfehlte Ebene sagt (:attr:`Ebene.verfehlt`)
+#: -- bei der Platte wie am gezeichneten Querschnitt.
+VERFEHLTE_EBENE = (
+    "Erzeugt die gefundene Ebene die Einwirkung nicht, gibt es zu ihr keine "
+    "Ebene, und der Nachweis sagt das, statt die Probe abzuhaken. Das kommt "
+    "vor, wo ein Gesetz springt wie der Spannungsblock: bei viel Druck und "
+    "wenig Moment liegt der Block immer ganz an einem Rand und gibt mehr "
+    "Moment, als einwirkt."
+)
+
+
+def probenschranken(querschnitt: Faserquerschnitt,
+                    grenzen: Dehnungsgrenzen) -> Tuple[float, float]:
+    """
+    Wie weit ``N_int`` und ``M_int`` einer gefundenen Ebene neben dem Ziel
+    liegen duerfen (:data:`PROBE_SCHRANKE`): gemessen an der Druckkraft des
+    ganzen Querschnitts bei seiner Grenzstauchung, das Moment dazu mal seiner
+    Hoehe. Am Querschnitt, nicht an der Einwirkung: wie genau eine Suche
+    trifft, haengt an ihm -- eine kleine Last auf einem grossen Querschnitt
+    trifft sie nicht genauer.
+    """
+    # Bei chi = 0 bleibt immer ein Fenster: jede Grenze laesst die Dehnung null zu.
+    gestaucht, _ = grenzen.fenster(0.0)
+    druck = abs(querschnitt.kraefte(gestaucht, 0.0).N)
+    arme = [g.arm for g in grenzen.grenzen]
+    return PROBE_SCHRANKE * druck, PROBE_SCHRANKE * druck * (max(arme) - min(arme))
 
 
 def plattenfasern(
@@ -473,7 +532,23 @@ class Faserloeser:
         eps_m = self._eps_zu_normalkraft(chi, N_Ed)
         if eps_m is None:
             return self._ergebnis(0.0, 0.0, konvergiert=False)
-        return self._ergebnis(eps_m, chi)
+        return self._mit_probe(eps_m, chi, N_Ed, M_Ed)
+
+    @cached_property
+    def _probenschranken(self) -> Tuple[float, float]:
+        """:func:`probenschranken` dieses Querschnitts -- einmal gerechnet."""
+        return probenschranken(self.querschnitt, self.grenzen)
+
+    def _mit_probe(self, eps_m: float, chi: float, N_Ed: float, M_Ed: float) -> Ebene:
+        """
+        Die gefundene Ebene, mit ihrer Probe: erzeugt sie ``N_Ed`` und
+        ``M_Ed`` nicht, ist sie verfehlt (:attr:`Ebene.verfehlt`).
+        """
+        ebene = self._ergebnis(eps_m, chi)
+        dN, dM = self._probenschranken
+        if abs(ebene.N_int - N_Ed) <= dN and abs(ebene.M_int - M_Ed) <= dM:
+            return ebene
+        return replace(ebene, konvergiert=False, verfehlt=True)
 
     def _suchen(self, f: Callable[[float], Optional[float]], unten: float, oben: float,
                 schranke: float, f_unten: Optional[float] = None,
@@ -673,14 +748,15 @@ class FaserloeserIllinois(Faserloeser):
         """
         Die Dehnungsebene -- von der zuletzt gefundenen Kruemmung aus
         eingegrenzt, wo es eine gibt, sonst wie jeder :class:`Faserloeser`.
-        Was die naechste Suche nicht eingrenzen kann, sucht sie von vorn.
+        Was die naechste Suche nicht eingrenzen kann oder verfehlt, sucht sie
+        von vorn.
         """
         if self.halbiert:
             return super().loese(N_Ed=N_Ed, M_Ed=M_Ed)
         ebene = None
         if self._zuletzt is not None and not (N_Ed == 0.0 and M_Ed == 0.0):
             ebene = self._von_zuletzt(N_Ed, M_Ed, self._zuletzt)
-        if ebene is None:
+        if ebene is None or ebene.verfehlt:
             ebene = super().loese(N_Ed=N_Ed, M_Ed=M_Ed)
         if ebene.konvergiert:
             self._zuletzt = ebene.chi
@@ -690,7 +766,8 @@ class FaserloeserIllinois(Faserloeser):
         """
         Von ``chi`` aus mit wachsenden Schritten, bis das Moment die Seite
         wechselt -- das Moment waechst mit der Kruemmung --, dann Illinois.
-        ``None``, wo unterwegs keine Ebene die Normalkraft traegt.
+        ``None``, wo unterwegs keine Ebene die Normalkraft traegt; die Ebene
+        mit ihrer Probe, die auch verfehlt sein kann (:meth:`_mit_probe`).
         """
         def zu_viel(k: float) -> Optional[float]:
             eps_m = self._eps_zu_normalkraft(k, N_Ed)
@@ -721,7 +798,7 @@ class FaserloeserIllinois(Faserloeser):
         if gefunden is None:
             return None
         eps_m = self._eps_zu_normalkraft(gefunden, N_Ed)
-        return None if eps_m is None else self._ergebnis(eps_m, gefunden)
+        return None if eps_m is None else self._mit_probe(eps_m, gefunden, N_Ed, M_Ed)
 
     def _suchen(self, f: Callable[[float], Optional[float]], unten: float, oben: float,
                 schranke: float, f_unten: Optional[float] = None,

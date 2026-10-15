@@ -1,5 +1,5 @@
 ---
-erzeugt: 8de0a0e461a4
+erzeugt: bb5f163151ad
 art: modul
 tags: [modul]
 ---
@@ -48,6 +48,16 @@ und der Nachweis, dass mit ihr `N_int = N_Ed` und `M_int = M_Ed`
 herauskommt. Wer das nachrechnen will, integriert zwei Mal ueber die Hoehe --
 das geht von Hand. Den Weg dorthin muss er nicht nachvollziehen. Dasselbe
 Vorgehen wie bei der Neigungssuche des Querkraftnachweises.
+
+Die Probe rechnet der Loeser auch selbst ([[opencivil.nachweis.querschnittsloeser#Faserloeser._mit_probe|Faserloeser._mit_probe]]):
+die Suchen enden, wo ihr Fenster eng genug ist, und erst die Probe sagt, ob
+dort `N_Ed` und `M_Ed` herauskommen. Springt ein Gesetz -- der
+Spannungsblock --, endet eine Suche auch an einem Sprung, wo es keine Ebene
+gibt. Dann ist sie verfehlt ([[opencivil.nachweis.querschnittsloeser#Ebene|Ebene.verfehlt]]), und der Nachweis sagt
+das statt der Probe. Bis 2026-10-15 stand die Probe dort trotzdem, mit
+Haekchen: an einer Platte h = 250 mm, ⌀12 oben und unten, unter
+N = -600 kN und M = 14.5 kNm erzeugte die Ebene der 0.85·x-Vereinfachung
+mit charakteristischen Werten -170 kN und 1.4 kNm.
 
 
 ## VORZEICHEN
@@ -142,6 +152,7 @@ Die gefundene Dehnungsebene samt Proberechnung.
 - `sigma_s: Tuple[float, ...]` – Stahlspannung je Lage, in Pa.
 - `eps_s: Tuple[float, ...]` – Stahldehnung je Lage.
 - `konvergiert: bool = True`
+- `verfehlt: bool = False` – Die Suche lief zu Ende, aber ihre Ebene erzeugt die Einwirkung nicht: sie blieb an einem Sprung haengen, wie ihn der Spannungsblock hat. Bei viel Druck und wenig Moment liegt der Block immer ganz an einem Rand und gibt mehr Moment, als einwirkt -- dazwischen gibt es keine Ebene. Dann ist `konvergiert` falsch, und `eps_m` und `chi` sind die Stelle des Sprungs, durch die eine Linie laeuft ([[opencivil.spannungsanalyse#moment_kruemmung|moment_kruemmung]]).
 
 #### Ebene.bei
 
@@ -185,6 +196,19 @@ abzudrucken hiesse, hundert Zeilen zu zeigen, von denen nur die letzte
 etwas behauptet -- und die wird ohnehin durch die Probe belegt. Wie
 gesucht wird, sagt der Loeser selbst (`suche`, sein
 [[opencivil.nachweis.querschnittsloeser#Faserloeser.suche|Faserloeser.suche]]); ohne Angabe das Halbieren.
+
+### probenschranken
+
+```python
+def probenschranken(querschnitt: Faserquerschnitt, grenzen: Dehnungsgrenzen) -> Tuple[float, float]
+```
+
+Wie weit `N_int` und `M_int` einer gefundenen Ebene neben dem Ziel
+liegen duerfen ([[opencivil.nachweis.querschnittsloeser#Konstanten|PROBE_SCHRANKE]]): gemessen an der Druckkraft des
+ganzen Querschnitts bei seiner Grenzstauchung, das Moment dazu mal seiner
+Hoehe. Am Querschnitt, nicht an der Einwirkung: wie genau eine Suche
+trifft, haengt an ihm -- eine kleine Last auf einem grossen Querschnitt
+trifft sie nicht genauer.
 
 ### plattenfasern
 
@@ -294,6 +318,24 @@ bestimmt, dass die Normalkraft stimmt, und das uebrig bleibende Moment
 gegen `M_Ed` gehalten. `M(chi)` waechst monoton -- mehr Kruemmung
 heisst mehr Moment --, solange der Querschnitt nicht versagt.
 
+#### Faserloeser._probenschranken
+
+```python
+@cached_property
+def _probenschranken(self) -> Tuple[float, float]
+```
+
+[[opencivil.nachweis.querschnittsloeser#probenschranken|probenschranken]] dieses Querschnitts -- einmal gerechnet.
+
+#### Faserloeser._mit_probe
+
+```python
+def _mit_probe(self, eps_m: float, chi: float, N_Ed: float, M_Ed: float) -> Ebene
+```
+
+Die gefundene Ebene, mit ihrer Probe: erzeugt sie `N_Ed` und
+`M_Ed` nicht, ist sie verfehlt ([[opencivil.nachweis.querschnittsloeser#Ebene|Ebene.verfehlt]]).
+
 #### Faserloeser._suchen
 
 ```python
@@ -399,7 +441,8 @@ def loese(self, *, N_Ed: float, M_Ed: float) -> Ebene
 
 Die Dehnungsebene -- von der zuletzt gefundenen Kruemmung aus
 eingegrenzt, wo es eine gibt, sonst wie jeder [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]].
-Was die naechste Suche nicht eingrenzen kann, sucht sie von vorn.
+Was die naechste Suche nicht eingrenzen kann oder verfehlt, sucht sie
+von vorn.
 
 #### FaserloeserIllinois._von_zuletzt
 
@@ -409,7 +452,8 @@ def _von_zuletzt(self, N_Ed: float, M_Ed: float, chi: float) -> Optional[Ebene]
 
 Von `chi` aus mit wachsenden Schritten, bis das Moment die Seite
 wechselt -- das Moment waechst mit der Kruemmung --, dann Illinois.
-`None`, wo unterwegs keine Ebene die Normalkraft traegt.
+`None`, wo unterwegs keine Ebene die Normalkraft traegt; die Ebene
+mit ihrer Probe, die auch verfehlt sein kann ([[opencivil.nachweis.querschnittsloeser#Faserloeser._mit_probe|_mit_probe]]).
 
 ### Querschnittsloeser
 
@@ -642,8 +686,10 @@ nichts. So rechnet die Handrechnung -- sie laesst die Druckbewehrung weg.
 - `SCHRITTE = 60` – Obergrenze der Halbierungen je Bisektion. Erreicht wird sie fast nie -- abgebrochen wird ueber die Schranken darunter, sobald das Fenster eng genug ist. Die Zahl steht nur da, damit keine Schleife ewig laeuft.
 - `EPS_SCHRANKE = 1e-11` – Wann das Dehnungsfenster eng genug ist. Der Startbereich ist rund 0.05 breit; 1e-11 ist ein Zehntausendstel eines Promille und liegt weit unter allem, was eine Eingabe hergibt. Ohne diese Schranke lief die Bisektion stur sechzig Mal -- die letzten zehn Durchlaeufe aendern in doppelter Genauigkeit nichts mehr und kosten doch jedesmal einen Faserdurchgang.
 - `CHI_SCHRANKE = 1e-10` – Dasselbe fuer die Kruemmung, in 1/m.
+- `PROBE_SCHRANKE = 1e-06` – Wie genau die gefundene Ebene ihre Schnittgroessen treffen muss -- als Teil der Druckkraft des ganzen Querschnitts bei seiner Grenzstauchung, beim Moment mal seiner Hoehe ([[opencivil.nachweis.querschnittsloeser#probenschranken|probenschranken]]). Die Suchen treffen weit genauer: in den beiden Pruefprojekten bleiben 1684 Ebenen unter 0.4 % der Schranke (2026-10-15). Eine Ebene, die an einem Sprung des Spannungsblocks haengen bleibt, liegt um Hunderte Kilonewton daneben.
 - `EPS_DRUCK = 0.003` – Aeusserste Dehnungen, innerhalb derer gesucht wird -- Stauchung und Dehnung. **Der Suchbereich muss im gueltigen Bereich beider Gesetze bleiben:** jenseits der Bruchdehnung geben sie null zurueck, und damit waere `N(eps_m)` nicht mehr monoton. Genau daran scheiterte die erste Fassung -- die Bisektion sah bei -0.5 dieselbe Normalkraft wie bei 0.
 - `EPS_ZUG = 0.045`
+- `VERFEHLTE_EBENE = 'Erzeugt die gefundene Ebene die Einwirkung nicht, gibt es zu ihr kei…` – Was die Mitschrift ueber eine verfehlte Ebene sagt ([[opencivil.nachweis.querschnittsloeser#Ebene|Ebene.verfehlt]]) -- bei der Platte wie am gezeichneten Querschnitt.
 
 ## Braucht
 
@@ -657,6 +703,7 @@ nichts. So rechnet die Handrechnung -- sie laesst die Druckbewehrung weg.
 - [[opencivil.nachweis.gebrauchsebene]]
 - [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.knicken]]
+- [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]

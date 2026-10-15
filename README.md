@@ -277,6 +277,15 @@ und des Knickens steht zuoberst eine Zeile «Rechenwahl», beim Knicken zwei -- 
   rechnet immer präzise: mit dem Spannungsblock wäre die Ausmitte nahe der
   Grenzkraft nicht eindeutig.
 
+Mit dem Spannungsblock -- Handrechnung und 0.85·x -- gibt es bei viel Druck
+und wenig Moment keine Dehnungsebene: der Block liegt immer ganz an einem
+Rand und gibt mehr Moment, als einwirkt. Jede Suche prüft darum am Schluss
+selbst, ob ihre Ebene N und M trifft. Trifft sie nicht, steht in der
+Stahlspannung statt der Probe «Mit der 0.85·x-Vereinfachung gibt es zu dieser
+Einwirkung keine Dehnungsebene – präzise rechnen.», und der Fall ist nicht
+erfüllt; das Bild «N, M» der Analysen sagt dasselbe. Die M-χ- und N-ε-Linien
+laufen weiter durch den Sprung.
+
 Mit 0.85·x oder präzise hält die Tragsicherheit gegen den Rand des
 Dehnungsfächers; den Widerstand bei N_Ed sucht sie genau, und die Herleitung
 zeigt die Probe des Bruchzustands. Querkraft und sprödes Versagen lesen ihr
