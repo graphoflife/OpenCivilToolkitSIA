@@ -115,6 +115,39 @@ class TestGleicheFallnamen(unittest.TestCase):
                             for t in self.meldungen(daten)))
 
 
+class TestLagerkraefteAmBildschirm(unittest.TestCase):
+    """
+    Bildschirm und Herleitung zeigen dieselben Lagerkräfte -- auch die Summe
+    der Bettung. Bis 2026-10-15 zeigte der Bildschirm nur die Lager an
+    Knoten, und beim gebetteten Balken gingen die Kräfte dort nicht auf.
+    """
+
+    def test_gebettet_halten_die_zeilen_der_last_das_gleichgewicht(self):
+        p = Projekt(name="Bettung")
+        p.beton("C30/37")
+        s = p.balkensystem("Streifen")
+        q = s.querschnitt("Balken", "rechteck", b=1000.0, h=400.0)
+        balken = s.linie((0, 0), (6, 0), querschnitt=q, material="b1",
+                         quer="feder", k_quer=20000.0)
+        s.lager_an((0, 0), "gelenkig")
+        g = s.lastfall("G")
+        s.stablast(g, balken, wert=10.0)
+
+        antwort = dienst.bearbeite("rechnen", {"projekt": p.als_dict()})
+        uebersicht = antwort.daten["balkensysteme"][s.kennung]
+        zeilen = uebersicht["faelle"][0]["lagerkraefte"]
+        self.assertEqual([z["wo"] for z in zeilen], ["A1 (K1)", "L1: Bettung, Summe"])
+        self.assertEqual([z["summe"] for z in zeilen], [False, True])
+        # 10 kN/m auf 6 m: was die Zeilen aufnehmen, ist die ganze Last.
+        self.assertAlmostEqual(sum(z["R_z"] for z in zeilen), 60.0, places=6)
+        self.assertIn("Bettung steht die Summe", uebersicht["summen_text"])
+
+        # Dieselben Zeilen stehen in der Herleitung.
+        herleitung = " ".join(getattr(b, "text", "") + " ".join(map(str, getattr(b, "zeilen", [])))
+                              for b in p.rechnen().loesung.protokoll.alle_bloecke())
+        self.assertIn("L1: Bettung, Summe", herleitung)
+
+
 class TestPruefen(unittest.TestCase):
 
     def test_unbekannte_wahl(self):

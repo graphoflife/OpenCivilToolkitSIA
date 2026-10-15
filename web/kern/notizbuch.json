@@ -3456,8 +3456,10 @@
       "stichworte": [
         "Stabquerschnitt",
         "Steifigkeit",
+        "Lagerkraft",
         "Systembefund",
         "Systembefund.verlaeufe",
+        "Systembefund.lagerkraefte",
         "SteifigkeitsmethodeProzedur",
         "SteifigkeitsmethodeProzedur.rechne",
         "Balkensystem",

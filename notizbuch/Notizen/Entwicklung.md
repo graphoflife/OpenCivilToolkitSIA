@@ -44,6 +44,39 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-15 · Bügelteilung, gleiche Fallnamen, Lagerkräfte am Bildschirm
+
+Vier Punkte, die man sieht -- drei behoben, einer bestätigt.
+
+**Eine Bügelteilung von null wird gemeldet.** Beim Lesen wurde sie still zu
+200 mm (`wahl(...) or 200`): die Maske zeigte 0, gerechnet wurde mit 200. Eine
+Null in y liess die Bügel sogar ganz verschwinden. Jetzt sagt allein der
+Durchmesser, ob Bügel liegen; mit Bügeln müssen die Teilungen und die
+Stabzahl grösser als null sein, sonst steht es als Satz da. Geprüft wird
+beim Bauen, nicht beim Öffnen: eine Datei mit 0 lässt sich so öffnen und
+korrigieren. In y gilt wie in der Maske: steht eine Teilung da, ist es die
+Teilung, sonst die Stabzahl.
+
+**Gleiche Fallnamen halten nur ihr System auf.** Heissen zwei Lastfälle,
+zwei Kombinationen oder ein Lastfall und eine Kombination gleich, wären die
+Fälle nicht zu unterscheiden -- sie werden am Namen erkannt. Bisher fiel das
+in `pruefen` auf, und das ganze Projekt rechnete nicht, auch keine Platte.
+Jetzt ist es eine Meldung des Systems: es rechnet nicht und sagt warum, der
+Rest rechnet weiter.
+
+**Lagerkräfte: dieselben Zeilen in Herleitung und Bildschirm.** Der
+Bildschirm zeigte nur die Lager an Knoten. Beim gebetteten Balken fehlte
+damit die Bettung, und die Kräfte gingen nicht auf: Einfeld mit 10 kN/m auf
+6 m, ein Lager und Bettung -- am Bildschirm 11.7 kN, in der Herleitung
+11.7 + 48.3 = 60 kN. Jetzt stellt `Systembefund.lagerkraefte` die Zeilen
+an einer Stelle zusammen: Lager an Knoten, gehaltene Stellen auf Stäben,
+die Summen von Linienlager und Bettung. Die Tabelle zeigt alle; unter dem
+Bild steht, was keinen Pfeil hat.
+
+**«kNm» in der Herleitung der Platte ist richtig.** Der TODO-Eintrag
+«gemeint ist kNm/m» stammte vom 11.09.; seit dem 26.09. gelten M und N
+bewusst je Streifen b (siehe [[Arbeitsweise]], «Entschieden»).
+
 ## 2026-10-14 · Umbau: Ergebnisse im Rechenlauf, ein Steckbrief je Bauteilart
 
 Zwei Befunde der Strukturdurchsicht (siehe [[TODO]], «Umbau»). Kein Ergebnis

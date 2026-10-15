@@ -24,7 +24,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from opencivil.stabwerk.rechnung import Systembefund
-from opencivil.stabwerk.system import UNBESTIMMT, Fall
+from opencivil.stabwerk.system import SUMMEN, UNBESTIMMT, Fall
 
 #: Wie viele Stuecke ein Stab im Bild mindestens hat -- dazu jede Grenze und jeder Extremwert.
 PROBEN_JE_STAB = 24
@@ -47,6 +47,7 @@ def uebersicht(befund: Optional[Systembefund]) -> Dict[str, Any]:
                       for m in e.meldungen],
         "unbestimmt": e.unbestimmt(),
         "unbestimmt_text": UNBESTIMMT,
+        "summen_text": SUMMEN,
         "beweglich": list(e.beweglich),
         "unbekannte": len(e.unbekannte),
         "faelle": [_fall(befund, f) for f in e.faelle],
@@ -62,15 +63,16 @@ def _fall(befund: Systembefund, fall: Fall) -> Dict[str, Any]:
             extrem[groesse] = {"kleinst": [e.kleinst[0], e.kleinst[1] * faktor],
                                "groesst": [e.groesst[0], e.groesst[1] * faktor]}
         staebe[name] = extrem
-    orte = befund.ergebnis.orte
     return {
         "name": fall.name,
         "kombination": fall.kombination,
         "staebe": staebe,
+        # Dieselben Zeilen wie in der Herleitung -- mit den Summen von
+        # Linienlager und Bettung, sonst gingen die Kraefte nicht auf.
         "lagerkraefte": [
-            {"ort": name, "knoten": orte[name].knoten, "stab": orte[name].stab,
-             "stelle": orte[name].stelle, "R_x": rx * kN, "R_z": rz * kN, "M": rm * kN}
-            for name, (rx, rz, rm) in fall.lagerkraefte.items()],
+            {"wo": k.wo, "knoten": k.knoten, "summe": k.summe,
+             "R_x": k.R_x * kN, "R_z": k.R_z * kN, "M": k.M * kN}
+            for k in befund.lagerkraefte(fall)],
     }
 
 

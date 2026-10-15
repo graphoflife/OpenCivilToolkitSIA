@@ -77,6 +77,9 @@ Kopie der Datei mit der Endung `.mjs`.
 - **k_σ = E/(400·f) bleibt** (2026-10-11), auch wenn der Anstieg der Parabel
   bei null damit 1.25·E_c,eff ist. Ändern nur, wenn der Benutzer eine
   Normstelle dazu liefert.
+- **M und N der Platte gelten je Streifen b**, in kNm und kN; V je Meter
+  (2026-10-15 bestätigt). Bei b = 500 mm heisst M_Ed = 50 kNm also
+  100 kNm/m. Nicht auf kNm/m umstellen.
 
 ## Berichten und fragen
 

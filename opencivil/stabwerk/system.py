@@ -77,6 +77,9 @@ TEILE_HOECHSTENS = 64
 #: Was an einem Knoten steht, dessen Drehung gestrichen ist.
 UNBESTIMMT = "Verdrehung nicht bestimmbar, da keine Steifigkeit"
 
+#: Was unter den Lagerkraeften steht, wenn Linienlager oder Bettung dabei sind.
+SUMMEN = "Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung."
+
 
 @dataclass(frozen=True)
 class Meldung:

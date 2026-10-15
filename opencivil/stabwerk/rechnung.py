@@ -49,7 +49,7 @@ from opencivil.material.basis import Baustoff, mit_index
 from opencivil.stabwerk import herleitung
 from opencivil.stabwerk.modell import System
 from opencivil.stabwerk.querschnitte import RECHTECK, Stabvorlage
-from opencivil.stabwerk.system import Ergebnis, Meldung, rechnen
+from opencivil.stabwerk.system import Ergebnis, Fall, Meldung, rechnen
 from opencivil.stabwerk.verlauf import Stabverlauf, verlaeufe
 
 #: Welcher E-Modul in die Steifigkeit eingeht, je Art des Materials -- nach
@@ -99,6 +99,26 @@ class Steifigkeit:
     EI: str
 
 
+@dataclass(frozen=True)
+class Lagerkraft:
+    """
+    Eine Zeile der Lagerkraefte eines Falls, auf das Tragwerk wirkend -- in
+    Herleitung und Bildschirm dieselbe.
+    """
+
+    wo: str
+    """«A1 (K1)», «L2 bei 1.500 m», «L2: Bettung, Summe»."""
+
+    R_x: float
+    R_z: float
+    M: float
+    knoten: str = ""
+    """Der Knoten, an dem sie angreift -- leer auf einem Stab und bei einer Summe."""
+
+    summe: bool = False
+    """Die Summe ueber einen Stab, mit dem Moment um den Ursprung (siehe ``SUMMEN``)."""
+
+
 @dataclass
 class Systembefund:
     """
@@ -117,6 +137,34 @@ class Systembefund:
         if fall not in self._verlaeufe:
             self._verlaeufe[fall] = verlaeufe(self.ergebnis.fall(fall))
         return self._verlaeufe[fall]
+
+    def lagerkraefte(self, fall: Fall) -> List[Lagerkraft]:
+        """
+        Die Lagerkraefte eines Falls, Zeile fuer Zeile: die Lager an Knoten,
+        gehaltene Stellen auf Staeben und je Stab die Summe dessen, was ein
+        festes Linienlager und die Bettung aufnehmen. Zusammen halten sie den
+        Lasten das Gleichgewicht -- darum fehlt keine davon, weder in der
+        Herleitung noch am Bildschirm.
+        """
+        orte = self.ergebnis.orte
+        lager_an: Dict[str, List[str]] = {}
+        for l in self.gerechnet.lager:
+            lager_an.setdefault(l.knoten, []).append(l.name)
+        zeilen = []
+        for name, (rx, rz, rm) in fall.lagerkraefte.items():
+            ort = orte[name]
+            if ort.knoten:
+                wo = (", ".join(lager_an[ort.knoten]) + f" ({ort.knoten})"
+                      if ort.knoten in lager_an else ort.knoten)
+            else:
+                wo = f"{ort.stab} bei {ort.stelle:.3f} m"
+            zeilen.append(Lagerkraft(wo, rx, rz, rm, knoten=ort.knoten))
+        for stab, (fx, fz, m) in fall.linienlast.items():
+            zeilen.append(Lagerkraft(f"{stab}: Lasten geradewegs ins Linienlager",
+                                     fx, fz, m, summe=True))
+        for stab, (fx, fz, m) in fall.bettung.items():
+            zeilen.append(Lagerkraft(f"{stab}: Bettung, Summe", fx, fz, m, summe=True))
+        return zeilen
 
 
 class SteifigkeitsmethodeProzedur(Prozedur):

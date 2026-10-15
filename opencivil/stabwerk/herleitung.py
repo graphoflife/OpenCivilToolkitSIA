@@ -23,14 +23,14 @@ Vorzeichen der Baustatik (:mod:`~opencivil.stabwerk.verlauf`).
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Dict, List, Sequence, Tuple
+from typing import TYPE_CHECKING, Sequence, Tuple
 
 from opencivil.core.latex import Mathe, fest, text_latex
 from opencivil.core.protokoll import Protokoll
 from opencivil.stabwerk import stab as st
 from opencivil.stabwerk.matrix import dicht
 from opencivil.stabwerk.modell import FEST, Stablast, System
-from opencivil.stabwerk.system import UNBESTIMMT, Ergebnis, Fall
+from opencivil.stabwerk.system import SUMMEN, UNBESTIMMT, Ergebnis, Fall
 
 if TYPE_CHECKING:
     from opencivil.stabwerk.rechnung import Balkensystem, Systembefund
@@ -241,30 +241,16 @@ def _stabenden(p: Protokoll, verlaeufe) -> None:
 
 
 def _lagerkraefte(p: Protokoll, befund: "Systembefund", fall: Fall) -> None:
-    orte = befund.ergebnis.orte
-    lager_an: Dict[str, List[str]] = {}
-    for l in befund.gerechnet.lager:
-        lager_an.setdefault(l.knoten, []).append(l.name)
-    zeilen = []
-    for name, (rx, rz, rm) in fall.lagerkraefte.items():
-        ort = orte[name]
-        if ort.knoten:
-            wo = (", ".join(lager_an[ort.knoten]) + f" ({ort.knoten})"
-                  if ort.knoten in lager_an else ort.knoten)
-        else:
-            wo = f"{ort.stab} bei {ort.stelle:.3f} m"
-        zeilen.append([wo, Mathe(fest(rx / 1e3, 1)), Mathe(fest(rz / 1e3, 1)),
-                       Mathe(fest(rm / 1e3, 1))])
-    for stab, werte in fall.linienlast.items():
-        zeilen.append([f"{stab}: Lasten geradewegs ins Linienlager"]
-                      + [Mathe(fest(w / 1e3, 1)) for w in werte])
-    for stab, werte in fall.bettung.items():
-        zeilen.append([f"{stab}: Bettung, Summe"] + [Mathe(fest(w / 1e3, 1)) for w in werte])
-    if zeilen:
-        p.tabelle(["Lager", Mathe(r"R_x\ [\mathrm{kN}]"), Mathe(r"R_z\ [\mathrm{kN}]"),
-                   Mathe(r"M\ [\mathrm{kNm}]")], zeilen, titel="Lagerkräfte, auf das Tragwerk")
-        if fall.linienlast or fall.bettung:
-            p.text("Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.")
+    kraefte = befund.lagerkraefte(fall)
+    if not kraefte:
+        return
+    p.tabelle(["Lager", Mathe(r"R_x\ [\mathrm{kN}]"), Mathe(r"R_z\ [\mathrm{kN}]"),
+               Mathe(r"M\ [\mathrm{kNm}]")],
+              [[k.wo] + [Mathe(fest(w / 1e3, 1)) for w in (k.R_x, k.R_z, k.M)]
+               for k in kraefte],
+              titel="Lagerkräfte, auf das Tragwerk")
+    if any(k.summe for k in kraefte):
+        p.text(SUMMEN)
 
 
 def _extremwerte(p: Protokoll, verlaeufe) -> None:

@@ -40,9 +40,6 @@ gelernt wurde, steht in [[Entwicklung]].
       Dazu jetzt das Modell des Zeichenfensters (`cad_modell.js`: Knoten
       anlegen, löschen, kopieren, je Element verschieben, zusammenführen),
       das Fangen und welche Ecke ein Klick nimmt.
-- [ ] Momente stehen in der Mitschrift als `kNm`, gemeint ist `kNm/m` (die
-      Platte wird je Laufmeter gerechnet). In der Eingabemaske steht es
-      richtig. Einheitlich ziehen.
 - [ ] Balkensystem im schmalen Fenster: das schwebende Fenster eines Knotens
       oder Stabs deckt die halbe Zeichnung. Zuklappen geht, aber bei Lasten
       mit vielen Feldern wird es lang.
@@ -84,26 +81,25 @@ und «Ein Steckbrief je Bauteilart» (siehe [[Entwicklung]]).
       Darüberfahren verbindet `bs_diagramme.js` zwei Proben gerade, obwohl
       der Kern den Wert genau kennt; Grenzwerte und grösste Durchbiegung
       wählt das JS selbst (dieselbe Regel in `stabwerk/herleitung.py`).
-      Bericht und Bildschirm stellen die Lagerkräfte verschieden zusammen:
-      beim gebetteten Balken fehlt am Bildschirm die Bettung, die Kräfte gehen
-      dort nicht auf. Hilfetexte wiederholen Regeln des Kerns -- «x/d ≤ 0.35»
+      Hilfetexte wiederholen Regeln des Kerns -- «x/d ≤ 0.35»
       steht neben einem Feld bis 0.5 (`nachweise.js`) --, eine Normstelle
       steht in `editor.js`, Wert-IDs werden aus Text nachgebaut
       (`zustand.js` `namensraum`). Besser: eine `Fallauswertung` im
-      Stabwerk für Herleitung und Bildschirm, Anzeige auf der nächsten
+      Stabwerk für Herleitung und Bildschirm -- für die Lagerkräfte gibt es
+      sie schon (`Systembefund.lagerkraefte`) --, Anzeige auf der nächsten
       Probe, Hilfetexte und Formeln aus denselben Konstanten über den
       Katalog.
 - [ ] **Geprüft wird nur beim Lesen.** 33 `aus_dict` von Hand, die
       Fassade geht an ihren Prüfungen vorbei: `quer="festt"` wird still zur
-      Bettung. `abstand_x=wahl("abstand_x") or cls.abstand_x` liest 0 als
-      200 (`eintraege.py`). Die Rissanforderung ist ein Text in vier
+      Bettung. Die Rissanforderung ist ein Text in vier
       Tabellen, ein Tippfehler wird über `.get` zur mildesten Stufe. Besser:
       ein Leser aus den Feldern der Datenklassen, erlaubte Werte am Feld,
       geprüft einmal in `Projekt.pruefen()`; die Leser alter Formate weg
       (seit 2026-10-11 erlaubt).
 - [ ] **Balkensystem: Kennung statt Name.** Ein Fall wird an seinem Namen
-      erkannt; heissen Kombination und Lastfall gleich, scheitert das ganze
-      Projekt, auch jede Platte. «Fest» reist als `math.inf` und wird in
+      erkannt, gleiche Namen sind darum verboten -- seit 2026-10-15 als
+      Meldung am System, nicht mehr als Fehler des ganzen Projekts. «Fest»
+      reist als `math.inf` und wird in
       `system.py` an 17 Stellen zurückübersetzt; Stäbe und Lasten werden in
       vier Durchgängen aufgelöst, mit einem Schalter `melden`; die
       Querschnittsart wird in drei Schichten verzweigt. Besser: LF1/LK1 als
@@ -339,6 +335,12 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Vier sichtbare Punkte: eine Bügelteilung von null wird gemeldet statt still
+zu 200 mm · gleiche Fallnamen im Balkensystem halten nur das System auf ·
+die Lagerkräfte am Bildschirm mit den Summen von Linienlager und Bettung,
+dieselben Zeilen wie in der Herleitung · «kNm» in der Herleitung der Platte
+ist richtig, M und N gelten je Streifen b (siehe [[Arbeitsweise]]) ·
 
 Ein Steckbrief je Bauteilart: `BAUTEILE` im Kern und `ARTEN` in der
 Oberfläche, ein Test hält beide gleich · je Bauteil ein Datensatz mit

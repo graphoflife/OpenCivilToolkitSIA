@@ -362,23 +362,32 @@ export function systemBlaetter(kennung, name) {
   if (!daten) return [kopf, el('div.blatt', {}, [leerzustand('Diagramme werden gerechnet …')])];
   const r = bildrahmen(daten.staebe);
   const veraltet = !eintrag.daten;
-  const blatt = (t, svg, zeilen) => {
+  const blatt = (t, svg, zeilen, unten = []) => {
     const huelle = el('div.bs-diagramm-huelle', {}, [svg]);
     zeigerEinrichten(huelle, svg, r, daten, zeilen);
     return el('div.blatt', { class: veraltet ? 'ist-veraltet' : '' }, [
-      el('div.b-titel', { text: `${t} – ${daten.fall}` }), huelle]);
+      el('div.b-titel', { text: `${t} – ${daten.fall}` }), huelle, ...unten]);
   };
   const verschiebung = (s, x) => [
     `u_x = ${fest(zwischen(s.proben, x, 'ux'), 2)} mm   u_z = ${fest(zwischen(s.proben, x, 'uz'), 2)} mm`,
     `w = ${fest(zwischen(s.proben, x, 'w'), 2)} mm gegen die Sehne`,
   ];
   const lager = (antwort.uebersicht?.faelle || []).find((f) => f.name === daten.fall)?.lagerkraefte || [];
+  // Was keinen Knoten hat -- eine Stelle auf einem Stab, die Summe von
+  // Linienlager oder Bettung --, steht unter dem Bild. Ohne sie ginge das
+  // Gleichgewicht am Bildschirm nicht auf.
+  const ohneKnoten = lager.filter((l) => !l.knoten).map((l) => el('p.bs-einheiten', {
+    text: `${l.wo}: R_x = ${fest(l.R_x, 1)} kN · R_z = ${fest(l.R_z, 1)} kN · M = ${fest(l.M, 1)} kNm`,
+  }));
+  if (lager.some((l) => l.summe)) {
+    ohneKnoten.push(el('p.bs-einheiten', { text: antwort.uebersicht.summen_text }));
+  }
   return [
     kopf,
     blatt('Verformung', verformungsbild(r, daten), verschiebung),
     ...GROESSEN.map((g) => blatt(g.titel, verlaufsbild(r, daten, g), (s, x) => [
       `${g.schluessel} = ${fest(zwischen(s.proben, x, g.schluessel), g.stellen)} ${g.einheit}`])),
-    blatt('Lagerkräfte', lagerbild(r, daten, lager), verschiebung),
+    blatt('Lagerkräfte', lagerbild(r, daten, lager), verschiebung, ohneKnoten),
   ];
 }
 
@@ -430,11 +439,14 @@ export function systemZusammenfassung(kennung, name) {
       wertzelle(m.klein, 1), wertzelle(m.gross, 1), wertzelle(wmax, 2),
     ]);
   });
-  const lagerzeilen = u.faelle.flatMap((f) => f.lagerkraefte.filter((l) => l.knoten).map((l) => el('tr', {}, [
-    el('td', { text: f.name }), el('td', { text: l.knoten }),
+  // Alle Zeilen, wie in der Herleitung -- auch die Summen von Linienlager
+  // und Bettung. Mit den Knoten allein gingen die Kräfte nicht auf.
+  const lagerzeilen = u.faelle.flatMap((f) => f.lagerkraefte.map((l) => el('tr', {}, [
+    el('td', { text: f.name }), el('td', { text: l.wo }),
     el('td.bs-zahl', { text: fest(l.R_x, 1) }), el('td.bs-zahl', { text: fest(l.R_z, 1) }),
     el('td.bs-zahl', { text: fest(l.M, 1) }),
   ])));
+  const summen = u.faelle.some((f) => f.lagerkraefte.some((l) => l.summe));
   return el('div.blatt', {}, [
     titel,
     ...meldungen,
@@ -442,8 +454,9 @@ export function systemZusammenfassung(kennung, name) {
     el('div.tabelle-huelle', {}, [el('table.bs-tabelle', {}, [el('thead', {}, [el('tr', {}, kopf)]), el('tbody', {}, zeilen)])]),
     lagerzeilen.length ? el('div.b-untertitel', { text: 'Lagerkräfte auf das Tragwerk' }) : null,
     lagerzeilen.length ? el('div.tabelle-huelle', {}, [el('table.bs-tabelle', {}, [
-      el('thead', {}, [el('tr', {}, ['Fall', 'Knoten', 'R_x [kN]', 'R_z [kN]', 'M [kNm]'].map((t) => el('th', { text: t })))]),
+      el('thead', {}, [el('tr', {}, ['Fall', 'Lager', 'R_x [kN]', 'R_z [kN]', 'M [kNm]'].map((t) => el('th', { text: t })))]),
       el('tbody', {}, lagerzeilen),
     ])]) : null,
+    summen ? el('p.bs-einheiten', { text: u.summen_text }) : null,
   ]);
 }

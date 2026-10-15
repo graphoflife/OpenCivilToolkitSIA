@@ -1,5 +1,5 @@
 ---
-erzeugt: 948087583a17
+erzeugt: b384e149849a
 art: modul
 tags: [modul]
 ---
@@ -80,6 +80,23 @@ Ein Paar aus Querschnitt und Material und die Wert-IDs seiner Steifigkeiten.
 - `EA: str`
 - `EI: str`
 
+### Lagerkraft
+
+```python
+@dataclass(frozen=True)
+class Lagerkraft
+```
+
+Eine Zeile der Lagerkraefte eines Falls, auf das Tragwerk wirkend -- in
+Herleitung und Bildschirm dieselbe.
+
+- `wo: str` – «A1 (K1)», «L2 bei 1.500 m», «L2: Bettung, Summe».
+- `R_x: float`
+- `R_z: float`
+- `M: float`
+- `knoten: str = ''` – Der Knoten, an dem sie angreift -- leer auf einem Stab und bei einer Summe.
+- `summe: bool = False` – Die Summe ueber einen Stab, mit dem Moment um den Ursprung (siehe `SUMMEN`).
+
 ### Systembefund
 
 ```python
@@ -103,6 +120,18 @@ def verlaeufe(self, fall: str) -> Dict[str, Stabverlauf]
 ```
 
 Je Stab der Verlauf der Schnittgroessen und der Biegelinie in einem Fall -- einmal gerechnet.
+
+#### Systembefund.lagerkraefte
+
+```python
+def lagerkraefte(self, fall: Fall) -> List[Lagerkraft]
+```
+
+Die Lagerkraefte eines Falls, Zeile fuer Zeile: die Lager an Knoten,
+gehaltene Stellen auf Staeben und je Stab die Summe dessen, was ein
+festes Linienlager und die Bettung aufnehmen. Zusammen halten sie den
+Lasten das Gleichgewicht -- darum fehlt keine davon, weder in der
+Herleitung noch am Bildschirm.
 
 ### SteifigkeitsmethodeProzedur
 

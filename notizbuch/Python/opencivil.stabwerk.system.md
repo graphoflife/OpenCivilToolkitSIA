@@ -1,5 +1,5 @@
 ---
-erzeugt: 75f8644149e6
+erzeugt: ab65420b77f0
 art: modul
 tags: [modul]
 ---
@@ -330,6 +330,7 @@ Alle Lasten des Falls als Kraft auf das Tragwerk und Moment um den Ursprung.
 - `TOLERANZ = 1e-06` – Wie nahe ein Knoten an einem Stab liegen muss, um mit ihm verbunden zu sein -- in m. Das Zeichenfenster rundet auf ein Millionstel.
 - `TEILE_HOECHSTENS = 64` – In hoechstens so viele Stuecke wird ein gebetteter Stab geteilt.
 - `UNBESTIMMT = 'Verdrehung nicht bestimmbar, da keine Steifigkeit'` – Was an einem Knoten steht, dessen Drehung gestrichen ist.
+- `SUMMEN = 'Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursp…` – Was unter den Lagerkraeften steht, wenn Linienlager oder Bettung dabei sind.
 
 ## Braucht
 
