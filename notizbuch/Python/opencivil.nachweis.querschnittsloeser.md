@@ -1,5 +1,5 @@
 ---
-erzeugt: 8957df54ad05
+erzeugt: 8de0a0e461a4
 art: modul
 tags: [modul]
 ---
@@ -171,7 +171,7 @@ Die Zeile zu [[opencivil.nachweis.querschnittsloeser#wirksamer_modul|wirksamer_m
 ### protokoll_verfahren
 
 ```python
-def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float, fasern: int=FASERN, verdraengt: bool=True) -> None
+def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float, fasern: int=FASERN, verdraengt: bool=True, suche: Optional[str]=None) -> None
 ```
 
 Der Ablauf der Suche, in die Mitschrift geschrieben.
@@ -182,7 +182,9 @@ das Verfahren aendert man eine davon.
 
 Beschrieben wird der *Ablauf*, nicht jeder Zwischenwert. Die Halbierungen
 abzudrucken hiesse, hundert Zeilen zu zeigen, von denen nur die letzte
-etwas behauptet -- und die wird ohnehin durch die Probe belegt.
+etwas behauptet -- und die wird ohnehin durch die Probe belegt. Wie
+gesucht wird, sagt der Loeser selbst (`suche`, sein
+[[opencivil.nachweis.querschnittsloeser#Faserloeser.suche|Faserloeser.suche]]); ohne Angabe das Halbieren.
 
 ### plattenfasern
 
@@ -220,6 +222,17 @@ Nachweis, der die Ebene zu einem Lastfall braucht --, laesst sie weg.
 
 Eine Lage liegt in der Tiefe `z` unter dem oberen Rand; ihr Arm ist
 `z + oben`.
+
+- `SUCHE = 'Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer fe…` – Wie gesucht wird, in der Mitschrift ([[opencivil.nachweis.querschnittsloeser#protokoll_verfahren|protokoll_verfahren]]).
+
+#### Faserloeser.suche
+
+```python
+@property
+def suche(self) -> str
+```
+
+Wie dieser Loeser sucht, in Worten -- fuer die Mitschrift.
 
 #### Faserloeser._fenster
 
@@ -331,13 +344,34 @@ Fuer den gezeichneten Querschnitt unter Gebrauchslast
 Nulllinie gedreht, und jede Neigung ist eine ganze Suche. Halbiert
 braucht eine Suche rund vierzig Schritte, mit Illinois ein Viertel davon:
 zwischen zwei Knicken der Gesetze ist die Kraft eine Gerade, und dort
-trifft die Sekante. Die Platte rechnet weiter mit dem Halbieren; ihre
-Zahlen bleiben so, wie sie sind.
+trifft die Sekante.
 
-Dazu faengt er bei der Kruemmung an, die er zuletzt gefunden hat
-([[opencivil.nachweis.querschnittsloeser#FaserloeserIllinois.loese|loese]]): beim Knicken folgen sich viele Ebenen mit wenig
-verschiedenen Schnittgroessen, und das Eingrenzen von der groessten
-Kruemmung her kostete jede von ihnen mehr als die Suche selbst.
+Dazu faengt er bei der Kruemmung und der Dehnung an, die er zuletzt
+gefunden hat ([[opencivil.nachweis.querschnittsloeser#FaserloeserIllinois.loese|loese]]): beim Knicken folgen sich viele Ebenen mit
+wenig verschiedenen Schnittgroessen, und das Eingrenzen von der groessten
+Kruemmung her kostete jede von ihnen mehr als die Suche selbst. Darum
+sucht auch das Knicken der Platte so ([[opencivil.nachweis.querschnittsloeser#QuerschnittsloeserIllinois|QuerschnittsloeserIllinois]]);
+ihre Stahlspannungen und Analysen halbieren weiter.
+
+**Nur wo die Ebene eindeutig ist.** Springt ein Gesetz -- der
+Spannungsblock --, hat das Moment ueber der Kruemmung flache Stuecke: dort
+traegt jede Kruemmung dasselbe Moment, und welche gefunden wird, haengt am
+Weg der Suche. Mit einem Gedaechtnis hinge das Ergebnis dann an der
+Reihenfolge der Rechnungen -- an der Stuetze des Pruefprojekts war die
+Grenzkraft so 4200 statt 4099.5 kN. Mit springendem Gesetz sucht er darum
+wie jeder [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]], halbiert und von vorn ([[opencivil.nachweis.querschnittsloeser#FaserloeserIllinois|halbiert]]).
+Gesetze ohne Sprung -- Parabel, elastisch -- haben flache Stuecke erst am
+vollplastischen Querschnitt; an den Pruefprojekten bleibt dort jede Zahl,
+wie sie war.
+
+- `SUCHE = 'Gesucht wird in zwei geschachtelten Suchen. Innen: zu einer festgeha…`
+
+#### FaserloeserIllinois.suche
+
+```python
+@property
+def suche(self) -> str
+```
 
 #### FaserloeserIllinois._eps_zu_normalkraft
 
@@ -412,6 +446,18 @@ der Beton auch dort, wo der Stahl liegt -- so rechnet die Handrechnung.
 
 Welche Gesetze zu welcher Wahl gehoeren, sagt
 [[opencivil.nachweis.rechenwahl#gesetze|opencivil.nachweis.rechenwahl.gesetze]].
+
+### QuerschnittsloeserIllinois
+
+```python
+class QuerschnittsloeserIllinois(FaserloeserIllinois, Querschnittsloeser)
+```
+
+Die Fasern der Platte ([[opencivil.nachweis.querschnittsloeser#Querschnittsloeser|Querschnittsloeser]]), gesucht wie am
+gezeichneten Querschnitt: mit Illinois, von der zuletzt gefundenen Ebene
+aus ([[opencivil.nachweis.querschnittsloeser#FaserloeserIllinois|FaserloeserIllinois]]). Fuer das Knicken der Platte -- dort
+kostete das Halbieren beinahe die ganze Rechenzeit (Benutzer,
+2026-10-15).
 
 ### Werkstoffsatz
 

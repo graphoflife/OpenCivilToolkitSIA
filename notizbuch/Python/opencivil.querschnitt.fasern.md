@@ -1,5 +1,5 @@
 ---
-erzeugt: 64e0fb80538e
+erzeugt: e2b6a1727458
 art: modul
 tags: [modul]
 ---
@@ -121,6 +121,16 @@ class Faserquerschnitt
 ```
 
 Fasergruppen und Staebe -- und die Kraefte, die eine Ebene in ihnen weckt.
+
+#### Faserquerschnitt.springt
+
+```python
+@property
+def springt(self) -> bool
+```
+
+Ob ein Gesetz springt und darum ueber die Faser gemittelt wird -- der
+Spannungsblock, auch wo ein Stab ihn verdraengt.
 
 #### Faserquerschnitt.kraefte
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: f81f76b7da4a
+erzeugt: f8a4b4a09527
 art: modul
 tags: [modul]
 ---
@@ -85,6 +85,17 @@ Vorgabe des Widerstands.
 Ein Knicknachweis braucht eine Knicklaenge, und die gehoert zu einer
 Tragrichtung. Gerechnet wird darum nur mit der Bewehrung in x -- in y waere
 die Breite der Platte die Laenge, und die ist keine Stuetze.
+
+
+## DER LOESER
+
+Die Iteration und die Suche nach N_Rd folgen sich in hunderten Ebenen mit
+wenig verschiedenen Schnittgroessen. Gesucht werden sie darum mit Illinois,
+von der zuletzt gefundenen Ebene aus
+([[opencivil.nachweis.querschnittsloeser#QuerschnittsloeserIllinois|QuerschnittsloeserIllinois]]):
+an den Pruefprojekten ein Drittel der Faserdurchlaeufe, dieselben
+Grenzkraefte auf 0.01 kN. Rechnet die Verformung mit dem Spannungsblock,
+wird halbiert wie vorher -- dort ist die Ebene nicht eindeutig.
 
 
 ## DAS VERFAHREN GEHOERT KEINEM QUERSCHNITT

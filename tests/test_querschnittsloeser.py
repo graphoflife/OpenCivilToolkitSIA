@@ -4,11 +4,11 @@ import math
 import unittest
 
 from opencivil.nachweis.querschnittsloeser import (
-    Querschnittsloeser, Stahllage, beton_elastisch, beton_nichtlinear,
-    stahl_bilinear,
+    Querschnittsloeser, QuerschnittsloeserIllinois, Stahllage, beton_elastisch,
+    beton_nichtlinear, stahl_bilinear,
 )
 from opencivil.nachweis.zustand2 import gerissen, wertigkeit
-from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
+from opencivil.querschnitt.werkstoffgesetz import Spannungsblock, Stahlgesetz
 
 
 def stahl(*, E_s: float, f_sd: float, eps_ud: float = 0.045) -> Stahlgesetz:
@@ -210,3 +210,55 @@ class TestGrenzen(unittest.TestCase):
             self.assertLessEqual(nachher, vorher + 1e-6)
         self.assertAlmostEqual(gesetz(-0.001) / 1e6, -15.0, places=9)
         self.assertAlmostEqual(gesetz(-0.002) / 1e6, -30.0, places=9)
+
+
+class TestIllinoisMitWarmstart(unittest.TestCase):
+    """
+    Der Löser des Knickens sucht mit Illinois, von der zuletzt gefundenen
+    Ebene aus. Er muss dieselben Ebenen finden wie das Halbieren -- und wo
+    ein Gesetz springt und die Ebene darum nicht eindeutig ist, halbiert er
+    selbst.
+    """
+
+    #: Eine Folge, wie sie das Knicken rechnet: Momente steigen, die
+    #: Druckkraft wechselt -- bis an den Widerstand und darüber.
+    FOLGE = [(-300e3, 20e3), (-300e3, 60e3), (-300e3, 61e3), (-900e3, 61e3),
+             (0.0, 150e3), (0.0, 234.9e3), (0.0, 236.0e3), (0.0, 120e3), (-50e3, 5e3)]
+
+    @staticmethod
+    def platte(klasse, beton, **mehr):
+        """Die Platte des Beispiels in x (φ = 2, Bemessungswerte) -- siehe TestGrenzen."""
+        s = stahl(E_s=205e9, f_sd=434.78e6, eps_ud=0.045)
+        return klasse(
+            h=0.3, b=1.0,
+            lagen=[Stahllage(a_s=1696e-6, z=0.249, stahl=s, nummer=1),
+                   Stahllage(a_s=754e-6, z=0.246, stahl=s, nummer=2),
+                   Stahllage(a_s=754e-6, z=0.048, stahl=s, nummer=4)],
+            beton=beton, eps_druck=0.0035, eps_zug=0.045, **mehr)
+
+    def test_dieselben_ebenen_wie_beim_halbieren(self):
+        parabel = beton_nichtlinear(f_cd=20e6, E_c=33.62e9 / 3.0, eps_c1d=0.002,
+                                    eps_c2d=0.0035)
+        halbiert = self.platte(Querschnittsloeser, parabel)
+        illinois = self.platte(QuerschnittsloeserIllinois, parabel)
+        self.assertFalse(illinois.halbiert)
+        for N, M in self.FOLGE:
+            a, b = halbiert.loese(N_Ed=N, M_Ed=M), illinois.loese(N_Ed=N, M_Ed=M)
+            with self.subTest(N=N, M=M):
+                self.assertEqual(a.konvergiert, b.konvergiert)
+                if a.konvergiert:
+                    self.assertAlmostEqual(b.eps_m, a.eps_m, delta=1e-9)
+                    self.assertAlmostEqual(b.chi, a.chi, delta=1e-8)
+                    self.assertAlmostEqual(b.M_int, M, delta=max(1.0, abs(M) * 1e-6))
+
+    def test_springt_ein_gesetz_wird_halbiert(self):
+        """Mit dem Spannungsblock Zeichen für Zeichen das Halbieren -- auch nach einer Folge."""
+        block = Spannungsblock(f_cd=20e6, eps_c2d=0.0035)
+        halbiert = self.platte(Querschnittsloeser, block, gemittelt=True)
+        illinois = self.platte(QuerschnittsloeserIllinois, block, gemittelt=True)
+        self.assertTrue(illinois.halbiert)
+        self.assertEqual(illinois.suche, Querschnittsloeser.SUCHE)
+        for N, M in self.FOLGE:
+            with self.subTest(N=N, M=M):
+                self.assertEqual(illinois.loese(N_Ed=N, M_Ed=M), halbiert.loese(N_Ed=N, M_Ed=M))
+

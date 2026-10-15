@@ -44,6 +44,33 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-15 · Knicken der Platte mit Illinois und Warmstart
+
+Das Knicken der Platte sucht seine Ebenen jetzt wie das am gezeichneten
+Querschnitt (Benutzer): mit Illinois, von der zuletzt gefundenen Krümmung
+und Dehnung aus (`QuerschnittsloeserIllinois`, die Fasern der Platte mit der
+Suche von `FaserloeserIllinois`). Die drei Knicknachweise des Prüfprojekts
+brauchten 1 768 883 Faserdurchläufe, beinahe die ganze Rechenzeit; jetzt sind
+es 518 917, und jede Grenzkraft ist auf 0.01 kN dieselbe.
+
+**Wo ein Gesetz springt, wird halbiert.** Der erste Versuch machte überall
+den Warmstart, und die Stütze q3 -- ihre Verformung rechnet absichtlich mit
+dem Spannungsblock -- kam auf 4200 statt 4099.5 kN. Mit dem Block hat das
+Moment über der Krümmung flache Stücke: dort trägt jede Krümmung dasselbe
+Moment, und welche gefunden wird, hängt am Weg der Suche. Beide Löser sagten
+bei 4200 kN «trägt nicht», wenn sie frisch anfingen; mit dem Gedächtnis der
+vorigen Probekräfte fand der neue eine Ebene. Ein Ergebnis, das an der
+Reihenfolge der Rechnungen hängt, ist keines. Springt ein Gesetz, sucht der
+Löser darum wie jeder `Faserloeser`, halbiert und von vorn
+(`FaserloeserIllinois.halbiert`); das gilt auch am gezeichneten Querschnitt.
+Parabel und elastisch haben flache Stücke erst am vollplastischen
+Querschnitt -- dort blieb an beiden Prüfprojekten jede Zahl, wie sie war, und
+ein Test hält eine ganze Knickfolge gegen das Halbieren.
+
+**Die Mitschrift sagt, wie gesucht wurde.** Der Löser beschreibt seine
+Suche selbst (`Faserloeser.suche`); das Knicken schreibt damit «Illinois,
+von der letzten Ebene aus» oder, beim Block, die Halbierungen.
+
 ## 2026-10-15 · Knicken am gezeichneten Querschnitt
 
 Knicken gibt es jetzt auch für den gezeichneten Querschnitt, je Fall zu der

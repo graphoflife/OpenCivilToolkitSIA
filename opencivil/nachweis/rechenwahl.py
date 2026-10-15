@@ -52,7 +52,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Callable, Dict, List, Sequence
+from typing import Callable, Dict, List, Sequence, Type
 
 from opencivil.core.berechnung import Eingabebezug, Eingaben
 from opencivil.core.latex import angabe
@@ -338,14 +338,17 @@ class Gesetze:
         return list(lagen)
 
     def loeser(self, *, h: float, b: float, lagen: Sequence[Stahllage],
-               beton: Gesetz = None, **fenster) -> Querschnittsloeser:
+               beton: Gesetz = None, klasse: Type[Querschnittsloeser] = Querschnittsloeser,
+               **fenster) -> Querschnittsloeser:
         """
         Der Loeser zu dieser Wahl. ``fenster`` sind die Grenzen der Suche
         (``eps_druck``, ``eps_zug``, ``grenzen``) -- die bringt jeder Nutzer
         selbst mit. ``beton`` ersetzt das Betongesetz, etwa durch den
-        ungerissenen Zustand; alles andere bleibt.
+        ungerissenen Zustand; alles andere bleibt. ``klasse`` waehlt, wie
+        gesucht wird -- das Knicken nimmt
+        :class:`~opencivil.nachweis.querschnittsloeser.QuerschnittsloeserIllinois`.
         """
-        return Querschnittsloeser(
+        return klasse(
             h=h, b=b, lagen=self.lagen(lagen, h), beton=beton or self.beton,
             stahl=self.stahl, gemittelt=self.gemittelt and beton is None,
             verdraengt=self.verdraengt, **fenster)

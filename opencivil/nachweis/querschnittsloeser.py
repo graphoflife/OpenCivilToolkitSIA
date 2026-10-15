@@ -224,7 +224,8 @@ def protokoll_wirksamer_modul(p, E_cm, phi, basis: str, *, titel: str,
 
 
 def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float,
-                        fasern: int = FASERN, verdraengt: bool = True) -> None:
+                        fasern: int = FASERN, verdraengt: bool = True,
+                        suche: Optional[str] = None) -> None:
     """
     Der Ablauf der Suche, in die Mitschrift geschrieben.
 
@@ -234,7 +235,9 @@ def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float,
 
     Beschrieben wird der *Ablauf*, nicht jeder Zwischenwert. Die Halbierungen
     abzudrucken hiesse, hundert Zeilen zu zeigen, von denen nur die letzte
-    etwas behauptet -- und die wird ohnehin durch die Probe belegt.
+    etwas behauptet -- und die wird ohnehin durch die Probe belegt. Wie
+    gesucht wird, sagt der Loeser selbst (``suche``, sein
+    :attr:`Faserloeser.suche`); ohne Angabe das Halbieren.
     """
     p.erklaerung(
         "Die Dehnungsebene wird gesucht, nicht hergeleitet. Eine ebene "
@@ -261,14 +264,7 @@ def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float,
         f"gleicher Dicke gebildet; der Stahl kommt Lage für Lage dazu. Wie in "
         f"der Handrechnung zählt der Beton auch dort, wo der Stahl liegt."
     )
-    p.erklaerung(
-        "Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer "
-        "festgehaltenen Krümmung χ wird ε_m so lange halbiert, bis N_int die "
-        "verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung "
-        "immer mehr Zug bedeutet. Aussen: mit diesem ε_m bleibt ein Moment "
-        "übrig, und χ wird so lange halbiert, bis auch M_int stimmt – hier "
-        "trägt die Monotonie, dass mehr Krümmung mehr Moment heisst."
-    )
+    p.erklaerung(suche or Faserloeser.SUCHE)
     p.erklaerung(
         f"Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen "
         f"({-eps_druck * 1e3:.1f} ‰ bis {eps_zug * 1e3:.1f} ‰). Jenseits "
@@ -332,6 +328,21 @@ class Faserloeser:
     Eine Lage liegt in der Tiefe ``z`` unter dem oberen Rand; ihr Arm ist
     ``z + oben``.
     """
+
+    #: Wie gesucht wird, in der Mitschrift (:func:`protokoll_verfahren`).
+    SUCHE = (
+        "Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer "
+        "festgehaltenen Krümmung χ wird ε_m so lange halbiert, bis N_int die "
+        "verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung "
+        "immer mehr Zug bedeutet. Aussen: mit diesem ε_m bleibt ein Moment "
+        "übrig, und χ wird so lange halbiert, bis auch M_int stimmt – hier "
+        "trägt die Monotonie, dass mehr Krümmung mehr Moment heisst."
+    )
+
+    @property
+    def suche(self) -> str:
+        """Wie dieser Loeser sucht, in Worten -- fuer die Mitschrift."""
+        return self.SUCHE
 
     def __init__(self, *, querschnitt: Faserquerschnitt, grenzen: Dehnungsgrenzen,
                  oben: float = 0.0, unten: float = 0.0, lagen: Sequence[Stahllage] = (),
@@ -563,14 +574,42 @@ class FaserloeserIllinois(Faserloeser):
     Nulllinie gedreht, und jede Neigung ist eine ganze Suche. Halbiert
     braucht eine Suche rund vierzig Schritte, mit Illinois ein Viertel davon:
     zwischen zwei Knicken der Gesetze ist die Kraft eine Gerade, und dort
-    trifft die Sekante. Die Platte rechnet weiter mit dem Halbieren; ihre
-    Zahlen bleiben so, wie sie sind.
+    trifft die Sekante.
 
-    Dazu faengt er bei der Kruemmung an, die er zuletzt gefunden hat
-    (:meth:`loese`): beim Knicken folgen sich viele Ebenen mit wenig
-    verschiedenen Schnittgroessen, und das Eingrenzen von der groessten
-    Kruemmung her kostete jede von ihnen mehr als die Suche selbst.
+    Dazu faengt er bei der Kruemmung und der Dehnung an, die er zuletzt
+    gefunden hat (:meth:`loese`): beim Knicken folgen sich viele Ebenen mit
+    wenig verschiedenen Schnittgroessen, und das Eingrenzen von der groessten
+    Kruemmung her kostete jede von ihnen mehr als die Suche selbst. Darum
+    sucht auch das Knicken der Platte so (:class:`QuerschnittsloeserIllinois`);
+    ihre Stahlspannungen und Analysen halbieren weiter.
+
+    **Nur wo die Ebene eindeutig ist.** Springt ein Gesetz -- der
+    Spannungsblock --, hat das Moment ueber der Kruemmung flache Stuecke: dort
+    traegt jede Kruemmung dasselbe Moment, und welche gefunden wird, haengt am
+    Weg der Suche. Mit einem Gedaechtnis hinge das Ergebnis dann an der
+    Reihenfolge der Rechnungen -- an der Stuetze des Pruefprojekts war die
+    Grenzkraft so 4200 statt 4099.5 kN. Mit springendem Gesetz sucht er darum
+    wie jeder :class:`Faserloeser`, halbiert und von vorn (:attr:`halbiert`).
+    Gesetze ohne Sprung -- Parabel, elastisch -- haben flache Stuecke erst am
+    vollplastischen Querschnitt; an den Pruefprojekten bleibt dort jede Zahl,
+    wie sie war.
     """
+
+    SUCHE = (
+        "Gesucht wird in zwei geschachtelten Suchen. Innen: zu einer "
+        "festgehaltenen Krümmung χ wird ε_m gesucht, bis N_int die verlangte "
+        "Normalkraft trifft – das geht sicher, weil mehr Dehnung immer mehr "
+        "Zug bedeutet. Aussen: mit diesem ε_m bleibt ein Moment übrig, und χ "
+        "wird gesucht, bis auch M_int stimmt – hier trägt die Monotonie, dass "
+        "mehr Krümmung mehr Moment heisst. Beide Suchen beginnen bei der "
+        "Ebene, die zuletzt gefunden wurde, grenzen die Stelle mit wachsenden "
+        "Schritten ein und treffen sie dann mit dem Illinois-Verfahren: einer "
+        "Sekante, die abwechselnd von beiden Seiten herankommt."
+    )
+
+    @property
+    def suche(self) -> str:
+        return Faserloeser.SUCHE if self.halbiert else self.SUCHE
 
     def __init__(self, **angaben) -> None:
         super().__init__(**angaben)
@@ -578,6 +617,8 @@ class FaserloeserIllinois(Faserloeser):
         """Die Kruemmung der zuletzt gefundenen Ebene -- von dort sucht die naechste."""
         self._eps_zuletzt: Optional[float] = None
         """Die zuletzt gefundene Mitteldehnung -- von dort sucht die naechste."""
+        self.halbiert = self.querschnitt.springt
+        """Ob er wie jeder :class:`Faserloeser` sucht, weil ein Gesetz springt -- siehe oben."""
 
     def _eps_zu_normalkraft(self, chi: float, N_ziel: float) -> Optional[float]:
         """
@@ -585,6 +626,8 @@ class FaserloeserIllinois(Faserloeser):
         Dehnung aus eingegrenzt: die Kruemmungen einer Suche liegen nahe
         beieinander, und mit ihnen die Dehnungen.
         """
+        if self.halbiert:
+            return super()._eps_zu_normalkraft(chi, N_ziel)
         eps = None
         if self._eps_zuletzt is not None:
             eps = self._eps_von(chi, N_ziel, self._eps_zuletzt)
@@ -632,6 +675,8 @@ class FaserloeserIllinois(Faserloeser):
         eingegrenzt, wo es eine gibt, sonst wie jeder :class:`Faserloeser`.
         Was die naechste Suche nicht eingrenzen kann, sucht sie von vorn.
         """
+        if self.halbiert:
+            return super().loese(N_Ed=N_Ed, M_Ed=M_Ed)
         ebene = None
         if self._zuletzt is not None and not (N_Ed == 0.0 and M_Ed == 0.0):
             ebene = self._von_zuletzt(N_Ed, M_Ed, self._zuletzt)
@@ -681,6 +726,8 @@ class FaserloeserIllinois(Faserloeser):
     def _suchen(self, f: Callable[[float], Optional[float]], unten: float, oben: float,
                 schranke: float, f_unten: Optional[float] = None,
                 f_oben: Optional[float] = None) -> Optional[float]:
+        if self.halbiert:
+            return super()._suchen(f, unten, oben, schranke, f_unten, f_oben)
         fa = f(unten) if f_unten is None else f_unten
         fb = f(oben) if f_oben is None else f_oben
         if fa is None or fb is None:
@@ -774,6 +821,16 @@ class Querschnittsloeser(Faserloeser):
         self.b = b
         self.beton = beton
         self.fasern = fasern
+
+
+class QuerschnittsloeserIllinois(FaserloeserIllinois, Querschnittsloeser):
+    """
+    Die Fasern der Platte (:class:`Querschnittsloeser`), gesucht wie am
+    gezeichneten Querschnitt: mit Illinois, von der zuletzt gefundenen Ebene
+    aus (:class:`FaserloeserIllinois`). Fuer das Knicken der Platte -- dort
+    kostete das Halbieren beinahe die ganze Rechenzeit (Benutzer,
+    2026-10-15).
+    """
 
 
 # ===========================================================================

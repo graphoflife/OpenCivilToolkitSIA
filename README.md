@@ -185,7 +185,7 @@ Fertig und getestet (1091 Tests):
 | `nachweis/dehnungsfaecher` | die Grenzen des Dehnungsfächers: als Ebenen für die genaue Linie, als Bedingungen für die Analyse |
 | `nachweis/resistenzlinie` | Handlinie und Ebenenlinie hinter einer Schnittstelle: Urteil, Widerstand bei N_Ed, Eckwerte, Probe |
 | `nachweis/rechenwahl` | Kriechzahl, Werte, Rechenart -- die eine Stelle, die daraus Gesetze und Löser baut |
-| `nachweis/querschnittsloeser` | Dehnungsebene aus N und M, zwei Bisektionen (am gezeichneten Querschnitt mit Illinois) |
+| `nachweis/querschnittsloeser` | Dehnungsebene aus N und M, zwei Bisektionen (am gezeichneten Querschnitt und beim Knicken mit Illinois, von der letzten Ebene aus) |
 | `nachweis/` | M-N, Querkraft (mit Bügeln), Duktilität, sprödes Versagen, Zwängung auf Normalkraft und auf Biegung, Stahlspannung unter häufiger (gegen Fliessen) und quasi-ständiger Last (aus der Rissbreite), Knicken am verformten System |
 | `nachweis/schiefe_biegung`, `schubwandnachweis`, `richtungsnachweise` | die Nachweise der Querschnittsanalyse: N mit M_y und M_z, Querkraft mit Torsion, Duktilität und sprödes Versagen je Richtung |
 | `nachweis/qa_gebrauch`, `stabgrenzen`, `gebrauchsebene` | ihre Gebrauchsnachweise: Zwängung auf N (ganzer Querschnitt) und auf M (je Richtung), Stahlspannung quasi-ständig und häufig; σ_s,adm je Stab; die Ebene unter Gebrauchslast, auch schief |

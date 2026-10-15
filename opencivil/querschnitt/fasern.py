@@ -145,6 +145,14 @@ class Faserquerschnitt:
              s.dicke / 2.0)
             for s in self.staebe)
 
+    @property
+    def springt(self) -> bool:
+        """
+        Ob ein Gesetz springt und darum ueber die Faser gemittelt wird -- der
+        Spannungsblock, auch wo ein Stab ihn verdraengt.
+        """
+        return bool(self._gemittelt) or any(s[5] is not None for s in self._staebe)
+
     def kraefte(self, eps_m: float, chi: float) -> Schnittkraefte:
         """
         Die inneren Kraefte der Ebene ``eps(v) = eps_m + chi·v``.

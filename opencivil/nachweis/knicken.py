@@ -67,6 +67,15 @@ Ein Knicknachweis braucht eine Knicklaenge, und die gehoert zu einer
 Tragrichtung. Gerechnet wird darum nur mit der Bewehrung in x -- in y waere
 die Breite der Platte die Laenge, und die ist keine Stuetze.
 
+DER LOESER:
+Die Iteration und die Suche nach N_Rd folgen sich in hunderten Ebenen mit
+wenig verschiedenen Schnittgroessen. Gesucht werden sie darum mit Illinois,
+von der zuletzt gefundenen Ebene aus
+(:class:`~opencivil.nachweis.querschnittsloeser.QuerschnittsloeserIllinois`):
+an den Pruefprojekten ein Drittel der Faserdurchlaeufe, dieselben
+Grenzkraefte auf 0.01 kN. Rechnet die Verformung mit dem Spannungsblock,
+wird halbiert wie vorher -- dort ist die Ebene nicht eindeutig.
+
 DAS VERFAHREN GEHOERT KEINEM QUERSCHNITT:
 Die Iteration und die Suche nach ``N_Rd`` brauchen vom Stab nur dreierlei:
 die Ebene zu N und M, den Momentenwiderstand bei N und die statische Hoehe
@@ -102,7 +111,8 @@ from opencivil.nachweis.biegung_normalkraft import (
     gleiche_linie, linienbezuege, resistenzlinie,
 )
 from opencivil.nachweis.querschnittsloeser import (
-    Faserloeser, Querschnittsloeser, protokoll_verfahren, protokoll_wirksamer_modul,
+    Faserloeser, Querschnittsloeser, QuerschnittsloeserIllinois, protokoll_verfahren,
+    protokoll_wirksamer_modul,
 )
 from opencivil.nachweis.rechenwahl import (
     Betonkennwerte, Rechenart, Rechenwahl, betonbezuege, bezuege_vereinen, gesetze,
@@ -759,10 +769,14 @@ class Knicken(Knickverfahren):
         # Kriechen weicht den Beton auf; das Gesetz rechnet mit dem wirksamen
         # Modul. eps_c1d und eps_c2d bleiben, wie die Norm sie angibt.
         g = gesetze(wahl, w)
-        loeser = g.loeser(h=h, b=b, lagen=lagen, eps_druck=w.eps_c2d)
+        # Gesucht mit Illinois, von der zuletzt gefundenen Ebene aus: die
+        # Iteration und die Suche nach N_Rd folgen sich in hunderten Ebenen
+        # mit wenig verschiedenen Schnittgroessen.
+        loeser = g.loeser(h=h, b=b, lagen=lagen, eps_druck=w.eps_c2d,
+                          klasse=QuerschnittsloeserIllinois)
 
         self._protokoll_ansatz(p, e, eps_druck=w.eps_c2d, eps_zug=loeser.eps_zug,
-                               verdraengt=g.verdraengt)
+                               verdraengt=g.verdraengt, suche=loeser.suche)
         # Schnell rechnet die eigene Linie mit den Schritten der Suche, wie die
         # der Tragsicherheit: sonst zahlte die Bewehrungssuche fuer jede Platte
         # mit Knickfall eine ganze genaue Linie, seit die Handrechnung hier
@@ -799,7 +813,7 @@ class Knicken(Knickverfahren):
     # -- Mitschrift ---------------------------------------------------------
 
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, *, eps_druck: float,
-                          eps_zug: float, verdraengt: bool) -> None:
+                          eps_zug: float, verdraengt: bool, suche: str) -> None:
         self._protokoll_verfahren(p)
         p.titel("Verformung", ebene=3)
         wahl, basis = self.verformung, f"{self.id}.verformung"
@@ -812,7 +826,8 @@ class Knicken(Knickverfahren):
                           posten=self.posten)
         p.erklaerung(VERFORMUNG_NACH_WAHL)
         p.titel("Wie die Dehnungsebene gefunden wird", ebene=3)
-        protokoll_verfahren(p, eps_druck=eps_druck, eps_zug=eps_zug, verdraengt=verdraengt)
+        protokoll_verfahren(p, eps_druck=eps_druck, eps_zug=eps_zug, verdraengt=verdraengt,
+                            suche=suche)
         p.erklaerung(
             "Die Ausmitten-Iteration darüber steht dagegen vollständig da, "
             "Durchlauf für Durchlauf: sie ist das Verfahren selbst, und dass "

@@ -1,5 +1,5 @@
 ---
-erzeugt: 13e2118f98b3
+erzeugt: 765d99c63f47
 art: modul
 tags: [modul]
 ---
@@ -318,13 +318,15 @@ Die Lagen, mit denen gerechnet wird -- in der Handrechnung je Seite eine.
 #### Gesetze.loeser
 
 ```python
-def loeser(self, *, h: float, b: float, lagen: Sequence[Stahllage], beton: Gesetz=None, **fenster) -> Querschnittsloeser
+def loeser(self, *, h: float, b: float, lagen: Sequence[Stahllage], beton: Gesetz=None, klasse: Type[Querschnittsloeser]=Querschnittsloeser, **fenster) -> Querschnittsloeser
 ```
 
 Der Loeser zu dieser Wahl. `fenster` sind die Grenzen der Suche
 (`eps_druck`, `eps_zug`, `grenzen`) -- die bringt jeder Nutzer
 selbst mit. `beton` ersetzt das Betongesetz, etwa durch den
-ungerissenen Zustand; alles andere bleibt.
+ungerissenen Zustand; alles andere bleibt. `klasse` waehlt, wie
+gesucht wird -- das Knicken nimmt
+[[opencivil.nachweis.querschnittsloeser#QuerschnittsloeserIllinois|QuerschnittsloeserIllinois]].
 
 ### protokoll_rechenwahl
 

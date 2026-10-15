@@ -4742,6 +4742,13 @@ Ordnung wächst, und der Stab knickt früher – φ = 0 läge dann auf der unsic
 der Gebrauchslasten unterscheidet sich die Parabel kaum vom linearen Gesetz, in der Nähe der
 Grenzlast erheblich, und genau dort entscheidet sich, ob es noch eine Gleichgewichtslage gibt.
 
+Gesucht wird in zwei geschachtelten Suchen. Innen: zu einer festgehaltenen Krümmung χ wird ε_m
+gesucht, bis N_int die verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung immer mehr
+Zug bedeutet. Aussen: mit diesem ε_m bleibt ein Moment übrig, und χ wird gesucht, bis auch M_int
+stimmt – hier trägt die Monotonie, dass mehr Krümmung mehr Moment heisst. Beide Suchen beginnen bei
+der Ebene, die zuletzt gefunden wurde, grenzen die Stelle mit wachsenden Schritten ein und treffen
+sie dann mit dem Illinois-Verfahren: einer Sekante, die abwechselnd von beiden Seiten herankommt.
+
 Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.5 ‰ bis 45.0 ‰). Jenseits davon geben
 die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Halbierung liefe auf
 eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine
