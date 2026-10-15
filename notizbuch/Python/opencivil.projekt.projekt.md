@@ -1,5 +1,5 @@
 ---
-erzeugt: 71932d771a88
+erzeugt: e56315e082ff
 art: modul
 tags: [modul]
 ---
@@ -34,6 +34,7 @@ Die vollstaendige, speicherbare Beschreibung eines Projekts.
 - `querschnitte: List[QuerschnittEintrag] = field(default_factory=list)`
 - `querschnittsanalysen: List[QuerschnittsanalyseEintrag] = field(default_factory=list)` – Gezeichnete Querschnitte: Polygone, Bewehrung, Schubwände.
 - `balkensysteme: List[BalkensystemEintrag] = field(default_factory=list)` – Ebene Rahmen: Knoten, Stäbe, Lager, Lasten, Lastfälle.
+- `skripte: List[SkriptEintrag] = field(default_factory=list)` – Die Python-Skripte der App «Python» -- gespeichert, nicht gerechnet.
 
 #### Projekt.material
 
@@ -193,6 +194,15 @@ mit dem Baukasten des Eintrags -- `querschnitt`, `linie`,
 Oberflaeche mit einem Einfeldtraeger: wer in Python zeichnet, zeichnet
 sein eigenes System.
 
+#### Projekt.skript
+
+```python
+def skript(self, name: str, code: str='') -> SkriptEintrag
+```
+
+Ein Python-Skript für die App «Python» -- Kennung `p1`, `p2` ...
+Ausgeführt wird es in der Konsole der Oberfläche, nicht hier.
+
 #### Projekt._einziges
 
 ```python
@@ -331,6 +341,7 @@ gemeldet, mit dem aehnlichsten Feld, statt still zu verschwinden.
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.projekt.skript]]
 - [[opencivil.querschnitt.platte]]
 
 ## Gebraucht von

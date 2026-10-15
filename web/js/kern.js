@@ -33,17 +33,22 @@ export class KernFehler extends Error {
 
 /**
  * Startet Python in einem eigenen Faden und liefert eine Schnittstelle zum
- * Rechendienst, sobald er bereit ist.
+ * Rechendienst, sobald er bereit ist. `modul` ist der Dienst darin: der
+ * Rechenkern -- oder die Konsole der App «Python» (`konsole.js`), in einem
+ * Faden für sich.
  *
  * @param {(text: string) => void} [fortschritt]  bekommt kurze Standmeldungen
- * @returns {Promise<{ruf: Function, art: string, fassung: string}>}
+ * @param {{modul?: string}} [optionen]
+ * @returns {Promise<{ruf: Function, beenden: Function, art: string, fassung: string}>}
  */
-export function kernStarten(fortschritt = () => {}) {
+export function kernStarten(fortschritt = () => {}, { modul = 'opencivil.web.dienst' } = {}) {
   // Beide Adressen kommen über die Importtafel in index.html, also mit
   // Versionsmarke. Im Faden gilt die Tafel nicht; die Adresse des
   // Kernverzeichnisses bekommt er darum mit der ersten Nachricht.
   const arbeiter = new Worker(import.meta.resolve('./kern_arbeiter.js'), { type: 'module' });
-  arbeiter.postMessage({ art: 'start', verzeichnis: import.meta.resolve('../kern/dateien.json') });
+  arbeiter.postMessage({
+    art: 'start', verzeichnis: import.meta.resolve('../kern/dateien.json'), modul,
+  });
   /** Nummer der Anfrage -> ihr Versprechen, bis die Antwort da ist. */
   const offen = new Map();
   let nummer = 0;
@@ -58,6 +63,14 @@ export function kernStarten(fortschritt = () => {}) {
       offen.set(nummer, { aufloesen, ablehnen });
       arbeiter.postMessage({ nr: nummer, name, rumpf: JSON.stringify(rumpf) });
     });
+  }
+
+  /** Beendet den Faden. Wer noch auf eine Antwort wartet, hört: abgebrochen. */
+  function beenden() {
+    arbeiter.terminate();
+    const fehler = Object.assign(new KernFehler('Abgebrochen.'), { abgebrochen: true });
+    for (const { ablehnen } of offen.values()) ablehnen(fehler);
+    offen.clear();
   }
 
   function beantworten({ nr, roh, absturz }) {
@@ -83,7 +96,7 @@ export function kernStarten(fortschritt = () => {}) {
       else if (data.art === 'fortschritt') fortschritt(data.text);
       else if (data.art === 'bereit') {
         fortschritt('');
-        bereit({ ruf, art: 'pyodide', fassung: data.fassung });
+        bereit({ ruf, beenden, art: 'pyodide', fassung: data.fassung });
       } else if (data.art === 'gescheitert') {
         gescheitert(new KernFehler(data.meldung, data.spur));
       }

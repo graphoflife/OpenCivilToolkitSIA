@@ -1,5 +1,5 @@
 ---
-erzeugt: 78b15069e639
+erzeugt: d4696d8e1475
 art: modul
 tags: [modul]
 ---
@@ -53,6 +53,7 @@ alldem die Formelsammlung und diese Seiten.
 - [[opencivil.bewehrungssuche]] – die Bewehrung suchen statt sie zu setzen.
 - [[opencivil.core]] – das Geruest, auf dem jede Rechnung steht.
 - [[opencivil.ergebnis]] – ein gerechnetes Projekt, wie man es ohne Oberflaeche braucht.
+- [[opencivil.konsole]] – Python im Browser, für die App «Python».
 - [[opencivil.material]] – die Baustoffe: Beton und Betonstahl.
 - [[opencivil.nachweis]] – die Nachweise der Platte und des gezeichneten Querschnitts.
 - [[opencivil.notizbuch]] – das Notizbuch: Formelsammlung und Python-Doku als Markdown.

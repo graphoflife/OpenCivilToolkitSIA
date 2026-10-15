@@ -1,5 +1,5 @@
 ---
-erzeugt: 7d16a45d362c
+erzeugt: cb520ce2294e
 art: modul
 tags: [modul]
 ---
@@ -70,7 +70,7 @@ die aendern sich nur, wenn jemand bewusst eine neue Fassung einlegt.
 Im Manifest steht auch, welche Fremdpakete unter `web/vendor/pyodide/`
 beiliegen ([[opencivil.web.bruecke#mitgelieferte_pakete|mitgelieferte_pakete]]): Importname -> Paketname, gelesen aus
 den Dateien, die dort liegen, und aus `pyodide-lock.json`. Die App «Python»
-laedt nur diese ([[opencivil|opencivil.konsole.pakete]]). Eine zweite, von Hand
+laedt nur diese ([[opencivil.konsole.pakete]]). Eine zweite, von Hand
 gefuehrte Liste gibt es nicht: was `werkzeug/pyodide_holen.py` hinlegt,
 steht nach dem naechsten Lauf der Bruecke im Manifest.
 

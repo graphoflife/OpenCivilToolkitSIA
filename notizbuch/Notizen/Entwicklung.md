@@ -44,6 +44,42 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-15 · Die App «Python»
+
+An die Stelle der analytischen Gleichungen tritt eine App, in der Python
+läuft (Benutzer): Skripte, gespeichert mit dem Projekt; in der Mitte Code
+und Konsole, rechts statt der Berechnung die Variablen -- wie in Spyder. Die
+Entscheide des Benutzers: reines Python, ohne das offene Projekt im
+Namensraum (`import opencivil` geht trotzdem); mehrere Skripte, eine Sitzung
+für alle; die Variablen rechts; numpy und pandas dazu, Diagramme mit einem
+eigenen Modul statt matplotlib.
+
+- **Immer im Browser.** Der Code läuft in einem eigenen Faden mit Pyodide,
+  auch wenn der lokale Server rechnet: über ihn könnte sonst jede Webseite
+  Code auf dem Rechner ausführen. Derselbe Faden wie beim Rechenkern
+  (`kern_arbeiter.js`), mit einem anderen Dienst (`opencivil.konsole.dienst`)
+  und für sich: eine Endlosschleife hält weder die Seite noch den Kern an, und
+  «Abbrechen» beendet ihn einfach -- unterbrechen liesse sich Python im Faden
+  nur mit Kopfzeilen, die GitHub Pages nicht setzt. Er startet erst beim
+  ersten Lauf; am Rechner war das Skript nach rund 5 s fertig.
+- **Die Sitzung** (`konsole/sitzung.py`) sammelt, was ein Lauf ergibt, der
+  Reihe nach: Ausgabe, Fehlerausgabe, den Wert der letzten Zeile (nur in der
+  Konsole), Fehler mit Skriptname und Zeile -- ohne die eigenen Rahmen --,
+  Bilder. Ein fehlendes Paket sagt, was beiliegt. `input()` meldet, dass es
+  hier keine Tastatur gibt, die wartet.
+- **Pakete** lädt die Konsole erst, wenn ein Skript sie mit `import`
+  einbindet (`konsole/pakete.py`); welche beiliegen, steht im
+  Kernverzeichnis, das der Faden dafür neben `opencivil/` einhängt.
+- **Diagramme** (`konsole/zeichnen.py`): die gängigen Befehle von
+  matplotlib.pyplot unter denselben Namen; ein Bild ist eine Beschreibung,
+  die Oberfläche zeichnet sie mit dem Achsenkreuz aller Diagramme
+  (`web/js/zeichnen.js`), mit Legende und dem Wert beim Darüberfahren. `show()`
+  stellt es zwischen die Ausgaben, was offen bleibt, kommt am Ende des Laufs.
+- **Der Code wird nicht neu gezeichnet**, solange dasselbe Skript gewählt
+  ist -- sonst spränge der Cursor. Gespeichert wird kurz nach dem Tippen und
+  vor jedem Lauf, als Anlass «skript»: das rechnet nichts neu.
+- Das Beispielprojekt hat ein Skript mit einem Diagramm, ohne Download.
+
 ## 2026-10-15 · numpy und pandas liegen bei
 
 Für die App «Python», die als Nächstes kommt, liegen numpy und pandas samt

@@ -40,7 +40,8 @@ from opencivil.nachweis.duktilitaet import HOECHSTENS as DUKTILITAET_HOECHSTENS
 from opencivil.nachweis.spannungsbegrenzung import GrenzeGegenFliessen
 from opencivil.projekt import (
     BEIDE_RICHTUNGEN, RISSANFORDERUNGEN, Aufbau, GebrauchsfallEintrag, KnickEintrag,
-    KombinationEintrag, MaterialEintrag, QuerschnittEintrag, SpannungsfallEintrag,
+    KombinationEintrag, MaterialEintrag, QuerschnittEintrag, SkriptEintrag,
+    SpannungsfallEintrag,
 )
 from opencivil.projekt import balkensystem as bs
 from opencivil.projekt.eintraege import BETONGESETZE, WERKSTOFFSAETZE
@@ -153,6 +154,8 @@ def katalog() -> dict:
         # Kennung, Name und das Material der Linien.
         "neues_balkensystem": bs.BalkensystemEintrag.neu(
             kennung="", name="", material="").als_dict(),
+        # Ein Skript der App «Python», mit einem Diagramm darin.
+        "neues_skript": SkriptEintrag.neu(kennung="", name="").als_dict(),
         # Dasselbe fuer jede Zeile, die man anfuegt -- mit den Startwerten, die
         # eine frische Zeile haben soll (eine Einwirkung von 30 kNm, ein
         # Knickfall unter Druck). Die Oberflaeche setzt nur den Namen und beim

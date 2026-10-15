@@ -34,7 +34,7 @@ Der lokale Server startet ohne Ladezeit. Sonst ist er dasselbe: beide Wege rufen
 
 Kein Fremdpaket, nirgends — es genügt ein `python3`. KaTeX, Pyodide und die
 Schrift JetBrains Mono liegen unter `web/vendor/` bei, damit die Seite
-ohne fremden Dienst auskommt.
+ohne fremden Dienst auskommt; dazu numpy und pandas für die App «Python».
 
 ## In Python, ohne Oberfläche
 
@@ -190,10 +190,11 @@ Fertig und getestet (1091 Tests):
 | `nachweis/schiefe_biegung`, `schubwandnachweis`, `richtungsnachweise` | die Nachweise der Querschnittsanalyse: N mit M_y und M_z, Querkraft mit Torsion, Duktilität und sprödes Versagen je Richtung |
 | `nachweis/qa_gebrauch`, `stabgrenzen`, `gebrauchsebene` | ihre Gebrauchsnachweise: Zwängung auf N (ganzer Querschnitt) und auf M (je Richtung), Stahlspannung quasi-ständig und häufig; σ_s,adm je Stab; die Ebene unter Gebrauchslast, auch schief |
 | `nachweis/knicken`, `qa_knicken` | Knicken am verformten System: das Verfahren (`Knickverfahren`), die Platte in x, der gezeichnete Querschnitt je Fall zu seiner Zugseite |
+| `konsole/` | die App «Python»: die Sitzung (`sitzung`), Diagramme ohne matplotlib (`zeichnen`), welche Fremdpakete beiliegen (`pakete`), der Dienst ihres Fadens (`dienst`) |
 | `spannungsanalyse.py` | sechs Fragen an den Querschnitt: Bild aus N und M oder aus Dehnungen, M-χ- und N-ε-Linie, äquivalenter E-Modul über M und über N — kein Nachweis |
 | `bewehrungssuche/` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt – Längsbewehrung, dünnste Platte, Bügel |
 | `bericht/` | der Bericht als Blöcke (`gliederung`), gesetzt als Konsolentext, LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) und Markdown; die Zusammenfassung je Platte |
-| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `balkensystem`, `projekt`) und was daraus gebaut wird (`aufbau`) |
+| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `balkensystem`, `skript`, `projekt`) und was daraus gebaut wird (`aufbau`) |
 | `ergebnis.py` | ein gerechnetes Projekt: Zusammenfassung, Bericht, LaTeX, Markdown, Analysen |
 | `notizbuch/` | das Notizbuch: Formel-, Themen- und Python-Seiten für Obsidian und die Dokumentation der Seite (`formelseiten`, `bibliothek`), geschrieben ohne Handgeschriebenes anzufassen (`tresor`) |
 | `web/bruecke.py` | was der Browser lädt: das Verzeichnis des Kerns, die Seiten des Notizbuchs, die Versionsmarken |
@@ -211,6 +212,7 @@ Fertig und getestet (1091 Tests):
 | `web/js/querschnittsanalyse.js`, `qa_diagramme.js` | ihre übrige Eingabe und ihre Diagramme |
 | `web/js/bs_zeichnung.js`, `bs_symbole.js` | was es im Balkensystem zeichnet: Stäbe, Lager, Federn, Gelenke, Lasten |
 | `web/js/balkensystem.js`, `bs_diagramme.js` | die übrige Eingabe des Balkensystems und seine Ergebnisse |
+| `web/js/python.js`, `konsole.js`, `variablen.js`, `zeichnen.js` | die App «Python»: Code und Konsole, der Faden der Sitzung, die Variablen rechts, die Diagramme |
 
 Wie das zusammenhängt und warum es so gebaut ist, steht in
 [Entwicklung](notizbuch/Notizen/Entwicklung.md).
@@ -224,8 +226,8 @@ dieselbe Aufteilung, nur nacheinander.
 
 Links steht zuoberst der Name des Projekts, darunter je App ein Knopf mit
 Zeichen und Anzahl -- Materialien, Stahlbeton-Platten, Querschnittsanalyse, 2D
-Balkensysteme -- und unter den Knöpfen die Liste der gewählten App, mit «+» zum
-Anlegen.
+Balkensysteme, Python -- und unter den Knöpfen die Liste der gewählten App, mit
+«+» zum Anlegen.
 
 Die Oberfläche rechnet nichts. Sie schickt die Projektbeschreibung an den Kern
 und stellt dar, was zurückkommt -- fertige Zahlen und fertige LaTeX-Zeichen­ketten.
@@ -357,6 +359,24 @@ gestrichen und trägt ein Fragezeichen. Die Querschnitte kommen aus einer
 Vorlage, von Hand, aus einer Platte oder aus einer Querschnittsanalyse; die
 Steifigkeit nach Vorgabe, nicht nachgeschlagen: E_cm bzw. E_s am
 ungerissenen Bruttoquerschnitt, ohne Schubverformung, Theorie 1. Ordnung.
+
+**Python:** die fünfte App. Skripte, gespeichert mit dem Projekt; in der
+Mitte der Code und darunter die Konsole, rechts statt der Berechnung die
+Variablen mit Typ, Grösse und Wert -- wie in Spyder. Strg+Enter führt das
+Skript aus, die Zeile der Konsole einen einzelnen Befehl (Enter; ↑ und ↓
+blättern). Alle Skripte teilen eine Sitzung: was eines anlegt, sieht das
+nächste. Es läuft reines Python, im Browser in einem eigenen Faden mit
+Pyodide -- auch wenn der lokale Server rechnet, denn über ihn könnte sonst
+jede Webseite Code auf dem Rechner ausführen. «Abbrechen» beendet eine
+Endlosschleife samt Sitzung. Dabei sind die Standardbibliothek, `opencivil`,
+numpy und pandas (geladen erst beim ersten `import`) und für Diagramme ein
+eigenes Modul mit den Befehlen von matplotlib:
+
+```python
+import zeichnen as plt
+plt.plot([0, 1, 2], [0, 1, 4], "o-", label="y = x²")   # dazu scatter, bar, axhline …
+plt.xlabel("x"); plt.legend(); plt.grid()             # erscheint in der Konsole
+```
 
 **Rechte Tafel:**
 

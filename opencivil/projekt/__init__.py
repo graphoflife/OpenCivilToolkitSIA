@@ -22,6 +22,8 @@ Aufgabe ein Modul::
                    ein ebener Rahmen: Knoten, Linien als Staebe und
                    Linienlager, Lager, Lasten, Lastfaelle, Kombinationen
     netz.py        Knoten mit Kennungen, fuer beide Zeichnungen
+    skript.py      ein Python-Skript der App «Python»: gespeichert, nicht
+                   gerechnet
     projekt.py     das Ganze: Zugriff, Rechnen ohne Oberflaeche, Pruefung,
                    Speichern, das Beispiel
     aufbau.py      aus der Beschreibung ein Rechenwerk
@@ -64,6 +66,7 @@ from opencivil.projekt.querschnittsanalyse import (
     QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
     WerkstoffwahlEintrag,
 )
+from opencivil.projekt.skript import SkriptEintrag
 from opencivil.projekt.aufbau import BAUTEILE, Aufbau, Bauteil, Bauteilart, aufbauen
 from opencivil.projekt.projekt import Projekt
 
@@ -80,7 +83,7 @@ __all__ = [
     "HAEUFIG_ANTEIL", "KnickEintrag", "KombinationEintrag", "LageEintrag",
     "MaterialEintrag", "ObergrenzeEintrag", "PostenEintrag", "Projekt", "ProjektFehler",
     "QUASISTAENDIG_ANTEIL", "QuerkraftbewehrungEintrag", "QuerschnittEintrag",
-    "RISSANFORDERUNGEN", "RechenwahlEintrag", "SpannungsfallEintrag",
+    "RISSANFORDERUNGEN", "RechenwahlEintrag", "SkriptEintrag", "SpannungsfallEintrag",
     "abgeleiteter_fallname",
     "aufbauen", "sorten",
 ]

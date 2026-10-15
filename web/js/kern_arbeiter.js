@@ -2,8 +2,10 @@
  * kern_arbeiter.js -- Pyodide in einem eigenen Faden.
  *
  * Startet Python (WebAssembly), legt die Quelldateien aus `opencivil/` in sein
- * Dateisystem und ruft darin `opencivil.web.dienst.bearbeite_json` auf -- je
- * Nachricht eine Anfrage, der Reihe nach. Der Hauptfaden (`kern.js`) schickt
+ * Dateisystem und ruft darin `bearbeite_json` eines Dienstes auf -- je
+ * Nachricht eine Anfrage, der Reihe nach. Der Dienst ist der Rechenkern
+ * (`opencivil.web.dienst`) oder, in einem Faden für sich, die Konsole der App
+ * «Python» (`opencivil.konsole.dienst`). Der Hauptfaden (`kern.js`) schickt
  * Name und Rumpf als JSON und bekommt die Antwort als JSON zurück, genau wie
  * über HTTP.
  *
@@ -14,9 +16,9 @@
  * Oberfläche bleibt bedienbar: der Laufbalken läuft, die Seite scrollt.
  *
  * Nachrichten vom Hauptfaden: zuerst `start` mit der Adresse des
- * Kernverzeichnisses, dann je Anfrage eine. Nachrichten an den Hauptfaden:
- * `fortschritt` (für den Ladeschirm), `bereit` oder `gescheitert` (einmal,
- * nach dem Start), `antwort` (je Anfrage).
+ * Kernverzeichnisses und dem Dienst, dann je Anfrage eine. Nachrichten an den
+ * Hauptfaden: `fortschritt` (für den Ladeschirm), `bereit` oder `gescheitert`
+ * (einmal, nach dem Start), `antwort` (je Anfrage).
  *
  * Die Importtafel aus index.html gilt in einem Faden nicht. Darum bindet
  * dieser keine eigenen Module ein -- sie kämen ohne Versionsmarke.
@@ -65,7 +67,8 @@ async function quellenEinhaengen(pyodide, verzeichnis) {
     throw startfehler(
       `Kernverzeichnis fehlt (${antwort.status}) → «python3 -m opencivil.web.bruecke».`);
   }
-  const { dateien } = await antwort.json();
+  const verzeichnisText = await antwort.text();
+  const { dateien } = JSON.parse(verzeichnisText);
   const eintraege = Object.entries(dateien || {});
   if (!eintraege.length) throw startfehler('Kernverzeichnis leer.');
 
@@ -77,6 +80,9 @@ async function quellenEinhaengen(pyodide, verzeichnis) {
     return [name, await datei.text()];
   }));
 
+  // Das Verzeichnis selbst liegt daneben, wo es auch auf dem Rechner liegt:
+  // die Konsole liest darin, welche Fremdpakete beiliegen.
+  geladen.push(['web/kern/dateien.json', verzeichnisText]);
   const kodierer = new TextEncoder();
   for (const [name, inhalt] of geladen) {
     const pfad = `${EINHAENGEPUNKT}/${name}`;
@@ -87,7 +93,7 @@ async function quellenEinhaengen(pyodide, verzeichnis) {
 }
 
 /** Python laden, den Kern einhängen, den Dienst einbinden -- und melden, dass es geht. */
-async function starten(verzeichnis) {
+async function starten(verzeichnis, modul) {
   melden({ art: 'fortschritt', text: 'Python wird geladen …' });
 
   let loadPyodide;
@@ -117,14 +123,13 @@ if ${JSON.stringify(EINHAENGEPUNKT)} not in sys.path:
 
   let dienst;
   try {
-    dienst = pyodide.pyimport('opencivil.web.dienst');
+    dienst = pyodide.pyimport(modul);
   } catch (ursache) {
-    throw startfehler('Rechenkern nicht einbindbar.', String(ursache));
+    throw startfehler(`${modul} nicht einbindbar.`, String(ursache));
   }
 
   const fassung = pyodide.runPython('import sys; sys.version.split()[0]');
-  console.info(
-    `Rechenkern bereit: Python ${fassung} über Pyodide, ${anzahl} Quelldateien.`);
+  console.info(`${modul} bereit: Python ${fassung} über Pyodide, ${anzahl} Quelldateien.`);
   melden({ art: 'bereit', fassung });
   return dienst;
 }
@@ -133,15 +138,16 @@ if ${JSON.stringify(EINHAENGEPUNKT)} not in sys.path:
 let dienstBereit;
 
 /**
- * Die erste Nachricht startet: `{art: 'start', verzeichnis}`. Jede weitere ist
- * eine Anfrage: `{nr, name, rumpf}`, der Rumpf schon als JSON. Hinein und
- * heraus geht JSON -- genau wie über HTTP; so bekommt die Oberfläche auf beiden
- * Wegen dieselben Daten, bis aufs Zeichen. Der Reihe nach, weil Python in
- * diesem Faden eines nach dem anderen tut.
+ * Die erste Nachricht startet: `{art: 'start', verzeichnis, modul}`. Jede
+ * weitere ist eine Anfrage: `{nr, name, rumpf}`, der Rumpf schon als JSON.
+ * Hinein und heraus geht JSON -- genau wie über HTTP; so bekommt die
+ * Oberfläche auf beiden Wegen dieselben Daten, bis aufs Zeichen. Der Reihe
+ * nach, weil Python in diesem Faden eines nach dem anderen tut. Die Antwort
+ * wird abgewartet: die Konsole lädt erst Pakete, bevor sie ausführt.
  */
 self.onmessage = async ({ data }) => {
   if (data.art === 'start') {
-    dienstBereit = starten(data.verzeichnis).catch((fehler) => {
+    dienstBereit = starten(data.verzeichnis, data.modul).catch((fehler) => {
       melden({ art: 'gescheitert', meldung: fehler.message, spur: fehler.spur || '' });
       return null;
     });
@@ -151,7 +157,7 @@ self.onmessage = async ({ data }) => {
   const dienst = await dienstBereit;
   if (!dienst) return;   // Der Start ist gescheitert; das ist schon gemeldet.
   try {
-    melden({ art: 'antwort', nr, roh: dienst.bearbeite_json(name, rumpf) });
+    melden({ art: 'antwort', nr, roh: await dienst.bearbeite_json(name, rumpf) });
   } catch (ursache) {
     // Hierher kommt nur, was bearbeite_json selbst umbringt -- der Dienst
     // fängt sonst alles ab und gibt es als Antwort zurück.

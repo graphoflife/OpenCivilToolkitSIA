@@ -1,5 +1,5 @@
 ---
-erzeugt: bc7f0e811141
+erzeugt: 206791da047c
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -26,6 +26,11 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.core.rechenwerk]] – Registrierung und Aufloesung von Berechnungen.
     - [[opencivil.core.wert]] – Benannte Werte im Rechenmodell.
   - [[opencivil.ergebnis]] – ein gerechnetes Projekt, wie man es ohne Oberflaeche braucht.
+- [[opencivil.konsole]] – Python im Browser, für die App «Python».
+    - [[opencivil.konsole.dienst]] – die Konsole als Dienst für ihren Faden.
+    - [[opencivil.konsole.pakete]] – welche Fremdpakete ein Skript einbinden kann.
+    - [[opencivil.konsole.sitzung]] – eine Python-Sitzung für die App «Python».
+    - [[opencivil.konsole.zeichnen]] – Diagramme aus der App «Python», ohne matplotlib.
 - [[opencivil.material]] – die Baustoffe: Beton und Betonstahl.
     - [[opencivil.material.basis]] – Gemeinsames Geruest fuer Baustoffe.
     - [[opencivil.material.beton]] – Beton nach SIA 262:2025.
@@ -68,6 +73,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.projekt.platte]] – eine Platte, wie die Oberflaeche sie beschreibt.
     - [[opencivil.projekt.projekt]] – das Projekt als Ganzes.
     - [[opencivil.projekt.querschnittsanalyse]] – ein gezeichneter Querschnitt, wie die Oberflaeche ihn beschreibt.
+    - [[opencivil.projekt.skript]] – ein Python-Skript der App «Python», wie es
 - [[opencivil.querschnitt]] – die Querschnitte: die Platte und der gezeichnete.
     - [[opencivil.querschnitt.analyse]] – der gezeichnete Querschnitt als Bauteil im Rechenwerk.
     - [[opencivil.querschnitt.fasern]] – Der Querschnitt als Summe von Fasern.

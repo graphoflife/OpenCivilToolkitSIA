@@ -1,5 +1,5 @@
 ---
-erzeugt: 47b6cac0bf87
+erzeugt: 6e0bb3dfdcc6
 art: modul
 tags: [modul]
 ---
@@ -32,6 +32,8 @@ balkensystem.py
                ein ebener Rahmen: Knoten, Linien als Staebe und
                Linienlager, Lager, Lasten, Lastfaelle, Kombinationen
 netz.py        Knoten mit Kennungen, fuer beide Zeichnungen
+skript.py      ein Python-Skript der App «Python»: gespeichert, nicht
+               gerechnet
 projekt.py     das Ganze: Zugriff, Rechnen ohne Oberflaeche, Pruefung,
                Speichern, das Beispiel
 aufbau.py      aus der Beschreibung ein Rechenwerk
@@ -68,6 +70,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.platte]] – eine Platte, wie die Oberflaeche sie beschreibt.
 - [[opencivil.projekt.projekt]] – das Projekt als Ganzes.
 - [[opencivil.projekt.querschnittsanalyse]] – ein gezeichneter Querschnitt, wie die Oberflaeche ihn beschreibt.
+- [[opencivil.projekt.skript]] – ein Python-Skript der App «Python», wie es
 
 ## Braucht
 
@@ -78,6 +81,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.projekt.skript]]
 
 ## Gebraucht von
 

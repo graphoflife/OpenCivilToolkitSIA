@@ -3,7 +3,7 @@
  *
  * Oben je App ein Knopf mit Zeichen, wie die Kapitel einer Platte in der
  * Mitte (Benutzer, 2026-10-15): Materialien, Stahlbeton-Platten,
- * Querschnittsanalyse, 2D Balkensysteme. Darunter steht die Liste der
+ * Querschnittsanalyse, 2D Balkensysteme, Python. Darunter steht die Liste der
  * gewählten App, mit «+» zum Anlegen -- bei den Materialien je eine für
  * Beton und Betonstahl. Darüber, zuoberst in der Tafel, der Name des
  * Projekts (index.html).
@@ -42,6 +42,7 @@ const APPS = [
   ...ARTEN.map((a) => ({
     app: a.art, knopf: a.knopf, zeichen: a.zeichen, liste: (p) => p[a.liste] || [],
   })),
+  { app: 'skript', knopf: 'Python', zeichen: 'python', liste: (p) => p.skripte || [] },
 ];
 
 function appKnopf(a, p, gewaehlt) {
@@ -99,6 +100,10 @@ const ANLEGEN = {
 /** Was rechts im Eintrag steht, wie er aussieht und wie er weggeht -- je Art. */
 const ART = {
   material: (m) => ({ text: m.sorte, loeschen: materialLoeschen }),
+  skript: (s) => {
+    const zeilen = (s.code || '').split('\n').filter((z) => z.trim()).length;
+    return { text: `${zeilen} ${zeilen === 1 ? 'Zeile' : 'Zeilen'}`, loeschen: () => entfernen('skripte', s) };
+  },
   ...Object.fromEntries(ARTEN.map((a) => [a.art, (e) => ({
     text: KURZTEXT[a.art](e), loeschen: () => bauteilLoeschen(a, e),
   })])),
@@ -184,6 +189,21 @@ function entfernen(liste, eintrag) {
     p[liste] = p[liste].filter((x) => x.kennung !== eintrag.kennung);
   });
   if (zustand.auswahl?.kennung === eintrag.kennung) waehlen(null);
+}
+
+/** Ein neues Skript -- nach der Vorlage des Kerns, mit einem Diagramm darin. */
+function skriptAnlegen() {
+  const vorlage = zustand.katalog?.neues_skript;
+  if (!vorlage) {
+    melden('Katalog noch nicht geladen.', true);
+    return;
+  }
+  const kennung = freieKennung('p');
+  projektAendern((p) => {
+    p.skripte = p.skripte || [];
+    p.skripte.push({ ...vorlage, kennung, name: naechsterName('Skript', p.skripte) });
+  }, 'skript');
+  waehlen({ art: 'skript', kennung });
 }
 
 function materialAnlegen(art) {
@@ -326,6 +346,12 @@ export function baumZeichnen(knoepfe, behaelter) {
       eintraege: p.materialien.filter((m) => m.art === art),
       plus: plus(`${titel} hinzufügen`, () => materialAnlegen(art)),
     })));
+  }
+  if (app === 'skript') {
+    return ersetzen(behaelter, liste({
+      titel: 'Python-Skripte', art: 'skript', leer: 'kein Skript', eintraege: p.skripte || [],
+      plus: plus('Skript hinzufügen', skriptAnlegen),
+    }));
   }
   const a = artVon(app);
   return ersetzen(behaelter, liste({

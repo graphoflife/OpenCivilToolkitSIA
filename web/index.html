@@ -8,17 +8,17 @@
   <link rel="stylesheet" href="vendor/katex/katex.min.css">
   <script defer src="vendor/katex/katex.min.js"></script>
   <!-- Versionsmarken: geschrieben von «python3 -m opencivil.web.bruecke», nicht von Hand ändern -->
-  <link rel="stylesheet" href="./css/stil.css?v=03cd38deda0a">
+  <link rel="stylesheet" href="./css/stil.css?v=f42646cf9869">
   <script type="importmap">
   {
     "imports": {
       "./js/ablage.js": "./js/ablage.js?v=a67aeb3de570",
       "./js/achsen.js": "./js/achsen.js?v=87b48bf3c1f9",
       "./js/api.js": "./js/api.js?v=7a369d6df9f2",
-      "./js/app.js": "./js/app.js?v=0dc0bf837767",
+      "./js/app.js": "./js/app.js?v=3fb0bbcd8972",
       "./js/arten.js": "./js/arten.js?v=a84472f39f79",
       "./js/balkensystem.js": "./js/balkensystem.js?v=58a3e65dbb2e",
-      "./js/baum.js": "./js/baum.js?v=a8a36420ea1d",
+      "./js/baum.js": "./js/baum.js?v=a010c9ee4de4",
       "./js/bausteine.js": "./js/bausteine.js?v=5e4ad56bf79b",
       "./js/bericht.js": "./js/bericht.js?v=4069adde393d",
       "./js/bs_diagramme.js": "./js/bs_diagramme.js?v=8c926719734b",
@@ -33,11 +33,12 @@
       "./js/cad_palette.js": "./js/cad_palette.js?v=d4ec92ee6165",
       "./js/diagramm.js": "./js/diagramm.js?v=afc3acde6f3a",
       "./js/dom.js": "./js/dom.js?v=c25fa011a69f",
-      "./js/editor.js": "./js/editor.js?v=2c3b82785e66",
+      "./js/editor.js": "./js/editor.js?v=025951260206",
       "./js/fenster.js": "./js/fenster.js?v=eeecf68a8192",
       "./js/kapitel.js": "./js/kapitel.js?v=975c506e03ab",
-      "./js/kern.js": "./js/kern.js?v=dc39e6201373",
-      "./js/kern_arbeiter.js": "./js/kern_arbeiter.js?v=7a1bf252b89f",
+      "./js/kern.js": "./js/kern.js?v=d9fb91326d27",
+      "./js/kern_arbeiter.js": "./js/kern_arbeiter.js?v=89902732e200",
+      "./js/konsole.js": "./js/konsole.js?v=0475041df9a2",
       "./js/kopierleiste.js": "./js/kopierleiste.js?v=5f7cd5851fbf",
       "./js/lagen.js": "./js/lagen.js?v=d1de89b1b40b",
       "./js/markdown.js": "./js/markdown.js?v=95b8ac3d60df",
@@ -45,16 +46,19 @@
       "./js/nachweise.js": "./js/nachweise.js?v=bb6b80cdf724",
       "./js/notizbuch.js": "./js/notizbuch.js?v=18958bac8115",
       "./js/notizbuch_seite.js": "./js/notizbuch_seite.js?v=639209806e79",
+      "./js/python.js": "./js/python.js?v=7f76e2598208",
       "./js/qa_diagramme.js": "./js/qa_diagramme.js?v=399f79cbd2fb",
       "./js/qa_uebersicht.js": "./js/qa_uebersicht.js?v=e1334817f2c1",
       "./js/qa_vorlagen.js": "./js/qa_vorlagen.js?v=bcb219f987e3",
       "./js/qa_zeichnung.js": "./js/qa_zeichnung.js?v=ab90188de64f",
       "./js/querschnittsanalyse.js": "./js/querschnittsanalyse.js?v=e9d2729d01ef",
-      "./js/sinnbilder.js": "./js/sinnbilder.js?v=68a5fccc7dcb",
+      "./js/sinnbilder.js": "./js/sinnbilder.js?v=437916c32cad",
       "./js/spannungsbild.js": "./js/spannungsbild.js?v=abdff79644fd",
-      "./js/zustand.js": "./js/zustand.js?v=331894502fa3",
-      "./kern/dateien.json": "./kern/dateien.json?v=004f716c5c97",
-      "./kern/notizbuch.json": "./kern/notizbuch.json?v=aed3b0ee35a2"
+      "./js/variablen.js": "./js/variablen.js?v=338f60c3569f",
+      "./js/zeichnen.js": "./js/zeichnen.js?v=aa8594c1d6fa",
+      "./js/zustand.js": "./js/zustand.js?v=3513a939fa16",
+      "./kern/dateien.json": "./kern/dateien.json?v=dd79cfdb5715",
+      "./kern/notizbuch.json": "./kern/notizbuch.json?v=3f9ab0c5948f"
     }
   }
   </script>
@@ -137,7 +141,7 @@
   <!-- ---------------------------------------------------------------- -->
   <section class="tafel tafel-rechts" id="tafel-bericht">
     <div class="tafel-kopf">
-      <h2>Berechnung</h2>
+      <h2 id="bericht-titel">Berechnung</h2>
       <span class="schalter" id="umfang" title="Alles zeigen oder nur den links gewählten Bestandteil">
         <button class="schalter-halb ist-an" data-umfang="seite">Aktuelle Seite</button>
         <button class="schalter-halb" data-umfang="gesamt">Gesamt</button>

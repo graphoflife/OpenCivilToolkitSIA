@@ -19,6 +19,8 @@ import {
 import { melden } from './dom.js';
 import { baumZeichnen } from './baum.js';
 import { berichtZeichnen } from './bericht.js';
+import { konsoleVerbinden } from './konsole.js';
+import { variablenZeichnen } from './variablen.js';
 import { editorZeichnen } from './editor.js';
 import { fensterEinrichten } from './fenster.js';
 import { notizbuchEinrichten } from './notizbuch.js';
@@ -440,19 +442,37 @@ function ohneSprung(zeichnen) {
  */
 const NUR_MITTE = new Set(['zeichnung', 'fenster']);
 
+/**
+ * Die rechte Tafel: die Berechnung -- oder, wenn links ein Skript gewählt
+ * ist, die Variablen der Python-Sitzung, wie in Spyder (Benutzer,
+ * 2026-10-15). Dann gelten Umfang und Reiter nicht.
+ */
+function rechtsZeichnen() {
+  const python = zustand.auswahl?.art === 'skript';
+  knoten.berichtTitel.textContent = python ? 'Variablen' : 'Berechnung';
+  knoten.tafelRechts.textContent = python ? 'Variablen' : 'Berechnung';
+  knoten.umfang.hidden = python;
+  knoten.reiter.hidden = python;
+  if (python) {
+    variablenZeichnen(knoten.bericht);
+    return;
+  }
+  berichtZeichnen(knoten.bericht, {
+    verfolgen: (ziel, name) => {
+      // Reiter und Platzhalter in einem Zug: sonst zeichnete der Wechsel
+      // erst die ganze Herleitung, die der Teillauf gleich ersetzt.
+      aendern({ reiter: 'herleitung', verfolgung: { ziel, name, loesung: null } }, 'verfolgung');
+      verfolgen(ziel, name);
+    },
+  });
+}
+
 function allesZeichnen(anlass) {
   const nurMitte = NUR_MITTE.has(anlass);
   ohneSprung(() => {
     if (!nurMitte) baumZeichnen(knoten.apps, knoten.baum);
     editorZeichnen(knoten.editor, knoten.editorTitel, knoten.editorHinweis, knoten.fenster);
-    if (!nurMitte) berichtZeichnen(knoten.bericht, {
-      verfolgen: (ziel, name) => {
-        // Reiter und Platzhalter in einem Zug: sonst zeichnete der Wechsel
-        // erst die ganze Herleitung, die der Teillauf gleich ersetzt.
-        aendern({ reiter: 'herleitung', verfolgung: { ziel, name, loesung: null } }, 'verfolgung');
-        verfolgen(ziel, name);
-      },
-    });
+    if (!nurMitte) rechtsZeichnen();
   });
 
   knoten.btnSpeichern.textContent = zustand.ungespeichert ? 'Speichern •' : 'Speichern';
@@ -492,6 +512,10 @@ async function starten() {
     editorHinweis: document.getElementById('editor-hinweis'),
     fenster: document.getElementById('fenster'),
     bericht: document.getElementById('bericht'),
+    berichtTitel: document.getElementById('bericht-titel'),
+    tafelRechts: document.querySelector('#tafelwahl [data-tafel="rechts"]'),
+    umfang: document.getElementById('umfang'),
+    reiter: document.getElementById('reiter'),
     projektname: document.getElementById('projektname'),
     zustandsanzeige: document.getElementById('zustandsanzeige'),
     kernanzeige: document.getElementById('kernanzeige'),
@@ -528,6 +552,8 @@ async function starten() {
   fensterEinrichten(knoten.fenster);
   ablageEinrichten(imBrowserAblegen);
   horchen(allesZeichnen);
+  // Die Konsole meldet, wenn ein Lauf etwas ergab -- gerechnet wird dabei nichts.
+  konsoleVerbinden(() => aendern({}, 'konsole'));
   // Vor dem Kern: das Notizbuch braucht ihn nicht, und eine Adresse
   // #notizbuch/… soll auch dann aufgehen, wenn Pyodide noch lädt.
   notizbuchEinrichten({

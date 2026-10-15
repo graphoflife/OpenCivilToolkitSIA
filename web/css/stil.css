@@ -2026,3 +2026,95 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-zahl { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .bs-wo { font-size: 10px; color: var(--schrift-zart); }
 .bs-einheiten { margin: 0 0 6px; font-size: 11px; color: var(--schrift-zart); }
+
+/* --------------------------------------------------------------- Python -- */
+
+/* Name und Knöpfe in einer Zeile über dem Code und unter der Konsole. */
+.py-kopf { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
+.py-kopf input[type="text"] { flex: 1; min-width: 0; font-weight: 600; }
+
+/* Der Code: Zeilennummern links, das Feld rechts, beide in derselben Schrift
+   und Zeilenhöhe -- sonst liefen die Nummern den Zeilen davon. */
+.py-editor {
+  display: grid; grid-template-columns: auto minmax(0, 1fr);
+  border: 1px solid var(--eingabe-rand); border-radius: 5px; overflow: hidden;
+  background: var(--flaeche);
+}
+.py-nummern, textarea.py-code {
+  font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; line-height: 1.5;
+  padding: 8px 6px;
+}
+.py-nummern {
+  min-width: 34px; overflow: hidden; text-align: right; user-select: none;
+  color: var(--schrift-zart); background: var(--flaeche-2); border-right: 1px solid var(--rand);
+}
+textarea.py-code {
+  height: clamp(220px, 46vh, 640px); resize: vertical; white-space: pre; overflow: auto;
+  border: 0; border-radius: 0; background: transparent; tab-size: 4;
+}
+textarea.py-code:focus { box-shadow: none; }
+.py-editor:focus-within { border-color: var(--blau); box-shadow: 0 0 0 2px var(--blau-hell); }
+.py-tipp { margin: 6px 0 0; font-size: 11.5px; color: var(--schrift-zart); }
+
+/* Die Konsole: dunkel wie ein Terminal, die Bilder darin auf hellem Grund. */
+.py-konsole {
+  max-height: 60vh; min-height: 120px; overflow: auto;
+  padding: 8px 10px; border-radius: 5px; margin-bottom: 6px;
+  background: #10161f; color: #d6deeb;
+  font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px;
+}
+.py-ausgabe { display: flex; flex-direction: column; gap: 2px; }
+.py-konsole pre { margin: 0; white-space: pre-wrap; word-break: break-word; font: inherit; }
+.py-eingabe   { color: #7fb4ff; }
+.py-lauf      { color: #7fb4ff; font-weight: 600; margin-top: 4px; }
+.py-wert      { color: #c3e88d; }
+.py-fehleraus { color: #ffcb6b; }
+.py-fehler    { color: #ff8a7a; }
+.py-hinweis   { color: #8ea3bf; font-style: italic; }
+.py-leer      { margin: 0; color: #8ea3bf; }
+.py-stand     { margin-top: 4px; color: #ffcb6b; }
+
+.py-eingabezeile { margin-bottom: 8px; }
+textarea.py-zeile {
+  font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px;
+  resize: none; field-sizing: content; min-height: 34px; max-height: 30vh;
+}
+
+/* Ein Bild in der Konsole: weiss, mit dem Zettel beim Darüberfahren. */
+.py-bild {
+  position: relative; margin: 6px 0; padding: 6px; border-radius: 5px;
+  background: var(--flaeche); color: var(--schrift); max-width: 640px;
+}
+.py-bild svg { display: block; width: 100%; height: auto; }
+.py-zettel {
+  position: absolute; z-index: 2; pointer-events: none; padding: 4px 8px;
+  border-radius: 5px; border: 1px solid var(--rand);
+  background: var(--flaeche); color: var(--schrift); font-size: 11.5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .15); white-space: nowrap;
+}
+
+/* Die Variablen rechts: je eine in zwei Zeilen -- Name und Typ, darunter der
+   Wert, gekürzt. Aufgeklappt steht er ganz da. */
+.py-variablen { padding: 6px 10px; }
+.py-variable { border-bottom: 1px solid var(--rand); }
+.py-variable > summary {
+  display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); gap: 2px 10px;
+  padding: 6px 2px; cursor: pointer; list-style: none;
+}
+.py-variable > summary::-webkit-details-marker { display: none; }
+.py-variable > summary:hover { background: var(--flaeche-2); }
+.py-v-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; }
+.py-v-typ { justify-self: end; font-size: 11.5px; color: var(--schrift-matt); white-space: nowrap; }
+.py-v-wert {
+  grid-column: 1 / -1; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--schrift-matt);
+}
+.py-variable[open] .py-v-wert { display: none; }
+.py-v-lang {
+  margin: 0 0 8px; padding: 6px 8px; border-radius: 5px; overflow: auto; max-height: 40vh;
+  background: var(--flaeche-2); font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 12px; white-space: pre;
+}
+
+/* Mit einem Skript links gelten rechts weder Umfang noch Reiter. */
+.tafel-kopf .schalter[hidden], .tafel-kopf .reiter[hidden] { display: none; }

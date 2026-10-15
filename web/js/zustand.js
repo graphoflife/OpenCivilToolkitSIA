@@ -37,8 +37,8 @@ export const zustand = {
    */
   verfolgung: null,
   /**
-   * Was links ausgewählt ist: {art, kennung} -- `art` ist 'material'
-   * oder die einer Bauteilart (ARTEN, arten.js).
+   * Was links ausgewählt ist: {art, kennung} -- `art` ist 'material',
+   * 'skript' oder die einer Bauteilart (ARTEN, arten.js).
    */
   auswahl: null,
   /**
@@ -66,9 +66,9 @@ export const zustand = {
   rechenfehler: null,
   ungespeichert: false,
   /**
-   * Welche App links gewählt ist: 'material' oder die Art eines Bauteils --
-   * wie die Auswahl sie nennt. Wer einen Eintrag wählt, wählt seine App mit
-   * (`waehlen`); null heisst: die der Auswahl, sonst die Platten.
+   * Welche App links gewählt ist: 'material', 'skript' oder die Art eines
+   * Bauteils -- wie die Auswahl sie nennt. Wer einen Eintrag wählt, wählt
+   * seine App mit (`waehlen`); null heisst: die der Auswahl, sonst die Platten.
    */
   app: null,
   /**
@@ -185,6 +185,12 @@ export function gewaehltesBauteil() {
   return eintrag ? { art, eintrag } : null;
 }
 
+/** Das gewählte Python-Skript, oder null. */
+export function gewaehltesSkript() {
+  if (zustand.auswahl?.art !== 'skript') return null;
+  return (zustand.projekt.skripte || []).find((s) => s.kennung === zustand.auswahl.kennung) || null;
+}
+
 export function materialien(art) {
   return zustand.projekt.materialien.filter((m) => m.art === art);
 }
@@ -193,6 +199,7 @@ export function freieKennung(vorsilbe) {
   const vergeben = new Set([
     ...zustand.projekt.materialien.map((m) => m.kennung),
     ...ARTEN.flatMap((a) => (zustand.projekt[a.liste] || []).map((e) => e.kennung)),
+    ...(zustand.projekt.skripte || []).map((s) => s.kennung),
   ]);
   let i = 1;
   while (vergeben.has(`${vorsilbe}${i}`)) i += 1;

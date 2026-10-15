@@ -29,6 +29,7 @@ from opencivil.projekt.eintraege import (
 from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.platte import QuerschnittEintrag
+from opencivil.projekt.skript import VORLAGE, SkriptEintrag
 from opencivil.projekt.querschnittsanalyse import (
     QuerschnittsanalyseEintrag, WerkstoffwahlEintrag,
 )
@@ -53,6 +54,9 @@ class Projekt(Beschreibung):
 
     balkensysteme: List[BalkensystemEintrag] = field(default_factory=list)
     """Ebene Rahmen: Knoten, Stäbe, Lager, Lasten, Lastfälle."""
+
+    skripte: List[SkriptEintrag] = field(default_factory=list)
+    """Die Python-Skripte der App «Python» -- gespeichert, nicht gerechnet."""
 
     # -- Zugriff ------------------------------------------------------------
 
@@ -100,7 +104,8 @@ class Projekt(Beschreibung):
         raise ProjektFehler(f"Ein Bauteil '{kennung}' gibt es im Projekt nicht.")
 
     def freie_kennung(self, vorsilbe: str) -> str:
-        vergeben = {m.kennung for m in self.materialien} | {e.kennung for e in self.bauteile()}
+        vergeben = ({m.kennung for m in self.materialien} | {e.kennung for e in self.bauteile()}
+                    | {s.kennung for s in self.skripte})
         i = 1
         while f"{vorsilbe}{i}" in vergeben:
             i += 1
@@ -278,6 +283,15 @@ class Projekt(Beschreibung):
         self.balkensysteme.append(eintrag)
         return eintrag
 
+    def skript(self, name: str, code: str = "") -> SkriptEintrag:
+        """
+        Ein Python-Skript für die App «Python» -- Kennung ``p1``, ``p2`` ...
+        Ausgeführt wird es in der Konsole der Oberfläche, nicht hier.
+        """
+        eintrag = SkriptEintrag(kennung=self.freie_kennung("p"), name=name, code=code)
+        self.skripte.append(eintrag)
+        return eintrag
+
     def _einziges(self, art: str,
                   gewaehlt: Union[str, MaterialEintrag, None]) -> str:
         """Die Kennung des gewaehlten Materials -- oder des einzigen dieser Art."""
@@ -349,6 +363,7 @@ class Projekt(Beschreibung):
             materialien=[MaterialEintrag.aus_dict(x) for x in (d.get("materialien") or [])],
             **{art.liste: [art.eintrag.aus_dict(x) for x in (d.get(art.liste) or [])]
                for art in BAUTEILE},
+            skripte=[SkriptEintrag.aus_dict(x) for x in (d.get("skripte") or [])],
         )
 
     def speichern(self, pfad: str | Path) -> Path:
@@ -413,6 +428,9 @@ class Projekt(Beschreibung):
         rahmen.stablast(eigengewicht, balken, wert=25.0)
         rahmen.stablast(wind, links, wert=3.0, richtung="waagrecht")
         rahmen.kombination("Tragsicherheit", (eigengewicht, 1.35), (wind, 1.5))
+
+        # Ein Skript für die App «Python», mit einem Diagramm -- ohne Download.
+        projekt.skript("Skript 1", VORLAGE)
         return projekt
 
     @classmethod

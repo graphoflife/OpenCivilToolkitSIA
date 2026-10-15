@@ -32,8 +32,9 @@ import {
 } from './nachweise.js';
 import { analyseEditor, analyseFenster } from './querschnittsanalyse.js';
 import { balkensystemEditor } from './balkensystem.js';
+import { skriptZeichnen } from './python.js';
 import {
-  aendern, gewaehltesBauteil, gewaehltesMaterial, kennwertId,
+  aendern, gewaehltesBauteil, gewaehltesMaterial, gewaehltesSkript, kennwertId,
   projektAendern, zustand,
 } from './zustand.js';
 
@@ -702,6 +703,12 @@ export function editorZeichnen(behaelter, titelKnoten, hinweisKnoten, fensterGru
     titelKnoten.textContent = bauteil.eintrag.name;
     hinweisKnoten.textContent = bauteil.art.bezeichnung;
     return ersetzen(behaelter, ...EDITOREN[bauteil.art.art](bauteil.eintrag));
+  }
+  const skript = gewaehltesSkript();
+  if (skript) {
+    titelKnoten.textContent = skript.name;
+    hinweisKnoten.textContent = 'Python';
+    return skriptZeichnen(behaelter, skript);
   }
   titelKnoten.textContent = 'Eingaben';
   hinweisKnoten.textContent = '';

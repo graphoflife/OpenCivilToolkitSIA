@@ -12,8 +12,8 @@ from opencivil.projekt import (
     KnotenlastEintrag, KombinationEintrag, LageEintrag, LagerEintrag, LastfallEintrag,
     LastkombinationEintrag, MaterialEintrag, ObergrenzeEintrag, PostenEintrag, Projekt,
     ProjektFehler, QuerkraftbewehrungEintrag, QuerschnittEintrag, RechenwahlEintrag,
-    SpannungsfallEintrag, StablastEintrag, StabquerschnittEintrag, SystemknotenEintrag,
-    SystemlinieEintrag,
+    SkriptEintrag, SpannungsfallEintrag, StablastEintrag, StabquerschnittEintrag,
+    SystemknotenEintrag, SystemlinieEintrag,
 )
 from opencivil.projekt.eintraege import Beschreibung
 from opencivil.projekt.querschnittsanalyse import (
@@ -423,6 +423,7 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
         (LastfallEintrag, {}, {}),
         (LastkombinationEintrag, {}, {}),
         (BalkensystemEintrag, {"kennung": "r"}, {"kennung": "r", "name": "r"}),
+        (SkriptEintrag, {"kennung": "p"}, {"kennung": "p", "name": "p"}),
         (Projekt, {}, {}),
     ]
 

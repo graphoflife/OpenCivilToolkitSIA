@@ -2158,6 +2158,91 @@
       ]
     },
     {
+      "name": "opencivil.konsole",
+      "pfad": "Python/opencivil.konsole.md",
+      "art": "modul",
+      "kurz": "Python im Browser, für die App «Python».",
+      "stichworte": []
+    },
+    {
+      "name": "opencivil.konsole.dienst",
+      "pfad": "Python/opencivil.konsole.dienst.md",
+      "art": "modul",
+      "kurz": "die Konsole als Dienst für ihren Faden.",
+      "stichworte": [
+        "bearbeite_json"
+      ]
+    },
+    {
+      "name": "opencivil.konsole.pakete",
+      "pfad": "Python/opencivil.konsole.pakete.md",
+      "art": "modul",
+      "kurz": "welche Fremdpakete ein Skript einbinden kann.",
+      "stichworte": [
+        "mitgeliefert",
+        "importe",
+        "gebraucht",
+        "laden",
+        "hinweis"
+      ]
+    },
+    {
+      "name": "opencivil.konsole.sitzung",
+      "pfad": "Python/opencivil.konsole.sitzung.md",
+      "art": "modul",
+      "kurz": "eine Python-Sitzung für die App «Python».",
+      "stichworte": [
+        "Lauf",
+        "Lauf.schreiben",
+        "_Strom",
+        "_Strom.write",
+        "_Strom.flush",
+        "Sitzung",
+        "Sitzung.zuruecksetzen",
+        "Sitzung.ausfuehren",
+        "Sitzung.variablen",
+        "_typ",
+        "_groesse",
+        "_darstellung",
+        "_fehlertext"
+      ]
+    },
+    {
+      "name": "opencivil.konsole.zeichnen",
+      "pfad": "Python/opencivil.konsole.zeichnen.md",
+      "art": "modul",
+      "kurz": "Diagramme aus der App «Python», ohne matplotlib.",
+      "stichworte": [
+        "Figur",
+        "Figur.leer",
+        "Figur.als_dict",
+        "figure",
+        "show",
+        "clf",
+        "abholen",
+        "savefig",
+        "plot",
+        "scatter",
+        "bar",
+        "axhline",
+        "axvline",
+        "title",
+        "xlabel",
+        "ylabel",
+        "legend",
+        "grid",
+        "xlim",
+        "ylim",
+        "_paare",
+        "_format",
+        "_als_kategorien",
+        "_folge",
+        "_zahl",
+        "_zahl_oder_luecke",
+        "_farbe"
+      ]
+    },
+    {
       "name": "opencivil.material",
       "pfad": "Python/opencivil.material.md",
       "art": "modul",
@@ -3068,6 +3153,7 @@
         "Projekt.platte",
         "Projekt.analyse",
         "Projekt.balkensystem",
+        "Projekt.skript",
         "Projekt._einziges",
         "Projekt.rechnen",
         "Projekt.pruefen",
@@ -3137,6 +3223,17 @@
         "QuerschnittsanalyseEintrag.neu",
         "QuerschnittsanalyseEintrag.aus_dict",
         "QuerschnittsanalyseEintrag._elemente_lesen"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.skript",
+      "pfad": "Python/opencivil.projekt.skript.md",
+      "art": "modul",
+      "kurz": "ein Python-Skript der App «Python», wie es",
+      "stichworte": [
+        "SkriptEintrag",
+        "SkriptEintrag.neu",
+        "SkriptEintrag.aus_dict"
       ]
     },
     {

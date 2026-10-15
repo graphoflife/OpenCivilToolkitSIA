@@ -104,6 +104,10 @@ const ZEICHEN = {
     pfade: ['M6 18V6h12v12', 'M3.5 18h5 M3.5 20l1-2 M5.5 20l1-2 M7.5 20l1-2',
       'M18 18l-2 3h4z'],
   },
+  // Eine Konsole: die Aufforderung und eine Zeile dahinter.
+  python: {
+    pfade: ['M3 4.5h18v15H3z', 'M6.5 9l3 3-3 3', 'M11.5 15.5h5'],
+  },
 };
 
 /** Ein Zeichen als SVG -- `name` aus der Liste oben. */

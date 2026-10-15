@@ -1,5 +1,5 @@
 ---
-erzeugt: 83f558b8d580
+erzeugt: 4e679b0e77b5
 art: modul
 tags: [modul]
 ---
@@ -589,4 +589,5 @@ def aus_dict(cls, d: Mapping[str, Any]) -> 'KombinationEintrag'
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.projekt.skript]]
 - [[opencivil.web.api]]
