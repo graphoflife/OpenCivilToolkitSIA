@@ -1,5 +1,5 @@
 ---
-erzeugt: 47c99ed55c7d
+erzeugt: f7b60624ad25
 art: modul
 tags: [modul]
 ---
@@ -417,8 +417,6 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.bericht.zusammenfassung]]
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.protokoll]]
-- [[opencivil.gleichungen.ausdruck]]
-- [[opencivil.gleichungen.blatt]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]

@@ -22,7 +22,6 @@ from opencivil.projekt.querschnittsanalyse import (
     QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
     WerkstoffwahlEintrag,
 )
-from opencivil.projekt.gleichungen import GleichungsblattEintrag, GleichungszeileEintrag
 from opencivil.web import api, dienst
 
 
@@ -403,8 +402,6 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
         (GebrauchsfallEintrag, {"name": "g"}, {"name": "g"}),
         (RechenwahlEintrag, {}, {}),
         (KombinationEintrag, {"name": "k"}, {"name": "k"}),
-        (GleichungszeileEintrag, {}, {}),
-        (GleichungsblattEintrag, {"kennung": "g"}, {"kennung": "g", "name": "g"}),
         (KnotenEintrag, {}, {}),
         (FlaecheEintrag, {}, {}),
         (StabEintrag, {}, {}),
@@ -709,6 +706,14 @@ class TestAltesFormat(unittest.TestCase):
     def test_rechnet_durch(self):
         aufbau = Projekt.aus_dict(self.ALT).aufbauen()
         self.assertTrue(aufbau.werk.loese(*aufbau.alle_nachweisziele()).vollstaendig)
+
+    def test_gleichungsblaetter_fallen_still_weg(self):
+        """Die App gibt es seit 2026-10-15 nicht mehr: «einfach löschen» (Benutzer)."""
+        alt = dict(self.ALT, gleichungen=[{"kennung": "g1", "name": "Vorbemessung",
+                                           "zeilen": [{"art": "text", "text": "Stütze"}]}])
+        projekt = Projekt.aus_dict(alt)
+        self.assertNotIn("gleichungen", projekt.als_dict())
+        self.assertEqual(projekt.freie_kennung("g"), "g1")
 
 
 class TestNurDieTragrichtungX(unittest.TestCase):

@@ -33,7 +33,6 @@ from opencivil.core.protokoll import (
 )
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
-from opencivil.gleichungen.ausdruck import EINHEITENNAMEN, blattname
 from opencivil.material.beton import BETON_VORLAGEN, BETONSORTEN
 from opencivil.material.betonstahl import STAHLSORTEN, STAHL_VORLAGEN
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
@@ -54,7 +53,6 @@ from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.schnittanalyse import Zugseite
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.vorlagen import VORLAGEN
-from opencivil.projekt.gleichungen import GleichungszeileEintrag
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
     FASERARTEN, FASERSPANNUNGSARTEN, RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN, Rechenart,
@@ -285,10 +283,6 @@ def katalog() -> dict:
         # Wie weit sich die Grenze x/d hoechstens setzen laesst -- fuer das
         # Feld; geprueft wird beim Bauen der Platte.
         "duktilitaet": {"hoechstens": DUKTILITAET_HOECHSTENS},
-        # Fuer das Blatt: die leere Zeile wie die frische Platte oben, und die
-        # Einheiten, die der Leser in \mathrm{...} versteht.
-        "neue_gleichungszeile": GleichungszeileEintrag().als_dict(),
-        "einheiten": sorted(EINHEITENNAMEN),
     }
 
 
@@ -343,9 +337,6 @@ def wert_dict(wert: Wert) -> dict:
         "quelle_text": wert.quelle.beschriftung,
         "herkunft": wert.herkunft or "",
         "latex": wert.zahl_latex(),
-        # Unter welchem Namen der Wert in einem Blatt steht -- der Vorschlag,
-        # wenn ihn jemand dort als Projektwert waehlt. Leer: kein gueltiger Name.
-        "blattname": blattname(wert.symbol),
     }
 
 
@@ -506,12 +497,6 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None) -> dict:
             for kennung, system in aufbau.balkensysteme.items()})
         ergebnis["warnungen"] = list(aufbau.warnungen)
         ergebnis["zuordnung"] = zuordnung(aufbau)
-        # Je Blatt und Zeile, was neben der Zeile steht -- gesetzt vom Kern.
-        ergebnis["gleichungen"] = {
-            kennung: [{"ergebnis": r.ergebnis, "fehler": r.fehler}
-                      for r in loesung.befunde.get(blatt.id, [])]
-            for kennung, blatt in aufbau.blaetter.items()
-        }
     return ergebnis
 
 

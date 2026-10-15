@@ -1,5 +1,5 @@
 ---
-erzeugt: 891c8de30c22
+erzeugt: bc7f0e811141
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -26,9 +26,6 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.core.rechenwerk]] – Registrierung und Aufloesung von Berechnungen.
     - [[opencivil.core.wert]] – Benannte Werte im Rechenmodell.
   - [[opencivil.ergebnis]] – ein gerechnetes Projekt, wie man es ohne Oberflaeche braucht.
-- [[opencivil.gleichungen]] – Analytische Gleichungen, Zeile fuer Zeile.
-    - [[opencivil.gleichungen.ausdruck]] – eine Zeile LaTeX: zerlegen, rechnen, setzen.
-    - [[opencivil.gleichungen.blatt]] – ein Blatt Gleichungen als Berechnung.
 - [[opencivil.material]] – die Baustoffe: Beton und Betonstahl.
     - [[opencivil.material.basis]] – Gemeinsames Geruest fuer Baustoffe.
     - [[opencivil.material.beton]] – Beton nach SIA 262:2025.
@@ -66,7 +63,6 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
     - [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
     - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
-    - [[opencivil.projekt.gleichungen]] – ein Blatt analytischer Gleichungen, wie es
     - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
     - [[opencivil.projekt.netz]] – Knoten mit Kennungen, und wie neue dazukommen.
     - [[opencivil.projekt.platte]] – eine Platte, wie die Oberflaeche sie beschreibt.

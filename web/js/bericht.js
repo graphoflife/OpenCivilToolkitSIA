@@ -683,7 +683,7 @@ function raumDerAuswahl() {
     const m = zustand.projekt.materialien.find((x) => x.kennung === wahl.kennung);
     return m ? namensraum(m.art, m.kennung) : null;
   }
-  return namensraum(wahl.art === 'blatt' ? 'gleichungen' : wahl.art, wahl.kennung);
+  return namensraum(wahl.art, wahl.kennung);
 }
 
 /**

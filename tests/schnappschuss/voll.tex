@@ -28,7 +28,7 @@
 \date{\today}
 \begin{document}
 \maketitle
-237 Berechnungen ausgeführt, 437 Werte bestimmt.
+236 Berechnungen ausgeführt, 433 Werte bestimmt.
 
 \section{Herleitung}
 \subsection{Plattenanalyse: Decke}
@@ -5053,23 +5053,6 @@ v'' = \frac{M}{EI} \qquad u' = \frac{N}{EA}
 \begin{equation*}
 \mathbf{K} = \begin{bmatrix} 1.210 \cdot 10^{6} & 0 & -1.210 \cdot 10^{6} & 0 \\ 0 & 145237 & 0 & 72619 \\ -1.210 \cdot 10^{6} & 0 & 1.210 \cdot 10^{6} & 0 \\ 0 & 72619 & 0 & 145237 \end{bmatrix}
 \end{equation*}
-\subsection{Analytische Gleichungen – Vorbemessung}
-Stütze 30 × 30 cm, zentrisch.
-
-\begin{equation*}
-a = 30\,\mathrm{cm}
-\end{equation*}
-\noindent\textbf{Bemessungswert der Betondruckfestigkeit}
-\begin{equation*}
-f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2}
-\end{equation*}
-\begin{equation*}
-N_{Rd} = a^{2} \cdot f_{cd} = \left(30\,\mathrm{cm}\right)^{2} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} = 1800\,\mathrm{kN}
-\end{equation*}
-\begin{equation*}
-\frac{N_{Rd}}{1.5\,\mathrm{m}} = \frac{1800\,\mathrm{kN}}{1.5\,\mathrm{m}} = 1200\,\mathrm{kN}/\mathrm{m}
-\end{equation*}
-\hinweis{Warnung}{Zeile 6: Einheiten passen nicht zusammen.}
 \section{Verwendete Formeln}
 \subsection{Querschnitt}
 Gerechnet in x, einmal mit Zug unten und einmal mit Zug oben. ρ gehört zur gezogenen Seite, ρ′ zur Gegenseite; d′ reicht vom gezogenen Rand bis zur Gegenlage und ist damit deren statische Höhe – ρ′ der einen Seite ist das ρ der anderen. Die x-Bewehrung einer Seite zählt zusammen, in ihrem Schwerpunkt. φ ist die Kriechzahl der Platte.
@@ -6168,10 +6151,6 @@ Bemessungswert der Fliessgrenze auf Druck & $f_{yd}^{-}$ & $435$ & N/mm² & bere
 Charakteristische Fliessgrenze & $f_{yk}$ & $500$ & N/mm² & Vorgabe \\
 Charakteristische Fliessgrenze auf Druck & $f_{yk}^{-}$ & $500$ & N/mm² & Vorgabe \\
 Teilsicherheitsbeiwert für Betonstahl & $\gamma_s$ & $1.15$ &  & Vorgabe \\
-Vorbemessung, Zeile 2 & $a$ & $30$ & cm & berechnet \\
-Vorbemessung, Zeile 3 & $f_{cd}$ & $20$ & N/mm² & berechnet \\
-Vorbemessung, Zeile 4 & $N_{Rd}$ & $1800$ & kN & berechnet \\
-Vorbemessung, Zeile 5 & $\frac{N_{Rd}}{1.5\,\mathrm{m}}$ & $1200$ & kN/m & berechnet \\
 Betrachtete Breite (x) & $b$ & $1000$ & mm & Vorgabe \\
 Betrachtete Breite (y) & $b_y$ & $1000$ & mm & Vorgabe \\
 Bewehrungsmass je Kubikmeter Beton & $\mu_s$ & $123$ & kg/m³ & berechnet \\

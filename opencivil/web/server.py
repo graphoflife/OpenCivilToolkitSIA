@@ -211,7 +211,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(inhalt)))
         # Beim Entwickeln aendert sich die Oberflaeche laufend, also nicht
         # zwischenspeichern. Ausgenommen ist, was sich nie aendert: die
-        # mitgelieferten Fremdpakete (KaTeX samt Schriften, MathLive, Pyodide)
+        # mitgelieferten Fremdpakete (KaTeX samt Schriften, Pyodide)
         # -- 13 MB bei jedem Neuladen waeren laestig.
         unveraenderlich = "web/vendor/" in ziel.as_posix()
         self.send_header(

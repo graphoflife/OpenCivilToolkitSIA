@@ -2,7 +2,7 @@
 Voll
 ====================================================================================================
 
-237 Berechnungen ausgeführt, 437 Werte bestimmt.
+236 Berechnungen ausgeführt, 433 Werte bestimmt.
 
 ====================================================================================================
 Herleitung
@@ -4209,21 +4209,6 @@ Biegelinie und Längsverschiebung
 Gesamtsteifigkeitsmatrix (kN, m)
     \mathbf{K} = \begin{bmatrix} 1.210 \cdot 10^{6} & 0 & -1.210 \cdot 10^{6} & 0 \\ 0 & 145237 & 0 & 72619 \\ -1.210 \cdot 10^{6} & 0 & 1.210 \cdot 10^{6} & 0 \\ 0 & 72619 & 0 & 145237 \end{bmatrix}
 
-Analytische Gleichungen – Vorbemessung
---------------------------------------
-
-Stütze 30 × 30 cm, zentrisch.
-
-    a = 30\,\mathrm{cm}
-
-Bemessungswert der Betondruckfestigkeit
-    f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2}
-
-    N_{Rd} = a^{2} \cdot f_{cd} = \left(30\,\mathrm{cm}\right)^{2} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} = 1800\,\mathrm{kN}
-
-    \frac{N_{Rd}}{1.5\,\mathrm{m}} = \frac{1800\,\mathrm{kN}}{1.5\,\mathrm{m}} = 1200\,\mathrm{kN}/\mathrm{m}
-[!] Warnung: Zeile 6: Einheiten passen nicht zusammen.
-
 ====================================================================================================
 Verwendete Formeln
 ====================================================================================================
@@ -5327,10 +5312,6 @@ Werte
     Charakteristische Fliessgrenze                                                  f_{yk}                                                     500  N/mm²     Vorgabe
     Charakteristische Fliessgrenze auf Druck                                        f_{yk}^{-}                                                 500  N/mm²     Vorgabe
     Teilsicherheitsbeiwert für Betonstahl                                           \gamma_s                                                  1.15            Vorgabe
-    Vorbemessung, Zeile 2                                                           a                                                           30  cm        berechnet
-    Vorbemessung, Zeile 3                                                           f_{cd}                                                      20  N/mm²     berechnet
-    Vorbemessung, Zeile 4                                                           N_{Rd}                                                    1800  kN        berechnet
-    Vorbemessung, Zeile 5                                                           \frac{N_{Rd}}{1.5\,\mathrm{m}}                            1200  kN/m      berechnet
     Betrachtete Breite (x)                                                          b                                                         1000  mm        Vorgabe
     Betrachtete Breite (y)                                                          b_y                                                       1000  mm        Vorgabe
     Bewehrungsmass je Kubikmeter Beton                                              \mu_s                                                      123  kg/m³     berechnet

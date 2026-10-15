@@ -26,7 +26,6 @@ from opencivil.ergebnis import Ergebnis
 from opencivil.projekt.eintraege import (
     Beschreibung, MaterialEintrag, PostenEintrag, RechenwahlEintrag,
 )
-from opencivil.projekt.gleichungen import GleichungsblattEintrag, GleichungszeileEintrag
 from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.platte import QuerschnittEintrag
@@ -49,9 +48,6 @@ class Projekt(Beschreibung):
     name: str = "Neues Projekt"
     materialien: List[MaterialEintrag] = field(default_factory=list)
     querschnitte: List[QuerschnittEintrag] = field(default_factory=list)
-    gleichungen: List[GleichungsblattEintrag] = field(default_factory=list)
-    """Blätter analytischer Gleichungen -- Zeile für Zeile, wie in Mathcad."""
-
     querschnittsanalysen: List[QuerschnittsanalyseEintrag] = field(default_factory=list)
     """Gezeichnete Querschnitte: Polygone, Bewehrung, Schubwände."""
 
@@ -85,7 +81,7 @@ class Projekt(Beschreibung):
     def nur(self, kennung: str) -> "Projekt":
         """
         Eine Kopie, in der von den Bauteilen nur dieses eine steht --
-        Materialien und Blätter bleiben. So rechnet die Bewehrungssuche: die
+        die Materialien bleiben. So rechnet die Bewehrungssuche: die
         anderen Bauteile kann sie nicht beeinflussen, und ihre Urteile
         zaehlten sonst mit.
         """
@@ -104,9 +100,7 @@ class Projekt(Beschreibung):
         raise ProjektFehler(f"Ein Bauteil '{kennung}' gibt es im Projekt nicht.")
 
     def freie_kennung(self, vorsilbe: str) -> str:
-        vergeben = ({m.kennung for m in self.materialien}
-                    | {b.kennung for b in self.gleichungen}
-                    | {e.kennung for e in self.bauteile()})
+        vergeben = {m.kennung for m in self.materialien} | {e.kennung for e in self.bauteile()}
         i = 1
         while f"{vorsilbe}{i}" in vergeben:
             i += 1
@@ -353,7 +347,6 @@ class Projekt(Beschreibung):
         return cls(
             name=str(d.get("name") or "Neues Projekt"),
             materialien=[MaterialEintrag.aus_dict(x) for x in (d.get("materialien") or [])],
-            gleichungen=[GleichungsblattEintrag.aus_dict(x) for x in (d.get("gleichungen") or [])],
             **{art.liste: [art.eintrag.aus_dict(x) for x in (d.get(art.liste) or [])]
                for art in BAUTEILE},
         )
@@ -440,8 +433,8 @@ class Projekt(Beschreibung):
         darunter, mit Einlage; eine dritte ohne x-Bewehrung; eine vierte mit
         Querkraft ohne Einlage, einer Einwirkung, die am kürzesten Abstand
         gemessen wird, und ⌀40 in y unter der x-Bewehrung -- die fliesst bei
-        x = h/2 nicht. Dazu ein Blatt Gleichungen. Gebaut über die Fassade, wie
-        ein Benutzer es in Python täte.
+        x = h/2 nicht. Gebaut über die Fassade, wie ein Benutzer es in Python
+        täte.
         """
         p = cls(name="Jeder Nachweis einmal")
         p.beton("C30/37")
@@ -535,18 +528,6 @@ class Projekt(Beschreibung):
         konsole = p.platte("Konsole", h=250, x=[12, 12], y=[40, 10])
         konsole.einwirkung("Feld", M_Ed=40, V_Ed=50)
         konsole.einwirkung("Schräg", M_Ed=30, N_Ed=-500).art = "naechster_Punkt"
-
-        # Ein Blatt Gleichungen: Definition, Projektwert, Auswertung mit
-        # gewünschter Einheit, Text -- und eine Zeile mit Fehler.
-        zeile = GleichungszeileEintrag
-        p.gleichungen.append(GleichungsblattEintrag(p.freie_kennung("g"), "Vorbemessung", [
-            zeile(art="text", text="Stütze 30 × 30 cm, zentrisch."),
-            zeile(latex=r"a=30\mathrm{cm}"),
-            zeile(art="projektwert", name=r"f_{cd}", wert_id="beton.b1.f_cd"),
-            zeile(latex=r"N_{Rd}=a^{2}\cdot f_{cd}", einheit="kN"),
-            zeile(latex=r"\frac{N_{Rd}}{1.5\mathrm{m}}="),
-            zeile(latex=r"b=a+N_{Rd}"),
-        ]))
 
         # Zwei gezeichnete Querschnitte. Ein Kastenträger mit Aussparung,
         # Bewehrung in allen drei Arten, vier Schubwänden als Zelle, Torsion,

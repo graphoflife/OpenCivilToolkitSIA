@@ -1,5 +1,5 @@
 ---
-erzeugt: 8d8c72ca2cb7
+erzeugt: ef5b103364fa
 art: modul
 tags: [modul]
 ---
@@ -197,7 +197,6 @@ nachsehen.
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
-- [[opencivil.projekt.gleichungen]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]

@@ -58,7 +58,7 @@ export const ARTEN = [
   },
 ];
 
-/** Die Art, die die Auswahl so nennt -- `undefined` bei Material und Blatt. */
+/** Die Art, die die Auswahl so nennt -- `undefined` beim Material. */
 export function artVon(name) {
   return ARTEN.find((a) => a.art === name);
 }

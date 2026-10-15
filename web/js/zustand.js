@@ -37,8 +37,8 @@ export const zustand = {
    */
   verfolgung: null,
   /**
-   * Was links ausgewählt ist: {art, kennung} -- `art` ist 'material',
-   * 'blatt' oder die einer Bauteilart (ARTEN, arten.js).
+   * Was links ausgewählt ist: {art, kennung} -- `art` ist 'material'
+   * oder die einer Bauteilart (ARTEN, arten.js).
    */
   auswahl: null,
   /**
@@ -66,8 +66,7 @@ export const zustand = {
   rechenfehler: null,
   ungespeichert: false,
   /** Aufgeklappte Kapitel im Baum. */
-  offen: new Set(['materialien', 'beton', 'betonstahl', ...ARTEN.map((a) => a.kapitel),
-    'gleichungen']),
+  offen: new Set(['materialien', 'beton', 'betonstahl', ...ARTEN.map((a) => a.kapitel)]),
   /**
    * Zugeklappte Panels der Eingaben, je App und Titel: «platte/Bewehrung».
    *
@@ -178,11 +177,6 @@ export function gewaehltesBauteil() {
   return eintrag ? { art, eintrag } : null;
 }
 
-export function gewaehltesBlatt() {
-  if (zustand.auswahl?.art !== 'blatt') return null;
-  return zustand.projekt.gleichungen?.find((b) => b.kennung === zustand.auswahl.kennung) || null;
-}
-
 export function materialien(art) {
   return zustand.projekt.materialien.filter((m) => m.art === art);
 }
@@ -191,7 +185,6 @@ export function freieKennung(vorsilbe) {
   const vergeben = new Set([
     ...zustand.projekt.materialien.map((m) => m.kennung),
     ...ARTEN.flatMap((a) => (zustand.projekt[a.liste] || []).map((e) => e.kennung)),
-    ...(zustand.projekt.gleichungen || []).map((b) => b.kennung),
   ]);
   let i = 1;
   while (vergeben.has(`${vorsilbe}${i}`)) i += 1;

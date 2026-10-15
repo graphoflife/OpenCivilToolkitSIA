@@ -44,6 +44,20 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-15 · Analytische Gleichungen entfernt
+
+Die App «Analytische Gleichungen» ist weg (Benutzer): an ihre Stelle kommt
+eine App, in der Python läuft, mit Konsole und Variablen. Mit ihr gingen der
+Leser der LaTeX-Zeilen (`opencivil/gleichungen/`), die Beschreibung der
+Blätter (`projekt/gleichungen.py`), ihr Editor (`web/js/gleichungen.js`) und
+MathLive (840 KB unter `web/vendor/`), das nur sie brauchte. Das Prüfprojekt
+«Jeder Nachweis» hat kein Blatt «Vorbemessung» mehr; sonst ändert sich am
+Bericht nichts.
+
+Eine alte Datei mit Blättern öffnet sich weiter: die Blätter fallen beim
+Lesen weg, ohne Hinweis (Benutzer: «Einfach löschen»). Alte Stände müssen
+ohnehin nicht weiter funktionieren (2026-10-11).
+
 ## 2026-10-15 · Die Suche prüft ihre Ebene selbst
 
 Mit dem Spannungsblock -- Handrechnung und 0.85·x -- gibt es bei viel Druck

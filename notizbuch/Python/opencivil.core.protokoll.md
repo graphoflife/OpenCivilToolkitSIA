@@ -1,5 +1,5 @@
 ---
-erzeugt: 04e094bf8b29
+erzeugt: e943f53a60ec
 art: modul
 tags: [modul]
 ---
@@ -592,7 +592,6 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.bericht.zusammenfassung]]
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.rechenwerk]]
-- [[opencivil.gleichungen.blatt]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]

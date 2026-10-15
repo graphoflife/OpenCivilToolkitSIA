@@ -1,5 +1,5 @@
 ---
-erzeugt: e399cfe3805a
+erzeugt: c1553887318d
 art: modul
 tags: [modul]
 ---
@@ -276,7 +276,6 @@ def beschreibung(self) -> str
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.ergebnis]]
-- [[opencivil.gleichungen.blatt]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]

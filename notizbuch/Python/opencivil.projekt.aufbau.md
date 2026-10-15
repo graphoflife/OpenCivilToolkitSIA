@@ -1,5 +1,5 @@
 ---
-erzeugt: 89a00a0a7d1c
+erzeugt: 6959fffd5121
 art: modul
 tags: [modul]
 ---
@@ -57,7 +57,6 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `knicken: Dict[str, Knicken] = field(default_factory=dict)` – Nachweis am verformten System, je Querschnitt -- nur in x-Richtung.
 - `fehlende: Dict[str, FehlendeBewehrung] = field(default_factory=dict)` – Je Richtung ohne Bewehrung, fuer die dennoch Einwirkungen angegeben sind. Sie rechnen nichts; sie sorgen dafuer, dass in der Zusammenfassung eine Zeile mit Erfuellungsgrad null steht statt gar nichts.
 - `spannungsfaelle: Dict[str, List['SpannungsfallEintrag']] = field(default_factory=dict)` – Je Platte die Auswertungen am Querschnitt -- als Beschreibung, nicht als Nachweis. Sie laufen nicht im Rechenwerk: sie haben kein Ziel, das jemand anderes brauchen koennte, und nichts haengt von ihnen ab.
-- `blaetter: Dict[str, Gleichungsblatt] = field(default_factory=dict)` – Die Blätter analytischer Gleichungen, nach Kennung.
 - `querschnittsanalysen: Dict[str, Any] = field(default_factory=dict)` – Die gezeichneten Querschnitte, nach Kennung -- Bauteile wie die Platten.
 - `qa_biegung: Dict[str, SchiefeBiegung] = field(default_factory=dict)` – Biegung und Normalkraft je Querschnittsanalyse, nach ihrer Kennung.
 - `qa_schub: Dict[str, Schubwandnachweis] = field(default_factory=dict)` – Querkraft und Torsion je Querschnittsanalyse.
@@ -174,22 +173,14 @@ Was ein vollstaendiger Lauf rechnet, in der Reihenfolge der Herleitung:
 erst die Baustoffe, dann Platte fuer Platte ihre Eckwerte und
 Nachweise. Wer ohne Oberflaeche rechnet, bekommt so denselben Bericht.
 
-#### Aufbau.blattziele
-
-```python
-def blattziele(self) -> List[str]
-```
-
-Die Blätter zuletzt -- sie lesen Werte der Platten, nie umgekehrt.
-
 #### Aufbau.berichtsziele
 
 ```python
 def berichtsziele(self) -> List[str]
 ```
 
-Was im Bericht steht: Nachweise, was die Bauteile sonst rechnen, Blätter
--- ohne die Baustoffkennwerte, die niemand braucht.
+Was im Bericht steht: Nachweise und was die Bauteile sonst rechnen --
+ohne die Baustoffkennwerte, die niemand braucht.
 
 #### Aufbau.urteile_von
 
@@ -465,7 +456,6 @@ Baufunktion von ihr bekannt sein muss. Eine neue Art kommt in
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.rechenwerk]]
-- [[opencivil.gleichungen.blatt]]
 - [[opencivil.material.basis]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]

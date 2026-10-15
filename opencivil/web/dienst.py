@@ -185,12 +185,6 @@ def _stromabwaerts(projekt: Projekt, aufbau) -> Loesung:
             SPEICHER.merken(kennung, stempel, teil)
         gesamt.anhaengen(teil)
         bekannt.update(teil.werte)
-
-    # Die Blätter zuletzt und ohne Zwischenspeicher: sie lesen Werte der
-    # Platten, und ihre Zeilen rechnen sich in Augenblicken.
-    blattziele = aufbau.blattziele()
-    if blattziele:
-        gesamt.anhaengen(aufbau.werk.loese(*blattziele, bekannt=bekannt))
     return gesamt
 
 

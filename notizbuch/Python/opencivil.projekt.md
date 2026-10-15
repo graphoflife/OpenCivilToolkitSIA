@@ -1,5 +1,5 @@
 ---
-erzeugt: 982361f7f57c
+erzeugt: 47b6cac0bf87
 art: modul
 tags: [modul]
 ---
@@ -63,7 +63,6 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
 - [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
 - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
-- [[opencivil.projekt.gleichungen]] – ein Blatt analytischer Gleichungen, wie es
 - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
 - [[opencivil.projekt.netz]] – Knoten mit Kennungen, und wie neue dazukommen.
 - [[opencivil.projekt.platte]] – eine Platte, wie die Oberflaeche sie beschreibt.

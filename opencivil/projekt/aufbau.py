@@ -34,7 +34,6 @@ from opencivil.core.einheiten import (
 )
 from opencivil.core.berechnung import Nachweis, NachweisUrteil
 from opencivil.core.rechenwerk import Rechenwerk
-from opencivil.gleichungen.blatt import Gleichungsblatt
 from opencivil.material.basis import Baustoff
 from opencivil.material.beton import beton
 from opencivil.material.betonstahl import betonstahl
@@ -148,9 +147,6 @@ class Aufbau:
     Nachweis. Sie laufen nicht im Rechenwerk: sie haben kein Ziel, das jemand
     anderes brauchen koennte, und nichts haengt von ihnen ab.
     """
-
-    blaetter: Dict[str, Gleichungsblatt] = field(default_factory=dict)
-    """Die Blätter analytischer Gleichungen, nach Kennung."""
 
     querschnittsanalysen: Dict[str, Any] = field(default_factory=dict)
     """Die gezeichneten Querschnitte, nach Kennung -- Bauteile wie die Platten."""
@@ -280,20 +276,15 @@ class Aufbau:
         ziele = self.materialziele()
         for _, eigene in self.ziele_je_bauteil():
             ziele += eigene
-        return ziele + self.blattziele()
-
-    def blattziele(self) -> List[str]:
-        """Die Blätter zuletzt -- sie lesen Werte der Platten, nie umgekehrt."""
-        return [b.id for b in self.blaetter.values()]
+        return ziele
 
     def berichtsziele(self) -> List[str]:
         """
-        Was im Bericht steht: Nachweise, was die Bauteile sonst rechnen, Blätter
-        -- ohne die Baustoffkennwerte, die niemand braucht.
+        Was im Bericht steht: Nachweise und was die Bauteile sonst rechnen --
+        ohne die Baustoffkennwerte, die niemand braucht.
         """
         return (self.alle_nachweisziele()
-                + [z for teil in self.bauteile() for z in teil.weitere_ziele]
-                + self.blattziele())
+                + [z for teil in self.bauteile() for z in teil.weitere_ziele])
 
     def urteile_von(self, kennung: str, urteile: Iterable[NachweisUrteil],
                     ) -> List[NachweisUrteil]:
@@ -400,13 +391,6 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
     for art in BAUTEILE:
         for eintrag in getattr(projekt, art.liste):
             aufbau.teile[eintrag.kennung] = art.bauen(art, eintrag, aufbau)
-
-    # Die Bewehrungssuche braucht keine Blätter -- sie liest nur Urteile.
-    if not schnell:
-        for eintrag in projekt.gleichungen:
-            blatt = Gleichungsblatt(eintrag)
-            werk.registriere(blatt)
-            aufbau.blaetter[eintrag.kennung] = blatt
 
     for baustoff in aufbau.baustoffe.values():
         baustoff.ins_rechenwerk(werk)

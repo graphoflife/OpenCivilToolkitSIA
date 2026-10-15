@@ -21,7 +21,6 @@ import { erklaerung, feld, panel } from './bausteine.js';
 import { auswahl, el, ersetzen, melden, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
 import { fensterZeigen } from './fenster.js';
-import { blattZeichnen } from './gleichungen.js';
 import {
   analysenKapitel, anzahl, eingeschaltet, gebrauchsstand, kapitelFenster, kapitelPanel, schalter,
 } from './kapitel.js';
@@ -34,7 +33,7 @@ import {
 import { analyseEditor, analyseFenster } from './querschnittsanalyse.js';
 import { balkensystemEditor } from './balkensystem.js';
 import {
-  aendern, gewaehltesBauteil, gewaehltesBlatt, gewaehltesMaterial, kennwertId,
+  aendern, gewaehltesBauteil, gewaehltesMaterial, kennwertId,
   projektAendern, zustand,
 } from './zustand.js';
 
@@ -703,12 +702,6 @@ export function editorZeichnen(behaelter, titelKnoten, hinweisKnoten, fensterGru
     titelKnoten.textContent = bauteil.eintrag.name;
     hinweisKnoten.textContent = bauteil.art.bezeichnung;
     return ersetzen(behaelter, ...EDITOREN[bauteil.art.art](bauteil.eintrag));
-  }
-  const blatt = gewaehltesBlatt();
-  if (blatt) {
-    titelKnoten.textContent = blatt.name;
-    hinweisKnoten.textContent = 'Analytische Gleichungen';
-    return blattZeichnen(behaelter, blatt);
   }
   titelKnoten.textContent = 'Eingaben';
   hinweisKnoten.textContent = '';

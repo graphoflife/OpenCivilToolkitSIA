@@ -9,7 +9,6 @@
  *     Stahlbeton-Platten
  *     Querschnittsanalyse
  *     2D Balkensysteme
- *     Analytische Gleichungen
  *
  * Jedes Kapitel lässt sich zuklappen; die Werkzeuge sitzen rechts in der
  * Kapitelleiste. Beim Löschen eines Materials wird geprüft, ob eine Platte,
@@ -22,7 +21,6 @@
 
 import { ARTEN } from './arten.js';
 import { el, ersetzen, melden } from './dom.js';
-import { neueZeile } from './gleichungen.js';
 import { benutzteMaterialien } from './querschnittsanalyse.js';
 import { fensterVergessen } from './qa_zeichnung.js';
 import { benutzteBauteile, benutzteMaterialien as systemMaterialien } from './balkensystem.js';
@@ -83,10 +81,6 @@ const ANLEGEN = {
 /** Was rechts im Eintrag steht, wie er aussieht und wie er weggeht -- je Art. */
 const ART = {
   material: (m) => ({ text: m.sorte, loeschen: materialLoeschen }),
-  blatt: (b) => ({
-    text: `${b.zeilen.length} ${b.zeilen.length === 1 ? 'Zeile' : 'Zeilen'}`,
-    loeschen: () => entfernen('gleichungen', b),
-  }),
   ...Object.fromEntries(ARTEN.map((a) => [a.art, (e) => ({
     text: KURZTEXT[a.art](e), loeschen: () => bauteilLoeschen(a, e),
   })])),
@@ -172,18 +166,6 @@ function entfernen(liste, eintrag) {
     p[liste] = p[liste].filter((x) => x.kennung !== eintrag.kennung);
   });
   if (zustand.auswahl?.kennung === eintrag.kennung) waehlen(null);
-}
-
-function blattAnlegen() {
-  const kennung = freieKennung('g');
-  projektAendern((p) => {
-    p.gleichungen = p.gleichungen || [];
-    p.gleichungen.push({
-      kennung, name: naechsterName('Blatt', p.gleichungen),
-      zeilen: [neueZeile()],
-    });
-  });
-  waehlen({ art: 'blatt', kennung });
 }
 
 function materialAnlegen(art) {
@@ -358,15 +340,5 @@ export function baumZeichnen(behaelter) {
     });
   });
 
-  const blaetter = p.gleichungen || [];
-  const gleichungen = kapitel({
-    schluessel: 'gleichungen',
-    titel: 'Analytische Gleichungen',
-    anzahl: blaetter.length,
-    oben: true,
-    werkzeuge: knopf('+', 'Blatt hinzufügen', blattAnlegen),
-    kinder: blaetter.length ? blaetter.map((b) => eintrag(b, 'blatt')) : [leerzeile('kein Blatt')],
-  });
-
-  ersetzen(behaelter, materialien, ...bauteile, gleichungen);
+  ersetzen(behaelter, materialien, ...bauteile);
 }

@@ -1,5 +1,5 @@
 ---
-erzeugt: 563f2316a915
+erzeugt: ae1f1d9a8fcc
 art: modul
 tags: [modul]
 ---
@@ -439,7 +439,6 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
-- [[opencivil.gleichungen.ausdruck]]
 - [[opencivil.material.basis]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]

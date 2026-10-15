@@ -1,5 +1,5 @@
 ---
-erzeugt: 08d138546c4e
+erzeugt: 71932d771a88
 art: modul
 tags: [modul]
 ---
@@ -32,7 +32,6 @@ Die vollstaendige, speicherbare Beschreibung eines Projekts.
 - `name: str = 'Neues Projekt'`
 - `materialien: List[MaterialEintrag] = field(default_factory=list)`
 - `querschnitte: List[QuerschnittEintrag] = field(default_factory=list)`
-- `gleichungen: List[GleichungsblattEintrag] = field(default_factory=list)` – Blätter analytischer Gleichungen -- Zeile für Zeile, wie in Mathcad.
 - `querschnittsanalysen: List[QuerschnittsanalyseEintrag] = field(default_factory=list)` – Gezeichnete Querschnitte: Polygone, Bewehrung, Schubwände.
 - `balkensysteme: List[BalkensystemEintrag] = field(default_factory=list)` – Ebene Rahmen: Knoten, Stäbe, Lager, Lasten, Lastfälle.
 
@@ -69,7 +68,7 @@ def nur(self, kennung: str) -> 'Projekt'
 ```
 
 Eine Kopie, in der von den Bauteilen nur dieses eine steht --
-Materialien und Blätter bleiben. So rechnet die Bewehrungssuche: die
+die Materialien bleiben. So rechnet die Bewehrungssuche: die
 anderen Bauteile kann sie nicht beeinflussen, und ihre Urteile
 zaehlten sonst mit.
 
@@ -289,8 +288,8 @@ fliesst, dazu Querkraft ohne Bügel -- einmal über m_Rd, einmal
 darunter, mit Einlage; eine dritte ohne x-Bewehrung; eine vierte mit
 Querkraft ohne Einlage, einer Einwirkung, die am kürzesten Abstand
 gemessen wird, und ⌀40 in y unter der x-Bewehrung -- die fliesst bei
-x = h/2 nicht. Dazu ein Blatt Gleichungen. Gebaut über die Fassade, wie
-ein Benutzer es in Python täte.
+x = h/2 nicht. Gebaut über die Fassade, wie ein Benutzer es in Python
+täte.
 
 #### Projekt._alles_einmal
 
@@ -329,7 +328,6 @@ gemeldet, mit dem aehnlichsten Feld, statt still zu verschwinden.
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
-- [[opencivil.projekt.gleichungen]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.querschnittsanalyse]]

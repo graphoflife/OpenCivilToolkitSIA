@@ -2158,76 +2158,6 @@
       ]
     },
     {
-      "name": "opencivil.gleichungen",
-      "pfad": "Python/opencivil.gleichungen.md",
-      "art": "modul",
-      "kurz": "Analytische Gleichungen, Zeile fuer Zeile.",
-      "stichworte": []
-    },
-    {
-      "name": "opencivil.gleichungen.ausdruck",
-      "pfad": "Python/opencivil.gleichungen.ausdruck.md",
-      "art": "modul",
-      "kurz": "eine Zeile LaTeX: zerlegen, rechnen, setzen.",
-      "stichworte": [
-        "AusdruckFehler",
-        "_si_einheit",
-        "anzeigeeinheit",
-        "einheit_aus_text",
-        "Token",
-        "zerlegen",
-        "Zahl",
-        "Masseinheit",
-        "Name",
-        "Operation",
-        "Potenz",
-        "Gegenzahl",
-        "Funktion",
-        "Wurzel",
-        "Betrag",
-        "Konstante",
-        "_Leser",
-        "_Leser.jetzt",
-        "_Leser.nehmen",
-        "_Leser.ist",
-        "_Leser.erwarten",
-        "_Leser._oeffnen",
-        "_Leser.ausdruck",
-        "_Leser.summand",
-        "_Leser.faktor",
-        "_Leser.potenz",
-        "_Leser._grad",
-        "_Leser.hochzahl",
-        "_Leser.gruppe",
-        "_Leser.primaer",
-        "_Leser.name",
-        "_Leser.index",
-        "_Leser.masseinheit",
-        "_Leser.funktion",
-        "Zeile",
-        "lesen",
-        "rechnen",
-        "_ist_angabe",
-        "_ist_einheit",
-        "setzen",
-        "namen",
-        "blattname",
-        "stellen"
-      ]
-    },
-    {
-      "name": "opencivil.gleichungen.blatt",
-      "pfad": "Python/opencivil.gleichungen.blatt.md",
-      "art": "modul",
-      "kurz": "ein Blatt Gleichungen als Berechnung.",
-      "stichworte": [
-        "Zeilenergebnis",
-        "Gleichungsblatt",
-        "Gleichungsblatt.rechne",
-        "Gleichungsblatt.ausfuehren"
-      ]
-    },
-    {
       "name": "opencivil.material",
       "pfad": "Python/opencivil.material.md",
       "art": "modul",
@@ -2935,7 +2865,6 @@
         "Aufbau.ziele_von",
         "Aufbau.ziele_je_bauteil",
         "Aufbau.alle_ziele",
-        "Aufbau.blattziele",
         "Aufbau.berichtsziele",
         "Aufbau.urteile_von",
         "Aufbau.materialziele",
@@ -3063,18 +2992,6 @@
         "Gebrauchsliste.aus_dict",
         "KombinationEintrag",
         "KombinationEintrag.aus_dict"
-      ]
-    },
-    {
-      "name": "opencivil.projekt.gleichungen",
-      "pfad": "Python/opencivil.projekt.gleichungen.md",
-      "art": "modul",
-      "kurz": "ein Blatt analytischer Gleichungen, wie es",
-      "stichworte": [
-        "GleichungszeileEintrag",
-        "GleichungszeileEintrag.aus_dict",
-        "GleichungsblattEintrag",
-        "GleichungsblattEintrag.aus_dict"
       ]
     },
     {

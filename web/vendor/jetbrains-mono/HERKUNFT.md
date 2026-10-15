@@ -20,7 +20,7 @@ Adresse nicht erlaubt und müssten überall maskiert werden.
 
 ## Warum hier und nicht von Google Fonts
 
-Dieselbe Überlegung wie bei KaTeX, MathLive und Pyodide nebenan: die Seite soll
+Dieselbe Überlegung wie bei KaTeX und Pyodide nebenan: die Seite soll
 ohne fremden Dienst laufen, auch offline. Von Google Fonts geladen, meldete
 dazu jeder Aufruf die Adresse des Besuchers an Google.
 

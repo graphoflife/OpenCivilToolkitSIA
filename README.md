@@ -32,8 +32,8 @@ python3 -m unittest discover -s tests -t .
 Der lokale Server startet ohne Ladezeit. Sonst ist er dasselbe: beide Wege rufen
 `opencivil/web/dienst.py` auf. Welcher gerade gilt, steht unten links im Fenster.
 
-Kein Fremdpaket, nirgends — es genügt ein `python3`. KaTeX, MathLive, Pyodide
-und die Schrift JetBrains Mono liegen unter `web/vendor/` bei, damit die Seite
+Kein Fremdpaket, nirgends — es genügt ein `python3`. KaTeX, Pyodide und die
+Schrift JetBrains Mono liegen unter `web/vendor/` bei, damit die Seite
 ohne fremden Dienst auskommt.
 
 ## In Python, ohne Oberfläche
