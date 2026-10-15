@@ -206,21 +206,23 @@ function skriptAnlegen() {
   waehlen({ art: 'skript', kennung });
 }
 
+/**
+ * Ein neues Material: die erste Sorte in der Reihenfolge des Kerns, die es im
+ * Projekt noch nicht gibt -- beim Beton C25/30, dann aufwärts, beim Stahl
+ * B500B, dann die übrigen.
+ */
 function materialAnlegen(art) {
   const kennung = freieKennung(art === 'beton' ? 'b' : 's');
-  const liste = art === 'beton' ? zustand.katalog?.betonsorten : zustand.katalog?.stahlsorten;
   const vergeben = new Set(zustand.projekt.materialien.map((m) => m.name || m.sorte));
   // Eine Normsorte darf es nur einmal geben -- der Name ist ihre Kennzeichnung.
-  const frei = (liste || []).find((s) => !vergeben.has(s.sorte));
+  const frei = (zustand.katalog?.anlegen?.[art] || []).find((sorte) => !vergeben.has(sorte));
   if (!frei) {
     melden('Alle Normsorten angelegt. Abwandeln: Material öffnen → '
       + '«Material modifizieren».', true);
     return;
   }
   projektAendern((p) => {
-    p.materialien.push(ausVorlage('material', {
-      kennung, art, sorte: frei.sorte, name: frei.sorte,
-    }));
+    p.materialien.push(ausVorlage('material', { kennung, art, sorte: frei, name: frei }));
   });
   waehlen({ art: 'material', kennung });
 }

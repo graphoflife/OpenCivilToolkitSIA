@@ -27,7 +27,7 @@ EIGENSTAENDIG NUTZBAR::
 from __future__ import annotations
 
 import math
-from typing import Dict, Mapping, Optional
+from typing import Dict, List, Mapping, Optional
 
 from opencivil.core.einheiten import (
     EINHEITSLOS, MPA, N_PRO_MM2, PROMILLE, Groesse, empirisch,
@@ -53,6 +53,18 @@ BETONSORTEN: Dict[str, tuple[float, float]] = {
     "C45/55": (45.0, 3.8),
     "C50/60": (50.0, 4.1),
 }
+
+#: Womit ein neuer Beton anfängt, wenn man in der Oberfläche einen anlegt:
+#: C25/30; gibt es den schon, der nächstfestere, und so weiter (Benutzer,
+#: 2026-10-15). Nach dem festesten kommen die schwächeren, von unten.
+ERSTER_BETON = "C25/30"
+
+
+def betonsorten_zum_anlegen() -> List[str]:
+    """Die Betonsorten in der Reihenfolge, in der neue angelegt werden -- siehe :data:`ERSTER_BETON`."""
+    sorten = list(BETONSORTEN)
+    ab = sorten.index(ERSTER_BETON)
+    return sorten[ab:] + sorten[:ab]
 
 
 # ===========================================================================

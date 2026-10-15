@@ -21,7 +21,7 @@ EIGENSTAENDIG NUTZBAR::
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Mapping, Optional
+from typing import Dict, List, Mapping, Optional
 
 from opencivil.core.einheiten import EINHEITSLOS, N_PRO_MM2, PROZENT, Groesse
 from opencivil.material.basis import Baustoff, Baustoffart, KennwertVorlage, erzeuge
@@ -59,6 +59,15 @@ STAHLSORTEN: Dict[str, Stahlsorte] = {
     "B700B": Stahlsorte(f_yk=700.0, f_yk_druck=700.0, eps_uk=5.0, eps_ud=4.5),
     "Stahl II": Stahlsorte(f_yk=345.0, f_yk_druck=345.0, eps_uk=5.0, eps_ud=4.5),
 }
+
+#: Womit ein neuer Betonstahl anfängt, wenn man in der Oberfläche einen
+#: anlegt: B500B, danach die übrigen der Reihe nach (Benutzer, 2026-10-15).
+ERSTER_STAHL = "B500B"
+
+
+def stahlsorten_zum_anlegen() -> List[str]:
+    """Die Stahlsorten in der Reihenfolge, in der neue angelegt werden -- siehe :data:`ERSTER_STAHL`."""
+    return [ERSTER_STAHL] + [s for s in STAHLSORTEN if s != ERSTER_STAHL]
 
 
 # ===========================================================================

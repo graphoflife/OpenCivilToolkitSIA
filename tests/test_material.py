@@ -6,8 +6,8 @@ import unittest
 from opencivil.core.einheiten import EINHEITSLOS, N_PRO_MM2, PROZENT, Groesse
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.core.wert import Quelle
-from opencivil.material.beton import BETONSORTEN, beton, beton_frei
-from opencivil.material.betonstahl import STAHLSORTEN, betonstahl
+from opencivil.material.beton import BETONSORTEN, beton, beton_frei, betonsorten_zum_anlegen
+from opencivil.material.betonstahl import STAHLSORTEN, betonstahl, stahlsorten_zum_anlegen
 
 
 def werk_mit(baustoff) -> Rechenwerk:
@@ -226,6 +226,27 @@ class TestMehrereMaterialien(unittest.TestCase):
         self.assertTrue(loesung.vollstaendig)
         self.assertTrue(loesung.hat(c30.id_von("f_cd")))
         self.assertTrue(loesung.hat(b500.id_von("f_yd")))
+
+
+
+class TestNeueSorten(unittest.TestCase):
+    """
+    In welcher Reihenfolge «+» neue Sorten anlegt (Benutzer, 2026-10-15):
+    die erste, die es im Projekt noch nicht gibt.
+    """
+
+    def test_beton_ab_c25_30_aufwaerts_dann_von_unten(self):
+        self.assertEqual(betonsorten_zum_anlegen(), [
+            "C25/30", "C30/37", "C35/45", "C40/50", "C45/55", "C50/60",
+            "C12/15", "C16/20", "C20/25"])
+
+    def test_stahl_b500b_dann_der_reihe_nach(self):
+        self.assertEqual(stahlsorten_zum_anlegen(),
+                         ["B500B", "B500A", "B500C", "B700B", "Stahl II"])
+
+    def test_jede_sorte_genau_einmal(self):
+        self.assertEqual(sorted(betonsorten_zum_anlegen()), sorted(BETONSORTEN))
+        self.assertEqual(sorted(stahlsorten_zum_anlegen()), sorted(STAHLSORTEN))
 
 
 if __name__ == "__main__":

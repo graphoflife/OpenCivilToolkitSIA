@@ -2278,6 +2278,7 @@
       "art": "modul",
       "kurz": "Beton nach SIA 262:2025.",
       "stichworte": [
+        "betonsorten_zum_anlegen",
         "_tau_cd",
         "_e_cm",
         "_eta_fc",
@@ -2292,6 +2293,7 @@
       "kurz": "Betonstahl nach SIA 262:2025.",
       "stichworte": [
         "Stahlsorte",
+        "stahlsorten_zum_anlegen",
         "betonstahl",
         "betonstahl_frei"
       ]

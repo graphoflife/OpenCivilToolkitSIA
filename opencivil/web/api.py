@@ -33,8 +33,8 @@ from opencivil.core.protokoll import (
 )
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
-from opencivil.material.beton import BETON_VORLAGEN, BETONSORTEN
-from opencivil.material.betonstahl import STAHLSORTEN, STAHL_VORLAGEN
+from opencivil.material.beton import BETON_VORLAGEN, BETONSORTEN, betonsorten_zum_anlegen
+from opencivil.material.betonstahl import STAHLSORTEN, STAHL_VORLAGEN, stahlsorten_zum_anlegen
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.nachweis.duktilitaet import HOECHSTENS as DUKTILITAET_HOECHSTENS
 from opencivil.nachweis.spannungsbegrenzung import GrenzeGegenFliessen
@@ -127,6 +127,10 @@ def katalog() -> dict:
             }
             for sorte, s in STAHLSORTEN.items()
         ],
+        # In welcher Reihenfolge «+» neue Sorten anlegt: die erste, die es im
+        # Projekt noch nicht gibt.
+        "anlegen": {"beton": betonsorten_zum_anlegen(),
+                    "betonstahl": stahlsorten_zum_anlegen()},
         "kennwerte": {
             "beton": [_vorlage_dict(v) for v in BETON_VORLAGEN],
             "betonstahl": [_vorlage_dict(v) for v in STAHL_VORLAGEN],

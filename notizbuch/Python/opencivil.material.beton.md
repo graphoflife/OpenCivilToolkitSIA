@@ -1,5 +1,5 @@
 ---
-erzeugt: 38e673ad7c44
+erzeugt: 8486eb1ea459
 art: modul
 tags: [modul]
 ---
@@ -37,6 +37,14 @@ print(loesung.wert(c30.id_von("f_cd")))
 ```
 
 ## Inhalt
+
+### betonsorten_zum_anlegen
+
+```python
+def betonsorten_zum_anlegen() -> List[str]
+```
+
+Die Betonsorten in der Reihenfolge, in der neue angelegt werden -- siehe [[opencivil.material.beton#Konstanten|ERSTER_BETON]].
 
 ### _tau_cd
 
@@ -92,6 +100,7 @@ werden, um Normvorgaben zu ersetzen.
 ## Konstanten
 
 - `BETONSORTEN = {'C12/15': (12.0, 1.6), 'C16/20': (16.0, 1.9), 'C20/25': (20.0, 2.2),…` – Betonsorten nach SIA 262:2025, Tabelle 3.1.2.2.7 -- (f_ck, f_ctm) in N/mm^2. Uebernommen aus der Vorgaengerfassung des Werkzeugs. Vor dem produktiven Einsatz gegen die gedruckte Norm pruefen.
+- `ERSTER_BETON = 'C25/30'` – Womit ein neuer Beton anfängt, wenn man in der Oberfläche einen anlegt: C25/30; gibt es den schon, der nächstfestere, und so weiter (Benutzer, 2026-10-15). Nach dem festesten kommen die schwächeren, von unten.
 - `BETON_VORLAGEN = (KennwertVorlage(kurzname='f_ck', symbol='f_{ck}', einheit=N_PRO_MM2,…` – Alle Betonkennwerte in der Reihenfolge, in der sie im Bericht erscheinen.
 
 ## Braucht

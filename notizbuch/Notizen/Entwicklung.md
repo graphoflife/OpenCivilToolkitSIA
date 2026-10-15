@@ -44,6 +44,18 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-15 · Neue Materialien: C25/30 und B500B zuerst
+
+«+» bei Beton legt zuerst C25/30 an, gibt es den schon, C30/37, und so
+weiter aufwärts; nach C50/60 kommen die schwächeren von unten. Beim Stahl
+zuerst B500B, danach die übrigen der Reihe nach (Benutzer). Vorher nahm
+«+» die erste freie Sorte der Tabelle, also C12/15 und B500A.
+
+Die Reihenfolge steht im Kern neben den Sortentabellen
+(`betonsorten_zum_anlegen`, `stahlsorten_zum_anlegen`) und kommt über den
+Katalog (`anlegen`) in die Oberfläche; die nimmt die erste Sorte, die es im
+Projekt noch nicht gibt.
+
 ## 2026-10-15 · Die App «Python»
 
 An die Stelle der analytischen Gleichungen tritt eine App, in der Python

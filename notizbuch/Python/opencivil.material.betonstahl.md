@@ -1,5 +1,5 @@
 ---
-erzeugt: 3a874f7167bf
+erzeugt: a1ae240778ec
 art: modul
 tags: [modul]
 ---
@@ -44,6 +44,14 @@ Zeile der Sortentabelle.
 - `eps_uk: float` – Dehnung bei Hoechstlast in %.
 - `eps_ud: float` – Bemessungswert der Dehnung bei Hoechstlast in %.
 
+### stahlsorten_zum_anlegen
+
+```python
+def stahlsorten_zum_anlegen() -> List[str]
+```
+
+Die Stahlsorten in der Reihenfolge, in der neue angelegt werden -- siehe [[opencivil.material.betonstahl#Konstanten|ERSTER_STAHL]].
+
 ### betonstahl
 
 ```python
@@ -68,6 +76,7 @@ Erzeugt einen frei definierten Betonstahl ohne Sortentabelle.
 
 - `FLIESSDEHNUNG = 'Fliessdehnung'` – Die Seite im Notizbuch fuer die Dehnung, bei der der Stahl zu fliessen beginnt -- mit Bemessungswert oder charakteristisch, wo immer sie steht.
 - `STAHLSORTEN = {'B500A': Stahlsorte(f_yk=500.0, f_yk_druck=500.0, eps_uk=2.5, eps_ud…` – Betonstahlsorten nach SIA 262:2025, Tabelle 3.2.2.3. Uebernommen aus der Vorgaengerfassung des Werkzeugs. Vor dem produktiven Einsatz gegen die gedruckte Norm pruefen.
+- `ERSTER_STAHL = 'B500B'` – Womit ein neuer Betonstahl anfängt, wenn man in der Oberfläche einen anlegt: B500B, danach die übrigen der Reihe nach (Benutzer, 2026-10-15).
 - `STAHL_VORLAGEN = (KennwertVorlage(kurzname='f_yk', symbol='f_{yk}', einheit=N_PRO_MM2,…`
 
 ## Braucht
