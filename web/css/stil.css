@@ -96,6 +96,9 @@
      dann muss die Zeile in der Schrift des Feldes gesetzt sein. */
   --pfeilspur: 15px;
   --zahlbreite: calc(8ch + var(--pfeilspur) + 10px);
+  /* Knapp: in den Lagen stehen Durchmesser und Teilungen -- «150» braucht
+     drei Zeichen, nicht acht. */
+  --zahlbreite-knapp: calc(4ch + var(--pfeilspur) + 10px);
 
   /* Die Kopfleiste steht fest; das Raster darunter zieht sie ab. Als
      Variable, weil sie auf schmalen Geraeten umbricht und dann hoeher ist --
@@ -459,12 +462,18 @@ input[readonly], input:disabled, select:disabled {
 .kennwert .bezeichnung small { color: var(--schrift-zart); }
 .kennwert .einheit { font-size: 11.5px; color: var(--schrift-zart); }
 
-/* Lagen -- knapp gehalten: vier Lagen mit je zwei Posten müssen ohne Scrollen
-   nebeneinander lesbar sein. */
+/* Lagen -- knapp: eine Lage ist so hoch wie ihre zwei Posten, Grund und
+   Zulage. Nummer und Richtung stehen links daneben, der Stahl und die Lage
+   der Stäbe zueinander rechts in den Zeilen. Vorher trug jede Lage eine
+   eigene Kopfzeile, und vier Lagen brauchten zwölf Zeilen statt acht. */
 .lage {
+  display: grid; grid-template-columns: 52px minmax(0, 1fr);
+  column-gap: 8px; row-gap: 2px; align-items: center;
   border: 1px solid var(--rand); border-left: 4px solid var(--rand-stark);
-  border-radius: var(--radius); padding: 6px 8px; margin-bottom: 5px; background: var(--flaeche);
+  border-radius: var(--radius); padding: 3px 8px; margin-bottom: 4px; background: var(--flaeche);
 }
+.lage > .postenzeile { margin-top: 0; }
+.lage > .neigungszeile { grid-column: 1 / -1; }
 .lage-x { border-left-color: var(--richtung-x); }
 .lage-y { border-left-color: var(--richtung-y); }
 /* Die Bügel tragen quer zu beiden Tragrichtungen -- also weder grün noch
@@ -472,8 +481,16 @@ input[readonly], input:disabled, select:disabled {
 .lage-querkraft { border-left-color: var(--beide); }
 .lage.ist-leer { opacity: .62; background: var(--flaeche-2); }
 .lage-kopf {
-  display: flex; align-items: center; gap: 7px; margin-bottom: 4px;
+  grid-row: span 2;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 3px;
   font-size: 12px; font-weight: 700; color: var(--schrift-matt);
+}
+.lage-name { white-space: nowrap; }
+/* Am Telefon steht der Kopf über den Zeilen: daneben bliebe den Zahlen
+   kein Platz. */
+@container (max-width: 360px) {
+  .lage { grid-template-columns: minmax(0, 1fr); }
+  .lage-kopf { grid-row: auto; flex-direction: row; align-items: center; gap: 8px; }
 }
 
 /* Zweistellungs-Schalter x|y und Gesamt|Seite -- mit dem Rand der
@@ -494,12 +511,16 @@ input[readonly], input:disabled, select:disabled {
 .schalter-halb.ist-y.ist-an     { background: var(--richtung-y); color: var(--schrift); }
 .schalter-halb.ist-beide.ist-an { background: var(--beide); color: #fff; }
 
-/* Ein Posten auf einer Zeile: × Name ⌀ [d] @ [s] mm [Umschalter] */
+/* Ein Posten auf einer Zeile: × Name ⌀ [d] @ [s] mm [Stahl oder Lage]. Die
+   Zahlenfelder sind knapp -- ein Durchmesser oder eine Teilung braucht
+   drei Ziffern. Rechts steht, was zur Lage gehört, bündig am Rand. */
 .postenzeile {
   display: grid;
-  grid-template-columns: 16px 52px 12px auto 12px auto 26px 1fr;
-  gap: 5px; align-items: center; margin-top: 3px;
+  grid-template-columns: 16px 40px 10px var(--zahlbreite-knapp) 12px var(--zahlbreite-knapp) 28px minmax(0, 1fr);
+  gap: 4px; align-items: center; margin-top: 3px;
 }
+.postenzeile .zahlfeld { width: var(--zahlbreite-knapp); }
+.postenzeile > :nth-child(8) { justify-self: end; }
 .postenzeile.ist-leer { opacity: .55; }
 
 /* Nimmt den Posten heraus, indem es den Durchmesser auf null setzt. Ein runder
@@ -591,25 +612,30 @@ input[readonly], input:disabled, select:disabled {
 .postenzeile .zeichen { font-size: 12px; color: var(--schrift-zart); text-align: center; }
 .postenzeile .einheit { font-size: 11px; color: var(--schrift-zart); }
 .postenzeile input[type="number"] { padding-block: 3px; }
-.postenzeile .umschalter { justify-self: start; font-size: 10.5px; padding: 2px 6px;
-                           border: 1px solid var(--eingabe-rand); border-radius: 4px; }
 
-/* Die Bügelzeile trägt eine Teilung je Richtung, hat also eine Zahl mehr als
-   eine Lagenzeile: drei volle Zahlenfelder und der Umschalter passen nicht in
-   eine Karte. Oben steht darum der Durchmesser, darunter die beiden
-   Teilungen, «x:» unter «⌀». Vorher waren die drei Felder 56 px schmal. Die
-   Namensspalte fehlt -- über der Zeile steht ohnehin «Querkraftbewehrung». */
-.postenzeile-quer {
-  grid-template-columns: 16px 16px auto 16px auto 34px 1fr;
+/* Die Einheit, die umschaltet: «mm» heisst Teilung, «Stk» Stabzahl. Sie
+   sieht aus wie eine Einheit und ist gestrichelt unterstrichen -- man sieht,
+   dass sie sich anklicken lässt, ohne dass ein Knopf Platz nimmt. */
+.einheit-knopf {
+  justify-self: start; padding: 0 1px; border: 0; background: none; cursor: pointer;
+  font-size: 11px; color: var(--blau-tief); border-bottom: 1px dashed var(--eingabe-rand);
 }
-.postenzeile-quer > :nth-child(n+4) { grid-row: 2; }
-.postenzeile-quer > :nth-child(4) { grid-column: 2; }
-.postenzeile-quer > :nth-child(5) { grid-column: 3; }
-.postenzeile-quer > :nth-child(6) { grid-column: 4; }
-.postenzeile-quer > :nth-child(7) { grid-column: 5; }
-.postenzeile-quer > :nth-child(8) { grid-column: 6; }
-.postenzeile-quer > :nth-child(9) { grid-column: 7; }
-.postenzeile-quer .zeichen { font-size: 11.5px; }
+.einheit-knopf:hover { color: var(--blau); border-bottom-style: solid; }
+
+/* Die Lage von Grund und Zulage zueinander: ein Knopf, der zeigt, was gilt.
+   Im Blau der gewöhnlichen Schalter -- es geht um die Höhenlage innerhalb
+   einer Lage, nicht um die Tragrichtung. */
+.gunst-knopf {
+  padding: 1px 7px; font-size: 10.5px; font-weight: 700; cursor: pointer;
+  border: 1px solid var(--eingabe-rand); border-radius: 9px;
+  background: var(--flaeche); color: var(--schrift-matt);
+}
+.gunst-knopf:hover { background: var(--blau-hell); }
+.gunst-knopf.ist-guenstig { background: var(--blau); border-color: var(--blau); color: #fff; }
+
+/* Der Stahl einer Seite, klein am Ende der Zeile der Grundbewehrung. */
+.stahlwahl { width: auto; max-width: 100%; padding: 1px 4px; font-size: 11px; }
+
 .neigungszeile {
   display: flex; align-items: center; gap: 6px; margin-top: 4px;
   font-size: 11.5px;
@@ -623,7 +649,7 @@ input[readonly], input:disabled, select:disabled {
 /* Eine Karte wie die Lagen: weiss, gerahmt, mit der blauen Kante links.
    Gestrichelt auf Grau ging sie zwischen den Lagen unter. */
 .ueberdeckung {
-  padding: 4px 9px; margin: 5px 0; border-radius: var(--radius);
+  padding: 2px 8px; margin: 4px 0; border-radius: var(--radius);
   background: var(--flaeche); border: 1px solid var(--rand);
   border-left: 4px solid var(--blau);
 }
@@ -980,16 +1006,6 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .kennzahl-name { color: var(--schrift-matt); }
 .kennzahl-wert { font-weight: 600; }
 
-/* ------------------------------------------------ Lage innerhalb der Lage -- */
-/* Im Blau der gewöhnlichen Schalter. Er war einmal gold, damit man ihn nicht
-   mit x|y verwechselt, als x noch blau war -- neben dem Gelb der y-Lagen
-   wäre Gold jetzt genau diese Verwechslung. Hier geht es um die Höhenlage
-   innerhalb einer Lage, nicht um die Tragrichtung.
-
-   Steht im Lagenkopf, links vom Stahl: die Lage der Stäbe zueinander gehört
-   zur Geometrie der Lage, nicht zum Werkstoff. */
-.schalter-gunst { flex: none; }
-.schalter-gunst .schalter-halb { text-transform: none; letter-spacing: 0; }
 
 /* «Automatische Bewehrung» -- eine Karte unter den Bügeln. Die Moduswahl
    nimmt die ganze Zeile: «Grundbew. ohne Kräfte, Zulage mit Kräften» passt
@@ -1260,6 +1276,12 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   /* Die Halbschalter stehen paarweise in engen Zeilen -- ihnen genügt die
      Höhe. Eine Mindestbreite schob die Lagenzeile über den Rand hinaus. */
   .schalter-halb { min-height: 34px; padding: 6px 10px; }
+  /* Der Löschknopf einer Postenzeile ist hier 34 px gross; seine Spalte
+     wächst mit, sonst läge er über dem Namen. */
+  .postenzeile {
+    grid-template-columns: 34px 40px 10px var(--zahlbreite-knapp) 12px
+                           var(--zahlbreite-knapp) 28px minmax(0, 1fr);
+  }
   .erklaerung-zeichen {
     width: 34px; height: 34px; line-height: 34px; font-size: 14px;
     border-radius: var(--radius);
@@ -1290,15 +1312,6 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
      nebeneinander bleiben -- die Einheit gibt Platz her. */
   .feld { grid-template-columns: minmax(0, 1fr) auto 34px; }
 
-  /* Der Umschalter «Teilung/Anzahl» steht in der Postenzeile ganz rechts und
-     ging als einziges Element über den Rand. Er darf hier umbrechen. */
-  .postenzeile .umschalter { justify-self: stretch; white-space: normal; }
-  /* Mit zwei vollen Zahlenfeldern bleibt ihm in der Lagenzeile kein Platz --
-     er steht darunter, unter den Feldern. Die Bügelzeile hat dafür schon ihre
-     zweite Zeile. */
-  .postenzeile:not(.postenzeile-quer) .umschalter {
-    grid-row: 2; grid-column: 4 / -1; justify-self: start;
-  }
 }
 
 /* ------------------------------------------------ Analytische Gleichungen -- */

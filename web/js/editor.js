@@ -241,17 +241,19 @@ function sorteAendern(material, neu, vorlagen) {
 /**
  * Ein Bewehrungsposten auf einer Zeile:
  *
- *     ×  Grund   ⌀ [18] @ [150] mm   [Teilung|Anzahl]
+ *     ×  Grund   ⌀ [18] @ [150] mm   [B500B]
  *
- * Der letzte Schalter legt fest, ob die mittlere Zahl eine Teilung oder eine
- * Stabzahl ist -- das Trennzeichen wechselt mit (`@` bzw. `×`).
+ * Die Einheit ist zugleich der Umschalter: «mm» heisst Teilung, «Stk»
+ * Stabzahl -- das Trennzeichen wechselt mit (`@` bzw. `×`). Ein eigener Knopf
+ * dafür kostete jede Zeile eine Spalte. `ende` steht ganz rechts: bei der
+ * Grundbewehrung der Stahl, bei der Zulage die Lage der Stäbe zueinander.
  *
  * Das × vorne setzt den Durchmesser auf null und nimmt den Posten damit heraus.
  * Es ist nur rot, solange es etwas zu entfernen gibt; bei leerem Posten bleibt
  * es blass, statt ganz zu verschwinden -- sonst rutschte die Zeile bei jeder
  * Eingabe um seine Breite.
  */
-function postenZeile(querschnitt, nummer, welcher, beschriftung) {
+function postenZeile(querschnitt, nummer, welcher, beschriftung, ende = null) {
   const posten = querschnitt.lagen[nummer - 1][welcher];
   const ueberAbstand = posten.abstand !== null && posten.abstand !== undefined;
   const leer = !(posten.durchmesser > 0);
@@ -287,18 +289,26 @@ function postenZeile(querschnitt, nummer, welcher, beschriftung) {
         wert: posten.anzahl, schritt: 1, min: 1, titel: 'Stabzahl je b',
         beiAenderung: (v) => aendern((x) => { x.anzahl = v; }),
       }),
-    el('span.einheit', { text: ueberAbstand ? 'mm' : 'Stk' }),
-    el('button.knopf.knopf-zart.umschalter', {
-      text: ueberAbstand ? 'Teilung' : 'Anzahl',
-      title: 'Teilung ↔ Stabzahl',
-      on: {
-        click: () => aendern((x) => {
-          if (ueberAbstand) { x.anzahl = x.anzahl || 5; x.abstand = null; }
-          else { x.abstand = x.abstand || 150; x.anzahl = null; }
-        }),
-      },
-    }),
+    einheitsSchalter(ueberAbstand, 'je b', () => aendern((x) => {
+      if (ueberAbstand) { x.anzahl = x.anzahl || 5; x.abstand = null; }
+      else { x.abstand = x.abstand || 150; x.anzahl = null; }
+    })),
+    ende || el('span'),
   ]);
+}
+
+/**
+ * Die Einheit hinter einer Teilung, die zugleich umschaltet: «mm» ist eine
+ * Teilung, «Stk» eine Stabzahl.
+ */
+function einheitsSchalter(ueberAbstand, bezug, umschalten) {
+  return el('button.einheit-knopf', {
+    text: ueberAbstand ? 'mm' : 'Stk',
+    title: ueberAbstand
+      ? `Teilung in mm – klicken für Stabzahl ${bezug}`
+      : `Stabzahl ${bezug} – klicken für Teilung in mm`,
+    on: { click: umschalten },
+  });
 }
 
 function lagenBlock(querschnitt, nummer) {
@@ -308,39 +318,38 @@ function lagenBlock(querschnitt, nummer) {
   const partner = partnerVon(nummer);
   const leer = !(lage.grund.durchmesser > 0 || lage.zulage.durchmesser > 0);
 
+  // Zwei Zeilen je Lage, Grund und Zulage. Was die Lage selbst angeht, steht
+  // am Rand: links Nummer und Richtung, rechts der Stahl und die Lage der
+  // Stäbe zueinander.
   return el('div.lage', { class: `lage-${richtung} ${leer ? 'ist-leer' : ''}` }, [
     el('div.lage-kopf', {}, [
-      el('span', { text: `${nummer}. Lage` }),
+      el('span.lage-name', { text: `${nummer}. Lage` }),
       richtungsSchalter(querschnitt, nummer, richtung, partner),
-      el('span', { style: { marginLeft: 'auto' } }),
-      // Links vom Stahl: die Lage der Stäbe zueinander gehört zur Geometrie
-      // der Lage, nicht zum Werkstoff.
-      lageSchalter(querschnitt, nummer, lage),
-      // Gewählt wird der Stahl nur an der x-Lage; die y-Lage derselben Seite
-      // bekommt ihn mit. Nachgewiesen wird nur x -- eine eigene Wahl in y
-      // stünde da, ohne dass ein Nachweis nach ihr fragt, und eine
-      // verborgene könnte unbemerkt vom Rest abweichen.
-      richtung === 'x' ? el('select', {
-        style: { width: 'auto', padding: '1px 6px', fontSize: '11px' },
-        title: 'Betonstahl dieser Seite – x- und y-Lage',
-        on: {
-          change: (e) => projektAendern((p) => {
-            const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
-            q.lagen[nummer - 1].stahl = e.target.value;
-            q.lagen[partner - 1].stahl = e.target.value;
-          }),
-        },
-      }, staehle.map((s) => el('option', {
-        value: s.kennung, text: s.name || s.sorte, selected: lage.stahl === s.kennung,
-      }))) : null,
     ]),
-    postenZeile(querschnitt, nummer, 'grund', 'Grund'),
-    postenZeile(querschnitt, nummer, 'zulage', 'Zulage'),
+    // Gewählt wird der Stahl nur an der x-Lage; die y-Lage derselben Seite
+    // bekommt ihn mit. Nachgewiesen wird nur x -- eine eigene Wahl in y
+    // stünde da, ohne dass ein Nachweis nach ihr fragt, und eine verborgene
+    // könnte unbemerkt vom Rest abweichen.
+    postenZeile(querschnitt, nummer, 'grund', 'Grund', richtung === 'x' ? el('select.stahlwahl', {
+      title: 'Betonstahl dieser Seite – x- und y-Lage',
+      on: {
+        change: (e) => projektAendern((p) => {
+          const q = p.querschnitte.find((x) => x.kennung === querschnitt.kennung);
+          q.lagen[nummer - 1].stahl = e.target.value;
+          q.lagen[partner - 1].stahl = e.target.value;
+        }),
+      },
+    }, staehle.map((s) => el('option', {
+      value: s.kennung, text: s.name || s.sorte, selected: lage.stahl === s.kennung,
+    }))) : null),
+    postenZeile(querschnitt, nummer, 'zulage', 'Zulage', lageSchalter(querschnitt, nummer, lage)),
   ]);
 }
 
 /**
- * Zweistellungs-Schalter für die Lage von Grundbewehrung und Zulage zueinander.
+ * Die Lage von Grundbewehrung und Zulage zueinander: ein Knopf, der zeigt,
+ * was gilt, und umschaltet. Als Paar «ungünstig | günstig» war er breiter
+ * als die Zahlen der Zeile.
  *
  * Nur sichtbar, wenn die Lage überhaupt zwei Posten hat -- bei einer einzelnen
  * Bewehrung gibt es nichts zueinander zu legen.
@@ -355,24 +364,17 @@ function lageSchalter(querschnitt, nummer, lage) {
   const ist = lage.unguenstig !== false;
   const untere = nummer <= 2;
 
-  return el('span.schalter.schalter-gunst', {
-    title: untere
+  return el('button.gunst-knopf', {
+    text: ist ? 'ungünstig' : 'günstig',
+    class: ist ? '' : 'ist-guenstig',
+    title: (untere
       ? 'Ungünstig: gleiche Oberkante, der dünnere Stab rückt nach oben. '
         + 'Günstig: gleiche Unterkante, jeder um seinen Halbmesser eingerückt.'
       : 'Ungünstig: gleiche Unterkante, der dünnere Stab rückt nach unten. '
-        + 'Günstig: gleiche Oberkante, jeder um seinen Halbmesser eingerückt.',
-  }, [
-    el('button.schalter-halb', {
-      text: 'ungünstig',
-      class: ist ? 'ist-an' : '',
-      on: { click: () => { if (!ist) setzen(true); } },
-    }),
-    el('button.schalter-halb', {
-      text: 'günstig',
-      class: ist ? '' : 'ist-an',
-      on: { click: () => { if (ist) setzen(false); } },
-    }),
-  ]);
+        + 'Günstig: gleiche Oberkante, jeder um seinen Halbmesser eingerückt.')
+      + ' Klicken schaltet um.',
+    on: { click: () => setzen(!ist) },
+  });
 }
 
 /** Zweistellungs-Schalter x|y. Die Partnerlage folgt zwingend der Gegenrichtung. */
@@ -395,13 +397,12 @@ function richtungsSchalter(querschnitt, nummer, richtung, partner) {
 
 
 /**
- * Die Bügel -- ein Raster über die ganze Platte, unterhalb der Lagen.
+ * Die Bügel -- ein Raster über die ganze Platte, unterhalb der Lagen, und
+ * gebaut wie eine Lage: zwei Zeilen, links der Name, rechts der Stahl.
  *
- *     ×  ⌀ [10]   x: [200]   y: [200] mm [Teilung|Anzahl]
+ *     Bügel  ×  x  ⌀ [10] @ [200] mm    [B500B]
+ *                y         @ [200] mm
  *     Neigung  α_min [30]°   α_max [45]°
- *
- * Die Namensspalte fehlt: über der Zeile steht «Querkraftbewehrung», und die
- * zusätzliche Teilung braucht den Platz.
  *
  * In y darf statt der Teilung eine Stabzahl über die betrachtete Breite
  * stehen, in x nicht: der Widerstand gilt je Laufmeter, und eine Stabzahl
@@ -423,11 +424,31 @@ function querkraftBlock(querschnitt) {
   });
 
   return el('div.lage.lage-querkraft', { class: leer ? 'ist-leer' : '' }, [
-    el('div.lage-kopf', {}, [
-      el('span', { text: 'Querkraftbewehrung' }),
-      el('span', { style: { marginLeft: 'auto' } }),
-      el('select', {
-        style: { width: 'auto', padding: '1px 6px', fontSize: '11px' },
+    el('div.lage-kopf', {}, [el('span.lage-name', { text: 'Bügel' })]),
+    el('div.postenzeile', { class: leer ? 'ist-leer' : '' }, [
+      el('button.weg', {
+        text: '×',
+        class: leer ? 'ist-stumpf' : '',
+        disabled: leer,
+        title: 'Querkraftbewehrung entfernen',
+        on: { click: () => aendern((x) => { x.durchmesser = 0; }) },
+      }),
+      el('span.postenname', { text: 'x' }),
+      el('span.zeichen', { text: '⌀' }),
+      zahlfeld({
+        wert: buegel.durchmesser || null, stufen: zustand.katalog.durchmesser, min: 0,
+        titel: 'Bügel-⌀ in mm; leer oder 0: keine Bügel',
+        leer: 0,
+        beiAenderung: (v) => aendern((x) => { x.durchmesser = v; }),
+      }),
+      el('span.zeichen', { text: '@' }),
+      zahlfeld({
+        wert: buegel.abstand_x, schritt: 25, min: 25,
+        titel: 'Bügelteilung x in mm',
+        beiAenderung: (v) => aendern((x) => { x.abstand_x = v; }),
+      }),
+      el('span.einheit', { text: 'mm' }),
+      el('select.stahlwahl', {
         title: 'Betonstahl der Bügel',
         on: {
           change: (e) => aendern((x) => { x.stahl = e.target.value; }),
@@ -436,29 +457,12 @@ function querkraftBlock(querschnitt) {
         value: s.kennung, text: s.name || s.sorte, selected: buegel.stahl === s.kennung,
       }))),
     ]),
-
-    el('div.postenzeile.postenzeile-quer', { class: leer ? 'ist-leer' : '' }, [
-      el('button.weg', {
-        text: '×',
-        class: leer ? 'ist-stumpf' : '',
-        disabled: leer,
-        title: 'Querkraftbewehrung entfernen',
-        on: { click: () => aendern((x) => { x.durchmesser = 0; }) },
-      }),
-      el('span.zeichen', { text: '⌀' }),
-      zahlfeld({
-        wert: buegel.durchmesser || null, stufen: zustand.katalog.durchmesser, min: 0,
-        titel: 'Bügel-⌀ in mm; leer oder 0: keine Bügel',
-        leer: 0,
-        beiAenderung: (v) => aendern((x) => { x.durchmesser = v; }),
-      }),
-      el('span.zeichen', { text: 'x:' }),
-      zahlfeld({
-        wert: buegel.abstand_x, schritt: 25, min: 25,
-        titel: 'Bügelteilung x in mm',
-        beiAenderung: (v) => aendern((x) => { x.abstand_x = v; }),
-      }),
-      el('span.zeichen', { text: 'y:' }),
+    el('div.postenzeile', { class: leer ? 'ist-leer' : '' }, [
+      el('span'),
+      el('span.postenname', { text: 'y' }),
+      el('span'),
+      el('span'),
+      el('span.zeichen', { text: ueberAbstand ? '@' : '×' }),
       ueberAbstand
         ? zahlfeld({
           wert: buegel.abstand_y, schritt: 25, min: 25,
@@ -470,17 +474,11 @@ function querkraftBlock(querschnitt) {
           titel: 'Bügelzahl je b; dann nur Nachweise in x',
           beiAenderung: (v) => aendern((x) => { x.anzahl_y = v; }),
         }),
-      el('span.einheit', { text: ueberAbstand ? 'mm' : 'Stk/b' }),
-      el('button.knopf.knopf-zart.umschalter', {
-        text: ueberAbstand ? 'Teilung' : 'Anzahl',
-        title: 'y: Teilung ↔ Stabzahl (Stabzahl: nur Nachweise in x)',
-        on: {
-          click: () => aendern((x) => {
-            if (ueberAbstand) { x.anzahl_y = x.anzahl_y || 5; x.abstand_y = null; }
-            else { x.abstand_y = x.abstand_y || 200; x.anzahl_y = null; }
-          }),
-        },
-      }),
+      einheitsSchalter(ueberAbstand, 'je b – dann nur Nachweise in x', () => aendern((x) => {
+        if (ueberAbstand) { x.anzahl_y = x.anzahl_y || 5; x.abstand_y = null; }
+        else { x.abstand_y = x.abstand_y || 200; x.anzahl_y = null; }
+      })),
+      el('span'),
     ]),
 
     el('div.neigungszeile', {}, [
