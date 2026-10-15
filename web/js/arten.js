@@ -2,8 +2,8 @@
  * arten.js -- die Bauteilarten der Oberfläche, je einmal.
  *
  * Was man von einer Art wissen muss, ohne ihre App zu kennen: ihre Liste im
- * Projekt, wie Auswahl und Rechenkern sie nennen, ihr Kapitel im Baum und
- * wie ein neuer Eintrag heisst. Wer alle Bauteile durchgeht -- Kennungen,
+ * Projekt, wie Auswahl und Rechenkern sie nennen, ihr Knopf links und wie
+ * ein neuer Eintrag heisst. Wer alle Bauteile durchgeht -- Kennungen,
  * Baum, Editor, Zusammenfassung, Diagramme --, geht diese Liste durch; eine
  * neue Art kommt hier dazu und in ihre eigenen Module.
  *
@@ -20,8 +20,9 @@ export const ARTEN = [
     liste: 'querschnitte',
     /** Womit ihre Kennungen beginnen. */
     vorsilbe: 'q',
-    /** Ihr Kapitel im Baum -- zugleich der Schlüssel, unter dem es aufgeklappt ist. */
-    kapitel: 'platten',
+    /** Ihr Knopf links: das Zeichen (sinnbilder.js) und der Name, mit weichem Trennstrich. */
+    zeichen: 'platte',
+    knopf: 'Stahlbeton-Platten',
     titel: 'Stahlbeton-Platten',
     /** Was über ihrem Editor steht. */
     bezeichnung: 'Stahlbeton-Platte',
@@ -36,7 +37,8 @@ export const ARTEN = [
     art: 'querschnittsanalyse',
     liste: 'querschnittsanalysen',
     vorsilbe: 'a',
-    kapitel: 'analysen',
+    zeichen: 'analyse',
+    knopf: 'Querschnitts\u00ADanalyse',
     titel: 'Querschnittsanalyse',
     bezeichnung: 'Querschnittsanalyse',
     einzahl: 'Querschnittsanalyse',
@@ -48,7 +50,8 @@ export const ARTEN = [
     art: 'balkensystem',
     liste: 'balkensysteme',
     vorsilbe: 'r',
-    kapitel: 'balkensysteme',
+    zeichen: 'balkensystem',
+    knopf: '2D Balken\u00ADsysteme',
     titel: '2D Balkensysteme',
     bezeichnung: '2D-Balkensystem',
     einzahl: 'Balkensystem',

@@ -8,17 +8,17 @@
   <link rel="stylesheet" href="vendor/katex/katex.min.css">
   <script defer src="vendor/katex/katex.min.js"></script>
   <!-- Versionsmarken: geschrieben von «python3 -m opencivil.web.bruecke», nicht von Hand ändern -->
-  <link rel="stylesheet" href="./css/stil.css?v=7845e3cfb999">
+  <link rel="stylesheet" href="./css/stil.css?v=03cd38deda0a">
   <script type="importmap">
   {
     "imports": {
       "./js/ablage.js": "./js/ablage.js?v=a67aeb3de570",
       "./js/achsen.js": "./js/achsen.js?v=87b48bf3c1f9",
       "./js/api.js": "./js/api.js?v=7a369d6df9f2",
-      "./js/app.js": "./js/app.js?v=e54b42aaec71",
-      "./js/arten.js": "./js/arten.js?v=a7eb6e17710d",
+      "./js/app.js": "./js/app.js?v=0dc0bf837767",
+      "./js/arten.js": "./js/arten.js?v=a84472f39f79",
       "./js/balkensystem.js": "./js/balkensystem.js?v=58a3e65dbb2e",
-      "./js/baum.js": "./js/baum.js?v=06dbb938f8af",
+      "./js/baum.js": "./js/baum.js?v=a8a36420ea1d",
       "./js/bausteine.js": "./js/bausteine.js?v=5e4ad56bf79b",
       "./js/bericht.js": "./js/bericht.js?v=4069adde393d",
       "./js/bs_diagramme.js": "./js/bs_diagramme.js?v=8c926719734b",
@@ -33,7 +33,7 @@
       "./js/cad_palette.js": "./js/cad_palette.js?v=d4ec92ee6165",
       "./js/diagramm.js": "./js/diagramm.js?v=afc3acde6f3a",
       "./js/dom.js": "./js/dom.js?v=c25fa011a69f",
-      "./js/editor.js": "./js/editor.js?v=9c4a79e31534",
+      "./js/editor.js": "./js/editor.js?v=2c3b82785e66",
       "./js/fenster.js": "./js/fenster.js?v=eeecf68a8192",
       "./js/kapitel.js": "./js/kapitel.js?v=975c506e03ab",
       "./js/kern.js": "./js/kern.js?v=dc39e6201373",
@@ -50,9 +50,9 @@
       "./js/qa_vorlagen.js": "./js/qa_vorlagen.js?v=bcb219f987e3",
       "./js/qa_zeichnung.js": "./js/qa_zeichnung.js?v=ab90188de64f",
       "./js/querschnittsanalyse.js": "./js/querschnittsanalyse.js?v=e9d2729d01ef",
-      "./js/sinnbilder.js": "./js/sinnbilder.js?v=110934c37585",
+      "./js/sinnbilder.js": "./js/sinnbilder.js?v=68a5fccc7dcb",
       "./js/spannungsbild.js": "./js/spannungsbild.js?v=abdff79644fd",
-      "./js/zustand.js": "./js/zustand.js?v=9c9e6a76e045",
+      "./js/zustand.js": "./js/zustand.js?v=331894502fa3",
       "./kern/dateien.json": "./kern/dateien.json?v=5cba19163e78",
       "./kern/notizbuch.json": "./kern/notizbuch.json?v=c1764c14b6ff"
     }
@@ -84,8 +84,6 @@
 <header class="kopfleiste">
   <div class="marke">Open<span>CivilToolkit</span><em>SIA</em></div>
 
-  <input id="projektname" class="projektname" type="text" aria-label="Projektname">
-
   <div class="kopf-knoepfe">
     <button id="btn-rechnen" class="knopf knopf-haupt" title="Alle Nachweise rechnen">
       Rechnen
@@ -110,9 +108,13 @@
 
   <!-- ---------------------------------------------------------------- -->
   <section class="tafel tafel-links" id="tafel-baum">
-    <div class="tafel-kopf">
+    <div class="tafel-kopf tafel-kopf-projekt">
       <h2>Projekt</h2>
+      <input id="projektname" class="projektname" type="text" aria-label="Projektname"
+             placeholder="Name des Projekts">
     </div>
+    <!-- Je App ein Knopf; darunter, in der rollenden Fläche, ihre Liste. -->
+    <nav class="app-wahl" id="apps" aria-label="Apps"></nav>
     <div class="tafel-inhalt" id="baum"></div>
   </section>
 

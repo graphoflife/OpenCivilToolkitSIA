@@ -222,6 +222,11 @@ ausgewählten Bestandteil, rechts das Ergebnis. Unter 900 px Fensterbreite steht
 eine Tafel allein und ein Umschalter am unteren Rand wechselt zwischen ihnen --
 dieselbe Aufteilung, nur nacheinander.
 
+Links steht zuoberst der Name des Projekts, darunter je App ein Knopf mit
+Zeichen und Anzahl -- Materialien, Stahlbeton-Platten, Querschnittsanalyse, 2D
+Balkensysteme -- und unter den Knöpfen die Liste der gewählten App, mit «+» zum
+Anlegen.
+
 Die Oberfläche rechnet nichts. Sie schickt die Projektbeschreibung an den Kern
 und stellt dar, was zurückkommt -- fertige Zahlen und fertige LaTeX-Zeichen­ketten.
 Deshalb kann am Bildschirm gar nichts anderes stehen als im Bericht.

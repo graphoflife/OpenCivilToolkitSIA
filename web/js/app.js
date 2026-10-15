@@ -443,7 +443,7 @@ const NUR_MITTE = new Set(['zeichnung', 'fenster']);
 function allesZeichnen(anlass) {
   const nurMitte = NUR_MITTE.has(anlass);
   ohneSprung(() => {
-    if (!nurMitte) baumZeichnen(knoten.baum);
+    if (!nurMitte) baumZeichnen(knoten.apps, knoten.baum);
     editorZeichnen(knoten.editor, knoten.editorTitel, knoten.editorHinweis, knoten.fenster);
     if (!nurMitte) berichtZeichnen(knoten.bericht, {
       verfolgen: (ziel, name) => {
@@ -485,6 +485,7 @@ function ladeanzeige(text) {
 
 async function starten() {
   Object.assign(knoten, {
+    apps: document.getElementById('apps'),
     baum: document.getElementById('baum'),
     editor: document.getElementById('editor'),
     editorTitel: document.getElementById('editor-titel'),

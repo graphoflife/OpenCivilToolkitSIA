@@ -707,7 +707,7 @@ export function editorZeichnen(behaelter, titelKnoten, hinweisKnoten, fensterGru
   hinweisKnoten.textContent = '';
   return ersetzen(behaelter, el('div.leer', {}, [
     el('p', { text: 'Links Bestandteil wählen.' }),
-    el('p', { text: 'Neu: + im Kapitelkopf.' }),
+    el('p', { text: 'Neu: + über der Liste links.' }),
   ]));
 }
 

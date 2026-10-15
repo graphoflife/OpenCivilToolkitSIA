@@ -65,8 +65,12 @@ export const zustand = {
    */
   rechenfehler: null,
   ungespeichert: false,
-  /** Aufgeklappte Kapitel im Baum. */
-  offen: new Set(['materialien', 'beton', 'betonstahl', ...ARTEN.map((a) => a.kapitel)]),
+  /**
+   * Welche App links gewählt ist: 'material' oder die Art eines Bauteils --
+   * wie die Auswahl sie nennt. Wer einen Eintrag wählt, wählt seine App mit
+   * (`waehlen`); null heisst: die der Auswahl, sonst die Platten.
+   */
+  app: null,
   /**
    * Zugeklappte Panels der Eingaben, je App und Titel: «platte/Bewehrung».
    *
@@ -87,10 +91,14 @@ export const zustand = {
 };
 
 /** Klappt ein Kapitel auf oder zu. */
-export function umschalten(kapitel) {
-  if (zustand.offen.has(kapitel)) zustand.offen.delete(kapitel);
-  else zustand.offen.add(kapitel);
-  aendern({}, 'baum');
+/** Wählt links eine App -- unter den Knöpfen steht dann ihre Liste. */
+export function appWaehlen(app) {
+  aendern({ app }, 'baum');
+}
+
+/** Die App, deren Liste links steht. */
+export function gewaehlteApp() {
+  return zustand.app || zustand.auswahl?.art || 'querschnitt';
 }
 
 /**
@@ -118,7 +126,7 @@ export function panelUmschalten(schluessel) {
  * gehört zum bisher gewählten und geht dabei zu.
  */
 export function waehlen(auswahl) {
-  aendern({ auswahl, fenster: null }, 'auswahl');
+  aendern({ auswahl, fenster: null, ...(auswahl ? { app: auswahl.art } : {}) }, 'auswahl');
 }
 
 export function horchen(rueckruf) {

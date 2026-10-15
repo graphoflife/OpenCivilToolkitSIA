@@ -1,10 +1,11 @@
 /**
- * sinnbilder.js -- die Zeichen auf den Kapitelknöpfen der Platte.
+ * sinnbilder.js -- die Zeichen auf den Knöpfen: die Kapitel eines Bauteils
+ * und die Apps links.
  *
  * Einfache Linienbilder, 24 × 24, in der Farbe der Schrift: was das Kapitel
  * zeigt oder prüft, auf einen Blick -- die Interaktionslinie, der geknickte
- * Stab, die Druckzone, der Riss. Selbst gezeichnet; keine fremde Bibliothek
- * und keine Bilddatei.
+ * Stab, die Druckzone, der Riss; bei den Apps, was sie bearbeiten. Selbst
+ * gezeichnet; keine fremde Bibliothek und keine Bilddatei.
  *
  * Jedes Zeichen ist eine Liste von Pfaden (`d`) und Kreisen (`[cx, cy, r]`).
  * Gestrichelt wird, was eine Grenze meint.
@@ -79,6 +80,29 @@ const ZEICHEN = {
   automatik: {
     pfade: ['M14.6 14.6L20.5 20.5'],
     kreise: [[10, 10, 6.2], [8, 11, 1.2], [12, 11, 1.2]],
+  },
+
+  // -- Die Apps links ------------------------------------------------------
+
+  // Ein Würfel Beton mit Kies darin.
+  material: {
+    pfade: ['M12 3l8 4.5v9L12 21l-8-4.5v-9z', 'M4 7.5l8 4.5 8-4.5 M12 12v9'],
+    kreise: [[7.5, 13.5, 0.8], [9, 16.5, 0.8], [15.5, 15, 0.8]],
+  },
+  // Eine Platte im Schnitt, die Bewehrung unten.
+  platte: {
+    pfade: ['M3 8.5h18v7H3z'],
+    kreise: [[6.5, 13, 0.9], [10.5, 13, 0.9], [14.5, 13, 0.9], [18.5, 13, 0.9]],
+  },
+  // Ein gezeichneter Querschnitt: ein T mit Stäben.
+  analyse: {
+    pfade: ['M4 4h16v5h-5v11H9V9H4z'],
+    kreise: [[11, 17.5, 0.9], [13, 17.5, 0.9], [6.5, 6.5, 0.9], [17.5, 6.5, 0.9]],
+  },
+  // Ein Rahmen, links eingespannt, rechts gelenkig.
+  balkensystem: {
+    pfade: ['M6 18V6h12v12', 'M3.5 18h5 M3.5 20l1-2 M5.5 20l1-2 M7.5 20l1-2',
+      'M18 18l-2 3h4z'],
   },
 };
 

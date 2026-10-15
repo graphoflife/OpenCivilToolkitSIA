@@ -1,17 +1,14 @@
 /**
- * baum.js -- Linke Tafel: die Bestandteile des Projekts.
+ * baum.js -- Linke Tafel: die Apps und die Bestandteile des Projekts.
  *
- * Gliederung::
+ * Oben je App ein Knopf mit Zeichen, wie die Kapitel einer Platte in der
+ * Mitte (Benutzer, 2026-10-15): Materialien, Stahlbeton-Platten,
+ * Querschnittsanalyse, 2D Balkensysteme. Darunter steht die Liste der
+ * gewählten App, mit «+» zum Anlegen -- bei den Materialien je eine für
+ * Beton und Betonstahl. Darüber, zuoberst in der Tafel, der Name des
+ * Projekts (index.html).
  *
- *     Materialien
- *         Beton
- *         Betonstahl
- *     Stahlbeton-Platten
- *     Querschnittsanalyse
- *     2D Balkensysteme
- *
- * Jedes Kapitel lässt sich zuklappen; die Werkzeuge sitzen rechts in der
- * Kapitelleiste. Beim Löschen eines Materials wird geprüft, ob eine Platte,
+ * Beim Löschen eines Materials wird geprüft, ob eine Platte,
  * eine Querschnittsanalyse oder ein Balkensystem es noch braucht -- und beim
  * Löschen einer Platte oder Analyse, ob ein Balkensystem ihren Querschnitt
  * nimmt. Sonst wäre die Beschreibung anschliessend widersprüchlich, und der
@@ -19,35 +16,56 @@
  * können.
  */
 
-import { ARTEN } from './arten.js';
+import { ARTEN, artVon } from './arten.js';
 import { el, ersetzen, melden } from './dom.js';
+import { sinnbild } from './sinnbilder.js';
 import { benutzteMaterialien } from './querschnittsanalyse.js';
 import { fensterVergessen } from './qa_zeichnung.js';
 import { benutzteBauteile, benutzteMaterialien as systemMaterialien } from './balkensystem.js';
 import { fensterVergessen as systemfensterVergessen } from './bs_zeichnung.js';
 import {
-  ausVorlage, freieKennung, naechsterName, projektAendern, umschalten, waehlen, zustand,
+  appWaehlen, ausVorlage, freieKennung, gewaehlteApp, naechsterName, projektAendern, waehlen,
+  zustand,
 } from './zustand.js';
 
 // ===========================================================================
 // Bausteine
 // ===========================================================================
 
-function kapitel({ schluessel, titel, anzahl, werkzeuge, kinder, oben }) {
-  const zu = !zustand.offen.has(schluessel);
+/**
+ * Die Apps, je ein Knopf: das Material, dann die Bauteilarten (ARTEN). `app`
+ * ist, wie die Auswahl ihre Einträge nennt; `liste`, wie viele es gibt -- auf
+ * dem Knopf steht nur die Zahl, «1 Querschnittsanalyse» passte nicht hinein.
+ */
+const APPS = [
+  { app: 'material', knopf: 'Materialien', zeichen: 'material', liste: (p) => p.materialien },
+  ...ARTEN.map((a) => ({
+    app: a.art, knopf: a.knopf, zeichen: a.zeichen, liste: (p) => p[a.liste] || [],
+  })),
+];
+
+function appKnopf(a, p, gewaehlt) {
+  return el('button.kachel.app-kachel', {
+    type: 'button', class: gewaehlt ? 'ist-gewaehlt' : '', 'aria-pressed': String(gewaehlt),
+    title: a.knopf.replace(/\u00AD/g, ''),
+    on: { click: () => appWaehlen(a.app) },
+  }, [
+    sinnbild(a.zeichen),
+    el('span.kachel-name', { text: a.knopf }),
+    el('span.kachel-stand', { text: String(a.liste(p).length) }),
+  ]);
+}
+
+/** Eine Liste unter den Knöpfen: Titel, Zahl und «+», darunter die Einträge. */
+function liste({ titel, eintraege, art, plus, leer }) {
   return el('div.baum-gruppe', {}, [
-    el('div.baum-kopf', {
-      class: `${zu ? 'ist-zu' : ''} ${oben ? 'baum-kopf-oben' : ''}`,
-      on: { click: () => umschalten(schluessel) },
-    }, [
-      el('span.pfeil', { text: '▼' }),
+    el('div.baum-kopf', {}, [
       el('span.titel', { text: titel }),
-      anzahl !== undefined ? el('span.zaehler', { text: String(anzahl) }) : null,
-      werkzeuge ? el('span.werkzeuge', {
-        on: { click: (e) => e.stopPropagation() },
-      }, [].concat(werkzeuge)) : null,
+      el('span.zaehler', { text: String(eintraege.length) }),
+      el('span.werkzeuge', {}, [plus]),
     ]),
-    zu ? null : el('div.baum-koerper', {}, kinder),
+    el('div.baum-koerper', {},
+      eintraege.length ? eintraege.map((e) => eintrag(e, art)) : [leerzeile(leer)]),
   ]);
 }
 
@@ -285,60 +303,33 @@ function systemAnlegen(art) {
 
 // ===========================================================================
 
-export function baumZeichnen(behaelter) {
+/**
+ * Zeichnet die linke Tafel: die Knöpfe der Apps in `knoepfe`, die Liste der
+ * gewählten darunter in `behaelter`.
+ */
+export function baumZeichnen(knoepfe, behaelter) {
   const p = zustand.projekt;
-  if (!p) return ersetzen(behaelter, el('div.leer', { text: 'Projekt wird geladen …' }));
+  if (!p) {
+    ersetzen(knoepfe);
+    return ersetzen(behaelter, el('div.leer', { text: 'Projekt wird geladen …' }));
+  }
+  const app = gewaehlteApp();
+  ersetzen(knoepfe, el('div.kacheln', {}, APPS.map((a) => appKnopf(a, p, a.app === app))));
 
-  const betone = p.materialien.filter((m) => m.art === 'beton');
-  const staehle = p.materialien.filter((m) => m.art === 'betonstahl');
-
-  const knopf = (text, titel, tun) => el('button.knopf.knopf-zart', {
-    text, title: titel, on: { click: tun },
+  const plus = (titel, tun) => el('button.knopf.knopf-zart', {
+    text: '+', title: titel, on: { click: tun },
   });
-
-  const materialien = kapitel({
-    schluessel: 'materialien',
-    titel: 'Materialien',
-    anzahl: p.materialien.length,
-    oben: true,
-    kinder: [
-      el('div.baum-unter', {}, [
-        kapitel({
-          schluessel: 'beton',
-          titel: 'Beton',
-          anzahl: betone.length,
-          werkzeuge: knopf('+', 'Beton hinzufügen', () => materialAnlegen('beton')),
-          kinder: betone.length
-            ? betone.map((m) => eintrag(m, 'material'))
-            : [leerzeile('kein Beton')],
-        }),
-        kapitel({
-          schluessel: 'betonstahl',
-          titel: 'Betonstahl',
-          anzahl: staehle.length,
-          werkzeuge: knopf('+', 'Betonstahl hinzufügen', () => materialAnlegen('betonstahl')),
-          kinder: staehle.length
-            ? staehle.map((m) => eintrag(m, 'material'))
-            : [leerzeile('kein Betonstahl')],
-        }),
-      ]),
-    ],
-  });
-
-  // Je Bauteilart ein Kapitel, in der Reihenfolge von ARTEN.
-  const bauteile = ARTEN.map((a) => {
-    const eintraege = p[a.liste] || [];
-    return kapitel({
-      schluessel: a.kapitel,
-      titel: a.titel,
-      anzahl: eintraege.length,
-      oben: true,
-      werkzeuge: knopf('+', `${a.einzahl} hinzufügen`, () => ANLEGEN[a.art](a)),
-      kinder: eintraege.length
-        ? eintraege.map((e) => eintrag(e, a.art))
-        : [leerzeile(a.leer)],
-    });
-  });
-
-  ersetzen(behaelter, materialien, ...bauteile);
+  if (app === 'material') {
+    return ersetzen(behaelter, ...[['beton', 'Beton', 'kein Beton'],
+      ['betonstahl', 'Betonstahl', 'kein Betonstahl']].map(([art, titel, leer]) => liste({
+      titel, art: 'material', leer,
+      eintraege: p.materialien.filter((m) => m.art === art),
+      plus: plus(`${titel} hinzufügen`, () => materialAnlegen(art)),
+    })));
+  }
+  const a = artVon(app);
+  return ersetzen(behaelter, liste({
+    titel: a.titel, art: a.art, leer: a.leer, eintraege: p[a.liste] || [],
+    plus: plus(`${a.einzahl} hinzufügen`, () => ANLEGEN[a.art](a)),
+  }));
 }

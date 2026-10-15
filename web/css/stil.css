@@ -167,23 +167,6 @@ button, input, select { font: inherit; color: inherit; }
 .marke span { color: #6ea8fe; }               /* CivilToolkit in angenehmem Blau */
 .marke em    { color: #ff8a7a; font-style: normal; font-weight: 800; }
 
-/* Das Feld steht in der dunklen Kopfleiste und nicht im Editor -- also helle
-   Schrift auf durchscheinendem Grund. Als `input.projektname` geschrieben,
-   damit es den allgemeinen Eingaberegeln weiter unten standhält: ein
-   Typselektor mit Attribut sticht sonst die blosse Klasse, und dann stünde
-   weisse Schrift auf hellblauem Grund. */
-input.projektname {
-  flex: 1; min-width: 120px; max-width: 420px;
-  padding: 6px 10px;
-  border: 1px solid rgba(255,255,255,.18); border-radius: var(--radius);
-  background: rgba(255,255,255,.10); color: #fff; font-weight: 500;
-}
-input.projektname::placeholder { color: rgba(255,255,255,.5); }
-input.projektname:hover { background: rgba(255,255,255,.16); }
-input.projektname:focus {
-  background: #fff; color: var(--schrift); border-color: var(--blau); outline: none;
-}
-
 .kopf-knoepfe { display: flex; gap: 6px; margin-left: auto; }
 
 .knopf {
@@ -265,6 +248,10 @@ a.knopf { display: inline-block; text-decoration: none; }
    Spalte breiter zu machen. */
 .tafel-mitte .tafel-kopf { contain: inline-size; }
 .tafel-links  .tafel-kopf { border-top-color: var(--beton); }
+/* Zuoberst links der Name des Projekts, neben dem Titel der Tafel. Sonst wie
+   jede Eingabe -- nur fett, weil er das ganze Projekt benennt. */
+.tafel-kopf-projekt { flex-wrap: nowrap; }
+.tafel-kopf-projekt input.projektname { flex: 1 1 auto; min-width: 0; font-weight: 600; }
 .tafel-mitte  .tafel-kopf { border-top-color: var(--stahl); }
 .tafel-rechts .tafel-kopf { border-top-color: var(--blau); }
 
@@ -296,21 +283,28 @@ a.knopf { display: inline-block; text-decoration: none; }
 
 /* --------------------------------------------------------------- Baum -- */
 
+/* Die Apps: dieselben Knöpfe wie die Kapitel einer Platte. Sie rollen nicht
+   mit -- nur die Liste darunter. Die gewählte trägt den Rand der Auswahl. */
+.app-wahl {
+  flex: none; padding: 10px 20px 2px 12px;
+  border-bottom: 1px solid var(--rand);
+  container-type: inline-size;
+}
+.app-wahl .kacheln { margin-bottom: 8px; }
+.kachel.ist-gewaehlt { border-color: var(--blau); background: var(--blau-hell); }
+.kachel.ist-gewaehlt .sinnbild { color: var(--blau); }
+.kachel.ist-gewaehlt .kachel-stand { color: var(--blau-tief); }
+
 .baum-gruppe { margin-bottom: 6px; }
 
-/* Schlicht: ein Kapitel ist eine Zeile Text mit Zähler und «+», ohne Zeichen
-   und ohne farbige Kante. Die obersten tragen einen hellen Grund, damit man
-   die fünf Teile des Projekts auf einen Blick trennt. */
+/* Schlicht: über einer Liste eine Zeile Text mit Zähler und «+», auf hellem
+   Grund. */
 .baum-kopf {
   display: flex; align-items: center; gap: 8px;
-  padding: 6px 9px; border-radius: var(--radius);
-  cursor: pointer; user-select: none;
-  font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px;
-  color: var(--schrift-matt);
+  padding: 6px 9px; border-radius: var(--radius); user-select: none;
+  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+  background: var(--panel); color: var(--schrift);
 }
-.baum-kopf:hover { background: var(--flaeche-2); }
-.baum-kopf .pfeil { font-size: 10px; color: var(--schrift-zart); width: 10px; transition: transform .12s; }
-.baum-kopf.ist-zu .pfeil { transform: rotate(-90deg); }
 .baum-kopf .titel { flex: 1; }
 .baum-kopf .zaehler {
   font-size: 11px; font-weight: 600; letter-spacing: 0;
@@ -319,11 +313,7 @@ a.knopf { display: inline-block; text-decoration: none; }
 }
 .baum-kopf .werkzeuge { display: flex; gap: 2px; }
 
-.baum-kopf-oben { background: var(--panel); color: var(--schrift); font-weight: 700; }
-.baum-kopf-oben:hover { background: var(--rand); }
-
 .baum-koerper { padding: 3px 0 8px; }
-.baum-unter   { margin-left: 10px; padding-left: 8px; border-left: 1px dashed var(--rand); }
 
 .baum-eintrag {
   display: flex; align-items: center; gap: 8px;
@@ -1337,7 +1327,6 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   :root { --kopfhoehe: 96px; --wahlhoehe: 46px; }
   .kopfleiste { flex-wrap: wrap; align-content: center; padding: 6px 10px; gap: 8px; }
   .kopfleiste .marke { font-size: 15px; }
-  input.projektname { order: 3; flex: 1 1 100%; }
   .kopf-knoepfe { margin-left: auto; }
   .zustandsanzeige { min-width: 0; }
 

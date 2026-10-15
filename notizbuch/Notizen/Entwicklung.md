@@ -44,6 +44,22 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-15 · Links Knöpfe je App
+
+Die linke Tafel zeigt die Apps als Knöpfe mit Zeichen, wie die Kapitel einer
+Platte in der Mitte (Benutzer): Materialien, Stahlbeton-Platten,
+Querschnittsanalyse, 2D Balkensysteme. Unter den Knöpfen steht nur die Liste
+der gewählten App, mit «+» darüber; bei den Materialien je eine für Beton und
+Betonstahl. Der Name des Projekts ist aus der Kopfleiste zuoberst in diese
+Tafel gezogen.
+
+- Welche App gewählt ist, steht in `zustand.app`; wer einen Eintrag wählt,
+  wählt seine App mit (`waehlen`). Das Zuklappen der Kapitel (`offen`) gibt
+  es nicht mehr -- es gibt nur noch eine Liste.
+- Auf dem Knopf steht nur die Anzahl: «1 Querschnittsanalyse» passte nicht
+  in die schmale Spalte.
+- Die Knöpfe rollen nicht mit, nur die Liste darunter.
+
 ## 2026-10-15 · Analytische Gleichungen entfernt
 
 Die App «Analytische Gleichungen» ist weg (Benutzer): an ihre Stelle kommt
