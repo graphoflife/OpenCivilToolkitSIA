@@ -10,8 +10,11 @@
  *
  * Jeder Befehl hat dieselbe Gestalt:
  *
+ *   start(a)          beim Start, wenn er schon etwas weiss (nicht jeder)
  *   frage(a)          was er gerade braucht -- steht im schwebenden Fenster
  *   hinweis           was er sonst kann -- steht in der Statuszeile (nicht jeder)
+ *   tasten            eigene Tasten, je {taste, zeichen, titel, tun(a, befehl),
+ *                     an(befehl)} -- auch als Knopf im Fenster (nicht jeder)
  *   punkt(a, erg)     ein Punkt ist da: {p, art, knoten?}
  *   vorschau(a, g)    was er bis zum Zeiger zeigt
  *   enter(a)          Enter ohne getippte Werte: fertig, schliessen
@@ -193,7 +196,7 @@ export function polygonBefehl() {
 }
 
 // ===========================================================================
-// Verschieben und Kopieren -- Basispunkt, dann Ziel
+// Verschieben und Kopieren -- ein Vektor vom Startpunkt zum Ziel
 // ===========================================================================
 
 /**
@@ -224,20 +227,51 @@ function auswahlGeometrie(a, nurGanze) {
   return formen;
 }
 
+/**
+ * Wo der zuletzt angeklickte Knoten liegt -- oder null, wenn keiner
+ * angeklickt ist oder es ihn nicht mehr gibt.
+ */
+function ankerLage(a) {
+  if (!a.anker) return null;
+  return a.modell.lagen(a.adapter.zeichnung()).get(a.anker) || null;
+}
+
+/**
+ * Verschieben oder Kopieren. Der Vektor beginnt am zuletzt angeklickten
+ * Knoten, und der ist zugleich Bezugspunkt: getippte Δ sind die Verschiebung
+ * selbst. Mit D wählt man einen anderen Startpunkt; Esc kehrt von dort zum
+ * angeklickten zurück. Ist keiner angeklickt -- etwa nach einem Rahmen --,
+ * fragt der Befehl zuerst nach dem Startpunkt.
+ */
 function bewegungsBefehl(kopie) {
   return {
     name: kopie ? 'kopieren' : 'verschieben',
     kopie,
     basis: null,
+    /** Der Startpunkt ohne Zutun: der zuletzt angeklickte Knoten. */
+    vorgabe: null,
     anzahl: 1,
+    hinweis: 'D anderer Startpunkt',
+    tasten: [{
+      taste: 'd', zeichen: 'D', titel: 'Anderer Startpunkt (D)',
+      an: (befehl) => !befehl.basis,
+      tun: (a, befehl) => { befehl.basis = null; },
+    }],
+    start(a) {
+      this.vorgabe = ankerLage(a);
+      this.basisSetzen(a, this.vorgabe);
+    },
+    basisSetzen(a, p) {
+      this.basis = p;
+      if (p) a.eingabe.bezug = p;
+    },
     frage(a) {
       const was = kopie ? 'Kopieren' : 'Verschieben';
-      return this.basis ? `${was}: Zielpunkt` : `${was}: Basispunkt`;
+      return this.basis ? `${was}: Zielpunkt` : `${was}: Startpunkt`;
     },
     punkt(a, erg) {
       if (!this.basis) {
-        this.basis = erg.p;
-        a.eingabe.bezug = erg.p;
+        this.basisSetzen(a, erg.p);
         return;
       }
       const d = [erg.p[0] - this.basis[0], erg.p[1] - this.basis[1]];
@@ -276,9 +310,11 @@ function bewegungsBefehl(kopie) {
       streckenzettel(a, g, this.basis, f.p);
     },
     enter: () => false,
-    zurueck() {
-      if (!this.basis) return false;
-      this.basis = null;
+    // Esc: ein selbst gewählter Startpunkt geht zurück auf den angeklickten
+    // Knoten; steht der Vektor schon dort, ist der Befehl zu Ende.
+    zurueck(a) {
+      if (this.basis === this.vorgabe) return false;
+      this.basisSetzen(a, this.vorgabe);
       return true;
     },
   };

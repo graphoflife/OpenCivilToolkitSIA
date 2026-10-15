@@ -143,6 +143,7 @@ function neu(adapter) {
     vollbild: false,
     einpassen: false,
     letzterKlick: null,
+    anker: null,         // der zuletzt angeklickte Knoten: dort beginnt der Vektor beim Verschieben
     knoten: null,
     teile: null,
     bildUhr: null,
@@ -244,6 +245,7 @@ function starten(a, befehl) {
   eingabeLeeren(a.eingabe);
   a.eingabe.bezug = null;
   a.letzterKlick = null;
+  befehl.start?.(a);
   zeichnen(a);
 }
 
@@ -543,6 +545,9 @@ function punkteingabe(a) {
       }),
     ]),
     el('div.cad-hilfen', {}, [
+      // Was der Befehl selbst an Tasten hat -- beim Verschieben D.
+      ...(a.befehl?.tasten || []).map((t) => hilfsknopf(
+        a, t.zeichen, t.titel, () => t.tun(a, a.befehl), t.an?.(a.befehl))),
       hilfsknopf(a, 'R', 'Bezugspunkt auf den gefangenen Punkt (R)', () => eingabeTaste(a, fake('r'))),
       hilfsknopf(a, x.toUpperCase(), `Entlang ${x} (${x.toUpperCase()})`, () => eingabeTaste(a, fake(x)),
         pe.bindung?.art === 'achse' && pe.bindung.r[0] === 1),
@@ -578,6 +583,7 @@ function paletteZeichnen(a) {
     const schluessel = JSON.stringify([
       'befehl', a.befehl.name, pe.modus, pe.runde, pe.bindung?.text, pe.warten?.art || pe.warten,
       a.befehl.kopie ? a.befehl.anzahl : null, neuTeil?.schluessel ?? null,
+      (a.befehl.tasten || []).map((t) => !!t.an?.(a.befehl)),
     ]);
     pal.setzen(hilfstext(a) || a.befehl.frage(a), [
       ...punkteingabe(a),
@@ -860,6 +866,13 @@ function taste(e) {
       zeichnen(a);
       return;
     }
+    const eigene = a.befehl.tasten?.find((t) => t.taste === k);
+    if (eigene) {
+      e.preventDefault();
+      eigene.tun(a, a.befehl);
+      zeichnen(a);
+      return;
+    }
     if (eingabeTaste(a, e)) {
       e.preventDefault();
       zeichnen(a);
@@ -878,7 +891,10 @@ function taste(e) {
   switch (k) {
     case 'Escape':
       if (a.befehl) befehlEnde(a);
-      else if (a.auswahl.size) a.auswahl = new Set();
+      else if (a.auswahl.size) {
+        a.auswahl = new Set();
+        a.anker = null;
+      }
       else if (a.vollbild) { vollbildSetzen(a, false); return; }
       break;
     case 'Delete':
@@ -1045,5 +1061,6 @@ export function cadWaehlen(a, kennungen) {
   a.befehl = null;
   eingabeLeeren(a.eingabe);
   a.auswahl = new Set(kennungen);
+  a.anker = null;
   zeichnen(a);
 }

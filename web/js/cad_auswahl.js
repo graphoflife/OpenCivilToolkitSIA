@@ -2,7 +2,7 @@
  * cad_auswahl.js -- was der Zeiger trifft, und wie eine Auswahl entsteht.
  *
  * Gezogen wird nichts: ein Element wählt man aus und verschiebt es danach
- * mit einem Befehl, mit Basispunkt und Ziel. Wer eine Ecke an eine bestimmte
+ * mit einem Befehl, mit Startpunkt und Ziel. Wer eine Ecke an eine bestimmte
  * Stelle will, tippt sie ins schwebende Fenster.
  *
  *   Klick              wählt, was unter dem Zeiger liegt: eine Ecke vor
@@ -13,6 +13,10 @@
  *   Rahmen ziehen      nach rechts: was ganz drin liegt, und jede Ecke im
  *                      Rahmen; nach links: auch, was er schneidet (wie in
  *                      AxisVM und AutoCAD)
+ *
+ * Trifft ein Klick einen Knoten -- eine Ecke, einen Stab, einen freien
+ * Knoten --, merkt sich das Fenster ihn (`a.anker`): beim Verschieben und
+ * Kopieren beginnt der Vektor dort. Ein Rahmen und das Abwählen vergessen ihn.
  *
  * In einer verbundenen Zeichnung (`a.einstellung.verbunden`, ein Rahmen)
  * gibt es keine Ecken: an einem Knoten wird der Knoten gewählt, und ein
@@ -99,6 +103,22 @@ export function treffer(a, bild) {
   return liste;
 }
 
+/**
+ * Der Knoten, den ein Schlüssel der Auswahl meint -- der Knoten selbst, die
+ * Ecke eines Elements oder ein Punkt wie ein Stab. Eine Linie oder Fläche als
+ * Ganzes meint keinen: null.
+ */
+function knotenVon(a, schluessel) {
+  if (!schluessel) return null;
+  const { kennung, i } = auswahlTeil(schluessel);
+  const da = a.modell.verzeichnis(a.adapter.zeichnung()).get(kennung);
+  if (!da) return null;
+  if (da.art === null) return kennung;
+  const verweise = a.modell.verweise(da.art, da.e);
+  if (i !== null) return verweise[i] ?? null;
+  return da.art.form === 'punkt' ? verweise[0] : null;
+}
+
 /** Ein Klick ohne Befehl: wählen, dazunehmen, durchschalten. */
 export function klickWaehlen(a, bild, e) {
   const liste = treffer(a, bild);
@@ -109,6 +129,8 @@ export function klickWaehlen(a, bild, e) {
     ziel = liste[(liste.indexOf(vorher) + 1) % liste.length];
   }
   a.letzterKlick = { bild, ziel };
+  // Ein Shift+Klick ins Leere ändert nichts -- auch nicht, wo der Vektor beginnt.
+  if (ziel || !e.shiftKey) a.anker = knotenVon(a, ziel);
   if (e.shiftKey) {
     if (ziel) {
       if (a.auswahl.has(ziel)) {
@@ -150,6 +172,7 @@ export function rahmenWaehlen(a, start, ende, dazu) {
   const m = a.modell;
   const lagen = m.lagen(z);
   const neu = new Set(dazu ? a.auswahl : []);
+  if (!dazu) a.anker = null;
   const ganzDrin = new Set();
   const verbunden = a.einstellung.verbunden;
   for (const { art, e } of m.elemente(z)) {

@@ -44,6 +44,23 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-15 · Zeichenfenster: der Vektor beginnt am angeklickten Knoten
+
+Verschieben und Kopieren fragten zuerst nach einem Basispunkt, dann nach dem
+Ziel -- zwei Klicks, auch wenn man den Knoten gerade angeklickt hatte, um
+ihn zu wählen. Jetzt merkt sich das Fenster den zuletzt angeklickten Knoten
+(`a.anker`): eine Ecke, ein Stab, ein freier Knoten. Mit V oder C beginnt der
+Vektor dort, und der Knoten ist zugleich Bezugspunkt -- getippte Δy und Δz
+sind die Verschiebung selbst. D wählt einen anderen Startpunkt; Esc kehrt von
+dort zum angeklickten zurück und beendet beim zweiten Mal. Ein Rahmen und das
+Abwählen vergessen den Knoten; dann fragt der Befehl wie bisher zuerst nach
+dem Startpunkt.
+
+Dafür kann ein Befehl jetzt eigene Tasten haben (`tasten`), die zugleich als
+Knopf im schwebenden Fenster stehen, und beim Start etwas tun (`start`). Das
+Zeichenfenster ist dasselbe für Querschnittsanalyse und Balkensystem; beide
+haben es.
+
 ## 2026-10-15 · Oberfläche: Kapitel als Knöpfe, kompakte Bewehrung
 
 Auf Wunsch übersichtlicher, in drei Schritten. Gerechnet wird dasselbe.
