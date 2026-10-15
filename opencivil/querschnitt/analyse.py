@@ -51,9 +51,11 @@ from opencivil.querschnitt.werkstoffgesetz import (
 )
 
 #: Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die
-#: eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin.
+#: eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin. ``E_cm`` braucht
+#: der Gebrauchszustand: der Beton dort rechnet mit ``E_cm/(1+phi)``.
 KENNWERTE = {
-    Baustoffart.BETON: ("f_ck", "f_cd", "eps_c1d", "eps_c2d", "k_sigma", "E_cd", "f_ctm"),
+    Baustoffart.BETON: ("f_ck", "f_cd", "eps_c1d", "eps_c2d", "k_sigma", "E_cd", "f_ctm",
+                        "E_cm"),
     Baustoffart.BETONSTAHL: ("f_yk", "f_yd", "f_yk_druck", "f_yd_druck", "E_s", "eps_ud"),
 }
 
@@ -724,11 +726,11 @@ class Querschnittsanalyse:
                  Eingabebezug("z_S", self.id_von("z_S"))]
                 + self.werkstoffbezuege())
 
-    def interaktion(self, e: Eingaben) -> Tuple[Querschnitt, List[str]]:
+    def interaktion(self, e: Eingaben) -> Tuple[Querschnitt, List[Stabgruppe]]:
         """
         Der Querschnitt im Bruchzustand, mit den gewaehlten Werkstoffgesetzen
         und dem Schwerpunkt aus dem Rechenwerk als Bezugspunkt -- dazu je
-        Bewehrung der Name ihres Elements.
+        Bewehrung das Element, aus dem sie stammt.
         """
         # Einmal je Satz von Werten: die Nachweise der Analyse teilen sich den
         # Querschnitt und mit ihm alles, was er schon gesucht hat.
@@ -744,10 +746,11 @@ class Querschnittsanalyse:
     # -- Fuer die Nachweise: Geometrie in Metern ------------------------------------
 
     def geometrie(self, index_von: Callable[[Baustoff], int],
-                  ) -> Tuple[List[Teil], List[Bewehrung], List[str]]:
+                  ) -> Tuple[List[Teil], List[Bewehrung], List[Stabgruppe]]:
         """
         Polygone und Bewehrung in Metern, mit den Werkstoffen als Index --
-        dazu je Bewehrung der Name ihres Elements, fuer die Kraefte in der Probe.
+        dazu je Bewehrung das Element, aus dem sie stammt: sein Name steht in
+        der Probe, sein Durchmesser bestimmt die Rissbreite.
         """
         mm = 1e-3
         teile = [Teil(punkte=tuple((y * mm, z * mm) for y, z in f.punkte),
@@ -755,7 +758,7 @@ class Querschnittsanalyse:
                       eltern=self.eltern[i])
                  for i, f in enumerate(self.flaechen)]
         bewehrung: List[Bewehrung] = []
-        herkunft: List[str] = []
+        herkunft: List[Stabgruppe] = []
         for g in self.gruppen:
             stahl = index_von(g.stahl)
             if g.art == Linienart.FLAECHE.value:
@@ -766,7 +769,7 @@ class Querschnittsanalyse:
                     g.flaeche * mm * mm, stahl,
                     index_von(beton) if beton is not None else None)
                 bewehrung += stuecke
-                herkunft += [g.name] * len(stuecke)
+                herkunft += [g] * len(stuecke)
                 continue
             einzeln = math.pi * g.durchmesser ** 2 / 4.0 * mm * mm
             for p in g.punkte:
@@ -774,7 +777,7 @@ class Querschnittsanalyse:
                 bewehrung.append(Bewehrung(
                     lage=(p[0] * mm, p[1] * mm), flaeche=einzeln, werkstoff=stahl,
                     verdraengt=index_von(beton) if beton is not None else None))
-                herkunft.append(g.name)
+                herkunft.append(g)
         return teile, bewehrung, herkunft
 
     def schubwaende(self, f_sd: Callable[[Wandangabe], float],

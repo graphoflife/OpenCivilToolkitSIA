@@ -286,9 +286,10 @@ class Spannungsgrenze(ABC):
         gerechnet und mitgeschrieben.
         """
 
+    @classmethod
     @abstractmethod
-    def festlegung(self, p: Protokoll) -> None:
-        """Welche Werte die Grenze ansetzt, und warum."""
+    def festlegung(cls, p: Protokoll) -> None:
+        """Welche Werte die Grenze ansetzt, und warum -- ohne Platte, nur der Absatz."""
 
 
 class GrenzeGegenFliessen(Spannungsgrenze):
@@ -331,7 +332,8 @@ class GrenzeGegenFliessen(Spannungsgrenze):
             grenzen[kennung_aus(stahl.id)] = sigma_adm
         return grenzen
 
-    def festlegung(self, p: Protokoll) -> None:
+    @classmethod
+    def festlegung(cls, p: Protokoll) -> None:
         p.erklaerung(
             "Drittens die Grenze: sie rechnet mit dem Bemessungswert, "
             "σ_s,adm = f_yd − 80 N/mm², und nicht mit f_yk − 80. Die Norm sagt "
@@ -412,7 +414,8 @@ class GrenzeAusRissbreite(Spannungsgrenze):
             grenzen[kennung_aus(stahl.id)] = sigma_adm
         return grenzen
 
-    def festlegung(self, p: Protokoll) -> None:
+    @classmethod
+    def festlegung(cls, p: Protokoll) -> None:
         p.erklaerung(
             "Drittens die Grenze: dieselbe wie bei der Zwängung, mit f_yk und "
             "bei erhöhter und hoher Anforderung zusätzlich begrenzt durch die "
@@ -422,6 +425,66 @@ class GrenzeAusRissbreite(Spannungsgrenze):
             "Stützmoment die obere –, und der dickste Stab gibt die kleinste "
             "zulässige Spannung. Das liegt für beide auf der sicheren Seite."
         )
+
+
+# ===========================================================================
+# Was jede Stahlspannung festlegt
+# ===========================================================================
+
+
+def protokoll_festlegungen(p: Protokoll, wahl: Rechenwahl) -> None:
+    """
+    Die ersten beiden der drei Festlegungen hinter jeder Stahlspannung:
+    Kriechen und Werkstoffgesetze. Die dritte, die Grenze, schreibt danach
+    die Grenze selbst (:meth:`Spannungsgrenze.festlegung`). Fuer die Platte
+    und den gezeichneten Querschnitt dieselben Absaetze.
+    """
+    p.titel("Welche Werte angesetzt werden", ebene=3)
+    p.erklaerung(
+        "Drei Festlegungen stecken in jeder Zahl unten, und alle drei "
+        "sind Auslegung der Norm und nicht Rechnung. Erstens das "
+        "Kriechen: angesetzt wird das φ dieses Kapitels. Ein grösseres φ "
+        "weicht den Beton auf, die Druckzone wächst, der Hebelarm wird "
+        "kleiner und die Stahlspannung damit grösser; mit φ = 0 gehen die "
+        "Spannungen zurück, und der Nachweis geht leichter auf. Mit dem "
+        "Spannungsblock hängt kein Gesetz am Modul – dort wirkt φ nicht."
+    )
+    if wahl.satz is Werkstoffsatz.CHARAKTERISTISCH:
+        p.erklaerung(
+            "Zweitens die Werkstoffgesetze: sie rechnen mit den "
+            "charakteristischen Festigkeiten. Der Stahl ist linear bis f_yk "
+            "und fliesst dann, der Beton trägt höchstens f_ck. Ein "
+            "Gebrauchsnachweis fragt, was der Querschnitt tut, und nicht, was "
+            "er darf – der Teilsicherheitsbeiwert gehört in die "
+            "Tragsicherheit. Läge das Plateau bei f_yd, bliebe jede "
+            "Stahlspannung darunter, und eine Grenze darüber könnte nie "
+            "überschritten werden."
+        )
+    else:
+        p.erklaerung(
+            "Zweitens die Werkstoffgesetze: sie rechnen hier mit den "
+            "Bemessungswerten f_cd und f_yd. Das Plateau des Stahls liegt "
+            "damit bei f_yd – eine Stahlspannung darüber gibt es nicht, und "
+            "eine Grenze darüber kann nicht überschritten werden."
+        )
+    if wahl.art.mit_block:
+        p.erklaerung(
+            "Mit dem Spannungsblock trägt der Beton unter (1 − 0.85)·ε_c2d "
+            "nichts. Unter Gebrauchslast liegt die Druckresultierende damit "
+            "am Rand, und der Hebelarm wird beinahe d – die Stahlspannung "
+            "kleiner, als der Querschnitt sie hat. Der Block ist ein Modell "
+            "für den Bruch.")
+
+
+#: Was verglichen wird, wenn die Bewehrung fliesst -- siehe Dateikopf.
+VERGLEICH_BEIM_FLIESSEN = (
+    "Fliesst die Bewehrung, bleibt ihre Spannung am Plateau stehen, "
+    "während die Dehnung weiterwächst. Verglichen wird dann die "
+    "Dehnung: ε_s gegen ε_s,adm = σ_s,adm / E_s. Solange der Stahl "
+    "elastisch bleibt, ist das genau der Spannungsvergleich; fliesst "
+    "er, fällt der Nachweis durch, und zwar um so deutlicher, je "
+    "weiter er gedehnt ist."
+)
 
 
 # ===========================================================================
@@ -638,52 +701,11 @@ class Spannungsbegrenzung(Nachweis):
                                       titel="Wirksamer Elastizitätsmodul", nachsatz=nachsatz)
         sigma_adm = g.bestimmen(e, p)
 
-        p.titel("Welche Werte angesetzt werden", ebene=3)
-        p.erklaerung(
-            "Drei Festlegungen stecken in jeder Zahl unten, und alle drei "
-            "sind Auslegung der Norm und nicht Rechnung. Erstens das "
-            "Kriechen: angesetzt wird das φ dieses Kapitels. Ein grösseres φ "
-            "weicht den Beton auf, die Druckzone wächst, der Hebelarm wird "
-            "kleiner und die Stahlspannung damit grösser; mit φ = 0 gehen die "
-            "Spannungen zurück, und der Nachweis geht leichter auf. Mit dem "
-            "Spannungsblock hängt kein Gesetz am Modul – dort wirkt φ nicht."
-        )
-        if wahl.satz is Werkstoffsatz.CHARAKTERISTISCH:
-            p.erklaerung(
-                "Zweitens die Werkstoffgesetze: sie rechnen mit den "
-                "charakteristischen Festigkeiten. Der Stahl ist linear bis f_yk "
-                "und fliesst dann, der Beton trägt höchstens f_ck. Ein "
-                "Gebrauchsnachweis fragt, was der Querschnitt tut, und nicht, was "
-                "er darf – der Teilsicherheitsbeiwert gehört in die "
-                "Tragsicherheit. Läge das Plateau bei f_yd, bliebe jede "
-                "Stahlspannung darunter, und eine Grenze darüber könnte nie "
-                "überschritten werden."
-            )
-        else:
-            p.erklaerung(
-                "Zweitens die Werkstoffgesetze: sie rechnen hier mit den "
-                "Bemessungswerten f_cd und f_yd. Das Plateau des Stahls liegt "
-                "damit bei f_yd – eine Stahlspannung darüber gibt es nicht, und "
-                "eine Grenze darüber kann nicht überschritten werden."
-            )
-        if wahl.art.mit_block:
-            p.erklaerung(
-                "Mit dem Spannungsblock trägt der Beton unter (1 − 0.85)·ε_c2d "
-                "nichts. Unter Gebrauchslast liegt die Druckresultierende damit "
-                "am Rand, und der Hebelarm wird beinahe d – die Stahlspannung "
-                "kleiner, als der Querschnitt sie hat. Der Block ist ein Modell "
-                "für den Bruch.")
+        protokoll_festlegungen(p, wahl)
         protokoll_gesetze(p, wahl, e, self.id, titel="Werkstoffgesetze im Gebrauchszustand",
                           posten=self.posten)
         g.festlegung(p)
-        p.erklaerung(
-            "Fliesst die Bewehrung, bleibt ihre Spannung am Plateau stehen, "
-            "während die Dehnung weiterwächst. Verglichen wird dann die "
-            "Dehnung: ε_s gegen ε_s,adm = σ_s,adm / E_s. Solange der Stahl "
-            "elastisch bleibt, ist das genau der Spannungsvergleich; fliesst "
-            "er, fällt der Nachweis durch, und zwar um so deutlicher, je "
-            "weiter er gedehnt ist."
-        )
+        p.erklaerung(VERGLEICH_BEIM_FLIESSEN)
         p.titel("Wie die Dehnungsebene gefunden wird", ebene=3)
         protokoll_verfahren(p, eps_druck=EPS_DRUCK, eps_zug=loeser.eps_zug,
                             verdraengt=wahl.art is not Rechenart.HANDRECHNUNG)

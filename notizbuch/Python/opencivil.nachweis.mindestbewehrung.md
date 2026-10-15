@@ -1,5 +1,5 @@
 ---
-erzeugt: b65241ffc5c4
+erzeugt: e2aaa61b1daa
 art: modul
 tags: [modul]
 ---
@@ -287,7 +287,9 @@ Lagen einen Stahl traegt.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
+- [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.lesen]]
 

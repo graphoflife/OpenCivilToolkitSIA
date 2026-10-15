@@ -1,5 +1,5 @@
 ---
-erzeugt: fa6c46f063e3
+erzeugt: 716c545b3805
 art: formel
 tags: [formel]
 ---
@@ -28,6 +28,7 @@ $$
 ## Gebraucht von
 
 - [[Risskraft der gezogenen Querschnittshälfte]]
+- [[Risskraft des ganzen Querschnitts]]
 - [[Rissmoment bei der Normalkraft]]
 - [[Rissmoment des ungerissenen Querschnitts]]
 - [[Rissnormalkraft beim Moment]]

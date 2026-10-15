@@ -1,5 +1,5 @@
 ---
-erzeugt: 36815ad47378
+erzeugt: 3988fa9f65ac
 art: modul
 tags: [modul]
 ---
@@ -624,6 +624,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.nachweis.fehlende_bewehrung]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
+- [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.richtungsnachweise]]
@@ -631,6 +632,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.sproedes_versagen]]
+- [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.platte]]

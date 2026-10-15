@@ -1,5 +1,5 @@
 ---
-erzeugt: 9a9f848bc056
+erzeugt: 3b92ae99621b
 art: modul
 tags: [modul]
 ---
@@ -251,6 +251,49 @@ Ein Lastfall der Querschnittsanalyse -- kN und kNm, Vorzeichen siehe oben.
 def aus_dict(cls, d: Mapping[str, Any]) -> 'QALastfallEintrag'
 ```
 
+### QAGebrauchsfallEintrag
+
+```python
+@dataclass
+class QAGebrauchsfallEintrag(Beschreibung)
+```
+
+Ein Lastfall unter Gebrauchslast -- wie ein Lastfall der Tragsicherheit,
+ohne Querkraft und Torsion: begrenzt wird die Stahlspannung, und dafuer
+zaehlen N und die Momente. kN und kNm, Vorzeichen siehe oben.
+
+- `name: str`
+- `N_Ed: float = 0.0`
+- `M_y_Ed: float = 0.0`
+- `M_z_Ed: float = 0.0`
+- `aktiv: bool = True`
+
+#### QAGebrauchsfallEintrag.aus_dict
+
+```python
+@classmethod
+def aus_dict(cls, d: Mapping[str, Any], wort: str='häufige') -> 'QAGebrauchsfallEintrag'
+```
+
+`wort` nennt die Liste in der Meldung -- «häufige» oder «quasi-ständige».
+
+### QAGebrauchsliste
+
+```python
+@dataclass
+class QAGebrauchsliste(Gebrauchsliste)
+```
+
+Die Lastfaelle einer Stahlspannung am gezeichneten Querschnitt: dieselbe
+Liste wie bei der Platte, mit N, M_y und M_z je Fall, abgeleitet aus den
+Lastfaellen der Tragsicherheit. Gerechnet wird ueber die Fasern -- eine
+Handrechnung gibt es hier nicht.
+
+- `FALL = QAGebrauchsfallEintrag`
+- `ARTEN = FASERSPANNUNGSARTEN`
+- `BAUTEIL = 'Querschnitt'`
+- `faelle: List[QAGebrauchsfallEintrag] = field(default_factory=list)`
+
 ### WerkstoffwahlEintrag
 
 ```python
@@ -350,6 +393,13 @@ Ein gezeichneter Querschnitt mit Bewehrung, Schubwaenden und Lastfaellen.
 - `duktilitaet: bool = False`
 - `x_d_max: float = X_D_MAX`
 - `sproede: bool = False`
+- `rissanforderung: str = 'normal'` – Anforderung an die Rissbildung -- `normal`, `erhoeht` oder `hoch`, wie bei der Platte.
+- `zwaengung: bool = False` – Ob die Zwaengung auf Normalkraft nachgewiesen wird -- am ganzen Querschnitt.
+- `zwaengung_begrenzt: bool = False` – Ob die rissaktive Dicke dabei hoechstens 500 mm betraegt.
+- `zwaengung_biegung: bool = False` – Ob die Zwaengung auf Biegung nachgewiesen wird -- je Richtung.
+- `zwaengung_biegung_kriechzahl: float = 0.0` – Die Kriechzahl φ der Zwaengung auf Biegung: der Beton mit `E_cm/(1+φ)`.
+- `quasistaendig: QAGebrauchsliste = field(default_factory=lambda: QAGebrauchsliste(anteil=QUASISTAENDIG_A…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
+- `haeufig: QAGebrauchsliste = field(default_factory=lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL))` – Die haeufigen Lastfaelle -- gegen das Fliessen, bei erhoehter und hoher Anforderung.
 - `spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)` – Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt.
 - `beschreibung: str = ''` – Freier Text -- geht in keine Rechnung ein, wie bei der Platte.
 
@@ -469,7 +519,9 @@ Passen die Masse nicht zueinander, ein `ValueError` mit dem Grund.
 def pruefen(self) -> None
 ```
 
-Was sich schon an der Beschreibung pruefen laesst: eindeutige Namen der Faelle.
+Was sich schon an der Beschreibung pruefen laesst: eindeutige Namen der
+Faelle, und die Gebrauchslisten pruefen sich selbst, samt Anteil und
+abgeleiteten Namen.
 
 #### QuerschnittsanalyseEintrag.lastfall
 
@@ -530,6 +582,7 @@ und mit ihr jeder Name im Bericht.
 ## Braucht
 
 - [[opencivil.nachweis.duktilitaet]]
+- [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.netz]]

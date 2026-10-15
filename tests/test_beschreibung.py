@@ -17,9 +17,9 @@ from opencivil.projekt import (
 )
 from opencivil.projekt.eintraege import Beschreibung
 from opencivil.projekt.querschnittsanalyse import (
-    FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QALastfallEintrag,
-    QASpannungsfallEintrag, QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag,
-    StablinieEintrag, WerkstoffwahlEintrag,
+    FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QAGebrauchsfallEintrag,
+    QAGebrauchsliste, QALastfallEintrag, QASpannungsfallEintrag, QuerschnittsanalyseEintrag,
+    SchubwandEintrag, StabEintrag, StablinieEintrag, WerkstoffwahlEintrag,
 )
 from opencivil.projekt.gleichungen import GleichungsblattEintrag, GleichungszeileEintrag
 from opencivil.web import api, dienst
@@ -411,6 +411,7 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
         (HilfslinieEintrag, {}, {}),
         (QALastfallEintrag, {"name": "l"}, {"name": "l"}),
         (QASpannungsfallEintrag, {"name": "s"}, {"name": "s"}),
+        (QAGebrauchsfallEintrag, {"name": "g"}, {"name": "g"}),
         (WerkstoffwahlEintrag, {"material": "b1"}, {"material": "b1"}),
         (QuerschnittsanalyseEintrag, {"kennung": "a"}, {"kennung": "a", "name": "a"}),
         (SystemknotenEintrag, {}, {}),
@@ -433,7 +434,7 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
     def test_jede_eintragsklasse_ist_dabei(self):
         """
         Eine neue Klasse ohne Eintrag oben wäre ungeprüft. Ausgenommen die
-        Gebrauchsliste: ihr Anteil hängt an der Liste (häufig 70 %,
+        Gebrauchslisten: ihr Anteil hängt an der Liste (häufig 70 %,
         quasi-ständig 60 %) und kommt als Argument.
         """
         def unterklassen(k):
@@ -441,8 +442,8 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
                 yield u
                 yield from unterklassen(u)
         geprueft = {cls for cls, _, _ in self.FAELLE}
-        self.assertEqual(set(unterklassen(Beschreibung)) - geprueft - {Gebrauchsliste},
-                         set())
+        self.assertEqual(set(unterklassen(Beschreibung)) - geprueft
+                         - {Gebrauchsliste, QAGebrauchsliste}, set())
 
 
 class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
@@ -469,6 +470,7 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
         for art, cls, pflicht in (
                 ("qa_lastfall", QALastfallEintrag, {"name": "Neu"}),
                 ("qa_analyse", QASpannungsfallEintrag, {"name": "Neu"}),
+                ("qa_gebrauchsfall", QAGebrauchsfallEintrag, {"name": "Neu"}),
                 ("knoten", KnotenEintrag, {}), ("flaeche", FlaecheEintrag, {}),
                 ("stab", StabEintrag, {}), ("stablinie", StablinieEintrag, {}),
                 ("schubwand", SchubwandEintrag, {}), ("hilfslinie", HilfslinieEintrag, {}),
@@ -861,18 +863,38 @@ class TestAusgeschaltetHeisstStill(unittest.TestCase):
         "zwaengung_biegung": ("zwaengung_biegung", "ZB"),
     }
 
+    #: Dieselben Schalter am gezeichneten Querschnitt -> (Feld, Art, Zahl der
+    #: Urteile): je Richtung eines, die Zwängung auf Normalkraft eines für alles.
+    QA_SCHALTER = {
+        "duktilitaet": ("qa_duktilitaet", "x/d", 4),
+        "sproede": ("qa_sproede", "Riss", 4),
+        "zwaengung": ("qa_rissnormalkraft", "N_Riss", 1),
+        "zwaengung_biegung": ("qa_zwaengung_biegung", "ZB", 4),
+    }
+
     def test_jeder_schalter(self):
         for schalter, (feld, art) in self.SCHALTER.items():
             projekt = Projekt.beispiel()
             setattr(projekt.querschnitt("q1"), schalter, False)
-            aufbau = projekt.aufbauen()
-            loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
-            with self.subTest(schalter=schalter):
-                self.assertTrue(all(n.still for n in getattr(aufbau, feld).values()))
-                urteile = [u for u in loesung.urteile if u.art == art]
-                self.assertEqual(len(urteile), 2)          # beide x-Lagen
-                self.assertTrue(all(u.still for u in urteile))
-                self.assertFalse([u for u in loesung.gefuehrte_urteile if u.art == art])
+            self._still(projekt, schalter, feld, art, 2)   # beide x-Lagen
+
+    def test_jeder_schalter_des_gezeichneten_querschnitts(self):
+        for schalter, (feld, art, anzahl) in self.QA_SCHALTER.items():
+            projekt = Projekt.beispiel()
+            setattr(projekt.querschnittsanalyse("a1"), schalter, False)
+            self._still(projekt, schalter, feld, art, anzahl)
+
+    def _still(self, projekt, schalter, feld, art, anzahl):
+        aufbau = projekt.aufbauen()
+        loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
+        nachweise = getattr(aufbau, feld).values()
+        with self.subTest(schalter=schalter, feld=feld):
+            self.assertTrue(nachweise and all(n.still for n in nachweise))
+            urteile = [u for u in loesung.urteile
+                       if u.art == art and any(u.ziel.startswith(n.id) for n in nachweise)]
+            self.assertEqual(len(urteile), anzahl)
+            self.assertTrue(all(u.still for u in urteile))
+            self.assertFalse([u for u in loesung.gefuehrte_urteile if u in urteile])
 
 
 class TestEinUrteilJeLagennachweis(unittest.TestCase):

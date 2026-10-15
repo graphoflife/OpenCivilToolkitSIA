@@ -1,5 +1,5 @@
 ---
-erzeugt: 7b91e0a5654f
+erzeugt: fa37e03991a3
 art: modul
 tags: [modul]
 ---
@@ -144,7 +144,7 @@ Tiefe, zeigt das Bild den, der dort ueberwiegt.
 ### _loeser
 
 ```python
-def _loeser(q: Querschnitt, seite: Zugseite, herkunft: List[str], staehle: Mapping[int, Stahlgesetz], namen: Mapping[int, str]) -> Faserloeser
+def _loeser(q: Querschnitt, seite: Zugseite, herkunft: List[Stabgruppe], staehle: Mapping[int, Stahlgesetz], namen: Mapping[int, str]) -> Faserloeser
 ```
 
 Der Querschnitt in einer Zugrichtung als [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]]. Staebe in
@@ -263,6 +263,17 @@ def herleitung_bezug(self, p: Protokoll, w: Zwischenwerte, momente: bool, ein: C
 
 Der reine Betonquerschnitt des aequivalenten Moduls: der Bruttoquerschnitt.
 
+### querschnitt_nach_wahl
+
+```python
+def querschnitt_nach_wahl(analyse: Querschnittsanalyse, wert: Callable[[str], float], wahl: Rechenwahl, *, ungerissen: bool=False) -> Tuple[Querschnitt, List[Stabgruppe], Dict[int, Stahlgesetz]]
+```
+
+Der gezeichnete Querschnitt mit den Gesetzen einer Rechenwahl -- dazu je
+Bewehrung ihr Element und je Stahl sein Gesetz, nach dem Index des
+Werkstoffs. `wert` liefert zu einer Wert-ID die Zahl in SI. Zerlegt in
+so viele Streifen, wie die Platte Fasern hat ([[opencivil.nachweis.querschnittsloeser#Konstanten|FASERN]]).
+
 ### schnittpaar
 
 ```python
@@ -303,6 +314,7 @@ gerufen. Mit `protokoll` schreibt jede Linie ihre Herleitung.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.web.api]]

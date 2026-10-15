@@ -21,10 +21,14 @@
 import { erklaerung, feld, hakenSchalter, panel } from './bausteine.js';
 import { auswahl, el, svgEl, zahlfeld } from './dom.js';
 import {
-  analysenKapitel, anzahl, eingeschaltet, kapitelFenster, kapitelPanel, schalter,
+  analysenKapitel, anzahl, eingeschaltet, gebrauchsstand, kapitelFenster, kapitelPanel,
+  schalter,
 } from './kapitel.js';
 import { span } from './mathe.js';
-import { analyseInhalt, mitKopf } from './nachweise.js';
+import {
+  analyseInhalt, fliessenGefordert, haeufigInhalt, mitKopf, quasistaendigInhalt,
+  zwangInhalt,
+} from './nachweise.js';
 import { uebersicht } from './qa_uebersicht.js';
 import { zeichenbereich } from './qa_zeichnung.js';
 import {
@@ -55,6 +59,30 @@ const HILFE = {
       ['Werte', 'M_Rd nach Werkstoffwahl, M_Riss mit f_ct,eff = k_t·f_ctm'],
     ],
     formel: 'M_Rd(N = 0) ≥ M_Riss = f_ct,eff · W',
+  },
+  zwang: {
+    zeilen: [
+      ['Normalkraft', 'der ganze Querschnitt reisst: Σ A_c·k_t·f_ctm, t = kleinere Abmessung; gegen alle Stäbe'],
+      ['Biegung', 'je Richtung M_Riss wie beim spröden Versagen, gegen das Moment, bei dem der erste gezogene Stab σ_s,adm erreicht – gerissen, elastisch, eigenes φ'],
+      ['σ_s,adm', 'je Stab nach Tab. 17 mit seinem ⌀; verschmiert: fiktiver ⌀ bei 150 mm Teilung'],
+    ],
+    formel: 'Σ A_s·σ_s,adm ≥ N_Riss    M_s,adm ≥ M_Riss',
+  },
+  quasistaendig: {
+    zeilen: [
+      ['Weg', 'Ebene am gerissenen Querschnitt; schief dreht die Nulllinie, bis N, M_y und M_z stimmen'],
+      ['Grenze', 'je gezogenem Stab aus der Rissbreite, mit seinem ⌀; massgebend der kleinste Erfüllungsgrad'],
+      ['Werte', 'nach Rechenwahl; Vorgabe charakteristisch (f_ck, f_yk), elastisch'],
+    ],
+    formel: 'σ_s ≤ σ_s,adm (Tab. 17), je Stab',
+  },
+  haeufig: {
+    zeilen: [
+      ['Weg', 'Ebene am gerissenen Querschnitt, wie quasi-ständig'],
+      ['Grenze', 'je Stahl f_yd − 80 N/mm²'],
+      ['Werte', 'nach Rechenwahl; Vorgabe charakteristisch (f_ck, f_yk), elastisch'],
+    ],
+    formel: 'σ_s ≤ f_yd − 80 N/mm²',
   },
   schubwaende: {
     zeilen: [
@@ -132,6 +160,15 @@ function querschnittGruppe(analyse) {
     feld('Bezeichnung', el('input', {
       type: 'text', value: analyse.name,
       on: { change: (e) => aendern((a) => { a.name = e.target.value; }) },
+    })),
+    // Wie bei der Platte: sie gilt für die Zwängung und beide Stahlspannungen.
+    feld('Rissanforderung', auswahl({
+      werte: (zustand.katalog?.rissanforderungen || []).map((r) => ({
+        wert: r.wert, beschriftung: r.beschriftung,
+      })),
+      gewaehlt: analyse.rissanforderung || 'normal',
+      titel: 'Bestimmt σ_s,adm (Tab. 17)',
+      beiAenderung: (v) => aendern((a) => { a.rissanforderung = v; }),
     })),
     zeichenbereich(analyse, uebersicht),
     el('div.unterkapitel', {}, [
@@ -468,6 +505,33 @@ const NACHWEISE = [
     inhalt: sproedeInhalt,
     stand: (a) => schalter(!!a.sproede),
   },
+  {
+    schluessel: 'zwang',
+    name: 'Riss bei Zwang', titel: 'Rissbreitenbegrenzung bei Zwang',
+    inhalt: (a) => zwangInhalt(a, ORT),
+    // Die Begrenzung auf 500 mm ist kein eigener Nachweis, sie ändert den
+    // auf Normalkraft.
+    stand: (a) => {
+      const teile = [a.zwaengung ? 'N' : null, a.zwaengung_biegung ? 'M' : null].filter(Boolean);
+      return { an: teile.length > 0, text: teile.length ? `auf ${teile.join(' und ')}` : 'aus' };
+    },
+  },
+  {
+    schluessel: 'quasistaendig',
+    name: 'Stahlspannung quasi-ständig',
+    titel: 'Stahlspannungsbegrenzung bei quasi-ständigen Lastfällen',
+    bezug: () => 'N in kN · M in kNm',
+    inhalt: (a) => quasistaendigInhalt(a, ORT),
+    stand: (a) => gebrauchsstand(a.quasistaendig),
+  },
+  {
+    schluessel: 'haeufig',
+    name: 'Fliessen häufig', titel: 'Verhindern des Fliessens für häufige Lastfälle',
+    bezug: () => 'N in kN · M in kNm',
+    inhalt: (a) => haeufigInhalt(a, ORT),
+    stand: (a) => (fliessenGefordert(a) ? gebrauchsstand(a.haeufig)
+      : { an: false, text: 'entfällt' }),
+  },
 ];
 
 /** Die Zugseiten einer Analyse aus dem Katalog -- und wie dann ihre Ränder heissen. */
@@ -493,6 +557,24 @@ const ORT = {
     beiAenderung: setzen,
   })),
   raender: (k) => zugseite(k.richtung)?.raender || ['oben', 'unten'],
+  // Die Zwängung: auf Normalkraft am ganzen Querschnitt, auf Biegung je
+  // Richtung -- das steht hinter den Zeilen statt einer Tragrichtung davor.
+  zwang: (a) => ({
+    marke: null,
+    hinweise: { zwaengung: 'ganzer Querschnitt', zwaengung_biegung: richtungstext(a) },
+    phiTitel: 'Kriechzahl φ der Zwängung auf Biegung: E_c,eff = E_cm / (1 + φ)',
+  }),
+  // Die Lastfälle unter Gebrauchslast: wie die der Tragsicherheit, ohne
+  // Querkraft und Torsion.
+  gebrauch: {
+    vorlage: 'qa_gebrauchsfall',
+    arten: 'faserspannungsarten',
+    spalten: (a) => spalten(a).filter((s) => ['N_Ed', 'M_y_Ed', 'M_z_Ed'].includes(s.feld))
+      .map((s) => ({
+        feld: s.feld, kopf: `${s.symbol}${s.feld === 'N_Ed' ? ' [kN]' : ' [kNm]'}`,
+        schritt: s.schritt, titel: (wort) => `${s.titel}, unter ${wort}er Einwirkung`,
+      })),
+  },
 };
 
 function kapitel() {

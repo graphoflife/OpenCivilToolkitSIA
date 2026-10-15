@@ -1,5 +1,5 @@
 ---
-erzeugt: 105ddff871e5
+erzeugt: 7e412d31863c
 art: modul
 tags: [modul]
 ---
@@ -492,6 +492,15 @@ damit arbeitete, setzte die drei zusammengehoerigen wieder ueber ihre
 Namen zusammen. Welche Liste haeufig und welche quasi-staendig ist, sagt
 das Feld der Platte, in dem sie steht; die Liste selbst weiss es nicht.
 
+Der gezeichnete Querschnitt hat dieselbe Liste mit anderen Faellen
+([[opencivil.projekt.querschnittsanalyse#QAGebrauchsliste|QAGebrauchsliste]]): was
+darin steht ([[opencivil.projekt.eintraege#Gebrauchsliste|FALL]]), welche Rechenarten sie anbietet
+([[opencivil.projekt.eintraege#Gebrauchsliste|ARTEN]]) und wie ihr Bauteil in den Meldungen heisst
+([[opencivil.projekt.eintraege#Gebrauchsliste|BAUTEIL]]).
+
+- `FALL = GebrauchsfallEintrag`
+- `ARTEN = SPANNUNGSARTEN`
+- `BAUTEIL = 'Platte'`
 - `anteil: float` – Welcher Anteil der Tragsicherheitseinwirkungen abgeleitet wird, in %.
 - `aus_tragsicherheit: bool = False` – Ob die abgeleiteten Faelle *gefuehrt* werden. Gebildet werden sie immer; ausgeschaltet rechnen sie still mit. Der Anteil ist eine bequeme Abschaetzung und keine Norm, darum stehen die Faelle nur auf Verlangen in der Tabelle.
 - `faelle: List[GebrauchsfallEintrag] = field(default_factory=list)` – Eigene Lastfaelle -- neben den abgeleiteten, nicht statt ihrer.
@@ -500,7 +509,7 @@ das Feld der Platte, in dem sie steht; die Liste selbst weiss es nicht.
 #### Gebrauchsliste.lastfall
 
 ```python
-def lastfall(self, name: str, *, M_Ed: float=0.0, N_Ed: float=0.0) -> GebrauchsfallEintrag
+def lastfall(self, name: str, **werte: float)
 ```
 
 Einen eigenen Lastfall anfuegen -- kNm und kN, Zug positiv.
@@ -508,7 +517,7 @@ Einen eigenen Lastfall anfuegen -- kNm und kN, Zug positiv.
 #### Gebrauchsliste.pruefen
 
 ```python
-def pruefen(self, platte: str, kombinationen: List['KombinationEintrag'], wort: str) -> None
+def pruefen(self, bauteil: str, kombinationen: List[Any], wort: str) -> None
 ```
 
 Was an dieser Liste nicht stimmen kann -- `wort` ist «häufige» oder
@@ -516,7 +525,8 @@ Was an dieser Liste nicht stimmen kann -- `wort` ist «häufige» oder
 
 Je Liste fuer sich: die beiden Listen landen in getrennten Nachweisen
 und damit in getrennten ID-Raeumen. Ein Fall «Dauer» darf in beiden
-stehen.
+stehen. `kombinationen` sind die Faelle der Tragsicherheit, aus
+denen abgeleitet wird -- gelesen wird nur ihr Name.
 
 #### Gebrauchsliste.aus_dict
 

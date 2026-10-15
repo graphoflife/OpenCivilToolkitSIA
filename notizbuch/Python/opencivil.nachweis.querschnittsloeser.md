@@ -1,5 +1,5 @@
 ---
-erzeugt: 5fc21ccec7f0
+erzeugt: d6f70028f932
 art: modul
 tags: [modul]
 ---
@@ -209,12 +209,14 @@ class Faserloeser
 Ein Querschnitt aus Fasern, mit Suche nach der Dehnungsebene.
 
 `querschnitt` sind die Fasern samt Staeben, `grenzen` die
-Dehnungsgrenzen, innerhalb derer jedes Gesetz gilt. Dazu, was Bilder und
-Linien vom Querschnitt wissen muessen: die Arme der Raender `oben` und
-`unten` -- oben ist gedrueckt, wenn ein positives Moment wirkt --, die
-Lagen mit ihrem Stahl, eine je Stab der Fasern, und die Spannung des
-Betons an einer Stelle (`beton(arm, eps)`). `eps_druck` und
-`eps_zug` sind die aeussersten Dehnungen, fuer die die Gesetze gelten.
+Dehnungsgrenzen, innerhalb derer jedes Gesetz gilt -- mehr braucht die
+Suche nicht. Dazu, was Bilder und Linien vom Querschnitt wissen muessen:
+die Arme der Raender `oben` und `unten` -- oben ist gedrueckt, wenn
+ein positives Moment wirkt --, die Lagen mit ihrem Stahl, eine je Stab
+der Fasern, und die Spannung des Betons an einer Stelle
+(`beton(arm, eps)`). `eps_druck` und `eps_zug` sind die
+aeussersten Dehnungen, fuer die die Gesetze gelten. Wer nur sucht -- ein
+Nachweis, der die Ebene zu einem Lastfall braucht --, laesst sie weg.
 
 Eine Lage liegt in der Tiefe `z` unter dem oberen Rand; ihr Arm ist
 `z + oben`.
@@ -279,6 +281,19 @@ bestimmt, dass die Normalkraft stimmt, und das uebrig bleibende Moment
 gegen `M_Ed` gehalten. `M(chi)` waechst monoton -- mehr Kruemmung
 heisst mehr Moment --, solange der Querschnitt nicht versagt.
 
+#### Faserloeser._suchen
+
+```python
+def _suchen(self, f: Callable[[float], Optional[float]], unten: float, oben: float, schranke: float, f_unten: Optional[float]=None, f_oben: Optional[float]=None) -> Optional[float]
+```
+
+Wo `f` zwischen `unten` und `oben` null wird -- `f` steigt,
+unten ist es negativ, oben nicht. Halbiert, bis das Fenster schmaler
+ist als `schranke`; `None`, wenn `f` unterwegs keinen Wert hat.
+`f_unten` und `f_oben` braucht das Halbieren nicht -- sie sind
+fuer eine Suche, die mit ihnen schneller ist
+([[opencivil.nachweis.querschnittsloeser#FaserloeserIllinois|FaserloeserIllinois]]).
+
 #### Faserloeser._rand
 
 ```python
@@ -301,6 +316,23 @@ hiessen dort «kein Gleichgewicht», obwohl der Querschnitt bis
 zwischen den beiden Stufen gesucht -- die groesste Kruemmung mit
 Gleichgewicht -- und dort noch einmal gefragt. Wo das Halbieren
 trifft, bleibt alles, wie es war.
+
+### FaserloeserIllinois
+
+```python
+class FaserloeserIllinois(Faserloeser)
+```
+
+Derselbe Loeser, der eine Nullstelle mit dem Illinois-Verfahren sucht
+statt durch Halbieren -- in denselben Klammern, bis auf dieselbe Breite.
+
+Fuer den gezeichneten Querschnitt unter Gebrauchslast
+([[opencivil.nachweis.qa_gebrauch]]): dort wird je Lastfall die
+Nulllinie gedreht, und jede Neigung ist eine ganze Suche. Halbiert
+braucht eine Suche rund vierzig Schritte, mit Illinois ein Viertel davon:
+zwischen zwei Knicken der Gesetze ist die Kraft eine Gerade, und dort
+trifft die Sekante. Die Platte rechnet weiter mit dem Halbieren; ihre
+Zahlen bleiben so, wie sie sind.
 
 ### Querschnittsloeser
 
@@ -533,8 +565,10 @@ nichts. So rechnet die Handrechnung -- sie laesst die Druckbewehrung weg.
 ## Gebraucht von
 
 - [[opencivil.nachweis.biegung_normalkraft]]
+- [[opencivil.nachweis.gebrauchsebene]]
 - [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.knicken]]
+- [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]

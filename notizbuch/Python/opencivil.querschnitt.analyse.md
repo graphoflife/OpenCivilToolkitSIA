@@ -1,5 +1,5 @@
 ---
-erzeugt: 3a52a9d1dff2
+erzeugt: 7ecfb8cd82da
 art: modul
 tags: [modul]
 ---
@@ -341,21 +341,22 @@ Was jeder Nachweis der Analyse liest: den Schwerpunkt und die Werkstoffe.
 #### Querschnittsanalyse.interaktion
 
 ```python
-def interaktion(self, e: Eingaben) -> Tuple[Querschnitt, List[str]]
+def interaktion(self, e: Eingaben) -> Tuple[Querschnitt, List[Stabgruppe]]
 ```
 
 Der Querschnitt im Bruchzustand, mit den gewaehlten Werkstoffgesetzen
 und dem Schwerpunkt aus dem Rechenwerk als Bezugspunkt -- dazu je
-Bewehrung der Name ihres Elements.
+Bewehrung das Element, aus dem sie stammt.
 
 #### Querschnittsanalyse.geometrie
 
 ```python
-def geometrie(self, index_von: Callable[[Baustoff], int]) -> Tuple[List[Teil], List[Bewehrung], List[str]]
+def geometrie(self, index_von: Callable[[Baustoff], int]) -> Tuple[List[Teil], List[Bewehrung], List[Stabgruppe]]
 ```
 
 Polygone und Bewehrung in Metern, mit den Werkstoffen als Index --
-dazu je Bewehrung der Name ihres Elements, fuer die Kraefte in der Probe.
+dazu je Bewehrung das Element, aus dem sie stammt: sein Name steht in
+der Probe, sein Durchmesser bestimmt die Rissbreite.
 
 #### Querschnittsanalyse.schubwaende
 
@@ -377,7 +378,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 
 ## Konstanten
 
-- `KENNWERTE = {Baustoffart.BETON: ('f_ck', 'f_cd', 'eps_c1d', 'eps_c2d', 'k_sigma',…` – Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin.
+- `KENNWERTE = {Baustoffart.BETON: ('f_ck', 'f_cd', 'eps_c1d', 'eps_c2d', 'k_sigma',…` – Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin. `E_cm` braucht der Gebrauchszustand: der Beton dort rechnet mit `E_cm/(1+phi)`.
 - `_K_SIGMA = next((v for v in BETON_VORLAGEN if v.kurzname == 'k_sigma'))` – Die Regel fuer k_sigma steht beim Beton. Mit charakteristischen Werten gilt dieselbe, mit f_ck statt f_cd -- also wird sie von dort genommen.
 
 ## Braucht
@@ -396,9 +397,11 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.schubwandnachweis]]
+- [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.web.api]]

@@ -550,8 +550,9 @@ class Projekt(Beschreibung):
         # Zwei gezeichnete Querschnitte. Ein Kastenträger mit Aussparung,
         # Bewehrung in allen drei Arten, vier Schubwänden als Zelle, Torsion,
         # schiefer Biegung und Längszugkraft, gerechnet mit dem
-        # Spannungsblock; dazu eine Stütze, einachsig und mit
-        # charakteristischen Werten -- so steht jede Wahl einmal da.
+        # Spannungsblock, dazu jeder Gebrauchsnachweis bei erhöhter
+        # Anforderung; eine Stütze, einachsig, mit charakteristischen Werten
+        # und normaler Anforderung -- so steht jede Wahl einmal da.
         p.querschnittsanalysen.append(cls._kastentraeger(p.freie_kennung("a")))
         p.querschnittsanalysen.append(cls._stuetze(p.freie_kennung("a")))
 
@@ -626,7 +627,9 @@ class Projekt(Beschreibung):
         a = QuerschnittsanalyseEintrag(
             kennung=kennung, name="Kastenträger",
             werkstoffwahl=[WerkstoffwahlEintrag(material="b1", betongesetz="block")],
-            laengszugkraft=True, duktilitaet=True, sproede=True)
+            laengszugkraft=True, duktilitaet=True, sproede=True,
+            rissanforderung="erhoeht", zwaengung=True, zwaengung_begrenzt=True,
+            zwaengung_biegung=True, zwaengung_biegung_kriechzahl=1.0)
         a.polygon([[0, 0], [800, 0], [800, 600], [0, 600]], material="b1")
         a.polygon([[150, 150], [650, 150], [650, 450], [150, 450]])
         a.stablinie([50, 50], [750, 50], art="teilung", durchmesser=16, teilung=150,
@@ -648,6 +651,11 @@ class Projekt(Beschreibung):
                         kriechzahl=1.0)
         a.spannungsfall("Zugsteifigkeit", art="normalkraft_emodul", M_Ed=-50.0,
                         werkstoffsatz="charakteristisch", rechenart="block")
+        # Die Stahlspannungen: quasi-ständig aus der Tragsicherheit und ein
+        # eigener Fall, häufig ein schiefer -- die Nulllinie dreht.
+        a.quasistaendig.aus_tragsicherheit = True
+        a.quasistaendig.lastfall("Dauer", N_Ed=-300.0, M_y_Ed=120.0, M_z_Ed=60.0)
+        a.haeufig.lastfall("Häufig schief", N_Ed=-500.0, M_y_Ed=200.0, M_z_Ed=100.0)
         return a
 
     @staticmethod
@@ -656,7 +664,7 @@ class Projekt(Beschreibung):
             kennung=kennung, name="Stütze",
             werkstoffwahl=[WerkstoffwahlEintrag(material="b1", satz="charakteristisch"),
                            WerkstoffwahlEintrag(material="s1", satz="charakteristisch")],
-            einachsig=True)
+            einachsig=True, zwaengung=True)
         a.polygon([[0, 0], [400, 0], [400, 400], [0, 400]], material="b1")
         for z in (50, 350):
             a.stablinie([50, z], [350, z], art="anzahl", durchmesser=20, anzahl=3, stahl="s1")
@@ -666,6 +674,9 @@ class Projekt(Beschreibung):
                         richtung="oben")
         a.spannungsfall("Biegesteifigkeit", art="moment_emodul", N_Ed=-800.0,
                         richtung="oben", werkstoffsatz="charakteristisch")
+        # Quasi-ständig mit der Parabel: σ_s,adm ist bei normaler Anforderung f_yk.
+        a.quasistaendig.wahl.rechenart = "parabel"
+        a.quasistaendig.lastfall("Dauer", N_Ed=-600.0, M_y_Ed=80.0)
         return a
 
 

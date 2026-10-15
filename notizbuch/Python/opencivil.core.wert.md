@@ -1,5 +1,5 @@
 ---
-erzeugt: 886d9052300e
+erzeugt: e399cfe3805a
 art: modul
 tags: [modul]
 ---
@@ -284,6 +284,7 @@ def beschreibung(self) -> str
 - [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
+- [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
@@ -292,6 +293,7 @@ def beschreibung(self) -> str
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.sproedes_versagen]]
+- [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.notizbuch.formelseiten]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.querschnitt.analyse]]

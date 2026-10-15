@@ -644,7 +644,17 @@ class Gebrauchsliste(Beschreibung):
     damit arbeitete, setzte die drei zusammengehoerigen wieder ueber ihre
     Namen zusammen. Welche Liste haeufig und welche quasi-staendig ist, sagt
     das Feld der Platte, in dem sie steht; die Liste selbst weiss es nicht.
+
+    Der gezeichnete Querschnitt hat dieselbe Liste mit anderen Faellen
+    (:class:`~opencivil.projekt.querschnittsanalyse.QAGebrauchsliste`): was
+    darin steht (:attr:`FALL`), welche Rechenarten sie anbietet
+    (:attr:`ARTEN`) und wie ihr Bauteil in den Meldungen heisst
+    (:attr:`BAUTEIL`).
     """
+
+    FALL = GebrauchsfallEintrag
+    ARTEN = SPANNUNGSARTEN
+    BAUTEIL = "Platte"
 
     anteil: float
     """Welcher Anteil der Tragsicherheitseinwirkungen abgeleitet wird, in %."""
@@ -664,35 +674,35 @@ class Gebrauchsliste(Beschreibung):
     wahl: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.gebrauch)
     """Womit die Stahlspannung gerechnet wird -- Vorgabe elastisch, charakteristisch."""
 
-    def lastfall(self, name: str, *, M_Ed: float = 0.0,
-                 N_Ed: float = 0.0) -> GebrauchsfallEintrag:
+    def lastfall(self, name: str, **werte: float):
         """Einen eigenen Lastfall anfuegen -- kNm und kN, Zug positiv."""
-        eintrag = GebrauchsfallEintrag(name=name, M_Ed=M_Ed, N_Ed=N_Ed)
+        eintrag = self.FALL(name=name, **werte)
         self.faelle.append(eintrag)
         return eintrag
 
-    def pruefen(self, platte: str, kombinationen: List["KombinationEintrag"],
-                wort: str) -> None:
+    def pruefen(self, bauteil: str, kombinationen: List[Any], wort: str) -> None:
         """
         Was an dieser Liste nicht stimmen kann -- ``wort`` ist «häufige» oder
         «quasi-ständige» und steht in der Meldung.
 
         Je Liste fuer sich: die beiden Listen landen in getrennten Nachweisen
         und damit in getrennten ID-Raeumen. Ein Fall «Dauer» darf in beiden
-        stehen.
+        stehen. ``kombinationen`` sind die Faelle der Tragsicherheit, aus
+        denen abgeleitet wird -- gelesen wird nur ihr Name.
         """
+        wo = f"{self.BAUTEIL} '{bauteil}'"
         # Null ergaebe Lastfaelle ohne Last -- ein Nachweis, der immer
         # aufgeht und nichts sagt. Ueber hundert waere keine Gebrauchslast
         # mehr. Gemeldet statt begrenzt: wer 700 statt 70 tippt, soll es
         # erfahren und nicht mit 100 weiterrechnen.
         if not 0.0 < self.anteil <= 100.0:
             raise ProjektFehler(
-                f"Platte '{platte}': der Anteil für die {wort}n Lastfälle muss "
+                f"{wo}: der Anteil für die {wort}n Lastfälle muss "
                 f"zwischen 0 und 100 % liegen, angegeben sind "
                 f"{self.anteil:g} %.")
 
-        eindeutig(self.faelle, platte, f"{wort}r Lastfall")
-        self.wahl.pruefen(f"Platte '{platte}', {wort} Lastfälle", SPANNUNGSARTEN)
+        eindeutig(self.faelle, bauteil, f"{wort}r Lastfall", bauteil=self.BAUTEIL)
+        self.wahl.pruefen(f"{wo}, {wort} Lastfälle", self.ARTEN)
 
         # Die abgeleiteten Faelle tragen den Namen ihrer Kombination mit
         # angehaengtem Anteil. Wer einen eigenen Lastfall genau so nennt,
@@ -702,7 +712,7 @@ class Gebrauchsliste(Beschreibung):
         for f in self.faelle:
             if f.name in abgeleitet:
                 raise ProjektFehler(
-                    f"Platte '{platte}': der {wort} Lastfall '{f.name}' heisst "
+                    f"{wo}: der {wort} Lastfall '{f.name}' heisst "
                     f"wie der aus der Tragsicherheit abgeleitete. Bitte anders "
                     f"benennen -- sonst lässt sich nicht auseinanderhalten, "
                     f"welcher gerechnet wurde.")
@@ -716,7 +726,7 @@ class Gebrauchsliste(Beschreibung):
             frueher = kennungen.setdefault(kennung_aus(name), name)
             if frueher != name:
                 raise ProjektFehler(
-                    f"Platte '{platte}': die {wort}n Lastfälle '{frueher}' und "
+                    f"{wo}: die {wort}n Lastfälle '{frueher}' und "
                     f"'{name}' unterscheiden sich nur in Satz- oder "
                     f"Leerzeichen. Im Bericht fielen sie auf denselben Eintrag "
                     f"-- bitte einen davon anders benennen.")
@@ -728,11 +738,10 @@ class Gebrauchsliste(Beschreibung):
         return cls(
             anteil=zahl(d, "anteil", vorgabe),
             aus_tragsicherheit=bool(d.get("aus_tragsicherheit", cls.aus_tragsicherheit)),
-            faelle=[GebrauchsfallEintrag.aus_dict(x, wort)
-                    for x in (d.get("faelle") or [])],
+            faelle=[cls.FALL.aus_dict(x, wort) for x in (d.get("faelle") or [])],
             wahl=RechenwahlEintrag.aus_dict(
                 d.get("wahl"), vorgabe=RechenwahlEintrag.gebrauch(),
-                kriechzahl_alt=kriechzahl_alt, arten=SPANNUNGSARTEN,
+                kriechzahl_alt=kriechzahl_alt, arten=cls.ARTEN,
                 wo=f"Rechenwahl der {wort}n Lastfälle"),
         )
 

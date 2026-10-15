@@ -695,8 +695,8 @@ input[readonly], input:disabled, select:disabled {
   gap: 3px 4px; align-items: center; margin-bottom: 4px;
 }
 .einwirkung.ist-knick, .einwirkung.ist-spannung { --felder: 4; }
-/* Häufig oder quasi-ständig -- dieselbe Zeile, ohne Querkraft. */
-.einwirkung.ist-gebrauch { --felder: 2; }
+/* Häufig oder quasi-ständig setzen --felder selbst: zwei Zahlen bei der
+   Platte, drei beim gezeichneten Querschnitt. */
 .einwirkung > :nth-child(n+3) { grid-row: 2; }
 .einwirkung > :nth-child(3) { grid-column: 2; }
 .einwirkung > :nth-child(4) { grid-column: 3; }

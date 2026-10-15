@@ -242,6 +242,17 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `N_Riss(M) = (f_ct,eff,t − M·v/I)·A`, mit `k_t` für ein Drittel der
       Tiefe bzw. die ganze, wie bei der Platte; `f_ctm` und `E_cm` vom Beton
       am gezogenen Rand. Der äquivalente Modul am Bruttoquerschnitt (`I`, `A`).
+- [ ] **Gebrauchsnachweise.** Eingebaut (`nachweis/qa_gebrauch.py`), je auf
+      Vorgabe des Benutzers vom 2026-10-15: die Zwängung auf Normalkraft am
+      ganzen Querschnitt, `N_Riss = Σ A_c·k_t·f_ctm` mit `t` als kleinerer
+      Abmessung des Betons (umschreibendes Rechteck, wahlweise ≤ 500 mm),
+      gegen `Σ A_s·σ_s,adm` aller Stäbe; die Zwängung auf Biegung je
+      Richtung mit dem Rissmoment des spröden Versagens gegen das Moment, bei
+      dem der erste gezogene Stab `σ_s,adm` erreicht -- gerissen, elastisch,
+      ohne N, mit eigenem φ, die gedrückte Bewehrung wirkt mit (die Platte
+      lässt sie weg). `σ_s,adm` je Stab mit seinem Durchmesser und dem
+      `f_ctm` seines Betons; eine verschmierte Linie mit einem fiktiven
+      Durchmesser bei 150 mm Teilung (`nachweis/stabgrenzen.py`).
 
 ### Balkensysteme
 
@@ -266,16 +277,17 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
 - [ ] **Querschnittsanalyse, nächste Schritte** (je ein eigener Plan):
       Baustahl (Sortentabelle, Gesetz, Verbundquerschnitt, Stahlwände mit
       eigenem G), Holz (wie spröd Zug und Druck sind, legen wir vorher fest),
-      weitere Nachweise (Stahlspannung im Gebrauch, Spannungsanalyse,
-      Knicken, Wände ohne Bügel).
+      weitere Nachweise (Knicken, Wände ohne Bügel).
 - [ ] **Die genaue Linie der Platte über den neuen Fächer.** Die Platte hat
       noch ihren eigenen `dehnungsfaecher`; der Fächer der Analyse kann
       dasselbe für jede Form. Seit beide ihren Widerstand genau suchen, liegen
       sie unter 0.01 % beisammen (`tests/test_interaktion.py`) -- umstellen
       ginge, die Fasern legen sie verschieden.
-- [ ] **Kriechzahl φ an den Flächen der Querschnittsanalyse.** Kommt mit der
-      ersten Rechnung, die sie braucht (Stahlspannung im Gebrauch, Knicken).
-      Die Eigenschaften einer Fläche stehen im schwebenden Fenster; φ kommt
+- [ ] **Kriechzahl φ an den Flächen der Querschnittsanalyse.** Die
+      Stahlspannungen und die Zwängung auf Biegung rechnen mit dem φ ihres
+      Kapitels, wie bei der Platte -- für jeden Beton dasselbe. Ein φ je
+      Fläche bräuchte es erst, wenn zwei Betone verschieden kriechen sollen.
+      Die Eigenschaften einer Fläche stehen im schwebenden Fenster; φ käme
       dort ohne Umbau dazu.
 - [ ] **Ein Kreis ist ein 48-Eck.** Die Ecken liegen auf dem Kreis, die
       Fläche ist darum 0.3 % kleiner als π·D²/4. Steht so in der Zeichnung;

@@ -1,5 +1,5 @@
 ---
-erzeugt: 41c42faa209f
+erzeugt: c460d8bd737e
 art: modul
 tags: [modul]
 ---
@@ -75,6 +75,15 @@ Lastfall das Ergebnis.
 - `querschnitt: Querschnitt`
 - `ergebnisse: List[Fallergebnis] = field(default_factory=list)`
 
+### protokoll_dehnungsebene
+
+```python
+def protokoll_dehnungsebene(p: Protokoll) -> None
+```
+
+Die Ebene, schraeg, und was sie an Kraeften erzeugt -- fuer jeden
+Nachweis, der am gezeichneten Querschnitt eine Ebene sucht.
+
 ### SchiefeBiegung
 
 ```python
@@ -109,11 +118,12 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.projekt.aufbau]]
 
 ## Formeln aus diesem Modul
 
-- [[Dehnungsebene und innere Kräfte]] · `SchiefeBiegung._protokoll_ansatz`
+- [[Dehnungsebene und innere Kräfte]] · `protokoll_dehnungsebene`
 - [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]] · `SchiefeBiegung._protokoll_ansatz`
 - [[Probe – Moment um y]] · `SchiefeBiegung._protokoll_bruchzustand`
 - [[Probe – Moment um z]] · `SchiefeBiegung._protokoll_bruchzustand`

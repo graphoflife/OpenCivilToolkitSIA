@@ -1,14 +1,18 @@
 ---
-erzeugt: 2efde4feec4c
+erzeugt: 774edf0045bb
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 9 Formeln, in der Folge, in der gerechnet wird.
+> 13 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
 Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Die Bewehrung muss die Kraft übernehmen können, die der Beton beim Reissen abgibt – erst dann kündigt sich das Versagen an.
+
+Eine aufgezwungene Verkürzung zieht den ganzen Querschnitt: es reisst der ganze Beton, und alle Stäbe teilen sich seine Risskraft, jeder bis zu seiner zulässigen Spannung. Die rissaktive Dicke t ist die kleinere Abmessung des Betons.
+
+Eine verschmierte Linie hat keinen Durchmesser – sie bekommt einen fiktiven, als lägen ihre Stäbe 150 mm auseinander (Annahme).
 
 ## Formeln
 
@@ -21,6 +25,10 @@ Ein zu schwach bewehrter Querschnitt reisst und versagt im selben Augenblick. Di
 7. [[Zulässige Stahlspannung (Rissbreite w_nom)]]
 8. [[Aufnehmbare Risskraft]]
 9. [[Erfüllungsgrad]]
+10. [[Rissaktive Dicke des gezeichneten Querschnitts]]
+11. [[Risskraft des ganzen Querschnitts]]
+12. [[Fiktiver Durchmesser einer verschmierten Linie]]
+13. [[Zulässige Stahlspannung (normale Anforderung)]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

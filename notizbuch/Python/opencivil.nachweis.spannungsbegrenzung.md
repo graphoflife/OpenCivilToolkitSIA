@@ -1,5 +1,5 @@
 ---
-erzeugt: edd74a9ebe96
+erzeugt: dfc85a441a87
 art: modul
 tags: [modul]
 ---
@@ -244,11 +244,12 @@ gerechnet und mitgeschrieben.
 #### Spannungsgrenze.festlegung
 
 ```python
+@classmethod
 @abstractmethod
-def festlegung(self, p: Protokoll) -> None
+def festlegung(cls, p: Protokoll) -> None
 ```
 
-Welche Werte die Grenze ansetzt, und warum.
+Welche Werte die Grenze ansetzt, und warum -- ohne Platte, nur der Absatz.
 
 ### GrenzeGegenFliessen
 
@@ -295,7 +296,8 @@ def bestimmen(self, e: Eingaben, p: Protokoll) -> Dict[str, float]
 #### GrenzeGegenFliessen.festlegung
 
 ```python
-def festlegung(self, p: Protokoll) -> None
+@classmethod
+def festlegung(cls, p: Protokoll) -> None
 ```
 
 ### GrenzeAusRissbreite
@@ -346,8 +348,20 @@ def bestimmen(self, e: Eingaben, p: Protokoll) -> Dict[str, float]
 #### GrenzeAusRissbreite.festlegung
 
 ```python
-def festlegung(self, p: Protokoll) -> None
+@classmethod
+def festlegung(cls, p: Protokoll) -> None
 ```
+
+### protokoll_festlegungen
+
+```python
+def protokoll_festlegungen(p: Protokoll, wahl: Rechenwahl) -> None
+```
+
+Die ersten beiden der drei Festlegungen hinter jeder Stahlspannung:
+Kriechen und Werkstoffgesetze. Die dritte, die Grenze, schreibt danach
+die Grenze selbst ([[opencivil.nachweis.spannungsbegrenzung#Spannungsgrenze.festlegung|Spannungsgrenze.festlegung]]). Fuer die Platte
+und den gezeichneten Querschnitt dieselben Absaetze.
 
 ### Spannungsbegrenzung
 
@@ -429,6 +443,7 @@ Der Fall, in dem die Spannung am Plateau stehen bleibt.
 - `FLIESSABSTAND = 80000000.0` – Abstand zur Bemessungsfliessgrenze, in Pa. SIA 262:2025, Tabelle 17.
 - `_GEFORDERT = ('erhoeht', 'hoch')` – Anforderungen, bei denen der Nachweis gegen Fliessen gefuehrt wird. Bei *normal* steht in der Tabelle ein Strich. Von aussen fragt man [[opencivil.nachweis.spannungsbegrenzung#GrenzeGegenFliessen.gilt_bei|GrenzeGegenFliessen.gilt_bei]] -- die Liste gehoert der Grenze.
 - `VORGABE = Rechenwahl(satz=Werkstoffsatz.CHARAKTERISTISCH, art=Rechenart.ELASTIS…` – Womit die Stahlspannungen rechnen, wenn das Kapitel nichts anderes waehlt: elastisch, mit charakteristischen Werten -- ein Gebrauchsnachweis fragt, was der Querschnitt tut, nicht was er darf.
+- `VERGLEICH_BEIM_FLIESSEN = 'Fliesst die Bewehrung, bleibt ihre Spannung am Plateau stehen, währe…` – Was verglichen wird, wenn die Bewehrung fliesst -- siehe Dateikopf.
 
 ## Braucht
 
@@ -447,6 +462,8 @@ Der Fall, in dem die Spannung am Plateau stehen bleibt.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.web.api]]
 

@@ -2,7 +2,7 @@
 Beispiel
 ====================================================================================================
 
-66 Berechnungen ausgeführt, 110 Werte bestimmt.
+69 Berechnungen ausgeführt, 116 Werte bestimmt.
 
 ====================================================================================================
 Herleitung
@@ -1171,10 +1171,16 @@ Werte
     Erfüllungsgrad Biegung und Normalkraft – Feld                                   \alpha_{eff,\text{Feld}}                                  1.41            berechnet
     Grösste aufnehmbare Druckkraft                                                  N_{Rd}^{-}                                             -4044.1  kN        berechnet
     Grösste aufnehmbare Zugkraft                                                    N_{Rd}^{+}                                               508.1  kN        berechnet
+    Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt                             \alpha_{eff,NR}                                           1.29            berechnet
+    Erfüllungsgrad Stahlspannung aus Rissbreite – Feld (60 %)                       \alpha_{eff,\sigma,w,\text{Feld (60 \%)}}                 2.66            berechnet
     Erfüllungsgrad sprödes Versagen – Zug links                                     \alpha_{eff,Riss,\text{Zug links}}                        2.45            berechnet
     Erfüllungsgrad sprödes Versagen – Zug oben                                      \alpha_{eff,Riss,\text{Zug oben}}                         1.18            berechnet
     Erfüllungsgrad sprödes Versagen – Zug rechts                                    \alpha_{eff,Riss,\text{Zug rechts}}                       2.45            berechnet
     Erfüllungsgrad sprödes Versagen – Zug unten                                     \alpha_{eff,Riss,\text{Zug unten}}                        4.46            berechnet
     Erfüllungsgrad Querkraft und Torsion – Feld                                     \alpha_{eff,V,\text{Feld}}                                1.75            berechnet
+    Erfüllungsgrad Zwängung auf Biegung – Zug links                                 \alpha_{eff,ZB,\text{Zug links}}                          1.99            berechnet
+    Erfüllungsgrad Zwängung auf Biegung – Zug oben                                  \alpha_{eff,ZB,\text{Zug oben}}                           1.25            berechnet
+    Erfüllungsgrad Zwängung auf Biegung – Zug rechts                                \alpha_{eff,ZB,\text{Zug rechts}}                         1.99            berechnet
+    Erfüllungsgrad Zwängung auf Biegung – Zug unten                                 \alpha_{eff,ZB,\text{Zug unten}}                          5.05            berechnet
     Schwerpunkt, y                                                                  y_S                                                        150  mm        berechnet
     Schwerpunkt, z                                                                  z_S                                                        300  mm        berechnet

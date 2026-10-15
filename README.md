@@ -185,9 +185,10 @@ Fertig und getestet (1091 Tests):
 | `nachweis/dehnungsfaecher` | die Grenzen des Dehnungsfächers: als Ebenen für die genaue Linie, als Bedingungen für die Analyse |
 | `nachweis/resistenzlinie` | Handlinie und Ebenenlinie hinter einer Schnittstelle: Urteil, Widerstand bei N_Ed, Eckwerte, Probe |
 | `nachweis/rechenwahl` | Kriechzahl, Werte, Rechenart -- die eine Stelle, die daraus Gesetze und Löser baut |
-| `nachweis/querschnittsloeser` | Dehnungsebene aus N und M, zwei Bisektionen |
+| `nachweis/querschnittsloeser` | Dehnungsebene aus N und M, zwei Bisektionen (am gezeichneten Querschnitt mit Illinois) |
 | `nachweis/` | M-N, Querkraft (mit Bügeln), Duktilität, sprödes Versagen, Zwängung auf Normalkraft und auf Biegung, Stahlspannung unter häufiger (gegen Fliessen) und quasi-ständiger Last (aus der Rissbreite), Knicken am verformten System |
 | `nachweis/schiefe_biegung`, `schubwandnachweis`, `richtungsnachweise` | die Nachweise der Querschnittsanalyse: N mit M_y und M_z, Querkraft mit Torsion, Duktilität und sprödes Versagen je Richtung |
+| `nachweis/qa_gebrauch`, `stabgrenzen`, `gebrauchsebene` | ihre Gebrauchsnachweise: Zwängung auf N (ganzer Querschnitt) und auf M (je Richtung), Stahlspannung quasi-ständig und häufig; σ_s,adm je Stab; die Ebene unter Gebrauchslast, auch schief |
 | `spannungsanalyse.py` | sechs Fragen an den Querschnitt: Bild aus N und M oder aus Dehnungen, M-χ- und N-ε-Linie, äquivalenter E-Modul über M und über N — kein Nachweis |
 | `bewehrungssuche/` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt – Längsbewehrung, dünnste Platte, Bügel |
 | `bericht/` | der Bericht als Blöcke (`gliederung`), gesetzt als Konsolentext, LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) und Markdown; die Zusammenfassung je Platte |
@@ -306,7 +307,14 @@ Tragsicherheit: je Material Bemessungs- oder charakteristische Werte und beim
 Beton das Gesetz, der Schalter «nur einachsig», die Lastfälle mit N, M_y,
 M_z, V_y, V_z und T und die Angaben der Schubwände (Neigung, k_c,
 Längszugkraft). Duktilität und sprödes Versagen rechnen am selben
-Querschnitt. Dazu die sechs Spannung-Dehnung-Analysen wie bei der Platte, je
+Querschnitt. Wie bei der Platte gibt es Riss bei Zwang, Stahlspannung
+quasi-ständig und Fliessen häufig, mit der Rissanforderung im Panel des
+Querschnitts. Dabei hält jeder gezogene Stab gegen seine eigene Grenze, mit
+seinem Durchmesser; eine verschmierte Linie zählt, als lägen ihre Stäbe
+150 mm auseinander. Die Zwängung auf Normalkraft rechnet am ganzen
+Querschnitt, die auf Biegung je Richtung; die Lastfälle unter Gebrauchslast
+tragen N, M_y und M_z, und bei schiefer Biegung dreht die Nulllinie.
+Dazu die sechs Spannung-Dehnung-Analysen wie bei der Platte, je
 Zugseite: unten, oben, links oder rechts -- die Seite, die ein positives
 Moment zieht. Die Nulllinie bleibt dabei parallel zur Achse; ε_m gilt im
 Schwerpunkt, der Riss und der äquivalente Modul am Bruttoquerschnitt. Die

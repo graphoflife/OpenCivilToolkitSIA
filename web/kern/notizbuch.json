@@ -165,7 +165,8 @@
       "pfad": "Formelsammlung/Formeln/Aufnehmbare Risskraft.md",
       "art": "formel",
       "zeichen": [
-        "N_{s,adm,2,x}"
+        "N_{s,adm,2,x}",
+        "N_{s,adm}"
       ],
       "themen": [
         "Zwängung auf Normalkraft"
@@ -234,6 +235,7 @@
         "Knicken",
         "Biegung und Normalkraft",
         "Stahlspannung gegen Fliessen",
+        "Stahlspannung aus Rissbreite",
         "Spannung-Dehnung-Analyse"
       ]
     },
@@ -538,7 +540,8 @@
         "Schiefe Biegung",
         "Stahlspannung aus Rissbreite",
         "Stahlspannung gegen Fliessen",
-        "Knicken"
+        "Knicken",
+        "Zwängung auf Biegung"
       ]
     },
     {
@@ -645,6 +648,19 @@
       "zeichen": [],
       "themen": [
         "Schiefe Biegung"
+      ]
+    },
+    {
+      "name": "Fiktiver Durchmesser einer verschmierten Linie",
+      "pfad": "Formelsammlung/Formeln/Fiktiver Durchmesser einer verschmierten Linie.md",
+      "art": "formel",
+      "zeichen": [
+        "\\varnothing_{fikt}"
+      ],
+      "themen": [
+        "Zwängung auf Normalkraft",
+        "Zwängung auf Biegung",
+        "Stahlspannung aus Rissbreite"
       ]
     },
     {
@@ -1027,6 +1043,15 @@
       ]
     },
     {
+      "name": "Moment der Bewehrung bei zulässiger Stahlspannung",
+      "pfad": "Formelsammlung/Formeln/Moment der Bewehrung bei zulässiger Stahlspannung.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Zwängung auf Biegung"
+      ]
+    },
+    {
       "name": "Momentengleichgewicht um die halbe Höhe",
       "pfad": "Formelsammlung/Formeln/Momentengleichgewicht um die halbe Höhe.md",
       "art": "formel",
@@ -1080,6 +1105,7 @@
         "Knicken",
         "Biegung und Normalkraft",
         "Stahlspannung gegen Fliessen",
+        "Stahlspannung aus Rissbreite",
         "Spannung-Dehnung-Analyse"
       ]
     },
@@ -1159,6 +1185,17 @@
       ]
     },
     {
+      "name": "Rissaktive Dicke des gezeichneten Querschnitts",
+      "pfad": "Formelsammlung/Formeln/Rissaktive Dicke des gezeichneten Querschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "t"
+      ],
+      "themen": [
+        "Zwängung auf Normalkraft"
+      ]
+    },
+    {
       "name": "Rissaktive Plattendicke",
       "pfad": "Formelsammlung/Formeln/Rissaktive Plattendicke.md",
       "art": "formel",
@@ -1172,6 +1209,17 @@
     {
       "name": "Risskraft der gezogenen Querschnittshälfte",
       "pfad": "Formelsammlung/Formeln/Risskraft der gezogenen Querschnittshälfte.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{Riss}"
+      ],
+      "themen": [
+        "Zwängung auf Normalkraft"
+      ]
+    },
+    {
+      "name": "Risskraft des ganzen Querschnitts",
+      "pfad": "Formelsammlung/Formeln/Risskraft des ganzen Querschnitts.md",
       "art": "formel",
       "zeichen": [
         "N_{Riss}"
@@ -1277,7 +1325,8 @@
       "art": "formel",
       "zeichen": [],
       "themen": [
-        "Sprödes Versagen je Richtung"
+        "Sprödes Versagen je Richtung",
+        "Zwängung auf Biegung"
       ]
     },
     {
@@ -1515,7 +1564,8 @@
         "W"
       ],
       "themen": [
-        "Sprödes Versagen je Richtung"
+        "Sprödes Versagen je Richtung",
+        "Zwängung auf Biegung"
       ]
     },
     {
@@ -1567,6 +1617,7 @@
         "Stahlspannung gegen Fliessen",
         "Knicken",
         "Biegung und Normalkraft",
+        "Zwängung auf Biegung",
         "Spannung-Dehnung-Analyse"
       ]
     },
@@ -1600,7 +1651,8 @@
         "\\sigma_{s,adm}"
       ],
       "themen": [
-        "Stahlspannung aus Rissbreite"
+        "Stahlspannung aus Rissbreite",
+        "Zwängung auf Normalkraft"
       ]
     },
     {
@@ -2309,6 +2361,18 @@
       ]
     },
     {
+      "name": "opencivil.nachweis.gebrauchsebene",
+      "pfad": "Python/opencivil.nachweis.gebrauchsebene.md",
+      "art": "modul",
+      "kurz": "die Dehnungsebene des gezeichneten Querschnitts unter Gebrauchslast.",
+      "stichworte": [
+        "Gebrauchsebene",
+        "_bei_neigung",
+        "gebrauchsebene",
+        "protokoll_ebene"
+      ]
+    },
+    {
       "name": "opencivil.nachweis.handrechnung",
       "pfad": "Python/opencivil.nachweis.handrechnung.md",
       "art": "modul",
@@ -2403,6 +2467,30 @@
       ]
     },
     {
+      "name": "opencivil.nachweis.qa_gebrauch",
+      "pfad": "Python/opencivil.nachweis.qa_gebrauch.md",
+      "art": "modul",
+      "kurz": "Gebrauchsnachweise des gezeichneten Querschnitts.",
+      "stichworte": [
+        "protokoll_gesetze",
+        "Fallergebnis",
+        "Fallergebnis.fliesst",
+        "SpannungsbegrenzungQA",
+        "SpannungsbegrenzungQA.thema",
+        "SpannungsbegrenzungQA.langname",
+        "SpannungsbegrenzungQA.pruefe",
+        "SpannungsbegrenzungQA._vergleich",
+        "SpannungsbegrenzungQA._tabelle_gezogen",
+        "betonflaechen",
+        "RissnormalkraftQA",
+        "RissnormalkraftQA.pruefe",
+        "RissnormalkraftQA._risskraft",
+        "ZwaengungBiegungQA",
+        "ZwaengungBiegungQA.pruefe",
+        "ZwaengungBiegungQA._an_der_grenze"
+      ]
+    },
+    {
       "name": "opencivil.nachweis.querkraft",
       "pfad": "Python/opencivil.nachweis.querkraft.md",
       "art": "modul",
@@ -2463,7 +2551,9 @@
         "Faserloeser.mitteldehnung",
         "Faserloeser.kruemmung",
         "Faserloeser.loese",
+        "Faserloeser._suchen",
         "Faserloeser._rand",
+        "FaserloeserIllinois",
         "Querschnittsloeser",
         "Werkstoffsatz",
         "Werkstoffsatz.beschriftung",
@@ -2562,12 +2652,17 @@
       "stichworte": [
         "richtungen",
         "bei_reiner_biegung",
+        "Rissmoment",
+        "rissbezuege",
+        "rissmoment",
+        "protokoll_spannung_ungerissen",
+        "protokoll_rissmoment",
+        "_hoehe",
+        "_w_vorlage",
         "DuktilitaetQA",
         "DuktilitaetQA.pruefe",
         "SproedesVersagenQA",
-        "SproedesVersagenQA.pruefe",
-        "SproedesVersagenQA._hoehe",
-        "SproedesVersagenQA._w_vorlage"
+        "SproedesVersagenQA.pruefe"
       ]
     },
     {
@@ -2578,6 +2673,7 @@
       "stichworte": [
         "Fallergebnis",
         "Bruchbefund",
+        "protokoll_dehnungsebene",
         "SchiefeBiegung",
         "SchiefeBiegung.pruefe"
       ]
@@ -2621,6 +2717,7 @@
         "GrenzeAusRissbreite.bezuege",
         "GrenzeAusRissbreite.bestimmen",
         "GrenzeAusRissbreite.festlegung",
+        "protokoll_festlegungen",
         "Spannungsbegrenzung",
         "Spannungsbegrenzung.thema",
         "Spannungsbegrenzung.langname",
@@ -2649,6 +2746,32 @@
         "SproedesVersagen",
         "SproedesVersagen.pruefe",
         "SproedesVersagen._m_rd"
+      ]
+    },
+    {
+      "name": "opencivil.nachweis.stabgrenzen",
+      "pfad": "Python/opencivil.nachweis.stabgrenzen.md",
+      "art": "modul",
+      "kurz": "die zulaessige Stahlspannung je Stab des gezeichneten Querschnitts.",
+      "stichworte": [
+        "Stabangabe",
+        "Stabangabe.stahl",
+        "Stabangabe.verschmiert",
+        "Stabangabe.ort",
+        "fiktiver_durchmesser",
+        "stabangaben",
+        "Grenzgruppe",
+        "Grenzen",
+        "Grenzen.gruppe",
+        "Grenzen.sigma",
+        "Grenzen.strengste",
+        "_gruppieren",
+        "grenzen_aus_rissbreite",
+        "grenzen_gegen_fliessen",
+        "protokoll_rissbreitengrenzen",
+        "protokoll_fliessgrenzen",
+        "_protokoll_fiktiv",
+        "_tabelle_grenzen"
       ]
     },
     {
@@ -2801,6 +2924,7 @@
         "_analyse",
         "_lagennachweise",
         "_spannungsnachweise",
+        "_qa_spannungsnachweise",
         "_gebrauchsfaelle",
         "_ausgefallene",
         "Bauteilart"
@@ -3037,6 +3161,9 @@
         "HilfslinieEintrag.aus_dict",
         "QALastfallEintrag",
         "QALastfallEintrag.aus_dict",
+        "QAGebrauchsfallEintrag",
+        "QAGebrauchsfallEintrag.aus_dict",
+        "QAGebrauchsliste",
         "WerkstoffwahlEintrag",
         "WerkstoffwahlEintrag.aus_dict",
         "QASpannungsfallEintrag",
@@ -3284,6 +3411,7 @@
         "Schnittpaar.herleitung_riss",
         "Schnittpaar.herleitung_dehnung_am_ende",
         "Schnittpaar.herleitung_bezug",
+        "querschnitt_nach_wahl",
         "schnittpaar",
         "analysen"
       ]

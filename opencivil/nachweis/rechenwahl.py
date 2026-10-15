@@ -38,7 +38,9 @@ der Tragsicherheit und bei den Stahlspannungen. Beim Knicken und in den
 Spannung-Dehnung-Analysen wird die Normalkraft genau gerechnet, Ebene fuer
 Ebene -- dort waere die Handrechnung nur der Spannungsblock mit
 weggelassener Druckbewehrung, also eine schlechtere 0.85·x-Vereinfachung
-(:data:`FASERARTEN`).
+(:data:`FASERARTEN`). Der gezeichnete Querschnitt rechnet immer ueber die
+Fasern: seine Stahlspannungen bieten darum die Fasern und «elastisch» an,
+ohne Handrechnung (:data:`FASERSPANNUNGSARTEN`).
 
 Die Kriechzahl wirkt nur bei praezise und elastisch: an den anderen Gesetzen
 haengt kein Modul. Der Wertesatz bestimmt, wo die Plateaus liegen
@@ -124,6 +126,10 @@ SPANNUNGSARTEN = RECHENARTEN + (Rechenart.ELASTISCH,)
 #: Was das Knicken und die Spannung-Dehnung-Analysen anbieten: nur, was ueber
 #: die Fasern rechnet -- siehe «Wer was anbietet» oben.
 FASERARTEN = (Rechenart.BLOCK, Rechenart.PARABEL)
+
+#: Die Stahlspannungen des gezeichneten Querschnitts: ueber die Fasern, dazu
+#: elastisch -- eine Handrechnung gibt es dort nicht.
+FASERSPANNUNGSARTEN = FASERARTEN + (Rechenart.ELASTISCH,)
 
 #: Was eine Datei von vor 2026-10-12 dort noch waehlen durfte, wo es die Wahl
 #: heute nicht mehr gibt -- und was daraus wird: aus der Handrechnung beim

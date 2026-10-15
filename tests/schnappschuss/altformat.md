@@ -1,6 +1,6 @@
 # Altformat
 
-40 Berechnungen ausgeführt, 87 Werte bestimmt.
+49 Berechnungen ausgeführt, 105 Werte bestimmt.
 
 ## Herleitung
 
@@ -1640,11 +1640,17 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erfüllungsgrad Biegung und Normalkraft – Feld | $\alpha_{eff,\text{Feld}}$ | $1.41$ |  | berechnet |
 | Grösste aufnehmbare Druckkraft | $N_{Rd}^{-}$ | $-4044.1$ | kN | berechnet |
 | Grösste aufnehmbare Zugkraft | $N_{Rd}^{+}$ | $508.1$ | kN | berechnet |
+| Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt | $\alpha_{eff,NR}$ | $1.29$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite – Feld (60 %) | $\alpha_{eff,\sigma,w,\text{Feld (60 \%)}}$ | $2.66$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug links | $\alpha_{eff,Riss,\text{Zug links}}$ | $2.45$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug oben | $\alpha_{eff,Riss,\text{Zug oben}}$ | $1.18$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug rechts | $\alpha_{eff,Riss,\text{Zug rechts}}$ | $2.45$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug unten | $\alpha_{eff,Riss,\text{Zug unten}}$ | $4.46$ |  | berechnet |
 | Erfüllungsgrad Querkraft und Torsion – Feld | $\alpha_{eff,V,\text{Feld}}$ | $1.75$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug links | $\alpha_{eff,ZB,\text{Zug links}}$ | $1.99$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug oben | $\alpha_{eff,ZB,\text{Zug oben}}$ | $1.25$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug rechts | $\alpha_{eff,ZB,\text{Zug rechts}}$ | $1.99$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug unten | $\alpha_{eff,ZB,\text{Zug unten}}$ | $5.05$ |  | berechnet |
 | Schwerpunkt, y | $y_S$ | $150$ | mm | berechnet |
 | Schwerpunkt, z | $z_S$ | $300$ | mm | berechnet |
 | Fläche des Bruttoquerschnitts | $A$ | $330000$ | mm² | berechnet |
@@ -1663,6 +1669,9 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Grösste aufnehmbare Druckkraft | $N_{Rd}^{-}$ | $-7501.7$ | kN | berechnet |
 | Grösste aufnehmbare Zugkraft | $N_{Rd}^{+}$ | $1031.7$ | kN | berechnet |
 | Erfüllungsgrad Biegung und Normalkraft – Schief | $\alpha_{eff,\text{Schief}}$ | $2.29$ |  | berechnet |
+| Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt | $\alpha_{eff,NR}$ | $1.61$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite – Feld (60 %) | $\alpha_{eff,\sigma,w,\text{Feld (60 \%)}}$ | $1.98$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite – Schief (60 %) | $\alpha_{eff,\sigma,w,\text{Schief (60 \%)}}$ | $32.97$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug links | $\alpha_{eff,Riss,\text{Zug links}}$ | $2.70$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug oben | $\alpha_{eff,Riss,\text{Zug oben}}$ | $1.67$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug rechts | $\alpha_{eff,Riss,\text{Zug rechts}}$ | $2.52$ |  | berechnet |
@@ -1675,6 +1684,10 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Moment der Längszugkraft um z – Schief | $\Delta M_z$ | $0$ | kNm | berechnet |
 | Längszugkraft aus Querkraft und Torsion – Schief | $\Delta N$ | $173.2$ | kN | berechnet |
 | Erfüllungsgrad Querkraft und Torsion – Schief | $\alpha_{eff,V,\text{Schief}}$ | $5.13$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug links | $\alpha_{eff,ZB,\text{Zug links}}$ | $2.24$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug oben | $\alpha_{eff,ZB,\text{Zug oben}}$ | $1.44$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug rechts | $\alpha_{eff,ZB,\text{Zug rechts}}$ | $2.09$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug unten | $\alpha_{eff,ZB,\text{Zug unten}}$ | $3.05$ |  | berechnet |
 | Schwerpunkt, y | $y_S$ | $400$ | mm | berechnet |
 | Schwerpunkt, z | $z_S$ | $300$ | mm | berechnet |
 | Fläche des Bruttoquerschnitts | $A$ | $160000$ | mm² | berechnet |
@@ -1688,7 +1701,12 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Grösste aufnehmbare Druckkraft | $N_{Rd}^{-}$ | $-5497.4$ | kN | berechnet |
 | Grösste aufnehmbare Zugkraft | $N_{Rd}^{+}$ | $942.5$ | kN | berechnet |
 | Erfüllungsgrad Biegung und Normalkraft – Zug | $\alpha_{eff,\text{Zug}}$ | $2.36$ |  | berechnet |
+| Erfüllungsgrad Rissnormalkraft – ganzer Querschnitt | $\alpha_{eff,NR}$ | $2.44$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite – Druck (60 %) | $\alpha_{eff,\sigma,w,\text{Druck (60 \%)}}$ | $\infty$ |  | berechnet |
+| Erfüllungsgrad Stahlspannung aus Rissbreite – Zug (60 %) | $\alpha_{eff,\sigma,w,\text{Zug (60 \%)}}$ | $3.93$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug oben | $\alpha_{eff,Riss,\text{Zug oben}}$ | $5.37$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – Zug unten | $\alpha_{eff,Riss,\text{Zug unten}}$ | $5.37$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug oben | $\alpha_{eff,ZB,\text{Zug oben}}$ | $5.20$ |  | berechnet |
+| Erfüllungsgrad Zwängung auf Biegung – Zug unten | $\alpha_{eff,ZB,\text{Zug unten}}$ | $5.20$ |  | berechnet |
 | Schwerpunkt, y | $y_S$ | $200$ | mm | berechnet |
 | Schwerpunkt, z | $z_S$ | $200$ | mm | berechnet |

@@ -1,5 +1,5 @@
 ---
-erzeugt: 440a77df6b4a
+erzeugt: a965ce6ab664
 art: modul
 tags: [modul]
 ---
@@ -51,7 +51,9 @@ der Tragsicherheit und bei den Stahlspannungen. Beim Knicken und in den
 Spannung-Dehnung-Analysen wird die Normalkraft genau gerechnet, Ebene fuer
 Ebene -- dort waere die Handrechnung nur der Spannungsblock mit
 weggelassener Druckbewehrung, also eine schlechtere 0.85·x-Vereinfachung
-([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]).
+([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]). Der gezeichnete Querschnitt rechnet immer ueber die
+Fasern: seine Stahlspannungen bieten darum die Fasern und «elastisch» an,
+ohne Handrechnung ([[opencivil.nachweis.rechenwahl#Konstanten|FASERSPANNUNGSARTEN]]).
 
 Die Kriechzahl wirkt nur bei praezise und elastisch: an den anderen Gesetzen
 haengt kein Modul. Der Wertesatz bestimmt, wo die Plateaus liegen
@@ -375,6 +377,7 @@ das Knicken und die Analysen mit dem der ersten Lage.
 - `RECHENARTEN = (Rechenart.HANDRECHNUNG, Rechenart.BLOCK, Rechenart.PARABEL)` – Was die Tragsicherheit anbietet.
 - `SPANNUNGSARTEN = RECHENARTEN + (Rechenart.ELASTISCH,)` – Die Stahlspannungen zusaetzlich elastisch.
 - `FASERARTEN = (Rechenart.BLOCK, Rechenart.PARABEL)` – Was das Knicken und die Spannung-Dehnung-Analysen anbieten: nur, was ueber die Fasern rechnet -- siehe «Wer was anbietet» oben.
+- `FASERSPANNUNGSARTEN = FASERARTEN + (Rechenart.ELASTISCH,)` – Die Stahlspannungen des gezeichneten Querschnitts: ueber die Fasern, dazu elastisch -- eine Handrechnung gibt es dort nicht.
 - `ERSATZ_ALTER_WAHL = {Rechenart.HANDRECHNUNG.value: Rechenart.BLOCK.value}` – Was eine Datei von vor 2026-10-12 dort noch waehlen durfte, wo es die Wahl heute nicht mehr gibt -- und was daraus wird: aus der Handrechnung beim Knicken und in den Analysen derselbe Spannungsblock, ueber die Fasern gerechnet. Die Druckbewehrung zaehlt dann mit; der Widerstand steigt darum leicht.
 - `STAHL_NUR_ZUG = 'Betonstahl nur auf Zug'` – Die Seite im Notizbuch fuer den Stahl der Handrechnung, der nur Zug traegt.
 
@@ -391,11 +394,13 @@ das Knicken und die Analysen mit dem der ersten Lage.
 
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.knicken]]
+- [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.platte]]
+- [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.web.api]]

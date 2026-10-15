@@ -42,14 +42,18 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX
+from opencivil.nachweis.rechenwahl import FASERSPANNUNGSARTEN
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.platte import ALPHA_MAX, ALPHA_MIN, K_C
 from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.schnittanalyse import Zugseite
 from opencivil.projekt.eintraege import (
-    BETONGESETZE, WERKSTOFFSAETZE, Beschreibung, SpannungsfallEintrag, eindeutig,
+    BETONGESETZE, HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, WERKSTOFFSAETZE, Beschreibung,
+    Gebrauchsliste, SpannungsfallEintrag, eindeutig,
 )
-from opencivil.projekt.lesen import ProjektFehler, pflichtfeld, zahl
+from opencivil.projekt.lesen import (
+    ProjektFehler, kriechzahl_aus, pflichtfeld, rissanforderung_aus, zahl,
+)
 from opencivil.projekt.netz import Netz, naechste_kennung
 
 #: Schnitte eines Buegels durch eine Schubwand: so viele Schenkel kreuzen sie.
@@ -281,6 +285,48 @@ class QALastfallEintrag(Beschreibung):
 
 
 @dataclass
+class QAGebrauchsfallEintrag(Beschreibung):
+    """
+    Ein Lastfall unter Gebrauchslast -- wie ein Lastfall der Tragsicherheit,
+    ohne Querkraft und Torsion: begrenzt wird die Stahlspannung, und dafuer
+    zaehlen N und die Momente. kN und kNm, Vorzeichen siehe oben.
+    """
+
+    name: str
+    N_Ed: float = 0.0
+    M_y_Ed: float = 0.0
+    M_z_Ed: float = 0.0
+    aktiv: bool = True
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any], wort: str = "häufige") -> "QAGebrauchsfallEintrag":
+        """``wort`` nennt die Liste in der Meldung -- «häufige» oder «quasi-ständige»."""
+        return cls(
+            name=pflichtfeld(d, "name", f"Ein {wort}r Lastfall"),
+            N_Ed=zahl(d, "N_Ed", cls.N_Ed),
+            M_y_Ed=zahl(d, "M_y_Ed", cls.M_y_Ed),
+            M_z_Ed=zahl(d, "M_z_Ed", cls.M_z_Ed),
+            aktiv=bool(d.get("aktiv", cls.aktiv)),
+        )
+
+
+@dataclass
+class QAGebrauchsliste(Gebrauchsliste):
+    """
+    Die Lastfaelle einer Stahlspannung am gezeichneten Querschnitt: dieselbe
+    Liste wie bei der Platte, mit N, M_y und M_z je Fall, abgeleitet aus den
+    Lastfaellen der Tragsicherheit. Gerechnet wird ueber die Fasern -- eine
+    Handrechnung gibt es hier nicht.
+    """
+
+    FALL = QAGebrauchsfallEintrag
+    ARTEN = FASERSPANNUNGSARTEN
+    BAUTEIL = "Querschnitt"
+
+    faelle: List[QAGebrauchsfallEintrag] = field(default_factory=list)
+
+
+@dataclass
 class WerkstoffwahlEintrag(Beschreibung):
     """
     Mit welchen Werten ein Material in dieser Analyse rechnet.
@@ -415,6 +461,29 @@ class QuerschnittsanalyseEintrag(Beschreibung):
     duktilitaet: bool = False
     x_d_max: float = X_D_MAX
     sproede: bool = False
+
+    rissanforderung: str = "normal"
+    """Anforderung an die Rissbildung -- ``normal``, ``erhoeht`` oder ``hoch``, wie bei der Platte."""
+
+    zwaengung: bool = False
+    """Ob die Zwaengung auf Normalkraft nachgewiesen wird -- am ganzen Querschnitt."""
+
+    zwaengung_begrenzt: bool = False
+    """Ob die rissaktive Dicke dabei hoechstens 500 mm betraegt."""
+
+    zwaengung_biegung: bool = False
+    """Ob die Zwaengung auf Biegung nachgewiesen wird -- je Richtung."""
+
+    zwaengung_biegung_kriechzahl: float = 0.0
+    """Die Kriechzahl φ der Zwaengung auf Biegung: der Beton mit ``E_cm/(1+φ)``."""
+
+    quasistaendig: QAGebrauchsliste = field(
+        default_factory=lambda: QAGebrauchsliste(anteil=QUASISTAENDIG_ANTEIL))
+    """Die quasi-staendigen Lastfaelle -- fuer die Rissbreite."""
+
+    haeufig: QAGebrauchsliste = field(
+        default_factory=lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL))
+    """Die haeufigen Lastfaelle -- gegen das Fliessen, bei erhoehter und hoher Anforderung."""
 
     spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)
     """Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt."""
@@ -612,10 +681,16 @@ class QuerschnittsanalyseEintrag(Beschreibung):
         return neu
 
     def pruefen(self) -> None:
-        """Was sich schon an der Beschreibung pruefen laesst: eindeutige Namen der Faelle."""
+        """
+        Was sich schon an der Beschreibung pruefen laesst: eindeutige Namen der
+        Faelle, und die Gebrauchslisten pruefen sich selbst, samt Anteil und
+        abgeleiteten Namen.
+        """
         eindeutig(self.lastfaelle, self.name, "Lastfall", bauteil="Querschnitt")
         eindeutig(self.spannungsfaelle, self.name, "Spannung-Dehnung-Analyse",
                   bauteil="Querschnitt")
+        for liste, wort in ((self.haeufig, "häufige"), (self.quasistaendig, "quasi-ständige")):
+            liste.pruefen(self.name, self.lastfaelle, wort)
 
     def lastfall(self, name: str, **werte: float) -> QALastfallEintrag:
         """Einen Lastfall anfuegen, ohne Oberflaeche -- kN und kNm."""
@@ -667,6 +742,19 @@ class QuerschnittsanalyseEintrag(Beschreibung):
             duktilitaet=bool(d.get("duktilitaet", cls.duktilitaet)),
             x_d_max=zahl(d, "x_d_max", cls.x_d_max),
             sproede=bool(d.get("sproede", cls.sproede)),
+            rissanforderung=rissanforderung_aus(d.get("rissanforderung"),
+                                                cls.rissanforderung),
+            zwaengung=bool(d.get("zwaengung", cls.zwaengung)),
+            zwaengung_begrenzt=bool(d.get("zwaengung_begrenzt", cls.zwaengung_begrenzt)),
+            zwaengung_biegung=bool(d.get("zwaengung_biegung", cls.zwaengung_biegung)),
+            zwaengung_biegung_kriechzahl=kriechzahl_aus(
+                d, "zwaengung_biegung_kriechzahl", alt=cls.zwaengung_biegung_kriechzahl,
+                wo=f"Querschnitt '{d.get('name') or kennung}', Zwängung auf Biegung"),
+            quasistaendig=QAGebrauchsliste.aus_dict(
+                d.get("quasistaendig") or {}, wort="quasi-ständige",
+                vorgabe=QUASISTAENDIG_ANTEIL),
+            haeufig=QAGebrauchsliste.aus_dict(
+                d.get("haeufig") or {}, wort="häufige", vorgabe=HAEUFIG_ANTEIL),
             spannungsfaelle=[QASpannungsfallEintrag.aus_dict(x)
                              for x in (d.get("spannungsfaelle") or [])],
             beschreibung=str(d.get("beschreibung") or cls.beschreibung),

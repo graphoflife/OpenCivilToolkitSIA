@@ -1,5 +1,5 @@
 ---
-erzeugt: 12bfff3ec89b
+erzeugt: 96526f0f6f39
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.1.6"
@@ -31,6 +31,7 @@ $$
 - [[Knicken]]
 - [[Biegung und Normalkraft]]
 - [[Stahlspannung gegen Fliessen]]
+- [[Stahlspannung aus Rissbreite]]
 - [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->

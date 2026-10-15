@@ -1,5 +1,5 @@
 ---
-erzeugt: 3c5354bb59f0
+erzeugt: f6f8b278d948
 art: formel
 tags: [formel]
 ---
@@ -40,6 +40,7 @@ $$
 - [[Stahlspannung gegen Fliessen]]
 - [[Knicken]]
 - [[Biegung und Normalkraft]]
+- [[Zwängung auf Biegung]]
 - [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->

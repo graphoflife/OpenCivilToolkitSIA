@@ -1,5 +1,5 @@
 ---
-erzeugt: 783a5c19a06c
+erzeugt: f3a2ff87396f
 art: formel
 tags: [formel]
 ---
@@ -43,7 +43,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.richtungsnachweise#SproedesVersagenQA.pruefe|SproedesVersagenQA.pruefe]]
+- [[opencivil.nachweis.richtungsnachweise#protokoll_rissmoment|protokoll_rissmoment]]
 - [[opencivil.nachweis.sproedes_versagen#protokoll_rissmoment|protokoll_rissmoment]]
 
 ## Themen

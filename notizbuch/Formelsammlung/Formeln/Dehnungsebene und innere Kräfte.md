@@ -1,5 +1,5 @@
 ---
-erzeugt: 9b1bbe167dca
+erzeugt: 770dd68b82c2
 art: formel
 tags: [formel]
 ---
@@ -21,7 +21,7 @@ $$
 ## Im Code
 
 - [[opencivil.nachweis.querschnittsloeser#protokoll_verfahren|protokoll_verfahren]]
-- [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_ansatz]]
+- [[opencivil.nachweis.schiefe_biegung#protokoll_dehnungsebene|protokoll_dehnungsebene]]
 
 ## Themen
 
@@ -29,6 +29,7 @@ $$
 - [[Stahlspannung aus Rissbreite]]
 - [[Stahlspannung gegen Fliessen]]
 - [[Knicken]]
+- [[Zwängung auf Biegung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

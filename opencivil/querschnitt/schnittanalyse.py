@@ -70,7 +70,7 @@ from opencivil.nachweis.rechenwahl import Rechenwahl, betongesetz
 from opencivil.nachweis.sproedes_versagen import (
     MOMENTENTEILER, beiwert_dicke, protokoll_zugfestigkeit,
 )
-from opencivil.querschnitt.analyse import Querschnittsanalyse
+from opencivil.querschnitt.analyse import Querschnittsanalyse, Stabgruppe
 from opencivil.querschnitt.fasern import Faserquerschnitt, Stab
 from opencivil.querschnitt.interaktion import Querschnitt, Werkstoff
 from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
@@ -174,7 +174,7 @@ def _betonspannung(r, gesetze: Mapping[int, Callable[[float], float]]
     return spannung
 
 
-def _loeser(q: Querschnitt, seite: Zugseite, herkunft: List[str],
+def _loeser(q: Querschnitt, seite: Zugseite, herkunft: List[Stabgruppe],
             staehle: Mapping[int, Stahlgesetz], namen: Mapping[int, str]) -> Faserloeser:
     """
     Der Querschnitt in einer Zugrichtung als :class:`Faserloeser`. Staebe in
@@ -184,9 +184,9 @@ def _loeser(q: Querschnitt, seite: Zugseite, herkunft: List[str],
     r = q.richtung(seite.psi)
     oben, unten = r.beton
     gruppen: Dict[tuple, List[Tuple[Stab, str]]] = {}
-    for b, stab, name in zip(q.bewehrung, r.fasern.staebe, herkunft):
+    for b, stab, element in zip(q.bewehrung, r.fasern.staebe, herkunft):
         schluessel = (round(stab.arm, 9), b.werkstoff, b.verdraengt, stab.dicke)
-        gruppen.setdefault(schluessel, []).append((stab, name))
+        gruppen.setdefault(schluessel, []).append((stab, element.name))
     staebe: List[Stab] = []
     lagen: List[Stahllage] = []
     for nummer, (schluessel, liste) in enumerate(sorted(gruppen.items(), key=lambda kv: kv[0][0]),
@@ -360,6 +360,23 @@ class Schnittpaar:
         return bezug
 
 
+def querschnitt_nach_wahl(analyse: Querschnittsanalyse, wert: Callable[[str], float],
+                          wahl: Rechenwahl, *, ungerissen: bool = False,
+                          ) -> Tuple[Querschnitt, List[Stabgruppe], Dict[int, Stahlgesetz]]:
+    """
+    Der gezeichnete Querschnitt mit den Gesetzen einer Rechenwahl -- dazu je
+    Bewehrung ihr Element und je Stahl sein Gesetz, nach dem Index des
+    Werkstoffs. ``wert`` liefert zu einer Wert-ID die Zahl in SI. Zerlegt in
+    so viele Streifen, wie die Platte Fasern hat (:data:`FASERN`).
+    """
+    werkstoffe, index, staehle = _werkstoffe(analyse, wert, wahl, ungerissen=ungerissen)
+    teile, bewehrung, herkunft = analyse.geometrie(lambda stoff: index[stoff.id])
+    q = Querschnitt(werkstoffe=werkstoffe, teile=teile, bewehrung=bewehrung,
+                    bezug=(wert(analyse.id_von("y_S")), wert(analyse.id_von("z_S"))),
+                    streifen=FASERN)
+    return q, herkunft, staehle
+
+
 def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[str], float],
                 wahl: Rechenwahl) -> Optional[Schnittpaar]:
     """
@@ -369,20 +386,16 @@ def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[s
     """
     if not analyse.gruppen:
         return None
-    bezug = (wert(analyse.id_von("y_S")), wert(analyse.id_von("z_S")))
     zustaende = []
     for ungerissen in (False, True):
-        werkstoffe, index, staehle = _werkstoffe(analyse, wert, wahl, ungerissen=ungerissen)
-        teile, bewehrung, herkunft = analyse.geometrie(lambda stoff: index[stoff.id])
-        q = Querschnitt(werkstoffe=werkstoffe, teile=teile, bewehrung=bewehrung, bezug=bezug,
-                        streifen=FASERN)
-        namen = {i: w.name for i, w in enumerate(werkstoffe)}
+        q, herkunft, staehle = querschnitt_nach_wahl(analyse, wert, wahl, ungerissen=ungerissen)
+        namen = {i: w.name for i, w in enumerate(q.werkstoffe)}
         zustaende.append((q, _loeser(q, seite, herkunft, staehle, namen)))
     (q, gerissen), (_, ungerissen) = zustaende
     r = q.richtung(seite.psi)
 
     # Der Beton am gezogenen Rand: er gibt f_ctm und E_cm.
-    sy, sz = bezug
+    sy, sz = q.bezug
     n = r.n
     ecke, stoff = max(analyse.beton_ecken, key=lambda es: n[0] * (es[0][0] * 1e-3 - sy)
                       + n[1] * (es[0][1] * 1e-3 - sz))

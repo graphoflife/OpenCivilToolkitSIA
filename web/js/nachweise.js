@@ -140,11 +140,19 @@ export function jeB(querschnitt) {
   return `M, N je b = ${querschnitt.b} mm`;
 }
 
-/** Ändert die Platte im Projekt -- für die Fenster, die an ihr schreiben. */
-function anPlatte(querschnitt) {
+/**
+ * Ändert das Bauteil im Projekt -- für die Fenster, die an ihm schreiben.
+ * `ort.liste` sagt, in welcher Liste des Projekts es steht.
+ */
+function anBauteil(eintrag, ort) {
   return (veraenderer) => projektAendern((p) => {
-    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
+    veraenderer(p[ort.liste].find((x) => x.kennung === eintrag.kennung));
   });
+}
+
+/** Dasselbe für die Platte. */
+function anPlatte(querschnitt) {
+  return anBauteil(querschnitt, PLATTE);
 }
 
 /**
@@ -401,56 +409,61 @@ export function fliessenGefordert(querschnitt) {
 /**
  * Rissbreite bei Zwang: Normalkraft, Biegung mit ihrem eigenen φ, und die
  * Begrenzung der rissaktiven Dicke. Eine Annahme über das Tragwerk, nicht
- * über die Platte -- darum ausgeschaltet, bis jemand sie trifft.
+ * über das Bauteil -- darum ausgeschaltet, bis jemand sie trifft.
+ *
+ * `ort.zwang(e)` sagt, was beim Bauteil anders ist: bei der Platte steht die
+ * Marke der Tragrichtung x vor den Zeilen, beim gezeichneten Querschnitt
+ * dahinter, worüber nachgewiesen wird.
  */
-export function zwangInhalt(querschnitt) {
-  const aendern = anPlatte(querschnitt);
+export function zwangInhalt(eintrag, ort = PLATTE) {
+  const aendern = anBauteil(eintrag, ort);
+  const { marke, hinweise, phiTitel } = ort.zwang(eintrag);
 
   // Der Zeilentitel sagt schon, was der Schalter tut. Die Spalte rechts
   // wiederholte das in einem ganzen Satz und machte die Tafel breit.
   // Mit Richtungsmarke wie die Lagenzeilen: dieselbe Angabe soll überall
   // gleich aussehen, sonst liest man sie zweimal verschieden.
-  const zwaengung = (feld, beschriftung, richtung = null, zusatz = null) => el(
-    `div.duktilitaetszeile${richtung ? '' : '.ist-breit'}${zusatz ? '.mit-feld' : ''}`, {}, [
-      hakenSchalter(!!querschnitt[feld],
-        (wert) => aendern((q) => { q[feld] = wert; }), 'Zwängung'),
-      richtung
-        ? el('span.richtung', {
-          text: richtung, class: `lage-${richtung}`,
-          title: 'Nur Tragrichtung x',
-        })
-        : null,
+  const zwaengung = (feld, beschriftung, { mitMarke = false, zusatz = null } = {}) => {
+    const vorne = mitMarke && marke ? marke() : null;
+    const art = vorne ? (zusatz ? '.mit-feld' : '') : (zusatz ? '.mit-grenze' : '.ist-breit');
+    return el(`div.duktilitaetszeile${art}`, {}, [
+      hakenSchalter(!!eintrag[feld], (wert) => aendern((q) => { q[feld] = wert; }), 'Zwängung'),
+      vorne,
       el('span.postenname', { text: beschriftung }),
       zusatz,
-      el('span.kurvenhinweis', { text: '' }),
+      el('span.kurvenhinweis', { text: hinweise[feld] || '' }),
     ]);
+  };
 
   return [
-    zwaengung('zwaengung', 'Zwängung auf Normalkraft', 'x'),
-    // Die Zwängung auf Biegung rechnet am gerissenen Querschnitt mit
-    // n = E_s/E_cm · (1+φ) -- mit ihrem eigenen φ, nicht dem der Platte.
-    zwaengung('zwaengung_biegung', 'Zwängung auf Biegung', 'x', el('span.zeilenfeld', {}, [
-      el('span.zeichen', { text: 'φ' }),
-      zahlfeld({
-        wert: querschnitt.zwaengung_biegung_kriechzahl ?? 0, schritt: 0.1, min: 0, leer: 0,
-        titel: 'Kriechzahl φ der Zwängung auf Biegung: n = E_s/E_cm · (1 + φ)',
-        beiAenderung: (v) => aendern((q) => { q.zwaengung_biegung_kriechzahl = v; }),
-      }),
-    ])),
+    zwaengung('zwaengung', 'Zwängung auf Normalkraft', { mitMarke: true }),
+    // Die Zwängung auf Biegung rechnet am gerissenen Querschnitt -- mit
+    // ihrem eigenen φ, nicht dem der Platte.
+    zwaengung('zwaengung_biegung', 'Zwängung auf Biegung', {
+      mitMarke: true,
+      zusatz: el('span.zeilenfeld', {}, [
+        el('span.zeichen', { text: 'φ' }),
+        zahlfeld({
+          wert: eintrag.zwaengung_biegung_kriechzahl ?? 0, schritt: 0.1, min: 0, leer: 0,
+          titel: phiTitel,
+          beiAenderung: (v) => aendern((q) => { q.zwaengung_biegung_kriechzahl = v; }),
+        }),
+      ]),
+    }),
     zwaengung('zwaengung_begrenzt', 'Begrenzung auf 500 mm'),
   ];
 }
 
 /** Die Stahlspannung unter quasi-ständigen Lastfällen -- begrenzt aus der Rissbreite. */
-export function quasistaendigInhalt(querschnitt) {
-  return gebrauchsKapitel(querschnitt, {
+export function quasistaendigInhalt(eintrag, ort = PLATTE) {
+  return gebrauchsKapitel(eintrag, ort, {
     feld: 'quasistaendig', wort: 'quasi-ständig', neu: 'Quasi-ständig',
   });
 }
 
 /** Das Fliessen unter häufigen Lastfällen -- gefordert nur bei erhöhter und hoher Anforderung. */
-export function haeufigInhalt(querschnitt) {
-  return gebrauchsKapitel(querschnitt, {
+export function haeufigInhalt(eintrag, ort = PLATTE) {
+  return gebrauchsKapitel(eintrag, ort, {
     feld: 'haeufig', wort: 'häufig', neu: 'Häufig',
     // Bei normaler Anforderung steht in Tabelle 17 ein Strich: der
     // Nachweis entfällt, und damit auch alles, was unten eingetragen wird.
@@ -459,8 +472,8 @@ export function haeufigInhalt(querschnitt) {
     // Zusammenfassung und findet nichts. Was gefordert ist, sagt der Kern
     // über den Katalog; hier steht keine zweite Fassung der Norm. Nur
     // dieses Kapitel: das quasi-ständige läuft immer.
-    hinweis: fliessenGefordert(querschnitt) ? null
-      : `Rissanforderung «${anforderung(querschnitt)?.beschriftung ?? '–'}» → `
+    hinweis: fliessenGefordert(eintrag) ? null
+      : `Rissanforderung «${anforderung(eintrag)?.beschriftung ?? '–'}» → `
         + 'Tab. 17: kein Nachweis. Für Nachweis: «Erhöht» oder «Hoch».',
   });
 }
@@ -474,29 +487,29 @@ export function haeufigInhalt(querschnitt) {
  * dieselbe Maske mit anderen Feldern. Eine Kopie davon stünde in der
  * Oberfläche genau so, wie sie im Kern vermieden wurde.
  *
- * `feld` ist die Gebrauchsliste der Platte -- `haeufig` oder `quasistaendig`,
- * je mit `anteil`, `aus_tragsicherheit` und `faelle`. Vorher waren das drei
- * Feldnamen je Kapitel, die hier wieder zusammengesetzt wurden.
+ * `feld` ist die Gebrauchsliste des Bauteils -- `haeufig` oder
+ * `quasistaendig`, je mit `anteil`, `aus_tragsicherheit` und `faelle`. Was
+ * ein Fall trägt und welche Rechenarten gelten, sagt `ort.gebrauch`: bei der
+ * Platte M und N, beim gezeichneten Querschnitt N, M_y und M_z.
  *
  * Der Anteil steht in der Schalterzeile und nicht darunter: «[✓] [60] % der
  * Tragsicherheitseinwirkungen» liest sich als ein Satz, und man sieht beim
  * Einschalten, womit gerechnet wird. Seine Vorgabe kommt aus dem Kern -- die
  * Datei läuft beim Laden durch ihn und bringt den Wert immer mit.
  */
-function gebrauchsKapitel(querschnitt, {
+function gebrauchsKapitel(eintrag, ort, {
   feld, wort, neu, hinweis,
 }) {
-  const liste = querschnitt[feld];
+  const liste = eintrag[feld];
   const abgeleitet = !!liste.aus_tragsicherheit;
   const faelle = liste.faelle;
-  const aendern = (veraenderer) => projektAendern((p) => {
-    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung)[feld]);
-  });
+  const aendern = (veraenderer) => anBauteil(eintrag, ort)((e) => veraenderer(e[feld]));
+  const spalten = ort.gebrauch.spalten(eintrag);
 
   return [
     hinweis ? el('p.hinweis.hinweis-annahme', { text: hinweis }) : null,
     rechenwahlZeile('Rechenwahl', liste.wahl,
-      (veraenderer) => aendern((l) => veraenderer(l.wahl)), { arten: 'spannungsarten' }),
+      (veraenderer) => aendern((l) => veraenderer(l.wahl)), { arten: ort.gebrauch.arten }),
 
     el('div.duktilitaetszeile.ist-anteil', {}, [
       hakenSchalter(abgeleitet, (wert) => aendern((l) => {
@@ -517,60 +530,48 @@ function gebrauchsKapitel(querschnitt, {
     // Anteil nimmt, kann trotzdem einen Fall von Hand dazustellen, den keine
     // Tragsicherheitskombination abbildet.
     faelle.length
-      ? el('div.einwirkung.ist-kopf.ist-gebrauch', {}, [
+      ? el('div.einwirkung.ist-kopf', { style: { '--felder': spalten.length } }, [
         el('span'),
         el('span', { text: 'Bezeichnung' }),
-        el('span', { text: 'M_Ed [kNm]' }),
-        el('span', { text: 'N_Ed [kN]' }),
+        ...spalten.map((s) => el('span', { text: s.kopf })),
         el('span'),
       ])
       : null,
     ...(faelle.length
-      ? faelle.map((_, i) => gebrauchsfallZeile(querschnitt, feld, wort, i))
+      ? faelle.map((_, i) => gebrauchsfallZeile(eintrag, ort, spalten, feld, wort, i))
       : [el('div.leer', {
         text: abgeleitet
           ? 'Nur die abgeleiteten Fälle.'
           : `Noch kein ${wort}er Lastfall.`,
       })]),
     anfuegenKnopf('Lastfall', () => aendern((l) => {
-      l.faelle.push(ausVorlage('gebrauchsfall', { name: naechsterName(neu, l.faelle) }));
+      l.faelle.push(ausVorlage(ort.gebrauch.vorlage, { name: naechsterName(neu, l.faelle) }));
     })),
   ];
 }
 
 /** Ein Lastfall unter Gebrauchslast auf einer Zeile -- wie eine Einwirkung, ohne Querkraft. */
-function gebrauchsfallZeile(querschnitt, feld, wort, index) {
-  const k = querschnitt[feld].faelle[index];
-  const aendern = (veraenderer) => projektAendern((p) => {
-    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
-      [feld].faelle[index]);
-  });
+function gebrauchsfallZeile(eintrag, ort, spalten, feld, wort, index) {
+  const k = eintrag[feld].faelle[index];
+  const aendern = (veraenderer) => anBauteil(eintrag, ort)((e) => veraenderer(e[feld].faelle[index]));
 
   const aktiv = k.aktiv !== false;
-  return el('div.einwirkung.ist-gebrauch', { class: aktiv ? '' : 'ist-aus' }, [
+  return el('div.einwirkung', {
+    class: aktiv ? '' : 'ist-aus', style: { '--felder': spalten.length },
+  }, [
     hakenSchalter(aktiv, (wert) => aendern((x) => { x.aktiv = wert; }), 'Lastfall'),
     el('input.ew-name', {
       type: 'text', value: k.name, title: `Bezeichnung des ${wort}en Lastfalls`,
       on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
     }),
-    zahlfeld({
-      wert: k.M_Ed, schritt: 10, titel: `Moment unter ${wort}er Einwirkung, in kNm`,
-      leer: 0,
-      beiAenderung: (v) => aendern((x) => { x.M_Ed = v; }),
-    }),
-    zahlfeld({
-      wert: k.N_Ed, schritt: 10,
-      titel: `Normalkraft unter ${wort}er Einwirkung, in kN – Zug positiv`,
-      leer: 0,
-      beiAenderung: (v) => aendern((x) => { x.N_Ed = v; }),
-    }),
+    ...spalten.map((s) => zahlfeld({
+      wert: k[s.feld], schritt: s.schritt, titel: s.titel(wort), leer: 0,
+      beiAenderung: (v) => aendern((x) => { x[s.feld] = v; }),
+    })),
     el('button.weg', {
       text: '×', title: `${wort[0].toUpperCase()}${wort.slice(1)}en Lastfall entfernen`,
       on: {
-        click: () => projektAendern((p) => {
-          p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
-            [feld].faelle.splice(index, 1);
-        }),
+        click: () => anBauteil(eintrag, ort)((e) => { e[feld].faelle.splice(index, 1); }),
       },
     }),
   ]);
@@ -757,18 +758,42 @@ async function bewehrungErmitteln(kennung) {
 }
 
 /**
- * Wo die Analysen eines Bauteils stehen und was bei ihm anders ist: die
- * Liste im Projekt, die Vorlage einer neuen Zeile und die Richtung -- bei der
- * Platte die Tragrichtung x oder y. Der gezeichnete Querschnitt hat seinen
+ * Wo die Kapitel eines Bauteils stehen und was bei ihm anders ist: die
+ * Liste im Projekt, die Vorlage einer neuen Analyse und ihre Richtung -- bei
+ * der Platte die Tragrichtung x oder y. Der gezeichnete Querschnitt hat seinen
  * eigenen Ort (`querschnittsanalyse.js`): dort ist die Richtung die Zugseite.
  * `raender(k)` sagt, wie die beiden Ränder einer Analyse heissen -- der
- * gedrückte und der gezogene.
+ * gedrückte und der gezogene. `zwang(e)` und `gebrauch` sind, was die
+ * Zwängung und die Stahlspannungen beim Bauteil anders zeigen.
  */
 export const PLATTE = {
   liste: 'querschnitte',
   vorlage: 'analyse',
   richtung: (k, setzen) => richtungsWahl(k.richtung || 'x', setzen, ['x', 'y']),
   raender: () => ['oben', 'unten'],
+  // Die Zwängung: nur in Tragrichtung x.
+  zwang: () => ({
+    marke: () => el('span.richtung', {
+      text: 'x', class: 'lage-x', title: 'Nur Tragrichtung x',
+    }),
+    hinweise: {},
+    phiTitel: 'Kriechzahl φ der Zwängung auf Biegung: n = E_s/E_cm · (1 + φ)',
+  }),
+  // Die Lastfälle unter Gebrauchslast: Moment und Normalkraft je b.
+  gebrauch: {
+    vorlage: 'gebrauchsfall',
+    arten: 'spannungsarten',
+    spalten: () => [
+      {
+        feld: 'M_Ed', kopf: 'M_Ed [kNm]', schritt: 10,
+        titel: (wort) => `Moment unter ${wort}er Einwirkung, in kNm`,
+      },
+      {
+        feld: 'N_Ed', kopf: 'N_Ed [kN]', schritt: 10,
+        titel: (wort) => `Normalkraft unter ${wort}er Einwirkung, in kN – Zug positiv`,
+      },
+    ],
+  },
 };
 
 /**

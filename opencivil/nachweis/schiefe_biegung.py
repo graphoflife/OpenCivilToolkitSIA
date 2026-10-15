@@ -42,7 +42,7 @@ from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, Groesse
 from opencivil.core.latex import Mathe, als_text, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
-from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse
+from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse, Stabgruppe
 from opencivil.querschnitt.interaktion import Bruchpunkt, Kraftanteil, Querschnitt
 
 #: Ab welchem Moment ein Lastfall als Biegung gilt, in Nm. Darunter ist es
@@ -74,6 +74,27 @@ class Bruchbefund:
 
     querschnitt: Querschnitt
     ergebnisse: List[Fallergebnis] = field(default_factory=list)
+
+
+def protokoll_dehnungsebene(p: Protokoll) -> None:
+    """
+    Die Ebene, schraeg, und was sie an Kraeften erzeugt -- fuer jeden
+    Nachweis, der am gezeichneten Querschnitt eine Ebene sucht.
+    """
+    p.erklaerung(
+        "Der Querschnitt bleibt eben (Bernoulli). Die Dehnung hängt nur vom "
+        "Abstand v in Zugrichtung n ab, gemessen ab dem Schwerpunkt; die "
+        "Nulllinie steht senkrecht zu n und darf schräg liegen. Zu jeder "
+        "Dehnungsebene ergeben sich N, M_y und M_z durch Integration über "
+        "die Fläche -- als Summe über Streifen quer zu n, deren Grenzen auf "
+        "jede Polygonecke fallen, und Stab für Stab.")
+    p.ansatz(
+        r"\varepsilon(y, z) = \varepsilon_0 + \kappa \cdot v \qquad "
+        r"v = n_y (y - y_S) + n_z (z - z_S) \qquad "
+        r"N = \int_A \sigma\,\mathrm{d}A \qquad "
+        r"M_y = -\int_A \sigma\,(z - z_S)\,\mathrm{d}A \qquad "
+        r"M_z = -\int_A \sigma\,(y - y_S)\,\mathrm{d}A",
+        titel="Dehnungsebene und innere Kräfte")
 
 
 class SchiefeBiegung(Nachweis):
@@ -158,7 +179,8 @@ class SchiefeBiegung(Nachweis):
                 M_z += e.g(f"dM_z_{fall.kennung}").si
         return N, M_y, M_z
 
-    def _ein_fall(self, p: Protokoll, e: Eingaben, q: Querschnitt, herkunft: Sequence[str],
+    def _ein_fall(self, p: Protokoll, e: Eingaben, q: Querschnitt,
+                  herkunft: Sequence[Stabgruppe],
                   fall: Lastfall, zug: float, druck: float
                   ) -> Tuple[Optional[NachweisUrteil], Fallergebnis]:
         werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
@@ -237,20 +259,7 @@ class SchiefeBiegung(Nachweis):
     # -- Mitschrift ----------------------------------------------------------------
 
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, q: Querschnitt) -> None:
-        p.erklaerung(
-            "Der Querschnitt bleibt eben (Bernoulli). Die Dehnung hängt nur vom "
-            "Abstand v in Zugrichtung n ab, gemessen ab dem Schwerpunkt; die "
-            "Nulllinie steht senkrecht zu n und darf schräg liegen. Zu jeder "
-            "Dehnungsebene ergeben sich N, M_y und M_z durch Integration über "
-            "die Fläche -- als Summe über Streifen quer zu n, deren Grenzen auf "
-            "jede Polygonecke fallen, und Stab für Stab.")
-        p.ansatz(
-            r"\varepsilon(y, z) = \varepsilon_0 + \kappa \cdot v \qquad "
-            r"v = n_y (y - y_S) + n_z (z - z_S) \qquad "
-            r"N = \int_A \sigma\,\mathrm{d}A \qquad "
-            r"M_y = -\int_A \sigma\,(z - z_S)\,\mathrm{d}A \qquad "
-            r"M_z = -\int_A \sigma\,(y - y_S)\,\mathrm{d}A",
-            titel="Dehnungsebene und innere Kräfte")
+        protokoll_dehnungsebene(p)
         p.erklaerung(
             "Der Bruchzustand: jede Dehnungsebene, bei der ein Werkstoff an "
             "seiner Grenze steht und keiner darüber. Der Beton wird an seinem "
@@ -285,7 +294,7 @@ class SchiefeBiegung(Nachweis):
                   titel="Einwirkung", ausrichtung="lrl")
 
     def _protokoll_bruchzustand(self, p: Protokoll, werte: Zwischenwerte, q: Querschnitt,
-                                punkt: Bruchpunkt, herkunft: Sequence[str]) -> None:
+                                punkt: Bruchpunkt, herkunft: Sequence[Stabgruppe]) -> None:
         n = punkt.zugrichtung
         richtung = math.degrees(math.atan2(n[1], n[0]))
         if punkt.chi > 0.0:
@@ -309,8 +318,8 @@ class SchiefeBiegung(Nachweis):
                            Mathe(fest(a.z * 1e3, 1)), "–", "–"])
         staebe = anteile[len(anteile) - len(q.bewehrung):]
         gruppen: Dict[str, List[Kraftanteil]] = {}
-        for name, a in zip(herkunft, staebe):
-            gruppen.setdefault(name, []).append(a)
+        for gruppe, a in zip(herkunft, staebe):
+            gruppen.setdefault(gruppe.name, []).append(a)
         for name, teile in gruppen.items():
             F = sum(a.N for a in teile)
             if F != 0.0:

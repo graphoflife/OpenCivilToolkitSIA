@@ -44,6 +44,48 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-15 · Gebrauchsnachweise am gezeichneten Querschnitt
+
+Was die Platte unter Gebrauchslast nachweist, gibt es jetzt auch für den
+gezeichneten Querschnitt: Rissbreite bei Zwang (Normalkraft und Biegung),
+Stahlspannung quasi-ständig und Fliessen häufig. Drei neue Knöpfe unter
+«Nachweise», dazu die Rissanforderung im Panel des Querschnitts.
+
+**Je Stab statt je Lage.** Die Platte hält den dicksten Stab einer Lage gegen
+die Rissbreite. Der gezeichnete Querschnitt kennt jeden Stab: jeder hat seine
+eigene Grenze, mit seinem Durchmesser und dem `f_ctm` seines Betons, und
+massgebend ist der kleinste Erfüllungsgrad (Benutzer). Eine verschmierte
+Linie hat keinen Durchmesser; sie bekommt einen fiktiven, als lägen ihre
+Stäbe 150 mm auseinander (Annahme des Benutzers). Stäbe mit derselben Grenze
+werden einmal hergeleitet (`nachweis/stabgrenzen.py`).
+
+**Zwang auf Normalkraft am ganzen Querschnitt** (Benutzer): der ganze Beton
+reisst, `N_Riss = Σ A_c·k_t·f_ctm` mit `t` als kleinerer Abmessung, gegen
+`Σ A_s·σ_s,adm` aller Stäbe. Bei der Platte nimmt jede Lage die Hälfte --
+zusammen derselbe Gedanke. **Zwang auf Biegung je Richtung** (Benutzer):
+dasselbe Rissmoment wie beim spröden Versagen -- es steht dafür jetzt einmal
+als Funktion da (`richtungsnachweise.rissmoment`) --, gegen das Moment, bei
+dem der erste gezogene Stab seine Grenze erreicht: gerissen, elastisch, mit
+eigenem φ. Linear ist das ein Dreisatz; kommt der Beton über `f_ck`, sucht
+Illinois weiter. An einem Rechteck mit Stäben nur unten trifft es die
+Handrechnung der Platte, `σ_s,adm·A_s·(d − x/3)`, auf 0.03 %.
+
+**Die Ebene bei schiefer Biegung** (`nachweis/gebrauchsebene.py`): zu einer
+Neigung ψ ist es die Aufgabe der Platte; ψ dreht, bis auch das Moment entlang
+der Nulllinie stimmt. Erst halbiert brauchte das am Unterzug 2.7 s für alle
+vier Nachweise. Zwei Dinge holten das auf 0.15 s, bei gleichen Zahlen: ψ
+folgt der Sekante statt fester Schritte, und der Löser sucht seine Ebene mit
+Illinois statt durch Halbieren. Dafür hat `Faserloeser` eine Methode
+`_suchen` bekommen, die eine Unterklasse ersetzt (`FaserloeserIllinois`);
+die Platte halbiert weiter, ihre Berichte sind Zeichen für Zeichen gleich.
+
+**Nichts doppelt.** Die Texte der Stahlspannung -- Kriechen,
+Werkstoffgesetze, was beim Fliessen verglichen wird -- stehen einmal
+(`spannungsbegrenzung.protokoll_festlegungen`), die Gebrauchsliste ist
+dieselbe Klasse mit anderem Fall (`QAGebrauchsliste`: N, M_y, M_z), und die
+Fenster der Oberfläche sind die der Platte mit einem anderen Ort
+(`ort.zwang`, `ort.gebrauch` in `nachweise.js`).
+
 ## 2026-10-15 · Spannung-Dehnung-Analysen am gezeichneten Querschnitt
 
 Die sechs Analysen der Platte gibt es jetzt auch für den gezeichneten

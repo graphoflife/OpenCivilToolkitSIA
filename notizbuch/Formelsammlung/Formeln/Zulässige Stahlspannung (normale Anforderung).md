@@ -1,5 +1,5 @@
 ---
-erzeugt: 1f47f8f4797d
+erzeugt: 0b4c546ee183
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.4.2"
@@ -27,6 +27,7 @@ $$
 
 ## Gebraucht von
 
+- [[Aufnehmbare Risskraft]]
 - [[Zulässige Dehnung]]
 
 ## Im Code
@@ -36,6 +37,7 @@ $$
 ## Themen
 
 - [[Stahlspannung aus Rissbreite]]
+- [[Zwängung auf Normalkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

@@ -320,21 +320,23 @@ class Faserloeser:
     Ein Querschnitt aus Fasern, mit Suche nach der Dehnungsebene.
 
     ``querschnitt`` sind die Fasern samt Staeben, ``grenzen`` die
-    Dehnungsgrenzen, innerhalb derer jedes Gesetz gilt. Dazu, was Bilder und
-    Linien vom Querschnitt wissen muessen: die Arme der Raender ``oben`` und
-    ``unten`` -- oben ist gedrueckt, wenn ein positives Moment wirkt --, die
-    Lagen mit ihrem Stahl, eine je Stab der Fasern, und die Spannung des
-    Betons an einer Stelle (``beton(arm, eps)``). ``eps_druck`` und
-    ``eps_zug`` sind die aeussersten Dehnungen, fuer die die Gesetze gelten.
+    Dehnungsgrenzen, innerhalb derer jedes Gesetz gilt -- mehr braucht die
+    Suche nicht. Dazu, was Bilder und Linien vom Querschnitt wissen muessen:
+    die Arme der Raender ``oben`` und ``unten`` -- oben ist gedrueckt, wenn
+    ein positives Moment wirkt --, die Lagen mit ihrem Stahl, eine je Stab
+    der Fasern, und die Spannung des Betons an einer Stelle
+    (``beton(arm, eps)``). ``eps_druck`` und ``eps_zug`` sind die
+    aeussersten Dehnungen, fuer die die Gesetze gelten. Wer nur sucht -- ein
+    Nachweis, der die Ebene zu einem Lastfall braucht --, laesst sie weg.
 
     Eine Lage liegt in der Tiefe ``z`` unter dem oberen Rand; ihr Arm ist
     ``z + oben``.
     """
 
     def __init__(self, *, querschnitt: Faserquerschnitt, grenzen: Dehnungsgrenzen,
-                 oben: float, unten: float, lagen: Sequence[Stahllage],
-                 beton: Callable[[float, float], float],
-                 eps_druck: float, eps_zug: float) -> None:
+                 oben: float = 0.0, unten: float = 0.0, lagen: Sequence[Stahllage] = (),
+                 beton: Optional[Callable[[float, float], float]] = None,
+                 eps_druck: float = 0.0, eps_zug: float = 0.0) -> None:
         self.querschnitt = querschnitt
         self.grenzen = grenzen
         self.oben = oben
@@ -374,19 +376,14 @@ class Faserloeser:
         if fenster is None:
             return None
         unten, oben = fenster
-        if self.kraefte(unten, chi).N > N_ziel:
+        zu_wenig = self.kraefte(unten, chi).N - N_ziel
+        if zu_wenig > 0.0:
             return None
-        if self.kraefte(oben, chi).N < N_ziel:
+        zu_viel = self.kraefte(oben, chi).N - N_ziel
+        if zu_viel < 0.0:
             return None
-        for _ in range(SCHRITTE):
-            if oben - unten <= EPS_SCHRANKE:
-                break
-            mitte = 0.5 * (unten + oben)
-            if self.kraefte(mitte, chi).N < N_ziel:
-                unten = mitte
-            else:
-                oben = mitte
-        return 0.5 * (unten + oben)
+        return self._suchen(lambda eps: self.kraefte(eps, chi).N - N_ziel,
+                            unten, oben, EPS_SCHRANKE, zu_wenig, zu_viel)
 
     def mitteldehnung(self, chi: float, N: float) -> Optional[float]:
         """
@@ -414,17 +411,12 @@ class Faserloeser:
         unten, oben = max(unten, -self.grenzen.kruemmungsgrenze(positiv=False)), min(oben, rand)
         if unten > oben:
             return None
-        if self.kraefte(eps_m, unten).M > M or self.kraefte(eps_m, oben).M < M:
+        zu_wenig = self.kraefte(eps_m, unten).M - M
+        zu_viel = self.kraefte(eps_m, oben).M - M
+        if zu_wenig > 0.0 or zu_viel < 0.0:
             return None
-        for _ in range(SCHRITTE):
-            if oben - unten <= CHI_SCHRANKE:
-                break
-            mitte = 0.5 * (unten + oben)
-            if self.kraefte(eps_m, mitte).M < M:
-                unten = mitte
-            else:
-                oben = mitte
-        return 0.5 * (unten + oben)
+        return self._suchen(lambda chi: self.kraefte(eps_m, chi).M - M,
+                            unten, oben, CHI_SCHRANKE, zu_wenig, zu_viel)
 
     def loese(self, *, N_Ed: float, M_Ed: float) -> Ebene:
         """
@@ -458,25 +450,43 @@ class Faserloeser:
         if oben is None:
             return self._ergebnis(0.0, 0.0, konvergiert=False)
 
-        for _ in range(SCHRITTE):
-            if oben - unten <= CHI_SCHRANKE:
-                break
-            mitte = 0.5 * (unten + oben)
-            m = moment(mitte)
-            if m is None:
-                # Sollte im eingegrenzten Fenster nicht vorkommen; wenn doch,
-                # lieber ehrlich nicht konvergiert melden als raten.
-                return self._ergebnis(0.0, 0.0, konvergiert=False)
-            if m < M_Ed:
-                unten = mitte
-            else:
-                oben = mitte
+        def zu_viel(chi: float) -> Optional[float]:
+            m = moment(chi)
+            return None if m is None else m - M_Ed
 
-        chi = 0.5 * (unten + oben)
+        # Ein Fehlen im eingegrenzten Fenster sollte nicht vorkommen; wenn
+        # doch, lieber ehrlich nicht konvergiert melden als raten.
+        chi = self._suchen(zu_viel, unten, oben, CHI_SCHRANKE)
+        if chi is None:
+            return self._ergebnis(0.0, 0.0, konvergiert=False)
         eps_m = self._eps_zu_normalkraft(chi, N_Ed)
         if eps_m is None:
             return self._ergebnis(0.0, 0.0, konvergiert=False)
         return self._ergebnis(eps_m, chi)
+
+    def _suchen(self, f: Callable[[float], Optional[float]], unten: float, oben: float,
+                schranke: float, f_unten: Optional[float] = None,
+                f_oben: Optional[float] = None) -> Optional[float]:
+        """
+        Wo ``f`` zwischen ``unten`` und ``oben`` null wird -- ``f`` steigt,
+        unten ist es negativ, oben nicht. Halbiert, bis das Fenster schmaler
+        ist als ``schranke``; ``None``, wenn ``f`` unterwegs keinen Wert hat.
+        ``f_unten`` und ``f_oben`` braucht das Halbieren nicht -- sie sind
+        fuer eine Suche, die mit ihnen schneller ist
+        (:class:`FaserloeserIllinois`).
+        """
+        for _ in range(SCHRITTE):
+            if oben - unten <= schranke:
+                break
+            mitte = 0.5 * (unten + oben)
+            wert = f(mitte)
+            if wert is None:
+                return None
+            if wert < 0.0:
+                unten = mitte
+            else:
+                oben = mitte
+        return 0.5 * (unten + oben)
 
     def _rand(self, start: float, N_Ed: float,
               moment: Callable[[float], Optional[float]], M_Ed: float,
@@ -541,6 +551,47 @@ class Faserloeser:
             sigma_s=tuple(s.gesetz(e) for s, e in zip(staebe, dehnungen)),
             eps_s=dehnungen,
             konvergiert=konvergiert)
+
+
+class FaserloeserIllinois(Faserloeser):
+    """
+    Derselbe Loeser, der eine Nullstelle mit dem Illinois-Verfahren sucht
+    statt durch Halbieren -- in denselben Klammern, bis auf dieselbe Breite.
+
+    Fuer den gezeichneten Querschnitt unter Gebrauchslast
+    (:mod:`opencivil.nachweis.qa_gebrauch`): dort wird je Lastfall die
+    Nulllinie gedreht, und jede Neigung ist eine ganze Suche. Halbiert
+    braucht eine Suche rund vierzig Schritte, mit Illinois ein Viertel davon:
+    zwischen zwei Knicken der Gesetze ist die Kraft eine Gerade, und dort
+    trifft die Sekante. Die Platte rechnet weiter mit dem Halbieren; ihre
+    Zahlen bleiben so, wie sie sind.
+    """
+
+    def _suchen(self, f: Callable[[float], Optional[float]], unten: float, oben: float,
+                schranke: float, f_unten: Optional[float] = None,
+                f_oben: Optional[float] = None) -> Optional[float]:
+        fa = f(unten) if f_unten is None else f_unten
+        fb = f(oben) if f_oben is None else f_oben
+        if fa is None or fb is None:
+            return None
+        a, b = unten, oben
+        if fa == 0.0:
+            return a
+        for _ in range(SCHRITTE):
+            if fb == 0.0 or abs(b - a) <= schranke:
+                break
+            c = b - fb * (b - a) / (fb - fa)
+            fc = f(c)
+            if fc is None:
+                return None
+            if (fc > 0.0) != (fb > 0.0):
+                a, fa = b, fb
+            else:
+                # Bleibt ein Ende zweimal stehen, wird sein Wert halbiert --
+                # sonst kroeche die Sekante nur von einer Seite heran.
+                fa *= 0.5
+            b, fb = c, fc
+        return b
 
 
 class Querschnittsloeser(Faserloeser):

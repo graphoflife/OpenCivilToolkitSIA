@@ -1,5 +1,5 @@
 ---
-erzeugt: a16d0839555c
+erzeugt: 5dfc238760e3
 art: formel
 tags: [formel]
 ---
@@ -12,11 +12,12 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.richtungsnachweise#SproedesVersagenQA.pruefe|SproedesVersagenQA.pruefe]]
+- [[opencivil.nachweis.richtungsnachweise#protokoll_spannung_ungerissen|protokoll_spannung_ungerissen]]
 
 ## Themen
 
 - [[Sprödes Versagen je Richtung]]
+- [[Zwängung auf Biegung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

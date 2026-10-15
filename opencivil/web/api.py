@@ -46,9 +46,9 @@ from opencivil.projekt import (
 from opencivil.projekt import balkensystem as bs
 from opencivil.projekt.eintraege import BETONGESETZE, WERKSTOFFSAETZE
 from opencivil.projekt.querschnittsanalyse import (
-    SCHNITTE, FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QALastfallEintrag,
-    QASpannungsfallEintrag, QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag,
-    StablinieEintrag, WerkstoffwahlEintrag,
+    SCHNITTE, FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QAGebrauchsfallEintrag,
+    QALastfallEintrag, QASpannungsfallEintrag, QuerschnittsanalyseEintrag, SchubwandEintrag,
+    StabEintrag, StablinieEintrag, WerkstoffwahlEintrag,
 )
 from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.schnittanalyse import Zugseite
@@ -56,7 +56,9 @@ from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.vorlagen import VORLAGEN
 from opencivil.projekt.gleichungen import GleichungszeileEintrag
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
-from opencivil.nachweis.rechenwahl import FASERARTEN, RECHENARTEN, SPANNUNGSARTEN, Rechenart
+from opencivil.nachweis.rechenwahl import (
+    FASERARTEN, FASERSPANNUNGSARTEN, RECHENARTEN, SPANNUNGSARTEN, Rechenart,
+)
 from opencivil.spannungsanalyse import Analyseart
 from opencivil.stabwerk import querschnitte as stabquerschnitte
 from opencivil.stabwerk.modell import Lastart, Lastrichtung
@@ -167,6 +169,7 @@ def katalog() -> dict:
             # anlegt. Es setzt nur Kennung, Knoten und die Materialien.
             "qa_lastfall": QALastfallEintrag(name="", M_y_Ed=100.0).als_dict(),
             "qa_analyse": QASpannungsfallEintrag(name="", M_Ed=30.0).als_dict(),
+            "qa_gebrauchsfall": QAGebrauchsfallEintrag(name="").als_dict(),
             "knoten": KnotenEintrag().als_dict(),
             "flaeche": FlaecheEintrag().als_dict(),
             "stab": StabEintrag().als_dict(),
@@ -250,12 +253,14 @@ def katalog() -> dict:
         },
         # Was ein Nachweis-Kapitel und eine Analyse waehlen: Wertesatz und
         # Rechenart -- die Stahlspannungen dazu «elastisch», das Knicken und
-        # die Analysen ohne Handrechnung.
+        # die Analysen ohne Handrechnung, die Stahlspannungen des gezeichneten
+        # Querschnitts beides.
         "rechenwahl": {
             "werkstoffsaetze": _WERKSTOFFSAETZE,
             "rechenarten": _rechenarten(RECHENARTEN),
             "spannungsarten": _rechenarten(SPANNUNGSARTEN),
             "faserarten": _rechenarten(FASERARTEN),
+            "faserspannungsarten": _rechenarten(FASERSPANNUNGSARTEN),
         },
         # `fliessnachweis` sagt, ob diese Anforderung den Nachweis gegen
         # das Fliessen unter haeufiger Einwirkung ueberhaupt verlangt -- bei

@@ -1,5 +1,5 @@
 ---
-erzeugt: e425c80f6e9c
+erzeugt: d2c00d359f0d
 art: modul
 tags: [modul]
 ---
@@ -19,10 +19,12 @@ Rechenwahl, mit der jedes Kapitel waehlt, womit es rechnet.
 - [[opencivil.nachweis.dehnungsfaecher]] – Die zulaessigen Dehnungsebenen einer Platte.
 - [[opencivil.nachweis.duktilitaet]] – Duktilitaetsnachweis ueber die Druckzonenhoehe.
 - [[opencivil.nachweis.fehlende_bewehrung]] – Nachweise, die mangels Bewehrung entfallen.
+- [[opencivil.nachweis.gebrauchsebene]] – die Dehnungsebene des gezeichneten Querschnitts unter Gebrauchslast.
 - [[opencivil.nachweis.handrechnung]] – Eckpunkte der Resistenzlinie von Hand.
 - [[opencivil.nachweis.knicken]] – Nachweis am verformten System.
 - [[opencivil.nachweis.linie]] – Geometrie einer geschlossenen M-N-Linie.
 - [[opencivil.nachweis.mindestbewehrung]] – Nachweise gegen sprödes Versagen.
+- [[opencivil.nachweis.qa_gebrauch]] – Gebrauchsnachweise des gezeichneten Querschnitts.
 - [[opencivil.nachweis.querkraft]] – Querkraftnachweis.
 - [[opencivil.nachweis.querschnittsloeser]] – Dehnungsebene zu gegebenen Schnittgrössen.
 - [[opencivil.nachweis.rechenwahl]] – womit ein Kapitel rechnet.
@@ -32,4 +34,5 @@ Rechenwahl, mit der jedes Kapitel waehlt, womit es rechnet.
 - [[opencivil.nachweis.schubwandnachweis]] – Querkraft und Torsion am gezeichneten Querschnitt.
 - [[opencivil.nachweis.spannungsbegrenzung]] – Stahlspannung unter Gebrauchslasten.
 - [[opencivil.nachweis.sproedes_versagen]] – Mindestbewehrung gegen sprödes Versagen.
+- [[opencivil.nachweis.stabgrenzen]] – die zulaessige Stahlspannung je Stab des gezeichneten Querschnitts.
 - [[opencivil.nachweis.zustand2]] – Der gerissene Querschnitt, linear elastisch.

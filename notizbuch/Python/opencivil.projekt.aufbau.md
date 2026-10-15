@@ -1,5 +1,5 @@
 ---
-erzeugt: dd185a5a24e3
+erzeugt: 58356cda19cb
 art: modul
 tags: [modul]
 ---
@@ -63,6 +63,10 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `qa_schub: Dict[str, Schubwandnachweis] = field(default_factory=dict)` – Querkraft und Torsion je Querschnittsanalyse.
 - `qa_duktilitaet: Dict[str, DuktilitaetQA] = field(default_factory=dict)`
 - `qa_sproede: Dict[str, SproedesVersagenQA] = field(default_factory=dict)`
+- `qa_rissnormalkraft: Dict[str, RissnormalkraftQA] = field(default_factory=dict)`
+- `qa_zwaengung_biegung: Dict[str, ZwaengungBiegungQA] = field(default_factory=dict)`
+- `qa_spannung_riss: Dict[str, SpannungsbegrenzungQA] = field(default_factory=dict)`
+- `qa_spannung: Dict[str, SpannungsbegrenzungQA] = field(default_factory=dict)` – Die Gebrauchsnachweise je Querschnittsanalyse, wie bei der Platte.
 - `balkensysteme: Dict[str, Balkensystem] = field(default_factory=dict)` – Die Balkensysteme, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis.
 - `warnungen: List[str] = field(default_factory=list)`
 - `NACHWEISFELDER = ('nachweise', 'querkraft', 'duktilitaet', 'fehlende', 'rissnormalkraf…` – Die Felder, in denen die Nachweise stehen -- die eine Stelle, an der ein neuer Nachweis eingetragen wird. Alle sind nach Kennung geschluesselt (`q1` oder `q1.x`) und alle tragen Nachweise mit `d_ausnutzung`. Ihre Reihenfolge ist die der Herleitung: in ihr rechnet ein Bauteil seine Nachweise ([[opencivil.projekt.aufbau#Bauteil.ziele|Bauteil.ziele]]).
@@ -301,8 +305,9 @@ Ein gezeichneter Querschnitt: das Bauteil und seine Nachweise.
 
 Biegung und Normalkraft immer -- ihre Eckwerte gehoeren dem Querschnitt.
 Querkraft und Torsion, sobald ein Lastfall sie hat oder die
-Laengszugkraft zaehlt. Duktilitaet und sproedes Versagen immer, still,
-wenn ausgeschaltet -- wie bei der Platte.
+Laengszugkraft zaehlt. Duktilitaet, sproedes Versagen und die Zwaengungen
+immer, still, wenn ausgeschaltet -- wie bei der Platte. Ebenso die
+Stahlspannungen, sobald es Lastfaelle gibt ([[opencivil.projekt.aufbau#_qa_spannungsnachweise|_qa_spannungsnachweise]]).
 
 ### _balkensystem
 
@@ -355,16 +360,28 @@ Die Stahlspannung, zweimal: aus der Rissbreite unter quasi-staendiger
 Einwirkung (bei jeder Anforderung) und gegen Fliessen unter haeufiger
 (nur bei erhoehter und hoher). Welche wann gilt, weiss die Grenze selbst.
 
+### _qa_spannungsnachweise
+
+```python
+def _qa_spannungsnachweise(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, aufbau: Aufbau, teil: Bauteil) -> None
+```
+
+Die Stahlspannungen des gezeichneten Querschnitts -- wie bei der Platte, je Grenze.
+
 ### _gebrauchsfaelle
 
 ```python
-def _gebrauchsfaelle(kombinationen: Sequence[KombinationEintrag], liste: Gebrauchsliste) -> Tuple[List[Gebrauchsfall], List[str]]
+def _gebrauchsfaelle(kombinationen: Sequence[Any], liste: Gebrauchsliste, fall: Callable[[str, Any, float], Any]) -> Tuple[List[Any], List[str]]
 ```
 
 Die Lastfaelle eines Stahlspannungsnachweises -- und welche laut sind.
 
 Einmal fuer die haeufigen, einmal fuer die quasi-staendigen; beide
 Listen werden gleich gebildet und unterscheiden sich nur im Anteil.
+`fall(name, eintrag, faktor)` macht aus einem Eintrag -- einer
+Kombination der Tragsicherheit oder einem eigenen Fall -- den Fall des
+Nachweises: bei der Platte einen [[opencivil.nachweis.spannungsbegrenzung#Gebrauchsfall|Gebrauchsfall]], beim
+gezeichneten Querschnitt einen [[opencivil.querschnitt.analyse#Lastfall|Lastfall]].
 
 Die eigens angegebenen, und zusaetzlich die Tragsicherheitsfaelle mit
 `liste.anteil` Prozent. Beides nebeneinander: der Anteil ist eine bequeme
@@ -448,6 +465,7 @@ Baufunktion von ihr bekannt sein muss. Eine neue Art kommt in
 - [[opencivil.nachweis.fehlende_bewehrung]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
+- [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.schiefe_biegung]]

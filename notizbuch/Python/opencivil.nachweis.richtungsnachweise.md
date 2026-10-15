@@ -1,5 +1,5 @@
 ---
-erzeugt: b03c6de231d5
+erzeugt: 195cf92f1a10
 art: modul
 tags: [modul]
 ---
@@ -26,7 +26,9 @@ steht ein Satz und kein Urteil, wie bei einer unbewehrten Lage der Platte.
 Das Rissmoment gehoert dem ungerissenen Bruttoquerschnitt, gerechnet mit
 `I_yz` fuer die unsymmetrische Biegung; `k_t` mit einem Drittel der Hoehe
 in Biegerichtung -- die Regel der Platte, uebertragen. Nach Vorgabe, nicht
-nachgeschlagen (`notizbuch/Notizen/TODO.md`).
+nachgeschlagen (`notizbuch/Notizen/TODO.md`). Die Zwaengung auf Biegung
+([[opencivil.nachweis.qa_gebrauch]]) haelt dasselbe Rissmoment gegen
+ihre Bewehrung: es steht darum hier einmal ([[opencivil.nachweis.richtungsnachweise#rissmoment|rissmoment]]).
 
 ## Inhalt
 
@@ -45,6 +47,73 @@ def bei_reiner_biegung(q: Querschnitt, M_y: float, M_z: float, einachsig: bool) 
 ```
 
 Der Bruchzustand bei N = 0 in dieser Richtung -- einachsig mit waagrechter Nulllinie.
+
+### Rissmoment
+
+```python
+@dataclass(frozen=True)
+class Rissmoment
+```
+
+Das Rissmoment des Bruttoquerschnitts in einer Richtung -- und woraus es entsteht.
+
+- `ecke: Punkt` – Der gezogenste Betonpunkt, in mm.
+- `stoff: Baustoff` – Sein Beton: er gibt `f_ctm`.
+- `W: float` – Das Widerstandsmoment zu diesem Punkt, m³.
+- `hoehe: float` – Die Ausdehnung des Betons in Biegerichtung, m -- fuer `k_t`.
+- `k_t: float`
+- `f_ct_eff: float`
+- `M_Riss: float` – in Nm.
+
+### rissbezuege
+
+```python
+def rissbezuege(analyse: Querschnittsanalyse) -> List[Eingabebezug]
+```
+
+Was das Rissmoment liest, ueber die Grundbezuege hinaus: die Traegheitsmomente.
+
+### rissmoment
+
+```python
+def rissmoment(analyse: Querschnittsanalyse, e: Eingaben, M_y: float, M_z: float) -> Rissmoment
+```
+
+Das Rissmoment in der Richtung `(M_y, M_z)` -- einem Moment von eins,
+wie in [[opencivil.nachweis.richtungsnachweise#Konstanten|RICHTUNGEN]]. Es reisst der gezogenste Betonpunkt, gerechnet
+mit `I_yz` fuer die unsymmetrische Biegung.
+
+### protokoll_spannung_ungerissen
+
+```python
+def protokoll_spannung_ungerissen(p: Protokoll) -> None
+```
+
+Wie der ungerissene Querschnitt Spannung traegt -- der Ansatz des Rissmoments.
+
+### protokoll_rissmoment
+
+```python
+def protokoll_rissmoment(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse, werte: Zwischenwerte, riss: Rissmoment, M_y: float, M_z: float, *, referenz: str) -> Wert
+```
+
+Die Herleitung von [[opencivil.nachweis.richtungsnachweise#rissmoment|rissmoment]] -- zurueck kommt `M_Riss`.
+
+### _hoehe
+
+```python
+def _hoehe(analyse: Querschnittsanalyse, um_y: bool) -> float
+```
+
+Die Ausdehnung des Betons in Biegerichtung, in m: z bei M_y, y bei M_z.
+
+### _w_vorlage
+
+```python
+def _w_vorlage(M_y: float, M_z: float) -> str
+```
+
+`W = 1/σ` bei einem Moment von eins -- je Richtung ausgeschrieben.
 
 ### DuktilitaetQA
 
@@ -80,23 +149,6 @@ class SproedesVersagenQA(Nachweis)
 def pruefe(self, e: Eingaben, p: Protokoll)
 ```
 
-#### SproedesVersagenQA._hoehe
-
-```python
-def _hoehe(self, um_y: bool) -> float
-```
-
-Die Ausdehnung des Betons in Biegerichtung, in m: z bei M_y, y bei M_z.
-
-#### SproedesVersagenQA._w_vorlage
-
-```python
-@staticmethod
-def _w_vorlage(M_y: float, M_z: float) -> str
-```
-
-`W = 1/σ` bei einem Moment von eins -- je Richtung ausgeschrieben.
-
 
 ## Konstanten
 
@@ -109,13 +161,16 @@ def _w_vorlage(M_y: float, M_z: float) -> str
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.material.basis]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.interaktion]]
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.projekt.aufbau]]
 
 ## Formeln aus diesem Modul
@@ -123,6 +178,6 @@ def _w_vorlage(M_y: float, M_z: float) -> str
 - [[Bedingung der Duktilität]] · `DuktilitaetQA.pruefe`
 - [[Bedingung gegen sprödes Versagen]] · `SproedesVersagenQA.pruefe`
 - [[Bezogene Druckzonenhöhe bei reiner Biegung]] · `DuktilitaetQA.pruefe`
-- [[Rissmoment des ungerissenen Querschnitts]] · `SproedesVersagenQA.pruefe`
-- [[Spannung im ungerissenen Querschnitt]] · `SproedesVersagenQA.pruefe`
-- [[Widerstandsmoment zum gezogensten Betonpunkt]] · `SproedesVersagenQA.pruefe`
+- [[Rissmoment des ungerissenen Querschnitts]] · `protokoll_rissmoment`
+- [[Spannung im ungerissenen Querschnitt]] · `protokoll_spannung_ungerissen`
+- [[Widerstandsmoment zum gezogensten Betonpunkt]] · `protokoll_rissmoment`

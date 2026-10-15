@@ -17,26 +17,31 @@ ANNAHMEN:
 Das Rissmoment gehoert dem ungerissenen Bruttoquerschnitt, gerechnet mit
 ``I_yz`` fuer die unsymmetrische Biegung; ``k_t`` mit einem Drittel der Hoehe
 in Biegerichtung -- die Regel der Platte, uebertragen. Nach Vorgabe, nicht
-nachgeschlagen (``notizbuch/Notizen/TODO.md``).
+nachgeschlagen (``notizbuch/Notizen/TODO.md``). Die Zwaengung auf Biegung
+(:mod:`opencivil.nachweis.qa_gebrauch`) haelt dasselbe Rissmoment gegen
+ihre Bewehrung: es steht darum hier einmal (:func:`rissmoment`).
 """
 
 from __future__ import annotations
 
 import math
-from typing import Dict, List, Optional, Sequence, Tuple
+from dataclasses import dataclass
+from typing import Dict, List, Tuple
 
 from opencivil.core.berechnung import (
     Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
-from opencivil.core.einheiten import EINHEITSLOS, MIO_MM3, MIO_MM4, MM, Groesse
-from opencivil.core.latex import Mathe, als_text, vergleich
+from opencivil.core.einheiten import EINHEITSLOS, MIO_MM3, MIO_MM4, Groesse
+from opencivil.core.latex import als_text, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.wert import WertDef, kennung_aus
+from opencivil.core.wert import Wert, WertDef, kennung_aus
+from opencivil.material.basis import Baustoff
 from opencivil.nachweis.duktilitaet import DUKTILITAETSBEDINGUNG
 from opencivil.nachweis.sproedes_versagen import (
     MOMENTENTEILER, beiwert_dicke, protokoll_zugfestigkeit,
 )
 from opencivil.querschnitt.analyse import Querschnittsanalyse
+from opencivil.querschnitt.geometrie import Punkt
 from opencivil.querschnitt.interaktion import Bruchpunkt, Querschnitt
 
 #: Die Richtungen: Name, und das Moment, das so zieht (M_y, M_z).
@@ -59,6 +64,120 @@ def bei_reiner_biegung(q: Querschnitt, M_y: float, M_z: float,
     if einachsig:
         return q.bei_normalkraft(-math.pi / 2.0 if M_y > 0 else math.pi / 2.0, 0.0)
     return q.in_richtung(0.0, M_y, M_z)
+
+
+# ===========================================================================
+# Das Rissmoment je Richtung
+# ===========================================================================
+
+
+@dataclass(frozen=True)
+class Rissmoment:
+    """Das Rissmoment des Bruttoquerschnitts in einer Richtung -- und woraus es entsteht."""
+
+    ecke: Punkt
+    """Der gezogenste Betonpunkt, in mm."""
+
+    stoff: Baustoff
+    """Sein Beton: er gibt ``f_ctm``."""
+
+    W: float
+    """Das Widerstandsmoment zu diesem Punkt, m³."""
+
+    hoehe: float
+    """Die Ausdehnung des Betons in Biegerichtung, m -- fuer ``k_t``."""
+
+    k_t: float
+    f_ct_eff: float
+    M_Riss: float
+    """in Nm."""
+
+
+def rissbezuege(analyse: Querschnittsanalyse) -> List[Eingabebezug]:
+    """Was das Rissmoment liest, ueber die Grundbezuege hinaus: die Traegheitsmomente."""
+    return [Eingabebezug(k, analyse.id_von(k)) for k in ("I_y", "I_z", "I_yz")]
+
+
+def rissmoment(analyse: Querschnittsanalyse, e: Eingaben, M_y: float,
+               M_z: float) -> Rissmoment:
+    """
+    Das Rissmoment in der Richtung ``(M_y, M_z)`` -- einem Moment von eins,
+    wie in :data:`RICHTUNGEN`. Es reisst der gezogenste Betonpunkt, gerechnet
+    mit ``I_yz`` fuer die unsymmetrische Biegung.
+    """
+    y_S, z_S = e.g("y_S").si, e.g("z_S").si
+    I_y, I_z, I_yz = e.g("I_y").si, e.g("I_z").si, e.g("I_yz").si
+    nenner = I_y * I_z - I_yz * I_yz
+
+    # Die Spannung bei einem Moment von eins in dieser Richtung.
+    def einheitsspannung(p_mm) -> float:
+        y_, z_ = p_mm[0] * 1e-3 - y_S, p_mm[1] * 1e-3 - z_S
+        return -(M_y * (I_z * z_ - I_yz * y_) + M_z * (I_y * y_ - I_yz * z_)) / nenner
+    ecke, stoff = max(analyse.beton_ecken, key=lambda es: einheitsspannung(es[0]))
+    W = 1.0 / einheitsspannung(ecke)
+    hoehe = _hoehe(analyse, M_y != 0.0)
+    k_t = beiwert_dicke(hoehe / MOMENTENTEILER)
+    f_ct_eff = k_t * abs(analyse.kennwert(e, stoff, "f_ctm"))
+    return Rissmoment(ecke=ecke, stoff=stoff, W=W, hoehe=hoehe, k_t=k_t,
+                      f_ct_eff=f_ct_eff, M_Riss=f_ct_eff * W)
+
+
+def protokoll_spannung_ungerissen(p: Protokoll) -> None:
+    """Wie der ungerissene Querschnitt Spannung traegt -- der Ansatz des Rissmoments."""
+    p.ansatz(r"\sigma(y, z) = -\frac{M_y\,(I_z z' - I_{yz} y') + "
+             r"M_z\,(I_y y' - I_{yz} z')}{I_y I_z - I_{yz}^2}"
+             r"\qquad y' = y - y_S,\ z' = z - z_S",
+             titel="Spannung im ungerissenen Querschnitt")
+
+
+def protokoll_rissmoment(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse,
+                         werte: Zwischenwerte, riss: Rissmoment, M_y: float, M_z: float,
+                         *, referenz: str) -> Wert:
+    """Die Herleitung von :func:`rissmoment` -- zurueck kommt ``M_Riss``."""
+    y_S, z_S = e.g("y_S").si, e.g("z_S").si
+    ecke = riss.ecke
+    p.text(f"Gezogenster Betonpunkt: y = {ecke[0]:g} mm, z = {ecke[1]:g} mm "
+           f"({riss.stoff.name}).")
+    h = werte.laenge("h", "h", riss.hoehe)
+    f_ct_eff = protokoll_zugfestigkeit(
+        p, werte, k_t=riss.k_t, f_ct_eff=riss.f_ct_eff, h=h,
+        f_ctm=e[analyse._name(riss.stoff, "f_ctm")], teiler=MOMENTENTEILER,
+        referenz=referenz, titel="Beiwert für die Höhe in Biegerichtung")
+    W = werte.wert("W", "W", Groesse.aus_si(riss.W, MIO_MM3), 2)
+    p.formel(W, _w_vorlage(M_y, M_z), {
+        "Iy": werte.wert("Iy", "I_y", Groesse.aus_si(e.g("I_y").si, MIO_MM4), 1),
+        "Iz": werte.wert("Iz", "I_z", Groesse.aus_si(e.g("I_z").si, MIO_MM4), 1),
+        "Iyz": werte.wert("Iyz", "I_{yz}", Groesse.aus_si(e.g("I_yz").si, MIO_MM4), 1),
+        "y": werte.laenge("y", "y'", ecke[0] * 1e-3 - y_S),
+        "z": werte.laenge("z", "z'", ecke[1] * 1e-3 - z_S),
+    }, titel="Widerstandsmoment zum gezogensten Betonpunkt")
+    M_Riss = werte.moment("M_Riss", "M_{Riss}", riss.M_Riss)
+    p.formel(M_Riss, r"@f \cdot @W", {"f": f_ct_eff, "W": W},
+             titel="Rissmoment des ungerissenen Querschnitts")
+    return M_Riss
+
+
+def _hoehe(analyse: Querschnittsanalyse, um_y: bool) -> float:
+    """Die Ausdehnung des Betons in Biegerichtung, in m: z bei M_y, y bei M_z."""
+    werte = [p[1] if um_y else p[0] for p, _ in analyse.beton_ecken]
+    return (max(werte) - min(werte)) * 1e-3
+
+
+def _w_vorlage(M_y: float, M_z: float) -> str:
+    """``W = 1/σ`` bei einem Moment von eins -- je Richtung ausgeschrieben."""
+    zaehler = r"@Iy \cdot @Iz - @Iyz^{2}"
+    nenner = {
+        (1.0, 0.0): r"@Iyz \cdot @y - @Iz \cdot @z",
+        (-1.0, 0.0): r"@Iz \cdot @z - @Iyz \cdot @y",
+        (0.0, 1.0): r"@Iyz \cdot @z - @Iy \cdot @y",
+        (0.0, -1.0): r"@Iy \cdot @y - @Iyz \cdot @z",
+    }[(M_y, M_z)]
+    return rf"\frac{{{zaehler}}}{{{nenner}}}"
+
+
+# ===========================================================================
+# Die Nachweise
+# ===========================================================================
 
 
 def _defs(basis: str, symbol: str, beschreibung: str, referenz: str,
@@ -145,17 +264,13 @@ class SproedesVersagenQA(Nachweis):
         basis = f"{analyse.id}.nachweis.sproede"
         self.d_ausnutzung = _defs(basis, "Riss", "Erfüllungsgrad sprödes Versagen",
                                   "SIA 262:2025, 4.4.1.3", einachsig)
-        bezuege = list(analyse.grundbezuege()) + [
-            Eingabebezug(k, analyse.id_von(k)) for k in ("I_y", "I_z", "I_yz")]
         super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()),
-                         bezuege=bezuege, titel=f"Sprödes Versagen – {analyse.name}",
+                         bezuege=analyse.grundbezuege() + rissbezuege(analyse),
+                         titel=f"Sprödes Versagen – {analyse.name}",
                          referenz="SIA 262:2025, 4.4.1.3", abschnitt=analyse.abschnitt)
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         q, _ = self.analyse.interaktion(e)
-        y_S, z_S = e.g("y_S").si, e.g("z_S").si
-        I_y, I_z, I_yz = e.g("I_y").si, e.g("I_z").si, e.g("I_yz").si
-        nenner = I_y * I_z - I_yz * I_yz
         p.erklaerung(
             "Ein zu schwach bewehrter Querschnitt reisst und versagt im selben "
             "Augenblick. Darum muss der bewehrte Querschnitt mehr tragen als der "
@@ -163,15 +278,11 @@ class SproedesVersagenQA(Nachweis):
             "Rissmoment. Das Rissmoment gehört dem ungerissenen "
             "Bruttoquerschnitt; bei unsymmetrischer Form mit dem "
             "Deviationsmoment.")
-        p.ansatz(r"\sigma(y, z) = -\frac{M_y\,(I_z z' - I_{yz} y') + "
-                 r"M_z\,(I_y y' - I_{yz} z')}{I_y I_z - I_{yz}^2}"
-                 r"\qquad y' = y - y_S,\ z' = z - z_S",
-                 titel="Spannung im ungerissenen Querschnitt")
+        protokoll_spannung_ungerissen(p)
         p.ansatz(r"M_{Rd}(N = 0) \ge M_{Riss} = f_{ct,eff} \cdot W",
                  titel="Sprödes Versagen", referenz="SIA 262:2025, 4.4.1.3",
                  name="Bedingung gegen sprödes Versagen")
 
-        ecken = self.analyse.beton_ecken
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
         for name, M_y, M_z in richtungen(self.einachsig):
@@ -185,42 +296,13 @@ class SproedesVersagenQA(Nachweis):
                 ergebnis[d_grad.id] = Groesse(math.inf, EINHEITSLOS)
                 continue
 
-            # Der gezogenste Betonpunkt bei einem Moment von eins in dieser Richtung.
-            def einheitsspannung(p_mm) -> float:
-                y_, z_ = p_mm[0] * 1e-3 - y_S, p_mm[1] * 1e-3 - z_S
-                return -(M_y * (I_z * z_ - I_yz * y_) + M_z * (I_y * y_ - I_yz * z_)) / nenner
-            ecke, stoff = max(ecken, key=lambda es: einheitsspannung(es[0]))
-            sigma = einheitsspannung(ecke)
-            W = 1.0 / sigma
-            hoehe = self._hoehe(M_y != 0.0)
-            k_t = beiwert_dicke(hoehe / MOMENTENTEILER)
-            f_ctm_si = abs(self.analyse.kennwert(e, stoff, "f_ctm"))
-            f_ct_eff_si = k_t * f_ctm_si
-            M_Riss_si = f_ct_eff_si * W
+            riss = rissmoment(self.analyse, e, M_y, M_z)
+            M_Riss = protokoll_rissmoment(p, e, self.analyse, werte, riss, M_y, M_z,
+                                          referenz="SIA 262:2025, 4.4.1.3")
             M_Rd_si = abs(punkt.M_y) if self.einachsig else punkt.moment
-
-            p.text(f"Gezogenster Betonpunkt: y = {ecke[0]:g} mm, z = {ecke[1]:g} mm "
-                   f"({stoff.name}).")
-            h = werte.laenge("h", "h", hoehe)
-            f_ct_eff = protokoll_zugfestigkeit(
-                p, werte, k_t=k_t, f_ct_eff=f_ct_eff_si, h=h,
-                f_ctm=e[self.analyse._name(stoff, "f_ctm")], teiler=MOMENTENTEILER,
-                referenz="SIA 262:2025, 4.4.1.3",
-                titel="Beiwert für die Höhe in Biegerichtung")
-            W_wert = werte.wert("W", "W", Groesse.aus_si(W, MIO_MM3), 2)
-            p.formel(W_wert, self._w_vorlage(M_y, M_z), {
-                "Iy": werte.wert("Iy", "I_y", Groesse.aus_si(I_y, MIO_MM4), 1),
-                "Iz": werte.wert("Iz", "I_z", Groesse.aus_si(I_z, MIO_MM4), 1),
-                "Iyz": werte.wert("Iyz", "I_{yz}", Groesse.aus_si(I_yz, MIO_MM4), 1),
-                "y": werte.laenge("y", "y'", ecke[0] * 1e-3 - y_S),
-                "z": werte.laenge("z", "z'", ecke[1] * 1e-3 - z_S),
-            }, titel="Widerstandsmoment zum gezogensten Betonpunkt")
-            M_Riss = werte.moment("M_Riss", "M_{Riss}", M_Riss_si)
-            p.formel(M_Riss, r"@f \cdot @W", {"f": f_ct_eff, "W": W_wert},
-                     titel="Rissmoment des ungerissenen Querschnitts")
             M_Rd = werte.moment("M_Rd", "M_{Rd}", M_Rd_si)
             p.wert(M_Rd, titel="Biegewiderstand bei N = 0 in dieser Richtung")
-            grad = M_Rd_si / M_Riss_si
+            grad = M_Rd_si / riss.M_Riss
             erfuellt = grad >= 1.0
             grad_formel(p, d_grad, grad, M_Rd, M_Riss, erfuellt)
             ergebnis[d_grad.id] = Groesse(grad, EINHEITSLOS)
@@ -231,20 +313,3 @@ class SproedesVersagenQA(Nachweis):
                 einwirkung=M_Riss, widerstand=M_Rd))
         self.protokoll_massgebend(p, urteile)
         return Ausfuehrung(ergebnis, self.teilurteile(urteile))
-
-    def _hoehe(self, um_y: bool) -> float:
-        """Die Ausdehnung des Betons in Biegerichtung, in m: z bei M_y, y bei M_z."""
-        werte = [p[1] if um_y else p[0] for p, _ in self.analyse.beton_ecken]
-        return (max(werte) - min(werte)) * 1e-3
-
-    @staticmethod
-    def _w_vorlage(M_y: float, M_z: float) -> str:
-        """``W = 1/σ`` bei einem Moment von eins -- je Richtung ausgeschrieben."""
-        zaehler = r"@Iy \cdot @Iz - @Iyz^{2}"
-        nenner = {
-            (1.0, 0.0): r"@Iyz \cdot @y - @Iz \cdot @z",
-            (-1.0, 0.0): r"@Iz \cdot @z - @Iyz \cdot @y",
-            (0.0, 1.0): r"@Iyz \cdot @z - @Iy \cdot @y",
-            (0.0, -1.0): r"@Iy \cdot @y - @Iyz \cdot @z",
-        }[(M_y, M_z)]
-        return rf"\frac{{{zaehler}}}{{{nenner}}}"

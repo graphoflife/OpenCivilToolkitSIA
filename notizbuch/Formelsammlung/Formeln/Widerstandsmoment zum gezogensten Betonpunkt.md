@@ -1,5 +1,5 @@
 ---
-erzeugt: ee68c3adca60
+erzeugt: 51f56b0d32d1
 art: formel
 tags: [formel]
 ---
@@ -88,11 +88,12 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.richtungsnachweise#SproedesVersagenQA.pruefe|SproedesVersagenQA.pruefe]]
+- [[opencivil.nachweis.richtungsnachweise#protokoll_rissmoment|protokoll_rissmoment]]
 
 ## Themen
 
 - [[Sprödes Versagen je Richtung]]
+- [[Zwängung auf Biegung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

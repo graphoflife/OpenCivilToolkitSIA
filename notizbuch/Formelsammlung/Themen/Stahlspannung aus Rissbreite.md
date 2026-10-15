@@ -1,10 +1,10 @@
 ---
-erzeugt: 1fabe22efa9c
+erzeugt: 5213b9a1e472
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 9 Formeln, in der Folge, in der gerechnet wird.
+> 12 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -34,6 +34,12 @@ Mit der Handrechnung rechnet der Querschnitt wie die Resistenzlinie aus Handrech
 
 Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebildet; der Stahl kommt Lage für Lage dazu. Wie in der Handrechnung zählt der Beton auch dort, wo der Stahl liegt.
 
+Unter quasi-ständiger Einwirkung begrenzt die Stahlspannung die Rissbreite – dieselbe Grenze wie bei der Zwängung, nur dass die Spannung hier aus den Lasten kommt und nicht aus einer aufgezwungenen Verformung. Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug auf, die Bewehrung wirkt auf Zug und auf Druck. Jeder gezogene Stab hält gegen seine Grenze; massgebend ist der mit dem kleinsten Erfüllungsgrad.
+
+Drittens die Grenze: dieselbe wie bei der Zwängung, mit f\_yk und bei erhöhter und hoher Anforderung zusätzlich begrenzt durch die Rissbreite. Jeder gezogene Stab hält gegen seine eigene Grenze, mit seinem Durchmesser und dem f\_ctm des Betons, in dem er liegt; massgebend ist der Stab mit dem kleinsten Erfüllungsgrad.
+
+Einachsig bleibt die Nulllinie waagrecht, und M\_z zählt nicht – wie in der Tragsicherheit.
+
 ## Formeln
 
 1. [[Wirksamer Elastizitätsmodul]]
@@ -45,6 +51,9 @@ Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebil
 7. [[Zulässige Dehnung]]
 8. [[Spannungsblock des Betons]]
 9. [[Betonstahl nur auf Zug]]
+10. [[Fiktiver Durchmesser einer verschmierten Linie]]
+11. [[Beiwert der Parabel, mit dem wirksamen Modul]]
+12. [[Parabel-Rechteck-Beziehung des Betons]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
