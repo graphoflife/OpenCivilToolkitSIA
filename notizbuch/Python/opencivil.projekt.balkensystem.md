@@ -1,5 +1,5 @@
 ---
-erzeugt: 1fbeb3d1e706
+erzeugt: f22bf7331e59
 art: modul
 tags: [modul]
 ---
@@ -327,7 +327,9 @@ def aus_dict(cls, d: Mapping[str, Any]) -> 'BalkensystemEintrag'
 def pruefen(self) -> None
 ```
 
-Was sich an der Beschreibung pruefen laesst: eindeutige Namen.
+Nichts, was das ganze Projekt aufhielte: was an einem System nicht
+stimmt -- auch zwei Faelle gleichen Namens --, steht in seinen
+Meldungen ([[opencivil.projekt.balkensystem#BalkensystemEintrag.modell|modell]]), und die anderen Bauteile rechnen weiter.
 
 #### BalkensystemEintrag.materialien
 

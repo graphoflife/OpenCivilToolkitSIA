@@ -3,6 +3,7 @@ Die Beschreibung eines Balkensystems: lesen, ablegen, zeichnen ohne
 Oberfläche -- und was Teilen und Umkehren mit den Lasten einer Linie tun.
 """
 
+import dataclasses
 import json
 import math
 import unittest
@@ -70,18 +71,51 @@ class TestBeschreibung(unittest.TestCase):
         self.assertEqual(len(dienst.pruefen({"projekt": roh})["projekt"]["balkensysteme"]), 1)
 
 
-class TestPruefen(unittest.TestCase):
-    def test_gleiche_namen(self):
-        p = rahmen()
-        p.balkensysteme[0].lastfall("Wind")
-        with self.assertRaises(ProjektFehler):
-            p.pruefen()
+class TestGleicheFallnamen(unittest.TestCase):
+    """
+    Gleiche Fallnamen sind ein Fehler des Systems, nicht des Projekts: das
+    System zeigt die Meldung und rechnet nicht, alles andere rechnet weiter,
+    und die Datei laesst sich oeffnen. Bis 2026-10-15 hielten sie das ganze
+    Projekt auf, auch jede Platte.
+    """
 
-    def test_lastfall_und_kombination_heissen_gleich(self):
-        p = rahmen()
-        p.balkensysteme[0].kombination("Wind")
-        with self.assertRaisesRegex(ProjektFehler, "Lastfall und eine Kombination"):
-            p.pruefen()
+    def gerechnet(self, aendern) -> dict:
+        p = Projekt.beispiel()
+        aendern(p.balkensysteme[0])
+        p.pruefen()                                     # oeffnen geht
+        antwort = dienst.bearbeite("rechnen", {"projekt": p.als_dict()})
+        self.assertEqual(antwort.status, 200)
+        return antwort.daten
+
+    def meldungen(self, daten) -> list:
+        system = daten["balkensysteme"]["r1"]
+        self.assertFalse(system["gueltig"])
+        self.assertEqual(system["faelle"], [])
+        return [m["text"] for m in system["meldungen"] if m["fehler"]]
+
+    def test_lastfall_und_kombination(self):
+        daten = self.gerechnet(lambda s: setattr(s.kombinationen[0], "name", "Wind"))
+        self.assertTrue(any("«Wind» heisst ein Lastfall und eine Kombination" in t
+                            for t in self.meldungen(daten)))
+        # Die Platte und die Analyse rechnen weiter.
+        self.assertTrue({u["raum"].split(".")[0] for u in daten["urteile"]}
+                        >= {"querschnitt", "querschnittsanalyse"})
+
+    def test_zwei_lastfaelle(self):
+        daten = self.gerechnet(
+            lambda s: setattr(s.lastfaelle[1], "name", s.lastfaelle[0].name))
+        self.assertTrue(any("Mehrere Lastfälle heissen «Eigengewicht»" in t
+                            for t in self.meldungen(daten)))
+
+    def test_zwei_kombinationen(self):
+        def zweite(s):
+            s.kombinationen.append(dataclasses.replace(s.kombinationen[0], kennung="LK2"))
+        daten = self.gerechnet(zweite)
+        self.assertTrue(any("Mehrere Kombinationen heissen «Tragsicherheit»" in t
+                            for t in self.meldungen(daten)))
+
+
+class TestPruefen(unittest.TestCase):
 
     def test_unbekannte_wahl(self):
         for roh in ({"art": "flaechenlast"}, {"richtung": "schraeg"}):

@@ -45,7 +45,7 @@ from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 from opencivil.core.einheiten import (
     KN, KN_PRO_M, KN_PRO_M2, KNM, KNM_PRO_M, KNM_PRO_RAD, Groesse,
 )
-from opencivil.projekt.eintraege import Beschreibung, eindeutig
+from opencivil.projekt.eintraege import Beschreibung
 from opencivil.projekt.lesen import ProjektFehler, pflichtfeld, zahl
 from opencivil.projekt.netz import Netz, naechste_kennung
 from opencivil.stabwerk import querschnitte as qs
@@ -397,13 +397,11 @@ class BalkensystemEintrag(Beschreibung):
         )
 
     def pruefen(self) -> None:
-        """Was sich an der Beschreibung pruefen laesst: eindeutige Namen."""
-        eindeutig(self.lastfaelle, self.name, "Lastfall", bauteil="Balkensystem")
-        eindeutig(self.kombinationen, self.name, "Kombination", bauteil="Balkensystem")
-        doppelt = {lf.name for lf in self.lastfaelle} & {k.name for k in self.kombinationen}
-        if doppelt:
-            raise ProjektFehler(f"Balkensystem '{self.name}': «{sorted(doppelt)[0]}» heisst "
-                                f"ein Lastfall und eine Kombination.")
+        """
+        Nichts, was das ganze Projekt aufhielte: was an einem System nicht
+        stimmt -- auch zwei Faelle gleichen Namens --, steht in seinen
+        Meldungen (:meth:`modell`), und die anderen Bauteile rechnen weiter.
+        """
 
     # -- Zugriff -------------------------------------------------------------
 
@@ -461,6 +459,19 @@ class BalkensystemEintrag(Beschreibung):
 
         def melden(text: str, *elemente: str, fehler: bool = True) -> None:
             meldungen.append(Meldung(text, tuple(elemente), fehler))
+
+        # Die Faelle werden an ihrem Namen erkannt; zwei gleiche waeren nicht zu
+        # unterscheiden. Ein Fehler dieses Systems -- bis 2026-10-15 hielt er
+        # das ganze Projekt auf, auch jede Platte.
+        lastfaelle = [lf.name for lf in self.lastfaelle]
+        kombinationen = [k.name for k in self.kombinationen]
+        for was, namen in (("Lastfälle", lastfaelle), ("Kombinationen", kombinationen)):
+            for name in sorted({n for n in namen if namen.count(n) > 1}):
+                melden(f"Mehrere {was} heissen «{name}» – sie wären nicht zu "
+                       f"unterscheiden. Gerechnet wird erst mit verschiedenen Namen.")
+        for name in sorted(set(lastfaelle) & set(kombinationen)):
+            melden(f"«{name}» heisst ein Lastfall und eine Kombination – die beiden wären "
+                   f"nicht zu unterscheiden. Gerechnet wird erst mit verschiedenen Namen.")
 
         def halt(art: str, k: float, feld: str, wo: str) -> Optional[float]:
             if art == "frei":
