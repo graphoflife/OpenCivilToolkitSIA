@@ -1,5 +1,5 @@
 ---
-erzeugt: a239e538ea93
+erzeugt: a746e16d32b0
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -235,8 +235,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Flächenträgheitsmoment eines Rechtecks]] · [[opencivil.spannungsanalyse#Loeserpaar.herleitung_bezug|Loeserpaar.herleitung_bezug]], [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
 - [[Flächenträgheitsmoment eines Trapezes]] · [[opencivil.stabwerk.querschnitte]]
-- [[Gewollte Ausmitte]] · [[opencivil.nachweis.knicken#Knicken|Knicken._protokoll_fall]]
-- [[Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein]] · [[opencivil.nachweis.knicken#Knicken|Knicken._protokoll_ansatz]]
+- [[Gewollte Ausmitte]] · [[opencivil.nachweis.knicken#Knickverfahren|Knickverfahren._protokoll_fall]]
+- [[Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein]] · [[opencivil.nachweis.knicken#Knickverfahren._protokoll_verfahren|Knickverfahren._protokoll_verfahren]]
 - [[Gleichmässiger Druck, ohne Bewehrung]] · [[opencivil.nachweis.handrechnung#Handrechnung._groesste_druckkraft|Handrechnung._groesste_druckkraft]]
 - [[Gleichungssystem der Steifigkeitsmethode]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Grenzdehnungen am Ende der Linie]] · [[opencivil.spannungsanalyse#herleitung|herleitung]]

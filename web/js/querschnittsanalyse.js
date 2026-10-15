@@ -26,8 +26,8 @@ import {
 } from './kapitel.js';
 import { span } from './mathe.js';
 import {
-  analyseInhalt, fliessenGefordert, haeufigInhalt, mitKopf, quasistaendigInhalt,
-  zwangInhalt,
+  analyseInhalt, fliessenGefordert, haeufigInhalt, knickInhalt, mitKopf,
+  quasistaendigInhalt, zwangInhalt,
 } from './nachweise.js';
 import { uebersicht } from './qa_uebersicht.js';
 import { zeichenbereich } from './qa_zeichnung.js';
@@ -59,6 +59,16 @@ const HILFE = {
       ['Werte', 'M_Rd nach Werkstoffwahl, M_Riss mit f_ct,eff = k_t·f_ctm'],
     ],
     formel: 'M_Rd(N = 0) ≥ M_Riss = f_ct,eff · W',
+  },
+  knicken: {
+    zeilen: [
+      ['Weg', 'verformtes System: e_0d + e_1d + e_2d, iteriert über die Krümmung – je Fall zur gewählten Zugseite'],
+      ['N_Rd', 'grösste Druckkraft mit Gleichgewichtslage'],
+      ['Verformung', 'Rechenwahl für e_2d; Vorgabe präzise, Bemessung'],
+      ['Widerstand', 'Rechenwahl für den Bruchzustand bei N; Vorgabe 0.85·x, Bemessung'],
+      ['d', 'vom gedrückten Rand bis zum entferntesten Stab in Zugrichtung'],
+    ],
+    formel: 'α_eff = N_Rd / |N_Ed|',
   },
   zwang: {
     zeilen: [
@@ -494,6 +504,16 @@ const NACHWEISE = [
     },
   },
   {
+    schluessel: 'knicken',
+    name: 'Knicken', titel: 'Knicken',
+    bezug: () => 'N in kN · M in kNm · l in m',
+    inhalt: (a) => knickInhalt(a, ORT),
+    stand: (a) => {
+      const n = eingeschaltet(a.knickfaelle);
+      return { an: n > 0, text: n ? anzahl(n, 'Fall', 'Fälle') : 'kein Fall' };
+    },
+  },
+  {
     schluessel: 'duktilitaet',
     name: 'Duktilität', titel: 'Duktilitätsnachweis',
     inhalt: duktilitaetInhalt,
@@ -540,22 +560,28 @@ function zugseite(wert) {
 }
 
 /**
- * Wo die Analysen eines gezeichneten Querschnitts stehen (vgl. `PLATTE` in
+ * Die Wahl der Zugseite. In einer schmalen Spalte nur die Seite -- «Zug»
+ * steht dann darüber, «Zug rechts» passte nicht hinein --, sonst ganz.
+ */
+function zugseitenWahl(gewaehlt, setzen, titel, { schmal = false } = {}) {
+  return auswahl({
+    werte: (zustand.katalog?.querschnittsanalyse?.zugseiten || [])
+      .map((z) => ({ wert: z.wert, beschriftung: schmal ? z.wert : z.beschriftung })),
+    gewaehlt, titel, beiAenderung: setzen,
+  });
+}
+
+/**
+ * Wo die Kapitel eines gezeichneten Querschnitts stehen (vgl. `PLATTE` in
  * nachweise.js): die Richtung ist die Zugseite, die Seite, die ein positives
  * Moment zieht. «oben» heisst dann der Rand gegenüber.
  */
 const ORT = {
   liste: 'querschnittsanalysen',
   vorlage: 'qa_analyse',
-  // «Zug» steht darüber, in der Auswahl nur die Seite: «Zug rechts» passt
-  // nicht in die Spalte.
-  richtung: (k, setzen) => mitKopf('Zug', auswahl({
-    werte: (zustand.katalog?.querschnittsanalyse?.zugseiten || [])
-      .map((z) => ({ wert: z.wert, beschriftung: z.wert })),
-    gewaehlt: k.richtung,
-    titel: 'Zugseite: die Seite, die ein positives Moment zieht',
-    beiAenderung: setzen,
-  })),
+  richtung: (k, setzen) => mitKopf('Zug', zugseitenWahl(
+    k.richtung, setzen, 'Zugseite: die Seite, die ein positives Moment zieht',
+    { schmal: true })),
   raender: (k) => zugseite(k.richtung)?.raender || ['oben', 'unten'],
   // Die Zwängung: auf Normalkraft am ganzen Querschnitt, auf Biegung je
   // Richtung -- das steht hinter den Zeilen statt einer Tragrichtung davor.
@@ -564,6 +590,20 @@ const ORT = {
     hinweise: { zwaengung: 'ganzer Querschnitt', zwaengung_biegung: richtungstext(a) },
     phiTitel: 'Kriechzahl φ der Zwängung auf Biegung: E_c,eff = E_cm / (1 + φ)',
   }),
+  // Das Knicken je Fall zu seiner Zugseite -- sie steht neben dem Namen.
+  knick: {
+    vorlage: 'qa_knickfall',
+    kopf: ['N_Ed [kN]', 'M_Ed,1 [kNm]', 'l [m]', 'l_cr [m]'],
+    titel: {
+      N_Ed: 'Druckkraft in kN – negativ',
+      M_Ed_1: 'Moment 1. Ordnung in kNm – es zieht die gewählte Seite',
+      laenge: 'Systemlänge in m – geht in die Schiefstellung ein',
+      knicklaenge: 'Knicklänge in m',
+    },
+    richtung: (k, setzen) => zugseitenWahl(
+      k.richtung, setzen, 'Zugseite: die Seite, zu der sich der Stab biegt'),
+    leer: 'Kein Knicknachweis.',
+  },
   // Die Lastfälle unter Gebrauchslast: wie die der Tragsicherheit, ohne
   // Querkraft und Torsion.
   gebrauch: {

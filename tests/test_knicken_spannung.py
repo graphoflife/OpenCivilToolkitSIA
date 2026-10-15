@@ -564,10 +564,9 @@ class TestKnicken(unittest.TestCase):
     def test_die_grenzkraft_traegt_und_ein_bisschen_mehr_nicht(self):
         """Die Probe auf die Halbierung: bei N_Rd steht er, knapp darüber nicht."""
         nachweis, erg, befund = self.aufbau.knicken["q1"], self.stabil, self.befund
-        self.assertTrue(nachweis._gleichgewicht(befund.loeser, befund.linie, erg.N_Rd * 0.999,
-                                                erg, 4.0).traegt)
-        self.assertFalse(nachweis._gleichgewicht(befund.loeser, befund.linie, erg.N_Rd * 1.02,
-                                                 erg, 4.0).traegt)
+        stab = nachweis.stab(befund.loeser, befund.linie)
+        self.assertTrue(nachweis._gleichgewicht(stab, erg.N_Rd * 0.999, erg, 4.0).traegt)
+        self.assertFalse(nachweis._gleichgewicht(stab, erg.N_Rd * 1.02, erg, 4.0).traegt)
 
     def test_die_iteration_steht_schritt_fuer_schritt_da(self):
         """

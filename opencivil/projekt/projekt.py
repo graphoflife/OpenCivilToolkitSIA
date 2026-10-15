@@ -551,8 +551,8 @@ class Projekt(Beschreibung):
         # Bewehrung in allen drei Arten, vier Schubwänden als Zelle, Torsion,
         # schiefer Biegung und Längszugkraft, gerechnet mit dem
         # Spannungsblock, dazu jeder Gebrauchsnachweis bei erhöhter
-        # Anforderung; eine Stütze, einachsig, mit charakteristischen Werten
-        # und normaler Anforderung -- so steht jede Wahl einmal da.
+        # Anforderung; eine Stütze, einachsig, mit charakteristischen Werten,
+        # normaler Anforderung und Knicken -- so steht jede Wahl einmal da.
         p.querschnittsanalysen.append(cls._kastentraeger(p.freie_kennung("a")))
         p.querschnittsanalysen.append(cls._stuetze(p.freie_kennung("a")))
 
@@ -677,6 +677,11 @@ class Projekt(Beschreibung):
         # Quasi-ständig mit der Parabel: σ_s,adm ist bei normaler Anforderung f_yk.
         a.quasistaendig.wahl.rechenart = "parabel"
         a.quasistaendig.lastfall("Dauer", N_Ed=-600.0, M_y_Ed=80.0)
+        # Knicken unten und seitlich, die Verformung mit Kriechen.
+        a.knicken_wahl_verformung.kriechzahl = 1.5
+        a.knickfall("Stütze", N_Ed=-1500.0, M_Ed_1=30.0, laenge=4.0)
+        a.knickfall("Seitlich", N_Ed=-1200.0, M_Ed_1=10.0, laenge=5.0, knicklaenge=3.5,
+                    richtung="links")
         return a
 
 

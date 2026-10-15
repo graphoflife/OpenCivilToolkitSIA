@@ -1,5 +1,5 @@
 ---
-erzeugt: 850f12bc9e66
+erzeugt: 891c8de30c22
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -44,6 +44,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.nachweis.linie]] – Geometrie einer geschlossenen M-N-Linie.
     - [[opencivil.nachweis.mindestbewehrung]] – Nachweise gegen sprödes Versagen.
     - [[opencivil.nachweis.qa_gebrauch]] – Gebrauchsnachweise des gezeichneten Querschnitts.
+    - [[opencivil.nachweis.qa_knicken]] – Knicken am gezeichneten Querschnitt.
     - [[opencivil.nachweis.querkraft]] – Querkraftnachweis.
     - [[opencivil.nachweis.querschnittsloeser]] – Dehnungsebene zu gegebenen Schnittgrössen.
     - [[opencivil.nachweis.rechenwahl]] – womit ein Kapitel rechnet.

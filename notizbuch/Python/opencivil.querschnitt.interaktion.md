@@ -1,5 +1,5 @@
 ---
-erzeugt: 688936d81588
+erzeugt: ba07e66aadff
 art: modul
 tags: [modul]
 ---
@@ -498,6 +498,7 @@ die andere Koordinate jeder Stelle.
 
 - [[opencivil.nachweis.gebrauchsebene]]
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.schiefe_biegung]]

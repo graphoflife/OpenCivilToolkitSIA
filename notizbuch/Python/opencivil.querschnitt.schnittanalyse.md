@@ -1,5 +1,5 @@
 ---
-erzeugt: fa37e03991a3
+erzeugt: d47f3335f9c6
 art: modul
 tags: [modul]
 ---
@@ -65,6 +65,14 @@ nicht nachgeschlagen (`notizbuch/Notizen/TODO.md`). Bei der Platte ist
 
 Bezogen auf den Bruttoquerschnitt: `I` um die Achse der Biegung bzw.
 `A`. Bei der Platte sind es `b·h³/12` und `b·h`.
+
+
+## DER QUERSCHNITT NACH WAHL
+
+Wie der gezeichnete Querschnitt mit den Gesetzen einer Rechenwahl entsteht
+([[opencivil.querschnitt.schnittanalyse#querschnitt_nach_wahl|querschnitt_nach_wahl]]) und wie diese Gesetze in die Herleitung
+kommen ([[opencivil.querschnitt.schnittanalyse#protokoll_gesetze_nach_wahl|protokoll_gesetze_nach_wahl]]), brauchen auch die
+Gebrauchsnachweise und das Knicken -- es steht darum einmal hier.
 
 
 ## EINHEITEN
@@ -274,6 +282,18 @@ Bewehrung ihr Element und je Stahl sein Gesetz, nach dem Index des
 Werkstoffs. `wert` liefert zu einer Wert-ID die Zahl in SI. Zerlegt in
 so viele Streifen, wie die Platte Fasern hat ([[opencivil.nachweis.querschnittsloeser#Konstanten|FASERN]]).
 
+### protokoll_gesetze_nach_wahl
+
+```python
+def protokoll_gesetze_nach_wahl(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse, wahl: Rechenwahl, basis: str, *, titel: str) -> None
+```
+
+Die Werkstoffgesetze einer Wahl, je Material des Querschnitts -- die von
+[[opencivil.querschnitt.schnittanalyse#querschnitt_nach_wahl|querschnitt_nach_wahl]], so wie bei der Platte
+([[opencivil.nachweis.rechenwahl#protokoll_gesetze|protokoll_gesetze]]), mit den Werten
+jedes Betons und jedes Stahls. Dazu der wirksame Modul, wo ein Gesetz an
+ihm haengt.
+
 ### schnittpaar
 
 ```python
@@ -297,7 +317,9 @@ gerufen. Mit `protokoll` schreibt jede Linie ihre Herleitung.
 
 ## Braucht
 
+- [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
+- [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
@@ -315,6 +337,8 @@ gerufen. Mit `protokoll` schreibt jede Linie ihre Herleitung.
 ## Gebraucht von
 
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_knicken]]
+- [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.web.api]]

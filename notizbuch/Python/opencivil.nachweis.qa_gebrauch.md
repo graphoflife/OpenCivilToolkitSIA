@@ -1,5 +1,5 @@
 ---
-erzeugt: 3f082d2270ec
+erzeugt: a837913a9148
 art: modul
 tags: [modul]
 ---
@@ -71,17 +71,6 @@ gerissenen Querschnitt. Siehe `notizbuch/Notizen/TODO.md`.
 SI-Basis wie im ganzen Querschnittsmodul; die Zeichnung in mm.
 
 ## Inhalt
-
-### protokoll_gesetze
-
-```python
-def protokoll_gesetze(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse, wahl: Rechenwahl, basis: str, *, titel: str) -> None
-```
-
-Die Werkstoffgesetze einer Wahl, je Material des Querschnitts -- wie bei
-der Platte ([[opencivil.nachweis.rechenwahl#protokoll_gesetze|protokoll_gesetze]]), mit
-den Werten jedes Betons und jedes Stahls. Dazu der wirksame Modul, wo
-ein Gesetz an ihm haengt.
 
 ### Fallergebnis
 
@@ -244,7 +233,6 @@ findet, liegt jenseits der Grenze: der Stahl fliesst dort laengst.
 - [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.gebrauchsebene]]
 - [[opencivil.nachweis.mindestbewehrung]]
-- [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.schiefe_biegung]]

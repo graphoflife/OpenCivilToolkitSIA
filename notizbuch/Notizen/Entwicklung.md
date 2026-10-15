@@ -44,6 +44,29 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-15 · Knicken am gezeichneten Querschnitt
+
+Knicken gibt es jetzt auch für den gezeichneten Querschnitt, je Fall zu der
+Zugseite, zu der sich der Stab biegt -- unten, oben, links, rechts.
+
+**Ein Verfahren, zwei Stäbe.** Die Ausmitten-Iteration und die Suche nach
+N_Rd brauchen vom Stab nur dreierlei: die Ebene zu N und M, den
+Momentenwiderstand bei N und die statische Höhe (`Knickstab`). Das Verfahren
+steht darum in `Knickverfahren`; die Platte (`Knicken`) gibt ihren Löser,
+ihre Resistenzlinie und die Höhe ihrer untersten x-Lage, der gezeichnete
+Querschnitt (`KnickenQA`) seine Fasern in der Richtung, den Bruchzustand bei
+N und das d vom gedrückten Rand bis zum entferntesten Stab. Am Rechteck 400 ×
+400 mit je drei ⌀20 geben beide dieselbe Grenzkraft, 3069.2 kN.
+
+**Warmstart.** Jede Probekraft der Suche nach N_Rd ist eine ganze
+Iteration, jede Iteration ein paar Ebenen mit wenig verschiedenen
+Schnittgrössen. Der Illinois-Löser fängt darum bei der Krümmung und der
+Dehnung an, die er zuletzt gefunden hat, statt von der grössten Krümmung
+her einzugrenzen: 111 072 statt 390 801 Faserdurchläufe für dieselben sechs
+Fälle, dieselben Zahlen auf 0.001 kN. Gemessen an der Zahl der Durchläufe,
+nicht an der Zeit -- die schwankte auf dem ausgelasteten Rechner um das
+Doppelte.
+
 ## 2026-10-15 · Gebrauchsnachweise am gezeichneten Querschnitt
 
 Was die Platte unter Gebrauchslast nachweist, gibt es jetzt auch für den

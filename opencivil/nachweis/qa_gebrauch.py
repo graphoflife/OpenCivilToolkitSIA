@@ -65,16 +65,13 @@ from opencivil.core.einheiten import EINHEITSLOS, MM, Groesse
 from opencivil.core.latex import Mathe, als_text, angabe, bedingung, fest, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
-from opencivil.material.basis import Baustoff, Baustoffart, mit_index
+from opencivil.material.basis import Baustoff, mit_index
 from opencivil.material.betonstahl import FLIESSDEHNUNG
 from opencivil.nachweis.gebrauchsebene import (
     EINACHSIG, KEINE, SUCHE_DER_EBENE, Gebrauchsebene, gebrauchsebene, protokoll_ebene,
 )
 from opencivil.nachweis.mindestbewehrung import DICKENGRENZE, RISSBREITE
-from opencivil.nachweis.querschnittsloeser import protokoll_wirksamer_modul
-from opencivil.nachweis.rechenwahl import (
-    Rechenart, Rechenwahl, protokoll_betongesetz, protokoll_rechenwahl, werte_nach_id,
-)
+from opencivil.nachweis.rechenwahl import Rechenwahl, protokoll_rechenwahl, werte_nach_id
 from opencivil.nachweis.richtungsnachweise import (
     protokoll_rissmoment, protokoll_spannung_ungerissen, richtungen, rissbezuege, rissmoment,
 )
@@ -91,50 +88,13 @@ from opencivil.nachweis.stabgrenzen import (
 from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse
 from opencivil.querschnitt.interaktion import Querschnitt, illinois
-from opencivil.querschnitt.schnittanalyse import querschnitt_nach_wahl
+from opencivil.querschnitt.schnittanalyse import (
+    protokoll_gesetze_nach_wahl, querschnitt_nach_wahl,
+)
 
 #: Wann das Moment der Zwaengung auf Biegung gefunden ist: wie nahe der
 #: erste gezogene Stab seiner Grenze kommen muss, als Teil von ihr.
 GRENZ_SCHRANKE = 1e-7
-
-
-# ===========================================================================
-# Was mehrere Nachweise schreiben
-# ===========================================================================
-
-
-def protokoll_gesetze(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse,
-                      wahl: Rechenwahl, basis: str, *, titel: str) -> None:
-    """
-    Die Werkstoffgesetze einer Wahl, je Material des Querschnitts -- wie bei
-    der Platte (:func:`~opencivil.nachweis.rechenwahl.protokoll_gesetze`), mit
-    den Werten jedes Betons und jedes Stahls. Dazu der wirksame Modul, wo
-    ein Gesetz an ihm haengt.
-    """
-    satz = wahl.satz
-    phi = Zwischenwerte(basis).zahl("phi", r"\varphi", wahl.kriechzahl, stellen=2)
-    for stoff in analyse.baustoffe:
-        if stoff.art is not Baustoffart.BETON:
-            continue
-        unter = f"{basis}.{kennung_aus(stoff.id)}"
-        E_cm = e[analyse._name(stoff, "E_cm")]
-        if wahl.art.mit_kriechzahl:
-            protokoll_wirksamer_modul(p, E_cm, phi, unter,
-                                      titel=f"Wirksamer Elastizitätsmodul {stoff.name}")
-        f_c = e[analyse._name(stoff, satz.beton)]
-        if wahl.art is Rechenart.ELASTISCH:
-            p.gleichung(
-                rf"\sigma_c = \max\left[E_{{c,eff}} \cdot \varepsilon_c;\ -{f_c.symbol}\right]"
-                rf" \quad {angabe(f_c)}", titel=f"{titel}: {stoff.name}, ohne Zug")
-        else:
-            protokoll_betongesetz(p, wahl, f_c, E_cm, unter, titel=f"{titel}: {stoff.name}")
-    festigkeiten = [e[analyse._name(s, satz.stahl)] for s in analyse.baustoffe
-                    if s.art is Baustoffart.BETONSTAHL]
-    if festigkeiten:
-        f_s = festigkeiten[0].symbol if len(festigkeiten) == 1 else satz.stahl_zeichen
-        p.gleichung(rf"\sigma_s = \min\left[E_s \cdot \varepsilon_s;\ {f_s}\right] \quad "
-                    + r" \quad ".join(angabe(w) for w in festigkeiten),
-                    titel=f"{titel}: Stahl")
 
 
 # ===========================================================================
@@ -313,7 +273,7 @@ class SpannungsbegrenzungQA(Nachweis):
             protokoll_rissbreitengrenzen(p, e, self.analyse, staebe, grenzen,
                                          self.anforderung, self.id, referenz=g.referenz)
         protokoll_festlegungen(p, self.wahl)
-        protokoll_gesetze(p, e, self.analyse, self.wahl, self.id,
+        protokoll_gesetze_nach_wahl(p, e, self.analyse, self.wahl, self.id,
                           titel="Werkstoffgesetze im Gebrauchszustand")
         if g is GrenzeGegenFliessen:
             g.festlegung(p)
@@ -695,6 +655,6 @@ class ZwaengungBiegungQA(Nachweis):
                  name="Moment der Bewehrung bei zulässiger Stahlspannung")
         protokoll_spannung_ungerissen(p)
         protokoll_rechenwahl(p, self.wahl, self.id)
-        protokoll_gesetze(p, e, self.analyse, self.wahl, self.id,
+        protokoll_gesetze_nach_wahl(p, e, self.analyse, self.wahl, self.id,
                           titel="Werkstoffgesetze im gerissenen Zustand")
         p.erklaerung(GRENZE_JE_STAB)

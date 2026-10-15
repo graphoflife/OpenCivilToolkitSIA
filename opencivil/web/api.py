@@ -47,8 +47,8 @@ from opencivil.projekt import balkensystem as bs
 from opencivil.projekt.eintraege import BETONGESETZE, WERKSTOFFSAETZE
 from opencivil.projekt.querschnittsanalyse import (
     SCHNITTE, FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QAGebrauchsfallEintrag,
-    QALastfallEintrag, QASpannungsfallEintrag, QuerschnittsanalyseEintrag, SchubwandEintrag,
-    StabEintrag, StablinieEintrag, WerkstoffwahlEintrag,
+    QAKnickEintrag, QALastfallEintrag, QASpannungsfallEintrag, QuerschnittsanalyseEintrag,
+    SchubwandEintrag, StabEintrag, StablinieEintrag, WerkstoffwahlEintrag,
 )
 from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.schnittanalyse import Zugseite
@@ -170,6 +170,7 @@ def katalog() -> dict:
             "qa_lastfall": QALastfallEintrag(name="", M_y_Ed=100.0).als_dict(),
             "qa_analyse": QASpannungsfallEintrag(name="", M_Ed=30.0).als_dict(),
             "qa_gebrauchsfall": QAGebrauchsfallEintrag(name="").als_dict(),
+            "qa_knickfall": QAKnickEintrag(name="", N_Ed=-500.0, M_Ed_1=20.0).als_dict(),
             "knoten": KnotenEintrag().als_dict(),
             "flaeche": FlaecheEintrag().als_dict(),
             "stab": StabEintrag().als_dict(),

@@ -49,6 +49,12 @@ DER AEQUIVALENTE MODUL:
 Bezogen auf den Bruttoquerschnitt: ``I`` um die Achse der Biegung bzw.
 ``A``. Bei der Platte sind es ``b·h³/12`` und ``b·h``.
 
+DER QUERSCHNITT NACH WAHL:
+Wie der gezeichnete Querschnitt mit den Gesetzen einer Rechenwahl entsteht
+(:func:`querschnitt_nach_wahl`) und wie diese Gesetze in die Herleitung
+kommen (:func:`protokoll_gesetze_nach_wahl`), brauchen auch die
+Gebrauchsnachweise und das Knicken -- es steht darum einmal hier.
+
 EINHEITEN:
 SI-Basis wie im ganzen Querschnittsmodul.
 """
@@ -60,13 +66,18 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import TYPE_CHECKING, Callable, Dict, List, Mapping, Optional, Tuple
 
+from opencivil.core.berechnung import Eingaben
 from opencivil.core.einheiten import MIO_MM3, MIO_MM4, Groesse
+from opencivil.core.latex import angabe
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.nachweis.querschnittsloeser import (
-    FASERN, Faserloeser, Stahllage, bilinear, wirksamer_modul,
+    FASERN, Faserloeser, Stahllage, bilinear, protokoll_wirksamer_modul, wirksamer_modul,
 )
-from opencivil.nachweis.rechenwahl import Rechenwahl, betongesetz
+from opencivil.nachweis.rechenwahl import (
+    Rechenart, Rechenwahl, betongesetz, protokoll_betongesetz,
+)
 from opencivil.nachweis.sproedes_versagen import (
     MOMENTENTEILER, beiwert_dicke, protokoll_zugfestigkeit,
 )
@@ -375,6 +386,41 @@ def querschnitt_nach_wahl(analyse: Querschnittsanalyse, wert: Callable[[str], fl
                     bezug=(wert(analyse.id_von("y_S")), wert(analyse.id_von("z_S"))),
                     streifen=FASERN)
     return q, herkunft, staehle
+
+
+def protokoll_gesetze_nach_wahl(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse,
+                      wahl: Rechenwahl, basis: str, *, titel: str) -> None:
+    """
+    Die Werkstoffgesetze einer Wahl, je Material des Querschnitts -- die von
+    :func:`querschnitt_nach_wahl`, so wie bei der Platte
+    (:func:`~opencivil.nachweis.rechenwahl.protokoll_gesetze`), mit den Werten
+    jedes Betons und jedes Stahls. Dazu der wirksame Modul, wo ein Gesetz an
+    ihm haengt.
+    """
+    satz = wahl.satz
+    phi = Zwischenwerte(basis).zahl("phi", r"\varphi", wahl.kriechzahl, stellen=2)
+    for stoff in analyse.baustoffe:
+        if stoff.art is not Baustoffart.BETON:
+            continue
+        unter = f"{basis}.{kennung_aus(stoff.id)}"
+        E_cm = e[analyse._name(stoff, "E_cm")]
+        if wahl.art.mit_kriechzahl:
+            protokoll_wirksamer_modul(p, E_cm, phi, unter,
+                                      titel=f"Wirksamer Elastizitätsmodul {stoff.name}")
+        f_c = e[analyse._name(stoff, satz.beton)]
+        if wahl.art is Rechenart.ELASTISCH:
+            p.gleichung(
+                rf"\sigma_c = \max\left[E_{{c,eff}} \cdot \varepsilon_c;\ -{f_c.symbol}\right]"
+                rf" \quad {angabe(f_c)}", titel=f"{titel}, {stoff.name}: Beton, elastisch ohne Zug")
+        else:
+            protokoll_betongesetz(p, wahl, f_c, E_cm, unter, titel=f"{titel}, {stoff.name}")
+    festigkeiten = [e[analyse._name(s, satz.stahl)] for s in analyse.baustoffe
+                    if s.art is Baustoffart.BETONSTAHL]
+    if festigkeiten:
+        f_s = festigkeiten[0].symbol if len(festigkeiten) == 1 else satz.stahl_zeichen
+        p.gleichung(rf"\sigma_s = \min\left[E_s \cdot \varepsilon_s;\ {f_s}\right] \quad "
+                    + r" \quad ".join(angabe(w) for w in festigkeiten),
+                    titel=f"{titel}: Stahl")
 
 
 def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[str], float],

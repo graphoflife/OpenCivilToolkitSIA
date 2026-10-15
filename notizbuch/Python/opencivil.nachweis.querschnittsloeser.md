@@ -1,5 +1,5 @@
 ---
-erzeugt: d6f70028f932
+erzeugt: 8957df54ad05
 art: modul
 tags: [modul]
 ---
@@ -334,6 +334,49 @@ zwischen zwei Knicken der Gesetze ist die Kraft eine Gerade, und dort
 trifft die Sekante. Die Platte rechnet weiter mit dem Halbieren; ihre
 Zahlen bleiben so, wie sie sind.
 
+Dazu faengt er bei der Kruemmung an, die er zuletzt gefunden hat
+([[opencivil.nachweis.querschnittsloeser#FaserloeserIllinois.loese|loese]]): beim Knicken folgen sich viele Ebenen mit wenig
+verschiedenen Schnittgroessen, und das Eingrenzen von der groessten
+Kruemmung her kostete jede von ihnen mehr als die Suche selbst.
+
+#### FaserloeserIllinois._eps_zu_normalkraft
+
+```python
+def _eps_zu_normalkraft(self, chi: float, N_ziel: float) -> Optional[float]
+```
+
+Wie beim [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]], aber von der zuletzt gefundenen
+Dehnung aus eingegrenzt: die Kruemmungen einer Suche liegen nahe
+beieinander, und mit ihnen die Dehnungen.
+
+#### FaserloeserIllinois._eps_von
+
+```python
+def _eps_von(self, chi: float, N_ziel: float, eps: float) -> Optional[float]
+```
+
+Von `eps` aus mit wachsenden Schritten eingrenzen, im Fenster -- dann Illinois.
+
+#### FaserloeserIllinois.loese
+
+```python
+def loese(self, *, N_Ed: float, M_Ed: float) -> Ebene
+```
+
+Die Dehnungsebene -- von der zuletzt gefundenen Kruemmung aus
+eingegrenzt, wo es eine gibt, sonst wie jeder [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]].
+Was die naechste Suche nicht eingrenzen kann, sucht sie von vorn.
+
+#### FaserloeserIllinois._von_zuletzt
+
+```python
+def _von_zuletzt(self, N_Ed: float, M_Ed: float, chi: float) -> Optional[Ebene]
+```
+
+Von `chi` aus mit wachsenden Schritten, bis das Moment die Seite
+wechselt -- das Moment waechst mit der Kruemmung --, dann Illinois.
+`None`, wo unterwegs keine Ebene die Normalkraft traegt.
+
 ### Querschnittsloeser
 
 ```python
@@ -568,7 +611,7 @@ nichts. So rechnet die Handrechnung -- sie laesst die Druckbewehrung weg.
 - [[opencivil.nachweis.gebrauchsebene]]
 - [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.knicken]]
-- [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]

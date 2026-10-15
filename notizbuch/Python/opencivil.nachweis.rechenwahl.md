@@ -1,5 +1,5 @@
 ---
-erzeugt: a965ce6ab664
+erzeugt: 13e2118f98b3
 art: modul
 tags: [modul]
 ---
@@ -395,6 +395,7 @@ das Knicken und die Analysen mit dem der ersten Lage.
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]

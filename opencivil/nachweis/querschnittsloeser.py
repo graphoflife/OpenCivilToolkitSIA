@@ -565,7 +565,118 @@ class FaserloeserIllinois(Faserloeser):
     zwischen zwei Knicken der Gesetze ist die Kraft eine Gerade, und dort
     trifft die Sekante. Die Platte rechnet weiter mit dem Halbieren; ihre
     Zahlen bleiben so, wie sie sind.
+
+    Dazu faengt er bei der Kruemmung an, die er zuletzt gefunden hat
+    (:meth:`loese`): beim Knicken folgen sich viele Ebenen mit wenig
+    verschiedenen Schnittgroessen, und das Eingrenzen von der groessten
+    Kruemmung her kostete jede von ihnen mehr als die Suche selbst.
     """
+
+    def __init__(self, **angaben) -> None:
+        super().__init__(**angaben)
+        self._zuletzt: Optional[float] = None
+        """Die Kruemmung der zuletzt gefundenen Ebene -- von dort sucht die naechste."""
+        self._eps_zuletzt: Optional[float] = None
+        """Die zuletzt gefundene Mitteldehnung -- von dort sucht die naechste."""
+
+    def _eps_zu_normalkraft(self, chi: float, N_ziel: float) -> Optional[float]:
+        """
+        Wie beim :class:`Faserloeser`, aber von der zuletzt gefundenen
+        Dehnung aus eingegrenzt: die Kruemmungen einer Suche liegen nahe
+        beieinander, und mit ihnen die Dehnungen.
+        """
+        eps = None
+        if self._eps_zuletzt is not None:
+            eps = self._eps_von(chi, N_ziel, self._eps_zuletzt)
+        if eps is None:
+            eps = super()._eps_zu_normalkraft(chi, N_ziel)
+        if eps is not None:
+            self._eps_zuletzt = eps
+        return eps
+
+    def _eps_von(self, chi: float, N_ziel: float, eps: float) -> Optional[float]:
+        """Von ``eps`` aus mit wachsenden Schritten eingrenzen, im Fenster -- dann Illinois."""
+        fenster = self._fenster(chi)
+        if fenster is None:
+            return None
+        unten, oben = fenster
+        a = min(max(eps, unten), oben)
+
+        def zu_viel(e: float) -> float:
+            return self.kraefte(e, chi).N - N_ziel
+
+        fa = zu_viel(a)
+        if fa == 0.0:
+            return a
+        schritt = 1e-6
+        for _ in range(SCHRITTE):
+            b = min(max(a - schritt if fa > 0.0 else a + schritt, unten), oben)
+            fb = zu_viel(b)
+            if fb == 0.0:
+                return b
+            if (fb > 0.0) != (fa > 0.0):
+                break
+            if b in (unten, oben):
+                return None
+            a, fa = b, fb
+            schritt *= 4.0
+        else:
+            return None
+        if fa < fb:
+            return self._suchen(zu_viel, a, b, EPS_SCHRANKE, fa, fb)
+        return self._suchen(zu_viel, b, a, EPS_SCHRANKE, fb, fa)
+
+    def loese(self, *, N_Ed: float, M_Ed: float) -> Ebene:
+        """
+        Die Dehnungsebene -- von der zuletzt gefundenen Kruemmung aus
+        eingegrenzt, wo es eine gibt, sonst wie jeder :class:`Faserloeser`.
+        Was die naechste Suche nicht eingrenzen kann, sucht sie von vorn.
+        """
+        ebene = None
+        if self._zuletzt is not None and not (N_Ed == 0.0 and M_Ed == 0.0):
+            ebene = self._von_zuletzt(N_Ed, M_Ed, self._zuletzt)
+        if ebene is None:
+            ebene = super().loese(N_Ed=N_Ed, M_Ed=M_Ed)
+        if ebene.konvergiert:
+            self._zuletzt = ebene.chi
+        return ebene
+
+    def _von_zuletzt(self, N_Ed: float, M_Ed: float, chi: float) -> Optional[Ebene]:
+        """
+        Von ``chi`` aus mit wachsenden Schritten, bis das Moment die Seite
+        wechselt -- das Moment waechst mit der Kruemmung --, dann Illinois.
+        ``None``, wo unterwegs keine Ebene die Normalkraft traegt.
+        """
+        def zu_viel(k: float) -> Optional[float]:
+            eps_m = self._eps_zu_normalkraft(k, N_Ed)
+            return None if eps_m is None else self.kraefte(eps_m, k).M - M_Ed
+
+        fa = zu_viel(chi)
+        if fa is None:
+            return None
+        schritt = max(abs(chi), self.grenzen.kruemmungsgrenze(positiv=True) * 1e-6) / 4.0
+        a = chi
+        for _ in range(SCHRITTE):
+            if fa == 0.0:
+                b, fb = a, fa
+                break
+            b = a - schritt if fa > 0.0 else a + schritt
+            fb = zu_viel(b)
+            if fb is None:
+                return None
+            if (fb > 0.0) != (fa > 0.0):
+                break
+            a, fa = b, fb
+            schritt *= 2.0
+        else:
+            return None
+        unten, oben = (a, b) if fa < fb else (b, a)
+        f_unten, f_oben = min(fa, fb), max(fa, fb)
+        gefunden = self._suchen(zu_viel, unten, oben, CHI_SCHRANKE, f_unten, f_oben)
+        if gefunden is None:
+            return None
+        eps_m = self._eps_zu_normalkraft(gefunden, N_Ed)
+        return None if eps_m is None else self._ergebnis(eps_m, gefunden)
 
     def _suchen(self, f: Callable[[float], Optional[float]], unten: float, oben: float,
                 schranke: float, f_unten: Optional[float] = None,

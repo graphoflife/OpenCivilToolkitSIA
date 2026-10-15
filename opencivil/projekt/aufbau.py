@@ -60,7 +60,7 @@ from opencivil.querschnitt.platte import (
     Bewehrungslage, Plattenquerschnitt, Richtung,
 )
 from opencivil.projekt.eintraege import (
-    Gebrauchsliste, KombinationEintrag, MaterialEintrag, SpannungsfallEintrag,
+    Gebrauchsliste, KnickEintrag, KombinationEintrag, MaterialEintrag, SpannungsfallEintrag,
     abgeleiteter_fallname,
 )
 from opencivil.projekt.balkensystem import BalkensystemEintrag, StabquerschnittEintrag
@@ -70,11 +70,13 @@ from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.nachweis.qa_gebrauch import (
     RissnormalkraftQA, SpannungsbegrenzungQA, ZwaengungBiegungQA,
 )
+from opencivil.nachweis.qa_knicken import KnickenQA, QAKnickfall
 from opencivil.nachweis.richtungsnachweise import DuktilitaetQA, SproedesVersagenQA
 from opencivil.nachweis.schiefe_biegung import SchiefeBiegung
 from opencivil.nachweis.schubwandnachweis import Schubwandnachweis
 from opencivil.querschnitt.analyse import Flaechenteil, Lastfall, Querschnittsanalyse
 from opencivil.querschnitt.geometrie import GeometrieFehler
+from opencivil.querschnitt.schnittanalyse import Zugseite
 from opencivil.stabwerk.rechnung import Balkensystem, Stabquerschnitt
 
 if TYPE_CHECKING:
@@ -167,6 +169,9 @@ class Aufbau:
     qa_spannung: Dict[str, SpannungsbegrenzungQA] = field(default_factory=dict)
     """Die Gebrauchsnachweise je Querschnittsanalyse, wie bei der Platte."""
 
+    qa_knicken: Dict[str, KnickenQA] = field(default_factory=dict)
+    """Knicken je Querschnittsanalyse -- je Fall in seiner Richtung."""
+
     balkensysteme: Dict[str, Balkensystem] = field(default_factory=dict)
     """Die Balkensysteme, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis."""
 
@@ -182,7 +187,7 @@ class Aufbau:
                       "spannung_riss", "spannung", "knicken",
                       "qa_biegung", "qa_schub", "qa_duktilitaet", "qa_sproede",
                       "qa_rissnormalkraft", "qa_zwaengung_biegung", "qa_spannung_riss",
-                      "qa_spannung")
+                      "qa_spannung", "qa_knicken")
 
     def nachweise_je_feld(self):
         """Alle Nachweise, Feld fuer Feld und in der Reihenfolge der Liste."""
@@ -471,13 +476,7 @@ def _platte(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> B
         knickfaelle = [k for k in eintrag.knickfaelle if k.aktiv]
         if knickfaelle:
             aufbau.eintragen(teil, "knicken", eintrag.kennung, Knicken(
-                querschnitt,
-                [Knickfall(name=k.name,
-                           N_Ed=Groesse(k.N_Ed, KN),
-                           M_Ed_1=Groesse(k.M_Ed_1, KNM),
-                           laenge=Groesse(k.laenge, M),
-                           knicklaenge=Groesse(k.knicklaenge, M))
-                 for k in knickfaelle],
+                querschnitt, [_knickfall(k) for k in knickfaelle],
                 nachweis, verformung=eintrag.knicken_wahl_verformung.wahl,
                 widerstand=eintrag.knicken_wahl_widerstand.wahl, schnell=schnell))
 
@@ -501,7 +500,8 @@ def _querschnittsanalyse(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     Querkraft und Torsion, sobald ein Lastfall sie hat oder die
     Laengszugkraft zaehlt. Duktilitaet, sproedes Versagen und die Zwaengungen
     immer, still, wenn ausgeschaltet -- wie bei der Platte. Ebenso die
-    Stahlspannungen, sobald es Lastfaelle gibt (:func:`_qa_spannungsnachweise`).
+    Stahlspannungen, sobald es Lastfaelle gibt (:func:`_qa_spannungsnachweise`),
+    und das Knicken, sobald ein Fall eingeschaltet ist.
     """
     analyse = _analyse(eintrag, aufbau.baustoffe, praefix=f"{art.raum}.{eintrag.kennung}")
     aufbau.querschnittsanalysen[eintrag.kennung] = analyse
@@ -542,6 +542,14 @@ def _querschnittsanalyse(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     biegung.still = not eintrag.zwaengung_biegung
     aufbau.eintragen(teil, "qa_zwaengung_biegung", eintrag.kennung, biegung)
     _qa_spannungsnachweise(eintrag, analyse, aufbau, teil)
+
+    knickfaelle = [k for k in eintrag.knickfaelle if k.aktiv]
+    if knickfaelle:
+        aufbau.eintragen(teil, "qa_knicken", eintrag.kennung, KnickenQA(
+            analyse, [_knickfall(k, QAKnickfall, richtung=Zugseite(k.richtung))
+                      for k in knickfaelle],
+            verformung=eintrag.knicken_wahl_verformung.wahl,
+            widerstand=eintrag.knicken_wahl_widerstand.wahl, schnell=aufbau.schnell))
 
     aktive = [s for s in eintrag.spannungsfaelle if s.aktiv]
     if aktive:
@@ -744,6 +752,12 @@ def _qa_spannungsnachweise(eintrag: QuerschnittsanalyseEintrag,
             wahl=liste.wahl.wahl, einachsig=eintrag.einachsig)
         spannung.stillstellen([f.name for f in faelle], laute)
         aufbau.eintragen(teil, feld, eintrag.kennung, spannung)
+
+
+def _knickfall(k: KnickEintrag, klasse: type = Knickfall, **mehr: Any) -> Knickfall:
+    """Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; ``mehr`` fuer die Analyse."""
+    return klasse(name=k.name, N_Ed=Groesse(k.N_Ed, KN), M_Ed_1=Groesse(k.M_Ed_1, KNM),
+                  laenge=Groesse(k.laenge, M), knicklaenge=Groesse(k.knicklaenge, M), **mehr)
 
 
 def _baustoff(eintrag: MaterialEintrag, symbol_index: str) -> Baustoff:

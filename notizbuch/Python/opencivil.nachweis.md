@@ -1,5 +1,5 @@
 ---
-erzeugt: d2c00d359f0d
+erzeugt: 469504673e43
 art: modul
 tags: [modul]
 ---
@@ -25,6 +25,7 @@ Rechenwahl, mit der jedes Kapitel waehlt, womit es rechnet.
 - [[opencivil.nachweis.linie]] – Geometrie einer geschlossenen M-N-Linie.
 - [[opencivil.nachweis.mindestbewehrung]] – Nachweise gegen sprödes Versagen.
 - [[opencivil.nachweis.qa_gebrauch]] – Gebrauchsnachweise des gezeichneten Querschnitts.
+- [[opencivil.nachweis.qa_knicken]] – Knicken am gezeichneten Querschnitt.
 - [[opencivil.nachweis.querkraft]] – Querkraftnachweis.
 - [[opencivil.nachweis.querschnittsloeser]] – Dehnungsebene zu gegebenen Schnittgrössen.
 - [[opencivil.nachweis.rechenwahl]] – womit ein Kapitel rechnet.

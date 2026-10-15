@@ -253,6 +253,12 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       lässt sie weg). `σ_s,adm` je Stab mit seinem Durchmesser und dem
       `f_ctm` seines Betons; eine verschmierte Linie mit einem fiktiven
       Durchmesser bei 150 mm Teilung (`nachweis/stabgrenzen.py`).
+- [ ] **Knicken je Richtung.** Eingebaut (`nachweis/qa_knicken.py`): je Fall
+      zu einer Zugseite, die Nulllinie parallel zur Achse wie einachsig --
+      ein unsymmetrischer Querschnitt, der um beide Achsen zugleich knickt,
+      wird nicht erfasst. `d` für die Mindestausmitte `d/30` vom gedrückten
+      Rand bis zum entferntesten Stab in Zugrichtung. Die Regeln der Platte,
+      übertragen; nach Vorgabe, nicht nachgeschlagen.
 
 ### Balkensysteme
 
@@ -277,7 +283,7 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
 - [ ] **Querschnittsanalyse, nächste Schritte** (je ein eigener Plan):
       Baustahl (Sortentabelle, Gesetz, Verbundquerschnitt, Stahlwände mit
       eigenem G), Holz (wie spröd Zug und Druck sind, legen wir vorher fest),
-      weitere Nachweise (Knicken, Wände ohne Bügel).
+      weitere Nachweise (Wände ohne Bügel).
 - [ ] **Die genaue Linie der Platte über den neuen Fächer.** Die Platte hat
       noch ihren eigenen `dehnungsfaecher`; der Fächer der Analyse kann
       dasselbe für jede Form. Seit beide ihren Widerstand genau suchen, liegen

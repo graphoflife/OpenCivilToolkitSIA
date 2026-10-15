@@ -42,14 +42,14 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX
-from opencivil.nachweis.rechenwahl import FASERSPANNUNGSARTEN
+from opencivil.nachweis.rechenwahl import FASERARTEN, FASERSPANNUNGSARTEN
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.platte import ALPHA_MAX, ALPHA_MIN, K_C
 from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.schnittanalyse import Zugseite
 from opencivil.projekt.eintraege import (
     BETONGESETZE, HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, WERKSTOFFSAETZE, Beschreibung,
-    Gebrauchsliste, SpannungsfallEintrag, eindeutig,
+    Gebrauchsliste, KnickEintrag, RechenwahlEintrag, SpannungsfallEintrag, eindeutig,
 )
 from opencivil.projekt.lesen import (
     ProjektFehler, kriechzahl_aus, pflichtfeld, rissanforderung_aus, zahl,
@@ -327,6 +327,28 @@ class QAGebrauchsliste(Gebrauchsliste):
 
 
 @dataclass
+class QAKnickEintrag(KnickEintrag):
+    """
+    Ein Knicknachweis des gezeichneten Querschnitts -- wie bei der Platte,
+    dazu die Zugseite: die Seite, zu der sich der Stab biegt und die das
+    Moment 1. Ordnung zieht (:class:`~opencivil.querschnitt.schnittanalyse.Zugseite`).
+    """
+
+    richtung: str = Zugseite.UNTEN.value
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any]) -> "QAKnickEintrag":
+        platte = KnickEintrag.aus_dict(d)
+        richtung = str(d.get("richtung") or cls.richtung)
+        moeglich = [z.value for z in Zugseite]
+        if richtung not in moeglich:
+            raise ProjektFehler(
+                f"Knicknachweis '{platte.name}': die Zugseite «{richtung}» gibt es nicht. "
+                f"Möglich sind: {', '.join(moeglich)}.")
+        return cls(**platte.als_dict(), richtung=richtung)
+
+
+@dataclass
 class WerkstoffwahlEintrag(Beschreibung):
     """
     Mit welchen Werten ein Material in dieser Analyse rechnet.
@@ -484,6 +506,15 @@ class QuerschnittsanalyseEintrag(Beschreibung):
     haeufig: QAGebrauchsliste = field(
         default_factory=lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL))
     """Die haeufigen Lastfaelle -- gegen das Fliessen, bei erhoehter und hoher Anforderung."""
+
+    knickfaelle: List[QAKnickEintrag] = field(default_factory=list)
+    """Knicknachweise, je in einer Richtung; leer heisst: keiner."""
+
+    knicken_wahl_verformung: RechenwahlEintrag = field(
+        default_factory=RechenwahlEintrag.knicken_verformung)
+    knicken_wahl_widerstand: RechenwahlEintrag = field(
+        default_factory=RechenwahlEintrag.knicken_widerstand)
+    """Womit das Knicken die Ausmitte e_2d und den Widerstand rechnet -- wie bei der Platte."""
 
     spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)
     """Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt."""
@@ -691,11 +722,26 @@ class QuerschnittsanalyseEintrag(Beschreibung):
                   bauteil="Querschnitt")
         for liste, wort in ((self.haeufig, "häufige"), (self.quasistaendig, "quasi-ständige")):
             liste.pruefen(self.name, self.lastfaelle, wort)
+        eindeutig(self.knickfaelle, self.name, "Knicknachweis", bauteil="Querschnitt")
+        for wahl, was in ((self.knicken_wahl_verformung, "Verformung"),
+                          (self.knicken_wahl_widerstand, "Widerstand")):
+            wahl.pruefen(f"Querschnitt '{self.name}', Knicken, {was}", FASERARTEN)
 
     def lastfall(self, name: str, **werte: float) -> QALastfallEintrag:
         """Einen Lastfall anfuegen, ohne Oberflaeche -- kN und kNm."""
         eintrag = QALastfallEintrag(name=name, **werte)
         self.lastfaelle.append(eintrag)
+        return eintrag
+
+    def knickfall(self, name: str, *, N_Ed: float, M_Ed_1: float = 0.0,
+                  laenge: float = 3.0, knicklaenge: Optional[float] = None,
+                  richtung: str = Zugseite.UNTEN.value) -> QAKnickEintrag:
+        """Ein Knicknachweis -- N_Ed in kN (Druck negativ), Längen in m, die Zugseite."""
+        eintrag = QAKnickEintrag.aus_dict(QAKnickEintrag(
+            name=name, N_Ed=N_Ed, M_Ed_1=M_Ed_1, laenge=laenge,
+            knicklaenge=laenge if knicklaenge is None else knicklaenge,
+            richtung=richtung).als_dict())
+        self.knickfaelle.append(eintrag)
         return eintrag
 
     def spannungsfall(self, name: str, *, art: str = "schnittgroessen",
@@ -755,6 +801,13 @@ class QuerschnittsanalyseEintrag(Beschreibung):
                 vorgabe=QUASISTAENDIG_ANTEIL),
             haeufig=QAGebrauchsliste.aus_dict(
                 d.get("haeufig") or {}, wort="häufige", vorgabe=HAEUFIG_ANTEIL),
+            knickfaelle=[QAKnickEintrag.aus_dict(x) for x in (d.get("knickfaelle") or [])],
+            knicken_wahl_verformung=RechenwahlEintrag.aus_dict(
+                d.get("knicken_wahl_verformung"), vorgabe=RechenwahlEintrag.knicken_verformung(),
+                wo=f"Querschnitt '{kennung}', Knicken, Verformung", arten=FASERARTEN),
+            knicken_wahl_widerstand=RechenwahlEintrag.aus_dict(
+                d.get("knicken_wahl_widerstand"), vorgabe=RechenwahlEintrag.knicken_widerstand(),
+                wo=f"Querschnitt '{kennung}', Knicken, Widerstand", arten=FASERARTEN),
             spannungsfaelle=[QASpannungsfallEintrag.aus_dict(x)
                              for x in (d.get("spannungsfaelle") or [])],
             beschreibung=str(d.get("beschreibung") or cls.beschreibung),

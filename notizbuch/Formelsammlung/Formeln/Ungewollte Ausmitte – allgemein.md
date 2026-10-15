@@ -1,5 +1,5 @@
 ---
-erzeugt: 5151a12fbf6c
+erzeugt: 70690382b486
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.7"
@@ -13,7 +13,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.knicken#Knicken|Knicken._protokoll_ansatz]]
+- [[opencivil.nachweis.knicken#Knickverfahren._protokoll_verfahren|Knickverfahren._protokoll_verfahren]]
 
 ## Themen
 

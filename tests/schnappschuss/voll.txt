@@ -2,7 +2,7 @@
 Voll
 ====================================================================================================
 
-236 Berechnungen ausgeführt, 435 Werte bestimmt.
+237 Berechnungen ausgeführt, 437 Werte bestimmt.
 
 ====================================================================================================
 Herleitung
@@ -2973,7 +2973,7 @@ Rechenwahl
 Wirksamer Elastizitätsmodul C30/37
     E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 1} = 16810\,\mathrm{N}/\mathrm{mm}^{2}
 
-Werkstoffgesetze im gerissenen Zustand: C30/37, ohne Zug
+Werkstoffgesetze im gerissenen Zustand, C30/37: Beton, elastisch ohne Zug
     \sigma_c = \max\left[E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right] \quad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
 
 Werkstoffgesetze im gerissenen Zustand: Stahl
@@ -3230,7 +3230,7 @@ Welche Werte angesetzt werden
 Wirksamer Elastizitätsmodul C30/37
     E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
 
-Werkstoffgesetze im Gebrauchszustand: C30/37, ohne Zug
+Werkstoffgesetze im Gebrauchszustand, C30/37: Beton, elastisch ohne Zug
     \sigma_c = \max\left[E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right] \quad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
 
 Werkstoffgesetze im Gebrauchszustand: Stahl
@@ -3337,7 +3337,7 @@ Welche Werte angesetzt werden
 Wirksamer Elastizitätsmodul C30/37
     E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
 
-Werkstoffgesetze im Gebrauchszustand: C30/37, ohne Zug
+Werkstoffgesetze im Gebrauchszustand, C30/37: Beton, elastisch ohne Zug
     \sigma_c = \max\left[E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right] \quad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
 
 Werkstoffgesetze im Gebrauchszustand: Stahl
@@ -3547,7 +3547,7 @@ Wirksamer Elastizitätsmodul C30/37
 Beiwert der Parabel, mit dem wirksamen Modul
     k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{ck}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 2.8
 
-Werkstoffgesetze im Gebrauchszustand: C30/37: Beton, Parabel-Rechteck   [SIA 262:2025, 4.2.1.6]
+Werkstoffgesetze im Gebrauchszustand, C30/37: Beton, Parabel-Rechteck   [SIA 262:2025, 4.2.1.6]
     \sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 
 Werkstoffgesetze im Gebrauchszustand: Stahl
@@ -3583,6 +3583,130 @@ Grösste Zugspannung in der Bewehrung
 
 Erfüllungsgrad
     \alpha_{eff,\sigma,w,\text{Dauer}} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{31\,\mathrm{N}/\mathrm{mm}^{2}} = 16.04
+
+Knicken
+-------
+
+Ungewollte Ausmitte – allgemein   [SIA 262:2025, 4.3.7]
+    \alpha_i = \min\left[\max\left(\frac{0.01}{\sqrt{l}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \qquad e_{0d} = \max\left(\frac{d}{30};\ \frac{\alpha_i \cdot l_{cr}}{2}\right)
+
+Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein
+    e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| \qquad e_{2d} = \left|\chi\right| \cdot \frac{l_{cr}^{2}}{\pi^{2}} \qquad M_{Ed,II} = \left|N_{Ed}\right| \cdot \left(e_{0d} + e_{1d} + e_{2d}\right)
+
+Verformung
+----------
+
+Rechenwahl – Verformung (e_2d)
+    \varphi = 1.5 \qquad \text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad \text{Präzise ohne Vereinfachung}
+
+Wirksamer Elastizitätsmodul C30/37
+    E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 1.5} = 13448\,\mathrm{N}/\mathrm{mm}^{2}
+
+Beiwert der Parabel, mit dem wirksamen Modul
+    k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{cd}}\right) = \max\left(1;\ \frac{13448\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 1.68
+
+Werkstoffgesetze – Verformung, C30/37: Beton, Parabel-Rechteck   [SIA 262:2025, 4.2.1.6]
+    \sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
+
+Werkstoffgesetze – Verformung: Stahl
+    \sigma_s = \min\left[E_s \cdot \varepsilon_s;\ f_{yd}\right] \quad f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2}
+
+Widerstand
+----------
+
+Rechenwahl – Widerstand (N_Rd)
+    \text{Bemessungswerte}\ f_{cd},\ f_{yd} \qquad 0.85 \cdot x\text{-Vereinfachung}
+
+Werkstoffgesetze – Widerstand, C30/37: Beton, Spannungsblock 0.85·x
+    \sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{cd} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \end{cases}
+
+Werkstoffgesetze – Widerstand: Stahl
+    \sigma_s = \min\left[E_s \cdot \varepsilon_s;\ f_{yd}\right] \quad f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2}
+
+Knicken – Stütze, Zug unten
+---------------------------
+
+Einwirkung und System
+    N_{Ed} = -1500\,\mathrm{kN} \qquad M_{Ed,1} = 30\,\mathrm{kNm} \qquad l = 4\,\mathrm{m} \qquad l_{cr} = 4\,\mathrm{m}
+
+Schiefstellung   [SIA 262:2025, 4.3.7]
+    \begin{aligned}
+      \alpha_i &= \min\left[\max\left(\frac{0.01}{\sqrt{l}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \\
+      &= \min\left[\max\left(\frac{0.01}{\sqrt{4}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \\
+      &= 0.005 \quad \left(l\ \text{in}\ \mathrm{m}\right)
+    \end{aligned}
+
+Ungewollte Ausmitte   [SIA 262:2025, 4.3.7]
+    e_{0d} = \max\left(\frac{d}{30};\ \frac{\alpha_i \cdot l_{cr}}{2}\right) = \max\left(\frac{350\,\mathrm{mm}}{30};\ \frac{0.005 \cdot 4\,\mathrm{m}}{2}\right) = 11.7\,\mathrm{mm}
+
+Gewollte Ausmitte
+    e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| = \left|\frac{30\,\mathrm{kNm}}{-1500\,\mathrm{kN}}\right| = 20\,\mathrm{mm}
+
+Das Verfahren   [SIA 262:2025, 4.3.7]
+    e_{2d}^{(k)} = \left|\chi^{(k)}\right| \cdot \frac{l_{cr}^{2}}{\pi^{2}} \qquad M_{Ed,II}^{(k)} = \left|N_{Ed}\right| \cdot \left(e_{0d} + e_{1d} + e_{2d}^{(k-1)}\right)
+
+Ausmitten-Iteration bei N_Ed = 1500.0 kN
+    k  e_{2d}^{(k-1)}\ [\mathrm{mm}]  M_{Ed,II}^{(k)}\ [\mathrm{kNm}]  \chi^{(k)}\ [\mathrm{m}^{-1}]  e_{2d}^{(k)}\ [\mathrm{mm}]
+    -  -----------------------------  -------------------------------  -----------------------------  ---------------------------
+    1                           0.00                            47.50                        0.00126                         2.05
+    2                           2.05                            50.57                        0.00134                         2.18
+    3                           2.18                            50.77                        0.00135                         2.19
+    4                           2.19                            50.78                        0.00135                         2.19
+    5                           2.19                            50.78                        0.00135                         2.19
+
+Probe: die gefundene Ebene erzeugt die Schnittgrössen
+    \varepsilon_m = -0.536\,\text{‰} \qquad \chi = 0.00135\,\mathrm{m}^{-1} \qquad N_{int} = -1500\,\mathrm{kN} \;\checkmark \qquad M_{int} = 50.8\,\mathrm{kNm} \;\checkmark
+
+Querschnitt am verformten System
+    M_{Rd}(N_{Ed}) = 276.3\,\mathrm{kNm} \quad \ge \quad M_{Ed,II} = 50.8\,\mathrm{kNm}
+
+Grenzkraft des Stabes
+    N_{Rd,K} = 3032.2\,\mathrm{kN} \quad \ge \quad \left|N_{Ed}\right| = 1500\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,K,\text{Stütze}} = \frac{N_{Rd,K}}{\left|N_{Ed}\right|} = \frac{3032.2\,\mathrm{kN}}{1500\,\mathrm{kN}} = 2.02 \quad \Rightarrow \quad \text{erfüllt}
+
+Knicken – Seitlich, Zug links
+-----------------------------
+
+Einwirkung und System
+    N_{Ed} = -1200\,\mathrm{kN} \qquad M_{Ed,1} = 10\,\mathrm{kNm} \qquad l = 5\,\mathrm{m} \qquad l_{cr} = 3.5\,\mathrm{m}
+
+Schiefstellung   [SIA 262:2025, 4.3.7]
+    \begin{aligned}
+      \alpha_i &= \min\left[\max\left(\frac{0.01}{\sqrt{l}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \\
+      &= \min\left[\max\left(\frac{0.01}{\sqrt{5}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \\
+      &= 0.00447 \quad \left(l\ \text{in}\ \mathrm{m}\right)
+    \end{aligned}
+
+Ungewollte Ausmitte   [SIA 262:2025, 4.3.7]
+    e_{0d} = \max\left(\frac{d}{30};\ \frac{\alpha_i \cdot l_{cr}}{2}\right) = \max\left(\frac{350\,\mathrm{mm}}{30};\ \frac{0.00447 \cdot 3.5\,\mathrm{m}}{2}\right) = 11.7\,\mathrm{mm}
+
+Gewollte Ausmitte
+    e_{1d} = \left|\frac{M_{Ed,1}}{N_{Ed}}\right| = \left|\frac{10\,\mathrm{kNm}}{-1200\,\mathrm{kN}}\right| = 8.3\,\mathrm{mm}
+
+Das Verfahren   [SIA 262:2025, 4.3.7]
+    e_{2d}^{(k)} = \left|\chi^{(k)}\right| \cdot \frac{l_{cr}^{2}}{\pi^{2}} \qquad M_{Ed,II}^{(k)} = \left|N_{Ed}\right| \cdot \left(e_{0d} + e_{1d} + e_{2d}^{(k-1)}\right)
+
+Ausmitten-Iteration bei N_Ed = 1200.0 kN
+    k  e_{2d}^{(k-1)}\ [\mathrm{mm}]  M_{Ed,II}^{(k)}\ [\mathrm{kNm}]  \chi^{(k)}\ [\mathrm{m}^{-1}]  e_{2d}^{(k)}\ [\mathrm{mm}]
+    -  -----------------------------  -------------------------------  -----------------------------  ---------------------------
+    1                           0.00                            24.00                        0.00066                         0.82
+    2                           0.82                            24.98                        0.00068                         0.85
+    3                           0.85                            25.02                        0.00069                         0.85
+    4                           0.85                            25.02                        0.00069                         0.85
+
+Probe: die gefundene Ebene erzeugt die Schnittgrössen
+    \varepsilon_m = -0.4191\,\text{‰} \qquad \chi = 0.00069\,\mathrm{m}^{-1} \qquad N_{int} = -1200\,\mathrm{kN} \;\checkmark \qquad M_{int} = 25\,\mathrm{kNm} \;\checkmark
+
+Querschnitt am verformten System
+    M_{Rd}(N_{Ed}) = 232.4\,\mathrm{kNm} \quad \ge \quad M_{Ed,II} = 25\,\mathrm{kNm}
+
+Grenzkraft des Stabes
+    N_{Rd,K} = 3266.6\,\mathrm{kN} \quad \ge \quad \left|N_{Ed}\right| = 1200\,\mathrm{kN}
+
+Erfüllungsgrad
+    \alpha_{eff,K,\text{Seitlich}} = \frac{N_{Rd,K}}{\left|N_{Ed}\right|} = \frac{3266.6\,\mathrm{kN}}{1200\,\mathrm{kN}} = 2.72 \quad \Rightarrow \quad \text{erfüllt}
 
 Balkensystem: Alles einmal
 --------------------------
@@ -4634,6 +4758,19 @@ fest – sie gehört zum System und nicht zur Last, M_Ed,1 wächst also mit. Bei
 immer; von dort aus wird das Fenster halbiert, bis getragene und nicht getragene Kraft
 zusammenfallen.
 
+Am gezeichneten Querschnitt gilt jeder Knickfall in einer Richtung: der Zugseite, zu der sich der
+Stab biegt. Die Nulllinie bleibt dabei parallel zur Achse; das Moment um die andere Achse, das ein
+unsymmetrischer Querschnitt weckt, zählt nicht. d reicht vom gedrückten Rand bis zum entferntesten
+Stab in Zugrichtung.
+
+Der Momentenwiderstand bei einer Druckkraft ist der Bruchzustand des Querschnitts in Biegerichtung,
+mit den Gesetzen des Widerstands – wie in der Tragsicherheit, mit der Nulllinie parallel zur Achse.
+
+Die Dehnung wächst linear in Zugrichtung, ε = ε_m + χ·v mit v ab dem Schwerpunkt. Zu jeder
+Druckkraft und jedem Moment finden zwei geschachtelte Suchen ε_m und χ, wie bei der Platte. Die
+Ausmitten-Iteration darüber steht vollständig da, Durchlauf für Durchlauf: sie ist das Verfahren
+selbst, und dass sie einläuft, ist die Aussage des Nachweises.
+
 Ungewollte Ausmitte – allgemein   [SIA 262:2025, 4.3.7]
     \alpha_i = \min\left[\max\left(\frac{0.01}{\sqrt{l}};\ \frac{1}{300}\right);\ \frac{1}{200}\right] \qquad e_{0d} = \max\left(\frac{d}{30};\ \frac{\alpha_i \cdot l_{cr}}{2}\right)
 
@@ -5076,6 +5213,8 @@ Bewehrung und Schubwände
     Biegung und Normalkraft          Zug                                  N_{Rd}^{+} = 942.5\,\mathrm{kN}                N_{Ed} = 400.0\,\mathrm{kN}          2.36
     Risse: Zwängung Normalkraft      ganzer Querschnitt                    N_{s,adm} = 942.5\,\mathrm{kN}              N_{Riss} = 386.7\,\mathrm{kN}          2.44
     Risse: Quasi-ständige Lastfälle  Dauer               \sigma_{s,adm} = 500\,\mathrm{N}/\mathrm{mm}^{2}  \sigma_s = 31\,\mathrm{N}/\mathrm{mm}^{2}         16.04
+    Knicken                          Stütze                                N_{Rd,K} = 3032.2\,\mathrm{kN}               N_{Ed} = 1500.0\,\mathrm{kN}          2.02
+    Knicken                          Seitlich                              N_{Rd,K} = 3266.6\,\mathrm{kN}               N_{Ed} = 1200.0\,\mathrm{kN}          2.72
 
 Mindestens ein Nachweis ist nicht erfüllt.
 
@@ -5506,6 +5645,8 @@ Werte
     Trägheitsmoment um z                                                            I_z                                                     2133.3  ·10⁶ mm⁴  berechnet
     Erfüllungsgrad Duktilität – Zug oben                                            \alpha_{eff,x/d,\text{Zug oben}}                          2.52            berechnet
     Erfüllungsgrad Duktilität – Zug unten                                           \alpha_{eff,x/d,\text{Zug unten}}                         2.52            berechnet
+    Erfüllungsgrad Knicken – Seitlich                                               \alpha_{eff,K,\text{Seitlich}}                            2.72            berechnet
+    Erfüllungsgrad Knicken – Stütze                                                 \alpha_{eff,K,\text{Stütze}}                              2.02            berechnet
     Erfüllungsgrad Biegung und Normalkraft – Druck                                  \alpha_{eff,\text{Druck}}                                 2.91            berechnet
     Grösste aufnehmbare Druckkraft                                                  N_{Rd}^{-}                                             -5497.4  kN        berechnet
     Grösste aufnehmbare Zugkraft                                                    N_{Rd}^{+}                                               942.5  kN        berechnet

@@ -18,8 +18,9 @@ from opencivil.projekt import (
 from opencivil.projekt.eintraege import Beschreibung
 from opencivil.projekt.querschnittsanalyse import (
     FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QAGebrauchsfallEintrag,
-    QAGebrauchsliste, QALastfallEintrag, QASpannungsfallEintrag, QuerschnittsanalyseEintrag,
-    SchubwandEintrag, StabEintrag, StablinieEintrag, WerkstoffwahlEintrag,
+    QAGebrauchsliste, QAKnickEintrag, QALastfallEintrag, QASpannungsfallEintrag,
+    QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
+    WerkstoffwahlEintrag,
 )
 from opencivil.projekt.gleichungen import GleichungsblattEintrag, GleichungszeileEintrag
 from opencivil.web import api, dienst
@@ -412,6 +413,7 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
         (QALastfallEintrag, {"name": "l"}, {"name": "l"}),
         (QASpannungsfallEintrag, {"name": "s"}, {"name": "s"}),
         (QAGebrauchsfallEintrag, {"name": "g"}, {"name": "g"}),
+        (QAKnickEintrag, {"name": "k"}, {"name": "k"}),
         (WerkstoffwahlEintrag, {"material": "b1"}, {"material": "b1"}),
         (QuerschnittsanalyseEintrag, {"kennung": "a"}, {"kennung": "a", "name": "a"}),
         (SystemknotenEintrag, {}, {}),
@@ -471,6 +473,7 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
                 ("qa_lastfall", QALastfallEintrag, {"name": "Neu"}),
                 ("qa_analyse", QASpannungsfallEintrag, {"name": "Neu"}),
                 ("qa_gebrauchsfall", QAGebrauchsfallEintrag, {"name": "Neu"}),
+                ("qa_knickfall", QAKnickEintrag, {"name": "Neu"}),
                 ("knoten", KnotenEintrag, {}), ("flaeche", FlaecheEintrag, {}),
                 ("stab", StabEintrag, {}), ("stablinie", StablinieEintrag, {}),
                 ("schubwand", SchubwandEintrag, {}), ("hilfslinie", HilfslinieEintrag, {}),

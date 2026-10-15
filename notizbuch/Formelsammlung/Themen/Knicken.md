@@ -1,5 +1,5 @@
 ---
-erzeugt: b2758bc9cf7a
+erzeugt: 520a05b8012d
 art: thema
 tags: [thema]
 ---
@@ -25,6 +25,12 @@ Der Beton ist in 200 Fasern über die Höhe geteilt, jede mit ihrer mittleren Sp
 Zu jedem Moment wird die Dehnungsebene gesucht, die es im Gleichgewicht hält; aus deren Krümmung folgt die nächste Ausmitte. Begonnen wird mit e\_2d = 0, also ohne Verformung.
 
 Gesucht wird die grösste Druckkraft mit Gleichgewichtslage. Die gewollte Ausmitte e\_1d bleibt dabei fest – sie gehört zum System und nicht zur Last, M\_Ed,1 wächst also mit. Bei N = 0 trägt der Stab immer; von dort aus wird das Fenster halbiert, bis getragene und nicht getragene Kraft zusammenfallen.
+
+Am gezeichneten Querschnitt gilt jeder Knickfall in einer Richtung: der Zugseite, zu der sich der Stab biegt. Die Nulllinie bleibt dabei parallel zur Achse; das Moment um die andere Achse, das ein unsymmetrischer Querschnitt weckt, zählt nicht. d reicht vom gedrückten Rand bis zum entferntesten Stab in Zugrichtung.
+
+Der Momentenwiderstand bei einer Druckkraft ist der Bruchzustand des Querschnitts in Biegerichtung, mit den Gesetzen des Widerstands – wie in der Tragsicherheit, mit der Nulllinie parallel zur Achse.
+
+Die Dehnung wächst linear in Zugrichtung, ε = ε\_m + χ·v mit v ab dem Schwerpunkt. Zu jeder Druckkraft und jedem Moment finden zwei geschachtelte Suchen ε\_m und χ, wie bei der Platte. Die Ausmitten-Iteration darüber steht vollständig da, Durchlauf für Durchlauf: sie ist das Verfahren selbst, und dass sie einläuft, ist die Aussage des Nachweises.
 
 ## Formeln
 

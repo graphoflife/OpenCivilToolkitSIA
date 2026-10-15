@@ -1,5 +1,5 @@
 ---
-erzeugt: 3b92ae99621b
+erzeugt: 559cdac7b5fb
 art: modul
 tags: [modul]
 ---
@@ -294,6 +294,26 @@ Handrechnung gibt es hier nicht.
 - `BAUTEIL = 'Querschnitt'`
 - `faelle: List[QAGebrauchsfallEintrag] = field(default_factory=list)`
 
+### QAKnickEintrag
+
+```python
+@dataclass
+class QAKnickEintrag(KnickEintrag)
+```
+
+Ein Knicknachweis des gezeichneten Querschnitts -- wie bei der Platte,
+dazu die Zugseite: die Seite, zu der sich der Stab biegt und die das
+Moment 1. Ordnung zieht ([[opencivil.querschnitt.schnittanalyse#Zugseite|Zugseite]]).
+
+- `richtung: str = Zugseite.UNTEN.value`
+
+#### QAKnickEintrag.aus_dict
+
+```python
+@classmethod
+def aus_dict(cls, d: Mapping[str, Any]) -> 'QAKnickEintrag'
+```
+
 ### WerkstoffwahlEintrag
 
 ```python
@@ -400,6 +420,9 @@ Ein gezeichneter Querschnitt mit Bewehrung, Schubwaenden und Lastfaellen.
 - `zwaengung_biegung_kriechzahl: float = 0.0` – Die Kriechzahl φ der Zwaengung auf Biegung: der Beton mit `E_cm/(1+φ)`.
 - `quasistaendig: QAGebrauchsliste = field(default_factory=lambda: QAGebrauchsliste(anteil=QUASISTAENDIG_A…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
 - `haeufig: QAGebrauchsliste = field(default_factory=lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL))` – Die haeufigen Lastfaelle -- gegen das Fliessen, bei erhoehter und hoher Anforderung.
+- `knickfaelle: List[QAKnickEintrag] = field(default_factory=list)` – Knicknachweise, je in einer Richtung; leer heisst: keiner.
+- `knicken_wahl_verformung: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.knicken_verformung)`
+- `knicken_wahl_widerstand: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.knicken_widerstand)` – Womit das Knicken die Ausmitte e_2d und den Widerstand rechnet -- wie bei der Platte.
 - `spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)` – Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt.
 - `beschreibung: str = ''` – Freier Text -- geht in keine Rechnung ein, wie bei der Platte.
 
@@ -530,6 +553,14 @@ def lastfall(self, name: str, **werte: float) -> QALastfallEintrag
 ```
 
 Einen Lastfall anfuegen, ohne Oberflaeche -- kN und kNm.
+
+#### QuerschnittsanalyseEintrag.knickfall
+
+```python
+def knickfall(self, name: str, *, N_Ed: float, M_Ed_1: float=0.0, laenge: float=3.0, knicklaenge: Optional[float]=None, richtung: str=Zugseite.UNTEN.value) -> QAKnickEintrag
+```
+
+Ein Knicknachweis -- N_Ed in kN (Druck negativ), Längen in m, die Zugseite.
 
 #### QuerschnittsanalyseEintrag.spannungsfall
 

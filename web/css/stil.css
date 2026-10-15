@@ -702,6 +702,11 @@ input[readonly], input:disabled, select:disabled {
 .einwirkung > :nth-child(4) { grid-column: 3; }
 .einwirkung > :nth-child(5) { grid-column: 4; }
 .einwirkung > :nth-child(6) { grid-column: 5; }
+/* Beim Knicken des gezeichneten Querschnitts steht die Zugseite oben neben
+   dem Namen, über den letzten beiden Zahlen: «Zug unten» braucht mehr Platz
+   als eine Zahl. */
+.einwirkung.mit-zugseite > :nth-child(2) { grid-column: 2 / 4; }
+.einwirkung.mit-zugseite > :nth-child(7) { grid-row: 1; grid-column: 4 / 6; }
 .einwirkung > :nth-child(2) { grid-column: 2 / -2; }
 .einwirkung > :last-child { grid-column: -2; grid-row: 1; }
 /* Im Lastfall ist der Schalter nur ein Beiwerk -- er darf der Zeile nicht die

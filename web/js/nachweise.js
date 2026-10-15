@@ -321,75 +321,76 @@ export function sproedeInhalt(querschnitt) {
 /**
  * Knicken -- Druckkraft, Moment 1. Ordnung, Länge und Knicklänge je Fall.
  *
- * Nur in x-Richtung: eine Knicklänge gehört zu einer Tragrichtung, und in y
- * wäre die Breite der Platte die Länge.
+ * Bei der Platte nur in x-Richtung: eine Knicklänge gehört zu einer
+ * Tragrichtung, und in y wäre die Breite der Platte die Länge. Der
+ * gezeichnete Querschnitt wählt je Fall die Zugseite, zu der sich der Stab
+ * biegt -- `ort.knick.richtung` baut die Auswahl; sie steht oben neben dem
+ * Namen, die vier Zahlen bleiben darunter. `ort.knick` sagt auch die Köpfe
+ * und Titel der Spalten.
  */
-export function knickInhalt(querschnitt) {
-  const faelle = querschnitt.knickfaelle || [];
-  const aendern = anPlatte(querschnitt);
+export function knickInhalt(eintrag, ort = PLATTE) {
+  const faelle = eintrag.knickfaelle || [];
+  const aendern = anBauteil(eintrag, ort);
+  const knick = ort.knick;
 
   return [
     // Zwei Wahlen: womit die Verformung gerechnet wird und womit der
     // Querschnitt widersteht.
     // Ohne Handrechnung: beim Knicken zählt die Normalkraft genau.
-    rechenwahlZeile('Verformung (e_2d)', querschnitt.knicken_wahl_verformung,
+    rechenwahlZeile('Verformung (e_2d)', eintrag.knicken_wahl_verformung,
       (veraenderer) => aendern((q) => veraenderer(q.knicken_wahl_verformung)),
       { arten: 'faserarten' }),
-    rechenwahlZeile('Widerstand (N_Rd)', querschnitt.knicken_wahl_widerstand,
+    rechenwahlZeile('Widerstand (N_Rd)', eintrag.knicken_wahl_widerstand,
       (veraenderer) => aendern((q) => veraenderer(q.knicken_wahl_widerstand)),
       { arten: 'faserarten' }),
     faelle.length
       ? el('div.einwirkung.ist-knick.ist-kopf', {}, [
         el('span'),
         el('span', { text: 'Bezeichnung' }),
-        el('span', { text: 'N_Ed,x [kN]' }),
-        el('span', { text: 'M_Ed,1,x [kNm]' }),
-        el('span', { text: 'l [m]' }),
-        el('span', { text: 'l_cr [m]' }),
+        ...knick.kopf.map((text) => el('span', { text })),
         el('span'),
       ])
       : null,
     ...(faelle.length
-      ? faelle.map((_, i) => knickZeile(querschnitt, i))
-      : [el('div.leer', { text: 'Kein Knicknachweis (nur x).' })]),
+      ? faelle.map((_, i) => knickZeile(eintrag, ort, i))
+      : [el('div.leer', { text: knick.leer })]),
     anfuegenKnopf('Knicknachweis', () => aendern((q) => {
       q.knickfaelle = q.knickfaelle || [];
       q.knickfaelle.push(
-        ausVorlage('knickfall', { name: naechsterName('Knicken', q.knickfaelle) }));
+        ausVorlage(knick.vorlage, { name: naechsterName('Knicken', q.knickfaelle) }));
     })),
   ];
 }
 
-function knickZeile(querschnitt, index) {
-  const k = (querschnitt.knickfaelle || [])[index];
-  const aendern = (veraenderer) => projektAendern((p) => {
-    veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
-      .knickfaelle[index]);
-  });
+function knickZeile(eintrag, ort, index) {
+  const k = (eintrag.knickfaelle || [])[index];
+  const aendern = (veraenderer) => anBauteil(eintrag, ort)((e) => veraenderer(e.knickfaelle[index]));
+  const titel = ort.knick.titel;
   // Eine Länge null gibt es nicht -- geleert bleibt der bisherige Wert.
-  const zahl = (feld, titel, schritt) => zahlfeld({
-    wert: k[feld], schritt, titel,
+  const zahl = (feld, schritt) => zahlfeld({
+    wert: k[feld], schritt, titel: titel[feld],
     beiAenderung: (v) => aendern((x) => { x[feld] = v; }),
   });
 
   const aktiv = k.aktiv !== false;
-  return el('div.einwirkung.ist-knick', { class: aktiv ? '' : 'ist-aus' }, [
+  const richtung = ort.knick.richtung;
+  return el(`div.einwirkung.ist-knick${richtung ? '.mit-zugseite' : ''}`, {
+    class: aktiv ? '' : 'ist-aus',
+  }, [
     hakenSchalter(aktiv, (wert) => aendern((x) => { x.aktiv = wert; }), 'Knicknachweis'),
     el('input.ew-name', {
       type: 'text', value: k.name, title: 'Bezeichnung des Knicknachweises',
       on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
     }),
-    zahl('N_Ed', 'Druckkraft in kN – negativ, in x-Richtung', 50),
-    zahl('M_Ed_1', 'Moment 1. Ordnung in kNm, um die y-Achse (Tragrichtung x)', 10),
-    zahl('laenge', 'Systemlänge in m – geht in die Schiefstellung ein', 0.5),
-    zahl('knicklaenge', 'Knicklänge in m', 0.5),
+    zahl('N_Ed', 50),
+    zahl('M_Ed_1', 10),
+    zahl('laenge', 0.5),
+    zahl('knicklaenge', 0.5),
+    richtung ? richtung(k, (wert) => aendern((x) => { x.richtung = wert; })) : null,
     el('button.weg', {
       text: '×', title: 'Knicknachweis entfernen',
       on: {
-        click: () => projektAendern((p) => {
-          p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
-            .knickfaelle.splice(index, 1);
-        }),
+        click: () => anBauteil(eintrag, ort)((e) => { e.knickfaelle.splice(index, 1); }),
       },
     }),
   ]);
@@ -763,8 +764,9 @@ async function bewehrungErmitteln(kennung) {
  * der Platte die Tragrichtung x oder y. Der gezeichnete Querschnitt hat seinen
  * eigenen Ort (`querschnittsanalyse.js`): dort ist die Richtung die Zugseite.
  * `raender(k)` sagt, wie die beiden Ränder einer Analyse heissen -- der
- * gedrückte und der gezogene. `zwang(e)` und `gebrauch` sind, was die
- * Zwängung und die Stahlspannungen beim Bauteil anders zeigen.
+ * gedrückte und der gezogene. `zwang(e)`, `gebrauch` und `knick` sind, was
+ * die Zwängung, die Stahlspannungen und das Knicken beim Bauteil anders
+ * zeigen.
  */
 export const PLATTE = {
   liste: 'querschnitte',
@@ -779,6 +781,19 @@ export const PLATTE = {
     hinweise: {},
     phiTitel: 'Kriechzahl φ der Zwängung auf Biegung: n = E_s/E_cm · (1 + φ)',
   }),
+  // Das Knicken: nur in x.
+  knick: {
+    vorlage: 'knickfall',
+    kopf: ['N_Ed,x [kN]', 'M_Ed,1,x [kNm]', 'l [m]', 'l_cr [m]'],
+    titel: {
+      N_Ed: 'Druckkraft in kN – negativ, in x-Richtung',
+      M_Ed_1: 'Moment 1. Ordnung in kNm, um die y-Achse (Tragrichtung x)',
+      laenge: 'Systemlänge in m – geht in die Schiefstellung ein',
+      knicklaenge: 'Knicklänge in m',
+    },
+    richtung: null,
+    leer: 'Kein Knicknachweis (nur x).',
+  },
   // Die Lastfälle unter Gebrauchslast: Moment und Normalkraft je b.
   gebrauch: {
     vorlage: 'gebrauchsfall',

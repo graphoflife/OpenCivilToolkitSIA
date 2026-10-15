@@ -1,5 +1,5 @@
 ---
-erzeugt: 58356cda19cb
+erzeugt: 89a00a0a7d1c
 art: modul
 tags: [modul]
 ---
@@ -67,6 +67,7 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `qa_zwaengung_biegung: Dict[str, ZwaengungBiegungQA] = field(default_factory=dict)`
 - `qa_spannung_riss: Dict[str, SpannungsbegrenzungQA] = field(default_factory=dict)`
 - `qa_spannung: Dict[str, SpannungsbegrenzungQA] = field(default_factory=dict)` – Die Gebrauchsnachweise je Querschnittsanalyse, wie bei der Platte.
+- `qa_knicken: Dict[str, KnickenQA] = field(default_factory=dict)` – Knicken je Querschnittsanalyse -- je Fall in seiner Richtung.
 - `balkensysteme: Dict[str, Balkensystem] = field(default_factory=dict)` – Die Balkensysteme, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis.
 - `warnungen: List[str] = field(default_factory=list)`
 - `NACHWEISFELDER = ('nachweise', 'querkraft', 'duktilitaet', 'fehlende', 'rissnormalkraf…` – Die Felder, in denen die Nachweise stehen -- die eine Stelle, an der ein neuer Nachweis eingetragen wird. Alle sind nach Kennung geschluesselt (`q1` oder `q1.x`) und alle tragen Nachweise mit `d_ausnutzung`. Ihre Reihenfolge ist die der Herleitung: in ihr rechnet ein Bauteil seine Nachweise ([[opencivil.projekt.aufbau#Bauteil.ziele|Bauteil.ziele]]).
@@ -307,7 +308,8 @@ Biegung und Normalkraft immer -- ihre Eckwerte gehoeren dem Querschnitt.
 Querkraft und Torsion, sobald ein Lastfall sie hat oder die
 Laengszugkraft zaehlt. Duktilitaet, sproedes Versagen und die Zwaengungen
 immer, still, wenn ausgeschaltet -- wie bei der Platte. Ebenso die
-Stahlspannungen, sobald es Lastfaelle gibt ([[opencivil.projekt.aufbau#_qa_spannungsnachweise|_qa_spannungsnachweise]]).
+Stahlspannungen, sobald es Lastfaelle gibt ([[opencivil.projekt.aufbau#_qa_spannungsnachweise|_qa_spannungsnachweise]]),
+und das Knicken, sobald ein Fall eingeschaltet ist.
 
 ### _balkensystem
 
@@ -367,6 +369,14 @@ def _qa_spannungsnachweise(eintrag: QuerschnittsanalyseEintrag, analyse: Quersch
 ```
 
 Die Stahlspannungen des gezeichneten Querschnitts -- wie bei der Platte, je Grenze.
+
+### _knickfall
+
+```python
+def _knickfall(k: KnickEintrag, klasse: type=Knickfall, **mehr: Any) -> Knickfall
+```
+
+Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; `mehr` fuer die Analyse.
 
 ### _gebrauchsfaelle
 
@@ -466,6 +476,7 @@ Baufunktion von ihr bekannt sein muss. Eine neue Art kommt in
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.schiefe_biegung]]
@@ -481,6 +492,7 @@ Baufunktion von ihr bekannt sein muss. Eine neue Art kommt in
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.platte]]
+- [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.stabwerk.rechnung]]
 
 ## Gebraucht von

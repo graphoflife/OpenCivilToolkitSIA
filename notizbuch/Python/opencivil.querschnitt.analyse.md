@@ -1,5 +1,5 @@
 ---
-erzeugt: 7ecfb8cd82da
+erzeugt: 8f3d24a40f54
 art: modul
 tags: [modul]
 ---
@@ -398,6 +398,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 ## Gebraucht von
 
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.schubwandnachweis]]

@@ -2413,13 +2413,18 @@
         "Knickergebnis",
         "Knickbefund",
         "schiefstellung",
+        "Knickstab",
+        "Knickverfahren",
+        "Knickverfahren._m_rd_symbol",
+        "Knickverfahren._gleichgewicht",
+        "Knickverfahren._grenzkraft",
+        "Knickverfahren._n_rd",
+        "Knickverfahren._protokoll_verfahren",
+        "Knickverfahren._protokoll_iteration",
+        "Knickverfahren._protokoll_grenzkraft",
         "Knicken",
-        "Knicken.pruefe",
-        "Knicken._gleichgewicht",
-        "Knicken._grenzkraft",
-        "Knicken._n_rd",
-        "Knicken._protokoll_iteration",
-        "Knicken._protokoll_grenzkraft"
+        "Knicken.stab",
+        "Knicken.pruefe"
       ]
     },
     {
@@ -2472,7 +2477,6 @@
       "art": "modul",
       "kurz": "Gebrauchsnachweise des gezeichneten Querschnitts.",
       "stichworte": [
-        "protokoll_gesetze",
         "Fallergebnis",
         "Fallergebnis.fliesst",
         "SpannungsbegrenzungQA",
@@ -2488,6 +2492,18 @@
         "ZwaengungBiegungQA",
         "ZwaengungBiegungQA.pruefe",
         "ZwaengungBiegungQA._an_der_grenze"
+      ]
+    },
+    {
+      "name": "opencivil.nachweis.qa_knicken",
+      "pfad": "Python/opencivil.nachweis.qa_knicken.md",
+      "art": "modul",
+      "kurz": "Knicken am gezeichneten Querschnitt.",
+      "stichworte": [
+        "QAKnickfall",
+        "knickstab",
+        "KnickenQA",
+        "KnickenQA.pruefe"
       ]
     },
     {
@@ -2554,6 +2570,10 @@
         "Faserloeser._suchen",
         "Faserloeser._rand",
         "FaserloeserIllinois",
+        "FaserloeserIllinois._eps_zu_normalkraft",
+        "FaserloeserIllinois._eps_von",
+        "FaserloeserIllinois.loese",
+        "FaserloeserIllinois._von_zuletzt",
         "Querschnittsloeser",
         "Werkstoffsatz",
         "Werkstoffsatz.beschriftung",
@@ -2925,6 +2945,7 @@
         "_lagennachweise",
         "_spannungsnachweise",
         "_qa_spannungsnachweise",
+        "_knickfall",
         "_gebrauchsfaelle",
         "_ausgefallene",
         "Bauteilart"
@@ -3164,6 +3185,8 @@
         "QAGebrauchsfallEintrag",
         "QAGebrauchsfallEintrag.aus_dict",
         "QAGebrauchsliste",
+        "QAKnickEintrag",
+        "QAKnickEintrag.aus_dict",
         "WerkstoffwahlEintrag",
         "WerkstoffwahlEintrag.aus_dict",
         "QASpannungsfallEintrag",
@@ -3185,6 +3208,7 @@
         "QuerschnittsanalyseEintrag.vorlage_einsetzen",
         "QuerschnittsanalyseEintrag.pruefen",
         "QuerschnittsanalyseEintrag.lastfall",
+        "QuerschnittsanalyseEintrag.knickfall",
         "QuerschnittsanalyseEintrag.spannungsfall",
         "QuerschnittsanalyseEintrag.neu",
         "QuerschnittsanalyseEintrag.aus_dict",
@@ -3412,6 +3436,7 @@
         "Schnittpaar.herleitung_dehnung_am_ende",
         "Schnittpaar.herleitung_bezug",
         "querschnitt_nach_wahl",
+        "protokoll_gesetze_nach_wahl",
         "schnittpaar",
         "analysen"
       ]
