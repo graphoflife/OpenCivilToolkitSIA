@@ -19,7 +19,7 @@ gelernt wurde, steht in [[Entwicklung]].
 - [ ] Der Riegel `k_g ≥ 1.20` ist nach Vorgabe eingebaut, aber nicht gegen die
       Norm geprüft. Bei D_max = 32 mm und C30/37 greift er (roh 1.00 → 1.20)
       und senkt den Querkraftwiderstand um gut 4 %.
-- [ ] Normstellen für 109 von 141 Formeln fehlen noch -- die Liste samt
+- [ ] Normstellen für 112 von 176 Formeln fehlen noch -- die Liste samt
       Stelle im Code steht auf der Übersicht der [[Formelsammlung]]. Sie
       kommen vom Benutzer und werden im Code eingetragen (`referenz=`).
 - [ ] Verformung und «Plattendicke optimieren»: **entschieden, noch nicht
@@ -40,10 +40,21 @@ gelernt wurde, steht in [[Entwicklung]].
       Tabelle 9.2.18 (der Text schreibt tan α); Wasser unter der Sohle, aber
       im Gleitkörper, rechnet mit γ' statt der verlangten
       Stabilitätsberechnung; eine Klammer der Lastneigung unter null gilt
-      null; δ*/φ als Eingabe mit Vorgabe 1. Vom Benutzer bestätigen lassen.
+      null; δ*/φ als Eingabe mit Vorgabe 1; gerechnet wird mit den
+      Teilsicherheiten auf φ und c, ein globaler Sicherheitsgrad wie F_stat
+      des Kapitels kommt nicht dazu. Vom Benutzer bestätigen lassen.
 - [ ] Grundbruch: keine Ausmitte der Last (wirksame Breite), kein
       Erdwiderstand vor dem Fundament. Der Gleitkörper im Bild gilt für
       waagrechte Sohle und waagrechtes Gelände.
+- [ ] **Kennzahlen der Platte, meine Festlegungen** (2026-10-16), vom
+      Benutzer bestätigen lassen: x/d steht je Seite, Zug unten und Zug oben;
+      mit Bügeln ist V_Rd das Kleinere beider Seiten, je bei der günstigsten
+      Neigung; gerechnet wird immer von Hand mit Bemessungswerten -- rechnet
+      die Tragsicherheit anders, mit eigener Herleitung
+      (`nachweis/kennzahlen.py`).
+- [ ] **Eigener Betonstahl heisst BS1, BS2 …** Der Benutzer nannte BE1 für
+      Beton; die Vorsilbe für Betonstahl ist meine Wahl
+      (`projekt/eintraege.py`, `EIGENE_VORSILBE`). Bestätigen lassen.
 - [ ] Der Dienst «bericht» und das PDF des lokalen Servers haben seit dem
       Wegfall des Knopfs «Bericht» keinen Weg mehr aus der Oberfläche.
       Entfernen, oder wieder erreichbar machen.
@@ -134,8 +145,11 @@ und «Ein Steckbrief je Bauteilart» (siehe [[Entwicklung]]).
       Befehle stehen in vier Listen, Knöpfe täuschen Tastendrücke vor),
       `querkraft.py` (zwei Nachweise hinter `if self.buegel is not None`:
       Fachwerk, ohne Bügel, mit Bügeln; die Regel für d_v steht in Kurve und
-      Nachweis je einmal), `spannungsanalyse.py` und `platte.py` (entlang
-      ihrer Abschnittsmarken), `stil.css` (ein Blatt je App).
+      Nachweis je einmal), `nachweise.js` (die Fenster für Riss und
+      Verformung in ein eigenes Modul), `spannungsanalyse.py`, `aufbau.py`
+      und `querschnittsloeser.py` (entlang ihrer Abschnittsmarken), `stil.css`
+      (ein Blatt je App). Stand 2026-10-16: stil.css 2248 Zeilen, die übrigen
+      1066 bis 1330.
 - [ ] **Der Posten als `Postenbezug` statt als 5-Tupel.** Ein
       Bewehrungsposten reist als `(Lage, Art, Posten, ID von A_s, ID von z)`
       und wird rund zwanzigmal nach Position zerlegt; die Marke
