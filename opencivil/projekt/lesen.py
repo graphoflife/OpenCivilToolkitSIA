@@ -47,7 +47,6 @@ from typing import Any, Dict, Iterable, Mapping, Optional
 
 from opencivil.material.beton import BETONSORTEN
 from opencivil.material.betonstahl import STAHLSORTEN
-from opencivil.nachweis.mindestbewehrung import RISSBREITE
 
 
 class ProjektFehler(Exception):
@@ -72,21 +71,6 @@ def nicht_negativ(vorgabe: float) -> Any:
 def sorten(art: str) -> Mapping[str, Any]:
     """Die Normsorten einer Materialart."""
     return {"beton": BETONSORTEN, "betonstahl": STAHLSORTEN}[art]
-
-
-#: Wie die Rissanforderungen an der Maske heissen.
-_BESCHRIFTUNG: Dict[str, str] = {
-    "normal": "Normal",
-    "erhoeht": "Erhöht",
-    "hoch": "Hoch",
-}
-
-#: Anforderung an die Rissbildung, mit ihrer Beschriftung. Welche es gibt,
-#: sagt :data:`mindestbewehrung.RISSBREITE` -- dort steht zu jeder die
-#: Rissbreite, und die Liste der Werte soll nur einmal dastehen. Kaeme dort
-#: eine dazu, ohne dass sie hier eine Beschriftung hat, scheiterte schon der
-#: Import.
-RISSANFORDERUNGEN: Dict[str, str] = {wert: _BESCHRIFTUNG[wert] for wert in RISSBREITE}
 
 
 # ===========================================================================

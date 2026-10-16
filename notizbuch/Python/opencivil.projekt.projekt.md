@@ -1,5 +1,5 @@
 ---
-erzeugt: 33668191c858
+erzeugt: 2d36f8521393
 art: modul
 tags: [modul]
 ---
@@ -353,7 +353,9 @@ def _felder_setzen(eintrag: Any, felder: Mapping[str, Any], wo: str) -> None
 ```
 
 Die Stichworte einer Fassade an den Eintrag -- ein unbekanntes wird
-gemeldet, mit dem aehnlichsten Feld, statt still zu verschwinden.
+gemeldet, mit dem aehnlichsten Feld, statt still zu verschwinden; ein
+Wert, der nicht passt, an der Zeile, in der er steht, und nicht erst beim
+Rechnen.
 
 
 ## Braucht

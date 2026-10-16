@@ -62,7 +62,7 @@ from opencivil.querschnitt.platte import (
 )
 from opencivil.projekt.eintraege import (
     Gebrauchsliste, KnickEintrag, KombinationEintrag, MaterialEintrag, SpannungsfallEintrag,
-    VerformungsfallEintrag, abgeleiteter_fallname,
+    VerformungsfallEintrag, abgeleiteter_fallname, druckfeld_pruefen,
 )
 from opencivil.projekt.balkensystem import BalkensystemEintrag, StabquerschnittEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
@@ -646,21 +646,10 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
     einen Satz, der die Analyse nennt.
     """
     wo = f"Querschnittsanalyse '{eintrag.name}'"
+    eintrag.zahlen_pruefen()
 
     def stoff(kennung: str, was: str, art: str) -> Baustoff:
-        gefunden = baustoffe.get(kennung)
-        if gefunden is None and not kennung:
-            # Kein Material angegeben -- wie bei den Lagen der Platte gilt
-            # dann das erste dieser Art im Projekt.
-            gefunden = next((s for s in baustoffe.values() if s.art.value == art), None)
-        if gefunden is None:
-            raise ProjektFehler(f"{wo}: {was} verweist auf das Material '{kennung}', "
-                                f"das es nicht (mehr) gibt.")
-        if gefunden.art.value != art:
-            raise ProjektFehler(f"{wo}: {was} braucht einen "
-                                f"{'Beton' if art == 'beton' else 'Betonstahl'}, "
-                                f"'{gefunden.name}' ist keiner.")
-        return gefunden
+        return _stoff(baustoffe, kennung, art, f"{wo}: {was}")
 
     elemente = eintrag.elemente()
     if elemente.fehler:
@@ -800,9 +789,16 @@ def _baustoff(eintrag: MaterialEintrag, symbol_index: str) -> Baustoff:
     # -- gamma_c = 0 endete in einem ZeroDivisionError, ein negatives f_ck
     # in einer komplexen Wurzel. Beides kam als Absturzmeldung beim
     # Benutzer an.
+    #
+    # Ein Kennwert, den es nicht gibt, ist ein Tippfehler: bis 2026-10-16 fiel
+    # eine Abweichung «fck» still weg, und gerechnet wurde mit der Sorte.
     for topf, wie in ((eintrag.abweichungen, "abweichender Wert"),
                       (eintrag.ueberschreibungen, "überschriebener Wert")):
         for kurzname, zahl in topf.items():
+            if kurzname not in roh.definitionen:
+                raise ProjektFehler(
+                    f"'{eintrag.anzeigename}': einen Kennwert '{kurzname}' gibt es nicht "
+                    f"({wie}). Möglich sind: {', '.join(roh.definitionen)}.")
             if zahl <= 0.0:
                 raise ProjektFehler(
                     f"'{eintrag.anzeigename}': {kurzname} muss grösser als null "
@@ -810,7 +806,6 @@ def _baustoff(eintrag: MaterialEintrag, symbol_index: str) -> Baustoff:
     abweichungen = {
         kurzname: Groesse(zahl, roh.definition(kurzname).einheit)
         for kurzname, zahl in eintrag.abweichungen.items()
-        if kurzname in roh.definitionen
     }
     return bauer(
         eintrag.sorte,
@@ -821,28 +816,47 @@ def _baustoff(eintrag: MaterialEintrag, symbol_index: str) -> Baustoff:
     )
 
 
+def _stoff(baustoffe: Mapping[str, Baustoff], kennung: str, art: str, wer: str) -> Baustoff:
+    """
+    Das Material, auf das ein Eintrag zeigt: es muss es geben, und es muss
+    von dieser Art sein. Ohne Angabe gilt nicht «das erste im Projekt» -- bis
+    2026-10-16 bekamen Buegel und Staebe ohne Stahl still den ersten.
+    """
+    gefunden = baustoffe.get(kennung)
+    if gefunden is None:
+        raise ProjektFehler(
+            f"{wer} verweist auf das Material '{kennung}', das es nicht (mehr) gibt."
+            if kennung else f"{wer} hat kein Material.")
+    if gefunden.art.value != art:
+        raise ProjektFehler(f"{wer} braucht einen "
+                            f"{'Beton' if art == 'beton' else 'Betonstahl'}, "
+                            f"'{gefunden.name}' ist keiner.")
+    return gefunden
+
+
 def _querschnitt(
     eintrag: QuerschnittEintrag, baustoffe: Mapping[str, Baustoff], *, praefix: str
 ) -> Plattenquerschnitt:
-    beton_stoff = baustoffe.get(eintrag.beton)
-    if beton_stoff is None:
-        raise ProjektFehler(
-            f"Platte '{eintrag.name}' verweist auf das Material "
-            f"'{eintrag.beton}', das es nicht (mehr) gibt.")
-    eintrag.masse_pruefen()
+    beton_stoff = _stoff(baustoffe, eintrag.beton, "beton", f"Platte '{eintrag.name}'")
+    eintrag.zahlen_pruefen()
 
     lagen: List[Bewehrungslage] = []
     for nummer, lage in enumerate(eintrag.lagen, start=1):
-        stahl = baustoffe.get(lage.stahl)
-        if stahl is None and lage.vorhanden:
-            raise ProjektFehler(
-                f"Die {nummer}. Lage von '{eintrag.name}' verweist auf den Stahl "
-                f"'{lage.stahl}', den es nicht (mehr) gibt.")
+        if lage.vorhanden:
+            stahl = _stoff(baustoffe, lage.stahl, "betonstahl",
+                           f"Die {nummer}. Lage von '{eintrag.name}'")
+        else:
+            # Eine leere Lage traegt nichts; ihr Stahl erscheint nur, wo die
+            # Mindestbewehrung sie als leer meldet. Steht kein Stahl da, der
+            # erste im Projekt.
+            stahl = baustoffe.get(lage.stahl)
+            if stahl is None or stahl.art.value != "betonstahl":
+                stahl = next((s for s in baustoffe.values() if s.art.value == "betonstahl"),
+                             None)
         lagen.append(Bewehrungslage(
             nummer=nummer,
             richtung=eintrag.richtung_von(nummer),
-            stahl=stahl or next(iter(
-                s for s in baustoffe.values() if s.art.value == "betonstahl"), None),
+            stahl=stahl,
             grund=lage.grund.als_posten(),
             zulage=lage.zulage.als_posten(),
             unguenstig=lage.unguenstig,
@@ -854,22 +868,12 @@ def _querschnitt(
             f"Widerstand bestimmen.")
 
     buegel = eintrag.querkraftbewehrung
-    buegel.pruefen(f"Platte '{eintrag.name}'")
-    buegelstahl = baustoffe.get(buegel.stahl)
-    if buegelstahl is None and buegel.stahl:
-        raise ProjektFehler(
-            f"Die Querkraftbewehrung von '{eintrag.name}' verweist auf den "
-            f"Stahl '{buegel.stahl}', den es nicht (mehr) gibt.")
-    if buegelstahl is None:
-        # Kein Stahl angegeben -- wie bei den Lagen gilt dann der erste im
-        # Projekt. Eine Beschreibung aus der Zeit vor den Buegeln nennt
-        # keinen, und daran soll der ganze Lauf nicht scheitern.
-        buegelstahl = next(
-            (s for s in baustoffe.values() if s.art.value == "betonstahl"), None)
-    if buegel.vorhanden and buegelstahl is None:
-        raise ProjektFehler(
-            f"Die Querkraftbewehrung von '{eintrag.name}' braucht einen "
-            f"Betonstahl, im Projekt gibt es aber keinen.")
+    wo = f"Platte '{eintrag.name}'"
+    buegel.pruefen(wo)
+    if buegel.vorhanden:
+        druckfeld_pruefen(eintrag.k_c, wo)
+        buegelstahl = _stoff(baustoffe, buegel.stahl, "betonstahl",
+                             f"Die Querkraftbewehrung von '{eintrag.name}'")
 
     return Plattenquerschnitt(
         name=eintrag.name,
@@ -882,8 +886,7 @@ def _querschnitt(
         d_max=Groesse(eintrag.d_max, MM),
         einlagenhoehe=Groesse(eintrag.einlagenhoehe, MM),
         k_c=Groesse(eintrag.k_c, EINHEITSLOS),
-        querkraftbewehrung=(buegel.als_bewehrung(buegelstahl)
-                            if buegel.vorhanden else None),
+        querkraftbewehrung=buegel.als_bewehrung(buegelstahl) if buegel.vorhanden else None,
         praefix=praefix,
     )
 
@@ -972,17 +975,12 @@ def _ausgefallene(
 
 
 def _kombination(eintrag: KombinationEintrag) -> Schnittgroessen:
-    try:
-        art = Erfuellungsart(eintrag.art)
-    except ValueError:
-        raise ProjektFehler(
-            f"Unbekannter Massstab '{eintrag.art}'. Möglich sind: "
-            f"{', '.join(a.value for a in Erfuellungsart)}.") from None
+    """Eine Einwirkung -- welche Massstaebe es gibt, prueft ihr Feld."""
     return Schnittgroessen(
         name=eintrag.name,
         M_Ed=Groesse(eintrag.M_Ed, KNM),
         N_Ed=Groesse(eintrag.N_Ed, KN),
-        art=art,
+        art=Erfuellungsart(eintrag.art),
     )
 
 
@@ -1019,14 +1017,10 @@ def _grundbruch(art: "Bauteilart", eintrag: GrundbruchEintrag, aufbau: Aufbau) -
 
 def _ueberschreibungen_setzen(projekt: "Projekt", werk: Rechenwerk,
                               aufbau: Aufbau) -> None:
+    """Die von Hand ueberschriebenen Kennwerte -- dass es sie gibt, prueft ``_baustoff``."""
     for eintrag in projekt.materialien:
         baustoff = aufbau.baustoffe[eintrag.kennung]
         for kurzname, zahl in eintrag.ueberschreibungen.items():
-            if kurzname not in baustoff.definitionen:
-                aufbau.warnungen.append(
-                    f"Material '{baustoff.name}': Kennwert '{kurzname}' unbekannt "
-                    f"→ Überschreibung übergangen.")
-                continue
             definition = baustoff.definition(kurzname)
             werk.setze(definition.id, Groesse(zahl, definition.einheit))
 

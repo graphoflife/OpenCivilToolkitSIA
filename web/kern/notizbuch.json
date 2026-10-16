@@ -2306,6 +2306,7 @@
       "stichworte": [
         "Suchmodus",
         "Suchmodus.beschriftung",
+        "teilungen_der_suche",
         "Loesung",
         "Suchergebnis",
         "Suchergebnis.gefunden",
@@ -3225,6 +3226,18 @@
       ]
     },
     {
+      "name": "opencivil.nachweis.rissanforderung",
+      "pfad": "Python/opencivil.nachweis.rissanforderung.md",
+      "art": "modul",
+      "kurz": "die Anforderung an die Rissbildung.",
+      "stichworte": [
+        "Rissanforderung",
+        "Rissanforderung.beschriftung",
+        "Rissanforderung.rissbreite",
+        "Rissanforderung.gegen_fliessen"
+      ]
+    },
+    {
       "name": "opencivil.nachweis.schiefe_biegung",
       "pfad": "Python/opencivil.nachweis.schiefe_biegung.md",
       "art": "modul",
@@ -3502,9 +3515,12 @@
         "_qa_spannungsnachweise",
         "_knickfall",
         "_verformungsfall",
+        "_stoff",
         "_gebrauchsfaelle",
         "_ausgefallene",
+        "_kombination",
         "_grundbruch",
+        "_ueberschreibungen_setzen",
         "Bauteilart"
       ]
     },
@@ -3567,6 +3583,7 @@
         "MaterialEintrag.pruefen",
         "PostenEintrag",
         "PostenEintrag.vorhanden",
+        "PostenEintrag.pruefen",
         "PostenEintrag.als_posten",
         "PostenEintrag.je_meter",
         "LageEintrag",
@@ -3578,7 +3595,11 @@
         "QuerkraftbewehrungEintrag.ueber_teilung_y",
         "QuerkraftbewehrungEintrag.pruefen",
         "QuerkraftbewehrungEintrag.als_bewehrung",
+        "neigungen_pruefen",
+        "druckfeld_pruefen",
+        "x_d_max_pruefen",
         "KnickEintrag",
+        "KnickEintrag.zahlen_pruefen",
         "VerformungsfallEintrag",
         "VerformungsfallEintrag.zahlen_pruefen",
         "VerformungEintrag",
@@ -3661,7 +3682,7 @@
         "QuerschnittEintrag",
         "QuerschnittEintrag.richtung_von",
         "QuerschnittEintrag.pruefen",
-        "QuerschnittEintrag.masse_pruefen",
+        "QuerschnittEintrag.zahlen_pruefen",
         "QuerschnittEintrag.ohne_lastfaelle",
         "QuerschnittEintrag.einwirkung",
         "QuerschnittEintrag.knickfall",
@@ -3745,6 +3766,7 @@
         "QuerschnittsanalyseEintrag.lage",
         "QuerschnittsanalyseEintrag.vorlage_einsetzen",
         "QuerschnittsanalyseEintrag.pruefen",
+        "QuerschnittsanalyseEintrag.zahlen_pruefen",
         "QuerschnittsanalyseEintrag.lastfall",
         "QuerschnittsanalyseEintrag.knickfall",
         "QuerschnittsanalyseEintrag.spannungsfall",

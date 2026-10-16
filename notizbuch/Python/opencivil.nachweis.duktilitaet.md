@@ -1,5 +1,5 @@
 ---
-erzeugt: 63e50da7bf3f
+erzeugt: 15e609e0656a
 art: modul
 tags: [modul]
 ---
@@ -166,6 +166,7 @@ Symbolen da, die Fassung mit Zahlen und Einheiten entsteht daraus.
 
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.web.api]]

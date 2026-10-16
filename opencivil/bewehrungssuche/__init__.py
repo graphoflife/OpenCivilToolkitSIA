@@ -21,7 +21,7 @@ from opencivil.bewehrungssuche.dicke import (
 )
 from opencivil.bewehrungssuche.laengs import (
     DURCHMESSER, MINDESTDURCHMESSER, RUNDEN, TEILUNGEN, Loesung, Stufen,
-    Suchergebnis, Suchmodus, stufen, suche, uebernehmen,
+    Suchergebnis, Suchmodus, stufen, suche, teilungen_der_suche, uebernehmen,
 )
 
 __all__ = [
@@ -29,5 +29,5 @@ __all__ = [
     "DICKENRASTER", "DURCHMESSER", "Dickenergebnis", "Dickenversuch",
     "Loesung", "MINDESTDURCHMESSER", "RUNDEN", "Stufen", "Suchergebnis", "Suchmodus",
     "TEILUNGEN", "bewerte", "buegel_suchen", "buegel_uebernehmen",
-    "dicke_suchen", "stufen", "suche", "uebernehmen",
+    "dicke_suchen", "stufen", "suche", "teilungen_der_suche", "uebernehmen",
 ]

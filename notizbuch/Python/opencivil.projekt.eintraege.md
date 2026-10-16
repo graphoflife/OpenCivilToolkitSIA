@@ -1,5 +1,5 @@
 ---
-erzeugt: d2cbbb164289
+erzeugt: f774869b7f95
 art: modul
 tags: [modul]
 ---
@@ -129,6 +129,17 @@ Grundbewehrung oder Zulage einer Lage.
 def vorhanden(self) -> bool
 ```
 
+#### PostenEintrag.pruefen
+
+```python
+def pruefen(self, wo: str) -> None
+```
+
+Ein Posten mit Durchmesser braucht eine Teilung oder eine Stabzahl
+groesser als null. Bis 2026-10-16 hiess eine Teilung von null still
+«kein Stab»: die Maske zeigte ⌀16, gerechnet wurde ohne. Ohne
+Durchmesser ist der Posten leer, was sonst auch dasteht.
+
 #### PostenEintrag.als_posten
 
 ```python
@@ -244,10 +255,35 @@ Was nicht stimmen kann, soll als Satz beim Benutzer ankommen.
 #### QuerkraftbewehrungEintrag.als_bewehrung
 
 ```python
-def als_bewehrung(self, stahl: Optional[Baustoff]) -> Querkraftbewehrung
+def als_bewehrung(self, stahl: Baustoff) -> Querkraftbewehrung
 ```
 
 Die Buegel fuer den Querschnitt -- erst nach [[opencivil.projekt.eintraege#QuerkraftbewehrungEintrag.pruefen|pruefen]].
+
+### neigungen_pruefen
+
+```python
+def neigungen_pruefen(alpha_min: int, alpha_max: int, wo: str) -> None
+```
+
+Die Grenzen der Druckfeldneigung -- bei den Buegeln der Platte wie bei den
+Schubwaenden des gezeichneten Querschnitts.
+
+### druckfeld_pruefen
+
+```python
+def druckfeld_pruefen(k_c: float, wo: str) -> None
+```
+
+Die Abminderung der Druckdiagonalen -- eine Festigkeit mal k_c, also groesser als null.
+
+### x_d_max_pruefen
+
+```python
+def x_d_max_pruefen(x_d_max: float, wo: str) -> None
+```
+
+Die Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis.
 
 ### KnickEintrag
 
@@ -267,6 +303,16 @@ in y waere die Breite der Platte die Laenge.
 - `laenge: float = 3.0` – Systemlaenge in m -- geht in die Schiefstellung ein.
 - `knicklaenge: float = 3.0` – Knicklaenge in m.
 - `aktiv: bool = True` – Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen -- eine geloeschte Zeile muesste man neu eintippen, um sie wieder anzusehen.
+
+#### KnickEintrag.zahlen_pruefen
+
+```python
+def zahlen_pruefen(self, wo: str) -> None
+```
+
+Laenge und Knicklaenge -- erst beim Bauen gefragt, wie die Masse der
+Platte. Bis 2026-10-16 rechnete eine Laenge von null und hiess
+«erfuellt».
 
 ### VerformungsfallEintrag
 
@@ -553,6 +599,7 @@ Eine zu pruefende Schnittgroessenkombination.
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
+- [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.verformung]]

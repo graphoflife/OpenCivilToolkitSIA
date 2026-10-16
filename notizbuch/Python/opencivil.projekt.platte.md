@@ -1,5 +1,5 @@
 ---
-erzeugt: 23e8778d4686
+erzeugt: 2717ce2ad258
 art: modul
 tags: [modul]
 ---
@@ -91,15 +91,16 @@ Lastfallnamen eindeutig je Liste (siehe [[opencivil.projekt.platte#QuerschnittEi
 die Gebrauchslisten pruefen sich selbst, samt Anteil und abgeleiteten
 Namen. Laeuft auch beim Oeffnen einer Datei -- darum hier nichts, was
 eine gespeicherte Platte unoeffenbar machte (siehe
-[[opencivil.projekt.platte#QuerschnittEintrag.masse_pruefen|masse_pruefen]]).
+[[opencivil.projekt.platte#QuerschnittEintrag.zahlen_pruefen|zahlen_pruefen]]).
 
-#### QuerschnittEintrag.masse_pruefen
+#### QuerschnittEintrag.zahlen_pruefen
 
 ```python
-def masse_pruefen(self) -> None
+def zahlen_pruefen(self) -> None
 ```
 
-Haelt unmoegliche Abmessungen auf, bevor daraus Zahlen werden.
+Haelt unmoegliche Abmessungen und Zahlen auf, bevor daraus ein
+Widerstand wird.
 
 Bis hierher lief jede Geometrie durch: eine Platte mit `h = -300` wurde
 gerechnet, eine mit beidseitiger Ueberdeckung groesser als die Dicke auch.
@@ -193,6 +194,7 @@ den Vorgabewerten der Felder.
 - [[opencivil.bewehrungssuche.laengs]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.rechenwahl]]
+- [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.querschnitt.platte]]

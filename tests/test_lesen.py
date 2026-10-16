@@ -159,7 +159,12 @@ class TestEineTuer(unittest.TestCase):
         return p
 
     def test_festt_wird_nicht_zur_feder(self):
-        projekt = self.rahmen(quer="festt", k_quer=2000.0)
+        """An der Zeile, in der es steht -- und von Hand gesetzt beim Rechnen."""
+        with self.assertRaises(ProjektFehler) as fehler:
+            self.rahmen(quer="festt", k_quer=2000.0)
+        self.assertIn("'festt' gibt es als 'quer' nicht", str(fehler.exception))
+        projekt = self.rahmen()
+        projekt.balkensysteme[0].linien[0].quer = "festt"
         with self.assertRaises(ProjektFehler) as fehler:
             projekt.rechnen()
         self.assertIn("Balkensystem 'Rahmen', linien 1", str(fehler.exception))
@@ -182,20 +187,27 @@ class TestEineTuer(unittest.TestCase):
         self.assertIn("Gemeint ist vielleicht 'richtung'", str(fehler.exception))
 
     def test_ein_text_statt_einer_zahl_in_python(self):
+        """An der Zeile, in der er steht -- nicht erst beim Rechnen."""
         p = self.rahmen()
-        p.platte("Decke", b="1000")
         with self.assertRaises(ProjektFehler) as fehler:
-            p.rechnen()
+            p.platte("Decke", b="1000")
         self.assertIn("Platte 'Decke': 'b' muss eine Zahl sein, nicht '1000'",
                       str(fehler.exception))
 
     def test_eine_rissanforderung_mit_tippfehler(self):
         """Früher die mildeste Stufe -- ohne x-Bewehrung sogar ganz ohne Meldung."""
         p = self.rahmen()
-        p.platte("Ohne x", x=[0, 0], rissanforderung="hcoh")
+        with self.assertRaises(ProjektFehler) as fehler:
+            p.platte("Ohne x", x=[0, 0], rissanforderung="hcoh")
+        self.assertIn("'hcoh' gibt es als 'rissanforderung' nicht", str(fehler.exception))
+
+    def test_von_hand_gesetzt_meldet_es_sich_beim_rechnen(self):
+        p = self.rahmen()
+        p.platte("Decke").rissanforderung = "hcoh"
         with self.assertRaises(ProjektFehler) as fehler:
             p.rechnen()
-        self.assertIn("'hcoh' gibt es als 'rissanforderung' nicht", str(fehler.exception))
+        self.assertIn("Platte 'Decke': 'hcoh' gibt es als 'rissanforderung' nicht",
+                      str(fehler.exception))
 
     def test_ein_eintrag_am_falschen_ort(self):
         q = QuerschnittEintrag("q1", "Decke", "b1")
@@ -209,14 +221,115 @@ class TestEineTuer(unittest.TestCase):
     def test_schnitte_einer_schubwand(self):
         p = self.rahmen()
         a = p.analyse("Unterzug")
-        a.schubwand([50, 50], [250, 50], schnitte=9)
         with self.assertRaises(ProjektFehler) as fehler:
-            p.pruefen()
+            a.schubwand([50, 50], [250, 50], schnitte=9)
         self.assertIn("9 gibt es als 'schnitte' nicht", str(fehler.exception))
         self.assertEqual(SchubwandEintrag().schnitte, 2)
 
     def test_ein_posten_ist_ein_posten(self):
         self.assertEqual(PostenEintrag.aus_dict({}), PostenEintrag())
+
+
+
+class TestNichtsStill(unittest.TestCase):
+    """
+    Was beim Rechnen bisher still einen Ersatz bekam, meldet sich: ein Posten
+    mit Durchmesser ohne Teilung, eine Knicklänge null, ein Stab ohne Stahl,
+    ein Kennwert, den es nicht gibt, zwei gleiche Kennungen.
+    """
+
+    def fehler(self, projekt: Projekt) -> str:
+        with self.assertRaises(ProjektFehler) as fehler:
+            projekt.aufbauen()
+        return str(fehler.exception)
+
+    def test_ein_posten_mit_durchmesser_braucht_eine_teilung(self):
+        """Bis 2026-10-16 hiess eine Teilung von null still «kein Stab»."""
+        p = Projekt.beispiel()
+        p.querschnitt("q1").lagen[1].grund.abstand = 0.0
+        self.assertIn("2. Lage, Grundbewehrung: die Teilung muss grösser als null sein",
+                      self.fehler(p))
+        p.querschnitt("q1").lagen[1].grund.abstand = None
+        self.assertIn("braucht eine Teilung oder eine Stabzahl", self.fehler(p))
+
+    def test_eine_knicklaenge_von_null(self):
+        """Sie rechnete und hiess «erfüllt»."""
+        p = Projekt.beispiel()
+        p.querschnitt("q1").knickfall("Wand", N_Ed=-500.0, laenge=0.0)
+        self.assertIn("Knicknachweis 'Wand': die Systemlänge muss grösser als null sein",
+                      self.fehler(p))
+
+    def test_die_grenzen_des_gezeichneten_querschnitts(self):
+        for feld, wert, text in (("alpha_min", 60, "α_min = 60° ist grösser als α_max"),
+                                 ("k_c", -1.0, "k_c muss grösser als null sein"),
+                                 ("x_d_max", 0.9, "max. x/d muss grösser als null")):
+            with self.subTest(feld=feld):
+                p = Projekt.beispiel()
+                setattr(p.querschnittsanalysen[0], feld, wert)
+                self.assertIn(text, self.fehler(p))
+
+    def test_ein_stab_ohne_stahl_nimmt_nicht_den_ersten(self):
+        p = Projekt.beispiel()
+        p.querschnittsanalysen[0].stablinien[0].stahl = ""
+        self.assertIn("Linie 1 hat kein Material", self.fehler(p))
+
+    def test_buegel_ohne_stahl_nehmen_nicht_den_ersten(self):
+        p = Projekt.beispiel()
+        buegel = p.querschnitt("q1").querkraftbewehrung
+        buegel.durchmesser, buegel.stahl = 10.0, ""
+        self.assertIn("Querkraftbewehrung von 'Decke über EG' hat kein Material", self.fehler(p))
+
+    def test_ein_stahl_ist_kein_beton(self):
+        p = Projekt.beispiel()
+        p.querschnitt("q1").beton = "s1"
+        self.assertIn("braucht einen Beton, 'B500B' ist keiner", self.fehler(p))
+
+    def test_ein_kennwert_den_es_nicht_gibt(self):
+        """Eine Abweichung «fck» fiel still weg -- gerechnet wurde mit der Sorte."""
+        p = Projekt.beispiel()
+        p.eigener_beton().abweichungen = {"fck": 35.0}
+        self.assertIn("einen Kennwert 'fck' gibt es nicht", self.fehler(p))
+
+    def test_zwei_gleiche_kennungen(self):
+        """Das spätere Material ersetzte still das frühere."""
+        p = Projekt.beispiel()
+        p.beton("C50/60").kennung = "b1"
+        self.assertIn("dieselbe Kennung 'b1'", self.fehler(p))
+
+    def test_zwei_werkstoffwahlen_fuer_ein_material(self):
+        from opencivil.projekt import WerkstoffwahlEintrag
+        p = Projekt.beispiel()
+        a = p.querschnittsanalysen[0]
+        a.werkstoffwahl = [WerkstoffwahlEintrag("b1"), WerkstoffwahlEintrag("b1", betongesetz="block")]
+        self.assertIn("zwei Werkstoffwahlen", self.fehler(p))
+
+    def test_zwei_lastfaelle_mit_derselben_kennung_im_rahmen(self):
+        """Eine Last fiel still in beide -- jetzt rechnet das System nicht und sagt warum."""
+        p = Projekt.beispiel()
+        rahmen = p.balkensysteme[0]
+        rahmen.lastfaelle[1].kennung = rahmen.lastfaelle[0].kennung
+        meldungen = [m.text for m in rahmen.modell().meldungen if m.fehler]
+        self.assertTrue(any("Mehrere Lastfälle haben die Kennung" in m for m in meldungen))
+
+    def test_ein_unbekanntes_mass_eines_stabquerschnitts(self):
+        """``B=500`` stand still da, gerechnet wurde mit b = 300."""
+        p = Projekt.beispiel()
+        q = p.balkensysteme[0].querschnitt("Stütze", "rechteck", B=500.0)
+        self.assertIn("ein Mass «B» gibt es bei «Rechteck» nicht", q.fehler())
+
+    def test_eine_leere_teilungsliste_der_suche(self):
+        """Sie wurde still zu 150 mm."""
+        p = Projekt.beispiel()
+        p.querschnitt("q1").automatik_teilungen = []
+        antwort = dienst.bearbeite("bewehrung_suchen", {"projekt": p.als_dict(), "kennung": "q1"})
+        self.assertEqual(antwort.status, 400)
+        self.assertIn("mindestens eine Teilung", antwort.daten["fehler"])
+
+    def test_eine_unbekannte_rissanforderung_im_nachweis(self):
+        from opencivil.nachweis.rissanforderung import Rissanforderung
+        with self.assertRaisesRegex(ValueError, "Unbekannte Rissanforderung 'mittel'"):
+            Rissanforderung("mittel")
+        self.assertEqual([a.gegen_fliessen for a in Rissanforderung], [False, True, True])
 
 
 if __name__ == "__main__":

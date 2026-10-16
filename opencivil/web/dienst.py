@@ -294,12 +294,16 @@ def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
         raise DienstFehler(404, f"Keine Platte mit der Kennung '{kennung}'.") from None
 
     eintrag = projekt.querschnitt(kennung)
+    # Der Modus ist beim Lesen geprueft; die Teilungen braucht nur die Suche.
+    modus = bewehrungssuche.Suchmodus(eintrag.automatik_modus)
+    gesucht = [eintrag.automatik_teilungen]
+    if eintrag.automatik_querkraft:
+        gesucht.append(eintrag.automatik_querkraft_teilungen)
     try:
-        modus = bewehrungssuche.Suchmodus(eintrag.automatik_modus)
-    except ValueError:
-        moeglich = ", ".join(m.value for m in bewehrungssuche.Suchmodus)
-        raise DienstFehler(400, f"Unbekannter Suchmodus '{eintrag.automatik_modus}'. "
-                                f"Möglich sind: {moeglich}.") from None
+        for teilungen in gesucht:
+            bewehrungssuche.teilungen_der_suche(teilungen)
+    except ValueError as fehler:
+        raise DienstFehler(400, f"Platte '{eintrag.name}': {fehler}") from None
 
     wie = {"teilungen": eintrag.automatik_teilungen,
            "mindestdurchmesser": eintrag.automatik_mindestdurchmesser}

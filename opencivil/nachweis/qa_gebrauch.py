@@ -70,9 +70,10 @@ from opencivil.material.betonstahl import FLIESSDEHNUNG
 from opencivil.nachweis.gebrauchsebene import (
     EINACHSIG, KEINE, SUCHE_DER_EBENE, Gebrauchsebene, gebrauchsebene, protokoll_ebene,
 )
-from opencivil.nachweis.mindestbewehrung import DICKENGRENZE, RISSBREITE
+from opencivil.nachweis.mindestbewehrung import DICKENGRENZE
 from opencivil.nachweis.querschnittsloeser import VERFEHLTE_EBENE
 from opencivil.nachweis.rechenwahl import Rechenwahl, protokoll_rechenwahl, werte_nach_id
+from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.richtungsnachweise import (
     protokoll_rissmoment, protokoll_spannung_ungerissen, richtungen, rissbezuege, rissmoment,
 )
@@ -148,13 +149,10 @@ class SpannungsbegrenzungQA(Nachweis):
                  wahl: Rechenwahl = VORGABE, einachsig: bool = False) -> None:
         if not faelle:
             raise ValueError("Ohne Lastfall gibt es nichts zu begrenzen.")
-        if anforderung not in RISSBREITE:
-            raise ValueError(f"Unbekannte Rissanforderung '{anforderung}'. Möglich sind: "
-                             f"{', '.join(RISSBREITE)}.")
         self.analyse = analyse
         self.faelle = list(faelle)
         self.grenze = grenze
-        self.anforderung = anforderung
+        self.anforderung = Rissanforderung(anforderung)
         self.wahl = wahl
         self.einachsig = einachsig
         basis = f"{analyse.id}.nachweis.{grenze.idteil}"
@@ -388,11 +386,8 @@ class RissnormalkraftQA(Nachweis):
 
     def __init__(self, analyse: Querschnittsanalyse, *, anforderung: str,
                  begrenzt: bool) -> None:
-        if anforderung not in RISSBREITE:
-            raise ValueError(f"Unbekannte Rissanforderung '{anforderung}'. Möglich sind: "
-                             f"{', '.join(RISSBREITE)}.")
         self.analyse = analyse
-        self.anforderung = anforderung
+        self.anforderung = Rissanforderung(anforderung)
         self.begrenzt = begrenzt
         basis = f"{analyse.id}.nachweis.rissnormalkraft"
         self.d_grad = grad_def(f"{basis}.erfuellungsgrad", r"\alpha_{eff,NR}",
@@ -510,12 +505,9 @@ class ZwaengungBiegungQA(Nachweis):
 
     def __init__(self, analyse: Querschnittsanalyse, *, einachsig: bool, anforderung: str,
                  kriechzahl: float) -> None:
-        if anforderung not in RISSBREITE:
-            raise ValueError(f"Unbekannte Rissanforderung '{anforderung}'. Möglich sind: "
-                             f"{', '.join(RISSBREITE)}.")
         self.analyse = analyse
         self.einachsig = einachsig
-        self.anforderung = anforderung
+        self.anforderung = Rissanforderung(anforderung)
         self.wahl = Rechenwahl(kriechzahl=kriechzahl, satz=VORGABE.satz, art=VORGABE.art)
         basis = f"{analyse.id}.nachweis.zwang_biegung"
         self.d_ausnutzung: Dict[str, WertDef] = {

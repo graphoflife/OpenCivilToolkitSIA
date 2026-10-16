@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from typing import Optional, Sequence
 
 from opencivil.bewehrungssuche.bewertung import arbeitskopie, bewerte
-from opencivil.bewehrungssuche.laengs import TEILUNGEN
+from opencivil.bewehrungssuche.laengs import TEILUNGEN, teilungen_der_suche
 
 #: Buegel dicker als ⌀26 biegt niemand -- die Buegelsuche bleibt darunter.
 BUEGELDURCHMESSER: Tuple[float, ...] = (8, 10, 12, 14, 16, 18, 20, 22, 26)
@@ -55,7 +55,7 @@ def buegel_suchen(projekt, kennung: str, *,
 
     Geht es ohne Buegel, kommt das heraus: Durchmesser null.
     """
-    teilungen = sorted(t for t in teilungen if t > 0) or list(TEILUNGEN)
+    teilungen = teilungen_der_suche(teilungen)
     durchmesser = sorted(d for d in durchmesser if d > 0) or list(BUEGELDURCHMESSER)
 
     # Mit der vorhandenen Laengsbewehrung: die Buegel kommen danach, und ohne

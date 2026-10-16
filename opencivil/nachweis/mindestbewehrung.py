@@ -55,18 +55,11 @@ from opencivil.nachweis.sproedes_versagen import (
     Rissgroessen as Momentgroessen, beiwert_dicke, protokoll_rissmoment,
     protokoll_zugfestigkeit, rissmoment, rissmoment_wert,
 )
+from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.zustand2 import gerissen, wertigkeit
 from opencivil.querschnitt.platte import (
     Bewehrungslage, Richtung, protokoll_lage,
 )
-
-#: Nominelle Rissbreite je Anforderung, in m. ``None`` heisst: keine Grenze aus
-#: der Rissbreite, dann gilt allein ``f_yk``.
-RISSBREITE: Dict[str, Optional[float]] = {
-    "normal": None,
-    "erhoeht": 0.5e-3,
-    "hoch": 0.2e-3,
-}
 
 #: Groesste Plattendicke, fuer die eine Zwaengung angesetzt wird, in m.
 #: Gilt nur, wenn die Begrenzung eingeschaltet ist.
@@ -116,7 +109,7 @@ def zulaessige_stahlspannung(
     Begrenzung weg; die Flaeche ist dann ohnehin null und der Nachweis
     scheitert an ihr.
     """
-    w_nom = RISSBREITE.get(anforderung)
+    w_nom = Rissanforderung(anforderung).rissbreite
     if w_nom is None or durchmesser <= 0.0:
         return f_yk
     return min(math.sqrt(9.0 * E_s * f_ctm * w_nom / durchmesser), f_yk)
@@ -135,7 +128,7 @@ def protokoll_zulaessige_stahlspannung(
     ist dimensionsrein -- (N/mm²)² unter der Wurzel -- und steht darum mit
     Einheiten da.
     """
-    w_nom = RISSBREITE.get(anforderung)
+    w_nom = Rissanforderung(anforderung).rissbreite
     if w_nom is None or durchmesser.groesse.si <= 0.0:
         p.formel(sigma, "@f_yk", {"f_yk": f_yk},
                  titel="Zulässige Stahlspannung (normale Anforderung)",
@@ -169,7 +162,7 @@ def _protokoll_stahlspannung(
     else:
         durchmesser = werte.laenge("phi", rf"\varnothing_{{{lage}}}",
                                    erg.durchmesser, stellen=0)
-        if RISSBREITE[anforderung] is not None:
+        if Rissanforderung(anforderung).rissbreite is not None:
             glieder = r";\ ".join(f"@d{i}" for i in range(len(staebe)))
             p.formel(durchmesser, rf"\max\left[{glieder}\right]",
                      {f"d{i}": s for i, s in enumerate(staebe)},
@@ -227,13 +220,9 @@ class Rissnormalkraft(Nachweis):
         anforderung: str,
         begrenzt: bool,
     ) -> None:
-        if anforderung not in RISSBREITE:
-            raise ValueError(
-                f"Unbekannte Rissanforderung '{anforderung}'. Möglich sind: "
-                f"{', '.join(RISSBREITE)}.")
         self.querschnitt = querschnitt
         self.richtung = richtung
-        self.anforderung = anforderung
+        self.anforderung = Rissanforderung(anforderung)
         self.begrenzt = begrenzt
 
         # Genau zwei Lagen je Richtung -- auch die leeren, denn gerade sie
@@ -485,13 +474,9 @@ class ZwaengungBiegung(Nachweis):
         anforderung: str,
         kriechzahl: float,
     ) -> None:
-        if anforderung not in RISSBREITE:
-            raise ValueError(
-                f"Unbekannte Rissanforderung '{anforderung}'. Möglich sind: "
-                f"{', '.join(RISSBREITE)}.")
         self.querschnitt = querschnitt
         self.richtung = richtung
-        self.anforderung = anforderung
+        self.anforderung = Rissanforderung(anforderung)
         self.kriechzahl = kriechzahl
 
         gewaehlt = sorted(set(lagen))

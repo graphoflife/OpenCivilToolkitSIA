@@ -17,16 +17,17 @@ from dataclasses import dataclass, field
 from typing import Any, List, Optional
 
 from opencivil.bewehrungssuche.laengs import Suchmodus
-from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX, HOECHSTENS as X_D_HOECHSTENS
+from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX
 from opencivil.nachweis.rechenwahl import FASERARTEN, VERFORMUNGSARTEN
 from opencivil.querschnitt.platte import K_C, LAGENZAHL, Richtung
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste,
     KnickEintrag, KombinationEintrag, LageEintrag, ObergrenzeEintrag,
     PostenEintrag, QuerkraftbewehrungEintrag, RechenwahlEintrag, SpannungsfallEintrag,
-    VerformungEintrag, VerformungsfallEintrag, eindeutig,
+    VerformungEintrag, VerformungsfallEintrag, eindeutig, x_d_max_pruefen,
 )
-from opencivil.projekt.lesen import RISSANFORDERUNGEN, ProjektFehler, einer_von, nicht_negativ
+from opencivil.nachweis.rissanforderung import RISSANFORDERUNGEN
+from opencivil.projekt.lesen import ProjektFehler, einer_von, nicht_negativ
 
 #: Die Richtungen einer Lage.
 RICHTUNGEN = tuple(r.value for r in Richtung)
@@ -252,7 +253,7 @@ class QuerschnittEintrag(Beschreibung):
         die Gebrauchslisten pruefen sich selbst, samt Anteil und abgeleiteten
         Namen. Laeuft auch beim Oeffnen einer Datei -- darum hier nichts, was
         eine gespeicherte Platte unoeffenbar machte (siehe
-        :meth:`masse_pruefen`).
+        :meth:`zahlen_pruefen`).
         """
         eindeutig(self.kombinationen, self.name, "Tragsicherheitseinwirkung")
         eindeutig(self.knickfaelle, self.name, "Knicknachweis")
@@ -267,9 +268,10 @@ class QuerschnittEintrag(Beschreibung):
         self.knicken_wahl_widerstand.pruefen(f"Platte '{self.name}', Knicken, Widerstand",
                                              FASERARTEN)
 
-    def masse_pruefen(self) -> None:
+    def zahlen_pruefen(self) -> None:
         """
-        Haelt unmoegliche Abmessungen auf, bevor daraus Zahlen werden.
+        Haelt unmoegliche Abmessungen und Zahlen auf, bevor daraus ein
+        Widerstand wird.
 
         Bis hierher lief jede Geometrie durch: eine Platte mit ``h = -300`` wurde
         gerechnet, eine mit beidseitiger Ueberdeckung groesser als die Dicke auch.
@@ -309,13 +311,15 @@ class QuerschnittEintrag(Beschreibung):
                 f"und lassen in einer {self.h:g} mm dicken Platte keinen Platz für "
                 f"Bewehrung.")
 
-        # Keine Abmessung, aber aus demselben Grund hier und nicht beim
+        # Keine Abmessungen, aber aus demselben Grund hier und nicht beim
         # Oeffnen: eine abgelegte Platte mit einer zu hohen Grenze soll sich
         # oeffnen und korrigieren lassen.
-        if not 0.0 < self.x_d_max <= X_D_HOECHSTENS:
-            raise ProjektFehler(
-                f"Platte '{name}': max. x/d muss grösser als null und höchstens "
-                f"{X_D_HOECHSTENS:g} sein, angegeben ist {self.x_d_max:g}.")
+        x_d_max_pruefen(self.x_d_max, f"Platte '{name}'")
+        for nummer, lage in enumerate(self.lagen, start=1):
+            lage.grund.pruefen(f"Platte '{name}', {nummer}. Lage, Grundbewehrung")
+            lage.zulage.pruefen(f"Platte '{name}', {nummer}. Lage, Zulage")
+        for fall in self.knickfaelle:
+            fall.zahlen_pruefen(f"Platte '{name}'")
         for fall in self.verformung.faelle:
             fall.zahlen_pruefen(f"Platte '{name}'")
 

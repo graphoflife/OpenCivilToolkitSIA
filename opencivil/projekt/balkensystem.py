@@ -81,6 +81,9 @@ KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT.value, Lastrichtung.WAAGRECHT.value)
 #: Woher ein Querschnitt kommt.
 QUERSCHNITTSARTEN = ("vorlage", "kennwerte", "platte", "analyse")
 
+#: Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴.
+KENNWERTE = ("A", "I")
+
 #: Die Vorwahlen eines Lagers -- je Richtung frei oder fest.
 LAGERARTEN = {
     "gelenkig": ("fest", "fest", "frei"),
@@ -215,12 +218,25 @@ class StabquerschnittEintrag(Beschreibung):
         return {**self.stabvorlage().vorgaben(), **self.masse}
 
     def fehler(self) -> Optional[str]:
-        """Was an Massen oder Kennwerten nicht geht -- ``None``, wenn alles geht."""
+        """
+        Was an Massen oder Kennwerten nicht geht -- ``None``, wenn alles geht.
+        Ein Mass, das die Vorlage nicht kennt, ist ein Tippfehler: bis
+        2026-10-16 stand ``B=500`` still da, und gerechnet wurde mit b = 300.
+        """
         if self.art == "vorlage":
-            return self.stabvorlage().pruefen(self.masse_mit_vorgaben())
-        if self.art == "kennwerte" and not (self.masse.get("A", 0.0) > 0.0
-                                            and self.masse.get("I", 0.0) > 0.0):
-            return "A und I müssen grösser als null sein."
+            vorlage = self.stabvorlage()
+            fremd = [k for k in self.masse if k not in vorlage.vorgaben()]
+            if fremd:
+                return (f"ein Mass «{fremd[0]}» gibt es bei «{vorlage.name}» nicht. "
+                        f"Möglich sind: {', '.join(vorlage.vorgaben())}.")
+            return vorlage.pruefen(self.masse_mit_vorgaben())
+        if self.art == "kennwerte":
+            fremd = [k for k in self.masse if k not in KENNWERTE]
+            if fremd:
+                return (f"einen Kennwert «{fremd[0]}» gibt es nicht. "
+                        f"Möglich sind: {', '.join(KENNWERTE)}.")
+            if not (self.masse.get("A", 0.0) > 0.0 and self.masse.get("I", 0.0) > 0.0):
+                return "A und I müssen grösser als null sein."
         return None
 
 
@@ -362,6 +378,17 @@ class BalkensystemEintrag(Beschreibung):
         for name in sorted(set(lastfaelle) & set(kombinationen)):
             melden(f"«{name}» heisst ein Lastfall und eine Kombination – die beiden wären "
                    f"nicht zu unterscheiden. Gerechnet wird erst mit verschiedenen Namen.")
+        # Je Teil eine Kennung: an ihr haengen Staebe, Lasten und Verweise. Bis
+        # 2026-10-16 fiel eine Last bei zwei gleichen Lastfall-Kennungen still
+        # in beide.
+        for was, liste in (("Knoten", self.knoten), ("Linien", self.linien),
+                           ("Lager", self.lager), ("Knotenlasten", self.knotenlasten),
+                           ("Querschnitte", self.querschnitte), ("Lastfälle", self.lastfaelle),
+                           ("Kombinationen", self.kombinationen)):
+            kennungen = [e.kennung for e in liste]
+            for kennung in sorted({k for k in kennungen if kennungen.count(k) > 1}):
+                melden(f"Mehrere {was} haben die Kennung «{kennung}» – sie wären nicht zu "
+                       f"unterscheiden. Gerechnet wird erst mit verschiedenen.", kennung)
 
         def halt(art: str, k: float, feld: str, wo: str) -> Optional[float]:
             if art == "frei":
@@ -475,12 +502,13 @@ class BalkensystemEintrag(Beschreibung):
         und ``material`` dastehen. Weitere Felder wie :class:`SystemlinieEintrag`.
         """
         netz = self.netz()
-        eintrag = SystemlinieEintrag(
-            kennung=self._neue_kennung(self.linien, "L"),
-            von=self._knoten(netz, von), bis=self._knoten(netz, bis),
-            stab=felder.pop("stab", querschnitt is not None),
-            querschnitt=_kennung_von(querschnitt) if querschnitt is not None else "",
-            material=_kennung_von(material) if material is not None else "", **felder)
+        eintrag = SystemlinieEintrag.aus_dict({
+            "kennung": self._neue_kennung(self.linien, "L"),
+            "von": self._knoten(netz, von), "bis": self._knoten(netz, bis),
+            "stab": querschnitt is not None,
+            "querschnitt": _kennung_von(querschnitt) if querschnitt is not None else "",
+            "material": _kennung_von(material) if material is not None else "", **felder},
+            f"Balkensystem '{self.name}', linien")
         self.linien.append(eintrag)
         return eintrag
 
@@ -490,9 +518,10 @@ class BalkensystemEintrag(Beschreibung):
             raise ProjektFehler(f"Eine Lagerart «{art}» gibt es nicht. Möglich sind: "
                                 f"{', '.join(LAGERARTEN)}.")
         x, z, phi = LAGERARTEN[art]
-        eintrag = LagerEintrag(kennung=self._neue_kennung(self.lager, "A"),
-                               knoten=self._knoten(self.netz(), ort),
-                               **{"x": x, "z": z, "phi": phi, **felder})
+        eintrag = LagerEintrag.aus_dict({
+            "kennung": self._neue_kennung(self.lager, "A"),
+            "knoten": self._knoten(self.netz(), ort), "x": x, "z": z, "phi": phi, **felder},
+            f"Balkensystem '{self.name}', lager")
         self.lager.append(eintrag)
         return eintrag
 

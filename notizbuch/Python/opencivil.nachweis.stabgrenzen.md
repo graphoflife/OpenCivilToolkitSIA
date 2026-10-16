@@ -1,5 +1,5 @@
 ---
-erzeugt: 0d1746285b53
+erzeugt: 932334b84e02
 art: modul
 tags: [modul]
 ---
@@ -226,6 +226,7 @@ Welche Elemente zu welcher Grenze gehoeren.
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.mindestbewehrung]]
+- [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.geometrie]]

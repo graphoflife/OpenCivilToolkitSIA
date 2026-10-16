@@ -1,5 +1,5 @@
 ---
-erzeugt: 8146540c4375
+erzeugt: fd6e337d1a2d
 art: modul
 tags: [modul]
 ---
@@ -82,6 +82,18 @@ Was gesucht wird und wogegen.
 @property
 def beschriftung(self) -> str
 ```
+
+### teilungen_der_suche
+
+```python
+def teilungen_der_suche(teilungen: Sequence[float]) -> List[float]
+```
+
+Die Teilungen, die eine Suche versucht -- aufsteigend, jede einmal.
+
+Leer oder nicht positiv ist ein Fehler und keine Vorgabe: bis 2026-10-16
+wurde eine leere Liste still zu 150 mm, und eine negative Teilung fiel
+still weg.
 
 ### Loesung
 

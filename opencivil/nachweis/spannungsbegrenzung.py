@@ -79,7 +79,7 @@ from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.material.basis import Baustoff, mit_index
 from opencivil.material.betonstahl import FLIESSDEHNUNG
 from opencivil.nachweis.mindestbewehrung import (
-    RISSBREITE, protokoll_zulaessige_stahlspannung, zulaessige_stahlspannung,
+    protokoll_zulaessige_stahlspannung, zulaessige_stahlspannung,
 )
 from opencivil.nachweis.querschnittsloeser import (
     EPS_DRUCK, protokoll_verfahren, protokoll_wirksamer_modul,
@@ -90,16 +90,12 @@ from opencivil.nachweis.rechenwahl import (
     lagenbezuege, protokoll_gesetze, protokoll_rechenwahl, stahlbezuege, stahllagen,
     stahlname, staehle, werte_nach_id,
 )
+from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.zustand2 import wertigkeit
 from opencivil.querschnitt.platte import Richtung
 
 #: Abstand zur Bemessungsfliessgrenze, in Pa. SIA 262:2025, Tabelle 17.
 FLIESSABSTAND = 80e6
-
-#: Anforderungen, bei denen der Nachweis gegen Fliessen gefuehrt wird. Bei
-#: *normal* steht in der Tabelle ein Strich. Von aussen fragt man
-#: :meth:`GrenzeGegenFliessen.gilt_bei` -- die Liste gehoert der Grenze.
-_GEFORDERT = ("erhoeht", "hoch")
 
 #: Womit die Stahlspannungen rechnen, wenn das Kapitel nichts anderes waehlt:
 #: elastisch, mit charakteristischen Werten -- ein Gebrauchsnachweis fragt,
@@ -233,10 +229,6 @@ class Spannungsgrenze(ABC):
         und der Rissanforderung. Was eine davon nicht braucht, laesst sie
         liegen; so kann der Aufbau beide in derselben Schleife anlegen.
         """
-        if anforderung not in RISSBREITE:
-            raise ValueError(
-                f"Unbekannte Rissanforderung '{anforderung}'. Möglich sind: "
-                f"{', '.join(RISSBREITE)}.")
         self.posten = querschnitt.posten_in_richtung(richtung)
         if not self.posten:
             raise ValueError(
@@ -244,7 +236,7 @@ class Spannungsgrenze(ABC):
                 f"liegt keine Bewehrung.")
         self.querschnitt = querschnitt
         self.richtung = richtung
-        self.anforderung = anforderung
+        self.anforderung = Rissanforderung(anforderung)
         self.staehle = staehle(self.posten)
         """
         Die Staehle dieser Richtung -- je Seite einer, der Editor laesst sie
@@ -297,8 +289,8 @@ class GrenzeGegenFliessen(Spannungsgrenze):
     ``f_yd - 80 N/mm²`` unter haeufiger Einwirkung -- das Fliessen verhindern.
 
     Nur bei erhoehter und hoher Anforderung -- bei normaler steht in
-    Tabelle 17 ein Strich. Das sagt :meth:`gilt_bei`; der Aufbau fragt, und
-    der Katalog der Oberflaeche auch.
+    Tabelle 17 ein Strich (:attr:`Rissanforderung.gegen_fliessen`). Der
+    Aufbau fragt :meth:`gilt_bei`.
     """
 
     idteil = "spannung"
@@ -315,7 +307,7 @@ class GrenzeGegenFliessen(Spannungsgrenze):
 
     @classmethod
     def gilt_bei(cls, anforderung: str) -> bool:
-        return anforderung in _GEFORDERT
+        return Rissanforderung(anforderung).gegen_fliessen
 
     def bezuege(self) -> List[Eingabebezug]:
         return stahlbezuege(self.posten, ("f_yd",))
@@ -397,7 +389,7 @@ class GrenzeAusRissbreite(Spannungsgrenze):
         durchmesser = max(e.g(f"dm_{m}").si for m in self.marken)
         werte = Zwischenwerte(self.id)
         dm = werte.laenge("dm_max", r"\varnothing_{max}", durchmesser, stellen=0)
-        if RISSBREITE[self.anforderung] is not None:
+        if self.anforderung.rissbreite is not None:
             p.wert(dm, titel="Dickster Stab der Tragrichtung")
 
         grenzen = {}

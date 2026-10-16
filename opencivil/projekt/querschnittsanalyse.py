@@ -29,7 +29,7 @@ WAS HIER NICHT GEPRUEFT WIRD:
 Ob die Polygone sich ueberlappen, ob ein Stab im Beton liegt: das prueft der
 Aufbau. Eine abgelegte Analyse mit einem verunglueckten Polygon soll sich
 oeffnen und korrigieren lassen -- dasselbe Vorgehen wie bei den Abmessungen
-der Platte (:meth:`QuerschnittEintrag.masse_pruefen`).
+der Platte (:meth:`QuerschnittEintrag.zahlen_pruefen`).
 """
 
 from __future__ import annotations
@@ -45,9 +45,11 @@ from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.schnittanalyse import Zugseite
 from opencivil.projekt.eintraege import (
     BETONGESETZE, HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, WERKSTOFFSAETZE, Beschreibung,
-    Gebrauchsliste, KnickEintrag, RechenwahlEintrag, SpannungsfallEintrag, eindeutig,
+    Gebrauchsliste, KnickEintrag, RechenwahlEintrag, SpannungsfallEintrag, druckfeld_pruefen,
+    eindeutig, neigungen_pruefen, x_d_max_pruefen,
 )
-from opencivil.projekt.lesen import RISSANFORDERUNGEN, ProjektFehler, einer_von, nicht_negativ
+from opencivil.nachweis.rissanforderung import RISSANFORDERUNGEN
+from opencivil.projekt.lesen import ProjektFehler, einer_von, nicht_negativ
 from opencivil.projekt.netz import Netz, naechste_kennung
 
 #: Schnitte eines Buegels durch eine Schubwand: so viele Schenkel kreuzen sie.
@@ -519,24 +521,27 @@ class QuerschnittsanalyseEintrag(Beschreibung):
 
     def stab(self, y: float, z: float, **felder: Any) -> StabEintrag:
         """Ein einzelner Stab bei ``(y, z)`` -- ``durchmesser``, ``stahl``."""
-        eintrag = StabEintrag(kennung=self._kennung("S"),
-                              knoten=self._knoten(self.netz(), (y, z)), **felder)
+        eintrag = StabEintrag.aus_dict(
+            {"kennung": self._kennung("S"), "knoten": self._knoten(self.netz(), (y, z)),
+             **felder}, f"Querschnitt '{self.name}', staebe")
         self.staebe.append(eintrag)
         return eintrag
 
     def stablinie(self, von: Ort, bis: Ort, **felder: Any) -> StablinieEintrag:
         """Eine Stablinie; die Felder wie :class:`StablinieEintrag`."""
         netz = self.netz()
-        eintrag = StablinieEintrag(kennung=self._kennung("L"), von=self._knoten(netz, von),
-                                   bis=self._knoten(netz, bis), **felder)
+        eintrag = StablinieEintrag.aus_dict(
+            {"kennung": self._kennung("L"), "von": self._knoten(netz, von),
+             "bis": self._knoten(netz, bis), **felder}, f"Querschnitt '{self.name}', stablinien")
         self.stablinien.append(eintrag)
         return eintrag
 
     def schubwand(self, von: Ort, bis: Ort, **felder: Any) -> SchubwandEintrag:
         """Eine Schubwand; die Felder wie :class:`SchubwandEintrag`."""
         netz = self.netz()
-        eintrag = SchubwandEintrag(kennung=self._kennung("L"), von=self._knoten(netz, von),
-                                   bis=self._knoten(netz, bis), **felder)
+        eintrag = SchubwandEintrag.aus_dict(
+            {"kennung": self._kennung("L"), "von": self._knoten(netz, von),
+             "bis": self._knoten(netz, bis), **felder}, f"Querschnitt '{self.name}', schubwaende")
         self.schubwaende.append(eintrag)
         return eintrag
 
@@ -601,10 +606,35 @@ class QuerschnittsanalyseEintrag(Beschreibung):
         for wahl, was, arten in ((self.knicken_wahl_verformung, "Verformung", VERFORMUNGSARTEN),
                                  (self.knicken_wahl_widerstand, "Widerstand", FASERARTEN)):
             wahl.pruefen(f"Querschnitt '{self.name}', Knicken, {was}", arten)
+        # Je Material eine Wahl. Zwei fuer dasselbe -- und welche gilt, hinge
+        # davon ab, wer liest: der Aufbau nahm die letzte, die Maske die erste.
+        gewaehlt = set()
+        for w in self.werkstoffwahl:
+            if w.material in gewaehlt:
+                raise ProjektFehler(
+                    f"Querschnitt '{self.name}': für das Material '{w.material}' stehen "
+                    f"zwei Werkstoffwahlen -- es braucht genau eine.")
+            gewaehlt.add(w.material)
+
+    def zahlen_pruefen(self) -> None:
+        """
+        Was erst das Rechnen braucht, wie bei der Platte
+        (:meth:`QuerschnittEintrag.zahlen_pruefen`): eine abgelegte Analyse
+        mit einer unmoeglichen Grenze soll sich oeffnen und korrigieren
+        lassen. Bis 2026-10-16 rechnete sie mit α_min > α_max, k_c < 0 und
+        x/d = 0.9.
+        """
+        wo = f"Querschnitt '{self.name}'"
+        neigungen_pruefen(self.alpha_min, self.alpha_max, wo)
+        druckfeld_pruefen(self.k_c, wo)
+        x_d_max_pruefen(self.x_d_max, wo)
+        for fall in self.knickfaelle:
+            fall.zahlen_pruefen(wo)
 
     def lastfall(self, name: str, **werte: float) -> QALastfallEintrag:
         """Einen Lastfall anfuegen, ohne Oberflaeche -- kN und kNm."""
-        eintrag = QALastfallEintrag(name=name, **werte)
+        eintrag = QALastfallEintrag.aus_dict({"name": name, **werte},
+                                             f"Querschnitt '{self.name}', lastfaelle")
         self.lastfaelle.append(eintrag)
         return eintrag
 

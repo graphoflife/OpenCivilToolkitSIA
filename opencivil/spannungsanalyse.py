@@ -1293,10 +1293,7 @@ def analysen(aufbau: "Aufbau", loesung: "Loesung",
         paare: Dict[tuple, Optional[Loeserpaar]] = {}
         liste: List[Analyse] = []
         for fall in faelle:
-            try:
-                richtung = Richtung(fall.richtung)
-            except ValueError:
-                richtung = Richtung.X
+            richtung = Richtung(fall.richtung)
             wahl = Rechenwahl.aus(fall.kriechzahl, fall.werkstoffsatz, fall.rechenart)
             schluessel = (richtung, wahl)
             if schluessel not in paare:

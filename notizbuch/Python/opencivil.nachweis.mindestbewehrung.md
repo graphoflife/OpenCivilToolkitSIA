@@ -1,5 +1,5 @@
 ---
-erzeugt: e2aaa61b1daa
+erzeugt: fb3780bfc01d
 art: modul
 tags: [modul]
 ---
@@ -271,7 +271,6 @@ Lagen einen Stahl traegt.
 
 ## Konstanten
 
-- `RISSBREITE = {'normal': None, 'erhoeht': 0.0005, 'hoch': 0.0002}` – Nominelle Rissbreite je Anforderung, in m. `None` heisst: keine Grenze aus der Rissbreite, dann gilt allein `f_yk`.
 - `DICKENGRENZE = 0.5` – Groesste Plattendicke, fuer die eine Zwaengung angesetzt wird, in m. Gilt nur, wenn die Begrenzung eingeschaltet ist.
 
 ## Braucht
@@ -281,6 +280,7 @@ Lagen einen Stahl traegt.
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.nachweis.zustand2]]
 - [[opencivil.querschnitt.platte]]
@@ -291,7 +291,6 @@ Lagen einen Stahl traegt.
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.projekt.aufbau]]
-- [[opencivil.projekt.lesen]]
 
 ## Formeln aus diesem Modul
 

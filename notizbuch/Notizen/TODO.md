@@ -109,13 +109,6 @@ und «Ein Steckbrief je Bauteilart» (siehe [[Entwicklung]]).
       sie schon (`Systembefund.lagerkraefte`) --, Anzeige auf der nächsten
       Probe, Hilfetexte und Formeln aus denselben Konstanten über den
       Katalog.
-- [ ] **Geprüft wird nur beim Lesen.** 33 `aus_dict` von Hand, die
-      Fassade geht an ihren Prüfungen vorbei: `quer="festt"` wird still zur
-      Bettung. Die Rissanforderung ist ein Text in vier
-      Tabellen, ein Tippfehler wird über `.get` zur mildesten Stufe. Besser:
-      ein Leser aus den Feldern der Datenklassen, erlaubte Werte am Feld,
-      geprüft einmal in `Projekt.pruefen()`; die Leser alter Formate weg
-      (seit 2026-10-11 erlaubt).
 - [ ] **Balkensystem: Kennung statt Name.** Ein Fall wird an seinem Namen
       erkannt, gleiche Namen sind darum verboten -- seit 2026-10-15 als
       Meldung am System, nicht mehr als Fehler des ganzen Projekts. «Fest»
@@ -384,6 +377,14 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Eingaben an einer Stelle geprüft (C1, 2026-10-16): ein Leser aus den Feldern
+der Datenklassen, streng, und dieselbe Prüfung vor jedem Rechnen -- die
+Fassade geht durch dieselbe Tür wie eine Datei · alte Formate weg · die
+Rissanforderung in einer Tabelle statt in vier · was beim Rechnen still einen
+Ersatz nahm, meldet sich: ein Posten ohne Teilung, eine Knicklänge null, Stäbe
+und Bügel ohne Stahl, ein Kennwert «fck», zwei gleiche Kennungen, ein Mass
+«B» am Stabquerschnitt, eine leere Teilungsliste der Suche ·
 
 Vom Benutzer entschieden (2026-10-16): die Kennzahlen der Platte bleiben, wie
 sie sind -- x/d je Seite, mit Bügeln das Kleinere beider Seiten, von Hand mit

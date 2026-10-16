@@ -22,6 +22,7 @@ from opencivil.core.einheiten import MM, MM2, Groesse
 from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import Baustoff
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
+from opencivil.nachweis.duktilitaet import HOECHSTENS as X_D_HOECHSTENS
 from opencivil.querschnitt.platte import (
     ALPHA_MAX, ALPHA_MIN, Bewehrungsposten, Querkraftbewehrung, Richtung,
 )
@@ -173,6 +174,26 @@ class PostenEintrag(Beschreibung):
             return False
         return bool(self.abstand and self.abstand > 0) or bool(self.anzahl and self.anzahl > 0)
 
+    def pruefen(self, wo: str) -> None:
+        """
+        Ein Posten mit Durchmesser braucht eine Teilung oder eine Stabzahl
+        groesser als null. Bis 2026-10-16 hiess eine Teilung von null still
+        «kein Stab»: die Maske zeigte ⌀16, gerechnet wurde ohne. Ohne
+        Durchmesser ist der Posten leer, was sonst auch dasteht.
+        """
+        if self.durchmesser < 0.0:
+            raise ProjektFehler(f"{wo}: der Durchmesser kann nicht negativ sein "
+                                f"({self.durchmesser:g} mm).")
+        if self.durchmesser == 0.0:
+            return
+        if self.abstand is not None:
+            if self.abstand <= 0.0:
+                raise ProjektFehler(f"{wo}: die Teilung muss grösser als null sein, "
+                                    f"angegeben sind {self.abstand:g} mm.")
+        elif self.anzahl is None or self.anzahl <= 0.0:
+            raise ProjektFehler(f"{wo}: ⌀{self.durchmesser:g} braucht eine Teilung oder "
+                                f"eine Stabzahl grösser als null.")
+
     def als_posten(self) -> Bewehrungsposten:
         return Bewehrungsposten(
             durchmesser=Groesse(self.durchmesser, MM),
@@ -279,18 +300,9 @@ class QuerkraftbewehrungEintrag(Beschreibung):
             raise ProjektFehler(
                 f"{wo}: die Bügelzahl in y muss grösser als null sein, "
                 f"angegeben ist {angegeben(self.anzahl_y)}.")
-        if not 1 <= self.alpha_min <= 89 or not 1 <= self.alpha_max <= 89:
-            raise ProjektFehler(
-                f"{wo}: die Neigung der Druckdiagonalen muss zwischen 1° und "
-                f"89° liegen, angegeben sind {self.alpha_min}° und "
-                f"{self.alpha_max}°.")
-        if self.alpha_min > self.alpha_max:
-            raise ProjektFehler(
-                f"{wo}: α_min = {self.alpha_min}° ist grösser als "
-                f"α_max = {self.alpha_max}°. Zwischen den beiden liegt dann "
-                f"keine Neigung, für die sich ein Widerstand rechnen liesse.")
+        neigungen_pruefen(self.alpha_min, self.alpha_max, wo)
 
-    def als_bewehrung(self, stahl: Optional[Baustoff]) -> Querkraftbewehrung:
+    def als_bewehrung(self, stahl: Baustoff) -> Querkraftbewehrung:
         """Die Buegel fuer den Querschnitt -- erst nach :meth:`pruefen`."""
         return Querkraftbewehrung(
             durchmesser=Groesse(self.durchmesser, MM),
@@ -301,6 +313,36 @@ class QuerkraftbewehrungEintrag(Beschreibung):
             alpha_min=self.alpha_min,
             alpha_max=self.alpha_max,
         )
+
+
+def neigungen_pruefen(alpha_min: int, alpha_max: int, wo: str) -> None:
+    """
+    Die Grenzen der Druckfeldneigung -- bei den Buegeln der Platte wie bei den
+    Schubwaenden des gezeichneten Querschnitts.
+    """
+    if not 1 <= alpha_min <= 89 or not 1 <= alpha_max <= 89:
+        raise ProjektFehler(
+            f"{wo}: die Neigung der Druckdiagonalen muss zwischen 1° und "
+            f"89° liegen, angegeben sind {alpha_min}° und {alpha_max}°.")
+    if alpha_min > alpha_max:
+        raise ProjektFehler(
+            f"{wo}: α_min = {alpha_min}° ist grösser als α_max = {alpha_max}°. "
+            f"Zwischen den beiden liegt dann keine Neigung, für die sich ein "
+            f"Widerstand rechnen liesse.")
+
+
+def druckfeld_pruefen(k_c: float, wo: str) -> None:
+    """Die Abminderung der Druckdiagonalen -- eine Festigkeit mal k_c, also groesser als null."""
+    if k_c <= 0.0:
+        raise ProjektFehler(f"{wo}: k_c muss grösser als null sein, angegeben ist {k_c:g}.")
+
+
+def x_d_max_pruefen(x_d_max: float, wo: str) -> None:
+    """Die Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis."""
+    if not 0.0 < x_d_max <= X_D_HOECHSTENS:
+        raise ProjektFehler(
+            f"{wo}: max. x/d muss grösser als null und höchstens "
+            f"{X_D_HOECHSTENS:g} sein, angegeben ist {x_d_max:g}.")
 
 
 @dataclass
@@ -326,6 +368,18 @@ class KnickEintrag(Beschreibung):
     aktiv: bool = True
     """Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen -- eine
     geloeschte Zeile muesste man neu eintippen, um sie wieder anzusehen."""
+
+    def zahlen_pruefen(self, wo: str) -> None:
+        """
+        Laenge und Knicklaenge -- erst beim Bauen gefragt, wie die Masse der
+        Platte. Bis 2026-10-16 rechnete eine Laenge von null und hiess
+        «erfuellt».
+        """
+        for feld, wert in (("Systemlänge", self.laenge), ("Knicklänge", self.knicklaenge)):
+            if wert <= 0.0:
+                raise ProjektFehler(
+                    f"{wo}, Knicknachweis '{self.name}': die {feld} muss grösser als "
+                    f"null sein, angegeben sind {wert:g} m.")
 
 
 @dataclass
@@ -605,7 +659,7 @@ class Gebrauchsliste(Beschreibung):
 
     def lastfall(self, name: str, **werte: float):
         """Einen eigenen Lastfall anfuegen -- kNm und kN, Zug positiv."""
-        eintrag = self.FALL(name=name, **werte)
+        eintrag = self.FALL.aus_dict({"name": name, **werte}, f"{self.BAUTEIL}, faelle")
         self.faelle.append(eintrag)
         return eintrag
 

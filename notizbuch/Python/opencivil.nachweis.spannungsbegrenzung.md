@@ -1,5 +1,5 @@
 ---
-erzeugt: dfc85a441a87
+erzeugt: 6ff002ca3918
 art: modul
 tags: [modul]
 ---
@@ -260,8 +260,8 @@ class GrenzeGegenFliessen(Spannungsgrenze)
 `f_yd - 80 N/mm²` unter haeufiger Einwirkung -- das Fliessen verhindern.
 
 Nur bei erhoehter und hoher Anforderung -- bei normaler steht in
-Tabelle 17 ein Strich. Das sagt [[opencivil.nachweis.spannungsbegrenzung#GrenzeGegenFliessen.gilt_bei|gilt_bei]]; der Aufbau fragt, und
-der Katalog der Oberflaeche auch.
+Tabelle 17 ein Strich ([[opencivil.nachweis.rissanforderung#Rissanforderung.gegen_fliessen|Rissanforderung.gegen_fliessen]]). Der
+Aufbau fragt [[opencivil.nachweis.spannungsbegrenzung#GrenzeGegenFliessen.gilt_bei|gilt_bei]].
 
 - `idteil = 'spannung'`
 - `symbolteil = '\\sigma'`
@@ -441,7 +441,6 @@ Der Fall, in dem die Spannung am Plateau stehen bleibt.
 ## Konstanten
 
 - `FLIESSABSTAND = 80000000.0` – Abstand zur Bemessungsfliessgrenze, in Pa. SIA 262:2025, Tabelle 17.
-- `_GEFORDERT = ('erhoeht', 'hoch')` – Anforderungen, bei denen der Nachweis gegen Fliessen gefuehrt wird. Bei *normal* steht in der Tabelle ein Strich. Von aussen fragt man [[opencivil.nachweis.spannungsbegrenzung#GrenzeGegenFliessen.gilt_bei|GrenzeGegenFliessen.gilt_bei]] -- die Liste gehoert der Grenze.
 - `VORGABE = Rechenwahl(satz=Werkstoffsatz.CHARAKTERISTISCH, art=Rechenart.ELASTIS…` – Womit die Stahlspannungen rechnen, wenn das Kapitel nichts anderes waehlt: elastisch, mit charakteristischen Werten -- ein Gebrauchsnachweis fragt, was der Querschnitt tut, nicht was er darf.
 - `VERGLEICH_BEIM_FLIESSEN = 'Fliesst die Bewehrung, bleibt ihre Spannung am Plateau stehen, währe…` – Was verglichen wird, wenn die Bewehrung fliesst -- siehe Dateikopf.
 
@@ -457,6 +456,7 @@ Der Fall, in dem die Spannung am Plateau stehen bleibt.
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
+- [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.nachweis.zustand2]]
 - [[opencivil.querschnitt.platte]]
 
@@ -465,7 +465,6 @@ Der Fall, in dem die Spannung am Plateau stehen bleibt.
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.projekt.aufbau]]
-- [[opencivil.web.api]]
 
 ## Formeln aus diesem Modul
 

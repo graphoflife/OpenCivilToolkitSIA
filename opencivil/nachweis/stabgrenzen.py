@@ -43,8 +43,9 @@ from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, kennung_aus
 from opencivil.material.basis import Baustoff, mit_index
 from opencivil.nachweis.mindestbewehrung import (
-    RISSBREITE, protokoll_zulaessige_stahlspannung, zulaessige_stahlspannung,
+    protokoll_zulaessige_stahlspannung, zulaessige_stahlspannung,
 )
+from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.spannungsbegrenzung import FLIESSABSTAND, GrenzeGegenFliessen
 from opencivil.querschnitt.analyse import Querschnittsanalyse, Stabgruppe
 from opencivil.querschnitt.geometrie import Linienart, Punkt
@@ -178,7 +179,7 @@ def grenzen_aus_rissbreite(analyse: Querschnittsanalyse, e: Eingaben,
     ``f_yk`` seines Stahls, bei erhoehter und hoher dazu die Rissbreite mit
     seinem Durchmesser und dem ``f_ctm`` seines Betons.
     """
-    mit_rissbreite = RISSBREITE[anforderung] is not None
+    mit_rissbreite = Rissanforderung(anforderung).rissbreite is not None
 
     def schluessel(s: Stabangabe) -> tuple:
         if not mit_rissbreite:

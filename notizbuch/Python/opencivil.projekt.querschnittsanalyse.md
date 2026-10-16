@@ -1,5 +1,5 @@
 ---
-erzeugt: 68221ed1e86c
+erzeugt: f61e178a5791
 art: modul
 tags: [modul]
 ---
@@ -44,7 +44,7 @@ Achsrichtung, T im Gegenuhrzeigersinn.
 Ob die Polygone sich ueberlappen, ob ein Stab im Beton liegt: das prueft der
 Aufbau. Eine abgelegte Analyse mit einem verunglueckten Polygon soll sich
 oeffnen und korrigieren lassen -- dasselbe Vorgehen wie bei den Abmessungen
-der Platte ([[opencivil.projekt.platte#QuerschnittEintrag.masse_pruefen|QuerschnittEintrag.masse_pruefen]]).
+der Platte ([[opencivil.projekt.platte#QuerschnittEintrag.zahlen_pruefen|QuerschnittEintrag.zahlen_pruefen]]).
 
 ## Inhalt
 
@@ -448,6 +448,18 @@ Was sich schon an der Beschreibung pruefen laesst: eindeutige Namen der
 Faelle, und die Gebrauchslisten pruefen sich selbst, samt Anteil und
 abgeleiteten Namen.
 
+#### QuerschnittsanalyseEintrag.zahlen_pruefen
+
+```python
+def zahlen_pruefen(self) -> None
+```
+
+Was erst das Rechnen braucht, wie bei der Platte
+([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|QuerschnittEintrag.zahlen_pruefen]]): eine abgelegte Analyse
+mit einer unmoeglichen Grenze soll sich oeffnen und korrigieren
+lassen. Bis 2026-10-16 rechnete sie mit α_min > α_max, k_c \< 0 und
+x/d = 0.9.
+
 #### QuerschnittsanalyseEintrag.lastfall
 
 ```python
@@ -498,6 +510,7 @@ wird danach, was man braucht.
 
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.rechenwahl]]
+- [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.netz]]

@@ -28,7 +28,7 @@ from opencivil.projekt.eintraege import (
 )
 from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
-from opencivil.projekt.lesen import ProjektFehler, felder_pruefen
+from opencivil.projekt.lesen import ProjektFehler, felder_pruefen, ort
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.skript import VORLAGE, SkriptEintrag
 from opencivil.projekt.querschnittsanalyse import (
@@ -343,6 +343,21 @@ class Projekt(Beschreibung):
         mehrere Felder zusammen betrifft.
         """
         felder_pruefen(self, "Projekt")
+
+        # Eine Kennung je Eintrag, ueber alle Arten -- an ihr haengen die
+        # Werte im Rechenwerk und die Verweise. Zwei gleiche hiessen: der
+        # spaetere ersetzt still den frueheren, und eine Platte rechnete mit
+        # dem falschen Beton.
+        vergeben: Dict[str, str] = {}
+        for eintrag in [*self.materialien, *self.bauteile(), *self.skripte]:
+            wer = ort(type(eintrag), {"name": getattr(eintrag, "anzeigename", eintrag.name),
+                                      "kennung": eintrag.kennung})
+            if eintrag.kennung in vergeben:
+                raise ProjektFehler(
+                    f"{vergeben[eintrag.kennung]} und {wer} haben dieselbe Kennung "
+                    f"'{eintrag.kennung}'. Jeder Eintrag braucht seine eigene.")
+            vergeben[eintrag.kennung] = wer
+
         for m in self.materialien:
             m.pruefen()
 
@@ -737,7 +752,9 @@ class Projekt(Beschreibung):
 def _felder_setzen(eintrag: Any, felder: Mapping[str, Any], wo: str) -> None:
     """
     Die Stichworte einer Fassade an den Eintrag -- ein unbekanntes wird
-    gemeldet, mit dem aehnlichsten Feld, statt still zu verschwinden.
+    gemeldet, mit dem aehnlichsten Feld, statt still zu verschwinden; ein
+    Wert, der nicht passt, an der Zeile, in der er steht, und nicht erst beim
+    Rechnen.
     """
     bekannt = {f.name for f in fields(eintrag)}
     for feld, wert in felder.items():
@@ -747,3 +764,4 @@ def _felder_setzen(eintrag: Any, felder: Mapping[str, Any], wo: str) -> None:
                 f"{wo}: ein Feld '{feld}' gibt es nicht."
                 + (f" Gemeint ist vielleicht '{aehnlich[0]}'?" if aehnlich else ""))
         setattr(eintrag, feld, wert)
+    felder_pruefen(eintrag, wo, tief=False)

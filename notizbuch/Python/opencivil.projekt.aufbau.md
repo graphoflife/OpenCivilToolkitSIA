@@ -1,5 +1,5 @@
 ---
-erzeugt: cca0aa16b943
+erzeugt: a339a48c3011
 art: modul
 tags: [modul]
 ---
@@ -383,6 +383,16 @@ def _verformungsfall(f: VerformungsfallEintrag) -> Verformungsfall
 
 Ein Verformungsfall aus seiner Beschreibung -- w in mm, die Spannweite in m.
 
+### _stoff
+
+```python
+def _stoff(baustoffe: Mapping[str, Baustoff], kennung: str, art: str, wer: str) -> Baustoff
+```
+
+Das Material, auf das ein Eintrag zeigt: es muss es geben, und es muss
+von dieser Art sein. Ohne Angabe gilt nicht «das erste im Projekt» -- bis
+2026-10-16 bekamen Buegel und Staebe ohne Stahl still den ersten.
+
 ### _gebrauchsfaelle
 
 ```python
@@ -438,6 +448,14 @@ Hoehe, also auch keinen Querkraftwiderstand. Beide Zeilen gehoeren in
 die Tabelle -- eine davon wegzulassen hiesse, die Luecke nur zur
 Haelfte zu schliessen.
 
+### _kombination
+
+```python
+def _kombination(eintrag: KombinationEintrag) -> Schnittgroessen
+```
+
+Eine Einwirkung -- welche Massstaebe es gibt, prueft ihr Feld.
+
 ### _grundbruch
 
 ```python
@@ -447,6 +465,14 @@ def _grundbruch(art: 'Bauteilart', eintrag: GrundbruchEintrag, aufbau: Aufbau) -
 Ein Fundament und seine beiden Nachweise -- Grundbruch und Gleiten --,
 sobald eine Kombination eingeschaltet ist. Ohne sie steht das Fundament
 allein da, wie eine Platte ohne Einwirkung.
+
+### _ueberschreibungen_setzen
+
+```python
+def _ueberschreibungen_setzen(projekt: 'Projekt', werk: Rechenwerk, aufbau: Aufbau) -> None
+```
+
+Die von Hand ueberschriebenen Kennwerte -- dass es sie gibt, prueft `_baustoff`.
 
 ### Bauteilart
 

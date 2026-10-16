@@ -1,5 +1,5 @@
 ---
-erzeugt: 43f3ec9789e5
+erzeugt: 7bee6c1d55f6
 art: modul
 tags: [modul]
 ---
@@ -189,6 +189,8 @@ def fehler(self) -> Optional[str]
 ```
 
 Was an Massen oder Kennwerten nicht geht -- `None`, wenn alles geht.
+Ein Mass, das die Vorlage nicht kennt, ist ein Tippfehler: bis
+2026-10-16 stand `B=500` still da, und gerechnet wurde mit b = 300.
 
 ### LastfallEintrag
 
@@ -450,6 +452,7 @@ Vorgabe.
 - `RICHTUNGEN = tuple((r.value for r in Lastrichtung))` – Wohin eine Kraft zeigt -- an einem Knoten nur senkrecht oder waagrecht.
 - `KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT.value, Lastrichtung.WAAGRECHT.value)`
 - `QUERSCHNITTSARTEN = ('vorlage', 'kennwerte', 'platte', 'analyse')` – Woher ein Querschnitt kommt.
+- `KENNWERTE = ('A', 'I')` – Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴.
 - `LAGERARTEN = {'gelenkig': ('fest', 'fest', 'frei'), 'verschieblich': ('frei', 'fes…` – Die Vorwahlen eines Lagers -- je Richtung frei oder fest.
 - `Ort = Union[str, Sequence[float]]` – Ein Punkt in m -- oder die Kennung eines Knotens, der dort liegt.
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: f1ef09aae381
+erzeugt: 2f2161abf43e
 art: modul
 tags: [modul]
 ---
@@ -200,15 +200,12 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 
 ## Konstanten
 
-- `_BESCHRIFTUNG = {'normal': 'Normal', 'erhoeht': 'Erhöht', 'hoch': 'Hoch'}` – Wie die Rissanforderungen an der Maske heissen.
-- `RISSANFORDERUNGEN = {wert: _BESCHRIFTUNG[wert] for wert in RISSBREITE}` – Anforderung an die Rissbildung, mit ihrer Beschriftung. Welche es gibt, sagt [[opencivil.nachweis.mindestbewehrung#Konstanten|mindestbewehrung.RISSBREITE]] -- dort steht zu jeder die Rissbreite, und die Liste der Werte soll nur einmal dastehen. Kaeme dort eine dazu, ohne dass sie hier eine Beschriftung hat, scheiterte schon der Import.
 - `_KEINE = object()` – Ein Feld ohne Vorgabe.
 
 ## Braucht
 
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
-- [[opencivil.nachweis.mindestbewehrung]]
 
 ## Gebraucht von
 

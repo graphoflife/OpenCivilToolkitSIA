@@ -37,10 +37,10 @@ from opencivil.material.beton import BETON_VORLAGEN, BETONSORTEN, betonsorten_zu
 from opencivil.material.betonstahl import STAHLSORTEN, STAHL_VORLAGEN, stahlsorten_zum_anlegen
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.nachweis.duktilitaet import HOECHSTENS as DUKTILITAET_HOECHSTENS
-from opencivil.nachweis.spannungsbegrenzung import GrenzeGegenFliessen
+from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.verformung import ZUGSEITEN as VERFORMUNG_ZUGSEITEN
 from opencivil.projekt import (
-    RISSANFORDERUNGEN, Aufbau, GebrauchsfallEintrag, GrundbruchEintrag,
+    Aufbau, GebrauchsfallEintrag, GrundbruchEintrag,
     GrundbruchkombinationEintrag, KnickEintrag, KombinationEintrag, MaterialEintrag,
     QuerschnittEintrag, SkriptEintrag, SpannungsfallEintrag, VerformungsfallEintrag,
 )
@@ -276,12 +276,12 @@ def katalog() -> dict:
         # das Fliessen unter haeufiger Einwirkung ueberhaupt verlangt -- bei
         # normaler steht in Tabelle 17 ein Strich. Die Oberflaeche braucht
         # das, um die eingetragenen Lastfaelle nicht stillschweigend
-        # wegzurechnen; die Regel selbst bleibt bei der Grenze. Der
+        # wegzurechnen; die Regel selbst steht bei der Anforderung. Der
         # quasi-staendige Nachweis aus der Rissbreite laeuft immer.
         "rissanforderungen": [
-            {"wert": wert, "beschriftung": text,
-             "fliessnachweis": GrenzeGegenFliessen.gilt_bei(wert)}
-            for wert, text in RISSANFORDERUNGEN.items()
+            {"wert": a.value, "beschriftung": a.beschriftung,
+             "fliessnachweis": a.gegen_fliessen}
+            for a in Rissanforderung
         ],
         # Die lieferbaren Stabdurchmesser -- die Stufen der Durchmesserfelder
         # und die Liste, durch die die Suche geht. Eine Liste, nicht zwei.

@@ -115,6 +115,23 @@ class Suchmodus(str, Enum):
         }[self]
 
 
+def teilungen_der_suche(teilungen: Sequence[float]) -> List[float]:
+    """
+    Die Teilungen, die eine Suche versucht -- aufsteigend, jede einmal.
+
+    Leer oder nicht positiv ist ein Fehler und keine Vorgabe: bis 2026-10-16
+    wurde eine leere Liste still zu 150 mm, und eine negative Teilung fiel
+    still weg.
+    """
+    if not teilungen:
+        raise ValueError("Die Suche braucht mindestens eine Teilung.")
+    for teilung in teilungen:
+        if not teilung > 0.0:
+            raise ValueError(f"Eine Teilung muss grösser als null sein, "
+                             f"angegeben sind {teilung:g} mm.")
+    return sorted(set(teilungen))
+
+
 #: Ein gesuchter Posten: Lagennummer (1..4) und Art ('grund' oder 'zulage').
 Posten = Tuple[int, str]
 
@@ -424,10 +441,9 @@ def suche(projekt, kennung: str, *,
     :func:`uebernehmen`.
     """
     ergebnis = Suchergebnis(modus=Suchmodus(modus))
-    teilungen = [t for t in teilungen if t > 0] or list(TEILUNGEN)
     je_art = Stufen.aus(durchmesser, mindestdurchmesser)
 
-    for teilung in sorted(teilungen):
+    for teilung in teilungen_der_suche(teilungen):
         loesung = _fuer_teilung(projekt, kennung, teilung, ergebnis.modus, je_art)
         ergebnis.loesungen.append(loesung)
 

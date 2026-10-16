@@ -1,5 +1,5 @@
 ---
-erzeugt: 3f7036be7d3d
+erzeugt: c0791561a46e
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -55,6 +55,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.nachweis.rechenwahl]] – womit ein Kapitel rechnet.
     - [[opencivil.nachweis.resistenzlinie]] – die Linie, gegen die der M-N-Nachweis haelt.
     - [[opencivil.nachweis.richtungsnachweise]] – Duktilitaet und sproedes Versagen des gezeichneten Querschnitts.
+    - [[opencivil.nachweis.rissanforderung]] – die Anforderung an die Rissbildung.
     - [[opencivil.nachweis.schiefe_biegung]] – Biegung und Normalkraft am gezeichneten Querschnitt.
     - [[opencivil.nachweis.schubwandnachweis]] – Querkraft und Torsion am gezeichneten Querschnitt.
     - [[opencivil.nachweis.spannungsbegrenzung]] – Stahlspannung unter Gebrauchslasten.

@@ -44,6 +44,37 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-16 · Was still einen Ersatz nahm, meldet sich
+
+Zweiter Teil von C1. Mit dem strengen Leser kommt nichts Unbekanntes mehr ins
+Projekt; was danach beim Rechnen still einen Ersatz nahm, ist jetzt ein
+Fehler mit Ort.
+
+- **Die Rissanforderung an einer Stelle** (`nachweis/rissanforderung.py`):
+  Stufe, Beschriftung, Rissbreite und ob gegen Fliessen nachgewiesen wird.
+  Vorher vier Tabellen und zwei `.get`, die eine unbekannte Stufe zur
+  mildesten machten; jetzt ist sie überall ein Fehler.
+- **Kein «erstes im Projekt» mehr** (`aufbau._stoff`): Stäbe, Linien und
+  Wände einer Analyse und Bügel ohne Stahl bekamen still den ersten. Ein
+  Material muss es geben, und es muss von seiner Art sein -- ein Stahl ist
+  kein Beton. Nur eine leere Lage behält den Ersatz: sie trägt nichts.
+- **Zahlen, die erst das Rechnen braucht** (`zahlen_pruefen`, vorher
+  `masse_pruefen`): ein Posten mit Durchmesser braucht eine Teilung oder
+  Stabzahl grösser null, eine Knicklänge grösser null; die Analyse prüft
+  α, k_c und x/d wie die Platte, über dieselben Funktionen
+  (`neigungen_pruefen`, `druckfeld_pruefen`, `x_d_max_pruefen`).
+- **Kennungen eindeutig** -- im Projekt über alle Arten (ein zweites `b1`
+  ersetzte still das erste), im Balkensystem je Teil als Meldung (eine Last
+  fiel in zwei Lastfälle), je Analyse eine Werkstoffwahl.
+- **Was es nicht gibt:** ein Kennwert `fck` (fiel weg), ein Mass `B` am
+  Stabquerschnitt (gerechnet wurde mit b = 300), eine leere Teilungsliste
+  der Suche (wurde 150 mm).
+- **Die Fassade meldet an der Zeile:** Stichworte gehen über den Leser, ein
+  vertipptes heisst «Gemeint ist vielleicht 'richtung'?» statt Pythons
+  englischer Meldung, ein falscher Wert fällt beim Anlegen auf.
+
+---
+
 ## 2026-10-16 · Ein Leser und eine Prüfung für jedes Feld
 
 Wunsch des Benutzers (TODO C1): Eingaben an einer Stelle prüfen. Vorher las
