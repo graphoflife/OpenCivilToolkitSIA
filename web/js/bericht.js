@@ -5,7 +5,8 @@
  *   Zusammenfassung  je Bauteil ein Panel mit Angaben, Bewehrung, der Tabelle
  *                    der Urteile und Erfüllungsgrade; das Auge je Zeile zeigt
  *                    genau diesen Nachweis
- *   Diagramme        je Bauteil ein Panel, je Diagramm eine Karte
+ *   Diagramme        oben eine Leiste mit einer Vorschau je Diagramm,
+ *                    darunter das gewählte gross
  *   Herleitung       die Mitschrift des Rechenkerns, je Abschnitt ein Panel;
  *                    jede Formel führt zu ihrer Seite in der Dokumentation
  *
@@ -562,17 +563,14 @@ const DIAGRAMME = {
   grundbruch: situationKarten,
 };
 
-function diagrammSicht(loesung) {
+/**
+ * Was der Reiter «Diagramme» zeigt, in Gruppen: die Werkstoffgesetze und je
+ * Bauteil seine Karten -- eingegrenzt wie die anderen Sichten.
+ */
+function diagrammgruppen(loesung) {
   const raum = eingrenzung();
-  const gesetze = loesung.werkstoffgesetze || {};
-  const spalten = zustand.diagrammspalten || 1;
-  // Die Karten eines Panels stehen so viele nebeneinander, wie gewählt ist.
-  const panelMit = (schluessel, titel, karten) => panel({ schluessel, titel }, [
-    el('div.karten', { class: `ist-${spalten}` }, karten)]);
-  const panels = [];
-
-  // -- Werkstoffgesetze: alle in einem Panel, je Material eine Karte -------
-  const gesetzkarten = Object.entries(gesetze)
+  const gruppen = [];
+  const gesetzkarten = Object.entries(loesung.werkstoffgesetze || {})
     .filter(([kennung, gesetz]) => imRaum(raum, `${gesetz.art}.${kennung}`))
     .map(([, gesetz]) => karte(`${gesetz.titel} – ${gesetz.name}`, [
       gesetz.referenz ? el('p.karte-hinweis', { text: gesetz.referenz }) : null,
@@ -582,36 +580,120 @@ function diagrammSicht(loesung) {
       }),
     ]));
   if (gesetzkarten.length) {
-    panels.push(panelMit('bericht/diagramm/werkstoffe', 'Werkstoffgesetze', gesetzkarten));
+    gruppen.push({ schluessel: 'werkstoffe', name: 'Werkstoffe', titel: 'Werkstoffgesetze',
+      karten: gesetzkarten });
   }
-
-  // -- Die Bauteile, Art für Art -------------------------------------------
   for (const art of ARTEN) {
     for (const [kennung, eintrag] of Object.entries(loesung.zuordnung?.[art.liste] || {})) {
       if (imRaum(raum, eintrag.namensraum)) {
-        panels.push(panelMit(`bericht/diagramm/${kennung}`, `Diagramme – ${eintrag.name}`,
-          DIAGRAMME[art.art](kennung, eintrag, loesung)));
+        gruppen.push({ schluessel: kennung, name: eintrag.name,
+          titel: `Diagramme – ${eintrag.name}`,
+          karten: DIAGRAMME[art.art](kennung, eintrag, loesung) });
       }
     }
   }
-
-  if (!panels.length) return leerzustand('Noch nichts zu zeichnen.');
-  // Wie viele nebeneinander -- der Schalter steht über allem, weil er für
-  // alle gilt und nicht für eines.
-  return stapel([spaltenwahl(), ...panels], `ist-${spalten}`);
+  return gruppen;
 }
 
-/** Wie viele Diagramme nebeneinander stehen -- eins, zwei oder drei. */
-function spaltenwahl() {
-  const jetzt = zustand.diagrammspalten || 1;
-  return el('div.spaltenwahl', {}, [
-    el('span', { text: 'Diagramme nebeneinander' }),
-    el('span.schalter', {}, [1, 2, 3].map((n) => el('button.schalter-halb', {
-      text: String(n),
-      class: n === jetzt ? 'ist-an' : '',
-      title: `${n} Diagramm${n > 1 ? 'e' : ''} je Zeile`,
-      on: { click: () => aendern({ diagrammspalten: n }, 'diagramm') },
-    }))),
+/** Der Titel einer Karte, wie er in ihrem Kopf steht -- leer, wenn sie keinen hat. */
+function kartentitel(k) {
+  return k.querySelector(':scope > .unterkapitel-kopf > span')?.textContent || '';
+}
+
+/**
+ * Die Diagramme, je eines gross (Benutzer, 2026-10-16). Zuoberst eine Leiste,
+ * die quer rollt, mit einer kleinen Vorschau je Diagramm -- ein Knopf; der
+ * gewählte steht darunter in voller Breite.
+ *
+ * Ein Diagramm ist jede Karte mit einem Bild. Die übrigen Karten eines
+ * Bauteils -- die Wahl des Falls, ein Hinweis -- stehen über dem Diagramm,
+ * das gross gezeigt wird, wenn es zu diesem Bauteil gehört. Hat ein Bauteil
+ * (noch) kein Bild, bekommt es einen Knopf ohne Vorschau, der seine Hinweise
+ * zeigt. Gemerkt wird die Wahl als Gruppe und Titel; fehlt dieser Titel,
+ * gilt dieselbe Stelle in der Gruppe, sonst das erste Diagramm.
+ */
+function diagrammSicht(loesung) {
+  const eintraege = [];
+  for (const gruppe of diagrammgruppen(loesung)) {
+    const bilder = gruppe.karten.filter((k) => k.querySelector('svg'));
+    if (!bilder.length) {
+      eintraege.push({ gruppe, karte: null, titel: 'ohne Bild', index: 0,
+        schluessel: `${gruppe.schluessel}|` });
+      continue;
+    }
+    const gesehen = {};
+    bilder.forEach((k, index) => {
+      const titel = kartentitel(k);
+      const n = gesehen[titel] = (gesehen[titel] || 0) + 1;
+      eintraege.push({ gruppe, karte: k, titel, index,
+        schluessel: `${gruppe.schluessel}|${titel}|${n}` });
+    });
+  }
+  if (!eintraege.length) return leerzustand('Noch nichts zu zeichnen.');
+
+  const wahl = zustand.diagrammWahl;
+  const gewaehlt = eintraege.find((e) => e.schluessel === wahl?.schluessel)
+    || eintraege.find((e) => e.gruppe.schluessel === wahl?.gruppe && e.index === wahl?.index)
+    || eintraege[0];
+  const mitGruppe = new Set(eintraege.map((e) => e.gruppe.schluessel)).size > 1;
+  const { gruppe } = gewaehlt;
+  return stapel([
+    vorschauleiste(eintraege, gewaehlt, mitGruppe),
+    panel({ schluessel: `bericht/diagramm/${gruppe.schluessel}`, titel: gruppe.titel }, [
+      ...gruppe.karten.filter((k) => !k.querySelector('svg')),
+      gewaehlt.karte,
+    ].filter(Boolean)),
+  ], 'ist-diagramm');
+}
+
+/** Wie weit die Leiste gerollt war -- sie wird bei jedem Zeichnen neu gebaut. */
+let leistenstand = 0;
+
+function vorschauleiste(eintraege, gewaehlt, mitGruppe) {
+  const leiste = el('div.vorschauleiste', {
+    role: 'tablist', 'aria-label': 'Diagramme',
+    on: { scroll: (ev) => { leistenstand = ev.target.scrollLeft; } },
+  }, eintraege.map((e) => vorschauknopf(e, e === gewaehlt, mitGruppe)));
+  // Erst wenn sie im Dokument steht, hat sie eine Breite: dann den alten
+  // Stand wiederherstellen und den gewählten Knopf ins Bild holen.
+  requestAnimationFrame(() => {
+    leiste.scrollLeft = leistenstand;
+    const aktiv = leiste.querySelector('.ist-gewaehlt');
+    if (aktiv) {
+      const links = aktiv.getBoundingClientRect().left - leiste.getBoundingClientRect().left
+        + leiste.scrollLeft;
+      if (links < leiste.scrollLeft) leiste.scrollLeft = links;
+      else if (links + aktiv.offsetWidth > leiste.scrollLeft + leiste.clientWidth) {
+        leiste.scrollLeft = links + aktiv.offsetWidth - leiste.clientWidth;
+      }
+    }
+  });
+  return leiste;
+}
+
+/** Ein Knopf der Leiste: die Vorschau -- eine verkleinerte Kopie des Bildes -- und der Titel. */
+function vorschauknopf(e, aktiv, mitGruppe) {
+  const bild = e.karte?.querySelector('svg')?.cloneNode(true);
+  if (bild) {
+    bild.removeAttribute('width');
+    bild.removeAttribute('height');
+    bild.removeAttribute('style');
+    bild.setAttribute('aria-hidden', 'true');
+  }
+  const name = e.titel || e.gruppe.name;
+  return el('button.vorschau', {
+    type: 'button', role: 'tab', 'aria-selected': String(aktiv),
+    class: aktiv ? 'ist-gewaehlt' : '',
+    title: mitGruppe ? `${e.gruppe.name} – ${name}` : name,
+    on: {
+      click: () => aendern({
+        diagrammWahl: { schluessel: e.schluessel, gruppe: e.gruppe.schluessel, index: e.index },
+      }, 'diagramm'),
+    },
+  }, [
+    el('span.vorschau-bild', {}, [bild || el('span.vorschau-leer', { text: '…' })]),
+    mitGruppe ? el('span.vorschau-gruppe', { text: e.gruppe.name }) : null,
+    el('span.vorschau-titel', { text: name }),
   ]);
 }
 

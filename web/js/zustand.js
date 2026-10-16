@@ -53,7 +53,11 @@ export const zustand = {
   // Die aktuelle Seite ist die Vorgabe: wer links eine Platte wählt, will in
   // aller Regel deren Nachweise sehen und nicht die des ganzen Projekts.
   umfang: 'seite',
-  diagrammspalten: 1,
+  /**
+   * Welches Diagramm gross steht: `{schluessel, gruppe, index}` -- siehe
+   * `diagrammSicht` in bericht.js. Null: das erste.
+   */
+  diagrammWahl: null,
   /** Ob im Betondiagramm der vereinfachte Spannungsblock mitgezeichnet wird. */
   zeigeVereinfacht: true,
   rechnetGerade: false,
