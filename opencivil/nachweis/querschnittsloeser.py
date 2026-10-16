@@ -78,7 +78,7 @@ from opencivil.core.protokoll import Zwischenwerte
 from opencivil.querschnitt.fasern import (
     Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt, Stab,
 )
-from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz, k_sigma as beiwert_parabel
+from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
 
 #: Fasern ueber die Plattenhoehe. 60 reichen: die Betonspannung ist stetig,
 #: und der Fehler der Mittelpunktsregel faellt mit dem Quadrat der Faserdicke.
@@ -834,9 +834,11 @@ class Querschnittsloeser(Faserloeser):
     Der Querschnitt einer Platte als Faserintegral -- aus Hoehe, Breite und
     Lagen gebaut, gesucht wird wie bei jedem :class:`Faserloeser`.
 
-    ``beton`` ist eine Funktion ``eps -> sigma`` in SI, ``stahl`` macht aus
-    dem Stahl einer Lage eine solche -- ohne Angabe :func:`bilinear`; die
-    Handrechnung gibt ihren Stahl nur auf Zug mit. Damit bleibt der Loeser
+    ``beton`` ist ein Werkstoffgesetz ``eps -> sigma`` in SI
+    (:mod:`opencivil.querschnitt.werkstoffgesetz`), ``stahl`` macht aus dem
+    Stahl einer Lage eines -- ohne Angabe das :class:`Stahlgesetz` der Lage
+    selbst, jenseits von ``eps_ud`` null; die Handrechnung gibt ihren Stahl
+    nur auf Zug mit. Damit bleibt der Loeser
     frei von Annahmen ueber das Werkstoffgesetz: die Spannungsbegrenzung rechnet
     elastisch mit Kriechen und charakteristischen Festigkeiten, der
     Knicknachweis mit dem nichtlinearen Gesetz der Norm und Bemessungswerten
@@ -847,8 +849,8 @@ class Querschnittsloeser(Faserloeser):
     Gesetze monoton sind -- jenseits ihrer Bruchdehnung geben sie null zurueck,
     und dort findet die Bisektion Scheinloesungen. Ohne ``eps_zug`` reicht das
     Fenster darum bis zur kleinsten Bruchdehnung der Lagen; ``eps_druck``
-    passt zu :func:`beton_nichtlinear`, wer es weitet, muss das Gesetz
-    mitweiten.
+    passt zur Parabel (:class:`~opencivil.querschnitt.werkstoffgesetz.Betongesetz`),
+    wer es weitet, muss das Gesetz mitweiten.
 
     Ohne ``grenzen`` gelten beide Werte an beiden Raendern. Wer andere
     Grenzen braucht -- die Spannung-Dehnung-Analyse die des Dehnungsfaechers,
@@ -880,7 +882,7 @@ class Querschnittsloeser(Faserloeser):
         lagen = list(lagen)
         eps_druck = abs(eps_druck)
         eps_zug = abs(eps_zug if eps_zug is not None else bruchdehnung(lagen))
-        stahl = stahl or bilinear
+        stahl = stahl or (lambda s: s)
         querschnitt = plattenfasern(
             h=h, b=b, beton=beton,
             staebe=[(l.a_s, l.z, stahl(l.stahl)) for l in lagen],
@@ -986,104 +988,3 @@ class Werkstoffsatz(str, Enum):
     def beton_zeichen(self) -> str:
         """Das Formelzeichen dazu, fuer die Herleitung -- ``f_{cd}``."""
         return "f_{cd}" if self is Werkstoffsatz.BEMESSUNG else "f_{ck}"
-
-
-def beton_elastisch(*, E_c: float,
-                    f_c: float = math.inf) -> Callable[[float], float]:
-    """
-    Beton ohne Zugfestigkeit, im Druck linear bis ``f_c``, dann waagrecht.
-
-    Fuer den gerissenen Gebrauchszustand. ``E_c`` ist bereits der wirksame
-    Modul, also ``E_cm/(1+phi)``, falls Kriechen zaehlt. ``f_c`` ist die
-    Festigkeit aus dem :class:`Werkstoffsatz` -- im Gebrauchszustand ``f_ck``.
-
-    Linear und nicht als Parabel: im Gebrauchszustand liegt die
-    Betonspannung weit unter der Festigkeit, und dort ist die Parabel eine
-    Gerade. Die Grenze steht trotzdem da, damit eine Druckzone, die doch
-    einmal so weit kommt, nicht mehr aufnimmt, als der Beton hergibt. Ohne
-    ``f_c`` bleibt das Gesetz unbegrenzt linear -- fuer Rechnungen, die mit
-    Festigkeiten nichts zu tun haben.
-
-    Ein Vergleich und nicht ``max()``: das Gesetz laeuft je Nachweisfall
-    rund siebzigtausend Mal, und der Funktionsaufruf kostete doppelt so viel
-    wie die Rechnung selbst -- gemessen 28 ms je Platte.
-    """
-    grenze = -f_c
-
-    def sigma(eps: float) -> float:
-        if eps > 0.0:
-            return 0.0
-        s = E_c * eps
-        return s if s > grenze else grenze
-    return sigma
-
-
-def beton_nichtlinear(*, f_cd: float, E_c: float,
-                      eps_c1d: float = 0.002,
-                      eps_c2d: float = 0.003) -> Callable[[float], float]:
-    """
-    Parabel-Rechteck-Beziehung nach SIA 262, als Funktion fuer den Loeser.
-
-    Keine Zugfestigkeit, Plateau zwischen ``eps_c1d`` und ``eps_c2d``, danach
-    Versagen (Spannung null). ``k_sigma = E_c/(400*f_cd)`` -- so steht es im
-    Vorbild --, aber nie unter 1 (:func:`~opencivil.querschnitt.werkstoffgesetz.k_sigma`).
-    """
-    k_sigma = beiwert_parabel(E_c, f_cd)
-
-    def sigma(eps: float) -> float:
-        if eps >= 0.0:
-            return 0.0
-        if eps < -eps_c2d:
-            return 0.0
-        if eps <= -eps_c1d:
-            return -f_cd
-        eta = -eps / eps_c1d
-        return -f_cd * (k_sigma * eta - eta * eta) / (1.0 + eta * (k_sigma - 2.0))
-    return sigma
-
-
-def stahl_bilinear(*, E_s: float, f_sd: float, eps_ud: float = 0.045,
-                   f_sd_druck: Optional[float] = None) -> Callable[[float], float]:
-    """
-    Linear bis zur Fliessgrenze, dann waagrecht; jenseits von ``eps_ud`` null.
-
-    ``f_sd`` ist die Grenze, ab der es waagrecht geht -- ``f_yd`` oder
-    ``f_yk``, je nach :class:`Werkstoffsatz`. ``f_sd_druck`` die auf Druck;
-    ohne sie gilt dieselbe. Bei den Normsorten sind beide gleich.
-    """
-    if f_sd_druck is None or f_sd_druck == f_sd:
-        def sigma(eps: float) -> float:
-            if abs(eps) > eps_ud:
-                return 0.0
-            return math.copysign(min(abs(eps) * E_s, f_sd), eps)
-        return sigma
-
-    def sigma_getrennt(eps: float) -> float:
-        if abs(eps) > eps_ud:
-            return 0.0
-        if eps >= 0.0:
-            return min(eps * E_s, f_sd)
-        return -min(-eps * E_s, f_sd_druck)
-    return sigma_getrennt
-
-
-def bilinear(s: Stahlgesetz) -> Callable[[float], float]:
-    """
-    Der Stahl einer Lage, wie der Loeser ihn rechnet: :func:`stahl_bilinear`
-    mit den Werten der Lage -- jenseits ihres ``eps_ud`` null, damit das
-    Suchfenster nicht ueber den gueltigen Bereich hinausgreift.
-    """
-    return stahl_bilinear(E_s=s.E_s, f_sd=s.f_yd, eps_ud=s.eps_ud, f_sd_druck=s.f_yd_druck)
-
-
-def stahl_nur_zug(*, E_s: float, f_sd: float,
-                  eps_ud: float = 0.045) -> Callable[[float], float]:
-    """
-    Wie :func:`stahl_bilinear`, aber ohne Druck: gedrueckter Stahl traegt
-    nichts. So rechnet die Handrechnung -- sie laesst die Druckbewehrung weg.
-    """
-    def sigma(eps: float) -> float:
-        if eps <= 0.0 or eps > eps_ud:
-            return 0.0
-        return min(eps * E_s, f_sd)
-    return sigma

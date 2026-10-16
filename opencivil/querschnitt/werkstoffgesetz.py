@@ -2,32 +2,44 @@
 opencivil/querschnitt/werkstoffgesetz.py -- Spannungs-Dehnungs-Beziehungen.
 
 VERANTWORTUNG:
-Liefert zu einer Dehnung die zugehoerige Spannung -- fuer Beton nach der
-Parabel-Rechteck-Beziehung (SIA 262:2025, 4.2.1.6) oder vereinfacht als
-Spannungsblock, und fuer Betonstahl nach der bilinearen Beziehung (4.2.2.4).
+Jedes Werkstoffgesetz ist ein Objekt, das rechnet und sich selbst als Formel
+schreibt -- dieselben Werte, dieselben Aeste. Beton: die
+Parabel-Rechteck-Beziehung (SIA 262:2025, 4.2.1.6, :class:`Betongesetz`), der
+Spannungsblock 0.85·x (:class:`Spannungsblock`), linear ohne Zug
+(:class:`BetonElastisch`) und ungerissen (:class:`BetonUngerissen`).
+Betonstahl: bilinear, auf Zug und Druck getrennt begrenzt, oder nur auf Zug
+(:class:`Stahlgesetz`, 4.2.2.4).
+
+Bis 2026-10-16 rechneten Funktionen im Loeser, und gedruckt wurden Klassen
+mit Platzhaltern oder Formeln von Hand. Jenseits von eps_c2d und beim
+gedrueckten Stahl stand in der Herleitung etwas anderes, als gerechnet wurde.
+
+JENSEITS DER GRENZDEHNUNG:
+Wer sucht -- der Loeser --, braucht dort null: eine Faser jenseits ihrer
+Grenzdehnung traegt nicht, und die Suche bleibt im gueltigen Bereich. Wer
+den Rand abfaehrt -- die genaue Resistenzlinie --, braucht das Gesetz stetig
+bis an die Grenze: eine Faser genau auf ihr darf nicht an einer Rundung auf
+null kippen. Das waehlt, wer das Gesetz baut, mit ``bricht``.
 
 VORZEICHEN (im ganzen Querschnittsmodul gleich):
     Dehnung   eps > 0  =  Zug
     Spannung  sig > 0  =  Zug
-Beton nimmt keinen Zug auf; oberhalb der Bruchdehnung faellt die Spannung auf
-null, was beim Aufbau der Interaktionslinie nie vorkommt, weil die Dehnungsebene
-dort ohnehin begrenzt wird.
 
-WARUM HIER MIT BLANKEN ZAHLEN GERECHNET WIRD:
-Diese Funktionen laufen in der Faserintegration hunderttausendfach. Sie
-arbeiten deshalb mit SI-Zahlen (N/m^2 und dimensionslose Dehnung) statt mit
-:class:`Groesse`. Die Umrechnung geschieht einmal am Rand, in
-:class:`Betongesetz.aus_werten` bzw. :class:`Stahlgesetz.aus_werten` -- dort ist
-die Einheitenpruefung also weiterhin lueckenlos.
+SCHNELL:
+Die Gesetze laufen in der Faserintegration hunderttausendfach. Jedes baut
+darum einmal seine Funktion (``funktion``) mit blanken SI-Zahlen; die Fasern
+rufen sie unmittelbar, ohne den Umweg ueber ``__call__``
+(:mod:`opencivil.querschnitt.fasern`). Wer ``funktion`` aendert, misst: ein
+``max()`` statt eines Vergleichs kostete 28 ms je Platte.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Mapping
+import math
+from dataclasses import dataclass, field
+from typing import Callable
 
-from opencivil.core.einheiten import EINHEITSLOS, N_PRO_MM2, Groesse
-from opencivil.core.wert import Wert
+Funktion = Callable[[float], float]
 
 
 #: Kleiner rechnet die Parabel ``k_sigma`` nicht. Darunter haette ihr Nenner
@@ -48,6 +60,11 @@ def k_sigma(E_c: float, f_c: float) -> float:
     return max(K_SIGMA_MIN, E_c / (400.0 * f_c)) if f_c > 0 else K_SIGMA_MIN
 
 
+def _gebaut(gesetz, funktion: Funktion) -> None:
+    """Legt die Funktion an ein eingefrorenes Gesetz -- einmal, beim Bauen."""
+    object.__setattr__(gesetz, "funktion", funktion)
+
+
 @dataclass(frozen=True)
 class Betongesetz:
     """
@@ -60,6 +77,8 @@ class Betongesetz:
                   1 + (k_sigma - 2) * eta
 
         sig = f_cd                              für eps_c1d < |eps| <= eps_c2d
+
+    Jenseits von ``eps_c2d`` null, wenn es ``bricht``, sonst ``f_cd``.
     """
 
     #: Die Seite im Notizbuch -- gleich, wer das Gesetz unter welchem Titel
@@ -67,7 +86,8 @@ class Betongesetz:
     NAME = "Parabel-Rechteck-Beziehung des Betons"
 
     f_cd: float
-    """Bemessungsdruckfestigkeit in N/m^2 (positiver Betrag)."""
+    """Festigkeit in N/m^2 (positiver Betrag) -- je nach Werkstoffsatz
+    ``f_cd`` oder ``f_ck``."""
 
     eps_c1d: float
     """Dehnung am Ende des ansteigenden Astes (positiver Betrag)."""
@@ -76,36 +96,41 @@ class Betongesetz:
     """Bruchdehnung (positiver Betrag)."""
 
     k_sigma: float
-    """Gerechnet wird mit hoechstens :data:`K_SIGMA_MIN` -- siehe dort."""
+    """Gerechnet wird mit mindestens :data:`K_SIGMA_MIN` -- siehe dort."""
+
+    bricht: bool = True
+    """Jenseits von ``eps_c2d`` null -- siehe Dateikopf."""
+
+    funktion: Funktion = field(init=False, repr=False, compare=False)
 
     @classmethod
-    def aus_werten(cls, werte: Mapping[str, Wert]) -> "Betongesetz":
-        """Baut das Gesetz aus den Kennwerten des Betons (mit Einheitenpruefung)."""
-        return cls(
-            f_cd=abs(werte["f_cd"].groesse.si),
-            eps_c1d=abs(werte["eps_c1d"].groesse.si),
-            eps_c2d=abs(werte["eps_c2d"].groesse.si),
-            k_sigma=werte["k_sigma"].groesse.si,
-        )
+    def mit_modul(cls, *, f_c: float, E_c: float, eps_c1d: float, eps_c2d: float,
+                  bricht: bool = True) -> "Betongesetz":
+        """Das Gesetz zum Modul ``E_c`` -- ``k_sigma`` aus :func:`k_sigma`, die eine Stelle."""
+        return cls(f_cd=f_c, eps_c1d=eps_c1d, eps_c2d=eps_c2d, k_sigma=k_sigma(E_c, f_c),
+                   bricht=bricht)
+
+    def __post_init__(self) -> None:
+        f, e1, e2 = self.f_cd, self.eps_c1d, self.eps_c2d
+        k = max(K_SIGMA_MIN, self.k_sigma)
+        jenseits = 0.0 if self.bricht else -f
+
+        def sigma(eps: float) -> float:
+            if eps >= 0.0:
+                return 0.0
+            if eps < -e2:
+                return jenseits
+            if eps <= -e1:
+                return -f
+            eta = -eps / e1
+            return -f * (k * eta - eta * eta) / (1.0 + eta * (k - 2.0))
+        _gebaut(self, sigma)
 
     def spannung(self, eps: float) -> float:
         """Spannung in N/m^2 zur Dehnung ``eps``. Zug positiv, also hier <= 0."""
-        if eps >= 0.0:
-            return 0.0  # Beton reisst, kein Zug
-        betrag = -eps
-        if betrag > self.eps_c1d:
-            # Oberhalb der Bruchdehnung wird das Plateau fortgesetzt statt auf
-            # null zu fallen. Der Dehnungsfaecher der Interaktionsrechnung haelt
-            # jede Faser innerhalb von eps_c2d, sodass dieser Fall gar nicht
-            # eintritt; eine Sprungstelle waere aber fuer jede numerische
-            # Auswertung verheerend, darum bleibt die Funktion hier stetig.
-            return -self.f_cd
-        eta = betrag / self.eps_c1d
-        k = max(K_SIGMA_MIN, self.k_sigma)
-        nenner = 1.0 + (k - 2.0) * eta
-        if nenner == 0.0:
-            return -self.f_cd
-        return -self.f_cd * (k * eta - eta * eta) / nenner
+        return self.funktion(eps)
+
+    __call__ = spannung
 
     def latex(self, f: str = "f_{cd}") -> str:
         """Als Formel -- ``f`` ist das Zeichen der Festigkeit, ``f_{ck}`` bei charakteristischen Werten."""
@@ -153,6 +178,25 @@ class Spannungsblock:
     eps_c2d: float
     """Bruchdehnung (positiver Betrag)."""
 
+    bricht: bool = True
+    """Jenseits von ``eps_c2d`` null -- siehe Dateikopf."""
+
+    funktion: Funktion = field(init=False, repr=False, compare=False)
+
+    def __post_init__(self) -> None:
+        f, knick, grenze = self.f_cd, -self.eps_knick, -self.eps_c2d
+        if self.bricht:
+            def sigma(eps: float) -> float:
+                if eps > knick or eps < grenze:
+                    return 0.0
+                return -f
+        else:
+            def sigma(eps: float) -> float:
+                if eps > knick:
+                    return 0.0  # Zug, oder zu wenig Stauchung fuer den Block
+                return -f
+        _gebaut(self, sigma)
+
     @property
     def eps_knick(self) -> float:
         """Ab dieser Stauchung (Betrag) setzt der Block ein."""
@@ -160,17 +204,15 @@ class Spannungsblock:
 
     def spannung(self, eps: float) -> float:
         """Spannung in N/m^2 zur Dehnung ``eps``. Zug positiv, also hier <= 0."""
-        if eps > -self.eps_knick:
-            return 0.0  # Zug, oder zu wenig Stauchung fuer den Block
-        return -self.f_cd
+        return self.funktion(eps)
 
     __call__ = spannung
 
     def mittel(self, eps_a: float, eps_b: float) -> float:
         """
         Die mittlere Spannung, wenn die Dehnung linear von ``eps_a`` nach
-        ``eps_b`` laeuft -- genau: ``f_cd`` mal der Anteil, der ueber dem Knick
-        liegt.
+        ``eps_b`` laeuft -- genau: ``f_cd`` mal der Anteil, der im Block liegt,
+        zwischen dem Knick und, wenn er ``bricht``, ``-eps_c2d``.
 
         Der Block springt. In der Mitte einer Faser gelesen, springt darum auch
         N, sobald eine Faser den Knick ueberschreitet -- am Kastentraeger um
@@ -179,11 +221,15 @@ class Spannungsblock:
         """
         unten, oben = min(eps_a, eps_b), max(eps_a, eps_b)
         knick = -self.eps_knick
-        if oben <= knick:
+        grenze = -self.eps_c2d if self.bricht else -math.inf
+        if oben == unten:
+            return self.funktion(unten)
+        if oben <= knick and unten >= grenze:
             return -self.f_cd
-        if unten > knick or oben == unten:
-            return self.spannung(unten)
-        return -self.f_cd * (knick - unten) / (oben - unten)
+        von, bis = max(unten, grenze), min(oben, knick)
+        if bis <= von:
+            return 0.0
+        return -self.f_cd * (bis - von) / (oben - unten)
 
     def latex(self, f: str = "f_{cd}") -> str:
         """Als Formel -- ``f`` ist das Zeichen der Festigkeit, ``f_{ck}`` bei charakteristischen Werten."""
@@ -202,7 +248,8 @@ class Stahlgesetz:
     Bilineare Beziehung ohne Verfestigung nach SIA 262:2025, 4.2.2.4.
 
     Zug und Druck werden getrennt begrenzt, weil ``f_yd`` und ``f_yd^-`` in der
-    Sortentabelle unterschiedlich sein duerfen.
+    Sortentabelle unterschiedlich sein duerfen. ``nur_zug``: der gedrueckte
+    Stahl traegt nichts -- so laesst die Handrechnung die Druckbewehrung weg.
     """
 
     #: Die Seite im Notizbuch, wie bei :attr:`Betongesetz.NAME`.
@@ -212,7 +259,7 @@ class Stahlgesetz:
     """Elastizitaetsmodul in N/m^2."""
 
     f_yd: float
-    """Fliessgrenze auf Zug in N/m^2."""
+    """Fliessgrenze auf Zug in N/m^2 -- je nach Werkstoffsatz ``f_yd`` oder ``f_yk``."""
 
     f_yd_druck: float
     """Fliessgrenze auf Druck in N/m^2 (positiver Betrag)."""
@@ -220,21 +267,23 @@ class Stahlgesetz:
     eps_ud: float
     """Grenzdehnung (positiver Betrag)."""
 
-    @classmethod
-    def aus_werten(cls, werte: Mapping[str, Wert]) -> "Stahlgesetz":
-        return cls(
-            E_s=werte["E_s"].groesse.si,
-            f_yd=abs(werte["f_yd"].groesse.si),
-            f_yd_druck=abs(werte["f_yd_druck"].groesse.si),
-            eps_ud=abs(werte["eps_ud"].groesse.si),
-        )
+    nur_zug: bool = False
+    """Der gedrueckte Stahl traegt nichts."""
+
+    bricht: bool = True
+    """Jenseits von ``eps_ud`` null -- siehe Dateikopf."""
+
+    funktion: Funktion = field(init=False, repr=False, compare=False)
+
+    def __post_init__(self) -> None:
+        _gebaut(self, _stahlfunktion(self.E_s, self.f_yd, self.f_yd_druck, self.eps_ud,
+                                     nur_zug=self.nur_zug, bricht=self.bricht))
 
     def spannung(self, eps: float) -> float:
         """Spannung in N/m^2 zur Dehnung ``eps``. Zug positiv."""
-        elastisch = self.E_s * eps
-        if eps >= 0.0:
-            return min(elastisch, self.f_yd)
-        return max(elastisch, -self.f_yd_druck)
+        return self.funktion(eps)
+
+    __call__ = spannung
 
     @property
     def eps_yd(self) -> float:
@@ -249,6 +298,114 @@ class Stahlgesetz:
             r" \end{cases}"
             r" \qquad |\varepsilon_s| \le \varepsilon_{ud}"
         )
+
+
+def _stahlfunktion(E_s: float, f: float, f_druck: float, eps_u: float, *,
+                   nur_zug: bool, bricht: bool) -> Funktion:
+    """
+    Die Funktion des Stahls, je Fall eine eigene: in der Schleife entscheidet
+    sie nichts, was schon beim Bauen feststeht. Sind beide Plateaus gleich --
+    bei den Normsorten --, rechnet sie mit dem Betrag.
+    """
+    if nur_zug:
+        def sigma_zug(eps: float) -> float:
+            if eps <= 0.0 or (bricht and eps > eps_u):
+                return 0.0
+            return min(eps * E_s, f)
+        return sigma_zug
+    if f_druck == f:
+        if bricht:
+            def sigma(eps: float) -> float:
+                if abs(eps) > eps_u:
+                    return 0.0
+                return math.copysign(min(abs(eps) * E_s, f), eps)
+            return sigma
+
+        def sigma_stetig(eps: float) -> float:
+            return math.copysign(min(abs(eps) * E_s, f), eps)
+        return sigma_stetig
+
+    def sigma_getrennt(eps: float) -> float:
+        if bricht and abs(eps) > eps_u:
+            return 0.0
+        if eps >= 0.0:
+            return min(eps * E_s, f)
+        return -min(-eps * E_s, f_druck)
+    return sigma_getrennt
+
+
+@dataclass(frozen=True)
+class BetonElastisch:
+    """
+    Beton ohne Zugfestigkeit, im Druck linear bis ``f_c``, dann waagrecht --
+    fuer den gerissenen Gebrauchszustand.
+
+    ``E_c`` ist bereits der wirksame Modul, ``E_cm/(1+phi)``, falls Kriechen
+    zaehlt; ``f_c`` die Festigkeit aus dem Werkstoffsatz, im Gebrauchszustand
+    ``f_ck``. Linear und nicht als Parabel: im Gebrauchszustand liegt die
+    Betonspannung weit unter der Festigkeit, und dort ist die Parabel eine
+    Gerade. Die Grenze steht trotzdem da, damit eine Druckzone, die doch
+    einmal so weit kommt, nicht mehr aufnimmt, als der Beton hergibt. Ohne
+    ``f_c`` bleibt das Gesetz unbegrenzt linear -- fuer Rechnungen, die mit
+    Festigkeiten nichts zu tun haben.
+    """
+
+    NAME = "Beton linear, ohne Zug"
+
+    E_c: float
+    f_c: float = math.inf
+
+    funktion: Funktion = field(init=False, repr=False, compare=False)
+
+    def __post_init__(self) -> None:
+        E_c, grenze = self.E_c, -self.f_c
+
+        # Ein Vergleich und nicht max(): das Gesetz laeuft je Nachweisfall
+        # rund siebzigtausend Mal, und der Funktionsaufruf kostete doppelt so
+        # viel wie die Rechnung selbst.
+        def sigma(eps: float) -> float:
+            if eps > 0.0:
+                return 0.0
+            s = E_c * eps
+            return s if s > grenze else grenze
+        _gebaut(self, sigma)
+
+    def spannung(self, eps: float) -> float:
+        return self.funktion(eps)
+
+    __call__ = spannung
+
+
+@dataclass(frozen=True)
+class BetonUngerissen:
+    """
+    Beton linear in beiden Richtungen -- der ungerissene Vergleichszustand.
+
+    Ohne Abminderung im Zug und ohne Abbruch bei ``f_ct``. Das ist Absicht:
+    gebraucht wird die *Steifigkeit* des ungerissenen Querschnitts, und wo er
+    reisst, sagt das Rissmoment -- oberhalb davon gilt die Linie gerissen,
+    dieser Zustand steht dort nur noch zum Vergleich. Ein Gesetz, das bei
+    ``f_ct`` abfiele, waere ausserdem nicht mehr monoton, und die Bisektion
+    des Loesers braucht Monotonie.
+    """
+
+    NAME = "Beton ungerissen, in Druck und Zug"
+
+    E_c: float
+
+    funktion: Funktion = field(init=False, repr=False, compare=False)
+
+    def __post_init__(self) -> None:
+        E_c = self.E_c
+
+        def sigma(eps: float) -> float:
+            return E_c * eps
+        _gebaut(self, sigma)
+
+    def spannung(self, eps: float) -> float:
+        return self.funktion(eps)
+
+    __call__ = spannung
 
 
 @dataclass(frozen=True)

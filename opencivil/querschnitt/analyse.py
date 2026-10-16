@@ -653,24 +653,22 @@ class Querschnittsanalyse:
             if stoff.art is Baustoffart.BETON:
                 f_c = w("f_cd") if bemessung else w("f_ck")
                 eps_c1d, eps_c2d = w("eps_c1d"), w("eps_c2d")
+                # Stetig bis an die Grenzen: die Interaktion faehrt den Rand ab.
                 if self.betongesetz(stoff) == "block":
-                    # Das Gesetz selbst, nicht nur seine Spannung: es weiss
-                    # auch, wie es ueber eine Faser zu mitteln ist.
-                    gesetz = Spannungsblock(f_cd=f_c, eps_c2d=eps_c2d)
+                    gesetz = Spannungsblock(f_cd=f_c, eps_c2d=eps_c2d, bricht=False)
                 else:
                     k = (self.kennwert(e, stoff, "k_sigma") if bemessung
                          else _K_SIGMA.funktion(E_cd=w("E_cd"), f_cd=f_c))
                     gesetz = Betongesetz(f_cd=f_c, eps_c1d=eps_c1d, eps_c2d=eps_c2d,
-                                         k_sigma=k).spannung
+                                         k_sigma=k, bricht=False)
                 liste.append(Werkstoff(stoff.name, gesetz, -eps_c2d, math.inf,
                                        c_punkt=(eps_c1d, eps_c2d), verdraengbar=True))
             else:
                 gesetz = Stahlgesetz(
                     E_s=w("E_s"), f_yd=w("f_yd") if bemessung else w("f_yk"),
                     f_yd_druck=w("f_yd_druck") if bemessung else w("f_yk_druck"),
-                    eps_ud=w("eps_ud"))
-                liste.append(Werkstoff(stoff.name, gesetz.spannung, -gesetz.eps_ud,
-                                       gesetz.eps_ud))
+                    eps_ud=w("eps_ud"), bricht=False)
+                liste.append(Werkstoff(stoff.name, gesetz, -gesetz.eps_ud, gesetz.eps_ud))
             index[stoff.id] = len(liste) - 1
         return liste, (lambda stoff: index[stoff.id])
 

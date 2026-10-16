@@ -121,7 +121,7 @@ from opencivil.nachweis.sproedes_versagen import (
 from opencivil.querschnitt.platte import Richtung
 from opencivil.material.betonstahl import FLIESSDEHNUNG
 from opencivil.querschnitt.werkstoffgesetz import (
-    BLOCKANTEIL, K_SIGMA_LATEX, Betongesetz, Spannungsblock, k_sigma,
+    BLOCKANTEIL, K_SIGMA_LATEX, BetonUngerissen, Betongesetz, Spannungsblock, k_sigma,
 )
 
 if TYPE_CHECKING:
@@ -338,22 +338,6 @@ def aus_dehnungen(loeser: Faserloeser, *,
 # ===========================================================================
 
 
-def beton_ungerissen(*, E_c: float) -> Callable[[float], float]:
-    """
-    Beton linear in beiden Richtungen -- der ungerissene Vergleichszustand.
-
-    Ohne Abminderung im Zug und ohne Abbruch bei ``f_ct``. Das ist Absicht:
-    gebraucht wird die *Steifigkeit* des ungerissenen Querschnitts, und wo er
-    reisst, sagt das Rissmoment -- oberhalb davon gilt die Linie gerissen,
-    dieser Zustand steht dort nur noch zum Vergleich. Ein Gesetz, das bei
-    ``f_ct`` abfiele, waere ausserdem nicht mehr monoton, und die Bisektion
-    des Loesers braucht Monotonie.
-    """
-    def sigma(eps: float) -> float:
-        return E_c * eps
-    return sigma
-
-
 @dataclass(frozen=True)
 class Loeserpaar:
     """
@@ -546,7 +530,7 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
     fenster = dict(grenzen=grenzen, eps_druck=w.eps_c2d)
     gerissen = g.loeser(h=h, b=b, lagen=lagen, **fenster)
     # Derselbe Querschnitt ungerissen: nur das Betongesetz ist ein anderes.
-    ungerissen = g.loeser(h=h, b=b, lagen=lagen, beton=beton_ungerissen(E_c=E_c_eff),
+    ungerissen = g.loeser(h=h, b=b, lagen=lagen, beton=BetonUngerissen(E_c=E_c_eff),
                           **fenster)
     f_ctm = wert(ids["f_ctm"])
     k_t_zug = beiwert_dicke(h)

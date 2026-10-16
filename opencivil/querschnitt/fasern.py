@@ -129,18 +129,19 @@ class Faserquerschnitt:
                 g.flaechen if isinstance(g.flaechen, tuple) else (g.flaechen,) * n,
                 g.quer if g.quer is not None else (0.0,) * n))
 
-        self._gleich = tuple((g.gesetz, g.arme, g.flaechen) for g in self.gruppen
+        self._gleich = tuple((_schnell(g.gesetz), g.arme, g.flaechen) for g in self.gruppen
                              if g.quer is None and not isinstance(g.flaechen, tuple)
                              and not gemittelt(g))
         self._einzeln = tuple(
-            (g.gesetz, einzeln(g)) for g in self.gruppen
+            (_schnell(g.gesetz), einzeln(g)) for g in self.gruppen
             if not (g.quer is None and not isinstance(g.flaechen, tuple)) and not gemittelt(g))
         self._gemittelt = tuple(
             (_mittel(g.gesetz), tuple((arm, a, u, d / 2.0)
                                       for (arm, a, u), d in zip(einzeln(g), g.dicken)))
             for g in self.gruppen if gemittelt(g))
         self._staebe = tuple(
-            (s.arm, s.flaeche, s.gesetz, s.verdraengt, s.quer,
+            (s.arm, s.flaeche, _schnell(s.gesetz),
+             None if s.verdraengt is None else _schnell(s.verdraengt), s.quer,
              _mittel(s.verdraengt) if s.verdraengt is not None and s.dicke > 0.0 else None,
              s.dicke / 2.0)
             for s in self.staebe)
@@ -201,6 +202,16 @@ class Faserquerschnitt:
 def _mittel(gesetz: Optional[Gesetz]) -> Optional[Callable[[float, float], float]]:
     """Die mittlere Spannung des Gesetzes ueber einen Bereich -- wenn es sie kennt."""
     return getattr(gesetz, "mittel", None)
+
+
+def _schnell(gesetz: Gesetz) -> Gesetz:
+    """
+    Was die Schleife ruft: bei einem Werkstoffgesetz seine ``funktion``
+    (:mod:`opencivil.querschnitt.werkstoffgesetz`) -- ohne den Umweg ueber
+    ``__call__``, der je Aufruf ein Fuenftel kostete --, sonst die Funktion
+    selbst.
+    """
+    return getattr(gesetz, "funktion", gesetz)
 
 
 # ===========================================================================

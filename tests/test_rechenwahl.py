@@ -11,7 +11,7 @@ import unittest
 
 from opencivil.core.berechnung import Eingabebezug
 from opencivil.nachweis.querschnittsloeser import (
-    Stahllage, Werkstoffsatz, lagen_je_seite, stahl_bilinear, stahl_nur_zug,
+    Stahllage, Werkstoffsatz, lagen_je_seite,
 )
 from opencivil.nachweis.rechenwahl import (
     RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN, Betonkennwerte, Rechenart, Rechenwahl,
@@ -98,20 +98,25 @@ class TestGesetze(unittest.TestCase):
 
 class TestStahl(unittest.TestCase):
     def test_eigenes_druckplateau(self):
-        gesetz = stahl_bilinear(E_s=200e9, f_sd=435e6, f_sd_druck=400e6)
+        gesetz = Stahlgesetz(E_s=200e9, f_yd=435e6, f_yd_druck=400e6, eps_ud=0.045)
         self.assertAlmostEqual(gesetz(0.01), 435e6)
         self.assertAlmostEqual(gesetz(-0.01), -400e6)
         self.assertEqual(gesetz(0.05), 0.0)
 
-    def test_gleiche_plateaus_rechnen_wie_vorher(self):
-        """Bei den Normsorten sind beide gleich -- dann Bit für Bit wie bis heute."""
-        alt = stahl_bilinear(E_s=200e9, f_sd=435e6)
-        neu = stahl_bilinear(E_s=200e9, f_sd=435e6, f_sd_druck=435e6)
+    def test_gleiche_plateaus_rechnen_wie_getrennte(self):
+        """
+        Bei den Normsorten sind beide gleich -- dann rechnet das Gesetz mit dem
+        Betrag, Bit für Bit wie Zug und Druck getrennt.
+        """
+        gesetz = Stahlgesetz(E_s=200e9, f_yd=435e6, f_yd_druck=435e6, eps_ud=0.045)
         for eps in (-0.05, -0.003, -1e-4, -0.0, 0.0, 1e-4, 0.003, 0.05):
-            self.assertEqual(neu(eps), alt(eps))
+            getrennt = (0.0 if abs(eps) > 0.045 else
+                        min(eps * 200e9, 435e6) if eps >= 0.0 else -min(-eps * 200e9, 435e6))
+            self.assertEqual(gesetz(eps), getrennt)
 
     def test_nur_zug(self):
-        gesetz = stahl_nur_zug(E_s=200e9, f_sd=435e6, eps_ud=0.045)
+        gesetz = Stahlgesetz(E_s=200e9, f_yd=435e6, f_yd_druck=435e6, eps_ud=0.045,
+                             nur_zug=True)
         self.assertEqual(gesetz(-0.001), 0.0)
         self.assertAlmostEqual(gesetz(0.001), 200e6)
         self.assertAlmostEqual(gesetz(0.01), 435e6)

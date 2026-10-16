@@ -4,11 +4,18 @@ import math
 import unittest
 
 from opencivil.nachweis.querschnittsloeser import (
-    Querschnittsloeser, QuerschnittsloeserIllinois, Stahllage, beton_elastisch,
-    beton_nichtlinear, probenschranken, stahl_bilinear,
+    Querschnittsloeser, QuerschnittsloeserIllinois, Stahllage, probenschranken,
 )
 from opencivil.nachweis.zustand2 import gerissen, wertigkeit
-from opencivil.querschnitt.werkstoffgesetz import Spannungsblock, Stahlgesetz
+from opencivil.querschnitt.werkstoffgesetz import (
+    BetonElastisch, Betongesetz, Spannungsblock, Stahlgesetz,
+)
+
+
+def parabelgesetz(*, f_cd: float, E_c: float, eps_c1d: float = 0.002,
+            eps_c2d: float = 0.003) -> Betongesetz:
+    """Die Parabel zum Modul ``E_c`` -- wie der Loeser sie rechnet, jenseits von eps_c2d null."""
+    return Betongesetz.mit_modul(f_c=f_cd, E_c=E_c, eps_c1d=eps_c1d, eps_c2d=eps_c2d)
 
 
 def stahl(*, E_s: float, f_sd: float, eps_ud: float = 0.045) -> Stahlgesetz:
@@ -24,7 +31,7 @@ def elastischer_loeser(a_s=2450e-6, d=0.2601, phi=2.0, h=0.3, b=1.0):
     """Gerissen, linear elastisch -- der Fall mit geschlossener Lösung."""
     return Querschnittsloeser(
         h=h, b=b, lagen=[Stahllage(a_s=a_s, z=d, stahl=ELASTISCH, nummer=1)],
-        beton=beton_elastisch(E_c=33.62e9 / (1.0 + phi)))
+        beton=BetonElastisch(E_c=33.62e9 / (1.0 + phi)))
 
 
 class TestGegenDieGeschlosseneLoesung(unittest.TestCase):
@@ -93,7 +100,7 @@ class TestProbe(unittest.TestCase):
             h=0.3, b=1.0,
             lagen=[Stahllage(a_s=1200e-6, z=0.26, stahl=ELASTISCH, nummer=1),
                    Stahllage(a_s=1200e-6, z=0.04, stahl=ELASTISCH, nummer=4)],
-            beton=beton_elastisch(E_c=33.62e9 / 3.0))
+            beton=BetonElastisch(E_c=33.62e9 / 3.0))
         for N_Ed, M_Ed in [(200e3, 0.0), (200e3, 10e3), (500e3, -15e3)]:
             with self.subTest(N=N_Ed, M=M_Ed):
                 e = loeser.loese(N_Ed=N_Ed, M_Ed=M_Ed)
@@ -113,7 +120,7 @@ class TestProbe(unittest.TestCase):
             h=0.3, b=1.0,
             lagen=[Stahllage(a_s=a_s, z=d, stahl=s, nummer=1),
                    Stahllage(a_s=a_s, z=d_u, stahl=s, nummer=4)],
-            beton=beton_nichtlinear(f_cd=28.1e6, E_c=39e9 / 2.0))
+            beton=parabelgesetz(f_cd=28.1e6, E_c=39e9 / 2.0))
 
         e = loeser.loese(N_Ed=-3000e3, M_Ed=150e3)
         self.assertTrue(e.konvergiert)
@@ -144,7 +151,7 @@ class TestGrenzen(unittest.TestCase):
         loeser = Querschnittsloeser(
             h=0.3, b=1.0,
             lagen=[Stahllage(a_s=200e-6, z=0.26, stahl=stahl(E_s=200e9, f_sd=435e6))],
-            beton=beton_nichtlinear(f_cd=20e6, E_c=33e9))
+            beton=parabelgesetz(f_cd=20e6, E_c=33e9))
         e = loeser.loese(N_Ed=0.0, M_Ed=5000e3)
         self.assertFalse(e.konvergiert)
 
@@ -161,7 +168,7 @@ class TestGrenzen(unittest.TestCase):
             lagen=[Stahllage(a_s=1696e-6, z=0.249, stahl=s, nummer=1),
                    Stahllage(a_s=754e-6, z=0.246, stahl=s, nummer=2),
                    Stahllage(a_s=754e-6, z=0.048, stahl=s, nummer=4)],
-            beton=beton_nichtlinear(f_cd=20e6, E_c=33.62e9 / 3.0,
+            beton=parabelgesetz(f_cd=20e6, E_c=33.62e9 / 3.0,
                                     eps_c1d=0.002, eps_c2d=0.0035),
             eps_druck=0.0035, eps_zug=0.045)
         e = loeser.loese(N_Ed=0.0, M_Ed=234.9e3)
@@ -180,19 +187,19 @@ class TestGrenzen(unittest.TestCase):
         loeser = Querschnittsloeser(
             h=0.3, b=1.0,
             lagen=[Stahllage(a_s=2450e-6, z=0.26, stahl=stahl(E_s=200e9, f_sd=435e6))],
-            beton=beton_nichtlinear(f_cd=20e6, E_c=33e9))
+            beton=parabelgesetz(f_cd=20e6, E_c=33e9))
         weit = loeser._fenster(0.0)
         eng = loeser._fenster(0.1)
         self.assertGreater(weit[1] - weit[0], eng[1] - eng[0])
         self.assertIsNone(loeser._fenster(1.0))
 
     def test_stahl_jenseits_der_bruchdehnung_traegt_nichts(self):
-        gesetz = stahl_bilinear(E_s=200e9, f_sd=435e6, eps_ud=0.045)
+        gesetz = stahl(E_s=200e9, f_sd=435e6, eps_ud=0.045)
         self.assertAlmostEqual(gesetz(0.01) / 1e6, 435.0)
         self.assertAlmostEqual(gesetz(0.05), 0.0)
 
     def test_beton_nimmt_keinen_zug(self):
-        gesetz = beton_nichtlinear(f_cd=20e6, E_c=33e9)
+        gesetz = parabelgesetz(f_cd=20e6, E_c=33e9)
         self.assertAlmostEqual(gesetz(0.001), 0.0)
         self.assertAlmostEqual(gesetz(-0.0025) / 1e6, -20.0)
         self.assertAlmostEqual(gesetz(-0.004), 0.0)
@@ -204,7 +211,7 @@ class TestGrenzen(unittest.TestCase):
         -- dort sprang die Spannung ins Unendliche und wechselte das
         Vorzeichen. Mit k_σ = 1 ist der Beton bis f_c bei ε_c1d linear.
         """
-        gesetz = beton_nichtlinear(f_cd=30e6, E_c=33.62e9 / 3.0, eps_c1d=0.002, eps_c2d=0.0035)
+        gesetz = parabelgesetz(f_cd=30e6, E_c=33.62e9 / 3.0, eps_c1d=0.002, eps_c2d=0.0035)
         werte = [gesetz(-i * 1e-5) for i in range(351)]
         for vorher, nachher in zip(werte, werte[1:]):
             self.assertLessEqual(nachher, vorher + 1e-6)
@@ -252,7 +259,7 @@ class TestVerfehlteEbene(unittest.TestCase):
                 self.assertAlmostEqual(ebene.M_int, M, delta=1.0)
 
     def test_mit_der_parabel_gibt_es_sie(self):
-        parabel = beton_nichtlinear(f_cd=20e6, E_c=33.62e9, eps_c1d=0.002, eps_c2d=0.003)
+        parabel = parabelgesetz(f_cd=20e6, E_c=33.62e9, eps_c1d=0.002, eps_c2d=0.003)
         ebene = self.loeser(beton=parabel).loese(N_Ed=-600e3, M_Ed=14.5e3)
         self.assertTrue(ebene.konvergiert)
         self.assertAlmostEqual(ebene.N_int, -600e3, delta=1.0)
@@ -295,7 +302,7 @@ class TestIllinoisMitWarmstart(unittest.TestCase):
             beton=beton, eps_druck=0.0035, eps_zug=0.045, **mehr)
 
     def test_dieselben_ebenen_wie_beim_halbieren(self):
-        parabel = beton_nichtlinear(f_cd=20e6, E_c=33.62e9 / 3.0, eps_c1d=0.002,
+        parabel = parabelgesetz(f_cd=20e6, E_c=33.62e9 / 3.0, eps_c1d=0.002,
                                     eps_c2d=0.0035)
         halbiert = self.platte(Querschnittsloeser, parabel)
         illinois = self.platte(QuerschnittsloeserIllinois, parabel)

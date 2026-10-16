@@ -1,5 +1,5 @@
 ---
-erzeugt: 9c202024fabd
+erzeugt: fbf41a2e7048
 art: modul
 tags: [modul]
 ---
@@ -303,7 +303,7 @@ Was zu einer Wahl gehoert -- Gesetze, Lagen, und wie die Fasern rechnen.
 #### Gesetze.stahl
 
 ```python
-def stahl(self, s: Stahlgesetz) -> Gesetz
+def stahl(self, s: Stahlgesetz) -> Stahlgesetz
 ```
 
 Der Stahl einer Lage, wie der Loeser ihn rechnet -- in der Handrechnung nur auf Zug.

@@ -1,5 +1,5 @@
 ---
-erzeugt: 659d83247b13
+erzeugt: 6d532eee9c1d
 art: modul
 tags: [modul]
 ---
@@ -253,21 +253,6 @@ Der umgekehrte Weg: die Ebene ist gegeben, gesucht sind die Kraefte.
 Hier gibt es nichts zu suchen -- aus den beiden Randdehnungen folgen
 Mitteldehnung und Kruemmung unmittelbar, und das Faserintegral liefert
 Normalkraft und Moment in einem Durchgang.
-
-### beton_ungerissen
-
-```python
-def beton_ungerissen(*, E_c: float) -> Callable[[float], float]
-```
-
-Beton linear in beiden Richtungen -- der ungerissene Vergleichszustand.
-
-Ohne Abminderung im Zug und ohne Abbruch bei `f_ct`. Das ist Absicht:
-gebraucht wird die *Steifigkeit* des ungerissenen Querschnitts, und wo er
-reisst, sagt das Rissmoment -- oberhalb davon gilt die Linie gerissen,
-dieser Zustand steht dort nur noch zum Vergleich. Ein Gesetz, das bei
-`f_ct` abfiele, waere ausserdem nicht mehr monoton, und die Bisektion
-des Loesers braucht Monotonie.
 
 ### Loeserpaar
 

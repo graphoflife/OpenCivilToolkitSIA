@@ -57,7 +57,7 @@ haengt kein Modul. Der Wertesatz bestimmt, wo die Plateaus liegen
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import Enum
 from typing import Callable, Dict, List, Sequence, Type
 
@@ -66,11 +66,11 @@ from opencivil.core.latex import angabe
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, kennung_aus
 from opencivil.nachweis.querschnittsloeser import (
-    Querschnittsloeser, Stahllage, Werkstoffsatz, beton_elastisch,
-    beton_nichtlinear, bilinear, lagen_je_seite, stahl_nur_zug, wirksamer_modul,
+    Querschnittsloeser, Stahllage, Werkstoffsatz, lagen_je_seite, wirksamer_modul,
 )
 from opencivil.querschnitt.werkstoffgesetz import (
-    BLOCKANTEIL, K_SIGMA_LATEX, Betongesetz, Spannungsblock, Stahlgesetz, k_sigma,
+    BLOCKANTEIL, K_SIGMA_LATEX, BetonElastisch, Betongesetz, Spannungsblock, Stahlgesetz,
+    k_sigma,
 )
 
 Gesetz = Callable[[float], float]
@@ -318,11 +318,11 @@ def betongesetz(wahl: Rechenwahl, *, f_c: float, E_cm: float, eps_c1d: float,
     bekommen ihren Beton beide hier.
     """
     if wahl.art is Rechenart.ELASTISCH:
-        return beton_elastisch(E_c=wirksamer_modul(E_cm, wahl.kriechzahl), f_c=f_c)
+        return BetonElastisch(E_c=wirksamer_modul(E_cm, wahl.kriechzahl), f_c=f_c)
     if wahl.art is Rechenart.PARABEL:
-        return beton_nichtlinear(f_cd=f_c, E_c=wirksamer_modul(E_cm, wahl.kriechzahl),
-                                 eps_c1d=eps_c1d, eps_c2d=eps_c2d)
-    return Spannungsblock(f_cd=f_c, eps_c2d=eps_c2d)
+        return Betongesetz.mit_modul(f_c=f_c, E_c=wirksamer_modul(E_cm, wahl.kriechzahl),
+                                     eps_c1d=eps_c1d, eps_c2d=eps_c2d)
+    return Spannungsblock(f_cd=f_c, eps_c2d=eps_c2d, bricht=False)
 
 
 @dataclass(frozen=True)
@@ -332,11 +332,9 @@ class Gesetze:
     wahl: Rechenwahl
     beton: Gesetz
 
-    def stahl(self, s: Stahlgesetz) -> Gesetz:
+    def stahl(self, s: Stahlgesetz) -> Stahlgesetz:
         """Der Stahl einer Lage, wie der Loeser ihn rechnet -- in der Handrechnung nur auf Zug."""
-        if self.wahl.art is Rechenart.HANDRECHNUNG:
-            return stahl_nur_zug(E_s=s.E_s, f_sd=s.f_yd, eps_ud=s.eps_ud)
-        return bilinear(s)
+        return replace(s, nur_zug=self.wahl.art is Rechenart.HANDRECHNUNG, bricht=True)
 
     @property
     def gemittelt(self) -> bool:

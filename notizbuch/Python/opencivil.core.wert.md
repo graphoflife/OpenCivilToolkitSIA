@@ -1,5 +1,5 @@
 ---
-erzeugt: d18b0ffd1446
+erzeugt: 52cbc5fbde3f
 art: modul
 tags: [modul]
 ---
@@ -302,7 +302,6 @@ def beschreibung(self) -> str
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.schnittanalyse]]
-- [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.web.api]]

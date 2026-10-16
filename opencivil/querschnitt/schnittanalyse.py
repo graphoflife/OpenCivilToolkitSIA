@@ -73,7 +73,7 @@ from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.nachweis.querschnittsloeser import (
-    FASERN, Faserloeser, Stahllage, bilinear, protokoll_wirksamer_modul, wirksamer_modul,
+    FASERN, Faserloeser, Stahllage, protokoll_wirksamer_modul, wirksamer_modul,
 )
 from opencivil.nachweis.rechenwahl import (
     Rechenart, Rechenwahl, betongesetz, protokoll_betongesetz,
@@ -84,9 +84,9 @@ from opencivil.nachweis.sproedes_versagen import (
 from opencivil.querschnitt.analyse import Querschnittsanalyse, Stabgruppe
 from opencivil.querschnitt.fasern import Faserquerschnitt, Stab
 from opencivil.querschnitt.interaktion import Querschnitt, Werkstoff
-from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
+from opencivil.querschnitt.werkstoffgesetz import BetonUngerissen, Stahlgesetz
 from opencivil.spannungsanalyse import (
-    Analyse, Analyseart, Grenzzustand, Linie, auswerten, beton_ungerissen, herleitung,
+    Analyse, Analyseart, Grenzzustand, Linie, auswerten, herleitung,
 )
 
 if TYPE_CHECKING:
@@ -148,7 +148,7 @@ def _werkstoffe(analyse: Querschnittsanalyse, wert: Callable[[str], float],
         w = lambda k: abs(wert(stoff.id_von(k)))
         if stoff.art is Baustoffart.BETON:
             E_cm, eps_c1d, eps_c2d = w("E_cm"), w("eps_c1d"), w("eps_c2d")
-            gesetz = (beton_ungerissen(E_c=wirksamer_modul(E_cm, wahl.kriechzahl)) if ungerissen
+            gesetz = (BetonUngerissen(E_c=wirksamer_modul(E_cm, wahl.kriechzahl)) if ungerissen
                       else betongesetz(wahl, f_c=w(satz.beton), E_cm=E_cm,
                                        eps_c1d=eps_c1d, eps_c2d=eps_c2d))
             liste.append(Werkstoff(stoff.name, gesetz, -eps_c2d, math.inf,
@@ -156,7 +156,7 @@ def _werkstoffe(analyse: Querschnittsanalyse, wert: Callable[[str], float],
         else:
             stahl = Stahlgesetz(E_s=w("E_s"), f_yd=w(satz.stahl),
                                 f_yd_druck=w(satz.stahl_druck), eps_ud=w("eps_ud"))
-            liste.append(Werkstoff(stoff.name, bilinear(stahl), -stahl.eps_ud, stahl.eps_ud))
+            liste.append(Werkstoff(stoff.name, stahl, -stahl.eps_ud, stahl.eps_ud))
             staehle[len(liste) - 1] = stahl
         index[stoff.id] = len(liste) - 1
     return liste, index, staehle

@@ -38,7 +38,7 @@ Bezugsachse fuer M ist die halbe Querschnittshoehe.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.einheiten import Groesse
@@ -262,9 +262,11 @@ class Ebenenlinie(Widerstandslinie):
         self.lagen = list(lagen)
         self.fasern = fasern
         self.schritte = schritte
+        #: Der Stahl je Lage, stetig bis an eps_ud -- siehe oben.
+        self.staehle = [replace(l.stahl, bricht=False) for l in self.lagen]
         self.querschnitt = plattenfasern(
             h=h, b=b, beton=beton,
-            staebe=[(l.a_s, l.z, l.stahl.spannung) for l in self.lagen],
+            staebe=[(l.a_s, l.z, stahl) for l, stahl in zip(self.lagen, self.staehle)],
             fasern=fasern, gemittelt=wahl.art.mit_block, verdraengt=True)
         self.grenzen, self.grenznamen = dehnungsfaecher.grenzen(
             h, [(l.z, l.stahl.eps_ud, f"Stahl der {l.text}") for l in self.lagen],
@@ -466,9 +468,9 @@ class Ebenenlinie(Widerstandslinie):
         chi = (treffer.eps_unten - treffer.eps_oben) / self.h
         N, M = self.kraefte(treffer.eps_oben, treffer.eps_unten)
         stahl = []
-        for l in self.lagen:
+        for l, gesetz in zip(self.lagen, self.staehle):
             eps = eps_m + chi * (l.z - self.h / 2.0)
-            sigma = l.stahl.spannung(eps)
+            sigma = gesetz.spannung(eps)
             stahl.append((l.text, eps, sigma, l.a_s, sigma * l.a_s, l.z))
         F_c = N - sum(s[4] for s in stahl)
         M_c = M - sum(s[4] * (s[5] - self.h / 2.0) for s in stahl)

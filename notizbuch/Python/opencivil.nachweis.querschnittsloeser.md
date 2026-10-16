@@ -1,5 +1,5 @@
 ---
-erzeugt: bb5f163151ad
+erzeugt: ede00533ce3e
 art: modul
 tags: [modul]
 ---
@@ -464,9 +464,11 @@ class Querschnittsloeser(Faserloeser)
 Der Querschnitt einer Platte als Faserintegral -- aus Hoehe, Breite und
 Lagen gebaut, gesucht wird wie bei jedem [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]].
 
-`beton` ist eine Funktion `eps -> sigma` in SI, `stahl` macht aus
-dem Stahl einer Lage eine solche -- ohne Angabe [[opencivil.nachweis.querschnittsloeser#bilinear|bilinear]]; die
-Handrechnung gibt ihren Stahl nur auf Zug mit. Damit bleibt der Loeser
+`beton` ist ein Werkstoffgesetz `eps -> sigma` in SI
+([[opencivil.querschnitt.werkstoffgesetz]]), `stahl` macht aus dem
+Stahl einer Lage eines -- ohne Angabe das [[opencivil.querschnitt.werkstoffgesetz#Stahlgesetz|Stahlgesetz]] der Lage
+selbst, jenseits von `eps_ud` null; die Handrechnung gibt ihren Stahl
+nur auf Zug mit. Damit bleibt der Loeser
 frei von Annahmen ueber das Werkstoffgesetz: die Spannungsbegrenzung rechnet
 elastisch mit Kriechen und charakteristischen Festigkeiten, der
 Knicknachweis mit dem nichtlinearen Gesetz der Norm und Bemessungswerten
@@ -477,8 +479,8 @@ Knicknachweis mit dem nichtlinearen Gesetz der Norm und Bemessungswerten
 Gesetze monoton sind -- jenseits ihrer Bruchdehnung geben sie null zurueck,
 und dort findet die Bisektion Scheinloesungen. Ohne `eps_zug` reicht das
 Fenster darum bis zur kleinsten Bruchdehnung der Lagen; `eps_druck`
-passt zu [[opencivil.nachweis.querschnittsloeser#beton_nichtlinear|beton_nichtlinear]], wer es weitet, muss das Gesetz
-mitweiten.
+passt zur Parabel ([[opencivil.querschnitt.werkstoffgesetz#Betongesetz|Betongesetz]]),
+wer es weitet, muss das Gesetz mitweiten.
 
 Ohne `grenzen` gelten beide Werte an beiden Raendern. Wer andere
 Grenzen braucht -- die Spannung-Dehnung-Analyse die des Dehnungsfaechers,
@@ -612,72 +614,6 @@ def beton_zeichen(self) -> str
 ```
 
 Das Formelzeichen dazu, fuer die Herleitung -- `f_{cd}`.
-
-### beton_elastisch
-
-```python
-def beton_elastisch(*, E_c: float, f_c: float=math.inf) -> Callable[[float], float]
-```
-
-Beton ohne Zugfestigkeit, im Druck linear bis `f_c`, dann waagrecht.
-
-Fuer den gerissenen Gebrauchszustand. `E_c` ist bereits der wirksame
-Modul, also `E_cm/(1+phi)`, falls Kriechen zaehlt. `f_c` ist die
-Festigkeit aus dem [[opencivil.nachweis.querschnittsloeser#Werkstoffsatz|Werkstoffsatz]] -- im Gebrauchszustand `f_ck`.
-
-Linear und nicht als Parabel: im Gebrauchszustand liegt die
-Betonspannung weit unter der Festigkeit, und dort ist die Parabel eine
-Gerade. Die Grenze steht trotzdem da, damit eine Druckzone, die doch
-einmal so weit kommt, nicht mehr aufnimmt, als der Beton hergibt. Ohne
-`f_c` bleibt das Gesetz unbegrenzt linear -- fuer Rechnungen, die mit
-Festigkeiten nichts zu tun haben.
-
-Ein Vergleich und nicht `max()`: das Gesetz laeuft je Nachweisfall
-rund siebzigtausend Mal, und der Funktionsaufruf kostete doppelt so viel
-wie die Rechnung selbst -- gemessen 28 ms je Platte.
-
-### beton_nichtlinear
-
-```python
-def beton_nichtlinear(*, f_cd: float, E_c: float, eps_c1d: float=0.002, eps_c2d: float=0.003) -> Callable[[float], float]
-```
-
-Parabel-Rechteck-Beziehung nach SIA 262, als Funktion fuer den Loeser.
-
-Keine Zugfestigkeit, Plateau zwischen `eps_c1d` und `eps_c2d`, danach
-Versagen (Spannung null). `k_sigma = E_c/(400*f_cd)` -- so steht es im
-Vorbild --, aber nie unter 1 ([[opencivil.querschnitt.werkstoffgesetz#k_sigma|k_sigma]]).
-
-### stahl_bilinear
-
-```python
-def stahl_bilinear(*, E_s: float, f_sd: float, eps_ud: float=0.045, f_sd_druck: Optional[float]=None) -> Callable[[float], float]
-```
-
-Linear bis zur Fliessgrenze, dann waagrecht; jenseits von `eps_ud` null.
-
-`f_sd` ist die Grenze, ab der es waagrecht geht -- `f_yd` oder
-`f_yk`, je nach [[opencivil.nachweis.querschnittsloeser#Werkstoffsatz|Werkstoffsatz]]. `f_sd_druck` die auf Druck;
-ohne sie gilt dieselbe. Bei den Normsorten sind beide gleich.
-
-### bilinear
-
-```python
-def bilinear(s: Stahlgesetz) -> Callable[[float], float]
-```
-
-Der Stahl einer Lage, wie der Loeser ihn rechnet: [[opencivil.nachweis.querschnittsloeser#stahl_bilinear|stahl_bilinear]]
-mit den Werten der Lage -- jenseits ihres `eps_ud` null, damit das
-Suchfenster nicht ueber den gueltigen Bereich hinausgreift.
-
-### stahl_nur_zug
-
-```python
-def stahl_nur_zug(*, E_s: float, f_sd: float, eps_ud: float=0.045) -> Callable[[float], float]
-```
-
-Wie [[opencivil.nachweis.querschnittsloeser#stahl_bilinear|stahl_bilinear]], aber ohne Druck: gedrueckter Stahl traegt
-nichts. So rechnet die Handrechnung -- sie laesst die Druckbewehrung weg.
 
 
 ## Konstanten

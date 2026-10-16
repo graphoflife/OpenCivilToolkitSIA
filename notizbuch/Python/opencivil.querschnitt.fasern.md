@@ -1,5 +1,5 @@
 ---
-erzeugt: e2b6a1727458
+erzeugt: 1713fd278bac
 art: modul
 tags: [modul]
 ---
@@ -151,6 +151,17 @@ def _mittel(gesetz: Optional[Gesetz]) -> Optional[Callable[[float, float], float
 ```
 
 Die mittlere Spannung des Gesetzes ueber einen Bereich -- wenn es sie kennt.
+
+### _schnell
+
+```python
+def _schnell(gesetz: Gesetz) -> Gesetz
+```
+
+Was die Schleife ruft: bei einem Werkstoffgesetz seine `funktion`
+([[opencivil.querschnitt.werkstoffgesetz]]) -- ohne den Umweg ueber
+`__call__`, der je Aufruf ein Fuenftel kostete --, sonst die Funktion
+selbst.
 
 ### Dehnungsgrenze
 
