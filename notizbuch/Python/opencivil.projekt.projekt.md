@@ -1,5 +1,5 @@
 ---
-erzeugt: 20d18e191669
+erzeugt: beaba8805ba0
 art: modul
 tags: [modul]
 ---
@@ -34,6 +34,7 @@ Die vollstaendige, speicherbare Beschreibung eines Projekts.
 - `querschnitte: List[QuerschnittEintrag] = field(default_factory=list)`
 - `querschnittsanalysen: List[QuerschnittsanalyseEintrag] = field(default_factory=list)` – Gezeichnete Querschnitte: Polygone, Bewehrung, Schubwände.
 - `balkensysteme: List[BalkensystemEintrag] = field(default_factory=list)` – Ebene Rahmen: Knoten, Stäbe, Lager, Lasten, Lastfälle.
+- `grundbrueche: List[GrundbruchEintrag] = field(default_factory=list)` – Flachfundamente mit Grundbruch und Gleiten.
 - `skripte: List[SkriptEintrag] = field(default_factory=list)` – Die Python-Skripte der App «Python» -- gespeichert, nicht gerechnet.
 
 #### Projekt.material
@@ -194,6 +195,18 @@ mit dem Baukasten des Eintrags -- `querschnitt`, `linie`,
 Oberflaeche mit einem Einfeldtraeger: wer in Python zeichnet, zeichnet
 sein eigenes System.
 
+#### Projekt.grundbruch
+
+```python
+def grundbruch(self, name: str, **felder: Any) -> GrundbruchEintrag
+```
+
+Ein Grundbruchnachweis mit den Vorgaben der Oberflaeche, aber ohne
+ihre Startkombination: wer rechnet, gibt seine Einwirkungen mit
+`kombination` selbst an. Alles Weitere -- `phi_k`, `b`, `t` ...
+-- geht als Stichwort an den Eintrag; Winkel in Grad, Masse in m,
+Spannungen in kPa.
+
 #### Projekt.skript
 
 ```python
@@ -302,6 +315,21 @@ gemessen wird, und ⌀40 in y unter der x-Bewehrung -- die fliesst bei
 x = h/2 nicht. Gebaut über die Fassade, wie ein Benutzer es in Python
 täte.
 
+#### Projekt._grundbrueche
+
+```python
+@staticmethod
+def _grundbrueche(p: 'Projekt') -> None
+```
+
+Jede Lage des Grundwassers und beide Arten des Bodens: drainiert mit
+Kohäsion, geneigter Sohle, geneigtem Gelände, Auflast und dem
+Wasser im Gleitkörper, dazu eine Last, so schräg, dass die Klammer
+eines Lastneigungsfaktors unter null fällt; das Wasser über der Sohle
+und auf ihrer Höhe, dort ein langer Streifen; undrainiert flach und
+tief eingebunden, einmal so schräg belastet, dass es keinen
+Widerstand gibt.
+
 #### Projekt._alles_einmal
 
 ```python
@@ -339,6 +367,7 @@ gemeldet, mit dem aehnlichsten Feld, statt still zu verschwinden.
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.querschnittsanalyse]]

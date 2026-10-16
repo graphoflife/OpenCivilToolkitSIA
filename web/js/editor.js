@@ -32,6 +32,7 @@ import {
 } from './nachweise.js';
 import { analyseEditor, analyseFenster } from './querschnittsanalyse.js';
 import { balkensystemEditor } from './balkensystem.js';
+import { grundbruchEditor } from './grundbruch.js';
 import { skriptZeichnen } from './python.js';
 import {
   aendern, gewaehltesBauteil, gewaehltesMaterial, gewaehltesSkript, kennwertId,
@@ -45,6 +46,7 @@ const EDITOREN = {
   querschnitt: plattenEditor,
   querschnittsanalyse: analyseEditor,
   balkensystem: balkensystemEditor,
+  grundbruch: grundbruchEditor,
 };
 
 function gerechnet(id) {

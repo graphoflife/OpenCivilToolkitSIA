@@ -1,5 +1,5 @@
 ---
-erzeugt: 921f0f345a60
+erzeugt: 2d45b66567a2
 art: modul
 tags: [modul]
 ---
@@ -617,6 +617,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.bericht.zusammenfassung]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.ergebnis]]
+- [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]

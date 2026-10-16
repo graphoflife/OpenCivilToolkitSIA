@@ -1,5 +1,5 @@
 ---
-erzeugt: a7ae80692e47
+erzeugt: e7a61c556b72
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -40,8 +40,15 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Stabquerschnitte]] · 17
 - [[Steifigkeitsmethode]] · 7
 
+**Grundbruch**
+
+- [[Fundament]] · 3
+- [[Grundbruch]] · 28
+- [[Gleiten]] · 3
+
 ## Formeln von A bis Z
 
+- [[Abstand des Grundwassers unter der Sohle]] · $T$
 - [[Äquivalenter E-Modul über dem Moment]]
 - [[Äquivalenter E-Modul über der Normalkraft]]
 - [[Arbeitsgleiche Knotenkräfte]]
@@ -58,8 +65,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bemessungswert der Betondruckfestigkeit]] · $f_{cd}$
 - [[Bemessungswert der Fliessgrenze]] · $f_{yd}$
 - [[Bemessungswert der Fliessgrenze auf Druck]] · $f_{yd}^{-}$
+- [[Bemessungswert der Kohäsion]] · $c_{eff}$
 - [[Bemessungswert der Schubspannungsgrenze]] · $\tau_{cd}$
 - [[Bemessungswert des Elastizitätsmoduls]] · $E_{cd}$
+- [[Bemessungswert des Reibungswinkels]] · $\varphi_{eff}$
 - [[Beton ungerissen, in Druck und Zug]]
 - [[Betonstahl nur auf Zug]]
 - [[Bettung eines Stabs]]
@@ -75,6 +84,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Biegelinie eines Stabs]]
 - [[Biegesteifigkeit]] · $EI_{\text{Q1}}$
 - [[Bilineare Beziehung des Betonstahls]]
+- [[Bruchspannung in der Sohle]] · $\sigma_f$
 - [[Bügelquerschnitt je Länge einer Schubwand (n Schnitte)]]
 - [[Dehnsteifigkeit]] · $EA_{\text{Q1}}$
 - [[Dehnung auf halber Höhe]] · $\varepsilon_v$
@@ -89,6 +99,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Einwirkung im normierten Diagramm]] · $\bar{E}_{d,x}$
 - [[Erfüllungsgrad]] · $\alpha_{eff,x}$
 - [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]]
+- [[Erweiterte Tragfähigkeitsformel]]
 - [[Fiktiver Durchmesser einer verschmierten Linie]] · $\varnothing_{fikt}$
 - [[Fläche eines Doppel-T-Querschnitts]] · $A_{\text{Q6}}$
 - [[Fläche eines Kreises]] · $A_{\text{Q2}}$
@@ -106,15 +117,22 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Flächenträgheitsmoment eines T-Querschnitts]] · $I_{\text{Q5}}$
 - [[Flächenträgheitsmoment eines Trapezes]] · $I_{\text{Q7}}$
 - [[Fliessdehnung]] · $\varepsilon_{yd}$
+- [[Formfaktor s_c]] · $s_c$
+- [[Formfaktor s_q]] · $s_q$
+- [[Formfaktor s_γ]] · $s_{\gamma}$
+- [[Geländeneigungsfaktor g_c]] · $g_c$
+- [[Geländeneigungsfaktor g_q]] · $g_q$
 - [[Gewollte Ausmitte]] · $e_{1d}$
 - [[Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein]]
 - [[Gleichmässiger Druck, ohne Bewehrung]] · $N_{Rd}^{-}$
 - [[Gleichungssystem der Steifigkeitsmethode]]
+- [[Gleitwiderstand]] · $T_{Rd}$
 - [[Grenzdehnungen am Ende der Linie]]
 - [[Grenzwert der Durchbiegung]] · $w_{max}$
 - [[Grösste Dehnung auf halber Höhe]] · $\varepsilon_{m,u}$
 - [[Grösste Dehnung im Schwerpunkt]] · $\varepsilon_{m,u}$
 - [[Grösste Krümmung]] · $\chi_{u}$
+- [[Grundbruchwiderstand]] · $N_{Rd}$
 - [[Hilfsgrösse der Nulllinie]] · $\rho$
 - [[Höhe der Distanzhalter]] · $h_{Dist}$
 - [[Innerer Hebelarm]] · $z$
@@ -124,11 +142,15 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Kräftegleichgewicht bei M_Ed = 0]]
 - [[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]] · $k_{\sigma}$
 - [[Kürzester Abstand zur Resistenzlinie]] · $a$
+- [[Lastneigungsfaktor i_c]] · $i_c$
+- [[Lastneigungsfaktor i_q]] · $i_q$
+- [[Lastneigungsfaktor i_γ]] · $i_{\gamma}$
 - [[Mittelwert der Zylinderdruckfestigkeit]] · $f_{cm}$
 - [[Mittelwert des Elastizitätsmoduls]] · $E_{cm}$
 - [[Moment der Bewehrung bei zulässiger Stahlspannung]]
 - [[Momentengleichgewicht um die halbe Höhe]] · $M_{Rd}^{+}$
 - [[Momentenwiderstand bei reiner Biegung]] · $M_{Rd}(N_{Ed}=0)^{+}$
+- [[Neigung der Last]] · $\delta_R$
 - [[Nulllinie auf halber Höhe]] · $x^{+}$
 - [[Nulllinie des gerissenen Querschnitts]] · $x$
 - [[Parabel-Rechteck-Beziehung des Betons]]
@@ -139,6 +161,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querkraftwiderstand mit Querkraftbewehrung]] · $V_{Rd,x}$
 - [[Querkraftwiderstand ohne Querkraftbewehrung]] · $V_{Rd,x}$
 - [[Querschnitt eines Bügelschenkels]] · $A_{\varnothing,V}$
+- [[Raumlast im Gleitkörper]] · $\gamma_G$
+- [[Raumlast unter Auftrieb]] · $\gamma'$
+- [[Reibungswinkel der Sohlfuge]] · $\delta^{*}$
+- [[Reichweite des Gleitkörpers]] · $L_{Gl}$
 - [[Rissaktive Dicke des gezeichneten Querschnitts]] · $t$
 - [[Rissaktive Plattendicke]] · $h_{eff}$
 - [[Risskraft der gezogenen Querschnittshälfte]] · $N_{Riss}$
@@ -151,6 +177,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Schnittgrössen längs eines Stabs]]
 - [[Schwerpunkt der zusammengefassten Lage]] · $z_{2,x}$
 - [[Schwerpunkt eines T-Querschnitts]] · $z_{S}$
+- [[Sohlneigungsfaktor b_c]] · $b_c$
+- [[Sohlneigungsfaktor b_q]] · $b_q$
+- [[Sohlneigungsfaktor b_γ]] · $b_{\gamma}$
 - [[Spannung im ungerissenen Querschnitt]]
 - [[Spannungsblock des Betons]]
 - [[Stahlspannung, höchstens die Fliessgrenze]] · $\sigma_{sd}$
@@ -158,8 +187,16 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Steifigkeitsmatrix eines Stabs]]
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]]
 - [[Teilung in y aus der Stabzahl]] · $s_{V,y}$
+- [[Tiefe des Gleitkörpers]] · $H_{Gl}$
+- [[Tiefenfaktor d_c]] · $d_c$
+- [[Tiefenfaktor d_q]] · $d_q$
 - [[Torsion in den Zellen (Bredt, mehrzellig)]]
+- [[Tragfähigkeitsfaktor N_c]] · $N_c$
+- [[Tragfähigkeitsfaktor N_q]] · $N_q$
+- [[Tragfähigkeitsfaktor N_γ]] · $N_{\gamma}$
+- [[Tragfähigkeitsformel undrainiert]]
 - [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]]
+- [[Überlagerung auf Höhe der Sohle]] · $\sigma_{v,0}$
 - [[Ungewollte Ausmitte]] · $e_{0d}$
 - [[Ungewollte Ausmitte – allgemein]]
 - [[Vergrösserungsfaktor der Durchbiegung]] · $\omega_{w,u}$
@@ -174,6 +211,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Widerstand je Länge einer Wand (Fachwerk)]]
 - [[Widerstandsmoment zum gezogenen Rand]] · $W$
 - [[Widerstandsmoment zum gezogensten Betonpunkt]] · $W$
+- [[Winkel der Einbindetiefe]] · $\vartheta_t$
 - [[Wirksame Durchbiegung]] · $w_{eff}$
 - [[Wirksame Höhe (Einlage nicht massgebend)]] · $d_v$
 - [[Wirksame Höhe, um die Einlage vermindert]] · $d_v$
@@ -186,7 +224,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-109 von 141 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
+111 von 173 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse#_herleitung_modul|_herleitung_modul]]
 - [[Äquivalenter E-Modul über der Normalkraft]] · [[opencivil.spannungsanalyse#_herleitung_modul|_herleitung_modul]]
@@ -196,6 +234,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Beide Lagen fliessen auf Zug]] · [[opencivil.nachweis.handrechnung#Handrechnung._groesste_zugkraft|Handrechnung._groesste_zugkraft]]
 - [[Beiwert der Parabel, mit dem wirksamen Modul]] · [[opencivil.nachweis.rechenwahl#protokoll_betongesetz|protokoll_betongesetz]], [[opencivil.spannungsanalyse#herleitung|herleitung]]
 - [[Beiwert für die statische Höhe]] · [[opencivil.nachweis.querkraft#Querkraft._protokoll_fall|Querkraft._protokoll_fall]]
+- [[Bemessungswert der Kohäsion]] · [[opencivil.geotechnik.grundbruch|_c_eff]]
 - [[Beton ungerissen, in Druck und Zug]] · [[opencivil.spannungsanalyse#herleitung|herleitung]]
 - [[Betonstahl nur auf Zug]] · [[opencivil.nachweis.rechenwahl#protokoll_gesetze|protokoll_gesetze]]
 - [[Bettung eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
@@ -261,6 +300,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Probe – Moment um z]] · [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Probe – Normalkraft]] · [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._protokoll_bruchzustand]]
 - [[Querkraft über die Federn der Wände]] · [[opencivil.nachweis.schubwandnachweis#Schubwandnachweis|Schubwandnachweis._protokoll_ansatz]]
+- [[Raumlast unter Auftrieb]] · [[opencivil.geotechnik.grundbruch|_gamma_auftrieb]]
 - [[Rissaktive Dicke des gezeichneten Querschnitts]] · [[opencivil.nachweis.qa_gebrauch#RissnormalkraftQA._risskraft|RissnormalkraftQA._risskraft]]
 - [[Rissaktive Plattendicke]] · [[opencivil.nachweis.mindestbewehrung#Rissnormalkraft|Rissnormalkraft._protokoll_ansatz]]
 - [[Risskraft der gezogenen Querschnittshälfte]] · [[opencivil.nachweis.mindestbewehrung#Rissnormalkraft|Rissnormalkraft._protokoll_ansatz]]

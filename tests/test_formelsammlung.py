@@ -66,9 +66,12 @@ class TestFormelsammlung(unittest.TestCase):
         for name in ("Stabquerschnitte", "Steifigkeitsmethode"):
             with self.subTest(thema=name):
                 self.assertEqual(art[name], "balkensystem")
+        for name in ("Fundament", "Grundbruch", "Gleiten"):
+            with self.subTest(thema=name):
+                self.assertEqual(art[name], "grundbruch")
         self.assertEqual({t.art for t in self.alle},
                          {"beton", "betonstahl", "querschnitt", "querschnittsanalyse",
-                          "balkensystem"})
+                          "balkensystem", "grundbruch"})
 
     def test_die_linien_der_analysen_stehen_darin(self):
         """

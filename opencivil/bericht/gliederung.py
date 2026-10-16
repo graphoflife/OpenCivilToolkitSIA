@@ -66,7 +66,7 @@ def bericht(
     if themen:
         _abschnitt(p, "Verwendete Formeln")
         formelsammlung_anfuegen(p, themen)
-    _nachweise(p, zusammenfassen(aufbau, loesung), aufbau)
+    _nachweise(p, zusammenfassen(aufbau, loesung), aufbau, loesung)
     _werte(p, loesung)
     _luecken(p, loesung)
     return p
@@ -86,7 +86,7 @@ def _abschnitt(p: Protokoll, titel: str) -> None:
 
 
 def _nachweise(p: Protokoll, zusammenfassung: Zusammenfassung,
-               aufbau: Optional["Aufbau"]) -> None:
+               aufbau: Optional["Aufbau"], loesung: Loesung) -> None:
     """
     Je Platte dasselbe wie auf dem Bildschirm: Angaben, Bewehrung,
     Nachweistabelle, darunter Hinweise und stille Maengel.
@@ -107,7 +107,7 @@ def _nachweise(p: Protokoll, zusammenfassung: Zusammenfassung,
             p.text("Kein Nachweis geführt.")
             continue
         if aufbau is not None:
-            p.anfuegen(*angaben(aufbau, bauteil.kennung))
+            p.anfuegen(*(b for b in angaben(aufbau, bauteil.kennung, loesung) if b is not None))
         if bauteil.zeilen:
             p.anfuegen(nachweistabelle(bauteil))
         for text in hinweise(bauteil):

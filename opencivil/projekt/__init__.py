@@ -21,6 +21,8 @@ Aufgabe ein Modul::
     balkensystem.py
                    ein ebener Rahmen: Knoten, Linien als Staebe und
                    Linienlager, Lager, Lasten, Lastfaelle, Kombinationen
+    grundbruch.py  ein Flachfundament: Boden, Masse, Gelaende, Grundwasser
+                   und Einwirkungen fuer Grundbruch und Gleiten
     netz.py        Knoten mit Kennungen, fuer beide Zeichnungen
     skript.py      ein Python-Skript der App «Python»: gespeichert, nicht
                    gerechnet
@@ -68,6 +70,7 @@ from opencivil.projekt.querschnittsanalyse import (
     WerkstoffwahlEintrag,
 )
 from opencivil.projekt.skript import SkriptEintrag
+from opencivil.projekt.grundbruch import GrundbruchEintrag, GrundbruchkombinationEintrag
 from opencivil.projekt.aufbau import BAUTEILE, Aufbau, Bauteil, Bauteilart, aufbauen
 from opencivil.projekt.projekt import Projekt
 
@@ -86,5 +89,6 @@ __all__ = [
     "QUASISTAENDIG_ANTEIL", "QuerkraftbewehrungEintrag", "QuerschnittEintrag",
     "RISSANFORDERUNGEN", "RechenwahlEintrag", "SkriptEintrag", "SpannungsfallEintrag",
     "VerformungEintrag", "VerformungsfallEintrag", "abgeleiteter_fallname",
+    "GrundbruchEintrag", "GrundbruchkombinationEintrag",
     "aufbauen", "sorten",
 ]

@@ -81,11 +81,16 @@ class Formel:
     themen: Dict[str, None] = field(default_factory=dict)
     codestellen: Dict[str, None] = field(default_factory=dict)
     gebraucht_von: Dict[str, None] = field(default_factory=dict)
+    normstellen: Dict[str, None] = field(default_factory=dict)
+    """
+    Jede Normstelle, unter der die Formel vorkommt -- nicht nur die ihrer
+    ersten Fassung: dieselbe Formel kann in zwei Abschnitten stehen, etwa
+    die Überlagerung beim Grundwasser und in der undrainierten Formel.
+    """
 
     @property
     def referenzen(self) -> List[str]:
-        return list(dict.fromkeys(f.block.referenz for f in self.fassungen.values()
-                                  if f.block.referenz))
+        return list(self.normstellen)
 
     @property
     def zeichen(self) -> List[str]:
@@ -130,6 +135,8 @@ def _vorkommen(block: GleichungBlock, projekt: str, formeln: Dict[str, Formel],
     fassung = formel.fassungen.setdefault(fs.schluessel(block), Fassung(block, projekt))
     formel.themen[block.thema] = None
     formel.codestellen[block.codestelle] = None
+    if block.referenz:
+        formel.normstellen[block.referenz] = None
     if block.formelzeile is None:
         return
     for platzhalter, wert in block.formelzeile.eingaben:

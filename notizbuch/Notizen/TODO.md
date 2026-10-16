@@ -33,6 +33,17 @@ gelernt wurde, steht in [[Entwicklung]].
       nachgeschlagen (`nachweis/verformung.py`, `GRENZE`). Die Normstelle dazu
       fehlt; die des Vergrösserungsfaktors (4.4.3.2.5) hat der Benutzer
       geliefert.
+- [ ] **Grundbruch: die Quelle benennen.** Die Formeln stehen mit «Kap.
+      9.2.x» am Code (`geotechnik/grundbruch.py`, `KAP_*`); der Titel des
+      Buches fehlt. Er kommt vom Benutzer.
+- [ ] Grundbruch, nach Vorgabe, nicht nachgeschlagen: b_γ mit tan φ wie
+      Tabelle 9.2.18 (der Text schreibt tan α); Wasser unter der Sohle, aber
+      im Gleitkörper, rechnet mit γ' statt der verlangten
+      Stabilitätsberechnung; eine Klammer der Lastneigung unter null gilt
+      null; δ*/φ als Eingabe mit Vorgabe 1. Vom Benutzer bestätigen lassen.
+- [ ] Grundbruch: keine Ausmitte der Last (wirksame Breite), kein
+      Erdwiderstand vor dem Fundament. Der Gleitkörper im Bild gilt für
+      waagrechte Sohle und waagrechtes Gelände.
 - [ ] Der Dienst «bericht» und das PDF des lokalen Servers haben seit dem
       Wegfall des Knopfs «Bericht» keinen Weg mehr aus der Oberfläche.
       Entfernen, oder wieder erreichbar machen.

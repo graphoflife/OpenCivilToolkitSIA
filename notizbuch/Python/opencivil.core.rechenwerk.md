@@ -1,5 +1,5 @@
 ---
-erzeugt: 7029c201dbeb
+erzeugt: 0c8ed62a0f94
 art: modul
 tags: [modul]
 ---
@@ -469,4 +469,5 @@ def abschliessen(self) -> Loesung
 - [[opencivil.web.api]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.dienst]]
+- [[opencivil.web.grundbruchdaten]]
 - [[opencivil.web.speicher]]

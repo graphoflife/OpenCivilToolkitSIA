@@ -28,7 +28,7 @@
 \date{\today}
 \begin{document}
 \maketitle
-233 Berechnungen ausgeführt, 424 Werte bestimmt.
+328 Berechnungen ausgeführt, 523 Werte bestimmt.
 
 \section{Herleitung}
 \subsection{Plattenanalyse: Decke}
@@ -4395,6 +4395,1071 @@ N_{Rd,K} = 3266.6\,\mathrm{kN} \quad \ge \quad \left|N_{Ed}\right| = 1200\,\math
 \begin{equation*}
 \alpha_{eff,K,\text{Seitlich}} = \frac{N_{Rd,K}}{\left|N_{Ed}\right|} = \frac{3266.6\,\mathrm{kN}}{1200\,\mathrm{kN}} = 2.72 \quad \Rightarrow \quad \text{erfüllt}
 \end{equation*}
+\subsection{Grundbruch: Hang}
+\noindent\textbf{Reibungswinkel, charakteristisch}
+\begin{equation*}
+\varphi_k = 33{}^{\circ}
+\end{equation*}
+\noindent\textbf{Partialfaktor des Reibungswinkels} \hfill \normref{SIA 267:2013, 5.3.2.2}
+\begin{equation*}
+\gamma_{\varphi} = 1.2
+\end{equation*}
+\noindent\textbf{Reibungswinkel, Bemessungswert} \hfill \normref{SIA 267:2013, 5.3.2.1}
+\begin{equation*}
+\varphi_{eff} = \arctan\left(\frac{\tan \varphi_k}{\gamma_{\varphi}}\right) = \arctan\left(\frac{\tan 33{}^{\circ}}{1.2}\right) = 28.42{}^{\circ}
+\end{equation*}
+\noindent\textbf{Kohäsion, charakteristisch}
+\begin{equation*}
+c_k = 6\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Partialfaktor der Kohäsion}
+\begin{equation*}
+\gamma_c = 1.5
+\end{equation*}
+\noindent\textbf{Kohäsion, Bemessungswert}
+\begin{equation*}
+c_{eff} = \frac{c_k}{\gamma_c} = \frac{6\,\mathrm{kPa}}{1.5} = 4\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Raumlast des Bodens}
+\begin{equation*}
+\gamma = 21\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Raumlast des Wassers}
+\begin{equation*}
+\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Raumlast des Bodens unter Auftrieb}
+\begin{equation*}
+\gamma' = \gamma - \gamma_w = 21\,\mathrm{kN}/\mathrm{m}^{3} - 10\,\mathrm{kN}/\mathrm{m}^{3} = 11\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Bemessungslast neben dem Fundament}
+\begin{equation*}
+q_{Ed} = 10\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Breite des Fundaments}
+\begin{equation*}
+b = 1.6\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Länge des Fundaments}
+\begin{equation*}
+L = 4\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Tiefe des höchsten Grundwasserspiegels unter Terrain}
+\begin{equation*}
+t_1 = 2\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Tiefe der Sohle unter Terrain}
+\begin{equation*}
+t = 0.8\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Neigung der Sohle}
+\begin{equation*}
+\alpha = 5{}^{\circ}
+\end{equation*}
+\noindent\textbf{Neigung des Geländes}
+\begin{equation*}
+\beta = 15{}^{\circ}
+\end{equation*}
+\subsection{Grundbruch}
+\noindent\textbf{Erweiterte Tragfähigkeitsformel} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+\sigma_f = c \, N_c s_c d_c i_c g_c b_c + \sigma_{v,0} \, N_q s_q d_q i_q g_q b_q + \tfrac{1}{2} \gamma_G \, b \, N_{\gamma} s_{\gamma} d_{\gamma} i_{\gamma} g_{\gamma} b_{\gamma} \qquad N_{Rd} = \sigma_f \cdot b \cdot L
+\end{equation*}
+\subsubsection{Tragfähigkeitsfaktoren}
+\noindent\textbf{Tragfähigkeitsfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.6}
+\begin{equation*}
+N_q = e^{\pi \tan \varphi_{eff}} \cdot \tan^{2}\left(45^\circ + \frac{\varphi_{eff}}{2}\right) = e^{\pi \tan 28.42{}^{\circ}} \cdot \tan^{2}\left(45^\circ + \frac{28.42{}^{\circ}}{2}\right) = 15.42
+\end{equation*}
+\noindent\textbf{Tragfähigkeitsfaktor der Kohäsion} \hfill \normref{Kap. 9.2.6}
+\begin{equation*}
+N_c = \frac{N_q - 1}{\tan \varphi_{eff}} = \frac{15.42 - 1}{\tan 28.42{}^{\circ}} = 26.64
+\end{equation*}
+\noindent\textbf{Tragfähigkeitsfaktor des Gleitkörpergewichts} \hfill \normref{Kap. 9.2.6}
+\begin{equation*}
+N_{\gamma} = 1.8 \cdot \left(N_q - 1\right) \cdot \tan \varphi_{eff} = 1.8 \cdot \left(15.42 - 1\right) \cdot \tan 28.42{}^{\circ} = 14.05
+\end{equation*}
+\subsubsection{Gleitkörper und Grundwasser}
+\noindent\textbf{Reichweite des Gleitkörpers} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+\begin{aligned}
+  L_{Gl} &= b \cdot \tan\left(45^\circ + \frac{\varphi_{eff}}{2}\right) \cdot e^{\frac{\pi}{2} \tan \varphi_{eff}} \\
+  &= 1.6\,\mathrm{m} \cdot \tan\left(45^\circ + \frac{28.42{}^{\circ}}{2}\right) \cdot e^{\frac{\pi}{2} \tan 28.42{}^{\circ}} \\
+  &= 6.28\,\mathrm{m}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Tiefe des Gleitkörpers} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+\begin{aligned}
+  H_{Gl} &= b \cdot \frac{\cos \varphi_{eff}}{2 \cos\left(45^\circ + \frac{\varphi_{eff}}{2}\right)} \cdot e^{\frac{\pi}{180^\circ}\left(45^\circ + \frac{\varphi_{eff}}{2}\right) \tan \varphi_{eff}} \\
+  &= 1.6\,\mathrm{m} \cdot \frac{\cos 28.42{}^{\circ}}{2 \cos\left(45^\circ + \frac{28.42{}^{\circ}}{2}\right)} \cdot e^{\frac{\pi}{180^\circ}\left(45^\circ + \frac{28.42{}^{\circ}}{2}\right) \tan 28.42{}^{\circ}} \\
+  &= 2.4\,\mathrm{m}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Überlagerung auf Höhe der Sohle, Grundwasser tiefer} \hfill \normref{Kap. 9.2.8}
+\begin{equation*}
+\sigma_{v,0} = \gamma \cdot t + q_{Ed} = 21\,\mathrm{kN}/\mathrm{m}^{3} \cdot 0.8\,\mathrm{m} + 10\,\mathrm{kPa} = 26.8\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Abstand des Grundwassers unter der Sohle} \hfill \normref{Kap. 9.2.8}
+\begin{equation*}
+T = t_1 - t = 2\,\mathrm{m} - 0.8\,\mathrm{m} = 1.2\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Grundwasser im Gleitkörper, unter der Sohle}
+\begin{equation*}
+T = 1.2\,\mathrm{m} \quad < \quad H_{Gl} = 2.4\,\mathrm{m}
+\end{equation*}
+\hinweis{Annahme}{Der Grundwasserspiegel liegt im Gleitkörper (T < H). Das Kapitel verlangt dafür eine Stabilitätsberechnung; gerechnet wird mit γ' wie in Lage 2, auf der sicheren Seite.}
+\noindent\textbf{Raumlast im Gleitkörper, unter Wasser} \hfill \normref{Kap. 9.2.8}
+\begin{equation*}
+\gamma_G = \gamma' = 11\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\subsubsection{Form, Tiefe, Gelände und Sohle}
+\noindent\textbf{Formfaktor der Kohäsion} \hfill \normref{Kap. 9.2.12}
+\begin{equation*}
+s_c = 1 + \frac{b}{L} \cdot \frac{N_q}{N_c} = 1 + \frac{1.6\,\mathrm{m}}{4\,\mathrm{m}} \cdot \frac{15.42}{26.64} = 1.23
+\end{equation*}
+\noindent\textbf{Formfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.12}
+\begin{equation*}
+s_q = 1 + \frac{b}{L} \cdot \tan \varphi_{eff} = 1 + \frac{1.6\,\mathrm{m}}{4\,\mathrm{m}} \cdot \tan 28.42{}^{\circ} = 1.22
+\end{equation*}
+\noindent\textbf{Formfaktor des Gleitkörpergewichts} \hfill \normref{Kap. 9.2.12}
+\begin{equation*}
+s_{\gamma} = 1 - 0.4 \cdot \frac{b}{L} = 1 - 0.4 \cdot \frac{1.6\,\mathrm{m}}{4\,\mathrm{m}} = 0.84
+\end{equation*}
+\noindent\textbf{Winkel der Einbindetiefe, in Grad} \hfill \normref{Kap. 9.2.13}
+\begin{equation*}
+\vartheta_t = \arctan\frac{t}{b} = \arctan\frac{0.8\,\mathrm{m}}{1.6\,\mathrm{m}} = 26.6{}^{\circ}
+\end{equation*}
+\noindent\textbf{Tiefenfaktor der Kohäsion} \hfill \normref{Kap. 9.2.13}
+\begin{equation*}
+d_c = 1 + 0.007 \cdot \vartheta_t = 1 + 0.007 \cdot 26.6{}^{\circ} = 1.19
+\end{equation*}
+\noindent\textbf{Tiefenfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.13}
+\begin{equation*}
+\begin{aligned}
+  d_q &= 1 + 0.035 \cdot \tan \varphi_{eff} \cdot \left(1 - \sin \varphi_{eff}\right)^{2} \cdot \vartheta_t \\
+  &= 1 + 0.035 \cdot \tan 28.42{}^{\circ} \cdot \left(1 - \sin 28.42{}^{\circ}\right)^{2} \cdot 26.6{}^{\circ} \\
+  &= 1.14
+\end{aligned}
+\end{equation*}
+Der Tiefenfaktor des Gleitkörpergewichts ist d\_γ = 1.
+
+\noindent\textbf{Geländeneigungsfaktor der Kohäsion} \hfill \normref{Kap. 9.2.15}
+\begin{equation*}
+g_c = 1 - \frac{\beta}{147^\circ} = 1 - \frac{15{}^{\circ}}{147^\circ} = 0.9
+\end{equation*}
+\noindent\textbf{Geländeneigungsfaktor der Auflast und des Gleitkörpers} \hfill \normref{Kap. 9.2.15}
+\begin{equation*}
+g_q = \left(1 - 0.5 \cdot \tan \beta\right)^{5} = \left(1 - 0.5 \cdot \tan 15{}^{\circ}\right)^{5} = 0.49
+\end{equation*}
+Für das Gleitkörpergewicht gilt derselbe Faktor: g\_γ = g\_q.
+
+\noindent\textbf{Sohlneigungsfaktor der Kohäsion} \hfill \normref{Kap. 9.2.16}
+\begin{equation*}
+b_c = 1 - \frac{\alpha}{147^\circ} = 1 - \frac{5{}^{\circ}}{147^\circ} = 0.97
+\end{equation*}
+\noindent\textbf{Sohlneigungsfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.16}
+\begin{equation*}
+b_q = e^{-0.035 \cdot \alpha \cdot \tan \varphi_{eff}} = e^{-0.035 \cdot 5{}^{\circ} \cdot \tan 28.42{}^{\circ}} = 0.91
+\end{equation*}
+\noindent\textbf{Sohlneigungsfaktor des Gleitkörpergewichts} \hfill \normref{Kap. 9.2.16}
+\begin{equation*}
+b_{\gamma} = e^{-0.047 \cdot \alpha \cdot \tan \varphi_{eff}} = e^{-0.047 \cdot 5{}^{\circ} \cdot \tan 28.42{}^{\circ}} = 0.88
+\end{equation*}
+\hinweis{Annahme}{b\_γ mit tan φ wie in Tabelle 9.2.18 -- im Text des Kapitels steht tan α; die Tabelle und die Formel für b\_q rechnen mit tan φ.}
+\subsubsection{Grundbruch – Normal}
+\noindent\textbf{Neigung der Last} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+\delta_R = \arctan\frac{T_{Ed}}{N_{Ed}} = \arctan\frac{120\,\mathrm{kN}}{900\,\mathrm{kN}} = 7.6{}^{\circ}
+\end{equation*}
+\noindent\textbf{Lastneigungsfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+\begin{aligned}
+  i_q &= \left[1 - \frac{0.5 \cdot T_{Ed}}{N_{Ed} + b \cdot L \cdot c_{eff} \cdot \cot \varphi_{eff}}\right]^{5} \\
+  &= \left[1 - \frac{0.5 \cdot 120\,\mathrm{kN}}{900\,\mathrm{kN} + 1.6\,\mathrm{m} \cdot 4\,\mathrm{m} \cdot 4\,\mathrm{kPa} \cdot \cot 28.42{}^{\circ}}\right]^{5} \\
+  &= 0.72
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Lastneigungsfaktor der Kohäsion} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+i_c = i_q - \frac{1 - i_q}{N_q - 1} = 0.72 - \frac{1 - 0.72}{15.42 - 1} = 0.7
+\end{equation*}
+\noindent\textbf{Lastneigungsfaktor des Gleitkörpergewichts} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+\begin{aligned}
+  i_{\gamma} &= \left[1 - \frac{\left(0.7 - \frac{\alpha}{450^\circ}\right) \cdot T_{Ed}}{N_{Ed} + b \cdot L \cdot c_{eff} \cdot \cot \varphi_{eff}}\right]^{5} \\
+  &= \left[1 - \frac{\left(0.7 - \frac{5{}^{\circ}}{450^\circ}\right) \cdot 120\,\mathrm{kN}}{900\,\mathrm{kN} + 1.6\,\mathrm{m} \cdot 4\,\mathrm{m} \cdot 4\,\mathrm{kPa} \cdot \cot 28.42{}^{\circ}}\right]^{5} \\
+  &= 0.63
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Bruchspannung in der Sohle} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+\begin{aligned}
+  \sigma_f &= c_{eff} \cdot N_c \cdot s_c \cdot d_c \cdot i_c \cdot g_c \cdot b_c + \sigma_{v,0} \cdot N_q \cdot s_q \cdot d_q \cdot i_q \cdot g_q \cdot b_q + \tfrac{1}{2} \cdot \gamma_G \cdot b \cdot N_{\gamma} \cdot s_{\gamma} \cdot 1 \cdot i_{\gamma} \cdot g_q \cdot b_{\gamma} \\
+  &= 4\,\mathrm{kPa} \cdot 26.64 \cdot 1.23 \cdot 1.19 \cdot 0.7 \cdot 0.9 \cdot 0.97 + 26.8\,\mathrm{kPa} \cdot 15.42 \cdot 1.22 \cdot 1.14 \cdot 0.72 \cdot 0.49 \cdot 0.91 + \tfrac{1}{2} \cdot 11\,\mathrm{kN}/\mathrm{m}^{3} \cdot 1.6\,\mathrm{m} \cdot 14.05 \cdot 0.84 \cdot 1 \cdot 0.63 \cdot 0.49 \cdot 0.88 \\
+  &= 305.7\,\mathrm{kPa}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Grundbruchwiderstand} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+N_{Rd} = \sigma_f \cdot b \cdot L = 305.7\,\mathrm{kPa} \cdot 1.6\,\mathrm{m} \cdot 4\,\mathrm{m} = 1956.7\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Einwirkung gegen Widerstand}
+\begin{equation*}
+N_{Ed} = 900\,\mathrm{kN} \quad \le \quad N_{Rd} = 1956.7\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,GB,\text{Normal}} = \frac{N_{Rd}}{N_{Ed}} = \frac{1956.7\,\mathrm{kN}}{900\,\mathrm{kN}} = 2.17 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Grundbruch – Steil}
+\noindent\textbf{Neigung der Last} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+\delta_R = \arctan\frac{T_{Ed}}{N_{Ed}} = \arctan\frac{300\,\mathrm{kN}}{150\,\mathrm{kN}} = 63.4{}^{\circ}
+\end{equation*}
+\noindent\textbf{Lastneigungsfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+\begin{aligned}
+  i_q &= \left[1 - \frac{0.5 \cdot T_{Ed}}{N_{Ed} + b \cdot L \cdot c_{eff} \cdot \cot \varphi_{eff}}\right]^{5} \\
+  &= \left[1 - \frac{0.5 \cdot 300\,\mathrm{kN}}{150\,\mathrm{kN} + 1.6\,\mathrm{m} \cdot 4\,\mathrm{m} \cdot 4\,\mathrm{kPa} \cdot \cot 28.42{}^{\circ}}\right]^{5} \\
+  &= 0
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Lastneigungsfaktor der Kohäsion} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+i_c = i_q - \frac{1 - i_q}{N_q - 1} = 0 - \frac{1 - 0}{15.42 - 1} = -0.07
+\end{equation*}
+\noindent\textbf{Lastneigungsfaktor des Gleitkörpergewichts} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+\begin{aligned}
+  i_{\gamma} &= \left[1 - \frac{\left(0.7 - \frac{\alpha}{450^\circ}\right) \cdot T_{Ed}}{N_{Ed} + b \cdot L \cdot c_{eff} \cdot \cot \varphi_{eff}}\right]^{5} \\
+  &= \left[1 - \frac{\left(0.7 - \frac{5{}^{\circ}}{450^\circ}\right) \cdot 300\,\mathrm{kN}}{150\,\mathrm{kN} + 1.6\,\mathrm{m} \cdot 4\,\mathrm{m} \cdot 4\,\mathrm{kPa} \cdot \cot 28.42{}^{\circ}}\right]^{5} \\
+  &= 0
+\end{aligned}
+\end{equation*}
+\hinweis{Annahme}{Ist die Klammer eines Lastneigungsfaktors kleiner als null, gilt null: die Last ist so stark geneigt, dass die Auflast oder das Gewicht des Gleitkörpers nichts mehr trägt.}
+\noindent\textbf{Bruchspannung in der Sohle} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+\begin{aligned}
+  \sigma_f &= c_{eff} \cdot N_c \cdot s_c \cdot d_c \cdot i_c \cdot g_c \cdot b_c + \sigma_{v,0} \cdot N_q \cdot s_q \cdot d_q \cdot i_q \cdot g_q \cdot b_q + \tfrac{1}{2} \cdot \gamma_G \cdot b \cdot N_{\gamma} \cdot s_{\gamma} \cdot 1 \cdot i_{\gamma} \cdot g_q \cdot b_{\gamma} \\
+  &= 4\,\mathrm{kPa} \cdot 26.64 \cdot 1.23 \cdot 1.19 \cdot \left(-0.07\right) \cdot 0.9 \cdot 0.97 + 26.8\,\mathrm{kPa} \cdot 15.42 \cdot 1.22 \cdot 1.14 \cdot 0 \cdot 0.49 \cdot 0.91 + \tfrac{1}{2} \cdot 11\,\mathrm{kN}/\mathrm{m}^{3} \cdot 1.6\,\mathrm{m} \cdot 14.05 \cdot 0.84 \cdot 1 \cdot 0 \cdot 0.49 \cdot 0.88 \\
+  &= -9\,\mathrm{kPa}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Grundbruchwiderstand} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+N_{Rd} = \sigma_f \cdot b \cdot L = -9\,\mathrm{kPa} \cdot 1.6\,\mathrm{m} \cdot 4\,\mathrm{m} = 0\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Einwirkung gegen Widerstand}
+\begin{equation*}
+N_{Ed} = 150\,\mathrm{kN} \quad > \quad N_{Rd} = 0\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,GB,\text{Steil}} = \frac{N_{Rd}}{N_{Ed}} = \frac{0\,\mathrm{kN}}{150\,\mathrm{kN}} = 0.00 \quad \Rightarrow \quad \text{NICHT erfüllt}
+\end{equation*}
+\noindent\textbf{Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ*/φ}
+\begin{equation*}
+k_{\delta} = 0.67
+\end{equation*}
+\subsection{Gleiten}
+\noindent\textbf{Reibungswinkel der Sohlfuge} \hfill \normref{Kap. 9.2.18}
+\begin{equation*}
+\delta^{*} = k_{\delta} \cdot \varphi_{eff} = 0.67 \cdot 28.42{}^{\circ} = 19.04{}^{\circ}
+\end{equation*}
+\subsubsection{Gleiten – Normal}
+\noindent\textbf{Gleitwiderstand} \hfill \normref{Kap. 9.2.18}
+\begin{equation*}
+T_{Rd} = N_{Ed} \cdot \tan \delta^{*} = 900\,\mathrm{kN} \cdot \tan 19.04{}^{\circ} = 310.6\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Einwirkung gegen Widerstand}
+\begin{equation*}
+T_{Ed} = 120\,\mathrm{kN} \quad \le \quad T_{Rd} = 310.6\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,GL,\text{Normal}} = \frac{T_{Rd}}{T_{Ed}} = \frac{310.6\,\mathrm{kN}}{120\,\mathrm{kN}} = 2.59 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Gleiten – Steil}
+\noindent\textbf{Gleitwiderstand} \hfill \normref{Kap. 9.2.18}
+\begin{equation*}
+T_{Rd} = N_{Ed} \cdot \tan \delta^{*} = 150\,\mathrm{kN} \cdot \tan 19.04{}^{\circ} = 51.8\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Einwirkung gegen Widerstand}
+\begin{equation*}
+T_{Ed} = 300\,\mathrm{kN} \quad > \quad T_{Rd} = 51.8\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,GL,\text{Steil}} = \frac{T_{Rd}}{T_{Ed}} = \frac{51.8\,\mathrm{kN}}{300\,\mathrm{kN}} = 0.17 \quad \Rightarrow \quad \text{NICHT erfüllt}
+\end{equation*}
+\subsection{Grundbruch: Ufer}
+\noindent\textbf{Reibungswinkel, charakteristisch}
+\begin{equation*}
+\varphi_k = 30{}^{\circ}
+\end{equation*}
+\noindent\textbf{Partialfaktor des Reibungswinkels} \hfill \normref{SIA 267:2013, 5.3.2.2}
+\begin{equation*}
+\gamma_{\varphi} = 1.2
+\end{equation*}
+\noindent\textbf{Reibungswinkel, Bemessungswert} \hfill \normref{SIA 267:2013, 5.3.2.1}
+\begin{equation*}
+\varphi_{eff} = \arctan\left(\frac{\tan \varphi_k}{\gamma_{\varphi}}\right) = \arctan\left(\frac{\tan 30{}^{\circ}}{1.2}\right) = 25.69{}^{\circ}
+\end{equation*}
+\noindent\textbf{Kohäsion, charakteristisch}
+\begin{equation*}
+c_k = 0\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Partialfaktor der Kohäsion}
+\begin{equation*}
+\gamma_c = 1.5
+\end{equation*}
+\noindent\textbf{Kohäsion, Bemessungswert}
+\begin{equation*}
+c_{eff} = \frac{c_k}{\gamma_c} = \frac{0\,\mathrm{kPa}}{1.5} = 0\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Raumlast des Bodens}
+\begin{equation*}
+\gamma = 21\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Raumlast des Wassers}
+\begin{equation*}
+\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Raumlast des Bodens unter Auftrieb}
+\begin{equation*}
+\gamma' = \gamma - \gamma_w = 21\,\mathrm{kN}/\mathrm{m}^{3} - 10\,\mathrm{kN}/\mathrm{m}^{3} = 11\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Bemessungslast neben dem Fundament}
+\begin{equation*}
+q_{Ed} = 0\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Breite des Fundaments}
+\begin{equation*}
+b = 1.5\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Länge des Fundaments}
+\begin{equation*}
+L = 1.5\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Tiefe des höchsten Grundwasserspiegels unter Terrain}
+\begin{equation*}
+t_1 = 0.4\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Tiefe der Sohle unter Terrain}
+\begin{equation*}
+t = 1\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Neigung der Sohle}
+\begin{equation*}
+\alpha = 0{}^{\circ}
+\end{equation*}
+\noindent\textbf{Neigung des Geländes}
+\begin{equation*}
+\beta = 0{}^{\circ}
+\end{equation*}
+\subsection{Grundbruch}
+\noindent\textbf{Erweiterte Tragfähigkeitsformel} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+\sigma_f = c \, N_c s_c d_c i_c g_c b_c + \sigma_{v,0} \, N_q s_q d_q i_q g_q b_q + \tfrac{1}{2} \gamma_G \, b \, N_{\gamma} s_{\gamma} d_{\gamma} i_{\gamma} g_{\gamma} b_{\gamma} \qquad N_{Rd} = \sigma_f \cdot b \cdot L
+\end{equation*}
+\subsubsection{Tragfähigkeitsfaktoren}
+\noindent\textbf{Tragfähigkeitsfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.6}
+\begin{equation*}
+N_q = e^{\pi \tan \varphi_{eff}} \cdot \tan^{2}\left(45^\circ + \frac{\varphi_{eff}}{2}\right) = e^{\pi \tan 25.69{}^{\circ}} \cdot \tan^{2}\left(45^\circ + \frac{25.69{}^{\circ}}{2}\right) = 11.47
+\end{equation*}
+\noindent\textbf{Tragfähigkeitsfaktor der Kohäsion} \hfill \normref{Kap. 9.2.6}
+\begin{equation*}
+N_c = \frac{N_q - 1}{\tan \varphi_{eff}} = \frac{11.47 - 1}{\tan 25.69{}^{\circ}} = 21.77
+\end{equation*}
+\noindent\textbf{Tragfähigkeitsfaktor des Gleitkörpergewichts} \hfill \normref{Kap. 9.2.6}
+\begin{equation*}
+N_{\gamma} = 1.8 \cdot \left(N_q - 1\right) \cdot \tan \varphi_{eff} = 1.8 \cdot \left(11.47 - 1\right) \cdot \tan 25.69{}^{\circ} = 9.07
+\end{equation*}
+\subsubsection{Gleitkörper und Grundwasser}
+\noindent\textbf{Reichweite des Gleitkörpers} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+\begin{aligned}
+  L_{Gl} &= b \cdot \tan\left(45^\circ + \frac{\varphi_{eff}}{2}\right) \cdot e^{\frac{\pi}{2} \tan \varphi_{eff}} \\
+  &= 1.5\,\mathrm{m} \cdot \tan\left(45^\circ + \frac{25.69{}^{\circ}}{2}\right) \cdot e^{\frac{\pi}{2} \tan 25.69{}^{\circ}} \\
+  &= 5.08\,\mathrm{m}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Tiefe des Gleitkörpers} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+\begin{aligned}
+  H_{Gl} &= b \cdot \frac{\cos \varphi_{eff}}{2 \cos\left(45^\circ + \frac{\varphi_{eff}}{2}\right)} \cdot e^{\frac{\pi}{180^\circ}\left(45^\circ + \frac{\varphi_{eff}}{2}\right) \tan \varphi_{eff}} \\
+  &= 1.5\,\mathrm{m} \cdot \frac{\cos 25.69{}^{\circ}}{2 \cos\left(45^\circ + \frac{25.69{}^{\circ}}{2}\right)} \cdot e^{\frac{\pi}{180^\circ}\left(45^\circ + \frac{25.69{}^{\circ}}{2}\right) \tan 25.69{}^{\circ}} \\
+  &= 2.06\,\mathrm{m}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Überlagerung auf Höhe der Sohle, Lage 1: Grundwasser über der Sohle} \hfill \normref{Kap. 9.2.8}
+\begin{equation*}
+\begin{aligned}
+  \sigma_{v,0} &= \gamma \cdot t_1 + \gamma' \cdot \left(t - t_1\right) + q_{Ed} \\
+  &= 21\,\mathrm{kN}/\mathrm{m}^{3} \cdot 0.4\,\mathrm{m} + 11\,\mathrm{kN}/\mathrm{m}^{3} \cdot \left(1\,\mathrm{m} - 0.4\,\mathrm{m}\right) + 0\,\mathrm{kPa} \\
+  &= 15\,\mathrm{kPa}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Raumlast im Gleitkörper, unter Wasser} \hfill \normref{Kap. 9.2.8}
+\begin{equation*}
+\gamma_G = \gamma' = 11\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\subsubsection{Form, Tiefe, Gelände und Sohle}
+\noindent\textbf{Formfaktor der Kohäsion} \hfill \normref{Kap. 9.2.12}
+\begin{equation*}
+s_c = 1 + \frac{b}{L} \cdot \frac{N_q}{N_c} = 1 + \frac{1.5\,\mathrm{m}}{1.5\,\mathrm{m}} \cdot \frac{11.47}{21.77} = 1.53
+\end{equation*}
+\noindent\textbf{Formfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.12}
+\begin{equation*}
+s_q = 1 + \frac{b}{L} \cdot \tan \varphi_{eff} = 1 + \frac{1.5\,\mathrm{m}}{1.5\,\mathrm{m}} \cdot \tan 25.69{}^{\circ} = 1.48
+\end{equation*}
+\noindent\textbf{Formfaktor des Gleitkörpergewichts} \hfill \normref{Kap. 9.2.12}
+\begin{equation*}
+s_{\gamma} = 1 - 0.4 \cdot \frac{b}{L} = 1 - 0.4 \cdot \frac{1.5\,\mathrm{m}}{1.5\,\mathrm{m}} = 0.6
+\end{equation*}
+\noindent\textbf{Winkel der Einbindetiefe, in Grad} \hfill \normref{Kap. 9.2.13}
+\begin{equation*}
+\vartheta_t = \arctan\frac{t}{b} = \arctan\frac{1\,\mathrm{m}}{1.5\,\mathrm{m}} = 33.7{}^{\circ}
+\end{equation*}
+\noindent\textbf{Tiefenfaktor der Kohäsion} \hfill \normref{Kap. 9.2.13}
+\begin{equation*}
+d_c = 1 + 0.007 \cdot \vartheta_t = 1 + 0.007 \cdot 33.7{}^{\circ} = 1.24
+\end{equation*}
+\noindent\textbf{Tiefenfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.13}
+\begin{equation*}
+\begin{aligned}
+  d_q &= 1 + 0.035 \cdot \tan \varphi_{eff} \cdot \left(1 - \sin \varphi_{eff}\right)^{2} \cdot \vartheta_t \\
+  &= 1 + 0.035 \cdot \tan 25.69{}^{\circ} \cdot \left(1 - \sin 25.69{}^{\circ}\right)^{2} \cdot 33.7{}^{\circ} \\
+  &= 1.18
+\end{aligned}
+\end{equation*}
+Der Tiefenfaktor des Gleitkörpergewichts ist d\_γ = 1.
+
+\noindent\textbf{Geländeneigungsfaktor der Kohäsion} \hfill \normref{Kap. 9.2.15}
+\begin{equation*}
+g_c = 1 - \frac{\beta}{147^\circ} = 1 - \frac{0{}^{\circ}}{147^\circ} = 1
+\end{equation*}
+\noindent\textbf{Geländeneigungsfaktor der Auflast und des Gleitkörpers} \hfill \normref{Kap. 9.2.15}
+\begin{equation*}
+g_q = \left(1 - 0.5 \cdot \tan \beta\right)^{5} = \left(1 - 0.5 \cdot \tan 0{}^{\circ}\right)^{5} = 1
+\end{equation*}
+Für das Gleitkörpergewicht gilt derselbe Faktor: g\_γ = g\_q.
+
+\noindent\textbf{Sohlneigungsfaktor der Kohäsion} \hfill \normref{Kap. 9.2.16}
+\begin{equation*}
+b_c = 1 - \frac{\alpha}{147^\circ} = 1 - \frac{0{}^{\circ}}{147^\circ} = 1
+\end{equation*}
+\noindent\textbf{Sohlneigungsfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.16}
+\begin{equation*}
+b_q = e^{-0.035 \cdot \alpha \cdot \tan \varphi_{eff}} = e^{-0.035 \cdot 0{}^{\circ} \cdot \tan 25.69{}^{\circ}} = 1
+\end{equation*}
+\noindent\textbf{Sohlneigungsfaktor des Gleitkörpergewichts} \hfill \normref{Kap. 9.2.16}
+\begin{equation*}
+b_{\gamma} = e^{-0.047 \cdot \alpha \cdot \tan \varphi_{eff}} = e^{-0.047 \cdot 0{}^{\circ} \cdot \tan 25.69{}^{\circ}} = 1
+\end{equation*}
+\hinweis{Annahme}{b\_γ mit tan φ wie in Tabelle 9.2.18 -- im Text des Kapitels steht tan α; die Tabelle und die Formel für b\_q rechnen mit tan φ.}
+\subsubsection{Grundbruch – Tragsicherheit}
+\noindent\textbf{Neigung der Last} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+\delta_R = \arctan\frac{T_{Ed}}{N_{Ed}} = \arctan\frac{100\,\mathrm{kN}}{1200\,\mathrm{kN}} = 4.8{}^{\circ}
+\end{equation*}
+\noindent\textbf{Lastneigungsfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+\begin{aligned}
+  i_q &= \left[1 - \frac{0.5 \cdot T_{Ed}}{N_{Ed} + b \cdot L \cdot c_{eff} \cdot \cot \varphi_{eff}}\right]^{5} \\
+  &= \left[1 - \frac{0.5 \cdot 100\,\mathrm{kN}}{1200\,\mathrm{kN} + 1.5\,\mathrm{m} \cdot 1.5\,\mathrm{m} \cdot 0\,\mathrm{kPa} \cdot \cot 25.69{}^{\circ}}\right]^{5} \\
+  &= 0.81
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Lastneigungsfaktor der Kohäsion} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+i_c = i_q - \frac{1 - i_q}{N_q - 1} = 0.81 - \frac{1 - 0.81}{11.47 - 1} = 0.79
+\end{equation*}
+\noindent\textbf{Lastneigungsfaktor des Gleitkörpergewichts} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+\begin{aligned}
+  i_{\gamma} &= \left[1 - \frac{\left(0.7 - \frac{\alpha}{450^\circ}\right) \cdot T_{Ed}}{N_{Ed} + b \cdot L \cdot c_{eff} \cdot \cot \varphi_{eff}}\right]^{5} \\
+  &= \left[1 - \frac{\left(0.7 - \frac{0{}^{\circ}}{450^\circ}\right) \cdot 100\,\mathrm{kN}}{1200\,\mathrm{kN} + 1.5\,\mathrm{m} \cdot 1.5\,\mathrm{m} \cdot 0\,\mathrm{kPa} \cdot \cot 25.69{}^{\circ}}\right]^{5} \\
+  &= 0.74
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Bruchspannung in der Sohle} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+\begin{aligned}
+  \sigma_f &= c_{eff} \cdot N_c \cdot s_c \cdot d_c \cdot i_c \cdot g_c \cdot b_c + \sigma_{v,0} \cdot N_q \cdot s_q \cdot d_q \cdot i_q \cdot g_q \cdot b_q + \tfrac{1}{2} \cdot \gamma_G \cdot b \cdot N_{\gamma} \cdot s_{\gamma} \cdot 1 \cdot i_{\gamma} \cdot g_q \cdot b_{\gamma} \\
+  &= 0\,\mathrm{kPa} \cdot 21.77 \cdot 1.53 \cdot 1.24 \cdot 0.79 \cdot 1 \cdot 1 + 15\,\mathrm{kPa} \cdot 11.47 \cdot 1.48 \cdot 1.18 \cdot 0.81 \cdot 1 \cdot 1 + \tfrac{1}{2} \cdot 11\,\mathrm{kN}/\mathrm{m}^{3} \cdot 1.5\,\mathrm{m} \cdot 9.07 \cdot 0.6 \cdot 1 \cdot 0.74 \cdot 1 \cdot 1 \\
+  &= 276.8\,\mathrm{kPa}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Grundbruchwiderstand} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+N_{Rd} = \sigma_f \cdot b \cdot L = 276.8\,\mathrm{kPa} \cdot 1.5\,\mathrm{m} \cdot 1.5\,\mathrm{m} = 622.8\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Einwirkung gegen Widerstand}
+\begin{equation*}
+N_{Ed} = 1200\,\mathrm{kN} \quad > \quad N_{Rd} = 622.8\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,GB,\text{Tragsicherheit}} = \frac{N_{Rd}}{N_{Ed}} = \frac{622.8\,\mathrm{kN}}{1200\,\mathrm{kN}} = 0.52 \quad \Rightarrow \quad \text{NICHT erfüllt}
+\end{equation*}
+\noindent\textbf{Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ*/φ}
+\begin{equation*}
+k_{\delta} = 1
+\end{equation*}
+\subsection{Gleiten}
+\noindent\textbf{Reibungswinkel der Sohlfuge} \hfill \normref{Kap. 9.2.18}
+\begin{equation*}
+\delta^{*} = k_{\delta} \cdot \varphi_{eff} = 1 \cdot 25.69{}^{\circ} = 25.69{}^{\circ}
+\end{equation*}
+\subsubsection{Gleiten – Tragsicherheit}
+\noindent\textbf{Gleitwiderstand} \hfill \normref{Kap. 9.2.18}
+\begin{equation*}
+T_{Rd} = N_{Ed} \cdot \tan \delta^{*} = 1200\,\mathrm{kN} \cdot \tan 25.69{}^{\circ} = 577.4\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Einwirkung gegen Widerstand}
+\begin{equation*}
+T_{Ed} = 100\,\mathrm{kN} \quad \le \quad T_{Rd} = 577.4\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,GL,\text{Tragsicherheit}} = \frac{T_{Rd}}{T_{Ed}} = \frac{577.4\,\mathrm{kN}}{100\,\mathrm{kN}} = 5.77 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsection{Grundbruch: Kai}
+\noindent\textbf{Reibungswinkel, charakteristisch}
+\begin{equation*}
+\varphi_k = 28{}^{\circ}
+\end{equation*}
+\noindent\textbf{Partialfaktor des Reibungswinkels} \hfill \normref{SIA 267:2013, 5.3.2.2}
+\begin{equation*}
+\gamma_{\varphi} = 1.2
+\end{equation*}
+\noindent\textbf{Reibungswinkel, Bemessungswert} \hfill \normref{SIA 267:2013, 5.3.2.1}
+\begin{equation*}
+\varphi_{eff} = \arctan\left(\frac{\tan \varphi_k}{\gamma_{\varphi}}\right) = \arctan\left(\frac{\tan 28{}^{\circ}}{1.2}\right) = 23.9{}^{\circ}
+\end{equation*}
+\noindent\textbf{Kohäsion, charakteristisch}
+\begin{equation*}
+c_k = 3\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Partialfaktor der Kohäsion}
+\begin{equation*}
+\gamma_c = 1.5
+\end{equation*}
+\noindent\textbf{Kohäsion, Bemessungswert}
+\begin{equation*}
+c_{eff} = \frac{c_k}{\gamma_c} = \frac{3\,\mathrm{kPa}}{1.5} = 2\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Raumlast des Bodens}
+\begin{equation*}
+\gamma = 21\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Raumlast des Wassers}
+\begin{equation*}
+\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Raumlast des Bodens unter Auftrieb}
+\begin{equation*}
+\gamma' = \gamma - \gamma_w = 21\,\mathrm{kN}/\mathrm{m}^{3} - 10\,\mathrm{kN}/\mathrm{m}^{3} = 11\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Bemessungslast neben dem Fundament}
+\begin{equation*}
+q_{Ed} = 0\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Breite des Fundaments}
+\begin{equation*}
+b = 2\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Länge des Fundaments}
+\begin{equation*}
+L = 20\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Tiefe des höchsten Grundwasserspiegels unter Terrain}
+\begin{equation*}
+t_1 = 1.5\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Tiefe der Sohle unter Terrain}
+\begin{equation*}
+t = 1.5\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Neigung der Sohle}
+\begin{equation*}
+\alpha = 0{}^{\circ}
+\end{equation*}
+\noindent\textbf{Neigung des Geländes}
+\begin{equation*}
+\beta = 0{}^{\circ}
+\end{equation*}
+\subsection{Grundbruch}
+\noindent\textbf{Erweiterte Tragfähigkeitsformel} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+\sigma_f = c \, N_c s_c d_c i_c g_c b_c + \sigma_{v,0} \, N_q s_q d_q i_q g_q b_q + \tfrac{1}{2} \gamma_G \, b \, N_{\gamma} s_{\gamma} d_{\gamma} i_{\gamma} g_{\gamma} b_{\gamma} \qquad N_{Rd} = \sigma_f \cdot b \cdot L
+\end{equation*}
+\subsubsection{Tragfähigkeitsfaktoren}
+\noindent\textbf{Tragfähigkeitsfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.6}
+\begin{equation*}
+N_q = e^{\pi \tan \varphi_{eff}} \cdot \tan^{2}\left(45^\circ + \frac{\varphi_{eff}}{2}\right) = e^{\pi \tan 23.9{}^{\circ}} \cdot \tan^{2}\left(45^\circ + \frac{23.9{}^{\circ}}{2}\right) = 9.5
+\end{equation*}
+\noindent\textbf{Tragfähigkeitsfaktor der Kohäsion} \hfill \normref{Kap. 9.2.6}
+\begin{equation*}
+N_c = \frac{N_q - 1}{\tan \varphi_{eff}} = \frac{9.5 - 1}{\tan 23.9{}^{\circ}} = 19.19
+\end{equation*}
+\noindent\textbf{Tragfähigkeitsfaktor des Gleitkörpergewichts} \hfill \normref{Kap. 9.2.6}
+\begin{equation*}
+N_{\gamma} = 1.8 \cdot \left(N_q - 1\right) \cdot \tan \varphi_{eff} = 1.8 \cdot \left(9.5 - 1\right) \cdot \tan 23.9{}^{\circ} = 6.78
+\end{equation*}
+\subsubsection{Gleitkörper und Grundwasser}
+\noindent\textbf{Reichweite des Gleitkörpers} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+\begin{aligned}
+  L_{Gl} &= b \cdot \tan\left(45^\circ + \frac{\varphi_{eff}}{2}\right) \cdot e^{\frac{\pi}{2} \tan \varphi_{eff}} \\
+  &= 2\,\mathrm{m} \cdot \tan\left(45^\circ + \frac{23.9{}^{\circ}}{2}\right) \cdot e^{\frac{\pi}{2} \tan 23.9{}^{\circ}} \\
+  &= 6.17\,\mathrm{m}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Tiefe des Gleitkörpers} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+\begin{aligned}
+  H_{Gl} &= b \cdot \frac{\cos \varphi_{eff}}{2 \cos\left(45^\circ + \frac{\varphi_{eff}}{2}\right)} \cdot e^{\frac{\pi}{180^\circ}\left(45^\circ + \frac{\varphi_{eff}}{2}\right) \tan \varphi_{eff}} \\
+  &= 2\,\mathrm{m} \cdot \frac{\cos 23.9{}^{\circ}}{2 \cos\left(45^\circ + \frac{23.9{}^{\circ}}{2}\right)} \cdot e^{\frac{\pi}{180^\circ}\left(45^\circ + \frac{23.9{}^{\circ}}{2}\right) \tan 23.9{}^{\circ}} \\
+  &= 2.6\,\mathrm{m}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Überlagerung auf Höhe der Sohle, Lage 2: Grundwasser auf Höhe der Sohle} \hfill \normref{Kap. 9.2.8}
+\begin{equation*}
+\begin{aligned}
+  \sigma_{v,0} &= \gamma \cdot t_1 + \gamma' \cdot \left(t - t_1\right) + q_{Ed} \\
+  &= 21\,\mathrm{kN}/\mathrm{m}^{3} \cdot 1.5\,\mathrm{m} + 11\,\mathrm{kN}/\mathrm{m}^{3} \cdot \left(1.5\,\mathrm{m} - 1.5\,\mathrm{m}\right) + 0\,\mathrm{kPa} \\
+  &= 31.5\,\mathrm{kPa}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Raumlast im Gleitkörper, unter Wasser} \hfill \normref{Kap. 9.2.8}
+\begin{equation*}
+\gamma_G = \gamma' = 11\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\subsubsection{Form, Tiefe, Gelände und Sohle}
+\noindent\textbf{Formfaktor der Kohäsion} \hfill \normref{Kap. 9.2.12}
+\begin{equation*}
+s_c = 1 + \frac{b}{L} \cdot \frac{N_q}{N_c} = 1 + \frac{2\,\mathrm{m}}{20\,\mathrm{m}} \cdot \frac{9.5}{19.19} = 1.05
+\end{equation*}
+\noindent\textbf{Formfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.12}
+\begin{equation*}
+s_q = 1 + \frac{b}{L} \cdot \tan \varphi_{eff} = 1 + \frac{2\,\mathrm{m}}{20\,\mathrm{m}} \cdot \tan 23.9{}^{\circ} = 1.04
+\end{equation*}
+\noindent\textbf{Formfaktor des Gleitkörpergewichts} \hfill \normref{Kap. 9.2.12}
+\begin{equation*}
+s_{\gamma} = 1 - 0.4 \cdot \frac{b}{L} = 1 - 0.4 \cdot \frac{2\,\mathrm{m}}{20\,\mathrm{m}} = 0.96
+\end{equation*}
+\noindent\textbf{Winkel der Einbindetiefe, in Grad} \hfill \normref{Kap. 9.2.13}
+\begin{equation*}
+\vartheta_t = \arctan\frac{t}{b} = \arctan\frac{1.5\,\mathrm{m}}{2\,\mathrm{m}} = 36.9{}^{\circ}
+\end{equation*}
+\noindent\textbf{Tiefenfaktor der Kohäsion} \hfill \normref{Kap. 9.2.13}
+\begin{equation*}
+d_c = 1 + 0.007 \cdot \vartheta_t = 1 + 0.007 \cdot 36.9{}^{\circ} = 1.26
+\end{equation*}
+\noindent\textbf{Tiefenfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.13}
+\begin{equation*}
+\begin{aligned}
+  d_q &= 1 + 0.035 \cdot \tan \varphi_{eff} \cdot \left(1 - \sin \varphi_{eff}\right)^{2} \cdot \vartheta_t \\
+  &= 1 + 0.035 \cdot \tan 23.9{}^{\circ} \cdot \left(1 - \sin 23.9{}^{\circ}\right)^{2} \cdot 36.9{}^{\circ} \\
+  &= 1.2
+\end{aligned}
+\end{equation*}
+Der Tiefenfaktor des Gleitkörpergewichts ist d\_γ = 1.
+
+\noindent\textbf{Geländeneigungsfaktor der Kohäsion} \hfill \normref{Kap. 9.2.15}
+\begin{equation*}
+g_c = 1 - \frac{\beta}{147^\circ} = 1 - \frac{0{}^{\circ}}{147^\circ} = 1
+\end{equation*}
+\noindent\textbf{Geländeneigungsfaktor der Auflast und des Gleitkörpers} \hfill \normref{Kap. 9.2.15}
+\begin{equation*}
+g_q = \left(1 - 0.5 \cdot \tan \beta\right)^{5} = \left(1 - 0.5 \cdot \tan 0{}^{\circ}\right)^{5} = 1
+\end{equation*}
+Für das Gleitkörpergewicht gilt derselbe Faktor: g\_γ = g\_q.
+
+\noindent\textbf{Sohlneigungsfaktor der Kohäsion} \hfill \normref{Kap. 9.2.16}
+\begin{equation*}
+b_c = 1 - \frac{\alpha}{147^\circ} = 1 - \frac{0{}^{\circ}}{147^\circ} = 1
+\end{equation*}
+\noindent\textbf{Sohlneigungsfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.16}
+\begin{equation*}
+b_q = e^{-0.035 \cdot \alpha \cdot \tan \varphi_{eff}} = e^{-0.035 \cdot 0{}^{\circ} \cdot \tan 23.9{}^{\circ}} = 1
+\end{equation*}
+\noindent\textbf{Sohlneigungsfaktor des Gleitkörpergewichts} \hfill \normref{Kap. 9.2.16}
+\begin{equation*}
+b_{\gamma} = e^{-0.047 \cdot \alpha \cdot \tan \varphi_{eff}} = e^{-0.047 \cdot 0{}^{\circ} \cdot \tan 23.9{}^{\circ}} = 1
+\end{equation*}
+\hinweis{Annahme}{b\_γ mit tan φ wie in Tabelle 9.2.18 -- im Text des Kapitels steht tan α; die Tabelle und die Formel für b\_q rechnen mit tan φ.}
+\subsubsection{Grundbruch – Tragsicherheit}
+\noindent\textbf{Neigung der Last} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+\delta_R = \arctan\frac{T_{Ed}}{N_{Ed}} = \arctan\frac{80\,\mathrm{kN}}{2000\,\mathrm{kN}} = 2.3{}^{\circ}
+\end{equation*}
+\noindent\textbf{Lastneigungsfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+\begin{aligned}
+  i_q &= \left[1 - \frac{0.5 \cdot T_{Ed}}{N_{Ed} + b \cdot L \cdot c_{eff} \cdot \cot \varphi_{eff}}\right]^{5} \\
+  &= \left[1 - \frac{0.5 \cdot 80\,\mathrm{kN}}{2000\,\mathrm{kN} + 2\,\mathrm{m} \cdot 20\,\mathrm{m} \cdot 2\,\mathrm{kPa} \cdot \cot 23.9{}^{\circ}}\right]^{5} \\
+  &= 0.91
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Lastneigungsfaktor der Kohäsion} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+i_c = i_q - \frac{1 - i_q}{N_q - 1} = 0.91 - \frac{1 - 0.91}{9.5 - 1} = 0.9
+\end{equation*}
+\noindent\textbf{Lastneigungsfaktor des Gleitkörpergewichts} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+\begin{aligned}
+  i_{\gamma} &= \left[1 - \frac{\left(0.7 - \frac{\alpha}{450^\circ}\right) \cdot T_{Ed}}{N_{Ed} + b \cdot L \cdot c_{eff} \cdot \cot \varphi_{eff}}\right]^{5} \\
+  &= \left[1 - \frac{\left(0.7 - \frac{0{}^{\circ}}{450^\circ}\right) \cdot 80\,\mathrm{kN}}{2000\,\mathrm{kN} + 2\,\mathrm{m} \cdot 20\,\mathrm{m} \cdot 2\,\mathrm{kPa} \cdot \cot 23.9{}^{\circ}}\right]^{5} \\
+  &= 0.88
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Bruchspannung in der Sohle} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+\begin{aligned}
+  \sigma_f &= c_{eff} \cdot N_c \cdot s_c \cdot d_c \cdot i_c \cdot g_c \cdot b_c + \sigma_{v,0} \cdot N_q \cdot s_q \cdot d_q \cdot i_q \cdot g_q \cdot b_q + \tfrac{1}{2} \cdot \gamma_G \cdot b \cdot N_{\gamma} \cdot s_{\gamma} \cdot 1 \cdot i_{\gamma} \cdot g_q \cdot b_{\gamma} \\
+  &= 2\,\mathrm{kPa} \cdot 19.19 \cdot 1.05 \cdot 1.26 \cdot 0.9 \cdot 1 \cdot 1 + 31.5\,\mathrm{kPa} \cdot 9.5 \cdot 1.04 \cdot 1.2 \cdot 0.91 \cdot 1 \cdot 1 + \tfrac{1}{2} \cdot 11\,\mathrm{kN}/\mathrm{m}^{3} \cdot 2\,\mathrm{m} \cdot 6.78 \cdot 0.96 \cdot 1 \cdot 0.88 \cdot 1 \cdot 1 \\
+  &= 451.1\,\mathrm{kPa}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Grundbruchwiderstand} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+N_{Rd} = \sigma_f \cdot b \cdot L = 451.1\,\mathrm{kPa} \cdot 2\,\mathrm{m} \cdot 20\,\mathrm{m} = 18045.2\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Einwirkung gegen Widerstand}
+\begin{equation*}
+N_{Ed} = 2000\,\mathrm{kN} \quad \le \quad N_{Rd} = 18045.2\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,GB,\text{Tragsicherheit}} = \frac{N_{Rd}}{N_{Ed}} = \frac{18045.2\,\mathrm{kN}}{2000\,\mathrm{kN}} = 9.02 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\noindent\textbf{Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ*/φ}
+\begin{equation*}
+k_{\delta} = 1
+\end{equation*}
+\subsection{Gleiten}
+\noindent\textbf{Reibungswinkel der Sohlfuge} \hfill \normref{Kap. 9.2.18}
+\begin{equation*}
+\delta^{*} = k_{\delta} \cdot \varphi_{eff} = 1 \cdot 23.9{}^{\circ} = 23.9{}^{\circ}
+\end{equation*}
+\subsubsection{Gleiten – Tragsicherheit}
+\noindent\textbf{Gleitwiderstand} \hfill \normref{Kap. 9.2.18}
+\begin{equation*}
+T_{Rd} = N_{Ed} \cdot \tan \delta^{*} = 2000\,\mathrm{kN} \cdot \tan 23.9{}^{\circ} = 886.2\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Einwirkung gegen Widerstand}
+\begin{equation*}
+T_{Ed} = 80\,\mathrm{kN} \quad \le \quad T_{Rd} = 886.2\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,GL,\text{Tragsicherheit}} = \frac{T_{Rd}}{T_{Ed}} = \frac{886.2\,\mathrm{kN}}{80\,\mathrm{kN}} = 11.08 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsection{Grundbruch: Seeton}
+\noindent\textbf{Reibungswinkel, charakteristisch}
+\begin{equation*}
+\varphi_k = 0{}^{\circ}
+\end{equation*}
+\noindent\textbf{Partialfaktor des Reibungswinkels} \hfill \normref{SIA 267:2013, 5.3.2.2}
+\begin{equation*}
+\gamma_{\varphi} = 1.2
+\end{equation*}
+\noindent\textbf{Reibungswinkel, Bemessungswert} \hfill \normref{SIA 267:2013, 5.3.2.1}
+\begin{equation*}
+\varphi_{eff} = \arctan\left(\frac{\tan \varphi_k}{\gamma_{\varphi}}\right) = \arctan\left(\frac{\tan 0{}^{\circ}}{1.2}\right) = 0{}^{\circ}
+\end{equation*}
+\noindent\textbf{Kohäsion, charakteristisch}
+\begin{equation*}
+c_k = 40\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Partialfaktor der Kohäsion}
+\begin{equation*}
+\gamma_c = 1.5
+\end{equation*}
+\noindent\textbf{Kohäsion, Bemessungswert}
+\begin{equation*}
+c_{eff} = \frac{c_k}{\gamma_c} = \frac{40\,\mathrm{kPa}}{1.5} = 26.7\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Raumlast des Bodens}
+\begin{equation*}
+\gamma = 21\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Raumlast des Wassers}
+\begin{equation*}
+\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Raumlast des Bodens unter Auftrieb}
+\begin{equation*}
+\gamma' = \gamma - \gamma_w = 21\,\mathrm{kN}/\mathrm{m}^{3} - 10\,\mathrm{kN}/\mathrm{m}^{3} = 11\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Bemessungslast neben dem Fundament}
+\begin{equation*}
+q_{Ed} = 0\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Breite des Fundaments}
+\begin{equation*}
+b = 1.5\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Länge des Fundaments}
+\begin{equation*}
+L = 2\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Tiefe des höchsten Grundwasserspiegels unter Terrain}
+\begin{equation*}
+t_1 = 0\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Tiefe der Sohle unter Terrain}
+\begin{equation*}
+t = 0.8\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Neigung der Sohle}
+\begin{equation*}
+\alpha = 4{}^{\circ}
+\end{equation*}
+\noindent\textbf{Neigung des Geländes}
+\begin{equation*}
+\beta = 10{}^{\circ}
+\end{equation*}
+\subsection{Grundbruch}
+\noindent\textbf{Tragfähigkeitsformel undrainiert} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+\sigma_f = 5.1 \, s_u \left(1 + s_c + d_c - i_c - b_c - g_c\right) + \left(\gamma t + q\right) \qquad N_{Rd} = \sigma_f \cdot b \cdot L
+\end{equation*}
+Mit φ = 0 ist c\_eff die undrainierte Scherfestigkeit s\_u.
+
+\noindent\textbf{Formfaktor, undrainiert} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+s_c = 0.2 \cdot \frac{b}{L} = 0.2 \cdot \frac{1.5\,\mathrm{m}}{2\,\mathrm{m}} = 0.15
+\end{equation*}
+\noindent\textbf{Tiefenfaktor, undrainiert, t < b} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+d_c = 0.4 \cdot \frac{t}{b} = 0.4 \cdot \frac{0.8\,\mathrm{m}}{1.5\,\mathrm{m}} = 0.21
+\end{equation*}
+\noindent\textbf{Geländeneigungsfaktor, undrainiert} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+g_c = \frac{\beta}{147^\circ} = \frac{10{}^{\circ}}{147^\circ} = 0.07
+\end{equation*}
+\noindent\textbf{Sohlneigungsfaktor, undrainiert} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+b_c = \frac{\alpha}{147^\circ} = \frac{4{}^{\circ}}{147^\circ} = 0.03
+\end{equation*}
+\noindent\textbf{Überlagerung auf Höhe der Sohle, totale Spannung} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+\sigma_{v,0} = \gamma \cdot t + q_{Ed} = 21\,\mathrm{kN}/\mathrm{m}^{3} \cdot 0.8\,\mathrm{m} + 0\,\mathrm{kPa} = 16.8\,\mathrm{kPa}
+\end{equation*}
+\subsubsection{Grundbruch – Normal}
+\noindent\textbf{Lastneigungsfaktor, undrainiert} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+i_c = 0.5 - \frac{1}{2} \sqrt{1 - \frac{T_{Ed}}{c_{eff} \cdot b \cdot L}} = 0.5 - \frac{1}{2} \sqrt{1 - \frac{40\,\mathrm{kN}}{26.7\,\mathrm{kPa} \cdot 1.5\,\mathrm{m} \cdot 2\,\mathrm{m}}} = 0.15
+\end{equation*}
+\noindent\textbf{Bruchspannung in der Sohle, undrainiert} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+\begin{aligned}
+  \sigma_f &= 5.1 \cdot c_{eff} \cdot \left(1 + s_c + d_c - i_c - b_c - g_c\right) + \sigma_{v,0} \\
+  &= 5.1 \cdot 26.7\,\mathrm{kPa} \cdot \left(1 + 0.15 + 0.21 - 0.15 - 0.03 - 0.07\right) + 16.8\,\mathrm{kPa} \\
+  &= 169.3\,\mathrm{kPa}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Grundbruchwiderstand} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+N_{Rd} = \sigma_f \cdot b \cdot L = 169.3\,\mathrm{kPa} \cdot 1.5\,\mathrm{m} \cdot 2\,\mathrm{m} = 508\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Einwirkung gegen Widerstand}
+\begin{equation*}
+N_{Ed} = 300\,\mathrm{kN} \quad \le \quad N_{Rd} = 508\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,GB,\text{Normal}} = \frac{N_{Rd}}{N_{Ed}} = \frac{508\,\mathrm{kN}}{300\,\mathrm{kN}} = 1.69 \quad \Rightarrow \quad \text{erfüllt}
+\end{equation*}
+\subsubsection{Grundbruch – Zu schräg}
+T\_Ed > s\_u · b · L: die Last ist zu stark geneigt, der Lastneigungsfaktor ist nicht bestimmt -- kein Grundbruchwiderstand.
+
+\noindent\textbf{Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ*/φ}
+\begin{equation*}
+k_{\delta} = 1
+\end{equation*}
+\subsection{Gleiten}
+\noindent\textbf{Reibungswinkel der Sohlfuge} \hfill \normref{Kap. 9.2.18}
+\begin{equation*}
+\delta^{*} = k_{\delta} \cdot \varphi_{eff} = 1 \cdot 0{}^{\circ} = 0{}^{\circ}
+\end{equation*}
+Mit φ = 0 gibt die Reibung in der Sohle keinen Widerstand; eine Haftung zählt nach dem Kapitel nicht.
+
+\subsubsection{Gleiten – Normal}
+\noindent\textbf{Gleitwiderstand} \hfill \normref{Kap. 9.2.18}
+\begin{equation*}
+T_{Rd} = N_{Ed} \cdot \tan \delta^{*} = 300\,\mathrm{kN} \cdot \tan 0{}^{\circ} = 0\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Einwirkung gegen Widerstand}
+\begin{equation*}
+T_{Ed} = 40\,\mathrm{kN} \quad > \quad T_{Rd} = 0\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,GL,\text{Normal}} = \frac{T_{Rd}}{T_{Ed}} = \frac{0\,\mathrm{kN}}{40\,\mathrm{kN}} = 0.00 \quad \Rightarrow \quad \text{NICHT erfüllt}
+\end{equation*}
+\subsubsection{Gleiten – Zu schräg}
+\noindent\textbf{Gleitwiderstand} \hfill \normref{Kap. 9.2.18}
+\begin{equation*}
+T_{Rd} = N_{Ed} \cdot \tan \delta^{*} = 300\,\mathrm{kN} \cdot \tan 0{}^{\circ} = 0\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Einwirkung gegen Widerstand}
+\begin{equation*}
+T_{Ed} = 200\,\mathrm{kN} \quad > \quad T_{Rd} = 0\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,GL,\text{Zu schräg}} = \frac{T_{Rd}}{T_{Ed}} = \frac{0\,\mathrm{kN}}{200\,\mathrm{kN}} = 0.00 \quad \Rightarrow \quad \text{NICHT erfüllt}
+\end{equation*}
+\subsection{Grundbruch: Schacht}
+\noindent\textbf{Reibungswinkel, charakteristisch}
+\begin{equation*}
+\varphi_k = 0{}^{\circ}
+\end{equation*}
+\noindent\textbf{Partialfaktor des Reibungswinkels} \hfill \normref{SIA 267:2013, 5.3.2.2}
+\begin{equation*}
+\gamma_{\varphi} = 1.2
+\end{equation*}
+\noindent\textbf{Reibungswinkel, Bemessungswert} \hfill \normref{SIA 267:2013, 5.3.2.1}
+\begin{equation*}
+\varphi_{eff} = \arctan\left(\frac{\tan \varphi_k}{\gamma_{\varphi}}\right) = \arctan\left(\frac{\tan 0{}^{\circ}}{1.2}\right) = 0{}^{\circ}
+\end{equation*}
+\noindent\textbf{Kohäsion, charakteristisch}
+\begin{equation*}
+c_k = 60\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Partialfaktor der Kohäsion}
+\begin{equation*}
+\gamma_c = 1.5
+\end{equation*}
+\noindent\textbf{Kohäsion, Bemessungswert}
+\begin{equation*}
+c_{eff} = \frac{c_k}{\gamma_c} = \frac{60\,\mathrm{kPa}}{1.5} = 40\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Raumlast des Bodens}
+\begin{equation*}
+\gamma = 21\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Raumlast des Wassers}
+\begin{equation*}
+\gamma_w = 10\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Raumlast des Bodens unter Auftrieb}
+\begin{equation*}
+\gamma' = \gamma - \gamma_w = 21\,\mathrm{kN}/\mathrm{m}^{3} - 10\,\mathrm{kN}/\mathrm{m}^{3} = 11\,\mathrm{kN}/\mathrm{m}^{3}
+\end{equation*}
+\noindent\textbf{Bemessungslast neben dem Fundament}
+\begin{equation*}
+q_{Ed} = 0\,\mathrm{kPa}
+\end{equation*}
+\noindent\textbf{Breite des Fundaments}
+\begin{equation*}
+b = 1.2\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Länge des Fundaments}
+\begin{equation*}
+L = 1.2\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Tiefe des höchsten Grundwasserspiegels unter Terrain}
+\begin{equation*}
+t_1 = 0\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Tiefe der Sohle unter Terrain}
+\begin{equation*}
+t = 2\,\mathrm{m}
+\end{equation*}
+\noindent\textbf{Neigung der Sohle}
+\begin{equation*}
+\alpha = 0{}^{\circ}
+\end{equation*}
+\noindent\textbf{Neigung des Geländes}
+\begin{equation*}
+\beta = 0{}^{\circ}
+\end{equation*}
+\subsection{Grundbruch}
+\noindent\textbf{Tragfähigkeitsformel undrainiert} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+\sigma_f = 5.1 \, s_u \left(1 + s_c + d_c - i_c - b_c - g_c\right) + \left(\gamma t + q\right) \qquad N_{Rd} = \sigma_f \cdot b \cdot L
+\end{equation*}
+Mit φ = 0 ist c\_eff die undrainierte Scherfestigkeit s\_u.
+
+\noindent\textbf{Formfaktor, undrainiert} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+s_c = 0.2 \cdot \frac{b}{L} = 0.2 \cdot \frac{1.2\,\mathrm{m}}{1.2\,\mathrm{m}} = 0.2
+\end{equation*}
+\noindent\textbf{Winkel der Einbindetiefe, in Grad} \hfill \normref{Kap. 9.2.13}
+\begin{equation*}
+\vartheta_t = \arctan\frac{t}{b} = \arctan\frac{2\,\mathrm{m}}{1.2\,\mathrm{m}} = 59{}^{\circ}
+\end{equation*}
+\noindent\textbf{Tiefenfaktor, undrainiert, t ≥ b} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+d_c = 0.007 \cdot \vartheta_t = 0.007 \cdot 59{}^{\circ} = 0.41
+\end{equation*}
+\noindent\textbf{Geländeneigungsfaktor, undrainiert} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+g_c = \frac{\beta}{147^\circ} = \frac{0{}^{\circ}}{147^\circ} = 0
+\end{equation*}
+\noindent\textbf{Sohlneigungsfaktor, undrainiert} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+b_c = \frac{\alpha}{147^\circ} = \frac{0{}^{\circ}}{147^\circ} = 0
+\end{equation*}
+\noindent\textbf{Überlagerung auf Höhe der Sohle, totale Spannung} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+\sigma_{v,0} = \gamma \cdot t + q_{Ed} = 21\,\mathrm{kN}/\mathrm{m}^{3} \cdot 2\,\mathrm{m} + 0\,\mathrm{kPa} = 42\,\mathrm{kPa}
+\end{equation*}
+\subsubsection{Grundbruch – Tragsicherheit}
+\noindent\textbf{Lastneigungsfaktor, undrainiert} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+i_c = 0.5 - \frac{1}{2} \sqrt{1 - \frac{T_{Ed}}{c_{eff} \cdot b \cdot L}} = 0.5 - \frac{1}{2} \sqrt{1 - \frac{30\,\mathrm{kN}}{40\,\mathrm{kPa} \cdot 1.2\,\mathrm{m} \cdot 1.2\,\mathrm{m}}} = 0.15
+\end{equation*}
+\noindent\textbf{Bruchspannung in der Sohle, undrainiert} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+\begin{aligned}
+  \sigma_f &= 5.1 \cdot c_{eff} \cdot \left(1 + s_c + d_c - i_c - b_c - g_c\right) + \sigma_{v,0} \\
+  &= 5.1 \cdot 40\,\mathrm{kPa} \cdot \left(1 + 0.2 + 0.41 - 0.15 - 0 - 0\right) + 42\,\mathrm{kPa} \\
+  &= 339.7\,\mathrm{kPa}
+\end{aligned}
+\end{equation*}
+\noindent\textbf{Grundbruchwiderstand} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+N_{Rd} = \sigma_f \cdot b \cdot L = 339.7\,\mathrm{kPa} \cdot 1.2\,\mathrm{m} \cdot 1.2\,\mathrm{m} = 489.2\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Einwirkung gegen Widerstand}
+\begin{equation*}
+N_{Ed} = 900\,\mathrm{kN} \quad > \quad N_{Rd} = 489.2\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,GB,\text{Tragsicherheit}} = \frac{N_{Rd}}{N_{Ed}} = \frac{489.2\,\mathrm{kN}}{900\,\mathrm{kN}} = 0.54 \quad \Rightarrow \quad \text{NICHT erfüllt}
+\end{equation*}
+\noindent\textbf{Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ*/φ}
+\begin{equation*}
+k_{\delta} = 1
+\end{equation*}
+\subsection{Gleiten}
+\noindent\textbf{Reibungswinkel der Sohlfuge} \hfill \normref{Kap. 9.2.18}
+\begin{equation*}
+\delta^{*} = k_{\delta} \cdot \varphi_{eff} = 1 \cdot 0{}^{\circ} = 0{}^{\circ}
+\end{equation*}
+Mit φ = 0 gibt die Reibung in der Sohle keinen Widerstand; eine Haftung zählt nach dem Kapitel nicht.
+
+\subsubsection{Gleiten – Tragsicherheit}
+\noindent\textbf{Gleitwiderstand} \hfill \normref{Kap. 9.2.18}
+\begin{equation*}
+T_{Rd} = N_{Ed} \cdot \tan \delta^{*} = 900\,\mathrm{kN} \cdot \tan 0{}^{\circ} = 0\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Einwirkung gegen Widerstand}
+\begin{equation*}
+T_{Ed} = 30\,\mathrm{kN} \quad > \quad T_{Rd} = 0\,\mathrm{kN}
+\end{equation*}
+\noindent\textbf{Erfüllungsgrad}
+\begin{equation*}
+\alpha_{eff,GL,\text{Tragsicherheit}} = \frac{T_{Rd}}{T_{Ed}} = \frac{0\,\mathrm{kN}}{30\,\mathrm{kN}} = 0.00 \quad \Rightarrow \quad \text{NICHT erfüllt}
+\end{equation*}
 \subsection{Balkensystem: Alles einmal}
 \noindent\textbf{Querschnittsfläche, «Balken 300×500» (Rechteck)}
 \begin{equation*}
@@ -5645,6 +6710,175 @@ W = \frac{I_y \cdot I_z - I_{yz}^{2}}{I_{yz} \cdot z' - I_y \cdot y'}
 \begin{equation*}
 W = \frac{I_y \cdot I_z - I_{yz}^{2}}{I_y \cdot y' - I_{yz} \cdot z'}
 \end{equation*}
+\subsection{Fundament}
+\noindent\textbf{Reibungswinkel, Bemessungswert} \hfill \normref{SIA 267:2013, 5.3.2.1}
+\begin{equation*}
+\varphi_{eff} = \arctan\left(\frac{\tan \varphi_k}{\gamma_{\varphi}}\right)
+\end{equation*}
+\noindent\textbf{Kohäsion, Bemessungswert}
+\begin{equation*}
+c_{eff} = \frac{c_k}{\gamma_c}
+\end{equation*}
+\noindent\textbf{Raumlast des Bodens unter Auftrieb}
+\begin{equation*}
+\gamma' = \gamma - \gamma_w
+\end{equation*}
+\subsection{Grundbruch}
+Unter der Sohle bildet sich beim Grundbruch ein Gleitkörper, der den Boden seitlich hinaus und nach oben drückt. Die erweiterte Tragfähigkeitsformel setzt seinen Widerstand aus drei Teilen zusammen: der Kohäsion, der seitlichen Auflast neben dem Fundament und dem Gewicht des Gleitkörpers -- je mit einem Tragfähigkeitsfaktor und den Korrekturen für Form, Tiefe, Lastneigung, Geländeneigung und Sohlneigung.
+
+Wird ein gesättigter Ton schnell belastet, kann das Porenwasser nicht entweichen: es gilt φ = 0, und an die Stelle der Kohäsion tritt die undrainierte Scherfestigkeit s\_u. Die Korrekturen stehen dann nicht als Faktoren, sondern als Summanden in der Klammer.
+
+\noindent\textbf{Erweiterte Tragfähigkeitsformel} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+\sigma_f = c \, N_c s_c d_c i_c g_c b_c + \sigma_{v,0} \, N_q s_q d_q i_q g_q b_q + \tfrac{1}{2} \gamma_G \, b \, N_{\gamma} s_{\gamma} d_{\gamma} i_{\gamma} g_{\gamma} b_{\gamma} \qquad N_{Rd} = \sigma_f \cdot b \cdot L
+\end{equation*}
+\noindent\textbf{Tragfähigkeitsfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.6}
+\begin{equation*}
+N_q = e^{\pi \tan \varphi_{eff}} \cdot \tan^{2}\left(45^\circ + \frac{\varphi_{eff}}{2}\right)
+\end{equation*}
+\noindent\textbf{Tragfähigkeitsfaktor der Kohäsion} \hfill \normref{Kap. 9.2.6}
+\begin{equation*}
+N_c = \frac{N_q - 1}{\tan \varphi_{eff}}
+\end{equation*}
+\noindent\textbf{Tragfähigkeitsfaktor des Gleitkörpergewichts} \hfill \normref{Kap. 9.2.6}
+\begin{equation*}
+N_{\gamma} = 1.8 \cdot \left(N_q - 1\right) \cdot \tan \varphi_{eff}
+\end{equation*}
+\noindent\textbf{Reichweite des Gleitkörpers} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+L_{Gl} = b \cdot \tan\left(45^\circ + \frac{\varphi_{eff}}{2}\right) \cdot e^{\frac{\pi}{2} \tan \varphi_{eff}}
+\end{equation*}
+\noindent\textbf{Tiefe des Gleitkörpers} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+H_{Gl} = b \cdot \frac{\cos \varphi_{eff}}{2 \cos\left(45^\circ + \frac{\varphi_{eff}}{2}\right)} \cdot e^{\frac{\pi}{180^\circ}\left(45^\circ + \frac{\varphi_{eff}}{2}\right) \tan \varphi_{eff}}
+\end{equation*}
+\noindent\textbf{Überlagerung auf Höhe der Sohle, Grundwasser tiefer} \hfill \normref{Kap. 9.2.8}
+\begin{equation*}
+\sigma_{v,0} = \gamma \cdot t + q_{Ed}
+\end{equation*}
+\noindent\textbf{Abstand des Grundwassers unter der Sohle} \hfill \normref{Kap. 9.2.8}
+\begin{equation*}
+T = t_1 - t
+\end{equation*}
+\noindent\textbf{Raumlast im Gleitkörper, unter Wasser} \hfill \normref{Kap. 9.2.8}
+\begin{equation*}
+\gamma_G = \gamma'
+\end{equation*}
+\noindent\textbf{Formfaktor der Kohäsion} \hfill \normref{Kap. 9.2.12}
+\begin{equation*}
+s_c = 1 + \frac{b}{L} \cdot \frac{N_q}{N_c}
+\end{equation*}
+\noindent\textbf{Formfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.12}
+\begin{equation*}
+s_q = 1 + \frac{b}{L} \cdot \tan \varphi_{eff}
+\end{equation*}
+\noindent\textbf{Formfaktor des Gleitkörpergewichts} \hfill \normref{Kap. 9.2.12}
+\begin{equation*}
+s_{\gamma} = 1 - 0.4 \cdot \frac{b}{L}
+\end{equation*}
+\noindent\textbf{Winkel der Einbindetiefe, in Grad} \hfill \normref{Kap. 9.2.13}
+\begin{equation*}
+\vartheta_t = \arctan\frac{t}{b}
+\end{equation*}
+\noindent\textbf{Tiefenfaktor der Kohäsion} \hfill \normref{Kap. 9.2.13}
+\begin{equation*}
+d_c = 1 + 0.007 \cdot \vartheta_t
+\end{equation*}
+\noindent\textbf{Tiefenfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.13}
+\begin{equation*}
+d_q = 1 + 0.035 \cdot \tan \varphi_{eff} \cdot \left(1 - \sin \varphi_{eff}\right)^{2} \cdot \vartheta_t
+\end{equation*}
+\noindent\textbf{Geländeneigungsfaktor der Kohäsion} \hfill \normref{Kap. 9.2.15}
+\begin{equation*}
+g_c = 1 - \frac{\beta}{147^\circ}
+\end{equation*}
+\noindent\textbf{Geländeneigungsfaktor der Auflast und des Gleitkörpers} \hfill \normref{Kap. 9.2.15}
+\begin{equation*}
+g_q = \left(1 - 0.5 \cdot \tan \beta\right)^{5}
+\end{equation*}
+\noindent\textbf{Sohlneigungsfaktor der Kohäsion} \hfill \normref{Kap. 9.2.16}
+\begin{equation*}
+b_c = 1 - \frac{\alpha}{147^\circ}
+\end{equation*}
+\noindent\textbf{Sohlneigungsfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.16}
+\begin{equation*}
+b_q = e^{-0.035 \cdot \alpha \cdot \tan \varphi_{eff}}
+\end{equation*}
+\noindent\textbf{Sohlneigungsfaktor des Gleitkörpergewichts} \hfill \normref{Kap. 9.2.16}
+\begin{equation*}
+b_{\gamma} = e^{-0.047 \cdot \alpha \cdot \tan \varphi_{eff}}
+\end{equation*}
+\noindent\textbf{Neigung der Last} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+\delta_R = \arctan\frac{T_{Ed}}{N_{Ed}}
+\end{equation*}
+\noindent\textbf{Lastneigungsfaktor der seitlichen Auflast} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+i_q = \left[1 - \frac{0.5 \cdot T_{Ed}}{N_{Ed} + b \cdot L \cdot c_{eff} \cdot \cot \varphi_{eff}}\right]^{5}
+\end{equation*}
+\noindent\textbf{Lastneigungsfaktor der Kohäsion} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+i_c = i_q - \frac{1 - i_q}{N_q - 1}
+\end{equation*}
+\noindent\textbf{Lastneigungsfaktor des Gleitkörpergewichts} \hfill \normref{Kap. 9.2.14}
+\begin{equation*}
+i_{\gamma} = \left[1 - \frac{\left(0.7 - \frac{\alpha}{450^\circ}\right) \cdot T_{Ed}}{N_{Ed} + b \cdot L \cdot c_{eff} \cdot \cot \varphi_{eff}}\right]^{5}
+\end{equation*}
+\noindent\textbf{Bruchspannung in der Sohle} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+\sigma_f = c_{eff} \cdot N_c \cdot s_c \cdot d_c \cdot i_c \cdot g_c \cdot b_c + \sigma_{v,0} \cdot N_q \cdot s_q \cdot d_q \cdot i_q \cdot g_q \cdot b_q + \tfrac{1}{2} \cdot \gamma_G \cdot b \cdot N_{\gamma} \cdot s_{\gamma} \cdot 1 \cdot i_{\gamma} \cdot g_q \cdot b_{\gamma}
+\end{equation*}
+\noindent\textbf{Grundbruchwiderstand} \hfill \normref{Kap. 9.2.10}
+\begin{equation*}
+N_{Rd} = \sigma_f \cdot b \cdot L
+\end{equation*}
+\noindent\textbf{Überlagerung auf Höhe der Sohle, Lage 1: Grundwasser über der Sohle} \hfill \normref{Kap. 9.2.8}
+\begin{equation*}
+\sigma_{v,0} = \gamma \cdot t_1 + \gamma' \cdot \left(t - t_1\right) + q_{Ed}
+\end{equation*}
+\noindent\textbf{Tragfähigkeitsformel undrainiert} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+\sigma_f = 5.1 \, s_u \left(1 + s_c + d_c - i_c - b_c - g_c\right) + \left(\gamma t + q\right) \qquad N_{Rd} = \sigma_f \cdot b \cdot L
+\end{equation*}
+\noindent\textbf{Formfaktor, undrainiert} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+s_c = 0.2 \cdot \frac{b}{L}
+\end{equation*}
+\noindent\textbf{Tiefenfaktor, undrainiert, t < b} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+d_c = 0.4 \cdot \frac{t}{b}
+\end{equation*}
+\noindent\textbf{Geländeneigungsfaktor, undrainiert} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+g_c = \frac{\beta}{147^\circ}
+\end{equation*}
+\noindent\textbf{Sohlneigungsfaktor, undrainiert} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+b_c = \frac{\alpha}{147^\circ}
+\end{equation*}
+\noindent\textbf{Lastneigungsfaktor, undrainiert} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+i_c = 0.5 - \frac{1}{2} \sqrt{1 - \frac{T_{Ed}}{c_{eff} \cdot b \cdot L}}
+\end{equation*}
+\noindent\textbf{Bruchspannung in der Sohle, undrainiert} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+\sigma_f = 5.1 \cdot c_{eff} \cdot \left(1 + s_c + d_c - i_c - b_c - g_c\right) + \sigma_{v,0}
+\end{equation*}
+\noindent\textbf{Tiefenfaktor, undrainiert, t ≥ b} \hfill \normref{Kap. 9.2.17}
+\begin{equation*}
+d_c = 0.007 \cdot \vartheta_t
+\end{equation*}
+\subsection{Gleiten}
+Die Kraft T in der Sohle muss durch Reibung zwischen Fundament und Boden aufgenommen werden. Der Reibungswinkel δ* der Sohlfuge liegt meist zwischen 2/3 φ und φ; ein Erdwiderstand vor dem Fundament wird nicht angesetzt.
+
+\noindent\textbf{Reibungswinkel der Sohlfuge} \hfill \normref{Kap. 9.2.18}
+\begin{equation*}
+\delta^{*} = k_{\delta} \cdot \varphi_{eff}
+\end{equation*}
+\noindent\textbf{Gleitwiderstand} \hfill \normref{Kap. 9.2.18}
+\begin{equation*}
+T_{Rd} = N_{Ed} \cdot \tan \delta^{*}
+\end{equation*}
 \subsection{Stabquerschnitte}
 \noindent\textbf{Querschnittsfläche, «Balken 300×500» (Rechteck)}
 \begin{equation*}
@@ -6020,6 +7254,160 @@ Knicken & Stütze & $N_{Rd,K} = 3032.2\,\mathrm{kN}$ & $N_{Ed} = 1500.0\,\mathrm
 Knicken & Seitlich & $N_{Rd,K} = 3266.6\,\mathrm{kN}$ & $N_{Ed} = 1200.0\,\mathrm{kN}$ & $2.72$ \\
 \hline
 \end{xltabular}
+\subsection{Hang}
+\noindent\textbf{Angaben zum Fundament}
+\begin{equation*}
+\begin{aligned} & \varphi_{eff} = 28.42{}^{\circ} \qquad c_{eff} = 4\,\mathrm{kPa} \qquad \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3} \qquad \gamma' = 11\,\mathrm{kN}/\mathrm{m}^{3} \\ & b = 1.6\,\mathrm{m} \qquad L = 4\,\mathrm{m} \qquad t = 0.8\,\mathrm{m} \qquad t_1 = 2\,\mathrm{m} \end{aligned}
+\end{equation*}
+\noindent\textbf{Tragfähigkeitsfaktoren}
+\begin{longtable}{lrlrlr}
+\hline
+Kohäsion &  & Seitliche Auflast &  & Gewicht Gleitkörper &  \\
+\hline
+\endhead
+$N_{c}$ & $26.64$ & $N_{q}$ & $15.42$ & $N_{\gamma}$ & $14.05$ \\
+$s_{c}$ & $1.23$ & $s_{q}$ & $1.22$ & $s_{\gamma}$ & $0.84$ \\
+$d_{c}$ & $1.19$ & $d_{q}$ & $1.14$ & $d_{\gamma}$ & $1.00$ \\
+$i_{c,\ \text{Normal}}$ & $0.70$ & $i_{q,\ \text{Normal}}$ & $0.72$ & $i_{\gamma,\ \text{Normal}}$ & $0.63$ \\
+$i_{c,\ \text{Steil}}$ & $-0.07$ & $i_{q,\ \text{Steil}}$ & $0.00$ & $i_{\gamma,\ \text{Steil}}$ & $0.00$ \\
+$g_{c}$ & $0.90$ & $g_{q}$ & $0.49$ & $g_{\gamma}$ & $0.49$ \\
+$b'_{c}$ & $0.97$ & $b'_{q}$ & $0.91$ & $b'_{\gamma}$ & $0.88$ \\
+\hline
+\end{longtable}
+\begin{xltabular}{\linewidth}{>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}Xrrr}
+\hline
+Nachweis & Bezeichnung & Widerstand & Einwirkung & $\alpha_{eff}$ \\
+\hline
+\endhead
+Grundbruch & Normal & $N_{Rd} = 1956.7\,\mathrm{kN}$ & $N_{Ed} = 900.0\,\mathrm{kN}$ & $2.17$ \\
+Grundbruch & Steil & $N_{Rd} = 0.0\,\mathrm{kN}$ & $N_{Ed} = 150.0\,\mathrm{kN}$ & $0.00$ \\
+Gleiten & Normal & $T_{Rd} = 310.6\,\mathrm{kN}$ & $T_{Ed} = 120.0\,\mathrm{kN}$ & $2.59$ \\
+Gleiten & Steil & $T_{Rd} = 51.8\,\mathrm{kN}$ & $T_{Ed} = 300.0\,\mathrm{kN}$ & $0.17$ \\
+\hline
+\end{xltabular}
+\hinweis{Warnung}{Grundbruch – Steil: nicht erfüllt. N\_Rd = 0 kN < N\_Ed = 150 kN.}
+\hinweis{Warnung}{Gleiten – Steil: nicht erfüllt. T\_Rd = 51.8 kN < T\_Ed = 300 kN.}
+\subsection{Ufer}
+\noindent\textbf{Angaben zum Fundament}
+\begin{equation*}
+\begin{aligned} & \varphi_{eff} = 25.69{}^{\circ} \qquad c_{eff} = 0\,\mathrm{kPa} \qquad \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3} \qquad \gamma' = 11\,\mathrm{kN}/\mathrm{m}^{3} \\ & b = 1.5\,\mathrm{m} \qquad L = 1.5\,\mathrm{m} \qquad t = 1\,\mathrm{m} \qquad t_1 = 0.4\,\mathrm{m} \end{aligned}
+\end{equation*}
+\noindent\textbf{Tragfähigkeitsfaktoren}
+\begin{longtable}{lrlrlr}
+\hline
+Kohäsion &  & Seitliche Auflast &  & Gewicht Gleitkörper &  \\
+\hline
+\endhead
+$N_{c}$ & $21.77$ & $N_{q}$ & $11.47$ & $N_{\gamma}$ & $9.07$ \\
+$s_{c}$ & $1.53$ & $s_{q}$ & $1.48$ & $s_{\gamma}$ & $0.60$ \\
+$d_{c}$ & $1.24$ & $d_{q}$ & $1.18$ & $d_{\gamma}$ & $1.00$ \\
+$i_{c}$ & $0.79$ & $i_{q}$ & $0.81$ & $i_{\gamma}$ & $0.74$ \\
+$g_{c}$ & $1.00$ & $g_{q}$ & $1.00$ & $g_{\gamma}$ & $1.00$ \\
+$b'_{c}$ & $1.00$ & $b'_{q}$ & $1.00$ & $b'_{\gamma}$ & $1.00$ \\
+\hline
+\end{longtable}
+\begin{xltabular}{\linewidth}{>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}Xrrr}
+\hline
+Nachweis & Bezeichnung & Widerstand & Einwirkung & $\alpha_{eff}$ \\
+\hline
+\endhead
+Grundbruch & Tragsicherheit & $N_{Rd} = 622.8\,\mathrm{kN}$ & $N_{Ed} = 1200.0\,\mathrm{kN}$ & $0.52$ \\
+Gleiten & Tragsicherheit & $T_{Rd} = 577.4\,\mathrm{kN}$ & $T_{Ed} = 100.0\,\mathrm{kN}$ & $5.77$ \\
+\hline
+\end{xltabular}
+\hinweis{Warnung}{Grundbruch – Tragsicherheit: nicht erfüllt. N\_Rd = 622.8 kN < N\_Ed = 1200 kN.}
+\subsection{Kai}
+\noindent\textbf{Angaben zum Fundament}
+\begin{equation*}
+\begin{aligned} & \varphi_{eff} = 23.9{}^{\circ} \qquad c_{eff} = 2\,\mathrm{kPa} \qquad \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3} \qquad \gamma' = 11\,\mathrm{kN}/\mathrm{m}^{3} \\ & b = 2\,\mathrm{m} \qquad L = 20\,\mathrm{m} \qquad t = 1.5\,\mathrm{m} \qquad t_1 = 1.5\,\mathrm{m} \end{aligned}
+\end{equation*}
+\noindent\textbf{Tragfähigkeitsfaktoren}
+\begin{longtable}{lrlrlr}
+\hline
+Kohäsion &  & Seitliche Auflast &  & Gewicht Gleitkörper &  \\
+\hline
+\endhead
+$N_{c}$ & $19.19$ & $N_{q}$ & $9.50$ & $N_{\gamma}$ & $6.78$ \\
+$s_{c}$ & $1.05$ & $s_{q}$ & $1.04$ & $s_{\gamma}$ & $0.96$ \\
+$d_{c}$ & $1.26$ & $d_{q}$ & $1.20$ & $d_{\gamma}$ & $1.00$ \\
+$i_{c}$ & $0.90$ & $i_{q}$ & $0.91$ & $i_{\gamma}$ & $0.88$ \\
+$g_{c}$ & $1.00$ & $g_{q}$ & $1.00$ & $g_{\gamma}$ & $1.00$ \\
+$b'_{c}$ & $1.00$ & $b'_{q}$ & $1.00$ & $b'_{\gamma}$ & $1.00$ \\
+\hline
+\end{longtable}
+\begin{xltabular}{\linewidth}{>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}Xrrr}
+\hline
+Nachweis & Bezeichnung & Widerstand & Einwirkung & $\alpha_{eff}$ \\
+\hline
+\endhead
+Grundbruch & Tragsicherheit & $N_{Rd} = 18045.2\,\mathrm{kN}$ & $N_{Ed} = 2000.0\,\mathrm{kN}$ & $9.02$ \\
+Gleiten & Tragsicherheit & $T_{Rd} = 886.2\,\mathrm{kN}$ & $T_{Ed} = 80.0\,\mathrm{kN}$ & $11.08$ \\
+\hline
+\end{xltabular}
+\subsection{Seeton}
+\noindent\textbf{Angaben zum Fundament}
+\begin{equation*}
+\begin{aligned} & \varphi_{eff} = 0{}^{\circ} \qquad c_{eff} = 26.7\,\mathrm{kPa} \qquad \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3} \qquad \gamma' = 11\,\mathrm{kN}/\mathrm{m}^{3} \\ & b = 1.5\,\mathrm{m} \qquad L = 2\,\mathrm{m} \qquad t = 0.8\,\mathrm{m} \qquad t_1 = 0\,\mathrm{m} \end{aligned}
+\end{equation*}
+\noindent\textbf{Tragfähigkeitsfaktoren}
+\begin{longtable}{lrlrlr}
+\hline
+Kohäsion &  & Seitliche Auflast &  & Gewicht Gleitkörper &  \\
+\hline
+\endhead
+$N_{c}$ & $5.10$ & – & – & – & – \\
+$s_{c}$ & $0.15$ & – & – & – & – \\
+$d_{c}$ & $0.21$ & – & – & – & – \\
+$i_{c,\ \text{Normal}}$ & $0.15$ & – & – & – & – \\
+$i_{c,\ \text{Zu schräg}}$ & – & – & – & – & – \\
+$g_{c}$ & $0.07$ & – & – & – & – \\
+$b'_{c}$ & $0.03$ & – & – & – & – \\
+\hline
+\end{longtable}
+\begin{xltabular}{\linewidth}{>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}Xrrr}
+\hline
+Nachweis & Bezeichnung & Widerstand & Einwirkung & $\alpha_{eff}$ \\
+\hline
+\endhead
+Grundbruch & Normal & $N_{Rd} = 508.0\,\mathrm{kN}$ & $N_{Ed} = 300.0\,\mathrm{kN}$ & $1.69$ \\
+Grundbruch & Zu schräg & $N_{Rd} = 0.0\,\mathrm{kN}$ & $N_{Ed} = 300.0\,\mathrm{kN}$ & $0.00$ \\
+Gleiten & Normal & $T_{Rd} = 0.0\,\mathrm{kN}$ & $T_{Ed} = 40.0\,\mathrm{kN}$ & $0.00$ \\
+Gleiten & Zu schräg & $T_{Rd} = 0.0\,\mathrm{kN}$ & $T_{Ed} = 200.0\,\mathrm{kN}$ & $0.00$ \\
+\hline
+\end{xltabular}
+\hinweis{Hinweis}{Grundbruch – Zu schräg: T\_Ed > s\_u · b · L: die Last ist zu stark geneigt, der Lastneigungsfaktor ist nicht bestimmt -- kein Grundbruchwiderstand.}
+\hinweis{Warnung}{Gleiten – Normal: nicht erfüllt. T\_Rd = 0 kN < T\_Ed = 40 kN.}
+\hinweis{Warnung}{Gleiten – Zu schräg: nicht erfüllt. T\_Rd = 0 kN < T\_Ed = 200 kN.}
+\subsection{Schacht}
+\noindent\textbf{Angaben zum Fundament}
+\begin{equation*}
+\begin{aligned} & \varphi_{eff} = 0{}^{\circ} \qquad c_{eff} = 40\,\mathrm{kPa} \qquad \gamma = 21\,\mathrm{kN}/\mathrm{m}^{3} \qquad \gamma' = 11\,\mathrm{kN}/\mathrm{m}^{3} \\ & b = 1.2\,\mathrm{m} \qquad L = 1.2\,\mathrm{m} \qquad t = 2\,\mathrm{m} \qquad t_1 = 0\,\mathrm{m} \end{aligned}
+\end{equation*}
+\noindent\textbf{Tragfähigkeitsfaktoren}
+\begin{longtable}{lrlrlr}
+\hline
+Kohäsion &  & Seitliche Auflast &  & Gewicht Gleitkörper &  \\
+\hline
+\endhead
+$N_{c}$ & $5.10$ & – & – & – & – \\
+$s_{c}$ & $0.20$ & – & – & – & – \\
+$d_{c}$ & $0.41$ & – & – & – & – \\
+$i_{c}$ & $0.15$ & – & – & – & – \\
+$g_{c}$ & $0.00$ & – & – & – & – \\
+$b'_{c}$ & $0.00$ & – & – & – & – \\
+\hline
+\end{longtable}
+\begin{xltabular}{\linewidth}{>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}Xrrr}
+\hline
+Nachweis & Bezeichnung & Widerstand & Einwirkung & $\alpha_{eff}$ \\
+\hline
+\endhead
+Grundbruch & Tragsicherheit & $N_{Rd} = 489.2\,\mathrm{kN}$ & $N_{Ed} = 900.0\,\mathrm{kN}$ & $0.54$ \\
+Gleiten & Tragsicherheit & $T_{Rd} = 0.0\,\mathrm{kN}$ & $T_{Ed} = 30.0\,\mathrm{kN}$ & $0.00$ \\
+\hline
+\end{xltabular}
+\hinweis{Warnung}{Grundbruch – Tragsicherheit: nicht erfüllt. N\_Rd = 489.2 kN < N\_Ed = 900 kN.}
+\hinweis{Warnung}{Gleiten – Tragsicherheit: nicht erfüllt. T\_Rd = 0 kN < T\_Ed = 30 kN.}
 Mindestens ein Nachweis ist nicht erfüllt.
 
 \hinweis{Warnung}{Platte 'Ohne x': ohne x-Bewehrung kein Verformungsnachweis.}
@@ -6110,6 +7498,105 @@ Bemessungswert der Fliessgrenze auf Druck & $f_{yd}^{-}$ & $435$ & N/mm² & bere
 Charakteristische Fliessgrenze & $f_{yk}$ & $500$ & N/mm² & Vorgabe \\
 Charakteristische Fliessgrenze auf Druck & $f_{yk}^{-}$ & $500$ & N/mm² & Vorgabe \\
 Teilsicherheitsbeiwert für Betonstahl & $\gamma_s$ & $1.15$ &  & Vorgabe \\
+Länge des Fundaments & $L$ & $4$ & m & Vorgabe \\
+Neigung der Sohle & $\alpha$ & $5$ & ° & Vorgabe \\
+Breite des Fundaments & $b$ & $1.6$ & m & Vorgabe \\
+Neigung des Geländes & $\beta$ & $15$ & ° & Vorgabe \\
+Kohäsion, Bemessungswert & $c_{eff}$ & $4$ & kPa & berechnet \\
+Kohäsion, charakteristisch & $c_k$ & $6$ & kPa & Vorgabe \\
+Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ*/φ & $k_{\delta}$ & $0.67$ &  & Vorgabe \\
+Raumlast des Bodens & $\gamma$ & $21$ & kN/m³ & Vorgabe \\
+Raumlast des Bodens unter Auftrieb & $\gamma'$ & $11$ & kN/m³ & berechnet \\
+Partialfaktor der Kohäsion & $\gamma_c$ & $1.5$ &  & Vorgabe \\
+Partialfaktor des Reibungswinkels & $\gamma_{\varphi}$ & $1.2$ &  & Vorgabe \\
+Raumlast des Wassers & $\gamma_w$ & $10$ & kN/m³ & Vorgabe \\
+Erfüllungsgrad Gleiten – Normal & $\alpha_{eff,GL,\text{Normal}}$ & $2.59$ &  & berechnet \\
+Erfüllungsgrad Gleiten – Steil & $\alpha_{eff,GL,\text{Steil}}$ & $0.17$ &  & berechnet \\
+Erfüllungsgrad Grundbruch – Normal & $\alpha_{eff,GB,\text{Normal}}$ & $2.17$ &  & berechnet \\
+Erfüllungsgrad Grundbruch – Steil & $\alpha_{eff,GB,\text{Steil}}$ & $0.00$ &  & berechnet \\
+Reibungswinkel, Bemessungswert & $\varphi_{eff}$ & $28.42$ & ° & berechnet \\
+Reibungswinkel, charakteristisch & $\varphi_k$ & $33$ & ° & Vorgabe \\
+Bemessungslast neben dem Fundament & $q_{Ed}$ & $10$ & kPa & Vorgabe \\
+Tiefe der Sohle unter Terrain & $t$ & $0.8$ & m & Vorgabe \\
+Tiefe des höchsten Grundwasserspiegels unter Terrain & $t_1$ & $2$ & m & Vorgabe \\
+Länge des Fundaments & $L$ & $1.5$ & m & Vorgabe \\
+Neigung der Sohle & $\alpha$ & $0$ & ° & Vorgabe \\
+Breite des Fundaments & $b$ & $1.5$ & m & Vorgabe \\
+Neigung des Geländes & $\beta$ & $0$ & ° & Vorgabe \\
+Kohäsion, Bemessungswert & $c_{eff}$ & $0$ & kPa & berechnet \\
+Kohäsion, charakteristisch & $c_k$ & $0$ & kPa & Vorgabe \\
+Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ*/φ & $k_{\delta}$ & $1$ &  & Vorgabe \\
+Raumlast des Bodens & $\gamma$ & $21$ & kN/m³ & Vorgabe \\
+Raumlast des Bodens unter Auftrieb & $\gamma'$ & $11$ & kN/m³ & berechnet \\
+Partialfaktor der Kohäsion & $\gamma_c$ & $1.5$ &  & Vorgabe \\
+Partialfaktor des Reibungswinkels & $\gamma_{\varphi}$ & $1.2$ &  & Vorgabe \\
+Raumlast des Wassers & $\gamma_w$ & $10$ & kN/m³ & Vorgabe \\
+Erfüllungsgrad Gleiten – Tragsicherheit & $\alpha_{eff,GL,\text{Tragsicherheit}}$ & $5.77$ &  & berechnet \\
+Erfüllungsgrad Grundbruch – Tragsicherheit & $\alpha_{eff,GB,\text{Tragsicherheit}}$ & $0.52$ &  & berechnet \\
+Reibungswinkel, Bemessungswert & $\varphi_{eff}$ & $25.69$ & ° & berechnet \\
+Reibungswinkel, charakteristisch & $\varphi_k$ & $30$ & ° & Vorgabe \\
+Bemessungslast neben dem Fundament & $q_{Ed}$ & $0$ & kPa & Vorgabe \\
+Tiefe der Sohle unter Terrain & $t$ & $1$ & m & Vorgabe \\
+Tiefe des höchsten Grundwasserspiegels unter Terrain & $t_1$ & $0.4$ & m & Vorgabe \\
+Länge des Fundaments & $L$ & $20$ & m & Vorgabe \\
+Neigung der Sohle & $\alpha$ & $0$ & ° & Vorgabe \\
+Breite des Fundaments & $b$ & $2$ & m & Vorgabe \\
+Neigung des Geländes & $\beta$ & $0$ & ° & Vorgabe \\
+Kohäsion, Bemessungswert & $c_{eff}$ & $2$ & kPa & berechnet \\
+Kohäsion, charakteristisch & $c_k$ & $3$ & kPa & Vorgabe \\
+Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ*/φ & $k_{\delta}$ & $1$ &  & Vorgabe \\
+Raumlast des Bodens & $\gamma$ & $21$ & kN/m³ & Vorgabe \\
+Raumlast des Bodens unter Auftrieb & $\gamma'$ & $11$ & kN/m³ & berechnet \\
+Partialfaktor der Kohäsion & $\gamma_c$ & $1.5$ &  & Vorgabe \\
+Partialfaktor des Reibungswinkels & $\gamma_{\varphi}$ & $1.2$ &  & Vorgabe \\
+Raumlast des Wassers & $\gamma_w$ & $10$ & kN/m³ & Vorgabe \\
+Erfüllungsgrad Gleiten – Tragsicherheit & $\alpha_{eff,GL,\text{Tragsicherheit}}$ & $11.08$ &  & berechnet \\
+Erfüllungsgrad Grundbruch – Tragsicherheit & $\alpha_{eff,GB,\text{Tragsicherheit}}$ & $9.02$ &  & berechnet \\
+Reibungswinkel, Bemessungswert & $\varphi_{eff}$ & $23.9$ & ° & berechnet \\
+Reibungswinkel, charakteristisch & $\varphi_k$ & $28$ & ° & Vorgabe \\
+Bemessungslast neben dem Fundament & $q_{Ed}$ & $0$ & kPa & Vorgabe \\
+Tiefe der Sohle unter Terrain & $t$ & $1.5$ & m & Vorgabe \\
+Tiefe des höchsten Grundwasserspiegels unter Terrain & $t_1$ & $1.5$ & m & Vorgabe \\
+Länge des Fundaments & $L$ & $2$ & m & Vorgabe \\
+Neigung der Sohle & $\alpha$ & $4$ & ° & Vorgabe \\
+Breite des Fundaments & $b$ & $1.5$ & m & Vorgabe \\
+Neigung des Geländes & $\beta$ & $10$ & ° & Vorgabe \\
+Kohäsion, Bemessungswert & $c_{eff}$ & $26.7$ & kPa & berechnet \\
+Kohäsion, charakteristisch & $c_k$ & $40$ & kPa & Vorgabe \\
+Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ*/φ & $k_{\delta}$ & $1$ &  & Vorgabe \\
+Raumlast des Bodens & $\gamma$ & $21$ & kN/m³ & Vorgabe \\
+Raumlast des Bodens unter Auftrieb & $\gamma'$ & $11$ & kN/m³ & berechnet \\
+Partialfaktor der Kohäsion & $\gamma_c$ & $1.5$ &  & Vorgabe \\
+Partialfaktor des Reibungswinkels & $\gamma_{\varphi}$ & $1.2$ &  & Vorgabe \\
+Raumlast des Wassers & $\gamma_w$ & $10$ & kN/m³ & Vorgabe \\
+Erfüllungsgrad Gleiten – Normal & $\alpha_{eff,GL,\text{Normal}}$ & $0.00$ &  & berechnet \\
+Erfüllungsgrad Gleiten – Zu schräg & $\alpha_{eff,GL,\text{Zu schräg}}$ & $0.00$ &  & berechnet \\
+Erfüllungsgrad Grundbruch – Normal & $\alpha_{eff,GB,\text{Normal}}$ & $1.69$ &  & berechnet \\
+Erfüllungsgrad Grundbruch – Zu schräg & $\alpha_{eff,GB,\text{Zu schräg}}$ & $0.00$ &  & berechnet \\
+Reibungswinkel, Bemessungswert & $\varphi_{eff}$ & $0$ & ° & berechnet \\
+Reibungswinkel, charakteristisch & $\varphi_k$ & $0$ & ° & Vorgabe \\
+Bemessungslast neben dem Fundament & $q_{Ed}$ & $0$ & kPa & Vorgabe \\
+Tiefe der Sohle unter Terrain & $t$ & $0.8$ & m & Vorgabe \\
+Tiefe des höchsten Grundwasserspiegels unter Terrain & $t_1$ & $0$ & m & Vorgabe \\
+Länge des Fundaments & $L$ & $1.2$ & m & Vorgabe \\
+Neigung der Sohle & $\alpha$ & $0$ & ° & Vorgabe \\
+Breite des Fundaments & $b$ & $1.2$ & m & Vorgabe \\
+Neigung des Geländes & $\beta$ & $0$ & ° & Vorgabe \\
+Kohäsion, Bemessungswert & $c_{eff}$ & $40$ & kPa & berechnet \\
+Kohäsion, charakteristisch & $c_k$ & $60$ & kPa & Vorgabe \\
+Sohlreibungswinkel im Verhältnis zum Reibungswinkel, δ*/φ & $k_{\delta}$ & $1$ &  & Vorgabe \\
+Raumlast des Bodens & $\gamma$ & $21$ & kN/m³ & Vorgabe \\
+Raumlast des Bodens unter Auftrieb & $\gamma'$ & $11$ & kN/m³ & berechnet \\
+Partialfaktor der Kohäsion & $\gamma_c$ & $1.5$ &  & Vorgabe \\
+Partialfaktor des Reibungswinkels & $\gamma_{\varphi}$ & $1.2$ &  & Vorgabe \\
+Raumlast des Wassers & $\gamma_w$ & $10$ & kN/m³ & Vorgabe \\
+Erfüllungsgrad Gleiten – Tragsicherheit & $\alpha_{eff,GL,\text{Tragsicherheit}}$ & $0.00$ &  & berechnet \\
+Erfüllungsgrad Grundbruch – Tragsicherheit & $\alpha_{eff,GB,\text{Tragsicherheit}}$ & $0.54$ &  & berechnet \\
+Reibungswinkel, Bemessungswert & $\varphi_{eff}$ & $0$ & ° & berechnet \\
+Reibungswinkel, charakteristisch & $\varphi_k$ & $0$ & ° & Vorgabe \\
+Bemessungslast neben dem Fundament & $q_{Ed}$ & $0$ & kPa & Vorgabe \\
+Tiefe der Sohle unter Terrain & $t$ & $2$ & m & Vorgabe \\
+Tiefe des höchsten Grundwasserspiegels unter Terrain & $t_1$ & $0$ & m & Vorgabe \\
 Betrachtete Breite (x) & $b$ & $1000$ & mm & Vorgabe \\
 Betrachtete Breite (y) & $b_y$ & $1000$ & mm & Vorgabe \\
 Bewehrungsmass je Kubikmeter Beton & $\mu_s$ & $123$ & kg/m³ & berechnet \\

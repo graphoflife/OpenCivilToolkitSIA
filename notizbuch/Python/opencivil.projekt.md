@@ -1,5 +1,5 @@
 ---
-erzeugt: 6e0bb3dfdcc6
+erzeugt: 4c82502a84c2
 art: modul
 tags: [modul]
 ---
@@ -31,6 +31,8 @@ querschnittsanalyse.py
 balkensystem.py
                ein ebener Rahmen: Knoten, Linien als Staebe und
                Linienlager, Lager, Lasten, Lastfaelle, Kombinationen
+grundbruch.py  ein Flachfundament: Boden, Masse, Gelaende, Grundwasser
+               und Einwirkungen fuer Grundbruch und Gleiten
 netz.py        Knoten mit Kennungen, fuer beide Zeichnungen
 skript.py      ein Python-Skript der App «Python»: gespeichert, nicht
                gerechnet
@@ -65,6 +67,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
 - [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
 - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
+- [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
 - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
 - [[opencivil.projekt.netz]] – Knoten mit Kennungen, und wie neue dazukommen.
 - [[opencivil.projekt.platte]] – eine Platte, wie die Oberflaeche sie beschreibt.
@@ -77,6 +80,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
@@ -99,4 +103,5 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.web.api]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.dienst]]
+- [[opencivil.web.grundbruchdaten]]
 - [[opencivil.web.speicher]]

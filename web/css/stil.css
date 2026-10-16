@@ -2042,6 +2042,51 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-wo { font-size: 10px; color: var(--schrift-zart); }
 .bs-einheiten { margin: 0 0 6px; font-size: 11px; color: var(--schrift-zart); }
 
+/* ----------------------------------------------------------- Grundbruch -- */
+
+/* Die Bemessungswerte des Bodens unter seinen Feldern, wie der Kern sie rechnet. */
+.gb-bemessung {
+  display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline;
+  margin: 4px 0 0; font-size: 12.5px; color: var(--schrift-matt);
+}
+.gb-trenner { color: var(--schrift-zart); }
+/* Die Kombinationen: zwei Zahlen, N_Ed und T_Ed. */
+.einwirkung.ist-grundbruch { --felder: 2; }
+
+/* Die Situation: Gelände, Fundament, Wasser, Gleitkörper, Kräfte. */
+.gb-bildhuelle { position: relative; }
+.gb-bild { display: block; width: 100%; height: auto; }
+.gb-text {
+  font-size: 13px; fill: var(--schrift);
+  paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round;
+}
+.gb-index { font-size: 10px; }
+.gb-zart { fill: var(--schrift-matt); }
+.gb-gelaende { fill: none; stroke: var(--schrift); stroke-width: 1.6; }
+.gb-schraffur { fill: none; stroke: var(--schrift-zart); stroke-width: 1; }
+.gb-fundament { fill: #dfe3e8; stroke: var(--schrift); stroke-width: 1.8; stroke-linejoin: round; }
+.gb-wasser { fill: none; stroke: #1c7ed6; stroke-width: 1.4; stroke-dasharray: 9 5; }
+.gb-wasser-kurz { stroke: #1c7ed6; stroke-width: 1.3; }
+.gb-wasserzeichen { fill: none; stroke: #1c7ed6; stroke-width: 1.3; }
+.gb-wassertext { fill: #1864ab; }
+.gb-gleitkoerper { fill: none; stroke: var(--system); stroke-width: 1.4; stroke-dasharray: 5 4; }
+.gb-hilfslinie { fill: none; stroke: var(--schrift-matt); stroke-width: 1; stroke-dasharray: 4 3; }
+.gb-bogen { fill: none; stroke: var(--schrift); stroke-width: 1.1; }
+.gb-pfeil-schaft { fill: none; stroke-width: 1.2; }
+.gb-masspfeil .gb-pfeil-schaft { stroke: var(--schrift-matt); stroke-width: 1; }
+.gb-masspfeil .gb-pfeil-spitze { fill: var(--schrift-matt); }
+.gb-masstext { font-size: 12px; fill: var(--schrift-matt); }
+.gb-masshilfe { fill: none; stroke: var(--schrift-zart); stroke-width: .8; }
+.gb-kraft .gb-pfeil-schaft { stroke: var(--last); stroke-width: 2.4; }
+.gb-kraft .gb-pfeil-spitze { fill: var(--last); }
+.gb-resultierende .gb-pfeil-schaft { stroke-width: 3; }
+.gb-krafttext { fill: var(--last); font-weight: 700; }
+.gb-auflast .gb-pfeil-schaft { stroke: var(--last); stroke-width: 1.2; }
+.gb-auflast .gb-pfeil-spitze { fill: var(--last); }
+.gb-lasttext { fill: var(--last); }
+.gb-legende { margin-top: 6px; }
+.gb-legende p { margin: 0 0 2px; font-size: 12px; color: var(--schrift-matt); }
+
 /* --------------------------------------------------------------- Python -- */
 
 /* Name und Knöpfe in einer Zeile über dem Code und unter der Konsole. */

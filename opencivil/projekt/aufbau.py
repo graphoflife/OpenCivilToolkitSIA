@@ -14,7 +14,7 @@ auffallen koennen -- ein Verweis auf ein geloeschtes Material, eine Platte
 ohne Bewehrung.
 
 DIE BAUTEILARTEN:
-Platte, Querschnittsanalyse und Balkensystem haben je einen Steckbrief
+Platte, Querschnittsanalyse, Balkensystem und Grundbruch haben je einen Steckbrief
 (:class:`Bauteilart`) in :data:`BAUTEILE` -- Liste in der Datei, Klasse der
 Eintraege, Vorsilbe der Kennungen, Namensraum, Baufunktion. Wer alle
 Bauteile durchgeht, geht diese Liste durch; eine neue Art kommt dort dazu
@@ -30,7 +30,7 @@ from typing import (
 )
 
 from opencivil.core.einheiten import (
-    EINHEITSLOS, KN, KNM, KN_PRO_M, M, MM, Groesse,
+    EINHEITSLOS, GRAD, KN, KNM, KN_PRO_M, KN_PRO_M3, KPA, M, MM, Groesse,
 )
 from opencivil.core.berechnung import Nachweis, NachweisUrteil
 from opencivil.core.rechenwerk import Rechenwerk
@@ -64,6 +64,8 @@ from opencivil.projekt.eintraege import (
     VerformungsfallEintrag, abgeleiteter_fallname,
 )
 from opencivil.projekt.balkensystem import BalkensystemEintrag, StabquerschnittEintrag
+from opencivil.projekt.grundbruch import GrundbruchEintrag
+from opencivil.geotechnik.grundbruch import Fundament, Gleiten, Grundbruch, Kombination
 from opencivil.projekt.lesen import ProjektFehler, schalter_aus
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
@@ -175,6 +177,13 @@ class Aufbau:
     balkensysteme: Dict[str, Balkensystem] = field(default_factory=dict)
     """Die Balkensysteme, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis."""
 
+    grundbrueche: Dict[str, Fundament] = field(default_factory=dict)
+    """Die Fundamente der Grundbruchnachweise, nach Kennung."""
+
+    grundbruch: Dict[str, Grundbruch] = field(default_factory=dict)
+    gleiten: Dict[str, Gleiten] = field(default_factory=dict)
+    """Grundbruch und Gleiten je Fundament."""
+
     warnungen: List[str] = field(default_factory=list)
 
     #: Die Felder, in denen die Nachweise stehen -- die eine Stelle, an der
@@ -187,7 +196,7 @@ class Aufbau:
                       "spannung_riss", "spannung", "verformung", "knicken",
                       "qa_biegung", "qa_schub", "qa_duktilitaet", "qa_sproede",
                       "qa_rissnormalkraft", "qa_zwaengung_biegung", "qa_spannung_riss",
-                      "qa_spannung", "qa_knicken")
+                      "qa_spannung", "qa_knicken", "grundbruch", "gleiten")
 
     def nachweise_je_feld(self):
         """Alle Nachweise, Feld fuer Feld und in der Reihenfolge der Liste."""
@@ -958,6 +967,37 @@ def _kombination(eintrag: KombinationEintrag) -> Schnittgroessen:
     )
 
 
+def _grundbruch(art: "Bauteilart", eintrag: GrundbruchEintrag, aufbau: Aufbau) -> Bauteil:
+    """
+    Ein Fundament und seine beiden Nachweise -- Grundbruch und Gleiten --,
+    sobald eine Kombination eingeschaltet ist. Ohne sie steht das Fundament
+    allein da, wie eine Platte ohne Einwirkung.
+    """
+    eintrag.zahlen_pruefen()
+    fundament = Fundament(
+        name=eintrag.name,
+        phi_k=Groesse(eintrag.phi_k, GRAD), gamma_phi=Groesse(eintrag.gamma_phi, EINHEITSLOS),
+        c_k=Groesse(eintrag.c_k, KPA), gamma_c=Groesse(eintrag.gamma_c, EINHEITSLOS),
+        gamma=Groesse(eintrag.gamma, KN_PRO_M3), gamma_w=Groesse(eintrag.gamma_w, KN_PRO_M3),
+        q_Ed=Groesse(eintrag.q_Ed, KPA), b=Groesse(eintrag.b, M), L=Groesse(eintrag.L, M),
+        t1=Groesse(eintrag.t1, M), t=Groesse(eintrag.t, M),
+        alpha=Groesse(eintrag.alpha, GRAD), beta=Groesse(eintrag.beta, GRAD),
+        delta_faktor=Groesse(eintrag.delta_faktor, EINHEITSLOS),
+        praefix=f"{art.raum}.{eintrag.kennung}")
+    aufbau.grundbrueche[eintrag.kennung] = fundament
+    fundament.ins_rechenwerk(aufbau.werk)
+    teil = Bauteil(eintrag.kennung, eintrag.name, art, fundament)
+    kombinationen = [Kombination(name=k.name, N_Ed=Groesse(k.N_Ed, KN), T_Ed=Groesse(k.T_Ed, KN))
+                     for k in eintrag.kombinationen if k.aktiv]
+    if kombinationen:
+        aufbau.eintragen(teil, "grundbruch", eintrag.kennung, Grundbruch(fundament, kombinationen))
+        aufbau.eintragen(teil, "gleiten", eintrag.kennung, Gleiten(fundament, kombinationen))
+    else:
+        aufbau.warnungen.append(
+            f"Grundbruch '{eintrag.name}': keine Kombination → kein Nachweis.")
+    return teil
+
+
 def _ueberschreibungen_setzen(projekt: "Projekt", werk: Rechenwerk,
                               aufbau: Aufbau) -> None:
     for eintrag in projekt.materialien:
@@ -1015,9 +1055,12 @@ ANALYSE = Bauteilart("querschnittsanalyse", "querschnittsanalysen",
                      "Querschnittsanalyse", _querschnittsanalyse)
 BALKENSYSTEM = Bauteilart("balkensystem", "balkensysteme", BalkensystemEintrag, "r",
                           "balkensystem", "Balkensysteme", _balkensystem)
+GRUNDBRUCH = Bauteilart("grundbruch", "grundbrueche", GrundbruchEintrag, "g",
+                        "grundbruch", "Grundbruch", _grundbruch)
 
 #: Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung -- ein
-#: Balkensystem liest Werte der Platten und Analysen, also kommt es zuletzt.
+#: Balkensystem liest Werte der Platten und Analysen, also kommt es nach
+#: ihnen; ein Grundbruch liest nichts von den anderen.
 #: Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher,
 #: Erkennen einer Datei), geht diese Liste durch.
-BAUTEILE: Tuple[Bauteilart, ...] = (PLATTE, ANALYSE, BALKENSYSTEM)
+BAUTEILE: Tuple[Bauteilart, ...] = (PLATTE, ANALYSE, BALKENSYSTEM, GRUNDBRUCH)

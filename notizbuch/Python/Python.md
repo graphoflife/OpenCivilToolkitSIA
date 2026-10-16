@@ -1,5 +1,5 @@
 ---
-erzeugt: 6c4044fb2087
+erzeugt: c9f44c305650
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -26,6 +26,8 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.core.rechenwerk]] – Registrierung und Aufloesung von Berechnungen.
     - [[opencivil.core.wert]] – Benannte Werte im Rechenmodell.
   - [[opencivil.ergebnis]] – ein gerechnetes Projekt, wie man es ohne Oberflaeche braucht.
+- [[opencivil.geotechnik]] – Nachweise im Baugrund.
+    - [[opencivil.geotechnik.grundbruch]] – Grundbruch und Gleiten eines Flachfundaments.
 - [[opencivil.konsole]] – Python im Browser, für die App «Python».
     - [[opencivil.konsole.dienst]] – die Konsole als Dienst für ihren Faden.
     - [[opencivil.konsole.pakete]] – welche Fremdpakete ein Skript einbinden kann.
@@ -69,6 +71,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
     - [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
     - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
+    - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
     - [[opencivil.projekt.lesen]] – was in einer Projektdatei stehen darf, und wie es gelesen wird.
     - [[opencivil.projekt.netz]] – Knoten mit Kennungen, und wie neue dazukommen.
     - [[opencivil.projekt.platte]] – eine Platte, wie die Oberflaeche sie beschreibt.
@@ -101,5 +104,6 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.web.bruecke]] – Welche Dateien der Browser laden muss.
     - [[opencivil.web.diagrammdaten]] – was die Oberflaeche zeichnet, als JSON.
     - [[opencivil.web.dienst]] – Der Rechendienst, unabhaengig vom Transportweg.
+    - [[opencivil.web.grundbruchdaten]] – was die Oberflaeche von einem Grundbruch zeichnet.
     - [[opencivil.web.server]] – Schlanker HTTP-Server fuer die Oberflaeche.
     - [[opencivil.web.speicher]] – was vom letzten Lauf noch gilt.

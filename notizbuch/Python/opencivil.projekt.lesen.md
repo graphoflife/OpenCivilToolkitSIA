@@ -1,5 +1,5 @@
 ---
-erzeugt: bbba2682abe4
+erzeugt: 90df82ef6c85
 art: modul
 tags: [modul]
 ---
@@ -197,6 +197,7 @@ nachsehen.
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]

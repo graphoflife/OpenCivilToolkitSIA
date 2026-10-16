@@ -44,6 +44,62 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-16 · Neue App «Grundbruch»: Grundbruch und Gleiten eines Flachfundaments
+
+Wunsch des Benutzers, mit dem Kapitel 9.2 «Tragfähigkeit» als Vorlage (Text,
+Tabellen 9.2.8 bis 9.2.18, Bilder 9.2.10 und 9.2.15) und den Vorgaben der
+Felder: φ_k = 30°, γ_φ = 1.2, c = 0, γ_c = 1.5, γ = 21 und γ_w = 10 kN/m³,
+q_Ed = 0, b = L = 1 m, t = t_1 = 0, N_Ed = 1000 kN, T_Ed = 200 kN, α = β = 0.
+
+- **Kern:** `opencivil/geotechnik/grundbruch.py`. Das `Fundament` legt die
+  Eingaben als Vorgaben ins Rechenwerk und rechnet φ_eff = arctan(tan φ_k /
+  γ_φ) (SIA 267:2013, 5.3.2.1), c_eff = c_k / γ_c und γ'. Zwei Nachweise je
+  Kombination: `Grundbruch` nach der erweiterten Tragfähigkeitsformel, für
+  φ = 0 nach der undrainierten (9.2.17), und `Gleiten`, T_Rd = N_Ed · tan δ*.
+  Die Faktoren, die nicht an der Last hängen, rechnen einmal; i je
+  Kombination. Der Befund trägt die Faktoren für die Tabelle der
+  Zusammenfassung und L, H des Gleitkörpers für das Bild.
+- **Steckbrief:** `GRUNDBRUCH` in `BAUTEILE`, Vorsilbe `g`. Lesen, Kennungen,
+  Zwischenspeicher, Formelsammlung und Erkennen einer Datei kamen damit von
+  selbst; dazu der Eintrag in `arten.js`.
+- **Zusammenfassung:** über den Nachweisen die Angaben in zwei Zeilen und die
+  Tabelle der Faktoren wie im Bild des Benutzers -- drei Spaltenpaare
+  Kohäsion, seitliche Auflast, Gewicht Gleitkörper; Zeilen N, s, d, i (je
+  Kombination), g, b'. `angaben()` braucht dafür die Lösung: die Faktoren
+  stehen erst nach dem Rechnen fest.
+- **Bild der Situation** (Reiter Diagramme): wie Bild 9.2.15, die Bruchseite
+  links. Die Masse kommen aus dem Eintrag, der Umriss des Gleitkörpers aus dem
+  Kern (`gleitkoerper()`, Prandtl: Keil, Spirale, Keil -- trifft L und H der
+  Formeln). Er ist für waagrechtes Gelände gerechnet und endet im Bild, wo er
+  aus einem geneigten Gelände tritt. Die Kräfte stehen im Verhältnis
+  zueinander, die grösste immer gleich lang; gezeigt wird die massgebende
+  Kombination oder die gewählte.
+- **Formelsammlung:** eine Seite sammelt jetzt jede Normstelle, unter der
+  ihre Formel vorkommt, nicht nur die der ersten Fassung -- σ_v0 = γ t + q
+  steht beim Grundwasser (9.2.8) und in der undrainierten Formel (9.2.17).
+- **Prüfprojekt:** Hang (Wasser im Gleitkörper, α, β, q, Kohäsion, eine
+  Last so schräg, dass i null wird), Ufer (Lage 1), Kai (Lage 2), Seeton
+  (undrainiert, einmal ohne Widerstand), Schacht (tief eingebunden). Das
+  Beispiel hat ein grünes Einzelfundament.
+- **Tests** gegen jede Tabelle des Kapitels und gegen die Tabelle des
+  Benutzers. Das Buch rundet nicht einheitlich: d_c bei t/b = 4 ist 1.532,
+  die Tabelle sagt 1.52; H/b bei 25° ist 1.35, sie sagt 1.4. Dort ist die
+  Toleranz eine Stelle weiter, die Abweichung steht beim Test.
+
+Entschieden, ohne Rückfrage, und so im [[TODO]]:
+
+- b_γ rechnet mit tan φ wie Tabelle 9.2.18; im Text steht tan α.
+- Liegt das Wasser unter der Sohle, aber höher als H, verlangt das Kapitel
+  eine Stabilitätsberechnung -- gerechnet wird mit γ' wie in Lage 2.
+- Eine Klammer eines Lastneigungsfaktors unter null gilt null; i_c bleibt,
+  wie die Formel es ergibt (auch negativ, wie in der Tabelle des Benutzers).
+- δ*/φ ist ein eigenes Feld, Vorgabe 1 -- das Kapitel nennt 2/3 φ bis φ.
+- L ≥ b wird verlangt: b ist die kürzere Seite.
+- Kein globaler Sicherheitsfaktor F wie im Kapitel: die Sicherheit steckt in
+  γ_φ und γ_c.
+
+---
+
 ## 2026-10-16 · Rechte Tafel wie die mittlere; Spannung-Dehnung als Diagramme
 
 Die rechte Tafel sieht jetzt aus wie die mittlere (Benutzer): je Bauteil ein

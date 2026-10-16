@@ -27,6 +27,7 @@ from opencivil.projekt.eintraege import (
     Beschreibung, MaterialEintrag, PostenEintrag, RechenwahlEintrag,
 )
 from opencivil.projekt.balkensystem import BalkensystemEintrag
+from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.skript import VORLAGE, SkriptEintrag
@@ -34,7 +35,7 @@ from opencivil.projekt.querschnittsanalyse import (
     QuerschnittsanalyseEintrag, WerkstoffwahlEintrag,
 )
 from opencivil.projekt.aufbau import (
-    ANALYSE, BALKENSYSTEM, BAUTEILE, PLATTE, Aufbau, aufbauen,
+    ANALYSE, BALKENSYSTEM, BAUTEILE, GRUNDBRUCH, PLATTE, Aufbau, aufbauen,
 )
 
 
@@ -54,6 +55,9 @@ class Projekt(Beschreibung):
 
     balkensysteme: List[BalkensystemEintrag] = field(default_factory=list)
     """Ebene Rahmen: Knoten, Stäbe, Lager, Lasten, Lastfälle."""
+
+    grundbrueche: List[GrundbruchEintrag] = field(default_factory=list)
+    """Flachfundamente mit Grundbruch und Gleiten."""
 
     skripte: List[SkriptEintrag] = field(default_factory=list)
     """Die Python-Skripte der App «Python» -- gespeichert, nicht gerechnet."""
@@ -283,6 +287,19 @@ class Projekt(Beschreibung):
         self.balkensysteme.append(eintrag)
         return eintrag
 
+    def grundbruch(self, name: str, **felder: Any) -> GrundbruchEintrag:
+        """
+        Ein Grundbruchnachweis mit den Vorgaben der Oberflaeche, aber ohne
+        ihre Startkombination: wer rechnet, gibt seine Einwirkungen mit
+        ``kombination`` selbst an. Alles Weitere -- ``phi_k``, ``b``, ``t`` ...
+        -- geht als Stichwort an den Eintrag; Winkel in Grad, Masse in m,
+        Spannungen in kPa.
+        """
+        eintrag = GrundbruchEintrag(kennung=self.freie_kennung(GRUNDBRUCH.vorsilbe), name=name)
+        _felder_setzen(eintrag, felder, f"Grundbruch '{name}'")
+        self.grundbrueche.append(eintrag)
+        return eintrag
+
     def skript(self, name: str, code: str = "") -> SkriptEintrag:
         """
         Ein Python-Skript für die App «Python» -- Kennung ``p1``, ``p2`` ...
@@ -431,6 +448,11 @@ class Projekt(Beschreibung):
         rahmen.stablast(eigengewicht, balken, wert=25.0)
         rahmen.stablast(wind, links, wert=3.0, richtung="waagrecht")
         rahmen.kombination("Tragsicherheit", (eigengewicht, 1.35), (wind, 1.5))
+        # Ein Einzelfundament 2.0 × 2.5 m, 1.2 m tief, das Grundwasser tiefer
+        # als der Gleitkörper -- grün, wie der Rest.
+        fundament = projekt.grundbruch("Fundament Stütze", phi_k=32.0, b=2.0, L=2.5,
+                                       t=1.2, t1=5.0)
+        fundament.kombination("Tragsicherheit", N_Ed=1500.0, T_Ed=150.0)
 
         # Ein Skript für die App «Python», mit einem Diagramm -- ohne Download.
         projekt.skript("Skript 1", VORLAGE)
@@ -568,10 +590,37 @@ class Projekt(Beschreibung):
         p.querschnittsanalysen.append(cls._stuetze(p.freie_kennung("a")))
 
         # Zwei Balkensysteme: eines, das alles einmal braucht, und eines, das
-        # sich nicht rechnen lässt.
+        # sich nicht rechnen lässt. Dazu jede Spielart des Grundbruchs.
         cls._alles_einmal(p, decke, p.querschnittsanalysen[0])
         cls._beweglich(p)
+        cls._grundbrueche(p)
         return p
+
+    @staticmethod
+    def _grundbrueche(p: "Projekt") -> None:
+        """
+        Jede Lage des Grundwassers und beide Arten des Bodens: drainiert mit
+        Kohäsion, geneigter Sohle, geneigtem Gelände, Auflast und dem
+        Wasser im Gleitkörper, dazu eine Last, so schräg, dass die Klammer
+        eines Lastneigungsfaktors unter null fällt; das Wasser über der Sohle
+        und auf ihrer Höhe, dort ein langer Streifen; undrainiert flach und
+        tief eingebunden, einmal so schräg belastet, dass es keinen
+        Widerstand gibt.
+        """
+        hang = p.grundbruch("Hang", phi_k=33.0, c_k=6.0, b=1.6, L=4.0, t=0.8, t1=2.0,
+                            alpha=5.0, beta=15.0, q_Ed=10.0, delta_faktor=0.67)
+        hang.kombination("Normal", N_Ed=900.0, T_Ed=120.0)
+        hang.kombination("Steil", N_Ed=150.0, T_Ed=300.0)
+        p.grundbruch("Ufer", phi_k=30.0, b=1.5, L=1.5, t=1.0, t1=0.4).kombination(
+            "Tragsicherheit", N_Ed=1200.0, T_Ed=100.0)
+        p.grundbruch("Kai", phi_k=28.0, c_k=3.0, b=2.0, L=20.0, t=1.5, t1=1.5).kombination(
+            "Tragsicherheit", N_Ed=2000.0, T_Ed=80.0)
+        seeton = p.grundbruch("Seeton", phi_k=0.0, c_k=40.0, b=1.5, L=2.0, t=0.8,
+                              alpha=4.0, beta=10.0)
+        seeton.kombination("Normal", N_Ed=300.0, T_Ed=40.0)
+        seeton.kombination("Zu schräg", N_Ed=300.0, T_Ed=200.0)
+        p.grundbruch("Schacht", phi_k=0.0, c_k=60.0, b=1.2, L=1.2, t=2.0).kombination(
+            "Tragsicherheit", N_Ed=900.0, T_Ed=30.0)
 
     @staticmethod
     def _alles_einmal(p: "Projekt", decke: QuerschnittEintrag,

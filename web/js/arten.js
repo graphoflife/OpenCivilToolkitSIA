@@ -59,6 +59,19 @@ export const ARTEN = [
     leer: 'kein Balkensystem',
     nachweise: false,
   },
+  {
+    art: 'grundbruch',
+    liste: 'grundbrueche',
+    vorsilbe: 'g',
+    zeichen: 'grundbruch',
+    knopf: 'Grundbruch',
+    titel: 'Grundbruch',
+    bezeichnung: 'Grundbruch und Gleiten',
+    einzahl: 'Grundbruch',
+    stamm: 'Fundament',
+    leer: 'kein Grundbruch',
+    nachweise: true,
+  },
 ];
 
 /** Die Art, die die Auswahl so nennt -- `undefined` beim Material. */

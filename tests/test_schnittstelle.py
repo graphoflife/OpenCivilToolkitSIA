@@ -21,9 +21,11 @@ class TestUrteilsraum(unittest.TestCase):
         projekt = Projekt.beispiel()
         # Nur Platten: um sie geht es hier. Der Unterzug des Beispiels hat
         # seinen eigenen Namensraum und zählte sonst bei keiner mit -- und der
-        # Rahmen, der seinen Querschnitt nimmt, geht mit ihm.
+        # Rahmen, der seinen Querschnitt nimmt, geht mit ihm. Das Fundament
+        # ebenso.
         projekt.querschnittsanalysen = []
         projekt.balkensysteme = []
+        projekt.grundbrueche = []
         zweite = Projekt.aus_dict(json.loads(json.dumps(projekt.als_dict()))).querschnitt("q1")
         zweite.kennung, zweite.name = "q2", "Decke über 1. OG"
         projekt.querschnitte.append(zweite)
@@ -318,9 +320,14 @@ class TestAngabengruppen(unittest.TestCase):
 
     def test_zwei_kaesten_statt_vier_zeilen(self):
         gruppen = self.gruppen()
-        # Zwei Kästen der Platte, einer des Unterzugs.
+        # Zwei Kästen der Platte, einer des Unterzugs, vier des Fundaments.
         self.assertEqual(sorted(gruppen),
-                         ["Abmessungen – Beton C30/37", "Bruttoquerschnitt", "Überdeckungen"])
+                         ["Abmessungen – Beton C30/37", "Boden", "Bruttoquerschnitt",
+                          "Fundament", "Gelände und Grundwasser", "Sohlreibung",
+                          "Überdeckungen"])
+        self.assertEqual(gruppen["Fundament"],
+                         ["Breite des Fundaments", "Länge des Fundaments",
+                          "Tiefe der Sohle unter Terrain", "Neigung der Sohle"])
         self.assertEqual(gruppen["Bruttoquerschnitt"],
                          ["Fläche des Bruttoquerschnitts", "Schwerpunkt, y", "Schwerpunkt, z",
                           "Trägheitsmoment um y", "Trägheitsmoment um z", "Deviationsmoment"])
@@ -506,6 +513,9 @@ class TestAngabengruppen(unittest.TestCase):
             "querschnittsanalyse.a1.A", "querschnittsanalyse.a1.y_S",
             "querschnittsanalyse.a1.z_S", "querschnittsanalyse.a1.I_y",
             "querschnittsanalyse.a1.I_z", "querschnittsanalyse.a1.I_yz",
+            *(f"grundbruch.g1.{n}" for n in (
+                "phi_k", "gamma_phi", "c_k", "gamma_c", "gamma", "gamma_w", "b", "L", "t",
+                "alpha", "t1", "beta", "q_Ed", "delta_faktor")),
         })
 
 

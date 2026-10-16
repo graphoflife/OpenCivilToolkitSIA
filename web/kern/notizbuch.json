@@ -74,6 +74,24 @@
       "bereich": "Balkensysteme"
     },
     {
+      "name": "Fundament",
+      "pfad": "Formelsammlung/Themen/Fundament.md",
+      "art": "thema",
+      "bereich": "Grundbruch"
+    },
+    {
+      "name": "Grundbruch",
+      "pfad": "Formelsammlung/Themen/Grundbruch.md",
+      "art": "thema",
+      "bereich": "Grundbruch"
+    },
+    {
+      "name": "Gleiten",
+      "pfad": "Formelsammlung/Themen/Gleiten.md",
+      "art": "thema",
+      "bereich": "Grundbruch"
+    },
+    {
       "name": "Querkraft",
       "pfad": "Formelsammlung/Themen/Querkraft.md",
       "art": "thema",
@@ -138,6 +156,17 @@
       "pfad": "Formelsammlung/Themen/Spannung-Dehnung-Analyse.md",
       "art": "thema",
       "bereich": "Platte"
+    },
+    {
+      "name": "Abstand des Grundwassers unter der Sohle",
+      "pfad": "Formelsammlung/Formeln/Abstand des Grundwassers unter der Sohle.md",
+      "art": "formel",
+      "zeichen": [
+        "T"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
     },
     {
       "name": "Äquivalenter E-Modul über dem Moment",
@@ -316,6 +345,17 @@
       ]
     },
     {
+      "name": "Bemessungswert der Kohäsion",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert der Kohäsion.md",
+      "art": "formel",
+      "zeichen": [
+        "c_{eff}"
+      ],
+      "themen": [
+        "Fundament"
+      ]
+    },
+    {
       "name": "Bemessungswert der Schubspannungsgrenze",
       "pfad": "Formelsammlung/Formeln/Bemessungswert der Schubspannungsgrenze.md",
       "art": "formel",
@@ -335,6 +375,17 @@
       ],
       "themen": [
         "Beton"
+      ]
+    },
+    {
+      "name": "Bemessungswert des Reibungswinkels",
+      "pfad": "Formelsammlung/Formeln/Bemessungswert des Reibungswinkels.md",
+      "art": "formel",
+      "zeichen": [
+        "\\varphi_{eff}"
+      ],
+      "themen": [
+        "Fundament"
       ]
     },
     {
@@ -496,6 +547,17 @@
       ]
     },
     {
+      "name": "Bruchspannung in der Sohle",
+      "pfad": "Formelsammlung/Formeln/Bruchspannung in der Sohle.md",
+      "art": "formel",
+      "zeichen": [
+        "\\sigma_f"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
       "name": "Bügelquerschnitt je Länge einer Schubwand (n Schnitte)",
       "pfad": "Formelsammlung/Formeln/Bügelquerschnitt je Länge einer Schubwand (n Schnitte).md",
       "art": "formel",
@@ -636,6 +698,8 @@
         "Verformung",
         "Schiefe Biegung",
         "Querkraft und Torsion",
+        "Grundbruch",
+        "Gleiten",
         "Querkraft",
         "Duktilität",
         "Zwängung auf Normalkraft",
@@ -655,6 +719,15 @@
       "zeichen": [],
       "themen": [
         "Schiefe Biegung"
+      ]
+    },
+    {
+      "name": "Erweiterte Tragfähigkeitsformel",
+      "pfad": "Formelsammlung/Formeln/Erweiterte Tragfähigkeitsformel.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Grundbruch"
       ]
     },
     {
@@ -850,6 +923,61 @@
       ]
     },
     {
+      "name": "Formfaktor s_c",
+      "pfad": "Formelsammlung/Formeln/Formfaktor s_c.md",
+      "art": "formel",
+      "zeichen": [
+        "s_c"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
+      "name": "Formfaktor s_q",
+      "pfad": "Formelsammlung/Formeln/Formfaktor s_q.md",
+      "art": "formel",
+      "zeichen": [
+        "s_q"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
+      "name": "Formfaktor s_γ",
+      "pfad": "Formelsammlung/Formeln/Formfaktor s_γ.md",
+      "art": "formel",
+      "zeichen": [
+        "s_{\\gamma}"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
+      "name": "Geländeneigungsfaktor g_c",
+      "pfad": "Formelsammlung/Formeln/Geländeneigungsfaktor g_c.md",
+      "art": "formel",
+      "zeichen": [
+        "g_c"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
+      "name": "Geländeneigungsfaktor g_q",
+      "pfad": "Formelsammlung/Formeln/Geländeneigungsfaktor g_q.md",
+      "art": "formel",
+      "zeichen": [
+        "g_q"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
       "name": "Gewollte Ausmitte",
       "pfad": "Formelsammlung/Formeln/Gewollte Ausmitte.md",
       "art": "formel",
@@ -887,6 +1015,17 @@
       "zeichen": [],
       "themen": [
         "Steifigkeitsmethode"
+      ]
+    },
+    {
+      "name": "Gleitwiderstand",
+      "pfad": "Formelsammlung/Formeln/Gleitwiderstand.md",
+      "art": "formel",
+      "zeichen": [
+        "T_{Rd}"
+      ],
+      "themen": [
+        "Gleiten"
       ]
     },
     {
@@ -940,6 +1079,17 @@
       ],
       "themen": [
         "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Grundbruchwiderstand",
+      "pfad": "Formelsammlung/Formeln/Grundbruchwiderstand.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{Rd}"
+      ],
+      "themen": [
+        "Grundbruch"
       ]
     },
     {
@@ -1039,6 +1189,39 @@
       ]
     },
     {
+      "name": "Lastneigungsfaktor i_c",
+      "pfad": "Formelsammlung/Formeln/Lastneigungsfaktor i_c.md",
+      "art": "formel",
+      "zeichen": [
+        "i_c"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
+      "name": "Lastneigungsfaktor i_q",
+      "pfad": "Formelsammlung/Formeln/Lastneigungsfaktor i_q.md",
+      "art": "formel",
+      "zeichen": [
+        "i_q"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
+      "name": "Lastneigungsfaktor i_γ",
+      "pfad": "Formelsammlung/Formeln/Lastneigungsfaktor i_γ.md",
+      "art": "formel",
+      "zeichen": [
+        "i_{\\gamma}"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
       "name": "Mittelwert der Zylinderdruckfestigkeit",
       "pfad": "Formelsammlung/Formeln/Mittelwert der Zylinderdruckfestigkeit.md",
       "art": "formel",
@@ -1089,6 +1272,17 @@
       ],
       "themen": [
         "Biegung und Normalkraft"
+      ]
+    },
+    {
+      "name": "Neigung der Last",
+      "pfad": "Formelsammlung/Formeln/Neigung der Last.md",
+      "art": "formel",
+      "zeichen": [
+        "\\delta_R"
+      ],
+      "themen": [
+        "Grundbruch"
       ]
     },
     {
@@ -1200,6 +1394,50 @@
       ],
       "themen": [
         "Querschnitt"
+      ]
+    },
+    {
+      "name": "Raumlast im Gleitkörper",
+      "pfad": "Formelsammlung/Formeln/Raumlast im Gleitkörper.md",
+      "art": "formel",
+      "zeichen": [
+        "\\gamma_G"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
+      "name": "Raumlast unter Auftrieb",
+      "pfad": "Formelsammlung/Formeln/Raumlast unter Auftrieb.md",
+      "art": "formel",
+      "zeichen": [
+        "\\gamma'"
+      ],
+      "themen": [
+        "Fundament"
+      ]
+    },
+    {
+      "name": "Reibungswinkel der Sohlfuge",
+      "pfad": "Formelsammlung/Formeln/Reibungswinkel der Sohlfuge.md",
+      "art": "formel",
+      "zeichen": [
+        "\\delta^{*}"
+      ],
+      "themen": [
+        "Gleiten"
+      ]
+    },
+    {
+      "name": "Reichweite des Gleitkörpers",
+      "pfad": "Formelsammlung/Formeln/Reichweite des Gleitkörpers.md",
+      "art": "formel",
+      "zeichen": [
+        "L_{Gl}"
+      ],
+      "themen": [
+        "Grundbruch"
       ]
     },
     {
@@ -1338,6 +1576,39 @@
       ]
     },
     {
+      "name": "Sohlneigungsfaktor b_c",
+      "pfad": "Formelsammlung/Formeln/Sohlneigungsfaktor b_c.md",
+      "art": "formel",
+      "zeichen": [
+        "b_c"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
+      "name": "Sohlneigungsfaktor b_q",
+      "pfad": "Formelsammlung/Formeln/Sohlneigungsfaktor b_q.md",
+      "art": "formel",
+      "zeichen": [
+        "b_q"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
+      "name": "Sohlneigungsfaktor b_γ",
+      "pfad": "Formelsammlung/Formeln/Sohlneigungsfaktor b_γ.md",
+      "art": "formel",
+      "zeichen": [
+        "b_{\\gamma}"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
       "name": "Spannung im ungerissenen Querschnitt",
       "pfad": "Formelsammlung/Formeln/Spannung im ungerissenen Querschnitt.md",
       "art": "formel",
@@ -1417,6 +1688,39 @@
       ]
     },
     {
+      "name": "Tiefe des Gleitkörpers",
+      "pfad": "Formelsammlung/Formeln/Tiefe des Gleitkörpers.md",
+      "art": "formel",
+      "zeichen": [
+        "H_{Gl}"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
+      "name": "Tiefenfaktor d_c",
+      "pfad": "Formelsammlung/Formeln/Tiefenfaktor d_c.md",
+      "art": "formel",
+      "zeichen": [
+        "d_c"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
+      "name": "Tiefenfaktor d_q",
+      "pfad": "Formelsammlung/Formeln/Tiefenfaktor d_q.md",
+      "art": "formel",
+      "zeichen": [
+        "d_q"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
       "name": "Torsion in den Zellen (Bredt, mehrzellig)",
       "pfad": "Formelsammlung/Formeln/Torsion in den Zellen (Bredt, mehrzellig).md",
       "art": "formel",
@@ -1426,12 +1730,65 @@
       ]
     },
     {
+      "name": "Tragfähigkeitsfaktor N_c",
+      "pfad": "Formelsammlung/Formeln/Tragfähigkeitsfaktor N_c.md",
+      "art": "formel",
+      "zeichen": [
+        "N_c"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
+      "name": "Tragfähigkeitsfaktor N_q",
+      "pfad": "Formelsammlung/Formeln/Tragfähigkeitsfaktor N_q.md",
+      "art": "formel",
+      "zeichen": [
+        "N_q"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
+      "name": "Tragfähigkeitsfaktor N_γ",
+      "pfad": "Formelsammlung/Formeln/Tragfähigkeitsfaktor N_γ.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{\\gamma}"
+      ],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
+      "name": "Tragfähigkeitsformel undrainiert",
+      "pfad": "Formelsammlung/Formeln/Tragfähigkeitsformel undrainiert.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Grundbruch"
+      ]
+    },
+    {
       "name": "Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt",
       "pfad": "Formelsammlung/Formeln/Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt.md",
       "art": "formel",
       "zeichen": [],
       "themen": [
         "Querschnittsanalyse"
+      ]
+    },
+    {
+      "name": "Überlagerung auf Höhe der Sohle",
+      "pfad": "Formelsammlung/Formeln/Überlagerung auf Höhe der Sohle.md",
+      "art": "formel",
+      "zeichen": [
+        "\\sigma_{v,0}"
+      ],
+      "themen": [
+        "Grundbruch"
       ]
     },
     {
@@ -1584,6 +1941,17 @@
       "themen": [
         "Sprödes Versagen je Richtung",
         "Zwängung auf Biegung"
+      ]
+    },
+    {
+      "name": "Winkel der Einbindetiefe",
+      "pfad": "Formelsammlung/Formeln/Winkel der Einbindetiefe.md",
+      "art": "formel",
+      "zeichen": [
+        "\\vartheta_t"
+      ],
+      "themen": [
+        "Grundbruch"
       ]
     },
     {
@@ -2184,6 +2552,41 @@
         "Ergebnis.bericht",
         "Ergebnis.markdown",
         "Ergebnis.latex"
+      ]
+    },
+    {
+      "name": "opencivil.geotechnik",
+      "pfad": "Python/opencivil.geotechnik.md",
+      "art": "modul",
+      "kurz": "Nachweise im Baugrund.",
+      "stichworte": []
+    },
+    {
+      "name": "opencivil.geotechnik.grundbruch",
+      "pfad": "Python/opencivil.geotechnik.grundbruch.md",
+      "art": "modul",
+      "kurz": "Grundbruch und Gleiten eines Flachfundaments.",
+      "stichworte": [
+        "grad",
+        "Fundament",
+        "Fundament.abschnitt",
+        "Fundament.id_von",
+        "Fundament.ins_rechenwerk",
+        "Kombination",
+        "Kombination.kennung",
+        "Faktoren",
+        "Fallergebnis",
+        "Grundbruchbefund",
+        "Grundbruch",
+        "Grundbruch.pruefe",
+        "Grundbruch._grundwasser",
+        "Grundbruch._einbindewinkel",
+        "gleitkoerper",
+        "_hoch5",
+        "Gleiten",
+        "Gleiten.pruefe",
+        "angaben",
+        "faktortabelle"
       ]
     },
     {
@@ -3017,6 +3420,7 @@
         "_verformungsfall",
         "_gebrauchsfaelle",
         "_ausgefallene",
+        "_grundbruch",
         "Bauteilart"
       ]
     },
@@ -3135,6 +3539,22 @@
       ]
     },
     {
+      "name": "opencivil.projekt.grundbruch",
+      "pfad": "Python/opencivil.projekt.grundbruch.md",
+      "art": "modul",
+      "kurz": "ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.",
+      "stichworte": [
+        "GrundbruchkombinationEintrag",
+        "GrundbruchkombinationEintrag.aus_dict",
+        "GrundbruchEintrag",
+        "GrundbruchEintrag.neu",
+        "GrundbruchEintrag.kombination",
+        "GrundbruchEintrag.pruefen",
+        "GrundbruchEintrag.zahlen_pruefen",
+        "GrundbruchEintrag.aus_dict"
+      ]
+    },
+    {
       "name": "opencivil.projekt.lesen",
       "pfad": "Python/opencivil.projekt.lesen.md",
       "art": "modul",
@@ -3209,6 +3629,7 @@
         "Projekt.platte",
         "Projekt.analyse",
         "Projekt.balkensystem",
+        "Projekt.grundbruch",
         "Projekt.skript",
         "Projekt._einziges",
         "Projekt.rechnen",
@@ -3219,6 +3640,7 @@
         "Projekt.laden",
         "Projekt.beispiel",
         "Projekt.jeder_nachweis",
+        "Projekt._grundbrueche",
         "Projekt._alles_einmal",
         "Projekt._beweglich",
         "_felder_setzen"
@@ -3971,6 +4393,16 @@
         "bearbeite",
         "nach_json",
         "bearbeite_json"
+      ]
+    },
+    {
+      "name": "opencivil.web.grundbruchdaten",
+      "pfad": "Python/opencivil.web.grundbruchdaten.md",
+      "art": "modul",
+      "kurz": "was die Oberflaeche von einem Grundbruch zeichnet.",
+      "stichworte": [
+        "situationen",
+        "situation"
       ]
     },
     {

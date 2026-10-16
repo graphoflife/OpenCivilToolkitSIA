@@ -40,9 +40,9 @@ from opencivil.nachweis.duktilitaet import HOECHSTENS as DUKTILITAET_HOECHSTENS
 from opencivil.nachweis.spannungsbegrenzung import GrenzeGegenFliessen
 from opencivil.nachweis.verformung import ZUGSEITEN as VERFORMUNG_ZUGSEITEN
 from opencivil.projekt import (
-    BEIDE_RICHTUNGEN, RISSANFORDERUNGEN, Aufbau, GebrauchsfallEintrag, KnickEintrag,
-    KombinationEintrag, MaterialEintrag, QuerschnittEintrag, SkriptEintrag,
-    SpannungsfallEintrag, VerformungsfallEintrag,
+    BEIDE_RICHTUNGEN, RISSANFORDERUNGEN, Aufbau, GebrauchsfallEintrag, GrundbruchEintrag,
+    GrundbruchkombinationEintrag, KnickEintrag, KombinationEintrag, MaterialEintrag,
+    QuerschnittEintrag, SkriptEintrag, SpannungsfallEintrag, VerformungsfallEintrag,
 )
 from opencivil.projekt import balkensystem as bs
 from opencivil.projekt.eintraege import BETONGESETZE, WERKSTOFFSAETZE
@@ -62,7 +62,7 @@ from opencivil.nachweis.rechenwahl import (
 from opencivil.spannungsanalyse import Analyseart
 from opencivil.stabwerk import querschnitte as stabquerschnitte
 from opencivil.stabwerk.modell import Lastart, Lastrichtung
-from opencivil.web import balkendaten, diagrammdaten
+from opencivil.web import balkendaten, diagrammdaten, grundbruchdaten
 
 #: Die Wertesaetze und Betongesetze mit Beschriftung -- dieselben in der
 #: Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse. ``kurz`` fuer
@@ -159,6 +159,9 @@ def katalog() -> dict:
         # Kennung, Name und das Material der Linien.
         "neues_balkensystem": bs.BalkensystemEintrag.neu(
             kennung="", name="", material="").als_dict(),
+        # Ein Grundbruch mit den Vorgaben des Benutzers und einer Kombination.
+        # Die Oberflaeche setzt Kennung und Name.
+        "neuer_grundbruch": GrundbruchEintrag.neu(kennung="", name="").als_dict(),
         # Ein Skript der App «Python», mit einem Diagramm darin.
         "neues_skript": SkriptEintrag.neu(kennung="", name="").als_dict(),
         # Dasselbe fuer jede Zeile, die man anfuegt -- mit den Startwerten, die
@@ -196,6 +199,8 @@ def katalog() -> dict:
                 masse=stabquerschnitte.RECHTECK.vorgaben()).als_dict(),
             "lastfall": bs.LastfallEintrag().als_dict(),
             "lastkombination": bs.LastkombinationEintrag().als_dict(),
+            # Eine Einwirkung auf ein Fundament.
+            "grundbruchkombination": GrundbruchkombinationEintrag(name="").als_dict(),
         },
         # Die Wahlmoeglichkeiten der Querschnittsanalyse, mit Beschriftung.
         "querschnittsanalyse": {
@@ -507,6 +512,8 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None) -> dict:
         ergebnis["balkensysteme"] = endlich({
             kennung: balkendaten.uebersicht(loesung.befunde.get(system.rechnung.id))
             for kennung, system in aufbau.balkensysteme.items()})
+        # Je Fundament, was die Situationszeichnung vom Kern braucht.
+        ergebnis["grundbrueche"] = endlich(grundbruchdaten.situationen(aufbau, loesung))
         ergebnis["warnungen"] = list(aufbau.warnungen)
         ergebnis["zuordnung"] = zuordnung(aufbau)
     return ergebnis
@@ -529,7 +536,7 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
         # «Kein Nachweis geführt».
         if platte.leer:
             continue
-        kopf_angaben, bewehrung = angaben(aufbau, platte.kennung)
+        kopf_angaben, bewehrung = angaben(aufbau, platte.kennung, loesung)
         tabelle = nachweistabelle(platte)
         ergebnis[platte.kennung] = {
             "kopf": [zelle_dict(k) for k in tabelle.kopf],
@@ -555,7 +562,7 @@ def zusammenfassungen(loesung: Loesung, aufbau: Aufbau) -> dict:
             "markdown": block_markdown(tabelle),
             "hinweise": hinweise(platte),
             "angaben": _gleichung_dict(kopf_angaben, 0),
-            "bewehrung": _tabelle_dict(bewehrung, 0),
+            "bewehrung": _tabelle_dict(bewehrung, 0) if bewehrung is not None else None,
             # Der Grad kommt fertig gesetzt: welche Stelle noetig ist, damit
             # er dem Wort «nicht erfuellt» nicht widerspricht, weiss hier
             # dieselbe Stelle wie fuer die Tabelle.
@@ -722,5 +729,13 @@ def zuordnung(aufbau: Aufbau) -> dict:
                                    "EA": s.EA, "EI": s.EI} for s in system.steifigkeiten],
             }
             for kennung, system in aufbau.balkensysteme.items()
+        },
+        "grundbrueche": {
+            kennung: {
+                "namensraum": fundament.id,
+                "name": fundament.name,
+                "werte": {k: d.id for k, d in fundament.definitionen.items()},
+            }
+            for kennung, fundament in aufbau.grundbrueche.items()
         },
     }

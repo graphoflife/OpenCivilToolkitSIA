@@ -1,5 +1,5 @@
 ---
-erzeugt: cd7222fd0714
+erzeugt: 323359b63bef
 art: modul
 tags: [modul]
 ---
@@ -9,9 +9,10 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Je Bauteil -- Platte oder Querschnittsanalyse -- die gefuehrten Urteile und
-darunter die still verfehlten; dazu, was ueber der Nachweistabelle steht
-(Angaben zur Platte, Bewehrung) und was darunter (Hinweise, stille Maengel). Als Bloecke und Saetze, nicht als
+Je Bauteil -- Platte, Querschnittsanalyse oder Grundbruch -- die gefuehrten
+Urteile und darunter die still verfehlten; dazu, was ueber der
+Nachweistabelle steht (Angaben, Bewehrung oder die Faktoren des Grundbruchs)
+und was darunter (Hinweise, stille Maengel). Als Bloecke und Saetze, nicht als
 Aussehen: dieselben Stuecke setzt die Oberflaeche
 ([[opencivil.web.api#zusammenfassungen|opencivil.web.api.zusammenfassungen]]) und der Bericht
 ([[opencivil.bericht.gliederung#bericht|opencivil.bericht.gliederung.bericht]]), jede Darstellung auf ihre Art.
@@ -159,12 +160,14 @@ darum das Einzige, was sagt, woran es fehlt.
 ### angaben
 
 ```python
-def angaben(aufbau: 'Aufbau', kennung: str) -> Tuple[GleichungBlock, TabellenBlock]
+def angaben(aufbau: 'Aufbau', kennung: str, loesung: Loesung) -> Tuple[GleichungBlock, Optional[TabellenBlock]]
 ```
 
 Was ueber der Nachweistabelle eines Bauteils steht: eine Zeile mit den
-Angaben und eine Tabelle der Bewehrung -- bei der Platte ihre Lagen, bei
-der Querschnittsanalyse ihre Staebe und Schubwaende.
+Angaben und eine Tabelle -- bei der Platte ihre Lagen, bei der
+Querschnittsanalyse ihre Staebe und Schubwaende, beim Grundbruch die
+Faktoren der Tragfaehigkeitsformel. Die stehen erst nach dem Rechnen
+fest; darum die Loesung.
 
 ### plattenangaben
 
@@ -208,6 +211,7 @@ die Lage ist eine Lage, auch wenn sie aus zwei Posten besteht.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
+- [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.projekt]]
 - [[opencivil.querschnitt.platte]]
 

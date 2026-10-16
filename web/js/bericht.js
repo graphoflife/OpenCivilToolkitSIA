@@ -29,6 +29,7 @@ import {
 } from './diagramm.js';
 import { analyseKarten } from './qa_diagramme.js';
 import { systemKarten, systemZusammenfassung } from './bs_diagramme.js';
+import { situationKarten } from './gb_zeichnung.js';
 import { spannungsfallZeichnen } from './spannungsbild.js';
 import { api } from './api.js';
 import { ARTEN } from './arten.js';
@@ -558,6 +559,7 @@ const DIAGRAMME = {
   querschnittsanalyse: (kennung, eintrag, loesung) => [
     ...analyseKarten(kennung), ...spannungskarten(kennung, loesung)],
   balkensystem: systemKarten,
+  grundbruch: situationKarten,
 };
 
 function diagrammSicht(loesung) {

@@ -1,5 +1,5 @@
 ---
-erzeugt: 88670d8e7c69
+erzeugt: b3466a07ca4a
 art: modul
 tags: [modul]
 ---
@@ -23,7 +23,7 @@ ohne Bewehrung.
 
 ## DIE BAUTEILARTEN
 
-Platte, Querschnittsanalyse und Balkensystem haben je einen Steckbrief
+Platte, Querschnittsanalyse, Balkensystem und Grundbruch haben je einen Steckbrief
 ([[opencivil.projekt.aufbau#Bauteilart|Bauteilart]]) in [[opencivil.projekt.aufbau#Konstanten|BAUTEILE]] -- Liste in der Datei, Klasse der
 Eintraege, Vorsilbe der Kennungen, Namensraum, Baufunktion. Wer alle
 Bauteile durchgeht, geht diese Liste durch; eine neue Art kommt dort dazu
@@ -69,6 +69,9 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `qa_spannung: Dict[str, SpannungsbegrenzungQA] = field(default_factory=dict)` – Die Gebrauchsnachweise je Querschnittsanalyse, wie bei der Platte.
 - `qa_knicken: Dict[str, KnickenQA] = field(default_factory=dict)` – Knicken je Querschnittsanalyse -- je Fall in seiner Richtung.
 - `balkensysteme: Dict[str, Balkensystem] = field(default_factory=dict)` – Die Balkensysteme, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis.
+- `grundbrueche: Dict[str, Fundament] = field(default_factory=dict)` – Die Fundamente der Grundbruchnachweise, nach Kennung.
+- `grundbruch: Dict[str, Grundbruch] = field(default_factory=dict)`
+- `gleiten: Dict[str, Gleiten] = field(default_factory=dict)` – Grundbruch und Gleiten je Fundament.
 - `warnungen: List[str] = field(default_factory=list)`
 - `NACHWEISFELDER = ('nachweise', 'querkraft', 'duktilitaet', 'fehlende', 'rissnormalkraf…` – Die Felder, in denen die Nachweise stehen -- die eine Stelle, an der ein neuer Nachweis eingetragen wird. Alle sind nach Kennung geschluesselt (`q1` oder `q1.x`) und alle tragen Nachweise mit `d_ausnutzung`. Ihre Reihenfolge ist die der Herleitung: in ihr rechnet ein Bauteil seine Nachweise ([[opencivil.projekt.aufbau#Bauteil.ziele|Bauteil.ziele]]).
 
@@ -433,6 +436,16 @@ Hoehe, also auch keinen Querkraftwiderstand. Beide Zeilen gehoeren in
 die Tabelle -- eine davon wegzulassen hiesse, die Luecke nur zur
 Haelfte zu schliessen.
 
+### _grundbruch
+
+```python
+def _grundbruch(art: 'Bauteilart', eintrag: GrundbruchEintrag, aufbau: Aufbau) -> Bauteil
+```
+
+Ein Fundament und seine beiden Nachweise -- Grundbruch und Gleiten --,
+sobald eine Kombination eingeschaltet ist. Ohne sie steht das Fundament
+allein da, wie eine Platte ohne Einwirkung.
+
 ### Bauteilart
 
 ```python
@@ -458,13 +471,15 @@ Baufunktion von ihr bekannt sein muss. Eine neue Art kommt in
 - `PLATTE = Bauteilart('platte', 'querschnitte', QuerschnittEintrag, 'q', 'quersc…`
 - `ANALYSE = Bauteilart('querschnittsanalyse', 'querschnittsanalysen', Querschnitt…`
 - `BALKENSYSTEM = Bauteilart('balkensystem', 'balkensysteme', BalkensystemEintrag, 'r',…`
-- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM)` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung -- ein Balkensystem liest Werte der Platten und Analysen, also kommt es zuletzt. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
+- `GRUNDBRUCH = Bauteilart('grundbruch', 'grundbrueche', GrundbruchEintrag, 'g', 'gru…`
+- `BAUTEILE = (PLATTE, ANALYSE, BALKENSYSTEM, GRUNDBRUCH)` – Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung -- ein Balkensystem liest Werte der Platten und Analysen, also kommt es nach ihnen; ein Grundbruch liest nichts von den anderen. Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher, Erkennen einer Datei), geht diese Liste durch.
 
 ## Braucht
 
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.material.basis]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
@@ -485,6 +500,7 @@ Baufunktion von ihr bekannt sein muss. Eine neue Art kommt in
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]

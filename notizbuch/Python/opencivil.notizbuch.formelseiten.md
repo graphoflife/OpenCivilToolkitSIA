@@ -1,5 +1,5 @@
 ---
-erzeugt: 71c069e3244d
+erzeugt: a649355b7706
 art: modul
 tags: [modul]
 ---
@@ -75,6 +75,7 @@ Alles zu einem Formelnamen, ueber alle Laeufe.
 - `themen: Dict[str, None] = field(default_factory=dict)`
 - `codestellen: Dict[str, None] = field(default_factory=dict)`
 - `gebraucht_von: Dict[str, None] = field(default_factory=dict)`
+- `normstellen: Dict[str, None] = field(default_factory=dict)` – Jede Normstelle, unter der die Formel vorkommt -- nicht nur die ihrer ersten Fassung: dieselbe Formel kann in zwei Abschnitten stehen, etwa die Überlagerung beim Grundwasser und in der undrainierten Formel.
 
 #### Formel.referenzen
 

@@ -3,9 +3,9 @@
  *
  * Oben je App ein Knopf mit Zeichen, wie die Kapitel einer Platte in der
  * Mitte (Benutzer, 2026-10-15): Materialien, Stahlbeton-Platten,
- * Querschnittsanalyse, 2D Balkensysteme, Python. Darunter steht die Liste der
- * gewählten App, mit «+» zum Anlegen -- bei den Materialien je eine für
- * Beton und Betonstahl. Darüber, zuoberst in der Tafel, der Name des
+ * Querschnittsanalyse, 2D Balkensysteme, Grundbruch, Python. Darunter steht
+ * die Liste der gewählten App, mit «+» zum Anlegen -- bei den Materialien je
+ * eine für Beton und Betonstahl. Darüber, zuoberst in der Tafel, der Name des
  * Projekts (index.html).
  *
  * Beim Löschen eines Materials wird geprüft, ob eine Platte,
@@ -85,6 +85,7 @@ const KURZTEXT = {
     const staebe = s.linien.filter((l) => l.stab).length;
     return `${staebe} ${staebe === 1 ? 'Stab' : 'Stäbe'}`;
   },
+  grundbruch: (g) => `${g.b}×${g.L} m`,
 };
 
 /** Welche Materialien ein Bauteil braucht -- je Bauteilart. */
@@ -92,6 +93,7 @@ const MATERIALIEN = {
   querschnitt: (q) => [q.beton, ...q.lagen.map((l) => l.stahl)],
   querschnittsanalyse: benutzteMaterialien,
   balkensystem: systemMaterialien,
+  grundbruch: () => [],
 };
 
 /** Welche Bauteile ein Bauteil als Querschnitt nimmt -- das tut nur ein Balkensystem. */
@@ -102,6 +104,7 @@ const ANLEGEN = {
   querschnitt: platteAnlegen,
   querschnittsanalyse: analyseAnlegen,
   balkensystem: systemAnlegen,
+  grundbruch: grundbruchAnlegen,
 };
 
 /** Was rechts im Eintrag steht, wie er aussieht und wie er weggeht -- je Art. */
@@ -326,6 +329,26 @@ function systemAnlegen(art) {
     system.name = naechsterName(art.stamm, p[art.liste]);
     system.linien.forEach((l) => { if (l.stab) l.material = beton.kennung; });
     p[art.liste].push(system);
+  });
+  waehlen({ art: art.art, kennung });
+}
+
+/**
+ * Ein neuer Grundbruch -- mit den Vorgaben des Kerns und einer Kombination.
+ * Er braucht kein Material; gesetzt werden nur Kennung und Name.
+ */
+function grundbruchAnlegen(art) {
+  const vorlage = zustand.katalog?.neuer_grundbruch;
+  if (!vorlage) {
+    melden('Katalog noch nicht geladen.', true);
+    return;
+  }
+  const kennung = freieKennung(art.vorsilbe);
+  projektAendern((p) => {
+    p[art.liste] = p[art.liste] || [];
+    p[art.liste].push({
+      ...structuredClone(vorlage), kennung, name: naechsterName(art.stamm, p[art.liste]),
+    });
   });
   waehlen({ art: art.art, kennung });
 }

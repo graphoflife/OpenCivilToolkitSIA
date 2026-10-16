@@ -1,5 +1,5 @@
 ---
-erzeugt: becc445492cd
+erzeugt: 28a5e8c6f8b3
 art: modul
 tags: [modul]
 ---
@@ -168,6 +168,7 @@ Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks.
 - [[opencivil.stabwerk.querschnitte]]
 - [[opencivil.web.balkendaten]]
 - [[opencivil.web.diagrammdaten]]
+- [[opencivil.web.grundbruchdaten]]
 
 ## Gebraucht von
 

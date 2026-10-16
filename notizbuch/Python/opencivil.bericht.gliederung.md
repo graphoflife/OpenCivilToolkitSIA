@@ -1,5 +1,5 @@
 ---
-erzeugt: bb7445e59d21
+erzeugt: 669aa41f6d91
 art: modul
 tags: [modul]
 ---
@@ -66,7 +66,7 @@ vorkommt.
 ### _nachweise
 
 ```python
-def _nachweise(p: Protokoll, zusammenfassung: Zusammenfassung, aufbau: Optional['Aufbau']) -> None
+def _nachweise(p: Protokoll, zusammenfassung: Zusammenfassung, aufbau: Optional['Aufbau'], loesung: Loesung) -> None
 ```
 
 Je Platte dasselbe wie auf dem Bildschirm: Angaben, Bewehrung,

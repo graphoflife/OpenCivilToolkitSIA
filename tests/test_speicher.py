@@ -23,8 +23,9 @@ from opencivil.web import dienst, speicher
 def projekt_mit_zwei_platten() -> dict:
     """
     Zwei Platten, die sich unterscheiden -- sonst merkt man nichts. Dazu der
-    Unterzug und der Rahmen des Beispiels: vier Bauteile, jedes mit eigenem
-    Platz im Speicher. Der Rahmen nimmt den Querschnitt des Unterzugs.
+    Unterzug, der Rahmen und das Fundament des Beispiels: fünf Bauteile, jedes
+    mit eigenem Platz im Speicher. Der Rahmen nimmt den Querschnitt des
+    Unterzugs.
 
     Ohne Knickfall: seine Grenzkraft kostet je kalten Lauf zwei Sekunden, und
     fast jeder Test hier rechnet kalt. Die Änderung, die ihn braucht, legt ihn
@@ -88,6 +89,8 @@ AENDERUNGEN = [
         {"y": 150.0, "z": 300.0, "durchmesser": 16.0, "stahl": "s1"})),
     ("eine Last des Rahmens",
      lambda d: d["balkensysteme"][0]["linien"][1]["lasten"][0].__setitem__("wert_a", 30.0)),
+    ("der Reibungswinkel des Fundaments",
+     lambda d: d["grundbrueche"][0].__setitem__("phi_k", 28.0)),
     ("eine gelöschte Platte", lambda d: d["querschnitte"].pop()),
 ]
 
@@ -115,7 +118,7 @@ class TestWasUebernommenWird(unittest.TestCase):
         rechnen(beschreibung, frisch=True)
         dienst.SPEICHER.treffer = 0
         rechnen(beschreibung, frisch=False)
-        self.assertEqual(dienst.SPEICHER.treffer, 4)
+        self.assertEqual(dienst.SPEICHER.treffer, 5)
 
     def test_die_geaenderte_platte_wird_neu_gerechnet(self):
         beschreibung = projekt_mit_zwei_platten()
@@ -123,7 +126,7 @@ class TestWasUebernommenWird(unittest.TestCase):
         dienst.SPEICHER.treffer = dienst.SPEICHER.fehlgriffe = 0
         beschreibung["querschnitte"][0]["h"] = 340
         rechnen(beschreibung, frisch=False)
-        self.assertEqual(dienst.SPEICHER.treffer, 3)      # die anderen gelten noch
+        self.assertEqual(dienst.SPEICHER.treffer, 4)      # die anderen gelten noch
         self.assertEqual(dienst.SPEICHER.fehlgriffe, 1)
 
     def test_die_geaenderte_analyse_wird_neu_gerechnet(self):
@@ -132,7 +135,7 @@ class TestWasUebernommenWird(unittest.TestCase):
         dienst.SPEICHER.treffer = dienst.SPEICHER.fehlgriffe = 0
         beschreibung["querschnittsanalysen"][0]["schubwaende"][0]["dicke"] = 120.0
         rechnen(beschreibung, frisch=False)
-        self.assertEqual(dienst.SPEICHER.treffer, 2)      # beide Platten gelten noch
+        self.assertEqual(dienst.SPEICHER.treffer, 3)      # Platten und Fundament gelten noch
         # Die Analyse -- und der Rahmen, der ihren Querschnitt nimmt.
         self.assertEqual(dienst.SPEICHER.fehlgriffe, 2)
 
@@ -149,15 +152,15 @@ class TestWasUebernommenWird(unittest.TestCase):
         beschreibung["materialien"][0]["name"] = "C25/30"
         rechnen(beschreibung, frisch=False)
         self.assertEqual(dienst.SPEICHER.treffer, 0)
-        self.assertEqual(dienst.SPEICHER.fehlgriffe, 4)
+        self.assertEqual(dienst.SPEICHER.fehlgriffe, 5)
 
     def test_eine_geloeschte_platte_raeumt_ihren_platz(self):
         beschreibung = projekt_mit_zwei_platten()
         rechnen(beschreibung, frisch=True)
-        self.assertEqual(dienst.SPEICHER.belegt, 4)
+        self.assertEqual(dienst.SPEICHER.belegt, 5)
         beschreibung["querschnitte"].pop()
         rechnen(beschreibung, frisch=False)
-        self.assertEqual(dienst.SPEICHER.belegt, 3)
+        self.assertEqual(dienst.SPEICHER.belegt, 4)
 
     def test_eine_rueckverfolgung_fuellt_den_speicher_nicht(self):
         """

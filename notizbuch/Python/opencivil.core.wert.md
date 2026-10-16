@@ -1,5 +1,5 @@
 ---
-erzeugt: 35bbf4529ddf
+erzeugt: dd5c2231d540
 art: modul
 tags: [modul]
 ---
@@ -276,6 +276,7 @@ def beschreibung(self) -> str
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.ergebnis]]
+- [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]
@@ -296,6 +297,7 @@ def beschreibung(self) -> str
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.notizbuch.formelseiten]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.grundbruch]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.schnittanalyse]]

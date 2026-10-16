@@ -127,6 +127,15 @@ system.ergebnis.meldungen                     # leer -- oder warum nicht gerechn
 system.verlaeufe("Tragsicherheit")["L2"].extrem("M")         # in SI: Stelle, Wert
 ```
 
+Ein Flachfundament mit Grundbruch und Gleiten -- Winkel in Grad, Masse in m,
+Spannungen in kPa, Kräfte in kN:
+
+```python
+f = p.grundbruch("Fundament Stütze", phi_k=32, b=2.0, L=2.5, t=1.2, t1=5.0,
+                 alpha=0, beta=0, q_Ed=0)    # dazu gamma_phi, c_k, gamma_c, gamma, ...
+f.kombination("Tragsicherheit", N_Ed=1500, T_Ed=150)  # N normal zur Sohle, T in ihr
+```
+
 Linien- und Dreieckslasten (`wert_b`), Einzellasten, Momente und verteilte
 Momente gehen mit `art=`; Federn, Bettung und feste Linienlager mit den
 Feldern der Linie (`quer`, `k_quer`, `laengs`, `k_laengs`). `r.teilen("L2",
@@ -161,7 +170,7 @@ Hand steht, bleibt dabei erhalten.
 
 ## Stand
 
-Fertig und getestet (1091 Tests):
+Fertig und getestet (1229 Tests):
 
 | Baustein | Inhalt |
 |---|---|
@@ -185,6 +194,7 @@ Fertig und getestet (1091 Tests):
 | `stabwerk/verlauf` | N, V, M und Biegelinie längs der Stäbe als Polynome, mit Extremwerten |
 | `stabwerk/querschnitte` | die Querschnitte der Stäbe nach Vorlage, mit ihren Formeln |
 | `stabwerk/rechnung`, `herleitung` | das Balkensystem im Rechenwerk und wie es seine Rechnung aufschreibt |
+| `geotechnik/grundbruch` | ein Flachfundament: Bemessungswerte des Bodens, Grundbruch nach der erweiterten Tragfähigkeitsformel (drainiert und undrainiert), Gleiten in der Sohle, der Gleitkörper nach Prandtl |
 | `nachweis/linie` | Geometrie einer M-N-Linie, `Achse` als Wert |
 | `nachweis/handrechnung` | die von Hand nachrechenbaren Eckpunkte |
 | `nachweis/dehnungsfaecher` | die Grenzen des Dehnungsfächers: als Ebenen für die genaue Linie, als Bedingungen für die Analyse |
@@ -200,13 +210,14 @@ Fertig und getestet (1091 Tests):
 | `spannungsanalyse.py` | sechs Fragen an den Querschnitt: Bild aus N und M oder aus Dehnungen, M-χ- und N-ε-Linie, äquivalenter E-Modul über M und über N — kein Nachweis |
 | `bewehrungssuche/` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt – Längsbewehrung, dünnste Platte, Bügel |
 | `bericht/` | der Bericht als Blöcke (`gliederung`), gesetzt als Konsolentext, LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) und Markdown; die Zusammenfassung je Platte |
-| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `balkensystem`, `skript`, `projekt`) und was daraus gebaut wird (`aufbau`) |
+| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `balkensystem`, `grundbruch`, `skript`, `projekt`) und was daraus gebaut wird (`aufbau`) |
 | `ergebnis.py` | ein gerechnetes Projekt: Zusammenfassung, Bericht, LaTeX, Markdown, Analysen |
 | `notizbuch/` | das Notizbuch: Formel-, Themen- und Python-Seiten für Obsidian und die Dokumentation der Seite (`formelseiten`, `bibliothek`), geschrieben ohne Handgeschriebenes anzufassen (`tresor`) |
 | `web/bruecke.py` | was der Browser lädt: das Verzeichnis des Kerns, die Seiten des Notizbuchs, die Versionsmarken |
 | `web/api.py` | Lösung, Mitschrift und Zusammenfassung als JSON |
 | `web/diagrammdaten.py` | die Punktfolgen der Diagramme als JSON |
 | `web/balkendaten.py` | was die Oberfläche von einem Balkensystem zeigt: Übersicht und Verläufe |
+| `web/grundbruchdaten.py` | was die Situationszeichnung eines Grundbruchs vom Kern braucht: Gleitkörper, Grundwasser, Kräfte je Kombination |
 | `web/speicher.py` | Ergebnisse je Bauteil, damit nur Geändertes neu rechnet |
 | `web/dienst.py` | der Rechendienst, unabhängig vom Transportweg |
 | `web/server.py` | HTTP-Hülle darum (nur Standardbibliothek) |
@@ -218,6 +229,7 @@ Fertig und getestet (1091 Tests):
 | `web/js/querschnittsanalyse.js`, `qa_diagramme.js` | ihre übrige Eingabe und ihre Diagramme |
 | `web/js/bs_zeichnung.js`, `bs_symbole.js` | was es im Balkensystem zeichnet: Stäbe, Lager, Federn, Gelenke, Lasten |
 | `web/js/balkensystem.js`, `bs_diagramme.js` | die übrige Eingabe des Balkensystems und seine Ergebnisse |
+| `web/js/grundbruch.js`, `gb_zeichnung.js` | die Eingabe eines Grundbruchs und das Bild seiner Situation |
 | `web/js/python.js`, `konsole.js`, `variablen.js`, `zeichnen.js` | die App «Python»: Code und Konsole, der Faden der Sitzung, die Variablen rechts, die Diagramme |
 
 Wie das zusammenhängt und warum es so gebaut ist, steht in
@@ -232,8 +244,8 @@ dieselbe Aufteilung, nur nacheinander.
 
 Links steht zuoberst der Name des Projekts, darunter je App ein Knopf mit
 Zeichen und Anzahl -- Materialien, Stahlbeton-Platten, Querschnittsanalyse, 2D
-Balkensysteme, Python -- und unter den Knöpfen die Liste der gewählten App, mit
-«+» zum Anlegen.
+Balkensysteme, Grundbruch, Python -- und unter den Knöpfen die Liste der
+gewählten App, mit «+» zum Anlegen.
 
 Die Oberfläche rechnet nichts. Sie schickt die Projektbeschreibung an den Kern
 und stellt dar, was zurückkommt -- fertige Zahlen und fertige LaTeX-Zeichen­ketten.
@@ -374,7 +386,22 @@ Vorlage, von Hand, aus einer Platte oder aus einer Querschnittsanalyse; die
 Steifigkeit nach Vorgabe, nicht nachgeschlagen: E_cm bzw. E_s am
 ungerissenen Bruttoquerschnitt, ohne Schubverformung, Theorie 1. Ordnung.
 
-**Python:** die fünfte App. Skripte, gespeichert mit dem Projekt; in der
+**Grundbruch:** ein Flachfundament auf seinem Baugrund, nach dem Kapitel 9.2
+«Tragfähigkeit», das der Benutzer geliefert hat. Oben das Panel «Grundbruch
+Situation» mit Boden (φ_k, γ_φ, c_k, γ_c, γ, γ_w), Fundament (b, L, t, α),
+Gelände und Grundwasser (β, t_1, q_Ed) und Sohlreibung (δ*/φ), darunter die
+Einwirkungen: beliebig viele Kombinationen aus N_Ed und T_Ed. Gerechnet wird
+mit Bemessungswerten, φ_eff = arctan(tan φ_k / γ_φ) nach SIA 267:2013, 5.3.2.1,
+und c_eff = c_k / γ_c; je Kombination der Grundbruchwiderstand N_Rd nach der
+erweiterten Tragfähigkeitsformel -- mit φ = 0 nach der undrainierten -- und
+der Gleitwiderstand T_Rd = N_Ed · tan δ*. Die Winkel wie in Bild 9.2.15: T
+zeigt zur Seite, auf der das Gelände um β abfällt, und die Sohle steigt um α
+in Richtung von T an. Rechts steht in der Zusammenfassung die Tabelle der
+Faktoren N, s, d, i, g, b' je Anteil -- Kohäsion, seitliche Auflast, Gewicht
+des Gleitkörpers -- und unter «Diagramme» das Bild der Situation: Fundament,
+Gelände, Grundwasser, Kräfte der gewählten Kombination und der Gleitkörper.
+
+**Python:** die sechste App. Skripte, gespeichert mit dem Projekt; in der
 Mitte der Code und darunter die Konsole, rechts statt der Berechnung die
 Variablen mit Typ, Grösse und Wert -- wie in Spyder. Strg+Enter führt das
 Skript aus, die Zeile der Konsole einen einzelnen Befehl (Enter; ↑ und ↓
@@ -416,7 +443,7 @@ weisse Karten; ein Klick auf den Kopf klappt es zu.
   Bruchzustand im Schnitt und der Schubfluss in den Wänden; bei einem
   Balkensystem je Fall Verformung, N, V, M und Lagerkräfte -- mit der Maus
   darüber (auf dem Telefon: tippen) der Wert an der Stelle, an einem Knoten
-  seine Verschiebung
+  seine Verschiebung; bei einem Grundbruch die Situation
 * *Herleitung* -- die Mitschrift, Formel für Formel, mit Normstelle; je
   Bestandteil ein Panel, je Kapitel eine Karte
 
@@ -573,6 +600,15 @@ Im Balkensystem:
 * Querschnittsmasse in mm, Lasten in kN, kN/m, kNm, kNm/m; Federn in kN/m und
   kNm/rad, Bettung in kN/m²
 
+Im Grundbruch, wie in Bild 9.2.15 des Kapitels:
+
+* `N_Ed` normal zur Sohle, Druck positiv; `T_Ed` in der Sohle, zur Seite, auf
+  der das Gelände abfällt -- beide nicht negativ
+* `α` positiv, wenn die Sohle in Richtung von T ansteigt; `β` positiv, wenn
+  das Gelände auf der Seite von T abfällt; `δ_R = arctan(T/N)`
+* `t` und `t_1` ab Oberkante Terrain: bis zur Sohle, bis zum höchsten
+  Grundwasserspiegel; Masse in m, Winkel in Grad, Spannungen in kPa
+
 ## Erfüllungsgrad beim M-N-Nachweis
 
 Ob ein Punkt innerhalb der Resistenzlinie liegt, entscheidet die massgebende
@@ -598,6 +634,9 @@ Massstab ab:
   Rissbegrenzung und Knicken sind gebaut.
 * **Schiefe Lagen** im Lagenaufbau (die alte Fassung konnte das). Zulagen gibt
   es.
+* **Grundbruch**: eine ausmittige Last (wirksame Breite), ein Erdwiderstand
+  vor dem Fundament und die Stabilitätsberechnung, die das Kapitel verlangt,
+  wenn das Grundwasser im Gleitkörper steht -- gerechnet wird dann mit γ'.
 * **Balkensysteme**: Eigengewicht aus dem Querschnitt, Umhüllende der
   Kombinationen, Theorie 2. Ordnung, Schubverformung, schiefe Lager und die
   Übergabe der Schnittgrössen an die Querschnittsnachweise fehlen noch.

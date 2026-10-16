@@ -8,7 +8,8 @@ from pathlib import Path
 
 from opencivil.core.einheiten import N_PRO_MM2
 from opencivil.projekt import (
-    Aufbau, BalkensystemEintrag, GebrauchsfallEintrag, Gebrauchsliste, KnickEintrag,
+    Aufbau, BalkensystemEintrag, GebrauchsfallEintrag, Gebrauchsliste, GrundbruchEintrag,
+    GrundbruchkombinationEintrag, KnickEintrag,
     KnotenlastEintrag, KombinationEintrag, LageEintrag, LagerEintrag, LastfallEintrag,
     LastkombinationEintrag, MaterialEintrag, ObergrenzeEintrag, PostenEintrag, Projekt,
     ProjektFehler, QuerkraftbewehrungEintrag, QuerschnittEintrag, RechenwahlEintrag,
@@ -35,15 +36,18 @@ class TestProjektBeschreibung(unittest.TestCase):
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         self.assertTrue(loesung.vollstaendig)
         # Gefuehrt werden bei der Platte die 3 M-N-Nachweise und die
-        # Verformung im Feld, beim Unterzug Biegung und Querkraft mit Torsion.
-        # Die uebrigen rechnen still mit: eingeschaltet hat sie niemand, und
-        # ungefragt in der Tabelle staenden sie sonst bei jedem Bauteil.
+        # Verformung im Feld, beim Unterzug Biegung und Querkraft mit Torsion,
+        # beim Fundament Grundbruch und Gleiten. Die uebrigen rechnen still
+        # mit: eingeschaltet hat sie niemand, und ungefragt in der Tabelle
+        # staenden sie sonst bei jedem Bauteil.
         laut = [u for u in loesung.urteile if not u.still]
         platte = [u for u in laut if u.raum.startswith("querschnitt.q1.")]
         unterzug = [u for u in laut if u.raum.startswith("querschnittsanalyse.a1.")]
+        fundament = [u for u in laut if u.raum.startswith("grundbruch.g1.")]
         self.assertEqual(sorted(u.art for u in platte), ["M-N", "M-N", "M-N", "w"])
         self.assertEqual(sorted(u.art for u in unterzug), ["M-N", "V+T"])
-        self.assertEqual(len(laut), len(platte) + len(unterzug))
+        self.assertEqual(sorted(u.art for u in fundament), ["GB", "GL"])
+        self.assertEqual(len(laut), len(platte) + len(unterzug) + len(fundament))
         self.assertTrue(all(u.erfuellt for u in laut))
         self.assertTrue([u for u in loesung.urteile if u.still])
 
@@ -429,6 +433,8 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
         (LastkombinationEintrag, {}, {}),
         (BalkensystemEintrag, {"kennung": "r"}, {"kennung": "r", "name": "r"}),
         (SkriptEintrag, {"kennung": "p"}, {"kennung": "p", "name": "p"}),
+        (GrundbruchEintrag, {"kennung": "g"}, {"kennung": "g", "name": "g"}),
+        (GrundbruchkombinationEintrag, {"name": "k"}, {"name": "k"}),
         (Projekt, {}, {}),
     ]
 
