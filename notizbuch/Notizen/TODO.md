@@ -19,13 +19,20 @@ gelernt wurde, steht in [[Entwicklung]].
 - [ ] Der Riegel `k_g ≥ 1.20` ist nach Vorgabe eingebaut, aber nicht gegen die
       Norm geprüft. Bei D_max = 32 mm und C30/37 greift er (roh 1.00 → 1.20)
       und senkt den Querkraftwiderstand um gut 4 %.
-- [ ] Normstellen für 80 von 111 Formeln fehlen noch -- die Liste samt
+- [ ] Normstellen für 109 von 141 Formeln fehlen noch -- die Liste samt
       Stelle im Code steht auf der Übersicht der [[Formelsammlung]]. Sie
       kommen vom Benutzer und werden im Code eingetragen (`referenz=`).
-- [ ] Auf dem Telefon (375 px) ist die Kopfleiste zu eng: die Marke steht
-      halb über dem oberen Rand, das Namensfeld ragt in die Tafel darunter,
-      und «Kern: lokaler Server» liegt über der unteren Tafelwahl. Schon vor
-      dem Notizbuch so.
+- [ ] Verformung und «Plattendicke optimieren»: die Suche hält w fest wie eine
+      Einwirkung. w gehört aber zur eingegebenen Dicke -- bei gleicher Last
+      wächst es mit 1/h³ --, und mit festem w hängt die Verformung bei der
+      Suche kaum an der Dicke: ω_w ändert sich mit h nur wenig. Frage an den Benutzer:
+      w bei der Dickensuche mit (h₀/h)³ umrechnen, oder die Verformung dort
+      weglassen?
+- [ ] Verformung der Platte: der Grenzwert w_max = L/350 und dass w mit der
+      Steifigkeit E_cm ermittelt ist, sind nach Vorgabe eingebaut, nicht
+      nachgeschlagen (`nachweis/verformung.py`, `GRENZE`). Die Normstelle dazu
+      fehlt; die des Vergrösserungsfaktors (4.4.3.2.5) hat der Benutzer
+      geliefert.
 - [ ] Der Dienst «bericht» und das PDF des lokalen Servers haben seit dem
       Wegfall des Knopfs «Bericht» keinen Weg mehr aus der Oberfläche.
       Entfernen, oder wieder erreichbar machen.

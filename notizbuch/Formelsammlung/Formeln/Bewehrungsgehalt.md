@@ -1,5 +1,5 @@
 ---
-erzeugt: cea65d3de375
+erzeugt: 2feb4b7eaf1c
 art: formel
 tags: [formel]
 ---
@@ -34,11 +34,11 @@ $$
 
 ## Im Code
 
-- [[opencivil.querschnitt.platte#Lagenaufbau._vergroesserung|Lagenaufbau._vergroesserung]]
+- [[opencivil.nachweis.verformung#Verformung._bewehrungsgehalte|Verformung._bewehrungsgehalte]]
 
 ## Themen
 
-- [[Querschnitt]]
+- [[Verformung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

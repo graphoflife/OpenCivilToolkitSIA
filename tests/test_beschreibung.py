@@ -13,7 +13,7 @@ from opencivil.projekt import (
     LastkombinationEintrag, MaterialEintrag, ObergrenzeEintrag, PostenEintrag, Projekt,
     ProjektFehler, QuerkraftbewehrungEintrag, QuerschnittEintrag, RechenwahlEintrag,
     SkriptEintrag, SpannungsfallEintrag, StablastEintrag, StabquerschnittEintrag,
-    SystemknotenEintrag, SystemlinieEintrag,
+    SystemknotenEintrag, SystemlinieEintrag, VerformungEintrag, VerformungsfallEintrag,
 )
 from opencivil.projekt.eintraege import Beschreibung
 from opencivil.projekt.querschnittsanalyse import (
@@ -34,15 +34,14 @@ class TestProjektBeschreibung(unittest.TestCase):
         self.assertEqual(sorted(aufbau.nachweise), ["q1.x"])
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         self.assertTrue(loesung.vollstaendig)
-        # Gefuehrt werden bei der Platte die 3 M-N-Nachweise, beim Unterzug
-        # Biegung und Querkraft mit Torsion. Die uebrigen rechnen still mit:
-        # eingeschaltet hat sie niemand, und ungefragt in der Tabelle staenden
-        # sie sonst bei jedem Bauteil.
+        # Gefuehrt werden bei der Platte die 3 M-N-Nachweise und die
+        # Verformung im Feld, beim Unterzug Biegung und Querkraft mit Torsion.
+        # Die uebrigen rechnen still mit: eingeschaltet hat sie niemand, und
+        # ungefragt in der Tabelle staenden sie sonst bei jedem Bauteil.
         laut = [u for u in loesung.urteile if not u.still]
         platte = [u for u in laut if u.raum.startswith("querschnitt.q1.")]
         unterzug = [u for u in laut if u.raum.startswith("querschnittsanalyse.a1.")]
-        self.assertEqual(len(platte), 3)
-        self.assertTrue(all(u.art == "M-N" for u in platte))
+        self.assertEqual(sorted(u.art for u in platte), ["M-N", "M-N", "M-N", "w"])
         self.assertEqual(sorted(u.art for u in unterzug), ["M-N", "V+T"])
         self.assertEqual(len(laut), len(platte) + len(unterzug))
         self.assertTrue(all(u.erfuellt for u in laut))
@@ -105,7 +104,10 @@ class TestVollstaendigeAblage(unittest.TestCase):
                     ueberdeckung_unten=25.0, ueberdeckung_oben=35.0,
                     d_max=16.0, einlagenhoehe=40.0, k_c=0.6,
                     rissanforderung="hoch", beschreibung="Unter dem Dach",
-                    kriechzahl=2.5, zwaengung=True, zwaengung_begrenzt=True,
+                    zwaengung=True, zwaengung_begrenzt=True,
+                    verformung=VerformungEintrag(kriechzahl=2.5, faelle=[
+                        VerformungsfallEintrag("Kragarm", w=1.5, laenge=2.0,
+                                               zugseite="oben", aktiv=False)]),
                     haeufig=Gebrauchsliste(anteil=75.0, aus_tragsicherheit=True, faelle=[
                         GebrauchsfallEintrag("Gebrauch", M_Ed=70.0, N_Ed=-40.0)]),
                     quasistaendig=Gebrauchsliste(anteil=55.0, aus_tragsicherheit=True, faelle=[
@@ -390,7 +392,8 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
         # Mit φ = 0: ohne Kriechzahlen der Kapitel ist ein Wörterbuch eine
         # Datei von vor 2026-10-09, und die Kapitel übernehmen das φ der Platte.
         (QuerschnittEintrag, {"kennung": "q", "beton": "b", "kriechzahl": 0.0},
-         {"kennung": "q", "name": "q", "beton": "b", "kriechzahl": 0.0}),
+         {"kennung": "q", "name": "q", "beton": "b",
+          "verformung": VerformungEintrag(kriechzahl=0.0)}),
         (MaterialEintrag, {"kennung": "m", "art": "beton", "sorte": "C30/37"},
          {"kennung": "m", "art": "beton", "sorte": "C30/37"}),
         (PostenEintrag, {}, {}),
@@ -398,6 +401,8 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
         (ObergrenzeEintrag, {}, {}),
         (QuerkraftbewehrungEintrag, {}, {}),
         (KnickEintrag, {"name": "k"}, {"name": "k"}),
+        (VerformungsfallEintrag, {"name": "v"}, {"name": "v"}),
+        (VerformungEintrag, {}, {}),
         (SpannungsfallEintrag, {"name": "s"}, {"name": "s"}),
         (GebrauchsfallEintrag, {"name": "g"}, {"name": "g"}),
         (RechenwahlEintrag, {}, {}),
@@ -510,7 +515,7 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
         for feld in ("duktilitaet", "sproede", "zwaengung_biegung", "zwaengung",
                      "haeufig", "quasistaendig", "automatik_modus",
                      "automatik_teilungen", "automatik_mindestdurchmesser",
-                     "rissanforderung", "kriechzahl", "d_max", "k_c", "b"):
+                     "rissanforderung", "verformung", "d_max", "k_c", "b"):
             with self.subTest(feld=feld):
                 self.assertEqual(vorlage[feld], leer[feld])
 

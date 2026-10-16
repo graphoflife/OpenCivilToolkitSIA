@@ -53,9 +53,10 @@ class TestUrteilsraum(unittest.TestCase):
             "rechnen", {"projekt": self.zweiplattenprojekt().als_dict()})
         raeume = {u["raum"] for u in antwort.daten["urteile"]}
         self.assertTrue(all(r.startswith("querschnitt.q") for r in raeume), raeume)
-        # 2 Platten, je ein M-N-Nachweis in x -- mehr ist im Beispiel nicht
-        # eingeschaltet, und die stillen Nachweise stehen nicht in dieser Liste.
-        self.assertEqual(len(raeume), 2)
+        # 2 Platten, je ein M-N-Nachweis in x und die Verformung -- mehr ist
+        # im Beispiel nicht eingeschaltet, und die stillen Nachweise stehen
+        # nicht in dieser Liste.
+        self.assertEqual(len(raeume), 4)
 
 
 class TestSpannungsnachweisNurWoGefordert(unittest.TestCase):
@@ -357,9 +358,9 @@ class TestAngabengruppen(unittest.TestCase):
         # Erfuellungsgrad. Eine Spalte "Urteil" gab es einmal; sie stand neben
         # dem Grad und sagte dasselbe noch einmal.
         self.assertEqual(len(tabelle["kopf"]), 5)
-        # 3 x M-N in x -- die uebrigen Nachweise rechnen still mit und
-        # stehen darum nicht in der Tabelle.
-        self.assertEqual(len(tabelle["zeilen"]), 3)
+        # 3 x M-N in x und die Verformung -- die uebrigen Nachweise rechnen
+        # still mit und stehen darum nicht in der Tabelle.
+        self.assertEqual(len(tabelle["zeilen"]), 4)
         for zeile in tabelle["zeilen"]:
             self.assertEqual(len(zeile["zellen"]), len(tabelle["kopf"]))
             self.assertIn("erfuellt", zeile)
@@ -474,7 +475,7 @@ class TestAngabengruppen(unittest.TestCase):
         """
         projekt = Projekt.beispiel()
         q = projekt.querschnitt("q1")
-        q.kombinationen = []
+        q.ohne_lastfaelle()
         q.duktilitaet = [False] * 4
         q.sproede = True
         q.zwaengung_biegung = True
@@ -487,7 +488,7 @@ class TestAngabengruppen(unittest.TestCase):
 
     def test_die_duktilitaet_laeuft_auch_ohne_schnittgroessen(self):
         projekt = Projekt.beispiel()
-        projekt.querschnitt("q1").kombinationen = []
+        projekt.querschnitt("q1").ohne_lastfaelle()
         projekt.querschnitt("q1").duktilitaet = [True, False, False, True]
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         namen = [z["zellen"][0]["text"]

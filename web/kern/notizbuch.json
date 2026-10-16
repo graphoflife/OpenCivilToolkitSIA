@@ -38,6 +38,12 @@
       "bereich": "Platte"
     },
     {
+      "name": "Verformung",
+      "pfad": "Formelsammlung/Themen/Verformung.md",
+      "art": "thema",
+      "bereich": "Platte"
+    },
+    {
       "name": "Querschnittsanalyse",
       "pfad": "Formelsammlung/Themen/Querschnittsanalyse.md",
       "art": "thema",
@@ -379,7 +385,7 @@
         "\\rho_{u}"
       ],
       "themen": [
-        "Querschnitt"
+        "Verformung"
       ]
     },
     {
@@ -398,11 +404,11 @@
       "pfad": "Formelsammlung/Formeln/Bewehrungsquerschnitt der zusammengefassten Lage.md",
       "art": "formel",
       "zeichen": [
-        "A_{s,u}"
+        "A_{s,2,x}"
       ],
       "themen": [
-        "Querschnitt",
-        "Biegung und Normalkraft"
+        "Biegung und Normalkraft",
+        "Verformung"
       ]
     },
     {
@@ -627,6 +633,7 @@
       ],
       "themen": [
         "Biegung und Normalkraft",
+        "Verformung",
         "Schiefe Biegung",
         "Querkraft und Torsion",
         "Querkraft",
@@ -889,6 +896,17 @@
       "zeichen": [],
       "themen": [
         "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
+      "name": "Grenzwert der Durchbiegung",
+      "pfad": "Formelsammlung/Formeln/Grenzwert der Durchbiegung.md",
+      "art": "formel",
+      "zeichen": [
+        "w_{max}"
+      ],
+      "themen": [
+        "Verformung"
       ]
     },
     {
@@ -1298,12 +1316,12 @@
       "pfad": "Formelsammlung/Formeln/Schwerpunkt der zusammengefassten Lage.md",
       "art": "formel",
       "zeichen": [
-        "z_{u}",
-        "z_{2,x}"
+        "z_{2,x}",
+        "z_{u}"
       ],
       "themen": [
-        "Querschnitt",
         "Biegung und Normalkraft",
+        "Verformung",
         "Duktilität",
         "Zwängung auf Biegung"
       ]
@@ -1358,12 +1376,12 @@
       "pfad": "Formelsammlung/Formeln/Statische Höhe.md",
       "art": "formel",
       "zeichen": [
-        "d_{u}",
-        "d_{o}"
+        "d_{2,x}",
+        "d_{3,x}"
       ],
       "themen": [
-        "Querschnitt",
         "Biegung und Normalkraft",
+        "Verformung",
         "Querkraft",
         "Duktilität",
         "Zwängung auf Biegung"
@@ -1441,10 +1459,10 @@
       "pfad": "Formelsammlung/Formeln/Vergrösserungsfaktor der Durchbiegung.md",
       "art": "formel",
       "zeichen": [
-        "\\left(\\frac{w}{w_c}\\right)_{u}"
+        "\\omega_{w,u}"
       ],
       "themen": [
-        "Querschnitt"
+        "Verformung"
       ]
     },
     {
@@ -1566,6 +1584,17 @@
       "themen": [
         "Sprödes Versagen je Richtung",
         "Zwängung auf Biegung"
+      ]
+    },
+    {
+      "name": "Wirksame Durchbiegung",
+      "pfad": "Formelsammlung/Formeln/Wirksame Durchbiegung.md",
+      "art": "formel",
+      "zeichen": [
+        "w_{eff}"
+      ],
+      "themen": [
+        "Verformung"
       ]
     },
     {
@@ -2819,6 +2848,22 @@
       ]
     },
     {
+      "name": "opencivil.nachweis.verformung",
+      "pfad": "Python/opencivil.nachweis.verformung.md",
+      "art": "modul",
+      "kurz": "die Durchbiegung der Platte.",
+      "stichworte": [
+        "gegenseite",
+        "Verformungsfall",
+        "Verformungsfall.kennung",
+        "Fallergebnis",
+        "Verformung",
+        "Verformung.pruefe",
+        "Verformung._vergroesserung",
+        "Verformung._bewehrungsgehalte"
+      ]
+    },
+    {
       "name": "opencivil.nachweis.zustand2",
       "pfad": "Python/opencivil.nachweis.zustand2.md",
       "art": "modul",
@@ -2969,6 +3014,7 @@
         "_spannungsnachweise",
         "_qa_spannungsnachweise",
         "_knickfall",
+        "_verformungsfall",
         "_gebrauchsfaelle",
         "_ausgefallene",
         "Bauteilart"
@@ -3059,6 +3105,13 @@
         "QuerkraftbewehrungEintrag.als_bewehrung",
         "KnickEintrag",
         "KnickEintrag.aus_dict",
+        "VerformungsfallEintrag",
+        "VerformungsfallEintrag.zahlen_pruefen",
+        "VerformungsfallEintrag.aus_dict",
+        "VerformungEintrag",
+        "VerformungEintrag.fall",
+        "VerformungEintrag.pruefen",
+        "VerformungEintrag.aus_dict",
         "abgeleiteter_fallname",
         "SpannungsfallEintrag",
         "SpannungsfallEintrag.aus_dict",
@@ -3127,6 +3180,7 @@
         "QuerschnittEintrag.ohne_lastfaelle",
         "QuerschnittEintrag.einwirkung",
         "QuerschnittEintrag.knickfall",
+        "QuerschnittEintrag.verformungsfall",
         "QuerschnittEintrag.spannungsfall",
         "QuerschnittEintrag.neu",
         "QuerschnittEintrag.aus_dict"
@@ -3419,7 +3473,6 @@
         "Postenbezug",
         "Lagenaufbau",
         "Lagenaufbau.rechne",
-        "Lagenaufbau._vergroesserung",
         "Lagenaufbau._kennzahlen",
         "Plattenquerschnitt",
         "Plattenquerschnitt.id_von",

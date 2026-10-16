@@ -38,10 +38,11 @@ from opencivil.material.betonstahl import STAHLSORTEN, STAHL_VORLAGEN, stahlsort
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.nachweis.duktilitaet import HOECHSTENS as DUKTILITAET_HOECHSTENS
 from opencivil.nachweis.spannungsbegrenzung import GrenzeGegenFliessen
+from opencivil.nachweis.verformung import ZUGSEITEN as VERFORMUNG_ZUGSEITEN
 from opencivil.projekt import (
     BEIDE_RICHTUNGEN, RISSANFORDERUNGEN, Aufbau, GebrauchsfallEintrag, KnickEintrag,
     KombinationEintrag, MaterialEintrag, QuerschnittEintrag, SkriptEintrag,
-    SpannungsfallEintrag,
+    SpannungsfallEintrag, VerformungsfallEintrag,
 )
 from opencivil.projekt import balkensystem as bs
 from opencivil.projekt.eintraege import BETONGESETZE, WERKSTOFFSAETZE
@@ -168,6 +169,7 @@ def katalog() -> dict:
             "einwirkung": KombinationEintrag(name="", M_Ed=30.0).als_dict(),
             "knickfall": KnickEintrag(name="", N_Ed=-500.0, M_Ed_1=20.0).als_dict(),
             "gebrauchsfall": GebrauchsfallEintrag(name="").als_dict(),
+            "verformungsfall": VerformungsfallEintrag(name="", w=2.0).als_dict(),
             "analyse": SpannungsfallEintrag(name="", M_Ed=30.0).als_dict(),
             "material": MaterialEintrag(kennung="", art="", sorte="").als_dict(),
             # Die Teile der Querschnittsanalyse, wie das Zeichenfenster sie
@@ -290,6 +292,9 @@ def katalog() -> dict:
         # Wie weit sich die Grenze x/d hoechstens setzen laesst -- fuer das
         # Feld; geprueft wird beim Bauen der Platte.
         "duktilitaet": {"hoechstens": DUKTILITAET_HOECHSTENS},
+        # Die Seiten, die ein Verformungsfall ziehen kann.
+        "verformung": {"zugseiten": [{"wert": s, "beschriftung": s}
+                                     for s in VERFORMUNG_ZUGSEITEN]},
     }
 
 
@@ -666,6 +671,13 @@ def zuordnung(aufbau: Aufbau) -> dict:
                         "eckwerte": {n: d.id for n, d in nw.d_eckwerte.items()},
                     }
                     for nw in aufbau.bauteil(kennung).im_feld("nachweise")
+                },
+                # Der Vergroesserungsfaktor je gezogene Seite -- er gehoert dem
+                # Verformungsnachweis und steht nur, wo der rechnet.
+                "verformung": {
+                    seite: d.id
+                    for nw in aufbau.bauteil(kennung).im_feld("verformung")
+                    for seite, d in nw.d_omega.items()
                 },
                 # Durchmesser, Teilung und Stabzahl als Zahlen, nicht nur als
                 # Text: das Querschnittsbild soll die tatsaechliche Teilung

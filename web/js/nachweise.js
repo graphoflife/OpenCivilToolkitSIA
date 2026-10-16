@@ -20,7 +20,7 @@
 
 import { api } from './api.js';
 import {
-  erklaerung, feld, hakenSchalter, richtungsWahl,
+  erklaerung, feld, hakenSchalter, richtungsWahl, zweiSchalter,
 } from './bausteine.js';
 import { auswahl, el, melden, zahlfeld } from './dom.js';
 import { xLagen } from './lagen.js';
@@ -98,6 +98,15 @@ const HILFE = {
       ['φ', 'nach Rechenwahl → E_c,eff = E_cm / (1 + φ), präzise und elastisch'],
     ],
     formel: 'σ_s ≤ f_yd − 80 N/mm²',
+  },
+  verformung: {
+    zeilen: [
+      ['Weg', 'w mit E_cm ermittelt, mal Vergrösserungsfaktor ω_w der gezogenen Seite'],
+      ['ω_w', 'SIA 262:2025, 4.4.3.2.5 – je Platte und gezogene Seite einmal gerechnet'],
+      ['Grenze', 'w_max = L/350 – nach Vorgabe, nicht nachgeschlagen'],
+      ['φ', 'oben im Fenster, für alle Fälle der Platte; Vorgabe 2'],
+    ],
+    formel: 'w_eff = ω_w · w ≤ w_max = L/350',
   },
   knicken: {
     zeilen: [
@@ -501,6 +510,89 @@ export function haeufigInhalt(eintrag, ort = PLATTE) {
       : `Rissanforderung «${anforderung(eintrag)?.beschriftung ?? '–'}» → `
         + 'Tab. 17: kein Nachweis. Für den Nachweis oben «Erhöht» oder «Hoch» wählen.',
   });
+}
+
+/**
+ * Die Verformung: zuoberst die Kriechzahl φ des Vergrösserungsfaktors ω_w,
+ * darunter die Verformungsfälle -- je Fall w, die Spannweite L und die
+ * Seite, die er zieht.
+ *
+ * φ gilt für die ganze Platte, nicht je Fall: ω_w hängt nur an der Platte
+ * und an der gezogenen Seite und wird je Seite einmal gerechnet (Benutzer,
+ * 2026-10-16). Vorher stand φ oben bei der Platte, nur für diesen Faktor.
+ */
+export function verformungInhalt(querschnitt) {
+  const aendern = (veraenderer) => anPlatte(querschnitt)((q) => veraenderer(q.verformung));
+  const { kriechzahl, faelle } = querschnitt.verformung;
+  return [
+    feld(['Kriechzahl ', span(String.raw`\varphi`)], zahlfeld({
+      wert: kriechzahl, schritt: 0.1, min: 0,
+      titel: 'Kriechzahl φ im Vergrösserungsfaktor ω_w',
+      beiAenderung: (v) => aendern((l) => { l.kriechzahl = v; }),
+    }), erklaerung([
+      ['Wofür', 'den Vergrösserungsfaktor ω_w (SIA 262:2025, 4.4.3.2.5)'],
+      ['Gilt für', 'alle Verformungsfälle dieser Platte: ω_w wird je gezogene Seite einmal gerechnet'],
+    ], 'ω_w = (1 − 20ρ′)/(10ρ^0.7) · (0.75 + 0.1φ) · (h/d)³')),
+    el('p.hinweis.hinweis-annahme', { text: 'w mit der Steifigkeit E_cm ermitteln.' }),
+    faelle.length
+      ? el('div.einwirkung.ist-kopf', {}, [
+        el('span'),
+        el('span', { text: 'Bezeichnung' }),
+        el('span', { text: 'w [mm]' }),
+        el('span', { text: 'L [m]' }),
+        el('span', { text: 'Zug' }),
+        el('span'),
+      ])
+      : null,
+    ...(faelle.length
+      ? faelle.map((_, i) => verformungsZeile(querschnitt, i))
+      : [el('div.leer', { text: 'Noch kein Verformungsfall (nur x).' })]),
+    anfuegenKnopf('Verformungsfall', () => aendern((l) => {
+      l.faelle.push(ausVorlage('verformungsfall', { name: naechsterName('Verformung', l.faelle) }));
+    })),
+  ];
+}
+
+/** Ein Verformungsfall auf einer Zeile: w, L und die gezogene Seite. */
+function verformungsZeile(querschnitt, index) {
+  const k = querschnitt.verformung.faelle[index];
+  const aendern = (veraenderer) => anPlatte(querschnitt)((q) => {
+    veraenderer(q.verformung.faelle[index]);
+  });
+  const aktiv = k.aktiv !== false;
+  const seiten = zustand.katalog?.verformung?.zugseiten || [];
+  return el('div.einwirkung', { class: aktiv ? '' : 'ist-aus' }, [
+    hakenSchalter(aktiv, (wert) => aendern((x) => { x.aktiv = wert; }), 'Verformungsfall'),
+    el('input.ew-name', {
+      type: 'text', value: k.name, title: 'Bezeichnung des Verformungsfalls',
+      on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
+    }),
+    zahlfeld({
+      wert: k.w, schritt: 1, min: 0, leer: 0,
+      titel: 'Durchbiegung w in mm, mit der Steifigkeit E_cm ermittelt',
+      beiAenderung: (v) => aendern((x) => { x.w = v; }),
+    }),
+    // Eine Spannweite null gibt es nicht -- geleert bleibt der bisherige Wert.
+    zahlfeld({
+      wert: k.laenge, schritt: 0.5,
+      titel: 'Spannweite L in m – der Grenzwert ist L/350',
+      beiAenderung: (v) => aendern((x) => { x.laenge = v; }),
+    }),
+    seiten.length === 2
+      ? zweiSchalter({
+        stellungen: seiten.map((s) => [s.wert, s.beschriftung]),
+        gewaehlt: k.zugseite, klasse: '.schalter-richtung',
+        setzen: (wert) => aendern((x) => { x.zugseite = wert; }),
+        titel: `Zug ${k.zugseite}: danach richtet sich ω_w -- Klicken schaltet um`,
+      })
+      : null,
+    el('button.weg', {
+      text: '×', title: 'Verformungsfall entfernen',
+      on: {
+        click: () => anPlatte(querschnitt)((q) => { q.verformung.faelle.splice(index, 1); }),
+      },
+    }),
+  ]);
 }
 
 /**

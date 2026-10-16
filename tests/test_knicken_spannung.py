@@ -489,7 +489,7 @@ class TestGebrauchsfallPruefung(unittest.TestCase):
 
         def ist_lastfall(klasse) -> bool:
             return dataclasses.is_dataclass(klasse) and any(
-                f.name in ("M_Ed", "N_Ed") for f in dataclasses.fields(klasse))
+                f.name in ("M_Ed", "N_Ed", "w") for f in dataclasses.fields(klasse))
 
         def listen(objekt, pfad=""):
             hinweise = typing.get_type_hints(type(objekt))
@@ -508,7 +508,7 @@ class TestGebrauchsfallPruefung(unittest.TestCase):
         self.assertEqual(
             sorted(pfad for pfad, *_ in gefunden),
             ["haeufig.faelle", "knickfaelle", "kombinationen",
-             "quasistaendig.faelle", "spannungsfaelle"])
+             "quasistaendig.faelle", "spannungsfaelle", "verformung.faelle"])
         for _, besitzer, feld, element in gefunden:
             setattr(besitzer, feld, [element(name="probe")])
 

@@ -17,7 +17,7 @@
  * Oberfläche nachgerechneter.
  */
 
-import { erklaerung, feld, panel, zweiSchalter } from './bausteine.js';
+import { feld, panel, zweiSchalter } from './bausteine.js';
 import { auswahl, el, ersetzen, melden, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
 import { fensterZeigen } from './fenster.js';
@@ -28,7 +28,7 @@ import { partnerVon, richtungSetzen, richtungVon } from './lagen.js';
 import {
   analyseInhalt, automatikInhalt, duktilitaetInhalt, fliessenGefordert, haeufigInhalt,
   hilfe, jeB, knickInhalt, quasistaendigInhalt, sproedeInhalt, sucheLaeuft,
-  tragsicherheitInhalt, zwangInhalt,
+  tragsicherheitInhalt, verformungInhalt, zwangInhalt,
 } from './nachweise.js';
 import { analyseEditor, analyseFenster } from './querschnittsanalyse.js';
 import { balkensystemEditor } from './balkensystem.js';
@@ -572,6 +572,16 @@ const NACHWEISE = [
     stand: (q) => (fliessenGefordert(q) ? gebrauchsstand(q.haeufig)
       : { an: false, text: 'entfällt' }),
   },
+  {
+    schluessel: 'verformung',
+    name: 'Verformung', titel: 'Begrenzung der Durchbiegung',
+    bezug: () => 'w in mm · L in m · nur x',
+    inhalt: verformungInhalt,
+    stand: (q) => {
+      const n = eingeschaltet(q.verformung?.faelle);
+      return { an: n > 0, text: n ? anzahl(n, 'Fall', 'Fälle') : 'kein Fall' };
+    },
+  },
 ];
 
 const SUCHE = {
@@ -620,18 +630,8 @@ function plattenEditor(querschnitt) {
           beiAenderung: (v) => aendern((q) => { q.b = v; }),
         }), 'mm'),
         // Grösstkorn, k_c und Einlagenhöhe stehen im Fenster der
-        // Tragsicherheit: nur die Querkraft braucht sie.
-        // Nur noch für den Vergrösserungsfaktor -- die Nachweise wählen ihr φ
-        // selbst, jedes Kapitel in seiner Zeile «Rechenwahl».
-        feld(['Kriechzahl ', span(String.raw`\varphi`)], zahlfeld({
-          wert: querschnitt.kriechzahl, schritt: 0.1, min: 0,
-          titel: 'Kriechzahl φ für den Vergrösserungsfaktor w/w_c',
-          beiAenderung: (v) => aendern((q) => { q.kriechzahl = v; }),
-        }), erklaerung([
-          ['Wofür', 'nur für den Vergrösserungsfaktor w/w_c (SIA 262:2025, 4.4.3.2.5)'],
-          ['Nachweise', 'wählen ihr φ selbst, in der Zeile «Rechenwahl» jedes Kapitels'],
-        ], 'w/w_c = (1 − 20ρ′)/(10ρ^0.7) · (0.75 + 0.1φ) · (h/d)³'),
-        'Kriechzahl φ – nur für w/w_c'),
+        // Tragsicherheit: nur die Querkraft braucht sie. Die Kriechzahl des
+        // Vergrösserungsfaktors steht im Fenster der Verformung.
         // Freier Text, der in keine Rechnung eingeht. Ohne ein solches Feld
         // landen solche Sätze im Namen der Platte.
         el('div.beschreibung', {}, [

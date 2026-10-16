@@ -1,5 +1,5 @@
 ---
-erzeugt: 206791da047c
+erzeugt: 6c4044fb2087
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -57,6 +57,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.nachweis.spannungsbegrenzung]] – Stahlspannung unter Gebrauchslasten.
     - [[opencivil.nachweis.sproedes_versagen]] – Mindestbewehrung gegen sprödes Versagen.
     - [[opencivil.nachweis.stabgrenzen]] – die zulaessige Stahlspannung je Stab des gezeichneten Querschnitts.
+    - [[opencivil.nachweis.verformung]] – die Durchbiegung der Platte.
     - [[opencivil.nachweis.zustand2]] – Der gerissene Querschnitt, linear elastisch.
 - [[opencivil.notizbuch]] – das Notizbuch: Formelsammlung und Python-Doku als Markdown.
     - [[opencivil.notizbuch.bibliothek]] – die Python-Bibliothek als Seiten.

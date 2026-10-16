@@ -1,5 +1,5 @@
 ---
-erzeugt: d8a736ce3936
+erzeugt: 885e38207908
 art: modul
 tags: [modul]
 ---
@@ -41,11 +41,11 @@ Eine Stahlbeton-Platte mit genau vier Bewehrungslagen.
 - `querkraftbewehrung: QuerkraftbewehrungEintrag = field(default_factory=QuerkraftbewehrungEintrag)` – Bügel; ohne Durchmesser heisst: keine.
 - `rissanforderung: str = 'normal'` – Anforderung an die Rissbildung -- `normal`, `erhoeht` oder `hoch`.
 - `beschreibung: str = ''` – Freier Text zur Platte -- was sonst nirgends hinpasst. Wo sie liegt, woher die Schnittgroessen stammen, was noch zu klaeren ist. Geht in keine Rechnung ein und steht in keinem Nachweis; sie wird gespeichert und wieder angezeigt, mehr nicht. Genau dafuer gibt es sie: ohne ein solches Feld landen solche Saetze im Namen der Platte.
-- `kriechzahl: float = KRIECHZAHL` – Kriechzahl phi der Platte -- nur fuer den Vergroesserungsfaktor w/w_c der Durchbiegung (SIA 262:2025, 4.4.3.2.5). Die Nachweise waehlen ihr phi selbst, jedes Kapitel in seiner Rechenwahl.
 - `zwaengung: bool = False` – Ob mit einer Normalkraft-Zwaengung zu rechnen ist. Vorgabe aus: eine Zwaengung ist eine Annahme ueber das Tragwerk, keine Eigenschaft der Platte. Wer sie braucht, schaltet sie ein. Ein Schalter, nicht zwei: nachgewiesen wird nur die Tragrichtung x. Die y-Lagen stehen im Querschnitt, weil sie die statische Hoehe von x bestimmen und zum Bewehrungsgehalt zaehlen -- nachgewiesen werden sie nicht.
 - `zwaengung_begrenzt: bool = False` – Ob die Zwaengung auf 500 mm Plattendicke begrenzt angesetzt wird.
 - `haeufig: Gebrauchsliste = field(default_factory=lambda: Gebrauchsliste(anteil=HAEUFIG_ANTEIL))` – Die haeufigen Lastfaelle -- fuer den Nachweis gegen Fliessen.
 - `quasistaendig: Gebrauchsliste = field(default_factory=lambda: Gebrauchsliste(anteil=QUASISTAENDIG_ANT…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
+- `verformung: VerformungEintrag = field(default_factory=VerformungEintrag)` – Die Verformungsfaelle und das phi ihres Vergroesserungsfaktors. Bis 2026-10-16 stand dieses phi als Kriechzahl an der Platte.
 - `knickfaelle: List[KnickEintrag] = field(default_factory=list)` – Knicknachweise; leer heisst: keiner.
 - `knicken_wahl_verformung: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.knicken_verformung)` – Womit die Ausmitte e_2d gerechnet wird -- immer praezise ohne Vereinfachung ([[opencivil.nachweis.rechenwahl#Konstanten|VERFORMUNGSARTEN]]), Vorgabe Bemessungswerte. Eine alte Datei mit dem Spannungsblock oder der Handrechnung liest sich als praezise.
 - `knicken_wahl_widerstand: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.knicken_widerstand)` – Womit N_Rd(M_Ed = N_Ed·e_tot) gerechnet wird -- Vorgabe die 0.85·x-Vereinfachung, ohne Handrechnung. Mit derselben Wahl wie die Tragsicherheit ist es deren Linie.
@@ -144,6 +144,14 @@ def knickfall(self, name: str, *, N_Ed: float, M_Ed_1: float=0.0, laenge: float=
 
 Ein Knicknachweis -- N_Ed in kN (Druck negativ), Laengen in m.
 
+#### QuerschnittEintrag.verformungsfall
+
+```python
+def verformungsfall(self, name: str, *, w: float, laenge: float, zugseite: str='unten') -> VerformungsfallEintrag
+```
+
+Ein Verformungsfall -- w in mm, mit E_cm ermittelt; die Spannweite in m.
+
 #### QuerschnittEintrag.spannungsfall
 
 ```python
@@ -185,6 +193,7 @@ def aus_dict(cls, d: Mapping[str, Any]) -> 'QuerschnittEintrag'
 
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.rechenwahl]]
+- [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.querschnitt.platte]]

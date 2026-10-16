@@ -1,5 +1,5 @@
 ---
-erzeugt: 469504673e43
+erzeugt: d258aed4ad60
 art: modul
 tags: [modul]
 ---
@@ -36,4 +36,5 @@ Rechenwahl, mit der jedes Kapitel waehlt, womit es rechnet.
 - [[opencivil.nachweis.spannungsbegrenzung]] – Stahlspannung unter Gebrauchslasten.
 - [[opencivil.nachweis.sproedes_versagen]] – Mindestbewehrung gegen sprödes Versagen.
 - [[opencivil.nachweis.stabgrenzen]] – die zulaessige Stahlspannung je Stab des gezeichneten Querschnitts.
+- [[opencivil.nachweis.verformung]] – die Durchbiegung der Platte.
 - [[opencivil.nachweis.zustand2]] – Der gerissene Querschnitt, linear elastisch.

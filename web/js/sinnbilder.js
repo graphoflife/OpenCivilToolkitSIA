@@ -36,6 +36,12 @@ const ZEICHEN = {
   sproede: {
     pfade: ['M6 3h12v18H6z', 'M12 21l-1.6-3.2 2.2-2.6-1.8-3.2 1.4-2.6'],
   },
+  // Ein Träger auf zwei Lagern, gestrichelt seine Biegelinie, dazu der Pfeil w.
+  verformung: {
+    pfade: ['M3 8h18', 'M4.5 8l-1.6 2.8h3.2z', 'M19.5 8l-1.6 2.8h3.2z',
+      'M12 9.5v4.5 M10.8 12.8l1.2 1.2 1.2-1.2'],
+    strich: ['M4.5 8Q12 22 19.5 8'],
+  },
   // Ein Stab zwischen zwei Wänden, in der Mitte gerissen.
   zwang: {
     pfade: ['M4 5v14 M20 5v14', 'M2 7l2-2 M2 11l2-2 M2 15l2-2 M2 19l2-2',

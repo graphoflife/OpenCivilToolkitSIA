@@ -64,7 +64,12 @@ q.tragsicherheit_wahl = RechenwahlEintrag(rechenart="parabel")      # genaue Lin
 q.quasistaendig.wahl.kriechzahl = 2.0                               # φ der Stahlspannung
 q.knicken_wahl_widerstand = RechenwahlEintrag(werkstoffsatz="charakteristisch",
                                                rechenart="parabel")
-q.kriechzahl = 2.0                            # φ der Platte: nur für w/w_c
+
+# Verformung: w mit E_cm ermittelt, in mm; die Spannweite in m. Gehalten
+# wird ω_w · w gegen L/350, ω_w je gezogene Seite.
+q.verformungsfall("Feld", w=3.5, laenge=6.0)
+q.verformungsfall("Kragarm", w=1.0, laenge=2.5, zugseite="oben")
+q.verformung.kriechzahl = 2.0                 # φ von ω_w, Vorgabe 2
 
 ergebnis = p.rechnen()
 print(ergebnis.zusammenfassung())             # je Platte eine Tabelle
@@ -190,6 +195,7 @@ Fertig und getestet (1091 Tests):
 | `nachweis/schiefe_biegung`, `schubwandnachweis`, `richtungsnachweise` | die Nachweise der Querschnittsanalyse: N mit M_y und M_z, Querkraft mit Torsion, Duktilität und sprödes Versagen je Richtung |
 | `nachweis/qa_gebrauch`, `stabgrenzen`, `gebrauchsebene` | ihre Gebrauchsnachweise: Zwängung auf N (ganzer Querschnitt) und auf M (je Richtung), Stahlspannung quasi-ständig und häufig; σ_s,adm je Stab; die Ebene unter Gebrauchslast, auch schief |
 | `nachweis/knicken`, `qa_knicken` | Knicken am verformten System: das Verfahren (`Knickverfahren`), die Platte in x, der gezeichnete Querschnitt je Fall zu seiner Zugseite |
+| `nachweis/verformung` | die Durchbiegung der Platte: ω_w · w gegen L/350, mit dem Vergrösserungsfaktor ω_w je gezogene Seite |
 | `konsole/` | die App «Python»: die Sitzung (`sitzung`), Diagramme ohne matplotlib (`zeichnen`), welche Fremdpakete beiliegen (`pakete`), der Dienst ihres Fadens (`dienst`) |
 | `spannungsanalyse.py` | sechs Fragen an den Querschnitt: Bild aus N und M oder aus Dehnungen, M-χ- und N-ε-Linie, äquivalenter E-Modul über M und über N — kein Nachweis |
 | `bewehrungssuche/` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt – Längsbewehrung, dünnste Platte, Bügel |
@@ -235,7 +241,7 @@ Deshalb kann am Bildschirm gar nichts anderes stehen als im Bericht.
 
 **Platte:** drei Panels -- die Platte selbst, die Bewehrung (vier Lagen mit
 Grund und Zulage, darunter die Bügel) und «Nachweise und Analysen». Dort steht
-jedes Kapitel als Knopf: die sieben Nachweise, die sechs
+jedes Kapitel als Knopf: die acht Nachweise, die sechs
 Spannung-Dehnung-Analysen und die Suche nach der Bewehrung, darunter klein,
 was eingestellt ist («3 Einwirkungen», «aus»). Ein Klick öffnet die Eingaben
 in einem Fenster über der mittleren Tafel; Baum und Ergebnis bleiben daneben
@@ -297,9 +303,17 @@ Mit 0.85·x oder präzise hält die Tragsicherheit gegen den Rand des
 Dehnungsfächers; den Widerstand bei N_Ed sucht sie genau, und die Herleitung
 zeigt die Probe des Bruchzustands. Querkraft und sprödes Versagen lesen ihr
 m_R aus derselben Linie. Wählt das Knicken für den Widerstand dasselbe wie die
-Tragsicherheit, nimmt es deren Linie, sonst eine eigene. Die Kriechzahl der
-Platte dient nur noch dem Vergrösserungsfaktor w/w_c (SIA 262:2025,
-4.4.3.2.5); er steht je gezogene Seite in der Zusammenfassung.
+Tragsicherheit, nimmt es deren Linie, sonst eine eigene.
+
+**Verformung:** neben «Fliessen häufig». Zuoberst die Kriechzahl φ, Vorgabe 2,
+darunter die Verformungsfälle wie Lastfälle: je Fall die Durchbiegung w in mm,
+mit der Steifigkeit E_cm ermittelt, die Spannweite L in m und die gezogene
+Seite (Feld unten, Kragarm oben). Gehalten wird w_eff = ω_w · w gegen
+w_max = L/350. Der Vergrösserungsfaktor ω_w -- in der Norm w/w_c, SIA
+262:2025, 4.4.3.2.5 -- wird je gezogene Seite einmal gerechnet, nicht je Fall,
+und steht in der Zusammenfassung unter der Tabelle. Ohne x-Bewehrung auf der
+gezogenen Seite gibt es keinen Faktor und keinen Nachweis. Der Grenzwert L/350
+ist nach Vorgabe eingebaut, nicht nachgeschlagen.
 
 **Querschnittsanalyse:** unter den Platten ein zweites Kapitel. Der
 Querschnitt wird gezeichnet wie in einem kleinen CAD, aus Knoten, Linien und

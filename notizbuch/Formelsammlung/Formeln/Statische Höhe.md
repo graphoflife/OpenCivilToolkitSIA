@@ -1,43 +1,43 @@
 ---
-erzeugt: 8fcb2e1d445f
+erzeugt: b4b05d6393e5
 art: formel
 tags: [formel]
 ---
 > [!warning] Normstelle fehlt noch
 > Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
 
-*In der Herleitung: «Statische Höhe der x-Bewehrung unten»*
+*In der Herleitung: «Statische Höhe der Lage unten, ab dem gedrückten Rand oben»*
 
 $$
-d_{u} = z_{u}
+d_{2,x} = z_{2,x}
 $$
 
-*In der Herleitung: «Statische Höhe der x-Bewehrung oben»*
+*In der Herleitung: «Statische Höhe der Lage oben, ab dem gedrückten Rand unten»*
 
 $$
-d_{o} = h - z_{3,x,g}
+d_{3,x} = h - z_{3,x}
 $$
 
 ## Grössen
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $z_{u}$ | – | mm | [[Schwerpunkt der zusammengefassten Lage]] |
-| $h$ | Plattendicke | mm | Vorgabe, Zwischenwert |
-| $z_{3,x,g}$ | Tiefe 3. Lage Grundbewehrung ab Oberkante | mm | Zwischenwert |
+| $z_{2,x}$ | – | mm | Zwischenwert, [[Schwerpunkt der zusammengefassten Lage]] |
+| $h$ | Plattendicke | mm | Zwischenwert, Vorgabe |
+| $z_{3,x}$ | – | mm | Zwischenwert |
 
 ## Beispiel
 
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-d_{u} = z_{u} = 248.1\,\mathrm{mm}
+d_{2,x} = z_{2,x} = 248.1\,\mathrm{mm}
 $$
 
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-d_{o} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
+d_{3,x} = h - z_{3,x} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
 $$
 
 ## Gebraucht von
@@ -58,13 +58,13 @@ $$
 
 ## Im Code
 
-- [[opencivil.querschnitt.platte#Lagenaufbau._vergroesserung|Lagenaufbau._vergroesserung]]
+- [[opencivil.nachweis.verformung#Verformung._bewehrungsgehalte|Verformung._bewehrungsgehalte]]
 - [[opencivil.querschnitt.platte#protokoll_statische_hoehe|protokoll_statische_hoehe]]
 
 ## Themen
 
-- [[Querschnitt]]
 - [[Biegung und Normalkraft]]
+- [[Verformung]]
 - [[Querkraft]]
 - [[Duktilität]]
 - [[Zwängung auf Biegung]]

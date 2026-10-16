@@ -32,6 +32,7 @@ from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
     ERSATZ_ALTER_WAHL, FASERARTEN, RECHENARTEN, SPANNUNGSARTEN, Rechenart, Rechenwahl,
 )
+from opencivil.nachweis.verformung import KRIECHZAHL as VERFORMUNG_KRIECHZAHL, ZUGSEITEN
 from opencivil.spannungsanalyse import Analyseart
 
 #: Mit welchen Festigkeiten ein Werkstoffgesetz rechnen kann, siehe
@@ -390,6 +391,107 @@ class KnickEintrag(Beschreibung):
         )
 
 
+@dataclass
+class VerformungsfallEintrag(Beschreibung):
+    """
+    Ein Verformungsfall: die Durchbiegung, mit der Steifigkeit E_cm
+    ermittelt, ihre Spannweite und die Seite, die er zieht.
+
+    Wie ein Knickfall nur in x-Richtung.
+    """
+
+    name: str
+    w: float = 0.0
+    """Durchbiegung in mm, mit E_cm ermittelt -- ein Betrag."""
+
+    laenge: float = 5.0
+    """Spannweite L in m -- der Grenzwert ist L/350."""
+
+    zugseite: str = "unten"
+    """``unten`` im Feld, ``oben`` am Kragarm -- welches rho gilt."""
+
+    aktiv: bool = True
+    """Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen."""
+
+    def zahlen_pruefen(self, wo: str) -> None:
+        """
+        w und L -- erst beim Bauen gefragt, wie die Masse der Platte: eine
+        abgelegte Platte mit L = 0 soll sich oeffnen und korrigieren lassen.
+        """
+        if self.w < 0.0:
+            raise ProjektFehler(
+                f"{wo}, Verformungsfall '{self.name}': w ist der Betrag der "
+                f"Durchbiegung und kann nicht negativ sein ({self.w:g} mm).")
+        if self.laenge <= 0.0:
+            raise ProjektFehler(
+                f"{wo}, Verformungsfall '{self.name}': die Spannweite L muss "
+                f"grösser als null sein, angegeben ist {self.laenge:g} m.")
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any]) -> "VerformungsfallEintrag":
+        return cls(
+            name=pflichtfeld(d, "name", "Ein Verformungsfall"),
+            w=zahl(d, "w", cls.w),
+            laenge=zahl(d, "laenge", cls.laenge),
+            zugseite=str(d.get("zugseite") or cls.zugseite),
+            aktiv=bool(d.get("aktiv", cls.aktiv)),
+        )
+
+
+@dataclass
+class VerformungEintrag(Beschreibung):
+    """
+    Der Verformungsnachweis einer Platte: die Kriechzahl seines
+    Vergroesserungsfaktors und die Faelle.
+
+    phi gilt fuer die Platte und nicht je Fall -- der Faktor wird je Seite
+    einmal gerechnet (:mod:`opencivil.nachweis.verformung`).
+    """
+
+    kriechzahl: float = VERFORMUNG_KRIECHZAHL
+    """phi im Vergroesserungsfaktor omega_w, Vorgabe 2."""
+
+    faelle: List[VerformungsfallEintrag] = field(default_factory=list)
+
+    def fall(self, name: str, *, w: float, laenge: float,
+             zugseite: str = VerformungsfallEintrag.zugseite) -> VerformungsfallEintrag:
+        """Einen Fall anfuegen -- w in mm, die Spannweite in m."""
+        eintrag = VerformungsfallEintrag(name=name, w=w, laenge=laenge, zugseite=zugseite)
+        self.faelle.append(eintrag)
+        return eintrag
+
+    def pruefen(self, bauteil: str) -> None:
+        wo = f"Platte '{bauteil}'"
+        if self.kriechzahl < 0.0:
+            raise ProjektFehler(f"{wo}, Verformung: die Kriechzahl kann nicht negativ sein.")
+        eindeutig(self.faelle, bauteil, "Verformungsfall")
+        # Verschiedene Namen koennen dieselbe Wert-ID ergeben -- wie bei den
+        # Gebrauchslisten.
+        kennungen: Dict[str, str] = {}
+        for f in self.faelle:
+            if f.zugseite not in ZUGSEITEN:
+                raise ProjektFehler(
+                    f"{wo}, Verformungsfall '{f.name}': unbekannte Zugseite "
+                    f"'{f.zugseite}'. Möglich sind: {', '.join(ZUGSEITEN)}.")
+            frueher = kennungen.setdefault(kennung_aus(f.name), f.name)
+            if frueher != f.name:
+                raise ProjektFehler(
+                    f"{wo}: die Verformungsfälle '{frueher}' und '{f.name}' "
+                    f"unterscheiden sich nur in Satz- oder Leerzeichen. Im Bericht "
+                    f"fielen sie auf denselben Eintrag -- bitte einen davon anders "
+                    f"benennen.")
+
+    @classmethod
+    def aus_dict(cls, d: Mapping[str, Any], *,
+                 kriechzahl_alt: float = VERFORMUNG_KRIECHZAHL) -> "VerformungEintrag":
+        """``kriechzahl_alt``: das phi, das bis 2026-10-16 an der Platte stand."""
+        return cls(
+            kriechzahl=kriechzahl_aus(d, "kriechzahl", alt=kriechzahl_alt,
+                                      wo="Verformung"),
+            faelle=[VerformungsfallEintrag.aus_dict(x) for x in (d.get("faelle") or [])],
+        )
+
+
 #: Anteil der Tragsicherheitseinwirkungen, der als haeufiger Lastfall gilt --
 #: in Prozent, wie die Maske ihn zeigt. Eine Vorgabe, einstellbar je Platte.
 HAEUFIG_ANTEIL = 70.0
@@ -551,11 +653,11 @@ class RechenwahlEintrag(Beschreibung):
     Womit ein Nachweis-Kapitel rechnet: Kriechzahl, Wertesatz, Rechenart --
     siehe :class:`~opencivil.nachweis.rechenwahl.Rechenwahl`.
 
-    Jedes Kapitel hat seine eigene; die Kriechzahl der Platte gilt nur fuer
-    den Vergroesserungsfaktor w/w_c. In einer Datei von vor 2026-10-09 fehlt
-    die Wahl -- dann gilt, was damals fest galt: die Rechenart und der
-    Wertesatz des Kapitels (``vorgabe``) und das phi der Platte
-    (``kriechzahl_alt``).
+    Jedes Kapitel hat seine eigene; die Kriechzahl des Vergroesserungsfaktors
+    gehoert dem Verformungsnachweis (:class:`VerformungEintrag`). In einer
+    Datei von vor 2026-10-09 fehlt die Wahl -- dann gilt, was damals fest
+    galt: die Rechenart und der Wertesatz des Kapitels (``vorgabe``) und das
+    phi, das damals an der Platte stand (``kriechzahl_alt``).
     """
 
     kriechzahl: float = 0.0

@@ -1,5 +1,5 @@
 ---
-erzeugt: 34c01048e273
+erzeugt: 952096444176
 art: formel
 tags: [formel]
 ---
@@ -32,6 +32,7 @@ $$
 ## Themen
 
 - [[Biegung und Normalkraft]]
+- [[Verformung]]
 - [[Schiefe Biegung]]
 - [[Querkraft und Torsion]]
 - [[Querkraft]]

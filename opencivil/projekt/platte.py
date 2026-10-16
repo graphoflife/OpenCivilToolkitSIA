@@ -18,12 +18,13 @@ from typing import Any, List, Mapping, Optional
 
 from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX, HOECHSTENS as X_D_HOECHSTENS
 from opencivil.nachweis.rechenwahl import FASERARTEN, VERFORMUNGSARTEN
-from opencivil.querschnitt.platte import K_C, KRIECHZAHL, LAGENZAHL, Richtung
+from opencivil.nachweis.verformung import KRIECHZAHL
+from opencivil.querschnitt.platte import K_C, LAGENZAHL, Richtung
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste,
     KnickEintrag, KombinationEintrag, LageEintrag, ObergrenzeEintrag,
     PostenEintrag, QuerkraftbewehrungEintrag, RechenwahlEintrag, SpannungsfallEintrag,
-    eindeutig,
+    VerformungEintrag, VerformungsfallEintrag, eindeutig,
 )
 from opencivil.projekt.lesen import (
     ProjektFehler, gebrauchsliste_roh, kriechzahl_aus, lagen_aus_altem_format,
@@ -68,13 +69,6 @@ class QuerschnittEintrag(Beschreibung):
     ohne ein solches Feld landen solche Saetze im Namen der Platte.
     """
 
-    kriechzahl: float = KRIECHZAHL
-    """
-    Kriechzahl phi der Platte -- nur fuer den Vergroesserungsfaktor w/w_c der
-    Durchbiegung (SIA 262:2025, 4.4.3.2.5). Die Nachweise waehlen ihr phi
-    selbst, jedes Kapitel in seiner Rechenwahl.
-    """
-
     zwaengung: bool = False
     """
     Ob mit einer Normalkraft-Zwaengung zu rechnen ist.
@@ -98,6 +92,12 @@ class QuerschnittEintrag(Beschreibung):
     quasistaendig: Gebrauchsliste = field(
         default_factory=lambda: Gebrauchsliste(anteil=QUASISTAENDIG_ANTEIL))
     """Die quasi-staendigen Lastfaelle -- fuer die Rissbreite."""
+
+    verformung: VerformungEintrag = field(default_factory=VerformungEintrag)
+    """
+    Die Verformungsfaelle und das phi ihres Vergroesserungsfaktors. Bis
+    2026-10-16 stand dieses phi als Kriechzahl an der Platte.
+    """
 
     knickfaelle: List[KnickEintrag] = field(default_factory=list)
     """Knicknachweise; leer heisst: keiner."""
@@ -260,6 +260,7 @@ class QuerschnittEintrag(Beschreibung):
         for liste, wort in ((self.haeufig, "häufige"),
                             (self.quasistaendig, "quasi-ständige")):
             liste.pruefen(self.name, self.kombinationen, wort)
+        self.verformung.pruefen(self.name)
         self.tragsicherheit_wahl.pruefen(f"Platte '{self.name}', Tragsicherheit")
         self.knicken_wahl_verformung.pruefen(f"Platte '{self.name}', Knicken, Verformung",
                                              VERFORMUNGSARTEN)
@@ -315,6 +316,8 @@ class QuerschnittEintrag(Beschreibung):
             raise ProjektFehler(
                 f"Platte '{name}': max. x/d muss grösser als null und höchstens "
                 f"{X_D_HOECHSTENS:g} sein, angegeben ist {self.x_d_max:g}.")
+        for fall in self.verformung.faelle:
+            fall.zahlen_pruefen(f"Platte '{name}'")
 
     def ohne_lastfaelle(self) -> None:
         """
@@ -332,6 +335,7 @@ class QuerschnittEintrag(Beschreibung):
         self.spannungsfaelle = []
         self.haeufig.faelle = []
         self.quasistaendig.faelle = []
+        self.verformung.faelle = []
 
     # -- Ohne Oberflaeche ---------------------------------------------------
     #
@@ -356,6 +360,11 @@ class QuerschnittEintrag(Beschreibung):
             knicklaenge=laenge if knicklaenge is None else knicklaenge)
         self.knickfaelle.append(eintrag)
         return eintrag
+
+    def verformungsfall(self, name: str, *, w: float, laenge: float,
+                        zugseite: str = "unten") -> VerformungsfallEintrag:
+        """Ein Verformungsfall -- w in mm, mit E_cm ermittelt; die Spannweite in m."""
+        return self.verformung.fall(name, w=w, laenge=laenge, zugseite=zugseite)
 
     def spannungsfall(self, name: str, *, art: str = "schnittgroessen",
                       **felder: Any) -> SpannungsfallEintrag:
@@ -422,6 +431,10 @@ class QuerschnittEintrag(Beschreibung):
         # hiess Grundbewehrung mit Kraeften und die Dicke dazu.
         if modus.startswith("dicke_"):
             modus, dicke = modus.removeprefix("dicke_"), True
+        # Bis 2026-10-16 trug die Platte ein eigenes phi, zuletzt nur fuer den
+        # Vergroesserungsfaktor -- es gehoert jetzt dem Verformungsnachweis.
+        # Bis 2026-10-09 galt es auch fuer jedes Kapitel ohne eigene Wahl.
+        phi_alt = zahl(d, "kriechzahl", KRIECHZAHL)
         return cls(
             kennung=kennung,
             name=str(d.get("name") or kennung),
@@ -456,12 +469,11 @@ class QuerschnittEintrag(Beschreibung):
                 d.get("zwaengung_biegung"), d.get("zwaengung_biegung_lagen"),
                 vorgabe=cls.zwaengung_biegung),
             zwaengung_biegung_kriechzahl=kriechzahl_aus(
-                d, "zwaengung_biegung_kriechzahl", alt=zahl(d, "kriechzahl", cls.kriechzahl),
+                d, "zwaengung_biegung_kriechzahl", alt=phi_alt,
                 wo=f"Platte '{kennung}', Zwängung auf Biegung"),
             rissanforderung=rissanforderung_aus(d.get("rissanforderung"),
                                                 cls.rissanforderung),
             beschreibung=str(d.get("beschreibung") or cls.beschreibung),
-            kriechzahl=zahl(d, "kriechzahl", cls.kriechzahl),
             x_d_max=zahl(d, "x_d_max", cls.x_d_max),
             # Aus x und y wird einer: nachgewiesen wird nur noch x.
             zwaengung=schalter_aus(d.get("zwaengung"), d.get("zwaengung_x"),
@@ -469,24 +481,23 @@ class QuerschnittEintrag(Beschreibung):
             zwaengung_begrenzt=bool(d.get("zwaengung_begrenzt", cls.zwaengung_begrenzt)),
             haeufig=Gebrauchsliste.aus_dict(
                 gebrauchsliste_roh(d, "haeufig", "haeufige"),
-                wort="häufige", vorgabe=HAEUFIG_ANTEIL,
-                kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl)),
+                wort="häufige", vorgabe=HAEUFIG_ANTEIL, kriechzahl_alt=phi_alt),
             quasistaendig=Gebrauchsliste.aus_dict(
                 gebrauchsliste_roh(d, "quasistaendig", "quasistaendige"),
-                wort="quasi-ständige", vorgabe=QUASISTAENDIG_ANTEIL,
-                kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl)),
+                wort="quasi-ständige", vorgabe=QUASISTAENDIG_ANTEIL, kriechzahl_alt=phi_alt),
+            verformung=VerformungEintrag.aus_dict(d.get("verformung") or {},
+                                                  kriechzahl_alt=phi_alt),
             knickfaelle=[KnickEintrag.aus_dict(x)
                          for x in (d.get("knickfaelle") or [])],
             knicken_wahl_verformung=RechenwahlEintrag.aus_dict(
                 d.get("knicken_wahl_verformung"), vorgabe=RechenwahlEintrag.knicken_verformung(),
-                kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl),
+                kriechzahl_alt=phi_alt,
                 wo=f"Platte '{kennung}', Knicken, Verformung", arten=VERFORMUNGSARTEN),
             knicken_wahl_widerstand=RechenwahlEintrag.aus_dict(
                 d.get("knicken_wahl_widerstand"), vorgabe=RechenwahlEintrag.knicken_widerstand(),
-                kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl),
+                kriechzahl_alt=phi_alt,
                 wo=f"Platte '{kennung}', Knicken, Widerstand", arten=FASERARTEN),
-            spannungsfaelle=[SpannungsfallEintrag.aus_dict(
-                x, kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl))
+            spannungsfaelle=[SpannungsfallEintrag.aus_dict(x, kriechzahl_alt=phi_alt)
                              for x in (d.get("spannungsfaelle") or [])],
             richtung_lage1=str(d.get("richtung_lage1") or cls.richtung_lage1),
             richtung_lage4=str(d.get("richtung_lage4") or cls.richtung_lage4),
@@ -494,7 +505,7 @@ class QuerschnittEintrag(Beschreibung):
             kombinationen=[
                 KombinationEintrag.aus_dict(x) for x in (d.get("kombinationen") or [])],
             tragsicherheit_wahl=RechenwahlEintrag.aus_dict(
-                d.get("tragsicherheit_wahl"), kriechzahl_alt=zahl(d, "kriechzahl", cls.kriechzahl),
+                d.get("tragsicherheit_wahl"), kriechzahl_alt=phi_alt,
                 wo=f"Platte '{kennung}', Tragsicherheit"),
         )
 

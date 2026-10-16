@@ -279,6 +279,10 @@ class TestStilleNachweiseImBericht(unittest.TestCase):
         q.h = 600.0
         for k in q.kombinationen:
             k.M_Ed, k.N_Ed, k.V_Ed = 10.0, 0.0, 0.0
+        # Auch die Durchbiegung klein: bei 600 mm gälte die des Beispiels
+        # nicht mehr, und die Verformung fiele laut durch.
+        for f in q.verformung.faelle:
+            f.w = 1.0
         lage = q.lagen[0]
         lage.grund.durchmesser, lage.grund.abstand = 6.0, 300.0
         lage.zulage.durchmesser = 0.0

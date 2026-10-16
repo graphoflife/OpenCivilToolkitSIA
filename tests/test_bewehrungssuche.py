@@ -302,7 +302,7 @@ class TestDieEbeneAufDerDieSucheStehenblieb(unittest.TestCase):
         projekt = platte(sproede = True)
         q = projekt.querschnitt("q1")
         q.richtung_lage1 = q.richtung_lage4 = "x"
-        q.kombinationen = []
+        q.ohne_lastfaelle()
         for nummer in (1, 2, 3, 4):
             lage = q.lagen[nummer - 1]
             lage.zulage.durchmesser = 0
@@ -755,7 +755,8 @@ class TestNurDiesesBauteil(unittest.TestCase):
         self.assertEqual([b.kennung for b in kopie.bauteile()], ["q1"])
         bewertung = bewerte(kopie)
         self.assertEqual(bewertung.fehler, "")
-        self.assertEqual(bewertung.anzahl, 3)          # M-N: Feld, Feld mit Druck, Stütze
+        # M-N: Feld, Feld mit Druck, Stütze; Verformung: Feld.
+        self.assertEqual(bewertung.anzahl, 4)
 
     def test_ein_system_auf_einer_anderen_platte_stoert_nicht(self):
         bewertung = bewerte(arbeitskopie(Projekt.jeder_nachweis(), "q2",

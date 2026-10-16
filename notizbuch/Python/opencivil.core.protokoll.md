@@ -1,5 +1,5 @@
 ---
-erzeugt: e943f53a60ec
+erzeugt: 281363d4a08e
 art: modul
 tags: [modul]
 ---
@@ -612,6 +612,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.nachweis.stabgrenzen]]
+- [[opencivil.nachweis.verformung]]
 - [[opencivil.notizbuch.formelseiten]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.platte]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 6959fffd5121
+erzeugt: 88670d8e7c69
 art: modul
 tags: [modul]
 ---
@@ -54,6 +54,7 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `zwaengung_biegung: Dict[str, ZwaengungBiegung] = field(default_factory=dict)` – Zwaengung auf Biegung, je `<querschnitt>.x`.
 - `spannung: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)` – Stahlspannung gegen Fliessen unter haeufiger Einwirkung, je `<querschnitt>.x`.
 - `spannung_riss: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)` – Stahlspannung aus der Rissbreite unter quasi-staendiger Einwirkung, je `<querschnitt>.x`.
+- `verformung: Dict[str, Verformung] = field(default_factory=dict)` – Die Durchbiegung je Verformungsfall, je Querschnitt -- nur in x-Richtung.
 - `knicken: Dict[str, Knicken] = field(default_factory=dict)` – Nachweis am verformten System, je Querschnitt -- nur in x-Richtung.
 - `fehlende: Dict[str, FehlendeBewehrung] = field(default_factory=dict)` – Je Richtung ohne Bewehrung, fuer die dennoch Einwirkungen angegeben sind. Sie rechnen nichts; sie sorgen dafuer, dass in der Zusammenfassung eine Zeile mit Erfuellungsgrad null steht statt gar nichts.
 - `spannungsfaelle: Dict[str, List['SpannungsfallEintrag']] = field(default_factory=dict)` – Je Platte die Auswertungen am Querschnitt -- als Beschreibung, nicht als Nachweis. Sie laufen nicht im Rechenwerk: sie haben kein Ziel, das jemand anderes brauchen koennte, und nichts haengt von ihnen ab.
@@ -369,6 +370,14 @@ def _knickfall(k: KnickEintrag, klasse: type=Knickfall, **mehr: Any) -> Knickfal
 
 Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; `mehr` fuer die Analyse.
 
+### _verformungsfall
+
+```python
+def _verformungsfall(f: VerformungsfallEintrag) -> Verformungsfall
+```
+
+Ein Verformungsfall aus seiner Beschreibung -- w in mm, die Spannweite in m.
+
 ### _gebrauchsfaelle
 
 ```python
@@ -473,6 +482,7 @@ Baufunktion von ihr bekannt sein muss. Eine neue Art kommt in
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.sproedes_versagen]]
+- [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]

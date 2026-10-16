@@ -1,5 +1,5 @@
 ---
-erzeugt: c1553887318d
+erzeugt: 35bbf4529ddf
 art: modul
 tags: [modul]
 ---
@@ -293,6 +293,7 @@ def beschreibung(self) -> str
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.nachweis.stabgrenzen]]
+- [[opencivil.nachweis.verformung]]
 - [[opencivil.notizbuch.formelseiten]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.querschnitt.analyse]]

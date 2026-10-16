@@ -1,5 +1,5 @@
 ---
-erzeugt: 4e679b0e77b5
+erzeugt: 17b5bd4c1d51
 art: modul
 tags: [modul]
 ---
@@ -289,6 +289,79 @@ in y waere die Breite der Platte die Laenge.
 def aus_dict(cls, d: Mapping[str, Any]) -> 'KnickEintrag'
 ```
 
+### VerformungsfallEintrag
+
+```python
+@dataclass
+class VerformungsfallEintrag(Beschreibung)
+```
+
+Ein Verformungsfall: die Durchbiegung, mit der Steifigkeit E_cm
+ermittelt, ihre Spannweite und die Seite, die er zieht.
+
+Wie ein Knickfall nur in x-Richtung.
+
+- `name: str`
+- `w: float = 0.0` – Durchbiegung in mm, mit E_cm ermittelt -- ein Betrag.
+- `laenge: float = 5.0` – Spannweite L in m -- der Grenzwert ist L/350.
+- `zugseite: str = 'unten'` – `unten` im Feld, `oben` am Kragarm -- welches rho gilt.
+- `aktiv: bool = True` – Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen.
+
+#### VerformungsfallEintrag.zahlen_pruefen
+
+```python
+def zahlen_pruefen(self, wo: str) -> None
+```
+
+w und L -- erst beim Bauen gefragt, wie die Masse der Platte: eine
+abgelegte Platte mit L = 0 soll sich oeffnen und korrigieren lassen.
+
+#### VerformungsfallEintrag.aus_dict
+
+```python
+@classmethod
+def aus_dict(cls, d: Mapping[str, Any]) -> 'VerformungsfallEintrag'
+```
+
+### VerformungEintrag
+
+```python
+@dataclass
+class VerformungEintrag(Beschreibung)
+```
+
+Der Verformungsnachweis einer Platte: die Kriechzahl seines
+Vergroesserungsfaktors und die Faelle.
+
+phi gilt fuer die Platte und nicht je Fall -- der Faktor wird je Seite
+einmal gerechnet ([[opencivil.nachweis.verformung]]).
+
+- `kriechzahl: float = VERFORMUNG_KRIECHZAHL` – phi im Vergroesserungsfaktor omega_w, Vorgabe 2.
+- `faelle: List[VerformungsfallEintrag] = field(default_factory=list)`
+
+#### VerformungEintrag.fall
+
+```python
+def fall(self, name: str, *, w: float, laenge: float, zugseite: str=VerformungsfallEintrag.zugseite) -> VerformungsfallEintrag
+```
+
+Einen Fall anfuegen -- w in mm, die Spannweite in m.
+
+#### VerformungEintrag.pruefen
+
+```python
+def pruefen(self, bauteil: str) -> None
+```
+
+#### VerformungEintrag.aus_dict
+
+```python
+@classmethod
+def aus_dict(cls, d: Mapping[str, Any], *, kriechzahl_alt: float=VERFORMUNG_KRIECHZAHL) -> 'VerformungEintrag'
+```
+
+`kriechzahl_alt`: das phi, das bis 2026-10-16 an der Platte stand.
+
 ### abgeleiteter_fallname
 
 ```python
@@ -397,11 +470,11 @@ class RechenwahlEintrag(Beschreibung)
 Womit ein Nachweis-Kapitel rechnet: Kriechzahl, Wertesatz, Rechenart --
 siehe [[opencivil.nachweis.rechenwahl#Rechenwahl|Rechenwahl]].
 
-Jedes Kapitel hat seine eigene; die Kriechzahl der Platte gilt nur fuer
-den Vergroesserungsfaktor w/w_c. In einer Datei von vor 2026-10-09 fehlt
-die Wahl -- dann gilt, was damals fest galt: die Rechenart und der
-Wertesatz des Kapitels (`vorgabe`) und das phi der Platte
-(`kriechzahl_alt`).
+Jedes Kapitel hat seine eigene; die Kriechzahl des Vergroesserungsfaktors
+gehoert dem Verformungsnachweis ([[opencivil.projekt.eintraege#VerformungEintrag|VerformungEintrag]]). In einer
+Datei von vor 2026-10-09 fehlt die Wahl -- dann gilt, was damals fest
+galt: die Rechenart und der Wertesatz des Kapitels (`vorgabe`) und das
+phi, das damals an der Platte stand (`kriechzahl_alt`).
 
 - `kriechzahl: float = 0.0`
 - `werkstoffsatz: str = WERKSTOFFSAETZE[0]`
@@ -577,6 +650,7 @@ def aus_dict(cls, d: Mapping[str, Any]) -> 'KombinationEintrag'
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
+- [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.spannungsanalyse]]

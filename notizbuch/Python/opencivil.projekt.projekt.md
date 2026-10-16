@@ -1,5 +1,5 @@
 ---
-erzeugt: e56315e082ff
+erzeugt: 20d18e191669
 art: modul
 tags: [modul]
 ---
@@ -292,10 +292,11 @@ und nicht bei den Tests.
 
 Erhöhte Anforderung mit allen Schaltern und begrenzter rissaktiver
 Dicke, häufige und quasi-ständige Lastfälle abgeleitet und eigene, Bügel
-mit Stabzahl in y, ein Knickfall; eine zweite Platte mit x aussen und
-b = 500 mm, die im Feld nicht aufgeht und deren Stahl unter Dauerlast
-fliesst, dazu Querkraft ohne Bügel -- einmal über m_Rd, einmal
-darunter, mit Einlage; eine dritte ohne x-Bewehrung; eine vierte mit
+mit Stabzahl in y, ein Knickfall, die Verformung im Feld und am
+Kragarm; eine zweite Platte mit x aussen und b = 500 mm, die im Feld
+nicht aufgeht, auch nicht in der Durchbiegung, und deren Stahl unter
+Dauerlast fliesst, dazu Querkraft ohne Bügel -- einmal über m_Rd,
+einmal darunter, mit Einlage; eine dritte ohne x-Bewehrung; eine vierte mit
 Querkraft ohne Einlage, einer Einwirkung, die am kürzesten Abstand
 gemessen wird, und ⌀40 in y unter der x-Bewehrung -- die fliesst bei
 x = h/2 nicht. Gebaut über die Fassade, wie ein Benutzer es in Python

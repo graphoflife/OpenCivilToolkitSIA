@@ -21,9 +21,10 @@ class TestDienst(unittest.TestCase):
         self.assertTrue(antwort.daten["vollstaendig"])
         # Nur die gefuehrten Nachweise -- die stillen stehen als Hinweis unter
         # der Zusammenfassung, nicht in dieser Liste.
-        # 3 M-N-Fälle der Platte in x, dazu Biegung und Querkraft mit
-        # Torsion des Unterzugs; mehr ist im Beispiel nicht eingeschaltet.
-        self.assertEqual(len(antwort.daten["urteile"]), 5)
+        # 3 M-N-Fälle der Platte in x und ihre Verformung im Feld, dazu
+        # Biegung und Querkraft mit Torsion des Unterzugs; mehr ist im
+        # Beispiel nicht eingeschaltet.
+        self.assertEqual(len(antwort.daten["urteile"]), 6)
         self.assertTrue(antwort.daten["alle_nachweise_erfuellt"])
 
     def test_rechnen_mit_einzelziel(self):

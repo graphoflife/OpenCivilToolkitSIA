@@ -1,5 +1,5 @@
 ---
-erzeugt: f7b60624ad25
+erzeugt: ce4c6da778c4
 art: modul
 tags: [modul]
 ---
@@ -436,6 +436,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.nachweis.stabgrenzen]]
+- [[opencivil.nachweis.verformung]]
 - [[opencivil.notizbuch.formelseiten]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.platte]]

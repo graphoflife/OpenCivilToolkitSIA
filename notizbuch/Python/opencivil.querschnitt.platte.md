@@ -1,5 +1,5 @@
 ---
-erzeugt: 1b33958e47c7
+erzeugt: 6c322c22b5b1
 art: modul
 tags: [modul]
 ---
@@ -389,29 +389,6 @@ Wie Grundbewehrung und Zulage innerhalb einer Lage zueinander liegen, sagt
 def rechne(self, e: Eingaben, p: Protokoll) -> Mapping[str, Groesse]
 ```
 
-#### Lagenaufbau._vergroesserung
-
-```python
-def _vergroesserung(self, p: Protokoll, e: Eingaben, gerechnet: Mapping[str, Groesse]) -> Dict[str, Groesse]
-```
-
-Der Vergroesserungsfaktor der Durchbiegung in x, Zug unten und Zug
-oben -- SIA 262:2025, 4.4.3.2.5, nach Vorgabe des Benutzers:
-
-```
-w / w_c = (1 - 20 rho') / (10 rho^0.7) · (0.75 + 0.1 phi) · (h/d)^3
-```
-
-`rho = A_s/(b·d)` der gezogenen Seite, `rho'` der Gegenseite mit
-`d'` vom gezogenen Rand bis zur Gegenlage -- und das ist deren
-statische Hoehe: `rho'` der einen Seite ist das `rho` der anderen.
-`phi` ist die Kriechzahl der Platte; die Nachweise waehlen ihre
-eigene.
-
-Die x-Posten einer Seite zaehlen zusammen, in ihrem Schwerpunkt. Fehlt
-die Gegenseite, ist `rho' = 0`; fehlt die gezogene Seite, gibt es
-keinen Faktor.
-
 #### Lagenaufbau._kennzahlen
 
 ```python
@@ -446,7 +423,6 @@ alle Schnittgroessen Werte pro Laufmeter.
 - `d_max: Groesse = field(default_factory=lambda: Groesse(32, MM))` – Grösstkorndurchmesser -- geht in den Querkraftwiderstand ein.
 - `einlagenhoehe: Groesse = field(default_factory=lambda: Groesse(0, MM))` – Höhe einer Einlage; verringert den Hebelarm d_v, wenn h/6 \< e \< d.
 - `k_c: Groesse = field(default_factory=lambda: Groesse(K_C, EINHEITSLOS))` – Abminderung der Betondruckfestigkeit in der Druckdiagonalen.
-- `kriechzahl: Groesse = field(default_factory=lambda: Groesse(KRIECHZAHL, EINHEITSLOS))` – Kriechzahl phi -- geht ueber n = (E_s/E_cm)*(1+phi) in den Hebelarm ein.
 - `querkraftbewehrung: Optional[Querkraftbewehrung] = None` – Bügel, sofern welche angegeben sind. `None` heisst: ohne.
 - `praefix: Optional[str] = None`
 - `definitionen: Dict[str, WertDef] = field(default_factory=dict, init=False)`
@@ -546,7 +522,6 @@ Rechnung sehen statt nur die Zahl.
 - `ALPHA_MAX = 45`
 - `ALPHA_ZUG = 40` – Bei einer Normalzugkraft steilt sich die Druckdiagonale auf. Beide Grenzen werden dann auf mindestens diesen Wert gehoben.
 - `K_C = 0.55` – Vorgabe fuer den Abminderungsbeiwert der Betondruckfestigkeit in der Druckdiagonalen.
-- `KRIECHZAHL = 2.0` – Vorgabe fuer die Kriechzahl phi. Sie beschreibt Klima und Belastungsalter -- eine Annahme ueber das Bauwerk, keine Materialgroesse.
 - `UEBERDECKUNGEN = 'Überdeckungen'` – Die beiden Kaesten, in denen die Plattenangaben zusammenstehen. Der erste traegt die Betonsorte im Namen: sie ist keine gerechnete Groesse und hat darum keine eigene Kette, an der sie haengen koennte -- als Aufschrift des Kastens gilt sie dagegen immer, denn eine Platte hat genau einen Beton.
 
 ## Braucht
@@ -572,6 +547,7 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.sproedes_versagen]]
+- [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
@@ -585,14 +561,9 @@ Rechnung sehen statt nur die Zahl.
 ## Formeln aus diesem Modul
 
 - [[Bewehrung der Lage]] · `protokoll_lage`
-- [[Bewehrungsgehalt]] · `Lagenaufbau._vergroesserung`
 - [[Bewehrungsmass je Kubikmeter Beton]] · `Lagenaufbau._kennzahlen`
-- [[Bewehrungsquerschnitt der zusammengefassten Lage]] · `Lagenaufbau._vergroesserung`
 - [[Bewehrungsquerschnitt über die Breite b]] · `Lagenaufbau.rechne`
 - [[Höhe der Distanzhalter]] · `Lagenaufbau._kennzahlen`
 - [[Querschnitt eines Bügelschenkels]] · `Plattenquerschnitt._querkraftbewehrung_aufbauen`
-- [[Schwerpunkt der zusammengefassten Lage]] · `Lagenaufbau._vergroesserung`
 - [[Schwerpunkt der zusammengefassten Lage]] · `protokoll_lage`
-- [[Statische Höhe]] · `Lagenaufbau._vergroesserung`
 - [[Statische Höhe]] · `protokoll_statische_hoehe`
-- [[Vergrösserungsfaktor der Durchbiegung]] · `Lagenaufbau._vergroesserung`

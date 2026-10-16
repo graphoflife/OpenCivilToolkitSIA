@@ -467,8 +467,8 @@ class TestWahl(unittest.TestCase):
 
     def test_die_kriechzahl_der_platte_spielt_keine_rolle(self):
         """
-        Eine neue Analyse beginnt mit φ = 0 -- das φ der Platte gilt nur für
-        den Vergrösserungsfaktor w/w_c.
+        Eine neue Analyse beginnt mit φ = 0 -- das φ des Vergrösserungsfaktors
+        gehört dem Verformungsnachweis und gilt nur dort.
         """
         projekt = Projekt.beispiel()
         projekt.querschnitte[0].spannungsfall("neu", art="moment_kruemmung")

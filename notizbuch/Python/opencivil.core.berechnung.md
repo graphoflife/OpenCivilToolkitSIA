@@ -1,5 +1,5 @@
 ---
-erzeugt: df77f91cd340
+erzeugt: 921f0f345a60
 art: modul
 tags: [modul]
 ---
@@ -633,6 +633,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.nachweis.stabgrenzen]]
+- [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.platte]]

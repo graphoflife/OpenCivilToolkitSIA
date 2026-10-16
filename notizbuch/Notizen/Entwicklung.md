@@ -44,6 +44,58 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-16 · Verformungsnachweis der Platte
+
+Die Kriechzahl φ steht nicht mehr bei der Platte. Dafür gibt es neben
+«Fliessen häufig» den Nachweis «Verformung» (Benutzer): zuoberst φ, Vorgabe 2,
+darunter Verformungsfälle wie Lastfälle, je Fall die Durchbiegung w in mm und
+die Spannweite L in m. Gehalten wird w_eff = ω_w · w gegen w_max = L/350; der
+Hinweis im Fenster sagt, dass w mit der Steifigkeit E_cm zu ermitteln ist.
+
+- **ω_w ist die Formel, die schon da war** -- w/w_c nach SIA 262:2025,
+  4.4.3.2.5, mit ρ der gezogenen und ρ′ der Gegenseite. Sie stand bei den
+  Bewehrungslagen und rechnete mit dem φ der Platte; jetzt gehört sie dem
+  Nachweis (`nachweis/verformung.py`), und die Zahlen sind dieselben (4.00
+  unten, 7.52 oben im Beispiel).
+- **Je Fall eine Zugseite**, Vorgabe unten. Der Faktor hängt an der Seite,
+  die gezogen wird; ein Kragarm zieht oben. Gerechnet wird er je Seite, die
+  ein Fall verlangt, einmal für die Platte -- nicht je Fall. Der Benutzer hat
+  die Frage nach der Seite mit der Formel beantwortet; die Zugseite je Fall
+  ist meine Folgerung daraus (ρ ist das der gezogenen Seite). Ohne x-Bewehrung
+  auf der gezogenen Seite gibt es keinen Faktor: der Fall steht mit Grad null
+  und dem Grund in der Tabelle.
+- **Nach Vorgabe, nicht nachgeschlagen:** L/350 und «w mit E_cm» (siehe
+  [[TODO]]). Die Herleitung sagt es als Annahme.
+- **Eine alte Datei** bringt ihr φ der Platte als φ der Verformung mit. w und
+  L prüft erst das Rechnen, wie die Masse der Platte: eine abgelegte Platte
+  mit L = 0 lässt sich öffnen und korrigieren.
+- Unter der Tabelle steht ω_w je gezogene Seite, wie vorher w/w_c -- jetzt
+  nur, wo der Nachweis rechnet. Beispiel und Prüfprojekt haben Fälle: unten
+  und oben, erfüllt und nicht, ein eigenes φ, eine Platte ohne x-Bewehrung.
+
+## 2026-10-16 · Schalter, Fenster, Apps, Rissanforderung
+
+Mehrere kleine Wünsche des Benutzers an die Oberfläche, je ein Commit:
+
+- **Schalter mit zwei Stellungen** sind ein einziger Knopf (`zweiSchalter` in
+  `bausteine.js`): ein Klick irgendwo schaltet um. So hoch wie die
+  Eingabefelder daneben; die gewählte Stellung ist eine abgerundete farbige
+  Fläche bis an den Rand, die andere bleibt blass auf grauem Grund. Gilt für
+  Haken/Kreuz, x/y, «Aktuelle Seite/Gesamt»; «günstig/ungünstig» ist ein
+  Knopf mit Text und bekam nur die Höhe.
+- **Fenster** erscheinen senkrecht in der Mitte; ein langes beginnt oben und
+  rollt wie bisher. Auf dem Telefon steht die Anzeige «Kern: …» über der
+  Reiterleiste statt dahinter.
+- **Apps merken sich ihre Auswahl** (`zuletzt` in `zustand.js`): beim Wechsel
+  ist der zuletzt gewählte Eintrag der App wieder gewählt, sonst der erste.
+  Ihr Zeichen ist blau, sobald sie einen Eintrag hat.
+- **Die Rissanforderung** steht in den Fenstern «Riss bei Zwang»,
+  «Stahlspannung quasi-ständig» und «Fliessen häufig» statt oben bei Platte
+  und Querschnitt, mit einem «?»: sie gehört weiter dem Bauteil und gilt für
+  alle drei.
+- **Die Bezeichnung der Platte** beginnt bündig über der Beton-Auswahl; eine
+  Auswahl mit kurzen Namen ist mindestens so breit wie ein Zahlenfeld.
+
 ## 2026-10-15 · Neue Materialien: C25/30 und B500B zuerst
 
 «+» bei Beton legt zuerst C25/30 an, gibt es den schon, C30/37, und so

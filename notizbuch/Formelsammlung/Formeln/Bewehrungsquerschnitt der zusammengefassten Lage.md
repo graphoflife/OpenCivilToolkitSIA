@@ -1,15 +1,13 @@
 ---
-erzeugt: f2541154a2be
+erzeugt: ca9edfb0b538
 art: formel
 tags: [formel]
 ---
 > [!warning] Normstelle fehlt noch
 > Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
 
-*In der Herleitung: «x-Bewehrung unten, zusammen»*
-
 $$
-A_{s,u} = A_{s,2,x,g} + A_{s,2,x,z}
+A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z}
 $$
 
 ## Grössen
@@ -24,7 +22,7 @@ $$
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-A_{s,u} = A_{s,2,x,g} + A_{s,2,x,z} = 1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2} = 2450\,\mathrm{mm}^{2}
+A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z} = 1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2} = 2450\,\mathrm{mm}^{2}
 $$
 
 ## Gebraucht von
@@ -35,12 +33,12 @@ $$
 ## Im Code
 
 - [[opencivil.nachweis.handrechnung#Handrechnung._schwerpunkt|Handrechnung._schwerpunkt]]
-- [[opencivil.querschnitt.platte#Lagenaufbau._vergroesserung|Lagenaufbau._vergroesserung]]
+- [[opencivil.nachweis.verformung#Verformung._bewehrungsgehalte|Verformung._bewehrungsgehalte]]
 
 ## Themen
 
-- [[Querschnitt]]
 - [[Biegung und Normalkraft]]
+- [[Verformung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

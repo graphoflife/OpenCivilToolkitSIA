@@ -436,22 +436,22 @@ function zeilenVon(zelle) {
 
 /**
  * Die Angaben zur Platte unter der Tabelle: zwei zur Ausführung und der
- * Vergrösserungsfaktor der Durchbiegung, je gezogene Seite.
+ * Vergrösserungsfaktor ω_w der Durchbiegung, je gezogene Seite.
  *
  * Alle kommen fertig aus dem Kern -- hier wird nichts gerechnet, auch nicht
- * "nur schnell" das Bewehrungsmass aus den Flächen. Fehlt in x die
- * Bewehrung einer Seite, gibt es dort keinen Faktor, und die Zeile entfällt.
- * Der Faktor steht mit festen zwei Stellen, wie verlangt; die anderen ohne
- * nachlaufende Nullen.
+ * "nur schnell" das Bewehrungsmass aus den Flächen. Der Faktor gehört dem
+ * Nachweis «Verformung»: er steht nur für die Seiten, die ein
+ * Verformungsfall zieht und die in x bewehrt sind. Er steht mit festen zwei
+ * Stellen, wie verlangt; die anderen ohne nachlaufende Nullen.
  */
 function plattenkennzahlen(eintrag, loesung) {
-  const wwc = 'Vergrösserungsfaktor w/w_c nach SIA 262:2025, 4.4.3.2.5, mit dem φ der Platte';
+  const omega = 'Vergrösserungsfaktor ω_w nach SIA 262:2025, 4.4.3.2.5 – aus dem Nachweis «Verformung»';
   const zeigen = [
     ['Bewehrungsmass', eintrag.werte?.bewehrungsmass, 'Stahldichte 7850 kg/m³'],
     ['Höhe der Distanzhalter', eintrag.werte?.distanzhalter,
       'OK innere untere Lage bis UK innere obere Lage'],
-    ['Vergrösserungsfaktor Zug unten', eintrag.werte?.w_wc_unten, wwc, true],
-    ['Vergrösserungsfaktor Zug oben', eintrag.werte?.w_wc_oben, wwc, true],
+    ['Vergrösserungsfaktor ω_w, Zug unten', eintrag.verformung?.unten, omega, true],
+    ['Vergrösserungsfaktor ω_w, Zug oben', eintrag.verformung?.oben, omega, true],
   ];
   const zeilen = zeigen
     .map(([beschriftung, id, erklaerung, fest]) => [

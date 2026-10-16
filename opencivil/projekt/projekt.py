@@ -401,6 +401,9 @@ class Projekt(Beschreibung):
         platte.einwirkung("Feld", M_Ed=100.0)
         platte.einwirkung("Feld mit Druck", M_Ed=100.0, N_Ed=-300.0)
         platte.einwirkung("Stütze", M_Ed=-50.0)
+        # Die Durchbiegung im Feld, mit E_cm gerechnet -- der
+        # Vergrösserungsfaktor macht sie gut viermal grösser.
+        platte.verformungsfall("Feld", w=3.5, laenge=6.0)
         # Ein gezeichneter Querschnitt: der Unterzug, 300 × 600 mm. Vier
         # Schubwände auf der Bügelachse umschliessen eine Zelle -- so trägt
         # er auch Torsion; jede Wand kreuzt ein Schenkel des Bügels.
@@ -445,10 +448,11 @@ class Projekt(Beschreibung):
 
         Erhöhte Anforderung mit allen Schaltern und begrenzter rissaktiver
         Dicke, häufige und quasi-ständige Lastfälle abgeleitet und eigene, Bügel
-        mit Stabzahl in y, ein Knickfall; eine zweite Platte mit x aussen und
-        b = 500 mm, die im Feld nicht aufgeht und deren Stahl unter Dauerlast
-        fliesst, dazu Querkraft ohne Bügel -- einmal über m_Rd, einmal
-        darunter, mit Einlage; eine dritte ohne x-Bewehrung; eine vierte mit
+        mit Stabzahl in y, ein Knickfall, die Verformung im Feld und am
+        Kragarm; eine zweite Platte mit x aussen und b = 500 mm, die im Feld
+        nicht aufgeht, auch nicht in der Durchbiegung, und deren Stahl unter
+        Dauerlast fliesst, dazu Querkraft ohne Bügel -- einmal über m_Rd,
+        einmal darunter, mit Einlage; eine dritte ohne x-Bewehrung; eine vierte mit
         Querkraft ohne Einlage, einer Einwirkung, die am kürzesten Abstand
         gemessen wird, und ⌀40 in y unter der x-Bewehrung -- die fliesst bei
         x = h/2 nicht. Gebaut über die Fassade, wie ein Benutzer es in Python
@@ -472,6 +476,9 @@ class Projekt(Beschreibung):
         decke.quasistaendig.aus_tragsicherheit = True
         decke.quasistaendig.lastfall("Dauerlast", M_Ed=70)
         decke.knickfall("Wand", N_Ed=-800, M_Ed_1=20, laenge=3.0)
+        # Die Verformung im Feld und am Kragarm -- einmal je gezogene Seite.
+        decke.verformungsfall("Feld", w=3.0, laenge=6.0)
+        decke.verformungsfall("Kragarm", w=0.8, laenge=2.5, zugseite="oben")
         # Die Kapitel der Decke rechnen mit φ = 2, wie bis 2026-10-09 die
         # Platte -- so bleiben ihre Zahlen im Bericht dieselben.
         decke.zwaengung_biegung_kriechzahl = 2.0
@@ -503,6 +510,9 @@ class Projekt(Beschreibung):
         dach.quasistaendig.lastfall("Dauerlast", M_Ed=20)
         # Mit φ = 2 fliesst hier der Stahl -- der Fall soll laut bleiben.
         dach.quasistaendig.wahl.kriechzahl = 2.0
+        # Die Durchbiegung geht nicht auf, mit einem eigenen φ.
+        dach.verformung.kriechzahl = 1.5
+        dach.verformungsfall("Feld", w=2.0, laenge=5.0)
 
         # Jede Rechenwahl einmal laut. Die Platte «Parabel» haelt die
         # Tragsicherheit praezise mit charakteristischen Werten -- M_Rk,
@@ -542,6 +552,7 @@ class Projekt(Beschreibung):
 
         ohne = p.platte("Ohne x", h=250, x=[0, 0], y=[12, 12])
         ohne.einwirkung("Feld", M_Ed=30, V_Ed=20)
+        ohne.verformungsfall("Feld", w=2.0, laenge=4.0)
 
         konsole = p.platte("Konsole", h=250, x=[12, 12], y=[40, 10])
         konsole.einwirkung("Feld", M_Ed=40, V_Ed=50)

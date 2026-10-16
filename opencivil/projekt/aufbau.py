@@ -53,6 +53,7 @@ from opencivil.nachweis.spannungsbegrenzung import (
     Spannungsbegrenzung,
 )
 from opencivil.nachweis import dehnungsfaecher
+from opencivil.nachweis.verformung import Verformung, Verformungsfall
 from opencivil.nachweis.sproedes_versagen import SproedesVersagen
 from opencivil.nachweis.querkraft import Querkraft, Querkraftfall
 from opencivil.querschnitt.platte import (
@@ -60,7 +61,7 @@ from opencivil.querschnitt.platte import (
 )
 from opencivil.projekt.eintraege import (
     Gebrauchsliste, KnickEintrag, KombinationEintrag, MaterialEintrag, SpannungsfallEintrag,
-    abgeleiteter_fallname,
+    VerformungsfallEintrag, abgeleiteter_fallname,
 )
 from opencivil.projekt.balkensystem import BalkensystemEintrag, StabquerschnittEintrag
 from opencivil.projekt.lesen import ProjektFehler, schalter_aus
@@ -129,6 +130,9 @@ class Aufbau:
     spannung_riss: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)
     """Stahlspannung aus der Rissbreite unter quasi-staendiger Einwirkung, je ``<querschnitt>.x``."""
 
+    verformung: Dict[str, Verformung] = field(default_factory=dict)
+    """Die Durchbiegung je Verformungsfall, je Querschnitt -- nur in x-Richtung."""
+
     knicken: Dict[str, Knicken] = field(default_factory=dict)
     """Nachweis am verformten System, je Querschnitt -- nur in x-Richtung."""
 
@@ -180,7 +184,7 @@ class Aufbau:
     #: rechnet ein Bauteil seine Nachweise (:meth:`Bauteil.ziele`).
     NACHWEISFELDER = ("nachweise", "querkraft", "duktilitaet", "fehlende",
                       "rissnormalkraft", "sproede", "zwaengung_biegung",
-                      "spannung_riss", "spannung", "knicken",
+                      "spannung_riss", "spannung", "verformung", "knicken",
                       "qa_biegung", "qa_schub", "qa_duktilitaet", "qa_sproede",
                       "qa_rissnormalkraft", "qa_zwaengung_biegung", "qa_spannung_riss",
                       "qa_spannung", "qa_knicken")
@@ -430,6 +434,9 @@ def _platte(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> B
         if eintrag.knickfaelle:
             aufbau.warnungen.append(
                 f"Platte '{eintrag.name}': ohne x-Bewehrung kein Knicknachweis.")
+        if eintrag.verformung.faelle:
+            aufbau.warnungen.append(
+                f"Platte '{eintrag.name}': ohne x-Bewehrung kein Verformungsnachweis.")
     else:
         # Der M-N-Nachweis entsteht auch ohne Schnittgroessen: seine
         # Eckwerte gehoeren dem Querschnitt, nicht der Einwirkung, und der
@@ -446,6 +453,12 @@ def _platte(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> B
 
         _lagennachweise(eintrag, querschnitt, richtung, nachweis, aufbau, teil)
         _spannungsnachweise(eintrag, querschnitt, richtung, aufbau, teil)
+
+        verformungsfaelle = [f for f in eintrag.verformung.faelle if f.aktiv]
+        if verformungsfaelle:
+            aufbau.eintragen(teil, "verformung", eintrag.kennung, Verformung(
+                querschnitt, [_verformungsfall(f) for f in verformungsfaelle],
+                kriechzahl=eintrag.verformung.kriechzahl))
 
         # Auch ohne V_Ed: dann still, nur fuer das Diagramm.
         aufbau.eintragen(teil, "querkraft", kennung_x, Querkraft(
@@ -744,6 +757,12 @@ def _knickfall(k: KnickEintrag, klasse: type = Knickfall, **mehr: Any) -> Knickf
                   laenge=Groesse(k.laenge, M), knicklaenge=Groesse(k.knicklaenge, M), **mehr)
 
 
+def _verformungsfall(f: VerformungsfallEintrag) -> Verformungsfall:
+    """Ein Verformungsfall aus seiner Beschreibung -- w in mm, die Spannweite in m."""
+    return Verformungsfall(name=f.name, w=Groesse(f.w, MM), laenge=Groesse(f.laenge, M),
+                           zugseite=f.zugseite)
+
+
 def _baustoff(eintrag: MaterialEintrag, symbol_index: str) -> Baustoff:
     bauer = {"beton": beton, "betonstahl": betonstahl}[eintrag.art]
     roh = bauer(eintrag.sorte, praefix=f"{eintrag.art}.{eintrag.kennung}")
@@ -835,7 +854,6 @@ def _querschnitt(
         d_max=Groesse(eintrag.d_max, MM),
         einlagenhoehe=Groesse(eintrag.einlagenhoehe, MM),
         k_c=Groesse(eintrag.k_c, EINHEITSLOS),
-        kriechzahl=Groesse(eintrag.kriechzahl, EINHEITSLOS),
         querkraftbewehrung=(buegel.als_bewehrung(buegelstahl)
                             if buegel.vorhanden else None),
         praefix=praefix,
