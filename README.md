@@ -327,8 +327,8 @@ Beton das Gesetz, der Schalter «nur einachsig», die Lastfälle mit N, M_y,
 M_z, V_y, V_z und T und die Angaben der Schubwände (Neigung, k_c,
 Längszugkraft). Duktilität und sprödes Versagen rechnen am selben
 Querschnitt. Wie bei der Platte gibt es Riss bei Zwang, Stahlspannung
-quasi-ständig und Fliessen häufig, mit der Rissanforderung im Panel des
-Querschnitts. Dabei hält jeder gezogene Stab gegen seine eigene Grenze, mit
+quasi-ständig und Fliessen häufig; die Rissanforderung steht in jedem dieser
+drei Fenster und gilt für alle drei. Dabei hält jeder gezogene Stab gegen seine eigene Grenze, mit
 seinem Durchmesser; eine verschmierte Linie zählt, als lägen ihre Stäbe
 150 mm auseinander. Die Zwängung auf Normalkraft rechnet am ganzen
 Querschnitt, die auf Biegung je Richtung; die Lastfälle unter Gebrauchslast

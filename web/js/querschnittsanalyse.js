@@ -171,15 +171,6 @@ function querschnittGruppe(analyse) {
       type: 'text', value: analyse.name,
       on: { change: (e) => aendern((a) => { a.name = e.target.value; }) },
     })),
-    // Wie bei der Platte: sie gilt für die Zwängung und beide Stahlspannungen.
-    feld('Rissanforderung', auswahl({
-      werte: (zustand.katalog?.rissanforderungen || []).map((r) => ({
-        wert: r.wert, beschriftung: r.beschriftung,
-      })),
-      gewaehlt: analyse.rissanforderung || 'normal',
-      titel: 'Bestimmt σ_s,adm (Tab. 17)',
-      beiAenderung: (v) => aendern((a) => { a.rissanforderung = v; }),
-    })),
     zeichenbereich(analyse, uebersicht),
     el('div.unterkapitel', {}, [
       // Freier Text, der in keine Rechnung eingeht -- wie bei der Platte.

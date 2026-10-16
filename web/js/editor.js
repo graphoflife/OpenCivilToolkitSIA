@@ -632,14 +632,6 @@ function plattenEditor(querschnitt) {
           ['Nachweise', 'wählen ihr φ selbst, in der Zeile «Rechenwahl» jedes Kapitels'],
         ], 'w/w_c = (1 − 20ρ′)/(10ρ^0.7) · (0.75 + 0.1φ) · (h/d)³'),
         'Kriechzahl φ – nur für w/w_c'),
-        feld('Rissanforderung', auswahl({
-          werte: (zustand.katalog.rissanforderungen || []).map((r) => ({
-            wert: r.wert, beschriftung: r.beschriftung,
-          })),
-          gewaehlt: querschnitt.rissanforderung || 'normal',
-          titel: 'Bestimmt σ_s,adm (Tab. 17)',
-          beiAenderung: (v) => aendern((q) => { q.rissanforderung = v; }),
-        })),
         // Freier Text, der in keine Rechnung eingeht. Ohne ein solches Feld
         // landen solche Sätze im Namen der Platte.
         el('div.beschreibung', {}, [

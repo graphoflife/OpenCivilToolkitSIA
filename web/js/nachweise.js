@@ -397,6 +397,28 @@ function knickZeile(eintrag, ort, index) {
   ]);
 }
 
+/**
+ * Die Rissanforderung als erste Zeile der drei Rissnachweise -- Zwang,
+ * quasi-ständig, häufig. Sie gehört dem Bauteil, nicht dem Nachweis: in
+ * einem der drei Fenster gewählt, gilt sie in allen. Vorher stand sie oben
+ * bei der Platte, weit weg von den Nachweisen, die sie brauchen (Benutzer,
+ * 2026-10-16).
+ */
+function rissanforderungZeile(eintrag, ort) {
+  return feld('Rissanforderung', auswahl({
+    werte: (zustand.katalog?.rissanforderungen || []).map((r) => ({
+      wert: r.wert, beschriftung: r.beschriftung,
+    })),
+    gewaehlt: eintrag.rissanforderung || 'normal',
+    titel: 'Bestimmt σ_s,adm (Tab. 17)',
+    beiAenderung: (v) => anBauteil(eintrag, ort)((e) => { e.rissanforderung = v; }),
+  }), erklaerung([
+    ['Gilt für', 'alle Rissnachweise: Riss bei Zwang, Stahlspannung quasi-ständig '
+      + 'und Fliessen häufig. Hier geändert, ändert sie sich in allen dreien.'],
+    ['Bestimmt', 'σ_s,adm nach Tab. 17 und ob «Fliessen häufig» gefordert ist'],
+  ]));
+}
+
 /** Die gewählte Rissanforderung aus dem Katalog -- oder nichts, wenn er fehlt. */
 function anforderung(querschnitt) {
   return (zustand.katalog?.rissanforderungen || [])
@@ -438,6 +460,7 @@ export function zwangInhalt(eintrag, ort = PLATTE) {
   };
 
   return [
+    rissanforderungZeile(eintrag, ort),
     zwaengung('zwaengung', 'Zwängung auf Normalkraft', { mitMarke: true }),
     // Die Zwängung auf Biegung rechnet am gerissenen Querschnitt -- mit
     // ihrem eigenen φ, nicht dem der Platte.
@@ -476,7 +499,7 @@ export function haeufigInhalt(eintrag, ort = PLATTE) {
     // dieses Kapitel: das quasi-ständige läuft immer.
     hinweis: fliessenGefordert(eintrag) ? null
       : `Rissanforderung «${anforderung(eintrag)?.beschriftung ?? '–'}» → `
-        + 'Tab. 17: kein Nachweis. Für Nachweis: «Erhöht» oder «Hoch».',
+        + 'Tab. 17: kein Nachweis. Für den Nachweis oben «Erhöht» oder «Hoch» wählen.',
   });
 }
 
@@ -509,6 +532,7 @@ function gebrauchsKapitel(eintrag, ort, {
   const spalten = ort.gebrauch.spalten(eintrag);
 
   return [
+    rissanforderungZeile(eintrag, ort),
     hinweis ? el('p.hinweis.hinweis-annahme', { text: hinweis }) : null,
     rechenwahlZeile('Rechenwahl', liste.wahl,
       (veraenderer) => aendern((l) => veraenderer(l.wahl)), { arten: ort.gebrauch.arten }),
