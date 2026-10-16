@@ -33,10 +33,10 @@ from opencivil.core.protokoll import GleichungBlock, TabellenBlock
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Wert
 from opencivil.geotechnik import grundbruch
-from opencivil.querschnitt.platte import BREITE_Y_MM
+from opencivil.querschnitt.platte import BREITE_Y_MM, Plattenquerschnitt
 
 if TYPE_CHECKING:
-    from opencivil.projekt import Aufbau, QuerschnittEintrag
+    from opencivil.projekt import Aufbau
 
 
 @dataclass(frozen=True)
@@ -240,7 +240,7 @@ def angaben(aufbau: "Aufbau", kennung: str,
     """
     platte = aufbau.querschnitte.get(kennung)
     if platte is not None:
-        return plattenangaben(platte), bewehrungsuebersicht(platte)
+        return plattenangaben(platte), bewehrungsuebersicht(platte, loesung.werte)
     fundament = aufbau.grundbrueche.get(kennung)
     if fundament is not None:
         nachweis = aufbau.grundbruch.get(kennung)
@@ -332,7 +332,7 @@ def kennzahlentabelle(zeilen: Sequence[Kennzahl]) -> TabellenBlock:
         titel="Kennzahlen", ausrichtung="llr")
 
 
-def plattenangaben(qs: "QuerschnittEintrag") -> GleichungBlock:
+def plattenangaben(qs: Plattenquerschnitt) -> GleichungBlock:
     """
     Beton, Dicke und betrachtete Breite -- eine Zeile ueber der Tabelle.
 
@@ -347,7 +347,7 @@ def plattenangaben(qs: "QuerschnittEintrag") -> GleichungBlock:
     return GleichungBlock(latex=latex, titel="Angaben zur Platte")
 
 
-def bewehrungsuebersicht(qs: "QuerschnittEintrag") -> TabellenBlock:
+def bewehrungsuebersicht(qs: Plattenquerschnitt, werte: Dict[str, Wert]) -> TabellenBlock:
     """
     Überdeckungen und Lagen, wie man die Platte im Schnitt sieht.
 
@@ -356,9 +356,20 @@ def bewehrungsuebersicht(qs: "QuerschnittEintrag") -> TabellenBlock:
     nebeneinander hat, soll nicht umdenken müssen.
 
     Grundbewehrung und Zulage stehen in einer Zeile, getrennt durch ``+`` --
-    die Lage ist eine Lage, auch wenn sie aus zwei Posten besteht.
+    die Lage ist eine Lage, auch wenn sie aus zwei Posten besteht. Zuletzt
+    die Höhe ihrer Stabachse über der Unterkante, ``h - z`` aus dem
+    Lagenaufbau (Benutzer, 2026-10-16); liegen Grund und Zulage verschieden
+    hoch, beide, getrennt durch ``/``.
     """
     strich = "–"
+    tiefen: Dict[int, List[float]] = {}
+    for lage, _, _, _, z_id in qs.posten_ids:
+        if z_id in werte:
+            tiefen.setdefault(lage.nummer, []).append(werte[z_id].groesse.si)
+
+    def hoehe(nummer: int) -> Zelle:
+        zahlen = [Groesse.aus_si(qs.h.si - z, MM).formatiert(1) for z in tiefen.get(nummer, [])]
+        return Mathe(" / ".join(dict.fromkeys(zahlen))) if zahlen else strich
 
     def menge(posten) -> str:
         if not posten.vorhanden:
@@ -370,7 +381,7 @@ def bewehrungsuebersicht(qs: "QuerschnittEintrag") -> TabellenBlock:
 
     zeilen: List[List[Zelle]] = [[
         "Überdeckung oben", strich,
-        Mathe(qs.ueberdeckung_oben.als_latex(0, MM)), strich]]
+        Mathe(qs.ueberdeckung_oben.als_latex(0, MM)), strich, strich]]
     for lage in reversed(qs.lagen):
         posten = [menge(lage.grund), menge(lage.zulage)]
         vorhanden = [t for t in posten if t]
@@ -379,9 +390,10 @@ def bewehrungsuebersicht(qs: "QuerschnittEintrag") -> TabellenBlock:
             lage.richtung.value,
             Mathe(" + ".join(vorhanden)) if vorhanden else strich,
             lage.stahl.name if (vorhanden and lage.stahl) else strich,
+            hoehe(lage.nummer) if vorhanden else strich,
         ])
     zeilen.append(["Überdeckung unten", strich,
-                   Mathe(qs.ueberdeckung_unten.als_latex(0, MM)), strich])
+                   Mathe(qs.ueberdeckung_unten.als_latex(0, MM)), strich, strich])
 
     # Die Bügel stehen am Ende und nicht in der Stapelfolge: sie sitzen über
     # die ganze Höhe und haben darin keinen Platz.
@@ -398,11 +410,12 @@ def bewehrungsuebersicht(qs: "QuerschnittEintrag") -> TabellenBlock:
             Mathe(rf"\varnothing {b.durchmesser.formatiert(0)}"
                   rf"@{b.abstand_x.formatiert(0)}@{menge_y}"),
             b.stahl.name if b.stahl else strich,
+            strich,
         ])
 
     return TabellenBlock(
-        kopf=["Lage", "Richtung", "Bewehrung", "Stahl"],
+        kopf=["Lage", "Richtung", "Bewehrung", "Stahl", "Höhe ab UK [mm]"],
         zeilen=zeilen,
         titel="Bewehrung von oben nach unten",
-        ausrichtung="llll",
+        ausrichtung="llllr",
     )

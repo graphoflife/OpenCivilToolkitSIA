@@ -431,8 +431,9 @@ plt.xlabel("x"); plt.legend(); plt.grid()             # erscheint in der Konsole
 **Rechte Tafel:** gebaut wie die mittlere -- je Bauteil ein graues Panel, darin
 weisse Karten; ein Klick auf den Kopf klappt es zu.
 
-* *Zusammenfassung* -- je Platte ein Panel mit den Angaben, der Bewehrung,
-  den Nachweisen und den Kennzahlen. Die Kennzahlen stehen immer, auch ohne
+* *Zusammenfassung* -- je Platte ein Panel mit den Angaben, der Bewehrung
+  (je Lage mit der Höhe ihrer Stabachse über der Unterkante), den Nachweisen
+  und den Kennzahlen. Die Kennzahlen stehen immer, auch ohne
   Lastfall: Bewehrungsmass, Distanzhalter, ω_w und ω_w', M_Rd⁺ und M_Rd⁻ bei
   N_Ed = 0, N_Rd⁺ und N_Rd⁻ bei M_Ed = 0 und x/d aus der Handrechnung, der
   Querkraftwiderstand bei N_Ed = 0 -- ohne Bügel V_Rd,max (bei M_Ed = 0) und

@@ -10839,15 +10839,15 @@ $$
 
 **Bewehrung von oben nach unten**
 
-| Lage | Richtung | Bewehrung | Stahl |
-| :--- | :--- | :--- | :--- |
-| Überdeckung oben | – | $30\,\mathrm{mm}$ | – |
-| 4. Lage | y | $\varnothing 12@150$ | B500B |
-| 3. Lage | x | $\varnothing 12@150$ | B500B |
-| 2. Lage | x | $\varnothing 18@150 + \varnothing 12@150$ | B500B |
-| 1. Lage | y | $\varnothing 12@150$ | B500B |
-| Überdeckung unten | – | $30\,\mathrm{mm}$ | – |
-| Querkraftbewehrung | x/y | $\varnothing 8@200@5\,\text{Stk}$ | B500B |
+| Lage | Richtung | Bewehrung | Stahl | Höhe ab UK [mm] |
+| :--- | :--- | :--- | :--- | ---: |
+| Überdeckung oben | – | $30\,\mathrm{mm}$ | – | – |
+| 4. Lage | y | $\varnothing 12@150$ | B500B | $264$ |
+| 3. Lage | x | $\varnothing 12@150$ | B500B | $252$ |
+| 2. Lage | x | $\varnothing 18@150 + \varnothing 12@150$ | B500B | $51 / 54$ |
+| 1. Lage | y | $\varnothing 12@150$ | B500B | $36$ |
+| Überdeckung unten | – | $30\,\mathrm{mm}$ | – | – |
+| Querkraftbewehrung | x/y | $\varnothing 8@200@5\,\text{Stk}$ | B500B | – |
 
 | Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
 | :--- | :--- | ---: | ---: | ---: |
@@ -10900,14 +10900,14 @@ $$
 
 **Bewehrung von oben nach unten**
 
-| Lage | Richtung | Bewehrung | Stahl |
-| :--- | :--- | :--- | :--- |
-| Überdeckung oben | – | $30\,\mathrm{mm}$ | – |
-| 4. Lage | x | $\varnothing 10@150$ | B500B |
-| 3. Lage | y | $\varnothing 8@150$ | B500B |
-| 2. Lage | y | $\varnothing 8@150$ | B500B |
-| 1. Lage | x | $\varnothing 10@150$ | B500B |
-| Überdeckung unten | – | $30\,\mathrm{mm}$ | – |
+| Lage | Richtung | Bewehrung | Stahl | Höhe ab UK [mm] |
+| :--- | :--- | :--- | :--- | ---: |
+| Überdeckung oben | – | $30\,\mathrm{mm}$ | – | – |
+| 4. Lage | x | $\varnothing 10@150$ | B500B | $165$ |
+| 3. Lage | y | $\varnothing 8@150$ | B500B | $156$ |
+| 2. Lage | y | $\varnothing 8@150$ | B500B | $44$ |
+| 1. Lage | x | $\varnothing 10@150$ | B500B | $35$ |
+| Überdeckung unten | – | $30\,\mathrm{mm}$ | – | – |
 
 | Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
 | :--- | :--- | ---: | ---: | ---: |
@@ -10953,14 +10953,14 @@ $$
 
 **Bewehrung von oben nach unten**
 
-| Lage | Richtung | Bewehrung | Stahl |
-| :--- | :--- | :--- | :--- |
-| Überdeckung oben | – | $30\,\mathrm{mm}$ | – |
-| 4. Lage | y | $\varnothing 10@150$ | B500B |
-| 3. Lage | x | $\varnothing 10@150$ | B500B |
-| 2. Lage | x | $\varnothing 12@150$ | B500B |
-| 1. Lage | y | $\varnothing 10@150$ | B500B |
-| Überdeckung unten | – | $30\,\mathrm{mm}$ | – |
+| Lage | Richtung | Bewehrung | Stahl | Höhe ab UK [mm] |
+| :--- | :--- | :--- | :--- | ---: |
+| Überdeckung oben | – | $30\,\mathrm{mm}$ | – | – |
+| 4. Lage | y | $\varnothing 10@150$ | B500B | $215$ |
+| 3. Lage | x | $\varnothing 10@150$ | B500B | $205$ |
+| 2. Lage | x | $\varnothing 12@150$ | B500B | $46$ |
+| 1. Lage | y | $\varnothing 10@150$ | B500B | $35$ |
+| Überdeckung unten | – | $30\,\mathrm{mm}$ | – | – |
 
 | Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
 | :--- | :--- | ---: | ---: | ---: |
@@ -11000,14 +11000,14 @@ $$
 
 **Bewehrung von oben nach unten**
 
-| Lage | Richtung | Bewehrung | Stahl |
-| :--- | :--- | :--- | :--- |
-| Überdeckung oben | – | $30\,\mathrm{mm}$ | – |
-| 4. Lage | y | $\varnothing 8@150$ | B500B |
-| 3. Lage | x | $\varnothing 10@150$ | B500B |
-| 2. Lage | x | $\varnothing 10@150$ | B500B |
-| 1. Lage | y | $\varnothing 8@150$ | B500B |
-| Überdeckung unten | – | $30\,\mathrm{mm}$ | – |
+| Lage | Richtung | Bewehrung | Stahl | Höhe ab UK [mm] |
+| :--- | :--- | :--- | :--- | ---: |
+| Überdeckung oben | – | $30\,\mathrm{mm}$ | – | – |
+| 4. Lage | y | $\varnothing 8@150$ | B500B | $186$ |
+| 3. Lage | x | $\varnothing 10@150$ | B500B | $177$ |
+| 2. Lage | x | $\varnothing 10@150$ | B500B | $43$ |
+| 1. Lage | y | $\varnothing 8@150$ | B500B | $34$ |
+| Überdeckung unten | – | $30\,\mathrm{mm}$ | – | – |
 
 | Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
 | :--- | :--- | ---: | ---: | ---: |
@@ -11046,14 +11046,14 @@ $$
 
 **Bewehrung von oben nach unten**
 
-| Lage | Richtung | Bewehrung | Stahl |
-| :--- | :--- | :--- | :--- |
-| Überdeckung oben | – | $30\,\mathrm{mm}$ | – |
-| 4. Lage | y | $\varnothing 12@150$ | B500B |
-| 3. Lage | x | – | – |
-| 2. Lage | x | – | – |
-| 1. Lage | y | $\varnothing 12@150$ | B500B |
-| Überdeckung unten | – | $30\,\mathrm{mm}$ | – |
+| Lage | Richtung | Bewehrung | Stahl | Höhe ab UK [mm] |
+| :--- | :--- | :--- | :--- | ---: |
+| Überdeckung oben | – | $30\,\mathrm{mm}$ | – | – |
+| 4. Lage | y | $\varnothing 12@150$ | B500B | $214$ |
+| 3. Lage | x | – | – | – |
+| 2. Lage | x | – | – | – |
+| 1. Lage | y | $\varnothing 12@150$ | B500B | $36$ |
+| Überdeckung unten | – | $30\,\mathrm{mm}$ | – | – |
 
 | Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
 | :--- | :--- | ---: | ---: | ---: |
@@ -11079,14 +11079,14 @@ $$
 
 **Bewehrung von oben nach unten**
 
-| Lage | Richtung | Bewehrung | Stahl |
-| :--- | :--- | :--- | :--- |
-| Überdeckung oben | – | $30\,\mathrm{mm}$ | – |
-| 4. Lage | y | $\varnothing 10@150$ | B500B |
-| 3. Lage | x | $\varnothing 12@150$ | B500B |
-| 2. Lage | x | $\varnothing 12@150$ | B500B |
-| 1. Lage | y | $\varnothing 40@150$ | B500B |
-| Überdeckung unten | – | $30\,\mathrm{mm}$ | – |
+| Lage | Richtung | Bewehrung | Stahl | Höhe ab UK [mm] |
+| :--- | :--- | :--- | :--- | ---: |
+| Überdeckung oben | – | $30\,\mathrm{mm}$ | – | – |
+| 4. Lage | y | $\varnothing 10@150$ | B500B | $215$ |
+| 3. Lage | x | $\varnothing 12@150$ | B500B | $204$ |
+| 2. Lage | x | $\varnothing 12@150$ | B500B | $76$ |
+| 1. Lage | y | $\varnothing 40@150$ | B500B | $50$ |
+| Überdeckung unten | – | $30\,\mathrm{mm}$ | – | – |
 
 | Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
 | :--- | :--- | ---: | ---: | ---: |

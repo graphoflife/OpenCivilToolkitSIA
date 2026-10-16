@@ -44,6 +44,21 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-16 · Bewehrung mit Höhe ab Unterkante
+
+Wunsch des Benutzers: in der Tabelle «Bewehrung von oben nach unten» eine
+Spalte mit der Höhe jeder Lage über der Unterkante, in mm.
+
+- Die Zahl ist `h - z` der Stabachse, mit z aus dem Lagenaufbau. Sie wechselt
+  nur den Bezug einer hergeleiteten Grösse und geht in keine Rechnung ein;
+  darum steht sie nur in der Übersicht, nicht als eigene Formel.
+- Liegen Grund und Zulage verschieden hoch, stehen beide, getrennt durch «/».
+  Beispiel: unten ⌀18 + ⌀12 in der 2. Lage ergibt «51 / 54».
+- `bewehrungsuebersicht` bekommt dafür die Werte der Lösung. Ihr Typ war
+  falsch angeschrieben (`QuerschnittEintrag` statt `Plattenquerschnitt`).
+
+---
+
 ## 2026-10-16 · Kennzahlen der Platte, immer gerechnet
 
 Wunsch des Benutzers: unter der Zusammenfassung jeder Platte Kennzahlen,

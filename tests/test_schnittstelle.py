@@ -547,6 +547,22 @@ class TestQuerkraftbewehrungInDerAusgabe(unittest.TestCase):
         # wird -- in einer Übersicht ist er nur Ballast.
         self.assertNotIn(r"A_{\varnothing,V}", letzte[2]["mathe"])
 
+    def test_jede_lage_mit_ihrer_hoehe_ab_unterkante(self):
+        """h - z der Stabachse; Grund und Zulage verschieden hoch: beide."""
+        antwort = dienst.bearbeite(
+            "rechnen", {"projekt": Projekt.beispiel().als_dict()})
+        tabelle = antwort.daten["zusammenfassungen"]["q1"]["bewehrung"]
+        self.assertEqual(tabelle["kopf"][-1], {"text": "Höhe ab UK [mm]"})
+        hoehen = {z[0]["text"]: z[-1] for z in tabelle["zeilen"]}
+        self.assertEqual(hoehen, {
+            "Überdeckung oben": {"text": "–"},
+            "4. Lage": {"mathe": "264"},
+            "3. Lage": {"mathe": "252"},
+            "2. Lage": {"mathe": "51 / 54"},
+            "1. Lage": {"mathe": "36"},
+            "Überdeckung unten": {"text": "–"},
+        })
+
     def test_eine_stabzahl_in_y_steht_als_stueckzahl_da(self):
         antwort = dienst.bearbeite(
             "rechnen", {"projekt": self.projekt(abstand_y=None, anzahl_y=5.0)})

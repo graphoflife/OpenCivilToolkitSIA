@@ -1,5 +1,5 @@
 ---
-erzeugt: 353d3a8ecfda
+erzeugt: 2d2a0a79d383
 art: modul
 tags: [modul]
 ---
@@ -215,7 +215,7 @@ Die Kennzahlen als Tabelle des Berichts: Beschriftung, Zeichen, Wert.
 ### plattenangaben
 
 ```python
-def plattenangaben(qs: 'QuerschnittEintrag') -> GleichungBlock
+def plattenangaben(qs: Plattenquerschnitt) -> GleichungBlock
 ```
 
 Beton, Dicke und betrachtete Breite -- eine Zeile ueber der Tabelle.
@@ -226,7 +226,7 @@ Sonst waere es bei jeder Platte dieselbe Zahl zweimal.
 ### bewehrungsuebersicht
 
 ```python
-def bewehrungsuebersicht(qs: 'QuerschnittEintrag') -> TabellenBlock
+def bewehrungsuebersicht(qs: Plattenquerschnitt, werte: Dict[str, Wert]) -> TabellenBlock
 ```
 
 Überdeckungen und Lagen, wie man die Platte im Schnitt sieht.
@@ -236,7 +236,10 @@ Von oben nach unten gelesen: obere Überdeckung, 4. bis 1. Lage, untere
 nebeneinander hat, soll nicht umdenken müssen.
 
 Grundbewehrung und Zulage stehen in einer Zeile, getrennt durch `+` --
-die Lage ist eine Lage, auch wenn sie aus zwei Posten besteht.
+die Lage ist eine Lage, auch wenn sie aus zwei Posten besteht. Zuletzt
+die Höhe ihrer Stabachse über der Unterkante, `h - z` aus dem
+Lagenaufbau (Benutzer, 2026-10-16); liegen Grund und Zulage verschieden
+hoch, beide, getrennt durch `/`.
 
 
 ## Konstanten
