@@ -1,5 +1,5 @@
 ---
-erzeugt: 6456c6634430
+erzeugt: 501c7004187f
 art: formel
 tags: [formel]
 ---
@@ -38,6 +38,7 @@ $$
 ## Themen
 
 - [[Biegung und Normalkraft]]
+- [[Kennzahlen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

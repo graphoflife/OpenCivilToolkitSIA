@@ -1,5 +1,5 @@
 ---
-erzeugt: e33114c52c97
+erzeugt: e658d1a95ee5
 art: modul
 tags: [modul]
 ---
@@ -179,6 +179,8 @@ Ein von Hand nachrechenbarer Punkt der Resistenzlinie.
 - `name: str` – Klartext -- fuer Kurzhinweise im Diagramm.
 - `N: float` – Normalkraft in N (Zug positiv).
 - `M: float` – Moment in Nm (Zug unten positiv).
+- `x: Optional[Wert] = field(default=None, compare=False)`
+- `d: Optional[Wert] = field(default=None, compare=False)` – Druckzonenhoehe und statische Hoehe -- nur bei M_Rd(N = 0), wie sie dort hergeleitet sind. Daraus rechnen die Kennzahlen der Platte x/d.
 
 ### Handrechnung
 

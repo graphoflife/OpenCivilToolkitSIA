@@ -1,5 +1,5 @@
 ---
-erzeugt: 1e355307caba
+erzeugt: b974a3493e7a
 art: modul
 tags: [modul]
 ---
@@ -116,8 +116,12 @@ def eckwerte(self) -> Dict[str, float]
 #### Widerstandslinie.protokoll_treffer
 
 ```python
-def protokoll_treffer(self, p: Protokoll, treffer: Treffer, *, achse: geo.Achse, fest: float, basis: str, titel: str='') -> None
+def protokoll_treffer(self, p: Protokoll, treffer: Treffer, *, achse: geo.Achse, fest: float, basis: str, titel: str='', ergebnis: Optional[Wert]=None) -> None
 ```
+
+Wie der Widerstand gefunden wurde. `ergebnis` ist der Wert, unter dem
+er weitergeht -- etwa eine Kennzahl der Platte; ohne ihn heisst er
+schlicht `N_Rd` oder `M_Rd`.
 
 ### _eckwerte
 
@@ -158,7 +162,7 @@ def eckwerte(self) -> Dict[str, float]
 #### Handlinie.protokoll_treffer
 
 ```python
-def protokoll_treffer(self, p: Protokoll, treffer: Treffer, *, achse: geo.Achse, fest: float, basis: str, titel: str='') -> None
+def protokoll_treffer(self, p: Protokoll, treffer: Treffer, *, achse: geo.Achse, fest: float, basis: str, titel: str='', ergebnis: Optional[Wert]=None) -> None
 ```
 
 Zwischen welchen beiden Eckpunkten geradlinig interpoliert wurde, und
@@ -261,7 +265,7 @@ Den Titel setzt der Nachweis.
 #### Ebenenlinie.protokoll_treffer
 
 ```python
-def protokoll_treffer(self, p: Protokoll, treffer: Treffer, *, achse: geo.Achse, fest: float, basis: str, titel: str='') -> None
+def protokoll_treffer(self, p: Protokoll, treffer: Treffer, *, achse: geo.Achse, fest: float, basis: str, titel: str='', ergebnis: Optional[Wert]=None) -> None
 ```
 
 Die Probe des Bruchzustands, an dem der Widerstand liegt: die Ebene,
@@ -320,4 +324,5 @@ Ein SI-Wert in Kilo-Einheiten, eine Nachkommastelle.
 
 - [[Bilineare Beziehung des Betonstahls]] · `Ebenenlinie.protokoll_ansatz`
 - [[Schnittgrössen aus der Spannungsverteilung]] · `Ebenenlinie.protokoll_ansatz`
+- [[Widerstand bei festgehaltenem M_Ed]] · `Handlinie.protokoll_treffer`
 - [[Widerstand bei festgehaltenem N_Ed]] · `Handlinie.protokoll_treffer`

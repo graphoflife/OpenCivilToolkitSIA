@@ -1,5 +1,5 @@
 ---
-erzeugt: 2d45b66567a2
+erzeugt: c2bac80c50bd
 art: modul
 tags: [modul]
 ---
@@ -622,6 +622,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.fehlende_bewehrung]]
+- [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]

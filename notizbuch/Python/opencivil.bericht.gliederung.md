@@ -1,5 +1,5 @@
 ---
-erzeugt: 669aa41f6d91
+erzeugt: 91e6a45eb26f
 art: modul
 tags: [modul]
 ---
@@ -70,7 +70,8 @@ def _nachweise(p: Protokoll, zusammenfassung: Zusammenfassung, aufbau: Optional[
 ```
 
 Je Platte dasselbe wie auf dem Bildschirm: Angaben, Bewehrung,
-Nachweistabelle, darunter Hinweise und stille Maengel.
+Nachweistabelle, darunter Hinweise und stille Maengel, zuletzt die
+Kennzahlen -- die auch ohne Lastfall.
 
 Eines kommt dazu. Auf dem Bildschirm ist ein nicht erfuellter Nachweis
 rot hinterlegt und traegt seine Begruendung im Tooltip -- auf Papier

@@ -1169,10 +1169,16 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 /* ---------------------------------------------------- Kennzahlen je Platte -- */
 
 /* Die Kennzahlen einer Platte stehen in ihrer eigenen Karte; die rahmt sie. */
-.kennzahlen { display: flex; flex-wrap: wrap; gap: 8px 22px; }
-.kennzahl { display: flex; align-items: baseline; gap: 7px; font-size: 12.5px; }
-.kennzahl-name { color: var(--schrift-matt); }
-.kennzahl-wert { font-weight: 600; }
+/* Die Kennzahlen einer Platte: je eine Zeile -- Beschriftung, Zeichen,
+   Wert --, die Werte bündig rechts, damit sich die Zahlen vergleichen lassen. */
+.kennzahlen {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 3px 14px; align-items: baseline; max-width: 560px;
+}
+.kennzahl { display: contents; font-size: 12.5px; }
+.kennzahl-name { color: var(--schrift-matt); font-size: 12.5px; }
+.kennzahl-zeichen { font-size: 12.5px; }
+.kennzahl-wert { font-weight: 600; font-size: 12.5px; text-align: right; white-space: nowrap; }
 
 
 /* «Automatische Bewehrung» -- im eigenen Fenster. Die Moduswahl

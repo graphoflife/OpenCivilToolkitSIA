@@ -207,7 +207,8 @@ Fertig und getestet (1229 Tests):
 | `nachweis/schiefe_biegung`, `schubwandnachweis`, `richtungsnachweise` | die Nachweise der Querschnittsanalyse: N mit M_y und M_z, Querkraft mit Torsion, Duktilität und sprödes Versagen je Richtung |
 | `nachweis/qa_gebrauch`, `stabgrenzen`, `gebrauchsebene` | ihre Gebrauchsnachweise: Zwängung auf N (ganzer Querschnitt) und auf M (je Richtung), Stahlspannung quasi-ständig und häufig; σ_s,adm je Stab; die Ebene unter Gebrauchslast, auch schief |
 | `nachweis/knicken`, `qa_knicken` | Knicken am verformten System: das Verfahren (`Knickverfahren`), die Platte in x, der gezeichnete Querschnitt je Fall zu seiner Zugseite |
-| `nachweis/verformung` | die Durchbiegung der Platte: ω_w · w gegen L/350, mit dem Vergrösserungsfaktor ω_w je gezogene Seite |
+| `nachweis/verformung` | die Durchbiegung der Platte: ω_w · w gegen L/350; der Vergrösserungsfaktor ω_w (Zug unten) und ω_w' (Zug oben) gehört der Platte und rechnet immer |
+| `nachweis/kennzahlen` | was eine Platte ohne Einwirkung aufnimmt: M_Rd± bei N = 0, N_Rd± bei M = 0 und x/d aus der Handrechnung, V_Rd,max und V_Rd,min ohne Bügel, V_Rd(α_opt) mit Bügeln |
 | `konsole/` | die App «Python»: die Sitzung (`sitzung`), Diagramme ohne matplotlib (`zeichnen`), welche Fremdpakete beiliegen (`pakete`), der Dienst ihres Fadens (`dienst`) |
 | `spannungsanalyse.py` | sechs Fragen an den Querschnitt: Bild aus N und M oder aus Dehnungen, M-χ- und N-ε-Linie, äquivalenter E-Modul über M und über N — kein Nachweis |
 | `bewehrungssuche/` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt – Längsbewehrung, dünnste Platte, Bügel |
@@ -431,7 +432,12 @@ plt.xlabel("x"); plt.legend(); plt.grid()             # erscheint in der Konsole
 weisse Karten; ein Klick auf den Kopf klappt es zu.
 
 * *Zusammenfassung* -- je Platte ein Panel mit den Angaben, der Bewehrung,
-  den Nachweisen und den Kennzahlen. Die Tabelle der Nachweise hat eine feste
+  den Nachweisen und den Kennzahlen. Die Kennzahlen stehen immer, auch ohne
+  Lastfall: Bewehrungsmass, Distanzhalter, ω_w und ω_w', M_Rd⁺ und M_Rd⁻ bei
+  N_Ed = 0, N_Rd⁺ und N_Rd⁻ bei M_Ed = 0 und x/d aus der Handrechnung, der
+  Querkraftwiderstand bei N_Ed = 0 -- ohne Bügel V_Rd,max (bei M_Ed = 0) und
+  V_Rd,min (bei M_Ed = M_Rd), je das Kleinere beider Seiten, mit Bügeln bei
+  der günstigsten Neigung. Die Tabelle der Nachweise hat eine feste
   Breite, sie skaliert nicht mit der Tafel: Widerstand, Einwirkung und
   Erfüllungsgrad. Darunter, in gedämpftem Rot, die ausgeschalteten Nachweise,
   die mit der vorliegenden Bewehrung *nicht* aufgehen würden. Das Auge am
@@ -444,7 +450,8 @@ weisse Karten; ein Klick auf den Kopf klappt es zu.
   Linie des Knickens --, Querkraftkurven und die Spannung-Dehnung-Analysen
   als Diagramme wie die M-N-Linie, mit Gitter, Teilung und Legende --
   Dehnung und Spannung über die Höhe in einem Diagramm, an derselben
-  Höhenachse; je Diagramm eine Karte, wahlweise bis drei nebeneinander;
+  Höhenachse; zuoberst eine Leiste mit einer Vorschau je Diagramm, das
+  gewählte darunter gross;
   bei einer Querschnittsanalyse ein einziges Interaktionsdiagramm mit
   wählbaren Achsen (zwei von N, M_y, M_z, die dritte mit festem Wert; ein
   Klick auf einen Lastfall legt den Schnitt durch ihn), dazu je Lastfall der

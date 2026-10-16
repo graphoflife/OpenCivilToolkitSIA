@@ -44,6 +44,12 @@
       "bereich": "Platte"
     },
     {
+      "name": "Kennzahlen",
+      "pfad": "Formelsammlung/Themen/Kennzahlen.md",
+      "art": "thema",
+      "bereich": "Platte"
+    },
+    {
       "name": "Querschnittsanalyse",
       "pfad": "Formelsammlung/Themen/Querschnittsanalyse.md",
       "art": "thema",
@@ -245,7 +251,8 @@
         "N_{Rd}^{+}"
       ],
       "themen": [
-        "Biegung und Normalkraft"
+        "Biegung und Normalkraft",
+        "Kennzahlen"
       ]
     },
     {
@@ -256,6 +263,7 @@
         "k_g"
       ],
       "themen": [
+        "Kennzahlen",
         "Querkraft"
       ]
     },
@@ -294,9 +302,10 @@
       "pfad": "Formelsammlung/Formeln/Beiwert für die statische Höhe.md",
       "art": "formel",
       "zeichen": [
-        "k_d"
+        "k_d^{+}"
       ],
       "themen": [
+        "Kennzahlen",
         "Querkraft"
       ]
     },
@@ -476,9 +485,10 @@
       "pfad": "Formelsammlung/Formeln/Bezogene Druckzonenhöhe.md",
       "art": "formel",
       "zeichen": [
-        "\\left(x/d\\right)_{2}"
+        "\\left(x/d\\right)^{+}"
       ],
       "themen": [
+        "Kennzahlen",
         "Duktilität"
       ]
     },
@@ -596,7 +606,8 @@
         "\\varepsilon_s^{+}"
       ],
       "themen": [
-        "Biegung und Normalkraft"
+        "Biegung und Normalkraft",
+        "Kennzahlen"
       ]
     },
     {
@@ -661,7 +672,8 @@
         "x^{+}"
       ],
       "themen": [
-        "Biegung und Normalkraft"
+        "Biegung und Normalkraft",
+        "Kennzahlen"
       ]
     },
     {
@@ -918,6 +930,7 @@
       ],
       "themen": [
         "Betonstahl",
+        "Kennzahlen",
         "Stahlspannung aus Rissbreite",
         "Spannung-Dehnung-Analyse"
       ]
@@ -1005,7 +1018,8 @@
         "N_{Rd}^{-}"
       ],
       "themen": [
-        "Biegung und Normalkraft"
+        "Biegung und Normalkraft",
+        "Kennzahlen"
       ]
     },
     {
@@ -1135,6 +1149,17 @@
       ]
     },
     {
+      "name": "Kleinerer Widerstand beider Seiten",
+      "pfad": "Formelsammlung/Formeln/Kleinerer Widerstand beider Seiten.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{Rd,max}"
+      ],
+      "themen": [
+        "Kennzahlen"
+      ]
+    },
+    {
       "name": "Kräfte mal Hebelarm um die halbe Höhe",
       "pfad": "Formelsammlung/Formeln/Kräfte mal Hebelarm um die halbe Höhe.md",
       "art": "formel",
@@ -1142,7 +1167,8 @@
         "M_{Rd}(N_{Rd}^{+})"
       ],
       "themen": [
-        "Biegung und Normalkraft"
+        "Biegung und Normalkraft",
+        "Kennzahlen"
       ]
     },
     {
@@ -1153,7 +1179,8 @@
         "N_{Rd}^{+}"
       ],
       "themen": [
-        "Biegung und Normalkraft"
+        "Biegung und Normalkraft",
+        "Kennzahlen"
       ]
     },
     {
@@ -1260,7 +1287,8 @@
         "M_{Rd}^{+}"
       ],
       "themen": [
-        "Biegung und Normalkraft"
+        "Biegung und Normalkraft",
+        "Kennzahlen"
       ]
     },
     {
@@ -1271,7 +1299,8 @@
         "M_{Rd}(N_{Ed}=0)^{+}"
       ],
       "themen": [
-        "Biegung und Normalkraft"
+        "Biegung und Normalkraft",
+        "Kennzahlen"
       ]
     },
     {
@@ -1293,7 +1322,8 @@
         "x^{+}"
       ],
       "themen": [
-        "Biegung und Normalkraft"
+        "Biegung und Normalkraft",
+        "Kennzahlen"
       ]
     },
     {
@@ -1371,7 +1401,19 @@
         "V_{Rd,x}"
       ],
       "themen": [
-        "Querkraft"
+        "Querkraft",
+        "Kennzahlen"
+      ]
+    },
+    {
+      "name": "Querkraftwiderstand ohne Bügel bei M_Ed = 0",
+      "pfad": "Formelsammlung/Formeln/Querkraftwiderstand ohne Bügel bei M_Ed = 0.md",
+      "art": "formel",
+      "zeichen": [
+        "V_{Rd}^{+}(M_{Ed} = 0)"
+      ],
+      "themen": [
+        "Kennzahlen"
       ]
     },
     {
@@ -1379,9 +1421,10 @@
       "pfad": "Formelsammlung/Formeln/Querkraftwiderstand ohne Querkraftbewehrung.md",
       "art": "formel",
       "zeichen": [
-        "V_{Rd,x}"
+        "V_{Rd}^{+}(M_{Ed} = M_{Rd}^{+})"
       ],
       "themen": [
+        "Kennzahlen",
         "Querkraft"
       ]
     },
@@ -1639,7 +1682,8 @@
         "\\sigma_{sd}"
       ],
       "themen": [
-        "Biegung und Normalkraft"
+        "Biegung und Normalkraft",
+        "Kennzahlen"
       ]
     },
     {
@@ -1653,6 +1697,7 @@
       "themen": [
         "Biegung und Normalkraft",
         "Verformung",
+        "Kennzahlen",
         "Querkraft",
         "Duktilität",
         "Zwängung auf Biegung"
@@ -1684,7 +1729,8 @@
         "s_{V,y}"
       ],
       "themen": [
-        "Querkraft"
+        "Querkraft",
+        "Kennzahlen"
       ]
     },
     {
@@ -1816,7 +1862,7 @@
       "pfad": "Formelsammlung/Formeln/Vergrösserungsfaktor der Durchbiegung.md",
       "art": "formel",
       "zeichen": [
-        "\\omega_{w,u}"
+        "\\omega_w"
       ],
       "themen": [
         "Verformung"
@@ -1856,6 +1902,18 @@
       ]
     },
     {
+      "name": "Widerstand bei festgehaltenem M_Ed",
+      "pfad": "Formelsammlung/Formeln/Widerstand bei festgehaltenem M_Ed.md",
+      "art": "formel",
+      "zeichen": [
+        "N_{Rd}^{+}(M_{Ed} = 0)",
+        "N_{Rd}^{-}(M_{Ed} = 0)"
+      ],
+      "themen": [
+        "Kennzahlen"
+      ]
+    },
+    {
       "name": "Widerstand bei festgehaltenem N_Ed",
       "pfad": "Formelsammlung/Formeln/Widerstand bei festgehaltenem N_Ed.md",
       "art": "formel",
@@ -1864,6 +1922,7 @@
       ],
       "themen": [
         "Biegung und Normalkraft",
+        "Kennzahlen",
         "Querkraft"
       ]
     },
@@ -1875,7 +1934,8 @@
         "V_{Rd,s}"
       ],
       "themen": [
-        "Querkraft"
+        "Querkraft",
+        "Kennzahlen"
       ]
     },
     {
@@ -1886,7 +1946,8 @@
         "V_{Rd,c}"
       ],
       "themen": [
-        "Querkraft"
+        "Querkraft",
+        "Kennzahlen"
       ]
     },
     {
@@ -1970,9 +2031,10 @@
       "pfad": "Formelsammlung/Formeln/Wirksame Höhe (Einlage nicht massgebend).md",
       "art": "formel",
       "zeichen": [
-        "d_v"
+        "d_v^{+}"
       ],
       "themen": [
+        "Kennzahlen",
         "Querkraft"
       ]
     },
@@ -1984,7 +2046,8 @@
         "d_v"
       ],
       "themen": [
-        "Querkraft"
+        "Querkraft",
+        "Kennzahlen"
       ]
     },
     {
@@ -2183,6 +2246,10 @@
         "hinweise",
         "stiller_hinweis",
         "angaben",
+        "Kennzahl",
+        "Kennzahl.text",
+        "kennzahlen",
+        "kennzahlentabelle",
         "plattenangaben",
         "bewehrungsuebersicht"
       ]
@@ -2850,6 +2917,20 @@
       ]
     },
     {
+      "name": "opencivil.nachweis.kennzahlen",
+      "pfad": "Python/opencivil.nachweis.kennzahlen.md",
+      "art": "modul",
+      "kurz": "was eine Platte aufnimmt, ohne Einwirkung.",
+      "stichworte": [
+        "Plattenkennzahlen",
+        "Plattenkennzahlen.rechne",
+        "Plattenkennzahlen._handrechnung",
+        "Plattenkennzahlen._auf_der_linie",
+        "Plattenkennzahlen._hoehen",
+        "Plattenkennzahlen._kleinstes"
+      ]
+    },
+    {
       "name": "opencivil.nachweis.knicken",
       "pfad": "Python/opencivil.nachweis.knicken.md",
       "art": "modul",
@@ -2973,7 +3054,9 @@
         "neigungen",
         "beste_neigung",
         "_statische_hoehe",
-        "_zuglage",
+        "zuglage",
+        "beiwert_k_g",
+        "buegelteilung_y",
         "_ohne_zugbewehrung",
         "Querkraftbefund",
         "Querkraftbefund.kurve",
@@ -3260,10 +3343,11 @@
         "Verformungsfall",
         "Verformungsfall.kennung",
         "Fallergebnis",
+        "Vergroesserungsfaktor",
+        "Vergroesserungsfaktor.rechne",
+        "Vergroesserungsfaktor._bewehrungsgehalte",
         "Verformung",
-        "Verformung.pruefe",
-        "Verformung._vergroesserung",
-        "Verformung._bewehrungsgehalte"
+        "Verformung.pruefe"
       ]
     },
     {

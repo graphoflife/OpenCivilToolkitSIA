@@ -1,5 +1,5 @@
 ---
-erzeugt: 1883b58ed6ba
+erzeugt: 3cbe6b578587
 art: formel
 tags: [formel]
 ---
@@ -9,14 +9,14 @@ tags: [formel]
 *In der Herleitung: «Wirksame Durchbiegung, Zug unten»*
 
 $$
-w_{eff} = \omega_{w,u} \cdot w
+w_{eff} = \omega_w \cdot w
 $$
 
 ## Grössen
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $\omega_{w,u}$ | Vergrösserungsfaktor der Durchbiegung, Zug unten | – | [[Vergrösserungsfaktor der Durchbiegung]] |
+| $\omega_w$ | Vergrösserungsfaktor der Durchbiegung, Zug unten | – | [[Vergrösserungsfaktor der Durchbiegung]] |
 | $w$ | Durchbiegung mit E\_cm | mm | Zwischenwert |
 
 ## Beispiel
@@ -24,7 +24,7 @@ $$
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-w_{eff} = \omega_{w,u} \cdot w = 4 \cdot 3.5\,\mathrm{mm} = 14\,\mathrm{mm}
+w_{eff} = \omega_w \cdot w = 4 \cdot 3.5\,\mathrm{mm} = 14\,\mathrm{mm}
 $$
 
 ## Im Code

@@ -53,7 +53,8 @@ from opencivil.nachweis.spannungsbegrenzung import (
     Spannungsbegrenzung,
 )
 from opencivil.nachweis import dehnungsfaecher
-from opencivil.nachweis.verformung import Verformung, Verformungsfall
+from opencivil.nachweis.verformung import Vergroesserungsfaktor, Verformung, Verformungsfall
+from opencivil.nachweis.kennzahlen import Plattenkennzahlen
 from opencivil.nachweis.sproedes_versagen import SproedesVersagen
 from opencivil.nachweis.querkraft import Querkraft, Querkraftfall
 from opencivil.querschnitt.platte import (
@@ -134,6 +135,12 @@ class Aufbau:
 
     verformung: Dict[str, Verformung] = field(default_factory=dict)
     """Die Durchbiegung je Verformungsfall, je Querschnitt -- nur in x-Richtung."""
+
+    vergroesserung: Dict[str, Vergroesserungsfaktor] = field(default_factory=dict)
+    """Die Vergroesserungsfaktoren je Platte mit x-Bewehrung -- immer gerechnet."""
+
+    kennzahlen: Dict[str, Plattenkennzahlen] = field(default_factory=dict)
+    """Die Kennzahlen je Platte mit x-Bewehrung -- immer gerechnet."""
 
     knicken: Dict[str, Knicken] = field(default_factory=dict)
     """Nachweis am verformten System, je Querschnitt -- nur in x-Richtung."""
@@ -426,7 +433,10 @@ def _platte(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> B
     querschnitt = _querschnitt(eintrag, aufbau.baustoffe, praefix=f"{art.raum}.{eintrag.kennung}")
     aufbau.querschnitte[eintrag.kennung] = querschnitt
     querschnitt.ins_rechenwerk(aufbau.werk)
-    teil = Bauteil(eintrag.kennung, eintrag.name, art, querschnitt)
+    # Bewehrungsmass und Distanzhalter stehen als Kennzahlen da, auch bei
+    # einer Platte ohne Nachweis -- ihr Lagenaufbau rechnet darum immer.
+    teil = Bauteil(eintrag.kennung, eintrag.name, art, querschnitt,
+                   weitere_ziele=[f"{querschnitt.id}.lagenaufbau"])
     schnell = aufbau.schnell
 
     richtung = Richtung.X
@@ -463,21 +473,34 @@ def _platte(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> B
         _lagennachweise(eintrag, querschnitt, richtung, nachweis, aufbau, teil)
         _spannungsnachweise(eintrag, querschnitt, richtung, aufbau, teil)
 
+        # Der Vergroesserungsfaktor gehoert der Platte, nicht einem Fall: er
+        # rechnet immer, als Kennzahl, und der Verformungsnachweis liest ihn.
+        faktor = Vergroesserungsfaktor(querschnitt, kriechzahl=eintrag.verformung.kriechzahl)
+        aufbau.werk.registriere(faktor)
+        aufbau.vergroesserung[eintrag.kennung] = faktor
         verformungsfaelle = [f for f in eintrag.verformung.faelle if f.aktiv]
         if verformungsfaelle:
             aufbau.eintragen(teil, "verformung", eintrag.kennung, Verformung(
                 querschnitt, [_verformungsfall(f) for f in verformungsfaelle],
-                kriechzahl=eintrag.verformung.kriechzahl))
+                faktor=faktor))
 
-        # Auch ohne V_Ed: dann still, nur fuer das Diagramm.
-        aufbau.eintragen(teil, "querkraft", kennung_x, Querkraft(
+        # Auch ohne V_Ed: dann still, nur fuer das Diagramm und die Kennzahlen.
+        querkraft = Querkraft(
             querschnitt,
             [Querkraftfall(name=k.name,
                            V_Ed=Groesse(k.V_Ed, KN_PRO_M),
                            M_Ed=Groesse(k.M_Ed, KNM),
                            N_Ed=Groesse(k.N_Ed, KN))
              for k in aktiv if k.V_Ed],
-            richtung, nachweis))
+            richtung, nachweis)
+        aufbau.eintragen(teil, "querkraft", kennung_x, querkraft)
+
+        # Was die Platte aufnimmt, ohne Einwirkung -- immer (Benutzer,
+        # 2026-10-16). Am Ende der Platte, nach ihren Nachweisen.
+        kennzahlen = Plattenkennzahlen(querschnitt, nachweis, querkraft)
+        aufbau.werk.registriere(kennzahlen)
+        aufbau.kennzahlen[eintrag.kennung] = kennzahlen
+        teil.weitere_ziele += [faktor.id, kennzahlen.id]
 
         knickfaelle = [k for k in eintrag.knickfaelle if k.aktiv]
         if knickfaelle:

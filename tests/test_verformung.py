@@ -5,10 +5,10 @@ Der Verformungsnachweis der Platte: w_eff = ω_w · w gegen w_max = L/350.
 
     ω_w = (1 - 20 rho') / (10 rho^0.7) · (0.75 + 0.1 phi) · (h/d)^3
 
-In x, je gezogene Seite, die ein Fall verlangt; rho' ist das rho der
-Gegenseite, mit d' vom gezogenen Rand bis zur Gegenlage. phi gehört dem
-Nachweis, Vorgabe 2. Bis 2026-10-16 stand der Faktor als w/w_c bei den
-Bewehrungslagen, mit der Kriechzahl der Platte -- die Zahlen sind dieselben.
+In x, je gezogene Seite mit x-Bewehrung, immer -- ω_w unten, ω_w' oben, als
+Kennzahl der Platte (2026-10-16); der Nachweis liest ihn. rho' ist das rho
+der Gegenseite, mit d' vom gezogenen Rand bis zur Gegenlage. phi gehört der
+Verformung der Platte, Vorgabe 2.
 """
 
 import math
@@ -20,6 +20,7 @@ from opencivil.projekt import (
 )
 
 RAUM = "querschnitt.{}.nachweis.verformung"
+FAKTOR = "querschnitt.{}.vergroesserung.omega_w_{}"
 
 
 def rechnen(projekt):
@@ -28,7 +29,7 @@ def rechnen(projekt):
 
 
 def faktor(loesung, kennung, seite):
-    wert = loesung.werte.get(f"{RAUM.format(kennung)}.omega_w_{seite}")
+    wert = loesung.werte.get(FAKTOR.format(kennung, seite))
     return None if wert is None else wert.groesse.si
 
 
@@ -87,12 +88,18 @@ class TestFaktor(unittest.TestCase):
         self.assertTrue(bloecke)
         self.assertTrue(all(b.referenz == "SIA 262:2025, 4.4.3.2.5" for b in bloecke))
 
-    def test_nur_die_seiten_der_faelle(self):
-        """Einmal je Seite, die ein Fall zieht -- nicht je Fall und nicht ungefragt."""
-        _, loesung = rechnen(beispiel(("Feld", 3.5, 6.0, "unten"),
-                                      ("Feld 2", 2.0, 5.0, "unten")))
-        self.assertIsNotNone(faktor(loesung, "q1", "unten"))
-        self.assertIsNone(faktor(loesung, "q1", "oben"))
+    def test_beide_seiten_immer_auch_ohne_fall(self):
+        """Einmal je bewehrte Seite, als Kennzahl -- auch ohne Verformungsfall."""
+        aufbau, loesung = rechnen(beispiel())
+        self.assertEqual(aufbau.verformung, {})
+        self.assertAlmostEqual(faktor(loesung, "q1", "unten"),
+                               faktor(self.loesung, "q1", "unten"), places=12)
+        self.assertAlmostEqual(faktor(loesung, "q1", "oben"),
+                               faktor(self.loesung, "q1", "oben"), places=12)
+
+    def test_die_zeichen_omega_w_und_omega_w_strich(self):
+        self.assertEqual(self.loesung.werte[FAKTOR.format("q1", "unten")].symbol, r"\omega_w")
+        self.assertEqual(self.loesung.werte[FAKTOR.format("q1", "oben")].symbol, r"\omega_w'")
 
     def test_die_kriechzahl_wirkt_linear(self):
         _, null = rechnen(beispiel(("Feld", 3.5, 6.0, "unten"), kriechzahl=0.0))

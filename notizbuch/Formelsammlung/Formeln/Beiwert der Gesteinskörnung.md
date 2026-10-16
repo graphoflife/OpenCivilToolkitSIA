@@ -1,5 +1,5 @@
 ---
-erzeugt: a82d12767e1f
+erzeugt: 721b3f731d03
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.3.2.1"
@@ -20,7 +20,7 @@ $$
 
 ## Beispiel
 
-Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
+Mit den Zahlen aus dem Beispielprojekt:
 
 $$
 \begin{aligned}
@@ -36,10 +36,11 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.querkraft#Querkraft|Querkraft._protokoll_k_g]]
+- [[opencivil.nachweis.querkraft#beiwert_k_g|beiwert_k_g]]
 
 ## Themen
 
+- [[Kennzahlen]]
 - [[Querkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->

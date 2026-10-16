@@ -1,5 +1,5 @@
 ---
-erzeugt: 95faad4a4e2a
+erzeugt: 24f143d1e724
 art: formel
 tags: [formel]
 ---
@@ -31,11 +31,13 @@ $$
 
 ## Im Code
 
+- [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._mit_buegeln]]
 - [[opencivil.nachweis.querkraft#Querkraft|Querkraft._protokoll_ansatz_buegel]]
 
 ## Themen
 
 - [[Querkraft]]
+- [[Kennzahlen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

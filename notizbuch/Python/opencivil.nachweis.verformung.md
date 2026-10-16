@@ -1,5 +1,5 @@
 ---
-erzeugt: 3ff1cf912ba1
+erzeugt: a041a8c4e11d
 art: modul
 tags: [modul]
 ---
@@ -28,15 +28,15 @@ Vergroesserungsfaktor omega_w -- in der Norm w/w_c, SIA 262:2025, 4.4.3.2.5
 `rho = A_s/(b·d)` gehoert zur gezogenen Seite, `rho'` zur Gegenseite, mit
 `d'` vom gezogenen Rand bis zur Gegenlage -- das ist deren statische Hoehe:
 `rho'` der einen Seite ist das `rho` der anderen. Der Faktor haengt also
-nur an der Platte und an der Seite, die ein Fall zieht; er wird je Seite
-einmal gerechnet und gilt fuer jeden Fall dieser Seite. Die x-Posten einer
-Seite zaehlen zusammen, in ihrem Schwerpunkt. Fehlt die Gegenseite, ist
-`rho' = 0`; fehlt die gezogene, gibt es keinen Faktor, und der Fall laesst
-sich nicht nachweisen.
+nur an der Platte und an der gezogenen Seite: [[opencivil.nachweis.verformung#Vergroesserungsfaktor|Vergroesserungsfaktor]]
+rechnet ihn je Seite mit x-Bewehrung, immer -- unten omega_w, oben omega_w'
+--, denn die Zusammenfassung zeigt beide als Kennzahl (Benutzer,
+2026-10-16). Der Nachweis liest ihn fuer jeden Fall seiner Seite. Die
+x-Posten einer Seite zaehlen zusammen, in ihrem Schwerpunkt. Fehlt die
+Gegenseite, ist `rho' = 0`; fehlt die gezogene, gibt es keinen Faktor, und
+der Fall laesst sich nicht nachweisen.
 
-Bis 2026-10-16 stand der Faktor bei den Bewehrungslagen, mit einer
-Kriechzahl der Platte. Der Benutzer hat ihn in diesen Nachweis gelegt, mit
-dessen eigenem phi.
+Das phi gehoert der Verformung der Platte, Vorgabe 2.
 
 
 ## NACH VORGABE
@@ -97,6 +97,34 @@ Was ein Fall ergibt -- fuer Urteil und Herleitung.
 - `begruendung: str = ''`
 - `hinweis: str = ''`
 
+### Vergroesserungsfaktor
+
+```python
+class Vergroesserungsfaktor(Prozedur)
+```
+
+Der Vergroesserungsfaktor der Durchbiegung in x, je gezogene Seite mit
+x-Bewehrung: unten omega_w, oben omega_w'. Er gehoert der Platte und
+rechnet immer -- als Kennzahl und fuer den Verformungsnachweis.
+
+- `THEMA = 'Verformung'`
+
+#### Vergroesserungsfaktor.rechne
+
+```python
+def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
+```
+
+#### Vergroesserungsfaktor._bewehrungsgehalte
+
+```python
+def _bewehrungsgehalte(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte) -> Dict[str, Tuple[Wert, Wert]]
+```
+
+Je Seite mit x-Bewehrung der Bewehrungsgehalt und seine statische
+Hoehe -- die gezogene Seite braucht beide, die Gegenseite ihren
+Gehalt als rho'.
+
 ### Verformung
 
 ```python
@@ -104,7 +132,8 @@ class Verformung(Nachweis)
 ```
 
 Die Durchbiegung je Verformungsfall, in x -- mit dem
-Vergroesserungsfaktor der Seite, die der Fall zieht.
+Vergroesserungsfaktor der Seite, die der Fall zieht
+([[opencivil.nachweis.verformung#Vergroesserungsfaktor|Vergroesserungsfaktor]]).
 
 - `THEMA = 'Verformung'`
 
@@ -114,30 +143,13 @@ Vergroesserungsfaktor der Seite, die der Fall zieht.
 def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ```
 
-#### Verformung._vergroesserung
-
-```python
-def _vergroesserung(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte, phi: Wert) -> Dict[str, Wert]
-```
-
-Je gezogene Seite, die ein Fall verlangt, der Faktor omega_w.
-
-#### Verformung._bewehrungsgehalte
-
-```python
-def _bewehrungsgehalte(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte) -> Dict[str, Tuple[Wert, Wert]]
-```
-
-Je Seite mit x-Bewehrung der Bewehrungsgehalt und seine statische
-Hoehe -- die gezogene Seite eines Falls braucht beide, die Gegenseite
-ihren Gehalt als rho'.
-
 
 ## Konstanten
 
 - `KRIECHZAHL = 2.0` – Vorgabe der Kriechzahl phi im Vergroesserungsfaktor -- Klima und Belastungsalter, eine Annahme ueber das Bauwerk.
 - `GRENZE = 350.0` – `w_max = L / GRENZE` -- nach Vorgabe des Benutzers (2026-10-16), nicht nachgeschlagen.
 - `ZUGSEITEN = ('unten', 'oben')` – Die Seiten, die ein Verformungsfall ziehen kann: unten im Feld, oben am Kragarm oder ueber der Stuetze.
+- `SYMBOL = {'unten': '\\omega_w', 'oben': "\\omega_w'"}` – Wie der Faktor einer Seite heisst: omega_w fuer Zug unten, omega_w' fuer Zug oben (Benutzer, 2026-10-16).
 
 ## Braucht
 
@@ -157,11 +169,10 @@ ihren Gehalt als rho'.
 
 ## Formeln aus diesem Modul
 
-- [[Bewehrungsgehalt]] · `Verformung._bewehrungsgehalte`
-- [[Bewehrungsquerschnitt der zusammengefassten Lage]] · `Verformung._bewehrungsgehalte`
+- [[Bewehrungsgehalt]] · `Vergroesserungsfaktor._bewehrungsgehalte`
+- [[Bewehrungsquerschnitt der zusammengefassten Lage]] · `Vergroesserungsfaktor._bewehrungsgehalte`
 - [[Grenzwert der Durchbiegung]] · `Verformung._einen_fall`
-- [[Schwerpunkt der zusammengefassten Lage]] · `Verformung._bewehrungsgehalte`
-- [[Statische Höhe]] · `Verformung._bewehrungsgehalte`
-- [[Vergrösserungsfaktor der Durchbiegung]] · `Verformung._protokoll_ansatz`
-- [[Vergrösserungsfaktor der Durchbiegung]] · `Verformung._vergroesserung`
+- [[Schwerpunkt der zusammengefassten Lage]] · `Vergroesserungsfaktor._bewehrungsgehalte`
+- [[Statische Höhe]] · `Vergroesserungsfaktor._bewehrungsgehalte`
+- [[Vergrösserungsfaktor der Durchbiegung]] · `Vergroesserungsfaktor.rechne`
 - [[Wirksame Durchbiegung]] · `Verformung._einen_fall`

@@ -1,5 +1,5 @@
 ---
-erzeugt: b3466a07ca4a
+erzeugt: cca0aa16b943
 art: modul
 tags: [modul]
 ---
@@ -55,6 +55,8 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `spannung: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)` – Stahlspannung gegen Fliessen unter haeufiger Einwirkung, je `<querschnitt>.x`.
 - `spannung_riss: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)` – Stahlspannung aus der Rissbreite unter quasi-staendiger Einwirkung, je `<querschnitt>.x`.
 - `verformung: Dict[str, Verformung] = field(default_factory=dict)` – Die Durchbiegung je Verformungsfall, je Querschnitt -- nur in x-Richtung.
+- `vergroesserung: Dict[str, Vergroesserungsfaktor] = field(default_factory=dict)` – Die Vergroesserungsfaktoren je Platte mit x-Bewehrung -- immer gerechnet.
+- `kennzahlen: Dict[str, Plattenkennzahlen] = field(default_factory=dict)` – Die Kennzahlen je Platte mit x-Bewehrung -- immer gerechnet.
 - `knicken: Dict[str, Knicken] = field(default_factory=dict)` – Nachweis am verformten System, je Querschnitt -- nur in x-Richtung.
 - `fehlende: Dict[str, FehlendeBewehrung] = field(default_factory=dict)` – Je Richtung ohne Bewehrung, fuer die dennoch Einwirkungen angegeben sind. Sie rechnen nichts; sie sorgen dafuer, dass in der Zusammenfassung eine Zeile mit Erfuellungsgrad null steht statt gar nichts.
 - `spannungsfaelle: Dict[str, List['SpannungsfallEintrag']] = field(default_factory=dict)` – Je Platte die Auswertungen am Querschnitt -- als Beschreibung, nicht als Nachweis. Sie laufen nicht im Rechenwerk: sie haben kein Ziel, das jemand anderes brauchen koennte, und nichts haengt von ihnen ab.
@@ -487,6 +489,7 @@ Baufunktion von ihr bekannt sein muss. Eine neue Art kommt in
 - [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.fehlende_bewehrung]]
+- [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]

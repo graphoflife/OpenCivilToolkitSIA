@@ -1,5 +1,5 @@
 ---
-erzeugt: 4f6971dced7c
+erzeugt: a5426dd4af1c
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.1.4.2.5"
@@ -7,31 +7,35 @@ normstelle: "SIA 262:2025, 4.1.4.2.5"
 > [!info] Normstelle
 > SIA 262:2025, 4.1.4.2.5
 
+*In der Herleitung: «Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten»*
+
 $$
-\left(x/d\right)_{2} = \frac{x}{d_{2,x}}
+\left(x/d\right)^{+} = \frac{x^{+}}{d_{2,x}}
 $$
 
 ## Grössen
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $x$ | – | mm | [[Druckzonenhöhe bei reiner Biegung]] |
+| $x^{+}$ | Höhe der Druckzone | mm | [[Druckzonenhöhe aus dem Kräftegleichgewicht]] |
 | $d_{2,x}$ | – | mm | [[Statische Höhe]] |
 
 ## Beispiel
 
-Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
+Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-\left(x/d\right)_{2} = \frac{x}{d_{2,x}} = \frac{62.7\,\mathrm{mm}}{248.1\,\mathrm{mm}} = 0.253 \quad \le \quad \left(x/d\right)_{max} = 0.35 \quad \Rightarrow \quad \text{erfüllt}
+\left(x/d\right)^{+} = \frac{x^{+}}{d_{2,x}} = \frac{62.7\,\mathrm{mm}}{248.1\,\mathrm{mm}} = 0.253
 $$
 
 ## Im Code
 
 - [[opencivil.nachweis.duktilitaet#Duktilitaet._protokoll_lage|Duktilitaet._protokoll_lage]]
+- [[opencivil.nachweis.kennzahlen#Plattenkennzahlen._handrechnung|Plattenkennzahlen._handrechnung]]
 
 ## Themen
 
+- [[Kennzahlen]]
 - [[Duktilität]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->

@@ -1,5 +1,5 @@
 ---
-erzeugt: 2bb9ba75286f
+erzeugt: eb620ec75b15
 art: formel
 tags: [formel]
 ---
@@ -45,10 +45,6 @@ $$
   &= 1.199\,\text{‰}
 \end{aligned}
 $$
-
-## Gebraucht von
-
-- [[Beiwert für die statische Höhe]]
 
 ## Im Code
 

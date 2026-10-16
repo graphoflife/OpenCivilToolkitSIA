@@ -1,5 +1,5 @@
 ---
-erzeugt: 7ab2a28c9bfb
+erzeugt: fa1cd15c0ab1
 art: modul
 tags: [modul]
 ---
@@ -182,4 +182,5 @@ kN und kNm lassen sich nicht sinnvoll gegeneinander aufrechnen.
 ## Gebraucht von
 
 - [[opencivil.nachweis.biegung_normalkraft]]
+- [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.resistenzlinie]]

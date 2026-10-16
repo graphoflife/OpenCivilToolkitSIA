@@ -23,7 +23,7 @@ from opencivil.core.einheiten import MM
 from opencivil.bericht.formelsammlung import formelname, in_sammlung
 from opencivil.bericht.markdown import block_markdown
 from opencivil.bericht.zusammenfassung import (
-    GRAD_SPALTE, STAPEL_SPALTEN, angaben, hinweise, nachweistabelle,
+    GRAD_SPALTE, STAPEL_SPALTEN, angaben, hinweise, kennzahlen, nachweistabelle,
     stiller_hinweis, zusammenfassen,
 )
 from opencivil.core.latex import Mathe, Zelle
@@ -515,6 +515,14 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None) -> dict:
             for kennung, system in aufbau.balkensysteme.items()})
         # Je Fundament, was die Situationszeichnung vom Kern braucht.
         ergebnis["grundbrueche"] = endlich(grundbruchdaten.situationen(aufbau, loesung))
+        # Je Platte ihre Kennzahlen -- auch ohne Lastfall, darum nicht in der
+        # Zusammenfassung, die es nur mit Urteilen gibt.
+        ergebnis["kennzahlen"] = {
+            kennung: [{"beschriftung": k.beschriftung, "symbol": k.wert.symbol,
+                       "text": k.text, "einheit": wert_dict(k.wert)["einheit"],
+                       "erklaerung": k.erklaerung, "id": k.wert.id}
+                      for k in kennzahlen(aufbau, kennung, loesung)]
+            for kennung in aufbau.querschnitte}
         ergebnis["warnungen"] = list(aufbau.warnungen)
         ergebnis["zuordnung"] = zuordnung(aufbau)
     return ergebnis
@@ -679,13 +687,6 @@ def zuordnung(aufbau: Aufbau) -> dict:
                         "eckwerte": {n: d.id for n, d in nw.d_eckwerte.items()},
                     }
                     for nw in aufbau.bauteil(kennung).im_feld("nachweise")
-                },
-                # Der Vergroesserungsfaktor je gezogene Seite -- er gehoert dem
-                # Verformungsnachweis und steht nur, wo der rechnet.
-                "verformung": {
-                    seite: d.id
-                    for nw in aufbau.bauteil(kennung).im_feld("verformung")
-                    for seite, d in nw.d_omega.items()
                 },
                 # Durchmesser, Teilung und Stabzahl als Zahlen, nicht nur als
                 # Text: das Querschnittsbild soll die tatsaechliche Teilung

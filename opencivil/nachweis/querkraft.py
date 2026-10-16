@@ -61,7 +61,7 @@ from opencivil.core.berechnung import (
     grad_def, grad_formel,
 )
 from opencivil.core.einheiten import (
-    EINHEITSLOS, GRAD, KN, KN_PRO_M, KNM, MM, N_PRO_MM2, EmpirischesErgebnis,
+    EINHEITSLOS, GRAD, KN, KN_PRO_M, KNM, MM, N_PRO_MM2,
     Groesse, empirisch,
 )
 from opencivil.core.latex import als_text
@@ -324,14 +324,14 @@ def _statische_hoehe(
     ``None``, wenn auf der gezogenen Seite nichts liegt. Dann gibt es kein
     ``d``, und ohne ``d`` keinen Querkraftwiderstand.
     """
-    i = _zuglage(lagen, moment_positiv)
+    i = zuglage(lagen, moment_positiv)
     if i is None:
         return None
     z = lagen[i][0]
     return z if moment_positiv else h - z
 
 
-def _zuglage(
+def zuglage(
     lagen: Sequence[Tuple[float, bool]], moment_positiv: bool
 ) -> Optional[int]:
     """Die aeusserste Lage der gezogenen Seite, als Index in ``lagen``."""
@@ -339,6 +339,39 @@ def _zuglage(
     if not gezogen:
         return None
     return (max if moment_positiv else min)(gezogen, key=lambda i: lagen[i][0])
+
+
+def beiwert_k_g(p: Protokoll, basis: str, D_max: Wert, f_ck: Wert) -> Wert:
+    """
+    Der Beiwert der Gesteinskoernung, samt seiner Zeile in der Herleitung --
+    fuer den Querkraftnachweis und die Kennzahlen der Platte, eine Formel.
+    Empirisch: ``D_max`` in mm, ``f_ck`` in N/mm^2.
+    """
+    k_g = empirisch(
+        lambda D_max, f_ck: max(
+            K_G_MINDEST, 48.0 / (16.0 + D_max * min(1.0, (60.0 / f_ck) ** 2))),
+        ergebnis=EINHEITSLOS,
+        D_max=(D_max.groesse, MM),
+        f_ck=(f_ck.groesse, N_PRO_MM2),
+    )
+    beiwert = Zwischenwerte(basis).zahl("k_g", "k_g", k_g.wert.si)
+    p.formel(
+        beiwert,
+        rf"\max\left[{K_G_MINDEST:.2f};\ \frac{{48}}{{16 + @D_max \cdot "
+        r"\min\left[1.0;\ \left(\frac{60}{@f_ck}\right)^{2}\right]}\right]",
+        {"D_max": D_max, "f_ck": f_ck}, empirisch=k_g.einheiten,
+        titel="Beiwert der Gesteinskörnung", referenz="SIA 262:2025, 4.3.3.2.1")
+    return beiwert
+
+
+def buegelteilung_y(buegel, b: float, menge_y: float) -> float:
+    """
+    Die Buegelteilung in y, in m: angegeben -- oder aus der Stabzahl ueber die
+    betrachtete Breite ``b``. Die Formel kennt nur Teilungen.
+    """
+    if buegel.ueber_abstand_y:
+        return menge_y
+    return b / menge_y if menge_y else 0.0
 
 
 def _ohne_zugbewehrung(M_Ed: float) -> str:
@@ -684,7 +717,7 @@ class Querkraft(Nachweis):
         lagen = self._lagen(e)
         zugstahl = {}
         for positiv in (True, False):
-            i = _zuglage(lagen, positiv)
+            i = zuglage(lagen, positiv)
             if i is not None:
                 stahl = self.posten[i][0].stahl
                 zugstahl[positiv] = (e.g(stahlname("f_yd", stahl)).si,
@@ -692,17 +725,8 @@ class Querkraft(Nachweis):
 
         self._protokoll_ansatz(p, e)
 
-        D_max = e.g("D_max")
-        f_ck = e.g("f_ck")
-        k_g_erg = empirisch(
-            lambda D_max, f_ck: max(
-                K_G_MINDEST, 48.0 / (16.0 + D_max * min(1.0, (60.0 / f_ck) ** 2))),
-            ergebnis=EINHEITSLOS,
-            D_max=(D_max, MM),
-            f_ck=(f_ck, N_PRO_MM2),
-        )
-        k_g = k_g_erg.wert.si
-        beiwert = self._protokoll_k_g(p, e, k_g_erg)
+        beiwert = beiwert_k_g(p, self.id, e["D_max"], e["f_ck"])
+        k_g = beiwert.groesse.si
 
         mn = e.befund("mn")
         befund = Querkraftbefund(
@@ -804,9 +828,8 @@ class Querkraft(Nachweis):
         # Die Menge in y: entweder eine Teilung oder eine Stabzahl über die
         # betrachtete Breite. Aus der Zahl wird hier eine Teilung -- die Formel
         # kennt nur Teilungen, und die Umrechnung steht in der Herleitung.
-        menge_y = e.g("menge_y")
         ueber_teilung = self.buegel.ueber_abstand_y
-        s_y = menge_y.si if ueber_teilung else (b / menge_y.si if menge_y.si else 0.0)
+        s_y = buegelteilung_y(self.buegel, b, e.g("menge_y").si)
 
         befund = Querkraftbefund(buegelwerte=Buegelwerte(
             a_s=a_s, s_x=s_x, s_y=s_y, f_yd=f_yd, f_cd=f_cd, k_c=k_c))
@@ -849,7 +872,7 @@ class Querkraft(Nachweis):
                 "in mm.")
             return erg
 
-        erg.zuglage = _zuglage(lagen, M_Ed >= 0)
+        erg.zuglage = zuglage(lagen, M_Ed >= 0)
         hoehen = _statische_hoehe(lagen, h, M_Ed >= 0)
         if hoehen is None:
             erg.begruendung = erg.hinweis = _ohne_zugbewehrung(M_Ed)
@@ -896,7 +919,7 @@ class Querkraft(Nachweis):
         # Ohne Bewehrung auf der gezogenen Seite gibt es kein d -- und ohne d
         # keinen Querkraftwiderstand. Frueher wurde hier die gedrueckte Seite
         # herangezogen und lieferte eine Zahl, die keine statische Hoehe ist.
-        erg.zuglage = _zuglage(lagen, M_Ed >= 0)
+        erg.zuglage = zuglage(lagen, M_Ed >= 0)
         hoehen = _statische_hoehe(lagen, h, M_Ed >= 0)
         if hoehen is None:
             erg.erfuellungsgrad = 0.0
@@ -1072,17 +1095,6 @@ class Querkraft(Nachweis):
         # Abmessungen und Bewehrung niemandem etwas sagen.
         for name in ("D_max", "einlagenhoehe"):
             p.wert(e[name])
-
-    def _protokoll_k_g(self, p: Protokoll, e: Eingaben,
-                       k_g: EmpirischesErgebnis) -> Wert:
-        beiwert = Zwischenwerte(self.id).zahl("k_g", "k_g", k_g.wert.si)
-        p.formel(
-            beiwert,
-            rf"\max\left[{K_G_MINDEST:.2f};\ \frac{{48}}{{16 + @D_max \cdot "
-            r"\min\left[1.0;\ \left(\frac{60}{@f_ck}\right)^{2}\right]}\right]",
-            {"D_max": e["D_max"], "f_ck": e["f_ck"]}, empirisch=k_g.einheiten,
-            titel="Beiwert der Gesteinskörnung", referenz="SIA 262:2025, 4.3.3.2.1")
-        return beiwert
 
     def _protokoll_fall(
         self, p: Protokoll, e: Eingaben, erg: Querkraftergebnis, k_g: Wert,

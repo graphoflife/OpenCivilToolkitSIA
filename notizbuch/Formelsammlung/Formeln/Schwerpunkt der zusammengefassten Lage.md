@@ -1,5 +1,5 @@
 ---
-erzeugt: bc46bf2a3cb0
+erzeugt: 67464d1c0bca
 art: formel
 tags: [formel]
 ---
@@ -57,7 +57,7 @@ $$
 ## Im Code
 
 - [[opencivil.nachweis.handrechnung#Handrechnung._schwerpunkt|Handrechnung._schwerpunkt]]
-- [[opencivil.nachweis.verformung#Verformung._bewehrungsgehalte|Verformung._bewehrungsgehalte]]
+- [[opencivil.nachweis.verformung#Vergroesserungsfaktor._bewehrungsgehalte|Vergroesserungsfaktor._bewehrungsgehalte]]
 - [[opencivil.querschnitt.platte#protokoll_lage|protokoll_lage]]
 
 ## Themen

@@ -1,5 +1,5 @@
 ---
-erzeugt: 6c322c22b5b1
+erzeugt: 4328c75edb34
 art: modul
 tags: [modul]
 ---
@@ -542,6 +542,7 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.fehlende_bewehrung]]
 - [[opencivil.nachweis.handrechnung]]
+- [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.querkraft]]

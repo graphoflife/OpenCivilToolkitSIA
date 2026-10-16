@@ -44,6 +44,37 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-16 · Kennzahlen der Platte, immer gerechnet
+
+Wunsch des Benutzers: unter der Zusammenfassung jeder Platte Kennzahlen,
+gleich ob Nachweise gewählt sind -- ω_w und ω_w', M_Rd± bei N_Ed = 0, N_Rd±
+bei M_Ed = 0, x/d aus der Handrechnung, V_Rd,max und V_Rd,min ohne Bügel
+(je das Kleinere beider Seiten) und V_Rd(α_opt) mit Bügeln.
+
+- **`Plattenkennzahlen`** (`nachweis/kennzahlen.py`), eine Prozedur je
+  Platte mit x-Bewehrung, Rechenziel der Platte nach ihren Nachweisen.
+  Rechnet die Tragsicherheit von Hand mit Bemessungswerten, liest sie deren
+  Linie aus dem Befund -- dasselbe Muster wie das Knicken --, sonst eine
+  eigene mit Herleitung. N_Rd bei M = 0 sucht `kante` auf der Linie;
+  `protokoll_treffer` nimmt dafür jetzt den Wert mit, unter dem das Ergebnis
+  weitergeht, statt eines allgemeinen N_Rd.
+- **Querkraft:** k_g und die Teilung in y sind Funktionen
+  (`beiwert_k_g`, `buegelteilung_y`), die Nachweis und Kennzahlen teilen;
+  der Widerstand kommt aus `widerstand` und `neigungen`. Bei M_Ed = M_Rd ist
+  ε_v = f_yd/E_s, gleich wie gross M_Rd ist -- die «Fliessdehnung».
+- **Vergrösserungsfaktor:** ω_w war Teil des Verformungsnachweises und
+  rechnete nur für Seiten, die ein Fall zog. Jetzt ist er eine eigene
+  Prozedur der Platte (`Vergroesserungsfaktor`), immer und für beide Seiten;
+  der Nachweis liest ihn. Die Zeichen heissen ω_w und ω_w' wie beim Benutzer.
+- **Eine Liste, zwei Darstellungen:** `zusammenfassung.kennzahlen` baut die
+  Zeilen; die Oberfläche zeigt sie (`loesung.kennzahlen`), der Bericht als
+  Tabelle unter jeder Platte. Bewehrungsmass und Distanzhalter gehören dazu;
+  der Lagenaufbau rechnet dafür auch bei einer Platte ohne Nachweis.
+- **x/d:** die Handrechnung hält am Punkt N = 0 ihr x und d fest
+  (`Eckpunkt.x`, `.d`).
+
+---
+
 ## 2026-10-16 · Rechte Tafel weiss, Diagramme einzeln gross, Normsorten gesperrt
 
 Wünsche des Benutzers, je ein Commit:

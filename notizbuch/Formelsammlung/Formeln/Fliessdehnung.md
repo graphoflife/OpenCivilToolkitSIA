@@ -1,5 +1,5 @@
 ---
-erzeugt: 90fbf1d04d3b
+erzeugt: 2e0136c29f24
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.2.4"
@@ -41,15 +41,21 @@ $$
 \varepsilon_y = \frac{f_{yk}}{E_s} = \frac{500\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 2.5\,\text{‰} \quad < \quad \varepsilon_{s,x} = 4.67\,\text{‰}
 $$
 
+## Gebraucht von
+
+- [[Beiwert für die statische Höhe]]
+
 ## Im Code
 
 - [[opencivil.material.betonstahl]]
+- [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._ohne_buegel]]
 - [[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung._protokoll_fliessen|Spannungsbegrenzung._protokoll_fliessen]]
 - [[opencivil.spannungsanalyse#herleitung|herleitung]]
 
 ## Themen
 
 - [[Betonstahl]]
+- [[Kennzahlen]]
 - [[Stahlspannung aus Rissbreite]]
 - [[Spannung-Dehnung-Analyse]]
 

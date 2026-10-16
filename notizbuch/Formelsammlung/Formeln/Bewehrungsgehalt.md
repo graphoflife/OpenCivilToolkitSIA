@@ -1,5 +1,5 @@
 ---
-erzeugt: 2feb4b7eaf1c
+erzeugt: eb36554fdfb0
 art: formel
 tags: [formel]
 ---
@@ -34,7 +34,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.verformung#Verformung._bewehrungsgehalte|Verformung._bewehrungsgehalte]]
+- [[opencivil.nachweis.verformung#Vergroesserungsfaktor._bewehrungsgehalte|Vergroesserungsfaktor._bewehrungsgehalte]]
 
 ## Themen
 

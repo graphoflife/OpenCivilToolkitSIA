@@ -1,5 +1,5 @@
 ---
-erzeugt: 6c72e4308e2e
+erzeugt: 500df62b21a0
 art: modul
 tags: [modul]
 ---
@@ -415,6 +415,7 @@ das Knicken und die Analysen mit dem der ersten Lage.
 ## Gebraucht von
 
 - [[opencivil.nachweis.biegung_normalkraft]]
+- [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_knicken]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: f4e17e96e843
+erzeugt: 8ad26373b02d
 art: modul
 tags: [modul]
 ---
@@ -446,6 +446,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.fehlende_bewehrung]]
+- [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.linie]]
 - [[opencivil.nachweis.mindestbewehrung]]

@@ -21,7 +21,7 @@
 
 import { karte, panel } from './bausteine.js';
 import { el, ersetzen, leerzustand, melden, svgEl, zahlfeld } from './dom.js';
-import { setzen } from './mathe.js';
+import { setzen, span } from './mathe.js';
 import { werkzeugleiste } from './kopierleiste.js';
 import { adresse, seiteVorhanden } from './notizbuch.js';
 import {
@@ -365,7 +365,7 @@ function zusammenfassung(loesung, verfolgen) {
     // zusammenzustellen hiesse, dieselbe Tabelle zweimal zu pflegen -- einmal
     // fürs Auge, einmal für den Kopierknopf.
     const tabelle = tabellen[kennung];
-    const kennzahlen = plattenkennzahlen(eintrag, loesung);
+    const kennzahlen = kennzahlenliste(kennung, loesung);
 
     return panel({
       schluessel: `bericht/zusammenfassung/${kennung}`, titel: `Zusammenfassung – ${eintrag.name}`,
@@ -495,38 +495,23 @@ function zeilenVon(zelle) {
 }
 
 /**
- * Die Angaben zur Platte unter der Tabelle: zwei zur Ausführung und der
- * Vergrösserungsfaktor ω_w der Durchbiegung, je gezogene Seite.
+ * Die Kennzahlen einer Platte unter der Tabelle: Bewehrungsmass,
+ * Distanzhalter, die Vergrösserungsfaktoren ω_w und ω_w′, die Eckwerte der
+ * Handrechnung und der Querkraftwiderstand bei N_Ed = 0 -- auch ohne
+ * Lastfall (Benutzer, 2026-10-16).
  *
- * Alle kommen fertig aus dem Kern -- hier wird nichts gerechnet, auch nicht
- * "nur schnell" das Bewehrungsmass aus den Flächen. Der Faktor gehört dem
- * Nachweis «Verformung»: er steht nur für die Seiten, die ein
- * Verformungsfall zieht und die in x bewehrt sind. Er steht mit festen zwei
- * Stellen, wie verlangt; die anderen ohne nachlaufende Nullen.
+ * Liste, Beschriftung und Zahl kommen fertig aus dem Kern
+ * (`zusammenfassung.kennzahlen`) -- dieselben wie im Bericht. Hier wird
+ * nichts gerechnet und nichts gerundet.
  */
-function plattenkennzahlen(eintrag, loesung) {
-  const omega = 'Vergrösserungsfaktor ω_w nach SIA 262:2025, 4.4.3.2.5 – aus dem Nachweis «Verformung»';
-  const zeigen = [
-    ['Bewehrungsmass', eintrag.werte?.bewehrungsmass, 'Stahldichte 7850 kg/m³'],
-    ['Höhe der Distanzhalter', eintrag.werte?.distanzhalter,
-      'OK innere untere Lage bis UK innere obere Lage'],
-    ['Vergrösserungsfaktor ω_w, Zug unten', eintrag.verformung?.unten, omega, true],
-    ['Vergrösserungsfaktor ω_w, Zug oben', eintrag.verformung?.oben, omega, true],
-  ];
-  const zeilen = zeigen
-    .map(([beschriftung, id, erklaerung, fest]) => [
-      beschriftung, loesung.werte?.[id], erklaerung, fest])
-    .filter(([, wert]) => wert);
+function kennzahlenliste(kennung, loesung) {
+  const zeilen = loesung.kennzahlen?.[kennung] || [];
   if (!zeilen.length) return null;
-
-  const zahl = (wert, fest) => (fest ? wert.zahl.toFixed(wert.stellen) : wert.wert);
-  return el('div.kennzahlen', {}, zeilen.map(([beschriftung, wert, erklaerung, fest]) =>
-    el('div.kennzahl', { title: erklaerung }, [
-      el('span.kennzahl-name', { text: beschriftung }),
-      el('span.kennzahl-wert', {
-        text: wert.einheit ? `${zahl(wert, fest)} ${wert.einheit}` : zahl(wert, fest),
-      }),
-    ])));
+  return el('div.kennzahlen', {}, zeilen.map((k) => el('div.kennzahl', { title: k.erklaerung }, [
+    el('span.kennzahl-name', {}, [k.beschriftung]),
+    el('span.kennzahl-zeichen', {}, [span(k.symbol)]),
+    el('span.kennzahl-wert', { text: k.einheit ? `${k.text} ${k.einheit}` : k.text }),
+  ])));
 }
 
 /**

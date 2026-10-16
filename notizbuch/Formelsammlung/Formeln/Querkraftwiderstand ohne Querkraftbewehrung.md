@@ -1,5 +1,5 @@
 ---
-erzeugt: 80f97ad24d6e
+erzeugt: ffd7d6556d51
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.3.2.1"
@@ -7,45 +7,47 @@ normstelle: "SIA 262:2025, 4.3.3.2.1"
 > [!info] Normstelle
 > SIA 262:2025, 4.3.3.2.1
 
+*In der Herleitung: «Zug unten, M\_Ed = M\_Rd»*
+
+$$
+V_{Rd}^{+}(M_{Ed} = M_{Rd}^{+}) = k_d^{+} \cdot \tau_{cd} \cdot d_v^{+}
+$$
+
 *In der Herleitung: «Ansatz»*
 
 $$
 V_{Rd} = k_d \cdot \tau_{cd} \cdot d_v \qquad k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g}
 $$
 
-*In der Herleitung: «Querkraftwiderstand»*
-
-$$
-V_{Rd,x} = k_d \cdot \tau_{cd} \cdot d_v
-$$
-
 ## Grössen
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $k_d$ | – | – | [[Beiwert für die statische Höhe]] |
+| $k_d^{+}$ | – | – | [[Beiwert für die statische Höhe]] |
 | $\tau_{cd}$ | – | N/mm² | Zwischenwert |
-| $d_v$ | – | mm | [[Wirksame Höhe, um die Einlage vermindert]], [[Wirksame Höhe (Einlage nicht massgebend)]] |
+| $d_v^{+}$ | – | mm | [[Wirksame Höhe (Einlage nicht massgebend)]], [[Wirksame Höhe, um die Einlage vermindert]] |
 
 ## Beispiel
 
-Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
+Mit den Zahlen aus dem Beispielprojekt:
 
 $$
 \begin{aligned}
-  V_{Rd,x}(M_{Ed} = 40\,\mathrm{kNm},\ N_{Ed} = 0\,\mathrm{kN}) &= k_d \cdot \tau_{cd} \cdot d_v \\
-  &= 0.6077 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 125\,\mathrm{mm} \\
-  &= 83.2\,\mathrm{kN}/\mathrm{m}
+  V_{Rd}^{+}(M_{Ed} = M_{Rd}^{+}) &= k_d^{+} \cdot \tau_{cd} \cdot d_v^{+} \\
+  &= 0.6062 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} \\
+  &= 165.4\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
 $$
 
 ## Im Code
 
+- [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._ohne_buegel]]
 - [[opencivil.nachweis.querkraft#Querkraft|Querkraft._protokoll_ansatz]]
 - [[opencivil.nachweis.querkraft#Querkraft._protokoll_fall|Querkraft._protokoll_fall]]
 
 ## Themen
 
+- [[Kennzahlen]]
 - [[Querkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->

@@ -1,5 +1,5 @@
 ---
-erzeugt: ed91bd71924c
+erzeugt: 002ddd13c03c
 art: formel
 tags: [formel]
 ---
@@ -58,6 +58,7 @@ $$
 ## Themen
 
 - [[Biegung und Normalkraft]]
+- [[Kennzahlen]]
 - [[Querkraft]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->

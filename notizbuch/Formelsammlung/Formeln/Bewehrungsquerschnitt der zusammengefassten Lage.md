@@ -1,5 +1,5 @@
 ---
-erzeugt: ca9edfb0b538
+erzeugt: 327fcabbced9
 art: formel
 tags: [formel]
 ---
@@ -33,7 +33,7 @@ $$
 ## Im Code
 
 - [[opencivil.nachweis.handrechnung#Handrechnung._schwerpunkt|Handrechnung._schwerpunkt]]
-- [[opencivil.nachweis.verformung#Verformung._bewehrungsgehalte|Verformung._bewehrungsgehalte]]
+- [[opencivil.nachweis.verformung#Vergroesserungsfaktor._bewehrungsgehalte|Vergroesserungsfaktor._bewehrungsgehalte]]
 
 ## Themen
 

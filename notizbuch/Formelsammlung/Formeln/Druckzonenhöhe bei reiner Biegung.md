@@ -1,5 +1,5 @@
 ---
-erzeugt: 0dd75bcdf367
+erzeugt: 9fec1952fa5c
 art: formel
 tags: [formel]
 ---
@@ -26,10 +26,6 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 x = \frac{A_{s,2,x} \cdot f_{sd}}{0.85 \cdot b \cdot f_{cd}} = \frac{2450\,\mathrm{mm}^{2} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2}}{0.85 \cdot 1000\,\mathrm{mm} \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 62.7\,\mathrm{mm}
 $$
-
-## Gebraucht von
-
-- [[Bezogene Druckzonenhöhe]]
 
 ## Im Code
 

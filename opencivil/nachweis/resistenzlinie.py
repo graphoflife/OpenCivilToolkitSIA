@@ -111,7 +111,13 @@ class Widerstandslinie:
         raise NotImplementedError
 
     def protokoll_treffer(self, p: Protokoll, treffer: Treffer, *, achse: geo.Achse,
-                          fest: float, basis: str, titel: str = "") -> None:
+                          fest: float, basis: str, titel: str = "",
+                          ergebnis: Optional[Wert] = None) -> None:
+        """
+        Wie der Widerstand gefunden wurde. ``ergebnis`` ist der Wert, unter dem
+        er weitergeht -- etwa eine Kennzahl der Platte; ohne ihn heisst er
+        schlicht ``N_Rd`` oder ``M_Rd``.
+        """
         raise NotImplementedError
 
 
@@ -158,7 +164,8 @@ class Handlinie(Widerstandslinie):
         return _eckwerte(extrem, geo.schnitte(self.punkte, geo.MOMENT, 0.0))
 
     def protokoll_treffer(self, p: Protokoll, treffer: Treffer, *, achse: geo.Achse,
-                          fest: float, basis: str, titel: str = "") -> None:
+                          fest: float, basis: str, titel: str = "",
+                          ergebnis: Optional[Wert] = None) -> None:
         """
         Zwischen welchen beiden Eckpunkten geradlinig interpoliert wurde, und
         mit welchem Anteil.
@@ -190,7 +197,8 @@ class Handlinie(Widerstandslinie):
         def wert(name: str, symbol: str, si: float, achse: geo.Achse):
             return werte.wert(name, symbol, Groesse.aus_si(si, achse.einheit))
 
-        rd = wert("Rd", f"{ziel.name}_{{{self.wahl.index}}}", treffer.wert, ziel)
+        rd = (ergebnis if ergebnis is not None
+              else wert("Rd", f"{ziel.name}_{{{self.wahl.index}}}", treffer.wert, ziel))
         # Eine Seite im Notizbuch, gleich welcher Titel und welcher Fall.
         name = f"Widerstand bei festgehaltenem {lauf.name}_Ed"
         if genau is not None:
@@ -434,7 +442,8 @@ class Ebenenlinie(Widerstandslinie):
         )
 
     def protokoll_treffer(self, p: Protokoll, treffer: Treffer, *, achse: geo.Achse,
-                          fest: float, basis: str, titel: str = "") -> None:
+                          fest: float, basis: str, titel: str = "",
+                          ergebnis: Optional[Wert] = None) -> None:
         """
         Die Probe des Bruchzustands, an dem der Widerstand liegt: die Ebene,
         die Kraft jedes Teils, die Summen -- und welche Grenze ihn bestimmt.
@@ -486,8 +495,9 @@ class Ebenenlinie(Widerstandslinie):
                            Groesse.aus_si(summen[lauf][1], lauf.einheit))
         p.gleichung(rf"{summen[lauf][0]} = {probe.zahl_latex()} = {probe.symbol}",
                     titel="Probe: die Ebene trägt genau die Einwirkung")
-        rd = werte.wert("Rd", f"{achse.name}_{{{self.wahl.index}}}",
-                        Groesse.aus_si(summen[achse][1], achse.einheit))
+        rd = ergebnis if ergebnis is not None else werte.wert(
+            "Rd", f"{achse.name}_{{{self.wahl.index}}}",
+            Groesse.aus_si(summen[achse][1], achse.einheit))
         p.gleichung(rf"{rd.symbol} = {summen[achse][0]} = {rd.zahl_latex()}",
                     titel=f"{achse.widerstand} aus den Teilkräften")
         erreicht = self.erreicht(treffer.eps_oben, treffer.eps_unten)

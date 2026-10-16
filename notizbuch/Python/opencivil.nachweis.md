@@ -1,5 +1,5 @@
 ---
-erzeugt: d258aed4ad60
+erzeugt: adb2f237eed8
 art: modul
 tags: [modul]
 ---
@@ -21,6 +21,7 @@ Rechenwahl, mit der jedes Kapitel waehlt, womit es rechnet.
 - [[opencivil.nachweis.fehlende_bewehrung]] – Nachweise, die mangels Bewehrung entfallen.
 - [[opencivil.nachweis.gebrauchsebene]] – die Dehnungsebene des gezeichneten Querschnitts unter Gebrauchslast.
 - [[opencivil.nachweis.handrechnung]] – Eckpunkte der Resistenzlinie von Hand.
+- [[opencivil.nachweis.kennzahlen]] – was eine Platte aufnimmt, ohne Einwirkung.
 - [[opencivil.nachweis.knicken]] – Nachweis am verformten System.
 - [[opencivil.nachweis.linie]] – Geometrie einer geschlossenen M-N-Linie.
 - [[opencivil.nachweis.mindestbewehrung]] – Nachweise gegen sprödes Versagen.

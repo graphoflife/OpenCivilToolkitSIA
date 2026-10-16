@@ -17,15 +17,15 @@ EIN FAKTOR JE SEITE, NICHT JE FALL:
 ``rho = A_s/(b·d)`` gehoert zur gezogenen Seite, ``rho'`` zur Gegenseite, mit
 ``d'`` vom gezogenen Rand bis zur Gegenlage -- das ist deren statische Hoehe:
 ``rho'`` der einen Seite ist das ``rho`` der anderen. Der Faktor haengt also
-nur an der Platte und an der Seite, die ein Fall zieht; er wird je Seite
-einmal gerechnet und gilt fuer jeden Fall dieser Seite. Die x-Posten einer
-Seite zaehlen zusammen, in ihrem Schwerpunkt. Fehlt die Gegenseite, ist
-``rho' = 0``; fehlt die gezogene, gibt es keinen Faktor, und der Fall laesst
-sich nicht nachweisen.
+nur an der Platte und an der gezogenen Seite: :class:`Vergroesserungsfaktor`
+rechnet ihn je Seite mit x-Bewehrung, immer -- unten omega_w, oben omega_w'
+--, denn die Zusammenfassung zeigt beide als Kennzahl (Benutzer,
+2026-10-16). Der Nachweis liest ihn fuer jeden Fall seiner Seite. Die
+x-Posten einer Seite zaehlen zusammen, in ihrem Schwerpunkt. Fehlt die
+Gegenseite, ist ``rho' = 0``; fehlt die gezogene, gibt es keinen Faktor, und
+der Fall laesst sich nicht nachweisen.
 
-Bis 2026-10-16 stand der Faktor bei den Bewehrungslagen, mit einer
-Kriechzahl der Platte. Der Benutzer hat ihn in diesen Nachweis gelegt, mit
-dessen eigenem phi.
+Das phi gehoert der Verformung der Platte, Vorgabe 2.
 
 NACH VORGABE:
 Der Grenzwert L/350 und dass ``w`` mit E_cm ermittelt ist, stehen so, wie
@@ -43,7 +43,8 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, Prozedur, grad_def,
+    grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import als_text, angabe, bedingung
@@ -62,6 +63,11 @@ GRENZE = 350.0
 #: Die Seiten, die ein Verformungsfall ziehen kann: unten im Feld, oben am
 #: Kragarm oder ueber der Stuetze.
 ZUGSEITEN = ("unten", "oben")
+
+
+#: Wie der Faktor einer Seite heisst: omega_w fuer Zug unten, omega_w' fuer
+#: Zug oben (Benutzer, 2026-10-16).
+SYMBOL = {"unten": r"\omega_w", "oben": r"\omega_w'"}
 
 
 def gegenseite(seite: str) -> str:
@@ -100,47 +106,30 @@ class Fallergebnis:
     hinweis: str = ""
 
 
-class Verformung(Nachweis):
+class Vergroesserungsfaktor(Prozedur):
     """
-    Die Durchbiegung je Verformungsfall, in x -- mit dem
-    Vergroesserungsfaktor der Seite, die der Fall zieht.
+    Der Vergroesserungsfaktor der Durchbiegung in x, je gezogene Seite mit
+    x-Bewehrung: unten omega_w, oben omega_w'. Er gehoert der Platte und
+    rechnet immer -- als Kennzahl und fuer den Verformungsnachweis.
     """
 
     THEMA = "Verformung"
 
-    def __init__(self, querschnitt, faelle: Sequence[Verformungsfall], *,
-                 kriechzahl: float = KRIECHZAHL) -> None:
-        if not faelle:
-            raise ValueError("Der Verformungsnachweis braucht mindestens einen Fall.")
-        self.querschnitt = querschnitt
-        self.richtung = Richtung.X
-        self.faelle = list(faelle)
+    def __init__(self, querschnitt, *, kriechzahl: float = KRIECHZAHL) -> None:
         self.kriechzahl = kriechzahl
-
         posten = querschnitt.posten_in_richtung(Richtung.X)
         #: Je Seite die Marken ihrer x-Posten, etwa «2g» und «2z».
         self.marken: Dict[str, List[str]] = {
             seite: [f"{lage.nummer}{art.kuerzel}" for lage, art, _, _, _ in posten
                     if lage.von_unten is (seite == "unten")]
             for seite in ZUGSEITEN}
-
-        basis = f"{querschnitt.id}.nachweis.verformung"
-        # Ein Faktor je gezogene Seite, die ein Fall verlangt -- und nur, wo
-        # sie x-Bewehrung hat: ohne sie gibt es keinen.
+        basis = f"{querschnitt.id}.vergroesserung"
         self.d_omega: Dict[str, WertDef] = {
             seite: WertDef(
-                id=f"{basis}.omega_w_{seite}", symbol=rf"\omega_{{w,{seite[0]}}}",
-                einheit=EINHEITSLOS,
+                id=f"{basis}.omega_w_{seite}", symbol=SYMBOL[seite], einheit=EINHEITSLOS,
                 beschreibung=f"Vergrösserungsfaktor der Durchbiegung, Zug {seite}",
                 referenz="SIA 262:2025, 4.4.3.2.5", stellen=2)
-            for seite in ZUGSEITEN
-            if self.marken[seite] and any(f.zugseite == seite for f in self.faelle)}
-        self.d_ausnutzung: Dict[str, WertDef] = {
-            f.name: grad_def(
-                f"{basis}.{f.kennung}.erfuellungsgrad",
-                rf"\alpha_{{eff,w,{als_text(f.name)}}}",
-                f"Erfüllungsgrad Verformung – {f.name}")
-            for f in self.faelle}
+            for seite in ZUGSEITEN if self.marken[seite]}
 
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),
@@ -150,41 +139,39 @@ class Verformung(Nachweis):
             marke = f"{lage.nummer}{art.kuerzel}"
             bezuege += [Eingabebezug(f"a_s_{marke}", as_id),
                         Eingabebezug(f"z_{marke}", z_id)]
-
         super().__init__(
-            basis,
-            ausgaben=[*self.d_omega.values(), *self.d_ausnutzung.values()],
-            bezuege=bezuege,
-            titel=f"Verformung – {querschnitt.name}",
-            abschnitt=querschnitt.abschnitt,
-        )
+            basis, ausgaben=list(self.d_omega.values()), bezuege=bezuege,
+            titel="Vergrösserungsfaktor der Durchbiegung",
+            referenz="SIA 262:2025, 4.4.3.2.5", abschnitt=querschnitt.abschnitt)
 
-    # -- Rechnen ------------------------------------------------------------
-
-    def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
+    def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]:
+        p.titel("Vergrösserungsfaktor der Durchbiegung")
         werte = Zwischenwerte(self.id)
         phi = werte.zahl("phi", r"\varphi", self.kriechzahl, "Kriechzahl", stellen=2)
-        self._protokoll_ansatz(p, phi)
-
-        omega = self._vergroesserung(p, e, werte, phi)
-        ergebnis: Dict[str, Groesse] = {self.d_omega[s].id: o.groesse
-                                        for s, o in omega.items()}
-        urteile: List[NachweisUrteil] = []
-        for fall in self.faelle:
-            erg = self._einen_fall(p, fall, omega.get(fall.zugseite))
-            ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(
-                erg.erfuellungsgrad, EINHEITSLOS)
-            urteile.append(self._urteil(erg))
-        return Ausfuehrung(ergebnis, urteile)
-
-    def _vergroesserung(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte,
-                        phi: Wert) -> Dict[str, Wert]:
-        """Je gezogene Seite, die ein Fall verlangt, der Faktor omega_w."""
-        if not self.d_omega:
-            return {}
+        p.erklaerung(
+            "Eine Durchbiegung, mit der Steifigkeit E_cm ermittelt, gilt für die "
+            "ungerissene Platte. Die gerissene ist weicher, und unter Dauerlast "
+            "kriecht der Beton; um wie viel beides die Durchbiegung vergrössert, "
+            "schätzt der Faktor ω_w. Er hängt nur an der Platte und an der Seite, "
+            "die gezogen wird: ω_w für Zug unten, ω_w′ für Zug oben."
+        )
+        p.ansatz(
+            r"\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot "
+            r"\left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3}"
+            r" \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}",
+            titel="Vergrösserungsfaktor der Durchbiegung – allgemein",
+            referenz="SIA 262:2025, 4.4.3.2.5", name="Vergrösserungsfaktor der Durchbiegung")
+        p.erklaerung(
+            "Gerechnet in x, je Seite mit x-Bewehrung – einmal je Platte, nicht je "
+            "Fall. ρ gehört zur gezogenen Seite, ρ′ zur Gegenseite; d′ reicht vom "
+            "gezogenen Rand bis zur Gegenlage und ist damit deren statische Höhe – "
+            "ρ′ der einen Seite ist das ρ der anderen. Die x-Bewehrung einer Seite "
+            "zählt zusammen, in ihrem Schwerpunkt."
+        )
+        p.wert(phi, titel="Kriechzahl")
         gehalte = self._bewehrungsgehalte(p, e, werte)
         h = e["h"]
-        ergebnis: Dict[str, Wert] = {}
+        ergebnis: Dict[str, Groesse] = {}
         for seite, definition in self.d_omega.items():
             rho, d = gehalte[seite]
             gegen = gehalte.get(gegenseite(seite))
@@ -194,9 +181,10 @@ class Verformung(Nachweis):
             zahl = ((1.0 - 20.0 * rho_s.groesse.si) / (10.0 * rho.groesse.si ** 0.7)
                     * (0.75 + 0.1 * phi.groesse.si)
                     * (h.groesse.si / d.groesse.si) ** 3)
-            ergebnis[seite] = definition.belegen(Groesse(zahl, EINHEITSLOS))
+            omega = definition.belegen(Groesse(zahl, EINHEITSLOS))
+            ergebnis[definition.id] = omega.groesse
             p.formel(
-                ergebnis[seite],
+                omega,
                 r"\frac{1 - 20 \cdot @rho_s}{10 \cdot @rho^{0.7}} \cdot "
                 r"\left(0.75 + 0.1 \cdot @phi\right) \cdot \left(\frac{@h}{@d}\right)^{3}",
                 {"rho_s": rho_s, "rho": rho, "phi": phi, "h": h, "d": d},
@@ -208,8 +196,8 @@ class Verformung(Nachweis):
                            werte: Zwischenwerte) -> Dict[str, Tuple[Wert, Wert]]:
         """
         Je Seite mit x-Bewehrung der Bewehrungsgehalt und seine statische
-        Hoehe -- die gezogene Seite eines Falls braucht beide, die Gegenseite
-        ihren Gehalt als rho'.
+        Hoehe -- die gezogene Seite braucht beide, die Gegenseite ihren
+        Gehalt als rho'.
         """
         h, b = e["h"], e["b"]
         gehalte: Dict[str, Tuple[Wert, Wert]] = {}
@@ -249,6 +237,57 @@ class Verformung(Nachweis):
                      titel=f"Bewehrungsgehalt {seite}", name="Bewehrungsgehalt")
             gehalte[seite] = (r, d)
         return gehalte
+
+
+class Verformung(Nachweis):
+    """
+    Die Durchbiegung je Verformungsfall, in x -- mit dem
+    Vergroesserungsfaktor der Seite, die der Fall zieht
+    (:class:`Vergroesserungsfaktor`).
+    """
+
+    THEMA = "Verformung"
+
+    def __init__(self, querschnitt, faelle: Sequence[Verformungsfall], *,
+                 faktor: Vergroesserungsfaktor) -> None:
+        if not faelle:
+            raise ValueError("Der Verformungsnachweis braucht mindestens einen Fall.")
+        self.querschnitt = querschnitt
+        self.richtung = Richtung.X
+        self.faelle = list(faelle)
+        #: Die Faktoren der Seiten, die ein Fall zieht -- soweit es sie gibt.
+        self.seiten = [seite for seite in ZUGSEITEN if seite in faktor.d_omega
+                       and any(f.zugseite == seite for f in self.faelle)]
+
+        basis = f"{querschnitt.id}.nachweis.verformung"
+        self.d_ausnutzung: Dict[str, WertDef] = {
+            f.name: grad_def(
+                f"{basis}.{f.kennung}.erfuellungsgrad",
+                rf"\alpha_{{eff,w,{als_text(f.name)}}}",
+                f"Erfüllungsgrad Verformung – {f.name}")
+            for f in self.faelle}
+        super().__init__(
+            basis,
+            ausgaben=list(self.d_ausnutzung.values()),
+            bezuege=[Eingabebezug(f"omega_{seite}", faktor.d_omega[seite].id)
+                     for seite in self.seiten],
+            titel=f"Verformung – {querschnitt.name}",
+            abschnitt=querschnitt.abschnitt,
+        )
+
+    # -- Rechnen ------------------------------------------------------------
+
+    def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung:
+        self._protokoll_ansatz(p)
+        omega = {seite: e[f"omega_{seite}"] for seite in self.seiten}
+        ergebnis: Dict[str, Groesse] = {}
+        urteile: List[NachweisUrteil] = []
+        for fall in self.faelle:
+            erg = self._einen_fall(p, fall, omega.get(fall.zugseite))
+            ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(
+                erg.erfuellungsgrad, EINHEITSLOS)
+            urteile.append(self._urteil(erg))
+        return Ausfuehrung(ergebnis, urteile)
 
     def _einen_fall(self, p: Protokoll, fall: Verformungsfall,
                     omega: Optional[Wert]) -> Fallergebnis:
@@ -304,30 +343,13 @@ class Verformung(Nachweis):
 
     # -- Mitschrift ---------------------------------------------------------
 
-    def _protokoll_ansatz(self, p: Protokoll, phi: Wert) -> None:
+    def _protokoll_ansatz(self, p: Protokoll) -> None:
         p.titel("Verformung")
         p.erklaerung(
             "Die Durchbiegung w ist mit der Steifigkeit E_cm ermittelt: elastisch, "
-            "am ungerissenen Querschnitt. Die gerissene Platte ist weicher, und unter "
-            "Dauerlast kriecht der Beton; um wie viel beides die Durchbiegung "
-            "vergrössert, schätzt der Faktor ω_w. Die so vergrösserte Durchbiegung "
-            "hält der Nachweis gegen L/350."
+            "am ungerissenen Querschnitt. Der Faktor ω_w der gezogenen Seite führt "
+            "sie auf die gerissene Platte unter Dauerlast; die so vergrösserte "
+            "Durchbiegung hält der Nachweis gegen L/350."
         )
         p.annahme(f"w ist mit der Steifigkeit E_cm ermittelt. Grenzwert w_max = "
                   f"L/{GRENZE:g} nach Vorgabe, nicht nachgeschlagen.")
-        if not self.d_omega:
-            return
-        p.ansatz(
-            r"\omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot "
-            r"\left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3}"
-            r" \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}",
-            titel="Vergrösserungsfaktor der Durchbiegung – allgemein",
-            referenz="SIA 262:2025, 4.4.3.2.5", name="Vergrösserungsfaktor der Durchbiegung")
-        p.erklaerung(
-            "Gerechnet in x, je Seite, die ein Verformungsfall zieht – einmal je "
-            "Platte, nicht je Fall. ρ gehört zur gezogenen Seite, ρ′ zur Gegenseite; "
-            "d′ reicht vom gezogenen Rand bis zur Gegenlage und ist damit deren "
-            "statische Höhe – ρ′ der einen Seite ist das ρ der anderen. Die "
-            "x-Bewehrung einer Seite zählt zusammen, in ihrem Schwerpunkt."
-        )
-        p.wert(phi, titel="Kriechzahl")

@@ -42,7 +42,7 @@ Dehnung hergibt: ``sigma_sd = min(E_s * eps_s; f_yd)``.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.latex import Mathe
@@ -167,6 +167,13 @@ class Eckpunkt:
 
     M: float
     """Moment in Nm (Zug unten positiv)."""
+
+    x: Optional[Wert] = field(default=None, compare=False)
+    d: Optional[Wert] = field(default=None, compare=False)
+    """
+    Druckzonenhoehe und statische Hoehe -- nur bei M_Rd(N = 0), wie sie dort
+    hergeleitet sind. Daraus rechnen die Kennzahlen der Platte x/d.
+    """
 
 
 class Handrechnung:
@@ -423,7 +430,7 @@ class Handrechnung:
             titel="Momentenwiderstand bei reiner Biegung",
         )
         return Eckpunkt(f"n0_{marke}", rf"M_{{{self.R}}}(N_{{Ed}}=0)^{{{hoch}}}",
-                        f"M_{self.R}(N_Ed=0) {hoch}", 0.0, vz * M)
+                        f"M_{self.R}(N_Ed=0) {hoch}", 0.0, vz * M, x=w_x, d=d)
 
     def _halbe_hoehe(self, p: Protokoll, zug: Lage, w_d: Wert,
                      vz: float, marke: str) -> Optional[Eckpunkt]:

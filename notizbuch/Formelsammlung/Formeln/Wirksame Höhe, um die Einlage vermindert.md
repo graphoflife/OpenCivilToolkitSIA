@@ -1,5 +1,5 @@
 ---
-erzeugt: cb11dbbcf482
+erzeugt: 1a28568be63d
 art: formel
 tags: [formel]
 ---
@@ -27,15 +27,18 @@ $$
 
 ## Gebraucht von
 
+- [[Querkraftwiderstand ohne Bügel bei M_Ed = 0]]
 - [[Querkraftwiderstand ohne Querkraftbewehrung]]
 
 ## Im Code
 
+- [[opencivil.nachweis.kennzahlen#Plattenkennzahlen._hoehen|Plattenkennzahlen._hoehen]]
 - [[opencivil.nachweis.querkraft#Querkraft._protokoll_fall|Querkraft._protokoll_fall]]
 
 ## Themen
 
 - [[Querkraft]]
+- [[Kennzahlen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

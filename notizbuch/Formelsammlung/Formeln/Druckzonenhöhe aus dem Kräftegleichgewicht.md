@@ -1,5 +1,5 @@
 ---
-erzeugt: e85935a97763
+erzeugt: 20f2519c1737
 art: formel
 tags: [formel]
 ---
@@ -29,6 +29,7 @@ $$
 
 ## Gebraucht von
 
+- [[Bezogene Druckzonenhöhe]]
 - [[Momentenwiderstand bei reiner Biegung]]
 
 ## Im Code
@@ -38,6 +39,7 @@ $$
 ## Themen
 
 - [[Biegung und Normalkraft]]
+- [[Kennzahlen]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

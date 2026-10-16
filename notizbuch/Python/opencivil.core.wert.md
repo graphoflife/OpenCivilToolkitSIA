@@ -1,5 +1,5 @@
 ---
-erzeugt: dd5c2231d540
+erzeugt: d18b0ffd1446
 art: modul
 tags: [modul]
 ---
@@ -282,6 +282,7 @@ def beschreibung(self) -> str
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.fehlende_bewehrung]]
 - [[opencivil.nachweis.handrechnung]]
+- [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]

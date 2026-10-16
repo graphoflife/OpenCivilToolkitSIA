@@ -30,8 +30,8 @@ from typing import TYPE_CHECKING, Optional
 from opencivil.bericht.formelsammlung import anfuegen as formelsammlung_anfuegen
 from opencivil.bericht.formelsammlung import formelsammlung
 from opencivil.bericht.zusammenfassung import (
-    Zusammenfassung, angaben, hinweise, nachweistabelle, stiller_hinweis,
-    zusammenfassen,
+    Zusammenfassung, angaben, hinweise, kennzahlen, kennzahlentabelle, nachweistabelle,
+    stiller_hinweis, zusammenfassen,
 )
 from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Protokoll, TabellenBlock
@@ -89,15 +89,18 @@ def _nachweise(p: Protokoll, zusammenfassung: Zusammenfassung,
                aufbau: Optional["Aufbau"], loesung: Loesung) -> None:
     """
     Je Platte dasselbe wie auf dem Bildschirm: Angaben, Bewehrung,
-    Nachweistabelle, darunter Hinweise und stille Maengel.
+    Nachweistabelle, darunter Hinweise und stille Maengel, zuletzt die
+    Kennzahlen -- die auch ohne Lastfall.
 
     Eines kommt dazu. Auf dem Bildschirm ist ein nicht erfuellter Nachweis
     rot hinterlegt und traegt seine Begruendung im Tooltip -- auf Papier
     gibt es beides nicht. Darum steht jeder unter der Tabelle mit seiner
     Begruendung, sofern ihn nicht schon ein gebuendelter Hinweis erklaert.
     """
+    zahlen = {b.kennung: (kennzahlen(aufbau, b.kennung, loesung) if aufbau is not None
+                          else []) for b in zusammenfassung.bauteile}
     if all(bauteil.leer for bauteil in zusammenfassung.bauteile) \
-            and not zusammenfassung.warnungen:
+            and not zusammenfassung.warnungen and not any(zahlen.values()):
         return
     _abschnitt(p, "Nachweise")
     for bauteil in zusammenfassung.bauteile:
@@ -105,6 +108,8 @@ def _nachweise(p: Protokoll, zusammenfassung: Zusammenfassung,
             p.titel(bauteil.name)
         if bauteil.leer:
             p.text("Kein Nachweis geführt.")
+            if zahlen[bauteil.kennung]:
+                p.anfuegen(kennzahlentabelle(zahlen[bauteil.kennung]))
             continue
         if aufbau is not None:
             p.anfuegen(*(b for b in angaben(aufbau, bauteil.kennung, loesung) if b is not None))
@@ -118,6 +123,8 @@ def _nachweise(p: Protokoll, zusammenfassung: Zusammenfassung,
                           f"{zeile.urteil.begruendung}".rstrip())
         for zeile in bauteil.stille:
             p.hinweis(stiller_hinweis(zeile))
+        if zahlen[bauteil.kennung]:
+            p.anfuegen(kennzahlentabelle(zahlen[bauteil.kennung]))
 
     if zusammenfassung.gefuehrt:
         p.text("Alle geführten Nachweise sind erfüllt."

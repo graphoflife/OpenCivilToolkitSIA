@@ -1,5 +1,5 @@
 ---
-erzeugt: 323359b63bef
+erzeugt: 353d3a8ecfda
 art: modul
 tags: [modul]
 ---
@@ -169,6 +169,49 @@ Querschnittsanalyse ihre Staebe und Schubwaende, beim Grundbruch die
 Faktoren der Tragfaehigkeitsformel. Die stehen erst nach dem Rechnen
 fest; darum die Loesung.
 
+### Kennzahl
+
+```python
+@dataclass(frozen=True)
+class Kennzahl
+```
+
+Eine Zahl, die eine Platte beschreibt -- gleich welche Lastfaelle es gibt.
+
+- `beschriftung: str`
+- `wert: Wert`
+- `erklaerung: str = ''`
+- `feste_stellen: bool = False` – Mit allen Stellen, auch nachlaufenden Nullen -- der Vergroesserungsfaktor.
+
+#### Kennzahl.text
+
+```python
+@property
+def text(self) -> str
+```
+
+Die Zahl, wie sie dasteht -- ohne Einheit.
+
+### kennzahlen
+
+```python
+def kennzahlen(aufbau: 'Aufbau', kennung: str, loesung: Loesung) -> List[Kennzahl]
+```
+
+Die Kennzahlen einer Platte, wie Zusammenfassung und Bericht sie zeigen:
+Bewehrungsmass und Distanzhalter, die Vergroesserungsfaktoren omega_w und
+omega_w', die Eckwerte der Handrechnung und der Querkraftwiderstand bei
+N_Ed = 0 (Benutzer, 2026-10-16). Was nicht gerechnet wurde -- eine
+Platte ohne x-Bewehrung --, fehlt.
+
+### kennzahlentabelle
+
+```python
+def kennzahlentabelle(zeilen: Sequence[Kennzahl]) -> TabellenBlock
+```
+
+Die Kennzahlen als Tabelle des Berichts: Beschriftung, Zeichen, Wert.
+
 ### plattenangaben
 
 ```python
@@ -202,6 +245,8 @@ die Lage ist eine Lage, auch wenn sie aus zwei Posten besteht.
 - `GRAD_SPALTE = 4` – Welche Spalte den Erfuellungsgrad traegt. Die Oberflaeche hinterlegt genau sie -- zaehlen statt raten, sonst haenge die Einfaerbung an der Reihenfolge der Kopfzeile.
 - `STAPEL_SPALTEN = (2, 3)` – Widerstand und Einwirkung: die Oberflaeche setzt sie uebereinander in eine Zelle, der Bericht behaelt beide Spalten.
 - `AUSRICHTUNG = 'LLrrr'` – Nachweis und Bezeichnung duerfen umbrechen: mit zwei Formeln daneben liefe die Tabelle im Bericht sonst ueber den Rand.
+- `_HAND = 'Handrechnung mit Bemessungswerten'` – Die Kennzahlen einer Platte, in dieser Folge: Kurzname in [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen]], Beschriftung, Erklaerung.
+- `_KENNZAHLEN = (('M_Rd_pos', 'Momentenwiderstand, Zug unten', _HAND), ('M_Rd_neg', '…`
 
 ## Braucht
 

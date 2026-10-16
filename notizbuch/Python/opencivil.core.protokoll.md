@@ -1,5 +1,5 @@
 ---
-erzeugt: 0c4e02d4ca19
+erzeugt: e0899786ce0c
 art: modul
 tags: [modul]
 ---
@@ -599,6 +599,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.nachweis.fehlende_bewehrung]]
 - [[opencivil.nachweis.gebrauchsebene]]
 - [[opencivil.nachweis.handrechnung]]
+- [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]

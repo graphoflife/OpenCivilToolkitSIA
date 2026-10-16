@@ -1,5 +1,5 @@
 ---
-erzeugt: c9defa4c9767
+erzeugt: 48e0513527e2
 art: modul
 tags: [modul]
 ---
@@ -267,13 +267,32 @@ Platte nur mit unterer Bewehrung lieferte fuers negative Moment
 `None`, wenn auf der gezogenen Seite nichts liegt. Dann gibt es kein
 `d`, und ohne `d` keinen Querkraftwiderstand.
 
-### _zuglage
+### zuglage
 
 ```python
-def _zuglage(lagen: Sequence[Tuple[float, bool]], moment_positiv: bool) -> Optional[int]
+def zuglage(lagen: Sequence[Tuple[float, bool]], moment_positiv: bool) -> Optional[int]
 ```
 
 Die aeusserste Lage der gezogenen Seite, als Index in `lagen`.
+
+### beiwert_k_g
+
+```python
+def beiwert_k_g(p: Protokoll, basis: str, D_max: Wert, f_ck: Wert) -> Wert
+```
+
+Der Beiwert der Gesteinskoernung, samt seiner Zeile in der Herleitung --
+fuer den Querkraftnachweis und die Kennzahlen der Platte, eine Formel.
+Empirisch: `D_max` in mm, `f_ck` in N/mm^2.
+
+### buegelteilung_y
+
+```python
+def buegelteilung_y(buegel, b: float, menge_y: float) -> float
+```
+
+Die Buegelteilung in y, in m: angegeben -- oder aus der Stabzahl ueber die
+betrachtete Breite `b`. Die Formel kennt nur Teilungen.
 
 ### _ohne_zugbewehrung
 
@@ -554,12 +573,13 @@ nicht nachrechnen konnte.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.querschnitt.schubwaende]]
 
 ## Formeln aus diesem Modul
 
-- [[Beiwert der Gesteinskörnung]] · `Querkraft._protokoll_k_g`
+- [[Beiwert der Gesteinskörnung]] · `beiwert_k_g`
 - [[Beiwert für die statische Höhe]] · `Querkraft._protokoll_fall`
 - [[Dehnung auf halber Höhe]] · `Querkraft._protokoll_fall`
 - [[Dekompressionsmoment]] · `Querkraft._protokoll_fall`

@@ -1,6 +1,6 @@
 # Beispiel
 
-88 Berechnungen ausgeführt, 134 Werte bestimmt.
+90 Berechnungen ausgeführt, 143 Werte bestimmt.
 
 ## Herleitung
 
@@ -349,9 +349,7 @@ $$
 \alpha_{eff,x,\text{Stütze}} = \frac{M_{Rd}}{M_{Ed}} = \frac{79.9\,\mathrm{kNm}}{50\,\mathrm{kNm}} = 1.60 \quad \Rightarrow \quad \text{erfüllt}
 $$
 
-### Verformung
-
-> **Annahme:** w ist mit der Steifigkeit E\_cm ermittelt. Grenzwert w\_max = L/350 nach Vorgabe, nicht nachgeschlagen.
+### Vergrösserungsfaktor der Durchbiegung
 
 **Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5)*
 
@@ -409,18 +407,32 @@ $$
 
 $$
 \begin{aligned}
-  \omega_{w,u} &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3} \\
+  \omega_w &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3} \\
   &= \frac{1 - 20 \cdot 0.00299}{10 \cdot 0.00988^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{248.1\,\mathrm{mm}}\right)^{3} \\
   &= 4
 \end{aligned}
 $$
+
+**Vergrösserungsfaktor, Zug oben** *(SIA 262:2025, 4.4.3.2.5)*
+
+$$
+\begin{aligned}
+  \omega_w' &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{o}}\right)^{3} \\
+  &= \frac{1 - 20 \cdot 0.00988}{10 \cdot 0.00299^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{252\,\mathrm{mm}}\right)^{3} \\
+  &= 7.52
+\end{aligned}
+$$
+
+### Verformung
+
+> **Annahme:** w ist mit der Steifigkeit E\_cm ermittelt. Grenzwert w\_max = L/350 nach Vorgabe, nicht nachgeschlagen.
 
 #### Verformung – Feld
 
 **Wirksame Durchbiegung, Zug unten**
 
 $$
-w_{eff} = \omega_{w,u} \cdot w = 4 \cdot 3.5\,\mathrm{mm} = 14\,\mathrm{mm}
+w_{eff} = \omega_w \cdot w = 4 \cdot 3.5\,\mathrm{mm} = 14\,\mathrm{mm}
 $$
 
 **Grenzwert der Durchbiegung, nach Vorgabe**
@@ -439,6 +451,171 @@ $$
 
 $$
 \alpha_{eff,w,\text{Feld}} = \frac{w_{max}}{w_{eff}} = \frac{17.1\,\mathrm{mm}}{14\,\mathrm{mm}} = 1.22 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+### Kennzahlen
+
+Die Eckpunkte stammen aus der Handrechnung der Tragsicherheit – sie rechnet ebenso, von Hand mit Bemessungswerten.
+
+#### Biegung und Normalkraft
+
+**Momentenwiderstand bei N\_Ed = 0, Zug unten**
+
+$$
+M_{Rd}^{+}(N_{Ed} = 0) = M_{Rd}(N_{Ed}=0)^{+} = 235.9\,\mathrm{kNm}
+$$
+
+**Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten**
+
+$$
+\left(x/d\right)^{+} = \frac{x^{+}}{d_{2,x}} = \frac{62.7\,\mathrm{mm}}{248.1\,\mathrm{mm}} = 0.253
+$$
+
+**Momentenwiderstand bei N\_Ed = 0, Zug oben**
+
+$$
+M_{Rd}^{-}(N_{Ed} = 0) = M_{Rd}(N_{Ed}=0)^{-} = -79.9\,\mathrm{kNm}
+$$
+
+**Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben**
+
+$$
+\left(x/d\right)^{-} = \frac{x^{-}}{d_{3,x}} = \frac{19.3\,\mathrm{mm}}{252\,\mathrm{mm}} = 0.077
+$$
+
+**Zugwiderstand bei M\_Ed = 0**
+
+$$
+\begin{aligned}
+  N_{Rd}^{+}(M_{Ed} = 0) &= N_1 + \frac{M_{Ed} - M_1}{M_2 - M_1} \cdot \left(N_2 - N_1\right) \\
+  &= 1393.2\,\mathrm{kN} + \frac{0\,\mathrm{kNm} - 71.1\,\mathrm{kNm}}{-79.9\,\mathrm{kNm} - 71.1\,\mathrm{kNm}} \cdot \left(0\,\mathrm{kN} - 1393.2\,\mathrm{kN}\right) \\
+  &= 737.5\,\mathrm{kN}
+\end{aligned}
+$$
+
+**Stützpunkte der Interpolation**
+
+| Punkt | $M\ [\mathrm{kNm}]$ | $N\ [\mathrm{kN}]$ |
+| :--- | ---: | ---: |
+| $N_{Rd}^{+}$ | $71.1$ | $1393.2$ |
+| $M_{Rd}(N_{Ed}=0)^{-}$ | $-79.9$ | $0.0$ |
+
+**Druckwiderstand bei M\_Ed = 0**
+
+$$
+N_{Rd}^{-}(M_{Ed} = 0) = N_{Rd}^{-} = -6000\,\mathrm{kN}
+$$
+
+#### Querkraftwiderstand ohne Bügel bei N\_Ed = 0
+
+**Beiwert der Gesteinskörnung** *(SIA 262:2025, 4.3.3.2.1)*
+
+$$
+\begin{aligned}
+  k_g &= \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right] \\
+  &= \max\left[1.20;\ \frac{48}{16 + 32 \cdot \min\left[1.0;\ \left(\frac{60}{30}\right)^{2}\right]}\right] \\
+  &= 1.2 \quad \left(D_{max}\ \text{in}\ \mathrm{mm},\ f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+\end{aligned}
+$$
+
+**Statische Höhe der Lage unten, ab dem gedrückten Rand oben**
+
+$$
+d^{+} = z_{2,x,g} = 249\,\mathrm{mm}
+$$
+
+**Wirksame Höhe (Einlage nicht massgebend)**
+
+$$
+d_v^{+} = d^{+} = 249\,\mathrm{mm}
+$$
+
+**Zug unten, M\_Ed = 0: ε\_v = 0, k\_d = 1** *(SIA 262:2025, 4.3.3.2.1)*
+
+$$
+V_{Rd}^{+}(M_{Ed} = 0) = \tau_{cd} \cdot d_v^{+} = 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} = 272.8\,\mathrm{kN}/\mathrm{m}
+$$
+
+**Zug unten, M\_Ed = M\_Rd: Dehnung beim Fliessbeginn**
+
+$$
+\varepsilon_v^{+} = \frac{f_{yd}}{E_s} = \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 2.174\,\text{‰}
+$$
+
+**Beiwert für die statische Höhe**
+
+$$
+k_d^{+} = \frac{1}{1 + \varepsilon_v^{+} \cdot d^{+} \cdot k_g} = \frac{1}{1 + 2.174\,\text{‰} \cdot 249 \cdot 1.2} = 0.6062 \quad \left(d^{+}\ \text{in}\ \mathrm{mm}\right)
+$$
+
+**Zug unten, M\_Ed = M\_Rd** *(SIA 262:2025, 4.3.3.2.1)*
+
+$$
+\begin{aligned}
+  V_{Rd}^{+}(M_{Ed} = M_{Rd}^{+}) &= k_d^{+} \cdot \tau_{cd} \cdot d_v^{+} \\
+  &= 0.6062 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} \\
+  &= 165.4\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
+$$
+
+**Statische Höhe der Lage oben, ab dem gedrückten Rand unten**
+
+$$
+d^{-} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
+$$
+
+**Wirksame Höhe (Einlage nicht massgebend)**
+
+$$
+d_v^{-} = d^{-} = 252\,\mathrm{mm}
+$$
+
+**Zug oben, M\_Ed = 0: ε\_v = 0, k\_d = 1** *(SIA 262:2025, 4.3.3.2.1)*
+
+$$
+V_{Rd}^{-}(M_{Ed} = 0) = \tau_{cd} \cdot d_v^{-} = 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 252\,\mathrm{mm} = 276.1\,\mathrm{kN}/\mathrm{m}
+$$
+
+**Zug oben, M\_Ed = M\_Rd: Dehnung beim Fliessbeginn**
+
+$$
+\varepsilon_v^{-} = \frac{f_{yd}}{E_s} = \frac{435\,\mathrm{N}/\mathrm{mm}^{2}}{200000\,\mathrm{N}/\mathrm{mm}^{2}} = 2.174\,\text{‰}
+$$
+
+**Beiwert für die statische Höhe**
+
+$$
+k_d^{-} = \frac{1}{1 + \varepsilon_v^{-} \cdot d^{-} \cdot k_g} = \frac{1}{1 + 2.174\,\text{‰} \cdot 252 \cdot 1.2} = 0.6034 \quad \left(d^{-}\ \text{in}\ \mathrm{mm}\right)
+$$
+
+**Zug oben, M\_Ed = M\_Rd** *(SIA 262:2025, 4.3.3.2.1)*
+
+$$
+\begin{aligned}
+  V_{Rd}^{-}(M_{Ed} = M_{Rd}^{-}) &= k_d^{-} \cdot \tau_{cd} \cdot d_v^{-} \\
+  &= 0.6034 \cdot 1.0954\,\mathrm{N}/\mathrm{mm}^{2} \cdot 252\,\mathrm{mm} \\
+  &= 166.6\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
+$$
+
+**Querkraftwiderstand ohne Bügel bei M\_Ed = 0, das Kleinere beider Seiten** *(SIA 262:2025, 4.3.3.2.1)*
+
+$$
+\begin{aligned}
+  V_{Rd,max} &= \min\left[V_{Rd}^{+}(M_{Ed} = 0);\ V_{Rd}^{-}(M_{Ed} = 0)\right] \\
+  &= \min\left[272.8\,\mathrm{kN}/\mathrm{m};\ 276.1\,\mathrm{kN}/\mathrm{m}\right] \\
+  &= 272.8\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
+$$
+
+**Querkraftwiderstand ohne Bügel bei M\_Ed = M\_Rd, das Kleinere beider Seiten** *(SIA 262:2025, 4.3.3.2.1)*
+
+$$
+\begin{aligned}
+  V_{Rd,min} &= \min\left[V_{Rd}^{+}(M_{Ed} = M_{Rd}^{+});\ V_{Rd}^{-}(M_{Ed} = M_{Rd}^{-})\right] \\
+  &= \min\left[165.4\,\mathrm{kN}/\mathrm{m};\ 166.6\,\mathrm{kN}/\mathrm{m}\right] \\
+  &= 165.4\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
 $$
 
 ### Beton: C30/37
@@ -1689,9 +1866,11 @@ $$
 
 ### Verformung
 
-Die Durchbiegung w ist mit der Steifigkeit E\_cm ermittelt: elastisch, am ungerissenen Querschnitt. Die gerissene Platte ist weicher, und unter Dauerlast kriecht der Beton; um wie viel beides die Durchbiegung vergrössert, schätzt der Faktor ω\_w. Die so vergrösserte Durchbiegung hält der Nachweis gegen L/350.
+Eine Durchbiegung, mit der Steifigkeit E\_cm ermittelt, gilt für die ungerissene Platte. Die gerissene ist weicher, und unter Dauerlast kriecht der Beton; um wie viel beides die Durchbiegung vergrössert, schätzt der Faktor ω\_w. Er hängt nur an der Platte und an der Seite, die gezogen wird: ω\_w für Zug unten, ω\_w′ für Zug oben.
 
-Gerechnet in x, je Seite, die ein Verformungsfall zieht – einmal je Platte, nicht je Fall. ρ gehört zur gezogenen Seite, ρ′ zur Gegenseite; d′ reicht vom gezogenen Rand bis zur Gegenlage und ist damit deren statische Höhe – ρ′ der einen Seite ist das ρ der anderen. Die x-Bewehrung einer Seite zählt zusammen, in ihrem Schwerpunkt.
+Gerechnet in x, je Seite mit x-Bewehrung – einmal je Platte, nicht je Fall. ρ gehört zur gezogenen Seite, ρ′ zur Gegenseite; d′ reicht vom gezogenen Rand bis zur Gegenlage und ist damit deren statische Höhe – ρ′ der einen Seite ist das ρ der anderen. Die x-Bewehrung einer Seite zählt zusammen, in ihrem Schwerpunkt.
+
+Die Durchbiegung w ist mit der Steifigkeit E\_cm ermittelt: elastisch, am ungerissenen Querschnitt. Der Faktor ω\_w der gezogenen Seite führt sie auf die gerissene Platte unter Dauerlast; die so vergrösserte Durchbiegung hält der Nachweis gegen L/350.
 
 **Vergrösserungsfaktor der Durchbiegung – allgemein** *(SIA 262:2025, 4.4.3.2.5)*
 
@@ -1714,13 +1893,13 @@ $$
 **Vergrösserungsfaktor, Zug unten** *(SIA 262:2025, 4.4.3.2.5)*
 
 $$
-\omega_{w,u} = \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3}
+\omega_w = \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3}
 $$
 
 **Wirksame Durchbiegung, Zug unten**
 
 $$
-w_{eff} = \omega_{w,u} \cdot w
+w_{eff} = \omega_w \cdot w
 $$
 
 **Grenzwert der Durchbiegung, nach Vorgabe**
@@ -2041,6 +2220,72 @@ $$
 T_{Rd} = N_{Ed} \cdot \tan \delta^{*}
 $$
 
+### Kennzahlen
+
+Was die Platte in x aufnimmt, ohne Bezug auf eine Einwirkung: die Eckwerte der Handrechnung mit Bemessungswerten und der Querkraftwiderstand ohne Normalkraft. Wo eine Seite massgebend ist, gilt das Kleinere beider Seiten.
+
+Ohne Bügel hängt der Widerstand am Moment: am grössten bei M\_Ed = 0, wo die Dehnung null ist, am kleinsten bei M\_Ed = M\_Rd, wo die Bewehrung zu fliessen beginnt und die Dehnung f\_yd/E\_s erreicht. Je Seite gilt ihre statische Höhe.
+
+**Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten**
+
+$$
+\left(x/d\right)^{+} = \frac{x^{+}}{d_{2,x}}
+$$
+
+**Zugwiderstand bei M\_Ed = 0**
+
+$$
+N_{Rd}^{+}(M_{Ed} = 0) = N_1 + \frac{M_{Ed} - M_1}{M_2 - M_1} \cdot \left(N_2 - N_1\right)
+$$
+
+**Druckwiderstand bei M\_Ed = 0**
+
+$$
+N_{Rd}^{-}(M_{Ed} = 0) = N_{Rd}^{-}
+$$
+
+**Beiwert der Gesteinskörnung** *(SIA 262:2025, 4.3.3.2.1)*
+
+$$
+k_g = \max\left[1.20;\ \frac{48}{16 + D_{max} \cdot \min\left[1.0;\ \left(\frac{60}{f_{ck}}\right)^{2}\right]}\right] \quad \left(D_{max}\ \text{in}\ \mathrm{mm},\ f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
+$$
+
+**Wirksame Höhe (Einlage nicht massgebend)**
+
+$$
+d_v^{+} = d^{+}
+$$
+
+**Zug unten, M\_Ed = 0: ε\_v = 0, k\_d = 1** *(SIA 262:2025, 4.3.3.2.1)*
+
+$$
+V_{Rd}^{+}(M_{Ed} = 0) = \tau_{cd} \cdot d_v^{+}
+$$
+
+**Zug unten, M\_Ed = M\_Rd: Dehnung beim Fliessbeginn**
+
+$$
+\varepsilon_v^{+} = \frac{f_{yd}}{E_s}
+$$
+
+**Beiwert für die statische Höhe**
+
+$$
+k_d^{+} = \frac{1}{1 + \varepsilon_v^{+} \cdot d^{+} \cdot k_g} \quad \left(d^{+}\ \text{in}\ \mathrm{mm}\right)
+$$
+
+**Zug unten, M\_Ed = M\_Rd** *(SIA 262:2025, 4.3.3.2.1)*
+
+$$
+V_{Rd}^{+}(M_{Ed} = M_{Rd}^{+}) = k_d^{+} \cdot \tau_{cd} \cdot d_v^{+}
+$$
+
+**Querkraftwiderstand ohne Bügel bei M\_Ed = 0, das Kleinere beider Seiten** *(SIA 262:2025, 4.3.3.2.1)*
+
+$$
+V_{Rd,max} = \min\left[V_{Rd}^{+}(M_{Ed} = 0);\ V_{Rd}^{-}(M_{Ed} = 0)\right]
+$$
+
 ### Stabquerschnitte
 
 **Querschnittsfläche, «Stütze 300×300» (Rechteck)**
@@ -2134,6 +2379,23 @@ $$
 | Verformung | Feld | $w_{max} = 17.1\,\mathrm{mm}$ | $w_{eff} = 14.0\,\mathrm{mm}$ | $1.22$ |
 
 > **Hinweis:** Risse: Zwängung Normalkraft – 3. Lage: nicht erfüllt (α\_eff = 0.996), ausgeschaltet. N\_s,adm = 754 mm² · 500 N/mm² = 377.0 kN \< N\_Riss = 378.3 kN.
+
+**Kennzahlen**
+
+| Kennzahl | Zeichen | Wert |
+| :--- | :--- | ---: |
+| Bewehrungsmass | $\mu_s$ | $123\,\mathrm{kg}/\mathrm{m}^{3}$ |
+| Höhe der Distanzhalter | $h_{Dist}$ | $186\,\mathrm{mm}$ |
+| Vergrösserungsfaktor, Zug unten | $\omega_w$ | $4.00$ |
+| Vergrösserungsfaktor, Zug oben | $\omega_w'$ | $7.52$ |
+| Momentenwiderstand, Zug unten | $M_{Rd}^{+}(N_{Ed} = 0)$ | $235.9\,\mathrm{kNm}$ |
+| Momentenwiderstand, Zug oben | $M_{Rd}^{-}(N_{Ed} = 0)$ | $-79.9\,\mathrm{kNm}$ |
+| Zugwiderstand | $N_{Rd}^{+}(M_{Ed} = 0)$ | $737.5\,\mathrm{kN}$ |
+| Druckwiderstand | $N_{Rd}^{-}(M_{Ed} = 0)$ | $-6000\,\mathrm{kN}$ |
+| Bezogene Druckzonenhöhe, Zug unten | $\left(x/d\right)^{+}$ | $0.253$ |
+| Bezogene Druckzonenhöhe, Zug oben | $\left(x/d\right)^{-}$ | $0.077$ |
+| Querkraftwiderstand ohne Bügel, grösster | $V_{Rd,max}$ | $272.8\,\mathrm{kN}/\mathrm{m}$ |
+| Querkraftwiderstand ohne Bügel, kleinster | $V_{Rd,min}$ | $165.4\,\mathrm{kN}/\mathrm{m}$ |
 
 ### Unterzug
 
@@ -2248,6 +2510,14 @@ Alle geführten Nachweise sind erfüllt.
 | Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage) | $h_{Dist}$ | $186$ | mm | berechnet |
 | Höhe der Einlage | $e_{Einlage}$ | $0$ | mm | Vorgabe |
 | Plattendicke | $h$ | $300$ | mm | Vorgabe |
+| Momentenwiderstand bei N\_Ed = 0, Zug oben | $M_{Rd}^{-}(N_{Ed} = 0)$ | $-79.9$ | kNm | berechnet |
+| Momentenwiderstand bei N\_Ed = 0, Zug unten | $M_{Rd}^{+}(N_{Ed} = 0)$ | $235.9$ | kNm | berechnet |
+| Druckwiderstand bei M\_Ed = 0 | $N_{Rd}^{-}(M_{Ed} = 0)$ | $-6000$ | kN | berechnet |
+| Zugwiderstand bei M\_Ed = 0 | $N_{Rd}^{+}(M_{Ed} = 0)$ | $737.5$ | kN | berechnet |
+| Querkraftwiderstand ohne Bügel bei M\_Ed = 0 und N\_Ed = 0 | $V_{Rd,max}$ | $272.8$ | kN/m | berechnet |
+| Querkraftwiderstand ohne Bügel bei M\_Ed = M\_Rd und N\_Ed = 0 | $V_{Rd,min}$ | $165.4$ | kN/m | berechnet |
+| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben | $\left(x/d\right)^{-}$ | $0.077$ |  | berechnet |
+| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten | $\left(x/d\right)^{+}$ | $0.253$ |  | berechnet |
 | Bewehrungsquerschnitt 1. Lage Grundbewehrung | $A_{s,1,y,g}$ | $754$ | mm² | berechnet |
 | Stabdurchmesser 1. Lage Grundbewehrung | $\varnothing_{1,y,g}$ | $12$ | mm | Vorgabe |
 | Teilung 1. Lage Grundbewehrung | $s_{1,y,g}$ | $150$ | mm | Vorgabe |
@@ -2292,9 +2562,10 @@ Alle geführten Nachweise sind erfüllt.
 | Erfüllungsgrad sprödes Versagen – 2. Lage x | $\alpha_{eff,SV,2,x}$ | $5.69$ |  | berechnet |
 | Erfüllungsgrad sprödes Versagen – 3. Lage x | $\alpha_{eff,SV,3,x}$ | $1.93$ |  | berechnet |
 | Erfüllungsgrad Verformung – Feld | $\alpha_{eff,w,\text{Feld}}$ | $1.22$ |  | berechnet |
-| Vergrösserungsfaktor der Durchbiegung, Zug unten | $\omega_{w,u}$ | $4$ |  | berechnet |
 | Erfüllungsgrad Zwängung auf Biegung – 2. Lage x | $\alpha_{eff,ZB,2,x}$ | $6.63$ |  | berechnet |
 | Erfüllungsgrad Zwängung auf Biegung – 3. Lage x | $\alpha_{eff,ZB,3,x}$ | $2.16$ |  | berechnet |
+| Vergrösserungsfaktor der Durchbiegung, Zug oben | $\omega_w'$ | $7.52$ |  | berechnet |
+| Vergrösserungsfaktor der Durchbiegung, Zug unten | $\omega_w$ | $4$ |  | berechnet |
 | Fläche des Bruttoquerschnitts | $A$ | $180000$ | mm² | berechnet |
 | Stahlfläche der Bewehrung | $A_{s,tot}$ | $1169$ | mm² | berechnet |
 | Trägheitsmoment um y | $I_y$ | $5400$ | ·10⁶ mm⁴ | berechnet |
