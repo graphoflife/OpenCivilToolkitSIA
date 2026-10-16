@@ -754,9 +754,12 @@ input[readonly], input:disabled, select:disabled {
 
 /* Das Fenster legt sich über die ganze mittlere Tafel. Der Grund rollt,
    nicht die Karte: so bleibt er beim Neuzeichnen stehen, und mit ihm die
-   Stelle, an der man war. */
+   Stelle, an der man war. Die Karte steht in seiner Mitte (Benutzer,
+   2026-10-16) -- mit Rändern «auto» statt mit Zentrieren: ist sie höher als
+   die Tafel, beginnt sie oben, und nichts wird abgeschnitten. */
 .fenster-grund {
   position: absolute; inset: 0; z-index: 20;
+  display: flex; flex-direction: column;
   overflow-y: auto; overscroll-behavior: contain;
   padding: 12px 12px 48px;
   background: rgba(16, 24, 40, .3);
@@ -764,7 +767,7 @@ input[readonly], input:disabled, select:disabled {
 .fenster-grund[hidden] { display: none; }
 /* So breit wie ein Panel, damit darin alles steht wie dort. */
 .fenster {
-  max-width: calc(var(--panelbreite) + 2px); margin: 0 auto;
+  width: 100%; max-width: calc(var(--panelbreite) + 2px); margin: auto;
   background: var(--panel); border: 1px solid var(--rand-stark); border-radius: 10px;
   box-shadow: 0 12px 32px rgba(16, 24, 40, .22), 0 2px 6px rgba(16, 24, 40, .1);
 }
@@ -1321,9 +1324,12 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
     background: var(--flaeche);
   }
   .tafelwahl .reiter-knopf { flex: 1; padding: 9px 6px; font-size: 13px; }
+  /* Die Anzeige, wo gerechnet wird, steht über der Reiterleiste -- auf ihr
+     lag sie über dem ersten Reiter, «Projekt». */
+  .fussleiste { bottom: calc(var(--wahlhoehe) + 4px); }
 
-  /* Kopfleiste: der Projektname braucht die ganze Zeile, die Knöpfe rutschen
-     darunter. Damit die Höhe stimmt, wächst die Variable mit. */
+  /* Kopfleiste: Marke, Knöpfe und Zustand stehen untereinander. Damit die
+     Höhe stimmt, wächst die Variable mit. */
   :root { --kopfhoehe: 96px; --wahlhoehe: 46px; }
   .kopfleiste { flex-wrap: wrap; align-content: center; padding: 6px 10px; gap: 8px; }
   .kopfleiste .marke { font-size: 15px; }
