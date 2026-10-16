@@ -67,6 +67,152 @@ gelernt wurde, steht in [[Entwicklung]].
       (`bs_symbole.js`, die verbundene Zeichnung in `cad_modell.js`) --
       geprüft von Hand im Browser.
 
+## Umbau: Befunde der Durchsicht vom 2026-10-16
+
+Sechs Durchsichten über die Arbeit vom 15. und 16. Oktober (42 Commits);
+jeder Punkt ist am Code nachgeprüft. Zuerst vier Fehler mit Folge, dann der
+Umbau in der empfohlenen Reihenfolge.
+
+- [ ] **Zuerst: ein abgelegtes Projekt, das sich nicht öffnen lässt, geht
+      verloren.** `projektHolen` startet dann mit dem Beispiel und meldet
+      «Nicht gelöscht» (`ablage.js`), aber die erste Änderung schreibt das
+      Beispiel auf denselben Speicherplatz (`zustand.js`, `projektAendern`).
+      Über die Oberfläche auslösbar: zwei Fälle gleich benennen, neu laden.
+      Seit 2026-10-16 trifft es auch jeden alten Speicherstand. Besser: den
+      unlesbaren Stand vor dem ersten Schreiben unter einem eigenen Schlüssel
+      sichern, und gleiche Namen erst beim Rechnen melden (siehe «Form beim
+      Lesen, Inhalt vor dem Rechnen»).
+- [ ] **Zuerst: die Konsole hängt bei NaN.** `konsole/dienst.py` baut den
+      JSON-Umschlag ein zweites Mal, ohne `endlich` und `allow_nan=False`
+      aus dem Rechenkern. `plt.plot(…, lw=float("nan"))` schickt `NaN`,
+      `JSON.parse` scheitert, und die Konsole bleibt bei «Läuft …». Besser:
+      ein Modul `web/umschlag.py` (`endlich`, `nach_json`, Fehlerform) für
+      beide Dienste.
+- [ ] **Zuerst: ein Bügelstahl lässt sich löschen, obwohl eine Platte ihn
+      braucht.** Der Löschschutz in `baum.js` (`MATERIALIEN`) kennt nur
+      Beton und Lagen; der nächste Lauf scheitert. Besser: der Kern
+      beantwortet, wer ein Material braucht (`materialien()` je Eintrag,
+      ein Dienst `verweise`); die drei Nachbauten im JS fallen weg.
+- [ ] **Zuerst: «Wand A» und «Wand-A» ergeben eine interne Meldung.** Ob
+      zwei Namen als Wert-ID gleich werden, prüfen nur drei von neun Listen
+      (`eintraege.py`, `projekt/grundbruch.py`). Bei Knick-, Spannungs- und
+      Lastfällen meldet erst das Rechenwerk «Wert … ist bereits mit
+      abweichender Definition bekannt». Besser: `eindeutig()` prüft beides,
+      und die drei Kopien fallen weg.
+- [ ] **Platte und gezeichneter Querschnitt: ein Nachweis, zwei
+      Geometrien.** Heute gibt es zwei Umsetzungen:
+      - `SpannungsbegrenzungQA` kopiert `Spannungsbegrenzung`, mit gleichem
+        `_urteil` und gleichem Satz «Stahl fliesst». Der Kopf der Platte
+        verbietet genau das.
+      - Die Rissgrössen stehen viermal und sagen schon Verschiedenes: Das
+        Rissmoment der Analyse rechnet ohne `I_yz`, das des Nachweises mit.
+        Für die rissaktive Dicke unter Zug gibt es vier Regeln.
+      - 14 Beschreibungsfelder, die Aufbaufunktionen und die Kapitel der
+        Oberfläche stehen doppelt.
+
+      Besser: je Nachweis ein Modul, je Geometrie ein schmaler Adapter
+      (Stellen, Ebene je Fall, Bruttoquerschnitt), so wie das Knicken über
+      `Knickstab` schon geschnitten ist. Vorher entscheiden: Rissmoment mit
+      oder ohne `I_yz`, und welche Dicke unter Zug gilt.
+- [ ] **Form beim Lesen, Inhalt vor dem Rechnen.** Heute wird zu drei
+      Zeitpunkten ohne Regel geprüft:
+      - `haeufig.anteil = 0` hält das Öffnen auf, `x_d_max = 0.9` und
+        `h = 0` erst das Rechnen.
+      - «Nicht negativ» gilt bei der Kriechzahl beim Lesen, bei der
+        Überdeckung beim Bauen.
+      - Es gibt fünf Formen von `pruefen` und zwei von `zahlen_pruefen`.
+
+      Besser: Bereiche am Feld (`bereich(…, ueber=0, bis=…)` statt
+      `nicht_negativ`), eine `inhalt_pruefen` vor dem Rechnen, und je Eintrag
+      nur noch die Regeln über mehrere Felder.
+- [ ] **Wahlfelder als Enum statt als Text.** Rund dreissig Stellen machen
+      aus dem Text wieder das Mitglied (`Rissanforderung(…)` 11×,
+      `Rechenwahl.aus` 4×, …), und neun Tupel wie `WERKSTOFFSAETZE` halten die
+      Werte. Besser: Der Leser kennt Enums, und die Teilmengen je Kapitel
+      stehen am Feld einer Unterklasse.
+- [ ] **Die Werkstoffgesetze an einer Stelle anschreiben.** Vier Stellen
+      schreiben sie in die Herleitung, jede mit eigener Weiche (`isinstance`,
+      `art is ELASTISCH`, `mit_block`): `rechenwahl.protokoll_gesetze`,
+      `schnittanalyse.protokoll_gesetze_nach_wahl`,
+      `Querschnittsanalyse.werkstoffe_protokollieren` und
+      `spannungsanalyse.herleitung`. Besser: `gesetz.protokoll(p, werte,
+      titel)`. Dazu ist der Schalter `gemittelt` überflüssig: Das Gesetz
+      weiss selbst, ob es springt (`mittel`), und der gezeichnete Querschnitt
+      nutzt das schon.
+- [ ] **Schichten: `querschnitt` importiert aus `nachweis`.** Das tun seit
+      2026-10-15/16 `analyse.py` und `schnittanalyse.py`; den Zyklus umgeht
+      ein Import in der Funktion (`spannungsanalyse.analysen`). Besser:
+      `Werkstoffsatz`, `Rechenart`, `Rechenwahl`, `betongesetz` und
+      `wirksamer_modul` nach `querschnitt/`, `schnittanalyse.py` neben
+      `spannungsanalyse.py`, und das Löserpaar als Protokoll statt `Any`.
+- [ ] **Der Löser bekommt seine Suche als Objekt.**
+      - Illinois und Halbieren sind Unterklassen samt Raute
+        (`QuerschnittsloeserIllinois`, `klasse=`). Sie schalten sich mit
+        `if self.halbiert` an vier Stellen wieder ab.
+      - Illinois steht zweimal, das Eingrenzen fünfmal.
+      - Folge: Die Herleitung der schiefen Biegung sagt «zwei geschachtelte
+        Halbierungen», gesucht wird aber mit Illinois
+        (`gebrauchsebene.SUCHE_DER_EBENE`).
+
+      Besser: ein Modul `suche.py`; der Löser bekommt seine Suche und
+      beschreibt sie selbst. Dazu gehört das Suchfenster an eine Stelle; heute
+      grenzen Knicken, Stahlspannung und Analyse es je anders ab. Das kann
+      Zahlen nahe der Grenze ändern -- deine Entscheidung.
+- [ ] **Kennzahlen: Die Querkraft schreibt ihre Herleitung selbst.**
+      - `kennzahlen.py` schreibt V_Rd,s, V_Rd,c und d_v ein zweites Mal. Ein
+        erzwungenes `einlage=0.0` bringt «Wirksame Höhe (Einlage nicht
+        massgebend) d_v = d» in den Bügelteil.
+      - Die Tabelle hängt an der Handliste `_KENNZAHLEN`.
+      - Was fehlt, wird 0: Ohne obere Bewehrung steht «(x/d)⁻ = 0».
+
+      Besser: `querkraft.py` bietet Funktionen an, die rechnen und schreiben,
+      und jeder Erzeuger nennt seine Kennzahlen selbst. Was fehlt, fehlt.
+- [ ] **Apps: eine Zeile je App.** Material und Python laufen in `baum.js`,
+      `editor.js`, `zustand.js` und `app.js` als Sonderwege; je App stehen
+      zehn Tabellen in drei Dateien. Besser: `apps.js` mit einer Zeile je
+      App; die gemeinsamen Abläufe schlagen nur noch nach.
+- [ ] **Eine Zugseite.** Sie steht in sechs Formen da: Enum `Zugseite`,
+      Tupel `RICHTUNGEN`, `verformung.ZUGSEITEN` als Text, `pos`/`neg`,
+      `+`/`-` und drei Winkelausdrücke. Dazu läuft `einachsig` durch sechs bis
+      elf Signaturen. Besser: ein Enum in einem neutralen Modul; `einachsig`
+      gehört der Analyse.
+- [ ] **Kern-Wissen im JS, neu dazugekommen:**
+      - Die Einheiten der Grundbruch-Eingaben stehen dreimal: `aufbau.py`,
+        `geotechnik/grundbruch.py`, `grundbruch.js`. Weichen zwei davon ab,
+        wird eine Zahl still um 10³ umgedeutet.
+      - `Math.round` rundet Neigungen (37.5 → 38).
+      - Beim Umschalten der Teilung setzt das JS eigene Vorgaben (`|| 150`).
+      - Die Analysearten und ihre Einheiten stehen zweimal (`nachweise.js`,
+        `spannungsbild.js`); E_eq/E_cm rechnet die Oberfläche.
+
+      Besser: Der Katalog liefert je Feld Einheit, Symbol, Bereich und Wahl.
+- [ ] **Dateien:**
+      - Neu über 1000 Zeilen:
+        - `aufbau.py` (960 → 1080): ein Paket je Bauteilart, die Teilung
+          liegt schon da.
+        - `nachweise.js` (931 → 1103): nach Abnehmern teilen in mit der
+          Analyse geteilt, nur Platte, und Bewehrungssuche.
+        - `test_beschreibung.py` (945 → 1015): `TestVorgabenAnEinerStelle`
+          prüft seit dem neuen Leser nur noch, was die Bauart garantiert.
+      - `spannungsanalyse.py` wuchs auf 1316 Zeilen, `querschnittsloeser.py`
+        steht bei 995.
+- [ ] **Kleineres:**
+      - Aus dem früheren Punkt C2 ist «je Rechenart eine Tabellenzeile»
+        nicht gemacht.
+      - Fünf Gesetzklassen tragen dieselbe Hülle; `fasern.py` nutzt `getattr`
+        als Ententyp.
+      - «Ungerissen» geht zweimal anders: Die Platte gibt ein Gesetz mit, die
+        Analyse einen Schalter.
+      - Grundbruch: Das Nachweisgerüst steht zweimal, und im Zweig «zu
+        schräg» kommt N_Rd = 0 aus den Vorgaben der Datenklasse.
+      - `verformung.py` schreibt die statische Höhe neu: 248.1 mm heissen
+        einmal d_{2,x}, einmal d_u.
+      - Die leere Lage bekommt still den ersten Stahl.
+      - Die Fallzeile ist siebenmal gebaut, und das Stilblatt zählt ihre
+        Kinder.
+      - Die Pakete laden über vier Schichten, obwohl Pyodide es selbst kann
+        (`loadPackagesFromImports`). Das ändert eine mitgelieferte Datei.
+
 ## Umbau: Befunde der Strukturdurchsicht (2026-10-12)
 
 Neun Durchsichten haben je einen Bereich ganz gelesen; jeder Punkt ist am
