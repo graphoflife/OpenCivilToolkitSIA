@@ -77,6 +77,8 @@
   --unterakzent:  #9aabc4;
 
   --radius:       7px;
+  /* Die Höhe der Köpfe aller drei Tafeln -- eine Zahl, damit sie gleich bleiben. */
+  --tafelkopf:    48px;
   --schatten:     0 1px 2px rgba(16,24,40,.06), 0 2px 6px rgba(16,24,40,.08);
 
   --breite-links: 300px;
@@ -240,17 +242,35 @@ a.knopf { display: inline-block; text-decoration: none; }
   background: var(--flaeche);
   border-right: 1px solid var(--rand);
 }
-.tafel-rechts { border-right: none; background: var(--grund); }
+/* Weiss wie die anderen Tafeln; grau sind darin nur die Panels (Benutzer,
+   2026-10-16). */
+.tafel-rechts { border-right: none; }
 /* Bezug für das Fenster, das sich über die Eingaben legt. */
 .tafel-mitte { position: relative; }
 
+/* Die Köpfe der drei Tafeln sind gleich hoch und brechen nicht um (Benutzer,
+   2026-10-16): oben links der Projektname, in der Mitte der Name des
+   Bestandteils, rechts Umfang und Reiter -- auf einer Linie. Was rechts
+   nicht hineinpasst, rollt quer, statt den Kopf höher zu machen. */
 .tafel-kopf {
-  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  padding: 9px 12px; min-height: 42px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: nowrap;
+  height: var(--tafelkopf); padding: 0 12px;
   border-bottom: 1px solid var(--rand);
   border-top: 3px solid var(--blau);
   background: linear-gradient(var(--flaeche-2), var(--flaeche));
   flex: none;
+}
+.tafel-rechts .tafel-kopf { overflow-x: auto; scrollbar-width: none; }
+.tafel-rechts .tafel-kopf > * { flex: none; }
+.tafel-kopf .reiter { flex-wrap: nowrap; }
+.tafel-kopf .reiter-knopf { padding-block: 4px; white-space: nowrap; }
+/* Ist die rechte Tafel schmal, fällt zuerst ihr Titel weg -- «Berechnung»
+   steht schon unten in der Wahl der Tafeln -- und die Reiter rücken
+   zusammen. So passt der Kopf noch bei 480 px auf eine Zeile. */
+.tafel-rechts { container: tafelrechts / inline-size; }
+@container tafelrechts (max-width: 600px) {
+  .tafel-rechts .tafel-kopf h2 { display: none; }
+  .tafel-rechts .tafel-kopf .reiter-knopf { padding-inline: 7px; }
 }
 /* Der Kopf der Eingaben bricht um, statt mit einem langen Namen die ganze
    Spalte breiter zu machen. */
@@ -259,7 +279,9 @@ a.knopf { display: inline-block; text-decoration: none; }
 /* Zuoberst links der Name des Projekts, neben dem Titel der Tafel. Sonst wie
    jede Eingabe -- nur fett, weil er das ganze Projekt benennt. */
 .tafel-kopf-projekt { flex-wrap: nowrap; }
-.tafel-kopf-projekt input.projektname { flex: 1 1 auto; min-width: 0; font-weight: 600; }
+.tafel-kopf-projekt input.projektname {
+  flex: 1 1 auto; min-width: 0; height: 30px; font-weight: 600;
+}
 .tafel-mitte  .tafel-kopf { border-top-color: var(--stahl); }
 .tafel-rechts .tafel-kopf { border-top-color: var(--blau); }
 
@@ -1309,6 +1331,12 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
    Die Grenze liegt bei 900 px: darunter bliebe für die rechte Tafel weniger
    als ihre Mindestbreite, und ein Drittel eines Diagramms ist kein Diagramm. */
 @media (max-width: 900px) {
+  /* Auf dem Telefon ist der Platz zu knapp für eine Zeile: dort bricht der
+     Kopf um und wird höher. */
+  .tafel-kopf { height: auto; min-height: var(--tafelkopf); padding: 9px 12px; flex-wrap: wrap; }
+  .tafel-rechts .tafel-kopf { overflow-x: visible; }
+  .tafel-kopf .reiter { flex-wrap: wrap; }
+
   .raster {
     grid-template-columns: 1fr;
     height: calc(100vh - var(--kopfhoehe) - var(--wahlhoehe));
