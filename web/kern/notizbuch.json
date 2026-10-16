@@ -398,6 +398,17 @@
       ]
     },
     {
+      "name": "Beton linear, ohne Zug",
+      "pfad": "Formelsammlung/Formeln/Beton linear, ohne Zug.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Stahlspannung aus Rissbreite",
+        "Stahlspannung gegen Fliessen",
+        "Zwängung auf Biegung"
+      ]
+    },
+    {
       "name": "Beton ungerissen, in Druck und Zug",
       "pfad": "Formelsammlung/Formeln/Beton ungerissen, in Druck und Zug.md",
       "art": "formel",
@@ -552,8 +563,11 @@
       "zeichen": [],
       "themen": [
         "Schiefe Biegung",
+        "Stahlspannung aus Rissbreite",
+        "Stahlspannung gegen Fliessen",
         "Knicken",
-        "Biegung und Normalkraft"
+        "Biegung und Normalkraft",
+        "Zwängung auf Biegung"
       ]
     },
     {
@@ -3123,6 +3137,7 @@
         "Werkstoffsatz.stahl",
         "Werkstoffsatz.beton",
         "Werkstoffsatz.stahl_zeichen",
+        "Werkstoffsatz.stahl_druck_zeichen",
         "Werkstoffsatz.beton_zeichen"
       ]
     },
@@ -4066,21 +4081,28 @@
         "Betongesetz",
         "Betongesetz.mit_modul",
         "Betongesetz.spannung",
+        "Betongesetz.seite",
         "Betongesetz.latex",
         "Spannungsblock",
         "Spannungsblock.eps_knick",
         "Spannungsblock.spannung",
         "Spannungsblock.mittel",
+        "Spannungsblock.seite",
         "Spannungsblock.latex",
         "Stahlgesetz",
         "Stahlgesetz.spannung",
         "Stahlgesetz.eps_yd",
+        "Stahlgesetz.seite",
         "Stahlgesetz.latex",
         "_stahlfunktion",
         "BetonElastisch",
         "BetonElastisch.spannung",
+        "BetonElastisch.seite",
+        "BetonElastisch.latex",
         "BetonUngerissen",
         "BetonUngerissen.spannung",
+        "BetonUngerissen.seite",
+        "BetonUngerissen.latex",
         "Dehnungsebene",
         "Dehnungsebene.durch_zwei_punkte",
         "Dehnungsebene.bei",

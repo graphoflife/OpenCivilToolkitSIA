@@ -653,46 +653,43 @@ class Querschnittsanalyse:
             if stoff.art is Baustoffart.BETON:
                 f_c = w("f_cd") if bemessung else w("f_ck")
                 eps_c1d, eps_c2d = w("eps_c1d"), w("eps_c2d")
-                # Stetig bis an die Grenzen: die Interaktion faehrt den Rand ab.
                 if self.betongesetz(stoff) == "block":
-                    gesetz = Spannungsblock(f_cd=f_c, eps_c2d=eps_c2d, bricht=False)
+                    gesetz = Spannungsblock(f_cd=f_c, eps_c2d=eps_c2d)
                 else:
                     k = (self.kennwert(e, stoff, "k_sigma") if bemessung
                          else _K_SIGMA.funktion(E_cd=w("E_cd"), f_cd=f_c))
                     gesetz = Betongesetz(f_cd=f_c, eps_c1d=eps_c1d, eps_c2d=eps_c2d,
-                                         k_sigma=k, bricht=False)
+                                         k_sigma=k)
                 liste.append(Werkstoff(stoff.name, gesetz, -eps_c2d, math.inf,
                                        c_punkt=(eps_c1d, eps_c2d), verdraengbar=True))
             else:
                 gesetz = Stahlgesetz(
                     E_s=w("E_s"), f_yd=w("f_yd") if bemessung else w("f_yk"),
                     f_yd_druck=w("f_yd_druck") if bemessung else w("f_yk_druck"),
-                    eps_ud=w("eps_ud"), bricht=False)
+                    eps_ud=w("eps_ud"))
                 liste.append(Werkstoff(stoff.name, gesetz, -gesetz.eps_ud, gesetz.eps_ud))
             index[stoff.id] = len(liste) - 1
         return liste, (lambda stoff: index[stoff.id])
 
     def werkstoffe_protokollieren(self, p: Protokoll, e: Eingaben, basis: str) -> None:
-        """Die Gesetze, mit denen gerechnet wird, und die Werte darin."""
+        """Die Gesetze, mit denen gerechnet wird -- sie schreiben sich selbst --, und die Werte darin."""
         werte = Zwischenwerte(basis)
+        werkstoffe, index = self.werkstoffe(e)
         for stoff in self.baustoffe:
+            gesetz = werkstoffe[index(stoff)].gesetz
             bemessung = self.satz(stoff) == "bemessung"
             satz = "Bemessungswerte" if bemessung else "charakteristische Werte"
             symbol = lambda k: stoff.definition(k).symbol
             if stoff.art is Baustoffart.BETON:
                 f_c = "f_cd" if bemessung else "f_ck"
                 zeichen = "f_{cd}" if bemessung else "f_{ck}"
-                gesetz = (Spannungsblock if self.betongesetz(stoff) == "block"
-                          else Betongesetz)
-                if gesetz is Spannungsblock:
-                    latex = Spannungsblock(1.0, 1.0).latex(zeichen)
+                if isinstance(gesetz, Spannungsblock):
                     titel = f"{stoff.name}: Spannungsblock 0.85·x, {satz}"
                     referenz = ""
                 else:
-                    latex = Betongesetz(1.0, 1.0, 1.0, 1.0).latex(zeichen)
                     titel = f"{stoff.name}: Parabel-Rechteck-Beziehung, {satz}"
                     referenz = "SIA 262:2025, 4.2.1.6"
-                p.ansatz(latex, titel=titel, referenz=referenz, name=gesetz.NAME)
+                p.ansatz(gesetz.latex(zeichen), titel=titel, referenz=referenz, name=gesetz.seite)
                 if not bemessung and self.betongesetz(stoff) != "block":
                     k = _K_SIGMA.funktion(E_cd=abs(self.kennwert(e, stoff, "E_cd")),
                                           f_cd=abs(self.kennwert(e, stoff, "f_ck")))
@@ -709,10 +706,9 @@ class Querschnittsanalyse:
                     ausrichtung="lr")
             else:
                 f_s = "f_yd" if bemessung else "f_yk"
-                latex = (Stahlgesetz(1.0, 1.0, 1.0, 1.0).latex() if bemessung
-                         else Stahlgesetz(1.0, 1.0, 1.0, 1.0).latex("f_{yk}", "f_{yk}^{-}"))
-                p.ansatz(latex, titel=f"{stoff.name}: bilineare Beziehung, {satz}",
-                         referenz="SIA 262:2025, 4.2.2.4", name=Stahlgesetz.NAME)
+                p.ansatz(gesetz.latex(symbol(f_s), symbol(f"{f_s}_druck")),
+                         titel=f"{stoff.name}: bilineare Beziehung, {satz}",
+                         referenz="SIA 262:2025, 4.2.2.4", name=gesetz.seite)
                 p.tabelle(kopf=["Kennwert", "Wert"], zeilen=[
                     [Mathe(symbol(k)), Mathe(e[self._name(stoff, k)].zahl_latex())]
                     for k in (f_s, f"{f_s}_druck", "E_s", "eps_ud")],

@@ -1,5 +1,5 @@
 ---
-erzeugt: d47f3335f9c6
+erzeugt: 006221ca8519
 art: modul
 tags: [modul]
 ---
@@ -345,6 +345,8 @@ gerufen. Mit `protokoll` schreibt jede Linie ihre Herleitung.
 
 ## Formeln aus diesem Modul
 
+- [[Beton linear, ohne Zug]] · `protokoll_gesetze_nach_wahl`
+- [[Bilineare Beziehung des Betonstahls]] · `protokoll_gesetze_nach_wahl`
 - [[Grösste Dehnung im Schwerpunkt]] · `Schnittpaar.herleitung_dehnung_am_ende`
 - [[Rissmoment bei der Normalkraft]] · `Schnittpaar.herleitung_riss`
 - [[Rissnormalkraft beim Moment]] · `Schnittpaar.herleitung_riss`

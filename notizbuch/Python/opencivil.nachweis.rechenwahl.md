@@ -1,5 +1,5 @@
 ---
-erzeugt: fbf41a2e7048
+erzeugt: 341bf1350a4d
 art: modul
 tags: [modul]
 ---
@@ -362,25 +362,28 @@ Rechenart. Zurueck kommt phi als Wert -- fuer die Formeln danach.
 def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *, titel: str, posten) -> None
 ```
 
-Die Werkstoffgesetze der Wahl, mit den Zeichen ihres Wertesatzes.
+Die Werkstoffgesetze der Wahl, so wie gerechnet wird: jedes Gesetz
+schreibt sich selbst ([[opencivil.querschnitt.werkstoffgesetz]]), mit
+den Zeichen seines Wertesatzes -- auch was jenseits der Grenzdehnung
+gilt und das Plateau des gedrueckten Stahls. Bis 2026-10-16 stand hier
+eine Formel von Hand, ohne beides.
 
-Der Stahl steht mit der Festigkeit jeder Sorte der Posten da; bei einer
-Sorte mit ihrem Zeichen, bei mehreren mit dem allgemeinen und je Sorte
-einer Angabe dahinter.
-
-Der wirksame Modul steht nicht hier: wo er gebraucht wird, schreibt ihn
-das Kapitel an der Stelle, an der er erklaert wird
-([[opencivil.nachweis.querschnittsloeser#protokoll_wirksamer_modul|protokoll_wirksamer_modul]]).
+Der Stahl steht mit den Festigkeiten jeder Sorte der Posten da; bei einer
+Sorte mit ihren Zeichen, bei mehreren mit den allgemeinen und je Sorte
+einer Angabe dahinter. Der wirksame Modul steht nicht hier: wo er
+gebraucht wird, schreibt ihn das Kapitel an der Stelle, an der er erklaert
+wird ([[opencivil.nachweis.querschnittsloeser#protokoll_wirksamer_modul|protokoll_wirksamer_modul]]).
 
 ### protokoll_betongesetz
 
 ```python
-def protokoll_betongesetz(p: Protokoll, wahl: Rechenwahl, f_c: Wert, E_cm: Wert, basis: str, *, titel: str) -> None
+def protokoll_betongesetz(p: Protokoll, wahl: Rechenwahl, gesetz: Gesetz, f_c: Wert, E_cm: Wert, basis: str, *, titel: str) -> None
 ```
 
-Der Beton einer Wahl mit Block oder Parabel -- bei der Parabel samt ihrem
-Beiwert aus dem wirksamen Modul `E_cm/(1+phi)`. `f_c` ist die
-Festigkeit des Wertesatzes, `f_cd` oder `f_ck`.
+Der Beton einer Wahl mit Block oder Parabel, so wie `gesetz` rechnet --
+bei der Parabel samt ihrem Beiwert aus dem wirksamen Modul
+`E_cm/(1+phi)`. `f_c` ist die Festigkeit des Wertesatzes, `f_cd`
+oder `f_ck`.
 
 ### gesetze
 
@@ -400,7 +403,6 @@ das Knicken und die Analysen mit dem der ersten Lage.
 - `FASERARTEN = (Rechenart.BLOCK, Rechenart.PARABEL)` – Was das Knicken und die Spannung-Dehnung-Analysen anbieten: nur, was ueber die Fasern rechnet -- siehe «Wer was anbietet» oben.
 - `FASERSPANNUNGSARTEN = FASERARTEN + (Rechenart.ELASTISCH,)` – Die Stahlspannungen des gezeichneten Querschnitts: ueber die Fasern, dazu elastisch -- eine Handrechnung gibt es dort nicht.
 - `VERFORMUNGSARTEN = (Rechenart.PARABEL,)` – Was die Verformung beim Knicken anbietet: nur praezise -- siehe «Wer was anbietet» oben.
-- `STAHL_NUR_ZUG = 'Betonstahl nur auf Zug'` – Die Seite im Notizbuch fuer den Stahl der Handrechnung, der nur Zug traegt.
 
 ## Braucht
 
@@ -431,6 +433,8 @@ das Knicken und die Analysen mit dem der ersten Lage.
 ## Formeln aus diesem Modul
 
 - [[Beiwert der Parabel, mit dem wirksamen Modul]] · `protokoll_betongesetz`
+- [[Beton linear, ohne Zug]] · `protokoll_gesetze`
 - [[Betonstahl nur auf Zug]] · `protokoll_gesetze`
+- [[Bilineare Beziehung des Betonstahls]] · `protokoll_gesetze`
 - [[Parabel-Rechteck-Beziehung des Betons]] · `protokoll_betongesetz`
 - [[Spannungsblock des Betons]] · `protokoll_betongesetz`

@@ -1,5 +1,5 @@
 ---
-erzeugt: 471ee123299c
+erzeugt: 1c39f10a8dce
 art: formel
 tags: [formel]
 ---
@@ -9,7 +9,7 @@ tags: [formel]
 *In der Herleitung: «Werkstoffgesetze im Gebrauchszustand: Stahl, nur auf Zug»*
 
 $$
-\sigma_s = \begin{cases} \min\left(E_s \cdot \varepsilon_s;\ f_{yk}\right) & \varepsilon_s > 0 \\[1ex] 0 & \varepsilon_s \le 0 \quad (\text{gedrückt: weggelassen}) \end{cases}
+\sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & 0 < \varepsilon_s \le \varepsilon_{ud} \\[1ex] 0 & \varepsilon_s \le 0 \quad (\text{gedrückt: weggelassen}) \\[1ex] 0 & \varepsilon_s > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
 ## Im Code
@@ -35,3 +35,6 @@ Beim Knicken und in den Spannung-Dehnung-Analysen steht die Handrechnung seit
 2026-10-12 nicht mehr zur Wahl: dort wird die Normalkraft Ebene für Ebene
 genau gerechnet, und ein Polygon aus Eckpunkten wäre nur eine schlechtere
 0.85·x-Vereinfachung.
+
+Jenseits von $\varepsilon_{ud}$ trägt er auch auf Zug nichts mehr, wie die
+[[Bilineare Beziehung des Betonstahls|bilineare Beziehung]].

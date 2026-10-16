@@ -1,5 +1,5 @@
 ---
-erzeugt: 8f3d24a40f54
+erzeugt: 3a583661b97f
 art: modul
 tags: [modul]
 ---
@@ -328,7 +328,7 @@ Dehnungsgrenzen bleiben -- wie beim Loeser der Platte
 def werkstoffe_protokollieren(self, p: Protokoll, e: Eingaben, basis: str) -> None
 ```
 
-Die Gesetze, mit denen gerechnet wird, und die Werte darin.
+Die Gesetze, mit denen gerechnet wird -- sie schreiben sich selbst --, und die Werte darin.
 
 #### Querschnittsanalyse.grundbezuege
 

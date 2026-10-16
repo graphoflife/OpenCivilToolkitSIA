@@ -155,9 +155,6 @@ FASERSPANNUNGSARTEN = FASERARTEN + (Rechenart.ELASTISCH,)
 #: anbietet» oben.
 VERFORMUNGSARTEN = (Rechenart.PARABEL,)
 
-#: Die Seite im Notizbuch fuer den Stahl der Handrechnung, der nur Zug traegt.
-STAHL_NUR_ZUG = "Betonstahl nur auf Zug"
-
 
 @dataclass(frozen=True)
 class Rechenwahl:
@@ -322,7 +319,7 @@ def betongesetz(wahl: Rechenwahl, *, f_c: float, E_cm: float, eps_c1d: float,
     if wahl.art is Rechenart.PARABEL:
         return Betongesetz.mit_modul(f_c=f_c, E_c=wirksamer_modul(E_cm, wahl.kriechzahl),
                                      eps_c1d=eps_c1d, eps_c2d=eps_c2d)
-    return Spannungsblock(f_cd=f_c, eps_c2d=eps_c2d, bricht=False)
+    return Spannungsblock(f_cd=f_c, eps_c2d=eps_c2d)
 
 
 @dataclass(frozen=True)
@@ -334,7 +331,7 @@ class Gesetze:
 
     def stahl(self, s: Stahlgesetz) -> Stahlgesetz:
         """Der Stahl einer Lage, wie der Loeser ihn rechnet -- in der Handrechnung nur auf Zug."""
-        return replace(s, nur_zug=self.wahl.art is Rechenart.HANDRECHNUNG, bricht=True)
+        return replace(s, nur_zug=self.wahl.art is Rechenart.HANDRECHNUNG)
 
     @property
     def gemittelt(self) -> bool:
@@ -387,29 +384,21 @@ def protokoll_rechenwahl(p: Protokoll, wahl: Rechenwahl, basis: str, *,
 def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *,
                       titel: str, posten) -> None:
     """
-    Die Werkstoffgesetze der Wahl, mit den Zeichen ihres Wertesatzes.
+    Die Werkstoffgesetze der Wahl, so wie gerechnet wird: jedes Gesetz
+    schreibt sich selbst (:mod:`opencivil.querschnitt.werkstoffgesetz`), mit
+    den Zeichen seines Wertesatzes -- auch was jenseits der Grenzdehnung
+    gilt und das Plateau des gedrueckten Stahls. Bis 2026-10-16 stand hier
+    eine Formel von Hand, ohne beides.
 
-    Der Stahl steht mit der Festigkeit jeder Sorte der Posten da; bei einer
-    Sorte mit ihrem Zeichen, bei mehreren mit dem allgemeinen und je Sorte
-    einer Angabe dahinter.
-
-    Der wirksame Modul steht nicht hier: wo er gebraucht wird, schreibt ihn
-    das Kapitel an der Stelle, an der er erklaert wird
-    (:func:`~opencivil.nachweis.querschnittsloeser.protokoll_wirksamer_modul`).
+    Der Stahl steht mit den Festigkeiten jeder Sorte der Posten da; bei einer
+    Sorte mit ihren Zeichen, bei mehreren mit den allgemeinen und je Sorte
+    einer Angabe dahinter. Der wirksame Modul steht nicht hier: wo er
+    gebraucht wird, schreibt ihn das Kapitel an der Stelle, an der er erklaert
+    wird (:func:`~opencivil.nachweis.querschnittsloeser.protokoll_wirksamer_modul`).
     """
     satz = wahl.satz
+    g = gesetze(wahl, Betonkennwerte.aus_eingaben(e, satz))
     f_c = e[satz.beton]
-    festigkeiten = [e[stahlname(satz.stahl, s)] for s in staehle(posten)]
-    f_s = festigkeiten[0].symbol if len(festigkeiten) == 1 else satz.stahl_zeichen
-    angaben = r" \quad ".join(angabe(w) for w in festigkeiten)
-    if wahl.art is Rechenart.ELASTISCH:
-        p.gleichung(
-            rf"\sigma_s = \min\left[E_s \cdot \varepsilon_s;\ {f_s}\right]"
-            rf" \quad {angaben} \qquad "
-            rf"\sigma_c = \max\left[E_{{c,eff}} \cdot \varepsilon_c;\ -{f_c.symbol}\right]"
-            rf" \quad {angabe(f_c)}",
-            titel=titel)
-        return
     if wahl.art is Rechenart.HANDRECHNUNG:
         p.erklaerung(
             "Mit der Handrechnung rechnet der Querschnitt wie die Resistenzlinie "
@@ -417,42 +406,47 @@ def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *
             "Bewehrung weggelassen, die Bewehrung jeder Seite zu einer Lage in "
             "ihrem Schwerpunkt zusammengefasst, und der Beton auch dort gezählt, "
             "wo der Stahl liegt.")
-    protokoll_betongesetz(p, wahl, f_c, e["E_cm"], basis, titel=titel)
-    if wahl.art is Rechenart.HANDRECHNUNG:
-        p.ansatz(
-            r"\sigma_s = \begin{cases} \min\left(E_s \cdot \varepsilon_s;\ "
-            + f_s + r"\right) & \varepsilon_s > 0 \\[1ex]"
-            r" 0 & \varepsilon_s \le 0 \quad (\text{gedrückt: weggelassen})"
-            r" \end{cases}",
-            titel=f"{titel}: Stahl, nur auf Zug", name=STAHL_NUR_ZUG)
+    if wahl.art is Rechenart.ELASTISCH:
+        p.ansatz(g.beton.latex(f=f_c.symbol), titel=f"{titel}: Beton, linear ohne Zug",
+                 name=g.beton.seite)
+        p.gleichung(angabe(f_c), titel=f"{titel}: Festigkeit des Betons")
     else:
-        p.gleichung(
-            rf"\sigma_s = \min\left[E_s \cdot \varepsilon_s;\ {f_s}\right]"
-            rf" \quad {angaben}", titel=f"{titel}: Stahl")
+        protokoll_betongesetz(p, wahl, g.beton, f_c, e["E_cm"], basis, titel=titel)
+
+    sorten = staehle(posten)
+    stahl = g.stahl(stahllagen(posten, satz, werte_nach_id(e))[0].stahl)
+    zug = [e[stahlname(satz.stahl, s)] for s in sorten]
+    druck = [] if stahl.nur_zug else [e[stahlname(satz.stahl_druck, s)] for s in sorten]
+    p.ansatz(stahl.latex(zug[0].symbol if len(zug) == 1 else satz.stahl_zeichen,
+                         druck[0].symbol if len(druck) == 1 else satz.stahl_druck_zeichen),
+             titel=f"{titel}: Stahl, {'nur auf Zug' if stahl.nur_zug else 'bilinear'}",
+             referenz="" if stahl.nur_zug else "SIA 262:2025, 4.2.2.4", name=stahl.seite)
+    p.gleichung(r" \quad ".join(angabe(w) for w in zug + druck),
+                titel=f"{titel}: Festigkeiten des Stahls")
 
 
-def protokoll_betongesetz(p: Protokoll, wahl: Rechenwahl, f_c: Wert, E_cm: Wert, basis: str,
-                          *, titel: str) -> None:
+def protokoll_betongesetz(p: Protokoll, wahl: Rechenwahl, gesetz: Gesetz, f_c: Wert,
+                          E_cm: Wert, basis: str, *, titel: str) -> None:
     """
-    Der Beton einer Wahl mit Block oder Parabel -- bei der Parabel samt ihrem
-    Beiwert aus dem wirksamen Modul ``E_cm/(1+phi)``. ``f_c`` ist die
-    Festigkeit des Wertesatzes, ``f_cd`` oder ``f_ck``.
+    Der Beton einer Wahl mit Block oder Parabel, so wie ``gesetz`` rechnet --
+    bei der Parabel samt ihrem Beiwert aus dem wirksamen Modul
+    ``E_cm/(1+phi)``. ``f_c`` ist die Festigkeit des Wertesatzes, ``f_cd``
+    oder ``f_ck``.
     """
-    if wahl.art is Rechenart.PARABEL:
+    if isinstance(gesetz, Betongesetz):
         werte = Zwischenwerte(basis)
         E_c_eff = werte.spannung("E_c_eff", "E_{c,eff}",
                                  wirksamer_modul(E_cm.groesse.si, wahl.kriechzahl))
-        p.formel(werte.zahl("k_sigma", r"k_{\sigma}", k_sigma(E_c_eff.groesse.si, f_c.groesse.si),
-                            stellen=2),
+        p.formel(werte.zahl("k_sigma", r"k_{\sigma}", gesetz.k_sigma, stellen=2),
                  K_SIGMA_LATEX, {"E_c": E_c_eff, "f_c": f_c},
                  titel="Beiwert der Parabel, mit dem wirksamen Modul")
-        p.ansatz(Betongesetz(0.0, 1.0, 1.0, 0.0).latex(f_c.symbol),
+        p.ansatz(gesetz.latex(f_c.symbol),
                  titel=f"{titel}: Beton, Parabel-Rechteck", referenz="SIA 262:2025, 4.2.1.6",
-                 name=Betongesetz.NAME)
+                 name=gesetz.seite)
     else:
-        p.ansatz(Spannungsblock(0.0, 1.0).latex(f_c.symbol),
+        p.ansatz(gesetz.latex(f_c.symbol),
                  titel=f"{titel}: Beton, Spannungsblock {BLOCKANTEIL}·x",
-                 name=Spannungsblock.NAME)
+                 name=gesetz.seite)
 
 
 def gesetze(wahl: Rechenwahl, w: Betonkennwerte) -> Gesetze:

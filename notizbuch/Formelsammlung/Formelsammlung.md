@@ -1,5 +1,5 @@
 ---
-erzeugt: 480398cc4033
+erzeugt: 3c124c8bd6c8
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -22,9 +22,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Duktilität]] · 8
 - [[Zwängung auf Normalkraft]] · 13
 - [[Sprödes Versagen]] · 4
-- [[Zwängung auf Biegung]] · 20
-- [[Stahlspannung aus Rissbreite]] · 12
-- [[Stahlspannung gegen Fliessen]] · 6
+- [[Zwängung auf Biegung]] · 22
+- [[Stahlspannung aus Rissbreite]] · 14
+- [[Stahlspannung gegen Fliessen]] · 8
 - [[Knicken]] · 14
 - [[Spannung-Dehnung-Analyse]] · 19
 
@@ -70,6 +70,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bemessungswert der Schubspannungsgrenze]] · $\tau_{cd}$
 - [[Bemessungswert des Elastizitätsmoduls]] · $E_{cd}$
 - [[Bemessungswert des Reibungswinkels]] · $\varphi_{eff}$
+- [[Beton linear, ohne Zug]]
 - [[Beton ungerissen, in Druck und Zug]]
 - [[Betonstahl nur auf Zug]]
 - [[Bettung eines Stabs]]
@@ -228,7 +229,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-112 von 176 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
+113 von 177 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse#_herleitung_modul|_herleitung_modul]]
 - [[Äquivalenter E-Modul über der Normalkraft]] · [[opencivil.spannungsanalyse#_herleitung_modul|_herleitung_modul]]
@@ -239,6 +240,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Beiwert der Parabel, mit dem wirksamen Modul]] · [[opencivil.nachweis.rechenwahl#protokoll_betongesetz|protokoll_betongesetz]], [[opencivil.spannungsanalyse#herleitung|herleitung]]
 - [[Beiwert für die statische Höhe]] · [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._ohne_buegel]], [[opencivil.nachweis.querkraft#Querkraft._protokoll_fall|Querkraft._protokoll_fall]]
 - [[Bemessungswert der Kohäsion]] · [[opencivil.geotechnik.grundbruch|_c_eff]]
+- [[Beton linear, ohne Zug]] · [[opencivil.nachweis.rechenwahl#protokoll_gesetze|protokoll_gesetze]], [[opencivil.querschnitt.schnittanalyse#protokoll_gesetze_nach_wahl|protokoll_gesetze_nach_wahl]]
 - [[Beton ungerissen, in Druck und Zug]] · [[opencivil.spannungsanalyse#herleitung|herleitung]]
 - [[Betonstahl nur auf Zug]] · [[opencivil.nachweis.rechenwahl#protokoll_gesetze|protokoll_gesetze]]
 - [[Bettung eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]

@@ -22,10 +22,8 @@ from opencivil.querschnitt.interaktion import (
 )
 from opencivil.querschnitt.werkstoffgesetz import Betongesetz, Spannungsblock, Stahlgesetz
 
-#: Stetig bis an die Grenzen, wie der gezeichnete Querschnitt sie einsetzt: der
-#: Faecher faehrt den Rand ab, und eine Faser genau auf ihm darf nicht kippen.
-BETON = Betongesetz(f_cd=20e6, eps_c1d=0.002, eps_c2d=0.003, k_sigma=2.0, bricht=False)
-STAHL = Stahlgesetz(E_s=200e9, f_yd=435e6, f_yd_druck=435e6, eps_ud=0.045, bricht=False)
+BETON = Betongesetz(f_cd=20e6, eps_c1d=0.002, eps_c2d=0.003, k_sigma=2.0)
+STAHL = Stahlgesetz(E_s=200e9, f_yd=435e6, f_yd_druck=435e6, eps_ud=0.045)
 WERKSTOFFE = [
     Werkstoff("Beton", BETON.spannung, -0.003, math.inf, c_punkt=(0.002, 0.003),
               verdraengbar=True),

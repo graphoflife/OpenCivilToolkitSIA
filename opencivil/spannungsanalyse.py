@@ -113,16 +113,14 @@ from opencivil.nachweis.querschnittsloeser import (
     Ebene, Faserloeser, Querschnittsloeser, Werkstoffsatz, wirksamer_modul,
 )
 from opencivil.nachweis.rechenwahl import (
-    Betonkennwerte, Rechenart, Rechenwahl, gesetze, stahllagen, staehle,
+    Betonkennwerte, Rechenart, Rechenwahl, betongesetz, gesetze, stahllagen, staehle,
 )
 from opencivil.nachweis.sproedes_versagen import (
     beiwert_dicke, protokoll_zugfestigkeit, rissmoment,
 )
 from opencivil.querschnitt.platte import Richtung
 from opencivil.material.betonstahl import FLIESSDEHNUNG
-from opencivil.querschnitt.werkstoffgesetz import (
-    BLOCKANTEIL, K_SIGMA_LATEX, BetonUngerissen, Betongesetz, Spannungsblock, k_sigma,
-)
+from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL, K_SIGMA_LATEX, BetonUngerissen
 
 if TYPE_CHECKING:
     from opencivil.core.rechenwerk import Loesung
@@ -1046,13 +1044,17 @@ def herleitung(p: Protokoll, fall, paar, linie: Linie,
         "der ungerissene Zustand nicht mehr, auch nicht zum Vergleich. Gerissen "
         "(Zustand II) trägt der Beton keinen Zug, und im Druck gilt das Gesetz der "
         "gewählten Rechenart.")
-    p.ansatz(r"\sigma_c = E_{c,eff} \cdot \varepsilon_c",
-             titel="Beton ungerissen, in Druck und Zug")
-    eps_c1d, eps_c2d = ein("eps_c1d"), ein("eps_c2d")
+    # Die Gesetze, wie die Loeser sie rechnen -- aus derselben Stelle
+    # (:func:`~opencivil.nachweis.rechenwahl.betongesetz`); sie schreiben sich selbst.
+    ungerissen = BetonUngerissen(E_c=E_c_eff.groesse.si)
+    f_c = ein("f_c")
+    gerissen = betongesetz(wahl, f_c=f_c.groesse.si, E_cm=ein("E_cm").groesse.si,
+                           eps_c1d=ein("eps_c1d").groesse.si, eps_c2d=ein("eps_c2d").groesse.si)
+    p.ansatz(ungerissen.latex(), titel="Beton ungerissen, in Druck und Zug",
+             name=ungerissen.seite)
     if wahl.art.mit_block:
-        p.ansatz(Spannungsblock(f_cd=0.0, eps_c2d=eps_c2d.groesse.si).latex(),
-                 titel=f"Beton gerissen: Spannungsblock {BLOCKANTEIL}·x",
-                 name=Spannungsblock.NAME)
+        p.ansatz(gerissen.latex(f_c.symbol),
+                 titel=f"Beton gerissen: Spannungsblock {BLOCKANTEIL}·x", name=gerissen.seite)
         p.erklaerung(
             "Der Spannungsblock ist ein Modell für den Bruch: unter "
             "(1 − 0.85)·ε_c2d trägt der Beton darin nichts. Über dem Riss ist die "
@@ -1060,18 +1062,16 @@ def herleitung(p: Protokoll, fall, paar, linie: Linie,
             "Widerstand der 0.85·x-Vereinfachung. Ein Modul hängt an ihm nicht: "
             "die Kriechzahl wirkt nur auf den ungerissenen Teil.")
     else:
-        k = w.zahl("k_sigma", r"k_{\sigma}", k_sigma(E_c_eff.groesse.si, ein("f_c").groesse.si),
-                   stellen=2)
-        p.formel(k, K_SIGMA_LATEX, {"E_c": E_c_eff, "f_c": ein("f_c")},
+        k = w.zahl("k_sigma", r"k_{\sigma}", gerissen.k_sigma, stellen=2)
+        p.formel(k, K_SIGMA_LATEX, {"E_c": E_c_eff, "f_c": f_c},
                  titel="Beiwert der Parabel, mit dem wirksamen Modul")
         p.erklaerung(
             "Unter 1 rechnet die Parabel k_σ nicht: dort hätte ihr Nenner im "
             "ansteigenden Ast eine Nullstelle. So weit kommt es mit dem kriechweichen "
             "Modul und charakteristischen Werten; mit k_σ = 1 ist der Beton bis f_c "
             "bei ε_c1d linear.")
-        p.ansatz(Betongesetz(f_cd=0.0, eps_c1d=eps_c1d.groesse.si,
-                             eps_c2d=eps_c2d.groesse.si, k_sigma=0.0).latex(),
-                 titel="Beton gerissen: Parabel-Rechteck", name=Betongesetz.NAME)
+        p.ansatz(gerissen.latex(f_c.symbol), titel="Beton gerissen: Parabel-Rechteck",
+                 name=gerissen.seite)
     if wahl.satz is Werkstoffsatz.CHARAKTERISTISCH:
         p.text("Mit charakteristischen Werten: f_ck statt f_cd, f_yk statt f_yd.")
 

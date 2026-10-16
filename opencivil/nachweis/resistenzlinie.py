@@ -38,7 +38,7 @@ Bezugsachse fuer M ist die halbe Querschnittshoehe.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.einheiten import Groesse
@@ -259,11 +259,11 @@ class Ebenenlinie(Widerstandslinie):
                              f"Parabel, nicht mit «{wahl.art.beschriftung}».")
         self.wahl = wahl
         self.h = h
+        self.beton = beton
         self.lagen = list(lagen)
         self.fasern = fasern
         self.schritte = schritte
-        #: Der Stahl je Lage, stetig bis an eps_ud -- siehe oben.
-        self.staehle = [replace(l.stahl, bricht=False) for l in self.lagen]
+        self.staehle = [l.stahl for l in self.lagen]
         self.querschnitt = plattenfasern(
             h=h, b=b, beton=beton,
             staebe=[(l.a_s, l.z, stahl) for l, stahl in zip(self.lagen, self.staehle)],
@@ -415,11 +415,11 @@ class Ebenenlinie(Widerstandslinie):
         if wahl.art is Rechenart.PARABEL:
             protokoll_wirksamer_modul(p, E_cm, phi, basis,
                                       titel="Wirksamer Modul der Parabel")
-        protokoll_betongesetz(p, wahl, f_c, E_cm, basis, titel="Werkstoffgesetze")
-        p.ansatz(Stahlgesetz(0.0, 0.0, 0.0, 0.0).latex(satz.stahl_zeichen,
-                                                       f"{satz.stahl_zeichen}^{{-}}"),
+        protokoll_betongesetz(p, wahl, self.beton, f_c, E_cm, basis, titel="Werkstoffgesetze")
+        stahl = self.staehle[0]
+        p.ansatz(stahl.latex(satz.stahl_zeichen, satz.stahl_druck_zeichen),
                  titel="Werkstoffgesetze: Stahl, bilinear", referenz="SIA 262:2025, 4.2.2.4",
-                 name=Stahlgesetz.NAME)
+                 name=stahl.seite)
         p.ansatz(
             r"N = \int_A \sigma\,\mathrm{d}A \qquad "
             r"M = \int_A \sigma \cdot \left(z - \tfrac{h}{2}\right)\,\mathrm{d}A",

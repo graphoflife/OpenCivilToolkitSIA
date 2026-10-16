@@ -1,10 +1,10 @@
 ---
-erzeugt: 530bfd3cd17d
+erzeugt: fdd081188f19
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 20 Formeln, in der Folge, in der gerechnet wird.
+> 22 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -41,9 +41,11 @@ Gesucht wird die Ebene, die N, M\_y und M\_z zugleich trägt. Zu einer festen Zu
 15. [[Moment der Bewehrung bei zulässiger Stahlspannung]]
 16. [[Spannung im ungerissenen Querschnitt]]
 17. [[Wirksamer Elastizitätsmodul]]
-18. [[Fiktiver Durchmesser einer verschmierten Linie]]
-19. [[Dehnungsebene und innere Kräfte]]
-20. [[Widerstandsmoment zum gezogensten Betonpunkt]]
+18. [[Beton linear, ohne Zug]]
+19. [[Bilineare Beziehung des Betonstahls]]
+20. [[Fiktiver Durchmesser einer verschmierten Linie]]
+21. [[Dehnungsebene und innere Kräfte]]
+22. [[Widerstandsmoment zum gezogensten Betonpunkt]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

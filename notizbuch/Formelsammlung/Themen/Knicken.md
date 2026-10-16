@@ -1,5 +1,5 @@
 ---
-erzeugt: 7e282382c618
+erzeugt: c32a8b4137e0
 art: thema
 tags: [thema]
 ---
@@ -41,9 +41,9 @@ Die Dehnung wächst linear in Zugrichtung, ε = ε\_m + χ·v mit v ab dem Schwe
 3. [[Wirksamer Elastizitätsmodul]]
 4. [[Beiwert der Parabel, mit dem wirksamen Modul]]
 5. [[Parabel-Rechteck-Beziehung des Betons]]
-6. [[Dehnungsebene und innere Kräfte]]
-7. [[Spannungsblock des Betons]]
-8. [[Bilineare Beziehung des Betonstahls]]
+6. [[Bilineare Beziehung des Betonstahls]]
+7. [[Dehnungsebene und innere Kräfte]]
+8. [[Spannungsblock des Betons]]
 9. [[Schnittgrössen aus der Spannungsverteilung]]
 10. [[Schiefstellung]]
 11. [[Ungewollte Ausmitte]]

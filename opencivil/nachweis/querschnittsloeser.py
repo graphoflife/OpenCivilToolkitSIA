@@ -985,6 +985,11 @@ class Werkstoffsatz(str, Enum):
         return "f_{yd}" if self is Werkstoffsatz.BEMESSUNG else "f_{yk}"
 
     @property
+    def stahl_druck_zeichen(self) -> str:
+        """Das Zeichen des Plateaus auf Druck -- ``f_{yd}^{-}``."""
+        return f"{self.stahl_zeichen}^{{-}}"
+
+    @property
     def beton_zeichen(self) -> str:
         """Das Formelzeichen dazu, fuer die Herleitung -- ``f_{cd}``."""
         return "f_{cd}" if self is Werkstoffsatz.BEMESSUNG else "f_{ck}"

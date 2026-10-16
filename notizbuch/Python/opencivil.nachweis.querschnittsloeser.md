@@ -1,5 +1,5 @@
 ---
-erzeugt: ede00533ce3e
+erzeugt: 76cdda00e6ee
 art: modul
 tags: [modul]
 ---
@@ -605,6 +605,15 @@ def stahl_zeichen(self) -> str
 ```
 
 Das Formelzeichen dazu, fuer die Herleitung -- `f_{yd}`.
+
+#### Werkstoffsatz.stahl_druck_zeichen
+
+```python
+@property
+def stahl_druck_zeichen(self) -> str
+```
+
+Das Zeichen des Plateaus auf Druck -- `f_{yd}^{-}`.
 
 #### Werkstoffsatz.beton_zeichen
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: b67e8cdf19c8
+erzeugt: 36d5f1d80908
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.2.4"
@@ -10,25 +10,30 @@ normstelle: "SIA 262:2025, 4.2.2.4"
 *In der Herleitung: «B500B: bilineare Beziehung, Bemessungswerte»*
 
 $$
-\sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & \varepsilon_s \ge 0 \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & \varepsilon_s < 0 \end{cases} \qquad |\varepsilon_s| \le \varepsilon_{ud}
+\sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-*In der Herleitung: «Werkstoffgesetze: Stahl, bilinear»*
+*In der Herleitung: «Werkstoffgesetze im Gebrauchszustand: Stahl, bilinear»*
 
 $$
-\sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & \varepsilon_s \ge 0 \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & \varepsilon_s < 0 \end{cases} \qquad |\varepsilon_s| \le \varepsilon_{ud}
+\sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
 ## Im Code
 
+- [[opencivil.nachweis.rechenwahl#protokoll_gesetze|protokoll_gesetze]]
 - [[opencivil.nachweis.resistenzlinie#Ebenenlinie.protokoll_ansatz|Ebenenlinie.protokoll_ansatz]]
 - [[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe_protokollieren|Querschnittsanalyse.werkstoffe_protokollieren]]
+- [[opencivil.querschnitt.schnittanalyse#protokoll_gesetze_nach_wahl|protokoll_gesetze_nach_wahl]]
 
 ## Themen
 
 - [[Schiefe Biegung]]
+- [[Stahlspannung aus Rissbreite]]
+- [[Stahlspannung gegen Fliessen]]
 - [[Knicken]]
 - [[Biegung und Normalkraft]]
+- [[Zwängung auf Biegung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -41,3 +46,8 @@ ist die Dehnung durch $\varepsilon_{ud}$: dort endet die Linie aus
 Dehnungsebenen auf der Zugseite.
 
 Mit charakteristischen Werten stehen $f_{yk}$ und $f_{yk}^-$ an ihrer Stelle.
+
+Jenseits von $\varepsilon_{ud}$ trägt der Stahl nichts mehr. Auf der Grenze
+selbst gilt das Plateau, auch um eine Rundung darüber: die Linie aus
+Dehnungsebenen legt die gezogene Lage genau auf $\varepsilon_{ud}$, und dort
+darf sie nicht an der letzten Stelle auf null kippen.
