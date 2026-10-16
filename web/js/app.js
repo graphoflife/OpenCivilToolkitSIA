@@ -366,8 +366,8 @@ function fokusZurueck(merkmal) {
  * Überschriften, Absätze, Formeln, Tabellentitel -- alles, was eine Stelle im
  * Bericht benennt und sich beim Neuzeichnen wiedererkennen lässt.
  */
-const ANKER = '.b-titel, .b-untertitel, .b-text, .gleichung, .angabengruppe,'
-            + ' .tabelle-titel, .hinweis, .kennwert, .feld';
+const ANKER = '.feldgruppe > h3, .unterkapitel-kopf, .b-untertitel, .b-text, .gleichung,'
+            + ' .angabengruppe, .tabelle-titel, .hinweis, .kennwert, .feld';
 
 /**
  * Merkt sich, welcher Inhalt gerade oben in der Tafel steht.

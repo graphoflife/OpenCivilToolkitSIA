@@ -27,6 +27,7 @@
 
 import { api } from './api.js';
 import { ARTEN } from './arten.js';
+import { karte } from './bausteine.js';
 import { kraftpfeil, momentSymbol } from './bs_symbole.js';
 import {
   auswahl, el, leerzustand, svgEl,
@@ -327,19 +328,18 @@ function fallwahl(kennung, faelle, gewaehlt) {
   });
 }
 
-/** Die Diagramme eines Systems -- je Bild ein Blatt, darüber die Wahl des Falls. */
-export function systemBlaetter(kennung, name) {
+/**
+ * Die Diagramme eines Systems -- je Bild eine Karte, darüber die Wahl des
+ * Falls. Das Panel darum baut bericht.js.
+ */
+export function systemKarten(kennung) {
   const faelle = faelleVon(kennung);
-  const titel = (t) => el('div.b-titel', { text: `${t} – ${name}` });
   const uebersicht = zustand.loesung?.balkensysteme?.[kennung];
   if (uebersicht && !uebersicht.gueltig) {
-    return [el('div.blatt', {}, [
-      titel('Balkensystem'),
-      ...(uebersicht.meldungen || []).filter((m) => m.fehler)
-        .map((m) => el('p.hinweis.hinweis-warnung', { text: m.text })),
-    ])];
+    return [karte(null, (uebersicht.meldungen || []).filter((m) => m.fehler)
+      .map((m) => el('p.hinweis.hinweis-warnung', { text: m.text })))];
   }
-  if (!faelle.length) return [el('div.blatt', {}, [titel('Balkensystem'), leerzustand('Kein Lastfall.')])];
+  if (!faelle.length) return [karte(null, [leerzustand('Kein Lastfall.')])];
   const fall = faelle.includes(gezeigt.get(kennung)) ? gezeigt.get(kennung) : faelle[0];
   const abdruck = `${abdruckVon(kennung)}|${fall}`;
   let eintrag = vorrat.get(kennung);
@@ -350,23 +350,23 @@ export function systemBlaetter(kennung, name) {
     anfordern(kennung, eintrag, alt?.verlauf?.fall === fall ? 500 : 80);
   }
   const antwort = eintrag.daten || eintrag.alt;
-  const kopf = el('div.blatt', {}, [
-    titel('Fall'),
+  // Die Wahl des Falls gilt für alle Bilder darunter -- über die ganze Breite.
+  const kopf = karte('Fall', [
     el('div.qa-fallkopf', {}, [
       fallwahl(kennung, faelle, fall),
       !eintrag.daten ? el('span.qa-nachfuehren', { text: 'wird nachgeführt …' }) : null,
     ]),
-  ]);
-  if (eintrag.fehler) return [kopf, el('div.blatt', {}, [el('p.hinweis.hinweis-warnung', { text: eintrag.fehler })])];
+  ], { klasse: 'ist-breit' });
+  if (eintrag.fehler) return [kopf, karte(null, [el('p.hinweis.hinweis-warnung', { text: eintrag.fehler })])];
   const daten = antwort?.verlauf;
-  if (!daten) return [kopf, el('div.blatt', {}, [leerzustand('Diagramme werden gerechnet …')])];
+  if (!daten) return [kopf, karte(null, [leerzustand('Diagramme werden gerechnet …')])];
   const r = bildrahmen(daten.staebe);
   const veraltet = !eintrag.daten;
   const blatt = (t, svg, zeilen, unten = []) => {
     const huelle = el('div.bs-diagramm-huelle', {}, [svg]);
     zeigerEinrichten(huelle, svg, r, daten, zeilen);
-    return el('div.blatt', { class: veraltet ? 'ist-veraltet' : '' }, [
-      el('div.b-titel', { text: `${t} – ${daten.fall}` }), huelle, ...unten]);
+    return karte(`${t} – ${daten.fall}`, [huelle, ...unten],
+      { klasse: veraltet ? 'ist-veraltet' : '' });
   };
   const verschiebung = (s, x) => [
     `u_x = ${fest(zwischen(s.proben, x, 'ux'), 2)} mm   u_z = ${fest(zwischen(s.proben, x, 'uz'), 2)} mm`,
@@ -414,16 +414,18 @@ function wertzelle(w, stellen) {
     fest(w.v, stellen), el('span.bs-wo', { text: ` ${w.name}` })]);
 }
 
-/** Die Zusammenfassung eines Systems: Meldungen, je Fall die Grenzwerte, die Lagerkräfte. */
-export function systemZusammenfassung(kennung, name) {
+/**
+ * Die Zusammenfassung eines Systems als Karten: Meldungen, je Fall die
+ * Grenzwerte, die Lagerkräfte. Das Panel darum baut bericht.js.
+ */
+export function systemZusammenfassung(kennung) {
   const u = zustand.loesung?.balkensysteme?.[kennung];
-  const titel = el('div.b-titel', { text: `Zusammenfassung – ${name}` });
-  if (!u?.gerechnet) return el('div.blatt', {}, [titel, leerzustand('Noch nicht gerechnet.')]);
+  if (!u?.gerechnet) return [karte(null, [leerzustand('Noch nicht gerechnet.')])];
   const meldungen = (u.meldungen || []).map((m) => el('p', {
     class: m.fehler ? 'hinweis hinweis-warnung' : 'hinweis', text: m.text,
   }));
   if (!u.gueltig || !u.faelle.length) {
-    return el('div.blatt', {}, [titel, ...meldungen, u.faelle.length ? null : leerzustand('Kein Lastfall.')]);
+    return [karte(null, [...meldungen, u.faelle.length ? null : leerzustand('Kein Lastfall.')])];
   }
   const kopf = ['Fall', 'N_min', 'N_max', 'V_min', 'V_max', 'M_min', 'M_max', 'w_max']
     .map((t) => el('th', { text: t }));
@@ -447,16 +449,18 @@ export function systemZusammenfassung(kennung, name) {
     el('td.bs-zahl', { text: fest(l.M, 1) }),
   ])));
   const summen = u.faelle.some((f) => f.lagerkraefte.some((l) => l.summe));
-  return el('div.blatt', {}, [
-    titel,
-    ...meldungen,
-    el('p.bs-einheiten', { text: 'N, V in kN · M in kNm · w in mm gegen die Sehne · der Stab mit dem Wert steht klein daneben' }),
-    el('div.tabelle-huelle', {}, [el('table.bs-tabelle', {}, [el('thead', {}, [el('tr', {}, kopf)]), el('tbody', {}, zeilen)])]),
-    lagerzeilen.length ? el('div.b-untertitel', { text: 'Lagerkräfte auf das Tragwerk' }) : null,
-    lagerzeilen.length ? el('div.tabelle-huelle', {}, [el('table.bs-tabelle', {}, [
-      el('thead', {}, [el('tr', {}, ['Fall', 'Lager', 'R_x [kN]', 'R_z [kN]', 'M [kNm]'].map((t) => el('th', { text: t })))]),
-      el('tbody', {}, lagerzeilen),
-    ])]) : null,
-    summen ? el('p.bs-einheiten', { text: u.summen_text }) : null,
-  ]);
+  return [
+    karte('Grenzwerte je Fall', [
+      ...meldungen,
+      el('p.bs-einheiten', { text: 'N, V in kN · M in kNm · w in mm gegen die Sehne · der Stab mit dem Wert steht klein daneben' }),
+      el('div.tabelle-huelle', {}, [el('table.bs-tabelle', {}, [el('thead', {}, [el('tr', {}, kopf)]), el('tbody', {}, zeilen)])]),
+    ]),
+    lagerzeilen.length ? karte('Lagerkräfte auf das Tragwerk', [
+      el('div.tabelle-huelle', {}, [el('table.bs-tabelle', {}, [
+        el('thead', {}, [el('tr', {}, ['Fall', 'Lager', 'R_x [kN]', 'R_z [kN]', 'M [kNm]'].map((t) => el('th', { text: t })))]),
+        el('tbody', {}, lagerzeilen),
+      ])]),
+      summen ? el('p.bs-einheiten', { text: u.summen_text }) : null,
+    ]) : null,
+  ];
 }

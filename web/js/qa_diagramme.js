@@ -28,6 +28,7 @@
 
 import { achsenkreuz, NR } from './achsen.js';
 import { api } from './api.js';
+import { karte } from './bausteine.js';
 import {
   auswahl, el, leerzustand, svgEl, zahlfeld,
 } from './dom.js';
@@ -440,12 +441,11 @@ function interaktionsbild(kennung, i, faelle, x, y, einachsig) {
   ]);
 }
 
-function interaktionsblatt(kennung, name, daten, veraltet) {
+function interaktionskarte(kennung, daten, veraltet) {
   const wahl = wahlVon(kennung);
   const x = daten.einachsig ? 'M_y' : wahl.x;
   const y = daten.einachsig ? 'N' : wahl.y;
-  return el('div.blatt', {}, [
-    el('div.b-titel', { text: `Interaktionsdiagramm – ${name}` }),
+  return karte('Interaktionsdiagramm', [
     schnittsteuerung(kennung, daten.einachsig),
     el('div', { class: veraltet ? 'ist-veraltet' : '' }, [
       daten.interaktion
@@ -466,10 +466,11 @@ function fallwahl(kennung, faelle, name) {
 }
 
 /**
- * Die Blätter einer Analyse für den Reiter «Diagramme». Fragt nach, wenn
- * die gezeigten Daten nicht mehr zur Eingabe passen.
+ * Die Karten einer Analyse für den Reiter «Diagramme» -- das Panel darum
+ * baut bericht.js. Fragt nach, wenn die gezeigten Daten nicht mehr zur
+ * Eingabe passen.
  */
-export function analyseBlaetter(kennung, name) {
+export function analyseKarten(kennung) {
   const wahl = wahlVon(kennung);
   const schnitt = { fest: festVon(wahl), wert: wahl.werte[festVon(wahl)] };
   const projektabdruck = abdruckVon(kennung);
@@ -486,22 +487,21 @@ export function analyseBlaetter(kennung, name) {
     anfordern(kennung, eintrag, nurSchnitt ? 80 : 600);
   }
   const daten = eintrag.daten || eintrag.alt;
-  const titel = (t) => el('div.b-titel', { text: `${t} – ${name}` });
   if (eintrag.fehler) {
-    return [el('div.blatt', {}, [titel('Diagramme'), el('p.hinweis.hinweis-warnung', { text: eintrag.fehler })])];
+    return [karte(null, [el('p.hinweis.hinweis-warnung', { text: eintrag.fehler })])];
   }
-  if (!daten) return [el('div.blatt', {}, [titel('Diagramme'), leerzustand('Diagramme werden gerechnet …')])];
-  const interaktion = interaktionsblatt(kennung, name, daten, !eintrag.daten);
+  if (!daten) return [karte(null, [leerzustand('Diagramme werden gerechnet …')])];
+  const interaktion = interaktionskarte(kennung, daten, !eintrag.daten);
   if (!daten.faelle.length) {
-    return [interaktion, el('div.blatt', {}, [titel('Lastfall'), leerzustand('Kein Lastfall.')])];
+    return [interaktion, karte('Lastfall', [leerzustand('Kein Lastfall.')])];
   }
 
   const gewaehlt = daten.faelle.find((f) => f.name === gezeigt.get(kennung)) || daten.faelle[0];
   const veraltet = !eintrag.daten;
-  const blatt = (t, inhalt) => el('div.blatt', { class: veraltet ? 'ist-veraltet' : '' }, [
-    el('div.b-titel', { text: `${t} – ${gewaehlt.name}` }), inhalt]);
-  const kopf = el('div.blatt', {}, [
-    titel('Lastfall'),
+  const bild = (t, inhalt) => karte(`${t} – ${gewaehlt.name}`, [inhalt],
+    { klasse: veraltet ? 'ist-veraltet' : '' });
+  // Die Wahl des Falls gilt für die Bilder darunter -- über die ganze Breite.
+  const kopf = karte('Lastfall', [
     el('div.qa-fallkopf', {}, [
       fallwahl(kennung, daten.faelle, gewaehlt.name),
       el('span', {
@@ -511,11 +511,11 @@ export function analyseBlaetter(kennung, name) {
       }),
       veraltet ? el('span.qa-nachfuehren', { text: 'wird nachgeführt …' }) : null,
     ]),
-  ]);
+  ], { klasse: 'ist-breit' });
   return [
     interaktion,
     kopf,
-    gewaehlt.bruch ? blatt('Bruchzustand', bruchbild(daten, gewaehlt)) : null,
-    gewaehlt.schub ? blatt('Schubfluss', schubbild(daten, gewaehlt)) : null,
+    gewaehlt.bruch ? bild('Bruchzustand', bruchbild(daten, gewaehlt)) : null,
+    gewaehlt.schub ? bild('Schubfluss', schubbild(daten, gewaehlt)) : null,
   ].filter(Boolean);
 }

@@ -84,6 +84,14 @@
      ist alles darin auf diese Breite: lange Beschreibungen brechen um, die
      Lastfälle stehen in zwei Zeilen. */
   --panelbreite: 420px;
+  /* So breit sind die Panels der rechten Tafel: so breit wie die Tabelle
+     der Nachweise in ihrer Karte, mehr nicht. Wie die Panels der Eingaben
+     stehen sie mittig und werden nur schmaler, wo die Tafel nicht reicht. */
+  --berichtbreite: 704px;
+  /* Die Tabelle der Nachweise hat eine feste Breite: sie skaliert nicht mit
+     der Tafel (Benutzer, 2026-10-16). Breiter wird sie nur, wo ihr Inhalt
+     es verlangt; ist die Tafel schmaler, rollt die Karte. */
+  --tabellenbreite: 660px;
   /* Das Panel der Zeichnung wächst als einziges mit: etwa die Hälfte des
      Platzes rechts vom Baum, nie schmaler als die anderen. */
   --cadbreite: max(var(--panelbreite), calc((100vw - var(--breite-links) - 5px) / 2 - 40px));
@@ -806,30 +814,49 @@ input[readonly], input:disabled, select:disabled {
 .reiter-knopf:hover { background: var(--flaeche-2); }
 .reiter-knopf.ist-aktiv { background: var(--blau); color: #fff; border-color: var(--blau); font-weight: 500; }
 
-.blatt {
-  background: var(--flaeche); border: 1px solid var(--rand); border-radius: var(--radius);
-  padding: 22px 26px; max-width: 940px; margin: 0 auto 16px; box-shadow: var(--schatten);
+/* Die rechte Tafel wie die mittlere: graue Panels, darin weisse Karten --
+   dieselben `panel` und `karte` (Benutzer, 2026-10-16). Der Stapel ist so
+   breit wie `--berichtbreite`; stehen in den Diagrammen mehrere Karten
+   nebeneinander, wächst er mit. */
+.berichtstapel {
+  --stapelbreite: var(--berichtbreite);
+  display: grid; grid-template-columns: minmax(0, var(--stapelbreite));
+  justify-content: center; align-content: start;
 }
+.berichtstapel.ist-2 { --stapelbreite: calc(2 * var(--berichtbreite)); }
+.berichtstapel.ist-3 { --stapelbreite: calc(3 * var(--berichtbreite)); }
+.berichtstapel > .feldgruppe { min-width: 0; padding: 8px 10px 8px; }
+.berichtstapel .unterkapitel { padding: 8px; min-width: 0; }
+/* Was in einer Karte steht, braucht keinen eigenen Rand mehr: die Karte
+   rahmt es schon. Eine Tabelle bekommt so die ganze Breite der Karte. */
+.unterkapitel > .gleichung { margin: 2px 0; padding: 4px 6px; }
+.unterkapitel > .tabelle-block { margin: 2px 0; padding: 2px 0; border-left: 0; }
+.unterkapitel > .tabelle-block:hover { background: none; }
+.unterkapitel > .gleichung:first-child, .unterkapitel > .tabelle-block:first-child { margin-top: 0; }
+.karte-hinweis { font-size: 12px; color: var(--schrift-zart); margin: 0 0 6px; }
+/* Die Angaben zur Platte linksbündig wie eine Feldzeile der Eingaben, nicht
+   mittig wie eine Formel der Herleitung. */
+.unterkapitel.ist-links .katex-display,
+.unterkapitel.ist-links .katex-display > .katex { text-align: left; }
 
-/* Zwei Arten von Überschrift, und nur zwei.
+/* Die Karten eines Panels in den Diagrammen: so viele nebeneinander, wie
+   gewählt ist und das Panel Platz hat. Eine Karte mit `ist-breit` -- die
+   Wahl des Falls -- steht über allen. */
+.karten { display: grid; gap: 10px; align-items: start; }
+.karten > .unterkapitel { margin: 0; }
+.karten > .unterkapitel.ist-breit { grid-column: 1 / -1; }
+@container (min-width: 700px)  { .karten.ist-2 { grid-template-columns: 1fr 1fr; } }
+@container (min-width: 1040px) { .karten.ist-3 { grid-template-columns: 1fr 1fr 1fr; } }
 
-   .b-titel      ein neuer Bestandteil beginnt -- ein Baustoff, eine Platte.
-                 Fett, blauer Akzent, Linie darunter.
-   .b-untertitel gliedert innerhalb. Leichter, gedämpfter Akzent, keine Linie.
-
-   Welche Art gilt, entscheidet nicht die Schriftgrösse eines Aufrufers,
-   sondern der Block: trägt er einen Namensraum, ist es das Erste. */
-.b-titel {
-  font-size: 16px; font-weight: 700; margin: 26px 0 11px; padding: 0 0 5px 10px;
-  border-bottom: 2px solid var(--rand); border-left: 4px solid var(--blau);
-}
-.b-titel:first-child { margin-top: 0; }
-
+/* Die Überschriften der Herleitung innerhalb eines Abschnitts. Ein neuer
+   Bestandteil -- ein Baustoff, eine Platte -- beginnt ein eigenes Panel,
+   sein Titel steht in dessen Kopf. Leichter, gedämpfter Akzent, keine Linie. */
 .b-untertitel {
   font-size: 14px; font-weight: 500; color: var(--schrift-matt);
   margin: 19px 0 7px; padding: 1px 0 1px 9px;
   border-left: 3px solid var(--unterakzent);
 }
+.unterkapitel > .b-untertitel:first-child { margin-top: 4px; }
 /* Eine Ebene tiefer: eingerückt statt neu eingefärbt -- die Gliederung soll
    sich an der Kante ablesen lassen, nicht an einer dritten Farbe. */
 .b-untertitel.ist-tief { font-size: 13px; margin: 14px 0 6px 14px; }
@@ -851,8 +878,7 @@ input[readonly], input:disabled, select:disabled {
   padding: 2px; box-shadow: var(--schatten);
 }
 .gleichung:hover .gleichung-werkzeug,
-.tabelle-block:hover .gleichung-werkzeug,
-.blatt:hover .gleichung-werkzeug { display: flex; }
+.tabelle-block:hover .gleichung-werkzeug { display: flex; }
 
 .hinweis {
   margin: 8px 0; padding: 7px 10px; border-radius: 5px; font-size: 13px;
@@ -877,11 +903,15 @@ table.gitter td:first-child, table.gitter th:first-child { text-align: left; }
 .tabelle-huelle { overflow-x: auto; }
 
 /* Nachweise -- kompakt. Keine Zelle mit mehr als zwei Zeilen: jede Zeile
-   bricht nicht weiter um, und die Tabelle ist so breit wie dieser Inhalt --
-   schmaler nie, breiter gern. Ist die Tafel schmaler, rollt die Hülle. */
+   bricht nicht weiter um. Die Tabelle ist immer gleich breit,
+   `--tabellenbreite`, gleich wie breit die Tafel ist. Breiter wird sie nur,
+   wo ihr Inhalt es verlangt -- schmaler als die Zeilen, die nicht umbrechen,
+   macht der Browser eine Tabelle nie; `min-width: max-content` braucht es
+   dafür nicht (und machte sie in Chrome fünfmal so breit). Ist die Tafel
+   schmaler, rollt die Hülle. */
 .nachweis-tabelle {
-  width: max-content; min-width: 100%;
-  border-collapse: collapse; font-size: 13px;
+  width: var(--tabellenbreite);
+  border-collapse: collapse; font-size: 12.5px;
 }
 .nachweis-tabelle .zeile { display: block; white-space: nowrap; }
 .nachweis-tabelle .links { text-align: left; }
@@ -900,12 +930,12 @@ table.gitter td:first-child, table.gitter th:first-child { text-align: left; }
 .hinweis.verfolgung { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .hinweis.verfolgung .knopf { margin-left: auto; }
 .nachweis-tabelle th {
-  font-size: 11.5px; text-transform: uppercase; letter-spacing: .4px;
-  color: var(--schrift-matt); text-align: right; padding: 6px 10px;
+  font-size: 11px; text-transform: uppercase; letter-spacing: .4px;
+  color: var(--schrift-matt); text-align: right; padding: 5px 8px;
   border-bottom: 2px solid var(--rand-stark);
 }
 .nachweis-tabelle th:first-child { text-align: left; }
-.nachweis-tabelle td { padding: 7px 10px; border-bottom: 1px solid var(--rand); text-align: right; }
+.nachweis-tabelle td { padding: 6px 8px; border-bottom: 1px solid var(--rand); text-align: right; }
 .nachweis-tabelle td:first-child { text-align: left; font-weight: 500; }
 .nachweis-tabelle td.zahl { font-variant-numeric: tabular-nums; }
 .nachweis-tabelle tr.ist-gut td:first-child      { box-shadow: inset 4px 0 0 var(--gut); }
@@ -914,7 +944,7 @@ table.gitter td:first-child, table.gitter th:first-child { text-align: left; }
 /* Der Erfüllungsgrad trägt das Urteil allein -- die Spalte daneben, die
    „erfüllt" ausschrieb, sagte dasselbe ein zweites Mal. Hinterlegt wird
    deshalb genau diese Zelle und nicht mehr die ganze Zeile. */
-.nachweis-tabelle td.grad { font-weight: 700; font-size: 14px; }
+.nachweis-tabelle td.grad { font-weight: 700; font-size: 13.5px; }
 .nachweis-tabelle .ist-gut      td.grad { background: var(--gut-hell);      color: var(--gut); }
 .nachweis-tabelle .ist-schlecht td.grad { background: var(--schlecht-hell); color: var(--schlecht); }
 .marke-gut      { color: var(--gut); font-weight: 600; font-size: 12.5px; }
@@ -1072,11 +1102,8 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 
 /* ---------------------------------------------------- Kennzahlen je Platte -- */
 
-.kennzahlen {
-  display: flex; flex-wrap: wrap; gap: 8px 22px;
-  margin: 10px 0 0; padding-top: 9px;
-  border-top: 1px solid var(--rand);
-}
+/* Die Kennzahlen einer Platte stehen in ihrer eigenen Karte; die rahmt sie. */
+.kennzahlen { display: flex; flex-wrap: wrap; gap: 8px 22px; }
 .kennzahl { display: flex; align-items: baseline; gap: 7px; font-size: 12.5px; }
 .kennzahl-name { color: var(--schrift-matt); }
 .kennzahl-wert { font-weight: 600; }
@@ -1111,13 +1138,8 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   .laufbalken::after { animation: none; width: 100%; opacity: .6; }
 }
 
-/* Die Bilder der Spannung-Dehnung-Analyse. Zwei nebeneinander, solange Platz
-   ist -- Dehnung und Spannung liest man im Vergleich, nicht nacheinander. */
-.sd-fall { margin-bottom: 18px; }
-.sd-kopf {
-  font-size: 12px; font-weight: 700; color: var(--schrift-matt);
-  margin-bottom: 4px;
-}
+/* Über dem Diagramm einer Spannung-Dehnung-Analyse: womit gerechnet wurde
+   und die Zahlen, nach denen man fragt. */
 .sd-zahlen {
   display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 11.5px;
   color: var(--schrift-matt); margin-bottom: 6px;
@@ -1125,11 +1147,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .sd-zahlen b { color: var(--schrift-zart); font-weight: 600; }
 /* KaTeX setzt eine Spur grösser als der Text -- in der Zeile eine zu viel. */
 .sd-zahlen .katex, .sd-wahl-text .katex { font-size: 1.08em; }
-.sd-wahl-text { font-size: 11px; color: var(--schrift-zart); margin: -2px 0 5px; }
-.sd-paar { display: flex; flex-wrap: wrap; gap: 10px; }
-.sd-bild { width: 300px; max-width: 100%; height: auto; }
-.sd-bild.sd-breit { width: 600px; }
-.sd-legende { font-size: 11px; color: var(--schrift-zart); margin-top: 4px; }
+.sd-wahl-text { font-size: 11px; color: var(--schrift-zart); margin: 0 0 5px; }
 
 /* Freier Text zur Platte. Über die ganze Breite statt in der Feldspalte:
    ein Satz ist kein Zahlenwert und passt nicht in 112 Pixel. */
@@ -1146,20 +1164,14 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 }
 
 /* Wie viele Diagramme nebeneinander. Der Schalter steht über allem, weil er
-   für alle gilt; die Blätter selbst wissen nichts davon. */
+   für alle gilt; die Karten selbst wissen nichts davon. Ob sie wirklich
+   nebeneinander stehen, entscheidet die Breite des Panels (`.karten`):
+   drei Spalten in einer schmalen Tafel wären drei unlesbare Streifen. */
 .spaltenwahl {
   display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
   font-size: 12px; color: var(--schrift-matt);
 }
 .spaltenwahl .schalter-halb { padding: 0 10px; }
-
-.blaetter { display: grid; gap: 12px; align-items: start; }
-.blaetter.ist-1 { grid-template-columns: 1fr; }
-/* Container-Abfrage und nicht @media: die rechte Tafel ist verstellbar, und
-   drei Spalten in einer schmalen Tafel wären drei unlesbare Streifen. */
-@container (min-width: 700px)  { .blaetter.ist-2 { grid-template-columns: 1fr 1fr; } }
-@container (min-width: 1040px) { .blaetter.ist-3 { grid-template-columns: 1fr 1fr 1fr; } }
-.blaetter > .blatt { min-width: 0; }
 
 /* Ein Knopf, der eine Liste verlängert: unter der Liste, über die ganze
    Breite, mit gestricheltem Rand -- man sieht, dass dort noch etwas
@@ -1374,10 +1386,6 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   :root { --pfeilspur: 0px; }
   .zahlpfeile { display: none; }
   .zahlfeld { font-size: 16px; }
-
-  /* 26 px Rand auf jeder Seite kosten bei 375 px Breite ein Siebtel des
-     Blattes. Am Schreibtisch ist der Rand Ruhe, hier ist er Verlust. */
-  .blatt { padding: 14px 12px; margin-bottom: 12px; }
 
   /* Die Feldzeile wird schmaler: Beschriftung, Wert, Einheit müssen
      nebeneinander bleiben -- die Einheit gibt Platz her. */
@@ -1775,7 +1783,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .qa-fallkopf { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font-size: 12.5px; }
 .qa-fallwahl .schalter-halb { text-transform: none; font-size: 12px; padding: 0 10px; }
 .qa-nachfuehren { color: var(--schrift-zart); font-style: italic; }
-.blatt.ist-veraltet { opacity: .55; }
+.ist-veraltet { opacity: .55; }
 
 /* Das Interaktionsdiagramm der Analyse: die Achsen und der Wert der dritten
    Grösse in einer Zeile über dem Bild. */

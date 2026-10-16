@@ -44,6 +44,34 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-16 · Rechte Tafel wie die mittlere; Spannung-Dehnung als Diagramme
+
+Die rechte Tafel sieht jetzt aus wie die mittlere (Benutzer): je Bauteil ein
+graues Panel, darin weisse Karten mit blauer Kante -- dieselben `panel` und
+`karte` aus `bausteine.js`, also auch derselbe Kopf zum Zuklappen.
+
+- **Zusammenfassung:** je Bauteil ein Panel mit den Karten Angaben,
+  Bewehrung, Nachweise, Kennzahlen. Die Tabelle der Nachweise ist immer
+  660 px breit (`--tabellenbreite`), sie skaliert nicht mehr mit der Tafel;
+  breiter wird sie nur, wo ihr Inhalt es verlangt. Das Panel ist so breit,
+  dass sie hineinpasst (`--berichtbreite`, 704 px) -- in der Tafel von 750 px,
+  die ein Bildschirm von 1536 px ergibt, ohne Rollen. Dafür wurde sie etwas
+  kleiner gesetzt (12.5 statt 13 px, knappere Zellen).
+- **Diagramme:** je Bauteil ein Panel, je Diagramm eine Karte; die Wahl
+  «nebeneinander» stellt die Karten im Panel nebeneinander, statt ganzer
+  Blätter. Die Werkstoffgesetze stehen zusammen in einem Panel.
+- **Herleitung:** je Bestandteil ein Panel, je Kapitel -- Titel der Ebene 2
+  -- eine Karte.
+- **Spannung-Dehnung-Analysen** sind keine kleinen Bilder mehr, sondern
+  Diagramme wie die M-N-Linie: 720 × 520, Gitter und Teilung an beiden
+  Achsen, Legende darunter, Werte über den Punkten beim Darüberfahren. Die
+  zwei Bilder «Dehnung» und «Spannung» über die Höhe sind ein Diagramm mit
+  zwei Feldern an derselben Höhenachse (Benutzer); die Nulllinie läuft durch
+  beide. Zwei Felder statt zweier Achsen in einem: die Einheiten sind
+  verschieden, übereinander läse man die eine Kurve an der Achse der anderen.
+- `min-width: max-content` an der Tabelle machte sie in Chrome fünfmal so
+  breit; es braucht ihn nicht, weil die Zeilen ohnehin nicht umbrechen.
+
 ## 2026-10-16 · Verformungsnachweis der Platte
 
 Die Kriechzahl φ steht nicht mehr bei der Platte. Dafür gibt es neben

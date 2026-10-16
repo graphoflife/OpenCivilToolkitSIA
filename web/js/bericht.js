@@ -2,17 +2,23 @@
  * bericht.js -- Rechte Tafel: das Rechenergebnis.
  *
  * Drei Sichten auf dieselbe Lösung:
- *   Zusammenfassung  je Platte eine Tabelle mit Urteilen und Erfüllungsgraden;
- *                    das Auge je Zeile zeigt genau diesen Nachweis
- *   Diagramme        Interaktionslinien, Kurven, Querschnitt
- *   Herleitung       die Mitschrift des Rechenkerns, Formel für Formel; jede
- *                    Formel führt zu ihrer Seite in der Dokumentation
+ *   Zusammenfassung  je Bauteil ein Panel mit Angaben, Bewehrung, der Tabelle
+ *                    der Urteile und Erfüllungsgrade; das Auge je Zeile zeigt
+ *                    genau diesen Nachweis
+ *   Diagramme        je Bauteil ein Panel, je Diagramm eine Karte
+ *   Herleitung       die Mitschrift des Rechenkerns, je Abschnitt ein Panel;
+ *                    jede Formel führt zu ihrer Seite in der Dokumentation
+ *
+ * Gebaut aus denselben Panels und Karten wie die Eingaben (`panel`, `karte`
+ * in bausteine.js): graue Fläche, weisse Karten mit blauer Kante, ein Klick
+ * auf den Kopf klappt zu (Benutzer, 2026-10-16).
  *
  * Sämtliche Zahlen und Formeln stammen unverändert aus der Lösung. Die
  * Oberfläche formatiert nichts nach -- sonst stünde am Bildschirm etwas
  * anderes als im Bericht.
  */
 
+import { karte, panel } from './bausteine.js';
 import { el, ersetzen, leerzustand, melden, svgEl, zahlfeld } from './dom.js';
 import { setzen } from './mathe.js';
 import { werkzeugleiste } from './kopierleiste.js';
@@ -21,8 +27,8 @@ import {
   diagrammZeichnen, kurveZeichnen, neigungskurveZeichnen,
   querkraftkurveZeichnen, querschnittZeichnen,
 } from './diagramm.js';
-import { analyseBlaetter } from './qa_diagramme.js';
-import { systemBlaetter, systemZusammenfassung } from './bs_diagramme.js';
+import { analyseKarten } from './qa_diagramme.js';
+import { systemKarten, systemZusammenfassung } from './bs_diagramme.js';
 import { spannungsfallZeichnen } from './spannungsbild.js';
 import { api } from './api.js';
 import { ARTEN } from './arten.js';
@@ -171,27 +177,20 @@ function bloeckeZeichnen(rohbloecke) {
 }
 
 /**
- * Eine Überschrift der Mitschrift.
+ * Eine Überschrift innerhalb eines Abschnitts der Mitschrift.
  *
- * Welche Art es ist, sagt der Block selbst: trägt er einen Namensraum, beginnt
- * hier ein neuer Bestandteil -- ein Baustoff, eine Platte. Alles andere
- * gliedert innerhalb.
- *
- * Vorher entschied die Ebene darüber, und die ist bei einem Abschnitt und bei
- * «Querkraft – x-Richtung» dieselbe. Beide sahen also gleich aus, und die
- * Mitschrift wirkte flach, wo sie es nicht ist. Die Ebene bleibt, aber nur
- * noch für die Tiefe *innerhalb* eines Abschnitts.
+ * Ein Titel mit Namensraum -- ein neuer Bestandteil, ein Baustoff, eine
+ * Platte -- steht hier nie: er ist der Kopf seines Panels (`abschnitte`).
+ * Die Ebene sagt nur noch die Tiefe *innerhalb* eines Abschnitts.
  */
 function titelZeichnen(block) {
-  if (block.raum) return el('div.b-titel', { text: block.text });
   return el(`div.b-untertitel${block.ebene >= 3 ? '.ist-tief' : ''}`,
     { text: block.text });
 }
 
-function lueckenBanner(loesung) {
+function lueckenPanel(loesung) {
   if (!loesung.fehlende?.length) return null;
-  return el('div', { class: 'abstand-oben' }, [
-    el('div.b-titel', { text: 'Fehlende Eingaben' }),
+  return panel({ schluessel: 'bericht/fehlende', titel: 'Fehlende Eingaben' }, [karte(null, [
     el('p.b-text', { text: 'Es fehlen:' }),
     ...loesung.fehlende.map((f) => el('div.luecke', {}, [
       el('div', {}, [
@@ -203,7 +202,16 @@ function lueckenBanner(loesung) {
         ? el('div.pfad', { text: `benötigt für: ${f.pfad.join(' → ')}` })
         : null,
     ])),
-  ]);
+  ])]);
+}
+
+/**
+ * Die Panels der rechten Tafel, untereinander wie die der mittleren und so
+ * breit wie `--berichtbreite` (Stilblatt). `klasse` trägt in den Diagrammen,
+ * wie viele nebeneinander stehen.
+ */
+function stapel(inhalt, klasse = '') {
+  return el('div.berichtstapel', { class: klasse }, inhalt);
 }
 
 // ===========================================================================
@@ -251,7 +259,7 @@ function herleitung(gesamt) {
     return leerzustand('Nichts gerechnet für diesen Bestandteil.');
   }
 
-  return el('div.blatt', {}, [
+  return stapel([
     verfolgung
       ? el('div.hinweis.hinweis-annahme.verfolgung', {}, [
         el('b', { text: verfolgung.name }),
@@ -265,9 +273,49 @@ function herleitung(gesamt) {
     ...(loesung.warnungen || []).map((w) => el('div.hinweis.hinweis-warnung', {}, [
       el('b', { text: 'Warnung: ' }), w,
     ])),
-    ...bloeckeZeichnen(bloecke),
-    lueckenBanner(loesung),
+    ...abschnitte(bloecke).map((a) => panel({
+      schluessel: `bericht/herleitung/${a.raum || a.titel}`, titel: a.titel,
+    }, kapitelkarten(a.bloecke))),
+    lueckenPanel(loesung),
   ]);
+}
+
+/**
+ * Ein Abschnitt der Mitschrift in Karten: je Kapitel -- ein Titel der Ebene
+ * 2, etwa «Querkraft – x-Richtung» -- eine Karte mit ihm im Kopf, wie die
+ * Kapitel der Eingaben. Was vor dem ersten steht, die Angaben des
+ * Bestandteils, bekommt eine Karte ohne Kopf.
+ */
+function kapitelkarten(bloecke) {
+  const kapitel = [];
+  for (const block of bloecke) {
+    if (block.art === 'titel' && block.ebene <= 2) {
+      kapitel.push({ titel: block.text, bloecke: [] });
+    } else {
+      if (!kapitel.length) kapitel.push({ titel: null, bloecke: [] });
+      kapitel.at(-1).bloecke.push(block);
+    }
+  }
+  return kapitel.map((k) => karte(k.titel, bloeckeZeichnen(k.bloecke)));
+}
+
+/**
+ * Die Mitschrift in Abschnitte geteilt: je Bestandteil einer -- ein Baustoff,
+ * eine Platte --, eröffnet von einem Titel mit Namensraum. Der Titel wird
+ * zum Kopf des Panels; was vor dem ersten steht, bildet einen Abschnitt
+ * «Herleitung».
+ */
+function abschnitte(bloecke) {
+  const heraus = [];
+  for (const block of bloecke) {
+    if (block.art === 'titel' && block.raum) {
+      heraus.push({ titel: block.text, raum: block.raum, bloecke: [] });
+    } else {
+      if (!heraus.length) heraus.push({ titel: 'Herleitung', raum: null, bloecke: [] });
+      heraus.at(-1).bloecke.push(block);
+    }
+  }
+  return heraus;
 }
 
 /**
@@ -303,29 +351,35 @@ function zusammenfassung(loesung, verfolgen) {
       `Links ${arten.slice(0, -1).join(', ')} oder ${arten.at(-1)} wählen oder oben «Gesamt».`);
   }
   if (!gezeigt.length && !ohne.length) {
-    return el('div.blatt', {}, [
-      leerzustand('Kein Bauteil vorhanden.'),
-      lueckenBanner(loesung),
-    ]);
+    return stapel([leerzustand('Kein Bauteil vorhanden.'), lueckenPanel(loesung)]);
   }
 
   const tabellen = loesung.zusammenfassungen || {};
 
-  const blaetter = gezeigt.map(({ kennung, eintrag }) => {
+  // Je Bauteil ein Panel, wie in den Eingaben: darin die Angaben, die
+  // Bewehrung, die Nachweise und die Kennzahlen je als Karte.
+  const panels = gezeigt.map(({ kennung, eintrag }) => {
     // Zeilen und LaTeX kommen fertig aus dem Kern. Sie hier ein zweites Mal
     // zusammenzustellen hiesse, dieselbe Tabelle zweimal zu pflegen -- einmal
     // fürs Auge, einmal für den Kopierknopf.
     const tabelle = tabellen[kennung];
+    const kennzahlen = plattenkennzahlen(eintrag, loesung);
 
-    return el('div.blatt', {}, [
-      el('div.b-titel', { text: `Zusammenfassung – ${eintrag.name}` }),
+    return panel({
+      schluessel: `bericht/zusammenfassung/${kennung}`, titel: `Zusammenfassung – ${eintrag.name}`,
+    }, [
       // Was das Bauteil ist und wie es bewehrt ist, steht über der Tabelle --
       // als gewöhnliche Gleichung und gewöhnliche Tabelle, mit denselben
-      // Kopierknöpfen wie alles andere.
-      tabelle?.angaben ? gleichungBlock(tabelle.angaben) : null,
-      tabelle?.bewehrung ? tabellenBlock(tabelle.bewehrung) : null,
-      tabelle
-        ? el('div.tabelle-block', {}, [
+      // Kopierknöpfen wie alles andere. Ihr Titel steht im Kopf der Karte.
+      tabelle?.angaben
+        ? karte(tabelle.angaben.titel, [gleichungBlock({ ...tabelle.angaben, titel: '' })],
+          { klasse: 'ist-links' })
+        : null,
+      tabelle?.bewehrung
+        ? karte(tabelle.bewehrung.titel, [tabellenBlock({ ...tabelle.bewehrung, titel: '' })])
+        : null,
+      karte('Nachweise', tabelle
+        ? [el('div.tabelle-block', {}, [
           el('div.tabelle-huelle', {}, [nachweistabelle(tabelle, verfolgen)]),
           werkzeugleiste({
             latex: tabelle.latex,
@@ -333,24 +387,28 @@ function zusammenfassung(loesung, verfolgen) {
             kopf: tabelle.kopf,
             zeilen: tabelle.zeilen.map((z) => z.zellen),
           }),
-          // Ein Widerstand von null erklärt sich nicht von selbst. Der Grund
-          // steht deshalb unter der Tabelle und nicht bloss im Tooltip, nach
-          // Grund gebündelt -- die Sätze kommen fertig aus dem Kern, derselbe
-          // Wortlaut wie im Bericht.
-          ...(tabelle.hinweise || []).map((text) => el('p.hinweis', { text })),
-          // Ausgeschaltete Nachweise: sie laufen mit, stehen aber nicht in
-          // der Tabelle und nicht in der Herleitung. Geht einer nicht auf,
-          // steht es hier -- leise, denn geführt wird er ja nicht.
-          ...(tabelle.stille || []).map((s) => el('p.stiller-hinweis', { text: s.text })),
-        ])
-        : el('div.leer', { text: 'Kein Nachweis gerechnet.' }),
-      plattenkennzahlen(eintrag, loesung),
+        ]),
+        // Ein Widerstand von null erklärt sich nicht von selbst. Der Grund
+        // steht deshalb unter der Tabelle und nicht bloss im Tooltip, nach
+        // Grund gebündelt -- die Sätze kommen fertig aus dem Kern, derselbe
+        // Wortlaut wie im Bericht.
+        ...(tabelle.hinweise || []).map((text) => el('p.hinweis', { text })),
+        // Ausgeschaltete Nachweise: sie laufen mit, stehen aber nicht in
+        // der Tabelle und nicht in der Herleitung. Geht einer nicht auf,
+        // steht es hier -- leise, denn geführt wird er ja nicht.
+        ...(tabelle.stille || []).map((s) => el('p.stiller-hinweis', { text: s.text }))]
+        : [el('div.leer', { text: 'Kein Nachweis gerechnet.' })]),
+      kennzahlen ? karte('Kennzahlen', [kennzahlen]) : null,
     ]);
   });
 
-  return el('div', {}, blaetter
-    .concat(ohne.map(({ art, kennung, eintrag }) => UEBERSICHTEN[art.art](kennung, eintrag.name)))
-    .concat([lueckenBanner(loesung)].filter(Boolean)));
+  return stapel([
+    ...panels,
+    ...ohne.map(({ art, kennung, eintrag }) => panel({
+      schluessel: `bericht/zusammenfassung/${kennung}`, titel: `Zusammenfassung – ${eintrag.name}`,
+    }, UEBERSICHTEN[art.art](kennung))),
+    lueckenPanel(loesung),
+  ]);
 }
 
 /**
@@ -470,100 +528,75 @@ function plattenkennzahlen(eintrag, loesung) {
 }
 
 /**
- * Spannung-Dehnung-Analyse -- noch ohne Inhalt.
- *
- * Das Panel steht, damit klar ist, wohin die Auswertung der Dehnungsebenen
- * gehört: der Querschnittslöser liefert zu jeder Schnittgrössenkombination
- * ein ε_m und ein χ, und daraus liesse sich der ganze Spannungsverlauf über
- * die Höhe zeichnen. Was genau gezeigt wird, ist noch offen -- darum steht
- * hier bewusst ein leerer Platz und keine erfundene Darstellung.
+ * Die Karten einer Platte: ihr Querschnitt, die Interaktionslinien, die
+ * Querkraftkurven und die Spannung-Dehnung-Analysen.
  */
-
-/**
- * Das Blatt einer Platte: ihr Querschnitt, die Interaktionslinien, die
- * Querkraftkurven und die Spannungsbilder.
- */
-function plattenblatt(kennung, eintrag, loesung) {
+function plattenkarten(kennung, eintrag, loesung) {
   const eigene = Object.values(loesung.linien || {}).filter((linie) => linie.bauteil === kennung);
-  return el('div.blatt', {}, [
-    el('div.b-titel', { text: `Querschnitt – ${eintrag.name}` }),
-    querschnittZeichnen(eintrag, loesung.werte || {}),
-    ...eigene.flatMap((linie) => [
-      el('div.b-titel', {
-        text: `M-N-Interaktionsdiagramm – ${eintrag.name}`,
-      }),
-      diagrammZeichnen(linie),
-    ]),
+  return [
+    karte('Querschnitt', [querschnittZeichnen(eintrag, loesung.werte || {})]),
+    ...eigene.map((linie) => karte('M-N-Interaktionsdiagramm', [diagrammZeichnen(linie)])),
     ...querkraftkurven(loesung, kennung),
     ...neigungskurven(loesung, kennung),
-    ...((loesung.spannungsanalysen || {})[kennung] || []).map(spannungsfallZeichnen),
-  ]);
+    ...spannungskarten(kennung, loesung),
+  ];
+}
+
+/** Die Spannung-Dehnung-Analysen eines Bauteils, je eine Karte. */
+function spannungskarten(kennung, loesung) {
+  return ((loesung.spannungsanalysen || {})[kennung] || []).map(spannungsfallZeichnen);
 }
 
 /**
- * Die Spannung-Dehnung-Analysen eines gezeichneten Querschnitts, auf einem
- * eigenen Blatt -- sie kommen mit der Rechnung, nicht mit den Diagrammen der
- * Analyse.
- */
-function analysenblatt(kennung, eintrag, loesung) {
-  const faelle = (loesung.spannungsanalysen || {})[kennung] || [];
-  if (!faelle.length) return [];
-  return [el('div.blatt', {}, [
-    el('div.b-titel', { text: `Spannung-Dehnung-Analysen – ${eintrag.name}` }),
-    ...faelle.map(spannungsfallZeichnen),
-  ])];
-}
-
-/**
- * Die Diagrammblätter je Bauteilart (ARTEN, arten.js). Die Diagramme der
+ * Die Karten je Bauteilart (ARTEN, arten.js). Die Diagramme der
  * Querschnittsanalysen und der Balkensysteme kommen aus eigenen Anfragen,
- * siehe qa_diagramme.js und bs_diagramme.js.
+ * siehe qa_diagramme.js und bs_diagramme.js; die Spannung-Dehnung-Analysen
+ * eines Querschnitts kommen mit der Rechnung.
  */
 const DIAGRAMME = {
-  querschnitt: (kennung, eintrag, loesung) => [plattenblatt(kennung, eintrag, loesung)],
+  querschnitt: plattenkarten,
   querschnittsanalyse: (kennung, eintrag, loesung) => [
-    ...analyseBlaetter(kennung, eintrag.name), ...analysenblatt(kennung, eintrag, loesung)],
-  balkensystem: (kennung, eintrag) => systemBlaetter(kennung, eintrag.name),
+    ...analyseKarten(kennung), ...spannungskarten(kennung, loesung)],
+  balkensystem: systemKarten,
 };
 
 function diagrammSicht(loesung) {
   const raum = eingrenzung();
   const gesetze = loesung.werkstoffgesetze || {};
-  const blaetter = [];
+  const spalten = zustand.diagrammspalten || 1;
+  // Die Karten eines Panels stehen so viele nebeneinander, wie gewählt ist.
+  const panelMit = (schluessel, titel, karten) => panel({ schluessel, titel }, [
+    el('div.karten', { class: `ist-${spalten}` }, karten)]);
+  const panels = [];
 
-  // -- Werkstoffgesetze ---------------------------------------------------
-  for (const [kennung, gesetz] of Object.entries(gesetze)) {
-    if (!imRaum(raum, `${gesetz.art}.${kennung}`)) continue;
-    blaetter.push(el('div.blatt', {}, [
-      el('div.b-titel', { text: `${gesetz.titel} – ${gesetz.name}` }),
-      gesetz.referenz
-        ? el('p.b-text', {
-          text: gesetz.referenz,
-          style: { fontSize: '12px', color: 'var(--schrift-zart)', margin: '0 0 6px' },
-        })
-        : null,
+  // -- Werkstoffgesetze: alle in einem Panel, je Material eine Karte -------
+  const gesetzkarten = Object.entries(gesetze)
+    .filter(([kennung, gesetz]) => imRaum(raum, `${gesetz.art}.${kennung}`))
+    .map(([, gesetz]) => karte(`${gesetz.titel} – ${gesetz.name}`, [
+      gesetz.referenz ? el('p.karte-hinweis', { text: gesetz.referenz }) : null,
       kurveZeichnen(gesetz, {
         zeigeVereinfacht: zustand.zeigeVereinfacht,
         beiUmschalten: (an) => aendern({ zeigeVereinfacht: an }, 'diagramm'),
       }),
     ]));
+  if (gesetzkarten.length) {
+    panels.push(panelMit('bericht/diagramm/werkstoffe', 'Werkstoffgesetze', gesetzkarten));
   }
 
   // -- Die Bauteile, Art für Art -------------------------------------------
   for (const art of ARTEN) {
     for (const [kennung, eintrag] of Object.entries(loesung.zuordnung?.[art.liste] || {})) {
       if (imRaum(raum, eintrag.namensraum)) {
-        blaetter.push(...DIAGRAMME[art.art](kennung, eintrag, loesung));
+        panels.push(panelMit(`bericht/diagramm/${kennung}`, `Diagramme – ${eintrag.name}`,
+          DIAGRAMME[art.art](kennung, eintrag, loesung)));
       }
     }
   }
 
-  if (!blaetter.length) return leerzustand('Noch nichts zu zeichnen.');
-  // Wie viele Blätter nebeneinander -- der Schalter steht über allem, weil er
-  // für alle gilt und nicht für eines.
-  return el('div', {}, [spaltenwahl(), el('div.blaetter', {
-    class: `ist-${zustand.diagrammspalten || 1}`,
-  }, blaetter)]);
+  if (!panels.length) return leerzustand('Noch nichts zu zeichnen.');
+  // Wie viele nebeneinander -- der Schalter steht über allem, weil er für
+  // alle gilt und nicht für eines.
+  return stapel([spaltenwahl(), ...panels], `ist-${spalten}`);
 }
 
 /** Wie viele Diagramme nebeneinander stehen -- eins, zwei oder drei. */
@@ -621,10 +654,7 @@ function querkraftkurven(loesung, querschnitt) {
   const alle = Object.entries(loesung.querkraftkurven || {})
     .filter(([, k]) => k.querschnitt === querschnitt);
 
-  return alle.flatMap(([kennung, kurve]) => [
-    el('div.b-titel', {
-      text: `Querkraft über Moment – ${kurve.name}`,
-    }),
+  return alle.map(([kennung, kurve]) => karte(`Querkraft über Moment – ${kurve.name}`, [
     querkraftkurveZeichnen(kurve),
     el('div.kurvenfuss', {}, [
       el('span.kurvenfuss-name', { text: 'gilt für N_Ed =' }),
@@ -639,7 +669,7 @@ function querkraftkurven(loesung, querschnitt) {
         text: 'Blass: Punkte mit anderem N.',
       }),
     ]),
-  ]);
+  ]));
 }
 
 /**
@@ -654,10 +684,7 @@ function neigungskurven(loesung, querschnitt) {
   const alle = Object.entries(loesung.neigungskurven || {})
     .filter(([, k]) => k.querschnitt === querschnitt);
 
-  return alle.flatMap(([, kurve]) => [
-    el('div.b-titel', {
-      text: `Querkraft über Neigung – ${kurve.name}`,
-    }),
+  return alle.map(([, kurve]) => karte(`Querkraft über Neigung – ${kurve.name}`, [
     neigungskurveZeichnen(kurve),
     el('div.kurvenfuss', {}, [
       el('span.kurvenfuss-name', { text: `d = ${kurve.d.toFixed(1)} mm` }),
@@ -668,7 +695,7 @@ function neigungskurven(loesung, querschnitt) {
           : 'Ausserhalb von α_min und α_max ist die Kurve blass gezeichnet.',
       }),
     ]),
-  ]);
+  ]));
 }
 
 /**

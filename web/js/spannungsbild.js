@@ -1,12 +1,20 @@
 /**
- * spannungsbild.js -- was im Querschnitt geschieht, gezeichnet.
+ * spannungsbild.js -- was im Querschnitt geschieht, als Diagramm.
  *
- * Bilder zu den sechs Fragen aus `opencivil/spannungsanalyse.py`:
+ * Diagramme zu den sechs Fragen aus `opencivil/spannungsanalyse.py`:
  *
  *   Dehnung und Spannung über die Höhe   -- für «aus N und M» und «aus Dehnungen»
  *   Momenten-Krümmungs-Linie M–χ         -- bei festgehaltener Normalkraft
  *   Normalkraft-Dehnungs-Linie N–ε       -- bei festgehaltenem Moment
  *   Äquivalenter E-Modul M–E_eq, N–E_eq  -- dieselben Linien, umgerechnet
+ *
+ * Gezeichnet wie das M-N-Interaktionsdiagramm und die Querkraftkurven:
+ * gleich gross, mit Gitter und Teilung an beiden Achsen, darunter die
+ * Legende, und über den Punkten steht beim Darüberfahren, was sie sind
+ * (Benutzer, 2026-10-16). Vorher waren es kleine Bilder ohne Teilung, mit
+ * den Grösstwerten an den Achsen. Dehnung und Spannung stehen in einem
+ * Diagramm: zwei Felder nebeneinander mit derselben Höhenachse -- die
+ * Nulllinie läuft durch beide.
  *
  * Die Höhe läuft nach unten, wie man einen Schnitt zeichnet: z = 0 ist die
  * Oberkante. Das ist dieselbe Achse, die der Löser und der Lagenaufbau
@@ -16,100 +24,124 @@
  * Datei setzt Striche.
  */
 
-import { achsenkreuz, formelText } from './achsen.js';
+import { achsenkreuz, formelText, NR, schrittweite } from './achsen.js';
+import { karte } from './bausteine.js';
 import { beschriftungenEntzerren } from './diagramm.js';
 import { el, svgEl } from './dom.js';
 import { span } from './mathe.js';
 import { zustand } from './zustand.js';
 
-const BREITE = 300;
-const HOEHE = 250;
-const RAND = { oben: 24, unten: 34, links: 44, rechts: 14 };
+/** Dieselbe Grösse und derselbe Rand wie das M-N-Interaktionsdiagramm. */
+const BREITE = 720;
+const HOEHE = 520;
+const RAND = { oben: 22, rechts: 22, unten: 46, links: 74 };
+
+/** Wo das Feld der Dehnung endet und das der Spannung beginnt. */
+const TEILUNG_FELDER = 384;
 
 const ZUG = '#b3261e';
 const DRUCK = '#1d4ed8';
 const STAHL = '#b45309';
-const ACHSE = '#8895a8';
+const NULLLINIE = '#16794a';
+const LINIE = '#16794a';
+const VERGLEICH = '#8895a8';
 const SCHRIFT = '#1a1f27';
 
-/**
- * So weit reicht der Wertebereich über den grössten Wert hinaus: Platz für
- * seine Zahl daneben, auch bei «-435.0».
- */
-const SPIELRAUM = 1.4;
+/** So weit reicht der Wertebereich über den grössten Wert hinaus: Platz für seine Zahl. */
+const SPIELRAUM = 1.25;
 
 /** Weiss hinterlegt, damit eine Zahl auch über einem Strich lesbar bleibt. */
 const HOF = { 'paint-order': 'stroke', stroke: '#fff', 'stroke-width': 3 };
 
+/** Die Schrift der Zahlen und Namen im Diagramm -- wie im M-N-Diagramm. */
+const SCHRIFTGROESSE = 11;
+
 /**
- * Ein Rahmen mit Nulllinie und den Grenzwerten an den Achsen -- beide Bilder
- * teilen ihn. Ohne Gitter: gezeigt wird ein Verlauf, abgelesen werden die
- * Zahlen darüber.
+ * Die Teilung einer Achse mit so vielen Nachkommastellen, wie ihr Schritt
+ * verlangt: eine Krümmung von 0.004 1/m hiesse mit ganzen Zahlen überall 0.
  */
-function tafel({ titel, einheit, werte, hoeheMm }) {
-  // Der Wertebereich wird um null herum aufgespannt: eine Spannungsverteilung
-  // ohne sichtbare Nulllinie sagt nicht, wo Druck aufhört und Zug anfängt.
-  // Die Höhe läuft nach unten, darum der Bereich von hoeheMm nach 0.
-  const grenze = Math.max(1e-9, ...werte.map(Math.abs));
-  const { svg, daten, x, y } = achsenkreuz({
-    breite: BREITE, hoehe: HOEHE, rand: RAND, rahmen: true,
-    attribute: { class: 'sd-bild', preserveAspectRatio: 'xMidYMid meet' },
-    x: { bereich: [-grenze * SPIELRAUM, grenze * SPIELRAUM] },
-    y: { bereich: [hoeheMm, 0] },
-  });
-  const hoehe = HOEHE - RAND.oben - RAND.unten;
-
-  daten.append(svgEl('line', {
-    x1: x(0), y1: RAND.oben, x2: x(0), y2: RAND.oben + hoehe,
-    stroke: ACHSE, 'stroke-width': 1, 'stroke-dasharray': '3 3',
-  }));
-
-  daten.append(formelText(svgEl('text', {
-    x: RAND.links, y: 14, 'font-size': 11, 'font-weight': 600, fill: SCHRIFT,
-  }), titel));
-
-  for (const [wert, anker] of [[-grenze, 'start'], [grenze, 'end']]) {
-    const marke = svgEl('text', {
-      x: x(wert), y: HOEHE - 20, 'text-anchor': anker,
-      'font-size': 9.5, fill: ACHSE,
-    });
-    marke.textContent = `${wert.toFixed(wert && Math.abs(wert) < 10 ? 2 : 0)}`;
-    daten.append(marke);
-  }
-  const eh = svgEl('text', {
-    x: x(0), y: HOEHE - 6, 'text-anchor': 'middle', 'font-size': 9.5, fill: ACHSE,
-  });
-  eh.textContent = einheit;
-  daten.append(eh);
-
-  for (const z of [0, hoeheMm]) {
-    const marke = svgEl('text', {
-      x: RAND.links - 5, y: y(z) + (z ? 3 : 8), 'text-anchor': 'end',
-      'font-size': 9.5, fill: ACHSE,
-    });
-    marke.textContent = `${z.toFixed(0)}`;
-    daten.append(marke);
-  }
-  return { svg, daten, x, y };
-}
-
-/** Die gefüllte Fläche zwischen Nulllinie und Verlauf -- Druck und Zug getrennt. */
-function verlauf(svg, x, y, punkte, hol) {
-  for (const [vorzeichen, farbe] of [[-1, DRUCK], [1, ZUG]]) {
-    const teil = punkte.map((p) => (Math.sign(hol(p)) === vorzeichen ? hol(p) : 0));
-    if (!teil.some((w) => w !== 0)) continue;
-    const ecken = punkte.map((p, i) => `${x(teil[i]).toFixed(1)},${y(p.z).toFixed(1)}`);
-    svg.append(svgEl('polygon', {
-      points: [`${x(0)},${y(punkte[0].z)}`, ...ecken,
-        `${x(0)},${y(punkte[punkte.length - 1].z)}`].join(' '),
-      fill: farbe, 'fill-opacity': .16, stroke: farbe, 'stroke-width': 1.4,
-    }));
-  }
+function teilung([a, b], ziel = 8) {
+  const schritt = schrittweite(Math.abs(b - a) || 1, ziel);
+  const stellen = Math.max(0, Math.ceil(-Math.log10(schritt) - 1e-9));
+  return { ziel, format: (v) => zahl(v, stellen) };
 }
 
 /** Eine Zahl ohne «-0.0». */
 function zahl(wert, stellen) {
   return (Math.abs(wert) < 0.5 * 10 ** -stellen ? 0 : wert).toFixed(stellen);
+}
+
+/** Eine Zahl mit Einheit, «-» als Minus. */
+function mitEinheit(wert, stellen, einheit) {
+  return `${zahl(wert, stellen).replace('-', '−')} ${einheit}`;
+}
+
+/** Ein Text im Diagramm, als Formel gesetzt, mit weissem Hof. */
+function beschriftung(attribute, inhalt) {
+  return formelText(svgEl('text', {
+    'font-size': SCHRIFTGROESSE, fill: SCHRIFT, ...HOF, ...attribute,
+  }), inhalt);
+}
+
+/** Ein Tooltip für einen Punkt -- wie im M-N-Diagramm über `title`. */
+function mitTitel(knoten, text) {
+  const titel = svgEl('title');
+  titel.textContent = text;
+  knoten.append(titel);
+  return knoten;
+}
+
+// ===========================================================================
+// Die Legende
+// ===========================================================================
+
+/** Ein Strichmuster als kleine Probe für die Legende. */
+function strich(farbe, { muster = null, breite = 2.2 } = {}) {
+  const probe = svgEl('svg', { width: 26, height: 10, viewBox: '0 0 26 10', 'aria-hidden': 'true' });
+  probe.append(svgEl('line', {
+    x1: 1, y1: 5, x2: 25, y2: 5, stroke: farbe, 'stroke-width': breite,
+    'stroke-dasharray': muster,
+  }));
+  return probe;
+}
+
+/** Ein Punkt für die Legende: gefüllt, oder hohl wie die Ecken der Linien. */
+function punkt(farbe, hohl = false) {
+  return el('i', {
+    style: hohl ? { background: '#fff', border: `2px solid ${farbe}`, boxSizing: 'border-box' }
+      : { background: farbe },
+  });
+}
+
+/** Eine Fläche für die Legende: Druck oder Zug. */
+function flaeche(farbe) {
+  return el('i', {
+    style: {
+      background: farbe, opacity: 0.35, borderRadius: '2px', border: `1px solid ${farbe}`,
+    },
+  });
+}
+
+function legende(eintraege) {
+  return el('div.mn-legende', {}, eintraege.map(([probe, text]) => el('span', {}, [probe, text])));
+}
+
+// ===========================================================================
+// Dehnung und Spannung über die Höhe
+// ===========================================================================
+
+/** Die gefüllte Fläche zwischen Nulllinie und Verlauf -- Druck und Zug getrennt. */
+function verlauf(daten, x, y, punkte, hol) {
+  for (const [vorzeichen, farbe] of [[-1, DRUCK], [1, ZUG]]) {
+    const teil = punkte.map((p) => (Math.sign(hol(p)) === vorzeichen ? hol(p) : 0));
+    if (!teil.some((w) => w !== 0)) continue;
+    const ecken = punkte.map((p, i) => `${x(teil[i]).toFixed(1)},${y(p.z).toFixed(1)}`);
+    daten.append(svgEl('polygon', {
+      points: [`${x(0)},${y(punkte[0].z)}`, ...ecken,
+        `${x(0)},${y(punkte[punkte.length - 1].z)}`].join(' '),
+      fill: farbe, 'fill-opacity': 0.16, stroke: farbe, 'stroke-width': 1.6,
+    }));
+  }
 }
 
 /**
@@ -121,81 +153,136 @@ function zahl(wert, stellen) {
  * Ein Zettel: `wert`, `punkt` (die Höhe des Punkts im Bild), `soll` (wo die
  * Grundlinie der Zahl stehen möchte) und `farbe`.
  */
-function anschreiben(daten, x, zettel, stellen) {
-  const oben = RAND.oben + 9;
-  const unten = HOEHE - RAND.unten - 3;
+function anschreiben(daten, x, feld, zettel, stellen) {
+  const oben = feld.oben + 10;
+  const unten = feld.unten - 3;
   for (const seite of [-1, 1]) {
     const teil = zettel.filter((z) => (zahl(z.wert, stellen) < 0 ? -1 : 1) === seite);
     if (!teil.length) continue;
-    for (const z of beschriftungenEntzerren(teil, 11, oben, unten)) {
-      const px = x(z.wert) + seite * 5;
+    for (const z of beschriftungenEntzerren(teil, 13, oben, unten)) {
+      const px = x(z.wert) + seite * 6;
       if (Math.abs(z.y - z.soll) > 2) {
         daten.append(svgEl('line', {
-          x1: x(z.wert), y1: z.punkt, x2: px - seite * 1, y2: z.y - 3.5,
-          stroke: z.farbe, 'stroke-width': .8, 'stroke-opacity': .7,
+          x1: x(z.wert), y1: z.punkt, x2: px - seite, y2: z.y - 4,
+          stroke: z.farbe, 'stroke-width': 0.8, 'stroke-opacity': 0.7,
         }));
       }
-      const t = svgEl('text', {
+      daten.append(beschriftung({
         x: px, y: z.y, 'text-anchor': seite < 0 ? 'end' : 'start',
-        'font-size': 9.5, 'font-weight': 600, fill: z.farbe, ...HOF,
-      });
-      t.textContent = zahl(z.wert, stellen);
-      daten.append(t);
+        'font-weight': 600, fill: z.farbe,
+      }, zahl(z.wert, stellen)));
     }
   }
 }
 
-/** Dehnung oder Spannung über die Höhe, mit den Bewehrungslagen darin. */
-function ueberDieHoehe(bild, { titel, einheit, hol, stahlHol, stellen }) {
+/**
+ * Ein Feld des Diagramms: Dehnung oder Spannung über die Höhe, mit den
+ * Bewehrungslagen darin. `links` sagt, ob es die Höhenachse trägt -- das
+ * rechte Feld teilt sie, ohne sie ein zweites Mal anzuschreiben.
+ */
+function hoehenfeld(bild, {
+  breite, rand, titel, hol, stahlHol, stellen, einheit, links,
+}) {
+  // Um null herum aufgespannt: eine Spannungsverteilung ohne sichtbare
+  // Nulllinie sagt nicht, wo Druck aufhört und Zug anfängt.
   const werte = [...bild.beton.map(hol), ...bild.stahl.map(stahlHol)];
-  const { svg, daten, x, y } = tafel({ titel, einheit, werte, hoeheMm: bild.h });
+  const grenze = Math.max(1e-9, ...werte.map(Math.abs)) * SPIELRAUM;
+  const bereich = [-grenze, grenze];
+  const { svg, daten, x, y, feld } = achsenkreuz({
+    breite, hoehe: HOEHE, rand,
+    attribute: { x: links ? 0 : TEILUNG_FELDER, y: 0, width: breite, height: HOEHE },
+    x: { bereich, teilung: teilung(bereich, 6), null: true, titel },
+    // Die Höhe läuft nach unten. Das rechte Feld zieht dieselben Linien,
+    // ohne Zahlen daran.
+    y: {
+      bereich: [bild.h, 0],
+      teilung: links ? teilung([0, bild.h], 8) : { ziel: 8, format: () => '' },
+      titel: links ? 'z [mm]  (ab Oberkante)' : null,
+    },
+  });
   verlauf(daten, x, y, bild.beton, hol);
 
   if (bild.nulllinie !== null && bild.nulllinie !== undefined) {
     daten.append(svgEl('line', {
-      x1: RAND.links, y1: y(bild.nulllinie), x2: BREITE - RAND.rechts,
-      y2: y(bild.nulllinie), stroke: '#16794a', 'stroke-width': 1.2,
-      'stroke-dasharray': '5 3',
+      x1: feld.links, y1: y(bild.nulllinie), x2: feld.rechts, y2: y(bild.nulllinie),
+      stroke: NULLLINIE, 'stroke-width': 1.4, 'stroke-dasharray': '6 4',
     }));
-    const marke = svgEl('text', {
-      x: BREITE - RAND.rechts - 2, y: y(bild.nulllinie) - 3,
-      'text-anchor': 'end', 'font-size': 9.5, fill: '#16794a',
-    });
-    marke.textContent = `x = ${bild.nulllinie.toFixed(0)} mm`;
-    daten.append(marke);
+    if (!links) {
+      daten.append(beschriftung({
+        x: feld.rechts - 4, y: y(bild.nulllinie) - 5, 'text-anchor': 'end', fill: NULLLINIE,
+      }, `x = ${bild.nulllinie.toFixed(0)} mm`));
+    }
   }
 
   for (const lage of bild.stahl) {
     const wert = stahlHol(lage);
     daten.append(svgEl('line', {
-      x1: x(0), y1: y(lage.z), x2: x(wert), y2: y(lage.z),
-      stroke: STAHL, 'stroke-width': 2,
+      x1: x(0), y1: y(lage.z), x2: x(wert), y2: y(lage.z), stroke: STAHL, 'stroke-width': 2.4,
     }));
-    const punkt = svgEl('circle', {
-      cx: x(wert), cy: y(lage.z), r: 3, fill: STAHL,
-    });
-    const titelKnoten = svgEl('title');
-    titelKnoten.textContent =
-      `${lage.name || `${lage.nummer}. Lage`} – ${lage.a_s.toFixed(0)} mm²\n`
+    daten.append(mitTitel(svgEl('circle', {
+      cx: x(wert), cy: y(lage.z), r: 4.5, fill: STAHL, stroke: '#fff', 'stroke-width': 1.5,
+    }), `${lage.name || `${lage.nummer}. Lage`} – ${lage.a_s.toFixed(0)} mm², z = ${lage.z.toFixed(0)} mm\n`
       + `ε = ${lage.eps.toFixed(3)} ‰, σ = ${lage.sigma.toFixed(0)} N/mm²\n`
-      + `F = ${lage.kraft.toFixed(1)} kN`;
-    punkt.append(titelKnoten);
-    daten.append(punkt);
+      + `F = ${lage.kraft.toFixed(1)} kN`));
   }
 
   // Der Beton am Rand: zuoberst knapp unter, zuunterst knapp über der Kante.
-  const betonfarbe = (w) => (w < 0 ? DRUCK : w > 0 ? ZUG : ACHSE);
-  const kopfwert = hol(bild.beton[0]);
-  const fusswert = hol(bild.beton[bild.beton.length - 1]);
-  anschreiben(daten, x, [
-    { wert: kopfwert, punkt: y(0), soll: y(0) + 9, farbe: betonfarbe(kopfwert) },
-    { wert: fusswert, punkt: y(bild.h), soll: y(bild.h) - 3, farbe: betonfarbe(fusswert) },
+  const betonfarbe = (w) => (w < 0 ? DRUCK : w > 0 ? ZUG : VERGLEICH);
+  const kopf = bild.beton[0];
+  const fuss = bild.beton[bild.beton.length - 1];
+  for (const [p, wo] of [[kopf, 'Oberkante'], [fuss, 'Unterkante']]) {
+    daten.append(mitTitel(svgEl('circle', {
+      cx: x(hol(p)), cy: y(p.z), r: 3.5, fill: betonfarbe(hol(p)), stroke: '#fff', 'stroke-width': 1.2,
+    }), `Beton an der ${wo}: ${zahl(hol(p), stellen)} ${einheit}`));
+  }
+  anschreiben(daten, x, feld, [
+    { wert: hol(kopf), punkt: y(0), soll: y(0) + 12, farbe: betonfarbe(hol(kopf)) },
+    { wert: hol(fuss), punkt: y(bild.h), soll: y(bild.h) - 4, farbe: betonfarbe(hol(fuss)) },
     ...bild.stahl.map((lage) => ({
-      wert: stahlHol(lage), punkt: y(lage.z), soll: y(lage.z) + 3.5, farbe: STAHL,
+      wert: stahlHol(lage), punkt: y(lage.z), soll: y(lage.z) + 4, farbe: STAHL,
     })),
   ], stellen);
   return svg;
 }
+
+/**
+ * Dehnung und Spannung über die Höhe in einem Diagramm: links die Dehnung,
+ * rechts die Spannung, beide an derselben Höhenachse (Benutzer, 2026-10-16).
+ * Zwei Felder statt zweier Achsen in einem: die Einheiten sind verschieden,
+ * und übereinander gezeichnet läse man die eine Kurve an der Achse der
+ * anderen.
+ */
+function verteilungsbild(bild) {
+  const svg = svgEl('svg', {
+    class: 'mn', xmlns: NR, viewBox: `0 0 ${BREITE} ${HOEHE}`, role: 'img',
+    'aria-label': 'Dehnung und Spannung über die Höhe',
+  });
+  svg.append(
+    hoehenfeld(bild, {
+      breite: TEILUNG_FELDER, rand: { ...RAND, rechts: 16 }, links: true,
+      titel: 'Dehnung ε [‰]', einheit: '‰', stellen: 2,
+      hol: (p) => p.eps, stahlHol: (s) => s.eps,
+    }),
+    hoehenfeld(bild, {
+      breite: BREITE - TEILUNG_FELDER, rand: { ...RAND, links: 16 }, links: false,
+      titel: 'Spannung σ [N/mm²]', einheit: 'N/mm²', stellen: 1,
+      hol: (p) => p.sigma, stahlHol: (s) => s.sigma,
+    }),
+  );
+  return el('div.diagramm-huelle', {}, [
+    svg,
+    legende([
+      [flaeche(DRUCK), 'Druck im Beton'],
+      [flaeche(ZUG), 'Zug im Beton'],
+      [punkt(STAHL), 'Bewehrungslage'],
+      [strich(NULLLINIE, { muster: '6 4', breite: 1.6 }), 'Nulllinie'],
+    ]),
+  ]);
+}
+
+// ===========================================================================
+// Die Linien: M–χ, N–ε, M–E_eq, N–E_eq
+// ===========================================================================
 
 /**
  * Was eine Linie ausmacht, je Art: wie Kraft und Verformung heissen, in
@@ -217,15 +304,24 @@ const LINIEN = {
   },
 };
 
+/**
+ * Was die Linie des äquivalenten Moduls ausmacht, je Art: die laufende Kraft,
+ * ihre Einheit und was festgehalten wird.
+ */
+const MODULE = {
+  moment_emodul: { kraft: 'M', kraftEinheit: 'kNm', fest: ['N', 'kN'], achse: 'M [kNm]' },
+  normalkraft_emodul: { kraft: 'N', kraftEinheit: 'kN', fest: ['M', 'kNm'], achse: 'N [kN]' },
+};
+
 /** Zeilenabstand der Namen an den Eckpunkten. */
-const ZEILE = 12.5;
+const ZEILE = 14;
 
 /** Ungefähre Breite einer Zeile -- ohne Satzzeichen des Formelsatzes, ein Index schmaler. */
 function zeilenbreite(zeile) {
   const index = [...zeile.matchAll(/_\{([^}]*)\}|_([A-Za-z0-9]+)/g)]
     .reduce((summe, m) => summe + (m[1] ?? m[2]).length, 0);
   const alles = zeile.replace(/[_{}]/g, '').length;
-  return 6.3 * (alles - index) + 4.8 * index;
+  return 6.7 * (alles - index) + 5.1 * index;
 }
 
 /**
@@ -238,7 +334,7 @@ function zeilenbreite(zeile) {
  * ersten, ins Feld geschoben.
  *
  * Eine Ecke: `px`, `py`, `zeilen` (die erste in Farbe, die übrigen zart),
- * `farbe`.
+ * `farbe`. Über dem Punkt steht beim Darüberfahren dasselbe.
  */
 function eckenAnschreiben(daten, feld, ecken) {
   const gesetzt = [];
@@ -248,21 +344,21 @@ function eckenAnschreiben(daten, feld, ecken) {
       || k.unten + 2 < g.oben || k.oben - 2 > g.unten);
   for (const { px, py, zeilen, farbe } of ecken) {
     const breite = Math.max(...zeilen.map(zeilenbreite));
-    const hoehe = (zeilen.length - 1) * ZEILE + 11;
-    const lagen = [[1, 15], [-1, 15], [-1, -8 - hoehe + 11], [1, -8 - hoehe + 11],
-      [-1, 19 + hoehe], [1, 19 + hoehe], [-1, 23 + 2 * hoehe]];
+    const hoehe = (zeilen.length - 1) * ZEILE + 12;
+    const lagen = [[1, 17], [-1, 17], [-1, -9 - hoehe + 12], [1, -9 - hoehe + 12],
+      [-1, 21 + hoehe], [1, 21 + hoehe], [-1, 25 + 2 * hoehe]];
     // Weiter oben, je eine Höhe mehr -- mit Strich zum Punkt.
     const nah = lagen.length;
     for (let n = 1; n <= 8; n += 1) {
-      const dy = -8 - hoehe + 11 - n * (hoehe + 6);
+      const dy = -9 - hoehe + 12 - n * (hoehe + 6);
       lagen.push([-1, dy], [1, dy]);
     }
     const kasten = ([seite, dy]) => {
-      const x = px + seite * 7;
+      const x = px + seite * 8;
       return {
         x, y: py + dy, seite,
         links: seite > 0 ? x : x - breite, rechts: seite > 0 ? x + breite : x,
-        oben: py + dy - 9, unten: py + dy - 9 + hoehe,
+        oben: py + dy - 10, unten: py + dy - 10 + hoehe,
       };
     };
     const wahl = lagen.findIndex((lage) => frei(kasten(lage)));
@@ -278,22 +374,54 @@ function eckenAnschreiben(daten, feld, ecken) {
       }));
     }
     gesetzt.push(k);
-    daten.append(svgEl('circle', {
-      cx: px, cy: py, r: 3.2, fill: '#fff', stroke: farbe, 'stroke-width': 1.6,
-    }));
+    daten.append(mitTitel(svgEl('circle', {
+      cx: px, cy: py, r: 4.5, fill: '#fff', stroke: farbe, 'stroke-width': 2,
+    }), zeilen.map((z) => z.replace(/_\{([^}]*)\}/g, '_$1')).join('\n')));
     zeilen.forEach((zeile, i) => {
-      daten.append(formelText(svgEl('text', {
+      daten.append(beschriftung({
         x: k.x, y: k.y + i * ZEILE, 'text-anchor': k.seite > 0 ? 'start' : 'end',
-        'font-size': i ? 9.5 : 10.5, 'font-weight': i ? 400 : 600,
-        fill: i ? SCHRIFT : farbe, ...HOF,
-      }), zeile));
+        'font-size': i ? SCHRIFTGROESSE - 1 : SCHRIFTGROESSE, 'font-weight': i ? 400 : 600,
+        fill: i ? SCHRIFT : farbe,
+      }, zeile));
     });
   }
 }
 
-/** Eine Zahl mit Einheit, «-» als Minus. */
-function mitEinheit(wert, stellen, einheit) {
-  return `${zahl(wert, stellen).replace('-', '−')} ${einheit}`;
+/**
+ * Ein leeres Diagramm für eine Linie: so gross wie das M-N-Diagramm, mit
+ * Gitter und Teilung an beiden Achsen.
+ */
+function linienkreuz(xBereich, yBereich, xTitel, yTitel, beschreibung) {
+  return achsenkreuz({
+    breite: BREITE, hoehe: HOEHE, rand: RAND,
+    attribute: { class: 'mn', xmlns: NR, role: 'img', 'aria-label': beschreibung },
+    x: { bereich: xBereich, teilung: teilung(xBereich), null: true, titel: xTitel },
+    y: { bereich: yBereich, teilung: teilung(yBereich), null: true, titel: yTitel },
+  });
+}
+
+/** Eine Polylinie aus den Punkten, bei denen `hol` einen Wert hat. */
+function zug(daten, punkte, px, py, { farbe, breite, muster = null }) {
+  const da = punkte.filter((p) => px(p) !== null && py(p) !== null);
+  if (da.length < 2) return;
+  daten.append(svgEl('polyline', {
+    points: da.map((p) => `${px(p).toFixed(2)},${py(p).toFixed(2)}`).join(' '),
+    fill: 'none', stroke: farbe, 'stroke-width': breite, 'stroke-dasharray': muster,
+    'stroke-linejoin': 'round',
+  }));
+}
+
+/** Die Legende unter jeder Linie: was durchgezogen und was gestrichelt ist, und die Ecken. */
+function linienlegende(K, kennwert) {
+  return legende([
+    [strich(LINIE), 'Querschnitt: ungerissen bis zum Riss, darüber gerissen (ohne Zugversteifung)'],
+    [strich(VERGLEICH, { muster: '6 4', breite: 1.4 }), 'ungerissen (I), bis zum Riss'],
+    [strich(VERGLEICH, { muster: '2 3', breite: 1.4 }), 'immer gerissen, ohne f_ct (II)'],
+    [punkt(ZUG, true), 'Riss'],
+    [punkt(STAHL, true), `${K}_y: Fliessbeginn`],
+    [punkt(LINIE, true), `${K}_${kennwert}: Ende der Linie, der Widerstand – wie in der `
+      + 'Tragsicherheit, wenn sie gleich wählt'],
+  ]);
 }
 
 /**
@@ -311,32 +439,23 @@ function linienbild(fall) {
   const vMax = Math.max(1e-9, ...verformungen);
   const kMax = Math.max(1e-9, ...k.punkte.map((p) => p.kraft));
   const spanne = vMax - vMin;
-  const { svg, daten, x, y, feld } = achsenkreuz({
-    breite: BREITE * 2, hoehe: HOEHE, rand: RAND, rahmen: true,
-    attribute: { class: 'sd-bild sd-breit', preserveAspectRatio: 'xMidYMid meet' },
-    x: {
-      bereich: [vMin - (vMin < 0 ? 0.05 * spanne : 0), vMax + 0.05 * spanne],
-      titel: art.achse(fall.bezugsort),
-    },
-    y: { bereich: [0, kMax * 1.05], titel: `${art.kraft} [${art.kraftEinheit}]` },
-    schrift: { teilung: 9.5, titel: 11 }, titelLinks: 12,
-  });
+  const { svg, daten, x, y, feld } = linienkreuz(
+    [vMin - (vMin < 0 ? 0.05 * spanne : 0), vMax + 0.05 * spanne], [0, kMax * 1.08],
+    art.achse(fall.bezugsort), `${art.kraft} [${art.kraftEinheit}]`, fall.titel);
 
-  const linie = (hol, farbe, breiteStrich, muster) => {
-    const punkte = k.punkte.filter((p) => hol(p) !== null && hol(p) !== undefined);
-    if (punkte.length < 2) return;
-    daten.append(svgEl('polyline', {
-      points: punkte.map((p) => `${x(hol(p)).toFixed(2)},${y(p.kraft).toFixed(2)}`).join(' '),
-      fill: 'none', stroke: farbe, 'stroke-width': breiteStrich,
-      'stroke-dasharray': muster || null,
-    }));
+  const wert = (hol) => (p) => {
+    const v = hol(p);
+    return v === null || v === undefined ? null : x(v);
   };
-  linie((p) => p.verformung_I, ACHSE, 1.2, '4 3');
-  linie((p) => p.verformung_II, ACHSE, 1.2, '2 3');
-  linie((p) => p.verformung, '#16794a', 2.2);
+  const kraft = (p) => y(p.kraft);
+  zug(daten, k.punkte, wert((p) => p.verformung_I), kraft,
+    { farbe: VERGLEICH, breite: 1.4, muster: '6 4' });
+  zug(daten, k.punkte, wert((p) => p.verformung_II), kraft,
+    { farbe: VERGLEICH, breite: 1.4, muster: '2 3' });
+  zug(daten, k.punkte, wert((p) => p.verformung), kraft, { farbe: LINIE, breite: 2.4 });
 
-  const v = (wert) => mitEinheit(wert, art.stellen, art.verformungEinheit);
-  const f = (wert) => mitEinheit(wert, 1, art.kraftEinheit);
+  const v = (w) => mitEinheit(w, art.stellen, art.verformungEinheit);
+  const f = (w) => mitEinheit(w, 1, art.kraftEinheit);
   const kennwert = fall.wahl?.index || 'Rd';
   const ecken = [];
   // Das Ende zuerst: es steht am Rand, und die anderen weichen ihm aus.
@@ -344,7 +463,7 @@ function linienbild(fall) {
   // gilt dort ihre letzte Verformung, nicht die gerissene des Bruchs.
   if (ende && k.bruch) {
     ecken.push({
-      px: x(ende.verformung), py: y(ende.kraft), farbe: '#16794a',
+      px: x(ende.verformung), py: y(ende.kraft), farbe: LINIE,
       zeilen: ende.gerissen
         ? [`${art.kraft}_{${kennwert}} = ${f(k.bruch.kraft)}`,
           `${art.verformung('u')} = ${v(k.bruch.verformung)}`, k.bruch.massgebend]
@@ -365,7 +484,7 @@ function linienbild(fall) {
   // Der Riss: ein Punkt vor dem waagrechten Stück, der Name an seinem Ende.
   if (k.sprung) {
     daten.append(svgEl('circle', {
-      cx: x(k.sprung.vor), cy: y(k.sprung.kraft), r: 2.4, fill: ZUG,
+      cx: x(k.sprung.vor), cy: y(k.sprung.kraft), r: 3, fill: ZUG,
     }));
     ecken.push({
       px: x(k.sprung.nach), py: y(k.sprung.kraft), farbe: ZUG,
@@ -374,29 +493,8 @@ function linienbild(fall) {
     });
   }
   eckenAnschreiben(daten, feld, ecken);
-
-  // Ohne Gitter: an den Achsen stehen nur die Grösstwerte.
-  for (const [wert, px, py, anker] of [
-    [vMax.toFixed(art.stellen), feld.rechts, HOEHE - 22, 'end'],
-    [kMax.toFixed(0), feld.links - 5, feld.oben + 8, 'end'],
-  ]) {
-    const t = svgEl('text', {
-      x: px, y: py, 'text-anchor': anker, 'font-size': 9.5, fill: ACHSE,
-    });
-    t.textContent = wert;
-    svg.append(t);
-  }
-  return svg;
+  return el('div.diagramm-huelle', {}, [svg, linienlegende(art.kraft, kennwert)]);
 }
-
-/**
- * Was die Linie des äquivalenten Moduls ausmacht, je Art: die laufende Kraft,
- * ihre Einheit und was festgehalten wird.
- */
-const MODULE = {
-  moment_emodul: { kraft: 'M', kraftEinheit: 'kNm', fest: ['N', 'kN'], achse: 'M [kNm]' },
-  normalkraft_emodul: { kraft: 'N', kraftEinheit: 'kN', fest: ['M', 'kNm'], achse: 'N [kN]' },
-};
 
 /** Das Vielfache von E_cm -- der Faktor, um den man E_cm abmindert. */
 function vielfaches(wert, E_cm) {
@@ -423,26 +521,19 @@ function modulbild(fall) {
     .filter((v) => v !== null && v !== undefined);
   const eMax = Math.max(1e-9, ...werte);
   const kMax = Math.max(1e-9, ...k.punkte.map((p) => p.kraft));
-  const { svg, daten, x, y, feld } = achsenkreuz({
-    breite: BREITE * 2, hoehe: HOEHE, rand: RAND, rahmen: true,
-    attribute: { class: 'sd-bild sd-breit', preserveAspectRatio: 'xMidYMid meet' },
-    x: { bereich: [0, kMax * 1.05], titel: art.achse },
-    y: { bereich: [0, eMax * 1.08], titel: 'E_eq [N/mm²]' },
-    schrift: { teilung: 9.5, titel: 11 }, titelLinks: 12,
-  });
+  const { svg, daten, x, y, feld } = linienkreuz(
+    [0, kMax * 1.05], [0, eMax * 1.1], art.achse, 'E_eq [N/mm²]', fall.titel);
 
-  const linie = (hol, farbe, breiteStrich, muster) => {
-    const punkte = k.punkte.filter((p) => hol(p) !== null && hol(p) !== undefined);
-    if (punkte.length < 2) return;
-    daten.append(svgEl('polyline', {
-      points: punkte.map((p) => `${x(p.kraft).toFixed(2)},${y(hol(p)).toFixed(2)}`).join(' '),
-      fill: 'none', stroke: farbe, 'stroke-width': breiteStrich,
-      'stroke-dasharray': muster || null,
-    }));
+  const modul = (hol) => (p) => {
+    const v = hol(p);
+    return v === null || v === undefined ? null : y(v);
   };
-  linie((p) => p.modul_I, ACHSE, 1.2, '4 3');
-  linie((p) => p.modul_II, ACHSE, 1.2, '2 3');
-  linie((p) => p.modul, '#16794a', 2.2);
+  const kraft = (p) => x(p.kraft);
+  zug(daten, k.punkte, kraft, modul((p) => p.modul_I),
+    { farbe: VERGLEICH, breite: 1.4, muster: '6 4' });
+  zug(daten, k.punkte, kraft, modul((p) => p.modul_II),
+    { farbe: VERGLEICH, breite: 1.4, muster: '2 3' });
+  zug(daten, k.punkte, kraft, modul((p) => p.modul), { farbe: LINIE, breite: 2.4 });
 
   const f = (wert) => mitEinheit(wert, 1, art.kraftEinheit);
   const e = (wert) => modulText(wert, k.E_cm);
@@ -454,7 +545,7 @@ function modulbild(fall) {
   // Das Ende zuerst: es steht am Rand, und die anderen weichen ihm aus.
   if (ende && k.bruch) {
     ecken.push({
-      px: x(ende.kraft), py: y(ende.modul), farbe: '#16794a',
+      px: x(ende.kraft), py: y(ende.modul), farbe: LINIE,
       zeilen: ende.gerissen
         ? [`${art.kraft}_{${kennwert}} = ${f(k.bruch.kraft)}`, `E_{eq} = ${e(ende.modul)}`,
           k.bruch.massgebend]
@@ -485,27 +576,27 @@ function modulbild(fall) {
   // ersten Punkts.
   if (anfang && anfang !== ende) {
     ecken.push({
-      px: x(anfang.kraft), py: y(anfang.modul), farbe: anfang.gerissen ? '#16794a' : ACHSE,
+      px: x(anfang.kraft), py: y(anfang.modul), farbe: anfang.gerissen ? LINIE : VERGLEICH,
       zeilen: [`${art.kraft} = ${f(anfang.kraft)}`, `E_{eq} = ${e(anfang.modul)}`],
     });
   }
   eckenAnschreiben(daten, feld, ecken);
-
-  // Ohne Gitter: an den Achsen stehen nur die Grösstwerte.
-  for (const [wert, px, py, anker] of [
-    [kMax.toFixed(0), feld.rechts, HOEHE - 22, 'end'],
-    [eMax.toFixed(0), feld.links - 5, feld.oben + 8, 'end'],
-  ]) {
-    const t = svgEl('text', {
-      x: px, y: py, 'text-anchor': anker, 'font-size': 9.5, fill: ACHSE,
-    });
-    t.textContent = wert;
-    svg.append(t);
-  }
-  return svg;
+  return el('div.diagramm-huelle', {}, [
+    svg,
+    linienlegende(art.kraft, kennwert),
+    el('p.karte-hinweis', {
+      text: 'E_eq: der E-Modul, den der reine Betonquerschnitt – ungerissen, ohne Stahl, '
+        + 'elastisch – bräuchte, um sich gleich stark zu verformen; gezählt ab dem Zustand '
+        + 'ohne laufende Kraft.',
+    }),
+  ]);
 }
 
-/** Die Zahlen über dem Bild, die Namen als Formel: χ ist dort kein x. */
+// ===========================================================================
+// Ein Fall als Karte
+// ===========================================================================
+
+/** Die Zahlen über dem Diagramm, die Namen als Formel: χ ist dort kein x. */
 function zahlenzeile(eintraege) {
   return el('div.sd-zahlen', {}, eintraege.map(([latex, wert]) =>
     el('span', {}, [el('b', {}, [span(`${latex} =`)]), ` ${wert}`])));
@@ -523,18 +614,9 @@ function wahlzeile(wahl) {
   ]);
 }
 
-/** Ein Fall: Überschrift, Zahlen, Bilder. */
-export function spannungsfallZeichnen(fall) {
-  if (!fall.moeglich) {
-    return el('div.sd-fall', {}, [
-      el('div.sd-kopf', { text: `${fall.name} – ${fall.titel}` }),
-      el('p.hinweis', { text: fall.hinweis }),
-    ]);
-  }
-
-  const kopf = el('div.sd-kopf', {
-    text: `${fall.name} – ${fall.titel} (${fall.richtung_text})`,
-  });
+/** Der Inhalt eines Falls: Zahlen und Diagramm -- je nachdem, was er fragt. */
+function inhalt(fall) {
+  if (!fall.moeglich) return [el('p.hinweis', { text: fall.hinweis })];
 
   if (fall.kurve && MODULE[fall.art]) {
     const k = fall.kurve;
@@ -544,8 +626,7 @@ export function spannungsfallZeichnen(fall) {
     const kraft = (wert) => mitEinheit(wert, 1, art.kraftEinheit);
     const modul = (wert) => (wert === null || wert === undefined ? '–'
       : `${mitEinheit(wert, 0, 'N/mm²')} = ${vielfaches(wert, k.E_cm)}·E_cm`);
-    return el('div.sd-fall', {}, [
-      kopf,
+    return [
       wahlzeile(fall.wahl),
       zahlenzeile([
         [art.fest[0], mitEinheit(k.fest, 1, art.fest[1])],
@@ -559,15 +640,8 @@ export function spannungsfallZeichnen(fall) {
         ['E_{cm}', mitEinheit(k.E_cm, 0, 'N/mm²')],
       ]),
       k.punkte.length ? modulbild(fall) : null,
-      el('p.sd-legende', {
-        text: 'E_eq: der E-Modul, den der reine Betonquerschnitt – ungerissen, ohne '
-          + 'Stahl, elastisch – bräuchte, um sich gleich stark zu verformen; gezählt ab dem '
-          + 'Zustand ohne laufende Kraft. Durchgezogen: der Querschnitt – ungerissen bis zum '
-          + 'Riss, dann der Sprung, darüber gerissen (ohne Zugversteifung) · lang gestrichelt: '
-          + 'ungerissen (I), bis zum Riss · kurz gestrichelt: immer gerissen (II)',
-      }),
       k.hinweis ? el('p.hinweis', { text: k.hinweis }) : null,
-    ]);
+    ];
   }
 
   if (fall.kurve) {
@@ -576,8 +650,7 @@ export function spannungsfallZeichnen(fall) {
     const K = art.kraft;
     const kennwert = fall.wahl?.index || 'Rd';
     const kraft = (wert) => mitEinheit(wert, 1, art.kraftEinheit);
-    return el('div.sd-fall', {}, [
-      kopf,
+    return [
       wahlzeile(fall.wahl),
       zahlenzeile([
         [art.fest[0], mitEinheit(k.fest, 1, art.fest[1])],
@@ -588,23 +661,13 @@ export function spannungsfallZeichnen(fall) {
           : []),
       ]),
       k.punkte.length ? linienbild(fall) : null,
-      el('p.sd-legende', {
-        text: 'Durchgezogen: der Querschnitt – ungerissen bis zum Riss, dann der Sprung, '
-          + 'darüber gerissen (ohne Zugversteifung) · lang gestrichelt: ungerissen (I), bis '
-          + `zum Riss · kurz gestrichelt: immer gerissen, ohne f_ct (II) · ${K}_y: Fliessbeginn · `
-          + `${K}_${kennwert}: Ende der Linie, der Widerstand – derselbe wie in der `
-          + 'Tragsicherheit, wenn sie gleich wählt',
-      }),
       k.hinweis ? el('p.hinweis', { text: k.hinweis }) : null,
-    ]);
+    ];
   }
 
   const b = fall.bild;
-  if (!b.konvergiert) {
-    return el('div.sd-fall', {}, [kopf, wahlzeile(fall.wahl), el('p.hinweis', { text: b.hinweis })]);
-  }
-  return el('div.sd-fall', {}, [
-    kopf,
+  if (!b.konvergiert) return [wahlzeile(fall.wahl), el('p.hinweis', { text: b.hinweis })];
+  return [
     wahlzeile(fall.wahl),
     zahlenzeile([
       ['N', mitEinheit(b.N, 1, 'kN')],
@@ -613,16 +676,15 @@ export function spannungsfallZeichnen(fall) {
       ['\\chi', mitEinheit(b.chi, 5, '1/m')],
       ['x', b.nulllinie === null ? '–' : mitEinheit(b.nulllinie, 0, 'mm')],
     ]),
-    el('div.sd-paar', {}, [
-      ueberDieHoehe(b, {
-        titel: 'Dehnung ε [‰]', einheit: '‰', stellen: 2,
-        hol: (p) => p.eps, stahlHol: (s) => s.eps,
-      }),
-      ueberDieHoehe(b, {
-        titel: 'Spannung σ [N/mm²]', einheit: 'N/mm²', stellen: 1,
-        hol: (p) => p.sigma, stahlHol: (s) => s.sigma,
-      }),
-    ]),
+    verteilungsbild(b),
     b.hinweis ? el('p.hinweis', { text: b.hinweis }) : null,
-  ]);
+  ];
+}
+
+/** Ein Fall als Karte: Name und Frage im Kopf, darunter Zahlen und Diagramm. */
+export function spannungsfallZeichnen(fall) {
+  const titel = fall.moeglich
+    ? `${fall.name} – ${fall.titel} (${fall.richtung_text})`
+    : `${fall.name} – ${fall.titel}`;
+  return karte(titel, inhalt(fall));
 }

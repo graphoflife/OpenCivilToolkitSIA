@@ -8,6 +8,7 @@
  * rechte Tafel ist oft schmal. Ein Klick klappt den ganzen Wert auf.
  */
 
+import { karte, panel } from './bausteine.js';
 import { el, ersetzen } from './dom.js';
 import { konsole } from './konsole.js';
 
@@ -38,5 +39,9 @@ export function variablenZeichnen(behaelter) {
       el('p', { text: 'Was ein Skript oder die Konsole anlegt, steht hier.' }),
     ]));
   }
-  return ersetzen(behaelter, el('div.blatt.py-variablen', {}, variablen.map(variable)));
+  // Ein Panel wie die der Berechnung, die Variablen in einer Karte.
+  return ersetzen(behaelter, el('div.berichtstapel', {}, [
+    panel({ schluessel: 'python/variablen', titel: 'Variablen der Sitzung' }, [
+      karte(null, [el('div.py-variablen', {}, variablen.map(variable))])]),
+  ]));
 }

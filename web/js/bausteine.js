@@ -55,6 +55,20 @@ export function panel({
 }
 
 /**
+ * Eine Karte in einem Panel: weiss, gerahmt, mit der blauen Kante links,
+ * darüber klein ihr Titel -- wie die Kapitel der Eingaben. Die rechte Tafel
+ * baut ihre Panels aus denselben Karten wie die mittlere (Benutzer,
+ * 2026-10-16). Ohne `titel` keine Kopfzeile: eine Karte allein im Panel
+ * hätte sonst denselben Titel zweimal. `zusatz` steht rechts im Kopf.
+ */
+export function karte(titel, inhalt, { zusatz = null, klasse = '' } = {}) {
+  return el('div.unterkapitel', { class: klasse }, [
+    titel ? el('div.unterkapitel-kopf', {}, [el('span', { text: titel }), zusatz]) : null,
+    ...inhalt,
+  ]);
+}
+
+/**
  * Eine Zeile Beschriftung – Eingabe – Einheit.
  *
  * `beschriftung` ist entweder Klartext oder eine Liste von Knoten. Letzteres

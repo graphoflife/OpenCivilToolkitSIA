@@ -355,7 +355,7 @@ Dazu die sechs Spannung-Dehnung-Analysen wie bei der Platte, je
 Zugseite: unten, oben, links oder rechts -- die Seite, die ein positives
 Moment zieht. Die Nulllinie bleibt dabei parallel zur Achse; ε_m gilt im
 Schwerpunkt, der Riss und der äquivalente Modul am Bruttoquerschnitt. Die
-Bilder stehen im Reiter Diagramme unter «Spannung-Dehnung-Analysen».
+Diagramme stehen im Reiter Diagramme, im Panel des Querschnitts.
 
 **2D Balkensysteme:** unter der Querschnittsanalyse ein drittes Kapitel,
 ein ebener Rahmen nach der Steifigkeitsmethode. Gezeichnet wird mit
@@ -392,9 +392,12 @@ plt.plot([0, 1, 2], [0, 1, 4], "o-", label="y = x²")   # dazu scatter, bar, axh
 plt.xlabel("x"); plt.legend(); plt.grid()             # erscheint in der Konsole
 ```
 
-**Rechte Tafel:**
+**Rechte Tafel:** gebaut wie die mittlere -- je Bauteil ein graues Panel, darin
+weisse Karten; ein Klick auf den Kopf klappt es zu.
 
-* *Zusammenfassung* -- je Platte eine Tabelle: Widerstand, Einwirkung und
+* *Zusammenfassung* -- je Platte ein Panel mit den Angaben, der Bewehrung,
+  den Nachweisen und den Kennzahlen. Die Tabelle der Nachweise hat eine feste
+  Breite, sie skaliert nicht mit der Tafel: Widerstand, Einwirkung und
   Erfüllungsgrad. Darunter, in gedämpftem Rot, die ausgeschalteten Nachweise,
   die mit der vorliegenden Bewehrung *nicht* aufgehen würden. Das Auge am
   Ende jeder Zeile zeigt genau diesen Nachweis: der Kern löst rückwärts auf,
@@ -403,7 +406,10 @@ plt.xlabel("x"); plt.legend(); plt.grid()             # erscheint in der Konsole
   Bemessungspunkten (die gestrichelte Strecke zeigt den Weg, in dem der
   Erfüllungsgrad gemessen wurde) -- massgebend die Linie der Rechenwahl,
   daneben zum Vergleich präzise oder die Handrechnung, und eine eigene
-  Linie des Knickens --, Querkraftkurven, Spannungs-Dehnungs-Bilder;
+  Linie des Knickens --, Querkraftkurven und die Spannung-Dehnung-Analysen
+  als Diagramme wie die M-N-Linie, mit Gitter, Teilung und Legende --
+  Dehnung und Spannung über die Höhe in einem Diagramm, an derselben
+  Höhenachse; je Diagramm eine Karte, wahlweise bis drei nebeneinander;
   bei einer Querschnittsanalyse ein einziges Interaktionsdiagramm mit
   wählbaren Achsen (zwei von N, M_y, M_z, die dritte mit festem Wert; ein
   Klick auf einen Lastfall legt den Schnitt durch ihn), dazu je Lastfall der
@@ -411,7 +417,8 @@ plt.xlabel("x"); plt.legend(); plt.grid()             # erscheint in der Konsole
   Balkensystem je Fall Verformung, N, V, M und Lagerkräfte -- mit der Maus
   darüber (auf dem Telefon: tippen) der Wert an der Stelle, an einem Knoten
   seine Verschiebung
-* *Herleitung* -- die Mitschrift, Formel für Formel, mit Normstelle
+* *Herleitung* -- die Mitschrift, Formel für Formel, mit Normstelle; je
+  Bestandteil ein Panel, je Kapitel eine Karte
 
 **Kopieren nach Word, LaTeX und Markdown:** jede Formel und jede Tabelle hat
 drei Knöpfe. *Word* legt eine Formel als MathML in die Zwischenablage -- Word
