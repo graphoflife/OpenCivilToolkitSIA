@@ -399,8 +399,15 @@ a.knopf { display: inline-block; text-decoration: none; }
 .feld > label { font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .feld .einheit { font-size: 12px; color: var(--schrift-zart); }
 /* Ein Name hat keine Einheit: er bekommt ihren Platz dazu. In gleich breiter
-   Schrift passte «Decke über EG» sonst nicht mehr ganz in 112 Pixel. */
-.feld:has(> .einheit:empty) > input[type="text"] { grid-column: span 2; }
+   Schrift passte «Decke über EG» sonst nicht mehr ganz in 112 Pixel. Er
+   beginnt dort, wo die Zahlenfelder und die Auswahl darunter beginnen --
+   bündig mit ihnen statt weiter links (Benutzer, 2026-10-16). */
+.feld:has(> .einheit:empty) > input[type="text"] {
+  grid-column: span 2; justify-self: end; width: calc(var(--zahlbreite) + 6px + 48px);
+}
+/* Eine Auswahl mit kurzen Namen ist mindestens so breit wie ein Zahlenfeld:
+   sonst begann «C30/37» zwei Pixel rechts vom Namensfeld darüber. */
+.feld > select { min-width: var(--zahlbreite); }
 .feld > .einheit:empty { display: none; }
 
 /* Alles, was man anfasst, sieht gleich aus: Zahlenfeld, Namensfeld,
