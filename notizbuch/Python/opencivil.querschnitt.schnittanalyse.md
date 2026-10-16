@@ -1,5 +1,5 @@
 ---
-erzeugt: 006221ca8519
+erzeugt: dabad1cf953c
 art: modul
 tags: [modul]
 ---
@@ -127,17 +127,6 @@ def raender(self) -> Tuple[str, str]
 ```
 
 Wie die beiden Raender heissen: der gedrueckte und der gezogene.
-
-### _werkstoffe
-
-```python
-def _werkstoffe(analyse: Querschnittsanalyse, wert: Callable[[str], float], wahl: Rechenwahl, *, ungerissen: bool) -> Tuple[List[Werkstoff], Dict[str, int], Dict[int, Stahlgesetz]]
-```
-
-Die Werkstoffe zu einer Rechenwahl -- jeder Beton mit dem Gesetz der Wahl
-oder, `ungerissen`, linear in Druck und Zug mit `E_cm/(1+phi)`; jeder
-Stahl bilinear im Wertesatz der Wahl. Die Grenzen sind die des
-Dehnungsfaechers, in beiden Zustaenden dieselben.
 
 ### _betonspannung
 

@@ -44,6 +44,43 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-16 · Ein Modell der Werkstoffgesetze
+
+C2 der Durchsicht vom 2026-10-12, in drei Commits. Keine Zahl im Bericht
+ändert sich; die Schnappschüsse bewegen sich nur in Formelzeilen.
+
+- **Ein Gesetz rechnet und schreibt sich selbst**
+  (`querschnitt/werkstoffgesetz.py`). Vorher rechnete der Löser mit
+  Funktionen (`beton_nichtlinear`, `stahl_bilinear`, `stahl_nur_zug`), und
+  gedruckt wurden Klassen, eine davon als Platzhalter nur fürs LaTeX.
+  Jenseits von ε_c2d und beim gedrückten Stahl stand in der Herleitung
+  etwas anderes, als gerechnet wurde. Jetzt baut jedes Gesetz einmal seine
+  Funktion (gemessen gleich schnell, rund 14 µs je Kräfteintegral) und
+  schreibt seine Formel aus denselben Ästen -- samt «0 jenseits der
+  Bruchstauchung». Neu die Formelseite «Beton linear, ohne Zug».
+- **Jenseits der Grenze null, auf ihr um eine Rundung** (`RUNDUNG`,
+  1e-12). Der Löser hielt die Grenze hart, die genaue Resistenzlinie gar
+  nicht (Schalter `bricht`): eine Lage genau auf ε_ud kippte an der letzten
+  Stelle auf null. Jetzt eine Formel je Gesetz.
+- **Die Querschnittsanalyse baut ihren Beton wie die Platte**
+  (`rechenwahl.betongesetz`). Der Beiwert der Parabel kommt aus E_cm statt
+  aus dem E_cd des Materials -- bei γ_cE = 1 dieselbe Zahl -- und steht
+  jetzt auch mit Bemessungswerten in ihrer Herleitung. Weil keine Rechnung
+  mehr γ_cE, E_cd und das k_σ des Materials liest, fallen die drei aus dem
+  Bericht; in der Materialtabelle stehen sie weiter (siehe [[TODO]]). Die
+  Wahl je Material ist eine `Rechenwahl` statt zweier Texte («bemessung»,
+  «block»), und Bruchzustand wie Spannungen und Knicken bauen ihre
+  Werkstoffe an einer Stelle (`Querschnittsanalyse.werkstoffe`) statt an
+  zweien. Das Materialbild zeigt dieselbe Parabel.
+- **Punkt C an einer Stelle** (`anteil_punkt_c`), vorher dreimal: im Fächer
+  der Platte, in ihren Grenzen und in der Interaktion.
+- **Der Hinweis zu Randdehnungen** misst Druck und Zug je an ihrer Grenze.
+  Vorher galt das Grössere der beiden: −5 ‰ blieb ohne Hinweis, weil der
+  Stahl bis 45 ‰ reicht, obwohl der Beton dort nichts mehr trägt.
+
+Offen bleibt der eigene Dehnungsfächer der Platte neben dem allgemeinen
+(siehe [[TODO]]).
+
 ## 2026-10-16 · Was still einen Ersatz nahm, meldet sich
 
 Zweiter Teil von C1. Mit dem strengen Leser kommt nichts Unbekanntes mehr ins

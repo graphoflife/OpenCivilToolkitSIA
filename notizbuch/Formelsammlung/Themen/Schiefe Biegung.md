@@ -1,5 +1,5 @@
 ---
-erzeugt: c01485d3ed59
+erzeugt: 78725fddffa7
 art: thema
 tags: [thema]
 ---
@@ -16,15 +16,15 @@ Der Bruchzustand: jede Dehnungsebene, bei der ein Werkstoff an seiner Grenze ste
 
 1. [[Dehnungsebene und innere Kräfte]]
 2. [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]]
-3. [[Parabel-Rechteck-Beziehung des Betons]]
-4. [[Bilineare Beziehung des Betonstahls]]
-5. [[Probe – Normalkraft]]
-6. [[Probe – Moment um y]]
-7. [[Probe – Moment um z]]
-8. [[Widerstand in der Richtung der Einwirkung]]
-9. [[Erfüllungsgrad]]
-10. [[Spannungsblock des Betons]]
-11. [[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]]
+3. [[Beiwert der Parabel]]
+4. [[Parabel-Rechteck-Beziehung des Betons]]
+5. [[Bilineare Beziehung des Betonstahls]]
+6. [[Probe – Normalkraft]]
+7. [[Probe – Moment um y]]
+8. [[Probe – Moment um z]]
+9. [[Widerstand in der Richtung der Einwirkung]]
+10. [[Erfüllungsgrad]]
+11. [[Spannungsblock des Betons]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: f6f8b278d948
+erzeugt: e3242617ed28
 art: formel
 tags: [formel]
 ---
@@ -24,10 +24,6 @@ Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 $$
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad n = 17.85
 $$
-
-## Gebraucht von
-
-- [[Beiwert der Parabel, mit dem wirksamen Modul]]
 
 ## Im Code
 

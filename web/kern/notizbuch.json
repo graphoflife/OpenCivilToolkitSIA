@@ -268,13 +268,14 @@
       ]
     },
     {
-      "name": "Beiwert der Parabel, mit dem wirksamen Modul",
-      "pfad": "Formelsammlung/Formeln/Beiwert der Parabel, mit dem wirksamen Modul.md",
+      "name": "Beiwert der Parabel",
+      "pfad": "Formelsammlung/Formeln/Beiwert der Parabel.md",
       "art": "formel",
       "zeichen": [
         "k_{\\sigma}"
       ],
       "themen": [
+        "Schiefe Biegung",
         "Knicken",
         "Biegung und Normalkraft",
         "Stahlspannung gegen Fliessen",
@@ -1214,8 +1215,7 @@
         "k_{\\sigma}"
       ],
       "themen": [
-        "Beton",
-        "Schiefe Biegung"
+        "Beton"
       ]
     },
     {
@@ -3759,6 +3759,7 @@
         "QAGebrauchsliste",
         "QAKnickEintrag",
         "WerkstoffwahlEintrag",
+        "WerkstoffwahlEintrag.rechenwahl",
         "QASpannungsfallEintrag",
         "Elemente",
         "QuerschnittsanalyseEintrag",
@@ -3830,8 +3831,7 @@
         "Querschnittsanalyse.baustoffe",
         "Querschnittsanalyse.aufbau_protokollieren",
         "Querschnittsanalyse.angaben",
-        "Querschnittsanalyse.satz",
-        "Querschnittsanalyse.betongesetz",
+        "Querschnittsanalyse.rechenwahl",
         "Querschnittsanalyse.werkstoffbezuege",
         "Querschnittsanalyse.kennwert",
         "Querschnittsanalyse.werkstoffe",
@@ -4000,7 +4000,6 @@
         "Zugseite.psi",
         "Zugseite.um_y",
         "Zugseite.raender",
-        "_werkstoffe",
         "_betonspannung",
         "_loeser",
         "Schnittpaar",
@@ -4077,6 +4076,7 @@
       "kurz": "Spannungs-Dehnungs-Beziehungen.",
       "stichworte": [
         "k_sigma",
+        "anteil_punkt_c",
         "_gebaut",
         "Betongesetz",
         "Betongesetz.mit_modul",

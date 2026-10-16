@@ -667,8 +667,9 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
     waende = [{**w, "stahl": stoff(w["stahl"], w["name"], "betonstahl")
                if w["durchmesser"] > 0 else None}
               for w in elemente.waende]
-    wahl = {baustoffe[w.material].id: (w.satz, w.betongesetz)
-            for w in eintrag.werkstoffwahl if w.material in baustoffe}
+    # Jeder Baustoff bekommt seine Wahl, auch wer keine eigene hat: so steht
+    # die Vorgabe nur an der Beschreibung.
+    wahl = {b.id: eintrag.wahl(kennung).rechenwahl for kennung, b in baustoffe.items()}
     try:
         return Querschnittsanalyse(
             name=eintrag.name, praefix=praefix,

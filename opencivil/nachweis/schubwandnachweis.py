@@ -28,7 +28,6 @@ from opencivil.core.einheiten import EINHEITSLOS, KN, KN_PRO_M, KNM, Groesse
 from opencivil.core.latex import Mathe, als_text, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import WertDef
-from opencivil.material.basis import Baustoff
 from opencivil.querschnitt import schubwaende as sw
 from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse, Wandangabe
 
@@ -100,11 +99,11 @@ class Schubwandnachweis(Nachweis):
     def _f_sd(self, e: Eingaben, w: Wandangabe) -> float:
         if w.stahl is None:
             return 0.0
-        k = "f_yd" if self.analyse.satz(w.stahl) == "bemessung" else "f_yk"
+        k = self.analyse.rechenwahl(w.stahl).satz.stahl
         return abs(self.analyse.kennwert(e, w.stahl, k))
 
     def _f_cd(self, e: Eingaben, w: Wandangabe) -> float:
-        k = "f_cd" if self.analyse.satz(w.beton) == "bemessung" else "f_ck"
+        k = self.analyse.rechenwahl(w.beton).satz.beton
         return abs(self.analyse.kennwert(e, w.beton, k))
 
     # -- Pruefen ----------------------------------------------------------------

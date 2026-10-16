@@ -1,5 +1,5 @@
 ---
-erzeugt: b9e430a13b1a
+erzeugt: 4fb534cc198a
 art: modul
 tags: [modul]
 ---
@@ -58,6 +58,19 @@ def k_sigma(E_c: float, f_c: float) -> float
 ```
 
 Der Beiwert der Parabel zum Modul `E_c`: `E_c/(400·f_c)`, nie unter 1.
+
+### anteil_punkt_c
+
+```python
+def anteil_punkt_c(eps_c1d: float, eps_c2d: float) -> float
+```
+
+Wo der Punkt C liegt, als Anteil der Hoehe ab dem gedrueckten Rand:
+`1 - eps_c1d/eps_c2d`. Ist der ganze Querschnitt gedrueckt, laufen die
+Ebenen des Bruchs durch ihn, mit der Stauchung `-eps_c1d` -- der reine
+Druck endet darum bei `-eps_c1d`, nicht bei `-eps_c2d`. Bis
+2026-10-16 stand die Formel dreimal da: im Faecher der Platte, in ihren
+Grenzen und in der Interaktion des gezeichneten Querschnitts.
 
 ### _gebaut
 
@@ -415,6 +428,7 @@ Ergebnis unendlich, was die Auswertung sauber ueberspringt.
 - `RUNDUNG = 1e-12` – Um so viel darf eine Dehnung ueber ihrer Grenze liegen und gilt noch als auf ihr: eine Rundung. Ein Milliardstel Promille -- weit unter allem, was eine Eingabe oder eine Suche unterscheidet, weit ueber der letzten Stelle.
 - `K_SIGMA_MIN = 1.0` – Kleiner rechnet die Parabel `k_sigma` nicht. Darunter haette ihr Nenner `1 + (k_sigma - 2)·eta` im ansteigenden Ast eine Nullstelle, bei `eta = 1/(2 - k_sigma)` -- die Spannung spraenge dort ins Unendliche und wechselte das Vorzeichen. So weit kommt es mit dem kriechweichen Modul: `E_cm/(1 + phi)` mit charakteristischen Werten und `phi = 2` gibt `k_sigma = 0.93`. Mit 1 ist der Beton bis `f_c` bei `eps_c1d` linear. Nach Vorgabe, nicht nachgeschlagen (`notizbuch/Notizen/TODO.md`).
 - `K_SIGMA_LATEX = '\\max\\left(1;\\ \\frac{@E_c}{400 \\cdot @f_c}\\right)'` – Dieselbe Regel als Formel, fuer die Herleitung -- mit `@E_c` und `@f_c`.
+- `K_SIGMA_SEITE = 'Beiwert der Parabel'` – Ihre Seite im Notizbuch -- eine fuer jede Herleitung, die sie anschreibt, mit welchem Modul auch immer.
 - `STAHL_NUR_ZUG = 'Betonstahl nur auf Zug'` – Die Seite im Notizbuch fuer den Stahl der Handrechnung, der nur Zug traegt.
 - `_JENSEITS_BETON = ' 0 & |\\varepsilon_c| > \\varepsilon_{c2d} \\quad (\\text{jenseits d…` – Was jenseits der Bruchstauchung gilt -- als Fall in der Formel der Parabel.
 - `BLOCKANTEIL = 0.85` – Anteil der Druckzonenhoehe, ueber den der Spannungsblock wirkt. Steht hier und nirgends sonst: die Handrechnung der Platte, ihr Duktilitaetsnachweis, das Diagramm der Werkstoffgesetze und der gezeichnete Querschnitt meinen alle denselben Block.
@@ -428,6 +442,7 @@ Ergebnis unendlich, was die Auswertung sauber ueberspringt.
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.web.diagrammdaten]]

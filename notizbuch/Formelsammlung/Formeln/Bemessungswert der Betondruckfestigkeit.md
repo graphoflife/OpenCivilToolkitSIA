@@ -1,5 +1,5 @@
 ---
-erzeugt: 3b77b308b777
+erzeugt: f58e7e41c404
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 2.4.2.3"
@@ -29,7 +29,7 @@ $$
 
 ## Gebraucht von
 
-- [[Beiwert der Parabel, mit dem wirksamen Modul]]
+- [[Beiwert der Parabel]]
 - [[Druckzonenhöhe bei reiner Biegung]]
 - [[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]]
 - [[Widerstand der Druckdiagonalen]]

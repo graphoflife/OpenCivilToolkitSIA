@@ -1,6 +1,6 @@
 # Beispiel
 
-90 Berechnungen ausgeführt, 143 Werte bestimmt.
+87 Berechnungen ausgeführt, 140 Werte bestimmt.
 
 ## Herleitung
 
@@ -686,24 +686,6 @@ $$
 f_{ctm} = 2.9\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Teilsicherheitsbeiwert für den Elastizitätsmodul** *(SIA 262:2025, 4.2.1.15)*
-
-$$
-\gamma_{cE} = 1
-$$
-
-**Bemessungswert des Elastizitätsmoduls** *(SIA 262:2025, 4.2.1.15)*
-
-$$
-E_{cd} = \frac{E_{cm}}{\gamma_{cE}} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
-$$
-
-**Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung** *(SIA 262:2025, 4.2.1.6)*
-
-$$
-k_{\sigma} = \frac{E_{cd}}{400 \cdot f_{cd}} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}} = 4.202
-$$
-
 ### Betonstahl: B500B
 
 **Elastizitätsmodul des Betonstahls** *(SIA 262:2025, 3.2.2.4)*
@@ -848,6 +830,12 @@ $$
 
 $$
 \alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
+$$
+
+**C30/37: Beiwert der Parabel**
+
+$$
+k_{\sigma} = \max\left(1;\ \frac{E_{cm}}{400 \cdot f_{cd}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 4.2
 $$
 
 **C30/37: Parabel-Rechteck-Beziehung, Bemessungswerte** *(SIA 262:2025, 4.2.1.6)*
@@ -1732,18 +1720,6 @@ $$
 \tau_{cd} = \frac{0.3 \cdot \sqrt{f_{ck}}}{\gamma_c} \quad \left(f_{ck}\ \text{in}\ \mathrm{N}/\mathrm{mm}^{2}\right)
 $$
 
-**Bemessungswert des Elastizitätsmoduls** *(SIA 262:2025, 4.2.1.15)*
-
-$$
-E_{cd} = \frac{E_{cm}}{\gamma_{cE}}
-$$
-
-**Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung** *(SIA 262:2025, 4.2.1.6)*
-
-$$
-k_{\sigma} = \frac{E_{cd}}{400 \cdot f_{cd}}
-$$
-
 ### Betonstahl
 
 **Bemessungswert der Fliessgrenze** *(SIA 262:2025, 2.4.2.5)*
@@ -1952,6 +1928,12 @@ $$
 
 $$
 \alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
+$$
+
+**C30/37: Beiwert der Parabel**
+
+$$
+k_{\sigma} = \max\left(1;\ \frac{E_{cm}}{400 \cdot f_{cd}}\right)
 $$
 
 **C30/37: Parabel-Rechteck-Beziehung, Bemessungswerte** *(SIA 262:2025, 4.2.1.6)*
@@ -2461,7 +2443,6 @@ Alle geführten Nachweise sind erfüllt.
 | Flächenträgheitsmoment, Unterzug | $I_{\text{Q2}}$ | $5400$ | ·10⁶ mm⁴ | berechnet |
 | Dehnsteifigkeit, Unterzug, C30/37 | $EA_{\text{Q2}}$ | $6052$ | MN | berechnet |
 | Biegesteifigkeit, Unterzug, C30/37 | $EI_{\text{Q2}}$ | $181547$ | kNm² | berechnet |
-| Bemessungswert des Elastizitätsmoduls | $E_{cd}$ | $33620$ | N/mm² | berechnet |
 | Mittelwert des Elastizitätsmoduls | $E_{cm}$ | $33620$ | N/mm² | berechnet |
 | Dehnung am Ende des ansteigenden Astes | $\varepsilon_{c1d}$ | $2$ | ‰ | Vorgabe |
 | Bruchdehnung des Betons | $\varepsilon_{c2d}$ | $3.5$ | ‰ | Vorgabe |
@@ -2471,9 +2452,7 @@ Alle geführten Nachweise sind erfüllt.
 | Mittelwert der Zylinderdruckfestigkeit | $f_{cm}$ | $38$ | N/mm² | berechnet |
 | Mittelwert der Zugfestigkeit | $f_{ctm}$ | $2.9$ | N/mm² | Vorgabe |
 | Teilsicherheitsbeiwert für Beton | $\gamma_c$ | $1.5$ |  | Vorgabe |
-| Teilsicherheitsbeiwert für den Elastizitätsmodul | $\gamma_{cE}$ | $1$ |  | Vorgabe |
 | Beiwert für die Gesteinskörnung | $k_e$ | $10000$ |  | Vorgabe |
-| Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung | $k_{\sigma}$ | $4.202$ |  | berechnet |
 | Bemessungswert der Schubspannungsgrenze | $\tau_{cd}$ | $1.1$ | N/mm² | berechnet |
 | Elastizitätsmodul des Betonstahls | $E_s$ | $200000$ | N/mm² | Vorgabe |
 | Bemessungswert der Dehnung bei Höchstlast | $\varepsilon_{ud}$ | $4.5$ | % | Vorgabe |

@@ -1,5 +1,5 @@
 ---
-erzeugt: 8486eb1ea459
+erzeugt: 4990f570f761
 art: modul
 tags: [modul]
 ---
@@ -112,7 +112,6 @@ werden, um Normvorgaben zu ersetzen.
 
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.lesen]]
-- [[opencivil.querschnitt.analyse]]
 - [[opencivil.web.api]]
 
 ## Formeln aus diesem Modul

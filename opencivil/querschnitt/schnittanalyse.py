@@ -73,10 +73,10 @@ from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.nachweis.querschnittsloeser import (
-    FASERN, Faserloeser, Stahllage, protokoll_wirksamer_modul, wirksamer_modul,
+    FASERN, Faserloeser, Stahllage, protokoll_wirksamer_modul,
 )
 from opencivil.nachweis.rechenwahl import (
-    Rechenart, Rechenwahl, betongesetz, protokoll_betongesetz, werte_nach_id,
+    Rechenart, Rechenwahl, protokoll_betongesetz, werte_nach_id,
 )
 from opencivil.nachweis.sproedes_versagen import (
     MOMENTENTEILER, beiwert_dicke, protokoll_zugfestigkeit,
@@ -84,7 +84,7 @@ from opencivil.nachweis.sproedes_versagen import (
 from opencivil.querschnitt.analyse import Querschnittsanalyse, Stabgruppe
 from opencivil.querschnitt.fasern import Faserquerschnitt, Stab
 from opencivil.querschnitt.interaktion import Querschnitt, Werkstoff
-from opencivil.querschnitt.werkstoffgesetz import BetonUngerissen, Stahlgesetz
+from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
 from opencivil.spannungsanalyse import (
     Analyse, Analyseart, Grenzzustand, Linie, auswerten, herleitung,
 )
@@ -129,37 +129,6 @@ class Zugseite(str, Enum):
 # ===========================================================================
 # Der Querschnitt je Zugseite
 # ===========================================================================
-
-
-def _werkstoffe(analyse: Querschnittsanalyse, wert: Callable[[str], float],
-                wahl: Rechenwahl, *, ungerissen: bool,
-                ) -> Tuple[List[Werkstoff], Dict[str, int], Dict[int, Stahlgesetz]]:
-    """
-    Die Werkstoffe zu einer Rechenwahl -- jeder Beton mit dem Gesetz der Wahl
-    oder, ``ungerissen``, linear in Druck und Zug mit ``E_cm/(1+phi)``; jeder
-    Stahl bilinear im Wertesatz der Wahl. Die Grenzen sind die des
-    Dehnungsfaechers, in beiden Zustaenden dieselben.
-    """
-    satz = wahl.satz
-    liste: List[Werkstoff] = []
-    index: Dict[str, int] = {}
-    staehle: Dict[int, Stahlgesetz] = {}
-    for stoff in analyse.baustoffe:
-        w = lambda k: abs(wert(stoff.id_von(k)))
-        if stoff.art is Baustoffart.BETON:
-            E_cm, eps_c1d, eps_c2d = w("E_cm"), w("eps_c1d"), w("eps_c2d")
-            gesetz = (BetonUngerissen(E_c=wirksamer_modul(E_cm, wahl.kriechzahl)) if ungerissen
-                      else betongesetz(wahl, f_c=w(satz.beton), E_cm=E_cm,
-                                       eps_c1d=eps_c1d, eps_c2d=eps_c2d))
-            liste.append(Werkstoff(stoff.name, gesetz, -eps_c2d, math.inf,
-                                   c_punkt=(eps_c1d, eps_c2d), verdraengbar=True))
-        else:
-            stahl = Stahlgesetz(E_s=w("E_s"), f_yd=w(satz.stahl),
-                                f_yd_druck=w(satz.stahl_druck), eps_ud=w("eps_ud"))
-            liste.append(Werkstoff(stoff.name, stahl, -stahl.eps_ud, stahl.eps_ud))
-            staehle[len(liste) - 1] = stahl
-        index[stoff.id] = len(liste) - 1
-    return liste, index, staehle
 
 
 def _betonspannung(r, gesetze: Mapping[int, Callable[[float], float]]
@@ -380,11 +349,12 @@ def querschnitt_nach_wahl(analyse: Querschnittsanalyse, wert: Callable[[str], fl
     Werkstoffs. ``wert`` liefert zu einer Wert-ID die Zahl in SI. Zerlegt in
     so viele Streifen, wie die Platte Fasern hat (:data:`FASERN`).
     """
-    werkstoffe, index, staehle = _werkstoffe(analyse, wert, wahl, ungerissen=ungerissen)
-    teile, bewehrung, herkunft = analyse.geometrie(lambda stoff: index[stoff.id])
+    werkstoffe, index = analyse.werkstoffe(wert, lambda stoff: wahl, ungerissen=ungerissen)
+    teile, bewehrung, herkunft = analyse.geometrie(index)
     q = Querschnitt(werkstoffe=werkstoffe, teile=teile, bewehrung=bewehrung,
                     bezug=(wert(analyse.id_von("y_S")), wert(analyse.id_von("z_S"))),
                     streifen=FASERN)
+    staehle = {i: w.gesetz for i, w in enumerate(werkstoffe) if w.c_punkt is None}
     return q, herkunft, staehle
 
 
@@ -400,10 +370,10 @@ def protokoll_gesetze_nach_wahl(p: Protokoll, e: Eingaben, analyse: Querschnitts
     satz = wahl.satz
     phi = Zwischenwerte(basis).zahl("phi", r"\varphi", wahl.kriechzahl, stellen=2)
     # Die Gesetze, mit denen gerechnet wird -- sie schreiben sich selbst.
-    werkstoffe, index, _ = _werkstoffe(analyse, werte_nach_id(e), wahl, ungerissen=False)
+    werkstoffe, index = analyse.werkstoffe(werte_nach_id(e), lambda stoff: wahl)
     staehle = []
     for stoff in analyse.baustoffe:
-        gesetz = werkstoffe[index[stoff.id]].gesetz
+        gesetz = werkstoffe[index(stoff)].gesetz
         if stoff.art is not Baustoffart.BETON:
             staehle.append((stoff, gesetz))
             continue

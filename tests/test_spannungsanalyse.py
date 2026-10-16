@@ -179,6 +179,20 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
         bild = sa.aus_dehnungen(self.gerissen, eps_oben=-0.05, eps_unten=0.2)
         self.assertTrue(bild.hinweis)
 
+    def test_druck_jenseits_des_betons_wird_gemeldet(self):
+        """
+        −5 ‰ liegt jenseits des Betons, auch wenn der Stahl bis 45 ‰ reicht.
+        Bis 2026-10-16 mass der Hinweis beide Ränder am Grösseren der beiden
+        Grenzen und blieb hier aus.
+        """
+        bild = sa.aus_dehnungen(self.gerissen, eps_oben=-0.005, eps_unten=0.001)
+        self.assertIn("ausserhalb", bild.hinweis)
+
+    def test_auf_der_grenze_kein_hinweis(self):
+        bild = sa.aus_dehnungen(self.gerissen, eps_oben=-self.gerissen.eps_druck,
+                                eps_unten=self.gerissen.eps_zug)
+        self.assertFalse(bild.hinweis)
+
 
 class TestMomentenKruemmung(unittest.TestCase):
     @classmethod

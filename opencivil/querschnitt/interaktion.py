@@ -72,6 +72,7 @@ from opencivil.querschnitt.fasern import (
     Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt, Gesetz,
     Stab,
 )
+from opencivil.querschnitt.werkstoffgesetz import anteil_punkt_c
 
 Punkt = Tuple[float, float]
 
@@ -506,7 +507,7 @@ class Querschnitt:
                              else f"{art}, äusserste Lage {seite}")
             if ist_beton:
                 eps_c1d, eps_c2d = stoff.c_punkt
-                anteil = 1.0 - eps_c1d / eps_c2d
+                anteil = anteil_punkt_c(eps_c1d, eps_c2d)
                 hoehe = v_max - v_min
                 for v in (v_min + anteil * hoehe, v_max - anteil * hoehe):
                     grenzen.append(Dehnungsgrenze(arm=v, eps_min=-eps_c1d,

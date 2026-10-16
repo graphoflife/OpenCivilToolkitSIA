@@ -25,7 +25,7 @@ einmal in Meter umgerechnet (:meth:`Querschnittsanalyse.geometrie`).
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
@@ -38,7 +38,6 @@ from opencivil.core.protokoll import (
 )
 from opencivil.core.wert import WertDef, kennung_aus
 from opencivil.material.basis import Baustoff, Baustoffart
-from opencivil.material.beton import BETON_VORLAGEN
 from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.geometrie import GeometrieFehler, Linienart, Punkt
 from opencivil.querschnitt.interaktion import (
@@ -46,22 +45,20 @@ from opencivil.querschnitt.interaktion import (
 )
 from opencivil.querschnitt.schubwaende import Wand
 from opencivil.querschnitt.schubwaende import zellen as zellen_finden
+from opencivil.nachweis.querschnittsloeser import wirksamer_modul
+from opencivil.nachweis.rechenwahl import Rechenwahl, betongesetz, werte_nach_id
 from opencivil.querschnitt.werkstoffgesetz import (
-    Betongesetz, Spannungsblock, Stahlgesetz,
+    BLOCKANTEIL, K_SIGMA_LATEX, K_SIGMA_SEITE, BetonUngerissen, Spannungsblock, Stahlgesetz,
 )
 
 #: Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die
-#: eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin. ``E_cm`` braucht
-#: der Gebrauchszustand: der Beton dort rechnet mit ``E_cm/(1+phi)``.
+#: eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin. Aus ``E_cm``
+#: entsteht der Beiwert der Parabel, wie bei der Platte; der Gebrauchszustand
+#: rechnet mit ``E_cm/(1+phi)``.
 KENNWERTE = {
-    Baustoffart.BETON: ("f_ck", "f_cd", "eps_c1d", "eps_c2d", "k_sigma", "E_cd", "f_ctm",
-                        "E_cm"),
+    Baustoffart.BETON: ("f_ck", "f_cd", "eps_c1d", "eps_c2d", "f_ctm", "E_cm"),
     Baustoffart.BETONSTAHL: ("f_yk", "f_yd", "f_yk_druck", "f_yd_druck", "E_s", "eps_ud"),
 }
-
-#: Die Regel fuer k_sigma steht beim Beton. Mit charakteristischen Werten gilt
-#: dieselbe, mit f_ck statt f_cd -- also wird sie von dort genommen.
-_K_SIGMA = next(v for v in BETON_VORLAGEN if v.kurzname == "k_sigma")
 
 
 @dataclass(frozen=True)
@@ -354,7 +351,7 @@ class Querschnittsanalyse:
         linien: Sequence[Mapping],
         waende: Sequence[Mapping],
         alpha_min: int, alpha_max: int, k_c: float,
-        wahl: Mapping[str, Tuple[str, str]],
+        wahl: Mapping[str, Rechenwahl],
     ) -> None:
         """
         ``staebe``, ``linien`` und ``waende`` wie bei :class:`Zeichnung`, je
@@ -364,7 +361,7 @@ class Querschnittsanalyse:
         self.name = name
         self.id = praefix
         self.wahl = dict(wahl)
-        """Je Baustoff-ID die Rechenwerte und beim Beton das Gesetz."""
+        """Je Baustoff-ID der Wertesatz und beim Beton die Rechenart -- ohne Kriechen."""
         self.flaechen = tuple(flaechen)
         self.definitionen: Dict[str, WertDef] = {}
         self.berechnungen: List[Berechnung] = []
@@ -616,11 +613,9 @@ class Querschnittsanalyse:
 
     # -- Fuer die Nachweise: Werkstoffe ---------------------------------------------
 
-    def satz(self, stoff: Baustoff) -> str:
-        return self.wahl.get(stoff.id, ("bemessung", "parabel"))[0]
-
-    def betongesetz(self, stoff: Baustoff) -> str:
-        return self.wahl.get(stoff.id, ("bemessung", "parabel"))[1]
+    def rechenwahl(self, stoff: Baustoff) -> Rechenwahl:
+        """Womit dieser Baustoff rechnet -- der Aufbau gibt jedem seine Wahl mit."""
+        return self.wahl[stoff.id]
 
     @staticmethod
     def _name(stoff: Baustoff, kennwert: str) -> str:
@@ -634,39 +629,45 @@ class Querschnittsanalyse:
     def kennwert(self, e: Eingaben, stoff: Baustoff, kennwert: str) -> float:
         return e.g(self._name(stoff, kennwert)).si
 
-    def werkstoffe(self, e: Eingaben) -> Tuple[List[Werkstoff], Callable[[Baustoff], int]]:
+    def werkstoffe(self, wert: Callable[[str], float],
+                   wahl: Callable[[Baustoff], Rechenwahl], *, ungerissen: bool = False,
+                   ) -> Tuple[List[Werkstoff], Callable[[Baustoff], int]]:
         """
-        Die Werkstoffe der Interaktion, mit den gewaehlten Rechenwerten.
+        Die Werkstoffe des Querschnitts -- die eine Stelle, die sie baut.
+        ``wert`` liefert zu einer Wert-ID die Zahl in SI; ``wahl`` je Baustoff
+        seine Rechenwahl: im Bruchzustand die des Baustoffs
+        (:meth:`rechenwahl`), fuer Spannungen und Knicken die des Kapitels.
 
-        Beton: Parabel-Rechteck oder Spannungsblock, gedrueckt bis ``-eps_c2d``
-        samt C-Punkt, verdraengt von den Staeben. Betonstahl: bilinear,
-        ``±eps_ud``. Die Rechenwerte bestimmen, wo die Plateaus liegen
+        Beton: das Gesetz der Wahl, gebaut wie bei der Platte
+        (:func:`~opencivil.nachweis.rechenwahl.betongesetz`), der Beiwert der
+        Parabel also aus ``E_cm/(1+phi)`` -- oder, ``ungerissen``, linear in
+        Druck und Zug mit demselben Modul; gedrueckt bis ``-eps_c2d`` samt
+        Punkt C, verdraengt von den Staeben. Betonstahl: bilinear,
+        ``±eps_ud``. Der Wertesatz bestimmt, wo die Plateaus liegen
         (``f_cd`` oder ``f_ck``, ``f_yd`` oder ``f_yk``); Moduln und
-        Dehnungsgrenzen bleiben -- wie beim Loeser der Platte
+        Dehnungsgrenzen bleiben
         (:class:`~opencivil.nachweis.querschnittsloeser.Werkstoffsatz`).
+
+        Bis 2026-10-16 baute die Spannung-Dehnung-Analyse ihre Werkstoffe
+        selbst, und der Bruchzustand nahm den Beiwert der Parabel aus ``E_cd``.
         """
         liste: List[Werkstoff] = []
         index: Dict[str, int] = {}
         for stoff in self.baustoffe:
-            w = lambda k: abs(self.kennwert(e, stoff, k))
-            bemessung = self.satz(stoff) == "bemessung"
+            w = lambda k: abs(wert(stoff.id_von(k)))
+            gewaehlt = wahl(stoff)
+            satz = gewaehlt.satz
             if stoff.art is Baustoffart.BETON:
-                f_c = w("f_cd") if bemessung else w("f_ck")
-                eps_c1d, eps_c2d = w("eps_c1d"), w("eps_c2d")
-                if self.betongesetz(stoff) == "block":
-                    gesetz = Spannungsblock(f_cd=f_c, eps_c2d=eps_c2d)
-                else:
-                    k = (self.kennwert(e, stoff, "k_sigma") if bemessung
-                         else _K_SIGMA.funktion(E_cd=w("E_cd"), f_cd=f_c))
-                    gesetz = Betongesetz(f_cd=f_c, eps_c1d=eps_c1d, eps_c2d=eps_c2d,
-                                         k_sigma=k)
+                E_cm, eps_c1d, eps_c2d = w("E_cm"), w("eps_c1d"), w("eps_c2d")
+                gesetz = (BetonUngerissen(E_c=wirksamer_modul(E_cm, gewaehlt.kriechzahl))
+                          if ungerissen else
+                          betongesetz(gewaehlt, f_c=w(satz.beton), E_cm=E_cm,
+                                      eps_c1d=eps_c1d, eps_c2d=eps_c2d))
                 liste.append(Werkstoff(stoff.name, gesetz, -eps_c2d, math.inf,
                                        c_punkt=(eps_c1d, eps_c2d), verdraengbar=True))
             else:
-                gesetz = Stahlgesetz(
-                    E_s=w("E_s"), f_yd=w("f_yd") if bemessung else w("f_yk"),
-                    f_yd_druck=w("f_yd_druck") if bemessung else w("f_yk_druck"),
-                    eps_ud=w("eps_ud"))
+                gesetz = Stahlgesetz(E_s=w("E_s"), f_yd=w(satz.stahl),
+                                     f_yd_druck=w(satz.stahl_druck), eps_ud=w("eps_ud"))
                 liste.append(Werkstoff(stoff.name, gesetz, -gesetz.eps_ud, gesetz.eps_ud))
             index[stoff.id] = len(liste) - 1
         return liste, (lambda stoff: index[stoff.id])
@@ -674,45 +675,34 @@ class Querschnittsanalyse:
     def werkstoffe_protokollieren(self, p: Protokoll, e: Eingaben, basis: str) -> None:
         """Die Gesetze, mit denen gerechnet wird -- sie schreiben sich selbst --, und die Werte darin."""
         werte = Zwischenwerte(basis)
-        werkstoffe, index = self.werkstoffe(e)
+        werkstoffe, index = self.werkstoffe(werte_nach_id(e), self.rechenwahl)
         for stoff in self.baustoffe:
             gesetz = werkstoffe[index(stoff)].gesetz
-            bemessung = self.satz(stoff) == "bemessung"
-            satz = "Bemessungswerte" if bemessung else "charakteristische Werte"
+            satz = self.rechenwahl(stoff).satz
+            wert = lambda k: e[self._name(stoff, k)]
             symbol = lambda k: stoff.definition(k).symbol
             if stoff.art is Baustoffart.BETON:
-                f_c = "f_cd" if bemessung else "f_ck"
-                zeichen = "f_{cd}" if bemessung else "f_{ck}"
                 if isinstance(gesetz, Spannungsblock):
-                    titel = f"{stoff.name}: Spannungsblock 0.85·x, {satz}"
+                    titel = f"{stoff.name}: Spannungsblock {BLOCKANTEIL}·x, {satz.beschriftung}"
                     referenz = ""
                 else:
-                    titel = f"{stoff.name}: Parabel-Rechteck-Beziehung, {satz}"
+                    p.formel(werte.zahl(f"k_sigma_{kennung_aus(stoff.id)}", r"k_{\sigma}",
+                                        gesetz.k_sigma, stellen=2),
+                             K_SIGMA_LATEX, {"E_c": wert("E_cm"), "f_c": wert(satz.beton)},
+                             titel=f"{stoff.name}: Beiwert der Parabel", name=K_SIGMA_SEITE)
+                    titel = f"{stoff.name}: Parabel-Rechteck-Beziehung, {satz.beschriftung}"
                     referenz = "SIA 262:2025, 4.2.1.6"
-                p.ansatz(gesetz.latex(zeichen), titel=titel, referenz=referenz, name=gesetz.seite)
-                if not bemessung and self.betongesetz(stoff) != "block":
-                    k = _K_SIGMA.funktion(E_cd=abs(self.kennwert(e, stoff, "E_cd")),
-                                          f_cd=abs(self.kennwert(e, stoff, "f_ck")))
-                    p.formel(werte.zahl(f"k_sigma_{kennung_aus(stoff.id)}",
-                                        rf"k_{{\sigma,k}}", k, stellen=3),
-                             _K_SIGMA.vorlage_latex,
-                             {"E_cd": e[self._name(stoff, "E_cd")],
-                              "f_cd": e[self._name(stoff, "f_ck")]},
-                             titel="Krümmungsbeiwert mit charakteristischer Festigkeit",
-                             referenz=_K_SIGMA.referenz, name=_K_SIGMA.beschreibung)
-                p.tabelle(kopf=["Kennwert", "Wert"], zeilen=[
-                    [Mathe(symbol(k)), Mathe(e[self._name(stoff, k)].zahl_latex())]
-                    for k in (f_c, "eps_c1d", "eps_c2d")], titel=f"Werte {stoff.name}",
-                    ausrichtung="lr")
+                p.ansatz(gesetz.latex(satz.beton_zeichen), titel=titel, referenz=referenz,
+                         name=gesetz.seite)
+                kennwerte = (satz.beton, "eps_c1d", "eps_c2d")
             else:
-                f_s = "f_yd" if bemessung else "f_yk"
-                p.ansatz(gesetz.latex(symbol(f_s), symbol(f"{f_s}_druck")),
-                         titel=f"{stoff.name}: bilineare Beziehung, {satz}",
+                p.ansatz(gesetz.latex(symbol(satz.stahl), symbol(satz.stahl_druck)),
+                         titel=f"{stoff.name}: bilineare Beziehung, {satz.beschriftung}",
                          referenz="SIA 262:2025, 4.2.2.4", name=gesetz.seite)
-                p.tabelle(kopf=["Kennwert", "Wert"], zeilen=[
-                    [Mathe(symbol(k)), Mathe(e[self._name(stoff, k)].zahl_latex())]
-                    for k in (f_s, f"{f_s}_druck", "E_s", "eps_ud")],
-                    titel=f"Werte {stoff.name}", ausrichtung="lr")
+                kennwerte = (satz.stahl, satz.stahl_druck, "E_s", "eps_ud")
+            p.tabelle(kopf=["Kennwert", "Wert"],
+                      zeilen=[[Mathe(symbol(k)), Mathe(wert(k).zahl_latex())] for k in kennwerte],
+                      titel=f"Werte {stoff.name}", ausrichtung="lr")
 
     def grundbezuege(self) -> List[Eingabebezug]:
         """Was jeder Nachweis der Analyse liest: den Schwerpunkt und die Werkstoffe."""
@@ -730,7 +720,7 @@ class Querschnittsanalyse:
         # Querschnitt und mit ihm alles, was er schon gesucht hat.
         schluessel = tuple(e.g(b.name).si for b in self.grundbezuege())
         if schluessel not in self._interaktionen:
-            werkstoffe, index = self.werkstoffe(e)
+            werkstoffe, index = self.werkstoffe(werte_nach_id(e), self.rechenwahl)
             teile, bewehrung, herkunft = self.geometrie(index)
             self._interaktionen[schluessel] = (Querschnitt(
                 werkstoffe=werkstoffe, teile=teile, bewehrung=bewehrung,

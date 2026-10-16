@@ -1,5 +1,5 @@
 ---
-erzeugt: 4a62aa822101
+erzeugt: 93329f1a92f0
 art: modul
 tags: [modul]
 ---
@@ -66,7 +66,6 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
-- [[opencivil.material.basis]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.schubwaende]]
 

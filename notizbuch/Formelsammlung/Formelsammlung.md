@@ -1,5 +1,5 @@
 ---
-erzeugt: 3c124c8bd6c8
+erzeugt: a8646703b904
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -59,7 +59,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bedingung gegen sprödes Versagen]]
 - [[Beide Lagen fliessen auf Zug]] · $N_{Rd}^{+}$
 - [[Beiwert der Gesteinskörnung]] · $k_g$
-- [[Beiwert der Parabel, mit dem wirksamen Modul]] · $k_{\sigma}$
+- [[Beiwert der Parabel]] · $k_{\sigma}$
 - [[Beiwert für die Dicke]] · $k_t$
 - [[Beiwert für die statische Höhe]] · $k_d^{+}$
 - [[Beiwert zur Berücksichtigung der Festigkeitsminderung]] · $\eta_{fc}$
@@ -237,7 +237,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Aufnehmbare Risskraft]] · [[opencivil.nachweis.mindestbewehrung#Rissnormalkraft|Rissnormalkraft._protokoll_lage]], [[opencivil.nachweis.qa_gebrauch#RissnormalkraftQA.pruefe|RissnormalkraftQA.pruefe]]
 - [[Aufnehmbares Moment der Bewehrung]] · [[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung|ZwaengungBiegung._protokoll_lage]]
 - [[Beide Lagen fliessen auf Zug]] · [[opencivil.nachweis.handrechnung#Handrechnung._groesste_zugkraft|Handrechnung._groesste_zugkraft]]
-- [[Beiwert der Parabel, mit dem wirksamen Modul]] · [[opencivil.nachweis.rechenwahl#protokoll_betongesetz|protokoll_betongesetz]], [[opencivil.spannungsanalyse#herleitung|herleitung]]
+- [[Beiwert der Parabel]] · [[opencivil.nachweis.rechenwahl#protokoll_betongesetz|protokoll_betongesetz]], [[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe_protokollieren|Querschnittsanalyse.werkstoffe_protokollieren]], [[opencivil.spannungsanalyse#herleitung|herleitung]]
 - [[Beiwert für die statische Höhe]] · [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._ohne_buegel]], [[opencivil.nachweis.querkraft#Querkraft._protokoll_fall|Querkraft._protokoll_fall]]
 - [[Bemessungswert der Kohäsion]] · [[opencivil.geotechnik.grundbruch|_c_eff]]
 - [[Beton linear, ohne Zug]] · [[opencivil.nachweis.rechenwahl#protokoll_gesetze|protokoll_gesetze]], [[opencivil.querschnitt.schnittanalyse#protokoll_gesetze_nach_wahl|protokoll_gesetze_nach_wahl]]

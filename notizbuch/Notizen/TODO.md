@@ -72,22 +72,10 @@ gelernt wurde, steht in [[Entwicklung]].
 Neun Durchsichten haben je einen Bereich ganz gelesen; jeder Punkt ist am
 Code nachgeprüft. Reihenfolge nach Empfehlung. Ziel jedes Punkts ist, dass
 etwas wegfällt, nicht dass es umzieht. Behoben sind der dringendste
-Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»
-und «Ein Steckbrief je Bauteilart» (siehe [[Entwicklung]]).
+Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
+«Ein Steckbrief je Bauteilart», «Eingaben an einer Stelle prüfen» und
+«Ein Modell der Werkstoffgesetze» (siehe [[Entwicklung]]).
 
-- [ ] **Ein Querschnittsmodell statt zweier.** Gerechnet wird mit den
-      Closures in `querschnittsloeser.py` (`beton_nichtlinear`,
-      `stahl_bilinear`, `stahl_nur_zug`), gedruckt mit den Klassen in
-      `werkstoffgesetz.py` -- `rechenwahl.py` baut dafür ein
-      Platzhalter-`Betongesetz(0.0, 1.0, 1.0, 0.0)` nur fürs LaTeX. Jenseits
-      ε_c2d und beim gedrückten Stahl unterscheiden sie sich schon; k_σ steht
-      dreimal. Der Dehnungsfächer steht zweimal (`dehnungsfaecher.faecher`
-      von Hand, `interaktion.py` aus den Dehnungsgrenzen), Punkt C dreimal.
-      Die Rechenart wird in sieben Modulen einzeln abgefragt, die Analyse
-      vergleicht rohe Texte («block», «bemessung»). Besser: ein Gesetz ist
-      ein Objekt mit `__call__` und `latex()` wie `Spannungsblock`, der Fächer
-      kommt aus `Dehnungsgrenzen`, je Rechenart eine Tabellenzeile. Vorher
-      die Geschwindigkeit der Closures messen.
 - [ ] **Eine Grundlage für die Apps mit Zeichenfenster.** `bs_zeichnung.js`
       ist aus `qa_zeichnung.js` kopiert, rund 150 Zeilen wortgleich bis auf
       `a.qa`/`a.bs`, und läuft schon auseinander (Fehler des Kerns: kurze
@@ -188,12 +176,15 @@ sie hier notiert; keine davon ist nachgeschlagen.
       Begründung für die wirksame Zugzone. Ein Vergleich würde zeigen, ob die
       Zahlen zusammenpassen.
 - [ ] **k_σ der Parabel aus `E_cm/(1+φ)`.** Die Parabel rechnet überall --
-      Tragsicherheit, Knicken, Stahlspannung, Analyse -- mit
+      Tragsicherheit, Knicken, Stahlspannung, Analyse, seit 2026-10-16 auch
+      der Bruchzustand der Querschnittsanalyse und das Materialbild -- mit
       `k_σ = max(1; E_c,eff/(400·f_c))`, `E_c,eff = E_cm/(1+φ)` und `f_c` des
       Wertesatzes. Der Beton hat daneben sein `k_σ = E_cd/(400·f_cd)`
-      (4.2.1.6); mit `γ_cE = 1` ist das bei φ = 0 dieselbe Zahl. Ob für
-      die Tragsicherheit `E_cd` und für das Kriechen der Modul der richtige
-      Ort ist, ist nach Vorgabe, nicht nachgeschlagen.
+      (4.2.1.6), das keine Rechnung mehr liest; die Materialtabelle zeigt es
+      noch. Mit `γ_cE = 1` ist das bei φ = 0 dieselbe Zahl. Ob für die
+      Tragsicherheit `E_cd` und für das Kriechen der Modul der richtige Ort
+      ist, ist nach Vorgabe, nicht nachgeschlagen; mit der Normstelle
+      entscheiden, ob das k_σ des Materials bleibt.
 - [ ] **Die Handrechnung als Rechenart im Löser.** Bei der Stahlspannung
       rechnet «Handrechnung» wie die Resistenzlinie aus Handrechnung
       (Knicken und Analysen bieten sie seit 2026-10-12 nicht mehr an):
@@ -377,6 +368,12 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Ein Modell der Werkstoffgesetze (C2, 2026-10-16): jedes Gesetz rechnet und
+schreibt sich selbst, aus denselben Ästen · jenseits der Grenze null, auf
+ihr um eine Rundung · die Querschnittsanalyse baut ihren Beton wie die
+Platte und ihre Werkstoffe an einer Stelle · Punkt C an einer Stelle · der
+Hinweis zu Randdehnungen misst Druck und Zug je für sich ·
 
 Eingaben an einer Stelle geprüft (C1, 2026-10-16): ein Leser aus den Feldern
 der Datenklassen, streng, und dieselbe Prüfung vor jedem Rechnen -- die

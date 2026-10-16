@@ -61,10 +61,26 @@ K_SIGMA_MIN = 1.0
 #: Dieselbe Regel als Formel, fuer die Herleitung -- mit ``@E_c`` und ``@f_c``.
 K_SIGMA_LATEX = r"\max\left(1;\ \frac{@E_c}{400 \cdot @f_c}\right)"
 
+#: Ihre Seite im Notizbuch -- eine fuer jede Herleitung, die sie anschreibt,
+#: mit welchem Modul auch immer.
+K_SIGMA_SEITE = "Beiwert der Parabel"
+
 
 def k_sigma(E_c: float, f_c: float) -> float:
     """Der Beiwert der Parabel zum Modul ``E_c``: ``E_c/(400·f_c)``, nie unter 1."""
     return max(K_SIGMA_MIN, E_c / (400.0 * f_c)) if f_c > 0 else K_SIGMA_MIN
+
+
+def anteil_punkt_c(eps_c1d: float, eps_c2d: float) -> float:
+    """
+    Wo der Punkt C liegt, als Anteil der Hoehe ab dem gedrueckten Rand:
+    ``1 - eps_c1d/eps_c2d``. Ist der ganze Querschnitt gedrueckt, laufen die
+    Ebenen des Bruchs durch ihn, mit der Stauchung ``-eps_c1d`` -- der reine
+    Druck endet darum bei ``-eps_c1d``, nicht bei ``-eps_c2d``. Bis
+    2026-10-16 stand die Formel dreimal da: im Faecher der Platte, in ihren
+    Grenzen und in der Interaktion des gezeichneten Querschnitts.
+    """
+    return 1.0 - eps_c1d / eps_c2d
 
 
 #: Die Seite im Notizbuch fuer den Stahl der Handrechnung, der nur Zug traegt.

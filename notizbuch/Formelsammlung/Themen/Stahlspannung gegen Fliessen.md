@@ -1,5 +1,5 @@
 ---
-erzeugt: 6d4f8104124b
+erzeugt: 00acde01d042
 art: thema
 tags: [thema]
 ---
@@ -22,7 +22,7 @@ Unter häufiger Einwirkung darf die Bewehrung nicht fliessen – sonst bleiben R
 4. [[Bilineare Beziehung des Betonstahls]]
 5. [[Dehnungsebene und innere Kräfte]]
 6. [[Erfüllungsgrad]]
-7. [[Beiwert der Parabel, mit dem wirksamen Modul]]
+7. [[Beiwert der Parabel]]
 8. [[Parabel-Rechteck-Beziehung des Betons]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->

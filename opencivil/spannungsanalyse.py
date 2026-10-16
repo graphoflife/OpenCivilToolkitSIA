@@ -120,7 +120,9 @@ from opencivil.nachweis.sproedes_versagen import (
 )
 from opencivil.querschnitt.platte import Richtung
 from opencivil.material.betonstahl import FLIESSDEHNUNG
-from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL, K_SIGMA_LATEX, BetonUngerissen
+from opencivil.querschnitt.werkstoffgesetz import (
+    BLOCKANTEIL, K_SIGMA_LATEX, K_SIGMA_SEITE, RUNDUNG, BetonUngerissen,
+)
 
 if TYPE_CHECKING:
     from opencivil.core.rechenwerk import Loesung
@@ -321,8 +323,11 @@ def aus_dehnungen(loeser: Faserloeser, *,
     chi = (eps_unten - eps_oben) / loeser.h if loeser.h > 0 else 0.0
     eps_m = eps_oben - chi * loeser.oben
     bild = _bild(loeser, eps_m, chi)
-    aussen = max(abs(eps_oben), abs(eps_unten))
-    if aussen > max(loeser.eps_druck, loeser.eps_zug):
+    # Druck und Zug je gegen ihre eigene Grenze: −5 ‰ liegt jenseits des
+    # Betons, auch wenn der Stahl bis 45 ‰ reicht. Bis 2026-10-16 stand hier
+    # das Groessere der beiden, und der Hinweis blieb aus.
+    if (min(eps_oben, eps_unten) < -(loeser.eps_druck + RUNDUNG)
+            or max(eps_oben, eps_unten) > loeser.eps_zug + RUNDUNG):
         bild.hinweis = (
             f"Die Randdehnung liegt ausserhalb dessen, wofür die "
             f"Werkstoffgesetze gelten (−{loeser.eps_druck * 1e3:.1f} ‰ bis "
@@ -1064,7 +1069,7 @@ def herleitung(p: Protokoll, fall, paar, linie: Linie,
     else:
         k = w.zahl("k_sigma", r"k_{\sigma}", gerissen.k_sigma, stellen=2)
         p.formel(k, K_SIGMA_LATEX, {"E_c": E_c_eff, "f_c": f_c},
-                 titel="Beiwert der Parabel, mit dem wirksamen Modul")
+                 titel="Beiwert der Parabel, mit dem wirksamen Modul", name=K_SIGMA_SEITE)
         p.erklaerung(
             "Unter 1 rechnet die Parabel k_σ nicht: dort hätte ihr Nenner im "
             "ansteigenden Ast eine Nullstelle. So weit kommt es mit dem kriechweichen "

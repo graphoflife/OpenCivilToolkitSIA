@@ -1,5 +1,5 @@
 ---
-erzeugt: ba07e66aadff
+erzeugt: 67fc9eb7e667
 art: modul
 tags: [modul]
 ---
@@ -493,6 +493,7 @@ die andere Koordinate jeder Stelle.
 
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.geometrie]]
+- [[opencivil.querschnitt.werkstoffgesetz]]
 
 ## Gebraucht von
 

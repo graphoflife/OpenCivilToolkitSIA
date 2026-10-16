@@ -148,6 +148,8 @@ if __name__ == "__main__":
 
 import math
 
+from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
+from opencivil.nachweis.rechenwahl import Betonkennwerte, Rechenart, Rechenwahl, gesetze
 from opencivil.projekt import WerkstoffwahlEintrag
 from opencivil.web import dienst
 
@@ -286,6 +288,33 @@ class TestBiegung(unittest.TestCase):
             p.querschnittsanalysen[0].lastfall("Feld", N_Ed=-800.0, M_y_Ed=150.0)
             return urteile(p.rechnen(), "M-N")["Feld"].erfuellungsgrad.si
         self.assertAlmostEqual(grad("block") / grad("parabel"), 1.0, delta=0.05)
+
+
+class TestGesetzeWieDiePlatte(unittest.TestCase):
+    """
+    Mit derselben Wahl rechnet der gezeichnete Querschnitt denselben Beton
+    wie die Platte -- ein Modell, gebaut an einer Stelle. Bis 2026-10-16 nahm
+    er den Beiwert der Parabel aus E_cd und baute ihn selbst.
+    """
+
+    def test_parabel_und_block_in_beiden_wertesaetzen(self):
+        for satz in Werkstoffsatz:
+            for art in (Rechenart.PARABEL, Rechenart.BLOCK):
+                with self.subTest(satz=satz.value, art=art.value):
+                    p = projekt(werkstoffwahl=[WerkstoffwahlEintrag(
+                        "b1", satz=satz.value, betongesetz=art.value)])
+                    aufbau = p.aufbauen()
+                    analyse = aufbau.querschnittsanalysen["a1"]
+                    loesung = aufbau.werk.loese(
+                        *(b.wert_id for b in analyse.werkstoffbezuege()))
+                    wert = lambda kid: loesung.werte[kid].groesse.si
+                    werkstoffe, index = analyse.werkstoffe(wert, analyse.rechenwahl)
+                    stoff = aufbau.baustoffe["b1"]
+                    w = lambda k: abs(wert(stoff.id_von(k)))
+                    platte = gesetze(Rechenwahl(satz=satz, art=art), Betonkennwerte(
+                        f_c=w(satz.beton), E_cm=w("E_cm"), eps_c1d=w("eps_c1d"),
+                        eps_c2d=w("eps_c2d"))).beton
+                    self.assertEqual(werkstoffe[index(stoff)].gesetz, platte)
 
 
 class TestSchub(unittest.TestCase):

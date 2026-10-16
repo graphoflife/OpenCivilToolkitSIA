@@ -1,5 +1,5 @@
 ---
-erzeugt: faf01d00515f
+erzeugt: 57aa486494b2
 art: modul
 tags: [modul]
 ---
@@ -133,7 +133,9 @@ dritten Quadranten, der Stahl spannt sich ueber beide.
 def _betonkurve(stoff, wert, schritte: int=80) -> Optional[dict]
 ```
 
-Parabel-Rechteck-Beziehung, von null bis zur Bruchdehnung.
+Parabel-Rechteck-Beziehung, von null bis zur Bruchdehnung -- mit
+Bemessungswerten, ohne Kriechen, gebaut wie in jeder Rechnung: der
+Beiwert aus `E_cm` ([[opencivil.querschnitt.werkstoffgesetz#Betongesetz.mit_modul|Betongesetz.mit_modul]]).
 
 ### _spannungsblock
 

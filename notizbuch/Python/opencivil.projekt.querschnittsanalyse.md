@@ -1,5 +1,5 @@
 ---
-erzeugt: f61e178a5791
+erzeugt: 58f275d78bcc
 art: modul
 tags: [modul]
 ---
@@ -246,6 +246,15 @@ vereinfachte Spannungsblock 0.85·x.
 - `material: str`
 - `satz: str = einer_von(WERKSTOFFSAETZE, WERKSTOFFSAETZE[0])`
 - `betongesetz: str = einer_von(BETONGESETZE, BETONGESETZE[0])`
+
+#### WerkstoffwahlEintrag.rechenwahl
+
+```python
+@property
+def rechenwahl(self) -> Rechenwahl
+```
+
+Fuer die Rechnung: Wertesatz und Rechenart, ohne Kriechen -- der Bruchzustand.
 
 ### QASpannungsfallEintrag
 

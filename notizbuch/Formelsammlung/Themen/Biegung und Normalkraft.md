@@ -1,5 +1,5 @@
 ---
-erzeugt: 0e1b10f7b6af
+erzeugt: ba30b0cd5eef
 art: thema
 tags: [thema]
 ---
@@ -30,7 +30,7 @@ Der Beton ist in 200 Fasern über die Höhe geteilt, die Bewehrung zählt Lage f
 14. [[Widerstand bei festgehaltenem N_Ed]]
 15. [[Erfüllungsgrad]]
 16. [[Wirksamer Elastizitätsmodul]]
-17. [[Beiwert der Parabel, mit dem wirksamen Modul]]
+17. [[Beiwert der Parabel]]
 18. [[Parabel-Rechteck-Beziehung des Betons]]
 19. [[Bilineare Beziehung des Betonstahls]]
 20. [[Schnittgrössen aus der Spannungsverteilung]]

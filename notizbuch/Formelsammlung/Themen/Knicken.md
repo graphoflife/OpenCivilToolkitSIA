@@ -1,5 +1,5 @@
 ---
-erzeugt: c32a8b4137e0
+erzeugt: f88f8c1b1a81
 art: thema
 tags: [thema]
 ---
@@ -39,7 +39,7 @@ Die Dehnung wächst linear in Zugrichtung, ε = ε\_m + χ·v mit v ab dem Schwe
 1. [[Ungewollte Ausmitte – allgemein]]
 2. [[Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein]]
 3. [[Wirksamer Elastizitätsmodul]]
-4. [[Beiwert der Parabel, mit dem wirksamen Modul]]
+4. [[Beiwert der Parabel]]
 5. [[Parabel-Rechteck-Beziehung des Betons]]
 6. [[Bilineare Beziehung des Betonstahls]]
 7. [[Dehnungsebene und innere Kräfte]]

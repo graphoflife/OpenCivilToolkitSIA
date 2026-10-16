@@ -54,7 +54,7 @@ from dataclasses import dataclass
 from typing import List, Sequence, Tuple
 
 from opencivil.querschnitt.fasern import Dehnungsgrenze
-from opencivil.querschnitt.werkstoffgesetz import Dehnungsebene
+from opencivil.querschnitt.werkstoffgesetz import Dehnungsebene, anteil_punkt_c
 
 #: Schritte je Faecherabschnitt. Die Linie nahe dem reinen Druck laeuft
 #: schnell und waere mit weniger sichtbar eckig. Die Zahlen im Bericht haengen
@@ -122,13 +122,9 @@ def faecher(
         return ebenen[-1][1]
 
     # Drehpunkt C: sobald die Nulllinie den Querschnitt verlassen hat, ist
-    # nicht mehr die Randfaser massgebend. Fuer den vollstaendig gedrueckten
-    # Querschnitt gilt die Stauchung eps_c1d, und alle Ebenen dieses
-    # Abschnitts laufen durch den Punkt
-    #     z_C = h * (1 - eps_c1d / eps_c2d)   ab dem gedrueckten Rand
-    # mit der Dehnung -eps_c1d. Der reine Druck endet folglich bei
-    # gleichmaessig -eps_c1d, nicht bei -eps_c2d.
-    anteil_c = 1.0 - eps_c1d / eps_c2d
+    # nicht mehr die Randfaser massgebend -- alle Ebenen dieses Abschnitts
+    # laufen durch C, mit der Dehnung -eps_c1d (siehe anteil_punkt_c).
+    anteil_c = anteil_punkt_c(eps_c1d, eps_c2d)
     z_c_oben = h * anteil_c          # von der Oberkante, wenn oben gedrueckt
     z_c_unten = h * (1.0 - anteil_c)  # von der Oberkante, wenn unten gedrueckt
 
@@ -165,7 +161,7 @@ def grenzen(
     Hoehe, wie in :mod:`opencivil.querschnitt.fasern`.
     """
     halb = h / 2.0
-    z_c = h * (1.0 - eps_c1d / eps_c2d)
+    z_c = h * anteil_punkt_c(eps_c1d, eps_c2d)
     paare = [
         (Dehnungsgrenze(arm=-halb, eps_min=-eps_c2d, eps_max=math.inf), "Beton am oberen Rand"),
         (Dehnungsgrenze(arm=halb, eps_min=-eps_c2d, eps_max=math.inf), "Beton am unteren Rand"),

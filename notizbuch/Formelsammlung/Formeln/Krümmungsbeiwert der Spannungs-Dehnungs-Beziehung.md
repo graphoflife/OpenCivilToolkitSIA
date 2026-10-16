@@ -1,5 +1,5 @@
 ---
-erzeugt: 62e6c77f6e5f
+erzeugt: df81d2c6891f
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.1.6"
@@ -29,12 +29,10 @@ $$
 ## Im Code
 
 - [[opencivil.material.beton]]
-- [[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe_protokollieren|Querschnittsanalyse.werkstoffe_protokollieren]]
 
 ## Themen
 
 - [[Beton]]
-- [[Schiefe Biegung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -50,7 +48,7 @@ beginnt, sagt $k_\sigma$: ihr Anstieg dort ist $k_\sigma \cdot f_{cd} /
   Kurve steigt steil und biegt dann um.
 - $k_\sigma = 1$ ist eine Gerade bis $f_{cd}$ bei $\varepsilon_{c1d}$. Kleiner
   wird er nicht angesetzt: darunter hätte der Nenner im ansteigenden Ast eine
-  Nullstelle (siehe [[Beiwert der Parabel, mit dem wirksamen Modul]]).
+  Nullstelle (siehe [[Beiwert der Parabel]]).
 
 Mit $k_\sigma = E_{cd}/(400 \cdot f_{cd})$ und $\varepsilon_{c1d}$ = 2 ‰ ist der
 Anstieg bei null $1.25 \cdot E_{cd}$ -- ein bekannter Unterschied, den das

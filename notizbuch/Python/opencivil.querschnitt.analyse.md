@@ -1,5 +1,5 @@
 ---
-erzeugt: 3a583661b97f
+erzeugt: 9e6371b39c66
 art: modul
 tags: [modul]
 ---
@@ -281,17 +281,13 @@ def angaben(self) -> Tuple[GleichungBlock, TabellenBlock]
 
 Was ueber der Nachweistabelle steht: Werkstoffe, Flaeche, Schwerpunkt; die Bewehrung.
 
-#### Querschnittsanalyse.satz
+#### Querschnittsanalyse.rechenwahl
 
 ```python
-def satz(self, stoff: Baustoff) -> str
+def rechenwahl(self, stoff: Baustoff) -> Rechenwahl
 ```
 
-#### Querschnittsanalyse.betongesetz
-
-```python
-def betongesetz(self, stoff: Baustoff) -> str
-```
+Womit dieser Baustoff rechnet -- der Aufbau gibt jedem seine Wahl mit.
 
 #### Querschnittsanalyse.werkstoffbezuege
 
@@ -310,17 +306,26 @@ def kennwert(self, e: Eingaben, stoff: Baustoff, kennwert: str) -> float
 #### Querschnittsanalyse.werkstoffe
 
 ```python
-def werkstoffe(self, e: Eingaben) -> Tuple[List[Werkstoff], Callable[[Baustoff], int]]
+def werkstoffe(self, wert: Callable[[str], float], wahl: Callable[[Baustoff], Rechenwahl], *, ungerissen: bool=False) -> Tuple[List[Werkstoff], Callable[[Baustoff], int]]
 ```
 
-Die Werkstoffe der Interaktion, mit den gewaehlten Rechenwerten.
+Die Werkstoffe des Querschnitts -- die eine Stelle, die sie baut.
+`wert` liefert zu einer Wert-ID die Zahl in SI; `wahl` je Baustoff
+seine Rechenwahl: im Bruchzustand die des Baustoffs
+([[opencivil.querschnitt.analyse#Querschnittsanalyse.rechenwahl|rechenwahl]]), fuer Spannungen und Knicken die des Kapitels.
 
-Beton: Parabel-Rechteck oder Spannungsblock, gedrueckt bis `-eps_c2d`
-samt C-Punkt, verdraengt von den Staeben. Betonstahl: bilinear,
-`±eps_ud`. Die Rechenwerte bestimmen, wo die Plateaus liegen
+Beton: das Gesetz der Wahl, gebaut wie bei der Platte
+([[opencivil.nachweis.rechenwahl#betongesetz|betongesetz]]), der Beiwert der
+Parabel also aus `E_cm/(1+phi)` -- oder, `ungerissen`, linear in
+Druck und Zug mit demselben Modul; gedrueckt bis `-eps_c2d` samt
+Punkt C, verdraengt von den Staeben. Betonstahl: bilinear,
+`±eps_ud`. Der Wertesatz bestimmt, wo die Plateaus liegen
 (`f_cd` oder `f_ck`, `f_yd` oder `f_yk`); Moduln und
-Dehnungsgrenzen bleiben -- wie beim Loeser der Platte
+Dehnungsgrenzen bleiben
 ([[opencivil.nachweis.querschnittsloeser#Werkstoffsatz|Werkstoffsatz]]).
+
+Bis 2026-10-16 baute die Spannung-Dehnung-Analyse ihre Werkstoffe
+selbst, und der Bruchzustand nahm den Beiwert der Parabel aus `E_cd`.
 
 #### Querschnittsanalyse.werkstoffe_protokollieren
 
@@ -378,8 +383,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 
 ## Konstanten
 
-- `KENNWERTE = {Baustoffart.BETON: ('f_ck', 'f_cd', 'eps_c1d', 'eps_c2d', 'k_sigma',…` – Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin. `E_cm` braucht der Gebrauchszustand: der Beton dort rechnet mit `E_cm/(1+phi)`.
-- `_K_SIGMA = next((v for v in BETON_VORLAGEN if v.kurzname == 'k_sigma'))` – Die Regel fuer k_sigma steht beim Beton. Mit charakteristischen Werten gilt dieselbe, mit f_ck statt f_cd -- also wird sie von dort genommen.
+- `KENNWERTE = {Baustoffart.BETON: ('f_ck', 'f_cd', 'eps_c1d', 'eps_c2d', 'f_ctm', '…` – Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin. Aus `E_cm` entsteht der Beiwert der Parabel, wie bei der Platte; der Gebrauchszustand rechnet mit `E_cm/(1+phi)`.
 
 ## Braucht
 
@@ -389,7 +393,8 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
-- [[opencivil.material.beton]]
+- [[opencivil.nachweis.querschnittsloeser]]
+- [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.schubwaende]]
@@ -409,10 +414,10 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 
 ## Formeln aus diesem Modul
 
+- [[Beiwert der Parabel]] · `Querschnittsanalyse.werkstoffe_protokollieren`
 - [[Bilineare Beziehung des Betonstahls]] · `Querschnittsanalyse.werkstoffe_protokollieren`
 - [[Bügelquerschnitt je Länge einer Schubwand (n Schnitte)]] · `Querschnittsanalyse._waende_protokollieren`
 - [[Fläche und Schwerpunkt eines Polygons (Satz von Gauss)]] · `Querschnittsanalyse.aufbau_protokollieren`
-- [[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]] · `Querschnittsanalyse.werkstoffe_protokollieren`
 - [[Parabel-Rechteck-Beziehung des Betons]] · `Querschnittsanalyse.werkstoffe_protokollieren`
 - [[Spannungsblock des Betons]] · `Querschnittsanalyse.werkstoffe_protokollieren`
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]] · `Querschnittsanalyse._bewehrung_protokollieren`

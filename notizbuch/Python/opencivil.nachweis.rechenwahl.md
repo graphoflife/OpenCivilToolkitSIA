@@ -1,5 +1,5 @@
 ---
-erzeugt: 341bf1350a4d
+erzeugt: 665ef337844c
 art: modul
 tags: [modul]
 ---
@@ -426,13 +426,14 @@ das Knicken und die Analysen mit dem der ersten Lage.
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.web.api]]
 
 ## Formeln aus diesem Modul
 
-- [[Beiwert der Parabel, mit dem wirksamen Modul]] · `protokoll_betongesetz`
+- [[Beiwert der Parabel]] · `protokoll_betongesetz`
 - [[Beton linear, ohne Zug]] · `protokoll_gesetze`
 - [[Betonstahl nur auf Zug]] · `protokoll_gesetze`
 - [[Bilineare Beziehung des Betonstahls]] · `protokoll_gesetze`

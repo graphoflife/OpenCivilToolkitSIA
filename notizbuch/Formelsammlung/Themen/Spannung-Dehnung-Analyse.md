@@ -1,5 +1,5 @@
 ---
-erzeugt: f04d035aeae6
+erzeugt: 254cded0d06a
 art: thema
 tags: [thema]
 ---
@@ -42,7 +42,7 @@ Der reine Betonquerschnitt ist der Bruttoquerschnitt, um die Achse der Biegung: 
 
 1. [[Wirksamer Elastizitätsmodul]]
 2. [[Beton ungerissen, in Druck und Zug]]
-3. [[Beiwert der Parabel, mit dem wirksamen Modul]]
+3. [[Beiwert der Parabel]]
 4. [[Parabel-Rechteck-Beziehung des Betons]]
 5. [[Rissmoment bei der Normalkraft]]
 6. [[Fliessdehnung]]

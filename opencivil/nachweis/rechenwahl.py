@@ -69,8 +69,8 @@ from opencivil.nachweis.querschnittsloeser import (
     Querschnittsloeser, Stahllage, Werkstoffsatz, lagen_je_seite, wirksamer_modul,
 )
 from opencivil.querschnitt.werkstoffgesetz import (
-    BLOCKANTEIL, K_SIGMA_LATEX, BetonElastisch, Betongesetz, Spannungsblock, Stahlgesetz,
-    k_sigma,
+    BLOCKANTEIL, K_SIGMA_LATEX, K_SIGMA_SEITE, BetonElastisch, Betongesetz, Spannungsblock,
+    Stahlgesetz, k_sigma,
 )
 
 Gesetz = Callable[[float], float]
@@ -439,7 +439,7 @@ def protokoll_betongesetz(p: Protokoll, wahl: Rechenwahl, gesetz: Gesetz, f_c: W
                                  wirksamer_modul(E_cm.groesse.si, wahl.kriechzahl))
         p.formel(werte.zahl("k_sigma", r"k_{\sigma}", gesetz.k_sigma, stellen=2),
                  K_SIGMA_LATEX, {"E_c": E_c_eff, "f_c": f_c},
-                 titel="Beiwert der Parabel, mit dem wirksamen Modul")
+                 titel="Beiwert der Parabel, mit dem wirksamen Modul", name=K_SIGMA_SEITE)
         p.ansatz(gesetz.latex(f_c.symbol),
                  titel=f"{titel}: Beton, Parabel-Rechteck", referenz="SIA 262:2025, 4.2.1.6",
                  name=gesetz.seite)

@@ -353,16 +353,20 @@ def werkstoffgesetze(aufbau: Aufbau, loesung: Loesung) -> dict:
 
 
 def _betonkurve(stoff, wert, schritte: int = 80) -> Optional[dict]:
-    """Parabel-Rechteck-Beziehung, von null bis zur Bruchdehnung."""
+    """
+    Parabel-Rechteck-Beziehung, von null bis zur Bruchdehnung -- mit
+    Bemessungswerten, ohne Kriechen, gebaut wie in jeder Rechnung: der
+    Beiwert aus ``E_cm`` (:meth:`Betongesetz.mit_modul`).
+    """
     from opencivil.querschnitt.werkstoffgesetz import Betongesetz
 
     f_cd, eps_c1d = wert("f_cd"), wert("eps_c1d")
-    eps_c2d, k_sigma = wert("eps_c2d"), wert("k_sigma")
-    if None in (f_cd, eps_c1d, eps_c2d, k_sigma):
+    eps_c2d, E_cm = wert("eps_c2d"), wert("E_cm")
+    if None in (f_cd, eps_c1d, eps_c2d, E_cm):
         return None
 
-    gesetz = Betongesetz(f_cd=abs(f_cd), eps_c1d=abs(eps_c1d),
-                         eps_c2d=abs(eps_c2d), k_sigma=k_sigma)
+    gesetz = Betongesetz.mit_modul(f_c=abs(f_cd), E_c=abs(E_cm), eps_c1d=abs(eps_c1d),
+                                   eps_c2d=abs(eps_c2d))
     punkte = []
     for i in range(schritte + 1):
         eps = -abs(eps_c2d) * i / schritte

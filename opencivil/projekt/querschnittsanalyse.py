@@ -38,7 +38,9 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX
-from opencivil.nachweis.rechenwahl import FASERARTEN, FASERSPANNUNGSARTEN, VERFORMUNGSARTEN
+from opencivil.nachweis.rechenwahl import (
+    FASERARTEN, FASERSPANNUNGSARTEN, VERFORMUNGSARTEN, Rechenwahl,
+)
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.platte import ALPHA_MAX, ALPHA_MIN, K_C
 from opencivil.querschnitt import vorlagen
@@ -256,6 +258,11 @@ class WerkstoffwahlEintrag(Beschreibung):
     material: str
     satz: str = einer_von(WERKSTOFFSAETZE, WERKSTOFFSAETZE[0])
     betongesetz: str = einer_von(BETONGESETZE, BETONGESETZE[0])
+
+    @property
+    def rechenwahl(self) -> Rechenwahl:
+        """Fuer die Rechnung: Wertesatz und Rechenart, ohne Kriechen -- der Bruchzustand."""
+        return Rechenwahl.aus(0.0, self.satz, self.betongesetz)
 
 
 @dataclass

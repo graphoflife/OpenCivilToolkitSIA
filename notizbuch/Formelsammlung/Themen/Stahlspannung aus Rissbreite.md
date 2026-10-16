@@ -1,5 +1,5 @@
 ---
-erzeugt: 4c7bc402a73a
+erzeugt: 84c583e1fdab
 art: thema
 tags: [thema]
 ---
@@ -56,7 +56,7 @@ Einachsig bleibt die Nulllinie waagrecht, und M\_z zählt nicht – wie in der T
 10. [[Spannungsblock des Betons]]
 11. [[Betonstahl nur auf Zug]]
 12. [[Fiktiver Durchmesser einer verschmierten Linie]]
-13. [[Beiwert der Parabel, mit dem wirksamen Modul]]
+13. [[Beiwert der Parabel]]
 14. [[Parabel-Rechteck-Beziehung des Betons]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->

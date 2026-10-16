@@ -1,37 +1,41 @@
 ---
-erzeugt: 307499f23314
+erzeugt: 340d3fe7f18e
 art: formel
 tags: [formel]
 ---
 > [!warning] Normstelle fehlt noch
 > Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
 
+*In der Herleitung: «C30/37: Beiwert der Parabel»*
+
 $$
-k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{cd}}\right)
+k_{\sigma} = \max\left(1;\ \frac{E_{cm}}{400 \cdot f_{cd}}\right)
 $$
 
 ## Grössen
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $E_{c,eff}$ | – | N/mm² | [[Wirksamer Elastizitätsmodul]] |
+| $E_{cm}$ | Mittelwert des Elastizitätsmoduls | N/mm² | [[Mittelwert des Elastizitätsmoduls]] |
 | $f_{cd}$ | Bemessungswert der Betondruckfestigkeit | N/mm² | [[Bemessungswert der Betondruckfestigkeit]] |
 
 ## Beispiel
 
-Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
+Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{cd}}\right) = \max\left(1;\ \frac{11207\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 1.4
+k_{\sigma} = \max\left(1;\ \frac{E_{cm}}{400 \cdot f_{cd}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 4.2
 $$
 
 ## Im Code
 
 - [[opencivil.nachweis.rechenwahl#protokoll_betongesetz|protokoll_betongesetz]]
+- [[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe_protokollieren|Querschnittsanalyse.werkstoffe_protokollieren]]
 - [[opencivil.spannungsanalyse#herleitung|herleitung]]
 
 ## Themen
 
+- [[Schiefe Biegung]]
 - [[Knicken]]
 - [[Biegung und Normalkraft]]
 - [[Stahlspannung gegen Fliessen]]
@@ -42,10 +46,13 @@ $$
 
 ## Theorie
 
-Derselbe Krümmungsbeiwert wie beim Beton (siehe
-[[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]]), aber mit dem
-kriechweichen [[Wirksamer Elastizitätsmodul|wirksamen Modul]] statt mit
-$E_{cd}$: die Parabel beginnt flacher, der Beton gibt unter Dauerlast nach.
+Der Krümmungsbeiwert der Parabel aus dem Modul, mit dem das Gesetz rechnet
+-- eine Regel für jede Rechnung. Im Bruchzustand ist das $E_{cm}$, unter
+Dauerlast der kriechweiche [[Wirksamer Elastizitätsmodul|wirksame Modul]]
+$E_{cm}/(1+\varphi)$: die Parabel beginnt dann flacher, der Beton gibt nach.
+Der Beton selbst nennt denselben Beiwert mit $E_{cd}$ (siehe
+[[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]]); mit
+$\gamma_{cE} = 1$ ist das dieselbe Zahl.
 
 Mit grossem $\varphi$ und charakteristischen Werten würde $k_\sigma$ kleiner
 als 1. Dann hätte der Nenner der Parabel, $1 + (k_\sigma - 2)\,\eta$, im

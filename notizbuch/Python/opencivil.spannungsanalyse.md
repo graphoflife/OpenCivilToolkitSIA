@@ -1,5 +1,5 @@
 ---
-erzeugt: 6d532eee9c1d
+erzeugt: c173c01b982f
 art: modul
 tags: [modul]
 ---
@@ -783,7 +783,7 @@ sammelt die Formelsammlung ihr Thema.
 
 - [[Äquivalenter E-Modul über dem Moment]] · `_herleitung_modul`
 - [[Äquivalenter E-Modul über der Normalkraft]] · `_herleitung_modul`
-- [[Beiwert der Parabel, mit dem wirksamen Modul]] · `herleitung`
+- [[Beiwert der Parabel]] · `herleitung`
 - [[Beton ungerissen, in Druck und Zug]] · `herleitung`
 - [[Fläche eines Rechtecks]] · `Loeserpaar.herleitung_bezug`
 - [[Flächenträgheitsmoment eines Rechtecks]] · `Loeserpaar.herleitung_bezug`
