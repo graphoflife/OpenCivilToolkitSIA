@@ -207,13 +207,12 @@ class TestBeschreibung(unittest.TestCase):
         platte = QuerschnittEintrag(kennung="q", name="q", beton="b")
         self.assertEqual(platte.verformung, VerformungEintrag(kriechzahl=2.0, faelle=[]))
 
-    def test_das_phi_der_platte_wird_das_der_verformung(self):
-        """Bis 2026-10-16 stand φ an der Platte, nur für den Faktor -- eine Datei von damals."""
+    def test_ein_phi_an_der_platte_gibt_es_nicht_mehr(self):
+        """Bis 2026-10-16 stand φ an der Platte -- eine solche Datei nennt das Feld."""
         roh = Projekt.beispiel().als_dict()
-        platte = roh["querschnitte"][0]
-        del platte["verformung"]
-        platte["kriechzahl"] = 1.3
-        self.assertEqual(Projekt.aus_dict(roh).querschnitte[0].verformung.kriechzahl, 1.3)
+        roh["querschnitte"][0]["kriechzahl"] = 1.3
+        with self.assertRaisesRegex(ProjektFehler, "'kriechzahl' gibt es nicht"):
+            Projekt.aus_dict(roh)
 
     def test_die_fassade(self):
         projekt, platte = platte_mit([12, 12])

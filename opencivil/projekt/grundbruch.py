@@ -16,11 +16,11 @@ nennt fuer delta* «2/3 phi bis 1 · phi».
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Mapping
+from typing import Dict, List
 
 from opencivil.core.wert import kennung_aus
 from opencivil.projekt.eintraege import Beschreibung, eindeutig
-from opencivil.projekt.lesen import ProjektFehler, pflichtfeld, zahl
+from opencivil.projekt.lesen import ProjektFehler
 
 
 @dataclass
@@ -33,19 +33,12 @@ class GrundbruchkombinationEintrag(Beschreibung):
     aktiv: bool = True
     """Ob die Kombination gerechnet wird. Ausgeschaltet bleibt sie stehen."""
 
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "GrundbruchkombinationEintrag":
-        return cls(
-            name=pflichtfeld(d, "name", "Eine Kombination des Grundbruchs"),
-            N_Ed=zahl(d, "N_Ed", cls.N_Ed),
-            T_Ed=zahl(d, "T_Ed", cls.T_Ed),
-            aktiv=bool(d.get("aktiv", cls.aktiv)),
-        )
-
 
 @dataclass
 class GrundbruchEintrag(Beschreibung):
     """Ein Flachfundament auf seinem Baugrund, mit seinen Einwirkungen."""
+
+    BEZEICHNUNG = "Grundbruch"
 
     kennung: str
     name: str
@@ -170,17 +163,3 @@ class GrundbruchEintrag(Beschreibung):
                 raise ProjektFehler(
                     f"{wo}, Kombination '{k.name}': T_Ed zeigt in die Richtung von "
                     f"Bild 9.2.15 und ist nicht negativ, angegeben sind {k.T_Ed:g} kN.")
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "GrundbruchEintrag":
-        kennung = pflichtfeld(d, "kennung", "Ein Grundbruch")
-        return cls(
-            kennung=kennung,
-            name=str(d.get("name") or kennung),
-            **{feld: zahl(d, feld, getattr(cls, feld)) for feld in (
-                "phi_k", "gamma_phi", "c_k", "gamma_c", "gamma", "gamma_w", "q_Ed",
-                "b", "L", "t1", "t", "alpha", "beta", "delta_faktor")},
-            beschreibung=str(d.get("beschreibung") or cls.beschreibung),
-            kombinationen=[GrundbruchkombinationEintrag.aus_dict(x)
-                           for x in (d.get("kombinationen") or [])],
-        )

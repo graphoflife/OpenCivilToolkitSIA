@@ -1,5 +1,5 @@
 ---
-erzeugt: e826ba87cc20
+erzeugt: 68221ed1e86c
 art: modul
 tags: [modul]
 ---
@@ -24,10 +24,6 @@ ein Polygon auf seine Ecken, ein Stab auf seine Lage, eine Linie auf Anfang
 und Ende. Wer einen Knoten verschiebt, verschiebt alles, was an ihm haengt.
 Jedes Element hat eine Kennung, die nie wiederkommt ([[opencivil.projekt.netz]]):
 K fuer Knoten, F fuer Flaechen, S fuer Staebe, L fuer alle Linien.
-
-Bis 2026-10-08 trugen die Elemente ihre Koordinaten selbst. Eine solche Datei
-wird beim Oeffnen umgewandelt: gleiche Koordinaten werden ein Knoten,
-Reihenfolge und Namen bleiben -- und damit jede Zahl im Bericht.
 
 
 ## KOORDINATEN UND EINHEITEN
@@ -58,23 +54,7 @@ der Platte ([[opencivil.projekt.platte#QuerschnittEintrag.masse_pruefen|Querschn
 def _punkt(roh: Any, wo: str) -> List[float]
 ```
 
-Ein Punkt `[y, z]` aus der Datei -- zwei Zahlen, sonst ein Satz, was fehlt.
-
-### _verweis
-
-```python
-def _verweis(d: Mapping[str, Any], feld: str) -> str
-```
-
-Die Kennung eines Knotens -- leer, wenn keine dasteht.
-
-### _hat_koordinaten
-
-```python
-def _hat_koordinaten(d: Mapping[str, Any], *felder: str) -> bool
-```
-
-Ein Element im alten Format: an der Stelle eines Verweises steht ein Punkt.
+Ein Punkt `[y, z]` -- zwei Zahlen, sonst ein Satz, was fehlt.
 
 ### KnotenEintrag
 
@@ -88,13 +68,6 @@ Ein Punkt der Zeichnung, in mm. Die Elemente verweisen mit seiner Kennung auf ih
 - `kennung: str = ''`
 - `y: float = 0.0`
 - `z: float = 0.0`
-
-#### KnotenEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'KnotenEintrag'
-```
 
 ### FlaecheEintrag
 
@@ -116,13 +89,6 @@ Ein Polygon des Querschnitts. Ohne Material ist es eine Aussparung.
 def ist_aussparung(self) -> bool
 ```
 
-#### FlaecheEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'FlaecheEintrag'
-```
-
 ### StabEintrag
 
 ```python
@@ -136,13 +102,6 @@ Ein einzelner Bewehrungsstab, an einem Knoten.
 - `knoten: str = ''`
 - `durchmesser: float = 16.0`
 - `stahl: str = ''`
-
-#### StabEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'StabEintrag'
-```
 
 ### StablinieEintrag
 
@@ -159,7 +118,7 @@ zurueck, findet seine Zahl noch vor. Welche gilt, sagt `art`.
 - `kennung: str = ''`
 - `von: str = ''`
 - `bis: str = ''` – Anfang und Ende als Knoten.
-- `art: str = Linienart.TEILUNG.value`
+- `art: str = einer_von((a.value for a in Linienart), Linienart.TEILUNG.value)`
 - `durchmesser: float = 16.0` – Bei Anzahl und Teilung der Stabdurchmesser in mm.
 - `flaeche: float = 1000.0` – Bei Art «Fläche» die ganze Stahlflaeche der Linie in mm².
 - `anzahl: float = 5.0`
@@ -167,13 +126,6 @@ zurueck, findet seine Zahl noch vor. Welche gilt, sagt `art`.
 - `starteisen: bool = True`
 - `endeisen: bool = True`
 - `stahl: str = ''`
-
-#### StablinieEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'StablinieEintrag'
-```
 
 ### SchubwandEintrag
 
@@ -194,15 +146,8 @@ im Schnitt ist sie nicht zu sehen.
 - `dicke: float = 200.0` – `b_w` in mm.
 - `durchmesser: float = 10.0` – Buegeldurchmesser in mm.
 - `teilung: float = 150.0` – Buegelteilung in Laengsrichtung in mm.
-- `schnitte: int = 2` – Wie viele Buegelschenkel die Wand kreuzen, 1 bis 8.
+- `schnitte: int = einer_von(SCHNITTE, 2)` – Wie viele Buegelschenkel die Wand kreuzen, 1 bis 8.
 - `stahl: str = ''`
-
-#### SchubwandEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'SchubwandEintrag'
-```
 
 ### HilfslinieEintrag
 
@@ -218,13 +163,6 @@ Zeichenfenster zu einer Flaeche machen.
 - `kennung: str = ''`
 - `von: str = ''`
 - `bis: str = ''`
-
-#### HilfslinieEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'HilfslinieEintrag'
-```
 
 ### QALastfallEintrag
 
@@ -244,13 +182,6 @@ Ein Lastfall der Querschnittsanalyse -- kN und kNm, Vorzeichen siehe oben.
 - `T_Ed: float = 0.0`
 - `aktiv: bool = True`
 
-#### QALastfallEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'QALastfallEintrag'
-```
-
 ### QAGebrauchsfallEintrag
 
 ```python
@@ -267,15 +198,6 @@ zaehlen N und die Momente. kN und kNm, Vorzeichen siehe oben.
 - `M_y_Ed: float = 0.0`
 - `M_z_Ed: float = 0.0`
 - `aktiv: bool = True`
-
-#### QAGebrauchsfallEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any], wort: str='häufige') -> 'QAGebrauchsfallEintrag'
-```
-
-`wort` nennt die Liste in der Meldung -- «häufige» oder «quasi-ständige».
 
 ### QAGebrauchsliste
 
@@ -305,14 +227,7 @@ Ein Knicknachweis des gezeichneten Querschnitts -- wie bei der Platte,
 dazu die Zugseite: die Seite, zu der sich der Stab biegt und die das
 Moment 1. Ordnung zieht ([[opencivil.querschnitt.schnittanalyse#Zugseite|Zugseite]]).
 
-- `richtung: str = Zugseite.UNTEN.value`
-
-#### QAKnickEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'QAKnickEintrag'
-```
+- `richtung: str = einer_von(ZUGSEITEN, Zugseite.UNTEN.value)`
 
 ### WerkstoffwahlEintrag
 
@@ -329,15 +244,8 @@ die Plateaus liegen (`f_cd` oder `f_ck`, `f_yd` oder `f_yk`).
 vereinfachte Spannungsblock 0.85·x.
 
 - `material: str`
-- `satz: str = WERKSTOFFSAETZE[0]`
-- `betongesetz: str = BETONGESETZE[0]`
-
-#### WerkstoffwahlEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'WerkstoffwahlEintrag'
-```
+- `satz: str = einer_von(WERKSTOFFSAETZE, WERKSTOFFSAETZE[0])`
+- `betongesetz: str = einer_von(BETONGESETZE, BETONGESETZE[0])`
 
 ### QASpannungsfallEintrag
 
@@ -350,14 +258,7 @@ Eine Spannung-Dehnung-Analyse des gezeichneten Querschnitts -- dieselben
 Felder wie bei der Platte. Die Richtung ist hier die Zugseite: die Seite,
 die ein positives Moment zieht ([[opencivil.querschnitt.schnittanalyse#Zugseite|Zugseite]]).
 
-- `richtung: str = Zugseite.UNTEN.value`
-
-#### QASpannungsfallEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any], **_: Any) -> 'QASpannungsfallEintrag'
-```
+- `richtung: str = einer_von(ZUGSEITEN, Zugseite.UNTEN.value)`
 
 ### Elemente
 
@@ -395,6 +296,7 @@ class QuerschnittsanalyseEintrag(Beschreibung)
 
 Ein gezeichneter Querschnitt mit Bewehrung, Schubwaenden und Lastfaellen.
 
+- `BEZEICHNUNG = 'Querschnitt'`
 - `kennung: str`
 - `name: str`
 - `knoten: List[KnotenEintrag] = field(default_factory=list)`
@@ -413,11 +315,11 @@ Ein gezeichneter Querschnitt mit Bewehrung, Schubwaenden und Lastfaellen.
 - `duktilitaet: bool = False`
 - `x_d_max: float = X_D_MAX`
 - `sproede: bool = False`
-- `rissanforderung: str = 'normal'` – Anforderung an die Rissbildung -- `normal`, `erhoeht` oder `hoch`, wie bei der Platte.
+- `rissanforderung: str = einer_von(RISSANFORDERUNGEN, 'normal')` – Anforderung an die Rissbildung -- `normal`, `erhoeht` oder `hoch`, wie bei der Platte.
 - `zwaengung: bool = False` – Ob die Zwaengung auf Normalkraft nachgewiesen wird -- am ganzen Querschnitt.
 - `zwaengung_begrenzt: bool = False` – Ob die rissaktive Dicke dabei hoechstens 500 mm betraegt.
 - `zwaengung_biegung: bool = False` – Ob die Zwaengung auf Biegung nachgewiesen wird -- je Richtung.
-- `zwaengung_biegung_kriechzahl: float = 0.0` – Die Kriechzahl φ der Zwaengung auf Biegung: der Beton mit `E_cm/(1+φ)`.
+- `zwaengung_biegung_kriechzahl: float = nicht_negativ(0.0)` – Die Kriechzahl φ der Zwaengung auf Biegung: der Beton mit `E_cm/(1+φ)`.
 - `quasistaendig: QAGebrauchsliste = field(default_factory=lambda: QAGebrauchsliste(anteil=QUASISTAENDIG_A…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
 - `haeufig: QAGebrauchsliste = field(default_factory=lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL))` – Die haeufigen Lastfaelle -- gegen das Fliessen, bei erhoehter und hoher Anforderung.
 - `knickfaelle: List[QAKnickEintrag] = field(default_factory=list)` – Knicknachweise, je in einer Richtung; leer heisst: keiner.
@@ -585,29 +487,11 @@ Ein Rechteck 300 × 600 mm, unten drei, oben zwei Staebe, und ein
 Lastfall mit Feldmoment. Zum Anfangen, nicht als Vorgabe: gezeichnet
 wird danach, was man braucht.
 
-#### QuerschnittsanalyseEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'QuerschnittsanalyseEintrag'
-```
-
-#### QuerschnittsanalyseEintrag._elemente_lesen
-
-```python
-def _elemente_lesen(self, d: Mapping[str, Any]) -> None
-```
-
-Die Elemente aus der Datei -- jedes im heutigen Format mit Verweisen,
-oder im alten mit eigenen Koordinaten. Ein altes wird ueber den
-Baukasten angelegt, wie es heute gezeichnet wuerde: seine Punkte
-werden Knoten, gleiche Koordinaten derselbe. Die Reihenfolge bleibt,
-und mit ihr jeder Name im Bericht.
-
 
 ## Konstanten
 
 - `SCHNITTE = range(1, 9)` – Schnitte eines Buegels durch eine Schubwand: so viele Schenkel kreuzen sie.
+- `ZUGSEITEN = tuple((z.value for z in Zugseite))` – Die Zugseiten eines gezeichneten Querschnitts.
 - `Ort = Union[str, Sequence[float]]` – Ein Punkt in mm -- oder die Kennung eines Knotens, der dort liegt.
 
 ## Braucht

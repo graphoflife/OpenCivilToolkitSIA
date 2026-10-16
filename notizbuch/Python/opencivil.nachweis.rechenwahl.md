@@ -1,5 +1,5 @@
 ---
-erzeugt: 500df62b21a0
+erzeugt: 9c202024fabd
 art: modul
 tags: [modul]
 ---
@@ -400,7 +400,6 @@ das Knicken und die Analysen mit dem der ersten Lage.
 - `FASERARTEN = (Rechenart.BLOCK, Rechenart.PARABEL)` – Was das Knicken und die Spannung-Dehnung-Analysen anbieten: nur, was ueber die Fasern rechnet -- siehe «Wer was anbietet» oben.
 - `FASERSPANNUNGSARTEN = FASERARTEN + (Rechenart.ELASTISCH,)` – Die Stahlspannungen des gezeichneten Querschnitts: ueber die Fasern, dazu elastisch -- eine Handrechnung gibt es dort nicht.
 - `VERFORMUNGSARTEN = (Rechenart.PARABEL,)` – Was die Verformung beim Knicken anbietet: nur praezise -- siehe «Wer was anbietet» oben.
-- `ERSATZ_ALTER_WAHL = {Rechenart.HANDRECHNUNG.value: Rechenart.BLOCK.value, Rechenart.BLOCK…` – Was eine alte Datei dort noch waehlen durfte, wo es die Wahl heute nicht mehr gibt -- und was daraus wird, Schritt fuer Schritt zur genaueren, bis es die Wahl gibt: aus der Handrechnung beim Knicken und in den Analysen der Spannungsblock, ueber die Fasern gerechnet (seit 2026-10-12); die Druckbewehrung zaehlt dann mit, der Widerstand steigt darum leicht. Aus dem Spannungsblock bei der Verformung des Knickens die Parabel (seit 2026-10-15), aus der Handrechnung dort also auch.
 - `STAHL_NUR_ZUG = 'Betonstahl nur auf Zug'` – Die Seite im Notizbuch fuer den Stahl der Handrechnung, der nur Zug traegt.
 
 ## Braucht

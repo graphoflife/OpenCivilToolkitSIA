@@ -3,7 +3,7 @@
 import unittest
 
 from opencivil.nachweis import knicken as knick_modul
-from opencivil.projekt import KnickEintrag, Projekt
+from opencivil.projekt import KnickEintrag, Projekt, ProjektFehler
 
 
 def rechnen(projekt: Projekt):
@@ -450,32 +450,14 @@ class TestGebrauchsfallPruefung(unittest.TestCase):
     def test_eine_datei_mit_den_alten_flachen_feldern(self):
         """
         Vor der Gebrauchsliste standen die drei Angaben einzeln an der Platte.
-        Solche Dateien gibt es -- sie werden gelesen und neu geschrieben.
+        Eine solche Datei nennt das Feld, das es nicht mehr gibt -- mit dem,
+        das es heute ist.
         """
         daten = Projekt.beispiel().als_dict()
-        platte = daten["querschnitte"][0]
-        for feld in ("haeufig", "quasistaendig"):
-            platte.pop(feld)
-        platte.update({
-            "haeufige": [{"name": "Gebrauch", "M_Ed": 70.0}],
-            "haeufige_aus_tragsicherheit": True,
-            "haeufige_anteil": 75.0,
-            "quasistaendige": [{"name": "Dauer", "M_Ed": 40.0, "aktiv": False}],
-            "quasistaendige_anteil": 55.0,
-        })
-        q = Projekt.aus_dict(daten).querschnitte[0]
-        self.assertEqual((q.haeufig.anteil, q.haeufig.aus_tragsicherheit), (75.0, True))
-        self.assertEqual([f.name for f in q.haeufig.faelle], ["Gebrauch"])
-        self.assertEqual((q.quasistaendig.anteil, q.quasistaendig.aus_tragsicherheit),
-                         (55.0, False))
-        self.assertFalse(q.quasistaendig.faelle[0].aktiv)
-
-        geschrieben = Projekt.aus_dict(daten).als_dict()["querschnitte"][0]
-        for alt in ("haeufige", "haeufige_aus_tragsicherheit", "haeufige_anteil",
-                    "quasistaendige", "quasistaendige_aus_tragsicherheit",
-                    "quasistaendige_anteil"):
-            self.assertNotIn(alt, geschrieben)
-        self.assertEqual(geschrieben["haeufig"]["anteil"], 75.0)
+        daten["querschnitte"][0]["haeufige_anteil"] = 75.0
+        with self.assertRaises(ProjektFehler) as fehler:
+            Projekt.aus_dict(daten)
+        self.assertIn("'haeufige_anteil' gibt es nicht", str(fehler.exception))
 
     def test_ohne_lastfaelle_leert_jede_lastfallliste(self):
         """

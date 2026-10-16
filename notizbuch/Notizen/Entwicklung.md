@@ -44,6 +44,47 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-16 · Ein Leser und eine Prüfung für jedes Feld
+
+Wunsch des Benutzers (TODO C1): Eingaben an einer Stelle prüfen. Vorher las
+jede Klasse ihre Datei von Hand -- 39 Leser, jeder mit eigenen Vorgaben,
+Prüfungen und alten Formaten --, und die Fassade ging an ihnen vorbei. Ein
+`quer="festt"` aus Python wurde still zur Bettung; eine Rissanforderung mit
+Tippfehler zur mildesten Stufe, ohne x-Bewehrung ganz ohne Meldung.
+
+- **Ein Leser** (`lesen.lesen`) für alle Einträge, aus den Feldern der
+  Datenklassen. Streng: ein Feld, das es nicht gibt, meldet sich mit dem
+  ähnlichsten («Gemeint ist vielleicht 'rissanforderung'?»), ein Text ist
+  keine Zahl, `"false"` kein Schalter, 35.7 keine ganze Zahl -- abgeschnitten
+  wird nichts. Was fehlt, bekommt die Vorgabe: bei einem Eintrag in einem
+  Eintrag die eines frischen an dieser Stelle, so rechnet eine teilweise
+  angegebene Rechenwahl des Knickens wie ihr Kapitel.
+- **Eine Prüfung** (`lesen.felder_pruefen`) für jedes Feld, aus dem, was an
+  ihm steht: Typ, Wahl (`einer_von`), Untergrenze (`nicht_negativ`), Pflicht
+  -- ein Text ohne Vorgabe darf nicht leer sein. Sie läuft beim Lesen und
+  vor jedem Rechnen über das ganze Projekt (`Projekt.pruefen`): was in
+  Python gebaut wurde, geht durch dieselbe Tür wie eine Datei.
+- **Der Ort steht in jeder Meldung** so, wie die Oberfläche ihn nennt:
+  «Platte 'Decke', lagen 2, grund: 'abstand' muss eine Zahl sein». Bauteile
+  und Materialien tragen dafür eine `BEZEICHNUNG`.
+- **Alte Formate weg** -- seit 2026-10-11 erlaubt: vier Lagen aus
+  `lagen_unten`, flache Gebrauchslisten, Schalterlisten je Lage, `richtung`
+  an Lastfällen, `betongesetz`, die Kriechzahl der Platte für jedes Kapitel,
+  Analysen mit eigenen Koordinaten, die Kette `ERSATZ_ALTER_WAHL`. Mit der
+  Kriechzahl der Platte ging ein stiller Fehler: fehlte in einer Platte ein
+  φ, galt 2.0 statt 0. Der Schnappschuss «altformat» ist weg, seine drei
+  Querschnitte stehen in den beiden anderen.
+- Am 2026-09-26 blieben die Leser von Hand, weil Altformate und Prüfungen
+  darin standen («ein Wächter statt eines generischen Lesers»). Die
+  Altformate sind weg, die Prüfungen stehen an den Feldern -- der Grund ist
+  entfallen. Der Wächter bleibt: ein Test prüft je Eintragsklasse, dass ein
+  Wörterbuch mit nur den Pflichtfeldern die Vorgaben ergibt.
+- Was erst das Rechnen braucht (h > 0, das Material einer Platte), prüft
+  weiter der Aufbau: eine abgelegte Platte mit h = 0 soll sich öffnen und
+  korrigieren lassen.
+
+---
+
 ## 2026-10-16 · Eigener Betonstahl heisst S1
 
 Der Benutzer hat die Festlegungen der Kennzahlen bestätigt und eine

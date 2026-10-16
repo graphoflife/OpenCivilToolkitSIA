@@ -14,11 +14,11 @@ Was daraus gerechnet wird, steht in :mod:`opencivil.projekt.aufbau`.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, List, Mapping, Optional
+from typing import Any, List, Optional
 
+from opencivil.bewehrungssuche.laengs import Suchmodus
 from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX, HOECHSTENS as X_D_HOECHSTENS
 from opencivil.nachweis.rechenwahl import FASERARTEN, VERFORMUNGSARTEN
-from opencivil.nachweis.verformung import KRIECHZAHL
 from opencivil.querschnitt.platte import K_C, LAGENZAHL, Richtung
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste,
@@ -26,15 +26,17 @@ from opencivil.projekt.eintraege import (
     PostenEintrag, QuerkraftbewehrungEintrag, RechenwahlEintrag, SpannungsfallEintrag,
     VerformungEintrag, VerformungsfallEintrag, eindeutig,
 )
-from opencivil.projekt.lesen import (
-    ProjektFehler, gebrauchsliste_roh, kriechzahl_aus, lagen_aus_altem_format,
-    pflichtfeld, rissanforderung_aus, schalter_aus, teilungen_aus, vorgabe, zahl,
-)
+from opencivil.projekt.lesen import RISSANFORDERUNGEN, ProjektFehler, einer_von, nicht_negativ
+
+#: Die Richtungen einer Lage.
+RICHTUNGEN = tuple(r.value for r in Richtung)
 
 
 @dataclass
 class QuerschnittEintrag(Beschreibung):
     """Eine Stahlbeton-Platte mit genau vier Bewehrungslagen."""
+
+    BEZEICHNUNG = "Platte"
 
     kennung: str
     name: str
@@ -56,7 +58,7 @@ class QuerschnittEintrag(Beschreibung):
         default_factory=QuerkraftbewehrungEintrag)
     """Bügel; ohne Durchmesser heisst: keine."""
 
-    rissanforderung: str = "normal"
+    rissanforderung: str = einer_von(RISSANFORDERUNGEN, "normal")
     """Anforderung an die Rissbildung -- ``normal``, ``erhoeht`` oder ``hoch``."""
 
     beschreibung: str = ""
@@ -94,10 +96,7 @@ class QuerschnittEintrag(Beschreibung):
     """Die quasi-staendigen Lastfaelle -- fuer die Rissbreite."""
 
     verformung: VerformungEintrag = field(default_factory=VerformungEintrag)
-    """
-    Die Verformungsfaelle und das phi ihres Vergroesserungsfaktors. Bis
-    2026-10-16 stand dieses phi als Kriechzahl an der Platte.
-    """
+    """Die Verformungsfaelle und das phi ihres Vergroesserungsfaktors."""
 
     knickfaelle: List[KnickEintrag] = field(default_factory=list)
     """Knicknachweise; leer heisst: keiner."""
@@ -107,8 +106,7 @@ class QuerschnittEintrag(Beschreibung):
     """
     Womit die Ausmitte e_2d gerechnet wird -- immer praezise ohne
     Vereinfachung (:data:`~opencivil.nachweis.rechenwahl.VERFORMUNGSARTEN`),
-    Vorgabe Bemessungswerte. Eine alte Datei mit dem Spannungsblock oder der
-    Handrechnung liest sich als praezise.
+    Vorgabe Bemessungswerte.
     """
 
     knicken_wahl_widerstand: RechenwahlEintrag = field(
@@ -122,7 +120,8 @@ class QuerschnittEintrag(Beschreibung):
     spannungsfaelle: List[SpannungsfallEintrag] = field(default_factory=list)
     """Auswertungen am Querschnitt -- Bilder, keine Nachweise."""
 
-    automatik_modus: str = "grund_ohne_zulage_mit"
+    automatik_modus: str = einer_von((m.value for m in Suchmodus),
+                                     Suchmodus.GRUND_OHNE_ZULAGE_MIT.value)
     """Wonach das Bewehrungswerkzeug sucht -- siehe ``bewehrungssuche.Suchmodus``."""
 
     automatik_dicke: bool = False
@@ -179,12 +178,8 @@ class QuerschnittEintrag(Beschreibung):
     zwaengung_biegung: bool = False
     """Ob die Zwaengung auf Biegung nachgewiesen wird."""
 
-    zwaengung_biegung_kriechzahl: float = 0.0
-    """
-    Die Kriechzahl phi der Zwaengung auf Biegung: ``n = (E_s/E_cm)*(1+phi)``.
-    Bis 2026-10-09 galt dort die der Platte -- eine Datei von damals
-    uebernimmt sie beim Lesen.
-    """
+    zwaengung_biegung_kriechzahl: float = nicht_negativ(0.0)
+    """Die Kriechzahl phi der Zwaengung auf Biegung: ``n = (E_s/E_cm)*(1+phi)``."""
 
     duktilitaet: bool = False
     """
@@ -207,9 +202,9 @@ class QuerschnittEintrag(Beschreibung):
     """
 
     lagen: List[LageEintrag] = field(default_factory=list)
-    """Genau vier, Index 0 = 1. Lage (unterste)."""
+    """Genau vier, Index 0 = 1. Lage (unterste). Fehlen welche, sind sie leer."""
 
-    richtung_lage1: str = "y"
+    richtung_lage1: str = einer_von(RICHTUNGEN, Richtung.Y.value)
     """
     Richtung der 1. Lage; die 2. bekommt die Gegenrichtung.
 
@@ -219,7 +214,7 @@ class QuerschnittEintrag(Beschreibung):
     verlegt, stellt es um.
     """
 
-    richtung_lage4: str = "y"
+    richtung_lage4: str = einer_von(RICHTUNGEN, Richtung.Y.value)
     """Richtung der 4. Lage; die 3. bekommt die Gegenrichtung."""
 
     kombinationen: List[KombinationEintrag] = field(default_factory=list)
@@ -232,9 +227,14 @@ class QuerschnittEintrag(Beschreibung):
     """
 
     def __post_init__(self) -> None:
+        # Mehr als vier waeren Bewehrung, die nirgends hinkaeme -- abschneiden
+        # hiesse, sie still wegzulassen.
+        if len(self.lagen) > LAGENZAHL:
+            raise ProjektFehler(
+                f"Platte '{self.name}': {len(self.lagen)} Lagen angegeben, eine "
+                f"Platte hat genau {LAGENZAHL}.")
         while len(self.lagen) < LAGENZAHL:
             self.lagen.append(LageEintrag())
-        del self.lagen[LAGENZAHL:]
 
     def richtung_von(self, nummer: int) -> Richtung:
         """Richtung der Lage 1..4 -- die Paare (1,2) und (3,4) sind gekoppelt."""
@@ -371,10 +371,11 @@ class QuerschnittEintrag(Beschreibung):
         """
         Eine Spannung-Dehnung-Analyse -- Felder wie im Eintrag, in kN, kNm und
         Promille. Gelesen wie aus einer Datei, also mit denselben Pruefungen:
-        eine Art oder ein Betongesetz, das es nicht gibt, meldet sich hier.
+        ein Feld, eine Art oder ein Betongesetz, das es nicht gibt, meldet
+        sich hier.
         """
         eintrag = SpannungsfallEintrag.aus_dict(
-            SpannungsfallEintrag(name=name, art=art, **felder).als_dict())
+            {"name": name, "art": art, **felder}, f"Platte '{self.name}', spannungsfaelle")
         self.spannungsfaelle.append(eintrag)
         return eintrag
 
@@ -418,95 +419,3 @@ class QuerschnittEintrag(Beschreibung):
                 durchmesser=0.0, stahl=stahl),
             kombinationen=[KombinationEintrag(name="Tragsicherheit 1", M_Ed=30.0)],
         )
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "QuerschnittEintrag":
-        lagen = d.get("lagen")
-        if lagen is None and ("lagen_unten" in d or "lagen_oben" in d):
-            lagen = lagen_aus_altem_format(d)
-        kennung = pflichtfeld(d, "kennung", "Ein Querschnitt")
-        modus = str(d.get("automatik_modus") or cls.automatik_modus)
-        dicke = bool(d.get("automatik_dicke", cls.automatik_dicke))
-        # Altformat: die Dicke war einmal ein eigener Modus, «dicke_grund_mit»
-        # hiess Grundbewehrung mit Kraeften und die Dicke dazu.
-        if modus.startswith("dicke_"):
-            modus, dicke = modus.removeprefix("dicke_"), True
-        # Bis 2026-10-16 trug die Platte ein eigenes phi, zuletzt nur fuer den
-        # Vergroesserungsfaktor -- es gehoert jetzt dem Verformungsnachweis.
-        # Bis 2026-10-09 galt es auch fuer jedes Kapitel ohne eigene Wahl.
-        phi_alt = zahl(d, "kriechzahl", KRIECHZAHL)
-        return cls(
-            kennung=kennung,
-            name=str(d.get("name") or kennung),
-            beton=pflichtfeld(d, "beton", f"Der Querschnitt '{kennung}'"),
-            h=zahl(d, "h", cls.h),
-            b=zahl(d, "b", cls.b),
-            ueberdeckung_unten=zahl(d, "ueberdeckung_unten", cls.ueberdeckung_unten),
-            ueberdeckung_oben=zahl(d, "ueberdeckung_oben", cls.ueberdeckung_oben),
-            d_max=zahl(d, "d_max", cls.d_max),
-            einlagenhoehe=zahl(d, "einlagenhoehe", cls.einlagenhoehe),
-            k_c=zahl(d, "k_c", cls.k_c),
-            querkraftbewehrung=QuerkraftbewehrungEintrag.aus_dict(
-                d.get("querkraftbewehrung") or {}),
-            duktilitaet=schalter_aus(d.get("duktilitaet"), vorgabe=cls.duktilitaet),
-            automatik_modus=modus,
-            automatik_dicke=dicke,
-            automatik_y_wie_x=bool(d.get("automatik_y_wie_x", cls.automatik_y_wie_x)),
-            automatik_teilungen=teilungen_aus(
-                d.get("automatik_teilungen"), vorgabe(cls, "automatik_teilungen")),
-            automatik_mindestdurchmesser=zahl(
-                d, "automatik_mindestdurchmesser", cls.automatik_mindestdurchmesser),
-            automatik_grenze=ObergrenzeEintrag.aus_dict(d.get("automatik_grenze") or {}),
-            automatik_mindestdicke=zahl(d, "automatik_mindestdicke",
-                                        cls.automatik_mindestdicke),
-            automatik_querkraft=bool(d.get("automatik_querkraft", cls.automatik_querkraft)),
-            automatik_querkraft_teilungen=teilungen_aus(
-                d.get("automatik_querkraft_teilungen"),
-                vorgabe(cls, "automatik_querkraft_teilungen")),
-            sproede=schalter_aus(d.get("sproede"), d.get("sproede_lagen"),
-                                 vorgabe=cls.sproede),
-            zwaengung_biegung=schalter_aus(
-                d.get("zwaengung_biegung"), d.get("zwaengung_biegung_lagen"),
-                vorgabe=cls.zwaengung_biegung),
-            zwaengung_biegung_kriechzahl=kriechzahl_aus(
-                d, "zwaengung_biegung_kriechzahl", alt=phi_alt,
-                wo=f"Platte '{kennung}', Zwängung auf Biegung"),
-            rissanforderung=rissanforderung_aus(d.get("rissanforderung"),
-                                                cls.rissanforderung),
-            beschreibung=str(d.get("beschreibung") or cls.beschreibung),
-            x_d_max=zahl(d, "x_d_max", cls.x_d_max),
-            # Aus x und y wird einer: nachgewiesen wird nur noch x.
-            zwaengung=schalter_aus(d.get("zwaengung"), d.get("zwaengung_x"),
-                                    d.get("zwaengung_y"), vorgabe=cls.zwaengung),
-            zwaengung_begrenzt=bool(d.get("zwaengung_begrenzt", cls.zwaengung_begrenzt)),
-            haeufig=Gebrauchsliste.aus_dict(
-                gebrauchsliste_roh(d, "haeufig", "haeufige"),
-                wort="häufige", vorgabe=HAEUFIG_ANTEIL, kriechzahl_alt=phi_alt),
-            quasistaendig=Gebrauchsliste.aus_dict(
-                gebrauchsliste_roh(d, "quasistaendig", "quasistaendige"),
-                wort="quasi-ständige", vorgabe=QUASISTAENDIG_ANTEIL, kriechzahl_alt=phi_alt),
-            verformung=VerformungEintrag.aus_dict(d.get("verformung") or {},
-                                                  kriechzahl_alt=phi_alt),
-            knickfaelle=[KnickEintrag.aus_dict(x)
-                         for x in (d.get("knickfaelle") or [])],
-            knicken_wahl_verformung=RechenwahlEintrag.aus_dict(
-                d.get("knicken_wahl_verformung"), vorgabe=RechenwahlEintrag.knicken_verformung(),
-                kriechzahl_alt=phi_alt,
-                wo=f"Platte '{kennung}', Knicken, Verformung", arten=VERFORMUNGSARTEN),
-            knicken_wahl_widerstand=RechenwahlEintrag.aus_dict(
-                d.get("knicken_wahl_widerstand"), vorgabe=RechenwahlEintrag.knicken_widerstand(),
-                kriechzahl_alt=phi_alt,
-                wo=f"Platte '{kennung}', Knicken, Widerstand", arten=FASERARTEN),
-            spannungsfaelle=[SpannungsfallEintrag.aus_dict(x, kriechzahl_alt=phi_alt)
-                             for x in (d.get("spannungsfaelle") or [])],
-            richtung_lage1=str(d.get("richtung_lage1") or cls.richtung_lage1),
-            richtung_lage4=str(d.get("richtung_lage4") or cls.richtung_lage4),
-            lagen=[LageEintrag.aus_dict(x) for x in (lagen or [])],
-            kombinationen=[
-                KombinationEintrag.aus_dict(x) for x in (d.get("kombinationen") or [])],
-            tragsicherheit_wahl=RechenwahlEintrag.aus_dict(
-                d.get("tragsicherheit_wahl"), kriechzahl_alt=phi_alt,
-                wo=f"Platte '{kennung}', Tragsicherheit"),
-        )
-
-

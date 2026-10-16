@@ -1,5 +1,5 @@
 ---
-erzeugt: f22bf7331e59
+erzeugt: 43f3ec9789e5
 art: modul
 tags: [modul]
 ---
@@ -64,13 +64,6 @@ Ein Punkt des Systems, in m.
 - `x: float = 0.0`
 - `z: float = 0.0`
 
-#### SystemknotenEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'SystemknotenEintrag'
-```
-
 ### StablastEintrag
 
 ```python
@@ -84,20 +77,13 @@ Bereichs, leer: wie `wert_a`. `bis` leer: bis zum Ende des Stabs.
 Einzellast und Einzelmoment stehen bei `von`.
 
 - `lastfall: str = ''`
-- `art: str = Lastart.LINIENLAST.value`
-- `richtung: str = Lastrichtung.SENKRECHT.value`
+- `art: str = einer_von(STABLASTEN, Lastart.LINIENLAST.value)`
+- `richtung: str = einer_von(RICHTUNGEN, Lastrichtung.SENKRECHT.value)`
 - `wert_a: float = 10.0`
 - `wert_b: Optional[float] = None`
 - `von: float = 0.0`
 - `bis: Optional[float] = None`
 - `projiziert: bool = False` – Senkrecht und waagrecht je Meter Projektion statt je Meter Stab.
-
-#### StablastEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'StablastEintrag'
-```
 
 #### StablastEintrag.verteilt
 
@@ -124,18 +110,11 @@ ein Linienlager quer und laengs.
 - `material: str = ''` – Kennung des Materials im Projekt (`b1`).
 - `gelenk_anfang: bool = False`
 - `gelenk_ende: bool = False`
-- `quer: str = 'frei'`
+- `quer: str = einer_von(HALT, 'frei')`
 - `k_quer: float = 0.0` – Bettung quer, kN/m².
-- `laengs: str = 'frei'`
+- `laengs: str = einer_von(HALT, 'frei')`
 - `k_laengs: float = 0.0`
 - `lasten: List[StablastEintrag] = field(default_factory=list)`
-
-#### SystemlinieEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'SystemlinieEintrag'
-```
 
 ### LagerEintrag
 
@@ -148,19 +127,12 @@ Ein Lager an einem Knoten: je Richtung frei, fest oder Feder.
 
 - `kennung: str = ''`
 - `knoten: str = ''`
-- `x: str = 'fest'`
+- `x: str = einer_von(HALT, 'fest')`
 - `k_x: float = 0.0` – kN/m.
-- `z: str = 'fest'`
+- `z: str = einer_von(HALT, 'fest')`
 - `k_z: float = 0.0`
-- `phi: str = 'frei'`
+- `phi: str = einer_von(HALT, 'frei')`
 - `k_phi: float = 0.0` – kNm/rad.
-
-#### LagerEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'LagerEintrag'
-```
 
 ### KnotenlastEintrag
 
@@ -174,16 +146,9 @@ Eine Last an einem Knoten, in einem Lastfall: eine Kraft mit Richtung oder ein M
 - `kennung: str = ''`
 - `knoten: str = ''`
 - `lastfall: str = ''`
-- `art: str = 'kraft'`
-- `richtung: str = Lastrichtung.SENKRECHT.value`
+- `art: str = einer_von(KNOTENLASTEN, 'kraft')`
+- `richtung: str = einer_von(KNOTENRICHTUNGEN, Lastrichtung.SENKRECHT.value)`
 - `wert: float = 10.0` – kN oder kNm.
-
-#### KnotenlastEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'KnotenlastEintrag'
-```
 
 ### StabquerschnittEintrag
 
@@ -198,17 +163,10 @@ einer Querschnittsanalyse des Projekts (`bezug`).
 
 - `kennung: str = ''`
 - `name: str = ''`
-- `art: str = 'vorlage'`
-- `vorlage: str = qs.RECHTECK.schluessel`
+- `art: str = einer_von(QUERSCHNITTSARTEN, 'vorlage')`
+- `vorlage: str = einer_von((v.schluessel for v in qs.VORLAGEN), qs.RECHTECK.schluessel)`
 - `masse: Dict[str, float] = field(default_factory=dict)`
 - `bezug: str = ''`
-
-#### StabquerschnittEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'StabquerschnittEintrag'
-```
 
 #### StabquerschnittEintrag.stabvorlage
 
@@ -244,13 +202,6 @@ Ein Lastfall des Systems: eine Kennung, auf die die Lasten zeigen, und ein Name.
 - `kennung: str = ''`
 - `name: str = ''`
 
-#### LastfallEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'LastfallEintrag'
-```
-
 ### LastkombinationEintrag
 
 ```python
@@ -263,13 +214,6 @@ Eine Kombination: je Lastfall (Kennung) ein Beiwert, von Hand.
 - `kennung: str = ''`
 - `name: str = ''`
 - `faktoren: Dict[str, float] = field(default_factory=dict)`
-
-#### LastkombinationEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'LastkombinationEintrag'
-```
 
 ### Modell
 
@@ -303,6 +247,7 @@ class BalkensystemEintrag(Beschreibung)
 
 Ein ebener Rahmen: Knoten, Linien, Lager, Lasten, Querschnitte, Lastfaelle, Kombinationen.
 
+- `BEZEICHNUNG = 'Balkensystem'`
 - `kennung: str`
 - `name: str`
 - `knoten: List[SystemknotenEintrag] = field(default_factory=list)`
@@ -313,13 +258,6 @@ Ein ebener Rahmen: Knoten, Linien, Lager, Lasten, Querschnitte, Lastfaelle, Komb
 - `lastfaelle: List[LastfallEintrag] = field(default_factory=list)`
 - `kombinationen: List[LastkombinationEintrag] = field(default_factory=list)`
 - `beschreibung: str = ''` – Freier Text -- geht in keine Rechnung ein.
-
-#### BalkensystemEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'BalkensystemEintrag'
-```
 
 #### BalkensystemEintrag.pruefen
 

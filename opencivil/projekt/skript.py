@@ -12,10 +12,8 @@ nächsten Öffnen wieder da ist (Benutzer, 2026-10-15).
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Mapping
 
 from opencivil.projekt.eintraege import Beschreibung
-from opencivil.projekt.lesen import pflichtfeld
 
 #: Was ein neues Skript schon enthält: ein Diagramm ohne Download -- numpy
 #: und pandas kosten beim ersten Einbinden ein paar Megabyte.
@@ -38,6 +36,8 @@ plt.legend()
 class SkriptEintrag(Beschreibung):
     """Ein Skript: Name und Code."""
 
+    BEZEICHNUNG = "Skript"
+
     kennung: str
     name: str = ""
     code: str = ""
@@ -46,9 +46,3 @@ class SkriptEintrag(Beschreibung):
     def neu(cls, kennung: str, name: str) -> "SkriptEintrag":
         """Ein neues Skript, mit der :data:`VORLAGE` darin."""
         return cls(kennung=kennung, name=name, code=VORLAGE)
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "SkriptEintrag":
-        kennung = pflichtfeld(d, "kennung", "Ein Skript")
-        return cls(kennung=kennung, name=str(d.get("name") or kennung),
-                   code=str(d.get("code") or ""))

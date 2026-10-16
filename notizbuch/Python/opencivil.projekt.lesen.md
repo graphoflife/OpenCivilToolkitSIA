@@ -1,5 +1,5 @@
 ---
-erzeugt: 90df82ef6c85
+erzeugt: f1ef09aae381
 art: modul
 tags: [modul]
 ---
@@ -9,16 +9,41 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Die Leser, mit denen die `aus_dict` der Eintraege eine Datei aufnehmen:
-Zahlen, Pflichtfelder, Schalter, Teilungen, die Rissanforderung -- und die
-alten Formate, die es in gespeicherten Dateien noch gibt (vier Lagen statt
-beliebig vieler, flache statt verschachtelter Gebrauchslisten, Lastfaelle
-in y).
+Ein Leser fuer jeden Eintrag und eine Pruefung fuer jedes Feld, beide aus den
+Feldern der Datenklassen. Was ein Feld annehmen darf, steht an ihm selbst:
 
-Ein eigenes Modul, weil sie die Lesefunktionen des ganzen Pakets sind:
-[[opencivil.projekt.eintraege|eintraege]], [[opencivil.projekt.projekt#Projekt.platte|platte]] und [[opencivil.projekt.aufbau|aufbau]] brauchen sie alle. Mit
-Unterstrich waren sie privat und wurden trotzdem von drei Modulen
-importiert.
+* sein Typ -- Text, Zahl, ganze Zahl, Schalter, Liste, Zuordnung, Eintrag;
+* eine Wahl ([[opencivil.projekt.lesen#einer_von|einer_von]]) -- die Werte, die es gibt;
+* eine Untergrenze ([[opencivil.projekt.lesen#nicht_negativ|nicht_negativ]]);
+* ein Text ohne Vorgabe ist Pflicht und darf nicht leer sein.
+
+
+## STRENG
+
+Gelesen wird, was dasteht, und nichts sonst. Ein Feld, das es nicht gibt, ein
+Text statt einer Zahl, eine Wahl, die es nicht gibt -- jedes meldet sich, mit
+dem Ort in der Datei und dem Wert. Umgedeutet wird nichts: ein unbekanntes
+Feld ist meist ein Tippfehler, und ein still uebergangener Tippfehler rechnet
+mit der Vorgabe statt mit der Zahl des Benutzers. Alte Dateiformate liest
+niemand mehr; alte Speicherstaende muessen seit 2026-10-11 nicht mehr gehen
+(Benutzer).
+
+Was fehlt, bekommt die Vorgabe: die des Feldes -- und bei einem Eintrag, der
+in einem Eintrag steht, die eines frischen an dieser Stelle. Die Rechenwahl
+des Knickens rechnet ohne Angabe praezise, nicht von Hand wie eine Rechenwahl
+fuer sich.
+
+
+## EINE TUER
+
+Dieselbe Pruefung laeuft vor jedem Rechnen ueber das ganze Projekt
+([[opencivil.projekt.projekt#Projekt.pruefen|pruefen]]). Was in Python gebaut
+wurde, ohne Datei, geht durch dieselbe Tuer wie eine Datei: ein «festt» im
+Linienlager meldet sich hier und wird nicht still zur Feder.
+
+Was erst das Rechnen braucht -- eine Dicke groesser als null, das Material,
+auf das eine Platte zeigt --, prueft der Aufbau. Eine abgelegte Platte mit
+h = 0 soll sich oeffnen und korrigieren lassen.
 
 ## Inhalt
 
@@ -30,44 +55,21 @@ class ProjektFehler(Exception)
 
 Die Projektbeschreibung ist in sich nicht stimmig.
 
-### zahl
+### einer_von
 
 ```python
-def zahl(d: Mapping[str, Any], feld: str, vorgabe: float) -> float
+def einer_von(moeglich: Iterable[Any], vorgabe: Any=dataclasses.MISSING) -> Any
 ```
 
-Eine Zahl aus der Beschreibung. Die Vorgabe gilt nur, wenn nichts dasteht.
+Ein Feld, das nur einen dieser Werte annimmt -- die Pruefung kennt sie von hier.
 
-Bewusst **nicht** `float(d.get(feld) or vorgabe)`: dieser Ausdruck kann
-eine eingegebene Null nicht von einem fehlenden Feld unterscheiden und
-ersetzt sie stillschweigend. Im Eingabefeld stand dann `h = 0`, gerechnet
-wurde mit 300 mm, und die Herleitung schrieb 300 mm hin -- ein Widerspruch,
-den niemand sieht. Eine Platte ohne Dicke meldete «alle Nachweise erfüllt».
-
-### kriechzahl_aus
+### nicht_negativ
 
 ```python
-def kriechzahl_aus(d: Mapping[str, Any], feld: str, *, alt: float, wo: str) -> float
+def nicht_negativ(vorgabe: float) -> Any
 ```
 
-Die Kriechzahl eines Nachweis-Kapitels oder einer Analyse.
-
-Fehlt sie oder steht sie leer -- in einer Datei von vor 2026-10-09 --,
-gilt `alt`: die Kriechzahl der Platte, mit der damals jedes Kapitel
-rechnete. So rechnet eine alte Datei wie damals, und eine neue Platte
-beginnt mit der Vorgabe ihrer Felder, 0. Die eine Stelle fuer diese Regel.
-
-### pflichtfeld
-
-```python
-def pflichtfeld(d: Mapping[str, Any], feld: str, wer: str) -> str
-```
-
-Ein Feld, ohne das sich nichts zusammenbauen laesst.
-
-Ohne diese Pruefung kam der nackte `KeyError` bis in die Oberflaeche --
-eine Fehlermeldung, die dem Benutzer nichts sagt und nach einem Absturz
-aussieht.
+Eine Zahl, die nicht unter null liegen kann -- eine Kriechzahl etwa.
 
 ### sorten
 
@@ -75,121 +77,138 @@ aussieht.
 def sorten(art: str) -> Mapping[str, Any]
 ```
 
-### vorgabe
+Die Normsorten einer Materialart.
+
+### lesen
 
 ```python
-def vorgabe(cls, feld: str) -> Any
+def lesen(cls: type, roh: Any, wo: str, basis: Any=None) -> Any
 ```
 
-Die Vorgabe eines Feldes, wie die Datenklasse sie festlegt -- auch fuer
-Felder mit `default_factory`.
+Ein Eintrag der Klasse `cls` aus `roh`, einem Woerterbuch aus der Datei.
 
-Die Leser nehmen ihre Vorgaben von der Klasse (`cls.h` oder hier) und
-schreiben sie nicht noch einmal hin. Stand die Zahl zweimal da -- im Feld
-und im Leser, und ein drittes Mal in der Oberflaeche --, gab es drei
-Vorgaben, die nur so lange uebereinstimmten, wie niemand eine aenderte.
+`wo` nennt den Ort in Meldungen. `basis` ist der Eintrag, dessen Werte
+fuer fehlende Felder gelten -- ohne sie die Vorgaben der Klasse. Jeder
+gelesene Eintrag ist danach geprueft ([[opencivil.projekt.lesen#felder_pruefen|felder_pruefen]]).
 
-### rissanforderung_aus
+### _wert_lesen
 
 ```python
-def rissanforderung_aus(wert: Any, vorgabe: str) -> str
+def _wert_lesen(roh: Any, typ: Any, wo: str, feld: str, vorbild: Any) -> Any
 ```
 
-Die Anforderung an die Rissbildung, oder die Vorgabe.
+Ein Feld aus der Datei. Eintraege und Listen von Eintraegen werden
+gelesen; Zahlen bleiben, was sie sind -- nur eine ganze Zahl aus JSON wird
+dort, wo eine Zahl hingehoert, zur Gleitkommazahl, und eine ganze
+Gleitkommazahl dort, wo eine ganze Zahl hingehoert, zur ganzen. Ob der
+Wert passt, sagt danach [[opencivil.projekt.lesen#felder_pruefen|felder_pruefen]].
 
-Eine unbekannte Angabe wird nicht stillschweigend auf 'normal' gezogen --
-sie waere die mildeste der drei, und eine stillschweigende Milderung ist
-genau das, was ein Nachweiswerkzeug nicht tun darf.
-
-### teilungen_aus
+### _zahl_lesen
 
 ```python
-def teilungen_aus(roh, vorgabe) -> List[float]
+def _zahl_lesen(roh: Any, typ: Any) -> Any
 ```
 
-Eine Liste von Teilungen, aufsteigend und ohne Unsinn.
+Eine Zahl, wie JSON sie bringt, in der Art des Feldes -- alles andere unveraendert.
 
-Ohne brauchbare Angabe die Vorgabe: eine leere Liste hiesse, dass die
-Suche nichts zu versuchen haette, und das ist kein Zustand, in dem man
-eine Oberflaeche stehen lassen will.
-
-### schalter_aus
+### ort
 
 ```python
-def schalter_aus(*werte: Any, vorgabe: bool=False) -> bool
+def ort(cls: type, roh: Any) -> str
 ```
 
-Ein Schalter aus dem, was in der Datei steht.
+Wie ein Eintrag fuer sich in Meldungen heisst: «Platte 'Decke'», ohne
+Namen mit seiner Kennung, sonst nur seine Art.
 
-Frueher war jeder dieser Nachweise eine Liste von vier Schaltern, einer je
-Lage, und die Zwaengung hatte je einen fuer x und y. Nachgewiesen wird nur
-noch x, und dort entscheidet die unguenstigere der beiden Lagen -- ein
-Schalter genuegt. Eine alte Datei bringt noch die Liste mit: war darin
-irgendein Haken gesetzt, gilt der Nachweis als eingeschaltet. Das ist die
-Lesart, die nichts wegnimmt, was jemand verlangt hat.
-
-Mehrere Werte, weil aus `zwaengung_x` und `zwaengung_y` einer wird.
-
-### nur_x
+### _ort_roh
 
 ```python
-def nur_x(d: Mapping[str, Any], was: str) -> None
+def _ort_roh(element: Any, cls: type, wo: str, feld: str, i: int) -> str
 ```
 
-Alte Lastfaelle, die nur in y galten, gehen nicht mehr.
+Wie ein Listenelement in Meldungen heisst -- aus der Datei, vor dem Lesen.
 
-Nachgewiesen wird ausschliesslich x. Ein Lastfall mit `richtung: "y"`
-stillschweigend auf x umzudeuten hiesse, eine Zahl an einem anderen
-Querschnitt anzusetzen als der Benutzer gemeint hat -- genau die Art von
-stiller Aenderung, die ein Nachweiswerkzeug nicht machen darf. `x` und
-`beide` gelten unveraendert weiter.
-
-### gebrauchsliste_roh
+### _ort
 
 ```python
-def gebrauchsliste_roh(d: Mapping[str, Any], feld: str, alt: str) -> Mapping[str, Any]
+def _ort(cls: type, name: Any, kennung: Any, wo: str, feld: str, i: int) -> str
 ```
 
-Die Gebrauchsliste einer Platte aus der Datei -- verschachtelt oder flach.
+Ein Bauteil oder Material heisst wie in der Oberflaeche -- «Platte 'Decke'»,
+und dort beginnt der Ort neu; alles darin nach seinem Feld und seinem
+Namen, ohne Namen nach seiner Nummer: «lagen 2».
 
-Bis zur [[opencivil.projekt.eintraege#Gebrauchsliste|Gebrauchsliste]] standen die drei Angaben einzeln an der
-Platte: `haeufige`, `haeufige_aus_tragsicherheit`, `haeufige_anteil`
-und dasselbe fuer `quasistaendige`. Solche Dateien gibt es; sie werden
-hier in die neue Form gebracht, geschrieben wird nur noch diese.
-
-### lagen_aus_altem_format
+### _benannt
 
 ```python
-def lagen_aus_altem_format(d: Mapping[str, Any]) -> List[dict]
+def _benannt(bezeichnung: str, name: Any, kennung: Any) -> Optional[str]
 ```
 
-Rechnet eine vor dem Vier-Lagen-Modell gespeicherte Platte um.
+«Platte 'Decke'», ohne Namen «Platte q1» -- `None` ohne beides.
 
-Frueher gab es beliebig viele Lagen je Seite, jede mit einem einzigen
-Bewehrungssatz. Uebernommen werden die beiden aeussersten je Seite:
+### felder_pruefen
 
-```
-lagen_unten[0] -> 1. Lage      lagen_oben[0] -> 4. Lage
-lagen_unten[1] -> 2. Lage      lagen_oben[1] -> 3. Lage
+```python
+def felder_pruefen(eintrag: Any, wo: str, *, tief: bool=True) -> None
 ```
 
-Weitere Lagen der alten Beschreibung gehen dabei verloren -- besser als eine
-gespeicherte Datei gar nicht mehr zu oeffnen, aber der Benutzer sollte sie
-nachsehen.
+Prueft jedes Feld eines Eintrags gegen das, was an ihm steht: Typ, Wahl,
+Pflicht, Untergrenze. `tief`: auch jeden Eintrag darin.
+
+### _blatt_pruefen
+
+```python
+def _blatt_pruefen(wert: Any, typ: Any, f: dataclasses.Field, wo: str) -> None
+```
+
+Ein Text, eine Zahl, ein Schalter -- und was an seinem Feld steht.
+
+### _typen
+
+```python
+@functools.lru_cache(maxsize=None)
+def _typen(cls: type) -> Dict[str, Any]
+```
+
+Die Typen der Felder, aufgeloest -- je Klasse einmal.
+
+### _art
+
+```python
+def _art(typ: Any)
+```
+
+Was fuer ein Feld es ist: `optional`, `liste`, `zuordnung`,
+`eintrag` -- mit dem Typ darin -- oder ein Blatt.
+
+### _vorgabe
+
+```python
+def _vorgabe(f: dataclasses.Field) -> Any
+```
+
+Die Vorgabe eines Feldes -- auch eine aus `default_factory` --, sonst [[opencivil.projekt.lesen#Konstanten|_KEINE]].
+
+### _zeigen
+
+```python
+def _zeigen(wert: Any) -> str
+```
+
+Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 
 
 ## Konstanten
 
-- `BEIDE_RICHTUNGEN = 'beide'` – Wahl der Tragrichtung einer Schnittgroessenkombination -- historisch. Schnittgroessen gehoeren jetzt immer zur Tragrichtung x; die Wahl gibt es nicht mehr. Die Konstante steht noch, um alte Dateien zu lesen.
 - `_BESCHRIFTUNG = {'normal': 'Normal', 'erhoeht': 'Erhöht', 'hoch': 'Hoch'}` – Wie die Rissanforderungen an der Maske heissen.
 - `RISSANFORDERUNGEN = {wert: _BESCHRIFTUNG[wert] for wert in RISSBREITE}` – Anforderung an die Rissbildung, mit ihrer Beschriftung. Welche es gibt, sagt [[opencivil.nachweis.mindestbewehrung#Konstanten|mindestbewehrung.RISSBREITE]] -- dort steht zu jeder die Rissbreite, und die Liste der Werte soll nur einmal dastehen. Kaeme dort eine dazu, ohne dass sie hier eine Beschriftung hat, scheiterte schon der Import.
+- `_KEINE = object()` – Ein Feld ohne Vorgabe.
 
 ## Braucht
 
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.mindestbewehrung]]
-- [[opencivil.querschnitt.platte]]
 
 ## Gebraucht von
 
@@ -201,4 +220,3 @@ nachsehen.
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
-- [[opencivil.projekt.skript]]

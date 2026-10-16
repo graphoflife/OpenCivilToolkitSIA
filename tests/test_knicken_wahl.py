@@ -12,7 +12,7 @@ import unittest
 from opencivil.nachweis.rechenwahl import Rechenart
 from opencivil.nachweis.resistenzlinie import Ebenenlinie
 from opencivil.projekt import KnickEintrag, Projekt, RechenwahlEintrag
-from opencivil.web import diagrammdaten
+from opencivil.web import diagrammdaten, dienst
 
 STUETZE = KnickEintrag("Stütze", N_Ed=-800.0, M_Ed_1=20.0, laenge=4.0, knicklaenge=4.0)
 
@@ -171,30 +171,37 @@ class TestVerformung(unittest.TestCase):
 
 
 class TestDatei(unittest.TestCase):
+    def oeffnen(self, **wahl) -> str:
+        """Öffnet das Beispiel mit dieser Wahl -- und gibt die Meldung zurück."""
+        daten = Projekt.beispiel().als_dict()
+        daten["querschnitte"][0].update(wahl)
+        antwort = dienst.bearbeite("pruefen", {"projekt": daten})
+        self.assertEqual(antwort.status, 400)
+        return antwort.daten["fehler"]
+
     def test_elastisch_gibt_es_beim_knicken_nicht(self):
-        from opencivil.projekt import ProjektFehler
-        daten = Projekt.beispiel().als_dict()
-        daten["querschnitte"][0]["knicken_wahl_verformung"] = {"rechenart": "elastisch"}
-        with self.assertRaises(ProjektFehler):
-            Projekt.aus_dict(daten)
+        self.assertIn("die Rechenart «elastisch» gibt es dort nicht", self.oeffnen(
+            knicken_wahl_verformung={"rechenart": "elastisch"}))
 
-    def test_die_handrechnung_einer_alten_datei(self):
+    def test_die_handrechnung_einer_alten_datei_wird_genannt(self):
         """
-        Bis 2026-10-12 gab es sie beim Knicken: im Widerstand wird sie 0.85·x,
-        in der Verformung -- wo es seit 2026-10-15 auch 0.85·x nicht mehr
-        gibt -- präzise.
+        Bis 2026-10-12 gab es sie beim Knicken. Eine alte Datei, die sie noch
+        wählt, wird nicht mehr umgedeutet -- sie nennt die Wahl.
         """
-        daten = Projekt.beispiel().als_dict()
         for feld in ("knicken_wahl_verformung", "knicken_wahl_widerstand"):
-            daten["querschnitte"][0][feld] = {"rechenart": "handrechnung"}
-        q = Projekt.aus_dict(daten).querschnitte[0]
-        self.assertEqual(q.knicken_wahl_verformung.rechenart, "parabel")
-        self.assertEqual(q.knicken_wahl_widerstand.rechenart, "block")
+            with self.subTest(feld=feld):
+                text = self.oeffnen(**{feld: {"rechenart": "handrechnung"}})
+                self.assertIn("Knicken", text)
+                self.assertIn("die Rechenart «handrechnung» gibt es dort nicht", text)
 
-    def test_der_block_einer_alten_datei_wird_in_der_verformung_praezise(self):
+    def test_der_block_gibt_es_in_der_verformung_nicht(self):
+        self.assertIn("«block» gibt es dort nicht", self.oeffnen(
+            knicken_wahl_verformung={"rechenart": "block"}))
+
+    def test_eine_teilweise_wahl_rechnet_wie_ihr_kapitel(self):
         daten = Projekt.beispiel().als_dict()
         daten["querschnitte"][0]["knicken_wahl_verformung"] = {
-            "rechenart": "block", "kriechzahl": 1.5, "werkstoffsatz": "charakteristisch"}
+            "kriechzahl": 1.5, "werkstoffsatz": "charakteristisch"}
         wahl = Projekt.aus_dict(daten).querschnitte[0].knicken_wahl_verformung
         self.assertEqual((wahl.rechenart, wahl.kriechzahl, wahl.werkstoffsatz),
                          ("parabel", 1.5, "charakteristisch"))

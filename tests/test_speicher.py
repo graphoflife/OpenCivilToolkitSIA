@@ -85,8 +85,10 @@ AENDERUNGEN = [
      lambda d: d["querschnitte"][1]["knickfaelle"][0].__setitem__("N_Ed", -1400.0)),
     ("Moment des Unterzugs",
      lambda d: d["querschnittsanalysen"][0]["lastfaelle"][0].__setitem__("M_y_Ed", 120.0)),
-    ("ein Stab im Unterzug", lambda d: d["querschnittsanalysen"][0]["staebe"].append(
-        {"y": 150.0, "z": 300.0, "durchmesser": 16.0, "stahl": "s1"})),
+    ("ein Stab im Unterzug", lambda d: (
+        d["querschnittsanalysen"][0]["knoten"].append({"kennung": "K99", "y": 150.0, "z": 300.0}),
+        d["querschnittsanalysen"][0]["staebe"].append(
+            {"kennung": "S99", "knoten": "K99", "durchmesser": 16.0, "stahl": "s1"}))),
     ("eine Last des Rahmens",
      lambda d: d["balkensysteme"][0]["linien"][1]["lasten"][0].__setitem__("wert_a", 30.0)),
     ("der Reibungswinkel des Fundaments",

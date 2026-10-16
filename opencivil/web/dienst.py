@@ -95,18 +95,17 @@ def pruefen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
     Prueft eine Projektbeschreibung und gibt sie aufgeraeumt zurueck.
 
-    Dafuer gedacht, dass eine hochgeladene oder im Browser abgelegte Datei durch
-    denselben Aufbau laeuft wie alles andere: fehlt ein Feld oder stammt die
-    Datei aus einer aelteren Fassung, greifen hier die Wandlung des alten
-    Formats und die Pruefungen aus :mod:`opencivil.projekt` -- nicht eine
-    zweite, nachgebaute Pruefung in JavaScript.
+    Dafuer gedacht, dass eine hochgeladene oder im Browser abgelegte Datei
+    durch denselben Leser und dieselben Pruefungen laeuft wie alles andere
+    (:mod:`opencivil.projekt.lesen`) -- nicht durch eine zweite, nachgebaute
+    Pruefung in JavaScript. Alte Formate liest er nicht; eine solche Datei
+    nennt das erste Feld, das er nicht kennt.
 
-    Die Vorpruefung auf :data:`KENNFELDER` ist noetig, weil
-    ``Projekt.aus_dict`` mit Absicht nachsichtig ist: es nimmt jedes ``dict``
-    und macht daraus notfalls ein leeres Projekt. Beim Laden einer Beschreibung
-    ist das richtig -- beim Oeffnen einer Datei waere es verheerend. Wer eine
-    beliebige JSON-Datei erwischt, bekaeme sonst wortlos ein leeres Projekt
-    und haette seine Arbeit verloren.
+    Die Vorpruefung auf :data:`KENNFELDER` haelt ein leeres Objekt auf: jedes
+    Feld eines Projekts hat eine Vorgabe, ``{}`` liest sich darum als leeres
+    Projekt. Beim Oeffnen einer Datei waere das verheerend -- wer eine falsche
+    Datei erwischt, bekaeme wortlos ein leeres Projekt und haette seine Arbeit
+    verloren.
     """
     roh = rumpf.get("projekt")
     if not isinstance(roh, Mapping):

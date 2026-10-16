@@ -1,5 +1,5 @@
 ---
-erzeugt: 0f2c5cb72e7a
+erzeugt: 8146540c4375
 art: modul
 tags: [modul]
 ---
@@ -345,3 +345,4 @@ Die gefundenen Lagen in die Platte schreiben.
 - [[opencivil.bewehrungssuche]]
 - [[opencivil.bewehrungssuche.buegel]]
 - [[opencivil.bewehrungssuche.dicke]]
+- [[opencivil.projekt.platte]]

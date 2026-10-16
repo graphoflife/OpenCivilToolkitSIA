@@ -2,188 +2,76 @@
 opencivil/projekt/lesen.py -- was in einer Projektdatei stehen darf, und wie es gelesen wird.
 
 VERANTWORTUNG:
-Die Leser, mit denen die ``aus_dict`` der Eintraege eine Datei aufnehmen:
-Zahlen, Pflichtfelder, Schalter, Teilungen, die Rissanforderung -- und die
-alten Formate, die es in gespeicherten Dateien noch gibt (vier Lagen statt
-beliebig vieler, flache statt verschachtelter Gebrauchslisten, Lastfaelle
-in y).
+Ein Leser fuer jeden Eintrag und eine Pruefung fuer jedes Feld, beide aus den
+Feldern der Datenklassen. Was ein Feld annehmen darf, steht an ihm selbst:
 
-Ein eigenes Modul, weil sie die Lesefunktionen des ganzen Pakets sind:
-:mod:`eintraege`, :mod:`platte` und :mod:`aufbau` brauchen sie alle. Mit
-Unterstrich waren sie privat und wurden trotzdem von drei Modulen
-importiert.
+* sein Typ -- Text, Zahl, ganze Zahl, Schalter, Liste, Zuordnung, Eintrag;
+* eine Wahl (:func:`einer_von`) -- die Werte, die es gibt;
+* eine Untergrenze (:func:`nicht_negativ`);
+* ein Text ohne Vorgabe ist Pflicht und darf nicht leer sein.
+
+STRENG:
+Gelesen wird, was dasteht, und nichts sonst. Ein Feld, das es nicht gibt, ein
+Text statt einer Zahl, eine Wahl, die es nicht gibt -- jedes meldet sich, mit
+dem Ort in der Datei und dem Wert. Umgedeutet wird nichts: ein unbekanntes
+Feld ist meist ein Tippfehler, und ein still uebergangener Tippfehler rechnet
+mit der Vorgabe statt mit der Zahl des Benutzers. Alte Dateiformate liest
+niemand mehr; alte Speicherstaende muessen seit 2026-10-11 nicht mehr gehen
+(Benutzer).
+
+Was fehlt, bekommt die Vorgabe: die des Feldes -- und bei einem Eintrag, der
+in einem Eintrag steht, die eines frischen an dieser Stelle. Die Rechenwahl
+des Knickens rechnet ohne Angabe praezise, nicht von Hand wie eine Rechenwahl
+fuer sich.
+
+EINE TUER:
+Dieselbe Pruefung laeuft vor jedem Rechnen ueber das ganze Projekt
+(:meth:`~opencivil.projekt.projekt.Projekt.pruefen`). Was in Python gebaut
+wurde, ohne Datei, geht durch dieselbe Tuer wie eine Datei: ein «festt» im
+Linienlager meldet sich hier und wird nicht still zur Feder.
+
+Was erst das Rechnen braucht -- eine Dicke groesser als null, das Material,
+auf das eine Platte zeigt --, prueft der Aufbau. Eine abgelegte Platte mit
+h = 0 soll sich oeffnen und korrigieren lassen.
 """
 
 from __future__ import annotations
 
+import copy
 import dataclasses
-from typing import Any, Dict, List, Mapping, Optional
+import difflib
+import functools
+import math
+import typing
+from typing import Any, Dict, Iterable, Mapping, Optional
 
 from opencivil.material.beton import BETONSORTEN
 from opencivil.material.betonstahl import STAHLSORTEN
 from opencivil.nachweis.mindestbewehrung import RISSBREITE
-from opencivil.querschnitt.platte import Richtung
 
 
 class ProjektFehler(Exception):
     """Die Projektbeschreibung ist in sich nicht stimmig."""
 
 
-def zahl(d: Mapping[str, Any], feld: str, vorgabe: float) -> float:
-    """
-    Eine Zahl aus der Beschreibung. Die Vorgabe gilt nur, wenn nichts dasteht.
-
-    Bewusst **nicht** ``float(d.get(feld) or vorgabe)``: dieser Ausdruck kann
-    eine eingegebene Null nicht von einem fehlenden Feld unterscheiden und
-    ersetzt sie stillschweigend. Im Eingabefeld stand dann ``h = 0``, gerechnet
-    wurde mit 300 mm, und die Herleitung schrieb 300 mm hin -- ein Widerspruch,
-    den niemand sieht. Eine Platte ohne Dicke meldete «alle Nachweise erfüllt».
-    """
-    wert = d.get(feld)
-    if wert is None or wert == "":
-        return vorgabe
-    try:
-        return float(wert)
-    except (TypeError, ValueError):
-        raise ProjektFehler(
-            f"Das Feld '{feld}' enthält keine Zahl, sondern {wert!r}."
-        ) from None
+# ===========================================================================
+# Was an einem Feld steht
+# ===========================================================================
 
 
-def kriechzahl_aus(d: Mapping[str, Any], feld: str, *, alt: float, wo: str) -> float:
-    """
-    Die Kriechzahl eines Nachweis-Kapitels oder einer Analyse.
-
-    Fehlt sie oder steht sie leer -- in einer Datei von vor 2026-10-09 --,
-    gilt ``alt``: die Kriechzahl der Platte, mit der damals jedes Kapitel
-    rechnete. So rechnet eine alte Datei wie damals, und eine neue Platte
-    beginnt mit der Vorgabe ihrer Felder, 0. Die eine Stelle fuer diese Regel.
-    """
-    wert = zahl(d, feld, alt)
-    if wert < 0.0:
-        raise ProjektFehler(f"{wo}: die Kriechzahl kann nicht negativ sein.")
-    return wert
+def einer_von(moeglich: Iterable[Any], vorgabe: Any = dataclasses.MISSING) -> Any:
+    """Ein Feld, das nur einen dieser Werte annimmt -- die Pruefung kennt sie von hier."""
+    return dataclasses.field(default=vorgabe, metadata={"wahl": tuple(moeglich)})
 
 
-def pflichtfeld(d: Mapping[str, Any], feld: str, wer: str) -> str:
-    """
-    Ein Feld, ohne das sich nichts zusammenbauen laesst.
-
-    Ohne diese Pruefung kam der nackte ``KeyError`` bis in die Oberflaeche --
-    eine Fehlermeldung, die dem Benutzer nichts sagt und nach einem Absturz
-    aussieht.
-    """
-    wert = d.get(feld)
-    if wert in (None, ""):
-        raise ProjektFehler(f"{wer} hat kein Feld '{feld}'. Die Datei ist unvollständig.")
-    return str(wert)
+def nicht_negativ(vorgabe: float) -> Any:
+    """Eine Zahl, die nicht unter null liegen kann -- eine Kriechzahl etwa."""
+    return dataclasses.field(default=vorgabe, metadata={"nicht_negativ": True})
 
 
 def sorten(art: str) -> Mapping[str, Any]:
-    return BETONSORTEN if art == "beton" else STAHLSORTEN
-
-
-def vorgabe(cls, feld: str) -> Any:
-    """
-    Die Vorgabe eines Feldes, wie die Datenklasse sie festlegt -- auch fuer
-    Felder mit ``default_factory``.
-
-    Die Leser nehmen ihre Vorgaben von der Klasse (``cls.h`` oder hier) und
-    schreiben sie nicht noch einmal hin. Stand die Zahl zweimal da -- im Feld
-    und im Leser, und ein drittes Mal in der Oberflaeche --, gab es drei
-    Vorgaben, die nur so lange uebereinstimmten, wie niemand eine aenderte.
-    """
-    f = next(f for f in dataclasses.fields(cls) if f.name == feld)
-    if f.default is not dataclasses.MISSING:
-        return f.default
-    if f.default_factory is not dataclasses.MISSING:
-        return f.default_factory()
-    raise KeyError(f"{cls.__name__}.{feld} hat keine Vorgabe.")
-
-
-def rissanforderung_aus(wert: Any, vorgabe: str) -> str:
-    """
-    Die Anforderung an die Rissbildung, oder die Vorgabe.
-
-    Eine unbekannte Angabe wird nicht stillschweigend auf 'normal' gezogen --
-    sie waere die mildeste der drei, und eine stillschweigende Milderung ist
-    genau das, was ein Nachweiswerkzeug nicht tun darf.
-    """
-    if wert in (None, ""):
-        return vorgabe
-    text = str(wert)
-    if text not in RISSANFORDERUNGEN:
-        raise ProjektFehler(
-            f"Unbekannte Rissanforderung '{text}'. Möglich sind: "
-            f"{', '.join(RISSANFORDERUNGEN)}.")
-    return text
-
-
-def teilungen_aus(roh, vorgabe) -> List[float]:
-    """
-    Eine Liste von Teilungen, aufsteigend und ohne Unsinn.
-
-    Ohne brauchbare Angabe die Vorgabe: eine leere Liste hiesse, dass die
-    Suche nichts zu versuchen haette, und das ist kein Zustand, in dem man
-    eine Oberflaeche stehen lassen will.
-    """
-    werte = []
-    for x in (roh or []):
-        try:
-            zahl = float(x)
-        except (TypeError, ValueError):
-            continue
-        if zahl > 0:
-            werte.append(zahl)
-    return sorted(set(werte)) or list(vorgabe)
-
-
-def schalter_aus(*werte: Any, vorgabe: bool = False) -> bool:
-    """
-    Ein Schalter aus dem, was in der Datei steht.
-
-    Frueher war jeder dieser Nachweise eine Liste von vier Schaltern, einer je
-    Lage, und die Zwaengung hatte je einen fuer x und y. Nachgewiesen wird nur
-    noch x, und dort entscheidet die unguenstigere der beiden Lagen -- ein
-    Schalter genuegt. Eine alte Datei bringt noch die Liste mit: war darin
-    irgendein Haken gesetzt, gilt der Nachweis als eingeschaltet. Das ist die
-    Lesart, die nichts wegnimmt, was jemand verlangt hat.
-
-    Mehrere Werte, weil aus `zwaengung_x` und `zwaengung_y` einer wird.
-    """
-    gefunden = False
-    for wert in werte:
-        if wert is None:
-            continue
-        gefunden = True
-        if any(wert) if isinstance(wert, (list, tuple)) else bool(wert):
-            return True
-    return False if gefunden else vorgabe
-
-
-#: Wahl der Tragrichtung einer Schnittgroessenkombination -- historisch.
-#:
-#: Schnittgroessen gehoeren jetzt immer zur Tragrichtung x; die Wahl gibt es
-#: nicht mehr. Die Konstante steht noch, um alte Dateien zu lesen.
-BEIDE_RICHTUNGEN = "beide"
-
-
-def nur_x(d: Mapping[str, Any], was: str) -> None:
-    """
-    Alte Lastfaelle, die nur in y galten, gehen nicht mehr.
-
-    Nachgewiesen wird ausschliesslich x. Ein Lastfall mit ``richtung: "y"``
-    stillschweigend auf x umzudeuten hiesse, eine Zahl an einem anderen
-    Querschnitt anzusetzen als der Benutzer gemeint hat -- genau die Art von
-    stiller Aenderung, die ein Nachweiswerkzeug nicht machen darf. ``x`` und
-    ``beide`` gelten unveraendert weiter.
-    """
-    if str(d.get("richtung") or "") == Richtung.Y.value:
-        raise ProjektFehler(
-            f"{was} gilt nur in y-Richtung. Nachgewiesen wird nur noch x -- "
-            f"die y-Lagen stehen im Querschnitt, damit die statische Höhe und "
-            f"der Bewehrungsgehalt stimmen, nachgewiesen werden sie nicht. "
-            f"Bitte die Richtung auf x stellen oder den Lastfall löschen.")
+    """Die Normsorten einer Materialart."""
+    return {"beton": BETONSORTEN, "betonstahl": STAHLSORTEN}[art]
 
 
 #: Wie die Rissanforderungen an der Maske heissen.
@@ -201,56 +89,252 @@ _BESCHRIFTUNG: Dict[str, str] = {
 RISSANFORDERUNGEN: Dict[str, str] = {wert: _BESCHRIFTUNG[wert] for wert in RISSBREITE}
 
 
-def gebrauchsliste_roh(d: Mapping[str, Any], feld: str,
-                       alt: str) -> Mapping[str, Any]:
+# ===========================================================================
+# Lesen
+# ===========================================================================
+
+
+#: Ein Feld ohne Vorgabe.
+_KEINE = object()
+
+
+def lesen(cls: type, roh: Any, wo: str, basis: Any = None) -> Any:
     """
-    Die Gebrauchsliste einer Platte aus der Datei -- verschachtelt oder flach.
+    Ein Eintrag der Klasse ``cls`` aus ``roh``, einem Woerterbuch aus der Datei.
 
-    Bis zur :class:`Gebrauchsliste` standen die drei Angaben einzeln an der
-    Platte: ``haeufige``, ``haeufige_aus_tragsicherheit``, ``haeufige_anteil``
-    und dasselbe fuer ``quasistaendige``. Solche Dateien gibt es; sie werden
-    hier in die neue Form gebracht, geschrieben wird nur noch diese.
+    ``wo`` nennt den Ort in Meldungen. ``basis`` ist der Eintrag, dessen Werte
+    fuer fehlende Felder gelten -- ohne sie die Vorgaben der Klasse. Jeder
+    gelesene Eintrag ist danach geprueft (:func:`felder_pruefen`).
     """
-    neu = d.get(feld)
-    if isinstance(neu, Mapping):
-        return neu
-    return {"faelle": d.get(alt) or [],
-            "aus_tragsicherheit": d.get(f"{alt}_aus_tragsicherheit", False),
-            "anteil": d.get(f"{alt}_anteil")}
+    if not isinstance(roh, Mapping):
+        raise ProjektFehler(f"{wo}: hier gehört ein Eintrag mit Feldern hin, "
+                            f"nicht {_zeigen(roh)}.")
+    felder = {f.name: f for f in dataclasses.fields(cls) if f.init}
+    for schluessel in roh:
+        if schluessel not in felder:
+            aehnlich = difflib.get_close_matches(str(schluessel), felder, n=1)
+            raise ProjektFehler(
+                f"{wo}: ein Feld '{schluessel}' gibt es nicht."
+                + (f" Gemeint ist vielleicht '{aehnlich[0]}'?" if aehnlich else ""))
+    typen = _typen(cls)
+    werte: Dict[str, Any] = {}
+    for name, f in felder.items():
+        vorbild = getattr(basis, name) if basis is not None else _vorgabe(f)
+        if name in roh:
+            werte[name] = _wert_lesen(roh[name], typen[name], wo, name, vorbild)
+        elif vorbild is _KEINE:
+            raise ProjektFehler(f"{wo}: das Feld '{name}' fehlt.")
+        elif basis is not None:
+            werte[name] = copy.deepcopy(vorbild)
+    eintrag = cls(**werte)
+    felder_pruefen(eintrag, wo, tief=False)
+    return eintrag
 
 
-def lagen_aus_altem_format(d: Mapping[str, Any]) -> List[dict]:
+def _wert_lesen(roh: Any, typ: Any, wo: str, feld: str, vorbild: Any) -> Any:
     """
-    Rechnet eine vor dem Vier-Lagen-Modell gespeicherte Platte um.
-
-    Frueher gab es beliebig viele Lagen je Seite, jede mit einem einzigen
-    Bewehrungssatz. Uebernommen werden die beiden aeussersten je Seite:
-
-        lagen_unten[0] -> 1. Lage      lagen_oben[0] -> 4. Lage
-        lagen_unten[1] -> 2. Lage      lagen_oben[1] -> 3. Lage
-
-    Weitere Lagen der alten Beschreibung gehen dabei verloren -- besser als eine
-    gespeicherte Datei gar nicht mehr zu oeffnen, aber der Benutzer sollte sie
-    nachsehen.
+    Ein Feld aus der Datei. Eintraege und Listen von Eintraegen werden
+    gelesen; Zahlen bleiben, was sie sind -- nur eine ganze Zahl aus JSON wird
+    dort, wo eine Zahl hingehoert, zur Gleitkommazahl, und eine ganze
+    Gleitkommazahl dort, wo eine ganze Zahl hingehoert, zur ganzen. Ob der
+    Wert passt, sagt danach :func:`felder_pruefen`.
     """
-    def umbauen(alt: Optional[Mapping[str, Any]]) -> dict:
-        if not alt:
-            return {"stahl": "", "grund": {"durchmesser": 0.0}, "zulage": {"durchmesser": 0.0}}
-        return {
-            "stahl": alt.get("stahl", ""),
-            "grund": {
-                "durchmesser": alt.get("durchmesser", 0.0),
-                "abstand": alt.get("abstand"),
-                "anzahl": alt.get("anzahl"),
-            },
-            "zulage": {"durchmesser": 0.0},
-        }
+    art, innen = _art(typ)
+    if art == "optional":
+        return None if roh is None else _wert_lesen(roh, innen, wo, feld, vorbild)
+    if art == "eintrag":
+        basis = vorbild if isinstance(vorbild, innen) else None
+        return lesen(innen, roh, f"{wo}, {feld}", basis)
+    if art == "liste":
+        if not isinstance(roh, list):
+            raise ProjektFehler(f"{wo}: '{feld}' muss eine Liste sein, nicht {_zeigen(roh)}.")
+        innere, _ = _art(innen)
+        if innere == "eintrag":
+            return [lesen(innen, element, _ort_roh(element, innen, wo, feld, i))
+                    for i, element in enumerate(roh)]
+        return [_zahl_lesen(element, innen) for element in roh]
+    if art == "zuordnung":
+        if not isinstance(roh, Mapping):
+            raise ProjektFehler(f"{wo}: '{feld}' muss eine Zuordnung sein, "
+                                f"nicht {_zeigen(roh)}.")
+        return {schluessel: _zahl_lesen(wert, innen) for schluessel, wert in roh.items()}
+    return _zahl_lesen(roh, typ)
 
-    unten = list(d.get("lagen_unten") or [])
-    oben = list(d.get("lagen_oben") or [])
-    return [
-        umbauen(unten[0] if len(unten) > 0 else None),   # 1. Lage
-        umbauen(unten[1] if len(unten) > 1 else None),   # 2. Lage
-        umbauen(oben[1] if len(oben) > 1 else None),     # 3. Lage
-        umbauen(oben[0] if len(oben) > 0 else None),     # 4. Lage
-    ]
+
+def _zahl_lesen(roh: Any, typ: Any) -> Any:
+    """Eine Zahl, wie JSON sie bringt, in der Art des Feldes -- alles andere unveraendert."""
+    if typ is float and type(roh) is int:
+        return float(roh)
+    if typ is int and type(roh) is float and roh.is_integer():
+        return int(roh)
+    return roh
+
+
+def ort(cls: type, roh: Any) -> str:
+    """
+    Wie ein Eintrag fuer sich in Meldungen heisst: «Platte 'Decke'», ohne
+    Namen mit seiner Kennung, sonst nur seine Art.
+    """
+    bezeichnung = getattr(cls, "BEZEICHNUNG", cls.__name__)
+    if not isinstance(roh, Mapping):
+        return bezeichnung
+    return _benannt(bezeichnung, roh.get("name"), roh.get("kennung")) or bezeichnung
+
+
+def _ort_roh(element: Any, cls: type, wo: str, feld: str, i: int) -> str:
+    """Wie ein Listenelement in Meldungen heisst -- aus der Datei, vor dem Lesen."""
+    if not isinstance(element, Mapping):
+        return f"{wo}, {feld} {i + 1}"
+    return _ort(cls, element.get("name"), element.get("kennung"), wo, feld, i)
+
+
+def _ort(cls: type, name: Any, kennung: Any, wo: str, feld: str, i: int) -> str:
+    """
+    Ein Bauteil oder Material heisst wie in der Oberflaeche -- «Platte 'Decke'»,
+    und dort beginnt der Ort neu; alles darin nach seinem Feld und seinem
+    Namen, ohne Namen nach seiner Nummer: «lagen 2».
+    """
+    bezeichnung = getattr(cls, "BEZEICHNUNG", None)
+    if bezeichnung:
+        return _benannt(bezeichnung, name, kennung) or f"{bezeichnung} {i + 1}"
+    if isinstance(name, str) and name:
+        return f"{wo}, {feld} '{name}'"
+    return f"{wo}, {feld} {i + 1}"
+
+
+def _benannt(bezeichnung: str, name: Any, kennung: Any) -> Optional[str]:
+    """«Platte 'Decke'», ohne Namen «Platte q1» -- ``None`` ohne beides."""
+    if isinstance(name, str) and name:
+        return f"{bezeichnung} '{name}'"
+    if isinstance(kennung, str) and kennung:
+        return f"{bezeichnung} {kennung}"
+    return None
+
+
+# ===========================================================================
+# Pruefen
+# ===========================================================================
+
+
+def felder_pruefen(eintrag: Any, wo: str, *, tief: bool = True) -> None:
+    """
+    Prueft jedes Feld eines Eintrags gegen das, was an ihm steht: Typ, Wahl,
+    Pflicht, Untergrenze. ``tief``: auch jeden Eintrag darin.
+    """
+    typen = _typen(type(eintrag))
+    for f in dataclasses.fields(eintrag):
+        _wert_pruefen(getattr(eintrag, f.name), typen[f.name], f, wo, tief)
+
+
+def _wert_pruefen(wert: Any, typ: Any, f: dataclasses.Field, wo: str, tief: bool) -> None:
+    art, innen = _art(typ)
+    if art == "optional":
+        if wert is not None:
+            _wert_pruefen(wert, innen, f, wo, tief)
+        return
+    if art == "eintrag":
+        if not isinstance(wert, innen):
+            raise ProjektFehler(f"{wo}: '{f.name}' muss ein {innen.__name__} sein, "
+                                f"nicht {_zeigen(wert)}.")
+        if tief:
+            felder_pruefen(wert, f"{wo}, {f.name}")
+        return
+    if art == "liste":
+        if not isinstance(wert, list):
+            raise ProjektFehler(f"{wo}: '{f.name}' muss eine Liste sein, nicht {_zeigen(wert)}.")
+        innere, _ = _art(innen)
+        for i, element in enumerate(wert):
+            if innere != "eintrag":
+                _blatt_pruefen(element, innen, f, wo)
+            elif not isinstance(element, innen):
+                raise ProjektFehler(f"{wo}: in '{f.name}' gehört ein {innen.__name__} hin, "
+                                    f"nicht {_zeigen(element)}.")
+            elif tief:
+                felder_pruefen(element, _ort(innen, getattr(element, "name", None),
+                                             getattr(element, "kennung", None), wo, f.name, i))
+        return
+    if art == "zuordnung":
+        if not isinstance(wert, dict) or not all(isinstance(k, str) for k in wert):
+            raise ProjektFehler(f"{wo}: '{f.name}' muss eine Zuordnung sein, "
+                                f"nicht {_zeigen(wert)}.")
+        for schluessel, element in wert.items():
+            _blatt_pruefen(element, innen, f, f"{wo}, {f.name} '{schluessel}'")
+        return
+    _blatt_pruefen(wert, typ, f, wo)
+
+
+def _blatt_pruefen(wert: Any, typ: Any, f: dataclasses.Field, wo: str) -> None:
+    """Ein Text, eine Zahl, ein Schalter -- und was an seinem Feld steht."""
+    if typ is str:
+        if not isinstance(wert, str):
+            raise ProjektFehler(f"{wo}: '{f.name}' muss ein Text sein, nicht {_zeigen(wert)}.")
+        if not wert and _vorgabe(f) is _KEINE:
+            raise ProjektFehler(f"{wo}: '{f.name}' darf nicht leer sein.")
+    elif typ is bool:
+        if not isinstance(wert, bool):
+            raise ProjektFehler(f"{wo}: '{f.name}' ist ein Schalter, true oder false -- "
+                                f"nicht {_zeigen(wert)}.")
+    elif typ is int:
+        if isinstance(wert, bool) or not isinstance(wert, int):
+            raise ProjektFehler(f"{wo}: '{f.name}' muss eine ganze Zahl sein, "
+                                f"nicht {_zeigen(wert)}.")
+    elif typ is float:
+        if isinstance(wert, bool) or not isinstance(wert, (int, float)) \
+                or not math.isfinite(wert):
+            raise ProjektFehler(f"{wo}: '{f.name}' muss eine Zahl sein, nicht {_zeigen(wert)}.")
+        if f.metadata.get("nicht_negativ") and wert < 0.0:
+            raise ProjektFehler(f"{wo}: '{f.name}' kann nicht negativ sein ({wert:g}).")
+    moeglich = f.metadata.get("wahl")
+    if moeglich is not None and wert not in moeglich:
+        raise ProjektFehler(f"{wo}: {_zeigen(wert)} gibt es als '{f.name}' nicht. "
+                            f"Möglich sind: {', '.join(str(m) for m in moeglich)}.")
+
+
+# ===========================================================================
+# Die Typen der Felder
+# ===========================================================================
+
+
+@functools.lru_cache(maxsize=None)
+def _typen(cls: type) -> Dict[str, Any]:
+    """Die Typen der Felder, aufgeloest -- je Klasse einmal."""
+    return typing.get_type_hints(cls)
+
+
+def _art(typ: Any):
+    """
+    Was fuer ein Feld es ist: ``optional``, ``liste``, ``zuordnung``,
+    ``eintrag`` -- mit dem Typ darin -- oder ein Blatt.
+    """
+    herkunft = typing.get_origin(typ)
+    argumente = typing.get_args(typ)
+    if herkunft is typing.Union:
+        innen = [a for a in argumente if a is not type(None)]
+        return "optional", innen[0]
+    if herkunft is list:
+        return "liste", argumente[0]
+    if herkunft is dict:
+        return "zuordnung", argumente[1]
+    if dataclasses.is_dataclass(typ):
+        return "eintrag", typ
+    return "blatt", typ
+
+
+def _vorgabe(f: dataclasses.Field) -> Any:
+    """Die Vorgabe eines Feldes -- auch eine aus ``default_factory`` --, sonst :data:`_KEINE`."""
+    if f.default is not dataclasses.MISSING:
+        return f.default
+    if f.default_factory is not dataclasses.MISSING:
+        return f.default_factory()
+    return _KEINE
+
+
+def _zeigen(wert: Any) -> str:
+    """Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen."""
+    if isinstance(wert, str):
+        return f"'{wert}'"
+    if isinstance(wert, Mapping):
+        return "ein Eintrag mit Feldern"
+    if isinstance(wert, list):
+        return "eine Liste"
+    return repr(wert)

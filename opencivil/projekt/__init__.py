@@ -11,8 +11,8 @@ AUFTEILUNG:
 Frueher eine Datei mit knapp zweitausend Zeilen und drei Aufgaben. Jetzt je
 Aufgabe ein Modul::
 
-    lesen.py       was in einer Datei stehen darf und wie es gelesen wird,
-                   samt den alten Formaten
+    lesen.py       was in einer Datei stehen darf, wie es gelesen und wie
+                   jedes Feld geprueft wird -- ein Leser fuer alle Eintraege
     eintraege.py   die Teile: Material, Lagen, Buegel, Lastfaelle
     platte.py      eine Platte mit ihren vier Lagen und allen Schaltern
     querschnittsanalyse.py
@@ -49,9 +49,7 @@ kNm, ...) -- also so, wie der Benutzer sie eintippt. Die Umrechnung in SI
 geschieht erst beim Aufbau, ueber die :class:`Groesse`.
 """
 
-from opencivil.projekt.lesen import (
-    BEIDE_RICHTUNGEN, RISSANFORDERUNGEN, ProjektFehler, sorten,
-)
+from opencivil.projekt.lesen import RISSANFORDERUNGEN, ProjektFehler, sorten
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, GebrauchsfallEintrag,
     Gebrauchsliste, KnickEintrag, KombinationEintrag, LageEintrag,
@@ -76,7 +74,7 @@ from opencivil.projekt.aufbau import BAUTEILE, Aufbau, Bauteil, Bauteilart, aufb
 from opencivil.projekt.projekt import Projekt
 
 __all__ = [
-    "Aufbau", "BAUTEILE", "BEIDE_RICHTUNGEN", "BalkensystemEintrag", "Bauteil",
+    "Aufbau", "BAUTEILE", "BalkensystemEintrag", "Bauteil",
     "Bauteilart", "Beschreibung",
     "FlaecheEintrag", "KnotenlastEintrag", "LagerEintrag", "LastfallEintrag",
     "LastkombinationEintrag", "StablastEintrag", "StabquerschnittEintrag",

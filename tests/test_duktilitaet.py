@@ -293,21 +293,16 @@ class TestVorgabeUndAblage(unittest.TestCase):
         projekt = Projekt.aus_dict(d)
         self.assertIs(projekt.querschnitt("q1").duktilitaet, False)
 
-    def test_eine_alte_liste_wird_zum_schalter(self):
+    def test_eine_alte_liste_je_lage_wird_genannt(self):
         """
         Früher war das eine Wahl je Lage. Eine Datei von damals bringt die
-        Liste noch mit: war irgendein Haken gesetzt, gilt der Nachweis als
-        eingeschaltet -- das ist die Lesart, die nichts wegnimmt.
+        Liste noch mit -- sie wird genannt und nicht mehr gedeutet.
         """
-        for liste, erwartet in (([False, True], True),
-                                ([True, False, False, True], True),
-                                ([False] * 4, False),
-                                ([], False)):
-            d = Projekt.beispiel().als_dict()
-            d["querschnitte"][0]["duktilitaet"] = liste
-            with self.subTest(liste=liste):
-                self.assertIs(
-                    Projekt.aus_dict(d).querschnitt("q1").duktilitaet, erwartet)
+        d = Projekt.beispiel().als_dict()
+        d["querschnitte"][0]["duktilitaet"] = [False, True]
+        with self.assertRaises(ProjektFehler) as fehler:
+            Projekt.aus_dict(d)
+        self.assertIn("'duktilitaet' ist ein Schalter", str(fehler.exception))
 
 
 class TestInDerZusammenfassung(unittest.TestCase):

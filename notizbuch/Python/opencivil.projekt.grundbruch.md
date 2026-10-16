@@ -1,5 +1,5 @@
 ---
-erzeugt: b4a5e01c5a5d
+erzeugt: 8657da8b04f7
 art: modul
 tags: [modul]
 ---
@@ -35,13 +35,6 @@ Eine Einwirkung auf das Fundament: N normal zur Sohle, T in ihrer Richtung, in k
 - `T_Ed: float = 200.0`
 - `aktiv: bool = True` – Ob die Kombination gerechnet wird. Ausgeschaltet bleibt sie stehen.
 
-#### GrundbruchkombinationEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'GrundbruchkombinationEintrag'
-```
-
 ### GrundbruchEintrag
 
 ```python
@@ -51,6 +44,7 @@ class GrundbruchEintrag(Beschreibung)
 
 Ein Flachfundament auf seinem Baugrund, mit seinen Einwirkungen.
 
+- `BEZEICHNUNG = 'Grundbruch'`
 - `kennung: str`
 - `name: str`
 - `phi_k: float = 30.0` – Reibungswinkel, charakteristisch, in Grad.
@@ -105,13 +99,6 @@ def zahlen_pruefen(self) -> None
 ```
 
 Haelt unmoegliche Zahlen auf, bevor daraus ein Widerstand wird.
-
-#### GrundbruchEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'GrundbruchEintrag'
-```
 
 
 ## Braucht

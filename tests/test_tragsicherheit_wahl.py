@@ -156,19 +156,18 @@ class TestDatei(unittest.TestCase):
         self.assertEqual(kopie.querschnitte[0].tragsicherheit_wahl,
                          projekt.querschnitte[0].tragsicherheit_wahl)
 
-    def test_alte_datei_uebernimmt_das_phi_der_platte(self):
+    def test_ohne_wahl_gilt_die_vorgabe(self):
+        """Eine Kriechzahl an der Platte gibt es nicht mehr -- jedes Kapitel hat seine."""
         daten = Projekt.beispiel().als_dict()
-        platte = daten["querschnitte"][0]
-        del platte["tragsicherheit_wahl"]
-        platte["kriechzahl"] = 1.5
+        del daten["querschnitte"][0]["tragsicherheit_wahl"]
         wahl = Projekt.aus_dict(daten).querschnitte[0].tragsicherheit_wahl
-        self.assertEqual(wahl, RechenwahlEintrag(kriechzahl=1.5))
+        self.assertEqual(wahl, RechenwahlEintrag())
 
     def test_elastisch_gibt_es_hier_nicht(self):
         daten = Projekt.beispiel().als_dict()
         daten["querschnitte"][0]["tragsicherheit_wahl"] = {"rechenart": "elastisch"}
         with self.assertRaises(ProjektFehler) as fehler:
-            Projekt.aus_dict(daten)
+            Projekt.aus_dict(daten).pruefen()
         self.assertIn("Tragsicherheit", str(fehler.exception))
 
     def test_negatives_phi(self):

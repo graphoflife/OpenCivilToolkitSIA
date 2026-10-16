@@ -393,11 +393,8 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
 
     #: Klasse, Wörterbuch mit den Pflichtfeldern, dieselben als Argumente.
     FAELLE = [
-        # Mit φ = 0: ohne Kriechzahlen der Kapitel ist ein Wörterbuch eine
-        # Datei von vor 2026-10-09, und die Kapitel übernehmen das φ der Platte.
-        (QuerschnittEintrag, {"kennung": "q", "beton": "b", "kriechzahl": 0.0},
-         {"kennung": "q", "name": "q", "beton": "b",
-          "verformung": VerformungEintrag(kriechzahl=0.0)}),
+        (QuerschnittEintrag, {"kennung": "q", "name": "q", "beton": "b"},
+         {"kennung": "q", "name": "q", "beton": "b"}),
         (MaterialEintrag, {"kennung": "m", "art": "beton", "sorte": "C30/37"},
          {"kennung": "m", "art": "beton", "sorte": "C30/37"}),
         (PostenEintrag, {}, {}),
@@ -422,7 +419,8 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
         (QAGebrauchsfallEintrag, {"name": "g"}, {"name": "g"}),
         (QAKnickEintrag, {"name": "k"}, {"name": "k"}),
         (WerkstoffwahlEintrag, {"material": "b1"}, {"material": "b1"}),
-        (QuerschnittsanalyseEintrag, {"kennung": "a"}, {"kennung": "a", "name": "a"}),
+        (QuerschnittsanalyseEintrag, {"kennung": "a", "name": "a"},
+         {"kennung": "a", "name": "a"}),
         (SystemknotenEintrag, {}, {}),
         (SystemlinieEintrag, {}, {}),
         (StablastEintrag, {}, {}),
@@ -431,9 +429,9 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
         (StabquerschnittEintrag, {}, {}),
         (LastfallEintrag, {}, {}),
         (LastkombinationEintrag, {}, {}),
-        (BalkensystemEintrag, {"kennung": "r"}, {"kennung": "r", "name": "r"}),
-        (SkriptEintrag, {"kennung": "p"}, {"kennung": "p", "name": "p"}),
-        (GrundbruchEintrag, {"kennung": "g"}, {"kennung": "g", "name": "g"}),
+        (BalkensystemEintrag, {"kennung": "r", "name": "r"}, {"kennung": "r", "name": "r"}),
+        (SkriptEintrag, {"kennung": "p"}, {"kennung": "p"}),
+        (GrundbruchEintrag, {"kennung": "g", "name": "g"}, {"kennung": "g", "name": "g"}),
         (GrundbruchkombinationEintrag, {"name": "k"}, {"name": "k"}),
         (Projekt, {}, {}),
     ]
@@ -693,48 +691,28 @@ class TestMehrfachverwendung(unittest.TestCase):
 
 
 class TestAltesFormat(unittest.TestCase):
-    """Eine vor dem Vier-Lagen-Modell gespeicherte Datei muss weiter aufgehen."""
+    """
+    Alte Speicherstände müssen nicht mehr aufgehen (Benutzer, 2026-10-11).
+    Eine solche Datei wird nicht umgerechnet und nicht still beschnitten --
+    sie nennt das Feld, das es nicht mehr gibt, mit dem, das es heute ist.
+    """
 
-    ALT = {
-        "name": "Alt",
-        "materialien": [
-            {"kennung": "b1", "art": "beton", "sorte": "C30/37", "name": "C30/37"},
-            {"kennung": "s1", "art": "betonstahl", "sorte": "B500B", "name": "B500B"},
-        ],
-        "querschnitte": [{
-            "kennung": "q1", "name": "Decke", "beton": "b1", "h": 300.0, "b": 1000.0,
-            "ueberdeckung_unten": 30.0, "ueberdeckung_oben": 30.0,
-            "lagen_unten": [
-                {"durchmesser": 18.0, "stahl": "s1", "abstand": 150.0, "anzahl": None},
-                {"durchmesser": 12.0, "stahl": "s1", "abstand": 150.0, "anzahl": None},
-            ],
-            "lagen_oben": [
-                {"durchmesser": 12.0, "stahl": "s1", "abstand": 150.0, "anzahl": None},
-            ],
-            "kombinationen": [{"name": "Feld", "M_Ed": 100.0, "N_Ed": 0.0, "art": "N_konstant"}],
-        }],
-    }
+    def test_vier_lagen_statt_lagen_unten(self):
+        roh = Projekt.beispiel().als_dict()
+        platte = roh["querschnitte"][0]
+        platte["lagen_unten"] = platte.pop("lagen")[:2]
+        with self.assertRaises(ProjektFehler) as fehler:
+            Projekt.aus_dict(roh)
+        self.assertIn("'lagen_unten' gibt es nicht", str(fehler.exception))
+        self.assertIn("Gemeint ist vielleicht 'lagen'", str(fehler.exception))
+        self.assertIn("Platte 'Decke über EG'", str(fehler.exception))
 
-    def test_wird_umgerechnet(self):
-        projekt = Projekt.aus_dict(self.ALT)
-        lagen = projekt.querschnitte[0].lagen
-        self.assertEqual(len(lagen), 4)
-        self.assertEqual(lagen[0].grund.durchmesser, 18.0)   # lagen_unten[0] -> 1. Lage
-        self.assertEqual(lagen[1].grund.durchmesser, 12.0)   # lagen_unten[1] -> 2. Lage
-        self.assertFalse(lagen[2].vorhanden)                 # es gab keine zweite obere
-        self.assertEqual(lagen[3].grund.durchmesser, 12.0)   # lagen_oben[0] -> 4. Lage
-
-    def test_rechnet_durch(self):
-        aufbau = Projekt.aus_dict(self.ALT).aufbauen()
-        self.assertTrue(aufbau.werk.loese(*aufbau.alle_nachweisziele()).vollstaendig)
-
-    def test_gleichungsblaetter_fallen_still_weg(self):
-        """Die App gibt es seit 2026-10-15 nicht mehr: «einfach löschen» (Benutzer)."""
-        alt = dict(self.ALT, gleichungen=[{"kennung": "g1", "name": "Vorbemessung",
-                                           "zeilen": [{"art": "text", "text": "Stütze"}]}])
-        projekt = Projekt.aus_dict(alt)
-        self.assertNotIn("gleichungen", projekt.als_dict())
-        self.assertEqual(projekt.freie_kennung("g"), "g1")
+    def test_gleichungsblaetter_werden_genannt(self):
+        """Die App gibt es seit 2026-10-15 nicht mehr -- ihre Liste wird nicht still verworfen."""
+        roh = dict(Projekt.beispiel().als_dict(), gleichungen=[])
+        with self.assertRaises(ProjektFehler) as fehler:
+            Projekt.aus_dict(roh)
+        self.assertIn("'gleichungen' gibt es nicht", str(fehler.exception))
 
 
 class TestNurDieTragrichtungX(unittest.TestCase):
@@ -762,27 +740,19 @@ class TestNurDieTragrichtungX(unittest.TestCase):
                 self.assertFalse([s for s in getattr(aufbau, feld)
                                   if s.endswith(".y")])
 
-    def test_eine_alte_richtung_stoert_nicht(self):
-        """``x`` und ``beide`` heissen beide: gilt in x. Das Feld entfällt."""
-        for richtung in ("x", "beide"):
-            with self.subTest(richtung=richtung):
-                eintrag = KombinationEintrag.aus_dict(
-                    {"name": "Feld", "M_Ed": 100.0, "richtung": richtung})
-                self.assertEqual(eintrag.M_Ed, 100.0)
-                self.assertFalse(hasattr(eintrag, "richtung"))
-
-    def test_ein_reiner_y_lastfall_wird_gemeldet(self):
+    def test_eine_richtung_am_lastfall_gibt_es_nicht_mehr(self):
         """
-        Ihn stillschweigend auf x umzudeuten hiesse, eine Zahl an einem
-        anderen Querschnitt anzusetzen als der Benutzer gemeint hat.
+        Auch nicht ``x``: ein Feld, das nichts mehr bedeutet, wird genannt
+        statt übergangen -- und ein y-Lastfall still in x angesetzt wäre eine
+        Zahl an einem anderen Querschnitt, als der Benutzer gemeint hat.
         """
-        for klasse, was in ((KombinationEintrag, "Einwirkung"),
-                            (GebrauchsfallEintrag, "häufige Lastfall")):
-            with self.subTest(klasse=klasse.__name__):
-                with self.assertRaises(ProjektFehler) as fehler:
-                    klasse.aus_dict({"name": "Feld", "M_Ed": 100.0,
-                                     "richtung": "y"})
-                self.assertIn("nur in y-Richtung", str(fehler.exception))
+        for klasse in (KombinationEintrag, GebrauchsfallEintrag):
+            for richtung in ("x", "y", "beide"):
+                with self.subTest(klasse=klasse.__name__, richtung=richtung):
+                    with self.assertRaises(ProjektFehler) as fehler:
+                        klasse.aus_dict({"name": "Feld", "M_Ed": 100.0,
+                                         "richtung": richtung})
+                    self.assertIn("'richtung' gibt es nicht", str(fehler.exception))
 
     def test_ohne_kombination_bleibt_es_stumm(self):
         """
@@ -985,7 +955,7 @@ class TestMindestbewehrungsEingaben(unittest.TestCase):
         d["querschnitte"][0]["rissanforderung"] = "mittel"
         with self.assertRaises(ProjektFehler) as fehler:
             Projekt.aus_dict(d)
-        self.assertIn("Unbekannte Rissanforderung", str(fehler.exception))
+        self.assertIn("'mittel' gibt es als 'rissanforderung' nicht", str(fehler.exception))
 
     def test_der_katalog_kennt_die_drei_stufen(self):
         stufen = api.katalog()["rissanforderungen"]

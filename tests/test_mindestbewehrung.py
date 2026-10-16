@@ -303,7 +303,7 @@ def projekt_zwang_biegung(**abweichungen) -> Projekt:
     """Zwängung auf Biegung für alle vier Lagen eingeschaltet, mit φ = 2."""
     projekt = Projekt.beispiel()
     q = projekt.querschnitte[0]
-    q.zwaengung_biegung = True * 4
+    q.zwaengung_biegung = True
     q.zwaengung_biegung_kriechzahl = 2.0
     for name, wert in abweichungen.items():
         setattr(q, name, wert)

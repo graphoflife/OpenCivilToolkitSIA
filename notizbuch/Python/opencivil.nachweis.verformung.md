@@ -1,5 +1,5 @@
 ---
-erzeugt: a041a8c4e11d
+erzeugt: bd3395b7c096
 art: modul
 tags: [modul]
 ---
@@ -164,7 +164,6 @@ def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.eintraege]]
-- [[opencivil.projekt.platte]]
 - [[opencivil.web.api]]
 
 ## Formeln aus diesem Modul

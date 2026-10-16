@@ -146,13 +146,19 @@ Feldern der Linie (`quer`, `k_quer`, `laengs`, `k_laengs`). `r.teilen("L2",
 Es ist dieselbe Beschreibung, die die Oberfläche speichert, und dieselbe
 Rechnung: `p.rechnen()` liefert dieselben Urteile wie die Maske, und
 `Projekt.beispiel()` ist selbst so gebaut. Ein vertipptes Feld
-(`riss_anforderung=...`) wird gemeldet, nicht still übergangen.
+(`riss_anforderung=...`) wird gemeldet, nicht still übergangen, und vor dem
+Rechnen geht das ganze Projekt durch dieselbe Prüfung wie eine Datei: ein
+`quer="festt"` meldet sich mit Ort und Wert, statt still zur Feder zu werden.
 
 ## Speichern
 
 Jede Eingabe liegt sofort im Browser; ein geschlossenes Fenster kostet nichts.
 *Speichern* legt das Projekt als `.json` auf die Platte, *Öffnen* liest es
-zurück. Gelesen wird die Datei im Kern, mit denselben Prüfungen wie alles andere.
+zurück. Gelesen wird die Datei im Kern, streng und mit denselben Prüfungen wie
+alles andere: ein Feld, das es nicht gibt, ein Text statt einer Zahl, eine
+Wahl, die es nicht gibt -- jedes wird mit seinem Ort genannt, etwa «Platte
+'Decke', lagen 2, grund: 'abstand' muss eine Zahl sein». Was fehlt, bekommt
+die Vorgabe. Dateien aus älteren Fassungen werden nicht mehr umgerechnet.
 
 ## Notizbuch und Obsidian
 

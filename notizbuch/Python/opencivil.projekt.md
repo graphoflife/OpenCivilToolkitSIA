@@ -1,5 +1,5 @@
 ---
-erzeugt: 1b3931d72a73
+erzeugt: ae9fbcf6af60
 art: modul
 tags: [modul]
 ---
@@ -21,8 +21,8 @@ Frueher eine Datei mit knapp zweitausend Zeilen und drei Aufgaben. Jetzt je
 Aufgabe ein Modul:
 
 ```
-lesen.py       was in einer Datei stehen darf und wie es gelesen wird,
-               samt den alten Formaten
+lesen.py       was in einer Datei stehen darf, wie es gelesen und wie
+               jedes Feld geprueft wird -- ein Leser fuer alle Eintraege
 eintraege.py   die Teile: Material, Lagen, Buegel, Lastfaelle
 platte.py      eine Platte mit ihren vier Lagen und allen Schaltern
 querschnittsanalyse.py

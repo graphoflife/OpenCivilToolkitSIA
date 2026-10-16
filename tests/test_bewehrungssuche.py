@@ -16,7 +16,9 @@ from unittest import mock
 from opencivil import bewehrungssuche as suche
 from opencivil.bewehrungssuche.bewertung import arbeitskopie, bewerte
 from opencivil.bewehrungssuche.laengs import _ueber_grenze
-from opencivil.projekt import KnickEintrag, ObergrenzeEintrag, PostenEintrag, Projekt
+from opencivil.projekt import (
+    KnickEintrag, ObergrenzeEintrag, PostenEintrag, Projekt, ProjektFehler,
+)
 from opencivil.web import dienst
 
 
@@ -726,16 +728,13 @@ class TestPlattendicke(unittest.TestCase):
         self.assertGreaterEqual(schlechtester(fertig), 1.0)
 
 
-    def test_eine_alte_datei_mit_dickenmodus(self):
+    def test_ein_alter_dickenmodus_wird_genannt(self):
         """Die Dicke war einmal ein eigener Modus -- jetzt ein Schalter daneben."""
-        for alt, modus in (("dicke_grund_mit", "grund_mit"),
-                           ("dicke_grund_ohne_zulage_mit", "grund_ohne_zulage_mit")):
-            d = platte().als_dict()
-            d["querschnitte"][0]["automatik_modus"] = alt
-            d["querschnitte"][0].pop("automatik_dicke")
-            q = Projekt.aus_dict(d).querschnitt("q1")
-            with self.subTest(alt=alt):
-                self.assertEqual((q.automatik_modus, q.automatik_dicke), (modus, True))
+        d = platte().als_dict()
+        d["querschnitte"][0]["automatik_modus"] = "dicke_grund_mit"
+        with self.assertRaisesRegex(ProjektFehler,
+                                    "'dicke_grund_mit' gibt es als 'automatik_modus' nicht"):
+            Projekt.aus_dict(d)
 
 
 if __name__ == "__main__":

@@ -483,7 +483,7 @@ class TestAngabengruppen(unittest.TestCase):
         projekt = Projekt.beispiel()
         q = projekt.querschnitt("q1")
         q.ohne_lastfaelle()
-        q.duktilitaet = [False] * 4
+        q.duktilitaet = False
         q.sproede = True
         q.zwaengung_biegung = True
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
@@ -496,7 +496,7 @@ class TestAngabengruppen(unittest.TestCase):
     def test_die_duktilitaet_laeuft_auch_ohne_schnittgroessen(self):
         projekt = Projekt.beispiel()
         projekt.querschnitt("q1").ohne_lastfaelle()
-        projekt.querschnitt("q1").duktilitaet = [True, False, False, True]
+        projekt.querschnitt("q1").duktilitaet = True
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         namen = [z["zellen"][0]["text"]
                  for z in antwort.daten["zusammenfassungen"]["q1"]["zeilen"]]

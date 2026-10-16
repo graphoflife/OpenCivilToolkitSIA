@@ -1,5 +1,5 @@
 ---
-erzeugt: 4328c75edb34
+erzeugt: 40f285b83e1f
 art: modul
 tags: [modul]
 ---
@@ -551,7 +551,6 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.eintraege]]
-- [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]

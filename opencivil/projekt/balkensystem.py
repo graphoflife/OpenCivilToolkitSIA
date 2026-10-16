@@ -40,13 +40,13 @@ from __future__ import annotations
 import copy
 import math
 from dataclasses import dataclass, field, replace
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from opencivil.core.einheiten import (
     KN, KN_PRO_M, KN_PRO_M2, KNM, KNM_PRO_M, KNM_PRO_RAD, Groesse,
 )
 from opencivil.projekt.eintraege import Beschreibung
-from opencivil.projekt.lesen import ProjektFehler, pflichtfeld, zahl
+from opencivil.projekt.lesen import ProjektFehler, einer_von
 from opencivil.projekt.netz import Netz, naechste_kennung
 from opencivil.stabwerk import querschnitte as qs
 from opencivil.stabwerk.modell import (
@@ -92,15 +92,6 @@ LAGERARTEN = {
 Ort = Union[str, Sequence[float]]
 
 
-def _gewaehlt(d: Mapping[str, Any], feld: str, vorgabe: str, moeglich: Sequence[str],
-              wo: str) -> str:
-    wert = str(d.get(feld) or vorgabe)
-    if wert not in moeglich:
-        raise ProjektFehler(f"{wo}: «{wert}» gibt es als {feld} nicht. "
-                            f"Möglich sind: {', '.join(moeglich)}.")
-    return wert
-
-
 def _kennung_von(eintrag: Any) -> str:
     return eintrag if isinstance(eintrag, str) else eintrag.kennung
 
@@ -118,11 +109,6 @@ class SystemknotenEintrag(Beschreibung):
     x: float = 0.0
     z: float = 0.0
 
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "SystemknotenEintrag":
-        return cls(kennung=str(d.get("kennung") or cls.kennung),
-                   x=zahl(d, "x", cls.x), z=zahl(d, "z", cls.z))
-
 
 @dataclass
 class StablastEintrag(Beschreibung):
@@ -134,28 +120,14 @@ class StablastEintrag(Beschreibung):
     """
 
     lastfall: str = ""
-    art: str = Lastart.LINIENLAST.value
-    richtung: str = Lastrichtung.SENKRECHT.value
+    art: str = einer_von(STABLASTEN, Lastart.LINIENLAST.value)
+    richtung: str = einer_von(RICHTUNGEN, Lastrichtung.SENKRECHT.value)
     wert_a: float = 10.0
     wert_b: Optional[float] = None
     von: float = 0.0
     bis: Optional[float] = None
     projiziert: bool = False
     """Senkrecht und waagrecht je Meter Projektion statt je Meter Stab."""
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "StablastEintrag":
-        wo = "Eine Stablast"
-        return cls(
-            lastfall=str(d.get("lastfall") or cls.lastfall),
-            art=_gewaehlt(d, "art", cls.art, STABLASTEN, wo),
-            richtung=_gewaehlt(d, "richtung", cls.richtung, RICHTUNGEN, wo),
-            wert_a=zahl(d, "wert_a", cls.wert_a),
-            wert_b=zahl(d, "wert_b", cls.wert_b),
-            von=zahl(d, "von", cls.von),
-            bis=zahl(d, "bis", cls.bis),
-            projiziert=bool(d.get("projiziert", cls.projiziert)),
-        )
 
     @property
     def verteilt(self) -> bool:
@@ -181,31 +153,13 @@ class SystemlinieEintrag(Beschreibung):
 
     gelenk_anfang: bool = False
     gelenk_ende: bool = False
-    quer: str = "frei"
+    quer: str = einer_von(HALT, "frei")
     k_quer: float = 0.0
     """Bettung quer, kN/m²."""
 
-    laengs: str = "frei"
+    laengs: str = einer_von(HALT, "frei")
     k_laengs: float = 0.0
     lasten: List[StablastEintrag] = field(default_factory=list)
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "SystemlinieEintrag":
-        wo = f"Linie {d.get('kennung') or ''}".strip()
-        return cls(
-            kennung=str(d.get("kennung") or cls.kennung),
-            von=str(d.get("von") or cls.von), bis=str(d.get("bis") or cls.bis),
-            stab=bool(d.get("stab", cls.stab)),
-            querschnitt=str(d.get("querschnitt") or cls.querschnitt),
-            material=str(d.get("material") or cls.material),
-            gelenk_anfang=bool(d.get("gelenk_anfang", cls.gelenk_anfang)),
-            gelenk_ende=bool(d.get("gelenk_ende", cls.gelenk_ende)),
-            quer=_gewaehlt(d, "quer", cls.quer, HALT, wo),
-            k_quer=zahl(d, "k_quer", cls.k_quer),
-            laengs=_gewaehlt(d, "laengs", cls.laengs, HALT, wo),
-            k_laengs=zahl(d, "k_laengs", cls.k_laengs),
-            lasten=[StablastEintrag.aus_dict(x) for x in (d.get("lasten") or [])],
-        )
 
 
 @dataclass
@@ -214,26 +168,15 @@ class LagerEintrag(Beschreibung):
 
     kennung: str = ""
     knoten: str = ""
-    x: str = "fest"
+    x: str = einer_von(HALT, "fest")
     k_x: float = 0.0
     """kN/m."""
 
-    z: str = "fest"
+    z: str = einer_von(HALT, "fest")
     k_z: float = 0.0
-    phi: str = "frei"
+    phi: str = einer_von(HALT, "frei")
     k_phi: float = 0.0
     """kNm/rad."""
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "LagerEintrag":
-        wo = f"Lager {d.get('kennung') or ''}".strip()
-        return cls(
-            kennung=str(d.get("kennung") or cls.kennung),
-            knoten=str(d.get("knoten") or cls.knoten),
-            x=_gewaehlt(d, "x", cls.x, HALT, wo), k_x=zahl(d, "k_x", cls.k_x),
-            z=_gewaehlt(d, "z", cls.z, HALT, wo), k_z=zahl(d, "k_z", cls.k_z),
-            phi=_gewaehlt(d, "phi", cls.phi, HALT, wo), k_phi=zahl(d, "k_phi", cls.k_phi),
-        )
 
 
 @dataclass
@@ -243,22 +186,10 @@ class KnotenlastEintrag(Beschreibung):
     kennung: str = ""
     knoten: str = ""
     lastfall: str = ""
-    art: str = "kraft"
-    richtung: str = Lastrichtung.SENKRECHT.value
+    art: str = einer_von(KNOTENLASTEN, "kraft")
+    richtung: str = einer_von(KNOTENRICHTUNGEN, Lastrichtung.SENKRECHT.value)
     wert: float = 10.0
     """kN oder kNm."""
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "KnotenlastEintrag":
-        wo = f"Knotenlast {d.get('kennung') or ''}".strip()
-        return cls(
-            kennung=str(d.get("kennung") or cls.kennung),
-            knoten=str(d.get("knoten") or cls.knoten),
-            lastfall=str(d.get("lastfall") or cls.lastfall),
-            art=_gewaehlt(d, "art", cls.art, KNOTENLASTEN, wo),
-            richtung=_gewaehlt(d, "richtung", cls.richtung, KNOTENRICHTUNGEN, wo),
-            wert=zahl(d, "wert", cls.wert),
-        )
 
 
 @dataclass
@@ -271,23 +202,10 @@ class StabquerschnittEintrag(Beschreibung):
 
     kennung: str = ""
     name: str = ""
-    art: str = "vorlage"
-    vorlage: str = qs.RECHTECK.schluessel
+    art: str = einer_von(QUERSCHNITTSARTEN, "vorlage")
+    vorlage: str = einer_von((v.schluessel for v in qs.VORLAGEN), qs.RECHTECK.schluessel)
     masse: Dict[str, float] = field(default_factory=dict)
     bezug: str = ""
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "StabquerschnittEintrag":
-        kennung = str(d.get("kennung") or cls.kennung)
-        wo = f"Querschnitt {d.get('name') or kennung}".strip()
-        art = _gewaehlt(d, "art", cls.art, QUERSCHNITTSARTEN, wo)
-        vorlage = _gewaehlt(d, "vorlage", cls.vorlage,
-                            [v.schluessel for v in qs.VORLAGEN], wo)
-        masse = {}
-        for schluessel, wert in (d.get("masse") or {}).items():
-            masse[str(schluessel)] = zahl({"wert": wert}, "wert", 0.0)
-        return cls(kennung=kennung, name=str(d.get("name") or kennung), art=art,
-                   vorlage=vorlage, masse=masse, bezug=str(d.get("bezug") or cls.bezug))
 
     def stabvorlage(self) -> qs.Stabvorlage:
         return qs.vorlage(self.vorlage)
@@ -313,11 +231,6 @@ class LastfallEintrag(Beschreibung):
     kennung: str = ""
     name: str = ""
 
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "LastfallEintrag":
-        kennung = str(d.get("kennung") or cls.kennung)
-        return cls(kennung=kennung, name=str(d.get("name") or kennung))
-
 
 @dataclass
 class LastkombinationEintrag(Beschreibung):
@@ -326,13 +239,6 @@ class LastkombinationEintrag(Beschreibung):
     kennung: str = ""
     name: str = ""
     faktoren: Dict[str, float] = field(default_factory=dict)
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "LastkombinationEintrag":
-        kennung = str(d.get("kennung") or cls.kennung)
-        faktoren = {str(k): zahl({"wert": v}, "wert", 0.0)
-                    for k, v in (d.get("faktoren") or {}).items()}
-        return cls(kennung=kennung, name=str(d.get("name") or kennung), faktoren=faktoren)
 
 
 # ===========================================================================
@@ -364,6 +270,8 @@ class Modell:
 class BalkensystemEintrag(Beschreibung):
     """Ein ebener Rahmen: Knoten, Linien, Lager, Lasten, Querschnitte, Lastfaelle, Kombinationen."""
 
+    BEZEICHNUNG = "Balkensystem"
+
     kennung: str
     name: str
     knoten: List[SystemknotenEintrag] = field(default_factory=list)
@@ -376,25 +284,7 @@ class BalkensystemEintrag(Beschreibung):
     beschreibung: str = ""
     """Freier Text -- geht in keine Rechnung ein."""
 
-    # -- Lesen ---------------------------------------------------------------
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "BalkensystemEintrag":
-        kennung = pflichtfeld(d, "kennung", "Ein Balkensystem")
-        return cls(
-            kennung=kennung,
-            name=str(d.get("name") or kennung),
-            knoten=[SystemknotenEintrag.aus_dict(x) for x in (d.get("knoten") or [])],
-            linien=[SystemlinieEintrag.aus_dict(x) for x in (d.get("linien") or [])],
-            lager=[LagerEintrag.aus_dict(x) for x in (d.get("lager") or [])],
-            knotenlasten=[KnotenlastEintrag.aus_dict(x) for x in (d.get("knotenlasten") or [])],
-            querschnitte=[StabquerschnittEintrag.aus_dict(x)
-                          for x in (d.get("querschnitte") or [])],
-            lastfaelle=[LastfallEintrag.aus_dict(x) for x in (d.get("lastfaelle") or [])],
-            kombinationen=[LastkombinationEintrag.aus_dict(x)
-                           for x in (d.get("kombinationen") or [])],
-            beschreibung=str(d.get("beschreibung") or ""),
-        )
+    # -- Pruefen --------------------------------------------------------------
 
     def pruefen(self) -> None:
         """
@@ -652,7 +542,8 @@ class BalkensystemEintrag(Beschreibung):
                  wert: float = 10.0, **felder: Any) -> StablastEintrag:
         """Eine Last auf einer Linie -- ``wert`` ist ``wert_a``; Felder wie :class:`StablastEintrag`."""
         eintrag = StablastEintrag.aus_dict({"lastfall": _kennung_von(lastfall), "art": art,
-                                            "wert_a": wert, **felder})
+                                            "wert_a": wert, **felder},
+                                           f"Balkensystem '{self.name}', lasten")
         self.linie_von(_kennung_von(linie)).lasten.append(eintrag)
         return eintrag
 
@@ -661,7 +552,8 @@ class BalkensystemEintrag(Beschreibung):
         eintrag = KnotenlastEintrag.aus_dict({
             "kennung": self._neue_kennung(self.knotenlasten, "P"),
             "knoten": self._knoten(self.netz(), ort), "lastfall": _kennung_von(lastfall),
-            "art": art, "richtung": richtung, "wert": wert})
+            "art": art, "richtung": richtung, "wert": wert},
+            f"Balkensystem '{self.name}', knotenlasten")
         self.knotenlasten.append(eintrag)
         return eintrag
 

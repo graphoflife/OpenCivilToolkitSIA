@@ -1,5 +1,5 @@
 ---
-erzeugt: 885e38207908
+erzeugt: 23e8778d4686
 art: modul
 tags: [modul]
 ---
@@ -28,6 +28,7 @@ class QuerschnittEintrag(Beschreibung)
 
 Eine Stahlbeton-Platte mit genau vier Bewehrungslagen.
 
+- `BEZEICHNUNG = 'Platte'`
 - `kennung: str`
 - `name: str`
 - `beton: str`
@@ -39,18 +40,18 @@ Eine Stahlbeton-Platte mit genau vier Bewehrungslagen.
 - `einlagenhoehe: float = 0.0` – Höhe einer Einlage in mm.
 - `k_c: float = K_C` – Abminderung der Betondruckfestigkeit in der Druckdiagonalen.
 - `querkraftbewehrung: QuerkraftbewehrungEintrag = field(default_factory=QuerkraftbewehrungEintrag)` – Bügel; ohne Durchmesser heisst: keine.
-- `rissanforderung: str = 'normal'` – Anforderung an die Rissbildung -- `normal`, `erhoeht` oder `hoch`.
+- `rissanforderung: str = einer_von(RISSANFORDERUNGEN, 'normal')` – Anforderung an die Rissbildung -- `normal`, `erhoeht` oder `hoch`.
 - `beschreibung: str = ''` – Freier Text zur Platte -- was sonst nirgends hinpasst. Wo sie liegt, woher die Schnittgroessen stammen, was noch zu klaeren ist. Geht in keine Rechnung ein und steht in keinem Nachweis; sie wird gespeichert und wieder angezeigt, mehr nicht. Genau dafuer gibt es sie: ohne ein solches Feld landen solche Saetze im Namen der Platte.
 - `zwaengung: bool = False` – Ob mit einer Normalkraft-Zwaengung zu rechnen ist. Vorgabe aus: eine Zwaengung ist eine Annahme ueber das Tragwerk, keine Eigenschaft der Platte. Wer sie braucht, schaltet sie ein. Ein Schalter, nicht zwei: nachgewiesen wird nur die Tragrichtung x. Die y-Lagen stehen im Querschnitt, weil sie die statische Hoehe von x bestimmen und zum Bewehrungsgehalt zaehlen -- nachgewiesen werden sie nicht.
 - `zwaengung_begrenzt: bool = False` – Ob die Zwaengung auf 500 mm Plattendicke begrenzt angesetzt wird.
 - `haeufig: Gebrauchsliste = field(default_factory=lambda: Gebrauchsliste(anteil=HAEUFIG_ANTEIL))` – Die haeufigen Lastfaelle -- fuer den Nachweis gegen Fliessen.
 - `quasistaendig: Gebrauchsliste = field(default_factory=lambda: Gebrauchsliste(anteil=QUASISTAENDIG_ANT…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
-- `verformung: VerformungEintrag = field(default_factory=VerformungEintrag)` – Die Verformungsfaelle und das phi ihres Vergroesserungsfaktors. Bis 2026-10-16 stand dieses phi als Kriechzahl an der Platte.
+- `verformung: VerformungEintrag = field(default_factory=VerformungEintrag)` – Die Verformungsfaelle und das phi ihres Vergroesserungsfaktors.
 - `knickfaelle: List[KnickEintrag] = field(default_factory=list)` – Knicknachweise; leer heisst: keiner.
-- `knicken_wahl_verformung: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.knicken_verformung)` – Womit die Ausmitte e_2d gerechnet wird -- immer praezise ohne Vereinfachung ([[opencivil.nachweis.rechenwahl#Konstanten|VERFORMUNGSARTEN]]), Vorgabe Bemessungswerte. Eine alte Datei mit dem Spannungsblock oder der Handrechnung liest sich als praezise.
+- `knicken_wahl_verformung: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.knicken_verformung)` – Womit die Ausmitte e_2d gerechnet wird -- immer praezise ohne Vereinfachung ([[opencivil.nachweis.rechenwahl#Konstanten|VERFORMUNGSARTEN]]), Vorgabe Bemessungswerte.
 - `knicken_wahl_widerstand: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.knicken_widerstand)` – Womit N_Rd(M_Ed = N_Ed·e_tot) gerechnet wird -- Vorgabe die 0.85·x-Vereinfachung, ohne Handrechnung. Mit derselben Wahl wie die Tragsicherheit ist es deren Linie.
 - `spannungsfaelle: List[SpannungsfallEintrag] = field(default_factory=list)` – Auswertungen am Querschnitt -- Bilder, keine Nachweise.
-- `automatik_modus: str = 'grund_ohne_zulage_mit'` – Wonach das Bewehrungswerkzeug sucht -- siehe `bewehrungssuche.Suchmodus`.
+- `automatik_modus: str = einer_von((m.value for m in Suchmodus), Suchmodus.GRUND_OHNE_ZULAGE_M…` – Wonach das Bewehrungswerkzeug sucht -- siehe `bewehrungssuche.Suchmodus`.
 - `automatik_dicke: bool = False` – Ob das Werkzeug dazu die duennste Plattendicke sucht («Plattendicke optimieren»). Ein Schalter neben dem Modus und nicht ein eigener Modus: je Dicke laeuft dieselbe Suche im gewaehlten Modus.
 - `automatik_y_wie_x: bool = False` – Ob die y-Grundbewehrung jeder Seite der x-Grundbewehrung dieser Seite folgt -- gleicher Durchmesser, gleiche Teilung. Ein Netz, wie es verlegt wird. Die Suche rechnet schon waehrend des Suchens damit: liegt y aussen, kostet ihr Durchmesser x die statische Hoehe.
 - `automatik_teilungen: List[float] = field(default_factory=lambda: [150.0])` – Teilungen, die es versucht. Grundbewehrung und Zulage teilen sich eine. Vorgabe ist die eine uebliche. Wer mehrere angibt, bekommt die mit der kleinsten Stahlflaeche -- das kostet aber je Teilung einen ganzen Suchlauf, und meistens steht die Teilung ohnehin fest.
@@ -61,12 +62,12 @@ Eine Stahlbeton-Platte mit genau vier Bewehrungslagen.
 - `automatik_querkraft_teilungen: List[float] = field(default_factory=lambda: [100.0, 150.0, 200.0])`
 - `sproede: bool = False` – Ob der Nachweis gegen sproedes Versagen gefuehrt wird.
 - `zwaengung_biegung: bool = False` – Ob die Zwaengung auf Biegung nachgewiesen wird.
-- `zwaengung_biegung_kriechzahl: float = 0.0` – Die Kriechzahl phi der Zwaengung auf Biegung: `n = (E_s/E_cm)*(1+phi)`. Bis 2026-10-09 galt dort die der Platte -- eine Datei von damals uebernimmt sie beim Lesen.
+- `zwaengung_biegung_kriechzahl: float = nicht_negativ(0.0)` – Die Kriechzahl phi der Zwaengung auf Biegung: `n = (E_s/E_cm)*(1+phi)`.
 - `duktilitaet: bool = False` – Ob der Duktilitaetsnachweis gefuehrt wird. Ein Schalter fuer die Platte und nicht einer je Lage. Gerechnet werden beide x-Lagen -- die obere traegt das Stuetz-, die untere das Feldmoment --, und in der Zusammenfassung steht die unguenstigere. Vier Schalter fuer einen Nachweis waren vier Gelegenheiten, den falschen zu vergessen; die Frage ist ohnehin, ob der Querschnitt sein Versagen ankuendigt, und die beantwortet die schlechtere Lage.
 - `x_d_max: float = X_D_MAX` – Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis. Vorgabe 0.35, hoechstens 0.5 -- die Zahlen stehen beim Nachweis (`duktilitaet.GRENZE`, `duktilitaet.HOECHSTENS`).
-- `lagen: List[LageEintrag] = field(default_factory=list)` – Genau vier, Index 0 = 1. Lage (unterste).
-- `richtung_lage1: str = 'y'` – Richtung der 1. Lage; die 2. bekommt die Gegenrichtung. Vorgabe y, damit x auf der 2. und 3. Lage liegt -- innen. Das ist der unguenstigere Fall und der haeufigere: die Tragrichtung liegt selten zu unterst, weil die Querrichtung darunter durchlaeuft. Wer es anders verlegt, stellt es um.
-- `richtung_lage4: str = 'y'` – Richtung der 4. Lage; die 3. bekommt die Gegenrichtung.
+- `lagen: List[LageEintrag] = field(default_factory=list)` – Genau vier, Index 0 = 1. Lage (unterste). Fehlen welche, sind sie leer.
+- `richtung_lage1: str = einer_von(RICHTUNGEN, Richtung.Y.value)` – Richtung der 1. Lage; die 2. bekommt die Gegenrichtung. Vorgabe y, damit x auf der 2. und 3. Lage liegt -- innen. Das ist der unguenstigere Fall und der haeufigere: die Tragrichtung liegt selten zu unterst, weil die Querrichtung darunter durchlaeuft. Wer es anders verlegt, stellt es um.
+- `richtung_lage4: str = einer_von(RICHTUNGEN, Richtung.Y.value)` – Richtung der 4. Lage; die 3. bekommt die Gegenrichtung.
 - `kombinationen: List[KombinationEintrag] = field(default_factory=list)`
 - `tragsicherheit_wahl: RechenwahlEintrag = field(default_factory=RechenwahlEintrag)` – Womit die Tragsicherheit rechnet -- Vorgabe die Handrechnung mit Bemessungswerten. Die Querkraft und das sproede Versagen lesen ihren Momentenwiderstand aus derselben Linie.
 
@@ -160,7 +161,8 @@ def spannungsfall(self, name: str, *, art: str='schnittgroessen', **felder: Any)
 
 Eine Spannung-Dehnung-Analyse -- Felder wie im Eintrag, in kN, kNm und
 Promille. Gelesen wie aus einer Datei, also mit denselben Pruefungen:
-eine Art oder ein Betongesetz, das es nicht gibt, meldet sich hier.
+ein Feld, eine Art oder ein Betongesetz, das es nicht gibt, meldet
+sich hier.
 
 #### QuerschnittEintrag.neu
 
@@ -181,19 +183,16 @@ Was hier steht, sind Entscheidungen und keine Vorgaben: alle vier
 Lagen bewehrt, ein Feldmoment zum Anfangen. Alles Uebrige kommt aus
 den Vorgabewerten der Felder.
 
-#### QuerschnittEintrag.aus_dict
 
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'QuerschnittEintrag'
-```
+## Konstanten
 
+- `RICHTUNGEN = tuple((r.value for r in Richtung))` – Die Richtungen einer Lage.
 
 ## Braucht
 
+- [[opencivil.bewehrungssuche.laengs]]
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.rechenwahl]]
-- [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.querschnitt.platte]]

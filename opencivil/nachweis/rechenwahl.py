@@ -155,16 +155,6 @@ FASERSPANNUNGSARTEN = FASERARTEN + (Rechenart.ELASTISCH,)
 #: anbietet» oben.
 VERFORMUNGSARTEN = (Rechenart.PARABEL,)
 
-#: Was eine alte Datei dort noch waehlen durfte, wo es die Wahl heute nicht
-#: mehr gibt -- und was daraus wird, Schritt fuer Schritt zur genaueren, bis es
-#: die Wahl gibt: aus der Handrechnung beim Knicken und in den Analysen der
-#: Spannungsblock, ueber die Fasern gerechnet (seit 2026-10-12); die
-#: Druckbewehrung zaehlt dann mit, der Widerstand steigt darum leicht. Aus dem
-#: Spannungsblock bei der Verformung des Knickens die Parabel (seit
-#: 2026-10-15), aus der Handrechnung dort also auch.
-ERSATZ_ALTER_WAHL = {Rechenart.HANDRECHNUNG.value: Rechenart.BLOCK.value,
-                     Rechenart.BLOCK.value: Rechenart.PARABEL.value}
-
 #: Die Seite im Notizbuch fuer den Stahl der Handrechnung, der nur Zug traegt.
 STAHL_NUR_ZUG = "Betonstahl nur auf Zug"
 

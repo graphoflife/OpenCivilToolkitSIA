@@ -126,12 +126,6 @@ export function richtungsWahl(gewaehlt, setzen, nur = null) {
   })));
 }
 
-/** Genau vier Schalter, auch wenn die Beschreibung älter ist als der Nachweis. */
-export function lagenwahl(vorhanden, vorgabe) {
-  const liste = Array.isArray(vorhanden) ? vorhanden : [];
-  return vorgabe.map((v, i) => (i < liste.length ? !!liste[i] : v));
-}
-
 /**
  * Ein Schalter mit zwei Stellungen: ein einziger Knopf, die gewählte Hälfte
  * farbig. Ein Klick irgendwo darauf schaltet um, nicht nur einer auf die

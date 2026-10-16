@@ -40,7 +40,7 @@ from opencivil.nachweis.duktilitaet import HOECHSTENS as DUKTILITAET_HOECHSTENS
 from opencivil.nachweis.spannungsbegrenzung import GrenzeGegenFliessen
 from opencivil.nachweis.verformung import ZUGSEITEN as VERFORMUNG_ZUGSEITEN
 from opencivil.projekt import (
-    BEIDE_RICHTUNGEN, RISSANFORDERUNGEN, Aufbau, GebrauchsfallEintrag, GrundbruchEintrag,
+    RISSANFORDERUNGEN, Aufbau, GebrauchsfallEintrag, GrundbruchEintrag,
     GrundbruchkombinationEintrag, KnickEintrag, KombinationEintrag, MaterialEintrag,
     QuerschnittEintrag, SkriptEintrag, SpannungsfallEintrag, VerformungsfallEintrag,
 )
@@ -139,11 +139,6 @@ def katalog() -> dict:
         },
         "erfuellungsarten": [
             {"wert": a.value, "beschriftung": a.beschriftung} for a in Erfuellungsart
-        ],
-        "richtungen": [
-            {"wert": "x", "beschriftung": "nur x-Richtung"},
-            {"wert": "y", "beschriftung": "nur y-Richtung"},
-            {"wert": BEIDE_RICHTUNGEN, "beschriftung": "beide Richtungen"},
         ],
         # Die frische Platte kommt aus dem Kern. Die Oberflaeche trug sie
         # einmal selbst -- zwanzig Felder, die jemand von Hand mit den

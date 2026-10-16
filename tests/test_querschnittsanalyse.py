@@ -31,9 +31,8 @@ class TestBeschreibung(unittest.TestCase):
 
     def test_die_vorlage_kommt_aus_dem_kern(self):
         vorlage = api.katalog()["neue_querschnittsanalyse"]
-        self.assertEqual(QuerschnittsanalyseEintrag.aus_dict(
-            {**vorlage, "kennung": "a1"}).als_dict(), {**vorlage, "kennung": "a1",
-                                                       "name": "a1"})
+        neu = {**vorlage, "kennung": "a1", "name": "Balken"}
+        self.assertEqual(QuerschnittsanalyseEintrag.aus_dict(neu).als_dict(), neu)
         self.assertEqual(len(vorlage["flaechen"]), 1)
 
     def test_materialien_und_wahl(self):
@@ -51,16 +50,17 @@ class TestBeschreibung(unittest.TestCase):
     def test_unbekanntes_wird_gemeldet(self):
         roh = self.neu().als_dict()
         roh["stablinien"][0]["art"] = "stueckweise"
-        with self.assertRaisesRegex(ProjektFehler, "Stablinie"):
+        with self.assertRaisesRegex(ProjektFehler,
+                                    "Querschnitt 'Balken', stablinien 1: 'stueckweise' "
+                                    "gibt es als 'art' nicht"):
             QuerschnittsanalyseEintrag.aus_dict(roh)
         roh = self.neu().als_dict()
         roh["schubwaende"] = [{"von": "K1", "bis": "K2", "schnitte": 9}]
-        with self.assertRaisesRegex(ProjektFehler, "Schnitte"):
+        with self.assertRaisesRegex(ProjektFehler, "9 gibt es als 'schnitte' nicht"):
             QuerschnittsanalyseEintrag.aus_dict(roh)
-        # Im alten Format, mit eigenen Koordinaten: ein Punkt aus einer Zahl.
-        roh = {"kennung": "a1", "flaechen": [{"punkte": [[0, 0], [300.0], [300, 600]]}]}
+        # Ein Punkt beim Zeichnen in Python: zwei Zahlen.
         with self.assertRaisesRegex(ProjektFehler, "zwei Zahlen"):
-            QuerschnittsanalyseEintrag.aus_dict(roh)
+            self.neu().polygon([[0, 0], [300.0], [300, 600]])
 
     def test_namen_zaehlen_je_art(self):
         """
@@ -130,23 +130,12 @@ class TestKnoten(unittest.TestCase):
         d = dienst.bearbeite("geometrie", {"projekt": p.als_dict(), "kennung": "a1"}).daten
         self.assertEqual(d["hilfslinien"], [{"element": "Hilfslinie 1", "kennung": h.kennung}])
 
-    def test_altes_format_wird_umgewandelt(self):
+    def test_das_alte_format_mit_koordinaten_wird_genannt(self):
+        """Bis 2026-10-08 trugen die Elemente ihre Punkte selbst -- das liest niemand mehr."""
         alt = {"kennung": "a1", "name": "Alt",
-               "flaechen": [{"punkte": [[0, 0], [300, 0], [300, 600], [0, 600]],
-                             "material": "b1"}],
-               "staebe": [{"y": 150, "z": 300, "durchmesser": 20, "stahl": "s1"}],
-               "stablinien": [{"von": [50, 50], "bis": [250, 50], "art": "anzahl",
-                               "anzahl": 3, "durchmesser": 20, "stahl": "s1"}],
-               "schubwaende": [{"von": [50, 50], "bis": [50, 550], "stahl": "s1"}]}
-        a = QuerschnittsanalyseEintrag.aus_dict(alt)
-        self.assertEqual([f.knoten for f in a.flaechen], [["K1", "K2", "K3", "K4"]])
-        self.assertEqual(a.staebe[0].knoten, "K5")
-        self.assertEqual((a.stablinien[0].von, a.stablinien[0].bis), ("K6", "K7"))
-        # Die Wand beginnt, wo die Linie beginnt: derselbe Knoten.
-        self.assertEqual((a.schubwaende[0].kennung, a.schubwaende[0].von), ("L2", "K6"))
-        self.assertEqual(a.elemente().polygone[0]["punkte"][2], (300.0, 600.0))
-        # Und einmal umgewandelt, liest es sich wieder genau so.
-        self.assertEqual(QuerschnittsanalyseEintrag.aus_dict(a.als_dict()), a)
+               "flaechen": [{"punkte": [[0, 0], [300, 0], [300, 600]], "material": "b1"}]}
+        with self.assertRaisesRegex(ProjektFehler, "flaechen 1: ein Feld 'punkte' gibt es nicht"):
+            QuerschnittsanalyseEintrag.aus_dict(alt)
 
 
 if __name__ == "__main__":
@@ -561,55 +550,6 @@ class TestDiagramme(unittest.TestCase):
             "projekt": Projekt.beispiel().als_dict(), "kennung": "a1",
             "schnitt": {"fest": "T", "wert": 0}})
         self.assertEqual(antwort.status, 400)
-
-
-# ===========================================================================
-# Dateien im alten Format
-# ===========================================================================
-
-import json
-from pathlib import Path
-
-ALTFORMAT = Path(__file__).parent / "altformat" / "querschnittsanalysen.json"
-
-
-class TestAltesFormat(unittest.TestCase):
-    """
-    Analysen, wie sie bis zu den Knoten gespeichert wurden: Polygone mit
-    Ecken, Stäbe und Linien mit eigenen Koordinaten -- der Unterzug aus dem
-    Beispiel, Kastenträger und Stütze aus dem Projekt mit jedem Nachweis.
-    Eingefroren am 2026-10-08, mit den Erfüllungsgraden und Querschnittswerten
-    von damals. Wer eine solche Datei öffnet, muss dieselben Zahlen bekommen;
-    den ganzen Bericht prüft der Schnappschuss «altformat».
-    """
-
-    @classmethod
-    def setUpClass(cls):
-        cls.datei = json.loads(ALTFORMAT.read_text(encoding="utf-8"))
-
-    def test_rechnet_wie_damals(self):
-        antwort = dienst.bearbeite("rechnen", {"projekt": self.datei["projekt"]})
-        self.assertEqual(antwort.status, 200)
-        gerechnet = {f'{u["raum"]} | {u["fall"]}': u["erfuellungsgrad"]
-                     for u in antwort.daten["urteile"]
-                     if u["raum"].startswith("querschnittsanalyse.")}
-        self.assertEqual(gerechnet, self.datei["erfuellungsgrade"])
-
-    def test_zeichnet_wie_damals(self):
-        p = Projekt.aus_dict(self.datei["projekt"])
-        for a in p.querschnittsanalysen:
-            g = api.geometrie(a, p)
-            with self.subTest(analyse=a.name):
-                self.assertTrue(g["gueltig"], g["meldungen"])
-                for groesse, wert in self.datei["brutto"][a.kennung].items():
-                    self.assertAlmostEqual(g["brutto"][groesse], wert, delta=1e-3)
-
-    def test_oeffnen_ist_beim_zweiten_mal_dasselbe(self):
-        """Was das Öffnen liefert, öffnet sich wieder zu genau demselben."""
-        einmal = dienst.bearbeite("pruefen", {"projekt": self.datei["projekt"]})
-        self.assertEqual(einmal.status, 200)
-        zweimal = dienst.bearbeite("pruefen", {"projekt": einmal.daten["projekt"]})
-        self.assertEqual(zweimal.daten["projekt"], einmal.daten["projekt"])
 
 
 # ===========================================================================

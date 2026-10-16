@@ -67,7 +67,7 @@ from opencivil.projekt.eintraege import (
 from opencivil.projekt.balkensystem import BalkensystemEintrag, StabquerschnittEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.geotechnik.grundbruch import Fundament, Gleiten, Grundbruch, Kombination
-from opencivil.projekt.lesen import ProjektFehler, schalter_aus
+from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.nachweis.qa_gebrauch import (
@@ -706,30 +706,26 @@ def _lagennachweise(eintrag: QuerschnittEintrag, querschnitt: Plattenquerschnitt
         return
     kennung_x = f"{eintrag.kennung}.x"
 
-    # Die vier Schalter durch denselben Leser wie beim Einlesen. Wer eine
-    # alte Beschreibung im Speicher haelt, traegt dort noch eine Liste -- und
-    # `[False, False, False, False]` ist als Wahrheit *wahr*. Der Nachweis
-    # stuende dann eingeschaltet da, obwohl jeder einzelne Haken aus ist.
     sproede = SproedesVersagen(querschnitt, richtung, lagen, nachweis)
-    sproede.still = not schalter_aus(eintrag.sproede)
+    sproede.still = not eintrag.sproede
     aufbau.eintragen(teil, "sproede", kennung_x, sproede)
 
     biegung = ZwaengungBiegung(
         querschnitt, richtung, lagen,
         anforderung=eintrag.rissanforderung,
         kriechzahl=eintrag.zwaengung_biegung_kriechzahl)
-    biegung.still = not schalter_aus(eintrag.zwaengung_biegung)
+    biegung.still = not eintrag.zwaengung_biegung
     aufbau.eintragen(teil, "zwaengung_biegung", kennung_x, biegung)
 
     zwang = Rissnormalkraft(
         querschnitt, richtung,
         anforderung=eintrag.rissanforderung,
         begrenzt=eintrag.zwaengung_begrenzt)
-    zwang.still = not schalter_aus(eintrag.zwaengung)
+    zwang.still = not eintrag.zwaengung
     aufbau.eintragen(teil, "rissnormalkraft", kennung_x, zwang)
 
     duktilitaet = Duktilitaet(querschnitt, lagen, grenze=eintrag.x_d_max)
-    duktilitaet.still = not schalter_aus(eintrag.duktilitaet)
+    duktilitaet.still = not eintrag.duktilitaet
     aufbau.eintragen(teil, "duktilitaet", eintrag.kennung, duktilitaet)
 
 

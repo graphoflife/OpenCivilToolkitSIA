@@ -16,10 +16,6 @@ und Ende. Wer einen Knoten verschiebt, verschiebt alles, was an ihm haengt.
 Jedes Element hat eine Kennung, die nie wiederkommt (:mod:`opencivil.projekt.netz`):
 K fuer Knoten, F fuer Flaechen, S fuer Staebe, L fuer alle Linien.
 
-Bis 2026-10-08 trugen die Elemente ihre Koordinaten selbst. Eine solche Datei
-wird beim Oeffnen umgewandelt: gleiche Koordinaten werden ein Knoten,
-Reihenfolge und Namen bleiben -- und damit jede Zahl im Bericht.
-
 KOORDINATEN UND EINHEITEN:
 y nach rechts, z nach oben, alles in Millimetern -- so, wie gezeichnet und
 eingetippt wird. Schnittgroessen in kN und kNm. Umgerechnet wird beim Bauen.
@@ -38,8 +34,8 @@ der Platte (:meth:`QuerschnittEintrag.masse_pruefen`).
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX
 from opencivil.nachweis.rechenwahl import FASERARTEN, FASERSPANNUNGSARTEN, VERFORMUNGSARTEN
@@ -51,13 +47,14 @@ from opencivil.projekt.eintraege import (
     BETONGESETZE, HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, WERKSTOFFSAETZE, Beschreibung,
     Gebrauchsliste, KnickEintrag, RechenwahlEintrag, SpannungsfallEintrag, eindeutig,
 )
-from opencivil.projekt.lesen import (
-    ProjektFehler, kriechzahl_aus, pflichtfeld, rissanforderung_aus, zahl,
-)
+from opencivil.projekt.lesen import RISSANFORDERUNGEN, ProjektFehler, einer_von, nicht_negativ
 from opencivil.projekt.netz import Netz, naechste_kennung
 
 #: Schnitte eines Buegels durch eine Schubwand: so viele Schenkel kreuzen sie.
 SCHNITTE = range(1, 9)
+
+#: Die Zugseiten eines gezeichneten Querschnitts.
+ZUGSEITEN = tuple(z.value for z in Zugseite)
 
 
 #: Ein Punkt in mm -- oder die Kennung eines Knotens, der dort liegt.
@@ -65,23 +62,13 @@ Ort = Union[str, Sequence[float]]
 
 
 def _punkt(roh: Any, wo: str) -> List[float]:
-    """Ein Punkt ``[y, z]`` aus der Datei -- zwei Zahlen, sonst ein Satz, was fehlt."""
+    """Ein Punkt ``[y, z]`` -- zwei Zahlen, sonst ein Satz, was fehlt."""
     try:
         y, z = roh
         return [float(y), float(z)]
     except (TypeError, ValueError):
         raise ProjektFehler(f"{wo}: ein Punkt muss aus zwei Zahlen bestehen, "
                             f"nicht {roh!r}.") from None
-
-
-def _verweis(d: Mapping[str, Any], feld: str) -> str:
-    """Die Kennung eines Knotens -- leer, wenn keine dasteht."""
-    return str(d.get(feld) or "")
-
-
-def _hat_koordinaten(d: Mapping[str, Any], *felder: str) -> bool:
-    """Ein Element im alten Format: an der Stelle eines Verweises steht ein Punkt."""
-    return any(isinstance(d.get(f), (list, tuple)) for f in felder)
 
 
 # ===========================================================================
@@ -96,11 +83,6 @@ class KnotenEintrag(Beschreibung):
     kennung: str = ""
     y: float = 0.0
     z: float = 0.0
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "KnotenEintrag":
-        return cls(kennung=str(d.get("kennung") or cls.kennung),
-                   y=zahl(d, "y", cls.y), z=zahl(d, "z", cls.z))
 
 
 @dataclass
@@ -118,12 +100,6 @@ class FlaecheEintrag(Beschreibung):
     def ist_aussparung(self) -> bool:
         return not self.material
 
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "FlaecheEintrag":
-        return cls(kennung=str(d.get("kennung") or cls.kennung),
-                   knoten=[str(k) for k in (d.get("knoten") or [])],
-                   material=str(d.get("material") or cls.material))
-
 
 @dataclass
 class StabEintrag(Beschreibung):
@@ -133,13 +109,6 @@ class StabEintrag(Beschreibung):
     knoten: str = ""
     durchmesser: float = 16.0
     stahl: str = ""
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "StabEintrag":
-        return cls(kennung=str(d.get("kennung") or cls.kennung),
-                   knoten=_verweis(d, "knoten"),
-                   durchmesser=zahl(d, "durchmesser", cls.durchmesser),
-                   stahl=str(d.get("stahl") or cls.stahl))
 
 
 @dataclass
@@ -156,7 +125,7 @@ class StablinieEintrag(Beschreibung):
     bis: str = ""
     """Anfang und Ende als Knoten."""
 
-    art: str = Linienart.TEILUNG.value
+    art: str = einer_von((a.value for a in Linienart), Linienart.TEILUNG.value)
     durchmesser: float = 16.0
     """Bei Anzahl und Teilung der Stabdurchmesser in mm."""
 
@@ -170,26 +139,6 @@ class StablinieEintrag(Beschreibung):
     starteisen: bool = True
     endeisen: bool = True
     stahl: str = ""
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "StablinieEintrag":
-        art = str(d.get("art") or cls.art)
-        if art not in {a.value for a in Linienart}:
-            raise ProjektFehler(
-                f"Unbekannte Art einer Stablinie '{art}'. Möglich sind: "
-                f"{', '.join(a.value for a in Linienart)}.")
-        return cls(
-            kennung=str(d.get("kennung") or cls.kennung),
-            von=_verweis(d, "von"), bis=_verweis(d, "bis"),
-            art=art,
-            durchmesser=zahl(d, "durchmesser", cls.durchmesser),
-            flaeche=zahl(d, "flaeche", cls.flaeche),
-            anzahl=zahl(d, "anzahl", cls.anzahl),
-            teilung=zahl(d, "teilung", cls.teilung),
-            starteisen=bool(d.get("starteisen", cls.starteisen)),
-            endeisen=bool(d.get("endeisen", cls.endeisen)),
-            stahl=str(d.get("stahl") or cls.stahl),
-        )
 
 
 @dataclass
@@ -216,27 +165,10 @@ class SchubwandEintrag(Beschreibung):
     teilung: float = 150.0
     """Buegelteilung in Laengsrichtung in mm."""
 
-    schnitte: int = 2
+    schnitte: int = einer_von(SCHNITTE, 2)
     """Wie viele Buegelschenkel die Wand kreuzen, 1 bis 8."""
 
     stahl: str = ""
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "SchubwandEintrag":
-        schnitte = int(zahl(d, "schnitte", cls.schnitte))
-        if schnitte not in SCHNITTE:
-            raise ProjektFehler(
-                f"Eine Schubwand hat {schnitte} Schnitte. Möglich sind "
-                f"{SCHNITTE.start} bis {SCHNITTE.stop - 1}.")
-        return cls(
-            kennung=str(d.get("kennung") or cls.kennung),
-            von=_verweis(d, "von"), bis=_verweis(d, "bis"),
-            dicke=zahl(d, "dicke", cls.dicke),
-            durchmesser=zahl(d, "durchmesser", cls.durchmesser),
-            teilung=zahl(d, "teilung", cls.teilung),
-            schnitte=schnitte,
-            stahl=str(d.get("stahl") or cls.stahl),
-        )
 
 
 @dataclass
@@ -250,11 +182,6 @@ class HilfslinieEintrag(Beschreibung):
     kennung: str = ""
     von: str = ""
     bis: str = ""
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "HilfslinieEintrag":
-        return cls(kennung=str(d.get("kennung") or cls.kennung),
-                   von=_verweis(d, "von"), bis=_verweis(d, "bis"))
 
 
 @dataclass
@@ -270,19 +197,6 @@ class QALastfallEintrag(Beschreibung):
     T_Ed: float = 0.0
     aktiv: bool = True
 
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "QALastfallEintrag":
-        return cls(
-            name=pflichtfeld(d, "name", "Ein Lastfall"),
-            N_Ed=zahl(d, "N_Ed", cls.N_Ed),
-            M_y_Ed=zahl(d, "M_y_Ed", cls.M_y_Ed),
-            M_z_Ed=zahl(d, "M_z_Ed", cls.M_z_Ed),
-            V_y_Ed=zahl(d, "V_y_Ed", cls.V_y_Ed),
-            V_z_Ed=zahl(d, "V_z_Ed", cls.V_z_Ed),
-            T_Ed=zahl(d, "T_Ed", cls.T_Ed),
-            aktiv=bool(d.get("aktiv", cls.aktiv)),
-        )
-
 
 @dataclass
 class QAGebrauchsfallEintrag(Beschreibung):
@@ -297,17 +211,6 @@ class QAGebrauchsfallEintrag(Beschreibung):
     M_y_Ed: float = 0.0
     M_z_Ed: float = 0.0
     aktiv: bool = True
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any], wort: str = "häufige") -> "QAGebrauchsfallEintrag":
-        """``wort`` nennt die Liste in der Meldung -- «häufige» oder «quasi-ständige»."""
-        return cls(
-            name=pflichtfeld(d, "name", f"Ein {wort}r Lastfall"),
-            N_Ed=zahl(d, "N_Ed", cls.N_Ed),
-            M_y_Ed=zahl(d, "M_y_Ed", cls.M_y_Ed),
-            M_z_Ed=zahl(d, "M_z_Ed", cls.M_z_Ed),
-            aktiv=bool(d.get("aktiv", cls.aktiv)),
-        )
 
 
 @dataclass
@@ -334,18 +237,7 @@ class QAKnickEintrag(KnickEintrag):
     Moment 1. Ordnung zieht (:class:`~opencivil.querschnitt.schnittanalyse.Zugseite`).
     """
 
-    richtung: str = Zugseite.UNTEN.value
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "QAKnickEintrag":
-        platte = KnickEintrag.aus_dict(d)
-        richtung = str(d.get("richtung") or cls.richtung)
-        moeglich = [z.value for z in Zugseite]
-        if richtung not in moeglich:
-            raise ProjektFehler(
-                f"Knicknachweis '{platte.name}': die Zugseite «{richtung}» gibt es nicht. "
-                f"Möglich sind: {', '.join(moeglich)}.")
-        return cls(**platte.als_dict(), richtung=richtung)
+    richtung: str = einer_von(ZUGSEITEN, Zugseite.UNTEN.value)
 
 
 @dataclass
@@ -360,21 +252,8 @@ class WerkstoffwahlEintrag(Beschreibung):
     """
 
     material: str
-    satz: str = WERKSTOFFSAETZE[0]
-    betongesetz: str = BETONGESETZE[0]
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "WerkstoffwahlEintrag":
-        satz = str(d.get("satz") or cls.satz)
-        gesetz = str(d.get("betongesetz") or cls.betongesetz)
-        if satz not in WERKSTOFFSAETZE:
-            raise ProjektFehler(f"Unbekannte Rechenwerte '{satz}'. Möglich sind: "
-                                f"{', '.join(WERKSTOFFSAETZE)}.")
-        if gesetz not in BETONGESETZE:
-            raise ProjektFehler(f"Unbekanntes Betongesetz '{gesetz}'. Möglich sind: "
-                                f"{', '.join(BETONGESETZE)}.")
-        return cls(material=pflichtfeld(d, "material", "Eine Werkstoffwahl"),
-                   satz=satz, betongesetz=gesetz)
+    satz: str = einer_von(WERKSTOFFSAETZE, WERKSTOFFSAETZE[0])
+    betongesetz: str = einer_von(BETONGESETZE, BETONGESETZE[0])
 
 
 @dataclass
@@ -385,17 +264,7 @@ class QASpannungsfallEintrag(SpannungsfallEintrag):
     die ein positives Moment zieht (:class:`~opencivil.querschnitt.schnittanalyse.Zugseite`).
     """
 
-    richtung: str = Zugseite.UNTEN.value
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any], **_: Any) -> "QASpannungsfallEintrag":
-        eintrag = super().aus_dict(d)
-        moeglich = [z.value for z in Zugseite]
-        if eintrag.richtung not in moeglich:
-            raise ProjektFehler(
-                f"Spannung-Dehnung-Analyse '{eintrag.name}': die Zugseite "
-                f"«{eintrag.richtung}» gibt es nicht. Möglich sind: {', '.join(moeglich)}.")
-        return eintrag
+    richtung: str = einer_von(ZUGSEITEN, Zugseite.UNTEN.value)
 
 
 # ===========================================================================
@@ -448,6 +317,8 @@ class Elemente:
 class QuerschnittsanalyseEintrag(Beschreibung):
     """Ein gezeichneter Querschnitt mit Bewehrung, Schubwaenden und Lastfaellen."""
 
+    BEZEICHNUNG = "Querschnitt"
+
     kennung: str
     name: str
     knoten: List[KnotenEintrag] = field(default_factory=list)
@@ -484,7 +355,7 @@ class QuerschnittsanalyseEintrag(Beschreibung):
     x_d_max: float = X_D_MAX
     sproede: bool = False
 
-    rissanforderung: str = "normal"
+    rissanforderung: str = einer_von(RISSANFORDERUNGEN, "normal")
     """Anforderung an die Rissbildung -- ``normal``, ``erhoeht`` oder ``hoch``, wie bei der Platte."""
 
     zwaengung: bool = False
@@ -496,7 +367,7 @@ class QuerschnittsanalyseEintrag(Beschreibung):
     zwaengung_biegung: bool = False
     """Ob die Zwaengung auf Biegung nachgewiesen wird -- je Richtung."""
 
-    zwaengung_biegung_kriechzahl: float = 0.0
+    zwaengung_biegung_kriechzahl: float = nicht_negativ(0.0)
     """Die Kriechzahl φ der Zwaengung auf Biegung: der Beton mit ``E_cm/(1+φ)``."""
 
     quasistaendig: QAGebrauchsliste = field(
@@ -741,10 +612,10 @@ class QuerschnittsanalyseEintrag(Beschreibung):
                   laenge: float = 3.0, knicklaenge: Optional[float] = None,
                   richtung: str = Zugseite.UNTEN.value) -> QAKnickEintrag:
         """Ein Knicknachweis -- N_Ed in kN (Druck negativ), Längen in m, die Zugseite."""
-        eintrag = QAKnickEintrag.aus_dict(QAKnickEintrag(
-            name=name, N_Ed=N_Ed, M_Ed_1=M_Ed_1, laenge=laenge,
-            knicklaenge=laenge if knicklaenge is None else knicklaenge,
-            richtung=richtung).als_dict())
+        eintrag = QAKnickEintrag.aus_dict(
+            {"name": name, "N_Ed": N_Ed, "M_Ed_1": M_Ed_1, "laenge": laenge,
+             "knicklaenge": laenge if knicklaenge is None else knicklaenge,
+             "richtung": richtung}, f"Querschnitt '{self.name}', knickfaelle")
         self.knickfaelle.append(eintrag)
         return eintrag
 
@@ -756,7 +627,7 @@ class QuerschnittsanalyseEintrag(Beschreibung):
         Gelesen wie aus einer Datei, also mit denselben Pruefungen.
         """
         eintrag = QASpannungsfallEintrag.aus_dict(
-            QASpannungsfallEintrag(name=name, art=art, **felder).als_dict())
+            {"name": name, "art": art, **felder}, f"Querschnitt '{self.name}', spannungsfaelle")
         self.spannungsfaelle.append(eintrag)
         return eintrag
 
@@ -773,82 +644,3 @@ class QuerschnittsanalyseEintrag(Beschreibung):
                 lastfaelle=[QALastfallEintrag(name="Tragsicherheit 1", M_y_Ed=100.0)])
         a.vorlage_einsetzen("rechteck", beton=beton, stahl=stahl, schubwaende=False)
         return a
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "QuerschnittsanalyseEintrag":
-        kennung = pflichtfeld(d, "kennung", "Eine Querschnittsanalyse")
-        a = cls(
-            kennung=kennung,
-            name=str(d.get("name") or kennung),
-            knoten=[KnotenEintrag.aus_dict(x) for x in (d.get("knoten") or [])],
-            werkstoffwahl=[WerkstoffwahlEintrag.aus_dict(x)
-                           for x in (d.get("werkstoffwahl") or [])],
-            lastfaelle=[QALastfallEintrag.aus_dict(x) for x in (d.get("lastfaelle") or [])],
-            einachsig=bool(d.get("einachsig", cls.einachsig)),
-            alpha_min=int(zahl(d, "alpha_min", cls.alpha_min)),
-            alpha_max=int(zahl(d, "alpha_max", cls.alpha_max)),
-            k_c=zahl(d, "k_c", cls.k_c),
-            laengszugkraft=bool(d.get("laengszugkraft", cls.laengszugkraft)),
-            duktilitaet=bool(d.get("duktilitaet", cls.duktilitaet)),
-            x_d_max=zahl(d, "x_d_max", cls.x_d_max),
-            sproede=bool(d.get("sproede", cls.sproede)),
-            rissanforderung=rissanforderung_aus(d.get("rissanforderung"),
-                                                cls.rissanforderung),
-            zwaengung=bool(d.get("zwaengung", cls.zwaengung)),
-            zwaengung_begrenzt=bool(d.get("zwaengung_begrenzt", cls.zwaengung_begrenzt)),
-            zwaengung_biegung=bool(d.get("zwaengung_biegung", cls.zwaengung_biegung)),
-            zwaengung_biegung_kriechzahl=kriechzahl_aus(
-                d, "zwaengung_biegung_kriechzahl", alt=cls.zwaengung_biegung_kriechzahl,
-                wo=f"Querschnitt '{d.get('name') or kennung}', Zwängung auf Biegung"),
-            quasistaendig=QAGebrauchsliste.aus_dict(
-                d.get("quasistaendig") or {}, wort="quasi-ständige",
-                vorgabe=QUASISTAENDIG_ANTEIL),
-            haeufig=QAGebrauchsliste.aus_dict(
-                d.get("haeufig") or {}, wort="häufige", vorgabe=HAEUFIG_ANTEIL),
-            knickfaelle=[QAKnickEintrag.aus_dict(x) for x in (d.get("knickfaelle") or [])],
-            knicken_wahl_verformung=RechenwahlEintrag.aus_dict(
-                d.get("knicken_wahl_verformung"), vorgabe=RechenwahlEintrag.knicken_verformung(),
-                wo=f"Querschnitt '{kennung}', Knicken, Verformung", arten=VERFORMUNGSARTEN),
-            knicken_wahl_widerstand=RechenwahlEintrag.aus_dict(
-                d.get("knicken_wahl_widerstand"), vorgabe=RechenwahlEintrag.knicken_widerstand(),
-                wo=f"Querschnitt '{kennung}', Knicken, Widerstand", arten=FASERARTEN),
-            spannungsfaelle=[QASpannungsfallEintrag.aus_dict(x)
-                             for x in (d.get("spannungsfaelle") or [])],
-            beschreibung=str(d.get("beschreibung") or cls.beschreibung),
-        )
-        a._elemente_lesen(d)
-        return a
-
-    def _elemente_lesen(self, d: Mapping[str, Any]) -> None:
-        """
-        Die Elemente aus der Datei -- jedes im heutigen Format mit Verweisen,
-        oder im alten mit eigenen Koordinaten. Ein altes wird ueber den
-        Baukasten angelegt, wie es heute gezeichnet wuerde: seine Punkte
-        werden Knoten, gleiche Koordinaten derselbe. Die Reihenfolge bleibt,
-        und mit ihr jeder Name im Bericht.
-        """
-        for roh in d.get("flaechen") or []:
-            if "punkte" in roh:
-                self.polygon([_punkt(p, "Ein Polygon") for p in roh.get("punkte") or []],
-                             material=str(roh.get("material") or ""))
-            else:
-                self.flaechen.append(FlaecheEintrag.aus_dict(roh))
-        for roh in d.get("staebe") or []:
-            if "knoten" not in roh and ("y" in roh or "z" in roh):
-                gelesen = StabEintrag.aus_dict(roh)
-                self.stab(zahl(roh, "y", 0.0), zahl(roh, "z", 0.0),
-                          durchmesser=gelesen.durchmesser, stahl=gelesen.stahl)
-            else:
-                self.staebe.append(StabEintrag.aus_dict(roh))
-        for liste, klasse, anlegen, wo in (
-                ("stablinien", StablinieEintrag, self.stablinie, "Eine Stablinie"),
-                ("schubwaende", SchubwandEintrag, self.schubwand, "Eine Schubwand"),
-                ("hilfslinien", HilfslinieEintrag, self.hilfslinie, "Eine Hilfslinie")):
-            for roh in d.get(liste) or []:
-                if not _hat_koordinaten(roh, "von", "bis"):
-                    getattr(self, liste).append(klasse.aus_dict(roh))
-                    continue
-                felder = asdict(klasse.aus_dict({**roh, "von": "", "bis": ""}))
-                for weg in ("kennung", "von", "bis"):
-                    felder.pop(weg)
-                anlegen(_punkt(roh.get("von"), wo), _punkt(roh.get("bis"), wo), **felder)

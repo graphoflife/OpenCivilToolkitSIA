@@ -375,13 +375,11 @@ class TestGegenDieHandrechnung(unittest.TestCase):
     def test_die_handrechnung_gibt_es_in_der_analyse_nicht(self):
         """
         Seit 2026-10-12 rechnet eine Analyse ohne Handrechnung: die Linie
-        rechnet N Ebene fuer Ebene genau. Eine alte Datei liest sich als
-        0.85·x-Vereinfachung.
+        rechnet N Ebene fuer Ebene genau. Eine Datei, die sie noch waehlt,
+        nennt die Wahl -- umgedeutet wird sie nicht mehr.
         """
-        self.assertEqual(SpannungsfallEintrag.aus_dict(
-            {"name": "x", "rechenart": "handrechnung"}).rechenart, "block")
-        self.assertEqual(SpannungsfallEintrag.aus_dict(
-            {"name": "x", "betongesetz": "handrechnung"}).rechenart, "block")
+        with self.assertRaisesRegex(ProjektFehler, "'handrechnung' gibt es als 'rechenart' nicht"):
+            SpannungsfallEintrag.aus_dict({"name": "x", "rechenart": "handrechnung"})
 
 
 class TestEndeIstTragwiderstand(unittest.TestCase):
@@ -502,24 +500,16 @@ class TestWahl(unittest.TestCase):
         self.assertTrue(bild.konvergiert)
         self.assertAlmostEqual(max(s.sigma for s in bild.stahl) / 1e6, 114.7, delta=0.1)
 
-    def test_eine_alte_datei_rechnet_wie_damals(self):
-        """
-        Bis 2026-10-09 hiess eine fehlende oder leere Kriechzahl «die der
-        Platte», und die Rechenart stand als ``betongesetz`` da. So wird eine
-        alte Datei gelesen -- und rechnet wie damals.
-        """
+    def test_ohne_kriechzahl_gilt_die_vorgabe(self):
+        """Eine Kriechzahl der Platte, die einspringt, gibt es seit 2026-10-09 nicht mehr."""
         roh = Projekt.beispiel().als_dict()
-        platte = roh["querschnitte"][0]
-        platte["kriechzahl"] = 1.7
-        platte["spannungsfaelle"] = [
+        roh["querschnitte"][0]["spannungsfaelle"] = [
             {"name": "ohne", "art": "moment_kruemmung"},
-            {"name": "leer", "art": "moment_kruemmung", "kriechzahl": None,
-             "betongesetz": "block"},
             {"name": "eigen", "art": "moment_kruemmung", "kriechzahl": 0.5},
         ]
         faelle = Projekt.aus_dict(roh).querschnitte[0].spannungsfaelle
-        self.assertEqual([f.kriechzahl for f in faelle], [1.7, 1.7, 0.5])
-        self.assertEqual([f.rechenart for f in faelle], ["parabel", "block", "parabel"])
+        self.assertEqual([f.kriechzahl for f in faelle], [0.0, 0.5])
+        self.assertEqual([f.rechenart for f in faelle], ["parabel", "parabel"])
 
     def test_was_es_nicht_gibt_meldet_sich(self):
         for feld, wert in (("art", "kreis"), ("werkstoffsatz", "mittel"),
@@ -531,9 +521,10 @@ class TestWahl(unittest.TestCase):
         with self.assertRaises(ProjektFehler):
             Projekt.beispiel().querschnitte[0].spannungsfall("x", rechenart="dreieck")
 
-    def test_eine_leere_kriechzahl_ist_null(self):
-        """Ohne alte Platte dahinter heisst leer die Vorgabe, 0."""
-        self.assertEqual(SpannungsfallEintrag.aus_dict({"name": "x", "kriechzahl": ""}).kriechzahl, 0.0)
+    def test_eine_leere_kriechzahl_ist_keine(self):
+        """Ein leerer Text ist keine Zahl -- die Maske schickt für ein geleertes Feld 0."""
+        with self.assertRaisesRegex(ProjektFehler, "'kriechzahl' muss eine Zahl sein"):
+            SpannungsfallEintrag.aus_dict({"name": "x", "kriechzahl": ""})
 
 
 class TestNormalkraftDehnung(unittest.TestCase):

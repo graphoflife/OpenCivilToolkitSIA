@@ -147,7 +147,8 @@ class TestBeschreibung(unittest.TestCase):
     def test_unbekannte_zugseite_wird_gemeldet(self):
         with self.assertRaises(ProjektFehler) as fehler:
             QASpannungsfallEintrag.aus_dict({"name": "x", "richtung": "x"})
-        self.assertIn("Zugseite", str(fehler.exception))
+        self.assertIn("'x' gibt es als 'richtung' nicht. Möglich sind: unten, oben, links, "
+                      "rechts", str(fehler.exception))
 
     def test_gleiche_namen_werden_gemeldet(self):
         p, kennung = rechteck()

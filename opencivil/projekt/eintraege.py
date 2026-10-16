@@ -3,9 +3,9 @@ opencivil/projekt/eintraege.py -- die Teile einer Projektbeschreibung.
 
 VERANTWORTUNG:
 Material, Bewehrungsposten und -lagen, Buegel, Lastfaelle -- jedes als
-Datenklasse, die sich als JSON speichern und wieder einlesen laesst. Dazu die
-Leser, mit denen ``aus_dict`` Zahlen, Pflichtfelder, Schalter und alte
-Dateiformate aufnimmt.
+Datenklasse, die sich als JSON speichern und wieder einlesen laesst. Gelesen
+und geprueft wird jeder Eintrag ueber seine Felder: was eines annehmen darf,
+steht an ihm (:mod:`opencivil.projekt.lesen`).
 
 Die Platte, die diese Teile zusammenhaelt, steht in
 :mod:`opencivil.projekt.platte`; das ganze Projekt in
@@ -23,14 +23,12 @@ from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import Baustoff
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.querschnitt.platte import (
-    ALPHA_MAX, ALPHA_MIN, Bewehrungsposten, Querkraftbewehrung,
+    ALPHA_MAX, ALPHA_MIN, Bewehrungsposten, Querkraftbewehrung, Richtung,
 )
-from opencivil.projekt.lesen import (
-    ProjektFehler, kriechzahl_aus, nur_x, pflichtfeld, sorten, vorgabe, zahl,
-)
+from opencivil.projekt.lesen import ProjektFehler, einer_von, lesen, nicht_negativ, ort, sorten
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
-    ERSATZ_ALTER_WAHL, FASERARTEN, RECHENARTEN, SPANNUNGSARTEN, Rechenart, Rechenwahl,
+    FASERARTEN, RECHENARTEN, SPANNUNGSARTEN, Rechenart, Rechenwahl,
 )
 from opencivil.nachweis.verformung import KRIECHZAHL as VERFORMUNG_KRIECHZAHL, ZUGSEITEN
 from opencivil.spannungsanalyse import Analyseart
@@ -69,12 +67,24 @@ class Beschreibung:
     Zahl. Von allen Fehlern der schlimmste -- und mit dieser Zeile gibt es ihn
     nicht.
 
-    Der Weg hinein bleibt je Klasse von Hand: dort stehen Vorgaben, alte
-    Dateiformate und Pruefungen, und das ist Arbeit und kein Spiegel.
+    Der Weg hinein ebenso: :func:`~opencivil.projekt.lesen.lesen` liest
+    jeden Eintrag aus seinen Feldern, streng, und prueft ihn mit
+    :func:`~opencivil.projekt.lesen.felder_pruefen` -- was ein Feld annehmen
+    darf, steht an ihm. Von Hand waren es 39 Leser, jeder mit eigenen
+    Vorgaben, Pruefungen und alten Formaten, und die Fassade ging an ihnen
+    vorbei: ein «festt» aus Python wurde still zur Feder (2026-10-16).
+
+    ``BEZEICHNUNG``, wo es sie gibt, nennt den Eintrag in Meldungen so wie
+    die Oberflaeche: «Platte 'Decke'».
     """
 
     def als_dict(self) -> dict:
         return asdict(self)
+
+    @classmethod
+    def aus_dict(cls, roh: Mapping[str, Any], wo: Optional[str] = None) -> Any:
+        """Ein Eintrag aus der Datei -- gelesen und geprueft, siehe :mod:`opencivil.projekt.lesen`."""
+        return lesen(cls, roh, wo or ort(cls, roh))
 
 
 #: Womit die Namen eigener Materialien beginnen: BE1, BE2 ... beim Beton,
@@ -90,9 +100,10 @@ class MaterialEintrag(Beschreibung):
     Vorlage.
     """
 
+    BEZEICHNUNG = "Material"
+
     kennung: str
-    art: str
-    """``beton`` oder ``betonstahl``."""
+    art: str = einer_von(("beton", "betonstahl"))
 
     sorte: str
     """Die Normsorte -- bei einem eigenen Material die Vorlage seiner Kennwerte."""
@@ -116,10 +127,7 @@ class MaterialEintrag(Beschreibung):
         return not self.eigenstaendig
 
     def pruefen(self) -> None:
-        if self.art not in ("beton", "betonstahl"):
-            raise ProjektFehler(
-                f"Unbekannte Materialart '{self.art}'. "
-                f"Möglich sind 'beton' und 'betonstahl'.")
+        """Sorte und Name -- die Materialart prueft ihr Feld."""
         if self.sorte not in sorten(self.art):
             raise ProjektFehler(
                 f"Unbekannte Sorte '{self.sorte}' für {self.art}. "
@@ -140,21 +148,6 @@ class MaterialEintrag(Beschreibung):
             raise ProjektFehler(
                 f"Ein eigenes Material darf nicht wie die Normsorte "
                 f"'{self.anzeigename}' heissen.")
-
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "MaterialEintrag":
-        kennung = pflichtfeld(d, "kennung", "Ein Material")
-        return cls(
-            kennung=kennung,
-            art=pflichtfeld(d, "art", f"Das Material '{kennung}'"),
-            sorte=str(d.get("sorte", "")),
-            name=str(d.get("name", cls.name)),
-            eigenstaendig=bool(d.get("eigenstaendig", cls.eigenstaendig)),
-            abweichungen={k: float(v) for k, v in (d.get("abweichungen") or {}).items()},
-            ueberschreibungen={
-                k: float(v) for k, v in (d.get("ueberschreibungen") or {}).items()},
-        )
 
 
 # ===========================================================================
@@ -179,23 +172,6 @@ class PostenEintrag(Beschreibung):
         if self.durchmesser <= 0:
             return False
         return bool(self.abstand and self.abstand > 0) or bool(self.anzahl and self.anzahl > 0)
-
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "PostenEintrag":
-        abstand, anzahl = d.get("abstand"), d.get("anzahl")
-        anzahl_wert = None if anzahl in (None, "") else float(anzahl)
-        abstand_wert = None if abstand in (None, "") else float(abstand)
-        # Steht keines von beiden da -- etwa bei einer noch leeren Zulage --,
-        # dann gilt die Teilung. Sonst stuende das Feld in der Oberflaeche auf
-        # 'Anzahl', was bei einer Platte nie der Regelfall ist.
-        if abstand_wert is None and anzahl_wert is None:
-            abstand_wert = cls.abstand
-        return cls(
-            durchmesser=zahl(d, "durchmesser", cls.durchmesser),
-            abstand=abstand_wert,
-            anzahl=anzahl_wert,
-        )
 
     def als_posten(self) -> Bewehrungsposten:
         return Bewehrungsposten(
@@ -229,19 +205,6 @@ class LageEintrag(Beschreibung):
         return self.grund.vorhanden or self.zulage.vorhanden
 
 
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "LageEintrag":
-        return cls(
-            stahl=str(d.get("stahl", cls.stahl)),
-            grund=PostenEintrag.aus_dict(d.get("grund") or vorgabe(cls, "grund").als_dict()),
-            zulage=PostenEintrag.aus_dict(d.get("zulage") or vorgabe(cls, "zulage").als_dict()),
-            # Alte Beschreibungen kennen das Feld nicht. Die unguenstige Lage
-            # ist die Vorgabe -- auf der Baustelle laesst sich nicht steuern,
-            # welche Kante fluchtet.
-            unguenstig=bool(d.get("unguenstig", cls.unguenstig)),
-        )
-
-
 @dataclass
 class ObergrenzeEintrag(Beschreibung):
     """
@@ -262,13 +225,6 @@ class ObergrenzeEintrag(Beschreibung):
         """Die Obergrenze in mm²/m -- unendlich, wenn keine gesetzt ist."""
         summe = self.grund.je_meter() + self.zulage.je_meter()
         return summe if summe > 0 else math.inf
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "ObergrenzeEintrag":
-        return cls(
-            grund=PostenEintrag.aus_dict(d.get("grund") or vorgabe(cls, "grund").als_dict()),
-            zulage=PostenEintrag.aus_dict(d.get("zulage") or vorgabe(cls, "zulage").als_dict()),
-        )
 
 
 @dataclass
@@ -304,30 +260,6 @@ class QuerkraftbewehrungEintrag(Beschreibung):
     def ueber_teilung_y(self) -> bool:
         """In y eine Teilung -- sonst eine Stabzahl. Wie in der Maske: es zaehlt, was dasteht."""
         return self.abstand_y is not None
-
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "QuerkraftbewehrungEintrag":
-        def wahl(name: str) -> Optional[float]:
-            wert = d.get(name)
-            return None if wert in (None, "") else float(wert)
-
-        abstand_x = wahl("abstand_x")
-        abstand_y, anzahl_y = wahl("abstand_y"), wahl("anzahl_y")
-        # Wie bei den Lagen: steht keines von beiden da, gilt die Teilung.
-        if abstand_y is None and anzahl_y is None:
-            abstand_y = cls.abstand_y
-        return cls(
-            durchmesser=zahl(d, "durchmesser", cls.durchmesser),
-            stahl=str(d.get("stahl", cls.stahl)),
-            # Nur was fehlt, bekommt die Vorgabe. Eine Null bleibt eine Null --
-            # pruefen() meldet sie; frueher wurde sie still zu 200 mm.
-            abstand_x=cls.abstand_x if abstand_x is None else abstand_x,
-            abstand_y=abstand_y,
-            anzahl_y=anzahl_y,
-            alpha_min=int(zahl(d, "alpha_min", float(cls.alpha_min))),
-            alpha_max=int(zahl(d, "alpha_max", float(cls.alpha_max))),
-        )
 
     def pruefen(self, wo: str) -> None:
         """Was nicht stimmen kann, soll als Satz beim Benutzer ankommen."""
@@ -396,18 +328,6 @@ class KnickEintrag(Beschreibung):
     geloeschte Zeile muesste man neu eintippen, um sie wieder anzusehen."""
 
 
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "KnickEintrag":
-        return cls(
-            name=pflichtfeld(d, "name", "Ein Knicknachweis"),
-            N_Ed=zahl(d, "N_Ed", cls.N_Ed),
-            M_Ed_1=zahl(d, "M_Ed_1", cls.M_Ed_1),
-            laenge=zahl(d, "laenge", cls.laenge),
-            knicklaenge=zahl(d, "knicklaenge", cls.knicklaenge),
-            aktiv=bool(d.get("aktiv", cls.aktiv)),
-        )
-
-
 @dataclass
 class VerformungsfallEintrag(Beschreibung):
     """
@@ -424,7 +344,7 @@ class VerformungsfallEintrag(Beschreibung):
     laenge: float = 5.0
     """Spannweite L in m -- der Grenzwert ist L/350."""
 
-    zugseite: str = "unten"
+    zugseite: str = einer_von(ZUGSEITEN, "unten")
     """``unten`` im Feld, ``oben`` am Kragarm -- welches rho gilt."""
 
     aktiv: bool = True
@@ -444,16 +364,6 @@ class VerformungsfallEintrag(Beschreibung):
                 f"{wo}, Verformungsfall '{self.name}': die Spannweite L muss "
                 f"grösser als null sein, angegeben ist {self.laenge:g} m.")
 
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "VerformungsfallEintrag":
-        return cls(
-            name=pflichtfeld(d, "name", "Ein Verformungsfall"),
-            w=zahl(d, "w", cls.w),
-            laenge=zahl(d, "laenge", cls.laenge),
-            zugseite=str(d.get("zugseite") or cls.zugseite),
-            aktiv=bool(d.get("aktiv", cls.aktiv)),
-        )
-
 
 @dataclass
 class VerformungEintrag(Beschreibung):
@@ -465,7 +375,7 @@ class VerformungEintrag(Beschreibung):
     einmal gerechnet (:mod:`opencivil.nachweis.verformung`).
     """
 
-    kriechzahl: float = VERFORMUNG_KRIECHZAHL
+    kriechzahl: float = nicht_negativ(VERFORMUNG_KRIECHZAHL)
     """phi im Vergroesserungsfaktor omega_w, Vorgabe 2."""
 
     faelle: List[VerformungsfallEintrag] = field(default_factory=list)
@@ -479,17 +389,11 @@ class VerformungEintrag(Beschreibung):
 
     def pruefen(self, bauteil: str) -> None:
         wo = f"Platte '{bauteil}'"
-        if self.kriechzahl < 0.0:
-            raise ProjektFehler(f"{wo}, Verformung: die Kriechzahl kann nicht negativ sein.")
         eindeutig(self.faelle, bauteil, "Verformungsfall")
         # Verschiedene Namen koennen dieselbe Wert-ID ergeben -- wie bei den
         # Gebrauchslisten.
         kennungen: Dict[str, str] = {}
         for f in self.faelle:
-            if f.zugseite not in ZUGSEITEN:
-                raise ProjektFehler(
-                    f"{wo}, Verformungsfall '{f.name}': unbekannte Zugseite "
-                    f"'{f.zugseite}'. Möglich sind: {', '.join(ZUGSEITEN)}.")
             frueher = kennungen.setdefault(kennung_aus(f.name), f.name)
             if frueher != f.name:
                 raise ProjektFehler(
@@ -497,16 +401,6 @@ class VerformungEintrag(Beschreibung):
                     f"unterscheiden sich nur in Satz- oder Leerzeichen. Im Bericht "
                     f"fielen sie auf denselben Eintrag -- bitte einen davon anders "
                     f"benennen.")
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any], *,
-                 kriechzahl_alt: float = VERFORMUNG_KRIECHZAHL) -> "VerformungEintrag":
-        """``kriechzahl_alt``: das phi, das bis 2026-10-16 an der Platte stand."""
-        return cls(
-            kriechzahl=kriechzahl_aus(d, "kriechzahl", alt=kriechzahl_alt,
-                                      wo="Verformung"),
-            faelle=[VerformungsfallEintrag.aus_dict(x) for x in (d.get("faelle") or [])],
-        )
 
 
 #: Anteil der Tragsicherheitseinwirkungen, der als haeufiger Lastfall gilt --
@@ -540,17 +434,13 @@ class SpannungsfallEintrag(Beschreibung):
 
     Womit gerechnet wird, waehlt jede Analyse fuer sich: die Kriechzahl, den
     Wertesatz und die Rechenart (:class:`~opencivil.nachweis.rechenwahl.Rechenwahl`).
-    In Dateien von vor 2026-10-09 fehlt die Kriechzahl oder steht leer --
-    sie hiess dort «die der Platte», und das bleibt sie beim Lesen
-    (``kriechzahl_alt``). Die Rechenart hiess dort ``betongesetz``.
     """
 
     name: str
-    art: str = "schnittgroessen"
-    """``schnittgroessen``, ``dehnungen``, ``moment_kruemmung`` oder
-    ``normalkraft_dehnung`` -- siehe :class:`~opencivil.spannungsanalyse.Analyseart`."""
+    art: str = einer_von((a.value for a in Analyseart), Analyseart.SCHNITTGROESSEN.value)
+    """Was gefragt wird -- siehe :class:`~opencivil.spannungsanalyse.Analyseart`."""
 
-    richtung: str = "x"
+    richtung: str = einer_von((r.value for r in Richtung), Richtung.X.value)
     """Welche Bewehrung zaehlt. Hier keine Wahl ``beide``: ein Bild zeigt
     einen Querschnitt, und der liegt in einer Richtung."""
 
@@ -564,50 +454,18 @@ class SpannungsfallEintrag(Beschreibung):
     eps_unten: float = 2.0
     """Randdehnungen in Promille -- nur fuer ``dehnungen``."""
 
-    kriechzahl: float = 0.0
+    kriechzahl: float = nicht_negativ(0.0)
     """Die Kriechzahl φ dieser Analyse."""
 
-    werkstoffsatz: str = WERKSTOFFSAETZE[0]
+    werkstoffsatz: str = einer_von(WERKSTOFFSAETZE, WERKSTOFFSAETZE[0])
     """``bemessung`` (f_cd, f_yd) oder ``charakteristisch`` (f_ck, f_yk)."""
 
-    rechenart: str = Rechenart.PARABEL.value
+    rechenart: str = einer_von((a.value for a in FASERARTEN), Rechenart.PARABEL.value)
     """``block`` oder ``parabel`` -- siehe
     :class:`~opencivil.nachweis.rechenwahl.Rechenart`. Die Handrechnung gibt
-    es hier nicht (:data:`~opencivil.nachweis.rechenwahl.FASERARTEN`); eine
-    Datei von vor 2026-10-12, die sie noch waehlt, liest sich als ``block``."""
+    es hier nicht (:data:`~opencivil.nachweis.rechenwahl.FASERARTEN`)."""
 
     aktiv: bool = True
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any], *,
-                 kriechzahl_alt: float = 0.0) -> "SpannungsfallEintrag":
-        """``kriechzahl_alt`` gilt, wo die Kriechzahl fehlt -- siehe Klasse."""
-        name = pflichtfeld(d, "name", "Eine Spannungsanalyse")
-        wo = f"Spannung-Dehnung-Analyse '{name}'"
-
-        def gewaehlt(feld: str, vorgabe: str, moeglich, roh: Any = None) -> str:
-            wert = str((roh if roh is not None else d.get(feld)) or vorgabe)
-            if wert not in moeglich:
-                raise ProjektFehler(f"{wo}: «{wert}» gibt es als {feld} nicht. "
-                                    f"Möglich sind: {', '.join(moeglich)}.")
-            return wert
-
-        return cls(
-            name=name,
-            art=gewaehlt("art", cls.art, tuple(a.value for a in Analyseart)),
-            richtung=str(d.get("richtung") or cls.richtung),
-            N_Ed=zahl(d, "N_Ed", cls.N_Ed),
-            M_Ed=zahl(d, "M_Ed", cls.M_Ed),
-            eps_oben=zahl(d, "eps_oben", cls.eps_oben),
-            eps_unten=zahl(d, "eps_unten", cls.eps_unten),
-            kriechzahl=kriechzahl_aus(d, "kriechzahl", alt=kriechzahl_alt, wo=wo),
-            werkstoffsatz=gewaehlt("werkstoffsatz", cls.werkstoffsatz, WERKSTOFFSAETZE),
-            rechenart=gewaehlt("rechenart", cls.rechenart,
-                               tuple(a.value for a in FASERARTEN),
-                               roh=_ersetzt(d.get("rechenart") or d.get("betongesetz"),
-                                            FASERARTEN)),
-            aktiv=bool(d.get("aktiv", cls.aktiv)),
-        )
 
 
 @dataclass
@@ -625,18 +483,6 @@ class GebrauchsfallEintrag(Beschreibung):
     N_Ed: float = 0.0
     aktiv: bool = True
     """Ob dieser Lastfall gerechnet wird. Ausgeschaltet bleibt er stehen."""
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any],
-                 wort: str = "häufige") -> "GebrauchsfallEintrag":
-        """``wort`` nennt die Liste in der Meldung -- «häufige» oder «quasi-ständige»."""
-        nur_x(d, f"Der {wort} Lastfall '{d.get('name')}'")
-        return cls(
-            name=pflichtfeld(d, "name", f"Ein {wort}r Lastfall"),
-            M_Ed=zahl(d, "M_Ed", cls.M_Ed),
-            N_Ed=zahl(d, "N_Ed", cls.N_Ed),
-            aktiv=bool(d.get("aktiv", cls.aktiv)),
-        )
 
 
 def eindeutig(faelle, platte: str, was: str, *, bauteil: str = "Platte") -> None:
@@ -671,15 +517,14 @@ class RechenwahlEintrag(Beschreibung):
     siehe :class:`~opencivil.nachweis.rechenwahl.Rechenwahl`.
 
     Jedes Kapitel hat seine eigene; die Kriechzahl des Vergroesserungsfaktors
-    gehoert dem Verformungsnachweis (:class:`VerformungEintrag`). In einer
-    Datei von vor 2026-10-09 fehlt die Wahl -- dann gilt, was damals fest
-    galt: die Rechenart und der Wertesatz des Kapitels (``vorgabe``) und das
-    phi, das damals an der Platte stand (``kriechzahl_alt``).
+    gehoert dem Verformungsnachweis (:class:`VerformungEintrag`). Welche
+    Rechenarten ein Kapitel anbietet, weiss das Kapitel -- es prueft sie
+    (:meth:`pruefen`); das Feld kennt nur, welche es ueberhaupt gibt.
     """
 
-    kriechzahl: float = 0.0
-    werkstoffsatz: str = WERKSTOFFSAETZE[0]
-    rechenart: str = Rechenart.HANDRECHNUNG.value
+    kriechzahl: float = nicht_negativ(0.0)
+    werkstoffsatz: str = einer_von(WERKSTOFFSAETZE, WERKSTOFFSAETZE[0])
+    rechenart: str = einer_von((a.value for a in Rechenart), Rechenart.HANDRECHNUNG.value)
 
     @classmethod
     def gebrauch(cls) -> "RechenwahlEintrag":
@@ -707,51 +552,11 @@ class RechenwahlEintrag(Beschreibung):
         return Rechenwahl.aus(self.kriechzahl, self.werkstoffsatz, self.rechenart)
 
     def pruefen(self, wo: str, arten=RECHENARTEN) -> None:
-        """Was es nicht gibt, meldet sich -- ``arten`` sagt, welche Rechenarten gelten."""
-        if self.kriechzahl < 0.0:
-            raise ProjektFehler(f"{wo}: die Kriechzahl kann nicht negativ sein.")
-        if self.werkstoffsatz not in WERKSTOFFSAETZE:
-            raise ProjektFehler(f"{wo}: «{self.werkstoffsatz}» gibt es als Werte nicht. "
-                                f"Möglich sind: {', '.join(WERKSTOFFSAETZE)}.")
+        """Ob das Kapitel diese Rechenart anbietet -- ``arten`` sagt, welche es gibt."""
         moeglich = [a.value for a in arten]
         if self.rechenart not in moeglich:
             raise ProjektFehler(f"{wo}: die Rechenart «{self.rechenart}» gibt es dort nicht. "
                                 f"Möglich sind: {', '.join(moeglich)}.")
-
-    @classmethod
-    def aus_dict(cls, d: Optional[Mapping[str, Any]], *,
-                 vorgabe: Optional["RechenwahlEintrag"] = None,
-                 kriechzahl_alt: Optional[float] = None,
-                 wo: str = "Rechenwahl", arten=RECHENARTEN) -> "RechenwahlEintrag":
-        """Fehlt ``d`` oder ein Feld darin, gilt ``vorgabe`` -- und fuer phi ``kriechzahl_alt``."""
-        vorgabe = vorgabe or cls()
-        d = d or {}
-        eintrag = cls(
-            kriechzahl=kriechzahl_aus(
-                d, "kriechzahl", wo=wo,
-                alt=vorgabe.kriechzahl if kriechzahl_alt is None else kriechzahl_alt),
-            werkstoffsatz=str(d.get("werkstoffsatz") or vorgabe.werkstoffsatz),
-            rechenart=_ersetzt(d.get("rechenart") or vorgabe.rechenart, arten),
-        )
-        eintrag.pruefen(wo, arten)
-        return eintrag
-
-
-def _ersetzt(rechenart: Any, arten) -> Any:
-    """
-    Die Rechenart, wie sie heute heisst: was eine alte Datei dort waehlt, wo
-    es die Wahl nicht mehr gibt, wird zu ihrem Ersatz -- und der, wo es auch
-    ihn nicht gibt, zu seinem
-    (:data:`~opencivil.nachweis.rechenwahl.ERSATZ_ALTER_WAHL`). Alles andere
-    bleibt -- auch Unbekanntes, das die Pruefung danach meldet.
-    """
-    moeglich = {a.value for a in arten}
-    while rechenart is not None and rechenart not in moeglich:
-        ersatz = ERSATZ_ALTER_WAHL.get(str(rechenart))
-        if ersatz is None:
-            break
-        rechenart = ersatz
-    return rechenart
 
 
 @dataclass
@@ -855,20 +660,6 @@ class Gebrauchsliste(Beschreibung):
                     f"Leerzeichen. Im Bericht fielen sie auf denselben Eintrag "
                     f"-- bitte einen davon anders benennen.")
 
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any], *, wort: str, vorgabe: float,
-                 kriechzahl_alt: Optional[float] = None) -> "Gebrauchsliste":
-        """``kriechzahl_alt``: das phi der Platte, fuer eine Datei ohne Wahl."""
-        return cls(
-            anteil=zahl(d, "anteil", vorgabe),
-            aus_tragsicherheit=bool(d.get("aus_tragsicherheit", cls.aus_tragsicherheit)),
-            faelle=[cls.FALL.aus_dict(x, wort) for x in (d.get("faelle") or [])],
-            wahl=RechenwahlEintrag.aus_dict(
-                d.get("wahl"), vorgabe=RechenwahlEintrag.gebrauch(),
-                kriechzahl_alt=kriechzahl_alt, arten=cls.ARTEN,
-                wo=f"Rechenwahl der {wort}n Lastfälle"),
-        )
-
 
 @dataclass
 class KombinationEintrag(Beschreibung):
@@ -880,21 +671,7 @@ class KombinationEintrag(Beschreibung):
     V_Ed: float = 0.0
     """Querkraft in kN/m -- für den Querkraftnachweis."""
 
-    art: str = Erfuellungsart.AUTOMATISCH.value
+    art: str = einer_von((a.value for a in Erfuellungsart), Erfuellungsart.AUTOMATISCH.value)
 
     aktiv: bool = True
     """Ob dieser Lastfall gerechnet wird. Ausgeschaltet bleibt er stehen."""
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "KombinationEintrag":
-        nur_x(d, f"Die Einwirkung '{d.get('name')}'")
-        return cls(
-            name=pflichtfeld(d, "name", "Eine Einwirkung"),
-            M_Ed=zahl(d, "M_Ed", cls.M_Ed),
-            N_Ed=zahl(d, "N_Ed", cls.N_Ed),
-            V_Ed=zahl(d, "V_Ed", cls.V_Ed),
-            art=str(d.get("art") or cls.art),
-            aktiv=bool(d.get("aktiv", cls.aktiv)),
-        )
-
-

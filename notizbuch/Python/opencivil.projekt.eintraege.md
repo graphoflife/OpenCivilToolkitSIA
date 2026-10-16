@@ -1,5 +1,5 @@
 ---
-erzeugt: 29a75bd7fe20
+erzeugt: d2cbbb164289
 art: modul
 tags: [modul]
 ---
@@ -10,9 +10,9 @@ tags: [modul]
 ## VERANTWORTUNG
 
 Material, Bewehrungsposten und -lagen, Buegel, Lastfaelle -- jedes als
-Datenklasse, die sich als JSON speichern und wieder einlesen laesst. Dazu die
-Leser, mit denen `aus_dict` Zahlen, Pflichtfelder, Schalter und alte
-Dateiformate aufnimmt.
+Datenklasse, die sich als JSON speichern und wieder einlesen laesst. Gelesen
+und geprueft wird jeder Eintrag ueber seine Felder: was eines annehmen darf,
+steht an ihm ([[opencivil.projekt.lesen]]).
 
 Die Platte, die diese Teile zusammenhaelt, steht in
 [[opencivil.projekt.platte]]; das ganze Projekt in
@@ -42,14 +42,30 @@ das Bauteil gaelte als unveraendert, und die Oberflaeche zeigte eine alte
 Zahl. Von allen Fehlern der schlimmste -- und mit dieser Zeile gibt es ihn
 nicht.
 
-Der Weg hinein bleibt je Klasse von Hand: dort stehen Vorgaben, alte
-Dateiformate und Pruefungen, und das ist Arbeit und kein Spiegel.
+Der Weg hinein ebenso: [[opencivil.projekt.lesen#lesen|lesen]] liest
+jeden Eintrag aus seinen Feldern, streng, und prueft ihn mit
+[[opencivil.projekt.lesen#felder_pruefen|felder_pruefen]] -- was ein Feld annehmen
+darf, steht an ihm. Von Hand waren es 39 Leser, jeder mit eigenen
+Vorgaben, Pruefungen und alten Formaten, und die Fassade ging an ihnen
+vorbei: ein «festt» aus Python wurde still zur Feder (2026-10-16).
+
+`BEZEICHNUNG`, wo es sie gibt, nennt den Eintrag in Meldungen so wie
+die Oberflaeche: «Platte 'Decke'».
 
 #### Beschreibung.als_dict
 
 ```python
 def als_dict(self) -> dict
 ```
+
+#### Beschreibung.aus_dict
+
+```python
+@classmethod
+def aus_dict(cls, roh: Mapping[str, Any], wo: Optional[str]=None) -> Any
+```
+
+Ein Eintrag aus der Datei -- gelesen und geprueft, siehe [[opencivil.projekt.lesen]].
 
 ### MaterialEintrag
 
@@ -62,8 +78,9 @@ Ein Baustoff, wie ihn die Oberflaeche beschreibt: eine Normsorte nach SIA,
 die bleibt, wie sie ist, oder ein eigenes Material mit einer Sorte als
 Vorlage.
 
+- `BEZEICHNUNG = 'Material'`
 - `kennung: str`
-- `art: str` – `beton` oder `betonstahl`.
+- `art: str = einer_von(('beton', 'betonstahl'))`
 - `sorte: str` – Die Normsorte -- bei einem eigenen Material die Vorlage seiner Kennwerte.
 - `name: str = ''`
 - `eigenstaendig: bool = False` – False = Normsorte, Kennwerte gesperrt, Name = Sorte -- nie aenderbar. True = eigenes Material, aenderbar, mit eigenem Namen (BE1, S1 ...).
@@ -90,12 +107,7 @@ def ist_normsorte(self) -> bool
 def pruefen(self) -> None
 ```
 
-#### MaterialEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'MaterialEintrag'
-```
+Sorte und Name -- die Materialart prueft ihr Feld.
 
 ### PostenEintrag
 
@@ -115,13 +127,6 @@ Grundbewehrung oder Zulage einer Lage.
 ```python
 @property
 def vorhanden(self) -> bool
-```
-
-#### PostenEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'PostenEintrag'
 ```
 
 #### PostenEintrag.als_posten
@@ -160,13 +165,6 @@ Eine der vier Lagen.
 def vorhanden(self) -> bool
 ```
 
-#### LageEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'LageEintrag'
-```
-
 ### ObergrenzeEintrag
 
 ```python
@@ -193,13 +191,6 @@ def je_meter(self) -> float
 ```
 
 Die Obergrenze in mm²/m -- unendlich, wenn keine gesetzt ist.
-
-#### ObergrenzeEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'ObergrenzeEintrag'
-```
 
 ### QuerkraftbewehrungEintrag
 
@@ -242,13 +233,6 @@ def ueber_teilung_y(self) -> bool
 
 In y eine Teilung -- sonst eine Stabzahl. Wie in der Maske: es zaehlt, was dasteht.
 
-#### QuerkraftbewehrungEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'QuerkraftbewehrungEintrag'
-```
-
 #### QuerkraftbewehrungEintrag.pruefen
 
 ```python
@@ -284,13 +268,6 @@ in y waere die Breite der Platte die Laenge.
 - `knicklaenge: float = 3.0` – Knicklaenge in m.
 - `aktiv: bool = True` – Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen -- eine geloeschte Zeile muesste man neu eintippen, um sie wieder anzusehen.
 
-#### KnickEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'KnickEintrag'
-```
-
 ### VerformungsfallEintrag
 
 ```python
@@ -306,7 +283,7 @@ Wie ein Knickfall nur in x-Richtung.
 - `name: str`
 - `w: float = 0.0` – Durchbiegung in mm, mit E_cm ermittelt -- ein Betrag.
 - `laenge: float = 5.0` – Spannweite L in m -- der Grenzwert ist L/350.
-- `zugseite: str = 'unten'` – `unten` im Feld, `oben` am Kragarm -- welches rho gilt.
+- `zugseite: str = einer_von(ZUGSEITEN, 'unten')` – `unten` im Feld, `oben` am Kragarm -- welches rho gilt.
 - `aktiv: bool = True` – Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen.
 
 #### VerformungsfallEintrag.zahlen_pruefen
@@ -317,13 +294,6 @@ def zahlen_pruefen(self, wo: str) -> None
 
 w und L -- erst beim Bauen gefragt, wie die Masse der Platte: eine
 abgelegte Platte mit L = 0 soll sich oeffnen und korrigieren lassen.
-
-#### VerformungsfallEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'VerformungsfallEintrag'
-```
 
 ### VerformungEintrag
 
@@ -338,7 +308,7 @@ Vergroesserungsfaktors und die Faelle.
 phi gilt fuer die Platte und nicht je Fall -- der Faktor wird je Seite
 einmal gerechnet ([[opencivil.nachweis.verformung]]).
 
-- `kriechzahl: float = VERFORMUNG_KRIECHZAHL` – phi im Vergroesserungsfaktor omega_w, Vorgabe 2.
+- `kriechzahl: float = nicht_negativ(VERFORMUNG_KRIECHZAHL)` – phi im Vergroesserungsfaktor omega_w, Vorgabe 2.
 - `faelle: List[VerformungsfallEintrag] = field(default_factory=list)`
 
 #### VerformungEintrag.fall
@@ -354,15 +324,6 @@ Einen Fall anfuegen -- w in mm, die Spannweite in m.
 ```python
 def pruefen(self, bauteil: str) -> None
 ```
-
-#### VerformungEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any], *, kriechzahl_alt: float=VERFORMUNG_KRIECHZAHL) -> 'VerformungEintrag'
-```
-
-`kriechzahl_alt`: das phi, das bis 2026-10-16 an der Platte stand.
 
 ### abgeleiteter_fallname
 
@@ -392,30 +353,18 @@ als Momenten-Kruemmungs- oder als Normalkraft-Dehnungs-Linie.
 
 Womit gerechnet wird, waehlt jede Analyse fuer sich: die Kriechzahl, den
 Wertesatz und die Rechenart ([[opencivil.nachweis.rechenwahl#Rechenwahl|Rechenwahl]]).
-In Dateien von vor 2026-10-09 fehlt die Kriechzahl oder steht leer --
-sie hiess dort «die der Platte», und das bleibt sie beim Lesen
-(`kriechzahl_alt`). Die Rechenart hiess dort `betongesetz`.
 
 - `name: str`
-- `art: str = 'schnittgroessen'` – `schnittgroessen`, `dehnungen`, `moment_kruemmung` oder `normalkraft_dehnung` -- siehe [[opencivil.spannungsanalyse#Analyseart|Analyseart]].
-- `richtung: str = 'x'` – Welche Bewehrung zaehlt. Hier keine Wahl `beide`: ein Bild zeigt einen Querschnitt, und der liegt in einer Richtung.
+- `art: str = einer_von((a.value for a in Analyseart), Analyseart.SCHNITTGROESSEN.v…` – Was gefragt wird -- siehe [[opencivil.spannungsanalyse#Analyseart|Analyseart]].
+- `richtung: str = einer_von((r.value for r in Richtung), Richtung.X.value)` – Welche Bewehrung zaehlt. Hier keine Wahl `beide`: ein Bild zeigt einen Querschnitt, und der liegt in einer Richtung.
 - `N_Ed: float = 0.0` – in kN, Zug positiv -- fuer `schnittgroessen` und `moment_kruemmung`.
 - `M_Ed: float = 0.0` – in kNm -- fuer `schnittgroessen` und `normalkraft_dehnung`.
 - `eps_oben: float = -1.0`
 - `eps_unten: float = 2.0` – Randdehnungen in Promille -- nur fuer `dehnungen`.
-- `kriechzahl: float = 0.0` – Die Kriechzahl φ dieser Analyse.
-- `werkstoffsatz: str = WERKSTOFFSAETZE[0]` – `bemessung` (f_cd, f_yd) oder `charakteristisch` (f_ck, f_yk).
-- `rechenart: str = Rechenart.PARABEL.value` – `block` oder `parabel` -- siehe [[opencivil.nachweis.rechenwahl#Rechenart|Rechenart]]. Die Handrechnung gibt es hier nicht ([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]); eine Datei von vor 2026-10-12, die sie noch waehlt, liest sich als `block`.
+- `kriechzahl: float = nicht_negativ(0.0)` – Die Kriechzahl φ dieser Analyse.
+- `werkstoffsatz: str = einer_von(WERKSTOFFSAETZE, WERKSTOFFSAETZE[0])` – `bemessung` (f_cd, f_yd) oder `charakteristisch` (f_ck, f_yk).
+- `rechenart: str = einer_von((a.value for a in FASERARTEN), Rechenart.PARABEL.value)` – `block` oder `parabel` -- siehe [[opencivil.nachweis.rechenwahl#Rechenart|Rechenart]]. Die Handrechnung gibt es hier nicht ([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]).
 - `aktiv: bool = True`
-
-#### SpannungsfallEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any], *, kriechzahl_alt: float=0.0) -> 'SpannungsfallEintrag'
-```
-
-`kriechzahl_alt` gilt, wo die Kriechzahl fehlt -- siehe Klasse.
 
 ### GebrauchsfallEintrag
 
@@ -434,15 +383,6 @@ haeufig oder quasi-staendig ist, sagt die Liste, in der er steht.
 - `M_Ed: float = 0.0`
 - `N_Ed: float = 0.0`
 - `aktiv: bool = True` – Ob dieser Lastfall gerechnet wird. Ausgeschaltet bleibt er stehen.
-
-#### GebrauchsfallEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any], wort: str='häufige') -> 'GebrauchsfallEintrag'
-```
-
-`wort` nennt die Liste in der Meldung -- «häufige» oder «quasi-ständige».
 
 ### eindeutig
 
@@ -473,14 +413,13 @@ Womit ein Nachweis-Kapitel rechnet: Kriechzahl, Wertesatz, Rechenart --
 siehe [[opencivil.nachweis.rechenwahl#Rechenwahl|Rechenwahl]].
 
 Jedes Kapitel hat seine eigene; die Kriechzahl des Vergroesserungsfaktors
-gehoert dem Verformungsnachweis ([[opencivil.projekt.eintraege#VerformungEintrag|VerformungEintrag]]). In einer
-Datei von vor 2026-10-09 fehlt die Wahl -- dann gilt, was damals fest
-galt: die Rechenart und der Wertesatz des Kapitels (`vorgabe`) und das
-phi, das damals an der Platte stand (`kriechzahl_alt`).
+gehoert dem Verformungsnachweis ([[opencivil.projekt.eintraege#VerformungEintrag|VerformungEintrag]]). Welche
+Rechenarten ein Kapitel anbietet, weiss das Kapitel -- es prueft sie
+([[opencivil.projekt.eintraege#RechenwahlEintrag.pruefen|pruefen]]); das Feld kennt nur, welche es ueberhaupt gibt.
 
-- `kriechzahl: float = 0.0`
-- `werkstoffsatz: str = WERKSTOFFSAETZE[0]`
-- `rechenart: str = Rechenart.HANDRECHNUNG.value`
+- `kriechzahl: float = nicht_negativ(0.0)`
+- `werkstoffsatz: str = einer_von(WERKSTOFFSAETZE, WERKSTOFFSAETZE[0])`
+- `rechenart: str = einer_von((a.value for a in Rechenart), Rechenart.HANDRECHNUNG.value)`
 
 #### RechenwahlEintrag.gebrauch
 
@@ -526,28 +465,7 @@ Was der Kern daraus rechnet.
 def pruefen(self, wo: str, arten=RECHENARTEN) -> None
 ```
 
-Was es nicht gibt, meldet sich -- `arten` sagt, welche Rechenarten gelten.
-
-#### RechenwahlEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Optional[Mapping[str, Any]], *, vorgabe: Optional['RechenwahlEintrag']=None, kriechzahl_alt: Optional[float]=None, wo: str='Rechenwahl', arten=RECHENARTEN) -> 'RechenwahlEintrag'
-```
-
-Fehlt `d` oder ein Feld darin, gilt `vorgabe` -- und fuer phi `kriechzahl_alt`.
-
-### _ersetzt
-
-```python
-def _ersetzt(rechenart: Any, arten) -> Any
-```
-
-Die Rechenart, wie sie heute heisst: was eine alte Datei dort waehlt, wo
-es die Wahl nicht mehr gibt, wird zu ihrem Ersatz -- und der, wo es auch
-ihn nicht gibt, zu seinem
-([[opencivil.nachweis.rechenwahl#Konstanten|ERSATZ_ALTER_WAHL]]). Alles andere
-bleibt -- auch Unbekanntes, das die Pruefung danach meldet.
+Ob das Kapitel diese Rechenart anbietet -- `arten` sagt, welche es gibt.
 
 ### Gebrauchsliste
 
@@ -604,15 +522,6 @@ und damit in getrennten ID-Raeumen. Ein Fall «Dauer» darf in beiden
 stehen. `kombinationen` sind die Faelle der Tragsicherheit, aus
 denen abgeleitet wird -- gelesen wird nur ihr Name.
 
-#### Gebrauchsliste.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any], *, wort: str, vorgabe: float, kriechzahl_alt: Optional[float]=None) -> 'Gebrauchsliste'
-```
-
-`kriechzahl_alt`: das phi der Platte, fuer eine Datei ohne Wahl.
-
 ### KombinationEintrag
 
 ```python
@@ -626,15 +535,8 @@ Eine zu pruefende Schnittgroessenkombination.
 - `M_Ed: float = 0.0`
 - `N_Ed: float = 0.0`
 - `V_Ed: float = 0.0` – Querkraft in kN/m -- für den Querkraftnachweis.
-- `art: str = Erfuellungsart.AUTOMATISCH.value`
+- `art: str = einer_von((a.value for a in Erfuellungsart), Erfuellungsart.AUTOMATIS…`
 - `aktiv: bool = True` – Ob dieser Lastfall gerechnet wird. Ausgeschaltet bleibt er stehen.
-
-#### KombinationEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'KombinationEintrag'
-```
 
 
 ## Konstanten

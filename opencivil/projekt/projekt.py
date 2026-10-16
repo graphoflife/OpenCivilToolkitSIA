@@ -28,7 +28,7 @@ from opencivil.projekt.eintraege import (
 )
 from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
-from opencivil.projekt.lesen import ProjektFehler
+from opencivil.projekt.lesen import ProjektFehler, felder_pruefen
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.skript import VORLAGE, SkriptEintrag
 from opencivil.projekt.querschnittsanalyse import (
@@ -333,7 +333,16 @@ class Projekt(Beschreibung):
     # -- Pruefung -----------------------------------------------------------
 
     def pruefen(self) -> None:
-        """Prueft die Beschreibung, bevor daraus gerechnet wird."""
+        """
+        Prueft die Beschreibung -- vor jedem Rechnen und beim Oeffnen einer
+        Datei.
+
+        Zuerst jedes Feld gegen das, was an ihm steht
+        (:func:`~opencivil.projekt.lesen.felder_pruefen`): was in Python
+        gebaut wurde, geht so durch dieselbe Tuer wie eine Datei. Danach, was
+        mehrere Felder zusammen betrifft.
+        """
+        felder_pruefen(self, "Projekt")
         for m in self.materialien:
             m.pruefen()
 
@@ -362,17 +371,6 @@ class Projekt(Beschreibung):
         return aufbauen(self, schnell=schnell)
 
     # -- Speichern ----------------------------------------------------------
-
-
-    @classmethod
-    def aus_dict(cls, d: Mapping[str, Any]) -> "Projekt":
-        return cls(
-            name=str(d.get("name") or "Neues Projekt"),
-            materialien=[MaterialEintrag.aus_dict(x) for x in (d.get("materialien") or [])],
-            **{art.liste: [art.eintrag.aus_dict(x) for x in (d.get(art.liste) or [])]
-               for art in BAUTEILE},
-            skripte=[SkriptEintrag.aus_dict(x) for x in (d.get("skripte") or [])],
-        )
 
     def speichern(self, pfad: str | Path) -> Path:
         ziel = Path(pfad)

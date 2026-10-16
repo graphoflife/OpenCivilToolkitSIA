@@ -1,5 +1,5 @@
 ---
-erzeugt: f475dc6eb980
+erzeugt: 701f04adc918
 art: modul
 tags: [modul]
 ---
@@ -28,6 +28,7 @@ class SkriptEintrag(Beschreibung)
 
 Ein Skript: Name und Code.
 
+- `BEZEICHNUNG = 'Skript'`
 - `kennung: str`
 - `name: str = ''`
 - `code: str = ''`
@@ -41,13 +42,6 @@ def neu(cls, kennung: str, name: str) -> 'SkriptEintrag'
 
 Ein neues Skript, mit der [[opencivil.projekt.skript#Konstanten|VORLAGE]] darin.
 
-#### SkriptEintrag.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'SkriptEintrag'
-```
-
 
 ## Konstanten
 
@@ -56,7 +50,6 @@ def aus_dict(cls, d: Mapping[str, Any]) -> 'SkriptEintrag'
 ## Braucht
 
 - [[opencivil.projekt.eintraege]]
-- [[opencivil.projekt.lesen]]
 
 ## Gebraucht von
 

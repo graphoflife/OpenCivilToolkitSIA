@@ -1,5 +1,5 @@
 ---
-erzeugt: 6f370f35d0f1
+erzeugt: 33668191c858
 art: modul
 tags: [modul]
 ---
@@ -238,7 +238,13 @@ wenn man dieselbe Platte hundertmal rechnet.
 def pruefen(self) -> None
 ```
 
-Prueft die Beschreibung, bevor daraus gerechnet wird.
+Prueft die Beschreibung -- vor jedem Rechnen und beim Oeffnen einer
+Datei.
+
+Zuerst jedes Feld gegen das, was an ihm steht
+([[opencivil.projekt.lesen#felder_pruefen|felder_pruefen]]): was in Python
+gebaut wurde, geht so durch dieselbe Tuer wie eine Datei. Danach, was
+mehrere Felder zusammen betrifft.
 
 #### Projekt.aufbauen
 
@@ -250,13 +256,6 @@ Baut aus der Beschreibung ein vollstaendiges Rechenwerk.
 
 Die Arbeit steht in [[opencivil.projekt.aufbau#aufbauen|opencivil.projekt.aufbau.aufbauen]], neben
 dem [[opencivil.projekt.aufbau#Aufbau|Aufbau]], der dabei herauskommt.
-
-#### Projekt.aus_dict
-
-```python
-@classmethod
-def aus_dict(cls, d: Mapping[str, Any]) -> 'Projekt'
-```
 
 #### Projekt.speichern
 
