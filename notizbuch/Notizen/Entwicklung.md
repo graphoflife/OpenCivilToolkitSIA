@@ -44,6 +44,17 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-16 · Eigener Betonstahl heisst S1
+
+Der Benutzer hat die Festlegungen der Kennzahlen bestätigt und eine
+geändert: eigener Betonstahl heisst S1, S2 … statt BS1 (`EIGENE_VORSILBE`).
+Eigener Beton heisst weiter BE1, BE2 …. Bezüge laufen über die Kennung
+(`s1`, `s2` …), angezeigt wird der Name; die beiden müssen nicht
+übereinstimmen -- ein eigener Stahl neben B500B hat die Kennung `s2` und
+heisst S1.
+
+---
+
 ## 2026-10-16 · Bewehrung mit Höhe ab Unterkante
 
 Wunsch des Benutzers: in der Tabelle «Bewehrung von oben nach unten» eine

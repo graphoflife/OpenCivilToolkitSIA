@@ -4,7 +4,7 @@
  * NORMSORTE ODER EIGENES MATERIAL:
  * Eine Normsorte nach SIA ist gesperrt -- kein Feld lässt sich anfassen, auch
  * die Sorte nicht. Wer abweichen will, legt ein eigenes Material an
- * (materialwahl.js): es heisst BE1 oder BS1 und ist änderbar. So kann keine
+ * (materialwahl.js): es heisst BE1 oder S1 und ist änderbar. So kann keine
  * abgewandelte Festigkeit unter einer Normbezeichnung im Bericht landen.
  *
  * BEWEHRUNG:

@@ -46,15 +46,6 @@ gelernt wurde, steht in [[Entwicklung]].
 - [ ] Grundbruch: keine Ausmitte der Last (wirksame Breite), kein
       Erdwiderstand vor dem Fundament. Der Gleitkörper im Bild gilt für
       waagrechte Sohle und waagrechtes Gelände.
-- [ ] **Kennzahlen der Platte, meine Festlegungen** (2026-10-16), vom
-      Benutzer bestätigen lassen: x/d steht je Seite, Zug unten und Zug oben;
-      mit Bügeln ist V_Rd das Kleinere beider Seiten, je bei der günstigsten
-      Neigung; gerechnet wird immer von Hand mit Bemessungswerten -- rechnet
-      die Tragsicherheit anders, mit eigener Herleitung
-      (`nachweis/kennzahlen.py`).
-- [ ] **Eigener Betonstahl heisst BS1, BS2 …** Der Benutzer nannte BE1 für
-      Beton; die Vorsilbe für Betonstahl ist meine Wahl
-      (`projekt/eintraege.py`, `EIGENE_VORSILBE`). Bestätigen lassen.
 - [ ] Der Dienst «bericht» und das PDF des lokalen Servers haben seit dem
       Wegfall des Knopfs «Bericht» keinen Weg mehr aus der Oberfläche.
       Entfernen, oder wieder erreichbar machen.
@@ -393,6 +384,10 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Vom Benutzer entschieden (2026-10-16): die Kennzahlen der Platte bleiben, wie
+sie sind -- x/d je Seite, mit Bügeln das Kleinere beider Seiten, von Hand mit
+Bemessungswerten · eigener Betonstahl heisst S1, S2 … statt BS1 ·
 
 Vier sichtbare Punkte: eine Bügelteilung von null wird gemeldet statt still
 zu 200 mm · gleiche Fallnamen im Balkensystem halten nur das System auf ·

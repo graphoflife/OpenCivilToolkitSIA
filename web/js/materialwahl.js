@@ -7,7 +7,7 @@
  *                          ist -- nichts daran lässt sich ändern, auch die
  *                          Sorte nicht
  *     eigenes Material     nimmt eine Sorte als Vorlage, heisst BE1, BE2 ...
- *                          (Betonstahl BS1 ...) und seine Kennwerte sind
+ *                          (Betonstahl S1 ...) und seine Kennwerte sind
  *                          änderbar; eine Sorte trägt es nicht
  *
  * Womit die Namen eigener Materialien beginnen und in welcher Folge die

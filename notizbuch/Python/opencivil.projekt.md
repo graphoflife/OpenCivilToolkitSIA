@@ -1,5 +1,5 @@
 ---
-erzeugt: 39a3437d1201
+erzeugt: 1b3931d72a73
 art: modul
 tags: [modul]
 ---
@@ -53,7 +53,7 @@ Normsorte traegt die Sortenbezeichnung und bleibt, wie sie ist: steht 'C30/37'
 auf einem Bauteil, sind die Kennwerte die der Norm. Wer abweichen will, legt
 ein eigenes Material an ([[opencivil.projekt.projekt#Projekt.eigener_beton|Projekt.eigener_beton]],
 [[opencivil.projekt.projekt#Projekt.eigener_stahl|Projekt.eigener_stahl]]), mit einer Sorte als Vorlage; es heisst BE1,
-BE2 ... oder BS1 ... So kann keine abgeaenderte Festigkeit unter dem
+BE2 ... oder S1 ... So kann keine abgeaenderte Festigkeit unter dem
 Deckmantel einer Normbezeichnung im Bericht landen.
 
 

@@ -639,7 +639,7 @@ class TestMaterialsperre(unittest.TestCase):
         self.assertTrue(beton.eigenstaendig)
         self.assertEqual((beton.name, beton.sorte, beton.kennung), ("BE1", "C25/30", "b2"))
         beton.abweichungen["f_ck"] = 45.0
-        self.assertEqual(projekt.eigener_stahl().name, "BS1")
+        self.assertEqual(projekt.eigener_stahl().name, "S1")
         projekt.aufbauen()  # abweichende Kennwerte sind hier erlaubt
 
     def test_eigener_name_weicht_belegten_aus(self):

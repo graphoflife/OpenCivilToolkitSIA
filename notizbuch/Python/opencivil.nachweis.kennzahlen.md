@@ -1,5 +1,5 @@
 ---
-erzeugt: 049227c9926f
+erzeugt: f1bc81465734
 art: modul
 tags: [modul]
 ---
@@ -20,6 +20,9 @@ Platte:
   Kleinere beider Seiten bei `M_Ed = 0`, und `V_Rd,min`, das Kleinere
   bei `M_Ed = M_Rd`. Mit Buegeln der Widerstand bei der guenstigsten
   Neigung, `V_Rd(alpha_opt)` -- auch er das Kleinere beider Seiten.
+
+x/d je Seite, das Kleinere beider Seiten auch mit Buegeln und die
+Handrechnung mit Bemessungswerten hat der Benutzer am 2026-10-16 bestaetigt.
 
 Die Vergroesserungsfaktoren omega_w und omega_w' rechnet
 [[opencivil.nachweis.verformung#Vergroesserungsfaktor|Vergroesserungsfaktor]]; die

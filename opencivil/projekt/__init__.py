@@ -40,7 +40,7 @@ Normsorte traegt die Sortenbezeichnung und bleibt, wie sie ist: steht 'C30/37'
 auf einem Bauteil, sind die Kennwerte die der Norm. Wer abweichen will, legt
 ein eigenes Material an (:meth:`Projekt.eigener_beton`,
 :meth:`Projekt.eigener_stahl`), mit einer Sorte als Vorlage; es heisst BE1,
-BE2 ... oder BS1 ... So kann keine abgeaenderte Festigkeit unter dem
+BE2 ... oder S1 ... So kann keine abgeaenderte Festigkeit unter dem
 Deckmantel einer Normbezeichnung im Bericht landen.
 
 EINHEITEN IN DER BESCHREIBUNG:

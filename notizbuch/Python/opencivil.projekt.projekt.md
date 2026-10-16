@@ -1,5 +1,5 @@
 ---
-erzeugt: f2fc7f4d4194
+erzeugt: 6f370f35d0f1
 art: modul
 tags: [modul]
 ---
@@ -94,7 +94,7 @@ def freie_kennung(self, vorsilbe: str) -> str
 def eigener_name(self, art: str) -> str
 ```
 
-Der erste freie Name eines eigenen Materials: BE1, BE2 ... oder BS1 ...
+Der erste freie Name eines eigenen Materials: BE1, BE2 ... oder S1 ...
 
 #### Projekt.beton
 
@@ -128,7 +128,7 @@ Ein eigener Beton, `BE1`, `BE2` ... -- mit den Kennwerten der Sorte
 def eigener_stahl(self, vorlage: str='B500B') -> MaterialEintrag
 ```
 
-Ein eigener Betonstahl, `BS1`, `BS2` ... -- siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
+Ein eigener Betonstahl, `S1`, `S2` ... -- siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
 
 #### Projekt._normsorte
 

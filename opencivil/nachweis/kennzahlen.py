@@ -14,6 +14,9 @@ Platte:
   bei ``M_Ed = M_Rd``. Mit Buegeln der Widerstand bei der guenstigsten
   Neigung, ``V_Rd(alpha_opt)`` -- auch er das Kleinere beider Seiten.
 
+x/d je Seite, das Kleinere beider Seiten auch mit Buegeln und die
+Handrechnung mit Bemessungswerten hat der Benutzer am 2026-10-16 bestaetigt.
+
 Die Vergroesserungsfaktoren omega_w und omega_w' rechnet
 :class:`~opencivil.nachweis.verformung.Vergroesserungsfaktor`; die
 Zusammenfassung stellt sie dazu.

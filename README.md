@@ -257,7 +257,7 @@ Deshalb kann am Bildschirm gar nichts anderes stehen als im Bericht.
 **Materialien:** «+» fragt in einem Fenster, was angelegt wird: eine
 Normsorte nach SIA -- sie heisst wie die Sorte, trägt links ein rotes «SIA»
 und lässt sich nicht ändern, auch ihre Sorte nicht -- oder ein eigenes
-Material mit einer Sorte als Vorlage: es heisst BE1, BE2 … (Betonstahl BS1 …),
+Material mit einer Sorte als Vorlage: es heisst BE1, BE2 … (Betonstahl S1 …),
 trägt «eigen», und seine Kennwerte sind änderbar.
 
 **Platte:** drei Panels -- die Platte selbst, die Bewehrung (vier Lagen mit

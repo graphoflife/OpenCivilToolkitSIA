@@ -1,5 +1,5 @@
 ---
-erzeugt: 5780a3f46238
+erzeugt: 29a75bd7fe20
 art: modul
 tags: [modul]
 ---
@@ -66,7 +66,7 @@ Vorlage.
 - `art: str` – `beton` oder `betonstahl`.
 - `sorte: str` – Die Normsorte -- bei einem eigenen Material die Vorlage seiner Kennwerte.
 - `name: str = ''`
-- `eigenstaendig: bool = False` – False = Normsorte, Kennwerte gesperrt, Name = Sorte -- nie aenderbar. True = eigenes Material, aenderbar, mit eigenem Namen (BE1, BS1 ...).
+- `eigenstaendig: bool = False` – False = Normsorte, Kennwerte gesperrt, Name = Sorte -- nie aenderbar. True = eigenes Material, aenderbar, mit eigenem Namen (BE1, S1 ...).
 - `abweichungen: Dict[str, float] = field(default_factory=dict)`
 - `ueberschreibungen: Dict[str, float] = field(default_factory=dict)`
 
@@ -641,7 +641,7 @@ def aus_dict(cls, d: Mapping[str, Any]) -> 'KombinationEintrag'
 
 - `WERKSTOFFSAETZE = tuple((s.value for s in Werkstoffsatz))` – Mit welchen Festigkeiten ein Werkstoffgesetz rechnen kann, siehe [[opencivil.nachweis.querschnittsloeser#Werkstoffsatz|Werkstoffsatz]]. Gewaehlt in der Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse.
 - `BETONGESETZE = (Rechenart.PARABEL.value, Rechenart.BLOCK.value)` – Welche Spannungs-Dehnungs-Beziehung der Beton der Querschnittsanalyse haben kann: Parabel-Rechteck oder der Spannungsblock 0.85·x -- die beiden genauen Rechenarten ([[opencivil.nachweis.rechenwahl#Rechenart|Rechenart]]).
-- `EIGENE_VORSILBE = {'beton': 'BE', 'betonstahl': 'BS'}` – Womit die Namen eigener Materialien beginnen: BE1, BE2 ... beim Beton, BS1, BS2 ... beim Betonstahl (Benutzer, 2026-10-16: «BE1 … BE2 etc.»; das BS fuer den Betonstahl nach demselben Muster).
+- `EIGENE_VORSILBE = {'beton': 'BE', 'betonstahl': 'S'}` – Womit die Namen eigener Materialien beginnen: BE1, BE2 ... beim Beton, S1, S2 ... beim Betonstahl (Benutzer, 2026-10-16).
 - `HAEUFIG_ANTEIL = 70.0` – Anteil der Tragsicherheitseinwirkungen, der als haeufiger Lastfall gilt -- in Prozent, wie die Maske ihn zeigt. Eine Vorgabe, einstellbar je Platte.
 - `QUASISTAENDIG_ANTEIL = 60.0` – Dasselbe fuer die quasi-staendigen Lastfaelle.
 

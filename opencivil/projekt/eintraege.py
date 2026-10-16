@@ -78,9 +78,8 @@ class Beschreibung:
 
 
 #: Womit die Namen eigener Materialien beginnen: BE1, BE2 ... beim Beton,
-#: BS1, BS2 ... beim Betonstahl (Benutzer, 2026-10-16: «BE1 … BE2 etc.»;
-#: das BS fuer den Betonstahl nach demselben Muster).
-EIGENE_VORSILBE = {"beton": "BE", "betonstahl": "BS"}
+#: S1, S2 ... beim Betonstahl (Benutzer, 2026-10-16).
+EIGENE_VORSILBE = {"beton": "BE", "betonstahl": "S"}
 
 
 @dataclass
@@ -102,7 +101,7 @@ class MaterialEintrag(Beschreibung):
     eigenstaendig: bool = False
     """
     False = Normsorte, Kennwerte gesperrt, Name = Sorte -- nie aenderbar.
-    True  = eigenes Material, aenderbar, mit eigenem Namen (BE1, BS1 ...).
+    True  = eigenes Material, aenderbar, mit eigenem Namen (BE1, S1 ...).
     """
 
     abweichungen: Dict[str, float] = field(default_factory=dict)

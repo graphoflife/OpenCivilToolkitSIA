@@ -116,7 +116,7 @@ class Projekt(Beschreibung):
         return f"{vorsilbe}{i}"
 
     def eigener_name(self, art: str) -> str:
-        """Der erste freie Name eines eigenen Materials: BE1, BE2 ... oder BS1 ..."""
+        """Der erste freie Name eines eigenen Materials: BE1, BE2 ... oder S1 ..."""
         vergeben = {m.anzeigename for m in self.materialien}
         i = 1
         while f"{EIGENE_VORSILBE[art]}{i}" in vergeben:
@@ -148,7 +148,7 @@ class Projekt(Beschreibung):
         return self._eigenes("beton", "b", vorlage)
 
     def eigener_stahl(self, vorlage: str = "B500B") -> MaterialEintrag:
-        """Ein eigener Betonstahl, ``BS1``, ``BS2`` ... -- siehe :meth:`eigener_beton`."""
+        """Ein eigener Betonstahl, ``S1``, ``S2`` ... -- siehe :meth:`eigener_beton`."""
         return self._eigenes("betonstahl", "s", vorlage)
 
     def _eigenes(self, art: str, vorsilbe: str, vorlage: str) -> MaterialEintrag:
