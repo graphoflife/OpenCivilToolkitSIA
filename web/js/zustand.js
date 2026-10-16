@@ -72,6 +72,11 @@ export const zustand = {
    */
   app: null,
   /**
+   * Je App die Kennung des Eintrags, der dort zuletzt gewählt war: wer
+   * zurückwechselt, findet ihn wieder (Benutzer, 2026-10-16).
+   */
+  zuletzt: {},
+  /**
    * Zugeklappte Panels der Eingaben, je App und Titel: «platte/Bewehrung».
    *
    * Ansichtssache wie `offen`, aber im Browser gemerkt: wer die Bewehrung
@@ -90,10 +95,15 @@ export const zustand = {
   kurvenNormalkraft: {},
 };
 
-/** Klappt ein Kapitel auf oder zu. */
-/** Wählt links eine App -- unter den Knöpfen steht dann ihre Liste. */
-export function appWaehlen(app) {
-  aendern({ app }, 'baum');
+/**
+ * Wählt links eine App -- unter den Knöpfen steht dann ihre Liste -- und
+ * darin den Eintrag, der dort zuletzt gewählt war, sonst den ersten.
+ * `eintraege` ist die Liste der App; ist sie leer, ist nichts gewählt.
+ */
+export function appWaehlen(app, eintraege) {
+  const kennungen = eintraege.map((e) => e.kennung);
+  const kennung = kennungen.includes(zustand.zuletzt[app]) ? zustand.zuletzt[app] : kennungen[0];
+  aendern({ app, fenster: null, auswahl: kennung ? { art: app, kennung } : null }, 'auswahl');
 }
 
 /** Die App, deren Liste links steht. */
@@ -126,6 +136,7 @@ export function panelUmschalten(schluessel) {
  * gehört zum bisher gewählten und geht dabei zu.
  */
 export function waehlen(auswahl) {
+  if (auswahl) zustand.zuletzt[auswahl.art] = auswahl.kennung;
   aendern({ auswahl, fenster: null, ...(auswahl ? { app: auswahl.art } : {}) }, 'auswahl');
 }
 

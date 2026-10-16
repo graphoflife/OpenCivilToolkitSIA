@@ -45,15 +45,22 @@ const APPS = [
   { app: 'skript', knopf: 'Python', zeichen: 'python', liste: (p) => p.skripte || [] },
 ];
 
+/**
+ * Ein Knopf je App. Das Zeichen ist blau, sobald es darin etwas gibt -- wie bei
+ * den Kapiteln einer Platte, die etwas rechnen; die gewählte App trägt dazu
+ * Grund und Rand der Auswahl.
+ */
 function appKnopf(a, p, gewaehlt) {
+  const eintraege = a.liste(p);
   return el('button.kachel.app-kachel', {
-    type: 'button', class: gewaehlt ? 'ist-gewaehlt' : '', 'aria-pressed': String(gewaehlt),
+    type: 'button', 'aria-pressed': String(gewaehlt),
+    class: `${gewaehlt ? 'ist-gewaehlt' : ''} ${eintraege.length ? 'ist-an' : ''}`,
     title: a.knopf.replace(/\u00AD/g, ''),
-    on: { click: () => appWaehlen(a.app) },
+    on: { click: () => appWaehlen(a.app, eintraege) },
   }, [
     sinnbild(a.zeichen),
     el('span.kachel-name', { text: a.knopf }),
-    el('span.kachel-stand', { text: String(a.liste(p).length) }),
+    el('span.kachel-stand', { text: String(eintraege.length) }),
   ]);
 }
 
