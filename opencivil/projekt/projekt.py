@@ -24,7 +24,7 @@ from typing import Any, Dict, List, Mapping, Sequence, Union
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
 from opencivil.ergebnis import Ergebnis
 from opencivil.projekt.eintraege import (
-    Beschreibung, MaterialEintrag, PostenEintrag, RechenwahlEintrag,
+    EIGENE_VORSILBE, Beschreibung, MaterialEintrag, PostenEintrag, RechenwahlEintrag,
 )
 from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
@@ -115,42 +115,13 @@ class Projekt(Beschreibung):
             i += 1
         return f"{vorsilbe}{i}"
 
-    def freier_name(self, wunsch: str, ausser: str = "") -> str:
-        """Haengt bei Bedarf _1, _2, ... an, bis der Name eindeutig ist."""
-        vergeben = {m.anzeigename for m in self.materialien if m.kennung != ausser}
-        if wunsch not in vergeben:
-            return wunsch
+    def eigener_name(self, art: str) -> str:
+        """Der erste freie Name eines eigenen Materials: BE1, BE2 ... oder BS1 ..."""
+        vergeben = {m.anzeigename for m in self.materialien}
         i = 1
-        while f"{wunsch}_{i}" in vergeben:
+        while f"{EIGENE_VORSILBE[art]}{i}" in vergeben:
             i += 1
-        return f"{wunsch}_{i}"
-
-    def abgeleiteter_name(self, sorte: str, ausser: str = "") -> str:
-        """
-        Erster freier Name der Form ``<Sorte>_1``, ``<Sorte>_2``, ...
-
-        Nicht ueber :meth:`freier_name` mit dem Wunsch ``C30/37_1``, denn das
-        haengte bei Belegung nochmals an und ergaebe ``C30/37_1_1``.
-        """
-        vergeben = {m.anzeigename for m in self.materialien if m.kennung != ausser}
-        i = 1
-        while f"{sorte}_{i}" in vergeben:
-            i += 1
-        return f"{sorte}_{i}"
-
-    def material_loesen(self, kennung: str) -> MaterialEintrag:
-        """
-        Macht aus einer Normsorte ein eigenstaendiges, aenderbares Material.
-
-        Der Name wird dabei zwingend geaendert -- die Sortenbezeichnung bleibt
-        der unveraenderten Norm vorbehalten.
-        """
-        eintrag = self.material(kennung)
-        if eintrag.eigenstaendig:
-            return eintrag
-        eintrag.eigenstaendig = True
-        eintrag.name = self.abgeleiteter_name(eintrag.sorte, ausser=kennung)
-        return eintrag
+        return f"{EIGENE_VORSILBE[art]}{i}"
 
     # -- Ohne Oberflaeche ---------------------------------------------------
     #
@@ -167,6 +138,26 @@ class Projekt(Beschreibung):
     def stahl(self, sorte: str = "B500B") -> MaterialEintrag:
         """Eine Betonstahlsorte nach Norm -- Kennung ``s1``, ``s2`` ..."""
         return self._normsorte("betonstahl", "s", sorte)
+
+    def eigener_beton(self, vorlage: str = "C30/37") -> MaterialEintrag:
+        """
+        Ein eigener Beton, ``BE1``, ``BE2`` ... -- mit den Kennwerten der Sorte
+        ``vorlage``, abzuaendern ueber ``abweichungen`` und
+        ``ueberschreibungen``. Eine Normsorte selbst bleibt, wie sie ist.
+        """
+        return self._eigenes("beton", "b", vorlage)
+
+    def eigener_stahl(self, vorlage: str = "B500B") -> MaterialEintrag:
+        """Ein eigener Betonstahl, ``BS1``, ``BS2`` ... -- siehe :meth:`eigener_beton`."""
+        return self._eigenes("betonstahl", "s", vorlage)
+
+    def _eigenes(self, art: str, vorsilbe: str, vorlage: str) -> MaterialEintrag:
+        eintrag = MaterialEintrag(kennung=self.freie_kennung(vorsilbe), art=art,
+                                  sorte=vorlage, name=self.eigener_name(art),
+                                  eigenstaendig=True)
+        eintrag.pruefen()
+        self.materialien.append(eintrag)
+        return eintrag
 
     def _normsorte(self, art: str, vorsilbe: str, sorte: str) -> MaterialEintrag:
         """

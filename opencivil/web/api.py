@@ -45,7 +45,7 @@ from opencivil.projekt import (
     QuerschnittEintrag, SkriptEintrag, SpannungsfallEintrag, VerformungsfallEintrag,
 )
 from opencivil.projekt import balkensystem as bs
-from opencivil.projekt.eintraege import BETONGESETZE, WERKSTOFFSAETZE
+from opencivil.projekt.eintraege import BETONGESETZE, EIGENE_VORSILBE, WERKSTOFFSAETZE
 from opencivil.projekt.querschnittsanalyse import (
     SCHNITTE, FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QAGebrauchsfallEintrag,
     QAKnickEintrag, QALastfallEintrag, QASpannungsfallEintrag, QuerschnittsanalyseEintrag,
@@ -128,10 +128,11 @@ def katalog() -> dict:
             }
             for sorte, s in STAHLSORTEN.items()
         ],
-        # In welcher Reihenfolge «+» neue Sorten anlegt: die erste, die es im
-        # Projekt noch nicht gibt.
+        # In welcher Reihenfolge das Fenster «Neues Material» die Sorten
+        # anbietet -- und womit die Namen eigener Materialien beginnen.
         "anlegen": {"beton": betonsorten_zum_anlegen(),
-                    "betonstahl": stahlsorten_zum_anlegen()},
+                    "betonstahl": stahlsorten_zum_anlegen(),
+                    "eigen": dict(EIGENE_VORSILBE)},
         "kennwerte": {
             "beton": [_vorlage_dict(v) for v in BETON_VORLAGEN],
             "betonstahl": [_vorlage_dict(v) for v in STAHL_VORLAGEN],

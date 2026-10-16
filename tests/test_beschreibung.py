@@ -210,18 +210,20 @@ class TestVollstaendigeAblage(unittest.TestCase):
     def test_abweichung_wird_in_der_anzeigeeinheit_gelesen(self):
         """Die Beschreibung enthält blanke Zahlen -- die Einheit kommt aus der Definition."""
         projekt = Projekt.beispiel()
-        projekt.material_loesen("b1").abweichungen["f_ck"] = 45.0
+        eigen = projekt.eigener_beton("C30/37")
+        eigen.abweichungen["f_ck"] = 45.0
         aufbau = projekt.aufbauen()
-        c = aufbau.baustoffe["b1"]
+        c = aufbau.baustoffe[eigen.kennung]
         wid = c.id_von("f_ck")
         self.assertAlmostEqual(
             aufbau.werk.loese(wid).groesse(wid).in_einheit(N_PRO_MM2), 45.0)
 
     def test_ueberschreibung_kappt_den_zweig(self):
         projekt = Projekt.beispiel()
-        projekt.material_loesen("b1").ueberschreibungen["f_cd"] = 12.0
+        eigen = projekt.eigener_beton("C30/37")
+        eigen.ueberschreibungen["f_cd"] = 12.0
         aufbau = projekt.aufbauen()
-        c = aufbau.baustoffe["b1"]
+        c = aufbau.baustoffe[eigen.kennung]
         loesung = aufbau.werk.loese(c.id_von("f_cd"))
         self.assertAlmostEqual(
             loesung.groesse(c.id_von("f_cd")).in_einheit(N_PRO_MM2), 12.0)
@@ -310,9 +312,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
         """
         for kurzname, zahl in (("gamma_c", 0.0), ("f_ck", -30.0)):
             projekt = Projekt.beispiel()
-            material = projekt.material("b1")
-            material.eigenstaendig = True
-            material.abweichungen = {kurzname: zahl}
+            projekt.eigener_beton().abweichungen = {kurzname: zahl}
             with self.assertRaises(ProjektFehler) as ctx:
                 projekt.aufbauen()
             self.assertIn(kurzname, str(ctx.exception))
@@ -633,19 +633,28 @@ class TestMaterialsperre(unittest.TestCase):
         with self.assertRaises(ProjektFehler):
             projekt.aufbauen()
 
-    def test_loesen_vergibt_eigenen_namen(self):
+    def test_eigenes_material_heisst_BE_und_BS(self):
         projekt = Projekt.beispiel()
-        eintrag = projekt.material_loesen("b1")
-        self.assertTrue(eintrag.eigenstaendig)
-        self.assertEqual(eintrag.name, "C30/37_1")
-        eintrag.abweichungen["f_ck"] = 45.0
-        projekt.aufbauen()  # jetzt erlaubt
+        beton = projekt.eigener_beton("C25/30")
+        self.assertTrue(beton.eigenstaendig)
+        self.assertEqual((beton.name, beton.sorte, beton.kennung), ("BE1", "C25/30", "b2"))
+        beton.abweichungen["f_ck"] = 45.0
+        self.assertEqual(projekt.eigener_stahl().name, "BS1")
+        projekt.aufbauen()  # abweichende Kennwerte sind hier erlaubt
 
-    def test_loesen_weicht_belegten_namen_aus(self):
+    def test_eigener_name_weicht_belegten_aus(self):
         projekt = Projekt.beispiel()
         projekt.materialien.append(
-            MaterialEintrag("b2", "beton", "C30/37", "C30/37_1", eigenstaendig=True))
-        self.assertEqual(projekt.material_loesen("b1").name, "C30/37_2")
+            MaterialEintrag("b2", "beton", "C30/37", "BE1", eigenstaendig=True))
+        self.assertEqual(projekt.eigener_beton().name, "BE2")
+
+    def test_eigenes_material_heisst_nicht_wie_eine_normsorte(self):
+        projekt = Projekt.beispiel()
+        projekt.materialien.append(
+            MaterialEintrag("b2", "beton", "C30/37", "C25/30", eigenstaendig=True))
+        with self.assertRaises(ProjektFehler) as ctx:
+            projekt.aufbauen()
+        self.assertIn("Normsorte", str(ctx.exception))
 
     def test_doppelte_namen_verboten(self):
         projekt = Projekt.beispiel()

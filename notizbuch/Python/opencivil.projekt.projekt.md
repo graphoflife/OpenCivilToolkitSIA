@@ -1,5 +1,5 @@
 ---
-erzeugt: beaba8805ba0
+erzeugt: f2fc7f4d4194
 art: modul
 tags: [modul]
 ---
@@ -88,35 +88,13 @@ Ein Bauteil gleich welcher Art -- eine Platte, eine Analyse, ein System.
 def freie_kennung(self, vorsilbe: str) -> str
 ```
 
-#### Projekt.freier_name
+#### Projekt.eigener_name
 
 ```python
-def freier_name(self, wunsch: str, ausser: str='') -> str
+def eigener_name(self, art: str) -> str
 ```
 
-Haengt bei Bedarf _1, _2, ... an, bis der Name eindeutig ist.
-
-#### Projekt.abgeleiteter_name
-
-```python
-def abgeleiteter_name(self, sorte: str, ausser: str='') -> str
-```
-
-Erster freier Name der Form `<Sorte>_1`, `<Sorte>_2`, ...
-
-Nicht ueber [[opencivil.projekt.projekt#Projekt.freier_name|freier_name]] mit dem Wunsch `C30/37_1`, denn das
-haengte bei Belegung nochmals an und ergaebe `C30/37_1_1`.
-
-#### Projekt.material_loesen
-
-```python
-def material_loesen(self, kennung: str) -> MaterialEintrag
-```
-
-Macht aus einer Normsorte ein eigenstaendiges, aenderbares Material.
-
-Der Name wird dabei zwingend geaendert -- die Sortenbezeichnung bleibt
-der unveraenderten Norm vorbehalten.
+Der erste freie Name eines eigenen Materials: BE1, BE2 ... oder BS1 ...
 
 #### Projekt.beton
 
@@ -133,6 +111,24 @@ def stahl(self, sorte: str='B500B') -> MaterialEintrag
 ```
 
 Eine Betonstahlsorte nach Norm -- Kennung `s1`, `s2` ...
+
+#### Projekt.eigener_beton
+
+```python
+def eigener_beton(self, vorlage: str='C30/37') -> MaterialEintrag
+```
+
+Ein eigener Beton, `BE1`, `BE2` ... -- mit den Kennwerten der Sorte
+`vorlage`, abzuaendern ueber `abweichungen` und
+`ueberschreibungen`. Eine Normsorte selbst bleibt, wie sie ist.
+
+#### Projekt.eigener_stahl
+
+```python
+def eigener_stahl(self, vorlage: str='B500B') -> MaterialEintrag
+```
+
+Ein eigener Betonstahl, `BS1`, `BS2` ... -- siehe [[opencivil.projekt.projekt#Projekt.eigener_beton|eigener_beton]].
 
 #### Projekt._normsorte
 

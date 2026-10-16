@@ -44,6 +44,30 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-16 · Rechte Tafel weiss, Diagramme einzeln gross, Normsorten gesperrt
+
+Wünsche des Benutzers, je ein Commit:
+
+- **Rechte Tafel wie die mittlere:** weisser Grund, die Köpfe aller drei
+  Tafeln gleich hoch (`--tafelkopf`) und ohne Umbruch. Ist die rechte
+  Tafel schmal, fällt ihr Titel weg und die Reiter rücken zusammen; auf dem
+  Telefon bricht der Kopf weiter um.
+- **Diagramme:** statt «nebeneinander 1, 2, 3» eine Leiste mit einer
+  Vorschau je Diagramm, darunter das gewählte gross. Die Vorschau ist eine
+  verkleinerte Kopie des Bildes, kein eigenes Bild -- ein zweiter Weg, die
+  Diagramme zu zeichnen, liefe auseinander. Ein Diagramm ist jede Karte mit
+  einem Bild; die übrigen Karten eines Bauteils (Wahl des Falls, Hinweise)
+  stehen über dem gewählten.
+- **Materialien:** «+» öffnet ein Fenster: Normsorte nach SIA oder eigenes
+  Material mit einer Sorte als Vorlage. Eine Normsorte bleibt, wie sie ist
+  -- «Material modifizieren» und die Wahl der Sorte sind weg; links trägt
+  sie ein rotes «SIA» statt des Schlosses. Ein eigenes Material heisst BE1,
+  BE2 … bzw. BS1 … (`EIGENE_VORSILBE`) und darf nicht wie eine Normsorte
+  heissen. In Python: `p.eigener_beton("C30/37")`, `p.eigener_stahl()`;
+  `material_loesen` ist weg.
+
+---
+
 ## 2026-10-16 · Neue App «Grundbruch»: Grundbruch und Gleiten eines Flachfundaments
 
 Wunsch des Benutzers, mit dem Kapitel 9.2 «Tragfähigkeit» als Vorlage (Text,

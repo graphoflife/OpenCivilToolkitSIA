@@ -42,8 +42,10 @@ ohne fremden Dienst auskommt; dazu numpy und pandas für die App «Python».
 from opencivil import Projekt
 
 p = Projekt("Decke über EG")
-p.beton("C30/37")
+p.beton("C30/37")                             # Normsorten nach SIA, nicht änderbar
 p.stahl("B500B")
+be = p.eigener_beton("C30/37")                # BE1: die Sorte als Vorlage, änderbar
+be.abweichungen["f_ck"] = 35.0                # N/mm²
 
 # Masse in mm; je Richtung zwei Durchmesser, unten und oben.
 # x liegt innen (2. und 3. Lage), y aussen.
@@ -250,6 +252,12 @@ gewählten App, mit «+» zum Anlegen.
 Die Oberfläche rechnet nichts. Sie schickt die Projektbeschreibung an den Kern
 und stellt dar, was zurückkommt -- fertige Zahlen und fertige LaTeX-Zeichen­ketten.
 Deshalb kann am Bildschirm gar nichts anderes stehen als im Bericht.
+
+**Materialien:** «+» fragt in einem Fenster, was angelegt wird: eine
+Normsorte nach SIA -- sie heisst wie die Sorte, trägt links ein rotes «SIA»
+und lässt sich nicht ändern, auch ihre Sorte nicht -- oder ein eigenes
+Material mit einer Sorte als Vorlage: es heisst BE1, BE2 … (Betonstahl BS1 …),
+trägt «eigen», und seine Kennwerte sind änderbar.
 
 **Platte:** drei Panels -- die Platte selbst, die Bewehrung (vier Lagen mit
 Grund und Zulage, darunter die Bügel) und «Nachweise und Analysen». Dort steht

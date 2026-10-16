@@ -2,9 +2,9 @@
  * editor.js -- Mittlere Tafel: Eingaben zum ausgewählten Bestandteil.
  *
  * NORMSORTE ODER EIGENES MATERIAL:
- * Eine unveränderte Normsorte ist gesperrt -- kein Feld lässt sich anfassen.
- * Wer abweichen will, drückt „Material modifizieren"; das Material bekommt
- * dann einen eigenen Namen (C30/37_1) und wird änderbar. So kann keine
+ * Eine Normsorte nach SIA ist gesperrt -- kein Feld lässt sich anfassen, auch
+ * die Sorte nicht. Wer abweichen will, legt ein eigenes Material an
+ * (materialwahl.js): es heisst BE1 oder BS1 und ist änderbar. So kann keine
  * abgewandelte Festigkeit unter einer Normbezeichnung im Bericht landen.
  *
  * BEWEHRUNG:
@@ -78,7 +78,7 @@ function kennwertZeile(material, vorlage) {
     // darum sagt es jedes Feld für sich und nicht die Pfeillogik für alle.
     min: 0,
     readonly: !schreibbar,
-    titel: gesperrt ? 'Normsorte – erst modifizieren, dann änderbar'
+    titel: gesperrt ? 'Normsorte nach SIA – nicht änderbar'
       : (vorlage.berechnet && !istUeberschrieben ? 'Wird gerechnet. Haken setzen zum Überschreiben.' : ''),
     // Leer: die eigene Zahl weg, der Wert der Sorte gilt wieder.
     leer: null,
@@ -93,7 +93,7 @@ function kennwertZeile(material, vorlage) {
   const schalter = vorlage.berechnet
     ? el('input', {
       type: 'checkbox', checked: istUeberschrieben, disabled: gesperrt,
-      title: gesperrt ? 'Normsorte – erst modifizieren' : 'Von Hand überschreiben',
+      title: gesperrt ? 'Normsorte nach SIA – nicht änderbar' : 'Von Hand überschreiben',
       on: {
         change: (e) => projektAendern((p) => {
           const m = p.materialien.find((x) => x.kennung === material.kennung);
@@ -129,31 +129,28 @@ function kennwertZeile(material, vorlage) {
 }
 
 function materialEditor(material) {
-  const sorten = material.art === 'beton'
-    ? zustand.katalog.betonsorten : zustand.katalog.stahlsorten;
   const vorlagen = zustand.katalog.kennwerte[material.art] || [];
   const gesperrt = !material.eigenstaendig;
   const anzahlUeberschrieben = Object.keys(material.ueberschreibungen).length;
 
+  // Eine Normsorte bleibt, wie sie ist -- es gibt keinen Weg, sie zu ändern,
+  // auch nicht ihre Sorte (Benutzer, 2026-10-16). Ein eigenes Material trägt
+  // keine Sorte; seine Vorlage zählt nur beim Anlegen.
   const kopf = gesperrt
     ? el('div.gesperrt-hinweis', {}, [
+      el('span.sia', { text: 'SIA' }),
       el('div', { style: { flex: '1 1 220px' } }, [
         el('b', { text: `Normsorte ${material.sorte}` }),
-        ' · Kennwerte aus der Norm, gesperrt',
+        ' · Kennwerte nach SIA 262:2025, nicht änderbar. Abweichen: links «+» '
+        + '→ eigenes Material.',
       ]),
-      el('button.knopf', {
-        text: 'Material modifizieren',
-        title: 'Eigenständiges Material mit eigenem Namen',
-        on: { click: () => materialLoesen(material) },
-      }),
     ])
     : el('div.gesperrt-hinweis', {
       style: { background: 'var(--warn-hell)', borderColor: 'var(--warn)' },
     }, [
       el('div', { style: { flex: '1 1 220px' } }, [
-        el('b', { text: 'Eigenständiges Material' }),
-        `Abgeleitet von ${material.sorte}. Die Kennwerte sind änderbar und `
-        + 'entsprechen nicht mehr zwingend der Norm.',
+        el('b', { text: 'Eigenes Material' }),
+        ' · Die Kennwerte sind änderbar und entsprechen nicht zwingend der Norm.',
       ]),
     ]);
 
@@ -161,14 +158,9 @@ function materialEditor(material) {
     kopf,
     panel({ schluessel: 'material/Material', titel: 'Material' }, [
       feld('Bezeichnung', el('input', {
-        type: 'text', value: material.name, disabled: gesperrt,
+        type: 'text', value: material.name || material.sorte, disabled: gesperrt,
         title: gesperrt ? 'Eine Normsorte trägt zwingend ihre Sortenbezeichnung' : '',
         on: { change: (e) => nameAendern(material, e.target.value, e.target) },
-      })),
-      feld('Sorte', auswahl({
-        werte: sorten.map((s) => ({ wert: s.sorte, beschriftung: s.sorte })),
-        gewaehlt: material.sorte,
-        beiAenderung: (neu) => sorteAendern(material, neu, vorlagen),
       })),
     ]),
 
@@ -192,24 +184,6 @@ function materialEditor(material) {
   ];
 }
 
-/** Macht aus einer Normsorte ein eigenständiges Material mit eigenem Namen. */
-function materialLoesen(material) {
-  const vergeben = new Set(zustand.projekt.materialien
-    .filter((m) => m.kennung !== material.kennung).map((m) => m.name || m.sorte));
-  // Hochzählen an der Sorte, nicht am schon abgeleiteten Namen -- sonst
-  // entstünde bei Belegung C30/37_1_1 statt C30/37_2.
-  let i = 1;
-  while (vergeben.has(`${material.sorte}_${i}`)) i += 1;
-  const name = `${material.sorte}_${i}`;
-
-  projektAendern((p) => {
-    const m = p.materialien.find((x) => x.kennung === material.kennung);
-    m.eigenstaendig = true;
-    m.name = name;
-  });
-  melden(`Eigenständig: „${name}".`);
-}
-
 function nameAendern(material, wunsch, feldKnoten) {
   const name = wunsch.trim();
   const vergeben = zustand.projekt.materialien
@@ -223,24 +197,6 @@ function nameAendern(material, wunsch, feldKnoten) {
   }
   projektAendern((p) => {
     p.materialien.find((x) => x.kennung === material.kennung).name = name;
-  });
-}
-
-function sorteAendern(material, neu, vorlagen) {
-  // Bei einer Normsorte wandert der Name mit -- er *ist* die Sorte.
-  if (!material.eigenstaendig) {
-    const vergeben = zustand.projekt.materialien
-      .some((m) => m.kennung !== material.kennung && (m.name || m.sorte) === neu);
-    if (vergeben) {
-      melden(`Normsorte „${neu}" schon angelegt.`, true);
-      return;
-    }
-  }
-  projektAendern((p) => {
-    const m = p.materialien.find((x) => x.kennung === material.kennung);
-    m.sorte = neu;
-    if (!m.eigenstaendig) m.name = neu;
-    for (const v of vorlagen.filter((x) => x.aus_sorte)) delete m.abweichungen[v.kurzname];
   });
 }
 
@@ -688,7 +644,7 @@ export function editorZeichnen(behaelter, titelKnoten, hinweisKnoten, fensterGru
   if (material) {
     titelKnoten.textContent = material.name || material.sorte;
     hinweisKnoten.textContent = `${ART_TEXT[material.art] || ''}`
-      + (material.eigenstaendig ? ' · eigenständig' : ' · Normsorte');
+      + (material.eigenstaendig ? ' · eigenes Material' : ' · Normsorte SIA');
     return ersetzen(behaelter, ...materialEditor(material));
   }
   if (bauteil) {

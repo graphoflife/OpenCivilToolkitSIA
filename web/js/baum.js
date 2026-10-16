@@ -23,6 +23,7 @@ import { benutzteMaterialien } from './querschnittsanalyse.js';
 import { fensterVergessen } from './qa_zeichnung.js';
 import { benutzteBauteile, benutzteMaterialien as systemMaterialien } from './balkensystem.js';
 import { fensterVergessen as systemfensterVergessen } from './bs_zeichnung.js';
+import { materialAnlegen } from './materialwahl.js';
 import {
   appWaehlen, ausVorlage, freieKennung, gewaehlteApp, naechsterName, projektAendern, waehlen,
   zustand,
@@ -107,9 +108,13 @@ const ANLEGEN = {
   grundbruch: grundbruchAnlegen,
 };
 
-/** Was rechts im Eintrag steht, wie er aussieht und wie er weggeht -- je Art. */
+/**
+ * Was rechts im Eintrag steht, wie er aussieht und wie er weggeht -- je Art.
+ * Beim Material steht keine Sorte: eine Normsorte heisst wie sie, ein
+ * eigenes Material trägt keine (Benutzer, 2026-10-16).
+ */
 const ART = {
-  material: (m) => ({ text: m.sorte, loeschen: materialLoeschen }),
+  material: () => ({ text: '', loeschen: materialLoeschen }),
   skript: (s) => {
     const zeilen = (s.code || '').split('\n').filter((z) => z.trim()).length;
     return { text: `${zeilen} ${zeilen === 1 ? 'Zeile' : 'Zeilen'}`, loeschen: () => entfernen('skripte', s) };
@@ -133,7 +138,7 @@ function eintrag(m, art) {
     }),
     istMaterial && m.eigenstaendig ? el('span.eigen', { text: 'eigen' }) : null,
     istMaterial && !m.eigenstaendig
-      ? el('span.schloss', { text: '\u{1F512}', title: 'Normsorte – Kennwerte gesperrt' })
+      ? el('span.sia', { text: 'SIA', title: 'Normsorte nach SIA – nicht änderbar' })
       : null,
     el('span.art', { text }),
     el('button.knopf.knopf-zart.knopf-gefahr', {
@@ -214,27 +219,6 @@ function skriptAnlegen() {
     p.skripte.push({ ...vorlage, kennung, name: naechsterName('Skript', p.skripte) });
   }, 'skript');
   waehlen({ art: 'skript', kennung });
-}
-
-/**
- * Ein neues Material: die erste Sorte in der Reihenfolge des Kerns, die es im
- * Projekt noch nicht gibt -- beim Beton C25/30, dann aufwärts, beim Stahl
- * B500B, dann die übrigen.
- */
-function materialAnlegen(art) {
-  const kennung = freieKennung(art === 'beton' ? 'b' : 's');
-  const vergeben = new Set(zustand.projekt.materialien.map((m) => m.name || m.sorte));
-  // Eine Normsorte darf es nur einmal geben -- der Name ist ihre Kennzeichnung.
-  const frei = (zustand.katalog?.anlegen?.[art] || []).find((sorte) => !vergeben.has(sorte));
-  if (!frei) {
-    melden('Alle Normsorten angelegt. Abwandeln: Material öffnen → '
-      + '«Material modifizieren».', true);
-    return;
-  }
-  projektAendern((p) => {
-    p.materialien.push(ausVorlage('material', { kennung, art, sorte: frei, name: frei }));
-  });
-  waehlen({ art: 'material', kennung });
 }
 
 function platteAnlegen(art) {

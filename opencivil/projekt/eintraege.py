@@ -77,20 +77,32 @@ class Beschreibung:
         return asdict(self)
 
 
+#: Womit die Namen eigener Materialien beginnen: BE1, BE2 ... beim Beton,
+#: BS1, BS2 ... beim Betonstahl (Benutzer, 2026-10-16: «BE1 … BE2 etc.»;
+#: das BS fuer den Betonstahl nach demselben Muster).
+EIGENE_VORSILBE = {"beton": "BE", "betonstahl": "BS"}
+
+
 @dataclass
 class MaterialEintrag(Beschreibung):
-    """Ein Baustoff, wie ihn die Oberflaeche beschreibt."""
+    """
+    Ein Baustoff, wie ihn die Oberflaeche beschreibt: eine Normsorte nach SIA,
+    die bleibt, wie sie ist, oder ein eigenes Material mit einer Sorte als
+    Vorlage.
+    """
 
     kennung: str
     art: str
     """``beton`` oder ``betonstahl``."""
 
     sorte: str
+    """Die Normsorte -- bei einem eigenen Material die Vorlage seiner Kennwerte."""
+
     name: str = ""
     eigenstaendig: bool = False
     """
-    False = unveraenderte Normsorte, Kennwerte gesperrt, Name = Sorte.
-    True  = eigenes Material, aenderbar, mit eigenem Namen.
+    False = Normsorte, Kennwerte gesperrt, Name = Sorte -- nie aenderbar.
+    True  = eigenes Material, aenderbar, mit eigenem Namen (BE1, BS1 ...).
     """
 
     abweichungen: Dict[str, float] = field(default_factory=dict)
@@ -123,6 +135,12 @@ class MaterialEintrag(Beschreibung):
                 raise ProjektFehler(
                     f"Eine unveränderte Normsorte muss '{self.sorte}' heissen, "
                     f"nicht '{self.name}'.")
+        elif self.anzeigename in sorten(self.art):
+            # Sonst stuende eine abgeaenderte Festigkeit unter einer
+            # Normbezeichnung im Bericht.
+            raise ProjektFehler(
+                f"Ein eigenes Material darf nicht wie die Normsorte "
+                f"'{self.anzeigename}' heissen.")
 
 
     @classmethod

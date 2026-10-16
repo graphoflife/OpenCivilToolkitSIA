@@ -1,5 +1,5 @@
 ---
-erzeugt: 11abfb241a47
+erzeugt: 5780a3f46238
 art: modul
 tags: [modul]
 ---
@@ -58,13 +58,15 @@ def als_dict(self) -> dict
 class MaterialEintrag(Beschreibung)
 ```
 
-Ein Baustoff, wie ihn die Oberflaeche beschreibt.
+Ein Baustoff, wie ihn die Oberflaeche beschreibt: eine Normsorte nach SIA,
+die bleibt, wie sie ist, oder ein eigenes Material mit einer Sorte als
+Vorlage.
 
 - `kennung: str`
 - `art: str` – `beton` oder `betonstahl`.
-- `sorte: str`
+- `sorte: str` – Die Normsorte -- bei einem eigenen Material die Vorlage seiner Kennwerte.
 - `name: str = ''`
-- `eigenstaendig: bool = False` – False = unveraenderte Normsorte, Kennwerte gesperrt, Name = Sorte. True = eigenes Material, aenderbar, mit eigenem Namen.
+- `eigenstaendig: bool = False` – False = Normsorte, Kennwerte gesperrt, Name = Sorte -- nie aenderbar. True = eigenes Material, aenderbar, mit eigenem Namen (BE1, BS1 ...).
 - `abweichungen: Dict[str, float] = field(default_factory=dict)`
 - `ueberschreibungen: Dict[str, float] = field(default_factory=dict)`
 
@@ -639,6 +641,7 @@ def aus_dict(cls, d: Mapping[str, Any]) -> 'KombinationEintrag'
 
 - `WERKSTOFFSAETZE = tuple((s.value for s in Werkstoffsatz))` – Mit welchen Festigkeiten ein Werkstoffgesetz rechnen kann, siehe [[opencivil.nachweis.querschnittsloeser#Werkstoffsatz|Werkstoffsatz]]. Gewaehlt in der Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse.
 - `BETONGESETZE = (Rechenart.PARABEL.value, Rechenart.BLOCK.value)` – Welche Spannungs-Dehnungs-Beziehung der Beton der Querschnittsanalyse haben kann: Parabel-Rechteck oder der Spannungsblock 0.85·x -- die beiden genauen Rechenarten ([[opencivil.nachweis.rechenwahl#Rechenart|Rechenart]]).
+- `EIGENE_VORSILBE = {'beton': 'BE', 'betonstahl': 'BS'}` – Womit die Namen eigener Materialien beginnen: BE1, BE2 ... beim Beton, BS1, BS2 ... beim Betonstahl (Benutzer, 2026-10-16: «BE1 … BE2 etc.»; das BS fuer den Betonstahl nach demselben Muster).
 - `HAEUFIG_ANTEIL = 70.0` – Anteil der Tragsicherheitseinwirkungen, der als haeufiger Lastfall gilt -- in Prozent, wie die Maske ihn zeigt. Eine Vorgabe, einstellbar je Platte.
 - `QUASISTAENDIG_ANTEIL = 60.0` – Dasselbe fuer die quasi-staendigen Lastfaelle.
 

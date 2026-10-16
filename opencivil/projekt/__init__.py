@@ -35,12 +35,13 @@ aufbau <- projekt. Wer von aussen kommt, importiert aus dem Paket, nicht aus den
 Modulen: ``from opencivil.projekt import Projekt``.
 
 NORMSORTE ODER EIGENES MATERIAL:
-Ein Material ist entweder eine unveraenderte Normsorte oder ein eigenes. Nur die
-unveraenderte darf die Sortenbezeichnung tragen: steht 'C30/37' auf einem
-Bauteil, muessen die Kennwerte auch die der Norm sein. Wer abweichen will, macht
-das Material mit :meth:`Projekt.material_loesen` eigenstaendig; es bekommt dann
-einen eigenen Namen wie ``C30/37_1``. So kann keine abgeaenderte Festigkeit unter
-dem Deckmantel einer Normbezeichnung im Bericht landen.
+Ein Material ist entweder eine Normsorte nach SIA oder ein eigenes. Die
+Normsorte traegt die Sortenbezeichnung und bleibt, wie sie ist: steht 'C30/37'
+auf einem Bauteil, sind die Kennwerte die der Norm. Wer abweichen will, legt
+ein eigenes Material an (:meth:`Projekt.eigener_beton`,
+:meth:`Projekt.eigener_stahl`), mit einer Sorte als Vorlage; es heisst BE1,
+BE2 ... oder BS1 ... So kann keine abgeaenderte Festigkeit unter dem
+Deckmantel einer Normbezeichnung im Bericht landen.
 
 EINHEITEN IN DER BESCHREIBUNG:
 Alle Zahlen stehen in der Anzeige-Einheit des jeweiligen Kennwerts (mm, N/mm^2,
