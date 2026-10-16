@@ -543,9 +543,9 @@ async function starten() {
       if (k.dataset.reiter === 'herleitung' && v && !v.loesung) verfolgen(v.ziel, v.name);
     });
   }
-  for (const k of document.querySelectorAll('#umfang .schalter-halb')) {
-    k.addEventListener('click', () => aendern({ umfang: k.dataset.umfang }, 'umfang'));
-  }
+  // Ein Klick irgendwo auf den Schalter schaltet um, wie bei jedem mit zwei Stellungen.
+  knoten.umfang.addEventListener('click', () => aendern(
+    { umfang: zustand.umfang === 'seite' ? 'gesamt' : 'seite' }, 'umfang'));
 
   griffeEinrichten();
   tafelwahlEinrichten();

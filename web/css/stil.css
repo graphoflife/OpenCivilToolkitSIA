@@ -485,17 +485,28 @@ input[readonly], input:disabled, select:disabled {
   .lage-kopf { grid-row: auto; flex-direction: row; align-items: center; gap: 8px; }
 }
 
-/* Zweistellungs-Schalter x|y und Gesamt|Seite -- mit dem Rand der
-   Eingabefelder: auch ein Schalter ist etwas, das man anfasst. */
-.schalter { display: inline-flex; border: 1px solid var(--eingabe-rand);
-            border-radius: 9px; overflow: hidden; }
+/* Schalter -- so hoch wie die Eingabefelder daneben und mit ihrem Rand: auch
+   ein Schalter ist etwas, das man anfasst. Die gewählte Stellung ist eine
+   abgerundete farbige Fläche, die bis an den Rand reicht; die andere bleibt
+   blass auf dem grauen Grund (Benutzer, 2026-10-16). Mit zwei Stellungen
+   ist der ganze Schalter ein Knopf und schaltet bei jedem Klick um
+   (`zweiSchalter`); mit mehr wählt ein Klick seine Stellung. */
+.schalter {
+  display: inline-flex; align-items: stretch; gap: 2px;
+  min-height: 28px; padding: 2px;
+  border: 1px solid var(--eingabe-rand); border-radius: 7px;
+  background: var(--flaeche-2); font: inherit; cursor: pointer;
+}
 .schalter-halb {
-  border: none; background: var(--flaeche); color: var(--schrift-zart);
-  padding: 1px 9px; font-size: 11px; font-weight: 700; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: none; border-radius: 5px; background: transparent; color: var(--schrift-zart);
+  padding: 0 9px; font-size: 11px; font-weight: 700; cursor: pointer;
   text-transform: uppercase;
 }
-.schalter-halb:hover { background: var(--flaeche-2); }
-.schalter-halb.ist-an { background: var(--blau); color: #fff; }
+.schalter:hover .schalter-halb:not(.ist-an) { color: var(--schrift-matt); }
+.schalter-halb.ist-an {
+  background: var(--blau); color: #fff; box-shadow: 0 1px 2px rgba(16, 24, 40, .25);
+}
 /* Eine Hälfte, die eine Tragrichtung meint, trägt deren Farbe -- an der Lage
    wie beim Lastfall. Die Hälfte sagt es selbst, nicht die Karte, in der sie
    steht: sonst färbte eine y-Lage jeden anderen Schalter darin mit. */
@@ -573,33 +584,16 @@ input[readonly], input:disabled, select:disabled {
 .duktilitaetszeile .richtung.lage-y {
   background: var(--richtung-y-hell); color: var(--richtung-y-tief);
 }
-/* Beide Hälften gleich breit und die Zeichen mittig: ✓ und ✗ sind verschieden
-   breit, und bei symmetrischem Innenabstand stand der Schalter dadurch
-   schief. Die abgewählte Seite bleibt blass, damit das Auge sofort sieht,
-   welche gilt. */
-/* Ja|Nein als ein Stück: die abgewählte Hälfte bleibt sichtbar, aber sie
-   soll nicht als weisse Spalte neben der farbigen stehen. Reines Weiss
-   neben Grün oder Rot liest sich wie eine Lücke im Schalter -- ein zarter
-   Grauton gehört erkennbar zum selben Knopf. */
-.schalter-haken { background: var(--flaeche-2); }
-.schalter-haken .schalter-halb {
-  width: 26px; padding: 2px 0; font-size: 12px; line-height: 15px;
-  display: inline-flex; align-items: center; justify-content: center;
-  color: var(--rand-stark); background: var(--flaeche-2);
-}
-.schalter-haken .schalter-halb:hover {
-  color: var(--schrift-matt); background: var(--flaeche-2);
-}
+/* Ja|Nein: grüner Haken, rotes Kreuz. Beide Hälften gleich breit und die
+   Zeichen mittig: ✓ und ✗ sind verschieden breit, und bei symmetrischem
+   Innenabstand stand der Schalter dadurch schief. */
+.schalter-haken .schalter-halb { width: 24px; padding: 0; font-size: 12px; color: var(--rand-stark); }
 .schalter-haken .ist-ja.ist-an   { background: var(--haken-gut); color: #fff; }
 .schalter-haken .ist-nein.ist-an { background: var(--haken-schlecht); color: #fff; }
-/* Die eingeschaltete Hälfte behält ihre Farbe auch unter dem Zeiger --
-   sonst blitzt beim Darüberfahren genau das Grau auf, das hier weg soll. */
-.schalter-haken .ist-ja.ist-an:hover   { background: var(--haken-gut); color: #fff; }
-.schalter-haken .ist-nein.ist-an:hover { background: var(--haken-schlecht); color: #fff; }
 
 /* Tragrichtung einer Einwirkung. Die Farben stehen bei .schalter-halb. */
 .schalter-richtung { width: 100%; }
-.schalter-richtung .schalter-halb { flex: 1; padding: 1px 2px; }
+.schalter-richtung .schalter-halb { flex: 1; padding: 0 2px; }
 .postenzeile .postenname { font-size: 11.5px; font-weight: 600; color: var(--schrift-matt); }
 .postenzeile .zeichen { font-size: 12px; color: var(--schrift-zart); text-align: center; }
 .postenzeile .einheit { font-size: 11px; color: var(--schrift-zart); }
@@ -618,8 +612,8 @@ input[readonly], input:disabled, select:disabled {
    Im Blau der gewöhnlichen Schalter -- es geht um die Höhenlage innerhalb
    einer Lage, nicht um die Tragrichtung. */
 .gunst-knopf {
-  padding: 1px 7px; font-size: 10.5px; font-weight: 700; cursor: pointer;
-  border: 1px solid var(--eingabe-rand); border-radius: 9px;
+  min-height: 28px; padding: 0 9px; font-size: 10.5px; font-weight: 700; cursor: pointer;
+  border: 1px solid var(--eingabe-rand); border-radius: 7px;
   background: var(--flaeche); color: var(--schrift-matt);
 }
 .gunst-knopf:hover { background: var(--blau-hell); }
@@ -1150,7 +1144,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
   font-size: 12px; color: var(--schrift-matt);
 }
-.spaltenwahl .schalter-halb { padding: 2px 10px; }
+.spaltenwahl .schalter-halb { padding: 0 10px; }
 
 .blaetter { display: grid; gap: 12px; align-items: start; }
 .blaetter.ist-1 { grid-template-columns: 1fr; }
@@ -1345,7 +1339,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   }
   /* Die Halbschalter stehen paarweise in engen Zeilen -- ihnen genügt die
      Höhe. Eine Mindestbreite schob die Lagenzeile über den Rand hinaus. */
-  .schalter-halb { min-height: 34px; padding: 6px 10px; }
+  .schalter, .gunst-knopf { min-height: 34px; }
   /* Der Löschknopf einer Postenzeile ist hier 34 px gross; seine Spalte
      wächst mit, sonst läge er über dem Namen. */
   .postenzeile {
@@ -1772,7 +1766,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 /* Diagramme der Querschnittsanalyse: oben der Lastfall, darunter seine Bilder.
    Solange die Bilder zur Eingabe davor gehören, bleiben sie blass stehen. */
 .qa-fallkopf { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font-size: 12.5px; }
-.qa-fallwahl .schalter-halb { text-transform: none; font-size: 12px; padding: 2px 10px; }
+.qa-fallwahl .schalter-halb { text-transform: none; font-size: 12px; padding: 0 10px; }
 .qa-nachfuehren { color: var(--schrift-zart); font-style: italic; }
 .blatt.ist-veraltet { opacity: .55; }
 

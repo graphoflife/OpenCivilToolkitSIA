@@ -17,7 +17,7 @@
  * Oberfläche nachgerechneter.
  */
 
-import { erklaerung, feld, panel } from './bausteine.js';
+import { erklaerung, feld, panel, zweiSchalter } from './bausteine.js';
 import { auswahl, el, ersetzen, melden, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
 import { fensterZeigen } from './fenster.js';
@@ -394,13 +394,11 @@ function richtungsSchalter(querschnitt, nummer, richtung, partner) {
       nummer, wert);
   });
 
-  return el('span.schalter', {
-    title: `Tragrichtung der ${nummer}. Lage – die ${partner}. bekommt die Gegenrichtung`,
-  }, ['x', 'y'].map((wert) => el('button.schalter-halb', {
-    text: wert,
-    class: `ist-${wert}${richtung === wert ? ' ist-an' : ''}`,
-    on: { click: () => { if (richtung !== wert) setzen(wert); } },
-  })));
+  return zweiSchalter({
+    stellungen: [['x', 'x', 'ist-x'], ['y', 'y', 'ist-y']], gewaehlt: richtung, setzen,
+    titel: `Tragrichtung der ${nummer}. Lage – die ${partner}. bekommt die Gegenrichtung. `
+      + 'Klicken schaltet um.',
+  });
 }
 
 

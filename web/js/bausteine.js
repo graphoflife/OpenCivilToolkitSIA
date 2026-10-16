@@ -119,26 +119,33 @@ export function lagenwahl(vorhanden, vorgabe) {
 }
 
 /**
+ * Ein Schalter mit zwei Stellungen: ein einziger Knopf, die gewählte Hälfte
+ * farbig. Ein Klick irgendwo darauf schaltet um, nicht nur einer auf die
+ * andere Hälfte (Benutzer, 2026-10-16). `stellungen` sind zwei
+ * `[wert, text, klasse]`; `klasse` trägt die Farbe der Hälfte.
+ */
+export function zweiSchalter({ stellungen, gewaehlt, setzen, titel, klasse = '' }) {
+  const [[a], [b]] = stellungen;
+  return el(`button.schalter${klasse}`, {
+    type: 'button', title: titel,
+    on: { click: () => setzen(gewaehlt === a ? b : a) },
+  }, stellungen.map(([wert, text, k]) => el('span.schalter-halb', {
+    text, class: `${k || ''} ${wert === gewaehlt ? 'ist-an' : ''}`,
+  })));
+}
+
+/**
  * Zweistellungs-Schalter ja/nein -- grüner Haken, rotes Kreuz.
  *
  * Beide Hälften gleich breit und die Zeichen mittig: ✓ und ✗ sind verschieden
  * breit, und bei symmetrischem Innenabstand wurde der Schalter dadurch schief.
  */
 export function hakenSchalter(an, setzen, was = 'Nachweis') {
-  return el('span.schalter.schalter-haken', {
-    title: an ? `${was} wird geführt` : `${was} wird nicht geführt`,
-  }, [
-    el('button.schalter-halb.ist-ja', {
-      text: '✓', title: `${was} führen`,
-      class: an ? 'ist-an' : '',
-      on: { click: () => { if (!an) setzen(true); } },
-    }),
-    el('button.schalter-halb.ist-nein', {
-      text: '✗', title: `${was} nicht führen`,
-      class: an ? '' : 'ist-an',
-      on: { click: () => { if (an) setzen(false); } },
-    }),
-  ]);
+  return zweiSchalter({
+    stellungen: [[true, '✓', 'ist-ja'], [false, '✗', 'ist-nein']],
+    gewaehlt: !!an, setzen, klasse: '.schalter-haken',
+    titel: `${was} ${an ? 'wird geführt' : 'wird nicht geführt'} -- Klicken schaltet um`,
+  });
 }
 
 /**

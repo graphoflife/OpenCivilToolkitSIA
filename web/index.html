@@ -8,18 +8,18 @@
   <link rel="stylesheet" href="vendor/katex/katex.min.css">
   <script defer src="vendor/katex/katex.min.js"></script>
   <!-- Versionsmarken: geschrieben von «python3 -m opencivil.web.bruecke», nicht von Hand ändern -->
-  <link rel="stylesheet" href="./css/stil.css?v=74e9c8288ac8">
+  <link rel="stylesheet" href="./css/stil.css?v=38062540b5e8">
   <script type="importmap">
   {
     "imports": {
       "./js/ablage.js": "./js/ablage.js?v=a67aeb3de570",
       "./js/achsen.js": "./js/achsen.js?v=87b48bf3c1f9",
       "./js/api.js": "./js/api.js?v=7a369d6df9f2",
-      "./js/app.js": "./js/app.js?v=3fb0bbcd8972",
+      "./js/app.js": "./js/app.js?v=78c5bb87595f",
       "./js/arten.js": "./js/arten.js?v=a84472f39f79",
       "./js/balkensystem.js": "./js/balkensystem.js?v=58a3e65dbb2e",
       "./js/baum.js": "./js/baum.js?v=6667d4856d09",
-      "./js/bausteine.js": "./js/bausteine.js?v=5e4ad56bf79b",
+      "./js/bausteine.js": "./js/bausteine.js?v=d1ce61476cf7",
       "./js/bericht.js": "./js/bericht.js?v=4069adde393d",
       "./js/bs_diagramme.js": "./js/bs_diagramme.js?v=8c926719734b",
       "./js/bs_symbole.js": "./js/bs_symbole.js?v=63dea3fc1a1c",
@@ -33,7 +33,7 @@
       "./js/cad_palette.js": "./js/cad_palette.js?v=d4ec92ee6165",
       "./js/diagramm.js": "./js/diagramm.js?v=afc3acde6f3a",
       "./js/dom.js": "./js/dom.js?v=c25fa011a69f",
-      "./js/editor.js": "./js/editor.js?v=025951260206",
+      "./js/editor.js": "./js/editor.js?v=6d5038372bda",
       "./js/fenster.js": "./js/fenster.js?v=eeecf68a8192",
       "./js/kapitel.js": "./js/kapitel.js?v=975c506e03ab",
       "./js/kern.js": "./js/kern.js?v=d9fb91326d27",
@@ -142,10 +142,11 @@
   <section class="tafel tafel-rechts" id="tafel-bericht">
     <div class="tafel-kopf">
       <h2 id="bericht-titel">Berechnung</h2>
-      <span class="schalter" id="umfang" title="Alles zeigen oder nur den links gewählten Bestandteil">
-        <button class="schalter-halb ist-an" data-umfang="seite">Aktuelle Seite</button>
-        <button class="schalter-halb" data-umfang="gesamt">Gesamt</button>
-      </span>
+      <button type="button" class="schalter" id="umfang"
+              title="Alles zeigen oder nur den links gewählten Bestandteil -- Klicken schaltet um">
+        <span class="schalter-halb ist-an" data-umfang="seite">Aktuelle Seite</span>
+        <span class="schalter-halb" data-umfang="gesamt">Gesamt</span>
+      </button>
       <div class="reiter" id="reiter">
         <button class="reiter-knopf ist-aktiv" data-reiter="nachweise">Zusammenfassung</button>
         <button class="reiter-knopf" data-reiter="diagramm">Diagramme</button>
