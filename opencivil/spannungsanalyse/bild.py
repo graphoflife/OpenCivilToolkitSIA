@@ -4,17 +4,20 @@ opencivil/spannungsanalyse/bild.py -- das Bild eines Querschnitts.
 VERANTWORTUNG:
 Die ersten zwei Fragen: aus Schnittgroessen oder aus Randdehnungen die
 Dehnung und die Spannung ueber die Hoehe, die Kraefte des Stahls und die
-Nulllinie (:class:`Querschnittsbild`).
+Nulllinie (:class:`Querschnittsbild`). Kippt die Nulllinie, zeigt das Bild
+den Schnitt senkrecht zu ihr.
 """
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from typing import List, Optional
 
 from opencivil.nachweis.querschnittsloeser import Faserloeser
 from opencivil.querschnitt.gesetzwahl import Rechenart
 from opencivil.querschnitt.werkstoffgesetz import RUNDUNG
+from opencivil.spannungsanalyse.linie import Dehnungsebene, Ebenensuche
 
 #: Punkte ueber die Hoehe, mit denen Dehnung und Spannung gezeichnet werden.
 #: Die Betonspannung hat am Nulldurchgang einen Knick; 41 Punkte zeigen ihn,
@@ -65,8 +68,18 @@ class Querschnittsbild:
 
     eps_m: float
     chi: float
+    """Dehnung am Arm null und Kruemmung senkrecht zur Nulllinie."""
+
     N: float
     M: float
+    """Das Moment um die Achse der Biegung."""
+
+    h: float = 0.0
+    """Die Tiefe des Betons, ueber die das Bild laeuft -- senkrecht zur Nulllinie, in m."""
+
+    neigung: float = 0.0
+    """Wie weit die Nulllinie gegen die Achse der Biegung gedreht ist, rad."""
+
     beton: List[Faserpunkt] = field(default_factory=list)
     stahl: List[Stahlpunkt] = field(default_factory=list)
     konvergiert: bool = True
@@ -89,9 +102,9 @@ class Querschnittsbild:
         return oben.z - oben.eps / self.chi
 
 
-def _bild(loeser: Faserloeser, eps_m: float, chi: float) -> Querschnittsbild:
+def _bild(ebene: Dehnungsebene) -> Querschnittsbild:
     """Dehnungen und Spannungen zu einer gegebenen Ebene -- ohne jede Suche."""
-    kraefte = loeser.kraefte(eps_m, chi)
+    loeser, eps_m, chi = ebene.loeser, ebene.eps_m, ebene.chi
     oben = loeser.oben
 
     beton = []
@@ -108,28 +121,37 @@ def _bild(loeser: Faserloeser, eps_m: float, chi: float) -> Querschnittsbild:
                                 nummer=lage.nummer, a_s=lage.a_s,
                                 kraft=sigma * lage.a_s, name=lage.text))
 
-    return Querschnittsbild(eps_m=eps_m, chi=chi, N=kraefte.N, M=kraefte.M,
-                            beton=beton, stahl=stahl)
+    bild = Querschnittsbild(eps_m=eps_m, chi=chi, N=ebene.N, M=ebene.M, h=loeser.h,
+                            neigung=ebene.neigung, beton=beton, stahl=stahl)
+    if ebene.neigung != 0.0:
+        winkel = f"{math.degrees(ebene.neigung):.1f}".replace("-", "−")
+        bild.hinweis = (
+            f"Die Nulllinie ist um {winkel}° gegen die Achse "
+            f"der Biegung gedreht, im Gegenuhrzeigersinn positiv: so bleibt kein Moment "
+            f"um die andere Achse. Das Bild zeigt den Schnitt senkrecht zu ihr, "
+            f"Krümmung und Tiefe gelten in dieser Richtung.")
+    return bild
 
 
-def aus_schnittgroessen(loeser: Faserloeser, *, N: float, M: float,
+def aus_schnittgroessen(suche: Ebenensuche, *, N: float, M: float,
                         art: Rechenart) -> Querschnittsbild:
     """
-    Die Dehnungsebene zu ``N`` und ``M``, samt allem, was darauf steht.
+    Die Dehnungsebene zu ``N`` und ``M``, samt allem, was darauf steht --
+    gefunden von der Ebenensuche des gerissenen Zustands.
 
     Gesucht wird mit demselben Verfahren wie in den Nachweisen. Findet sich
     keine Ebene, kommt das Bild leer zurueck und sagt warum -- geraten wird
     nicht. Verfehlt die Suche ihre Ebene, sagt es die Rechenart ``art``
     (:attr:`Rechenart.ohne_ebene`).
     """
-    ebene = loeser.loese(N_Ed=N, M_Ed=M)
-    if not ebene.konvergiert:
+    ebene = suche.zu_kraeften(N, M)
+    if ebene is None or ebene.verfehlt:
         return Querschnittsbild(
             eps_m=0.0, chi=0.0, N=N, M=M, konvergiert=False,
-            hinweis=(art.ohne_ebene if ebene.verfehlt else
+            hinweis=(art.ohne_ebene if ebene is not None else
                      "Zu dieser Kombination gibt es keine Gleichgewichtslage: "
                      "der Querschnitt nimmt sie nicht auf."))
-    return _bild(loeser, ebene.eps_m, ebene.chi)
+    return _bild(ebene)
 
 
 def aus_dehnungen(loeser: Faserloeser, *,
@@ -147,7 +169,7 @@ def aus_dehnungen(loeser: Faserloeser, *,
     # Schwerpunkt.
     chi = (eps_unten - eps_oben) / loeser.h if loeser.h > 0 else 0.0
     eps_m = eps_oben - chi * loeser.oben
-    bild = _bild(loeser, eps_m, chi)
+    bild = _bild(Dehnungsebene(loeser=loeser, eps_m=eps_m, chi=chi))
     # Druck und Zug je gegen ihre eigene Grenze: −5 ‰ liegt jenseits des
     # Betons, auch wenn der Stahl bis 45 ‰ reicht. Bis 2026-10-16 stand hier
     # das Groessere der beiden, und der Hinweis blieb aus.

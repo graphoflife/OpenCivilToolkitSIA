@@ -1,5 +1,5 @@
 ---
-erzeugt: 717252588268
+erzeugt: e88924496f81
 art: formel
 tags: [formel]
 ---
@@ -27,7 +27,7 @@ $$
 | $h$ | Plattendicke | mm | Vorgabe |
 | $f_{ct,eff}$ | – | N/mm² | [[Wirksame Zugfestigkeit]] |
 | $A$ | Fläche des Bruttoquerschnitts | mm² | Zwischenwert |
-| $W$ | – | ·10⁶ mm³ | [[Widerstandsmoment zum gezogenen Rand]] |
+| $W$ | – | ·10⁶ mm³ | [[Widerstandsmoment zum gezogensten Betonpunkt]], [[Widerstandsmoment zum gezogenen Rand]] |
 
 ## Beispiel
 
@@ -68,3 +68,9 @@ den gerissenen Wert.
 
 Gerechnet wird wie beim [[Rissmoment des ungerissenen Querschnitts]] am
 Bruttoquerschnitt ohne Stahl -- nach Vorgabe, nicht nachgeschlagen.
+
+Beim gezeichneten Querschnitt gehört $W$ zur Ecke, die unter reiner Biegung
+zuerst reisst: kippt die Nulllinie, mit dem Deviationsmoment
+([[Widerstandsmoment zum gezogensten Betonpunkt]]), «einachsig» zum gezogenen
+Rand ([[Widerstandsmoment zum gezogenen Rand]]). Die Normalkraft verschiebt
+das Rissmoment um $N \cdot W/A$.

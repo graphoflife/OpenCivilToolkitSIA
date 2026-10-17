@@ -1,5 +1,5 @@
 ---
-erzeugt: b579e25f8200
+erzeugt: 84ebf1a6e01f
 art: modul
 tags: [modul]
 ---
@@ -28,7 +28,6 @@ Ein Spannungsfall der Beschreibung -- und was die Auswertung ergab.
 - `art: Analyseart`
 - `richtung: Any` – Die Tragrichtung einer Platte ([[opencivil.spannungsanalyse.analysen#Analyse|Richtung]]) oder die Zugseite eines gezeichneten Querschnitts ([[opencivil.querschnitt.zugseite#Zugseite|Zugseite]]).
 - `richtung_text: str = ''` – Wie sie neben dem Titel steht -- «x», «Zug unten».
-- `h: float = 0.0` – Die Tiefe in m -- fuer das Bild: die Dicke der Platte, beim gezeichneten Querschnitt die Ausdehnung des Betons in Zugrichtung.
 - `bild: Optional[Querschnittsbild] = None`
 - `kurve: Optional[Union[Linie, 'Modullinie']] = None` – Die M-chi- oder N-eps-Linie -- oder der aequivalente Modul daraus.
 - `paar: Optional[Paar] = None` – Womit gerechnet wurde -- das Paar mit Kriechzahl, Wertesatz, Betongesetz: das der Platte oder das des gezeichneten Querschnitts.

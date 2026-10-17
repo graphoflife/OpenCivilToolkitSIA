@@ -1,5 +1,5 @@
 ---
-erzeugt: 317ecbc5d489
+erzeugt: a81f21c74d6e
 art: modul
 tags: [modul]
 ---
@@ -41,6 +41,14 @@ gerechnet wird.
 - `ids: Mapping[str, str] = field(default_factory=dict)` – Kurzname -> Wert-ID der Eingaben, fuer die Herleitung.
 - `E_cm: float = 0.0` – Der Modul des Betons -- daran misst sich der aequivalente Modul.
 - `bezugsort = 'auf halber Höhe'` – Wo die Mitteldehnung gilt -- dort greift N an.
+
+#### Loeserpaar.ebenen
+
+```python
+def ebenen(self) -> Zustaende
+```
+
+Die Ebenen der Platte: ein Rechteck, die Nulllinie bleibt parallel zur Achse.
 
 #### Loeserpaar.rissmoment_bei
 
@@ -122,7 +130,7 @@ Wo die Linie reisst: das Rissmoment bei N, oder die Rissnormalkraft bei M.
 #### Loeserpaar.herleitung_dehnung_am_ende
 
 ```python
-def herleitung_dehnung_am_ende(self, p: Protokoll, w: Zwischenwerte, bruch: 'Grenzzustand', oben: 'Wert', unten: 'Wert') -> None
+def herleitung_dehnung_am_ende(self, p: Protokoll, w: Zwischenwerte, bruch: 'Grenzzustand', oben: 'Wert', unten: 'Wert', h: 'Wert') -> None
 ```
 
 Die Dehnung, ueber die die N-eps-Linie laeuft, am Ende -- auf halber Hoehe.

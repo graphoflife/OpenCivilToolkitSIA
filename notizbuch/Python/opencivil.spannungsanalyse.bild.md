@@ -1,5 +1,5 @@
 ---
-erzeugt: 444d7b5e5d75
+erzeugt: 06d354fd5906
 art: modul
 tags: [modul]
 ---
@@ -11,7 +11,8 @@ tags: [modul]
 
 Die ersten zwei Fragen: aus Schnittgroessen oder aus Randdehnungen die
 Dehnung und die Spannung ueber die Hoehe, die Kraefte des Stahls und die
-Nulllinie ([[opencivil.spannungsanalyse.bild#Querschnittsbild|Querschnittsbild]]).
+Nulllinie ([[opencivil.spannungsanalyse.bild#Querschnittsbild|Querschnittsbild]]). Kippt die Nulllinie, zeigt das Bild
+den Schnitt senkrecht zu ihr.
 
 ## Inhalt
 
@@ -52,9 +53,11 @@ class Querschnittsbild
 Dehnungsebene, Spannungen und die daraus entstehenden Schnittgroessen.
 
 - `eps_m: float`
-- `chi: float`
+- `chi: float` – Dehnung am Arm null und Kruemmung senkrecht zur Nulllinie.
 - `N: float`
-- `M: float`
+- `M: float` – Das Moment um die Achse der Biegung.
+- `h: float = 0.0` – Die Tiefe des Betons, ueber die das Bild laeuft -- senkrecht zur Nulllinie, in m.
+- `neigung: float = 0.0` – Wie weit die Nulllinie gegen die Achse der Biegung gedreht ist, rad.
 - `beton: List[Faserpunkt] = field(default_factory=list)`
 - `stahl: List[Stahlpunkt] = field(default_factory=list)`
 - `konvergiert: bool = True`
@@ -76,7 +79,7 @@ zeigen, die es nicht gibt.
 ### _bild
 
 ```python
-def _bild(loeser: Faserloeser, eps_m: float, chi: float) -> Querschnittsbild
+def _bild(ebene: Dehnungsebene) -> Querschnittsbild
 ```
 
 Dehnungen und Spannungen zu einer gegebenen Ebene -- ohne jede Suche.
@@ -84,10 +87,11 @@ Dehnungen und Spannungen zu einer gegebenen Ebene -- ohne jede Suche.
 ### aus_schnittgroessen
 
 ```python
-def aus_schnittgroessen(loeser: Faserloeser, *, N: float, M: float, art: Rechenart) -> Querschnittsbild
+def aus_schnittgroessen(suche: Ebenensuche, *, N: float, M: float, art: Rechenart) -> Querschnittsbild
 ```
 
-Die Dehnungsebene zu `N` und `M`, samt allem, was darauf steht.
+Die Dehnungsebene zu `N` und `M`, samt allem, was darauf steht --
+gefunden von der Ebenensuche des gerissenen Zustands.
 
 Gesucht wird mit demselben Verfahren wie in den Nachweisen. Findet sich
 keine Ebene, kommt das Bild leer zurueck und sagt warum -- geraten wird
@@ -116,6 +120,7 @@ Normalkraft und Moment in einem Durchgang.
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
+- [[opencivil.spannungsanalyse.linie]]
 
 ## Gebraucht von
 

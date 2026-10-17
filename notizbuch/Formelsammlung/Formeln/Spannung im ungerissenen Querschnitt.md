@@ -1,5 +1,5 @@
 ---
-erzeugt: 61af010ee86d
+erzeugt: 746d7394b89b
 art: formel
 tags: [formel]
 ---
@@ -18,6 +18,7 @@ $$
 
 - [[Sprödes Versagen je Richtung]]
 - [[Zwängung auf Biegung]]
+- [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

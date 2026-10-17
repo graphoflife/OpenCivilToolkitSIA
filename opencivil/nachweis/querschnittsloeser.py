@@ -662,6 +662,12 @@ class FaserloeserIllinois(Faserloeser):
     Gesetze ohne Sprung -- Parabel, elastisch -- haben flache Stuecke erst am
     vollplastischen Querschnitt; an den Pruefprojekten bleibt dort jede Zahl,
     wie sie war.
+
+    Wer ihn fuer eine einzige Frage baut, hat kein Gedaechtnis, an dem das
+    Ergebnis haengen koennte: der darf ihn auch bei springendem Gesetz mit
+    Illinois suchen lassen (``halbiert=False``) -- so die kippende Nulllinie
+    der Spannung-Dehnung-Analyse
+    (:class:`~opencivil.spannungsanalyse.schnitt.KippendeNulllinie`).
     """
 
     SUCHE = (
@@ -680,14 +686,17 @@ class FaserloeserIllinois(Faserloeser):
     def suche(self) -> str:
         return Faserloeser.SUCHE if self.halbiert else self.SUCHE
 
-    def __init__(self, **angaben) -> None:
+    def __init__(self, *, halbiert: Optional[bool] = None, **angaben) -> None:
         super().__init__(**angaben)
         self._zuletzt: Optional[float] = None
         """Die Kruemmung der zuletzt gefundenen Ebene -- von dort sucht die naechste."""
         self._eps_zuletzt: Optional[float] = None
         """Die zuletzt gefundene Mitteldehnung -- von dort sucht die naechste."""
-        self.halbiert = self.querschnitt.springt
-        """Ob er wie jeder :class:`Faserloeser` sucht, weil ein Gesetz springt -- siehe oben."""
+        self.halbiert = self.querschnitt.springt if halbiert is None else halbiert
+        """
+        Ob er wie jeder :class:`Faserloeser` sucht -- ohne Angabe, wo ein Gesetz
+        springt, siehe oben.
+        """
 
     def _eps_zu_normalkraft(self, chi: float, N_ziel: float) -> Optional[float]:
         """

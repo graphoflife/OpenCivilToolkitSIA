@@ -1,5 +1,5 @@
 ---
-erzeugt: bbd74ba37eb5
+erzeugt: 7a8c581e4a8a
 art: modul
 tags: [modul]
 ---
@@ -245,7 +245,13 @@ Stuecken fast so schnell wie das Sekantenverfahren. Die Abwandlung halbiert
 den Wert am Ende, das zweimal hintereinander stehen bleibt; sonst
 kroeche die Regula falsi an einer gekruemmten Funktion nur von einer Seite
 heran. `f` gibt `(Wert, Beigabe)` zurueck; zurueck kommt die Beigabe
-der besten Stelle.
+der besten Stelle -- `None`, wenn schon die erste keinen Wert hat.
+
+Hat `f` an einer Stelle keinen Wert (`nan`), endet die Suche dort: ohne
+ihn laesst sich nicht weiter eingrenzen. Bis 2026-10-17 rechnete sie mit
+`nan` weiter, bis eine Zerlegung bei ψ = nan abbrach -- an der kippenden
+Nulllinie eines L, wo zwischen zwei Neigungen mit Gleichgewicht eine ohne
+liegen kann.
 
 ### Querschnitt
 

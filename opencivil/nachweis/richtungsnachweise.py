@@ -172,7 +172,7 @@ class SproedesVersagenQA(Nachweis):
                  titel="Sprödes Versagen", referenz="SIA 262:2025, 4.4.1.3",
                  name="Bedingung gegen sprödes Versagen")
 
-        brutto = bruttoquerschnitt(self.analyse, e)
+        brutto = bruttoquerschnitt(self.analyse, e.si_nach_id())
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
         for name, M_y, M_z in richtungen(self.einachsig):
@@ -187,7 +187,7 @@ class SproedesVersagenQA(Nachweis):
                 continue
 
             riss = rissmoment(brutto, M_y, M_z, einachsig=self.einachsig)
-            M_Riss = protokoll_rissmoment(p, e, self.analyse, werte, riss, M_y, M_z,
+            M_Riss = protokoll_rissmoment(p, e, self.analyse, werte, brutto, riss, M_y, M_z,
                                           einachsig=self.einachsig,
                                           referenz="SIA 262:2025, 4.4.1.3")
             M_Rd_si = abs(punkt.M_y) if self.einachsig else punkt.moment

@@ -37,6 +37,16 @@ class Zugseite(Wahl):
                 Zugseite.LINKS: math.pi, Zugseite.RECHTS: 0.0}[self]
 
     @property
+    def moment(self) -> Tuple[float, float]:
+        """
+        Ein Moment von eins, das diese Seite zieht, als ``(M_y, M_z)``: M_y > 0
+        zieht unten, M_z > 0 links -- wie
+        :meth:`~opencivil.querschnitt.interaktion.Querschnitt.neigung_fuer`.
+        """
+        return {Zugseite.UNTEN: (1.0, 0.0), Zugseite.OBEN: (-1.0, 0.0),
+                Zugseite.LINKS: (0.0, 1.0), Zugseite.RECHTS: (0.0, -1.0)}[self]
+
+    @property
     def um_y(self) -> bool:
         """Ob die Biegung um die y-Achse geht -- Zug unten oder oben."""
         return self in (Zugseite.UNTEN, Zugseite.OBEN)

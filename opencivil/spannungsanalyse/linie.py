@@ -9,15 +9,28 @@ muss (:class:`Paar`). Die Platte bietet es je Tragrichtung
 Querschnitt je Zugseite
 (:class:`~opencivil.spannungsanalyse.schnitt.Schnittpaar`); bis 2026-10-17
 hiess es an den Funktionen dafuer ``paar: Any``.
+
+DIE EBENEN:
+Jede Linie fragt einen Zustand des Paars nach Ebenen: zu N und M, zu einer
+Kruemmung bei N, zu einer Dehnung bei M (:class:`Ebenensuche`). Die Antwort
+ist eine :class:`Dehnungsebene` in der Richtung ihres Loesers. Bei der
+Platte und beim gezeichneten Querschnitt «einachsig» bleibt die Nulllinie
+parallel zur Achse der Biegung (:class:`FesteNulllinie`); sonst kippt sie,
+bis kein Moment um die andere Achse bleibt
+(:class:`~opencivil.spannungsanalyse.schnitt.KippendeNulllinie`). Die Linie
+selbst weiss davon nichts: sie liest Kraft und Verformung der Ebene.
 """
 
 from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Callable, List, Mapping, Optional, Protocol, Tuple
+from functools import cached_property
+from typing import (
+    TYPE_CHECKING, Any, Callable, List, Mapping, NamedTuple, Optional, Protocol, Tuple,
+)
 
-from opencivil.nachweis.querschnittsloeser import Ebene, Faserloeser
+from opencivil.nachweis.querschnittsloeser import Faserloeser
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.spannungsanalyse.art import Analyseart
@@ -25,6 +38,7 @@ from opencivil.spannungsanalyse.art import Analyseart
 if TYPE_CHECKING:
     from opencivil.core.protokoll import Protokoll, Zwischenwerte
     from opencivil.core.wert import Wert
+    from opencivil.querschnitt.fasern import Schnittkraefte
 
 #: Punkte des gerissenen Teils einer Linie -- vor dem Fliessen ein Drittel,
 #: danach der Rest, denn dort waechst die Verformung am staerksten.
@@ -32,6 +46,155 @@ KURVENPUNKTE = 40
 
 #: Punkte des ungerissenen Teils. Er ist beinahe gerade.
 PUNKTE_UNGERISSEN = 10
+
+
+# ===========================================================================
+# Die Ebenen eines Zustands
+# ===========================================================================
+
+
+@dataclass(frozen=True)
+class Dehnungsebene:
+    """
+    Eine Dehnungsebene eines Paars -- in der Richtung ihres Loesers, also
+    senkrecht zu ihrer Nulllinie. Kippt die Nulllinie um :attr:`neigung`,
+    zaehlen Moment und Kruemmung, wie sie zur Achse der Biegung stehen: das
+    Moment um diese Achse und die Kruemmung senkrecht zu ihr.
+    """
+
+    loeser: Faserloeser
+    """Der Querschnitt in der Richtung der Ebene."""
+
+    eps_m: float
+    chi: float
+    """Dehnung am Arm null und Kruemmung senkrecht zur Nulllinie."""
+
+    neigung: float = 0.0
+    """Wie weit die Nulllinie gegen die Achse der Biegung gedreht ist, rad -- gegen den Uhrzeiger."""
+
+    grenznamen: Tuple[str, ...] = ()
+    """Je Grenze des Loesers, was sie ist -- fuer «massgebend»."""
+
+    verfehlt: bool = False
+    """
+    Ob die Suche an einem Sprung des Spannungsblocks haengen blieb
+    (:attr:`~opencivil.nachweis.querschnittsloeser.Ebene.verfehlt`). Eine
+    Linie nimmt eine solche Ebene: sie fragt nach der Verformung, bei der ihre
+    Kraft einen Wert durchlaeuft, und am Sprung ist das seine Stelle, auch wenn
+    dort keine Ebene die Kraft genau erzeugt. Ein Bild dagegen braucht die
+    Ebene selbst.
+    """
+
+    @cached_property
+    def kraefte(self) -> "Schnittkraefte":
+        """``N``, ``M`` und ``M_quer`` in der Richtung des Loesers."""
+        return self.loeser.kraefte(self.eps_m, self.chi)
+
+    @property
+    def N(self) -> float:
+        return self.kraefte.N
+
+    @property
+    def M(self) -> float:
+        """Das Moment um die Achse der Biegung -- bei gekippter Nulllinie aus beiden Anteilen."""
+        k = self.kraefte
+        if self.neigung == 0.0:
+            return k.M
+        return k.M * math.cos(self.neigung) - k.M_quer * math.sin(self.neigung)
+
+    @property
+    def M_quer(self) -> float:
+        """Das Moment um die andere Achse -- unter reiner Biegung null."""
+        k = self.kraefte
+        return k.M * math.sin(self.neigung) + k.M_quer * math.cos(self.neigung)
+
+    @property
+    def kruemmung(self) -> float:
+        """Die Kruemmung senkrecht zur Achse der Biegung -- ueber sie laeuft die M-χ-Linie."""
+        return self.chi if self.neigung == 0.0 else self.chi * math.cos(self.neigung)
+
+    @property
+    def eps_oben(self) -> float:
+        """Die Dehnung am oberen Rand des Betons, dem gedrueckten bei positivem Moment."""
+        return self.eps_m + self.chi * self.loeser.oben
+
+    @property
+    def eps_unten(self) -> float:
+        return self.eps_m + self.chi * self.loeser.unten
+
+    @property
+    def fliesst(self) -> bool:
+        """Ob eine Lage die Fliessdehnung erreicht -- jede die ihres eigenen Stahls."""
+        oben = self.loeser.oben
+        return any(self.eps_m + self.chi * (l.z + oben) >= l.stahl.eps_yd
+                   for l in self.loeser.lagen)
+
+    @property
+    def massgebend(self) -> str:
+        """Welche Grenzdehnung die Ebene erreicht -- die mit dem kleinsten Abstand."""
+        bester, abstand = ("", 0.0), math.inf
+        for g, name in zip(self.loeser.grenzen.grenzen, self.grenznamen):
+            eps = self.eps_m + self.chi * g.arm
+            for grenze in (g.eps_min, g.eps_max):
+                if math.isfinite(grenze) and abs(eps - grenze) < abstand:
+                    bester, abstand = (name, grenze), abs(eps - grenze)
+        name, grenze = bester
+        return f"{name} bei {grenze * 1e3:.2f} ‰".replace("-", "−")
+
+
+class Ebenensuche(Protocol):
+    """
+    Wie ein Zustand eines Paars -- gerissen oder ungerissen -- zu seinen
+    Ebenen kommt. Jede Frage hat ihre Ebene oder ``None``, wo es kein
+    Gleichgewicht gibt; ``M`` ist das Moment um die Achse der Biegung,
+    ``chi`` die Kruemmung senkrecht zu ihr.
+    """
+
+    def zu_kraeften(self, N: float, M: float) -> Optional[Dehnungsebene]:
+        """Die Ebene, die ``N`` und ``M`` traegt -- auch eine verfehlte (siehe dort)."""
+
+    def zur_kruemmung(self, chi: float, N: float) -> Optional[Dehnungsebene]:
+        """Die Ebene mit der Kruemmung ``chi``, die ``N`` traegt."""
+
+    def zur_dehnung(self, eps_m: float, M: float) -> Optional[Dehnungsebene]:
+        """Die Ebene mit der Dehnung ``eps_m`` am Arm null, die ``M`` traegt."""
+
+
+@dataclass(frozen=True)
+class FesteNulllinie:
+    """
+    Die Ebenen in einer festen Richtung: die Nulllinie bleibt parallel zur
+    Achse der Biegung, und jede Frage ist eine Suche des Loesers. So rechnet
+    die Platte, so rechnet der gezeichnete Querschnitt «einachsig».
+    """
+
+    loeser: Faserloeser
+    grenznamen: Tuple[str, ...] = ()
+
+    def _ebene(self, eps_m: float, chi: float, *, verfehlt: bool = False) -> Dehnungsebene:
+        return Dehnungsebene(loeser=self.loeser, eps_m=eps_m, chi=chi,
+                             grenznamen=self.grenznamen, verfehlt=verfehlt)
+
+    def zu_kraeften(self, N: float, M: float) -> Optional[Dehnungsebene]:
+        e = self.loeser.loese(N_Ed=N, M_Ed=M)
+        if not (e.konvergiert or e.verfehlt):
+            return None
+        return self._ebene(e.eps_m, e.chi, verfehlt=e.verfehlt)
+
+    def zur_kruemmung(self, chi: float, N: float) -> Optional[Dehnungsebene]:
+        eps_m = self.loeser.mitteldehnung(chi, N)
+        return None if eps_m is None else self._ebene(eps_m, chi)
+
+    def zur_dehnung(self, eps_m: float, M: float) -> Optional[Dehnungsebene]:
+        chi = self.loeser.kruemmung(eps_m, M)
+        return None if chi is None else self._ebene(eps_m, chi)
+
+
+class Zustaende(NamedTuple):
+    """Die beiden Zustaende eines Paars, je mit seiner Ebenensuche."""
+
+    gerissen: Ebenensuche
+    ungerissen: Ebenensuche
 
 
 # ===========================================================================
@@ -49,11 +212,10 @@ class Paar(Protocol):
 
     gerissen: Faserloeser
     ungerissen: Faserloeser
+    """Die beiden Loeser in der Richtung des Paars -- fuer das Bild aus Randdehnungen."""
+
     wahl: Rechenwahl
     """Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart."""
-
-    grenznamen: Tuple[str, ...]
-    """Je Grenze des gerissenen Loesers, was sie ist -- fuer «massgebend»."""
 
     ids: Mapping[str, str]
     """Kurzname -> Wert-ID der Eingaben, fuer die Herleitung."""
@@ -66,6 +228,13 @@ class Paar(Protocol):
 
     bezugsort: str
     """Wo die Mitteldehnung gilt -- dort greift N an."""
+
+    def ebenen(self) -> Zustaende:
+        """
+        Wie die beiden Zustaende ihre Ebenen finden -- fuer jede Linie und
+        jedes Bild neu: eine Suche, die bei der zuletzt gefundenen Neigung
+        anfaengt, hinge sonst an dem, was vorher gerechnet wurde.
+        """
 
     @property
     def I_c(self) -> float: ...
@@ -83,7 +252,8 @@ class Paar(Protocol):
                         ein: Callable[[str], "Wert"], h: "Wert") -> None: ...
 
     def herleitung_dehnung_am_ende(self, p: "Protokoll", w: "Zwischenwerte",
-                                   bruch: "Grenzzustand", oben: "Wert", unten: "Wert") -> None: ...
+                                   bruch: "Grenzzustand", oben: "Wert", unten: "Wert",
+                                   h: "Wert") -> None: ...
 
     def herleitung_bezug(self, p: "Protokoll", w: "Zwischenwerte", momente: bool,
                          ein: Callable[[str], "Wert"], h: "Wert") -> "Wert": ...
@@ -132,6 +302,8 @@ class Grenzzustand(Eckpunkt):
     eps_oben: float = 0.0
     eps_unten: float = 0.0
     massgebend: str = ""
+    ebene: Optional[Dehnungsebene] = field(default=None, compare=False, repr=False)
+    """Die Ebene am Ende -- mit ihrer Richtung, fuer die Herleitung."""
 
 
 @dataclass
@@ -177,15 +349,16 @@ class _Weg:
     """
     Wie eine Linie laeuft -- der einzige Unterschied zwischen M-chi und N-eps.
 
-    ``ebene`` fuehrt von einer Verformung zur gerissenen Ebene ``(eps_m,
-    chi)`` oder zu ``None``, wo es kein Gleichgewicht gibt; ``kraft`` liest
-    aus der Ebene die Kraft der Linie; ``verformung_bei`` sucht zu einer Kraft
-    die Verformung, mit einem der beiden Loeser.
+    ``ebene`` fuehrt von einer Verformung zur gerissenen Ebene oder zu
+    ``None``, wo es kein Gleichgewicht gibt; ``kraft`` liest aus der Ebene die
+    Kraft der Linie; ``verformung_I`` und ``verformung_II`` suchen zu einer
+    Kraft die Verformung, ungerissen und gerissen.
     """
 
-    ebene: Callable[[float], Optional[Tuple[float, float]]]
-    kraft: Callable[[Tuple[float, float]], float]
-    verformung_bei: Callable[[Faserloeser, float], Optional[float]]
+    ebene: Callable[[float], Optional[Dehnungsebene]]
+    kraft: Callable[[Dehnungsebene], float]
+    verformung_I: Callable[[float], Optional[float]]
+    verformung_II: Callable[[float], Optional[float]]
     obergrenze: float
     """Eine Verformung, ueber der es sicher kein Gleichgewicht mehr gibt."""
 
@@ -205,18 +378,6 @@ def _grenze(gut: Callable[[float], bool], unten: float, oben: float) -> float:
     return unten
 
 
-def _massgebend(paar: Paar, eps_m: float, chi: float) -> str:
-    """Welche Grenzdehnung die Ebene erreicht -- die mit dem kleinsten Abstand."""
-    bester, abstand = ("", 0.0), math.inf
-    for g, name in zip(paar.gerissen.grenzen.grenzen, paar.grenznamen):
-        eps = eps_m + chi * g.arm
-        for grenze in (g.eps_min, g.eps_max):
-            if math.isfinite(grenze) and abs(eps - grenze) < abstand:
-                bester, abstand = (name, grenze), abs(eps - grenze)
-    name, grenze = bester
-    return f"{name} bei {grenze * 1e3:.2f} ‰".replace("-", "−")
-
-
 def _linie(paar: Paar, weg: _Weg, art: Analyseart, fest: float,
            riss: float) -> Linie:
     """
@@ -225,7 +386,7 @@ def _linie(paar: Paar, weg: _Weg, art: Analyseart, fest: float,
     Fliessbeginn als Punkt der Linie.
     """
     linie = Linie(art=art, fest=fest, riss=riss)
-    start = weg.verformung_bei(paar.gerissen, 0.0)
+    start = weg.verformung_II(0.0)
     if start is None:
         return linie
 
@@ -239,11 +400,9 @@ def _linie(paar: Paar, weg: _Weg, art: Analyseart, fest: float,
     ebene = weg.ebene(ende)
     if ebene is None:
         return linie
-    eps_m, chi = ebene
-    g = paar.gerissen
     linie.bruch = Grenzzustand(
-        kraft=weg.kraft(ebene), verformung=ende, eps_oben=eps_m + chi * g.oben,
-        eps_unten=eps_m + chi * g.unten, massgebend=_massgebend(paar, eps_m, chi))
+        kraft=weg.kraft(ebene), verformung=ende, eps_oben=ebene.eps_oben,
+        eps_unten=ebene.eps_unten, massgebend=ebene.massgebend, ebene=ebene)
     kraft_u = linie.bruch.kraft
     if kraft_u <= 0.0:
         return linie
@@ -254,11 +413,10 @@ def _linie(paar: Paar, weg: _Weg, art: Analyseart, fest: float,
             # Der letzte genau bei ``bis``: bis * 10 / 10 liegt sonst eine
             # Rundung darueber, beim Riss also schon jenseits des Risses.
             kraft = bis if i == PUNKTE_UNGERISSEN else bis * i / PUNKTE_UNGERISSEN
-            v_I = weg.verformung_bei(paar.ungerissen, kraft)
+            v_I = weg.verformung_I(kraft)
             if v_I is not None:
                 punkte.append(Linienpunkt(kraft=kraft, verformung=v_I, gerissen=False,
-                                          verformung_I=v_I,
-                                          verformung_II=weg.verformung_bei(paar.gerissen, kraft)))
+                                          verformung_I=v_I, verformung_II=weg.verformung_II(kraft)))
         return punkte
 
     if riss >= kraft_u:
@@ -266,17 +424,14 @@ def _linie(paar: Paar, weg: _Weg, art: Analyseart, fest: float,
         linie.punkte = kraftpunkte(kraft_u)
         return linie
 
-    arme = [(l.z + g.oben, l.stahl.eps_yd) for l in g.lagen]
-
     def fliesst(verformung: float) -> bool:
-        # Jede Lage an der Fliessdehnung ihres eigenen Stahls.
         e = weg.ebene(verformung)
-        return e is not None and any(e[0] + e[1] * a >= eps_y for a, eps_y in arme)
+        return e is not None and e.fliesst
 
     anfang, risskraft = start, None
     if riss > 0.0:
         linie.punkte = kraftpunkte(riss)
-        nach_riss = weg.verformung_bei(paar.gerissen, riss)
+        nach_riss = weg.verformung_II(riss)
         if nach_riss is not None:
             anfang, risskraft = nach_riss, riss
 
@@ -308,8 +463,7 @@ def _linie(paar: Paar, weg: _Weg, art: Analyseart, fest: float,
         # Grenze. Der erste Punkt nach dem Sprung traegt genau die Risskraft.
         linie.punkte.append(Linienpunkt(
             kraft=kraft, verformung=verformung, gerissen=True,
-            verformung_I=(weg.verformung_bei(paar.ungerissen, kraft)
-                          if kraft <= riss else None),
+            verformung_I=weg.verformung_I(kraft) if kraft <= riss else None,
             verformung_II=verformung))
     if paar.wahl.art.mit_block:
         linie.hinweisen(
@@ -321,36 +475,23 @@ def _linie(paar: Paar, weg: _Weg, art: Analyseart, fest: float,
     return linie
 
 
-def _durchlaufen(e: Ebene) -> bool:
-    """
-    Ob eine Linie die Ebene nimmt: gefunden -- oder verfehlt an einem Sprung
-    des Spannungsblocks (:attr:`Ebene.verfehlt`). Eine Linie fragt nach der
-    Verformung, bei der ihre Kraft einen Wert durchlaeuft; am Sprung ist das
-    seine Stelle, auch wenn dort keine Ebene die Kraft genau erzeugt. Ein
-    Nachweis dagegen braucht die Ebene selbst.
-    """
-    return e.konvergiert or e.verfehlt
-
-
 def moment_kruemmung(paar: Paar, *, N: float) -> Linie:
     """
     Die Momenten-Kruemmungs-Linie bei der Normalkraft ``N`` (Zug positiv):
     ungerissen bis ``M_Riss(N)``, dort der Sprung, darueber gerissen bis zum
     Bruch.
     """
-    gerissen = paar.gerissen
+    gerissen, ungerissen = paar.ebenen()
 
-    def ebene(chi: float) -> Optional[Tuple[float, float]]:
-        eps_m = gerissen.mitteldehnung(chi, N)
-        return None if eps_m is None else (eps_m, chi)
+    def kruemmung_bei(suche: Ebenensuche) -> Callable[[float], Optional[float]]:
+        def bei(M: float) -> Optional[float]:
+            e = suche.zu_kraeften(N, M)
+            return None if e is None else e.kruemmung
+        return bei
 
-    def verformung_bei(loeser: Faserloeser, M: float) -> Optional[float]:
-        e = loeser.loese(N_Ed=N, M_Ed=M)
-        return e.chi if _durchlaufen(e) else None
-
-    weg = _Weg(ebene=ebene, kraft=lambda e: gerissen.kraefte(*e).M,
-               verformung_bei=verformung_bei,
-               obergrenze=gerissen.grenzen.kruemmungsgrenze(positiv=True))
+    weg = _Weg(ebene=lambda chi: gerissen.zur_kruemmung(chi, N), kraft=lambda e: e.M,
+               verformung_I=kruemmung_bei(ungerissen), verformung_II=kruemmung_bei(gerissen),
+               obergrenze=paar.gerissen.grenzen.kruemmungsgrenze(positiv=True))
     linie = _linie(paar, weg, Analyseart.MOMENT_KRUEMMUNG, N, paar.rissmoment_bei(N))
     if linie.bruch is None or not linie.tragfaehig:
         linie.hinweis = (
@@ -374,19 +515,19 @@ def normalkraft_dehnung(paar: Paar, *, M: float) -> Linie:
     Die Dehnung ist die am Arm null -- dort greift ``N`` an: bei der Platte
     auf halber Hoehe, beim gezeichneten Querschnitt im Schwerpunkt.
     """
-    gerissen = paar.gerissen
+    gerissen, ungerissen = paar.ebenen()
 
-    def ebene(eps_m: float) -> Optional[Tuple[float, float]]:
-        chi = gerissen.kruemmung(eps_m, M)
-        return None if chi is None else (eps_m, chi)
+    def dehnung_bei(suche: Ebenensuche) -> Callable[[float], Optional[float]]:
+        def bei(N: float) -> Optional[float]:
+            e = suche.zu_kraeften(N, M)
+            return None if e is None else e.eps_m
+        return bei
 
-    def verformung_bei(loeser: Faserloeser, N: float) -> Optional[float]:
-        e = loeser.loese(N_Ed=N, M_Ed=M)
-        return e.eps_m if _durchlaufen(e) else None
-
-    obergrenze = max(g.eps_max for g in gerissen.grenzen.grenzen if math.isfinite(g.eps_max))
-    weg = _Weg(ebene=ebene, kraft=lambda e: gerissen.kraefte(*e).N,
-               verformung_bei=verformung_bei, obergrenze=obergrenze)
+    obergrenze = max(g.eps_max for g in paar.gerissen.grenzen.grenzen
+                     if math.isfinite(g.eps_max))
+    weg = _Weg(ebene=lambda eps_m: gerissen.zur_dehnung(eps_m, M), kraft=lambda e: e.N,
+               verformung_I=dehnung_bei(ungerissen), verformung_II=dehnung_bei(gerissen),
+               obergrenze=obergrenze)
     linie = _linie(paar, weg, Analyseart.NORMALKRAFT_DEHNUNG, M, paar.rissnormalkraft_bei(M))
     if linie.bruch is None or not linie.tragfaehig:
         linie.hinweis = (

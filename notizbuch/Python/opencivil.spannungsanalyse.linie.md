@@ -1,5 +1,5 @@
 ---
-erzeugt: 8e7e9adb406b
+erzeugt: 29ea5860b0d0
 art: modul
 tags: [modul]
 ---
@@ -17,7 +17,193 @@ Querschnitt je Zugseite
 ([[opencivil.spannungsanalyse.schnitt#Schnittpaar|Schnittpaar]]); bis 2026-10-17
 hiess es an den Funktionen dafuer `paar: Any`.
 
+
+## DIE EBENEN
+
+Jede Linie fragt einen Zustand des Paars nach Ebenen: zu N und M, zu einer
+Kruemmung bei N, zu einer Dehnung bei M ([[opencivil.spannungsanalyse.linie#Ebenensuche|Ebenensuche]]). Die Antwort
+ist eine [[opencivil.spannungsanalyse.linie#Dehnungsebene|Dehnungsebene]] in der Richtung ihres Loesers. Bei der
+Platte und beim gezeichneten Querschnitt «einachsig» bleibt die Nulllinie
+parallel zur Achse der Biegung ([[opencivil.spannungsanalyse.linie#FesteNulllinie|FesteNulllinie]]); sonst kippt sie,
+bis kein Moment um die andere Achse bleibt
+([[opencivil.spannungsanalyse.schnitt#KippendeNulllinie|KippendeNulllinie]]). Die Linie
+selbst weiss davon nichts: sie liest Kraft und Verformung der Ebene.
+
 ## Inhalt
+
+### Dehnungsebene
+
+```python
+@dataclass(frozen=True)
+class Dehnungsebene
+```
+
+Eine Dehnungsebene eines Paars -- in der Richtung ihres Loesers, also
+senkrecht zu ihrer Nulllinie. Kippt die Nulllinie um [[opencivil.spannungsanalyse.linie#Dehnungsebene|neigung]],
+zaehlen Moment und Kruemmung, wie sie zur Achse der Biegung stehen: das
+Moment um diese Achse und die Kruemmung senkrecht zu ihr.
+
+- `loeser: Faserloeser` – Der Querschnitt in der Richtung der Ebene.
+- `eps_m: float`
+- `chi: float` – Dehnung am Arm null und Kruemmung senkrecht zur Nulllinie.
+- `neigung: float = 0.0` – Wie weit die Nulllinie gegen die Achse der Biegung gedreht ist, rad -- gegen den Uhrzeiger.
+- `grenznamen: Tuple[str, ...] = ()` – Je Grenze des Loesers, was sie ist -- fuer «massgebend».
+- `verfehlt: bool = False` – Ob die Suche an einem Sprung des Spannungsblocks haengen blieb ([[opencivil.nachweis.querschnittsloeser#Ebene|verfehlt]]). Eine Linie nimmt eine solche Ebene: sie fragt nach der Verformung, bei der ihre Kraft einen Wert durchlaeuft, und am Sprung ist das seine Stelle, auch wenn dort keine Ebene die Kraft genau erzeugt. Ein Bild dagegen braucht die Ebene selbst.
+
+#### Dehnungsebene.kraefte
+
+```python
+@cached_property
+def kraefte(self) -> 'Schnittkraefte'
+```
+
+`N`, `M` und `M_quer` in der Richtung des Loesers.
+
+#### Dehnungsebene.N
+
+```python
+@property
+def N(self) -> float
+```
+
+#### Dehnungsebene.M
+
+```python
+@property
+def M(self) -> float
+```
+
+Das Moment um die Achse der Biegung -- bei gekippter Nulllinie aus beiden Anteilen.
+
+#### Dehnungsebene.M_quer
+
+```python
+@property
+def M_quer(self) -> float
+```
+
+Das Moment um die andere Achse -- unter reiner Biegung null.
+
+#### Dehnungsebene.kruemmung
+
+```python
+@property
+def kruemmung(self) -> float
+```
+
+Die Kruemmung senkrecht zur Achse der Biegung -- ueber sie laeuft die M-χ-Linie.
+
+#### Dehnungsebene.eps_oben
+
+```python
+@property
+def eps_oben(self) -> float
+```
+
+Die Dehnung am oberen Rand des Betons, dem gedrueckten bei positivem Moment.
+
+#### Dehnungsebene.eps_unten
+
+```python
+@property
+def eps_unten(self) -> float
+```
+
+#### Dehnungsebene.fliesst
+
+```python
+@property
+def fliesst(self) -> bool
+```
+
+Ob eine Lage die Fliessdehnung erreicht -- jede die ihres eigenen Stahls.
+
+#### Dehnungsebene.massgebend
+
+```python
+@property
+def massgebend(self) -> str
+```
+
+Welche Grenzdehnung die Ebene erreicht -- die mit dem kleinsten Abstand.
+
+### Ebenensuche
+
+```python
+class Ebenensuche(Protocol)
+```
+
+Wie ein Zustand eines Paars -- gerissen oder ungerissen -- zu seinen
+Ebenen kommt. Jede Frage hat ihre Ebene oder `None`, wo es kein
+Gleichgewicht gibt; `M` ist das Moment um die Achse der Biegung,
+`chi` die Kruemmung senkrecht zu ihr.
+
+#### Ebenensuche.zu_kraeften
+
+```python
+def zu_kraeften(self, N: float, M: float) -> Optional[Dehnungsebene]
+```
+
+Die Ebene, die `N` und `M` traegt -- auch eine verfehlte (siehe dort).
+
+#### Ebenensuche.zur_kruemmung
+
+```python
+def zur_kruemmung(self, chi: float, N: float) -> Optional[Dehnungsebene]
+```
+
+Die Ebene mit der Kruemmung `chi`, die `N` traegt.
+
+#### Ebenensuche.zur_dehnung
+
+```python
+def zur_dehnung(self, eps_m: float, M: float) -> Optional[Dehnungsebene]
+```
+
+Die Ebene mit der Dehnung `eps_m` am Arm null, die `M` traegt.
+
+### FesteNulllinie
+
+```python
+@dataclass(frozen=True)
+class FesteNulllinie
+```
+
+Die Ebenen in einer festen Richtung: die Nulllinie bleibt parallel zur
+Achse der Biegung, und jede Frage ist eine Suche des Loesers. So rechnet
+die Platte, so rechnet der gezeichnete Querschnitt «einachsig».
+
+- `loeser: Faserloeser`
+- `grenznamen: Tuple[str, ...] = ()`
+
+#### FesteNulllinie.zu_kraeften
+
+```python
+def zu_kraeften(self, N: float, M: float) -> Optional[Dehnungsebene]
+```
+
+#### FesteNulllinie.zur_kruemmung
+
+```python
+def zur_kruemmung(self, chi: float, N: float) -> Optional[Dehnungsebene]
+```
+
+#### FesteNulllinie.zur_dehnung
+
+```python
+def zur_dehnung(self, eps_m: float, M: float) -> Optional[Dehnungsebene]
+```
+
+### Zustaende
+
+```python
+class Zustaende(NamedTuple)
+```
+
+Die beiden Zustaende eines Paars, je mit seiner Ebenensuche.
+
+- `gerissen: Ebenensuche`
+- `ungerissen: Ebenensuche`
 
 ### Paar
 
@@ -31,13 +217,22 @@ des Bauteils weiss -- die Tiefe, den Riss, die Dehnung am Ende, den reinen
 Betonquerschnitt --, schreibt das Paar selbst in die Herleitung.
 
 - `gerissen: Faserloeser`
-- `ungerissen: Faserloeser`
+- `ungerissen: Faserloeser` – Die beiden Loeser in der Richtung des Paars -- fuer das Bild aus Randdehnungen.
 - `wahl: Rechenwahl` – Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart.
-- `grenznamen: Tuple[str, ...]` – Je Grenze des gerissenen Loesers, was sie ist -- fuer «massgebend».
 - `ids: Mapping[str, str]` – Kurzname -> Wert-ID der Eingaben, fuer die Herleitung.
 - `staehle: Tuple[Any, ...]` – Die Staehle der Bewehrung, jeder einmal -- fuer die Fliessdehnung.
 - `E_cm: float` – Der Modul des Betons -- daran misst sich der aequivalente Modul.
 - `bezugsort: str` – Wo die Mitteldehnung gilt -- dort greift N an.
+
+#### Paar.ebenen
+
+```python
+def ebenen(self) -> Zustaende
+```
+
+Wie die beiden Zustaende ihre Ebenen finden -- fuer jede Linie und
+jedes Bild neu: eine Suche, die bei der zuletzt gefundenen Neigung
+anfaengt, hinge sonst an dem, was vorher gerechnet wurde.
 
 #### Paar.I_c
 
@@ -80,7 +275,7 @@ def herleitung_riss(self, p: 'Protokoll', w: 'Zwischenwerte', linie: 'Linie', ei
 #### Paar.herleitung_dehnung_am_ende
 
 ```python
-def herleitung_dehnung_am_ende(self, p: 'Protokoll', w: 'Zwischenwerte', bruch: 'Grenzzustand', oben: 'Wert', unten: 'Wert') -> None
+def herleitung_dehnung_am_ende(self, p: 'Protokoll', w: 'Zwischenwerte', bruch: 'Grenzzustand', oben: 'Wert', unten: 'Wert', h: 'Wert') -> None
 ```
 
 #### Paar.herleitung_bezug
@@ -130,6 +325,7 @@ Das Ende einer Linie -- und welche Grenzdehnung es bestimmt.
 - `eps_oben: float = 0.0`
 - `eps_unten: float = 0.0`
 - `massgebend: str = ''`
+- `ebene: Optional[Dehnungsebene] = field(default=None, compare=False, repr=False)` – Die Ebene am Ende -- mit ihrer Richtung, fuer die Herleitung.
 
 ### Linie
 
@@ -182,14 +378,15 @@ class _Weg
 
 Wie eine Linie laeuft -- der einzige Unterschied zwischen M-chi und N-eps.
 
-`ebene` fuehrt von einer Verformung zur gerissenen Ebene ``(eps_m,
-chi)` oder zu `None`, wo es kein Gleichgewicht gibt; `kraft`` liest
-aus der Ebene die Kraft der Linie; `verformung_bei` sucht zu einer Kraft
-die Verformung, mit einem der beiden Loeser.
+`ebene` fuehrt von einer Verformung zur gerissenen Ebene oder zu
+`None`, wo es kein Gleichgewicht gibt; `kraft` liest aus der Ebene die
+Kraft der Linie; `verformung_I` und `verformung_II` suchen zu einer
+Kraft die Verformung, ungerissen und gerissen.
 
-- `ebene: Callable[[float], Optional[Tuple[float, float]]]`
-- `kraft: Callable[[Tuple[float, float]], float]`
-- `verformung_bei: Callable[[Faserloeser, float], Optional[float]]`
+- `ebene: Callable[[float], Optional[Dehnungsebene]]`
+- `kraft: Callable[[Dehnungsebene], float]`
+- `verformung_I: Callable[[float], Optional[float]]`
+- `verformung_II: Callable[[float], Optional[float]]`
 - `obergrenze: float` – Eine Verformung, ueber der es sicher kein Gleichgewicht mehr gibt.
 
 ### _grenze
@@ -200,14 +397,6 @@ def _grenze(gut: Callable[[float], bool], unten: float, oben: float) -> float
 
 Wo `gut` endet, zwischen `unten` (gut) und `oben` -- durch Halbieren.
 
-### _massgebend
-
-```python
-def _massgebend(paar: Paar, eps_m: float, chi: float) -> str
-```
-
-Welche Grenzdehnung die Ebene erreicht -- die mit dem kleinsten Abstand.
-
 ### _linie
 
 ```python
@@ -217,18 +406,6 @@ def _linie(paar: Paar, weg: _Weg, art: Analyseart, fest: float, riss: float) -> 
 Die Linie von null bis zum Bruch: ungerissen bis `riss`, dort der
 Sprung, darueber gerissen -- ueber die Verformung gerechnet, mit dem
 Fliessbeginn als Punkt der Linie.
-
-### _durchlaufen
-
-```python
-def _durchlaufen(e: Ebene) -> bool
-```
-
-Ob eine Linie die Ebene nimmt: gefunden -- oder verfehlt an einem Sprung
-des Spannungsblocks ([[opencivil.nachweis.querschnittsloeser#Ebene|Ebene.verfehlt]]). Eine Linie fragt nach der
-Verformung, bei der ihre Kraft einen Wert durchlaeuft; am Sprung ist das
-seine Stelle, auch wenn dort keine Ebene die Kraft genau erzeugt. Ein
-Nachweis dagegen braucht die Ebene selbst.
 
 ### moment_kruemmung
 
@@ -262,6 +439,7 @@ auf halber Hoehe, beim gezeichneten Querschnitt im Schwerpunkt.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.nachweis.querschnittsloeser]]
+- [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.spannungsanalyse.art]]
@@ -270,6 +448,7 @@ auf halber Hoehe, beim gezeichneten Querschnitt im Schwerpunkt.
 
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.spannungsanalyse.analysen]]
+- [[opencivil.spannungsanalyse.bild]]
 - [[opencivil.spannungsanalyse.herleitung]]
 - [[opencivil.spannungsanalyse.modul]]
 - [[opencivil.spannungsanalyse.platte]]

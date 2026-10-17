@@ -672,7 +672,7 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
             name=eintrag.name, praefix=praefix,
             flaechen=flaechen, staebe=staebe, linien=linien, waende=waende,
             alpha_min=eintrag.alpha_min, alpha_max=eintrag.alpha_max, k_c=eintrag.k_c,
-            wahl=wahl)
+            wahl=wahl, einachsig=eintrag.einachsig)
     except GeometrieFehler as fehler:
         raise ProjektFehler(f"{wo}: {fehler}") from None
 

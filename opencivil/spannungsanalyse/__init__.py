@@ -85,12 +85,14 @@ eine Linie des Bauteils zu rechnen waere, ist offen
 (``notizbuch/Notizen/TODO.md``).
 
 PLATTE UND GEZEICHNETER QUERSCHNITT:
-Die Fragen selbst -- Bild, Linie, Modul -- kennen nur einen
-:class:`~opencivil.nachweis.querschnittsloeser.Faserloeser` und ein Paar
-daraus: gerissen und ungerissen, dazu Riss, Bezugsflaeche des Moduls und
-Rechenwahl (:class:`~opencivil.spannungsanalyse.linie.Paar`). Die Platte
-bietet es je Tragrichtung, der gezeichnete Querschnitt je Zugseite, und
-eine Schleife stellt die Fragen beiden.
+Die Fragen selbst -- Bild, Linie, Modul -- kennen nur ein Paar: gerissen und
+ungerissen, je mit einer Suche nach seinen Ebenen, dazu Riss, Bezugsflaeche
+des Moduls und Rechenwahl (:class:`~opencivil.spannungsanalyse.linie.Paar`).
+Die Platte bietet es je Tragrichtung, der gezeichnete Querschnitt je
+Zugseite, und eine Schleife stellt die Fragen beiden. Bei der Platte bleibt
+die Nulllinie parallel zur Achse der Biegung; beim gezeichneten Querschnitt
+kippt sie unter reiner Biegung, bis kein Moment um die andere Achse bleibt,
+ausser er rechnet «einachsig» (Benutzer, 2026-10-17).
 
 DIE TEILE:
 * :mod:`~opencivil.spannungsanalyse.art` -- welche Frage gestellt wird;
@@ -113,15 +115,17 @@ from opencivil.spannungsanalyse.art import Analyseart
 from opencivil.spannungsanalyse.bild import Querschnittsbild, aus_dehnungen, aus_schnittgroessen
 from opencivil.spannungsanalyse.herleitung import THEMA, herleitung
 from opencivil.spannungsanalyse.linie import (
-    Grenzzustand, Linie, Linienpunkt, Paar, moment_kruemmung, normalkraft_dehnung,
+    Dehnungsebene, Ebenensuche, FesteNulllinie, Grenzzustand, Linie, Linienpunkt, Paar,
+    Zustaende, moment_kruemmung, normalkraft_dehnung,
 )
 from opencivil.spannungsanalyse.modul import Modullinie, Modulpunkt, aequivalenter_modul
 from opencivil.spannungsanalyse.platte import Loeserpaar, loeserpaar
-from opencivil.spannungsanalyse.schnitt import Schnittpaar, schnittpaar
+from opencivil.spannungsanalyse.schnitt import KippendeNulllinie, Schnittpaar, schnittpaar
 
 __all__ = [
-    "THEMA", "Analyse", "Analyseart", "Grenzzustand", "Linie", "Linienpunkt", "Loeserpaar",
-    "Modullinie", "Modulpunkt", "Paar", "Querschnittsbild", "Schnittpaar",
+    "THEMA", "Analyse", "Analyseart", "Dehnungsebene", "Ebenensuche", "FesteNulllinie",
+    "Grenzzustand", "KippendeNulllinie", "Linie", "Linienpunkt", "Loeserpaar", "Modullinie",
+    "Modulpunkt", "Paar", "Querschnittsbild", "Schnittpaar", "Zustaende",
     "aequivalenter_modul", "analysen", "aus_dehnungen", "aus_schnittgroessen", "auswerten",
     "herleitung", "loeserpaar", "moment_kruemmung", "normalkraft_dehnung", "schnittpaar",
 ]

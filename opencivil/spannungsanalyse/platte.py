@@ -23,7 +23,7 @@ from opencivil.nachweis.rissgroessen import (
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.querschnitt.platte import Richtung
 from opencivil.spannungsanalyse.art import Analyseart
-from opencivil.spannungsanalyse.linie import Grenzzustand, Linie
+from opencivil.spannungsanalyse.linie import FesteNulllinie, Grenzzustand, Linie, Zustaende
 
 if TYPE_CHECKING:
     from opencivil.core.wert import Wert
@@ -73,6 +73,11 @@ class Loeserpaar:
 
     E_cm: float = 0.0
     """Der Modul des Betons -- daran misst sich der aequivalente Modul."""
+
+    def ebenen(self) -> Zustaende:
+        """Die Ebenen der Platte: ein Rechteck, die Nulllinie bleibt parallel zur Achse."""
+        return Zustaende(FesteNulllinie(self.gerissen, self.grenznamen),
+                         FesteNulllinie(self.ungerissen, self.grenznamen))
 
     def rissmoment_bei(self, N: float) -> float:
         """
@@ -164,7 +169,7 @@ class Loeserpaar:
                  titel="Rissnormalkraft beim Moment")
 
     def herleitung_dehnung_am_ende(self, p: Protokoll, w: Zwischenwerte, bruch: "Grenzzustand",
-                                   oben: "Wert", unten: "Wert") -> None:
+                                   oben: "Wert", unten: "Wert", h: "Wert") -> None:
         """Die Dehnung, ueber die die N-eps-Linie laeuft, am Ende -- auf halber Hoehe."""
         p.formel(w.dehnung("eps_mu", r"\varepsilon_{m,u}", bruch.verformung),
                  r"\frac{@eps_oben + @eps_unten}{2}",

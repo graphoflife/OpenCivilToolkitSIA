@@ -1,5 +1,5 @@
 ---
-erzeugt: 65173c1144ed
+erzeugt: cf2e336d4150
 art: formel
 tags: [formel]
 ---
@@ -7,14 +7,14 @@ tags: [formel]
 > Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
 
 $$
-W = \frac{I_z}{v_z}
+W = \frac{I_y}{v_z}
 $$
 
 ## Grössen
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $I_z$ | Trägheitsmoment um z | ·10⁶ mm⁴ | Zwischenwert |
+| $I_y$ | Trägheitsmoment um y | ·10⁶ mm⁴ | Zwischenwert |
 | $v_z$ | Abstand des gezogenen Rands vom Schwerpunkt | mm | Zwischenwert |
 
 ## Beispiel
@@ -22,7 +22,7 @@ $$
 Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
 
 $$
-W = \frac{I_z}{v_z} = \frac{22475\,\cdot 10^{6}\,\mathrm{mm}^{4}}{400\,\mathrm{mm}} = 56.19\,\cdot 10^{6}\,\mathrm{mm}^{3}
+W = \frac{I_y}{v_z} = \frac{2133.3\,\cdot 10^{6}\,\mathrm{mm}^{4}}{200\,\mathrm{mm}} = 10.67\,\cdot 10^{6}\,\mathrm{mm}^{3}
 $$
 
 ## Gebraucht von

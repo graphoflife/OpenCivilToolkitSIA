@@ -1,5 +1,5 @@
 ---
-erzeugt: 177da6fe6477
+erzeugt: 3c42a7fd5b6c
 art: modul
 tags: [modul]
 ---
@@ -104,12 +104,14 @@ eine Linie des Bauteils zu rechnen waere, ist offen
 
 ## PLATTE UND GEZEICHNETER QUERSCHNITT
 
-Die Fragen selbst -- Bild, Linie, Modul -- kennen nur einen
-[[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]] und ein Paar
-daraus: gerissen und ungerissen, dazu Riss, Bezugsflaeche des Moduls und
-Rechenwahl ([[opencivil.spannungsanalyse.linie#Paar|Paar]]). Die Platte
-bietet es je Tragrichtung, der gezeichnete Querschnitt je Zugseite, und
-eine Schleife stellt die Fragen beiden.
+Die Fragen selbst -- Bild, Linie, Modul -- kennen nur ein Paar: gerissen und
+ungerissen, je mit einer Suche nach seinen Ebenen, dazu Riss, Bezugsflaeche
+des Moduls und Rechenwahl ([[opencivil.spannungsanalyse.linie#Paar|Paar]]).
+Die Platte bietet es je Tragrichtung, der gezeichnete Querschnitt je
+Zugseite, und eine Schleife stellt die Fragen beiden. Bei der Platte bleibt
+die Nulllinie parallel zur Achse der Biegung; beim gezeichneten Querschnitt
+kippt sie unter reiner Biegung, bis kein Moment um die andere Achse bleibt,
+ausser er rechnet «einachsig» (Benutzer, 2026-10-17).
 
 
 ## DIE TEILE

@@ -14,9 +14,13 @@ Moment in Zugrichtung bestimmen ``eps_m`` und ``chi``
 Uebrig bleibt das Moment entlang der Nulllinie, und ψ wird gedreht, bis auch
 es stimmt (:func:`gebrauchsebene`): der Sekante nach, dann Illinois, und wo
 die Sekante wegliefe, mit wachsenden Schritten nach beiden Seiten
-eingegrenzt. Bei einem symmetrischen Querschnitt trifft schon die Neigung,
-die zum Moment gehoert. Einachsig bleibt die Nulllinie waagrecht, und M_z
-zaehlt nicht -- wie in der Tragsicherheit.
+eingegrenzt (:func:`neigung_suchen`). Bei einem symmetrischen Querschnitt
+trifft schon die Neigung, die zum Moment gehoert. Einachsig bleibt die
+Nulllinie waagrecht, und M_z zaehlt nicht -- wie in der Tragsicherheit.
+
+Dieselbe Suche dreht die Nulllinie in der Spannung-Dehnung-Analyse des
+gezeichneten Querschnitts (:class:`~opencivil.spannungsanalyse.schnitt.KippendeNulllinie`);
+dort ist je Neigung eine andere Aufgabe zu loesen, gesucht wird ψ gleich.
 
 WAS ES KOSTET:
 Jede Neigung ist eine ganze Suche ueber die Fasern. Halbiert brauchte die
@@ -31,7 +35,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, replace
-from typing import Optional, Tuple
+from typing import Callable, Optional, Tuple, TypeVar
 
 from opencivil.core.latex import angabe, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
@@ -47,6 +51,13 @@ NEIGUNGSSCHRITTE = (2.0, 5.0, 10.0, 20.0, 35.0, 55.0, 75.0, 90.0)
 #: Wann das Moment entlang der Nulllinie als getroffen gilt, als Teil der
 #: groessten Schnittgroesse -- N mit einem Hebel von einem Meter gezaehlt.
 QUER_SCHRANKE = 1e-7
+
+#: Was eine Neigung ergibt -- die Ebene, wie der Fragende sie braucht.
+E = TypeVar("E")
+
+#: Wie oft zwischen einer Neigung mit Ebene und einer ohne halbiert wird, um
+#: den Rand des Gleichgewichts zu finden -- auf ein Millionstel des Schritts.
+RANDSCHRITTE = 20
 
 
 @dataclass(frozen=True)
@@ -111,18 +122,107 @@ def _bei_neigung(q: Querschnitt, psi: float, N: float, M_y: float,
     return ebene, k.M_quer + (n_y * M_y - n_z * M_z)
 
 
+def neigung_suchen(abweichung: Callable[[float], Tuple[float, Optional[E]]], mitte: float,
+                   schranke: float, *, geprueft: Callable[[E], E] = lambda e: e) -> Optional[E]:
+    """
+    Die Neigung ψ, bei der ``abweichung`` null wird -- und was sie dort ergibt.
+
+    ``abweichung(ψ)`` loest die Aufgabe bei dieser Neigung und gibt zurueck,
+    was am Moment entlang der Nulllinie noch fehlt, mit der Ebene; ohne Ebene
+    ``(nan, None)``. Gesucht wird von ``mitte`` aus: trifft schon sie, bleibt
+    es bei ihr. Sonst der Sekante nach, bis die Abweichung das Vorzeichen
+    wechselt, dann Illinois; was Illinois findet, geht durch ``geprueft``.
+    Laeuft die Sekante weg, wird nach beiden Seiten mit wachsenden Schritten
+    eingegrenzt (:data:`NEIGUNGSSCHRITTE`). ``None``, wo ``mitte`` keine Ebene
+    hat oder sich keine Neigung findet.
+
+    Hat ein Schritt keine Ebene, liegt zwischen ihm und dem letzten mit Ebene
+    der Rand des Gleichgewichts -- und dort kann das Vorzeichen schon
+    gewechselt haben. Darum wird der Rand gesucht (:data:`RANDSCHRITTE`) und
+    an ihm gefragt; danach geht es auf dieser Seite nicht weiter. Bis
+    2026-10-17 sprang die Suche ueber ihn hinweg: an der kippenden Nulllinie
+    des Unterzugs im Beispiel, bei Zug links unter Zug, lag die Neigung bei
+    -38°, Ebenen gab es bis -42°, und nach -35° kam der Schritt nach -55°.
+    Wo jeder Schritt eine Ebene hat, aendert das nichts.
+    """
+    fa, ebene = abweichung(mitte)
+    if ebene is None:
+        return None
+    if abs(fa) <= schranke:
+        return ebene
+
+    def eingegrenzt(a: float, fa: float, b: float, fb: float) -> Optional[E]:
+        gefunden = illinois(abweichung, a, fa, b, fb, schranke_x=1e-12, schranke_f=schranke)
+        return None if gefunden is None else geprueft(gefunden)
+
+    # Der Sekante nach: zwischen zwei Knicken ist die Abweichung beinahe eine
+    # Gerade in ψ.
+    a, b = mitte, mitte + math.radians(1.0)
+    fb, ebene = abweichung(b)
+    for _ in range(8):
+        if ebene is None or abs(b - mitte) > math.pi / 2.0:
+            break
+        if abs(fb) <= schranke:
+            return ebene
+        if (fb > 0.0) != (fa > 0.0):
+            return eingegrenzt(a, fa, b, fb)
+        if fb == fa:
+            break
+        a, fa, b = b, fb, b - fb * (b - a) / (fb - fa)
+        fb, ebene = abweichung(b)
+
+    # Eingrenzen, nach beiden Seiten.
+    fa = abweichung(mitte)[0]
+    zuletzt = {1.0: (mitte, fa), -1.0: (mitte, fa)}
+    am_rand = {1.0: False, -1.0: False}
+    for weite in NEIGUNGSSCHRITTE:
+        for seite in (1.0, -1.0):
+            if am_rand[seite]:
+                continue
+            b = mitte + seite * math.radians(weite)
+            fb, ebene = abweichung(b)
+            if ebene is None:
+                am_rand[seite] = True
+                b, fb, ebene = _rand(abweichung, zuletzt[seite][0], b)
+                if ebene is None:
+                    continue
+            if abs(fb) <= schranke:
+                return ebene
+            x, fx = zuletzt[seite]
+            if (fb > 0.0) != (fx > 0.0):
+                return eingegrenzt(x, fx, b, fb)
+            zuletzt[seite] = (b, fb)
+    return None
+
+
+def _rand(abweichung: Callable[[float], Tuple[float, Optional[E]]], mit: float,
+          ohne: float) -> Tuple[float, float, Optional[E]]:
+    """
+    Die letzte Neigung mit Ebene zwischen ``mit`` (hat eine) und ``ohne``
+    (hat keine) -- durch Halbieren, mit ihrer Abweichung und Ebene. ``None``
+    als Ebene, wo sich ausser ``mit`` selbst keine findet.
+    """
+    gefunden: Tuple[float, float, Optional[E]] = (mit, math.nan, None)
+    for _ in range(RANDSCHRITTE):
+        mitte = 0.5 * (mit + ohne)
+        fm, ebene = abweichung(mitte)
+        if ebene is None:
+            ohne = mitte
+        else:
+            mit, gefunden = mitte, (mitte, fm, ebene)
+    return gefunden
+
+
 def gebrauchsebene(q: Querschnitt, *, N: float, M_y: float, M_z: float,
                    einachsig: bool, start: Optional[float] = None) -> Gebrauchsebene:
     """
     Die Dehnungsebene, die ``N``, ``M_y`` und ``M_z`` im Gleichgewicht haelt.
 
     Einachsig mit waagrechter Nulllinie, ``M_z`` zaehlt nicht. Sonst wird die
-    Neigung gesucht, bei der auch das Moment entlang der Nulllinie stimmt --
-    von ``start`` aus oder von der, die bei Symmetrie gaelte; bei einem
-    symmetrischen Querschnitt trifft schon sie. Sonst der Sekante nach, bis
-    die Abweichung das Vorzeichen wechselt, dann Illinois. Laeuft die Sekante
-    weg, wird nach beiden Seiten mit wachsenden Schritten eingegrenzt
-    (:data:`NEIGUNGSSCHRITTE`), wie beim Widerstand in einer Momentenrichtung
+    Neigung gesucht, bei der auch das Moment entlang der Nulllinie stimmt
+    (:func:`neigung_suchen`) -- von ``start`` aus oder von der, die bei
+    Symmetrie gaelte; bei einem symmetrischen Querschnitt trifft schon sie.
+    Eingegrenzt wird wie beim Widerstand in einer Momentenrichtung
     (:meth:`~opencivil.querschnitt.interaktion.Querschnitt.in_richtung`).
     Ohne Ebene :data:`KEINE` -- oder :data:`VERFEHLT`, wo die Suche an einem
     Sprung haengen blieb.
@@ -144,10 +244,7 @@ def gebrauchsebene(q: Querschnitt, *, N: float, M_y: float, M_z: float,
             return math.nan, None
         return fehlt, ebene
 
-    def eingegrenzt(a: float, fa: float, b: float, fb: float) -> Gebrauchsebene:
-        ebene = illinois(abweichung, a, fa, b, fb, schranke_x=1e-12, schranke_f=schranke)
-        if ebene is None:
-            return ohne
+    def geprueft(ebene: Gebrauchsebene) -> Gebrauchsebene:
         # Auch die Neigung hat ihre Probe, an dem, was dasteht: endet die
         # Suche an einem Sprung, verfehlt die Ebene M_y oder M_z um mehr, als
         # Neigung und Ebene verfehlen duerfen.
@@ -158,44 +255,8 @@ def gebrauchsebene(q: Querschnitt, *, N: float, M_y: float, M_z: float,
         return VERFEHLT
 
     mitte = Querschnitt.neigung_fuer(M_y, M_z) if start is None else start
-    fa, ebene = abweichung(mitte)
-    if ebene is None:
-        return ohne
-    if abs(fa) <= schranke:
-        return ebene
-
-    # Der Sekante nach: zwischen zwei Knicken ist die Abweichung beinahe eine
-    # Gerade in ψ.
-    a, b = mitte, mitte + math.radians(1.0)
-    fb, ebene = abweichung(b)
-    for _ in range(8):
-        if ebene is None or abs(b - mitte) > math.pi / 2.0:
-            break
-        if abs(fb) <= schranke:
-            return ebene
-        if (fb > 0.0) != (fa > 0.0):
-            return eingegrenzt(a, fa, b, fb)
-        if fb == fa:
-            break
-        a, fa, b = b, fb, b - fb * (b - a) / (fb - fa)
-        fb, ebene = abweichung(b)
-
-    # Eingrenzen, nach beiden Seiten.
-    fa = abweichung(mitte)[0]
-    zuletzt = {1.0: (mitte, fa), -1.0: (mitte, fa)}
-    for weite in NEIGUNGSSCHRITTE:
-        for seite in (1.0, -1.0):
-            b = mitte + seite * math.radians(weite)
-            fb, ebene = abweichung(b)
-            if ebene is None:
-                continue
-            if abs(fb) <= schranke:
-                return ebene
-            x, fx = zuletzt[seite]
-            if (fb > 0.0) != (fx > 0.0):
-                return eingegrenzt(x, fx, b, fb)
-            zuletzt[seite] = (b, fb)
-    return ohne
+    gefunden = neigung_suchen(abweichung, mitte, schranke, geprueft=geprueft)
+    return ohne if gefunden is None else gefunden
 
 
 #: Wie die Ebene unter Gebrauchslast gefunden wird -- bei schiefer Biegung.

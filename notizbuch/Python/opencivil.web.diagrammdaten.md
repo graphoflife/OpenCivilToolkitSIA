@@ -1,5 +1,5 @@
 ---
-erzeugt: d9625978fbea
+erzeugt: 687216c42788
 art: modul
 tags: [modul]
 ---
@@ -76,7 +76,7 @@ gerechnet wird beides hier.
 ### _bild_dict
 
 ```python
-def _bild_dict(bild, h: float) -> dict
+def _bild_dict(bild) -> dict
 ```
 
 Ein Querschnittsbild in Zeichengroessen: mm, Promille, N/mm², kN.

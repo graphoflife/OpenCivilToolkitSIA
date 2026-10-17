@@ -101,6 +101,10 @@ Phase 5 Oberfläche.
         Die 500 mm bleiben ein Schalter.
       - Platte: die Handformel d − x/3 der Zwängung auf Biegung bleibt, ebenso
         die Zwängung auf Normalkraft je Lage.
+      - Der äquivalente Modul vergleicht, wo die Nulllinie kippt, mit einem
+        reinen Betonquerschnitt, der ebenfalls kippt: I_c = I_y − I_yz²/I_z.
+      - Die kippende Linie rechnet etwa dreimal so lang; angenommen, schneller
+        mit der Suche als Objekt (unten).
 - [ ] **Die Werkstoffgesetze an einer Stelle anschreiben.** Vier Stellen
       schreiben sie in die Herleitung, jede mit eigener Weiche (`isinstance`,
       `art is ELASTISCH`, `mit_block`): `rechenwahl.protokoll_gesetze`,
@@ -129,6 +133,13 @@ Phase 5 Oberfläche.
       beschreibt sie selbst. Dazu gehört das Suchfenster an eine Stelle; heute
       grenzen Knicken, Stahlspannung und Analyse es je anders ab. Das kann
       Zahlen nahe der Grenze ändern -- deine Entscheidung.
+
+      Dabei die kippende Nulllinie der Analyse schneller machen
+      (`spannungsanalyse/schnitt.KippendeNulllinie`): eine Linie braucht etwa
+      dreimal so lang wie mit fester Nulllinie, alle Analysen des Prüfprojekts
+      7.6 statt 3.2 s. Je Neigung baut sie einen frischen Löser und sucht von
+      den Grenzen her; mit dem Spannungsblock waren es 9 s, bis sie Illinois
+      ohne Gedächtnis nahm (`halbiert=False`).
 - [ ] **Kennzahlen: Die Querkraft schreibt ihre Herleitung selbst.**
       - `kennzahlen.py` schreibt V_Rd,s, V_Rd,c und d_v ein zweites Mal. Ein
         erzwungenes `einlage=0.0` bringt «Wirksame Höhe (Einlage nicht
@@ -363,13 +374,16 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Benutzer ein. Das Beispiel nimmt 100 mm auf der Bügelachse; eine Regel
       dafür ist nicht nachgeschlagen.
 - [ ] **Spannung-Dehnung-Analyse je Zugseite.** Eingebaut
-      (`querschnitt/schnittanalyse.py`): die Nulllinie bleibt parallel zur
-      Achse, wie einachsig -- das Moment um die andere Achse, das ein
-      unsymmetrischer Querschnitt dabei weckt, zählt nicht. Der Riss am
-      ungerissenen Bruttoquerschnitt, `M_Riss(N) = (f_ct,eff − N/A)·W` und
-      `N_Riss(M) = (f_ct,eff,t − M·v/I)·A`, mit `k_t` für ein Drittel der
-      Tiefe bzw. die ganze, wie bei der Platte; `f_ctm` und `E_cm` vom Beton
-      am gezogenen Rand. Der äquivalente Modul am Bruttoquerschnitt (`I`, `A`).
+      (`spannungsanalyse/schnitt.py`): unter reiner Biegung kippt die
+      Nulllinie, bis kein Moment um die andere Achse bleibt, «einachsig»
+      bleibt sie parallel zur Achse (Benutzer, 2026-10-17). Der Riss am
+      ungerissenen Bruttoquerschnitt (`nachweis/rissgroessen.py`):
+      `M_Riss(N) = (f_ct,eff − N/A)·W` mit W zur Ecke, die unter reiner
+      Biegung zuerst reisst, und `N_Riss(M) = (f_ct,eff,t − σ_M)·A` an der
+      Ecke, an der das am wenigsten Zug braucht; `k_t` für ein Drittel der
+      Tiefe bzw. für `min(h; b)`, die Regeln der Platte, übertragen; `f_ctm`
+      vom Beton der Ecke. Der äquivalente Modul am Bruttoquerschnitt (`I`,
+      `A`), gekippt mit `I_y − I_yz²/I_z`.
 - [ ] **Gebrauchsnachweise.** Eingebaut (`nachweis/qa_gebrauch.py`), je auf
       Vorgabe des Benutzers vom 2026-10-15: die Zwängung auf Normalkraft am
       ganzen Querschnitt, `N_Riss = Σ A_c·k_t·f_ctm` mit `t` als kleinerer

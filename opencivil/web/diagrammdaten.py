@@ -202,12 +202,12 @@ def neigungskurven(aufbau: Aufbau, loesung: Loesung) -> dict:
     return kurven
 
 
-def _bild_dict(bild, h: float) -> dict:
+def _bild_dict(bild) -> dict:
     """Ein Querschnittsbild in Zeichengroessen: mm, Promille, N/mm², kN."""
     return {
         "eps_m": bild.eps_m * 1e3, "chi": bild.chi,
         "N": bild.N / 1e3, "M": bild.M / 1e3,
-        "h": h * 1e3,
+        "h": bild.h * 1e3,
         "nulllinie": (bild.nulllinie * 1e3
                       if bild.nulllinie is not None else None),
         "beton": [{"z": f.z * 1e3, "eps": f.eps * 1e3, "sigma": f.sigma / 1e6}
@@ -250,7 +250,7 @@ def _analyse_dict(analyse) -> dict:
         return {**kopf, "moeglich": True, "kurve": _modul_dict(analyse.kurve)}
     if analyse.kurve is not None:
         return {**kopf, "moeglich": True, "kurve": _linie_dict(analyse.kurve)}
-    return {**kopf, "moeglich": True, "bild": _bild_dict(analyse.bild, analyse.h)}
+    return {**kopf, "moeglich": True, "bild": _bild_dict(analyse.bild)}
 
 
 def _linie_dict(linie) -> dict:

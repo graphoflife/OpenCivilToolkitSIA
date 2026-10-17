@@ -48,10 +48,6 @@ class Analyse:
     richtung_text: str = ""
     """Wie sie neben dem Titel steht -- «x», «Zug unten»."""
 
-    h: float = 0.0
-    """Die Tiefe in m -- fuer das Bild: die Dicke der Platte, beim gezeichneten
-    Querschnitt die Ausdehnung des Betons in Zugrichtung."""
-
     bild: Optional[Querschnittsbild] = None
     kurve: Optional[Union[Linie, "Modullinie"]] = None
     """Die M-chi- oder N-eps-Linie -- oder der aequivalente Modul daraus."""
@@ -82,7 +78,7 @@ def auswerten(fall, art: Analyseart, paar: Paar) -> Tuple[
     elif art.linie is Analyseart.NORMALKRAFT_DEHNUNG:
         linie = normalkraft_dehnung(paar, M=fall.M_Ed * 1e3)
     else:
-        return aus_schnittgroessen(paar.gerissen, N=fall.N_Ed * 1e3,
+        return aus_schnittgroessen(paar.ebenen().gerissen, N=fall.N_Ed * 1e3,
                                    M=fall.M_Ed * 1e3, art=paar.wahl.art), None
     if art.modul:
         return None, aequivalenter_modul(linie, I_c=paar.I_c, A_c=paar.A_c, E_cm=paar.E_cm)
@@ -165,7 +161,6 @@ def analysen(aufbau: "Aufbau", loesung: "Loesung",
                 if paar is None:
                     analyse.hinweis = art.ohne_bewehrung(fall.richtung)
                 else:
-                    analyse.h = paar.gerissen.h
                     analyse.bild, analyse.kurve = auswerten(fall, analyse.art, paar)
                     kurve = analyse.kurve
                     if kurve is not None:

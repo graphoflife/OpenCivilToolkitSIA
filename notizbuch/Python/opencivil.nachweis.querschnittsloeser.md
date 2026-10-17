@@ -1,5 +1,5 @@
 ---
-erzeugt: 6e545c9ca85c
+erzeugt: 6f29100e9bc1
 art: modul
 tags: [modul]
 ---
@@ -406,6 +406,12 @@ wie jeder [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]], hal
 Gesetze ohne Sprung -- Parabel, elastisch -- haben flache Stuecke erst am
 vollplastischen Querschnitt; an den Pruefprojekten bleibt dort jede Zahl,
 wie sie war.
+
+Wer ihn fuer eine einzige Frage baut, hat kein Gedaechtnis, an dem das
+Ergebnis haengen koennte: der darf ihn auch bei springendem Gesetz mit
+Illinois suchen lassen (`halbiert=False`) -- so die kippende Nulllinie
+der Spannung-Dehnung-Analyse
+([[opencivil.spannungsanalyse.schnitt#KippendeNulllinie|KippendeNulllinie]]).
 
 - `SUCHE = 'Gesucht wird in zwei geschachtelten Suchen. Innen: zu einer festgeha…`
 

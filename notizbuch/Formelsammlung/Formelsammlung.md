@@ -1,5 +1,5 @@
 ---
-erzeugt: 5de017a3d95a
+erzeugt: 2f1fa3f2e0cf
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -26,7 +26,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Stahlspannung aus Rissbreite]] · 14
 - [[Stahlspannung gegen Fliessen]] · 8
 - [[Knicken]] · 14
-- [[Spannung-Dehnung-Analyse]] · 20
+- [[Spannung-Dehnung-Analyse]] · 23
 
 **Querschnittsanalyse**
 
@@ -184,6 +184,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Sohlneigungsfaktor b_c]] · $b_c$
 - [[Sohlneigungsfaktor b_q]] · $b_q$
 - [[Sohlneigungsfaktor b_γ]] · $b_{\gamma}$
+- [[Spannung aus dem Moment an der Ecke, die zuerst reisst]] · $\sigma_M$
 - [[Spannung im ungerissenen Querschnitt]]
 - [[Spannungsblock des Betons]]
 - [[Stahlspannung, höchstens die Fliessgrenze]] · $\sigma_{sd}$
@@ -229,7 +230,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-113 von 177 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
+114 von 178 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
 - [[Äquivalenter E-Modul über der Normalkraft]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
@@ -318,6 +319,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Schnittgrössen längs eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Schwerpunkt der zusammengefassten Lage]] · [[opencivil.nachweis.handrechnung#Handrechnung._schwerpunkt|Handrechnung._schwerpunkt]], [[opencivil.nachweis.verformung#Vergroesserungsfaktor._bewehrungsgehalte|Vergroesserungsfaktor._bewehrungsgehalte]], [[opencivil.querschnitt.platte#protokoll_lage|protokoll_lage]]
 - [[Schwerpunkt eines T-Querschnitts]] · [[opencivil.stabwerk.querschnitte]]
+- [[Spannung aus dem Moment an der Ecke, die zuerst reisst]] · [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
 - [[Spannung im ungerissenen Querschnitt]] · [[opencivil.nachweis.rissgroessen#protokoll_spannung_ungerissen|protokoll_spannung_ungerissen]]
 - [[Spannungsblock des Betons]] · [[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|Gesetz.protokoll]]
 - [[Stahlspannung, höchstens die Fliessgrenze]] · [[opencivil.nachweis.handrechnung#Handrechnung._halbe_hoehe|Handrechnung._halbe_hoehe]]
@@ -337,7 +339,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Widerstand im normierten Diagramm]] · [[opencivil.nachweis.biegung_normalkraft#BiegungNormalkraft._protokoll_naechster|BiegungNormalkraft._protokoll_naechster]]
 - [[Widerstand in der Richtung der Einwirkung]] · [[opencivil.nachweis.schiefe_biegung#SchiefeBiegung|SchiefeBiegung._ein_fall]]
 - [[Widerstandsmoment zum gezogenen Rand]] · [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
-- [[Widerstandsmoment zum gezogensten Betonpunkt]] · [[opencivil.nachweis.rissgroessen#protokoll_rissmoment|protokoll_rissmoment]]
+- [[Widerstandsmoment zum gezogensten Betonpunkt]] · [[opencivil.nachweis.rissgroessen#protokoll_widerstandsmoment|protokoll_widerstandsmoment]]
 - [[Wirksame Durchbiegung]] · [[opencivil.nachweis.verformung#Verformung|Verformung._einen_fall]]
 - [[Wirksame Höhe (Einlage nicht massgebend)]] · [[opencivil.nachweis.kennzahlen#Plattenkennzahlen._hoehen|Plattenkennzahlen._hoehen]], [[opencivil.nachweis.querkraft#Querkraft._protokoll_fall|Querkraft._protokoll_fall]]
 - [[Wirksame Höhe, um die Einlage vermindert]] · [[opencivil.nachweis.kennzahlen#Plattenkennzahlen._hoehen|Plattenkennzahlen._hoehen]], [[opencivil.nachweis.querkraft#Querkraft._protokoll_fall|Querkraft._protokoll_fall]]

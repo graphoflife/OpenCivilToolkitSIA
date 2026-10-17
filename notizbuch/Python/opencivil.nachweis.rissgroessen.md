@@ -1,5 +1,5 @@
 ---
-erzeugt: e79763b829ab
+erzeugt: 6ebdbc372c83
 art: modul
 tags: [modul]
 ---
@@ -20,9 +20,12 @@ gezeichneten Querschnitts wie fuer ihre Spannung-Dehnung-Analysen:
 * **das Rissmoment unter reiner Biegung**: das Moment, bei dem `f_ct,eff`
   am ungerissenen Bruttoquerschnitt zum ersten Mal irgendwo erreicht wird
   ([[opencivil.nachweis.rissgroessen#rissmoment|rissmoment]]). Mit dem Deviationsmoment `I_yz` kippt die
-  Nulllinie; «einachsig» bleibt sie waagrecht, und es gilt `W = I/v`. Bei
-  der Platte, einem Rechteck, ist es beide Male `b·h²/6`
-  ([[opencivil.nachweis.rissgroessen#rissmoment_rechteck|rissmoment_rechteck]]).
+  Nulllinie; «einachsig» bleibt sie parallel zur Achse der Biegung, und es
+  gilt `W = I/v`. Bei der Platte, einem Rechteck, ist es beide Male
+  `b·h²/6` ([[opencivil.nachweis.rissgroessen#rissmoment_rechteck|rissmoment_rechteck]]);
+* **die Rissnormalkraft bei einem Moment**: die Zugkraft, bei der
+  `f_ct,eff` zum ersten Mal irgendwo erreicht wird ([[opencivil.nachweis.rissgroessen#rissnormalkraft|rissnormalkraft]])
+  -- fuer die Analyse des gezeichneten Querschnitts.
 
 So hat es der Benutzer am 2026-10-17 entschieden. Bis dahin standen die
 Rissgroessen viermal da -- im sproeden Versagen, in den Richtungsnachweisen
@@ -162,8 +165,10 @@ Die Hoehe in Biegerichtung und die Breite quer dazu, in m -- aus der Zeichnung.
 def einheitsspannung(self, ecke: Ecke, M_y: float, M_z: float, *, einachsig: bool) -> float
 ```
 
-Die Spannung an der Ecke bei einem Moment von eins in dieser Richtung,
-Zug positiv. `einachsig` mit waagrechter Nulllinie, ohne `I_yz`.
+Die Spannung an der Ecke beim Moment `(M_y, M_z)`, Zug positiv -- bei
+einem Moment von eins in dieser Richtung die Einheitsspannung.
+`einachsig` bleibt die Nulllinie parallel zur Achse der Biegung, ohne
+`I_yz`.
 
 ### rissbezuege
 
@@ -176,10 +181,13 @@ Was der Bruttoquerschnitt liest, ueber die Grundbezuege hinaus: die Traegheitsmo
 ### bruttoquerschnitt
 
 ```python
-def bruttoquerschnitt(analyse: Querschnittsanalyse, e: Eingaben) -> Bruttoquerschnitt
+def bruttoquerschnitt(analyse: Querschnittsanalyse, wert: Callable[[str], float]) -> Bruttoquerschnitt
 ```
 
-Der Bruttoquerschnitt eines gezeichneten Querschnitts, aus den Eingaben von [[opencivil.nachweis.rissgroessen#rissbezuege|rissbezuege]].
+Der Bruttoquerschnitt eines gezeichneten Querschnitts. `wert` liefert
+zu einer Wert-ID die Zahl in SI -- aus den Eingaben eines Nachweises mit
+[[opencivil.nachweis.rissgroessen#rissbezuege|rissbezuege]] ([[opencivil.core.berechnung#Eingaben.si_nach_id|si_nach_id]])
+oder aus einer Loesung.
 
 ### Rissmoment
 
@@ -208,6 +216,32 @@ das Moment unter reiner Biegung, bei dem `f_ct,eff` zum ersten Mal
 irgendwo erreicht wird. Bei mehreren Betonen reisst zuerst die Ecke mit
 der groessten Spannung, gemessen an ihrer Zugfestigkeit.
 
+### Rissnormalkraft
+
+```python
+@dataclass(frozen=True)
+class Rissnormalkraft
+```
+
+Die Rissnormalkraft bei einem Moment -- und woraus sie entsteht.
+
+- `ecke: Ecke` – Die Ecke, die zuerst ihre Zugfestigkeit erreicht.
+- `sigma_M: float` – Die Spannung, die das Moment allein an ihr weckt, Pa.
+- `f_ct_eff: float`
+- `N_Riss: float` – in N.
+
+### rissnormalkraft
+
+```python
+def rissnormalkraft(q: Bruttoquerschnitt, M_y: float, M_z: float, *, einachsig: bool, k_t: float, A: float) -> Rissnormalkraft
+```
+
+Die Zugkraft, bei der der ungerissene Bruttoquerschnitt beim Moment
+`(M_y, M_z)` -- in Nm, nicht von eins -- zum ersten Mal irgendwo
+`f_ct,eff = k_t·f_ctm` erreicht: `N_Riss = (f_ct,eff - σ_M)·A` an der
+Ecke, an der das am wenigsten Zug braucht. `k_t` gilt fuer die
+rissaktive Dicke unter Zug ([[opencivil.nachweis.rissgroessen#rissaktive_dicke|rissaktive_dicke]]).
+
 ### protokoll_spannung_ungerissen
 
 ```python
@@ -216,10 +250,27 @@ def protokoll_spannung_ungerissen(p: Protokoll, *, einachsig: bool) -> None
 
 Wie der ungerissene Querschnitt Spannung traegt -- der Ansatz des Rissmoments.
 
+### protokoll_ecke
+
+```python
+def protokoll_ecke(p: Protokoll, ecke: Ecke) -> None
+```
+
+Welche Ecke zuerst reisst -- in der Zeichnung, mit ihrem Beton.
+
+### protokoll_widerstandsmoment
+
+```python
+def protokoll_widerstandsmoment(p: Protokoll, werte: Zwischenwerte, q: Bruttoquerschnitt, ecke: Ecke, W: float, M_y: float, M_z: float, *, einachsig: bool) -> Wert
+```
+
+`W = 1/σ` an der Ecke bei einem Moment von eins in der Richtung
+`(M_y, M_z)`, um y -- einachsig `I_y/v`, sonst mit `I_yz`.
+
 ### protokoll_rissmoment
 
 ```python
-def protokoll_rissmoment(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse, werte: Zwischenwerte, riss: Rissmoment, M_y: float, M_z: float, *, einachsig: bool, referenz: str) -> Wert
+def protokoll_rissmoment(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse, werte: Zwischenwerte, q: Bruttoquerschnitt, riss: Rissmoment, M_y: float, M_z: float, *, einachsig: bool, referenz: str) -> Wert
 ```
 
 Die Herleitung von [[opencivil.nachweis.rissgroessen#rissmoment|rissmoment]] -- zurueck kommt `M_Riss`.
@@ -261,5 +312,5 @@ def _w_vorlage(M_y: float, M_z: float) -> str
 - [[Rissmoment des ungerissenen Querschnitts]] · `protokoll_rissmoment`
 - [[Rissmoment des ungerissenen Querschnitts]] · `protokoll_rissmoment_rechteck`
 - [[Spannung im ungerissenen Querschnitt]] · `protokoll_spannung_ungerissen`
-- [[Widerstandsmoment zum gezogensten Betonpunkt]] · `protokoll_rissmoment`
+- [[Widerstandsmoment zum gezogensten Betonpunkt]] · `protokoll_widerstandsmoment`
 - [[Wirksame Zugfestigkeit]] · `protokoll_zugfestigkeit`

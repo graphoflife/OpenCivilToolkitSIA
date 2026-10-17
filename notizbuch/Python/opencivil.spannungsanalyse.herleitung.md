@@ -1,5 +1,5 @@
 ---
-erzeugt: 6f1e1a63f811
+erzeugt: b580b6239516
 art: modul
 tags: [modul]
 ---
@@ -50,6 +50,7 @@ hin, wie ihn die Art des Bauteils kennt, und gibt ihn zurueck;
 
 ## Braucht
 
+- [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]

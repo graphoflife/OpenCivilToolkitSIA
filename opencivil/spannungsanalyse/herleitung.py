@@ -9,9 +9,11 @@ des Bauteils weiss, schreibt das Paar (:class:`~opencivil.spannungsanalyse.linie
 
 from __future__ import annotations
 
+import math
 import re
 from typing import TYPE_CHECKING, Callable, List, Mapping, Optional, Tuple
 
+from opencivil.core.einheiten import GRAD, Groesse
 from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import kennung_aus
@@ -136,13 +138,29 @@ def herleitung(p: Protokoll, fall, paar: Paar, linie: Linie,
         b = linie.bruch
         oben = w.dehnung("eps_oben", r"\varepsilon_{oben}", b.eps_oben)
         unten = w.dehnung("eps_unten", r"\varepsilon_{unten}", b.eps_unten)
+        neigung = b.ebene.neigung if b.ebene is not None else 0.0
+        tiefe, zeichen = h, ""
+        if neigung != 0.0:
+            # Gekippt gelten die Raender senkrecht zur Nulllinie, und die
+            # Linie laeuft ueber den Anteil der Kruemmung senkrecht zur Achse.
+            theta = w.wert("theta", r"\vartheta", Groesse(math.degrees(neigung), GRAD), stellen=1)
+            p.erklaerung(
+                "Am Ende ist die Nulllinie um ϑ gegen die Achse der Biegung gedreht, im "
+                "Gegenuhrzeigersinn positiv: so bleibt kein Moment um die andere Achse. "
+                "Die Randdehnungen gelten senkrecht zu ihr, über die Tiefe h_ϑ des Betons "
+                "in dieser Richtung.")
+            p.wert(theta, titel="Neigung der Nulllinie am Ende")
+            tiefe = w.laenge("h_theta", r"h_{\vartheta}", b.ebene.loeser.h,
+                             "Tiefe des Betons senkrecht zur Nulllinie")
+            zeichen = r" \cdot \cos\left(@theta\right)"
         if momente:
             p.formel(w.kruemmung("chi_u", r"\chi_{u}", b.verformung),
-                     r"\frac{@eps_unten - @eps_oben}{@h}",
-                     {"eps_unten": unten, "eps_oben": oben, "h": h},
+                     r"\frac{@eps_unten - @eps_oben}{@h}" + zeichen,
+                     {"eps_unten": unten, "eps_oben": oben, "h": tiefe,
+                      **({"theta": theta} if zeichen else {})},
                      titel="Grösste Krümmung")
         else:
-            paar.herleitung_dehnung_am_ende(p, w, b, oben, unten)
+            paar.herleitung_dehnung_am_ende(p, w, b, oben, unten, tiefe)
         p.text(f"Massgebend: {b.massgebend}.")
     if modul is not None:
         _herleitung_modul(p, w, modul,

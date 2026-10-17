@@ -1,10 +1,10 @@
 ---
-erzeugt: dade3c248003
+erzeugt: 1c4193631320
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 20 Formeln, in der Folge, in der gerechnet wird.
+> 23 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -26,9 +26,9 @@ Dieselbe Rissbedingung, nach der Normalkraft aufgelöst: beim Moment M reisst de
 
 Der äquivalente E-Modul ist der Modul, den ein reiner Betonquerschnitt bräuchte – ungerissen, ohne Stahl, elastisch –, um sich unter der laufenden Kraft gleich stark zu verformen wie der bewehrte Querschnitt. Gezählt wird ab dem Zustand ohne laufende Kraft: was die festgehaltene Kraft allein verformt, kann ein solcher Querschnitt nicht abbilden. Ist sie null, ist es genau M = E·I·χ bzw. N = E·A·ε.
 
-Die Nulllinie bleibt parallel zur Achse der Biegung: gezogen wird der Rand links, gedrückt der Rand rechts. Das Moment um die andere Achse, das ein unsymmetrischer Querschnitt dabei weckt, zählt nicht. Am Bruttoquerschnitt reisst der gezogene Rand, wenn N/A + M/W = f\_ct,eff; W gehört zu diesem Rand, v\_z ist sein Abstand vom Schwerpunkt.
+Unter reiner Biegung kippt die Nulllinie, bis kein Moment um die andere Achse bleibt. Am ungerissenen Bruttoquerschnitt hängt die Spannung dann auch vom Deviationsmoment I\_yz ab, und es reisst die Ecke zuerst, die ihre Zugfestigkeit zuerst erreicht – bei einem unsymmetrischen Querschnitt eine Ecke, nicht der ganze Rand.
 
-Die Nulllinie bleibt parallel zur Achse der Biegung: gezogen wird der Rand unten, gedrückt der Rand oben. Das Moment um die andere Achse, das ein unsymmetrischer Querschnitt dabei weckt, zählt nicht. Am Bruttoquerschnitt reisst der gezogene Rand, wenn N/A + M/W = f\_ct,eff; W gehört zu diesem Rand, v\_z ist sein Abstand vom Schwerpunkt.
+Am Ende ist die Nulllinie um ϑ gegen die Achse der Biegung gedreht, im Gegenuhrzeigersinn positiv: so bleibt kein Moment um die andere Achse. Die Randdehnungen gelten senkrecht zu ihr, über die Tiefe h\_ϑ des Betons in dieser Richtung.
 
 Dieselbe Rissbedingung, nach der Normalkraft aufgelöst. Unter Zug gilt k\_t für die rissaktive Dicke t, die kleinere Abmessung des Betons -- nicht für h/3 wie beim Rissmoment. Ein negatives Moment zieht den anderen Rand: dann gilt dessen Abstand.
 
@@ -57,9 +57,12 @@ Der reine Betonquerschnitt ist der Bruttoquerschnitt, um die Achse der Biegung: 
 15. [[Äquivalenter E-Modul über dem Moment]]
 16. [[Fläche eines Rechtecks]]
 17. [[Äquivalenter E-Modul über der Normalkraft]]
-18. [[Widerstandsmoment zum gezogenen Rand]]
-19. [[Rissaktive Dicke des gezeichneten Querschnitts]]
-20. [[Grösste Dehnung im Schwerpunkt]]
+18. [[Spannung im ungerissenen Querschnitt]]
+19. [[Widerstandsmoment zum gezogensten Betonpunkt]]
+20. [[Rissaktive Dicke des gezeichneten Querschnitts]]
+21. [[Spannung aus dem Moment an der Ecke, die zuerst reisst]]
+22. [[Grösste Dehnung im Schwerpunkt]]
+23. [[Widerstandsmoment zum gezogenen Rand]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

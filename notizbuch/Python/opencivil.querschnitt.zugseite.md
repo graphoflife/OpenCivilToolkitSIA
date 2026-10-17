@@ -1,5 +1,5 @@
 ---
-erzeugt: 45722ce53e69
+erzeugt: 0437fb2cbad9
 art: modul
 tags: [modul]
 ---
@@ -46,6 +46,17 @@ def psi(self) -> float
 ```
 
 Die Zugrichtung als Winkel, wie [[opencivil.querschnitt.interaktion#Querschnitt|Querschnitt]] sie nimmt.
+
+#### Zugseite.moment
+
+```python
+@property
+def moment(self) -> Tuple[float, float]
+```
+
+Ein Moment von eins, das diese Seite zieht, als `(M_y, M_z)`: M_y > 0
+zieht unten, M_z > 0 links -- wie
+[[opencivil.querschnitt.interaktion#Querschnitt.neigung_fuer|neigung_fuer]].
 
 #### Zugseite.um_y
 

@@ -319,12 +319,20 @@ def illinois(f, a: float, fa: float, b: float, fb: float, *,
     den Wert am Ende, das zweimal hintereinander stehen bleibt; sonst
     kroeche die Regula falsi an einer gekruemmten Funktion nur von einer Seite
     heran. ``f`` gibt ``(Wert, Beigabe)`` zurueck; zurueck kommt die Beigabe
-    der besten Stelle.
+    der besten Stelle -- ``None``, wenn schon die erste keinen Wert hat.
+
+    Hat ``f`` an einer Stelle keinen Wert (``nan``), endet die Suche dort: ohne
+    ihn laesst sich nicht weiter eingrenzen. Bis 2026-10-17 rechnete sie mit
+    ``nan`` weiter, bis eine Zerlegung bei ψ = nan abbrach -- an der kippenden
+    Nulllinie eines L, wo zwischen zwei Neigungen mit Gleichgewicht eine ohne
+    liegen kann.
     """
     beste = None
     for _ in range(SUCHE_HOECHSTENS):
         c = b - fb * (b - a) / (fb - fa)
         fc, beigabe = f(c)
+        if math.isnan(fc):
+            break
         if beste is None or abs(fc) < beste[0]:
             beste = (abs(fc), beigabe)
         if abs(fc) <= schranke_f or abs(b - a) <= schranke_x:
@@ -334,7 +342,7 @@ def illinois(f, a: float, fa: float, b: float, fb: float, *,
         else:
             fa = fa / 2.0
         b, fb = c, fc
-    return beste[1]
+    return None if beste is None else beste[1]
 
 
 # ===========================================================================

@@ -1667,13 +1667,25 @@
       ]
     },
     {
+      "name": "Spannung aus dem Moment an der Ecke, die zuerst reisst",
+      "pfad": "Formelsammlung/Formeln/Spannung aus dem Moment an der Ecke, die zuerst reisst.md",
+      "art": "formel",
+      "zeichen": [
+        "\\sigma_M"
+      ],
+      "themen": [
+        "Spannung-Dehnung-Analyse"
+      ]
+    },
+    {
       "name": "Spannung im ungerissenen Querschnitt",
       "pfad": "Formelsammlung/Formeln/Spannung im ungerissenen Querschnitt.md",
       "art": "formel",
       "zeichen": [],
       "themen": [
         "Sprödes Versagen je Richtung",
-        "Zwängung auf Biegung"
+        "Zwängung auf Biegung",
+        "Spannung-Dehnung-Analyse"
       ]
     },
     {
@@ -2016,7 +2028,8 @@
       ],
       "themen": [
         "Sprödes Versagen je Richtung",
-        "Zwängung auf Biegung"
+        "Zwängung auf Biegung",
+        "Spannung-Dehnung-Analyse"
       ]
     },
     {
@@ -2914,6 +2927,8 @@
       "stichworte": [
         "Gebrauchsebene",
         "_bei_neigung",
+        "neigung_suchen",
+        "_rand",
         "gebrauchsebene",
         "protokoll_ebene"
       ]
@@ -3247,7 +3262,11 @@
         "bruttoquerschnitt",
         "Rissmoment",
         "rissmoment",
+        "Rissnormalkraft",
+        "rissnormalkraft",
         "protokoll_spannung_ungerissen",
+        "protokoll_ecke",
+        "protokoll_widerstandsmoment",
         "protokoll_rissmoment",
         "_w_vorlage"
       ]
@@ -4153,6 +4172,7 @@
         "Zugseite",
         "Zugseite.beschriftung",
         "Zugseite.psi",
+        "Zugseite.moment",
         "Zugseite.um_y",
         "Zugseite.raender"
       ]
@@ -4221,7 +4241,27 @@
       "art": "modul",
       "kurz": "die Linien eines Querschnitts.",
       "stichworte": [
+        "Dehnungsebene",
+        "Dehnungsebene.kraefte",
+        "Dehnungsebene.N",
+        "Dehnungsebene.M",
+        "Dehnungsebene.M_quer",
+        "Dehnungsebene.kruemmung",
+        "Dehnungsebene.eps_oben",
+        "Dehnungsebene.eps_unten",
+        "Dehnungsebene.fliesst",
+        "Dehnungsebene.massgebend",
+        "Ebenensuche",
+        "Ebenensuche.zu_kraeften",
+        "Ebenensuche.zur_kruemmung",
+        "Ebenensuche.zur_dehnung",
+        "FesteNulllinie",
+        "FesteNulllinie.zu_kraeften",
+        "FesteNulllinie.zur_kruemmung",
+        "FesteNulllinie.zur_dehnung",
+        "Zustaende",
         "Paar",
+        "Paar.ebenen",
         "Paar.I_c",
         "Paar.A_c",
         "Paar.rissmoment_bei",
@@ -4239,9 +4279,7 @@
         "Linie.sprung",
         "_Weg",
         "_grenze",
-        "_massgebend",
         "_linie",
-        "_durchlaufen",
         "moment_kruemmung",
         "normalkraft_dehnung"
       ]
@@ -4269,6 +4307,7 @@
       "kurz": "das Paar einer Platte.",
       "stichworte": [
         "Loeserpaar",
+        "Loeserpaar.ebenen",
         "Loeserpaar.rissmoment_bei",
         "Loeserpaar.rissnormalkraft_bei",
         "Loeserpaar.I_c",
@@ -4288,10 +4327,23 @@
       "stichworte": [
         "_betonspannung",
         "_loeser",
+        "_Zerlegung",
+        "_Zerlegung.in_richtung",
+        "KippendeNulllinie",
+        "KippendeNulllinie._gekippt",
+        "KippendeNulllinie._gemerkt",
+        "KippendeNulllinie.zu_kraeften",
+        "KippendeNulllinie.zur_kruemmung",
+        "KippendeNulllinie.zur_dehnung",
+        "_rest_beim_moment",
+        "_getroffen",
+        "_massstab",
         "Schnittpaar",
+        "Schnittpaar.ebenen",
         "Schnittpaar.W",
         "Schnittpaar.M_Riss",
         "Schnittpaar.rissmoment_bei",
+        "Schnittpaar.rissnormalkraft",
         "Schnittpaar.rissnormalkraft_bei",
         "Schnittpaar.I_c",
         "Schnittpaar.A_c",

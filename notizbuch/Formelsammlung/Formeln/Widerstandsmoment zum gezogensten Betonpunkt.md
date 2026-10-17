@@ -1,5 +1,5 @@
 ---
-erzeugt: 22025f94b23e
+erzeugt: 9920b5184d24
 art: formel
 tags: [formel]
 ---
@@ -84,16 +84,19 @@ $$
 
 ## Gebraucht von
 
+- [[Rissmoment bei der Normalkraft]]
 - [[Rissmoment des ungerissenen Querschnitts]]
+- [[Spannung aus dem Moment an der Ecke, die zuerst reisst]]
 
 ## Im Code
 
-- [[opencivil.nachweis.rissgroessen#protokoll_rissmoment|protokoll_rissmoment]]
+- [[opencivil.nachweis.rissgroessen#protokoll_widerstandsmoment|protokoll_widerstandsmoment]]
 
 ## Themen
 
 - [[Sprödes Versagen je Richtung]]
 - [[Zwängung auf Biegung]]
+- [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -104,4 +107,6 @@ Querschnitt folgt das Widerstandsmoment aus der
 [[Spannung im ungerissenen Querschnitt]]: gesucht ist das Moment, bei dem der
 gezogenste Punkt gerade $f_{ct,eff}$ erreicht. Welche der vier Fassungen gilt,
 hängt davon ab, um welche Achse das Moment wirkt und mit welchem Vorzeichen --
-darum stehen hier vier.
+darum stehen hier vier. Dasselbe Widerstandsmoment nimmt die
+Spannung-Dehnung-Analyse des gezeichneten Querschnitts, wenn ihre Nulllinie
+kippt.

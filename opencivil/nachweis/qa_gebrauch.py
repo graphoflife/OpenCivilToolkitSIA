@@ -532,7 +532,7 @@ class ZwaengungBiegungQA(Nachweis):
         protokoll_dehnungsebene(p)
         p.erklaerung(EINACHSIG if self.einachsig else SUCHE_DER_EBENE)
 
-        brutto = bruttoquerschnitt(a, e)
+        brutto = bruttoquerschnitt(a, e.si_nach_id())
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
         for name, M_y, M_z in richtungen(self.einachsig):
@@ -546,7 +546,7 @@ class ZwaengungBiegungQA(Nachweis):
                 ergebnis[d_grad.id] = Groesse(math.inf, EINHEITSLOS)
                 continue
             M_s_adm_si, ebene, stab = gefunden
-            M_Riss = protokoll_rissmoment(p, e, a, werte, riss, M_y, M_z,
+            M_Riss = protokoll_rissmoment(p, e, a, werte, brutto, riss, M_y, M_z,
                                           einachsig=self.einachsig,
                                           referenz="SIA 262:2025, 4.4.2")
             M_s_adm = werte.moment("M_s_adm", r"M_{s,adm}", M_s_adm_si, "Widerstand")

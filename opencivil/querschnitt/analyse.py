@@ -347,7 +347,7 @@ class Querschnittsanalyse:
         linien: Sequence[Mapping],
         waende: Sequence[Mapping],
         alpha_min: int, alpha_max: int, k_c: float,
-        wahl: Mapping[str, Rechenwahl],
+        wahl: Mapping[str, Rechenwahl], einachsig: bool = False,
     ) -> None:
         """
         ``staebe``, ``linien`` und ``waende`` wie bei :class:`Zeichnung`, je
@@ -356,6 +356,12 @@ class Querschnittsanalyse:
         """
         self.name = name
         self.id = praefix
+        self.einachsig = einachsig
+        """
+        Ob die Nulllinie parallel zur Achse der Biegung bleibt, statt unter
+        reiner Biegung zu kippen -- bisher liest es nur die
+        Spannung-Dehnung-Analyse, die Nachweise bekommen es noch einzeln.
+        """
         self.wahl = dict(wahl)
         """Je Baustoff-ID der Wertesatz und beim Beton die Rechenart -- ohne Kriechen."""
         self.flaechen = tuple(flaechen)
