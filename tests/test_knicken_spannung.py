@@ -174,7 +174,7 @@ class TestVerfehlteEbene(unittest.TestCase):
     """
 
     def gerechnet(self, rechenart):
-        from opencivil.projekt import RechenwahlEintrag
+        from opencivil.projekt import Gebrauchswahl
 
         projekt = Projekt(name="Wand")
         projekt.beton("C30/37")
@@ -183,8 +183,7 @@ class TestVerfehlteEbene(unittest.TestCase):
         wand.einwirkung("Feld", M_Ed=20, V_Ed=10)
         wand.quasistaendig.lastfall("Wenig Moment", M_Ed=14.5, N_Ed=-600)
         wand.quasistaendig.lastfall("Mehr Moment", M_Ed=80, N_Ed=-600)
-        wand.quasistaendig.wahl = RechenwahlEintrag(werkstoffsatz="charakteristisch",
-                                                    rechenart=rechenart)
+        wand.quasistaendig.wahl = Gebrauchswahl(rechenart=rechenart)
         aufbau, loesung = rechnen(projekt)
         return Gelaufen(aufbau.spannung_riss["q1.x"], loesung)
 

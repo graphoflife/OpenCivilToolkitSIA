@@ -1,5 +1,5 @@
 ---
-erzeugt: 97f8c9be191b
+erzeugt: d205ff13f26e
 art: modul
 tags: [modul]
 ---
@@ -655,6 +655,8 @@ Das Formelzeichen dazu, fuer die Herleitung -- `f_{cd}`.
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.projekt]]
+- [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.spannungsanalyse]]

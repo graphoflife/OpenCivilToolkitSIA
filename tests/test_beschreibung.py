@@ -13,6 +13,7 @@ from opencivil.projekt import (
     KnotenlastEintrag, KombinationEintrag, LageEintrag, LagerEintrag, LastfallEintrag,
     LastkombinationEintrag, MaterialEintrag, ObergrenzeEintrag, PostenEintrag, Projekt,
     ProjektFehler, QuerkraftbewehrungEintrag, QuerschnittEintrag, RechenwahlEintrag,
+    Gebrauchswahl, KnickVerformungswahl, KnickWiderstandswahl, QAGebrauchswahl,
     SkriptEintrag, SpannungsfallEintrag, StablastEintrag, StabquerschnittEintrag,
     SystemknotenEintrag, SystemlinieEintrag, VerformungEintrag, VerformungsfallEintrag,
 )
@@ -131,9 +132,9 @@ class TestVollstaendigeAblage(unittest.TestCase):
                     zwaengung_biegung_kriechzahl=1.2,
                     tragsicherheit_wahl=RechenwahlEintrag(
                         kriechzahl=1.5, werkstoffsatz="charakteristisch", rechenart="parabel"),
-                    knicken_wahl_verformung=RechenwahlEintrag(
+                    knicken_wahl_verformung=KnickVerformungswahl(
                         kriechzahl=2.5, werkstoffsatz="charakteristisch", rechenart="parabel"),
-                    knicken_wahl_widerstand=RechenwahlEintrag(
+                    knicken_wahl_widerstand=KnickWiderstandswahl(
                         kriechzahl=0.5, werkstoffsatz="charakteristisch", rechenart="parabel"),
                     querkraftbewehrung=QuerkraftbewehrungEintrag(
                         durchmesser=10.0, stahl="s1", abstand_x=250.0,
@@ -407,6 +408,10 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
         (SpannungsfallEintrag, {"name": "s"}, {"name": "s"}),
         (GebrauchsfallEintrag, {"name": "g"}, {"name": "g"}),
         (RechenwahlEintrag, {}, {}),
+        (Gebrauchswahl, {}, {}),
+        (KnickVerformungswahl, {}, {}),
+        (KnickWiderstandswahl, {}, {}),
+        (QAGebrauchswahl, {}, {}),
         (KombinationEintrag, {"name": "k"}, {"name": "k"}),
         (KnotenEintrag, {}, {}),
         (FlaecheEintrag, {}, {}),

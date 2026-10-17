@@ -1,5 +1,5 @@
 ---
-erzeugt: edbed3bb9cfa
+erzeugt: cde457918140
 art: modul
 tags: [modul]
 ---
@@ -117,7 +117,7 @@ Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks.
 ## Konstanten
 
 - `_WERKSTOFFSAETZE = [{'wert': s.value, 'beschriftung': s.beschriftung, 'kurz': s.kurz} fo…` – Die Wertesaetze und Betongesetze mit Beschriftung -- dieselben in der Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse. `kurz` fuer die Karte einer Analyse, in der die lange nicht Platz hat. Die Woerter stehen beim Wertesatz selbst.
-- `_BETONGESETZE = [{'wert': wert, 'beschriftung': Rechenart(wert).beschriftung, 'kurz':…` – Die Betongesetze heissen wie die Rechenarten, deren Werte sie sind.
+- `_BETONGESETZE = [{'wert': a.value, 'beschriftung': a.beschriftung, 'kurz': a.kurz} fo…` – Die Betongesetze heissen wie die Rechenarten, deren Werte sie sind; welche es gibt, steht am Feld der Werkstoffwahl.
 - `TAFEL = {TitelBlock: _titel_dict, TextBlock: _text_dict, GleichungBlock: _gle…` – Je Blockart, wie die Oberflaeche sie bekommt -- jede als JSON-Objekt.
 
 ## Braucht
@@ -142,6 +142,7 @@ Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks.
 - [[opencivil.projekt]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.geometrie]]

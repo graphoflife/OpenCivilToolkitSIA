@@ -31,20 +31,10 @@ from opencivil.projekt.lesen import (
 )
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
-    FASERARTEN, RECHENARTEN, SPANNUNGSARTEN, Rechenart, Rechenwahl,
+    FASERARTEN, RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN, Rechenart, Rechenwahl,
 )
 from opencivil.nachweis.verformung import KRIECHZAHL as VERFORMUNG_KRIECHZAHL, ZUGSEITEN
 from opencivil.spannungsanalyse import Analyseart
-
-#: Mit welchen Festigkeiten ein Werkstoffgesetz rechnen kann, siehe
-#: :class:`~opencivil.nachweis.querschnittsloeser.Werkstoffsatz`. Gewaehlt in
-#: der Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse.
-WERKSTOFFSAETZE = tuple(s.value for s in Werkstoffsatz)
-
-#: Welche Spannungs-Dehnungs-Beziehung der Beton der Querschnittsanalyse haben
-#: kann: Parabel-Rechteck oder der Spannungsblock 0.85·x -- die beiden genauen
-#: Rechenarten (:class:`~opencivil.nachweis.rechenwahl.Rechenart`).
-BETONGESETZE = (Rechenart.PARABEL.value, Rechenart.BLOCK.value)
 
 
 # ===========================================================================
@@ -506,13 +496,19 @@ class SpannungsfallEintrag(Beschreibung):
     kriechzahl: float = nicht_negativ(0.0)
     """Die Kriechzahl φ dieser Analyse."""
 
-    werkstoffsatz: str = einer_von(WERKSTOFFSAETZE, WERKSTOFFSAETZE[0])
+    werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
     """``bemessung`` (f_cd, f_yd) oder ``charakteristisch`` (f_ck, f_yk)."""
 
-    rechenart: str = einer_von((a.value for a in FASERARTEN), Rechenart.PARABEL.value)
+    rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)
     """``block`` oder ``parabel`` -- siehe
     :class:`~opencivil.nachweis.rechenwahl.Rechenart`. Die Handrechnung gibt
     es hier nicht (:data:`~opencivil.nachweis.rechenwahl.FASERARTEN`)."""
+
+    @property
+    def wahl(self) -> Rechenwahl:
+        """Womit die Analyse rechnet."""
+        return Rechenwahl(kriechzahl=self.kriechzahl, satz=self.werkstoffsatz,
+                          art=self.rechenart)
 
     aktiv: bool = True
 
@@ -577,49 +573,51 @@ def eindeutig(namen: Iterable[str], wo: str, was: str) -> None:
 class RechenwahlEintrag(Beschreibung):
     """
     Womit ein Nachweis-Kapitel rechnet: Kriechzahl, Wertesatz, Rechenart --
-    siehe :class:`~opencivil.nachweis.rechenwahl.Rechenwahl`.
+    siehe :class:`~opencivil.nachweis.rechenwahl.Rechenwahl`. So steht sie in
+    der Tragsicherheit.
 
-    Jedes Kapitel hat seine eigene; die Kriechzahl des Vergroesserungsfaktors
-    gehoert dem Verformungsnachweis (:class:`VerformungEintrag`). Welche
-    Rechenarten ein Kapitel anbietet, weiss das Kapitel -- es prueft sie
-    (:meth:`pruefen`); das Feld kennt nur, welche es ueberhaupt gibt.
+    Jedes andere Kapitel hat seine Unterklasse, und welche Rechenarten es
+    anbietet, steht an deren Feld: der Leser prueft es wie jede Wahl. Bis
+    2026-10-17 prueften fuenf Aufrufer je mit ihrer Liste nach dem Lesen.
+    Die Kriechzahl des Vergroesserungsfaktors gehoert dem Verformungsnachweis
+    (:class:`VerformungEintrag`).
     """
 
     kriechzahl: float = nicht_negativ(0.0)
-    werkstoffsatz: str = einer_von(WERKSTOFFSAETZE, WERKSTOFFSAETZE[0])
-    rechenart: str = einer_von((a.value for a in Rechenart), Rechenart.HANDRECHNUNG.value)
-
-    @classmethod
-    def gebrauch(cls) -> "RechenwahlEintrag":
-        """Die Stahlspannungen: elastisch, mit charakteristischen Werten."""
-        return cls(werkstoffsatz=Werkstoffsatz.CHARAKTERISTISCH.value,
-                   rechenart=Rechenart.ELASTISCH.value)
-
-    @classmethod
-    def knicken_verformung(cls) -> "RechenwahlEintrag":
-        """Die Ausmitte e_2d: praezise ohne Vereinfachung, mit Bemessungswerten."""
-        return cls(rechenart=Rechenart.PARABEL.value)
-
-    @classmethod
-    def knicken_widerstand(cls) -> "RechenwahlEintrag":
-        """
-        Der Widerstand beim Knicken: die 0.85·x-Vereinfachung, mit
-        Bemessungswerten. Bis 2026-10-12 war es die Handrechnung, die es dort
-        nicht mehr gibt; die Vereinfachung kommt ihr am naechsten.
-        """
-        return cls(rechenart=Rechenart.BLOCK.value)
+    werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
+    rechenart: Rechenart = einer_von(RECHENARTEN, Rechenart.HANDRECHNUNG)
 
     @property
     def wahl(self) -> Rechenwahl:
         """Was der Kern daraus rechnet."""
-        return Rechenwahl.aus(self.kriechzahl, self.werkstoffsatz, self.rechenart)
+        return Rechenwahl(kriechzahl=self.kriechzahl, satz=self.werkstoffsatz,
+                          art=self.rechenart)
 
-    def pruefen(self, wo: str, arten=RECHENARTEN) -> None:
-        """Ob das Kapitel diese Rechenart anbietet -- ``arten`` sagt, welche es gibt."""
-        moeglich = [a.value for a in arten]
-        if self.rechenart not in moeglich:
-            raise ProjektFehler(f"{wo}: die Rechenart «{self.rechenart}» gibt es dort nicht. "
-                                f"Möglich sind: {', '.join(moeglich)}.")
+
+@dataclass
+class Gebrauchswahl(RechenwahlEintrag):
+    """Die Stahlspannungen: elastisch, mit charakteristischen Werten -- dazu die Rechenarten der Tragsicherheit."""
+
+    werkstoffsatz: Werkstoffsatz = Werkstoffsatz.CHARAKTERISTISCH
+    rechenart: Rechenart = einer_von(SPANNUNGSARTEN, Rechenart.ELASTISCH)
+
+
+@dataclass
+class KnickVerformungswahl(RechenwahlEintrag):
+    """Die Ausmitte e_2d beim Knicken: nur praezise ohne Vereinfachung."""
+
+    rechenart: Rechenart = einer_von(VERFORMUNGSARTEN, Rechenart.PARABEL)
+
+
+@dataclass
+class KnickWiderstandswahl(RechenwahlEintrag):
+    """
+    Der Widerstand beim Knicken: ueber die Fasern, vorgegeben die
+    0.85·x-Vereinfachung. Bis 2026-10-12 war es die Handrechnung, die es
+    dort nicht mehr gibt; die Vereinfachung kommt ihr am naechsten.
+    """
+
+    rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.BLOCK)
 
 
 @dataclass
@@ -639,13 +637,12 @@ class Gebrauchsliste(Beschreibung):
 
     Der gezeichnete Querschnitt hat dieselbe Liste mit anderen Faellen
     (:class:`~opencivil.projekt.querschnittsanalyse.QAGebrauchsliste`): was
-    darin steht (:attr:`FALL`), welche Rechenarten sie anbietet
-    (:attr:`ARTEN`) und wie ihr Bauteil in den Meldungen heisst
+    darin steht (:attr:`FALL`), welche Rechenarten sie anbietet (der Typ
+    ihres Feldes :attr:`wahl`) und wie ihr Bauteil in den Meldungen heisst
     (:attr:`BAUTEIL`).
     """
 
     FALL = GebrauchsfallEintrag
-    ARTEN = SPANNUNGSARTEN
     BAUTEIL = "Platte"
 
     anteil: float
@@ -663,7 +660,7 @@ class Gebrauchsliste(Beschreibung):
     faelle: List[GebrauchsfallEintrag] = field(default_factory=list)
     """Eigene Lastfaelle -- neben den abgeleiteten, nicht statt ihrer."""
 
-    wahl: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.gebrauch)
+    wahl: Gebrauchswahl = field(default_factory=Gebrauchswahl)
     """Womit die Stahlspannung gerechnet wird -- Vorgabe elastisch, charakteristisch."""
 
     def lastfall(self, name: str, **werte: float):
@@ -689,7 +686,6 @@ class Gebrauchsliste(Beschreibung):
                 f"zwischen 0 und 100 % liegen, angegeben sind "
                 f"{self.anteil:g} %.")
 
-        self.wahl.pruefen(f"{wo}, {wort} Lastfälle", self.ARTEN)
 
     def namen_pruefen(self, bauteil: str, kombinationen: List[Any], wort: str) -> None:
         """

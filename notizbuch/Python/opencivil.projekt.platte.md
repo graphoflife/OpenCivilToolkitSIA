@@ -1,5 +1,5 @@
 ---
-erzeugt: 03c89be7656d
+erzeugt: 2dd363019f0d
 art: modul
 tags: [modul]
 ---
@@ -48,8 +48,8 @@ Eine Stahlbeton-Platte mit genau vier Bewehrungslagen.
 - `quasistaendig: Gebrauchsliste = field(default_factory=lambda: Gebrauchsliste(anteil=QUASISTAENDIG_ANT…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
 - `verformung: VerformungEintrag = field(default_factory=VerformungEintrag)` – Die Verformungsfaelle und das phi ihres Vergroesserungsfaktors.
 - `knickfaelle: List[KnickEintrag] = field(default_factory=list)` – Knicknachweise; leer heisst: keiner.
-- `knicken_wahl_verformung: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.knicken_verformung)` – Womit die Ausmitte e_2d gerechnet wird -- immer praezise ohne Vereinfachung ([[opencivil.nachweis.rechenwahl#Konstanten|VERFORMUNGSARTEN]]), Vorgabe Bemessungswerte.
-- `knicken_wahl_widerstand: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.knicken_widerstand)` – Womit N_Rd(M_Ed = N_Ed·e_tot) gerechnet wird -- Vorgabe die 0.85·x-Vereinfachung, ohne Handrechnung. Mit derselben Wahl wie die Tragsicherheit ist es deren Linie.
+- `knicken_wahl_verformung: KnickVerformungswahl = field(default_factory=KnickVerformungswahl)` – Womit die Ausmitte e_2d gerechnet wird -- immer praezise ohne Vereinfachung ([[opencivil.nachweis.rechenwahl#Konstanten|VERFORMUNGSARTEN]]), Vorgabe Bemessungswerte.
+- `knicken_wahl_widerstand: KnickWiderstandswahl = field(default_factory=KnickWiderstandswahl)` – Womit N_Rd(M_Ed = N_Ed·e_tot) gerechnet wird -- Vorgabe die 0.85·x-Vereinfachung, ohne Handrechnung. Mit derselben Wahl wie die Tragsicherheit ist es deren Linie.
 - `spannungsfaelle: List[SpannungsfallEintrag] = field(default_factory=list)` – Auswertungen am Querschnitt -- Bilder, keine Nachweise.
 - `automatik_modus: str = einer_von((m.value for m in Suchmodus), Suchmodus.GRUND_OHNE_ZULAGE_M…` – Wonach das Bewehrungswerkzeug sucht -- siehe `bewehrungssuche.Suchmodus`.
 - `automatik_dicke: bool = False` – Ob das Werkzeug dazu die duennste Plattendicke sucht («Plattendicke optimieren»). Ein Schalter neben dem Modus und nicht ein eigener Modus: je Dicke laeuft dieselbe Suche im gewaehlten Modus.
@@ -107,10 +107,10 @@ def pruefen(self) -> None
 ```
 
 Was an dieser Platte nicht stimmen kann, schon beim Oeffnen: die
-Gebrauchslisten samt Anteil und die Rechenarten der Kapitel. Laeuft
-auch beim Oeffnen einer Datei -- darum hier nichts, was eine
-gespeicherte Platte unoeffenbar machte; Namen und Zahlen prueft
-[[opencivil.projekt.platte#QuerschnittEintrag.regeln|regeln]] vor dem Rechnen.
+Gebrauchslisten samt Anteil. Laeuft auch beim Oeffnen einer Datei --
+darum hier nichts, was eine gespeicherte Platte unoeffenbar machte;
+Namen und Zahlen prueft [[opencivil.projekt.platte#QuerschnittEintrag.regeln|regeln]] vor dem Rechnen. Welche
+Rechenarten ein Kapitel anbietet, steht am Feld seiner Wahl.
 
 #### QuerschnittEintrag.regeln
 
@@ -215,7 +215,6 @@ den Vorgabewerten der Felder.
 
 - [[opencivil.bewehrungssuche.laengs]]
 - [[opencivil.nachweis.duktilitaet]]
-- [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]

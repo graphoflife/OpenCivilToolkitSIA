@@ -1,5 +1,5 @@
 ---
-erzeugt: a2696f757e4e
+erzeugt: c8768b25eb8e
 art: modul
 tags: [modul]
 ---
@@ -406,9 +406,18 @@ Wertesatz und die Rechenart ([[opencivil.nachweis.rechenwahl#Rechenwahl|Rechenwa
 - `eps_oben: float = -1.0`
 - `eps_unten: float = 2.0` – Randdehnungen in Promille -- nur fuer `dehnungen`.
 - `kriechzahl: float = nicht_negativ(0.0)` – Die Kriechzahl φ dieser Analyse.
-- `werkstoffsatz: str = einer_von(WERKSTOFFSAETZE, WERKSTOFFSAETZE[0])` – `bemessung` (f_cd, f_yd) oder `charakteristisch` (f_ck, f_yk).
-- `rechenart: str = einer_von((a.value for a in FASERARTEN), Rechenart.PARABEL.value)` – `block` oder `parabel` -- siehe [[opencivil.nachweis.rechenwahl#Rechenart|Rechenart]]. Die Handrechnung gibt es hier nicht ([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]).
+- `werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG` – `bemessung` (f_cd, f_yd) oder `charakteristisch` (f_ck, f_yk).
+- `rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)` – `block` oder `parabel` -- siehe [[opencivil.nachweis.rechenwahl#Rechenart|Rechenart]]. Die Handrechnung gibt es hier nicht ([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]).
 - `aktiv: bool = True`
+
+#### SpannungsfallEintrag.wahl
+
+```python
+@property
+def wahl(self) -> Rechenwahl
+```
+
+Womit die Analyse rechnet.
 
 ### GebrauchsfallEintrag
 
@@ -462,45 +471,18 @@ class RechenwahlEintrag(Beschreibung)
 ```
 
 Womit ein Nachweis-Kapitel rechnet: Kriechzahl, Wertesatz, Rechenart --
-siehe [[opencivil.nachweis.rechenwahl#Rechenwahl|Rechenwahl]].
+siehe [[opencivil.nachweis.rechenwahl#Rechenwahl|Rechenwahl]]. So steht sie in
+der Tragsicherheit.
 
-Jedes Kapitel hat seine eigene; die Kriechzahl des Vergroesserungsfaktors
-gehoert dem Verformungsnachweis ([[opencivil.projekt.eintraege#VerformungEintrag|VerformungEintrag]]). Welche
-Rechenarten ein Kapitel anbietet, weiss das Kapitel -- es prueft sie
-([[opencivil.projekt.eintraege#RechenwahlEintrag.pruefen|pruefen]]); das Feld kennt nur, welche es ueberhaupt gibt.
+Jedes andere Kapitel hat seine Unterklasse, und welche Rechenarten es
+anbietet, steht an deren Feld: der Leser prueft es wie jede Wahl. Bis
+2026-10-17 prueften fuenf Aufrufer je mit ihrer Liste nach dem Lesen.
+Die Kriechzahl des Vergroesserungsfaktors gehoert dem Verformungsnachweis
+([[opencivil.projekt.eintraege#VerformungEintrag|VerformungEintrag]]).
 
 - `kriechzahl: float = nicht_negativ(0.0)`
-- `werkstoffsatz: str = einer_von(WERKSTOFFSAETZE, WERKSTOFFSAETZE[0])`
-- `rechenart: str = einer_von((a.value for a in Rechenart), Rechenart.HANDRECHNUNG.value)`
-
-#### RechenwahlEintrag.gebrauch
-
-```python
-@classmethod
-def gebrauch(cls) -> 'RechenwahlEintrag'
-```
-
-Die Stahlspannungen: elastisch, mit charakteristischen Werten.
-
-#### RechenwahlEintrag.knicken_verformung
-
-```python
-@classmethod
-def knicken_verformung(cls) -> 'RechenwahlEintrag'
-```
-
-Die Ausmitte e_2d: praezise ohne Vereinfachung, mit Bemessungswerten.
-
-#### RechenwahlEintrag.knicken_widerstand
-
-```python
-@classmethod
-def knicken_widerstand(cls) -> 'RechenwahlEintrag'
-```
-
-Der Widerstand beim Knicken: die 0.85·x-Vereinfachung, mit
-Bemessungswerten. Bis 2026-10-12 war es die Handrechnung, die es dort
-nicht mehr gibt; die Vereinfachung kommt ihr am naechsten.
+- `werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG`
+- `rechenart: Rechenart = einer_von(RECHENARTEN, Rechenart.HANDRECHNUNG)`
 
 #### RechenwahlEintrag.wahl
 
@@ -511,13 +493,41 @@ def wahl(self) -> Rechenwahl
 
 Was der Kern daraus rechnet.
 
-#### RechenwahlEintrag.pruefen
+### Gebrauchswahl
 
 ```python
-def pruefen(self, wo: str, arten=RECHENARTEN) -> None
+@dataclass
+class Gebrauchswahl(RechenwahlEintrag)
 ```
 
-Ob das Kapitel diese Rechenart anbietet -- `arten` sagt, welche es gibt.
+Die Stahlspannungen: elastisch, mit charakteristischen Werten -- dazu die Rechenarten der Tragsicherheit.
+
+- `werkstoffsatz: Werkstoffsatz = Werkstoffsatz.CHARAKTERISTISCH`
+- `rechenart: Rechenart = einer_von(SPANNUNGSARTEN, Rechenart.ELASTISCH)`
+
+### KnickVerformungswahl
+
+```python
+@dataclass
+class KnickVerformungswahl(RechenwahlEintrag)
+```
+
+Die Ausmitte e_2d beim Knicken: nur praezise ohne Vereinfachung.
+
+- `rechenart: Rechenart = einer_von(VERFORMUNGSARTEN, Rechenart.PARABEL)`
+
+### KnickWiderstandswahl
+
+```python
+@dataclass
+class KnickWiderstandswahl(RechenwahlEintrag)
+```
+
+Der Widerstand beim Knicken: ueber die Fasern, vorgegeben die
+0.85·x-Vereinfachung. Bis 2026-10-12 war es die Handrechnung, die es
+dort nicht mehr gibt; die Vereinfachung kommt ihr am naechsten.
+
+- `rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.BLOCK)`
 
 ### Gebrauchsliste
 
@@ -540,17 +550,16 @@ das Feld der Platte, in dem sie steht; die Liste selbst weiss es nicht.
 
 Der gezeichnete Querschnitt hat dieselbe Liste mit anderen Faellen
 ([[opencivil.projekt.querschnittsanalyse#QAGebrauchsliste|QAGebrauchsliste]]): was
-darin steht ([[opencivil.projekt.eintraege#Gebrauchsliste|FALL]]), welche Rechenarten sie anbietet
-([[opencivil.projekt.eintraege#Gebrauchsliste|ARTEN]]) und wie ihr Bauteil in den Meldungen heisst
+darin steht ([[opencivil.projekt.eintraege#Gebrauchsliste|FALL]]), welche Rechenarten sie anbietet (der Typ
+ihres Feldes [[opencivil.projekt.eintraege#Gebrauchsliste|wahl]]) und wie ihr Bauteil in den Meldungen heisst
 ([[opencivil.projekt.eintraege#Gebrauchsliste|BAUTEIL]]).
 
 - `FALL = GebrauchsfallEintrag`
-- `ARTEN = SPANNUNGSARTEN`
 - `BAUTEIL = 'Platte'`
 - `anteil: float` – Welcher Anteil der Tragsicherheitseinwirkungen abgeleitet wird, in %.
 - `aus_tragsicherheit: bool = False` – Ob die abgeleiteten Faelle *gefuehrt* werden. Gebildet werden sie immer; ausgeschaltet rechnen sie still mit. Der Anteil ist eine bequeme Abschaetzung und keine Norm, darum stehen die Faelle nur auf Verlangen in der Tabelle.
 - `faelle: List[GebrauchsfallEintrag] = field(default_factory=list)` – Eigene Lastfaelle -- neben den abgeleiteten, nicht statt ihrer.
-- `wahl: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.gebrauch)` – Womit die Stahlspannung gerechnet wird -- Vorgabe elastisch, charakteristisch.
+- `wahl: Gebrauchswahl = field(default_factory=Gebrauchswahl)` – Womit die Stahlspannung gerechnet wird -- Vorgabe elastisch, charakteristisch.
 
 #### Gebrauchsliste.lastfall
 
@@ -601,8 +610,6 @@ Eine zu pruefende Schnittgroessenkombination.
 
 ## Konstanten
 
-- `WERKSTOFFSAETZE = tuple((s.value for s in Werkstoffsatz))` – Mit welchen Festigkeiten ein Werkstoffgesetz rechnen kann, siehe [[opencivil.nachweis.querschnittsloeser#Werkstoffsatz|Werkstoffsatz]]. Gewaehlt in der Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse.
-- `BETONGESETZE = (Rechenart.PARABEL.value, Rechenart.BLOCK.value)` – Welche Spannungs-Dehnungs-Beziehung der Beton der Querschnittsanalyse haben kann: Parabel-Rechteck oder der Spannungsblock 0.85·x -- die beiden genauen Rechenarten ([[opencivil.nachweis.rechenwahl#Rechenart|Rechenart]]).
 - `EIGENE_VORSILBE = {'beton': 'BE', 'betonstahl': 'S'}` – Womit die Namen eigener Materialien beginnen: BE1, BE2 ... beim Beton, S1, S2 ... beim Betonstahl (Benutzer, 2026-10-16).
 - `HAEUFIG_ANTEIL = 70.0` – Anteil der Tragsicherheitseinwirkungen, der als haeufiger Lastfall gilt -- in Prozent, wie die Maske ihn zeigt. Eine Vorgabe, einstellbar je Platte.
 - `QUASISTAENDIG_ANTEIL = 60.0` – Dasselbe fuer die quasi-staendigen Lastfaelle.

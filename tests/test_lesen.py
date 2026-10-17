@@ -9,9 +9,10 @@ nicht stimmt, meldet sich mit Ort und Wert; umgedeutet wird nichts.
 import json
 import unittest
 
+from opencivil.nachweis.rechenwahl import Rechenart
 from opencivil.projekt import (
-    KombinationEintrag, PostenEintrag, Projekt, ProjektFehler, QuerschnittEintrag,
-    RechenwahlEintrag,
+    Gebrauchswahl, KnickVerformungswahl, KombinationEintrag, PostenEintrag, Projekt,
+    ProjektFehler, QuerschnittEintrag,
 )
 from opencivil.projekt.querschnittsanalyse import SchubwandEintrag
 from opencivil.nachweis.rissanforderung import Rissanforderung
@@ -122,13 +123,14 @@ class TestVorgaben(unittest.TestCase):
         """Die Verformung beim Knicken ist ohne Angabe präzise, nicht von Hand."""
         roh = platte_roh(knicken_wahl_verformung={"kriechzahl": 1.5})
         wahl = Projekt.aus_dict(roh).querschnitt("q1").knicken_wahl_verformung
-        self.assertEqual(wahl, RechenwahlEintrag(kriechzahl=1.5, rechenart="parabel"))
+        self.assertEqual(wahl, KnickVerformungswahl(kriechzahl=1.5))
+        self.assertIs(wahl.rechenart, Rechenart.PARABEL)
 
     def test_eine_teilweise_gebrauchsliste_behaelt_ihren_anteil(self):
         roh = platte_roh(quasistaendig={"aus_tragsicherheit": True})
         liste = Projekt.aus_dict(roh).querschnitt("q1").quasistaendig
         self.assertEqual(liste.anteil, 60.0)
-        self.assertEqual(liste.wahl, RechenwahlEintrag.gebrauch())
+        self.assertEqual(liste.wahl, Gebrauchswahl())
 
     def test_ein_listenelement_bekommt_die_vorgaben_seiner_klasse(self):
         roh = platte_roh(kombinationen=[{"name": "Feld"}])

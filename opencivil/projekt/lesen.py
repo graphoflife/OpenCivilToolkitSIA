@@ -313,6 +313,12 @@ def _wahlfelder(cls: type) -> Dict[str, type]:
     return {name: typ for name, typ in _typen(cls).items() if _ist_wahl(typ)}
 
 
+def wahl_von(cls: type, feld: str) -> tuple:
+    """Was ein Wahlfeld annehmen kann -- seine Teilmenge, sonst jedes Mitglied seiner Wahl."""
+    f = next(f for f in dataclasses.fields(cls) if f.name == feld)
+    return tuple(f.metadata.get("wahl") or _wahlfelder(cls)[feld])
+
+
 def wahl_aus_text(cls: type, feld: str, wert: Any) -> Any:
     """
     Text in einem Wahlfeld wird sein Mitglied -- beim Lesen einer Datei und

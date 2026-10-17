@@ -11,7 +11,10 @@ import unittest
 
 from opencivil.nachweis.rechenwahl import Rechenart
 from opencivil.nachweis.resistenzlinie import Ebenenlinie
-from opencivil.projekt import KnickEintrag, Projekt, RechenwahlEintrag
+from opencivil.projekt import (
+    KnickEintrag, KnickVerformungswahl, KnickWiderstandswahl, Projekt, ProjektFehler,
+    RechenwahlEintrag,
+)
 from opencivil.web import diagrammdaten, dienst
 
 STUETZE = KnickEintrag("Stütze", N_Ed=-800.0, M_Ed_1=20.0, laenge=4.0, knicklaenge=4.0)
@@ -94,7 +97,7 @@ class TestEigeneLinie(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.aufbau, cls.knicken, cls.loesung = gerechnet(
-            widerstand=RechenwahlEintrag(werkstoffsatz="charakteristisch", rechenart="parabel"))
+            widerstand=KnickWiderstandswahl(werkstoffsatz="charakteristisch", rechenart="parabel"))
 
     def test_mit_eigener_herleitung(self):
         self.assertTrue(self.knicken.eigene_linie)
@@ -128,14 +131,15 @@ class TestEigeneLinie(unittest.TestCase):
 class TestGleicheWahl(unittest.TestCase):
     def test_die_kriechzahl_zaehlt_nur_wo_sie_wirkt(self):
         parabel = RechenwahlEintrag(kriechzahl=1.0, rechenart="parabel")
-        _, geteilt, _ = gerechnet(widerstand=parabel, tragsicherheit=parabel)
+        _, geteilt, _ = gerechnet(widerstand=KnickWiderstandswahl(kriechzahl=1.0, rechenart="parabel"),
+                                  tragsicherheit=parabel)
         self.assertFalse(geteilt.eigene_linie)
-        _, anders, _ = gerechnet(widerstand=RechenwahlEintrag(kriechzahl=2.0, rechenart="parabel"),
+        _, anders, _ = gerechnet(widerstand=KnickWiderstandswahl(kriechzahl=2.0, rechenart="parabel"),
                                  tragsicherheit=parabel)
         self.assertTrue(anders.eigene_linie)
         # Bei der 0.85·x-Vereinfachung wirkt phi nicht: dieselbe Linie.
         block = RechenwahlEintrag(rechenart="block")
-        _, gleich, _ = gerechnet(widerstand=RechenwahlEintrag(kriechzahl=3.0, rechenart="block"),
+        _, gleich, _ = gerechnet(widerstand=KnickWiderstandswahl(kriechzahl=3.0, rechenart="block"),
                                  tragsicherheit=block)
         self.assertFalse(gleich.eigene_linie)
 
@@ -145,7 +149,7 @@ class TestVerformung(unittest.TestCase):
         e_2d = {}
         for phi in (0.0, 2.0):
             _, knicken, loesung = gerechnet(
-                verformung=RechenwahlEintrag(kriechzahl=phi, rechenart="parabel"))
+                verformung=KnickVerformungswahl(kriechzahl=phi))
             e_2d[phi] = loesung.befund(knicken).ergebnisse[0].e_2d
         self.assertGreater(e_2d[2.0], e_2d[0.0])
 
@@ -154,18 +158,17 @@ class TestVerformung(unittest.TestCase):
         Mit ihm trüge auf flachen Stücken jede Krümmung dasselbe Moment, und
         nahe der Grenzkraft hinge N_Rd an der Suche (2026-10-15).
         """
-        from opencivil.projekt import ProjektFehler
-        q = Projekt.beispiel().querschnitte[0]
-        q.knicken_wahl_verformung = RechenwahlEintrag(rechenart="block")
-        with self.assertRaises(ProjektFehler):
-            q.pruefen()
+        p = Projekt.beispiel()
+        p.querschnitte[0].knicken_wahl_verformung.rechenart = "block"
+        with self.assertRaisesRegex(ProjektFehler, "'block' gibt es als 'rechenart' nicht"):
+            p.pruefen()
 
     def test_die_werte_sind_waehlbar(self):
         """Charakteristisch ist der Beton steifer begrenzt: weniger Ausmitte als mit f_cd."""
         e_2d = {}
         for satz in ("bemessung", "charakteristisch"):
             _, knicken, loesung = gerechnet(
-                verformung=RechenwahlEintrag(werkstoffsatz=satz, rechenart="parabel"))
+                verformung=KnickVerformungswahl(werkstoffsatz=satz))
             e_2d[satz] = loesung.befund(knicken).ergebnisse[0].e_2d
         self.assertLess(e_2d["charakteristisch"], e_2d["bemessung"])
 
@@ -180,8 +183,8 @@ class TestDatei(unittest.TestCase):
         return antwort.daten["fehler"]
 
     def test_elastisch_gibt_es_beim_knicken_nicht(self):
-        self.assertIn("die Rechenart «elastisch» gibt es dort nicht", self.oeffnen(
-            knicken_wahl_verformung={"rechenart": "elastisch"}))
+        self.assertIn("knicken_wahl_verformung: 'elastisch' gibt es als 'rechenart' nicht",
+                      self.oeffnen(knicken_wahl_verformung={"rechenart": "elastisch"}))
 
     def test_die_handrechnung_einer_alten_datei_wird_genannt(self):
         """
@@ -191,11 +194,10 @@ class TestDatei(unittest.TestCase):
         for feld in ("knicken_wahl_verformung", "knicken_wahl_widerstand"):
             with self.subTest(feld=feld):
                 text = self.oeffnen(**{feld: {"rechenart": "handrechnung"}})
-                self.assertIn("Knicken", text)
-                self.assertIn("die Rechenart «handrechnung» gibt es dort nicht", text)
+                self.assertIn(f"{feld}: 'handrechnung' gibt es als 'rechenart' nicht", text)
 
     def test_der_block_gibt_es_in_der_verformung_nicht(self):
-        self.assertIn("«block» gibt es dort nicht", self.oeffnen(
+        self.assertIn("'block' gibt es als 'rechenart' nicht", self.oeffnen(
             knicken_wahl_verformung={"rechenart": "block"}))
 
     def test_eine_teilweise_wahl_rechnet_wie_ihr_kapitel(self):
@@ -207,11 +209,10 @@ class TestDatei(unittest.TestCase):
                          ("parabel", 1.5, "charakteristisch"))
 
     def test_von_hand_gesetzt_meldet_sich(self):
-        from opencivil.projekt import ProjektFehler
-        q = Projekt.beispiel().querschnitte[0]
-        q.knicken_wahl_widerstand = RechenwahlEintrag(rechenart="handrechnung")
-        with self.assertRaises(ProjektFehler):
-            q.pruefen()
+        p = Projekt.beispiel()
+        p.querschnitte[0].knicken_wahl_widerstand.rechenart = "handrechnung"
+        with self.assertRaisesRegex(ProjektFehler, "'handrechnung' gibt es als 'rechenart' nicht"):
+            p.pruefen()
 
 
 if __name__ == "__main__":

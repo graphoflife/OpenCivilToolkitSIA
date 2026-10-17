@@ -1,5 +1,5 @@
 ---
-erzeugt: eeebc96e6823
+erzeugt: b76b45816c77
 art: modul
 tags: [modul]
 ---
@@ -149,15 +149,6 @@ Was ein Kapitel waehlt: Kriechzahl, Wertesatz, Rechenart.
 - `kriechzahl: float = 0.0`
 - `satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG`
 - `art: Rechenart = Rechenart.HANDRECHNUNG`
-
-#### Rechenwahl.aus
-
-```python
-@classmethod
-def aus(cls, kriechzahl: float, werkstoffsatz: str, rechenart: str) -> 'Rechenwahl'
-```
-
-Aus den Feldern einer Beschreibung -- Zahl und zwei Namen.
 
 #### Rechenwahl.index
 
@@ -425,7 +416,7 @@ das Knicken und die Analysen mit dem der ersten Lage.
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.projekt.eintraege]]
-- [[opencivil.projekt.platte]]
+- [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.schnittanalyse]]

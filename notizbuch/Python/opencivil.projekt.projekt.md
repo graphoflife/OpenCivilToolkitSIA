@@ -1,5 +1,5 @@
 ---
-erzeugt: c11a8c12d3a8
+erzeugt: 4cfdd07ea457
 art: modul
 tags: [modul]
 ---
@@ -373,6 +373,8 @@ Rechnen.
 ## Braucht
 
 - [[opencivil.ergebnis]]
+- [[opencivil.nachweis.querschnittsloeser]]
+- [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]

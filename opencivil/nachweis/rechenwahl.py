@@ -164,12 +164,6 @@ class Rechenwahl:
     satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
     art: Rechenart = Rechenart.HANDRECHNUNG
 
-    @classmethod
-    def aus(cls, kriechzahl: float, werkstoffsatz: str, rechenart: str) -> "Rechenwahl":
-        """Aus den Feldern einer Beschreibung -- Zahl und zwei Namen."""
-        return cls(kriechzahl=float(kriechzahl), satz=Werkstoffsatz(werkstoffsatz),
-                   art=Rechenart(rechenart))
-
     @property
     def index(self) -> str:
         """``Rd`` oder ``Rk`` -- wie ein Widerstand dieser Wahl heisst."""

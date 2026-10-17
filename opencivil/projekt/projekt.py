@@ -23,8 +23,11 @@ from typing import Any, Dict, List, Mapping, Sequence, Union
 
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
 from opencivil.ergebnis import Ergebnis
+from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
+from opencivil.nachweis.rechenwahl import Rechenart
 from opencivil.projekt.eintraege import (
-    EIGENE_VORSILBE, Beschreibung, MaterialEintrag, PostenEintrag, RechenwahlEintrag,
+    EIGENE_VORSILBE, Beschreibung, Gebrauchswahl, KnickVerformungswahl, KnickWiderstandswahl,
+    MaterialEintrag, PostenEintrag, RechenwahlEintrag,
 )
 from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
@@ -561,31 +564,29 @@ class Projekt(Beschreibung):
         genau = p.platte("Parabel", h=250, x=[12, 10], y=[10, 10],
                          rissanforderung="erhoeht", sproede=True)
         genau.tragsicherheit_wahl = RechenwahlEintrag(
-            kriechzahl=1.0, werkstoffsatz="charakteristisch", rechenart="parabel")
+            kriechzahl=1.0, werkstoffsatz=Werkstoffsatz.CHARAKTERISTISCH,
+            rechenart=Rechenart.PARABEL)
         genau.einwirkung("Feld", M_Ed=60, N_Ed=-200, V_Ed=50)
         genau.quasistaendig.lastfall("Dauerlast", M_Ed=30)
-        genau.quasistaendig.wahl = RechenwahlEintrag(
-            kriechzahl=1.0, werkstoffsatz="charakteristisch", rechenart="block")
+        genau.quasistaendig.wahl = Gebrauchswahl(kriechzahl=1.0, rechenart=Rechenart.BLOCK)
         genau.haeufig.lastfall("Gebrauch", M_Ed=45)
-        genau.haeufig.wahl = RechenwahlEintrag(
-            kriechzahl=2.0, werkstoffsatz="charakteristisch", rechenart="parabel")
+        genau.haeufig.wahl = Gebrauchswahl(kriechzahl=2.0, rechenart=Rechenart.PARABEL)
         genau.knickfall("Stütze", N_Ed=-600, M_Ed_1=10, laenge=3.0)
-        genau.knicken_wahl_verformung = RechenwahlEintrag(
-            werkstoffsatz="charakteristisch", rechenart="parabel")
-        genau.knicken_wahl_widerstand = RechenwahlEintrag(rechenart="parabel")
+        genau.knicken_wahl_verformung = KnickVerformungswahl(
+            werkstoffsatz=Werkstoffsatz.CHARAKTERISTISCH)
+        genau.knicken_wahl_widerstand = KnickWiderstandswahl(rechenart=Rechenart.PARABEL)
 
         # Die Platte «Block» haelt die Tragsicherheit mit der 0.85·x-Vereinfachung,
         # einmal bei festem Moment -- dort zeigt die Probe die Normalkraft --,
         # rechnet die Stahlspannung von Hand und knickt gegen dieselbe Linie.
         block = p.platte("Block", h=220, x=[10, 10], y=[8, 8])
-        block.tragsicherheit_wahl = RechenwahlEintrag(rechenart="block")
+        block.tragsicherheit_wahl = RechenwahlEintrag(rechenart=Rechenart.BLOCK)
         block.einwirkung("Feld", M_Ed=25, V_Ed=30)
         block.einwirkung("Rand", M_Ed=-15, N_Ed=-100).art = "M_konstant"
         block.quasistaendig.lastfall("Dauerlast", M_Ed=12)
-        block.quasistaendig.wahl = RechenwahlEintrag(
-            werkstoffsatz="charakteristisch", rechenart="handrechnung")
+        block.quasistaendig.wahl = Gebrauchswahl(rechenart=Rechenart.HANDRECHNUNG)
         block.knickfall("Wand", N_Ed=-400, M_Ed_1=5, laenge=2.5)
-        block.knicken_wahl_widerstand = RechenwahlEintrag(rechenart="block")
+        block.knicken_wahl_widerstand = KnickWiderstandswahl()
 
         ohne = p.platte("Ohne x", h=250, x=[0, 0], y=[12, 12])
         ohne.einwirkung("Feld", M_Ed=30, V_Ed=20)

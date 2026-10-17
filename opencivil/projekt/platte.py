@@ -18,12 +18,12 @@ from typing import Any, List, Optional
 
 from opencivil.bewehrungssuche.laengs import Suchmodus
 from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX
-from opencivil.nachweis.rechenwahl import FASERARTEN, VERFORMUNGSARTEN
 from opencivil.querschnitt.platte import K_C, LAGENZAHL, Richtung
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste,
     KnickEintrag, KombinationEintrag, LageEintrag, ObergrenzeEintrag,
-    PostenEintrag, QuerkraftbewehrungEintrag, RechenwahlEintrag, SpannungsfallEintrag,
+    KnickVerformungswahl, KnickWiderstandswahl, PostenEintrag, QuerkraftbewehrungEintrag,
+    RechenwahlEintrag, SpannungsfallEintrag,
     VerformungEintrag, VerformungsfallEintrag, eindeutig, x_d_max_pruefen,
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
@@ -102,16 +102,14 @@ class QuerschnittEintrag(Beschreibung):
     knickfaelle: List[KnickEintrag] = field(default_factory=list)
     """Knicknachweise; leer heisst: keiner."""
 
-    knicken_wahl_verformung: RechenwahlEintrag = field(
-        default_factory=RechenwahlEintrag.knicken_verformung)
+    knicken_wahl_verformung: KnickVerformungswahl = field(default_factory=KnickVerformungswahl)
     """
     Womit die Ausmitte e_2d gerechnet wird -- immer praezise ohne
     Vereinfachung (:data:`~opencivil.nachweis.rechenwahl.VERFORMUNGSARTEN`),
     Vorgabe Bemessungswerte.
     """
 
-    knicken_wahl_widerstand: RechenwahlEintrag = field(
-        default_factory=RechenwahlEintrag.knicken_widerstand)
+    knicken_wahl_widerstand: KnickWiderstandswahl = field(default_factory=KnickWiderstandswahl)
     """
     Womit N_Rd(M_Ed = N_Ed·e_tot) gerechnet wird -- Vorgabe die
     0.85·x-Vereinfachung, ohne Handrechnung. Mit derselben Wahl wie die
@@ -268,19 +266,14 @@ class QuerschnittEintrag(Beschreibung):
     def pruefen(self) -> None:
         """
         Was an dieser Platte nicht stimmen kann, schon beim Oeffnen: die
-        Gebrauchslisten samt Anteil und die Rechenarten der Kapitel. Laeuft
-        auch beim Oeffnen einer Datei -- darum hier nichts, was eine
-        gespeicherte Platte unoeffenbar machte; Namen und Zahlen prueft
-        :meth:`regeln` vor dem Rechnen.
+        Gebrauchslisten samt Anteil. Laeuft auch beim Oeffnen einer Datei --
+        darum hier nichts, was eine gespeicherte Platte unoeffenbar machte;
+        Namen und Zahlen prueft :meth:`regeln` vor dem Rechnen. Welche
+        Rechenarten ein Kapitel anbietet, steht am Feld seiner Wahl.
         """
         for liste, wort in ((self.haeufig, "häufige"),
                             (self.quasistaendig, "quasi-ständige")):
             liste.pruefen(self.name, wort)
-        self.tragsicherheit_wahl.pruefen(f"Platte '{self.name}', Tragsicherheit")
-        self.knicken_wahl_verformung.pruefen(f"Platte '{self.name}', Knicken, Verformung",
-                                             VERFORMUNGSARTEN)
-        self.knicken_wahl_widerstand.pruefen(f"Platte '{self.name}', Knicken, Widerstand",
-                                             FASERARTEN)
 
     def regeln(self) -> None:
         """

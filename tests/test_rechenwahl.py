@@ -35,7 +35,10 @@ class TestRechenarten(unittest.TestCase):
         self.assertEqual(Rechenwahl(satz=Werkstoffsatz.CHARAKTERISTISCH).index, "Rk")
 
     def test_aus_den_feldern_einer_beschreibung(self):
-        wahl = Rechenwahl.aus(1.5, "charakteristisch", "parabel")
+        """Die Felder halten schon die Wahlen -- die Rechenwahl entsteht ohne Umwandlung."""
+        from opencivil.projekt import RechenwahlEintrag
+        wahl = RechenwahlEintrag(kriechzahl=1.5, werkstoffsatz="charakteristisch",
+                                 rechenart="parabel").wahl
         self.assertEqual(wahl, Rechenwahl(1.5, Werkstoffsatz.CHARAKTERISTISCH, Rechenart.PARABEL))
 
     def test_ohne_ebene_nennt_die_wahl(self):

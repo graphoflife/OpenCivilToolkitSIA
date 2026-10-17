@@ -20,9 +20,10 @@ from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import Rechenart, Rechenwahl
 from opencivil.nachweis.spannungsbegrenzung import VORGABE
 from opencivil.nachweis.zustand2 import gerissen
-from opencivil.projekt import Projekt, ProjektFehler, RechenwahlEintrag
+from opencivil.projekt import Projekt, ProjektFehler, QAGebrauchswahl
+from opencivil.projekt.lesen import wahl_von
 from opencivil.projekt.querschnittsanalyse import (
-    QAGebrauchsfallEintrag, QAGebrauchsliste, QuerschnittsanalyseEintrag,
+    QAGebrauchsfallEintrag, QuerschnittsanalyseEintrag,
 )
 from opencivil.nachweis.stabgrenzen import fiktiver_durchmesser
 from opencivil.querschnitt.interaktion import Querschnitt
@@ -116,8 +117,7 @@ class TestVerfehlteEbene(unittest.TestCase):
 
     def test_der_nachweis_sagt_es(self):
         p, a = self.stuetze()
-        a.quasistaendig.wahl = RechenwahlEintrag(werkstoffsatz="charakteristisch",
-                                                 rechenart="block")
+        a.quasistaendig.wahl = QAGebrauchswahl(rechenart="block")
         a.quasistaendig.lastfall("Wenig Moment", N_Ed=-600.0, M_y_Ed=10.0)
         aufbau, loesung = rechnen(p)
         urteil = urteil_zu(loesung, aufbau.qa_spannung_riss["a1"], "Wenig Moment")
@@ -283,7 +283,7 @@ class TestBeschreibung(unittest.TestCase):
     def test_keine_handrechnung(self):
         """Der gezeichnete Querschnitt rechnet über die Fasern -- die Handrechnung gibt es nicht."""
         p, a = rechteck()
-        self.assertNotIn(Rechenart.HANDRECHNUNG, QAGebrauchsliste.ARTEN)
+        self.assertNotIn(Rechenart.HANDRECHNUNG, wahl_von(QAGebrauchswahl, "rechenart"))
         roh = a.als_dict()
         roh["quasistaendig"]["wahl"]["rechenart"] = "quatsch"
         with self.assertRaises(ProjektFehler):

@@ -38,17 +38,16 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX
-from opencivil.nachweis.rechenwahl import (
-    FASERARTEN, FASERSPANNUNGSARTEN, VERFORMUNGSARTEN, Rechenwahl,
-)
+from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
+from opencivil.nachweis.rechenwahl import FASERSPANNUNGSARTEN, Rechenart, Rechenwahl
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.platte import ALPHA_MAX, ALPHA_MIN, K_C
 from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.schnittanalyse import Zugseite
 from opencivil.projekt.eintraege import (
-    BETONGESETZE, HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, WERKSTOFFSAETZE, Beschreibung,
-    Gebrauchsliste, KnickEintrag, RechenwahlEintrag, SpannungsfallEintrag, druckfeld_pruefen,
-    eindeutig, neigungen_pruefen, x_d_max_pruefen,
+    HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste, Gebrauchswahl,
+    KnickEintrag, KnickVerformungswahl, KnickWiderstandswahl, SpannungsfallEintrag,
+    druckfeld_pruefen, eindeutig, neigungen_pruefen, x_d_max_pruefen,
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt.lesen import ProjektFehler, einer_von, nicht_negativ
@@ -218,6 +217,13 @@ class QAGebrauchsfallEintrag(Beschreibung):
 
 
 @dataclass
+class QAGebrauchswahl(Gebrauchswahl):
+    """Die Stahlspannungen am gezeichneten Querschnitt: ueber die Fasern oder elastisch -- ohne Handrechnung."""
+
+    rechenart: Rechenart = einer_von(FASERSPANNUNGSARTEN, Rechenart.ELASTISCH)
+
+
+@dataclass
 class QAGebrauchsliste(Gebrauchsliste):
     """
     Die Lastfaelle einer Stahlspannung am gezeichneten Querschnitt: dieselbe
@@ -227,10 +233,10 @@ class QAGebrauchsliste(Gebrauchsliste):
     """
 
     FALL = QAGebrauchsfallEintrag
-    ARTEN = FASERSPANNUNGSARTEN
     BAUTEIL = "Querschnitt"
 
     faelle: List[QAGebrauchsfallEintrag] = field(default_factory=list)
+    wahl: QAGebrauchswahl = field(default_factory=QAGebrauchswahl)
 
 
 @dataclass
@@ -256,13 +262,14 @@ class WerkstoffwahlEintrag(Beschreibung):
     """
 
     material: str
-    satz: str = einer_von(WERKSTOFFSAETZE, WERKSTOFFSAETZE[0])
-    betongesetz: str = einer_von(BETONGESETZE, BETONGESETZE[0])
+    satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
+    betongesetz: Rechenart = einer_von((Rechenart.PARABEL, Rechenart.BLOCK), Rechenart.PARABEL)
+    """Die beiden genauen Rechenarten -- die Parabel zuerst, sie ist die Vorgabe."""
 
     @property
     def rechenwahl(self) -> Rechenwahl:
         """Fuer die Rechnung: Wertesatz und Rechenart, ohne Kriechen -- der Bruchzustand."""
-        return Rechenwahl.aus(0.0, self.satz, self.betongesetz)
+        return Rechenwahl(satz=self.satz, art=self.betongesetz)
 
 
 @dataclass
@@ -390,10 +397,8 @@ class QuerschnittsanalyseEintrag(Beschreibung):
     knickfaelle: List[QAKnickEintrag] = field(default_factory=list)
     """Knicknachweise, je in einer Richtung; leer heisst: keiner."""
 
-    knicken_wahl_verformung: RechenwahlEintrag = field(
-        default_factory=RechenwahlEintrag.knicken_verformung)
-    knicken_wahl_widerstand: RechenwahlEintrag = field(
-        default_factory=RechenwahlEintrag.knicken_widerstand)
+    knicken_wahl_verformung: KnickVerformungswahl = field(default_factory=KnickVerformungswahl)
+    knicken_wahl_widerstand: KnickWiderstandswahl = field(default_factory=KnickWiderstandswahl)
     """
     Womit das Knicken die Ausmitte e_2d und den Widerstand rechnet -- wie bei
     der Platte: die Verformung immer praezise, der Widerstand mit 0.85·x oder
@@ -610,14 +615,12 @@ class QuerschnittsanalyseEintrag(Beschreibung):
     def pruefen(self) -> None:
         """
         Was sich schon beim Oeffnen pruefen laesst: die Gebrauchslisten samt
-        Anteil, die Rechenarten des Knickens, je Material eine Wahl. Die
-        Namen der Faelle prueft :meth:`regeln` vor dem Rechnen.
+        Anteil, je Material eine Wahl. Die Namen der Faelle prueft
+        :meth:`regeln` vor dem Rechnen; welche Rechenarten ein Kapitel
+        anbietet, steht am Feld seiner Wahl.
         """
         for liste, wort in ((self.haeufig, "häufige"), (self.quasistaendig, "quasi-ständige")):
             liste.pruefen(self.name, wort)
-        for wahl, was, arten in ((self.knicken_wahl_verformung, "Verformung", VERFORMUNGSARTEN),
-                                 (self.knicken_wahl_widerstand, "Widerstand", FASERARTEN)):
-            wahl.pruefen(f"Querschnitt '{self.name}', Knicken, {was}", arten)
         # Je Material eine Wahl. Zwei fuer dasselbe -- und welche gilt, hinge
         # davon ab, wer liest: der Aufbau nahm die letzte, die Maske die erste.
         gewaehlt = set()

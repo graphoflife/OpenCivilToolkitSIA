@@ -1,5 +1,5 @@
 ---
-erzeugt: dc93e1a6e3e2
+erzeugt: cda6988d2e41
 art: modul
 tags: [modul]
 ---
@@ -194,6 +194,14 @@ def _wahlfelder(cls: type) -> Dict[str, type]
 
 Je Wahlfeld einer Datenklasse seine Wahl -- je Klasse einmal.
 
+### wahl_von
+
+```python
+def wahl_von(cls: type, feld: str) -> tuple
+```
+
+Was ein Wahlfeld annehmen kann -- seine Teilmenge, sonst jedes Mitglied seiner Wahl.
+
 ### wahl_aus_text
 
 ```python
@@ -249,3 +257,4 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.web.api]]

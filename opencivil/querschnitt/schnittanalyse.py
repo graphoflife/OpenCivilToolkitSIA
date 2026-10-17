@@ -464,7 +464,7 @@ def analysen(aufbau: "Aufbau", loesung: "Loesung",
         liste: List[Analyse] = []
         for fall in faelle:
             seite = Zugseite(fall.richtung)
-            wahl = Rechenwahl.aus(fall.kriechzahl, fall.werkstoffsatz, fall.rechenart)
+            wahl = fall.wahl
             schluessel = (seite, wahl)
             if schluessel not in paare:
                 try:

@@ -45,7 +45,8 @@ from opencivil.projekt import (
     QuerschnittEintrag, SkriptEintrag, SpannungsfallEintrag, VerformungsfallEintrag,
 )
 from opencivil.projekt import balkensystem as bs
-from opencivil.projekt.eintraege import BETONGESETZE, EIGENE_VORSILBE, WERKSTOFFSAETZE
+from opencivil.projekt.eintraege import EIGENE_VORSILBE
+from opencivil.projekt.lesen import wahl_von
 from opencivil.projekt.querschnittsanalyse import (
     SCHNITTE, FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QAGebrauchsfallEintrag,
     QAKnickEintrag, QALastfallEintrag, QASpannungsfallEintrag, QuerschnittsanalyseEintrag,
@@ -57,7 +58,7 @@ from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.vorlagen import VORLAGEN
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
-    FASERARTEN, FASERSPANNUNGSARTEN, RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN, Rechenart,
+    FASERARTEN, FASERSPANNUNGSARTEN, RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN,
 )
 from opencivil.spannungsanalyse import Analyseart
 from opencivil.stabwerk import querschnitte as stabquerschnitte
@@ -71,12 +72,13 @@ from opencivil.web.umschlag import endlich
 #: stehen beim Wertesatz selbst.
 _WERKSTOFFSAETZE = [
     {"wert": s.value, "beschriftung": s.beschriftung, "kurz": s.kurz}
-    for s in map(Werkstoffsatz, WERKSTOFFSAETZE)
+    for s in Werkstoffsatz
 ]
-#: Die Betongesetze heissen wie die Rechenarten, deren Werte sie sind.
+#: Die Betongesetze heissen wie die Rechenarten, deren Werte sie sind; welche
+#: es gibt, steht am Feld der Werkstoffwahl.
 _BETONGESETZE = [
-    {"wert": wert, "beschriftung": Rechenart(wert).beschriftung, "kurz": Rechenart(wert).kurz}
-    for wert in BETONGESETZE
+    {"wert": a.value, "beschriftung": a.beschriftung, "kurz": a.kurz}
+    for a in wahl_von(WerkstoffwahlEintrag, "betongesetz")
 ]
 
 

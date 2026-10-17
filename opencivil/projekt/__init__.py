@@ -52,10 +52,10 @@ geschieht erst beim Aufbau, ueber die :class:`Groesse`.
 from opencivil.projekt.lesen import ProjektFehler, sorten
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, GebrauchsfallEintrag,
-    Gebrauchsliste, KnickEintrag, KombinationEintrag, LageEintrag,
-    MaterialEintrag, ObergrenzeEintrag, PostenEintrag, QuerkraftbewehrungEintrag,
-    RechenwahlEintrag, SpannungsfallEintrag, VerformungEintrag, VerformungsfallEintrag,
-    abgeleiteter_fallname,
+    Gebrauchsliste, Gebrauchswahl, KnickEintrag, KnickVerformungswahl, KnickWiderstandswahl,
+    KombinationEintrag, LageEintrag, MaterialEintrag, ObergrenzeEintrag, PostenEintrag,
+    QuerkraftbewehrungEintrag, RechenwahlEintrag, SpannungsfallEintrag, VerformungEintrag,
+    VerformungsfallEintrag, abgeleiteter_fallname,
 )
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.balkensystem import (
@@ -64,7 +64,7 @@ from opencivil.projekt.balkensystem import (
     SystemknotenEintrag, SystemlinieEintrag,
 )
 from opencivil.projekt.querschnittsanalyse import (
-    FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QALastfallEintrag,
+    FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QAGebrauchswahl, QALastfallEintrag,
     QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
     WerkstoffwahlEintrag,
 )
@@ -82,7 +82,8 @@ __all__ = [
     "GebrauchsfallEintrag", "HilfslinieEintrag", "KnotenEintrag",
     "QALastfallEintrag", "QuerschnittsanalyseEintrag",
     "SchubwandEintrag", "StabEintrag", "StablinieEintrag", "WerkstoffwahlEintrag",
-    "Gebrauchsliste",
+    "Gebrauchsliste", "Gebrauchswahl", "KnickVerformungswahl", "KnickWiderstandswahl",
+    "QAGebrauchswahl",
     "HAEUFIG_ANTEIL", "KnickEintrag", "KombinationEintrag", "LageEintrag",
     "MaterialEintrag", "ObergrenzeEintrag", "PostenEintrag", "Projekt", "ProjektFehler",
     "QUASISTAENDIG_ANTEIL", "QuerkraftbewehrungEintrag", "QuerschnittEintrag",

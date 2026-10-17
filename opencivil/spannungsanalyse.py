@@ -1283,7 +1283,7 @@ def analysen(aufbau: "Aufbau", loesung: "Loesung",
         liste: List[Analyse] = []
         for fall in faelle:
             richtung = Richtung(fall.richtung)
-            wahl = Rechenwahl.aus(fall.kriechzahl, fall.werkstoffsatz, fall.rechenart)
+            wahl = fall.wahl
             schluessel = (richtung, wahl)
             if schluessel not in paare:
                 try:

@@ -1,5 +1,5 @@
 ---
-erzeugt: 40a23a959972
+erzeugt: 04bbea655dd4
 art: modul
 tags: [modul]
 ---
@@ -199,6 +199,17 @@ zaehlen N und die Momente. kN und kNm, Vorzeichen siehe oben.
 - `M_z_Ed: float = 0.0`
 - `aktiv: bool = True`
 
+### QAGebrauchswahl
+
+```python
+@dataclass
+class QAGebrauchswahl(Gebrauchswahl)
+```
+
+Die Stahlspannungen am gezeichneten Querschnitt: ueber die Fasern oder elastisch -- ohne Handrechnung.
+
+- `rechenart: Rechenart = einer_von(FASERSPANNUNGSARTEN, Rechenart.ELASTISCH)`
+
 ### QAGebrauchsliste
 
 ```python
@@ -212,9 +223,9 @@ Lastfaellen der Tragsicherheit. Gerechnet wird ueber die Fasern -- eine
 Handrechnung gibt es hier nicht.
 
 - `FALL = QAGebrauchsfallEintrag`
-- `ARTEN = FASERSPANNUNGSARTEN`
 - `BAUTEIL = 'Querschnitt'`
 - `faelle: List[QAGebrauchsfallEintrag] = field(default_factory=list)`
+- `wahl: QAGebrauchswahl = field(default_factory=QAGebrauchswahl)`
 
 ### QAKnickEintrag
 
@@ -244,8 +255,8 @@ die Plateaus liegen (`f_cd` oder `f_ck`, `f_yd` oder `f_yk`).
 vereinfachte Spannungsblock 0.85·x.
 
 - `material: str`
-- `satz: str = einer_von(WERKSTOFFSAETZE, WERKSTOFFSAETZE[0])`
-- `betongesetz: str = einer_von(BETONGESETZE, BETONGESETZE[0])`
+- `satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG`
+- `betongesetz: Rechenart = einer_von((Rechenart.PARABEL, Rechenart.BLOCK), Rechenart.PARABEL)` – Die beiden genauen Rechenarten -- die Parabel zuerst, sie ist die Vorgabe.
 
 #### WerkstoffwahlEintrag.rechenwahl
 
@@ -332,8 +343,8 @@ Ein gezeichneter Querschnitt mit Bewehrung, Schubwaenden und Lastfaellen.
 - `quasistaendig: QAGebrauchsliste = field(default_factory=lambda: QAGebrauchsliste(anteil=QUASISTAENDIG_A…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
 - `haeufig: QAGebrauchsliste = field(default_factory=lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL))` – Die haeufigen Lastfaelle -- gegen das Fliessen, bei erhoehter und hoher Anforderung.
 - `knickfaelle: List[QAKnickEintrag] = field(default_factory=list)` – Knicknachweise, je in einer Richtung; leer heisst: keiner.
-- `knicken_wahl_verformung: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.knicken_verformung)`
-- `knicken_wahl_widerstand: RechenwahlEintrag = field(default_factory=RechenwahlEintrag.knicken_widerstand)` – Womit das Knicken die Ausmitte e_2d und den Widerstand rechnet -- wie bei der Platte: die Verformung immer praezise, der Widerstand mit 0.85·x oder praezise.
+- `knicken_wahl_verformung: KnickVerformungswahl = field(default_factory=KnickVerformungswahl)`
+- `knicken_wahl_widerstand: KnickWiderstandswahl = field(default_factory=KnickWiderstandswahl)` – Womit das Knicken die Ausmitte e_2d und den Widerstand rechnet -- wie bei der Platte: die Verformung immer praezise, der Widerstand mit 0.85·x oder praezise.
 - `spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)` – Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt.
 - `beschreibung: str = ''` – Freier Text -- geht in keine Rechnung ein, wie bei der Platte.
 
@@ -465,8 +476,9 @@ def pruefen(self) -> None
 ```
 
 Was sich schon beim Oeffnen pruefen laesst: die Gebrauchslisten samt
-Anteil, die Rechenarten des Knickens, je Material eine Wahl. Die
-Namen der Faelle prueft [[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.regeln|regeln]] vor dem Rechnen.
+Anteil, je Material eine Wahl. Die Namen der Faelle prueft
+[[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.regeln|regeln]] vor dem Rechnen; welche Rechenarten ein Kapitel
+anbietet, steht am Feld seiner Wahl.
 
 #### QuerschnittsanalyseEintrag.regeln
 
@@ -529,6 +541,7 @@ wird danach, was man braucht.
 ## Braucht
 
 - [[opencivil.nachweis.duktilitaet]]
+- [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.projekt.eintraege]]
