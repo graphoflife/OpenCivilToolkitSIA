@@ -2602,6 +2602,22 @@
       ]
     },
     {
+      "name": "opencivil.core.suche",
+      "pfad": "Python/opencivil.core.suche.md",
+      "art": "modul",
+      "kurz": "wo eine steigende Funktion null wird.",
+      "stichworte": [
+        "Halbieren",
+        "Halbieren.finde",
+        "Illinois",
+        "Illinois.finde",
+        "illinois",
+        "_sekante",
+        "_weiter",
+        "eingrenzen"
+      ]
+    },
+    {
       "name": "opencivil.core.wahl",
       "pfad": "Python/opencivil.core.wahl.md",
       "art": "modul",
@@ -4080,7 +4096,6 @@
         "Richtung",
         "Richtung.momente",
         "Richtung.punkt",
-        "illinois",
         "Querschnitt",
         "Querschnitt.richtung",
         "Querschnitt._grenzen",

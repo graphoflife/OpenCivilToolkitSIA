@@ -1,5 +1,5 @@
 ---
-erzeugt: 4dd3d6407af1
+erzeugt: 09d24871c5a1
 art: modul
 tags: [modul]
 ---
@@ -21,5 +21,6 @@ Berechnung ihre Herleitung schreibt ([[opencivil.core.protokoll]],
 - [[opencivil.core.latex]] – Bausteine fuer die LaTeX-Ausgabe von Berechnungen.
 - [[opencivil.core.protokoll]] – Mitschrift einer Berechnung.
 - [[opencivil.core.rechenwerk]] – Registrierung und Aufloesung von Berechnungen.
+- [[opencivil.core.suche]] – wo eine steigende Funktion null wird.
 - [[opencivil.core.wahl]] – was ein Wahlfeld annehmen kann.
 - [[opencivil.core.wert]] – Benannte Werte im Rechenmodell.

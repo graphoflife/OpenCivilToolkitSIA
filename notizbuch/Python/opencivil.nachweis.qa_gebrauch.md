@@ -1,5 +1,5 @@
 ---
-erzeugt: 21b2256ba385
+erzeugt: da8d364f7dea
 art: modul
 tags: [modul]
 ---
@@ -260,6 +260,7 @@ findet, liegt jenseits der Grenze: der Stahl fliesst dort laengst.
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.suche]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.gebrauchsebene]]

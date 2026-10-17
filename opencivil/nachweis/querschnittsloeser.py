@@ -73,6 +73,7 @@ from functools import cached_property
 from typing import Callable, List, Optional, Sequence, Tuple
 
 from opencivil.core.protokoll import Zwischenwerte
+from opencivil.core.suche import Halbieren, Illinois, eingrenzen
 from opencivil.querschnitt.fasern import (
     FASERN, Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt, Stab,
 )
@@ -548,25 +549,12 @@ class Faserloeser:
                 schranke: float, f_unten: Optional[float] = None,
                 f_oben: Optional[float] = None) -> Optional[float]:
         """
-        Wo ``f`` zwischen ``unten`` und ``oben`` null wird -- ``f`` steigt,
-        unten ist es negativ, oben nicht. Halbiert, bis das Fenster schmaler
-        ist als ``schranke``; ``None``, wenn ``f`` unterwegs keinen Wert hat.
-        ``f_unten`` und ``f_oben`` braucht das Halbieren nicht -- sie sind
-        fuer eine Suche, die mit ihnen schneller ist
+        Wo ``f`` zwischen ``unten`` und ``oben`` null wird -- durch Halbieren
+        (:class:`~opencivil.core.suche.Halbieren`). ``f_unten`` und ``f_oben``
+        sind fuer eine Suche, die mit ihnen schneller ist
         (:class:`FaserloeserIllinois`).
         """
-        for _ in range(SCHRITTE):
-            if oben - unten <= schranke:
-                break
-            mitte = 0.5 * (unten + oben)
-            wert = f(mitte)
-            if wert is None:
-                return None
-            if wert < 0.0:
-                unten = mitte
-            else:
-                oben = mitte
-        return 0.5 * (unten + oben)
+        return Halbieren().finde(f, unten, oben, schranke, f_unten, f_oben)
 
     def _rand(self, start: float, N_Ed: float,
               moment: Callable[[float], Optional[float]], M_Ed: float,
@@ -726,26 +714,11 @@ class FaserloeserIllinois(Faserloeser):
         def zu_viel(e: float) -> float:
             return self.kraefte(e, chi).N - N_ziel
 
-        fa = zu_viel(a)
-        if fa == 0.0:
-            return a
-        schritt = 1e-6
-        for _ in range(SCHRITTE):
-            b = min(max(a - schritt if fa > 0.0 else a + schritt, unten), oben)
-            fb = zu_viel(b)
-            if fb == 0.0:
-                return b
-            if (fb > 0.0) != (fa > 0.0):
-                break
-            if b in (unten, oben):
-                return None
-            a, fa = b, fb
-            schritt *= 4.0
-        else:
+        klammer = eingrenzen(zu_viel, a, zu_viel(a), 1e-6, faktor=4.0, unten=unten, oben=oben)
+        if klammer is None:
             return None
-        if fa < fb:
-            return self._suchen(zu_viel, a, b, EPS_SCHRANKE, fa, fb)
-        return self._suchen(zu_viel, b, a, EPS_SCHRANKE, fb, fa)
+        von, bis, f_von, f_bis = klammer
+        return self._suchen(zu_viel, von, bis, EPS_SCHRANKE, f_von, f_bis)
 
     def loese(self, *, N_Ed: float, M_Ed: float) -> Ebene:
         """
@@ -780,23 +753,10 @@ class FaserloeserIllinois(Faserloeser):
         if fa is None:
             return None
         schritt = max(abs(chi), self.grenzen.kruemmungsgrenze(positiv=True) * 1e-6) / 4.0
-        a = chi
-        for _ in range(SCHRITTE):
-            if fa == 0.0:
-                b, fb = a, fa
-                break
-            b = a - schritt if fa > 0.0 else a + schritt
-            fb = zu_viel(b)
-            if fb is None:
-                return None
-            if (fb > 0.0) != (fa > 0.0):
-                break
-            a, fa = b, fb
-            schritt *= 2.0
-        else:
+        klammer = eingrenzen(zu_viel, chi, fa, schritt, faktor=2.0)
+        if klammer is None:
             return None
-        unten, oben = (a, b) if fa < fb else (b, a)
-        f_unten, f_oben = min(fa, fb), max(fa, fb)
+        unten, oben, f_unten, f_oben = klammer
         gefunden = self._suchen(zu_viel, unten, oben, CHI_SCHRANKE, f_unten, f_oben)
         if gefunden is None:
             return None
@@ -808,28 +768,7 @@ class FaserloeserIllinois(Faserloeser):
                 f_oben: Optional[float] = None) -> Optional[float]:
         if self.halbiert:
             return super()._suchen(f, unten, oben, schranke, f_unten, f_oben)
-        fa = f(unten) if f_unten is None else f_unten
-        fb = f(oben) if f_oben is None else f_oben
-        if fa is None or fb is None:
-            return None
-        a, b = unten, oben
-        if fa == 0.0:
-            return a
-        for _ in range(SCHRITTE):
-            if fb == 0.0 or abs(b - a) <= schranke:
-                break
-            c = b - fb * (b - a) / (fb - fa)
-            fc = f(c)
-            if fc is None:
-                return None
-            if (fc > 0.0) != (fb > 0.0):
-                a, fa = b, fb
-            else:
-                # Bleibt ein Ende zweimal stehen, wird sein Wert halbiert --
-                # sonst kroeche die Sekante nur von einer Seite heran.
-                fa *= 0.5
-            b, fb = c, fc
-        return b
+        return Illinois().finde(f, unten, oben, schranke, f_unten, f_oben)
 
 
 class Querschnittsloeser(Faserloeser):

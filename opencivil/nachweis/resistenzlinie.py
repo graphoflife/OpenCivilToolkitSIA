@@ -45,6 +45,7 @@ from opencivil.core.berechnung import Eingaben
 from opencivil.core.einheiten import Groesse
 from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.suche import illinois
 from opencivil.core.wert import Wert
 from opencivil.nachweis import dehnungsfaecher, linie as geo
 from opencivil.nachweis.dehnungsfaecher import Linienpunkt
@@ -53,7 +54,6 @@ from opencivil.nachweis.querschnittsloeser import (
 )
 from opencivil.nachweis.rechenwahl import protokoll_gesetze
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
-from opencivil.querschnitt.interaktion import illinois
 from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
 
 #: Ab welchem Abstand eine Dehnung nicht mehr auf ihrer Grenze liegt. Die

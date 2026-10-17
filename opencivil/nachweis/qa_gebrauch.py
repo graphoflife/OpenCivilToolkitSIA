@@ -66,6 +66,7 @@ from opencivil.core.berechnung import (
 from opencivil.core.einheiten import EINHEITSLOS, MM, Groesse
 from opencivil.core.latex import Mathe, als_text, angabe, bedingung, fest, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.suche import illinois
 from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.material.basis import Baustoff, mit_index
 from opencivil.nachweis.gebrauchsebene import (
@@ -93,7 +94,7 @@ from opencivil.nachweis.stabgrenzen import (
 )
 from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse
-from opencivil.querschnitt.interaktion import Querschnitt, illinois
+from opencivil.querschnitt.interaktion import Querschnitt
 
 #: Wann das Moment der Zwaengung auf Biegung gefunden ist: wie nahe der
 #: erste gezogene Stab seiner Grenze kommen muss, als Teil von ihr.

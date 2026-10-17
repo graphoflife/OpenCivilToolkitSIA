@@ -67,6 +67,7 @@ import math
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
+from opencivil.core.suche import illinois
 from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.fasern import (
     Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt, Gesetz,
@@ -107,10 +108,6 @@ FLAECHE_SCHRITTE = 8
 #: genuegen: innerhalb eines Abschnitts aendert sich N glatt, und das
 #: Illinois-Verfahren findet die Stelle danach in wenigen Schritten.
 SUCHSCHRITTE = 4
-
-#: Hoechstzahl der Schritte jeder Suche. Erreicht wird sie nicht; sie steht
-#: da, damit keine Schleife ewig laeuft.
-SUCHE_HOECHSTENS = 80
 
 #: Groesste Zugdehnung, wo kein Werkstoff eine nennt -- ein Querschnitt ganz
 #: ohne Bewehrung. Beton traegt keinen Zug; die Grenze legt nur fest, wo der
@@ -301,48 +298,6 @@ class Richtung:
         k = self.fasern.kraefte(eps_m, chi)
         M_y, M_z = self.momente(k.N, k.M, k.M_quer)
         return Bruchpunkt(psi=self.psi, eps_m=eps_m, chi=chi, N=k.N, M_y=M_y, M_z=M_z)
-
-
-# ===========================================================================
-# Nullstellensuche
-# ===========================================================================
-
-
-def illinois(f, a: float, fa: float, b: float, fb: float, *,
-             schranke_x: float, schranke_f: float):
-    """
-    Eine Nullstelle von ``f`` zwischen ``a`` und ``b``, die verschiedene
-    Vorzeichen haben -- Regula falsi mit der Illinois-Abwandlung.
-
-    Bleibt immer eingegrenzt wie eine Halbierung, konvergiert aber auf glatten
-    Stuecken fast so schnell wie das Sekantenverfahren. Die Abwandlung halbiert
-    den Wert am Ende, das zweimal hintereinander stehen bleibt; sonst
-    kroeche die Regula falsi an einer gekruemmten Funktion nur von einer Seite
-    heran. ``f`` gibt ``(Wert, Beigabe)`` zurueck; zurueck kommt die Beigabe
-    der besten Stelle -- ``None``, wenn schon die erste keinen Wert hat.
-
-    Hat ``f`` an einer Stelle keinen Wert (``nan``), endet die Suche dort: ohne
-    ihn laesst sich nicht weiter eingrenzen. Bis 2026-10-17 rechnete sie mit
-    ``nan`` weiter, bis eine Zerlegung bei ψ = nan abbrach -- an der kippenden
-    Nulllinie eines L, wo zwischen zwei Neigungen mit Gleichgewicht eine ohne
-    liegen kann.
-    """
-    beste = None
-    for _ in range(SUCHE_HOECHSTENS):
-        c = b - fb * (b - a) / (fb - fa)
-        fc, beigabe = f(c)
-        if math.isnan(fc):
-            break
-        if beste is None or abs(fc) < beste[0]:
-            beste = (abs(fc), beigabe)
-        if abs(fc) <= schranke_f or abs(b - a) <= schranke_x:
-            break
-        if (fc > 0) != (fb > 0):
-            a, fa = b, fb
-        else:
-            fa = fa / 2.0
-        b, fb = c, fc
-    return None if beste is None else beste[1]
 
 
 # ===========================================================================

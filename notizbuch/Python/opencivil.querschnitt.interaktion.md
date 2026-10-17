@@ -1,5 +1,5 @@
 ---
-erzeugt: 7a8c581e4a8a
+erzeugt: c8a5402a5d82
 art: modul
 tags: [modul]
 ---
@@ -230,28 +230,6 @@ M_z = -(n_y · Σ F·v - n_z · Σ F·u)
 ```python
 def punkt(self, eps_m: float, chi: float) -> Bruchpunkt
 ```
-
-### illinois
-
-```python
-def illinois(f, a: float, fa: float, b: float, fb: float, *, schranke_x: float, schranke_f: float)
-```
-
-Eine Nullstelle von `f` zwischen `a` und `b`, die verschiedene
-Vorzeichen haben -- Regula falsi mit der Illinois-Abwandlung.
-
-Bleibt immer eingegrenzt wie eine Halbierung, konvergiert aber auf glatten
-Stuecken fast so schnell wie das Sekantenverfahren. Die Abwandlung halbiert
-den Wert am Ende, das zweimal hintereinander stehen bleibt; sonst
-kroeche die Regula falsi an einer gekruemmten Funktion nur von einer Seite
-heran. `f` gibt `(Wert, Beigabe)` zurueck; zurueck kommt die Beigabe
-der besten Stelle -- `None`, wenn schon die erste keinen Wert hat.
-
-Hat `f` an einer Stelle keinen Wert (`nan`), endet die Suche dort: ohne
-ihn laesst sich nicht weiter eingrenzen. Bis 2026-10-17 rechnete sie mit
-`nan` weiter, bis eine Zerlegung bei ψ = nan abbrach -- an der kippenden
-Nulllinie eines L, wo zwischen zwei Neigungen mit Gleichgewicht eine ohne
-liegen kann.
 
 ### Querschnitt
 
@@ -487,7 +465,6 @@ die andere Koordinate jeder Stelle.
 - `FAECHER_TIEFE = 8` – Wie oft eine Luecke im Faecher hoechstens halbiert wird.
 - `FLAECHE_SCHRITTE = 8` – Stuetzstellen je Abschnitt fuer die Flaeche der Widerstaende -- weniger als fuer eine Linie; die Luecken fuellt das Halbieren.
 - `SUCHSCHRITTE = 4` – Stuetzstellen je Abschnitt, um die Stelle `N = N_Ed` einzugrenzen. Wenige genuegen: innerhalb eines Abschnitts aendert sich N glatt, und das Illinois-Verfahren findet die Stelle danach in wenigen Schritten.
-- `SUCHE_HOECHSTENS = 80` – Hoechstzahl der Schritte jeder Suche. Erreicht wird sie nicht; sie steht da, damit keine Schleife ewig laeuft.
 - `EPS_ZUG_OHNE_GRENZE = 0.045` – Groesste Zugdehnung, wo kein Werkstoff eine nennt -- ein Querschnitt ganz ohne Bewehrung. Beton traegt keinen Zug; die Grenze legt nur fest, wo der Faecher beginnt. Derselbe Wert wie der Suchbereich des Plattenloesers.
 - `WINKEL_SCHRANKE = 1e-07` – Wann zwei Richtungen des Moments als gleich gelten, im Bogenmass. Ein Zehnmillionstel verschiebt den Widerstand um weniger, als je gedruckt wird.
 - `LINIENSTUECK = 0.02` – Teile einer verschmierten Stablinie: alle so viele Meter ein Stueck.
@@ -497,6 +474,7 @@ die andere Koordinate jeder Stelle.
 
 ## Braucht
 
+- [[opencivil.core.suche]]
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
@@ -506,7 +484,6 @@ die andere Koordinate jeder Stelle.
 - [[opencivil.nachweis.gebrauchsebene]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_knicken]]
-- [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.stabgrenzen]]

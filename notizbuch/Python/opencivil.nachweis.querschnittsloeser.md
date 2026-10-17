@@ -1,5 +1,5 @@
 ---
-erzeugt: 6f29100e9bc1
+erzeugt: f75f6ab3ee84
 art: modul
 tags: [modul]
 ---
@@ -343,11 +343,9 @@ Die gefundene Ebene, mit ihrer Probe: erzeugt sie `N_Ed` und
 def _suchen(self, f: Callable[[float], Optional[float]], unten: float, oben: float, schranke: float, f_unten: Optional[float]=None, f_oben: Optional[float]=None) -> Optional[float]
 ```
 
-Wo `f` zwischen `unten` und `oben` null wird -- `f` steigt,
-unten ist es negativ, oben nicht. Halbiert, bis das Fenster schmaler
-ist als `schranke`; `None`, wenn `f` unterwegs keinen Wert hat.
-`f_unten` und `f_oben` braucht das Halbieren nicht -- sie sind
-fuer eine Suche, die mit ihnen schneller ist
+Wo `f` zwischen `unten` und `oben` null wird -- durch Halbieren
+([[opencivil.core.suche#Halbieren|Halbieren]]). `f_unten` und `f_oben`
+sind fuer eine Suche, die mit ihnen schneller ist
 ([[opencivil.nachweis.querschnittsloeser#FaserloeserIllinois|FaserloeserIllinois]]).
 
 #### Faserloeser._rand
@@ -526,6 +524,7 @@ kostete das Halbieren beinahe die ganze Rechenzeit (Benutzer,
 ## Braucht
 
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.suche]]
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.werkstoffgesetz]]

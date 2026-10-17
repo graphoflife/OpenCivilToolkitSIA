@@ -1,5 +1,5 @@
 ---
-erzeugt: 425f5eef299f
+erzeugt: ca54d6d6d1a0
 art: modul
 tags: [modul]
 ---
@@ -308,13 +308,13 @@ Ein SI-Wert in Kilo-Einheiten, eine Nachkommastelle.
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.suche]]
 - [[opencivil.core.wert]]
 - [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.linie]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.querschnitt.gesetzwahl]]
-- [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 
 ## Gebraucht von

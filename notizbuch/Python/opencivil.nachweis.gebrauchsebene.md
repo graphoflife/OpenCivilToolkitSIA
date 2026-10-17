@@ -1,5 +1,5 @@
 ---
-erzeugt: cd7dcff499d6
+erzeugt: cb5ed5a89c00
 art: modul
 tags: [modul]
 ---
@@ -154,6 +154,7 @@ Die gefundene Ebene und ihre Probe.
 
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.suche]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.querschnitt.interaktion]]
 

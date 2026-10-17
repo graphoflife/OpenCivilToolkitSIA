@@ -39,8 +39,9 @@ from typing import Callable, Optional, Tuple, TypeVar
 
 from opencivil.core.latex import angabe, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.suche import illinois
 from opencivil.nachweis.querschnittsloeser import FaserloeserIllinois, probenschranken
-from opencivil.querschnitt.interaktion import Querschnitt, illinois
+from opencivil.querschnitt.interaktion import Querschnitt
 
 #: Wie weit sich die Neigung ψ der Ebene unter Gebrauchslast von der
 #: entfernen darf, die bei Symmetrie gaelte -- nach jeder Seite, in Grad.
