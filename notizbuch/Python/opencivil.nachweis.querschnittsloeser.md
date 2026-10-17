@@ -1,5 +1,5 @@
 ---
-erzeugt: f75f6ab3ee84
+erzeugt: ae85a41d1008
 art: modul
 tags: [modul]
 ---
@@ -182,7 +182,7 @@ Die Zeile zu [[opencivil.querschnitt.gesetzwahl#wirksamer_modul|wirksamer_modul]
 ### protokoll_verfahren
 
 ```python
-def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float, fasern: int=FASERN, verdraengt: bool=True, suche: Optional[str]=None) -> None
+def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float, fasern: int=FASERN, verdraengt: bool=True, verfahren: Optional[str]=None) -> None
 ```
 
 Der Ablauf der Suche, in die Mitschrift geschrieben.
@@ -194,8 +194,8 @@ das Verfahren aendert man eine davon.
 Beschrieben wird der *Ablauf*, nicht jeder Zwischenwert. Die Halbierungen
 abzudrucken hiesse, hundert Zeilen zu zeigen, von denen nur die letzte
 etwas behauptet -- und die wird ohnehin durch die Probe belegt. Wie
-gesucht wird, sagt der Loeser selbst (`suche`, sein
-[[opencivil.nachweis.querschnittsloeser#Faserloeser.suche|Faserloeser.suche]]); ohne Angabe das Halbieren.
+gesucht wird, sagt der Loeser selbst (`verfahren`, sein
+[[opencivil.nachweis.querschnittsloeser#Faserloeser.verfahren|Faserloeser.verfahren]]); ohne Angabe das Halbieren.
 
 ### probenschranken
 
@@ -248,13 +248,39 @@ Nachweis, der die Ebene zu einem Lastfall braucht --, laesst sie weg.
 Eine Lage liegt in der Tiefe `z` unter dem oberen Rand; ihr Arm ist
 `z + oben`.
 
-- `SUCHE = 'Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer fe…` – Wie gesucht wird, in der Mitschrift ([[opencivil.nachweis.querschnittsloeser#protokoll_verfahren|protokoll_verfahren]]).
+**WIE GESUCHT WIRD**
 
-#### Faserloeser.suche
+`suche` ([[opencivil.core.suche]]): ohne Angabe halbiert er, von
+vorn. Mit [[opencivil.core.suche#Konstanten|ILLINOIS]] faengt er bei der
+Kruemmung und der Dehnung an, die er zuletzt gefunden hat: beim Knicken
+folgen sich viele Ebenen mit wenig verschiedenen Schnittgroessen, und das
+Eingrenzen von der groessten Kruemmung her kostete jede von ihnen mehr als
+die Suche selbst. Halbiert braucht eine Suche rund vierzig Schritte, mit
+Illinois ein Viertel davon.
+
+**Illinois nur, wo die Ebene eindeutig ist.** Springt ein Gesetz -- der
+Spannungsblock --, hat das Moment ueber der Kruemmung flache Stuecke: dort
+traegt jede Kruemmung dasselbe Moment, und welche gefunden wird, haengt am
+Weg der Suche. Mit dem Gedaechtnis hinge das Ergebnis dann an der
+Reihenfolge der Rechnungen -- an der Stuetze des Pruefprojekts war die
+Grenzkraft so 4200 statt 4099.5 kN. Mit springendem Gesetz halbiert er
+darum von vorn, gleich welche Suche er bekommt -- ausser sie taugt dort
+([[opencivil.core.suche#Suche|auch_bei_sprung]]): wer den Loeser fuer
+eine einzige Frage baut, hat kein Gedaechtnis, an dem das Ergebnis haengen
+koennte -- so die kippende Nulllinie der Spannung-Dehnung-Analyse
+([[opencivil.spannungsanalyse.schnitt#KippendeNulllinie|KippendeNulllinie]]). Gesetze
+ohne Sprung -- Parabel, elastisch -- haben flache Stuecke erst am
+vollplastischen Querschnitt; an den Pruefprojekten bleibt dort jede Zahl,
+wie sie war.
+
+- `SUCHE = 'Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer fe…` – Wie gesucht wird, in der Mitschrift ([[opencivil.nachweis.querschnittsloeser#protokoll_verfahren|protokoll_verfahren]]).
+- `SUCHE_VOM_LETZTEN = 'Gesucht wird in zwei geschachtelten Suchen. Innen: zu einer festgeha…` – Dasselbe, wo er bei der zuletzt gefundenen Ebene anfaengt.
+
+#### Faserloeser.verfahren
 
 ```python
 @property
-def suche(self) -> str
+def verfahren(self) -> str
 ```
 
 Wie dieser Loeser sucht, in Worten -- fuer die Mitschrift.
@@ -278,8 +304,21 @@ def _eps_zu_normalkraft(self, chi: float, N_ziel: float) -> Optional[float]
 
 Die mittlere Dehnung, bei der `N = N_ziel` gilt -- bei festem `chi`.
 
+Faengt die Suche bei der zuletzt gefundenen an, wird von dort
+eingegrenzt ([[opencivil.nachweis.querschnittsloeser#Faserloeser._eps_von|_eps_von]]): die Kruemmungen einer Suche liegen
+nahe beieinander, und mit ihnen die Dehnungen. Sonst im ganzen
+Fenster ([[opencivil.nachweis.querschnittsloeser#Faserloeser._eps_im_fenster|_eps_im_fenster]]).
+
+#### Faserloeser._eps_im_fenster
+
+```python
+def _eps_im_fenster(self, chi: float, N_ziel: float) -> Optional[float]
+```
+
+Die mittlere Dehnung zu `N_ziel`, gesucht im ganzen Fenster.
+
 `N(eps_m)` waechst im gueltigen Bereich monoton: mehr Dehnung heisst
-mehr Zug. Eine Bisektion findet die Stelle also sicher, sofern sie im
+mehr Zug. Die Suche findet die Stelle also sicher, sofern sie im
 Fenster liegt.
 
 #### Faserloeser.mitteldehnung
@@ -312,9 +351,21 @@ was die Grenzen bei dieser Dehnung zulassen.
 def loese(self, *, N_Ed: float, M_Ed: float) -> Ebene
 ```
 
-Die Dehnungsebene zu diesen Schnittgroessen.
+Die Dehnungsebene zu diesen Schnittgroessen -- von der zuletzt
+gefundenen Kruemmung aus eingegrenzt, wo die Suche dort anfaengt und es
+eine gibt ([[opencivil.nachweis.querschnittsloeser#Faserloeser._von_zuletzt|_von_zuletzt]]), sonst von vorn ([[opencivil.nachweis.querschnittsloeser#Faserloeser._von_vorn|_von_vorn]]).
+Was die naechste Suche nicht eingrenzen kann oder verfehlt, sucht sie
+von vorn.
 
-Aeussere Bisektion ueber `chi`: zu jedem `chi` wird `eps_m` so
+#### Faserloeser._von_vorn
+
+```python
+def _von_vorn(self, N_Ed: float, M_Ed: float) -> Ebene
+```
+
+Die Dehnungsebene, gesucht ueber die ganze Kruemmung.
+
+Aeussere Suche ueber `chi`: zu jedem `chi` wird `eps_m` so
 bestimmt, dass die Normalkraft stimmt, und das uebrig bleibende Moment
 gegen `M_Ed` gehalten. `M(chi)` waechst monoton -- mehr Kruemmung
 heisst mehr Moment --, solange der Querschnitt nicht versagt.
@@ -343,10 +394,9 @@ Die gefundene Ebene, mit ihrer Probe: erzeugt sie `N_Ed` und
 def _suchen(self, f: Callable[[float], Optional[float]], unten: float, oben: float, schranke: float, f_unten: Optional[float]=None, f_oben: Optional[float]=None) -> Optional[float]
 ```
 
-Wo `f` zwischen `unten` und `oben` null wird -- durch Halbieren
-([[opencivil.core.suche#Halbieren|Halbieren]]). `f_unten` und `f_oben`
-sind fuer eine Suche, die mit ihnen schneller ist
-([[opencivil.nachweis.querschnittsloeser#FaserloeserIllinois|FaserloeserIllinois]]).
+Wo `f` zwischen `unten` und `oben` null wird -- mit der Suche
+dieses Loesers. `f_unten` und `f_oben` sind fuer eine Suche, die
+mit ihnen schneller ist ([[opencivil.core.suche#Illinois|Illinois]]).
 
 #### Faserloeser._rand
 
@@ -371,92 +421,22 @@ zwischen den beiden Stufen gesucht -- die groesste Kruemmung mit
 Gleichgewicht -- und dort noch einmal gefragt. Wo das Halbieren
 trifft, bleibt alles, wie es war.
 
-### FaserloeserIllinois
-
-```python
-class FaserloeserIllinois(Faserloeser)
-```
-
-Derselbe Loeser, der eine Nullstelle mit dem Illinois-Verfahren sucht
-statt durch Halbieren -- in denselben Klammern, bis auf dieselbe Breite.
-
-Fuer den gezeichneten Querschnitt unter Gebrauchslast
-([[opencivil.nachweis.qa_gebrauch]]): dort wird je Lastfall die
-Nulllinie gedreht, und jede Neigung ist eine ganze Suche. Halbiert
-braucht eine Suche rund vierzig Schritte, mit Illinois ein Viertel davon:
-zwischen zwei Knicken der Gesetze ist die Kraft eine Gerade, und dort
-trifft die Sekante.
-
-Dazu faengt er bei der Kruemmung und der Dehnung an, die er zuletzt
-gefunden hat ([[opencivil.nachweis.querschnittsloeser#FaserloeserIllinois.loese|loese]]): beim Knicken folgen sich viele Ebenen mit
-wenig verschiedenen Schnittgroessen, und das Eingrenzen von der groessten
-Kruemmung her kostete jede von ihnen mehr als die Suche selbst. Darum
-sucht auch das Knicken der Platte so ([[opencivil.nachweis.querschnittsloeser#QuerschnittsloeserIllinois|QuerschnittsloeserIllinois]]);
-ihre Stahlspannungen und Analysen halbieren weiter.
-
-**Nur wo die Ebene eindeutig ist.** Springt ein Gesetz -- der
-Spannungsblock --, hat das Moment ueber der Kruemmung flache Stuecke: dort
-traegt jede Kruemmung dasselbe Moment, und welche gefunden wird, haengt am
-Weg der Suche. Mit einem Gedaechtnis hinge das Ergebnis dann an der
-Reihenfolge der Rechnungen -- an der Stuetze des Pruefprojekts war die
-Grenzkraft so 4200 statt 4099.5 kN. Mit springendem Gesetz sucht er darum
-wie jeder [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]], halbiert und von vorn ([[opencivil.nachweis.querschnittsloeser#FaserloeserIllinois|halbiert]]).
-Gesetze ohne Sprung -- Parabel, elastisch -- haben flache Stuecke erst am
-vollplastischen Querschnitt; an den Pruefprojekten bleibt dort jede Zahl,
-wie sie war.
-
-Wer ihn fuer eine einzige Frage baut, hat kein Gedaechtnis, an dem das
-Ergebnis haengen koennte: der darf ihn auch bei springendem Gesetz mit
-Illinois suchen lassen (`halbiert=False`) -- so die kippende Nulllinie
-der Spannung-Dehnung-Analyse
-([[opencivil.spannungsanalyse.schnitt#KippendeNulllinie|KippendeNulllinie]]).
-
-- `SUCHE = 'Gesucht wird in zwei geschachtelten Suchen. Innen: zu einer festgeha…`
-
-#### FaserloeserIllinois.suche
-
-```python
-@property
-def suche(self) -> str
-```
-
-#### FaserloeserIllinois._eps_zu_normalkraft
-
-```python
-def _eps_zu_normalkraft(self, chi: float, N_ziel: float) -> Optional[float]
-```
-
-Wie beim [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]], aber von der zuletzt gefundenen
-Dehnung aus eingegrenzt: die Kruemmungen einer Suche liegen nahe
-beieinander, und mit ihnen die Dehnungen.
-
-#### FaserloeserIllinois._eps_von
+#### Faserloeser._eps_von
 
 ```python
 def _eps_von(self, chi: float, N_ziel: float, eps: float) -> Optional[float]
 ```
 
-Von `eps` aus mit wachsenden Schritten eingrenzen, im Fenster -- dann Illinois.
+Von `eps` aus mit wachsenden Schritten eingrenzen, im Fenster -- dann die Suche.
 
-#### FaserloeserIllinois.loese
-
-```python
-def loese(self, *, N_Ed: float, M_Ed: float) -> Ebene
-```
-
-Die Dehnungsebene -- von der zuletzt gefundenen Kruemmung aus
-eingegrenzt, wo es eine gibt, sonst wie jeder [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]].
-Was die naechste Suche nicht eingrenzen kann oder verfehlt, sucht sie
-von vorn.
-
-#### FaserloeserIllinois._von_zuletzt
+#### Faserloeser._von_zuletzt
 
 ```python
 def _von_zuletzt(self, N_Ed: float, M_Ed: float, chi: float) -> Optional[Ebene]
 ```
 
 Von `chi` aus mit wachsenden Schritten, bis das Moment die Seite
-wechselt -- das Moment waechst mit der Kruemmung --, dann Illinois.
+wechselt -- das Moment waechst mit der Kruemmung --, dann die Suche.
 `None`, wo unterwegs keine Ebene die Normalkraft traegt; die Ebene
 mit ihrer Probe, die auch verfehlt sein kann ([[opencivil.nachweis.querschnittsloeser#Faserloeser._mit_probe|_mit_probe]]).
 
@@ -496,19 +476,10 @@ Ebene trifft sie genau. Ohne `verdraengt` zaehlt der Beton auch dort,
 wo der Stahl liegt -- so rechnet die Handrechnung.
 
 Welche Gesetze zu welcher Wahl gehoeren, sagt
-[[opencivil.nachweis.rechenwahl#gesetze|opencivil.nachweis.rechenwahl.gesetze]].
-
-### QuerschnittsloeserIllinois
-
-```python
-class QuerschnittsloeserIllinois(FaserloeserIllinois, Querschnittsloeser)
-```
-
-Die Fasern der Platte ([[opencivil.nachweis.querschnittsloeser#Querschnittsloeser|Querschnittsloeser]]), gesucht wie am
-gezeichneten Querschnitt: mit Illinois, von der zuletzt gefundenen Ebene
-aus ([[opencivil.nachweis.querschnittsloeser#FaserloeserIllinois|FaserloeserIllinois]]). Fuer das Knicken der Platte -- dort
-kostete das Halbieren beinahe die ganze Rechenzeit (Benutzer,
-2026-10-15).
+[[opencivil.nachweis.rechenwahl#gesetze|opencivil.nachweis.rechenwahl.gesetze]]. `suche` wie beim
+[[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]] -- das Knicken der Platte sucht mit Illinois
+(Benutzer, 2026-10-15): dort kostete das Halbieren beinahe die ganze
+Rechenzeit.
 
 
 ## Konstanten

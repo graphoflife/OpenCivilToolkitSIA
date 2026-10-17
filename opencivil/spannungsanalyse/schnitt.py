@@ -71,15 +71,15 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field, replace
-from functools import partial
 from typing import TYPE_CHECKING, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.einheiten import MIO_MM3, MIO_MM4, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.suche import HALBIEREN, Illinois, Suche
 from opencivil.material.basis import Baustoff
 from opencivil.nachweis.gebrauchsebene import QUER_SCHRANKE, neigung_suchen
 from opencivil.nachweis.querschnittsloeser import (
-    Faserloeser, FaserloeserIllinois, Stahllage, probenschranken,
+    Faserloeser, Stahllage, probenschranken,
 )
 from opencivil.nachweis.rissgroessen import (
     MOMENTENTEILER, Bruttoquerschnitt, Rissmoment, Rissnormalkraft, beiwert_dicke,
@@ -132,7 +132,7 @@ def _betonspannung(r, gesetze: Mapping[int, Callable[[float], float]]
 
 def _loeser(q: Querschnitt, psi: float, herkunft: Sequence[Stabgruppe],
             staehle: Mapping[int, Stahlgesetz], namen: Mapping[int, str], *,
-            klasse: Callable[..., Faserloeser] = Faserloeser) -> Faserloeser:
+            suche: Suche = HALBIEREN) -> Faserloeser:
     """
     Der Querschnitt in der Zugrichtung ``psi`` als :class:`Faserloeser`.
     Staebe in derselben Tiefe, aus demselben Stahl und im selben Beton werden
@@ -140,7 +140,7 @@ def _loeser(q: Querschnitt, psi: float, herkunft: Sequence[Stabgruppe],
     Ihr Arm entlang der Nulllinie ist der Schwerpunkt ihrer Flaechen: mit ihm
     stimmt das Moment um die andere Achse, nach dem die kippende Nulllinie
     sucht. Bis 2026-10-17 fiel er weg, und die Suche fand an einem L Ebenen
-    mit einem Moment um die andere Achse. ``klasse`` waehlt, wie der Loeser
+    mit einem Moment um die andere Achse. ``suche`` sagt, wie der Loeser
     sucht -- die kippende Nulllinie nimmt Illinois.
     """
     r = q.richtung(psi)
@@ -164,12 +164,12 @@ def _loeser(q: Querschnitt, psi: float, herkunft: Sequence[Stabgruppe],
             sorte=namen[werkstoff], nummer=nummer,
             text=", ".join(dict.fromkeys(name for _, name in liste))))
     betone = {i: w for i, w in enumerate(q.werkstoffe) if w.c_punkt is not None}
-    return klasse(
+    return Faserloeser(
         querschnitt=Faserquerschnitt(r.fasern.gruppen, staebe), grenzen=r.grenzen,
         oben=oben, unten=unten, lagen=lagen,
         beton=_betonspannung(r, {i: w.gesetz for i, w in betone.items()}),
         eps_druck=min(-w.eps_min for w in betone.values()),
-        eps_zug=min((s.eps_ud for s in staehle.values()), default=math.inf))
+        eps_zug=min((s.eps_ud for s in staehle.values()), default=math.inf), suche=suche)
 
 
 @dataclass(frozen=True)
@@ -183,11 +183,10 @@ class _Zerlegung:
     staehle: Mapping[int, Stahlgesetz]
     namen: Mapping[int, str]
 
-    def in_richtung(self, psi: float, *,
-                    klasse: Callable[..., Faserloeser] = Faserloeser) -> FesteNulllinie:
+    def in_richtung(self, psi: float, *, suche: Suche = HALBIEREN) -> FesteNulllinie:
         """Der Zustand in der Zugrichtung ``psi``, mit fester Nulllinie."""
         return FesteNulllinie(_loeser(self.querschnitt, psi, self.herkunft, self.staehle,
-                                      self.namen, klasse=klasse),
+                                      self.namen, suche=suche),
                               self.querschnitt.richtung(psi).grenznamen)
 
 
@@ -211,8 +210,7 @@ class KippendeNulllinie:
     geht. Bei einem symmetrischen Querschnitt trifft schon die Zugseite, und
     es bleibt bei der Ebene, die die feste Nulllinie faende.
 
-    Gesucht wird in jeder gekippten Richtung mit Illinois
-    (:class:`~opencivil.nachweis.querschnittsloeser.FaserloeserIllinois`),
+    Gesucht wird in jeder gekippten Richtung mit Illinois (:data:`_JE_FRAGE`),
     wie unter Gebrauchslast: halbiert kostete eine Linie am L des Dateikopfs
     viermal so lang. Ihre Loeser entstehen je Frage frisch, ohne Gedaechtnis
     -- so haengt keine Ebene an der Reihenfolge der Fragen, und Illinois darf
@@ -268,7 +266,7 @@ class KippendeNulllinie:
         def fest_in(psi: float) -> FesteNulllinie:
             if psi == psi0:
                 return self._zugseite
-            return self._zerlegung.in_richtung(psi, klasse=_OHNE_GEDAECHTNIS)
+            return self._zerlegung.in_richtung(psi, suche=_JE_FRAGE)
 
         def abweichung(psi: float) -> Tuple[float, Optional[Dehnungsebene]]:
             if psi in gesehen:
@@ -328,8 +326,9 @@ class KippendeNulllinie:
 
 
 #: Wie eine gekippte Richtung sucht: mit Illinois, auch beim Spannungsblock --
-#: ihr Loeser lebt fuer eine Frage, ein Gedaechtnis hat er nicht.
-_OHNE_GEDAECHTNIS = partial(FaserloeserIllinois, halbiert=False)
+#: ihr Loeser lebt fuer eine Frage, ein Gedaechtnis ueber Fragen hinweg hat er
+#: nicht.
+_JE_FRAGE = Illinois(auch_bei_sprung=True)
 
 
 def _rest_beim_moment(M: float) -> Callable[[Dehnungsebene], float]:

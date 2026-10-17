@@ -20,6 +20,13 @@ die Kraft eine Gerade, und dort trifft die Sekante. Springt die Funktion,
 findet Illinois eine der Stellen um den Sprung, und welche, haengt am Weg
 (:mod:`opencivil.nachweis.querschnittsloeser`).
 
+Wer eine Suche braucht, bekommt sie als Gegenstand (:class:`Suche`) und
+fragt sie zweierlei: ob sie bei der zuletzt gefundenen Stelle anfaengt
+(:attr:`Suche.vom_letzten`) und ob sie auch dort taugt, wo die Funktion
+springt (:attr:`Suche.auch_bei_sprung`). Bis 2026-10-17 waren es
+Unterklassen des Loesers, die sich mit einem Schalter an vier Stellen
+wieder abschalteten.
+
 EINHEITEN:
 Keine -- hier gibt es nur Zahlen.
 """
@@ -27,7 +34,7 @@ Keine -- hier gibt es nur Zahlen.
 from __future__ import annotations
 
 import math
-from typing import Callable, Optional, Tuple, TypeVar
+from typing import Callable, Optional, Protocol, Tuple, TypeVar
 
 #: Hoechstzahl der Schritte einer Suche. Erreicht wird sie nicht: abgebrochen
 #: wird an der Schranke. Die Zahl steht nur da, damit keine Schleife ewig
@@ -41,8 +48,35 @@ Wert = Optional[float]
 B = TypeVar("B")
 
 
+class Suche(Protocol):
+    """Was eine Suche kann und von sich sagt -- :class:`Halbieren` oder :class:`Illinois`."""
+
+    vom_letzten: bool
+    """
+    Ob sie bei der zuletzt gefundenen Stelle anfaengt und von dort eingrenzt
+    (:func:`eingrenzen`) -- das lohnt nur, wo sie nahe am Ziel schnell trifft.
+    """
+
+    auch_bei_sprung: bool
+    """
+    Ob sie auch dort taugt, wo die Funktion springt -- wo es also mehrere
+    Stellen gibt und welche gefunden wird, am Weg haengt.
+    """
+
+    def finde(self, f: Callable[[float], Wert], unten: float, oben: float, schranke: float,
+              f_unten: Wert = None, f_oben: Wert = None) -> Wert:
+        """Wo ``f`` zwischen ``unten`` und ``oben`` null wird."""
+
+
 class Halbieren:
-    """Das Fenster halbieren, bis es schmal genug ist -- sicher, auch wo die Funktion springt."""
+    """
+    Das Fenster halbieren, bis es schmal genug ist. Braucht von ueberall
+    gleich viele Schritte und faengt darum von vorn an; sicher, auch wo die
+    Funktion springt: die Stelle haengt nur am Fenster.
+    """
+
+    vom_letzten = False
+    auch_bei_sprung = True
 
     def finde(self, f: Callable[[float], Wert], unten: float, oben: float, schranke: float,
               f_unten: Wert = None, f_oben: Wert = None) -> Wert:
@@ -74,8 +108,19 @@ class Illinois:
     hintereinander stehen, wird sein Wert halbiert -- sonst kroeche die
     Sekante an einer gekruemmten Funktion nur von einer Seite heran. Bleibt
     eingegrenzt wie das Halbieren, konvergiert auf glatten Stuecken aber fast
-    so schnell wie das Sekantenverfahren.
+    so schnell wie das Sekantenverfahren -- am schnellsten, wo es nahe der
+    Stelle anfaengt: darum bei der zuletzt gefundenen.
+
+    Springt die Funktion, findet es eine der Stellen um den Sprung, und
+    welche, haengt am Weg -- von der zuletzt gefundenen Stelle aus also an
+    der Reihenfolge der Fragen. Taugen soll es dort nur, wo das nicht zaehlt:
+    ``auch_bei_sprung`` fuer eine Suche, die je Frage frisch anfaengt.
     """
+
+    vom_letzten = True
+
+    def __init__(self, *, auch_bei_sprung: bool = False) -> None:
+        self.auch_bei_sprung = auch_bei_sprung
 
     def finde(self, f: Callable[[float], Wert], unten: float, oben: float, schranke: float,
               f_unten: Wert = None, f_oben: Wert = None) -> Wert:
@@ -101,6 +146,13 @@ class Illinois:
                 return None
             a, fa, b, fb = _weiter(a, fa, b, fb, c, fc)
         return b
+
+
+#: Die beiden Suchen, wie sie meist gebraucht werden. Ohne eigenen Zustand --
+#: wo eine Suche bei der zuletzt gefundenen Stelle anfaengt, merkt sich die
+#: Stelle, wer sucht.
+HALBIEREN = Halbieren()
+ILLINOIS = Illinois()
 
 
 def illinois(f: Callable[[float], Tuple[float, Optional[B]]], a: float, fa: float,

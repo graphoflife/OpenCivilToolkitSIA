@@ -1,5 +1,5 @@
 ---
-erzeugt: 261cff6f251f
+erzeugt: b24884fe2e41
 art: modul
 tags: [modul]
 ---
@@ -179,13 +179,13 @@ Die Lagen, mit denen gerechnet wird -- in der Handrechnung je Seite eine.
 #### Gesetze.loeser
 
 ```python
-def loeser(self, *, h: float, b: float, lagen: Sequence[Stahllage], klasse: Type[Querschnittsloeser]=Querschnittsloeser, **fenster) -> Querschnittsloeser
+def loeser(self, *, h: float, b: float, lagen: Sequence[Stahllage], suche: Suche=HALBIEREN, **fenster) -> Querschnittsloeser
 ```
 
 Der Loeser zu dieser Wahl. `fenster` sind die Grenzen der Suche
 (`eps_druck`, `eps_zug`, `grenzen`) -- die bringt jeder Nutzer
-selbst mit. `klasse` waehlt, wie gesucht wird -- das Knicken nimmt
-[[opencivil.nachweis.querschnittsloeser#QuerschnittsloeserIllinois|QuerschnittsloeserIllinois]].
+selbst mit. `suche` sagt, wie gesucht wird -- das Knicken nimmt
+[[opencivil.core.suche#Konstanten|ILLINOIS]].
 
 ### protokoll_rechenwahl
 
@@ -252,6 +252,7 @@ ersten Lage.
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.suche]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.querschnittsloeser]]

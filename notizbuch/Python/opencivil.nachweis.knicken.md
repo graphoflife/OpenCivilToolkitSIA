@@ -1,5 +1,5 @@
 ---
-erzeugt: 4c96b69f369b
+erzeugt: 7a06ac8b622f
 art: modul
 tags: [modul]
 ---
@@ -95,7 +95,8 @@ die Breite der Platte die Laenge, und die ist keine Stuetze.
 Die Iteration und die Suche nach N_Rd folgen sich in hunderten Ebenen mit
 wenig verschiedenen Schnittgroessen. Gesucht werden sie darum mit Illinois,
 von der zuletzt gefundenen Ebene aus
-([[opencivil.nachweis.querschnittsloeser#QuerschnittsloeserIllinois|QuerschnittsloeserIllinois]]):
+([[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]] mit
+[[opencivil.core.suche#Konstanten|ILLINOIS]]):
 an den Pruefprojekten ein Drittel der Faserdurchlaeufe, dieselben
 Grenzkraefte auf 0.01 kN. Wo ein Gesetz springt, halbiert der Loeser wie
 vorher -- dort ist die Ebene nicht eindeutig; die Verformung rechnet seit
@@ -384,6 +385,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.suche]]
 - [[opencivil.core.wert]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.dehnungsfaecher]]

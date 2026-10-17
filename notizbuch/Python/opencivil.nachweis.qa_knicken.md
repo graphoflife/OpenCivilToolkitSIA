@@ -1,5 +1,5 @@
 ---
-erzeugt: 352446fbf2f8
+erzeugt: 64f4470645c4
 art: modul
 tags: [modul]
 ---
@@ -36,9 +36,9 @@ Nach Vorgabe, nicht nachgeschlagen (`notizbuch/Notizen/TODO.md`).
 ## WAS ES KOSTET
 
 Jede Probekraft der Suche nach N_Rd ist eine ganze Ausmitten-Iteration, jede
-Iteration ein paar Ebenen. Gesucht werden sie mit Illinois
-([[opencivil.nachweis.querschnittsloeser#FaserloeserIllinois|FaserloeserIllinois]]), wie
-unter Gebrauchslast.
+Iteration ein paar Ebenen. Gesucht werden sie mit Illinois, von der
+zuletzt gefundenen Ebene aus ([[opencivil.core.suche#Konstanten|ILLINOIS]]), wie
+das Knicken der Platte.
 
 
 ## EINHEITEN
@@ -88,6 +88,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.suche]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]

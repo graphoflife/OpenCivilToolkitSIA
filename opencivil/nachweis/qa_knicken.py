@@ -25,9 +25,9 @@ Nach Vorgabe, nicht nachgeschlagen (``notizbuch/Notizen/TODO.md``).
 
 WAS ES KOSTET:
 Jede Probekraft der Suche nach N_Rd ist eine ganze Ausmitten-Iteration, jede
-Iteration ein paar Ebenen. Gesucht werden sie mit Illinois
-(:class:`~opencivil.nachweis.querschnittsloeser.FaserloeserIllinois`), wie
-unter Gebrauchslast.
+Iteration ein paar Ebenen. Gesucht werden sie mit Illinois, von der
+zuletzt gefundenen Ebene aus (:data:`~opencivil.core.suche.ILLINOIS`), wie
+das Knicken der Platte.
 
 EINHEITEN:
 SI-Basis; die Zeichnung in mm.
@@ -43,10 +43,11 @@ from opencivil.core.berechnung import Ausfuehrung, Eingaben, NachweisUrteil, gra
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import als_text
 from opencivil.core.protokoll import Protokoll
+from opencivil.core.suche import ILLINOIS
 from opencivil.nachweis.knicken import (
     VERFORMUNG, VERFORMUNG_NACH_WAHL, WIDERSTAND, Knickfall, Knickstab, Knickverfahren,
 )
-from opencivil.nachweis.querschnittsloeser import FaserloeserIllinois
+from opencivil.nachweis.querschnittsloeser import Faserloeser
 from opencivil.nachweis.rechenwahl import protokoll_gesetze_nach_wahl, protokoll_rechenwahl
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.querschnitt.analyse import Querschnittsanalyse
@@ -78,7 +79,8 @@ def knickstab(verformung: Querschnitt, widerstand: Querschnitt, seite: Zugseite)
         return -(math.sin(psi) * punkt.M_y + math.cos(psi) * punkt.M_z)
 
     gedrueckt = r.beton[0]
-    return Knickstab(loeser=FaserloeserIllinois(querschnitt=r.fasern, grenzen=r.grenzen),
+    return Knickstab(loeser=Faserloeser(querschnitt=r.fasern, grenzen=r.grenzen,
+                                        suche=ILLINOIS),
                      moment_bei=moment_bei,
                      d=max(r.staebe_v, default=r.beton[1]) - gedrueckt)
 

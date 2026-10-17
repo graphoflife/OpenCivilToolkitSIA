@@ -73,7 +73,7 @@ from functools import cached_property
 from typing import Callable, List, Optional, Sequence, Tuple
 
 from opencivil.core.protokoll import Zwischenwerte
-from opencivil.core.suche import Halbieren, Illinois, eingrenzen
+from opencivil.core.suche import HALBIEREN, Suche, eingrenzen
 from opencivil.querschnitt.fasern import (
     FASERN, Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt, Stab,
 )
@@ -251,7 +251,7 @@ def protokoll_wirksamer_modul(p, E_cm, phi, basis: str, *, titel: str,
 
 def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float,
                         fasern: int = FASERN, verdraengt: bool = True,
-                        suche: Optional[str] = None) -> None:
+                        verfahren: Optional[str] = None) -> None:
     """
     Der Ablauf der Suche, in die Mitschrift geschrieben.
 
@@ -262,8 +262,8 @@ def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float,
     Beschrieben wird der *Ablauf*, nicht jeder Zwischenwert. Die Halbierungen
     abzudrucken hiesse, hundert Zeilen zu zeigen, von denen nur die letzte
     etwas behauptet -- und die wird ohnehin durch die Probe belegt. Wie
-    gesucht wird, sagt der Loeser selbst (``suche``, sein
-    :attr:`Faserloeser.suche`); ohne Angabe das Halbieren.
+    gesucht wird, sagt der Loeser selbst (``verfahren``, sein
+    :attr:`Faserloeser.verfahren`); ohne Angabe das Halbieren.
     """
     p.erklaerung(
         "Die Dehnungsebene wird gesucht, nicht hergeleitet. Eine ebene "
@@ -290,7 +290,7 @@ def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float,
         f"gleicher Dicke gebildet; der Stahl kommt Lage für Lage dazu. Wie in "
         f"der Handrechnung zählt der Beton auch dort, wo der Stahl liegt."
     )
-    p.erklaerung(suche or Faserloeser.SUCHE)
+    p.erklaerung(verfahren or Faserloeser.SUCHE)
     p.erklaerung(
         f"Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen "
         f"({-eps_druck * 1e3:.1f} ‰ bis {eps_zug * 1e3:.1f} ‰). Jenseits "
@@ -381,6 +381,30 @@ class Faserloeser:
 
     Eine Lage liegt in der Tiefe ``z`` unter dem oberen Rand; ihr Arm ist
     ``z + oben``.
+
+    WIE GESUCHT WIRD:
+    ``suche`` (:mod:`opencivil.core.suche`): ohne Angabe halbiert er, von
+    vorn. Mit :data:`~opencivil.core.suche.ILLINOIS` faengt er bei der
+    Kruemmung und der Dehnung an, die er zuletzt gefunden hat: beim Knicken
+    folgen sich viele Ebenen mit wenig verschiedenen Schnittgroessen, und das
+    Eingrenzen von der groessten Kruemmung her kostete jede von ihnen mehr als
+    die Suche selbst. Halbiert braucht eine Suche rund vierzig Schritte, mit
+    Illinois ein Viertel davon.
+
+    **Illinois nur, wo die Ebene eindeutig ist.** Springt ein Gesetz -- der
+    Spannungsblock --, hat das Moment ueber der Kruemmung flache Stuecke: dort
+    traegt jede Kruemmung dasselbe Moment, und welche gefunden wird, haengt am
+    Weg der Suche. Mit dem Gedaechtnis hinge das Ergebnis dann an der
+    Reihenfolge der Rechnungen -- an der Stuetze des Pruefprojekts war die
+    Grenzkraft so 4200 statt 4099.5 kN. Mit springendem Gesetz halbiert er
+    darum von vorn, gleich welche Suche er bekommt -- ausser sie taugt dort
+    (:attr:`~opencivil.core.suche.Suche.auch_bei_sprung`): wer den Loeser fuer
+    eine einzige Frage baut, hat kein Gedaechtnis, an dem das Ergebnis haengen
+    koennte -- so die kippende Nulllinie der Spannung-Dehnung-Analyse
+    (:class:`~opencivil.spannungsanalyse.schnitt.KippendeNulllinie`). Gesetze
+    ohne Sprung -- Parabel, elastisch -- haben flache Stuecke erst am
+    vollplastischen Querschnitt; an den Pruefprojekten bleibt dort jede Zahl,
+    wie sie war.
     """
 
     #: Wie gesucht wird, in der Mitschrift (:func:`protokoll_verfahren`).
@@ -393,15 +417,36 @@ class Faserloeser:
         "trägt die Monotonie, dass mehr Krümmung mehr Moment heisst."
     )
 
+    #: Dasselbe, wo er bei der zuletzt gefundenen Ebene anfaengt.
+    SUCHE_VOM_LETZTEN = (
+        "Gesucht wird in zwei geschachtelten Suchen. Innen: zu einer "
+        "festgehaltenen Krümmung χ wird ε_m gesucht, bis N_int die verlangte "
+        "Normalkraft trifft – das geht sicher, weil mehr Dehnung immer mehr "
+        "Zug bedeutet. Aussen: mit diesem ε_m bleibt ein Moment übrig, und χ "
+        "wird gesucht, bis auch M_int stimmt – hier trägt die Monotonie, dass "
+        "mehr Krümmung mehr Moment heisst. Beide Suchen beginnen bei der "
+        "Ebene, die zuletzt gefunden wurde, grenzen die Stelle mit wachsenden "
+        "Schritten ein und treffen sie dann mit dem Illinois-Verfahren: einer "
+        "Sekante, die abwechselnd von beiden Seiten herankommt."
+    )
+
     @property
-    def suche(self) -> str:
+    def verfahren(self) -> str:
         """Wie dieser Loeser sucht, in Worten -- fuer die Mitschrift."""
-        return self.SUCHE
+        return self.SUCHE_VOM_LETZTEN if self.suche.vom_letzten else self.SUCHE
 
     def __init__(self, *, querschnitt: Faserquerschnitt, grenzen: Dehnungsgrenzen,
                  oben: float = 0.0, unten: float = 0.0, lagen: Sequence[Stahllage] = (),
                  beton: Optional[Callable[[float, float], float]] = None,
-                 eps_druck: float = 0.0, eps_zug: float = 0.0) -> None:
+                 eps_druck: float = 0.0, eps_zug: float = 0.0,
+                 suche: Suche = HALBIEREN) -> None:
+        self.suche = (suche if suche.auch_bei_sprung or not querschnitt.springt
+                      else HALBIEREN)
+        """Wie er sucht -- wo ein Gesetz springt, halbierend, siehe oben."""
+        self._zuletzt: Optional[float] = None
+        """Die Kruemmung der zuletzt gefundenen Ebene -- von dort sucht die naechste."""
+        self._eps_zuletzt: Optional[float] = None
+        """Die zuletzt gefundene Mitteldehnung -- von dort sucht die naechste."""
         self.querschnitt = querschnitt
         self.grenzen = grenzen
         self.oben = oben
@@ -433,8 +478,26 @@ class Faserloeser:
         """
         Die mittlere Dehnung, bei der ``N = N_ziel`` gilt -- bei festem ``chi``.
 
+        Faengt die Suche bei der zuletzt gefundenen an, wird von dort
+        eingegrenzt (:meth:`_eps_von`): die Kruemmungen einer Suche liegen
+        nahe beieinander, und mit ihnen die Dehnungen. Sonst im ganzen
+        Fenster (:meth:`_eps_im_fenster`).
+        """
+        eps = None
+        if self.suche.vom_letzten and self._eps_zuletzt is not None:
+            eps = self._eps_von(chi, N_ziel, self._eps_zuletzt)
+        if eps is None:
+            eps = self._eps_im_fenster(chi, N_ziel)
+        if eps is not None:
+            self._eps_zuletzt = eps
+        return eps
+
+    def _eps_im_fenster(self, chi: float, N_ziel: float) -> Optional[float]:
+        """
+        Die mittlere Dehnung zu ``N_ziel``, gesucht im ganzen Fenster.
+
         ``N(eps_m)`` waechst im gueltigen Bereich monoton: mehr Dehnung heisst
-        mehr Zug. Eine Bisektion findet die Stelle also sicher, sofern sie im
+        mehr Zug. Die Suche findet die Stelle also sicher, sofern sie im
         Fenster liegt.
         """
         fenster = self._fenster(chi)
@@ -485,9 +548,27 @@ class Faserloeser:
 
     def loese(self, *, N_Ed: float, M_Ed: float) -> Ebene:
         """
-        Die Dehnungsebene zu diesen Schnittgroessen.
+        Die Dehnungsebene zu diesen Schnittgroessen -- von der zuletzt
+        gefundenen Kruemmung aus eingegrenzt, wo die Suche dort anfaengt und es
+        eine gibt (:meth:`_von_zuletzt`), sonst von vorn (:meth:`_von_vorn`).
+        Was die naechste Suche nicht eingrenzen kann oder verfehlt, sucht sie
+        von vorn.
+        """
+        ebene = None
+        if (self.suche.vom_letzten and self._zuletzt is not None
+                and not (N_Ed == 0.0 and M_Ed == 0.0)):
+            ebene = self._von_zuletzt(N_Ed, M_Ed, self._zuletzt)
+        if ebene is None or ebene.verfehlt:
+            ebene = self._von_vorn(N_Ed, M_Ed)
+        if ebene.konvergiert:
+            self._zuletzt = ebene.chi
+        return ebene
 
-        Aeussere Bisektion ueber ``chi``: zu jedem ``chi`` wird ``eps_m`` so
+    def _von_vorn(self, N_Ed: float, M_Ed: float) -> Ebene:
+        """
+        Die Dehnungsebene, gesucht ueber die ganze Kruemmung.
+
+        Aeussere Suche ueber ``chi``: zu jedem ``chi`` wird ``eps_m`` so
         bestimmt, dass die Normalkraft stimmt, und das uebrig bleibende Moment
         gegen ``M_Ed`` gehalten. ``M(chi)`` waechst monoton -- mehr Kruemmung
         heisst mehr Moment --, solange der Querschnitt nicht versagt.
@@ -549,12 +630,11 @@ class Faserloeser:
                 schranke: float, f_unten: Optional[float] = None,
                 f_oben: Optional[float] = None) -> Optional[float]:
         """
-        Wo ``f`` zwischen ``unten`` und ``oben`` null wird -- durch Halbieren
-        (:class:`~opencivil.core.suche.Halbieren`). ``f_unten`` und ``f_oben``
-        sind fuer eine Suche, die mit ihnen schneller ist
-        (:class:`FaserloeserIllinois`).
+        Wo ``f`` zwischen ``unten`` und ``oben`` null wird -- mit der Suche
+        dieses Loesers. ``f_unten`` und ``f_oben`` sind fuer eine Suche, die
+        mit ihnen schneller ist (:class:`~opencivil.core.suche.Illinois`).
         """
-        return Halbieren().finde(f, unten, oben, schranke, f_unten, f_oben)
+        return self.suche.finde(f, unten, oben, schranke, f_unten, f_oben)
 
     def _rand(self, start: float, N_Ed: float,
               moment: Callable[[float], Optional[float]], M_Ed: float,
@@ -620,91 +700,8 @@ class Faserloeser:
             eps_s=dehnungen,
             konvergiert=konvergiert)
 
-
-class FaserloeserIllinois(Faserloeser):
-    """
-    Derselbe Loeser, der eine Nullstelle mit dem Illinois-Verfahren sucht
-    statt durch Halbieren -- in denselben Klammern, bis auf dieselbe Breite.
-
-    Fuer den gezeichneten Querschnitt unter Gebrauchslast
-    (:mod:`opencivil.nachweis.qa_gebrauch`): dort wird je Lastfall die
-    Nulllinie gedreht, und jede Neigung ist eine ganze Suche. Halbiert
-    braucht eine Suche rund vierzig Schritte, mit Illinois ein Viertel davon:
-    zwischen zwei Knicken der Gesetze ist die Kraft eine Gerade, und dort
-    trifft die Sekante.
-
-    Dazu faengt er bei der Kruemmung und der Dehnung an, die er zuletzt
-    gefunden hat (:meth:`loese`): beim Knicken folgen sich viele Ebenen mit
-    wenig verschiedenen Schnittgroessen, und das Eingrenzen von der groessten
-    Kruemmung her kostete jede von ihnen mehr als die Suche selbst. Darum
-    sucht auch das Knicken der Platte so (:class:`QuerschnittsloeserIllinois`);
-    ihre Stahlspannungen und Analysen halbieren weiter.
-
-    **Nur wo die Ebene eindeutig ist.** Springt ein Gesetz -- der
-    Spannungsblock --, hat das Moment ueber der Kruemmung flache Stuecke: dort
-    traegt jede Kruemmung dasselbe Moment, und welche gefunden wird, haengt am
-    Weg der Suche. Mit einem Gedaechtnis hinge das Ergebnis dann an der
-    Reihenfolge der Rechnungen -- an der Stuetze des Pruefprojekts war die
-    Grenzkraft so 4200 statt 4099.5 kN. Mit springendem Gesetz sucht er darum
-    wie jeder :class:`Faserloeser`, halbiert und von vorn (:attr:`halbiert`).
-    Gesetze ohne Sprung -- Parabel, elastisch -- haben flache Stuecke erst am
-    vollplastischen Querschnitt; an den Pruefprojekten bleibt dort jede Zahl,
-    wie sie war.
-
-    Wer ihn fuer eine einzige Frage baut, hat kein Gedaechtnis, an dem das
-    Ergebnis haengen koennte: der darf ihn auch bei springendem Gesetz mit
-    Illinois suchen lassen (``halbiert=False``) -- so die kippende Nulllinie
-    der Spannung-Dehnung-Analyse
-    (:class:`~opencivil.spannungsanalyse.schnitt.KippendeNulllinie`).
-    """
-
-    SUCHE = (
-        "Gesucht wird in zwei geschachtelten Suchen. Innen: zu einer "
-        "festgehaltenen Krümmung χ wird ε_m gesucht, bis N_int die verlangte "
-        "Normalkraft trifft – das geht sicher, weil mehr Dehnung immer mehr "
-        "Zug bedeutet. Aussen: mit diesem ε_m bleibt ein Moment übrig, und χ "
-        "wird gesucht, bis auch M_int stimmt – hier trägt die Monotonie, dass "
-        "mehr Krümmung mehr Moment heisst. Beide Suchen beginnen bei der "
-        "Ebene, die zuletzt gefunden wurde, grenzen die Stelle mit wachsenden "
-        "Schritten ein und treffen sie dann mit dem Illinois-Verfahren: einer "
-        "Sekante, die abwechselnd von beiden Seiten herankommt."
-    )
-
-    @property
-    def suche(self) -> str:
-        return Faserloeser.SUCHE if self.halbiert else self.SUCHE
-
-    def __init__(self, *, halbiert: Optional[bool] = None, **angaben) -> None:
-        super().__init__(**angaben)
-        self._zuletzt: Optional[float] = None
-        """Die Kruemmung der zuletzt gefundenen Ebene -- von dort sucht die naechste."""
-        self._eps_zuletzt: Optional[float] = None
-        """Die zuletzt gefundene Mitteldehnung -- von dort sucht die naechste."""
-        self.halbiert = self.querschnitt.springt if halbiert is None else halbiert
-        """
-        Ob er wie jeder :class:`Faserloeser` sucht -- ohne Angabe, wo ein Gesetz
-        springt, siehe oben.
-        """
-
-    def _eps_zu_normalkraft(self, chi: float, N_ziel: float) -> Optional[float]:
-        """
-        Wie beim :class:`Faserloeser`, aber von der zuletzt gefundenen
-        Dehnung aus eingegrenzt: die Kruemmungen einer Suche liegen nahe
-        beieinander, und mit ihnen die Dehnungen.
-        """
-        if self.halbiert:
-            return super()._eps_zu_normalkraft(chi, N_ziel)
-        eps = None
-        if self._eps_zuletzt is not None:
-            eps = self._eps_von(chi, N_ziel, self._eps_zuletzt)
-        if eps is None:
-            eps = super()._eps_zu_normalkraft(chi, N_ziel)
-        if eps is not None:
-            self._eps_zuletzt = eps
-        return eps
-
     def _eps_von(self, chi: float, N_ziel: float, eps: float) -> Optional[float]:
-        """Von ``eps`` aus mit wachsenden Schritten eingrenzen, im Fenster -- dann Illinois."""
+        """Von ``eps`` aus mit wachsenden Schritten eingrenzen, im Fenster -- dann die Suche."""
         fenster = self._fenster(chi)
         if fenster is None:
             return None
@@ -720,28 +717,10 @@ class FaserloeserIllinois(Faserloeser):
         von, bis, f_von, f_bis = klammer
         return self._suchen(zu_viel, von, bis, EPS_SCHRANKE, f_von, f_bis)
 
-    def loese(self, *, N_Ed: float, M_Ed: float) -> Ebene:
-        """
-        Die Dehnungsebene -- von der zuletzt gefundenen Kruemmung aus
-        eingegrenzt, wo es eine gibt, sonst wie jeder :class:`Faserloeser`.
-        Was die naechste Suche nicht eingrenzen kann oder verfehlt, sucht sie
-        von vorn.
-        """
-        if self.halbiert:
-            return super().loese(N_Ed=N_Ed, M_Ed=M_Ed)
-        ebene = None
-        if self._zuletzt is not None and not (N_Ed == 0.0 and M_Ed == 0.0):
-            ebene = self._von_zuletzt(N_Ed, M_Ed, self._zuletzt)
-        if ebene is None or ebene.verfehlt:
-            ebene = super().loese(N_Ed=N_Ed, M_Ed=M_Ed)
-        if ebene.konvergiert:
-            self._zuletzt = ebene.chi
-        return ebene
-
     def _von_zuletzt(self, N_Ed: float, M_Ed: float, chi: float) -> Optional[Ebene]:
         """
         Von ``chi`` aus mit wachsenden Schritten, bis das Moment die Seite
-        wechselt -- das Moment waechst mit der Kruemmung --, dann Illinois.
+        wechselt -- das Moment waechst mit der Kruemmung --, dann die Suche.
         ``None``, wo unterwegs keine Ebene die Normalkraft traegt; die Ebene
         mit ihrer Probe, die auch verfehlt sein kann (:meth:`_mit_probe`).
         """
@@ -762,13 +741,6 @@ class FaserloeserIllinois(Faserloeser):
             return None
         eps_m = self._eps_zu_normalkraft(gefunden, N_Ed)
         return None if eps_m is None else self._mit_probe(eps_m, gefunden, N_Ed, M_Ed)
-
-    def _suchen(self, f: Callable[[float], Optional[float]], unten: float, oben: float,
-                schranke: float, f_unten: Optional[float] = None,
-                f_oben: Optional[float] = None) -> Optional[float]:
-        if self.halbiert:
-            return super()._suchen(f, unten, oben, schranke, f_unten, f_oben)
-        return Illinois().finde(f, unten, oben, schranke, f_unten, f_oben)
 
 
 class Querschnittsloeser(Faserloeser):
@@ -803,7 +775,10 @@ class Querschnittsloeser(Faserloeser):
     wo der Stahl liegt -- so rechnet die Handrechnung.
 
     Welche Gesetze zu welcher Wahl gehoeren, sagt
-    :func:`opencivil.nachweis.rechenwahl.gesetze`.
+    :func:`opencivil.nachweis.rechenwahl.gesetze`. ``suche`` wie beim
+    :class:`Faserloeser` -- das Knicken der Platte sucht mit Illinois
+    (Benutzer, 2026-10-15): dort kostete das Halbieren beinahe die ganze
+    Rechenzeit.
     """
 
     def __init__(
@@ -819,6 +794,7 @@ class Querschnittsloeser(Faserloeser):
         eps_zug: Optional[float] = None,
         grenzen: Optional[Sequence[Dehnungsgrenze]] = None,
         verdraengt: bool = True,
+        suche: Suche = HALBIEREN,
     ) -> None:
         lagen = list(lagen)
         eps_druck = abs(eps_druck)
@@ -837,17 +813,8 @@ class Querschnittsloeser(Faserloeser):
                 Dehnungsgrenze(arm=h / 2.0, eps_min=-eps_druck, eps_max=eps_zug),
             ]),
             oben=-h / 2.0, unten=h / 2.0, lagen=lagen,
-            beton=lambda arm, eps: beton(eps), eps_druck=eps_druck, eps_zug=eps_zug)
+            beton=lambda arm, eps: beton(eps), eps_druck=eps_druck, eps_zug=eps_zug,
+            suche=suche)
         self.b = b
         self.beton = beton
         self.fasern = fasern
-
-
-class QuerschnittsloeserIllinois(FaserloeserIllinois, Querschnittsloeser):
-    """
-    Die Fasern der Platte (:class:`Querschnittsloeser`), gesucht wie am
-    gezeichneten Querschnitt: mit Illinois, von der zuletzt gefundenen Ebene
-    aus (:class:`FaserloeserIllinois`). Fuer das Knicken der Platte -- dort
-    kostete das Halbieren beinahe die ganze Rechenzeit (Benutzer,
-    2026-10-15).
-    """

@@ -1,5 +1,5 @@
 ---
-erzeugt: a3d85afdda4b
+erzeugt: 11bf94e58c61
 art: modul
 tags: [modul]
 ---
@@ -100,7 +100,7 @@ Tiefe, zeigt das Bild den, der dort ueberwiegt.
 ### _loeser
 
 ```python
-def _loeser(q: Querschnitt, psi: float, herkunft: Sequence[Stabgruppe], staehle: Mapping[int, Stahlgesetz], namen: Mapping[int, str], *, klasse: Callable[..., Faserloeser]=Faserloeser) -> Faserloeser
+def _loeser(q: Querschnitt, psi: float, herkunft: Sequence[Stabgruppe], staehle: Mapping[int, Stahlgesetz], namen: Mapping[int, str], *, suche: Suche=HALBIEREN) -> Faserloeser
 ```
 
 Der Querschnitt in der Zugrichtung `psi` als [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]].
@@ -109,7 +109,7 @@ eine Lage -- sie haben dieselbe Dehnung, und das Bild zeigt sie als eine.
 Ihr Arm entlang der Nulllinie ist der Schwerpunkt ihrer Flaechen: mit ihm
 stimmt das Moment um die andere Achse, nach dem die kippende Nulllinie
 sucht. Bis 2026-10-17 fiel er weg, und die Suche fand an einem L Ebenen
-mit einem Moment um die andere Achse. `klasse` waehlt, wie der Loeser
+mit einem Moment um die andere Achse. `suche` sagt, wie der Loeser
 sucht -- die kippende Nulllinie nimmt Illinois.
 
 ### _Zerlegung
@@ -129,7 +129,7 @@ Ein Zustand des gezeichneten Querschnitts -- in jeder Zugrichtung zu haben.
 #### _Zerlegung.in_richtung
 
 ```python
-def in_richtung(self, psi: float, *, klasse: Callable[..., Faserloeser]=Faserloeser) -> FesteNulllinie
+def in_richtung(self, psi: float, *, suche: Suche=HALBIEREN) -> FesteNulllinie
 ```
 
 Der Zustand in der Zugrichtung `psi`, mit fester Nulllinie.
@@ -158,8 +158,7 @@ unter Druck beginnt, kippt an einem L um +29°, ihre gebogenen Ebenen um
 geht. Bei einem symmetrischen Querschnitt trifft schon die Zugseite, und
 es bleibt bei der Ebene, die die feste Nulllinie faende.
 
-Gesucht wird in jeder gekippten Richtung mit Illinois
-([[opencivil.nachweis.querschnittsloeser#FaserloeserIllinois|FaserloeserIllinois]]),
+Gesucht wird in jeder gekippten Richtung mit Illinois ([[opencivil.spannungsanalyse.schnitt#Konstanten|_JE_FRAGE]]),
 wie unter Gebrauchslast: halbiert kostete eine Linie am L des Dateikopfs
 viermal so lang. Ihre Loeser entstehen je Frage frisch, ohne Gedaechtnis
 -- so haengt keine Ebene an der Reihenfolge der Fragen, und Illinois darf
@@ -401,13 +400,14 @@ aus einer Loesung.
 
 ## Konstanten
 
-- `_OHNE_GEDAECHTNIS = partial(FaserloeserIllinois, halbiert=False)` – Wie eine gekippte Richtung sucht: mit Illinois, auch beim Spannungsblock -- ihr Loeser lebt fuer eine Frage, ein Gedaechtnis hat er nicht.
+- `_JE_FRAGE = Illinois(auch_bei_sprung=True)` – Wie eine gekippte Richtung sucht: mit Illinois, auch beim Spannungsblock -- ihr Loeser lebt fuer eine Frage, ein Gedaechtnis ueber Fragen hinweg hat er nicht.
 - `KIPPGRENZE = 1e-06` – Unter diesem `cos ϑ` gibt es zu einer Kruemmung keine Neigung mehr: die gekippte Ebene braeuchte `chi/cos ϑ`.
 
 ## Braucht
 
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.suche]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.gebrauchsebene]]

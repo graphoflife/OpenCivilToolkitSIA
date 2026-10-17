@@ -1,5 +1,5 @@
 ---
-erzeugt: 28bcdf146c4e
+erzeugt: 465171a19705
 art: modul
 tags: [modul]
 ---
@@ -29,6 +29,13 @@ die Kraft eine Gerade, und dort trifft die Sekante. Springt die Funktion,
 findet Illinois eine der Stellen um den Sprung, und welche, haengt am Weg
 ([[opencivil.nachweis.querschnittsloeser]]).
 
+Wer eine Suche braucht, bekommt sie als Gegenstand ([[opencivil.core.suche#Suche|Suche]]) und
+fragt sie zweierlei: ob sie bei der zuletzt gefundenen Stelle anfaengt
+([[opencivil.core.suche#Suche|Suche.vom_letzten]]) und ob sie auch dort taugt, wo die Funktion
+springt ([[opencivil.core.suche#Suche|Suche.auch_bei_sprung]]). Bis 2026-10-17 waren es
+Unterklassen des Loesers, die sich mit einem Schalter an vier Stellen
+wieder abschalteten.
+
 
 ## EINHEITEN
 
@@ -36,13 +43,37 @@ Keine -- hier gibt es nur Zahlen.
 
 ## Inhalt
 
+### Suche
+
+```python
+class Suche(Protocol)
+```
+
+Was eine Suche kann und von sich sagt -- [[opencivil.core.suche#Halbieren|Halbieren]] oder [[opencivil.core.suche#Illinois|Illinois]].
+
+- `vom_letzten: bool` – Ob sie bei der zuletzt gefundenen Stelle anfaengt und von dort eingrenzt ([[opencivil.core.suche#eingrenzen|eingrenzen]]) -- das lohnt nur, wo sie nahe am Ziel schnell trifft.
+- `auch_bei_sprung: bool` – Ob sie auch dort taugt, wo die Funktion springt -- wo es also mehrere Stellen gibt und welche gefunden wird, am Weg haengt.
+
+#### Suche.finde
+
+```python
+def finde(self, f: Callable[[float], Wert], unten: float, oben: float, schranke: float, f_unten: Wert=None, f_oben: Wert=None) -> Wert
+```
+
+Wo `f` zwischen `unten` und `oben` null wird.
+
 ### Halbieren
 
 ```python
 class Halbieren
 ```
 
-Das Fenster halbieren, bis es schmal genug ist -- sicher, auch wo die Funktion springt.
+Das Fenster halbieren, bis es schmal genug ist. Braucht von ueberall
+gleich viele Schritte und faengt darum von vorn an; sicher, auch wo die
+Funktion springt: die Stelle haengt nur am Fenster.
+
+- `vom_letzten = False`
+- `auch_bei_sprung = True`
 
 #### Halbieren.finde
 
@@ -67,7 +98,15 @@ Sekante durch die beiden Enden null wird, und bleibt ein Ende zweimal
 hintereinander stehen, wird sein Wert halbiert -- sonst kroeche die
 Sekante an einer gekruemmten Funktion nur von einer Seite heran. Bleibt
 eingegrenzt wie das Halbieren, konvergiert auf glatten Stuecken aber fast
-so schnell wie das Sekantenverfahren.
+so schnell wie das Sekantenverfahren -- am schnellsten, wo es nahe der
+Stelle anfaengt: darum bei der zuletzt gefundenen.
+
+Springt die Funktion, findet es eine der Stellen um den Sprung, und
+welche, haengt am Weg -- von der zuletzt gefundenen Stelle aus also an
+der Reihenfolge der Fragen. Taugen soll es dort nur, wo das nicht zaehlt:
+`auch_bei_sprung` fuer eine Suche, die je Frage frisch anfaengt.
+
+- `vom_letzten = True`
 
 #### Illinois.finde
 
@@ -140,11 +179,17 @@ gefundenen Ebene: dort ist das Fenster in wenigen Schritten eng.
 - `SCHRITTE = 80` – Hoechstzahl der Schritte einer Suche. Erreicht wird sie nicht: abgebrochen wird an der Schranke. Die Zahl steht nur da, damit keine Schleife ewig laeuft.
 - `Wert = Optional[float]` – Was eine Funktion an einer Stelle hat -- `None`, wo sie keinen Wert hat.
 - `B = TypeVar('B')` – Was [[opencivil.core.suche#illinois|illinois]] neben dem Wert mitgibt und an der besten Stelle zurueckgibt.
+- `HALBIEREN = Halbieren()` – Die beiden Suchen, wie sie meist gebraucht werden. Ohne eigenen Zustand -- wo eine Suche bei der zuletzt gefundenen Stelle anfaengt, merkt sich die Stelle, wer sucht.
+- `ILLINOIS = Illinois()`
 
 ## Gebraucht von
 
 - [[opencivil.nachweis.gebrauchsebene]]
+- [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.querschnittsloeser]]
+- [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.querschnitt.interaktion]]
+- [[opencivil.spannungsanalyse.schnitt]]

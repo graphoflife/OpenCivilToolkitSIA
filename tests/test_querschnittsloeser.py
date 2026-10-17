@@ -3,8 +3,9 @@
 import math
 import unittest
 
+from opencivil.core.suche import HALBIEREN, ILLINOIS, Illinois
 from opencivil.nachweis.querschnittsloeser import (
-    Querschnittsloeser, QuerschnittsloeserIllinois, Stahllage, probenschranken,
+    Querschnittsloeser, Stahllage, probenschranken,
 )
 from opencivil.nachweis.zustand2 import gerissen, wertigkeit
 from opencivil.querschnitt.werkstoffgesetz import (
@@ -231,18 +232,18 @@ class TestVerfehlteEbene(unittest.TestCase):
     STAHL = stahl(E_s=200e9, f_sd=435e6)
     BLOCK = Spannungsblock(f_cd=20e6, eps_c2d=0.003)
 
-    def loeser(self, klasse=Querschnittsloeser, beton=None):
+    def loeser(self, suche=HALBIEREN, beton=None):
         """h = 250 mm, b = 1 m, je 1131 mm² oben und unten."""
-        return klasse(
+        return Querschnittsloeser(
             h=0.25, b=1.0,
             lagen=[Stahllage(a_s=1131e-6, z=0.025, stahl=self.STAHL, nummer=1),
                    Stahllage(a_s=1131e-6, z=0.225, stahl=self.STAHL, nummer=2)],
-            beton=beton or self.BLOCK)
+            beton=beton or self.BLOCK, suche=suche)
 
     def test_viel_druck_und_wenig_moment_ist_verfehlt(self):
-        for klasse in (Querschnittsloeser, QuerschnittsloeserIllinois):
-            with self.subTest(klasse=klasse.__name__):
-                ebene = self.loeser(klasse).loese(N_Ed=-600e3, M_Ed=14.5e3)
+        for suche in (HALBIEREN, ILLINOIS, Illinois(auch_bei_sprung=True)):
+            with self.subTest(suche=type(suche).__name__):
+                ebene = self.loeser(suche).loese(N_Ed=-600e3, M_Ed=14.5e3)
                 self.assertFalse(ebene.konvergiert)
                 self.assertTrue(ebene.verfehlt)
                 # Was die verfehlte Ebene erzeugt: weit weg von der Einwirkung.
@@ -291,10 +292,10 @@ class TestIllinoisMitWarmstart(unittest.TestCase):
              (0.0, 150e3), (0.0, 234.9e3), (0.0, 236.0e3), (0.0, 120e3), (-50e3, 5e3)]
 
     @staticmethod
-    def platte(klasse, beton, **mehr):
+    def platte(beton, **mehr):
         """Die Platte des Beispiels in x (φ = 2, Bemessungswerte) -- siehe TestGrenzen."""
         s = stahl(E_s=205e9, f_sd=434.78e6, eps_ud=0.045)
-        return klasse(
+        return Querschnittsloeser(
             h=0.3, b=1.0,
             lagen=[Stahllage(a_s=1696e-6, z=0.249, stahl=s, nummer=1),
                    Stahllage(a_s=754e-6, z=0.246, stahl=s, nummer=2),
@@ -304,9 +305,9 @@ class TestIllinoisMitWarmstart(unittest.TestCase):
     def test_dieselben_ebenen_wie_beim_halbieren(self):
         parabel = parabelgesetz(f_cd=20e6, E_c=33.62e9 / 3.0, eps_c1d=0.002,
                                     eps_c2d=0.0035)
-        halbiert = self.platte(Querschnittsloeser, parabel)
-        illinois = self.platte(QuerschnittsloeserIllinois, parabel)
-        self.assertFalse(illinois.halbiert)
+        halbiert = self.platte(parabel)
+        illinois = self.platte(parabel, suche=ILLINOIS)
+        self.assertIs(illinois.suche, ILLINOIS)
         for N, M in self.FOLGE:
             a, b = halbiert.loese(N_Ed=N, M_Ed=M), illinois.loese(N_Ed=N, M_Ed=M)
             with self.subTest(N=N, M=M):
@@ -319,11 +320,18 @@ class TestIllinoisMitWarmstart(unittest.TestCase):
     def test_springt_ein_gesetz_wird_halbiert(self):
         """Mit dem Spannungsblock Zeichen für Zeichen das Halbieren -- auch nach einer Folge."""
         block = Spannungsblock(f_cd=20e6, eps_c2d=0.0035)
-        halbiert = self.platte(Querschnittsloeser, block)
-        illinois = self.platte(QuerschnittsloeserIllinois, block)
-        self.assertTrue(illinois.halbiert)
-        self.assertEqual(illinois.suche, Querschnittsloeser.SUCHE)
+        halbiert = self.platte(block)
+        illinois = self.platte(block, suche=ILLINOIS)
+        self.assertIs(illinois.suche, HALBIEREN)
+        self.assertEqual(illinois.verfahren, Querschnittsloeser.SUCHE)
         for N, M in self.FOLGE:
             with self.subTest(N=N, M=M):
                 self.assertEqual(illinois.loese(N_Ed=N, M_Ed=M), halbiert.loese(N_Ed=N, M_Ed=M))
+
+    def test_je_frage_bleibt_es_bei_illinois(self):
+        """Wer den Löser für eine einzige Frage baut, darf auch am Spannungsblock Illinois nehmen."""
+        je_frage = Illinois(auch_bei_sprung=True)
+        loeser = self.platte(Spannungsblock(f_cd=20e6, eps_c2d=0.0035), suche=je_frage)
+        self.assertIs(loeser.suche, je_frage)
+        self.assertEqual(loeser.verfahren, Querschnittsloeser.SUCHE_VOM_LETZTEN)
 

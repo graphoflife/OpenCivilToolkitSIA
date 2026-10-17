@@ -37,11 +37,12 @@ N_Rd davon ab, wie gesucht wurde -- an der Stuetze des Pruefprojekts
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
-from typing import Callable, Dict, List, Sequence, Type
+from typing import Callable, Dict, List, Sequence
 
 from opencivil.core.berechnung import Eingabebezug, Eingaben
 from opencivil.core.latex import angabe
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.suche import HALBIEREN, Suche
 from opencivil.core.wert import Wert, kennung_aus
 from opencivil.material.basis import Baustoffart
 from opencivil.nachweis.querschnittsloeser import (
@@ -211,17 +212,16 @@ class Gesetze:
         return list(lagen)
 
     def loeser(self, *, h: float, b: float, lagen: Sequence[Stahllage],
-               klasse: Type[Querschnittsloeser] = Querschnittsloeser,
-               **fenster) -> Querschnittsloeser:
+               suche: Suche = HALBIEREN, **fenster) -> Querschnittsloeser:
         """
         Der Loeser zu dieser Wahl. ``fenster`` sind die Grenzen der Suche
         (``eps_druck``, ``eps_zug``, ``grenzen``) -- die bringt jeder Nutzer
-        selbst mit. ``klasse`` waehlt, wie gesucht wird -- das Knicken nimmt
-        :class:`~opencivil.nachweis.querschnittsloeser.QuerschnittsloeserIllinois`.
+        selbst mit. ``suche`` sagt, wie gesucht wird -- das Knicken nimmt
+        :data:`~opencivil.core.suche.ILLINOIS`.
         """
-        return klasse(
+        return Querschnittsloeser(
             h=h, b=b, lagen=self.lagen(lagen, h), beton=self.beton,
-            stahl=self.stahl, verdraengt=self.verdraengt, **fenster)
+            stahl=self.stahl, verdraengt=self.verdraengt, suche=suche, **fenster)
 
 
 def protokoll_rechenwahl(p: Protokoll, wahl: Rechenwahl, basis: str, *,

@@ -1,5 +1,5 @@
 ---
-erzeugt: cb5ed5a89c00
+erzeugt: 7d81ff361db0
 art: modul
 tags: [modul]
 ---
@@ -19,7 +19,7 @@ Stahlspannungen und die Zwaengung auf Biegung
 
 Zu einer Neigung ψ der Zugrichtung ist es die Aufgabe der Platte: N und das
 Moment in Zugrichtung bestimmen `eps_m` und `chi`
-([[opencivil.nachweis.querschnittsloeser#FaserloeserIllinois|FaserloeserIllinois]]).
+([[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]], mit Illinois).
 Uebrig bleibt das Moment entlang der Nulllinie, und ψ wird gedreht, bis auch
 es stimmt ([[opencivil.nachweis.gebrauchsebene#gebrauchsebene|gebrauchsebene]]): der Sekante nach, dann Illinois, und wo
 die Sekante wegliefe, mit wachsenden Schritten nach beiden Seiten

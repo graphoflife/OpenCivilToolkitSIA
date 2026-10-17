@@ -10,7 +10,7 @@ Stahlspannungen und die Zwaengung auf Biegung
 DIE SUCHE:
 Zu einer Neigung ψ der Zugrichtung ist es die Aufgabe der Platte: N und das
 Moment in Zugrichtung bestimmen ``eps_m`` und ``chi``
-(:class:`~opencivil.nachweis.querschnittsloeser.FaserloeserIllinois`).
+(:class:`~opencivil.nachweis.querschnittsloeser.Faserloeser`, mit Illinois).
 Uebrig bleibt das Moment entlang der Nulllinie, und ψ wird gedreht, bis auch
 es stimmt (:func:`gebrauchsebene`): der Sekante nach, dann Illinois, und wo
 die Sekante wegliefe, mit wachsenden Schritten nach beiden Seiten
@@ -39,8 +39,8 @@ from typing import Callable, Optional, Tuple, TypeVar
 
 from opencivil.core.latex import angabe, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.suche import illinois
-from opencivil.nachweis.querschnittsloeser import FaserloeserIllinois, probenschranken
+from opencivil.core.suche import ILLINOIS, illinois
+from opencivil.nachweis.querschnittsloeser import Faserloeser, probenschranken
 from opencivil.querschnitt.interaktion import Querschnitt
 
 #: Wie weit sich die Neigung ψ der Ebene unter Gebrauchslast von der
@@ -112,7 +112,7 @@ def _bei_neigung(q: Querschnitt, psi: float, N: float, M_y: float,
     """
     r = q.richtung(psi)
     n_y, n_z = r.n
-    loesung = FaserloeserIllinois(querschnitt=r.fasern, grenzen=r.grenzen).loese(
+    loesung = Faserloeser(querschnitt=r.fasern, grenzen=r.grenzen, suche=ILLINOIS).loese(
         N_Ed=N, M_Ed=-(n_z * M_y + n_y * M_z))
     if not loesung.konvergiert:
         return (VERFEHLT if loesung.verfehlt else KEINE), math.nan
