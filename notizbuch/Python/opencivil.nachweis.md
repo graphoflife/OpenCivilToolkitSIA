@@ -1,5 +1,5 @@
 ---
-erzeugt: 2afd88c4fce6
+erzeugt: 8ae93d6bfd0f
 art: modul
 tags: [modul]
 ---
@@ -37,6 +37,7 @@ Rechenwahl, mit der jedes Kapitel waehlt, womit es rechnet.
 - [[opencivil.nachweis.schiefe_biegung]] – Biegung und Normalkraft am gezeichneten Querschnitt.
 - [[opencivil.nachweis.schubwandnachweis]] – Querkraft und Torsion am gezeichneten Querschnitt.
 - [[opencivil.nachweis.spannungsbegrenzung]] – Stahlspannung unter Gebrauchslasten.
+- [[opencivil.nachweis.spannungsgrenzen]] – wogegen die Stahlspannung gehalten wird.
 - [[opencivil.nachweis.sproedes_versagen]] – Mindestbewehrung gegen sprödes Versagen.
 - [[opencivil.nachweis.stabgrenzen]] – die zulaessige Stahlspannung je Stab des gezeichneten Querschnitts.
 - [[opencivil.nachweis.verformung]] – die Durchbiegung der Platte.

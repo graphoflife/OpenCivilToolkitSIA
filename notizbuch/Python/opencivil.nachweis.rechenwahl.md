@@ -1,5 +1,5 @@
 ---
-erzeugt: f644c9c25b7a
+erzeugt: 261cff6f251f
 art: modul
 tags: [modul]
 ---
@@ -269,6 +269,7 @@ ersten Lage.
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
+- [[opencivil.nachweis.spannungsgrenzen]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.spannungsanalyse.platte]]

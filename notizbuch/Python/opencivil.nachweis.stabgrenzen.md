@@ -1,5 +1,5 @@
 ---
-erzeugt: c6fec057b130
+erzeugt: 5498ad9d3013
 art: modul
 tags: [modul]
 ---
@@ -11,11 +11,11 @@ tags: [modul]
 
 Die Gebrauchsnachweise der Querschnittsanalyse ([[opencivil.nachweis.qa_gebrauch]])
 halten jeden Stab gegen seine eigene Grenze. Hier steht, wie ein Stab zu ihr
-kommt und wie sie in die Herleitung kommt: aus der Rissbreite
-([[opencivil.nachweis.stabgrenzen#grenzen_aus_rissbreite|grenzen_aus_rissbreite]]) oder gegen das Fliessen
-([[opencivil.nachweis.stabgrenzen#grenzen_gegen_fliessen|grenzen_gegen_fliessen]]), mit denselben Funktionen wie bei der
-Platte ([[opencivil.nachweis.mindestbewehrung#zulaessige_stahlspannung|zulaessige_stahlspannung]],
-`f_yd - 80 N/mm²`).
+kommt und wie sie in die Herleitung kommt, wo die Rissbreite zaehlt
+([[opencivil.nachweis.stabgrenzen#grenzen_aus_rissbreite|grenzen_aus_rissbreite]]), mit derselben Funktion wie bei der Platte
+([[opencivil.nachweis.mindestbewehrung#zulaessige_stahlspannung|zulaessige_stahlspannung]]).
+Gegen das Fliessen gilt je Stahl `f_yd - 80 N/mm²`, fuer jede Geometrie
+gleich ([[opencivil.nachweis.spannungsgrenzen#gegen_fliessen|gegen_fliessen]]).
 
 
 ## JE STAB
@@ -23,7 +23,8 @@ Platte ([[opencivil.nachweis.mindestbewehrung#zulaessige_stahlspannung|zulaessig
 Die Platte haelt je Lage den dicksten Stab gegen die Rissbreite. Hier hat
 jeder Stab seine Grenze -- mit seinem Durchmesser und dem `f_ctm` des
 Betons, in dem er liegt (Benutzer, 2026-10-15). Staebe mit derselben Grenze
-bilden eine Gruppe, die einmal hergeleitet wird ([[opencivil.nachweis.stabgrenzen#Grenzgruppe|Grenzgruppe]]).
+bilden eine Gruppe, die einmal hergeleitet wird
+([[opencivil.nachweis.spannungsgrenzen#Grenzgruppe|Grenzgruppe]]).
 
 
 ## DER FIKTIVE DURCHMESSER
@@ -101,61 +102,13 @@ def stabangaben(analyse: Querschnittsanalyse, q: Querschnitt, herkunft: Sequence
 
 Je Bewehrung des Querschnitts ihre Angaben -- in derselben Reihenfolge wie dort.
 
-### Grenzgruppe
-
-```python
-@dataclass
-class Grenzgruppe
-```
-
-Staebe mit derselben zulaessigen Spannung -- und woraus sie entsteht.
-
-- `sigma: float` – `sigma_s,adm` in Pa.
-- `stahl: Baustoff`
-- `stab: Optional[Stabangabe]` – Ein Stab der Gruppe, fuer Durchmesser und Beton -- nur, wo die Rissbreite zaehlt. Bei normaler Anforderung und gegen das Fliessen gilt die Grenze fuer jeden Stab des Stahls.
-- `staebe: List[int] = field(default_factory=list)` – Die Staebe, nach ihrer Stelle in [[opencivil.nachweis.stabgrenzen#stabangaben|stabangaben]].
-- `wert: Optional[Wert] = None` – Die Grenze, wie sie in Herleitung und Vergleich steht -- gesetzt beim Protokollieren.
-
-### Grenzen
-
-```python
-@dataclass(frozen=True)
-class Grenzen
-```
-
-Die Grenze jedes Stabs -- und die Gruppen, in denen sie hergeleitet wird.
-
-- `gruppen: List[Grenzgruppe]`
-- `je_stab: List[int]` – Je Stab die Stelle seiner Gruppe.
-
-#### Grenzen.gruppe
-
-```python
-def gruppe(self, i: int) -> Grenzgruppe
-```
-
-#### Grenzen.sigma
-
-```python
-def sigma(self, i: int) -> float
-```
-
-#### Grenzen.strengste
-
-```python
-@property
-def strengste(self) -> int
-```
-
-Der Stab mit der kleinsten Grenze -- er steht da, wo keiner gezogen ist.
-
 ### _gruppieren
 
 ```python
 def _gruppieren(staebe: Sequence[Stabangabe], schluessel: Callable[[Stabangabe], tuple], bilden: Callable[[Stabangabe], Grenzgruppe]) -> Grenzen
 ```
 
-Je Schluessel eine Gruppe, in der Reihenfolge ihres ersten Stabs.
+Je Schluessel eine Gruppe, in der Reihenfolge ihres ersten Stabs -- jeder Stab eine Stelle.
 
 ### grenzen_aus_rissbreite
 
@@ -167,14 +120,6 @@ def grenzen_aus_rissbreite(analyse: Querschnittsanalyse, e: Eingaben, staebe: Se
 `f_yk` seines Stahls, bei erhoehter und hoher dazu die Rissbreite mit
 seinem Durchmesser und dem `f_ctm` seines Betons.
 
-### grenzen_gegen_fliessen
-
-```python
-def grenzen_gegen_fliessen(analyse: Querschnittsanalyse, e: Eingaben, staebe: Sequence[Stabangabe]) -> Grenzen
-```
-
-`f_yd - 80 N/mm²` je Stahl -- der Durchmesser zaehlt hier nicht.
-
 ### protokoll_rissbreitengrenzen
 
 ```python
@@ -184,15 +129,7 @@ def protokoll_rissbreitengrenzen(p: Protokoll, e: Eingaben, analyse: Querschnitt
 `sigma_s,adm` aus der Rissbreite, je Gruppe gleicher Staebe einmal
 hergeleitet -- vorher der fiktive Durchmesser jeder verschmierten Linie,
 die ihn braucht. Bei mehreren Gruppen danach eine Tabelle, welche Elemente
-zu welcher gehoeren. Setzt [[opencivil.nachweis.stabgrenzen#Grenzgruppe|Grenzgruppe.wert]].
-
-### protokoll_fliessgrenzen
-
-```python
-def protokoll_fliessgrenzen(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse, grenzen: Grenzen, basis: str) -> None
-```
-
-`f_yd - 80 N/mm²` je Stahl -- wie bei der Platte. Setzt [[opencivil.nachweis.stabgrenzen#Grenzgruppe|Grenzgruppe.wert]].
+zu welcher gehoeren. Setzt [[opencivil.nachweis.spannungsgrenzen#Grenzgruppe|Grenzgruppe.wert]].
 
 ### _protokoll_fiktiv
 
@@ -220,14 +157,13 @@ Welche Elemente zu welcher Grenze gehoeren.
 ## Braucht
 
 - [[opencivil.core.berechnung]]
-- [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.rissanforderung]]
-- [[opencivil.nachweis.spannungsbegrenzung]]
+- [[opencivil.nachweis.spannungsgrenzen]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.interaktion]]
@@ -235,8 +171,8 @@ Welche Elemente zu welcher Grenze gehoeren.
 ## Gebraucht von
 
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.spannungsgrenzen]]
 
 ## Formeln aus diesem Modul
 
 - [[Fiktiver Durchmesser einer verschmierten Linie]] · `_protokoll_fiktiv`
-- [[Zulässige Stahlspannung]] · `protokoll_fliessgrenzen`

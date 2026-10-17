@@ -115,9 +115,9 @@ class TestSpannungsbegrenzung(unittest.TestCase):
         for erg in self.nachweis(self.projekt("hoch")).ergebnisse:
             with self.subTest(fall=erg.fall.name):
                 self.assertTrue(erg.konvergiert)
-                self.assertAlmostEqual(erg.N_int, erg.fall.N_Ed.si,
+                self.assertAlmostEqual(erg.ebene.N_int, erg.fall.N_Ed.si,
                                        delta=max(1.0, abs(erg.fall.N_Ed.si) * 1e-5))
-                self.assertAlmostEqual(erg.M_int, erg.fall.M_Ed.si,
+                self.assertAlmostEqual(erg.ebene.M_int, erg.fall.M_Ed.si,
                                        delta=max(1.0, abs(erg.fall.M_Ed.si) * 1e-5))
 
     def test_die_siebzig_prozent_kommen_aus_dem_kern(self):
@@ -205,14 +205,14 @@ class TestVerfehlteEbene(unittest.TestCase):
         spannung = self.gerechnet("block")
         mehr = next(e for e in spannung.ergebnisse if e.fall.name == "Mehr Moment")
         self.assertTrue(mehr.konvergiert)
-        self.assertAlmostEqual(mehr.N_int, -600e3, delta=1.0)
-        self.assertAlmostEqual(mehr.M_int, 80e3, delta=1.0)
+        self.assertAlmostEqual(mehr.ebene.N_int, -600e3, delta=1.0)
+        self.assertAlmostEqual(mehr.ebene.M_int, 80e3, delta=1.0)
 
     def test_praezise_gibt_es_sie_auch_mit_wenig_moment(self):
         spannung = self.gerechnet("parabel")
         wenig = next(e for e in spannung.ergebnisse if e.fall.name == "Wenig Moment")
         self.assertTrue(wenig.konvergiert)
-        self.assertAlmostEqual(wenig.N_int, -600e3, delta=1.0)
+        self.assertAlmostEqual(wenig.ebene.N_int, -600e3, delta=1.0)
 
 
 class TestStahlspannungAusRissbreite(unittest.TestCase):

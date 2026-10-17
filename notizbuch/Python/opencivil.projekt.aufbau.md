@@ -1,5 +1,5 @@
 ---
-erzeugt: 87664f028e6e
+erzeugt: d39d93c04943
 art: modul
 tags: [modul]
 ---
@@ -67,8 +67,8 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `qa_sproede: Dict[str, SproedesVersagenQA] = field(default_factory=dict)`
 - `qa_rissnormalkraft: Dict[str, RissnormalkraftQA] = field(default_factory=dict)`
 - `qa_zwaengung_biegung: Dict[str, ZwaengungBiegungQA] = field(default_factory=dict)`
-- `qa_spannung_riss: Dict[str, SpannungsbegrenzungQA] = field(default_factory=dict)`
-- `qa_spannung: Dict[str, SpannungsbegrenzungQA] = field(default_factory=dict)` – Die Gebrauchsnachweise je Querschnittsanalyse, wie bei der Platte.
+- `qa_spannung_riss: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)`
+- `qa_spannung: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)` – Die Gebrauchsnachweise je Querschnittsanalyse, wie bei der Platte.
 - `qa_knicken: Dict[str, KnickenQA] = field(default_factory=dict)` – Knicken je Querschnittsanalyse -- je Fall in seiner Richtung.
 - `balkensysteme: Dict[str, Balkensystem] = field(default_factory=dict)` – Die Balkensysteme, nach Kennung -- Bauteile ohne Nachweise, mit ihrem Ergebnis.
 - `grundbrueche: Dict[str, Fundament] = field(default_factory=dict)` – Die Fundamente der Grundbruchnachweise, nach Kennung.
@@ -305,7 +305,7 @@ Biegung und Normalkraft immer -- ihre Eckwerte gehoeren dem Querschnitt.
 Querkraft und Torsion, sobald ein Lastfall sie hat oder die
 Laengszugkraft zaehlt. Duktilitaet, sproedes Versagen und die Zwaengungen
 immer, still, wenn ausgeschaltet -- wie bei der Platte. Ebenso die
-Stahlspannungen, sobald es Lastfaelle gibt ([[opencivil.projekt.aufbau#_qa_spannungsnachweise|_qa_spannungsnachweise]]),
+Stahlspannungen, sobald es Lastfaelle gibt ([[opencivil.projekt.aufbau#_spannungsnachweise|_spannungsnachweise]]),
 und das Knicken, sobald ein Fall eingeschaltet ist.
 
 ### _balkensystem
@@ -352,20 +352,17 @@ gerechnet wird trotzdem, damit ein Hinweis stehen kann.
 ### _spannungsnachweise
 
 ```python
-def _spannungsnachweise(eintrag: QuerschnittEintrag, querschnitt: Plattenquerschnitt, richtung: Richtung, aufbau: Aufbau, teil: Bauteil) -> None
+def _spannungsnachweise(eintrag, ort: Stahlspannungsort, kombinationen: Sequence[Any], fall: Callable[[str, Any, float], Any], *, praefix: str, kennung: str, aufbau: Aufbau, teil: Bauteil) -> None
 ```
 
 Die Stahlspannung, zweimal: aus der Rissbreite unter quasi-staendiger
 Einwirkung (bei jeder Anforderung) und gegen Fliessen unter haeufiger
 (nur bei erhoehter und hoher). Welche wann gilt, weiss die Grenze selbst.
 
-### _qa_spannungsnachweise
-
-```python
-def _qa_spannungsnachweise(eintrag: QuerschnittsanalyseEintrag, analyse: Querschnittsanalyse, aufbau: Aufbau, teil: Bauteil) -> None
-```
-
-Die Stahlspannungen des gezeichneten Querschnitts -- wie bei der Platte, je Grenze.
+Fuer die Platte und den gezeichneten Querschnitt dieselbe Schleife: `ort`
+sagt, wo gemessen wird, `fall` macht die Faelle
+([[opencivil.projekt.aufbau#_gebrauchsfaelle|_gebrauchsfaelle]]), `praefix` das Feld des Aufbaus -- «qa_»
+beim gezeichneten Querschnitt. Bis 2026-10-17 stand sie zweimal da.
 
 ### _knickfall
 
@@ -525,6 +522,7 @@ Baufunktion von ihr bekannt sein muss. Eine neue Art kommt in
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
+- [[opencivil.nachweis.spannungsgrenzen]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt.balkensystem]]

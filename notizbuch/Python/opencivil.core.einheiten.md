@@ -1,5 +1,5 @@
 ---
-erzeugt: 162158713029
+erzeugt: eb387f5393c7
 art: modul
 tags: [modul]
 ---
@@ -459,8 +459,8 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
+- [[opencivil.nachweis.spannungsgrenzen]]
 - [[opencivil.nachweis.sproedes_versagen]]
-- [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]

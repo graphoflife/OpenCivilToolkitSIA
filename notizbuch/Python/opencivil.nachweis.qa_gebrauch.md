@@ -1,5 +1,5 @@
 ---
-erzeugt: 01375af5235a
+erzeugt: 99955bf9e6af
 art: modul
 tags: [modul]
 ---
@@ -12,7 +12,9 @@ tags: [modul]
 Was die Platte unter Gebrauchslast nachweist, am gezeichneten Querschnitt:
 
 * die Stahlspannung -- unter quasi-staendiger Einwirkung aus der Rissbreite
-  begrenzt, unter haeufiger gegen das Fliessen ([[opencivil.nachweis.qa_gebrauch#SpannungsbegrenzungQA|SpannungsbegrenzungQA]]);
+  begrenzt, unter haeufiger gegen das Fliessen: derselbe Nachweis wie bei
+  der Platte ([[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung|Spannungsbegrenzung]]),
+  hier mit den Staeben als Stellen ([[opencivil.nachweis.qa_gebrauch#AnalyseStellen|AnalyseStellen]]);
 * die Zwaengung auf Normalkraft, am ganzen Querschnitt
   ([[opencivil.nachweis.qa_gebrauch#RissnormalkraftQA|RissnormalkraftQA]]), und auf Biegung, je Richtung
   ([[opencivil.nachweis.qa_gebrauch#ZwaengungBiegungQA|ZwaengungBiegungQA]]).
@@ -72,76 +74,109 @@ SI-Basis wie im ganzen Querschnittsmodul; die Zeichnung in mm.
 
 ## Inhalt
 
-### Fallergebnis
+### _Analysezustand
 
 ```python
-@dataclass
-class Fallergebnis
+@dataclass(frozen=True)
+class _Analysezustand(Stahlzustand)
 ```
 
-Was der Nachweis fuer einen Lastfall gefunden hat.
+Dazu der Querschnitt nach der Wahl und je Stab seine Angaben.
 
-- `fall: Lastfall`
-- `ebene: Gebrauchsebene = KEINE`
-- `stab: int = 0` – Der massgebende Stab: der gezogene mit dem kleinsten Erfuellungsgrad.
-- `eps_s: float = 0.0`
-- `sigma_s: float = 0.0`
-- `E_s: float = 0.0`
-- `eps_y: float = 0.0`
-- `erfuellungsgrad: float = 0.0`
-- `erfuellt: bool = False`
-- `vergleich: Optional[Vergleich] = None` – Fehlt nur, wenn sich keine Gleichgewichtslage fand.
-- `begruendung: str = ''`
-- `hinweis: str = ''`
+- `querschnitt: Querschnitt`
+- `staebe: Tuple[Stabangabe, ...]`
 
-#### Fallergebnis.fliesst
+### AnalyseStellen
 
 ```python
-@property
-def fliesst(self) -> bool
+class AnalyseStellen(Stahlspannungsort)
 ```
 
-### SpannungsbegrenzungQA
+Der gezeichnete Querschnitt fuer die Stahlspannung
+([[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung|Spannungsbegrenzung]]):
+Stellen sind seine Staebe, und jeder gezogene haelt gegen seine eigene
+Grenze (siehe Dateikopf). Die Ebene eines Lastfalls traegt N, M_y und M_z
+mit gedrehter Nulllinie ([[opencivil.nachweis.gebrauchsebene#gebrauchsebene|gebrauchsebene]]);
+«einachsig» bleibt sie waagrecht.
+
+- `messung = 'Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen Zug…`
+- `regel_der_rissbreite = GRENZE_JE_STAB`
+
+#### AnalyseStellen.basis
 
 ```python
-class SpannungsbegrenzungQA(Nachweis)
+def basis(self, grenze: Type[Spannungsgrenze]) -> str
 ```
 
-Die Stahlspannung je Lastfall gegen ihre Grenze -- aus der Rissbreite
-oder gegen das Fliessen, je nach `grenze`. Ein Urteil je Lastfall.
-
-#### SpannungsbegrenzungQA.thema
+#### AnalyseStellen.bezuege
 
 ```python
-@property
-def thema(self) -> str
+def bezuege(self, wahl: Rechenwahl) -> List[Eingabebezug]
 ```
 
-#### SpannungsbegrenzungQA.langname
+#### AnalyseStellen.zustand
 
 ```python
-@property
-def langname(self) -> str
+def zustand(self, e: Eingaben, wahl: Rechenwahl) -> _Analysezustand
 ```
 
-#### SpannungsbegrenzungQA.pruefe
+#### AnalyseStellen.aus_rissbreite
 
 ```python
-def pruefe(self, e: Eingaben, p: Protokoll)
+def aus_rissbreite(self, zustand: _Analysezustand, e: Eingaben, p: Protokoll, anforderung: Rissanforderung, basis: str) -> Grenzen
 ```
 
-#### SpannungsbegrenzungQA._vergleich
+#### AnalyseStellen.ebene
 
 ```python
-def _vergleich(self, erg: Fallergebnis, grenzen: Grenzen) -> Vergleich
+def ebene(self, zustand: _Analysezustand, fall: Lastfall) -> Gebrauchsebene
 ```
 
-Spannungen oder Dehnungen -- die eine Stelle, die das entscheidet.
-
-#### SpannungsbegrenzungQA._tabelle_gezogen
+#### AnalyseStellen.keine_ebene
 
 ```python
-@staticmethod
+def keine_ebene(self, fall: Lastfall) -> str
+```
+
+#### AnalyseStellen.begruendung
+
+```python
+def begruendung(self, zustand: _Analysezustand, erg: Fallergebnis) -> str
+```
+
+#### AnalyseStellen.dehnungsgrenze
+
+```python
+def dehnungsgrenze(self, basis: str, werte: Zwischenwerte, erg: Fallergebnis) -> Wert
+```
+
+#### AnalyseStellen.protokoll_gesetze
+
+```python
+def protokoll_gesetze(self, p: Protokoll, e: Eingaben, zustand: _Analysezustand, wahl: Rechenwahl, basis: str) -> None
+```
+
+#### AnalyseStellen.protokoll_verfahren
+
+```python
+def protokoll_verfahren(self, p: Protokoll, zustand: _Analysezustand, wahl: Rechenwahl) -> None
+```
+
+#### AnalyseStellen.protokoll_einwirkung
+
+```python
+def protokoll_einwirkung(self, p: Protokoll, fall: Lastfall, index: str) -> None
+```
+
+#### AnalyseStellen.protokoll_ebene
+
+```python
+def protokoll_ebene(self, p: Protokoll, werte: Zwischenwerte, zustand: _Analysezustand, grenzen: Grenzen, erg: Fallergebnis) -> None
+```
+
+### _tabelle_gezogen
+
+```python
 def _tabelle_gezogen(p: Protokoll, staebe: Sequence[Stabangabe], grenzen: Grenzen, ebene: Gebrauchsebene) -> None
 ```
 
@@ -230,7 +265,6 @@ findet, liegt jenseits der Grenze: der Stahl fliesst dort laengst.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
-- [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.gebrauchsebene]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
@@ -239,6 +273,7 @@ findet, liegt jenseits der Grenze: der Stahl fliesst dort laengst.
 - [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
+- [[opencivil.nachweis.spannungsgrenzen]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.geometrie]]

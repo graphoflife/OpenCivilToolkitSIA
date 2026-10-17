@@ -1,5 +1,5 @@
 ---
-erzeugt: 8c9b79f2a3c8
+erzeugt: ce6f7bc4a092
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, Tabelle 17"
@@ -27,8 +27,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.spannungsbegrenzung#GrenzeGegenFliessen.bestimmen|GrenzeGegenFliessen.bestimmen]]
-- [[opencivil.nachweis.stabgrenzen#protokoll_fliessgrenzen|protokoll_fliessgrenzen]]
+- [[opencivil.nachweis.spannungsgrenzen#gegen_fliessen|gegen_fliessen]]
 
 ## Themen
 

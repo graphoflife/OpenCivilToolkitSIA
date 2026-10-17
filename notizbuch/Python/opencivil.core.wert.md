@@ -1,5 +1,5 @@
 ---
-erzeugt: 9802df7f96ca
+erzeugt: 6464251f2689
 art: modul
 tags: [modul]
 ---
@@ -294,6 +294,7 @@ def beschreibung(self) -> str
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
+- [[opencivil.nachweis.spannungsgrenzen]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.nachweis.verformung]]

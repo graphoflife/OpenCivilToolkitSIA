@@ -1,5 +1,5 @@
 ---
-erzeugt: a9c30b803c76
+erzeugt: 31105a018b07
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -61,6 +61,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.nachweis.schiefe_biegung]] – Biegung und Normalkraft am gezeichneten Querschnitt.
     - [[opencivil.nachweis.schubwandnachweis]] – Querkraft und Torsion am gezeichneten Querschnitt.
     - [[opencivil.nachweis.spannungsbegrenzung]] – Stahlspannung unter Gebrauchslasten.
+    - [[opencivil.nachweis.spannungsgrenzen]] – wogegen die Stahlspannung gehalten wird.
     - [[opencivil.nachweis.sproedes_versagen]] – Mindestbewehrung gegen sprödes Versagen.
     - [[opencivil.nachweis.stabgrenzen]] – die zulaessige Stahlspannung je Stab des gezeichneten Querschnitts.
     - [[opencivil.nachweis.verformung]] – die Durchbiegung der Platte.

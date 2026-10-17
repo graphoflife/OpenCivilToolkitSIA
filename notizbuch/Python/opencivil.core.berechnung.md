@@ -1,5 +1,5 @@
 ---
-erzeugt: 0f6a30d7e190
+erzeugt: 9bd9283a80a5
 art: modul
 tags: [modul]
 ---
@@ -646,6 +646,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
+- [[opencivil.nachweis.spannungsgrenzen]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.nachweis.verformung]]

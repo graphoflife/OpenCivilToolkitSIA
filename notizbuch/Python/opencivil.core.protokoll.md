@@ -1,5 +1,5 @@
 ---
-erzeugt: ba43b6431862
+erzeugt: 37bbcf1b0882
 art: modul
 tags: [modul]
 ---
@@ -613,6 +613,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
+- [[opencivil.nachweis.spannungsgrenzen]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.nachweis.verformung]]

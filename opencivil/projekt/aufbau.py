@@ -47,9 +47,9 @@ from opencivil.nachweis.mindestbewehrung import (
     Rissnormalkraft, ZwaengungBiegung,
 )
 from opencivil.nachweis.spannungsbegrenzung import (
-    Gebrauchsfall, GrenzeAusRissbreite, GrenzeGegenFliessen,
-    Spannungsbegrenzung,
+    Gebrauchsfall, PlattenStellen, Spannungsbegrenzung, Stahlspannungsort,
 )
+from opencivil.nachweis.spannungsgrenzen import GrenzeAusRissbreite, GrenzeGegenFliessen
 from opencivil.nachweis import dehnungsfaecher
 from opencivil.nachweis.verformung import Vergroesserungsfaktor, Verformung, Verformungsfall
 from opencivil.nachweis.kennzahlen import Plattenkennzahlen
@@ -69,7 +69,7 @@ from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.nachweis.qa_gebrauch import (
-    RissnormalkraftQA, SpannungsbegrenzungQA, ZwaengungBiegungQA,
+    AnalyseStellen, RissnormalkraftQA, ZwaengungBiegungQA,
 )
 from opencivil.nachweis.qa_knicken import KnickenQA, QAKnickfall
 from opencivil.nachweis.richtungsnachweise import DuktilitaetQA, SproedesVersagenQA
@@ -171,8 +171,8 @@ class Aufbau:
     qa_sproede: Dict[str, SproedesVersagenQA] = field(default_factory=dict)
     qa_rissnormalkraft: Dict[str, RissnormalkraftQA] = field(default_factory=dict)
     qa_zwaengung_biegung: Dict[str, ZwaengungBiegungQA] = field(default_factory=dict)
-    qa_spannung_riss: Dict[str, SpannungsbegrenzungQA] = field(default_factory=dict)
-    qa_spannung: Dict[str, SpannungsbegrenzungQA] = field(default_factory=dict)
+    qa_spannung_riss: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)
+    qa_spannung: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)
     """Die Gebrauchsnachweise je Querschnittsanalyse, wie bei der Platte."""
 
     qa_knicken: Dict[str, KnickenQA] = field(default_factory=dict)
@@ -469,7 +469,11 @@ def _platte(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> B
         aufbau.eintragen(teil, "nachweise", kennung_x, nachweis)
 
         _lagennachweise(eintrag, querschnitt, richtung, nachweis, aufbau, teil)
-        _spannungsnachweise(eintrag, querschnitt, richtung, aufbau, teil)
+        _spannungsnachweise(
+            eintrag, PlattenStellen(querschnitt, richtung), eintrag.kombinationen,
+            lambda name, k, faktor: Gebrauchsfall(name=name, M_Ed=Groesse(faktor * k.M_Ed, KNM),
+                                                   N_Ed=Groesse(faktor * k.N_Ed, KN)),
+            praefix="", kennung=kennung_x, aufbau=aufbau, teil=teil)
 
         # Der Vergroesserungsfaktor gehoert der Platte, nicht einem Fall: er
         # rechnet immer, als Kennzahl, und der Verformungsnachweis liest ihn.
@@ -527,7 +531,7 @@ def _querschnittsanalyse(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     Querkraft und Torsion, sobald ein Lastfall sie hat oder die
     Laengszugkraft zaehlt. Duktilitaet, sproedes Versagen und die Zwaengungen
     immer, still, wenn ausgeschaltet -- wie bei der Platte. Ebenso die
-    Stahlspannungen, sobald es Lastfaelle gibt (:func:`_qa_spannungsnachweise`),
+    Stahlspannungen, sobald es Lastfaelle gibt (:func:`_spannungsnachweise`),
     und das Knicken, sobald ein Fall eingeschaltet ist.
     """
     analyse = _analyse(eintrag, aufbau.baustoffe, praefix=f"{art.raum}.{eintrag.kennung}")
@@ -568,7 +572,12 @@ def _querschnittsanalyse(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
                                  kriechzahl=eintrag.zwaengung_biegung_kriechzahl)
     biegung.still = not eintrag.zwaengung_biegung
     aufbau.eintragen(teil, "qa_zwaengung_biegung", eintrag.kennung, biegung)
-    _qa_spannungsnachweise(eintrag, analyse, aufbau, teil)
+    kN = 1e3
+    _spannungsnachweise(
+        eintrag, AnalyseStellen(analyse), eintrag.lastfaelle,
+        lambda name, l, faktor: Lastfall(name=name, N=faktor * l.N_Ed * kN,
+                                         M_y=faktor * l.M_y_Ed * kN, M_z=faktor * l.M_z_Ed * kN),
+        praefix="qa_", kennung=eintrag.kennung, aufbau=aufbau, teil=teil)
 
     knickfaelle = [k for k in eintrag.knickfaelle if k.aktiv]
     if knickfaelle:
@@ -716,54 +725,32 @@ def _lagennachweise(eintrag: QuerschnittEintrag, querschnitt: Plattenquerschnitt
     aufbau.eintragen(teil, "duktilitaet", eintrag.kennung, duktilitaet)
 
 
-def _spannungsnachweise(eintrag: QuerschnittEintrag,
-                        querschnitt: Plattenquerschnitt, richtung: Richtung,
+def _spannungsnachweise(eintrag, ort: Stahlspannungsort, kombinationen: Sequence[Any],
+                        fall: Callable[[str, Any, float], Any], *, praefix: str, kennung: str,
                         aufbau: Aufbau, teil: Bauteil) -> None:
     """
     Die Stahlspannung, zweimal: aus der Rissbreite unter quasi-staendiger
     Einwirkung (bei jeder Anforderung) und gegen Fliessen unter haeufiger
     (nur bei erhoehter und hoher). Welche wann gilt, weiss die Grenze selbst.
+
+    Fuer die Platte und den gezeichneten Querschnitt dieselbe Schleife: ``ort``
+    sagt, wo gemessen wird, ``fall`` macht die Faelle
+    (:func:`_gebrauchsfaelle`), ``praefix`` das Feld des Aufbaus -- «qa_»
+    beim gezeichneten Querschnitt. Bis 2026-10-17 stand sie zweimal da.
     """
     for feld, liste, grenze in (
             ("spannung_riss", eintrag.quasistaendig, GrenzeAusRissbreite),
             ("spannung", eintrag.haeufig, GrenzeGegenFliessen)):
         if not grenze.gilt_bei(eintrag.rissanforderung):
             continue
-        faelle, laute = _gebrauchsfaelle(
-            eintrag.kombinationen, liste,
-            lambda name, k, faktor: Gebrauchsfall(name=name, M_Ed=Groesse(faktor * k.M_Ed, KNM),
-                                                   N_Ed=Groesse(faktor * k.N_Ed, KN)))
+        faelle, laute = _gebrauchsfaelle(kombinationen, liste, fall)
         if not faelle:
             continue
-        spannung = Spannungsbegrenzung(
-            faelle, grenze=grenze(querschnitt, richtung, eintrag.rissanforderung),
-            wahl=liste.wahl.wahl)
+        spannung = Spannungsbegrenzung(ort, faelle, grenze=grenze,
+                                       anforderung=eintrag.rissanforderung,
+                                       wahl=liste.wahl.wahl)
         spannung.stillstellen([f.name for f in faelle], laute)
-        aufbau.eintragen(teil, feld, f"{eintrag.kennung}.x", spannung)
-
-
-def _qa_spannungsnachweise(eintrag: QuerschnittsanalyseEintrag,
-                           analyse: Querschnittsanalyse, aufbau: Aufbau,
-                           teil: Bauteil) -> None:
-    """Die Stahlspannungen des gezeichneten Querschnitts -- wie bei der Platte, je Grenze."""
-    kN = 1e3
-    for feld, liste, grenze in (
-            ("qa_spannung_riss", eintrag.quasistaendig, GrenzeAusRissbreite),
-            ("qa_spannung", eintrag.haeufig, GrenzeGegenFliessen)):
-        if not grenze.gilt_bei(eintrag.rissanforderung):
-            continue
-        faelle, laute = _gebrauchsfaelle(
-            eintrag.lastfaelle, liste,
-            lambda name, l, faktor: Lastfall(name=name, N=faktor * l.N_Ed * kN,
-                                             M_y=faktor * l.M_y_Ed * kN,
-                                             M_z=faktor * l.M_z_Ed * kN))
-        if not faelle:
-            continue
-        spannung = SpannungsbegrenzungQA(
-            analyse, faelle, grenze=grenze, anforderung=eintrag.rissanforderung,
-            wahl=liste.wahl.wahl, einachsig=eintrag.einachsig)
-        spannung.stillstellen([f.name for f in faelle], laute)
-        aufbau.eintragen(teil, feld, eintrag.kennung, spannung)
+        aufbau.eintragen(teil, f"{praefix}{feld}", kennung, spannung)
 
 
 def _knickfall(k: KnickEintrag, klasse: type = Knickfall, **mehr: Any) -> Knickfall:

@@ -5,7 +5,9 @@ VERANTWORTUNG:
 Was die Platte unter Gebrauchslast nachweist, am gezeichneten Querschnitt:
 
 * die Stahlspannung -- unter quasi-staendiger Einwirkung aus der Rissbreite
-  begrenzt, unter haeufiger gegen das Fliessen (:class:`SpannungsbegrenzungQA`);
+  begrenzt, unter haeufiger gegen das Fliessen: derselbe Nachweis wie bei
+  der Platte (:class:`~opencivil.nachweis.spannungsbegrenzung.Spannungsbegrenzung`),
+  hier mit den Staeben als Stellen (:class:`AnalyseStellen`);
 * die Zwaengung auf Normalkraft, am ganzen Querschnitt
   (:class:`RissnormalkraftQA`), und auf Biegung, je Richtung
   (:class:`ZwaengungBiegungQA`).
@@ -59,16 +61,15 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple, Type
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, MM, Groesse
 from opencivil.core.latex import Mathe, als_text, angabe, bedingung, fest, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.material.basis import Baustoff, mit_index
-from opencivil.material.betonstahl import FLIESSDEHNUNG
 from opencivil.nachweis.gebrauchsebene import (
-    EINACHSIG, KEINE, SUCHE_DER_EBENE, Gebrauchsebene, gebrauchsebene, protokoll_ebene,
+    EINACHSIG, SUCHE_DER_EBENE, Gebrauchsebene, gebrauchsebene, protokoll_ebene,
 )
 from opencivil.nachweis.querschnittsloeser import VERFEHLTE_EBENE
 from opencivil.nachweis.rechenwahl import protokoll_gesetze_nach_wahl, protokoll_rechenwahl
@@ -81,13 +82,13 @@ from opencivil.nachweis.rissgroessen import (
     rissmoment,
 )
 from opencivil.nachweis.schiefe_biegung import protokoll_dehnungsebene
-from opencivil.nachweis.spannungsbegrenzung import (
-    VERGLEICH_BEIM_FLIESSEN, VORGABE, GrenzeGegenFliessen, Spannungsgrenze, Vergleich,
-    protokoll_festlegungen,
+from opencivil.nachweis.spannungsbegrenzung import VORGABE, Fallergebnis, Stahlspannungsort
+from opencivil.nachweis.spannungsgrenzen import (
+    GrenzeAusRissbreite, Grenzen, Spannungsgrenze, Stahlzustand, Stelle,
 )
 from opencivil.nachweis.stabgrenzen import (
-    GRENZE_JE_STAB, Grenzen, Stabangabe, grenzen_aus_rissbreite, grenzen_gegen_fliessen,
-    protokoll_fliessgrenzen, protokoll_rissbreitengrenzen, stabangaben,
+    GRENZE_JE_STAB, Stabangabe, grenzen_aus_rissbreite, protokoll_rissbreitengrenzen,
+    stabangaben,
 )
 from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse
@@ -103,257 +104,130 @@ GRENZ_SCHRANKE = 1e-7
 # ===========================================================================
 
 
-@dataclass
-class Fallergebnis:
-    """Was der Nachweis fuer einen Lastfall gefunden hat."""
+@dataclass(frozen=True)
+class _Analysezustand(Stahlzustand):
+    """Dazu der Querschnitt nach der Wahl und je Stab seine Angaben."""
 
-    fall: Lastfall
-    ebene: Gebrauchsebene = KEINE
-    stab: int = 0
-    """Der massgebende Stab: der gezogene mit dem kleinsten Erfuellungsgrad."""
-
-    eps_s: float = 0.0
-    sigma_s: float = 0.0
-    E_s: float = 0.0
-    eps_y: float = 0.0
-    erfuellungsgrad: float = 0.0
-    erfuellt: bool = False
-    vergleich: Optional[Vergleich] = None
-    """Fehlt nur, wenn sich keine Gleichgewichtslage fand."""
-
-    begruendung: str = ""
-    hinweis: str = ""
-
-    @property
-    def fliesst(self) -> bool:
-        return self.eps_s > self.eps_y
+    querschnitt: Querschnitt
+    staebe: Tuple[Stabangabe, ...]
 
 
-class SpannungsbegrenzungQA(Nachweis):
+class AnalyseStellen(Stahlspannungsort):
     """
-    Die Stahlspannung je Lastfall gegen ihre Grenze -- aus der Rissbreite
-    oder gegen das Fliessen, je nach ``grenze``. Ein Urteil je Lastfall.
+    Der gezeichnete Querschnitt fuer die Stahlspannung
+    (:class:`~opencivil.nachweis.spannungsbegrenzung.Spannungsbegrenzung`):
+    Stellen sind seine Staebe, und jeder gezogene haelt gegen seine eigene
+    Grenze (siehe Dateikopf). Die Ebene eines Lastfalls traegt N, M_y und M_z
+    mit gedrehter Nulllinie (:func:`~opencivil.nachweis.gebrauchsebene.gebrauchsebene`);
+    «einachsig» bleibt sie waagrecht.
     """
 
-    @property
-    def thema(self) -> str:
-        return self.grenze.thema
+    messung = ("Gerechnet wird am gerissenen Querschnitt: der Beton nimmt keinen "
+               "Zug auf, die Bewehrung wirkt auf Zug und auf Druck. Jeder gezogene "
+               "Stab hält gegen seine Grenze; massgebend ist der mit dem kleinsten "
+               "Erfüllungsgrad.")
+    regel_der_rissbreite = GRENZE_JE_STAB
 
-    @property
-    def langname(self) -> str:
-        return self.grenze.langname
-
-    def __init__(self, analyse: Querschnittsanalyse, faelle: Sequence[Lastfall], *,
-                 grenze: Type[Spannungsgrenze], anforderung: Rissanforderung,
-                 wahl: Rechenwahl = VORGABE, einachsig: bool = False) -> None:
-        if not faelle:
-            raise ValueError("Ohne Lastfall gibt es nichts zu begrenzen.")
+    def __init__(self, analyse: Querschnittsanalyse) -> None:
         self.analyse = analyse
-        self.faelle = list(faelle)
-        self.grenze = grenze
-        self.anforderung = anforderung
-        self.wahl = wahl
-        self.einachsig = einachsig
-        basis = f"{analyse.id}.nachweis.{grenze.idteil}"
-        self.d_ausnutzung: Dict[str, WertDef] = {
-            f.name: grad_def(f"{basis}.{f.kennung}.erfuellungsgrad",
-                             rf"\alpha_{{eff,{grenze.symbolteil},{als_text(f.name)}}}",
-                             f"Erfüllungsgrad {grenze.thema} – {f.name}", grenze.referenz)
-            for f in self.faelle}
-        super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()),
-                         bezuege=analyse.grundbezuege(),
-                         titel=f"Stahlspannung unter {grenze.einwirkung} Einwirkung – "
-                               f"{analyse.name}",
-                         referenz=grenze.referenz, abschnitt=analyse.abschnitt)
+        self.name = analyse.name
+        self.abschnitt = analyse.abschnitt
 
-    # -- Rechnen ------------------------------------------------------------
+    def basis(self, grenze: Type[Spannungsgrenze]) -> str:
+        return f"{self.analyse.id}.nachweis.{grenze.idteil}"
 
-    def pruefe(self, e: Eingaben, p: Protokoll):
+    def bezuege(self, wahl: Rechenwahl) -> List[Eingabebezug]:
+        return self.analyse.grundbezuege()
+
+    def zustand(self, e: Eingaben, wahl: Rechenwahl) -> _Analysezustand:
         a = self.analyse
-        q, herkunft, _ = a.querschnitt(e.si_nach_id(), self.wahl)
-        staebe = stabangaben(a, q, herkunft)
-        grenzen = (grenzen_gegen_fliessen(a, e, staebe) if self.grenze is GrenzeGegenFliessen
-                   else grenzen_aus_rissbreite(a, e, staebe, self.anforderung))
-        self._protokoll_ansatz(p, e, staebe, grenzen)
+        q, herkunft, _ = a.querschnitt(e.si_nach_id(), wahl)
+        staebe = tuple(stabangaben(a, q, herkunft))
+        stellen = []
+        for s in staebe:
+            E_s = a.kennwert(e, s.stahl, "E_s")
+            stellen.append(Stelle(stahl=s.stahl, E_s=E_s,
+                                  eps_y=abs(a.kennwert(e, s.stahl, wahl.satz.stahl)) / E_s))
+        return _Analysezustand(
+            stellen=tuple(stellen), staehle=tuple({s.stahl.id: s.stahl for s in staebe}.values()),
+            querschnitt=q, staebe=staebe)
 
-        ergebnis: Dict[str, Groesse] = {}
-        urteile: List[NachweisUrteil] = []
-        for fall in self.faelle:
-            # Ausgeschaltete Lastfaelle rechnen mit und schweigen dabei.
-            leise = self.leise(fall.name)
-            erg = self._einen_fall(e, q, staebe, grenzen, fall)
-            if not leise:
-                self._protokoll_fall(p, e, staebe, grenzen, erg)
-            ergebnis[self.d_ausnutzung[fall.name].id] = Groesse(erg.erfuellungsgrad,
-                                                                EINHEITSLOS)
-            urteile.append(self._urteil(erg, still=leise))
-        return Ausfuehrung(ergebnis, urteile)
+    def aus_rissbreite(self, zustand: _Analysezustand, e: Eingaben, p: Protokoll,
+                       anforderung: Rissanforderung, basis: str) -> Grenzen:
+        grenzen = grenzen_aus_rissbreite(self.analyse, e, zustand.staebe, anforderung)
+        protokoll_rissbreitengrenzen(p, e, self.analyse, zustand.staebe, grenzen, anforderung,
+                                     basis, referenz=GrenzeAusRissbreite.referenz)
+        return grenzen
 
-    def _einen_fall(self, e: Eingaben, q: Querschnitt, staebe: Sequence[Stabangabe],
-                    grenzen: Grenzen, fall: Lastfall) -> Fallergebnis:
-        erg = Fallergebnis(fall=fall)
-        if not staebe:
-            erg.begruendung = erg.hinweis = "Ohne Bewehrung gibt es keine Stahlspannung."
-            return erg
-        erg.ebene = ebene = gebrauchsebene(q, N=fall.N, M_y=fall.M_y, M_z=fall.M_z,
-                                           einachsig=self.einachsig)
-        if not ebene.konvergiert:
-            erg.begruendung = erg.hinweis = (
-                self.wahl.art.ohne_ebene if ebene.verfehlt else
-                f"Keine Dehnungsebene für N = {fall.N / 1e3:.1f} kN, "
+    def ebene(self, zustand: _Analysezustand, fall: Lastfall) -> Gebrauchsebene:
+        return gebrauchsebene(zustand.querschnitt, N=fall.N, M_y=fall.M_y, M_z=fall.M_z,
+                              einachsig=self.analyse.einachsig)
+
+    def keine_ebene(self, fall: Lastfall) -> str:
+        return (f"Keine Dehnungsebene für N = {fall.N / 1e3:.1f} kN, "
                 f"M_y = {fall.M_y / 1e3:.1f} kNm"
-                + ("" if self.einachsig else f", M_z = {fall.M_z / 1e3:.1f} kNm")
+                + ("" if self.analyse.einachsig else f", M_z = {fall.M_z / 1e3:.1f} kNm")
                 + " → nicht aufnehmbar.")
-            return erg
 
-        # Gemessen an der Dehnung, wie bei der Platte: auf dem Plateau haben
-        # mehrere Staebe dieselbe Spannung, aber nur einer ist am weitesten
-        # gedehnt. Ohne gezogenen Stab steht die strengste Grenze da.
-        E_s = [self.analyse.kennwert(e, s.stahl, "E_s") for s in staebe]
-        gezogen = [(grenzen.sigma(i) / (E_s[i] * eps), -eps, i)
-                   for i, eps in enumerate(ebene.eps_s) if eps > 0.0]
-        i = erg.stab = min(gezogen)[2] if gezogen else grenzen.strengste
-        erg.E_s = E_s[i]
-        erg.eps_s = ebene.eps_s[i] if gezogen else 0.0
-        erg.sigma_s = ebene.sigma_s[i] if gezogen else 0.0
-        erg.eps_y = abs(self.analyse.kennwert(e, staebe[i].stahl,
-                                              self.wahl.satz.stahl)) / erg.E_s
-        gedehnt = erg.E_s * erg.eps_s
-        erg.erfuellungsgrad = math.inf if gedehnt <= 0.0 else grenzen.sigma(i) / gedehnt
-        erg.erfuellt = gedehnt <= grenzen.sigma(i)
-        erg.vergleich = self._vergleich(erg, grenzen)
-        erg.begruendung = f"{staebe[i].element.name}: {erg.vergleich.satz}"
-        return erg
+    def begruendung(self, zustand: _Analysezustand, erg: Fallergebnis) -> str:
+        return f"{zustand.staebe[erg.stelle].element.name}: {erg.vergleich.satz}"
 
-    def _vergleich(self, erg: Fallergebnis, grenzen: Grenzen) -> Vergleich:
-        """Spannungen oder Dehnungen -- die eine Stelle, die das entscheidet."""
-        werte = Zwischenwerte(f"{self.id}.{erg.fall.kennung}")
-        gruppe = grenzen.gruppe(erg.stab)
-        if erg.fliesst:
-            eps_adm = gruppe.sigma / erg.E_s
-            return Vergleich(
-                einwirkung=werte.dehnung("eps_s", r"\varepsilon_s", erg.eps_s, "Einwirkung"),
-                widerstand=werte.dehnung("eps_s_adm", r"\varepsilon_{s,adm}", eps_adm,
-                                         "Widerstand"),
-                satz=(f"Stahl fliesst (ε_s = {erg.eps_s * 1e3:.2f} ‰ > ε_y = "
-                      f"{erg.eps_y * 1e3:.2f} ‰): ε_s {'≤' if erg.erfuellt else '>'} "
-                      f"ε_s,adm = {eps_adm * 1e3:.2f} ‰."))
-        return Vergleich(
-            einwirkung=werte.spannung("sigma_s", r"\sigma_s", erg.sigma_s, "Einwirkung"),
-            widerstand=gruppe.wert,
-            satz=(f"σ_s = {erg.sigma_s / 1e6:.0f} N/mm² {'≤' if erg.erfuellt else '>'} "
-                  f"σ_s,adm = {gruppe.sigma / 1e6:.0f} N/mm²."))
+    def dehnungsgrenze(self, basis: str, werte: Zwischenwerte, erg: Fallergebnis) -> Wert:
+        return werte.dehnung("eps_s_adm", r"\varepsilon_{s,adm}", erg.eps_s_adm, "Widerstand")
 
-    def _urteil(self, erg: Fallergebnis, *, still: bool) -> NachweisUrteil:
-        vergleich = erg.vergleich
-        return NachweisUrteil(
-            art=self.grenze.art, ziel=self.d_ausnutzung[erg.fall.name].id,
-            fall=erg.fall.name, erfuellt=erg.erfuellt,
-            erfuellungsgrad=Groesse(erg.erfuellungsgrad, EINHEITSLOS),
-            begruendung=erg.begruendung, hinweis=erg.hinweis,
-            einwirkung=vergleich.einwirkung if vergleich else None,
-            widerstand=vergleich.widerstand if vergleich else None, still=still)
+    def protokoll_gesetze(self, p: Protokoll, e: Eingaben, zustand: _Analysezustand,
+                          wahl: Rechenwahl, basis: str) -> None:
+        protokoll_gesetze_nach_wahl(p, e, self.analyse, wahl, basis,
+                                    titel="Werkstoffgesetze im Gebrauchszustand")
 
-    # -- Mitschrift ---------------------------------------------------------
-
-    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, staebe: Sequence[Stabangabe],
-                          grenzen: Grenzen) -> None:
-        g = self.grenze
-        p.titel(f"Stahlspannung unter {g.einwirkung} Einwirkung")
-        p.erklaerung(
-            f"{g.einleitung} Gerechnet wird am gerissenen Querschnitt: der Beton nimmt "
-            f"keinen Zug auf, die Bewehrung wirkt auf Zug und auf Druck. Jeder gezogene "
-            f"Stab hält gegen seine Grenze; massgebend ist der mit dem kleinsten "
-            f"Erfüllungsgrad.")
-        protokoll_rechenwahl(p, self.wahl, self.id)
-        if g is GrenzeGegenFliessen:
-            protokoll_fliessgrenzen(p, e, self.analyse, grenzen, self.id)
-        else:
-            protokoll_rissbreitengrenzen(p, e, self.analyse, staebe, grenzen,
-                                         self.anforderung, self.id, referenz=g.referenz)
-        protokoll_festlegungen(p, self.wahl)
-        protokoll_gesetze_nach_wahl(p, e, self.analyse, self.wahl, self.id,
-                          titel="Werkstoffgesetze im Gebrauchszustand")
-        if g is GrenzeGegenFliessen:
-            g.festlegung(p)
-        else:
-            p.erklaerung("Drittens die Grenze: dieselbe wie bei der Zwängung, mit f_yk "
-                         "und bei erhöhter und hoher Anforderung zusätzlich begrenzt durch "
-                         f"die Rissbreite. {GRENZE_JE_STAB}")
-        p.erklaerung(VERGLEICH_BEIM_FLIESSEN)
-        p.titel("Wie die Dehnungsebene gefunden wird", ebene=3)
+    def protokoll_verfahren(self, p: Protokoll, zustand: _Analysezustand,
+                            wahl: Rechenwahl) -> None:
         protokoll_dehnungsebene(p)
-        p.erklaerung(EINACHSIG if self.einachsig else SUCHE_DER_EBENE)
+        p.erklaerung(EINACHSIG if self.analyse.einachsig else SUCHE_DER_EBENE)
         p.erklaerung(VERFEHLTE_EBENE)
 
-    def _protokoll_fall(self, p: Protokoll, e: Eingaben, staebe: Sequence[Stabangabe],
-                        grenzen: Grenzen, erg: Fallergebnis) -> None:
-        fall = erg.fall
-        index = self.grenze.lastindex
-        p.titel(f"{self.grenze.fallwort} – {fall.name}", ebene=3)
+    def protokoll_einwirkung(self, p: Protokoll, fall: Lastfall, index: str) -> None:
         teile = [rf"N_{{Ed,{index}}} = {fest(fall.N / 1e3, 1)}\ \mathrm{{kN}}",
                  rf"M_{{y,Ed,{index}}} = {fest(fall.M_y / 1e3, 1)}\ \mathrm{{kNm}}"]
-        if not self.einachsig:
+        if not self.analyse.einachsig:
             teile.append(rf"M_{{z,Ed,{index}}} = {fest(fall.M_z / 1e3, 1)}\ \mathrm{{kNm}}")
         p.gleichung(r" \qquad ".join(teile), titel="Einwirkung")
-        if erg.vergleich is None:
-            p.text(erg.begruendung)
-            return
 
-        werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
-        protokoll_ebene(p, werte, erg.ebene, self.einachsig)
+    def protokoll_ebene(self, p: Protokoll, werte: Zwischenwerte, zustand: _Analysezustand,
+                        grenzen: Grenzen, erg: Fallergebnis) -> None:
+        protokoll_ebene(p, werte, erg.ebene, self.analyse.einachsig)
         if erg.eps_s <= 0.0:
             p.text("Kein Stab ist gezogen – es gibt keine Zugspannung zu begrenzen.")
-        else:
-            self._tabelle_gezogen(p, staebe, grenzen, erg.ebene)
-            p.text(f"Massgebend: {staebe[erg.stab].ort}.")
-        wirkt, grenze = erg.vergleich.einwirkung, erg.vergleich.widerstand
-        if erg.fliesst:
-            stahl = staebe[erg.stab].stahl
-            E_s = e[self.analyse._name(stahl, "E_s")]
-            p.text(f"Stahl fliesst (σ_s = {erg.sigma_s / 1e6:.0f} N/mm²) → "
-                   f"Vergleich über die Dehnung.")
-            p.formel(werte.dehnung("eps_y", r"\varepsilon_y", erg.eps_y),
-                     r"\frac{@f_s}{@E_s}",
-                     {"f_s": e[self.analyse._name(stahl, self.wahl.satz.stahl)], "E_s": E_s},
-                     titel="Grösste Zugdehnung in der Bewehrung", name=FLIESSDEHNUNG,
-                     nachsatz=rf"\quad < \quad {angabe(wirkt)}")
-            p.formel(grenze, r"\frac{@sigma}{@E_s}",
-                     {"sigma": grenzen.gruppe(erg.stab).wert, "E_s": E_s},
-                     titel="Zulässige Dehnung",
-                     nachsatz=vergleich(r"\ge", angabe(wirkt), erg.erfuellt))
-        else:
-            p.gleichung(bedingung(angabe(wirkt), r"\le", angabe(grenze), erg.erfuellt),
-                        titel="Grösste Zugspannung in der Bewehrung")
-        grad_formel(p, self.d_ausnutzung[fall.name], erg.erfuellungsgrad, grenze, wirkt,
-                    erg.erfuellt)
+            return
+        _tabelle_gezogen(p, zustand.staebe, grenzen, erg.ebene)
+        p.text(f"Massgebend: {zustand.staebe[erg.stelle].ort}.")
 
-    @staticmethod
-    def _tabelle_gezogen(p: Protokoll, staebe: Sequence[Stabangabe], grenzen: Grenzen,
-                         ebene: Gebrauchsebene) -> None:
-        """
-        Je Element mit gezogenen Staeben der unguenstigste: Dehnung, Spannung,
-        Grenze -- bei einer verschmierten Linie das Stueck, das seiner Grenze
-        am naechsten kommt.
-        """
-        je_element: Dict[str, int] = {}
-        for i, eps in enumerate(ebene.eps_s):
-            if eps <= 0.0:
-                continue
-            kennung = staebe[i].element.kennung
-            bisher = je_element.get(kennung)
-            if bisher is None or (ebene.sigma_s[i] / grenzen.sigma(i)
-                                  > ebene.sigma_s[bisher] / grenzen.sigma(bisher)):
-                je_element[kennung] = i
-        zeilen = [[staebe[i].element.name, Mathe(fest(ebene.eps_s[i] * 1e3, 3)),
-                   Mathe(fest(ebene.sigma_s[i] / 1e6, 0)),
-                   Mathe(fest(grenzen.sigma(i) / 1e6, 0))]
-                  for i in je_element.values()]
-        p.tabelle(kopf=["Element", Mathe(r"\varepsilon_s\ [‰]"),
-                        Mathe(r"\sigma_s\ [\mathrm{N/mm^2}]"),
-                        Mathe(r"\sigma_{s,adm}\ [\mathrm{N/mm^2}]")],
-                  zeilen=zeilen, titel="Gezogene Bewehrung, je Element der ungünstigste Stab",
-                  ausrichtung="lrrr")
+
+def _tabelle_gezogen(p: Protokoll, staebe: Sequence[Stabangabe], grenzen: Grenzen,
+                     ebene: Gebrauchsebene) -> None:
+    """
+    Je Element mit gezogenen Staeben der unguenstigste: Dehnung, Spannung,
+    Grenze -- bei einer verschmierten Linie das Stueck, das seiner Grenze
+    am naechsten kommt.
+    """
+    je_element: Dict[str, int] = {}
+    for i, eps in enumerate(ebene.eps_s):
+        if eps <= 0.0:
+            continue
+        kennung = staebe[i].element.kennung
+        bisher = je_element.get(kennung)
+        if bisher is None or (ebene.sigma_s[i] / grenzen.sigma(i)
+                              > ebene.sigma_s[bisher] / grenzen.sigma(bisher)):
+            je_element[kennung] = i
+    zeilen = [[staebe[i].element.name, Mathe(fest(ebene.eps_s[i] * 1e3, 3)),
+               Mathe(fest(ebene.sigma_s[i] / 1e6, 0)),
+               Mathe(fest(grenzen.sigma(i) / 1e6, 0))]
+              for i in je_element.values()]
+    p.tabelle(kopf=["Element", Mathe(r"\varepsilon_s\ [‰]"),
+                    Mathe(r"\sigma_s\ [\mathrm{N/mm^2}]"),
+                    Mathe(r"\sigma_{s,adm}\ [\mathrm{N/mm^2}]")],
+              zeilen=zeilen, titel="Gezogene Bewehrung, je Element der ungünstigste Stab",
+              ausrichtung="lrrr")
 
 
 # ===========================================================================
@@ -425,7 +299,7 @@ class RissnormalkraftQA(Nachweis):
         for nummer, gruppe in enumerate(grenzen.gruppen, start=1):
             A_s = werte.flaeche(f"A_s{nummer}" if mehrere else "A_s",
                                 rf"A_{{s,{nummer}}}" if mehrere else "A_s",
-                                sum(staebe[i].flaeche for i in gruppe.staebe))
+                                sum(staebe[i].flaeche for i in gruppe.stellen))
             glieder.append((A_s, gruppe.wert))
         N_s_adm_si = sum(A.groesse.si * s.groesse.si for A, s in glieder)
         N_s_adm = werte.kraft("N_s_adm", r"N_{s,adm}", N_s_adm_si, "Widerstand")
