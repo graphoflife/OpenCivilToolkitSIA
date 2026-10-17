@@ -44,6 +44,49 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-17 · Prüfen nach Regel, Wahlfelder als Wahl
+
+Phase 2 des Umbaus aus der Durchsicht vom 2026-10-16, in elf Commits. Keine
+Zahl ändert sich (Werteabdruck nach jedem Schritt), und die Dateien bleiben
+Zeichen für Zeichen gleich.
+
+- **Ein Wahlfeld hält sein Mitglied** (`core/wahl.py`,
+  `lesen.wahl_aus_text`). Zwölf Wahlen erben von `Wahl`, einem `StrEnum`,
+  das sich als sein Text ausgibt und einen unbekannten Text mit den
+  möglichen nennt. Text in einem Wahlfeld wird beim Lesen, im Konstruktor
+  und bei jeder Zuweisung zum Mitglied (`Beschreibung.__setattr__`);
+  `json.dumps` schreibt den Wert. Warum: rund dreissig Stellen verwandelten
+  den Text zurück (`Rissanforderung(…)` elfmal, `Rechenwahl.aus` viermal),
+  und neun Tupel hielten die Werte ein zweites Mal. Welche Rechenarten ein
+  Kapitel anbietet, steht am Feld seiner Unterklasse (`Gebrauchswahl`,
+  `KnickVerformungswahl` …) statt in fünf Aufrufen von `pruefen(wo, arten)`.
+- **Die Fassade liest wie eine Datei.** Was als Stichwort an
+  `Projekt.platte`, `analyse`, `balkensystem` und `grundbruch` geht, liest
+  `lesen` mit dem frischen Eintrag als Grundlage; ein Teil darf als Eintrag
+  oder als seine Felder kommen. Die zweite Fassung von «Gemeint ist
+  vielleicht …» fällt weg.
+- **Form beim Lesen, Inhalt vor dem Rechnen** (`lesen.bereich`,
+  `lesen.inhalt_pruefen`). Beim Öffnen zählt die Form: Typ, Wahl, Pflicht,
+  eine Kennung je Eintrag, die Sorte eines Materials. Wo eine Zahl liegen
+  muss, steht an ihrem Feld -- `bereich(300.0, heisst="Dicke h",
+  einheit=MM, ueber=0.0)`; was mehrere Felder betrifft, in `regeln(wo)` des
+  Eintrags. Beides prüft `inhalt_pruefen` vor jedem Rechnen über das ganze
+  Projekt, mit dem Ort am Feld. Warum: geprüft wurde zu drei Zeitpunkten
+  ohne Regel -- ein Anteil null hielt das Öffnen auf, eine Dicke null erst
+  das Rechnen, eine negative Kriechzahl das Lesen, eine negative Überdeckung
+  das Bauen --, dazu in fünf Formen von `pruefen`. Ein abgelegter Stand mit
+  einem Fehler im Inhalt soll sich öffnen und korrigieren lassen; seit 1d
+  galt das schon für gleiche Namen.
+- **Dabei neu gemeldet:** k_c und α der Platte gelten auch ohne Bügel; ein
+  negativer Bügeldurchmesser hiess still «keine Bügel»; die Posten der
+  Obergrenze der Suche werden vor jedem Rechnen geprüft. Die Felder, die
+  Platte und gezeichneter Querschnitt teilen, stehen einmal (`neigung`,
+  `druckfeld`, `x_d_grenze`).
+- **Die Suche prüft vorab** (`bewehrungssuche.vorab_pruefen`). Eine
+  unmögliche Platte endete in der Bewertung als «nicht gefunden», weil dort
+  jede Ausnahme ein Nein wird. Gebaut wird vorab nicht: eine Platte ohne
+  Bewehrung darf gesucht werden.
+
 ## 2026-10-17 · Vier Fehler aus der Durchsicht behoben
 
 Die Durchsicht vom 2026-10-16 fand vier Fehler mit sichtbarer Folge. Jeder

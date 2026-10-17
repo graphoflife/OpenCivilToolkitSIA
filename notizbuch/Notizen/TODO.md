@@ -70,11 +70,11 @@ gelernt wurde, steht in [[Entwicklung]].
 ## Umbau: Befunde der Durchsicht vom 2026-10-16
 
 Sechs Durchsichten über die Arbeit vom 15. und 16. Oktober (42 Commits);
-jeder Punkt ist am Code nachgeprüft. Die vier Fehler mit Folge sind behoben
-(2026-10-17, siehe [[Entwicklung]]); hier steht der Umbau in der empfohlenen
-Reihenfolge. Der Plan dazu: Phase 2 Prüfen und Wahlfelder, Phase 3 Platte
-und Querschnitt als ein Nachweis, Phase 4 Löser und Kennzahlen, Phase 5
-Oberfläche.
+jeder Punkt ist am Code nachgeprüft. Die vier Fehler mit Folge sind behoben,
+ebenso Phase 2, Prüfen und Wahlfelder (2026-10-17, siehe [[Entwicklung]]);
+hier steht der Umbau in der empfohlenen Reihenfolge. Der Plan dazu: Phase 3
+Platte und Querschnitt als ein Nachweis, Phase 4 Löser und Kennzahlen,
+Phase 5 Oberfläche.
 
 - [ ] **Platte und gezeichneter Querschnitt: ein Nachweis, zwei
       Geometrien.** Heute gibt es zwei Umsetzungen:
@@ -101,22 +101,6 @@ Oberfläche.
         Die 500 mm bleiben ein Schalter.
       - Platte: die Handformel d − x/3 der Zwängung auf Biegung bleibt, ebenso
         die Zwängung auf Normalkraft je Lage.
-- [ ] **Form beim Lesen, Inhalt vor dem Rechnen.** Heute wird zu drei
-      Zeitpunkten ohne Regel geprüft:
-      - `haeufig.anteil = 0` hält das Öffnen auf, `x_d_max = 0.9` und
-        `h = 0` erst das Rechnen.
-      - «Nicht negativ» gilt bei der Kriechzahl beim Lesen, bei der
-        Überdeckung beim Bauen.
-      - Es gibt fünf Formen von `pruefen` und zwei von `zahlen_pruefen`.
-
-      Besser: Bereiche am Feld (`bereich(…, ueber=0, bis=…)` statt
-      `nicht_negativ`), eine `inhalt_pruefen` vor dem Rechnen, und je Eintrag
-      nur noch die Regeln über mehrere Felder.
-- [ ] **Wahlfelder als Enum statt als Text.** Rund dreissig Stellen machen
-      aus dem Text wieder das Mitglied (`Rissanforderung(…)` 11×,
-      `Rechenwahl.aus` 4×, …), und neun Tupel wie `WERKSTOFFSAETZE` halten die
-      Werte. Besser: Der Leser kennt Enums, und die Teilmengen je Kapitel
-      stehen am Feld einer Unterklasse.
 - [ ] **Die Werkstoffgesetze an einer Stelle anschreiben.** Vier Stellen
       schreiben sie in die Herleitung, jede mit eigener Weiche (`isinstance`,
       `art is ELASTISCH`, `mit_block`): `rechenwahl.protokoll_gesetze`,
@@ -199,6 +183,10 @@ Oberfläche.
         Kinder.
       - Die Pakete laden über vier Schichten, obwohl Pyodide es selbst kann
         (`loadPackagesFromImports`). Das ändert eine mitgelieferte Datei.
+      - Eine Meldung nennt ihren Ort mit den Feldern der Datei («Platte
+        'Decke', lagen 2, grund: …»), nicht mit den Wörtern der Maske
+        («2. Lage, Grundbewehrung»). Gehen könnte das mit einer Bezeichnung
+        je Feld, wie sie der Katalog in Phase 5 ohnehin bekommt.
 
 ## Umbau: Befunde der Strukturdurchsicht (2026-10-12)
 
