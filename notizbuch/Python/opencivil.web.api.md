@@ -1,5 +1,5 @@
 ---
-erzeugt: b7470c52ecb0
+erzeugt: edbed3bb9cfa
 art: modul
 tags: [modul]
 ---
@@ -28,22 +28,6 @@ def _rechenarten(arten) -> list
 ```
 
 Die Rechenarten mit Beschriftung -- und ob die Kriechzahl bei ihnen wirkt.
-
-### endlich
-
-```python
-def endlich(daten: Any) -> Any
-```
-
-Ersetzt unendliche und undefinierte Zahlen durch `None`.
-
-`json.dumps` schreibt dafuer sonst `Infinity` bzw. `NaN` -- eine
-Erweiterung, die Python selbst wieder liest, `JSON.parse` im Browser aber
-ablehnt. Die Antwort kaeme mit Status 200 an und waere dennoch unbrauchbar.
-
-Solche Werte entstehen ganz regulaer: ein Erfuellungsgrad ist unendlich,
-wenn die Einwirkung null ist. In JSON wird daraus `null`, und die
-Oberflaeche zeigt dafuer das Unendlichkeitszeichen.
 
 ### katalog
 
@@ -169,6 +153,7 @@ Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks.
 - [[opencivil.web.balkendaten]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.grundbruchdaten]]
+- [[opencivil.web.umschlag]]
 
 ## Gebraucht von
 

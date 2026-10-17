@@ -90,6 +90,8 @@ export async function abbrechen() {
   if (!faden) return;
   const alt = faden;
   faden = null;
+  // Was lief, ist vorbei -- auch wenn seine Antwort nie mehr kommt.
+  konsole.stand = '';
   konsole.variablen = [];
   melden({ art: 'hinweis', text: 'Abgebrochen. Die Sitzung beginnt neu, die Variablen sind weg.' });
   try {

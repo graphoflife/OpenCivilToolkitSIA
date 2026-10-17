@@ -2752,6 +2752,9 @@
         "_als_kategorien",
         "_folge",
         "_zahl",
+        "_angegeben",
+        "_eigenschaft",
+        "_name",
         "_zahl_oder_luecke",
         "_farbe"
       ]
@@ -4371,7 +4374,6 @@
       "kurz": "Uebersetzung der Rechenergebnisse nach JSON.",
       "stichworte": [
         "_rechenarten",
-        "endlich",
         "katalog",
         "obergrenzen",
         "wert_dict",
@@ -4482,7 +4484,6 @@
         "vorlage",
         "vorlage_einsetzen",
         "bearbeite",
-        "nach_json",
         "bearbeite_json"
       ]
     },
@@ -4524,6 +4525,18 @@
         "Ergebnisspeicher.aufraeumen",
         "Ergebnisspeicher.leeren",
         "Ergebnisspeicher.belegt"
+      ]
+    },
+    {
+      "name": "opencivil.web.umschlag",
+      "pfad": "Python/opencivil.web.umschlag.md",
+      "art": "modul",
+      "kurz": "wie eine Antwort an die Oberfläche verpackt wird.",
+      "stichworte": [
+        "endlich",
+        "nach_json",
+        "fehlerdaten",
+        "umschlag"
       ]
     },
     {

@@ -81,7 +81,16 @@ export function kernStarten(fortschritt = () => {}, { modul = 'opencivil.web.die
       anfrage.ablehnen(new KernFehler(`Rechenkern abgebrochen: ${absturz}`, absturz));
       return;
     }
-    const umschlag = JSON.parse(roh);
+    let umschlag;
+    try {
+      umschlag = JSON.parse(roh);
+    } catch (fehler) {
+      // Wer wartet, hört den Grund -- die Anfrage ist schon aus `offen`
+      // genommen, und ohne Antwort hinge sie für immer (bis 2026-10-17 die
+      // Konsole, bei einer NaN in einem Bild).
+      anfrage.ablehnen(new KernFehler(`Antwort des Rechenkerns unlesbar: ${fehler.message}`));
+      return;
+    }
     if (umschlag.status >= 400) {
       anfrage.ablehnen(new KernFehler(
         umschlag.daten.fehler || `Fehler ${umschlag.status}`, umschlag.daten.spur));

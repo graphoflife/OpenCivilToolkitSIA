@@ -1,5 +1,5 @@
 ---
-erzeugt: 3f20e931d580
+erzeugt: f3448508f3f9
 art: modul
 tags: [modul]
 ---
@@ -225,6 +225,32 @@ def _zahl(v: Any, befehl: str, name: str) -> float
 ```
 
 Eine endliche Zahl -- unendlich liesse sich nicht zeichnen.
+
+### _angegeben
+
+```python
+def _angegeben(*werte: Any) -> Any
+```
+
+Der erste angegebene Wert -- `0` ist angegeben, `None` nicht (`lw=0` ist keine Linie).
+
+### _eigenschaft
+
+```python
+def _eigenschaft(v: Any, befehl: str, name: str, *, ab: Optional[float]=None, ueber: Optional[float]=None, bis: Optional[float]=None) -> Optional[float]
+```
+
+Breite, Grösse oder Deckung: eine endliche Zahl in ihrem Bereich, `None`
+heisst nicht angegeben. Bis 2026-10-17 gingen diese ungeprüft durch, und
+ein `nan` hielt die Konsole an ([[opencivil.web.umschlag]]).
+
+### _name
+
+```python
+def _name(label: Any) -> Optional[str]
+```
+
+Der Name einer Reihe für die Legende -- als Text, wie matplotlib ihn schreibt.
 
 ### _zahl_oder_luecke
 

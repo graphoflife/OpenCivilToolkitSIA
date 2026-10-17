@@ -63,6 +63,7 @@ from opencivil.spannungsanalyse import Analyseart
 from opencivil.stabwerk import querschnitte as stabquerschnitte
 from opencivil.stabwerk.modell import Lastart, Lastrichtung
 from opencivil.web import balkendaten, diagrammdaten, grundbruchdaten
+from opencivil.web.umschlag import endlich
 
 #: Die Wertesaetze und Betongesetze mit Beschriftung -- dieselben in der
 #: Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse. ``kurz`` fuer
@@ -83,27 +84,6 @@ def _rechenarten(arten) -> list:
     """Die Rechenarten mit Beschriftung -- und ob die Kriechzahl bei ihnen wirkt."""
     return [{"wert": a.value, "beschriftung": a.beschriftung, "kurz": a.kurz,
              "mit_kriechzahl": a.mit_kriechzahl} for a in arten]
-
-
-def endlich(daten: Any) -> Any:
-    """
-    Ersetzt unendliche und undefinierte Zahlen durch ``None``.
-
-    ``json.dumps`` schreibt dafuer sonst ``Infinity`` bzw. ``NaN`` -- eine
-    Erweiterung, die Python selbst wieder liest, ``JSON.parse`` im Browser aber
-    ablehnt. Die Antwort kaeme mit Status 200 an und waere dennoch unbrauchbar.
-
-    Solche Werte entstehen ganz regulaer: ein Erfuellungsgrad ist unendlich,
-    wenn die Einwirkung null ist. In JSON wird daraus ``null``, und die
-    Oberflaeche zeigt dafuer das Unendlichkeitszeichen.
-    """
-    if isinstance(daten, float):
-        return daten if math.isfinite(daten) else None
-    if isinstance(daten, dict):
-        return {k: endlich(v) for k, v in daten.items()}
-    if isinstance(daten, (list, tuple)):
-        return [endlich(v) for v in daten]
-    return daten
 
 
 # ===========================================================================

@@ -17,7 +17,8 @@ ANFRAGEN:
     Leert den Namensraum.
 
 Asynchron, weil das Laden der Pakete im Browser wartet; der Faden wartet auf
-jede Antwort, beim Rechenkern auf eine fertige Zeichenkette.
+jede Antwort, beim Rechenkern auf eine fertige Zeichenkette. Verpackt wird
+wie beim Rechenkern (:mod:`opencivil.web.umschlag`).
 """
 
 from __future__ import annotations
@@ -28,6 +29,7 @@ from typing import Any, Dict
 
 from opencivil.konsole import pakete
 from opencivil.konsole.sitzung import Sitzung
+from opencivil.web.umschlag import fehlerdaten, umschlag
 
 SITZUNG = Sitzung()
 
@@ -47,11 +49,9 @@ async def bearbeite_json(name: str, rumpf: str) -> str:
             SITZUNG.zuruecksetzen()
             antwort = {}
         else:
-            return json.dumps({"status": 404, "daten": {
-                "fehler": f"Die Konsole kennt die Anfrage '{name}' nicht."}})
+            return umschlag(404, fehlerdaten(f"Die Konsole kennt die Anfrage '{name}' nicht."))
         antwort["variablen"] = SITZUNG.variablen()
-        return json.dumps({"status": 200, "daten": antwort}, ensure_ascii=False)
+        return umschlag(200, antwort)
     except Exception as fehler:  # noqa: BLE001 -- jede Panne wird eine Antwort
-        return json.dumps({"status": 500, "daten": {
-            "fehler": f"{type(fehler).__name__}: {fehler}",
-            "spur": traceback.format_exc()}})
+        return umschlag(500, fehlerdaten(f"{type(fehler).__name__}: {fehler}",
+                                         traceback.format_exc()))

@@ -1,5 +1,5 @@
 ---
-erzeugt: 263c58c8f612
+erzeugt: d1756685e1d1
 art: modul
 tags: [modul]
 ---
@@ -26,7 +26,8 @@ kommen die Ereignisse des Laufs und die Variablen danach.
 Leert den Namensraum.
 
 Asynchron, weil das Laden der Pakete im Browser wartet; der Faden wartet auf
-jede Antwort, beim Rechenkern auf eine fertige Zeichenkette.
+jede Antwort, beim Rechenkern auf eine fertige Zeichenkette. Verpackt wird
+wie beim Rechenkern ([[opencivil.web.umschlag]]).
 
 ## Inhalt
 
@@ -47,3 +48,4 @@ Eine Anfrage, als JSON hinein und hinaus -- Fehler kommen als Antwort, nie als A
 
 - [[opencivil.konsole.pakete]]
 - [[opencivil.konsole.sitzung]]
+- [[opencivil.web.umschlag]]

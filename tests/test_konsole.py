@@ -8,11 +8,14 @@ zeigt :func:`gebraucht`.
 
 import asyncio
 import json
+import subprocess
+import sys
 import unittest
 
 from opencivil.konsole import pakete, zeichnen
 from opencivil.konsole.dienst import bearbeite_json
 from opencivil.konsole.sitzung import Sitzung
+from opencivil.web.umschlag import umschlag
 
 try:
     import numpy
@@ -173,6 +176,11 @@ class TestZeichnen(unittest.TestCase):
                               ("plt.plot([1], 'q')", "Formatzeichen 'q'"),
                               ("plt.plot(['a', 1], [1, 2])", "mischt Namen und Zahlen"),
                               ("plt.axhline(float('inf'))", "endlich"),
+                              ("plt.plot([1, 2], lw=float('nan'))", "linewidth muss endlich"),
+                              ("plt.plot([1, 2], ms=-1)", "markersize darf nicht unter 0"),
+                              ("plt.plot([1, 2], alpha=2)", "alpha darf höchstens 1"),
+                              ("plt.scatter([1], [1], s=float('inf'))", "s muss endlich"),
+                              ("plt.bar(['a'], [1], width=0)", "width muss grösser als 0"),
                               ("plt.savefig('a.png')", "savefig gibt es hier nicht")):
             with self.subTest(code=code):
                 lauf = Sitzung().ausfuehren("import zeichnen as plt\n" + code)
@@ -217,6 +225,31 @@ class TestDienst(unittest.TestCase):
 
     def test_unbekannte_anfrage(self):
         self.assertEqual(self.frage("gibtesnicht")["status"], 404)
+
+    def test_jede_antwort_ist_strenges_json(self):
+        """
+        So streng, wie ``JSON.parse`` im Browser liest: kein ``NaN``. Bis
+        2026-10-17 kam ``plt.plot(…, lw=float("nan"))`` als ``"breite": NaN``
+        an, der Browser lehnte die Antwort ab, und die Konsole blieb stehen.
+        """
+        def streng(roh):
+            return json.loads(roh, parse_constant=lambda c: self.fail(f"{c} im JSON"))
+
+        for code in ("import zeichnen as plt\nplt.plot([1, 2], lw=float('nan'))",
+                     "import zeichnen as plt\nplt.plot([1, float('nan'), 3])",
+                     "x = float('nan')"):
+            with self.subTest(code=code):
+                streng(asyncio.run(bearbeite_json("ausfuehren", json.dumps({"code": code}))))
+        self.assertIsNone(streng(umschlag(200, {"x": float("nan")}))["daten"]["x"])
+        self.assertEqual(streng(umschlag(200, {"x": object()}))["status"], 500)
+
+    def test_die_konsole_laedt_den_rechenkern_nicht(self):
+        """Ihr Faden soll schnell bereit sein: der Umschlag kommt aus einem leichten Modul."""
+        geladen = subprocess.run(
+            [sys.executable, "-c", "import sys, opencivil.konsole.dienst; "
+                                   "print('opencivil.web.api' in sys.modules)"],
+            capture_output=True, text=True, check=True).stdout.strip()
+        self.assertEqual(geladen, "False")
 
 
 if __name__ == "__main__":

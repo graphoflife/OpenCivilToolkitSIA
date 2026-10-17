@@ -39,7 +39,7 @@ from opencivil.projekt import BAUTEILE, BalkensystemEintrag, Projekt, ProjektFeh
 from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.interaktion import GROESSEN
 from opencivil.web import api, balkendaten, diagrammdaten, speicher
-from opencivil.web.api import endlich
+from opencivil.web.umschlag import endlich, fehlerdaten, umschlag
 
 #: Das Gedaechtnis zwischen zwei Anfragen -- siehe :mod:`opencivil.web.speicher`.
 #: Im Modul und damit im Prozess: beim Server die laufende Sitzung, im Browser
@@ -593,20 +593,7 @@ def bearbeite(name: str, rumpf: Mapping[str, Any] | None = None) -> Antwort:
 
 
 def _fehler(status: int, meldung: str, spur: str = "") -> Antwort:
-    return Antwort({"fehler": meldung, "spur": spur}, status)
-
-
-def nach_json(daten: Any) -> str:
-    """
-    Wandelt eine Antwort in JSON.
-
-    ``allow_nan=False`` ist Absicht: ``json.dumps`` schriebe sonst ``Infinity``
-    und ``NaN``. Python liest das wieder, ``JSON.parse`` im Browser lehnt es ab
-    -- die Antwort kaeme heil an und waere trotzdem unbrauchbar. Lieber hier
-    laut scheitern als dort stumm. :func:`endlich` raeumt die Faelle vorher weg,
-    sodass der Riegel nur zuschlaegt, wenn wirklich etwas Neues auftaucht.
-    """
-    return json.dumps(endlich(daten), ensure_ascii=False, allow_nan=False)
+    return Antwort(fehlerdaten(meldung, spur), status)
 
 
 def bearbeite_json(name: str, rumpf_json: str = "{}") -> str:
@@ -630,4 +617,4 @@ def bearbeite_json(name: str, rumpf_json: str = "{}") -> str:
         else:
             antwort = bearbeite(name, rumpf)
 
-    return nach_json({"status": antwort.status, "daten": antwort.daten})
+    return umschlag(antwort.status, antwort.daten)

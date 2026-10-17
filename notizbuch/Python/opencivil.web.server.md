@@ -1,5 +1,5 @@
 ---
-erzeugt: 5ad7c5b90dc8
+erzeugt: 77108ef3ca82
 art: modul
 tags: [modul]
 ---
@@ -126,3 +126,4 @@ def starten(port: int=8080, adresse: str='127.0.0.1') -> None
 
 - [[opencivil.bericht.latex_dokument]]
 - [[opencivil.web.dienst]]
+- [[opencivil.web.umschlag]]

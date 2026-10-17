@@ -47,6 +47,7 @@ from urllib.parse import unquote, urlparse
 
 from opencivil.bericht.latex_dokument import finde_tex_maschine, uebersetze
 from opencivil.web import dienst
+from opencivil.web.umschlag import nach_json
 
 WURZEL = Path(__file__).resolve().parents[2]
 AUSGABE_ORDNER = WURZEL / "ausgabe"
@@ -150,7 +151,7 @@ class Handler(BaseHTTPRequestHandler):
     # -- Antworten ----------------------------------------------------------
 
     def _json(self, daten: Any, status: int = 200) -> None:
-        rumpf = dienst.nach_json(daten).encode("utf-8")
+        rumpf = nach_json(daten).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(rumpf)))

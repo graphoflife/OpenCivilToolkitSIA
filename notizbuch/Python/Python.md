@@ -1,5 +1,5 @@
 ---
-erzeugt: c0791561a46e
+erzeugt: 1245da0e06b5
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -109,3 +109,4 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.web.grundbruchdaten]] – was die Oberflaeche von einem Grundbruch zeichnet.
     - [[opencivil.web.server]] – Schlanker HTTP-Server fuer die Oberflaeche.
     - [[opencivil.web.speicher]] – was vom letzten Lauf noch gilt.
+    - [[opencivil.web.umschlag]] – wie eine Antwort an die Oberfläche verpackt wird.

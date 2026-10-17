@@ -138,28 +138,35 @@ def plot(*args: Any, label: Optional[str] = None, color: Optional[str] = None,
     Eine Linie: ``plot(y)``, ``plot(x, y)`` oder ``plot(x, y, "r--o")`` --
     mehrere Paare hintereinander geben mehrere Linien.
     """
+    breite = _eigenschaft(_angegeben(linewidth, lw), "plot", "linewidth", ab=0.0)
+    groesse = _eigenschaft(_angegeben(markersize, ms), "plot", "markersize", ab=0.0)
+    deckung = _eigenschaft(alpha, "plot", "alpha", ab=0.0, bis=1.0)
     for x, y, fmt in _paare(args, "plot"):
         farbe, strich, marke = _format(fmt)
-        _reihe("linie", x, y, name=label, farbe=_farbe(color or c) or farbe,
+        _reihe("linie", x, y, name=_name(label), farbe=_farbe(color or c) or farbe,
                strich=_strich(linestyle or ls, strich if fmt else "-"),
-               marke=_marke(marker, marke), breite=linewidth or lw,
-               groesse=markersize or ms, deckung=alpha, befehl="plot")
+               marke=_marke(marker, marke), breite=breite, groesse=groesse,
+               deckung=deckung, befehl="plot")
 
 
 def scatter(x: Any, y: Any, s: Optional[float] = None, c: Optional[str] = None, *,
             label: Optional[str] = None, color: Optional[str] = None,
             marker: Optional[str] = None, alpha: Optional[float] = None) -> None:
     """Punkte: ``scatter(x, y)`` -- ``s`` ist die Fläche der Marke wie bei matplotlib."""
-    _reihe("punkte", _folge(x, "scatter", "x"), _folge(y, "scatter", "y"), name=label,
+    flaeche = _eigenschaft(s, "scatter", "s", ab=0.0)
+    _reihe("punkte", _folge(x, "scatter", "x"), _folge(y, "scatter", "y"), name=_name(label),
            farbe=_farbe(color or c), strich="", marke=_marke(marker, "o"),
-           groesse=math.sqrt(s) if s else None, deckung=alpha, befehl="scatter")
+           groesse=None if flaeche is None else math.sqrt(flaeche),
+           deckung=_eigenschaft(alpha, "scatter", "alpha", ab=0.0, bis=1.0), befehl="scatter")
 
 
 def bar(x: Any, height: Any, width: float = 0.8, *, label: Optional[str] = None,
         color: Optional[str] = None, alpha: Optional[float] = None) -> None:
     """Balken: ``bar(["A", "B"], [3, 5])`` -- die Stellen dürfen auch Namen sein."""
-    _reihe("balken", _folge(x, "bar", "x"), _folge(height, "bar", "height"), name=label,
-           farbe=_farbe(color), strich="", marke="", breite=width, deckung=alpha, befehl="bar")
+    _reihe("balken", _folge(x, "bar", "x"), _folge(height, "bar", "height"), name=_name(label),
+           farbe=_farbe(color), strich="", marke="",
+           breite=_eigenschaft(width, "bar", "width", ueber=0.0),
+           deckung=_eigenschaft(alpha, "bar", "alpha", ab=0.0, bis=1.0), befehl="bar")
 
 
 def axhline(y: float = 0.0, *, color: Optional[str] = None,
@@ -322,6 +329,35 @@ def _roh(v: Any, befehl: str, name: str) -> float:
         return float(v)
     except (TypeError, ValueError):
         raise TypeError(f"{befehl}(): {name} muss eine Zahl sein, nicht {v!r}.") from None
+
+
+def _angegeben(*werte: Any) -> Any:
+    """Der erste angegebene Wert -- ``0`` ist angegeben, ``None`` nicht (``lw=0`` ist keine Linie)."""
+    return next((w for w in werte if w is not None), None)
+
+
+def _eigenschaft(v: Any, befehl: str, name: str, *, ab: Optional[float] = None,
+                 ueber: Optional[float] = None, bis: Optional[float] = None) -> Optional[float]:
+    """
+    Breite, Grösse oder Deckung: eine endliche Zahl in ihrem Bereich, ``None``
+    heisst nicht angegeben. Bis 2026-10-17 gingen diese ungeprüft durch, und
+    ein ``nan`` hielt die Konsole an (:mod:`opencivil.web.umschlag`).
+    """
+    if v is None:
+        return None
+    zahl = _zahl(v, befehl, name)
+    if ab is not None and zahl < ab:
+        raise ValueError(f"{befehl}(): {name} darf nicht unter {ab:g} liegen, nicht {zahl:g}.")
+    if ueber is not None and zahl <= ueber:
+        raise ValueError(f"{befehl}(): {name} muss grösser als {ueber:g} sein, nicht {zahl:g}.")
+    if bis is not None and zahl > bis:
+        raise ValueError(f"{befehl}(): {name} darf höchstens {bis:g} sein, nicht {zahl:g}.")
+    return zahl
+
+
+def _name(label: Any) -> Optional[str]:
+    """Der Name einer Reihe für die Legende -- als Text, wie matplotlib ihn schreibt."""
+    return None if label is None else str(label)
 
 
 def _zahl_oder_luecke(v: Any, befehl: str, name: str) -> Optional[float]:

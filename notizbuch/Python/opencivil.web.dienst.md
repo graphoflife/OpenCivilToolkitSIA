@@ -1,5 +1,5 @@
 ---
-erzeugt: ad54172dbb70
+erzeugt: 91ba9d6a863b
 art: modul
 tags: [modul]
 ---
@@ -324,20 +324,6 @@ Dass auch der Fehlerfall eine gewoehnliche Antwort ist, haelt die beiden
 Huellen duenn: keine muss sich ueberlegen, welche Ausnahme welchen Status
 verdient.
 
-### nach_json
-
-```python
-def nach_json(daten: Any) -> str
-```
-
-Wandelt eine Antwort in JSON.
-
-`allow_nan=False` ist Absicht: `json.dumps` schriebe sonst `Infinity`
-und `NaN`. Python liest das wieder, `JSON.parse` im Browser lehnt es ab
--- die Antwort kaeme heil an und waere trotzdem unbrauchbar. Lieber hier
-laut scheitern als dort stumm. [[opencivil.web.api#endlich|endlich]] raeumt die Faelle vorher weg,
-sodass der Riegel nur zuschlaegt, wenn wirklich etwas Neues auftaucht.
-
 ### bearbeite_json
 
 ```python
@@ -373,6 +359,7 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 - [[opencivil.web.balkendaten]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.speicher]]
+- [[opencivil.web.umschlag]]
 
 ## Gebraucht von
 
