@@ -20,22 +20,21 @@
 
 import { erklaerung, feld, hakenSchalter, panel } from './bausteine.js';
 import { auswahl, el, svgEl, zahlfeld } from './dom.js';
-import {
-  analysenKapitel, anzahl, eingeschaltet, gebrauchsstand, kapitelFenster, kapitelPanel,
-  schalter,
-} from './kapitel.js';
+import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
 import { span } from './mathe.js';
-import {
-  analyseInhalt, fliessenGefordert, haeufigInhalt, knickInhalt, mitKopf,
-  quasistaendigInhalt, zwangInhalt,
-} from './nachweise.js';
+import { analysenKapitel, mitKopf, nachweisKapitel } from './nachweise.js';
 import { uebersicht } from './qa_uebersicht.js';
 import { zeichenbereich } from './qa_zeichnung.js';
 import {
   ausVorlage, naechsterName, projektAendern, zustand,
 } from './zustand.js';
 
-/** Was hinter den Fragezeichen steht -- Stichworte wie bei der Platte. */
+/**
+ * Was hinter den Fragezeichen steht -- Stichworte wie bei der Platte.
+ * Knicken und die beiden Stahlspannungen rechnet die Platte gleich: dort
+ * steht hier nur, was beim gezeichneten Querschnitt dazukommt, das Übrige
+ * steht bei den Kapiteln (`nachweisKapitel` in nachweise.js).
+ */
 const HILFE = {
   tragsicherheit: {
     zeilen: [
@@ -62,13 +61,9 @@ const HILFE = {
   },
   knicken: {
     zeilen: [
-      ['Weg', 'verformtes System: e_0d + e_1d + e_2d, iteriert über die Krümmung – je Fall zur gewählten Zugseite'],
-      ['N_Rd', 'grösste Druckkraft mit Gleichgewichtslage'],
-      ['Verformung', 'e_2d immer präzise; φ und Werte nach Wahl, Vorgabe Bemessung'],
-      ['Widerstand', 'Rechenwahl für den Bruchzustand bei N; Vorgabe 0.85·x, Bemessung'],
+      ['Richtung', 'je Fall zur gewählten Zugseite'],
       ['d', 'vom gedrückten Rand bis zum entferntesten Stab in Zugrichtung'],
     ],
-    formel: 'α_eff = N_Rd / |N_Ed|',
   },
   zwang: {
     zeilen: [
@@ -82,17 +77,12 @@ const HILFE = {
     zeilen: [
       ['Weg', 'Ebene am gerissenen Querschnitt; schief dreht die Nulllinie, bis N, M_y und M_z stimmen'],
       ['Grenze', 'je gezogenem Stab aus der Rissbreite, mit seinem ⌀; massgebend der kleinste Erfüllungsgrad'],
-      ['Werte', 'nach Rechenwahl; Vorgabe charakteristisch (f_ck, f_yk), elastisch'],
     ],
-    formel: 'σ_s ≤ σ_s,adm (Tab. 17), je Stab',
   },
   haeufig: {
     zeilen: [
       ['Weg', 'Ebene am gerissenen Querschnitt, wie quasi-ständig'],
-      ['Grenze', 'je Stahl f_yd − 80 N/mm²'],
-      ['Werte', 'nach Rechenwahl; Vorgabe charakteristisch (f_ck, f_yk), elastisch'],
     ],
-    formel: 'σ_s ≤ f_yd − 80 N/mm²',
   },
   schubwaende: {
     zeilen: [
@@ -103,12 +93,6 @@ const HILFE = {
     formel: 'V_Rd = min(A_sw/s·l·f_sd·cot α ; b_w·l·k_c·f_cd·sin α·cos α)',
   },
 };
-
-/** Das Fragezeichen eines Kapitels -- null, wo es keines hat. */
-function hilfe(schluessel) {
-  const eintrag = HILFE[schluessel];
-  return eintrag ? erklaerung(eintrag.zeilen, eintrag.formel) : null;
-}
 
 /**
  * Die Spalten eines Lastfalls. `zweiachsig`: nur bei schiefer Biegung --
@@ -251,7 +235,7 @@ function schubwandAngaben(analyse) {
   const aendern = (veraenderer) => aendernAn(analyse.kennung, veraenderer);
   return el('div.unterkapitel', {}, [
     el('div.unterkapitel-kopf', {}, [el('span', { text: 'Querkraft und Torsion: Fachwerk je Wand' }),
-      hilfe('schubwaende')]),
+      erklaerung(HILFE.schubwaende.zeilen, HILFE.schubwaende.formel)]),
     el('div.neigungszeile', {}, [
       el('span.postenname', { text: 'Neigung' }),
       span(String.raw`\alpha_{min}`),
@@ -323,45 +307,7 @@ function tragsicherheitInhalt(analyse) {
   ];
 }
 
-/** Gerechnet am Querschnitt der Tragsicherheit -- mit ihren Rechenwerten. */
-const WIE_TRAGSICHERHEIT = 'Gerechnet mit den Rechenwerten der Tragsicherheit.';
-
-/** Duktilität: ein Schalter und die Grenze x/d. */
-function duktilitaetInhalt(analyse) {
-  const aendern = (veraenderer) => aendernAn(analyse.kennung, veraenderer);
-  return [
-    el('div.duktilitaetszeile.mit-grenze', {}, [
-      hakenSchalter(!!analyse.duktilitaet,
-        (wert) => aendern((a) => { a.duktilitaet = wert; }), 'Nachweis'),
-      el('span.postenname', { text: 'Max. x/d' }),
-      zahlfeld({
-        wert: analyse.x_d_max, schritt: 0.05, min: 0.05,
-        max: zustand.katalog?.duktilitaet?.hoechstens,
-        titel: `Grenze der Druckzonenhöhe x/d; höchstens ${
-          zustand.katalog?.duktilitaet?.hoechstens ?? '–'}`,
-        beiAenderung: (v) => aendern((a) => { a.x_d_max = v; }),
-      }),
-      el('span.kurvenhinweis', { text: richtungstext(analyse) }),
-    ]),
-    el('p.qa-erlaeuterung', { text: WIE_TRAGSICHERHEIT }),
-  ];
-}
-
-/** Sprödes Versagen: ein Schalter. */
-function sproedeInhalt(analyse) {
-  const aendern = (veraenderer) => aendernAn(analyse.kennung, veraenderer);
-  return [
-    el('div.duktilitaetszeile.ist-breit', {}, [
-      hakenSchalter(!!analyse.sproede,
-        (wert) => aendern((a) => { a.sproede = wert; }), 'Nachweis'),
-      el('span.postenname', { text: 'Rissmoment' }),
-      el('span.kurvenhinweis', { text: richtungstext(analyse) }),
-    ]),
-    el('p.qa-erlaeuterung', { text: WIE_TRAGSICHERHEIT }),
-  ];
-}
-
-/** In welchen Richtungen Duktilität und sprödes Versagen geführt werden. */
+/** In welchen Richtungen Duktilität, sprödes Versagen und Zwängung auf Biegung geführt werden. */
 function richtungstext(analyse) {
   return analyse.einachsig ? 'Zug unten und oben' : 'Zug unten, oben, links, rechts';
 }
@@ -484,67 +430,19 @@ function vorzeichenbild(einachsig) {
 // Die Kapitel -- je ein Knopf, die Eingaben im Fenster (kapitel.js)
 // ===========================================================================
 
-const NACHWEISE = [
-  {
-    schluessel: 'tragsicherheit',
-    name: 'Trag\u00adsicherheit', titel: 'Tragsicherheitsnachweise',
-    bezug: () => 'N, V in kN · M, T in kNm',
-    inhalt: tragsicherheitInhalt,
-    stand: (a) => {
-      const n = eingeschaltet(a.lastfaelle);
-      return { an: n > 0, text: n ? anzahl(n, 'Lastfall', 'Lastfälle') : 'kein Lastfall' };
-    },
-  },
-  {
-    schluessel: 'knicken',
-    name: 'Knicken', titel: 'Knicken',
-    bezug: () => 'N in kN · M in kNm · l in m',
-    inhalt: (a) => knickInhalt(a, ORT),
-    stand: (a) => {
-      const n = eingeschaltet(a.knickfaelle);
-      return { an: n > 0, text: n ? anzahl(n, 'Fall', 'Fälle') : 'kein Fall' };
-    },
-  },
-  {
-    schluessel: 'duktilitaet',
-    name: 'Duktilität', titel: 'Duktilitätsnachweis',
-    inhalt: duktilitaetInhalt,
-    stand: (a) => schalter(!!a.duktilitaet),
-  },
-  {
-    schluessel: 'sproede',
-    name: 'Sprödes Versagen', titel: 'Nachweis gegen sprödes Versagen',
-    inhalt: sproedeInhalt,
-    stand: (a) => schalter(!!a.sproede),
-  },
-  {
-    schluessel: 'zwang',
-    name: 'Riss bei Zwang', titel: 'Rissbreitenbegrenzung bei Zwang',
-    inhalt: (a) => zwangInhalt(a, ORT),
-    // Die Begrenzung auf 500 mm ist kein eigener Nachweis, sie ändert den
-    // auf Normalkraft.
-    stand: (a) => {
-      const teile = [a.zwaengung ? 'N' : null, a.zwaengung_biegung ? 'M' : null].filter(Boolean);
-      return { an: teile.length > 0, text: teile.length ? `auf ${teile.join(' und ')}` : 'aus' };
-    },
-  },
-  {
-    schluessel: 'quasistaendig',
-    name: 'Stahlspannung quasi-ständig',
-    titel: 'Stahlspannungsbegrenzung bei quasi-ständigen Lastfällen',
-    bezug: () => 'N in kN · M in kNm',
-    inhalt: (a) => quasistaendigInhalt(a, ORT),
-    stand: (a) => gebrauchsstand(a.quasistaendig),
-  },
-  {
-    schluessel: 'haeufig',
-    name: 'Fliessen häufig', titel: 'Verhindern des Fliessens für häufige Lastfälle',
-    bezug: () => 'N in kN · M in kNm',
-    inhalt: (a) => haeufigInhalt(a, ORT),
-    stand: (a) => (fliessenGefordert(a) ? gebrauchsstand(a.haeufig)
-      : { an: false, text: 'entfällt' }),
-  },
-];
+/**
+ * Die Tragsicherheit des gezeichneten Querschnitts, mit Querkraft und
+ * Torsion. Die übrigen Nachweise führt er wie die Platte
+ * (`nachweisKapitel`).
+ */
+const TRAGSICHERHEIT = {
+  schluessel: 'tragsicherheit',
+  name: 'Trag\u00adsicherheit', titel: 'Tragsicherheitsnachweise',
+  bezug: () => 'N, V in kN · M, T in kNm',
+  hilfe: HILFE.tragsicherheit,
+  inhalt: tragsicherheitInhalt,
+  stand: (a) => zeilenstand(a.lastfaelle, 'Lastfall', 'Lastfälle', 'kein Lastfall'),
+};
 
 /** Die Zugseiten einer Analyse aus dem Katalog -- und wie dann ihre Ränder heissen. */
 function zugseite(wert) {
@@ -564,9 +462,10 @@ function zugseitenWahl(gewaehlt, setzen, titel, { schmal = false } = {}) {
 }
 
 /**
- * Wo die Kapitel eines gezeichneten Querschnitts stehen (vgl. `PLATTE` in
- * nachweise.js): die Richtung ist die Zugseite, die Seite, die ein positives
- * Moment zieht. «oben» heisst dann der Rand gegenüber.
+ * Wo die Kapitel eines gezeichneten Querschnitts stehen und was bei ihm
+ * anders ist (vgl. `PLATTE` in nachweise.js): die Richtung ist die Zugseite,
+ * die Seite, die ein positives Moment zieht. «oben» heisst dann der Rand
+ * gegenüber.
  */
 const ORT = {
   liste: 'querschnittsanalysen',
@@ -575,13 +474,15 @@ const ORT = {
     k.richtung, setzen, 'Zugseite: die Seite, die ein positives Moment zieht',
     { schmal: true })),
   raender: (k) => zugseite(k.richtung)?.raender || ['oben', 'unten'],
-  // Die Zwängung: auf Normalkraft am ganzen Querschnitt, auf Biegung je
-  // Richtung -- das steht hinter den Zeilen statt einer Tragrichtung davor.
-  zwang: (a) => ({
-    marke: null,
-    hinweise: { zwaengung: 'ganzer Querschnitt', zwaengung_biegung: richtungstext(a) },
-    phiTitel: 'Kriechzahl φ der Zwängung auf Biegung: E_c,eff = E_cm / (1 + φ)',
-  }),
+  bezug: () => 'N in kN · M in kNm',
+  hilfe: HILFE,
+  // Nachgewiesen wird in jeder Richtung: vor einem Schalter steht keine
+  // Tragrichtung, dahinter steht, in welchen Richtungen -- die Zwängung auf
+  // Normalkraft gilt dem ganzen Querschnitt.
+  marke: () => null,
+  hinweis: (a, feld) => (feld === 'zwaengung' ? 'ganzer Querschnitt' : richtungstext(a)),
+  // Duktilität und sprödes Versagen rechnen am Querschnitt der Tragsicherheit.
+  rechenwerte: 'Gerechnet mit den Rechenwerten der Tragsicherheit.',
   // Das Knicken je Fall zu seiner Zugseite -- sie steht neben dem Namen.
   knick: {
     vorlage: 'qa_knickfall',
@@ -611,13 +512,8 @@ const ORT = {
 
 function kapitel() {
   return [
-    { titel: 'Nachweise', kapitel: NACHWEISE },
-    {
-      titel: 'Spannung-Dehnung-Analysen',
-      kapitel: analysenKapitel({
-        inhalt: (a, art) => analyseInhalt(a, art, ORT), bezug: () => 'N in kN · M in kNm',
-      }),
-    },
+    { titel: 'Nachweise', kapitel: [TRAGSICHERHEIT, ...nachweisKapitel(ORT)] },
+    { titel: 'Spannung-Dehnung-Analysen', kapitel: analysenKapitel(ORT) },
   ];
 }
 
@@ -632,5 +528,5 @@ export function analyseEditor(analyse) {
 
 /** Das offene Fenster einer Querschnittsanalyse -- oder null. */
 export function analyseFenster(analyse, schluessel) {
-  return kapitelFenster(analyse, kapitel(), schluessel, hilfe);
+  return kapitelFenster(analyse, kapitel(), schluessel);
 }

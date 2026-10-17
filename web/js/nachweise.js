@@ -3,10 +3,18 @@
  *
  * Jedes Kapitel öffnet sich in einem eigenen Fenster (`kapitel.js`):
  * Tragsicherheit samt den Angaben zur Querkraft, Knicken, Duktilität,
- * sprödes Versagen, Rissbreite bei Zwang, die beiden Stahlspannungen und
- * die sechs Spannung-Dehnung-Analysen; dazu das Werkzeug, das die Bewehrung
- * sucht. Hier steht, was in den Fenstern steht -- `…Inhalt(q)` liefert die
- * Knoten.
+ * sprödes Versagen, Rissbreite bei Zwang, die beiden Stahlspannungen, die
+ * Verformung und die sechs Spannung-Dehnung-Analysen; dazu das Werkzeug,
+ * das die Bewehrung sucht. Hier steht, welche Kapitel die Platte hat
+ * (`plattenKapitel`) und was in den Fenstern steht -- `…Inhalt(e, ort)`
+ * liefert die Knoten.
+ *
+ * Der gezeichnete Querschnitt führt dieselben Nachweise bis auf die
+ * Tragsicherheit und die Verformung. Diese Kapitel stehen darum einmal, für
+ * beide (`nachweisKapitel`, `analysenKapitel`); was bei einem Bauteil
+ * anders ist, sagt sein Ort -- `PLATTE` hier, `ORT` in
+ * `querschnittsanalyse.js`. Bis 2026-10-17 führte jedes Bauteil seine eigene
+ * Liste, mit eigenen Fragezeichen, die schon Verschiedenes sagten.
  *
  * Eigenes Modul, weil `editor.js` sonst über tausend Zeilen läge und die
  * beiden Hälften wenig miteinander zu tun haben: oben steht, was die Platte
@@ -23,6 +31,7 @@ import {
   erklaerung, feld, hakenSchalter, richtungsWahl, zweiSchalter,
 } from './bausteine.js';
 import { auswahl, el, melden, zahlfeld } from './dom.js';
+import { gebrauchsstand, schalter, zeilenstand } from './kapitel.js';
 import { xLagen } from './lagen.js';
 import { span } from './mathe.js';
 import {
@@ -44,10 +53,14 @@ import {
 const laufendeSuche = new Set();
 
 /**
- * Was hinter jedem Fragezeichen steht: Rechenweg, Werte (Bemessung oder
- * charakteristisch), φ -- als Stichworte, dazu die Bedingung. Alle an einer
- * Stelle, damit sie gleich gebaut sind. Die Begründungen stehen in der
+ * Was hinter den Fragezeichen der Platte steht: Rechenweg, Werte (Bemessung
+ * oder charakteristisch), φ -- als Stichworte, dazu die Bedingung. Alle an
+ * einer Stelle, damit sie gleich gebaut sind. Die Begründungen stehen in der
  * Dokumentation, nicht hier.
+ *
+ * Knicken und die beiden Stahlspannungen rechnet der gezeichnete Querschnitt
+ * gleich: dort steht hier nur, was bei der Platte dazukommt, das Übrige
+ * steht bei den Kapiteln (`nachweisKapitel`).
  */
 const HILFE = {
   tragsicherheit: {
@@ -86,18 +99,13 @@ const HILFE = {
   quasistaendig: {
     zeilen: [
       ['Weg', 'Stahlspannung am gerissenen Querschnitt, an der am stärksten gezogenen Lage'],
-      ['Werte', 'nach Rechenwahl; Vorgabe charakteristisch (f_ck, f_yk), elastisch'],
-      ['φ', 'nach Rechenwahl → E_c,eff = E_cm / (1 + φ), präzise und elastisch'],
+      ['Grenze', 'σ_s,adm mit dem dicksten Stab der Tragrichtung'],
     ],
-    formel: 'σ_s ≤ σ_s,adm (Tab. 17)',
   },
   haeufig: {
     zeilen: [
       ['Weg', 'Stahlspannung am gerissenen Querschnitt, an der am stärksten gezogenen Lage'],
-      ['Werte', 'nach Rechenwahl; Vorgabe charakteristisch (f_ck, f_yk), elastisch; Grenze aus f_yd'],
-      ['φ', 'nach Rechenwahl → E_c,eff = E_cm / (1 + φ), präzise und elastisch'],
     ],
-    formel: 'σ_s ≤ f_yd − 80 N/mm²',
   },
   verformung: {
     zeilen: [
@@ -110,24 +118,11 @@ const HILFE = {
   },
   knicken: {
     zeilen: [
-      ['Weg', 'verformtes System: e_0d + e_1d + e_2d, iteriert über die Krümmung'],
-      ['N_Rd', 'grösste Druckkraft mit Gleichgewichtslage'],
-      ['Verformung', 'e_2d immer präzise; φ und Werte nach Wahl, Vorgabe Bemessung (f_cd, f_yd)'],
-      ['Widerstand', 'Rechenwahl für N_Rd(M_Ed = N_Ed·e_tot), ohne Handrechnung; Vorgabe 0.85·x, Bemessung; gleich wie die Tragsicherheit gewählt: deren Linie'],
-      ['φ', 'je Wahl, nur präzise → E_c,eff = E_cm / (1 + φ)'],
+      ['Richtung', 'nur Tragrichtung x'],
+      ['Linie', 'Widerstand gleich gewählt wie die Tragsicherheit: deren Linie'],
     ],
-    formel: 'α_eff = N_Rd / |N_Ed|',
   },
 };
-
-/**
- * Das Fragezeichen im Kopf eines Fensters -- null, wo es nichts zu erklären
- * gibt: die Analysen und die Suche haben keines.
- */
-export function hilfe(schluessel) {
-  const eintrag = HILFE[schluessel];
-  return eintrag ? erklaerung(eintrag.zeilen, eintrag.formel) : null;
-}
 
 /**
  * Der Knopf, der eine Liste verlängert.
@@ -145,7 +140,7 @@ function anfuegenKnopf(text, tun) {
  * Worauf sich M und N beziehen: auf den Streifen b, nicht auf den Meter --
  * bei b = 500 mm heisst M_Ed = 50 kNm also 100 kNm/m. V gilt je Meter.
  */
-export function jeB(querschnitt) {
+function jeB(querschnitt) {
   return `M, N je b = ${querschnitt.b} mm`;
 }
 
@@ -168,7 +163,7 @@ function anPlatte(querschnitt) {
  * Tragsicherheit: Rechenwahl, die Einwirkungen und die Angaben, die allein
  * die Querkraft braucht.
  */
-export function tragsicherheitInhalt(querschnitt) {
+function tragsicherheitInhalt(querschnitt) {
   const aendernAn = anPlatte(querschnitt);
   return [
     rechenwahlZeile('Rechenwahl', querschnitt.tragsicherheit_wahl,
@@ -272,59 +267,73 @@ function einwirkungZeile(querschnitt, index) {
 }
 
 /**
- * Die Zeile eines Nachweises mit *einem* Schalter.
+ * Die Zeile eines Nachweises mit *einem* Schalter: Duktilität, sprödes
+ * Versagen und die Zeilen der Zwängung. Vorne der Schalter, dann die Marke,
+ * die der Ort davor setzt (`ort.marke`: bei der Platte die Tragrichtung x),
+ * der Name, dahinter wahlweise ein Feld -- die Grenze x/d, das φ der
+ * Zwängung auf Biegung -- und zuletzt, was der Ort zum Nachweis sagt
+ * (`ort.hinweis`). `name` sagt, woran gemessen wird, `was` im Titel des
+ * Schalters, was er führt.
  *
- * Duktilität, sprödes Versagen und Zwängung auf Biegung sind gleich gebaut:
- * gerechnet werden die beiden x-Lagen, in der Zusammenfassung steht die
- * ungünstigere. Vorher stand hier ein Schalter je Lage -- vier Haken für eine
- * Frage, und drei davon betrafen Lagen, die niemand nachweist.
- *
- * Nachgewiesen wird nur x. Die y-Lagen stehen im Querschnitt, weil sie die
+ * Bei der Platte werden die beiden x-Lagen gerechnet, in der
+ * Zusammenfassung steht die ungünstigere. Vorher stand hier ein Schalter je
+ * Lage -- vier Haken für eine Frage, und drei davon betrafen Lagen, die
+ * niemand nachweist. Die y-Lagen stehen im Querschnitt, weil sie die
  * statische Höhe von x bestimmen; ein Nachweis fragt nicht nach ihnen.
  *
- * `name` sagt, woran gemessen wird; `zusatz` ist ein Feld dahinter, etwa die
- * Grenze x/d der Duktilität.
+ * `nachweis: false` für einen Schalter, der keinen eigenen Nachweis führt,
+ * sondern einen anderen ändert -- die Begrenzung auf 500 mm: ohne Marke und
+ * ohne Hinweis.
  */
-function schalterZeile(querschnitt, { feld, name, zusatz = null }) {
-  const an = !!querschnitt[feld];
-  const leer = !xLagen(querschnitt).some(
-    (n) => querschnitt.lagen[n - 1].grund.durchmesser > 0
-        || querschnitt.lagen[n - 1].zulage.durchmesser > 0);
-
-  return el(`div.duktilitaetszeile${zusatz ? '.mit-feld' : ''}`, {}, [
-    hakenSchalter(an, (wert) => anPlatte(querschnitt)((q) => { q[feld] = wert; }), 'Nachweis'),
-    el('span.richtung', {
-      text: 'x', class: 'lage-x',
-      title: 'Nur Tragrichtung x; es zählt die ungünstigere x-Lage',
-    }),
+function schalterZeile(eintrag, ort, {
+  feld, name, was = 'Nachweis', zusatz = null, nachweis = true,
+}) {
+  const vorne = nachweis ? ort.marke() : null;
+  const art = vorne ? (zusatz ? '.mit-feld' : '') : (zusatz ? '.mit-grenze' : '.ist-breit');
+  return el(`div.duktilitaetszeile${art}`, {}, [
+    hakenSchalter(!!eintrag[feld],
+      (wert) => anBauteil(eintrag, ort)((e) => { e[feld] = wert; }), was),
+    vorne,
     el('span.postenname', { text: name }),
     zusatz,
-    // Ein eingeschalteter Nachweis ohne Bewehrung ist kein Fehler der
-    // Eingabe -- er wird geführt und meldet selbst, dass er nicht geht.
-    // Hier steht es trotzdem, damit man es beim Einschalten sieht.
-    el('span.kurvenhinweis', { text: (an && leer) ? 'keine x-Bewehrung' : '' }),
+    el('span.kurvenhinweis', { text: nachweis ? ort.hinweis(eintrag, feld) : '' }),
   ]);
 }
 
+/**
+ * Unter Duktilität und sprödem Versagen, wo der Ort sagt, womit sie rechnen
+ * (`ort.rechenwerte`) -- beim gezeichneten Querschnitt mit den Werten der
+ * Tragsicherheit. Bei der Platte steht es im Fragezeichen.
+ */
+function rechenwerteSatz(ort) {
+  return ort.rechenwerte ? el('p.qa-erlaeuterung', { text: ort.rechenwerte }) : null;
+}
+
 /** Duktilität: ein Schalter und die Grenze x/d. */
-export function duktilitaetInhalt(querschnitt) {
-  return [schalterZeile(querschnitt, {
-    feld: 'duktilitaet', name: 'Max. x/d',
-    // Vorgabe und Höchstwert der Grenze kennt der Kern. Leer gelassen
-    // bleibt der bisherige Wert -- eine Grenze von null gäbe es nicht.
-    zusatz: zahlfeld({
-      wert: querschnitt.x_d_max, schritt: 0.05, min: 0.05,
-      max: zustand.katalog?.duktilitaet?.hoechstens,
-      titel: `Grenze der Druckzonenhöhe x/d; höchstens ${
-        zustand.katalog?.duktilitaet?.hoechstens ?? '–'}`,
-      beiAenderung: (v) => anPlatte(querschnitt)((q) => { q.x_d_max = v; }),
+function duktilitaetInhalt(eintrag, ort) {
+  return [
+    schalterZeile(eintrag, ort, {
+      feld: 'duktilitaet', name: 'Max. x/d',
+      // Vorgabe und Höchstwert der Grenze kennt der Kern. Leer gelassen
+      // bleibt der bisherige Wert -- eine Grenze von null gäbe es nicht.
+      zusatz: zahlfeld({
+        wert: eintrag.x_d_max, schritt: 0.05, min: 0.05,
+        max: zustand.katalog?.duktilitaet?.hoechstens,
+        titel: `Grenze der Druckzonenhöhe x/d; höchstens ${
+          zustand.katalog?.duktilitaet?.hoechstens ?? '–'}`,
+        beiAenderung: (v) => anBauteil(eintrag, ort)((e) => { e.x_d_max = v; }),
+      }),
     }),
-  })];
+    rechenwerteSatz(ort),
+  ];
 }
 
 /** Sprödes Versagen: ein Schalter. */
-export function sproedeInhalt(querschnitt) {
-  return [schalterZeile(querschnitt, { feld: 'sproede', name: 'Rissmoment' })];
+function sproedeInhalt(eintrag, ort) {
+  return [
+    schalterZeile(eintrag, ort, { feld: 'sproede', name: 'Rissmoment' }),
+    rechenwerteSatz(ort),
+  ];
 }
 
 /**
@@ -337,7 +346,7 @@ export function sproedeInhalt(querschnitt) {
  * Namen, die vier Zahlen bleiben darunter. `ort.knick` sagt auch die Köpfe
  * und Titel der Spalten.
  */
-export function knickInhalt(eintrag, ort = PLATTE) {
+function knickInhalt(eintrag, ort) {
   const faelle = eintrag.knickfaelle || [];
   const aendern = anBauteil(eintrag, ort);
   const knick = ort.knick;
@@ -435,7 +444,7 @@ function anforderung(querschnitt) {
 }
 
 /** Ob der Nachweis gegen Fliessen gefordert ist -- das weiss der Kern über den Katalog. */
-export function fliessenGefordert(querschnitt) {
+function fliessenGefordert(querschnitt) {
   return anforderung(querschnitt)?.fliessnachweis !== false;
 }
 
@@ -444,59 +453,48 @@ export function fliessenGefordert(querschnitt) {
  * Begrenzung der rissaktiven Dicke. Eine Annahme über das Tragwerk, nicht
  * über das Bauteil -- darum ausgeschaltet, bis jemand sie trifft.
  *
- * `ort.zwang(e)` sagt, was beim Bauteil anders ist: bei der Platte steht die
- * Marke der Tragrichtung x vor den Zeilen, beim gezeichneten Querschnitt
- * dahinter, worüber nachgewiesen wird.
+ * Der Zeilentitel sagt schon, was der Schalter tut. Die Spalte rechts
+ * wiederholte das in einem ganzen Satz und machte die Tafel breit.
  */
-export function zwangInhalt(eintrag, ort = PLATTE) {
-  const aendern = anBauteil(eintrag, ort);
-  const { marke, hinweise, phiTitel } = ort.zwang(eintrag);
-
-  // Der Zeilentitel sagt schon, was der Schalter tut. Die Spalte rechts
-  // wiederholte das in einem ganzen Satz und machte die Tafel breit.
-  // Mit Richtungsmarke wie die Lagenzeilen: dieselbe Angabe soll überall
-  // gleich aussehen, sonst liest man sie zweimal verschieden.
-  const zwaengung = (feld, beschriftung, { mitMarke = false, zusatz = null } = {}) => {
-    const vorne = mitMarke && marke ? marke() : null;
-    const art = vorne ? (zusatz ? '.mit-feld' : '') : (zusatz ? '.mit-grenze' : '.ist-breit');
-    return el(`div.duktilitaetszeile${art}`, {}, [
-      hakenSchalter(!!eintrag[feld], (wert) => aendern((q) => { q[feld] = wert; }), 'Zwängung'),
-      vorne,
-      el('span.postenname', { text: beschriftung }),
-      zusatz,
-      el('span.kurvenhinweis', { text: hinweise[feld] || '' }),
-    ]);
-  };
-
+function zwangInhalt(eintrag, ort) {
   return [
     rissanforderungZeile(eintrag, ort),
-    zwaengung('zwaengung', 'Zwängung auf Normalkraft', { mitMarke: true }),
+    schalterZeile(eintrag, ort, {
+      feld: 'zwaengung', name: 'Zwängung auf Normalkraft', was: 'Zwängung',
+    }),
     // Die Zwängung auf Biegung rechnet am gerissenen Querschnitt -- mit
-    // ihrem eigenen φ, nicht dem der Platte.
-    zwaengung('zwaengung_biegung', 'Zwängung auf Biegung', {
-      mitMarke: true,
+    // ihrem eigenen φ, nicht dem des Bauteils.
+    schalterZeile(eintrag, ort, {
+      feld: 'zwaengung_biegung', name: 'Zwängung auf Biegung', was: 'Zwängung',
       zusatz: el('span.zeilenfeld', {}, [
         el('span.zeichen', { text: 'φ' }),
         zahlfeld({
           wert: eintrag.zwaengung_biegung_kriechzahl ?? 0, schritt: 0.1, min: 0, leer: 0,
-          titel: phiTitel,
-          beiAenderung: (v) => aendern((q) => { q.zwaengung_biegung_kriechzahl = v; }),
+          titel: 'Kriechzahl φ der Zwängung auf Biegung: E_c,eff = E_cm / (1 + φ)',
+          beiAenderung: (v) => anBauteil(eintrag, ort)((e) => {
+            e.zwaengung_biegung_kriechzahl = v;
+          }),
         }),
       ]),
     }),
-    zwaengung('zwaengung_begrenzt', 'Begrenzung auf 500 mm'),
+    // Ändert nur die Zwängung auf Normalkraft: die Dicke, über die der
+    // Querschnitt unter Zug reisst.
+    schalterZeile(eintrag, ort, {
+      feld: 'zwaengung_begrenzt', name: 'Begrenzung auf 500 mm', was: 'Zwängung',
+      nachweis: false,
+    }),
   ];
 }
 
 /** Die Stahlspannung unter quasi-ständigen Lastfällen -- begrenzt aus der Rissbreite. */
-export function quasistaendigInhalt(eintrag, ort = PLATTE) {
+function quasistaendigInhalt(eintrag, ort) {
   return gebrauchsKapitel(eintrag, ort, {
     feld: 'quasistaendig', wort: 'quasi-ständig', neu: 'Quasi-ständig',
   });
 }
 
 /** Das Fliessen unter häufigen Lastfällen -- gefordert nur bei erhöhter und hoher Anforderung. */
-export function haeufigInhalt(eintrag, ort = PLATTE) {
+function haeufigInhalt(eintrag, ort) {
   return gebrauchsKapitel(eintrag, ort, {
     feld: 'haeufig', wort: 'häufig', neu: 'Häufig',
     // Bei normaler Anforderung steht in Tabelle 17 ein Strich: der
@@ -521,7 +519,7 @@ export function haeufigInhalt(eintrag, ort = PLATTE) {
  * und an der gezogenen Seite und wird je Seite einmal gerechnet (Benutzer,
  * 2026-10-16). Vorher stand φ oben bei der Platte, nur für diesen Faktor.
  */
-export function verformungInhalt(querschnitt) {
+function verformungInhalt(querschnitt) {
   const aendern = (veraenderer) => anPlatte(querschnitt)((q) => veraenderer(q.verformung));
   const { kriechzahl, faelle } = querschnitt.verformung;
   return [
@@ -706,7 +704,7 @@ function gebrauchsfallZeile(eintrag, ort, spalten, feld, wort, index) {
  * Gesucht wird gegen die Nachweise, die eingeschaltet sind. Die Schalter
  * weiter unten steuern damit unmittelbar, wonach gesucht wird.
  */
-export function automatikInhalt(querschnitt) {
+function automatikInhalt(querschnitt) {
   const aendern = (veraenderer) => projektAendern((p) => {
     veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
   });
@@ -775,11 +773,6 @@ export function automatikInhalt(querschnitt) {
       'mm')] : []),
     automatikLeiste(querschnitt),
   ])];
-}
-
-/** Ob für diese Platte gerade gesucht wird -- der Knopf im Panel sagt es dann. */
-export function sucheLaeuft(kennung) {
-  return laufendeSuche.has(kennung);
 }
 
 /**
@@ -875,29 +868,195 @@ async function bewehrungErmitteln(kennung) {
   }
 }
 
+// ===========================================================================
+// Die Kapitel -- je ein Knopf, die Eingaben im Fenster (kapitel.js)
+// ===========================================================================
+
+/**
+ * Die Nachweise, die Platte und gezeichneter Querschnitt gleich führen, als
+ * Kapitel: Knicken, Duktilität, sprödes Versagen, Riss bei Zwang und die
+ * beiden Stahlspannungen. Davor steht bei jedem Bauteil seine Tragsicherheit
+ * -- die Platte fragt dort nach Bügeln, der gezeichnete Querschnitt nach
+ * Schubwänden --, bei der Platte danach die Verformung.
+ *
+ * `ort` sagt, was beim Bauteil anders ist (`PLATTE` unten). Knicken und
+ * Stahlspannung rechnen beide Bauteile gleich: das Gemeinsame ihrer Hilfe
+ * steht hier, und der Ort fügt seine Zeilen an. Duktilität, sprödes
+ * Versagen und Zwang rechnet jedes Bauteil auf seine Weise -- ihre Hilfe
+ * kommt ganz vom Ort.
+ */
+export function nachweisKapitel(ort) {
+  // Die beiden Stahlspannungen sind dieselbe Rechnung mit anderer Grenze.
+  const stahlspannung = [
+    ['Werte', 'nach Rechenwahl; Vorgabe charakteristisch (f_ck, f_yk), elastisch'],
+    ['φ', 'nach Rechenwahl → E_c,eff = E_cm / (1 + φ), präzise und elastisch'],
+  ];
+  return [
+    {
+      schluessel: 'knicken',
+      name: 'Knicken', titel: 'Knicken', bezug: ort.bezug,
+      hilfe: {
+        zeilen: [
+          ['Weg', 'verformtes System: e_0d + e_1d + e_2d, iteriert über die Krümmung'],
+          ['N_Rd', 'grösste Druckkraft mit Gleichgewichtslage'],
+          ['Verformung', 'e_2d immer präzise; φ und Werte nach Wahl, Vorgabe Bemessung (f_cd, f_yd)'],
+          ['Widerstand', 'Rechenwahl für N_Rd(M_Ed = N_Ed·e_tot), ohne Handrechnung; '
+            + 'Vorgabe 0.85·x, Bemessung'],
+          ['φ', 'je Wahl, nur präzise → E_c,eff = E_cm / (1 + φ)'],
+          ...ort.hilfe.knicken.zeilen,
+        ],
+        formel: 'α_eff = N_Rd / |N_Ed|',
+      },
+      inhalt: (e) => knickInhalt(e, ort),
+      stand: (e) => zeilenstand(e.knickfaelle, 'Fall', 'Fälle', 'kein Fall'),
+    },
+    {
+      schluessel: 'duktilitaet',
+      name: 'Duktilität', titel: 'Duktilitätsnachweis', hilfe: ort.hilfe.duktilitaet,
+      inhalt: (e) => duktilitaetInhalt(e, ort),
+      stand: (e) => schalter(!!e.duktilitaet),
+    },
+    {
+      schluessel: 'sproede',
+      name: 'Sprödes Versagen', titel: 'Nachweis gegen sprödes Versagen',
+      hilfe: ort.hilfe.sproede,
+      inhalt: (e) => sproedeInhalt(e, ort),
+      stand: (e) => schalter(!!e.sproede),
+    },
+    {
+      schluessel: 'zwang',
+      name: 'Riss bei Zwang', titel: 'Rissbreitenbegrenzung bei Zwang', hilfe: ort.hilfe.zwang,
+      inhalt: (e) => zwangInhalt(e, ort),
+      // Die Begrenzung auf 500 mm ist kein eigener Nachweis, sie ändert den
+      // auf Normalkraft.
+      stand: (e) => {
+        const teile = [e.zwaengung ? 'N' : null, e.zwaengung_biegung ? 'M' : null].filter(Boolean);
+        return { an: teile.length > 0, text: teile.length ? `auf ${teile.join(' und ')}` : 'aus' };
+      },
+    },
+    {
+      schluessel: 'quasistaendig',
+      name: 'Stahlspannung quasi-ständig',
+      titel: 'Stahlspannungsbegrenzung bei quasi-ständigen Lastfällen', bezug: ort.bezug,
+      hilfe: {
+        zeilen: [...ort.hilfe.quasistaendig.zeilen, ...stahlspannung],
+        formel: 'σ_s ≤ σ_s,adm (Tab. 17)',
+      },
+      inhalt: (e) => quasistaendigInhalt(e, ort),
+      stand: (e) => gebrauchsstand(e.quasistaendig),
+    },
+    {
+      schluessel: 'haeufig',
+      name: 'Fliessen häufig', titel: 'Verhindern des Fliessens für häufige Lastfälle',
+      bezug: ort.bezug,
+      hilfe: {
+        zeilen: [
+          ...ort.hilfe.haeufig.zeilen, ['Grenze', 'je Stahl aus seinem f_yd'], ...stahlspannung,
+        ],
+        formel: 'σ_s ≤ f_yd − 80 N/mm²',
+      },
+      inhalt: (e) => haeufigInhalt(e, ort),
+      stand: (e) => (fliessenGefordert(e) ? gebrauchsstand(e.haeufig)
+        : { an: false, text: 'entfällt' }),
+    },
+  ];
+}
+
+/**
+ * Die sechs Spannung-Dehnung-Analysen als Kapitel, je Art aus dem Katalog:
+ * der Name auf dem Knopf kurz, über dem Fenster lang.
+ */
+export function analysenKapitel(ort) {
+  return (zustand.katalog?.spannungsanalyse?.arten || []).map((a) => ({
+    schluessel: a.wert,
+    name: a.beschriftung, titel: a.titel,
+    bezug: (e) => `Spannung-Dehnung-Analyse · ${ort.bezug(e)}`,
+    inhalt: (e) => analyseInhalt(e, a.wert, ort),
+    stand: (e) => zeilenstand((e.spannungsfaelle || []).filter((k) => k.art === a.wert),
+      'Bild', 'Bilder', 'kein Bild'),
+  }));
+}
+
+/** Die Tragsicherheit der Platte -- mit der Querkraft, und die gilt je Meter. */
+const TRAGSICHERHEIT = {
+  schluessel: 'tragsicherheit',
+  name: 'Trag\u00adsicherheit', titel: 'Tragsicherheitsnachweise',
+  bezug: (q) => `${jeB(q)} · V je m`,
+  hilfe: HILFE.tragsicherheit,
+  inhalt: tragsicherheitInhalt,
+  stand: (q) => zeilenstand(q.kombinationen, 'Einwirkung', 'Einwirkungen', 'keine Einwirkung'),
+};
+
+const VERFORMUNG = {
+  schluessel: 'verformung',
+  name: 'Verformung', titel: 'Begrenzung der Durchbiegung',
+  bezug: () => 'w in mm · L in m · nur x',
+  hilfe: HILFE.verformung,
+  inhalt: verformungInhalt,
+  stand: (q) => zeilenstand(q.verformung?.faelle, 'Fall', 'Fälle', 'kein Fall'),
+};
+
+const SUCHE = {
+  schluessel: 'automatik',
+  name: 'Bewehrung suchen', titel: 'Automatische Bewehrung',
+  inhalt: automatikInhalt,
+  stand: (q) => (laufendeSuche.has(q.kennung) ? { an: true, text: 'sucht …' }
+    : { an: false, text: q.automatik_dicke ? 'mit Dicke' : '' }),
+};
+
+/**
+ * Die Kapitel der Platte in ihren Gruppen: die Nachweise, die Analysen und
+ * das Werkzeug, das die Bewehrung sucht.
+ */
+export function plattenKapitel() {
+  return [
+    { titel: 'Nachweise', kapitel: [TRAGSICHERHEIT, ...nachweisKapitel(PLATTE), VERFORMUNG] },
+    { titel: 'Spannung-Dehnung-Analysen', kapitel: analysenKapitel(PLATTE) },
+    { titel: 'Werkzeug', kapitel: [SUCHE] },
+  ];
+}
+
+/** Ob in x Bewehrung liegt -- Grund oder Zulage einer x-Lage. */
+function xBewehrt(querschnitt) {
+  return xLagen(querschnitt).some((n) => querschnitt.lagen[n - 1].grund.durchmesser > 0
+    || querschnitt.lagen[n - 1].zulage.durchmesser > 0);
+}
+
 /**
  * Wo die Kapitel eines Bauteils stehen und was bei ihm anders ist: die
  * Liste im Projekt, die Vorlage einer neuen Analyse und ihre Richtung -- bei
  * der Platte die Tragrichtung x oder y. Der gezeichnete Querschnitt hat seinen
  * eigenen Ort (`querschnittsanalyse.js`): dort ist die Richtung die Zugseite.
  * `raender(k)` sagt, wie die beiden Ränder einer Analyse heissen -- der
- * gedrückte und der gezogene. `zwang(e)`, `gebrauch` und `knick` sind, was
- * die Zwängung, die Stahlspannungen und das Knicken beim Bauteil anders
- * zeigen.
+ * gedrückte und der gezogene.
+ *
+ * Für die Kapitel (`nachweisKapitel`, `analysenKapitel`): `bezug(e)` steht
+ * unter dem Titel eines Fensters, `hilfe` hinter seinem Fragezeichen.
+ * `marke()` und `hinweis(e, feld)` stehen vor und hinter den Zeilen mit
+ * einem Schalter, `rechenwerte` unter Duktilität und sprödem Versagen.
+ * `gebrauch` und `knick` sind, was die Stahlspannungen und das Knicken beim
+ * Bauteil anders zeigen.
  */
 export const PLATTE = {
   liste: 'querschnitte',
   vorlage: 'analyse',
   richtung: (k, setzen) => richtungsWahl(k.richtung || 'x', setzen, ['x', 'y']),
   raender: () => ['oben', 'unten'],
-  // Die Zwängung: nur in Tragrichtung x.
-  zwang: () => ({
-    marke: () => el('span.richtung', {
-      text: 'x', class: 'lage-x', title: 'Nur Tragrichtung x',
-    }),
-    hinweise: {},
-    phiTitel: 'Kriechzahl φ der Zwängung auf Biegung: n = E_s/E_cm · (1 + φ)',
+  bezug: jeB,
+  hilfe: HILFE,
+  // Nachgewiesen wird nur x: vor jedem Schalter die Marke der Tragrichtung,
+  // wie in den Lagenzeilen -- dieselbe Angabe soll überall gleich aussehen,
+  // sonst liest man sie zweimal verschieden.
+  marke: () => el('span.richtung', {
+    text: 'x', class: 'lage-x', title: 'Nur Tragrichtung x; es zählt die ungünstigere x-Lage',
   }),
+  // Ein eingeschalteter Nachweis ohne Bewehrung ist kein Fehler der
+  // Eingabe -- er wird geführt und meldet selbst, dass er nicht geht. Hier
+  // steht es trotzdem, damit man es beim Einschalten sieht.
+  hinweis: (q, feld) => (q[feld] && !xBewehrt(q) ? 'keine x-Bewehrung' : ''),
+  // Womit Duktilität und sprödes Versagen rechnen, steht im Fragezeichen:
+  // die beiden rechnen hier verschieden.
+  rechenwerte: null,
   // Das Knicken: nur in x.
   knick: {
     vorlage: 'knickfall',
@@ -939,7 +1098,7 @@ export const PLATTE = {
  * Dehnungsfelder zeigen, die sie nicht liest. Die Bilder aller Arten
  * stehen in einer Liste der Platte; jede Zeile behält ihre Stelle darin.
  */
-export function analyseInhalt(eintrag, art, ort = PLATTE) {
+function analyseInhalt(eintrag, art, ort) {
   const stellen = (eintrag.spannungsfaelle || [])
     .map((k, i) => (k.art === art ? i : -1))
     .filter((i) => i >= 0);

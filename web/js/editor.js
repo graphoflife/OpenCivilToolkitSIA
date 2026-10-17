@@ -21,15 +21,9 @@ import { feld, panel, zweiSchalter } from './bausteine.js';
 import { auswahl, el, ersetzen, melden, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
 import { fensterZeigen } from './fenster.js';
-import {
-  analysenKapitel, anzahl, eingeschaltet, gebrauchsstand, kapitelFenster, kapitelPanel, schalter,
-} from './kapitel.js';
+import { kapitelFenster, kapitelPanel } from './kapitel.js';
 import { partnerVon, richtungSetzen, richtungVon } from './lagen.js';
-import {
-  analyseInhalt, automatikInhalt, duktilitaetInhalt, fliessenGefordert, haeufigInhalt,
-  hilfe, jeB, knickInhalt, quasistaendigInhalt, sproedeInhalt, sucheLaeuft,
-  tragsicherheitInhalt, verformungInhalt, zwangInhalt,
-} from './nachweise.js';
+import { plattenKapitel } from './nachweise.js';
 import { analyseEditor, analyseFenster } from './querschnittsanalyse.js';
 import { balkensystemEditor } from './balkensystem.js';
 import { grundbruchEditor } from './grundbruch.js';
@@ -463,100 +457,6 @@ function ueberdeckungsBlock(querschnitt, welche) {
   ]);
 }
 
-
-
-// ===========================================================================
-// Die Kapitel der Platte -- je ein Knopf, die Eingaben im Fenster (kapitel.js)
-// ===========================================================================
-
-/** Worauf sich die Eingaben beziehen, unter dem Titel des Fensters. */
-const mitQuerkraft = (q) => `${jeB(q)} · V je m`;
-
-const NACHWEISE = [
-  {
-    schluessel: 'tragsicherheit',
-    name: 'Trag\u00adsicherheit', titel: 'Tragsicherheitsnachweise', bezug: mitQuerkraft,
-    inhalt: tragsicherheitInhalt,
-    stand: (q) => {
-      const n = eingeschaltet(q.kombinationen);
-      return { an: n > 0, text: n ? anzahl(n, 'Einwirkung', 'Einwirkungen') : 'keine Einwirkung' };
-    },
-  },
-  {
-    schluessel: 'knicken',
-    name: 'Knicken', titel: 'Knicken', bezug: jeB,
-    inhalt: knickInhalt,
-    stand: (q) => {
-      const n = eingeschaltet(q.knickfaelle);
-      return { an: n > 0, text: n ? anzahl(n, 'Fall', 'Fälle') : 'kein Fall' };
-    },
-  },
-  {
-    schluessel: 'duktilitaet',
-    name: 'Duktilität', titel: 'Duktilitätsnachweis',
-    inhalt: duktilitaetInhalt,
-    stand: (q) => schalter(!!q.duktilitaet),
-  },
-  {
-    schluessel: 'sproede',
-    name: 'Sprödes Versagen', titel: 'Nachweis gegen sprödes Versagen',
-    inhalt: sproedeInhalt,
-    stand: (q) => schalter(!!q.sproede),
-  },
-  {
-    schluessel: 'zwang',
-    name: 'Riss bei Zwang', titel: 'Rissbreitenbegrenzung bei Zwang',
-    inhalt: zwangInhalt,
-    // Die Begrenzung auf 500 mm ist kein eigener Nachweis, sie ändert die
-    // beiden anderen.
-    stand: (q) => {
-      const teile = [q.zwaengung ? 'N' : null, q.zwaengung_biegung ? 'M' : null].filter(Boolean);
-      return { an: teile.length > 0, text: teile.length ? `auf ${teile.join(' und ')}` : 'aus' };
-    },
-  },
-  {
-    schluessel: 'quasistaendig',
-    name: 'Stahlspannung quasi-ständig',
-    titel: 'Stahlspannungsbegrenzung bei quasi-ständigen Lastfällen', bezug: jeB,
-    inhalt: quasistaendigInhalt,
-    stand: (q) => gebrauchsstand(q.quasistaendig),
-  },
-  {
-    schluessel: 'haeufig',
-    name: 'Fliessen häufig', titel: 'Verhindern des Fliessens für häufige Lastfälle',
-    bezug: jeB,
-    inhalt: haeufigInhalt,
-    stand: (q) => (fliessenGefordert(q) ? gebrauchsstand(q.haeufig)
-      : { an: false, text: 'entfällt' }),
-  },
-  {
-    schluessel: 'verformung',
-    name: 'Verformung', titel: 'Begrenzung der Durchbiegung',
-    bezug: () => 'w in mm · L in m · nur x',
-    inhalt: verformungInhalt,
-    stand: (q) => {
-      const n = eingeschaltet(q.verformung?.faelle);
-      return { an: n > 0, text: n ? anzahl(n, 'Fall', 'Fälle') : 'kein Fall' };
-    },
-  },
-];
-
-const SUCHE = {
-  schluessel: 'automatik',
-  name: 'Bewehrung suchen', titel: 'Automatische Bewehrung',
-  inhalt: automatikInhalt,
-  stand: (q) => (sucheLaeuft(q.kennung) ? { an: true, text: 'sucht …' }
-    : { an: false, text: q.automatik_dicke ? 'mit Dicke' : '' }),
-};
-
-function plattenKapitel() {
-  return [
-    { titel: 'Nachweise', kapitel: NACHWEISE },
-    { titel: 'Spannung-Dehnung-Analysen', kapitel: analysenKapitel({ inhalt: analyseInhalt, bezug: jeB }) },
-    { titel: 'Werkzeug', kapitel: [SUCHE] },
-  ];
-}
-
 function plattenEditor(querschnitt) {
   const betone = zustand.projekt.materialien.filter((m) => m.art === 'beton');
   const aendern = (veraenderer) => projektAendern((p) => {
@@ -616,7 +516,7 @@ function plattenEditor(querschnitt) {
     ]),
 
     // Nachweise, Analysen und die Suche der Bewehrung: je ein Knopf, die
-    // Eingaben im Fenster.
+    // Eingaben im Fenster -- welche es sind, steht in nachweise.js.
     kapitelPanel(querschnitt, plattenKapitel(),
       { schluessel: 'platte/Kapitel', titel: 'Nachweise und Analysen' }),
   ];
@@ -626,7 +526,7 @@ function plattenEditor(querschnitt) {
 
 /** Das Fenster eines Kapitels, je Bauteilart -- das Balkensystem hat keine. */
 const FENSTER = {
-  querschnitt: (q, schluessel) => kapitelFenster(q, plattenKapitel(), schluessel, hilfe),
+  querschnitt: (q, schluessel) => kapitelFenster(q, plattenKapitel(), schluessel),
   querschnittsanalyse: analyseFenster,
 };
 
