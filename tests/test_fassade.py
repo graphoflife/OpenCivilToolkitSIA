@@ -13,8 +13,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
-from opencivil.nachweis.rechenwahl import Rechenart
+from opencivil.querschnitt.gesetzwahl import Rechenart, Werkstoffsatz
 from opencivil.projekt import (
     GebrauchsfallEintrag, KnickEintrag, KombinationEintrag, Projekt, ProjektFehler,
     RechenwahlEintrag,

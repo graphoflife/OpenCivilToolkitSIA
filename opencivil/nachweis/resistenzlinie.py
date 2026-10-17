@@ -51,7 +51,8 @@ from opencivil.nachweis.dehnungsfaecher import Linienpunkt
 from opencivil.nachweis.querschnittsloeser import (
     Stahllage, plattenfasern, protokoll_wirksamer_modul,
 )
-from opencivil.nachweis.rechenwahl import Rechenart, Rechenwahl, protokoll_gesetze
+from opencivil.nachweis.rechenwahl import protokoll_gesetze
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.querschnitt.interaktion import illinois
 from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
 
@@ -240,7 +241,7 @@ class Ebenenlinie(Widerstandslinie):
     Der Rand des Dehnungsfaechers -- genau nachgeschaerft, siehe Dateikopf.
 
     ``beton`` ist das Gesetz der Wahl
-    (:func:`~opencivil.nachweis.rechenwahl.betongesetz`). Der Stahl kommt je
+    (:func:`~opencivil.querschnitt.gesetzwahl.betongesetz`). Der Stahl kommt je
     Lage mit ihrer :class:`Stahllage` -- als :class:`Stahlgesetz`, ohne
     Abfall jenseits von ``eps_ud``: die unterste Lage liegt im Faecher genau
     auf dieser Grenze, und ein Gesetz, das dort auf null faellt, kippte an

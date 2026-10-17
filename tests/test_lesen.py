@@ -10,7 +10,7 @@ import json
 import unittest
 
 from opencivil.core.einheiten import GRAD, MM
-from opencivil.nachweis.rechenwahl import Rechenart
+from opencivil.querschnitt.gesetzwahl import Rechenart
 from opencivil.projekt import (
     Gebrauchswahl, KnickVerformungswahl, KombinationEintrag, PostenEintrag, Projekt,
     ProjektFehler, QuerschnittEintrag,

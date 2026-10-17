@@ -3075,13 +3075,9 @@
         "Kurvenbeiwerte.hoehen",
         "Widerstandspunkt",
         "widerstand",
-        "Buegelpunkt",
-        "Buegelpunkt.V_Rd",
-        "fachwerk",
         "buegelwiderstand",
         "Buegelwerte",
         "neigungen",
-        "beste_neigung",
         "_statische_hoehe",
         "zuglage",
         "beiwert_k_g",
@@ -3118,7 +3114,6 @@
         "bruchdehnung",
         "Ebene",
         "Ebene.bei",
-        "wirksamer_modul",
         "wirksamer_modul_wert",
         "protokoll_wirksamer_modul",
         "protokoll_verfahren",
@@ -3142,20 +3137,7 @@
         "FaserloeserIllinois.loese",
         "FaserloeserIllinois._von_zuletzt",
         "Querschnittsloeser",
-        "QuerschnittsloeserIllinois",
-        "Werkstoffsatz",
-        "Werkstoffsatz.beschriftung",
-        "Werkstoffsatz.kurz",
-        "Werkstoffsatz.kuerzel",
-        "Werkstoffsatz.widerstandsindex",
-        "Werkstoffsatz.stahl_druck",
-        "Werkstoffsatz.stahl",
-        "Werkstoffsatz.beton",
-        "Werkstoffsatz.stahl_zeichen",
-        "Werkstoffsatz.stahl_druck_zeichen",
-        "Werkstoffsatz.beton_zeichen",
-        "Werkstoffsatz.betonkennwerte",
-        "Werkstoffsatz.stahlkennwerte"
+        "QuerschnittsloeserIllinois"
       ]
     },
     {
@@ -3164,16 +3146,6 @@
       "art": "modul",
       "kurz": "womit ein Kapitel rechnet.",
       "stichworte": [
-        "Rechenart",
-        "Rechenart.beschriftung",
-        "Rechenart.kurz",
-        "Rechenart.latex",
-        "Rechenart.mit_kriechzahl",
-        "Rechenart.mit_block",
-        "Rechenart.ohne_ebene",
-        "Rechenwahl",
-        "Rechenwahl.index",
-        "Rechenwahl.beschriftung",
         "Betonkennwerte",
         "Betonkennwerte.aus_eingaben",
         "betonbezuege",
@@ -3183,7 +3155,6 @@
         "lagenbezuege",
         "stahllagen",
         "bezuege_vereinen",
-        "betongesetz",
         "Gesetze",
         "Gesetze.stahl",
         "Gesetze.verdraengt",
@@ -3870,6 +3841,18 @@
       ]
     },
     {
+      "name": "opencivil.querschnitt.fachwerk",
+      "pfad": "Python/opencivil.querschnitt.fachwerk.md",
+      "art": "modul",
+      "kurz": "das Fachwerk mit veraenderlicher Neigung.",
+      "stichworte": [
+        "Buegelpunkt",
+        "Buegelpunkt.V_Rd",
+        "fachwerk",
+        "beste_neigung"
+      ]
+    },
+    {
       "name": "opencivil.querschnitt.fasern",
       "pfad": "Python/opencivil.querschnitt.fasern.md",
       "art": "modul",
@@ -3919,6 +3902,39 @@
         "Stablinie",
         "_halb_auf",
         "stablinie"
+      ]
+    },
+    {
+      "name": "opencivil.querschnitt.gesetzwahl",
+      "pfad": "Python/opencivil.querschnitt.gesetzwahl.md",
+      "art": "modul",
+      "kurz": "womit ein Querschnitt rechnet.",
+      "stichworte": [
+        "Werkstoffsatz",
+        "Werkstoffsatz.beschriftung",
+        "Werkstoffsatz.kurz",
+        "Werkstoffsatz.kuerzel",
+        "Werkstoffsatz.widerstandsindex",
+        "Werkstoffsatz.stahl_druck",
+        "Werkstoffsatz.stahl",
+        "Werkstoffsatz.beton",
+        "Werkstoffsatz.stahl_zeichen",
+        "Werkstoffsatz.stahl_druck_zeichen",
+        "Werkstoffsatz.beton_zeichen",
+        "Werkstoffsatz.betonkennwerte",
+        "Werkstoffsatz.stahlkennwerte",
+        "Rechenart",
+        "Rechenart.beschriftung",
+        "Rechenart.kurz",
+        "Rechenart.latex",
+        "Rechenart.mit_kriechzahl",
+        "Rechenart.mit_block",
+        "Rechenart.ohne_ebene",
+        "Rechenwahl",
+        "Rechenwahl.index",
+        "Rechenwahl.beschriftung",
+        "wirksamer_modul",
+        "betongesetz"
       ]
     },
     {

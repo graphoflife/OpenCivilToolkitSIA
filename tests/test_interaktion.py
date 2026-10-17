@@ -13,7 +13,7 @@ import unittest
 
 from opencivil.nachweis import linie
 from opencivil.nachweis.querschnittsloeser import Stahllage
-from opencivil.nachweis.rechenwahl import Rechenart, Rechenwahl
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.nachweis.resistenzlinie import Ebenenlinie
 from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.interaktion import (

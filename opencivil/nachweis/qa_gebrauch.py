@@ -72,7 +72,8 @@ from opencivil.nachweis.gebrauchsebene import (
 )
 from opencivil.nachweis.mindestbewehrung import DICKENGRENZE
 from opencivil.nachweis.querschnittsloeser import VERFEHLTE_EBENE
-from opencivil.nachweis.rechenwahl import Rechenwahl, protokoll_rechenwahl
+from opencivil.nachweis.rechenwahl import protokoll_rechenwahl
+from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.richtungsnachweise import (
     protokoll_rissmoment, protokoll_spannung_ungerissen, richtungen, rissbezuege, rissmoment,

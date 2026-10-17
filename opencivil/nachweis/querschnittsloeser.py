@@ -70,13 +70,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from functools import cached_property
-from typing import Callable, Dict, List, Optional, Sequence, Tuple
+from typing import Callable, List, Optional, Sequence, Tuple
 
 from opencivil.core.protokoll import Zwischenwerte
-from opencivil.core.wahl import Wahl
 from opencivil.querschnitt.fasern import (
     Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt, Stab,
 )
+from opencivil.querschnitt.gesetzwahl import wirksamer_modul
 from opencivil.querschnitt.werkstoffgesetz import Gesetz, Stahlgesetz
 
 #: Fasern ueber die Plattenhoehe. 60 reichen: die Betonspannung ist stetig,
@@ -233,11 +233,6 @@ class Ebene:
         """Die Dehnung in der Tiefe ``z``."""
         return self.eps_m + self.chi * (z - h / 2.0)
 
-
-
-def wirksamer_modul(E_cm: float, phi: float) -> float:
-    """``E_c,eff = E_cm / (1 + phi)`` -- das Kriechen weicht den Beton auf."""
-    return E_cm / (1.0 + phi)
 
 
 def wirksamer_modul_wert(E_cm, phi: float, basis: str):
@@ -912,101 +907,3 @@ class QuerschnittsloeserIllinois(FaserloeserIllinois, Querschnittsloeser):
     kostete das Halbieren beinahe die ganze Rechenzeit (Benutzer,
     2026-10-15).
     """
-
-
-# ===========================================================================
-# Werkstoffgesetze fuer den Loeser
-# ===========================================================================
-
-
-class Werkstoffsatz(Wahl):
-    """
-    Mit welchen Festigkeiten die Werkstoffgesetze rechnen.
-
-    **Bemessung** -- ``f_cd`` und ``f_yd``. Fuer die Tragsicherheit: gefragt
-    ist, was der Querschnitt *darf*, und dahinein gehoert der
-    Teilsicherheitsbeiwert.
-
-    **Charakteristisch** -- ``f_ck`` und ``f_yk``. Fuer die
-    Gebrauchstauglichkeit: gefragt ist, was der Querschnitt *tut*, und Stahl
-    fliesst bei ``f_yk``, nicht bei ``f_yd``. Mit dem Plateau bei ``f_yd``
-    laege jede Stahlspannung unter 435 N/mm², und eine Grenze darueber --
-    ``f_yk`` bei normaler Rissanforderung -- waere nie zu ueberschreiten: ein
-    Nachweis, der per Konstruktion immer aufgeht.
-
-    Der Satz bestimmt, **wo die Plateaus liegen**, und sonst nichts. Die
-    Moduln und Dehnungsgrenzen sind in beiden Saetzen dieselben. Er steht hier
-    als Name und nicht als zwei Zahlen an jeder Aufrufstelle: welche Werte ein
-    Nachweis ansetzt, ist eine Entscheidung, und eine Entscheidung soll man
-    lesen koennen, statt sie aus ``f_sd=...`` erschliessen zu muessen. Jeder
-    Nutzer des Loesers nennt darum seinen Satz -- der Knicknachweis
-    ``BEMESSUNG``, die Spannungsbegrenzung ``CHARAKTERISTISCH``; die
-    Spannung-Dehnung-Analyse waehlt ihn je Analyse.
-    """
-
-    BEMESSUNG = "bemessung"
-    CHARAKTERISTISCH = "charakteristisch"
-
-    @property
-    def beschriftung(self) -> str:
-        return "Bemessungswerte" if self is Werkstoffsatz.BEMESSUNG else "charakteristisch"
-
-    @property
-    def kurz(self) -> str:
-        """Fuer schmale Zeilen."""
-        return "Bemessung" if self is Werkstoffsatz.BEMESSUNG else "charakteristisch"
-
-    @property
-    def kuerzel(self) -> str:
-        """Der Buchstabe am Index: ``d`` (design) oder ``k`` (charakteristisch)."""
-        return "d" if self is Werkstoffsatz.BEMESSUNG else "k"
-
-    @property
-    def widerstandsindex(self) -> str:
-        """Der Index an einem Widerstand: ``M_{Rd}`` oder ``M_{Rk}``."""
-        return "Rd" if self is Werkstoffsatz.BEMESSUNG else "Rk"
-
-    @property
-    def stahl_druck(self) -> str:
-        """Kurzname der Stahlfestigkeit auf Druck -- dort beginnt das Plateau."""
-        return "f_yd_druck" if self is Werkstoffsatz.BEMESSUNG else "f_yk_druck"
-
-    @property
-    def stahl(self) -> str:
-        """Kurzname der Stahlfestigkeit -- dort beginnt das Fliessplateau."""
-        return "f_yd" if self is Werkstoffsatz.BEMESSUNG else "f_yk"
-
-    @property
-    def beton(self) -> str:
-        """Kurzname der Betonfestigkeit -- dort endet der Anstieg im Druck."""
-        return "f_cd" if self is Werkstoffsatz.BEMESSUNG else "f_ck"
-
-    @property
-    def stahl_zeichen(self) -> str:
-        """Das Formelzeichen dazu, fuer die Herleitung -- ``f_{yd}``."""
-        return "f_{yd}" if self is Werkstoffsatz.BEMESSUNG else "f_{yk}"
-
-    @property
-    def stahl_druck_zeichen(self) -> str:
-        """Das Zeichen des Plateaus auf Druck -- ``f_{yd}^{-}``."""
-        return f"{self.stahl_zeichen}^{{-}}"
-
-    @property
-    def beton_zeichen(self) -> str:
-        """Das Formelzeichen dazu, fuer die Herleitung -- ``f_{cd}``."""
-        return "f_{cd}" if self is Werkstoffsatz.BEMESSUNG else "f_{ck}"
-
-    @property
-    def betonkennwerte(self) -> Dict[str, str]:
-        """
-        Je Rolle eines Betongesetzes
-        (:data:`~opencivil.querschnitt.werkstoffgesetz.Werte`) der Kurzname
-        seines Kennwerts in diesem Satz -- ``E_c`` als ``E_cm``, ohne Kriechen.
-        """
-        return {"f_c": self.beton, "E_c": "E_cm", "eps_c1d": "eps_c1d", "eps_c2d": "eps_c2d"}
-
-    @property
-    def stahlkennwerte(self) -> Dict[str, str]:
-        """Dasselbe fuer ein Stahlgesetz."""
-        return {"f_s": self.stahl, "f_s_druck": self.stahl_druck, "E_s": "E_s",
-                "eps_ud": "eps_ud"}

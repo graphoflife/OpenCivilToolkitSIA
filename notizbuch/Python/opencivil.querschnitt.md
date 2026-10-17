@@ -1,5 +1,5 @@
 ---
-erzeugt: ffcd17728a97
+erzeugt: c269848f09e8
 art: modul
 tags: [modul]
 ---
@@ -15,8 +15,10 @@ schiefer Biegung, Querkraft und Torsion auf Schubwaende.
 ## Module
 
 - [[opencivil.querschnitt.analyse]] – der gezeichnete Querschnitt als Bauteil im Rechenwerk.
+- [[opencivil.querschnitt.fachwerk]] – das Fachwerk mit veraenderlicher Neigung.
 - [[opencivil.querschnitt.fasern]] – Der Querschnitt als Summe von Fasern.
 - [[opencivil.querschnitt.geometrie]] – Ebene Geometrie eines gezeichneten Querschnitts.
+- [[opencivil.querschnitt.gesetzwahl]] – womit ein Querschnitt rechnet.
 - [[opencivil.querschnitt.interaktion]] – Bruchzustand gezeichneter Querschnitte, auch schief.
 - [[opencivil.querschnitt.platte]] – Stahlbeton-Plattenquerschnitt.
 - [[opencivil.querschnitt.schnittanalyse]] – Spannung-Dehnung-Analyse am gezeichneten Querschnitt.

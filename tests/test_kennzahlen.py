@@ -9,7 +9,8 @@ import unittest
 
 from opencivil.bericht.zusammenfassung import kennzahlen
 from opencivil.nachweis import linie as geo
-from opencivil.nachweis.querkraft import beste_neigung, neigungen
+from opencivil.nachweis.querkraft import neigungen
+from opencivil.querschnitt.fachwerk import beste_neigung
 from opencivil.projekt import Projekt, RechenwahlEintrag
 from opencivil.web import dienst
 

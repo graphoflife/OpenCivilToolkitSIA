@@ -1,5 +1,5 @@
 ---
-erzeugt: 3af3e3666f4f
+erzeugt: 81858609a626
 art: modul
 tags: [modul]
 ---
@@ -38,7 +38,7 @@ melden.
 Ueber [[opencivil.nachweis.querschnittsloeser]]: gesucht wird die
 Dehnungsebene, die `M_Ed` und `N_Ed` des Lastfalls im Gleichgewicht
 haelt. Der Beton nimmt keinen Zug auf. Womit gerechnet wird, waehlt das
-Kapitel ([[opencivil.nachweis.rechenwahl#Rechenwahl|Rechenwahl]]): die
+Kapitel ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]): die
 Kriechzahl, den Wertesatz und die Rechenart. Die Vorgabe ist, wie bis
 2026-10-09 fest: **elastisch** -- der Beton im Druck linear mit dem wirksamen
 Modul `E_cm/(1+phi)` -- mit den **charakteristischen** Festigkeiten: der
@@ -458,6 +458,7 @@ Der Fall, in dem die Spannung am Plateau stehen bleibt.
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.nachweis.zustand2]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 
 ## Gebraucht von

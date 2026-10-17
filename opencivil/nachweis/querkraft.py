@@ -52,7 +52,6 @@ in Millimeter ein, ``f_ck`` in N/mm^2. ``k_g`` laeuft deshalb ueber
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, field
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
@@ -69,6 +68,7 @@ from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.nachweis.biegung_normalkraft import MNBefund, protokoll_widerstand
 from opencivil.nachweis.rechenwahl import stahlbezuege, stahlname, staehle
+from opencivil.querschnitt.fachwerk import Buegelpunkt, beste_neigung, fachwerk
 from opencivil.querschnitt.platte import (
     ALPHA_ZUG, Plattenquerschnitt, Richtung, protokoll_statische_hoehe,
 )
@@ -201,53 +201,6 @@ def widerstand(
         plastisch=plastisch)
 
 
-@dataclass(frozen=True)
-class Buegelpunkt:
-    """
-    Was bei einer bestimmten Neigung der Druckdiagonalen aufnehmbar ist.
-
-    Beide Anteile in N/m, also je Laufmeter -- wie ``V_Ed``.
-    """
-
-    alpha: int
-    """Neigung der Druckdiagonalen in Grad."""
-
-    V_Rd_s: float
-    """Bügel: waechst, je flacher die Diagonale liegt."""
-
-    V_Rd_c: float
-    """Druckdiagonale: groesst bei 45°, faellt nach beiden Seiten."""
-
-    @property
-    def V_Rd(self) -> float:
-        """Massgebend ist der kleinere der beiden -- eines von beiden versagt."""
-        return min(self.V_Rd_s, self.V_Rd_c)
-
-
-def fachwerk(
-    *, alpha: int, a_sw_s: float, z: float, b_w: float,
-    f_yd: float, f_cd: float, k_c: float,
-) -> Buegelpunkt:
-    """
-    Fachwerkmodell mit veraenderlicher Neigung der Druckdiagonalen -- fuer die
-    Buegel einer Platte wie fuer eine Schubwand der Querschnittsanalyse.
-
-    Alles in SI-Basis: Flaechen in m^2, Laengen in m, Festigkeiten in Pa::
-
-        V_Rd,s = A_sw/s · z · f_yd · cot(alpha)
-        V_Rd,c = b_w · z · k_c · f_cd · sin(alpha) · cos(alpha)
-
-    ``A_sw/s`` ist der Bewehrungsgehalt je Laenge in Laengsrichtung, ``z``
-    der Hebelarm der inneren Kraefte, ``b_w`` die Breite des Stegs.
-    """
-    bogen = math.radians(alpha)
-    return Buegelpunkt(
-        alpha=alpha,
-        V_Rd_s=a_sw_s * z * f_yd / math.tan(bogen),
-        V_Rd_c=b_w * z * k_c * f_cd * math.sin(bogen) * math.cos(bogen),
-    )
-
-
 def buegelwiderstand(
     *, alpha: int, a_s: float, s_x: float, s_y: float, d: float,
     f_yd: float, f_cd: float, k_c: float,
@@ -292,18 +245,6 @@ def neigungen(
     """Je ganzes Grad im Bereich ein Punkt, einschliesslich der Grenzen."""
     return [buegelwiderstand(alpha=a, **werte)
             for a in range(alpha_min, alpha_max + 1)]
-
-
-def beste_neigung(punkte: Sequence[Buegelpunkt]) -> Buegelpunkt:
-    """
-    Die Neigung mit dem groessten Widerstand.
-
-    ``V_Rd,s`` waechst mit flacherer Diagonale, ``V_Rd,c`` faellt dabei --
-    das Kleinere von beiden hat sein Groesstes dort, wo sich die beiden
-    Aeste treffen. Gesucht wird ganzgradig; bei Gleichstand gilt die
-    steilere Neigung, weil sie die Druckdiagonale weniger beansprucht.
-    """
-    return max(punkte, key=lambda q: (q.V_Rd, q.alpha))
 
 
 def _statische_hoehe(

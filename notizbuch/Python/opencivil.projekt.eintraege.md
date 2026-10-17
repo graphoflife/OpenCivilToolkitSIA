@@ -1,5 +1,5 @@
 ---
-erzeugt: bf32127fc59c
+erzeugt: f7a078553ac0
 art: modul
 tags: [modul]
 ---
@@ -411,7 +411,7 @@ der einen oder der anderen Seite -- aus Schnittgroessen, aus Dehnungen,
 als Momenten-Kruemmungs- oder als Normalkraft-Dehnungs-Linie.
 
 Womit gerechnet wird, waehlt jede Analyse fuer sich: die Kriechzahl, den
-Wertesatz und die Rechenart ([[opencivil.nachweis.rechenwahl#Rechenwahl|Rechenwahl]]).
+Wertesatz und die Rechenart ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]).
 
 - `name: str`
 - `art: Analyseart = Analyseart.SCHNITTGROESSEN` – Was gefragt wird -- siehe [[opencivil.spannungsanalyse#Analyseart|Analyseart]].
@@ -422,7 +422,7 @@ Wertesatz und die Rechenart ([[opencivil.nachweis.rechenwahl#Rechenwahl|Rechenwa
 - `eps_unten: float = 2.0` – Randdehnungen in Promille -- nur fuer `dehnungen`.
 - `kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)` – Die Kriechzahl φ dieser Analyse.
 - `werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG` – `bemessung` (f_cd, f_yd) oder `charakteristisch` (f_ck, f_yk).
-- `rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)` – `block` oder `parabel` -- siehe [[opencivil.nachweis.rechenwahl#Rechenart|Rechenart]]. Die Handrechnung gibt es hier nicht ([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]).
+- `rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)` – `block` oder `parabel` -- siehe [[opencivil.querschnitt.gesetzwahl#Rechenart|Rechenart]]. Die Handrechnung gibt es hier nicht ([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]).
 - `aktiv: bool = True`
 
 #### SpannungsfallEintrag.wahl
@@ -486,7 +486,7 @@ class RechenwahlEintrag(Beschreibung)
 ```
 
 Womit ein Nachweis-Kapitel rechnet: Kriechzahl, Wertesatz, Rechenart --
-siehe [[opencivil.nachweis.rechenwahl#Rechenwahl|Rechenwahl]]. So steht sie in
+siehe [[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]. So steht sie in
 der Tragsicherheit.
 
 Jedes andere Kapitel hat seine Unterklasse, und welche Rechenarten es
@@ -627,10 +627,10 @@ Eine zu pruefende Schnittgroessenkombination.
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]
-- [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt.lesen]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.spannungsanalyse]]
 

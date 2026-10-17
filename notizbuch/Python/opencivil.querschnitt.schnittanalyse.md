@@ -1,5 +1,5 @@
 ---
-erzeugt: cde140101f1c
+erzeugt: af3978bd29f4
 art: modul
 tags: [modul]
 ---
@@ -267,11 +267,11 @@ gerufen. Mit `protokoll` schreibt jede Linie ihre Herleitung.
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.querschnittsloeser]]
-- [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.projekt]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.fasern]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.querschnitt.zugseite]]

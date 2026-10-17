@@ -29,9 +29,9 @@ from opencivil.querschnitt.platte import (
 from opencivil.projekt.lesen import (
     ProjektFehler, bereich, einer_von, lesen, ort, sorten, wahl_aus_text,
 )
-from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
-    FASERARTEN, RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN, Rechenart, Rechenwahl,
+    FASERARTEN, RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN,
 )
 from opencivil.nachweis.verformung import KRIECHZAHL as VERFORMUNG_KRIECHZAHL, ZUGSEITEN
 from opencivil.spannungsanalyse import Analyseart
@@ -468,7 +468,7 @@ class SpannungsfallEintrag(Beschreibung):
     als Momenten-Kruemmungs- oder als Normalkraft-Dehnungs-Linie.
 
     Womit gerechnet wird, waehlt jede Analyse fuer sich: die Kriechzahl, den
-    Wertesatz und die Rechenart (:class:`~opencivil.nachweis.rechenwahl.Rechenwahl`).
+    Wertesatz und die Rechenart (:class:`~opencivil.querschnitt.gesetzwahl.Rechenwahl`).
     """
 
     name: str
@@ -497,7 +497,7 @@ class SpannungsfallEintrag(Beschreibung):
 
     rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)
     """``block`` oder ``parabel`` -- siehe
-    :class:`~opencivil.nachweis.rechenwahl.Rechenart`. Die Handrechnung gibt
+    :class:`~opencivil.querschnitt.gesetzwahl.Rechenart`. Die Handrechnung gibt
     es hier nicht (:data:`~opencivil.nachweis.rechenwahl.FASERARTEN`)."""
 
     @property
@@ -569,7 +569,7 @@ def eindeutig(namen: Iterable[str], wo: str, was: str) -> None:
 class RechenwahlEintrag(Beschreibung):
     """
     Womit ein Nachweis-Kapitel rechnet: Kriechzahl, Wertesatz, Rechenart --
-    siehe :class:`~opencivil.nachweis.rechenwahl.Rechenwahl`. So steht sie in
+    siehe :class:`~opencivil.querschnitt.gesetzwahl.Rechenwahl`. So steht sie in
     der Tragsicherheit.
 
     Jedes andere Kapitel hat seine Unterklasse, und welche Rechenarten es

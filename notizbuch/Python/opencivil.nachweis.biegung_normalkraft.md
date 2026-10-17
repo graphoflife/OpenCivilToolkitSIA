@@ -1,5 +1,5 @@
 ---
-erzeugt: bc3c9d3c9a3d
+erzeugt: b1bfd1465733
 art: modul
 tags: [modul]
 ---
@@ -15,7 +15,7 @@ eines Querschnitts.
 
 ## ZWEI LINIEN, EINE DAVON MASSGEBEND
 
-Welche massgebend ist, waehlt das Kapitel ([[opencivil.nachweis.rechenwahl#Rechenwahl|Rechenwahl]]):
+Welche massgebend ist, waehlt das Kapitel ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]):
 
 * **Handrechnung Block 0.85·x** -- das Polygon aus wenigen Eckpunkten in
   [[opencivil.nachweis.handrechnung]]. Seine Herleitung steht
@@ -378,9 +378,9 @@ Ein SI-Wert in der Einheit seiner Achse, mit Einheitenzeichen.
 - [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.linie]]
-- [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 
 ## Gebraucht von

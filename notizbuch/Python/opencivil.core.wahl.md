@@ -1,5 +1,5 @@
 ---
-erzeugt: 75b27452353b
+erzeugt: a30a9f54b5ef
 art: modul
 tags: [modul]
 ---
@@ -34,10 +34,9 @@ Eine Wahl: das Mitglied ist sein Text.
 - [[opencivil.bewehrungssuche.laengs]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
-- [[opencivil.nachweis.querschnittsloeser]]
-- [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.querschnitt.geometrie]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.querschnitt.zugseite]]

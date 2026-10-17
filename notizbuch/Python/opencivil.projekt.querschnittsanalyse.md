@@ -1,5 +1,5 @@
 ---
-erzeugt: aa95861855af
+erzeugt: e22c969f9e9b
 art: modul
 tags: [modul]
 ---
@@ -528,13 +528,13 @@ wird danach, was man braucht.
 
 ## Braucht
 
-- [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.netz]]
 - [[opencivil.querschnitt.geometrie]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.querschnitt.zugseite]]

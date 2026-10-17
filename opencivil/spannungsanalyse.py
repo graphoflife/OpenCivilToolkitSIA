@@ -27,7 +27,7 @@ eigentlich im Querschnitt?*
 
 JE ANALYSE GEWAEHLT:
 Jede Analyse (:class:`~opencivil.projekt.SpannungsfallEintrag`) waehlt als
-:class:`~opencivil.nachweis.rechenwahl.Rechenwahl`
+:class:`~opencivil.querschnitt.gesetzwahl.Rechenwahl`
 
 * die Kriechzahl;
 * der Wertesatz -- Bemessung (``f_cd``, ``f_yd``) oder charakteristisch
@@ -109,12 +109,11 @@ from opencivil.core.wahl import Wahl
 from opencivil.core.wert import kennung_aus
 from opencivil.nachweis import dehnungsfaecher
 from opencivil.material.basis import mit_index
-from opencivil.nachweis.querschnittsloeser import (
-    Ebene, Faserloeser, Querschnittsloeser, Werkstoffsatz, wirksamer_modul,
+from opencivil.nachweis.querschnittsloeser import Ebene, Faserloeser, Querschnittsloeser
+from opencivil.querschnitt.gesetzwahl import (
+    Rechenart, Rechenwahl, Werkstoffsatz, betongesetz, wirksamer_modul,
 )
-from opencivil.nachweis.rechenwahl import (
-    Betonkennwerte, Rechenart, Rechenwahl, betongesetz, gesetze, stahllagen, staehle,
-)
+from opencivil.nachweis.rechenwahl import Betonkennwerte, gesetze, staehle, stahllagen
 from opencivil.nachweis.sproedes_versagen import (
     beiwert_dicke, protokoll_zugfestigkeit, rissmoment,
 )
@@ -1048,7 +1047,7 @@ def herleitung(p: Protokoll, fall, paar, linie: Linie,
         "(Zustand II) trägt der Beton keinen Zug, und im Druck gilt das Gesetz der "
         "gewählten Rechenart.")
     # Die Gesetze, wie die Loeser sie rechnen -- aus derselben Stelle
-    # (:func:`~opencivil.nachweis.rechenwahl.betongesetz`); sie schreiben sich selbst.
+    # (:func:`~opencivil.querschnitt.gesetzwahl.betongesetz`); sie schreiben sich selbst.
     beton = {"f_c": ein("f_c"), "E_c": E_c_eff, "eps_c1d": ein("eps_c1d"),
              "eps_c2d": ein("eps_c2d")}
     BetonUngerissen(E_c=E_c_eff.groesse.si).protokoll(p, beton, titel="Ungerissen (Zustand I)")

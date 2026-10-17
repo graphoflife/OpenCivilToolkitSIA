@@ -1,5 +1,5 @@
 ---
-erzeugt: 53b57ad3883e
+erzeugt: da3f81674359
 art: modul
 tags: [modul]
 ---
@@ -162,14 +162,6 @@ def bei(self, z: float, h: float) -> float
 
 Die Dehnung in der Tiefe `z`.
 
-### wirksamer_modul
-
-```python
-def wirksamer_modul(E_cm: float, phi: float) -> float
-```
-
-`E_c,eff = E_cm / (1 + phi)` -- das Kriechen weicht den Beton auf.
-
 ### wirksamer_modul_wert
 
 ```python
@@ -184,7 +176,7 @@ def wirksamer_modul_wert(E_cm, phi: float, basis: str)
 def protokoll_wirksamer_modul(p, E_cm, phi, basis: str, *, titel: str, nachsatz: str='') -> None
 ```
 
-Die Zeile zu [[opencivil.nachweis.querschnittsloeser#wirksamer_modul|wirksamer_modul]], aus den Werten `E_cm` und
+Die Zeile zu [[opencivil.querschnitt.gesetzwahl#wirksamer_modul|wirksamer_modul]], aus den Werten `E_cm` und
 `phi` -- fuer jeden Nachweis, der mit dem aufgeweichten Beton rechnet.
 
 ### protokoll_verfahren
@@ -481,7 +473,7 @@ nur auf Zug mit. Damit bleibt der Loeser
 frei von Annahmen ueber das Werkstoffgesetz: die Spannungsbegrenzung rechnet
 elastisch mit Kriechen und charakteristischen Festigkeiten, der
 Knicknachweis mit dem nichtlinearen Gesetz der Norm und Bemessungswerten
--- siehe [[opencivil.nachweis.querschnittsloeser#Werkstoffsatz|Werkstoffsatz]].
+-- siehe [[opencivil.nachweis.querschnittsloeser#Querschnittsloeser|Werkstoffsatz]].
 
 **Das Suchfenster muss zu den Gesetzen passen.** `eps_druck` und
 `eps_zug` duerfen nicht weiter reichen als der Bereich, in dem beide
@@ -514,145 +506,6 @@ aus ([[opencivil.nachweis.querschnittsloeser#FaserloeserIllinois|FaserloeserIlli
 kostete das Halbieren beinahe die ganze Rechenzeit (Benutzer,
 2026-10-15).
 
-### Werkstoffsatz
-
-```python
-class Werkstoffsatz(Wahl)
-```
-
-Mit welchen Festigkeiten die Werkstoffgesetze rechnen.
-
-**Bemessung** -- `f_cd` und `f_yd`. Fuer die Tragsicherheit: gefragt
-ist, was der Querschnitt *darf*, und dahinein gehoert der
-Teilsicherheitsbeiwert.
-
-**Charakteristisch** -- `f_ck` und `f_yk`. Fuer die
-Gebrauchstauglichkeit: gefragt ist, was der Querschnitt *tut*, und Stahl
-fliesst bei `f_yk`, nicht bei `f_yd`. Mit dem Plateau bei `f_yd`
-laege jede Stahlspannung unter 435 N/mm², und eine Grenze darueber --
-`f_yk` bei normaler Rissanforderung -- waere nie zu ueberschreiten: ein
-Nachweis, der per Konstruktion immer aufgeht.
-
-Der Satz bestimmt, **wo die Plateaus liegen**, und sonst nichts. Die
-Moduln und Dehnungsgrenzen sind in beiden Saetzen dieselben. Er steht hier
-als Name und nicht als zwei Zahlen an jeder Aufrufstelle: welche Werte ein
-Nachweis ansetzt, ist eine Entscheidung, und eine Entscheidung soll man
-lesen koennen, statt sie aus `f_sd=...` erschliessen zu muessen. Jeder
-Nutzer des Loesers nennt darum seinen Satz -- der Knicknachweis
-`BEMESSUNG`, die Spannungsbegrenzung `CHARAKTERISTISCH`; die
-Spannung-Dehnung-Analyse waehlt ihn je Analyse.
-
-- `BEMESSUNG = 'bemessung'`
-- `CHARAKTERISTISCH = 'charakteristisch'`
-
-#### Werkstoffsatz.beschriftung
-
-```python
-@property
-def beschriftung(self) -> str
-```
-
-#### Werkstoffsatz.kurz
-
-```python
-@property
-def kurz(self) -> str
-```
-
-Fuer schmale Zeilen.
-
-#### Werkstoffsatz.kuerzel
-
-```python
-@property
-def kuerzel(self) -> str
-```
-
-Der Buchstabe am Index: `d` (design) oder `k` (charakteristisch).
-
-#### Werkstoffsatz.widerstandsindex
-
-```python
-@property
-def widerstandsindex(self) -> str
-```
-
-Der Index an einem Widerstand: `M_{Rd}` oder `M_{Rk}`.
-
-#### Werkstoffsatz.stahl_druck
-
-```python
-@property
-def stahl_druck(self) -> str
-```
-
-Kurzname der Stahlfestigkeit auf Druck -- dort beginnt das Plateau.
-
-#### Werkstoffsatz.stahl
-
-```python
-@property
-def stahl(self) -> str
-```
-
-Kurzname der Stahlfestigkeit -- dort beginnt das Fliessplateau.
-
-#### Werkstoffsatz.beton
-
-```python
-@property
-def beton(self) -> str
-```
-
-Kurzname der Betonfestigkeit -- dort endet der Anstieg im Druck.
-
-#### Werkstoffsatz.stahl_zeichen
-
-```python
-@property
-def stahl_zeichen(self) -> str
-```
-
-Das Formelzeichen dazu, fuer die Herleitung -- `f_{yd}`.
-
-#### Werkstoffsatz.stahl_druck_zeichen
-
-```python
-@property
-def stahl_druck_zeichen(self) -> str
-```
-
-Das Zeichen des Plateaus auf Druck -- `f_{yd}^{-}`.
-
-#### Werkstoffsatz.beton_zeichen
-
-```python
-@property
-def beton_zeichen(self) -> str
-```
-
-Das Formelzeichen dazu, fuer die Herleitung -- `f_{cd}`.
-
-#### Werkstoffsatz.betonkennwerte
-
-```python
-@property
-def betonkennwerte(self) -> Dict[str, str]
-```
-
-Je Rolle eines Betongesetzes
-([[opencivil.querschnitt.werkstoffgesetz#Konstanten|Werte]]) der Kurzname
-seines Kennwerts in diesem Satz -- `E_c` als `E_cm`, ohne Kriechen.
-
-#### Werkstoffsatz.stahlkennwerte
-
-```python
-@property
-def stahlkennwerte(self) -> Dict[str, str]
-```
-
-Dasselbe fuer ein Stahlgesetz.
-
 
 ## Konstanten
 
@@ -668,28 +521,21 @@ Dasselbe fuer ein Stahlgesetz.
 ## Braucht
 
 - [[opencivil.core.protokoll]]
-- [[opencivil.core.wahl]]
 - [[opencivil.querschnitt.fasern]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 
 ## Gebraucht von
 
-- [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.gebrauchsebene]]
-- [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
-- [[opencivil.projekt.eintraege]]
-- [[opencivil.projekt.projekt]]
-- [[opencivil.projekt.querschnittsanalyse]]
-- [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.spannungsanalyse]]
-- [[opencivil.web.api]]
 
 ## Formeln aus diesem Modul
 

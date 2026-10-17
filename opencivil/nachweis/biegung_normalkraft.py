@@ -60,10 +60,9 @@ from opencivil.nachweis.dehnungsfaecher import Linienpunkt
 from opencivil.nachweis.handrechnung import (
     Eckpunkt, Handrechnung, Posten as HandPosten, lagen_zusammenfassen,
 )
-from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, betongesetz
 from opencivil.nachweis.rechenwahl import (
-    RECHENARTEN, Rechenart, Rechenwahl, betonbezuege, betongesetz, lagenbezuege,
-    protokoll_rechenwahl, stahllagen,
+    RECHENARTEN, betonbezuege, lagenbezuege, protokoll_rechenwahl, stahllagen,
 )
 from opencivil.nachweis.resistenzlinie import (
     Ebenenlinie, Handlinie, Treffer, Widerstandslinie,

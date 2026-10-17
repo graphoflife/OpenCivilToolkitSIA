@@ -49,10 +49,12 @@ from opencivil.nachweis.biegung_normalkraft import (
     gleiche_linie, linienbezuege, resistenzlinie,
 )
 from opencivil.nachweis.querkraft import (
-    MIT_BUEGELN, OHNE_BUEGEL, Kurvenbeiwerte, beiwert_k_g, beste_neigung, neigungen,
-    buegelteilung_y, widerstand, zuglage,
+    MIT_BUEGELN, OHNE_BUEGEL, Kurvenbeiwerte, beiwert_k_g, buegelteilung_y, neigungen,
+    widerstand, zuglage,
 )
-from opencivil.nachweis.rechenwahl import Rechenwahl, bezuege_vereinen, stahlname
+from opencivil.querschnitt.fachwerk import beste_neigung
+from opencivil.nachweis.rechenwahl import bezuege_vereinen, stahlname
+from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.querschnitt.platte import Richtung, protokoll_statische_hoehe
 
 #: Womit die Kennzahlen rechnen: die Handrechnung mit Bemessungswerten.

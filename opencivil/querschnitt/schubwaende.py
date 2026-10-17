@@ -39,7 +39,7 @@ In jedem Fall gilt: die Wandkraefte ergeben ``V_y`` und ``V_z``, und ihr
 Moment um den Schwerpunkt ist ``T``.
 
 WIDERSTAND:
-Je Wand das Fachwerk aus :func:`opencivil.nachweis.querkraft.fachwerk`, je
+Je Wand das Fachwerk aus :func:`opencivil.querschnitt.fachwerk.fachwerk`, je
 Laenge der Wand::
 
     v_Rd,s = A_sw/s · f_sd · cot α          v_Rd,c = b_w · k_c · f_cd · sin α · cos α
@@ -64,7 +64,7 @@ import math
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
-from opencivil.nachweis.querkraft import beste_neigung, fachwerk
+from opencivil.querschnitt.fachwerk import beste_neigung, fachwerk
 from opencivil.querschnitt.platte import druckfeldgrenzen
 
 Punkt = Tuple[float, float]

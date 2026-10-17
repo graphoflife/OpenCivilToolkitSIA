@@ -11,7 +11,7 @@ Dehnungsfächers, und die Herleitung zeigt seine Probe.
 import json
 import unittest
 
-from opencivil.nachweis.rechenwahl import Rechenart, Rechenwahl
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.nachweis.resistenzlinie import Ebenenlinie, Handlinie
 from opencivil.projekt import Projekt, ProjektFehler, RechenwahlEintrag
 

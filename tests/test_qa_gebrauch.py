@@ -16,8 +16,7 @@ import unittest
 from opencivil.nachweis.gebrauchsebene import gebrauchsebene
 from opencivil.nachweis.mindestbewehrung import zulaessige_stahlspannung
 from opencivil.nachweis.rissanforderung import Rissanforderung
-from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
-from opencivil.nachweis.rechenwahl import Rechenart, Rechenwahl
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.nachweis.spannungsbegrenzung import VORGABE
 from opencivil.nachweis.zustand2 import gerissen
 from opencivil.projekt import Projekt, ProjektFehler, QAGebrauchswahl

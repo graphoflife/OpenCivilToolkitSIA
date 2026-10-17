@@ -1,5 +1,5 @@
 ---
-erzeugt: 1aa818c8aaef
+erzeugt: 425f5eef299f
 art: modul
 tags: [modul]
 ---
@@ -185,7 +185,7 @@ class Ebenenlinie(Widerstandslinie)
 Der Rand des Dehnungsfaechers -- genau nachgeschaerft, siehe Dateikopf.
 
 `beton` ist das Gesetz der Wahl
-([[opencivil.nachweis.rechenwahl#betongesetz|betongesetz]]). Der Stahl kommt je
+([[opencivil.querschnitt.gesetzwahl#betongesetz|betongesetz]]). Der Stahl kommt je
 Lage mit ihrer [[opencivil.nachweis.querschnittsloeser#Stahllage|Stahllage]] -- als [[opencivil.querschnitt.werkstoffgesetz#Stahlgesetz|Stahlgesetz]], ohne
 Abfall jenseits von `eps_ud`: die unterste Lage liegt im Faecher genau
 auf dieser Grenze, und ein Gesetz, das dort auf null faellt, kippte an
@@ -313,6 +313,7 @@ Ein SI-Wert in Kilo-Einheiten, eine Nachkommastelle.
 - [[opencivil.nachweis.linie]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 

@@ -119,9 +119,10 @@ from opencivil.nachweis.querschnittsloeser import (
     protokoll_wirksamer_modul,
 )
 from opencivil.nachweis.rechenwahl import (
-    Betonkennwerte, Rechenart, Rechenwahl, betonbezuege, bezuege_vereinen, gesetze,
-    lagenbezuege, protokoll_gesetze, protokoll_rechenwahl, stahllagen,
+    Betonkennwerte, betonbezuege, bezuege_vereinen, gesetze, lagenbezuege, protokoll_gesetze,
+    protokoll_rechenwahl, stahllagen,
 )
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.nachweis.resistenzlinie import Widerstandslinie
 from opencivil.querschnitt.platte import Richtung
 

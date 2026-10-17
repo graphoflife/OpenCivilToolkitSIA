@@ -1,5 +1,5 @@
 ---
-erzeugt: 480faaa281c5
+erzeugt: 8a04889eb51c
 art: modul
 tags: [modul]
 ---
@@ -9,11 +9,12 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Was ein Nachweis-Kapitel waehlt -- die Kriechzahl, den Wertesatz und die
-Rechenart -- und die eine Stelle, die daraus die Werkstoffgesetze, die
-Bewehrungslagen und den Querschnittsloeser baut. Die Kapitel der Platte und
-die Spannung-Dehnung-Analyse fragen hier, keines baut seine Gesetze oder
-Lagen selbst.
+Was ein Nachweis-Kapitel aus seiner Wahl macht -- der Kriechzahl, dem
+Wertesatz und der Rechenart ([[opencivil.querschnitt.gesetzwahl]]): die
+eine Stelle, die daraus die Werkstoffgesetze, die Bewehrungslagen und den
+Querschnittsloeser baut, und welche Rechenarten ein Kapitel anbietet. Die
+Kapitel der Platte und die Spannung-Dehnung-Analyse fragen hier, keines baut
+seine Gesetze oder Lagen selbst.
 
 
 ## JEDE LAGE MIT IHREM STAHL
@@ -23,25 +24,6 @@ darum ihren Stahl ([[opencivil.nachweis.querschnittsloeser#Stahllage|Stahllage]]
 `{kennwert}__{sorte}` ([[opencivil.nachweis.rechenwahl#lagenbezuege|lagenbezuege]]), gebaut von
 [[opencivil.nachweis.rechenwahl#stahllagen|stahllagen]]. Bis 2026-10-12 nahmen Stahlspannung, Knicken, Querkraft
 und Analyse den Stahl der ersten Lage fuer alle.
-
-
-## DIE RECHENARTEN
-
-* **Handrechnung** -- im Loeser derselbe Querschnitt wie in der
-  Resistenzlinie aus Handrechnung: der Spannungsblock, die Bewehrung nur auf
-  Zug, je Seite zu einer Lage im Schwerpunkt zusammengefasst, und der Beton
-  auch dort gezaehlt, wo der Stahl liegt. Die gedrueckte Bewehrung zaehlt
-  nicht -- in keiner anderen Rechenart fehlt sie.
-* **0.85·x-Vereinfachung** -- derselbe Spannungsblock, ueber die Hoehe
-  integriert, jede Faser mit ihrer mittleren Spannung. Die gedrueckte
-  Bewehrung wirkt mit und verdraengt den Beton an ihrer Stelle.
-* **Praezise ohne Vereinfachung** -- die Parabel-Rechteck-Beziehung, ihr
-  Anstieg mit dem wirksamen Modul `E_cm/(1+phi)`, `k_sigma` nie unter 1.
-* **elastisch** -- nur fuer die Stahlspannungen: der Beton linear mit
-  `E_cm/(1+phi)`, hoechstens `f_c`. So rechneten sie bis 2026-10-09 fest.
-
-Die Namen hat der Benutzer am 2026-10-12 gewaehlt; vorher hiessen sie
-«Handrechnung Block 0.85·x», «Block 0.85·x genau» und «Parabel».
 
 
 ## WER WAS ANBIETET
@@ -62,111 +44,7 @@ Ausmitte zweiter Ordnung ist nicht eindeutig, und nahe der Grenzkraft hing
 N_Rd davon ab, wie gesucht wurde -- an der Stuetze des Pruefprojekts
 4099.5 kN halbiert, 4200 kN mit Warmstart.
 
-Die Kriechzahl wirkt nur bei praezise und elastisch: an den anderen Gesetzen
-haengt kein Modul. Der Wertesatz bestimmt, wo die Plateaus liegen
-([[opencivil.nachweis.querschnittsloeser#Werkstoffsatz|Werkstoffsatz]]), und wie ein Widerstand heisst -- `R_d` oder
-`R_k`.
-
 ## Inhalt
-
-### Rechenart
-
-```python
-class Rechenart(Wahl)
-```
-
-Wie der Querschnitt gerechnet wird -- siehe Dateikopf.
-
-- `HANDRECHNUNG = 'handrechnung'`
-- `BLOCK = 'block'`
-- `PARABEL = 'parabel'`
-- `ELASTISCH = 'elastisch'`
-
-#### Rechenart.beschriftung
-
-```python
-@property
-def beschriftung(self) -> str
-```
-
-#### Rechenart.kurz
-
-```python
-@property
-def kurz(self) -> str
-```
-
-Fuer schmale Zeilen -- etwa die Auswahl auf der Karte einer Analyse.
-
-#### Rechenart.latex
-
-```python
-@property
-def latex(self) -> str
-```
-
-Der Name als Formeltext -- fuer die Zeile «Rechenwahl» der Herleitung.
-
-#### Rechenart.mit_kriechzahl
-
-```python
-@property
-def mit_kriechzahl(self) -> bool
-```
-
-Ob `phi` etwas aendert -- nur, wo ein Gesetz am Modul haengt.
-
-#### Rechenart.mit_block
-
-```python
-@property
-def mit_block(self) -> bool
-```
-
-Ob der Beton als Spannungsblock rechnet.
-
-#### Rechenart.ohne_ebene
-
-```python
-@property
-def ohne_ebene(self) -> str
-```
-
-Was statt der Probe dasteht, wenn die Suche ihre Ebene verfehlt
-([[opencivil.nachweis.querschnittsloeser#Ebene|verfehlt]]) --
-mit dem Spannungsblock bei viel Druck und wenig Moment. Mit der
-Parabel gibt es die Ebene dort.
-
-### Rechenwahl
-
-```python
-@dataclass(frozen=True)
-class Rechenwahl
-```
-
-Was ein Kapitel waehlt: Kriechzahl, Wertesatz, Rechenart.
-
-- `kriechzahl: float = 0.0`
-- `satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG`
-- `art: Rechenart = Rechenart.HANDRECHNUNG`
-
-#### Rechenwahl.index
-
-```python
-@property
-def index(self) -> str
-```
-
-`Rd` oder `Rk` -- wie ein Widerstand dieser Wahl heisst.
-
-#### Rechenwahl.beschriftung
-
-```python
-@property
-def beschriftung(self) -> str
-```
-
-Fuer Legenden: «Präzise ohne Vereinfachung, φ = 2, Bemessung» -- phi nur, wo es wirkt.
 
 ### Betonkennwerte
 
@@ -260,16 +138,6 @@ Mehrere Listen von Eingaben zu einer -- jeder Name einmal.
 Derselbe Name mit derselben Wert-ID ist dieselbe Eingabe und wird einmal
 angemeldet. Derselbe Name mit einer anderen ID waere eine Verwechslung:
 die Rechnung laese dann die eine Zahl unter dem Namen der anderen.
-
-### betongesetz
-
-```python
-def betongesetz(wahl: Rechenwahl, *, f_c: float, E_cm: float, eps_c1d: float, eps_c2d: float) -> Gesetz
-```
-
-Der Beton im gerissenen Zustand -- je Rechenart. Die eine Stelle fuer
-die Parabel und den Block: der Loeser und die genaue Resistenzlinie
-bekommen ihren Beton beide hier.
 
 ### Gesetze
 
@@ -370,9 +238,9 @@ das Knicken und die Analysen mit dem der ersten Lage.
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
-- [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 - [[opencivil.nachweis.querschnittsloeser]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 
 ## Gebraucht von
@@ -386,9 +254,6 @@ das Knicken und die Analysen mit dem der ersten Lage.
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.projekt.eintraege]]
-- [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
-- [[opencivil.querschnitt.analyse]]
-- [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.web.api]]

@@ -49,7 +49,7 @@ from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
 from opencivil.material.basis import mit_index
-from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
+from opencivil.querschnitt.gesetzwahl import Werkstoffsatz
 from opencivil.querschnitt.platte import protokoll_statische_hoehe
 # Der Anteil des Spannungsblocks steht beim Gesetz; hier wird er nur benutzt.
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL

@@ -1,5 +1,5 @@
 ---
-erzeugt: 6f10af0aa953
+erzeugt: 79aeebebfca4
 art: modul
 tags: [modul]
 ---
@@ -61,7 +61,7 @@ liegt. Die Normalkraft dagegen hat immer einen Grenzwert.
 
 ## ZWEI WAHLEN
 
-Womit gerechnet wird, waehlt das Kapitel zweimal ([[opencivil.nachweis.rechenwahl#Rechenwahl|Rechenwahl]]):
+Womit gerechnet wird, waehlt das Kapitel zweimal ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]):
 
 * **Verformung (e_2d)** -- die Gesetze des Loesers, der zu jedem Moment die
   Kruemmung sucht. Immer praezise ohne Vereinfachung, gewaehlt werden
@@ -390,6 +390,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 
 ## Gebraucht von

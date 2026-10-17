@@ -13,7 +13,7 @@ import unittest
 from opencivil.core.protokoll import Protokoll
 from opencivil.nachweis import linie as geo
 from opencivil.nachweis.querschnittsloeser import Stahllage
-from opencivil.nachweis.rechenwahl import Rechenart, Rechenwahl, betongesetz
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, betongesetz
 from opencivil.nachweis.resistenzlinie import Ebenenlinie
 from opencivil.querschnitt.interaktion import Bewehrung, Querschnitt, Teil, Werkstoff
 from opencivil.querschnitt.werkstoffgesetz import Spannungsblock, Stahlgesetz

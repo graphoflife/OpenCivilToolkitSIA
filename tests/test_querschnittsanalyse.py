@@ -150,8 +150,8 @@ if __name__ == "__main__":
 
 import math
 
-from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
-from opencivil.nachweis.rechenwahl import Betonkennwerte, Rechenart, Rechenwahl, gesetze
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
+from opencivil.nachweis.rechenwahl import Betonkennwerte, gesetze
 from opencivil.projekt import WerkstoffwahlEintrag
 from opencivil.web import dienst
 

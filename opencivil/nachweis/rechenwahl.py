@@ -2,11 +2,12 @@
 opencivil/nachweis/rechenwahl.py -- womit ein Kapitel rechnet.
 
 VERANTWORTUNG:
-Was ein Nachweis-Kapitel waehlt -- die Kriechzahl, den Wertesatz und die
-Rechenart -- und die eine Stelle, die daraus die Werkstoffgesetze, die
-Bewehrungslagen und den Querschnittsloeser baut. Die Kapitel der Platte und
-die Spannung-Dehnung-Analyse fragen hier, keines baut seine Gesetze oder
-Lagen selbst.
+Was ein Nachweis-Kapitel aus seiner Wahl macht -- der Kriechzahl, dem
+Wertesatz und der Rechenart (:mod:`opencivil.querschnitt.gesetzwahl`): die
+eine Stelle, die daraus die Werkstoffgesetze, die Bewehrungslagen und den
+Querschnittsloeser baut, und welche Rechenarten ein Kapitel anbietet. Die
+Kapitel der Platte und die Spannung-Dehnung-Analyse fragen hier, keines baut
+seine Gesetze oder Lagen selbst.
 
 JEDE LAGE MIT IHREM STAHL:
 Der Editor laesst je Seite einen eigenen Stahl waehlen. Jede Lage traegt
@@ -14,23 +15,6 @@ darum ihren Stahl (:class:`Stahllage`), angemeldet wird je Sorte unter
 ``{kennwert}__{sorte}`` (:func:`lagenbezuege`), gebaut von
 :func:`stahllagen`. Bis 2026-10-12 nahmen Stahlspannung, Knicken, Querkraft
 und Analyse den Stahl der ersten Lage fuer alle.
-
-DIE RECHENARTEN:
-* **Handrechnung** -- im Loeser derselbe Querschnitt wie in der
-  Resistenzlinie aus Handrechnung: der Spannungsblock, die Bewehrung nur auf
-  Zug, je Seite zu einer Lage im Schwerpunkt zusammengefasst, und der Beton
-  auch dort gezaehlt, wo der Stahl liegt. Die gedrueckte Bewehrung zaehlt
-  nicht -- in keiner anderen Rechenart fehlt sie.
-* **0.85·x-Vereinfachung** -- derselbe Spannungsblock, ueber die Hoehe
-  integriert, jede Faser mit ihrer mittleren Spannung. Die gedrueckte
-  Bewehrung wirkt mit und verdraengt den Beton an ihrer Stelle.
-* **Praezise ohne Vereinfachung** -- die Parabel-Rechteck-Beziehung, ihr
-  Anstieg mit dem wirksamen Modul ``E_cm/(1+phi)``, ``k_sigma`` nie unter 1.
-* **elastisch** -- nur fuer die Stahlspannungen: der Beton linear mit
-  ``E_cm/(1+phi)``, hoechstens ``f_c``. So rechneten sie bis 2026-10-09 fest.
-
-Die Namen hat der Benutzer am 2026-10-12 gewaehlt; vorher hiessen sie
-«Handrechnung Block 0.85·x», «Block 0.85·x genau» und «Parabel».
 
 WER WAS ANBIETET:
 Die Handrechnung gibt es nur, wo ein Polygon aus Eckpunkten Sinn ergibt: in
@@ -49,10 +33,6 @@ Ausmitte zweiter Ordnung ist nicht eindeutig, und nahe der Grenzkraft hing
 N_Rd davon ab, wie gesucht wurde -- an der Stuetze des Pruefprojekts
 4099.5 kN halbiert, 4200 kN mit Warmstart.
 
-Die Kriechzahl wirkt nur bei praezise und elastisch: an den anderen Gesetzen
-haengt kein Modul. Der Wertesatz bestimmt, wo die Plateaus liegen
-(:class:`Werkstoffsatz`), und wie ein Widerstand heisst -- ``R_d`` oder
-``R_k``.
 """
 
 from __future__ import annotations
@@ -63,76 +43,12 @@ from typing import Callable, Dict, List, Sequence, Type
 from opencivil.core.berechnung import Eingabebezug, Eingaben
 from opencivil.core.latex import angabe
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Wert, kennung_aus
 from opencivil.nachweis.querschnittsloeser import (
-    Querschnittsloeser, Stahllage, Werkstoffsatz, lagen_je_seite, wirksamer_modul,
-    wirksamer_modul_wert,
+    Querschnittsloeser, Stahllage, lagen_je_seite, wirksamer_modul_wert,
 )
-from opencivil.querschnitt.werkstoffgesetz import (
-    BLOCKANTEIL, BetonElastisch, Betongesetz, Gesetz, Spannungsblock, Stahlgesetz,
-)
-
-
-class Rechenart(Wahl):
-    """Wie der Querschnitt gerechnet wird -- siehe Dateikopf."""
-
-    HANDRECHNUNG = "handrechnung"
-    BLOCK = "block"
-    PARABEL = "parabel"
-    ELASTISCH = "elastisch"
-
-    @property
-    def beschriftung(self) -> str:
-        return {
-            Rechenart.HANDRECHNUNG: "Handrechnung",
-            Rechenart.BLOCK: f"{BLOCKANTEIL}·x-Vereinfachung",
-            Rechenart.PARABEL: "Präzise ohne Vereinfachung",
-            Rechenart.ELASTISCH: "elastisch",
-        }[self]
-
-    @property
-    def kurz(self) -> str:
-        """Fuer schmale Zeilen -- etwa die Auswahl auf der Karte einer Analyse."""
-        return {
-            Rechenart.HANDRECHNUNG: "Hand",
-            Rechenart.BLOCK: f"{BLOCKANTEIL}·x",
-            Rechenart.PARABEL: "präzise",
-            Rechenart.ELASTISCH: "elastisch",
-        }[self]
-
-    @property
-    def latex(self) -> str:
-        """Der Name als Formeltext -- fuer die Zeile «Rechenwahl» der Herleitung."""
-        return {
-            Rechenart.HANDRECHNUNG: r"\text{Handrechnung}",
-            Rechenart.BLOCK: rf"{BLOCKANTEIL} \cdot x\text{{-Vereinfachung}}",
-            Rechenart.PARABEL: r"\text{Präzise ohne Vereinfachung}",
-            Rechenart.ELASTISCH: r"\text{elastisch}",
-        }[self]
-
-    @property
-    def mit_kriechzahl(self) -> bool:
-        """Ob ``phi`` etwas aendert -- nur, wo ein Gesetz am Modul haengt."""
-        return self in (Rechenart.PARABEL, Rechenart.ELASTISCH)
-
-    @property
-    def mit_block(self) -> bool:
-        """Ob der Beton als Spannungsblock rechnet."""
-        return self in (Rechenart.HANDRECHNUNG, Rechenart.BLOCK)
-
-    @property
-    def ohne_ebene(self) -> str:
-        """
-        Was statt der Probe dasteht, wenn die Suche ihre Ebene verfehlt
-        (:attr:`~opencivil.nachweis.querschnittsloeser.Ebene.verfehlt`) --
-        mit dem Spannungsblock bei viel Druck und wenig Moment. Mit der
-        Parabel gibt es die Ebene dort.
-        """
-        if self.mit_block:
-            return (f"Mit der {self.beschriftung} gibt es zu dieser Einwirkung keine "
-                    f"Dehnungsebene – präzise rechnen.")
-        return "Die gefundene Dehnungsebene erzeugt diese Einwirkung nicht."
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, betongesetz
+from opencivil.querschnitt.werkstoffgesetz import Betongesetz, Gesetz, Spannungsblock, Stahlgesetz
 
 
 #: Was die Tragsicherheit anbietet.
@@ -152,28 +68,6 @@ FASERSPANNUNGSARTEN = FASERARTEN + (Rechenart.ELASTISCH,)
 #: Was die Verformung beim Knicken anbietet: nur praezise -- siehe «Wer was
 #: anbietet» oben.
 VERFORMUNGSARTEN = (Rechenart.PARABEL,)
-
-
-@dataclass(frozen=True)
-class Rechenwahl:
-    """Was ein Kapitel waehlt: Kriechzahl, Wertesatz, Rechenart."""
-
-    kriechzahl: float = 0.0
-    satz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
-    art: Rechenart = Rechenart.HANDRECHNUNG
-
-    @property
-    def index(self) -> str:
-        """``Rd`` oder ``Rk`` -- wie ein Widerstand dieser Wahl heisst."""
-        return self.satz.widerstandsindex
-
-    @property
-    def beschriftung(self) -> str:
-        """Fuer Legenden: «Präzise ohne Vereinfachung, φ = 2, Bemessung» -- phi nur, wo es wirkt."""
-        teile = [self.art.beschriftung]
-        if self.art.mit_kriechzahl:
-            teile.append(f"φ = {self.kriechzahl:g}")
-        return ", ".join(teile + [self.satz.kurz])
 
 
 # ===========================================================================
@@ -291,21 +185,6 @@ def bezuege_vereinen(*listen: Sequence[Eingabebezug]) -> List[Eingabebezug]:
                     f"Die Eingabe '{b.name}' steht einmal als {vorhanden[b.name]} "
                     f"und einmal als {b.wert_id} da.")
     return heraus
-
-
-def betongesetz(wahl: Rechenwahl, *, f_c: float, E_cm: float, eps_c1d: float,
-                 eps_c2d: float) -> Gesetz:
-    """
-    Der Beton im gerissenen Zustand -- je Rechenart. Die eine Stelle fuer
-    die Parabel und den Block: der Loeser und die genaue Resistenzlinie
-    bekommen ihren Beton beide hier.
-    """
-    if wahl.art is Rechenart.ELASTISCH:
-        return BetonElastisch(E_c=wirksamer_modul(E_cm, wahl.kriechzahl), f_c=f_c)
-    if wahl.art is Rechenart.PARABEL:
-        return Betongesetz.mit_modul(f_c=f_c, E_c=wirksamer_modul(E_cm, wahl.kriechzahl),
-                                     eps_c1d=eps_c1d, eps_c2d=eps_c2d)
-    return Spannungsblock(f_cd=f_c, eps_c2d=eps_c2d)
 
 
 @dataclass(frozen=True)

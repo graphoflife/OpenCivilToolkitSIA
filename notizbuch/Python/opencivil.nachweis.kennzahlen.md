@@ -1,5 +1,5 @@
 ---
-erzeugt: f1bc81465734
+erzeugt: b51cd78ec94b
 art: modul
 tags: [modul]
 ---
@@ -113,6 +113,8 @@ Das Kleinere der Seiten -- bei nur einer Seite sie selbst.
 - [[opencivil.nachweis.linie]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.rechenwahl]]
+- [[opencivil.querschnitt.fachwerk]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 
 ## Gebraucht von

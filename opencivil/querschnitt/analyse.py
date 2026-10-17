@@ -43,8 +43,7 @@ from opencivil.querschnitt.interaktion import (
 )
 from opencivil.querschnitt.schubwaende import Wand
 from opencivil.querschnitt.schubwaende import zellen as zellen_finden
-from opencivil.nachweis.querschnittsloeser import wirksamer_modul
-from opencivil.nachweis.rechenwahl import Rechenwahl, betongesetz
+from opencivil.querschnitt.gesetzwahl import Rechenwahl, betongesetz, wirksamer_modul
 from opencivil.querschnitt.werkstoffgesetz import BetonUngerissen, Stahlgesetz
 
 #: Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die
@@ -635,14 +634,14 @@ class Querschnittsanalyse:
         (:meth:`rechenwahl`), fuer Spannungen und Knicken die des Kapitels.
 
         Beton: das Gesetz der Wahl, gebaut wie bei der Platte
-        (:func:`~opencivil.nachweis.rechenwahl.betongesetz`), der Beiwert der
+        (:func:`~opencivil.querschnitt.gesetzwahl.betongesetz`), der Beiwert der
         Parabel also aus ``E_cm/(1+phi)`` -- oder, ``ungerissen``, linear in
         Druck und Zug mit demselben Modul; gedrueckt bis ``-eps_c2d`` samt
         Punkt C, verdraengt von den Staeben. Betonstahl: bilinear,
         ``±eps_ud``. Der Wertesatz bestimmt, wo die Plateaus liegen
         (``f_cd`` oder ``f_ck``, ``f_yd`` oder ``f_yk``); Moduln und
         Dehnungsgrenzen bleiben
-        (:class:`~opencivil.nachweis.querschnittsloeser.Werkstoffsatz`).
+        (:class:`~opencivil.querschnitt.gesetzwahl.Werkstoffsatz`).
 
         Bis 2026-10-16 baute die Spannung-Dehnung-Analyse ihre Werkstoffe
         selbst, und der Bruchzustand nahm den Beiwert der Parabel aus ``E_cd``.

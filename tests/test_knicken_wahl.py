@@ -9,7 +9,7 @@ mit eigener Herleitung, und im Diagramm steht sie neben der massgebenden.
 
 import unittest
 
-from opencivil.nachweis.rechenwahl import Rechenart
+from opencivil.querschnitt.gesetzwahl import Rechenart
 from opencivil.nachweis.resistenzlinie import Ebenenlinie
 from opencivil.projekt import (
     KnickEintrag, KnickVerformungswahl, KnickWiderstandswahl, Projekt, ProjektFehler,

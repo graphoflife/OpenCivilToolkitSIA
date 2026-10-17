@@ -15,7 +15,7 @@ from opencivil.projekt import KnickEintrag, Projekt
 from opencivil.querschnitt.platte import Richtung
 from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
 from opencivil.spannungsanalyse import loeserpaar
-from opencivil.nachweis.rechenwahl import Rechenart, Rechenwahl
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 
 #: Bemessungswerte der Fliessgrenze, in Pa.
 F_YD_B500B = 500e6 / 1.15

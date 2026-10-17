@@ -1,5 +1,5 @@
 ---
-erzeugt: 5dae8a47b663
+erzeugt: b0b00d91d3b7
 art: modul
 tags: [modul]
 ---
@@ -387,8 +387,6 @@ Ein Träger auf zwei Rollen: nichts hält ihn waagrecht -- eine Meldung statt ei
 ## Braucht
 
 - [[opencivil.ergebnis]]
-- [[opencivil.nachweis.querschnittsloeser]]
-- [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
@@ -397,6 +395,7 @@ Ein Träger auf zwei Rollen: nichts hält ihn waagrecht -- eine Meldung statt ei
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.projekt.skript]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 
 ## Gebraucht von

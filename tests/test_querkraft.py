@@ -4,6 +4,7 @@ import unittest
 
 from opencivil.core.einheiten import EINHEITSLOS, KNM, KN_PRO_M
 from opencivil.nachweis import querkraft
+from opencivil.querschnitt import fachwerk
 from opencivil.projekt import Projekt
 
 
@@ -512,14 +513,14 @@ class TestBuegelformeln(unittest.TestCase):
         Höchstwert. Von Hand: das Maximum über alle ganzen Grade.
         """
         punkte = querkraft.neigungen(alpha_min=25, alpha_max=60, **self.werte)
-        beste = querkraft.beste_neigung(punkte)
+        beste = fachwerk.beste_neigung(punkte)
         self.assertAlmostEqual(beste.V_Rd, max(q.V_Rd for q in punkte))
 
     def test_bei_gleichstand_gilt_die_steilere_neigung(self):
         """Sie beansprucht die Druckdiagonale weniger."""
-        gleich = [querkraft.Buegelpunkt(alpha=a, V_Rd_s=100.0, V_Rd_c=100.0)
+        gleich = [fachwerk.Buegelpunkt(alpha=a, V_Rd_s=100.0, V_Rd_c=100.0)
                   for a in (30, 35, 40)]
-        self.assertEqual(querkraft.beste_neigung(gleich).alpha, 40)
+        self.assertEqual(fachwerk.beste_neigung(gleich).alpha, 40)
 
 
 class TestNachweisMitBuegeln(unittest.TestCase):

@@ -27,7 +27,7 @@ WIE DIE SPANNUNG ENTSTEHT:
 Ueber :mod:`opencivil.nachweis.querschnittsloeser`: gesucht wird die
 Dehnungsebene, die ``M_Ed`` und ``N_Ed`` des Lastfalls im Gleichgewicht
 haelt. Der Beton nimmt keinen Zug auf. Womit gerechnet wird, waehlt das
-Kapitel (:class:`~opencivil.nachweis.rechenwahl.Rechenwahl`): die
+Kapitel (:class:`~opencivil.querschnitt.gesetzwahl.Rechenwahl`): die
 Kriechzahl, den Wertesatz und die Rechenart. Die Vorgabe ist, wie bis
 2026-10-09 fest: **elastisch** -- der Beton im Druck linear mit dem wirksamen
 Modul ``E_cm/(1+phi)`` -- mit den **charakteristischen** Festigkeiten: der
@@ -82,13 +82,12 @@ from opencivil.nachweis.mindestbewehrung import (
     protokoll_zulaessige_stahlspannung, zulaessige_stahlspannung,
 )
 from opencivil.nachweis.querschnittsloeser import (
-    EPS_DRUCK, protokoll_verfahren, protokoll_wirksamer_modul,
-    Querschnittsloeser, Werkstoffsatz,
+    EPS_DRUCK, Querschnittsloeser, protokoll_verfahren, protokoll_wirksamer_modul,
 )
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
-    Betonkennwerte, Rechenart, Rechenwahl, betonbezuege, bezuege_vereinen, gesetze,
-    lagenbezuege, protokoll_gesetze, protokoll_rechenwahl, stahlbezuege, stahllagen,
-    stahlname, staehle,
+    Betonkennwerte, betonbezuege, bezuege_vereinen, gesetze, lagenbezuege, protokoll_gesetze,
+    protokoll_rechenwahl, staehle, stahlbezuege, stahllagen, stahlname,
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.zustand2 import wertigkeit

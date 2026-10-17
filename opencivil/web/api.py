@@ -56,7 +56,7 @@ from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.vorlagen import VORLAGEN
-from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
+from opencivil.querschnitt.gesetzwahl import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
     FASERARTEN, FASERSPANNUNGSARTEN, RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN,
 )

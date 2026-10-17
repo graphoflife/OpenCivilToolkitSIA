@@ -1,5 +1,5 @@
 ---
-erzeugt: f836dc797d29
+erzeugt: c704dd7126db
 art: modul
 tags: [modul]
 ---
@@ -315,14 +315,14 @@ seine Rechenwahl: im Bruchzustand die des Baustoffs
 ([[opencivil.querschnitt.analyse#Querschnittsanalyse.rechenwahl|rechenwahl]]), fuer Spannungen und Knicken die des Kapitels.
 
 Beton: das Gesetz der Wahl, gebaut wie bei der Platte
-([[opencivil.nachweis.rechenwahl#betongesetz|betongesetz]]), der Beiwert der
+([[opencivil.querschnitt.gesetzwahl#betongesetz|betongesetz]]), der Beiwert der
 Parabel also aus `E_cm/(1+phi)` -- oder, `ungerissen`, linear in
 Druck und Zug mit demselben Modul; gedrueckt bis `-eps_c2d` samt
 Punkt C, verdraengt von den Staeben. Betonstahl: bilinear,
 `±eps_ud`. Der Wertesatz bestimmt, wo die Plateaus liegen
 (`f_cd` oder `f_ck`, `f_yd` oder `f_yk`); Moduln und
 Dehnungsgrenzen bleiben
-([[opencivil.nachweis.querschnittsloeser#Werkstoffsatz|Werkstoffsatz]]).
+([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]).
 
 Bis 2026-10-16 baute die Spannung-Dehnung-Analyse ihre Werkstoffe
 selbst, und der Bruchzustand nahm den Beiwert der Parabel aus `E_cd`.
@@ -395,9 +395,8 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
-- [[opencivil.nachweis.querschnittsloeser]]
-- [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.querschnitt.geometrie]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.schubwaende]]
 - [[opencivil.querschnitt.werkstoffgesetz]]

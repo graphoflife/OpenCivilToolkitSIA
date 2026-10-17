@@ -1,5 +1,5 @@
 ---
-erzeugt: e658d1a95ee5
+erzeugt: 771e8caddc78
 art: modul
 tags: [modul]
 ---
@@ -28,7 +28,7 @@ Diagramm stehen, das Urteil faellt aber ueber die Handrechnung.
 ## ANSATZ
 
 * Druckzone als Spannungsblock der Hoehe `0.85 x` mit durchgehend `f_cd`
-  -- oder `f_ck` mit charakteristischen Werten ([[opencivil.nachweis.querschnittsloeser#Werkstoffsatz|Werkstoffsatz]]);
+  -- oder `f_ck` mit charakteristischen Werten ([[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]]);
   dann heissen die Eckpunkte `R_k` statt `R_d`.
 * **Gedrueckter Stahl wird durchgehend vernachlaessigt.** Das liegt auf der
   sicheren Seite und erspart die Frage, ob er ueberhaupt fliesst.
@@ -318,7 +318,7 @@ Schwerpunkts fiel still aus, weil sie `len(teile) > 1` verlangt.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
-- [[opencivil.nachweis.querschnittsloeser]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 

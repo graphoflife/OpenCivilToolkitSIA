@@ -1,5 +1,5 @@
 ---
-erzeugt: d037e5b85e46
+erzeugt: b766705798d1
 art: modul
 tags: [modul]
 ---
@@ -52,7 +52,7 @@ Moment um den Schwerpunkt ist `T`.
 
 ## WIDERSTAND
 
-Je Wand das Fachwerk aus [[opencivil.nachweis.querkraft#fachwerk|opencivil.nachweis.querkraft.fachwerk]], je
+Je Wand das Fachwerk aus [[opencivil.querschnitt.fachwerk#fachwerk|opencivil.querschnitt.fachwerk.fachwerk]], je
 Laenge der Wand:
 
 ```
@@ -372,7 +372,7 @@ die Mitten nicht im Schwerpunkt, gibt das auch Momente:
 
 ## Braucht
 
-- [[opencivil.nachweis.querkraft]]
+- [[opencivil.querschnitt.fachwerk]]
 - [[opencivil.querschnitt.platte]]
 
 ## Gebraucht von

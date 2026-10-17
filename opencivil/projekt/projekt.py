@@ -22,8 +22,7 @@ from typing import Any, Dict, List, Sequence, Union
 
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
 from opencivil.ergebnis import Ergebnis
-from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
-from opencivil.nachweis.rechenwahl import Rechenart
+from opencivil.querschnitt.gesetzwahl import Rechenart, Werkstoffsatz
 from opencivil.projekt.eintraege import (
     EIGENE_VORSILBE, Beschreibung, Gebrauchswahl, KnickVerformungswahl, KnickWiderstandswahl,
     MaterialEintrag, PostenEintrag, RechenwahlEintrag,

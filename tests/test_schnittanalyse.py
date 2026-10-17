@@ -12,7 +12,7 @@ import math
 import unittest
 
 from opencivil import spannungsanalyse as sa
-from opencivil.nachweis.rechenwahl import Rechenart, Rechenwahl
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.projekt import Projekt, ProjektFehler
 from opencivil.projekt.querschnittsanalyse import (
     QASpannungsfallEintrag, QuerschnittsanalyseEintrag,

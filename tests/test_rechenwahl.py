@@ -10,12 +10,10 @@ und die Altdatei, die vor dem Umbau festgehalten wurde.
 import unittest
 
 from opencivil.core.berechnung import Eingabebezug
-from opencivil.nachweis.querschnittsloeser import (
-    Stahllage, Werkstoffsatz, lagen_je_seite,
-)
+from opencivil.nachweis.querschnittsloeser import Stahllage, lagen_je_seite
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
-    RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN, Betonkennwerte, Rechenart, Rechenwahl,
-    bezuege_vereinen, gesetze,
+    RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN, Betonkennwerte, bezuege_vereinen, gesetze,
 )
 from opencivil.querschnitt.werkstoffgesetz import BetonUngerissen, Spannungsblock, Stahlgesetz
 

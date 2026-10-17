@@ -1,5 +1,5 @@
 ---
-erzeugt: 3d14d6f7883a
+erzeugt: e895b8d871a7
 art: modul
 tags: [modul]
 ---
@@ -243,6 +243,7 @@ findet, liegt jenseits der Grenze: der Stahl fliesst dort laengst.
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.geometrie]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.schnittanalyse]]
 

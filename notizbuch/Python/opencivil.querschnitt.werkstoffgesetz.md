@@ -1,5 +1,5 @@
 ---
-erzeugt: 05264d6b6049
+erzeugt: aa64a6cd40c9
 art: modul
 tags: [modul]
 ---
@@ -530,6 +530,7 @@ Ergebnis unendlich, was die Auswertung sauber ueberspringt.
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.fasern]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.spannungsanalyse]]

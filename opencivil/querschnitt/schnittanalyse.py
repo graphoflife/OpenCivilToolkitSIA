@@ -74,9 +74,7 @@ from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.nachweis.querschnittsloeser import (
     FASERN, Faserloeser, Stahllage, protokoll_wirksamer_modul, wirksamer_modul_wert,
 )
-from opencivil.nachweis.rechenwahl import (
-    Rechenart, Rechenwahl,
-)
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.nachweis.sproedes_versagen import (
     MOMENTENTEILER, beiwert_dicke, protokoll_zugfestigkeit,
 )

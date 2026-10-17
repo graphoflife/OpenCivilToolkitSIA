@@ -15,8 +15,7 @@ import unittest
 
 from opencivil import spannungsanalyse as sa
 from opencivil.core.protokoll import GleichungBlock, Protokoll, TitelBlock
-from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
-from opencivil.nachweis.rechenwahl import Rechenart, Rechenwahl
+from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.projekt import (
     Projekt, ProjektFehler, RechenwahlEintrag, SpannungsfallEintrag,
 )

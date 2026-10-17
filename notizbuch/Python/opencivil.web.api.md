@@ -1,5 +1,5 @@
 ---
-erzeugt: 7d93e06354ee
+erzeugt: 7d800f0654aa
 art: modul
 tags: [modul]
 ---
@@ -135,7 +135,6 @@ Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks.
 - [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]
-- [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.nachweis.verformung]]
@@ -146,6 +145,7 @@ Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks.
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.geometrie]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.vorlagen]]
 - [[opencivil.querschnitt.zugseite]]
 - [[opencivil.spannungsanalyse]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 5c393de9f49f
+erzeugt: 4ed2b5bfe78f
 art: modul
 tags: [modul]
 ---
@@ -38,11 +38,11 @@ eigentlich im Querschnitt?*
 ## JE ANALYSE GEWAEHLT
 
 Jede Analyse ([[opencivil.projekt.eintraege#SpannungsfallEintrag|SpannungsfallEintrag]]) waehlt als
-[[opencivil.nachweis.rechenwahl#Rechenwahl|Rechenwahl]]
+[[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]
 
 * die Kriechzahl;
 * der Wertesatz -- Bemessung (`f_cd`, `f_yd`) oder charakteristisch
-  (`f_ck`, `f_yk`), siehe [[opencivil.nachweis.querschnittsloeser#Werkstoffsatz|Werkstoffsatz]];
+  (`f_ck`, `f_yk`), siehe [[opencivil.querschnitt.gesetzwahl#Werkstoffsatz|Werkstoffsatz]];
 * die Rechenart -- die 0.85·x-Vereinfachung oder praezise ohne Vereinfachung,
   die Parabel mit `E_c,eff`. Die Handrechnung gibt es hier nicht
   ([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]): eine Linie rechnet die
@@ -240,7 +240,7 @@ Die Dehnungsebene zu `N` und `M`, samt allem, was darauf steht.
 Gesucht wird mit demselben Verfahren wie in den Nachweisen. Findet sich
 keine Ebene, kommt das Bild leer zurueck und sagt warum -- geraten wird
 nicht. Verfehlt die Suche ihre Ebene, sagt es die Rechenart `art`
-([[opencivil.nachweis.rechenwahl#Rechenart.ohne_ebene|Rechenart.ohne_ebene]]).
+([[opencivil.querschnitt.gesetzwahl#Rechenart.ohne_ebene|Rechenart.ohne_ebene]]).
 
 ### aus_dehnungen
 
@@ -767,6 +767,7 @@ sammelt die Formelsammlung ihr Thema.
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.projekt]]
+- [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
