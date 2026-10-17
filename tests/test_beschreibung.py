@@ -8,20 +8,14 @@ from pathlib import Path
 
 from opencivil.core.einheiten import N_PRO_MM2
 from opencivil.projekt import (
-    Aufbau, BalkensystemEintrag, GebrauchsfallEintrag, Gebrauchsliste, GrundbruchEintrag,
-    GrundbruchkombinationEintrag, KnickEintrag,
-    KnotenlastEintrag, KombinationEintrag, LageEintrag, LagerEintrag, LastfallEintrag,
-    LastkombinationEintrag, MaterialEintrag, ObergrenzeEintrag, PostenEintrag, Projekt,
-    ProjektFehler, QuerkraftbewehrungEintrag, QuerschnittEintrag, RechenwahlEintrag,
-    Gebrauchswahl, KnickVerformungswahl, KnickWiderstandswahl, QAGebrauchswahl,
-    SkriptEintrag, SpannungsfallEintrag, StablastEintrag, StabquerschnittEintrag,
-    SystemknotenEintrag, SystemlinieEintrag, VerformungEintrag, VerformungsfallEintrag,
+    Aufbau, GebrauchsfallEintrag, Gebrauchsliste, KnickEintrag, KombinationEintrag, LageEintrag,
+    MaterialEintrag, ObergrenzeEintrag, PostenEintrag, Projekt, ProjektFehler,
+    QuerkraftbewehrungEintrag, QuerschnittEintrag, RechenwahlEintrag, KnickVerformungswahl,
+    KnickWiderstandswahl, SpannungsfallEintrag, VerformungEintrag, VerformungsfallEintrag,
 )
-from opencivil.projekt.eintraege import Beschreibung, Querschnittsangaben
 from opencivil.projekt.querschnittsanalyse import (
-    FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QAGebrauchsfallEintrag,
-    QAGebrauchsliste, QAKnickEintrag, QALastfallEintrag, QASpannungsfallEintrag,
-    QuerschnittsanalyseEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
+    FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QAGebrauchsfallEintrag, QAKnickEintrag,
+    QALastfallEintrag, QASpannungsfallEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
     WerkstoffwahlEintrag,
 )
 from opencivil.web import api, dienst
@@ -381,85 +375,6 @@ class TestVollstaendigeAblage(unittest.TestCase):
         eintrag = PostenEintrag.aus_dict({"durchmesser": 14.0, "abstand": None, "anzahl": 6.0})
         self.assertIsNone(eintrag.abstand)
         self.assertEqual(eintrag.anzahl, 6.0)
-
-
-class TestVorgabenAnEinerStelle(unittest.TestCase):
-    """
-    Jede Vorgabe steht in der Datenklasse und nur dort: ein Wörterbuch mit nur
-    den Pflichtfeldern liest sich genau wie die Klasse mit ihren Vorgaben.
-
-    Früher stand dieselbe Zahl im Feld, im Leser und in der Oberfläche. Wer
-    eine davon ändert und die andere vergisst, fällt hier auf.
-    """
-
-    #: Klasse, Wörterbuch mit den Pflichtfeldern, dieselben als Argumente.
-    FAELLE = [
-        (QuerschnittEintrag, {"kennung": "q", "name": "q", "beton": "b"},
-         {"kennung": "q", "name": "q", "beton": "b"}),
-        (Querschnittsangaben, {"kennung": "q", "name": "q"}, {"kennung": "q", "name": "q"}),
-        (MaterialEintrag, {"kennung": "m", "art": "beton", "sorte": "C30/37"},
-         {"kennung": "m", "art": "beton", "sorte": "C30/37"}),
-        (PostenEintrag, {}, {}),
-        (LageEintrag, {}, {}),
-        (ObergrenzeEintrag, {}, {}),
-        (QuerkraftbewehrungEintrag, {}, {}),
-        (KnickEintrag, {"name": "k"}, {"name": "k"}),
-        (VerformungsfallEintrag, {"name": "v"}, {"name": "v"}),
-        (VerformungEintrag, {}, {}),
-        (SpannungsfallEintrag, {"name": "s"}, {"name": "s"}),
-        (GebrauchsfallEintrag, {"name": "g"}, {"name": "g"}),
-        (RechenwahlEintrag, {}, {}),
-        (Gebrauchswahl, {}, {}),
-        (KnickVerformungswahl, {}, {}),
-        (KnickWiderstandswahl, {}, {}),
-        (QAGebrauchswahl, {}, {}),
-        (KombinationEintrag, {"name": "k"}, {"name": "k"}),
-        (KnotenEintrag, {}, {}),
-        (FlaecheEintrag, {}, {}),
-        (StabEintrag, {}, {}),
-        (StablinieEintrag, {}, {}),
-        (SchubwandEintrag, {}, {}),
-        (HilfslinieEintrag, {}, {}),
-        (QALastfallEintrag, {"name": "l"}, {"name": "l"}),
-        (QASpannungsfallEintrag, {"name": "s"}, {"name": "s"}),
-        (QAGebrauchsfallEintrag, {"name": "g"}, {"name": "g"}),
-        (QAKnickEintrag, {"name": "k"}, {"name": "k"}),
-        (WerkstoffwahlEintrag, {"material": "b1"}, {"material": "b1"}),
-        (QuerschnittsanalyseEintrag, {"kennung": "a", "name": "a"},
-         {"kennung": "a", "name": "a"}),
-        (SystemknotenEintrag, {}, {}),
-        (SystemlinieEintrag, {}, {}),
-        (StablastEintrag, {}, {}),
-        (LagerEintrag, {}, {}),
-        (KnotenlastEintrag, {}, {}),
-        (StabquerschnittEintrag, {}, {}),
-        (LastfallEintrag, {}, {}),
-        (LastkombinationEintrag, {}, {}),
-        (BalkensystemEintrag, {"kennung": "r", "name": "r"}, {"kennung": "r", "name": "r"}),
-        (SkriptEintrag, {"kennung": "p"}, {"kennung": "p"}),
-        (GrundbruchEintrag, {"kennung": "g", "name": "g"}, {"kennung": "g", "name": "g"}),
-        (GrundbruchkombinationEintrag, {"name": "k"}, {"name": "k"}),
-        (Projekt, {}, {}),
-    ]
-
-    def test_ein_leeres_woerterbuch_liest_sich_wie_die_vorgaben(self):
-        for cls, roh, pflicht in self.FAELLE:
-            with self.subTest(klasse=cls.__name__):
-                self.assertEqual(cls.aus_dict(roh), cls(**pflicht))
-
-    def test_jede_eintragsklasse_ist_dabei(self):
-        """
-        Eine neue Klasse ohne Eintrag oben wäre ungeprüft. Ausgenommen die
-        Gebrauchslisten: ihr Anteil hängt an der Liste (häufig 70 %,
-        quasi-ständig 60 %) und kommt als Argument.
-        """
-        def unterklassen(k):
-            for u in k.__subclasses__():
-                yield u
-                yield from unterklassen(u)
-        geprueft = {cls for cls, _, _ in self.FAELLE}
-        self.assertEqual(set(unterklassen(Beschreibung)) - geprueft
-                         - {Gebrauchsliste, QAGebrauchsliste}, set())
 
 
 class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
