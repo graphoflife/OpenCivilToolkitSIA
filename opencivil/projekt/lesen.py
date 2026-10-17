@@ -101,7 +101,13 @@ def lesen(cls: type, roh: Any, wo: str, basis: Any = None) -> Any:
     ``wo`` nennt den Ort in Meldungen. ``basis`` ist der Eintrag, dessen Werte
     fuer fehlende Felder gelten -- ohne sie die Vorgaben der Klasse. Jeder
     gelesene Eintrag ist danach geprueft (:func:`felder_pruefen`).
+
+    Aus Python darf ``roh`` auch schon ein Eintrag der Klasse sein, etwa ein
+    Stichwort der Fassade: er bleibt, wie er ist, und wird ganz geprueft.
     """
+    if isinstance(roh, cls):
+        felder_pruefen(roh, wo)
+        return roh
     if not isinstance(roh, Mapping):
         raise ProjektFehler(f"{wo}: hier gehört ein Eintrag mit Feldern hin, "
                             f"nicht {_zeigen(roh)}.")

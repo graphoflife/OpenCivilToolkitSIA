@@ -1,5 +1,5 @@
 ---
-erzeugt: 4cfdd07ea457
+erzeugt: db40b5f85735
 art: modul
 tags: [modul]
 ---
@@ -170,6 +170,9 @@ auf die 2. und 3. Lage, wie die Vorgabe der Oberflaeche.
 einen hat. Alles Weitere -- `b`, `rissanforderung`,
 `duktilitaet` ... -- geht als Stichwort an den Eintrag; ein
 unbekanntes Stichwort wird gemeldet, statt still zu verschwinden.
+Gelesen wird es wie aus einer Datei: ein Teil darf als Eintrag kommen
+oder als seine Felder, `tragsicherheit_wahl={"rechenart": "parabel"}`
+aendert nur die Rechenart.
 
 Gebaut wird ueber [[opencivil.projekt.platte#QuerschnittEintrag.neu|QuerschnittEintrag.neu]], dieselbe Vorlage wie
 in der Oberflaeche, nur ohne deren Startlast: wer rechnet, gibt seine
@@ -357,17 +360,6 @@ def _beweglich(p: 'Projekt') -> None
 ```
 
 Ein Träger auf zwei Rollen: nichts hält ihn waagrecht -- eine Meldung statt einer Zahl.
-
-### _felder_setzen
-
-```python
-def _felder_setzen(eintrag: Any, felder: Mapping[str, Any], wo: str) -> None
-```
-
-Die Stichworte einer Fassade an den Eintrag -- ein unbekanntes wird
-gemeldet, mit dem aehnlichsten Feld, statt still zu verschwinden; ein
-Wert, der nicht passt, an der Zeile, in der er steht, und nicht erst beim
-Rechnen.
 
 
 ## Braucht

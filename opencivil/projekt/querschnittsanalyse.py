@@ -56,9 +56,6 @@ from opencivil.projekt.netz import Netz, naechste_kennung
 #: Schnitte eines Buegels durch eine Schubwand: so viele Schenkel kreuzen sie.
 SCHNITTE = range(1, 9)
 
-#: Die Zugseiten eines gezeichneten Querschnitts.
-
-
 #: Ein Punkt in mm -- oder die Kennung eines Knotens, der dort liegt.
 Ort = Union[str, Sequence[float]]
 

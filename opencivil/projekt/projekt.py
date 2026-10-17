@@ -15,11 +15,10 @@ reicht nur weiter.
 from __future__ import annotations
 
 import copy
-import difflib
 import json
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Sequence, Union
+from typing import Any, Dict, List, Sequence, Union
 
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
 from opencivil.ergebnis import Ergebnis
@@ -31,7 +30,7 @@ from opencivil.projekt.eintraege import (
 )
 from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
-from opencivil.projekt.lesen import ProjektFehler, felder_pruefen, ort
+from opencivil.projekt.lesen import ProjektFehler, felder_pruefen, lesen, ort
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.skript import VORLAGE, SkriptEintrag
 from opencivil.projekt.querschnittsanalyse import (
@@ -217,6 +216,9 @@ class Projekt(Beschreibung):
         einen hat. Alles Weitere -- ``b``, ``rissanforderung``,
         ``duktilitaet`` ... -- geht als Stichwort an den Eintrag; ein
         unbekanntes Stichwort wird gemeldet, statt still zu verschwinden.
+        Gelesen wird es wie aus einer Datei: ein Teil darf als Eintrag kommen
+        oder als seine Felder, ``tragsicherheit_wahl={"rechenart": "parabel"}``
+        aendert nur die Rechenart.
 
         Gebaut wird ueber :meth:`QuerschnittEintrag.neu`, dieselbe Vorlage wie
         in der Oberflaeche, nur ohne deren Startlast: wer rechnet, gibt seine
@@ -230,7 +232,7 @@ class Projekt(Beschreibung):
         eintrag.h = float(h)
         eintrag.kombinationen = []
         aussen = Richtung.Y if x_innen else Richtung.X
-        eintrag.richtung_lage1 = eintrag.richtung_lage4 = aussen.value
+        eintrag.richtung_lage1 = eintrag.richtung_lage4 = aussen
 
         durchmesser = {Richtung.X: (x, x_zulage), Richtung.Y: (y, y_zulage)}
         for richtung, (grund, zulage) in durchmesser.items():
@@ -247,7 +249,7 @@ class Projekt(Beschreibung):
                 lage.grund = PostenEintrag(durchmesser=float(d), abstand=teilung)
                 lage.zulage = PostenEintrag(durchmesser=float(dz), abstand=teilung)
 
-        _felder_setzen(eintrag, felder, f"Platte '{name}'")
+        eintrag = lesen(QuerschnittEintrag, felder, f"Platte '{name}'", eintrag)
         self.querschnitte.append(eintrag)
         return eintrag
 
@@ -273,7 +275,8 @@ class Projekt(Beschreibung):
             kennung=self.freie_kennung(ANALYSE.vorsilbe), name=name,
             beton=self._einziges("beton", beton), stahl=self._einziges("betonstahl", stahl))
         eintrag.lastfaelle = []
-        _felder_setzen(eintrag, felder, f"Querschnittsanalyse '{name}'")
+        eintrag = lesen(QuerschnittsanalyseEintrag, felder, f"Querschnittsanalyse '{name}'",
+                        eintrag)
         self.querschnittsanalysen.append(eintrag)
         return eintrag
 
@@ -286,9 +289,9 @@ class Projekt(Beschreibung):
         Oberflaeche mit einem Einfeldtraeger: wer in Python zeichnet, zeichnet
         sein eigenes System.
         """
-        eintrag = BalkensystemEintrag(kennung=self.freie_kennung(BALKENSYSTEM.vorsilbe),
-                                      name=name)
-        _felder_setzen(eintrag, felder, f"Balkensystem '{name}'")
+        eintrag = lesen(BalkensystemEintrag, felder, f"Balkensystem '{name}'",
+                        BalkensystemEintrag(kennung=self.freie_kennung(BALKENSYSTEM.vorsilbe),
+                                            name=name))
         self.balkensysteme.append(eintrag)
         return eintrag
 
@@ -300,8 +303,9 @@ class Projekt(Beschreibung):
         -- geht als Stichwort an den Eintrag; Winkel in Grad, Masse in m,
         Spannungen in kPa.
         """
-        eintrag = GrundbruchEintrag(kennung=self.freie_kennung(GRUNDBRUCH.vorsilbe), name=name)
-        _felder_setzen(eintrag, felder, f"Grundbruch '{name}'")
+        eintrag = lesen(GrundbruchEintrag, felder, f"Grundbruch '{name}'",
+                        GrundbruchEintrag(kennung=self.freie_kennung(GRUNDBRUCH.vorsilbe),
+                                          name=name))
         self.grundbrueche.append(eintrag)
         return eintrag
 
@@ -759,21 +763,3 @@ class Projekt(Beschreibung):
         a.knickfall("Seitlich", N_Ed=-1200.0, M_Ed_1=10.0, laenge=5.0, knicklaenge=3.5,
                     richtung="links")
         return a
-
-
-def _felder_setzen(eintrag: Any, felder: Mapping[str, Any], wo: str) -> None:
-    """
-    Die Stichworte einer Fassade an den Eintrag -- ein unbekanntes wird
-    gemeldet, mit dem aehnlichsten Feld, statt still zu verschwinden; ein
-    Wert, der nicht passt, an der Zeile, in der er steht, und nicht erst beim
-    Rechnen.
-    """
-    bekannt = {f.name for f in fields(eintrag)}
-    for feld, wert in felder.items():
-        if feld not in bekannt:
-            aehnlich = difflib.get_close_matches(feld, bekannt, n=1)
-            raise ProjektFehler(
-                f"{wo}: ein Feld '{feld}' gibt es nicht."
-                + (f" Gemeint ist vielleicht '{aehnlich[0]}'?" if aehnlich else ""))
-        setattr(eintrag, feld, wert)
-    felder_pruefen(eintrag, wo, tief=False)

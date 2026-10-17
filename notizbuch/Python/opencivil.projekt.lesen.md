@@ -1,5 +1,5 @@
 ---
-erzeugt: cda6988d2e41
+erzeugt: fc966b02c868
 art: modul
 tags: [modul]
 ---
@@ -103,6 +103,9 @@ Ein Eintrag der Klasse `cls` aus `roh`, einem Woerterbuch aus der Datei.
 `wo` nennt den Ort in Meldungen. `basis` ist der Eintrag, dessen Werte
 fuer fehlende Felder gelten -- ohne sie die Vorgaben der Klasse. Jeder
 gelesene Eintrag ist danach geprueft ([[opencivil.projekt.lesen#felder_pruefen|felder_pruefen]]).
+
+Aus Python darf `roh` auch schon ein Eintrag der Klasse sein, etwa ein
+Stichwort der Fassade: er bleibt, wie er ist, und wird ganz geprueft.
 
 ### _wert_lesen
 

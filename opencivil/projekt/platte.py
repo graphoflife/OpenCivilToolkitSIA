@@ -29,8 +29,6 @@ from opencivil.projekt.eintraege import (
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt.lesen import ProjektFehler, nicht_negativ
 
-#: Die Richtungen einer Lage.
-
 
 @dataclass
 class QuerschnittEintrag(Beschreibung):

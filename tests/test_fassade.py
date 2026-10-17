@@ -13,8 +13,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
+from opencivil.nachweis.rechenwahl import Rechenart
 from opencivil.projekt import (
     GebrauchsfallEintrag, KnickEintrag, KombinationEintrag, Projekt, ProjektFehler,
+    RechenwahlEintrag,
 )
 
 WURZEL = Path(__file__).resolve().parents[1]
@@ -72,6 +75,24 @@ class TestAnlegen(unittest.TestCase):
     def test_weitere_felder_als_stichwort(self):
         q = einfach().platte("P", b=800, rissanforderung="hoch", duktilitaet=True)
         self.assertEqual((q.b, q.rissanforderung, q.duktilitaet), (800, "hoch", True))
+
+    def test_ein_teil_als_seine_felder(self):
+        """Wie in einer Datei: was fehlt, bleibt, wie es die Vorlage hat."""
+        q = einfach().platte("P", tragsicherheit_wahl={"rechenart": "parabel"})
+        self.assertIs(q.tragsicherheit_wahl.rechenart, Rechenart.PARABEL)
+        self.assertIs(q.tragsicherheit_wahl.werkstoffsatz, Werkstoffsatz.BEMESSUNG)
+
+    def test_ein_teil_als_eintrag(self):
+        wahl = RechenwahlEintrag(rechenart="parabel")
+        self.assertIs(einfach().platte("P", tragsicherheit_wahl=wahl).tragsicherheit_wahl, wahl)
+
+    def test_ein_falscher_wert_in_einem_teil_an_der_zeile(self):
+        """Als Eintrag ebenso wie als Felder -- nicht erst beim Rechnen."""
+        for wahl in (RechenwahlEintrag(rechenart="blok"), {"rechenart": "blok"}):
+            with self.subTest(wahl=wahl), self.assertRaises(ProjektFehler) as fehler:
+                einfach().platte("P", tragsicherheit_wahl=wahl)
+            self.assertIn("Platte 'P', tragsicherheit_wahl: 'blok' gibt es als 'rechenart' "
+                          "nicht", str(fehler.exception))
 
     def test_ein_vertipptes_feld_wird_gemeldet(self):
         with self.assertRaises(ProjektFehler) as fehler:
