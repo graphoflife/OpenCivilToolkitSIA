@@ -50,10 +50,10 @@ from __future__ import annotations
 
 import copy
 from dataclasses import dataclass, field
-from enum import Enum
 from typing import TYPE_CHECKING, List, Optional, Sequence, Tuple
 
 from opencivil.bewehrungssuche.bewertung import Bewertung, arbeitskopie, bewerte
+from opencivil.core.wahl import Wahl
 from opencivil.querschnitt.platte import Richtung
 
 if TYPE_CHECKING:
@@ -78,7 +78,7 @@ MINDESTDURCHMESSER = 10.0
 RUNDEN = 60
 
 
-class Suchmodus(str, Enum):
+class Suchmodus(Wahl):
     """Was gesucht wird und wogegen."""
 
     GRUND_OHNE = "grund_ohne"

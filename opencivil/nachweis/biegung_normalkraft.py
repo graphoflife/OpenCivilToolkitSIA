@@ -44,7 +44,6 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from enum import Enum
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import (
@@ -53,6 +52,7 @@ from opencivil.core.berechnung import (
 from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, Groesse
 from opencivil.core.latex import als_text, angabe
 from opencivil.core.protokoll import Protokoll, StillesProtokoll, Zwischenwerte
+from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Wert, WertDef
 from opencivil.core.wert import kennung_aus
 from opencivil.nachweis import dehnungsfaecher, linie as geo
@@ -73,7 +73,7 @@ from opencivil.querschnitt.platte import (
 )
 
 
-class Erfuellungsart(str, Enum):
+class Erfuellungsart(Wahl):
     """Massstab, in dem der Abstand zur Resistenzlinie gemessen wird."""
 
     AUTOMATISCH = "automatisch"
@@ -91,9 +91,6 @@ class Erfuellungsart(str, Enum):
     NAECHSTER_PUNKT = "naechster_Punkt"
     """Kuerzester Weg zur Linie, gemessen im auf die Groesstwerte normierten
     Diagramm (sonst waere der Abstand von der Wahl der Einheiten abhaengig)."""
-
-    def __str__(self) -> str:
-        return self.value
 
     @property
     def beschriftung(self) -> str:

@@ -36,6 +36,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional, Sequence, Tuple
 
+from opencivil.core.wahl import Wahl
+
 Punkt = Tuple[float, float]
 
 #: Wie nahe zwei Lagen beieinander liegen duerfen, um als gleich zu gelten, in
@@ -456,7 +458,7 @@ def strecke_liegt_in(
 # ===========================================================================
 
 
-class Linienart(str, Enum):
+class Linienart(Wahl):
     """Wie die Menge einer Stablinie angegeben ist."""
 
     FLAECHE = "flaeche"

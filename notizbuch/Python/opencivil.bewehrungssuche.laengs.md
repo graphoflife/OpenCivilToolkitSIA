@@ -1,5 +1,5 @@
 ---
-erzeugt: fd6e337d1a2d
+erzeugt: 1849aa1eb1a3
 art: modul
 tags: [modul]
 ---
@@ -67,7 +67,7 @@ der Durchmesser bis ⌀40; die Grenze haelt die Suche im Zaum.
 ### Suchmodus
 
 ```python
-class Suchmodus(str, Enum)
+class Suchmodus(Wahl)
 ```
 
 Was gesucht wird und wogegen.
@@ -349,6 +349,7 @@ Die gefundenen Lagen in die Platte schreiben.
 ## Braucht
 
 - [[opencivil.bewehrungssuche.bewertung]]
+- [[opencivil.core.wahl]]
 - [[opencivil.projekt]]
 - [[opencivil.querschnitt.platte]]
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 40f285b83e1f
+erzeugt: e2963b4662f7
 art: modul
 tags: [modul]
 ---
@@ -51,7 +51,7 @@ Rechnung, und die Interaktionsrechnung braucht keine Sonderfaelle.
 ### Richtung
 
 ```python
-class Richtung(str, Enum)
+class Richtung(Wahl)
 ```
 
 Tragrichtung einer Bewehrungslage.
@@ -530,6 +530,7 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 

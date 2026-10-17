@@ -1,5 +1,5 @@
 ---
-erzeugt: 9a96fcbe8391
+erzeugt: b43b18bcb08d
 art: modul
 tags: [modul]
 ---
@@ -44,7 +44,7 @@ und laengs. Eine Feder in N/m bzw. Nm/rad, eine Bettung in N/m je m Stab.
 ### Lastrichtung
 
 ```python
-class Lastrichtung(str, Enum)
+class Lastrichtung(Wahl)
 ```
 
 Wohin eine Kraftlast zeigt, wenn ihr Wert positiv ist.
@@ -91,7 +91,7 @@ Laenge der Projektion je Meter Stab -- senkrecht auf die Waagrechte, waagrecht a
 ### Lastart
 
 ```python
-class Lastart(str, Enum)
+class Lastart(Wahl)
 ```
 
 Was fuer eine Last auf einem Stab liegt.
@@ -267,6 +267,10 @@ Beiwerten gewichteten Lastfaelle.
 ## Konstanten
 
 - `FEST = math.inf` – Fest gehalten -- eine Richtung ohne Verschiebung.
+
+## Braucht
+
+- [[opencivil.core.wahl]]
 
 ## Gebraucht von
 

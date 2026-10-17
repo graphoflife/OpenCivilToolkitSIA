@@ -1,5 +1,5 @@
 ---
-erzeugt: dabad1cf953c
+erzeugt: a6f66e9e66ac
 art: modul
 tags: [modul]
 ---
@@ -84,7 +84,7 @@ SI-Basis wie im ganzen Querschnittsmodul.
 ### Zugseite
 
 ```python
-class Zugseite(str, Enum)
+class Zugseite(Wahl)
 ```
 
 Die Seite, die ein positives Moment zieht -- und die Richtung, die dazu gehoert.
@@ -311,6 +311,7 @@ gerufen. Mit `protokoll` schreibt jede Linie ihre Herleitung.
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.querschnittsloeser]]

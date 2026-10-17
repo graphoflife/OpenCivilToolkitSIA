@@ -1,5 +1,5 @@
 ---
-erzeugt: 864aba6a98b4
+erzeugt: 154bcd30ad0b
 art: modul
 tags: [modul]
 ---
@@ -28,7 +28,7 @@ gefuehrt wird, steht in SIA 262:2025, Tabelle 17 (ein Strich).
 ### Rissanforderung
 
 ```python
-class Rissanforderung(str, Enum)
+class Rissanforderung(Wahl)
 ```
 
 Normal, erhoeht oder hoch -- wie die Maske und die Datei sie schreiben.
@@ -70,6 +70,10 @@ Ob der Nachweis gegen Fliessen unter haeufiger Einwirkung verlangt ist (Tabelle 
 ## Konstanten
 
 - `RISSANFORDERUNGEN = tuple((a.value for a in Rissanforderung))` – Die Stufen, wie sie in der Datei stehen -- fuer die Wahl am Feld.
+
+## Braucht
+
+- [[opencivil.core.wahl]]
 
 ## Gebraucht von
 

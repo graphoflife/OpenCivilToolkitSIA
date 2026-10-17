@@ -19,24 +19,17 @@ gefuehrt wird, steht in SIA 262:2025, Tabelle 17 (ein Strich).
 
 from __future__ import annotations
 
-from enum import Enum
 from typing import Optional
 
+from opencivil.core.wahl import Wahl
 
-class Rissanforderung(str, Enum):
+
+class Rissanforderung(Wahl):
     """Normal, erhoeht oder hoch -- wie die Maske und die Datei sie schreiben."""
 
     NORMAL = "normal"
     ERHOEHT = "erhoeht"
     HOCH = "hoch"
-
-    def __str__(self) -> str:
-        return self.value
-
-    @classmethod
-    def _missing_(cls, wert: object) -> "Rissanforderung":
-        raise ValueError(f"Unbekannte Rissanforderung '{wert}'. Möglich sind: "
-                         f"{', '.join(a.value for a in cls)}.")
 
     @property
     def beschriftung(self) -> str:

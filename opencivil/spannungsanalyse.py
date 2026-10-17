@@ -98,7 +98,6 @@ from __future__ import annotations
 import math
 import re
 from dataclasses import dataclass, field
-from enum import Enum
 from typing import (
     TYPE_CHECKING, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union,
 )
@@ -106,6 +105,7 @@ from typing import (
 from opencivil.core.einheiten import MIO_MM4, Groesse
 from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Protokoll, StillesProtokoll, Zwischenwerte
+from opencivil.core.wahl import Wahl
 from opencivil.core.wert import kennung_aus
 from opencivil.nachweis import dehnungsfaecher
 from opencivil.material.basis import mit_index
@@ -145,7 +145,7 @@ PUNKTE_UNGERISSEN = 10
 THEMA = "Spannung-Dehnung-Analyse"
 
 
-class Analyseart(str, Enum):
+class Analyseart(Wahl):
     """Welche der sechs Fragen gestellt wird."""
 
     SCHNITTGROESSEN = "schnittgroessen"

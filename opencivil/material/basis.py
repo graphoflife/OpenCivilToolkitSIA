@@ -23,13 +23,13 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from enum import Enum
-from typing import Callable, Dict, List, Mapping, Optional, Sequence, Tuple, Union
+from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil.core.berechnung import Berechnung, Formel, FormelFunktion, Vorgabe
 from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
 from opencivil.core.latex import text_latex
 from opencivil.core.protokoll import Abschnitt
+from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Quelle, WertDef, kennung_aus
 
 
@@ -76,12 +76,9 @@ def mit_index(symbol: str, index: str) -> str:
     return f"{basis}_{{{neuer_tief}}}{hoch}"
 
 
-class Baustoffart(str, Enum):
+class Baustoffart(Wahl):
     BETON = "beton"
     BETONSTAHL = "betonstahl"
-
-    def __str__(self) -> str:
-        return self.value
 
     @property
     def beschriftung(self) -> str:

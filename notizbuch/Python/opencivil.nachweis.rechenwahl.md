@@ -1,5 +1,5 @@
 ---
-erzeugt: 665ef337844c
+erzeugt: eeebc96e6823
 art: modul
 tags: [modul]
 ---
@@ -72,7 +72,7 @@ haengt kein Modul. Der Wertesatz bestimmt, wo die Plateaus liegen
 ### Rechenart
 
 ```python
-class Rechenart(str, Enum)
+class Rechenart(Wahl)
 ```
 
 Wie der Querschnitt gerechnet wird -- siehe Dateikopf.
@@ -409,6 +409,7 @@ das Knicken und die Analysen mit dem der ersten Lage.
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.querschnitt.werkstoffgesetz]]

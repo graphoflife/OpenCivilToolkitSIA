@@ -68,13 +68,12 @@ Alles in SI-Basis.
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, replace
-from enum import Enum
 from functools import cached_property
 from typing import Callable, List, Optional, Sequence, Tuple
 
 from opencivil.core.protokoll import Zwischenwerte
+from opencivil.core.wahl import Wahl
 from opencivil.querschnitt.fasern import (
     Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt, Stab,
 )
@@ -917,7 +916,7 @@ class QuerschnittsloeserIllinois(FaserloeserIllinois, Querschnittsloeser):
 # ===========================================================================
 
 
-class Werkstoffsatz(str, Enum):
+class Werkstoffsatz(Wahl):
     """
     Mit welchen Festigkeiten die Werkstoffgesetze rechnen.
 

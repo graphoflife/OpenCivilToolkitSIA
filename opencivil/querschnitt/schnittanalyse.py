@@ -63,13 +63,13 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from enum import Enum
 from typing import TYPE_CHECKING, Callable, Dict, List, Mapping, Optional, Tuple
 
 from opencivil.core.berechnung import Eingaben
 from opencivil.core.einheiten import MIO_MM3, MIO_MM4, Groesse
 from opencivil.core.latex import angabe
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.wahl import Wahl
 from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.nachweis.querschnittsloeser import (
@@ -95,7 +95,7 @@ if TYPE_CHECKING:
     from opencivil.projekt import Aufbau
 
 
-class Zugseite(str, Enum):
+class Zugseite(Wahl):
     """Die Seite, die ein positives Moment zieht -- und die Richtung, die dazu gehoert."""
 
     UNTEN = "unten"

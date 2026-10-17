@@ -1,5 +1,5 @@
 ---
-erzeugt: 0c0b5c4228a8
+erzeugt: 58dc9e1ed732
 art: modul
 tags: [modul]
 ---
@@ -298,7 +298,7 @@ liegen unter allem, was als Aussparung gezeichnet wird.
 ### Linienart
 
 ```python
-class Linienart(str, Enum)
+class Linienart(Wahl)
 ```
 
 Wie die Menge einer Stablinie angegeben ist.
@@ -357,6 +357,10 @@ Enden acht Staebe. Bei einer Flaeche gibt es keine Einzelstaebe.
 - `TOLERANZ = 1e-06` – Wie nahe zwei Lagen beieinander liegen duerfen, um als gleich zu gelten, in der Einheit der Punkte. Ein Millionstel Millimeter liegt weit unter allem, was jemand zeichnet, und weit ueber dem Rauschen gerechneter Kreispunkte.
 - `NULL = Flaechenwerte(A=0.0, y_S=0.0, z_S=0.0, I_y=0.0, I_z=0.0, I_yz=0.0)` – Ein Querschnitt ohne Flaeche -- der Anfang jeder Summe.
 - `WANDPROBE = 5.0` – Abstand der Proben entlang einer Wandlinie, in der Einheit der Punkte.
+
+## Braucht
+
+- [[opencivil.core.wahl]]
 
 ## Gebraucht von
 

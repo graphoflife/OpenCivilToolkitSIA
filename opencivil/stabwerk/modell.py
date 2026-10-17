@@ -31,14 +31,15 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field, replace
-from enum import Enum
 from typing import Dict, List, Optional, Tuple, Union
+
+from opencivil.core.wahl import Wahl
 
 #: Fest gehalten -- eine Richtung ohne Verschiebung.
 FEST = math.inf
 
 
-class Lastrichtung(str, Enum):
+class Lastrichtung(Wahl):
     """Wohin eine Kraftlast zeigt, wenn ihr Wert positiv ist."""
 
     SENKRECHT = "senkrecht"
@@ -78,7 +79,7 @@ class Lastrichtung(str, Enum):
         return abs(c) if self is Lastrichtung.SENKRECHT else abs(s)
 
 
-class Lastart(str, Enum):
+class Lastart(Wahl):
     """Was fuer eine Last auf einem Stab liegt."""
 
     LINIENLAST = "linienlast"

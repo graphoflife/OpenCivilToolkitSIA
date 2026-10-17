@@ -58,12 +58,12 @@ haengt kein Modul. Der Wertesatz bestimmt, wo die Plateaus liegen
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
-from enum import Enum
 from typing import Callable, Dict, List, Sequence, Type
 
 from opencivil.core.berechnung import Eingabebezug, Eingaben
 from opencivil.core.latex import angabe
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Wert, kennung_aus
 from opencivil.nachweis.querschnittsloeser import (
     Querschnittsloeser, Stahllage, Werkstoffsatz, lagen_je_seite, wirksamer_modul,
@@ -76,7 +76,7 @@ from opencivil.querschnitt.werkstoffgesetz import (
 Gesetz = Callable[[float], float]
 
 
-class Rechenart(str, Enum):
+class Rechenart(Wahl):
     """Wie der Querschnitt gerechnet wird -- siehe Dateikopf."""
 
     HANDRECHNUNG = "handrechnung"

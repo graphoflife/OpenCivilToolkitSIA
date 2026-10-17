@@ -327,7 +327,7 @@ class TestNichtsStill(unittest.TestCase):
 
     def test_eine_unbekannte_rissanforderung_im_nachweis(self):
         from opencivil.nachweis.rissanforderung import Rissanforderung
-        with self.assertRaisesRegex(ValueError, "Unbekannte Rissanforderung 'mittel'"):
+        with self.assertRaisesRegex(ValueError, "'mittel' gibt es als Rissanforderung nicht"):
             Rissanforderung("mittel")
         self.assertEqual([a.gegen_fliessen for a in Rissanforderung], [False, True, True])
 

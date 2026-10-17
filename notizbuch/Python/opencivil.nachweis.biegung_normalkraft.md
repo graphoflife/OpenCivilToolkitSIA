@@ -1,5 +1,5 @@
 ---
-erzeugt: 4636277b10bd
+erzeugt: bc3c9d3c9a3d
 art: modul
 tags: [modul]
 ---
@@ -61,7 +61,7 @@ haengt vom gewaehlten Massstab ab -- siehe [[opencivil.nachweis.biegung_normalkr
 ### Erfuellungsart
 
 ```python
-class Erfuellungsart(str, Enum)
+class Erfuellungsart(Wahl)
 ```
 
 Massstab, in dem der Abstand zur Resistenzlinie gemessen wird.
@@ -373,6 +373,7 @@ Ein SI-Wert in der Einheit seiner Achse, mit Einheitenzeichen.
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 - [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.handrechnung]]

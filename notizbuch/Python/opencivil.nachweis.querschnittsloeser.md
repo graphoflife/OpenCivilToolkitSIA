@@ -1,5 +1,5 @@
 ---
-erzeugt: 9dac9fe1a249
+erzeugt: 97f8c9be191b
 art: modul
 tags: [modul]
 ---
@@ -508,7 +508,7 @@ kostete das Halbieren beinahe die ganze Rechenzeit (Benutzer,
 ### Werkstoffsatz
 
 ```python
-class Werkstoffsatz(str, Enum)
+class Werkstoffsatz(Wahl)
 ```
 
 Mit welchen Festigkeiten die Werkstoffgesetze rechnen.
@@ -639,6 +639,7 @@ Das Formelzeichen dazu, fuer die Herleitung -- `f_{cd}`.
 ## Braucht
 
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.wahl]]
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 

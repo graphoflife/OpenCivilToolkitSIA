@@ -47,6 +47,7 @@ from opencivil.core.einheiten import (
 )
 from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Abschnitt, Protokoll, Zwischenwerte
+from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.material.basis import Baustoff
 
@@ -63,14 +64,11 @@ BREITE_Y_MM = 1000.0
 STAHLDICHTE = 7850.0
 
 
-class Richtung(str, Enum):
+class Richtung(Wahl):
     """Tragrichtung einer Bewehrungslage."""
 
     X = "x"
     Y = "y"
-
-    def __str__(self) -> str:
-        return self.value
 
     @property
     def gegenrichtung(self) -> "Richtung":

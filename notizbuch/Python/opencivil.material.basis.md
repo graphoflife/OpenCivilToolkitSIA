@@ -1,5 +1,5 @@
 ---
-erzeugt: 44face12572b
+erzeugt: ebf64bbcd2ce
 art: modul
 tags: [modul]
 ---
@@ -55,7 +55,7 @@ f_{yk}^{-}    -> f_{yk,\text{B500B}}^{-}
 ### Baustoffart
 
 ```python
-class Baustoffart(str, Enum)
+class Baustoffart(Wahl)
 ```
 
 - `BETON = 'beton'`
@@ -214,6 +214,7 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
+- [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 
 ## Gebraucht von

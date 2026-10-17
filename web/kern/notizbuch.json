@@ -2586,6 +2586,15 @@
       ]
     },
     {
+      "name": "opencivil.core.wahl",
+      "pfad": "Python/opencivil.core.wahl.md",
+      "art": "modul",
+      "kurz": "was ein Wahlfeld annehmen kann.",
+      "stichworte": [
+        "Wahl"
+      ]
+    },
+    {
       "name": "opencivil.core.wert",
       "pfad": "Python/opencivil.core.wert.md",
       "art": "modul",

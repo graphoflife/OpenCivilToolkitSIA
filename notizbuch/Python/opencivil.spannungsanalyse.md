@@ -1,5 +1,5 @@
 ---
-erzeugt: c173c01b982f
+erzeugt: 87a17a07b158
 art: modul
 tags: [modul]
 ---
@@ -116,7 +116,7 @@ gezeichneten Querschnitts, je Zugseite, steht in
 ### Analyseart
 
 ```python
-class Analyseart(str, Enum)
+class Analyseart(Wahl)
 ```
 
 Welche der sechs Fragen gestellt wird.
@@ -758,6 +758,7 @@ sammelt die Formelsammlung ihr Thema.
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.material.betonstahl]]
