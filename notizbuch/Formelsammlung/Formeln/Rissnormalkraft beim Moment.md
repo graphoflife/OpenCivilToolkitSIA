@@ -1,5 +1,5 @@
 ---
-erzeugt: af900b65c57c
+erzeugt: 7a700ebf4d7b
 art: formel
 tags: [formel]
 ---
@@ -54,8 +54,8 @@ $$
 
 ## Im Code
 
-- [[opencivil.querschnitt.schnittanalyse#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
-- [[opencivil.spannungsanalyse#Loeserpaar.herleitung_riss|Loeserpaar.herleitung_riss]]
+- [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_riss|Loeserpaar.herleitung_riss]]
+- [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
 
 ## Themen
 

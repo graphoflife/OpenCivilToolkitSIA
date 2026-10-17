@@ -1,5 +1,5 @@
 ---
-erzeugt: 57aa486494b2
+erzeugt: d9625978fbea
 art: modul
 tags: [modul]
 ---
@@ -90,7 +90,7 @@ def spannungsanalysen(aufbau: Aufbau, loesung: Loesung) -> dict
 Die Auswertungen am Querschnitt, je Platte und je gezeichnetem Querschnitt
 -- fertig zum Zeichnen.
 
-Gerechnet wird in [[opencivil.spannungsanalyse#analysen|opencivil.spannungsanalyse.analysen]]; hier wird
+Gerechnet wird in [[opencivil.spannungsanalyse.analysen]]; hier wird
 nur in Zeichengroessen abgebildet.
 
 ### _linie_dict
@@ -110,7 +110,7 @@ def _modul_dict(modul) -> dict
 
 Der aequivalente E-Modul in Zeichengroessen: die laufende Kraft in kNm
 bzw. kN, der Modul in N/mm², dazu E_cm, an dem er sich misst. Gerechnet
-ist alles im Kern ([[opencivil.spannungsanalyse#Modullinie|Modullinie]]).
+ist alles im Kern ([[opencivil.spannungsanalyse.modul#Modullinie|Modullinie]]).
 
 ### werkstoffgesetze
 

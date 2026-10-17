@@ -1,5 +1,5 @@
 ---
-erzeugt: f7a078553ac0
+erzeugt: 598dfd041b6a
 art: modul
 tags: [modul]
 ---
@@ -414,7 +414,7 @@ Womit gerechnet wird, waehlt jede Analyse fuer sich: die Kriechzahl, den
 Wertesatz und die Rechenart ([[opencivil.querschnitt.gesetzwahl#Rechenwahl|Rechenwahl]]).
 
 - `name: str`
-- `art: Analyseart = Analyseart.SCHNITTGROESSEN` – Was gefragt wird -- siehe [[opencivil.spannungsanalyse#Analyseart|Analyseart]].
+- `art: Analyseart = Analyseart.SCHNITTGROESSEN` – Was gefragt wird -- siehe [[opencivil.spannungsanalyse.art#Analyseart|Analyseart]].
 - `richtung: Richtung = Richtung.X` – Welche Bewehrung zaehlt. Hier keine Wahl `beide`: ein Bild zeigt einen Querschnitt, und der liegt in einer Richtung.
 - `N_Ed: float = 0.0` – in kN, Zug positiv -- fuer `schnittgroessen` und `moment_kruemmung`.
 - `M_Ed: float = 0.0` – in kNm -- fuer `schnittgroessen` und `normalkraft_dehnung`.

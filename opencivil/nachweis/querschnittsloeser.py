@@ -58,7 +58,7 @@ Die Suche braucht nur zweierlei: die Fasern mit ihren Kraeften und die
 Dehnungsgrenzen, in denen jede gilt. Das steht in :class:`Faserloeser`. Die
 Platte baut beides aus Hoehe, Breite und Lagen (:class:`Querschnittsloeser`),
 der gezeichnete Querschnitt je Zugseite aus seinen Polygonen
-(:mod:`opencivil.querschnitt.schnittanalyse`). Dort ist ``eps_m`` die Dehnung
+(:mod:`opencivil.spannungsanalyse.schnitt`). Dort ist ``eps_m`` die Dehnung
 im Schwerpunkt statt auf halber Hoehe; ``oben`` und ``unten`` sagen, wo die
 Raender liegen.
 

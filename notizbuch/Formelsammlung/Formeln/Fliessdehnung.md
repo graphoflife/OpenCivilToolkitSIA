@@ -1,5 +1,5 @@
 ---
-erzeugt: 2e0136c29f24
+erzeugt: aff783d89b76
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.2.4"
@@ -50,7 +50,7 @@ $$
 - [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._ohne_buegel]]
 - [[opencivil.nachweis.spannungsbegrenzung#Spannungsbegrenzung._protokoll_fliessen|Spannungsbegrenzung._protokoll_fliessen]]
-- [[opencivil.spannungsanalyse#herleitung|herleitung]]
+- [[opencivil.spannungsanalyse.herleitung#herleitung|herleitung]]
 
 ## Themen
 

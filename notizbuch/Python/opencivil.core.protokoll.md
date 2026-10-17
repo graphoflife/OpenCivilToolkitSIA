@@ -1,5 +1,5 @@
 ---
-erzeugt: 4c1c8d36d9a5
+erzeugt: e90277178342
 art: modul
 tags: [modul]
 ---
@@ -618,9 +618,12 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.notizbuch.formelseiten]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.platte]]
-- [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
-- [[opencivil.spannungsanalyse]]
+- [[opencivil.spannungsanalyse.analysen]]
+- [[opencivil.spannungsanalyse.herleitung]]
+- [[opencivil.spannungsanalyse.linie]]
+- [[opencivil.spannungsanalyse.platte]]
+- [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.stabwerk.rechnung]]
 - [[opencivil.web.api]]

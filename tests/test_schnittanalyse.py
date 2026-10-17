@@ -17,7 +17,7 @@ from opencivil.projekt import Projekt, ProjektFehler
 from opencivil.projekt.querschnittsanalyse import (
     QASpannungsfallEintrag, QuerschnittsanalyseEintrag,
 )
-from opencivil.querschnitt.schnittanalyse import schnittpaar
+from opencivil.spannungsanalyse import schnittpaar
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.web import dienst
 

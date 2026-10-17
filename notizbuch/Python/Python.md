@@ -1,5 +1,5 @@
 ---
-erzeugt: 340fc971854a
+erzeugt: 70fc5c3d40b0
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -89,12 +89,19 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.querschnitt.gesetzwahl]] – womit ein Querschnitt rechnet.
     - [[opencivil.querschnitt.interaktion]] – Bruchzustand gezeichneter Querschnitte, auch schief.
     - [[opencivil.querschnitt.platte]] – Stahlbeton-Plattenquerschnitt.
-    - [[opencivil.querschnitt.schnittanalyse]] – Spannung-Dehnung-Analyse am gezeichneten Querschnitt.
     - [[opencivil.querschnitt.schubwaende]] – Querkraft und Torsion auf Schubwaende verteilt.
     - [[opencivil.querschnitt.vorlagen]] – Querschnitte zum Anfangen.
     - [[opencivil.querschnitt.werkstoffgesetz]] – Spannungs-Dehnungs-Beziehungen.
     - [[opencivil.querschnitt.zugseite]] – welche Seite ein Moment zieht.
-  - [[opencivil.spannungsanalyse]] – den Querschnitt ansehen, ohne ihn nachzuweisen.
+- [[opencivil.spannungsanalyse]] – den Querschnitt ansehen, ohne ihn nachzuweisen.
+    - [[opencivil.spannungsanalyse.analysen]] – die Analysen eines Projekts.
+    - [[opencivil.spannungsanalyse.art]] – welche der sechs Fragen eine Analyse stellt.
+    - [[opencivil.spannungsanalyse.bild]] – das Bild eines Querschnitts.
+    - [[opencivil.spannungsanalyse.herleitung]] – wie eine Linie entstand.
+    - [[opencivil.spannungsanalyse.linie]] – die Linien eines Querschnitts.
+    - [[opencivil.spannungsanalyse.modul]] – der aequivalente E-Modul.
+    - [[opencivil.spannungsanalyse.platte]] – das Paar einer Platte.
+    - [[opencivil.spannungsanalyse.schnitt]] – das Paar eines gezeichneten Querschnitts.
 - [[opencivil.stabwerk]] – ebene Stabwerke nach der Steifigkeitsmethode.
     - [[opencivil.stabwerk.herleitung]] – wie ein Balkensystem seine Rechnung aufschreibt.
     - [[opencivil.stabwerk.matrix]] – das Gleichungssystem eines Stabwerks.

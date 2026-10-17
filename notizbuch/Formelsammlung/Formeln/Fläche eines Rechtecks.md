@@ -1,5 +1,5 @@
 ---
-erzeugt: 812827823edd
+erzeugt: eb5527c694bf
 art: formel
 tags: [formel]
 ---
@@ -33,7 +33,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.spannungsanalyse#Loeserpaar.herleitung_bezug|Loeserpaar.herleitung_bezug]]
+- [[opencivil.spannungsanalyse.platte#Loeserpaar.herleitung_bezug|Loeserpaar.herleitung_bezug]]
 - [[opencivil.stabwerk.querschnitte]]
 
 ## Themen

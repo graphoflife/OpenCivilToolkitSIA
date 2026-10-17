@@ -43,9 +43,11 @@ from opencivil.core.berechnung import Eingabebezug, Eingaben
 from opencivil.core.latex import angabe
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, kennung_aus
+from opencivil.material.basis import Baustoffart
 from opencivil.nachweis.querschnittsloeser import (
-    Querschnittsloeser, Stahllage, lagen_je_seite, wirksamer_modul_wert,
+    Querschnittsloeser, Stahllage, lagen_je_seite, protokoll_wirksamer_modul, wirksamer_modul_wert,
 )
+from opencivil.querschnitt.analyse import Querschnittsanalyse
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, betongesetz
 from opencivil.querschnitt.werkstoffgesetz import Betongesetz, Gesetz, Spannungsblock, Stahlgesetz
 
@@ -269,6 +271,36 @@ def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *
         g.stahl(gesetz_von[kennung_aus(stahl.id)]).protokoll(
             p, {rolle: e[stahlname(name, stahl)] for rolle, name in satz.stahlkennwerte.items()},
             titel=titel if len(sorten) == 1 else f"{titel}, {stahl.name}")
+
+
+def protokoll_gesetze_nach_wahl(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse,
+                                wahl: Rechenwahl, basis: str, *, titel: str) -> None:
+    """
+    Die Werkstoffgesetze einer Wahl, je Material eines gezeichneten
+    Querschnitts -- die von
+    :meth:`~opencivil.querschnitt.analyse.Querschnittsanalyse.querschnitt`;
+    jedes schreibt sich selbst, mit seinen Werten, wie bei der Platte
+    (:func:`protokoll_gesetze`). Vor jedem Beton sein wirksamer Modul, wo ein
+    Gesetz an ihm haengt. Fuer die Gebrauchsnachweise und das Knicken des
+    gezeichneten Querschnitts.
+    """
+    satz = wahl.satz
+    phi = Zwischenwerte(basis).zahl("phi", r"\varphi", wahl.kriechzahl, stellen=2)
+    werkstoffe, index = analyse.werkstoffe(e.si_nach_id(), lambda stoff: wahl)
+    for stoff in analyse.baustoffe:
+        unter = f"{basis}.{kennung_aus(stoff.id)}"
+        if stoff.art is Baustoffart.BETON:
+            werte = {rolle: e[analyse._name(stoff, name)]
+                     for rolle, name in satz.betonkennwerte.items()}
+            if wahl.art.mit_kriechzahl:
+                protokoll_wirksamer_modul(p, werte["E_c"], phi, unter,
+                                          titel=f"Wirksamer Elastizitätsmodul {stoff.name}")
+            werte["E_c"] = wirksamer_modul_wert(werte["E_c"], wahl.kriechzahl, unter)
+        else:
+            werte = {rolle: e[analyse._name(stoff, name)]
+                     for rolle, name in satz.stahlkennwerte.items()}
+        werkstoffe[index(stoff)].gesetz.protokoll(p, werte, titel=f"{titel}, {stoff.name}",
+                                                  basis=unter)
 
 
 def gesetze(wahl: Rechenwahl, w: Betonkennwerte, *, ungerissen: bool = False) -> Gesetze:

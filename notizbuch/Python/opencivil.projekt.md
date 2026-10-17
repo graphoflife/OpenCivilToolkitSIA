@@ -1,5 +1,5 @@
 ---
-erzeugt: ae9fbcf6af60
+erzeugt: 10a4e10f3294
 art: modul
 tags: [modul]
 ---
@@ -99,8 +99,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.bericht.zusammenfassung]]
 - [[opencivil.bewehrungssuche.laengs]]
 - [[opencivil.ergebnis]]
-- [[opencivil.querschnitt.schnittanalyse]]
-- [[opencivil.spannungsanalyse]]
+- [[opencivil.spannungsanalyse.analysen]]
 - [[opencivil.web.api]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.dienst]]

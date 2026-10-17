@@ -1,5 +1,5 @@
 ---
-erzeugt: 52a3d1d8b834
+erzeugt: 72a3974acc99
 art: modul
 tags: [modul]
 ---
@@ -327,6 +327,9 @@ gezeichnete Querschnitt baute ihn hinter einem Schalter selbst.
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.querschnitt.analyse]]
-- [[opencivil.querschnitt.schnittanalyse]]
-- [[opencivil.spannungsanalyse]]
+- [[opencivil.spannungsanalyse.bild]]
+- [[opencivil.spannungsanalyse.herleitung]]
+- [[opencivil.spannungsanalyse.linie]]
+- [[opencivil.spannungsanalyse.platte]]
+- [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.web.api]]

@@ -19,10 +19,6 @@ WURZEL = pathlib.Path(__file__).resolve().parents[1]
 DARUEBER = ("opencivil.nachweis", "opencivil.projekt", "opencivil.web",
             "opencivil.spannungsanalyse", "opencivil.bericht", "opencivil.bewehrungssuche")
 
-#: Die Schnittanalyse zieht als Nächstes zur Spannung-Dehnung-Analyse; bis
-#: dahin steht sie noch hier.
-NOCH_NICHT = {"schnittanalyse.py"}
-
 
 def importe(pfad: pathlib.Path):
     """Jedes Modul, das die Datei importiert -- auch in Funktionen und unter TYPE_CHECKING."""
@@ -38,8 +34,6 @@ def importe(pfad: pathlib.Path):
 class TestSchichten(unittest.TestCase):
     def test_der_querschnitt_importiert_nichts_von_darueber(self):
         for pfad in sorted((WURZEL / "opencivil" / "querschnitt").glob("*.py")):
-            if pfad.name in NOCH_NICHT:
-                continue
             for modul in importe(pfad):
                 with self.subTest(datei=pfad.name, modul=modul):
                     self.assertFalse(

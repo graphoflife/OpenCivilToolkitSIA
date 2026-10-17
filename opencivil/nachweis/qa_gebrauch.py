@@ -72,7 +72,7 @@ from opencivil.nachweis.gebrauchsebene import (
 )
 from opencivil.nachweis.mindestbewehrung import DICKENGRENZE
 from opencivil.nachweis.querschnittsloeser import VERFEHLTE_EBENE
-from opencivil.nachweis.rechenwahl import protokoll_rechenwahl
+from opencivil.nachweis.rechenwahl import protokoll_gesetze_nach_wahl, protokoll_rechenwahl
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.richtungsnachweise import (
@@ -91,7 +91,6 @@ from opencivil.nachweis.stabgrenzen import (
 from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse
 from opencivil.querschnitt.interaktion import Querschnitt, illinois
-from opencivil.querschnitt.schnittanalyse import protokoll_gesetze_nach_wahl
 
 #: Wann das Moment der Zwaengung auf Biegung gefunden ist: wie nahe der
 #: erste gezogene Stab seiner Grenze kommen muss, als Teil von ihr.

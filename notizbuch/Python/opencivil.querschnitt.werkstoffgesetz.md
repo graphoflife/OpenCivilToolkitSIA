@@ -1,5 +1,5 @@
 ---
-erzeugt: aa64a6cd40c9
+erzeugt: 50cbe1ec083d
 art: modul
 tags: [modul]
 ---
@@ -532,8 +532,10 @@ Ergebnis unendlich, was die Auswertung sauber ueberspringt.
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.interaktion]]
-- [[opencivil.querschnitt.schnittanalyse]]
-- [[opencivil.spannungsanalyse]]
+- [[opencivil.spannungsanalyse.bild]]
+- [[opencivil.spannungsanalyse.herleitung]]
+- [[opencivil.spannungsanalyse.linie]]
+- [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.web.diagrammdaten]]
 
 ## Formeln aus diesem Modul

@@ -1,5 +1,5 @@
 ---
-erzeugt: 5d5eec7e2f4f
+erzeugt: 6e545c9ca85c
 art: modul
 tags: [modul]
 ---
@@ -77,7 +77,7 @@ Die Suche braucht nur zweierlei: die Fasern mit ihren Kraeften und die
 Dehnungsgrenzen, in denen jede gilt. Das steht in [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]]. Die
 Platte baut beides aus Hoehe, Breite und Lagen ([[opencivil.nachweis.querschnittsloeser#Querschnittsloeser|Querschnittsloeser]]),
 der gezeichnete Querschnitt je Zugseite aus seinen Polygonen
-([[opencivil.querschnitt.schnittanalyse]]). Dort ist `eps_m` die Dehnung
+([[opencivil.spannungsanalyse.schnitt]]). Dort ist `eps_m` die Dehnung
 im Schwerpunkt statt auf halber Hoehe; `oben` und `unten` sagen, wo die
 Raender liegen.
 
@@ -152,7 +152,7 @@ Die gefundene Dehnungsebene samt Proberechnung.
 - `sigma_s: Tuple[float, ...]` – Stahlspannung je Lage, in Pa.
 - `eps_s: Tuple[float, ...]` – Stahldehnung je Lage.
 - `konvergiert: bool = True`
-- `verfehlt: bool = False` – Die Suche lief zu Ende, aber ihre Ebene erzeugt die Einwirkung nicht: sie blieb an einem Sprung haengen, wie ihn der Spannungsblock hat. Bei viel Druck und wenig Moment liegt der Block immer ganz an einem Rand und gibt mehr Moment, als einwirkt -- dazwischen gibt es keine Ebene. Dann ist `konvergiert` falsch, und `eps_m` und `chi` sind die Stelle des Sprungs, durch die eine Linie laeuft ([[opencivil.spannungsanalyse#moment_kruemmung|moment_kruemmung]]).
+- `verfehlt: bool = False` – Die Suche lief zu Ende, aber ihre Ebene erzeugt die Einwirkung nicht: sie blieb an einem Sprung haengen, wie ihn der Spannungsblock hat. Bei viel Druck und wenig Moment liegt der Block immer ganz an einem Rand und gibt mehr Moment, als einwirkt -- dazwischen gibt es keine Ebene. Dann ist `konvergiert` falsch, und `eps_m` und `chi` sind die Stelle des Sprungs, durch die eine Linie laeuft ([[opencivil.spannungsanalyse.linie#moment_kruemmung|moment_kruemmung]]).
 
 #### Ebene.bei
 
@@ -533,8 +533,10 @@ kostete das Halbieren beinahe die ganze Rechenzeit (Benutzer,
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
-- [[opencivil.querschnitt.schnittanalyse]]
-- [[opencivil.spannungsanalyse]]
+- [[opencivil.spannungsanalyse.bild]]
+- [[opencivil.spannungsanalyse.linie]]
+- [[opencivil.spannungsanalyse.platte]]
+- [[opencivil.spannungsanalyse.schnitt]]
 
 ## Formeln aus diesem Modul
 

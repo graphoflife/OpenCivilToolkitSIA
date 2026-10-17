@@ -1,5 +1,5 @@
 ---
-erzeugt: a1ae240778ec
+erzeugt: f256ddf89dd4
 art: modul
 tags: [modul]
 ---
@@ -90,7 +90,7 @@ Erzeugt einen frei definierten Betonstahl ohne Sortentabelle.
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.lesen]]
-- [[opencivil.spannungsanalyse]]
+- [[opencivil.spannungsanalyse.herleitung]]
 - [[opencivil.web.api]]
 
 ## Formeln aus diesem Modul

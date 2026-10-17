@@ -1,5 +1,5 @@
 ---
-erzeugt: 9f2595898efd
+erzeugt: c80a3eb2435e
 art: modul
 tags: [modul]
 ---
@@ -187,8 +187,8 @@ Der Biegewiderstand der Lage -- der Widerstand in Tabelle und Herleitung.
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.projekt.aufbau]]
-- [[opencivil.querschnitt.schnittanalyse]]
-- [[opencivil.spannungsanalyse]]
+- [[opencivil.spannungsanalyse.platte]]
+- [[opencivil.spannungsanalyse.schnitt]]
 
 ## Formeln aus diesem Modul
 

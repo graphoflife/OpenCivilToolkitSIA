@@ -1,30 +1,30 @@
 ---
-erzeugt: a5a67eac2bd4
+erzeugt: 8d69fe6b7b17
 art: modul
 tags: [modul]
 ---
-> [!abstract] opencivil/querschnitt/schnittanalyse.py
-> Spannung-Dehnung-Analyse am gezeichneten Querschnitt.
-> Paket [[opencivil.querschnitt]] · [Quelltext](../../opencivil/querschnitt/schnittanalyse.py)
+> [!abstract] opencivil/spannungsanalyse/schnitt.py
+> das Paar eines gezeichneten Querschnitts.
+> Paket [[opencivil.spannungsanalyse]] · [Quelltext](../../opencivil/spannungsanalyse/schnitt.py)
 
 ## VERANTWORTUNG
 
-Die sechs Fragen der Spannung-Dehnung-Analyse an einen gezeichneten
-Querschnitt: aus N und M, aus Randdehnungen, die M-χ- und die N-ε-Linie und
-der aequivalente E-Modul darueber. Gerechnet wird mit denselben Funktionen
-wie bei der Platte ([[opencivil.spannungsanalyse]]); hier steht, wie der
-Querschnitt zu ihnen kommt -- das Loeserpaar je Zugseite -- und was seine
-Herleitung anders schreibt.
+Wie ein gezeichneter Querschnitt zu den sechs Fragen kommt: das Loeserpaar
+je Zugseite ([[opencivil.spannungsanalyse.schnitt#Schnittpaar|Schnittpaar]], ein
+[[opencivil.spannungsanalyse.linie#Paar|Paar]]) und was seine Herleitung
+anders schreibt als die Platte. Bis 2026-10-17 stand es in
+`opencivil/querschnitt/schnittanalyse.py` -- im Querschnitt, aber auf der
+Analyse gebaut, die es ihrerseits erst in einer Funktion laden konnte.
 
 
 ## JE ZUGSEITE
 
 Eine Analyse waehlt die Seite, die ein positives Moment zieht: unten, oben,
-links oder rechts ([[opencivil.querschnitt.zugseite#Zugseite|Zugseite]]). Die Nulllinie bleibt parallel zur
-Achse, wie in der einachsigen Tragsicherheit. Das Moment um die andere
-Achse, das ein unsymmetrischer Querschnitt dabei weckt, zaehlt nicht -- ein
-L-Querschnitt drehte seine Nulllinie in Wirklichkeit. Die Platte rechnet
-immer so.
+links oder rechts ([[opencivil.querschnitt.zugseite#Zugseite|Zugseite]]). Die
+Nulllinie bleibt parallel zur Achse, wie in der einachsigen Tragsicherheit.
+Das Moment um die andere Achse, das ein unsymmetrischer Querschnitt dabei
+weckt, zaehlt nicht -- ein L-Querschnitt drehte seine Nulllinie in
+Wirklichkeit. Die Platte rechnet immer so.
 
 `eps_m` ist die Dehnung im Schwerpunkt des Bruttoquerschnitts, und die
 Momente beziehen sich auf ihn, wie in den Lastfaellen. «Oben» heisst der
@@ -39,10 +39,10 @@ Rechenart --, fuer jeden Werkstoff des Querschnitts dieselbe. Die
 Werkstoffwahl der Tragsicherheit gilt hier nicht. Staebe in derselben Tiefe,
 aus demselben Stahl, werden zu einer Lage: sie haben dieselbe Dehnung.
 Zerlegt wird in so viele Streifen wie die Platte in Fasern
-([[opencivil.querschnitt.fasern#Konstanten|FASERN]]),
-dazu die Grenzen an jeder Ecke: eine Linie rechnet viele Ebenen, und mit den
-200 Streifen der Tragsicherheit dauerte sie dreimal so lang -- fuer ein
-M_Rd, das sich um zwei Zehntelpromille aendert.
+([[opencivil.querschnitt.fasern#Konstanten|FASERN]]), dazu die Grenzen an jeder
+Ecke: eine Linie rechnet viele Ebenen, und mit den 200 Streifen der
+Tragsicherheit dauerte sie dreimal so lang -- fuer ein M_Rd, das sich um
+zwei Zehntelpromille aendert.
 
 
 ## DER RISS
@@ -66,15 +66,6 @@ nicht nachgeschlagen (`notizbuch/Notizen/TODO.md`). Bei der Platte ist
 
 Bezogen auf den Bruttoquerschnitt: `I` um die Achse der Biegung bzw.
 `A`. Bei der Platte sind es `b·h³/12` und `b·h`.
-
-
-## DER QUERSCHNITT NACH WAHL
-
-Wie der gezeichnete Querschnitt mit den Gesetzen einer Rechenwahl entsteht,
-baut er selbst ([[opencivil.querschnitt.analyse#Querschnittsanalyse.querschnitt|querschnitt]]);
-wie diese Gesetze in die Herleitung kommen ([[opencivil.querschnitt.schnittanalyse#protokoll_gesetze_nach_wahl|protokoll_gesetze_nach_wahl]]),
-brauchen auch die Gebrauchsnachweise und das Knicken -- es steht darum einmal
-hier.
 
 
 ## EINHEITEN
@@ -111,7 +102,7 @@ class Schnittpaar
 ```
 
 Die beiden Loeser eines gezeichneten Querschnitts in einer Zugrichtung --
-gerissen und ungerissen, wie das [[opencivil.spannungsanalyse#Loeserpaar|Loeserpaar]]
+gerissen und ungerissen, wie das [[opencivil.spannungsanalyse.platte#Loeserpaar|Loeserpaar]]
 der Platte. Dazu der Riss am Bruttoquerschnitt und was die Herleitung
 braucht.
 
@@ -215,18 +206,6 @@ def herleitung_bezug(self, p: Protokoll, w: Zwischenwerte, momente: bool, ein: C
 
 Der reine Betonquerschnitt des aequivalenten Moduls: der Bruttoquerschnitt.
 
-### protokoll_gesetze_nach_wahl
-
-```python
-def protokoll_gesetze_nach_wahl(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse, wahl: Rechenwahl, basis: str, *, titel: str) -> None
-```
-
-Die Werkstoffgesetze einer Wahl, je Material des Querschnitts -- die von
-[[opencivil.querschnitt.analyse#Querschnittsanalyse.querschnitt|Querschnittsanalyse.querschnitt]]; jedes schreibt sich selbst, mit seinen
-Werten, wie bei der Platte
-([[opencivil.nachweis.rechenwahl#protokoll_gesetze|protokoll_gesetze]]). Vor jedem
-Beton sein wirksamer Modul, wo ein Gesetz an ihm haengt.
-
 ### schnittpaar
 
 ```python
@@ -237,42 +216,28 @@ Das Loeserpaar eines gezeichneten Querschnitts in einer Zugrichtung --
 `None` ohne Bewehrung. `wert` liefert zu einer Wert-ID die Zahl in SI,
 aus einer Loesung.
 
-### analysen
-
-```python
-def analysen(aufbau: 'Aufbau', loesung: 'Loesung', protokoll: Protokoll) -> Dict[str, List[Analyse]]
-```
-
-Die Auswertungen je gezeichnetem Querschnitt -- wie
-[[opencivil.spannungsanalyse#analysen|opencivil.spannungsanalyse.analysen]] je Platte, und von dort
-gerufen. Mit `protokoll` schreibt jede Linie ihre Herleitung.
-
 
 ## Braucht
 
-- [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.protokoll]]
-- [[opencivil.core.rechenwerk]]
-- [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.sproedes_versagen]]
-- [[opencivil.projekt]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.querschnitt.zugseite]]
-- [[opencivil.spannungsanalyse]]
+- [[opencivil.spannungsanalyse.art]]
+- [[opencivil.spannungsanalyse.linie]]
 
 ## Gebraucht von
 
-- [[opencivil.nachweis.qa_gebrauch]]
-- [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.spannungsanalyse]]
+- [[opencivil.spannungsanalyse.analysen]]
 
 ## Formeln aus diesem Modul
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: d235be0c5903
+erzeugt: 2b1c4b3970a3
 art: formel
 tags: [formel]
 ---
@@ -33,7 +33,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.querschnitt.schnittanalyse#Schnittpaar.herleitung_dehnung_am_ende|Schnittpaar.herleitung_dehnung_am_ende]]
+- [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_dehnung_am_ende|Schnittpaar.herleitung_dehnung_am_ende]]
 
 ## Themen
 

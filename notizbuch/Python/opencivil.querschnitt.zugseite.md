@@ -1,5 +1,5 @@
 ---
-erzeugt: 71a0b917826e
+erzeugt: 45722ce53e69
 art: modul
 tags: [modul]
 ---
@@ -14,7 +14,7 @@ rechts -- dazu die Zugrichtung als Winkel, die Achse, um die gebogen wird,
 und wie die beiden Raender heissen. Eine Wahl fuer sich, in einem eigenen
 Modul: die Beschreibung des Projekts, die Nachweise und die Analysen fragen
 sie, und keiner von ihnen soll dafuer die Spannung-Dehnung-Analyse laden.
-Bis 2026-10-17 stand sie in [[opencivil.querschnitt.schnittanalyse]].
+Bis 2026-10-17 stand sie in der Schnittanalyse des gezeichneten Querschnitts.
 
 ## Inhalt
 
@@ -74,5 +74,5 @@ Wie die beiden Raender heissen: der gedrueckte und der gezogene.
 
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.projekt.querschnittsanalyse]]
-- [[opencivil.querschnitt.schnittanalyse]]
+- [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.web.api]]

@@ -47,11 +47,10 @@ from opencivil.nachweis.knicken import (
     VERFORMUNG, VERFORMUNG_NACH_WAHL, WIDERSTAND, Knickfall, Knickstab, Knickverfahren,
 )
 from opencivil.nachweis.querschnittsloeser import FaserloeserIllinois
-from opencivil.nachweis.rechenwahl import protokoll_rechenwahl
+from opencivil.nachweis.rechenwahl import protokoll_gesetze_nach_wahl, protokoll_rechenwahl
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.querschnitt.analyse import Querschnittsanalyse
 from opencivil.querschnitt.interaktion import Querschnitt
-from opencivil.querschnitt.schnittanalyse import protokoll_gesetze_nach_wahl
 from opencivil.querschnitt.zugseite import Zugseite
 
 

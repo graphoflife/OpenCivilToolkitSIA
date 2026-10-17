@@ -7,7 +7,7 @@ rechts -- dazu die Zugrichtung als Winkel, die Achse, um die gebogen wird,
 und wie die beiden Raender heissen. Eine Wahl fuer sich, in einem eigenen
 Modul: die Beschreibung des Projekts, die Nachweise und die Analysen fragen
 sie, und keiner von ihnen soll dafuer die Spannung-Dehnung-Analyse laden.
-Bis 2026-10-17 stand sie in :mod:`opencivil.querschnitt.schnittanalyse`.
+Bis 2026-10-17 stand sie in der Schnittanalyse des gezeichneten Querschnitts.
 """
 
 from __future__ import annotations

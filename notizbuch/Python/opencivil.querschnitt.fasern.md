@@ -1,5 +1,5 @@
 ---
-erzeugt: 3d47aeeae550
+erzeugt: bd0ee61d134d
 art: modul
 tags: [modul]
 ---
@@ -220,4 +220,4 @@ Unterkante gegen die Oberkante, `(eps_zug + eps_druck) / h`.
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.interaktion]]
-- [[opencivil.querschnitt.schnittanalyse]]
+- [[opencivil.spannungsanalyse.schnitt]]

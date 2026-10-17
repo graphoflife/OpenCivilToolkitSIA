@@ -3162,6 +3162,7 @@
         "Gesetze.loeser",
         "protokoll_rechenwahl",
         "protokoll_gesetze",
+        "protokoll_gesetze_nach_wahl",
         "gesetze"
       ]
     },
@@ -4031,30 +4032,6 @@
       ]
     },
     {
-      "name": "opencivil.querschnitt.schnittanalyse",
-      "pfad": "Python/opencivil.querschnitt.schnittanalyse.md",
-      "art": "modul",
-      "kurz": "Spannung-Dehnung-Analyse am gezeichneten Querschnitt.",
-      "stichworte": [
-        "_betonspannung",
-        "_loeser",
-        "Schnittpaar",
-        "Schnittpaar.W",
-        "Schnittpaar.M_Riss",
-        "Schnittpaar.rissmoment_bei",
-        "Schnittpaar.rissnormalkraft_bei",
-        "Schnittpaar.I_c",
-        "Schnittpaar.A_c",
-        "Schnittpaar.tiefe",
-        "Schnittpaar.herleitung_riss",
-        "Schnittpaar.herleitung_dehnung_am_ende",
-        "Schnittpaar.herleitung_bezug",
-        "protokoll_gesetze_nach_wahl",
-        "schnittpaar",
-        "analysen"
-      ]
-    },
-    {
       "name": "opencivil.querschnitt.schubwaende",
       "pfad": "Python/opencivil.querschnitt.schubwaende.md",
       "art": "modul",
@@ -4171,29 +4148,74 @@
       "pfad": "Python/opencivil.spannungsanalyse.md",
       "art": "modul",
       "kurz": "den Querschnitt ansehen, ohne ihn nachzuweisen.",
+      "stichworte": []
+    },
+    {
+      "name": "opencivil.spannungsanalyse.analysen",
+      "pfad": "Python/opencivil.spannungsanalyse.analysen.md",
+      "art": "modul",
+      "kurz": "die Analysen eines Projekts.",
+      "stichworte": [
+        "Analyse",
+        "Analyse.moeglich",
+        "auswerten",
+        "_Bauteilart",
+        "analysen"
+      ]
+    },
+    {
+      "name": "opencivil.spannungsanalyse.art",
+      "pfad": "Python/opencivil.spannungsanalyse.art.md",
+      "art": "modul",
+      "kurz": "welche der sechs Fragen eine Analyse stellt.",
       "stichworte": [
         "Analyseart",
         "Analyseart.beschriftung",
         "Analyseart.kurz",
         "Analyseart.linie",
-        "Analyseart.modul",
+        "Analyseart.modul"
+      ]
+    },
+    {
+      "name": "opencivil.spannungsanalyse.bild",
+      "pfad": "Python/opencivil.spannungsanalyse.bild.md",
+      "art": "modul",
+      "kurz": "das Bild eines Querschnitts.",
+      "stichworte": [
         "Faserpunkt",
         "Stahlpunkt",
         "Querschnittsbild",
         "Querschnittsbild.nulllinie",
         "_bild",
         "aus_schnittgroessen",
-        "aus_dehnungen",
-        "Loeserpaar",
-        "Loeserpaar.rissmoment_bei",
-        "Loeserpaar.rissnormalkraft_bei",
-        "Loeserpaar.I_c",
-        "Loeserpaar.A_c",
-        "Loeserpaar.tiefe",
-        "Loeserpaar.herleitung_riss",
-        "Loeserpaar.herleitung_dehnung_am_ende",
-        "Loeserpaar.herleitung_bezug",
-        "loeserpaar",
+        "aus_dehnungen"
+      ]
+    },
+    {
+      "name": "opencivil.spannungsanalyse.herleitung",
+      "pfad": "Python/opencivil.spannungsanalyse.herleitung.md",
+      "art": "modul",
+      "kurz": "wie eine Linie entstand.",
+      "stichworte": [
+        "herleitung",
+        "_herleitung_modul"
+      ]
+    },
+    {
+      "name": "opencivil.spannungsanalyse.linie",
+      "pfad": "Python/opencivil.spannungsanalyse.linie.md",
+      "art": "modul",
+      "kurz": "die Linien eines Querschnitts.",
+      "stichworte": [
+        "Paar",
+        "Paar.I_c",
+        "Paar.A_c",
+        "Paar.rissmoment_bei",
+        "Paar.rissnormalkraft_bei",
+        "Paar.tiefe",
+        "Paar.herleitung_riss",
+        "Paar.herleitung_dehnung_am_ende",
+        "Paar.herleitung_bezug",
         "Linienpunkt",
         "Eckpunkt",
         "Grenzzustand",
@@ -4207,7 +4229,15 @@
         "_linie",
         "_durchlaufen",
         "moment_kruemmung",
-        "normalkraft_dehnung",
+        "normalkraft_dehnung"
+      ]
+    },
+    {
+      "name": "opencivil.spannungsanalyse.modul",
+      "pfad": "Python/opencivil.spannungsanalyse.modul.md",
+      "art": "modul",
+      "kurz": "der aequivalente E-Modul.",
+      "stichworte": [
         "Modulpunkt",
         "Modullinie",
         "Modullinie.modul",
@@ -4215,13 +4245,47 @@
         "Modullinie.riss",
         "Modullinie.fliessen",
         "Modullinie.ende",
-        "aequivalenter_modul",
-        "herleitung",
-        "_herleitung_modul",
-        "Analyse",
-        "Analyse.moeglich",
-        "auswerten",
-        "analysen"
+        "aequivalenter_modul"
+      ]
+    },
+    {
+      "name": "opencivil.spannungsanalyse.platte",
+      "pfad": "Python/opencivil.spannungsanalyse.platte.md",
+      "art": "modul",
+      "kurz": "das Paar einer Platte.",
+      "stichworte": [
+        "Loeserpaar",
+        "Loeserpaar.rissmoment_bei",
+        "Loeserpaar.rissnormalkraft_bei",
+        "Loeserpaar.I_c",
+        "Loeserpaar.A_c",
+        "Loeserpaar.tiefe",
+        "Loeserpaar.herleitung_riss",
+        "Loeserpaar.herleitung_dehnung_am_ende",
+        "Loeserpaar.herleitung_bezug",
+        "loeserpaar"
+      ]
+    },
+    {
+      "name": "opencivil.spannungsanalyse.schnitt",
+      "pfad": "Python/opencivil.spannungsanalyse.schnitt.md",
+      "art": "modul",
+      "kurz": "das Paar eines gezeichneten Querschnitts.",
+      "stichworte": [
+        "_betonspannung",
+        "_loeser",
+        "Schnittpaar",
+        "Schnittpaar.W",
+        "Schnittpaar.M_Riss",
+        "Schnittpaar.rissmoment_bei",
+        "Schnittpaar.rissnormalkraft_bei",
+        "Schnittpaar.I_c",
+        "Schnittpaar.A_c",
+        "Schnittpaar.tiefe",
+        "Schnittpaar.herleitung_riss",
+        "Schnittpaar.herleitung_dehnung_am_ende",
+        "Schnittpaar.herleitung_bezug",
+        "schnittpaar"
       ]
     },
     {

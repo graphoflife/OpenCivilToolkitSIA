@@ -1,5 +1,5 @@
 ---
-erzeugt: 3526a7a0eaa6
+erzeugt: f644c9c25b7a
 art: modul
 tags: [modul]
 ---
@@ -212,6 +212,20 @@ Der wirksame Modul selbst steht nicht hier: wo er gebraucht wird, schreibt
 ihn das Kapitel an der Stelle, an der er erklaert wird
 ([[opencivil.nachweis.querschnittsloeser#protokoll_wirksamer_modul|protokoll_wirksamer_modul]]).
 
+### protokoll_gesetze_nach_wahl
+
+```python
+def protokoll_gesetze_nach_wahl(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse, wahl: Rechenwahl, basis: str, *, titel: str) -> None
+```
+
+Die Werkstoffgesetze einer Wahl, je Material eines gezeichneten
+Querschnitts -- die von
+[[opencivil.querschnitt.analyse#Querschnittsanalyse.querschnitt|querschnitt]];
+jedes schreibt sich selbst, mit seinen Werten, wie bei der Platte
+([[opencivil.nachweis.rechenwahl#protokoll_gesetze|protokoll_gesetze]]). Vor jedem Beton sein wirksamer Modul, wo ein
+Gesetz an ihm haengt. Fuer die Gebrauchsnachweise und das Knicken des
+gezeichneten Querschnitts.
+
 ### gesetze
 
 ```python
@@ -239,7 +253,9 @@ ersten Lage.
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.material.basis]]
 - [[opencivil.nachweis.querschnittsloeser]]
+- [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 
@@ -255,5 +271,5 @@ ersten Lage.
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.querschnittsanalyse]]
-- [[opencivil.spannungsanalyse]]
+- [[opencivil.spannungsanalyse.platte]]
 - [[opencivil.web.api]]

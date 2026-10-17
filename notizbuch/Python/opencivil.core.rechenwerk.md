@@ -1,5 +1,5 @@
 ---
-erzeugt: 0c8ed62a0f94
+erzeugt: f4f5c4043a45
 art: modul
 tags: [modul]
 ---
@@ -464,8 +464,7 @@ def abschliessen(self) -> Loesung
 - [[opencivil.bericht.zusammenfassung]]
 - [[opencivil.ergebnis]]
 - [[opencivil.projekt.aufbau]]
-- [[opencivil.querschnitt.schnittanalyse]]
-- [[opencivil.spannungsanalyse]]
+- [[opencivil.spannungsanalyse.analysen]]
 - [[opencivil.web.api]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.dienst]]

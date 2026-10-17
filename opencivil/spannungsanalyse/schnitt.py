@@ -1,21 +1,21 @@
 """
-opencivil/querschnitt/schnittanalyse.py -- Spannung-Dehnung-Analyse am gezeichneten Querschnitt.
+opencivil/spannungsanalyse/schnitt.py -- das Paar eines gezeichneten Querschnitts.
 
 VERANTWORTUNG:
-Die sechs Fragen der Spannung-Dehnung-Analyse an einen gezeichneten
-Querschnitt: aus N und M, aus Randdehnungen, die M-χ- und die N-ε-Linie und
-der aequivalente E-Modul darueber. Gerechnet wird mit denselben Funktionen
-wie bei der Platte (:mod:`opencivil.spannungsanalyse`); hier steht, wie der
-Querschnitt zu ihnen kommt -- das Loeserpaar je Zugseite -- und was seine
-Herleitung anders schreibt.
+Wie ein gezeichneter Querschnitt zu den sechs Fragen kommt: das Loeserpaar
+je Zugseite (:class:`Schnittpaar`, ein
+:class:`~opencivil.spannungsanalyse.linie.Paar`) und was seine Herleitung
+anders schreibt als die Platte. Bis 2026-10-17 stand es in
+``opencivil/querschnitt/schnittanalyse.py`` -- im Querschnitt, aber auf der
+Analyse gebaut, die es ihrerseits erst in einer Funktion laden konnte.
 
 JE ZUGSEITE:
 Eine Analyse waehlt die Seite, die ein positives Moment zieht: unten, oben,
-links oder rechts (:class:`Zugseite`). Die Nulllinie bleibt parallel zur
-Achse, wie in der einachsigen Tragsicherheit. Das Moment um die andere
-Achse, das ein unsymmetrischer Querschnitt dabei weckt, zaehlt nicht -- ein
-L-Querschnitt drehte seine Nulllinie in Wirklichkeit. Die Platte rechnet
-immer so.
+links oder rechts (:class:`~opencivil.querschnitt.zugseite.Zugseite`). Die
+Nulllinie bleibt parallel zur Achse, wie in der einachsigen Tragsicherheit.
+Das Moment um die andere Achse, das ein unsymmetrischer Querschnitt dabei
+weckt, zaehlt nicht -- ein L-Querschnitt drehte seine Nulllinie in
+Wirklichkeit. Die Platte rechnet immer so.
 
 ``eps_m`` ist die Dehnung im Schwerpunkt des Bruttoquerschnitts, und die
 Momente beziehen sich auf ihn, wie in den Lastfaellen. «Oben» heisst der
@@ -28,10 +28,10 @@ Rechenart --, fuer jeden Werkstoff des Querschnitts dieselbe. Die
 Werkstoffwahl der Tragsicherheit gilt hier nicht. Staebe in derselben Tiefe,
 aus demselben Stahl, werden zu einer Lage: sie haben dieselbe Dehnung.
 Zerlegt wird in so viele Streifen wie die Platte in Fasern
-(:data:`~opencivil.querschnitt.fasern.FASERN`),
-dazu die Grenzen an jeder Ecke: eine Linie rechnet viele Ebenen, und mit den
-200 Streifen der Tragsicherheit dauerte sie dreimal so lang -- fuer ein
-M_Rd, das sich um zwei Zehntelpromille aendert.
+(:data:`~opencivil.querschnitt.fasern.FASERN`), dazu die Grenzen an jeder
+Ecke: eine Linie rechnet viele Ebenen, und mit den 200 Streifen der
+Tragsicherheit dauerte sie dreimal so lang -- fuer ein M_Rd, das sich um
+zwei Zehntelpromille aendert.
 
 DER RISS:
 Am ungerissenen Bruttoquerschnitt, ohne Stahl, wie beim sproeden Versagen::
@@ -50,13 +50,6 @@ DER AEQUIVALENTE MODUL:
 Bezogen auf den Bruttoquerschnitt: ``I`` um die Achse der Biegung bzw.
 ``A``. Bei der Platte sind es ``b·h³/12`` und ``b·h``.
 
-DER QUERSCHNITT NACH WAHL:
-Wie der gezeichnete Querschnitt mit den Gesetzen einer Rechenwahl entsteht,
-baut er selbst (:meth:`~opencivil.querschnitt.analyse.Querschnittsanalyse.querschnitt`);
-wie diese Gesetze in die Herleitung kommen (:func:`protokoll_gesetze_nach_wahl`),
-brauchen auch die Gebrauchsnachweise und das Knicken -- es steht darum einmal
-hier.
-
 EINHEITEN:
 SI-Basis wie im ganzen Querschnittsmodul.
 """
@@ -67,32 +60,24 @@ import math
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Callable, Dict, List, Mapping, Optional, Tuple
 
-from opencivil.core.berechnung import Eingaben
 from opencivil.core.einheiten import MIO_MM3, MIO_MM4, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.wahl import Wahl
-from opencivil.core.wert import kennung_aus
-from opencivil.material.basis import Baustoff, Baustoffart
-from opencivil.nachweis.querschnittsloeser import (
-    Faserloeser, Stahllage, protokoll_wirksamer_modul, wirksamer_modul_wert,
-)
-from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
+from opencivil.material.basis import Baustoff
+from opencivil.nachweis.querschnittsloeser import Faserloeser, Stahllage
 from opencivil.nachweis.sproedes_versagen import (
     MOMENTENTEILER, beiwert_dicke, protokoll_zugfestigkeit,
 )
 from opencivil.querschnitt.analyse import Querschnittsanalyse, Stabgruppe
 from opencivil.querschnitt.fasern import Faserquerschnitt, Stab
-from opencivil.querschnitt.interaktion import Querschnitt, Werkstoff
+from opencivil.querschnitt.gesetzwahl import Rechenwahl
+from opencivil.querschnitt.interaktion import Querschnitt
 from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
 from opencivil.querschnitt.zugseite import Zugseite
-from opencivil.spannungsanalyse import (
-    Analyse, Analyseart, Grenzzustand, Linie, auswerten, herleitung,
-)
+from opencivil.spannungsanalyse.art import Analyseart
+from opencivil.spannungsanalyse.linie import Grenzzustand, Linie
 
 if TYPE_CHECKING:
-    from opencivil.core.rechenwerk import Loesung
     from opencivil.core.wert import Wert
-    from opencivil.projekt import Aufbau
 
 
 # ===========================================================================
@@ -309,34 +294,6 @@ class Schnittpaar:
         return bezug
 
 
-def protokoll_gesetze_nach_wahl(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse,
-                      wahl: Rechenwahl, basis: str, *, titel: str) -> None:
-    """
-    Die Werkstoffgesetze einer Wahl, je Material des Querschnitts -- die von
-    :meth:`Querschnittsanalyse.querschnitt`; jedes schreibt sich selbst, mit seinen
-    Werten, wie bei der Platte
-    (:func:`~opencivil.nachweis.rechenwahl.protokoll_gesetze`). Vor jedem
-    Beton sein wirksamer Modul, wo ein Gesetz an ihm haengt.
-    """
-    satz = wahl.satz
-    phi = Zwischenwerte(basis).zahl("phi", r"\varphi", wahl.kriechzahl, stellen=2)
-    werkstoffe, index = analyse.werkstoffe(e.si_nach_id(), lambda stoff: wahl)
-    for stoff in analyse.baustoffe:
-        unter = f"{basis}.{kennung_aus(stoff.id)}"
-        if stoff.art is Baustoffart.BETON:
-            werte = {rolle: e[analyse._name(stoff, name)]
-                     for rolle, name in satz.betonkennwerte.items()}
-            if wahl.art.mit_kriechzahl:
-                protokoll_wirksamer_modul(p, werte["E_c"], phi, unter,
-                                          titel=f"Wirksamer Elastizitätsmodul {stoff.name}")
-            werte["E_c"] = wirksamer_modul_wert(werte["E_c"], wahl.kriechzahl, unter)
-        else:
-            werte = {rolle: e[analyse._name(stoff, name)]
-                     for rolle, name in satz.stahlkennwerte.items()}
-        werkstoffe[index(stoff)].gesetz.protokoll(p, werte, titel=f"{titel}, {stoff.name}",
-                                                  basis=unter)
-
-
 def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[str], float],
                 wahl: Rechenwahl) -> Optional[Schnittpaar]:
     """
@@ -373,55 +330,3 @@ def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[s
         v_oben=gerissen.oben, v_unten=gerissen.unten,
         k_t=k_t, f_ct_eff=k_t * f_ctm, k_t_zug=k_t_zug, f_ct_eff_zug=k_t_zug * f_ctm,
         E_cm=abs(wert(ids["E_cm"])), staehle=stahlstoffe, ids=ids)
-
-
-# ===========================================================================
-# Die Analysen der gezeichneten Querschnitte
-# ===========================================================================
-
-
-def analysen(aufbau: "Aufbau", loesung: "Loesung",
-             protokoll: Protokoll) -> Dict[str, List[Analyse]]:
-    """
-    Die Auswertungen je gezeichnetem Querschnitt -- wie
-    :func:`opencivil.spannungsanalyse.analysen` je Platte, und von dort
-    gerufen. Mit ``protokoll`` schreibt jede Linie ihre Herleitung.
-    """
-    def wert(kid: str) -> float:
-        return loesung.werte[kid].groesse.si
-
-    ergebnis: Dict[str, List[Analyse]] = {}
-    for kennung, faelle in aufbau.spannungsfaelle.items():
-        analyse = aufbau.querschnittsanalysen.get(kennung)
-        if analyse is None:
-            continue
-        paare: Dict[tuple, Optional[Schnittpaar]] = {}
-        liste: List[Analyse] = []
-        for fall in faelle:
-            seite = fall.richtung
-            wahl = fall.wahl
-            schluessel = (seite, wahl)
-            if schluessel not in paare:
-                try:
-                    paare[schluessel] = schnittpaar(analyse, seite, wert, wahl)
-                except KeyError:
-                    # Ein Wert wurde nicht gerechnet -- etwa, weil ein
-                    # Baustoff fehlt. Dann gibt es nichts auszuwerten.
-                    paare[schluessel] = None
-            paar = paare[schluessel]
-            eintrag = Analyse(fall=fall, art=fall.art, richtung=seite,
-                              richtung_text=seite.beschriftung, paar=paar)
-            if paar is None:
-                eintrag.hinweis = ("Der Querschnitt hat keine Bewehrung – ohne sie gibt "
-                                   "es nichts zum Auswerten.")
-            else:
-                eintrag.h = paar.gerissen.h
-                eintrag.bild, eintrag.kurve = auswerten(fall, eintrag.art, paar)
-                kurve = eintrag.kurve
-                if kurve is not None:
-                    linie = kurve if isinstance(kurve, Linie) else kurve.linie
-                    herleitung(protokoll, fall, paar, linie, loesung.werte, analyse.id,
-                               modul=None if isinstance(kurve, Linie) else kurve)
-            liste.append(eintrag)
-        ergebnis[kennung] = liste
-    return ergebnis
