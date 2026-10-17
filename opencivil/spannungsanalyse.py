@@ -1282,7 +1282,7 @@ def analysen(aufbau: "Aufbau", loesung: "Loesung",
         paare: Dict[tuple, Optional[Loeserpaar]] = {}
         liste: List[Analyse] = []
         for fall in faelle:
-            richtung = Richtung(fall.richtung)
+            richtung = fall.richtung
             wahl = fall.wahl
             schluessel = (richtung, wahl)
             if schluessel not in paare:
@@ -1293,7 +1293,7 @@ def analysen(aufbau: "Aufbau", loesung: "Loesung",
                     # gibt es fuer sie keinen Querschnitt zum Auswerten.
                     paare[schluessel] = None
             paar = paare[schluessel]
-            analyse = Analyse(fall=fall, art=Analyseart(fall.art), richtung=richtung,
+            analyse = Analyse(fall=fall, art=fall.art, richtung=richtung,
                               richtung_text=richtung.value, paar=paar)
             if paar is None:
                 analyse.hinweis = (

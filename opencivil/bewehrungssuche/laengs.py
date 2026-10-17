@@ -440,7 +440,7 @@ def suche(projekt, kennung: str, *,
     unberuehrt. Wer die gefundene Bewehrung uebernehmen will, ruft
     :func:`uebernehmen`.
     """
-    ergebnis = Suchergebnis(modus=Suchmodus(modus))
+    ergebnis = Suchergebnis(modus=modus)
     je_art = Stufen.aus(durchmesser, mindestdurchmesser)
 
     for teilung in teilungen_der_suche(teilungen):

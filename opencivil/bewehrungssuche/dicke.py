@@ -86,7 +86,6 @@ def dicke_suchen(projekt, kennung: str, *, modus: Suchmodus,
     ``wie`` geht an :func:`suche` (Teilungen, Durchmesser); das Projekt
     bleibt unberuehrt.
     """
-    modus = Suchmodus(modus)
     ergebnis = Dickenergebnis(modus=modus)
     eintrag = projekt.querschnitt(kennung)
     duktil = eintrag.duktilitaet

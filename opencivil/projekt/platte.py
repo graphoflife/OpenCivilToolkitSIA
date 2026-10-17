@@ -27,10 +27,9 @@ from opencivil.projekt.eintraege import (
     VerformungEintrag, VerformungsfallEintrag, eindeutig, x_d_max_pruefen,
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
-from opencivil.projekt.lesen import ProjektFehler, einer_von, nicht_negativ
+from opencivil.projekt.lesen import ProjektFehler, nicht_negativ
 
 #: Die Richtungen einer Lage.
-RICHTUNGEN = tuple(r.value for r in Richtung)
 
 
 @dataclass
@@ -119,8 +118,7 @@ class QuerschnittEintrag(Beschreibung):
     spannungsfaelle: List[SpannungsfallEintrag] = field(default_factory=list)
     """Auswertungen am Querschnitt -- Bilder, keine Nachweise."""
 
-    automatik_modus: str = einer_von((m.value for m in Suchmodus),
-                                     Suchmodus.GRUND_OHNE_ZULAGE_MIT.value)
+    automatik_modus: Suchmodus = Suchmodus.GRUND_OHNE_ZULAGE_MIT
     """Wonach das Bewehrungswerkzeug sucht -- siehe ``bewehrungssuche.Suchmodus``."""
 
     automatik_dicke: bool = False
@@ -203,7 +201,7 @@ class QuerschnittEintrag(Beschreibung):
     lagen: List[LageEintrag] = field(default_factory=list)
     """Genau vier, Index 0 = 1. Lage (unterste). Fehlen welche, sind sie leer."""
 
-    richtung_lage1: str = einer_von(RICHTUNGEN, Richtung.Y.value)
+    richtung_lage1: Richtung = Richtung.Y
     """
     Richtung der 1. Lage; die 2. bekommt die Gegenrichtung.
 
@@ -213,7 +211,7 @@ class QuerschnittEintrag(Beschreibung):
     verlegt, stellt es um.
     """
 
-    richtung_lage4: str = einer_von(RICHTUNGEN, Richtung.Y.value)
+    richtung_lage4: Richtung = Richtung.Y
     """Richtung der 4. Lage; die 3. bekommt die Gegenrichtung."""
 
     kombinationen: List[KombinationEintrag] = field(default_factory=list)
@@ -237,8 +235,7 @@ class QuerschnittEintrag(Beschreibung):
 
     def richtung_von(self, nummer: int) -> Richtung:
         """Richtung der Lage 1..4 -- die Paare (1,2) und (3,4) sind gekoppelt."""
-        eins = Richtung(self.richtung_lage1)
-        vier = Richtung(self.richtung_lage4)
+        eins, vier = self.richtung_lage1, self.richtung_lage4
         return {1: eins, 2: eins.gegenrichtung, 3: vier.gegenrichtung, 4: vier}[nummer]
 
     def materialien(self) -> List[str]:

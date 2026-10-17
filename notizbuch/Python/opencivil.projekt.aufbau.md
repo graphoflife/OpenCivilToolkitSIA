@@ -1,5 +1,5 @@
 ---
-erzeugt: a339a48c3011
+erzeugt: 87664f028e6e
 art: modul
 tags: [modul]
 ---
@@ -537,7 +537,6 @@ Baufunktion von ihr bekannt sein muss. Eine neue Art kommt in
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.platte]]
-- [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.stabwerk.rechnung]]
 
 ## Gebraucht von

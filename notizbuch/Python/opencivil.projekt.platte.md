@@ -1,5 +1,5 @@
 ---
-erzeugt: 2dd363019f0d
+erzeugt: 6f6c4f1e3c81
 art: modul
 tags: [modul]
 ---
@@ -51,7 +51,7 @@ Eine Stahlbeton-Platte mit genau vier Bewehrungslagen.
 - `knicken_wahl_verformung: KnickVerformungswahl = field(default_factory=KnickVerformungswahl)` – Womit die Ausmitte e_2d gerechnet wird -- immer praezise ohne Vereinfachung ([[opencivil.nachweis.rechenwahl#Konstanten|VERFORMUNGSARTEN]]), Vorgabe Bemessungswerte.
 - `knicken_wahl_widerstand: KnickWiderstandswahl = field(default_factory=KnickWiderstandswahl)` – Womit N_Rd(M_Ed = N_Ed·e_tot) gerechnet wird -- Vorgabe die 0.85·x-Vereinfachung, ohne Handrechnung. Mit derselben Wahl wie die Tragsicherheit ist es deren Linie.
 - `spannungsfaelle: List[SpannungsfallEintrag] = field(default_factory=list)` – Auswertungen am Querschnitt -- Bilder, keine Nachweise.
-- `automatik_modus: str = einer_von((m.value for m in Suchmodus), Suchmodus.GRUND_OHNE_ZULAGE_M…` – Wonach das Bewehrungswerkzeug sucht -- siehe `bewehrungssuche.Suchmodus`.
+- `automatik_modus: Suchmodus = Suchmodus.GRUND_OHNE_ZULAGE_MIT` – Wonach das Bewehrungswerkzeug sucht -- siehe `bewehrungssuche.Suchmodus`.
 - `automatik_dicke: bool = False` – Ob das Werkzeug dazu die duennste Plattendicke sucht («Plattendicke optimieren»). Ein Schalter neben dem Modus und nicht ein eigener Modus: je Dicke laeuft dieselbe Suche im gewaehlten Modus.
 - `automatik_y_wie_x: bool = False` – Ob die y-Grundbewehrung jeder Seite der x-Grundbewehrung dieser Seite folgt -- gleicher Durchmesser, gleiche Teilung. Ein Netz, wie es verlegt wird. Die Suche rechnet schon waehrend des Suchens damit: liegt y aussen, kostet ihr Durchmesser x die statische Hoehe.
 - `automatik_teilungen: List[float] = field(default_factory=lambda: [150.0])` – Teilungen, die es versucht. Grundbewehrung und Zulage teilen sich eine. Vorgabe ist die eine uebliche. Wer mehrere angibt, bekommt die mit der kleinsten Stahlflaeche -- das kostet aber je Teilung einen ganzen Suchlauf, und meistens steht die Teilung ohnehin fest.
@@ -66,8 +66,8 @@ Eine Stahlbeton-Platte mit genau vier Bewehrungslagen.
 - `duktilitaet: bool = False` – Ob der Duktilitaetsnachweis gefuehrt wird. Ein Schalter fuer die Platte und nicht einer je Lage. Gerechnet werden beide x-Lagen -- die obere traegt das Stuetz-, die untere das Feldmoment --, und in der Zusammenfassung steht die unguenstigere. Vier Schalter fuer einen Nachweis waren vier Gelegenheiten, den falschen zu vergessen; die Frage ist ohnehin, ob der Querschnitt sein Versagen ankuendigt, und die beantwortet die schlechtere Lage.
 - `x_d_max: float = X_D_MAX` – Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis. Vorgabe 0.35, hoechstens 0.5 -- die Zahlen stehen beim Nachweis (`duktilitaet.GRENZE`, `duktilitaet.HOECHSTENS`).
 - `lagen: List[LageEintrag] = field(default_factory=list)` – Genau vier, Index 0 = 1. Lage (unterste). Fehlen welche, sind sie leer.
-- `richtung_lage1: str = einer_von(RICHTUNGEN, Richtung.Y.value)` – Richtung der 1. Lage; die 2. bekommt die Gegenrichtung. Vorgabe y, damit x auf der 2. und 3. Lage liegt -- innen. Das ist der unguenstigere Fall und der haeufigere: die Tragrichtung liegt selten zu unterst, weil die Querrichtung darunter durchlaeuft. Wer es anders verlegt, stellt es um.
-- `richtung_lage4: str = einer_von(RICHTUNGEN, Richtung.Y.value)` – Richtung der 4. Lage; die 3. bekommt die Gegenrichtung.
+- `richtung_lage1: Richtung = Richtung.Y` – Richtung der 1. Lage; die 2. bekommt die Gegenrichtung. Vorgabe y, damit x auf der 2. und 3. Lage liegt -- innen. Das ist der unguenstigere Fall und der haeufigere: die Tragrichtung liegt selten zu unterst, weil die Querrichtung darunter durchlaeuft. Wer es anders verlegt, stellt es um.
+- `richtung_lage4: Richtung = Richtung.Y` – Richtung der 4. Lage; die 3. bekommt die Gegenrichtung.
 - `kombinationen: List[KombinationEintrag] = field(default_factory=list)`
 - `tragsicherheit_wahl: RechenwahlEintrag = field(default_factory=RechenwahlEintrag)` – Womit die Tragsicherheit rechnet -- Vorgabe die Handrechnung mit Bemessungswerten. Die Querkraft und das sproede Versagen lesen ihren Momentenwiderstand aus derselben Linie.
 
@@ -206,10 +206,6 @@ Was hier steht, sind Entscheidungen und keine Vorgaben: alle vier
 Lagen bewehrt, ein Feldmoment zum Anfangen. Alles Uebrige kommt aus
 den Vorgabewerten der Felder.
 
-
-## Konstanten
-
-- `RICHTUNGEN = tuple((r.value for r in Richtung))` – Die Richtungen einer Lage.
 
 ## Braucht
 

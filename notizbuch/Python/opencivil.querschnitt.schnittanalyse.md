@@ -1,5 +1,5 @@
 ---
-erzeugt: a6f66e9e66ac
+erzeugt: fb1f542efe8d
 art: modul
 tags: [modul]
 ---
@@ -328,7 +328,6 @@ gerufen. Mit `protokoll` schreibt jede Linie ihre Herleitung.
 
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_knicken]]
-- [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.web.api]]

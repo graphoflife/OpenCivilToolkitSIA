@@ -37,9 +37,7 @@ from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.material.basis import Baustoff
 from opencivil.material.beton import beton
 from opencivil.material.betonstahl import betonstahl
-from opencivil.nachweis.biegung_normalkraft import (
-    BiegungNormalkraft, Erfuellungsart, Schnittgroessen,
-)
+from opencivil.nachweis.biegung_normalkraft import BiegungNormalkraft, Schnittgroessen
 from opencivil.nachweis.duktilitaet import Duktilitaet
 from opencivil.nachweis.knicken import Knickfall, Knicken
 from opencivil.nachweis.fehlende_bewehrung import (
@@ -79,7 +77,6 @@ from opencivil.nachweis.schiefe_biegung import SchiefeBiegung
 from opencivil.nachweis.schubwandnachweis import Schubwandnachweis
 from opencivil.querschnitt.analyse import Flaechenteil, Lastfall, Querschnittsanalyse
 from opencivil.querschnitt.geometrie import GeometrieFehler
-from opencivil.querschnitt.schnittanalyse import Zugseite
 from opencivil.stabwerk.rechnung import Balkensystem, Stabquerschnitt
 
 if TYPE_CHECKING:
@@ -575,7 +572,7 @@ def _querschnittsanalyse(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
     knickfaelle = [k for k in eintrag.knickfaelle if k.aktiv]
     if knickfaelle:
         aufbau.eintragen(teil, "qa_knicken", eintrag.kennung, KnickenQA(
-            analyse, [_knickfall(k, QAKnickfall, richtung=Zugseite(k.richtung))
+            analyse, [_knickfall(k, QAKnickfall, richtung=k.richtung)
                       for k in knickfaelle],
             verformung=eintrag.knicken_wahl_verformung.wahl,
             widerstand=eintrag.knicken_wahl_widerstand.wahl, schnell=aufbau.schnell))
@@ -981,7 +978,7 @@ def _kombination(eintrag: KombinationEintrag) -> Schnittgroessen:
         name=eintrag.name,
         M_Ed=Groesse(eintrag.M_Ed, KNM),
         N_Ed=Groesse(eintrag.N_Ed, KN),
-        art=Erfuellungsart(eintrag.art),
+        art=eintrag.art,
     )
 
 

@@ -20,7 +20,7 @@ from typing import Any, Dict, Iterable, List, Mapping, Optional
 
 from opencivil.core.einheiten import MM, MM2, Groesse
 from opencivil.core.wert import kennung_aus
-from opencivil.material.basis import Baustoff
+from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.nachweis.duktilitaet import HOECHSTENS as X_D_HOECHSTENS
 from opencivil.querschnitt.platte import (
@@ -103,7 +103,7 @@ class MaterialEintrag(Beschreibung):
     BEZEICHNUNG = "Material"
 
     kennung: str
-    art: str = einer_von(("beton", "betonstahl"))
+    art: Baustoffart
 
     sorte: str
     """Die Normsorte -- bei einem eigenen Material die Vorlage seiner Kennwerte."""
@@ -476,10 +476,10 @@ class SpannungsfallEintrag(Beschreibung):
     """
 
     name: str
-    art: str = einer_von((a.value for a in Analyseart), Analyseart.SCHNITTGROESSEN.value)
+    art: Analyseart = Analyseart.SCHNITTGROESSEN
     """Was gefragt wird -- siehe :class:`~opencivil.spannungsanalyse.Analyseart`."""
 
-    richtung: str = einer_von((r.value for r in Richtung), Richtung.X.value)
+    richtung: Richtung = Richtung.X
     """Welche Bewehrung zaehlt. Hier keine Wahl ``beide``: ein Bild zeigt
     einen Querschnitt, und der liegt in einer Richtung."""
 
@@ -721,7 +721,7 @@ class KombinationEintrag(Beschreibung):
     V_Ed: float = 0.0
     """Querkraft in kN/m -- für den Querkraftnachweis."""
 
-    art: str = einer_von((a.value for a in Erfuellungsart), Erfuellungsart.AUTOMATISCH.value)
+    art: Erfuellungsart = Erfuellungsart.AUTOMATISCH
 
     aktiv: bool = True
     """Ob dieser Lastfall gerechnet wird. Ausgeschaltet bleibt er stehen."""

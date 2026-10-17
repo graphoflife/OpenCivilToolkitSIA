@@ -1,5 +1,5 @@
 ---
-erzeugt: c8768b25eb8e
+erzeugt: 57e79c3c0d5f
 art: modul
 tags: [modul]
 ---
@@ -84,7 +84,7 @@ Vorlage.
 
 - `BEZEICHNUNG = 'Material'`
 - `kennung: str`
-- `art: str = einer_von(('beton', 'betonstahl'))`
+- `art: Baustoffart`
 - `sorte: str` – Die Normsorte -- bei einem eigenen Material die Vorlage seiner Kennwerte.
 - `name: str = ''`
 - `eigenstaendig: bool = False` – False = Normsorte, Kennwerte gesperrt, Name = Sorte -- nie aenderbar. True = eigenes Material, aenderbar, mit eigenem Namen (BE1, S1 ...).
@@ -399,8 +399,8 @@ Womit gerechnet wird, waehlt jede Analyse fuer sich: die Kriechzahl, den
 Wertesatz und die Rechenart ([[opencivil.nachweis.rechenwahl#Rechenwahl|Rechenwahl]]).
 
 - `name: str`
-- `art: str = einer_von((a.value for a in Analyseart), Analyseart.SCHNITTGROESSEN.v…` – Was gefragt wird -- siehe [[opencivil.spannungsanalyse#Analyseart|Analyseart]].
-- `richtung: str = einer_von((r.value for r in Richtung), Richtung.X.value)` – Welche Bewehrung zaehlt. Hier keine Wahl `beide`: ein Bild zeigt einen Querschnitt, und der liegt in einer Richtung.
+- `art: Analyseart = Analyseart.SCHNITTGROESSEN` – Was gefragt wird -- siehe [[opencivil.spannungsanalyse#Analyseart|Analyseart]].
+- `richtung: Richtung = Richtung.X` – Welche Bewehrung zaehlt. Hier keine Wahl `beide`: ein Bild zeigt einen Querschnitt, und der liegt in einer Richtung.
 - `N_Ed: float = 0.0` – in kN, Zug positiv -- fuer `schnittgroessen` und `moment_kruemmung`.
 - `M_Ed: float = 0.0` – in kNm -- fuer `schnittgroessen` und `normalkraft_dehnung`.
 - `eps_oben: float = -1.0`
@@ -604,7 +604,7 @@ Eine zu pruefende Schnittgroessenkombination.
 - `M_Ed: float = 0.0`
 - `N_Ed: float = 0.0`
 - `V_Ed: float = 0.0` – Querkraft in kN/m -- für den Querkraftnachweis.
-- `art: str = einer_von((a.value for a in Erfuellungsart), Erfuellungsart.AUTOMATIS…`
+- `art: Erfuellungsart = Erfuellungsart.AUTOMATISCH`
 - `aktiv: bool = True` – Ob dieser Lastfall gerechnet wird. Ausgeschaltet bleibt er stehen.
 
 

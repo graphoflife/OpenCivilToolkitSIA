@@ -295,7 +295,7 @@ def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
 
     eintrag = projekt.querschnitt(kennung)
     # Der Modus ist beim Lesen geprueft; die Teilungen braucht nur die Suche.
-    modus = bewehrungssuche.Suchmodus(eintrag.automatik_modus)
+    modus = eintrag.automatik_modus
     gesucht = [eintrag.automatik_teilungen]
     if eintrag.automatik_querkraft:
         gesucht.append(eintrag.automatik_querkraft_teilungen)

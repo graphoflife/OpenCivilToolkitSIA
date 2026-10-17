@@ -57,7 +57,6 @@ from opencivil.projekt.netz import Netz, naechste_kennung
 SCHNITTE = range(1, 9)
 
 #: Die Zugseiten eines gezeichneten Querschnitts.
-ZUGSEITEN = tuple(z.value for z in Zugseite)
 
 
 #: Ein Punkt in mm -- oder die Kennung eines Knotens, der dort liegt.
@@ -128,7 +127,7 @@ class StablinieEintrag(Beschreibung):
     bis: str = ""
     """Anfang und Ende als Knoten."""
 
-    art: str = einer_von((a.value for a in Linienart), Linienart.TEILUNG.value)
+    art: Linienart = Linienart.TEILUNG
     durchmesser: float = 16.0
     """Bei Anzahl und Teilung der Stabdurchmesser in mm."""
 
@@ -247,7 +246,7 @@ class QAKnickEintrag(KnickEintrag):
     Moment 1. Ordnung zieht (:class:`~opencivil.querschnitt.schnittanalyse.Zugseite`).
     """
 
-    richtung: str = einer_von(ZUGSEITEN, Zugseite.UNTEN.value)
+    richtung: Zugseite = Zugseite.UNTEN
 
 
 @dataclass
@@ -280,7 +279,7 @@ class QASpannungsfallEintrag(SpannungsfallEintrag):
     die ein positives Moment zieht (:class:`~opencivil.querschnitt.schnittanalyse.Zugseite`).
     """
 
-    richtung: str = einer_von(ZUGSEITEN, Zugseite.UNTEN.value)
+    richtung: Zugseite = Zugseite.UNTEN
 
 
 # ===========================================================================

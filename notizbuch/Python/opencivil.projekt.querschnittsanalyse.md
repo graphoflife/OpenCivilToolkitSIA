@@ -1,5 +1,5 @@
 ---
-erzeugt: 04bbea655dd4
+erzeugt: 80626dc75392
 art: modul
 tags: [modul]
 ---
@@ -118,7 +118,7 @@ zurueck, findet seine Zahl noch vor. Welche gilt, sagt `art`.
 - `kennung: str = ''`
 - `von: str = ''`
 - `bis: str = ''` – Anfang und Ende als Knoten.
-- `art: str = einer_von((a.value for a in Linienart), Linienart.TEILUNG.value)`
+- `art: Linienart = Linienart.TEILUNG`
 - `durchmesser: float = 16.0` – Bei Anzahl und Teilung der Stabdurchmesser in mm.
 - `flaeche: float = 1000.0` – Bei Art «Fläche» die ganze Stahlflaeche der Linie in mm².
 - `anzahl: float = 5.0`
@@ -238,7 +238,7 @@ Ein Knicknachweis des gezeichneten Querschnitts -- wie bei der Platte,
 dazu die Zugseite: die Seite, zu der sich der Stab biegt und die das
 Moment 1. Ordnung zieht ([[opencivil.querschnitt.schnittanalyse#Zugseite|Zugseite]]).
 
-- `richtung: str = einer_von(ZUGSEITEN, Zugseite.UNTEN.value)`
+- `richtung: Zugseite = Zugseite.UNTEN`
 
 ### WerkstoffwahlEintrag
 
@@ -278,7 +278,7 @@ Eine Spannung-Dehnung-Analyse des gezeichneten Querschnitts -- dieselben
 Felder wie bei der Platte. Die Richtung ist hier die Zugseite: die Seite,
 die ein positives Moment zieht ([[opencivil.querschnitt.schnittanalyse#Zugseite|Zugseite]]).
 
-- `richtung: str = einer_von(ZUGSEITEN, Zugseite.UNTEN.value)`
+- `richtung: Zugseite = Zugseite.UNTEN`
 
 ### Elemente
 
@@ -535,7 +535,6 @@ wird danach, was man braucht.
 ## Konstanten
 
 - `SCHNITTE = range(1, 9)` – Schnitte eines Buegels durch eine Schubwand: so viele Schenkel kreuzen sie.
-- `ZUGSEITEN = tuple((z.value for z in Zugseite))` – Die Zugseiten eines gezeichneten Querschnitts.
 - `Ort = Union[str, Sequence[float]]` – Ein Punkt in mm -- oder die Kennung eines Knotens, der dort liegt.
 
 ## Braucht

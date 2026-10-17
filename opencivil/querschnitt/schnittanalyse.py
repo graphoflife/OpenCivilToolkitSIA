@@ -463,7 +463,7 @@ def analysen(aufbau: "Aufbau", loesung: "Loesung",
         paare: Dict[tuple, Optional[Schnittpaar]] = {}
         liste: List[Analyse] = []
         for fall in faelle:
-            seite = Zugseite(fall.richtung)
+            seite = fall.richtung
             wahl = fall.wahl
             schluessel = (seite, wahl)
             if schluessel not in paare:
@@ -474,7 +474,7 @@ def analysen(aufbau: "Aufbau", loesung: "Loesung",
                     # Baustoff fehlt. Dann gibt es nichts auszuwerten.
                     paare[schluessel] = None
             paar = paare[schluessel]
-            eintrag = Analyse(fall=fall, art=Analyseart(fall.art), richtung=seite,
+            eintrag = Analyse(fall=fall, art=fall.art, richtung=seite,
                               richtung_text=seite.beschriftung, paar=paar)
             if paar is None:
                 eintrag.hinweis = ("Der Querschnitt hat keine Bewehrung – ohne sie gibt "
