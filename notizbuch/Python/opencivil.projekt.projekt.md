@@ -1,5 +1,5 @@
 ---
-erzeugt: f348b9697500
+erzeugt: 504fab4c9ff3
 art: modul
 tags: [modul]
 ---
@@ -12,8 +12,8 @@ tags: [modul]
 Das [[opencivil.projekt.projekt#Projekt|Projekt]] haelt Materialien und Bauteile zusammen und ist das, was
 gespeichert, geoeffnet und gerechnet wird. Hier stehen der Zugriff auf die
 Teile, die Methoden fuer das Rechnen ohne Oberflaeche, die Pruefungen ueber
-mehrere Teile hinweg (eindeutige Namen, Anteile), Speichern und Laden -- und
-das Beispiel, mit dem die Oberflaeche startet.
+mehrere Teile hinweg (eindeutige Kennungen und Materialnamen), Speichern und
+Laden -- und das Beispiel, mit dem die Oberflaeche startet.
 
 Gebaut wird in [[opencivil.projekt.aufbau]]; [[opencivil.projekt.projekt#Projekt.aufbauen|Projekt.aufbauen]]
 reicht nur weiter.
@@ -254,14 +254,24 @@ def pruefen(self) -> None
 ```
 
 Prueft die Form der Beschreibung -- vor jedem Rechnen und beim Oeffnen
-einer Datei.
+einer Datei: jedes Feld gegen das, was an ihm steht
+([[opencivil.projekt.lesen#felder_pruefen|felder_pruefen]]), eine Kennung je
+Eintrag und die Sorte jedes Materials. Was in Python gebaut wurde,
+geht so durch dieselbe Tuer wie eine Datei.
 
-Zuerst jedes Feld gegen das, was an ihm steht
-([[opencivil.projekt.lesen#felder_pruefen|felder_pruefen]]): was in Python
-gebaut wurde, geht so durch dieselbe Tuer wie eine Datei. Danach, was
-mehrere Eintraege zusammen betrifft. Den Inhalt -- Bereiche und
-Regeln der Bauteile -- prueft erst das Rechnen
-([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]).
+Den Inhalt -- Bereiche, die Regeln der Bauteile und Materialien, ihre
+Namen -- prueft erst das Rechnen
+([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]): ein abgelegtes
+Projekt mit zwei gleich benannten Materialien soll sich oeffnen und
+korrigieren lassen.
+
+#### Projekt.regeln
+
+```python
+def regeln(self, wo: str) -> None
+```
+
+Die Namen der Materialien, vor dem Rechnen -- je Material einer.
 
 #### Projekt.aufbauen
 

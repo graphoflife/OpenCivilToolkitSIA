@@ -666,6 +666,30 @@ class TestMaterialsperre(unittest.TestCase):
             projekt.aufbauen()
         self.assertIn("zweimal vergeben", str(ctx.exception))
 
+    def test_ein_falscher_name_oeffnet_sich_und_meldet_sich_beim_rechnen(self):
+        """Beim Öffnen zählen Kennung und Sorte; Name und Kennwerte erst beim Rechnen."""
+        for setzen, text in (
+                (lambda m: setattr(m, "name", "Mein Beton"),
+                 "Material 'Mein Beton': eine unveränderte Normsorte muss 'C30/37' heissen."),
+                (lambda m: m.abweichungen.update(f_ck=45.0),
+                 "Material 'C30/37': eine Normsorte darf keine abweichenden Kennwerte haben.")):
+            projekt = Projekt.beispiel()
+            setzen(projekt.material("b1"))
+            roh = projekt.als_dict()
+            with self.subTest(text=text):
+                self.assertEqual(dienst.bearbeite("pruefen", {"projekt": roh}).status, 200)
+                antwort = dienst.bearbeite("rechnen", {"projekt": roh})
+                self.assertEqual(antwort.status, 400)
+                self.assertIn(text, antwort.daten["fehler"])
+
+    def test_eine_unbekannte_sorte_haelt_das_oeffnen_auf(self):
+        """Ohne Sorte keine Kennwerte -- das Material liesse sich nicht einmal zeigen."""
+        roh = Projekt.beispiel().als_dict()
+        roh["materialien"][0]["sorte"] = "C31/37"
+        antwort = dienst.bearbeite("pruefen", {"projekt": roh})
+        self.assertEqual(antwort.status, 400)
+        self.assertIn("Unbekannte Sorte 'C31/37'", antwort.daten["fehler"])
+
     def test_mehrere_materialien_bekommen_indizierte_symbole(self):
         """Sonst stünden im Bericht zwei gleich aussehende Gleichungen."""
         projekt = Projekt.beispiel()

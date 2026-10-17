@@ -106,9 +106,17 @@ class TestDienst(unittest.TestCase):
                       daten["markdown"])
 
     def test_pruefen_meldet_kaputte_beschreibung(self):
+        """Beim Öffnen die Form -- zwei gleiche Kennungen; zwei gleiche Namen erst beim Rechnen."""
         kaputt = Projekt.beispiel().als_dict()
-        kaputt["materialien"][0]["name"] = kaputt["materialien"][1]["name"]
+        kaputt["materialien"][0]["kennung"] = kaputt["materialien"][1]["kennung"]
         antwort = dienst.bearbeite("pruefen", {"projekt": kaputt})
+        self.assertEqual(antwort.status, 400)
+        self.assertIn("dieselbe Kennung", antwort.daten["fehler"])
+
+        gleich = Projekt.beispiel().als_dict()
+        gleich["materialien"][0]["name"] = gleich["materialien"][1]["name"]
+        self.assertEqual(dienst.bearbeite("pruefen", {"projekt": gleich}).status, 200)
+        antwort = dienst.bearbeite("rechnen", {"projekt": gleich})
         self.assertEqual(antwort.status, 400)
 
     def test_pruefen_weist_fremde_dateien_ab(self):

@@ -133,27 +133,36 @@ class MaterialEintrag(Beschreibung):
     def ist_normsorte(self) -> bool:
         return not self.eigenstaendig
 
-    def pruefen(self) -> None:
-        """Sorte und Name -- die Materialart prueft ihr Feld."""
+    def sorte_pruefen(self) -> None:
+        """
+        Die Sorte -- schon beim Oeffnen: aus ihr kommen die Kennwerte, ohne
+        sie laesst sich das Material nicht einmal zeigen. Die Materialart
+        prueft ihr Feld.
+        """
         if self.sorte not in sorten(self.art):
             raise ProjektFehler(
                 f"Unbekannte Sorte '{self.sorte}' für {self.art}. "
                 f"Verfügbar: {', '.join(sorten(self.art))}.")
+
+    def regeln(self, wo: str) -> None:
+        """
+        Was eine Normsorte bleibt und wie ein eigenes Material heissen darf --
+        vor dem Rechnen, nicht beim Oeffnen: ein abgelegtes Material mit
+        falschem Namen soll sich oeffnen und umbenennen lassen.
+        """
         if self.ist_normsorte:
             if self.abweichungen or self.ueberschreibungen:
                 raise ProjektFehler(
-                    f"'{self.anzeigename}' ist als Normsorte geführt und darf keine "
-                    f"abweichenden Kennwerte haben. Bitte zuerst zu einem eigenen "
-                    f"Material machen.")
+                    f"{wo}: eine Normsorte darf keine abweichenden Kennwerte haben. "
+                    f"Bitte zuerst zu einem eigenen Material machen.")
             if self.name and self.name != self.sorte:
                 raise ProjektFehler(
-                    f"Eine unveränderte Normsorte muss '{self.sorte}' heissen, "
-                    f"nicht '{self.name}'.")
+                    f"{wo}: eine unveränderte Normsorte muss '{self.sorte}' heissen.")
         elif self.anzeigename in sorten(self.art):
             # Sonst stuende eine abgeaenderte Festigkeit unter einer
             # Normbezeichnung im Bericht.
             raise ProjektFehler(
-                f"Ein eigenes Material darf nicht wie die Normsorte "
+                f"{wo}: ein eigenes Material darf nicht wie die Normsorte "
                 f"'{self.anzeigename}' heissen.")
 
 

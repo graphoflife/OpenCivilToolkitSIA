@@ -1,5 +1,5 @@
 ---
-erzeugt: 630347e8b33a
+erzeugt: bf32127fc59c
 art: modul
 tags: [modul]
 ---
@@ -117,13 +117,25 @@ def anzeigename(self) -> str
 def ist_normsorte(self) -> bool
 ```
 
-#### MaterialEintrag.pruefen
+#### MaterialEintrag.sorte_pruefen
 
 ```python
-def pruefen(self) -> None
+def sorte_pruefen(self) -> None
 ```
 
-Sorte und Name -- die Materialart prueft ihr Feld.
+Die Sorte -- schon beim Oeffnen: aus ihr kommen die Kennwerte, ohne
+sie laesst sich das Material nicht einmal zeigen. Die Materialart
+prueft ihr Feld.
+
+#### MaterialEintrag.regeln
+
+```python
+def regeln(self, wo: str) -> None
+```
+
+Was eine Normsorte bleibt und wie ein eigenes Material heissen darf --
+vor dem Rechnen, nicht beim Oeffnen: ein abgelegtes Material mit
+falschem Namen soll sich oeffnen und umbenennen lassen.
 
 ### neigung
 
