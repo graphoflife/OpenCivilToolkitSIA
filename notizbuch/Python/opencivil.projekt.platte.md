@@ -1,5 +1,5 @@
 ---
-erzeugt: 9766bbe5d695
+erzeugt: 03c89be7656d
 art: modul
 tags: [modul]
 ---
@@ -40,7 +40,7 @@ Eine Stahlbeton-Platte mit genau vier Bewehrungslagen.
 - `einlagenhoehe: float = 0.0` – Höhe einer Einlage in mm.
 - `k_c: float = K_C` – Abminderung der Betondruckfestigkeit in der Druckdiagonalen.
 - `querkraftbewehrung: QuerkraftbewehrungEintrag = field(default_factory=QuerkraftbewehrungEintrag)` – Bügel; ohne Durchmesser heisst: keine.
-- `rissanforderung: str = einer_von(RISSANFORDERUNGEN, 'normal')` – Anforderung an die Rissbildung -- `normal`, `erhoeht` oder `hoch`.
+- `rissanforderung: Rissanforderung = Rissanforderung.NORMAL` – Anforderung an die Rissbildung -- `normal`, `erhoeht` oder `hoch`.
 - `beschreibung: str = ''` – Freier Text zur Platte -- was sonst nirgends hinpasst. Wo sie liegt, woher die Schnittgroessen stammen, was noch zu klaeren ist. Geht in keine Rechnung ein und steht in keinem Nachweis; sie wird gespeichert und wieder angezeigt, mehr nicht. Genau dafuer gibt es sie: ohne ein solches Feld landen solche Saetze im Namen der Platte.
 - `zwaengung: bool = False` – Ob mit einer Normalkraft-Zwaengung zu rechnen ist. Vorgabe aus: eine Zwaengung ist eine Annahme ueber das Tragwerk, keine Eigenschaft der Platte. Wer sie braucht, schaltet sie ein. Ein Schalter, nicht zwei: nachgewiesen wird nur die Tragrichtung x. Die y-Lagen stehen im Querschnitt, weil sie die statische Hoehe von x bestimmen und zum Bewehrungsgehalt zaehlen -- nachgewiesen werden sie nicht.
 - `zwaengung_begrenzt: bool = False` – Ob die Zwaengung auf 500 mm Plattendicke begrenzt angesetzt wird.

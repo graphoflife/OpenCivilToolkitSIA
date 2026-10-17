@@ -1,5 +1,5 @@
 ---
-erzeugt: fb3780bfc01d
+erzeugt: baaa7bf209fd
 art: modul
 tags: [modul]
 ---
@@ -84,7 +84,7 @@ Alles in SI-Basis; `h` und `b` in m, `f_ctm` in Pa, Rueckgabe in N.
 ### zulaessige_stahlspannung
 
 ```python
-def zulaessige_stahlspannung(*, anforderung: str, f_yk: float, E_s: float, f_ctm: float, durchmesser: float) -> float
+def zulaessige_stahlspannung(*, anforderung: Rissanforderung, f_yk: float, E_s: float, f_ctm: float, durchmesser: float) -> float
 ```
 
 Die Spannung, bis zu der die Bewehrung beansprucht werden darf.
@@ -100,7 +100,7 @@ scheitert an ihr.
 ### protokoll_zulaessige_stahlspannung
 
 ```python
-def protokoll_zulaessige_stahlspannung(p: Protokoll, sigma: Wert, *, anforderung: str, f_yk: Wert, E_s: Wert, f_ctm: Wert, durchmesser: Wert, basis: str, referenz: str='') -> None
+def protokoll_zulaessige_stahlspannung(p: Protokoll, sigma: Wert, *, anforderung: Rissanforderung, f_yk: Wert, E_s: Wert, f_ctm: Wert, durchmesser: Wert, basis: str, referenz: str='') -> None
 ```
 
 Wie [[opencivil.nachweis.mindestbewehrung#zulaessige_stahlspannung|zulaessige_stahlspannung]] zu ihrer Zahl kommt -- eine
@@ -114,7 +114,7 @@ Einheiten da.
 ### _protokoll_stahlspannung
 
 ```python
-def _protokoll_stahlspannung(p: Protokoll, e: Eingaben, werte: Zwischenwerte, erg, *, eintraege: Sequence[Tuple], anforderung: str) -> Wert
+def _protokoll_stahlspannung(p: Protokoll, e: Eingaben, werte: Zwischenwerte, erg, *, eintraege: Sequence[Tuple], anforderung: Rissanforderung) -> Wert
 ```
 
 `sigma_s,adm` einer Lage -- fuer beide Zwängungen dieselbe Herleitung.

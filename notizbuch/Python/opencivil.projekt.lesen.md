@@ -1,5 +1,5 @@
 ---
-erzeugt: 2f2161abf43e
+erzeugt: dc93e1a6e3e2
 art: modul
 tags: [modul]
 ---
@@ -12,8 +12,10 @@ tags: [modul]
 Ein Leser fuer jeden Eintrag und eine Pruefung fuer jedes Feld, beide aus den
 Feldern der Datenklassen. Was ein Feld annehmen darf, steht an ihm selbst:
 
-* sein Typ -- Text, Zahl, ganze Zahl, Schalter, Liste, Zuordnung, Eintrag;
-* eine Wahl ([[opencivil.projekt.lesen#einer_von|einer_von]]) -- die Werte, die es gibt;
+* sein Typ -- Text, Zahl, ganze Zahl, Schalter, Liste, Zuordnung, Eintrag,
+  oder eine Wahl ([[opencivil.core.wahl#Wahl|Wahl]]), deren Mitglieder es
+  annimmt;
+* eine Teilmenge davon ([[opencivil.projekt.lesen#einer_von|einer_von]]) -- die Werte, die es gibt;
 * eine Untergrenze ([[opencivil.projekt.lesen#nicht_negativ|nicht_negativ]]);
 * ein Text ohne Vorgabe ist Pflicht und darf nicht leer sein.
 
@@ -44,6 +46,17 @@ Linienlager meldet sich hier und wird nicht still zur Feder.
 Was erst das Rechnen braucht -- eine Dicke groesser als null, das Material,
 auf das eine Platte zeigt --, prueft der Aufbau. Eine abgelegte Platte mit
 h = 0 soll sich oeffnen und korrigieren lassen.
+
+
+## WAHLEN SIND MITGLIEDER
+
+Ein Wahlfeld haelt das Mitglied seiner Wahl, nicht den Text: aus «hoch» in
+der Datei wird `Rissanforderung.HOCH`, und wer im Code einen Text
+zuweist, bekommt ebenso das Mitglied ([[opencivil.projekt.lesen#wahl_aus_text|wahl_aus_text]], aufgerufen von
+`Beschreibung.__setattr__`). Geschrieben wird der Text -- `json.dumps`
+schreibt eine Wahl als ihren Wert, die Dateien bleiben Zeichen fuer Zeichen
+gleich. Bis 2026-10-17 hielten die Felder Text, und rund dreissig Stellen
+machten daraus wieder das Mitglied.
 
 ## Inhalt
 
@@ -161,7 +174,7 @@ Pflicht, Untergrenze. `tief`: auch jeden Eintrag darin.
 def _blatt_pruefen(wert: Any, typ: Any, f: dataclasses.Field, wo: str) -> None
 ```
 
-Ein Text, eine Zahl, ein Schalter -- und was an seinem Feld steht.
+Ein Text, eine Zahl, ein Schalter, eine Wahl -- und was an seinem Feld steht.
 
 ### _typen
 
@@ -171,6 +184,25 @@ def _typen(cls: type) -> Dict[str, Any]
 ```
 
 Die Typen der Felder, aufgeloest -- je Klasse einmal.
+
+### _wahlfelder
+
+```python
+@functools.lru_cache(maxsize=None)
+def _wahlfelder(cls: type) -> Dict[str, type]
+```
+
+Je Wahlfeld einer Datenklasse seine Wahl -- je Klasse einmal.
+
+### wahl_aus_text
+
+```python
+def wahl_aus_text(cls: type, feld: str, wert: Any) -> Any
+```
+
+Text in einem Wahlfeld wird sein Mitglied -- beim Lesen einer Datei und
+wo Python einen Text zuweist. Ein Text, den es nicht gibt, bleibt Text:
+die Pruefung meldet ihn dann mit seinem Ort ([[opencivil.projekt.lesen#felder_pruefen|felder_pruefen]]).
 
 ### _art
 

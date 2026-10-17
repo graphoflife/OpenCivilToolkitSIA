@@ -26,7 +26,7 @@ from opencivil.projekt.eintraege import (
     PostenEintrag, QuerkraftbewehrungEintrag, RechenwahlEintrag, SpannungsfallEintrag,
     VerformungEintrag, VerformungsfallEintrag, eindeutig, x_d_max_pruefen,
 )
-from opencivil.nachweis.rissanforderung import RISSANFORDERUNGEN
+from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt.lesen import ProjektFehler, einer_von, nicht_negativ
 
 #: Die Richtungen einer Lage.
@@ -59,7 +59,7 @@ class QuerschnittEintrag(Beschreibung):
         default_factory=QuerkraftbewehrungEintrag)
     """Bügel; ohne Durchmesser heisst: keine."""
 
-    rissanforderung: str = einer_von(RISSANFORDERUNGEN, "normal")
+    rissanforderung: Rissanforderung = Rissanforderung.NORMAL
     """Anforderung an die Rissbildung -- ``normal``, ``erhoeht`` oder ``hoch``."""
 
     beschreibung: str = ""

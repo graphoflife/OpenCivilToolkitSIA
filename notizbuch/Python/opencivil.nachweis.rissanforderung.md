@@ -1,5 +1,5 @@
 ---
-erzeugt: 154bcd30ad0b
+erzeugt: ede4ed171d77
 art: modul
 tags: [modul]
 ---
@@ -66,10 +66,6 @@ def gegen_fliessen(self) -> bool
 
 Ob der Nachweis gegen Fliessen unter haeufiger Einwirkung verlangt ist (Tabelle 17).
 
-
-## Konstanten
-
-- `RISSANFORDERUNGEN = tuple((a.value for a in Rissanforderung))` – Die Stufen, wie sie in der Datei stehen -- fuer die Wahl am Feld.
 
 ## Braucht
 

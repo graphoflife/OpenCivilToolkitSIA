@@ -3679,6 +3679,8 @@
         "felder_pruefen",
         "_blatt_pruefen",
         "_typen",
+        "_wahlfelder",
+        "wahl_aus_text",
         "_art",
         "_vorgabe",
         "_zeigen"

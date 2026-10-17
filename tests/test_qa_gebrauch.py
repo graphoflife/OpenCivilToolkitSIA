@@ -15,6 +15,7 @@ import unittest
 
 from opencivil.nachweis.gebrauchsebene import gebrauchsebene
 from opencivil.nachweis.mindestbewehrung import zulaessige_stahlspannung
+from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import Rechenart, Rechenwahl
 from opencivil.nachweis.spannungsbegrenzung import VORGABE
@@ -181,7 +182,7 @@ class TestStahlspannung(unittest.TestCase):
         a.quasistaendig.lastfall("Dauer", M_y_Ed=60.0)
         aufbau, loesung = rechnen(p)
         urteil = urteil_zu(loesung, aufbau.qa_spannung_riss["a1"], "Dauer")
-        grenze = zulaessige_stahlspannung(anforderung="erhoeht", f_yk=F_YK, E_s=E_S,
+        grenze = zulaessige_stahlspannung(anforderung=Rissanforderung.ERHOEHT, f_yk=F_YK, E_s=E_S,
                                           f_ctm=F_CTM, durchmesser=0.026)
         self.assertIn("Linie 2", urteil.begruendung)
         self.assertAlmostEqual(urteil.widerstand.groesse.si, grenze, delta=1.0)

@@ -1,5 +1,5 @@
 ---
-erzeugt: 6ff002ca3918
+erzeugt: 3af3e3666f4f
 art: modul
 tags: [modul]
 ---
@@ -217,7 +217,7 @@ def spannung(self, sigma_adm: float, stahl: Baustoff) -> Wert
 
 ```python
 @classmethod
-def gilt_bei(cls, anforderung: str) -> bool
+def gilt_bei(cls, anforderung: Rissanforderung) -> bool
 ```
 
 Ob der Nachweis bei dieser Rissanforderung verlangt ist.
@@ -278,7 +278,7 @@ Aufbau fragt [[opencivil.nachweis.spannungsbegrenzung#GrenzeGegenFliessen.gilt_b
 
 ```python
 @classmethod
-def gilt_bei(cls, anforderung: str) -> bool
+def gilt_bei(cls, anforderung: Rissanforderung) -> bool
 ```
 
 #### GrenzeGegenFliessen.bezuege

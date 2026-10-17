@@ -26,7 +26,9 @@ from opencivil.nachweis.duktilitaet import HOECHSTENS as X_D_HOECHSTENS
 from opencivil.querschnitt.platte import (
     ALPHA_MAX, ALPHA_MIN, Bewehrungsposten, Querkraftbewehrung, Richtung,
 )
-from opencivil.projekt.lesen import ProjektFehler, einer_von, lesen, nicht_negativ, ort, sorten
+from opencivil.projekt.lesen import (
+    ProjektFehler, einer_von, lesen, nicht_negativ, ort, sorten, wahl_aus_text,
+)
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
     FASERARTEN, RECHENARTEN, SPANNUNGSARTEN, Rechenart, Rechenwahl,
@@ -77,7 +79,14 @@ class Beschreibung:
 
     ``BEZEICHNUNG``, wo es sie gibt, nennt den Eintrag in Meldungen so wie
     die Oberflaeche: «Platte 'Decke'».
+
+    Ein Wahlfeld haelt das Mitglied seiner Wahl; wer Text zuweist -- die
+    Datei, der Konstruktor, die Fassade --, bekommt hier das Mitglied
+    (:func:`~opencivil.projekt.lesen.wahl_aus_text`).
     """
+
+    def __setattr__(self, name: str, wert: Any) -> None:
+        super().__setattr__(name, wahl_aus_text(type(self), name, wert))
 
     def als_dict(self) -> dict:
         return asdict(self)

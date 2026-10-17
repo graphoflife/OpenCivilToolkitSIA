@@ -1,5 +1,5 @@
 ---
-erzeugt: 41018479bc77
+erzeugt: 40a23a959972
 art: modul
 tags: [modul]
 ---
@@ -324,7 +324,7 @@ Ein gezeichneter Querschnitt mit Bewehrung, Schubwaenden und Lastfaellen.
 - `duktilitaet: bool = False`
 - `x_d_max: float = X_D_MAX`
 - `sproede: bool = False`
-- `rissanforderung: str = einer_von(RISSANFORDERUNGEN, 'normal')` – Anforderung an die Rissbildung -- `normal`, `erhoeht` oder `hoch`, wie bei der Platte.
+- `rissanforderung: Rissanforderung = Rissanforderung.NORMAL` – Anforderung an die Rissbildung -- `normal`, `erhoeht` oder `hoch`, wie bei der Platte.
 - `zwaengung: bool = False` – Ob die Zwaengung auf Normalkraft nachgewiesen wird -- am ganzen Querschnitt.
 - `zwaengung_begrenzt: bool = False` – Ob die rissaktive Dicke dabei hoechstens 500 mm betraegt.
 - `zwaengung_biegung: bool = False` – Ob die Zwaengung auf Biegung nachgewiesen wird -- je Richtung.

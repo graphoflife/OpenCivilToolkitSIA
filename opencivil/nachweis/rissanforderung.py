@@ -52,6 +52,3 @@ class Rissanforderung(Wahl):
         """Ob der Nachweis gegen Fliessen unter haeufiger Einwirkung verlangt ist (Tabelle 17)."""
         return self is not Rissanforderung.NORMAL
 
-
-#: Die Stufen, wie sie in der Datei stehen -- fuer die Wahl am Feld.
-RISSANFORDERUNGEN = tuple(a.value for a in Rissanforderung)

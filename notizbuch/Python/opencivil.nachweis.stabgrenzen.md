@@ -1,5 +1,5 @@
 ---
-erzeugt: 932334b84e02
+erzeugt: c6fec057b130
 art: modul
 tags: [modul]
 ---
@@ -160,7 +160,7 @@ Je Schluessel eine Gruppe, in der Reihenfolge ihres ersten Stabs.
 ### grenzen_aus_rissbreite
 
 ```python
-def grenzen_aus_rissbreite(analyse: Querschnittsanalyse, e: Eingaben, staebe: Sequence[Stabangabe], anforderung: str) -> Grenzen
+def grenzen_aus_rissbreite(analyse: Querschnittsanalyse, e: Eingaben, staebe: Sequence[Stabangabe], anforderung: Rissanforderung) -> Grenzen
 ```
 
 `sigma_s,adm` je Stab aus der Rissanforderung: bei normaler Anforderung
@@ -178,7 +178,7 @@ def grenzen_gegen_fliessen(analyse: Querschnittsanalyse, e: Eingaben, staebe: Se
 ### protokoll_rissbreitengrenzen
 
 ```python
-def protokoll_rissbreitengrenzen(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse, staebe: Sequence[Stabangabe], grenzen: Grenzen, anforderung: str, basis: str, *, referenz: str) -> None
+def protokoll_rissbreitengrenzen(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse, staebe: Sequence[Stabangabe], grenzen: Grenzen, anforderung: Rissanforderung, basis: str, *, referenz: str) -> None
 ```
 
 `sigma_s,adm` aus der Rissbreite, je Gruppe gleicher Staebe einmal

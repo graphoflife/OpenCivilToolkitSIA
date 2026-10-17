@@ -173,13 +173,14 @@ def _gruppieren(staebe: Sequence[Stabangabe], schluessel: Callable[[Stabangabe],
 
 
 def grenzen_aus_rissbreite(analyse: Querschnittsanalyse, e: Eingaben,
-                           staebe: Sequence[Stabangabe], anforderung: str) -> Grenzen:
+                           staebe: Sequence[Stabangabe],
+                           anforderung: Rissanforderung) -> Grenzen:
     """
     ``sigma_s,adm`` je Stab aus der Rissanforderung: bei normaler Anforderung
     ``f_yk`` seines Stahls, bei erhoehter und hoher dazu die Rissbreite mit
     seinem Durchmesser und dem ``f_ctm`` seines Betons.
     """
-    mit_rissbreite = Rissanforderung(anforderung).rissbreite is not None
+    mit_rissbreite = anforderung.rissbreite is not None
 
     def schluessel(s: Stabangabe) -> tuple:
         if not mit_rissbreite:
@@ -217,7 +218,8 @@ FIKTIV = ("Eine verschmierte Linie hat keinen Durchmesser – sie bekommt einen 
 
 def protokoll_rissbreitengrenzen(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse,
                                  staebe: Sequence[Stabangabe], grenzen: Grenzen,
-                                 anforderung: str, basis: str, *, referenz: str) -> None:
+                                 anforderung: Rissanforderung, basis: str, *,
+                                 referenz: str) -> None:
     """
     ``sigma_s,adm`` aus der Rissbreite, je Gruppe gleicher Staebe einmal
     hergeleitet -- vorher der fiktive Durchmesser jeder verschmierten Linie,

@@ -95,7 +95,7 @@ def rissnormalkraft(*, h: float, b: float, f_ctm: float,
 
 
 def zulaessige_stahlspannung(
-    *, anforderung: str, f_yk: float, E_s: float, f_ctm: float,
+    *, anforderung: Rissanforderung, f_yk: float, E_s: float, f_ctm: float,
     durchmesser: float,
 ) -> float:
     """
@@ -109,14 +109,14 @@ def zulaessige_stahlspannung(
     Begrenzung weg; die Flaeche ist dann ohnehin null und der Nachweis
     scheitert an ihr.
     """
-    w_nom = Rissanforderung(anforderung).rissbreite
+    w_nom = anforderung.rissbreite
     if w_nom is None or durchmesser <= 0.0:
         return f_yk
     return min(math.sqrt(9.0 * E_s * f_ctm * w_nom / durchmesser), f_yk)
 
 
 def protokoll_zulaessige_stahlspannung(
-    p: Protokoll, sigma: Wert, *, anforderung: str, f_yk: Wert, E_s: Wert,
+    p: Protokoll, sigma: Wert, *, anforderung: Rissanforderung, f_yk: Wert, E_s: Wert,
     f_ctm: Wert, durchmesser: Wert, basis: str, referenz: str = "",
 ) -> None:
     """
@@ -128,7 +128,7 @@ def protokoll_zulaessige_stahlspannung(
     ist dimensionsrein -- (N/mm²)² unter der Wurzel -- und steht darum mit
     Einheiten da.
     """
-    w_nom = Rissanforderung(anforderung).rissbreite
+    w_nom = anforderung.rissbreite
     if w_nom is None or durchmesser.groesse.si <= 0.0:
         p.formel(sigma, "@f_yk", {"f_yk": f_yk},
                  titel="Zulässige Stahlspannung (normale Anforderung)",
@@ -145,7 +145,7 @@ def protokoll_zulaessige_stahlspannung(
 
 def _protokoll_stahlspannung(
     p: Protokoll, e: Eingaben, werte: Zwischenwerte, erg, *,
-    eintraege: Sequence[Tuple], anforderung: str,
+    eintraege: Sequence[Tuple], anforderung: Rissanforderung,
 ) -> Wert:
     """
     ``sigma_s,adm`` einer Lage -- fuer beide Zwängungen dieselbe Herleitung.
@@ -162,7 +162,7 @@ def _protokoll_stahlspannung(
     else:
         durchmesser = werte.laenge("phi", rf"\varnothing_{{{lage}}}",
                                    erg.durchmesser, stellen=0)
-        if Rissanforderung(anforderung).rissbreite is not None:
+        if anforderung.rissbreite is not None:
             glieder = r";\ ".join(f"@d{i}" for i in range(len(staebe)))
             p.formel(durchmesser, rf"\max\left[{glieder}\right]",
                      {f"d{i}": s for i, s in enumerate(staebe)},
@@ -217,12 +217,12 @@ class Rissnormalkraft(Nachweis):
         querschnitt,
         richtung: Richtung,
         *,
-        anforderung: str,
+        anforderung: Rissanforderung,
         begrenzt: bool,
     ) -> None:
         self.querschnitt = querschnitt
         self.richtung = richtung
-        self.anforderung = Rissanforderung(anforderung)
+        self.anforderung = anforderung
         self.begrenzt = begrenzt
 
         # Genau zwei Lagen je Richtung -- auch die leeren, denn gerade sie
@@ -471,12 +471,12 @@ class ZwaengungBiegung(Nachweis):
         richtung: Richtung,
         lagen: Sequence[int],
         *,
-        anforderung: str,
+        anforderung: Rissanforderung,
         kriechzahl: float,
     ) -> None:
         self.querschnitt = querschnitt
         self.richtung = richtung
-        self.anforderung = Rissanforderung(anforderung)
+        self.anforderung = anforderung
         self.kriechzahl = kriechzahl
 
         gewaehlt = sorted(set(lagen))

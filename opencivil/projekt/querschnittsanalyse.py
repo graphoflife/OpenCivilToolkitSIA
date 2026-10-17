@@ -50,7 +50,7 @@ from opencivil.projekt.eintraege import (
     Gebrauchsliste, KnickEintrag, RechenwahlEintrag, SpannungsfallEintrag, druckfeld_pruefen,
     eindeutig, neigungen_pruefen, x_d_max_pruefen,
 )
-from opencivil.nachweis.rissanforderung import RISSANFORDERUNGEN
+from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt.lesen import ProjektFehler, einer_von, nicht_negativ
 from opencivil.projekt.netz import Netz, naechste_kennung
 
@@ -364,7 +364,7 @@ class QuerschnittsanalyseEintrag(Beschreibung):
     x_d_max: float = X_D_MAX
     sproede: bool = False
 
-    rissanforderung: str = einer_von(RISSANFORDERUNGEN, "normal")
+    rissanforderung: Rissanforderung = Rissanforderung.NORMAL
     """Anforderung an die Rissbildung -- ``normal``, ``erhoeht`` oder ``hoch``, wie bei der Platte."""
 
     zwaengung: bool = False

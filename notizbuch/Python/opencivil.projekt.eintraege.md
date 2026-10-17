@@ -1,5 +1,5 @@
 ---
-erzeugt: 9f8ec8243771
+erzeugt: a2696f757e4e
 art: modul
 tags: [modul]
 ---
@@ -51,6 +51,10 @@ vorbei: ein «festt» aus Python wurde still zur Feder (2026-10-16).
 
 `BEZEICHNUNG`, wo es sie gibt, nennt den Eintrag in Meldungen so wie
 die Oberflaeche: «Platte 'Decke'».
+
+Ein Wahlfeld haelt das Mitglied seiner Wahl; wer Text zuweist -- die
+Datei, der Konstruktor, die Fassade --, bekommt hier das Mitglied
+([[opencivil.projekt.lesen#wahl_aus_text|wahl_aus_text]]).
 
 #### Beschreibung.als_dict
 

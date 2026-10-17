@@ -6,6 +6,7 @@ Prüfung für eine Datei wie für ein Projekt, das in Python gebaut wurde. Was
 nicht stimmt, meldet sich mit Ort und Wert; umgedeutet wird nichts.
 """
 
+import json
 import unittest
 
 from opencivil.projekt import (
@@ -13,6 +14,8 @@ from opencivil.projekt import (
     RechenwahlEintrag,
 )
 from opencivil.projekt.querschnittsanalyse import SchubwandEintrag
+from opencivil.nachweis.rissanforderung import Rissanforderung
+from opencivil.projekt.lesen import felder_pruefen
 from opencivil.web import dienst
 
 
@@ -330,6 +333,38 @@ class TestNichtsStill(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "'mittel' gibt es als Rissanforderung nicht"):
             Rissanforderung("mittel")
         self.assertEqual([a.gegen_fliessen for a in Rissanforderung], [False, True, True])
+
+
+class TestWahlen(unittest.TestCase):
+    """
+    Ein Wahlfeld hält das Mitglied seiner Wahl -- gelesen, gebaut oder im Code
+    zugewiesen. Bis 2026-10-17 hielt es Text, und rund dreissig Stellen machten
+    daraus wieder das Mitglied.
+    """
+
+    def test_lesen_gibt_das_mitglied(self):
+        roh = Projekt.beispiel().als_dict()
+        roh["querschnitte"][0]["rissanforderung"] = "hoch"
+        self.assertIs(Projekt.aus_dict(roh).querschnitte[0].rissanforderung,
+                      Rissanforderung.HOCH)
+
+    def test_text_im_code_wird_das_mitglied(self):
+        q = Projekt.beispiel().querschnitte[0]
+        q.rissanforderung = "erhoeht"
+        self.assertIs(q.rissanforderung, Rissanforderung.ERHOEHT)
+
+    def test_die_datei_bleibt_text(self):
+        p = Projekt.beispiel()
+        p.querschnitte[0].rissanforderung = Rissanforderung.HOCH
+        roh = json.loads(json.dumps(p.als_dict()))
+        self.assertEqual(roh["querschnitte"][0]["rissanforderung"], "hoch")
+
+    def test_unbekanntes_meldet_sich_mit_ort(self):
+        q = Projekt.beispiel().querschnitte[0]
+        q.rissanforderung = "mittel"
+        with self.assertRaisesRegex(ProjektFehler, "Platte: 'mittel' gibt es als "
+                                    "'rissanforderung' nicht. Möglich sind: normal, erhoeht, hoch"):
+            felder_pruefen(q, "Platte")
 
 
 if __name__ == "__main__":

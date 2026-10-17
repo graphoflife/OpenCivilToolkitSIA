@@ -223,7 +223,8 @@ class Spannungsgrenze(ABC):
     #: Der erste Satz der Herleitung: wozu der Nachweis da ist.
     einleitung: str
 
-    def __init__(self, querschnitt, richtung: Richtung, anforderung: str) -> None:
+    def __init__(self, querschnitt, richtung: Richtung,
+                 anforderung: Rissanforderung) -> None:
         """
         Alle Grenzen werden gleich gebaut -- aus der Platte, der Tragrichtung
         und der Rissanforderung. Was eine davon nicht braucht, laesst sie
@@ -236,7 +237,7 @@ class Spannungsgrenze(ABC):
                 f"liegt keine Bewehrung.")
         self.querschnitt = querschnitt
         self.richtung = richtung
-        self.anforderung = Rissanforderung(anforderung)
+        self.anforderung = anforderung
         self.staehle = staehle(self.posten)
         """
         Die Staehle dieser Richtung -- je Seite einer, der Editor laesst sie
@@ -263,7 +264,7 @@ class Spannungsgrenze(ABC):
         return Zwischenwerte(self.id).spannung(name, symbol, sigma_adm, "Widerstand")
 
     @classmethod
-    def gilt_bei(cls, anforderung: str) -> bool:
+    def gilt_bei(cls, anforderung: Rissanforderung) -> bool:
         """Ob der Nachweis bei dieser Rissanforderung verlangt ist."""
         return True
 
@@ -306,8 +307,8 @@ class GrenzeGegenFliessen(Spannungsgrenze):
                   "fliessen – sonst bleiben Risse und Durchbiegung dauerhaft.")
 
     @classmethod
-    def gilt_bei(cls, anforderung: str) -> bool:
-        return Rissanforderung(anforderung).gegen_fliessen
+    def gilt_bei(cls, anforderung: Rissanforderung) -> bool:
+        return anforderung.gegen_fliessen
 
     def bezuege(self) -> List[Eingabebezug]:
         return stahlbezuege(self.posten, ("f_yd",))
@@ -371,7 +372,8 @@ class GrenzeAusRissbreite(Spannungsgrenze):
                   "Zwängung, nur dass die Spannung hier aus den Lasten kommt "
                   "und nicht aus einer aufgezwungenen Verformung.")
 
-    def __init__(self, querschnitt, richtung: Richtung, anforderung: str) -> None:
+    def __init__(self, querschnitt, richtung: Richtung,
+                 anforderung: Rissanforderung) -> None:
         super().__init__(querschnitt, richtung, anforderung)
         self.marken = [f"{lage.nummer}{art.kuerzel}"
                        for lage, art, _, _, _ in self.posten]

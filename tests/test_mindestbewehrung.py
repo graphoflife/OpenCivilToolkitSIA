@@ -4,6 +4,7 @@ import math
 import unittest
 
 from opencivil.nachweis import mindestbewehrung, sproedes_versagen, zustand2
+from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt import Projekt
 from opencivil.web import dienst
 
@@ -97,39 +98,39 @@ class TestZulaessigeStahlspannung(unittest.TestCase):
     def test_normal_ist_die_fliessgrenze(self):
         """f_yk, nicht f_yd: nachgewiesen wird das Überleben des Risses."""
         sigma = mindestbewehrung.zulaessige_stahlspannung(
-            anforderung="normal", **self.werte)
+            anforderung=Rissanforderung.NORMAL, **self.werte)
         self.assertAlmostEqual(sigma / 1e6, 500.0)
 
     def test_erhoeht_von_hand(self):
         """sqrt(9 · 200000 · 2.9 · 0.5 / 18) = sqrt(145000) = 380.8 N/mm²."""
         sigma = mindestbewehrung.zulaessige_stahlspannung(
-            anforderung="erhoeht", **self.werte)
+            anforderung=Rissanforderung.ERHOEHT, **self.werte)
         self.assertAlmostEqual(sigma / 1e6, math.sqrt(145000.0), places=3)
         self.assertAlmostEqual(sigma / 1e6, 380.8, delta=0.1)
 
     def test_hoch_von_hand(self):
         """sqrt(9 · 200000 · 2.9 · 0.2 / 18) = sqrt(58000) = 240.8 N/mm²."""
         sigma = mindestbewehrung.zulaessige_stahlspannung(
-            anforderung="hoch", **self.werte)
+            anforderung=Rissanforderung.HOCH, **self.werte)
         self.assertAlmostEqual(sigma / 1e6, 240.8, delta=0.1)
 
     def test_der_duennere_stab_darf_mehr(self):
         """Er verteilt den Riss auf mehr Stäbe."""
         duenn = mindestbewehrung.zulaessige_stahlspannung(
-            anforderung="hoch", **{**self.werte, "durchmesser": 8e-3})
+            anforderung=Rissanforderung.HOCH, **{**self.werte, "durchmesser": 8e-3})
         dick = mindestbewehrung.zulaessige_stahlspannung(
-            anforderung="hoch", **{**self.werte, "durchmesser": 26e-3})
+            anforderung=Rissanforderung.HOCH, **{**self.werte, "durchmesser": 26e-3})
         self.assertGreater(duenn, dick)
 
     def test_die_fliessgrenze_bleibt_die_obere_schranke(self):
         """Ein sehr dünner Stab dürfte rechnerisch mehr -- er darf es nicht."""
         sigma = mindestbewehrung.zulaessige_stahlspannung(
-            anforderung="erhoeht", **{**self.werte, "durchmesser": 6e-3})
+            anforderung=Rissanforderung.ERHOEHT, **{**self.werte, "durchmesser": 6e-3})
         self.assertAlmostEqual(sigma / 1e6, 500.0)
 
     def test_die_anforderung_ist_monoton(self):
         reihe = [mindestbewehrung.zulaessige_stahlspannung(
-            anforderung=a, **self.werte) for a in ("normal", "erhoeht", "hoch")]
+            anforderung=a, **self.werte) for a in Rissanforderung]
         self.assertEqual(reihe, sorted(reihe, reverse=True))
 
 
@@ -157,7 +158,7 @@ class TestNachweis(unittest.TestCase):
         Er verteilt den Riss auf die wenigsten Stäbe und bekommt damit die
         grösste Spannung -- also ist er massgebend.
         """
-        erg = befund(projekt_mit(rissanforderung="hoch"), "rissnormalkraft").ergebnisse[0]
+        erg = befund(projekt_mit(rissanforderung=Rissanforderung.HOCH), "rissnormalkraft").ergebnisse[0]
         # Grund ⌀18, Zulage ⌀12 -> der Grundstab bestimmt.
         self.assertAlmostEqual(erg.durchmesser * 1e3, 18.0)
 
@@ -185,7 +186,7 @@ class TestNachweis(unittest.TestCase):
     def test_die_herleitung_ist_vollstaendig(self):
         from opencivil.core.protokoll import GleichungBlock
 
-        aufbau = projekt_mit(rissanforderung="erhoeht").aufbauen()
+        aufbau = projekt_mit(rissanforderung=Rissanforderung.ERHOEHT).aufbauen()
         loesung = aufbau.werk.loese(*aufbau.alle_nachweisziele())
         titel = [b.titel for b in loesung.protokoll.alle_bloecke()
                  if isinstance(b, GleichungBlock)]

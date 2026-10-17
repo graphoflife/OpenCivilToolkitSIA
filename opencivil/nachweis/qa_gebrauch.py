@@ -145,14 +145,14 @@ class SpannungsbegrenzungQA(Nachweis):
         return self.grenze.langname
 
     def __init__(self, analyse: Querschnittsanalyse, faelle: Sequence[Lastfall], *,
-                 grenze: Type[Spannungsgrenze], anforderung: str,
+                 grenze: Type[Spannungsgrenze], anforderung: Rissanforderung,
                  wahl: Rechenwahl = VORGABE, einachsig: bool = False) -> None:
         if not faelle:
             raise ValueError("Ohne Lastfall gibt es nichts zu begrenzen.")
         self.analyse = analyse
         self.faelle = list(faelle)
         self.grenze = grenze
-        self.anforderung = Rissanforderung(anforderung)
+        self.anforderung = anforderung
         self.wahl = wahl
         self.einachsig = einachsig
         basis = f"{analyse.id}.nachweis.{grenze.idteil}"
@@ -384,10 +384,10 @@ class RissnormalkraftQA(Nachweis):
     THEMA = "Zwängung auf Normalkraft"
     LANGNAME = "Risse: Zwängung Normalkraft"
 
-    def __init__(self, analyse: Querschnittsanalyse, *, anforderung: str,
+    def __init__(self, analyse: Querschnittsanalyse, *, anforderung: Rissanforderung,
                  begrenzt: bool) -> None:
         self.analyse = analyse
-        self.anforderung = Rissanforderung(anforderung)
+        self.anforderung = anforderung
         self.begrenzt = begrenzt
         basis = f"{analyse.id}.nachweis.rissnormalkraft"
         self.d_grad = grad_def(f"{basis}.erfuellungsgrad", r"\alpha_{eff,NR}",
@@ -503,11 +503,12 @@ class ZwaengungBiegungQA(Nachweis):
     THEMA = "Zwängung auf Biegung"
     LANGNAME = "Risse: Zwängung Biegung"
 
-    def __init__(self, analyse: Querschnittsanalyse, *, einachsig: bool, anforderung: str,
+    def __init__(self, analyse: Querschnittsanalyse, *, einachsig: bool,
+                 anforderung: Rissanforderung,
                  kriechzahl: float) -> None:
         self.analyse = analyse
         self.einachsig = einachsig
-        self.anforderung = Rissanforderung(anforderung)
+        self.anforderung = anforderung
         self.wahl = Rechenwahl(kriechzahl=kriechzahl, satz=VORGABE.satz, art=VORGABE.art)
         basis = f"{analyse.id}.nachweis.zwang_biegung"
         self.d_ausnutzung: Dict[str, WertDef] = {
