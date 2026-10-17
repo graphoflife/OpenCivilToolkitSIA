@@ -241,8 +241,10 @@ class TestBeschreibung(unittest.TestCase):
             with self.subTest():
                 projekt = beispiel(("Feld", 3.5, 6.0, "unten"))
                 aendern(projekt.querschnitte[0].verformung)
+                # Gleiche Namen erst beim Rechnen, das Übrige schon beim Öffnen --
+                # das Bauen prüft beides.
                 with self.assertRaises(ProjektFehler):
-                    projekt.pruefen()
+                    projekt.aufbauen()
 
     def test_eine_negative_kriechzahl_in_der_datei(self):
         roh = Projekt.beispiel().als_dict()

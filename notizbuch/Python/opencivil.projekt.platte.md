@@ -1,5 +1,5 @@
 ---
-erzeugt: 89716068801c
+erzeugt: 9766bbe5d695
 art: modul
 tags: [modul]
 ---
@@ -106,21 +106,19 @@ Die Bauteile, deren Querschnitt die Platte nimmt -- keine.
 def pruefen(self) -> None
 ```
 
-Was an dieser Platte nicht stimmen kann, bevor daraus gerechnet wird.
+Was an dieser Platte nicht stimmen kann, schon beim Oeffnen: die
+Gebrauchslisten samt Anteil und die Rechenarten der Kapitel. Laeuft
+auch beim Oeffnen einer Datei -- darum hier nichts, was eine
+gespeicherte Platte unoeffenbar machte; Namen und Zahlen prueft
+[[opencivil.projekt.platte#QuerschnittEintrag.regeln|regeln]] vor dem Rechnen.
 
-Lastfallnamen eindeutig je Liste (siehe [[opencivil.projekt.platte#QuerschnittEintrag|eintraege.eindeutig]]);
-die Gebrauchslisten pruefen sich selbst, samt Anteil und abgeleiteten
-Namen. Laeuft auch beim Oeffnen einer Datei -- darum hier nichts, was
-eine gespeicherte Platte unoeffenbar machte (siehe
-[[opencivil.projekt.platte#QuerschnittEintrag.zahlen_pruefen|zahlen_pruefen]]).
-
-#### QuerschnittEintrag.zahlen_pruefen
+#### QuerschnittEintrag.regeln
 
 ```python
-def zahlen_pruefen(self) -> None
+def regeln(self) -> None
 ```
 
-Haelt unmoegliche Abmessungen und Zahlen auf, bevor daraus ein
+Haelt unmoegliche Abmessungen, Zahlen und Namen auf, bevor daraus ein
 Widerstand wird.
 
 Bis hierher lief jede Geometrie durch: eine Platte mit `h = -300` wurde
@@ -135,6 +133,9 @@ entscheidet der Ingenieur.
 **Nicht in [[opencivil.projekt.platte#QuerschnittEintrag.pruefen|pruefen]].** Das laeuft auch beim Oeffnen einer Datei;
 eine abgelegte Platte mit `h = 0` liesse sich dann nicht mehr oeffnen
 -- und damit nicht mehr korrigieren. Gefragt wird erst beim Bauen.
+Ebenso die Namen der Faelle ([[opencivil.projekt.eintraege#eindeutig|eindeutig]]),
+die der Tragsicherheit zuerst: aus ihnen leiten sich die
+Gebrauchslisten ab.
 
 #### QuerschnittEintrag.ohne_lastfaelle
 

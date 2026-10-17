@@ -29,7 +29,7 @@ WAS HIER NICHT GEPRUEFT WIRD:
 Ob die Polygone sich ueberlappen, ob ein Stab im Beton liegt: das prueft der
 Aufbau. Eine abgelegte Analyse mit einem verunglueckten Polygon soll sich
 oeffnen und korrigieren lassen -- dasselbe Vorgehen wie bei den Abmessungen
-der Platte (:meth:`QuerschnittEintrag.zahlen_pruefen`).
+der Platte (:meth:`QuerschnittEintrag.regeln`).
 """
 
 from __future__ import annotations
@@ -609,16 +609,12 @@ class QuerschnittsanalyseEintrag(Beschreibung):
 
     def pruefen(self) -> None:
         """
-        Was sich schon an der Beschreibung pruefen laesst: eindeutige Namen der
-        Faelle, und die Gebrauchslisten pruefen sich selbst, samt Anteil und
-        abgeleiteten Namen.
+        Was sich schon beim Oeffnen pruefen laesst: die Gebrauchslisten samt
+        Anteil, die Rechenarten des Knickens, je Material eine Wahl. Die
+        Namen der Faelle prueft :meth:`regeln` vor dem Rechnen.
         """
-        eindeutig(self.lastfaelle, self.name, "Lastfall", bauteil="Querschnitt")
-        eindeutig(self.spannungsfaelle, self.name, "Spannung-Dehnung-Analyse",
-                  bauteil="Querschnitt")
         for liste, wort in ((self.haeufig, "häufige"), (self.quasistaendig, "quasi-ständige")):
-            liste.pruefen(self.name, self.lastfaelle, wort)
-        eindeutig(self.knickfaelle, self.name, "Knicknachweis", bauteil="Querschnitt")
+            liste.pruefen(self.name, wort)
         for wahl, was, arten in ((self.knicken_wahl_verformung, "Verformung", VERFORMUNGSARTEN),
                                  (self.knicken_wahl_widerstand, "Widerstand", FASERARTEN)):
             wahl.pruefen(f"Querschnitt '{self.name}', Knicken, {was}", arten)
@@ -632,20 +628,25 @@ class QuerschnittsanalyseEintrag(Beschreibung):
                     f"zwei Werkstoffwahlen -- es braucht genau eine.")
             gewaehlt.add(w.material)
 
-    def zahlen_pruefen(self) -> None:
+    def regeln(self) -> None:
         """
         Was erst das Rechnen braucht, wie bei der Platte
-        (:meth:`QuerschnittEintrag.zahlen_pruefen`): eine abgelegte Analyse
+        (:meth:`QuerschnittEintrag.regeln`): eine abgelegte Analyse
         mit einer unmoeglichen Grenze soll sich oeffnen und korrigieren
         lassen. Bis 2026-10-16 rechnete sie mit α_min > α_max, k_c < 0 und
         x/d = 0.9.
         """
         wo = f"Querschnitt '{self.name}'"
+        eindeutig((f.name for f in self.lastfaelle), wo, "Lastfall")
+        for liste, wort in ((self.haeufig, "häufige"), (self.quasistaendig, "quasi-ständige")):
+            liste.namen_pruefen(self.name, self.lastfaelle, wort)
+        eindeutig((f.name for f in self.spannungsfaelle), wo, "Spannung-Dehnung-Analyse")
+        eindeutig((f.name for f in self.knickfaelle), wo, "Knicknachweis")
         neigungen_pruefen(self.alpha_min, self.alpha_max, wo)
         druckfeld_pruefen(self.k_c, wo)
         x_d_max_pruefen(self.x_d_max, wo)
         for fall in self.knickfaelle:
-            fall.zahlen_pruefen(wo)
+            fall.regeln(wo)
 
     def lastfall(self, name: str, **werte: float) -> QALastfallEintrag:
         """Einen Lastfall anfuegen, ohne Oberflaeche -- kN und kNm."""

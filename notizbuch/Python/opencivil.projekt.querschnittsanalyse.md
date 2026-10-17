@@ -1,5 +1,5 @@
 ---
-erzeugt: e3aae930be7c
+erzeugt: 41018479bc77
 art: modul
 tags: [modul]
 ---
@@ -44,7 +44,7 @@ Achsrichtung, T im Gegenuhrzeigersinn.
 Ob die Polygone sich ueberlappen, ob ein Stab im Beton liegt: das prueft der
 Aufbau. Eine abgelegte Analyse mit einem verunglueckten Polygon soll sich
 oeffnen und korrigieren lassen -- dasselbe Vorgehen wie bei den Abmessungen
-der Platte ([[opencivil.projekt.platte#QuerschnittEintrag.zahlen_pruefen|QuerschnittEintrag.zahlen_pruefen]]).
+der Platte ([[opencivil.projekt.platte#QuerschnittEintrag.regeln|QuerschnittEintrag.regeln]]).
 
 ## Inhalt
 
@@ -464,18 +464,18 @@ Passen die Masse nicht zueinander, ein `ValueError` mit dem Grund.
 def pruefen(self) -> None
 ```
 
-Was sich schon an der Beschreibung pruefen laesst: eindeutige Namen der
-Faelle, und die Gebrauchslisten pruefen sich selbst, samt Anteil und
-abgeleiteten Namen.
+Was sich schon beim Oeffnen pruefen laesst: die Gebrauchslisten samt
+Anteil, die Rechenarten des Knickens, je Material eine Wahl. Die
+Namen der Faelle prueft [[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.regeln|regeln]] vor dem Rechnen.
 
-#### QuerschnittsanalyseEintrag.zahlen_pruefen
+#### QuerschnittsanalyseEintrag.regeln
 
 ```python
-def zahlen_pruefen(self) -> None
+def regeln(self) -> None
 ```
 
 Was erst das Rechnen braucht, wie bei der Platte
-([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|QuerschnittEintrag.zahlen_pruefen]]): eine abgelegte Analyse
+([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|QuerschnittEintrag.regeln]]): eine abgelegte Analyse
 mit einer unmoeglichen Grenze soll sich oeffnen und korrigieren
 lassen. Bis 2026-10-16 rechnete sie mit α_min > α_max, k_c \< 0 und
 x/d = 0.9.

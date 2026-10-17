@@ -1,5 +1,5 @@
 ---
-erzeugt: 52cbc5fbde3f
+erzeugt: 35725d584744
 art: modul
 tags: [modul]
 ---
@@ -298,7 +298,6 @@ def beschreibung(self) -> str
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.notizbuch.formelseiten]]
 - [[opencivil.projekt.eintraege]]
-- [[opencivil.projekt.grundbruch]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.schnittanalyse]]

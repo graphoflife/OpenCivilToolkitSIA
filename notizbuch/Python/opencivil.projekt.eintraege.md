@@ -1,5 +1,5 @@
 ---
-erzeugt: f774869b7f95
+erzeugt: 9f8ec8243771
 art: modul
 tags: [modul]
 ---
@@ -304,10 +304,10 @@ in y waere die Breite der Platte die Laenge.
 - `knicklaenge: float = 3.0` – Knicklaenge in m.
 - `aktiv: bool = True` – Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen -- eine geloeschte Zeile muesste man neu eintippen, um sie wieder anzusehen.
 
-#### KnickEintrag.zahlen_pruefen
+#### KnickEintrag.regeln
 
 ```python
-def zahlen_pruefen(self, wo: str) -> None
+def regeln(self, wo: str) -> None
 ```
 
 Laenge und Knicklaenge -- erst beim Bauen gefragt, wie die Masse der
@@ -332,10 +332,10 @@ Wie ein Knickfall nur in x-Richtung.
 - `zugseite: str = einer_von(ZUGSEITEN, 'unten')` – `unten` im Feld, `oben` am Kragarm -- welches rho gilt.
 - `aktiv: bool = True` – Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen.
 
-#### VerformungsfallEintrag.zahlen_pruefen
+#### VerformungsfallEintrag.regeln
 
 ```python
-def zahlen_pruefen(self, wo: str) -> None
+def regeln(self, wo: str) -> None
 ```
 
 w und L -- erst beim Bauen gefragt, wie die Masse der Platte: eine
@@ -364,12 +364,6 @@ def fall(self, name: str, *, w: float, laenge: float, zugseite: str=Verformungsf
 ```
 
 Einen Fall anfuegen -- w in mm, die Spannweite in m.
-
-#### VerformungEintrag.pruefen
-
-```python
-def pruefen(self, bauteil: str) -> None
-```
 
 ### abgeleiteter_fallname
 
@@ -433,10 +427,10 @@ haeufig oder quasi-staendig ist, sagt die Liste, in der er steht.
 ### eindeutig
 
 ```python
-def eindeutig(faelle, platte: str, was: str, *, bauteil: str='Platte') -> None
+def eindeutig(namen: Iterable[str], wo: str, was: str) -> None
 ```
 
-Lastfallnamen muessen je Platte und Liste eindeutig sein.
+Fallnamen muessen je Liste eindeutig sein -- auch als Kennung.
 
 Die Nachweise legen ihre Ergebniswerte unter dem Fallnamen ab -- M-N,
 Querkraft und Stahlspannung alle drei. Zwei Kombinationen gleichen
@@ -444,9 +438,17 @@ Namens fielen darum auf einen Eintrag zusammen: der zweite ueberschrieb
 den ersten, und in der Tabelle fehlte eine Zeile. Kein Fehler, keine
 Warnung, eine Zahl weniger.
 
+Verschiedene Namen koennen dieselbe Kennung ergeben: «Wand A» und
+«Wand-A» werden beide zu «Wand_A» ([[opencivil.core.wert#kennung_aus|kennung_aus]]). Das Rechenwerk
+wiese den zweiten zurueck, aber mit einer Meldung ueber Wert-IDs, die an
+der Maske niemand versteht. Bis 2026-10-17 pruefte das nur drei der neun
+Listen.
+
 Gemeldet statt umbenannt: welcher der beiden gemeint war, weiss nur der
 Benutzer, und ein automatisch angehaengtes «(2)» stuende danach in seinem
-Bericht.
+Bericht. Gefragt wird vor dem Rechnen, nicht beim Oeffnen: zwei gleiche
+Namen sind schnell getippt, und ein Projekt, das sich darum nicht mehr
+oeffnen liesse, waere schlimmer als eine Meldung beim Rechnen.
 
 ### RechenwahlEintrag
 
@@ -557,16 +559,24 @@ Einen eigenen Lastfall anfuegen -- kNm und kN, Zug positiv.
 #### Gebrauchsliste.pruefen
 
 ```python
-def pruefen(self, bauteil: str, kombinationen: List[Any], wort: str) -> None
+def pruefen(self, bauteil: str, wort: str) -> None
 ```
 
 Was an dieser Liste nicht stimmen kann -- `wort` ist «häufige» oder
-«quasi-ständige» und steht in der Meldung.
+«quasi-ständige» und steht in der Meldung. Die Namen prueft
+[[opencivil.projekt.eintraege#Gebrauchsliste.namen_pruefen|namen_pruefen]], vor dem Rechnen.
 
-Je Liste fuer sich: die beiden Listen landen in getrennten Nachweisen
-und damit in getrennten ID-Raeumen. Ein Fall «Dauer» darf in beiden
-stehen. `kombinationen` sind die Faelle der Tragsicherheit, aus
-denen abgeleitet wird -- gelesen wird nur ihr Name.
+#### Gebrauchsliste.namen_pruefen
+
+```python
+def namen_pruefen(self, bauteil: str, kombinationen: List[Any], wort: str) -> None
+```
+
+Die Namen dieser Liste, vor dem Rechnen (siehe [[opencivil.projekt.eintraege#eindeutig|eindeutig]]). Je
+Liste fuer sich: die beiden Listen landen in getrennten Nachweisen und
+damit in getrennten ID-Raeumen, ein Fall «Dauer» darf in beiden stehen.
+`kombinationen` sind die Faelle der Tragsicherheit, aus denen
+abgeleitet wird -- ihre eigenen Namen hat das Bauteil schon geprueft.
 
 ### KombinationEintrag
 

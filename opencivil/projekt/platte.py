@@ -267,30 +267,24 @@ class QuerschnittEintrag(Beschreibung):
 
     def pruefen(self) -> None:
         """
-        Was an dieser Platte nicht stimmen kann, bevor daraus gerechnet wird.
-
-        Lastfallnamen eindeutig je Liste (siehe :func:`eintraege.eindeutig`);
-        die Gebrauchslisten pruefen sich selbst, samt Anteil und abgeleiteten
-        Namen. Laeuft auch beim Oeffnen einer Datei -- darum hier nichts, was
-        eine gespeicherte Platte unoeffenbar machte (siehe
-        :meth:`zahlen_pruefen`).
+        Was an dieser Platte nicht stimmen kann, schon beim Oeffnen: die
+        Gebrauchslisten samt Anteil und die Rechenarten der Kapitel. Laeuft
+        auch beim Oeffnen einer Datei -- darum hier nichts, was eine
+        gespeicherte Platte unoeffenbar machte; Namen und Zahlen prueft
+        :meth:`regeln` vor dem Rechnen.
         """
-        eindeutig(self.kombinationen, self.name, "Tragsicherheitseinwirkung")
-        eindeutig(self.knickfaelle, self.name, "Knicknachweis")
-        eindeutig(self.spannungsfaelle, self.name, "Spannung-Dehnung-Analyse")
         for liste, wort in ((self.haeufig, "häufige"),
                             (self.quasistaendig, "quasi-ständige")):
-            liste.pruefen(self.name, self.kombinationen, wort)
-        self.verformung.pruefen(self.name)
+            liste.pruefen(self.name, wort)
         self.tragsicherheit_wahl.pruefen(f"Platte '{self.name}', Tragsicherheit")
         self.knicken_wahl_verformung.pruefen(f"Platte '{self.name}', Knicken, Verformung",
                                              VERFORMUNGSARTEN)
         self.knicken_wahl_widerstand.pruefen(f"Platte '{self.name}', Knicken, Widerstand",
                                              FASERARTEN)
 
-    def zahlen_pruefen(self) -> None:
+    def regeln(self) -> None:
         """
-        Haelt unmoegliche Abmessungen und Zahlen auf, bevor daraus ein
+        Haelt unmoegliche Abmessungen, Zahlen und Namen auf, bevor daraus ein
         Widerstand wird.
 
         Bis hierher lief jede Geometrie durch: eine Platte mit ``h = -300`` wurde
@@ -305,8 +299,20 @@ class QuerschnittEintrag(Beschreibung):
         **Nicht in :meth:`pruefen`.** Das laeuft auch beim Oeffnen einer Datei;
         eine abgelegte Platte mit ``h = 0`` liesse sich dann nicht mehr oeffnen
         -- und damit nicht mehr korrigieren. Gefragt wird erst beim Bauen.
+        Ebenso die Namen der Faelle (:func:`~opencivil.projekt.eintraege.eindeutig`),
+        die der Tragsicherheit zuerst: aus ihnen leiten sich die
+        Gebrauchslisten ab.
         """
         name = self.name
+        wo = f"Platte '{name}'"
+        eindeutig((k.name for k in self.kombinationen), wo, "Tragsicherheitseinwirkung")
+        for liste, wort in ((self.haeufig, "häufige"),
+                            (self.quasistaendig, "quasi-ständige")):
+            liste.namen_pruefen(name, self.kombinationen, wort)
+        eindeutig((k.name for k in self.knickfaelle), wo, "Knicknachweis")
+        eindeutig((f.name for f in self.spannungsfaelle), wo, "Spannung-Dehnung-Analyse")
+        eindeutig((f.name for f in self.verformung.faelle), wo, "Verformungsfall")
+
         for feld, wert, wie in (
             ("Dicke h", self.h, "grösser als null"),
             ("Breite b", self.b, "grösser als null"),
@@ -339,9 +345,9 @@ class QuerschnittEintrag(Beschreibung):
             lage.grund.pruefen(f"Platte '{name}', {nummer}. Lage, Grundbewehrung")
             lage.zulage.pruefen(f"Platte '{name}', {nummer}. Lage, Zulage")
         for fall in self.knickfaelle:
-            fall.zahlen_pruefen(f"Platte '{name}'")
+            fall.regeln(wo)
         for fall in self.verformung.faelle:
-            fall.zahlen_pruefen(f"Platte '{name}'")
+            fall.regeln(wo)
 
     def ohne_lastfaelle(self) -> None:
         """

@@ -16,9 +16,8 @@ nennt fuer delta* «2/3 phi bis 1 · phi».
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List
+from typing import List
 
-from opencivil.core.wert import kennung_aus
 from opencivil.projekt.eintraege import Beschreibung, eindeutig
 from opencivil.projekt.lesen import ProjektFehler
 
@@ -113,25 +112,16 @@ class GrundbruchEintrag(Beschreibung):
 
     def pruefen(self) -> None:
         """
-        Was beim Oeffnen nicht stimmen kann: Namen der Kombinationen
-        eindeutig, auch in der Kennung. Die Zahlen prueft erst das Rechnen
-        (:meth:`zahlen_pruefen`) -- eine abgelegte Datei mit b = 0 soll sich
-        oeffnen und korrigieren lassen.
+        Beim Oeffnen nichts ueber die Felder hinaus: Namen und Zahlen prueft
+        :meth:`regeln` vor dem Rechnen -- eine abgelegte Datei mit b = 0 oder
+        zwei gleich benannten Kombinationen soll sich oeffnen und korrigieren
+        lassen.
         """
-        eindeutig(self.kombinationen, self.name, "Kombination", bauteil="Grundbruch")
-        kennungen: Dict[str, str] = {}
-        for k in self.kombinationen:
-            frueher = kennungen.setdefault(kennung_aus(k.name), k.name)
-            if frueher != k.name:
-                raise ProjektFehler(
-                    f"Grundbruch '{self.name}': die Kombinationen '{frueher}' und "
-                    f"'{k.name}' unterscheiden sich nur in Satz- oder Leerzeichen. Im "
-                    f"Bericht fielen sie auf denselben Eintrag -- bitte eine anders "
-                    f"benennen.")
 
-    def zahlen_pruefen(self) -> None:
-        """Haelt unmoegliche Zahlen auf, bevor daraus ein Widerstand wird."""
+    def regeln(self) -> None:
+        """Haelt unmoegliche Zahlen und Namen auf, bevor daraus ein Widerstand wird."""
         wo = f"Grundbruch '{self.name}'"
+        eindeutig((k.name for k in self.kombinationen), wo, "Kombination")
         for feld, wert, wie in (
                 ("Breite b", self.b, self.b > 0.0),
                 ("Partialfaktor γ_φ", self.gamma_phi, self.gamma_phi > 0.0),

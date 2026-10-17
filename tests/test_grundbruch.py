@@ -352,8 +352,9 @@ class TestEintrag(unittest.TestCase):
             g.kombinationen = []
             for name in namen:
                 g.kombination(name, N_Ed=100.0)
+            g.pruefen()  # Öffnen geht -- gemeldet wird vor dem Rechnen.
             with self.subTest(namen=namen), self.assertRaises(ProjektFehler):
-                g.pruefen()
+                g.regeln()
 
     def test_unmoegliche_zahlen(self):
         faelle = {

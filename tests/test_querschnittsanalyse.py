@@ -44,8 +44,9 @@ class TestBeschreibung(unittest.TestCase):
     def test_doppelte_lastfaelle(self):
         a = self.neu()
         a.lastfaelle.append(QALastfallEintrag(name="Tragsicherheit 1"))
+        a.pruefen()  # Öffnen geht -- gemeldet wird vor dem Rechnen.
         with self.assertRaisesRegex(ProjektFehler, "Querschnitt 'Balken'"):
-            a.pruefen()
+            a.regeln()
 
     def test_unbekanntes_wird_gemeldet(self):
         roh = self.neu().als_dict()

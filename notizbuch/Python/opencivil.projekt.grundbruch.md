@@ -1,5 +1,5 @@
 ---
-erzeugt: adfaad44e819
+erzeugt: 65d2bfcadb89
 art: modul
 tags: [modul]
 ---
@@ -103,23 +103,22 @@ Eine Kombination anfügen -- N normal zur Sohle, T in ihrer Richtung, in kN.
 def pruefen(self) -> None
 ```
 
-Was beim Oeffnen nicht stimmen kann: Namen der Kombinationen
-eindeutig, auch in der Kennung. Die Zahlen prueft erst das Rechnen
-([[opencivil.projekt.grundbruch#GrundbruchEintrag.zahlen_pruefen|zahlen_pruefen]]) -- eine abgelegte Datei mit b = 0 soll sich
-oeffnen und korrigieren lassen.
+Beim Oeffnen nichts ueber die Felder hinaus: Namen und Zahlen prueft
+[[opencivil.projekt.grundbruch#GrundbruchEintrag.regeln|regeln]] vor dem Rechnen -- eine abgelegte Datei mit b = 0 oder
+zwei gleich benannten Kombinationen soll sich oeffnen und korrigieren
+lassen.
 
-#### GrundbruchEintrag.zahlen_pruefen
+#### GrundbruchEintrag.regeln
 
 ```python
-def zahlen_pruefen(self) -> None
+def regeln(self) -> None
 ```
 
-Haelt unmoegliche Zahlen auf, bevor daraus ein Widerstand wird.
+Haelt unmoegliche Zahlen und Namen auf, bevor daraus ein Widerstand wird.
 
 
 ## Braucht
 
-- [[opencivil.core.wert]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
 

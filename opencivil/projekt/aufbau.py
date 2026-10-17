@@ -646,7 +646,7 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
     einen Satz, der die Analyse nennt.
     """
     wo = f"Querschnittsanalyse '{eintrag.name}'"
-    eintrag.zahlen_pruefen()
+    eintrag.regeln()
 
     def stoff(kennung: str, was: str, art: str) -> Baustoff:
         return _stoff(baustoffe, kennung, art, f"{wo}: {was}")
@@ -839,7 +839,7 @@ def _querschnitt(
     eintrag: QuerschnittEintrag, baustoffe: Mapping[str, Baustoff], *, praefix: str
 ) -> Plattenquerschnitt:
     beton_stoff = _stoff(baustoffe, eintrag.beton, "beton", f"Platte '{eintrag.name}'")
-    eintrag.zahlen_pruefen()
+    eintrag.regeln()
 
     lagen: List[Bewehrungslage] = []
     for nummer, lage in enumerate(eintrag.lagen, start=1):
@@ -991,7 +991,7 @@ def _grundbruch(art: "Bauteilart", eintrag: GrundbruchEintrag, aufbau: Aufbau) -
     sobald eine Kombination eingeschaltet ist. Ohne sie steht das Fundament
     allein da, wie eine Platte ohne Einwirkung.
     """
-    eintrag.zahlen_pruefen()
+    eintrag.regeln()
     fundament = Fundament(
         name=eintrag.name,
         phi_k=Groesse(eintrag.phi_k, GRAD), gamma_phi=Groesse(eintrag.gamma_phi, EINHEITSLOS),

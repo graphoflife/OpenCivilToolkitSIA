@@ -3612,12 +3612,11 @@
         "druckfeld_pruefen",
         "x_d_max_pruefen",
         "KnickEintrag",
-        "KnickEintrag.zahlen_pruefen",
+        "KnickEintrag.regeln",
         "VerformungsfallEintrag",
-        "VerformungsfallEintrag.zahlen_pruefen",
+        "VerformungsfallEintrag.regeln",
         "VerformungEintrag",
         "VerformungEintrag.fall",
-        "VerformungEintrag.pruefen",
         "abgeleiteter_fallname",
         "SpannungsfallEintrag",
         "GebrauchsfallEintrag",
@@ -3631,6 +3630,7 @@
         "Gebrauchsliste",
         "Gebrauchsliste.lastfall",
         "Gebrauchsliste.pruefen",
+        "Gebrauchsliste.namen_pruefen",
         "KombinationEintrag"
       ]
     },
@@ -3647,7 +3647,7 @@
         "GrundbruchEintrag.bezuege",
         "GrundbruchEintrag.kombination",
         "GrundbruchEintrag.pruefen",
-        "GrundbruchEintrag.zahlen_pruefen"
+        "GrundbruchEintrag.regeln"
       ]
     },
     {
@@ -3699,7 +3699,7 @@
         "QuerschnittEintrag.materialien",
         "QuerschnittEintrag.bezuege",
         "QuerschnittEintrag.pruefen",
-        "QuerschnittEintrag.zahlen_pruefen",
+        "QuerschnittEintrag.regeln",
         "QuerschnittEintrag.ohne_lastfaelle",
         "QuerschnittEintrag.einwirkung",
         "QuerschnittEintrag.knickfall",
@@ -3786,7 +3786,7 @@
         "QuerschnittsanalyseEintrag.lage",
         "QuerschnittsanalyseEintrag.vorlage_einsetzen",
         "QuerschnittsanalyseEintrag.pruefen",
-        "QuerschnittsanalyseEintrag.zahlen_pruefen",
+        "QuerschnittsanalyseEintrag.regeln",
         "QuerschnittsanalyseEintrag.lastfall",
         "QuerschnittsanalyseEintrag.knickfall",
         "QuerschnittsanalyseEintrag.spannungsfall",
