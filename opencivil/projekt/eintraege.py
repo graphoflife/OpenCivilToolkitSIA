@@ -15,7 +15,7 @@ Die Platte, die diese Teile zusammenhaelt, steht in
 from __future__ import annotations
 
 import math
-from dataclasses import asdict, dataclass, field
+from dataclasses import KW_ONLY, asdict, dataclass, field
 from typing import Any, Dict, Iterable, List, Mapping, Optional
 
 from opencivil.core.einheiten import GRAD, M, MM, MM2, PROZENT, Groesse
@@ -33,6 +33,7 @@ from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsat
 from opencivil.nachweis.rechenwahl import (
     FASERARTEN, RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN,
 )
+from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.verformung import KRIECHZAHL as VERFORMUNG_KRIECHZAHL, ZUGSEITEN
 from opencivil.spannungsanalyse import Analyseart
 
@@ -695,6 +696,104 @@ class Gebrauchsliste(Beschreibung):
                     f"benennen -- sonst lässt sich nicht auseinanderhalten, "
                     f"welcher gerechnet wurde.")
         eindeutig(abgeleitet + [f.name for f in self.faelle], wo, f"{wort}r Lastfall")
+
+
+@dataclass
+class Querschnittsangaben(Beschreibung):
+    """
+    Was die Platte (:class:`~opencivil.projekt.platte.QuerschnittEintrag`) und
+    der gezeichnete Querschnitt
+    (:class:`~opencivil.projekt.querschnittsanalyse.QuerschnittsanalyseEintrag`)
+    gleich angeben: die Rissanforderung, die Schalter der Zwaengungen, des
+    sproeden Versagens und der Duktilitaet mit ihren Werten, womit das Knicken
+    rechnet, die Abminderung im Druckfeld und den freien Text. Bis 2026-10-17
+    stand jedes dieser Felder zweimal da, je mit eigener Beschreibung.
+
+    Wo nachgewiesen wird, sagt die Geometrie: die Platte je x-Lage, der
+    gezeichnete Querschnitt je Richtung oder am ganzen Querschnitt. Die Felder
+    hier sind nur mit Namen anzugeben (``KW_ONLY``): so duerfen die Felder der
+    Geometrie ohne Vorgabe dahinter folgen -- der Beton der Platte.
+    """
+
+    kennung: str
+    name: str
+    _: KW_ONLY
+
+    rissanforderung: Rissanforderung = Rissanforderung.NORMAL
+    """Anforderung an die Rissbildung -- ``normal``, ``erhoeht`` oder ``hoch``."""
+
+    zwaengung: bool = False
+    """
+    Ob die Zwaengung auf Normalkraft nachgewiesen wird -- an der Platte je
+    x-Lage, am gezeichneten Querschnitt am ganzen Querschnitt.
+
+    Vorgabe aus: eine Zwaengung ist eine Annahme ueber das Tragwerk, keine
+    Eigenschaft des Querschnitts. Wer sie braucht, schaltet sie ein. An der
+    Platte ein Schalter, nicht zwei: nachgewiesen wird nur die Tragrichtung x.
+    Die y-Lagen stehen im Querschnitt, weil sie die statische Hoehe von x
+    bestimmen und zum Bewehrungsgehalt zaehlen -- nachgewiesen werden sie
+    nicht.
+    """
+
+    zwaengung_begrenzt: bool = False
+    """Ob die rissaktive Dicke der Zwaengung auf Normalkraft hoechstens 500 mm betraegt."""
+
+    zwaengung_biegung: bool = False
+    """
+    Ob die Zwaengung auf Biegung nachgewiesen wird -- an der Platte je
+    x-Lage, am gezeichneten Querschnitt je Richtung.
+    """
+
+    zwaengung_biegung_kriechzahl: float = bereich(0.0, heisst="Kriechzahl φ", ab=0.0)
+    """
+    Die Kriechzahl φ der Zwaengung auf Biegung: der Beton mit ``E_cm/(1+φ)``,
+    an der Platte als Wertigkeit ``n = (E_s/E_cm)·(1+φ)``.
+    """
+
+    sproede: bool = False
+    """Ob der Nachweis gegen sproedes Versagen gefuehrt wird."""
+
+    duktilitaet: bool = False
+    """
+    Ob der Duktilitaetsnachweis gefuehrt wird.
+
+    Ein Schalter fuer das Bauteil und nicht einer je Lage. An der Platte
+    werden beide x-Lagen gerechnet -- die obere traegt das Stuetz-, die untere
+    das Feldmoment --, und in der Zusammenfassung steht die unguenstigere.
+    Vier Schalter fuer einen Nachweis waren vier Gelegenheiten, den falschen
+    zu vergessen; die Frage ist ohnehin, ob der Querschnitt sein Versagen
+    ankuendigt, und die beantwortet die schlechtere Lage.
+    """
+
+    x_d_max: float = x_d_grenze()
+    """Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis."""
+
+    knicken_wahl_verformung: KnickVerformungswahl = field(default_factory=KnickVerformungswahl)
+    """
+    Womit die Ausmitte e_2d gerechnet wird -- immer praezise ohne
+    Vereinfachung (:data:`~opencivil.nachweis.rechenwahl.VERFORMUNGSARTEN`),
+    Vorgabe Bemessungswerte.
+    """
+
+    knicken_wahl_widerstand: KnickWiderstandswahl = field(default_factory=KnickWiderstandswahl)
+    """
+    Womit N_Rd(M_Ed = N_Ed·e_tot) gerechnet wird -- Vorgabe die
+    0.85·x-Vereinfachung, ohne Handrechnung. Mit derselben Wahl wie die
+    Tragsicherheit ist es deren Linie.
+    """
+
+    k_c: float = druckfeld()
+    """Abminderung der Betondruckfestigkeit in der Druckdiagonalen."""
+
+    beschreibung: str = ""
+    """
+    Freier Text zum Bauteil -- was sonst nirgends hinpasst.
+
+    Wo es liegt, woher die Schnittgroessen stammen, was noch zu klaeren ist.
+    Geht in keine Rechnung ein und steht in keinem Nachweis; er wird
+    gespeichert und wieder angezeigt, mehr nicht. Genau dafuer gibt es ihn:
+    ohne ein solches Feld landen solche Saetze im Namen.
+    """
 
 
 @dataclass

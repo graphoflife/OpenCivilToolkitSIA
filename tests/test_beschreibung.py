@@ -17,7 +17,7 @@ from opencivil.projekt import (
     SkriptEintrag, SpannungsfallEintrag, StablastEintrag, StabquerschnittEintrag,
     SystemknotenEintrag, SystemlinieEintrag, VerformungEintrag, VerformungsfallEintrag,
 )
-from opencivil.projekt.eintraege import Beschreibung
+from opencivil.projekt.eintraege import Beschreibung, Querschnittsangaben
 from opencivil.projekt.querschnittsanalyse import (
     FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QAGebrauchsfallEintrag,
     QAGebrauchsliste, QAKnickEintrag, QALastfallEintrag, QASpannungsfallEintrag,
@@ -396,6 +396,7 @@ class TestVorgabenAnEinerStelle(unittest.TestCase):
     FAELLE = [
         (QuerschnittEintrag, {"kennung": "q", "name": "q", "beton": "b"},
          {"kennung": "q", "name": "q", "beton": "b"}),
+        (Querschnittsangaben, {"kennung": "q", "name": "q"}, {"kennung": "q", "name": "q"}),
         (MaterialEintrag, {"kennung": "m", "art": "beton", "sorte": "C30/37"},
          {"kennung": "m", "art": "beton", "sorte": "C30/37"}),
         (PostenEintrag, {}, {}),

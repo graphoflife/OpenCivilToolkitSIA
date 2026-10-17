@@ -20,24 +20,24 @@ from opencivil.bewehrungssuche.laengs import Suchmodus
 from opencivil.core.einheiten import MM
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
 from opencivil.projekt.eintraege import (
-    HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste,
-    KnickEintrag, KombinationEintrag, LageEintrag, ObergrenzeEintrag,
-    KnickVerformungswahl, KnickWiderstandswahl, PostenEintrag, QuerkraftbewehrungEintrag,
-    RechenwahlEintrag, SpannungsfallEintrag,
-    VerformungEintrag, VerformungsfallEintrag, druckfeld, eindeutig, x_d_grenze,
+    HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Gebrauchsliste, KnickEintrag, KombinationEintrag,
+    LageEintrag, ObergrenzeEintrag, PostenEintrag, QuerkraftbewehrungEintrag,
+    Querschnittsangaben, RechenwahlEintrag, SpannungsfallEintrag, VerformungEintrag,
+    VerformungsfallEintrag, eindeutig,
 )
-from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt.lesen import ProjektFehler, bereich
 
 
 @dataclass
-class QuerschnittEintrag(Beschreibung):
-    """Eine Stahlbeton-Platte mit genau vier Bewehrungslagen."""
+class QuerschnittEintrag(Querschnittsangaben):
+    """
+    Eine Stahlbeton-Platte mit genau vier Bewehrungslagen. Was sie mit dem
+    gezeichneten Querschnitt gleich angibt, steht in der Grundlage
+    (:class:`~opencivil.projekt.eintraege.Querschnittsangaben`).
+    """
 
     BEZEICHNUNG = "Platte"
 
-    kennung: str
-    name: str
     beton: str
     h: float = bereich(300.0, heisst="Dicke h", einheit=MM, ueber=0.0)
     b: float = bereich(1000.0, heisst="Breite b", einheit=MM, ueber=0.0)
@@ -49,41 +49,9 @@ class QuerschnittEintrag(Beschreibung):
     einlagenhoehe: float = bereich(0.0, heisst="Einlagenhöhe", einheit=MM, ab=0.0)
     """Höhe einer Einlage in mm."""
 
-    k_c: float = druckfeld()
-    """Abminderung der Betondruckfestigkeit in der Druckdiagonalen."""
-
     querkraftbewehrung: QuerkraftbewehrungEintrag = field(
         default_factory=QuerkraftbewehrungEintrag)
     """Bügel; ohne Durchmesser heisst: keine."""
-
-    rissanforderung: Rissanforderung = Rissanforderung.NORMAL
-    """Anforderung an die Rissbildung -- ``normal``, ``erhoeht`` oder ``hoch``."""
-
-    beschreibung: str = ""
-    """
-    Freier Text zur Platte -- was sonst nirgends hinpasst.
-
-    Wo sie liegt, woher die Schnittgroessen stammen, was noch zu klaeren ist.
-    Geht in keine Rechnung ein und steht in keinem Nachweis; sie wird
-    gespeichert und wieder angezeigt, mehr nicht. Genau dafuer gibt es sie:
-    ohne ein solches Feld landen solche Saetze im Namen der Platte.
-    """
-
-    zwaengung: bool = False
-    """
-    Ob mit einer Normalkraft-Zwaengung zu rechnen ist.
-
-    Vorgabe aus: eine Zwaengung ist eine Annahme ueber das Tragwerk, keine
-    Eigenschaft der Platte. Wer sie braucht, schaltet sie ein.
-
-    Ein Schalter, nicht zwei: nachgewiesen wird nur die Tragrichtung x. Die
-    y-Lagen stehen im Querschnitt, weil sie die statische Hoehe von x
-    bestimmen und zum Bewehrungsgehalt zaehlen -- nachgewiesen werden sie
-    nicht.
-    """
-
-    zwaengung_begrenzt: bool = False
-    """Ob die Zwaengung auf 500 mm Plattendicke begrenzt angesetzt wird."""
 
     haeufig: Gebrauchsliste = field(
         default_factory=lambda: Gebrauchsliste(anteil=HAEUFIG_ANTEIL))
@@ -98,20 +66,6 @@ class QuerschnittEintrag(Beschreibung):
 
     knickfaelle: List[KnickEintrag] = field(default_factory=list)
     """Knicknachweise; leer heisst: keiner."""
-
-    knicken_wahl_verformung: KnickVerformungswahl = field(default_factory=KnickVerformungswahl)
-    """
-    Womit die Ausmitte e_2d gerechnet wird -- immer praezise ohne
-    Vereinfachung (:data:`~opencivil.nachweis.rechenwahl.VERFORMUNGSARTEN`),
-    Vorgabe Bemessungswerte.
-    """
-
-    knicken_wahl_widerstand: KnickWiderstandswahl = field(default_factory=KnickWiderstandswahl)
-    """
-    Womit N_Rd(M_Ed = N_Ed·e_tot) gerechnet wird -- Vorgabe die
-    0.85·x-Vereinfachung, ohne Handrechnung. Mit derselben Wahl wie die
-    Tragsicherheit ist es deren Linie.
-    """
 
     spannungsfaelle: List[SpannungsfallEintrag] = field(default_factory=list)
     """Auswertungen am Querschnitt -- Bilder, keine Nachweise."""
@@ -166,30 +120,6 @@ class QuerschnittEintrag(Beschreibung):
 
     automatik_querkraft_teilungen: List[float] = field(
         default_factory=lambda: [100.0, 150.0, 200.0])
-
-    sproede: bool = False
-    """Ob der Nachweis gegen sproedes Versagen gefuehrt wird."""
-
-    zwaengung_biegung: bool = False
-    """Ob die Zwaengung auf Biegung nachgewiesen wird."""
-
-    zwaengung_biegung_kriechzahl: float = bereich(0.0, heisst="Kriechzahl φ", ab=0.0)
-    """Die Kriechzahl phi der Zwaengung auf Biegung: ``n = (E_s/E_cm)*(1+phi)``."""
-
-    duktilitaet: bool = False
-    """
-    Ob der Duktilitaetsnachweis gefuehrt wird.
-
-    Ein Schalter fuer die Platte und nicht einer je Lage. Gerechnet werden
-    beide x-Lagen -- die obere traegt das Stuetz-, die untere das Feldmoment
-    --, und in der Zusammenfassung steht die unguenstigere. Vier Schalter fuer
-    einen Nachweis waren vier Gelegenheiten, den falschen zu vergessen; die
-    Frage ist ohnehin, ob der Querschnitt sein Versagen ankuendigt, und die
-    beantwortet die schlechtere Lage.
-    """
-
-    x_d_max: float = x_d_grenze()
-    """Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis."""
 
     lagen: List[LageEintrag] = field(default_factory=list)
     """Genau vier, Index 0 = 1. Lage (unterste). Fehlen welche, sind sie leer."""

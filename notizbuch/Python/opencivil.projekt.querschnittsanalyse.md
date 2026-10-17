@@ -1,5 +1,5 @@
 ---
-erzeugt: e22c969f9e9b
+erzeugt: 2b0167da3598
 art: modul
 tags: [modul]
 ---
@@ -311,14 +311,14 @@ Elemente danach heissen weiter so wie vorher.
 
 ```python
 @dataclass
-class QuerschnittsanalyseEintrag(Beschreibung)
+class QuerschnittsanalyseEintrag(Querschnittsangaben)
 ```
 
 Ein gezeichneter Querschnitt mit Bewehrung, Schubwaenden und Lastfaellen.
+Was er mit der Platte gleich angibt, steht in der Grundlage
+([[opencivil.projekt.eintraege#Querschnittsangaben|Querschnittsangaben]]).
 
 - `BEZEICHNUNG = 'Querschnitt'`
-- `kennung: str`
-- `name: str`
 - `knoten: List[KnotenEintrag] = field(default_factory=list)`
 - `flaechen: List[FlaecheEintrag] = field(default_factory=list)`
 - `staebe: List[StabEintrag] = field(default_factory=list)`
@@ -329,24 +329,12 @@ Ein gezeichneter Querschnitt mit Bewehrung, Schubwaenden und Lastfaellen.
 - `lastfaelle: List[QALastfallEintrag] = field(default_factory=list)`
 - `einachsig: bool = False` – Nur Biegung um y: die Nulllinie bleibt waagrecht, M_z und V_y zaehlen nicht, und Duktilitaet und sproedes Versagen gibt es nur in y. Torsion bleibt. Bei einem unsymmetrischen Querschnitt ist das eine Naeherung -- dasselbe, was die Platte immer tut.
 - `alpha_min: int = neigung(ALPHA_MIN, 'α_min')`
-- `alpha_max: int = neigung(ALPHA_MAX, 'α_max')`
-- `k_c: float = druckfeld()` – Grenzen der Druckfeldneigung und Abminderung der Druckdiagonalen -- wie bei der Platte.
+- `alpha_max: int = neigung(ALPHA_MAX, 'α_max')` – Die Grenzen der Druckfeldneigung in den Schubwaenden -- wie bei den Buegeln der Platte.
 - `laengszugkraft: bool = False` – Ob die Laengszugkraft aus Querkraft und Torsion in den M-N-Nachweis eingeht: das Druckfeld jeder Schubwand braucht in Laengsrichtung Zug.
-- `duktilitaet: bool = False`
-- `x_d_max: float = x_d_grenze()`
-- `sproede: bool = False`
-- `rissanforderung: Rissanforderung = Rissanforderung.NORMAL` – Anforderung an die Rissbildung -- `normal`, `erhoeht` oder `hoch`, wie bei der Platte.
-- `zwaengung: bool = False` – Ob die Zwaengung auf Normalkraft nachgewiesen wird -- am ganzen Querschnitt.
-- `zwaengung_begrenzt: bool = False` – Ob die rissaktive Dicke dabei hoechstens 500 mm betraegt.
-- `zwaengung_biegung: bool = False` – Ob die Zwaengung auf Biegung nachgewiesen wird -- je Richtung.
-- `zwaengung_biegung_kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)` – Die Kriechzahl φ der Zwaengung auf Biegung: der Beton mit `E_cm/(1+φ)`.
 - `quasistaendig: QAGebrauchsliste = field(default_factory=lambda: QAGebrauchsliste(anteil=QUASISTAENDIG_A…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
 - `haeufig: QAGebrauchsliste = field(default_factory=lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL))` – Die haeufigen Lastfaelle -- gegen das Fliessen, bei erhoehter und hoher Anforderung.
 - `knickfaelle: List[QAKnickEintrag] = field(default_factory=list)` – Knicknachweise, je in einer Richtung; leer heisst: keiner.
-- `knicken_wahl_verformung: KnickVerformungswahl = field(default_factory=KnickVerformungswahl)`
-- `knicken_wahl_widerstand: KnickWiderstandswahl = field(default_factory=KnickWiderstandswahl)` – Womit das Knicken die Ausmitte e_2d und den Widerstand rechnet -- wie bei der Platte: die Verformung immer praezise, der Widerstand mit 0.85·x oder praezise.
 - `spannungsfaelle: List[QASpannungsfallEintrag] = field(default_factory=list)` – Die Spannung-Dehnung-Analysen -- kein Nachweis, ein Blick in den Querschnitt.
-- `beschreibung: str = ''` – Freier Text -- geht in keine Rechnung ein, wie bei der Platte.
 
 #### QuerschnittsanalyseEintrag.wahl
 
@@ -529,7 +517,6 @@ wird danach, was man braucht.
 ## Braucht
 
 - [[opencivil.nachweis.rechenwahl]]
-- [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.netz]]

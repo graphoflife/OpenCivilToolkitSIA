@@ -1,5 +1,5 @@
 ---
-erzeugt: 9588eb3762fd
+erzeugt: 5d256792e579
 art: modul
 tags: [modul]
 ---
@@ -78,6 +78,5 @@ Ob der Nachweis gegen Fliessen unter haeufiger Einwirkung verlangt ist (Tabelle 
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.spannungsgrenzen]]
 - [[opencivil.nachweis.stabgrenzen]]
-- [[opencivil.projekt.platte]]
-- [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.projekt.eintraege]]
 - [[opencivil.web.api]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: 7d48d77cef95
+erzeugt: 732eaf2d7744
 art: modul
 tags: [modul]
 ---
@@ -23,14 +23,14 @@ Was daraus gerechnet wird, steht in [[opencivil.projekt.aufbau]].
 
 ```python
 @dataclass
-class QuerschnittEintrag(Beschreibung)
+class QuerschnittEintrag(Querschnittsangaben)
 ```
 
-Eine Stahlbeton-Platte mit genau vier Bewehrungslagen.
+Eine Stahlbeton-Platte mit genau vier Bewehrungslagen. Was sie mit dem
+gezeichneten Querschnitt gleich angibt, steht in der Grundlage
+([[opencivil.projekt.eintraege#Querschnittsangaben|Querschnittsangaben]]).
 
 - `BEZEICHNUNG = 'Platte'`
-- `kennung: str`
-- `name: str`
 - `beton: str`
 - `h: float = bereich(300.0, heisst='Dicke h', einheit=MM, ueber=0.0)`
 - `b: float = bereich(1000.0, heisst='Breite b', einheit=MM, ueber=0.0)`
@@ -38,18 +38,11 @@ Eine Stahlbeton-Platte mit genau vier Bewehrungslagen.
 - `ueberdeckung_oben: float = bereich(30.0, heisst='Überdeckung oben', einheit=MM, ab=0.0)`
 - `d_max: float = bereich(32.0, heisst='Grösstkorn D_max', einheit=MM, ueber=0.0)` – Grösstkorndurchmesser in mm.
 - `einlagenhoehe: float = bereich(0.0, heisst='Einlagenhöhe', einheit=MM, ab=0.0)` – Höhe einer Einlage in mm.
-- `k_c: float = druckfeld()` – Abminderung der Betondruckfestigkeit in der Druckdiagonalen.
 - `querkraftbewehrung: QuerkraftbewehrungEintrag = field(default_factory=QuerkraftbewehrungEintrag)` – Bügel; ohne Durchmesser heisst: keine.
-- `rissanforderung: Rissanforderung = Rissanforderung.NORMAL` – Anforderung an die Rissbildung -- `normal`, `erhoeht` oder `hoch`.
-- `beschreibung: str = ''` – Freier Text zur Platte -- was sonst nirgends hinpasst. Wo sie liegt, woher die Schnittgroessen stammen, was noch zu klaeren ist. Geht in keine Rechnung ein und steht in keinem Nachweis; sie wird gespeichert und wieder angezeigt, mehr nicht. Genau dafuer gibt es sie: ohne ein solches Feld landen solche Saetze im Namen der Platte.
-- `zwaengung: bool = False` – Ob mit einer Normalkraft-Zwaengung zu rechnen ist. Vorgabe aus: eine Zwaengung ist eine Annahme ueber das Tragwerk, keine Eigenschaft der Platte. Wer sie braucht, schaltet sie ein. Ein Schalter, nicht zwei: nachgewiesen wird nur die Tragrichtung x. Die y-Lagen stehen im Querschnitt, weil sie die statische Hoehe von x bestimmen und zum Bewehrungsgehalt zaehlen -- nachgewiesen werden sie nicht.
-- `zwaengung_begrenzt: bool = False` – Ob die Zwaengung auf 500 mm Plattendicke begrenzt angesetzt wird.
 - `haeufig: Gebrauchsliste = field(default_factory=lambda: Gebrauchsliste(anteil=HAEUFIG_ANTEIL))` – Die haeufigen Lastfaelle -- fuer den Nachweis gegen Fliessen.
 - `quasistaendig: Gebrauchsliste = field(default_factory=lambda: Gebrauchsliste(anteil=QUASISTAENDIG_ANT…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
 - `verformung: VerformungEintrag = field(default_factory=VerformungEintrag)` – Die Verformungsfaelle und das phi ihres Vergroesserungsfaktors.
 - `knickfaelle: List[KnickEintrag] = field(default_factory=list)` – Knicknachweise; leer heisst: keiner.
-- `knicken_wahl_verformung: KnickVerformungswahl = field(default_factory=KnickVerformungswahl)` – Womit die Ausmitte e_2d gerechnet wird -- immer praezise ohne Vereinfachung ([[opencivil.nachweis.rechenwahl#Konstanten|VERFORMUNGSARTEN]]), Vorgabe Bemessungswerte.
-- `knicken_wahl_widerstand: KnickWiderstandswahl = field(default_factory=KnickWiderstandswahl)` – Womit N_Rd(M_Ed = N_Ed·e_tot) gerechnet wird -- Vorgabe die 0.85·x-Vereinfachung, ohne Handrechnung. Mit derselben Wahl wie die Tragsicherheit ist es deren Linie.
 - `spannungsfaelle: List[SpannungsfallEintrag] = field(default_factory=list)` – Auswertungen am Querschnitt -- Bilder, keine Nachweise.
 - `automatik_modus: Suchmodus = Suchmodus.GRUND_OHNE_ZULAGE_MIT` – Wonach das Bewehrungswerkzeug sucht -- siehe `bewehrungssuche.Suchmodus`.
 - `automatik_dicke: bool = False` – Ob das Werkzeug dazu die duennste Plattendicke sucht («Plattendicke optimieren»). Ein Schalter neben dem Modus und nicht ein eigener Modus: je Dicke laeuft dieselbe Suche im gewaehlten Modus.
@@ -60,11 +53,6 @@ Eine Stahlbeton-Platte mit genau vier Bewehrungslagen.
 - `automatik_mindestdicke: float = 150.0` – Duenner sucht die Dickenoptimierung keine Platte -- in mm.
 - `automatik_querkraft: bool = False` – Ob auch die Buegel gesucht werden.
 - `automatik_querkraft_teilungen: List[float] = field(default_factory=lambda: [100.0, 150.0, 200.0])`
-- `sproede: bool = False` – Ob der Nachweis gegen sproedes Versagen gefuehrt wird.
-- `zwaengung_biegung: bool = False` – Ob die Zwaengung auf Biegung nachgewiesen wird.
-- `zwaengung_biegung_kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)` – Die Kriechzahl phi der Zwaengung auf Biegung: `n = (E_s/E_cm)*(1+phi)`.
-- `duktilitaet: bool = False` – Ob der Duktilitaetsnachweis gefuehrt wird. Ein Schalter fuer die Platte und nicht einer je Lage. Gerechnet werden beide x-Lagen -- die obere traegt das Stuetz-, die untere das Feldmoment --, und in der Zusammenfassung steht die unguenstigere. Vier Schalter fuer einen Nachweis waren vier Gelegenheiten, den falschen zu vergessen; die Frage ist ohnehin, ob der Querschnitt sein Versagen ankuendigt, und die beantwortet die schlechtere Lage.
-- `x_d_max: float = x_d_grenze()` – Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis.
 - `lagen: List[LageEintrag] = field(default_factory=list)` – Genau vier, Index 0 = 1. Lage (unterste). Fehlen welche, sind sie leer.
 - `richtung_lage1: Richtung = Richtung.Y` – Richtung der 1. Lage; die 2. bekommt die Gegenrichtung. Vorgabe y, damit x auf der 2. und 3. Lage liegt -- innen. Das ist der unguenstigere Fall und der haeufigere: die Tragrichtung liegt selten zu unterst, weil die Querrichtung darunter durchlaeuft. Wer es anders verlegt, stellt es um.
 - `richtung_lage4: Richtung = Richtung.Y` – Richtung der 4. Lage; die 3. bekommt die Gegenrichtung.
@@ -200,7 +188,6 @@ den Vorgabewerten der Felder.
 
 - [[opencivil.bewehrungssuche.laengs]]
 - [[opencivil.core.einheiten]]
-- [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.querschnitt.platte]]
