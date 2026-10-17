@@ -1,5 +1,5 @@
 ---
-erzeugt: 99955bf9e6af
+erzeugt: 9bea252bb346
 art: modul
 tags: [modul]
 ---
@@ -221,14 +221,11 @@ Rissaktive Dicke, wirksame Zugfestigkeit je Beton und die Risskraft.
 ### ZwaengungBiegungQA
 
 ```python
-class ZwaengungBiegungQA(Nachweis)
+class ZwaengungBiegungQA(Biegezwang)
 ```
 
 Je Richtung das Rissmoment gegen das Moment, bei dem der erste gezogene
 Stab sein `sigma_s,adm` erreicht.
-
-- `THEMA = 'Zwängung auf Biegung'`
-- `LANGNAME = 'Risse: Zwängung Biegung'`
 
 #### ZwaengungBiegungQA.pruefe
 
@@ -266,6 +263,7 @@ findet, liegt jenseits der Grenze: der Stahl fliesst dort laengst.
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.gebrauchsebene]]
+- [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.richtungsnachweise]]

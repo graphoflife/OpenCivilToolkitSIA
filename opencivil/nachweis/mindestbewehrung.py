@@ -444,7 +444,35 @@ class Momentlagenergebnis:
         return self.a_s > 0.0
 
 
-class ZwaengungBiegung(Nachweis):
+class Biegezwang(Nachweis):
+    """
+    Was die Zwaengung auf Biegung an der Platte (:class:`ZwaengungBiegung`)
+    und am gezeichneten Querschnitt
+    (:class:`~opencivil.nachweis.qa_gebrauch.ZwaengungBiegungQA`) teilt: Name,
+    Thema, Normstelle und den ersten Satz der Herleitung.
+
+    Mehr teilen sie nicht. Die Platte rechnet je Lage von Hand, mit dem
+    Hebelarm ``d - x/3``; der gezeichnete Querschnitt sucht je Zugseite das
+    Moment, bei dem der erste gezogene Stab seine Grenze erreicht. Gleich ist
+    nur der Vergleich ``M_s,adm >= M_Riss`` -- ein gemeinsamer Nachweis haette
+    fast nur weitergereicht (Benutzer, 2026-10-17).
+    """
+
+    THEMA = "Zwängung auf Biegung"
+    LANGNAME = "Risse: Zwängung Biegung"
+    REFERENZ = "SIA 262:2025, 4.4.2"
+
+    #: Der erste Satz der Herleitung.
+    EINLEITUNG = (
+        "Eine aufgezwungene Krümmung erzeugt beim Reissen ein Moment, das "
+        "die Bewehrung übernehmen muss – ohne über die zulässige "
+        "Stahlspannung zu kommen. Nicht zu verwechseln mit dem Nachweis "
+        "gegen sprödes Versagen: dort steht der Biegewiderstand gegen das "
+        "Rissmoment, hier die Stahlspannung gegen ihre Grenze."
+    )
+
+
+class ZwaengungBiegung(Biegezwang):
     """
     Zwängung auf Biegung, je gewählter Lage.
 
@@ -457,9 +485,6 @@ class ZwaengungBiegung(Nachweis):
     Spannungen sind Gebrauchsspannungen, also elastisch. Eine plastische
     Druckzone gibt es in diesem Augenblick nicht.
     """
-
-    THEMA = "Zwängung auf Biegung"
-    LANGNAME = "Risse: Zwängung Biegung"
 
     def __init__(
         self,
@@ -493,9 +518,8 @@ class ZwaengungBiegung(Nachweis):
             l.nummer: grad_def(
                 f"{basis}.lage{l.nummer}.erfuellungsgrad",
                 rf"\alpha_{{eff,ZB,{l.nummer},{r}}}",
-                (f"Erfüllungsgrad Zwängung auf Biegung – "
-                 f"{l.nummer}. Lage {r}"),
-                "SIA 262:2025, 4.4.2",
+                f"Erfüllungsgrad {self.THEMA} – {l.nummer}. Lage {r}",
+                self.REFERENZ,
             )
             for l in self.lagen
         }
@@ -526,9 +550,8 @@ class ZwaengungBiegung(Nachweis):
             basis,
             ausgaben=list(self.d_ausnutzung.values()),
             bezuege=bezuege,
-            titel=(f"Zwängung auf Biegung {richtung.beschriftung} – "
-                   f"{querschnitt.name}"),
-            referenz="SIA 262:2025, 4.4.2",
+            titel=f"{self.THEMA} {richtung.beschriftung} – {querschnitt.name}",
+            referenz=self.REFERENZ,
             abschnitt=querschnitt.abschnitt,
         )
 
@@ -629,16 +652,9 @@ class ZwaengungBiegung(Nachweis):
 
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben,
                           groessen: Momentgroessen) -> None:
-        p.titel(f"Zwängung auf Biegung – {self.richtung.beschriftung}")
-        p.erklaerung(
-            "Eine aufgezwungene Krümmung erzeugt beim Reissen ein Moment, das "
-            "die Bewehrung übernehmen muss – ohne über die zulässige "
-            "Stahlspannung zu kommen. Nicht zu verwechseln mit dem Nachweis "
-            "gegen sprödes Versagen: dort steht der Biegewiderstand gegen das "
-            "Rissmoment, hier die Stahlspannung gegen ihre Grenze."
-        )
-        protokoll_rissmoment_rechteck(p, e, groessen, basis=self.id,
-                                      referenz="SIA 262:2025, 4.4.2")
+        p.titel(f"{self.THEMA} – {self.richtung.beschriftung}")
+        p.erklaerung(self.EINLEITUNG)
+        protokoll_rissmoment_rechteck(p, e, groessen, basis=self.id, referenz=self.REFERENZ)
         p.erklaerung(
             "Das Rissmoment gilt für den ungerissenen Bruttoquerschnitt – den "
             "Zustand vor dem Riss. Der Widerstand dagegen wird am gerissenen "
@@ -664,7 +680,7 @@ class ZwaengungBiegung(Nachweis):
     def _protokoll_lage(self, p: Protokoll, e: Eingaben, erg: Momentlagenergebnis,
                         groessen: Momentgroessen) -> None:
         nummer = erg.lage.nummer
-        p.titel(f"Zwängung auf Biegung – {nummer}. Lage {self.richtung.value}", ebene=3)
+        p.titel(f"{self.THEMA} – {nummer}. Lage {self.richtung.value}", ebene=3)
 
         if not erg.machbar:
             p.text(erg.begruendung)

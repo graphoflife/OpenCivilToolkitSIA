@@ -1,5 +1,5 @@
 ---
-erzeugt: 7291fce34fc1
+erzeugt: ec1d23d3ce1b
 art: modul
 tags: [modul]
 ---
@@ -221,10 +221,32 @@ Was der Nachweis gegen das Rissmoment fuer eine Lage gefunden hat.
 def machbar(self) -> bool
 ```
 
+### Biegezwang
+
+```python
+class Biegezwang(Nachweis)
+```
+
+Was die Zwaengung auf Biegung an der Platte ([[opencivil.nachweis.mindestbewehrung#ZwaengungBiegung|ZwaengungBiegung]])
+und am gezeichneten Querschnitt
+([[opencivil.nachweis.qa_gebrauch#ZwaengungBiegungQA|ZwaengungBiegungQA]]) teilt: Name,
+Thema, Normstelle und den ersten Satz der Herleitung.
+
+Mehr teilen sie nicht. Die Platte rechnet je Lage von Hand, mit dem
+Hebelarm `d - x/3`; der gezeichnete Querschnitt sucht je Zugseite das
+Moment, bei dem der erste gezogene Stab seine Grenze erreicht. Gleich ist
+nur der Vergleich `M_s,adm >= M_Riss` -- ein gemeinsamer Nachweis haette
+fast nur weitergereicht (Benutzer, 2026-10-17).
+
+- `THEMA = 'Zwängung auf Biegung'`
+- `LANGNAME = 'Risse: Zwängung Biegung'`
+- `REFERENZ = 'SIA 262:2025, 4.4.2'`
+- `EINLEITUNG = 'Eine aufgezwungene Krümmung erzeugt beim Reissen ein Moment, das die…` – Der erste Satz der Herleitung.
+
 ### ZwaengungBiegung
 
 ```python
-class ZwaengungBiegung(Nachweis)
+class ZwaengungBiegung(Biegezwang)
 ```
 
 Zwängung auf Biegung, je gewählter Lage.
@@ -237,9 +259,6 @@ Der aufnehmbare Moment wird am **gerissenen** Querschnitt bestimmt --
 unmittelbar nach dem Riss ist der Querschnitt genau dort, und die
 Spannungen sind Gebrauchsspannungen, also elastisch. Eine plastische
 Druckzone gibt es in diesem Augenblick nicht.
-
-- `THEMA = 'Zwängung auf Biegung'`
-- `LANGNAME = 'Risse: Zwängung Biegung'`
 
 #### ZwaengungBiegung.pruefe
 
@@ -283,6 +302,7 @@ Lagen einen Stahl traegt.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.projekt.aufbau]]

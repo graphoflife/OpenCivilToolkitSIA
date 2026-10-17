@@ -71,6 +71,7 @@ from opencivil.material.basis import Baustoff, mit_index
 from opencivil.nachweis.gebrauchsebene import (
     EINACHSIG, SUCHE_DER_EBENE, Gebrauchsebene, gebrauchsebene, protokoll_ebene,
 )
+from opencivil.nachweis.mindestbewehrung import Biegezwang
 from opencivil.nachweis.querschnittsloeser import VERFEHLTE_EBENE
 from opencivil.nachweis.rechenwahl import protokoll_gesetze_nach_wahl, protokoll_rechenwahl
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
@@ -367,14 +368,11 @@ class RissnormalkraftQA(Nachweis):
 # ===========================================================================
 
 
-class ZwaengungBiegungQA(Nachweis):
+class ZwaengungBiegungQA(Biegezwang):
     """
     Je Richtung das Rissmoment gegen das Moment, bei dem der erste gezogene
     Stab sein ``sigma_s,adm`` erreicht.
     """
-
-    THEMA = "Zwängung auf Biegung"
-    LANGNAME = "Risse: Zwängung Biegung"
 
     def __init__(self, analyse: Querschnittsanalyse, *, einachsig: bool,
                  anforderung: Rissanforderung,
@@ -387,13 +385,12 @@ class ZwaengungBiegungQA(Nachweis):
         self.d_ausnutzung: Dict[str, WertDef] = {
             name: grad_def(f"{basis}.{kennung_aus(name)}.erfuellungsgrad",
                            rf"\alpha_{{eff,ZB,{als_text(name)}}}",
-                           f"Erfüllungsgrad Zwängung auf Biegung – {name}",
-                           "SIA 262:2025, 4.4.2")
+                           f"Erfüllungsgrad {self.THEMA} – {name}", self.REFERENZ)
             for name, _, _ in richtungen(einachsig)}
         super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()),
                          bezuege=analyse.grundbezuege() + rissbezuege(analyse),
-                         titel=f"Zwängung auf Biegung – {analyse.name}",
-                         referenz="SIA 262:2025, 4.4.2", abschnitt=analyse.abschnitt)
+                         titel=f"{self.THEMA} – {analyse.name}",
+                         referenz=self.REFERENZ, abschnitt=analyse.abschnitt)
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         a = self.analyse
@@ -402,7 +399,7 @@ class ZwaengungBiegungQA(Nachweis):
         self._protokoll_ansatz(p, e)
         grenzen = grenzen_aus_rissbreite(a, e, staebe, self.anforderung)
         protokoll_rissbreitengrenzen(p, e, a, staebe, grenzen, self.anforderung, self.id,
-                                     referenz="SIA 262:2025, 4.4.2")
+                                     referenz=self.REFERENZ)
         protokoll_dehnungsebene(p)
         p.erklaerung(EINACHSIG if self.einachsig else SUCHE_DER_EBENE)
 
@@ -421,8 +418,7 @@ class ZwaengungBiegungQA(Nachweis):
                 continue
             M_s_adm_si, ebene, stab = gefunden
             M_Riss = protokoll_rissmoment(p, e, a, werte, brutto, riss, M_y, M_z,
-                                          einachsig=self.einachsig,
-                                          referenz="SIA 262:2025, 4.4.2")
+                                          einachsig=self.einachsig, referenz=self.REFERENZ)
             M_s_adm = werte.moment("M_s_adm", r"M_{s,adm}", M_s_adm_si, "Widerstand")
             p.wert(M_s_adm, titel="Moment, bei dem der erste gezogene Stab σ_s,adm erreicht")
             protokoll_ebene(p, werte, ebene, self.einachsig)
@@ -432,7 +428,7 @@ class ZwaengungBiegungQA(Nachweis):
                         titel=f"An der Grenze: {staebe[stab].ort}")
             erfuellt = M_s_adm_si >= riss.M_Riss
             p.gleichung(bedingung(angabe(M_s_adm), r"\ge", angabe(M_Riss), erfuellt),
-                        titel="Zwängung auf Biegung")
+                        titel=self.THEMA)
             grad = M_s_adm_si / riss.M_Riss
             grad_formel(p, d_grad, grad, M_s_adm, M_Riss, erfuellt)
             ergebnis[d_grad.id] = Groesse(grad, EINHEITSLOS)
@@ -506,13 +502,8 @@ class ZwaengungBiegungQA(Nachweis):
         return gefunden if gefunden is not None and gefunden[2] >= 0 else None
 
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben) -> None:
-        p.titel("Zwängung auf Biegung")
-        p.erklaerung(
-            "Eine aufgezwungene Krümmung erzeugt beim Reissen ein Moment, das "
-            "die Bewehrung übernehmen muss – ohne über die zulässige "
-            "Stahlspannung zu kommen. Nicht zu verwechseln mit dem Nachweis "
-            "gegen sprödes Versagen: dort steht der Biegewiderstand gegen das "
-            "Rissmoment, hier die Stahlspannung gegen ihre Grenze.")
+        p.titel(self.THEMA)
+        p.erklaerung(self.EINLEITUNG)
         p.erklaerung(
             "Am gezeichneten Querschnitt je Richtung: dasselbe Rissmoment wie beim "
             "spröden Versagen, gehalten gegen das Moment, bei dem der erste gezogene "
@@ -522,7 +513,7 @@ class ZwaengungBiegungQA(Nachweis):
             "gedrückte Bewehrung wirkt mit.")
         p.ansatz(r"\max_i \frac{\sigma_{s,i}(M_{s,adm})}{\sigma_{s,adm,i}} = 1"
                  r"\qquad M_{s,adm} \ge M_{Riss}",
-                 titel="Zwängung auf Biegung, je Stab", referenz="SIA 262:2025, 4.4.2",
+                 titel=f"{self.THEMA}, je Stab", referenz=self.REFERENZ,
                  name="Moment der Bewehrung bei zulässiger Stahlspannung")
         protokoll_spannung_ungerissen(p, einachsig=self.einachsig)
         protokoll_rechenwahl(p, self.wahl, self.id)

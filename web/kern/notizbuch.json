@@ -3040,6 +3040,7 @@
         "Rissnormalkraft._n_s_adm",
         "Momentlagenergebnis",
         "Momentlagenergebnis.machbar",
+        "Biegezwang",
         "ZwaengungBiegung",
         "ZwaengungBiegung.pruefe",
         "ZwaengungBiegung._m_s_adm",
