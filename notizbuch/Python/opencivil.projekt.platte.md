@@ -1,5 +1,5 @@
 ---
-erzeugt: 2717ce2ad258
+erzeugt: 89716068801c
 art: modul
 tags: [modul]
 ---
@@ -78,6 +78,27 @@ def richtung_von(self, nummer: int) -> Richtung
 ```
 
 Richtung der Lage 1..4 -- die Paare (1,2) und (3,4) sind gekoppelt.
+
+#### QuerschnittEintrag.materialien
+
+```python
+def materialien(self) -> List[str]
+```
+
+Jedes Material, auf das die Platte zeigt -- Beton, Stahl jeder Lage,
+Buegelstahl --, je einmal. Jeder Verweis zaehlt, auch einer, der gerade nichts traegt: wer das
+Material loescht, liesse ihn ins Leere zeigen, und spaetestens die
+naechste Aenderung machte daraus einen Fehler beim Rechnen.
+Bis 2026-10-17 kannte der Loeschschutz der Oberflaeche den Buegelstahl
+nicht.
+
+#### QuerschnittEintrag.bezuege
+
+```python
+def bezuege(self) -> List[str]
+```
+
+Die Bauteile, deren Querschnitt die Platte nimmt -- keine.
 
 #### QuerschnittEintrag.pruefen
 

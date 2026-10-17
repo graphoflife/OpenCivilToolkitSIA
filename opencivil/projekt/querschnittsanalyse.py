@@ -414,7 +414,12 @@ class QuerschnittsanalyseEintrag(Beschreibung):
         return WerkstoffwahlEintrag(material=material)
 
     def materialien(self) -> List[str]:
-        """Jedes Material, das die Analyse benutzt, in der Reihenfolge des ersten Auftretens."""
+        """
+        Jedes Material, auf das die Analyse zeigt, in der Reihenfolge des
+        ersten Auftretens. Jeder Verweis zaehlt, auch einer, der gerade nichts traegt: wer das
+        Material loescht, liesse ihn ins Leere zeigen, und spaetestens die
+        naechste Aenderung machte daraus einen Fehler beim Rechnen.
+        """
         gesehen: List[str] = []
         for kennung in ([f.material for f in self.flaechen]
                         + [s.stahl for s in self.staebe]
@@ -423,6 +428,10 @@ class QuerschnittsanalyseEintrag(Beschreibung):
             if kennung and kennung not in gesehen:
                 gesehen.append(kennung)
         return gesehen
+
+    def bezuege(self) -> List[str]:
+        """Die Bauteile, deren Querschnitt die Analyse nimmt -- keine."""
+        return []
 
     def elemente(self) -> Elemente:
         """Die Elemente mit Name und Kennung, Koordinaten in mm -- siehe :class:`Elemente`."""

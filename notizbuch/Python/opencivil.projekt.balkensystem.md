@@ -1,5 +1,5 @@
 ---
-erzeugt: 7bee6c1d55f6
+erzeugt: 622508caaa7a
 art: modul
 tags: [modul]
 ---
@@ -277,7 +277,11 @@ Meldungen ([[opencivil.projekt.balkensystem#BalkensystemEintrag.modell|modell]])
 def materialien(self) -> List[str]
 ```
 
-Die Materialien der Staebe -- fuer den Baum, der keines loeschen laesst, das gebraucht wird.
+Jedes Material, auf das eine Linie zeigt. Jeder Verweis zaehlt, auch einer, der gerade nichts traegt: wer das
+Material loescht, liesse ihn ins Leere zeigen, und spaetestens die
+naechste Aenderung machte daraus einen Fehler beim Rechnen.
+Dazu gehoert eine Linie, die gerade kein Stab ist: wird sie wieder einer,
+nimmt sie ihr Material mit.
 
 #### BalkensystemEintrag.bezuege
 

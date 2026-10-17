@@ -1,5 +1,5 @@
 ---
-erzeugt: 91ba9d6a863b
+erzeugt: e085cba82c67
 art: modul
 tags: [modul]
 ---
@@ -218,6 +218,17 @@ Mindestdurchmesser 0, also «kein Minimum», wurde still zur Vorgabe der
 Platte. Zwei Quellen fuer dieselbe Zahl, und die Oberflaeche benutzte die
 zweite ohnehin nie.
 
+### verweise
+
+```python
+def verweise(rumpf: Mapping[str, Any]) -> Dict[str, Any]
+```
+
+Wer auf einen Eintrag zeigt: `{projekt, kennung}` hinein, die Bauteile
+mit Kennung und Name hinaus ([[opencivil.projekt.projekt#Projekt.verweise|verweise]]).
+Die Oberflaeche fragt, bevor sie ein Material oder Bauteil loescht --
+eine eigene Liste dort kannte den Buegelstahl nicht.
+
 ### geometrie
 
 ```python
@@ -344,7 +355,7 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 
 - `SPEICHER = speicher.Ergebnisspeicher()` – Das Gedaechtnis zwischen zwei Anfragen -- siehe [[opencivil.web.speicher]]. Im Modul und damit im Prozess: beim Server die laufende Sitzung, im Browser der offene Reiter.
 - `KENNFELDER = ('name', 'materialien', *(art.liste for art in BAUTEILE))` – Woran eine Projektdatei zu erkennen ist. Mindestens eines davon muss da sein.
-- `ANFRAGEN = {'katalog': katalog, 'beispiel': beispiel, 'pruefen': pruefen, 'rechn…` – Name der Anfrage -> Funktion. Diese Namen sind der ganze Vertrag zwischen Oberflaeche und Kern; beide Huellen reichen sie unveraendert durch.
+- `ANFRAGEN = {'katalog': katalog, 'beispiel': beispiel, 'pruefen': pruefen, 'verwe…` – Name der Anfrage -> Funktion. Diese Namen sind der ganze Vertrag zwischen Oberflaeche und Kern; beide Huellen reichen sie unveraendert durch.
 
 ## Braucht
 

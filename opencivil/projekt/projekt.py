@@ -115,6 +115,17 @@ class Projekt(Beschreibung):
             i += 1
         return f"{vorsilbe}{i}"
 
+    def verweise(self, kennung: str) -> List[Any]:
+        """
+        Die Bauteile, die auf diese Kennung zeigen -- als Material oder als
+        Querschnitt (:meth:`materialien` und :meth:`bezuege` jedes Eintrags).
+        Was hier steht, darf nicht geloescht werden; die Oberflaeche fragt hier,
+        bevor sie loescht (Dienst ``verweise``), statt es in einer eigenen
+        Liste nachzubauen.
+        """
+        return [e for e in self.bauteile()
+                if kennung in e.materialien() or kennung in e.bezuege()]
+
     def eigener_name(self, art: str) -> str:
         """Der erste freie Name eines eigenen Materials: BE1, BE2 ... oder S1 ..."""
         vergeben = {m.anzeigename for m in self.materialien}

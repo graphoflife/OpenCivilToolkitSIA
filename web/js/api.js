@@ -127,6 +127,8 @@ export const api = {
   beispiel: () => ruf('beispiel', {}),
   /** Prüft eine Beschreibung (aus der Ablage oder aus einer Datei). */
   pruefen: (projekt) => ruf('pruefen', { projekt }),
+  /** Die Bauteile, die auf diese Kennung zeigen -- als Material oder als Querschnitt. */
+  verweise: (projekt, kennung) => ruf('verweise', { projekt, kennung }),
   /** Ohne `ziele` alles; mit `ziele` genau diese samt dem, was sie brauchen. */
   rechnen: (projekt, ziele) => ruf('rechnen', { projekt, ziele }),
   /** M-V-Kurven für selbst gewählte Normalkräfte: {Kennung: N_Ed in kN}. */

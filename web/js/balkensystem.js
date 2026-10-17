@@ -55,17 +55,6 @@ function aendernAn(kennung, veraenderer) {
   projektAendern((p) => veraenderer(p.balkensysteme.find((s) => s.kennung === kennung)));
 }
 
-/** Die Materialien eines Systems -- für den Baum, der keines löschen lässt, das gebraucht wird. */
-export function benutzteMaterialien(system) {
-  return [...new Set(system.linien.filter((l) => l.stab && l.material).map((l) => l.material))];
-}
-
-/** Die Platten und Analysen, aus denen ein System Querschnitte nimmt. */
-export function benutzteBauteile(system) {
-  return [...new Set((system.querschnitte || [])
-    .filter((q) => (q.art === 'platte' || q.art === 'analyse') && q.bezug).map((q) => q.bezug))];
-}
-
 // ===========================================================================
 // Unter der Zeichnung
 // ===========================================================================

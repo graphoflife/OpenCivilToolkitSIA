@@ -312,10 +312,16 @@ class BalkensystemEintrag(Beschreibung):
     # -- Zugriff -------------------------------------------------------------
 
     def materialien(self) -> List[str]:
-        """Die Materialien der Staebe -- fuer den Baum, der keines loeschen laesst, das gebraucht wird."""
+        """
+        Jedes Material, auf das eine Linie zeigt. Jeder Verweis zaehlt, auch einer, der gerade nichts traegt: wer das
+        Material loescht, liesse ihn ins Leere zeigen, und spaetestens die
+        naechste Aenderung machte daraus einen Fehler beim Rechnen.
+        Dazu gehoert eine Linie, die gerade kein Stab ist: wird sie wieder einer,
+        nimmt sie ihr Material mit.
+        """
         gesehen: List[str] = []
         for l in self.linien:
-            if l.stab and l.material and l.material not in gesehen:
+            if l.material and l.material not in gesehen:
                 gesehen.append(l.material)
         return gesehen
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 8657da8b04f7
+erzeugt: adfaad44e819
 art: modul
 tags: [modul]
 ---
@@ -72,6 +72,22 @@ def neu(cls, kennung: str, name: str) -> 'GrundbruchEintrag'
 ```
 
 Ein frischer Grundbruch, wie die Oberflaeche ihn anlegt: mit einer Kombination.
+
+#### GrundbruchEintrag.materialien
+
+```python
+def materialien(self) -> List[str]
+```
+
+Die Materialien, auf die das Fundament zeigt -- keine: der Boden steht im Eintrag.
+
+#### GrundbruchEintrag.bezuege
+
+```python
+def bezuege(self) -> List[str]
+```
+
+Die Bauteile, deren Querschnitt das Fundament nimmt -- keine.
 
 #### GrundbruchEintrag.kombination
 

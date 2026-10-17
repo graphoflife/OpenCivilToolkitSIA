@@ -378,8 +378,7 @@ function richtungsSchalter(querschnitt, nummer, richtung, partner) {
 function querkraftBlock(querschnitt) {
   const staehle = zustand.projekt.materialien.filter((m) => m.art === 'betonstahl');
   // Vollständig: jede Platte kommt durch den Kern, und der setzt die Bügel
-  // mit allen Feldern -- auch in einer Datei aus der Zeit vor den Bügeln.
-  // Ohne Stahl nimmt er den ersten; die Auswahl zeigt dann ebenfalls ihn.
+  // mit allen Feldern. Bügel ohne Stahl meldet der Kern beim Rechnen.
   const buegel = querschnitt.querkraftbewehrung;
   const ueberAbstand = buegel.abstand_y !== null && buegel.abstand_y !== undefined;
   const leer = !(buegel.durchmesser > 0);

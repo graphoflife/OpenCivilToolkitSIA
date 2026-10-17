@@ -19,9 +19,8 @@
 import { ARTEN, artVon } from './arten.js';
 import { el, ersetzen, melden } from './dom.js';
 import { sinnbild } from './sinnbilder.js';
-import { benutzteMaterialien } from './querschnittsanalyse.js';
+import { api } from './api.js';
 import { fensterVergessen } from './qa_zeichnung.js';
-import { benutzteBauteile, benutzteMaterialien as systemMaterialien } from './balkensystem.js';
 import { fensterVergessen as systemfensterVergessen } from './bs_zeichnung.js';
 import { materialAnlegen } from './materialwahl.js';
 import {
@@ -88,17 +87,6 @@ const KURZTEXT = {
   },
   grundbruch: (g) => `${g.b}×${g.L} m`,
 };
-
-/** Welche Materialien ein Bauteil braucht -- je Bauteilart. */
-const MATERIALIEN = {
-  querschnitt: (q) => [q.beton, ...q.lagen.map((l) => l.stahl)],
-  querschnittsanalyse: benutzteMaterialien,
-  balkensystem: systemMaterialien,
-  grundbruch: () => [],
-};
-
-/** Welche Bauteile ein Bauteil als Querschnitt nimmt -- das tut nur ein Balkensystem. */
-const BEZUEGE = { balkensystem: benutzteBauteile };
 
 /** Wie ein neues Bauteil entsteht -- je Bauteilart. */
 const ANLEGEN = {
@@ -177,25 +165,33 @@ function leerzeile(text) {
 // ===========================================================================
 
 function materialLoeschen(material) {
-  const benutztVon = ARTEN.flatMap((a) => (zustand.projekt[a.liste] || []).filter((e) =>
-    MATERIALIEN[a.art](e).includes(material.kennung)));
-  if (benutztVon.length) {
-    melden(`„${material.name || material.sorte}" verwendet von: `
-      + benutztVon.map((q) => q.name).join(', '), true);
-    return;
-  }
-  entfernen('materialien', material);
+  return loeschenWennFrei('materialien', material, `„${material.name || material.sorte}" verwendet von`);
 }
 
 /** Ein Bauteil -- ausser ein Balkensystem nimmt noch seinen Querschnitt. */
 function bauteilLoeschen(art, eintrag) {
-  const benutztVon = ARTEN.flatMap((a) => (zustand.projekt[a.liste] || []).filter((e) =>
-    (BEZUEGE[a.art]?.(e) || []).includes(eintrag.kennung)));
-  if (benutztVon.length) {
-    melden(`„${eintrag.name}" ist Querschnitt in: ${benutztVon.map((s) => s.name).join(', ')}`, true);
+  return loeschenWennFrei(art.liste, eintrag, `„${eintrag.name}" ist Querschnitt in`);
+}
+
+/**
+ * Löscht einen Eintrag, wenn kein Bauteil mehr auf ihn zeigt -- sonst sagt
+ * es, welche. Wer worauf zeigt, weiss der Kern (`Projekt.verweise`); eine
+ * eigene Liste hier kannte bis 2026-10-17 den Bügelstahl nicht, und der
+ * nächste Lauf scheiterte am gelöschten Stahl.
+ */
+async function loeschenWennFrei(liste, eintrag, satz) {
+  let verweise;
+  try {
+    ({ verweise } = await api.verweise(zustand.projekt, eintrag.kennung));
+  } catch (fehler) {
+    melden(`Nicht gelöscht: ${fehler.message}`, true);
     return;
   }
-  entfernen(art.liste, eintrag);
+  if (verweise.length) {
+    melden(`${satz}: ${verweise.map((v) => v.name).join(', ')}`, true);
+    return;
+  }
+  entfernen(liste, eintrag);
 }
 
 /** Einen Eintrag aus einer Liste des Projekts -- und aus der Auswahl, wenn er gewählt war. */

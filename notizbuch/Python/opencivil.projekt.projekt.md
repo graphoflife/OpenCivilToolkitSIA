@@ -1,5 +1,5 @@
 ---
-erzeugt: 2d36f8521393
+erzeugt: c11a8c12d3a8
 art: modul
 tags: [modul]
 ---
@@ -87,6 +87,18 @@ Ein Bauteil gleich welcher Art -- eine Platte, eine Analyse, ein System.
 ```python
 def freie_kennung(self, vorsilbe: str) -> str
 ```
+
+#### Projekt.verweise
+
+```python
+def verweise(self, kennung: str) -> List[Any]
+```
+
+Die Bauteile, die auf diese Kennung zeigen -- als Material oder als
+Querschnitt ([[opencivil.projekt.projekt#Projekt|materialien]] und [[opencivil.projekt.projekt#Projekt|bezuege]] jedes Eintrags).
+Was hier steht, darf nicht geloescht werden; die Oberflaeche fragt hier,
+bevor sie loescht (Dienst `verweise`), statt es in einer eigenen
+Liste nachzubauen.
 
 #### Projekt.eigener_name
 

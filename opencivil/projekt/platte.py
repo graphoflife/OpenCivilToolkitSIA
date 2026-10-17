@@ -243,6 +243,26 @@ class QuerschnittEintrag(Beschreibung):
         vier = Richtung(self.richtung_lage4)
         return {1: eins, 2: eins.gegenrichtung, 3: vier.gegenrichtung, 4: vier}[nummer]
 
+    def materialien(self) -> List[str]:
+        """
+        Jedes Material, auf das die Platte zeigt -- Beton, Stahl jeder Lage,
+        Buegelstahl --, je einmal. Jeder Verweis zaehlt, auch einer, der gerade nichts traegt: wer das
+        Material loescht, liesse ihn ins Leere zeigen, und spaetestens die
+        naechste Aenderung machte daraus einen Fehler beim Rechnen.
+        Bis 2026-10-17 kannte der Loeschschutz der Oberflaeche den Buegelstahl
+        nicht.
+        """
+        gesehen: List[str] = []
+        for kennung in (self.beton, *(l.stahl for l in self.lagen),
+                        self.querkraftbewehrung.stahl):
+            if kennung and kennung not in gesehen:
+                gesehen.append(kennung)
+        return gesehen
+
+    def bezuege(self) -> List[str]:
+        """Die Bauteile, deren Querschnitt die Platte nimmt -- keine."""
+        return []
+
     # -- Pruefen und Leeren -------------------------------------------------
 
     def pruefen(self) -> None:

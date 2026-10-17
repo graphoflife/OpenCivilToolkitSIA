@@ -96,6 +96,14 @@ class GrundbruchEintrag(Beschreibung):
         return cls(kennung=kennung, name=name,
                    kombinationen=[GrundbruchkombinationEintrag(name="Kombination 1")])
 
+    def materialien(self) -> List[str]:
+        """Die Materialien, auf die das Fundament zeigt -- keine: der Boden steht im Eintrag."""
+        return []
+
+    def bezuege(self) -> List[str]:
+        """Die Bauteile, deren Querschnitt das Fundament nimmt -- keine."""
+        return []
+
     def kombination(self, name: str, *, N_Ed: float, T_Ed: float = 0.0
                     ) -> GrundbruchkombinationEintrag:
         """Eine Kombination anfügen -- N normal zur Sohle, T in ihrer Richtung, in kN."""

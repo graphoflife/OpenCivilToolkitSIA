@@ -348,6 +348,21 @@ def bewehrung_suchen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     return antwort
 
 
+def verweise(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
+    """
+    Wer auf einen Eintrag zeigt: ``{projekt, kennung}`` hinein, die Bauteile
+    mit Kennung und Name hinaus (:meth:`~opencivil.projekt.projekt.Projekt.verweise`).
+    Die Oberflaeche fragt, bevor sie ein Material oder Bauteil loescht --
+    eine eigene Liste dort kannte den Buegelstahl nicht.
+    """
+    projekt = _projekt(rumpf)
+    kennung = rumpf.get("kennung")
+    if not isinstance(kennung, str) or not kennung:
+        raise DienstFehler(400, "Es fehlt die Kennung des Eintrags.")
+    return {"verweise": [{"kennung": e.kennung, "name": e.name}
+                         for e in projekt.verweise(kennung)]}
+
+
 def geometrie(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
     """
     Was das Zeichenfenster einer Querschnittsanalyse zeigt -- ohne Nachweise.
@@ -550,6 +565,7 @@ ANFRAGEN: Dict[str, Callable[[Mapping[str, Any]], Dict[str, Any]]] = {
     "katalog": katalog,
     "beispiel": beispiel,
     "pruefen": pruefen,
+    "verweise": verweise,
     "rechnen": rechnen,
     "querkraftkurven": querkraftkurven,
     "bericht": bericht,

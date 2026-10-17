@@ -1,5 +1,5 @@
 ---
-erzeugt: 58f275d78bcc
+erzeugt: e3aae930be7c
 art: modul
 tags: [modul]
 ---
@@ -351,7 +351,18 @@ Die Wahl fuer dieses Material -- die Vorgaben, wenn keine dasteht.
 def materialien(self) -> List[str]
 ```
 
-Jedes Material, das die Analyse benutzt, in der Reihenfolge des ersten Auftretens.
+Jedes Material, auf das die Analyse zeigt, in der Reihenfolge des
+ersten Auftretens. Jeder Verweis zaehlt, auch einer, der gerade nichts traegt: wer das
+Material loescht, liesse ihn ins Leere zeigen, und spaetestens die
+naechste Aenderung machte daraus einen Fehler beim Rechnen.
+
+#### QuerschnittsanalyseEintrag.bezuege
+
+```python
+def bezuege(self) -> List[str]
+```
+
+Die Bauteile, deren Querschnitt die Analyse nimmt -- keine.
 
 #### QuerschnittsanalyseEintrag.elemente
 

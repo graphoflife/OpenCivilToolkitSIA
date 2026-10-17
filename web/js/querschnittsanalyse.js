@@ -143,9 +143,10 @@ function aendernAn(kennung, veraenderer) {
 /**
  * Jedes Material, auf das die Analyse verweist -- in der Reihenfolge des
  * ersten Auftretens, wie im Kern (`QuerschnittsanalyseEintrag.materialien`).
- * Gebraucht für die Werkstoffwahl und beim Löschen eines Materials.
+ * Nur für die Werkstoffwahl; ob ein Material gelöscht werden darf, fragt der
+ * Baum den Kern (Dienst `verweise`).
  */
-export function benutzteMaterialien(analyse) {
+function benutzteMaterialien(analyse) {
   const gesehen = [];
   const kennungen = [
     ...analyse.flaechen.map((f) => f.material),
