@@ -8,10 +8,10 @@
  * (`fenster.js`).
  *
  * Welche Kapitel ein Bauteil hat, sagt seine Art: die Platte in
- * `nachweise.js`, die Querschnittsanalyse in `querschnittsanalyse.js` --
- * die Nachweise, die beide gleich führen, und die Analysen baut für beide
- * `nachweise.js`. Hier steht nur, wie Knopf und Fenster daraus werden. Ein
- * Kapitel ist ein Eintrag mit
+ * `plattenkapitel.js`, die Querschnittsanalyse in `querschnittsanalyse.js`
+ * -- die Nachweise, die beide gleich führen, und die Analysen baut für
+ * beide `nachweise.js`. Hier steht nur, wie Knopf und Fenster daraus
+ * werden. Ein Kapitel ist ein Eintrag mit
  *
  *   schluessel   zugleich der Name seines Zeichens (sinnbilder.js)
  *   name         auf dem Knopf -- mit weichem Trennstrich, wo ein Wort

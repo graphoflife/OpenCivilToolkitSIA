@@ -23,7 +23,7 @@ import { span } from './mathe.js';
 import { fensterZeigen } from './fenster.js';
 import { kapitelFenster, kapitelPanel } from './kapitel.js';
 import { partnerVon, richtungSetzen, richtungVon } from './lagen.js';
-import { plattenKapitel } from './nachweise.js';
+import { plattenKapitel } from './plattenkapitel.js';
 import { analyseEditor, analyseFenster } from './querschnittsanalyse.js';
 import { balkensystemEditor } from './balkensystem.js';
 import { grundbruchEditor } from './grundbruch.js';
@@ -516,7 +516,7 @@ function plattenEditor(querschnitt) {
     ]),
 
     // Nachweise, Analysen und die Suche der Bewehrung: je ein Knopf, die
-    // Eingaben im Fenster -- welche es sind, steht in nachweise.js.
+    // Eingaben im Fenster -- welche es sind, steht in plattenkapitel.js.
     kapitelPanel(querschnitt, plattenKapitel(),
       { schluessel: 'platte/Kapitel', titel: 'Nachweise und Analysen' }),
   ];

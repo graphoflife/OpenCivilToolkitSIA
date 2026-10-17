@@ -463,7 +463,7 @@ function zugseitenWahl(gewaehlt, setzen, titel, { schmal = false } = {}) {
 
 /**
  * Wo die Kapitel eines gezeichneten Querschnitts stehen und was bei ihm
- * anders ist (vgl. `PLATTE` in nachweise.js): die Richtung ist die Zugseite,
+ * anders ist (vgl. `PLATTE` in plattenkapitel.js): die Richtung ist die Zugseite,
  * die Seite, die ein positives Moment zieht. «oben» heisst dann der Rand
  * gegenüber.
  */
