@@ -70,35 +70,12 @@ gelernt wurde, steht in [[Entwicklung]].
 ## Umbau: Befunde der Durchsicht vom 2026-10-16
 
 Sechs Durchsichten über die Arbeit vom 15. und 16. Oktober (42 Commits);
-jeder Punkt ist am Code nachgeprüft. Zuerst vier Fehler mit Folge, dann der
-Umbau in der empfohlenen Reihenfolge.
+jeder Punkt ist am Code nachgeprüft. Die vier Fehler mit Folge sind behoben
+(2026-10-17, siehe [[Entwicklung]]); hier steht der Umbau in der empfohlenen
+Reihenfolge. Der Plan dazu: Phase 2 Prüfen und Wahlfelder, Phase 3 Platte
+und Querschnitt als ein Nachweis, Phase 4 Löser und Kennzahlen, Phase 5
+Oberfläche.
 
-- [ ] **Zuerst: ein abgelegtes Projekt, das sich nicht öffnen lässt, geht
-      verloren.** `projektHolen` startet dann mit dem Beispiel und meldet
-      «Nicht gelöscht» (`ablage.js`), aber die erste Änderung schreibt das
-      Beispiel auf denselben Speicherplatz (`zustand.js`, `projektAendern`).
-      Über die Oberfläche auslösbar: zwei Fälle gleich benennen, neu laden.
-      Seit 2026-10-16 trifft es auch jeden alten Speicherstand. Besser: den
-      unlesbaren Stand vor dem ersten Schreiben unter einem eigenen Schlüssel
-      sichern, und gleiche Namen erst beim Rechnen melden (siehe «Form beim
-      Lesen, Inhalt vor dem Rechnen»).
-- [ ] **Zuerst: die Konsole hängt bei NaN.** `konsole/dienst.py` baut den
-      JSON-Umschlag ein zweites Mal, ohne `endlich` und `allow_nan=False`
-      aus dem Rechenkern. `plt.plot(…, lw=float("nan"))` schickt `NaN`,
-      `JSON.parse` scheitert, und die Konsole bleibt bei «Läuft …». Besser:
-      ein Modul `web/umschlag.py` (`endlich`, `nach_json`, Fehlerform) für
-      beide Dienste.
-- [ ] **Zuerst: ein Bügelstahl lässt sich löschen, obwohl eine Platte ihn
-      braucht.** Der Löschschutz in `baum.js` (`MATERIALIEN`) kennt nur
-      Beton und Lagen; der nächste Lauf scheitert. Besser: der Kern
-      beantwortet, wer ein Material braucht (`materialien()` je Eintrag,
-      ein Dienst `verweise`); die drei Nachbauten im JS fallen weg.
-- [ ] **Zuerst: «Wand A» und «Wand-A» ergeben eine interne Meldung.** Ob
-      zwei Namen als Wert-ID gleich werden, prüfen nur drei von neun Listen
-      (`eintraege.py`, `projekt/grundbruch.py`). Bei Knick-, Spannungs- und
-      Lastfällen meldet erst das Rechenwerk «Wert … ist bereits mit
-      abweichender Definition bekannt». Besser: `eindeutig()` prüft beides,
-      und die drei Kopien fallen weg.
 - [ ] **Platte und gezeichneter Querschnitt: ein Nachweis, zwei
       Geometrien.** Heute gibt es zwei Umsetzungen:
       - `SpannungsbegrenzungQA` kopiert `Spannungsbegrenzung`, mit gleichem
@@ -112,8 +89,18 @@ Umbau in der empfohlenen Reihenfolge.
 
       Besser: je Nachweis ein Modul, je Geometrie ein schmaler Adapter
       (Stellen, Ebene je Fall, Bruttoquerschnitt), so wie das Knicken über
-      `Knickstab` schon geschnitten ist. Vorher entscheiden: Rissmoment mit
-      oder ohne `I_yz`, und welche Dicke unter Zug gilt.
+      `Knickstab` schon geschnitten ist.
+
+      Entschieden (Benutzer, 2026-10-17):
+      - Das Rissmoment ist das Moment unter reiner Biegung, bei dem f_ctm zum
+        ersten Mal irgendwo erreicht wird, also mit `I_yz`. Die
+        Spannung-Dehnung-Analyse des gezeichneten Querschnitts lässt dafür die
+        Nulllinie kippen wie die Gebrauchsnachweise. Mit «einachsig» bleibt sie
+        überall waagrecht, W = I/v.
+      - k_t: bei Biegung mit h/3, h in Biegerichtung; bei Zug mit min(h; b).
+        Die 500 mm bleiben ein Schalter.
+      - Platte: die Handformel d − x/3 der Zwängung auf Biegung bleibt, ebenso
+        die Zwängung auf Normalkraft je Lage.
 - [ ] **Form beim Lesen, Inhalt vor dem Rechnen.** Heute wird zu drei
       Zeitpunkten ohne Regel geprüft:
       - `haeufig.anteil = 0` hält das Öffnen auf, `x_d_max = 0.9` und
@@ -514,6 +501,12 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       `σ_s,adm` stehen nach Vorgabe da, nachgeschlagen ist keines davon.
 
 ## Erledigt zuletzt
+
+Vier Fehler der Durchsicht (2026-10-17): ein unlesbarer Stand im Browser
+bleibt erhalten · die Konsole hängt nicht mehr bei NaN, ein Umschlag für
+alle Antworten · Löschen fragt den Kern, auch nach dem Bügelstahl · gleiche
+und fast gleiche Namen melden sich vor dem Rechnen, in allen Listen ·
+Werteabdruck als Netz für die Umbauten ·
 
 Ein Modell der Werkstoffgesetze (C2, 2026-10-16): jedes Gesetz rechnet und
 schreibt sich selbst, aus denselben Ästen · jenseits der Grenze null, auf

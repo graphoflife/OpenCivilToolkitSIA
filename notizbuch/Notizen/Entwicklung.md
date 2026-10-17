@@ -44,6 +44,35 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-17 · Vier Fehler aus der Durchsicht behoben
+
+Die Durchsicht vom 2026-10-16 fand vier Fehler mit sichtbarer Folge. Jeder
+steckte in einer Doppelung, und behoben ist er dort, wo die Doppelung
+wegfällt.
+
+- **Ein unlesbarer Stand im Browser bleibt erhalten** (`web/js/ablage.js`).
+  Liess sich der abgelegte Stand nicht öffnen, startete die Seite mit dem
+  Beispiel und meldete «Nicht gelöscht» -- die erste Änderung überschrieb
+  ihn doch. Jetzt wird der Rohtext vorher unter `opencivil.projekt.unlesbar`
+  aufbewahrt; ein bleibender Hinweis oben rechts bietet ihn zum
+  Herunterladen an, bis er verworfen ist.
+- **Ein Umschlag für alle Antworten** (`opencivil/web/umschlag.py`). Die
+  Konsole baute ihre JSON-Antwort selbst, ohne den Riegel gegen NaN, und
+  hing bei `plt.plot(…, lw=float("nan"))`. Dazu weist `kern.js` eine
+  unlesbare Antwort zurück, statt die Anfrage offen zu lassen, und
+  `zeichnen.py` prüft Breite, Grösse und Deckung.
+- **Wer worauf zeigt, sagt der Kern** (`Projekt.verweise`, Dienst
+  `verweise`). Der Löschschutz im Baum hielt eine eigene Liste, die den
+  Bügelstahl nicht kannte.
+- **Gleiche Namen erst beim Rechnen, in allen Listen** (`eindeutig`). Die
+  Prüfung «Wand A»/«Wand-A» stand nur bei drei von neun Listen; und weil
+  gleiche Namen schon das Öffnen aufhielten, waren sie ein Auslöser des
+  ersten Fehlers.
+
+Dazu ein Werkzeug für die Umbauten der nächsten Phasen:
+`werkzeug/werteabdruck.py` legt jede Zahl der Prüfprojekte ab und
+vergleicht genau. Nach Phase 1: alle gleich.
+
 ## 2026-10-16 · Ein Modell der Werkstoffgesetze
 
 C2 der Durchsicht vom 2026-10-12, in drei Commits. Keine Zahl im Bericht
