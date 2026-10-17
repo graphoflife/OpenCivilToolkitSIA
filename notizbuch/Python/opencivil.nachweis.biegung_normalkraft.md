@@ -1,5 +1,5 @@
 ---
-erzeugt: b1bfd1465733
+erzeugt: dfa5841949dc
 art: modul
 tags: [modul]
 ---
@@ -388,7 +388,8 @@ Ein SI-Wert in der Einheit seiner Achse, mit Einheitenzeichen.
 - [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.querkraft]]
-- [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.web.api]]
 

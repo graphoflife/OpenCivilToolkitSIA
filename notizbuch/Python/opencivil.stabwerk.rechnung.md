@@ -1,5 +1,5 @@
 ---
-erzeugt: b384e149849a
+erzeugt: cfdaf9655ac5
 art: modul
 tags: [modul]
 ---
@@ -238,7 +238,8 @@ bleibt es bei ihr.
 ## Gebraucht von
 
 - [[opencivil.ergebnis]]
-- [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.balkensystem]]
+- [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.stabwerk.herleitung]]
 - [[opencivil.web.balkendaten]]
 

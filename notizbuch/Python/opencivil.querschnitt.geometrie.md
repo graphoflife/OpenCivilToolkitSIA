@@ -1,5 +1,5 @@
 ---
-erzeugt: d93b653e757b
+erzeugt: 56eb723f18ed
 art: modul
 tags: [modul]
 ---
@@ -366,7 +366,7 @@ Enden acht Staebe. Bei einer Flaeche gibt es keine Einzelstaebe.
 
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.stabgrenzen]]
-- [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.interaktion]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: a4042c3603c8
+erzeugt: b223dda15592
 art: modul
 tags: [modul]
 ---
@@ -228,7 +228,10 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.spannungsgrenzen]]
 - [[opencivil.nachweis.stabgrenzen]]
-- [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.balkensystem]]
+- [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.aufbau.platte]]
+- [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.platte]]

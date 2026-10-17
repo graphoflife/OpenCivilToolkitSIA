@@ -1,5 +1,5 @@
 ---
-erzeugt: 817d29067efa
+erzeugt: d7dcd1280db0
 art: modul
 tags: [modul]
 ---
@@ -120,4 +120,5 @@ Kombinationen soll sich oeffnen und korrigieren lassen.
 
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.projekt]]

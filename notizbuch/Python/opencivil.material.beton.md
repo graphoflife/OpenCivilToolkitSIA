@@ -1,5 +1,5 @@
 ---
-erzeugt: 4990f570f761
+erzeugt: 955f494f2a66
 art: modul
 tags: [modul]
 ---
@@ -110,7 +110,7 @@ werden, um Normvorgaben zu ersetzen.
 
 ## Gebraucht von
 
-- [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.web.api]]
 

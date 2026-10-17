@@ -8,7 +8,7 @@
  * neue Art kommt hier dazu und in ihre eigenen Module.
  *
  * Liste, Vorsilbe und Namensraum stehen ebenso im Kern, im Steckbrief
- * `BAUTEILE` (opencivil/projekt/aufbau.py); tests/test_arten_js.py hält
+ * `BAUTEILE` (opencivil/projekt/aufbau/__init__.py); tests/test_arten_js.py hält
  * beide gleich. Ohne Imports, damit der Test das Modul in node laden kann.
  */
 

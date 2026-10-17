@@ -1,5 +1,5 @@
 ---
-erzeugt: 79aeebebfca4
+erzeugt: 4c96b69f369b
 art: modul
 tags: [modul]
 ---
@@ -396,7 +396,8 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 ## Gebraucht von
 
 - [[opencivil.nachweis.qa_knicken]]
-- [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.aufbau.platte]]
 
 ## Formeln aus diesem Modul
 

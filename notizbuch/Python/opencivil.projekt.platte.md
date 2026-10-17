@@ -1,5 +1,5 @@
 ---
-erzeugt: 732eaf2d7744
+erzeugt: d7f8b460448d
 art: modul
 tags: [modul]
 ---
@@ -196,4 +196,5 @@ den Vorgabewerten der Felder.
 
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.projekt]]

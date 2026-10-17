@@ -1,5 +1,5 @@
 ---
-erzeugt: 2b0167da3598
+erzeugt: 47207e9bbf1a
 art: modul
 tags: [modul]
 ---
@@ -530,5 +530,6 @@ wird danach, was man braucht.
 
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.web.api]]

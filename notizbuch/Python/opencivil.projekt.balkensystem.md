@@ -1,5 +1,5 @@
 ---
-erzeugt: d74f5716d54d
+erzeugt: ae8f7b06fbc8
 art: modul
 tags: [modul]
 ---
@@ -466,5 +466,6 @@ Vorgabe.
 
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.web.api]]

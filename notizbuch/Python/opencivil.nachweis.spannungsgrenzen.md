@@ -1,5 +1,5 @@
 ---
-erzeugt: dc221fceef7d
+erzeugt: b7545bed4e5a
 art: modul
 tags: [modul]
 ---
@@ -326,7 +326,7 @@ def festlegung(cls, p: Protokoll, ort: 'Stahlspannungsort') -> None
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.stabgrenzen]]
-- [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.kern]]
 
 ## Formeln aus diesem Modul
 

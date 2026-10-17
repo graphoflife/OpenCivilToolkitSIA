@@ -1,5 +1,5 @@
 ---
-erzeugt: 3fbf61ba673e
+erzeugt: eb9bee685c2d
 art: modul
 tags: [modul]
 ---
@@ -519,7 +519,8 @@ nicht nachrechnen konnte.
 ## Gebraucht von
 
 - [[opencivil.nachweis.kennzahlen]]
-- [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.aufbau.platte]]
 
 ## Formeln aus diesem Modul
 

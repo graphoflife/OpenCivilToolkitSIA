@@ -1,5 +1,5 @@
 ---
-erzeugt: 10a4e10f3294
+erzeugt: ecb3e732c42f
 art: modul
 tags: [modul]
 ---
@@ -38,7 +38,8 @@ skript.py      ein Python-Skript der App «Python»: gespeichert, nicht
                gerechnet
 projekt.py     das Ganze: Zugriff, Rechnen ohne Oberflaeche, Pruefung,
                Speichern, das Beispiel
-aufbau.py      aus der Beschreibung ein Rechenwerk
+aufbau/        aus der Beschreibung ein Rechenwerk: der Kern und je
+               Bauteilart ein Modul
 ```
 
 Die Abhaengigkeit laeuft in eine Richtung: lesen \<- eintraege \<- platte \<-

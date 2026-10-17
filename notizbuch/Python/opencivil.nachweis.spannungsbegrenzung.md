@@ -1,5 +1,5 @@
 ---
-erzeugt: ba31ac9514f2
+erzeugt: e643c3360c8f
 art: modul
 tags: [modul]
 ---
@@ -585,7 +585,8 @@ Der Fall, in dem die Spannung am Plateau stehen bleibt.
 
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.spannungsgrenzen]]
-- [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.aufbau.platte]]
 
 ## Formeln aus diesem Modul
 

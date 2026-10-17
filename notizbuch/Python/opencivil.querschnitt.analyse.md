@@ -1,5 +1,5 @@
 ---
-erzeugt: a34db466cbf5
+erzeugt: 7c35da335a58
 art: modul
 tags: [modul]
 ---
@@ -424,7 +424,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.nachweis.stabgrenzen]]
-- [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.querschnittsanalyse]]
 - [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.web.api]]
 

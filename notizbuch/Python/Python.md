@@ -1,5 +1,5 @@
 ---
-erzeugt: 31105a018b07
+erzeugt: e75ab03e9105
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -73,7 +73,12 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.notizbuch.namen]] – aus einem Namen wird ein Seitenname.
     - [[opencivil.notizbuch.tresor]] – erzeugte Seiten in den Ordner `notizbuch/`.
 - [[opencivil.projekt]] – Serialisierbare Beschreibung eines ganzen Projekts.
-    - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
+  - [[opencivil.projekt.aufbau]] – aus der Beschreibung ein Rechenwerk.
+      - [[opencivil.projekt.aufbau.balkensystem]] – ein Balkensystem wird Rechnung.
+      - [[opencivil.projekt.aufbau.grundbruch]] – ein Fundament wird Rechnung.
+      - [[opencivil.projekt.aufbau.kern]] – was alle Bauteilarten beim Bauen teilen.
+      - [[opencivil.projekt.aufbau.platte]] – eine Platte wird Rechnung.
+      - [[opencivil.projekt.aufbau.querschnittsanalyse]] – ein gezeichneter Querschnitt wird Rechnung.
     - [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
     - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
     - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.

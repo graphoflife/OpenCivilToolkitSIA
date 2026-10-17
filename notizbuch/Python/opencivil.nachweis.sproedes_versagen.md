@@ -1,5 +1,5 @@
 ---
-erzeugt: 412c03166706
+erzeugt: e52b2ac4ef0a
 art: modul
 tags: [modul]
 ---
@@ -113,4 +113,5 @@ Der Biegewiderstand der Lage -- der Widerstand in Tabelle und Herleitung.
 
 ## Gebraucht von
 
-- [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.aufbau.platte]]

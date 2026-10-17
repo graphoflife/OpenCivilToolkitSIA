@@ -1,5 +1,5 @@
 ---
-erzeugt: b51cd78ec94b
+erzeugt: 3450caad87e0
 art: modul
 tags: [modul]
 ---
@@ -119,7 +119,8 @@ Das Kleinere der Seiten -- bei nur einer Seite sie selbst.
 
 ## Gebraucht von
 
-- [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.aufbau.platte]]
 
 ## Formeln aus diesem Modul
 

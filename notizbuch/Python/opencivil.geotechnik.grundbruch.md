@@ -1,5 +1,5 @@
 ---
-erzeugt: 1d7a7bd4b74c
+erzeugt: 38b59845796f
 art: modul
 tags: [modul]
 ---
@@ -328,7 +328,8 @@ die Spalte der Kohäsion.
 ## Gebraucht von
 
 - [[opencivil.bericht.zusammenfassung]]
-- [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.grundbruch]]
+- [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.web.grundbruchdaten]]
 
 ## Formeln aus diesem Modul

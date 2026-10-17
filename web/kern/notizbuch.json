@@ -3564,6 +3564,35 @@
       "art": "modul",
       "kurz": "aus der Beschreibung ein Rechenwerk.",
       "stichworte": [
+        "aufbauen",
+        "Bauteilart"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.aufbau.balkensystem",
+      "pfad": "Python/opencivil.projekt.aufbau.balkensystem.md",
+      "art": "modul",
+      "kurz": "ein Balkensystem wird Rechnung.",
+      "stichworte": [
+        "bauen",
+        "_stabquerschnitt"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.aufbau.grundbruch",
+      "pfad": "Python/opencivil.projekt.aufbau.grundbruch.md",
+      "art": "modul",
+      "kurz": "ein Fundament wird Rechnung.",
+      "stichworte": [
+        "bauen"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.aufbau.kern",
+      "pfad": "Python/opencivil.projekt.aufbau.kern.md",
+      "art": "modul",
+      "kurz": "was alle Bauteilarten beim Bauen teilen.",
+      "stichworte": [
         "Aufbau",
         "Aufbau.nachweise_je_feld",
         "Aufbau.alle_nachweise",
@@ -3582,23 +3611,35 @@
         "Bauteil.raum",
         "Bauteil.im_feld",
         "Bauteil.ziele",
-        "aufbauen",
-        "_platte",
-        "_querschnittsanalyse",
-        "_balkensystem",
-        "_stabquerschnitt",
-        "_analyse",
-        "_lagennachweise",
-        "_spannungsnachweise",
-        "_knickfall",
-        "_verformungsfall",
-        "_stoff",
+        "baustoff_bauen",
+        "material",
+        "ueberschreibungen_setzen",
+        "spannungsnachweise",
         "_gebrauchsfaelle",
+        "knickfall"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.aufbau.platte",
+      "pfad": "Python/opencivil.projekt.aufbau.platte.md",
+      "art": "modul",
+      "kurz": "eine Platte wird Rechnung.",
+      "stichworte": [
+        "bauen",
+        "_lagennachweise",
+        "_verformungsfall",
         "_ausgefallene",
-        "_kombination",
-        "_grundbruch",
-        "_ueberschreibungen_setzen",
-        "Bauteilart"
+        "_kombination"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.aufbau.querschnittsanalyse",
+      "pfad": "Python/opencivil.projekt.aufbau.querschnittsanalyse.md",
+      "art": "modul",
+      "kurz": "ein gezeichneter Querschnitt wird Rechnung.",
+      "stichworte": [
+        "bauen",
+        "_analyse"
       ]
     },
     {

@@ -1,5 +1,5 @@
 ---
-erzeugt: 7232044bbe60
+erzeugt: 9415d9843513
 art: modul
 tags: [modul]
 ---
@@ -29,7 +29,7 @@ braucht, soll dafuer nicht alle Nachweise importieren.
 Ein [[opencivil.projekt.projekt#Projekt|Projekt]] ist eine Beschreibung -- Baustoffe,
 Platten, gezeichnete Querschnitte, Einwirkungen --, so wie die Oberflaeche
 sie speichert. [[opencivil.projekt.projekt#Projekt.aufbauen|Projekt.aufbauen]] macht daraus einen
-[[opencivil.projekt.aufbau#Aufbau|Aufbau]]: ein
+[[opencivil.projekt.aufbau.kern#Aufbau|Aufbau]]: ein
 [[opencivil.core.rechenwerk#Rechenwerk|Rechenwerk]] voller Berechnungen, je
 Kennwert, je Lage, je Nachweis eine.
 

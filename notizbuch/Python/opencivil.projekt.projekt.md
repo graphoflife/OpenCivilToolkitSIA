@@ -1,5 +1,5 @@
 ---
-erzeugt: b0b00d91d3b7
+erzeugt: 426f94ab5b70
 art: modul
 tags: [modul]
 ---
@@ -243,7 +243,7 @@ def rechnen(self) -> Ergebnis
 
 Alles rechnen, was die Oberflaeche auch rechnet -- ohne sie.
 
-Dieselben Ziele in derselben Reihenfolge ([[opencivil.projekt.aufbau#Aufbau.alle_ziele|Aufbau.alle_ziele]]),
+Dieselben Ziele in derselben Reihenfolge ([[opencivil.projekt.aufbau.kern#Aufbau.alle_ziele|Aufbau.alle_ziele]]),
 also derselbe Bericht. Ohne Zwischenspeicher: der lohnt sich erst,
 wenn man dieselbe Platte hundertmal rechnet.
 
@@ -292,7 +292,7 @@ def aufbauen(self, *, schnell: bool=False) -> Aufbau
 Baut aus der Beschreibung ein vollstaendiges Rechenwerk.
 
 Die Arbeit steht in [[opencivil.projekt.aufbau#aufbauen|opencivil.projekt.aufbau.aufbauen]], neben
-dem [[opencivil.projekt.aufbau#Aufbau|Aufbau]], der dabei herauskommt.
+dem [[opencivil.projekt.aufbau.kern#Aufbau|Aufbau]], der dabei herauskommt.
 
 #### Projekt.speichern
 
@@ -402,3 +402,4 @@ Ein Träger auf zwei Rollen: nichts hält ihn waagrecht -- eine Meldung statt ei
 
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.kern]]

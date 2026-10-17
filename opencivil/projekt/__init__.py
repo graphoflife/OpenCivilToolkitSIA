@@ -28,7 +28,8 @@ Aufgabe ein Modul::
                    gerechnet
     projekt.py     das Ganze: Zugriff, Rechnen ohne Oberflaeche, Pruefung,
                    Speichern, das Beispiel
-    aufbau.py      aus der Beschreibung ein Rechenwerk
+    aufbau/        aus der Beschreibung ein Rechenwerk: der Kern und je
+                   Bauteilart ein Modul
 
 Die Abhaengigkeit laeuft in eine Richtung: lesen <- eintraege <- platte <-
 aufbau <- projekt. Wer von aussen kommt, importiert aus dem Paket, nicht aus den

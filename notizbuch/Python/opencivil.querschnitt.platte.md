@@ -1,5 +1,5 @@
 ---
-erzeugt: afec2c923331
+erzeugt: 5bca803bbfc6
 art: modul
 tags: [modul]
 ---
@@ -550,7 +550,8 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.nachweis.verformung]]
-- [[opencivil.projekt.aufbau]]
+- [[opencivil.projekt.aufbau.kern]]
+- [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
