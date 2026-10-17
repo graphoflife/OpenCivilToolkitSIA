@@ -14,9 +14,10 @@ import {
   ablageEinrichten, aendern, horchen, projektAendern, zustand,
 } from './zustand.js';
 import {
-  alsDateiSichern, ausDateiLaden, imBrowserAblegen, projektHolen,
+  alsDateiSichern, ausDateiLaden, gerettete, geretteteHerunterladen, geretteteVerwerfen,
+  imBrowserAblegen, projektHolen,
 } from './ablage.js';
-import { melden } from './dom.js';
+import { el, melden } from './dom.js';
 import { baumZeichnen } from './baum.js';
 import { berichtZeichnen } from './bericht.js';
 import { konsoleVerbinden } from './konsole.js';
@@ -455,16 +456,47 @@ function rechtsZeichnen() {
   knoten.reiter.hidden = python;
   if (python) {
     variablenZeichnen(knoten.bericht);
-    return;
+  } else {
+    berichtZeichnen(knoten.bericht, {
+      verfolgen: (ziel, name) => {
+        // Reiter und Platzhalter in einem Zug: sonst zeichnete der Wechsel
+        // erst die ganze Herleitung, die der Teillauf gleich ersetzt.
+        aendern({ reiter: 'herleitung', verfolgung: { ziel, name, loesung: null } }, 'verfolgung');
+        verfolgen(ziel, name);
+      },
+    });
   }
-  berichtZeichnen(knoten.bericht, {
-    verfolgen: (ziel, name) => {
-      // Reiter und Platzhalter in einem Zug: sonst zeichnete der Wechsel
-      // erst die ganze Herleitung, die der Teillauf gleich ersetzt.
-      aendern({ reiter: 'herleitung', verfolgung: { ziel, name, loesung: null } }, 'verfolgung');
-      verfolgen(ziel, name);
-    },
-  });
+  // Über allem, in beiden Sichten: ein Stand, der sich nicht öffnen liess.
+  knoten.bericht.prepend(...zustand.gerettet.map(geretteterStand));
+}
+
+/**
+ * Ein Stand, der sich beim Start nicht öffnen liess: warum, und was damit
+ * geschehen soll. Er bleibt aufbewahrt, bis er verworfen ist.
+ */
+function geretteterStand(eintrag) {
+  const wann = new Date(eintrag.zeit).toLocaleString('de-CH');
+  return el('div.hinweis.hinweis-warnung', {}, [
+    el('b', { text: 'Abgelegter Stand nicht geöffnet: ' }),
+    `${eintrag.grund} Er ist aufbewahrt (${wann}); gezeigt wird das Beispiel. `,
+    eintrag.aufbewahrt
+      ? ''
+      : 'Der Browser hat keinen Platz, ihn abzulegen -- bis er heruntergeladen '
+        + 'oder verworfen ist, legt die Seite nichts im Browser ab. ',
+    el('button.knopf.knopf-klein', {
+      text: 'Als Datei herunterladen', on: { click: () => geretteteHerunterladen(eintrag) },
+    }),
+    ' ',
+    el('button.knopf.knopf-klein', {
+      text: 'Verwerfen',
+      on: {
+        click: () => {
+          geretteteVerwerfen(eintrag);
+          aendern({ gerettet: gerettete() }, 'gerettet');
+        },
+      },
+    }),
+  ]);
 }
 
 function allesZeichnen(anlass) {
@@ -568,13 +600,13 @@ async function starten() {
     knoten.kernanzeige.textContent = kern.beschriftung;
 
     const [katalog, abgelegt] = await Promise.all([api.katalog(), projektHolen()]);
-    if (abgelegt.hinweis) melden(abgelegt.hinweis, true);
 
     knoten.projektname.value = abgelegt.projekt.name;
     aendern({
       katalog,
       projekt: abgelegt.projekt,
       ungespeichert: !abgelegt.gesichert,
+      gerettet: gerettete(),
     }, 'start');
     await rechnen();
   } catch (fehler) {

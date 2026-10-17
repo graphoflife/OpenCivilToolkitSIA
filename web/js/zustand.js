@@ -70,6 +70,11 @@ export const zustand = {
   rechenfehler: null,
   ungespeichert: false,
   /**
+   * Die Stände, die sich beim Start nicht öffnen liessen (`gerettete` in
+   * ablage.js) -- die rechte Tafel bietet sie an, bis sie verworfen sind.
+   */
+  gerettet: [],
+  /**
    * Welche App links gewählt ist: 'material', 'skript' oder die Art eines
    * Bauteils -- wie die Auswahl sie nennt. Wer einen Eintrag wählt, wählt
    * seine App mit (`waehlen`); null heisst: die der Auswahl, sonst die Platten.

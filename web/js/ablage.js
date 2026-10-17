@@ -16,11 +16,29 @@
  * alter Formate und dieselben Prüfungen wie überall sonst. Eine zweite,
  * nachgebaute Prüfung in JavaScript gäbe es hier fast geschenkt, und sie wäre
  * genau darum falsch: sie würde irgendwann von der echten abweichen.
+ *
+ * WAS SICH NICHT ÖFFNEN LÄSST, BLEIBT:
+ * Lehnt der Kern den abgelegten Stand ab -- oder ist er gar kein JSON --,
+ * startet die Oberfläche mit dem Beispiel. Die erste Änderung legt das
+ * Beispiel auf denselben Platz; darum wird der Stand vorher als Rohtext unter
+ * eigenem Schlüssel aufbewahrt, bis der Benutzer ihn herunterlädt oder
+ * verwirft (`gerettete`). Bis 2026-10-17 hiess es hier «Nicht gelöscht», und
+ * die erste Änderung löschte ihn doch.
  */
 
 import { api } from './api.js';
 
 const SCHLUESSEL = 'opencivil.projekt';
+
+/** Die Stände, die sich nicht öffnen liessen -- eine Liste, als Rohtext. */
+const GERETTET = 'opencivil.projekt.unlesbar';
+
+/**
+ * Was sich nicht öffnen liess und im Browser nicht aufbewahrt werden konnte
+ * (voller Speicher). Solange etwas darin steht, legt die Ablage nichts ab:
+ * sie überschriebe den einzigen Stand.
+ */
+const nichtAufbewahrt = [];
 
 // ===========================================================================
 // Browser
@@ -35,6 +53,7 @@ const SCHLUESSEL = 'opencivil.projekt';
  * gesichert -- und das wäre schlicht gelogen.
  */
 export function imBrowserAblegen(projekt, gesichert = false) {
+  if (nichtAufbewahrt.length) return false;
   try {
     localStorage.setItem(SCHLUESSEL, JSON.stringify(
       { fassung: 1, gesichert, projekt }));
@@ -50,65 +69,125 @@ export function imBrowserAblegen(projekt, gesichert = false) {
 /**
  * Was im Browser liegt -- oder null. Wirft nicht.
  *
- * @returns {{projekt: Object, gesichert: boolean}|null}
+ * Dabei steht immer der Rohtext, wie er dalag: lässt sich der Stand nicht
+ * öffnen, wird genau er aufbewahrt. Ist er kein JSON, sagt `fehler` es.
+ *
+ * @returns {{roh: string, projekt?: Object, gesichert?: boolean, fehler?: string}|null}
  */
 export function ausDemBrowser() {
+  let roh;
   try {
-    const roh = localStorage.getItem(SCHLUESSEL);
-    if (!roh) return null;
+    roh = localStorage.getItem(SCHLUESSEL);
+  } catch (fehler) {
+    console.warn('Die Ablage im Browser ist nicht erreichbar:', fehler);
+    return null;
+  }
+  if (!roh) return null;
+  try {
     const inhalt = JSON.parse(roh);
     // Ohne Umschlag ist es eine Ablage aus der Zeit vor dieser Notiz --
     // dann gilt der Stand als ungesichert, was die vorsichtigere Annahme ist.
     return inhalt?.fassung === 1
-      ? { projekt: inhalt.projekt, gesichert: !!inhalt.gesichert }
-      : { projekt: inhalt, gesichert: false };
+      ? { roh, projekt: inhalt.projekt, gesichert: !!inhalt.gesichert }
+      : { roh, projekt: inhalt, gesichert: false };
   } catch (fehler) {
-    console.warn('Die Ablage im Browser ist unlesbar:', fehler);
-    return null;
+    return { roh, fehler: `Kein lesbares JSON (${fehler.message}).` };
   }
 }
 
-export function ablageLeeren() {
+/** Die aufbewahrten Stände im Browser -- leer, wenn es keine gibt. */
+function aufbewahrte() {
   try {
-    localStorage.removeItem(SCHLUESSEL);
+    const liste = JSON.parse(localStorage.getItem(GERETTET) || '[]');
+    return Array.isArray(liste) ? liste : [];
   } catch {
-    /* egal */
+    return [];
+  }
+}
+
+/**
+ * Bewahrt einen Stand auf, der sich nicht öffnen liess -- bevor irgendetwas
+ * seinen Platz überschreibt. Derselbe Rohtext steht nur einmal da. Gelingt
+ * es nicht, bleibt er im Speicher der Seite, und die Ablage schreibt nichts
+ * mehr, bis er verworfen ist.
+ */
+function retten(roh, grund) {
+  const eintrag = { zeit: new Date().toISOString(), grund, roh };
+  try {
+    const liste = aufbewahrte();
+    if (liste.some((e) => e.roh === roh)) return;
+    localStorage.setItem(GERETTET, JSON.stringify([...liste, eintrag]));
+  } catch (fehler) {
+    console.warn('Der unlesbare Stand liess sich im Browser nicht aufbewahren:', fehler);
+    nichtAufbewahrt.push(eintrag);
+  }
+}
+
+/**
+ * Die Stände, die sich nicht öffnen liessen, älteste zuerst. `aufbewahrt`
+ * sagt, ob einer im Browser liegt oder nur in dieser Seite.
+ *
+ * @returns {Array<{zeit: string, grund: string, roh: string, aufbewahrt: boolean}>}
+ */
+export function gerettete() {
+  return [
+    ...aufbewahrte().map((e) => ({ ...e, aufbewahrt: true })),
+    ...nichtAufbewahrt.map((e) => ({ ...e, aufbewahrt: false })),
+  ];
+}
+
+/** Bietet einen geretteten Stand als Datei an -- unverändert, wie er dalag. */
+export function geretteteHerunterladen(eintrag) {
+  let name = '';
+  try {
+    const inhalt = JSON.parse(eintrag.roh);
+    name = (inhalt?.fassung === 1 ? inhalt.projekt : inhalt)?.name || '';
+  } catch {
+    /* kein JSON: dann ohne Namen */
+  }
+  const zeit = eintrag.zeit.slice(0, 16).replace(/[-:T]/g, '');
+  herunterladen(eintrag.roh, `${dateiname(name)}-unlesbar-${zeit}.json`);
+}
+
+/** Verwirft einen geretteten Stand -- danach darf die Ablage wieder schreiben. */
+export function geretteteVerwerfen(eintrag) {
+  const i = nichtAufbewahrt.findIndex((e) => e.zeit === eintrag.zeit && e.roh === eintrag.roh);
+  if (i >= 0) {
+    nichtAufbewahrt.splice(i, 1);
+    return;
+  }
+  try {
+    const liste = aufbewahrte().filter((e) => e.zeit !== eintrag.zeit || e.roh !== eintrag.roh);
+    if (liste.length) localStorage.setItem(GERETTET, JSON.stringify(liste));
+    else localStorage.removeItem(GERETTET);
+  } catch (fehler) {
+    console.warn('Verwerfen nicht möglich:', fehler);
   }
 }
 
 /**
  * Holt die Beschreibung, mit der die Oberfläche startet.
  *
- * Erst der Browser, sonst das Beispiel. Ist das Abgelegte unbrauchbar, sagt
- * der Kern warum -- dann kommt das Beispiel, und der Grund wird gemeldet.
+ * Erst der Browser, sonst das Beispiel. Lässt sich das Abgelegte nicht
+ * öffnen, wird es aufbewahrt (`gerettete`), bevor das Beispiel kommt -- die
+ * Oberfläche zeigt es an, solange es da ist.
  *
- * @returns {Promise<{projekt: Object, gesichert: boolean,
- *                    herkunft: 'ablage'|'beispiel', hinweis: string}>}
+ * @returns {Promise<{projekt: Object, gesichert: boolean}>}
  */
 export async function projektHolen() {
   const abgelegt = ausDemBrowser();
-  if (abgelegt) {
+  if (!abgelegt) return { projekt: await api.beispiel(), gesichert: true };
+  let grund = abgelegt.fehler;
+  if (!grund) {
     try {
       const { projekt } = await api.pruefen(abgelegt.projekt);
-      return {
-        projekt, gesichert: abgelegt.gesichert, herkunft: 'ablage', hinweis: '',
-      };
+      return { projekt, gesichert: abgelegt.gesichert };
     } catch (fehler) {
-      // Nicht löschen: vielleicht lässt es sich noch retten, und ein
-      // stillschweigend geleerter Speicher wäre das schlechtere Ergebnis.
-      return {
-        projekt: await api.beispiel(),
-        gesichert: true,
-        herkunft: 'beispiel',
-        hinweis: `Abgelegtes Projekt unlesbar (${fehler.message}). Nicht gelöscht; `
-               + 'Start mit dem Beispiel.',
-      };
+      grund = fehler.message;
     }
   }
-  return {
-    projekt: await api.beispiel(), gesichert: true,
-    herkunft: 'beispiel', hinweis: '',
-  };
+  retten(abgelegt.roh, grund);
+  return { projekt: await api.beispiel(), gesichert: true };
 }
 
 // ===========================================================================
@@ -132,24 +211,27 @@ export function dateiname(name) {
  * verwaltung vernünftig vergleichen lassen, nicht bloss klein sein.
  */
 export function alsDateiSichern(projekt) {
-  const text = JSON.stringify(projekt, null, 2);
+  const name = herunterladen(JSON.stringify(projekt, null, 2),
+    `${dateiname(projekt.name)}.json`);
+  // Dieser Stand liegt jetzt auf der Platte -- das merkt sich die Ablage, damit
+  // der Punkt am Speichern-Knopf auch morgen noch die Wahrheit sagt.
+  imBrowserAblegen(projekt, true);
+  return name;
+}
+
+/** Bietet einen Text als Datei zum Herunterladen an und gibt ihren Namen zurück. */
+function herunterladen(text, name) {
   const adresse = URL.createObjectURL(
     new Blob([text], { type: 'application/json' }));
-
   const verweis = document.createElement('a');
   verweis.href = adresse;
-  verweis.download = `${dateiname(projekt.name)}.json`;
+  verweis.download = name;
   document.body.append(verweis);
   verweis.click();
   verweis.remove();
   // Erst freigeben, wenn der Browser den Download angenommen hat.
   setTimeout(() => URL.revokeObjectURL(adresse), 30000);
-
-  // Dieser Stand liegt jetzt auf der Platte -- das merkt sich die Ablage, damit
-  // der Punkt am Speichern-Knopf auch morgen noch die Wahrheit sagt.
-  imBrowserAblegen(projekt, true);
-
-  return verweis.download;
+  return name;
 }
 
 /**
