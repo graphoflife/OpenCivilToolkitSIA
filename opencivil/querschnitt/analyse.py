@@ -44,7 +44,7 @@ from opencivil.querschnitt.interaktion import (
 from opencivil.querschnitt.schubwaende import Wand
 from opencivil.querschnitt.schubwaende import zellen as zellen_finden
 from opencivil.nachweis.querschnittsloeser import wirksamer_modul
-from opencivil.nachweis.rechenwahl import Rechenwahl, betongesetz, werte_nach_id
+from opencivil.nachweis.rechenwahl import Rechenwahl, betongesetz
 from opencivil.querschnitt.werkstoffgesetz import BetonUngerissen, Stahlgesetz
 
 #: Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die
@@ -674,7 +674,7 @@ class Querschnittsanalyse:
         jedes schreibt sich selbst, mit den Werten darin. Ohne Kriechen: die
         Parabel haengt hier an ``E_cm``.
         """
-        werkstoffe, index = self.werkstoffe(werte_nach_id(e), self.rechenwahl)
+        werkstoffe, index = self.werkstoffe(e.si_nach_id(), self.rechenwahl)
         for stoff in self.baustoffe:
             satz = self.rechenwahl(stoff).satz
             kennwerte = (satz.betonkennwerte if stoff.art is Baustoffart.BETON
@@ -700,7 +700,7 @@ class Querschnittsanalyse:
         # Querschnitt und mit ihm alles, was er schon gesucht hat.
         schluessel = tuple(e.g(b.name).si for b in self.grundbezuege())
         if schluessel not in self._interaktionen:
-            werkstoffe, index = self.werkstoffe(werte_nach_id(e), self.rechenwahl)
+            werkstoffe, index = self.werkstoffe(e.si_nach_id(), self.rechenwahl)
             teile, bewehrung, herkunft = self.geometrie(index)
             self._interaktionen[schluessel] = (Querschnitt(
                 werkstoffe=werkstoffe, teile=teile, bewehrung=bewehrung,

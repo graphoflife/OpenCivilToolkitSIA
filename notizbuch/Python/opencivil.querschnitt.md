@@ -1,5 +1,5 @@
 ---
-erzeugt: 2a2a51b060d1
+erzeugt: ffcd17728a97
 art: modul
 tags: [modul]
 ---
@@ -23,3 +23,4 @@ schiefer Biegung, Querkraft und Torsion auf Schubwaende.
 - [[opencivil.querschnitt.schubwaende]] – Querkraft und Torsion auf Schubwaende verteilt.
 - [[opencivil.querschnitt.vorlagen]] – Querschnitte zum Anfangen.
 - [[opencivil.querschnitt.werkstoffgesetz]] – Spannungs-Dehnungs-Beziehungen.
+- [[opencivil.querschnitt.zugseite]] – welche Seite ein Moment zieht.

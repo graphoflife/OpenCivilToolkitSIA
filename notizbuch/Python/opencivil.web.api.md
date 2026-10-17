@@ -1,5 +1,5 @@
 ---
-erzeugt: cde457918140
+erzeugt: 7d93e06354ee
 art: modul
 tags: [modul]
 ---
@@ -146,8 +146,8 @@ Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks.
 - [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.geometrie]]
-- [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.querschnitt.vorlagen]]
+- [[opencivil.querschnitt.zugseite]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.stabwerk.modell]]
 - [[opencivil.stabwerk.querschnitte]]

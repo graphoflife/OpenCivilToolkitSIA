@@ -1,5 +1,5 @@
 ---
-erzeugt: 883469d589bb
+erzeugt: 660d6d61272e
 art: modul
 tags: [modul]
 ---
@@ -122,6 +122,17 @@ def g(self, name: str) -> Groesse
 ```
 
 Nur die Groesse -- die Kurzform fuers Rechnen.
+
+#### Eingaben.si_nach_id
+
+```python
+def si_nach_id(self) -> Callable[[str], float]
+```
+
+Die Zahl einer Eingabe in SI, nach ihrer Wert-ID -- fuer, wer seine
+Werte nach ID liest: die Stahllagen der Platte, die Werkstoffe des
+gezeichneten Querschnitts. So lesen sie aus einer Loesung wie aus den
+Eingaben eines Nachweises.
 
 #### Eingaben.groessen
 

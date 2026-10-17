@@ -245,19 +245,13 @@ def lagenbezuege(posten, satz: Werkstoffsatz) -> List[Eingabebezug]:
     return bezuege + stahlbezuege(posten, ("E_s", satz.stahl, satz.stahl_druck, "eps_ud"))
 
 
-def werte_nach_id(e: Eingaben) -> Callable[[str], float]:
-    """Die Zahl einer Eingabe in SI, nach ihrer Wert-ID -- fuer :func:`stahllagen`."""
-    nach_id = {w.id: w.groesse.si for w in e.values()}
-    return nach_id.__getitem__
-
-
 def stahllagen(posten, satz: Werkstoffsatz, wert: Callable[[str], float]) -> List[Stahllage]:
     """
     Je Bewehrungsposten eine Lage, mit dem Stahl ihrer Lage im Wertesatz der
     Wahl -- die eine Stelle, die Lagen baut.
 
     ``wert`` liefert zu einer Wert-ID die Zahl in SI: in einem Nachweis aus
-    seinen Eingaben (:func:`werte_nach_id` ueber :func:`lagenbezuege`), in
+    seinen Eingaben (``Eingaben.si_nach_id`` ueber :func:`lagenbezuege`), in
     der Spannung-Dehnung-Analyse aus der Loesung.
     """
     gesetze: Dict[str, Stahlgesetz] = {}
@@ -394,7 +388,7 @@ def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *
     g.beton.protokoll(p, beton, titel=titel, basis=basis)
 
     sorten = staehle(posten)
-    gesetz_von = {l.sorte: l.stahl for l in stahllagen(posten, satz, werte_nach_id(e))}
+    gesetz_von = {l.sorte: l.stahl for l in stahllagen(posten, satz, e.si_nach_id())}
     for stahl in sorten:
         g.stahl(gesetz_von[kennung_aus(stahl.id)]).protokoll(
             p, {rolle: e[stahlname(name, stahl)] for rolle, name in satz.stahlkennwerte.items()},

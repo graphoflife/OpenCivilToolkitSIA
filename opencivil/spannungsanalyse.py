@@ -1197,7 +1197,7 @@ class Analyse:
     art: Analyseart
     richtung: Any
     """Die Tragrichtung einer Platte (:class:`Richtung`) oder die Zugseite eines
-    gezeichneten Querschnitts (:class:`~opencivil.querschnitt.schnittanalyse.Zugseite`)."""
+    gezeichneten Querschnitts (:class:`~opencivil.querschnitt.zugseite.Zugseite`)."""
 
     richtung_text: str = ""
     """Wie sie neben dem Titel steht -- «x», «Zug unten»."""

@@ -88,7 +88,7 @@ from opencivil.nachweis.querschnittsloeser import (
 from opencivil.nachweis.rechenwahl import (
     Betonkennwerte, Rechenart, Rechenwahl, betonbezuege, bezuege_vereinen, gesetze,
     lagenbezuege, protokoll_gesetze, protokoll_rechenwahl, stahlbezuege, stahllagen,
-    stahlname, staehle, werte_nach_id,
+    stahlname, staehle,
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.zustand2 import wertigkeit
@@ -562,7 +562,7 @@ class Spannungsbegrenzung(Nachweis):
         b = e.g("b").si
         wahl = self.wahl
         w = Betonkennwerte.aus_eingaben(e, wahl.satz)
-        lagen = stahllagen(self.posten, wahl.satz, werte_nach_id(e))
+        lagen = stahllagen(self.posten, wahl.satz, e.si_nach_id())
         loeser = gesetze(wahl, w).loeser(h=h, b=b, lagen=lagen)
 
         sigma_adm = self._protokoll_ansatz(p, e, w, loeser)

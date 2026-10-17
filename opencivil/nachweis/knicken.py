@@ -120,7 +120,7 @@ from opencivil.nachweis.querschnittsloeser import (
 )
 from opencivil.nachweis.rechenwahl import (
     Betonkennwerte, Rechenart, Rechenwahl, betonbezuege, bezuege_vereinen, gesetze,
-    lagenbezuege, protokoll_gesetze, protokoll_rechenwahl, stahllagen, werte_nach_id,
+    lagenbezuege, protokoll_gesetze, protokoll_rechenwahl, stahllagen,
 )
 from opencivil.nachweis.resistenzlinie import Widerstandslinie
 from opencivil.querschnitt.platte import Richtung
@@ -771,7 +771,7 @@ class Knicken(Knickverfahren):
 
         # Jede Lage mit ihrem Stahl; das Fenster reicht im Zug bis zur
         # kleinsten Bruchdehnung der Lagen, an beiden Raendern.
-        lagen = stahllagen(self.posten, wahl.satz, werte_nach_id(e))
+        lagen = stahllagen(self.posten, wahl.satz, e.si_nach_id())
         # Kriechen weicht den Beton auf; das Gesetz rechnet mit dem wirksamen
         # Modul. eps_c1d und eps_c2d bleiben, wie die Norm sie angibt.
         g = gesetze(wahl, w)

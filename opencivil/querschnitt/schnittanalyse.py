@@ -75,7 +75,7 @@ from opencivil.nachweis.querschnittsloeser import (
     FASERN, Faserloeser, Stahllage, protokoll_wirksamer_modul, wirksamer_modul_wert,
 )
 from opencivil.nachweis.rechenwahl import (
-    Rechenart, Rechenwahl, werte_nach_id,
+    Rechenart, Rechenwahl,
 )
 from opencivil.nachweis.sproedes_versagen import (
     MOMENTENTEILER, beiwert_dicke, protokoll_zugfestigkeit,
@@ -84,6 +84,7 @@ from opencivil.querschnitt.analyse import Querschnittsanalyse, Stabgruppe
 from opencivil.querschnitt.fasern import Faserquerschnitt, Stab
 from opencivil.querschnitt.interaktion import Querschnitt, Werkstoff
 from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
+from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.spannungsanalyse import (
     Analyse, Analyseart, Grenzzustand, Linie, auswerten, herleitung,
 )
@@ -92,37 +93,6 @@ if TYPE_CHECKING:
     from opencivil.core.rechenwerk import Loesung
     from opencivil.core.wert import Wert
     from opencivil.projekt import Aufbau
-
-
-class Zugseite(Wahl):
-    """Die Seite, die ein positives Moment zieht -- und die Richtung, die dazu gehoert."""
-
-    UNTEN = "unten"
-    OBEN = "oben"
-    LINKS = "links"
-    RECHTS = "rechts"
-
-    @property
-    def beschriftung(self) -> str:
-        return f"Zug {self.value}"
-
-    @property
-    def psi(self) -> float:
-        """Die Zugrichtung als Winkel, wie :class:`~opencivil.querschnitt.interaktion.Querschnitt` sie nimmt."""
-        return {Zugseite.UNTEN: -math.pi / 2.0, Zugseite.OBEN: math.pi / 2.0,
-                Zugseite.LINKS: math.pi, Zugseite.RECHTS: 0.0}[self]
-
-    @property
-    def um_y(self) -> bool:
-        """Ob die Biegung um die y-Achse geht -- Zug unten oder oben."""
-        return self in (Zugseite.UNTEN, Zugseite.OBEN)
-
-    @property
-    def raender(self) -> Tuple[str, str]:
-        """Wie die beiden Raender heissen: der gedrueckte und der gezogene."""
-        return {Zugseite.UNTEN: ("oben", "unten"), Zugseite.OBEN: ("unten", "oben"),
-                Zugseite.LINKS: ("rechts", "links"),
-                Zugseite.RECHTS: ("links", "rechts")}[self]
 
 
 # ===========================================================================
@@ -368,7 +338,7 @@ def protokoll_gesetze_nach_wahl(p: Protokoll, e: Eingaben, analyse: Querschnitts
     """
     satz = wahl.satz
     phi = Zwischenwerte(basis).zahl("phi", r"\varphi", wahl.kriechzahl, stellen=2)
-    werkstoffe, index = analyse.werkstoffe(werte_nach_id(e), lambda stoff: wahl)
+    werkstoffe, index = analyse.werkstoffe(e.si_nach_id(), lambda stoff: wahl)
     for stoff in analyse.baustoffe:
         unter = f"{basis}.{kennung_aus(stoff.id)}"
         if stoff.art is Baustoffart.BETON:

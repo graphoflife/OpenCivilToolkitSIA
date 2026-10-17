@@ -42,7 +42,7 @@ from opencivil.nachweis.rechenwahl import FASERSPANNUNGSARTEN, Rechenart, Rechen
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.platte import ALPHA_MAX, ALPHA_MIN
 from opencivil.querschnitt import vorlagen
-from opencivil.querschnitt.schnittanalyse import Zugseite
+from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste, Gebrauchswahl,
     KnickEintrag, KnickVerformungswahl, KnickWiderstandswahl, SpannungsfallEintrag,
@@ -239,7 +239,7 @@ class QAKnickEintrag(KnickEintrag):
     """
     Ein Knicknachweis des gezeichneten Querschnitts -- wie bei der Platte,
     dazu die Zugseite: die Seite, zu der sich der Stab biegt und die das
-    Moment 1. Ordnung zieht (:class:`~opencivil.querschnitt.schnittanalyse.Zugseite`).
+    Moment 1. Ordnung zieht (:class:`~opencivil.querschnitt.zugseite.Zugseite`).
     """
 
     richtung: Zugseite = Zugseite.UNTEN
@@ -272,7 +272,7 @@ class QASpannungsfallEintrag(SpannungsfallEintrag):
     """
     Eine Spannung-Dehnung-Analyse des gezeichneten Querschnitts -- dieselben
     Felder wie bei der Platte. Die Richtung ist hier die Zugseite: die Seite,
-    die ein positives Moment zieht (:class:`~opencivil.querschnitt.schnittanalyse.Zugseite`).
+    die ein positives Moment zieht (:class:`~opencivil.querschnitt.zugseite.Zugseite`).
     """
 
     richtung: Zugseite = Zugseite.UNTEN

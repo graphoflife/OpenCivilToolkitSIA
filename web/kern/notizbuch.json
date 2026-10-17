@@ -2363,6 +2363,7 @@
         "Eingaben.befund",
         "Eingaben.hat",
         "Eingaben.g",
+        "Eingaben.si_nach_id",
         "Eingaben.groessen",
         "Eingaben.teilmenge",
         "Ausfuehrung",
@@ -3180,7 +3181,6 @@
         "stahlname",
         "stahlbezuege",
         "lagenbezuege",
-        "werte_nach_id",
         "stahllagen",
         "bezuege_vereinen",
         "betongesetz",
@@ -4019,11 +4019,6 @@
       "art": "modul",
       "kurz": "Spannung-Dehnung-Analyse am gezeichneten Querschnitt.",
       "stichworte": [
-        "Zugseite",
-        "Zugseite.beschriftung",
-        "Zugseite.psi",
-        "Zugseite.um_y",
-        "Zugseite.raender",
         "_betonspannung",
         "_loeser",
         "Schnittpaar",
@@ -4140,6 +4135,19 @@
         "Dehnungsebene.bei",
         "Dehnungsebene.kruemmung",
         "Dehnungsebene.nulllinie"
+      ]
+    },
+    {
+      "name": "opencivil.querschnitt.zugseite",
+      "pfad": "Python/opencivil.querschnitt.zugseite.md",
+      "art": "modul",
+      "kurz": "welche Seite ein Moment zieht.",
+      "stichworte": [
+        "Zugseite",
+        "Zugseite.beschriftung",
+        "Zugseite.psi",
+        "Zugseite.um_y",
+        "Zugseite.raender"
       ]
     },
     {

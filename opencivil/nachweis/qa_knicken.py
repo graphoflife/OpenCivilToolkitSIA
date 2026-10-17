@@ -5,7 +5,7 @@ VERANTWORTUNG:
 Der Knicknachweis der Platte am gezeichneten Querschnitt, je Knickfall in
 einer Richtung: der Zugseite, zu der sich der Stab biegt -- unten, oben,
 links oder rechts, wie bei den Spannung-Dehnung-Analysen
-(:class:`~opencivil.querschnitt.schnittanalyse.Zugseite`). Das Verfahren ist
+(:class:`~opencivil.querschnitt.zugseite.Zugseite`). Das Verfahren ist
 dasselbe (:class:`~opencivil.nachweis.knicken.Knickverfahren`: Ausmitten-
 Iteration, Grenzkraft N_Rd); hier steht nur, woher der Stab kommt
 (:class:`~opencivil.nachweis.knicken.Knickstab`):
@@ -47,12 +47,13 @@ from opencivil.nachweis.knicken import (
     VERFORMUNG, VERFORMUNG_NACH_WAHL, WIDERSTAND, Knickfall, Knickstab, Knickverfahren,
 )
 from opencivil.nachweis.querschnittsloeser import FaserloeserIllinois
-from opencivil.nachweis.rechenwahl import Rechenwahl, protokoll_rechenwahl, werte_nach_id
+from opencivil.nachweis.rechenwahl import Rechenwahl, protokoll_rechenwahl
 from opencivil.querschnitt.analyse import Querschnittsanalyse
 from opencivil.querschnitt.interaktion import Querschnitt
 from opencivil.querschnitt.schnittanalyse import (
-    Zugseite, protokoll_gesetze_nach_wahl, querschnitt_nach_wahl,
+    protokoll_gesetze_nach_wahl, querschnitt_nach_wahl,
 )
+from opencivil.querschnitt.zugseite import Zugseite
 
 
 @dataclass(frozen=True)
@@ -113,7 +114,7 @@ class KnickenQA(Knickverfahren):
         return f"Knicken – {fall.name}, {fall.richtung.beschriftung}"
 
     def pruefe(self, e: Eingaben, p: Protokoll):
-        wert = werte_nach_id(e)
+        wert = e.si_nach_id()
         q_verformung, _, _ = querschnitt_nach_wahl(self.analyse, wert, self.verformung)
         q_widerstand, _, _ = querschnitt_nach_wahl(self.analyse, wert, self.widerstand)
         self._protokoll_ansatz(p, e)

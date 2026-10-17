@@ -72,7 +72,7 @@ from opencivil.nachweis.gebrauchsebene import (
 )
 from opencivil.nachweis.mindestbewehrung import DICKENGRENZE
 from opencivil.nachweis.querschnittsloeser import VERFEHLTE_EBENE
-from opencivil.nachweis.rechenwahl import Rechenwahl, protokoll_rechenwahl, werte_nach_id
+from opencivil.nachweis.rechenwahl import Rechenwahl, protokoll_rechenwahl
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.richtungsnachweise import (
     protokoll_rissmoment, protokoll_spannung_ungerissen, richtungen, rissbezuege, rissmoment,
@@ -171,7 +171,7 @@ class SpannungsbegrenzungQA(Nachweis):
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         a = self.analyse
-        q, herkunft, _ = querschnitt_nach_wahl(a, werte_nach_id(e), self.wahl)
+        q, herkunft, _ = querschnitt_nach_wahl(a, e.si_nach_id(), self.wahl)
         staebe = stabangaben(a, q, herkunft)
         grenzen = (grenzen_gegen_fliessen(a, e, staebe) if self.grenze is GrenzeGegenFliessen
                    else grenzen_aus_rissbreite(a, e, staebe, self.anforderung))
@@ -413,7 +413,7 @@ class RissnormalkraftQA(Nachweis):
             "Betons.")
         N_Riss = self._risskraft(p, e, werte)
 
-        q, herkunft, _ = querschnitt_nach_wahl(a, werte_nach_id(e), VORGABE)
+        q, herkunft, _ = querschnitt_nach_wahl(a, e.si_nach_id(), VORGABE)
         staebe = stabangaben(a, q, herkunft)
         if not staebe:
             p.text("Ohne Bewehrung → kein Nachweis.")
@@ -524,7 +524,7 @@ class ZwaengungBiegungQA(Nachweis):
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         a = self.analyse
-        q, herkunft, _ = querschnitt_nach_wahl(a, werte_nach_id(e), self.wahl)
+        q, herkunft, _ = querschnitt_nach_wahl(a, e.si_nach_id(), self.wahl)
         staebe = stabangaben(a, q, herkunft)
         self._protokoll_ansatz(p, e)
         grenzen = grenzen_aus_rissbreite(a, e, staebe, self.anforderung)

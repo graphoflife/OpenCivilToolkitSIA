@@ -53,7 +53,7 @@ from opencivil.projekt.querschnittsanalyse import (
     SchubwandEintrag, StabEintrag, StablinieEintrag, WerkstoffwahlEintrag,
 )
 from opencivil.querschnitt.analyse import Zeichnung
-from opencivil.querschnitt.schnittanalyse import Zugseite
+from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.vorlagen import VORLAGEN
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz

@@ -15,7 +15,8 @@ from opencivil.nachweis.knicken import VERFORMUNG, WIDERSTAND
 from opencivil.nachweis.qa_knicken import knickstab
 from opencivil.projekt import Projekt, ProjektFehler
 from opencivil.projekt.querschnittsanalyse import QAKnickEintrag, QuerschnittsanalyseEintrag
-from opencivil.querschnitt.schnittanalyse import Zugseite, querschnitt_nach_wahl
+from opencivil.querschnitt.schnittanalyse import querschnitt_nach_wahl
+from opencivil.querschnitt.zugseite import Zugseite
 
 
 def stuetze(b=400, h=400):

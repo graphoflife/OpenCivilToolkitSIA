@@ -140,6 +140,16 @@ class Eingaben(Mapping[str, Wert]):
         """Nur die Groesse -- die Kurzform fuers Rechnen."""
         return self[name].groesse
 
+    def si_nach_id(self) -> Callable[[str], float]:
+        """
+        Die Zahl einer Eingabe in SI, nach ihrer Wert-ID -- fuer, wer seine
+        Werte nach ID liest: die Stahllagen der Platte, die Werkstoffe des
+        gezeichneten Querschnitts. So lesen sie aus einer Loesung wie aus den
+        Eingaben eines Nachweises.
+        """
+        nach_id = {w.id: w.groesse.si for w in self._werte.values()}
+        return nach_id.__getitem__
+
     def groessen(self) -> Dict[str, Groesse]:
         """Alle Eingaben als ``name -> Groesse``, passend fuer ``funktion(**...)``."""
         return {name: wert.groesse for name, wert in self._werte.items()}

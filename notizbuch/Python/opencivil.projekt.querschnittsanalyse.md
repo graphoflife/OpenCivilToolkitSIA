@@ -1,5 +1,5 @@
 ---
-erzeugt: 7edaf4b05de4
+erzeugt: aa95861855af
 art: modul
 tags: [modul]
 ---
@@ -236,7 +236,7 @@ class QAKnickEintrag(KnickEintrag)
 
 Ein Knicknachweis des gezeichneten Querschnitts -- wie bei der Platte,
 dazu die Zugseite: die Seite, zu der sich der Stab biegt und die das
-Moment 1. Ordnung zieht ([[opencivil.querschnitt.schnittanalyse#Zugseite|Zugseite]]).
+Moment 1. Ordnung zieht ([[opencivil.querschnitt.zugseite#Zugseite|Zugseite]]).
 
 - `richtung: Zugseite = Zugseite.UNTEN`
 
@@ -276,7 +276,7 @@ class QASpannungsfallEintrag(SpannungsfallEintrag)
 
 Eine Spannung-Dehnung-Analyse des gezeichneten Querschnitts -- dieselben
 Felder wie bei der Platte. Die Richtung ist hier die Zugseite: die Seite,
-die ein positives Moment zieht ([[opencivil.querschnitt.schnittanalyse#Zugseite|Zugseite]]).
+die ein positives Moment zieht ([[opencivil.querschnitt.zugseite#Zugseite|Zugseite]]).
 
 - `richtung: Zugseite = Zugseite.UNTEN`
 
@@ -536,8 +536,8 @@ wird danach, was man braucht.
 - [[opencivil.projekt.netz]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.platte]]
-- [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.querschnitt.vorlagen]]
+- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 

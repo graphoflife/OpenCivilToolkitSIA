@@ -1,5 +1,5 @@
 ---
-erzeugt: 1579134af575
+erzeugt: cde140101f1c
 art: modul
 tags: [modul]
 ---
@@ -20,7 +20,7 @@ Herleitung anders schreibt.
 ## JE ZUGSEITE
 
 Eine Analyse waehlt die Seite, die ein positives Moment zieht: unten, oben,
-links oder rechts ([[opencivil.querschnitt.schnittanalyse#Zugseite|Zugseite]]). Die Nulllinie bleibt parallel zur
+links oder rechts ([[opencivil.querschnitt.zugseite#Zugseite|Zugseite]]). Die Nulllinie bleibt parallel zur
 Achse, wie in der einachsigen Tragsicherheit. Das Moment um die andere
 Achse, das ein unsymmetrischer Querschnitt dabei weckt, zaehlt nicht -- ein
 L-Querschnitt drehte seine Nulllinie in Wirklichkeit. Die Platte rechnet
@@ -80,53 +80,6 @@ Gebrauchsnachweise und das Knicken -- es steht darum einmal hier.
 SI-Basis wie im ganzen Querschnittsmodul.
 
 ## Inhalt
-
-### Zugseite
-
-```python
-class Zugseite(Wahl)
-```
-
-Die Seite, die ein positives Moment zieht -- und die Richtung, die dazu gehoert.
-
-- `UNTEN = 'unten'`
-- `OBEN = 'oben'`
-- `LINKS = 'links'`
-- `RECHTS = 'rechts'`
-
-#### Zugseite.beschriftung
-
-```python
-@property
-def beschriftung(self) -> str
-```
-
-#### Zugseite.psi
-
-```python
-@property
-def psi(self) -> float
-```
-
-Die Zugrichtung als Winkel, wie [[opencivil.querschnitt.interaktion#Querschnitt|Querschnitt]] sie nimmt.
-
-#### Zugseite.um_y
-
-```python
-@property
-def um_y(self) -> bool
-```
-
-Ob die Biegung um die y-Achse geht -- Zug unten oder oben.
-
-#### Zugseite.raender
-
-```python
-@property
-def raender(self) -> Tuple[str, str]
-```
-
-Wie die beiden Raender heissen: der gedrueckte und der gezogene.
 
 ### _betonspannung
 
@@ -321,15 +274,14 @@ gerufen. Mit `protokoll` schreibt jede Linie ihre Herleitung.
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
+- [[opencivil.querschnitt.zugseite]]
 - [[opencivil.spannungsanalyse]]
 
 ## Gebraucht von
 
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.qa_knicken]]
-- [[opencivil.projekt.querschnittsanalyse]]
 - [[opencivil.spannungsanalyse]]
-- [[opencivil.web.api]]
 
 ## Formeln aus diesem Modul
 

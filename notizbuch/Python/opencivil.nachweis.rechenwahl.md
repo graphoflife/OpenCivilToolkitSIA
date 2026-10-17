@@ -1,5 +1,5 @@
 ---
-erzeugt: f0612bba7d47
+erzeugt: 480faaa281c5
 art: modul
 tags: [modul]
 ---
@@ -236,14 +236,6 @@ def lagenbezuege(posten, satz: Werkstoffsatz) -> List[Eingabebezug]
 Was [[opencivil.nachweis.rechenwahl#stahllagen|stahllagen]] liest: je Posten Flaeche und Tiefe, je Stahl
 seine Kennwerte im Wertesatz der Wahl.
 
-### werte_nach_id
-
-```python
-def werte_nach_id(e: Eingaben) -> Callable[[str], float]
-```
-
-Die Zahl einer Eingabe in SI, nach ihrer Wert-ID -- fuer [[opencivil.nachweis.rechenwahl#stahllagen|stahllagen]].
-
 ### stahllagen
 
 ```python
@@ -254,7 +246,7 @@ Je Bewehrungsposten eine Lage, mit dem Stahl ihrer Lage im Wertesatz der
 Wahl -- die eine Stelle, die Lagen baut.
 
 `wert` liefert zu einer Wert-ID die Zahl in SI: in einem Nachweis aus
-seinen Eingaben ([[opencivil.nachweis.rechenwahl#werte_nach_id|werte_nach_id]] ueber [[opencivil.nachweis.rechenwahl#lagenbezuege|lagenbezuege]]), in
+seinen Eingaben (`Eingaben.si_nach_id` ueber [[opencivil.nachweis.rechenwahl#lagenbezuege|lagenbezuege]]), in
 der Spannung-Dehnung-Analyse aus der Loesung.
 
 ### bezuege_vereinen

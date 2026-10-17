@@ -1,5 +1,5 @@
 ---
-erzeugt: 18d9605bc43a
+erzeugt: 98d09a10f0db
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -91,6 +91,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.querschnitt.schubwaende]] – Querkraft und Torsion auf Schubwaende verteilt.
     - [[opencivil.querschnitt.vorlagen]] – Querschnitte zum Anfangen.
     - [[opencivil.querschnitt.werkstoffgesetz]] – Spannungs-Dehnungs-Beziehungen.
+    - [[opencivil.querschnitt.zugseite]] – welche Seite ein Moment zieht.
   - [[opencivil.spannungsanalyse]] – den Querschnitt ansehen, ohne ihn nachzuweisen.
 - [[opencivil.stabwerk]] – ebene Stabwerke nach der Steifigkeitsmethode.
     - [[opencivil.stabwerk.herleitung]] – wie ein Balkensystem seine Rechnung aufschreibt.

@@ -63,7 +63,7 @@ from opencivil.nachweis.handrechnung import (
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
     RECHENARTEN, Rechenart, Rechenwahl, betonbezuege, betongesetz, lagenbezuege,
-    protokoll_rechenwahl, stahllagen, werte_nach_id,
+    protokoll_rechenwahl, stahllagen,
 )
 from opencivil.nachweis.resistenzlinie import (
     Ebenenlinie, Handlinie, Treffer, Widerstandslinie,
@@ -683,7 +683,7 @@ def resistenzlinie(
     h, b = e.g("h").si, e.g("b").si
     f_c = abs(e.g(satz.beton).si)
     eps_c1d, eps_c2d = abs(e.g("eps_c1d").si), abs(e.g("eps_c2d").si)
-    lagen = stahllagen(posten, satz, werte_nach_id(e))
+    lagen = stahllagen(posten, satz, e.si_nach_id())
 
     if hand:
         # Die Zugehoerigkeit zur unteren oder oberen Lage kommt aus dem

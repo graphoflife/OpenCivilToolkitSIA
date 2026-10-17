@@ -1,5 +1,5 @@
 ---
-erzeugt: f432536e4fc7
+erzeugt: 5c393de9f49f
 art: modul
 tags: [modul]
 ---
@@ -700,7 +700,7 @@ Ein Spannungsfall der Beschreibung -- und was die Auswertung ergab.
 
 - `fall: Any` – Der [[opencivil.spannungsanalyse#Analyse|SpannungsfallEintrag]], wie er in der Beschreibung steht.
 - `art: Analyseart`
-- `richtung: Any` – Die Tragrichtung einer Platte ([[opencivil.querschnitt.platte#Richtung|Richtung]]) oder die Zugseite eines gezeichneten Querschnitts ([[opencivil.querschnitt.schnittanalyse#Zugseite|Zugseite]]).
+- `richtung: Any` – Die Tragrichtung einer Platte ([[opencivil.querschnitt.platte#Richtung|Richtung]]) oder die Zugseite eines gezeichneten Querschnitts ([[opencivil.querschnitt.zugseite#Zugseite|Zugseite]]).
 - `richtung_text: str = ''` – Wie sie neben dem Titel steht -- «x», «Zug unten».
 - `h: float = 0.0` – Die Tiefe in m -- fuer das Bild: die Dicke der Platte, beim gezeichneten Querschnitt die Ausdehnung des Betons in Zugrichtung.
 - `bild: Optional[Querschnittsbild] = None`

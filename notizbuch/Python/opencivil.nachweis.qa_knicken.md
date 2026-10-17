@@ -1,5 +1,5 @@
 ---
-erzeugt: f240d83daf8f
+erzeugt: 23583abb8d51
 art: modul
 tags: [modul]
 ---
@@ -12,7 +12,7 @@ tags: [modul]
 Der Knicknachweis der Platte am gezeichneten Querschnitt, je Knickfall in
 einer Richtung: der Zugseite, zu der sich der Stab biegt -- unten, oben,
 links oder rechts, wie bei den Spannung-Dehnung-Analysen
-([[opencivil.querschnitt.schnittanalyse#Zugseite|Zugseite]]). Das Verfahren ist
+([[opencivil.querschnitt.zugseite#Zugseite|Zugseite]]). Das Verfahren ist
 dasselbe ([[opencivil.nachweis.knicken#Knickverfahren|Knickverfahren]]: Ausmitten-
 Iteration, Grenzkraft N_Rd); hier steht nur, woher der Stab kommt
 ([[opencivil.nachweis.knicken#Knickstab|Knickstab]]):
@@ -94,6 +94,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.schnittanalyse]]
+- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 

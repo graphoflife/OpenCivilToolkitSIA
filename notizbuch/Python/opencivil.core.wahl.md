@@ -1,5 +1,5 @@
 ---
-erzeugt: 4bdf3c9f4b1e
+erzeugt: 75b27452353b
 art: modul
 tags: [modul]
 ---
@@ -40,5 +40,6 @@ Eine Wahl: das Mitglied ist sein Text.
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.schnittanalyse]]
+- [[opencivil.querschnitt.zugseite]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.stabwerk.modell]]
