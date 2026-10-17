@@ -44,6 +44,63 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-17 · Platte und gezeichneter Querschnitt: ein Nachweis, zwei Geometrien
+
+Phase 3 des Umbaus aus der Durchsicht vom 2026-10-16, in fünfzehn Commits.
+Zahlen ändern sich nur, wo der Benutzer es entschieden hat -- bei den
+Rissgrössen und der kippenden Nulllinie; jeder andere Schritt ist mit dem
+Werteabdruck bis auf die letzte Stelle belegt.
+
+- **Ein Gesetz schreibt sich selbst** (`Gesetz.protokoll`). Fünf Stellen
+  schrieben die Werkstoffgesetze in die Herleitung, jede mit eigener Weiche
+  (`isinstance`, `art is ELASTISCH`, `mit_block`); jetzt schreibt jedes
+  Gesetz seine Formel und seine Werte. Der Schalter `gemittelt` fällt weg:
+  ob ein Gesetz springt, sagt es selbst (`mittel`).
+- **Schichten.** Rechenwahl, Rechenart, Wertesatz und Betongesetz gehören
+  dem Querschnitt (`querschnitt/gesetzwahl.py`), die Zugseite hat ein
+  eigenes Modul, das Fachwerk zieht nach `querschnitt/fachwerk.py`;
+  `tests/test_schichten.py` hält fest, dass der Querschnitt nichts von oben
+  importiert. Die Spannung-Dehnung-Analyse ist ein Paket
+  (`spannungsanalyse/`), mit einem Protokoll `Paar` statt `Any`.
+  «Ungerissen» gibt es nur noch auf einem Weg (`betongesetz(…,
+  ungerissen=True)`).
+- **Die Rissgrössen an einer Stelle** (`nachweis/rissgroessen.py`). Sie
+  standen viermal da und sagten schon Verschiedenes: das Rissmoment der
+  Analyse ohne I_yz, das des Nachweises mit, und für die rissaktive Dicke
+  unter Zug vier Regeln. Jetzt, wie der Benutzer am 2026-10-17 entschieden
+  hat: das Rissmoment unter reiner Biegung, wo f_ct,eff zuerst erreicht
+  wird, «einachsig» mit W = I/v; k_t unter Biegung mit h/3, unter Zug mit
+  min(h; b), wahlweise höchstens 500 mm.
+- **Die Nulllinie der Analyse kippt** (`spannungsanalyse/schnitt.py`,
+  `KippendeNulllinie`). Jede Ebene sucht die Neigung, bei der kein Moment
+  um die andere Achse bleibt, mit der Suche der Gebrauchsnachweise
+  (`gebrauchsebene.neigung_suchen`); «einachsig» bleibt sie waagrecht. Der
+  äquivalente Modul vergleicht dann mit I_y − I_yz²/I_z. An einem L (Steg
+  200 × 800, Flansch 600 × 200) sinkt das Rissmoment von 116.0 auf
+  56.9 kNm, und die Linie endet genau beim Widerstand der Tragsicherheit.
+  Der Preis: eine gekippte Linie dauert etwa dreimal so lang -- angenommen,
+  schneller in Phase 4. Unterwegs behoben: Stäbe gleicher Tiefe verloren
+  als Lage ihren Arm entlang der Nulllinie, und `illinois` rechnete mit
+  `nan` weiter.
+- **Ein Nachweis, zwei Anschlüsse.** Die Stahlspannung misst an Stellen --
+  Lagen oder Stäbe --, was die Geometrie beiträgt, sagt ein schmaler
+  Anschluss (`Stahlspannungsort`: `PlattenStellen`, `AnalyseStellen`);
+  `SpannungsbegrenzungQA` mit seinem kopierten Urteil fällt weg. Bei der
+  Zwängung auf Biegung teilen beide nur Name, Thema und Einleitung
+  (`Biegezwang`): die Platte rechnet von Hand mit d − x/3, der gezeichnete
+  Querschnitt sucht -- ein gemeinsamer Nachweis hätte fast nur
+  weitergereicht (Benutzer, 2026-10-17).
+- **Die Beschreibung und die Maske einmal.** Zwölf Felder, die beide gleich
+  angeben, stehen in `Querschnittsangaben`. Die Oberfläche baut die sechs
+  gemeinsamen Kapitel mit `nachweisKapitel(ort)`: eine Schalterzeile, die
+  Fragezeichen am Kapitel, das Gemeinsame der Hilfe einmal. Was das
+  Bauteil anders zeigt, sagt sein Ort (`PLATTE`, `ORT`).
+- **Dateien.** `projekt/aufbau.py` wird ein Paket -- ein Kern und je
+  Bauteilart ein Modul --, `nachweise.js` teilt sich nach Abnehmern
+  (`nachweise.js` für beide, `plattenkapitel.js`, `bewehrungssuche.js`),
+  und `TestVorgabenAnEinerStelle` fällt weg: seit dem neuen Leser prüfte er
+  nur noch, was die Bauart garantiert.
+
 ## 2026-10-17 · Prüfen nach Regel, Wahlfelder als Wahl
 
 Phase 2 des Umbaus aus der Durchsicht vom 2026-10-16, in elf Commits. Keine

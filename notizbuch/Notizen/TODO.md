@@ -71,55 +71,11 @@ gelernt wurde, steht in [[Entwicklung]].
 
 Sechs Durchsichten über die Arbeit vom 15. und 16. Oktober (42 Commits);
 jeder Punkt ist am Code nachgeprüft. Die vier Fehler mit Folge sind behoben,
-ebenso Phase 2, Prüfen und Wahlfelder (2026-10-17, siehe [[Entwicklung]]);
-hier steht der Umbau in der empfohlenen Reihenfolge. Der Plan dazu: Phase 3
-Platte und Querschnitt als ein Nachweis, Phase 4 Löser und Kennzahlen,
+ebenso Phase 2, Prüfen und Wahlfelder, und Phase 3, Platte und Querschnitt
+als ein Nachweis (beide 2026-10-17, siehe [[Entwicklung]]). Hier steht, was
+bleibt, in der empfohlenen Reihenfolge: Phase 4 Löser und Kennzahlen,
 Phase 5 Oberfläche.
 
-- [ ] **Platte und gezeichneter Querschnitt: ein Nachweis, zwei
-      Geometrien.** Heute gibt es zwei Umsetzungen:
-      - `SpannungsbegrenzungQA` kopiert `Spannungsbegrenzung`, mit gleichem
-        `_urteil` und gleichem Satz «Stahl fliesst». Der Kopf der Platte
-        verbietet genau das.
-      - Die Rissgrössen stehen viermal und sagen schon Verschiedenes: Das
-        Rissmoment der Analyse rechnet ohne `I_yz`, das des Nachweises mit.
-        Für die rissaktive Dicke unter Zug gibt es vier Regeln.
-      - 14 Beschreibungsfelder, die Aufbaufunktionen und die Kapitel der
-        Oberfläche stehen doppelt.
-
-      Besser: je Nachweis ein Modul, je Geometrie ein schmaler Adapter
-      (Stellen, Ebene je Fall, Bruttoquerschnitt), so wie das Knicken über
-      `Knickstab` schon geschnitten ist.
-
-      Entschieden (Benutzer, 2026-10-17):
-      - Das Rissmoment ist das Moment unter reiner Biegung, bei dem f_ctm zum
-        ersten Mal irgendwo erreicht wird, also mit `I_yz`. Die
-        Spannung-Dehnung-Analyse des gezeichneten Querschnitts lässt dafür die
-        Nulllinie kippen wie die Gebrauchsnachweise. Mit «einachsig» bleibt sie
-        überall waagrecht, W = I/v.
-      - k_t: bei Biegung mit h/3, h in Biegerichtung; bei Zug mit min(h; b).
-        Die 500 mm bleiben ein Schalter.
-      - Platte: die Handformel d − x/3 der Zwängung auf Biegung bleibt, ebenso
-        die Zwängung auf Normalkraft je Lage.
-      - Der äquivalente Modul vergleicht, wo die Nulllinie kippt, mit einem
-        reinen Betonquerschnitt, der ebenfalls kippt: I_c = I_y − I_yz²/I_z.
-      - Die kippende Linie rechnet etwa dreimal so lang; angenommen, schneller
-        mit der Suche als Objekt (unten).
-- [ ] **Die Werkstoffgesetze an einer Stelle anschreiben.** Vier Stellen
-      schreiben sie in die Herleitung, jede mit eigener Weiche (`isinstance`,
-      `art is ELASTISCH`, `mit_block`): `rechenwahl.protokoll_gesetze`,
-      `schnittanalyse.protokoll_gesetze_nach_wahl`,
-      `Querschnittsanalyse.werkstoffe_protokollieren` und
-      `spannungsanalyse.herleitung`. Besser: `gesetz.protokoll(p, werte,
-      titel)`. Dazu ist der Schalter `gemittelt` überflüssig: Das Gesetz
-      weiss selbst, ob es springt (`mittel`), und der gezeichnete Querschnitt
-      nutzt das schon.
-- [ ] **Schichten: `querschnitt` importiert aus `nachweis`.** Das tun seit
-      2026-10-15/16 `analyse.py` und `schnittanalyse.py`; den Zyklus umgeht
-      ein Import in der Funktion (`spannungsanalyse.analysen`). Besser:
-      `Werkstoffsatz`, `Rechenart`, `Rechenwahl`, `betongesetz` und
-      `wirksamer_modul` nach `querschnitt/`, `schnittanalyse.py` neben
-      `spannungsanalyse.py`, und das Löserpaar als Protokoll statt `Any`.
 - [ ] **Der Löser bekommt seine Suche als Objekt.**
       - Illinois und Halbieren sind Unterklassen samt Raute
         (`QuerschnittsloeserIllinois`, `klasse=`). Sie schalten sich mit
@@ -168,23 +124,9 @@ Phase 5 Oberfläche.
         `spannungsbild.js`); E_eq/E_cm rechnet die Oberfläche.
 
       Besser: Der Katalog liefert je Feld Einheit, Symbol, Bereich und Wahl.
-- [ ] **Dateien:**
-      - Neu über 1000 Zeilen:
-        - `aufbau.py` (960 → 1080): ein Paket je Bauteilart, die Teilung
-          liegt schon da.
-        - `nachweise.js` (931 → 1103): nach Abnehmern teilen in mit der
-          Analyse geteilt, nur Platte, und Bewehrungssuche.
-        - `test_beschreibung.py` (945 → 1015): `TestVorgabenAnEinerStelle`
-          prüft seit dem neuen Leser nur noch, was die Bauart garantiert.
-      - `spannungsanalyse.py` wuchs auf 1316 Zeilen, `querschnittsloeser.py`
-        steht bei 995.
 - [ ] **Kleineres:**
       - Aus dem früheren Punkt C2 ist «je Rechenart eine Tabellenzeile»
         nicht gemacht.
-      - Fünf Gesetzklassen tragen dieselbe Hülle; `fasern.py` nutzt `getattr`
-        als Ententyp.
-      - «Ungerissen» geht zweimal anders: Die Platte gibt ein Gesetz mit, die
-        Analyse einen Schalter.
       - Grundbruch: Das Nachweisgerüst steht zweimal, und im Zweig «zu
         schräg» kommt N_Rd = 0 aus den Vorgaben der Datenklasse.
       - `verformung.py` schreibt die statische Höhe neu: 248.1 mm heissen
@@ -249,11 +191,10 @@ Befund, die gemischten Stahlsorten, dazu «Ergebnisse in den Rechenlauf»,
       Befehle stehen in vier Listen, Knöpfe täuschen Tastendrücke vor),
       `querkraft.py` (zwei Nachweise hinter `if self.buegel is not None`:
       Fachwerk, ohne Bügel, mit Bügeln; die Regel für d_v steht in Kurve und
-      Nachweis je einmal), `nachweise.js` (die Fenster für Riss und
-      Verformung in ein eigenes Modul), `spannungsanalyse.py`, `aufbau.py`
-      und `querschnittsloeser.py` (entlang ihrer Abschnittsmarken), `stil.css`
-      (ein Blatt je App). Stand 2026-10-16: stil.css 2248 Zeilen, die übrigen
-      1066 bis 1330.
+      Nachweis je einmal), `stil.css` (ein Blatt je App). Stand 2026-10-17:
+      stil.css 2248 Zeilen, cad_fenster.js 1066, querkraft.py 1131.
+      `nachweise.js`, `spannungsanalyse.py` und `aufbau.py` sind geteilt,
+      `querschnittsloeser.py` liegt bei 914.
 - [ ] **Der Posten als `Postenbezug` statt als 5-Tupel.** Ein
       Bewehrungsposten reist als `(Lage, Art, Posten, ID von A_s, ID von z)`
       und wird rund zwanzigmal nach Position zerlegt; die Marke
