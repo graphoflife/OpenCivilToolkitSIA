@@ -1,5 +1,5 @@
 ---
-erzeugt: 2543ea0ae46e
+erzeugt: 7edaf4b05de4
 art: modul
 tags: [modul]
 ---
@@ -328,12 +328,12 @@ Ein gezeichneter Querschnitt mit Bewehrung, Schubwaenden und Lastfaellen.
 - `werkstoffwahl: List[WerkstoffwahlEintrag] = field(default_factory=list)` – Je Material eine Wahl; fehlt eine, gelten die Vorgaben.
 - `lastfaelle: List[QALastfallEintrag] = field(default_factory=list)`
 - `einachsig: bool = False` – Nur Biegung um y: die Nulllinie bleibt waagrecht, M_z und V_y zaehlen nicht, und Duktilitaet und sproedes Versagen gibt es nur in y. Torsion bleibt. Bei einem unsymmetrischen Querschnitt ist das eine Naeherung -- dasselbe, was die Platte immer tut.
-- `alpha_min: int = ALPHA_MIN`
-- `alpha_max: int = ALPHA_MAX`
-- `k_c: float = K_C` – Grenzen der Druckfeldneigung und Abminderung der Druckdiagonalen -- wie bei der Platte.
+- `alpha_min: int = neigung(ALPHA_MIN, 'α_min')`
+- `alpha_max: int = neigung(ALPHA_MAX, 'α_max')`
+- `k_c: float = druckfeld()` – Grenzen der Druckfeldneigung und Abminderung der Druckdiagonalen -- wie bei der Platte.
 - `laengszugkraft: bool = False` – Ob die Laengszugkraft aus Querkraft und Torsion in den M-N-Nachweis eingeht: das Druckfeld jeder Schubwand braucht in Laengsrichtung Zug.
 - `duktilitaet: bool = False`
-- `x_d_max: float = X_D_MAX`
+- `x_d_max: float = x_d_grenze()`
 - `sproede: bool = False`
 - `rissanforderung: Rissanforderung = Rissanforderung.NORMAL` – Anforderung an die Rissbildung -- `normal`, `erhoeht` oder `hoch`, wie bei der Platte.
 - `zwaengung: bool = False` – Ob die Zwaengung auf Normalkraft nachgewiesen wird -- am ganzen Querschnitt.
@@ -528,7 +528,6 @@ wird danach, was man braucht.
 
 ## Braucht
 
-- [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.rissanforderung]]

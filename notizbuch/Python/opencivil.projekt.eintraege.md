@@ -1,5 +1,5 @@
 ---
-erzeugt: c7802508903c
+erzeugt: 630347e8b33a
 art: modul
 tags: [modul]
 ---
@@ -125,6 +125,32 @@ def pruefen(self) -> None
 
 Sorte und Name -- die Materialart prueft ihr Feld.
 
+### neigung
+
+```python
+def neigung(vorgabe: int, heisst: str) -> Any
+```
+
+Eine Grenze der Druckfeldneigung -- in ganzen Grad, 1° bis 89°.
+
+### druckfeld
+
+```python
+def druckfeld() -> Any
+```
+
+Die Abminderung k_c der Druckdiagonalen -- eine Festigkeit mal k_c, also groesser als null.
+
+### x_d_grenze
+
+```python
+def x_d_grenze() -> Any
+```
+
+Die Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis --
+Vorgabe und Hoechstwert stehen beim Nachweis (`duktilitaet.GRENZE`,
+`duktilitaet.HOECHSTENS`).
+
 ### PostenEintrag
 
 ```python
@@ -134,7 +160,7 @@ class PostenEintrag(Beschreibung)
 
 Grundbewehrung oder Zulage einer Lage.
 
-- `durchmesser: float = 0.0` – in mm; 0 bedeutet: nicht vorhanden.
+- `durchmesser: float = bereich(0.0, heisst='Durchmesser', einheit=MM, ab=0.0)` – in mm; 0 bedeutet: nicht vorhanden.
 - `abstand: Optional[float] = 150.0` – Teilung in mm. Genau eines von `abstand` und `anzahl` ist gesetzt.
 - `anzahl: Optional[float] = None`
 
@@ -145,10 +171,10 @@ Grundbewehrung oder Zulage einer Lage.
 def vorhanden(self) -> bool
 ```
 
-#### PostenEintrag.pruefen
+#### PostenEintrag.regeln
 
 ```python
-def pruefen(self, wo: str) -> None
+def regeln(self, wo: str) -> None
 ```
 
 Ein Posten mit Durchmesser braucht eine Teilung oder eine Stabzahl
@@ -232,13 +258,13 @@ In y darf statt der Teilung eine Stabzahl über die betrachtete Breite
 stehen; in x nicht. Siehe
 [[opencivil.querschnitt.platte#Querkraftbewehrung|opencivil.querschnitt.platte.Querkraftbewehrung]].
 
-- `durchmesser: float = 0.0` – in mm; 0 bedeutet: keine Querkraftbewehrung.
+- `durchmesser: float = bereich(0.0, heisst='Bügeldurchmesser', einheit=MM, ab=0.0)` – in mm; 0 bedeutet: keine Querkraftbewehrung.
 - `stahl: str = ''`
 - `abstand_x: Optional[float] = 200.0`
 - `abstand_y: Optional[float] = 200.0`
 - `anzahl_y: Optional[float] = None`
-- `alpha_min: int = ALPHA_MIN`
-- `alpha_max: int = ALPHA_MAX`
+- `alpha_min: int = neigung(ALPHA_MIN, 'α_min')`
+- `alpha_max: int = neigung(ALPHA_MAX, 'α_max')`
 
 #### QuerkraftbewehrungEintrag.vorhanden
 
@@ -249,7 +275,7 @@ def vorhanden(self) -> bool
 
 Ob Buegel liegen -- das sagt allein der Durchmesser. Eine Teilung von
 null heisst nicht «keine Buegel», sondern ist ein Fehler, und
-[[opencivil.projekt.eintraege#QuerkraftbewehrungEintrag.pruefen|pruefen]] sagt es.
+[[opencivil.projekt.eintraege#QuerkraftbewehrungEintrag.regeln|regeln]] sagt es.
 
 #### QuerkraftbewehrungEintrag.ueber_teilung_y
 
@@ -260,10 +286,10 @@ def ueber_teilung_y(self) -> bool
 
 In y eine Teilung -- sonst eine Stabzahl. Wie in der Maske: es zaehlt, was dasteht.
 
-#### QuerkraftbewehrungEintrag.pruefen
+#### QuerkraftbewehrungEintrag.regeln
 
 ```python
-def pruefen(self, wo: str) -> None
+def regeln(self, wo: str) -> None
 ```
 
 Was nicht stimmen kann, soll als Satz beim Benutzer ankommen.
@@ -274,32 +300,16 @@ Was nicht stimmen kann, soll als Satz beim Benutzer ankommen.
 def als_bewehrung(self, stahl: Baustoff) -> Querkraftbewehrung
 ```
 
-Die Buegel fuer den Querschnitt -- erst nach [[opencivil.projekt.eintraege#QuerkraftbewehrungEintrag.pruefen|pruefen]].
+Die Buegel fuer den Querschnitt -- erst nach [[opencivil.projekt.eintraege#QuerkraftbewehrungEintrag.regeln|regeln]].
 
-### neigungen_pruefen
-
-```python
-def neigungen_pruefen(alpha_min: int, alpha_max: int, wo: str) -> None
-```
-
-Die Grenzen der Druckfeldneigung -- bei den Buegeln der Platte wie bei den
-Schubwaenden des gezeichneten Querschnitts.
-
-### druckfeld_pruefen
+### neigungen_ordnen
 
 ```python
-def druckfeld_pruefen(k_c: float, wo: str) -> None
+def neigungen_ordnen(alpha_min: int, alpha_max: int, wo: str) -> None
 ```
 
-Die Abminderung der Druckdiagonalen -- eine Festigkeit mal k_c, also groesser als null.
-
-### x_d_max_pruefen
-
-```python
-def x_d_max_pruefen(x_d_max: float, wo: str) -> None
-```
-
-Die Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis.
+α_min nicht ueber α_max -- bei den Buegeln der Platte wie am gezeichneten
+Querschnitt. Wo jede fuer sich liegt, steht am Feld ([[opencivil.projekt.eintraege#neigung|neigung]]).
 
 ### KnickEintrag
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: d2ef9899ec4d
+erzeugt: 7d48d77cef95
 art: modul
 tags: [modul]
 ---
@@ -32,13 +32,13 @@ Eine Stahlbeton-Platte mit genau vier Bewehrungslagen.
 - `kennung: str`
 - `name: str`
 - `beton: str`
-- `h: float = 300.0`
-- `b: float = 1000.0`
-- `ueberdeckung_unten: float = 30.0`
-- `ueberdeckung_oben: float = 30.0`
-- `d_max: float = 32.0` – Grösstkorndurchmesser in mm.
-- `einlagenhoehe: float = 0.0` – Höhe einer Einlage in mm.
-- `k_c: float = K_C` – Abminderung der Betondruckfestigkeit in der Druckdiagonalen.
+- `h: float = bereich(300.0, heisst='Dicke h', einheit=MM, ueber=0.0)`
+- `b: float = bereich(1000.0, heisst='Breite b', einheit=MM, ueber=0.0)`
+- `ueberdeckung_unten: float = bereich(30.0, heisst='Überdeckung unten', einheit=MM, ab=0.0)`
+- `ueberdeckung_oben: float = bereich(30.0, heisst='Überdeckung oben', einheit=MM, ab=0.0)`
+- `d_max: float = bereich(32.0, heisst='Grösstkorn D_max', einheit=MM, ueber=0.0)` – Grösstkorndurchmesser in mm.
+- `einlagenhoehe: float = bereich(0.0, heisst='Einlagenhöhe', einheit=MM, ab=0.0)` – Höhe einer Einlage in mm.
+- `k_c: float = druckfeld()` – Abminderung der Betondruckfestigkeit in der Druckdiagonalen.
 - `querkraftbewehrung: QuerkraftbewehrungEintrag = field(default_factory=QuerkraftbewehrungEintrag)` – Bügel; ohne Durchmesser heisst: keine.
 - `rissanforderung: Rissanforderung = Rissanforderung.NORMAL` – Anforderung an die Rissbildung -- `normal`, `erhoeht` oder `hoch`.
 - `beschreibung: str = ''` – Freier Text zur Platte -- was sonst nirgends hinpasst. Wo sie liegt, woher die Schnittgroessen stammen, was noch zu klaeren ist. Geht in keine Rechnung ein und steht in keinem Nachweis; sie wird gespeichert und wieder angezeigt, mehr nicht. Genau dafuer gibt es sie: ohne ein solches Feld landen solche Saetze im Namen der Platte.
@@ -64,7 +64,7 @@ Eine Stahlbeton-Platte mit genau vier Bewehrungslagen.
 - `zwaengung_biegung: bool = False` – Ob die Zwaengung auf Biegung nachgewiesen wird.
 - `zwaengung_biegung_kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)` – Die Kriechzahl phi der Zwaengung auf Biegung: `n = (E_s/E_cm)*(1+phi)`.
 - `duktilitaet: bool = False` – Ob der Duktilitaetsnachweis gefuehrt wird. Ein Schalter fuer die Platte und nicht einer je Lage. Gerechnet werden beide x-Lagen -- die obere traegt das Stuetz-, die untere das Feldmoment --, und in der Zusammenfassung steht die unguenstigere. Vier Schalter fuer einen Nachweis waren vier Gelegenheiten, den falschen zu vergessen; die Frage ist ohnehin, ob der Querschnitt sein Versagen ankuendigt, und die beantwortet die schlechtere Lage.
-- `x_d_max: float = X_D_MAX` – Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis. Vorgabe 0.35, hoechstens 0.5 -- die Zahlen stehen beim Nachweis (`duktilitaet.GRENZE`, `duktilitaet.HOECHSTENS`).
+- `x_d_max: float = x_d_grenze()` – Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis.
 - `lagen: List[LageEintrag] = field(default_factory=list)` – Genau vier, Index 0 = 1. Lage (unterste). Fehlen welche, sind sie leer.
 - `richtung_lage1: Richtung = Richtung.Y` – Richtung der 1. Lage; die 2. bekommt die Gegenrichtung. Vorgabe y, damit x auf der 2. und 3. Lage liegt -- innen. Das ist der unguenstigere Fall und der haeufigere: die Tragrichtung liegt selten zu unterst, weil die Querrichtung darunter durchlaeuft. Wer es anders verlegt, stellt es um.
 - `richtung_lage4: Richtung = Richtung.Y` – Richtung der 4. Lage; die 3. bekommt die Gegenrichtung.
@@ -106,8 +106,9 @@ Die Bauteile, deren Querschnitt die Platte nimmt -- keine.
 def regeln(self, wo: str) -> None
 ```
 
-Haelt unmoegliche Abmessungen, Zahlen und Namen auf, bevor daraus ein
-Widerstand wird.
+Haelt unmoegliche Abmessungen und Namen auf, bevor daraus ein
+Widerstand wird -- was mehrere Felder zusammen betrifft; wo jede Zahl
+fuer sich liegt, steht an ihrem Feld ([[opencivil.projekt.lesen#bereich|bereich]]).
 
 Bis hierher lief jede Geometrie durch: eine Platte mit `h = -300` wurde
 gerechnet, eine mit beidseitiger Ueberdeckung groesser als die Dicke auch.
@@ -198,7 +199,7 @@ den Vorgabewerten der Felder.
 ## Braucht
 
 - [[opencivil.bewehrungssuche.laengs]]
-- [[opencivil.nachweis.duktilitaet]]
+- [[opencivil.core.einheiten]]
 - [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]

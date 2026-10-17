@@ -60,7 +60,7 @@ from opencivil.querschnitt.platte import (
 )
 from opencivil.projekt.eintraege import (
     Gebrauchsliste, KnickEintrag, KombinationEintrag, MaterialEintrag, SpannungsfallEintrag,
-    VerformungsfallEintrag, abgeleiteter_fallname, druckfeld_pruefen,
+    VerformungsfallEintrag, abgeleiteter_fallname,
 )
 from opencivil.projekt.balkensystem import BalkensystemEintrag, StabquerschnittEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
@@ -865,10 +865,7 @@ def _querschnitt(
             f"Widerstand bestimmen.")
 
     buegel = eintrag.querkraftbewehrung
-    wo = f"Platte '{eintrag.name}'"
-    buegel.pruefen(wo)
     if buegel.vorhanden:
-        druckfeld_pruefen(eintrag.k_c, wo)
         buegelstahl = _stoff(baustoffe, buegel.stahl, "betonstahl",
                              f"Die Querkraftbewehrung von '{eintrag.name}'")
 

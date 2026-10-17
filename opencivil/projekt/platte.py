@@ -17,14 +17,14 @@ from dataclasses import dataclass, field
 from typing import Any, List, Optional
 
 from opencivil.bewehrungssuche.laengs import Suchmodus
-from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX
-from opencivil.querschnitt.platte import K_C, LAGENZAHL, Richtung
+from opencivil.core.einheiten import MM
+from opencivil.querschnitt.platte import LAGENZAHL, Richtung
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste,
     KnickEintrag, KombinationEintrag, LageEintrag, ObergrenzeEintrag,
     KnickVerformungswahl, KnickWiderstandswahl, PostenEintrag, QuerkraftbewehrungEintrag,
     RechenwahlEintrag, SpannungsfallEintrag,
-    VerformungEintrag, VerformungsfallEintrag, eindeutig, x_d_max_pruefen,
+    VerformungEintrag, VerformungsfallEintrag, druckfeld, eindeutig, x_d_grenze,
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt.lesen import ProjektFehler, bereich
@@ -39,17 +39,17 @@ class QuerschnittEintrag(Beschreibung):
     kennung: str
     name: str
     beton: str
-    h: float = 300.0
-    b: float = 1000.0
-    ueberdeckung_unten: float = 30.0
-    ueberdeckung_oben: float = 30.0
-    d_max: float = 32.0
+    h: float = bereich(300.0, heisst="Dicke h", einheit=MM, ueber=0.0)
+    b: float = bereich(1000.0, heisst="Breite b", einheit=MM, ueber=0.0)
+    ueberdeckung_unten: float = bereich(30.0, heisst="Überdeckung unten", einheit=MM, ab=0.0)
+    ueberdeckung_oben: float = bereich(30.0, heisst="Überdeckung oben", einheit=MM, ab=0.0)
+    d_max: float = bereich(32.0, heisst="Grösstkorn D_max", einheit=MM, ueber=0.0)
     """Grösstkorndurchmesser in mm."""
 
-    einlagenhoehe: float = 0.0
+    einlagenhoehe: float = bereich(0.0, heisst="Einlagenhöhe", einheit=MM, ab=0.0)
     """Höhe einer Einlage in mm."""
 
-    k_c: float = K_C
+    k_c: float = druckfeld()
     """Abminderung der Betondruckfestigkeit in der Druckdiagonalen."""
 
     querkraftbewehrung: QuerkraftbewehrungEintrag = field(
@@ -188,13 +188,8 @@ class QuerschnittEintrag(Beschreibung):
     beantwortet die schlechtere Lage.
     """
 
-    x_d_max: float = X_D_MAX
-    """
-    Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis.
-
-    Vorgabe 0.35, hoechstens 0.5 -- die Zahlen stehen beim Nachweis
-    (``duktilitaet.GRENZE``, ``duktilitaet.HOECHSTENS``).
-    """
+    x_d_max: float = x_d_grenze()
+    """Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis."""
 
     lagen: List[LageEintrag] = field(default_factory=list)
     """Genau vier, Index 0 = 1. Lage (unterste). Fehlen welche, sind sie leer."""
@@ -260,8 +255,9 @@ class QuerschnittEintrag(Beschreibung):
 
     def regeln(self, wo: str) -> None:
         """
-        Haelt unmoegliche Abmessungen, Zahlen und Namen auf, bevor daraus ein
-        Widerstand wird.
+        Haelt unmoegliche Abmessungen und Namen auf, bevor daraus ein
+        Widerstand wird -- was mehrere Felder zusammen betrifft; wo jede Zahl
+        fuer sich liegt, steht an ihrem Feld (:func:`~opencivil.projekt.lesen.bereich`).
 
         Bis hierher lief jede Geometrie durch: eine Platte mit ``h = -300`` wurde
         gerechnet, eine mit beidseitiger Ueberdeckung groesser als die Dicke auch.
@@ -279,7 +275,6 @@ class QuerschnittEintrag(Beschreibung):
         die der Tragsicherheit zuerst: aus ihnen leiten sich die
         Gebrauchslisten ab.
         """
-        name = self.name
         eindeutig((k.name for k in self.kombinationen), wo, "Tragsicherheitseinwirkung")
         for liste, wort in ((self.haeufig, "häufige"),
                             (self.quasistaendig, "quasi-ständige")):
@@ -288,37 +283,12 @@ class QuerschnittEintrag(Beschreibung):
         eindeutig((f.name for f in self.spannungsfaelle), wo, "Spannung-Dehnung-Analyse")
         eindeutig((f.name for f in self.verformung.faelle), wo, "Verformungsfall")
 
-        for feld, wert, wie in (
-            ("Dicke h", self.h, "grösser als null"),
-            ("Breite b", self.b, "grösser als null"),
-            ("Grösstkorn D_max", self.d_max, "grösser als null"),
-        ):
-            if wert <= 0.0:
-                raise ProjektFehler(
-                    f"Platte '{name}': {feld} muss {wie} sein, angegeben ist {wert:g} mm.")
-
-        for feld, wert in (("Überdeckung unten", self.ueberdeckung_unten),
-                           ("Überdeckung oben", self.ueberdeckung_oben),
-                           ("Einlagenhöhe", self.einlagenhoehe)):
-            if wert < 0.0:
-                raise ProjektFehler(
-                    f"Platte '{name}': {feld} kann nicht negativ sein "
-                    f"({wert:g} mm).")
-
         zusammen = self.ueberdeckung_unten + self.ueberdeckung_oben
         if zusammen >= self.h:
             raise ProjektFehler(
-                f"Platte '{name}': die Überdeckungen ergeben zusammen {zusammen:g} mm "
+                f"{wo}: die Überdeckungen ergeben zusammen {zusammen:g} mm "
                 f"und lassen in einer {self.h:g} mm dicken Platte keinen Platz für "
                 f"Bewehrung.")
-
-        # Keine Abmessungen, aber aus demselben Grund hier und nicht beim
-        # Oeffnen: eine abgelegte Platte mit einer zu hohen Grenze soll sich
-        # oeffnen und korrigieren lassen.
-        x_d_max_pruefen(self.x_d_max, f"Platte '{name}'")
-        for nummer, lage in enumerate(self.lagen, start=1):
-            lage.grund.pruefen(f"Platte '{name}', {nummer}. Lage, Grundbewehrung")
-            lage.zulage.pruefen(f"Platte '{name}', {nummer}. Lage, Zulage")
 
     def ohne_lastfaelle(self) -> None:
         """

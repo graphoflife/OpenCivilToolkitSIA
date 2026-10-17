@@ -290,7 +290,7 @@ class TestNichtsStill(unittest.TestCase):
         """Bis 2026-10-16 hiess eine Teilung von null still «kein Stab»."""
         p = Projekt.beispiel()
         p.querschnitt("q1").lagen[1].grund.abstand = 0.0
-        self.assertIn("2. Lage, Grundbewehrung: die Teilung muss grösser als null sein",
+        self.assertIn("lagen 2, grund: die Teilung muss grösser als null sein",
                       self.fehler(p))
         p.querschnitt("q1").lagen[1].grund.abstand = None
         self.assertIn("braucht eine Teilung oder eine Stabzahl", self.fehler(p))
@@ -301,6 +301,23 @@ class TestNichtsStill(unittest.TestCase):
         p.querschnitt("q1").knickfall("Wand", N_Ed=-500.0, laenge=0.0)
         self.assertIn("knickfaelle 'Wand': Systemlänge muss grösser als null sein, "
                       "angegeben ist 0 m.", self.fehler(p))
+
+    def test_die_grenzen_der_buegel_gelten_auch_ohne_buegel(self):
+        """Bis 2026-10-17 prüfte die Platte k_c und α nur, wenn Bügel lagen."""
+        for setzen, text in (
+                (lambda q: setattr(q, "k_c", 0.0),
+                 "Platte 'Decke über EG': k_c muss grösser als null sein, angegeben ist 0."),
+                (lambda q: setattr(q.querkraftbewehrung, "alpha_max", 90),
+                 "querkraftbewehrung: α_max muss mindestens 1° und höchstens 89° sein, "
+                 "angegeben ist 90°."),
+                (lambda q: setattr(q.querkraftbewehrung, "durchmesser", -10.0),
+                 "querkraftbewehrung: Bügeldurchmesser kann nicht negativ sein")):
+            with self.subTest(text=text):
+                p = Projekt.beispiel()
+                q = p.querschnitt("q1")
+                q.querkraftbewehrung.durchmesser = 0.0
+                setzen(q)
+                self.assertIn(text, self.fehler(p))
 
     def test_die_grenzen_des_gezeichneten_querschnitts(self):
         for feld, wert, text in (("alpha_min", 60, "α_min = 60° ist grösser als α_max"),

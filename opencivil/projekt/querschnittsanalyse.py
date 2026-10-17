@@ -37,17 +37,16 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
-from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import FASERSPANNUNGSARTEN, Rechenart, Rechenwahl
 from opencivil.querschnitt.geometrie import Linienart
-from opencivil.querschnitt.platte import ALPHA_MAX, ALPHA_MIN, K_C
+from opencivil.querschnitt.platte import ALPHA_MAX, ALPHA_MIN
 from opencivil.querschnitt import vorlagen
 from opencivil.querschnitt.schnittanalyse import Zugseite
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Beschreibung, Gebrauchsliste, Gebrauchswahl,
     KnickEintrag, KnickVerformungswahl, KnickWiderstandswahl, SpannungsfallEintrag,
-    druckfeld_pruefen, eindeutig, neigungen_pruefen, x_d_max_pruefen,
+    druckfeld, eindeutig, neigung, neigungen_ordnen, x_d_grenze,
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von
@@ -352,9 +351,9 @@ class QuerschnittsanalyseEintrag(Beschreibung):
     dasselbe, was die Platte immer tut.
     """
 
-    alpha_min: int = ALPHA_MIN
-    alpha_max: int = ALPHA_MAX
-    k_c: float = K_C
+    alpha_min: int = neigung(ALPHA_MIN, "α_min")
+    alpha_max: int = neigung(ALPHA_MAX, "α_max")
+    k_c: float = druckfeld()
     """Grenzen der Druckfeldneigung und Abminderung der Druckdiagonalen -- wie bei der Platte."""
 
     laengszugkraft: bool = False
@@ -364,7 +363,7 @@ class QuerschnittsanalyseEintrag(Beschreibung):
     """
 
     duktilitaet: bool = False
-    x_d_max: float = X_D_MAX
+    x_d_max: float = x_d_grenze()
     sproede: bool = False
 
     rissanforderung: Rissanforderung = Rissanforderung.NORMAL
@@ -630,9 +629,7 @@ class QuerschnittsanalyseEintrag(Beschreibung):
             gewaehlt.add(w.material)
         eindeutig((f.name for f in self.spannungsfaelle), wo, "Spannung-Dehnung-Analyse")
         eindeutig((f.name for f in self.knickfaelle), wo, "Knicknachweis")
-        neigungen_pruefen(self.alpha_min, self.alpha_max, wo)
-        druckfeld_pruefen(self.k_c, wo)
-        x_d_max_pruefen(self.x_d_max, wo)
+        neigungen_ordnen(self.alpha_min, self.alpha_max, wo)
 
     def lastfall(self, name: str, **werte: float) -> QALastfallEintrag:
         """Einen Lastfall anfuegen, ohne Oberflaeche -- kN und kNm."""

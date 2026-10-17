@@ -18,13 +18,13 @@ import math
 from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, Iterable, List, Mapping, Optional
 
-from opencivil.core.einheiten import M, MM, MM2, PROZENT, Groesse
+from opencivil.core.einheiten import GRAD, M, MM, MM2, PROZENT, Groesse
 from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
-from opencivil.nachweis.duktilitaet import HOECHSTENS as X_D_HOECHSTENS
+from opencivil.nachweis.duktilitaet import GRENZE as X_D_MAX, HOECHSTENS as X_D_HOECHSTENS
 from opencivil.querschnitt.platte import (
-    ALPHA_MAX, ALPHA_MIN, Bewehrungsposten, Querkraftbewehrung, Richtung,
+    ALPHA_MAX, ALPHA_MIN, K_C, Bewehrungsposten, Querkraftbewehrung, Richtung,
 )
 from opencivil.projekt.lesen import (
     ProjektFehler, bereich, einer_von, lesen, ort, sorten, wahl_aus_text,
@@ -158,6 +158,30 @@ class MaterialEintrag(Beschreibung):
 
 
 # ===========================================================================
+# Felder, die Platte und gezeichneter Querschnitt teilen
+# ===========================================================================
+
+
+def neigung(vorgabe: int, heisst: str) -> Any:
+    """Eine Grenze der Druckfeldneigung -- in ganzen Grad, 1° bis 89°."""
+    return bereich(vorgabe, heisst=heisst, einheit=GRAD, ab=1, bis=89)
+
+
+def druckfeld() -> Any:
+    """Die Abminderung k_c der Druckdiagonalen -- eine Festigkeit mal k_c, also groesser als null."""
+    return bereich(K_C, heisst="k_c", ueber=0.0)
+
+
+def x_d_grenze() -> Any:
+    """
+    Die Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis --
+    Vorgabe und Hoechstwert stehen beim Nachweis (``duktilitaet.GRENZE``,
+    ``duktilitaet.HOECHSTENS``).
+    """
+    return bereich(X_D_MAX, heisst="max. x/d", ueber=0.0, bis=X_D_HOECHSTENS)
+
+
+# ===========================================================================
 # Bewehrung
 # ===========================================================================
 
@@ -166,7 +190,7 @@ class MaterialEintrag(Beschreibung):
 class PostenEintrag(Beschreibung):
     """Grundbewehrung oder Zulage einer Lage."""
 
-    durchmesser: float = 0.0
+    durchmesser: float = bereich(0.0, heisst="Durchmesser", einheit=MM, ab=0.0)
     """in mm; 0 bedeutet: nicht vorhanden."""
 
     abstand: Optional[float] = 150.0
@@ -180,16 +204,13 @@ class PostenEintrag(Beschreibung):
             return False
         return bool(self.abstand and self.abstand > 0) or bool(self.anzahl and self.anzahl > 0)
 
-    def pruefen(self, wo: str) -> None:
+    def regeln(self, wo: str) -> None:
         """
         Ein Posten mit Durchmesser braucht eine Teilung oder eine Stabzahl
         groesser als null. Bis 2026-10-16 hiess eine Teilung von null still
         «kein Stab»: die Maske zeigte ⌀16, gerechnet wurde ohne. Ohne
         Durchmesser ist der Posten leer, was sonst auch dasteht.
         """
-        if self.durchmesser < 0.0:
-            raise ProjektFehler(f"{wo}: der Durchmesser kann nicht negativ sein "
-                                f"({self.durchmesser:g} mm).")
         if self.durchmesser == 0.0:
             return
         if self.abstand is not None:
@@ -264,22 +285,22 @@ class QuerkraftbewehrungEintrag(Beschreibung):
     :class:`opencivil.querschnitt.platte.Querkraftbewehrung`.
     """
 
-    durchmesser: float = 0.0
+    durchmesser: float = bereich(0.0, heisst="Bügeldurchmesser", einheit=MM, ab=0.0)
     """in mm; 0 bedeutet: keine Querkraftbewehrung."""
 
     stahl: str = ""
     abstand_x: Optional[float] = 200.0
     abstand_y: Optional[float] = 200.0
     anzahl_y: Optional[float] = None
-    alpha_min: int = ALPHA_MIN
-    alpha_max: int = ALPHA_MAX
+    alpha_min: int = neigung(ALPHA_MIN, "α_min")
+    alpha_max: int = neigung(ALPHA_MAX, "α_max")
 
     @property
     def vorhanden(self) -> bool:
         """
         Ob Buegel liegen -- das sagt allein der Durchmesser. Eine Teilung von
         null heisst nicht «keine Buegel», sondern ist ein Fehler, und
-        :meth:`pruefen` sagt es.
+        :meth:`regeln` sagt es.
         """
         return self.durchmesser > 0
 
@@ -288,8 +309,9 @@ class QuerkraftbewehrungEintrag(Beschreibung):
         """In y eine Teilung -- sonst eine Stabzahl. Wie in der Maske: es zaehlt, was dasteht."""
         return self.abstand_y is not None
 
-    def pruefen(self, wo: str) -> None:
+    def regeln(self, wo: str) -> None:
         """Was nicht stimmen kann, soll als Satz beim Benutzer ankommen."""
+        neigungen_ordnen(self.alpha_min, self.alpha_max, wo)
         if not self.vorhanden:
             return
         angegeben = (lambda wert, einheit="":
@@ -306,10 +328,9 @@ class QuerkraftbewehrungEintrag(Beschreibung):
             raise ProjektFehler(
                 f"{wo}: die Bügelzahl in y muss grösser als null sein, "
                 f"angegeben ist {angegeben(self.anzahl_y)}.")
-        neigungen_pruefen(self.alpha_min, self.alpha_max, wo)
 
     def als_bewehrung(self, stahl: Baustoff) -> Querkraftbewehrung:
-        """Die Buegel fuer den Querschnitt -- erst nach :meth:`pruefen`."""
+        """Die Buegel fuer den Querschnitt -- erst nach :meth:`regeln`."""
         return Querkraftbewehrung(
             durchmesser=Groesse(self.durchmesser, MM),
             stahl=stahl,
@@ -321,34 +342,16 @@ class QuerkraftbewehrungEintrag(Beschreibung):
         )
 
 
-def neigungen_pruefen(alpha_min: int, alpha_max: int, wo: str) -> None:
+def neigungen_ordnen(alpha_min: int, alpha_max: int, wo: str) -> None:
     """
-    Die Grenzen der Druckfeldneigung -- bei den Buegeln der Platte wie bei den
-    Schubwaenden des gezeichneten Querschnitts.
+    α_min nicht ueber α_max -- bei den Buegeln der Platte wie am gezeichneten
+    Querschnitt. Wo jede fuer sich liegt, steht am Feld (:func:`neigung`).
     """
-    if not 1 <= alpha_min <= 89 or not 1 <= alpha_max <= 89:
-        raise ProjektFehler(
-            f"{wo}: die Neigung der Druckdiagonalen muss zwischen 1° und "
-            f"89° liegen, angegeben sind {alpha_min}° und {alpha_max}°.")
     if alpha_min > alpha_max:
         raise ProjektFehler(
             f"{wo}: α_min = {alpha_min}° ist grösser als α_max = {alpha_max}°. "
             f"Zwischen den beiden liegt dann keine Neigung, für die sich ein "
             f"Widerstand rechnen liesse.")
-
-
-def druckfeld_pruefen(k_c: float, wo: str) -> None:
-    """Die Abminderung der Druckdiagonalen -- eine Festigkeit mal k_c, also groesser als null."""
-    if k_c <= 0.0:
-        raise ProjektFehler(f"{wo}: k_c muss grösser als null sein, angegeben ist {k_c:g}.")
-
-
-def x_d_max_pruefen(x_d_max: float, wo: str) -> None:
-    """Die Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis."""
-    if not 0.0 < x_d_max <= X_D_HOECHSTENS:
-        raise ProjektFehler(
-            f"{wo}: max. x/d muss grösser als null und höchstens "
-            f"{X_D_HOECHSTENS:g} sein, angegeben ist {x_d_max:g}.")
 
 
 @dataclass
