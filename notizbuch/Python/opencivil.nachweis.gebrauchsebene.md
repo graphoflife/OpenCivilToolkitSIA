@@ -1,5 +1,5 @@
 ---
-erzeugt: 7d81ff361db0
+erzeugt: ac71ef15b1af
 art: modul
 tags: [modul]
 ---
@@ -130,6 +130,17 @@ Eingegrenzt wird wie beim Widerstand in einer Momentenrichtung
 Ohne Ebene [[opencivil.nachweis.gebrauchsebene#Konstanten|KEINE]] -- oder [[opencivil.nachweis.gebrauchsebene#Konstanten|VERFEHLT]], wo die Suche an einem
 Sprung haengen blieb.
 
+### suche_der_ebene
+
+```python
+def suche_der_ebene(q: Querschnitt) -> str
+```
+
+Wie die Ebene unter Gebrauchslast gefunden wird -- bei schiefer Biegung,
+mit der Suche, mit der [[opencivil.nachweis.gebrauchsebene#_bei_neigung|_bei_neigung]] an diesem Querschnitt
+wirklich sucht. Bis 2026-10-17 stand hier «zwei geschachtelte
+Halbierungen», auch wo mit Illinois gesucht wurde.
+
 ### protokoll_ebene
 
 ```python
@@ -147,7 +158,6 @@ Die gefundene Ebene und ihre Probe.
 - `RANDSCHRITTE = 20` – Wie oft zwischen einer Neigung mit Ebene und einer ohne halbiert wird, um den Rand des Gleichgewichts zu finden -- auf ein Millionstel des Schritts.
 - `KEINE = Gebrauchsebene(psi=0.0, eps_m=0.0, chi=0.0, N=0.0, M_y=0.0, M_z=0.0, …` – Wenn sich keine Ebene findet.
 - `VERFEHLT = replace(KEINE, verfehlt=True)` – Wenn die Suche ihre Ebene verfehlt -- mit dem Spannungsblock bei viel Druck und wenig Moment.
-- `SUCHE_DER_EBENE = 'Gesucht wird die Ebene, die N, M_y und M_z zugleich trägt. Zu einer …` – Wie die Ebene unter Gebrauchslast gefunden wird -- bei schiefer Biegung.
 - `EINACHSIG = 'Einachsig bleibt die Nulllinie waagrecht, und M_z zählt nicht – wie …` – Dasselbe, einachsig.
 
 ## Braucht

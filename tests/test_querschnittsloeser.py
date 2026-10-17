@@ -5,7 +5,7 @@ import unittest
 
 from opencivil.core.suche import HALBIEREN, ILLINOIS, Illinois
 from opencivil.nachweis.querschnittsloeser import (
-    Querschnittsloeser, Stahllage, probenschranken,
+    Querschnittsloeser, Stahllage, probenschranken, verfahren,
 )
 from opencivil.nachweis.zustand2 import gerissen, wertigkeit
 from opencivil.querschnitt.werkstoffgesetz import (
@@ -323,7 +323,6 @@ class TestIllinoisMitWarmstart(unittest.TestCase):
         halbiert = self.platte(block)
         illinois = self.platte(block, suche=ILLINOIS)
         self.assertIs(illinois.suche, HALBIEREN)
-        self.assertEqual(illinois.verfahren, Querschnittsloeser.SUCHE)
         for N, M in self.FOLGE:
             with self.subTest(N=N, M=M):
                 self.assertEqual(illinois.loese(N_Ed=N, M_Ed=M), halbiert.loese(N_Ed=N, M_Ed=M))
@@ -333,5 +332,13 @@ class TestIllinoisMitWarmstart(unittest.TestCase):
         je_frage = Illinois(auch_bei_sprung=True)
         loeser = self.platte(Spannungsblock(f_cd=20e6, eps_c2d=0.0035), suche=je_frage)
         self.assertIs(loeser.suche, je_frage)
-        self.assertEqual(loeser.verfahren, Querschnittsloeser.SUCHE_VOM_LETZTEN)
+
+    def test_die_mitschrift_sagt_wie_gesucht_wird(self):
+        """Bis 2026-10-17 stand auch dort «zwei geschachtelte Halbierungen», wo Illinois suchte."""
+        halbiert, illinois = verfahren(HALBIEREN), verfahren(ILLINOIS)
+        self.assertIn("beide durch Halbieren", halbiert)
+        self.assertNotIn("Illinois", halbiert)
+        self.assertIn("Illinois-Verfahren", illinois)
+        self.assertIn("zuletzt gefunden", illinois)
+        self.assertNotIn("Halbier", illinois)
 

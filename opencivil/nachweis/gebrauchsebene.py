@@ -40,7 +40,9 @@ from typing import Callable, Optional, Tuple, TypeVar
 from opencivil.core.latex import angabe, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.suche import ILLINOIS, illinois
-from opencivil.nachweis.querschnittsloeser import Faserloeser, probenschranken
+from opencivil.nachweis.querschnittsloeser import (
+    Faserloeser, probenschranken, wie_gesucht, wirksame_suche,
+)
 from opencivil.querschnitt.interaktion import Querschnitt
 
 #: Wie weit sich die Neigung ψ der Ebene unter Gebrauchslast von der
@@ -260,16 +262,23 @@ def gebrauchsebene(q: Querschnitt, *, N: float, M_y: float, M_z: float,
     return ohne if gefunden is None else gefunden
 
 
-#: Wie die Ebene unter Gebrauchslast gefunden wird -- bei schiefer Biegung.
-SUCHE_DER_EBENE = (
-    "Gesucht wird die Ebene, die N, M_y und M_z zugleich trägt. Zu einer "
-    "festen Zugrichtung n ist es dieselbe Aufgabe wie bei der Platte: zwei "
-    "geschachtelte Halbierungen finden ε_0 und κ, mit denen N und das Moment "
-    "um die Nulllinie stimmen. Übrig bleibt das Moment entlang der Nulllinie; "
-    "die Zugrichtung wird gedreht, bis auch es stimmt – bei einem "
-    "symmetrischen Querschnitt steht sie senkrecht zum Moment, bei einem "
-    "unsymmetrischen nicht. Nachgewiesen wird das Ergebnis: die Probe, dass "
-    "die Ebene die Einwirkung erzeugt.")
+def suche_der_ebene(q: Querschnitt) -> str:
+    """
+    Wie die Ebene unter Gebrauchslast gefunden wird -- bei schiefer Biegung,
+    mit der Suche, mit der :func:`_bei_neigung` an diesem Querschnitt
+    wirklich sucht. Bis 2026-10-17 stand hier «zwei geschachtelte
+    Halbierungen», auch wo mit Illinois gesucht wurde.
+    """
+    suche = wirksame_suche(ILLINOIS, q.richtung(0.0).fasern)
+    return (
+        f"Gesucht wird die Ebene, die N, M_y und M_z zugleich trägt. Zu einer "
+        f"festen Zugrichtung n ist es dieselbe Aufgabe wie bei der Platte: zwei "
+        f"geschachtelte Suchen finden ε_0 und κ, mit denen N und das Moment um "
+        f"die Nulllinie stimmen, {wie_gesucht(suche)}. Übrig bleibt das Moment "
+        f"entlang der Nulllinie; die Zugrichtung wird gedreht, bis auch es "
+        f"stimmt – bei einem symmetrischen Querschnitt steht sie senkrecht zum "
+        f"Moment, bei einem unsymmetrischen nicht. Nachgewiesen wird das "
+        f"Ergebnis: die Probe, dass die Ebene die Einwirkung erzeugt.")
 
 #: Dasselbe, einachsig.
 EINACHSIG = ("Einachsig bleibt die Nulllinie waagrecht, und M_z zählt nicht – wie "

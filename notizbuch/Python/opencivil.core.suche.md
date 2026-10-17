@@ -1,5 +1,5 @@
 ---
-erzeugt: 465171a19705
+erzeugt: cc47205cd8c6
 art: modul
 tags: [modul]
 ---
@@ -53,6 +53,7 @@ Was eine Suche kann und von sich sagt -- [[opencivil.core.suche#Halbieren|Halbie
 
 - `vom_letzten: bool` – Ob sie bei der zuletzt gefundenen Stelle anfaengt und von dort eingrenzt ([[opencivil.core.suche#eingrenzen|eingrenzen]]) -- das lohnt nur, wo sie nahe am Ziel schnell trifft.
 - `auch_bei_sprung: bool` – Ob sie auch dort taugt, wo die Funktion springt -- wo es also mehrere Stellen gibt und welche gefunden wird, am Weg haengt.
+- `wie: str` – Wie sie die Stelle findet, in Worten -- fuer die Mitschrift: «durch Halbieren».
 
 #### Suche.finde
 
@@ -74,6 +75,7 @@ Funktion springt: die Stelle haengt nur am Fenster.
 
 - `vom_letzten = False`
 - `auch_bei_sprung = True`
+- `wie = 'durch Halbieren'`
 
 #### Halbieren.finde
 
@@ -107,6 +109,7 @@ der Reihenfolge der Fragen. Taugen soll es dort nur, wo das nicht zaehlt:
 `auch_bei_sprung` fuer eine Suche, die je Frage frisch anfaengt.
 
 - `vom_letzten = True`
+- `wie = 'mit dem Illinois-Verfahren, einer Sekante, die abwechselnd von beide…`
 
 #### Illinois.finde
 

@@ -547,7 +547,8 @@ class PlattenStellen(Stahlspannungsort):
     def protokoll_verfahren(self, p: Protokoll, zustand: _Plattenzustand,
                             wahl: Rechenwahl) -> None:
         protokoll_verfahren(p, eps_druck=EPS_DRUCK, eps_zug=zustand.loeser.eps_zug,
-                            verdraengt=wahl.art is not Rechenart.HANDRECHNUNG)
+                            verdraengt=wahl.art is not Rechenart.HANDRECHNUNG,
+                            suche=zustand.loeser.suche)
 
     def protokoll_einwirkung(self, p: Protokoll, fall: Gebrauchsfall, index: str) -> None:
         p.gleichung(

@@ -1,5 +1,5 @@
 ---
-erzeugt: ae85a41d1008
+erzeugt: e96341b5aab9
 art: modul
 tags: [modul]
 ---
@@ -24,21 +24,23 @@ Browser ueber Pyodide, ohne Abhaengigkeiten.
 
 ## DAS VERFAHREN
 
-Zwei ineinandergeschachtelte Bisektionen. Bei festem `chi` waechst
+Zwei ineinandergeschachtelte Suchen. Bei festem `chi` waechst
 `N(eps_m)` monoton -- mehr Dehnung heisst mehr Zug --, also laesst sich
 `eps_m` eindeutig so waehlen, dass `N = N_Ed`. Damit wird `M` eine
 Funktion von `chi` allein, und die waechst ebenfalls monoton. Die aeussere
-Bisektion sucht darin die Kruemmung.
+Suche findet darin die Kruemmung. Wie beide suchen -- halbiert oder mit
+Illinois --, bekommt der Loeser mit ([[opencivil.core.suche]]), und so
+schreibt er es auch in die Mitschrift ([[opencivil.nachweis.querschnittsloeser#verfahren|verfahren]]).
 
-**Beide Bisektionen brauchen einen gueltigen Dehnungsbereich.** Jenseits der
+**Beide Suchen brauchen einen gueltigen Dehnungsbereich.** Jenseits der
 Bruchdehnungen geben die Werkstoffgesetze null zurueck; dort ist nichts mehr
 monoton, und die Suche findet Scheinloesungen. Das Fenster fuer `eps_m`
 haengt darum von `chi` ab -- siehe [[opencivil.nachweis.querschnittsloeser#Querschnittsloeser|Querschnittsloeser._fenster]].
 
-Beide Bisektionen sind robust: kein Startwert kann danebenliegen, kein
-Newton-Schritt kann davonlaufen. Sie kosten mehr Auswertungen als ein
-Newton-Verfahren -- bei rund 60 Fasern und 60 Halbierungen ist das
-unbedeutend.
+Beide Suchen sind robust: sie bleiben eingegrenzt, kein Startwert kann
+danebenliegen, kein Newton-Schritt kann davonlaufen. Halbiert kosten sie
+mehr Auswertungen als ein Newton-Verfahren -- bei rund 60 Fasern und 60
+Halbierungen ist das unbedeutend; mit Illinois ein Viertel davon.
 
 
 ## WAS IN DIE MITSCHRIFT GEHOERT
@@ -182,7 +184,7 @@ Die Zeile zu [[opencivil.querschnitt.gesetzwahl#wirksamer_modul|wirksamer_modul]
 ### protokoll_verfahren
 
 ```python
-def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float, fasern: int=FASERN, verdraengt: bool=True, verfahren: Optional[str]=None) -> None
+def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float, suche: Suche, fasern: int=FASERN, verdraengt: bool=True) -> None
 ```
 
 Der Ablauf der Suche, in die Mitschrift geschrieben.
@@ -194,8 +196,9 @@ das Verfahren aendert man eine davon.
 Beschrieben wird der *Ablauf*, nicht jeder Zwischenwert. Die Halbierungen
 abzudrucken hiesse, hundert Zeilen zu zeigen, von denen nur die letzte
 etwas behauptet -- und die wird ohnehin durch die Probe belegt. Wie
-gesucht wird, sagt der Loeser selbst (`verfahren`, sein
-[[opencivil.nachweis.querschnittsloeser#Faserloeser.verfahren|Faserloeser.verfahren]]); ohne Angabe das Halbieren.
+gesucht wird, sagt die Suche des Loesers (`suche`, sein
+[[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser.suche]]) -- vorher stand dort immer das Halbieren,
+auch wo mit Illinois gesucht wurde.
 
 ### probenschranken
 
@@ -226,6 +229,36 @@ demselben Querschnitt -- darum steht er einmal da. `verdraengt` wie bei
 gemittelt wird damit, wo das Gesetz springt
 ([[opencivil.querschnitt.fasern]]). Bis 2026-10-17 sagte das ein
 Schalter `gemittelt`, den jeder Aufrufer aus der Rechenart ableitete.
+
+### wirksame_suche
+
+```python
+def wirksame_suche(suche: Suche, querschnitt: Faserquerschnitt) -> Suche
+```
+
+Wie ein Loeser an diesem Querschnitt sucht, wenn er `suche` bekommt:
+wo ein Gesetz springt, halbierend -- ausser die Suche taugt dort
+([[opencivil.core.suche#Suche|auch_bei_sprung]]). Warum, steht beim
+[[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]]; hier steht die Regel einmal, fuer ihn und fuer die
+Mitschrift, die sagt, wie gesucht wurde.
+
+### wie_gesucht
+
+```python
+def wie_gesucht(suche: Suche) -> str
+```
+
+Wie die beiden geschachtelten Suchen die Stelle finden, als Teil eines
+Satzes: «beide durch Halbieren» -- mit Illinois dazu, dass sie bei der
+zuletzt gefundenen Ebene beginnen.
+
+### verfahren
+
+```python
+def verfahren(suche: Suche) -> str
+```
+
+Wie ein Loeser mit dieser Suche die Ebene findet, in Worten -- fuer die Mitschrift.
 
 ### Faserloeser
 
@@ -272,18 +305,6 @@ koennte -- so die kippende Nulllinie der Spannung-Dehnung-Analyse
 ohne Sprung -- Parabel, elastisch -- haben flache Stuecke erst am
 vollplastischen Querschnitt; an den Pruefprojekten bleibt dort jede Zahl,
 wie sie war.
-
-- `SUCHE = 'Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer fe…` – Wie gesucht wird, in der Mitschrift ([[opencivil.nachweis.querschnittsloeser#protokoll_verfahren|protokoll_verfahren]]).
-- `SUCHE_VOM_LETZTEN = 'Gesucht wird in zwei geschachtelten Suchen. Innen: zu einer festgeha…` – Dasselbe, wo er bei der zuletzt gefundenen Ebene anfaengt.
-
-#### Faserloeser.verfahren
-
-```python
-@property
-def verfahren(self) -> str
-```
-
-Wie dieser Loeser sucht, in Worten -- fuer die Mitschrift.
 
 #### Faserloeser._fenster
 

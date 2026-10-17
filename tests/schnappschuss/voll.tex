@@ -7603,7 +7603,7 @@ Am gezeichneten Querschnitt je Richtung: dasselbe Rissmoment wie beim spröden V
 
 Jeder gezogene Stab hält gegen seine eigene Grenze, mit seinem Durchmesser und dem f\_ctm des Betons, in dem er liegt; massgebend ist der Stab mit dem kleinsten Erfüllungsgrad.
 
-Gesucht wird die Ebene, die N, M\_y und M\_z zugleich trägt. Zu einer festen Zugrichtung n ist es dieselbe Aufgabe wie bei der Platte: zwei geschachtelte Halbierungen finden ε\_0 und κ, mit denen N und das Moment um die Nulllinie stimmen. Übrig bleibt das Moment entlang der Nulllinie; die Zugrichtung wird gedreht, bis auch es stimmt – bei einem symmetrischen Querschnitt steht sie senkrecht zum Moment, bei einem unsymmetrischen nicht. Nachgewiesen wird das Ergebnis: die Probe, dass die Ebene die Einwirkung erzeugt.
+Gesucht wird die Ebene, die N, M\_y und M\_z zugleich trägt. Zu einer festen Zugrichtung n ist es dieselbe Aufgabe wie bei der Platte: zwei geschachtelte Suchen finden ε\_0 und κ, mit denen N und das Moment um die Nulllinie stimmen, beide mit dem Illinois-Verfahren, einer Sekante, die abwechselnd von beiden Seiten herankommt; beide beginnen bei der Ebene, die zuletzt gefunden wurde, und grenzen die Stelle von dort mit wachsenden Schritten ein. Übrig bleibt das Moment entlang der Nulllinie; die Zugrichtung wird gedreht, bis auch es stimmt – bei einem symmetrischen Querschnitt steht sie senkrecht zum Moment, bei einem unsymmetrischen nicht. Nachgewiesen wird das Ergebnis: die Probe, dass die Ebene die Einwirkung erzeugt.
 
 \noindent\textbf{Wertigkeit im gerissenen Zustand}
 \begin{equation*}
@@ -7644,9 +7644,9 @@ Die Dehnungsebene wird gesucht, nicht hergeleitet. Eine ebene Dehnungsverteilung
 
 Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebildet, jede mit der Spannung in ihrer Mitte; der Stahl kommt Lage für Lage dazu, und die von ihm verdrängte Betonfläche wird abgezogen, damit dieselbe Fläche nicht zweimal zählt.
 
-Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer festgehaltenen Krümmung χ wird ε\_m so lange halbiert, bis N\_int die verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung immer mehr Zug bedeutet. Aussen: mit diesem ε\_m bleibt ein Moment übrig, und χ wird so lange halbiert, bis auch M\_int stimmt – hier trägt die Monotonie, dass mehr Krümmung mehr Moment heisst.
+Gesucht wird in zwei geschachtelten Suchen, beide durch Halbieren. Innen: zu einer festgehaltenen Krümmung χ wird ε\_m gesucht, bis N\_int die verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung immer mehr Zug bedeutet. Aussen: mit diesem ε\_m bleibt ein Moment übrig, und χ wird gesucht, bis auch M\_int stimmt – hier trägt die Monotonie, dass mehr Krümmung mehr Moment heisst.
 
-Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.0 ‰ bis 45.0 ‰). Jenseits davon geben die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Halbierung liefe auf eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine Gleichgewichtslage – dann sagt der Nachweis das und rät nicht.
+Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.0 ‰ bis 45.0 ‰). Jenseits davon geben die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Suche liefe auf eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine Gleichgewichtslage – dann sagt der Nachweis das und rät nicht.
 
 Nachgewiesen wird deshalb nicht der Weg, sondern das Ergebnis: dass die gefundene Ebene genau die angegebenen Schnittgrössen erzeugt. Diese Probe steht bei jedem Fall.
 
@@ -7741,9 +7741,9 @@ Der Erfüllungsgrad ist ein Verhältnis von Normalkräften: N\_Rd ist die gröss
 
 Die Verformung rechnet präzise, mit der Parabel; Kriechzahl und Werte wählt das Kapitel. Das Kriechen weicht den Beton auf: er verformt sich mehr, die Ausmitte zweiter Ordnung wächst, und der Stab knickt früher – φ = 0 läge dann auf der unsicheren Seite. Im Bereich der Gebrauchslasten unterscheidet sich die Parabel kaum vom linearen Gesetz, in der Nähe der Grenzlast erheblich, und genau dort entscheidet sich, ob es noch eine Gleichgewichtslage gibt. Den Spannungsblock gibt es hier nicht: mit ihm trüge auf flachen Stücken jede Krümmung dasselbe Moment, und die Ausmitte wäre nicht eindeutig.
 
-Gesucht wird in zwei geschachtelten Suchen. Innen: zu einer festgehaltenen Krümmung χ wird ε\_m gesucht, bis N\_int die verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung immer mehr Zug bedeutet. Aussen: mit diesem ε\_m bleibt ein Moment übrig, und χ wird gesucht, bis auch M\_int stimmt – hier trägt die Monotonie, dass mehr Krümmung mehr Moment heisst. Beide Suchen beginnen bei der Ebene, die zuletzt gefunden wurde, grenzen die Stelle mit wachsenden Schritten ein und treffen sie dann mit dem Illinois-Verfahren: einer Sekante, die abwechselnd von beiden Seiten herankommt.
+Gesucht wird in zwei geschachtelten Suchen, beide mit dem Illinois-Verfahren, einer Sekante, die abwechselnd von beiden Seiten herankommt; beide beginnen bei der Ebene, die zuletzt gefunden wurde, und grenzen die Stelle von dort mit wachsenden Schritten ein. Innen: zu einer festgehaltenen Krümmung χ wird ε\_m gesucht, bis N\_int die verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung immer mehr Zug bedeutet. Aussen: mit diesem ε\_m bleibt ein Moment übrig, und χ wird gesucht, bis auch M\_int stimmt – hier trägt die Monotonie, dass mehr Krümmung mehr Moment heisst.
 
-Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.5 ‰ bis 45.0 ‰). Jenseits davon geben die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Halbierung liefe auf eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine Gleichgewichtslage – dann sagt der Nachweis das und rät nicht.
+Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.5 ‰ bis 45.0 ‰). Jenseits davon geben die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Suche liefe auf eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine Gleichgewichtslage – dann sagt der Nachweis das und rät nicht.
 
 Die Ausmitten-Iteration darüber steht dagegen vollständig da, Durchlauf für Durchlauf: sie ist das Verfahren selbst, und dass sie einläuft, ist die Aussage des Nachweises.
 

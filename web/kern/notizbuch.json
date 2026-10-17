@@ -2948,6 +2948,7 @@
         "neigung_suchen",
         "_rand",
         "gebrauchsebene",
+        "suche_der_ebene",
         "protokoll_ebene"
       ]
     },
@@ -3161,8 +3162,10 @@
         "protokoll_verfahren",
         "probenschranken",
         "plattenfasern",
+        "wirksame_suche",
+        "wie_gesucht",
+        "verfahren",
         "Faserloeser",
-        "Faserloeser.verfahren",
         "Faserloeser._fenster",
         "Faserloeser._eps_zu_normalkraft",
         "Faserloeser._eps_im_fenster",

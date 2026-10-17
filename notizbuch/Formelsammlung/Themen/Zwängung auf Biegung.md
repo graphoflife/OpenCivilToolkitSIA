@@ -1,5 +1,5 @@
 ---
-erzeugt: fdd081188f19
+erzeugt: e9959bb00047
 art: thema
 tags: [thema]
 ---
@@ -20,7 +20,7 @@ Am gezeichneten Querschnitt je Richtung: dasselbe Rissmoment wie beim spröden V
 
 Jeder gezogene Stab hält gegen seine eigene Grenze, mit seinem Durchmesser und dem f\_ctm des Betons, in dem er liegt; massgebend ist der Stab mit dem kleinsten Erfüllungsgrad.
 
-Gesucht wird die Ebene, die N, M\_y und M\_z zugleich trägt. Zu einer festen Zugrichtung n ist es dieselbe Aufgabe wie bei der Platte: zwei geschachtelte Halbierungen finden ε\_0 und κ, mit denen N und das Moment um die Nulllinie stimmen. Übrig bleibt das Moment entlang der Nulllinie; die Zugrichtung wird gedreht, bis auch es stimmt – bei einem symmetrischen Querschnitt steht sie senkrecht zum Moment, bei einem unsymmetrischen nicht. Nachgewiesen wird das Ergebnis: die Probe, dass die Ebene die Einwirkung erzeugt.
+Gesucht wird die Ebene, die N, M\_y und M\_z zugleich trägt. Zu einer festen Zugrichtung n ist es dieselbe Aufgabe wie bei der Platte: zwei geschachtelte Suchen finden ε\_0 und κ, mit denen N und das Moment um die Nulllinie stimmen, beide mit dem Illinois-Verfahren, einer Sekante, die abwechselnd von beiden Seiten herankommt; beide beginnen bei der Ebene, die zuletzt gefunden wurde, und grenzen die Stelle von dort mit wachsenden Schritten ein. Übrig bleibt das Moment entlang der Nulllinie; die Zugrichtung wird gedreht, bis auch es stimmt – bei einem symmetrischen Querschnitt steht sie senkrecht zum Moment, bei einem unsymmetrischen nicht. Nachgewiesen wird das Ergebnis: die Probe, dass die Ebene die Einwirkung erzeugt.
 
 ## Formeln
 

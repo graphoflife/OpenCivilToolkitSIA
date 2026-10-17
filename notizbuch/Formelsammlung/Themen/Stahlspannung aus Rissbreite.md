@@ -1,5 +1,5 @@
 ---
-erzeugt: 84c583e1fdab
+erzeugt: 28fa9273db59
 art: thema
 tags: [thema]
 ---
@@ -22,9 +22,9 @@ Die Dehnungsebene wird gesucht, nicht hergeleitet. Eine ebene Dehnungsverteilung
 
 Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebildet, jede mit der Spannung in ihrer Mitte; der Stahl kommt Lage für Lage dazu, und die von ihm verdrängte Betonfläche wird abgezogen, damit dieselbe Fläche nicht zweimal zählt.
 
-Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer festgehaltenen Krümmung χ wird ε\_m so lange halbiert, bis N\_int die verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung immer mehr Zug bedeutet. Aussen: mit diesem ε\_m bleibt ein Moment übrig, und χ wird so lange halbiert, bis auch M\_int stimmt – hier trägt die Monotonie, dass mehr Krümmung mehr Moment heisst.
+Gesucht wird in zwei geschachtelten Suchen, beide durch Halbieren. Innen: zu einer festgehaltenen Krümmung χ wird ε\_m gesucht, bis N\_int die verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung immer mehr Zug bedeutet. Aussen: mit diesem ε\_m bleibt ein Moment übrig, und χ wird gesucht, bis auch M\_int stimmt – hier trägt die Monotonie, dass mehr Krümmung mehr Moment heisst.
 
-Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.0 ‰ bis 45.0 ‰). Jenseits davon geben die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Halbierung liefe auf eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine Gleichgewichtslage – dann sagt der Nachweis das und rät nicht.
+Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.0 ‰ bis 45.0 ‰). Jenseits davon geben die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Suche liefe auf eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine Gleichgewichtslage – dann sagt der Nachweis das und rät nicht.
 
 Nachgewiesen wird deshalb nicht der Weg, sondern das Ergebnis: dass die gefundene Ebene genau die angegebenen Schnittgrössen erzeugt. Diese Probe steht bei jedem Fall.
 

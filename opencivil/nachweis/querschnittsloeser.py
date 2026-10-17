@@ -13,21 +13,23 @@ fremdes Paket kaeme dafuer nicht in Frage: dieses Werkzeug laeuft auch im
 Browser ueber Pyodide, ohne Abhaengigkeiten.
 
 DAS VERFAHREN:
-Zwei ineinandergeschachtelte Bisektionen. Bei festem ``chi`` waechst
+Zwei ineinandergeschachtelte Suchen. Bei festem ``chi`` waechst
 ``N(eps_m)`` monoton -- mehr Dehnung heisst mehr Zug --, also laesst sich
 ``eps_m`` eindeutig so waehlen, dass ``N = N_Ed``. Damit wird ``M`` eine
 Funktion von ``chi`` allein, und die waechst ebenfalls monoton. Die aeussere
-Bisektion sucht darin die Kruemmung.
+Suche findet darin die Kruemmung. Wie beide suchen -- halbiert oder mit
+Illinois --, bekommt der Loeser mit (:mod:`opencivil.core.suche`), und so
+schreibt er es auch in die Mitschrift (:func:`verfahren`).
 
-**Beide Bisektionen brauchen einen gueltigen Dehnungsbereich.** Jenseits der
+**Beide Suchen brauchen einen gueltigen Dehnungsbereich.** Jenseits der
 Bruchdehnungen geben die Werkstoffgesetze null zurueck; dort ist nichts mehr
 monoton, und die Suche findet Scheinloesungen. Das Fenster fuer ``eps_m``
 haengt darum von ``chi`` ab -- siehe :meth:`Querschnittsloeser._fenster`.
 
-Beide Bisektionen sind robust: kein Startwert kann danebenliegen, kein
-Newton-Schritt kann davonlaufen. Sie kosten mehr Auswertungen als ein
-Newton-Verfahren -- bei rund 60 Fasern und 60 Halbierungen ist das
-unbedeutend.
+Beide Suchen sind robust: sie bleiben eingegrenzt, kein Startwert kann
+danebenliegen, kein Newton-Schritt kann davonlaufen. Halbiert kosten sie
+mehr Auswertungen als ein Newton-Verfahren -- bei rund 60 Fasern und 60
+Halbierungen ist das unbedeutend; mit Illinois ein Viertel davon.
 
 WAS IN DIE MITSCHRIFT GEHOERT:
 Nicht die Suche, sondern die **Probe**. Geschrieben wird die gefundene Ebene
@@ -249,9 +251,8 @@ def protokoll_wirksamer_modul(p, E_cm, phi, basis: str, *, titel: str,
              titel=titel, nachsatz=nachsatz, name="Wirksamer Elastizitätsmodul")
 
 
-def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float,
-                        fasern: int = FASERN, verdraengt: bool = True,
-                        verfahren: Optional[str] = None) -> None:
+def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float, suche: Suche,
+                        fasern: int = FASERN, verdraengt: bool = True) -> None:
     """
     Der Ablauf der Suche, in die Mitschrift geschrieben.
 
@@ -262,8 +263,9 @@ def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float,
     Beschrieben wird der *Ablauf*, nicht jeder Zwischenwert. Die Halbierungen
     abzudrucken hiesse, hundert Zeilen zu zeigen, von denen nur die letzte
     etwas behauptet -- und die wird ohnehin durch die Probe belegt. Wie
-    gesucht wird, sagt der Loeser selbst (``verfahren``, sein
-    :attr:`Faserloeser.verfahren`); ohne Angabe das Halbieren.
+    gesucht wird, sagt die Suche des Loesers (``suche``, sein
+    :attr:`Faserloeser.suche`) -- vorher stand dort immer das Halbieren,
+    auch wo mit Illinois gesucht wurde.
     """
     p.erklaerung(
         "Die Dehnungsebene wird gesucht, nicht hergeleitet. Eine ebene "
@@ -290,12 +292,12 @@ def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float,
         f"gleicher Dicke gebildet; der Stahl kommt Lage für Lage dazu. Wie in "
         f"der Handrechnung zählt der Beton auch dort, wo der Stahl liegt."
     )
-    p.erklaerung(verfahren or Faserloeser.SUCHE)
+    p.erklaerung(verfahren(suche))
     p.erklaerung(
         f"Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen "
         f"({-eps_druck * 1e3:.1f} ‰ bis {eps_zug * 1e3:.1f} ‰). Jenseits "
         f"davon geben die Werkstoffgesetze null zurück, die Kraft wäre nicht "
-        f"mehr monoton, und die Halbierung liefe auf eine beliebige Stelle "
+        f"mehr monoton, und die Suche liefe auf eine beliebige Stelle "
         f"zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine "
         f"Gleichgewichtslage – dann sagt der Nachweis das und rät nicht."
     )
@@ -365,6 +367,41 @@ def plattenfasern(
                 for a_s, z, gesetz in staebe])
 
 
+def wirksame_suche(suche: Suche, querschnitt: Faserquerschnitt) -> Suche:
+    """
+    Wie ein Loeser an diesem Querschnitt sucht, wenn er ``suche`` bekommt:
+    wo ein Gesetz springt, halbierend -- ausser die Suche taugt dort
+    (:attr:`~opencivil.core.suche.Suche.auch_bei_sprung`). Warum, steht beim
+    :class:`Faserloeser`; hier steht die Regel einmal, fuer ihn und fuer die
+    Mitschrift, die sagt, wie gesucht wurde.
+    """
+    return suche if suche.auch_bei_sprung or not querschnitt.springt else HALBIEREN
+
+
+def wie_gesucht(suche: Suche) -> str:
+    """
+    Wie die beiden geschachtelten Suchen die Stelle finden, als Teil eines
+    Satzes: «beide durch Halbieren» -- mit Illinois dazu, dass sie bei der
+    zuletzt gefundenen Ebene beginnen.
+    """
+    if suche.vom_letzten:
+        return (f"beide {suche.wie}; beide beginnen bei der Ebene, die zuletzt "
+                f"gefunden wurde, und grenzen die Stelle von dort mit wachsenden "
+                f"Schritten ein")
+    return f"beide {suche.wie}"
+
+
+def verfahren(suche: Suche) -> str:
+    """Wie ein Loeser mit dieser Suche die Ebene findet, in Worten -- fuer die Mitschrift."""
+    return (
+        f"Gesucht wird in zwei geschachtelten Suchen, {wie_gesucht(suche)}. "
+        f"Innen: zu einer festgehaltenen Krümmung χ wird ε_m gesucht, bis N_int "
+        f"die verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung "
+        f"immer mehr Zug bedeutet. Aussen: mit diesem ε_m bleibt ein Moment "
+        f"übrig, und χ wird gesucht, bis auch M_int stimmt – hier trägt die "
+        f"Monotonie, dass mehr Krümmung mehr Moment heisst.")
+
+
 class Faserloeser:
     """
     Ein Querschnitt aus Fasern, mit Suche nach der Dehnungsebene.
@@ -407,41 +444,12 @@ class Faserloeser:
     wie sie war.
     """
 
-    #: Wie gesucht wird, in der Mitschrift (:func:`protokoll_verfahren`).
-    SUCHE = (
-        "Gesucht wird in zwei geschachtelten Halbierungen. Innen: zu einer "
-        "festgehaltenen Krümmung χ wird ε_m so lange halbiert, bis N_int die "
-        "verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung "
-        "immer mehr Zug bedeutet. Aussen: mit diesem ε_m bleibt ein Moment "
-        "übrig, und χ wird so lange halbiert, bis auch M_int stimmt – hier "
-        "trägt die Monotonie, dass mehr Krümmung mehr Moment heisst."
-    )
-
-    #: Dasselbe, wo er bei der zuletzt gefundenen Ebene anfaengt.
-    SUCHE_VOM_LETZTEN = (
-        "Gesucht wird in zwei geschachtelten Suchen. Innen: zu einer "
-        "festgehaltenen Krümmung χ wird ε_m gesucht, bis N_int die verlangte "
-        "Normalkraft trifft – das geht sicher, weil mehr Dehnung immer mehr "
-        "Zug bedeutet. Aussen: mit diesem ε_m bleibt ein Moment übrig, und χ "
-        "wird gesucht, bis auch M_int stimmt – hier trägt die Monotonie, dass "
-        "mehr Krümmung mehr Moment heisst. Beide Suchen beginnen bei der "
-        "Ebene, die zuletzt gefunden wurde, grenzen die Stelle mit wachsenden "
-        "Schritten ein und treffen sie dann mit dem Illinois-Verfahren: einer "
-        "Sekante, die abwechselnd von beiden Seiten herankommt."
-    )
-
-    @property
-    def verfahren(self) -> str:
-        """Wie dieser Loeser sucht, in Worten -- fuer die Mitschrift."""
-        return self.SUCHE_VOM_LETZTEN if self.suche.vom_letzten else self.SUCHE
-
     def __init__(self, *, querschnitt: Faserquerschnitt, grenzen: Dehnungsgrenzen,
                  oben: float = 0.0, unten: float = 0.0, lagen: Sequence[Stahllage] = (),
                  beton: Optional[Callable[[float, float], float]] = None,
                  eps_druck: float = 0.0, eps_zug: float = 0.0,
                  suche: Suche = HALBIEREN) -> None:
-        self.suche = (suche if suche.auch_bei_sprung or not querschnitt.springt
-                      else HALBIEREN)
+        self.suche = wirksame_suche(suche, querschnitt)
         """Wie er sucht -- wo ein Gesetz springt, halbierend, siehe oben."""
         self._zuletzt: Optional[float] = None
         """Die Kruemmung der zuletzt gefundenen Ebene -- von dort sucht die naechste."""

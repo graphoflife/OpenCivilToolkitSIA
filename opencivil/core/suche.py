@@ -63,6 +63,9 @@ class Suche(Protocol):
     Stellen gibt und welche gefunden wird, am Weg haengt.
     """
 
+    wie: str
+    """Wie sie die Stelle findet, in Worten -- fuer die Mitschrift: «durch Halbieren»."""
+
     def finde(self, f: Callable[[float], Wert], unten: float, oben: float, schranke: float,
               f_unten: Wert = None, f_oben: Wert = None) -> Wert:
         """Wo ``f`` zwischen ``unten`` und ``oben`` null wird."""
@@ -77,6 +80,7 @@ class Halbieren:
 
     vom_letzten = False
     auch_bei_sprung = True
+    wie = "durch Halbieren"
 
     def finde(self, f: Callable[[float], Wert], unten: float, oben: float, schranke: float,
               f_unten: Wert = None, f_oben: Wert = None) -> Wert:
@@ -118,6 +122,8 @@ class Illinois:
     """
 
     vom_letzten = True
+    wie = ("mit dem Illinois-Verfahren, einer Sekante, die abwechselnd von beiden "
+           "Seiten herankommt")
 
     def __init__(self, *, auch_bei_sprung: bool = False) -> None:
         self.auch_bei_sprung = auch_bei_sprung

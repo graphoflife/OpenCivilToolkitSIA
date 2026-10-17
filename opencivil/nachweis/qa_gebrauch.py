@@ -70,7 +70,7 @@ from opencivil.core.suche import illinois
 from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.material.basis import Baustoff, mit_index
 from opencivil.nachweis.gebrauchsebene import (
-    EINACHSIG, SUCHE_DER_EBENE, Gebrauchsebene, gebrauchsebene, protokoll_ebene,
+    EINACHSIG, Gebrauchsebene, gebrauchsebene, protokoll_ebene, suche_der_ebene,
 )
 from opencivil.nachweis.mindestbewehrung import Biegezwang
 from opencivil.nachweis.querschnittsloeser import VERFEHLTE_EBENE
@@ -185,7 +185,8 @@ class AnalyseStellen(Stahlspannungsort):
     def protokoll_verfahren(self, p: Protokoll, zustand: _Analysezustand,
                             wahl: Rechenwahl) -> None:
         protokoll_dehnungsebene(p)
-        p.erklaerung(EINACHSIG if self.analyse.einachsig else SUCHE_DER_EBENE)
+        p.erklaerung(EINACHSIG if self.analyse.einachsig
+                     else suche_der_ebene(zustand.querschnitt))
         p.erklaerung(VERFEHLTE_EBENE)
 
     def protokoll_einwirkung(self, p: Protokoll, fall: Lastfall, index: str) -> None:
@@ -402,7 +403,7 @@ class ZwaengungBiegungQA(Biegezwang):
         protokoll_rissbreitengrenzen(p, e, a, staebe, grenzen, self.anforderung, self.id,
                                      referenz=self.REFERENZ)
         protokoll_dehnungsebene(p)
-        p.erklaerung(EINACHSIG if self.einachsig else SUCHE_DER_EBENE)
+        p.erklaerung(EINACHSIG if self.einachsig else suche_der_ebene(q))
 
         brutto = bruttoquerschnitt(a, e.si_nach_id())
         ergebnis: Dict[str, Groesse] = {}
