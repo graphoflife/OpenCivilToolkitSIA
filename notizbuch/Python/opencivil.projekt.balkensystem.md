@@ -1,5 +1,5 @@
 ---
-erzeugt: 622508caaa7a
+erzeugt: ee2091dc796d
 art: modul
 tags: [modul]
 ---
@@ -77,8 +77,8 @@ Bereichs, leer: wie `wert_a`. `bis` leer: bis zum Ende des Stabs.
 Einzellast und Einzelmoment stehen bei `von`.
 
 - `lastfall: str = ''`
-- `art: str = einer_von(STABLASTEN, Lastart.LINIENLAST.value)`
-- `richtung: str = einer_von(RICHTUNGEN, Lastrichtung.SENKRECHT.value)`
+- `art: Lastart = Lastart.LINIENLAST`
+- `richtung: Lastrichtung = Lastrichtung.SENKRECHT`
 - `wert_a: float = 10.0`
 - `wert_b: Optional[float] = None`
 - `von: float = 0.0`
@@ -147,7 +147,7 @@ Eine Last an einem Knoten, in einem Lastfall: eine Kraft mit Richtung oder ein M
 - `knoten: str = ''`
 - `lastfall: str = ''`
 - `art: str = einer_von(KNOTENLASTEN, 'kraft')`
-- `richtung: str = einer_von(KNOTENRICHTUNGEN, Lastrichtung.SENKRECHT.value)`
+- `richtung: Lastrichtung = einer_von(KNOTENRICHTUNGEN, Lastrichtung.SENKRECHT)`
 - `wert: float = 10.0` – kN oder kNm.
 
 ### StabquerschnittEintrag
@@ -397,7 +397,7 @@ Eine Kombination -- je Lastfall (Eintrag oder Kennung) ein Beiwert: `(g, 1.35), 
 #### BalkensystemEintrag.stablast
 
 ```python
-def stablast(self, lastfall: Any, linie: Any, art: str=Lastart.LINIENLAST.value, wert: float=10.0, **felder: Any) -> StablastEintrag
+def stablast(self, lastfall: Any, linie: Any, art: Lastart=Lastart.LINIENLAST, wert: float=10.0, **felder: Any) -> StablastEintrag
 ```
 
 Eine Last auf einer Linie -- `wert` ist `wert_a`; Felder wie [[opencivil.projekt.balkensystem#StablastEintrag|StablastEintrag]].
@@ -405,7 +405,7 @@ Eine Last auf einer Linie -- `wert` ist `wert_a`; Felder wie [[opencivil.projekt
 #### BalkensystemEintrag.knotenlast
 
 ```python
-def knotenlast(self, lastfall: Any, ort: Ort, wert: float=10.0, *, art: str='kraft', richtung: str=Lastrichtung.SENKRECHT.value) -> KnotenlastEintrag
+def knotenlast(self, lastfall: Any, ort: Ort, wert: float=10.0, *, art: str='kraft', richtung: Lastrichtung=Lastrichtung.SENKRECHT) -> KnotenlastEintrag
 ```
 
 #### BalkensystemEintrag.teilen
@@ -449,12 +449,10 @@ Vorgabe.
 ## Konstanten
 
 - `HALT = ('frei', 'fest', 'feder')` – Wie ein Lager oder Linienlager je Richtung haelt.
-- `EINHEIT_DER_LAST = {Lastart.LINIENLAST.value: KN_PRO_M, Lastart.EINZELLAST.value: KN, La…` – Die Einheit jeder Last in der Beschreibung, nach ihrer Art -- an einem Stab oder Knoten. Umgerechnet wird beim Bauen, mit diesen.
+- `EINHEIT_DER_LAST = {Lastart.LINIENLAST: KN_PRO_M, Lastart.EINZELLAST: KN, Lastart.MOMENT…` – Die Einheit jeder Last in der Beschreibung, nach ihrer Art -- an einem Stab oder Knoten. Umgerechnet wird beim Bauen, mit diesen.
 - `EINHEIT_DER_FEDER = {'k_x': KN_PRO_M, 'k_z': KN_PRO_M, 'k_phi': KNM_PRO_RAD, 'k_quer': KN…` – Die Einheit jeder Feder, nach ihrem Feld: Lager in kN/m und kNm/rad, Bettung in kN/m je m Stab.
-- `STABLASTEN = tuple((a.value for a in Lastart))` – Was fuer Lasten auf einem Stab liegen koennen -- und an einem Knoten.
-- `KNOTENLASTEN = ('kraft', 'moment')`
-- `RICHTUNGEN = tuple((r.value for r in Lastrichtung))` – Wohin eine Kraft zeigt -- an einem Knoten nur senkrecht oder waagrecht.
-- `KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT.value, Lastrichtung.WAAGRECHT.value)`
+- `KNOTENLASTEN = ('kraft', 'moment')` – Was fuer Lasten an einem Knoten liegen koennen; an einem Stab jede [[opencivil.stabwerk.modell#Lastart|Lastart]].
+- `KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT, Lastrichtung.WAAGRECHT)` – Wohin eine Kraft an einem Knoten zeigt -- nur senkrecht oder waagrecht.
 - `QUERSCHNITTSARTEN = ('vorlage', 'kennwerte', 'platte', 'analyse')` – Woher ein Querschnitt kommt.
 - `KENNWERTE = ('A', 'I')` – Die Kennwerte eines Querschnitts von Hand: A in mm², I in 10⁶ mm⁴.
 - `LAGERARTEN = {'gelenkig': ('fest', 'fest', 'frei'), 'verschieblich': ('frei', 'fes…` – Die Vorwahlen eines Lagers -- je Richtung frei oder fest.

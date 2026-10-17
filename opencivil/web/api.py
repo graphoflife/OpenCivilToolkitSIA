@@ -231,7 +231,7 @@ def katalog() -> dict:
             ],
             "richtungen": [{"wert": r.value, "beschriftung": r.beschriftung}
                            for r in Lastrichtung],
-            "knotenrichtungen": list(bs.KNOTENRICHTUNGEN),
+            "knotenrichtungen": [r.value for r in bs.KNOTENRICHTUNGEN],
             "halt": list(bs.HALT),
             "federeinheiten": {feld: e.beschriftung for feld, e in bs.EINHEIT_DER_FEDER.items()},
             "lagerarten": [{"wert": art, "x": x, "z": z, "phi": phi}

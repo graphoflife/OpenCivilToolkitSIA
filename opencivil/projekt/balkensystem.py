@@ -61,8 +61,8 @@ HALT = ("frei", "fest", "feder")
 #: Die Einheit jeder Last in der Beschreibung, nach ihrer Art -- an einem
 #: Stab oder Knoten. Umgerechnet wird beim Bauen, mit diesen.
 EINHEIT_DER_LAST = {
-    Lastart.LINIENLAST.value: KN_PRO_M, Lastart.EINZELLAST.value: KN,
-    Lastart.MOMENT.value: KNM, Lastart.LINIENMOMENT.value: KNM_PRO_M, "kraft": KN,
+    Lastart.LINIENLAST: KN_PRO_M, Lastart.EINZELLAST: KN,
+    Lastart.MOMENT: KNM, Lastart.LINIENMOMENT: KNM_PRO_M, "kraft": KN,
 }
 
 #: Die Einheit jeder Feder, nach ihrem Feld: Lager in kN/m und kNm/rad,
@@ -70,13 +70,11 @@ EINHEIT_DER_LAST = {
 EINHEIT_DER_FEDER = {"k_x": KN_PRO_M, "k_z": KN_PRO_M, "k_phi": KNM_PRO_RAD,
                      "k_quer": KN_PRO_M2, "k_laengs": KN_PRO_M2}
 
-#: Was fuer Lasten auf einem Stab liegen koennen -- und an einem Knoten.
-STABLASTEN = tuple(a.value for a in Lastart)
+#: Was fuer Lasten an einem Knoten liegen koennen; an einem Stab jede :class:`Lastart`.
 KNOTENLASTEN = ("kraft", "moment")
 
-#: Wohin eine Kraft zeigt -- an einem Knoten nur senkrecht oder waagrecht.
-RICHTUNGEN = tuple(r.value for r in Lastrichtung)
-KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT.value, Lastrichtung.WAAGRECHT.value)
+#: Wohin eine Kraft an einem Knoten zeigt -- nur senkrecht oder waagrecht.
+KNOTENRICHTUNGEN = (Lastrichtung.SENKRECHT, Lastrichtung.WAAGRECHT)
 
 #: Woher ein Querschnitt kommt.
 QUERSCHNITTSARTEN = ("vorlage", "kennwerte", "platte", "analyse")
@@ -123,8 +121,8 @@ class StablastEintrag(Beschreibung):
     """
 
     lastfall: str = ""
-    art: str = einer_von(STABLASTEN, Lastart.LINIENLAST.value)
-    richtung: str = einer_von(RICHTUNGEN, Lastrichtung.SENKRECHT.value)
+    art: Lastart = Lastart.LINIENLAST
+    richtung: Lastrichtung = Lastrichtung.SENKRECHT
     wert_a: float = 10.0
     wert_b: Optional[float] = None
     von: float = 0.0
@@ -134,7 +132,7 @@ class StablastEintrag(Beschreibung):
 
     @property
     def verteilt(self) -> bool:
-        return Lastart(self.art).verteilt
+        return self.art.verteilt
 
 
 @dataclass
@@ -190,7 +188,7 @@ class KnotenlastEintrag(Beschreibung):
     knoten: str = ""
     lastfall: str = ""
     art: str = einer_von(KNOTENLASTEN, "kraft")
-    richtung: str = einer_von(KNOTENRICHTUNGEN, Lastrichtung.SENKRECHT.value)
+    richtung: Lastrichtung = einer_von(KNOTENRICHTUNGEN, Lastrichtung.SENKRECHT)
     wert: float = 10.0
     """kN oder kNm."""
 
@@ -451,10 +449,10 @@ class BalkensystemEintrag(Beschreibung):
                     continue
                 einheit = EINHEIT_DER_LAST[last.art]
                 lasten[last.lastfall].append(Stablast(
-                    stab=l.kennung, art=Lastart(last.art),
+                    stab=l.kennung, art=last.art,
                     wert_a=Groesse(last.wert_a, einheit).si,
                     wert_b=None if last.wert_b is None else Groesse(last.wert_b, einheit).si,
-                    richtung=Lastrichtung(last.richtung), von=last.von, bis=last.bis,
+                    richtung=last.richtung, von=last.von, bis=last.bis,
                     projiziert=last.projiziert))
         for p in self.knotenlasten:
             if p.lastfall not in name_von:
@@ -464,7 +462,7 @@ class BalkensystemEintrag(Beschreibung):
             wert = Groesse(p.wert, EINHEIT_DER_LAST[p.art]).si
             if p.art == "moment":
                 last = Knotenlast(p.knoten, M=wert)
-            elif p.richtung == Lastrichtung.WAAGRECHT.value:
+            elif p.richtung is Lastrichtung.WAAGRECHT:
                 last = Knotenlast(p.knoten, Fx=wert)
             else:
                 last = Knotenlast(p.knoten, Fz=-wert)
@@ -573,7 +571,7 @@ class BalkensystemEintrag(Beschreibung):
         self.kombinationen.append(eintrag)
         return eintrag
 
-    def stablast(self, lastfall: Any, linie: Any, art: str = Lastart.LINIENLAST.value,
+    def stablast(self, lastfall: Any, linie: Any, art: Lastart = Lastart.LINIENLAST,
                  wert: float = 10.0, **felder: Any) -> StablastEintrag:
         """Eine Last auf einer Linie -- ``wert`` ist ``wert_a``; Felder wie :class:`StablastEintrag`."""
         eintrag = StablastEintrag.aus_dict({"lastfall": _kennung_von(lastfall), "art": art,
@@ -583,7 +581,7 @@ class BalkensystemEintrag(Beschreibung):
         return eintrag
 
     def knotenlast(self, lastfall: Any, ort: Ort, wert: float = 10.0, *, art: str = "kraft",
-                   richtung: str = Lastrichtung.SENKRECHT.value) -> KnotenlastEintrag:
+                   richtung: Lastrichtung = Lastrichtung.SENKRECHT) -> KnotenlastEintrag:
         eintrag = KnotenlastEintrag.aus_dict({
             "kennung": self._neue_kennung(self.knotenlasten, "P"),
             "knoten": self._knoten(self.netz(), ort), "lastfall": _kennung_von(lastfall),
@@ -658,8 +656,8 @@ class BalkensystemEintrag(Beschreibung):
         linie.gelenk_anfang, linie.gelenk_ende = linie.gelenk_ende, linie.gelenk_anfang
         neu = []
         for last in linie.lasten:
-            vorzeichen = -1.0 if last.richtung in (Lastrichtung.QUER.value, Lastrichtung.LAENGS.value) \
-                and Lastart(last.art).kraft else 1.0
+            vorzeichen = -1.0 if last.richtung in (Lastrichtung.QUER, Lastrichtung.LAENGS) \
+                and last.art.kraft else 1.0
             if not last.verteilt:
                 neu.append(replace(last, von=L - last.von, wert_a=vorzeichen * last.wert_a))
                 continue
