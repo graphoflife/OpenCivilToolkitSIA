@@ -41,6 +41,7 @@ import math
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
+from opencivil.core.berechnung import Eingaben
 from opencivil.core.einheiten import Groesse
 from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
@@ -50,9 +51,7 @@ from opencivil.nachweis.dehnungsfaecher import Linienpunkt
 from opencivil.nachweis.querschnittsloeser import (
     Stahllage, plattenfasern, protokoll_wirksamer_modul,
 )
-from opencivil.nachweis.rechenwahl import (
-    Rechenart, Rechenwahl, protokoll_betongesetz,
-)
+from opencivil.nachweis.rechenwahl import Rechenart, Rechenwahl, protokoll_gesetze
 from opencivil.querschnitt.interaktion import illinois
 from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
 
@@ -397,11 +396,12 @@ class Ebenenlinie(Widerstandslinie):
                 namen.append(name)
         return namen
 
-    def protokoll_ansatz(self, p: Protokoll, *, f_c: Wert, E_cm: Wert, phi: Wert,
+    def protokoll_ansatz(self, p: Protokoll, e: Eingaben, *, posten, phi: Wert,
                          basis: str) -> None:
         """
         Wie die Linie entsteht -- einmal je Nachweis, vor den Kombinationen.
-        Den Titel setzt der Nachweis.
+        Den Titel setzt der Nachweis; ``e`` und ``posten`` sind die der Linie
+        (:func:`~opencivil.nachweis.biegung_normalkraft.linienbezuege`).
         """
         wahl, satz = self.wahl, self.wahl.satz
         p.erklaerung(
@@ -413,13 +413,9 @@ class Ebenenlinie(Widerstandslinie):
             "Querschnitt gedrückt ist, im Punkt C −ε_c1d."
         )
         if wahl.art is Rechenart.PARABEL:
-            protokoll_wirksamer_modul(p, E_cm, phi, basis,
+            protokoll_wirksamer_modul(p, e["E_cm"], phi, basis,
                                       titel="Wirksamer Modul der Parabel")
-        protokoll_betongesetz(p, wahl, self.beton, f_c, E_cm, basis, titel="Werkstoffgesetze")
-        stahl = self.staehle[0]
-        p.ansatz(stahl.latex(satz.stahl_zeichen, satz.stahl_druck_zeichen),
-                 titel="Werkstoffgesetze: Stahl, bilinear", referenz="SIA 262:2025, 4.2.2.4",
-                 name=stahl.seite)
+        protokoll_gesetze(p, wahl, e, basis, titel="Werkstoffgesetze", posten=posten)
         p.ansatz(
             r"N = \int_A \sigma\,\mathrm{d}A \qquad "
             r"M = \int_A \sigma \cdot \left(z - \tfrac{h}{2}\right)\,\mathrm{d}A",

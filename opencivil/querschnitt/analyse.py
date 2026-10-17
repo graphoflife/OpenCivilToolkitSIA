@@ -33,9 +33,7 @@ from opencivil.core.berechnung import (
 )
 from opencivil.core.einheiten import EINHEITSLOS, GRAD, MIO_MM4, MM, MM2, Groesse
 from opencivil.core.latex import Mathe, als_text
-from opencivil.core.protokoll import (
-    Abschnitt, GleichungBlock, Protokoll, TabellenBlock, Zwischenwerte,
-)
+from opencivil.core.protokoll import Abschnitt, GleichungBlock, Protokoll, TabellenBlock
 from opencivil.core.wert import WertDef, kennung_aus
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.querschnitt import geometrie as geo
@@ -47,9 +45,7 @@ from opencivil.querschnitt.schubwaende import Wand
 from opencivil.querschnitt.schubwaende import zellen as zellen_finden
 from opencivil.nachweis.querschnittsloeser import wirksamer_modul
 from opencivil.nachweis.rechenwahl import Rechenwahl, betongesetz, werte_nach_id
-from opencivil.querschnitt.werkstoffgesetz import (
-    BLOCKANTEIL, K_SIGMA_LATEX, K_SIGMA_SEITE, BetonUngerissen, Spannungsblock, Stahlgesetz,
-)
+from opencivil.querschnitt.werkstoffgesetz import BetonUngerissen, Stahlgesetz
 
 #: Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die
 #: eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin. Aus ``E_cm``
@@ -673,36 +669,20 @@ class Querschnittsanalyse:
         return liste, (lambda stoff: index[stoff.id])
 
     def werkstoffe_protokollieren(self, p: Protokoll, e: Eingaben, basis: str) -> None:
-        """Die Gesetze, mit denen gerechnet wird -- sie schreiben sich selbst --, und die Werte darin."""
-        werte = Zwischenwerte(basis)
+        """
+        Die Gesetze, mit denen gerechnet wird, je Material mit seiner Wahl --
+        jedes schreibt sich selbst, mit den Werten darin. Ohne Kriechen: die
+        Parabel haengt hier an ``E_cm``.
+        """
         werkstoffe, index = self.werkstoffe(werte_nach_id(e), self.rechenwahl)
         for stoff in self.baustoffe:
-            gesetz = werkstoffe[index(stoff)].gesetz
             satz = self.rechenwahl(stoff).satz
-            wert = lambda k: e[self._name(stoff, k)]
-            symbol = lambda k: stoff.definition(k).symbol
-            if stoff.art is Baustoffart.BETON:
-                if isinstance(gesetz, Spannungsblock):
-                    titel = f"{stoff.name}: Spannungsblock {BLOCKANTEIL}·x, {satz.beschriftung}"
-                    referenz = ""
-                else:
-                    p.formel(werte.zahl(f"k_sigma_{kennung_aus(stoff.id)}", r"k_{\sigma}",
-                                        gesetz.k_sigma, stellen=2),
-                             K_SIGMA_LATEX, {"E_c": wert("E_cm"), "f_c": wert(satz.beton)},
-                             titel=f"{stoff.name}: Beiwert der Parabel", name=K_SIGMA_SEITE)
-                    titel = f"{stoff.name}: Parabel-Rechteck-Beziehung, {satz.beschriftung}"
-                    referenz = "SIA 262:2025, 4.2.1.6"
-                p.ansatz(gesetz.latex(satz.beton_zeichen), titel=titel, referenz=referenz,
-                         name=gesetz.seite)
-                kennwerte = (satz.beton, "eps_c1d", "eps_c2d")
-            else:
-                p.ansatz(gesetz.latex(symbol(satz.stahl), symbol(satz.stahl_druck)),
-                         titel=f"{stoff.name}: bilineare Beziehung, {satz.beschriftung}",
-                         referenz="SIA 262:2025, 4.2.2.4", name=gesetz.seite)
-                kennwerte = (satz.stahl, satz.stahl_druck, "E_s", "eps_ud")
-            p.tabelle(kopf=["Kennwert", "Wert"],
-                      zeilen=[[Mathe(symbol(k)), Mathe(wert(k).zahl_latex())] for k in kennwerte],
-                      titel=f"Werte {stoff.name}", ausrichtung="lr")
+            kennwerte = (satz.betonkennwerte if stoff.art is Baustoffart.BETON
+                         else satz.stahlkennwerte)
+            werkstoffe[index(stoff)].gesetz.protokoll(
+                p, {rolle: e[self._name(stoff, name)] for rolle, name in kennwerte.items()},
+                titel=f"Werkstoffgesetz {stoff.name}, {satz.beschriftung}",
+                basis=f"{basis}.{kennung_aus(stoff.id)}")
 
     def grundbezuege(self) -> List[Eingabebezug]:
         """Was jeder Nachweis der Analyse liest: den Schwerpunkt und die Werkstoffe."""

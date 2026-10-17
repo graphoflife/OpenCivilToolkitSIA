@@ -14,6 +14,14 @@ Bis 2026-10-16 rechneten Funktionen im Loeser, und gedruckt wurden Klassen
 mit Platzhaltern oder Formeln von Hand. Jenseits von eps_c2d und beim
 gedrueckten Stahl stand in der Herleitung etwas anderes, als gerechnet wurde.
 
+IN DIE HERLEITUNG:
+Jedes Gesetz schreibt sich selbst (:meth:`Gesetz.protokoll`): als Formel mit
+den Zeichen der Werte, mit denen es rechnet, unter dem Namen seiner Seite im
+Notizbuch, und danach diese Werte. Die Werte bringt, wer schreibt -- je
+Rolle (:data:`Werte`), denn wie ein Kennwert im Rechenwerk heisst, weiss die
+Platte anders als der gezeichnete Querschnitt. Bis 2026-10-17 schrieben fuenf
+Stellen die Gesetze an, jede mit eigener Weiche nach Art des Gesetzes.
+
 JENSEITS DER GRENZDEHNUNG:
 Null: eine Faser jenseits ihrer Bruchstauchung oder Bruchdehnung traegt
 nicht, und eine Suche bleibt im gueltigen Bereich. Auf der Grenze selbst
@@ -39,9 +47,20 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import Callable
+from typing import Callable, ClassVar, Mapping, Optional, Tuple
+
+from opencivil.core.latex import angabe
+from opencivil.core.protokoll import Protokoll, Zwischenwerte
+from opencivil.core.wert import Wert
 
 Funktion = Callable[[float], float]
+
+#: Womit ein Gesetz sich anschreibt: je Rolle der Wert, mit seinem Zeichen.
+#: Beim Beton die Festigkeit des Wertesatzes ``f_c`` (``f_cd`` oder ``f_ck``),
+#: der Modul ``E_c``, an dem ein Gesetz haengt -- der wirksame, wo Kriechen
+#: zaehlt --, und die Dehnungen ``eps_c1d`` und ``eps_c2d``; beim Stahl die
+#: Plateaus ``f_s`` und ``f_s_druck``, ``E_s`` und ``eps_ud``.
+Werte = Mapping[str, Wert]
 
 #: Um so viel darf eine Dehnung ueber ihrer Grenze liegen und gilt noch als auf
 #: ihr: eine Rundung. Ein Milliardstel Promille -- weit unter allem, was eine
@@ -97,7 +116,76 @@ def _gebaut(gesetz, funktion: Funktion) -> None:
 
 
 @dataclass(frozen=True)
-class Betongesetz:
+class Gesetz:
+    """
+    Was jedes Werkstoffgesetz ist: es rechnet -- ``funktion``, einmal gebaut,
+    mit blanken SI-Zahlen --, es heisst wie seine Seite im Notizbuch
+    (:attr:`NAME`), und es schreibt sich selbst in eine Herleitung
+    (:meth:`protokoll`). ``mittel`` hat nur ein Gesetz, das springt
+    (:meth:`Spannungsblock.mittel`).
+    """
+
+    #: Die Seite im Notizbuch -- gleich, wer das Gesetz unter welchem Titel
+    #: aufschreibt.
+    NAME: ClassVar[str] = ""
+
+    #: Wie ein Titel das Gesetz nennt: «Beton, Parabel-Rechteck».
+    WORT: ClassVar[str] = ""
+
+    #: Die Normstelle, wo es eine hat.
+    REFERENZ: ClassVar[str] = ""
+
+    #: Die Rollen seiner Werte (:data:`Werte`), in der Folge der Angabe.
+    ROLLEN: ClassVar[Tuple[str, ...]] = ()
+
+    #: Was die Zeile mit den Werten heisst.
+    WERTTITEL: ClassVar[str] = "Werte des Betons"
+
+    mittel: ClassVar[Optional[Callable[[float, float], float]]] = None
+
+    funktion: Funktion = field(init=False, repr=False, compare=False)
+
+    def spannung(self, eps: float) -> float:
+        """Spannung in N/m^2 zur Dehnung ``eps``. Zug positiv."""
+        return self.funktion(eps)
+
+    __call__ = spannung
+
+    @property
+    def seite(self) -> str:
+        """Die Seite im Notizbuch."""
+        return self.NAME
+
+    @property
+    def wort(self) -> str:
+        return self.WORT
+
+    @property
+    def referenz(self) -> str:
+        return self.REFERENZ
+
+    @property
+    def rollen(self) -> Tuple[str, ...]:
+        return self.ROLLEN
+
+    def formel(self, werte: Werte) -> str:
+        """Das Gesetz als Formel, mit den Zeichen von ``werte``."""
+        raise NotImplementedError
+
+    def protokoll(self, p: Protokoll, werte: Werte, *, titel: str, basis: str = "") -> None:
+        """
+        Das Gesetz in die Herleitung, so wie gerechnet wird: die Formel mit den
+        Zeichen von ``werte`` und danach diese Werte. ``basis`` ordnet die
+        Zwischenwerte zu, wo ein Gesetz welche hat.
+        """
+        p.ansatz(self.formel(werte), titel=f"{titel}: {self.wort}", referenz=self.referenz,
+                 name=self.seite)
+        p.gleichung(r" \quad ".join(angabe(werte[r]) for r in self.rollen),
+                    titel=f"{titel}: {self.WERTTITEL}")
+
+
+@dataclass(frozen=True)
+class Betongesetz(Gesetz):
     """
     Parabel-Rechteck-Beziehung nach SIA 262:2025, 4.2.1.6.
 
@@ -112,9 +200,10 @@ class Betongesetz:
     Jenseits von ``eps_c2d`` null -- siehe Dateikopf.
     """
 
-    #: Die Seite im Notizbuch -- gleich, wer das Gesetz unter welchem Titel
-    #: aufschreibt.
     NAME = "Parabel-Rechteck-Beziehung des Betons"
+    WORT = "Beton, Parabel-Rechteck"
+    REFERENZ = "SIA 262:2025, 4.2.1.6"
+    ROLLEN = ("f_c", "eps_c1d", "eps_c2d")
 
     f_cd: float
     """Festigkeit in N/m^2 (positiver Betrag) -- je nach Werkstoffsatz
@@ -128,8 +217,6 @@ class Betongesetz:
 
     k_sigma: float
     """Gerechnet wird mit mindestens :data:`K_SIGMA_MIN` -- siehe dort."""
-
-    funktion: Funktion = field(init=False, repr=False, compare=False)
 
     @classmethod
     def mit_modul(cls, *, f_c: float, E_c: float, eps_c1d: float,
@@ -152,16 +239,15 @@ class Betongesetz:
             return -f * (k * eta - eta * eta) / (1.0 + eta * (k - 2.0))
         _gebaut(self, sigma)
 
-    def spannung(self, eps: float) -> float:
-        """Spannung in N/m^2 zur Dehnung ``eps``. Zug positiv, also hier <= 0."""
-        return self.funktion(eps)
+    def formel(self, werte: Werte) -> str:
+        return self.latex(werte["f_c"].symbol)
 
-    __call__ = spannung
-
-    @property
-    def seite(self) -> str:
-        """Die Seite im Notizbuch."""
-        return self.NAME
+    def protokoll(self, p: Protokoll, werte: Werte, *, titel: str, basis: str = "") -> None:
+        """Vorab der Beiwert der Parabel, aus dem Modul ``E_c`` der Werte."""
+        p.formel(Zwischenwerte(basis).zahl("k_sigma", r"k_{\sigma}", self.k_sigma, stellen=2),
+                 K_SIGMA_LATEX, {"E_c": werte["E_c"], "f_c": werte["f_c"]},
+                 titel=f"{titel}: Beiwert der Parabel", name=K_SIGMA_SEITE)
+        super().protokoll(p, werte, titel=titel, basis=basis)
 
     def latex(self, f: str = "f_{cd}") -> str:
         """Als Formel -- ``f`` ist das Zeichen der Festigkeit, ``f_{ck}`` bei charakteristischen Werten."""
@@ -185,7 +271,7 @@ BLOCKANTEIL = 0.85
 
 
 @dataclass(frozen=True)
-class Spannungsblock:
+class Spannungsblock(Gesetz):
     """
     Der vereinfachte, rechteckige Spannungsverlauf des Betons.
 
@@ -200,8 +286,9 @@ class Spannungsblock:
     wird nicht erfunden.
     """
 
-    #: Die Seite im Notizbuch, wie bei :attr:`Betongesetz.NAME`.
     NAME = "Spannungsblock des Betons"
+    WORT = f"Beton, Spannungsblock {BLOCKANTEIL}·x"
+    ROLLEN = ("f_c", "eps_c2d")
 
     f_cd: float
     """Festigkeit des Blocks in N/m^2 (positiver Betrag) -- je nach
@@ -209,8 +296,6 @@ class Spannungsblock:
 
     eps_c2d: float
     """Bruchdehnung (positiver Betrag)."""
-
-    funktion: Funktion = field(init=False, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         f, knick, grenze = self.f_cd, -self.eps_knick, -(self.eps_c2d + RUNDUNG)
@@ -225,12 +310,6 @@ class Spannungsblock:
     def eps_knick(self) -> float:
         """Ab dieser Stauchung (Betrag) setzt der Block ein."""
         return (1.0 - BLOCKANTEIL) * self.eps_c2d
-
-    def spannung(self, eps: float) -> float:
-        """Spannung in N/m^2 zur Dehnung ``eps``. Zug positiv, also hier <= 0."""
-        return self.funktion(eps)
-
-    __call__ = spannung
 
     def mittel(self, eps_a: float, eps_b: float) -> float:
         """
@@ -254,10 +333,8 @@ class Spannungsblock:
             return 0.0
         return -self.f_cd * (bis - von) / (oben - unten)
 
-    @property
-    def seite(self) -> str:
-        """Die Seite im Notizbuch."""
-        return self.NAME
+    def formel(self, werte: Werte) -> str:
+        return self.latex(werte["f_c"].symbol)
 
     def latex(self, f: str = "f_{cd}") -> str:
         """Als Formel -- ``f`` ist das Zeichen der Festigkeit, ``f_{ck}`` bei charakteristischen Werten."""
@@ -273,7 +350,7 @@ class Spannungsblock:
 
 
 @dataclass(frozen=True)
-class Stahlgesetz:
+class Stahlgesetz(Gesetz):
     """
     Bilineare Beziehung ohne Verfestigung nach SIA 262:2025, 4.2.2.4.
 
@@ -282,8 +359,11 @@ class Stahlgesetz:
     Stahl traegt nichts -- so laesst die Handrechnung die Druckbewehrung weg.
     """
 
-    #: Die Seite im Notizbuch, wie bei :attr:`Betongesetz.NAME`.
     NAME = "Bilineare Beziehung des Betonstahls"
+    WORT = "Stahl, bilinear"
+    REFERENZ = "SIA 262:2025, 4.2.2.4"
+    ROLLEN = ("f_s", "f_s_druck", "E_s", "eps_ud")
+    WERTTITEL = "Werte des Stahls"
 
     E_s: float
     """Elastizitaetsmodul in N/m^2."""
@@ -300,26 +380,36 @@ class Stahlgesetz:
     nur_zug: bool = False
     """Der gedrueckte Stahl traegt nichts."""
 
-    funktion: Funktion = field(init=False, repr=False, compare=False)
-
     def __post_init__(self) -> None:
         _gebaut(self, _stahlfunktion(self.E_s, self.f_yd, self.f_yd_druck, self.eps_ud,
                                      nur_zug=self.nur_zug))
-
-    def spannung(self, eps: float) -> float:
-        """Spannung in N/m^2 zur Dehnung ``eps``. Zug positiv."""
-        return self.funktion(eps)
-
-    __call__ = spannung
 
     @property
     def eps_yd(self) -> float:
         return self.f_yd / self.E_s
 
+    # Der Stahl nur auf Zug hat seine eigene Seite, keine Normstelle -- so
+    # laesst ihn die Handrechnung weg -- und kein Plateau auf Druck.
+
     @property
     def seite(self) -> str:
-        """Die Seite im Notizbuch -- der Stahl nur auf Zug hat seine eigene."""
         return STAHL_NUR_ZUG if self.nur_zug else self.NAME
+
+    @property
+    def wort(self) -> str:
+        return "Stahl, nur auf Zug" if self.nur_zug else self.WORT
+
+    @property
+    def referenz(self) -> str:
+        return "" if self.nur_zug else self.REFERENZ
+
+    @property
+    def rollen(self) -> Tuple[str, ...]:
+        return tuple(r for r in self.ROLLEN if not (self.nur_zug and r == "f_s_druck"))
+
+    def formel(self, werte: Werte) -> str:
+        druck = werte.get("f_s_druck")
+        return self.latex(werte["f_s"].symbol, druck.symbol if druck else "f_{yd}^{-}")
 
     def latex(self, zug: str = "f_{yd}", druck: str = "f_{yd}^{-}") -> str:
         """Als Formel -- ``zug`` und ``druck`` sind die Zeichen der Plateaus."""
@@ -371,7 +461,7 @@ def _stahlfunktion(E_s: float, f: float, f_druck: float, eps_ud: float, *,
 
 
 @dataclass(frozen=True)
-class BetonElastisch:
+class BetonElastisch(Gesetz):
     """
     Beton ohne Zugfestigkeit, im Druck linear bis ``f_c``, dann waagrecht --
     fuer den gerissenen Gebrauchszustand.
@@ -387,11 +477,11 @@ class BetonElastisch:
     """
 
     NAME = "Beton linear, ohne Zug"
+    WORT = "Beton, linear ohne Zug"
+    ROLLEN = ("E_c", "f_c")
 
     E_c: float
     f_c: float = math.inf
-
-    funktion: Funktion = field(init=False, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         E_c, grenze = self.E_c, -self.f_c
@@ -406,15 +496,8 @@ class BetonElastisch:
             return s if s > grenze else grenze
         _gebaut(self, sigma)
 
-    def spannung(self, eps: float) -> float:
-        return self.funktion(eps)
-
-    __call__ = spannung
-
-    @property
-    def seite(self) -> str:
-        """Die Seite im Notizbuch."""
-        return self.NAME
+    def formel(self, werte: Werte) -> str:
+        return self.latex(E=werte["E_c"].symbol, f=werte["f_c"].symbol)
 
     def latex(self, E: str = "E_{c,eff}", f: str = "f_{ck}") -> str:
         """Als Formel -- ``E`` der Modul, ``f`` die Festigkeit, bei der es waagrecht wird."""
@@ -427,7 +510,7 @@ class BetonElastisch:
 
 
 @dataclass(frozen=True)
-class BetonUngerissen:
+class BetonUngerissen(Gesetz):
     """
     Beton linear in beiden Richtungen -- der ungerissene Vergleichszustand.
 
@@ -440,10 +523,10 @@ class BetonUngerissen:
     """
 
     NAME = "Beton ungerissen, in Druck und Zug"
+    WORT = "Beton, linear in Druck und Zug"
+    ROLLEN = ("E_c",)
 
     E_c: float
-
-    funktion: Funktion = field(init=False, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         E_c = self.E_c
@@ -452,15 +535,8 @@ class BetonUngerissen:
             return E_c * eps
         _gebaut(self, sigma)
 
-    def spannung(self, eps: float) -> float:
-        return self.funktion(eps)
-
-    __call__ = spannung
-
-    @property
-    def seite(self) -> str:
-        """Die Seite im Notizbuch."""
-        return self.NAME
+    def formel(self, werte: Werte) -> str:
+        return self.latex(E=werte["E_c"].symbol)
 
     def latex(self, E: str = "E_{c,eff}") -> str:
         """Als Formel -- ``E`` ist der Modul."""

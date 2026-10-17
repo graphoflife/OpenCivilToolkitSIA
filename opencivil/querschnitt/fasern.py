@@ -48,9 +48,9 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Callable, Optional, Sequence, Tuple, Union
+from typing import Optional, Sequence, Tuple, Union
 
-Gesetz = Callable[[float], float]
+from opencivil.querschnitt.werkstoffgesetz import Gesetz
 
 
 @dataclass(frozen=True)
@@ -120,7 +120,7 @@ class Faserquerschnitt:
         # die Felder einer Datenklasse, und die Schleife laeuft
         # hunderttausendfach.
         def gemittelt(g: Fasergruppe) -> bool:
-            return g.dicken is not None and _mittel(g.gesetz) is not None
+            return g.dicken is not None and g.gesetz.mittel is not None
 
         def einzeln(g: Fasergruppe):
             n = len(g.arme)
@@ -129,20 +129,22 @@ class Faserquerschnitt:
                 g.flaechen if isinstance(g.flaechen, tuple) else (g.flaechen,) * n,
                 g.quer if g.quer is not None else (0.0,) * n))
 
-        self._gleich = tuple((_schnell(g.gesetz), g.arme, g.flaechen) for g in self.gruppen
+        # Gerufen wird ``funktion`` jedes Gesetzes, ohne den Umweg ueber
+        # ``__call__``, der je Aufruf ein Fuenftel kostete.
+        self._gleich = tuple((g.gesetz.funktion, g.arme, g.flaechen) for g in self.gruppen
                              if g.quer is None and not isinstance(g.flaechen, tuple)
                              and not gemittelt(g))
         self._einzeln = tuple(
-            (_schnell(g.gesetz), einzeln(g)) for g in self.gruppen
+            (g.gesetz.funktion, einzeln(g)) for g in self.gruppen
             if not (g.quer is None and not isinstance(g.flaechen, tuple)) and not gemittelt(g))
         self._gemittelt = tuple(
-            (_mittel(g.gesetz), tuple((arm, a, u, d / 2.0)
-                                      for (arm, a, u), d in zip(einzeln(g), g.dicken)))
+            (g.gesetz.mittel, tuple((arm, a, u, d / 2.0)
+                                    for (arm, a, u), d in zip(einzeln(g), g.dicken)))
             for g in self.gruppen if gemittelt(g))
         self._staebe = tuple(
-            (s.arm, s.flaeche, _schnell(s.gesetz),
-             None if s.verdraengt is None else _schnell(s.verdraengt), s.quer,
-             _mittel(s.verdraengt) if s.verdraengt is not None and s.dicke > 0.0 else None,
+            (s.arm, s.flaeche, s.gesetz.funktion,
+             None if s.verdraengt is None else s.verdraengt.funktion, s.quer,
+             s.verdraengt.mittel if s.verdraengt is not None and s.dicke > 0.0 else None,
              s.dicke / 2.0)
             for s in self.staebe)
 
@@ -197,21 +199,6 @@ class Faserquerschnitt:
             if schief:
                 M_quer += kraft * quer
         return Schnittkraefte(N=N, M=M, M_quer=M_quer)
-
-
-def _mittel(gesetz: Optional[Gesetz]) -> Optional[Callable[[float, float], float]]:
-    """Die mittlere Spannung des Gesetzes ueber einen Bereich -- wenn es sie kennt."""
-    return getattr(gesetz, "mittel", None)
-
-
-def _schnell(gesetz: Gesetz) -> Gesetz:
-    """
-    Was die Schleife ruft: bei einem Werkstoffgesetz seine ``funktion``
-    (:mod:`opencivil.querschnitt.werkstoffgesetz`) -- ohne den Umweg ueber
-    ``__call__``, der je Aufruf ein Fuenftel kostete --, sonst die Funktion
-    selbst.
-    """
-    return getattr(gesetz, "funktion", gesetz)
 
 
 # ===========================================================================

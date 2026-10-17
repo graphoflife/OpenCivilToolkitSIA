@@ -1,5 +1,5 @@
 ---
-erzeugt: 36d5f1d80908
+erzeugt: 0ff5e3632e1d
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.2.4"
@@ -7,7 +7,7 @@ normstelle: "SIA 262:2025, 4.2.2.4"
 > [!info] Normstelle
 > SIA 262:2025, 4.2.2.4
 
-*In der Herleitung: «B500B: bilineare Beziehung, Bemessungswerte»*
+*In der Herleitung: «Werkstoffgesetz B500B, Bemessungswerte: Stahl, bilinear»*
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
@@ -21,10 +21,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.rechenwahl#protokoll_gesetze|protokoll_gesetze]]
-- [[opencivil.nachweis.resistenzlinie#Ebenenlinie.protokoll_ansatz|Ebenenlinie.protokoll_ansatz]]
-- [[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe_protokollieren|Querschnittsanalyse.werkstoffe_protokollieren]]
-- [[opencivil.querschnitt.schnittanalyse#protokoll_gesetze_nach_wahl|protokoll_gesetze_nach_wahl]]
+- [[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|Gesetz.protokoll]]
 
 ## Themen
 

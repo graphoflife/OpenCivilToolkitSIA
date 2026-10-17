@@ -17,7 +17,7 @@ from opencivil.nachweis.rechenwahl import (
     RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN, Betonkennwerte, Rechenart, Rechenwahl,
     bezuege_vereinen, gesetze,
 )
-from opencivil.querschnitt.werkstoffgesetz import Spannungsblock, Stahlgesetz
+from opencivil.querschnitt.werkstoffgesetz import BetonUngerissen, Spannungsblock, Stahlgesetz
 
 W = Betonkennwerte(f_c=20e6, E_cm=33.6e9, eps_c1d=0.002, eps_c2d=0.0035)
 STAHL = Stahlgesetz(E_s=200e9, f_yd=435e6, f_yd_druck=435e6, eps_ud=0.045)
@@ -93,7 +93,7 @@ class TestGesetze(unittest.TestCase):
 
     def test_der_ungerissene_zustand_ersetzt_nur_den_beton(self):
         g = gesetze(Rechenwahl(art=Rechenart.HANDRECHNUNG), W)
-        loeser = g.loeser(h=0.3, b=1.0, lagen=LAGEN, beton=lambda eps: 1e10 * eps)
+        loeser = g.loeser(h=0.3, b=1.0, lagen=LAGEN, beton=BetonUngerissen(E_c=1e10))
         self.assertEqual(len(loeser.lagen), 2)
         # Der Stahl bleibt der der Wahl: nur auf Zug.
         self.assertEqual([s.gesetz(-0.01) for s in loeser.querschnitt.staebe], [0.0, 0.0])

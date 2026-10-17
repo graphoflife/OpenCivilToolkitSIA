@@ -70,7 +70,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from functools import cached_property
-from typing import Callable, List, Optional, Sequence, Tuple
+from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
 from opencivil.core.protokoll import Zwischenwerte
 from opencivil.core.wahl import Wahl
@@ -240,14 +240,19 @@ def wirksamer_modul(E_cm: float, phi: float) -> float:
     return E_cm / (1.0 + phi)
 
 
+def wirksamer_modul_wert(E_cm, phi: float, basis: str):
+    """``E_c,eff`` als Zwischenwert der Herleitung, unter ``{basis}.E_c_eff``."""
+    return Zwischenwerte(basis).spannung("E_c_eff", "E_{c,eff}",
+                                         wirksamer_modul(E_cm.groesse.si, phi))
+
+
 def protokoll_wirksamer_modul(p, E_cm, phi, basis: str, *, titel: str,
                               nachsatz: str = "") -> None:
     """
     Die Zeile zu :func:`wirksamer_modul`, aus den Werten ``E_cm`` und
     ``phi`` -- fuer jeden Nachweis, der mit dem aufgeweichten Beton rechnet.
     """
-    modul = wirksamer_modul(E_cm.groesse.si, phi.groesse.si)
-    p.formel(Zwischenwerte(basis).spannung("E_c_eff", "E_{c,eff}", modul),
+    p.formel(wirksamer_modul_wert(E_cm, phi.groesse.si, basis),
              r"\frac{@E_cm}{1 + @phi}", {"E_cm": E_cm, "phi": phi},
              titel=titel, nachsatz=nachsatz, name="Wirksamer Elastizitätsmodul")
 
@@ -992,3 +997,18 @@ class Werkstoffsatz(Wahl):
     def beton_zeichen(self) -> str:
         """Das Formelzeichen dazu, fuer die Herleitung -- ``f_{cd}``."""
         return "f_{cd}" if self is Werkstoffsatz.BEMESSUNG else "f_{ck}"
+
+    @property
+    def betonkennwerte(self) -> Dict[str, str]:
+        """
+        Je Rolle eines Betongesetzes
+        (:data:`~opencivil.querschnitt.werkstoffgesetz.Werte`) der Kurzname
+        seines Kennwerts in diesem Satz -- ``E_c`` als ``E_cm``, ohne Kriechen.
+        """
+        return {"f_c": self.beton, "E_c": "E_cm", "eps_c1d": "eps_c1d", "eps_c2d": "eps_c2d"}
+
+    @property
+    def stahlkennwerte(self) -> Dict[str, str]:
+        """Dasselbe fuer ein Stahlgesetz."""
+        return {"f_s": self.stahl, "f_s_druck": self.stahl_druck, "E_s": "E_s",
+                "eps_ud": "eps_ud"}

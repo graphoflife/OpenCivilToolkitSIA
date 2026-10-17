@@ -1,5 +1,5 @@
 ---
-erzeugt: 82dec5e3e818
+erzeugt: 757eed6ed8ae
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.2.1.6"
@@ -7,7 +7,7 @@ normstelle: "SIA 262:2025, 4.2.1.6"
 > [!info] Normstelle
 > SIA 262:2025, 4.2.1.6
 
-*In der Herleitung: «C30/37: Parabel-Rechteck-Beziehung, Bemessungswerte»*
+*In der Herleitung: «Werkstoffgesetz C30/37, Bemessungswerte: Beton, Parabel-Rechteck»*
 
 $$
 \sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
@@ -21,9 +21,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.rechenwahl#protokoll_betongesetz|protokoll_betongesetz]]
-- [[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe_protokollieren|Querschnittsanalyse.werkstoffe_protokollieren]]
-- [[opencivil.spannungsanalyse#herleitung|herleitung]]
+- [[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|Gesetz.protokoll]]
 
 ## Themen
 

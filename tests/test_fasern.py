@@ -12,6 +12,7 @@ import unittest
 from opencivil.querschnitt.fasern import (
     Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt, Stab,
 )
+from opencivil.querschnitt.werkstoffgesetz import BetonUngerissen, Spannungsblock
 
 
 def platte(h=0.3, eps_druck=0.003, eps_zug=0.045):
@@ -68,7 +69,7 @@ class TestDehnungsgrenzen(unittest.TestCase):
 class TestFaserquerschnitt(unittest.TestCase):
 
     def test_gleiche_flaechen_wie_einzeln(self):
-        gesetz = lambda eps: 200e9 * eps  # linear
+        gesetz = BetonUngerissen(E_c=200e9)  # linear
         arme = (-0.1, 0.0, 0.1)
         einmal = Faserquerschnitt([Fasergruppe(gesetz, arme, 0.01)], [])
         einzeln = Faserquerschnitt([Fasergruppe(gesetz, arme, (0.01, 0.01, 0.01))], [])
@@ -77,15 +78,15 @@ class TestFaserquerschnitt(unittest.TestCase):
         self.assertAlmostEqual(a.M, b.M)
 
     def test_stab_verdraengt_den_beton(self):
-        beton = lambda eps: -20e6 if eps < 0 else 0.0
-        stahl = lambda eps: 200e9 * eps
+        beton = Spannungsblock(f_cd=20e6, eps_c2d=0.0035)
+        stahl = BetonUngerissen(E_c=200e9)  # linear
         stab = Stab(arm=0.0, flaeche=0.001, gesetz=stahl, verdraengt=beton)
         k = Faserquerschnitt([], [stab]).kraefte(-0.001, 0.0)
         self.assertAlmostEqual(k.N, (-200e6 + 20e6) * 0.001)
 
     def test_moment_entlang_der_nulllinie(self):
         """Nur wer `quer` angibt, bekommt das zweite Moment."""
-        gesetz = lambda eps: 1e9 * eps
+        gesetz = BetonUngerissen(E_c=1e9)  # linear
         gruppe = Fasergruppe(gesetz, (0.1, 0.1), (0.5, 0.5), quer=(-0.2, 0.4))
         k = Faserquerschnitt([gruppe], []).kraefte(0.0, 1.0)
         kraft = 1e9 * 0.1 * 0.5

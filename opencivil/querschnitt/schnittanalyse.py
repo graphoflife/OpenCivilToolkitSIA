@@ -67,16 +67,15 @@ from typing import TYPE_CHECKING, Callable, Dict, List, Mapping, Optional, Tuple
 
 from opencivil.core.berechnung import Eingaben
 from opencivil.core.einheiten import MIO_MM3, MIO_MM4, Groesse
-from opencivil.core.latex import angabe
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.nachweis.querschnittsloeser import (
-    FASERN, Faserloeser, Stahllage, protokoll_wirksamer_modul,
+    FASERN, Faserloeser, Stahllage, protokoll_wirksamer_modul, wirksamer_modul_wert,
 )
 from opencivil.nachweis.rechenwahl import (
-    Rechenart, Rechenwahl, protokoll_betongesetz, werte_nach_id,
+    Rechenart, Rechenwahl, werte_nach_id,
 )
 from opencivil.nachweis.sproedes_versagen import (
     MOMENTENTEILER, beiwert_dicke, protokoll_zugfestigkeit,
@@ -362,44 +361,28 @@ def protokoll_gesetze_nach_wahl(p: Protokoll, e: Eingaben, analyse: Querschnitts
                       wahl: Rechenwahl, basis: str, *, titel: str) -> None:
     """
     Die Werkstoffgesetze einer Wahl, je Material des Querschnitts -- die von
-    :func:`querschnitt_nach_wahl`, so wie bei der Platte
-    (:func:`~opencivil.nachweis.rechenwahl.protokoll_gesetze`), mit den Werten
-    jedes Betons und jedes Stahls. Dazu der wirksame Modul, wo ein Gesetz an
-    ihm haengt.
+    :func:`querschnitt_nach_wahl`; jedes schreibt sich selbst, mit seinen
+    Werten, wie bei der Platte
+    (:func:`~opencivil.nachweis.rechenwahl.protokoll_gesetze`). Vor jedem
+    Beton sein wirksamer Modul, wo ein Gesetz an ihm haengt.
     """
     satz = wahl.satz
     phi = Zwischenwerte(basis).zahl("phi", r"\varphi", wahl.kriechzahl, stellen=2)
-    # Die Gesetze, mit denen gerechnet wird -- sie schreiben sich selbst.
     werkstoffe, index = analyse.werkstoffe(werte_nach_id(e), lambda stoff: wahl)
-    staehle = []
     for stoff in analyse.baustoffe:
-        gesetz = werkstoffe[index(stoff)].gesetz
-        if stoff.art is not Baustoffart.BETON:
-            staehle.append((stoff, gesetz))
-            continue
         unter = f"{basis}.{kennung_aus(stoff.id)}"
-        E_cm = e[analyse._name(stoff, "E_cm")]
-        if wahl.art.mit_kriechzahl:
-            protokoll_wirksamer_modul(p, E_cm, phi, unter,
-                                      titel=f"Wirksamer Elastizitätsmodul {stoff.name}")
-        f_c = e[analyse._name(stoff, satz.beton)]
-        if wahl.art is Rechenart.ELASTISCH:
-            p.ansatz(gesetz.latex(f=f_c.symbol), name=gesetz.seite,
-                     titel=f"{titel}, {stoff.name}: Beton, linear ohne Zug")
-            p.gleichung(angabe(f_c), titel=f"{titel}, {stoff.name}: Festigkeit des Betons")
+        if stoff.art is Baustoffart.BETON:
+            werte = {rolle: e[analyse._name(stoff, name)]
+                     for rolle, name in satz.betonkennwerte.items()}
+            if wahl.art.mit_kriechzahl:
+                protokoll_wirksamer_modul(p, werte["E_c"], phi, unter,
+                                          titel=f"Wirksamer Elastizitätsmodul {stoff.name}")
+            werte["E_c"] = wirksamer_modul_wert(werte["E_c"], wahl.kriechzahl, unter)
         else:
-            protokoll_betongesetz(p, wahl, gesetz, f_c, E_cm, unter,
-                                  titel=f"{titel}, {stoff.name}")
-    if staehle:
-        zug = [e[analyse._name(s, satz.stahl)] for s, _ in staehle]
-        druck = [e[analyse._name(s, satz.stahl_druck)] for s, _ in staehle]
-        stahl = staehle[0][1]
-        p.ansatz(stahl.latex(zug[0].symbol if len(zug) == 1 else satz.stahl_zeichen,
-                             druck[0].symbol if len(druck) == 1 else satz.stahl_druck_zeichen),
-                 titel=f"{titel}: Stahl, bilinear", referenz="SIA 262:2025, 4.2.2.4",
-                 name=stahl.seite)
-        p.gleichung(r" \quad ".join(angabe(w) for w in zug + druck),
-                    titel=f"{titel}: Festigkeiten des Stahls")
+            werte = {rolle: e[analyse._name(stoff, name)]
+                     for rolle, name in satz.stahlkennwerte.items()}
+        werkstoffe[index(stoff)].gesetz.protokoll(p, werte, titel=f"{titel}, {stoff.name}",
+                                                  basis=unter)
 
 
 def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[str], float],

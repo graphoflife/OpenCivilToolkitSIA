@@ -652,41 +652,26 @@ Wand 4 & $(50;\ 550) \rightarrow (50;\ 50)$ & $500$ & $100$ & $1 \times \varnoth
 \begin{equation*}
 \alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
 \end{equation*}
-\noindent\textbf{C30/37: Beiwert der Parabel}
+\noindent\textbf{Werkstoffgesetz C30/37, Bemessungswerte: Beiwert der Parabel}
 \begin{equation*}
 k_{\sigma} = \max\left(1;\ \frac{E_{cm}}{400 \cdot f_{cd}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 4.2
 \end{equation*}
-\noindent\textbf{C30/37: Parabel-Rechteck-Beziehung, Bemessungswerte} \hfill \normref{SIA 262:2025, 4.2.1.6}
+\noindent\textbf{Werkstoffgesetz C30/37, Bemessungswerte: Beton, Parabel-Rechteck} \hfill \normref{SIA 262:2025, 4.2.1.6}
 \begin{equation*}
 \sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 \end{equation*}
-\noindent\textbf{Werte C30/37}
-\begin{longtable}{lr}
-\hline
-Kennwert & Wert \\
-\hline
-\endhead
-$f_{cd}$ & $20\,\mathrm{N}/\mathrm{mm}^{2}$ \\
-$\varepsilon_{c1d}$ & $2\,\text{‰}$ \\
-$\varepsilon_{c2d}$ & $3.5\,\text{‰}$ \\
-\hline
-\end{longtable}
-\noindent\textbf{B500B: bilineare Beziehung, Bemessungswerte} \hfill \normref{SIA 262:2025, 4.2.2.4}
+\noindent\textbf{Werkstoffgesetz C30/37, Bemessungswerte: Werte des Betons}
+\begin{equation*}
+f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+\end{equation*}
+\noindent\textbf{Werkstoffgesetz B500B, Bemessungswerte: Stahl, bilinear} \hfill \normref{SIA 262:2025, 4.2.2.4}
 \begin{equation*}
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 \end{equation*}
-\noindent\textbf{Werte B500B}
-\begin{longtable}{lr}
-\hline
-Kennwert & Wert \\
-\hline
-\endhead
-$f_{yd}$ & $435\,\mathrm{N}/\mathrm{mm}^{2}$ \\
-$f_{yd}^{-}$ & $435\,\mathrm{N}/\mathrm{mm}^{2}$ \\
-$E_s$ & $200000\,\mathrm{N}/\mathrm{mm}^{2}$ \\
-$\varepsilon_{ud}$ & $4.5\,\%$ \\
-\hline
-\end{longtable}
+\noindent\textbf{Werkstoffgesetz B500B, Bemessungswerte: Werte des Stahls}
+\begin{equation*}
+f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yd}^{-} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
+\end{equation*}
 \noindent\textbf{Reine Normalkraft}
 \begin{longtable}{lr}
 \hline
@@ -1562,15 +1547,15 @@ Der Bruchzustand: jede Dehnungsebene, bei der ein Werkstoff an seiner Grenze ste
 \begin{equation*}
 \alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
 \end{equation*}
-\noindent\textbf{C30/37: Beiwert der Parabel}
+\noindent\textbf{Werkstoffgesetz C30/37, Bemessungswerte: Beiwert der Parabel}
 \begin{equation*}
 k_{\sigma} = \max\left(1;\ \frac{E_{cm}}{400 \cdot f_{cd}}\right)
 \end{equation*}
-\noindent\textbf{C30/37: Parabel-Rechteck-Beziehung, Bemessungswerte} \hfill \normref{SIA 262:2025, 4.2.1.6}
+\noindent\textbf{Werkstoffgesetz C30/37, Bemessungswerte: Beton, Parabel-Rechteck} \hfill \normref{SIA 262:2025, 4.2.1.6}
 \begin{equation*}
 \sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 \end{equation*}
-\noindent\textbf{B500B: bilineare Beziehung, Bemessungswerte} \hfill \normref{SIA 262:2025, 4.2.2.4}
+\noindent\textbf{Werkstoffgesetz B500B, Bemessungswerte: Stahl, bilinear} \hfill \normref{SIA 262:2025, 4.2.2.4}
 \begin{equation*}
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 \end{equation*}

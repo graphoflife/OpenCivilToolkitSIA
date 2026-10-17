@@ -25,9 +25,9 @@ from opencivil.querschnitt.werkstoffgesetz import Betongesetz, Spannungsblock, S
 BETON = Betongesetz(f_cd=20e6, eps_c1d=0.002, eps_c2d=0.003, k_sigma=2.0)
 STAHL = Stahlgesetz(E_s=200e9, f_yd=435e6, f_yd_druck=435e6, eps_ud=0.045)
 WERKSTOFFE = [
-    Werkstoff("Beton", BETON.spannung, -0.003, math.inf, c_punkt=(0.002, 0.003),
+    Werkstoff("Beton", BETON, -0.003, math.inf, c_punkt=(0.002, 0.003),
               verdraengbar=True),
-    Werkstoff("Stahl", STAHL.spannung, -0.045, 0.045),
+    Werkstoff("Stahl", STAHL, -0.045, 0.045),
 ]
 
 
@@ -50,7 +50,7 @@ class TestWieDiePlatte(unittest.TestCase):
 
     def setUp(self):
         self.ebenen = Ebenenlinie(
-            Rechenwahl(art=Rechenart.PARABEL), h=self.h, b=self.b, beton=BETON.spannung,
+            Rechenwahl(art=Rechenart.PARABEL), h=self.h, b=self.b, beton=BETON,
             lagen=[Stahllage(a_s=1131e-6, z=0.215, stahl=STAHL, text="unten"),
                    Stahllage(a_s=565e-6, z=0.035, stahl=STAHL, text="oben")],
             eps_c1d=BETON.eps_c1d, eps_c2d=BETON.eps_c2d)
@@ -217,7 +217,7 @@ class TestSpannungsblock(unittest.TestCase):
         werkstoffe = [
             Werkstoff("Beton", block, -0.003, math.inf, c_punkt=(0.002, 0.003),
                       verdraengbar=True),
-            Werkstoff("Stahl", STAHL.spannung, -0.045, 0.045),
+            Werkstoff("Stahl", STAHL, -0.045, 0.045),
         ]
         # Ein Kasten mit Loch und Stäben im Beton: Fasern und verdrängtes
         # Material springen beide.

@@ -1,5 +1,5 @@
 ---
-erzeugt: d205ff13f26e
+erzeugt: f42d2a83064c
 art: modul
 tags: [modul]
 ---
@@ -169,6 +169,14 @@ def wirksamer_modul(E_cm: float, phi: float) -> float
 ```
 
 `E_c,eff = E_cm / (1 + phi)` -- das Kriechen weicht den Beton auf.
+
+### wirksamer_modul_wert
+
+```python
+def wirksamer_modul_wert(E_cm, phi: float, basis: str)
+```
+
+`E_c,eff` als Zwischenwert der Herleitung, unter `{basis}.E_c_eff`.
 
 ### protokoll_wirksamer_modul
 
@@ -623,6 +631,26 @@ def beton_zeichen(self) -> str
 ```
 
 Das Formelzeichen dazu, fuer die Herleitung -- `f_{cd}`.
+
+#### Werkstoffsatz.betonkennwerte
+
+```python
+@property
+def betonkennwerte(self) -> Dict[str, str]
+```
+
+Je Rolle eines Betongesetzes
+([[opencivil.querschnitt.werkstoffgesetz#Konstanten|Werte]]) der Kurzname
+seines Kennwerts in diesem Satz -- `E_c` als `E_cm`, ohne Kriechen.
+
+#### Werkstoffsatz.stahlkennwerte
+
+```python
+@property
+def stahlkennwerte(self) -> Dict[str, str]
+```
+
+Dasselbe fuer ein Stahlgesetz.
 
 
 ## Konstanten

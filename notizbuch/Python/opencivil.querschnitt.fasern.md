@@ -1,5 +1,5 @@
 ---
-erzeugt: 1713fd278bac
+erzeugt: 0e9e3dc5fc2a
 art: modul
 tags: [modul]
 ---
@@ -144,25 +144,6 @@ Ortsgebundene Namen statt `self.`: diese Schleife laeuft je Nachweis
 hunderttausende Male, und jeder Zugriff ueber ein Attribut kostet darin
 eine Suche.
 
-### _mittel
-
-```python
-def _mittel(gesetz: Optional[Gesetz]) -> Optional[Callable[[float, float], float]]
-```
-
-Die mittlere Spannung des Gesetzes ueber einen Bereich -- wenn es sie kennt.
-
-### _schnell
-
-```python
-def _schnell(gesetz: Gesetz) -> Gesetz
-```
-
-Was die Schleife ruft: bei einem Werkstoffgesetz seine `funktion`
-([[opencivil.querschnitt.werkstoffgesetz]]) -- ohne den Umweg ueber
-`__call__`, der je Aufruf ein Fuenftel kostete --, sonst die Funktion
-selbst.
-
 ### Dehnungsgrenze
 
 ```python
@@ -224,6 +205,10 @@ Kruemmung dehnt, gilt `|chi| <= (eps_max_l - eps_min_k) / Abstand`.
 Massgebend ist das engste Paar. Bei der Platte ist das eines: die
 Unterkante gegen die Oberkante, `(eps_zug + eps_druck) / h`.
 
+
+## Braucht
+
+- [[opencivil.querschnitt.werkstoffgesetz]]
 
 ## Gebraucht von
 

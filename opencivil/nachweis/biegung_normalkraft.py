@@ -708,7 +708,7 @@ def resistenzlinie(
         beton=betongesetz(wahl, f_c=f_c, E_cm=e.g("E_cm").si,
                           eps_c1d=eps_c1d, eps_c2d=eps_c2d),
         schritte=schritte, fasern=fasern)
-    linie.protokoll_ansatz(p, f_c=e[satz.beton], E_cm=e["E_cm"], phi=phi, basis=basis)
+    linie.protokoll_ansatz(p, e, posten=posten, phi=phi, basis=basis)
     return linie
 
 

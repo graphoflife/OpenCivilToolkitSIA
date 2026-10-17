@@ -1,5 +1,5 @@
 ---
-erzeugt: 1c39f10a8dce
+erzeugt: 46a991359149
 art: formel
 tags: [formel]
 ---
@@ -14,7 +14,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.rechenwahl#protokoll_gesetze|protokoll_gesetze]]
+- [[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|Gesetz.protokoll]]
 
 ## Themen
 

@@ -933,10 +933,10 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} \max\left(E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right) & \varepsilon_c \le 0 \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand: Festigkeit des Betons**
+**Werkstoffgesetze im Gebrauchszustand: Werte des Betons**
 
 $$
-f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
+E_{c,eff} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Werkstoffgesetze im Gebrauchszustand: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
@@ -945,10 +945,10 @@ $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand: Festigkeiten des Stahls**
+**Werkstoffgesetze im Gebrauchszustand: Werte des Stahls**
 
 $$
-f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 #### Wie die Dehnungsebene gefunden wird
@@ -1115,10 +1115,10 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} \max\left(E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right) & \varepsilon_c \le 0 \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand: Festigkeit des Betons**
+**Werkstoffgesetze im Gebrauchszustand: Werte des Betons**
 
 $$
-f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
+E_{c,eff} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Werkstoffgesetze im Gebrauchszustand: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
@@ -1127,10 +1127,10 @@ $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand: Festigkeiten des Stahls**
+**Werkstoffgesetze im Gebrauchszustand: Werte des Stahls**
 
 $$
-f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 #### Wie die Dehnungsebene gefunden wird
@@ -1427,7 +1427,7 @@ $$
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 2} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \qquad f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Beiwert der Parabel, mit dem wirksamen Modul**
+**Werkstoffgesetze der Verformung: Beiwert der Parabel**
 
 $$
 k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{cd}}\right) = \max\left(1;\ \frac{11207\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 1.4
@@ -1439,16 +1439,22 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
+**Werkstoffgesetze der Verformung: Werte des Betons**
+
+$$
+f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+$$
+
 **Werkstoffgesetze der Verformung: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-**Werkstoffgesetze der Verformung: Festigkeiten des Stahls**
+**Werkstoffgesetze der Verformung: Werte des Stahls**
 
 $$
-f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yd}^{-} = 435\,\mathrm{N}/\mathrm{mm}^{2}
+f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yd}^{-} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 #### Wie die Dehnungsebene gefunden wird
@@ -1473,10 +1479,22 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{cd} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] 0 & \varepsilon_c < -\varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \end{cases}
 $$
 
+**Werkstoffgesetze: Werte des Betons**
+
+$$
+f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+$$
+
 **Werkstoffgesetze: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
+$$
+
+**Werkstoffgesetze: Werte des Stahls**
+
+$$
+f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yd}^{-} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 **Schnittgrössen aus der Spannungsverteilung**
@@ -2320,10 +2338,10 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} \max\left(E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right) & \varepsilon_c \le 0 \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand: Festigkeit des Betons**
+**Werkstoffgesetze im Gebrauchszustand: Werte des Betons**
 
 $$
-f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
+E_{c,eff} = 11207\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
 **Werkstoffgesetze im Gebrauchszustand: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
@@ -2332,10 +2350,10 @@ $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand: Festigkeiten des Stahls**
+**Werkstoffgesetze im Gebrauchszustand: Werte des Stahls**
 
 $$
-f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 #### Wie die Dehnungsebene gefunden wird
@@ -2709,7 +2727,7 @@ $$
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 1} = 16810\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Beiwert der Parabel, mit dem wirksamen Modul**
+**Werkstoffgesetze: Beiwert der Parabel**
 
 $$
 k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{ck}}\right) = \max\left(1;\ \frac{16810\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 1.4
@@ -2721,10 +2739,22 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
+**Werkstoffgesetze: Werte des Betons**
+
+$$
+f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+$$
+
 **Werkstoffgesetze: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
+$$
+
+**Werkstoffgesetze: Werte des Stahls**
+
+$$
+f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 **Schnittgrössen aus der Spannungsverteilung**
@@ -2986,16 +3016,22 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{ck} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] 0 & \varepsilon_c < -\varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \end{cases}
 $$
 
+**Werkstoffgesetze im Gebrauchszustand: Werte des Betons**
+
+$$
+f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+$$
+
 **Werkstoffgesetze im Gebrauchszustand: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand: Festigkeiten des Stahls**
+**Werkstoffgesetze im Gebrauchszustand: Werte des Stahls**
 
 $$
-f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 #### Wie die Dehnungsebene gefunden wird
@@ -3060,7 +3096,7 @@ $$
 
 #### Welche Werte angesetzt werden
 
-**Beiwert der Parabel, mit dem wirksamen Modul**
+**Werkstoffgesetze im Gebrauchszustand: Beiwert der Parabel**
 
 $$
 k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{ck}}\right) = \max\left(1;\ \frac{11207\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 1
@@ -3072,16 +3108,22 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
+**Werkstoffgesetze im Gebrauchszustand: Werte des Betons**
+
+$$
+f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+$$
+
 **Werkstoffgesetze im Gebrauchszustand: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand: Festigkeiten des Stahls**
+**Werkstoffgesetze im Gebrauchszustand: Werte des Stahls**
 
 $$
-f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 #### Wie die Dehnungsebene gefunden wird
@@ -3152,7 +3194,7 @@ $$
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \qquad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Beiwert der Parabel, mit dem wirksamen Modul**
+**Werkstoffgesetze der Verformung: Beiwert der Parabel**
 
 $$
 k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{ck}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 2.8
@@ -3164,16 +3206,22 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
+**Werkstoffgesetze der Verformung: Werte des Betons**
+
+$$
+f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+$$
+
 **Werkstoffgesetze der Verformung: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-**Werkstoffgesetze der Verformung: Festigkeiten des Stahls**
+**Werkstoffgesetze der Verformung: Werte des Stahls**
 
 $$
-f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 #### Wie die Dehnungsebene gefunden wird
@@ -3198,7 +3246,7 @@ $$
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Beiwert der Parabel, mit dem wirksamen Modul**
+**Werkstoffgesetze: Beiwert der Parabel**
 
 $$
 k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{cd}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 4.2
@@ -3210,10 +3258,22 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
+**Werkstoffgesetze: Werte des Betons**
+
+$$
+f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+$$
+
 **Werkstoffgesetze: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
+$$
+
+**Werkstoffgesetze: Werte des Stahls**
+
+$$
+f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yd}^{-} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 **Schnittgrössen aus der Spannungsverteilung**
@@ -3790,10 +3850,22 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{cd} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] 0 & \varepsilon_c < -\varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \end{cases}
 $$
 
+**Werkstoffgesetze: Werte des Betons**
+
+$$
+f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+$$
+
 **Werkstoffgesetze: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
+$$
+
+**Werkstoffgesetze: Werte des Stahls**
+
+$$
+f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yd}^{-} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 **Schnittgrössen aus der Spannungsverteilung**
@@ -4037,16 +4109,22 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{ck} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] 0 & \varepsilon_c < -\varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \end{cases}
 $$
 
+**Werkstoffgesetze im Gebrauchszustand: Werte des Betons**
+
+$$
+f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+$$
+
 **Werkstoffgesetze im Gebrauchszustand: Stahl, nur auf Zug**
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & 0 < \varepsilon_s \le \varepsilon_{ud} \\[1ex] 0 & \varepsilon_s \le 0 \quad (\text{gedrückt: weggelassen}) \\[1ex] 0 & \varepsilon_s > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand: Festigkeiten des Stahls**
+**Werkstoffgesetze im Gebrauchszustand: Werte des Stahls**
 
 $$
-f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 #### Wie die Dehnungsebene gefunden wird
@@ -4117,7 +4195,7 @@ $$
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \qquad f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Beiwert der Parabel, mit dem wirksamen Modul**
+**Werkstoffgesetze der Verformung: Beiwert der Parabel**
 
 $$
 k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{cd}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 4.2
@@ -4129,16 +4207,22 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
+**Werkstoffgesetze der Verformung: Werte des Betons**
+
+$$
+f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+$$
+
 **Werkstoffgesetze der Verformung: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-**Werkstoffgesetze der Verformung: Festigkeiten des Stahls**
+**Werkstoffgesetze der Verformung: Werte des Stahls**
 
 $$
-f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yd}^{-} = 435\,\mathrm{N}/\mathrm{mm}^{2}
+f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yd}^{-} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 #### Wie die Dehnungsebene gefunden wird
@@ -5604,34 +5688,29 @@ $$
 \alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
 $$
 
-**C30/37: Spannungsblock 0.85·x, Bemessungswerte**
+**Werkstoffgesetz C30/37, Bemessungswerte: Beton, Spannungsblock 0.85·x**
 
 $$
 \sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{cd} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] 0 & \varepsilon_c < -\varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \end{cases}
 $$
 
-**Werte C30/37**
+**Werkstoffgesetz C30/37, Bemessungswerte: Werte des Betons**
 
-| Kennwert | Wert |
-| :--- | ---: |
-| $f_{cd}$ | $20\,\mathrm{N}/\mathrm{mm}^{2}$ |
-| $\varepsilon_{c1d}$ | $2\,\text{‰}$ |
-| $\varepsilon_{c2d}$ | $3.5\,\text{‰}$ |
+$$
+f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+$$
 
-**B500B: bilineare Beziehung, Bemessungswerte** *(SIA 262:2025, 4.2.2.4)*
+**Werkstoffgesetz B500B, Bemessungswerte: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-**Werte B500B**
+**Werkstoffgesetz B500B, Bemessungswerte: Werte des Stahls**
 
-| Kennwert | Wert |
-| :--- | ---: |
-| $f_{yd}$ | $435\,\mathrm{N}/\mathrm{mm}^{2}$ |
-| $f_{yd}^{-}$ | $435\,\mathrm{N}/\mathrm{mm}^{2}$ |
-| $E_s$ | $200000\,\mathrm{N}/\mathrm{mm}^{2}$ |
-| $\varepsilon_{ud}$ | $4.5\,\%$ |
+$$
+f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yd}^{-} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
+$$
 
 **Reine Normalkraft**
 
@@ -6151,22 +6230,22 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} \max\left(E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right) & \varepsilon_c \le 0 \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
-**Werkstoffgesetze im gerissenen Zustand, C30/37: Festigkeit des Betons**
+**Werkstoffgesetze im gerissenen Zustand, C30/37: Werte des Betons**
 
 $$
-f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
+E_{c,eff} = 16810\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Werkstoffgesetze im gerissenen Zustand: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
+**Werkstoffgesetze im gerissenen Zustand, B500B: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-**Werkstoffgesetze im gerissenen Zustand: Festigkeiten des Stahls**
+**Werkstoffgesetze im gerissenen Zustand, B500B: Werte des Stahls**
 
 $$
-f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 **Linie 3: verschmiert, als Stäbe mit 150 mm Teilung**
@@ -6581,22 +6660,22 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} \max\left(E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right) & \varepsilon_c \le 0 \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand, C30/37: Festigkeit des Betons**
+**Werkstoffgesetze im Gebrauchszustand, C30/37: Werte des Betons**
 
 $$
-f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
+E_{c,eff} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
+**Werkstoffgesetze im Gebrauchszustand, B500B: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand: Festigkeiten des Stahls**
+**Werkstoffgesetze im Gebrauchszustand, B500B: Werte des Stahls**
 
 $$
-f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 #### Wie die Dehnungsebene gefunden wird
@@ -6760,22 +6839,22 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} \max\left(E_{c,eff} \cdot \varepsilon_c;\ -f_{ck}\right) & \varepsilon_c \le 0 \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand, C30/37: Festigkeit des Betons**
+**Werkstoffgesetze im Gebrauchszustand, C30/37: Werte des Betons**
 
 $$
-f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
+E_{c,eff} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
+**Werkstoffgesetze im Gebrauchszustand, B500B: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand: Festigkeiten des Stahls**
+**Werkstoffgesetze im Gebrauchszustand, B500B: Werte des Stahls**
 
 $$
-f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 #### Wie die Dehnungsebene gefunden wird
@@ -6915,40 +6994,35 @@ $$
 \alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
 $$
 
-**C30/37: Beiwert der Parabel**
+**Werkstoffgesetz C30/37, charakteristisch: Beiwert der Parabel**
 
 $$
 k_{\sigma} = \max\left(1;\ \frac{E_{cm}}{400 \cdot f_{ck}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 2.8
 $$
 
-**C30/37: Parabel-Rechteck-Beziehung, charakteristisch** *(SIA 262:2025, 4.2.1.6)*
+**Werkstoffgesetz C30/37, charakteristisch: Beton, Parabel-Rechteck** *(SIA 262:2025, 4.2.1.6)*
 
 $$
 \sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
-**Werte C30/37**
+**Werkstoffgesetz C30/37, charakteristisch: Werte des Betons**
 
-| Kennwert | Wert |
-| :--- | ---: |
-| $f_{ck}$ | $30\,\mathrm{N}/\mathrm{mm}^{2}$ |
-| $\varepsilon_{c1d}$ | $2\,\text{‰}$ |
-| $\varepsilon_{c2d}$ | $3.5\,\text{‰}$ |
+$$
+f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+$$
 
-**B500B: bilineare Beziehung, charakteristisch** *(SIA 262:2025, 4.2.2.4)*
+**Werkstoffgesetz B500B, charakteristisch: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-**Werte B500B**
+**Werkstoffgesetz B500B, charakteristisch: Werte des Stahls**
 
-| Kennwert | Wert |
-| :--- | ---: |
-| $f_{yk}$ | $500\,\mathrm{N}/\mathrm{mm}^{2}$ |
-| $f_{yk}^{-}$ | $500\,\mathrm{N}/\mathrm{mm}^{2}$ |
-| $E_s$ | $200000\,\mathrm{N}/\mathrm{mm}^{2}$ |
-| $\varepsilon_{ud}$ | $4.5\,\%$ |
+$$
+f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
+$$
 
 **Reine Normalkraft**
 
@@ -7085,7 +7159,7 @@ $$
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 0} = 33620\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Beiwert der Parabel, mit dem wirksamen Modul**
+**Werkstoffgesetze im Gebrauchszustand, C30/37: Beiwert der Parabel**
 
 $$
 k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{ck}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 30\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 2.8
@@ -7097,16 +7171,22 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} -f_{ck} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{ck} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
+**Werkstoffgesetze im Gebrauchszustand, C30/37: Werte des Betons**
+
+$$
+f_{ck} = 30\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+$$
+
+**Werkstoffgesetze im Gebrauchszustand, B500B: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yk}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yk}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-**Werkstoffgesetze im Gebrauchszustand: Festigkeiten des Stahls**
+**Werkstoffgesetze im Gebrauchszustand, B500B: Werte des Stahls**
 
 $$
-f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2}
+f_{yk} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yk}^{-} = 500\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 #### Wie die Dehnungsebene gefunden wird
@@ -7185,7 +7265,7 @@ $$
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi} = \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{1 + 1.5} = 13448\,\mathrm{N}/\mathrm{mm}^{2}
 $$
 
-**Beiwert der Parabel, mit dem wirksamen Modul**
+**Werkstoffgesetze – Verformung, C30/37: Beiwert der Parabel**
 
 $$
 k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{cd}}\right) = \max\left(1;\ \frac{13448\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 1.68
@@ -7197,16 +7277,22 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 $$
 
-**Werkstoffgesetze – Verformung: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
+**Werkstoffgesetze – Verformung, C30/37: Werte des Betons**
+
+$$
+f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+$$
+
+**Werkstoffgesetze – Verformung, B500B: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-**Werkstoffgesetze – Verformung: Festigkeiten des Stahls**
+**Werkstoffgesetze – Verformung, B500B: Werte des Stahls**
 
 $$
-f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yd}^{-} = 435\,\mathrm{N}/\mathrm{mm}^{2}
+f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yd}^{-} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 #### Widerstand
@@ -7223,16 +7309,22 @@ $$
 \sigma_c(\varepsilon_c) = \begin{cases} 0 & \varepsilon_c > -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] -f_{cd} & -\varepsilon_{c2d} \le \varepsilon_c \le -(1 - 0.85) \cdot \varepsilon_{c2d} \\[1ex] 0 & \varepsilon_c < -\varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \end{cases}
 $$
 
-**Werkstoffgesetze – Widerstand: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
+**Werkstoffgesetze – Widerstand, C30/37: Werte des Betons**
+
+$$
+f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
+$$
+
+**Werkstoffgesetze – Widerstand, B500B: Stahl, bilinear** *(SIA 262:2025, 4.2.2.4)*
 
 $$
 \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 $$
 
-**Werkstoffgesetze – Widerstand: Festigkeiten des Stahls**
+**Werkstoffgesetze – Widerstand, B500B: Werte des Stahls**
 
 $$
-f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yd}^{-} = 435\,\mathrm{N}/\mathrm{mm}^{2}
+f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yd}^{-} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 $$
 
 #### Knicken – Stütze, Zug unten
@@ -9789,7 +9881,7 @@ $$
 E_{c,eff} = \frac{E_{cm}}{1 + \varphi}
 $$
 
-**Beiwert der Parabel, mit dem wirksamen Modul**
+**Werkstoffgesetze: Beiwert der Parabel**
 
 $$
 k_{\sigma} = \max\left(1;\ \frac{E_{c,eff}}{400 \cdot f_{ck}}\right)

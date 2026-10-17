@@ -1,5 +1,5 @@
 ---
-erzeugt: 9e6371b39c66
+erzeugt: f836dc797d29
 art: modul
 tags: [modul]
 ---
@@ -333,7 +333,9 @@ selbst, und der Bruchzustand nahm den Beiwert der Parabel aus `E_cd`.
 def werkstoffe_protokollieren(self, p: Protokoll, e: Eingaben, basis: str) -> None
 ```
 
-Die Gesetze, mit denen gerechnet wird -- sie schreiben sich selbst --, und die Werte darin.
+Die Gesetze, mit denen gerechnet wird, je Material mit seiner Wahl --
+jedes schreibt sich selbst, mit den Werten darin. Ohne Kriechen: die
+Parabel haengt hier an `E_cm`.
 
 #### Querschnittsanalyse.grundbezuege
 
@@ -414,11 +416,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 
 ## Formeln aus diesem Modul
 
-- [[Beiwert der Parabel]] · `Querschnittsanalyse.werkstoffe_protokollieren`
-- [[Bilineare Beziehung des Betonstahls]] · `Querschnittsanalyse.werkstoffe_protokollieren`
 - [[Bügelquerschnitt je Länge einer Schubwand (n Schnitte)]] · `Querschnittsanalyse._waende_protokollieren`
 - [[Fläche und Schwerpunkt eines Polygons (Satz von Gauss)]] · `Querschnittsanalyse.aufbau_protokollieren`
-- [[Parabel-Rechteck-Beziehung des Betons]] · `Querschnittsanalyse.werkstoffe_protokollieren`
-- [[Spannungsblock des Betons]] · `Querschnittsanalyse.werkstoffe_protokollieren`
 - [[Teilung einer Stablinie – gleiche Felder, auf die Länge gerundet]] · `Querschnittsanalyse._bewehrung_protokollieren`
 - [[Trägheitsmomente eines Polygons, bezogen auf den Schwerpunkt]] · `Querschnittsanalyse.aufbau_protokollieren`

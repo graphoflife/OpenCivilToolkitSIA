@@ -1,5 +1,5 @@
 ---
-erzeugt: b76b45816c77
+erzeugt: 6c841d16372d
 art: modul
 tags: [modul]
 ---
@@ -354,27 +354,14 @@ def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *
 ```
 
 Die Werkstoffgesetze der Wahl, so wie gerechnet wird: jedes Gesetz
-schreibt sich selbst ([[opencivil.querschnitt.werkstoffgesetz]]), mit
-den Zeichen seines Wertesatzes -- auch was jenseits der Grenzdehnung
-gilt und das Plateau des gedrueckten Stahls. Bis 2026-10-16 stand hier
-eine Formel von Hand, ohne beides.
+schreibt sich selbst
+([[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|protokoll]]), mit den
+Werten, mit denen es rechnet -- der Beton mit dem wirksamen Modul, jeder
+Stahl der Posten mit seinen; bei mehreren Staehlen mit dem Namen im Titel.
 
-Der Stahl steht mit den Festigkeiten jeder Sorte der Posten da; bei einer
-Sorte mit ihren Zeichen, bei mehreren mit den allgemeinen und je Sorte
-einer Angabe dahinter. Der wirksame Modul steht nicht hier: wo er
-gebraucht wird, schreibt ihn das Kapitel an der Stelle, an der er erklaert
-wird ([[opencivil.nachweis.querschnittsloeser#protokoll_wirksamer_modul|protokoll_wirksamer_modul]]).
-
-### protokoll_betongesetz
-
-```python
-def protokoll_betongesetz(p: Protokoll, wahl: Rechenwahl, gesetz: Gesetz, f_c: Wert, E_cm: Wert, basis: str, *, titel: str) -> None
-```
-
-Der Beton einer Wahl mit Block oder Parabel, so wie `gesetz` rechnet --
-bei der Parabel samt ihrem Beiwert aus dem wirksamen Modul
-`E_cm/(1+phi)`. `f_c` ist die Festigkeit des Wertesatzes, `f_cd`
-oder `f_ck`.
+Der wirksame Modul selbst steht nicht hier: wo er gebraucht wird, schreibt
+ihn das Kapitel an der Stelle, an der er erklaert wird
+([[opencivil.nachweis.querschnittsloeser#protokoll_wirksamer_modul|protokoll_wirksamer_modul]]).
 
 ### gesetze
 
@@ -422,12 +409,3 @@ das Knicken und die Analysen mit dem der ersten Lage.
 - [[opencivil.querschnitt.schnittanalyse]]
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.web.api]]
-
-## Formeln aus diesem Modul
-
-- [[Beiwert der Parabel]] · `protokoll_betongesetz`
-- [[Beton linear, ohne Zug]] · `protokoll_gesetze`
-- [[Betonstahl nur auf Zug]] · `protokoll_gesetze`
-- [[Bilineare Beziehung des Betonstahls]] · `protokoll_gesetze`
-- [[Parabel-Rechteck-Beziehung des Betons]] · `protokoll_betongesetz`
-- [[Spannungsblock des Betons]] · `protokoll_betongesetz`

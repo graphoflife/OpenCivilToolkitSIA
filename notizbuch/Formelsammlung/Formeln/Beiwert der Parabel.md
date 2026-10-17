@@ -1,12 +1,12 @@
 ---
-erzeugt: 340d3fe7f18e
+erzeugt: 2f93282fe676
 art: formel
 tags: [formel]
 ---
 > [!warning] Normstelle fehlt noch
 > Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
 
-*In der Herleitung: «C30/37: Beiwert der Parabel»*
+*In der Herleitung: «Werkstoffgesetz C30/37, Bemessungswerte: Beiwert der Parabel»*
 
 $$
 k_{\sigma} = \max\left(1;\ \frac{E_{cm}}{400 \cdot f_{cd}}\right)
@@ -29,9 +29,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.rechenwahl#protokoll_betongesetz|protokoll_betongesetz]]
-- [[opencivil.querschnitt.analyse#Querschnittsanalyse.werkstoffe_protokollieren|Querschnittsanalyse.werkstoffe_protokollieren]]
-- [[opencivil.spannungsanalyse#herleitung|herleitung]]
+- [[opencivil.querschnitt.werkstoffgesetz#Betongesetz.protokoll|Betongesetz.protokoll]]
 
 ## Themen
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: b974a3493e7a
+erzeugt: 1aa818c8aaef
 art: modul
 tags: [modul]
 ---
@@ -256,11 +256,12 @@ Welche Grenzen diese Ebene erreicht -- die, die ihren Bruchzustand bestimmen.
 #### Ebenenlinie.protokoll_ansatz
 
 ```python
-def protokoll_ansatz(self, p: Protokoll, *, f_c: Wert, E_cm: Wert, phi: Wert, basis: str) -> None
+def protokoll_ansatz(self, p: Protokoll, e: Eingaben, *, posten, phi: Wert, basis: str) -> None
 ```
 
 Wie die Linie entsteht -- einmal je Nachweis, vor den Kombinationen.
-Den Titel setzt der Nachweis.
+Den Titel setzt der Nachweis; `e` und `posten` sind die der Linie
+([[opencivil.nachweis.biegung_normalkraft#linienbezuege|linienbezuege]]).
 
 #### Ebenenlinie.protokoll_treffer
 
@@ -303,6 +304,7 @@ Ein SI-Wert in Kilo-Einheiten, eine Nachkommastelle.
 
 ## Braucht
 
+- [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
@@ -322,7 +324,6 @@ Ein SI-Wert in Kilo-Einheiten, eine Nachkommastelle.
 
 ## Formeln aus diesem Modul
 
-- [[Bilineare Beziehung des Betonstahls]] · `Ebenenlinie.protokoll_ansatz`
 - [[Schnittgrössen aus der Spannungsverteilung]] · `Ebenenlinie.protokoll_ansatz`
 - [[Widerstand bei festgehaltenem M_Ed]] · `Handlinie.protokoll_treffer`
 - [[Widerstand bei festgehaltenem N_Ed]] · `Handlinie.protokoll_treffer`

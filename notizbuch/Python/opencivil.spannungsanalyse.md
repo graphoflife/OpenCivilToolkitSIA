@@ -1,5 +1,5 @@
 ---
-erzeugt: 87a17a07b158
+erzeugt: f432536e4fc7
 art: modul
 tags: [modul]
 ---
@@ -784,16 +784,12 @@ sammelt die Formelsammlung ihr Thema.
 
 - [[Äquivalenter E-Modul über dem Moment]] · `_herleitung_modul`
 - [[Äquivalenter E-Modul über der Normalkraft]] · `_herleitung_modul`
-- [[Beiwert der Parabel]] · `herleitung`
-- [[Beton ungerissen, in Druck und Zug]] · `herleitung`
 - [[Fläche eines Rechtecks]] · `Loeserpaar.herleitung_bezug`
 - [[Flächenträgheitsmoment eines Rechtecks]] · `Loeserpaar.herleitung_bezug`
 - [[Fliessdehnung]] · `herleitung`
 - [[Grenzdehnungen am Ende der Linie]] · `herleitung`
 - [[Grösste Dehnung auf halber Höhe]] · `Loeserpaar.herleitung_dehnung_am_ende`
 - [[Grösste Krümmung]] · `herleitung`
-- [[Parabel-Rechteck-Beziehung des Betons]] · `herleitung`
 - [[Rissmoment bei der Normalkraft]] · `Loeserpaar.herleitung_riss`
 - [[Rissnormalkraft beim Moment]] · `Loeserpaar.herleitung_riss`
-- [[Spannungsblock des Betons]] · `herleitung`
 - [[Wirksamer Elastizitätsmodul]] · `herleitung`

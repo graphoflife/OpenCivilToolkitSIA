@@ -120,9 +120,7 @@ from opencivil.nachweis.sproedes_versagen import (
 )
 from opencivil.querschnitt.platte import Richtung
 from opencivil.material.betonstahl import FLIESSDEHNUNG
-from opencivil.querschnitt.werkstoffgesetz import (
-    BLOCKANTEIL, K_SIGMA_LATEX, K_SIGMA_SEITE, RUNDUNG, BetonUngerissen,
-)
+from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL, RUNDUNG, BetonUngerissen
 
 if TYPE_CHECKING:
     from opencivil.core.rechenwerk import Loesung
@@ -1051,15 +1049,13 @@ def herleitung(p: Protokoll, fall, paar, linie: Linie,
         "gewählten Rechenart.")
     # Die Gesetze, wie die Loeser sie rechnen -- aus derselben Stelle
     # (:func:`~opencivil.nachweis.rechenwahl.betongesetz`); sie schreiben sich selbst.
-    ungerissen = BetonUngerissen(E_c=E_c_eff.groesse.si)
-    f_c = ein("f_c")
-    gerissen = betongesetz(wahl, f_c=f_c.groesse.si, E_cm=ein("E_cm").groesse.si,
-                           eps_c1d=ein("eps_c1d").groesse.si, eps_c2d=ein("eps_c2d").groesse.si)
-    p.ansatz(ungerissen.latex(), titel="Beton ungerissen, in Druck und Zug",
-             name=ungerissen.seite)
+    beton = {"f_c": ein("f_c"), "E_c": E_c_eff, "eps_c1d": ein("eps_c1d"),
+             "eps_c2d": ein("eps_c2d")}
+    BetonUngerissen(E_c=E_c_eff.groesse.si).protokoll(p, beton, titel="Ungerissen (Zustand I)")
+    betongesetz(wahl, f_c=beton["f_c"].groesse.si, E_cm=ein("E_cm").groesse.si,
+                eps_c1d=beton["eps_c1d"].groesse.si, eps_c2d=beton["eps_c2d"].groesse.si
+                ).protokoll(p, beton, titel="Gerissen (Zustand II)", basis=w.basis)
     if wahl.art.mit_block:
-        p.ansatz(gerissen.latex(f_c.symbol),
-                 titel=f"Beton gerissen: Spannungsblock {BLOCKANTEIL}·x", name=gerissen.seite)
         p.erklaerung(
             "Der Spannungsblock ist ein Modell für den Bruch: unter "
             "(1 − 0.85)·ε_c2d trägt der Beton darin nichts. Über dem Riss ist die "
@@ -1067,16 +1063,11 @@ def herleitung(p: Protokoll, fall, paar, linie: Linie,
             "Widerstand der 0.85·x-Vereinfachung. Ein Modul hängt an ihm nicht: "
             "die Kriechzahl wirkt nur auf den ungerissenen Teil.")
     else:
-        k = w.zahl("k_sigma", r"k_{\sigma}", gerissen.k_sigma, stellen=2)
-        p.formel(k, K_SIGMA_LATEX, {"E_c": E_c_eff, "f_c": f_c},
-                 titel="Beiwert der Parabel, mit dem wirksamen Modul", name=K_SIGMA_SEITE)
         p.erklaerung(
             "Unter 1 rechnet die Parabel k_σ nicht: dort hätte ihr Nenner im "
             "ansteigenden Ast eine Nullstelle. So weit kommt es mit dem kriechweichen "
             "Modul und charakteristischen Werten; mit k_σ = 1 ist der Beton bis f_c "
             "bei ε_c1d linear.")
-        p.ansatz(gerissen.latex(f_c.symbol), titel="Beton gerissen: Parabel-Rechteck",
-                 name=gerissen.seite)
     if wahl.satz is Werkstoffsatz.CHARAKTERISTISCH:
         p.text("Mit charakteristischen Werten: f_ck statt f_cd, f_yk statt f_yd.")
 

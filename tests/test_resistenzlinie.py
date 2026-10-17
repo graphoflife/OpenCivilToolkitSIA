@@ -134,7 +134,7 @@ class TestBlockWieDieQuerschnittsanalyse(unittest.TestCase):
         qa = Querschnitt(
             werkstoffe=[Werkstoff("Beton", block, -EPS_C2D, math.inf,
                                   c_punkt=(EPS_C1D, EPS_C2D), verdraengbar=True),
-                        Werkstoff("Stahl", STAHL.spannung, -STAHL.eps_ud, STAHL.eps_ud)],
+                        Werkstoff("Stahl", STAHL, -STAHL.eps_ud, STAHL.eps_ud)],
             teile=[Teil(((0, 0), (B, 0), (B, H), (0, H)), 0, None)],
             bewehrung=[Bewehrung((0.5, H - 0.215), 1131e-6, 1, 0),
                        Bewehrung((0.5, H - 0.035), 565e-6, 1, 0)],

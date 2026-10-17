@@ -529,29 +529,20 @@ Dehnungsebene und innere Kräfte
 Erfüllungsgrad bei fester Normalkraft und fester Richtung
     \alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
 
-C30/37: Beiwert der Parabel
+Werkstoffgesetz C30/37, Bemessungswerte: Beiwert der Parabel
     k_{\sigma} = \max\left(1;\ \frac{E_{cm}}{400 \cdot f_{cd}}\right) = \max\left(1;\ \frac{33620\,\mathrm{N}/\mathrm{mm}^{2}}{400 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2}}\right) = 4.2
 
-C30/37: Parabel-Rechteck-Beziehung, Bemessungswerte   [SIA 262:2025, 4.2.1.6]
+Werkstoffgesetz C30/37, Bemessungswerte: Beton, Parabel-Rechteck   [SIA 262:2025, 4.2.1.6]
     \sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 
-Werte C30/37
-    Kennwert                                     Wert
-    -----------------  ------------------------------
-    f_{cd}             20\,\mathrm{N}/\mathrm{mm}^{2}
-    \varepsilon_{c1d}                     2\,\text{‰}
-    \varepsilon_{c2d}                   3.5\,\text{‰}
+Werkstoffgesetz C30/37, Bemessungswerte: Werte des Betons
+    f_{cd} = 20\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{c1d} = 2\,\text{‰} \quad \varepsilon_{c2d} = 3.5\,\text{‰}
 
-B500B: bilineare Beziehung, Bemessungswerte   [SIA 262:2025, 4.2.2.4]
+Werkstoffgesetz B500B, Bemessungswerte: Stahl, bilinear   [SIA 262:2025, 4.2.2.4]
     \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 
-Werte B500B
-    Kennwert                                        Wert
-    ----------------  ----------------------------------
-    f_{yd}               435\,\mathrm{N}/\mathrm{mm}^{2}
-    f_{yd}^{-}           435\,\mathrm{N}/\mathrm{mm}^{2}
-    E_s               200000\,\mathrm{N}/\mathrm{mm}^{2}
-    \varepsilon_{ud}                             4.5\,\%
+Werkstoffgesetz B500B, Bemessungswerte: Werte des Stahls
+    f_{yd} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad f_{yd}^{-} = 435\,\mathrm{N}/\mathrm{mm}^{2} \quad E_s = 200000\,\mathrm{N}/\mathrm{mm}^{2} \quad \varepsilon_{ud} = 4.5\,\%
 
 Reine Normalkraft
     Grenze                                                   Wert
@@ -1273,13 +1264,13 @@ Dehnungsebene und innere Kräfte
 Erfüllungsgrad bei fester Normalkraft und fester Richtung
     \alpha_{eff} = \frac{M_{Rd}}{M_{Ed}} \qquad M = \sqrt{M_y^2 + M_z^2}
 
-C30/37: Beiwert der Parabel
+Werkstoffgesetz C30/37, Bemessungswerte: Beiwert der Parabel
     k_{\sigma} = \max\left(1;\ \frac{E_{cm}}{400 \cdot f_{cd}}\right)
 
-C30/37: Parabel-Rechteck-Beziehung, Bemessungswerte   [SIA 262:2025, 4.2.1.6]
+Werkstoffgesetz C30/37, Bemessungswerte: Beton, Parabel-Rechteck   [SIA 262:2025, 4.2.1.6]
     \sigma_c(\varepsilon_c) = \begin{cases} -f_{cd} \cdot \dfrac{k_\sigma\,\eta - \eta^2}{1 + (k_\sigma - 2)\,\eta} & 0 \le |\varepsilon_c| \le \varepsilon_{c1d},\ \eta = \dfrac{|\varepsilon_c|}{\varepsilon_{c1d}} \\[2ex] -f_{cd} & \varepsilon_{c1d} < |\varepsilon_c| \le \varepsilon_{c2d} \\[1ex] 0 & |\varepsilon_c| > \varepsilon_{c2d} \quad (\text{jenseits der Bruchstauchung}) \\[1ex] 0 & \varepsilon_c > 0 \quad (\text{Zug, gerissen}) \end{cases}
 
-B500B: bilineare Beziehung, Bemessungswerte   [SIA 262:2025, 4.2.2.4]
+Werkstoffgesetz B500B, Bemessungswerte: Stahl, bilinear   [SIA 262:2025, 4.2.2.4]
     \sigma_s(\varepsilon_s) = \begin{cases} \min(E_s\,\varepsilon_s;\ f_{yd}) & 0 \le \varepsilon_s \le \varepsilon_{ud} \\[1ex] \max(E_s\,\varepsilon_s;\ -f_{yd}^{-}) & -\varepsilon_{ud} \le \varepsilon_s < 0 \\[1ex] 0 & |\varepsilon_s| > \varepsilon_{ud} \quad (\text{jenseits der Bruchdehnung}) \end{cases}
 
 Probe: Normalkraft

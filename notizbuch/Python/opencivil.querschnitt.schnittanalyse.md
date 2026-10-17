@@ -1,5 +1,5 @@
 ---
-erzeugt: fb1f542efe8d
+erzeugt: 1579134af575
 art: modul
 tags: [modul]
 ---
@@ -278,10 +278,10 @@ def protokoll_gesetze_nach_wahl(p: Protokoll, e: Eingaben, analyse: Querschnitts
 ```
 
 Die Werkstoffgesetze einer Wahl, je Material des Querschnitts -- die von
-[[opencivil.querschnitt.schnittanalyse#querschnitt_nach_wahl|querschnitt_nach_wahl]], so wie bei der Platte
-([[opencivil.nachweis.rechenwahl#protokoll_gesetze|protokoll_gesetze]]), mit den Werten
-jedes Betons und jedes Stahls. Dazu der wirksame Modul, wo ein Gesetz an
-ihm haengt.
+[[opencivil.querschnitt.schnittanalyse#querschnitt_nach_wahl|querschnitt_nach_wahl]]; jedes schreibt sich selbst, mit seinen
+Werten, wie bei der Platte
+([[opencivil.nachweis.rechenwahl#protokoll_gesetze|protokoll_gesetze]]). Vor jedem
+Beton sein wirksamer Modul, wo ein Gesetz an ihm haengt.
 
 ### schnittpaar
 
@@ -308,7 +308,6 @@ gerufen. Mit `protokoll` schreibt jede Linie ihre Herleitung.
 
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
-- [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wahl]]
@@ -334,8 +333,6 @@ gerufen. Mit `protokoll` schreibt jede Linie ihre Herleitung.
 
 ## Formeln aus diesem Modul
 
-- [[Beton linear, ohne Zug]] · `protokoll_gesetze_nach_wahl`
-- [[Bilineare Beziehung des Betonstahls]] · `protokoll_gesetze_nach_wahl`
 - [[Grösste Dehnung im Schwerpunkt]] · `Schnittpaar.herleitung_dehnung_am_ende`
 - [[Rissmoment bei der Normalkraft]] · `Schnittpaar.herleitung_riss`
 - [[Rissnormalkraft beim Moment]] · `Schnittpaar.herleitung_riss`

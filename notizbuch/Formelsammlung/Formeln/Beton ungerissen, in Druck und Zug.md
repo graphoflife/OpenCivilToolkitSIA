@@ -1,10 +1,12 @@
 ---
-erzeugt: e7d63fd2dfd2
+erzeugt: a8cb3fdc8e99
 art: formel
 tags: [formel]
 ---
 > [!warning] Normstelle fehlt noch
 > Sie kommt vom Benutzer und wird im Code eingetragen – von dort steht sie im Bericht und hier.
+
+*In der Herleitung: «Ungerissen (Zustand I): Beton, linear in Druck und Zug»*
 
 $$
 \sigma_c = E_{c,eff} \cdot \varepsilon_c
@@ -12,7 +14,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.spannungsanalyse#herleitung|herleitung]]
+- [[opencivil.querschnitt.werkstoffgesetz#Gesetz.protokoll|Gesetz.protokoll]]
 
 ## Themen
 
