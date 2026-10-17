@@ -11,7 +11,7 @@ Iteration, Grenzkraft N_Rd); hier steht nur, woher der Stab kommt
 (:class:`~opencivil.nachweis.knicken.Knickstab`):
 
 * die Verformung aus den Fasern in dieser Richtung, mit den Gesetzen der
-  Wahl «Verformung» (:func:`~opencivil.querschnitt.schnittanalyse.querschnitt_nach_wahl`);
+  Wahl «Verformung» (:meth:`~opencivil.querschnitt.analyse.Querschnittsanalyse.querschnitt`);
 * der Widerstand aus dem Bruchzustand bei der Druckkraft in dieser Richtung,
   mit den Gesetzen der Wahl «Widerstand» -- das Moment in Biegerichtung;
 * die statische Hoehe vom gedrueckten Rand bis zum entferntesten Stab in
@@ -51,9 +51,7 @@ from opencivil.nachweis.rechenwahl import protokoll_rechenwahl
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.querschnitt.analyse import Querschnittsanalyse
 from opencivil.querschnitt.interaktion import Querschnitt
-from opencivil.querschnitt.schnittanalyse import (
-    protokoll_gesetze_nach_wahl, querschnitt_nach_wahl,
-)
+from opencivil.querschnitt.schnittanalyse import protokoll_gesetze_nach_wahl
 from opencivil.querschnitt.zugseite import Zugseite
 
 
@@ -116,8 +114,8 @@ class KnickenQA(Knickverfahren):
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         wert = e.si_nach_id()
-        q_verformung, _, _ = querschnitt_nach_wahl(self.analyse, wert, self.verformung)
-        q_widerstand, _, _ = querschnitt_nach_wahl(self.analyse, wert, self.widerstand)
+        q_verformung, _, _ = self.analyse.querschnitt(wert, self.verformung)
+        q_widerstand, _, _ = self.analyse.querschnitt(wert, self.widerstand)
         self._protokoll_ansatz(p, e)
 
         staebe: Dict[Zugseite, Knickstab] = {}

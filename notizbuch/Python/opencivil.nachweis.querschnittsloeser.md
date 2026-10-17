@@ -1,5 +1,5 @@
 ---
-erzeugt: da3f81674359
+erzeugt: 5d5eec7e2f4f
 art: modul
 tags: [modul]
 ---
@@ -509,7 +509,6 @@ kostete das Halbieren beinahe die ganze Rechenzeit (Benutzer,
 
 ## Konstanten
 
-- `FASERN = 60` – Fasern ueber die Plattenhoehe. 60 reichen: die Betonspannung ist stetig, und der Fehler der Mittelpunktsregel faellt mit dem Quadrat der Faserdicke.
 - `SCHRITTE = 60` – Obergrenze der Halbierungen je Bisektion. Erreicht wird sie fast nie -- abgebrochen wird ueber die Schranken darunter, sobald das Fenster eng genug ist. Die Zahl steht nur da, damit keine Schleife ewig laeuft.
 - `EPS_SCHRANKE = 1e-11` – Wann das Dehnungsfenster eng genug ist. Der Startbereich ist rund 0.05 breit; 1e-11 ist ein Zehntausendstel eines Promille und liegt weit unter allem, was eine Eingabe hergibt. Ohne diese Schranke lief die Bisektion stur sechzig Mal -- die letzten zehn Durchlaeufe aendern in doppelter Genauigkeit nichts mehr und kosten doch jedesmal einen Faserdurchgang.
 - `CHI_SCHRANKE = 1e-10` – Dasselbe fuer die Kruemmung, in 1/m.

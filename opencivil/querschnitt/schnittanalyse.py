@@ -27,7 +27,8 @@ Je Analyse eine Rechenwahl wie bei der Platte -- Kriechzahl, Wertesatz,
 Rechenart --, fuer jeden Werkstoff des Querschnitts dieselbe. Die
 Werkstoffwahl der Tragsicherheit gilt hier nicht. Staebe in derselben Tiefe,
 aus demselben Stahl, werden zu einer Lage: sie haben dieselbe Dehnung.
-Zerlegt wird in so viele Streifen wie die Platte in Fasern (:data:`FASERN`),
+Zerlegt wird in so viele Streifen wie die Platte in Fasern
+(:data:`~opencivil.querschnitt.fasern.FASERN`),
 dazu die Grenzen an jeder Ecke: eine Linie rechnet viele Ebenen, und mit den
 200 Streifen der Tragsicherheit dauerte sie dreimal so lang -- fuer ein
 M_Rd, das sich um zwei Zehntelpromille aendert.
@@ -50,10 +51,11 @@ Bezogen auf den Bruttoquerschnitt: ``I`` um die Achse der Biegung bzw.
 ``A``. Bei der Platte sind es ``b·h³/12`` und ``b·h``.
 
 DER QUERSCHNITT NACH WAHL:
-Wie der gezeichnete Querschnitt mit den Gesetzen einer Rechenwahl entsteht
-(:func:`querschnitt_nach_wahl`) und wie diese Gesetze in die Herleitung
-kommen (:func:`protokoll_gesetze_nach_wahl`), brauchen auch die
-Gebrauchsnachweise und das Knicken -- es steht darum einmal hier.
+Wie der gezeichnete Querschnitt mit den Gesetzen einer Rechenwahl entsteht,
+baut er selbst (:meth:`~opencivil.querschnitt.analyse.Querschnittsanalyse.querschnitt`);
+wie diese Gesetze in die Herleitung kommen (:func:`protokoll_gesetze_nach_wahl`),
+brauchen auch die Gebrauchsnachweise und das Knicken -- es steht darum einmal
+hier.
 
 EINHEITEN:
 SI-Basis wie im ganzen Querschnittsmodul.
@@ -72,7 +74,7 @@ from opencivil.core.wahl import Wahl
 from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.nachweis.querschnittsloeser import (
-    FASERN, Faserloeser, Stahllage, protokoll_wirksamer_modul, wirksamer_modul_wert,
+    Faserloeser, Stahllage, protokoll_wirksamer_modul, wirksamer_modul_wert,
 )
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.nachweis.sproedes_versagen import (
@@ -307,29 +309,11 @@ class Schnittpaar:
         return bezug
 
 
-def querschnitt_nach_wahl(analyse: Querschnittsanalyse, wert: Callable[[str], float],
-                          wahl: Rechenwahl, *, ungerissen: bool = False,
-                          ) -> Tuple[Querschnitt, List[Stabgruppe], Dict[int, Stahlgesetz]]:
-    """
-    Der gezeichnete Querschnitt mit den Gesetzen einer Rechenwahl -- dazu je
-    Bewehrung ihr Element und je Stahl sein Gesetz, nach dem Index des
-    Werkstoffs. ``wert`` liefert zu einer Wert-ID die Zahl in SI. Zerlegt in
-    so viele Streifen, wie die Platte Fasern hat (:data:`FASERN`).
-    """
-    werkstoffe, index = analyse.werkstoffe(wert, lambda stoff: wahl, ungerissen=ungerissen)
-    teile, bewehrung, herkunft = analyse.geometrie(index)
-    q = Querschnitt(werkstoffe=werkstoffe, teile=teile, bewehrung=bewehrung,
-                    bezug=(wert(analyse.id_von("y_S")), wert(analyse.id_von("z_S"))),
-                    streifen=FASERN)
-    staehle = {i: w.gesetz for i, w in enumerate(werkstoffe) if w.c_punkt is None}
-    return q, herkunft, staehle
-
-
 def protokoll_gesetze_nach_wahl(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse,
                       wahl: Rechenwahl, basis: str, *, titel: str) -> None:
     """
     Die Werkstoffgesetze einer Wahl, je Material des Querschnitts -- die von
-    :func:`querschnitt_nach_wahl`; jedes schreibt sich selbst, mit seinen
+    :meth:`Querschnittsanalyse.querschnitt`; jedes schreibt sich selbst, mit seinen
     Werten, wie bei der Platte
     (:func:`~opencivil.nachweis.rechenwahl.protokoll_gesetze`). Vor jedem
     Beton sein wirksamer Modul, wo ein Gesetz an ihm haengt.
@@ -364,7 +348,7 @@ def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[s
         return None
     zustaende = []
     for ungerissen in (False, True):
-        q, herkunft, staehle = querschnitt_nach_wahl(analyse, wert, wahl, ungerissen=ungerissen)
+        q, herkunft, staehle = analyse.querschnitt(wert, wahl, ungerissen=ungerissen)
         namen = {i: w.name for i, w in enumerate(q.werkstoffe)}
         zustaende.append((q, _loeser(q, seite, herkunft, staehle, namen)))
     (q, gerissen), (_, ungerissen) = zustaende

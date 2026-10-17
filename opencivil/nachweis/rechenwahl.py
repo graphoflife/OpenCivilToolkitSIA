@@ -32,7 +32,6 @@ Kruemmung flache Stuecke: dort traegt jede Kruemmung dasselbe Moment, die
 Ausmitte zweiter Ordnung ist nicht eindeutig, und nahe der Grenzkraft hing
 N_Rd davon ab, wie gesucht wurde -- an der Stuetze des Pruefprojekts
 4099.5 kN halbiert, 4200 kN mit Warmstart.
-
 """
 
 from __future__ import annotations
@@ -210,18 +209,16 @@ class Gesetze:
         return list(lagen)
 
     def loeser(self, *, h: float, b: float, lagen: Sequence[Stahllage],
-               beton: Gesetz = None, klasse: Type[Querschnittsloeser] = Querschnittsloeser,
+               klasse: Type[Querschnittsloeser] = Querschnittsloeser,
                **fenster) -> Querschnittsloeser:
         """
         Der Loeser zu dieser Wahl. ``fenster`` sind die Grenzen der Suche
         (``eps_druck``, ``eps_zug``, ``grenzen``) -- die bringt jeder Nutzer
-        selbst mit. ``beton`` ersetzt das Betongesetz, etwa durch den
-        ungerissenen Zustand; alles andere bleibt. ``klasse`` waehlt, wie
-        gesucht wird -- das Knicken nimmt
+        selbst mit. ``klasse`` waehlt, wie gesucht wird -- das Knicken nimmt
         :class:`~opencivil.nachweis.querschnittsloeser.QuerschnittsloeserIllinois`.
         """
         return klasse(
-            h=h, b=b, lagen=self.lagen(lagen, h), beton=beton or self.beton,
+            h=h, b=b, lagen=self.lagen(lagen, h), beton=self.beton,
             stahl=self.stahl, verdraengt=self.verdraengt, **fenster)
 
 
@@ -274,11 +271,14 @@ def protokoll_gesetze(p: Protokoll, wahl: Rechenwahl, e: Eingaben, basis: str, *
             titel=titel if len(sorten) == 1 else f"{titel}, {stahl.name}")
 
 
-def gesetze(wahl: Rechenwahl, w: Betonkennwerte) -> Gesetze:
+def gesetze(wahl: Rechenwahl, w: Betonkennwerte, *, ungerissen: bool = False) -> Gesetze:
     """
-    Die Gesetze zu einer Wahl. Der Stahl kommt je Lage dazu, samt seinem
-    ``eps_ud`` -- bis 2026-10-12 rechneten die Stahlspannungen fest mit 4.5 %,
-    das Knicken und die Analysen mit dem der ersten Lage.
+    Die Gesetze zu einer Wahl, ``ungerissen`` mit dem ungerissenen Beton
+    (:func:`~opencivil.querschnitt.gesetzwahl.betongesetz`). Der Stahl kommt
+    je Lage dazu, samt seinem ``eps_ud`` -- bis 2026-10-12 rechneten die
+    Stahlspannungen fest mit 4.5 %, das Knicken und die Analysen mit dem der
+    ersten Lage.
     """
     return Gesetze(wahl=wahl, beton=betongesetz(wahl, f_c=w.f_c, E_cm=w.E_cm,
-                                                eps_c1d=w.eps_c1d, eps_c2d=w.eps_c2d))
+                                                eps_c1d=w.eps_c1d, eps_c2d=w.eps_c2d,
+                                                ungerissen=ungerissen))

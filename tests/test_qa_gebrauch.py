@@ -26,7 +26,6 @@ from opencivil.projekt.querschnittsanalyse import (
 )
 from opencivil.nachweis.stabgrenzen import fiktiver_durchmesser
 from opencivil.querschnitt.interaktion import Querschnitt
-from opencivil.querschnitt.schnittanalyse import querschnitt_nach_wahl
 
 #: Die Kennwerte von C30/37 und B500B, wie das Rechenwerk sie liefert.
 E_S, F_YK, F_YD, F_CTM, E_CM = 200e9, 500e6, 500e6 / 1.15, 2.9e6, 33.62e9
@@ -66,8 +65,7 @@ def querschnitt(projekt, wahl=VORGABE):
     """Der gezeichnete Querschnitt mit den Gesetzen einer Wahl -- und seine Stäbe."""
     aufbau, loesung = rechnen(projekt)
     analyse = aufbau.querschnittsanalysen["a1"]
-    q, herkunft, _ = querschnitt_nach_wahl(
-        analyse, lambda kid: loesung.werte[kid].groesse.si, wahl)
+    q, herkunft, _ = analyse.querschnitt(lambda kid: loesung.werte[kid].groesse.si, wahl)
     return q
 
 

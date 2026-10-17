@@ -90,8 +90,10 @@ class TestGesetze(unittest.TestCase):
         self.assertEqual(elastisch.beton(-0.01), -20e6)
 
     def test_der_ungerissene_zustand_ersetzt_nur_den_beton(self):
-        g = gesetze(Rechenwahl(art=Rechenart.HANDRECHNUNG), W)
-        loeser = g.loeser(h=0.3, b=1.0, lagen=LAGEN, beton=BetonUngerissen(E_c=1e10))
+        wahl = Rechenwahl(2.0, art=Rechenart.HANDRECHNUNG)
+        g = gesetze(wahl, W, ungerissen=True)
+        self.assertEqual(g.beton, BetonUngerissen(E_c=33.6e9 / 3))
+        loeser = g.loeser(h=0.3, b=1.0, lagen=LAGEN)
         self.assertEqual(len(loeser.lagen), 2)
         # Der Stahl bleibt der der Wahl: nur auf Zug.
         self.assertEqual([s.gesetz(-0.01) for s in loeser.querschnitt.staebe], [0.0, 0.0])

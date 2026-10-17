@@ -91,9 +91,7 @@ from opencivil.nachweis.stabgrenzen import (
 from opencivil.querschnitt import geometrie as geo
 from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse
 from opencivil.querschnitt.interaktion import Querschnitt, illinois
-from opencivil.querschnitt.schnittanalyse import (
-    protokoll_gesetze_nach_wahl, querschnitt_nach_wahl,
-)
+from opencivil.querschnitt.schnittanalyse import protokoll_gesetze_nach_wahl
 
 #: Wann das Moment der Zwaengung auf Biegung gefunden ist: wie nahe der
 #: erste gezogene Stab seiner Grenze kommen muss, als Teil von ihr.
@@ -172,7 +170,7 @@ class SpannungsbegrenzungQA(Nachweis):
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         a = self.analyse
-        q, herkunft, _ = querschnitt_nach_wahl(a, e.si_nach_id(), self.wahl)
+        q, herkunft, _ = a.querschnitt(e.si_nach_id(), self.wahl)
         staebe = stabangaben(a, q, herkunft)
         grenzen = (grenzen_gegen_fliessen(a, e, staebe) if self.grenze is GrenzeGegenFliessen
                    else grenzen_aus_rissbreite(a, e, staebe, self.anforderung))
@@ -414,7 +412,7 @@ class RissnormalkraftQA(Nachweis):
             "Betons.")
         N_Riss = self._risskraft(p, e, werte)
 
-        q, herkunft, _ = querschnitt_nach_wahl(a, e.si_nach_id(), VORGABE)
+        q, herkunft, _ = a.querschnitt(e.si_nach_id(), VORGABE)
         staebe = stabangaben(a, q, herkunft)
         if not staebe:
             p.text("Ohne Bewehrung → kein Nachweis.")
@@ -525,7 +523,7 @@ class ZwaengungBiegungQA(Nachweis):
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         a = self.analyse
-        q, herkunft, _ = querschnitt_nach_wahl(a, e.si_nach_id(), self.wahl)
+        q, herkunft, _ = a.querschnitt(e.si_nach_id(), self.wahl)
         staebe = stabangaben(a, q, herkunft)
         self._protokoll_ansatz(p, e)
         grenzen = grenzen_aus_rissbreite(a, e, staebe, self.anforderung)

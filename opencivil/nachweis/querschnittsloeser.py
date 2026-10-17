@@ -74,14 +74,10 @@ from typing import Callable, List, Optional, Sequence, Tuple
 
 from opencivil.core.protokoll import Zwischenwerte
 from opencivil.querschnitt.fasern import (
-    Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt, Stab,
+    FASERN, Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt, Stab,
 )
 from opencivil.querschnitt.gesetzwahl import wirksamer_modul
 from opencivil.querschnitt.werkstoffgesetz import Gesetz, Stahlgesetz
-
-#: Fasern ueber die Plattenhoehe. 60 reichen: die Betonspannung ist stetig,
-#: und der Fehler der Mittelpunktsregel faellt mit dem Quadrat der Faserdicke.
-FASERN = 60
 
 #: Obergrenze der Halbierungen je Bisektion. Erreicht wird sie fast nie --
 #: abgebrochen wird ueber die Schranken darunter, sobald das Fenster eng

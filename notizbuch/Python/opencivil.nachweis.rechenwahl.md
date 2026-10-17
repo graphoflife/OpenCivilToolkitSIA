@@ -1,5 +1,5 @@
 ---
-erzeugt: 8a04889eb51c
+erzeugt: 3526a7a0eaa6
 art: modul
 tags: [modul]
 ---
@@ -179,14 +179,12 @@ Die Lagen, mit denen gerechnet wird -- in der Handrechnung je Seite eine.
 #### Gesetze.loeser
 
 ```python
-def loeser(self, *, h: float, b: float, lagen: Sequence[Stahllage], beton: Gesetz=None, klasse: Type[Querschnittsloeser]=Querschnittsloeser, **fenster) -> Querschnittsloeser
+def loeser(self, *, h: float, b: float, lagen: Sequence[Stahllage], klasse: Type[Querschnittsloeser]=Querschnittsloeser, **fenster) -> Querschnittsloeser
 ```
 
 Der Loeser zu dieser Wahl. `fenster` sind die Grenzen der Suche
 (`eps_druck`, `eps_zug`, `grenzen`) -- die bringt jeder Nutzer
-selbst mit. `beton` ersetzt das Betongesetz, etwa durch den
-ungerissenen Zustand; alles andere bleibt. `klasse` waehlt, wie
-gesucht wird -- das Knicken nimmt
+selbst mit. `klasse` waehlt, wie gesucht wird -- das Knicken nimmt
 [[opencivil.nachweis.querschnittsloeser#QuerschnittsloeserIllinois|QuerschnittsloeserIllinois]].
 
 ### protokoll_rechenwahl
@@ -217,12 +215,14 @@ ihn das Kapitel an der Stelle, an der er erklaert wird
 ### gesetze
 
 ```python
-def gesetze(wahl: Rechenwahl, w: Betonkennwerte) -> Gesetze
+def gesetze(wahl: Rechenwahl, w: Betonkennwerte, *, ungerissen: bool=False) -> Gesetze
 ```
 
-Die Gesetze zu einer Wahl. Der Stahl kommt je Lage dazu, samt seinem
-`eps_ud` -- bis 2026-10-12 rechneten die Stahlspannungen fest mit 4.5 %,
-das Knicken und die Analysen mit dem der ersten Lage.
+Die Gesetze zu einer Wahl, `ungerissen` mit dem ungerissenen Beton
+([[opencivil.querschnitt.gesetzwahl#betongesetz|betongesetz]]). Der Stahl kommt
+je Lage dazu, samt seinem `eps_ud` -- bis 2026-10-12 rechneten die
+Stahlspannungen fest mit 4.5 %, das Knicken und die Analysen mit dem der
+ersten Lage.
 
 
 ## Konstanten

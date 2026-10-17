@@ -1,5 +1,5 @@
 ---
-erzeugt: 6a5ed83cfcb5
+erzeugt: 8a9d8ea97802
 art: modul
 tags: [modul]
 ---
@@ -18,7 +18,7 @@ Iteration, Grenzkraft N_Rd); hier steht nur, woher der Stab kommt
 ([[opencivil.nachweis.knicken#Knickstab|Knickstab]]):
 
 * die Verformung aus den Fasern in dieser Richtung, mit den Gesetzen der
-  Wahl «Verformung» ([[opencivil.querschnitt.schnittanalyse#querschnitt_nach_wahl|querschnitt_nach_wahl]]);
+  Wahl «Verformung» ([[opencivil.querschnitt.analyse#Querschnittsanalyse.querschnitt|querschnitt]]);
 * der Widerstand aus dem Bruchzustand bei der Druckkraft in dieser Richtung,
   mit den Gesetzen der Wahl «Widerstand» -- das Moment in Biegerichtung;
 * die statische Hoehe vom gedrueckten Rand bis zum entferntesten Stab in

@@ -1,5 +1,5 @@
 ---
-erzeugt: 0e9e3dc5fc2a
+erzeugt: 3d47aeeae550
 art: modul
 tags: [modul]
 ---
@@ -206,6 +206,10 @@ Massgebend ist das engste Paar. Bei der Platte ist das eines: die
 Unterkante gegen die Oberkante, `(eps_zug + eps_druck) / h`.
 
 
+## Konstanten
+
+- `FASERN = 60` – Fasern ueber die Plattenhoehe -- und Streifen, wo der gezeichnete Querschnitt wie die Platte rechnet. 60 reichen: die Betonspannung ist stetig, und der Fehler der Mittelpunktsregel faellt mit dem Quadrat der Faserdicke.
+
 ## Braucht
 
 - [[opencivil.querschnitt.werkstoffgesetz]]
@@ -214,5 +218,6 @@ Unterkante gegen die Oberkante, `(eps_zug + eps_druck) / h`.
 
 - [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.querschnittsloeser]]
+- [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.schnittanalyse]]

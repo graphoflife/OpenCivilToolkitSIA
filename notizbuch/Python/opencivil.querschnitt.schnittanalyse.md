@@ -1,5 +1,5 @@
 ---
-erzeugt: af3978bd29f4
+erzeugt: a5a67eac2bd4
 art: modul
 tags: [modul]
 ---
@@ -38,7 +38,8 @@ Je Analyse eine Rechenwahl wie bei der Platte -- Kriechzahl, Wertesatz,
 Rechenart --, fuer jeden Werkstoff des Querschnitts dieselbe. Die
 Werkstoffwahl der Tragsicherheit gilt hier nicht. Staebe in derselben Tiefe,
 aus demselben Stahl, werden zu einer Lage: sie haben dieselbe Dehnung.
-Zerlegt wird in so viele Streifen wie die Platte in Fasern ([[opencivil.nachweis.querschnittsloeser#Konstanten|FASERN]]),
+Zerlegt wird in so viele Streifen wie die Platte in Fasern
+([[opencivil.querschnitt.fasern#Konstanten|FASERN]]),
 dazu die Grenzen an jeder Ecke: eine Linie rechnet viele Ebenen, und mit den
 200 Streifen der Tragsicherheit dauerte sie dreimal so lang -- fuer ein
 M_Rd, das sich um zwei Zehntelpromille aendert.
@@ -69,10 +70,11 @@ Bezogen auf den Bruttoquerschnitt: `I` um die Achse der Biegung bzw.
 
 ## DER QUERSCHNITT NACH WAHL
 
-Wie der gezeichnete Querschnitt mit den Gesetzen einer Rechenwahl entsteht
-([[opencivil.querschnitt.schnittanalyse#querschnitt_nach_wahl|querschnitt_nach_wahl]]) und wie diese Gesetze in die Herleitung
-kommen ([[opencivil.querschnitt.schnittanalyse#protokoll_gesetze_nach_wahl|protokoll_gesetze_nach_wahl]]), brauchen auch die
-Gebrauchsnachweise und das Knicken -- es steht darum einmal hier.
+Wie der gezeichnete Querschnitt mit den Gesetzen einer Rechenwahl entsteht,
+baut er selbst ([[opencivil.querschnitt.analyse#Querschnittsanalyse.querschnitt|querschnitt]]);
+wie diese Gesetze in die Herleitung kommen ([[opencivil.querschnitt.schnittanalyse#protokoll_gesetze_nach_wahl|protokoll_gesetze_nach_wahl]]),
+brauchen auch die Gebrauchsnachweise und das Knicken -- es steht darum einmal
+hier.
 
 
 ## EINHEITEN
@@ -213,17 +215,6 @@ def herleitung_bezug(self, p: Protokoll, w: Zwischenwerte, momente: bool, ein: C
 
 Der reine Betonquerschnitt des aequivalenten Moduls: der Bruttoquerschnitt.
 
-### querschnitt_nach_wahl
-
-```python
-def querschnitt_nach_wahl(analyse: Querschnittsanalyse, wert: Callable[[str], float], wahl: Rechenwahl, *, ungerissen: bool=False) -> Tuple[Querschnitt, List[Stabgruppe], Dict[int, Stahlgesetz]]
-```
-
-Der gezeichnete Querschnitt mit den Gesetzen einer Rechenwahl -- dazu je
-Bewehrung ihr Element und je Stahl sein Gesetz, nach dem Index des
-Werkstoffs. `wert` liefert zu einer Wert-ID die Zahl in SI. Zerlegt in
-so viele Streifen, wie die Platte Fasern hat ([[opencivil.nachweis.querschnittsloeser#Konstanten|FASERN]]).
-
 ### protokoll_gesetze_nach_wahl
 
 ```python
@@ -231,7 +222,7 @@ def protokoll_gesetze_nach_wahl(p: Protokoll, e: Eingaben, analyse: Querschnitts
 ```
 
 Die Werkstoffgesetze einer Wahl, je Material des Querschnitts -- die von
-[[opencivil.querschnitt.schnittanalyse#querschnitt_nach_wahl|querschnitt_nach_wahl]]; jedes schreibt sich selbst, mit seinen
+[[opencivil.querschnitt.analyse#Querschnittsanalyse.querschnitt|Querschnittsanalyse.querschnitt]]; jedes schreibt sich selbst, mit seinen
 Werten, wie bei der Platte
 ([[opencivil.nachweis.rechenwahl#protokoll_gesetze|protokoll_gesetze]]). Vor jedem
 Beton sein wirksamer Modul, wo ein Gesetz an ihm haengt.

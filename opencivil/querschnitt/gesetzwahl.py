@@ -43,7 +43,7 @@ from typing import Dict
 
 from opencivil.core.wahl import Wahl
 from opencivil.querschnitt.werkstoffgesetz import (
-    BLOCKANTEIL, BetonElastisch, Betongesetz, Gesetz, Spannungsblock,
+    BLOCKANTEIL, BetonElastisch, Betongesetz, BetonUngerissen, Gesetz, Spannungsblock,
 )
 
 
@@ -229,12 +229,17 @@ def wirksamer_modul(E_cm: float, phi: float) -> float:
 
 
 def betongesetz(wahl: Rechenwahl, *, f_c: float, E_cm: float, eps_c1d: float,
-                 eps_c2d: float) -> Gesetz:
+                 eps_c2d: float, ungerissen: bool = False) -> Gesetz:
     """
-    Der Beton im gerissenen Zustand -- je Rechenart. Die eine Stelle fuer
-    die Parabel und den Block: der Loeser und die genaue Resistenzlinie
-    bekommen ihren Beton beide hier.
+    Der Beton einer Wahl -- im gerissenen Zustand je Rechenart, ``ungerissen``
+    linear in Druck und Zug mit dem wirksamen Modul. Die eine Stelle fuer
+    beide: der Loeser der Platte, die genaue Resistenzlinie und der
+    gezeichnete Querschnitt bekommen ihren Beton hier. Bis 2026-10-17 gab die
+    Platte ihrem Loeser den ungerissenen Beton als eigenes Gesetz mit, und der
+    gezeichnete Querschnitt baute ihn hinter einem Schalter selbst.
     """
+    if ungerissen:
+        return BetonUngerissen(E_c=wirksamer_modul(E_cm, wahl.kriechzahl))
     if wahl.art is Rechenart.ELASTISCH:
         return BetonElastisch(E_c=wirksamer_modul(E_cm, wahl.kriechzahl), f_c=f_c)
     if wahl.art is Rechenart.PARABEL:

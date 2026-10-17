@@ -43,8 +43,9 @@ from opencivil.querschnitt.interaktion import (
 )
 from opencivil.querschnitt.schubwaende import Wand
 from opencivil.querschnitt.schubwaende import zellen as zellen_finden
-from opencivil.querschnitt.gesetzwahl import Rechenwahl, betongesetz, wirksamer_modul
-from opencivil.querschnitt.werkstoffgesetz import BetonUngerissen, Stahlgesetz
+from opencivil.querschnitt.fasern import FASERN
+from opencivil.querschnitt.gesetzwahl import Rechenwahl, betongesetz
+from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
 
 #: Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die
 #: eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin. Aus ``E_cm``
@@ -636,8 +637,8 @@ class Querschnittsanalyse:
         Beton: das Gesetz der Wahl, gebaut wie bei der Platte
         (:func:`~opencivil.querschnitt.gesetzwahl.betongesetz`), der Beiwert der
         Parabel also aus ``E_cm/(1+phi)`` -- oder, ``ungerissen``, linear in
-        Druck und Zug mit demselben Modul; gedrueckt bis ``-eps_c2d`` samt
-        Punkt C, verdraengt von den Staeben. Betonstahl: bilinear,
+        Druck und Zug mit demselben Modul, aus derselben Stelle; gedrueckt bis
+        ``-eps_c2d`` samt Punkt C, verdraengt von den Staeben. Betonstahl: bilinear,
         ``±eps_ud``. Der Wertesatz bestimmt, wo die Plateaus liegen
         (``f_cd`` oder ``f_ck``, ``f_yd`` oder ``f_yk``); Moduln und
         Dehnungsgrenzen bleiben
@@ -653,11 +654,9 @@ class Querschnittsanalyse:
             gewaehlt = wahl(stoff)
             satz = gewaehlt.satz
             if stoff.art is Baustoffart.BETON:
-                E_cm, eps_c1d, eps_c2d = w("E_cm"), w("eps_c1d"), w("eps_c2d")
-                gesetz = (BetonUngerissen(E_c=wirksamer_modul(E_cm, gewaehlt.kriechzahl))
-                          if ungerissen else
-                          betongesetz(gewaehlt, f_c=w(satz.beton), E_cm=E_cm,
-                                      eps_c1d=eps_c1d, eps_c2d=eps_c2d))
+                eps_c1d, eps_c2d = w("eps_c1d"), w("eps_c2d")
+                gesetz = betongesetz(gewaehlt, f_c=w(satz.beton), E_cm=w("E_cm"),
+                                     eps_c1d=eps_c1d, eps_c2d=eps_c2d, ungerissen=ungerissen)
                 liste.append(Werkstoff(stoff.name, gesetz, -eps_c2d, math.inf,
                                        c_punkt=(eps_c1d, eps_c2d), verdraengbar=True))
             else:
@@ -666,6 +665,24 @@ class Querschnittsanalyse:
                 liste.append(Werkstoff(stoff.name, gesetz, -gesetz.eps_ud, gesetz.eps_ud))
             index[stoff.id] = len(liste) - 1
         return liste, (lambda stoff: index[stoff.id])
+
+    def querschnitt(self, wert: Callable[[str], float], wahl: Rechenwahl, *,
+                    ungerissen: bool = False,
+                    ) -> Tuple[Querschnitt, List["Stabgruppe"], Dict[int, Stahlgesetz]]:
+        """
+        Der Querschnitt mit den Gesetzen einer Rechenwahl, fuer jeden Werkstoff
+        dieselbe -- dazu je Bewehrung ihr Element und je Stahl sein Gesetz,
+        nach dem Index des Werkstoffs. ``wert`` liefert zu einer Wert-ID die
+        Zahl in SI. Zerlegt in so viele Streifen, wie die Platte Fasern hat
+        (:data:`~opencivil.querschnitt.fasern.FASERN`).
+        """
+        werkstoffe, index = self.werkstoffe(wert, lambda stoff: wahl, ungerissen=ungerissen)
+        teile, bewehrung, herkunft = self.geometrie(index)
+        q = Querschnitt(werkstoffe=werkstoffe, teile=teile, bewehrung=bewehrung,
+                        bezug=(wert(self.id_von("y_S")), wert(self.id_von("z_S"))),
+                        streifen=FASERN)
+        staehle = {i: w.gesetz for i, w in enumerate(werkstoffe) if w.c_punkt is None}
+        return q, herkunft, staehle
 
     def werkstoffe_protokollieren(self, p: Protokoll, e: Eingaben, basis: str) -> None:
         """

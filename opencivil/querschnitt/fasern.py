@@ -52,6 +52,12 @@ from typing import Optional, Sequence, Tuple, Union
 
 from opencivil.querschnitt.werkstoffgesetz import Gesetz
 
+#: Fasern ueber die Plattenhoehe -- und Streifen, wo der gezeichnete
+#: Querschnitt wie die Platte rechnet. 60 reichen: die Betonspannung ist
+#: stetig, und der Fehler der Mittelpunktsregel faellt mit dem Quadrat der
+#: Faserdicke.
+FASERN = 60
+
 
 @dataclass(frozen=True)
 class Schnittkraefte:

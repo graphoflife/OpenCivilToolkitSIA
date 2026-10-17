@@ -1,5 +1,5 @@
 ---
-erzeugt: c704dd7126db
+erzeugt: 6b6f654a9e31
 art: modul
 tags: [modul]
 ---
@@ -317,8 +317,8 @@ seine Rechenwahl: im Bruchzustand die des Baustoffs
 Beton: das Gesetz der Wahl, gebaut wie bei der Platte
 ([[opencivil.querschnitt.gesetzwahl#betongesetz|betongesetz]]), der Beiwert der
 Parabel also aus `E_cm/(1+phi)` -- oder, `ungerissen`, linear in
-Druck und Zug mit demselben Modul; gedrueckt bis `-eps_c2d` samt
-Punkt C, verdraengt von den Staeben. Betonstahl: bilinear,
+Druck und Zug mit demselben Modul, aus derselben Stelle; gedrueckt bis
+`-eps_c2d` samt Punkt C, verdraengt von den Staeben. Betonstahl: bilinear,
 `±eps_ud`. Der Wertesatz bestimmt, wo die Plateaus liegen
 (`f_cd` oder `f_ck`, `f_yd` oder `f_yk`); Moduln und
 Dehnungsgrenzen bleiben
@@ -326,6 +326,18 @@ Dehnungsgrenzen bleiben
 
 Bis 2026-10-16 baute die Spannung-Dehnung-Analyse ihre Werkstoffe
 selbst, und der Bruchzustand nahm den Beiwert der Parabel aus `E_cd`.
+
+#### Querschnittsanalyse.querschnitt
+
+```python
+def querschnitt(self, wert: Callable[[str], float], wahl: Rechenwahl, *, ungerissen: bool=False) -> Tuple[Querschnitt, List['Stabgruppe'], Dict[int, Stahlgesetz]]
+```
+
+Der Querschnitt mit den Gesetzen einer Rechenwahl, fuer jeden Werkstoff
+dieselbe -- dazu je Bewehrung ihr Element und je Stahl sein Gesetz,
+nach dem Index des Werkstoffs. `wert` liefert zu einer Wert-ID die
+Zahl in SI. Zerlegt in so viele Streifen, wie die Platte Fasern hat
+([[opencivil.querschnitt.fasern#Konstanten|FASERN]]).
 
 #### Querschnittsanalyse.werkstoffe_protokollieren
 
@@ -395,6 +407,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
+- [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.interaktion]]

@@ -15,7 +15,6 @@ from opencivil.nachweis.knicken import VERFORMUNG, WIDERSTAND
 from opencivil.nachweis.qa_knicken import knickstab
 from opencivil.projekt import Projekt, ProjektFehler
 from opencivil.projekt.querschnittsanalyse import QAKnickEintrag, QuerschnittsanalyseEintrag
-from opencivil.querschnitt.schnittanalyse import querschnitt_nach_wahl
 from opencivil.querschnitt.zugseite import Zugseite
 
 
@@ -68,8 +67,8 @@ class TestJeRichtung(unittest.TestCase):
         a.knickfall("K", N_Ed=-500.0)
         aufbau = p.aufbauen()
         loesung = aufbau.werk.loese(aufbau.qa_knicken["a1"].id)
-        q, _, _ = querschnitt_nach_wahl(aufbau.querschnittsanalysen["a1"],
-                                        lambda kid: loesung.werte[kid].groesse.si, VERFORMUNG)
+        q, _, _ = aufbau.querschnittsanalysen["a1"].querschnitt(
+            lambda kid: loesung.werte[kid].groesse.si, VERFORMUNG)
         for seite, d in ((Zugseite.UNTEN, 0.45), (Zugseite.OBEN, 0.45),
                          (Zugseite.LINKS, 0.25), (Zugseite.RECHTS, 0.25)):
             with self.subTest(seite=seite.value):

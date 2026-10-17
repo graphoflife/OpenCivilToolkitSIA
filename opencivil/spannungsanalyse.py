@@ -518,7 +518,6 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
         "f_ctm": beton.id_von("f_ctm"),
     }
     h, b = wert(ids["h"]), wert(ids["b"])
-    E_c_eff = wirksamer_modul(wert(ids["E_cm"]), wahl.kriechzahl)
     w = Betonkennwerte(f_c=wert(ids["f_c"]), E_cm=wert(ids["E_cm"]),
                        eps_c1d=wert(ids["eps_c1d"]), eps_c2d=wert(ids["eps_c2d"]))
     g = gesetze(wahl, w)
@@ -530,8 +529,7 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
     fenster = dict(grenzen=grenzen, eps_druck=w.eps_c2d)
     gerissen = g.loeser(h=h, b=b, lagen=lagen, **fenster)
     # Derselbe Querschnitt ungerissen: nur das Betongesetz ist ein anderes.
-    ungerissen = g.loeser(h=h, b=b, lagen=lagen, beton=BetonUngerissen(E_c=E_c_eff),
-                          **fenster)
+    ungerissen = gesetze(wahl, w, ungerissen=True).loeser(h=h, b=b, lagen=lagen, **fenster)
     f_ctm = wert(ids["f_ctm"])
     k_t_zug = beiwert_dicke(h)
     return Loeserpaar(

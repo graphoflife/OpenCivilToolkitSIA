@@ -3832,6 +3832,7 @@
         "Querschnittsanalyse.werkstoffbezuege",
         "Querschnittsanalyse.kennwert",
         "Querschnittsanalyse.werkstoffe",
+        "Querschnittsanalyse.querschnitt",
         "Querschnittsanalyse.werkstoffe_protokollieren",
         "Querschnittsanalyse.grundbezuege",
         "Querschnittsanalyse.interaktion",
@@ -4048,7 +4049,6 @@
         "Schnittpaar.herleitung_riss",
         "Schnittpaar.herleitung_dehnung_am_ende",
         "Schnittpaar.herleitung_bezug",
-        "querschnitt_nach_wahl",
         "protokoll_gesetze_nach_wahl",
         "schnittpaar",
         "analysen"
