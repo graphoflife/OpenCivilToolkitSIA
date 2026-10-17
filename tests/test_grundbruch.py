@@ -15,6 +15,7 @@ from opencivil.bericht.zusammenfassung import angaben, nachweistabelle, zusammen
 from opencivil.core.protokoll import HinweisArt, HinweisBlock
 from opencivil.geotechnik.grundbruch import gleitkoerper
 from opencivil.projekt import GrundbruchEintrag, Projekt, ProjektFehler
+from opencivil.projekt.lesen import inhalt_pruefen
 from opencivil.web import dienst
 
 
@@ -352,9 +353,9 @@ class TestEintrag(unittest.TestCase):
             g.kombinationen = []
             for name in namen:
                 g.kombination(name, N_Ed=100.0)
-            g.pruefen()  # Öffnen geht -- gemeldet wird vor dem Rechnen.
+            GrundbruchEintrag.aus_dict(g.als_dict())  # Öffnen geht -- gemeldet wird vor dem Rechnen.
             with self.subTest(namen=namen), self.assertRaises(ProjektFehler):
-                g.regeln()
+                inhalt_pruefen(g, "Grundbruch 'F'")
 
     def test_unmoegliche_zahlen(self):
         faelle = {

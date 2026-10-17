@@ -9,6 +9,7 @@ import unittest
 from opencivil.projekt import (
     Projekt, ProjektFehler, QALastfallEintrag, QuerschnittsanalyseEintrag,
 )
+from opencivil.projekt.lesen import inhalt_pruefen
 from opencivil.web import api
 
 
@@ -44,9 +45,9 @@ class TestBeschreibung(unittest.TestCase):
     def test_doppelte_lastfaelle(self):
         a = self.neu()
         a.lastfaelle.append(QALastfallEintrag(name="Tragsicherheit 1"))
-        a.pruefen()  # Öffnen geht -- gemeldet wird vor dem Rechnen.
-        with self.assertRaisesRegex(ProjektFehler, "Querschnitt 'Balken'"):
-            a.regeln()
+        QuerschnittsanalyseEintrag.aus_dict(a.als_dict())  # Öffnen geht -- gemeldet wird vor dem Rechnen.
+        with self.assertRaisesRegex(ProjektFehler, "'Tragsicherheit 1' ist zweimal"):
+            inhalt_pruefen(a, "Querschnitt 'Balken'")
 
     def test_unbekanntes_wird_gemeldet(self):
         roh = self.neu().als_dict()

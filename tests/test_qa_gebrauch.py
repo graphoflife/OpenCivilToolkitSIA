@@ -294,8 +294,8 @@ class TestBeschreibung(unittest.TestCase):
         a.haeufig.lastfall("H", M_y_Ed=1.0)
         a.haeufig.lastfall("H", M_y_Ed=2.0)
         with self.assertRaises(ProjektFehler) as fehler:
-            a.regeln()
-        self.assertIn("Querschnitt 'Balken'", str(fehler.exception))
+            p.aufbauen()
+        self.assertIn("Querschnitt 'Balken': der Name 'H' ist zweimal", str(fehler.exception))
 
 
 if __name__ == "__main__":

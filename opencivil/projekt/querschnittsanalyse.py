@@ -50,7 +50,7 @@ from opencivil.projekt.eintraege import (
     druckfeld_pruefen, eindeutig, neigungen_pruefen, x_d_max_pruefen,
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
-from opencivil.projekt.lesen import ProjektFehler, einer_von, nicht_negativ
+from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von
 from opencivil.projekt.netz import Netz, naechste_kennung
 
 #: Schnitte eines Buegels durch eine Schubwand: so viele Schenkel kreuzen sie.
@@ -379,7 +379,7 @@ class QuerschnittsanalyseEintrag(Beschreibung):
     zwaengung_biegung: bool = False
     """Ob die Zwaengung auf Biegung nachgewiesen wird -- je Richtung."""
 
-    zwaengung_biegung_kriechzahl: float = nicht_negativ(0.0)
+    zwaengung_biegung_kriechzahl: float = bereich(0.0, heisst="Kriechzahl φ", ab=0.0)
     """Die Kriechzahl φ der Zwaengung auf Biegung: der Beton mit ``E_cm/(1+φ)``."""
 
     quasistaendig: QAGebrauchsliste = field(
@@ -608,26 +608,7 @@ class QuerschnittsanalyseEintrag(Beschreibung):
                                       stahl=stahl).kennung)
         return neu
 
-    def pruefen(self) -> None:
-        """
-        Was sich schon beim Oeffnen pruefen laesst: die Gebrauchslisten samt
-        Anteil, je Material eine Wahl. Die Namen der Faelle prueft
-        :meth:`regeln` vor dem Rechnen; welche Rechenarten ein Kapitel
-        anbietet, steht am Feld seiner Wahl.
-        """
-        for liste, wort in ((self.haeufig, "häufige"), (self.quasistaendig, "quasi-ständige")):
-            liste.pruefen(self.name, wort)
-        # Je Material eine Wahl. Zwei fuer dasselbe -- und welche gilt, hinge
-        # davon ab, wer liest: der Aufbau nahm die letzte, die Maske die erste.
-        gewaehlt = set()
-        for w in self.werkstoffwahl:
-            if w.material in gewaehlt:
-                raise ProjektFehler(
-                    f"Querschnitt '{self.name}': für das Material '{w.material}' stehen "
-                    f"zwei Werkstoffwahlen -- es braucht genau eine.")
-            gewaehlt.add(w.material)
-
-    def regeln(self) -> None:
+    def regeln(self, wo: str) -> None:
         """
         Was erst das Rechnen braucht, wie bei der Platte
         (:meth:`QuerschnittEintrag.regeln`): eine abgelegte Analyse
@@ -635,17 +616,23 @@ class QuerschnittsanalyseEintrag(Beschreibung):
         lassen. Bis 2026-10-16 rechnete sie mit α_min > α_max, k_c < 0 und
         x/d = 0.9.
         """
-        wo = f"Querschnitt '{self.name}'"
         eindeutig((f.name for f in self.lastfaelle), wo, "Lastfall")
         for liste, wort in ((self.haeufig, "häufige"), (self.quasistaendig, "quasi-ständige")):
-            liste.namen_pruefen(self.name, self.lastfaelle, wort)
+            liste.namen_pruefen(wo, self.lastfaelle, wort)
+        # Je Material eine Wahl. Zwei fuer dasselbe -- und welche gilt, hinge
+        # davon ab, wer liest: der Aufbau nahm die letzte, die Maske die erste.
+        gewaehlt = set()
+        for w in self.werkstoffwahl:
+            if w.material in gewaehlt:
+                raise ProjektFehler(
+                    f"{wo}: für das Material '{w.material}' stehen zwei "
+                    f"Werkstoffwahlen -- es braucht genau eine.")
+            gewaehlt.add(w.material)
         eindeutig((f.name for f in self.spannungsfaelle), wo, "Spannung-Dehnung-Analyse")
         eindeutig((f.name for f in self.knickfaelle), wo, "Knicknachweis")
         neigungen_pruefen(self.alpha_min, self.alpha_max, wo)
         druckfeld_pruefen(self.k_c, wo)
         x_d_max_pruefen(self.x_d_max, wo)
-        for fall in self.knickfaelle:
-            fall.regeln(wo)
 
     def lastfall(self, name: str, **werte: float) -> QALastfallEintrag:
         """Einen Lastfall anfuegen, ohne Oberflaeche -- kN und kNm."""

@@ -282,7 +282,13 @@ class Modell:
 
 @dataclass
 class BalkensystemEintrag(Beschreibung):
-    """Ein ebener Rahmen: Knoten, Linien, Lager, Lasten, Querschnitte, Lastfaelle, Kombinationen."""
+    """
+    Ein ebener Rahmen: Knoten, Linien, Lager, Lasten, Querschnitte, Lastfaelle, Kombinationen.
+
+    Ohne Regeln, die das ganze Projekt aufhielten: was an einem System nicht
+    stimmt -- auch zwei Faelle gleichen Namens --, steht in seinen Meldungen
+    (:meth:`modell`), und die anderen Bauteile rechnen weiter.
+    """
 
     BEZEICHNUNG = "Balkensystem"
 
@@ -297,15 +303,6 @@ class BalkensystemEintrag(Beschreibung):
     kombinationen: List[LastkombinationEintrag] = field(default_factory=list)
     beschreibung: str = ""
     """Freier Text -- geht in keine Rechnung ein."""
-
-    # -- Pruefen --------------------------------------------------------------
-
-    def pruefen(self) -> None:
-        """
-        Nichts, was das ganze Projekt aufhielte: was an einem System nicht
-        stimmt -- auch zwei Faelle gleichen Namens --, steht in seinen
-        Meldungen (:meth:`modell`), und die anderen Bauteile rechnen weiter.
-        """
 
     # -- Zugriff -------------------------------------------------------------
 

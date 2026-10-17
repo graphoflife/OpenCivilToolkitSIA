@@ -1,5 +1,5 @@
 ---
-erzeugt: 57e79c3c0d5f
+erzeugt: c7802508903c
 art: modul
 tags: [modul]
 ---
@@ -55,6 +55,18 @@ die Oberflaeche: «Platte 'Decke'».
 Ein Wahlfeld haelt das Mitglied seiner Wahl; wer Text zuweist -- die
 Datei, der Konstruktor, die Fassade --, bekommt hier das Mitglied
 ([[opencivil.projekt.lesen#wahl_aus_text|wahl_aus_text]]).
+
+Was ueber mehrere Felder gilt, steht in [[opencivil.projekt.eintraege#Beschreibung.regeln|regeln]] -- geprueft vor
+dem Rechnen, nach den Bereichen der Felder
+([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]).
+
+#### Beschreibung.regeln
+
+```python
+def regeln(self, wo: str) -> None
+```
+
+Die Regeln ueber mehrere Felder -- ohne eigene keine. `wo` nennt den Eintrag.
 
 #### Beschreibung.als_dict
 
@@ -304,19 +316,9 @@ in y waere die Breite der Platte die Laenge.
 - `name: str`
 - `N_Ed: float = 0.0` – in kN, Druck negativ.
 - `M_Ed_1: float = 0.0`
-- `laenge: float = 3.0` – Systemlaenge in m -- geht in die Schiefstellung ein.
-- `knicklaenge: float = 3.0` – Knicklaenge in m.
+- `laenge: float = bereich(3.0, heisst='Systemlänge', einheit=M, ueber=0.0)` – Systemlaenge in m -- geht in die Schiefstellung ein. Bis 2026-10-16 rechnete eine Laenge von null und hiess «erfuellt».
+- `knicklaenge: float = bereich(3.0, heisst='Knicklänge', einheit=M, ueber=0.0)` – Knicklaenge in m.
 - `aktiv: bool = True` – Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen -- eine geloeschte Zeile muesste man neu eintippen, um sie wieder anzusehen.
-
-#### KnickEintrag.regeln
-
-```python
-def regeln(self, wo: str) -> None
-```
-
-Laenge und Knicklaenge -- erst beim Bauen gefragt, wie die Masse der
-Platte. Bis 2026-10-16 rechnete eine Laenge von null und hiess
-«erfuellt».
 
 ### VerformungsfallEintrag
 
@@ -331,19 +333,10 @@ ermittelt, ihre Spannweite und die Seite, die er zieht.
 Wie ein Knickfall nur in x-Richtung.
 
 - `name: str`
-- `w: float = 0.0` – Durchbiegung in mm, mit E_cm ermittelt -- ein Betrag.
-- `laenge: float = 5.0` – Spannweite L in m -- der Grenzwert ist L/350.
+- `w: float = bereich(0.0, heisst='Durchbiegung w', einheit=MM, ab=0.0)` – Durchbiegung in mm, mit E_cm ermittelt -- ein Betrag.
+- `laenge: float = bereich(5.0, heisst='Spannweite L', einheit=M, ueber=0.0)` – Spannweite L in m -- der Grenzwert ist L/350.
 - `zugseite: str = einer_von(ZUGSEITEN, 'unten')` – `unten` im Feld, `oben` am Kragarm -- welches rho gilt.
 - `aktiv: bool = True` – Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen.
-
-#### VerformungsfallEintrag.regeln
-
-```python
-def regeln(self, wo: str) -> None
-```
-
-w und L -- erst beim Bauen gefragt, wie die Masse der Platte: eine
-abgelegte Platte mit L = 0 soll sich oeffnen und korrigieren lassen.
 
 ### VerformungEintrag
 
@@ -358,7 +351,7 @@ Vergroesserungsfaktors und die Faelle.
 phi gilt fuer die Platte und nicht je Fall -- der Faktor wird je Seite
 einmal gerechnet ([[opencivil.nachweis.verformung]]).
 
-- `kriechzahl: float = nicht_negativ(VERFORMUNG_KRIECHZAHL)` – phi im Vergroesserungsfaktor omega_w, Vorgabe 2.
+- `kriechzahl: float = bereich(VERFORMUNG_KRIECHZAHL, heisst='Kriechzahl φ', ab=0.0)` – phi im Vergroesserungsfaktor omega_w, Vorgabe 2.
 - `faelle: List[VerformungsfallEintrag] = field(default_factory=list)`
 
 #### VerformungEintrag.fall
@@ -405,7 +398,7 @@ Wertesatz und die Rechenart ([[opencivil.nachweis.rechenwahl#Rechenwahl|Rechenwa
 - `M_Ed: float = 0.0` – in kNm -- fuer `schnittgroessen` und `normalkraft_dehnung`.
 - `eps_oben: float = -1.0`
 - `eps_unten: float = 2.0` – Randdehnungen in Promille -- nur fuer `dehnungen`.
-- `kriechzahl: float = nicht_negativ(0.0)` – Die Kriechzahl φ dieser Analyse.
+- `kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)` – Die Kriechzahl φ dieser Analyse.
 - `werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG` – `bemessung` (f_cd, f_yd) oder `charakteristisch` (f_ck, f_yk).
 - `rechenart: Rechenart = einer_von(FASERARTEN, Rechenart.PARABEL)` – `block` oder `parabel` -- siehe [[opencivil.nachweis.rechenwahl#Rechenart|Rechenart]]. Die Handrechnung gibt es hier nicht ([[opencivil.nachweis.rechenwahl#Konstanten|FASERARTEN]]).
 - `aktiv: bool = True`
@@ -480,7 +473,7 @@ anbietet, steht an deren Feld: der Leser prueft es wie jede Wahl. Bis
 Die Kriechzahl des Vergroesserungsfaktors gehoert dem Verformungsnachweis
 ([[opencivil.projekt.eintraege#VerformungEintrag|VerformungEintrag]]).
 
-- `kriechzahl: float = nicht_negativ(0.0)`
+- `kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)`
 - `werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG`
 - `rechenart: Rechenart = einer_von(RECHENARTEN, Rechenart.HANDRECHNUNG)`
 
@@ -551,12 +544,12 @@ das Feld der Platte, in dem sie steht; die Liste selbst weiss es nicht.
 Der gezeichnete Querschnitt hat dieselbe Liste mit anderen Faellen
 ([[opencivil.projekt.querschnittsanalyse#QAGebrauchsliste|QAGebrauchsliste]]): was
 darin steht ([[opencivil.projekt.eintraege#Gebrauchsliste|FALL]]), welche Rechenarten sie anbietet (der Typ
-ihres Feldes [[opencivil.projekt.eintraege#Gebrauchsliste|wahl]]) und wie ihr Bauteil in den Meldungen heisst
-([[opencivil.projekt.eintraege#Gebrauchsliste|BAUTEIL]]).
+ihres Feldes [[opencivil.projekt.eintraege#Gebrauchsliste|wahl]]) und wie ihr Bauteil heisst, wo ein Fall ohne
+Bauteil gelesen wird ([[opencivil.projekt.eintraege#Gebrauchsliste|BAUTEIL]]).
 
 - `FALL = GebrauchsfallEintrag`
 - `BAUTEIL = 'Platte'`
-- `anteil: float` – Welcher Anteil der Tragsicherheitseinwirkungen abgeleitet wird, in %.
+- `anteil: float = bereich(heisst='Anteil aus der Tragsicherheit', einheit=PROZENT, uebe…` – Welcher Anteil der Tragsicherheitseinwirkungen abgeleitet wird, in %. Null ergaebe Lastfaelle ohne Last -- ein Nachweis, der immer aufgeht und nichts sagt. Ueber hundert waere keine Gebrauchslast mehr. Gemeldet statt begrenzt: wer 700 statt 70 tippt, soll es erfahren und nicht mit 100 weiterrechnen.
 - `aus_tragsicherheit: bool = False` – Ob die abgeleiteten Faelle *gefuehrt* werden. Gebildet werden sie immer; ausgeschaltet rechnen sie still mit. Der Anteil ist eine bequeme Abschaetzung und keine Norm, darum stehen die Faelle nur auf Verlangen in der Tabelle.
 - `faelle: List[GebrauchsfallEintrag] = field(default_factory=list)` – Eigene Lastfaelle -- neben den abgeleiteten, nicht statt ihrer.
 - `wahl: Gebrauchswahl = field(default_factory=Gebrauchswahl)` – Womit die Stahlspannung gerechnet wird -- Vorgabe elastisch, charakteristisch.
@@ -569,20 +562,10 @@ def lastfall(self, name: str, **werte: float)
 
 Einen eigenen Lastfall anfuegen -- kNm und kN, Zug positiv.
 
-#### Gebrauchsliste.pruefen
-
-```python
-def pruefen(self, bauteil: str, wort: str) -> None
-```
-
-Was an dieser Liste nicht stimmen kann -- `wort` ist «häufige» oder
-«quasi-ständige» und steht in der Meldung. Die Namen prueft
-[[opencivil.projekt.eintraege#Gebrauchsliste.namen_pruefen|namen_pruefen]], vor dem Rechnen.
-
 #### Gebrauchsliste.namen_pruefen
 
 ```python
-def namen_pruefen(self, bauteil: str, kombinationen: List[Any], wort: str) -> None
+def namen_pruefen(self, wo: str, kombinationen: List[Any], wort: str) -> None
 ```
 
 Die Namen dieser Liste, vor dem Rechnen (siehe [[opencivil.projekt.eintraege#eindeutig|eindeutig]]). Je
@@ -590,6 +573,7 @@ Liste fuer sich: die beiden Listen landen in getrennten Nachweisen und
 damit in getrennten ID-Raeumen, ein Fall «Dauer» darf in beiden stehen.
 `kombinationen` sind die Faelle der Tragsicherheit, aus denen
 abgeleitet wird -- ihre eigenen Namen hat das Bauteil schon geprueft.
+`wo` nennt das Bauteil.
 
 ### KombinationEintrag
 

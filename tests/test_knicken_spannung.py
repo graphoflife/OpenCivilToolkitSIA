@@ -435,7 +435,8 @@ class TestGebrauchsfallPruefung(unittest.TestCase):
                            ("quasistaendig__anteil", -10.0),
                            ("haeufig__anteil", 700.0)):
             with self.subTest(feld=feld, wert=wert):
-                self.assertIn("zwischen 0 und 100 %",
+                self.assertIn(f"Anteil aus der Tragsicherheit muss grösser als null und "
+                              f"höchstens 100 % sein, angegeben ist {wert:g} %.",
                               self.fehler(**{feld: wert}))
 
     def test_eine_datei_ohne_die_listen_bekommt_die_vorgaben(self):

@@ -1,5 +1,5 @@
 ---
-erzeugt: 80626dc75392
+erzeugt: 2543ea0ae46e
 art: modul
 tags: [modul]
 ---
@@ -339,7 +339,7 @@ Ein gezeichneter Querschnitt mit Bewehrung, Schubwaenden und Lastfaellen.
 - `zwaengung: bool = False` – Ob die Zwaengung auf Normalkraft nachgewiesen wird -- am ganzen Querschnitt.
 - `zwaengung_begrenzt: bool = False` – Ob die rissaktive Dicke dabei hoechstens 500 mm betraegt.
 - `zwaengung_biegung: bool = False` – Ob die Zwaengung auf Biegung nachgewiesen wird -- je Richtung.
-- `zwaengung_biegung_kriechzahl: float = nicht_negativ(0.0)` – Die Kriechzahl φ der Zwaengung auf Biegung: der Beton mit `E_cm/(1+φ)`.
+- `zwaengung_biegung_kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)` – Die Kriechzahl φ der Zwaengung auf Biegung: der Beton mit `E_cm/(1+φ)`.
 - `quasistaendig: QAGebrauchsliste = field(default_factory=lambda: QAGebrauchsliste(anteil=QUASISTAENDIG_A…` – Die quasi-staendigen Lastfaelle -- fuer die Rissbreite.
 - `haeufig: QAGebrauchsliste = field(default_factory=lambda: QAGebrauchsliste(anteil=HAEUFIG_ANTEIL))` – Die haeufigen Lastfaelle -- gegen das Fliessen, bei erhoehter und hoher Anforderung.
 - `knickfaelle: List[QAKnickEintrag] = field(default_factory=list)` – Knicknachweise, je in einer Richtung; leer heisst: keiner.
@@ -469,21 +469,10 @@ Millionstel Millimeter wie im Zeichenfenster, damit die Summe keinen
 Rundungsrest behaelt. Gibt die Kennungen der neuen Elemente zurueck.
 Passen die Masse nicht zueinander, ein `ValueError` mit dem Grund.
 
-#### QuerschnittsanalyseEintrag.pruefen
-
-```python
-def pruefen(self) -> None
-```
-
-Was sich schon beim Oeffnen pruefen laesst: die Gebrauchslisten samt
-Anteil, je Material eine Wahl. Die Namen der Faelle prueft
-[[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.regeln|regeln]] vor dem Rechnen; welche Rechenarten ein Kapitel
-anbietet, steht am Feld seiner Wahl.
-
 #### QuerschnittsanalyseEintrag.regeln
 
 ```python
-def regeln(self) -> None
+def regeln(self, wo: str) -> None
 ```
 
 Was erst das Rechnen braucht, wie bei der Platte

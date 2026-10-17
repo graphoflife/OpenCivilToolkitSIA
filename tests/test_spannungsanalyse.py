@@ -20,6 +20,7 @@ from opencivil.nachweis.rechenwahl import Rechenart, Rechenwahl
 from opencivil.projekt import (
     Projekt, ProjektFehler, RechenwahlEintrag, SpannungsfallEintrag,
 )
+from opencivil.projekt.lesen import inhalt_pruefen
 from opencivil.querschnitt.platte import Richtung
 from opencivil.web import dienst
 
@@ -527,13 +528,18 @@ class TestWahl(unittest.TestCase):
 
     def test_was_es_nicht_gibt_meldet_sich(self):
         for feld, wert in (("art", "kreis"), ("werkstoffsatz", "mittel"),
-                           ("rechenart", "dreieck"), ("betongesetz", "dreieck"),
-                           ("kriechzahl", -1.0)):
+                           ("rechenart", "dreieck"), ("betongesetz", "dreieck")):
             with self.subTest(feld=feld):
                 with self.assertRaises(ProjektFehler):
                     SpannungsfallEintrag.aus_dict({"name": "x", feld: wert})
         with self.assertRaises(ProjektFehler):
             Projekt.beispiel().querschnitte[0].spannungsfall("x", rechenart="dreieck")
+
+    def test_eine_negative_kriechzahl_meldet_sich_vor_dem_rechnen(self):
+        """Lesen geht -- die Form stimmt; der Bereich zählt vor dem Rechnen."""
+        fall = SpannungsfallEintrag.aus_dict({"name": "x", "kriechzahl": -1.0})
+        with self.assertRaisesRegex(ProjektFehler, "x: Kriechzahl φ kann nicht negativ sein"):
+            inhalt_pruefen(fall, "x")
 
     def test_eine_leere_kriechzahl_ist_keine(self):
         """Ein leerer Text ist keine Zahl -- die Maske schickt für ein geleertes Feld 0."""

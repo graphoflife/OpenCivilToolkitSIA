@@ -250,7 +250,7 @@ class TestBeschreibung(unittest.TestCase):
         roh = Projekt.beispiel().als_dict()
         roh["querschnitte"][0]["verformung"]["kriechzahl"] = -1.0
         with self.assertRaises(ProjektFehler):
-            Projekt.aus_dict(roh)
+            Projekt.aus_dict(roh).aufbauen()
 
 
 if __name__ == "__main__":

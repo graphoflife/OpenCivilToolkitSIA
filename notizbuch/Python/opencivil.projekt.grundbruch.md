@@ -1,5 +1,5 @@
 ---
-erzeugt: 65d2bfcadb89
+erzeugt: b66f4078f413
 art: modul
 tags: [modul]
 ---
@@ -97,24 +97,16 @@ def kombination(self, name: str, *, N_Ed: float, T_Ed: float=0.0) -> Grundbruchk
 
 Eine Kombination anfügen -- N normal zur Sohle, T in ihrer Richtung, in kN.
 
-#### GrundbruchEintrag.pruefen
-
-```python
-def pruefen(self) -> None
-```
-
-Beim Oeffnen nichts ueber die Felder hinaus: Namen und Zahlen prueft
-[[opencivil.projekt.grundbruch#GrundbruchEintrag.regeln|regeln]] vor dem Rechnen -- eine abgelegte Datei mit b = 0 oder
-zwei gleich benannten Kombinationen soll sich oeffnen und korrigieren
-lassen.
-
 #### GrundbruchEintrag.regeln
 
 ```python
-def regeln(self) -> None
+def regeln(self, wo: str) -> None
 ```
 
-Haelt unmoegliche Zahlen und Namen auf, bevor daraus ein Widerstand wird.
+Haelt unmoegliche Zahlen und Namen auf, bevor daraus ein Widerstand
+wird -- vor dem Rechnen und nicht beim Oeffnen: eine abgelegte Datei
+mit b = 0 oder zwei gleich benannten Kombinationen soll sich oeffnen
+und korrigieren lassen.
 
 
 ## Braucht

@@ -1,5 +1,5 @@
 ---
-erzeugt: fc966b02c868
+erzeugt: 384e63c24c02
 art: modul
 tags: [modul]
 ---
@@ -16,8 +16,8 @@ Feldern der Datenklassen. Was ein Feld annehmen darf, steht an ihm selbst:
   oder eine Wahl ([[opencivil.core.wahl#Wahl|Wahl]]), deren Mitglieder es
   annimmt;
 * eine Teilmenge davon ([[opencivil.projekt.lesen#einer_von|einer_von]]) -- die Werte, die es gibt;
-* eine Untergrenze ([[opencivil.projekt.lesen#nicht_negativ|nicht_negativ]]);
-* ein Text ohne Vorgabe ist Pflicht und darf nicht leer sein.
+* ein Text ohne Vorgabe ist Pflicht und darf nicht leer sein;
+* ein Bereich ([[opencivil.projekt.lesen#bereich|bereich]]) -- wo seine Zahl liegen muss.
 
 
 ## STRENG
@@ -43,9 +43,16 @@ Dieselbe Pruefung laeuft vor jedem Rechnen ueber das ganze Projekt
 wurde, ohne Datei, geht durch dieselbe Tuer wie eine Datei: ein «festt» im
 Linienlager meldet sich hier und wird nicht still zur Feder.
 
-Was erst das Rechnen braucht -- eine Dicke groesser als null, das Material,
-auf das eine Platte zeigt --, prueft der Aufbau. Eine abgelegte Platte mit
-h = 0 soll sich oeffnen und korrigieren lassen.
+
+## FORM BEIM LESEN, INHALT VOR DEM RECHNEN
+
+Beim Lesen zaehlt die Form: Typ, Wahl, Pflicht. Was erst das Rechnen braucht
+-- der Bereich eines Feldes, eine Dicke groesser als null, die Regeln ueber
+mehrere Felder (`regeln`) --, prueft [[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]] vor jedem
+Rechnen; das Material, auf das eine Platte zeigt, der Aufbau. Eine abgelegte
+Platte mit h = 0 soll sich oeffnen und korrigieren lassen. Bis 2026-10-17
+hielt eine negative Kriechzahl schon das Oeffnen auf, eine negative
+Ueberdeckung erst das Rechnen.
 
 
 ## WAHLEN SIND MITGLIEDER
@@ -76,13 +83,54 @@ def einer_von(moeglich: Iterable[Any], vorgabe: Any=dataclasses.MISSING) -> Any
 
 Ein Feld, das nur einen dieser Werte annimmt -- die Pruefung kennt sie von hier.
 
-### nicht_negativ
+### Bereich
 
 ```python
-def nicht_negativ(vorgabe: float) -> Any
+@dataclasses.dataclass(frozen=True)
+class Bereich
 ```
 
-Eine Zahl, die nicht unter null liegen kann -- eine Kriechzahl etwa.
+Wo die Zahl eines Feldes liegen muss -- jede Grenze darf fehlen, `ueber`
+und `unter` schliessen die Grenze aus, `ab` und `bis` ein. Geprueft
+vor dem Rechnen ([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]).
+
+- `heisst: str` – Wie das Feld in der Meldung heisst -- wie an der Maske: «Dicke h».
+- `einheit: Optional[Einheit] = None`
+- `ueber: Optional[float] = None`
+- `ab: Optional[float] = None`
+- `bis: Optional[float] = None`
+- `unter: Optional[float] = None`
+
+#### Bereich.pruefen
+
+```python
+def pruefen(self, wert: float, wo: str) -> None
+```
+
+#### Bereich.verlangt
+
+```python
+@property
+def verlangt(self) -> str
+```
+
+Was die Grenzen verlangen: «muss grösser als null sein».
+
+#### Bereich._zahl
+
+```python
+def _zahl(self, wert: float) -> str
+```
+
+Eine Zahl mit der Einheit des Feldes: «300 mm», «30°», «0.9».
+
+### bereich
+
+```python
+def bereich(vorgabe: Any=dataclasses.MISSING, *, heisst: str, einheit: Optional[Einheit]=None, ueber: Optional[float]=None, ab: Optional[float]=None, bis: Optional[float]=None, unter: Optional[float]=None) -> Any
+```
+
+Ein Feld, dessen Zahl in einem [[opencivil.projekt.lesen#Bereich|Bereich]] liegen muss -- eine Kriechzahl ab null etwa.
 
 ### sorten
 
@@ -168,8 +216,8 @@ def _benannt(bezeichnung: str, name: Any, kennung: Any) -> Optional[str]
 def felder_pruefen(eintrag: Any, wo: str, *, tief: bool=True) -> None
 ```
 
-Prueft jedes Feld eines Eintrags gegen das, was an ihm steht: Typ, Wahl,
-Pflicht, Untergrenze. `tief`: auch jeden Eintrag darin.
+Prueft die Form jedes Feldes eines Eintrags gegen das, was an ihm steht:
+Typ, Wahl, Pflicht. `tief`: auch jeden Eintrag darin.
 
 ### _blatt_pruefen
 
@@ -178,6 +226,26 @@ def _blatt_pruefen(wert: Any, typ: Any, f: dataclasses.Field, wo: str) -> None
 ```
 
 Ein Text, eine Zahl, ein Schalter, eine Wahl -- und was an seinem Feld steht.
+
+### inhalt_pruefen
+
+```python
+def inhalt_pruefen(eintrag: Any, wo: str) -> None
+```
+
+Prueft, was erst das Rechnen braucht -- nach der Form, vor jedem Rechnen:
+jede Zahl gegen ihren Bereich ([[opencivil.projekt.lesen#bereich|bereich]]), jeden Eintrag darin
+ebenso, und danach die Regeln des Eintrags ueber mehrere Felder,
+`regeln(wo)`. Die Form ist da schon geprueft: ein Eintrag steht, wo
+einer hingehoert, eine Zahl, wo eine Zahl hingehoert.
+
+### _ort_von
+
+```python
+def _ort_von(element: Any, wo: str, feld: str, i: int) -> str
+```
+
+Wie ein gebautes Listenelement in Meldungen heisst -- wie [[opencivil.projekt.lesen#_ort_roh|_ort_roh]] vor dem Lesen.
 
 ### _typen
 
@@ -247,6 +315,7 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 
 ## Braucht
 
+- [[opencivil.core.einheiten]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
 

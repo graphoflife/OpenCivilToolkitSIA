@@ -172,10 +172,11 @@ class TestDatei(unittest.TestCase):
                       str(fehler.exception))
 
     def test_negatives_phi(self):
+        """Die Datei öffnet sich; gemeldet wird vor dem Rechnen."""
         daten = Projekt.beispiel().als_dict()
         daten["querschnitte"][0]["tragsicherheit_wahl"] = {"kriechzahl": -1}
         with self.assertRaises(ProjektFehler):
-            Projekt.aus_dict(daten)
+            Projekt.aus_dict(daten).aufbauen()
 
 
 if __name__ == "__main__":

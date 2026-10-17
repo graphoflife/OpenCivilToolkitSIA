@@ -9,6 +9,7 @@ nicht stimmt, meldet sich mit Ort und Wert; umgedeutet wird nichts.
 import json
 import unittest
 
+from opencivil.core.einheiten import GRAD, MM
 from opencivil.nachweis.rechenwahl import Rechenart
 from opencivil.projekt import (
     Gebrauchswahl, KnickVerformungswahl, KombinationEintrag, PostenEintrag, Projekt,
@@ -16,7 +17,7 @@ from opencivil.projekt import (
 )
 from opencivil.projekt.querschnittsanalyse import SchubwandEintrag
 from opencivil.nachweis.rissanforderung import Rissanforderung
-from opencivil.projekt.lesen import felder_pruefen
+from opencivil.projekt.lesen import Bereich, felder_pruefen
 from opencivil.web import dienst
 
 
@@ -102,12 +103,16 @@ class TestStreng(unittest.TestCase):
     def test_eine_liste_bleibt_eine_liste(self):
         self.assertIn("'kombinationen' muss eine Liste sein", meldung(platte_roh(kombinationen={})))
 
-    def test_eine_kriechzahl_ist_nicht_negativ(self):
+    def test_eine_negative_kriechzahl_oeffnet_sich_und_meldet_sich_beim_rechnen(self):
+        """Form beim Lesen, Inhalt vor dem Rechnen -- bis 2026-10-17 hielt sie das Öffnen auf."""
         roh = platte_roh()
         roh["querschnitte"][0]["tragsicherheit_wahl"]["kriechzahl"] = -1
-        text = meldung(roh)
-        self.assertIn("tragsicherheit_wahl", text)
-        self.assertIn("'kriechzahl' kann nicht negativ sein", text)
+        projekt = Projekt.aus_dict(roh)
+        projekt.pruefen()
+        with self.assertRaises(ProjektFehler) as fehler:
+            projekt.aufbauen()
+        self.assertIn("tragsicherheit_wahl: Kriechzahl φ kann nicht negativ sein, angegeben "
+                      "ist -1.", str(fehler.exception))
 
     def test_mehr_als_vier_lagen(self):
         roh = platte_roh()
@@ -236,6 +241,39 @@ class TestEineTuer(unittest.TestCase):
 
 
 
+class TestInhaltVorDemRechnen(unittest.TestCase):
+    """
+    Form beim Lesen, Inhalt vor dem Rechnen: was erst das Rechnen braucht --
+    ein Bereich, eine Regel über mehrere Felder --, hält das Öffnen nicht auf.
+    """
+
+    def test_oeffnen_geht_rechnen_meldet(self):
+        roh = platte_roh()
+        roh["querschnitte"][0]["haeufig"]["anteil"] = 0.0
+        self.assertEqual(dienst.bearbeite("pruefen", {"projekt": roh}).status, 200)
+        antwort = dienst.bearbeite("rechnen", {"projekt": roh})
+        self.assertEqual(antwort.status, 400)
+        self.assertIn("Platte 'Decke über EG', haeufig: Anteil aus der Tragsicherheit muss "
+                      "grösser als null und höchstens 100 % sein, angegeben ist 0 %.",
+                      antwort.daten["fehler"])
+
+    def test_was_ein_bereich_verlangt(self):
+        for bereich, wert, text in (
+                (Bereich("Kriechzahl φ", ab=0.0), -1.0,
+                 "Kriechzahl φ kann nicht negativ sein, angegeben ist -1."),
+                (Bereich("Dicke h", MM, ueber=0.0), 0.0,
+                 "Dicke h muss grösser als null sein, angegeben ist 0 mm."),
+                (Bereich("α_min", GRAD, ab=1, bis=89), 90,
+                 "α_min muss mindestens 1° und höchstens 89° sein, angegeben ist 90°."),
+                (Bereich("φ_k", GRAD, ab=0.0, unter=90.0), 90.0,
+                 "φ_k muss mindestens null und kleiner als 90° sein, angegeben ist 90°.")):
+            with self.subTest(text=text):
+                bereich.pruefen(wert - 1 if wert > 0 else wert + 1, "Hier")
+                with self.assertRaises(ProjektFehler) as fehler:
+                    bereich.pruefen(wert, "Hier")
+                self.assertEqual(str(fehler.exception), f"Hier: {text}")
+
+
 class TestNichtsStill(unittest.TestCase):
     """
     Was beim Rechnen bisher still einen Ersatz bekam, meldet sich: ein Posten
@@ -261,8 +299,8 @@ class TestNichtsStill(unittest.TestCase):
         """Sie rechnete und hiess «erfüllt»."""
         p = Projekt.beispiel()
         p.querschnitt("q1").knickfall("Wand", N_Ed=-500.0, laenge=0.0)
-        self.assertIn("Knicknachweis 'Wand': die Systemlänge muss grösser als null sein",
-                      self.fehler(p))
+        self.assertIn("knickfaelle 'Wand': Systemlänge muss grösser als null sein, "
+                      "angegeben ist 0 m.", self.fehler(p))
 
     def test_die_grenzen_des_gezeichneten_querschnitts(self):
         for feld, wert, text in (("alpha_min", 60, "α_min = 60° ist grösser als α_max"),

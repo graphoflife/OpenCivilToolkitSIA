@@ -27,7 +27,7 @@ from opencivil.projekt.eintraege import (
     VerformungEintrag, VerformungsfallEintrag, eindeutig, x_d_max_pruefen,
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
-from opencivil.projekt.lesen import ProjektFehler, nicht_negativ
+from opencivil.projekt.lesen import ProjektFehler, bereich
 
 
 @dataclass
@@ -173,7 +173,7 @@ class QuerschnittEintrag(Beschreibung):
     zwaengung_biegung: bool = False
     """Ob die Zwaengung auf Biegung nachgewiesen wird."""
 
-    zwaengung_biegung_kriechzahl: float = nicht_negativ(0.0)
+    zwaengung_biegung_kriechzahl: float = bereich(0.0, heisst="Kriechzahl φ", ab=0.0)
     """Die Kriechzahl phi der Zwaengung auf Biegung: ``n = (E_s/E_cm)*(1+phi)``."""
 
     duktilitaet: bool = False
@@ -258,19 +258,7 @@ class QuerschnittEintrag(Beschreibung):
 
     # -- Pruefen und Leeren -------------------------------------------------
 
-    def pruefen(self) -> None:
-        """
-        Was an dieser Platte nicht stimmen kann, schon beim Oeffnen: die
-        Gebrauchslisten samt Anteil. Laeuft auch beim Oeffnen einer Datei --
-        darum hier nichts, was eine gespeicherte Platte unoeffenbar machte;
-        Namen und Zahlen prueft :meth:`regeln` vor dem Rechnen. Welche
-        Rechenarten ein Kapitel anbietet, steht am Feld seiner Wahl.
-        """
-        for liste, wort in ((self.haeufig, "häufige"),
-                            (self.quasistaendig, "quasi-ständige")):
-            liste.pruefen(self.name, wort)
-
-    def regeln(self) -> None:
+    def regeln(self, wo: str) -> None:
         """
         Haelt unmoegliche Abmessungen, Zahlen und Namen auf, bevor daraus ein
         Widerstand wird.
@@ -284,19 +272,18 @@ class QuerschnittEintrag(Beschreibung):
         waere. Ob 20 mm Ueberdeckung fuer die Expositionsklasse genuegen,
         entscheidet der Ingenieur.
 
-        **Nicht in :meth:`pruefen`.** Das laeuft auch beim Oeffnen einer Datei;
-        eine abgelegte Platte mit ``h = 0`` liesse sich dann nicht mehr oeffnen
-        -- und damit nicht mehr korrigieren. Gefragt wird erst beim Bauen.
+        **Nicht beim Oeffnen.** Eine abgelegte Platte mit ``h = 0`` liesse sich
+        sonst nicht mehr oeffnen -- und damit nicht mehr korrigieren. Gefragt
+        wird vor dem Rechnen (:func:`~opencivil.projekt.lesen.inhalt_pruefen`).
         Ebenso die Namen der Faelle (:func:`~opencivil.projekt.eintraege.eindeutig`),
         die der Tragsicherheit zuerst: aus ihnen leiten sich die
         Gebrauchslisten ab.
         """
         name = self.name
-        wo = f"Platte '{name}'"
         eindeutig((k.name for k in self.kombinationen), wo, "Tragsicherheitseinwirkung")
         for liste, wort in ((self.haeufig, "häufige"),
                             (self.quasistaendig, "quasi-ständige")):
-            liste.namen_pruefen(name, self.kombinationen, wort)
+            liste.namen_pruefen(wo, self.kombinationen, wort)
         eindeutig((k.name for k in self.knickfaelle), wo, "Knicknachweis")
         eindeutig((f.name for f in self.spannungsfaelle), wo, "Spannung-Dehnung-Analyse")
         eindeutig((f.name for f in self.verformung.faelle), wo, "Verformungsfall")
@@ -332,10 +319,6 @@ class QuerschnittEintrag(Beschreibung):
         for nummer, lage in enumerate(self.lagen, start=1):
             lage.grund.pruefen(f"Platte '{name}', {nummer}. Lage, Grundbewehrung")
             lage.zulage.pruefen(f"Platte '{name}', {nummer}. Lage, Zulage")
-        for fall in self.knickfaelle:
-            fall.regeln(wo)
-        for fall in self.verformung.faelle:
-            fall.regeln(wo)
 
     def ohne_lastfaelle(self) -> None:
         """

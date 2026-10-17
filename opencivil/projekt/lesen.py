@@ -9,8 +9,8 @@ Feldern der Datenklassen. Was ein Feld annehmen darf, steht an ihm selbst:
   oder eine Wahl (:class:`~opencivil.core.wahl.Wahl`), deren Mitglieder es
   annimmt;
 * eine Teilmenge davon (:func:`einer_von`) -- die Werte, die es gibt;
-* eine Untergrenze (:func:`nicht_negativ`);
-* ein Text ohne Vorgabe ist Pflicht und darf nicht leer sein.
+* ein Text ohne Vorgabe ist Pflicht und darf nicht leer sein;
+* ein Bereich (:func:`bereich`) -- wo seine Zahl liegen muss.
 
 STRENG:
 Gelesen wird, was dasteht, und nichts sonst. Ein Feld, das es nicht gibt, ein
@@ -32,9 +32,14 @@ Dieselbe Pruefung laeuft vor jedem Rechnen ueber das ganze Projekt
 wurde, ohne Datei, geht durch dieselbe Tuer wie eine Datei: ein «festt» im
 Linienlager meldet sich hier und wird nicht still zur Feder.
 
-Was erst das Rechnen braucht -- eine Dicke groesser als null, das Material,
-auf das eine Platte zeigt --, prueft der Aufbau. Eine abgelegte Platte mit
-h = 0 soll sich oeffnen und korrigieren lassen.
+FORM BEIM LESEN, INHALT VOR DEM RECHNEN:
+Beim Lesen zaehlt die Form: Typ, Wahl, Pflicht. Was erst das Rechnen braucht
+-- der Bereich eines Feldes, eine Dicke groesser als null, die Regeln ueber
+mehrere Felder (``regeln``) --, prueft :func:`inhalt_pruefen` vor jedem
+Rechnen; das Material, auf das eine Platte zeigt, der Aufbau. Eine abgelegte
+Platte mit h = 0 soll sich oeffnen und korrigieren lassen. Bis 2026-10-17
+hielt eine negative Kriechzahl schon das Oeffnen auf, eine negative
+Ueberdeckung erst das Rechnen.
 
 WAHLEN SIND MITGLIEDER:
 Ein Wahlfeld haelt das Mitglied seiner Wahl, nicht den Text: aus «hoch» in
@@ -57,6 +62,7 @@ import math
 import typing
 from typing import Any, Dict, Iterable, Mapping, Optional
 
+from opencivil.core.einheiten import Einheit
 from opencivil.material.beton import BETONSORTEN
 from opencivil.material.betonstahl import STAHLSORTEN
 
@@ -75,9 +81,56 @@ def einer_von(moeglich: Iterable[Any], vorgabe: Any = dataclasses.MISSING) -> An
     return dataclasses.field(default=vorgabe, metadata={"wahl": tuple(moeglich)})
 
 
-def nicht_negativ(vorgabe: float) -> Any:
-    """Eine Zahl, die nicht unter null liegen kann -- eine Kriechzahl etwa."""
-    return dataclasses.field(default=vorgabe, metadata={"nicht_negativ": True})
+@dataclasses.dataclass(frozen=True)
+class Bereich:
+    """
+    Wo die Zahl eines Feldes liegen muss -- jede Grenze darf fehlen, ``ueber``
+    und ``unter`` schliessen die Grenze aus, ``ab`` und ``bis`` ein. Geprueft
+    vor dem Rechnen (:func:`inhalt_pruefen`).
+    """
+
+    heisst: str
+    """Wie das Feld in der Meldung heisst -- wie an der Maske: «Dicke h»."""
+
+    einheit: Optional[Einheit] = None
+    ueber: Optional[float] = None
+    ab: Optional[float] = None
+    bis: Optional[float] = None
+    unter: Optional[float] = None
+
+    def pruefen(self, wert: float, wo: str) -> None:
+        if ((self.ueber is None or wert > self.ueber) and (self.ab is None or wert >= self.ab)
+                and (self.bis is None or wert <= self.bis)
+                and (self.unter is None or wert < self.unter)):
+            return
+        raise ProjektFehler(f"{wo}: {self.heisst} {self.verlangt}, angegeben ist "
+                            f"{self._zahl(wert)}.")
+
+    @property
+    def verlangt(self) -> str:
+        """Was die Grenzen verlangen: «muss grösser als null sein»."""
+        grenzen = [(wort, g) for wort, g in (("grösser als", self.ueber), ("mindestens", self.ab),
+                                             ("kleiner als", self.unter), ("höchstens", self.bis))
+                   if g is not None]
+        if grenzen == [("mindestens", 0.0)]:
+            return "kann nicht negativ sein"
+        return "muss " + " und ".join(
+            f"{wort} {'null' if g == 0.0 else self._zahl(g)}" for wort, g in grenzen) + " sein"
+
+    def _zahl(self, wert: float) -> str:
+        """Eine Zahl mit der Einheit des Feldes: «300 mm», «30°», «0.9»."""
+        if self.einheit is None or self.einheit.name in ("", "-"):
+            return f"{wert:g}"
+        return f"{wert:g}{'' if self.einheit.klebt else ' '}{self.einheit.beschriftung}"
+
+
+def bereich(vorgabe: Any = dataclasses.MISSING, *, heisst: str,
+            einheit: Optional[Einheit] = None, ueber: Optional[float] = None,
+            ab: Optional[float] = None, bis: Optional[float] = None,
+            unter: Optional[float] = None) -> Any:
+    """Ein Feld, dessen Zahl in einem :class:`Bereich` liegen muss -- eine Kriechzahl ab null etwa."""
+    return dataclasses.field(default=vorgabe, metadata={
+        "bereich": Bereich(heisst, einheit, ueber=ueber, ab=ab, bis=bis, unter=unter)})
 
 
 def sorten(art: str) -> Mapping[str, Any]:
@@ -220,8 +273,8 @@ def _benannt(bezeichnung: str, name: Any, kennung: Any) -> Optional[str]:
 
 def felder_pruefen(eintrag: Any, wo: str, *, tief: bool = True) -> None:
     """
-    Prueft jedes Feld eines Eintrags gegen das, was an ihm steht: Typ, Wahl,
-    Pflicht, Untergrenze. ``tief``: auch jeden Eintrag darin.
+    Prueft die Form jedes Feldes eines Eintrags gegen das, was an ihm steht:
+    Typ, Wahl, Pflicht. ``tief``: auch jeden Eintrag darin.
     """
     typen = _typen(type(eintrag))
     for f in dataclasses.fields(eintrag):
@@ -252,8 +305,7 @@ def _wert_pruefen(wert: Any, typ: Any, f: dataclasses.Field, wo: str, tief: bool
                 raise ProjektFehler(f"{wo}: in '{f.name}' gehört ein {innen.__name__} hin, "
                                     f"nicht {_zeigen(element)}.")
             elif tief:
-                felder_pruefen(element, _ort(innen, getattr(element, "name", None),
-                                             getattr(element, "kennung", None), wo, f.name, i))
+                felder_pruefen(element, _ort_von(element, wo, f.name, i))
         return
     if art == "zuordnung":
         if not isinstance(wert, dict) or not all(isinstance(k, str) for k in wert):
@@ -290,12 +342,37 @@ def _blatt_pruefen(wert: Any, typ: Any, f: dataclasses.Field, wo: str) -> None:
         if isinstance(wert, bool) or not isinstance(wert, (int, float)) \
                 or not math.isfinite(wert):
             raise ProjektFehler(f"{wo}: '{f.name}' muss eine Zahl sein, nicht {_zeigen(wert)}.")
-        if f.metadata.get("nicht_negativ") and wert < 0.0:
-            raise ProjektFehler(f"{wo}: '{f.name}' kann nicht negativ sein ({wert:g}).")
     moeglich = f.metadata.get("wahl")
     if moeglich is not None and wert not in moeglich:
         raise ProjektFehler(f"{wo}: {_zeigen(wert)} gibt es als '{f.name}' nicht. "
                             f"Möglich sind: {', '.join(str(m) for m in moeglich)}.")
+
+
+def inhalt_pruefen(eintrag: Any, wo: str) -> None:
+    """
+    Prueft, was erst das Rechnen braucht -- nach der Form, vor jedem Rechnen:
+    jede Zahl gegen ihren Bereich (:func:`bereich`), jeden Eintrag darin
+    ebenso, und danach die Regeln des Eintrags ueber mehrere Felder,
+    ``regeln(wo)``. Die Form ist da schon geprueft: ein Eintrag steht, wo
+    einer hingehoert, eine Zahl, wo eine Zahl hingehoert.
+    """
+    for f in dataclasses.fields(eintrag):
+        wert = getattr(eintrag, f.name)
+        bereich_ = f.metadata.get("bereich")
+        teile = wert if isinstance(wert, list) else [wert]
+        for i, teil in enumerate(teile):
+            if dataclasses.is_dataclass(teil):
+                inhalt_pruefen(teil, _ort_von(teil, wo, f.name, i) if teile is wert
+                               else f"{wo}, {f.name}")
+            elif bereich_ is not None and teil is not None:
+                bereich_.pruefen(teil, wo)
+    eintrag.regeln(wo)
+
+
+def _ort_von(element: Any, wo: str, feld: str, i: int) -> str:
+    """Wie ein gebautes Listenelement in Meldungen heisst -- wie :func:`_ort_roh` vor dem Lesen."""
+    return _ort(type(element), getattr(element, "name", None),
+                getattr(element, "kennung", None), wo, feld, i)
 
 
 # ===========================================================================

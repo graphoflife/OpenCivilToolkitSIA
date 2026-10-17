@@ -1,5 +1,5 @@
 ---
-erzeugt: 6f6c4f1e3c81
+erzeugt: d2ef9899ec4d
 art: modul
 tags: [modul]
 ---
@@ -62,7 +62,7 @@ Eine Stahlbeton-Platte mit genau vier Bewehrungslagen.
 - `automatik_querkraft_teilungen: List[float] = field(default_factory=lambda: [100.0, 150.0, 200.0])`
 - `sproede: bool = False` – Ob der Nachweis gegen sproedes Versagen gefuehrt wird.
 - `zwaengung_biegung: bool = False` – Ob die Zwaengung auf Biegung nachgewiesen wird.
-- `zwaengung_biegung_kriechzahl: float = nicht_negativ(0.0)` – Die Kriechzahl phi der Zwaengung auf Biegung: `n = (E_s/E_cm)*(1+phi)`.
+- `zwaengung_biegung_kriechzahl: float = bereich(0.0, heisst='Kriechzahl φ', ab=0.0)` – Die Kriechzahl phi der Zwaengung auf Biegung: `n = (E_s/E_cm)*(1+phi)`.
 - `duktilitaet: bool = False` – Ob der Duktilitaetsnachweis gefuehrt wird. Ein Schalter fuer die Platte und nicht einer je Lage. Gerechnet werden beide x-Lagen -- die obere traegt das Stuetz-, die untere das Feldmoment --, und in der Zusammenfassung steht die unguenstigere. Vier Schalter fuer einen Nachweis waren vier Gelegenheiten, den falschen zu vergessen; die Frage ist ohnehin, ob der Querschnitt sein Versagen ankuendigt, und die beantwortet die schlechtere Lage.
 - `x_d_max: float = X_D_MAX` – Grenze der bezogenen Druckzonenhoehe im Duktilitaetsnachweis. Vorgabe 0.35, hoechstens 0.5 -- die Zahlen stehen beim Nachweis (`duktilitaet.GRENZE`, `duktilitaet.HOECHSTENS`).
 - `lagen: List[LageEintrag] = field(default_factory=list)` – Genau vier, Index 0 = 1. Lage (unterste). Fehlen welche, sind sie leer.
@@ -100,22 +100,10 @@ def bezuege(self) -> List[str]
 
 Die Bauteile, deren Querschnitt die Platte nimmt -- keine.
 
-#### QuerschnittEintrag.pruefen
-
-```python
-def pruefen(self) -> None
-```
-
-Was an dieser Platte nicht stimmen kann, schon beim Oeffnen: die
-Gebrauchslisten samt Anteil. Laeuft auch beim Oeffnen einer Datei --
-darum hier nichts, was eine gespeicherte Platte unoeffenbar machte;
-Namen und Zahlen prueft [[opencivil.projekt.platte#QuerschnittEintrag.regeln|regeln]] vor dem Rechnen. Welche
-Rechenarten ein Kapitel anbietet, steht am Feld seiner Wahl.
-
 #### QuerschnittEintrag.regeln
 
 ```python
-def regeln(self) -> None
+def regeln(self, wo: str) -> None
 ```
 
 Haelt unmoegliche Abmessungen, Zahlen und Namen auf, bevor daraus ein
@@ -130,9 +118,9 @@ Geprueft wird nur, was geometrisch unmoeglich ist, nicht was unueblich
 waere. Ob 20 mm Ueberdeckung fuer die Expositionsklasse genuegen,
 entscheidet der Ingenieur.
 
-**Nicht in [[opencivil.projekt.platte#QuerschnittEintrag.pruefen|pruefen]].** Das laeuft auch beim Oeffnen einer Datei;
-eine abgelegte Platte mit `h = 0` liesse sich dann nicht mehr oeffnen
--- und damit nicht mehr korrigieren. Gefragt wird erst beim Bauen.
+**Nicht beim Oeffnen.** Eine abgelegte Platte mit `h = 0` liesse sich
+sonst nicht mehr oeffnen -- und damit nicht mehr korrigieren. Gefragt
+wird vor dem Rechnen ([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]).
 Ebenso die Namen der Faelle ([[opencivil.projekt.eintraege#eindeutig|eindeutig]]),
 die der Tragsicherheit zuerst: aus ihnen leiten sich die
 Gebrauchslisten ab.

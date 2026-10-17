@@ -18,7 +18,7 @@ import math
 from dataclasses import asdict, dataclass, field
 from typing import Any, Dict, Iterable, List, Mapping, Optional
 
-from opencivil.core.einheiten import MM, MM2, Groesse
+from opencivil.core.einheiten import M, MM, MM2, PROZENT, Groesse
 from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
@@ -27,7 +27,7 @@ from opencivil.querschnitt.platte import (
     ALPHA_MAX, ALPHA_MIN, Bewehrungsposten, Querkraftbewehrung, Richtung,
 )
 from opencivil.projekt.lesen import (
-    ProjektFehler, einer_von, lesen, nicht_negativ, ort, sorten, wahl_aus_text,
+    ProjektFehler, bereich, einer_von, lesen, ort, sorten, wahl_aus_text,
 )
 from opencivil.nachweis.querschnittsloeser import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
@@ -73,10 +73,17 @@ class Beschreibung:
     Ein Wahlfeld haelt das Mitglied seiner Wahl; wer Text zuweist -- die
     Datei, der Konstruktor, die Fassade --, bekommt hier das Mitglied
     (:func:`~opencivil.projekt.lesen.wahl_aus_text`).
+
+    Was ueber mehrere Felder gilt, steht in :meth:`regeln` -- geprueft vor
+    dem Rechnen, nach den Bereichen der Felder
+    (:func:`~opencivil.projekt.lesen.inhalt_pruefen`).
     """
 
     def __setattr__(self, name: str, wert: Any) -> None:
         super().__setattr__(name, wahl_aus_text(type(self), name, wert))
+
+    def regeln(self, wo: str) -> None:
+        """Die Regeln ueber mehrere Felder -- ohne eigene keine. ``wo`` nennt den Eintrag."""
 
     def als_dict(self) -> dict:
         return asdict(self)
@@ -358,27 +365,18 @@ class KnickEintrag(Beschreibung):
     """in kN, Druck negativ."""
 
     M_Ed_1: float = 0.0
-    laenge: float = 3.0
-    """Systemlaenge in m -- geht in die Schiefstellung ein."""
+    laenge: float = bereich(3.0, heisst="Systemlänge", einheit=M, ueber=0.0)
+    """
+    Systemlaenge in m -- geht in die Schiefstellung ein. Bis 2026-10-16
+    rechnete eine Laenge von null und hiess «erfuellt».
+    """
 
-    knicklaenge: float = 3.0
+    knicklaenge: float = bereich(3.0, heisst="Knicklänge", einheit=M, ueber=0.0)
     """Knicklaenge in m."""
 
     aktiv: bool = True
     """Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen -- eine
     geloeschte Zeile muesste man neu eintippen, um sie wieder anzusehen."""
-
-    def regeln(self, wo: str) -> None:
-        """
-        Laenge und Knicklaenge -- erst beim Bauen gefragt, wie die Masse der
-        Platte. Bis 2026-10-16 rechnete eine Laenge von null und hiess
-        «erfuellt».
-        """
-        for feld, wert in (("Systemlänge", self.laenge), ("Knicklänge", self.knicklaenge)):
-            if wert <= 0.0:
-                raise ProjektFehler(
-                    f"{wo}, Knicknachweis '{self.name}': die {feld} muss grösser als "
-                    f"null sein, angegeben sind {wert:g} m.")
 
 
 @dataclass
@@ -391,10 +389,10 @@ class VerformungsfallEintrag(Beschreibung):
     """
 
     name: str
-    w: float = 0.0
+    w: float = bereich(0.0, heisst="Durchbiegung w", einheit=MM, ab=0.0)
     """Durchbiegung in mm, mit E_cm ermittelt -- ein Betrag."""
 
-    laenge: float = 5.0
+    laenge: float = bereich(5.0, heisst="Spannweite L", einheit=M, ueber=0.0)
     """Spannweite L in m -- der Grenzwert ist L/350."""
 
     zugseite: str = einer_von(ZUGSEITEN, "unten")
@@ -402,20 +400,6 @@ class VerformungsfallEintrag(Beschreibung):
 
     aktiv: bool = True
     """Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen."""
-
-    def regeln(self, wo: str) -> None:
-        """
-        w und L -- erst beim Bauen gefragt, wie die Masse der Platte: eine
-        abgelegte Platte mit L = 0 soll sich oeffnen und korrigieren lassen.
-        """
-        if self.w < 0.0:
-            raise ProjektFehler(
-                f"{wo}, Verformungsfall '{self.name}': w ist der Betrag der "
-                f"Durchbiegung und kann nicht negativ sein ({self.w:g} mm).")
-        if self.laenge <= 0.0:
-            raise ProjektFehler(
-                f"{wo}, Verformungsfall '{self.name}': die Spannweite L muss "
-                f"grösser als null sein, angegeben ist {self.laenge:g} m.")
 
 
 @dataclass
@@ -428,7 +412,7 @@ class VerformungEintrag(Beschreibung):
     einmal gerechnet (:mod:`opencivil.nachweis.verformung`).
     """
 
-    kriechzahl: float = nicht_negativ(VERFORMUNG_KRIECHZAHL)
+    kriechzahl: float = bereich(VERFORMUNG_KRIECHZAHL, heisst="Kriechzahl φ", ab=0.0)
     """phi im Vergroesserungsfaktor omega_w, Vorgabe 2."""
 
     faelle: List[VerformungsfallEintrag] = field(default_factory=list)
@@ -493,7 +477,7 @@ class SpannungsfallEintrag(Beschreibung):
     eps_unten: float = 2.0
     """Randdehnungen in Promille -- nur fuer ``dehnungen``."""
 
-    kriechzahl: float = nicht_negativ(0.0)
+    kriechzahl: float = bereich(0.0, heisst="Kriechzahl φ", ab=0.0)
     """Die Kriechzahl φ dieser Analyse."""
 
     werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
@@ -583,7 +567,7 @@ class RechenwahlEintrag(Beschreibung):
     (:class:`VerformungEintrag`).
     """
 
-    kriechzahl: float = nicht_negativ(0.0)
+    kriechzahl: float = bereich(0.0, heisst="Kriechzahl φ", ab=0.0)
     werkstoffsatz: Werkstoffsatz = Werkstoffsatz.BEMESSUNG
     rechenart: Rechenart = einer_von(RECHENARTEN, Rechenart.HANDRECHNUNG)
 
@@ -638,15 +622,23 @@ class Gebrauchsliste(Beschreibung):
     Der gezeichnete Querschnitt hat dieselbe Liste mit anderen Faellen
     (:class:`~opencivil.projekt.querschnittsanalyse.QAGebrauchsliste`): was
     darin steht (:attr:`FALL`), welche Rechenarten sie anbietet (der Typ
-    ihres Feldes :attr:`wahl`) und wie ihr Bauteil in den Meldungen heisst
-    (:attr:`BAUTEIL`).
+    ihres Feldes :attr:`wahl`) und wie ihr Bauteil heisst, wo ein Fall ohne
+    Bauteil gelesen wird (:attr:`BAUTEIL`).
     """
 
     FALL = GebrauchsfallEintrag
     BAUTEIL = "Platte"
 
-    anteil: float
-    """Welcher Anteil der Tragsicherheitseinwirkungen abgeleitet wird, in %."""
+    anteil: float = bereich(heisst="Anteil aus der Tragsicherheit", einheit=PROZENT,
+                            ueber=0.0, bis=100.0)
+    """
+    Welcher Anteil der Tragsicherheitseinwirkungen abgeleitet wird, in %.
+
+    Null ergaebe Lastfaelle ohne Last -- ein Nachweis, der immer aufgeht und
+    nichts sagt. Ueber hundert waere keine Gebrauchslast mehr. Gemeldet
+    statt begrenzt: wer 700 statt 70 tippt, soll es erfahren und nicht mit
+    100 weiterrechnen.
+    """
 
     aus_tragsicherheit: bool = False
     """
@@ -669,33 +661,15 @@ class Gebrauchsliste(Beschreibung):
         self.faelle.append(eintrag)
         return eintrag
 
-    def pruefen(self, bauteil: str, wort: str) -> None:
-        """
-        Was an dieser Liste nicht stimmen kann -- ``wort`` ist «häufige» oder
-        «quasi-ständige» und steht in der Meldung. Die Namen prueft
-        :meth:`namen_pruefen`, vor dem Rechnen.
-        """
-        wo = f"{self.BAUTEIL} '{bauteil}'"
-        # Null ergaebe Lastfaelle ohne Last -- ein Nachweis, der immer
-        # aufgeht und nichts sagt. Ueber hundert waere keine Gebrauchslast
-        # mehr. Gemeldet statt begrenzt: wer 700 statt 70 tippt, soll es
-        # erfahren und nicht mit 100 weiterrechnen.
-        if not 0.0 < self.anteil <= 100.0:
-            raise ProjektFehler(
-                f"{wo}: der Anteil für die {wort}n Lastfälle muss "
-                f"zwischen 0 und 100 % liegen, angegeben sind "
-                f"{self.anteil:g} %.")
-
-
-    def namen_pruefen(self, bauteil: str, kombinationen: List[Any], wort: str) -> None:
+    def namen_pruefen(self, wo: str, kombinationen: List[Any], wort: str) -> None:
         """
         Die Namen dieser Liste, vor dem Rechnen (siehe :func:`eindeutig`). Je
         Liste fuer sich: die beiden Listen landen in getrennten Nachweisen und
         damit in getrennten ID-Raeumen, ein Fall «Dauer» darf in beiden stehen.
         ``kombinationen`` sind die Faelle der Tragsicherheit, aus denen
         abgeleitet wird -- ihre eigenen Namen hat das Bauteil schon geprueft.
+        ``wo`` nennt das Bauteil.
         """
-        wo = f"{self.BAUTEIL} '{bauteil}'"
         eindeutig((f.name for f in self.faelle), wo, f"{wort}r Lastfall")
         # Die abgeleiteten Faelle tragen den Namen ihrer Kombination mit
         # angehaengtem Anteil. Wer einen eigenen Lastfall genau so nennt,

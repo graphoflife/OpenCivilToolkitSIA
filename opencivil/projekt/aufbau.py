@@ -65,7 +65,7 @@ from opencivil.projekt.eintraege import (
 from opencivil.projekt.balkensystem import BalkensystemEintrag, StabquerschnittEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.geotechnik.grundbruch import Fundament, Gleiten, Grundbruch, Kombination
-from opencivil.projekt.lesen import ProjektFehler
+from opencivil.projekt.lesen import ProjektFehler, inhalt_pruefen
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.nachweis.qa_gebrauch import (
@@ -390,6 +390,7 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
     das nichts: dort soll die Zahl stehen, die auch in der Tabelle steht.
     """
     projekt.pruefen()
+    inhalt_pruefen(projekt, "Projekt")
     werk = Rechenwerk()
     aufbau = Aufbau(werk=werk, schnell=schnell)
 
@@ -643,7 +644,6 @@ def _analyse(eintrag: QuerschnittsanalyseEintrag, baustoffe: Mapping[str, Bausto
     einen Satz, der die Analyse nennt.
     """
     wo = f"Querschnittsanalyse '{eintrag.name}'"
-    eintrag.regeln()
 
     def stoff(kennung: str, was: str, art: str) -> Baustoff:
         return _stoff(baustoffe, kennung, art, f"{wo}: {was}")
@@ -836,7 +836,6 @@ def _querschnitt(
     eintrag: QuerschnittEintrag, baustoffe: Mapping[str, Baustoff], *, praefix: str
 ) -> Plattenquerschnitt:
     beton_stoff = _stoff(baustoffe, eintrag.beton, "beton", f"Platte '{eintrag.name}'")
-    eintrag.regeln()
 
     lagen: List[Bewehrungslage] = []
     for nummer, lage in enumerate(eintrag.lagen, start=1):
@@ -988,7 +987,6 @@ def _grundbruch(art: "Bauteilart", eintrag: GrundbruchEintrag, aufbau: Aufbau) -
     sobald eine Kombination eingeschaltet ist. Ohne sie steht das Fundament
     allein da, wie eine Platte ohne Einwirkung.
     """
-    eintrag.regeln()
     fundament = Fundament(
         name=eintrag.name,
         phi_k=Groesse(eintrag.phi_k, GRAD), gamma_phi=Groesse(eintrag.gamma_phi, EINHEITSLOS),

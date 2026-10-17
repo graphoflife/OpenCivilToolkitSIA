@@ -1,5 +1,5 @@
 ---
-erzeugt: db40b5f85735
+erzeugt: f348b9697500
 art: modul
 tags: [modul]
 ---
@@ -253,13 +253,15 @@ wenn man dieselbe Platte hundertmal rechnet.
 def pruefen(self) -> None
 ```
 
-Prueft die Beschreibung -- vor jedem Rechnen und beim Oeffnen einer
-Datei.
+Prueft die Form der Beschreibung -- vor jedem Rechnen und beim Oeffnen
+einer Datei.
 
 Zuerst jedes Feld gegen das, was an ihm steht
 ([[opencivil.projekt.lesen#felder_pruefen|felder_pruefen]]): was in Python
 gebaut wurde, geht so durch dieselbe Tuer wie eine Datei. Danach, was
-mehrere Felder zusammen betrifft.
+mehrere Eintraege zusammen betrifft. Den Inhalt -- Bereiche und
+Regeln der Bauteile -- prueft erst das Rechnen
+([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]).
 
 #### Projekt.aufbauen
 

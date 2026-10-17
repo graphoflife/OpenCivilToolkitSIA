@@ -1,5 +1,5 @@
 ---
-erzeugt: ee2091dc796d
+erzeugt: d74f5716d54d
 art: modul
 tags: [modul]
 ---
@@ -249,6 +249,10 @@ class BalkensystemEintrag(Beschreibung)
 
 Ein ebener Rahmen: Knoten, Linien, Lager, Lasten, Querschnitte, Lastfaelle, Kombinationen.
 
+Ohne Regeln, die das ganze Projekt aufhielten: was an einem System nicht
+stimmt -- auch zwei Faelle gleichen Namens --, steht in seinen Meldungen
+([[opencivil.projekt.balkensystem#BalkensystemEintrag.modell|modell]]), und die anderen Bauteile rechnen weiter.
+
 - `BEZEICHNUNG = 'Balkensystem'`
 - `kennung: str`
 - `name: str`
@@ -260,16 +264,6 @@ Ein ebener Rahmen: Knoten, Linien, Lager, Lasten, Querschnitte, Lastfaelle, Komb
 - `lastfaelle: List[LastfallEintrag] = field(default_factory=list)`
 - `kombinationen: List[LastkombinationEintrag] = field(default_factory=list)`
 - `beschreibung: str = ''` – Freier Text -- geht in keine Rechnung ein.
-
-#### BalkensystemEintrag.pruefen
-
-```python
-def pruefen(self) -> None
-```
-
-Nichts, was das ganze Projekt aufhielte: was an einem System nicht
-stimmt -- auch zwei Faelle gleichen Namens --, steht in seinen
-Meldungen ([[opencivil.projekt.balkensystem#BalkensystemEintrag.modell|modell]]), und die anderen Bauteile rechnen weiter.
 
 #### BalkensystemEintrag.materialien
 

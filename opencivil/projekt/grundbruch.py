@@ -110,17 +110,13 @@ class GrundbruchEintrag(Beschreibung):
         self.kombinationen.append(eintrag)
         return eintrag
 
-    def pruefen(self) -> None:
+    def regeln(self, wo: str) -> None:
         """
-        Beim Oeffnen nichts ueber die Felder hinaus: Namen und Zahlen prueft
-        :meth:`regeln` vor dem Rechnen -- eine abgelegte Datei mit b = 0 oder
-        zwei gleich benannten Kombinationen soll sich oeffnen und korrigieren
-        lassen.
+        Haelt unmoegliche Zahlen und Namen auf, bevor daraus ein Widerstand
+        wird -- vor dem Rechnen und nicht beim Oeffnen: eine abgelegte Datei
+        mit b = 0 oder zwei gleich benannten Kombinationen soll sich oeffnen
+        und korrigieren lassen.
         """
-
-    def regeln(self) -> None:
-        """Haelt unmoegliche Zahlen und Namen auf, bevor daraus ein Widerstand wird."""
-        wo = f"Grundbruch '{self.name}'"
         eindeutig((k.name for k in self.kombinationen), wo, "Kombination")
         for feld, wert, wie in (
                 ("Breite b", self.b, self.b > 0.0),

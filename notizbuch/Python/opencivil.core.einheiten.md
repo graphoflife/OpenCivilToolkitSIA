@@ -1,5 +1,5 @@
 ---
-erzeugt: 3699a5d53297
+erzeugt: c3d3c06e9f49
 art: modul
 tags: [modul]
 ---
@@ -464,6 +464,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.lesen]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.schnittanalyse]]
