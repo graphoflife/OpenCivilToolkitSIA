@@ -1,5 +1,5 @@
 ---
-erzeugt: f42d2a83064c
+erzeugt: 53b57ad3883e
 art: modul
 tags: [modul]
 ---
@@ -221,7 +221,7 @@ trifft sie nicht genauer.
 ### plattenfasern
 
 ```python
-def plattenfasern(*, h: float, b: float, beton: Callable[[float], float], staebe: Sequence[Tuple[float, float, Callable[[float], float]]], fasern: int=FASERN, gemittelt: bool=False, verdraengt: bool=True) -> Faserquerschnitt
+def plattenfasern(*, h: float, b: float, beton: Gesetz, staebe: Sequence[Tuple[float, float, Gesetz]], fasern: int=FASERN, verdraengt: bool=True) -> Faserquerschnitt
 ```
 
 Die Platte als Fasern: gleich dicke Scheiben ueber die Hoehe, der Arm ab
@@ -229,10 +229,11 @@ der Mittelebene, dazu je Lage `(Flaeche, z, Gesetz)` ein Stab.
 
 Der Loeser und die genaue Resistenzlinie
 ([[opencivil.nachweis.resistenzlinie#Ebenenlinie|Ebenenlinie]]) rechnen mit
-demselben Querschnitt -- darum steht er einmal da. `gemittelt` und
-`verdraengt` wie bei [[opencivil.nachweis.querschnittsloeser#Querschnittsloeser|Querschnittsloeser]]. Die Ausdruecke
-stehen genau so da wie vor dem Umbau: dieselben Zahlen bis aufs letzte
-Bit, und damit derselbe Bericht.
+demselben Querschnitt -- darum steht er einmal da. `verdraengt` wie bei
+[[opencivil.nachweis.querschnittsloeser#Querschnittsloeser|Querschnittsloeser]]. Jede Faser und jeder Stab kennt seine Dicke:
+gemittelt wird damit, wo das Gesetz springt
+([[opencivil.querschnitt.fasern]]). Bis 2026-10-17 sagte das ein
+Schalter `gemittelt`, den jeder Aufrufer aus der Rechenart ableitete.
 
 ### Faserloeser
 
@@ -492,11 +493,11 @@ wer es weitet, muss das Gesetz mitweiten.
 
 Ohne `grenzen` gelten beide Werte an beiden Raendern. Wer andere
 Grenzen braucht -- die Spannung-Dehnung-Analyse die des Dehnungsfaechers,
-mit `eps_ud` am Stahl statt am Betonrand --, gibt sie mit.
-`gemittelt` laesst ein Gesetz, das springt (der Spannungsblock), ueber
-jede Faser mitteln statt in ihrer Mitte lesen: sonst springt mit ihm die
-Normalkraft, und keine Ebene trifft sie genau. Ohne `verdraengt` zaehlt
-der Beton auch dort, wo der Stahl liegt -- so rechnet die Handrechnung.
+mit `eps_ud` am Stahl statt am Betonrand --, gibt sie mit. Ein Gesetz,
+das springt (der Spannungsblock), wird ueber jede Faser gemittelt statt
+in ihrer Mitte gelesen: sonst springt mit ihm die Normalkraft, und keine
+Ebene trifft sie genau. Ohne `verdraengt` zaehlt der Beton auch dort,
+wo der Stahl liegt -- so rechnet die Handrechnung.
 
 Welche Gesetze zu welcher Wahl gehoeren, sagt
 [[opencivil.nachweis.rechenwahl#gesetze|opencivil.nachweis.rechenwahl.gesetze]].

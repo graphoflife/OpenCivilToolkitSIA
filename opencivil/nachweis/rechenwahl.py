@@ -326,11 +326,6 @@ class Gesetze:
         return replace(s, nur_zug=self.wahl.art is Rechenart.HANDRECHNUNG)
 
     @property
-    def gemittelt(self) -> bool:
-        """Der Block springt: ueber jede Faser gemittelt, sonst springt N mit."""
-        return self.wahl.art.mit_block
-
-    @property
     def verdraengt(self) -> bool:
         """Die Handrechnung zaehlt den Beton auch, wo der Stahl liegt."""
         return self.wahl.art is not Rechenart.HANDRECHNUNG
@@ -354,8 +349,7 @@ class Gesetze:
         """
         return klasse(
             h=h, b=b, lagen=self.lagen(lagen, h), beton=beton or self.beton,
-            stahl=self.stahl, gemittelt=self.gemittelt and beton is None,
-            verdraengt=self.verdraengt, **fenster)
+            stahl=self.stahl, verdraengt=self.verdraengt, **fenster)
 
 
 def protokoll_rechenwahl(p: Protokoll, wahl: Rechenwahl, basis: str, *,

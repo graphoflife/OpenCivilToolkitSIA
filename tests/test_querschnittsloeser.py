@@ -237,7 +237,7 @@ class TestVerfehlteEbene(unittest.TestCase):
             h=0.25, b=1.0,
             lagen=[Stahllage(a_s=1131e-6, z=0.025, stahl=self.STAHL, nummer=1),
                    Stahllage(a_s=1131e-6, z=0.225, stahl=self.STAHL, nummer=2)],
-            beton=beton or self.BLOCK, gemittelt=beton is None)
+            beton=beton or self.BLOCK)
 
     def test_viel_druck_und_wenig_moment_ist_verfehlt(self):
         for klasse in (Querschnittsloeser, QuerschnittsloeserIllinois):
@@ -319,8 +319,8 @@ class TestIllinoisMitWarmstart(unittest.TestCase):
     def test_springt_ein_gesetz_wird_halbiert(self):
         """Mit dem Spannungsblock Zeichen für Zeichen das Halbieren -- auch nach einer Folge."""
         block = Spannungsblock(f_cd=20e6, eps_c2d=0.0035)
-        halbiert = self.platte(Querschnittsloeser, block, gemittelt=True)
-        illinois = self.platte(QuerschnittsloeserIllinois, block, gemittelt=True)
+        halbiert = self.platte(Querschnittsloeser, block)
+        illinois = self.platte(QuerschnittsloeserIllinois, block)
         self.assertTrue(illinois.halbiert)
         self.assertEqual(illinois.suche, Querschnittsloeser.SUCHE)
         for N, M in self.FOLGE:

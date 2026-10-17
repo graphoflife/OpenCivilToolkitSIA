@@ -1,5 +1,5 @@
 ---
-erzeugt: 6c841d16372d
+erzeugt: f0612bba7d47
 art: modul
 tags: [modul]
 ---
@@ -298,15 +298,6 @@ def stahl(self, s: Stahlgesetz) -> Stahlgesetz
 ```
 
 Der Stahl einer Lage, wie der Loeser ihn rechnet -- in der Handrechnung nur auf Zug.
-
-#### Gesetze.gemittelt
-
-```python
-@property
-def gemittelt(self) -> bool
-```
-
-Der Block springt: ueber jede Faser gemittelt, sonst springt N mit.
 
 #### Gesetze.verdraengt
 

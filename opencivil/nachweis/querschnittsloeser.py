@@ -77,7 +77,7 @@ from opencivil.core.wahl import Wahl
 from opencivil.querschnitt.fasern import (
     Dehnungsgrenze, Dehnungsgrenzen, Fasergruppe, Faserquerschnitt, Stab,
 )
-from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
+from opencivil.querschnitt.werkstoffgesetz import Gesetz, Stahlgesetz
 
 #: Fasern ueber die Plattenhoehe. 60 reichen: die Betonspannung ist stetig,
 #: und der Fehler der Mittelpunktsregel faellt mit dem Quadrat der Faserdicke.
@@ -344,9 +344,8 @@ def probenschranken(querschnitt: Faserquerschnitt,
 
 
 def plattenfasern(
-    *, h: float, b: float, beton: Callable[[float], float],
-    staebe: Sequence[Tuple[float, float, Callable[[float], float]]],
-    fasern: int = FASERN, gemittelt: bool = False, verdraengt: bool = True,
+    *, h: float, b: float, beton: Gesetz, staebe: Sequence[Tuple[float, float, Gesetz]],
+    fasern: int = FASERN, verdraengt: bool = True,
 ) -> Faserquerschnitt:
     """
     Die Platte als Fasern: gleich dicke Scheiben ueber die Hoehe, der Arm ab
@@ -354,10 +353,11 @@ def plattenfasern(
 
     Der Loeser und die genaue Resistenzlinie
     (:class:`~opencivil.nachweis.resistenzlinie.Ebenenlinie`) rechnen mit
-    demselben Querschnitt -- darum steht er einmal da. ``gemittelt`` und
-    ``verdraengt`` wie bei :class:`Querschnittsloeser`. Die Ausdruecke
-    stehen genau so da wie vor dem Umbau: dieselben Zahlen bis aufs letzte
-    Bit, und damit derselbe Bericht.
+    demselben Querschnitt -- darum steht er einmal da. ``verdraengt`` wie bei
+    :class:`Querschnittsloeser`. Jede Faser und jeder Stab kennt seine Dicke:
+    gemittelt wird damit, wo das Gesetz springt
+    (:mod:`opencivil.querschnitt.fasern`). Bis 2026-10-17 sagte das ein
+    Schalter ``gemittelt``, den jeder Aufrufer aus der Rechenart ableitete.
     """
     dicke = h / fasern
     return Faserquerschnitt(
@@ -365,12 +365,11 @@ def plattenfasern(
             gesetz=beton,
             arme=tuple((i + 0.5) * dicke - h / 2.0 for i in range(fasern)),
             flaechen=dicke * b,
-            dicken=(dicke,) * fasern if gemittelt else None)],
+            dicken=(dicke,) * fasern)],
         # Netto: der Stahl ersetzt den Beton an seiner Stelle -- ausser
         # in der Handrechnung, die den Beton durchgehend zaehlt.
         staebe=[Stab(arm=z - h / 2.0, flaeche=a_s, gesetz=gesetz,
-                     verdraengt=beton if verdraengt else None,
-                     dicke=dicke if gemittelt else 0.0)
+                     verdraengt=beton if verdraengt else None, dicke=dicke)
                 for a_s, z, gesetz in staebe])
 
 
@@ -858,11 +857,11 @@ class Querschnittsloeser(Faserloeser):
 
     Ohne ``grenzen`` gelten beide Werte an beiden Raendern. Wer andere
     Grenzen braucht -- die Spannung-Dehnung-Analyse die des Dehnungsfaechers,
-    mit ``eps_ud`` am Stahl statt am Betonrand --, gibt sie mit.
-    ``gemittelt`` laesst ein Gesetz, das springt (der Spannungsblock), ueber
-    jede Faser mitteln statt in ihrer Mitte lesen: sonst springt mit ihm die
-    Normalkraft, und keine Ebene trifft sie genau. Ohne ``verdraengt`` zaehlt
-    der Beton auch dort, wo der Stahl liegt -- so rechnet die Handrechnung.
+    mit ``eps_ud`` am Stahl statt am Betonrand --, gibt sie mit. Ein Gesetz,
+    das springt (der Spannungsblock), wird ueber jede Faser gemittelt statt
+    in ihrer Mitte gelesen: sonst springt mit ihm die Normalkraft, und keine
+    Ebene trifft sie genau. Ohne ``verdraengt`` zaehlt der Beton auch dort,
+    wo der Stahl liegt -- so rechnet die Handrechnung.
 
     Welche Gesetze zu welcher Wahl gehoeren, sagt
     :func:`opencivil.nachweis.rechenwahl.gesetze`.
@@ -874,13 +873,12 @@ class Querschnittsloeser(Faserloeser):
         h: float,
         b: float,
         lagen: Sequence[Stahllage],
-        beton: Callable[[float], float],
-        stahl: Optional[Callable[[Stahlgesetz], Callable[[float], float]]] = None,
+        beton: Gesetz,
+        stahl: Optional[Callable[[Stahlgesetz], Stahlgesetz]] = None,
         fasern: int = FASERN,
         eps_druck: float = EPS_DRUCK,
         eps_zug: Optional[float] = None,
         grenzen: Optional[Sequence[Dehnungsgrenze]] = None,
-        gemittelt: bool = False,
         verdraengt: bool = True,
     ) -> None:
         lagen = list(lagen)
@@ -890,7 +888,7 @@ class Querschnittsloeser(Faserloeser):
         querschnitt = plattenfasern(
             h=h, b=b, beton=beton,
             staebe=[(l.a_s, l.z, stahl(l.stahl)) for l in lagen],
-            fasern=fasern, gemittelt=gemittelt, verdraengt=verdraengt)
+            fasern=fasern, verdraengt=verdraengt)
         super().__init__(
             querschnitt=querschnitt,
             # Der gueltige Bereich der Gesetze gilt an beiden Raendern -- wenn

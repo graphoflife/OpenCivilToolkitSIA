@@ -266,7 +266,7 @@ class Ebenenlinie(Widerstandslinie):
         self.querschnitt = plattenfasern(
             h=h, b=b, beton=beton,
             staebe=[(l.a_s, l.z, stahl) for l, stahl in zip(self.lagen, self.staehle)],
-            fasern=fasern, gemittelt=wahl.art.mit_block, verdraengt=True)
+            fasern=fasern, verdraengt=True)
         self.grenzen, self.grenznamen = dehnungsfaecher.grenzen(
             h, [(l.z, l.stahl.eps_ud, f"Stahl der {l.text}") for l in self.lagen],
             eps_c1d=eps_c1d, eps_c2d=eps_c2d)
