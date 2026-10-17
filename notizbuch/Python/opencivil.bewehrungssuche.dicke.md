@@ -1,5 +1,5 @@
 ---
-erzeugt: 3a759b9fd84a
+erzeugt: 9a18082975fa
 art: modul
 tags: [modul]
 ---
@@ -72,7 +72,8 @@ Mindestbewehrung, die mit der Dicke waechst, erst bei sehr dicken Platten
 nicht mehr.
 
 `wie` geht an [[opencivil.bewehrungssuche.laengs#suche|suche]] (Teilungen, Durchmesser); das Projekt
-bleibt unberuehrt.
+bleibt unberuehrt. Was an der Platte nicht stimmen kann, meldet sich
+vorab, mit ihrer eingegebenen Dicke ([[opencivil.bewehrungssuche.bewertung#vorab_pruefen|vorab_pruefen]]).
 
 ### _versuche_text
 
@@ -90,6 +91,7 @@ def _versuche_text(ergebnis: Dickenergebnis) -> str
 
 ## Braucht
 
+- [[opencivil.bewehrungssuche.bewertung]]
 - [[opencivil.bewehrungssuche.laengs]]
 
 ## Gebraucht von

@@ -13,7 +13,7 @@ import math
 from dataclasses import dataclass
 from typing import Optional, Sequence
 
-from opencivil.bewehrungssuche.bewertung import arbeitskopie, bewerte
+from opencivil.bewehrungssuche.bewertung import arbeitskopie, bewerte, vorab_pruefen
 from opencivil.bewehrungssuche.laengs import TEILUNGEN, teilungen_der_suche
 
 #: Buegel dicker als ⌀26 biegt niemand -- die Buegelsuche bleibt darunter.
@@ -53,8 +53,10 @@ def buegel_suchen(projekt, kennung: str, *,
     ein dicker Stab weit auseinander kann weniger Stahl sein als ein duenner
     eng, und teurer ist er trotzdem seltener.
 
-    Geht es ohne Buegel, kommt das heraus: Durchmesser null.
+    Geht es ohne Buegel, kommt das heraus: Durchmesser null. Was an der
+    Platte nicht stimmen kann, meldet sich vorab (:func:`vorab_pruefen`).
     """
+    vorab_pruefen(projekt, kennung)
     teilungen = teilungen_der_suche(teilungen)
     durchmesser = sorted(d for d in durchmesser if d > 0) or list(BUEGELDURCHMESSER)
 

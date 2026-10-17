@@ -1,5 +1,5 @@
 ---
-erzeugt: fe76018dbef6
+erzeugt: 3adc9b80f5f7
 art: modul
 tags: [modul]
 ---
@@ -44,7 +44,8 @@ wird. Verglichen wird ueber den Buegelquerschnitt je Flaecheneinheit --
 ein dicker Stab weit auseinander kann weniger Stahl sein als ein duenner
 eng, und teurer ist er trotzdem seltener.
 
-Geht es ohne Buegel, kommt das heraus: Durchmesser null.
+Geht es ohne Buegel, kommt das heraus: Durchmesser null. Was an der
+Platte nicht stimmen kann, meldet sich vorab ([[opencivil.bewehrungssuche.bewertung#vorab_pruefen|vorab_pruefen]]).
 
 ### buegel_uebernehmen
 

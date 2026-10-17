@@ -113,6 +113,20 @@ def bewerte(projekt) -> Bewertung:
     return Bewertung(rueckstand, schlechtester, name, len(zaehlt))
 
 
+def vorab_pruefen(projekt, kennung: str) -> None:
+    """
+    Was an der Platte nicht stimmen kann, meldet sich vor der Suche -- als
+    Fehler und nicht als «nicht gefunden». In der Bewertung wird jede
+    Ausnahme ein Nein (:func:`bewerte`); eine Platte mit h = 0 hiess dort,
+    keine Bewehrung reiche. Geprueft wird, was die Suche rechnet: die Platte
+    mit den Materialien (``Projekt.nur``), Form und Inhalt -- gebaut wird
+    nicht, eine Platte ohne Bewehrung darf ihre Suche haben.
+    """
+    probe = projekt.nur(kennung)
+    probe.pruefen()
+    probe.inhalt_pruefen()
+
+
 # ===========================================================================
 # Die Platte der Suche
 # ===========================================================================

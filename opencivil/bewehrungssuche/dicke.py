@@ -15,6 +15,7 @@ import math
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
+from opencivil.bewehrungssuche.bewertung import vorab_pruefen
 from opencivil.bewehrungssuche.laengs import Suchergebnis, Suchmodus, suche
 
 # ===========================================================================
@@ -84,8 +85,10 @@ def dicke_suchen(projekt, kennung: str, *, modus: Suchmodus,
     nicht mehr.
 
     ``wie`` geht an :func:`suche` (Teilungen, Durchmesser); das Projekt
-    bleibt unberuehrt.
+    bleibt unberuehrt. Was an der Platte nicht stimmen kann, meldet sich
+    vorab, mit ihrer eingegebenen Dicke (:func:`vorab_pruefen`).
     """
+    vorab_pruefen(projekt, kennung)
     ergebnis = Dickenergebnis(modus=modus)
     eintrag = projekt.querschnitt(kennung)
     duktil = eintrag.duktilitaet
@@ -96,7 +99,7 @@ def dicke_suchen(projekt, kennung: str, *, modus: Suchmodus,
         if h not in geprueft:
             probe = copy.deepcopy(projekt)
             probe.querschnitt(kennung).h = h
-            such = suche(probe, kennung, modus=modus, **wie)
+            such = suche(probe, kennung, modus=modus, geprueft=True, **wie)
             # Die Suche geht der Duktilitaet aus dem Weg (sie wird mit mehr
             # Stahl schlechter); hier zaehlt sie, wenn sie eingeschaltet ist --
             # eine dickere Platte ist das Mittel gegen sie.

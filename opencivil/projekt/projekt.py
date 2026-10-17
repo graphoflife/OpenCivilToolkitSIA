@@ -30,7 +30,7 @@ from opencivil.projekt.eintraege import (
 )
 from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
-from opencivil.projekt.lesen import ProjektFehler, felder_pruefen, lesen, ort
+from opencivil.projekt.lesen import ProjektFehler, felder_pruefen, inhalt_pruefen, lesen, ort
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.skript import VORLAGE, SkriptEintrag
 from opencivil.projekt.querschnittsanalyse import (
@@ -394,6 +394,14 @@ class Projekt(Beschreibung):
                     f"müssen eindeutig sein, sonst lässt sich im Bericht nicht "
                     f"erkennen, welches gemeint ist.")
             gesehen[m.anzeigename] = m.kennung
+
+    def inhalt_pruefen(self) -> None:
+        """
+        Prueft den Inhalt, vor jedem Rechnen und vor jeder Suche: Bereiche
+        und Regeln jedes Eintrags (:func:`~opencivil.projekt.lesen.inhalt_pruefen`).
+        Die Form prueft :meth:`pruefen`.
+        """
+        inhalt_pruefen(self, "Projekt")
 
     # -- Aufbau -------------------------------------------------------------
 

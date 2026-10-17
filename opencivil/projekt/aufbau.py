@@ -65,7 +65,7 @@ from opencivil.projekt.eintraege import (
 from opencivil.projekt.balkensystem import BalkensystemEintrag, StabquerschnittEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.geotechnik.grundbruch import Fundament, Gleiten, Grundbruch, Kombination
-from opencivil.projekt.lesen import ProjektFehler, inhalt_pruefen
+from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.nachweis.qa_gebrauch import (
@@ -390,7 +390,7 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
     das nichts: dort soll die Zahl stehen, die auch in der Tabelle steht.
     """
     projekt.pruefen()
-    inhalt_pruefen(projekt, "Projekt")
+    projekt.inhalt_pruefen()
     werk = Rechenwerk()
     aufbau = Aufbau(werk=werk, schnell=schnell)
 

@@ -14,7 +14,7 @@ import unittest
 from unittest import mock
 
 from opencivil import bewehrungssuche as suche
-from opencivil.bewehrungssuche.bewertung import arbeitskopie, bewerte
+from opencivil.bewehrungssuche.bewertung import arbeitskopie, bewerte, vorab_pruefen
 from opencivil.bewehrungssuche.laengs import _ueber_grenze
 from opencivil.projekt import (
     KnickEintrag, ObergrenzeEintrag, PostenEintrag, Projekt, ProjektFehler,
@@ -612,6 +612,27 @@ class TestUeberDenDienst(unittest.TestCase):
         # Durchmesser nicht selbst einsetzen müssen.
         fertig = Projekt.aus_dict(antwort.daten["projekt"])
         self.assertGreaterEqual(schlechtester(fertig), 1.0)
+
+    def test_eine_unmoegliche_platte_meldet_sich_vorab(self):
+        """Bis 2026-10-17 hiess sie «nicht gefunden» -- als reichte keine Bewehrung."""
+        for felder, text in (({"h": 0.0}, "Dicke h muss grösser als null sein"),
+                             ({"k_c": -1.0}, "k_c muss grösser als null sein")):
+            for dicke in (False, True):
+                with self.subTest(felder=felder, dicke=dicke):
+                    antwort = dienst.bearbeite("bewehrung_suchen", {
+                        "projekt": platte(automatik_dicke=dicke, **felder).als_dict(),
+                        "kennung": "q1"})
+                    self.assertEqual(antwort.status, 400)
+                    self.assertIn(text, antwort.daten["fehler"])
+
+    def test_vorab_wird_nicht_gebaut(self):
+        """Eine Platte ohne Bewehrung lässt sich nicht rechnen -- aber suchen."""
+        projekt = platte()
+        for lage in projekt.querschnitt("q1").lagen:
+            lage.grund.durchmesser = lage.zulage.durchmesser = 0.0
+        with self.assertRaisesRegex(ProjektFehler, "ohne Bewehrung"):
+            projekt.aufbauen()
+        vorab_pruefen(projekt, "q1")
 
     def test_eine_unbekannte_platte_ist_ein_404(self):
         antwort = dienst.bearbeite("bewehrung_suchen", {

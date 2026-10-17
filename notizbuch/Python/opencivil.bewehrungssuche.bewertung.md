@@ -1,5 +1,5 @@
 ---
-erzeugt: ae0269b5c08a
+erzeugt: 1ca6362f4149
 art: modul
 tags: [modul]
 ---
@@ -81,6 +81,19 @@ hiesse dem Benutzer Bewehrung aufzudraengen, die er nicht verlangt hat.
 Der Duktilitaetsnachweis faellt so von selbst heraus:
 [[opencivil.bewehrungssuche.bewertung#arbeitskopie|arbeitskopie]] schaltet ihn ab.
 
+### vorab_pruefen
+
+```python
+def vorab_pruefen(projekt, kennung: str) -> None
+```
+
+Was an der Platte nicht stimmen kann, meldet sich vor der Suche -- als
+Fehler und nicht als «nicht gefunden». In der Bewertung wird jede
+Ausnahme ein Nein ([[opencivil.bewehrungssuche.bewertung#bewerte|bewerte]]); eine Platte mit h = 0 hiess dort,
+keine Bewehrung reiche. Geprueft wird, was die Suche rechnet: die Platte
+mit den Materialien (`Projekt.nur`), Form und Inhalt -- gebaut wird
+nicht, eine Platte ohne Bewehrung darf ihre Suche haben.
+
 ### arbeitskopie
 
 ```python
@@ -120,4 +133,5 @@ Regel soll die Suche nichts vorbeischmuggeln.
 
 - [[opencivil.bewehrungssuche]]
 - [[opencivil.bewehrungssuche.buegel]]
+- [[opencivil.bewehrungssuche.dicke]]
 - [[opencivil.bewehrungssuche.laengs]]

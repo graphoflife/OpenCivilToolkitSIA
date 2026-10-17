@@ -1,5 +1,5 @@
 ---
-erzeugt: 1849aa1eb1a3
+erzeugt: beb96ba10a53
 art: modul
 tags: [modul]
 ---
@@ -277,7 +277,7 @@ suchen.
 ### suche
 
 ```python
-def suche(projekt, kennung: str, *, modus: Suchmodus=Suchmodus.GRUND_OHNE, teilungen: Sequence[float]=TEILUNGEN, durchmesser: Sequence[float]=DURCHMESSER, mindestdurchmesser: float=MINDESTDURCHMESSER) -> Suchergebnis
+def suche(projekt, kennung: str, *, modus: Suchmodus=Suchmodus.GRUND_OHNE, teilungen: Sequence[float]=TEILUNGEN, durchmesser: Sequence[float]=DURCHMESSER, mindestdurchmesser: float=MINDESTDURCHMESSER, geprueft: bool=False) -> Suchergebnis
 ```
 
 Die kleinste Bewehrung, mit der alle eingeschalteten Nachweise aufgehen.
@@ -285,6 +285,11 @@ Die kleinste Bewehrung, mit der alle eingeschalteten Nachweise aufgehen.
 Mit `mindestdurchmesser` hat die Grundbewehrung jeder Lage wenigstens
 ihn -- siehe «Der Mindestdurchmesser» oben. Null: eine Lage darf leer
 bleiben.
+
+Was an der Platte nicht stimmen kann, meldet sich vorab
+([[opencivil.bewehrungssuche.bewertung#vorab_pruefen|vorab_pruefen]]). `geprueft`
+heisst: das hat der Aufrufer schon getan -- die Dickensuche, deren duenne
+Versuche das Bauen ablehnen darf; dort heisst das «geht nicht».
 
 Zurueck kommt ein [[opencivil.bewehrungssuche.laengs#Suchergebnis|Suchergebnis]]; das Projekt selbst bleibt
 unberuehrt. Wer die gefundene Bewehrung uebernehmen will, ruft

@@ -52,7 +52,7 @@ import copy
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, List, Optional, Sequence, Tuple
 
-from opencivil.bewehrungssuche.bewertung import Bewertung, arbeitskopie, bewerte
+from opencivil.bewehrungssuche.bewertung import Bewertung, arbeitskopie, bewerte, vorab_pruefen
 from opencivil.core.wahl import Wahl
 from opencivil.querschnitt.platte import Richtung
 
@@ -428,7 +428,8 @@ def suche(projekt, kennung: str, *,
           modus: Suchmodus = Suchmodus.GRUND_OHNE,
           teilungen: Sequence[float] = TEILUNGEN,
           durchmesser: Sequence[float] = DURCHMESSER,
-          mindestdurchmesser: float = MINDESTDURCHMESSER) -> Suchergebnis:
+          mindestdurchmesser: float = MINDESTDURCHMESSER,
+          geprueft: bool = False) -> Suchergebnis:
     """
     Die kleinste Bewehrung, mit der alle eingeschalteten Nachweise aufgehen.
 
@@ -436,10 +437,17 @@ def suche(projekt, kennung: str, *,
     ihn -- siehe «Der Mindestdurchmesser» oben. Null: eine Lage darf leer
     bleiben.
 
+    Was an der Platte nicht stimmen kann, meldet sich vorab
+    (:func:`~opencivil.bewehrungssuche.bewertung.vorab_pruefen`). ``geprueft``
+    heisst: das hat der Aufrufer schon getan -- die Dickensuche, deren duenne
+    Versuche das Bauen ablehnen darf; dort heisst das «geht nicht».
+
     Zurueck kommt ein :class:`Suchergebnis`; das Projekt selbst bleibt
     unberuehrt. Wer die gefundene Bewehrung uebernehmen will, ruft
     :func:`uebernehmen`.
     """
+    if not geprueft:
+        vorab_pruefen(projekt, kennung)
     ergebnis = Suchergebnis(modus=modus)
     je_art = Stufen.aus(durchmesser, mindestdurchmesser)
 

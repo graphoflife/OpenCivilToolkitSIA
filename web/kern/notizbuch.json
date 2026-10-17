@@ -2285,6 +2285,7 @@
         "Bewertung.abstand",
         "Bewertung.erfuellt",
         "bewerte",
+        "vorab_pruefen",
         "arbeitskopie"
       ]
     },
@@ -3752,6 +3753,7 @@
         "Projekt.rechnen",
         "Projekt.pruefen",
         "Projekt.regeln",
+        "Projekt.inhalt_pruefen",
         "Projekt.aufbauen",
         "Projekt.speichern",
         "Projekt.laden",

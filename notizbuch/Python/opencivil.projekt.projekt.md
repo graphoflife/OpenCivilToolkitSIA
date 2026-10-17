@@ -1,5 +1,5 @@
 ---
-erzeugt: 504fab4c9ff3
+erzeugt: 5dae8a47b663
 art: modul
 tags: [modul]
 ---
@@ -272,6 +272,16 @@ def regeln(self, wo: str) -> None
 ```
 
 Die Namen der Materialien, vor dem Rechnen -- je Material einer.
+
+#### Projekt.inhalt_pruefen
+
+```python
+def inhalt_pruefen(self) -> None
+```
+
+Prueft den Inhalt, vor jedem Rechnen und vor jeder Suche: Bereiche
+und Regeln jedes Eintrags ([[opencivil.projekt.lesen#inhalt_pruefen|inhalt_pruefen]]).
+Die Form prueft [[opencivil.projekt.projekt#Projekt.pruefen|pruefen]].
 
 #### Projekt.aufbauen
 
