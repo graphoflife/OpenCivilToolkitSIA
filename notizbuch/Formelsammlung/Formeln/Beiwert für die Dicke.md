@@ -1,5 +1,5 @@
 ---
-erzeugt: c55aa611209b
+erzeugt: 69ee1c80c604
 art: formel
 tags: [formel]
 normstelle: ["SIA 262:2025, 4.4.2", "SIA 262:2025, 4.4.1.3"]
@@ -46,7 +46,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.sproedes_versagen#protokoll_zugfestigkeit|protokoll_zugfestigkeit]]
+- [[opencivil.nachweis.rissgroessen#protokoll_zugfestigkeit|protokoll_zugfestigkeit]]
 
 ## Themen
 

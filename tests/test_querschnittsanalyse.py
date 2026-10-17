@@ -350,7 +350,7 @@ class TestRichtungen(unittest.TestCase):
         Rechteck 300 × 600: W = b·h²/6 und k_t aus h/3 -- dieselbe Zahl wie
         bei der Platte, um y mit h = 600, um z mit h = 300.
         """
-        from opencivil.nachweis.sproedes_versagen import rissmoment
+        from opencivil.nachweis.rissgroessen import rissmoment_rechteck as rissmoment
         e = projekt(sproede=True).rechnen()
         alle = {u.fall: u for u in e.loesung.urteile if u.raum.endswith("sproede")}
         f_ctm = e.wert("beton.b1.f_ctm").groesse.si

@@ -3,7 +3,7 @@
 import math
 import unittest
 
-from opencivil.nachweis import mindestbewehrung, sproedes_versagen, zustand2
+from opencivil.nachweis import mindestbewehrung, rissgroessen, zustand2
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt import Projekt
 from opencivil.web import dienst
@@ -276,7 +276,7 @@ class TestRissmomentGroessen(unittest.TestCase):
             f_ct,eff = 2.762 N/mm²
             M_Riss   = 2.762 · 300²·1000/6 = 41.4 kNm
         """
-        g = sproedes_versagen.rissmoment(h=0.300, b=1.0, f_ctm=2.9e6)
+        g = rissgroessen.rissmoment_rechteck(h=0.300, b=1.0, f_ctm=2.9e6)
         self.assertAlmostEqual(g.k_t, 0.9524, places=4)
         self.assertAlmostEqual(g.f_ct_eff / 1e6, 2.762, places=3)
         self.assertAlmostEqual(g.M_Riss / 1e3, 41.4, delta=0.1)
@@ -286,17 +286,17 @@ class TestRissmomentGroessen(unittest.TestCase):
         Unter Biegung reisst nur der Randbereich, unter Zwang die halbe Höhe --
         darum h/3 statt h. Das Rissmoment ist damit weniger abgemindert.
         """
-        biegung = sproedes_versagen.rissmoment(h=0.800, b=1.0, f_ctm=2.9e6)
+        biegung = rissgroessen.rissmoment_rechteck(h=0.800, b=1.0, f_ctm=2.9e6)
         zwang = mindestbewehrung.rissnormalkraft(
             h=0.800, b=1.0, f_ctm=2.9e6, begrenzt=False)
         self.assertGreater(biegung.k_t, zwang.k_t)
 
     def test_die_dicke_geht_ungekuerzt_ein(self):
         """Die 500-mm-Grenze gilt nur für die Zwängung."""
-        g = sproedes_versagen.rissmoment(h=0.800, b=1.0, f_ctm=2.9e6)
+        g = rissgroessen.rissmoment_rechteck(h=0.800, b=1.0, f_ctm=2.9e6)
         # M_Riss waechst mit h^2 -- bei 500 mm waere es weniger als die Haelfte.
         self.assertGreater(g.M_Riss,
-                           sproedes_versagen.rissmoment(
+                           rissgroessen.rissmoment_rechteck(
                                h=0.500, b=1.0, f_ctm=2.9e6).M_Riss * 2.0)
 
 

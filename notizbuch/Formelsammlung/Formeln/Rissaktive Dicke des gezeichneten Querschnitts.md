@@ -1,5 +1,5 @@
 ---
-erzeugt: e4ba8608b8f5
+erzeugt: 7f03c9a26d0c
 art: formel
 tags: [formel]
 ---
@@ -16,6 +16,12 @@ $$
 
 $$
 t = \min\left[b;\ h\right]
+$$
+
+*In der Herleitung: «Rissaktive Dicke unter Zug: die kleinere Abmessung»*
+
+$$
+t = \min\left[h;\ b\right]
 $$
 
 ## Grössen
@@ -39,13 +45,21 @@ $$
 t = \min\left[b;\ h\right] = \min\left[400\,\mathrm{mm};\ 400\,\mathrm{mm}\right] = 400\,\mathrm{mm}
 $$
 
+Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
+
+$$
+t = \min\left[h;\ b\right] = \min\left[600\,\mathrm{mm};\ 800\,\mathrm{mm}\right] = 600\,\mathrm{mm}
+$$
+
 ## Im Code
 
 - [[opencivil.nachweis.qa_gebrauch#RissnormalkraftQA._risskraft|RissnormalkraftQA._risskraft]]
+- [[opencivil.spannungsanalyse.schnitt#Schnittpaar.herleitung_riss|Schnittpaar.herleitung_riss]]
 
 ## Themen
 
 - [[Zwängung auf Normalkraft]]
+- [[Spannung-Dehnung-Analyse]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

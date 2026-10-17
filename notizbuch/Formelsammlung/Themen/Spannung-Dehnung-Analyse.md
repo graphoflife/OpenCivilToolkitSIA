@@ -1,10 +1,10 @@
 ---
-erzeugt: 254cded0d06a
+erzeugt: dade3c248003
 art: thema
 tags: [thema]
 ---
 > [!abstract] Platte
-> 19 Formeln, in der Folge, in der gerechnet wird.
+> 20 Formeln, in der Folge, in der gerechnet wird.
 
 ## Was die Rechnung dazu sagt
 
@@ -30,7 +30,7 @@ Die Nulllinie bleibt parallel zur Achse der Biegung: gezogen wird der Rand links
 
 Die Nulllinie bleibt parallel zur Achse der Biegung: gezogen wird der Rand unten, gedrückt der Rand oben. Das Moment um die andere Achse, das ein unsymmetrischer Querschnitt dabei weckt, zählt nicht. Am Bruttoquerschnitt reisst der gezogene Rand, wenn N/A + M/W = f\_ct,eff; W gehört zu diesem Rand, v\_z ist sein Abstand vom Schwerpunkt.
 
-Dieselbe Rissbedingung, nach der Normalkraft aufgelöst. Unter Zug reisst die ganze Tiefe, darum gilt k\_t für t = h und nicht für h/3 wie beim Rissmoment. Ein negatives Moment zieht den anderen Rand: dann gilt dessen Abstand.
+Dieselbe Rissbedingung, nach der Normalkraft aufgelöst. Unter Zug gilt k\_t für die rissaktive Dicke t, die kleinere Abmessung des Betons -- nicht für h/3 wie beim Rissmoment. Ein negatives Moment zieht den anderen Rand: dann gilt dessen Abstand.
 
 Der reine Betonquerschnitt ist der Bruttoquerschnitt: A\_c = A.
 
@@ -58,7 +58,8 @@ Der reine Betonquerschnitt ist der Bruttoquerschnitt, um die Achse der Biegung: 
 16. [[Fläche eines Rechtecks]]
 17. [[Äquivalenter E-Modul über der Normalkraft]]
 18. [[Widerstandsmoment zum gezogenen Rand]]
-19. [[Grösste Dehnung im Schwerpunkt]]
+19. [[Rissaktive Dicke des gezeichneten Querschnitts]]
+20. [[Grösste Dehnung im Schwerpunkt]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 

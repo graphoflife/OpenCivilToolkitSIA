@@ -64,8 +64,8 @@ from opencivil.core.einheiten import MIO_MM3, MIO_MM4, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.material.basis import Baustoff
 from opencivil.nachweis.querschnittsloeser import Faserloeser, Stahllage
-from opencivil.nachweis.sproedes_versagen import (
-    MOMENTENTEILER, beiwert_dicke, protokoll_zugfestigkeit,
+from opencivil.nachweis.rissgroessen import (
+    MOMENTENTEILER, beiwert_dicke, protokoll_zugfestigkeit, rissaktive_dicke,
 )
 from opencivil.querschnitt.analyse import Querschnittsanalyse, Stabgruppe
 from opencivil.querschnitt.fasern import Faserquerschnitt, Stab
@@ -177,7 +177,17 @@ class Schnittpaar:
 
     k_t_zug: float
     f_ct_eff_zug: float
-    """Fuer die Rissnormalkraft: ``k_t`` fuer die ganze Tiefe."""
+    """
+    Fuer die Rissnormalkraft: ``k_t`` fuer die rissaktive Dicke unter Zug,
+    die kleinere Abmessung ``min(h; b)`` (Benutzer, 2026-10-17). Bis dahin die
+    ganze Tiefe in Zugrichtung, auch wo der Querschnitt quer dazu schmaler ist.
+    """
+
+    breite: float
+    """Die Ausdehnung des Betons quer zur Zugrichtung, m."""
+
+    t_zug: float
+    """Die rissaktive Dicke unter Zug, ``min(h; b)``, m."""
 
     E_cm: float
     """Der Modul des Betons am gezogenen Rand -- daran misst sich der aequivalente Modul."""
@@ -252,14 +262,20 @@ class Schnittpaar:
                      titel="Rissmoment bei der Normalkraft")
             return
         p.erklaerung(
-            "Dieselbe Rissbedingung, nach der Normalkraft aufgelöst. Unter Zug "
-            "reisst die ganze Tiefe, darum gilt k_t für t = h und nicht für h/3 wie "
-            "beim Rissmoment. Ein negatives Moment zieht den anderen Rand: dann "
-            "gilt dessen Abstand.")
+            "Dieselbe Rissbedingung, nach der Normalkraft aufgelöst. Unter Zug gilt "
+            "k_t für die rissaktive Dicke t, die kleinere Abmessung des Betons -- "
+            "nicht für h/3 wie beim Rissmoment. Ein negatives Moment zieht den anderen "
+            "Rand: dann gilt dessen Abstand.")
+        t = w.laenge("t", "t", self.t_zug)
+        p.formel(t, r"\min\left[@h;\ @b\right]",
+                 {"h": h, "b": w.laenge("b", "b", self.breite,
+                                         "Ausdehnung des Betons quer zur Zugrichtung")},
+                 titel="Rissaktive Dicke unter Zug: die kleinere Abmessung",
+                 name="Rissaktive Dicke des gezeichneten Querschnitts")
         f_ct_eff = protokoll_zugfestigkeit(
-            p, w, k_t=self.k_t_zug, f_ct_eff=self.f_ct_eff_zug, h=h, f_ctm=ein("f_ctm"),
+            p, w, k_t=self.k_t_zug, f_ct_eff=self.f_ct_eff_zug, h=t, f_ctm=ein("f_ctm"),
             teiler=1, referenz="SIA 262:2025, 4.4.2",
-            titel="Beiwert für die Tiefe in Biegerichtung")
+            titel="Beiwert für die rissaktive Dicke")
         M = linie.fest
         rand = v if M >= 0.0 else w.laenge(
             "v_d", "v_d", self.v_oben, "Abstand des gedrückten Rands vom Schwerpunkt, negativ")
@@ -322,11 +338,16 @@ def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[s
            "f_ctm": stoff.id_von("f_ctm"), "A": analyse.id_von("A"), "I": I_id}
     f_ctm = abs(wert(ids["f_ctm"]))
     tiefe = gerissen.h
-    k_t, k_t_zug = beiwert_dicke(tiefe / MOMENTENTEILER), beiwert_dicke(tiefe)
+    quer = [p[0 if seite.um_y else 1] for p, _ in analyse.beton_ecken]
+    breite = (max(quer) - min(quer)) * 1e-3
+    t_zug = rissaktive_dicke(h=tiefe, b=breite, zug=True)
+    k_t = beiwert_dicke(rissaktive_dicke(h=tiefe, zug=False))
+    k_t_zug = beiwert_dicke(t_zug)
     stahlstoffe = tuple({g.stahl.id: g.stahl for g in analyse.gruppen}.values())
     return Schnittpaar(
         gerissen=gerissen, ungerissen=ungerissen, seite=seite, wahl=wahl,
         grenznamen=r.grenznamen, querschnitt=q, A=wert(ids["A"]), I=wert(I_id),
         v_oben=gerissen.oben, v_unten=gerissen.unten,
         k_t=k_t, f_ct_eff=k_t * f_ctm, k_t_zug=k_t_zug, f_ct_eff_zug=k_t_zug * f_ctm,
+        breite=breite, t_zug=t_zug,
         E_cm=abs(wert(ids["E_cm"])), staehle=stahlstoffe, ids=ids)

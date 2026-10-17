@@ -17,8 +17,8 @@ from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.nachweis import dehnungsfaecher
 from opencivil.nachweis.querschnittsloeser import Querschnittsloeser
 from opencivil.nachweis.rechenwahl import Betonkennwerte, gesetze, staehle, stahllagen
-from opencivil.nachweis.sproedes_versagen import (
-    beiwert_dicke, protokoll_zugfestigkeit, rissmoment,
+from opencivil.nachweis.rissgroessen import (
+    beiwert_dicke, protokoll_zugfestigkeit, rissaktive_dicke, rissmoment_rechteck,
 )
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.querschnitt.platte import Richtung
@@ -80,7 +80,7 @@ class Loeserpaar:
 
         Am Bruttoquerschnitt reisst der Rand, wenn ``N/A + M/W = f_ct,eff``.
         Mit ``A = b·h`` und ``W = b·h²/6`` -- denselben Werten, mit denen
-        :func:`~opencivil.nachweis.sproedes_versagen.rissmoment` das
+        :func:`~opencivil.nachweis.rissgroessen.rissmoment_rechteck` das
         Rissmoment ohne Normalkraft rechnet -- ist das
         ``M_Riss(N) = M_Riss(0) - N·h/6``. Druck hebt es, Zug senkt es.
 
@@ -226,10 +226,10 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
     # Derselbe Querschnitt ungerissen: nur das Betongesetz ist ein anderes.
     ungerissen = gesetze(wahl, w, ungerissen=True).loeser(h=h, b=b, lagen=lagen, **fenster)
     f_ctm = wert(ids["f_ctm"])
-    k_t_zug = beiwert_dicke(h)
+    k_t_zug = beiwert_dicke(rissaktive_dicke(h=h, zug=True))
     return Loeserpaar(
         gerissen=gerissen, ungerissen=ungerissen,
-        M_Riss=rissmoment(h=h, b=b, f_ctm=f_ctm).M_Riss,
+        M_Riss=rissmoment_rechteck(h=h, b=b, f_ctm=f_ctm).M_Riss,
         k_t_zug=k_t_zug, f_ct_eff_zug=k_t_zug * f_ctm,
         staehle=tuple(staehle(posten)),
         wahl=wahl, grenznamen=namen, ids=ids, E_cm=w.E_cm)

@@ -1,5 +1,5 @@
 ---
-erzeugt: 446df63a95e6
+erzeugt: 01375af5235a
 art: modul
 tags: [modul]
 ---
@@ -52,7 +52,7 @@ Bei der Platte nimmt jede Lage die Haelfte -- zusammen derselbe Gedanke.
 ## ZWAENGUNG AUF BIEGUNG
 
 Je Richtung wie das sproede Versagen: dasselbe Rissmoment
-([[opencivil.nachweis.richtungsnachweise#rissmoment|rissmoment]]), gehalten gegen
+([[opencivil.nachweis.rissgroessen#rissmoment|rissmoment]]), gehalten gegen
 das Moment, bei dem der erste gezogene Stab sein `sigma_s,adm` erreicht --
 am gerissenen Querschnitt, elastisch, ohne Normalkraft, mit eigenem φ
 (Benutzer, 2026-10-15). Die Platte rechnet dasselbe von Hand, mit dem
@@ -232,14 +232,13 @@ findet, liegt jenseits der Grenze: der Stahl fliesst dort laengst.
 - [[opencivil.material.basis]]
 - [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.gebrauchsebene]]
-- [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.rissanforderung]]
+- [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
-- [[opencivil.nachweis.sproedes_versagen]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.geometrie]]

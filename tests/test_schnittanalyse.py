@@ -119,8 +119,9 @@ class TestDerRiss(unittest.TestCase):
                                100e3 * h / 6.0, delta=1e-3)
 
     def test_rissnormalkraft_wie_beim_rechteck(self):
+        """Unter Zug reisst die kleinere Abmessung, t = min(h; b) (Benutzer, 2026-10-17)."""
         b, h = 0.3, 0.5
-        k_t = 1.0 / (1.0 + 0.5 * h)
+        k_t = 1.0 / (1.0 + 0.5 * min(h, b))
         self.assertAlmostEqual(self.paar.rissnormalkraft_bei(0.0), k_t * self.f_ctm * b * h,
                                delta=1e-3)
         # Ein Moment senkt sie, gleich in welche Richtung -- das Rechteck ist symmetrisch.

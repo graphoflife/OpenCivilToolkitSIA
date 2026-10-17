@@ -1,5 +1,5 @@
 ---
-erzeugt: f8ce20307e87
+erzeugt: 0f6a30d7e190
 art: modul
 tags: [modul]
 ---
@@ -642,6 +642,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.richtungsnachweise]]
+- [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.nachweis.spannungsbegrenzung]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: e90277178342
+erzeugt: ba43b6431862
 art: modul
 tags: [modul]
 ---
@@ -609,6 +609,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.richtungsnachweise]]
+- [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.nachweis.spannungsbegrenzung]]

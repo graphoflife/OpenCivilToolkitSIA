@@ -1,5 +1,5 @@
 ---
-erzeugt: baaa7bf209fd
+erzeugt: 7291fce34fc1
 art: modul
 tags: [modul]
 ---
@@ -269,10 +269,6 @@ massgebend ist, was in der Lagenrechnung steht. `None`, wenn keine der
 Lagen einen Stahl traegt.
 
 
-## Konstanten
-
-- `DICKENGRENZE = 0.5` – Groesste Plattendicke, fuer die eine Zwaengung angesetzt wird, in m. Gilt nur, wenn die Begrenzung eingeschaltet ist.
-
 ## Braucht
 
 - [[opencivil.core.berechnung]]
@@ -281,13 +277,12 @@ Lagen einen Stahl traegt.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.nachweis.rissanforderung]]
-- [[opencivil.nachweis.sproedes_versagen]]
+- [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.nachweis.zustand2]]
 - [[opencivil.querschnitt.platte]]
 
 ## Gebraucht von
 
-- [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.projekt.aufbau]]

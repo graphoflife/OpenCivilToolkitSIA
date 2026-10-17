@@ -1,5 +1,5 @@
 ---
-erzeugt: d78e02bdc100
+erzeugt: 9802df7f96ca
 art: modul
 tags: [modul]
 ---
@@ -290,6 +290,7 @@ def beschreibung(self) -> str
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.nachweis.richtungsnachweise]]
+- [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.nachweis.schiefe_biegung]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.nachweis.spannungsbegrenzung]]

@@ -1,5 +1,5 @@
 ---
-erzeugt: c80a3eb2435e
+erzeugt: 412c03166706
 art: modul
 tags: [modul]
 ---
@@ -44,73 +44,6 @@ Der Teiler 3 gilt fuer Platten unter Biegung -- es reisst der Randbereich, nicht
 die halbe Hoehe wie beim Zwang (SIA 262:2025, 4.4.1.3).
 
 ## Inhalt
-
-### Rissgroessen
-
-```python
-@dataclass(frozen=True)
-class Rissgroessen
-```
-
-Das Rissmoment und was dazu gehoert -- je Platte, nicht je Lage.
-
-- `k_t: float`
-- `f_ct_eff: float`
-- `M_Riss: float` – Rissmoment in Nm, bezogen auf die betrachtete Breite.
-
-### beiwert_dicke
-
-```python
-def beiwert_dicke(h_riss: float) -> float
-```
-
-`k_t = 1 / (1 + 0.5 * h)` -- eine dicke Platte reisst nicht ueber ihre
-ganze Hoehe gleichzeitig.
-
-Empirisch: `h_riss` geht in Metern ein, und Meter ist die SI-Basis.
-Unter Biegung ist es ein Drittel der Dicke, beim Zwang die rissaktive.
-
-### rissmoment
-
-```python
-def rissmoment(*, h: float, b: float, f_ctm: float) -> Rissgroessen
-```
-
-Das Moment, bei dem der ungerissene Querschnitt aufreisst.
-
-`h^2*b/6` ist das elastische Widerstandsmoment des Bruttoquerschnitts.
-Alles in SI-Basis; Rueckgabe in Nm.
-
-### rissmoment_wert
-
-```python
-def rissmoment_wert(basis: str, g: Rissgroessen) -> Wert
-```
-
-Das Rissmoment -- die Einwirkung in Tabelle und Herleitung.
-
-### protokoll_zugfestigkeit
-
-```python
-def protokoll_zugfestigkeit(p: Protokoll, werte: Zwischenwerte, *, k_t: float, f_ct_eff: float, h: Wert, f_ctm: Wert, teiler: float, referenz: str, titel: str='Beiwert für die Plattendicke') -> Wert
-```
-
-Beiwert fuer die Plattendicke und wirksame Zugfestigkeit, hergeleitet.
-
-Drei Nachweise brauchen die beiden Zeilen -- das spröde Versagen und beide
-Zwängungen. `teiler` ist der Anteil der Dicke, der reisst: ein Drittel
-unter Biegung, bei der Normalkraft die ganze rissaktive Dicke (`1`).
-Zurueck kommt `f_ct,eff` fuer die Zeile danach.
-
-### protokoll_rissmoment
-
-```python
-def protokoll_rissmoment(p: Protokoll, e: Eingaben, g: Rissgroessen, *, basis: str, referenz: str) -> None
-```
-
-Das Rissmoment von `k_t` an -- fuer das spröde Versagen und die
-Zwängung auf Biegung dieselben drei Zeilen. Gebraucht werden die
-Eingaben `h`, `b` und `f_ctm`.
 
 ### Lagenergebnis
 
@@ -168,10 +101,6 @@ def _m_rd(self, erg: Lagenergebnis) -> Wert
 Der Biegewiderstand der Lage -- der Widerstand in Tabelle und Herleitung.
 
 
-## Konstanten
-
-- `MOMENTENTEILER = 3.0` – Teiler der Plattendicke im Beiwert. Unter Biegung reisst der Randbereich, nicht die halbe Hoehe wie beim Zwang. SIA 262:2025, 4.4.1.3.
-
 ## Braucht
 
 - [[opencivil.core.berechnung]]
@@ -179,19 +108,9 @@ Der Biegewiderstand der Lage -- der Widerstand in Tabelle und Herleitung.
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.querschnitt.platte]]
 
 ## Gebraucht von
 
-- [[opencivil.nachweis.mindestbewehrung]]
-- [[opencivil.nachweis.qa_gebrauch]]
-- [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.projekt.aufbau]]
-- [[opencivil.spannungsanalyse.platte]]
-- [[opencivil.spannungsanalyse.schnitt]]
-
-## Formeln aus diesem Modul
-
-- [[Beiwert für die Dicke]] · `protokoll_zugfestigkeit`
-- [[Rissmoment des ungerissenen Querschnitts]] · `protokoll_rissmoment`
-- [[Wirksame Zugfestigkeit]] · `protokoll_zugfestigkeit`

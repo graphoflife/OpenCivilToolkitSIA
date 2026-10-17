@@ -1,5 +1,5 @@
 ---
-erzeugt: bcbd1d20d652
+erzeugt: 317ecbc5d489
 art: modul
 tags: [modul]
 ---
@@ -52,7 +52,7 @@ Das Rissmoment bei der Normalkraft `N` (Zug positiv), in Nm.
 
 Am Bruttoquerschnitt reisst der Rand, wenn `N/A + M/W = f_ct,eff`.
 Mit `A = b·h` und `W = b·h²/6` -- denselben Werten, mit denen
-[[opencivil.nachweis.sproedes_versagen#rissmoment|rissmoment]] das
+[[opencivil.nachweis.rissgroessen#rissmoment_rechteck|rissmoment_rechteck]] das
 Rissmoment ohne Normalkraft rechnet -- ist das
 `M_Riss(N) = M_Riss(0) - N·h/6`. Druck hebt es, Zug senkt es.
 
@@ -160,7 +160,7 @@ nach -- er pruefte seine Kopie statt der echten.
 - [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
-- [[opencivil.nachweis.sproedes_versagen]]
+- [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.spannungsanalyse.art]]

@@ -37,7 +37,7 @@ Bei der Platte nimmt jede Lage die Haelfte -- zusammen derselbe Gedanke.
 
 ZWAENGUNG AUF BIEGUNG:
 Je Richtung wie das sproede Versagen: dasselbe Rissmoment
-(:func:`~opencivil.nachweis.richtungsnachweise.rissmoment`), gehalten gegen
+(:func:`~opencivil.nachweis.rissgroessen.rissmoment`), gehalten gegen
 das Moment, bei dem der erste gezogene Stab sein ``sigma_s,adm`` erreicht --
 am gerissenen Querschnitt, elastisch, ohne Normalkraft, mit eigenem φ
 (Benutzer, 2026-10-15). Die Platte rechnet dasselbe von Hand, mit dem
@@ -70,20 +70,21 @@ from opencivil.material.betonstahl import FLIESSDEHNUNG
 from opencivil.nachweis.gebrauchsebene import (
     EINACHSIG, KEINE, SUCHE_DER_EBENE, Gebrauchsebene, gebrauchsebene, protokoll_ebene,
 )
-from opencivil.nachweis.mindestbewehrung import DICKENGRENZE
 from opencivil.nachweis.querschnittsloeser import VERFEHLTE_EBENE
 from opencivil.nachweis.rechenwahl import protokoll_gesetze_nach_wahl, protokoll_rechenwahl
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.nachweis.rissanforderung import Rissanforderung
-from opencivil.nachweis.richtungsnachweise import (
-    protokoll_rissmoment, protokoll_spannung_ungerissen, richtungen, rissbezuege, rissmoment,
+from opencivil.nachweis.richtungsnachweise import richtungen
+from opencivil.nachweis.rissgroessen import (
+    DICKENGRENZE, beiwert_dicke, bruttoquerschnitt, protokoll_rissmoment,
+    protokoll_spannung_ungerissen, protokoll_zugfestigkeit, rissaktive_dicke, rissbezuege,
+    rissmoment,
 )
 from opencivil.nachweis.schiefe_biegung import protokoll_dehnungsebene
 from opencivil.nachweis.spannungsbegrenzung import (
     VERGLEICH_BEIM_FLIESSEN, VORGABE, GrenzeGegenFliessen, Spannungsgrenze, Vergleich,
     protokoll_festlegungen,
 )
-from opencivil.nachweis.sproedes_versagen import beiwert_dicke, protokoll_zugfestigkeit
 from opencivil.nachweis.stabgrenzen import (
     GRENZE_JE_STAB, Grenzen, Stabangabe, grenzen_aus_rissbreite, grenzen_gegen_fliessen,
     protokoll_fliessgrenzen, protokoll_rissbreitengrenzen, stabangaben,
@@ -449,7 +450,7 @@ class RissnormalkraftQA(Nachweis):
         grenze = ""
         if self.begrenzt:
             grenze = Groesse.aus_si(DICKENGRENZE, MM).als_latex(0) + r";\ "
-        t = werte.laenge("t", "t", min(b, h, DICKENGRENZE) if self.begrenzt else min(b, h))
+        t = werte.laenge("t", "t", rissaktive_dicke(h=h, b=b, zug=True, begrenzt=self.begrenzt))
         p.formel(t, rf"\min\left[{grenze}@b;\ @h\right]",
                  {"b": werte.laenge("b", "b", b, "Ausdehnung des Betons in y"),
                   "h": werte.laenge("h", "h", h, "Ausdehnung des Betons in z")},
@@ -531,13 +532,14 @@ class ZwaengungBiegungQA(Nachweis):
         protokoll_dehnungsebene(p)
         p.erklaerung(EINACHSIG if self.einachsig else SUCHE_DER_EBENE)
 
+        brutto = bruttoquerschnitt(a, e)
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
         for name, M_y, M_z in richtungen(self.einachsig):
             d_grad = self.d_ausnutzung[name]
             werte = Zwischenwerte(f"{self.id}.{kennung_aus(name)}")
             p.titel(name, ebene=3)
-            riss = rissmoment(a, e, M_y, M_z)
+            riss = rissmoment(brutto, M_y, M_z, einachsig=self.einachsig)
             gefunden = self._an_der_grenze(q, staebe, grenzen, M_y, M_z, riss.M_Riss)
             if gefunden is None:
                 p.text("Keine Bewehrung auf der gezogenen Seite → kein Nachweis.")
@@ -545,6 +547,7 @@ class ZwaengungBiegungQA(Nachweis):
                 continue
             M_s_adm_si, ebene, stab = gefunden
             M_Riss = protokoll_rissmoment(p, e, a, werte, riss, M_y, M_z,
+                                          einachsig=self.einachsig,
                                           referenz="SIA 262:2025, 4.4.2")
             M_s_adm = werte.moment("M_s_adm", r"M_{s,adm}", M_s_adm_si, "Widerstand")
             p.wert(M_s_adm, titel="Moment, bei dem der erste gezogene Stab σ_s,adm erreicht")
@@ -647,7 +650,7 @@ class ZwaengungBiegungQA(Nachweis):
                  r"\qquad M_{s,adm} \ge M_{Riss}",
                  titel="Zwängung auf Biegung, je Stab", referenz="SIA 262:2025, 4.4.2",
                  name="Moment der Bewehrung bei zulässiger Stahlspannung")
-        protokoll_spannung_ungerissen(p)
+        protokoll_spannung_ungerissen(p, einachsig=self.einachsig)
         protokoll_rechenwahl(p, self.wahl, self.id)
         protokoll_gesetze_nach_wahl(p, e, self.analyse, self.wahl, self.id,
                           titel="Werkstoffgesetze im gerissenen Zustand")

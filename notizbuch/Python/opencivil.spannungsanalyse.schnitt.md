@@ -1,5 +1,5 @@
 ---
-erzeugt: 8d69fe6b7b17
+erzeugt: 09e050900d04
 art: modul
 tags: [modul]
 ---
@@ -119,7 +119,9 @@ braucht.
 - `k_t: float`
 - `f_ct_eff: float` – Fuer das Rissmoment: `k_t` fuer ein Drittel der Tiefe, `k_t·f_ctm`.
 - `k_t_zug: float`
-- `f_ct_eff_zug: float` – Fuer die Rissnormalkraft: `k_t` fuer die ganze Tiefe.
+- `f_ct_eff_zug: float` – Fuer die Rissnormalkraft: `k_t` fuer die rissaktive Dicke unter Zug, die kleinere Abmessung `min(h; b)` (Benutzer, 2026-10-17). Bis dahin die ganze Tiefe in Zugrichtung, auch wo der Querschnitt quer dazu schmaler ist.
+- `breite: float` – Die Ausdehnung des Betons quer zur Zugrichtung, m.
+- `t_zug: float` – Die rissaktive Dicke unter Zug, `min(h; b)`, m.
 - `E_cm: float` – Der Modul des Betons am gezogenen Rand -- daran misst sich der aequivalente Modul.
 - `staehle: Tuple[Baustoff, ...] = ()`
 - `ids: Mapping[str, str] = field(default_factory=dict)` – Kurzname -> Wert-ID der Eingaben, fuer die Herleitung: der Beton am gezogenen Rand und A, I.
@@ -224,7 +226,7 @@ aus einer Loesung.
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.querschnittsloeser]]
-- [[opencivil.nachweis.sproedes_versagen]]
+- [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.gesetzwahl]]
@@ -242,6 +244,7 @@ aus einer Loesung.
 ## Formeln aus diesem Modul
 
 - [[Grösste Dehnung im Schwerpunkt]] · `Schnittpaar.herleitung_dehnung_am_ende`
+- [[Rissaktive Dicke des gezeichneten Querschnitts]] · `Schnittpaar.herleitung_riss`
 - [[Rissmoment bei der Normalkraft]] · `Schnittpaar.herleitung_riss`
 - [[Rissnormalkraft beim Moment]] · `Schnittpaar.herleitung_riss`
 - [[Widerstandsmoment zum gezogenen Rand]] · `Schnittpaar.herleitung_riss`

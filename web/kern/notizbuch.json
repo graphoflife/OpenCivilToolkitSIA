@@ -1505,7 +1505,8 @@
         "t"
       ],
       "themen": [
-        "Zwängung auf Normalkraft"
+        "Zwängung auf Normalkraft",
+        "Spannung-Dehnung-Analyse"
       ]
     },
     {
@@ -3207,13 +3208,6 @@
       "stichworte": [
         "richtungen",
         "bei_reiner_biegung",
-        "Rissmoment",
-        "rissbezuege",
-        "rissmoment",
-        "protokoll_spannung_ungerissen",
-        "protokoll_rissmoment",
-        "_hoehe",
-        "_w_vorlage",
         "DuktilitaetQA",
         "DuktilitaetQA.pruefe",
         "SproedesVersagenQA",
@@ -3230,6 +3224,32 @@
         "Rissanforderung.beschriftung",
         "Rissanforderung.rissbreite",
         "Rissanforderung.gegen_fliessen"
+      ]
+    },
+    {
+      "name": "opencivil.nachweis.rissgroessen",
+      "pfad": "Python/opencivil.nachweis.rissgroessen.md",
+      "art": "modul",
+      "kurz": "wann der Beton reisst.",
+      "stichworte": [
+        "beiwert_dicke",
+        "rissaktive_dicke",
+        "protokoll_zugfestigkeit",
+        "Rissgroessen",
+        "rissmoment_rechteck",
+        "rissmoment_wert",
+        "protokoll_rissmoment_rechteck",
+        "Ecke",
+        "Bruttoquerschnitt",
+        "Bruttoquerschnitt.ausdehnung",
+        "Bruttoquerschnitt.einheitsspannung",
+        "rissbezuege",
+        "bruttoquerschnitt",
+        "Rissmoment",
+        "rissmoment",
+        "protokoll_spannung_ungerissen",
+        "protokoll_rissmoment",
+        "_w_vorlage"
       ]
     },
     {
@@ -3302,12 +3322,6 @@
       "art": "modul",
       "kurz": "Mindestbewehrung gegen sprödes Versagen.",
       "stichworte": [
-        "Rissgroessen",
-        "beiwert_dicke",
-        "rissmoment",
-        "rissmoment_wert",
-        "protokoll_zugfestigkeit",
-        "protokoll_rissmoment",
         "Lagenergebnis",
         "Lagenergebnis.machbar",
         "SproedesVersagen",

@@ -40,95 +40,14 @@ from opencivil.core.berechnung import (
     Ausfuehrung, Eingabebezug, Eingaben, Fallbefund, Nachweis, NachweisUrteil, grad_def,
     grad_formel,
 )
-from opencivil.core.einheiten import EINHEITSLOS, M, Groesse
+from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import angabe, bedingung
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
+from opencivil.nachweis.rissgroessen import (
+    Rissgroessen, protokoll_rissmoment_rechteck, rissmoment_rechteck, rissmoment_wert,
+)
 from opencivil.querschnitt.platte import Bewehrungslage, Richtung
-
-
-@dataclass(frozen=True)
-class Rissgroessen:
-    """Das Rissmoment und was dazu gehoert -- je Platte, nicht je Lage."""
-
-    k_t: float
-    f_ct_eff: float
-    M_Riss: float
-    """Rissmoment in Nm, bezogen auf die betrachtete Breite."""
-
-
-#: Teiler der Plattendicke im Beiwert. Unter Biegung reisst der Randbereich,
-#: nicht die halbe Hoehe wie beim Zwang. SIA 262:2025, 4.4.1.3.
-MOMENTENTEILER = 3.0
-
-
-def beiwert_dicke(h_riss: float) -> float:
-    """
-    ``k_t = 1 / (1 + 0.5 * h)`` -- eine dicke Platte reisst nicht ueber ihre
-    ganze Hoehe gleichzeitig.
-
-    Empirisch: ``h_riss`` geht in Metern ein, und Meter ist die SI-Basis.
-    Unter Biegung ist es ein Drittel der Dicke, beim Zwang die rissaktive.
-    """
-    return 1.0 / (1.0 + 0.5 * h_riss)
-
-
-def rissmoment(*, h: float, b: float, f_ctm: float) -> Rissgroessen:
-    """
-    Das Moment, bei dem der ungerissene Querschnitt aufreisst.
-
-    ``h^2*b/6`` ist das elastische Widerstandsmoment des Bruttoquerschnitts.
-    Alles in SI-Basis; Rueckgabe in Nm.
-    """
-    k_t = beiwert_dicke(h / MOMENTENTEILER)
-    f_ct_eff = k_t * f_ctm
-    return Rissgroessen(k_t=k_t, f_ct_eff=f_ct_eff,
-                        M_Riss=f_ct_eff * h * h * b / 6.0)
-
-
-def rissmoment_wert(basis: str, g: Rissgroessen) -> Wert:
-    """Das Rissmoment -- die Einwirkung in Tabelle und Herleitung."""
-    return Zwischenwerte(basis).moment("M_Riss", "M_{Riss}", g.M_Riss, "Einwirkung")
-
-
-def protokoll_zugfestigkeit(
-    p: Protokoll, werte: Zwischenwerte, *, k_t: float, f_ct_eff: float,
-    h: Wert, f_ctm: Wert, teiler: float, referenz: str,
-    titel: str = "Beiwert für die Plattendicke",
-) -> Wert:
-    """
-    Beiwert fuer die Plattendicke und wirksame Zugfestigkeit, hergeleitet.
-
-    Drei Nachweise brauchen die beiden Zeilen -- das spröde Versagen und beide
-    Zwängungen. ``teiler`` ist der Anteil der Dicke, der reisst: ein Drittel
-    unter Biegung, bei der Normalkraft die ganze rissaktive Dicke (``1``).
-    Zurueck kommt ``f_ct,eff`` fuer die Zeile danach.
-    """
-    anteil = "@h" if teiler == 1 else rf"@h/{teiler:.0f}"
-    beiwert = werte.zahl("k_t", "k_t", k_t)
-    p.formel(beiwert, rf"\frac{{1}}{{1 + 0.5 \cdot {anteil}}}", {"h": h},
-             titel=titel, referenz=referenz, empirisch={"h": M},
-             name="Beiwert für die Dicke")
-    wirksam = werte.spannung("f_ct_eff", "f_{ct,eff}", f_ct_eff, stellen=2)
-    p.formel(wirksam, r"@k_t \cdot @f_ctm", {"k_t": beiwert, "f_ctm": f_ctm},
-             titel="Wirksame Zugfestigkeit")
-    return wirksam
-
-
-def protokoll_rissmoment(
-    p: Protokoll, e: Eingaben, g: Rissgroessen, *, basis: str, referenz: str,
-) -> None:
-    """
-    Das Rissmoment von ``k_t`` an -- fuer das spröde Versagen und die
-    Zwängung auf Biegung dieselben drei Zeilen. Gebraucht werden die
-    Eingaben ``h``, ``b`` und ``f_ctm``.
-    """
-    f_ct_eff = protokoll_zugfestigkeit(
-        p, Zwischenwerte(basis), k_t=g.k_t, f_ct_eff=g.f_ct_eff, h=e["h"],
-        f_ctm=e["f_ctm"], teiler=MOMENTENTEILER, referenz=referenz)
-    p.formel(rissmoment_wert(basis, g), r"@f_ct_eff \cdot \frac{@h^{2} \cdot @b}{6}",
-             {"f_ct_eff": f_ct_eff, "h": e["h"], "b": e["b"]},
-             titel="Rissmoment des ungerissenen Querschnitts")
 
 
 @dataclass
@@ -225,7 +144,7 @@ class SproedesVersagen(Nachweis):
         b = e.g("b").si
         f_ctm = e.g("f_ctm").si
 
-        groessen = rissmoment(h=h, b=b, f_ctm=f_ctm)
+        groessen = rissmoment_rechteck(h=h, b=b, f_ctm=f_ctm)
         self._protokoll_ansatz(p, e, groessen)
 
         ergebnis: Dict[str, Groesse] = {}
@@ -290,8 +209,8 @@ class SproedesVersagen(Nachweis):
             "Querschnitt mehr trägt als der unbewehrte im Augenblick des "
             f"Risses: M_{self.mn.wahl.index}(N_Ed = 0) ≥ M_Riss."
         )
-        protokoll_rissmoment(p, e, groessen, basis=self.id,
-                             referenz="SIA 262:2025, 4.4.1.3")
+        protokoll_rissmoment_rechteck(p, e, groessen, basis=self.id,
+                                      referenz="SIA 262:2025, 4.4.1.3")
 
     def _protokoll_lage(self, p: Protokoll, erg: Lagenergebnis,
                         groessen: Rissgroessen) -> None:

@@ -1,5 +1,5 @@
 ---
-erzeugt: f3a2ff87396f
+erzeugt: 42b77aca8694
 art: formel
 tags: [formel]
 ---
@@ -43,8 +43,8 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.richtungsnachweise#protokoll_rissmoment|protokoll_rissmoment]]
-- [[opencivil.nachweis.sproedes_versagen#protokoll_rissmoment|protokoll_rissmoment]]
+- [[opencivil.nachweis.rissgroessen#protokoll_rissmoment|protokoll_rissmoment]]
+- [[opencivil.nachweis.rissgroessen#protokoll_rissmoment_rechteck|protokoll_rissmoment_rechteck]]
 
 ## Themen
 

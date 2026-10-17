@@ -1,5 +1,5 @@
 ---
-erzeugt: a3b24fa456b0
+erzeugt: 2afd88c4fce6
 art: modul
 tags: [modul]
 ---
@@ -33,6 +33,7 @@ Rechenwahl, mit der jedes Kapitel waehlt, womit es rechnet.
 - [[opencivil.nachweis.resistenzlinie]] – die Linie, gegen die der M-N-Nachweis haelt.
 - [[opencivil.nachweis.richtungsnachweise]] – Duktilitaet und sproedes Versagen des gezeichneten Querschnitts.
 - [[opencivil.nachweis.rissanforderung]] – die Anforderung an die Rissbildung.
+- [[opencivil.nachweis.rissgroessen]] – wann der Beton reisst.
 - [[opencivil.nachweis.schiefe_biegung]] – Biegung und Normalkraft am gezeichneten Querschnitt.
 - [[opencivil.nachweis.schubwandnachweis]] – Querkraft und Torsion am gezeichneten Querschnitt.
 - [[opencivil.nachweis.spannungsbegrenzung]] – Stahlspannung unter Gebrauchslasten.

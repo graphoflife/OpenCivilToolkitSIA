@@ -1,5 +1,5 @@
 ---
-erzeugt: 5dfc238760e3
+erzeugt: 61af010ee86d
 art: formel
 tags: [formel]
 ---
@@ -12,7 +12,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.richtungsnachweise#protokoll_spannung_ungerissen|protokoll_spannung_ungerissen]]
+- [[opencivil.nachweis.rissgroessen#protokoll_spannung_ungerissen|protokoll_spannung_ungerissen]]
 
 ## Themen
 

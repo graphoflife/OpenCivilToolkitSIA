@@ -51,20 +51,16 @@ from opencivil.core.einheiten import EINHEITSLOS, MM, Groesse
 from opencivil.core.latex import angabe, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef, kennung_aus
-from opencivil.nachweis.sproedes_versagen import (
-    Rissgroessen as Momentgroessen, beiwert_dicke, protokoll_rissmoment,
-    protokoll_zugfestigkeit, rissmoment, rissmoment_wert,
+from opencivil.nachweis.rissgroessen import (
+    DICKENGRENZE, Rissgroessen as Momentgroessen, beiwert_dicke,
+    protokoll_rissmoment_rechteck, protokoll_zugfestigkeit, rissaktive_dicke,
+    rissmoment_rechteck, rissmoment_wert,
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.zustand2 import gerissen, wertigkeit
 from opencivil.querschnitt.platte import (
     Bewehrungslage, Richtung, protokoll_lage,
 )
-
-#: Groesste Plattendicke, fuer die eine Zwaengung angesetzt wird, in m.
-#: Gilt nur, wenn die Begrenzung eingeschaltet ist.
-DICKENGRENZE = 0.500
-
 
 
 @dataclass(frozen=True)
@@ -87,7 +83,7 @@ def rissnormalkraft(*, h: float, b: float, f_ctm: float,
 
     Alles in SI-Basis; ``h`` und ``b`` in m, ``f_ctm`` in Pa, Rueckgabe in N.
     """
-    h_eff = min(DICKENGRENZE, h) if begrenzt else h
+    h_eff = rissaktive_dicke(h=h, zug=True, begrenzt=begrenzt)
     k_t = beiwert_dicke(h_eff)
     f_ct_eff = k_t * f_ctm
     return Rissgroessen(h_eff=h_eff, k_t=k_t, f_ct_eff=f_ct_eff,
@@ -545,7 +541,7 @@ class ZwaengungBiegung(Nachweis):
         E_cm = e.g("E_cm").si
         phi = self.kriechzahl
 
-        groessen = rissmoment(h=h, b=b, f_ctm=f_ctm)
+        groessen = rissmoment_rechteck(h=h, b=b, f_ctm=f_ctm)
         self._protokoll_ansatz(p, e, groessen)
 
         ergebnis: Dict[str, Groesse] = {}
@@ -641,8 +637,8 @@ class ZwaengungBiegung(Nachweis):
             "gegen sprödes Versagen: dort steht der Biegewiderstand gegen das "
             "Rissmoment, hier die Stahlspannung gegen ihre Grenze."
         )
-        protokoll_rissmoment(p, e, groessen, basis=self.id,
-                             referenz="SIA 262:2025, 4.4.2")
+        protokoll_rissmoment_rechteck(p, e, groessen, basis=self.id,
+                                      referenz="SIA 262:2025, 4.4.2")
         p.erklaerung(
             "Das Rissmoment gilt für den ungerissenen Bruttoquerschnitt – den "
             "Zustand vor dem Riss. Der Widerstand dagegen wird am gerissenen "

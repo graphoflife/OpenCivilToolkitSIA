@@ -1,5 +1,5 @@
 ---
-erzeugt: 80d5da004d7a
+erzeugt: d40f862386b9
 art: modul
 tags: [modul]
 ---
@@ -225,7 +225,6 @@ Giesst aus den Vorlagen ein Material mit eigenem Namensraum.
 - [[opencivil.nachweis.handrechnung]]
 - [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.nachweis.rechenwahl]]
-- [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.projekt.aufbau]]
