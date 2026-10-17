@@ -18,8 +18,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List
 
+from opencivil.core.einheiten import GRAD, KN, KN_PRO_M3, KPA, M
 from opencivil.projekt.eintraege import Beschreibung, eindeutig
-from opencivil.projekt.lesen import ProjektFehler
+from opencivil.projekt.lesen import ProjektFehler, bereich
 
 
 @dataclass
@@ -27,8 +28,9 @@ class GrundbruchkombinationEintrag(Beschreibung):
     """Eine Einwirkung auf das Fundament: N normal zur Sohle, T in ihrer Richtung, in kN."""
 
     name: str
-    N_Ed: float = 1000.0
-    T_Ed: float = 200.0
+    N_Ed: float = bereich(1000.0, heisst="Druckkraft N_Ed", einheit=KN, ueber=0.0)
+    T_Ed: float = bereich(200.0, heisst="T_Ed, in Richtung von Bild 9.2.15,", einheit=KN,
+                          ab=0.0)
     aktiv: bool = True
     """Ob die Kombination gerechnet wird. Ausgeschaltet bleibt sie stehen."""
 
@@ -42,46 +44,46 @@ class GrundbruchEintrag(Beschreibung):
     kennung: str
     name: str
 
-    phi_k: float = 30.0
+    phi_k: float = bereich(30.0, heisst="φ_k", einheit=GRAD, ab=0.0, unter=90.0)
     """Reibungswinkel, charakteristisch, in Grad."""
 
-    gamma_phi: float = 1.2
+    gamma_phi: float = bereich(1.2, heisst="Partialfaktor γ_φ", ueber=0.0)
     """Partialfaktor des Reibungswinkels -- SIA 267:2013, 5.3.2.2."""
 
-    c_k: float = 0.0
+    c_k: float = bereich(0.0, heisst="Kohäsion c", einheit=KPA, ab=0.0)
     """Kohäsion, charakteristisch, in kPa -- mit phi = 0 die undrainierte Scherfestigkeit."""
 
-    gamma_c: float = 1.5
+    gamma_c: float = bereich(1.5, heisst="Partialfaktor γ_c", ueber=0.0)
     """Partialfaktor der Kohäsion."""
 
-    gamma: float = 21.0
+    gamma: float = bereich(21.0, heisst="Raumlast γ", einheit=KN_PRO_M3, ueber=0.0)
     """Raumlast des Bodens in kN/m³."""
 
-    gamma_w: float = 10.0
+    gamma_w: float = bereich(10.0, heisst="γ_w", einheit=KN_PRO_M3, ab=0.0)
     """Raumlast des Wassers in kN/m³."""
 
-    q_Ed: float = 0.0
+    q_Ed: float = bereich(0.0, heisst="Auflast q_Ed", einheit=KPA, ab=0.0)
     """Bemessungslast neben dem Fundament in kPa."""
 
-    b: float = 1.0
+    b: float = bereich(1.0, heisst="Breite b", einheit=M, ueber=0.0)
     """Breite des Fundaments in m -- die kürzere Seite."""
 
-    L: float = 1.0
+    L: float = bereich(1.0, heisst="Länge L", einheit=M, ueber=0.0)
     """Länge des Fundaments in m."""
 
-    t1: float = 0.0
+    t1: float = bereich(0.0, heisst="Tiefe t_1", einheit=M, ab=0.0)
     """Tiefe des höchsten möglichen Grundwasserspiegels unter Terrain, in m."""
 
-    t: float = 0.0
+    t: float = bereich(0.0, heisst="Tiefe t", einheit=M, ab=0.0)
     """Tiefe der Fundamentsohle unter Terrain, in m."""
 
-    alpha: float = 0.0
+    alpha: float = bereich(0.0, heisst="α", einheit=GRAD, ab=0.0, unter=90.0)
     """Neigung der Sohle in Grad, positiv gegen T ansteigend (Bild 9.2.15)."""
 
-    beta: float = 0.0
+    beta: float = bereich(0.0, heisst="β", einheit=GRAD, ab=0.0, unter=90.0)
     """Neigung des Geländes in Grad, positiv vom Fundament weg abfallend."""
 
-    delta_faktor: float = 1.0
+    delta_faktor: float = bereich(1.0, heisst="δ*/φ", ueber=0.0)
     """Sohlreibungswinkel im Verhältnis zum Reibungswinkel, delta*/phi."""
 
     beschreibung: str = ""
@@ -113,24 +115,12 @@ class GrundbruchEintrag(Beschreibung):
     def regeln(self, wo: str) -> None:
         """
         Haelt unmoegliche Zahlen und Namen auf, bevor daraus ein Widerstand
-        wird -- vor dem Rechnen und nicht beim Oeffnen: eine abgelegte Datei
-        mit b = 0 oder zwei gleich benannten Kombinationen soll sich oeffnen
-        und korrigieren lassen.
+        wird -- was mehrere Felder zusammen betrifft; wo jede Zahl fuer sich
+        liegt, steht an ihrem Feld. Vor dem Rechnen und nicht beim Oeffnen:
+        eine abgelegte Datei mit b = 0 oder zwei gleich benannten
+        Kombinationen soll sich oeffnen und korrigieren lassen.
         """
         eindeutig((k.name for k in self.kombinationen), wo, "Kombination")
-        for feld, wert, wie in (
-                ("Breite b", self.b, self.b > 0.0),
-                ("Partialfaktor γ_φ", self.gamma_phi, self.gamma_phi > 0.0),
-                ("Partialfaktor γ_c", self.gamma_c, self.gamma_c > 0.0),
-                ("δ*/φ", self.delta_faktor, self.delta_faktor > 0.0)):
-            if not wie:
-                raise ProjektFehler(f"{wo}: {feld} muss grösser als null sein, "
-                                    f"angegeben ist {wert:g}.")
-        for feld, wert in (("Tiefe t", self.t), ("Tiefe t_1", self.t1),
-                           ("Kohäsion c", self.c_k), ("Auflast q_Ed", self.q_Ed),
-                           ("γ_w", self.gamma_w)):
-            if wert < 0.0:
-                raise ProjektFehler(f"{wo}: {feld} kann nicht negativ sein ({wert:g}).")
         if self.L < self.b:
             raise ProjektFehler(
                 f"{wo}: b ist die kürzere Seite des Fundaments -- die Länge L = {self.L:g} m "
@@ -140,20 +130,7 @@ class GrundbruchEintrag(Beschreibung):
                 f"{wo}: die Raumlast des Bodens γ = {self.gamma:g} kN/m³ muss grösser sein "
                 f"als die des Wassers, γ_w = {self.gamma_w:g} kN/m³ -- sonst ist γ' nicht "
                 f"positiv.")
-        for feld, wert in (("φ_k", self.phi_k), ("α", self.alpha), ("β", self.beta)):
-            if not 0.0 <= wert < 90.0:
-                raise ProjektFehler(f"{wo}: {feld} muss zwischen 0° und 90° liegen, "
-                                    f"angegeben sind {wert:g}°.")
         if self.phi_k == 0.0 and self.c_k <= 0.0:
             raise ProjektFehler(
                 f"{wo}: mit φ = 0 trägt nur die Kohäsion (undrainiert, c = s_u) -- sie muss "
                 f"grösser als null sein.")
-        for k in self.kombinationen:
-            if k.N_Ed <= 0.0:
-                raise ProjektFehler(
-                    f"{wo}, Kombination '{k.name}': N_Ed muss eine Druckkraft sein, "
-                    f"grösser als null, angegeben sind {k.N_Ed:g} kN.")
-            if k.T_Ed < 0.0:
-                raise ProjektFehler(
-                    f"{wo}, Kombination '{k.name}': T_Ed zeigt in die Richtung von "
-                    f"Bild 9.2.15 und ist nicht negativ, angegeben sind {k.T_Ed:g} kN.")

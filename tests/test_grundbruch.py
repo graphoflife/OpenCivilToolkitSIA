@@ -382,6 +382,19 @@ class TestEintrag(unittest.TestCase):
             with self.subTest(N=N, T=T), self.assertRaises(ProjektFehler):
                 p.aufbauen()
 
+    def test_ein_bereich_nennt_seine_einheit(self):
+        """Der Bereich steht am Feld, mit der Einheit, in der das Feld zählt."""
+        for felder, text in (
+                ({"phi_k": 95.0}, "φ_k muss mindestens null und kleiner als 90° sein, "
+                                  "angegeben ist 95°."),
+                ({"c_k": -5.0}, "Kohäsion c kann nicht negativ sein, angegeben ist -5 kPa."),
+                ({"t": -0.5}, "Tiefe t kann nicht negativ sein, angegeben ist -0.5 m.")):
+            p = Projekt(name="Probe")
+            p.grundbruch("F", **felder).kombination("K", N_Ed=100.0)
+            with self.subTest(text=text), self.assertRaises(ProjektFehler) as fehler:
+                p.aufbauen()
+            self.assertEqual(str(fehler.exception), f"Grundbruch 'F': {text}")
+
 
 class TestZusammenfassung(unittest.TestCase):
     def test_faktoren_als_tabelle_und_die_nachweise(self):
