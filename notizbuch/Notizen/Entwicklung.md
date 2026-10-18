@@ -44,6 +44,54 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-18 · Löser und Kennzahlen
+
+Phase 4 des Umbaus aus der Durchsicht vom 2026-10-16, in zehn Commits.
+Zahlen bewegen sich nur, wo der Benutzer es entschieden hat -- beim
+Suchfenster und bei der Suche der Analysen, beide erst ab der siebten
+Stelle; jeder andere Schritt ist mit dem Werteabdruck belegt.
+
+- **Die Suche ist ein Gegenstand** (`core/suche.py`). Halbieren und
+  Illinois waren Unterklassen des Lösers (`FaserloeserIllinois`,
+  `QuerschnittsloeserIllinois`, `klasse=`), die sich an vier Stellen mit
+  `if self.halbiert` wieder abschalteten; Illinois stand zweimal, das
+  Eingrenzen fünfmal. Jetzt bekommt der Löser seine Suche
+  (`Faserloeser(…, suche=ILLINOIS)`), und sie sagt zweierlei von sich: ob
+  sie bei der zuletzt gefundenen Stelle anfängt (`vom_letzten`) und ob sie
+  taugt, wo ein Gesetz springt (`auch_bei_sprung`). Springt eines, halbiert
+  der Löser trotzdem (`wirksame_suche`). Die Herleitung nennt die Suche mit
+  deren eigenem Text; der falsche Satz «zwei geschachtelte Halbierungen»
+  ist weg.
+- **Ein Suchfenster aus den Gesetzen** (`Gesetze.grenzen`, Benutzer
+  2026-10-18). Jeder Löser der Platte sucht in den Grenzen des
+  Dehnungsfächers: der Beton an den Rändern bis −ε_c2d, im Punkt C bis
+  −ε_c1d, jeder Stahl an seiner Lage bis ±ε_ud. Vorher suchte die
+  Stahlspannung den Beton fest bis 3 ‰ -- bei einem Beton mit ε_c2d unter
+  3 ‰ jenseits seines Gesetzes. 111 Werte bewegen sich, höchstens um
+  7·10⁻⁷ relativ.
+- **Die Analysen schneller** (`SUCHE_DER_ANALYSEN`, Benutzer 2026-10-18).
+  Ihre Löser suchen mit Illinois, jede Frage im ganzen Fenster; wo der
+  Spannungsblock springt, wird weiter halbiert. Alle Analysen des
+  Prüfprojekts rechnen in 4.0 statt 5.2 s, die der Platte etwa fünfmal
+  schneller; 674 Werte bewegen sich, höchstens um 2·10⁻⁶ relativ. Nicht
+  geholfen hat, die Löser je Neigung mit der zuletzt gefundenen Ebene
+  vorzubelegen: es machte sie langsamer.
+- **Die Querkraft schreibt ihre Herleitung selbst** (`protokoll_hoehen`,
+  `protokoll_ohne_buegel`, `protokoll_mit_buegeln`). Die Kennzahlen
+  schrieben V_Rd,c, V_Rd,s und d_v ein zweites Mal, samt einem erzwungenen
+  «d_v = d (Einlage nicht massgebend)» im Bügelteil.
+- **Kennzahlen: jeder Erzeuger nennt seine** (`core.wert.Kennzahl`,
+  `Bauteil.kennzahlen`). Die Handliste der Beschriftungen in der
+  Zusammenfassung fällt weg. Was fehlt, fehlt: ein x/d gibt es nur für
+  eine Seite mit Zugbewehrung, statt «(x/d)⁻ = 0».
+- **Ein Fehler unterwegs** (`linie._schnittpunkte`). Eine Platte nur mit
+  oberer x-Bewehrung zeigte als Druckwiderstand 0 statt −5000 kN: ihre
+  Linie berührt M = 0 nur, entlang einer Kante, und die Schnittsuche
+  zählte nur Kreuzungen. Jetzt zählt jeder Eckpunkt auf der Geraden.
+- **Dieselbe Höhe, ein Name.** Der Vergrösserungsfaktor schreibt seine
+  Lagen mit `protokoll_lage`: 248.1 mm heissen d_{2,x} wie in der Zwängung,
+  nicht mehr d_u.
+
 ## 2026-10-17 · Platte und gezeichneter Querschnitt: ein Nachweis, zwei Geometrien
 
 Phase 3 des Umbaus aus der Durchsicht vom 2026-10-16, in fünfzehn Commits.

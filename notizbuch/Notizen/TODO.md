@@ -71,31 +71,11 @@ gelernt wurde, steht in [[Entwicklung]].
 
 Sechs Durchsichten über die Arbeit vom 15. und 16. Oktober (42 Commits);
 jeder Punkt ist am Code nachgeprüft. Die vier Fehler mit Folge sind behoben,
-ebenso Phase 2, Prüfen und Wahlfelder, und Phase 3, Platte und Querschnitt
-als ein Nachweis (beide 2026-10-17, siehe [[Entwicklung]]). Hier steht, was
-bleibt, in der empfohlenen Reihenfolge: Phase 4 Löser und Kennzahlen,
-Phase 5 Oberfläche.
+ebenso Phase 2, Prüfen und Wahlfelder, Phase 3, Platte und Querschnitt als
+ein Nachweis (beide 2026-10-17), und Phase 4, Löser und Kennzahlen
+(2026-10-18, siehe [[Entwicklung]]). Hier steht, was bleibt: Phase 5, die
+Oberfläche.
 
-- [ ] **Der Löser bekommt seine Suche als Objekt.**
-      - Illinois und Halbieren sind Unterklassen samt Raute
-        (`QuerschnittsloeserIllinois`, `klasse=`). Sie schalten sich mit
-        `if self.halbiert` an vier Stellen wieder ab.
-      - Illinois steht zweimal, das Eingrenzen fünfmal.
-      - Folge: Die Herleitung der schiefen Biegung sagt «zwei geschachtelte
-        Halbierungen», gesucht wird aber mit Illinois
-        (`gebrauchsebene.SUCHE_DER_EBENE`).
-
-      Besser: ein Modul `suche.py`; der Löser bekommt seine Suche und
-      beschreibt sie selbst. Dazu gehört das Suchfenster an eine Stelle; heute
-      grenzen Knicken, Stahlspannung und Analyse es je anders ab. Das kann
-      Zahlen nahe der Grenze ändern -- deine Entscheidung.
-
-      Dabei die kippende Nulllinie der Analyse schneller machen
-      (`spannungsanalyse/schnitt.KippendeNulllinie`): eine Linie braucht etwa
-      dreimal so lang wie mit fester Nulllinie, alle Analysen des Prüfprojekts
-      7.6 statt 3.2 s. Je Neigung baut sie einen frischen Löser und sucht von
-      den Grenzen her; mit dem Spannungsblock waren es 9 s, bis sie Illinois
-      ohne Gedächtnis nahm (`halbiert=False`).
 - [ ] **Apps: eine Zeile je App.** Material und Python laufen in `baum.js`,
       `editor.js`, `zustand.js` und `app.js` als Sonderwege; je App stehen
       zehn Tabellen in drei Dateien. Besser: `apps.js` mit einer Zeile je
