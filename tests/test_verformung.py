@@ -88,6 +88,20 @@ class TestFaktor(unittest.TestCase):
         self.assertTrue(bloecke)
         self.assertTrue(all(b.referenz == "SIA 262:2025, 4.4.3.2.5" for b in bloecke))
 
+    def test_die_statische_hoehe_heisst_wie_in_den_nachweisen_der_lagen(self):
+        """
+        248.1 mm sind d_{2,x}, wie in den Nachweisen der Lagen -- bis
+        2026-10-18 hiessen sie hier d_u, dieselbe Zahl unter zwei Namen.
+        """
+        hoehen = {b.wert_id: b.latex for b in self.loesung.protokoll.alle_bloecke()
+                  if getattr(b, "wert_id", "").startswith("querschnitt.q1.vergroesserung.")
+                  and b.wert_id.endswith(".d")}
+        self.assertEqual(hoehen, {
+            "querschnitt.q1.vergroesserung.unten.d": r"d_{2,x} = z_{2,x} = 248.1\,\mathrm{mm}",
+            "querschnitt.q1.vergroesserung.oben.d":
+                r"d_{3,x,g} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}",
+        })
+
     def test_beide_seiten_immer_auch_ohne_fall(self):
         """Einmal je bewehrte Seite, als Kennzahl -- auch ohne Verformungsfall."""
         aufbau, loesung = rechnen(beispiel())

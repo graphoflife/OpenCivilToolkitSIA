@@ -1,5 +1,5 @@
 ---
-erzeugt: c09ce5757d12
+erzeugt: 50374e91b6d5
 art: formel
 tags: [formel]
 ---
@@ -19,7 +19,7 @@ $$
 
 ## Beispiel
 
-Mit den Zahlen aus dem Prüfprojekt «Jeder Nachweis»:
+Mit den Zahlen aus dem Beispielprojekt:
 
 $$
 A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z} = 1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2} = 2450\,\mathrm{mm}^{2}
@@ -29,6 +29,7 @@ $$
 
 - [[Aufnehmbare Risskraft]]
 - [[Aufnehmbares Moment der Bewehrung]]
+- [[Bewehrungsgehalt]]
 - [[Druckzonenhöhe bei reiner Biegung]]
 - [[Hilfsgrösse der Nulllinie]]
 
@@ -38,6 +39,7 @@ $$
 
 ## Themen
 
+- [[Verformung]]
 - [[Duktilität]]
 - [[Zwängung auf Normalkraft]]
 - [[Zwängung auf Biegung]]

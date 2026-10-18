@@ -1,5 +1,5 @@
 ---
-erzeugt: 548eb25c2f94
+erzeugt: 840940da98e2
 art: formel
 tags: [formel]
 ---
@@ -58,7 +58,6 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.verformung#Vergroesserungsfaktor._bewehrungsgehalte|Vergroesserungsfaktor._bewehrungsgehalte]]
 - [[opencivil.querschnitt.platte#protokoll_statische_hoehe|protokoll_statische_hoehe]]
 
 ## Themen

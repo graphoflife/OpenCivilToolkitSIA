@@ -1,5 +1,5 @@
 ---
-erzeugt: 67464d1c0bca
+erzeugt: 14cc911f97cd
 art: formel
 tags: [formel]
 ---
@@ -12,21 +12,14 @@ $$
 z_{2,x} = \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}}
 $$
 
-*In der Herleitung: «Schwerpunkt der x-Bewehrung unten»*
-
-$$
-z_{u} = \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,u}}
-$$
-
 ## Grössen
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $A_{s,2,x,g}$ | Bewehrungsquerschnitt 2. Lage Grundbewehrung | mm² | Zwischenwert |
-| $z_{2,x,g}$ | Tiefe 2. Lage Grundbewehrung ab Oberkante | mm | Zwischenwert |
-| $A_{s,2,x,z}$ | Bewehrungsquerschnitt 2. Lage Zulage | mm² | Zwischenwert |
-| $z_{2,x,z}$ | Tiefe 2. Lage Zulage ab Oberkante | mm | Zwischenwert |
-| $A_{s,u}$ | – | mm² | [[Bewehrungsquerschnitt der zusammengefassten Lage]] |
+| $A_{s,2,x,g}$ | – | mm² | Zwischenwert |
+| $z_{2,x,g}$ | – | mm | Zwischenwert |
+| $A_{s,2,x,z}$ | – | mm² | Zwischenwert |
+| $z_{2,x,z}$ | – | mm | Zwischenwert |
 
 ## Beispiel
 
@@ -40,16 +33,6 @@ $$
 \end{aligned}
 $$
 
-Mit den Zahlen aus dem Beispielprojekt:
-
-$$
-\begin{aligned}
-  z_{u} &= \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,u}} \\
-  &= \frac{1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 246\,\mathrm{mm}}{2450\,\mathrm{mm}^{2}} \\
-  &= 248.1\,\mathrm{mm}
-\end{aligned}
-$$
-
 ## Gebraucht von
 
 - [[Statische Höhe]]
@@ -57,7 +40,6 @@ $$
 ## Im Code
 
 - [[opencivil.nachweis.handrechnung#Handrechnung._schwerpunkt|Handrechnung._schwerpunkt]]
-- [[opencivil.nachweis.verformung#Vergroesserungsfaktor._bewehrungsgehalte|Vergroesserungsfaktor._bewehrungsgehalte]]
 - [[opencivil.querschnitt.platte#protokoll_lage|protokoll_lage]]
 
 ## Themen

@@ -1,5 +1,5 @@
 ---
-erzeugt: 327fcabbced9
+erzeugt: cbe555000685
 art: formel
 tags: [formel]
 ---
@@ -14,8 +14,8 @@ $$
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $A_{s,2,x,g}$ | Bewehrungsquerschnitt 2. Lage Grundbewehrung | mm² | Zwischenwert |
-| $A_{s,2,x,z}$ | Bewehrungsquerschnitt 2. Lage Zulage | mm² | Zwischenwert |
+| $A_{s,2,x,g}$ | – | mm² | Zwischenwert |
+| $A_{s,2,x,z}$ | – | mm² | Zwischenwert |
 
 ## Beispiel
 
@@ -25,20 +25,13 @@ $$
 A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z} = 1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2} = 2450\,\mathrm{mm}^{2}
 $$
 
-## Gebraucht von
-
-- [[Bewehrungsgehalt]]
-- [[Schwerpunkt der zusammengefassten Lage]]
-
 ## Im Code
 
 - [[opencivil.nachweis.handrechnung#Handrechnung._schwerpunkt|Handrechnung._schwerpunkt]]
-- [[opencivil.nachweis.verformung#Vergroesserungsfaktor._bewehrungsgehalte|Vergroesserungsfaktor._bewehrungsgehalte]]
 
 ## Themen
 
 - [[Biegung und Normalkraft]]
-- [[Verformung]]
 
 <!-- Ab hier von Hand: bleibt beim Neuerzeugen erhalten -->
 
@@ -46,6 +39,7 @@ $$
 
 Liegen Grundbewehrung und Zulage in derselben Lage, wirken sie wie ein
 gemeinsamer Querschnitt: ihre Flächen addieren sich. Wo die Rechnung nur
-eine Lage je Seite kennt -- in der Handrechnung und beim
-[[Vergrösserungsfaktor der Durchbiegung]] --, steht die Summe in ihrem
-[[Schwerpunkt der zusammengefassten Lage|Schwerpunkt]].
+eine Lage je Seite kennt -- in der Handrechnung --, steht die Summe in ihrem
+[[Schwerpunkt der zusammengefassten Lage|Schwerpunkt]]. Dieselbe Summe
+schreiben die Nachweise der Lagen und der
+[[Vergrösserungsfaktor der Durchbiegung]] als [[Bewehrung der Lage]].

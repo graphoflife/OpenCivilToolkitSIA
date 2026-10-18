@@ -444,6 +444,7 @@
         "A_{s,2,x}"
       ],
       "themen": [
+        "Verformung",
         "Duktilität",
         "Zwängung auf Normalkraft",
         "Zwängung auf Biegung"
@@ -479,8 +480,7 @@
         "A_{s,2,x}"
       ],
       "themen": [
-        "Biegung und Normalkraft",
-        "Verformung"
+        "Biegung und Normalkraft"
       ]
     },
     {
@@ -1612,8 +1612,7 @@
       "pfad": "Formelsammlung/Formeln/Schwerpunkt der zusammengefassten Lage.md",
       "art": "formel",
       "zeichen": [
-        "z_{2,x}",
-        "z_{u}"
+        "z_{2,x}"
       ],
       "themen": [
         "Biegung und Normalkraft",

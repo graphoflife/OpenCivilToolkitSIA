@@ -61,7 +61,7 @@
     "opencivil/nachweis/spannungsgrenzen.py": "8281fc57d304",
     "opencivil/nachweis/sproedes_versagen.py": "9836cdc1630f",
     "opencivil/nachweis/stabgrenzen.py": "7197e7d070c2",
-    "opencivil/nachweis/verformung.py": "2a3c0d41c962",
+    "opencivil/nachweis/verformung.py": "57d3616ed3e1",
     "opencivil/nachweis/zustand2.py": "7ba9c5ef3a2c",
     "opencivil/notizbuch/__init__.py": "ef0db86ead09",
     "opencivil/notizbuch/bibliothek.py": "4d8b1446199d",

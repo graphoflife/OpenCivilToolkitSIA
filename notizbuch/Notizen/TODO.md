@@ -120,8 +120,10 @@ Phase 5 Oberfläche.
         nicht gemacht.
       - Grundbruch: Das Nachweisgerüst steht zweimal, und im Zweig «zu
         schräg» kommt N_Rd = 0 aus den Vorgaben der Datenklasse.
-      - `verformung.py` schreibt die statische Höhe neu: 248.1 mm heissen
-        einmal d_{2,x}, einmal d_u.
+      - Die Summe von Grundbewehrung und Zulage hat zwei Formelseiten:
+        [[Bewehrung der Lage]] (`protokoll_lage`, auch die Verformung) und
+        [[Bewehrungsquerschnitt der zusammengefassten Lage]] (Handrechnung).
+        Zusammenlegen hiesse, eine Seite umzubenennen.
       - Die leere Lage bekommt still den ersten Stahl.
       - Die Fallzeile ist siebenmal gebaut, und das Stilblatt zählt ihre
         Kinder.

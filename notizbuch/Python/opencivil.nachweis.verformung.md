@@ -1,5 +1,5 @@
 ---
-erzeugt: e4e8600aa13b
+erzeugt: 4290eb0d2876
 art: modul
 tags: [modul]
 ---
@@ -123,7 +123,10 @@ def _bewehrungsgehalte(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte) ->
 
 Je Seite mit x-Bewehrung der Bewehrungsgehalt und seine statische
 Hoehe -- die gezogene Seite braucht beide, die Gegenseite ihren
-Gehalt als rho'.
+Gehalt als rho'. Querschnitt, Schwerpunkt und Hoehe der Lage schreibt
+[[opencivil.querschnitt.platte#protokoll_lage|protokoll_lage]], wie in den
+Nachweisen der Lagen: dieselbe Hoehe heisst ueberall gleich, etwa
+d_{2,x}. Bis 2026-10-18 hiess sie hier d_u.
 
 ### Verformung
 
@@ -170,9 +173,6 @@ def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 ## Formeln aus diesem Modul
 
 - [[Bewehrungsgehalt]] · `Vergroesserungsfaktor._bewehrungsgehalte`
-- [[Bewehrungsquerschnitt der zusammengefassten Lage]] · `Vergroesserungsfaktor._bewehrungsgehalte`
 - [[Grenzwert der Durchbiegung]] · `Verformung._einen_fall`
-- [[Schwerpunkt der zusammengefassten Lage]] · `Vergroesserungsfaktor._bewehrungsgehalte`
-- [[Statische Höhe]] · `Vergroesserungsfaktor._bewehrungsgehalte`
 - [[Vergrösserungsfaktor der Durchbiegung]] · `Vergroesserungsfaktor.rechne`
 - [[Wirksame Durchbiegung]] · `Verformung._einen_fall`

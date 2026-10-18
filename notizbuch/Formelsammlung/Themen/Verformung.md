@@ -1,5 +1,5 @@
 ---
-erzeugt: ffe0448c6348
+erzeugt: da9f12115ed7
 art: thema
 tags: [thema]
 ---
@@ -17,7 +17,7 @@ Die Durchbiegung w ist mit der Steifigkeit E\_cm ermittelt: elastisch, am ungeri
 ## Formeln
 
 1. [[Vergrösserungsfaktor der Durchbiegung]]
-2. [[Bewehrungsquerschnitt der zusammengefassten Lage]]
+2. [[Bewehrung der Lage]]
 3. [[Schwerpunkt der zusammengefassten Lage]]
 4. [[Statische Höhe]]
 5. [[Bewehrungsgehalt]]

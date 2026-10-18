@@ -941,38 +941,38 @@ N_{int} = 0\,\mathrm{kN} \;\checkmark \qquad M_{int} = 90\,\mathrm{kNm} \;\check
 \begin{equation*}
 \varphi = 2
 \end{equation*}
-\noindent\textbf{x-Bewehrung unten, zusammen}
+\noindent\textbf{Bewehrung der Lage}
 \begin{equation*}
-A_{s,u} = A_{s,2,x,g} + A_{s,2,x,z} = 1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2} = 2450\,\mathrm{mm}^{2}
+A_{s,2,x} = A_{s,2,x,g} + A_{s,2,x,z} = 1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2} = 2450\,\mathrm{mm}^{2}
 \end{equation*}
-\noindent\textbf{Schwerpunkt der x-Bewehrung unten}
+\noindent\textbf{Gemeinsamer Schwerpunkt der Lage}
 \begin{equation*}
 \begin{aligned}
-  z_{u} &= \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,u}} \\
-  &= \frac{1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 246\,\mathrm{mm}}{2450\,\mathrm{mm}^{2}} \\
+  z_{2,x} &= \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,2,x,g} + A_{s,2,x,z}} \\
+  &= \frac{1696\,\mathrm{mm}^{2} \cdot 249\,\mathrm{mm} + 754\,\mathrm{mm}^{2} \cdot 246\,\mathrm{mm}}{1696\,\mathrm{mm}^{2} + 754\,\mathrm{mm}^{2}} \\
   &= 248.1\,\mathrm{mm}
 \end{aligned}
 \end{equation*}
-\noindent\textbf{Statische Höhe der x-Bewehrung unten}
+\noindent\textbf{Statische Höhe der Lage unten, ab dem gedrückten Rand oben}
 \begin{equation*}
-d_{u} = z_{u} = 248.1\,\mathrm{mm}
+d_{2,x} = z_{2,x} = 248.1\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Bewehrungsgehalt unten}
 \begin{equation*}
-\rho_{u} = \frac{A_{s,u}}{b \cdot d_{u}} = \frac{2450\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 248.1\,\mathrm{mm}} = 0.00988
+\rho_{u} = \frac{A_{s,2,x}}{b \cdot d_{2,x}} = \frac{2450\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 248.1\,\mathrm{mm}} = 0.00988
 \end{equation*}
-\noindent\textbf{Statische Höhe der x-Bewehrung oben}
+\noindent\textbf{Statische Höhe der Lage oben, ab dem gedrückten Rand unten}
 \begin{equation*}
-d_{o} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
+d_{3,x,g} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Bewehrungsgehalt oben}
 \begin{equation*}
-\rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{o}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 252\,\mathrm{mm}} = 0.00299
+\rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{3,x,g}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 252\,\mathrm{mm}} = 0.00299
 \end{equation*}
 \noindent\textbf{Vergrösserungsfaktor, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
 \begin{equation*}
 \begin{aligned}
-  \omega_w &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3} \\
+  \omega_w &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x}}\right)^{3} \\
   &= \frac{1 - 20 \cdot 0.00299}{10 \cdot 0.00988^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{248.1\,\mathrm{mm}}\right)^{3} \\
   &= 4
 \end{aligned}
@@ -980,7 +980,7 @@ d_{o} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
 \noindent\textbf{Vergrösserungsfaktor, Zug oben} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
 \begin{equation*}
 \begin{aligned}
-  \omega_w' &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{o}}\right)^{3} \\
+  \omega_w' &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{3,x,g}}\right)^{3} \\
   &= \frac{1 - 20 \cdot 0.00988}{10 \cdot 0.00299^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{300\,\mathrm{mm}}{252\,\mathrm{mm}}\right)^{3} \\
   &= 7.52
 \end{aligned}
@@ -1758,26 +1758,26 @@ Stahl fliesst (σ\_s = 500 N/mm²) → Vergleich über die Dehnung.
 \begin{equation*}
 \varphi = 1.5
 \end{equation*}
-\noindent\textbf{Statische Höhe der x-Bewehrung unten}
+\noindent\textbf{Statische Höhe der Lage unten, ab dem gedrückten Rand oben}
 \begin{equation*}
-d_{u} = z_{1,x,g} = 165\,\mathrm{mm}
+d_{1,x,g} = z_{1,x,g} = 165\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Bewehrungsgehalt unten}
 \begin{equation*}
-\rho_{u} = \frac{A_{s,1,x,g}}{b \cdot d_{u}} = \frac{262\,\mathrm{mm}^{2}}{500\,\mathrm{mm} \cdot 165\,\mathrm{mm}} = 0.00317
+\rho_{u} = \frac{A_{s,1,x,g}}{b \cdot d_{1,x,g}} = \frac{262\,\mathrm{mm}^{2}}{500\,\mathrm{mm} \cdot 165\,\mathrm{mm}} = 0.00317
 \end{equation*}
-\noindent\textbf{Statische Höhe der x-Bewehrung oben}
+\noindent\textbf{Statische Höhe der Lage oben, ab dem gedrückten Rand unten}
 \begin{equation*}
-d_{o} = h - z_{4,x,g} = 200\,\mathrm{mm} - 35\,\mathrm{mm} = 165\,\mathrm{mm}
+d_{4,x,g} = h - z_{4,x,g} = 200\,\mathrm{mm} - 35\,\mathrm{mm} = 165\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Bewehrungsgehalt oben}
 \begin{equation*}
-\rho_{o} = \frac{A_{s,4,x,g}}{b \cdot d_{o}} = \frac{262\,\mathrm{mm}^{2}}{500\,\mathrm{mm} \cdot 165\,\mathrm{mm}} = 0.00317
+\rho_{o} = \frac{A_{s,4,x,g}}{b \cdot d_{4,x,g}} = \frac{262\,\mathrm{mm}^{2}}{500\,\mathrm{mm} \cdot 165\,\mathrm{mm}} = 0.00317
 \end{equation*}
 \noindent\textbf{Vergrösserungsfaktor, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
 \begin{equation*}
 \begin{aligned}
-  \omega_w &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3} \\
+  \omega_w &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{1,x,g}}\right)^{3} \\
   &= \frac{1 - 20 \cdot 0.00317}{10 \cdot 0.00317^{0.7}} \cdot \left(0.75 + 0.1 \cdot 1.5\right) \cdot \left(\frac{200\,\mathrm{mm}}{165\,\mathrm{mm}}\right)^{3} \\
   &= 8.42
 \end{aligned}
@@ -1785,7 +1785,7 @@ d_{o} = h - z_{4,x,g} = 200\,\mathrm{mm} - 35\,\mathrm{mm} = 165\,\mathrm{mm}
 \noindent\textbf{Vergrösserungsfaktor, Zug oben} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
 \begin{equation*}
 \begin{aligned}
-  \omega_w' &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{o}}\right)^{3} \\
+  \omega_w' &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{4,x,g}}\right)^{3} \\
   &= \frac{1 - 20 \cdot 0.00317}{10 \cdot 0.00317^{0.7}} \cdot \left(0.75 + 0.1 \cdot 1.5\right) \cdot \left(\frac{200\,\mathrm{mm}}{165\,\mathrm{mm}}\right)^{3} \\
   &= 8.42
 \end{aligned}
@@ -2436,26 +2436,26 @@ N_{Rd,K} = 4156.2\,\mathrm{kN} \quad \ge \quad \left|N_{Ed}\right| = 600\,\mathr
 \begin{equation*}
 \varphi = 2
 \end{equation*}
-\noindent\textbf{Statische Höhe der x-Bewehrung unten}
+\noindent\textbf{Statische Höhe der Lage unten, ab dem gedrückten Rand oben}
 \begin{equation*}
-d_{u} = z_{2,x,g} = 204\,\mathrm{mm}
+d_{2,x,g} = z_{2,x,g} = 204\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Bewehrungsgehalt unten}
 \begin{equation*}
-\rho_{u} = \frac{A_{s,2,x,g}}{b \cdot d_{u}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 204\,\mathrm{mm}} = 0.0037
+\rho_{u} = \frac{A_{s,2,x,g}}{b \cdot d_{2,x,g}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 204\,\mathrm{mm}} = 0.0037
 \end{equation*}
-\noindent\textbf{Statische Höhe der x-Bewehrung oben}
+\noindent\textbf{Statische Höhe der Lage oben, ab dem gedrückten Rand unten}
 \begin{equation*}
-d_{o} = h - z_{3,x,g} = 250\,\mathrm{mm} - 45\,\mathrm{mm} = 205\,\mathrm{mm}
+d_{3,x,g} = h - z_{3,x,g} = 250\,\mathrm{mm} - 45\,\mathrm{mm} = 205\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Bewehrungsgehalt oben}
 \begin{equation*}
-\rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{o}} = \frac{524\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 205\,\mathrm{mm}} = 0.00255
+\rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{3,x,g}} = \frac{524\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 205\,\mathrm{mm}} = 0.00255
 \end{equation*}
 \noindent\textbf{Vergrösserungsfaktor, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
 \begin{equation*}
 \begin{aligned}
-  \omega_w &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3} \\
+  \omega_w &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x,g}}\right)^{3} \\
   &= \frac{1 - 20 \cdot 0.00255}{10 \cdot 0.0037^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{250\,\mathrm{mm}}{204\,\mathrm{mm}}\right)^{3} \\
   &= 8.37
 \end{aligned}
@@ -2463,7 +2463,7 @@ d_{o} = h - z_{3,x,g} = 250\,\mathrm{mm} - 45\,\mathrm{mm} = 205\,\mathrm{mm}
 \noindent\textbf{Vergrösserungsfaktor, Zug oben} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
 \begin{equation*}
 \begin{aligned}
-  \omega_w' &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{o}}\right)^{3} \\
+  \omega_w' &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{3,x,g}}\right)^{3} \\
   &= \frac{1 - 20 \cdot 0.0037}{10 \cdot 0.00255^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{250\,\mathrm{mm}}{205\,\mathrm{mm}}\right)^{3} \\
   &= 10.42
 \end{aligned}
@@ -3148,26 +3148,26 @@ N_{Rd,K} = 3508.6\,\mathrm{kN} \quad \ge \quad \left|N_{Ed}\right| = 400\,\mathr
 \begin{equation*}
 \varphi = 2
 \end{equation*}
-\noindent\textbf{Statische Höhe der x-Bewehrung unten}
+\noindent\textbf{Statische Höhe der Lage unten, ab dem gedrückten Rand oben}
 \begin{equation*}
-d_{u} = z_{2,x,g} = 177\,\mathrm{mm}
+d_{2,x,g} = z_{2,x,g} = 177\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Bewehrungsgehalt unten}
 \begin{equation*}
-\rho_{u} = \frac{A_{s,2,x,g}}{b \cdot d_{u}} = \frac{524\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 177\,\mathrm{mm}} = 0.00296
+\rho_{u} = \frac{A_{s,2,x,g}}{b \cdot d_{2,x,g}} = \frac{524\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 177\,\mathrm{mm}} = 0.00296
 \end{equation*}
-\noindent\textbf{Statische Höhe der x-Bewehrung oben}
+\noindent\textbf{Statische Höhe der Lage oben, ab dem gedrückten Rand unten}
 \begin{equation*}
-d_{o} = h - z_{3,x,g} = 220\,\mathrm{mm} - 43\,\mathrm{mm} = 177\,\mathrm{mm}
+d_{3,x,g} = h - z_{3,x,g} = 220\,\mathrm{mm} - 43\,\mathrm{mm} = 177\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Bewehrungsgehalt oben}
 \begin{equation*}
-\rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{o}} = \frac{524\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 177\,\mathrm{mm}} = 0.00296
+\rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{3,x,g}} = \frac{524\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 177\,\mathrm{mm}} = 0.00296
 \end{equation*}
 \noindent\textbf{Vergrösserungsfaktor, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
 \begin{equation*}
 \begin{aligned}
-  \omega_w &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3} \\
+  \omega_w &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x,g}}\right)^{3} \\
   &= \frac{1 - 20 \cdot 0.00296}{10 \cdot 0.00296^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{220\,\mathrm{mm}}{177\,\mathrm{mm}}\right)^{3} \\
   &= 10.11
 \end{aligned}
@@ -3175,7 +3175,7 @@ d_{o} = h - z_{3,x,g} = 220\,\mathrm{mm} - 43\,\mathrm{mm} = 177\,\mathrm{mm}
 \noindent\textbf{Vergrösserungsfaktor, Zug oben} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
 \begin{equation*}
 \begin{aligned}
-  \omega_w' &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{o}}\right)^{3} \\
+  \omega_w' &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{3,x,g}}\right)^{3} \\
   &= \frac{1 - 20 \cdot 0.00296}{10 \cdot 0.00296^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{220\,\mathrm{mm}}{177\,\mathrm{mm}}\right)^{3} \\
   &= 10.11
 \end{aligned}
@@ -3779,26 +3779,26 @@ k_d = \frac{1}{1 + \varepsilon_v \cdot d \cdot k_g} = \frac{1}{1 + 1.6\,\text{�
 \begin{equation*}
 \varphi = 2
 \end{equation*}
-\noindent\textbf{Statische Höhe der x-Bewehrung unten}
+\noindent\textbf{Statische Höhe der Lage unten, ab dem gedrückten Rand oben}
 \begin{equation*}
-d_{u} = z_{2,x,g} = 174\,\mathrm{mm}
+d_{2,x,g} = z_{2,x,g} = 174\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Bewehrungsgehalt unten}
 \begin{equation*}
-\rho_{u} = \frac{A_{s,2,x,g}}{b \cdot d_{u}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 174\,\mathrm{mm}} = 0.00433
+\rho_{u} = \frac{A_{s,2,x,g}}{b \cdot d_{2,x,g}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 174\,\mathrm{mm}} = 0.00433
 \end{equation*}
-\noindent\textbf{Statische Höhe der x-Bewehrung oben}
+\noindent\textbf{Statische Höhe der Lage oben, ab dem gedrückten Rand unten}
 \begin{equation*}
-d_{o} = h - z_{3,x,g} = 250\,\mathrm{mm} - 46\,\mathrm{mm} = 204\,\mathrm{mm}
+d_{3,x,g} = h - z_{3,x,g} = 250\,\mathrm{mm} - 46\,\mathrm{mm} = 204\,\mathrm{mm}
 \end{equation*}
 \noindent\textbf{Bewehrungsgehalt oben}
 \begin{equation*}
-\rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{o}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 204\,\mathrm{mm}} = 0.0037
+\rho_{o} = \frac{A_{s,3,x,g}}{b \cdot d_{3,x,g}} = \frac{754\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 204\,\mathrm{mm}} = 0.0037
 \end{equation*}
 \noindent\textbf{Vergrösserungsfaktor, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
 \begin{equation*}
 \begin{aligned}
-  \omega_w &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3} \\
+  \omega_w &= \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x,g}}\right)^{3} \\
   &= \frac{1 - 20 \cdot 0.0037}{10 \cdot 0.00433^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{250\,\mathrm{mm}}{174\,\mathrm{mm}}\right)^{3} \\
   &= 11.77
 \end{aligned}
@@ -3806,7 +3806,7 @@ d_{o} = h - z_{3,x,g} = 250\,\mathrm{mm} - 46\,\mathrm{mm} = 204\,\mathrm{mm}
 \noindent\textbf{Vergrösserungsfaktor, Zug oben} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
 \begin{equation*}
 \begin{aligned}
-  \omega_w' &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{o}}\right)^{3} \\
+  \omega_w' &= \frac{1 - 20 \cdot \rho_{u}}{10 \cdot \rho_{o}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{3,x,g}}\right)^{3} \\
   &= \frac{1 - 20 \cdot 0.00433}{10 \cdot 0.0037^{0.7}} \cdot \left(0.75 + 0.1 \cdot 2\right) \cdot \left(\frac{250\,\mathrm{mm}}{204\,\mathrm{mm}}\right)^{3} \\
   &= 8.05
 \end{aligned}
@@ -7706,17 +7706,13 @@ Die Durchbiegung w ist mit der Steifigkeit E\_cm ermittelt: elastisch, am ungeri
 \begin{equation*}
 \omega_w = \frac{w}{w_c} = \frac{1 - 20 \cdot \rho'}{10 \cdot \rho^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d}\right)^{3} \qquad \rho = \frac{A_s}{b \cdot d} \qquad \rho' = \frac{A_s'}{b \cdot d'}
 \end{equation*}
-\noindent\textbf{Schwerpunkt der x-Bewehrung unten}
-\begin{equation*}
-z_{u} = \frac{A_{s,2,x,g} \cdot z_{2,x,g} + A_{s,2,x,z} \cdot z_{2,x,z}}{A_{s,u}}
-\end{equation*}
 \noindent\textbf{Bewehrungsgehalt unten}
 \begin{equation*}
-\rho_{u} = \frac{A_{s,u}}{b \cdot d_{u}}
+\rho_{u} = \frac{A_{s,2,x}}{b \cdot d_{2,x}}
 \end{equation*}
 \noindent\textbf{Vergrösserungsfaktor, Zug unten} \hfill \normref{SIA 262:2025, 4.4.3.2.5}
 \begin{equation*}
-\omega_w = \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{u}}\right)^{3}
+\omega_w = \frac{1 - 20 \cdot \rho_{o}}{10 \cdot \rho_{u}^{0.7}} \cdot \left(0.75 + 0.1 \cdot \varphi\right) \cdot \left(\frac{h}{d_{2,x}}\right)^{3}
 \end{equation*}
 \noindent\textbf{Wirksame Durchbiegung, Zug unten}
 \begin{equation*}

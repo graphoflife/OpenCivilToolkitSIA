@@ -50,7 +50,7 @@ from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import als_text, angabe, bedingung
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Kennzahl, Wert, WertDef, kennung_aus
-from opencivil.querschnitt.platte import Richtung
+from opencivil.querschnitt.platte import Richtung, protokoll_lage
 
 #: Vorgabe der Kriechzahl phi im Vergroesserungsfaktor -- Klima und
 #: Belastungsalter, eine Annahme ueber das Bauwerk.
@@ -118,10 +118,11 @@ class Vergroesserungsfaktor(Prozedur):
     def __init__(self, querschnitt, *, kriechzahl: float = KRIECHZAHL) -> None:
         self.kriechzahl = kriechzahl
         posten = querschnitt.posten_in_richtung(Richtung.X)
-        #: Je Seite die Marken ihrer x-Posten, etwa «2g» und «2z».
-        self.marken: Dict[str, List[str]] = {
-            seite: [f"{lage.nummer}{art.kuerzel}" for lage, art, _, _, _ in posten
-                    if lage.von_unten is (seite == "unten")]
+        #: Je Seite ihre x-Posten: eine Lage, mit Grundbewehrung und Zulage --
+        #: die x-Lage unten ist die 1. oder 2., die oben die 3. oder 4.
+        self.posten_je_seite: Dict[str, List[Tuple]] = {
+            seite: [eintrag for eintrag in posten
+                    if eintrag[0].von_unten is (seite == "unten")]
             for seite in ZUGSEITEN}
         basis = f"{querschnitt.id}.vergroesserung"
         self.d_omega: Dict[str, WertDef] = {
@@ -129,7 +130,7 @@ class Vergroesserungsfaktor(Prozedur):
                 id=f"{basis}.omega_w_{seite}", symbol=SYMBOL[seite], einheit=EINHEITSLOS,
                 beschreibung=f"Vergrösserungsfaktor der Durchbiegung, Zug {seite}",
                 referenz="SIA 262:2025, 4.4.3.2.5", stellen=2)
-            for seite in ZUGSEITEN if self.marken[seite]}
+            for seite in ZUGSEITEN if self.posten_je_seite[seite]}
         #: Je Seite mit x-Bewehrung ihr Faktor, mit allen Stellen.
         self.kennzahlen: List[Kennzahl] = [
             Kennzahl(definition, f"Vergrösserungsfaktor, Zug {seite}", definition.referenz,
@@ -202,40 +203,23 @@ class Vergroesserungsfaktor(Prozedur):
         """
         Je Seite mit x-Bewehrung der Bewehrungsgehalt und seine statische
         Hoehe -- die gezogene Seite braucht beide, die Gegenseite ihren
-        Gehalt als rho'.
+        Gehalt als rho'. Querschnitt, Schwerpunkt und Hoehe der Lage schreibt
+        :func:`~opencivil.querschnitt.platte.protokoll_lage`, wie in den
+        Nachweisen der Lagen: dieselbe Hoehe heisst ueberall gleich, etwa
+        d_{2,x}. Bis 2026-10-18 hiess sie hier d_u.
         """
-        h, b = e["h"], e["b"]
+        h, b = e.g("h").si, e["b"]
         gehalte: Dict[str, Tuple[Wert, Wert]] = {}
-        for seite in ZUGSEITEN:
-            marken = self.marken[seite]
-            if not marken:
+        for seite, eintraege in self.posten_je_seite.items():
+            if not eintraege:
                 continue
-            unten = seite == "unten"
+            marken = [f"{lage.nummer}{art.kuerzel}" for lage, art, _, _, _ in eintraege]
+            flaechen = [(e.g(f"a_s_{m}").si, e.g(f"z_{m}").si) for m in marken]
+            a_s = sum(a for a, _ in flaechen)
+            z = sum(a * t for a, t in flaechen) / a_s
+            A, d = protokoll_lage(p, e, Zwischenwerte(f"{self.id}.{seite}"), eintraege,
+                                  a_s=a_s, z=z, d=z if seite == "unten" else h - z)
             k = seite[0]
-            flaechen = [e[f"a_s_{m}"] for m in marken]
-            tiefen = [e[f"z_{m}"] for m in marken]
-            a_s = sum(a.groesse.si for a in flaechen)
-            if len(marken) == 1:
-                A, z = flaechen[0], tiefen[0]
-            else:
-                A = werte.flaeche(f"A_s_{k}", f"A_{{s,{k}}}", a_s)
-                p.formel(A, " + ".join(f"@A{i}" for i in range(len(marken))),
-                         {f"A{i}": a for i, a in enumerate(flaechen)},
-                         titel=f"x-Bewehrung {seite}, zusammen",
-                         name="Bewehrungsquerschnitt der zusammengefassten Lage")
-                z = werte.laenge(f"z_{k}", f"z_{{{k}}}",
-                                 sum(a.groesse.si * t.groesse.si
-                                     for a, t in zip(flaechen, tiefen)) / a_s)
-                p.formel(z, rf"\frac{{{' + '.join(f'@A{i} \\cdot @z{i}' for i in range(len(marken)))}}}"
-                            rf"{{@A}}",
-                         {"A": A, **{f"A{i}": a for i, a in enumerate(flaechen)},
-                          **{f"z{i}": t for i, t in enumerate(tiefen)}},
-                         titel=f"Schwerpunkt der x-Bewehrung {seite}",
-                         name="Schwerpunkt der zusammengefassten Lage")
-            d = werte.laenge(f"d_{k}", f"d_{{{k}}}",
-                             z.groesse.si if unten else h.groesse.si - z.groesse.si)
-            p.formel(d, "@z" if unten else "@h - @z", {"z": z, "h": h},
-                     titel=f"Statische Höhe der x-Bewehrung {seite}", name="Statische Höhe")
             r = werte.zahl(f"rho_{k}", rf"\rho_{{{k}}}", a_s / (b.groesse.si * d.groesse.si),
                            stellen=5)
             p.formel(r, r"\frac{@A}{@b \cdot @d}", {"A": A, "b": b, "d": d},

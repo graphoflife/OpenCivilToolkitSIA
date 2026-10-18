@@ -1,5 +1,5 @@
 ---
-erzeugt: eb36554fdfb0
+erzeugt: 40e958415343
 art: formel
 tags: [formel]
 ---
@@ -9,23 +9,23 @@ tags: [formel]
 *In der Herleitung: «Bewehrungsgehalt unten»*
 
 $$
-\rho_{u} = \frac{A_{s,u}}{b \cdot d_{u}}
+\rho_{u} = \frac{A_{s,2,x}}{b \cdot d_{2,x}}
 $$
 
 ## Grössen
 
 | Zeichen | Bedeutung | Einheit | Woher |
 | --- | --- | --- | --- |
-| $A_{s,u}$ | – | mm² | [[Bewehrungsquerschnitt der zusammengefassten Lage]] |
+| $A_{s,2,x}$ | – | mm² | [[Bewehrung der Lage]] |
 | $b$ | Betrachtete Breite (x) | mm | Vorgabe |
-| $d_{u}$ | – | mm | [[Statische Höhe]] |
+| $d_{2,x}$ | – | mm | [[Statische Höhe]] |
 
 ## Beispiel
 
 Mit den Zahlen aus dem Beispielprojekt:
 
 $$
-\rho_{u} = \frac{A_{s,u}}{b \cdot d_{u}} = \frac{2450\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 248.1\,\mathrm{mm}} = 0.00988
+\rho_{u} = \frac{A_{s,2,x}}{b \cdot d_{2,x}} = \frac{2450\,\mathrm{mm}^{2}}{1000\,\mathrm{mm} \cdot 248.1\,\mathrm{mm}} = 0.00988
 $$
 
 ## Gebraucht von
