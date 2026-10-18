@@ -119,14 +119,18 @@ class Illinois:
     welche, haengt am Weg -- von der zuletzt gefundenen Stelle aus also an
     der Reihenfolge der Fragen. Taugen soll es dort nur, wo das nicht zaehlt:
     ``auch_bei_sprung`` fuer eine Suche, die je Frage frisch anfaengt.
+
+    Ohne ``vom_letzten`` sucht es jede Frage im ganzen Fenster: langsamer als
+    von der letzten Stelle aus, aber die Antwort haengt allein an der Frage
+    (:data:`ILLINOIS_VON_VORN`).
     """
 
-    vom_letzten = True
     wie = ("mit dem Illinois-Verfahren, einer Sekante, die abwechselnd von beiden "
            "Seiten herankommt")
 
-    def __init__(self, *, auch_bei_sprung: bool = False) -> None:
+    def __init__(self, *, auch_bei_sprung: bool = False, vom_letzten: bool = True) -> None:
         self.auch_bei_sprung = auch_bei_sprung
+        self.vom_letzten = vom_letzten
 
     def finde(self, f: Callable[[float], Wert], unten: float, oben: float, schranke: float,
               f_unten: Wert = None, f_oben: Wert = None) -> Wert:
@@ -159,6 +163,11 @@ class Illinois:
 #: Stelle, wer sucht.
 HALBIEREN = Halbieren()
 ILLINOIS = Illinois()
+
+#: Illinois ohne Gedaechtnis: jede Suche im ganzen Fenster -- fuer einen
+#: Loeser, der viele Fragen beantwortet und dessen Antworten nicht an ihrer
+#: Reihenfolge haengen sollen.
+ILLINOIS_VON_VORN = Illinois(vom_letzten=False)
 
 
 def illinois(f: Callable[[float], Tuple[float, Optional[B]]], a: float, fa: float,

@@ -95,7 +95,7 @@ from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
 from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.spannungsanalyse.art import Analyseart
 from opencivil.spannungsanalyse.linie import (
-    Dehnungsebene, FesteNulllinie, Grenzzustand, Linie, Zustaende,
+    SUCHE_DER_ANALYSEN, Dehnungsebene, FesteNulllinie, Grenzzustand, Linie, Zustaende,
 )
 
 if TYPE_CHECKING:
@@ -248,7 +248,7 @@ class KippendeNulllinie:
         self._psi0 = seite.psi
         self._psi = seite.psi
         """Die Zugrichtung der zuletzt gefundenen Ebene -- von dort sucht die naechste."""
-        self._zugseite = zerlegung.in_richtung(seite.psi)
+        self._zugseite = zerlegung.in_richtung(seite.psi, suche=SUCHE_DER_ANALYSEN)
         """Die Zugseite selbst, wie der Loeser des Paars -- fuer jede Frage dieselbe."""
         self._gefunden: Dict[Tuple[str, float, float], Optional[Dehnungsebene]] = {}
 
@@ -621,7 +621,8 @@ def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[s
         q, herkunft, staehle = analyse.querschnitt(wert, wahl, ungerissen=ungerissen)
         zerlegungen.append(_Zerlegung(q, tuple(herkunft), staehle,
                                       {i: w.name for i, w in enumerate(q.werkstoffe)}))
-    gerissen, ungerissen = (z.in_richtung(seite.psi) for z in zerlegungen)
+    gerissen, ungerissen = (z.in_richtung(seite.psi, suche=SUCHE_DER_ANALYSEN)
+                            for z in zerlegungen)
     q = zerlegungen[0].querschnitt
 
     # Der Riss am Bruttoquerschnitt; der Beton der Ecke, die zuerst reisst,

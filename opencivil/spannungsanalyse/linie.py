@@ -30,6 +30,7 @@ from typing import (
     TYPE_CHECKING, Any, Callable, List, Mapping, NamedTuple, Optional, Protocol, Tuple,
 )
 
+from opencivil.core.suche import ILLINOIS_VON_VORN
 from opencivil.nachweis.querschnittsloeser import Faserloeser
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
@@ -39,6 +40,16 @@ if TYPE_CHECKING:
     from opencivil.core.protokoll import Protokoll, Zwischenwerte
     from opencivil.core.wert import Wert
     from opencivil.querschnitt.fasern import Schnittkraefte
+
+#: Wie die Loeser der Analysen suchen, bei der Platte wie am gezeichneten
+#: Querschnitt: mit Illinois, jede Frage im ganzen Fenster -- eine Linie fragt
+#: ihre Punkte in einer Reihenfolge, und keiner soll an ihr haengen. Wo ein
+#: Gesetz springt, halbierend (:func:`~opencivil.nachweis.querschnittsloeser.wirksame_suche`):
+#: dort faende Illinois auf einem flachen Stueck einen anderen Punkt. Bis
+#: 2026-10-18 halbierten alle; so rechnen alle Analysen des Pruefprojekts in
+#: 4.0 statt 5.2 s, die der Platte etwa fuenfmal schneller, und ihre Zahlen
+#: bewegen sich erst ab der siebten Stelle (Benutzer, 2026-10-18).
+SUCHE_DER_ANALYSEN = ILLINOIS_VON_VORN
 
 #: Punkte des gerissenen Teils einer Linie -- vor dem Fliessen ein Drittel,
 #: danach der Rest, denn dort waechst die Verformung am staerksten.

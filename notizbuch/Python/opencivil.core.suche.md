@@ -1,5 +1,5 @@
 ---
-erzeugt: cc47205cd8c6
+erzeugt: f4f0e38f6046
 art: modul
 tags: [modul]
 ---
@@ -108,7 +108,10 @@ welche, haengt am Weg -- von der zuletzt gefundenen Stelle aus also an
 der Reihenfolge der Fragen. Taugen soll es dort nur, wo das nicht zaehlt:
 `auch_bei_sprung` fuer eine Suche, die je Frage frisch anfaengt.
 
-- `vom_letzten = True`
+Ohne `vom_letzten` sucht es jede Frage im ganzen Fenster: langsamer als
+von der letzten Stelle aus, aber die Antwort haengt allein an der Frage
+([[opencivil.core.suche#Konstanten|ILLINOIS_VON_VORN]]).
+
 - `wie = 'mit dem Illinois-Verfahren, einer Sekante, die abwechselnd von beide…`
 
 #### Illinois.finde
@@ -184,6 +187,7 @@ gefundenen Ebene: dort ist das Fenster in wenigen Schritten eng.
 - `B = TypeVar('B')` – Was [[opencivil.core.suche#illinois|illinois]] neben dem Wert mitgibt und an der besten Stelle zurueckgibt.
 - `HALBIEREN = Halbieren()` – Die beiden Suchen, wie sie meist gebraucht werden. Ohne eigenen Zustand -- wo eine Suche bei der zuletzt gefundenen Stelle anfaengt, merkt sich die Stelle, wer sucht.
 - `ILLINOIS = Illinois()`
+- `ILLINOIS_VON_VORN = Illinois(vom_letzten=False)` – Illinois ohne Gedaechtnis: jede Suche im ganzen Fenster -- fuer einen Loeser, der viele Fragen beantwortet und dessen Antworten nicht an ihrer Reihenfolge haengen sollen.
 
 ## Gebraucht von
 
@@ -195,4 +199,5 @@ gefundenen Ebene: dort ist das Fenster in wenigen Schritten eng.
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]
 - [[opencivil.querschnitt.interaktion]]
+- [[opencivil.spannungsanalyse.linie]]
 - [[opencivil.spannungsanalyse.schnitt]]

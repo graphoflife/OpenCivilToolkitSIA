@@ -23,7 +23,9 @@ from opencivil.nachweis.rissgroessen import (
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl
 from opencivil.querschnitt.platte import Richtung
 from opencivil.spannungsanalyse.art import Analyseart
-from opencivil.spannungsanalyse.linie import FesteNulllinie, Grenzzustand, Linie, Zustaende
+from opencivil.spannungsanalyse.linie import (
+    SUCHE_DER_ANALYSEN, FesteNulllinie, Grenzzustand, Linie, Zustaende,
+)
 
 if TYPE_CHECKING:
     from opencivil.core.wert import Wert
@@ -227,9 +229,10 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
         h, [(l.z, l.stahl.eps_ud, f"Stahl der {l.nummer}. Lage") for l in g.lagen(lagen, h)],
         eps_c1d=w.eps_c1d, eps_c2d=w.eps_c2d)
     fenster = dict(grenzen=grenzen, eps_druck=w.eps_c2d)
-    gerissen = g.loeser(h=h, b=b, lagen=lagen, **fenster)
+    gerissen = g.loeser(h=h, b=b, lagen=lagen, suche=SUCHE_DER_ANALYSEN, **fenster)
     # Derselbe Querschnitt ungerissen: nur das Betongesetz ist ein anderes.
-    ungerissen = gesetze(wahl, w, ungerissen=True).loeser(h=h, b=b, lagen=lagen, **fenster)
+    ungerissen = gesetze(wahl, w, ungerissen=True).loeser(
+        h=h, b=b, lagen=lagen, suche=SUCHE_DER_ANALYSEN, **fenster)
     f_ctm = wert(ids["f_ctm"])
     k_t_zug = beiwert_dicke(rissaktive_dicke(h=h, zug=True))
     return Loeserpaar(
