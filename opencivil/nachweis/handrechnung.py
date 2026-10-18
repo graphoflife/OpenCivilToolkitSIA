@@ -50,7 +50,7 @@ from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert
 from opencivil.material.basis import mit_index
 from opencivil.querschnitt.gesetzwahl import Werkstoffsatz
-from opencivil.querschnitt.platte import protokoll_statische_hoehe
+from opencivil.querschnitt.platte import protokoll_statische_hoehe, statische_hoehe
 from opencivil.querschnitt.zugseite import Zugseite
 # Der Anteil des Spannungsblocks steht beim Gesetz; hier wird er nur benutzt.
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL
@@ -384,8 +384,7 @@ class Handrechnung:
                 f"({seite.beschriftung})", ebene=3)
         # d wird ab der gedrueckten Randfaser gemessen -- die wechselt mit dem
         # Vorzeichen des Moments die Seite.
-        d = self.werte.laenge(f"d_{marke}", zug.symbol_d,
-                              zug.z if unten else self.h - zug.z)
+        d = self.werte.laenge(f"d_{marke}", zug.symbol_d, statische_hoehe(zug.z, self.h, seite))
         if zug.a_s > 0.0:
             protokoll_statische_hoehe(
                 p, d, h=self.werte.laenge("h", "h", self.h),

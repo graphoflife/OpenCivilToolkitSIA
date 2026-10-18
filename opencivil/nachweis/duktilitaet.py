@@ -60,7 +60,7 @@ from opencivil.core.wert import Wert, WertDef, kennung_aus
 from opencivil.material.basis import mit_index
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL
 from opencivil.querschnitt.platte import (
-    Bewehrungslage, Richtung, protokoll_lage,
+    Bewehrungslage, Richtung, lage_aus_posten, protokoll_lage,
 )
 
 #: Groesste zulaessige bezogene Druckzonenhoehe -- die Vorgabe.
@@ -222,7 +222,6 @@ class Duktilitaet(Nachweis):
     # -- Rechnen ------------------------------------------------------------
 
     def pruefe(self, e: Eingaben, p: Protokoll):
-        h = e.g("h").si
         f_cd = e.g("f_cd").si
 
         self._protokoll_ansatz(p, e)
@@ -234,7 +233,7 @@ class Duktilitaet(Nachweis):
         for lage in self.lagen:
             # Die Breite in der Richtung der Lage.
             breite = "b" if lage.richtung is Richtung.X else "b_y"
-            erg = self._eine_lage(e, lage, h=h, b=e.g(breite).si, f_cd=f_cd)
+            erg = self._eine_lage(e, lage, b=e.g(breite).si, f_cd=f_cd)
             befund.ergebnisse.append(erg)
             self._protokoll_lage(p, e, erg, breite)
 
@@ -248,30 +247,17 @@ class Duktilitaet(Nachweis):
         return Ausfuehrung(ergebnis, self.teilurteile(urteile), befund)
 
     def _eine_lage(
-        self, e: Eingaben, lage: Bewehrungslage, *,
-        h: float, b: float, f_cd: float,
+        self, e: Eingaben, lage: Bewehrungslage, *, b: float, f_cd: float,
     ) -> Lagenergebnis:
         erg = Lagenergebnis(lage=lage)
-        eintraege = self.posten_je_lage[lage.nummer]
-
-        flaechen = [(e.g(f"a_s_{lage.nummer}{art.kuerzel}").si,
-                     e.g(f"z_{lage.nummer}{art.kuerzel}").si)
-                    for _, art, _, _, _ in eintraege]
-        erg.a_s = sum(a for a, _ in flaechen)
+        erg.a_s, z, d = lage_aus_posten(e, self.posten_je_lage[lage.nummer])
         if erg.a_s <= 0.0:
             erg.begruendung = erg.hinweis = self.ohne_bewehrung(lage.nummer)
             return erg
+        erg.z, erg.d = z, d
 
-        # Grundbewehrung und Zulage liegen auf leicht verschiedenen Hoehen --
-        # sie gehoeren aber zur selben Lage, also zaehlt ihr gemeinsamer
-        # Schwerpunkt. Die schwaechere Stahlsorte gaebe es hier nicht: eine
-        # Lage traegt genau einen Stahl.
-        erg.z = sum(a * z for a, z in flaechen) / erg.a_s
-        # Gemessen ab der gedrueckten Randfaser: unten bewehrt heisst oben
-        # gedrueckt. Wer hier z stehen liesse, bekaeme bei den oberen Lagen
-        # eine Zahl, die keine statische Hoehe ist.
-        erg.d = erg.z if lage.von_unten else h - erg.z
-
+        # Eine Lage traegt genau einen Stahl -- eine schwaechere Sorte unter
+        # ihren Posten gibt es nicht.
         erg.f_sd = e.g(f"f_yd__{kennung_aus(lage.stahl.id)}").si
         erg.x = druckzonenhoehe(a_s=erg.a_s, f_sd=erg.f_sd, b=b, f_cd=f_cd)
         erg.verhaeltnis = erg.x / erg.d if erg.d > 0 else float("inf")

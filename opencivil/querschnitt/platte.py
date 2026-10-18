@@ -344,6 +344,38 @@ def lagenindex(eintraege: Sequence[Tuple]) -> str:
     return f"{lage.nummer},{lage.richtung.value}"
 
 
+def statische_hoehe(z: float, h: float, seite: Zugseite) -> float:
+    """
+    Die statische Hoehe einer Lage in der Tiefe ``z`` unter der Oberkante,
+    gemessen ab dem gedrueckten Rand: unten ``d = z``, oben ``d = h - z`` --
+    die Zahl zur Zeile von :func:`protokoll_statische_hoehe`. Wer ``z``
+    stehen liesse, bekaeme bei den oberen Lagen eine Zahl, die keine
+    statische Hoehe ist.
+    """
+    return z if seite is Zugseite.UNTEN else h - z
+
+
+def lage_aus_posten(
+    e: Eingaben, eintraege: Sequence[Tuple],
+) -> Tuple[float, Optional[float], Optional[float]]:
+    """
+    Querschnitt, gemeinsamer Schwerpunkt und statische Hoehe einer Lage aus
+    ihren Posten -- die Zahlen, die :func:`protokoll_lage` herleitet.
+    Grundbewehrung und Zulage liegen auf leicht verschiedenen Hoehen, gehoeren
+    aber zur selben Lage: es zaehlt ihr gemeinsamer Schwerpunkt. Ohne Stahl
+    gibt es weder Schwerpunkt noch Hoehe, beide ``None``. Bis 2026-10-18
+    rechneten drei Nachweise das je fuer sich.
+    """
+    flaechen = [(e.g(f"a_s_{lage.nummer}{art.kuerzel}").si,
+                 e.g(f"z_{lage.nummer}{art.kuerzel}").si)
+                for lage, art, *_ in eintraege]
+    a_s = sum(a for a, _ in flaechen)
+    if a_s <= 0.0:
+        return a_s, None, None
+    z = sum(a * t for a, t in flaechen) / a_s
+    return a_s, z, statische_hoehe(z, e.g("h").si, eintraege[0][0].seite)
+
+
 def protokoll_lage(
     p: Protokoll, e: Eingaben, werte: Zwischenwerte, eintraege: Sequence[Tuple],
     *, a_s: float, z: Optional[float] = None, d: float = 0.0,

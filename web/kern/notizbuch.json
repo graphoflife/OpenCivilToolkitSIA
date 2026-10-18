@@ -4160,6 +4160,8 @@
         "druckfeldgrenzen",
         "posten_index",
         "lagenindex",
+        "statische_hoehe",
+        "lage_aus_posten",
         "protokoll_lage",
         "protokoll_statische_hoehe",
         "Postenbezug",

@@ -50,7 +50,7 @@ from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import als_text, angabe, bedingung
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Kennzahl, Wert, WertDef, kennung_aus
-from opencivil.querschnitt.platte import Richtung, protokoll_lage
+from opencivil.querschnitt.platte import Richtung, lage_aus_posten, protokoll_lage
 from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 
 #: Vorgabe der Kriechzahl phi im Vergroesserungsfaktor -- Klima und
@@ -201,17 +201,14 @@ class Vergroesserungsfaktor(Prozedur):
         Nachweisen der Lagen: dieselbe Hoehe heisst ueberall gleich, etwa
         d_{2,x}. Bis 2026-10-18 hiess sie hier d_u.
         """
-        h, b = e.g("h").si, e["b"]
+        b = e["b"]
         gehalte: Dict[Zugseite, Tuple[Wert, Wert]] = {}
         for seite, eintraege in self.posten_je_seite.items():
             if not eintraege:
                 continue
-            marken = [f"{lage.nummer}{art.kuerzel}" for lage, art, _, _, _ in eintraege]
-            flaechen = [(e.g(f"a_s_{m}").si, e.g(f"z_{m}").si) for m in marken]
-            a_s = sum(a for a, _ in flaechen)
-            z = sum(a * t for a, t in flaechen) / a_s
+            a_s, z, d = lage_aus_posten(e, eintraege)
             A, d = protokoll_lage(p, e, Zwischenwerte(f"{self.id}.{seite}"), eintraege,
-                                  a_s=a_s, z=z, d=z if seite is Zugseite.UNTEN else h - z)
+                                  a_s=a_s, z=z, d=d)
             k = seite.value[0]
             r = werte.zahl(f"rho_{k}", rf"\rho_{{{k}}}", a_s / (b.groesse.si * d.groesse.si),
                            stellen=5)

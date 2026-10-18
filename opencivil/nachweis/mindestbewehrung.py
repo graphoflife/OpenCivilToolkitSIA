@@ -59,7 +59,7 @@ from opencivil.nachweis.rissgroessen import (
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.zustand2 import gerissen, wertigkeit
 from opencivil.querschnitt.platte import (
-    Bewehrungslage, Richtung, protokoll_lage,
+    Bewehrungslage, Richtung, lage_aus_posten, protokoll_lage,
 )
 
 
@@ -572,7 +572,7 @@ class ZwaengungBiegung(Biegezwang):
         befund = Fallbefund()
 
         for lage in self.lagen:
-            erg = self._eine_lage(e, lage, h=h, b=b, f_ctm=f_ctm, E_cm=E_cm, phi=phi,
+            erg = self._eine_lage(e, lage, b=b, f_ctm=f_ctm, E_cm=E_cm, phi=phi,
                                   M_Riss=groessen.M_Riss)
             befund.ergebnisse.append(erg)
             self._protokoll_lage(p, e, erg, groessen)
@@ -583,23 +583,18 @@ class ZwaengungBiegung(Biegezwang):
         self.protokoll_massgebend(p, urteile)
         return Ausfuehrung(ergebnis, self.teilurteile(urteile), befund)
 
-    def _eine_lage(self, e: Eingaben, lage: Bewehrungslage, *, h: float,
+    def _eine_lage(self, e: Eingaben, lage: Bewehrungslage, *,
                    b: float, f_ctm: float, E_cm: float, phi: float,
                    M_Riss: float) -> Momentlagenergebnis:
         erg = Momentlagenergebnis(lage=lage)
         eintraege = self.posten_je_lage[lage.nummer]
         marken = [f"{lage.nummer}{art.kuerzel}" for _, art, _, _, _ in eintraege]
 
-        flaechen = [(e.g(f"a_s_{m}").si, e.g(f"z_{m}").si) for m in marken]
-        erg.a_s = sum(a for a, _ in flaechen)
+        erg.a_s, z, d = lage_aus_posten(e, eintraege)
         if erg.a_s <= 0.0:
             erg.begruendung = erg.hinweis = self.ohne_bewehrung(lage.nummer)
             return erg
-
-        erg.z_s = sum(a * z for a, z in flaechen) / erg.a_s
-        # Ab der gedrueckten Randfaser: eine untere Lage wird bei positivem
-        # Moment gezogen, gedrueckt ist dann oben.
-        erg.d = erg.z_s if lage.von_unten else h - erg.z_s
+        erg.z_s, erg.d = z, d
         erg.durchmesser = max(e.g(f"phi_{m}").si for m in marken)
 
         kurz = kennung_aus(lage.stahl.id)

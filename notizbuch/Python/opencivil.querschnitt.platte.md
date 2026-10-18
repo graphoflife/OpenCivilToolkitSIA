@@ -1,5 +1,5 @@
 ---
-erzeugt: 62ae331addc4
+erzeugt: be40b87e7593
 art: modul
 tags: [modul]
 ---
@@ -324,6 +324,31 @@ Gerechnet wird mit der ganzen Lage, nicht mit einem Posten; ein
 Postenindex am Symbol behauptete etwas anderes. Hat die Lage nur einen
 Posten, ist dessen Index auch ihrer -- dann heisst `A_s` so wie in der
 Tabelle der Platte. `eintraege` sind Zeilen aus `posten_ids`.
+
+### statische_hoehe
+
+```python
+def statische_hoehe(z: float, h: float, seite: Zugseite) -> float
+```
+
+Die statische Hoehe einer Lage in der Tiefe `z` unter der Oberkante,
+gemessen ab dem gedrueckten Rand: unten `d = z`, oben `d = h - z` --
+die Zahl zur Zeile von [[opencivil.querschnitt.platte#protokoll_statische_hoehe|protokoll_statische_hoehe]]. Wer `z`
+stehen liesse, bekaeme bei den oberen Lagen eine Zahl, die keine
+statische Hoehe ist.
+
+### lage_aus_posten
+
+```python
+def lage_aus_posten(e: Eingaben, eintraege: Sequence[Tuple]) -> Tuple[float, Optional[float], Optional[float]]
+```
+
+Querschnitt, gemeinsamer Schwerpunkt und statische Hoehe einer Lage aus
+ihren Posten -- die Zahlen, die [[opencivil.querschnitt.platte#protokoll_lage|protokoll_lage]] herleitet.
+Grundbewehrung und Zulage liegen auf leicht verschiedenen Hoehen, gehoeren
+aber zur selben Lage: es zaehlt ihr gemeinsamer Schwerpunkt. Ohne Stahl
+gibt es weder Schwerpunkt noch Hoehe, beide `None`. Bis 2026-10-18
+rechneten drei Nachweise das je fuer sich.
 
 ### protokoll_lage
 
