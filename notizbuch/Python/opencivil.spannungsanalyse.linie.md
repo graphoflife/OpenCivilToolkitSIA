@@ -1,5 +1,5 @@
 ---
-erzeugt: 5b4b0dfabba2
+erzeugt: 6340a73c897e
 art: modul
 tags: [modul]
 ---
@@ -431,7 +431,7 @@ auf halber Hoehe, beim gezeichneten Querschnitt im Schwerpunkt.
 
 ## Konstanten
 
-- `SUCHE_DER_ANALYSEN = ILLINOIS_VON_VORN` – Wie die Loeser der Analysen suchen, bei der Platte wie am gezeichneten Querschnitt: mit Illinois, jede Frage im ganzen Fenster -- eine Linie fragt ihre Punkte in einer Reihenfolge, und keiner soll an ihr haengen. Wo ein Gesetz springt, halbierend ([[opencivil.nachweis.querschnittsloeser#wirksame_suche|wirksame_suche]]): dort faende Illinois auf einem flachen Stueck einen anderen Punkt. Bis 2026-10-18 halbierten alle; so rechnen alle Analysen des Pruefprojekts in 4.0 statt 5.2 s, die der Platte etwa fuenfmal schneller, und ihre Zahlen bewegen sich erst ab der siebten Stelle (Benutzer, 2026-10-18).
+- `SUCHE_DER_ANALYSEN = ILLINOIS_VON_VORN` – Wie die Loeser der Analysen suchen, bei der Platte wie am gezeichneten Querschnitt: mit Illinois, jede Frage im ganzen Fenster -- eine Linie fragt ihre Punkte in einer Reihenfolge, und keiner soll an ihr haengen. Wo ein Gesetz springt, halbierend ([[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]]): dort faende Illinois auf einem flachen Stueck einen anderen Punkt. Bis 2026-10-18 halbierten alle; so rechnen alle Analysen des Pruefprojekts in 4.0 statt 5.2 s, die der Platte etwa fuenfmal schneller, und ihre Zahlen bewegen sich erst ab der siebten Stelle (Benutzer, 2026-10-18).
 - `KURVENPUNKTE = 40` – Punkte des gerissenen Teils einer Linie -- vor dem Fliessen ein Drittel, danach der Rest, denn dort waechst die Verformung am staerksten.
 - `PUNKTE_UNGERISSEN = 10` – Punkte des ungerissenen Teils. Er ist beinahe gerade.
 

@@ -2943,6 +2943,7 @@
       "kurz": "die Dehnungsebene des gezeichneten Querschnitts unter Gebrauchslast.",
       "stichworte": [
         "Gebrauchsebene",
+        "_loeser",
         "_bei_neigung",
         "neigung_suchen",
         "_rand",
@@ -3164,7 +3165,6 @@
         "protokoll_verfahren",
         "probenschranken",
         "plattenfasern",
-        "wirksame_suche",
         "wie_gesucht",
         "verfahren",
         "Faserloeser",

@@ -82,9 +82,11 @@ from opencivil.querschnitt.fasern import (
 from opencivil.querschnitt.gesetzwahl import wirksamer_modul
 from opencivil.querschnitt.werkstoffgesetz import Gesetz, Stahlgesetz
 
-#: Obergrenze der Halbierungen je Bisektion. Erreicht wird sie fast nie --
-#: abgebrochen wird ueber die Schranken darunter, sobald das Fenster eng
-#: genug ist. Die Zahl steht nur da, damit keine Schleife ewig laeuft.
+#: Obergrenze der Schritte, mit denen :meth:`Faserloeser._rand` den Rand des
+#: Gleichgewichts sucht; die Suchen nach der Ebene haben ihre eigene
+#: (:data:`opencivil.core.suche.SCHRITTE`). Erreicht wird sie fast nie --
+#: abgebrochen wird ueber :data:`CHI_SCHRANKE`, sobald das Fenster eng genug
+#: ist. Die Zahl steht nur da, damit keine Schleife ewig laeuft.
 SCHRITTE = 60
 
 #: Wann das Dehnungsfenster eng genug ist. Der Startbereich ist rund 0.05
@@ -369,17 +371,6 @@ def plattenfasern(
                 for a_s, z, gesetz in staebe])
 
 
-def wirksame_suche(suche: Suche, querschnitt: Faserquerschnitt) -> Suche:
-    """
-    Wie ein Loeser an diesem Querschnitt sucht, wenn er ``suche`` bekommt:
-    wo ein Gesetz springt, halbierend -- ausser die Suche taugt dort
-    (:attr:`~opencivil.core.suche.Suche.auch_bei_sprung`). Warum, steht beim
-    :class:`Faserloeser`; hier steht die Regel einmal, fuer ihn und fuer die
-    Mitschrift, die sagt, wie gesucht wurde.
-    """
-    return suche if suche.auch_bei_sprung or not querschnitt.springt else HALBIEREN
-
-
 def wie_gesucht(suche: Suche) -> str:
     """
     Wie die beiden geschachtelten Suchen die Stelle finden, als Teil eines
@@ -451,8 +442,9 @@ class Faserloeser:
                  beton: Optional[Callable[[float, float], float]] = None,
                  eps_druck: float = 0.0, eps_zug: float = 0.0,
                  suche: Suche = HALBIEREN) -> None:
-        self.suche = wirksame_suche(suche, querschnitt)
-        """Wie er sucht -- wo ein Gesetz springt, halbierend, siehe oben."""
+        self.suche = suche if suche.auch_bei_sprung or not querschnitt.springt else HALBIEREN
+        """Wie er sucht -- wo ein Gesetz springt, halbierend, siehe oben. Die
+        Mitschrift liest es hier, statt die Regel nachzubauen."""
         self._zuletzt: Optional[float] = None
         """Die Kruemmung der zuletzt gefundenen Ebene -- von dort sucht die naechste."""
         self._eps_zuletzt: Optional[float] = None
@@ -538,8 +530,8 @@ class Faserloeser:
 
         Bei fester Dehnung waechst das Moment mit der Kruemmung: die eine
         Seite wird mehr gedehnt, die andere mehr gestaucht. Gesucht wird darum
-        wie in :meth:`_eps_zu_normalkraft` durch Halbieren, innerhalb dessen,
-        was die Grenzen bei dieser Dehnung zulassen.
+        wie in :meth:`_eps_zu_normalkraft`, mit der Suche des Loesers, innerhalb
+        dessen, was die Grenzen bei dieser Dehnung zulassen.
         """
         fenster = self.grenzen.kruemmungsfenster(eps_m)
         if fenster is None:

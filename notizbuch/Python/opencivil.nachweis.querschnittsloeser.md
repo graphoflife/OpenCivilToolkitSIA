@@ -1,5 +1,5 @@
 ---
-erzeugt: f8e8ff79a24c
+erzeugt: 3de8bbdb8708
 art: modul
 tags: [modul]
 ---
@@ -230,18 +230,6 @@ gemittelt wird damit, wo das Gesetz springt
 ([[opencivil.querschnitt.fasern]]). Bis 2026-10-17 sagte das ein
 Schalter `gemittelt`, den jeder Aufrufer aus der Rechenart ableitete.
 
-### wirksame_suche
-
-```python
-def wirksame_suche(suche: Suche, querschnitt: Faserquerschnitt) -> Suche
-```
-
-Wie ein Loeser an diesem Querschnitt sucht, wenn er `suche` bekommt:
-wo ein Gesetz springt, halbierend -- ausser die Suche taugt dort
-([[opencivil.core.suche#Suche|auch_bei_sprung]]). Warum, steht beim
-[[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]]; hier steht die Regel einmal, fuer ihn und fuer die
-Mitschrift, die sagt, wie gesucht wurde.
-
 ### wie_gesucht
 
 ```python
@@ -363,8 +351,8 @@ Hoehe das Moment `M` traegt -- `None`, wo es keine gibt.
 
 Bei fester Dehnung waechst das Moment mit der Kruemmung: die eine
 Seite wird mehr gedehnt, die andere mehr gestaucht. Gesucht wird darum
-wie in [[opencivil.nachweis.querschnittsloeser#Faserloeser._eps_zu_normalkraft|_eps_zu_normalkraft]] durch Halbieren, innerhalb dessen,
-was die Grenzen bei dieser Dehnung zulassen.
+wie in [[opencivil.nachweis.querschnittsloeser#Faserloeser._eps_zu_normalkraft|_eps_zu_normalkraft]], mit der Suche des Loesers, innerhalb
+dessen, was die Grenzen bei dieser Dehnung zulassen.
 
 #### Faserloeser.loese
 
@@ -505,7 +493,7 @@ Rechenzeit.
 
 ## Konstanten
 
-- `SCHRITTE = 60` – Obergrenze der Halbierungen je Bisektion. Erreicht wird sie fast nie -- abgebrochen wird ueber die Schranken darunter, sobald das Fenster eng genug ist. Die Zahl steht nur da, damit keine Schleife ewig laeuft.
+- `SCHRITTE = 60` – Obergrenze der Schritte, mit denen [[opencivil.nachweis.querschnittsloeser#Faserloeser._rand|Faserloeser._rand]] den Rand des Gleichgewichts sucht; die Suchen nach der Ebene haben ihre eigene ([[opencivil.core.suche#Konstanten|opencivil.core.suche.SCHRITTE]]). Erreicht wird sie fast nie -- abgebrochen wird ueber [[opencivil.nachweis.querschnittsloeser#Konstanten|CHI_SCHRANKE]], sobald das Fenster eng genug ist. Die Zahl steht nur da, damit keine Schleife ewig laeuft.
 - `EPS_SCHRANKE = 1e-11` – Wann das Dehnungsfenster eng genug ist. Der Startbereich ist rund 0.05 breit; 1e-11 ist ein Zehntausendstel eines Promille und liegt weit unter allem, was eine Eingabe hergibt. Ohne diese Schranke lief die Bisektion stur sechzig Mal -- die letzten zehn Durchlaeufe aendern in doppelter Genauigkeit nichts mehr und kosten doch jedesmal einen Faserdurchgang.
 - `CHI_SCHRANKE = 1e-10` – Dasselbe fuer die Kruemmung, in 1/m.
 - `PROBE_SCHRANKE = 1e-06` – Wie genau die gefundene Ebene ihre Schnittgroessen treffen muss -- als Teil der Druckkraft des ganzen Querschnitts bei seiner Grenzstauchung, beim Moment mal seiner Hoehe ([[opencivil.nachweis.querschnittsloeser#probenschranken|probenschranken]]). Die Suchen treffen weit genauer: in den beiden Pruefprojekten bleiben 1684 Ebenen unter 0.4 % der Schranke (2026-10-15). Eine Ebene, die an einem Sprung des Spannungsblocks haengen bleibt, liegt um Hunderte Kilonewton daneben.

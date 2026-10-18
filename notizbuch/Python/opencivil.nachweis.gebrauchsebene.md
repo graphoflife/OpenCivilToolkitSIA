@@ -1,5 +1,5 @@
 ---
-erzeugt: 6faf75c120f3
+erzeugt: 3b7b88f661a7
 art: modul
 tags: [modul]
 ---
@@ -64,6 +64,15 @@ Die Dehnungsebene zu einem Lastfall -- und was sie erzeugt.
 - `sigma_s: Tuple[float, ...]` – Dehnung und Spannung je Bewehrung des Querschnitts.
 - `konvergiert: bool = True`
 - `verfehlt: bool = False` – Ob die Suche an einem Sprung haengen blieb, statt eine Ebene zu finden -- wie [[opencivil.nachweis.querschnittsloeser#Ebene|verfehlt]].
+
+### _loeser
+
+```python
+def _loeser(r: Richtung) -> Faserloeser
+```
+
+Der Loeser in einer Zugrichtung -- mit Illinois, wo kein Gesetz springt.
+Die Ebene sucht er, [[opencivil.nachweis.gebrauchsebene#suche_der_ebene|suche_der_ebene]] liest von ihm, wie.
 
 ### _bei_neigung
 
@@ -138,8 +147,8 @@ def suche_der_ebene(q: Querschnitt) -> str
 
 Wie die Ebene unter Gebrauchslast gefunden wird -- bei schiefer Biegung,
 mit der Suche, mit der [[opencivil.nachweis.gebrauchsebene#_bei_neigung|_bei_neigung]] an diesem Querschnitt
-wirklich sucht. Bis 2026-10-17 stand hier «zwei geschachtelte
-Halbierungen», auch wo mit Illinois gesucht wurde.
+wirklich sucht: der Loeser sagt sie selbst. Bis 2026-10-17 stand hier
+«zwei geschachtelte Halbierungen», auch wo mit Illinois gesucht wurde.
 
 ### protokoll_ebene
 

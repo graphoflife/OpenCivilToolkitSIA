@@ -75,7 +75,7 @@ from typing import TYPE_CHECKING, Callable, Dict, List, Mapping, Optional, Seque
 
 from opencivil.core.einheiten import MIO_MM3, MIO_MM4, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.suche import HALBIEREN, Illinois, Suche
+from opencivil.core.suche import Illinois, Suche
 from opencivil.material.basis import Baustoff
 from opencivil.nachweis.gebrauchsebene import QUER_SCHRANKE, neigung_suchen
 from opencivil.nachweis.querschnittsloeser import (
@@ -132,7 +132,7 @@ def _betonspannung(r, gesetze: Mapping[int, Callable[[float], float]]
 
 def _loeser(q: Querschnitt, psi: float, herkunft: Sequence[Stabgruppe],
             staehle: Mapping[int, Stahlgesetz], namen: Mapping[int, str], *,
-            suche: Suche = HALBIEREN) -> Faserloeser:
+            suche: Suche) -> Faserloeser:
     """
     Der Querschnitt in der Zugrichtung ``psi`` als :class:`Faserloeser`.
     Staebe in derselben Tiefe, aus demselben Stahl und im selben Beton werden
@@ -141,7 +141,7 @@ def _loeser(q: Querschnitt, psi: float, herkunft: Sequence[Stabgruppe],
     stimmt das Moment um die andere Achse, nach dem die kippende Nulllinie
     sucht. Bis 2026-10-17 fiel er weg, und die Suche fand an einem L Ebenen
     mit einem Moment um die andere Achse. ``suche`` sagt, wie der Loeser
-    sucht -- die kippende Nulllinie nimmt Illinois.
+    sucht (:meth:`_Zerlegung.in_richtung`).
     """
     r = q.richtung(psi)
     oben, unten = r.beton
@@ -183,8 +183,13 @@ class _Zerlegung:
     staehle: Mapping[int, Stahlgesetz]
     namen: Mapping[int, str]
 
-    def in_richtung(self, psi: float, *, suche: Suche = HALBIEREN) -> FesteNulllinie:
-        """Der Zustand in der Zugrichtung ``psi``, mit fester Nulllinie."""
+    def in_richtung(self, psi: float, *,
+                    suche: Suche = SUCHE_DER_ANALYSEN) -> FesteNulllinie:
+        """
+        Der Zustand in der Zugrichtung ``psi``, mit fester Nulllinie --
+        gesucht wie in allen Analysen. Nur die gekippten Richtungen der
+        kippenden Nulllinie suchen je Frage frisch (:data:`_JE_FRAGE`).
+        """
         return FesteNulllinie(_loeser(self.querschnitt, psi, self.herkunft, self.staehle,
                                       self.namen, suche=suche),
                               self.querschnitt.richtung(psi).grenznamen)
@@ -248,7 +253,7 @@ class KippendeNulllinie:
         self._psi0 = seite.psi
         self._psi = seite.psi
         """Die Zugrichtung der zuletzt gefundenen Ebene -- von dort sucht die naechste."""
-        self._zugseite = zerlegung.in_richtung(seite.psi, suche=SUCHE_DER_ANALYSEN)
+        self._zugseite = zerlegung.in_richtung(seite.psi)
         """Die Zugseite selbst, wie der Loeser des Paars -- fuer jede Frage dieselbe."""
         self._gefunden: Dict[Tuple[str, float, float], Optional[Dehnungsebene]] = {}
 
@@ -623,8 +628,7 @@ def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[s
         q, herkunft, staehle = analyse.querschnitt(wert, wahl, ungerissen=ungerissen)
         zerlegungen.append(_Zerlegung(q, tuple(herkunft), staehle,
                                       {i: w.name for i, w in enumerate(q.werkstoffe)}))
-    gerissen, ungerissen = (z.in_richtung(seite.psi, suche=SUCHE_DER_ANALYSEN)
-                            for z in zerlegungen)
+    gerissen, ungerissen = (z.in_richtung(seite.psi) for z in zerlegungen)
     q = zerlegungen[0].querschnitt
 
     # Der Riss am Bruttoquerschnitt; der Beton der Ecke, die zuerst reisst,

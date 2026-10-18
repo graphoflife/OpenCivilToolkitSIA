@@ -40,10 +40,8 @@ from typing import Callable, Optional, Tuple, TypeVar
 from opencivil.core.latex import angabe, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.suche import ILLINOIS, illinois
-from opencivil.nachweis.querschnittsloeser import (
-    Faserloeser, probenschranken, wie_gesucht, wirksame_suche,
-)
-from opencivil.querschnitt.interaktion import Querschnitt
+from opencivil.nachweis.querschnittsloeser import Faserloeser, probenschranken, wie_gesucht
+from opencivil.querschnitt.interaktion import Querschnitt, Richtung
 from opencivil.querschnitt.zugseite import Zugseite
 
 #: Wie weit sich die Neigung ψ der Ebene unter Gebrauchslast von der
@@ -104,6 +102,14 @@ KEINE = Gebrauchsebene(psi=0.0, eps_m=0.0, chi=0.0, N=0.0, M_y=0.0, M_z=0.0,
 VERFEHLT = replace(KEINE, verfehlt=True)
 
 
+def _loeser(r: Richtung) -> Faserloeser:
+    """
+    Der Loeser in einer Zugrichtung -- mit Illinois, wo kein Gesetz springt.
+    Die Ebene sucht er, :func:`suche_der_ebene` liest von ihm, wie.
+    """
+    return Faserloeser(querschnitt=r.fasern, grenzen=r.grenzen, suche=ILLINOIS)
+
+
 def _bei_neigung(q: Querschnitt, psi: float, N: float, M_y: float,
                  M_z: float) -> Tuple[Gebrauchsebene, float]:
     """
@@ -115,8 +121,7 @@ def _bei_neigung(q: Querschnitt, psi: float, N: float, M_y: float,
     """
     r = q.richtung(psi)
     n_y, n_z = r.n
-    loesung = Faserloeser(querschnitt=r.fasern, grenzen=r.grenzen, suche=ILLINOIS).loese(
-        N_Ed=N, M_Ed=-(n_z * M_y + n_y * M_z))
+    loesung = _loeser(r).loese(N_Ed=N, M_Ed=-(n_z * M_y + n_y * M_z))
     if not loesung.konvergiert:
         return (VERFEHLT if loesung.verfehlt else KEINE), math.nan
     k = r.fasern.kraefte(loesung.eps_m, loesung.chi)
@@ -266,10 +271,10 @@ def suche_der_ebene(q: Querschnitt) -> str:
     """
     Wie die Ebene unter Gebrauchslast gefunden wird -- bei schiefer Biegung,
     mit der Suche, mit der :func:`_bei_neigung` an diesem Querschnitt
-    wirklich sucht. Bis 2026-10-17 stand hier «zwei geschachtelte
-    Halbierungen», auch wo mit Illinois gesucht wurde.
+    wirklich sucht: der Loeser sagt sie selbst. Bis 2026-10-17 stand hier
+    «zwei geschachtelte Halbierungen», auch wo mit Illinois gesucht wurde.
     """
-    suche = wirksame_suche(ILLINOIS, q.richtung(0.0).fasern)
+    suche = _loeser(q.richtung(0.0)).suche
     return (
         f"Gesucht wird die Ebene, die N, M_y und M_z zugleich trägt. Zu einer "
         f"festen Zugrichtung n ist es dieselbe Aufgabe wie bei der Platte: zwei "

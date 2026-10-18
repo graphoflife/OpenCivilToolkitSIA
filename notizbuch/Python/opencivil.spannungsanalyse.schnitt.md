@@ -1,5 +1,5 @@
 ---
-erzeugt: a2e9a8a7c76b
+erzeugt: d86bfbb45e9d
 art: modul
 tags: [modul]
 ---
@@ -100,7 +100,7 @@ Tiefe, zeigt das Bild den, der dort ueberwiegt.
 ### _loeser
 
 ```python
-def _loeser(q: Querschnitt, psi: float, herkunft: Sequence[Stabgruppe], staehle: Mapping[int, Stahlgesetz], namen: Mapping[int, str], *, suche: Suche=HALBIEREN) -> Faserloeser
+def _loeser(q: Querschnitt, psi: float, herkunft: Sequence[Stabgruppe], staehle: Mapping[int, Stahlgesetz], namen: Mapping[int, str], *, suche: Suche) -> Faserloeser
 ```
 
 Der Querschnitt in der Zugrichtung `psi` als [[opencivil.nachweis.querschnittsloeser#Faserloeser|Faserloeser]].
@@ -110,7 +110,7 @@ Ihr Arm entlang der Nulllinie ist der Schwerpunkt ihrer Flaechen: mit ihm
 stimmt das Moment um die andere Achse, nach dem die kippende Nulllinie
 sucht. Bis 2026-10-17 fiel er weg, und die Suche fand an einem L Ebenen
 mit einem Moment um die andere Achse. `suche` sagt, wie der Loeser
-sucht -- die kippende Nulllinie nimmt Illinois.
+sucht ([[opencivil.spannungsanalyse.schnitt#_Zerlegung.in_richtung|_Zerlegung.in_richtung]]).
 
 ### _Zerlegung
 
@@ -129,10 +129,12 @@ Ein Zustand des gezeichneten Querschnitts -- in jeder Zugrichtung zu haben.
 #### _Zerlegung.in_richtung
 
 ```python
-def in_richtung(self, psi: float, *, suche: Suche=HALBIEREN) -> FesteNulllinie
+def in_richtung(self, psi: float, *, suche: Suche=SUCHE_DER_ANALYSEN) -> FesteNulllinie
 ```
 
-Der Zustand in der Zugrichtung `psi`, mit fester Nulllinie.
+Der Zustand in der Zugrichtung `psi`, mit fester Nulllinie --
+gesucht wie in allen Analysen. Nur die gekippten Richtungen der
+kippenden Nulllinie suchen je Frage frisch ([[opencivil.spannungsanalyse.schnitt#Konstanten|_JE_FRAGE]]).
 
 ### KippendeNulllinie
 

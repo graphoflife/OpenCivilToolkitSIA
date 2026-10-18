@@ -44,7 +44,7 @@ if TYPE_CHECKING:
 #: Wie die Loeser der Analysen suchen, bei der Platte wie am gezeichneten
 #: Querschnitt: mit Illinois, jede Frage im ganzen Fenster -- eine Linie fragt
 #: ihre Punkte in einer Reihenfolge, und keiner soll an ihr haengen. Wo ein
-#: Gesetz springt, halbierend (:func:`~opencivil.nachweis.querschnittsloeser.wirksame_suche`):
+#: Gesetz springt, halbierend (:class:`~opencivil.nachweis.querschnittsloeser.Faserloeser`):
 #: dort faende Illinois auf einem flachen Stueck einen anderen Punkt. Bis
 #: 2026-10-18 halbierten alle; so rechnen alle Analysen des Pruefprojekts in
 #: 4.0 statt 5.2 s, die der Platte etwa fuenfmal schneller, und ihre Zahlen
