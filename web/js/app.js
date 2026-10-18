@@ -17,7 +17,7 @@ import {
   alsDateiSichern, ausDateiLaden, gerettete, geretteteHerunterladen, geretteteVerwerfen,
   imBrowserAblegen, projektHolen,
 } from './ablage.js';
-import { el, melden } from './dom.js';
+import { el, inhaltMarkieren, melden } from './dom.js';
 import { baumZeichnen } from './baum.js';
 import { berichtZeichnen } from './bericht.js';
 import { konsoleVerbinden } from './konsole.js';
@@ -581,6 +581,8 @@ async function starten() {
 
   griffeEinrichten();
   tafelwahlEinrichten();
+  // Ein Klick in ein Feld markiert seinen Inhalt -- Tippen ersetzt ihn.
+  inhaltMarkieren();
   fensterEinrichten(knoten.fenster);
   ablageEinrichten(imBrowserAblegen);
   horchen(allesZeichnen);

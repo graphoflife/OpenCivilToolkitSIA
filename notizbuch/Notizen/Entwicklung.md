@@ -44,6 +44,26 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-18 · Ein Klick in ein Feld markiert seinen Inhalt
+
+Wunsch des Benutzers: wer in ein Text- oder Zahlenfeld klickt, soll gleich
+tippen können. Vorher setzte der Klick nur den Cursor: wer hinter die 300
+klickte und 250 tippte, bekam 300250. Jetzt ist 300 markiert und wird
+ersetzt. Ein zweiter Klick setzt den Cursor wie gewohnt.
+
+- Eine Stelle für die ganze Seite: `inhaltMarkieren` in `dom.js`, beim Start
+  einmal eingerichtet. Markiert wird beim Fokus, also auch, wenn das
+  CAD-Fenster eine Ziffer ins erste Feld schickt -- sie ersetzt dann, was
+  dort stand -- und wenn die Seite nach dem Neuzeichnen den Fokus zurückgibt.
+  Ein Textfeld bekommt dort gleich danach seinen Cursor zurück; ein
+  Zahlenfeld hat keinen und bleibt markiert, etwa nach Enter.
+- Der Browser hebt die Markierung beim Loslassen der Maus wieder auf; dieses
+  eine Loslassen wird abgefangen.
+- Mehrzeilige Felder (Beschreibung, Python-Skript) bleiben aussen vor: dort
+  ersetzte ein Tastendruck den ganzen Text.
+
+---
+
 ## 2026-10-18 · Die Oberfläche fragt den Kern
 
 Phase 5 des Umbaus aus der Durchsicht vom 2026-10-16, in neun Commits.

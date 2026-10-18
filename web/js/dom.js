@@ -207,6 +207,37 @@ export function zahlfeld({
   ]);
 }
 
+/**
+ * Ein Klick in ein Text- oder Zahlenfeld markiert seinen ganzen Inhalt: wer
+ * dann tippt, ersetzt ihn (Benutzer, 2026-10-18). Erst ein zweiter Klick
+ * setzt den Cursor an eine Stelle. Mehrzeilige Felder -- eine Beschreibung,
+ * ein Skript -- bleiben aussen vor: dort ersetzte ein Tastendruck den ganzen
+ * Text.
+ *
+ * Markiert wird beim Fokus, für die ganze Seite an einer Stelle. Fokussiert
+ * ein Klick das Feld, hebt der Browser die Markierung beim Loslassen wieder
+ * auf und setzt den Cursor -- dieses eine Loslassen wird darum abgefangen.
+ * Über die Tastatur (Tab) kommt man ohnehin markiert hinein.
+ */
+export function inhaltMarkieren(wurzel = document) {
+  let geklickt = null;
+  wurzel.addEventListener('mousedown', (e) => {
+    geklickt = einzeilig(e.target) && e.target !== document.activeElement ? e.target : null;
+  }, true);
+  wurzel.addEventListener('focusin', (e) => {
+    if (einzeilig(e.target)) e.target.select();
+  });
+  wurzel.addEventListener('mouseup', (e) => {
+    if (geklickt && e.target === geklickt) e.preventDefault();
+    geklickt = null;
+  }, true);
+}
+
+/** Ein Feld, in das man eine Zeile tippt: Text, Zahl oder Suche. */
+function einzeilig(knoten) {
+  return knoten instanceof HTMLInputElement && ['text', 'number', 'search'].includes(knoten.type);
+}
+
 export function auswahl({ werte, gewaehlt, beiAenderung, titel }) {
   return el('select', {
     title: titel,
