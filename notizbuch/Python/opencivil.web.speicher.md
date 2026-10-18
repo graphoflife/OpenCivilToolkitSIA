@@ -1,5 +1,5 @@
 ---
-erzeugt: 623f7823dc9a
+erzeugt: 83207a5c7c9a
 art: modul
 tags: [modul]
 ---
@@ -47,6 +47,12 @@ das Ergebnis eines Balkensystems. Die Bilder lesen dort, nicht an den
 Rechenobjekten; die eines frischen Aufbaus taugen darum so gut wie die von
 damals.
 
+Daneben, in einem zweiten Speicher derselben Art, die Zeichendaten seiner
+Spannung-Dehnung-Analysen, unter demselben Abdruck: sie lesen nur seinen
+Eintrag, die Materialien und die Werte, die daraus folgen. Bis 2026-10-18
+rechnete jede Rechnung alle Analysen neu, auch die unveraenderter Bauteile --
+am Pruefprojekt «jeder Nachweis» zwei Drittel jeder Rechnung.
+
 ## Inhalt
 
 ### abdruck
@@ -71,28 +77,29 @@ sich aendert.
 ### Ergebnisspeicher
 
 ```python
-class Ergebnisspeicher
+class Ergebnisspeicher(Generic[T])
 ```
 
 Das Gedaechtnis zwischen zwei Anfragen.
 
 Ein Eintrag je Bauteil, geschluesselt nach Kennung und nur gueltig,
-solange der Abdruck stimmt. Die Loesung darin ist die eines Laufs, der
-die Baustoffe mitgebracht bekam -- sie enthaelt nur, was das Bauteil
-selbst gerechnet hat. Der Speicher liegt im Modul und damit im Prozess: beim
+solange der Abdruck stimmt. Was darin liegt, sagt, wer ihn anlegt: die
+Loesung eines Laufs, der die Baustoffe mitgebracht bekam -- sie enthaelt
+nur, was das Bauteil selbst gerechnet hat --, oder die Zeichendaten
+seiner Analysen. Der Speicher liegt im Modul und damit im Prozess: beim
 Server ist das die laufende Sitzung, im Browser der offene Reiter. Eine
 Ablage auf der Platte waere ein zweiter Ort fuer dieselbe Wahrheit.
 
 #### Ergebnisspeicher.hole
 
 ```python
-def hole(self, kennung: str, stempel: str) -> Optional[Loesung]
+def hole(self, kennung: str, stempel: str) -> Optional[T]
 ```
 
 #### Ergebnisspeicher.merken
 
 ```python
-def merken(self, kennung: str, stempel: str, teil: Loesung) -> None
+def merken(self, kennung: str, stempel: str, teil: T) -> None
 ```
 
 #### Ergebnisspeicher.aufraeumen
@@ -119,11 +126,11 @@ def belegt(self) -> int
 
 ## Konstanten
 
+- `T = TypeVar('T')` – Was ein Speicher je Bauteil aufbewahrt -- eine Loesung oder Zeichendaten.
 - `PLAETZE = 32` – Wie viele Bauteile hoechstens aufbewahrt werden. Ein Projekt mit mehr Platten als das laeuft nicht langsamer als ohne Speicher -- es gewinnt nur nichts mehr. Die Grenze ist gegen ein Gedaechtnis, das nie kleiner wird.
 
 ## Braucht
 
-- [[opencivil.core.rechenwerk]]
 - [[opencivil.projekt]]
 
 ## Gebraucht von

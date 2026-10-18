@@ -44,7 +44,11 @@ from opencivil.web.umschlag import endlich, fehlerdaten, umschlag
 #: Das Gedaechtnis zwischen zwei Anfragen -- siehe :mod:`opencivil.web.speicher`.
 #: Im Modul und damit im Prozess: beim Server die laufende Sitzung, im Browser
 #: der offene Reiter.
-SPEICHER = speicher.Ergebnisspeicher()
+SPEICHER: speicher.Ergebnisspeicher[Loesung] = speicher.Ergebnisspeicher()
+
+#: Dasselbe fuer die Zeichendaten der Spannung-Dehnung-Analysen, je Bauteil
+#: unter demselben Abdruck wie seine Loesung (:func:`_analysen`).
+ANALYSEN: speicher.Ergebnisspeicher[list] = speicher.Ergebnisspeicher()
 
 
 class DienstFehler(Exception):
@@ -142,15 +146,18 @@ def rechnen(rumpf: Mapping[str, Any]) -> Dict[str, Any]:
         # aufzubewahren waere der Weg zu Zahlen, die niemand erklaeren kann.
         return api.loesung_dict(aufbau.werk.loese(*gewaehlt), aufbau)
 
+    beschreibung = projekt.als_dict()
     if not aufbau.alle_ziele():
         # Kein Nachweis vorhanden -- dann wenigstens alle Materialkennwerte.
         loesung = aufbau.werk.loese_alles()
     else:
-        loesung = _stromabwaerts(projekt, aufbau)
-    return {**api.loesung_dict(loesung, aufbau), "obergrenzen": api.obergrenzen(projekt)}
+        loesung = _stromabwaerts(projekt, aufbau, beschreibung)
+    analysen = _analysen(beschreibung, aufbau, loesung)
+    return {**api.loesung_dict(loesung, aufbau, spannungsanalysen=analysen),
+            "obergrenzen": api.obergrenzen(projekt)}
 
 
-def _stromabwaerts(projekt: Projekt, aufbau) -> Loesung:
+def _stromabwaerts(projekt: Projekt, aufbau, beschreibung: Mapping[str, Any]) -> Loesung:
     """
     Alles rechnen -- aber nur, was sich geaendert hat.
 
@@ -172,7 +179,6 @@ def _stromabwaerts(projekt: Projekt, aufbau) -> Loesung:
     materialziele = aufbau.materialziele()
     gesamt = aufbau.werk.loese(*materialziele)
     bekannt = dict(gesamt.werte)
-    beschreibung = projekt.als_dict()
 
     for kennung, eigene in aufbau.ziele_je_bauteil():
         if not eigene:
@@ -185,6 +191,26 @@ def _stromabwaerts(projekt: Projekt, aufbau) -> Loesung:
         gesamt.anhaengen(teil)
         bekannt.update(teil.werte)
     return gesamt
+
+
+def _analysen(beschreibung: Mapping[str, Any], aufbau, loesung: Loesung) -> Dict[str, list]:
+    """
+    Die Zeichendaten der Spannung-Dehnung-Analysen, je Bauteil -- aus dem
+    Speicher, solange sein Abdruck derselbe ist wie bei seiner Loesung: eine
+    Analyse liest nur den Eintrag ihres Bauteils, die Materialien und die
+    Werte, die daraus folgen. Gerechnet werden nur die uebrigen, in einem
+    Lauf. Bis 2026-10-18 rechnete jede Rechnung alle Analysen neu, auch die
+    unveraenderter Bauteile -- am Pruefprojekt «jeder Nachweis» zwei Drittel
+    jeder Rechnung.
+    """
+    ANALYSEN.aufraeumen(aufbau.spannungsfaelle)
+    stempel = {k: _abdruck(beschreibung, aufbau, k) for k in aufbau.spannungsfaelle}
+    daten = {k: ANALYSEN.hole(k, s) for k, s in stempel.items()}
+    neu = diagrammdaten.spannungsanalysen(
+        aufbau, loesung, nur={k for k, d in daten.items() if d is None})
+    for kennung, d in neu.items():
+        ANALYSEN.merken(kennung, stempel[kennung], d)
+    return {**daten, **neu}
 
 
 def _abdruck(beschreibung: Mapping[str, Any], aufbau, kennung: str) -> str:

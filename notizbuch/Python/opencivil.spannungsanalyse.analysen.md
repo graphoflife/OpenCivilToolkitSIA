@@ -1,5 +1,5 @@
 ---
-erzeugt: cfe7935e32b0
+erzeugt: 3946e4dbcca7
 art: modul
 tags: [modul]
 ---
@@ -72,7 +72,7 @@ dasteht, wo es kein Paar gibt.
 ### analysen
 
 ```python
-def analysen(aufbau: 'Aufbau', loesung: 'Loesung', protokoll: Optional[Protokoll]=None) -> Dict[str, List[Analyse]]
+def analysen(aufbau: 'Aufbau', loesung: 'Loesung', protokoll: Optional[Protokoll]=None, *, nur: Optional[Collection[str]]=None) -> Dict[str, List[Analyse]]
 ```
 
 Die Auswertungen am Querschnitt, je Platte und je gezeichnetem Querschnitt.
@@ -84,7 +84,9 @@ in den Nachweisen -- ein zweites Modell daneben waere eine zweite
 Wahrheit ueber denselben Querschnitt.
 
 Mit `protokoll` schreibt jede Linie dorthin, wie sie entstand -- daraus
-sammelt die Formelsammlung ihr Thema. Eine Schleife fuer beide
+sammelt die Formelsammlung ihr Thema. `nur` rechnet nur diese Bauteile:
+die uebrigen hat der Zwischenspeicher der Oberflaeche noch
+([[opencivil.web.dienst#rechnen|opencivil.web.dienst.rechnen]]). Eine Schleife fuer beide
 Bauteilarten ([[opencivil.spannungsanalyse.analysen#Konstanten|_BAUTEILARTEN]]); bis 2026-10-17 stand die des
 gezeichneten Querschnitts ein zweites Mal in dessen Modul, geladen mit
 einem Import in dieser Funktion.

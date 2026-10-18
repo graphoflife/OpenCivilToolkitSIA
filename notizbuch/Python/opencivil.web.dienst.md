@@ -1,5 +1,5 @@
 ---
-erzeugt: e085cba82c67
+erzeugt: 4e66a22c54d5
 art: modul
 tags: [modul]
 ---
@@ -124,7 +124,7 @@ meldet, welche Eingabe fehlt.
 ### _stromabwaerts
 
 ```python
-def _stromabwaerts(projekt: Projekt, aufbau) -> Loesung
+def _stromabwaerts(projekt: Projekt, aufbau, beschreibung: Mapping[str, Any]) -> Loesung
 ```
 
 Alles rechnen -- aber nur, was sich geaendert hat.
@@ -141,6 +141,20 @@ Bauteile in der Reihenfolge der Beschreibung --, und daran haengt der
 Aufbau des Protokolls. Ein Zwischenspeicher, der die Reihenfolge
 verschoebe, aenderte den Bericht, und das waere keine Beschleunigung mehr,
 sondern eine andere Ausgabe.
+
+### _analysen
+
+```python
+def _analysen(beschreibung: Mapping[str, Any], aufbau, loesung: Loesung) -> Dict[str, list]
+```
+
+Die Zeichendaten der Spannung-Dehnung-Analysen, je Bauteil -- aus dem
+Speicher, solange sein Abdruck derselbe ist wie bei seiner Loesung: eine
+Analyse liest nur den Eintrag ihres Bauteils, die Materialien und die
+Werte, die daraus folgen. Gerechnet werden nur die uebrigen, in einem
+Lauf. Bis 2026-10-18 rechnete jede Rechnung alle Analysen neu, auch die
+unveraenderter Bauteile -- am Pruefprojekt «jeder Nachweis» zwei Drittel
+jeder Rechnung.
 
 ### _abdruck
 
@@ -354,6 +368,7 @@ entspricht dem, was der Server ueber HTTP melden wuerde.
 ## Konstanten
 
 - `SPEICHER = speicher.Ergebnisspeicher()` – Das Gedaechtnis zwischen zwei Anfragen -- siehe [[opencivil.web.speicher]]. Im Modul und damit im Prozess: beim Server die laufende Sitzung, im Browser der offene Reiter.
+- `ANALYSEN = speicher.Ergebnisspeicher()` – Dasselbe fuer die Zeichendaten der Spannung-Dehnung-Analysen, je Bauteil unter demselben Abdruck wie seine Loesung ([[opencivil.web.dienst#_analysen|_analysen]]).
 - `KENNFELDER = ('name', 'materialien', *(art.liste for art in BAUTEILE))` – Woran eine Projektdatei zu erkennen ist. Mindestens eines davon muss da sein.
 - `ANFRAGEN = {'katalog': katalog, 'beispiel': beispiel, 'pruefen': pruefen, 'verwe…` – Name der Anfrage -> Funktion. Diese Namen sind der ganze Vertrag zwischen Oberflaeche und Kern; beide Huellen reichen sie unveraendert durch.
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 21a3b2d816fb
+erzeugt: 4babe6c72c58
 art: modul
 tags: [modul]
 ---
@@ -72,10 +72,13 @@ def protokoll_liste(protokoll: Protokoll) -> List[dict]
 ### loesung_dict
 
 ```python
-def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau]=None) -> dict
+def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau]=None, *, spannungsanalysen: Optional[dict]=None) -> dict
 ```
 
-Vollstaendige Abbildung eines Rechenlaufs.
+Vollstaendige Abbildung eines Rechenlaufs. `spannungsanalysen` sind die
+Zeichendaten der Analysen, wo der Aufrufer sie schon hat -- aus dem
+Zwischenspeicher ([[opencivil.web.dienst#rechnen|opencivil.web.dienst.rechnen]]); sonst werden sie
+hier gerechnet.
 
 ### zusammenfassungen
 

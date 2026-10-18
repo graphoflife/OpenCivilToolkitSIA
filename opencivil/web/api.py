@@ -436,8 +436,14 @@ def protokoll_liste(protokoll: Protokoll) -> List[dict]:
 # ===========================================================================
 
 
-def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None) -> dict:
-    """Vollstaendige Abbildung eines Rechenlaufs."""
+def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
+                 spannungsanalysen: Optional[dict] = None) -> dict:
+    """
+    Vollstaendige Abbildung eines Rechenlaufs. ``spannungsanalysen`` sind die
+    Zeichendaten der Analysen, wo der Aufrufer sie schon hat -- aus dem
+    Zwischenspeicher (:func:`opencivil.web.dienst.rechnen`); sonst werden sie
+    hier gerechnet.
+    """
     ergebnis: Dict[str, Any] = {
         "werte": {wid: wert_dict(w) for wid, w in loesung.werte.items()},
         "protokoll": protokoll_liste(loesung.protokoll),
@@ -498,7 +504,9 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None) -> dict:
         ergebnis["werkstoffgesetze"] = diagrammdaten.werkstoffgesetze(aufbau, loesung)
         ergebnis["querkraftkurven"] = diagrammdaten.querkraftkurven(aufbau, loesung)
         ergebnis["neigungskurven"] = diagrammdaten.neigungskurven(aufbau, loesung)
-        ergebnis["spannungsanalysen"] = diagrammdaten.spannungsanalysen(aufbau, loesung)
+        ergebnis["spannungsanalysen"] = (
+            spannungsanalysen if spannungsanalysen is not None
+            else diagrammdaten.spannungsanalysen(aufbau, loesung))
         ergebnis["zusammenfassungen"] = zusammenfassungen(loesung, aufbau)
         # Je Balkensystem die knappe Uebersicht; die Verlaeufe fuer die
         # Bilder holt eine eigene Anfrage (dienst.balkensystem_verlauf).

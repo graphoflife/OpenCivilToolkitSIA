@@ -10,7 +10,9 @@ jeder Linie (:func:`analysen`).
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
+from typing import (
+    TYPE_CHECKING, Any, Callable, Collection, Dict, List, Mapping, Optional, Tuple, Union,
+)
 
 from opencivil.core.protokoll import Protokoll, StillesProtokoll
 from opencivil.spannungsanalyse.art import Analyseart
@@ -120,8 +122,8 @@ _BAUTEILARTEN = (
 )
 
 
-def analysen(aufbau: "Aufbau", loesung: "Loesung",
-             protokoll: Optional[Protokoll] = None) -> Dict[str, List[Analyse]]:
+def analysen(aufbau: "Aufbau", loesung: "Loesung", protokoll: Optional[Protokoll] = None,
+             *, nur: Optional[Collection[str]] = None) -> Dict[str, List[Analyse]]:
     """
     Die Auswertungen am Querschnitt, je Platte und je gezeichnetem Querschnitt.
 
@@ -132,7 +134,9 @@ def analysen(aufbau: "Aufbau", loesung: "Loesung",
     Wahrheit ueber denselben Querschnitt.
 
     Mit ``protokoll`` schreibt jede Linie dorthin, wie sie entstand -- daraus
-    sammelt die Formelsammlung ihr Thema. Eine Schleife fuer beide
+    sammelt die Formelsammlung ihr Thema. ``nur`` rechnet nur diese Bauteile:
+    die uebrigen hat der Zwischenspeicher der Oberflaeche noch
+    (:func:`opencivil.web.dienst.rechnen`). Eine Schleife fuer beide
     Bauteilarten (:data:`_BAUTEILARTEN`); bis 2026-10-17 stand die des
     gezeichneten Querschnitts ein zweites Mal in dessen Modul, geladen mit
     einem Import in dieser Funktion.
@@ -147,7 +151,7 @@ def analysen(aufbau: "Aufbau", loesung: "Loesung",
         teile = art.teile(aufbau)
         for kennung, faelle in aufbau.spannungsfaelle.items():
             teil = teile.get(kennung)
-            if teil is None:
+            if teil is None or (nur is not None and kennung not in nur):
                 continue
             paare: Dict[tuple, Optional[Paar]] = {}
             liste: List[Analyse] = []

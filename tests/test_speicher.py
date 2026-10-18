@@ -59,7 +59,31 @@ def _anders(wert):
 def rechnen(beschreibung: dict, *, frisch: bool):
     if frisch:
         dienst.SPEICHER.leeren()
+        dienst.ANALYSEN.leeren()
     return dienst.bearbeite("rechnen", {"projekt": copy.deepcopy(beschreibung)})
+
+
+def projekt_mit_analysen() -> dict:
+    """
+    Dazu Analysen: an der ersten Platte ein Bild aus N und M und eine
+    Momenten-Krümmungs-Linie, am Unterzug ein Bild. Die zweite Platte und
+    das Fundament haben keine -- an ihnen sieht man, was nicht neu rechnen soll.
+    """
+    p = Projekt.aus_dict(projekt_mit_zwei_platten())
+    p.querschnitte[0].spannungsfall("Bild", art="schnittgroessen", N_Ed=-200.0, M_Ed=60.0)
+    p.querschnitte[0].spannungsfall("Linie", art="moment_kruemmung")
+    p.querschnittsanalysen[0].spannungsfall("Bild", art="schnittgroessen", M_Ed=100.0)
+    return p.als_dict()
+
+
+def analysen_zaehlen(beschreibung: dict, aendern) -> tuple:
+    """Warm gerechnet, geändert, nochmals: wie viele Analysen aus dem Speicher kamen, wie viele neu."""
+    rechnen(beschreibung, frisch=True)
+    dienst.ANALYSEN.treffer = dienst.ANALYSEN.fehlgriffe = 0
+    aendern(beschreibung)
+    antwort = rechnen(beschreibung, frisch=False)
+    assert antwort.status == 200, antwort.daten
+    return dienst.ANALYSEN.treffer, dienst.ANALYSEN.fehlgriffe
 
 
 def als_text(antwort) -> str:
@@ -169,12 +193,80 @@ class TestWasUebernommenWird(unittest.TestCase):
         Ein Teillauf rechnet absichtlich nicht alles. Ihn als ganzes Ergebnis
         aufzubewahren wäre der Weg zu Zahlen, die niemand erklären kann.
         """
-        beschreibung = projekt_mit_zwei_platten()
+        beschreibung = projekt_mit_analysen()
         dienst.SPEICHER.leeren()
+        dienst.ANALYSEN.leeren()
         antwort = dienst.bearbeite("rechnen", {
             "projekt": beschreibung, "ziele": ["querschnitt.q1.h"]})
         self.assertEqual(antwort.status, 200)
         self.assertEqual(dienst.SPEICHER.belegt, 0)
+        self.assertEqual(dienst.ANALYSEN.belegt, 0)
+
+
+class TestAnalysenAusDemSpeicher(unittest.TestCase):
+    """
+    Die Spannung-Dehnung-Analysen eines Bauteils gelten, solange sein Abdruck
+    derselbe ist -- wie seine Nachweise. Bis 2026-10-18 rechnete jede Rechnung
+    alle neu: am Prüfprojekt zwei Drittel jeder Rechnung, auch nach einer
+    Änderung an einem Bauteil ohne Analyse.
+    """
+
+    #: Änderungen, nach denen warm und kalt dasselbe herauskommen muss.
+    AENDERUNGEN = [
+        ("gar nichts", lambda d: None),
+        ("Dicke der Platte ohne Analyse", lambda d: d["querschnitte"][1].__setitem__("h", 330)),
+        ("Dicke der Platte mit Analysen", lambda d: d["querschnitte"][0].__setitem__("h", 320)),
+        ("Moment einer Analyse",
+         lambda d: d["querschnitte"][0]["spannungsfaelle"][0].__setitem__("M_Ed", 75.0)),
+        ("Betonsorte", lambda d: (d["materialien"][0].__setitem__("sorte", "C25/30"),
+                                  d["materialien"][0].__setitem__("name", "C25/30"))),
+        ("ein Stab im Unterzug", lambda d: (
+            d["querschnittsanalysen"][0]["knoten"].append({"kennung": "K99", "y": 150.0, "z": 300.0}),
+            d["querschnittsanalysen"][0]["staebe"].append(
+                {"kennung": "S99", "knoten": "K99", "durchmesser": 16.0, "stahl": "s1"}))),
+        ("die Analysen der Platte fallen weg",
+         lambda d: d["querschnitte"][0].__setitem__("spannungsfaelle", [])),
+    ]
+
+    def test_jede_aenderung_liefert_mit_und_ohne_speicher_dasselbe(self):
+        beschreibung = projekt_mit_analysen()
+        rechnen(beschreibung, frisch=True)
+        for name, aendern in self.AENDERUNGEN:
+            aendern(beschreibung)
+            mit = rechnen(beschreibung, frisch=False)
+            ohne = rechnen(beschreibung, frisch=True)
+            with self.subTest(aenderung=name):
+                self.assertEqual(mit.status, 200)
+                self.assertEqual(als_text(mit), als_text(ohne))
+            rechnen(beschreibung, frisch=False)
+
+    def test_unveraendert_kommen_alle_aus_dem_speicher(self):
+        self.assertEqual(analysen_zaehlen(projekt_mit_analysen(), lambda d: None), (2, 0))
+
+    def test_ein_bauteil_ohne_analyse_rechnet_keine_neu(self):
+        def aendern(d):
+            d["querschnitte"][1]["h"] = 330
+            d["grundbrueche"][0]["phi_k"] = 28.0
+        self.assertEqual(analysen_zaehlen(projekt_mit_analysen(), aendern), (2, 0))
+
+    def test_eine_geaenderte_analyse_rechnet_nur_ihr_bauteil_neu(self):
+        def aendern(d):
+            d["querschnitte"][0]["spannungsfaelle"][1]["N_Ed"] = -500.0
+        self.assertEqual(analysen_zaehlen(projekt_mit_analysen(), aendern), (1, 1))
+
+    def test_ein_geaendertes_material_rechnet_alle_neu(self):
+        def aendern(d):
+            d["materialien"][0]["sorte"] = d["materialien"][0]["name"] = "C25/30"
+        self.assertEqual(analysen_zaehlen(projekt_mit_analysen(), aendern), (0, 2))
+
+    def test_ein_bauteil_ohne_analysen_raeumt_seinen_platz(self):
+        beschreibung = projekt_mit_analysen()
+        rechnen(beschreibung, frisch=True)
+        self.assertEqual(dienst.ANALYSEN.belegt, 2)
+        beschreibung["querschnitte"][0]["spannungsfaelle"] = []
+        antwort = rechnen(beschreibung, frisch=False)
+        self.assertEqual(dienst.ANALYSEN.belegt, 1)
+        self.assertEqual(list(antwort.daten["spannungsanalysen"]), ["a1"])
 
 
 class TestBilderAusDemSpeicher(unittest.TestCase):

@@ -33,15 +33,23 @@ Herleitung, Urteile und die Befunde -- Interaktionslinien, Fallergebnisse,
 das Ergebnis eines Balkensystems. Die Bilder lesen dort, nicht an den
 Rechenobjekten; die eines frischen Aufbaus taugen darum so gut wie die von
 damals.
+
+Daneben, in einem zweiten Speicher derselben Art, die Zeichendaten seiner
+Spannung-Dehnung-Analysen, unter demselben Abdruck: sie lesen nur seinen
+Eintrag, die Materialien und die Werte, die daraus folgen. Bis 2026-10-18
+rechnete jede Rechnung alle Analysen neu, auch die unveraenderter Bauteile --
+am Pruefprojekt «jeder Nachweis» zwei Drittel jeder Rechnung.
 """
 
 from __future__ import annotations
 
 import json
-from typing import Any, Dict, Mapping, Optional, Sequence, Tuple
+from typing import Any, Dict, Generic, Mapping, Optional, Sequence, Tuple, TypeVar
 
-from opencivil.core.rechenwerk import Loesung
 from opencivil.projekt import BAUTEILE
+
+#: Was ein Speicher je Bauteil aufbewahrt -- eine Loesung oder Zeichendaten.
+T = TypeVar("T")
 
 #: Wie viele Bauteile hoechstens aufbewahrt werden. Ein Projekt mit mehr
 #: Platten als das laeuft nicht langsamer als ohne Speicher -- es gewinnt nur
@@ -73,25 +81,26 @@ def abdruck(projekt_dict: Mapping[str, Any], kennung: str,
         sort_keys=True, ensure_ascii=False, default=str)
 
 
-class Ergebnisspeicher:
+class Ergebnisspeicher(Generic[T]):
     """
     Das Gedaechtnis zwischen zwei Anfragen.
 
     Ein Eintrag je Bauteil, geschluesselt nach Kennung und nur gueltig,
-    solange der Abdruck stimmt. Die Loesung darin ist die eines Laufs, der
-    die Baustoffe mitgebracht bekam -- sie enthaelt nur, was das Bauteil
-    selbst gerechnet hat. Der Speicher liegt im Modul und damit im Prozess: beim
+    solange der Abdruck stimmt. Was darin liegt, sagt, wer ihn anlegt: die
+    Loesung eines Laufs, der die Baustoffe mitgebracht bekam -- sie enthaelt
+    nur, was das Bauteil selbst gerechnet hat --, oder die Zeichendaten
+    seiner Analysen. Der Speicher liegt im Modul und damit im Prozess: beim
     Server ist das die laufende Sitzung, im Browser der offene Reiter. Eine
     Ablage auf der Platte waere ein zweiter Ort fuer dieselbe Wahrheit.
     """
 
     def __init__(self, plaetze: int = PLAETZE) -> None:
-        self._eintraege: Dict[str, Tuple[str, Loesung]] = {}
+        self._eintraege: Dict[str, Tuple[str, T]] = {}
         self._plaetze = plaetze
         self.treffer = 0
         self.fehlgriffe = 0
 
-    def hole(self, kennung: str, stempel: str) -> Optional[Loesung]:
+    def hole(self, kennung: str, stempel: str) -> Optional[T]:
         eintrag = self._eintraege.get(kennung)
         if eintrag is None or eintrag[0] != stempel:
             self.fehlgriffe += 1
@@ -99,7 +108,7 @@ class Ergebnisspeicher:
         self.treffer += 1
         return eintrag[1]
 
-    def merken(self, kennung: str, stempel: str, teil: Loesung) -> None:
+    def merken(self, kennung: str, stempel: str, teil: T) -> None:
         if kennung in self._eintraege:
             del self._eintraege[kennung]
         elif len(self._eintraege) >= self._plaetze:

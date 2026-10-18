@@ -1,5 +1,5 @@
 ---
-erzeugt: 38e4216ed386
+erzeugt: 921dc93645eb
 art: modul
 tags: [modul]
 ---
@@ -84,11 +84,11 @@ Ein Querschnittsbild in Zeichengroessen: mm, Promille, N/mm², kN.
 ### spannungsanalysen
 
 ```python
-def spannungsanalysen(aufbau: Aufbau, loesung: Loesung) -> dict
+def spannungsanalysen(aufbau: Aufbau, loesung: Loesung, *, nur: Optional[Collection[str]]=None) -> dict
 ```
 
 Die Auswertungen am Querschnitt, je Platte und je gezeichnetem Querschnitt
--- fertig zum Zeichnen.
+-- fertig zum Zeichnen; mit `nur` die dieser Bauteile.
 
 Gerechnet wird in [[opencivil.spannungsanalyse.analysen]]; hier wird
 nur in Zeichengroessen abgebildet.

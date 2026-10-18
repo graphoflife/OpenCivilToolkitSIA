@@ -15,7 +15,7 @@ kNm und mm umgesetzt.
 from __future__ import annotations
 
 import math
-from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, Callable, Collection, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil import spannungsanalyse
 from opencivil.core.berechnung import grad_als_text
@@ -221,16 +221,17 @@ def _bild_dict(bild) -> dict:
     }
 
 
-def spannungsanalysen(aufbau: Aufbau, loesung: Loesung) -> dict:
+def spannungsanalysen(aufbau: Aufbau, loesung: Loesung, *,
+                      nur: Optional[Collection[str]] = None) -> dict:
     """
     Die Auswertungen am Querschnitt, je Platte und je gezeichnetem Querschnitt
-    -- fertig zum Zeichnen.
+    -- fertig zum Zeichnen; mit ``nur`` die dieser Bauteile.
 
     Gerechnet wird in :func:`opencivil.spannungsanalyse.analysen`; hier wird
     nur in Zeichengroessen abgebildet.
     """
     return {kennung: [_analyse_dict(a) for a in liste]
-            for kennung, liste in spannungsanalyse.analysen(aufbau, loesung).items()}
+            for kennung, liste in spannungsanalyse.analysen(aufbau, loesung, nur=nur).items()}
 
 
 def _analyse_dict(analyse) -> dict:
