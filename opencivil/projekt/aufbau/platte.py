@@ -54,7 +54,8 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bau
     # Bewehrungsmass und Distanzhalter stehen als Kennzahlen da, auch bei
     # einer Platte ohne Nachweis -- ihr Lagenaufbau rechnet darum immer.
     teil = Bauteil(eintrag.kennung, eintrag.name, art, querschnitt,
-                   weitere_ziele=[f"{querschnitt.id}.lagenaufbau"])
+                   weitere_ziele=[f"{querschnitt.id}.lagenaufbau"],
+                   kennzahlen=list(querschnitt.kennzahlen))
     schnell = aufbau.schnell
 
     richtung = Richtung.X
@@ -99,7 +100,6 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bau
         # rechnet immer, als Kennzahl, und der Verformungsnachweis liest ihn.
         faktor = Vergroesserungsfaktor(querschnitt, kriechzahl=eintrag.verformung.kriechzahl)
         aufbau.werk.registriere(faktor)
-        aufbau.vergroesserung[eintrag.kennung] = faktor
         verformungsfaelle = [f for f in eintrag.verformung.faelle if f.aktiv]
         if verformungsfaelle:
             aufbau.eintragen(teil, "verformung", eintrag.kennung, Verformung(
@@ -123,6 +123,7 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittEintrag, aufbau: Aufbau) -> Bau
         aufbau.werk.registriere(kennzahlen)
         aufbau.kennzahlen[eintrag.kennung] = kennzahlen
         teil.weitere_ziele += [faktor.id, kennzahlen.id]
+        teil.kennzahlen += faktor.kennzahlen + kennzahlen.kennzahlen
 
         knickfaelle = [k for k in eintrag.knickfaelle if k.aktiv]
         if knickfaelle:

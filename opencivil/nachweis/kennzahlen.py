@@ -21,6 +21,13 @@ Die Vergroesserungsfaktoren omega_w und omega_w' rechnet
 :class:`~opencivil.nachweis.verformung.Vergroesserungsfaktor`; die
 Zusammenfassung stellt sie dazu.
 
+WAS FEHLT, FEHLT:
+Jede Kennzahl steht mit ihrer Beschriftung hier (:attr:`Plattenkennzahlen.kennzahlen`),
+und nur, was die Platte hat: ein x/d gibt es nur fuer eine Seite mit
+Zugbewehrung. Bis 2026-10-18 stand fuer die andere 0, und ein Widerstand, den
+die Linie nicht traf, ebenfalls -- so hatte eine Platte nur mit oberer
+Bewehrung den Druckwiderstand 0 statt -5000 kN.
+
 NICHTS ZWEIMAL:
 Rechnet die Tragsicherheit von Hand mit Bemessungswerten -- die Vorgabe --,
 lesen die Kennzahlen deren Linie aus ihrem Befund und leiten nichts ein
@@ -44,10 +51,10 @@ from __future__ import annotations
 
 from typing import Dict, List, Optional, Tuple
 
-from opencivil.core.berechnung import Befundbezug, Eingaben, Prozedur
+from opencivil.core.berechnung import BerechnungsFehler, Befundbezug, Eingaben, Prozedur
 from opencivil.core.einheiten import EINHEITSLOS, KN, KN_PRO_M, KNM, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.wert import Wert, WertDef
+from opencivil.core.wert import Kennzahl, Wert, WertDef
 from opencivil.nachweis import linie as geo
 from opencivil.nachweis.biegung_normalkraft import (
     gleiche_linie, linienbezuege, resistenzlinie,
@@ -67,6 +74,9 @@ WAHL = Rechenwahl()
 #: Die beiden Seiten: ob der Zug unten liegt, wie sie heisst, ihr Zeichen.
 SEITEN: Tuple[Tuple[bool, str, str], ...] = ((True, "unten", "+"), (False, "oben", "-"))
 
+#: Woher die Eckwerte stammen -- ihre Erklaerung unter der Platte.
+HAND = "Handrechnung mit Bemessungswerten"
+
 
 class Plattenkennzahlen(Prozedur):
     """Die Kennzahlen einer Platte in x -- siehe Dateikopf."""
@@ -81,40 +91,51 @@ class Plattenkennzahlen(Prozedur):
         self.eigene_linie = not gleiche_linie(mn.wahl, WAHL)
 
         basis = f"{querschnitt.id}.kennzahlen"
+        #: Je Kurzname die Definition -- zum Belegen.
+        self.d: Dict[str, WertDef] = {}
+        #: Dieselben, wie sie unter der Platte stehen, in dieser Folge.
+        self.kennzahlen: List[Kennzahl] = []
 
-        def d(kurz: str, symbol: str, einheit, beschreibung: str, stellen: int = 1,
-              referenz: str = "") -> WertDef:
-            return WertDef(id=f"{basis}.{kurz}", symbol=symbol, einheit=einheit,
-                           beschreibung=beschreibung, referenz=referenz, stellen=stellen)
+        def dazu(kurz: str, symbol: str, einheit, beschreibung: str, beschriftung: str,
+                 erklaerung: str = HAND, *, stellen: int = 1, referenz: str = "") -> None:
+            definition = WertDef(id=f"{basis}.{kurz}", symbol=symbol, einheit=einheit,
+                                 beschreibung=beschreibung, referenz=referenz,
+                                 stellen=stellen)
+            self.d[kurz] = definition
+            self.kennzahlen.append(Kennzahl(definition, beschriftung, erklaerung))
 
-        self.d: Dict[str, WertDef] = {
-            "M_Rd_pos": d("M_Rd_pos", r"M_{Rd}^{+}(N_{Ed} = 0)", KNM,
-                          "Momentenwiderstand bei N_Ed = 0, Zug unten"),
-            "M_Rd_neg": d("M_Rd_neg", r"M_{Rd}^{-}(N_{Ed} = 0)", KNM,
-                          "Momentenwiderstand bei N_Ed = 0, Zug oben"),
-            "N_Rd_zug": d("N_Rd_zug", r"N_{Rd}^{+}(M_{Ed} = 0)", KN,
-                          "Zugwiderstand bei M_Ed = 0"),
-            "N_Rd_druck": d("N_Rd_druck", r"N_{Rd}^{-}(M_{Ed} = 0)", KN,
-                            "Druckwiderstand bei M_Ed = 0"),
-            "x_d_pos": d("x_d_pos", r"\left(x/d\right)^{+}", EINHEITSLOS,
-                         "Bezogene Druckzonenhöhe bei N_Ed = 0, Zug unten", 3),
-            "x_d_neg": d("x_d_neg", r"\left(x/d\right)^{-}", EINHEITSLOS,
-                         "Bezogene Druckzonenhöhe bei N_Ed = 0, Zug oben", 3),
-        }
+        dazu("M_Rd_pos", r"M_{Rd}^{+}(N_{Ed} = 0)", KNM,
+             "Momentenwiderstand bei N_Ed = 0, Zug unten", "Momentenwiderstand, Zug unten")
+        dazu("M_Rd_neg", r"M_{Rd}^{-}(N_{Ed} = 0)", KNM,
+             "Momentenwiderstand bei N_Ed = 0, Zug oben", "Momentenwiderstand, Zug oben")
+        dazu("N_Rd_zug", r"N_{Rd}^{+}(M_{Ed} = 0)", KN,
+             "Zugwiderstand bei M_Ed = 0", "Zugwiderstand")
+        dazu("N_Rd_druck", r"N_{Rd}^{-}(M_{Ed} = 0)", KN,
+             "Druckwiderstand bei M_Ed = 0", "Druckwiderstand")
+        # Ein x/d nur, wo Zug auf Bewehrung trifft: ohne sie gibt es kein d.
+        gezogen = {lage.von_unten for lage, _, _, _, _ in self.posten}
+        for positiv, seite, hoch in SEITEN:
+            if positiv in gezogen:
+                dazu(f"x_d_{'pos' if positiv else 'neg'}", rf"\left(x/d\right)^{{{hoch}}}",
+                     EINHEITSLOS, f"Bezogene Druckzonenhöhe bei N_Ed = 0, Zug {seite}",
+                     f"Bezogene Druckzonenhöhe, Zug {seite}", stellen=3)
         if self.buegel is None:
-            self.d["V_Rd_max"] = d(
-                "V_Rd_max", r"V_{Rd,max}", KN_PRO_M,
-                "Querkraftwiderstand ohne Bügel bei M_Ed = 0 und N_Ed = 0",
-                referenz="SIA 262:2025, 4.3.3.2.1")
-            self.d["V_Rd_min"] = d(
-                "V_Rd_min", r"V_{Rd,min}", KN_PRO_M,
-                "Querkraftwiderstand ohne Bügel bei M_Ed = M_Rd und N_Ed = 0",
-                referenz="SIA 262:2025, 4.3.3.2.1")
+            dazu("V_Rd_max", r"V_{Rd,max}", KN_PRO_M,
+                 "Querkraftwiderstand ohne Bügel bei M_Ed = 0 und N_Ed = 0",
+                 "Querkraftwiderstand ohne Bügel, grösster",
+                 "N_Ed = 0, M_Ed = 0 – das Kleinere beider Seiten",
+                 referenz="SIA 262:2025, 4.3.3.2.1")
+            dazu("V_Rd_min", r"V_{Rd,min}", KN_PRO_M,
+                 "Querkraftwiderstand ohne Bügel bei M_Ed = M_Rd und N_Ed = 0",
+                 "Querkraftwiderstand ohne Bügel, kleinster",
+                 "N_Ed = 0, M_Ed = M_Rd – das Kleinere beider Seiten",
+                 referenz="SIA 262:2025, 4.3.3.2.1")
         else:
-            self.d["V_Rd_buegel"] = d(
-                "V_Rd_buegel", r"V_{Rd}(\alpha_{opt})", KN_PRO_M,
-                "Querkraftwiderstand mit Bügeln bei der günstigsten Neigung, N_Ed = 0",
-                referenz="SIA 262:2025, 4.3.3.4")
+            dazu("V_Rd_buegel", r"V_{Rd}(\alpha_{opt})", KN_PRO_M,
+                 "Querkraftwiderstand mit Bügeln bei der günstigsten Neigung, N_Ed = 0",
+                 "Querkraftwiderstand mit Bügeln",
+                 "N_Ed = 0, günstigste Neigung – das Kleinere beider Seiten",
+                 referenz="SIA 262:2025, 4.3.3.4")
 
         # Was die Querkraft braucht, unter den Namen ihres Nachweises -- ohne
         # die Momentenwiderstaende seiner Faelle.
@@ -173,20 +194,20 @@ class Plattenkennzahlen(Prozedur):
         p.titel("Biegung und Normalkraft", ebene=3)
         eckpunkt = {q.kennung: q for q in linie.punkte}
         momente: Dict[bool, float] = {}
-        for positiv, seite, hoch in SEITEN:
+        for positiv, seite, _ in SEITEN:
             kurz = "pos" if positiv else "neg"
             m = self._auf_der_linie(p, linie, ergebnis, geo.MOMENT, positiv, f"M_Rd_{kurz}",
                                     f"Momentenwiderstand bei N_Ed = 0, Zug {seite}")
             momente[positiv] = abs(m)
-            punkt = eckpunkt.get(f"n0_{kurz}")
-            if punkt is not None and punkt.x is not None and punkt.d.groesse.si > 0.0:
-                p.formel(self._belegen(ergebnis, f"x_d_{kurz}",
-                                       punkt.x.groesse.si / punkt.d.groesse.si),
-                         r"\frac{@x}{@d}", {"x": punkt.x, "d": punkt.d},
-                         titel=f"Bezogene Druckzonenhöhe bei N_Ed = 0, Zug {seite}",
-                         name="Bezogene Druckzonenhöhe")
-            else:
-                self._belegen(ergebnis, f"x_d_{kurz}", 0.0)
+            if f"x_d_{kurz}" not in self.d:
+                p.text(f"Zug {seite} ohne x-Bewehrung → kein d, kein x/d dieser Seite.")
+                continue
+            punkt = eckpunkt[f"n0_{kurz}"]
+            p.formel(self._belegen(ergebnis, f"x_d_{kurz}",
+                                   punkt.x.groesse.si / punkt.d.groesse.si),
+                     r"\frac{@x}{@d}", {"x": punkt.x, "d": punkt.d},
+                     titel=f"Bezogene Druckzonenhöhe bei N_Ed = 0, Zug {seite}",
+                     name="Bezogene Druckzonenhöhe")
 
         for positiv, kurz, wie in ((True, "zug", "Zugwiderstand"),
                                    (False, "druck", "Druckwiderstand")):
@@ -199,14 +220,19 @@ class Plattenkennzahlen(Prozedur):
         """
         Ein Widerstand auf der Linie, die Gegengroesse null -- hergeleitet, wie
         die Linie ihn findet: als Eckpunkt oder zwischen zweien.
+
+        Getroffen wird sie immer: sie umschliesst den Querschnitt ohne
+        Dehnung, N = M = 0, oder geht durch ihn, und jede Gerade durch ihn
+        trifft sie (bei einseitiger Bewehrung als Eckpunkt,
+        :func:`~opencivil.nachweis.linie.kante`).
         """
         treffer = linie.kante(achse, 0.0, positiv=positiv)
-        wert = self._belegen(ergebnis, kurz, treffer.wert if treffer is not None else 0.0)
         if treffer is None:
-            p.wert(wert, titel=titel)
-        else:
-            linie.protokoll_treffer(p, treffer, achse=achse, fest=0.0,
-                                    basis=f"{self.id}.{kurz}", titel=titel, ergebnis=wert)
+            raise BerechnungsFehler(
+                self.id, f"{titel}: die Linie trifft {achse.gegen.name} = 0 nicht.")
+        wert = self._belegen(ergebnis, kurz, treffer.wert)
+        linie.protokoll_treffer(p, treffer, achse=achse, fest=0.0,
+                                basis=f"{self.id}.{kurz}", titel=titel, ergebnis=wert)
         return wert.groesse.si
 
     def _hoehen(self, e: Eingaben, werte: Zwischenwerte, p: Protokoll,
@@ -333,15 +359,15 @@ class Plattenkennzahlen(Prozedur):
 
     def _kleinstes(self, p: Protokoll, ergebnis: Dict[str, Groesse], kurz: str,
                    teile: List[Wert], titel: str) -> None:
-        """Das Kleinere der Seiten -- bei nur einer Seite sie selbst."""
-        kleinstes = min((t.groesse.si for t in teile), default=0.0)
-        wert = self._belegen(ergebnis, kurz, kleinstes)
+        """
+        Das Kleinere der Seiten mit Zugbewehrung -- bei nur einer sie selbst.
+        Eine hat die Platte immer: ohne x-Bewehrung gibt es keine Kennzahlen.
+        """
+        wert = self._belegen(ergebnis, kurz, min(t.groesse.si for t in teile))
         if len(teile) == 2:
             p.formel(wert, r"\min\left[@a;\ @b\right]", {"a": teile[0], "b": teile[1]},
                      titel=titel, name="Kleinerer Widerstand beider Seiten")
-        elif teile:
+        else:
             p.formel(wert, "@a", {"a": teile[0]}, titel=titel,
                      name="Kleinerer Widerstand beider Seiten")
-        else:
-            p.wert(wert, titel=titel)
 

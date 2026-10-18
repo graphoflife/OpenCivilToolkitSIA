@@ -1,5 +1,5 @@
 ---
-erzeugt: 2d2a0a79d383
+erzeugt: f87437244977
 art: modul
 tags: [modul]
 ---
@@ -169,45 +169,24 @@ Querschnittsanalyse ihre Staebe und Schubwaende, beim Grundbruch die
 Faktoren der Tragfaehigkeitsformel. Die stehen erst nach dem Rechnen
 fest; darum die Loesung.
 
-### Kennzahl
-
-```python
-@dataclass(frozen=True)
-class Kennzahl
-```
-
-Eine Zahl, die eine Platte beschreibt -- gleich welche Lastfaelle es gibt.
-
-- `beschriftung: str`
-- `wert: Wert`
-- `erklaerung: str = ''`
-- `feste_stellen: bool = False` – Mit allen Stellen, auch nachlaufenden Nullen -- der Vergroesserungsfaktor.
-
-#### Kennzahl.text
-
-```python
-@property
-def text(self) -> str
-```
-
-Die Zahl, wie sie dasteht -- ohne Einheit.
-
 ### kennzahlen
 
 ```python
-def kennzahlen(aufbau: 'Aufbau', kennung: str, loesung: Loesung) -> List[Kennzahl]
+def kennzahlen(aufbau: 'Aufbau', kennung: str, loesung: Loesung) -> List[Tuple[Kennzahl, Wert]]
 ```
 
-Die Kennzahlen einer Platte, wie Zusammenfassung und Bericht sie zeigen:
-Bewehrungsmass und Distanzhalter, die Vergroesserungsfaktoren omega_w und
-omega_w', die Eckwerte der Handrechnung und der Querkraftwiderstand bei
-N_Ed = 0 (Benutzer, 2026-10-16). Was nicht gerechnet wurde -- eine
-Platte ohne x-Bewehrung --, fehlt.
+Die Kennzahlen eines Bauteils mit ihren Werten, wie Zusammenfassung und
+Bericht sie zeigen -- bei der Platte Bewehrungsmass und Distanzhalter, die
+Vergroesserungsfaktoren omega_w und omega_w', die Eckwerte der
+Handrechnung und der Querkraftwiderstand bei N_Ed = 0 (Benutzer,
+2026-10-16). Welche es gibt und wie sie heissen, sagen ihre Erzeuger
+([[opencivil.projekt.aufbau.kern#Bauteil|kennzahlen]]). Was dieser
+Lauf nicht gerechnet hat, fehlt: ein Teillauf rechnet nur sein Bauteil.
 
 ### kennzahlentabelle
 
 ```python
-def kennzahlentabelle(zeilen: Sequence[Kennzahl]) -> TabellenBlock
+def kennzahlentabelle(zeilen: Sequence[Tuple[Kennzahl, Wert]]) -> TabellenBlock
 ```
 
 Die Kennzahlen als Tabelle des Berichts: Beschriftung, Zeichen, Wert.
@@ -248,8 +227,6 @@ hoch, beide, getrennt durch `/`.
 - `GRAD_SPALTE = 4` – Welche Spalte den Erfuellungsgrad traegt. Die Oberflaeche hinterlegt genau sie -- zaehlen statt raten, sonst haenge die Einfaerbung an der Reihenfolge der Kopfzeile.
 - `STAPEL_SPALTEN = (2, 3)` – Widerstand und Einwirkung: die Oberflaeche setzt sie uebereinander in eine Zelle, der Bericht behaelt beide Spalten.
 - `AUSRICHTUNG = 'LLrrr'` – Nachweis und Bezeichnung duerfen umbrechen: mit zwei Formeln daneben liefe die Tabelle im Bericht sonst ueber den Rand.
-- `_HAND = 'Handrechnung mit Bemessungswerten'` – Die Kennzahlen einer Platte, in dieser Folge: Kurzname in [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen]], Beschriftung, Erklaerung.
-- `_KENNZAHLEN = (('M_Rd_pos', 'Momentenwiderstand, Zug unten', _HAND), ('M_Rd_neg', '…`
 
 ## Braucht
 

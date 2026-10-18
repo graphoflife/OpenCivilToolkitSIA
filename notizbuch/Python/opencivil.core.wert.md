@@ -1,5 +1,5 @@
 ---
-erzeugt: 6464251f2689
+erzeugt: d9c13aad8820
 art: modul
 tags: [modul]
 ---
@@ -238,6 +238,32 @@ def zahl_latex(self) -> str
 
 Zahlenwert samt Einheit als LaTeX-Fragment, z.B. `18.7\,\mathrm{MPa}`.
 
+### Kennzahl
+
+```python
+@dataclass(frozen=True)
+class Kennzahl
+```
+
+Ein Wert, der ein Bauteil beschreibt, gleich welche Lastfaelle es gibt --
+und wie er unter ihm steht. Wer ihn rechnet, nennt ihn: die Platte ihr
+Bewehrungsmass, der Vergroesserungsfaktor sein omega_w, die Kennzahlen
+ihre Widerstaende. Bis 2026-10-18 stand eine Handliste der Beschriftungen
+in der Zusammenfassung, getrennt von den Werten, die sie beschriftete.
+
+- `definition: WertDef`
+- `beschriftung: str`
+- `erklaerung: str = ''`
+- `feste_stellen: bool = False` – Mit allen Stellen, auch nachlaufenden Nullen -- der Vergroesserungsfaktor.
+
+#### Kennzahl.text
+
+```python
+def text(self, wert: Wert) -> str
+```
+
+Die Zahl, wie sie dasteht -- ohne Einheit.
+
 ### FehlendeEingabe
 
 ```python
@@ -299,6 +325,7 @@ def beschreibung(self) -> str
 - [[opencivil.nachweis.stabgrenzen]]
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.notizbuch.formelseiten]]
+- [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.platte]]

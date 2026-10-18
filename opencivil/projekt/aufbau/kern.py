@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Mapping, 
 from opencivil.core.einheiten import KN, KNM, M, Groesse
 from opencivil.core.berechnung import Nachweis, NachweisUrteil
 from opencivil.core.rechenwerk import Rechenwerk
+from opencivil.core.wert import Kennzahl
 from opencivil.material.basis import Baustoff
 from opencivil.material.beton import beton
 from opencivil.material.betonstahl import betonstahl
@@ -34,7 +35,7 @@ from opencivil.nachweis.fehlende_bewehrung import FehlendeBewehrung
 from opencivil.nachweis.mindestbewehrung import Rissnormalkraft, ZwaengungBiegung
 from opencivil.nachweis.spannungsbegrenzung import Spannungsbegrenzung, Stahlspannungsort
 from opencivil.nachweis.spannungsgrenzen import GrenzeAusRissbreite, GrenzeGegenFliessen
-from opencivil.nachweis.verformung import Vergroesserungsfaktor, Verformung
+from opencivil.nachweis.verformung import Verformung
 from opencivil.nachweis.kennzahlen import Plattenkennzahlen
 from opencivil.nachweis.sproedes_versagen import SproedesVersagen
 from opencivil.nachweis.querkraft import Querkraft
@@ -108,9 +109,6 @@ class Aufbau:
 
     verformung: Dict[str, Verformung] = field(default_factory=dict)
     """Die Durchbiegung je Verformungsfall, je Querschnitt -- nur in x-Richtung."""
-
-    vergroesserung: Dict[str, Vergroesserungsfaktor] = field(default_factory=dict)
-    """Die Vergroesserungsfaktoren je Platte mit x-Bewehrung -- immer gerechnet."""
 
     kennzahlen: Dict[str, Plattenkennzahlen] = field(default_factory=dict)
     """Die Kennzahlen je Platte mit x-Bewehrung -- immer gerechnet."""
@@ -328,6 +326,12 @@ class Bauteil:
 
     weitere_ziele: List[str] = field(default_factory=list)
     """Was es ausser seinen Nachweisen rechnet -- ein Balkensystem seine Querschnitte und sich."""
+
+    kennzahlen: List[Kennzahl] = field(default_factory=list)
+    """
+    Was es beschreibt, gleich welche Lastfaelle es gibt, in der Folge der
+    Zusammenfassung -- jede so, wie ihr Erzeuger sie nennt.
+    """
 
     bezuege: Tuple[str, ...] = ()
     """Die Bauteile, deren Werte es liest: Platten und Analysen, aus denen ein System Querschnitte nimmt."""

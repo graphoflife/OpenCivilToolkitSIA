@@ -258,6 +258,29 @@ class Wert:
         return f"Wert({self.id}={self.formatiert()} {self.einheit.name}, {self.quelle})"
 
 
+@dataclass(frozen=True)
+class Kennzahl:
+    """
+    Ein Wert, der ein Bauteil beschreibt, gleich welche Lastfaelle es gibt --
+    und wie er unter ihm steht. Wer ihn rechnet, nennt ihn: die Platte ihr
+    Bewehrungsmass, der Vergroesserungsfaktor sein omega_w, die Kennzahlen
+    ihre Widerstaende. Bis 2026-10-18 stand eine Handliste der Beschriftungen
+    in der Zusammenfassung, getrennt von den Werten, die sie beschriftete.
+    """
+
+    definition: WertDef
+    beschriftung: str
+    erklaerung: str = ""
+    feste_stellen: bool = False
+    """Mit allen Stellen, auch nachlaufenden Nullen -- der Vergroesserungsfaktor."""
+
+    def text(self, wert: Wert) -> str:
+        """Die Zahl, wie sie dasteht -- ohne Einheit."""
+        if self.feste_stellen:
+            return f"{wert.groesse.in_einheit(wert.einheit):.{wert.stellen}f}"
+        return wert.formatiert()
+
+
 @dataclass
 class FehlendeEingabe:
     """

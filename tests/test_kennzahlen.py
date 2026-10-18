@@ -137,7 +137,7 @@ class TestImmer(unittest.TestCase):
         projekt.stahl("B500B")
         projekt.platte("Ohne x", h=250, x=[0, 0], y=[12, 12])
         aufbau, loesung = rechnen(projekt)
-        self.assertEqual([k.beschriftung for k in kennzahlen(aufbau, "q1", loesung)],
+        self.assertEqual([k.beschriftung for k, _ in kennzahlen(aufbau, "q1", loesung)],
                          ["Bewehrungsmass", "Höhe der Distanzhalter"])
 
     def test_im_bericht(self):
@@ -165,6 +165,28 @@ class TestEinseitigBewehrt(unittest.TestCase):
                 projekt.platte("Probe", h=250, x=x, y=[10, 10])
                 aufbau, loesung = rechnen(projekt)
                 self.assertAlmostEqual(wert(aufbau, loesung, "N_Rd_druck"), -5.0e6, delta=1.0)
+
+    def test_nur_unten_bewehrt_fehlt_was_oben_waere(self):
+        """
+        Ohne obere x-Lage gibt es für Zug oben weder x/d noch omega_w' -- sie
+        fehlen, statt 0 zu zeigen. M_Rd- ist dagegen wirklich null: ohne obere
+        Bewehrung trägt die Platte kein negatives Moment.
+        """
+        projekt = Projekt(name="Probe")
+        projekt.beton("C30/37")
+        projekt.stahl("B500B")
+        projekt.platte("Probe", h=250, x=[12, 0], y=[10, 10])
+        aufbau, loesung = rechnen(projekt)
+        self.assertEqual([k.beschriftung for k, _ in kennzahlen(aufbau, "q1", loesung)], [
+            "Bewehrungsmass", "Höhe der Distanzhalter", "Vergrösserungsfaktor, Zug unten",
+            "Momentenwiderstand, Zug unten", "Momentenwiderstand, Zug oben",
+            "Zugwiderstand", "Druckwiderstand", "Bezogene Druckzonenhöhe, Zug unten",
+            "Querkraftwiderstand ohne Bügel, grösster",
+            "Querkraftwiderstand ohne Bügel, kleinster"])
+        self.assertEqual(wert(aufbau, loesung, "M_Rd_neg"), 0.0)
+        self.assertGreater(wert(aufbau, loesung, "x_d_pos"), 0.0)
+        texte = [getattr(b, "text", "") for b in loesung.protokoll.alle_bloecke()]
+        self.assertIn("Zug oben ohne x-Bewehrung → kein d, kein x/d dieser Seite.", texte)
 
     def test_die_kante_findet_den_beruehrten_eckpunkt(self):
         linie = [geo.Stelle(N=-5000.0, M=0.0), geo.Stelle(N=0.0, M=0.0),

@@ -96,15 +96,6 @@ Phase 5 Oberfläche.
       7.6 statt 3.2 s. Je Neigung baut sie einen frischen Löser und sucht von
       den Grenzen her; mit dem Spannungsblock waren es 9 s, bis sie Illinois
       ohne Gedächtnis nahm (`halbiert=False`).
-- [ ] **Kennzahlen: Die Querkraft schreibt ihre Herleitung selbst.**
-      - `kennzahlen.py` schreibt V_Rd,s, V_Rd,c und d_v ein zweites Mal. Ein
-        erzwungenes `einlage=0.0` bringt «Wirksame Höhe (Einlage nicht
-        massgebend) d_v = d» in den Bügelteil.
-      - Die Tabelle hängt an der Handliste `_KENNZAHLEN`.
-      - Was fehlt, wird 0: Ohne obere Bewehrung steht «(x/d)⁻ = 0».
-
-      Besser: `querkraft.py` bietet Funktionen an, die rechnen und schreiben,
-      und jeder Erzeuger nennt seine Kennzahlen selbst. Was fehlt, fehlt.
 - [ ] **Apps: eine Zeile je App.** Material und Python laufen in `baum.js`,
       `editor.js`, `zustand.js` und `app.js` als Sonderwege; je App stehen
       zehn Tabellen in drei Dateien. Besser: `apps.js` mit einer Zeile je

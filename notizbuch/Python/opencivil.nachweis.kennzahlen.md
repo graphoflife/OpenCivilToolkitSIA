@@ -1,5 +1,5 @@
 ---
-erzeugt: db55287a46cd
+erzeugt: 86099bbaf702
 art: modul
 tags: [modul]
 ---
@@ -27,6 +27,15 @@ Handrechnung mit Bemessungswerten hat der Benutzer am 2026-10-16 bestaetigt.
 Die Vergroesserungsfaktoren omega_w und omega_w' rechnet
 [[opencivil.nachweis.verformung#Vergroesserungsfaktor|Vergroesserungsfaktor]]; die
 Zusammenfassung stellt sie dazu.
+
+
+## WAS FEHLT, FEHLT
+
+Jede Kennzahl steht mit ihrer Beschriftung hier ([[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen.kennzahlen]]),
+und nur, was die Platte hat: ein x/d gibt es nur fuer eine Seite mit
+Zugbewehrung. Bis 2026-10-18 stand fuer die andere 0, und ein Widerstand, den
+die Linie nicht traf, ebenfalls -- so hatte eine Platte nur mit oberer
+Bewehrung den Druckwiderstand 0 statt -5000 kN.
 
 
 ## NICHTS ZWEIMAL
@@ -85,6 +94,11 @@ def _auf_der_linie(self, p: Protokoll, linie, ergebnis: Dict[str, Groesse], achs
 Ein Widerstand auf der Linie, die Gegengroesse null -- hergeleitet, wie
 die Linie ihn findet: als Eckpunkt oder zwischen zweien.
 
+Getroffen wird sie immer: sie umschliesst den Querschnitt ohne
+Dehnung, N = M = 0, oder geht durch ihn, und jede Gerade durch ihn
+trifft sie (bei einseitiger Bewehrung als Eckpunkt,
+[[opencivil.nachweis.linie#kante|kante]]).
+
 #### Plattenkennzahlen._hoehen
 
 ```python
@@ -100,13 +114,15 @@ hergeleitet wie im Querkraftnachweis; `None` ohne Zugbewehrung.
 def _kleinstes(self, p: Protokoll, ergebnis: Dict[str, Groesse], kurz: str, teile: List[Wert], titel: str) -> None
 ```
 
-Das Kleinere der Seiten -- bei nur einer Seite sie selbst.
+Das Kleinere der Seiten mit Zugbewehrung -- bei nur einer sie selbst.
+Eine hat die Platte immer: ohne x-Bewehrung gibt es keine Kennzahlen.
 
 
 ## Konstanten
 
 - `WAHL = Rechenwahl()` – Womit die Kennzahlen rechnen: die Handrechnung mit Bemessungswerten.
 - `SEITEN = ((True, 'unten', '+'), (False, 'oben', '-'))` – Die beiden Seiten: ob der Zug unten liegt, wie sie heisst, ihr Zeichen.
+- `HAND = 'Handrechnung mit Bemessungswerten'` – Woher die Eckwerte stammen -- ihre Erklaerung unter der Platte.
 
 ## Braucht
 

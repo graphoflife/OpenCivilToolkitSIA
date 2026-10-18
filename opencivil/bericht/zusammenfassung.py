@@ -31,7 +31,7 @@ from opencivil.core.einheiten import MM, Groesse
 from opencivil.core.latex import Mathe, Zelle, als_text
 from opencivil.core.protokoll import GleichungBlock, TabellenBlock
 from opencivil.core.rechenwerk import Loesung
-from opencivil.core.wert import Wert
+from opencivil.core.wert import Kennzahl, Wert
 from opencivil.geotechnik import grundbruch
 from opencivil.querschnitt.platte import BREITE_Y_MM, Plattenquerschnitt
 
@@ -250,85 +250,29 @@ def angaben(aufbau: "Aufbau", kennung: str,
     return aufbau.querschnittsanalysen[kennung].angaben()
 
 
-@dataclass(frozen=True)
-class Kennzahl:
-    """Eine Zahl, die eine Platte beschreibt -- gleich welche Lastfaelle es gibt."""
-
-    beschriftung: str
-    wert: Wert
-    erklaerung: str = ""
-    feste_stellen: bool = False
-    """Mit allen Stellen, auch nachlaufenden Nullen -- der Vergroesserungsfaktor."""
-
-    @property
-    def text(self) -> str:
-        """Die Zahl, wie sie dasteht -- ohne Einheit."""
-        if self.feste_stellen:
-            return f"{self.wert.groesse.in_einheit(self.wert.einheit):.{self.wert.definition.stellen}f}"
-        return self.wert.formatiert()
-
-
-#: Die Kennzahlen einer Platte, in dieser Folge: Kurzname in
-#: :class:`~opencivil.nachweis.kennzahlen.Plattenkennzahlen`, Beschriftung,
-#: Erklaerung.
-_HAND = "Handrechnung mit Bemessungswerten"
-_KENNZAHLEN = (
-    ("M_Rd_pos", "Momentenwiderstand, Zug unten", _HAND),
-    ("M_Rd_neg", "Momentenwiderstand, Zug oben", _HAND),
-    ("N_Rd_zug", "Zugwiderstand", _HAND),
-    ("N_Rd_druck", "Druckwiderstand", _HAND),
-    ("x_d_pos", "Bezogene Druckzonenhöhe, Zug unten", _HAND),
-    ("x_d_neg", "Bezogene Druckzonenhöhe, Zug oben", _HAND),
-    ("V_Rd_max", "Querkraftwiderstand ohne Bügel, grösster",
-     "N_Ed = 0, M_Ed = 0 – das Kleinere beider Seiten"),
-    ("V_Rd_min", "Querkraftwiderstand ohne Bügel, kleinster",
-     "N_Ed = 0, M_Ed = M_Rd – das Kleinere beider Seiten"),
-    ("V_Rd_buegel", "Querkraftwiderstand mit Bügeln",
-     "N_Ed = 0, günstigste Neigung – das Kleinere beider Seiten"),
-)
-
-
-def kennzahlen(aufbau: "Aufbau", kennung: str, loesung: Loesung) -> List[Kennzahl]:
+def kennzahlen(aufbau: "Aufbau", kennung: str,
+               loesung: Loesung) -> List[Tuple[Kennzahl, Wert]]:
     """
-    Die Kennzahlen einer Platte, wie Zusammenfassung und Bericht sie zeigen:
-    Bewehrungsmass und Distanzhalter, die Vergroesserungsfaktoren omega_w und
-    omega_w', die Eckwerte der Handrechnung und der Querkraftwiderstand bei
-    N_Ed = 0 (Benutzer, 2026-10-16). Was nicht gerechnet wurde -- eine
-    Platte ohne x-Bewehrung --, fehlt.
+    Die Kennzahlen eines Bauteils mit ihren Werten, wie Zusammenfassung und
+    Bericht sie zeigen -- bei der Platte Bewehrungsmass und Distanzhalter, die
+    Vergroesserungsfaktoren omega_w und omega_w', die Eckwerte der
+    Handrechnung und der Querkraftwiderstand bei N_Ed = 0 (Benutzer,
+    2026-10-16). Welche es gibt und wie sie heissen, sagen ihre Erzeuger
+    (:attr:`~opencivil.projekt.aufbau.kern.Bauteil.kennzahlen`). Was dieser
+    Lauf nicht gerechnet hat, fehlt: ein Teillauf rechnet nur sein Bauteil.
     """
-    platte = aufbau.querschnitte.get(kennung)
-    if platte is None:
-        return []
-    zeilen: List[Kennzahl] = []
-
-    def dazu(beschriftung: str, wert_id: str, erklaerung: str = "",
-             feste_stellen: bool = False) -> None:
-        wert = loesung.werte.get(wert_id)
-        if wert is not None:
-            zeilen.append(Kennzahl(beschriftung, wert, erklaerung, feste_stellen))
-
-    dazu("Bewehrungsmass", platte.id_von("bewehrungsmass"), "Stahldichte 7850 kg/m³")
-    dazu("Höhe der Distanzhalter", platte.id_von("distanzhalter"),
-         "OK innere untere Lage bis UK innere obere Lage")
-    faktor = aufbau.vergroesserung.get(kennung)
-    for seite, definition in (faktor.d_omega.items() if faktor else ()):
-        dazu(f"Vergrösserungsfaktor, Zug {seite}", definition.id,
-             "SIA 262:2025, 4.4.3.2.5", feste_stellen=True)
-    werte = aufbau.kennzahlen.get(kennung)
-    for kurz, beschriftung, erklaerung in (_KENNZAHLEN if werte else ()):
-        if kurz in werte.d:
-            dazu(beschriftung, werte.d[kurz].id, erklaerung)
-    return zeilen
+    return [(k, loesung.werte[k.definition.id]) for k in aufbau.bauteil(kennung).kennzahlen
+            if k.definition.id in loesung.werte]
 
 
-def kennzahlentabelle(zeilen: Sequence[Kennzahl]) -> TabellenBlock:
+def kennzahlentabelle(zeilen: Sequence[Tuple[Kennzahl, Wert]]) -> TabellenBlock:
     """Die Kennzahlen als Tabelle des Berichts: Beschriftung, Zeichen, Wert."""
     return TabellenBlock(
         kopf=["Kennzahl", "Zeichen", "Wert"],
-        zeilen=[[k.beschriftung, Mathe(k.wert.symbol),
-                 Mathe(rf"{k.text}\,{k.wert.einheit.latex}" if k.wert.einheit.latex
-                       else k.text)]
-                for k in zeilen],
+        zeilen=[[k.beschriftung, Mathe(wert.symbol),
+                 Mathe(rf"{k.text(wert)}\,{wert.einheit.latex}" if wert.einheit.latex
+                       else k.text(wert))]
+                for k, wert in zeilen],
         titel="Kennzahlen", ausrichtung="llr")
 
 

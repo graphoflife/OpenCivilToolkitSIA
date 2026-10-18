@@ -1,5 +1,5 @@
 ---
-erzeugt: 5656b083889b
+erzeugt: 40f4b03e66cc
 art: modul
 tags: [modul]
 ---
@@ -47,7 +47,6 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `spannung: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)` – Stahlspannung gegen Fliessen unter haeufiger Einwirkung, je `<querschnitt>.x`.
 - `spannung_riss: Dict[str, Spannungsbegrenzung] = field(default_factory=dict)` – Stahlspannung aus der Rissbreite unter quasi-staendiger Einwirkung, je `<querschnitt>.x`.
 - `verformung: Dict[str, Verformung] = field(default_factory=dict)` – Die Durchbiegung je Verformungsfall, je Querschnitt -- nur in x-Richtung.
-- `vergroesserung: Dict[str, Vergroesserungsfaktor] = field(default_factory=dict)` – Die Vergroesserungsfaktoren je Platte mit x-Bewehrung -- immer gerechnet.
 - `kennzahlen: Dict[str, Plattenkennzahlen] = field(default_factory=dict)` – Die Kennzahlen je Platte mit x-Bewehrung -- immer gerechnet.
 - `knicken: Dict[str, Knicken] = field(default_factory=dict)` – Nachweis am verformten System, je Querschnitt -- nur in x-Richtung.
 - `fehlende: Dict[str, FehlendeBewehrung] = field(default_factory=dict)` – Je Richtung ohne Bewehrung, fuer die dennoch Einwirkungen angegeben sind. Sie rechnen nichts; sie sorgen dafuer, dass in der Zusammenfassung eine Zeile mit Erfuellungsgrad null steht statt gar nichts.
@@ -224,6 +223,7 @@ steht hier -- niemand muss es aus einer Kennung wie «q1.x» zurueckgewinnen.
 - `objekt: Any` – Der Plattenquerschnitt, die Querschnittsanalyse oder das Balkensystem.
 - `nachweise: List[Tuple[str, Nachweis]] = field(default_factory=list)` – Feld im [[opencivil.projekt.aufbau.kern#Aufbau|Aufbau]] und Nachweis, angemeldet ueber [[opencivil.projekt.aufbau.kern#Aufbau.eintragen|Aufbau.eintragen]].
 - `weitere_ziele: List[str] = field(default_factory=list)` – Was es ausser seinen Nachweisen rechnet -- ein Balkensystem seine Querschnitte und sich.
+- `kennzahlen: List[Kennzahl] = field(default_factory=list)` – Was es beschreibt, gleich welche Lastfaelle es gibt, in der Folge der Zusammenfassung -- jede so, wie ihr Erzeuger sie nennt.
 - `bezuege: Tuple[str, ...] = ()` – Die Bauteile, deren Werte es liest: Platten und Analysen, aus denen ein System Querschnitte nimmt.
 
 #### Bauteil.raum
@@ -347,6 +347,7 @@ Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; `mehr` fuer die Analyse.
 - [[opencivil.core.berechnung]]
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.rechenwerk]]
+- [[opencivil.core.wert]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.material.basis]]
 - [[opencivil.material.beton]]

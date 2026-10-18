@@ -495,10 +495,10 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None) -> dict:
         # Je Platte ihre Kennzahlen -- auch ohne Lastfall, darum nicht in der
         # Zusammenfassung, die es nur mit Urteilen gibt.
         ergebnis["kennzahlen"] = {
-            kennung: [{"beschriftung": k.beschriftung, "symbol": k.wert.symbol,
-                       "text": k.text, "einheit": wert_dict(k.wert)["einheit"],
-                       "erklaerung": k.erklaerung, "id": k.wert.id}
-                      for k in kennzahlen(aufbau, kennung, loesung)]
+            kennung: [{"beschriftung": k.beschriftung, "symbol": wert.symbol,
+                       "text": k.text(wert), "einheit": wert_dict(wert)["einheit"],
+                       "erklaerung": k.erklaerung, "id": wert.id}
+                      for k, wert in kennzahlen(aufbau, kennung, loesung)]
             for kennung in aufbau.querschnitte}
         ergebnis["warnungen"] = list(aufbau.warnungen)
         ergebnis["zuordnung"] = zuordnung(aufbau)

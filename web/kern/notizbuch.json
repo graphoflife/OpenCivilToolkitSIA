@@ -2274,8 +2274,6 @@
         "hinweise",
         "stiller_hinweis",
         "angaben",
-        "Kennzahl",
-        "Kennzahl.text",
         "kennzahlen",
         "kennzahlentabelle",
         "plattenangaben",
@@ -2654,6 +2652,8 @@
         "Wert.in_einheit",
         "Wert.formatiert",
         "Wert.zahl_latex",
+        "Kennzahl",
+        "Kennzahl.text",
         "FehlendeEingabe",
         "FehlendeEingabe.beschreibung"
       ]

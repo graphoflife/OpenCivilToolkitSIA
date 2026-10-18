@@ -49,7 +49,7 @@ from opencivil.core.berechnung import (
 from opencivil.core.einheiten import EINHEITSLOS, Groesse
 from opencivil.core.latex import als_text, angabe, bedingung
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.core.wert import Wert, WertDef, kennung_aus
+from opencivil.core.wert import Kennzahl, Wert, WertDef, kennung_aus
 from opencivil.querschnitt.platte import Richtung
 
 #: Vorgabe der Kriechzahl phi im Vergroesserungsfaktor -- Klima und
@@ -130,6 +130,11 @@ class Vergroesserungsfaktor(Prozedur):
                 beschreibung=f"Vergrösserungsfaktor der Durchbiegung, Zug {seite}",
                 referenz="SIA 262:2025, 4.4.3.2.5", stellen=2)
             for seite in ZUGSEITEN if self.marken[seite]}
+        #: Je Seite mit x-Bewehrung ihr Faktor, mit allen Stellen.
+        self.kennzahlen: List[Kennzahl] = [
+            Kennzahl(definition, f"Vergrösserungsfaktor, Zug {seite}", definition.referenz,
+                     feste_stellen=True)
+            for seite, definition in self.d_omega.items()]
 
         bezuege = [
             Eingabebezug("h", querschnitt.id_von("h")),

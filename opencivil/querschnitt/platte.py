@@ -48,7 +48,7 @@ from opencivil.core.einheiten import (
 from opencivil.core.latex import Mathe
 from opencivil.core.protokoll import Abschnitt, Protokoll, Zwischenwerte
 from opencivil.core.wahl import Wahl
-from opencivil.core.wert import Wert, WertDef, kennung_aus
+from opencivil.core.wert import Kennzahl, Wert, WertDef, kennung_aus
 from opencivil.material.basis import Baustoff
 
 #: Anzahl Lagen einer Platte. Bewusst fest -- eine Platte hat unten und oben je
@@ -811,6 +811,13 @@ class Plattenquerschnitt:
         self.d_distanzhalter = self._def(
             "distanzhalter", "h_{Dist}", MM,
             "Höhe der Distanzhalter (OK innere untere bis UK innere obere Lage)", 1)
+        #: Was der Lagenaufbau beschreibt, gleich welche Lastfaelle es gibt.
+        self.kennzahlen: List[Kennzahl] = [
+            Kennzahl(self.d_bewehrungsmass, "Bewehrungsmass",
+                     f"Stahldichte {STAHLDICHTE:g} kg/m³"),
+            Kennzahl(self.d_distanzhalter, "Höhe der Distanzhalter",
+                     "OK innere untere Lage bis UK innere obere Lage"),
+        ]
 
         aufbau_ausgaben: List[WertDef] = [self.d_bewehrungsmass, self.d_distanzhalter]
         aufbau_posten: List[Postenbezug] = []
