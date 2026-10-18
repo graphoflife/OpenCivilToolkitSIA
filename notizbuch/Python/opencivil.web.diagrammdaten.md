@@ -1,5 +1,5 @@
 ---
-erzeugt: 687216c42788
+erzeugt: 38e4216ed386
 art: modul
 tags: [modul]
 ---
@@ -93,6 +93,45 @@ Die Auswertungen am Querschnitt, je Platte und je gezeichnetem Querschnitt
 Gerechnet wird in [[opencivil.spannungsanalyse.analysen]]; hier wird
 nur in Zeichengroessen abgebildet.
 
+### _Groesse
+
+```python
+@dataclass(frozen=True)
+class _Groesse
+```
+
+Eine Groesse einer Linie, wie sie in den Zeichendaten steht: Zeichen und Einheit.
+
+- `zeichen: str`
+- `einheit: Einheit`
+- `latex: str = ''`
+- `stellen: int = 1`
+- `am_bezugsort: bool = False` – Ob sie an einem Ort des Querschnitts gilt -- die Mitteldehnung, nicht die Kruemmung.
+
+#### _Groesse.zahl
+
+```python
+def zahl(self, si: Optional[float]) -> Optional[float]
+```
+
+Ein Wert in SI, in der Einheit dieser Groesse.
+
+#### _Groesse.als_dict
+
+```python
+def als_dict(self) -> dict
+```
+
+### liniengroessen
+
+```python
+def liniengroessen(art) -> Optional[dict]
+```
+
+Was die Linie einer Frage zeigt -- Kraft, Festgehaltenes, Verformung --,
+wie es in ihren Daten steht; `None` fuer die beiden Bilder. Fuer den
+Katalog: die Maske nennt damit, wie weit eine Linie laeuft.
+
 ### _linie_dict
 
 ```python
@@ -100,7 +139,8 @@ def _linie_dict(linie) -> dict
 ```
 
 Eine Linie in Zeichengroessen: die Kraft in kNm bzw. kN, die Verformung
-als Kruemmung in 1/m bzw. als Dehnung in Promille.
+als Kruemmung in 1/m bzw. als Dehnung in Promille -- und unter
+`groessen` Zeichen und Einheit dazu ([[opencivil.web.diagrammdaten#Konstanten|_LINIENGROESSEN]]).
 
 ### _modul_dict
 
@@ -109,8 +149,11 @@ def _modul_dict(modul) -> dict
 ```
 
 Der aequivalente E-Modul in Zeichengroessen: die laufende Kraft in kNm
-bzw. kN, der Modul in N/mm², dazu E_cm, an dem er sich misst. Gerechnet
-ist alles im Kern ([[opencivil.spannungsanalyse.modul#Modullinie|Modullinie]]).
+bzw. kN, der Modul in N/mm², dazu E_cm, an dem er sich misst -- und
+sein Vielfaches von E_cm, wo er angeschrieben wird: je Punkt daneben, an
+den Ecken mit ihm (`{"wert", "vielfaches"}`). Gerechnet ist alles im
+Kern ([[opencivil.spannungsanalyse.modul#Modullinie|Modullinie]]); bis 2026-10-18
+teilte die Oberflaeche selbst durch E_cm.
 
 ### werkstoffgesetze
 
@@ -322,6 +365,9 @@ gewaehlt hat. Ohne Verteilung (keine Wand, keine Last) nichts.
 
 - `NEIGUNG_VON = 25` – Wie weit die Neigungskurve mindestens reicht, in Grad. Die beiden Grenzen des Benutzers liegen normalerweise darin; gehen sie darueber hinaus, waechst die Achse mit -- ein abgeschnittener Ast waere schlimmer als eine breite Achse.
 - `NEIGUNG_BIS = 45`
+- `_LINIENGROESSEN = {spannungsanalyse.Analyseart.MOMENT_KRUEMMUNG: (_Groesse('M', KNM), _…` – Was eine Linie zeigt, je Art ihrer Linie: die laufende Kraft, die festgehaltene und die Verformung. Massstab und Beschriftung an einer Stelle -- bis 2026-10-18 skalierte der Kern hier, und spannungsbild.js schrieb Zeichen und Einheiten ein zweites Mal daneben (LINIEN, MODULE).
+- `_MODUL = _Groesse('E_eq', N_PRO_MM2, 'E_{eq}', 0)` – Der aequivalente Modul, ueber der laufenden Kraft.
+- `_RANDDEHNUNG = _Groesse('ε', PROMILLE, '\\varepsilon', 2)` – Die Randdehnungen beim Bruch.
 
 ## Braucht
 

@@ -18,7 +18,7 @@ import math
 from dataclasses import KW_ONLY, asdict, dataclass, field
 from typing import Any, Dict, Iterable, List, Mapping, Optional
 
-from opencivil.core.einheiten import GRAD, M, MM, MM2, PROZENT, Groesse
+from opencivil.core.einheiten import GRAD, KN, KNM, M, MM, MM2, PROMILLE, PROZENT, Groesse
 from opencivil.core.wert import kennung_aus
 from opencivil.material.basis import Baustoff, Baustoffart
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
@@ -500,15 +500,13 @@ class SpannungsfallEintrag(Beschreibung):
     """Welche Bewehrung zaehlt. Hier keine Wahl ``beide``: ein Bild zeigt
     einen Querschnitt, und der liegt in einer Richtung."""
 
-    N_Ed: float = 0.0
-    """in kN, Zug positiv -- fuer ``schnittgroessen`` und ``moment_kruemmung``."""
+    N_Ed: float = bereich(0.0, heisst="N_Ed", einheit=KN)
+    """Zug positiv. Welche Frage welches Feld braucht, sagt :attr:`Analyseart.eingaben`."""
 
-    M_Ed: float = 0.0
-    """in kNm -- fuer ``schnittgroessen`` und ``normalkraft_dehnung``."""
-
-    eps_oben: float = -1.0
-    eps_unten: float = 2.0
-    """Randdehnungen in Promille -- nur fuer ``dehnungen``."""
+    M_Ed: float = bereich(0.0, heisst="M_Ed", einheit=KNM)
+    eps_oben: float = bereich(-1.0, heisst="ε oben", einheit=PROMILLE)
+    eps_unten: float = bereich(2.0, heisst="ε unten", einheit=PROMILLE)
+    """Die Randdehnungen."""
 
     kriechzahl: float = bereich(0.0, heisst="Kriechzahl φ", ab=0.0)
     """Die Kriechzahl φ dieser Analyse."""

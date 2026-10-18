@@ -4326,6 +4326,7 @@
         "Analyseart.beschriftung",
         "Analyseart.kurz",
         "Analyseart.linie",
+        "Analyseart.eingaben",
         "Analyseart.modul"
       ]
     },
@@ -4736,6 +4737,10 @@
         "neigungskurven",
         "_bild_dict",
         "spannungsanalysen",
+        "_Groesse",
+        "_Groesse.zahl",
+        "_Groesse.als_dict",
+        "liniengroessen",
         "_linie_dict",
         "_modul_dict",
         "werkstoffgesetze",

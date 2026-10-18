@@ -19,7 +19,9 @@ from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
 from opencivil import spannungsanalyse
 from opencivil.core.berechnung import grad_als_text
-from opencivil.core.einheiten import KN, KNM, KN_PRO_M
+from dataclasses import dataclass
+
+from opencivil.core.einheiten import KN, KNM, KN_PRO_M, N_PRO_MM2, PRO_M, PROMILLE, Einheit
 from opencivil.core.rechenwerk import Loesung
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL, Spannungsblock
 from opencivil.nachweis.resistenzlinie import Handlinie
@@ -252,36 +254,90 @@ def _analyse_dict(analyse) -> dict:
     return {**kopf, "moeglich": True, "bild": _bild_dict(analyse.bild)}
 
 
+@dataclass(frozen=True)
+class _Groesse:
+    """Eine Groesse einer Linie, wie sie in den Zeichendaten steht: Zeichen und Einheit."""
+
+    zeichen: str
+    einheit: Einheit
+    latex: str = ""
+    stellen: int = 1
+    am_bezugsort: bool = False
+    """Ob sie an einem Ort des Querschnitts gilt -- die Mitteldehnung, nicht die Kruemmung."""
+
+    def zahl(self, si: Optional[float]) -> Optional[float]:
+        """Ein Wert in SI, in der Einheit dieser Groesse."""
+        return None if si is None else si / self.einheit.faktor
+
+    def als_dict(self) -> dict:
+        return {"zeichen": self.zeichen, "latex": self.latex or self.zeichen,
+                "einheit": self.einheit.beschriftung, "stellen": self.stellen,
+                "am_bezugsort": self.am_bezugsort}
+
+
+#: Was eine Linie zeigt, je Art ihrer Linie: die laufende Kraft, die
+#: festgehaltene und die Verformung. Massstab und Beschriftung an einer
+#: Stelle -- bis 2026-10-18 skalierte der Kern hier, und spannungsbild.js
+#: schrieb Zeichen und Einheiten ein zweites Mal daneben (LINIEN, MODULE).
+_LINIENGROESSEN: Dict[Any, Tuple[_Groesse, _Groesse, _Groesse]] = {
+    spannungsanalyse.Analyseart.MOMENT_KRUEMMUNG: (
+        _Groesse("M", KNM), _Groesse("N", KN), _Groesse("χ", PRO_M, r"\chi", 4)),
+    spannungsanalyse.Analyseart.NORMALKRAFT_DEHNUNG: (
+        _Groesse("N", KN), _Groesse("M", KNM),
+        _Groesse("ε_m", PROMILLE, r"\varepsilon_{m}", 2, am_bezugsort=True)),
+}
+
+#: Der aequivalente Modul, ueber der laufenden Kraft.
+_MODUL = _Groesse("E_eq", N_PRO_MM2, "E_{eq}", 0)
+
+
+def liniengroessen(art) -> Optional[dict]:
+    """
+    Was die Linie einer Frage zeigt -- Kraft, Festgehaltenes, Verformung --,
+    wie es in ihren Daten steht; ``None`` fuer die beiden Bilder. Fuer den
+    Katalog: die Maske nennt damit, wie weit eine Linie laeuft.
+    """
+    if art.linie is None:
+        return None
+    kraft, fest, verformung = _LINIENGROESSEN[art.linie]
+    return {"kraft": kraft.als_dict(), "fest": fest.als_dict(),
+            "verformung": verformung.als_dict()}
+
+#: Die Randdehnungen beim Bruch.
+_RANDDEHNUNG = _Groesse("ε", PROMILLE, r"\varepsilon", 2)
+
+
 def _linie_dict(linie) -> dict:
     """
     Eine Linie in Zeichengroessen: die Kraft in kNm bzw. kN, die Verformung
-    als Kruemmung in 1/m bzw. als Dehnung in Promille.
+    als Kruemmung in 1/m bzw. als Dehnung in Promille -- und unter
+    ``groessen`` Zeichen und Einheit dazu (:data:`_LINIENGROESSEN`).
     """
-    pro_mille = linie.art is spannungsanalyse.Analyseart.NORMALKRAFT_DEHNUNG
-    v = 1e3 if pro_mille else 1.0
-
-    def verformung(x: Optional[float]) -> Optional[float]:
-        return None if x is None else x * v
+    kraft, fest, verformung = _LINIENGROESSEN[linie.art.linie]
+    v = verformung.zahl
 
     def eck(e) -> Optional[dict]:
-        return None if e is None else {"kraft": e.kraft / 1e3, "verformung": e.verformung * v}
+        return None if e is None else {"kraft": kraft.zahl(e.kraft), "verformung": v(e.verformung)}
 
     sprung = linie.sprung
     bruch = linie.bruch
     return {
-        "fest": linie.fest / 1e3, "riss": linie.riss / 1e3,
-        "punkte": [{"kraft": p.kraft / 1e3, "verformung": p.verformung * v,
-                    "gerissen": p.gerissen, "verformung_I": verformung(p.verformung_I),
-                    "verformung_II": verformung(p.verformung_II)}
+        "groessen": {"kraft": kraft.als_dict(), "fest": fest.als_dict(),
+                     "verformung": verformung.als_dict()},
+        "fest": fest.zahl(linie.fest), "riss": kraft.zahl(linie.riss),
+        "punkte": [{"kraft": kraft.zahl(p.kraft), "verformung": v(p.verformung),
+                    "gerissen": p.gerissen, "verformung_I": v(p.verformung_I),
+                    "verformung_II": v(p.verformung_II)}
                    for p in linie.punkte],
         # Der Sprung beim Reissen: dieselbe Kraft, zwei Verformungen.
         "sprung": (None if sprung is None else
-                   {"kraft": sprung[0].kraft / 1e3, "vor": sprung[0].verformung * v,
-                    "nach": sprung[1].verformung * v}),
+                   {"kraft": kraft.zahl(sprung[0].kraft), "vor": v(sprung[0].verformung),
+                    "nach": v(sprung[1].verformung)}),
         "fliessen": eck(linie.fliessen),
         "bruch": (None if bruch is None else
-                  {**eck(bruch), "eps_oben": bruch.eps_oben * 1e3,
-                   "eps_unten": bruch.eps_unten * 1e3, "massgebend": bruch.massgebend}),
+                  {**eck(bruch), "eps_oben": _RANDDEHNUNG.zahl(bruch.eps_oben),
+                   "eps_unten": _RANDDEHNUNG.zahl(bruch.eps_unten),
+                   "massgebend": bruch.massgebend}),
         "tragfaehig": linie.tragfaehig,
         "hinweis": linie.hinweis,
     }
@@ -290,29 +346,41 @@ def _linie_dict(linie) -> dict:
 def _modul_dict(modul) -> dict:
     """
     Der aequivalente E-Modul in Zeichengroessen: die laufende Kraft in kNm
-    bzw. kN, der Modul in N/mm², dazu E_cm, an dem er sich misst. Gerechnet
-    ist alles im Kern (:class:`~opencivil.spannungsanalyse.Modullinie`).
+    bzw. kN, der Modul in N/mm², dazu E_cm, an dem er sich misst -- und
+    sein Vielfaches von E_cm, wo er angeschrieben wird: je Punkt daneben, an
+    den Ecken mit ihm (``{"wert", "vielfaches"}``). Gerechnet ist alles im
+    Kern (:class:`~opencivil.spannungsanalyse.Modullinie`); bis 2026-10-18
+    teilte die Oberflaeche selbst durch E_cm.
     """
     linie = modul.linie
+    kraft, fest, _ = _LINIENGROESSEN[linie.art.linie]
+    E = _MODUL.zahl
 
-    def E(x: Optional[float]) -> Optional[float]:
-        return None if x is None else x / 1e6
+    def vielfaches(x: Optional[float]) -> Optional[float]:
+        return None if x is None else x / modul.E_cm
+
+    def angeschrieben(x: Optional[float]) -> Optional[dict]:
+        """Ein Modul an einer Ecke, mit seinem Vielfachen von E_cm."""
+        return None if x is None else {"wert": E(x), "vielfaches": vielfaches(x)}
 
     sprung = linie.sprung
     return {
-        "fest": linie.fest / 1e3, "riss": linie.riss / 1e3, "E_cm": modul.E_cm / 1e6,
-        "punkte": [{"kraft": p.kraft / 1e3, "modul": E(p.modul), "gerissen": p.gerissen,
+        "groessen": {"kraft": kraft.als_dict(), "fest": fest.als_dict(), "modul": _MODUL.als_dict()},
+        "fest": fest.zahl(linie.fest), "riss": kraft.zahl(linie.riss), "E_cm": E(modul.E_cm),
+        "punkte": [{"kraft": kraft.zahl(p.kraft), "modul": E(p.modul),
+                    "vielfaches": vielfaches(p.modul), "gerissen": p.gerissen,
                     "modul_I": E(p.modul_I), "modul_II": E(p.modul_II)}
                    for p in modul.punkte],
         # Der Sprung beim Reissen: dieselbe Kraft, zwei Moduln.
         "sprung": (None if sprung is None else
-                   {"kraft": sprung[0].kraft / 1e3,
-                    "vor": E(modul.modul(sprung[0].kraft, sprung[0].verformung)),
-                    "nach": E(modul.riss)}),
+                   {"kraft": kraft.zahl(sprung[0].kraft),
+                    "vor": angeschrieben(modul.modul(sprung[0].kraft, sprung[0].verformung)),
+                    "nach": angeschrieben(modul.riss)}),
         "fliessen": (None if linie.fliessen is None else
-                     {"kraft": linie.fliessen.kraft / 1e3, "modul": E(modul.fliessen)}),
+                     {"kraft": kraft.zahl(linie.fliessen.kraft),
+                      "modul": angeschrieben(modul.fliessen)}),
         "bruch": (None if linie.bruch is None else
-                  {"kraft": linie.bruch.kraft / 1e3, "modul": E(modul.ende),
+                  {"kraft": kraft.zahl(linie.bruch.kraft), "modul": angeschrieben(modul.ende),
                    "massgebend": linie.bruch.massgebend}),
         "tragfaehig": linie.tragfaehig,
         "hinweis": linie.hinweis,

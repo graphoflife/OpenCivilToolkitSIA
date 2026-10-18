@@ -713,9 +713,14 @@ class TestAequivalenterModul(unittest.TestCase):
         biegung, zug = antwort.daten["spannungsanalysen"]["q1"]
         kurve = biegung["kurve"]
         self.assertEqual(biegung["titel"], "Äquivalenter E-Modul über dem Moment")
-        self.assertAlmostEqual(kurve["sprung"]["vor"], 35903, delta=1)
-        self.assertAlmostEqual(kurve["sprung"]["nach"], 8925, delta=1)
+        self.assertAlmostEqual(kurve["sprung"]["vor"]["wert"], 35903, delta=1)
+        self.assertAlmostEqual(kurve["sprung"]["nach"]["wert"], 8925, delta=1)
         self.assertAlmostEqual(kurve["E_cm"], 33620, delta=1)
+        # Das Vielfache von E_cm rechnet der Kern, nicht die Oberfläche (2026-10-18).
+        self.assertAlmostEqual(kurve["sprung"]["nach"]["vielfaches"], 8925 / 33620, delta=1e-4)
+        self.assertEqual(kurve["groessen"]["modul"]["einheit"], "N/mm²")
+        self.assertEqual((kurve["groessen"]["kraft"]["zeichen"],
+                          kurve["groessen"]["kraft"]["einheit"]), ("M", "kNm"))
         self.assertEqual(kurve["punkte"][0]["kraft"], 0.0)
         self.assertIsNotNone(kurve["punkte"][0]["modul"])
         self.assertIn("massgebend", kurve["bruch"])

@@ -284,34 +284,23 @@ function verteilungsbild(bild) {
 // Die Linien: M–χ, N–ε, M–E_eq, N–E_eq
 // ===========================================================================
 
-/**
- * Was eine Linie ausmacht, je Art: wie Kraft und Verformung heissen, in
- * welcher Einheit sie stehen, und was festgehalten wird. Die Namen in der
- * Schreibweise von `formelText`, für KaTeX daneben dieselben noch einmal.
+/*
+ * Was eine Linie zeigt, bringt sie mit (`kurve.groessen`, aus dem Kern): die
+ * laufende Kraft, die festgehaltene und die Verformung bzw. den Modul, je mit
+ * Zeichen, Einheit und Stellen -- dort, wo der Kern ihre Zahlen auch
+ * skaliert. Bis 2026-10-18 stand dasselbe hier ein zweites Mal, je Art
+ * (LINIEN, MODULE), und das Vielfache von E_cm rechnete die Oberfläche.
  */
-const LINIEN = {
-  moment_kruemmung: {
-    kraft: 'M', kraftEinheit: 'kNm', verformungEinheit: '1/m', stellen: 4,
-    verformung: (index) => (index ? `χ_{${index}}` : 'χ'),
-    latex: (index) => (index ? `\\chi_{${index}}` : '\\chi'),
-    fest: ['N', 'kN'], achse: () => 'χ [1/m]',
-  },
-  normalkraft_dehnung: {
-    kraft: 'N', kraftEinheit: 'kN', verformungEinheit: '‰', stellen: 2,
-    verformung: (index) => (index ? `ε_{m,${index}}` : 'ε_m'),
-    latex: (index) => (index ? `\\varepsilon_{m,${index}}` : '\\varepsilon_{m}'),
-    fest: ['M', 'kNm'], achse: (ort) => `ε_m [‰]   (${ort})`,
-  },
-};
 
 /**
- * Was die Linie des äquivalenten Moduls ausmacht, je Art: die laufende Kraft,
- * ihre Einheit und was festgehalten wird.
+ * Ein Zeichen mit Index, in der Schreibweise von `formelText` oder für KaTeX:
+ * χ_{u}, ε_{m,u} -- ein vorhandener Index wird ergänzt, nicht ersetzt.
  */
-const MODULE = {
-  moment_emodul: { kraft: 'M', kraftEinheit: 'kNm', fest: ['N', 'kN'], achse: 'M [kNm]' },
-  normalkraft_emodul: { kraft: 'N', kraftEinheit: 'kN', fest: ['M', 'kNm'], achse: 'N [kN]' },
-};
+function mitIndex(groesse, index, latex = false) {
+  const zeichen = latex ? groesse.latex : groesse.zeichen;
+  const m = zeichen.match(/^(.*?)_\{?([^}]*)\}?$/);
+  return m ? `${m[1]}_{${m[2]},${index}}` : `${zeichen}_{${index}}`;
+}
 
 /** Zeilenabstand der Namen an den Eckpunkten. */
 const ZEILE = 14;
@@ -432,7 +421,7 @@ function linienlegende(K, kennwert) {
  */
 function linienbild(fall) {
   const k = fall.kurve;
-  const art = LINIEN[fall.art];
+  const { kraft: K, verformung: V } = k.groessen;
   const ende = k.punkte[k.punkte.length - 1];
   const verformungen = k.punkte.map((p) => p.verformung);
   const vMin = Math.min(0, ...verformungen);
@@ -441,7 +430,8 @@ function linienbild(fall) {
   const spanne = vMax - vMin;
   const { svg, daten, x, y, feld } = linienkreuz(
     [vMin - (vMin < 0 ? 0.05 * spanne : 0), vMax + 0.05 * spanne], [0, kMax * 1.08],
-    art.achse(fall.bezugsort), `${art.kraft} [${art.kraftEinheit}]`, fall.titel);
+    `${V.zeichen} [${V.einheit}]${V.am_bezugsort ? `   (${fall.bezugsort})` : ''}`,
+    `${K.zeichen} [${K.einheit}]`, fall.titel);
 
   const wert = (hol) => (p) => {
     const v = hol(p);
@@ -454,8 +444,8 @@ function linienbild(fall) {
     { farbe: VERGLEICH, breite: 1.4, muster: '2 3' });
   zug(daten, k.punkte, wert((p) => p.verformung), kraft, { farbe: LINIE, breite: 2.4 });
 
-  const v = (w) => mitEinheit(w, art.stellen, art.verformungEinheit);
-  const f = (w) => mitEinheit(w, 1, art.kraftEinheit);
+  const v = (w) => mitEinheit(w, V.stellen, V.einheit);
+  const f = (w) => mitEinheit(w, 1, K.einheit);
   const kennwert = fall.wahl?.index || 'Rd';
   const ecken = [];
   // Das Ende zuerst: es steht am Rand, und die anderen weichen ihm aus.
@@ -465,10 +455,10 @@ function linienbild(fall) {
     ecken.push({
       px: x(ende.verformung), py: y(ende.kraft), farbe: LINIE,
       zeilen: ende.gerissen
-        ? [`${art.kraft}_{${kennwert}} = ${f(k.bruch.kraft)}`,
-          `${art.verformung('u')} = ${v(k.bruch.verformung)}`, k.bruch.massgebend]
-        : [`${art.kraft}_{${kennwert}} = ${f(k.bruch.kraft)}`,
-          `${art.verformung('')} = ${v(ende.verformung)}`],
+        ? [`${K.zeichen}_{${kennwert}} = ${f(k.bruch.kraft)}`,
+          `${mitIndex(V, 'u')} = ${v(k.bruch.verformung)}`, k.bruch.massgebend]
+        : [`${K.zeichen}_{${kennwert}} = ${f(k.bruch.kraft)}`,
+          `${V.zeichen} = ${v(ende.verformung)}`],
     });
   }
   // Der Fliessbeginn heisst M_y bzw. N_y, wie seine Verformung; das Ende
@@ -477,8 +467,8 @@ function linienbild(fall) {
   if (k.fliessen) {
     ecken.push({
       px: x(k.fliessen.verformung), py: y(k.fliessen.kraft), farbe: STAHL,
-      zeilen: [`${art.kraft}_{y} = ${f(k.fliessen.kraft)}`,
-        `${art.verformung('y')} = ${v(k.fliessen.verformung)}`],
+      zeilen: [`${K.zeichen}_{y} = ${f(k.fliessen.kraft)}`,
+        `${mitIndex(V, 'y')} = ${v(k.fliessen.verformung)}`],
     });
   }
   // Der Riss: ein Punkt vor dem waagrechten Stück, der Name an seinem Ende.
@@ -488,22 +478,12 @@ function linienbild(fall) {
     }));
     ecken.push({
       px: x(k.sprung.nach), py: y(k.sprung.kraft), farbe: ZUG,
-      zeilen: [`${art.kraft}_{Riss} = ${f(k.sprung.kraft)}`,
-        `${art.verformung('')} = ${zahl(k.sprung.vor, art.stellen)} → ${v(k.sprung.nach)}`],
+      zeilen: [`${K.zeichen}_{Riss} = ${f(k.sprung.kraft)}`,
+        `${V.zeichen} = ${zahl(k.sprung.vor, V.stellen)} → ${v(k.sprung.nach)}`],
     });
   }
   eckenAnschreiben(daten, feld, ecken);
-  return el('div.diagramm-huelle', {}, [svg, linienlegende(art.kraft, kennwert)]);
-}
-
-/** Das Vielfache von E_cm -- der Faktor, um den man E_cm abmindert. */
-function vielfaches(wert, E_cm) {
-  return (wert / E_cm).toFixed(2);
-}
-
-/** Ein Modul in N/mm², dazu sein Vielfaches von E_cm -- für die Namen an den Ecken. */
-function modulText(wert, E_cm) {
-  return `${zahl(wert, 0)} N/mm² = ${vielfaches(wert, E_cm)}·E_{cm}`;
+  return el('div.diagramm-huelle', {}, [svg, linienlegende(K.zeichen, kennwert)]);
 }
 
 /**
@@ -516,13 +496,14 @@ function modulText(wert, E_cm) {
  */
 function modulbild(fall) {
   const k = fall.kurve;
-  const art = MODULE[fall.art];
+  const { kraft: K, modul: M } = k.groessen;
   const werte = k.punkte.flatMap((p) => [p.modul, p.modul_I, p.modul_II])
     .filter((v) => v !== null && v !== undefined);
   const eMax = Math.max(1e-9, ...werte);
   const kMax = Math.max(1e-9, ...k.punkte.map((p) => p.kraft));
   const { svg, daten, x, y, feld } = linienkreuz(
-    [0, kMax * 1.05], [0, eMax * 1.1], art.achse, 'E_eq [N/mm²]', fall.titel);
+    [0, kMax * 1.05], [0, eMax * 1.1], `${K.zeichen} [${K.einheit}]`,
+    `${M.zeichen} [${M.einheit}]`, fall.titel);
 
   const modul = (hol) => (p) => {
     const v = hol(p);
@@ -535,8 +516,11 @@ function modulbild(fall) {
     { farbe: VERGLEICH, breite: 1.4, muster: '2 3' });
   zug(daten, k.punkte, kraft, modul((p) => p.modul), { farbe: LINIE, breite: 2.4 });
 
-  const f = (wert) => mitEinheit(wert, 1, art.kraftEinheit);
-  const e = (wert) => modulText(wert, k.E_cm);
+  const f = (wert) => mitEinheit(wert, 1, K.einheit);
+  // Ein Modul mit seinem Vielfachen von E_cm, beides aus dem Kern: an den
+  // Ecken `{wert, vielfaches}`, je Punkt die beiden nebeneinander.
+  const e = (m) => `${zahl(m.wert, 0)} ${M.einheit} = ${m.vielfaches.toFixed(2)}·E_{cm}`;
+  const amPunkt = (p) => ({ wert: p.modul, vielfaches: p.vielfaches });
   const kennwert = fall.wahl?.index || 'Rd';
   const gueltig = k.punkte.filter((p) => p.modul !== null && p.modul !== undefined);
   const ende = gueltig[gueltig.length - 1];
@@ -547,15 +531,15 @@ function modulbild(fall) {
     ecken.push({
       px: x(ende.kraft), py: y(ende.modul), farbe: LINIE,
       zeilen: ende.gerissen
-        ? [`${art.kraft}_{${kennwert}} = ${f(k.bruch.kraft)}`, `E_{eq} = ${e(ende.modul)}`,
+        ? [`${K.zeichen}_{${kennwert}} = ${f(k.bruch.kraft)}`, `E_{eq} = ${e(amPunkt(ende))}`,
           k.bruch.massgebend]
-        : [`${art.kraft}_{${kennwert}} = ${f(k.bruch.kraft)}`, `E_{eq} = ${e(ende.modul)}`],
+        : [`${K.zeichen}_{${kennwert}} = ${f(k.bruch.kraft)}`, `E_{eq} = ${e(amPunkt(ende))}`],
     });
   }
   if (k.fliessen && k.fliessen.modul !== null) {
     ecken.push({
-      px: x(k.fliessen.kraft), py: y(k.fliessen.modul), farbe: STAHL,
-      zeilen: [`${art.kraft}_{y} = ${f(k.fliessen.kraft)}`,
+      px: x(k.fliessen.kraft), py: y(k.fliessen.modul.wert), farbe: STAHL,
+      zeilen: [`${K.zeichen}_{y} = ${f(k.fliessen.kraft)}`,
         `E_{eq} = ${e(k.fliessen.modul)}`],
     });
   }
@@ -563,12 +547,12 @@ function modulbild(fall) {
   // danach -- jede mit ihrem Modul.
   if (k.sprung && k.sprung.vor !== null && k.sprung.nach !== null) {
     ecken.push({
-      px: x(k.sprung.kraft), py: y(k.sprung.nach), farbe: ZUG,
-      zeilen: [`${art.kraft}_{Riss} = ${f(k.sprung.kraft)}`,
+      px: x(k.sprung.kraft), py: y(k.sprung.nach.wert), farbe: ZUG,
+      zeilen: [`${K.zeichen}_{Riss} = ${f(k.sprung.kraft)}`,
         `E_{eq,II} = ${e(k.sprung.nach)}`],
     });
     ecken.push({
-      px: x(k.sprung.kraft), py: y(k.sprung.vor), farbe: ZUG,
+      px: x(k.sprung.kraft), py: y(k.sprung.vor.wert), farbe: ZUG,
       zeilen: [`E_{eq,I} = ${e(k.sprung.vor)}`],
     });
   }
@@ -577,13 +561,13 @@ function modulbild(fall) {
   if (anfang && anfang !== ende) {
     ecken.push({
       px: x(anfang.kraft), py: y(anfang.modul), farbe: anfang.gerissen ? LINIE : VERGLEICH,
-      zeilen: [`${art.kraft} = ${f(anfang.kraft)}`, `E_{eq} = ${e(anfang.modul)}`],
+      zeilen: [`${K.zeichen} = ${f(anfang.kraft)}`, `E_{eq} = ${e(amPunkt(anfang))}`],
     });
   }
   eckenAnschreiben(daten, feld, ecken);
   return el('div.diagramm-huelle', {}, [
     svg,
-    linienlegende(art.kraft, kennwert),
+    linienlegende(K.zeichen, kennwert),
     el('p.karte-hinweis', {
       text: 'E_eq: der E-Modul, den der reine Betonquerschnitt – ungerissen, ohne Stahl, '
         + 'elastisch – bräuchte, um sich gleich stark zu verformen; gezählt ab dem Zustand '
@@ -618,18 +602,18 @@ function wahlzeile(wahl) {
 function inhalt(fall) {
   if (!fall.moeglich) return [el('p.hinweis', { text: fall.hinweis })];
 
-  if (fall.kurve && MODULE[fall.art]) {
+  if (fall.kurve?.groessen.modul) {
     const k = fall.kurve;
-    const art = MODULE[fall.art];
-    const K = art.kraft;
+    const { kraft: Kg, fest: F, modul: M } = k.groessen;
+    const K = Kg.zeichen;
     const kennwert = fall.wahl?.index || 'Rd';
-    const kraft = (wert) => mitEinheit(wert, 1, art.kraftEinheit);
-    const modul = (wert) => (wert === null || wert === undefined ? '–'
-      : `${mitEinheit(wert, 0, 'N/mm²')} = ${vielfaches(wert, k.E_cm)}·E_cm`);
+    const kraft = (wert) => mitEinheit(wert, 1, Kg.einheit);
+    const modul = (m) => (m === null || m === undefined ? '–'
+      : `${mitEinheit(m.wert, 0, M.einheit)} = ${m.vielfaches.toFixed(2)}·E_cm`);
     return [
       wahlzeile(fall.wahl),
       zahlenzeile([
-        [art.fest[0], mitEinheit(k.fest, 1, art.fest[1])],
+        [F.zeichen, mitEinheit(k.fest, 1, F.einheit)],
         [`${K}_{Riss}`, kraft(k.riss)],
         ...(k.sprung ? [['E_{eq,I}', modul(k.sprung.vor)], ['E_{eq,II}', modul(k.sprung.nach)]]
           : []),
@@ -637,7 +621,7 @@ function inhalt(fall) {
           ['E_{eq,y}', modul(k.fliessen.modul)]] : []),
         ...(k.bruch ? [[`${K}_{${kennwert}}`, kraft(k.bruch.kraft)],
           ['E_{eq,u}', modul(k.bruch.modul)]] : []),
-        ['E_{cm}', mitEinheit(k.E_cm, 0, 'N/mm²')],
+        ['E_{cm}', mitEinheit(k.E_cm, 0, M.einheit)],
       ]),
       k.punkte.length ? modulbild(fall) : null,
       k.hinweis ? el('p.hinweis', { text: k.hinweis }) : null,
@@ -646,18 +630,18 @@ function inhalt(fall) {
 
   if (fall.kurve) {
     const k = fall.kurve;
-    const art = LINIEN[fall.art];
-    const K = art.kraft;
+    const { kraft: Kg, fest: F, verformung: V } = k.groessen;
+    const K = Kg.zeichen;
     const kennwert = fall.wahl?.index || 'Rd';
-    const kraft = (wert) => mitEinheit(wert, 1, art.kraftEinheit);
+    const kraft = (wert) => mitEinheit(wert, 1, Kg.einheit);
     return [
       wahlzeile(fall.wahl),
       zahlenzeile([
-        [art.fest[0], mitEinheit(k.fest, 1, art.fest[1])],
+        [F.zeichen, mitEinheit(k.fest, 1, F.einheit)],
         [`${K}_{Riss}`, kraft(k.riss)],
         ...(k.fliessen ? [[`${K}_{y}`, kraft(k.fliessen.kraft)]] : []),
         ...(k.bruch ? [[`${K}_{${kennwert}}`, kraft(k.bruch.kraft)],
-          [art.latex('u'), mitEinheit(k.bruch.verformung, art.stellen, art.verformungEinheit)]]
+          [mitIndex(V, 'u', true), mitEinheit(k.bruch.verformung, V.stellen, V.einheit)]]
           : []),
       ]),
       k.punkte.length ? linienbild(fall) : null,

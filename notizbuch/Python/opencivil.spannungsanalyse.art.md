@@ -1,5 +1,5 @@
 ---
-erzeugt: d94fd3eeb692
+erzeugt: 558a7b274dcc
 art: modul
 tags: [modul]
 ---
@@ -55,6 +55,17 @@ def linie(self) -> Optional['Analyseart']
 
 Die Linie, auf der diese Frage laeuft: M-chi oder N-eps -- der Modul
 ist dieselbe Linie, umgerechnet. `None` fuer die beiden Bilder.
+
+#### Analyseart.eingaben
+
+```python
+@property
+def eingaben(self) -> Tuple[str, ...]
+```
+
+Die Felder des Falls, die diese Frage braucht, in der Folge der Maske:
+N und M, die beiden Randdehnungen -- oder bei einer Linie das, was auf
+ihr festgehalten wird: N auf der M-chi-Linie, M auf der N-eps-Linie.
 
 #### Analyseart.modul
 

@@ -9,7 +9,7 @@ Randdehnungen, die beiden Linien und der aequivalente Modul ueber jeder
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Tuple
 
 from opencivil.core.wahl import Wahl
 
@@ -59,6 +59,19 @@ class Analyseart(Wahl):
             Analyseart.NORMALKRAFT_DEHNUNG: Analyseart.NORMALKRAFT_DEHNUNG,
             Analyseart.NORMALKRAFT_EMODUL: Analyseart.NORMALKRAFT_DEHNUNG,
         }.get(self)
+
+    @property
+    def eingaben(self) -> Tuple[str, ...]:
+        """
+        Die Felder des Falls, die diese Frage braucht, in der Folge der Maske:
+        N und M, die beiden Randdehnungen -- oder bei einer Linie das, was auf
+        ihr festgehalten wird: N auf der M-chi-Linie, M auf der N-eps-Linie.
+        """
+        if self is Analyseart.SCHNITTGROESSEN:
+            return ("N_Ed", "M_Ed")
+        if self is Analyseart.DEHNUNGEN:
+            return ("eps_oben", "eps_unten")
+        return ("N_Ed",) if self.linie is Analyseart.MOMENT_KRUEMMUNG else ("M_Ed",)
 
     @property
     def modul(self) -> bool:

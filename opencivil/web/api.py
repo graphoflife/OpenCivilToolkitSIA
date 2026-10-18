@@ -148,6 +148,7 @@ def katalog() -> dict:
             "grundbruchkombination": feldangaben(GrundbruchkombinationEintrag),
             "querkraftbewehrung": feldangaben(QuerkraftbewehrungEintrag),
             "querschnittsanalyse": feldangaben(QuerschnittsanalyseEintrag),
+            "spannungsfall": feldangaben(SpannungsfallEintrag),
         },
         # Ein Skript der App «Python», mit einem Diagramm darin.
         "neues_skript": SkriptEintrag.neu(kennung="", name="").als_dict(),
@@ -248,7 +249,12 @@ def katalog() -> dict:
         },
         # Die Fragen der Spannung-Dehnung-Analyse.
         "spannungsanalyse": {
-            "arten": [{"wert": a.value, "beschriftung": a.kurz, "titel": a.beschriftung}
+            # Je Frage, welche Felder des Falls sie braucht und was ihre
+            # Linie zeigt -- bis 2026-10-18 stand beides je Art in der
+            # Oberflaeche (nachweise.js, spannungsbild.js).
+            "arten": [{"wert": a.value, "beschriftung": a.kurz, "titel": a.beschriftung,
+                       "eingaben": list(a.eingaben),
+                       "groessen": diagrammdaten.liniengroessen(a)}
                       for a in Analyseart],
         },
         # Was ein Nachweis-Kapitel und eine Analyse waehlen: Wertesatz und

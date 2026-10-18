@@ -82,8 +82,10 @@ Oberfläche.
       `bericht.js` ausziehen -- sonst importierten sich `apps.js` und
       `bericht.js` gegenseitig.
 - [ ] **Kern-Wissen im JS, neu dazugekommen:**
-      - Die Analysearten und ihre Einheiten stehen zweimal (`nachweise.js`,
-        `spannungsbild.js`); E_eq/E_cm rechnet die Oberfläche.
+      - Das Querschnittsbild einer Analyse (Punkt aus N und M oder aus
+        Randdehnungen) beschriftet seine Zahlen selbst mit kN, kNm, ‰, 1/m
+        und mm -- wie seine Zeichendaten sie liefern (`_bild_dict`). Die
+        Linien bringen ihre Grössen seit 2026-10-18 mit.
       - Die Situationszeichnung des Grundbruchs (`gb_zeichnung.js`)
         beschriftet b, t, t₁, α, β und q_Ed selbst mit m, ° und kPa; ihre
         Geometrie rechnet ohnehin in m und Grad. Ganz aus dem JS gehen diese

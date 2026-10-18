@@ -24,7 +24,7 @@
 import { erklaerung, feld, hakenSchalter } from './bausteine.js';
 import { auswahl, el, zahlfeld } from './dom.js';
 import { gebrauchsstand, schalter, zeilenstand } from './kapitel.js';
-import { ausVorlage, naechsterName, projektAendern, zustand } from './zustand.js';
+import { ausVorlage, feldangabe, naechsterName, projektAendern, zustand } from './zustand.js';
 
 // ===========================================================================
 // Die Kapitel -- je ein Knopf, die Eingaben im Fenster (kapitel.js)
@@ -615,46 +615,28 @@ function spannungsZeile(eintrag, index, ort) {
   });
   const aktiv = k.aktiv !== false;
 
-  // Je Art andere Felder -- und immer zwei, damit die Zeilen untereinander
-  // dieselbe Gestalt behalten.
-  // Je Art andere Felder -- und andere Beschriftungen darüber. Ohne sie
-  // stünden dort zwei namenlose Zahlen, und ob die erste eine Kraft oder
-  // eine Dehnung ist, sähe man erst am Ergebnis.
-  const kruemmung = {
-    kopf: ['N_Ed [kN]', ''],
-    felder: () => [
-      zahl('N_Ed', 'Normalkraft in kN – Zug positiv', 50),
-      el('span.kurvenhinweis', { text: '0 … M_Rd' }),
-    ],
+  // Welche Felder die Frage braucht, sagt der Kern (`katalog.spannungsanalyse`),
+  // ebenso ihre Einheiten (`katalog.felder`). Hier steht nur, wie ein Feld über
+  // seiner Zahl heisst, sein Titel und sein Schritt. Immer zwei Spalten, damit
+  // die Zeilen untereinander dieselbe Gestalt behalten: eine Linie hat nur die
+  // festgehaltene Zahl, daneben steht, wie weit sie läuft. Bis 2026-10-18 stand
+  // je Art ein eigener Bauplan hier, mit den Einheiten darin.
+  const frage = (zustand.katalog?.spannungsanalyse?.arten || []).find((a) => a.wert === k.art);
+  const linie = frage?.groessen;
+  const FELDER = {
+    N_Ed: { kopf: 'N_Ed', schritt: 50, titel: (e) => `Normalkraft in ${e} – Zug positiv` },
+    M_Ed: { kopf: 'M_Ed', schritt: 10, titel: (e) => `Moment in ${e}${linie ? ', festgehalten' : ''}` },
+    eps_oben: { kopf: `ε ${oben}`, schritt: 0.5, titel: (e) => `Randdehnung ${oben} in ${e} – Zug positiv` },
+    eps_unten: { kopf: `ε ${unten}`, schritt: 0.5, titel: (e) => `Randdehnung ${unten} in ${e} – Zug positiv` },
   };
-  const dehnung = {
-    kopf: ['M_Ed [kNm]', ''],
-    felder: () => [
-      zahl('M_Ed', 'Moment in kNm, festgehalten', 10),
-      el('span.kurvenhinweis', { text: '0 … N_Rd' }),
-    ],
-  };
-  const bauplan = {
-    schnittgroessen: {
-      kopf: ['N_Ed [kN]', 'M_Ed [kNm]'],
-      felder: () => [
-        zahl('N_Ed', 'Normalkraft in kN – Zug positiv', 50),
-        zahl('M_Ed', 'Moment in kNm', 10),
-      ],
-    },
-    dehnungen: {
-      kopf: [`ε ${oben} [‰]`, `ε ${unten} [‰]`],
-      felder: () => [
-        zahl('eps_oben', `Randdehnung ${oben} in ‰ – Zug positiv`, 0.5),
-        zahl('eps_unten', `Randdehnung ${unten} in ‰ – Zug positiv`, 0.5),
-      ],
-    },
-    // Der äquivalente Modul läuft auf denselben Linien: dieselben Felder.
-    moment_kruemmung: kruemmung,
-    moment_emodul: kruemmung,
-    normalkraft_dehnung: dehnung,
-    normalkraft_emodul: dehnung,
-  }[k.art];
+  const spalten = (frage?.eingaben || []).map((feld) => {
+    const { einheit } = feldangabe('spannungsfall', feld);
+    const f = FELDER[feld];
+    return mitKopf(`${f.kopf} [${einheit}]`, zahl(feld, f.titel(einheit), f.schritt));
+  });
+  if (linie) {
+    spalten.push(mitKopf('', el('span.kurvenhinweis', { text: `0 … ${linie.kraft.zeichen}_Rd` })));
+  }
   // Womit gerechnet wird -- je Analyse, wie in den Kapiteln, aber ohne
   // Handrechnung: eine Linie rechnet die Normalkraft genau.
   const [phi, werte, rechenart] = rechenwahlFelder(
@@ -668,7 +650,7 @@ function spannungsZeile(eintrag, index, ort) {
     }),
     // Beschriftung über dem Feld, nicht daneben: so bleibt das Raster der
     // Zeile dasselbe, gleich welche Art es ist.
-    ...bauplan.felder().map((eingabe, i) => mitKopf(bauplan.kopf[i] || '', eingabe)),
+    ...spalten,
     phi,
     ort.richtung(k, (wert) => aendern((x) => { x.richtung = wert; })),
     werte,
