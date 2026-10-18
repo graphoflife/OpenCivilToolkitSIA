@@ -1,5 +1,5 @@
 ---
-erzeugt: 46d950662477
+erzeugt: 050de19da28c
 art: modul
 tags: [modul]
 ---
@@ -24,14 +24,17 @@ Ein Fundament und seine beiden Nachweise -- Grundbruch und Gleiten --,
 sobald eine Kombination eingeschaltet ist. Ohne sie steht das Fundament
 allein da, wie eine Platte ohne Einwirkung.
 
+Jede Zahl in der Einheit ihres Feldes ([[opencivil.projekt.lesen#als_groesse|als_groesse]])
+-- bis 2026-10-18 stand sie hier ein zweites Mal.
+
 
 ## Braucht
 
-- [[opencivil.core.einheiten]]
 - [[opencivil.geotechnik.grundbruch]]
 - [[opencivil.projekt.aufbau]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.grundbruch]]
+- [[opencivil.projekt.lesen]]
 
 ## Gebraucht von
 

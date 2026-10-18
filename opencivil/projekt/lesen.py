@@ -62,7 +62,7 @@ import math
 import typing
 from typing import Any, Dict, Iterable, Mapping, Optional
 
-from opencivil.core.einheiten import Einheit
+from opencivil.core.einheiten import EINHEITSLOS, Einheit, Groesse
 from opencivil.material.beton import BETONSORTEN
 from opencivil.material.betonstahl import STAHLSORTEN
 
@@ -131,6 +131,46 @@ def bereich(vorgabe: Any = dataclasses.MISSING, *, heisst: str,
     """Ein Feld, dessen Zahl in einem :class:`Bereich` liegen muss -- eine Kriechzahl ab null etwa."""
     return dataclasses.field(default=vorgabe, metadata={
         "bereich": Bereich(heisst, einheit, ueber=ueber, ab=ab, bis=bis, unter=unter)})
+
+
+def als_groesse(eintrag: Any, feld: str) -> Groesse:
+    """
+    Die Zahl eines Feldes als Groesse, in der Einheit seines Bereichs -- der,
+    in der die Maske sie zeigt (:func:`feldangaben`); ohne Einheit
+    einheitslos. So steht die Einheit einer Eingabe nur an ihrem Feld.
+    """
+    f = next(f for f in dataclasses.fields(eintrag) if f.name == feld)
+    return Groesse(getattr(eintrag, feld), f.metadata["bereich"].einheit or EINHEITSLOS)
+
+
+def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
+    """
+    Was die Oberflaeche je Feld eines Eintrags vom Kern wissen muss, fuer den
+    Katalog: die Einheit, in der eine Zahl gemeint ist, wo sie liegen muss
+    (``ueber``, ``ab``, ``bis``, ``unter`` wie :class:`Bereich`), ob sie ganz
+    sein muss, und was eine Wahl annehmen kann.
+
+    Steht es am Feld, steht es einmal. Bis 2026-10-18 standen die Einheiten
+    des Grundbruchs dreimal da -- am Feld, beim Bauen und in grundbruch.js --,
+    und wichen zwei davon ab, galt eine Zahl still um 10³ anders.
+    """
+    typen = _typen(cls)
+    angaben: Dict[str, Dict[str, Any]] = {}
+    for f in dataclasses.fields(cls):
+        angabe: Dict[str, Any] = {}
+        b = f.metadata.get("bereich")
+        if b is not None:
+            if b.einheit is not None and b.einheit.name not in ("", "-"):
+                angabe["einheit"] = b.einheit.beschriftung
+            angabe.update({grenze: getattr(b, grenze) for grenze in ("ueber", "ab", "bis", "unter")
+                           if getattr(b, grenze) is not None})
+        if typen.get(f.name) is int:
+            angabe["ganz"] = True
+        if _ist_wahl(typen.get(f.name)):
+            angabe["wahl"] = [w.value for w in wahl_von(cls, f.name)]
+        if angabe:
+            angaben[f.name] = angabe
+    return angaben
 
 
 def sorten(art: str) -> Mapping[str, Any]:

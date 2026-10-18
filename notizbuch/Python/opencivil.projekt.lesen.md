@@ -1,5 +1,5 @@
 ---
-erzeugt: 21712ed12d7b
+erzeugt: e8698a9ec079
 art: modul
 tags: [modul]
 ---
@@ -131,6 +131,31 @@ def bereich(vorgabe: Any=dataclasses.MISSING, *, heisst: str, einheit: Optional[
 ```
 
 Ein Feld, dessen Zahl in einem [[opencivil.projekt.lesen#Bereich|Bereich]] liegen muss -- eine Kriechzahl ab null etwa.
+
+### als_groesse
+
+```python
+def als_groesse(eintrag: Any, feld: str) -> Groesse
+```
+
+Die Zahl eines Feldes als Groesse, in der Einheit seines Bereichs -- der,
+in der die Maske sie zeigt ([[opencivil.projekt.lesen#feldangaben|feldangaben]]); ohne Einheit
+einheitslos. So steht die Einheit einer Eingabe nur an ihrem Feld.
+
+### feldangaben
+
+```python
+def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]
+```
+
+Was die Oberflaeche je Feld eines Eintrags vom Kern wissen muss, fuer den
+Katalog: die Einheit, in der eine Zahl gemeint ist, wo sie liegen muss
+(`ueber`, `ab`, `bis`, `unter` wie [[opencivil.projekt.lesen#Bereich|Bereich]]), ob sie ganz
+sein muss, und was eine Wahl annehmen kann.
+
+Steht es am Feld, steht es einmal. Bis 2026-10-18 standen die Einheiten
+des Grundbruchs dreimal da -- am Feld, beim Bauen und in grundbruch.js --,
+und wichen zwei davon ab, galt eine Zahl still um 10³ anders.
 
 ### sorten
 
@@ -323,6 +348,7 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 
 - [[opencivil.projekt]]
 - [[opencivil.projekt.aufbau.balkensystem]]
+- [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]

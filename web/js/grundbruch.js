@@ -15,6 +15,11 @@
  * WINKEL wie in Bild 9.2.15 des Kapitels: T zeigt zur Seite, auf der das
  * Gelände um β abfällt, und die Sohle steigt um α in Richtung von T an. Das
  * Bild der Situation rechts unter «Diagramme» zeigt beides.
+ *
+ * EINHEITEN UND GRENZEN kommen aus dem Katalog (`katalog.felder`): in
+ * welcher Einheit der Kern eine Zahl meint, steht an ihrem Feld im Kern und
+ * nur dort. Bis 2026-10-18 stand sie auch hier -- wich sie ab, galt eine
+ * Zahl still um 10³ anders, als die Maske sagte.
  */
 
 import { erklaerung, feld, hakenSchalter, karte, panel } from './bausteine.js';
@@ -50,12 +55,30 @@ function aendernAn(kennung, veraenderer) {
   projektAendern((p) => veraenderer(p.grundbrueche.find((g) => g.kennung === kennung)));
 }
 
+/** Was der Kern über ein Feld weiss (`katalog.felder`): Einheit und Grenzen. */
+function angabe(art, schluessel) {
+  return zustand.katalog?.felder?.[art]?.[schluessel] || {};
+}
+
+/**
+ * Wie weit die Pfeile eines Feldes gehen: bis zu den Grenzen des Kerns. Eine
+ * ausgeschlossene rückt um einen Schritt nach innen -- «grösser als null»
+ * heisst beim Schritt 0.1 ab 0.1. Getippt wird, was man will; der Kern prüft.
+ */
+function grenzen(f, schritt) {
+  return {
+    min: f.ab ?? (f.ueber === undefined ? undefined : f.ueber + schritt),
+    max: f.bis ?? (f.unter === undefined ? undefined : f.unter - schritt),
+  };
+}
+
 /** Eine Zahl des Eintrags als Feld: Beschriftung mit Symbol, Einheit, Schrittweite. */
-function zahlzeile(g, schluessel, text, symbol, einheit, { schritt = 1, min = 0, max, titel } = {}) {
+function zahlzeile(g, schluessel, text, symbol, { schritt = 1, titel } = {}) {
+  const f = angabe('grundbruch', schluessel);
   return feld([`${text} `, span(symbol)], zahlfeld({
-    wert: g[schluessel], schritt, min, max, titel,
+    wert: g[schluessel], schritt, ...grenzen(f, schritt), titel,
     beiAenderung: (v) => aendernAn(g.kennung, (x) => { x[schluessel] = v; }),
-  }), einheit, titel);
+  }), f.einheit || '', titel);
 }
 
 /** Die Bemessungswerte des Bodens, wie der Kern sie gerechnet hat -- oder nichts. */
@@ -83,37 +106,37 @@ function situationPanel(g) {
       })),
     ]),
     karte('Boden', [
-      zahlzeile(g, 'phi_k', 'Reibungswinkel', String.raw`\varphi_k`, '°',
-        { max: 89, titel: 'Reibungswinkel, charakteristisch' }),
-      zahlzeile(g, 'gamma_phi', 'Partialfaktor', String.raw`\gamma_{\varphi}`, '',
-        { schritt: 0.05, min: 0.05, titel: 'Partialfaktor des Reibungswinkels, SIA 267:2013, 5.3.2.2' }),
-      zahlzeile(g, 'c_k', 'Kohäsion', 'c_k', 'kPa',
+      zahlzeile(g, 'phi_k', 'Reibungswinkel', String.raw`\varphi_k`,
+        { titel: 'Reibungswinkel, charakteristisch' }),
+      zahlzeile(g, 'gamma_phi', 'Partialfaktor', String.raw`\gamma_{\varphi}`,
+        { schritt: 0.05, titel: 'Partialfaktor des Reibungswinkels, SIA 267:2013, 5.3.2.2' }),
+      zahlzeile(g, 'c_k', 'Kohäsion', 'c_k',
         { titel: 'Kohäsion, charakteristisch -- mit φ = 0 die undrainierte Scherfestigkeit' }),
-      zahlzeile(g, 'gamma_c', 'Partialfaktor', String.raw`\gamma_c`, '',
-        { schritt: 0.05, min: 0.05, titel: 'Partialfaktor der Kohäsion' }),
-      zahlzeile(g, 'gamma', 'Raumlast Boden', String.raw`\gamma`, 'kN/m³', { schritt: 0.5 }),
-      zahlzeile(g, 'gamma_w', 'Raumlast Wasser', String.raw`\gamma_w`, 'kN/m³', { schritt: 0.5 }),
+      zahlzeile(g, 'gamma_c', 'Partialfaktor', String.raw`\gamma_c`,
+        { schritt: 0.05, titel: 'Partialfaktor der Kohäsion' }),
+      zahlzeile(g, 'gamma', 'Raumlast Boden', String.raw`\gamma`, { schritt: 0.5 }),
+      zahlzeile(g, 'gamma_w', 'Raumlast Wasser', String.raw`\gamma_w`, { schritt: 0.5 }),
       bemessungswerte(g),
     ]),
     karte('Fundament', [
-      zahlzeile(g, 'b', 'Breite', 'b', 'm', { schritt: 0.1, min: 0.1, titel: 'Die kürzere Seite' }),
-      zahlzeile(g, 'L', 'Länge', 'L', 'm', { schritt: 0.1, min: 0.1 }),
-      zahlzeile(g, 't', 'Tiefe der Sohle', 't', 'm',
+      zahlzeile(g, 'b', 'Breite', 'b', { schritt: 0.1, titel: 'Die kürzere Seite' }),
+      zahlzeile(g, 'L', 'Länge', 'L', { schritt: 0.1 }),
+      zahlzeile(g, 't', 'Tiefe der Sohle', 't',
         { schritt: 0.1, titel: 'Oberkante Terrain bis Unterkante Fundament' }),
-      zahlzeile(g, 'alpha', 'Sohlneigung', String.raw`\alpha`, '°',
-        { max: 89, titel: 'Positiv, wenn die Sohle in Richtung von T ansteigt' }),
+      zahlzeile(g, 'alpha', 'Sohlneigung', String.raw`\alpha`,
+        { titel: 'Positiv, wenn die Sohle in Richtung von T ansteigt' }),
     ]),
     karte('Gelände und Grundwasser', [
-      zahlzeile(g, 'beta', 'Geländeneigung', String.raw`\beta`, '°',
-        { max: 89, titel: 'Positiv, wenn das Gelände auf der Seite von T abfällt' }),
-      zahlzeile(g, 't1', 'Grundwasser', 't_1', 'm',
+      zahlzeile(g, 'beta', 'Geländeneigung', String.raw`\beta`,
+        { titel: 'Positiv, wenn das Gelände auf der Seite von T abfällt' }),
+      zahlzeile(g, 't1', 'Grundwasser', 't_1',
         { schritt: 0.1, titel: 'Oberkante Terrain bis zum höchsten möglichen Grundwasserspiegel' }),
-      zahlzeile(g, 'q_Ed', 'Auflast neben dem Fundament', 'q_{Ed}', 'kPa',
+      zahlzeile(g, 'q_Ed', 'Auflast neben dem Fundament', 'q_{Ed}',
         { titel: 'Bemessungslast auf dem Gelände neben dem Fundament' }),
     ]),
     karte('Sohlreibung', [
-      zahlzeile(g, 'delta_faktor', 'Reibung der Sohle', String.raw`\delta^{*}/\varphi`, '',
-        { schritt: 0.05, min: 0.05, titel: 'δ* im Verhältnis zu φ -- meist zwischen 2/3 und 1' }),
+      zahlzeile(g, 'delta_faktor', 'Reibung der Sohle', String.raw`\delta^{*}/\varphi`,
+        { schritt: 0.05, titel: 'δ* im Verhältnis zu φ -- meist zwischen 2/3 und 1' }),
     ]),
     el('div.unterkapitel', {}, [
       el('div.beschreibung', {}, [
@@ -132,8 +155,8 @@ function kombinationZeile(g, i) {
   const aendern = (veraenderer) => aendernAn(g.kennung, (x) => veraenderer(x.kombinationen[i]));
   const an = k.aktiv !== false;
   const zahl = (schluessel, titel) => zahlfeld({
-    wert: k[schluessel], schritt: 10, min: 0, titel, leer: 0,
-    beiAenderung: (v) => aendern((x) => { x[schluessel] = v; }),
+    wert: k[schluessel], schritt: 10, ...grenzen(angabe('grundbruchkombination', schluessel), 10),
+    titel, leer: 0, beiAenderung: (v) => aendern((x) => { x[schluessel] = v; }),
   });
   return el('div.einwirkung.ist-grundbruch', { class: an ? '' : 'ist-aus' }, [
     hakenSchalter(an, (wert) => aendern((x) => { x.aktiv = wert; }), 'Kombination'),
@@ -141,8 +164,8 @@ function kombinationZeile(g, i) {
       type: 'text', value: k.name, title: 'Bezeichnung der Kombination',
       on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
     }),
-    zahl('N_Ed', 'Normal zur Sohle, Druck positiv, in kN'),
-    zahl('T_Ed', 'In der Sohle, zur Seite, auf der das Gelände abfällt, in kN'),
+    zahl('N_Ed', 'Normal zur Sohle, Druck positiv'),
+    zahl('T_Ed', 'In der Sohle, zur Seite, auf der das Gelände abfällt'),
     el('button.weg', {
       type: 'button', text: '×', title: 'Kombination entfernen',
       on: { click: () => aendernAn(g.kennung, (x) => { x.kombinationen.splice(i, 1); }) },
@@ -164,8 +187,9 @@ function einwirkungenPanel(g) {
         ? el('div.einwirkung.ist-grundbruch.ist-kopf', {}, [
           el('span'),
           el('span', { text: 'Bezeichnung' }),
-          el('span', { text: 'N_Ed [kN]' }),
-          el('span', { text: 'T_Ed [kN]' }),
+          ...['N_Ed', 'T_Ed'].map((s) => el('span', {
+            text: `${s} [${angabe('grundbruchkombination', s).einheit}]`,
+          })),
           el('span'),
         ])
         : el('div.leer', { text: 'Ohne Kombination kein Nachweis.' }),

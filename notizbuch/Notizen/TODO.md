@@ -82,15 +82,19 @@ Oberfläche.
       `bericht.js` ausziehen -- sonst importierten sich `apps.js` und
       `bericht.js` gegenseitig.
 - [ ] **Kern-Wissen im JS, neu dazugekommen:**
-      - Die Einheiten der Grundbruch-Eingaben stehen dreimal: `aufbau.py`,
-        `geotechnik/grundbruch.py`, `grundbruch.js`. Weichen zwei davon ab,
-        wird eine Zahl still um 10³ umgedeutet.
       - `Math.round` rundet Neigungen (37.5 → 38).
       - Beim Umschalten der Teilung setzt das JS eigene Vorgaben (`|| 150`).
       - Die Analysearten und ihre Einheiten stehen zweimal (`nachweise.js`,
         `spannungsbild.js`); E_eq/E_cm rechnet die Oberfläche.
+      - Die Situationszeichnung des Grundbruchs (`gb_zeichnung.js`)
+        beschriftet b, t, t₁, α, β und q_Ed selbst mit m, ° und kPa; ihre
+        Geometrie rechnet ohnehin in m und Grad. Ganz aus dem JS gehen diese
+        Einheiten erst mit Situationsdaten des Kerns in SI.
 
-      Besser: Der Katalog liefert je Feld Einheit, Symbol, Bereich und Wahl.
+      Besser: Der Katalog liefert je Feld Einheit, Bereich und Wahl
+      (`katalog.felder`, seit 2026-10-18 beim Grundbruch); die übrigen Masken
+      folgen. Das Zeichen bleibt in der Maske: im Kern steht es an der
+      Rechnung, nicht am Feld.
 - [ ] **Kleineres:**
       - Aus dem früheren Punkt C2 ist «je Rechenart eine Tabellenzeile»
         nicht gemacht.

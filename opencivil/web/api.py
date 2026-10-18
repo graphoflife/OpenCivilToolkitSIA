@@ -45,7 +45,7 @@ from opencivil.projekt import (
 )
 from opencivil.projekt import balkensystem as bs
 from opencivil.projekt.eintraege import EIGENE_VORSILBE
-from opencivil.projekt.lesen import wahl_von
+from opencivil.projekt.lesen import feldangaben, wahl_von
 from opencivil.projekt.querschnittsanalyse import (
     SCHNITTE, FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QAGebrauchsfallEintrag,
     QAKnickEintrag, QALastfallEintrag, QASpannungsfallEintrag, QuerschnittsanalyseEintrag,
@@ -139,6 +139,13 @@ def katalog() -> dict:
         # Ein Grundbruch mit den Vorgaben des Benutzers und einer Kombination.
         # Die Oberflaeche setzt Kennung und Name.
         "neuer_grundbruch": GrundbruchEintrag.neu(kennung="", name="").als_dict(),
+        # Je Feld, was der Kern ueber seine Zahl weiss: die Einheit, in der
+        # sie gemeint ist, die Grenzen, ob sie ganz sein muss, die Wahl --
+        # zuerst beim Grundbruch, dessen Einheiten die Maske selbst trug.
+        "felder": {
+            "grundbruch": feldangaben(GrundbruchEintrag),
+            "grundbruchkombination": feldangaben(GrundbruchkombinationEintrag),
+        },
         # Ein Skript der App «Python», mit einem Diagramm darin.
         "neues_skript": SkriptEintrag.neu(kennung="", name="").als_dict(),
         # Dasselbe fuer jede Zeile, die man anfuegt -- mit den Startwerten, die

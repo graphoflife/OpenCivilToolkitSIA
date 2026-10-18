@@ -17,6 +17,7 @@ from opencivil.geotechnik.grundbruch import gleitkoerper
 from opencivil.projekt import GrundbruchEintrag, Projekt, ProjektFehler
 from opencivil.projekt.lesen import inhalt_pruefen
 from opencivil.web import dienst
+from opencivil.web.api import katalog
 
 
 def rechnen(kombinationen=(("K", 1000.0, 0.0),), **felder):
@@ -314,6 +315,31 @@ class TestGleitkoerper(unittest.TestCase):
                 self.assertAlmostEqual(zug[-1][0], befund.L_gl, places=9)
                 self.assertEqual(zug[-1][1], 0.0)
                 self.assertAlmostEqual(max(z for _, z in zug), befund.H_gl, places=5)
+
+
+class TestEinheitenAmFeld(unittest.TestCase):
+    """
+    Die Einheit einer Eingabe steht an ihrem Feld: die Rechnung nimmt sie
+    dort, der Katalog gibt sie der Maske. Bis 2026-10-18 stand sie dreimal da.
+    """
+
+    def test_der_katalog_nennt_einheit_und_grenzen(self):
+        felder = katalog()["felder"]
+        self.assertEqual(felder["grundbruch"]["c_k"], {"einheit": "kPa", "ab": 0.0})
+        self.assertEqual(felder["grundbruch"]["phi_k"], {"einheit": "°", "ab": 0.0, "unter": 90.0})
+        self.assertEqual(felder["grundbruch"]["gamma_phi"], {"ueber": 0.0})
+        self.assertEqual(felder["grundbruchkombination"]["N_Ed"], {"einheit": "kN", "ueber": 0.0})
+
+    def test_die_rechnung_nimmt_die_einheit_des_feldes(self):
+        """Jede Zahl der Maske kommt in der Einheit ihres Feldes in die Rechnung."""
+        aufbau, loesung, _ = rechnen(c_k=5.0, q_Ed=10.0, b=1.6, L=4.0, alpha=5.0)
+        g = aufbau.grundbrueche["g1"]
+        for feld, zahl in (("c_k", 5.0), ("q_Ed", 10.0), ("b", 1.6), ("alpha", 5.0)):
+            with self.subTest(feld=feld):
+                wert = loesung.werte[g.id_von(feld)]
+                einheit = katalog()["felder"]["grundbruch"][feld]["einheit"]
+                self.assertEqual(wert.einheit.beschriftung, einheit)
+                self.assertAlmostEqual(wert.groesse.in_einheit(wert.einheit), zahl)
 
 
 class TestEintrag(unittest.TestCase):
