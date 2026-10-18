@@ -25,7 +25,7 @@ import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
 import { span } from './mathe.js';
 import { analysenKapitel, mitKopf, nachweisKapitel } from './nachweise.js';
 import { uebersicht } from './qa_uebersicht.js';
-import { zeichenbereich } from './qa_zeichnung.js';
+import { materialienVon, zeichenbereich } from './qa_zeichnung.js';
 import {
   ausVorlage, feldangabe, naechsterName, projektAendern, zustand,
 } from './zustand.js';
@@ -125,24 +125,6 @@ function aendernAn(kennung, veraenderer) {
   });
 }
 
-/**
- * Jedes Material, auf das die Analyse verweist -- in der Reihenfolge des
- * ersten Auftretens, wie im Kern (`QuerschnittsanalyseEintrag.materialien`).
- * Nur für die Werkstoffwahl; ob ein Material gelöscht werden darf, fragt der
- * Baum den Kern (Dienst `verweise`).
- */
-function benutzteMaterialien(analyse) {
-  const gesehen = [];
-  const kennungen = [
-    ...analyse.flaechen.map((f) => f.material),
-    ...analyse.staebe.map((s) => s.stahl),
-    ...analyse.stablinien.map((l) => l.stahl),
-    ...analyse.schubwaende.map((w) => w.stahl),
-  ];
-  for (const k of kennungen) if (k && !gesehen.includes(k)) gesehen.push(k);
-  return gesehen;
-}
-
 // ===========================================================================
 // Querschnitt
 // ===========================================================================
@@ -177,13 +159,14 @@ function querschnittGruppe(analyse) {
 
 /**
  * Je Material im Querschnitt eine Zeile: Bemessungs- oder charakteristische
- * Werte, beim Beton dazu das Gesetz. Die Beschriftungen kommen aus dem Kern,
- * die Vorgaben einer fehlenden Wahl aus seiner Vorlage. Es ist die Wahl der
- * Tragsicherheit; Duktilität und sprödes Versagen rechnen am selben
- * Querschnitt.
+ * Werte, beim Beton dazu das Gesetz. Welche Materialien es sind, zählt der
+ * Kern (`materialienVon`) -- bis 2026-10-18 zählte die Oberfläche sie ein
+ * zweites Mal. Die Beschriftungen kommen aus dem Kern, die Vorgaben einer
+ * fehlenden Wahl aus seiner Vorlage. Es ist die Wahl der Tragsicherheit;
+ * Duktilität und sprödes Versagen rechnen am selben Querschnitt.
  */
 function werkstoffwahl(analyse) {
-  const kennungen = benutzteMaterialien(analyse);
+  const kennungen = materialienVon(analyse.kennung);
   const wahlen = zustand.katalog?.querschnittsanalyse || {};
   const vorgabe = zustand.katalog?.neue_zeilen?.werkstoffwahl || {};
 
@@ -220,12 +203,11 @@ function werkstoffwahl(analyse) {
     ]);
   };
 
-  return [
-    el('span.rechenwahl-titel', { text: 'Rechenwerte je Material' }),
-    ...(kennungen.length
-      ? kennungen.map(zeile)
-      : [el('div.leer', { text: 'Noch kein Material im Querschnitt.' })]),
-  ];
+  let inhalt;
+  if (kennungen === null) inhalt = [el('div.leer', { text: 'Der Kern liest die Zeichnung …' })];
+  else if (!kennungen.length) inhalt = [el('div.leer', { text: 'Noch kein Material im Querschnitt.' })];
+  else inhalt = kennungen.map(zeile);
+  return [el('span.rechenwahl-titel', { text: 'Rechenwerte je Material' }), ...inhalt];
 }
 
 /**

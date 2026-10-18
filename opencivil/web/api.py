@@ -644,6 +644,9 @@ def geometrie(eintrag, projekt) -> dict:
                    for ecken, flaeche in z.zellen],
         "hilfslinien": [{"element": h["name"], "kennung": h["kennung"]}
                         for h in elemente.hilfslinien],
+        # Die Materialien, auf die die Zeichnung zeigt -- fuer die Werkstoffwahl
+        # je Material. Bis 2026-10-18 zaehlte die Oberflaeche sie ein zweites Mal.
+        "materialien": eintrag.materialien(),
     }
 
 

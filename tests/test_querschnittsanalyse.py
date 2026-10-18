@@ -124,6 +124,16 @@ class TestKnoten(unittest.TestCase):
         a.stablinien[1].kennung = "L1"
         self.assertIn("dieselbe Kennung 'L1'", a.elemente().fehler[0]["text"])
 
+    def test_die_antwort_nennt_die_materialien_der_zeichnung(self):
+        """
+        Die Werkstoffwahl je Material liest sie dort -- bis 2026-10-18 zählte
+        die Oberfläche sie ein zweites Mal.
+        """
+        p = projekt()
+        d = dienst.bearbeite("geometrie", {"projekt": p.als_dict(), "kennung": "a1"}).daten
+        self.assertEqual(d["materialien"], p.querschnittsanalysen[0].materialien())
+        self.assertEqual(d["materialien"], ["b1", "s1"])
+
     def test_hilfslinien_heissen_wie_alles_andere_im_kern(self):
         """Die Oberfläche nennt eine Hilfslinie so, wie die Antwort es sagt."""
         p = projekt()

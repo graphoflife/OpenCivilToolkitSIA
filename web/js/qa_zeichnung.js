@@ -111,6 +111,15 @@ export function waehlen(kennung, kennungen) {
   cadWaehlen(fensterVon(kennung), kennungen);
 }
 
+/**
+ * Die Materialien, auf die die Analyse zeigt, wie der Kern sie zählt
+ * (`QuerschnittsanalyseEintrag.materialien`, mit der Antwort zur Zeichnung)
+ * -- null, solange die Antwort zur jetzigen Zeichnung aussteht.
+ */
+export function materialienVon(kennung) {
+  return passendeGeometrie(fensterVon(kennung))?.materialien ?? null;
+}
+
 /** Die Antwort des Kerns -- nur, wenn sie zur Zeichnung passt, die gerade zu sehen ist. */
 export function passendeGeometrie(a) {
   const g = a.qa.geometrie;
@@ -276,6 +285,9 @@ function geometrieHolen(a) {
     a.qa.namen = namen;
     a.neuZeichnen();
     uebersichtZeichnen(a);
+    // Ein offenes Fenster zeigt vielleicht, was erst jetzt feststeht: die
+    // Materialien der Werkstoffwahl (`materialienVon`).
+    if (zustand.fenster && zustand.auswahl?.kennung === a.qa.kennung) aendern({}, 'fenster');
   }).catch((fehler) => {
     if (a.qa.gefragt === jetzt) melden(fehler.message, true);
   });
