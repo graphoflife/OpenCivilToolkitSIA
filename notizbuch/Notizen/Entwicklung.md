@@ -44,6 +44,37 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-18 · Analysen aus dem Speicher; das Suchfenster steht einmal
+
+Zwei Punkte aus der Durchsicht, auf Wunsch des Benutzers.
+
+**Analysen aus dem Speicher.** Jede Rechnung rechnete alle
+Spannung-Dehnung-Analysen neu, auch die unveränderter Bauteile; die
+Nachweise kamen schon aus dem Zwischenspeicher. Jetzt liegen auch die
+Zeichendaten der Analysen dort, in einem zweiten Speicher derselben Art
+(`dienst.ANALYSEN`), je Bauteil unter demselben Abdruck wie seine Lösung.
+Am Prüfprojekt «jeder Nachweis» (Server): dieselbe Rechnung nochmals 3,17 s
+→ 0,04 s, nach einer Änderung an einer Platte ohne Analyse 3,20 s → 0,10 s.
+In Pyodide eine neue Analyse 167 ms, danach 54 ms.
+
+**Das Suchfenster steht einmal.** Ein Bild aus Randdehnungen mit −1 ‰ oben
+und 48 ‰ unten meldete «ausserhalb dessen, wofür die Werkstoffgesetze
+gelten», obwohl die unterste Lage bei 39.7 ‰ lag: Die Meldung mass beide
+Ränder an `eps_druck`/`eps_zug`, einem zweiten, groberen Fenster neben den
+Grenzen, in denen der Löser sucht.
+
+- Jede `Dehnungsgrenze` trägt ihren Namen; die parallelen `grenznamen`
+  fallen weg.
+- `Dehnungsgrenzen.verletzt` sagt, welche Grenze eine Ebene verlässt, und
+  der Hinweis nennt sie: «Stahl der 2. Lage bei 49.6 ‰, gilt bis 45.0 ‰».
+- `eps_druck`/`eps_zug` fallen am Löser weg, dazu das Ersatzfenster, das nur
+  noch Tests nutzten. Die Herleitung nennt ε_c2d aus den Kennwerten des
+  Betons; ihr Text bleibt gleich.
+
+Alle Zahlen beider Prüfprojekte bis aufs letzte Bit gleich.
+
+---
+
 ## 2026-10-18 · Durchsicht der Phasen 4 und 5: Regeln, die zweimal standen
 
 Vier Durchsichten über die Arbeit seit 300d19a (Wiederverwendung,
