@@ -76,10 +76,11 @@ ein Nachweis (beide 2026-10-17), und Phase 4, Löser und Kennzahlen
 (2026-10-18, siehe [[Entwicklung]]). Hier steht, was bleibt: Phase 5, die
 Oberfläche.
 
-- [ ] **Apps: eine Zeile je App.** Material und Python laufen in `baum.js`,
-      `editor.js`, `zustand.js` und `app.js` als Sonderwege; je App stehen
-      zehn Tabellen in drei Dateien. Besser: `apps.js` mit einer Zeile je
-      App; die gemeinsamen Abläufe schlagen nur noch nach.
+- [ ] **Die Karten des Berichts je Bauteilart** stehen noch neben den Zeilen
+      von `apps.js`: `UEBERSICHTEN` und `DIAGRAMME` in `bericht.js`. In die
+      Zeilen ziehen sie erst, wenn `plattenkarten` und `spannungskarten` aus
+      `bericht.js` ausziehen -- sonst importierten sich `apps.js` und
+      `bericht.js` gegenseitig.
 - [ ] **Kern-Wissen im JS, neu dazugekommen:**
       - Die Einheiten der Grundbruch-Eingaben stehen dreimal: `aufbau.py`,
         `geotechnik/grundbruch.py`, `grundbruch.js`. Weichen zwei davon ab,

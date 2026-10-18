@@ -10,8 +10,6 @@
  * nachgerechnet.
  */
 
-import { ARTEN, artVon } from './arten.js';
-
 const zuhoerer = new Set();
 
 /** Unter diesem Schlüssel merkt sich der Browser die zugeklappten Panels. */
@@ -37,8 +35,9 @@ export const zustand = {
    */
   verfolgung: null,
   /**
-   * Was links ausgewählt ist: {art, kennung} -- `art` ist 'material',
-   * 'skript' oder die einer Bauteilart (ARTEN, arten.js).
+   * Was links ausgewählt ist: {art, kennung} -- `art` ist die App des
+   * Eintrags, wie apps.js sie nennt: 'material', 'skript' oder eine
+   * Bauteilart (ARTEN, arten.js).
    */
   auswahl: null,
   /**
@@ -192,35 +191,19 @@ export function projektAendern(veraenderer, anlass = 'projekt') {
 
 // -- Zugriffshilfen ---------------------------------------------------------
 
-export function gewaehltesMaterial() {
-  if (zustand.auswahl?.art !== 'material') return null;
-  return zustand.projekt.materialien.find((m) => m.kennung === zustand.auswahl.kennung) || null;
-}
-
-/** Das gewählte Bauteil samt seiner Art -- `{art, eintrag}`, oder null. */
-export function gewaehltesBauteil() {
-  const art = artVon(zustand.auswahl?.art);
-  const eintrag = art && (zustand.projekt[art.liste] || []).find(
-    (e) => e.kennung === zustand.auswahl.kennung);
-  return eintrag ? { art, eintrag } : null;
-}
-
-/** Das gewählte Python-Skript, oder null. */
-export function gewaehltesSkript() {
-  if (zustand.auswahl?.art !== 'skript') return null;
-  return (zustand.projekt.skripte || []).find((s) => s.kennung === zustand.auswahl.kennung) || null;
-}
-
 export function materialien(art) {
   return zustand.projekt.materialien.filter((m) => m.art === art);
 }
 
+/**
+ * Die kleinste freie Kennung mit dieser Vorsilbe: «q3». Frei heisst, kein
+ * Eintrag einer Liste des Projekts trägt sie -- gleich welcher App; eine
+ * neue App braucht dafür hier nichts.
+ */
 export function freieKennung(vorsilbe) {
-  const vergeben = new Set([
-    ...zustand.projekt.materialien.map((m) => m.kennung),
-    ...ARTEN.flatMap((a) => (zustand.projekt[a.liste] || []).map((e) => e.kennung)),
-    ...(zustand.projekt.skripte || []).map((s) => s.kennung),
-  ]);
+  const vergeben = new Set(Object.values(zustand.projekt)
+    .filter(Array.isArray)
+    .flatMap((liste) => liste.map((e) => e?.kennung)));
   let i = 1;
   while (vergeben.has(`${vorsilbe}${i}`)) i += 1;
   return `${vorsilbe}${i}`;

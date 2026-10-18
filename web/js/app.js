@@ -21,7 +21,7 @@ import { el, melden } from './dom.js';
 import { baumZeichnen } from './baum.js';
 import { berichtZeichnen } from './bericht.js';
 import { konsoleVerbinden } from './konsole.js';
-import { variablenZeichnen } from './variablen.js';
+import { appVon } from './apps.js';
 import { editorZeichnen } from './editor.js';
 import { fensterEinrichten } from './fenster.js';
 import { notizbuchEinrichten } from './notizbuch.js';
@@ -444,18 +444,18 @@ function ohneSprung(zeichnen) {
 const NUR_MITTE = new Set(['zeichnung', 'fenster']);
 
 /**
- * Die rechte Tafel: die Berechnung -- oder, wenn links ein Skript gewählt
- * ist, die Variablen der Python-Sitzung, wie in Spyder (Benutzer,
- * 2026-10-15). Dann gelten Umfang und Reiter nicht.
+ * Die rechte Tafel: die Berechnung -- oder was die App des Gewählten selbst
+ * rechts zeigt (apps.js, `rechts`): bei Python die Variablen der Sitzung,
+ * wie in Spyder (Benutzer, 2026-10-15). Dann gelten Umfang und Reiter nicht.
  */
 function rechtsZeichnen() {
-  const python = zustand.auswahl?.art === 'skript';
-  knoten.berichtTitel.textContent = python ? 'Variablen' : 'Berechnung';
-  knoten.tafelRechts.textContent = python ? 'Variablen' : 'Berechnung';
-  knoten.umfang.hidden = python;
-  knoten.reiter.hidden = python;
-  if (python) {
-    variablenZeichnen(knoten.bericht);
+  const eigen = appVon(zustand.auswahl?.art)?.rechts;
+  knoten.berichtTitel.textContent = eigen ? eigen.titel : 'Berechnung';
+  knoten.tafelRechts.textContent = eigen ? eigen.titel : 'Berechnung';
+  knoten.umfang.hidden = Boolean(eigen);
+  knoten.reiter.hidden = Boolean(eigen);
+  if (eigen) {
+    eigen.zeichnen(knoten.bericht);
   } else {
     berichtZeichnen(knoten.bericht, {
       verfolgen: (ziel, name) => {

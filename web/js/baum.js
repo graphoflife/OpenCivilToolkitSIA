@@ -14,48 +14,32 @@
  * nimmt. Sonst wäre die Beschreibung anschliessend widersprüchlich, und der
  * Rechenkern müsste einen Fehler melden, den die Oberfläche hätte verhindern
  * können.
+ *
+ * Was eine App zeigt und wie ihre Einträge entstehen und weggehen, steht in
+ * ihrer Zeile (apps.js); hier wird nur gezeichnet.
  */
 
-import { ARTEN, artVon } from './arten.js';
-import { el, ersetzen, melden } from './dom.js';
+import { APPS, appVon } from './apps.js';
+import { el, ersetzen } from './dom.js';
 import { sinnbild } from './sinnbilder.js';
-import { api } from './api.js';
-import { fensterVergessen } from './qa_zeichnung.js';
-import { fensterVergessen as systemfensterVergessen } from './bs_zeichnung.js';
-import { materialAnlegen } from './materialwahl.js';
-import {
-  appWaehlen, ausVorlage, freieKennung, gewaehlteApp, naechsterName, projektAendern, waehlen,
-  zustand,
-} from './zustand.js';
+import { appWaehlen, gewaehlteApp, waehlen, zustand } from './zustand.js';
 
 // ===========================================================================
 // Bausteine
 // ===========================================================================
 
 /**
- * Die Apps, je ein Knopf: das Material, dann die Bauteilarten (ARTEN). `app`
- * ist, wie die Auswahl ihre Einträge nennt; `liste`, wie viele es gibt -- auf
- * dem Knopf steht nur die Zahl, «1 Querschnittsanalyse» passte nicht hinein.
- */
-const APPS = [
-  { app: 'material', knopf: 'Materialien', zeichen: 'material', liste: (p) => p.materialien },
-  ...ARTEN.map((a) => ({
-    app: a.art, knopf: a.knopf, zeichen: a.zeichen, liste: (p) => p[a.liste] || [],
-  })),
-  { app: 'skript', knopf: 'Python', zeichen: 'python', liste: (p) => p.skripte || [] },
-];
-
-/**
- * Ein Knopf je App. Das Zeichen ist blau, sobald es darin etwas gibt -- wie bei
- * den Kapiteln einer Platte, die etwas rechnen; die gewählte App trägt dazu
- * Grund und Rand der Auswahl.
+ * Ein Knopf je App. Das Zeichen ist blau, sobald es darin etwas gibt -- wie
+ * bei den Kapiteln einer Platte, die etwas rechnen; die gewählte App trägt
+ * dazu Grund und Rand der Auswahl. Auf dem Knopf steht nur die Zahl ihrer
+ * Einträge, «1 Querschnittsanalyse» passte nicht hinein.
  */
 function appKnopf(a, p, gewaehlt) {
-  const eintraege = a.liste(p);
+  const eintraege = p[a.liste] || [];
   return el('button.kachel.app-kachel', {
     type: 'button', 'aria-pressed': String(gewaehlt),
     class: `${gewaehlt ? 'ist-gewaehlt' : ''} ${eintraege.length ? 'ist-an' : ''}`,
-    title: a.knopf.replace(/\u00AD/g, ''),
+    title: a.knopf.replace(/­/g, ''),
     on: { click: () => appWaehlen(a.app, eintraege) },
   }, [
     sinnbild(a.zeichen),
@@ -65,93 +49,40 @@ function appKnopf(a, p, gewaehlt) {
 }
 
 /** Eine Liste unter den Knöpfen: Titel, Zahl und «+», darunter die Einträge. */
-function liste({ titel, eintraege, art, plus, leer }) {
+function liste(a, { titel, eintraege, plus, leer }) {
   return el('div.baum-gruppe', {}, [
     el('div.baum-kopf', {}, [
       el('span.titel', { text: titel }),
       el('span.zaehler', { text: String(eintraege.length) }),
-      el('span.werkzeuge', {}, [plus]),
+      el('span.werkzeuge', {}, [el('button.knopf.knopf-zart', {
+        text: '+', title: plus.titel, on: { click: plus.tun },
+      })]),
     ]),
     el('div.baum-koerper', {},
-      eintraege.length ? eintraege.map((e) => eintrag(e, art)) : [leerzeile(leer)]),
+      eintraege.length ? eintraege.map((e) => eintrag(a, e)) : [leerzeile(leer)]),
   ]);
 }
 
-/** Was rechts im Eintrag eines Bauteils steht -- je Bauteilart (ARTEN). */
-const KURZTEXT = {
-  querschnitt: (q) => `${q.h}×${q.b} mm`,
-  querschnittsanalyse: umriss,
-  balkensystem: (s) => {
-    const staebe = s.linien.filter((l) => l.stab).length;
-    return `${staebe} ${staebe === 1 ? 'Stab' : 'Stäbe'}`;
-  },
-  grundbruch: (g) => `${g.b}×${g.L} m`,
-};
-
-/** Wie ein neues Bauteil entsteht -- je Bauteilart. */
-const ANLEGEN = {
-  querschnitt: platteAnlegen,
-  querschnittsanalyse: analyseAnlegen,
-  balkensystem: systemAnlegen,
-  grundbruch: grundbruchAnlegen,
-};
-
-/**
- * Was rechts im Eintrag steht, wie er aussieht und wie er weggeht -- je Art.
- * Beim Material steht keine Sorte: eine Normsorte heisst wie sie, ein
- * eigenes Material trägt keine (Benutzer, 2026-10-16).
- */
-const ART = {
-  material: () => ({ text: '', loeschen: materialLoeschen }),
-  skript: (s) => {
-    const zeilen = (s.code || '').split('\n').filter((z) => z.trim()).length;
-    return { text: `${zeilen} ${zeilen === 1 ? 'Zeile' : 'Zeilen'}`, loeschen: () => entfernen('skripte', s) };
-  },
-  ...Object.fromEntries(ARTEN.map((a) => [a.art, (e) => ({
-    text: KURZTEXT[a.art](e), loeschen: () => bauteilLoeschen(a, e),
-  })])),
-};
-
-function eintrag(m, art) {
-  const aktiv = zustand.auswahl?.art === art && zustand.auswahl.kennung === m.kennung;
-  const istMaterial = art === 'material';
-  const { text, loeschen } = ART[art](m);
+/** Ein Eintrag: sein Name, beim Material ob es eine Normsorte ist, rechts sein Kurztext. */
+function eintrag(a, e) {
+  const aktiv = zustand.auswahl?.art === a.app && zustand.auswahl.kennung === e.kennung;
   return el('div.baum-eintrag', {
     class: aktiv ? 'ist-aktiv' : '',
-    on: { click: () => waehlen({ art, kennung: m.kennung }) },
+    on: { click: () => waehlen({ art: a.app, kennung: e.kennung }) },
   }, [
-    el('span.name', {
-      text: istMaterial ? (m.name || m.sorte) : m.name,
-      title: istMaterial ? (m.name || m.sorte) : m.name,
-    }),
-    istMaterial && m.eigenstaendig ? el('span.eigen', { text: 'eigen' }) : null,
-    istMaterial && !m.eigenstaendig
-      ? el('span.sia', { text: 'SIA', title: 'Normsorte nach SIA – nicht änderbar' })
-      : null,
-    el('span.art', { text }),
+    el('span.name', { text: a.name(e), title: a.name(e) }),
+    a.marke?.(e) ?? null,
+    el('span.art', { text: a.kurztext(e) }),
     el('button.knopf.knopf-zart.knopf-gefahr', {
       text: '×', title: 'Entfernen',
       on: {
-        click: (e) => {
-          e.stopPropagation();
-          loeschen(m);
+        click: (ereignis) => {
+          ereignis.stopPropagation();
+          a.loeschen(e);
         },
       },
     }),
   ]);
-}
-
-/**
- * «300×600 mm» -- Breite und Höhe dessen, was gezeichnet ist. Die
- * Platte zeigt an derselben Stelle h × b; eine Analyse hat statt zweier
- * Masse die Ecken ihrer Flächen, und die äussersten davon sind dasselbe.
- */
-function umriss(analyse) {
-  const ecken = new Set(analyse.flaechen.flatMap((f) => f.knoten));
-  const punkte = (analyse.knoten || []).filter((k) => ecken.has(k.kennung)).map((k) => [k.y, k.z]);
-  if (!punkte.length) return 'leer';
-  const spanne = (i) => Math.max(...punkte.map((p) => p[i])) - Math.min(...punkte.map((p) => p[i]));
-  return `${Number(spanne(0).toFixed(1))}×${Number(spanne(1).toFixed(1))} mm`;
 }
 
 function leerzeile(text) {
@@ -161,183 +92,10 @@ function leerzeile(text) {
 }
 
 // ===========================================================================
-// Aktionen
-// ===========================================================================
-
-function materialLoeschen(material) {
-  return loeschenWennFrei('materialien', material, `„${material.name || material.sorte}" verwendet von`);
-}
-
-/** Ein Bauteil -- ausser ein Balkensystem nimmt noch seinen Querschnitt. */
-function bauteilLoeschen(art, eintrag) {
-  return loeschenWennFrei(art.liste, eintrag, `„${eintrag.name}" ist Querschnitt in`);
-}
 
 /**
- * Löscht einen Eintrag, wenn kein Bauteil mehr auf ihn zeigt -- sonst sagt
- * es, welche. Wer worauf zeigt, weiss der Kern (`Projekt.verweise`); eine
- * eigene Liste hier kannte bis 2026-10-17 den Bügelstahl nicht, und der
- * nächste Lauf scheiterte am gelöschten Stahl.
- */
-async function loeschenWennFrei(liste, eintrag, satz) {
-  let verweise;
-  try {
-    ({ verweise } = await api.verweise(zustand.projekt, eintrag.kennung));
-  } catch (fehler) {
-    melden(`Nicht gelöscht: ${fehler.message}`, true);
-    return;
-  }
-  if (verweise.length) {
-    melden(`${satz}: ${verweise.map((v) => v.name).join(', ')}`, true);
-    return;
-  }
-  entfernen(liste, eintrag);
-}
-
-/** Einen Eintrag aus einer Liste des Projekts -- und aus der Auswahl, wenn er gewählt war. */
-function entfernen(liste, eintrag) {
-  projektAendern((p) => {
-    p[liste] = p[liste].filter((x) => x.kennung !== eintrag.kennung);
-  });
-  if (zustand.auswahl?.kennung === eintrag.kennung) waehlen(null);
-}
-
-/** Ein neues Skript -- nach der Vorlage des Kerns, mit einem Diagramm darin. */
-function skriptAnlegen() {
-  const vorlage = zustand.katalog?.neues_skript;
-  if (!vorlage) {
-    melden('Katalog noch nicht geladen.', true);
-    return;
-  }
-  const kennung = freieKennung('p');
-  projektAendern((p) => {
-    p.skripte = p.skripte || [];
-    p.skripte.push({ ...vorlage, kennung, name: naechsterName('Skript', p.skripte) });
-  }, 'skript');
-  waehlen({ art: 'skript', kennung });
-}
-
-function platteAnlegen(art) {
-  const beton = zustand.projekt.materialien.find((m) => m.art === 'beton');
-  const stahl = zustand.projekt.materialien.find((m) => m.art === 'betonstahl');
-  if (!beton || !stahl) {
-    melden('Zuerst Beton und Betonstahl anlegen.', true);
-    return;
-  }
-  // Die Vorlage kommt aus dem Kern. Sie stand einmal hier -- zwanzig Felder,
-  // die von Hand mit den Vorgaben in opencivil/projekt/platte.py
-  // gleichgehalten werden mussten. Als sich die Vorgaben änderten, blieb
-  // diese Kopie stehen, und neue Platten brachten Nachweise eingeschaltet
-  // mit, die überall sonst aus waren. Gesetzt wird hier nur noch, was der
-  // Kern nicht wissen kann: die Kennung, der Name und welche Materialien es
-  // im Projekt gibt.
-  const vorlage = zustand.katalog?.neue_platte;
-  if (!vorlage) {
-    melden('Katalog noch nicht geladen.', true);
-    return;
-  }
-  const kennung = freieKennung(art.vorsilbe);
-  projektAendern((p) => {
-    // Kopie, nicht die Vorlage selbst: sonst teilten sich alle neuen Platten
-    // dieselben Lagen, und die zweite änderte die erste mit.
-    const platte = structuredClone(vorlage);
-    platte.kennung = kennung;
-    platte.name = naechsterName(art.stamm, p[art.liste]);
-    platte.beton = beton.kennung;
-    platte.querkraftbewehrung.stahl = stahl.kennung;
-    platte.lagen.forEach((l) => { l.stahl = stahl.kennung; });
-    p[art.liste].push(platte);
-  });
-  waehlen({ art: art.art, kennung });
-}
-
-/**
- * Eine neue Querschnittsanalyse -- wie die Platte nach der Vorlage des Kerns:
- * ein Rechteck mit Stäben und einem Lastfall. Gesetzt wird nur, was der Kern
- * nicht wissen kann: Kennung, Name und die Materialien des Projekts.
- */
-function analyseAnlegen(art) {
-  const beton = zustand.projekt.materialien.find((m) => m.art === 'beton');
-  const stahl = zustand.projekt.materialien.find((m) => m.art === 'betonstahl');
-  if (!beton || !stahl) {
-    melden('Zuerst Beton und Betonstahl anlegen.', true);
-    return;
-  }
-  const vorlage = zustand.katalog?.neue_querschnittsanalyse;
-  if (!vorlage) {
-    melden('Katalog noch nicht geladen.', true);
-    return;
-  }
-  const kennung = freieKennung(art.vorsilbe);
-  fensterVergessen(kennung);
-  projektAendern((p) => {
-    const analyse = structuredClone(vorlage);
-    analyse.kennung = kennung;
-    p[art.liste] = p[art.liste] || [];
-    analyse.name = naechsterName(art.stamm, p[art.liste]);
-    analyse.flaechen.forEach((f) => { f.material = beton.kennung; });
-    for (const liste of [analyse.staebe, analyse.stablinien, analyse.schubwaende]) {
-      liste.forEach((x) => { x.stahl = stahl.kennung; });
-    }
-    p[art.liste].push(analyse);
-  });
-  waehlen({ art: art.art, kennung });
-}
-
-/**
- * Ein neues Balkensystem -- nach der Vorlage des Kerns ein Einfeldträger
- * mit einem Lastfall. Gesetzt wird nur, was der Kern nicht wissen kann:
- * Kennung, Name und der Beton der Linien.
- */
-function systemAnlegen(art) {
-  const beton = zustand.projekt.materialien.find((m) => m.art === 'beton');
-  if (!beton) {
-    melden('Zuerst einen Beton anlegen.', true);
-    return;
-  }
-  const vorlage = zustand.katalog?.neues_balkensystem;
-  if (!vorlage) {
-    melden('Katalog noch nicht geladen.', true);
-    return;
-  }
-  const kennung = freieKennung(art.vorsilbe);
-  systemfensterVergessen(kennung);
-  projektAendern((p) => {
-    const system = structuredClone(vorlage);
-    system.kennung = kennung;
-    p[art.liste] = p[art.liste] || [];
-    system.name = naechsterName(art.stamm, p[art.liste]);
-    system.linien.forEach((l) => { if (l.stab) l.material = beton.kennung; });
-    p[art.liste].push(system);
-  });
-  waehlen({ art: art.art, kennung });
-}
-
-/**
- * Ein neuer Grundbruch -- mit den Vorgaben des Kerns und einer Kombination.
- * Er braucht kein Material; gesetzt werden nur Kennung und Name.
- */
-function grundbruchAnlegen(art) {
-  const vorlage = zustand.katalog?.neuer_grundbruch;
-  if (!vorlage) {
-    melden('Katalog noch nicht geladen.', true);
-    return;
-  }
-  const kennung = freieKennung(art.vorsilbe);
-  projektAendern((p) => {
-    p[art.liste] = p[art.liste] || [];
-    p[art.liste].push({
-      ...structuredClone(vorlage), kennung, name: naechsterName(art.stamm, p[art.liste]),
-    });
-  });
-  waehlen({ art: art.art, kennung });
-}
-
-// ===========================================================================
-
-/**
- * Zeichnet die linke Tafel: die Knöpfe der Apps in `knoepfe`, die Liste der
- * gewählten darunter in `behaelter`.
+ * Zeichnet die linke Tafel: die Knöpfe der Apps in `knoepfe`, die Listen der
+ * gewählten darunter in `behaelter` -- beim Material eine je Art.
  */
 export function baumZeichnen(knoepfe, behaelter) {
   const p = zustand.projekt;
@@ -345,29 +103,7 @@ export function baumZeichnen(knoepfe, behaelter) {
     ersetzen(knoepfe);
     return ersetzen(behaelter, el('div.leer', { text: 'Projekt wird geladen …' }));
   }
-  const app = gewaehlteApp();
-  ersetzen(knoepfe, el('div.kacheln', {}, APPS.map((a) => appKnopf(a, p, a.app === app))));
-
-  const plus = (titel, tun) => el('button.knopf.knopf-zart', {
-    text: '+', title: titel, on: { click: tun },
-  });
-  if (app === 'material') {
-    return ersetzen(behaelter, ...[['beton', 'Beton', 'kein Beton'],
-      ['betonstahl', 'Betonstahl', 'kein Betonstahl']].map(([art, titel, leer]) => liste({
-      titel, art: 'material', leer,
-      eintraege: p.materialien.filter((m) => m.art === art),
-      plus: plus(`${titel} hinzufügen`, () => materialAnlegen(art)),
-    })));
-  }
-  if (app === 'skript') {
-    return ersetzen(behaelter, liste({
-      titel: 'Python-Skripte', art: 'skript', leer: 'kein Skript', eintraege: p.skripte || [],
-      plus: plus('Skript hinzufügen', skriptAnlegen),
-    }));
-  }
-  const a = artVon(app);
-  return ersetzen(behaelter, liste({
-    titel: a.titel, art: a.art, leer: a.leer, eintraege: p[a.liste] || [],
-    plus: plus(`${a.einzahl} hinzufügen`, () => ANLEGEN[a.art](a)),
-  }));
+  const gewaehlt = appVon(gewaehlteApp());
+  ersetzen(knoepfe, el('div.kacheln', {}, APPS.map((a) => appKnopf(a, p, a === gewaehlt))));
+  return ersetzen(behaelter, ...gewaehlt.gruppen(p).map((g) => liste(gewaehlt, g)));
 }
