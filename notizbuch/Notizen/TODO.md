@@ -70,11 +70,11 @@ gelernt wurde, steht in [[Entwicklung]].
 ## Umbau: Befunde der Durchsicht vom 2026-10-16
 
 Sechs Durchsichten über die Arbeit vom 15. und 16. Oktober (42 Commits);
-jeder Punkt ist am Code nachgeprüft. Die vier Fehler mit Folge sind behoben,
-ebenso Phase 2, Prüfen und Wahlfelder, Phase 3, Platte und Querschnitt als
-ein Nachweis (beide 2026-10-17), und Phase 4, Löser und Kennzahlen
-(2026-10-18, siehe [[Entwicklung]]). Hier steht, was bleibt: Phase 5, die
-Oberfläche.
+jeder Punkt ist am Code nachgeprüft. Umgesetzt ist der ganze Plan: die vier
+Fehler mit Folge, Phase 2, Prüfen und Wahlfelder, Phase 3, Platte und
+Querschnitt als ein Nachweis (beide 2026-10-17), Phase 4, Löser und
+Kennzahlen, und Phase 5, die Oberfläche (beide 2026-10-18, siehe
+[[Entwicklung]]). Hier steht, was dabei liegen blieb oder neu auffiel.
 
 - [ ] **Die Karten des Berichts je Bauteilart** stehen noch neben den Zeilen
       von `apps.js`: `UEBERSICHTEN` und `DIAGRAMME` in `bericht.js`. In die

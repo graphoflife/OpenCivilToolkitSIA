@@ -44,6 +44,52 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-18 · Die Oberfläche fragt den Kern
+
+Phase 5 des Umbaus aus der Durchsicht vom 2026-10-16, in neun Commits.
+Keine Zahl ändert sich; geändert hat sich die Datei (Teilung und Stabzahl)
+und, wo Kern-Wissen im JS stand, wer es weiss.
+
+- **Eine Zugseite** (`querschnitt/zugseite.py`). Dieselbe Seite stand in
+  sechs Formen da: Enum, Tupel der Richtungen, Text der Verformung,
+  `pos`/`neg`, `+`/`-` und drei Winkelausdrücke. Jetzt sagt die
+  `Zugseite` selbst, was die anderen ausrechneten: Gegenseite, Vorzeichen,
+  Zeichen, Marke in Kennungen; die Seiten der Platte sind `UM_Y`, und jede
+  Lage kennt ihre (`Bewehrungslage.seite`).
+- **«einachsig» gehört der Analyse.** Die fünf Nachweise des gezeichneten
+  Querschnitts lesen `analyse.einachsig`, ihre Seiten sind
+  `analyse.zugseiten`, und der Bruttoquerschnitt trägt den Schalter weiter
+  -- vorher lief er durch elf Signaturen.
+- **Eine Zeile je App** (`apps.js`). Material und Python liefen als
+  Sonderwege durch Baum, Editor, Zustand und rechte Tafel; je Bauteilart
+  standen ihre Teile in sieben Tabellen. Die fünf Anleger nach der Vorlage
+  des Kerns sind einer (`nachVorlage`); der Editor des Materials und der
+  der Platte haben eigene Module (`material.js`, `platte.js`).
+- **Der Katalog nennt je Feld Einheit, Grenzen, «ganz» und Wahl**
+  (`lesen.feldangaben`, `katalog.felder`). Die Einheiten des Grundbruchs
+  standen dreimal; jetzt am Feld, das Bauen nimmt sie dort
+  (`lesen.als_groesse`). Das Zahlenfeld nimmt die Angabe des Kerns
+  (`zahlfeld({angabe})`): Grenzen für die Pfeile, und ein ganzzahliges
+  Feld lehnt eine Kommazahl sichtbar ab -- vorher rundete die Oberfläche
+  37.5° still auf 38°.
+- **Teilung und Stabzahl bleiben beide stehen**, `art` sagt, welche gilt --
+  wie bei der Stablinie. Umschalten setzt nur noch die Art; die Vorgaben
+  (5 Stäbe, 150 und 200 mm) stehen im Kern statt im JS. Ein Stand von
+  vorher öffnet sich nicht mehr (null gibt es dort nicht mehr); die Seite
+  bewahrt ihn auf, wie für alte Stände entschieden.
+- **Analysearten, Einheiten und E_eq/E_cm aus dem Kern.** Die Daten einer
+  Linie bringen Zeichen und Einheiten mit, aus der Tabelle, die auch
+  skaliert (`diagrammdaten._LINIENGROESSEN`); der Modul sein Vielfaches
+  von E_cm. Welche Felder eine Frage braucht, sagt `Analyseart.eingaben`.
+- **Eine Fallzeile** (`faelle.js`): sieben Zeilenbauer und sechzehn Regeln
+  mit `:nth-child` werden eine Zeile, deren Zellen ihre Klasse tragen; die
+  Zahlen übernehmen die Spalten der Zeile (`subgrid`). Unterwegs: `el()`
+  setzte `--felder` nie, die Gebrauchsfälle der Platte standen still in
+  drei statt zwei Spalten.
+- **Die Werkstoffwahl** der Analyse nimmt die Materialien aus der Antwort
+  des Kerns zur Zeichnung -- die letzte JS-Kopie von «wer braucht welches
+  Material».
+
 ## 2026-10-18 · Löser und Kennzahlen
 
 Phase 4 des Umbaus aus der Durchsicht vom 2026-10-16, in zehn Commits.
