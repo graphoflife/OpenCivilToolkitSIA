@@ -20,6 +20,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Sequence, Union
 
+from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
 from opencivil.ergebnis import Ergebnis
 from opencivil.querschnitt.gesetzwahl import Rechenart, Werkstoffsatz
@@ -520,7 +521,7 @@ class Projekt(Beschreibung):
                          zwaengung=True, zwaengung_begrenzt=True,
                          zwaengung_biegung=True)
         decke.querkraftbewehrung.durchmesser = 8.0
-        decke.querkraftbewehrung.abstand_y = None
+        decke.querkraftbewehrung.art_y = Linienart.ANZAHL
         decke.querkraftbewehrung.anzahl_y = 5.0
         decke.einwirkung("Feld", M_Ed=150, V_Ed=80)
         decke.einwirkung("Feld mit Druck", M_Ed=120, N_Ed=-300)

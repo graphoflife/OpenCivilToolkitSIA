@@ -54,6 +54,7 @@ from typing import TYPE_CHECKING, List, Optional, Sequence, Tuple
 
 from opencivil.bewehrungssuche.bewertung import Bewertung, arbeitskopie, bewerte, vorab_pruefen
 from opencivil.core.wahl import Wahl
+from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.platte import Richtung
 
 if TYPE_CHECKING:
@@ -293,14 +294,15 @@ def _y_ableiten(eintrag, mindest: float, teilung: float) -> None:
         for x, y in _seiten(eintrag):
             vorbild, folger = _posten(eintrag, x, "grund"), _posten(eintrag, y, "grund")
             folger.durchmesser = vorbild.durchmesser
+            folger.art = vorbild.art
             folger.abstand = vorbild.abstand
             folger.anzahl = vorbild.anzahl
         return
     for nummer, lage in enumerate(eintrag.lagen, start=1):
         if eintrag.richtung_von(nummer) is not Richtung.X and lage.grund.durchmesser < mindest:
             lage.grund.durchmesser = mindest
+            lage.grund.art = Linienart.TEILUNG
             lage.grund.abstand = teilung
-            lage.grund.anzahl = None
 
 
 def _ueber_grenze(eintrag, grenze: float) -> bool:
@@ -352,8 +354,8 @@ def _eine_teilung(projekt, kennung: str, teilung: float,
         # verlegen. Auch fuer den, der gerade nicht gesucht wird.
         for lage in {lage for lage, _ in posten}:
             for art in ("grund", "zulage"):
+                _posten(eintrag, lage, art).art = Linienart.TEILUNG
                 _posten(eintrag, lage, art).abstand = teilung
-                _posten(eintrag, lage, art).anzahl = None
         _y_ableiten(eintrag, stufen.mindest, teilung)
 
     setzen()

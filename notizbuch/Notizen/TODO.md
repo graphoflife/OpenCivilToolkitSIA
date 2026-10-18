@@ -82,7 +82,6 @@ Oberfläche.
       `bericht.js` ausziehen -- sonst importierten sich `apps.js` und
       `bericht.js` gegenseitig.
 - [ ] **Kern-Wissen im JS, neu dazugekommen:**
-      - Beim Umschalten der Teilung setzt das JS eigene Vorgaben (`|| 150`).
       - Die Analysearten und ihre Einheiten stehen zweimal (`nachweise.js`,
         `spannungsbild.js`); E_eq/E_cm rechnet die Oberfläche.
       - Die Situationszeichnung des Grundbruchs (`gb_zeichnung.js`)

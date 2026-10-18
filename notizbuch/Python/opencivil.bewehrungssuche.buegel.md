@@ -1,5 +1,5 @@
 ---
-erzeugt: 3adc9b80f5f7
+erzeugt: 7d391f23041c
 art: modul
 tags: [modul]
 ---
@@ -64,6 +64,7 @@ Die gefundenen Buegel in die Platte schreiben.
 
 - [[opencivil.bewehrungssuche.bewertung]]
 - [[opencivil.bewehrungssuche.laengs]]
+- [[opencivil.querschnitt.geometrie]]
 
 ## Gebraucht von
 

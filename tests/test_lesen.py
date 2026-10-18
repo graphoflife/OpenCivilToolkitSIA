@@ -93,12 +93,15 @@ class TestStreng(unittest.TestCase):
         self.assertIn("'name' darf nicht leer sein", text)
 
     def test_null_nur_wo_leer_etwas_heisst(self):
-        roh = platte_roh()
-        lage = roh["querschnitte"][0]["lagen"][0]
-        lage["grund"]["abstand"], lage["grund"]["anzahl"] = None, 6
-        self.assertIsNone(Projekt.aus_dict(roh).querschnitt("q1").lagen[0].grund.abstand)
-        lage["grund"]["durchmesser"] = None
-        self.assertIn("'durchmesser' muss eine Zahl sein, nicht None", meldung(roh))
+        """
+        Bei Durchmesser und Teilung heisst leer nichts: welche Menge gilt,
+        sagt seit 2026-10-18 die Art, und beide Zahlen stehen immer da.
+        """
+        for feld in ("durchmesser", "abstand", "anzahl"):
+            with self.subTest(feld=feld):
+                roh = platte_roh()
+                roh["querschnitte"][0]["lagen"][0]["grund"][feld] = None
+                self.assertIn(f"'{feld}' muss eine Zahl sein, nicht None", meldung(roh))
 
     def test_eine_liste_bleibt_eine_liste(self):
         self.assertIn("'kombinationen' muss eine Liste sein", meldung(platte_roh(kombinationen={})))
@@ -292,8 +295,9 @@ class TestNichtsStill(unittest.TestCase):
         p.querschnitt("q1").lagen[1].grund.abstand = 0.0
         self.assertIn("lagen 2, grund: die Teilung muss grösser als null sein",
                       self.fehler(p))
-        p.querschnitt("q1").lagen[1].grund.abstand = None
-        self.assertIn("braucht eine Teilung oder eine Stabzahl", self.fehler(p))
+        grund = p.querschnitt("q1").lagen[1].grund
+        grund.art, grund.anzahl = "anzahl", 0.0
+        self.assertIn("braucht eine Stabzahl grösser als null", self.fehler(p))
 
     def test_eine_knicklaenge_von_null(self):
         """Sie rechnete und hiess «erfüllt»."""

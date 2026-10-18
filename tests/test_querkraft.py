@@ -569,7 +569,7 @@ class TestNachweisMitBuegeln(unittest.TestCase):
     def test_die_stabzahl_wird_zur_teilung(self):
         """s_V,y = b / n -- fünf Bügel auf 1000 mm sind 200 mm Teilung."""
         mit_teilung = projekt_mit_buegeln()
-        mit_zahl = projekt_mit_buegeln(abstand_y=None, anzahl_y=5.0)
+        mit_zahl = projekt_mit_buegeln(art_y="anzahl", anzahl_y=5.0)
         self.assertAlmostEqual(querkraftbefund(mit_teilung).ergebnisse[0].v_Rd,
                                querkraftbefund(mit_zahl).ergebnisse[0].v_Rd,
                                places=6)

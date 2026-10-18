@@ -39,7 +39,7 @@ import { projektAendern, zustand } from './zustand.js';
  */
 function postenZeile(querschnitt, nummer, welcher, beschriftung, ende = null) {
   const posten = querschnitt.lagen[nummer - 1][welcher];
-  const ueberAbstand = posten.abstand !== null && posten.abstand !== undefined;
+  const ueberAbstand = posten.art === 'teilung';
   const leer = !(posten.durchmesser > 0);
 
   const aendern = (veraenderer) => projektAendern((p) => {
@@ -74,8 +74,7 @@ function postenZeile(querschnitt, nummer, welcher, beschriftung, ende = null) {
         beiAenderung: (v) => aendern((x) => { x.anzahl = v; }),
       }),
     einheitsSchalter(ueberAbstand, 'je b', () => aendern((x) => {
-      if (ueberAbstand) { x.anzahl = x.anzahl || 5; x.abstand = null; }
-      else { x.abstand = x.abstand || 150; x.anzahl = null; }
+      x.art = ueberAbstand ? 'anzahl' : 'teilung';
     })),
     ende || el('span'),
   ]);
@@ -83,7 +82,9 @@ function postenZeile(querschnitt, nummer, welcher, beschriftung, ende = null) {
 
 /**
  * Die Einheit hinter einer Teilung, die zugleich umschaltet: «mm» ist eine
- * Teilung, «Stk» eine Stabzahl.
+ * Teilung, «Stk» eine Stabzahl. Umgeschaltet wird nur, welche gilt (`art`);
+ * beide Zahlen bleiben stehen, und ihre Vorgaben kommen aus dem Kern -- bis
+ * 2026-10-18 setzte das Umschalten hier eigene (5 Stäbe, 150 und 200 mm).
  */
 function einheitsSchalter(ueberAbstand, bezug, umschalten) {
   return el('button.einheit-knopf', {
@@ -198,7 +199,7 @@ function querkraftBlock(querschnitt) {
   // Vollständig: jede Platte kommt durch den Kern, und der setzt die Bügel
   // mit allen Feldern. Bügel ohne Stahl meldet der Kern beim Rechnen.
   const buegel = querschnitt.querkraftbewehrung;
-  const ueberAbstand = buegel.abstand_y !== null && buegel.abstand_y !== undefined;
+  const ueberAbstand = buegel.art_y === 'teilung';
   const leer = !(buegel.durchmesser > 0);
 
   const aendern = (veraenderer) => projektAendern((p) => {
@@ -258,8 +259,7 @@ function querkraftBlock(querschnitt) {
           beiAenderung: (v) => aendern((x) => { x.anzahl_y = v; }),
         }),
       einheitsSchalter(ueberAbstand, 'je b – dann nur Nachweise in x', () => aendern((x) => {
-        if (ueberAbstand) { x.anzahl_y = x.anzahl_y || 5; x.abstand_y = null; }
-        else { x.abstand_y = x.abstand_y || 200; x.anzahl_y = null; }
+        x.art_y = ueberAbstand ? 'anzahl' : 'teilung';
       })),
       el('span'),
     ]),

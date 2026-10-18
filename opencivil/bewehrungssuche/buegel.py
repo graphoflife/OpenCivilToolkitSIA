@@ -15,6 +15,7 @@ from typing import Optional, Sequence
 
 from opencivil.bewehrungssuche.bewertung import arbeitskopie, bewerte, vorab_pruefen
 from opencivil.bewehrungssuche.laengs import TEILUNGEN, teilungen_der_suche
+from opencivil.querschnitt.geometrie import Linienart
 
 #: Buegel dicker als ⌀26 biegt niemand -- die Buegelsuche bleibt darunter.
 BUEGELDURCHMESSER: Tuple[float, ...] = (8, 10, 12, 14, 16, 18, 20, 22, 26)
@@ -76,8 +77,8 @@ def buegel_suchen(projekt, kennung: str, *,
     beste: Optional[Buegelloesung] = None
     for teilung in teilungen:
         buegel.abstand_x = teilung
+        buegel.art_y = Linienart.TEILUNG
         buegel.abstand_y = teilung
-        buegel.anzahl_y = None
         for d in durchmesser:
             buegel.durchmesser = d
             if not bewerte(arbeit).erfuellt():
@@ -103,5 +104,5 @@ def buegel_uebernehmen(projekt, kennung: str, loesung: Buegelloesung) -> None:
     buegel.durchmesser = loesung.durchmesser
     if loesung.teilung > 0:
         buegel.abstand_x = loesung.teilung
+        buegel.art_y = Linienart.TEILUNG
         buegel.abstand_y = loesung.teilung
-        buegel.anzahl_y = None

@@ -35,6 +35,7 @@ from opencivil.nachweis.rechenwahl import (
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.verformung import KRIECHZAHL as VERFORMUNG_KRIECHZAHL
+from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 from opencivil.spannungsanalyse import Analyseart
 
@@ -196,47 +197,65 @@ def x_d_grenze() -> Any:
 # Bewehrung
 # ===========================================================================
 
+#: Wie ein Posten der Platte seine Menge angibt -- wie eine Stablinie
+#: (:class:`~opencivil.projekt.querschnittsanalyse.StablinieEintrag`), aber
+#: ohne verschmierte Flaeche: als Teilung oder als Stabzahl.
+MENGEN = (Linienart.TEILUNG, Linienart.ANZAHL)
+
 
 @dataclass
 class PostenEintrag(Beschreibung):
-    """Grundbewehrung oder Zulage einer Lage."""
+    """
+    Grundbewehrung oder Zulage einer Lage.
+
+    Je Art ein eigenes Feld fuer die Menge, wie bei der Stablinie: wer von der
+    Teilung zur Stabzahl wechselt und zurueck, findet seine Zahl noch vor.
+    Welche gilt, sagt ``art``. Bis 2026-10-18 war genau eine der beiden
+    gesetzt, und beim Umschalten setzte die Oberflaeche die andere mit eigenen
+    Vorgaben (5 Staebe, 150 mm).
+    """
 
     durchmesser: float = bereich(0.0, heisst="Durchmesser", einheit=MM, ab=0.0)
     """in mm; 0 bedeutet: nicht vorhanden."""
 
-    abstand: Optional[float] = 150.0
-    """Teilung in mm. Genau eines von ``abstand`` und ``anzahl`` ist gesetzt."""
+    abstand: float = 150.0
+    """Teilung in mm -- bei Art «Teilung»."""
 
-    anzahl: Optional[float] = None
+    anzahl: float = 5.0
+    """Stabzahl auf der Breite b -- bei Art «Anzahl»."""
+
+    art: Linienart = einer_von(MENGEN, Linienart.TEILUNG)
+    """Welche der beiden gilt -- nach den Zahlen, damit ``PostenEintrag(⌀, s)`` bleibt."""
+
+    @property
+    def ueber_abstand(self) -> bool:
+        return self.art is Linienart.TEILUNG
 
     @property
     def vorhanden(self) -> bool:
-        if self.durchmesser <= 0:
-            return False
-        return bool(self.abstand and self.abstand > 0) or bool(self.anzahl and self.anzahl > 0)
+        return self.durchmesser > 0 and (self.abstand if self.ueber_abstand else self.anzahl) > 0
 
     def regeln(self, wo: str) -> None:
         """
         Ein Posten mit Durchmesser braucht eine Teilung oder eine Stabzahl
-        groesser als null. Bis 2026-10-16 hiess eine Teilung von null still
-        «kein Stab»: die Maske zeigte ⌀16, gerechnet wurde ohne. Ohne
-        Durchmesser ist der Posten leer, was sonst auch dasteht.
+        groesser als null -- die, die gilt. Bis 2026-10-16 hiess eine Teilung
+        von null still «kein Stab»: die Maske zeigte ⌀16, gerechnet wurde
+        ohne. Ohne Durchmesser ist der Posten leer, was sonst auch dasteht.
         """
         if self.durchmesser == 0.0:
             return
-        if self.abstand is not None:
-            if self.abstand <= 0.0:
-                raise ProjektFehler(f"{wo}: die Teilung muss grösser als null sein, "
-                                    f"angegeben sind {self.abstand:g} mm.")
-        elif self.anzahl is None or self.anzahl <= 0.0:
-            raise ProjektFehler(f"{wo}: ⌀{self.durchmesser:g} braucht eine Teilung oder "
-                                f"eine Stabzahl grösser als null.")
+        if self.ueber_abstand and self.abstand <= 0.0:
+            raise ProjektFehler(f"{wo}: die Teilung muss grösser als null sein, "
+                                f"angegeben sind {self.abstand:g} mm.")
+        if not self.ueber_abstand and self.anzahl <= 0.0:
+            raise ProjektFehler(f"{wo}: ⌀{self.durchmesser:g} braucht eine Stabzahl grösser "
+                                f"als null, angegeben sind {self.anzahl:g}.")
 
     def als_posten(self) -> Bewehrungsposten:
         return Bewehrungsposten(
             durchmesser=Groesse(self.durchmesser, MM),
-            abstand=Groesse(self.abstand, MM) if self.abstand else None,
-            anzahl=self.anzahl if not self.abstand else None,
+            abstand=Groesse(self.abstand, MM) if self.ueber_abstand else None,
+            anzahl=None if self.ueber_abstand else self.anzahl,
         )
 
     def je_meter(self, b: float = 1000.0) -> float:
@@ -293,16 +312,18 @@ class QuerkraftbewehrungEintrag(Beschreibung):
 
     In y darf statt der Teilung eine Stabzahl über die betrachtete Breite
     stehen; in x nicht. Siehe
-    :class:`opencivil.querschnitt.platte.Querkraftbewehrung`.
+    :class:`opencivil.querschnitt.platte.Querkraftbewehrung`. In y je Art ein
+    eigenes Feld, wie beim :class:`PostenEintrag`; welches gilt, sagt ``art_y``.
     """
 
     durchmesser: float = bereich(0.0, heisst="Bügeldurchmesser", einheit=MM, ab=0.0)
     """in mm; 0 bedeutet: keine Querkraftbewehrung."""
 
     stahl: str = ""
-    abstand_x: Optional[float] = 200.0
-    abstand_y: Optional[float] = 200.0
-    anzahl_y: Optional[float] = None
+    abstand_x: float = 200.0
+    abstand_y: float = 200.0
+    anzahl_y: float = 5.0
+    art_y: Linienart = einer_von(MENGEN, Linienart.TEILUNG)
     alpha_min: int = neigung(ALPHA_MIN, "α_min")
     alpha_max: int = neigung(ALPHA_MAX, "α_max")
 
@@ -317,28 +338,26 @@ class QuerkraftbewehrungEintrag(Beschreibung):
 
     @property
     def ueber_teilung_y(self) -> bool:
-        """In y eine Teilung -- sonst eine Stabzahl. Wie in der Maske: es zaehlt, was dasteht."""
-        return self.abstand_y is not None
+        """In y eine Teilung -- sonst eine Stabzahl."""
+        return self.art_y is Linienart.TEILUNG
 
     def regeln(self, wo: str) -> None:
         """Was nicht stimmen kann, soll als Satz beim Benutzer ankommen."""
         neigungen_ordnen(self.alpha_min, self.alpha_max, wo)
         if not self.vorhanden:
             return
-        angegeben = (lambda wert, einheit="":
-                     "nichts" if wert is None else f"{wert:g}{einheit}")
-        if self.abstand_x is None or self.abstand_x <= 0:
+        if self.abstand_x <= 0:
             raise ProjektFehler(
                 f"{wo}: die Bügelteilung in x muss grösser als null sein, "
-                f"angegeben ist {angegeben(self.abstand_x, ' mm')}.")
+                f"angegeben ist {self.abstand_x:g} mm.")
         if self.ueber_teilung_y and self.abstand_y <= 0:
             raise ProjektFehler(
                 f"{wo}: die Bügelteilung in y muss grösser als null sein, "
-                f"angegeben ist {angegeben(self.abstand_y, ' mm')}.")
-        if not self.ueber_teilung_y and (self.anzahl_y is None or self.anzahl_y <= 0):
+                f"angegeben ist {self.abstand_y:g} mm.")
+        if not self.ueber_teilung_y and self.anzahl_y <= 0:
             raise ProjektFehler(
                 f"{wo}: die Bügelzahl in y muss grösser als null sein, "
-                f"angegeben ist {angegeben(self.anzahl_y)}.")
+                f"angegeben ist {self.anzahl_y:g}.")
 
     def als_bewehrung(self, stahl: Baustoff) -> Querkraftbewehrung:
         """Die Buegel fuer den Querschnitt -- erst nach :meth:`regeln`."""

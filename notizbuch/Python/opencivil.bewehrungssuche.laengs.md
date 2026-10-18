@@ -1,5 +1,5 @@
 ---
-erzeugt: beb96ba10a53
+erzeugt: b402b85eb4a2
 art: modul
 tags: [modul]
 ---
@@ -356,6 +356,7 @@ Die gefundenen Lagen in die Platte schreiben.
 - [[opencivil.bewehrungssuche.bewertung]]
 - [[opencivil.core.wahl]]
 - [[opencivil.projekt]]
+- [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.platte]]
 
 ## Gebraucht von

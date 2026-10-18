@@ -1,5 +1,5 @@
 ---
-erzeugt: 237ad68e7d71
+erzeugt: 80f3c7072644
 art: modul
 tags: [modul]
 ---
@@ -172,9 +172,23 @@ class PostenEintrag(Beschreibung)
 
 Grundbewehrung oder Zulage einer Lage.
 
+Je Art ein eigenes Feld fuer die Menge, wie bei der Stablinie: wer von der
+Teilung zur Stabzahl wechselt und zurueck, findet seine Zahl noch vor.
+Welche gilt, sagt `art`. Bis 2026-10-18 war genau eine der beiden
+gesetzt, und beim Umschalten setzte die Oberflaeche die andere mit eigenen
+Vorgaben (5 Staebe, 150 mm).
+
 - `durchmesser: float = bereich(0.0, heisst='Durchmesser', einheit=MM, ab=0.0)` – in mm; 0 bedeutet: nicht vorhanden.
-- `abstand: Optional[float] = 150.0` – Teilung in mm. Genau eines von `abstand` und `anzahl` ist gesetzt.
-- `anzahl: Optional[float] = None`
+- `abstand: float = 150.0` – Teilung in mm -- bei Art «Teilung».
+- `anzahl: float = 5.0` – Stabzahl auf der Breite b -- bei Art «Anzahl».
+- `art: Linienart = einer_von(MENGEN, Linienart.TEILUNG)` – Welche der beiden gilt -- nach den Zahlen, damit `PostenEintrag(⌀, s)` bleibt.
+
+#### PostenEintrag.ueber_abstand
+
+```python
+@property
+def ueber_abstand(self) -> bool
+```
 
 #### PostenEintrag.vorhanden
 
@@ -190,9 +204,9 @@ def regeln(self, wo: str) -> None
 ```
 
 Ein Posten mit Durchmesser braucht eine Teilung oder eine Stabzahl
-groesser als null. Bis 2026-10-16 hiess eine Teilung von null still
-«kein Stab»: die Maske zeigte ⌀16, gerechnet wurde ohne. Ohne
-Durchmesser ist der Posten leer, was sonst auch dasteht.
+groesser als null -- die, die gilt. Bis 2026-10-16 hiess eine Teilung
+von null still «kein Stab»: die Maske zeigte ⌀16, gerechnet wurde
+ohne. Ohne Durchmesser ist der Posten leer, was sonst auch dasteht.
 
 #### PostenEintrag.als_posten
 
@@ -268,13 +282,15 @@ Die Bügel einer Platte -- ein Raster, ein Durchmesser, zwei Teilungen.
 
 In y darf statt der Teilung eine Stabzahl über die betrachtete Breite
 stehen; in x nicht. Siehe
-[[opencivil.querschnitt.platte#Querkraftbewehrung|opencivil.querschnitt.platte.Querkraftbewehrung]].
+[[opencivil.querschnitt.platte#Querkraftbewehrung|opencivil.querschnitt.platte.Querkraftbewehrung]]. In y je Art ein
+eigenes Feld, wie beim [[opencivil.projekt.eintraege#PostenEintrag|PostenEintrag]]; welches gilt, sagt `art_y`.
 
 - `durchmesser: float = bereich(0.0, heisst='Bügeldurchmesser', einheit=MM, ab=0.0)` – in mm; 0 bedeutet: keine Querkraftbewehrung.
 - `stahl: str = ''`
-- `abstand_x: Optional[float] = 200.0`
-- `abstand_y: Optional[float] = 200.0`
-- `anzahl_y: Optional[float] = None`
+- `abstand_x: float = 200.0`
+- `abstand_y: float = 200.0`
+- `anzahl_y: float = 5.0`
+- `art_y: Linienart = einer_von(MENGEN, Linienart.TEILUNG)`
 - `alpha_min: int = neigung(ALPHA_MIN, 'α_min')`
 - `alpha_max: int = neigung(ALPHA_MAX, 'α_max')`
 
@@ -296,7 +312,7 @@ null heisst nicht «keine Buegel», sondern ist ein Fehler, und
 def ueber_teilung_y(self) -> bool
 ```
 
-In y eine Teilung -- sonst eine Stabzahl. Wie in der Maske: es zaehlt, was dasteht.
+In y eine Teilung -- sonst eine Stabzahl.
 
 #### QuerkraftbewehrungEintrag.regeln
 
@@ -653,6 +669,7 @@ Eine zu pruefende Schnittgroessenkombination.
 ## Konstanten
 
 - `EIGENE_VORSILBE = {'beton': 'BE', 'betonstahl': 'S'}` – Womit die Namen eigener Materialien beginnen: BE1, BE2 ... beim Beton, S1, S2 ... beim Betonstahl (Benutzer, 2026-10-16).
+- `MENGEN = (Linienart.TEILUNG, Linienart.ANZAHL)` – Wie ein Posten der Platte seine Menge angibt -- wie eine Stablinie ([[opencivil.projekt.querschnittsanalyse#StablinieEintrag|StablinieEintrag]]), aber ohne verschmierte Flaeche: als Teilung oder als Stabzahl.
 - `HAEUFIG_ANTEIL = 70.0` – Anteil der Tragsicherheitseinwirkungen, der als haeufiger Lastfall gilt -- in Prozent, wie die Maske ihn zeigt. Eine Vorgabe, einstellbar je Platte.
 - `QUASISTAENDIG_ANTEIL = 60.0` – Dasselbe fuer die quasi-staendigen Lastfaelle.
 
@@ -667,6 +684,7 @@ Eine zu pruefende Schnittgroessenkombination.
 - [[opencivil.nachweis.rissanforderung]]
 - [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt.lesen]]
+- [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.zugseite]]

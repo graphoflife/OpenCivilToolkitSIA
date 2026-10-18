@@ -565,7 +565,7 @@ class TestQuerkraftbewehrungInDerAusgabe(unittest.TestCase):
 
     def test_eine_stabzahl_in_y_steht_als_stueckzahl_da(self):
         antwort = dienst.bearbeite(
-            "rechnen", {"projekt": self.projekt(abstand_y=None, anzahl_y=5.0)})
+            "rechnen", {"projekt": self.projekt(art_y="anzahl", anzahl_y=5.0)})
         letzte = antwort.daten["zusammenfassungen"]["q1"]["bewehrung"]["zeilen"][-1]
         self.assertEqual(letzte[2], {"mathe": r"\varnothing 10@200@5\,\text{Stk}"})
 

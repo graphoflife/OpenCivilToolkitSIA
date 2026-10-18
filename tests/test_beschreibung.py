@@ -18,6 +18,7 @@ from opencivil.projekt.querschnittsanalyse import (
     QALastfallEintrag, QASpannungsfallEintrag, SchubwandEintrag, StabEintrag, StablinieEintrag,
     WerkstoffwahlEintrag,
 )
+from opencivil.querschnitt.geometrie import Linienart
 from opencivil.web import api, dienst
 
 
@@ -132,7 +133,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
                         kriechzahl=0.5, werkstoffsatz="charakteristisch", rechenart="parabel"),
                     querkraftbewehrung=QuerkraftbewehrungEintrag(
                         durchmesser=10.0, stahl="s1", abstand_x=250.0,
-                        abstand_y=None, anzahl_y=4.0,
+                        art_y="anzahl", anzahl_y=4.0,
                         alpha_min=35, alpha_max=42),
                     richtung_lage1="x", richtung_lage4="x",
                     lagen=[
@@ -176,7 +177,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
         self.assertEqual(kopie.querschnitt("q2").lagen[0].stahl, "s2")
         buegel = kopie.querschnitt("q1").querkraftbewehrung
         self.assertEqual((buegel.durchmesser, buegel.abstand_x), (10.0, 250.0))
-        self.assertEqual((buegel.abstand_y, buegel.anzahl_y), (None, 4.0))
+        self.assertEqual((buegel.art_y, buegel.anzahl_y), (Linienart.ANZAHL, 4.0))
         self.assertEqual((buegel.alpha_min, buegel.alpha_max), (35, 42))
         self.assertEqual(kopie.querschnitt("q1").k_c, 0.6)
 
@@ -348,7 +349,7 @@ class TestVollstaendigeAblage(unittest.TestCase):
     def test_stabzahl_statt_abstand(self):
         projekt = Projekt.beispiel()
         grund = projekt.querschnitt("q1").lagen[0].grund
-        grund.abstand, grund.anzahl = None, 7.0
+        grund.art, grund.anzahl = "anzahl", 7.0
         aufbau = projekt.aufbauen()
         posten = aufbau.querschnitte["q1"].lagen[0].grund
         self.assertIsNone(posten.abstand)
@@ -367,14 +368,18 @@ class TestVollstaendigeAblage(unittest.TestCase):
         """
         lage = LageEintrag.aus_dict({"stahl": "s1", "grund": {"durchmesser": 16.0}})
         self.assertEqual(lage.zulage.abstand, 150.0)
-        self.assertIsNone(lage.zulage.anzahl)
+        self.assertIs(lage.zulage.art, Linienart.TEILUNG)
         self.assertFalse(lage.zulage.vorhanden)   # ohne Durchmesser trotzdem leer
         self.assertEqual(lage.grund.abstand, 150.0)
 
     def test_eine_gewaehlte_stabzahl_bleibt_eine_stabzahl(self):
-        eintrag = PostenEintrag.aus_dict({"durchmesser": 14.0, "abstand": None, "anzahl": 6.0})
-        self.assertIsNone(eintrag.abstand)
-        self.assertEqual(eintrag.anzahl, 6.0)
+        """Und die Teilung bleibt stehen: wer zurückschaltet, findet sie (2026-10-18)."""
+        eintrag = PostenEintrag.aus_dict({"durchmesser": 14.0, "anzahl": 6.0, "art": "anzahl",
+                                          "abstand": 125.0})
+        self.assertIs(eintrag.art, Linienart.ANZAHL)
+        self.assertEqual((eintrag.anzahl, eintrag.abstand), (6.0, 125.0))
+        posten = eintrag.als_posten()
+        self.assertEqual((posten.abstand, posten.anzahl), (None, 6.0))
 
 
 class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
@@ -945,11 +950,11 @@ class TestBuegelteilung(unittest.TestCase):
 
     def test_teilung_in_y(self):
         self.assertIn("Bügelteilung in y muss grösser als null sein",
-                      self.fehler(self.buegel(abstand_y=0, anzahl_y=None)))
+                      self.fehler(self.buegel(abstand_y=0)))
 
     def test_stabzahl_in_y(self):
         self.assertIn("Bügelzahl in y muss grösser als null sein",
-                      self.fehler(self.buegel(abstand_y=None, anzahl_y=0)))
+                      self.fehler(self.buegel(art_y="anzahl", anzahl_y=0)))
 
     def test_ohne_buegel_spielt_die_teilung_keine_rolle(self):
         d = self.buegel(durchmesser=0.0, abstand_x=0)

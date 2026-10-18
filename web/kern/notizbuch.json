@@ -3723,6 +3723,7 @@
         "druckfeld",
         "x_d_grenze",
         "PostenEintrag",
+        "PostenEintrag.ueber_abstand",
         "PostenEintrag.vorhanden",
         "PostenEintrag.regeln",
         "PostenEintrag.als_posten",
