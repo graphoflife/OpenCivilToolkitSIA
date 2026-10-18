@@ -310,6 +310,10 @@ class Ebenenlinie(Widerstandslinie):
         if grob is None:
             return None
         _, a, b = grob
+        if a is b:
+            # Ein Eckpunkt liegt genau auf der Geraden: dort ist nichts zu suchen.
+            return Treffer(wert=achse.von(a), a=a, b=b,
+                           eps_oben=a.eps_oben, eps_unten=a.eps_unten)
         lauf = achse.gegen
 
         def abweichung(anteil: float):

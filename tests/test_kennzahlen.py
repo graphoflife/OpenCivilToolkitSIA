@@ -148,5 +148,30 @@ class TestImmer(unittest.TestCase):
         self.assertIn("Querkraftwiderstand ohne Bügel, kleinster", teil)
 
 
+class TestEinseitigBewehrt(unittest.TestCase):
+    """
+    Nur eine Seite bewehrt: die Linie liegt ganz bei M >= 0 oder M <= 0 und
+    berührt M = 0 nur, entlang der Kante vom reinen Druck bis N = 0. Bis
+    2026-10-18 fand die Schnittsuche dort nichts, und nur oben bewehrt stand
+    als Druckwiderstand 0 statt -5000 kN.
+    """
+
+    def test_der_druckwiderstand_auf_beiden_seiten_gleich(self):
+        for x in ([12, 0], [0, 12]):
+            with self.subTest(x=x):
+                projekt = Projekt(name="Probe")
+                projekt.beton("C30/37")
+                projekt.stahl("B500B")
+                projekt.platte("Probe", h=250, x=x, y=[10, 10])
+                aufbau, loesung = rechnen(projekt)
+                self.assertAlmostEqual(wert(aufbau, loesung, "N_Rd_druck"), -5.0e6, delta=1.0)
+
+    def test_die_kante_findet_den_beruehrten_eckpunkt(self):
+        linie = [geo.Stelle(N=-5000.0, M=0.0), geo.Stelle(N=0.0, M=0.0),
+                 geo.Stelle(N=300.0, M=-25.0), geo.Stelle(N=0.0, M=-64.0)]
+        self.assertEqual(geo.kante(linie, geo.NORMALKRAFT, 0.0, positiv=False)[0], -5000.0)
+        self.assertEqual(geo.kante(linie, geo.NORMALKRAFT, 0.0, positiv=True)[0], 0.0)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -107,16 +107,26 @@ def innerhalb(N: float, M: float, linie: Sequence[Punkt]) -> bool:
 
 def _schnittpunkte(linie: Sequence[Punkt], achse: Achse, fest: float):
     """
-    Alle Kanten, die die Gerade ``achse.gegen = fest`` schneiden.
+    Alle Kanten, die die Gerade ``achse.gegen = fest`` schneiden, und jeder
+    Eckpunkt, der genau auf ihr liegt.
 
-    Liefert Tripel ``(Wert auf achse, Punkt a, Punkt b)``. Die einzige Stelle,
-    an der ueber die Linie gelaufen wird -- alles Weitere waehlt daraus aus.
+    Liefert Tripel ``(Wert auf achse, Punkt a, Punkt b)``; ein Eckpunkt auf
+    der Geraden kommt als ``(Wert, a, a)``. Die einzige Stelle, an der ueber
+    die Linie gelaufen wird -- alles Weitere waehlt daraus aus.
+
+    Die Eckpunkte zaehlen fuer sich, weil die Linie die Gerade auch nur
+    beruehren kann, ohne sie zu kreuzen: eine Platte nur mit oberer Bewehrung
+    liegt ganz bei M <= 0, und ihre Kante vom reinen Druck zu N = 0 liegt auf
+    M = 0. Bis 2026-10-18 fand die Suche dort nichts, und als Druckwiderstand
+    bei M_Ed = 0 stand 0 statt -5000 kN.
     """
     lauf = achse.gegen
     anzahl = len(linie)
     for i in range(anzahl):
         a, b = linie[i], linie[(i + 1) % anzahl]
         la, lb = lauf.von(a), lauf.von(b)
+        if la == fest:
+            yield achse.von(a), a, a
         if (la > fest) != (lb > fest) and lb != la:
             ga, gb = achse.von(a), achse.von(b)
             yield ga + (fest - la) * (gb - ga) / (lb - la), a, b
