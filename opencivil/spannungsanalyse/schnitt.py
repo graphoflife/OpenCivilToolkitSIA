@@ -167,9 +167,7 @@ def _loeser(q: Querschnitt, psi: float, herkunft: Sequence[Stabgruppe],
     return Faserloeser(
         querschnitt=Faserquerschnitt(r.fasern.gruppen, staebe), grenzen=r.grenzen,
         oben=oben, unten=unten, lagen=lagen,
-        beton=_betonspannung(r, {i: w.gesetz for i, w in betone.items()}),
-        eps_druck=min(-w.eps_min for w in betone.values()),
-        eps_zug=min((s.eps_ud for s in staehle.values()), default=math.inf), suche=suche)
+        beton=_betonspannung(r, {i: w.gesetz for i, w in betone.items()}), suche=suche)
 
 
 @dataclass(frozen=True)
@@ -191,8 +189,7 @@ class _Zerlegung:
         kippenden Nulllinie suchen je Frage frisch (:data:`_JE_FRAGE`).
         """
         return FesteNulllinie(_loeser(self.querschnitt, psi, self.herkunft, self.staehle,
-                                      self.namen, suche=suche),
-                              self.querschnitt.richtung(psi).grenznamen)
+                                      self.namen, suche=suche))
 
 
 class KippendeNulllinie:
@@ -386,7 +383,6 @@ class Schnittpaar:
     ungerissen: Faserloeser
     seite: Zugseite
     wahl: Rechenwahl
-    grenznamen: Tuple[str, ...]
 
     querschnitt: Querschnitt
     """Der gerissene Querschnitt im Bruchzustand -- derselbe, aus dem ``gerissen`` stammt."""
@@ -436,8 +432,7 @@ class Schnittpaar:
     def ebenen(self) -> Zustaende:
         """Die Ebenen beider Zustaende: kippend, «einachsig» mit fester Nulllinie."""
         if self.einachsig:
-            return Zustaende(FesteNulllinie(self.gerissen, self.grenznamen),
-                             FesteNulllinie(self.ungerissen, self.grenznamen))
+            return Zustaende(FesteNulllinie(self.gerissen), FesteNulllinie(self.ungerissen))
         gerissen, ungerissen = (KippendeNulllinie(z, self.seite) for z in self.zerlegungen)
         return Zustaende(gerissen, ungerissen)
 
@@ -647,7 +642,7 @@ def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[s
     stahlstoffe = tuple({g.stahl.id: g.stahl for g in analyse.gruppen}.values())
     return Schnittpaar(
         gerissen=gerissen.loeser, ungerissen=ungerissen.loeser, seite=seite, wahl=wahl,
-        grenznamen=gerissen.grenznamen, querschnitt=q, zerlegungen=tuple(zerlegungen),
+        querschnitt=q, zerlegungen=tuple(zerlegungen),
         A=wert(ids["A"]), I=wert(I_id), brutto=brutto, riss=riss,
         k_t_zug=beiwert_dicke(t_zug), breite=breite, t_zug=t_zug,
         E_cm=abs(wert(ids["E_cm"])), staehle=stahlstoffe, ids=ids)

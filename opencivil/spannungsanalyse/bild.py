@@ -12,9 +12,10 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from opencivil.nachweis.querschnittsloeser import Faserloeser
+from opencivil.querschnitt.fasern import Dehnungsgrenze
 from opencivil.querschnitt.gesetzwahl import Rechenart
 from opencivil.querschnitt.werkstoffgesetz import RUNDUNG
 from opencivil.spannungsanalyse.linie import Dehnungsebene, Ebenensuche
@@ -170,14 +171,27 @@ def aus_dehnungen(loeser: Faserloeser, *,
     chi = (eps_unten - eps_oben) / loeser.h if loeser.h > 0 else 0.0
     eps_m = eps_oben - chi * loeser.oben
     bild = _bild(Dehnungsebene(loeser=loeser, eps_m=eps_m, chi=chi))
-    # Druck und Zug je gegen ihre eigene Grenze: −5 ‰ liegt jenseits des
-    # Betons, auch wenn der Stahl bis 45 ‰ reicht. Bis 2026-10-16 stand hier
-    # das Groessere der beiden, und der Hinweis blieb aus.
-    if (min(eps_oben, eps_unten) < -(loeser.eps_druck + RUNDUNG)
-            or max(eps_oben, eps_unten) > loeser.eps_zug + RUNDUNG):
+    # Geprueft an denselben Grenzen, in denen der Loeser sucht, jede an ihrer
+    # Stelle: der Stahl an seiner Lage, der Beton am Rand -- auf Zug hat er
+    # keine Grenze. Bis 2026-10-18 stand hier ein zweites, groberes Fenster
+    # an beiden Raendern: 48 ‰ am unteren Rand galt als ungueltig, obwohl die
+    # unterste Lage bei 39.7 ‰ lag.
+    verletzt: Dict[str, str] = {}
+    for grenze, eps in loeser.grenzen.verletzt(eps_m, chi, toleranz=RUNDUNG):
+        verletzt.setdefault(grenze.name, _ueberschritten(grenze, eps))
+    if verletzt:
         bild.hinweis = (
-            f"Die Randdehnung liegt ausserhalb dessen, wofür die "
-            f"Werkstoffgesetze gelten (−{loeser.eps_druck * 1e3:.1f} ‰ bis "
-            f"+{loeser.eps_zug * 1e3:.1f} ‰). Jenseits davon geben sie null "
-            f"zurück, und die Spannungen unten sind keine Aussage mehr.")
+            f"Die Ebene liegt ausserhalb dessen, wofür die Werkstoffgesetze "
+            f"gelten: {'; '.join(verletzt.values())}. Jenseits davon geben sie "
+            f"null zurück, und die Spannungen unten sind keine Aussage mehr.")
     return bild
+
+
+def _ueberschritten(grenze: Dehnungsgrenze, eps: float) -> str:
+    """Eine verletzte Grenze im Hinweis: «Stahl der 1. Lage bei 47.3 ‰, gilt bis 45.0 ‰»."""
+    wert, wort = (grenze.eps_min, "ab") if eps < grenze.eps_min else (grenze.eps_max, "bis")
+    return f"{grenze.name} bei {_promille(eps)}, gilt {wort} {_promille(wert)}"
+
+
+def _promille(eps: float) -> str:
+    return f"{eps * 1e3:.1f} ‰".replace("-", "−")

@@ -8,6 +8,7 @@ from opencivil.nachweis.querschnittsloeser import (
     Querschnittsloeser, Stahllage, probenschranken, verfahren,
 )
 from opencivil.nachweis.zustand2 import gerissen, wertigkeit
+from opencivil.querschnitt.fasern import Dehnungsgrenze
 from opencivil.querschnitt.werkstoffgesetz import (
     BetonElastisch, Betongesetz, Spannungsblock, Stahlgesetz,
 )
@@ -28,11 +29,21 @@ def stahl(*, E_s: float, f_sd: float, eps_ud: float = 0.045) -> Stahlgesetz:
 ELASTISCH = stahl(E_s=200e9, f_sd=1e12)
 
 
+def raender(h: float, *, eps_druck: float = 0.003, eps_zug: float = 0.045):
+    """
+    Das Fenster dieser Tests: an beiden Raendern dieselben Grenzen -- bis
+    2026-10-18 das Ersatzfenster des Loesers, wenn niemand Grenzen mitgab.
+    Die Platte sucht im Fenster ihrer Gesetze (:meth:`Gesetze.grenzen`).
+    """
+    return [Dehnungsgrenze(arm=-h / 2.0, eps_min=-eps_druck, eps_max=eps_zug),
+            Dehnungsgrenze(arm=h / 2.0, eps_min=-eps_druck, eps_max=eps_zug)]
+
+
 def elastischer_loeser(a_s=2450e-6, d=0.2601, phi=2.0, h=0.3, b=1.0):
     """Gerissen, linear elastisch -- der Fall mit geschlossener Lösung."""
     return Querschnittsloeser(
         h=h, b=b, lagen=[Stahllage(a_s=a_s, z=d, stahl=ELASTISCH, nummer=1)],
-        beton=BetonElastisch(E_c=33.62e9 / (1.0 + phi)))
+        beton=BetonElastisch(E_c=33.62e9 / (1.0 + phi)), grenzen=raender(h))
 
 
 class TestGegenDieGeschlosseneLoesung(unittest.TestCase):
@@ -101,7 +112,7 @@ class TestProbe(unittest.TestCase):
             h=0.3, b=1.0,
             lagen=[Stahllage(a_s=1200e-6, z=0.26, stahl=ELASTISCH, nummer=1),
                    Stahllage(a_s=1200e-6, z=0.04, stahl=ELASTISCH, nummer=4)],
-            beton=BetonElastisch(E_c=33.62e9 / 3.0))
+            beton=BetonElastisch(E_c=33.62e9 / 3.0), grenzen=raender(0.3))
         for N_Ed, M_Ed in [(200e3, 0.0), (200e3, 10e3), (500e3, -15e3)]:
             with self.subTest(N=N_Ed, M=M_Ed):
                 e = loeser.loese(N_Ed=N_Ed, M_Ed=M_Ed)
@@ -121,7 +132,7 @@ class TestProbe(unittest.TestCase):
             h=0.3, b=1.0,
             lagen=[Stahllage(a_s=a_s, z=d, stahl=s, nummer=1),
                    Stahllage(a_s=a_s, z=d_u, stahl=s, nummer=4)],
-            beton=parabelgesetz(f_cd=28.1e6, E_c=39e9 / 2.0))
+            beton=parabelgesetz(f_cd=28.1e6, E_c=39e9 / 2.0), grenzen=raender(0.3))
 
         e = loeser.loese(N_Ed=-3000e3, M_Ed=150e3)
         self.assertTrue(e.konvergiert)
@@ -152,7 +163,7 @@ class TestGrenzen(unittest.TestCase):
         loeser = Querschnittsloeser(
             h=0.3, b=1.0,
             lagen=[Stahllage(a_s=200e-6, z=0.26, stahl=stahl(E_s=200e9, f_sd=435e6))],
-            beton=parabelgesetz(f_cd=20e6, E_c=33e9))
+            beton=parabelgesetz(f_cd=20e6, E_c=33e9), grenzen=raender(0.3))
         e = loeser.loese(N_Ed=0.0, M_Ed=5000e3)
         self.assertFalse(e.konvergiert)
 
@@ -171,7 +182,7 @@ class TestGrenzen(unittest.TestCase):
                    Stahllage(a_s=754e-6, z=0.048, stahl=s, nummer=4)],
             beton=parabelgesetz(f_cd=20e6, E_c=33.62e9 / 3.0,
                                     eps_c1d=0.002, eps_c2d=0.0035),
-            eps_druck=0.0035, eps_zug=0.045)
+            grenzen=raender(0.3, eps_druck=0.0035))
         e = loeser.loese(N_Ed=0.0, M_Ed=234.9e3)
         self.assertTrue(e.konvergiert)
         self.assertGreater(e.chi, 0.04)
@@ -188,7 +199,7 @@ class TestGrenzen(unittest.TestCase):
         loeser = Querschnittsloeser(
             h=0.3, b=1.0,
             lagen=[Stahllage(a_s=2450e-6, z=0.26, stahl=stahl(E_s=200e9, f_sd=435e6))],
-            beton=parabelgesetz(f_cd=20e6, E_c=33e9))
+            beton=parabelgesetz(f_cd=20e6, E_c=33e9), grenzen=raender(0.3))
         weit = loeser._fenster(0.0)
         eng = loeser._fenster(0.1)
         self.assertGreater(weit[1] - weit[0], eng[1] - eng[0])
@@ -238,7 +249,7 @@ class TestVerfehlteEbene(unittest.TestCase):
             h=0.25, b=1.0,
             lagen=[Stahllage(a_s=1131e-6, z=0.025, stahl=self.STAHL, nummer=1),
                    Stahllage(a_s=1131e-6, z=0.225, stahl=self.STAHL, nummer=2)],
-            beton=beton or self.BLOCK, suche=suche)
+            beton=beton or self.BLOCK, grenzen=raender(0.25), suche=suche)
 
     def test_viel_druck_und_wenig_moment_ist_verfehlt(self):
         for suche in (HALBIEREN, ILLINOIS, Illinois(auch_bei_sprung=True)):
@@ -300,7 +311,7 @@ class TestIllinoisMitWarmstart(unittest.TestCase):
             lagen=[Stahllage(a_s=1696e-6, z=0.249, stahl=s, nummer=1),
                    Stahllage(a_s=754e-6, z=0.246, stahl=s, nummer=2),
                    Stahllage(a_s=754e-6, z=0.048, stahl=s, nummer=4)],
-            beton=beton, eps_druck=0.0035, eps_zug=0.045, **mehr)
+            beton=beton, grenzen=raender(0.3, eps_druck=0.0035), **mehr)
 
     def test_dieselben_ebenen_wie_beim_halbieren(self):
         parabel = parabelgesetz(f_cd=20e6, E_c=33.62e9 / 3.0, eps_c1d=0.002,

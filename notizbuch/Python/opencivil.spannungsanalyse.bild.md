@@ -1,5 +1,5 @@
 ---
-erzeugt: 06d354fd5906
+erzeugt: 2841decef3e8
 art: modul
 tags: [modul]
 ---
@@ -110,6 +110,14 @@ Hier gibt es nichts zu suchen -- aus den beiden Randdehnungen folgen
 Mitteldehnung und Kruemmung unmittelbar, und das Faserintegral liefert
 Normalkraft und Moment in einem Durchgang.
 
+### _ueberschritten
+
+```python
+def _ueberschritten(grenze: Dehnungsgrenze, eps: float) -> str
+```
+
+Eine verletzte Grenze im Hinweis: «Stahl der 1. Lage bei 47.3 ‰, gilt bis 45.0 ‰».
+
 
 ## Konstanten
 
@@ -118,6 +126,7 @@ Normalkraft und Moment in einem Durchgang.
 ## Braucht
 
 - [[opencivil.nachweis.querschnittsloeser]]
+- [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 - [[opencivil.spannungsanalyse.linie]]

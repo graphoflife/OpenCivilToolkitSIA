@@ -48,7 +48,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Optional, Sequence, Tuple, Union
+from typing import List, Optional, Sequence, Tuple, Union
 
 from opencivil.querschnitt.werkstoffgesetz import Gesetz
 
@@ -214,7 +214,13 @@ class Faserquerschnitt:
 
 @dataclass(frozen=True)
 class Dehnungsgrenze:
-    """An der Stelle ``arm`` muss die Dehnung zwischen ``eps_min`` und ``eps_max`` liegen."""
+    """
+    An der Stelle ``arm`` muss die Dehnung zwischen ``eps_min`` und ``eps_max``
+    liegen. ``name`` sagt, was dort liegt -- «Stahl der 1. Lage» --, fuer
+    die Mitschrift und fuer Meldungen. Bis 2026-10-18 reisten die Namen als
+    eigenes Tupel neben den Grenzen durch sechs Gegenstaende und wurden nach
+    ihrer Stelle zugeordnet.
+    """
 
     arm: float
     eps_min: float
@@ -222,6 +228,8 @@ class Dehnungsgrenze:
 
     eps_max: float
     """Groesste zulaessige Dehnung, positiv; ``inf``, wo es keine gibt."""
+
+    name: str = ""
 
 
 class Dehnungsgrenzen:
@@ -243,6 +251,16 @@ class Dehnungsgrenzen:
         unten = max(g.eps_min - chi * g.arm for g in self.grenzen)
         oben = min(g.eps_max - chi * g.arm for g in self.grenzen)
         return (unten, oben) if unten <= oben else None
+
+    def verletzt(self, eps_m: float, chi: float, *,
+                 toleranz: float = 0.0) -> List[Tuple[Dehnungsgrenze, float]]:
+        """
+        Die Grenzen, an denen die Ebene ``eps_m + chi·arm`` aus ihrem Bereich
+        faellt, je mit der Dehnung dort -- an denselben Grenzen, in denen der
+        Loeser sucht. ``toleranz`` laesst eine gerundete Eingabe gelten.
+        """
+        return [(g, eps) for g in self.grenzen for eps in (eps_m + chi * g.arm,)
+                if eps < g.eps_min - toleranz or eps > g.eps_max + toleranz]
 
     def kruemmungsfenster(self, eps_m: float) -> Optional[Tuple[float, float]]:
         """
@@ -272,8 +290,8 @@ class Dehnungsgrenzen:
 
         Fuer jedes Paar von Grenzen ``k`` und ``l``, deren Abstand die
         Kruemmung dehnt, gilt ``|chi| <= (eps_max_l - eps_min_k) / Abstand``.
-        Massgebend ist das engste Paar. Bei der Platte ist das eines: die
-        Unterkante gegen die Oberkante, ``(eps_zug + eps_druck) / h``.
+        Massgebend ist das engste Paar. Bei der Platte ist das meist die
+        unterste Lage gegen den oberen Rand, ``(eps_ud + eps_c2d) / d``.
         """
         grenze = math.inf
         for k in self.grenzen:

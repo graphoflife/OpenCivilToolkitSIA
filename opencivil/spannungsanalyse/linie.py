@@ -83,9 +83,6 @@ class Dehnungsebene:
     neigung: float = 0.0
     """Wie weit die Nulllinie gegen die Achse der Biegung gedreht ist, rad -- gegen den Uhrzeiger."""
 
-    grenznamen: Tuple[str, ...] = ()
-    """Je Grenze des Loesers, was sie ist -- fuer «massgebend»."""
-
     verfehlt: bool = False
     """
     Ob die Suche an einem Sprung des Spannungsblocks haengen blieb
@@ -144,11 +141,11 @@ class Dehnungsebene:
     def massgebend(self) -> str:
         """Welche Grenzdehnung die Ebene erreicht -- die mit dem kleinsten Abstand."""
         bester, abstand = ("", 0.0), math.inf
-        for g, name in zip(self.loeser.grenzen.grenzen, self.grenznamen):
+        for g in self.loeser.grenzen.grenzen:
             eps = self.eps_m + self.chi * g.arm
             for grenze in (g.eps_min, g.eps_max):
                 if math.isfinite(grenze) and abs(eps - grenze) < abstand:
-                    bester, abstand = (name, grenze), abs(eps - grenze)
+                    bester, abstand = (g.name, grenze), abs(eps - grenze)
         name, grenze = bester
         return f"{name} bei {grenze * 1e3:.2f} ‰".replace("-", "−")
 
@@ -180,11 +177,9 @@ class FesteNulllinie:
     """
 
     loeser: Faserloeser
-    grenznamen: Tuple[str, ...] = ()
 
     def _ebene(self, eps_m: float, chi: float, *, verfehlt: bool = False) -> Dehnungsebene:
-        return Dehnungsebene(loeser=self.loeser, eps_m=eps_m, chi=chi,
-                             grenznamen=self.grenznamen, verfehlt=verfehlt)
+        return Dehnungsebene(loeser=self.loeser, eps_m=eps_m, chi=chi, verfehlt=verfehlt)
 
     def zu_kraeften(self, N: float, M: float) -> Optional[Dehnungsebene]:
         e = self.loeser.loese(N_Ed=N, M_Ed=M)

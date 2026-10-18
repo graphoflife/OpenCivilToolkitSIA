@@ -268,7 +268,7 @@ class Ebenenlinie(Widerstandslinie):
             h=h, b=b, beton=beton,
             staebe=[(l.a_s, l.z, stahl) for l, stahl in zip(self.lagen, self.staehle)],
             fasern=fasern, verdraengt=True)
-        self.grenzen, self.grenznamen = dehnungsfaecher.grenzen(
+        self.grenzen = dehnungsfaecher.grenzen(
             h, [(l.z, l.stahl.eps_ud, f"Stahl der {l.text}") for l in self.lagen],
             eps_c1d=eps_c1d, eps_c2d=eps_c2d)
         self.punkte: List[Linienpunkt] = geo.ohne_wiederholungen([
@@ -394,11 +394,11 @@ class Ebenenlinie(Widerstandslinie):
         eps_m = 0.5 * (eps_oben + eps_unten)
         chi = (eps_unten - eps_oben) / self.h
         namen: List[str] = []
-        for grenze, name in zip(self.grenzen, self.grenznamen):
+        for grenze in self.grenzen:
             eps = eps_m + chi * grenze.arm
             if ((abs(eps - grenze.eps_min) <= AUF_DER_GRENZE
-                 or abs(eps - grenze.eps_max) <= AUF_DER_GRENZE) and name not in namen):
-                namen.append(name)
+                 or abs(eps - grenze.eps_max) <= AUF_DER_GRENZE) and grenze.name not in namen):
+                namen.append(grenze.name)
         return namen
 
     def protokoll_ansatz(self, p: Protokoll, e: Eingaben, *, posten, phi: Wert,

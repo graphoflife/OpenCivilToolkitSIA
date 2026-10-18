@@ -1,5 +1,5 @@
 ---
-erzeugt: cb1dcb732e08
+erzeugt: 3a65abee23b5
 art: modul
 tags: [modul]
 ---
@@ -95,10 +95,10 @@ sie die geschlossene Resistenzlinie.
 ### grenzen
 
 ```python
-def grenzen(h: float, staebe: Sequence[Tuple[float, float, str]], *, eps_c1d: float, eps_c2d: float) -> Tuple[List[Dehnungsgrenze], Tuple[str, ...]]
+def grenzen(h: float, staebe: Sequence[Tuple[float, float, str]], *, eps_c1d: float, eps_c2d: float) -> List[Dehnungsgrenze]
 ```
 
-Dieselben Grenzen als Bedingungen an einzelne Stellen, samt Namen.
+Dieselben Grenzen als Bedingungen an einzelne Stellen, jede mit ihrem Namen.
 
 `staebe` sind `(z, eps_ud, Name)` je Lage. Der Beton an beiden
 Raendern bis `-eps_c2d`; im Punkt C, im Abstand

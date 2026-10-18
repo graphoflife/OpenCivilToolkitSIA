@@ -3158,7 +3158,6 @@
       "stichworte": [
         "Stahllage",
         "lagen_je_seite",
-        "bruchdehnung",
         "Ebene",
         "Ebene.bei",
         "wirksamer_modul_wert",
@@ -4019,6 +4018,7 @@
         "Dehnungsgrenze",
         "Dehnungsgrenzen",
         "Dehnungsgrenzen.fenster",
+        "Dehnungsgrenzen.verletzt",
         "Dehnungsgrenzen.kruemmungsfenster",
         "Dehnungsgrenzen.kruemmungsgrenze"
       ]
@@ -4347,7 +4347,8 @@
         "Querschnittsbild.nulllinie",
         "_bild",
         "aus_schnittgroessen",
-        "aus_dehnungen"
+        "aus_dehnungen",
+        "_ueberschritten"
       ]
     },
     {

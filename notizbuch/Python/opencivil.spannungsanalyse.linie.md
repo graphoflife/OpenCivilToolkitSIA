@@ -1,5 +1,5 @@
 ---
-erzeugt: 6340a73c897e
+erzeugt: b6beac02ac7c
 art: modul
 tags: [modul]
 ---
@@ -47,7 +47,6 @@ Moment um diese Achse und die Kruemmung senkrecht zu ihr.
 - `eps_m: float`
 - `chi: float` – Dehnung am Arm null und Kruemmung senkrecht zur Nulllinie.
 - `neigung: float = 0.0` – Wie weit die Nulllinie gegen die Achse der Biegung gedreht ist, rad -- gegen den Uhrzeiger.
-- `grenznamen: Tuple[str, ...] = ()` – Je Grenze des Loesers, was sie ist -- fuer «massgebend».
 - `verfehlt: bool = False` – Ob die Suche an einem Sprung des Spannungsblocks haengen blieb ([[opencivil.nachweis.querschnittsloeser#Ebene|verfehlt]]). Eine Linie nimmt eine solche Ebene: sie fragt nach der Verformung, bei der ihre Kraft einen Wert durchlaeuft, und am Sprung ist das seine Stelle, auch wenn dort keine Ebene die Kraft genau erzeugt. Ein Bild dagegen braucht die Ebene selbst.
 
 #### Dehnungsebene.kraefte
@@ -174,7 +173,6 @@ Achse der Biegung, und jede Frage ist eine Suche des Loesers. So rechnet
 die Platte, so rechnet der gezeichnete Querschnitt «einachsig».
 
 - `loeser: Faserloeser`
-- `grenznamen: Tuple[str, ...] = ()`
 
 #### FesteNulllinie.zu_kraeften
 

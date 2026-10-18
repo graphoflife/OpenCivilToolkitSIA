@@ -1,5 +1,5 @@
 ---
-erzeugt: c36a0ec4dd65
+erzeugt: 5b07fd910e22
 art: modul
 tags: [modul]
 ---
@@ -151,11 +151,16 @@ eine Suche.
 class Dehnungsgrenze
 ```
 
-An der Stelle `arm` muss die Dehnung zwischen `eps_min` und `eps_max` liegen.
+An der Stelle `arm` muss die Dehnung zwischen `eps_min` und `eps_max`
+liegen. `name` sagt, was dort liegt -- «Stahl der 1. Lage» --, fuer
+die Mitschrift und fuer Meldungen. Bis 2026-10-18 reisten die Namen als
+eigenes Tupel neben den Grenzen durch sechs Gegenstaende und wurden nach
+ihrer Stelle zugeordnet.
 
 - `arm: float`
 - `eps_min: float` – Groesste zulaessige Stauchung, negativ.
 - `eps_max: float` – Groesste zulaessige Dehnung, positiv; `inf`, wo es keine gibt.
+- `name: str = ''`
 
 ### Dehnungsgrenzen
 
@@ -176,6 +181,16 @@ Dehnung aus ihrem Bereich faellt -- bei dieser Kruemmung.
 
 Jede Grenze verlangt `eps_min <= eps_m + chi·arm <= eps_max`. Ist das
 Fenster leer, ist die Kruemmung fuer diesen Querschnitt zu gross.
+
+#### Dehnungsgrenzen.verletzt
+
+```python
+def verletzt(self, eps_m: float, chi: float, *, toleranz: float=0.0) -> List[Tuple[Dehnungsgrenze, float]]
+```
+
+Die Grenzen, an denen die Ebene `eps_m + chi·arm` aus ihrem Bereich
+faellt, je mit der Dehnung dort -- an denselben Grenzen, in denen der
+Loeser sucht. `toleranz` laesst eine gerundete Eingabe gelten.
 
 #### Dehnungsgrenzen.kruemmungsfenster
 
@@ -202,8 +217,8 @@ Die groesste Kruemmung (als Betrag), bei der noch ein Fenster bleibt.
 
 Fuer jedes Paar von Grenzen `k` und `l`, deren Abstand die
 Kruemmung dehnt, gilt `|chi| <= (eps_max_l - eps_min_k) / Abstand`.
-Massgebend ist das engste Paar. Bei der Platte ist das eines: die
-Unterkante gegen die Oberkante, `(eps_zug + eps_druck) / h`.
+Massgebend ist das engste Paar. Bei der Platte ist das meist die
+unterste Lage gegen den oberen Rand, `(eps_ud + eps_c2d) / d`.
 
 
 ## Konstanten
@@ -221,5 +236,6 @@ Unterkante gegen die Oberkante, `(eps_zug + eps_druck) / h`.
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.interaktion]]
+- [[opencivil.spannungsanalyse.bild]]
 - [[opencivil.spannungsanalyse.linie]]
 - [[opencivil.spannungsanalyse.schnitt]]

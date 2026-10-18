@@ -187,11 +187,35 @@ class TestDieDreiPassenZueinander(unittest.TestCase):
         Grenzen und blieb hier aus.
         """
         bild = sa.aus_dehnungen(self.gerissen, eps_oben=-0.005, eps_unten=0.001)
-        self.assertIn("ausserhalb", bild.hinweis)
+        self.assertIn("Beton am oberen Rand bei −5.0 ‰, gilt ab −3.5 ‰", bild.hinweis)
+
+    def test_der_stahl_zaehlt_an_seiner_lage_nicht_am_rand(self):
+        """
+        −1 ‰ oben und 48 ‰ unten: am Rand mehr als ε_ud, an der untersten Lage
+        weniger -- und der Beton hat auf Zug keine Grenze. Die Ebene gilt. Bis
+        2026-10-18 mass der Hinweis den Rand an ε_ud und meldete sie als
+        ungültig: der Löser trug neben seinen Grenzen ein zweites, gröberes
+        Fenster.
+        """
+        unterste = max(self.gerissen.lagen, key=lambda l: l.z)
+        dort = -0.001 + 0.049 / self.gerissen.h * unterste.z
+        self.assertLess(dort, unterste.stahl.eps_ud)
+        bild = sa.aus_dehnungen(self.gerissen, eps_oben=-0.001, eps_unten=0.048)
+        self.assertFalse(bild.hinweis)
+
+    def test_der_hinweis_nennt_die_lage(self):
+        bild = sa.aus_dehnungen(self.gerissen, eps_oben=-0.001, eps_unten=0.06)
+        self.assertRegex(bild.hinweis, r"Stahl der \d\. Lage bei 4\d\.\d ‰, gilt bis 45\.0 ‰")
 
     def test_auf_der_grenze_kein_hinweis(self):
-        bild = sa.aus_dehnungen(self.gerissen, eps_oben=-self.gerissen.eps_druck,
-                                eps_unten=self.gerissen.eps_zug)
+        """Der Beton oben genau bei −ε_c2d, die unterste Lage genau bei ε_ud: das gilt noch."""
+        l = self.gerissen
+        oben = next(g for g in l.grenzen.grenzen if g.name == "Beton am oberen Rand")
+        lage = max((g for g in l.grenzen.grenzen if g.name.startswith("Stahl")),
+                   key=lambda g: g.arm)
+        chi = (lage.eps_max - oben.eps_min) / (lage.arm - oben.arm)
+        eps_m = oben.eps_min - chi * oben.arm
+        bild = sa.aus_dehnungen(l, eps_oben=eps_m + chi * l.oben, eps_unten=eps_m + chi * l.unten)
         self.assertFalse(bild.hinweis)
 
 

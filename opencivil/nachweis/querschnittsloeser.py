@@ -107,14 +107,6 @@ CHI_SCHRANKE = 1e-10
 #: haengen bleibt, liegt um Hunderte Kilonewton daneben.
 PROBE_SCHRANKE = 1e-6
 
-#: Aeusserste Dehnungen, innerhalb derer gesucht wird -- Stauchung und
-#: Dehnung. **Der Suchbereich muss im gueltigen Bereich beider Gesetze
-#: bleiben:** jenseits der Bruchdehnung geben sie null zurueck, und damit
-#: waere ``N(eps_m)`` nicht mehr monoton. Genau daran scheiterte die erste
-#: Fassung -- die Bisektion sah bei -0.5 dieselbe Normalkraft wie bei 0.
-EPS_DRUCK = 0.003
-EPS_ZUG = 0.045
-
 
 @dataclass(frozen=True)
 class Stahllage:
@@ -186,17 +178,6 @@ def lagen_je_seite(lagen: Sequence[Stahllage], h: float) -> List[Stahllage]:
     return heraus
 
 
-def bruchdehnung(lagen: Sequence[Stahllage]) -> float:
-    """
-    Wie weit das Suchfenster im Zug reicht: bis zur kleinsten Bruchdehnung
-    der Lagen. Jenseits davon gaebe das Gesetz dieser Lage null zurueck, und
-    die Bisektion faende Scheinloesungen. Bei einer Sorte ist es ihr
-    ``eps_ud``; bei zweien die kleinere -- das Fenster gilt an beiden
-    Raendern. Ohne Lage gilt :data:`EPS_ZUG`.
-    """
-    return min((l.stahl.eps_ud for l in lagen), default=EPS_ZUG)
-
-
 @dataclass(frozen=True)
 class Ebene:
     """Die gefundene Dehnungsebene samt Proberechnung."""
@@ -253,7 +234,7 @@ def protokoll_wirksamer_modul(p, E_cm, phi, basis: str, *, titel: str,
              titel=titel, nachsatz=nachsatz, name="Wirksamer Elastizitätsmodul")
 
 
-def protokoll_verfahren(p, *, eps_druck: float, suche: Suche,
+def protokoll_verfahren(p, *, eps_c2d: float, suche: Suche,
                         fasern: int = FASERN, verdraengt: bool = True) -> None:
     """
     Der Ablauf der Suche, in die Mitschrift geschrieben.
@@ -297,7 +278,7 @@ def protokoll_verfahren(p, *, eps_druck: float, suche: Suche,
     p.erklaerung(verfahren(suche))
     p.erklaerung(
         f"Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen der "
-        f"Gesetze: der Beton an den Rändern bis {-eps_druck * 1e3:.1f} ‰ und, "
+        f"Gesetze: der Beton an den Rändern bis {-eps_c2d * 1e3:.1f} ‰ und, "
         f"ist der ganze Querschnitt gedrückt, im Punkt C bis ε_c1d; jeder "
         f"Stahl an seiner Lage bis zu seiner Bruchdehnung ε_ud. Jenseits "
         f"davon geben die Werkstoffgesetze null zurück, die Kraft wäre nicht "
@@ -405,9 +386,11 @@ class Faserloeser:
     die Arme der Raender ``oben`` und ``unten`` -- oben ist gedrueckt, wenn
     ein positives Moment wirkt --, die Lagen mit ihrem Stahl, eine je Stab
     der Fasern, und die Spannung des Betons an einer Stelle
-    (``beton(arm, eps)``). ``eps_druck`` und ``eps_zug`` sind die
-    aeussersten Dehnungen, fuer die die Gesetze gelten. Wer nur sucht -- ein
-    Nachweis, der die Ebene zu einem Lastfall braucht --, laesst sie weg.
+    (``beton(arm, eps)``). Wo die Gesetze gelten, sagen allein die Grenzen,
+    jede mit ihrem Namen: bis 2026-10-18 trug der Loeser dazu ``eps_druck``
+    und ``eps_zug``, ein zweites, groberes Fenster an beiden Raendern, und das
+    Bild aus Randdehnungen meldete danach Ebenen als ungueltig, die es nicht
+    waren.
 
     Eine Lage liegt in der Tiefe ``z`` unter dem oberen Rand; ihr Arm ist
     ``z + oben``.
@@ -440,7 +423,6 @@ class Faserloeser:
     def __init__(self, *, querschnitt: Faserquerschnitt, grenzen: Dehnungsgrenzen,
                  oben: float = 0.0, unten: float = 0.0, lagen: Sequence[Stahllage] = (),
                  beton: Optional[Callable[[float, float], float]] = None,
-                 eps_druck: float = 0.0, eps_zug: float = 0.0,
                  suche: Suche = HALBIEREN) -> None:
         self.suche = suche if suche.auch_bei_sprung or not querschnitt.springt else HALBIEREN
         """Wie er sucht -- wo ein Gesetz springt, halbierend, siehe oben. Die
@@ -456,8 +438,6 @@ class Faserloeser:
         self.h = unten - oben
         self.lagen = list(lagen)
         self.betonspannung = beton
-        self.eps_druck = abs(eps_druck)
-        self.eps_zug = abs(eps_zug)
         #: Die inneren Kraefte einer Dehnungsebene -- der Beton ueber Fasern,
         #: der Stahl Lage fuer Lage, siehe :meth:`Faserquerschnitt.kraefte`.
         #: Unmittelbar gebunden statt durch eine Methode gereicht: die
@@ -470,9 +450,7 @@ class Faserloeser:
     def _fenster(self, chi: float) -> Optional[Tuple[float, float]]:
         """
         In welchem Bereich ``eps_m`` liegen darf, damit keine Faser aus dem
-        gueltigen Dehnungsbereich faellt. Bei der Platte: beide Raender
-        zwischen ``-eps_druck`` und ``eps_zug``, siehe
-        :meth:`Dehnungsgrenzen.fenster`.
+        gueltigen Dehnungsbereich faellt -- siehe :meth:`Dehnungsgrenzen.fenster`.
         """
         return self.grenzen.fenster(chi)
 
@@ -588,7 +566,7 @@ class Faserloeser:
             return self.kraefte(eps_m, chi).M
 
         # Groesste Kruemmung je Richtung, bei der ueberhaupt noch ein Fenster
-        # bleibt. Bei der Platte beide (eps_druck + eps_zug) / h.
+        # bleibt (:meth:`Dehnungsgrenzen.kruemmungsgrenze`).
         unten, oben = self._rand(-self.grenzen.kruemmungsgrenze(positiv=False),
                                  N_Ed, moment, M_Ed, nach_oben=False)
         if unten is None:
@@ -760,21 +738,17 @@ class Querschnittsloeser(Faserloeser):
     Knicknachweis mit dem nichtlinearen Gesetz der Norm und Bemessungswerten
     -- siehe :class:`Werkstoffsatz`.
 
-    **Das Suchfenster muss zu den Gesetzen passen.** ``eps_druck`` und
-    ``eps_zug`` duerfen nicht weiter reichen als der Bereich, in dem beide
-    Gesetze monoton sind -- jenseits ihrer Bruchdehnung geben sie null zurueck,
-    und dort findet die Bisektion Scheinloesungen. Ohne ``eps_zug`` reicht das
-    Fenster darum bis zur kleinsten Bruchdehnung der Lagen; ``eps_druck``
-    passt zur Parabel (:class:`~opencivil.querschnitt.werkstoffgesetz.Betongesetz`),
-    wer es weitet, muss das Gesetz mitweiten.
-
-    Ohne ``grenzen`` gelten beide Werte an beiden Raendern. Wer andere
-    Grenzen braucht -- die Spannung-Dehnung-Analyse die des Dehnungsfaechers,
-    mit ``eps_ud`` am Stahl statt am Betonrand --, gibt sie mit. Ein Gesetz,
-    das springt (der Spannungsblock), wird ueber jede Faser gemittelt statt
-    in ihrer Mitte gelesen: sonst springt mit ihm die Normalkraft, und keine
-    Ebene trifft sie genau. Ohne ``verdraengt`` zaehlt der Beton auch dort,
-    wo der Stahl liegt -- so rechnet die Handrechnung.
+    **Das Suchfenster sind die Grenzen der Gesetze** (``grenzen``): jenseits
+    ihrer Bruchdehnung geben sie null zurueck, die Kraft waere nicht mehr
+    monoton, und dort faende die Suche Scheinloesungen. Welche es sind, sagt
+    :meth:`~opencivil.nachweis.rechenwahl.Gesetze.grenzen` -- die des
+    Dehnungsfaechers, ``eps_ud`` am Stahl statt am Betonrand. Bis 2026-10-18
+    galt ohne Grenzen ein Ersatzfenster an beiden Raendern; gebraucht haben es
+    zuletzt nur noch Tests. Ein Gesetz, das springt (der Spannungsblock), wird
+    ueber jede Faser gemittelt statt in ihrer Mitte gelesen: sonst springt mit
+    ihm die Normalkraft, und keine Ebene trifft sie genau. Ohne ``verdraengt``
+    zaehlt der Beton auch dort, wo der Stahl liegt -- so rechnet die
+    Handrechnung.
 
     Welche Gesetze zu welcher Wahl gehoeren, sagt
     :func:`opencivil.nachweis.rechenwahl.gesetze`. ``suche`` wie beim
@@ -790,33 +764,22 @@ class Querschnittsloeser(Faserloeser):
         b: float,
         lagen: Sequence[Stahllage],
         beton: Gesetz,
+        grenzen: Sequence[Dehnungsgrenze],
         stahl: Optional[Callable[[Stahlgesetz], Stahlgesetz]] = None,
         fasern: int = FASERN,
-        eps_druck: float = EPS_DRUCK,
-        eps_zug: Optional[float] = None,
-        grenzen: Optional[Sequence[Dehnungsgrenze]] = None,
         verdraengt: bool = True,
         suche: Suche = HALBIEREN,
     ) -> None:
         lagen = list(lagen)
-        eps_druck = abs(eps_druck)
-        eps_zug = abs(eps_zug if eps_zug is not None else bruchdehnung(lagen))
         stahl = stahl or (lambda s: s)
         querschnitt = plattenfasern(
             h=h, b=b, beton=beton,
             staebe=[(l.a_s, l.z, stahl(l.stahl)) for l in lagen],
             fasern=fasern, verdraengt=verdraengt)
         super().__init__(
-            querschnitt=querschnitt,
-            # Der gueltige Bereich der Gesetze gilt an beiden Raendern -- wenn
-            # niemand andere Grenzen mitgibt.
-            grenzen=Dehnungsgrenzen(grenzen or [
-                Dehnungsgrenze(arm=-h / 2.0, eps_min=-eps_druck, eps_max=eps_zug),
-                Dehnungsgrenze(arm=h / 2.0, eps_min=-eps_druck, eps_max=eps_zug),
-            ]),
+            querschnitt=querschnitt, grenzen=Dehnungsgrenzen(grenzen),
             oben=-h / 2.0, unten=h / 2.0, lagen=lagen,
-            beton=lambda arm, eps: beton(eps), eps_druck=eps_druck, eps_zug=eps_zug,
-            suche=suche)
+            beton=lambda arm, eps: beton(eps), suche=suche)
         self.b = b
         self.beton = beton
         self.fasern = fasern

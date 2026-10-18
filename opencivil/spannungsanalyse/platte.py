@@ -66,9 +66,6 @@ class Loeserpaar:
     wahl: Rechenwahl = Rechenwahl(art=Rechenart.PARABEL)
     """Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart."""
 
-    grenznamen: Tuple[str, ...] = ()
-    """Je Grenze des gerissenen Loesers, was sie ist -- fuer «massgebend»."""
-
     ids: Mapping[str, str] = field(default_factory=dict)
     """Kurzname -> Wert-ID der Eingaben, fuer die Herleitung."""
 
@@ -77,8 +74,7 @@ class Loeserpaar:
 
     def ebenen(self) -> Zustaende:
         """Die Ebenen der Platte: ein Rechteck, die Nulllinie bleibt parallel zur Achse."""
-        return Zustaende(FesteNulllinie(self.gerissen, self.grenznamen),
-                         FesteNulllinie(self.ungerissen, self.grenznamen))
+        return Zustaende(FesteNulllinie(self.gerissen), FesteNulllinie(self.ungerissen))
 
     def rissmoment_bei(self, N: float) -> float:
         """
@@ -221,11 +217,10 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
     h, b = wert(ids["h"]), wert(ids["b"])
     w = Betonkennwerte(f_c=wert(ids["f_c"]), E_cm=wert(ids["E_cm"]),
                        eps_c1d=wert(ids["eps_c1d"]), eps_c2d=wert(ids["eps_c2d"]))
-    g = gesetze(wahl, w)
     # Gesucht wird im Fenster der Gesetze, wie in jedem Loeser der Platte;
-    # seine Grenzen heissen in den Bildern, wo eine massgebend ist.
-    _, namen = g.grenzen(lagen, h)
-    gerissen = g.loeser(h=h, b=b, lagen=lagen, suche=SUCHE_DER_ANALYSEN)
+    # seine Grenzen tragen ihre Namen, und die Bilder nennen damit, welche
+    # massgebend ist.
+    gerissen = gesetze(wahl, w).loeser(h=h, b=b, lagen=lagen, suche=SUCHE_DER_ANALYSEN)
     # Derselbe Querschnitt ungerissen: nur das Betongesetz ist ein anderes.
     ungerissen = gesetze(wahl, w, ungerissen=True).loeser(
         h=h, b=b, lagen=lagen, suche=SUCHE_DER_ANALYSEN)
@@ -236,4 +231,4 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
         M_Riss=rissmoment_rechteck(h=h, b=b, f_ctm=f_ctm).M_Riss,
         k_t_zug=k_t_zug, f_ct_eff_zug=k_t_zug * f_ctm,
         staehle=tuple(staehle(posten)),
-        wahl=wahl, grenznamen=namen, ids=ids, E_cm=w.E_cm)
+        wahl=wahl, ids=ids, E_cm=w.E_cm)

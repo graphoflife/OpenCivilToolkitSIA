@@ -782,7 +782,7 @@ class Knicken(Knickverfahren):
         # mit wenig verschiedenen Schnittgroessen.
         loeser = g.loeser(h=h, b=b, lagen=lagen, suche=ILLINOIS)
 
-        self._protokoll_ansatz(p, e, eps_druck=loeser.eps_druck,
+        self._protokoll_ansatz(p, e, eps_c2d=w.eps_c2d,
                                verdraengt=g.verdraengt, suche=loeser.suche)
         # Schnell rechnet die eigene Linie mit den Schritten der Suche, wie die
         # der Tragsicherheit: sonst zahlte die Bewehrungssuche fuer jede Platte
@@ -819,7 +819,7 @@ class Knicken(Knickverfahren):
 
     # -- Mitschrift ---------------------------------------------------------
 
-    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, *, eps_druck: float,
+    def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, *, eps_c2d: float,
                           verdraengt: bool, suche: Suche) -> None:
         self._protokoll_verfahren(p)
         p.titel("Verformung", ebene=3)
@@ -833,8 +833,7 @@ class Knicken(Knickverfahren):
                           posten=self.posten)
         p.erklaerung(VERFORMUNG_NACH_WAHL)
         p.titel("Wie die Dehnungsebene gefunden wird", ebene=3)
-        protokoll_verfahren(p, eps_druck=eps_druck, verdraengt=verdraengt,
-                            suche=suche)
+        protokoll_verfahren(p, eps_c2d=eps_c2d, verdraengt=verdraengt, suche=suche)
         p.erklaerung(
             "Die Ausmitten-Iteration darüber steht dagegen vollständig da, "
             "Durchlauf für Durchlauf: sie ist das Verfahren selbst, und dass "

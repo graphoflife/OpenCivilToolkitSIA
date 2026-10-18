@@ -1,5 +1,5 @@
 ---
-erzeugt: 8b4faf275c41
+erzeugt: 949601bc9c8f
 art: modul
 tags: [modul]
 ---
@@ -37,7 +37,6 @@ gerechnet wird.
 - `f_ct_eff_zug: float = 0.0` – Fuer die Rissnormalkraft: `k_t` fuer die ganze Dicke und `k_t·f_ctm`.
 - `staehle: Tuple[Any, ...] = ()` – Die Staehle der Lagen, jeder einmal -- fuer die Fliessdehnung in der Herleitung. Fliessen beginnt, wo die erste Lage die Fliessdehnung ihres eigenen Stahls erreicht ([[opencivil.spannungsanalyse.platte#Loeserpaar|Stahlgesetz.eps_yd]] der Lage).
 - `wahl: Rechenwahl = Rechenwahl(art=Rechenart.PARABEL)` – Womit gerechnet wird -- Kriechzahl, Wertesatz, Rechenart.
-- `grenznamen: Tuple[str, ...] = ()` – Je Grenze des gerissenen Loesers, was sie ist -- fuer «massgebend».
 - `ids: Mapping[str, str] = field(default_factory=dict)` – Kurzname -> Wert-ID der Eingaben, fuer die Herleitung.
 - `E_cm: float = 0.0` – Der Modul des Betons -- daran misst sich der aequivalente Modul.
 - `bezugsort = 'auf halber Höhe'` – Wo die Mitteldehnung gilt -- dort greift N an.

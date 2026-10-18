@@ -37,7 +37,7 @@ N_Rd davon ab, wie gesucht wurde -- an der Stuetze des Pruefprojekts
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
-from typing import Callable, Dict, List, Sequence, Tuple
+from typing import Callable, Dict, List, Sequence
 
 from opencivil.core.berechnung import Eingabebezug, Eingaben
 from opencivil.core.latex import angabe
@@ -215,10 +215,9 @@ class Gesetze:
             return lagen_je_seite(lagen, h)
         return list(lagen)
 
-    def grenzen(self, lagen: Sequence[Stahllage],
-                h: float) -> Tuple[List[Dehnungsgrenze], Tuple[str, ...]]:
+    def grenzen(self, lagen: Sequence[Stahllage], h: float) -> List[Dehnungsgrenze]:
         """
-        Wo die Gesetze gelten, als Grenzen der Suche samt ihren Namen -- die
+        Wo die Gesetze gelten, als benannte Grenzen der Suche -- die
         des Dehnungsfaechers (:func:`~opencivil.nachweis.dehnungsfaecher.grenzen`):
         der Beton an den Raendern bis ``-eps_c2d``, im Punkt C bis
         ``-eps_c1d``, jede Lage, mit der gerechnet wird, bis ``±eps_ud`` ihres
@@ -242,11 +241,10 @@ class Gesetze:
         ``suche`` sagt, wie gesucht wird -- das Knicken nimmt
         :data:`~opencivil.core.suche.ILLINOIS`.
         """
-        grenzen, _ = self.grenzen(lagen, h)
         return Querschnittsloeser(
             h=h, b=b, lagen=self.lagen(lagen, h), beton=self.beton,
             stahl=self.stahl, verdraengt=self.verdraengt, suche=suche,
-            grenzen=grenzen, eps_druck=self.kennwerte.eps_c2d)
+            grenzen=self.grenzen(lagen, h))
 
 
 def protokoll_rechenwahl(p: Protokoll, wahl: Rechenwahl, basis: str, *,

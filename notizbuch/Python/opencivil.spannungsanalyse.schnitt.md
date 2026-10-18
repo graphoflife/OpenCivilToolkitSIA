@@ -1,5 +1,5 @@
 ---
-erzeugt: d86bfbb45e9d
+erzeugt: 27be3b88a9ba
 art: modul
 tags: [modul]
 ---
@@ -274,7 +274,6 @@ Herleitung braucht.
 - `ungerissen: Faserloeser`
 - `seite: Zugseite`
 - `wahl: Rechenwahl`
-- `grenznamen: Tuple[str, ...]`
 - `querschnitt: Querschnitt` – Der gerissene Querschnitt im Bruchzustand -- derselbe, aus dem `gerissen` stammt.
 - `zerlegungen: Tuple[_Zerlegung, _Zerlegung]` – Gerissen und ungerissen, in jeder Richtung -- fuer die kippende Nulllinie.
 - `A: float` – Flaeche des Bruttoquerschnitts, m².

@@ -1,5 +1,5 @@
 ---
-erzeugt: 828538af5a20
+erzeugt: c2cc798fc427
 art: modul
 tags: [modul]
 ---
@@ -180,10 +180,10 @@ Die Lagen, mit denen gerechnet wird -- in der Handrechnung je Seite eine.
 #### Gesetze.grenzen
 
 ```python
-def grenzen(self, lagen: Sequence[Stahllage], h: float) -> Tuple[List[Dehnungsgrenze], Tuple[str, ...]]
+def grenzen(self, lagen: Sequence[Stahllage], h: float) -> List[Dehnungsgrenze]
 ```
 
-Wo die Gesetze gelten, als Grenzen der Suche samt ihren Namen -- die
+Wo die Gesetze gelten, als benannte Grenzen der Suche -- die
 des Dehnungsfaechers ([[opencivil.nachweis.dehnungsfaecher#grenzen|grenzen]]):
 der Beton an den Raendern bis `-eps_c2d`, im Punkt C bis
 `-eps_c1d`, jede Lage, mit der gerechnet wird, bis `±eps_ud` ihres

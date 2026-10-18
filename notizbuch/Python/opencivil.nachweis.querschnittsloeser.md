@@ -1,5 +1,5 @@
 ---
-erzeugt: 3de8bbdb8708
+erzeugt: 3954396941b1
 art: modul
 tags: [modul]
 ---
@@ -126,18 +126,6 @@ Staehle auf einer Seite liessen sich nicht zu einer Lage machen -- die
 Platte hat sie nicht, je Seite und Richtung liegt eine Lage, und Grund-
 und Zulage teilen ihren Stahl.
 
-### bruchdehnung
-
-```python
-def bruchdehnung(lagen: Sequence[Stahllage]) -> float
-```
-
-Wie weit das Suchfenster im Zug reicht: bis zur kleinsten Bruchdehnung
-der Lagen. Jenseits davon gaebe das Gesetz dieser Lage null zurueck, und
-die Bisektion faende Scheinloesungen. Bei einer Sorte ist es ihr
-`eps_ud`; bei zweien die kleinere -- das Fenster gilt an beiden
-Raendern. Ohne Lage gilt [[opencivil.nachweis.querschnittsloeser#Konstanten|EPS_ZUG]].
-
 ### Ebene
 
 ```python
@@ -184,7 +172,7 @@ Die Zeile zu [[opencivil.querschnitt.gesetzwahl#wirksamer_modul|wirksamer_modul]
 ### protokoll_verfahren
 
 ```python
-def protokoll_verfahren(p, *, eps_druck: float, suche: Suche, fasern: int=FASERN, verdraengt: bool=True) -> None
+def protokoll_verfahren(p, *, eps_c2d: float, suche: Suche, fasern: int=FASERN, verdraengt: bool=True) -> None
 ```
 
 Der Ablauf der Suche, in die Mitschrift geschrieben.
@@ -262,9 +250,11 @@ Suche nicht. Dazu, was Bilder und Linien vom Querschnitt wissen muessen:
 die Arme der Raender `oben` und `unten` -- oben ist gedrueckt, wenn
 ein positives Moment wirkt --, die Lagen mit ihrem Stahl, eine je Stab
 der Fasern, und die Spannung des Betons an einer Stelle
-(`beton(arm, eps)`). `eps_druck` und `eps_zug` sind die
-aeussersten Dehnungen, fuer die die Gesetze gelten. Wer nur sucht -- ein
-Nachweis, der die Ebene zu einem Lastfall braucht --, laesst sie weg.
+(`beton(arm, eps)`). Wo die Gesetze gelten, sagen allein die Grenzen,
+jede mit ihrem Namen: bis 2026-10-18 trug der Loeser dazu `eps_druck`
+und `eps_zug`, ein zweites, groberes Fenster an beiden Raendern, und das
+Bild aus Randdehnungen meldete danach Ebenen als ungueltig, die es nicht
+waren.
 
 Eine Lage liegt in der Tiefe `z` unter dem oberen Rand; ihr Arm ist
 `z + oben`.
@@ -301,9 +291,7 @@ def _fenster(self, chi: float) -> Optional[Tuple[float, float]]
 ```
 
 In welchem Bereich `eps_m` liegen darf, damit keine Faser aus dem
-gueltigen Dehnungsbereich faellt. Bei der Platte: beide Raender
-zwischen `-eps_druck` und `eps_zug`, siehe
-[[opencivil.querschnitt.fasern#Dehnungsgrenzen.fenster|Dehnungsgrenzen.fenster]].
+gueltigen Dehnungsbereich faellt -- siehe [[opencivil.querschnitt.fasern#Dehnungsgrenzen.fenster|Dehnungsgrenzen.fenster]].
 
 #### Faserloeser._eps_zu_normalkraft
 
@@ -468,21 +456,17 @@ elastisch mit Kriechen und charakteristischen Festigkeiten, der
 Knicknachweis mit dem nichtlinearen Gesetz der Norm und Bemessungswerten
 -- siehe [[opencivil.nachweis.querschnittsloeser#Querschnittsloeser|Werkstoffsatz]].
 
-**Das Suchfenster muss zu den Gesetzen passen.** `eps_druck` und
-`eps_zug` duerfen nicht weiter reichen als der Bereich, in dem beide
-Gesetze monoton sind -- jenseits ihrer Bruchdehnung geben sie null zurueck,
-und dort findet die Bisektion Scheinloesungen. Ohne `eps_zug` reicht das
-Fenster darum bis zur kleinsten Bruchdehnung der Lagen; `eps_druck`
-passt zur Parabel ([[opencivil.querschnitt.werkstoffgesetz#Betongesetz|Betongesetz]]),
-wer es weitet, muss das Gesetz mitweiten.
-
-Ohne `grenzen` gelten beide Werte an beiden Raendern. Wer andere
-Grenzen braucht -- die Spannung-Dehnung-Analyse die des Dehnungsfaechers,
-mit `eps_ud` am Stahl statt am Betonrand --, gibt sie mit. Ein Gesetz,
-das springt (der Spannungsblock), wird ueber jede Faser gemittelt statt
-in ihrer Mitte gelesen: sonst springt mit ihm die Normalkraft, und keine
-Ebene trifft sie genau. Ohne `verdraengt` zaehlt der Beton auch dort,
-wo der Stahl liegt -- so rechnet die Handrechnung.
+**Das Suchfenster sind die Grenzen der Gesetze** (`grenzen`): jenseits
+ihrer Bruchdehnung geben sie null zurueck, die Kraft waere nicht mehr
+monoton, und dort faende die Suche Scheinloesungen. Welche es sind, sagt
+[[opencivil.nachweis.rechenwahl#Gesetze.grenzen|grenzen]] -- die des
+Dehnungsfaechers, `eps_ud` am Stahl statt am Betonrand. Bis 2026-10-18
+galt ohne Grenzen ein Ersatzfenster an beiden Raendern; gebraucht haben es
+zuletzt nur noch Tests. Ein Gesetz, das springt (der Spannungsblock), wird
+ueber jede Faser gemittelt statt in ihrer Mitte gelesen: sonst springt mit
+ihm die Normalkraft, und keine Ebene trifft sie genau. Ohne `verdraengt`
+zaehlt der Beton auch dort, wo der Stahl liegt -- so rechnet die
+Handrechnung.
 
 Welche Gesetze zu welcher Wahl gehoeren, sagt
 [[opencivil.nachweis.rechenwahl#gesetze|opencivil.nachweis.rechenwahl.gesetze]]. `suche` wie beim
@@ -497,8 +481,6 @@ Rechenzeit.
 - `EPS_SCHRANKE = 1e-11` – Wann das Dehnungsfenster eng genug ist. Der Startbereich ist rund 0.05 breit; 1e-11 ist ein Zehntausendstel eines Promille und liegt weit unter allem, was eine Eingabe hergibt. Ohne diese Schranke lief die Bisektion stur sechzig Mal -- die letzten zehn Durchlaeufe aendern in doppelter Genauigkeit nichts mehr und kosten doch jedesmal einen Faserdurchgang.
 - `CHI_SCHRANKE = 1e-10` – Dasselbe fuer die Kruemmung, in 1/m.
 - `PROBE_SCHRANKE = 1e-06` – Wie genau die gefundene Ebene ihre Schnittgroessen treffen muss -- als Teil der Druckkraft des ganzen Querschnitts bei seiner Grenzstauchung, beim Moment mal seiner Hoehe ([[opencivil.nachweis.querschnittsloeser#probenschranken|probenschranken]]). Die Suchen treffen weit genauer: in den beiden Pruefprojekten bleiben 1684 Ebenen unter 0.4 % der Schranke (2026-10-15). Eine Ebene, die an einem Sprung des Spannungsblocks haengen bleibt, liegt um Hunderte Kilonewton daneben.
-- `EPS_DRUCK = 0.003` – Aeusserste Dehnungen, innerhalb derer gesucht wird -- Stauchung und Dehnung. **Der Suchbereich muss im gueltigen Bereich beider Gesetze bleiben:** jenseits der Bruchdehnung geben sie null zurueck, und damit waere `N(eps_m)` nicht mehr monoton. Genau daran scheiterte die erste Fassung -- die Bisektion sah bei -0.5 dieselbe Normalkraft wie bei 0.
-- `EPS_ZUG = 0.045`
 - `VERFEHLTE_EBENE = 'Erzeugt die gefundene Ebene die Einwirkung nicht, gibt es zu ihr kei…` – Was die Mitschrift ueber eine verfehlte Ebene sagt ([[opencivil.nachweis.querschnittsloeser#Ebene|Ebene.verfehlt]]) -- bei der Platte wie am gezeichneten Querschnitt.
 
 ## Braucht

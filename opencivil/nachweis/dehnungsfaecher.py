@@ -148,9 +148,9 @@ def faecher(
 def grenzen(
     h: float, staebe: Sequence[Tuple[float, float, str]], *,
     eps_c1d: float, eps_c2d: float,
-) -> Tuple[List[Dehnungsgrenze], Tuple[str, ...]]:
+) -> List[Dehnungsgrenze]:
     """
-    Dieselben Grenzen als Bedingungen an einzelne Stellen, samt Namen.
+    Dieselben Grenzen als Bedingungen an einzelne Stellen, jede mit ihrem Namen.
 
     ``staebe`` sind ``(z, eps_ud, Name)`` je Lage. Der Beton an beiden
     Raendern bis ``-eps_c2d``; im Punkt C, im Abstand
@@ -162,11 +162,12 @@ def grenzen(
     """
     halb = h / 2.0
     z_c = h * anteil_punkt_c(eps_c1d, eps_c2d)
-    paare = [
-        (Dehnungsgrenze(arm=-halb, eps_min=-eps_c2d, eps_max=math.inf), "Beton am oberen Rand"),
-        (Dehnungsgrenze(arm=halb, eps_min=-eps_c2d, eps_max=math.inf), "Beton am unteren Rand"),
-        (Dehnungsgrenze(arm=z_c - halb, eps_min=-eps_c1d, eps_max=math.inf), "Beton im Punkt C"),
-        (Dehnungsgrenze(arm=halb - z_c, eps_min=-eps_c1d, eps_max=math.inf), "Beton im Punkt C"),
-    ] + [(Dehnungsgrenze(arm=z - halb, eps_min=-eps_ud, eps_max=eps_ud), name)
+    return [
+        Dehnungsgrenze(arm=-halb, eps_min=-eps_c2d, eps_max=math.inf, name="Beton am oberen Rand"),
+        Dehnungsgrenze(arm=halb, eps_min=-eps_c2d, eps_max=math.inf, name="Beton am unteren Rand"),
+        Dehnungsgrenze(arm=z_c - halb, eps_min=-eps_c1d, eps_max=math.inf,
+                       name="Beton im Punkt C"),
+        Dehnungsgrenze(arm=halb - z_c, eps_min=-eps_c1d, eps_max=math.inf,
+                       name="Beton im Punkt C"),
+    ] + [Dehnungsgrenze(arm=z - halb, eps_min=-eps_ud, eps_max=eps_ud, name=name)
          for z, eps_ud, name in staebe]
-    return [g for g, _ in paare], tuple(n for _, n in paare)
