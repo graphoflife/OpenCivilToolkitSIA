@@ -44,6 +44,30 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-18 · Durchsicht der Phasen 4 und 5: Regeln, die zweimal standen
+
+Vier Durchsichten über die Arbeit seit 300d19a (Wiederverwendung,
+Vereinfachung, Effizienz, Wurzel). Behoben, je ein Commit, alle Zahlen beider
+Prüfprojekte bis aufs letzte Bit gleich:
+
+- Die Analyse rechnete N_Ed, M_Ed und die Randdehnungen mit eigenen Faktoren
+  um, obwohl die Felder ihre Einheit tragen; jetzt `fall.si(feld)`.
+- A_s, Schwerpunkt und d einer Lage rechneten drei Nachweise je für sich;
+  jetzt `lage_aus_posten` und `statische_hoehe` neben `protokoll_lage`.
+- Die Gebrauchsebene nannte ihre Suche für die Mitschrift ein zweites Mal;
+  jetzt liest die Mitschrift sie vom Löser.
+- Kleine Doppel: Erfüllungsgrade je Seite, τ_cd und die Lagen der Querkraft,
+  die Einheit der Kennzahlentabelle, ungelesene Wahllisten im Katalog.
+- Die Fallzeile nimmt den Fall statt vier Angaben aus ihm.
+
+Dabei gefunden, ein Fehler aus 2b56a9c: Kam anderswo ein Material dazu,
+wartete die Werkstoffwahl der Zeichnung auf eine Antwort, die nie kam. Jetzt
+fragt `passendeGeometrie` selbst, wenn die Antwort nicht mehr passt.
+
+Was liegen blieb, steht im [[TODO]].
+
+---
+
 ## 2026-10-18 · Ein Klick in ein Feld markiert seinen Inhalt
 
 Wunsch des Benutzers: wer in ein Text- oder Zahlenfeld klickt, soll gleich

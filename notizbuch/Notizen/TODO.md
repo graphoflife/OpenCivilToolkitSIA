@@ -67,6 +67,56 @@ gelernt wurde, steht in [[Entwicklung]].
       (`bs_symbole.js`, die verbundene Zeichnung in `cad_modell.js`) --
       geprüft von Hand im Browser.
 
+## Umbau: liegen geblieben bei der Durchsicht vom 2026-10-18
+
+Vier Durchsichten (Wiederverwendung, Vereinfachung, Effizienz, Wurzel) über
+die Phasen 4 und 5; was sich ohne Umbau ausserhalb dieser Arbeit beheben
+liess, ist behoben (siehe [[Entwicklung]]). Liegen blieb:
+
+- [ ] **Jede Rechnung rechnet alle Spannung-Dehnung-Analysen neu**, auch die
+      unveränderter Bauteile (`loesung_dict` in `web/api.py`, seit 227757e);
+      die Nachweise kommen dagegen aus dem `SPEICHER`. Am Prüfprojekt
+      (CPython) dauert eine Rechnung nach einer Änderung an einer Platte ohne
+      Analyse 2,37 s, davon 2,30 s für die unveränderten Analysen; ohne sie
+      0,03 s. In Pyodide entsprechend länger. Besser: die Zeichendaten der
+      Analysen je Bauteil unter demselben Abdruck aufbewahren wie die
+      Nachweise.
+- [ ] **Das Suchfenster des Lösers steht zweimal:** als Grenzen und als
+      `eps_druck`/`eps_zug`, die Namen der Grenzen reisen als eigenes Tupel.
+      Die Mitschrift und das Querschnittsbild lesen die beiden Zahlen, die
+      Suche die Grenzen -- und sie widersprechen sich schon: eine Analyse aus
+      Randdehnungen mit ε oben = −1 ‰ und ε unten = 48 ‰ meldet «ausserhalb
+      dessen, wofür die Werkstoffgesetze gelten (−3.5 ‰ bis +45.0 ‰)», obwohl
+      jeder Stab höchstens 39.7 ‰ hat. Besser: benannte Grenzen, und
+      `aus_dehnungen` prüft gegen das Fenster des Lösers. Dazu fällt das
+      Ersatzfenster des `Querschnittsloeser` weg, das nur noch Tests nutzen.
+- [ ] **Einheiten der Platte beim Bauen ein zweites Mal:** `Groesse(eintrag.h,
+      MM)` und Co. für h, b, Überdeckungen, D_max, Einlagenhöhe, w, L und die
+      Knicklängen, obwohl die Felder ihre Einheit tragen. Besser
+      `eintrag.si(…)` wie die Analyse. Die Masken von Verformung und Knicken
+      schreiben ihre Einheiten und `min: 0` noch selbst; der Katalog hätte
+      sie (`feldangaben(VerformungsfallEintrag)`, `KnickEintrag`).
+- [ ] **Der Rand des Gleichgewichts wird viermal von Hand halbiert**
+      (`linie._grenze`, N_Rd beim Knicken, `gebrauchsebene._rand`,
+      `Faserloeser._rand`), mit vier Abbruchregeln; `core/suche.py` kennt
+      diese Suchform nicht. `Knickergebnis.halbierungen` wird geschrieben,
+      aber nie gelesen.
+- [ ] **Teilung oder Stabzahl** steht als `art`/`abstand`/`anzahl` und als
+      `art_y`/`abstand_y`/`anzahl_y` da; die Rechenobjekte wandeln es zurück
+      in «eine Zahl ist None». Besser ein gemeinsamer Eintrag für beide.
+- [ ] **Die Grössen einer Linie** (Zeichen, Einheit, Stellen) stehen in den
+      Diagrammdaten (`_LINIENGROESSEN`) und in der Herleitung je für sich;
+      das JS zerlegt die Zeichen mit einem regulären Ausdruck (`mitIndex`).
+- [ ] **Material in der Oberfläche:** «Name oder Sorte» steht 14-mal im JS,
+      im Kern als `anzeigename`; `materialwahl` ist privat in
+      `qa_zeichnung.js`, die Platte baut ihre Auswahl selbst; «Beton» und
+      «Betonstahl» stehen in drei JS-Tabellen neben `Baustoffart.beschriftung`.
+- [ ] **Kleineres:** Welche Seite x-Bewehrung hat, fragen Kennzahlen,
+      Verformung und Querkraft je für sich · `Aufbau.kennzahlen` lesen nur
+      noch Tests · `protokoll_mit_buegeln` nimmt `seite` als Text an und
+      bekommt eine Zugseite · zwei kleine Einsparungen im Löser (−4 % der
+      Faserdurchläufe, Zeit im Rauschen) sind nicht gemacht.
+
 ## Umbau: Befunde der Durchsicht vom 2026-10-16
 
 Sechs Durchsichten über die Arbeit vom 15. und 16. Oktober (42 Commits);
