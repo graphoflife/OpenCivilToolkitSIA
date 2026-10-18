@@ -3451,7 +3451,6 @@
       "art": "modul",
       "kurz": "die Durchbiegung der Platte.",
       "stichworte": [
-        "gegenseite",
         "Verformungsfall",
         "Verformungsfall.kennung",
         "Fallergebnis",
@@ -4141,6 +4140,7 @@
         "Bewehrungsposten.menge_text",
         "Bewehrungslage",
         "Bewehrungslage.von_unten",
+        "Bewehrungslage.seite",
         "Bewehrungslage.stapelrang",
         "Bewehrungslage.vorhanden",
         "Bewehrungslage.groesster_durchmesser",
@@ -4285,7 +4285,12 @@
         "Zugseite.psi",
         "Zugseite.moment",
         "Zugseite.um_y",
-        "Zugseite.raender"
+        "Zugseite.raender",
+        "Zugseite.gegen",
+        "Zugseite.positiv",
+        "Zugseite.zeichen",
+        "Zugseite.marke",
+        "Zugseite.aus_moment"
       ]
     },
     {

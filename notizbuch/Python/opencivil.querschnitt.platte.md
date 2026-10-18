@@ -1,5 +1,5 @@
 ---
-erzeugt: 5bca803bbfc6
+erzeugt: 62ae331addc4
 art: modul
 tags: [modul]
 ---
@@ -166,6 +166,15 @@ def von_unten(self) -> bool
 ```
 
 Lagen 1 und 2 werden von der Unterkante aus gestapelt.
+
+#### Bewehrungslage.seite
+
+```python
+@property
+def seite(self) -> Zugseite
+```
+
+Die Seite, an der sie liegt -- und die ein Moment ziehen muss, damit sie traegt.
 
 #### Bewehrungslage.stapelrang
 
@@ -334,7 +343,7 @@ Schwerpunkt vom Himmel. Ohne `z` nur der Querschnitt. Zurueck kommen
 ### protokoll_statische_hoehe
 
 ```python
-def protokoll_statische_hoehe(p: Protokoll, d: Wert, *, h: Wert, z: Wert, von_unten: bool) -> None
+def protokoll_statische_hoehe(p: Protokoll, d: Wert, *, h: Wert, z: Wert, seite: Zugseite) -> None
 ```
 
 Die statische Hoehe einer gezogenen Lage, gemessen ab dem gedrueckten Rand.
@@ -533,6 +542,7 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
+- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 

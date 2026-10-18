@@ -51,6 +51,7 @@ from opencivil.core.wert import Wert
 from opencivil.material.basis import mit_index
 from opencivil.querschnitt.gesetzwahl import Werkstoffsatz
 from opencivil.querschnitt.platte import protokoll_statische_hoehe
+from opencivil.querschnitt.zugseite import Zugseite
 # Der Anteil des Spannungsblocks steht beim Gesetz; hier wird er nur benutzt.
 from opencivil.querschnitt.werkstoffgesetz import BLOCKANTEIL
 
@@ -224,8 +225,8 @@ class Handrechnung:
         # Reihenfolge so, dass ein geschlossenes Polygon entsteht: vom reinen
         # Druck ueber die positive Seite zur Zugspitze und ueber die negative
         # Seite zurueck.
-        rechts = self._seite(p, positiv=True)
-        links = self._seite(p, positiv=False)
+        rechts = self._seite(p, Zugseite.UNTEN)
+        links = self._seite(p, Zugseite.OBEN)
 
         # Innerhalb einer Seite nach der Normalkraft geordnet -- hinauf zum Zug,
         # wieder hinunter zum Druck.
@@ -373,40 +374,38 @@ class Handrechnung:
         )
         return Eckpunkt("zug", f"N_{{{self.R}}}^{{+}}", "grösste Zugkraft", N, M)
 
-    def _seite(self, p: Protokoll, *, positiv: bool) -> List[Eckpunkt]:
-        """Die beiden Punkte eines Momentenvorzeichens."""
-        zug, gegen = (self.unten, self.oben) if positiv else (self.oben, self.unten)
-        vz = 1.0 if positiv else -1.0
-        marke = "pos" if positiv else "neg"
+    def _seite(self, p: Protokoll, seite: Zugseite) -> List[Eckpunkt]:
+        """Die beiden Punkte eines Momentenvorzeichens -- des Moments, das ``seite`` zieht."""
+        unten = seite is Zugseite.UNTEN
+        zug = self.unten if unten else self.oben
+        marke = seite.marke
 
-        p.titel(
-            "Positives Moment (Zug unten)" if positiv
-            else "Negatives Moment (Zug oben)", ebene=3)
+        p.titel(f"{'Positives' if seite.positiv else 'Negatives'} Moment "
+                f"({seite.beschriftung})", ebene=3)
         # d wird ab der gedrueckten Randfaser gemessen -- die wechselt mit dem
         # Vorzeichen des Moments die Seite.
         d = self.werte.laenge(f"d_{marke}", zug.symbol_d,
-                              zug.z if positiv else self.h - zug.z)
+                              zug.z if unten else self.h - zug.z)
         if zug.a_s > 0.0:
             protokoll_statische_hoehe(
                 p, d, h=self.werte.laenge("h", "h", self.h),
-                z=self.werte.laenge(f"z_{marke}", zug.symbol_z, zug.z), von_unten=positiv)
+                z=self.werte.laenge(f"z_{marke}", zug.symbol_z, zug.z), seite=seite)
 
-        punkte = [self._bei_n_null(p, zug, d, vz, marke)]
-        halb = self._halbe_hoehe(p, zug, d, vz, marke)
+        punkte = [self._bei_n_null(p, zug, d, seite)]
+        halb = self._halbe_hoehe(p, zug, d, seite)
         if halb is not None:
             punkte.append(halb)
         return punkte
 
-    def _bei_n_null(self, p: Protokoll, zug: Lage, d: Wert,
-                    vz: float, marke: str) -> Eckpunkt:
+    def _bei_n_null(self, p: Protokoll, zug: Lage, d: Wert, seite: Zugseite) -> Eckpunkt:
         """Reine Biegung: die Druckkraft im Beton haelt der Zugkraft die Waage."""
         x = zug.a_s * zug.f_yd / (BLOCKANTEIL * self.b * self.f_cd)
         M = zug.a_s * zug.f_yd * (d.groesse.si - BLOCKANTEIL * x / 2.0)
 
-        hoch = "+" if vz > 0 else "-"
+        vz, hoch, marke = (1.0 if seite.positiv else -1.0), seite.zeichen, seite.marke
         # Bei negativem Moment traegt die Formel selbst das Minus. Sonst stuende
         # eine Gleichung da, deren rechte Seite nicht ihr eigenes Ergebnis ist.
-        minus = "" if vz > 0 else "-"
+        minus = "" if seite.positiv else "-"
 
         w_x = self.werte.laenge(f"x_{marke}", f"x^{{{hoch}}}", x, "Höhe der Druckzone")
         eingaben = {
@@ -433,7 +432,7 @@ class Handrechnung:
                         f"M_{self.R}(N_Ed=0) {hoch}", 0.0, vz * M, x=w_x, d=d)
 
     def _halbe_hoehe(self, p: Protokoll, zug: Lage, w_d: Wert,
-                     vz: float, marke: str) -> Optional[Eckpunkt]:
+                     seite: Zugseite) -> Optional[Eckpunkt]:
         """
         Der Punkt mit der Nulllinie auf halber Hoehe: ``x = h/2``.
 
@@ -472,8 +471,8 @@ class Handrechnung:
         N = -D + zug.a_s * sigma
         M = D * (self.h / 2 - block / 2) + zug.a_s * sigma * (d - self.h / 2)
 
-        hoch = "+" if vz > 0 else "-"
-        minus = "" if vz > 0 else "-"
+        vz, hoch, marke = (1.0 if seite.positiv else -1.0), seite.zeichen, seite.marke
+        minus = "" if seite.positiv else "-"
 
         w_x = self.werte.laenge(f"xh_{marke}", f"x^{{{hoch}}}", x, "Druckzonenhöhe")
         p.formel(

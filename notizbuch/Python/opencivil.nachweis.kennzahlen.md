@@ -1,5 +1,5 @@
 ---
-erzeugt: 86099bbaf702
+erzeugt: c8798a22894e
 art: modul
 tags: [modul]
 ---
@@ -80,7 +80,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
 #### Plattenkennzahlen._handrechnung
 
 ```python
-def _handrechnung(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte, ergebnis: Dict[str, Groesse]) -> Dict[bool, float]
+def _handrechnung(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte, ergebnis: Dict[str, Groesse]) -> Dict[Zugseite, float]
 ```
 
 M_Rd und x/d bei N = 0, N_Rd bei M = 0 -- aus der Linie der Handrechnung.
@@ -102,7 +102,7 @@ trifft sie (bei einseitiger Bewehrung als Eckpunkt,
 #### Plattenkennzahlen._hoehen
 
 ```python
-def _hoehen(self, e: Eingaben, werte: Zwischenwerte, p: Protokoll, beiwerte: Kurvenbeiwerte, positiv: bool, hoch: str, *, wirksam: bool) -> Optional[Tuple[Wert, Optional[Wert]]]
+def _hoehen(self, e: Eingaben, werte: Zwischenwerte, p: Protokoll, beiwerte: Kurvenbeiwerte, seite: Zugseite, *, wirksam: bool) -> Optional[Tuple[Wert, Optional[Wert]]]
 ```
 
 `d` der gezogenen Seite und, ohne Buegel (`wirksam`), `d_v` --
@@ -121,7 +121,6 @@ Eine hat die Platte immer: ohne x-Bewehrung gibt es keine Kennzahlen.
 ## Konstanten
 
 - `WAHL = Rechenwahl()` – Womit die Kennzahlen rechnen: die Handrechnung mit Bemessungswerten.
-- `SEITEN = ((True, 'unten', '+'), (False, 'oben', '-'))` – Die beiden Seiten: ob der Zug unten liegt, wie sie heisst, ihr Zeichen.
 - `HAND = 'Handrechnung mit Bemessungswerten'` – Woher die Eckwerte stammen -- ihre Erklaerung unter der Platte.
 
 ## Braucht
@@ -137,6 +136,7 @@ Eine hat die Platte immer: ohne x-Bewehrung gibt es keine Kennzahlen.
 - [[opencivil.querschnitt.fachwerk]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
+- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 

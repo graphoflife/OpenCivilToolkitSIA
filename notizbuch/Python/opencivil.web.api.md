@@ -1,5 +1,5 @@
 ---
-erzeugt: 7d800f0654aa
+erzeugt: 21a3b2d816fb
 art: modul
 tags: [modul]
 ---
@@ -137,7 +137,6 @@ Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks.
 - [[opencivil.nachweis.duktilitaet]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.rissanforderung]]
-- [[opencivil.nachweis.verformung]]
 - [[opencivil.projekt]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]

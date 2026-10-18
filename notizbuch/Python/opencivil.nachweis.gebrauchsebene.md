@@ -1,5 +1,5 @@
 ---
-erzeugt: ac71ef15b1af
+erzeugt: 6faf75c120f3
 art: modul
 tags: [modul]
 ---
@@ -167,6 +167,7 @@ Die gefundene Ebene und ihre Probe.
 - [[opencivil.core.suche]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.querschnitt.interaktion]]
+- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 

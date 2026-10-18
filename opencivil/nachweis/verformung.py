@@ -51,6 +51,7 @@ from opencivil.core.latex import als_text, angabe, bedingung
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Kennzahl, Wert, WertDef, kennung_aus
 from opencivil.querschnitt.platte import Richtung, protokoll_lage
+from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 
 #: Vorgabe der Kriechzahl phi im Vergroesserungsfaktor -- Klima und
 #: Belastungsalter, eine Annahme ueber das Bauwerk.
@@ -60,18 +61,11 @@ KRIECHZAHL = 2.0
 #: nachgeschlagen.
 GRENZE = 350.0
 
-#: Die Seiten, die ein Verformungsfall ziehen kann: unten im Feld, oben am
-#: Kragarm oder ueber der Stuetze.
-ZUGSEITEN = ("unten", "oben")
-
-
 #: Wie der Faktor einer Seite heisst: omega_w fuer Zug unten, omega_w' fuer
-#: Zug oben (Benutzer, 2026-10-16).
-SYMBOL = {"unten": r"\omega_w", "oben": r"\omega_w'"}
-
-
-def gegenseite(seite: str) -> str:
-    return "oben" if seite == "unten" else "unten"
+#: Zug oben (Benutzer, 2026-10-16). Ziehen kann ein Fall die Seiten der
+#: Platte, :data:`~opencivil.querschnitt.zugseite.UM_Y`: unten im Feld, oben
+#: am Kragarm oder ueber der Stuetze.
+SYMBOL = {Zugseite.UNTEN: r"\omega_w", Zugseite.OBEN: r"\omega_w'"}
 
 
 @dataclass(frozen=True)
@@ -85,7 +79,7 @@ class Verformungsfall:
     laenge: Groesse
     """Die Spannweite L."""
 
-    zugseite: str = "unten"
+    zugseite: Zugseite = Zugseite.UNTEN
     """Welche Seite der Fall zieht -- danach richten sich rho und rho'."""
 
     @property
@@ -120,17 +114,16 @@ class Vergroesserungsfaktor(Prozedur):
         posten = querschnitt.posten_in_richtung(Richtung.X)
         #: Je Seite ihre x-Posten: eine Lage, mit Grundbewehrung und Zulage --
         #: die x-Lage unten ist die 1. oder 2., die oben die 3. oder 4.
-        self.posten_je_seite: Dict[str, List[Tuple]] = {
-            seite: [eintrag for eintrag in posten
-                    if eintrag[0].von_unten is (seite == "unten")]
-            for seite in ZUGSEITEN}
+        self.posten_je_seite: Dict[Zugseite, List[Tuple]] = {
+            seite: [eintrag for eintrag in posten if eintrag[0].seite is seite]
+            for seite in UM_Y}
         basis = f"{querschnitt.id}.vergroesserung"
-        self.d_omega: Dict[str, WertDef] = {
+        self.d_omega: Dict[Zugseite, WertDef] = {
             seite: WertDef(
                 id=f"{basis}.omega_w_{seite}", symbol=SYMBOL[seite], einheit=EINHEITSLOS,
                 beschreibung=f"Vergrösserungsfaktor der Durchbiegung, Zug {seite}",
                 referenz="SIA 262:2025, 4.4.3.2.5", stellen=2)
-            for seite in ZUGSEITEN if self.posten_je_seite[seite]}
+            for seite in UM_Y if self.posten_je_seite[seite]}
         #: Je Seite mit x-Bewehrung ihr Faktor, mit allen Stellen.
         self.kennzahlen: List[Kennzahl] = [
             Kennzahl(definition, f"Vergrösserungsfaktor, Zug {seite}", definition.referenz,
@@ -180,8 +173,8 @@ class Vergroesserungsfaktor(Prozedur):
         ergebnis: Dict[str, Groesse] = {}
         for seite, definition in self.d_omega.items():
             rho, d = gehalte[seite]
-            gegen = gehalte.get(gegenseite(seite))
-            k = gegenseite(seite)[0]
+            gegen = gehalte.get(seite.gegen)
+            k = seite.gegen.value[0]
             rho_s = gegen[0] if gegen else werte.zahl(f"rho_{k}", rf"\rho_{{{k}}}", 0.0,
                                                       stellen=5)
             zahl = ((1.0 - 20.0 * rho_s.groesse.si) / (10.0 * rho.groesse.si ** 0.7)
@@ -199,7 +192,7 @@ class Vergroesserungsfaktor(Prozedur):
         return ergebnis
 
     def _bewehrungsgehalte(self, p: Protokoll, e: Eingaben,
-                           werte: Zwischenwerte) -> Dict[str, Tuple[Wert, Wert]]:
+                           werte: Zwischenwerte) -> Dict[Zugseite, Tuple[Wert, Wert]]:
         """
         Je Seite mit x-Bewehrung der Bewehrungsgehalt und seine statische
         Hoehe -- die gezogene Seite braucht beide, die Gegenseite ihren
@@ -209,7 +202,7 @@ class Vergroesserungsfaktor(Prozedur):
         d_{2,x}. Bis 2026-10-18 hiess sie hier d_u.
         """
         h, b = e.g("h").si, e["b"]
-        gehalte: Dict[str, Tuple[Wert, Wert]] = {}
+        gehalte: Dict[Zugseite, Tuple[Wert, Wert]] = {}
         for seite, eintraege in self.posten_je_seite.items():
             if not eintraege:
                 continue
@@ -218,8 +211,8 @@ class Vergroesserungsfaktor(Prozedur):
             a_s = sum(a for a, _ in flaechen)
             z = sum(a * t for a, t in flaechen) / a_s
             A, d = protokoll_lage(p, e, Zwischenwerte(f"{self.id}.{seite}"), eintraege,
-                                  a_s=a_s, z=z, d=z if seite == "unten" else h - z)
-            k = seite[0]
+                                  a_s=a_s, z=z, d=z if seite is Zugseite.UNTEN else h - z)
+            k = seite.value[0]
             r = werte.zahl(f"rho_{k}", rf"\rho_{{{k}}}", a_s / (b.groesse.si * d.groesse.si),
                            stellen=5)
             p.formel(r, r"\frac{@A}{@b \cdot @d}", {"A": A, "b": b, "d": d},
@@ -245,7 +238,7 @@ class Verformung(Nachweis):
         self.richtung = Richtung.X
         self.faelle = list(faelle)
         #: Die Faktoren der Seiten, die ein Fall zieht -- soweit es sie gibt.
-        self.seiten = [seite for seite in ZUGSEITEN if seite in faktor.d_omega
+        self.seiten = [seite for seite in UM_Y if seite in faktor.d_omega
                        and any(f.zugseite == seite for f in self.faelle)]
 
         basis = f"{querschnitt.id}.nachweis.verformung"

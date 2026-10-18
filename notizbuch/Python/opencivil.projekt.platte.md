@@ -1,5 +1,5 @@
 ---
-erzeugt: d7f8b460448d
+erzeugt: 36ee47d33057
 art: modul
 tags: [modul]
 ---
@@ -148,7 +148,7 @@ Ein Knicknachweis -- N_Ed in kN (Druck negativ), Laengen in m.
 #### QuerschnittEintrag.verformungsfall
 
 ```python
-def verformungsfall(self, name: str, *, w: float, laenge: float, zugseite: str='unten') -> VerformungsfallEintrag
+def verformungsfall(self, name: str, *, w: float, laenge: float, zugseite: Zugseite=Zugseite.UNTEN) -> VerformungsfallEintrag
 ```
 
 Ein Verformungsfall -- w in mm, mit E_cm ermittelt; die Spannweite in m.
@@ -191,6 +191,7 @@ den Vorgabewerten der Felder.
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.querschnitt.platte]]
+- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 

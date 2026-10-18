@@ -38,7 +38,6 @@ from opencivil.material.betonstahl import STAHLSORTEN, STAHL_VORLAGEN, stahlsort
 from opencivil.nachweis.biegung_normalkraft import Erfuellungsart
 from opencivil.nachweis.duktilitaet import HOECHSTENS as DUKTILITAET_HOECHSTENS
 from opencivil.nachweis.rissanforderung import Rissanforderung
-from opencivil.nachweis.verformung import ZUGSEITEN as VERFORMUNG_ZUGSEITEN
 from opencivil.projekt import (
     Aufbau, GebrauchsfallEintrag, GrundbruchEintrag,
     GrundbruchkombinationEintrag, KnickEintrag, KombinationEintrag, MaterialEintrag,
@@ -53,7 +52,7 @@ from opencivil.projekt.querschnittsanalyse import (
     SchubwandEintrag, StabEintrag, StablinieEintrag, WerkstoffwahlEintrag,
 )
 from opencivil.querschnitt.analyse import Zeichnung
-from opencivil.querschnitt.zugseite import Zugseite
+from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 from opencivil.querschnitt.geometrie import Linienart
 from opencivil.querschnitt.vorlagen import VORLAGEN
 from opencivil.querschnitt.gesetzwahl import Werkstoffsatz
@@ -276,8 +275,8 @@ def katalog() -> dict:
         # Feld; geprueft wird beim Bauen der Platte.
         "duktilitaet": {"hoechstens": DUKTILITAET_HOECHSTENS},
         # Die Seiten, die ein Verformungsfall ziehen kann.
-        "verformung": {"zugseiten": [{"wert": s, "beschriftung": s}
-                                     for s in VERFORMUNG_ZUGSEITEN]},
+        "verformung": {"zugseiten": [{"wert": s.value, "beschriftung": s.value}
+                                     for s in UM_Y]},
     }
 
 

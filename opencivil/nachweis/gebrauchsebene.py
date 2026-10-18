@@ -44,6 +44,7 @@ from opencivil.nachweis.querschnittsloeser import (
     Faserloeser, probenschranken, wie_gesucht, wirksame_suche,
 )
 from opencivil.querschnitt.interaktion import Querschnitt
+from opencivil.querschnitt.zugseite import Zugseite
 
 #: Wie weit sich die Neigung ψ der Ebene unter Gebrauchslast von der
 #: entfernen darf, die bei Symmetrie gaelte -- nach jeder Seite, in Grad.
@@ -231,8 +232,7 @@ def gebrauchsebene(q: Querschnitt, *, N: float, M_y: float, M_z: float,
     Sprung haengen blieb.
     """
     if einachsig:
-        return _bei_neigung(q, -math.pi / 2.0 if M_y >= 0.0 else math.pi / 2.0,
-                            N, M_y, 0.0)[0]
+        return _bei_neigung(q, Zugseite.aus_moment(M_y).psi, N, M_y, 0.0)[0]
 
     schranke = QUER_SCHRANKE * max(abs(M_y), abs(M_z), abs(N) * 1.0, 1.0)
     # Was am Ende ohne Ebene dasteht: verfehlt, sobald eine Neigung an einem

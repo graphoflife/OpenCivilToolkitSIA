@@ -72,6 +72,7 @@ from opencivil.querschnitt.fachwerk import Buegelpunkt, beste_neigung, fachwerk
 from opencivil.querschnitt.platte import (
     ALPHA_ZUG, Plattenquerschnitt, Richtung, protokoll_statische_hoehe,
 )
+from opencivil.querschnitt.zugseite import Zugseite
 
 #: Unterer Riegel fuer den Beiwert der Gesteinskoernung.
 K_G_MINDEST = 1.20
@@ -328,13 +329,13 @@ def _hoch(kurz: str, symbol: str, zeichen: str) -> Tuple[str, str]:
 
 
 def protokoll_hoehen(p: Protokoll, werte: Zwischenwerte, e: Eingaben, posten, zuglage: int,
-                     d: float, d_v: Optional[float] = None, *, positiv: bool,
+                     d: float, d_v: Optional[float] = None, *, seite: Zugseite,
                      zeichen: str = "") -> Tuple[Wert, Optional[Wert]]:
     """
     Die statische Hoehe der gezogenen Bewehrung und, ohne Buegel, die
     wirksame -- geschrieben, und fuer die Formeln danach. ``zuglage`` ist der
-    Posten der aeussersten gezogenen Lage (:func:`zuglage`), ``positiv``, ob
-    der Zug unten liegt. ``zeichen`` hebt die Groessen hoch, wo zwei Seiten
+    Posten der aeussersten gezogenen Lage (:func:`zuglage`), ``seite`` die
+    gezogene. ``zeichen`` hebt die Groessen hoch, wo zwei Seiten
     nebeneinander stehen: ``d^{+}`` (die Kennzahlen).
 
     Mit Buegeln gibt es kein ``d_v``: bis 2026-10-18 schrieben die Kennzahlen
@@ -344,7 +345,7 @@ def protokoll_hoehen(p: Protokoll, werte: Zwischenwerte, e: Eingaben, posten, zu
     lage, art = posten[zuglage][:2]
     hoehe = werte.laenge(*_hoch("d", "d", zeichen), d)
     protokoll_statische_hoehe(p, hoehe, h=e["h"], z=e[f"z_{lage.nummer}{art.kuerzel}"],
-                              von_unten=positiv)
+                              seite=seite)
     if d_v is None:
         return hoehe, None
     wirksam = werte.laenge(*_hoch("d_v", "d_v", zeichen), d_v)
@@ -408,8 +409,7 @@ def protokoll_mit_buegeln(p: Protokoll, werte: Zwischenwerte, widerstand: Wert,
 
 def _ohne_zugbewehrung(M_Ed: float) -> str:
     """Die Begruendung, wenn die gezogene Seite keinen Stahl hat -- fuer beide Ansaetze."""
-    seite = "unten" if M_Ed >= 0 else "oben"
-    return f"Zugseite ({seite}) ohne Bewehrung → kein d, V_Rd = 0."
+    return f"Zugseite ({Zugseite.aus_moment(M_Ed).value}) ohne Bewehrung → kein d, V_Rd = 0."
 
 
 @dataclass
@@ -1036,7 +1036,7 @@ class Querkraft(Nachweis):
 
         werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
         d, _ = protokoll_hoehen(p, werte, e, self.posten, erg.zuglage, erg.d,
-                                positiv=fall.M_Ed.si >= 0)
+                                seite=Zugseite.aus_moment(fall.M_Ed.si))
 
         if erg.zug_hebt_alpha:
             p.text(f"N_Ed = {fall.N_Ed.formatiert(1, KN)} kN (Zug) → "
@@ -1124,7 +1124,7 @@ class Querkraft(Nachweis):
 
         werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
         d, d_v = protokoll_hoehen(p, werte, e, self.posten, erg.zuglage, erg.d, erg.d_v,
-                                  positiv=M_Ed >= 0)
+                                  seite=Zugseite.aus_moment(M_Ed))
 
         m_Dd = werte.moment("m_Dd", "m_{Dd}", erg.m_Dd)
         p.formel(m_Dd, r"\frac{\left|\min(@N_Ed;\ 0)\right| \cdot @h}{6}",

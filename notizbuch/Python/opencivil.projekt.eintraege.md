@@ -1,5 +1,5 @@
 ---
-erzeugt: da39d927424d
+erzeugt: 237ad68e7d71
 art: modul
 tags: [modul]
 ---
@@ -357,7 +357,7 @@ Wie ein Knickfall nur in x-Richtung.
 - `name: str`
 - `w: float = bereich(0.0, heisst='Durchbiegung w', einheit=MM, ab=0.0)` – Durchbiegung in mm, mit E_cm ermittelt -- ein Betrag.
 - `laenge: float = bereich(5.0, heisst='Spannweite L', einheit=M, ueber=0.0)` – Spannweite L in m -- der Grenzwert ist L/350.
-- `zugseite: str = einer_von(ZUGSEITEN, 'unten')` – `unten` im Feld, `oben` am Kragarm -- welches rho gilt.
+- `zugseite: Zugseite = einer_von(UM_Y, Zugseite.UNTEN)` – `unten` im Feld, `oben` am Kragarm -- welches rho gilt.
 - `aktiv: bool = True` – Ob der Fall gerechnet wird. Ausgeschaltet bleibt er stehen.
 
 ### VerformungEintrag
@@ -379,7 +379,7 @@ einmal gerechnet ([[opencivil.nachweis.verformung]]).
 #### VerformungEintrag.fall
 
 ```python
-def fall(self, name: str, *, w: float, laenge: float, zugseite: str=VerformungsfallEintrag.zugseite) -> VerformungsfallEintrag
+def fall(self, name: str, *, w: float, laenge: float, zugseite: Zugseite=VerformungsfallEintrag.zugseite) -> VerformungsfallEintrag
 ```
 
 Einen Fall anfuegen -- w in mm, die Spannweite in m.
@@ -669,6 +669,7 @@ Eine zu pruefende Schnittgroessenkombination.
 - [[opencivil.projekt.lesen]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
+- [[opencivil.querschnitt.zugseite]]
 - [[opencivil.spannungsanalyse]]
 
 ## Gebraucht von

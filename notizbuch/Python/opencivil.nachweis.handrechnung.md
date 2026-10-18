@@ -1,5 +1,5 @@
 ---
-erzeugt: 771e8caddc78
+erzeugt: d79d790ab752
 art: modul
 tags: [modul]
 ---
@@ -236,15 +236,15 @@ Dehnungszustand ist eindeutig, also auch das zugehoerige Moment.
 #### Handrechnung._seite
 
 ```python
-def _seite(self, p: Protokoll, *, positiv: bool) -> List[Eckpunkt]
+def _seite(self, p: Protokoll, seite: Zugseite) -> List[Eckpunkt]
 ```
 
-Die beiden Punkte eines Momentenvorzeichens.
+Die beiden Punkte eines Momentenvorzeichens -- des Moments, das `seite` zieht.
 
 #### Handrechnung._bei_n_null
 
 ```python
-def _bei_n_null(self, p: Protokoll, zug: Lage, d: Wert, vz: float, marke: str) -> Eckpunkt
+def _bei_n_null(self, p: Protokoll, zug: Lage, d: Wert, seite: Zugseite) -> Eckpunkt
 ```
 
 Reine Biegung: die Druckkraft im Beton haelt der Zugkraft die Waage.
@@ -252,7 +252,7 @@ Reine Biegung: die Druckkraft im Beton haelt der Zugkraft die Waage.
 #### Handrechnung._halbe_hoehe
 
 ```python
-def _halbe_hoehe(self, p: Protokoll, zug: Lage, w_d: Wert, vz: float, marke: str) -> Optional[Eckpunkt]
+def _halbe_hoehe(self, p: Protokoll, zug: Lage, w_d: Wert, seite: Zugseite) -> Optional[Eckpunkt]
 ```
 
 Der Punkt mit der Nulllinie auf halber Hoehe: `x = h/2`.
@@ -321,6 +321,7 @@ Schwerpunkts fiel still aus, weil sie `len(teile) > 1` verlangt.
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
+- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 

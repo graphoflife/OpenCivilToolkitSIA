@@ -388,7 +388,7 @@ class ZwaengungBiegungQA(Biegezwang):
             name: grad_def(f"{basis}.{kennung_aus(name)}.erfuellungsgrad",
                            rf"\alpha_{{eff,ZB,{als_text(name)}}}",
                            f"Erfüllungsgrad {self.THEMA} – {name}", self.REFERENZ)
-            for name, _, _ in richtungen(einachsig)}
+            for name in (seite.beschriftung for seite in richtungen(einachsig))}
         super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()),
                          bezuege=analyse.grundbezuege() + rissbezuege(analyse),
                          titel=f"{self.THEMA} – {analyse.name}",
@@ -408,7 +408,8 @@ class ZwaengungBiegungQA(Biegezwang):
         brutto = bruttoquerschnitt(a, e.si_nach_id())
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
-        for name, M_y, M_z in richtungen(self.einachsig):
+        for seite in richtungen(self.einachsig):
+            name, (M_y, M_z) = seite.beschriftung, seite.moment
             d_grad = self.d_ausnutzung[name]
             werte = Zwischenwerte(f"{self.id}.{kennung_aus(name)}")
             p.titel(name, ebene=3)

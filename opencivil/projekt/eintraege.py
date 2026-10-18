@@ -34,7 +34,8 @@ from opencivil.nachweis.rechenwahl import (
     FASERARTEN, RECHENARTEN, SPANNUNGSARTEN, VERFORMUNGSARTEN,
 )
 from opencivil.nachweis.rissanforderung import Rissanforderung
-from opencivil.nachweis.verformung import KRIECHZAHL as VERFORMUNG_KRIECHZAHL, ZUGSEITEN
+from opencivil.nachweis.verformung import KRIECHZAHL as VERFORMUNG_KRIECHZAHL
+from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 from opencivil.spannungsanalyse import Analyseart
 
 
@@ -408,7 +409,7 @@ class VerformungsfallEintrag(Beschreibung):
     laenge: float = bereich(5.0, heisst="Spannweite L", einheit=M, ueber=0.0)
     """Spannweite L in m -- der Grenzwert ist L/350."""
 
-    zugseite: str = einer_von(ZUGSEITEN, "unten")
+    zugseite: Zugseite = einer_von(UM_Y, Zugseite.UNTEN)
     """``unten`` im Feld, ``oben`` am Kragarm -- welches rho gilt."""
 
     aktiv: bool = True
@@ -431,7 +432,7 @@ class VerformungEintrag(Beschreibung):
     faelle: List[VerformungsfallEintrag] = field(default_factory=list)
 
     def fall(self, name: str, *, w: float, laenge: float,
-             zugseite: str = VerformungsfallEintrag.zugseite) -> VerformungsfallEintrag:
+             zugseite: Zugseite = VerformungsfallEintrag.zugseite) -> VerformungsfallEintrag:
         """Einen Fall anfuegen -- w in mm, die Spannweite in m."""
         eintrag = VerformungsfallEintrag(name=name, w=w, laenge=laenge, zugseite=zugseite)
         self.faelle.append(eintrag)

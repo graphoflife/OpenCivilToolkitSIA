@@ -94,7 +94,6 @@ def querkraftkurven(
             "aeste": [
                 {
                     "moment_positiv": ast["moment_positiv"],
-                    "zugseite": "unten" if ast["moment_positiv"] else "oben",
                     "m_Rd": ast["m_Rd"] / 1e3,
                     "d": ast["d"] * 1e3,
                     "punkte": [

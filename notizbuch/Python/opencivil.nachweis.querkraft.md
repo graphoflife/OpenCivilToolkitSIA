@@ -1,5 +1,5 @@
 ---
-erzeugt: 0f483e3370ff
+erzeugt: d4a321ec28cb
 art: modul
 tags: [modul]
 ---
@@ -249,13 +249,13 @@ Kurzname und Zeichen, mit `zeichen` hochgestellt: `d_+` und `d^{+}`.
 ### protokoll_hoehen
 
 ```python
-def protokoll_hoehen(p: Protokoll, werte: Zwischenwerte, e: Eingaben, posten, zuglage: int, d: float, d_v: Optional[float]=None, *, positiv: bool, zeichen: str='') -> Tuple[Wert, Optional[Wert]]
+def protokoll_hoehen(p: Protokoll, werte: Zwischenwerte, e: Eingaben, posten, zuglage: int, d: float, d_v: Optional[float]=None, *, seite: Zugseite, zeichen: str='') -> Tuple[Wert, Optional[Wert]]
 ```
 
 Die statische Hoehe der gezogenen Bewehrung und, ohne Buegel, die
 wirksame -- geschrieben, und fuer die Formeln danach. `zuglage` ist der
-Posten der aeussersten gezogenen Lage ([[opencivil.nachweis.querkraft#zuglage|zuglage]]), `positiv`, ob
-der Zug unten liegt. `zeichen` hebt die Groessen hoch, wo zwei Seiten
+Posten der aeussersten gezogenen Lage ([[opencivil.nachweis.querkraft#zuglage|zuglage]]), `seite` die
+gezogene. `zeichen` hebt die Groessen hoch, wo zwei Seiten
 nebeneinander stehen: `d^{+}` (die Kennzahlen).
 
 Mit Buegeln gibt es kein `d_v`: bis 2026-10-18 schrieben die Kennzahlen
@@ -552,6 +552,7 @@ nicht nachrechnen konnte.
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.querschnitt.fachwerk]]
 - [[opencivil.querschnitt.platte]]
+- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 

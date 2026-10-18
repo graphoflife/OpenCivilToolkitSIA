@@ -19,6 +19,7 @@ from typing import Any, List, Optional
 from opencivil.bewehrungssuche.laengs import Suchmodus
 from opencivil.core.einheiten import MM
 from opencivil.querschnitt.platte import LAGENZAHL, Richtung
+from opencivil.querschnitt.zugseite import Zugseite
 from opencivil.projekt.eintraege import (
     HAEUFIG_ANTEIL, QUASISTAENDIG_ANTEIL, Gebrauchsliste, KnickEintrag, KombinationEintrag,
     LageEintrag, ObergrenzeEintrag, PostenEintrag, QuerkraftbewehrungEintrag,
@@ -263,7 +264,7 @@ class QuerschnittEintrag(Querschnittsangaben):
         return eintrag
 
     def verformungsfall(self, name: str, *, w: float, laenge: float,
-                        zugseite: str = "unten") -> VerformungsfallEintrag:
+                        zugseite: Zugseite = Zugseite.UNTEN) -> VerformungsfallEintrag:
         """Ein Verformungsfall -- w in mm, mit E_cm ermittelt; die Spannweite in m."""
         return self.verformung.fall(name, w=w, laenge=laenge, zugseite=zugseite)
 

@@ -38,12 +38,13 @@ from typing import Dict, List, Optional, Sequence, Tuple
 from opencivil.core.berechnung import (
     Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
-from opencivil.core.einheiten import EINHEITSLOS, KN, KNM, Groesse
+from opencivil.core.einheiten import EINHEITSLOS, KN, Groesse
 from opencivil.core.latex import Mathe, als_text, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
 from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse, Stabgruppe
 from opencivil.querschnitt.interaktion import Bruchpunkt, Kraftanteil, Querschnitt
+from opencivil.querschnitt.zugseite import Zugseite
 
 #: Ab welchem Moment ein Lastfall als Biegung gilt, in Nm. Darunter ist es
 #: reine Normalkraft -- eine Richtung des Moments gibt es dann nicht.
@@ -227,7 +228,7 @@ class SchiefeBiegung(Nachweis):
 
         # -- Der Bruchzustand -------------------------------------------------
         if self.einachsig:
-            punkt = q.bei_normalkraft(-math.pi / 2.0 if M_y >= 0 else math.pi / 2.0, N)
+            punkt = q.bei_normalkraft(Zugseite.aus_moment(M_y).psi, N)
             M_Rd_si = abs(punkt.M_y)
         else:
             punkt = q.in_richtung(N, M_y, M_z)

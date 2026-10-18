@@ -1,5 +1,5 @@
 ---
-erzeugt: 66d3dc73d2da
+erzeugt: c4fcb7f598dc
 art: modul
 tags: [modul]
 ---
@@ -115,6 +115,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[opencivil.core.wert]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.interaktion]]
+- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 

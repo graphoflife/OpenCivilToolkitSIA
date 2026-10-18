@@ -67,12 +67,10 @@ from opencivil.querschnitt.fachwerk import beste_neigung
 from opencivil.nachweis.rechenwahl import bezuege_vereinen, stahlname
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.querschnitt.platte import Richtung
+from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 
 #: Womit die Kennzahlen rechnen: die Handrechnung mit Bemessungswerten.
 WAHL = Rechenwahl()
-
-#: Die beiden Seiten: ob der Zug unten liegt, wie sie heisst, ihr Zeichen.
-SEITEN: Tuple[Tuple[bool, str, str], ...] = ((True, "unten", "+"), (False, "oben", "-"))
 
 #: Woher die Eckwerte stammen -- ihre Erklaerung unter der Platte.
 HAND = "Handrechnung mit Bemessungswerten"
@@ -113,10 +111,10 @@ class Plattenkennzahlen(Prozedur):
         dazu("N_Rd_druck", r"N_{Rd}^{-}(M_{Ed} = 0)", KN,
              "Druckwiderstand bei M_Ed = 0", "Druckwiderstand")
         # Ein x/d nur, wo Zug auf Bewehrung trifft: ohne sie gibt es kein d.
-        gezogen = {lage.von_unten for lage, _, _, _, _ in self.posten}
-        for positiv, seite, hoch in SEITEN:
-            if positiv in gezogen:
-                dazu(f"x_d_{'pos' if positiv else 'neg'}", rf"\left(x/d\right)^{{{hoch}}}",
+        gezogen = {lage.seite for lage, _, _, _, _ in self.posten}
+        for seite in UM_Y:
+            if seite in gezogen:
+                dazu(f"x_d_{seite.marke}", rf"\left(x/d\right)^{{{seite.zeichen}}}",
                      EINHEITSLOS, f"Bezogene Druckzonenhöhe bei N_Ed = 0, Zug {seite}",
                      f"Bezogene Druckzonenhöhe, Zug {seite}", stellen=3)
         if self.buegel is None:
@@ -179,7 +177,7 @@ class Plattenkennzahlen(Prozedur):
         return wert
 
     def _handrechnung(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte,
-                      ergebnis: Dict[str, Groesse]) -> Dict[bool, float]:
+                      ergebnis: Dict[str, Groesse]) -> Dict[Zugseite, float]:
         """M_Rd und x/d bei N = 0, N_Rd bei M = 0 -- aus der Linie der Handrechnung."""
         if self.eigene_linie:
             linie = resistenzlinie(
@@ -193,12 +191,12 @@ class Plattenkennzahlen(Prozedur):
 
         p.titel("Biegung und Normalkraft", ebene=3)
         eckpunkt = {q.kennung: q for q in linie.punkte}
-        momente: Dict[bool, float] = {}
-        for positiv, seite, _ in SEITEN:
-            kurz = "pos" if positiv else "neg"
-            m = self._auf_der_linie(p, linie, ergebnis, geo.MOMENT, positiv, f"M_Rd_{kurz}",
-                                    f"Momentenwiderstand bei N_Ed = 0, Zug {seite}")
-            momente[positiv] = abs(m)
+        momente: Dict[Zugseite, float] = {}
+        for seite in UM_Y:
+            kurz = seite.marke
+            m = self._auf_der_linie(p, linie, ergebnis, geo.MOMENT, seite.positiv,
+                                    f"M_Rd_{kurz}", f"Momentenwiderstand bei N_Ed = 0, Zug {seite}")
+            momente[seite] = abs(m)
             if f"x_d_{kurz}" not in self.d:
                 p.text(f"Zug {seite} ohne x-Bewehrung → kein d, kein x/d dieser Seite.")
                 continue
@@ -236,21 +234,22 @@ class Plattenkennzahlen(Prozedur):
         return wert.groesse.si
 
     def _hoehen(self, e: Eingaben, werte: Zwischenwerte, p: Protokoll,
-                beiwerte: Kurvenbeiwerte, positiv: bool, hoch: str, *,
+                beiwerte: Kurvenbeiwerte, seite: Zugseite, *,
                 wirksam: bool) -> Optional[Tuple[Wert, Optional[Wert]]]:
         """
         ``d`` der gezogenen Seite und, ohne Buegel (``wirksam``), ``d_v`` --
         hergeleitet wie im Querkraftnachweis; ``None`` ohne Zugbewehrung.
         """
-        hoehen = beiwerte.hoehen(positiv)
+        hoehen = beiwerte.hoehen(seite.positiv)
         if hoehen is None:
             return None
-        return protokoll_hoehen(p, werte, e, self.posten, zuglage(beiwerte.lagen, positiv),
+        return protokoll_hoehen(p, werte, e, self.posten,
+                                zuglage(beiwerte.lagen, seite.positiv),
                                 hoehen[0], hoehen[1] if wirksam else None,
-                                positiv=positiv, zeichen=hoch)
+                                seite=seite, zeichen=seite.zeichen)
 
     def _ohne_buegel(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte,
-                     ergebnis: Dict[str, Groesse], momente: Dict[bool, float]) -> None:
+                     ergebnis: Dict[str, Groesse], momente: Dict[Zugseite, float]) -> None:
         p.titel("Querkraftwiderstand ohne Bügel bei N_Ed = 0", ebene=3)
         p.erklaerung(
             "Ohne Bügel hängt der Widerstand am Moment: am grössten bei M_Ed = 0, "
@@ -271,20 +270,21 @@ class Plattenkennzahlen(Prozedur):
 
         bei_null: List[Wert] = []
         beim_widerstand: List[Wert] = []
-        for positiv, seite, hoch in SEITEN:
-            hoehen = self._hoehen(e, werte, p, beiwerte, positiv, hoch, wirksam=True)
+        for seite in UM_Y:
+            hoch = seite.zeichen
+            hoehen = self._hoehen(e, werte, p, beiwerte, seite, wirksam=True)
             if hoehen is None:
                 p.text(f"Zug {seite} ohne x-Bewehrung → kein d, kein Widerstand dieser Seite.")
                 continue
             d, d_v = hoehen
             # Der Stahl der aeussersten gezogenen Lage, wie im Querkraftnachweis.
-            stahl = self.posten[zuglage(lagen, positiv)][0].stahl
+            stahl = self.posten[zuglage(lagen, seite.positiv)][0].stahl
             f_yd, E_s = e[stahlname("f_yd", stahl)], e[stahlname("E_s", stahl)]
 
             null = widerstand(M_Ed=0.0, N_Ed=0.0, h=beiwerte.h, d=d.groesse.si,
                               d_v=d_v.groesse.si, tau_cd=beiwerte.tau_cd,
                               f_yd=f_yd.groesse.si, E_s=E_s.groesse.si, k_g=beiwerte.k_g,
-                              m_Rd=momente[positiv])
+                              m_Rd=momente[seite])
             v_null = werte.wert(f"V_null_{hoch}", rf"V_{{Rd}}^{{{hoch}}}(M_{{Ed}} = 0)",
                                 Groesse.aus_si(null.v_Rd, KN_PRO_M), 1)
             p.formel(v_null, r"@tau_cd \cdot @d_v", {"tau_cd": tau_cd, "d_v": d_v},
@@ -293,10 +293,10 @@ class Plattenkennzahlen(Prozedur):
                      name="Querkraftwiderstand ohne Bügel bei M_Ed = 0")
             bei_null.append(v_null)
 
-            voll = widerstand(M_Ed=momente[positiv], N_Ed=0.0, h=beiwerte.h,
+            voll = widerstand(M_Ed=momente[seite], N_Ed=0.0, h=beiwerte.h,
                               d=d.groesse.si, d_v=d_v.groesse.si, tau_cd=beiwerte.tau_cd,
                               f_yd=f_yd.groesse.si, E_s=E_s.groesse.si, k_g=beiwerte.k_g,
-                              m_Rd=momente[positiv])
+                              m_Rd=momente[seite])
             eps_v = werte.dehnung(f"eps_v_{hoch}", rf"\varepsilon_v^{{{hoch}}}", voll.eps_v,
                                   stellen=3)
             p.formel(eps_v, r"\frac{@f_yd}{@E_s}", {"f_yd": f_yd, "E_s": E_s},
@@ -338,8 +338,9 @@ class Plattenkennzahlen(Prozedur):
                                   zugstahl={}, k_g=0.0)
 
         teile: List[Wert] = []
-        for positiv, seite, hoch in SEITEN:
-            hoehen = self._hoehen(e, werte, p, beiwerte, positiv, hoch, wirksam=False)
+        for seite in UM_Y:
+            hoch = seite.zeichen
+            hoehen = self._hoehen(e, werte, p, beiwerte, seite, wirksam=False)
             if hoehen is None:
                 p.text(f"Zug {seite} ohne x-Bewehrung → kein d, kein Widerstand dieser Seite.")
                 continue

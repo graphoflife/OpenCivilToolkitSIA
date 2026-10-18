@@ -1,5 +1,5 @@
 ---
-erzeugt: 64da9852f2a8
+erzeugt: 126161e17c59
 art: modul
 tags: [modul]
 ---
@@ -35,18 +35,20 @@ dasselbe Rissmoment gegen ihre Bewehrung.
 ### richtungen
 
 ```python
-def richtungen(einachsig: bool) -> Tuple[Tuple[str, float, float], ...]
+def richtungen(einachsig: bool) -> Tuple[Zugseite, ...]
 ```
 
-Einachsig nur unten und oben -- um z wird dann nicht nachgewiesen.
+Die Seiten, die je ein Nachweis gezogen werden -- einachsig nur unten und
+oben, um z wird dann nicht nachgewiesen. Ihre Namen, «Zug unten», sind
+die der Faelle; die Kennungen «Zug_unten».
 
 ### bei_reiner_biegung
 
 ```python
-def bei_reiner_biegung(q: Querschnitt, M_y: float, M_z: float, einachsig: bool) -> Bruchpunkt
+def bei_reiner_biegung(q: Querschnitt, seite: Zugseite, einachsig: bool) -> Bruchpunkt
 ```
 
-Der Bruchzustand bei N = 0 in dieser Richtung -- einachsig mit waagrechter Nulllinie.
+Der Bruchzustand bei N = 0, der diese Seite zieht -- einachsig mit waagrechter Nulllinie.
 
 ### DuktilitaetQA
 
@@ -83,10 +85,6 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 ```
 
 
-## Konstanten
-
-- `RICHTUNGEN = (('Zug unten', 1.0, 0.0), ('Zug oben', -1.0, 0.0), ('Zug links', 0.0,…` – Die Richtungen: Name, und das Moment, das so zieht (M_y, M_z).
-
 ## Braucht
 
 - [[opencivil.core.berechnung]]
@@ -98,6 +96,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 - [[opencivil.nachweis.rissgroessen]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.interaktion]]
+- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 

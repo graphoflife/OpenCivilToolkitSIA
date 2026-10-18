@@ -1,5 +1,5 @@
 ---
-erzeugt: 4290eb0d2876
+erzeugt: 862b01d5116c
 art: modul
 tags: [modul]
 ---
@@ -53,12 +53,6 @@ Alles in SI-Basis; `w` in mm und `L` in m kommen als Groessen.
 
 ## Inhalt
 
-### gegenseite
-
-```python
-def gegenseite(seite: str) -> str
-```
-
 ### Verformungsfall
 
 ```python
@@ -71,7 +65,7 @@ Eine Durchbiegung, mit E_cm ermittelt, zu ihrer Spannweite.
 - `name: str`
 - `w: Groesse` – Die Durchbiegung mit der Steifigkeit E_cm -- ein Betrag.
 - `laenge: Groesse` – Die Spannweite L.
-- `zugseite: str = 'unten'` – Welche Seite der Fall zieht -- danach richten sich rho und rho'.
+- `zugseite: Zugseite = Zugseite.UNTEN` – Welche Seite der Fall zieht -- danach richten sich rho und rho'.
 
 #### Verformungsfall.kennung
 
@@ -118,7 +112,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
 #### Vergroesserungsfaktor._bewehrungsgehalte
 
 ```python
-def _bewehrungsgehalte(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte) -> Dict[str, Tuple[Wert, Wert]]
+def _bewehrungsgehalte(self, p: Protokoll, e: Eingaben, werte: Zwischenwerte) -> Dict[Zugseite, Tuple[Wert, Wert]]
 ```
 
 Je Seite mit x-Bewehrung der Bewehrungsgehalt und seine statische
@@ -151,8 +145,7 @@ def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 
 - `KRIECHZAHL = 2.0` – Vorgabe der Kriechzahl phi im Vergroesserungsfaktor -- Klima und Belastungsalter, eine Annahme ueber das Bauwerk.
 - `GRENZE = 350.0` – `w_max = L / GRENZE` -- nach Vorgabe des Benutzers (2026-10-16), nicht nachgeschlagen.
-- `ZUGSEITEN = ('unten', 'oben')` – Die Seiten, die ein Verformungsfall ziehen kann: unten im Feld, oben am Kragarm oder ueber der Stuetze.
-- `SYMBOL = {'unten': '\\omega_w', 'oben': "\\omega_w'"}` – Wie der Faktor einer Seite heisst: omega_w fuer Zug unten, omega_w' fuer Zug oben (Benutzer, 2026-10-16).
+- `SYMBOL = {Zugseite.UNTEN: '\\omega_w', Zugseite.OBEN: "\\omega_w'"}` – Wie der Faktor einer Seite heisst: omega_w fuer Zug unten, omega_w' fuer Zug oben (Benutzer, 2026-10-16). Ziehen kann ein Fall die Seiten der Platte, [[opencivil.querschnitt.zugseite#Konstanten|UM_Y]]: unten im Feld, oben am Kragarm oder ueber der Stuetze.
 
 ## Braucht
 
@@ -162,13 +155,13 @@ def pruefe(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
 - [[opencivil.querschnitt.platte]]
+- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.eintraege]]
-- [[opencivil.web.api]]
 
 ## Formeln aus diesem Modul
 

@@ -1,5 +1,5 @@
 ---
-erzeugt: 0437fb2cbad9
+erzeugt: c5b817acf445
 art: modul
 tags: [modul]
 ---
@@ -15,6 +15,16 @@ und wie die beiden Raender heissen. Eine Wahl fuer sich, in einem eigenen
 Modul: die Beschreibung des Projekts, die Nachweise und die Analysen fragen
 sie, und keiner von ihnen soll dafuer die Spannung-Dehnung-Analyse laden.
 Bis 2026-10-17 stand sie in der Schnittanalyse des gezeichneten Querschnitts.
+
+
+## EINE SEITE, EINE FORM
+
+Auch die Platte fragt sie: ihre Seiten sind [[opencivil.querschnitt.zugseite#Konstanten|UM_Y]], unten und oben, und
+wie eine Seite in Zeichen und Kennungen heisst, sagt sie selbst
+([[opencivil.querschnitt.zugseite#Zugseite.zeichen|Zugseite.zeichen]], [[opencivil.querschnitt.zugseite#Zugseite.marke|Zugseite.marke]]). Bis 2026-10-18 stand
+dieselbe Seite in sechs Formen da: als Tupel der Richtungen des gezeichneten
+Querschnitts, als Text der Verformung, als `pos`/`neg`, als `+`/`-`
+und in drei Winkelausdruecken.
 
 ## Inhalt
 
@@ -76,6 +86,56 @@ def raender(self) -> Tuple[str, str]
 
 Wie die beiden Raender heissen: der gedrueckte und der gezogene.
 
+#### Zugseite.gegen
+
+```python
+@property
+def gegen(self) -> 'Zugseite'
+```
+
+Die Gegenseite -- die gedrueckte.
+
+#### Zugseite.positiv
+
+```python
+@property
+def positiv(self) -> bool
+```
+
+Ob ein positives Moment sie zieht: M_y > 0 zieht unten, M_z > 0 links.
+
+#### Zugseite.zeichen
+
+```python
+@property
+def zeichen(self) -> str
+```
+
+Ihr Vorzeichen, wie es an Symbolen steht: M_Rd^+ fuer Zug unten.
+
+#### Zugseite.marke
+
+```python
+@property
+def marke(self) -> str
+```
+
+Ihr Vorzeichen in Kennungen: `M_Rd_N0_pos` fuer Zug unten.
+
+#### Zugseite.aus_moment
+
+```python
+@classmethod
+def aus_moment(cls, M_y: float) -> 'Zugseite'
+```
+
+Die Seite, die ein Moment um y zieht -- bei M_y = 0 die untere, wie
+die waagrechte Nulllinie einer einachsigen Rechnung es braucht.
+
+
+## Konstanten
+
+- `UM_Y = (Zugseite.UNTEN, Zugseite.OBEN)` – Die Seiten, die ein Moment um y zieht: die einer Platte, und die eines gezeichneten Querschnitts, der einachsig gerechnet wird.
 
 ## Braucht
 
@@ -83,7 +143,17 @@ Wie die beiden Raender heissen: der gedrueckte und der gezogene.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.gebrauchsebene]]
+- [[opencivil.nachweis.handrechnung]]
+- [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]
+- [[opencivil.nachweis.querkraft]]
+- [[opencivil.nachweis.richtungsnachweise]]
+- [[opencivil.nachweis.schiefe_biegung]]
+- [[opencivil.nachweis.verformung]]
+- [[opencivil.projekt.eintraege]]
+- [[opencivil.projekt.platte]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.querschnitt.platte]]
 - [[opencivil.spannungsanalyse.schnitt]]
 - [[opencivil.web.api]]

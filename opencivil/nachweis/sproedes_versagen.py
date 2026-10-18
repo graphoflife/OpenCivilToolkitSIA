@@ -123,9 +123,9 @@ class SproedesVersagen(Nachweis):
         # Je Seite der passende Eckwert: die untere Lage traegt das positive
         # Moment, die obere das negative.
         for lage in self.lagen:
-            schluessel = "M_Rd_N0_pos" if lage.von_unten else "M_Rd_N0_neg"
             bezuege.append(Eingabebezug(
-                f"M_Rd_{lage.nummer}", mn_nachweis.d_eckwerte[schluessel].id))
+                f"M_Rd_{lage.nummer}",
+                mn_nachweis.d_eckwerte[f"M_Rd_N0_{lage.seite.marke}"].id))
 
         super().__init__(
             basis,
@@ -157,9 +157,8 @@ class SproedesVersagen(Nachweis):
             M_Riss = groessen.M_Riss
 
             if erg.M_Rd <= 0.0:
-                seite = "unten" if lage.von_unten else "oben"
                 erg.begruendung = erg.hinweis = (
-                    f"{lage.nummer}. Lage ({seite}) ohne Bewehrung → kein "
+                    f"{lage.nummer}. Lage ({lage.seite}) ohne Bewehrung → kein "
                     f"Biegewiderstand, kein Nachweis.")
             else:
                 erg.erfuellungsgrad = (float("inf") if M_Riss == 0

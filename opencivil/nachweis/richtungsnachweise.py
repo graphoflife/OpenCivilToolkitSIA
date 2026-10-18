@@ -41,27 +41,23 @@ from opencivil.nachweis.rissgroessen import (
 )
 from opencivil.querschnitt.analyse import Querschnittsanalyse
 from opencivil.querschnitt.interaktion import Bruchpunkt, Querschnitt
-
-#: Die Richtungen: Name, und das Moment, das so zieht (M_y, M_z).
-RICHTUNGEN: Tuple[Tuple[str, float, float], ...] = (
-    ("Zug unten", 1.0, 0.0),
-    ("Zug oben", -1.0, 0.0),
-    ("Zug links", 0.0, 1.0),
-    ("Zug rechts", 0.0, -1.0),
-)
+from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 
 
-def richtungen(einachsig: bool) -> Tuple[Tuple[str, float, float], ...]:
-    """Einachsig nur unten und oben -- um z wird dann nicht nachgewiesen."""
-    return RICHTUNGEN[:2] if einachsig else RICHTUNGEN
+def richtungen(einachsig: bool) -> Tuple[Zugseite, ...]:
+    """
+    Die Seiten, die je ein Nachweis gezogen werden -- einachsig nur unten und
+    oben, um z wird dann nicht nachgewiesen. Ihre Namen, «Zug unten», sind
+    die der Faelle; die Kennungen «Zug_unten».
+    """
+    return UM_Y if einachsig else tuple(Zugseite)
 
 
-def bei_reiner_biegung(q: Querschnitt, M_y: float, M_z: float,
-                       einachsig: bool) -> Bruchpunkt:
-    """Der Bruchzustand bei N = 0 in dieser Richtung -- einachsig mit waagrechter Nulllinie."""
+def bei_reiner_biegung(q: Querschnitt, seite: Zugseite, einachsig: bool) -> Bruchpunkt:
+    """Der Bruchzustand bei N = 0, der diese Seite zieht -- einachsig mit waagrechter Nulllinie."""
     if einachsig:
-        return q.bei_normalkraft(-math.pi / 2.0 if M_y > 0 else math.pi / 2.0, 0.0)
-    return q.in_richtung(0.0, M_y, M_z)
+        return q.bei_normalkraft(seite.psi, 0.0)
+    return q.in_richtung(0.0, *seite.moment)
 
 
 # ===========================================================================
@@ -71,10 +67,11 @@ def bei_reiner_biegung(q: Querschnitt, M_y: float, M_z: float,
 
 def _defs(basis: str, symbol: str, beschreibung: str, referenz: str,
           einachsig: bool) -> Dict[str, WertDef]:
+    namen = [seite.beschriftung for seite in richtungen(einachsig)]
     return {name: grad_def(f"{basis}.{kennung_aus(name)}.erfuellungsgrad",
                            rf"\alpha_{{eff,{symbol},{als_text(name)}}}",
                            f"{beschreibung} – {name}", referenz)
-            for name, _, _ in richtungen(einachsig)}
+            for name in namen}
 
 
 class DuktilitaetQA(Nachweis):
@@ -109,10 +106,11 @@ class DuktilitaetQA(Nachweis):
                  name=DUKTILITAETSBEDINGUNG)
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
-        for name, M_y, M_z in richtungen(self.einachsig):
+        for seite in richtungen(self.einachsig):
+            name = seite.beschriftung
             werte = Zwischenwerte(f"{self.id}.{kennung_aus(name)}")
             d_grad = self.d_ausnutzung[name]
-            punkt = bei_reiner_biegung(q, M_y, M_z, self.einachsig)
+            punkt = bei_reiner_biegung(q, seite, self.einachsig)
             x, d = q.druckzone(punkt)
             p.titel(name, ebene=3)
             if d <= 0.0 or not q.zugseite_bewehrt(punkt):
@@ -175,11 +173,12 @@ class SproedesVersagenQA(Nachweis):
         brutto = bruttoquerschnitt(self.analyse, e.si_nach_id())
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
-        for name, M_y, M_z in richtungen(self.einachsig):
+        for seite in richtungen(self.einachsig):
+            name, (M_y, M_z) = seite.beschriftung, seite.moment
             werte = Zwischenwerte(f"{self.id}.{kennung_aus(name)}")
             d_grad = self.d_ausnutzung[name]
             p.titel(name, ebene=3)
-            punkt = bei_reiner_biegung(q, M_y, M_z, self.einachsig)
+            punkt = bei_reiner_biegung(q, seite, self.einachsig)
             _, d = q.druckzone(punkt)
             if d <= 0.0 or not q.zugseite_bewehrt(punkt):
                 p.text("Keine Bewehrung auf der gezogenen Seite → kein Nachweis.")

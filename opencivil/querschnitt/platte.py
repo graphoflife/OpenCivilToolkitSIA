@@ -50,6 +50,7 @@ from opencivil.core.protokoll import Abschnitt, Protokoll, Zwischenwerte
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Kennzahl, Wert, WertDef, kennung_aus
 from opencivil.material.basis import Baustoff
+from opencivil.querschnitt.zugseite import Zugseite
 
 #: Anzahl Lagen einer Platte. Bewusst fest -- eine Platte hat unten und oben je
 #: eine Haupt- und eine Querlage, mehr braucht es nicht, weniger waere ein
@@ -182,6 +183,11 @@ class Bewehrungslage:
         return self.nummer <= 2
 
     @property
+    def seite(self) -> Zugseite:
+        """Die Seite, an der sie liegt -- und die ein Moment ziehen muss, damit sie traegt."""
+        return Zugseite.UNTEN if self.von_unten else Zugseite.OBEN
+
+    @property
     def stapelrang(self) -> int:
         """0 = aussen (direkt auf der Überdeckung), 1 = darüber."""
         return self.nummer - 1 if self.von_unten else LAGENZAHL - self.nummer
@@ -204,8 +210,7 @@ class Bewehrungslage:
         yield Postenart.ZULAGE, self.zulage
 
     def beschriftung(self) -> str:
-        seite = "unten" if self.von_unten else "oben"
-        return f"{self.nummer}. Lage ({seite}, {self.richtung.beschriftung})"
+        return f"{self.nummer}. Lage ({self.seite.value}, {self.richtung.beschriftung})"
 
 
 #: Vorgabe fuer die Neigung der Druckdiagonalen, in Grad.
@@ -374,12 +379,12 @@ def protokoll_lage(
     else:
         tiefe = e[f"z_{marken[0]}"]
     hoehe = werte.laenge("d", f"d_{{{index}}}", d)
-    protokoll_statische_hoehe(p, hoehe, h=e["h"], z=tiefe, von_unten=lage.von_unten)
+    protokoll_statische_hoehe(p, hoehe, h=e["h"], z=tiefe, seite=lage.seite)
     return flaeche, hoehe
 
 
 def protokoll_statische_hoehe(
-    p: Protokoll, d: Wert, *, h: Wert, z: Wert, von_unten: bool,
+    p: Protokoll, d: Wert, *, h: Wert, z: Wert, seite: Zugseite,
 ) -> None:
     """
     Die statische Hoehe einer gezogenen Lage, gemessen ab dem gedrueckten Rand.
@@ -388,11 +393,11 @@ def protokoll_statische_hoehe(
     Unterkante, ``d = h - z``. Mehrere Nachweise brauchen diese Zeile -- steht
     sie an einer Stelle, sagt «unten» in allen dasselbe.
     """
-    seite, rand = ("unten", "oben") if von_unten else ("oben", "unten")
-    vorlage, eingaben = (("@z", {"z": z}) if von_unten
+    rand, gezogen = seite.raender
+    vorlage, eingaben = (("@z", {"z": z}) if seite is Zugseite.UNTEN
                          else ("@h - @z", {"h": h, "z": z}))
     p.formel(d, vorlage, eingaben,
-             titel=f"Statische Höhe der Lage {seite}, ab dem gedrückten Rand {rand}",
+             titel=f"Statische Höhe der Lage {gezogen}, ab dem gedrückten Rand {rand}",
              name="Statische Höhe")
 
 
