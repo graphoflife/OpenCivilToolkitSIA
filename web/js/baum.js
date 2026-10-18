@@ -39,7 +39,7 @@ function appKnopf(a, p, gewaehlt) {
   return el('button.kachel.app-kachel', {
     type: 'button', 'aria-pressed': String(gewaehlt),
     class: `${gewaehlt ? 'ist-gewaehlt' : ''} ${eintraege.length ? 'ist-an' : ''}`,
-    title: a.knopf.replace(/­/g, ''),
+    title: a.knopf.replace(/\u00AD/g, ''),
     on: { click: () => appWaehlen(a.app, eintraege) },
   }, [
     sinnbild(a.zeichen),

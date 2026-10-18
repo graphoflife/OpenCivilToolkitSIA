@@ -19,7 +19,7 @@ import { span } from './mathe.js';
 import { kapitelFenster, kapitelPanel } from './kapitel.js';
 import { partnerVon, richtungSetzen, richtungVon } from './lagen.js';
 import { plattenKapitel } from './plattenkapitel.js';
-import { projektAendern, zustand } from './zustand.js';
+import { materialien, projektAendern, zustand } from './zustand.js';
 
 
 /**
@@ -98,7 +98,7 @@ function einheitsSchalter(ueberAbstand, bezug, umschalten) {
 
 function lagenBlock(querschnitt, nummer) {
   const lage = querschnitt.lagen[nummer - 1];
-  const staehle = zustand.projekt.materialien.filter((m) => m.art === 'betonstahl');
+  const staehle = materialien('betonstahl');
   const richtung = richtungVon(querschnitt, nummer);
   const partner = partnerVon(nummer);
   const leer = !(lage.grund.durchmesser > 0 || lage.zulage.durchmesser > 0);
@@ -195,7 +195,7 @@ function richtungsSchalter(querschnitt, nummer, richtung, partner) {
  * x-Richtung -- der Nachweis sagt es dann selbst.
  */
 function querkraftBlock(querschnitt) {
-  const staehle = zustand.projekt.materialien.filter((m) => m.art === 'betonstahl');
+  const staehle = materialien('betonstahl');
   // Vollständig: jede Platte kommt durch den Kern, und der setzt die Bügel
   // mit allen Feldern. Bügel ohne Stahl meldet der Kern beim Rechnen.
   const buegel = querschnitt.querkraftbewehrung;
@@ -282,7 +282,7 @@ function ueberdeckungsBlock(querschnitt, welche) {
 }
 
 export function plattenEditor(querschnitt) {
-  const betone = zustand.projekt.materialien.filter((m) => m.art === 'beton');
+  const betone = materialien('beton');
   const aendern = (veraenderer) => projektAendern((p) => {
     veraenderer(p.querschnitte.find((x) => x.kennung === querschnitt.kennung));
   });

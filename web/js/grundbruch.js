@@ -142,9 +142,7 @@ function kombinationZeile(g, i) {
     titel, leer: 0, beiAenderung: (v) => aendern((x) => { x[schluessel] = v; }),
   });
   return fallzeile({
-    an: k.aktiv !== false, umschalten: (wert) => aendern((x) => { x.aktiv = wert; }),
-    was: 'Kombination', name: k.name, nameTitel: 'Bezeichnung der Kombination',
-    umbenennen: (name) => aendern((x) => { x.name = name; }),
+    fall: k, aendern, was: 'Kombination', nameTitel: 'Bezeichnung der Kombination',
     zahlen: [zahl('N_Ed', 'Normal zur Sohle, Druck positiv'),
       zahl('T_Ed', 'In der Sohle, zur Seite, auf der das Gelände abfällt')],
     entfernenTitel: 'Kombination entfernen',

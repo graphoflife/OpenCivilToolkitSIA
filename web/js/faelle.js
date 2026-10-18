@@ -20,22 +20,30 @@ import { hakenSchalter } from './bausteine.js';
 import { el } from './dom.js';
 
 /**
- * Eine Zeile. `was` heisst der Fall am Schalter («Lastfall wird geführt»),
- * `nameTitel` und `entfernenTitel` sagen, was Name und Kreuz tun.
+ * Eine Zeile. `fall` ist der Eintrag, `aendern(veraenderer)` ändert ihn im
+ * Projekt; Schalter und Name gehen darüber -- fehlt `aktiv`, ist der Fall an.
+ * `was` heisst der Fall am Schalter («Lastfall wird geführt»), `nameTitel`
+ * und `entfernenTitel` sagen, was Name und Kreuz tun.
  */
 export function fallzeile({
-  an, umschalten, was, name, umbenennen, nameTitel, zahlen, entfernen, entfernenTitel,
+  fall, aendern, was, nameTitel, zahlen, entfernen, entfernenTitel,
   oben = null, unten = null, spalten = zahlen.length, klasse = '',
 }) {
-  const schalter = hakenSchalter(an, umschalten, was);
+  const an = fall.aktiv !== false;
+  const schalter = hakenSchalter(an, (wert) => aendern((x) => { x.aktiv = wert; }), was);
   schalter.classList.add('fall-schalter');
   return el(`div.fallzeile${klasse}`, {
     class: `${an ? '' : 'ist-aus'} ${oben ? 'mit-oben' : ''}`, style: { '--felder': spalten },
   }, [
     schalter,
     el('input.fall-name', {
-      type: 'text', value: name, title: nameTitel,
-      on: { change: (e) => umbenennen(e.target.value) },
+      type: 'text', value: fall.name, title: nameTitel,
+      on: {
+        change: (e) => {
+          const name = e.target.value;
+          aendern((x) => { x.name = name; });
+        },
+      },
     }),
     oben ? el('div.fall-oben', {}, [oben]) : null,
     el('div.fall-zahlen', {}, zahlen),

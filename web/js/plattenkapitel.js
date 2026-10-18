@@ -296,9 +296,7 @@ function einwirkungZeile(querschnitt, index) {
   });
 
   return fallzeile({
-    an: k.aktiv !== false, umschalten: (wert) => aendern((x) => { x.aktiv = wert; }),
-    was: 'Lastfall', name: k.name, nameTitel: 'Bezeichnung der Einwirkung',
-    umbenennen: (name) => aendern((x) => { x.name = name; }),
+    fall: k, aendern, was: 'Lastfall', nameTitel: 'Bezeichnung der Einwirkung',
     zahlen: [
       zahl('M_Ed', 'Bemessungsmoment in kNm'),
       zahl('N_Ed', 'Normalkraft in kN – Zug positiv, Druck negativ'),
@@ -352,9 +350,7 @@ function verformungsZeile(querschnitt, index) {
   });
   const seiten = zustand.katalog?.verformung?.zugseiten || [];
   return fallzeile({
-    an: k.aktiv !== false, umschalten: (wert) => aendern((x) => { x.aktiv = wert; }),
-    was: 'Verformungsfall', name: k.name, nameTitel: 'Bezeichnung des Verformungsfalls',
-    umbenennen: (name) => aendern((x) => { x.name = name; }),
+    fall: k, aendern, was: 'Verformungsfall', nameTitel: 'Bezeichnung des Verformungsfalls',
     zahlen: [
       zahlfeld({
         wert: k.w, schritt: 1, min: 0, leer: 0,

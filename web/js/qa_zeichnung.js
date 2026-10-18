@@ -32,7 +32,7 @@ import { vorlageOeffnen } from './qa_vorlagen.js';
 import {
   auswahl, el, melden, svgEl, zahlfeld,
 } from './dom.js';
-import { aendern, ausVorlage, projektAendern, zustand } from './zustand.js';
+import { aendern, ausVorlage, materialien, projektAendern, zustand } from './zustand.js';
 
 /**
  * Die Arten des Querschnitts, für das allgemeine Fenster. Eine Bewehrung
@@ -521,7 +521,7 @@ function zeile(beschriftung, eingabe, einheit = '') {
 function materialwahl(art, gewaehlt, setzen, mitLoch = false) {
   return auswahl({
     werte: [
-      ...zustand.projekt.materialien.filter((m) => m.art === art)
+      ...materialien(art)
         .map((m) => ({ wert: m.kennung, beschriftung: m.name || m.sorte })),
       ...(mitLoch ? [{ wert: '', beschriftung: 'Aussparung' }] : []),
     ],

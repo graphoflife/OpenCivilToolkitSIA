@@ -285,9 +285,7 @@ function knickZeile(eintrag, ort, index) {
   // «Zug unten» braucht mehr Platz als eine Zahl.
   const richtung = ort.knick.richtung;
   return fallzeile({
-    an: k.aktiv !== false, umschalten: (wert) => aendern((x) => { x.aktiv = wert; }),
-    was: 'Knicknachweis', name: k.name, nameTitel: 'Bezeichnung des Knicknachweises',
-    umbenennen: (name) => aendern((x) => { x.name = name; }),
+    fall: k, aendern, was: 'Knicknachweis', nameTitel: 'Bezeichnung des Knicknachweises',
     oben: richtung ? richtung(k, (wert) => aendern((x) => { x.richtung = wert; })) : null,
     zahlen: [zahl('N_Ed', 50), zahl('M_Ed_1', 10), zahl('laenge', 0.5), zahl('knicklaenge', 0.5)],
     entfernenTitel: 'Knicknachweis entfernen',
@@ -462,9 +460,7 @@ function gebrauchsfallZeile(eintrag, ort, spalten, feld, wort, index) {
   const aendern = (veraenderer) => anBauteil(eintrag, ort)((e) => veraenderer(e[feld].faelle[index]));
 
   return fallzeile({
-    an: k.aktiv !== false, umschalten: (wert) => aendern((x) => { x.aktiv = wert; }),
-    was: 'Lastfall', name: k.name, nameTitel: `Bezeichnung des ${wort}en Lastfalls`,
-    umbenennen: (name) => aendern((x) => { x.name = name; }),
+    fall: k, aendern, was: 'Lastfall', nameTitel: `Bezeichnung des ${wort}en Lastfalls`,
     zahlen: spalten.map((s) => zahlfeld({
       wert: k[s.feld], schritt: s.schritt, titel: s.titel(wort), leer: 0,
       beiAenderung: (v) => aendern((x) => { x[s.feld] = v; }),
@@ -581,7 +577,6 @@ function spannungsZeile(eintrag, index, ort) {
     wert: k[feld], schritt, titel, leer: 0,
     beiAenderung: (v) => aendern((x) => { x[feld] = v; }),
   });
-  const aktiv = k.aktiv !== false;
 
   // Welche Felder die Frage braucht, sagt der Kern (`katalog.spannungsanalyse`),
   // ebenso ihre Einheiten (`katalog.felder`). Hier steht nur, wie ein Feld über
@@ -614,9 +609,7 @@ function spannungsZeile(eintrag, index, ort) {
   // Zeile dasselbe, gleich welche Art es ist. Werte und Rechenart je zwei
   // Spalten breit in einer Zeile darunter -- in einer wären sie abgeschnitten.
   return fallzeile({
-    an: aktiv, umschalten: (wert) => aendern((x) => { x.aktiv = wert; }),
-    was: 'Analyse', name: k.name, nameTitel: 'Bezeichnung der Analyse',
-    umbenennen: (name) => aendern((x) => { x.name = name; }),
+    fall: k, aendern, was: 'Analyse', nameTitel: 'Bezeichnung der Analyse',
     zahlen: [...spalten, phi, ort.richtung(k, (wert) => aendern((x) => { x.richtung = wert; }))],
     unten: [werte, rechenart],
     entfernenTitel: 'Analyse entfernen',

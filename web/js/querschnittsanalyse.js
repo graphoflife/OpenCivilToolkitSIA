@@ -312,9 +312,7 @@ function lastfallZeile(analyse, index) {
   const aendern = (veraenderer) => aendernAn(analyse.kennung,
     (a) => veraenderer(a.lastfaelle[index]));
   return fallzeile({
-    an: fall.aktiv !== false, umschalten: (wert) => aendern((x) => { x.aktiv = wert; }),
-    was: 'Lastfall', name: fall.name, nameTitel: 'Bezeichnung des Lastfalls',
-    umbenennen: (name) => aendern((x) => { x.name = name; }),
+    fall, aendern, was: 'Lastfall', nameTitel: 'Bezeichnung des Lastfalls',
     zahlen: spalten(analyse).map((s) => zahlfeld({
       // Eine Last, die man leert, ist keine Last.
       wert: fall[s.feld], schritt: s.schritt, titel: s.titel, leer: 0,

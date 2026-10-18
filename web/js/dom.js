@@ -219,15 +219,15 @@ export function zahlfeld({
  * auf und setzt den Cursor -- dieses eine Loslassen wird darum abgefangen.
  * Über die Tastatur (Tab) kommt man ohnehin markiert hinein.
  */
-export function inhaltMarkieren(wurzel = document) {
+export function inhaltMarkieren() {
   let geklickt = null;
-  wurzel.addEventListener('mousedown', (e) => {
+  document.addEventListener('mousedown', (e) => {
     geklickt = einzeilig(e.target) && e.target !== document.activeElement ? e.target : null;
   }, true);
-  wurzel.addEventListener('focusin', (e) => {
+  document.addEventListener('focusin', (e) => {
     if (einzeilig(e.target)) e.target.select();
   });
-  wurzel.addEventListener('mouseup', (e) => {
+  document.addEventListener('mouseup', (e) => {
     if (geklickt && e.target === geklickt) e.preventDefault();
     geklickt = null;
   }, true);
