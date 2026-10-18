@@ -67,8 +67,10 @@ class TestVorgabe(unittest.TestCase):
         self.assertIn(r"x\text{-Vereinfachung}", text(self.loesung))
 
     def test_das_fenster_steht_wie_gerechnet(self):
-        """Gerechnet wird bis eps_c2d = 3.5 ‰ -- so steht es auch da."""
-        self.assertIn("-3.5 ‰ bis 45.0 ‰", text(self.loesung))
+        """Gerechnet wird bis eps_c2d = 3.5 ‰, der Stahl bis eps_ud an seiner Lage -- so steht es da."""
+        self.assertIn("der Beton an den Rändern bis -3.5 ‰", text(self.loesung))
+        self.assertIn("jeder Stahl an seiner Lage bis zu seiner Bruchdehnung ε_ud",
+                      text(self.loesung))
 
     def test_im_diagramm_daneben(self):
         linie = diagramm(self.aufbau)
