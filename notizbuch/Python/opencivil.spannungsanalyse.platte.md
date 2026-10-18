@@ -1,5 +1,5 @@
 ---
-erzeugt: a81f21c74d6e
+erzeugt: 8b4faf275c41
 art: modul
 tags: [modul]
 ---
@@ -165,7 +165,6 @@ nach -- er pruefte seine Kopie statt der echten.
 - [[opencivil.core.einheiten]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
-- [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.rissgroessen]]

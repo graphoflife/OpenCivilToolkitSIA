@@ -14,7 +14,6 @@ from typing import TYPE_CHECKING, Any, Callable, Mapping, Optional, Tuple
 
 from opencivil.core.einheiten import MIO_MM4, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
-from opencivil.nachweis import dehnungsfaecher
 from opencivil.nachweis.querschnittsloeser import Querschnittsloeser
 from opencivil.nachweis.rechenwahl import Betonkennwerte, gesetze, staehle, stahllagen
 from opencivil.nachweis.rissgroessen import (
@@ -223,16 +222,13 @@ def loeserpaar(querschnitt, richtung: Richtung, wert: Callable[[str], float],
     w = Betonkennwerte(f_c=wert(ids["f_c"]), E_cm=wert(ids["E_cm"]),
                        eps_c1d=wert(ids["eps_c1d"]), eps_c2d=wert(ids["eps_c2d"]))
     g = gesetze(wahl, w)
-    # Die Grenzen gelten an den Lagen, mit denen gerechnet wird -- in der
-    # Handrechnung den zusammengefassten --, jede mit dem eps_ud ihres Stahls.
-    grenzen, namen = dehnungsfaecher.grenzen(
-        h, [(l.z, l.stahl.eps_ud, f"Stahl der {l.nummer}. Lage") for l in g.lagen(lagen, h)],
-        eps_c1d=w.eps_c1d, eps_c2d=w.eps_c2d)
-    fenster = dict(grenzen=grenzen, eps_druck=w.eps_c2d)
-    gerissen = g.loeser(h=h, b=b, lagen=lagen, suche=SUCHE_DER_ANALYSEN, **fenster)
+    # Gesucht wird im Fenster der Gesetze, wie in jedem Loeser der Platte;
+    # seine Grenzen heissen in den Bildern, wo eine massgebend ist.
+    _, namen = g.grenzen(lagen, h)
+    gerissen = g.loeser(h=h, b=b, lagen=lagen, suche=SUCHE_DER_ANALYSEN)
     # Derselbe Querschnitt ungerissen: nur das Betongesetz ist ein anderes.
     ungerissen = gesetze(wahl, w, ungerissen=True).loeser(
-        h=h, b=b, lagen=lagen, suche=SUCHE_DER_ANALYSEN, **fenster)
+        h=h, b=b, lagen=lagen, suche=SUCHE_DER_ANALYSEN)
     f_ctm = wert(ids["f_ctm"])
     k_t_zug = beiwert_dicke(rissaktive_dicke(h=h, zug=True))
     return Loeserpaar(

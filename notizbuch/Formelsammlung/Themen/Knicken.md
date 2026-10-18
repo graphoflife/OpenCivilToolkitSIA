@@ -1,5 +1,5 @@
 ---
-erzeugt: 5dbfb516bb4a
+erzeugt: 02a496bf32ce
 art: thema
 tags: [thema]
 ---
@@ -15,8 +15,6 @@ Der Erfüllungsgrad ist ein Verhältnis von Normalkräften: N\_Rd ist die gröss
 Die Verformung rechnet präzise, mit der Parabel; Kriechzahl und Werte wählt das Kapitel. Das Kriechen weicht den Beton auf: er verformt sich mehr, die Ausmitte zweiter Ordnung wächst, und der Stab knickt früher – φ = 0 läge dann auf der unsicheren Seite. Im Bereich der Gebrauchslasten unterscheidet sich die Parabel kaum vom linearen Gesetz, in der Nähe der Grenzlast erheblich, und genau dort entscheidet sich, ob es noch eine Gleichgewichtslage gibt. Den Spannungsblock gibt es hier nicht: mit ihm trüge auf flachen Stücken jede Krümmung dasselbe Moment, und die Ausmitte wäre nicht eindeutig.
 
 Gesucht wird in zwei geschachtelten Suchen, beide mit dem Illinois-Verfahren, einer Sekante, die abwechselnd von beiden Seiten herankommt; beide beginnen bei der Ebene, die zuletzt gefunden wurde, und grenzen die Stelle von dort mit wachsenden Schritten ein. Innen: zu einer festgehaltenen Krümmung χ wird ε\_m gesucht, bis N\_int die verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung immer mehr Zug bedeutet. Aussen: mit diesem ε\_m bleibt ein Moment übrig, und χ wird gesucht, bis auch M\_int stimmt – hier trägt die Monotonie, dass mehr Krümmung mehr Moment heisst.
-
-Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.5 ‰ bis 45.0 ‰). Jenseits davon geben die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Suche liefe auf eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine Gleichgewichtslage – dann sagt der Nachweis das und rät nicht.
 
 Die Ausmitten-Iteration darüber steht dagegen vollständig da, Durchlauf für Durchlauf: sie ist das Verfahren selbst, und dass sie einläuft, ist die Aussage des Nachweises.
 

@@ -37,7 +37,7 @@ N_Rd davon ab, wie gesucht wurde -- an der Stuetze des Pruefprojekts
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
-from typing import Callable, Dict, List, Sequence
+from typing import Callable, Dict, List, Sequence, Tuple
 
 from opencivil.core.berechnung import Eingabebezug, Eingaben
 from opencivil.core.latex import angabe
@@ -48,7 +48,9 @@ from opencivil.material.basis import Baustoffart
 from opencivil.nachweis.querschnittsloeser import (
     Querschnittsloeser, Stahllage, lagen_je_seite, protokoll_wirksamer_modul, wirksamer_modul_wert,
 )
+from opencivil.nachweis import dehnungsfaecher
 from opencivil.querschnitt.analyse import Querschnittsanalyse
+from opencivil.querschnitt.fasern import Dehnungsgrenze
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz, betongesetz
 from opencivil.querschnitt.werkstoffgesetz import Betongesetz, Gesetz, Spannungsblock, Stahlgesetz
 
@@ -195,6 +197,8 @@ class Gesetze:
 
     wahl: Rechenwahl
     beton: Gesetz
+    kennwerte: Betonkennwerte
+    """Die Zahlen des Betons -- seine Grenzdehnungen begrenzen die Suche (:meth:`grenzen`)."""
 
     def stahl(self, s: Stahlgesetz) -> Stahlgesetz:
         """Der Stahl einer Lage, wie der Loeser ihn rechnet -- in der Handrechnung nur auf Zug."""
@@ -211,17 +215,38 @@ class Gesetze:
             return lagen_je_seite(lagen, h)
         return list(lagen)
 
-    def loeser(self, *, h: float, b: float, lagen: Sequence[Stahllage],
-               suche: Suche = HALBIEREN, **fenster) -> Querschnittsloeser:
+    def grenzen(self, lagen: Sequence[Stahllage],
+                h: float) -> Tuple[List[Dehnungsgrenze], Tuple[str, ...]]:
         """
-        Der Loeser zu dieser Wahl. ``fenster`` sind die Grenzen der Suche
-        (``eps_druck``, ``eps_zug``, ``grenzen``) -- die bringt jeder Nutzer
-        selbst mit. ``suche`` sagt, wie gesucht wird -- das Knicken nimmt
+        Wo die Gesetze gelten, als Grenzen der Suche samt ihren Namen -- die
+        des Dehnungsfaechers (:func:`~opencivil.nachweis.dehnungsfaecher.grenzen`):
+        der Beton an den Raendern bis ``-eps_c2d``, im Punkt C bis
+        ``-eps_c1d``, jede Lage, mit der gerechnet wird, bis ``±eps_ud`` ihres
+        Stahls. Jenseits davon geben die Gesetze null zurueck, und die Suche
+        faende Scheinloesungen.
+
+        Ein Fenster fuer jeden Loeser der Platte -- Stahlspannung, Knicken,
+        Analysen. Bis 2026-10-18 suchten die Stahlspannungen den Beton fest
+        bis 3 ‰ und den Stahl am Betonrand, das Knicken mit ``eps_c2d``, aber
+        den Stahl ebenso am Rand (Benutzer, 2026-10-18).
+        """
+        return dehnungsfaecher.grenzen(
+            h, [(l.z, l.stahl.eps_ud, f"Stahl der {l.nummer}. Lage")
+                for l in self.lagen(lagen, h)],
+            eps_c1d=self.kennwerte.eps_c1d, eps_c2d=self.kennwerte.eps_c2d)
+
+    def loeser(self, *, h: float, b: float, lagen: Sequence[Stahllage],
+               suche: Suche = HALBIEREN) -> Querschnittsloeser:
+        """
+        Der Loeser zu dieser Wahl, im Fenster der Gesetze (:meth:`grenzen`).
+        ``suche`` sagt, wie gesucht wird -- das Knicken nimmt
         :data:`~opencivil.core.suche.ILLINOIS`.
         """
+        grenzen, _ = self.grenzen(lagen, h)
         return Querschnittsloeser(
             h=h, b=b, lagen=self.lagen(lagen, h), beton=self.beton,
-            stahl=self.stahl, verdraengt=self.verdraengt, suche=suche, **fenster)
+            stahl=self.stahl, verdraengt=self.verdraengt, suche=suche,
+            grenzen=grenzen, eps_druck=self.kennwerte.eps_c2d)
 
 
 def protokoll_rechenwahl(p: Protokoll, wahl: Rechenwahl, basis: str, *,
@@ -313,4 +338,5 @@ def gesetze(wahl: Rechenwahl, w: Betonkennwerte, *, ungerissen: bool = False) ->
     """
     return Gesetze(wahl=wahl, beton=betongesetz(wahl, f_c=w.f_c, E_cm=w.E_cm,
                                                 eps_c1d=w.eps_c1d, eps_c2d=w.eps_c2d,
-                                                ungerissen=ungerissen))
+                                                ungerissen=ungerissen),
+                   kennwerte=w)

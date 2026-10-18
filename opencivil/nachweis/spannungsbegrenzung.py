@@ -96,7 +96,7 @@ from opencivil.nachweis.mindestbewehrung import (
     protokoll_zulaessige_stahlspannung, zulaessige_stahlspannung,
 )
 from opencivil.nachweis.querschnittsloeser import (
-    EPS_DRUCK, Ebene, Querschnittsloeser, protokoll_verfahren, protokoll_wirksamer_modul,
+    Ebene, Querschnittsloeser, protokoll_verfahren, protokoll_wirksamer_modul,
 )
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
@@ -546,7 +546,7 @@ class PlattenStellen(Stahlspannungsort):
 
     def protokoll_verfahren(self, p: Protokoll, zustand: _Plattenzustand,
                             wahl: Rechenwahl) -> None:
-        protokoll_verfahren(p, eps_druck=EPS_DRUCK, eps_zug=zustand.loeser.eps_zug,
+        protokoll_verfahren(p, eps_druck=zustand.loeser.eps_druck,
                             verdraengt=wahl.art is not Rechenart.HANDRECHNUNG,
                             suche=zustand.loeser.suche)
 

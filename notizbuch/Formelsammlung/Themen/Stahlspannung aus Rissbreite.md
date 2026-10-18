@@ -1,5 +1,5 @@
 ---
-erzeugt: 28fa9273db59
+erzeugt: f266d626f3c5
 art: thema
 tags: [thema]
 ---
@@ -24,7 +24,7 @@ Das Integral über den Beton wird als Summe über 60 Fasern gleicher Dicke gebil
 
 Gesucht wird in zwei geschachtelten Suchen, beide durch Halbieren. Innen: zu einer festgehaltenen Krümmung χ wird ε\_m gesucht, bis N\_int die verlangte Normalkraft trifft – das geht sicher, weil mehr Dehnung immer mehr Zug bedeutet. Aussen: mit diesem ε\_m bleibt ein Moment übrig, und χ wird gesucht, bis auch M\_int stimmt – hier trägt die Monotonie, dass mehr Krümmung mehr Moment heisst.
 
-Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen (-3.0 ‰ bis 45.0 ‰). Jenseits davon geben die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Suche liefe auf eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine Gleichgewichtslage – dann sagt der Nachweis das und rät nicht.
+Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen der Gesetze: der Beton an den Rändern bis -3.5 ‰ und, ist der ganze Querschnitt gedrückt, im Punkt C bis ε\_c1d; jeder Stahl an seiner Lage bis zu seiner Bruchdehnung ε\_ud. Jenseits davon geben die Werkstoffgesetze null zurück, die Kraft wäre nicht mehr monoton, und die Suche liefe auf eine beliebige Stelle zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine Gleichgewichtslage – dann sagt der Nachweis das und rät nicht.
 
 Nachgewiesen wird deshalb nicht der Weg, sondern das Ergebnis: dass die gefundene Ebene genau die angegebenen Schnittgrössen erzeugt. Diese Probe steht bei jedem Fall.
 

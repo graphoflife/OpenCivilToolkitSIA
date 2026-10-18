@@ -251,7 +251,7 @@ def protokoll_wirksamer_modul(p, E_cm, phi, basis: str, *, titel: str,
              titel=titel, nachsatz=nachsatz, name="Wirksamer Elastizitätsmodul")
 
 
-def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float, suche: Suche,
+def protokoll_verfahren(p, *, eps_druck: float, suche: Suche,
                         fasern: int = FASERN, verdraengt: bool = True) -> None:
     """
     Der Ablauf der Suche, in die Mitschrift geschrieben.
@@ -294,8 +294,10 @@ def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float, suche: Suche,
     )
     p.erklaerung(verfahren(suche))
     p.erklaerung(
-        f"Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen "
-        f"({-eps_druck * 1e3:.1f} ‰ bis {eps_zug * 1e3:.1f} ‰). Jenseits "
+        f"Das Suchfenster bleibt dabei innerhalb der Grenzdehnungen der "
+        f"Gesetze: der Beton an den Rändern bis {-eps_druck * 1e3:.1f} ‰ und, "
+        f"ist der ganze Querschnitt gedrückt, im Punkt C bis ε_c1d; jeder "
+        f"Stahl an seiner Lage bis zu seiner Bruchdehnung ε_ud. Jenseits "
         f"davon geben die Werkstoffgesetze null zurück, die Kraft wäre nicht "
         f"mehr monoton, und die Suche liefe auf eine beliebige Stelle "
         f"zu. Passt zu einer Krümmung kein Fenster mehr, gibt es keine "

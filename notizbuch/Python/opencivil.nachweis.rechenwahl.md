@@ -1,5 +1,5 @@
 ---
-erzeugt: b24884fe2e41
+erzeugt: 828538af5a20
 art: modul
 tags: [modul]
 ---
@@ -150,6 +150,7 @@ Was zu einer Wahl gehoert -- Gesetze, Lagen, und wie die Fasern rechnen.
 
 - `wahl: Rechenwahl`
 - `beton: Gesetz`
+- `kennwerte: Betonkennwerte` – Die Zahlen des Betons -- seine Grenzdehnungen begrenzen die Suche ([[opencivil.nachweis.rechenwahl#Gesetze.grenzen|grenzen]]).
 
 #### Gesetze.stahl
 
@@ -176,15 +177,32 @@ def lagen(self, lagen: Sequence[Stahllage], h: float) -> List[Stahllage]
 
 Die Lagen, mit denen gerechnet wird -- in der Handrechnung je Seite eine.
 
+#### Gesetze.grenzen
+
+```python
+def grenzen(self, lagen: Sequence[Stahllage], h: float) -> Tuple[List[Dehnungsgrenze], Tuple[str, ...]]
+```
+
+Wo die Gesetze gelten, als Grenzen der Suche samt ihren Namen -- die
+des Dehnungsfaechers ([[opencivil.nachweis.dehnungsfaecher#grenzen|grenzen]]):
+der Beton an den Raendern bis `-eps_c2d`, im Punkt C bis
+`-eps_c1d`, jede Lage, mit der gerechnet wird, bis `±eps_ud` ihres
+Stahls. Jenseits davon geben die Gesetze null zurueck, und die Suche
+faende Scheinloesungen.
+
+Ein Fenster fuer jeden Loeser der Platte -- Stahlspannung, Knicken,
+Analysen. Bis 2026-10-18 suchten die Stahlspannungen den Beton fest
+bis 3 ‰ und den Stahl am Betonrand, das Knicken mit `eps_c2d`, aber
+den Stahl ebenso am Rand (Benutzer, 2026-10-18).
+
 #### Gesetze.loeser
 
 ```python
-def loeser(self, *, h: float, b: float, lagen: Sequence[Stahllage], suche: Suche=HALBIEREN, **fenster) -> Querschnittsloeser
+def loeser(self, *, h: float, b: float, lagen: Sequence[Stahllage], suche: Suche=HALBIEREN) -> Querschnittsloeser
 ```
 
-Der Loeser zu dieser Wahl. `fenster` sind die Grenzen der Suche
-(`eps_druck`, `eps_zug`, `grenzen`) -- die bringt jeder Nutzer
-selbst mit. `suche` sagt, wie gesucht wird -- das Knicken nimmt
+Der Loeser zu dieser Wahl, im Fenster der Gesetze ([[opencivil.nachweis.rechenwahl#Gesetze.grenzen|grenzen]]).
+`suche` sagt, wie gesucht wird -- das Knicken nimmt
 [[opencivil.core.suche#Konstanten|ILLINOIS]].
 
 ### protokoll_rechenwahl
@@ -255,8 +273,10 @@ ersten Lage.
 - [[opencivil.core.suche]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
+- [[opencivil.nachweis.dehnungsfaecher]]
 - [[opencivil.nachweis.querschnittsloeser]]
 - [[opencivil.querschnitt.analyse]]
+- [[opencivil.querschnitt.fasern]]
 - [[opencivil.querschnitt.gesetzwahl]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
 

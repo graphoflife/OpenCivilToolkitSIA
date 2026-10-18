@@ -780,9 +780,9 @@ class Knicken(Knickverfahren):
         # Gesucht mit Illinois, von der zuletzt gefundenen Ebene aus: die
         # Iteration und die Suche nach N_Rd folgen sich in hunderten Ebenen
         # mit wenig verschiedenen Schnittgroessen.
-        loeser = g.loeser(h=h, b=b, lagen=lagen, eps_druck=w.eps_c2d, suche=ILLINOIS)
+        loeser = g.loeser(h=h, b=b, lagen=lagen, suche=ILLINOIS)
 
-        self._protokoll_ansatz(p, e, eps_druck=w.eps_c2d, eps_zug=loeser.eps_zug,
+        self._protokoll_ansatz(p, e, eps_druck=loeser.eps_druck,
                                verdraengt=g.verdraengt, suche=loeser.suche)
         # Schnell rechnet die eigene Linie mit den Schritten der Suche, wie die
         # der Tragsicherheit: sonst zahlte die Bewehrungssuche fuer jede Platte
@@ -820,7 +820,7 @@ class Knicken(Knickverfahren):
     # -- Mitschrift ---------------------------------------------------------
 
     def _protokoll_ansatz(self, p: Protokoll, e: Eingaben, *, eps_druck: float,
-                          eps_zug: float, verdraengt: bool, suche: Suche) -> None:
+                          verdraengt: bool, suche: Suche) -> None:
         self._protokoll_verfahren(p)
         p.titel("Verformung", ebene=3)
         wahl, basis = self.verformung, f"{self.id}.verformung"
@@ -833,7 +833,7 @@ class Knicken(Knickverfahren):
                           posten=self.posten)
         p.erklaerung(VERFORMUNG_NACH_WAHL)
         p.titel("Wie die Dehnungsebene gefunden wird", ebene=3)
-        protokoll_verfahren(p, eps_druck=eps_druck, eps_zug=eps_zug, verdraengt=verdraengt,
+        protokoll_verfahren(p, eps_druck=eps_druck, verdraengt=verdraengt,
                             suche=suche)
         p.erklaerung(
             "Die Ausmitten-Iteration darüber steht dagegen vollständig da, "

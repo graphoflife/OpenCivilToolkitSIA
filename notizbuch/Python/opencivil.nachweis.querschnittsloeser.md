@@ -1,5 +1,5 @@
 ---
-erzeugt: e96341b5aab9
+erzeugt: f8e8ff79a24c
 art: modul
 tags: [modul]
 ---
@@ -184,7 +184,7 @@ Die Zeile zu [[opencivil.querschnitt.gesetzwahl#wirksamer_modul|wirksamer_modul]
 ### protokoll_verfahren
 
 ```python
-def protokoll_verfahren(p, *, eps_druck: float, eps_zug: float, suche: Suche, fasern: int=FASERN, verdraengt: bool=True) -> None
+def protokoll_verfahren(p, *, eps_druck: float, suche: Suche, fasern: int=FASERN, verdraengt: bool=True) -> None
 ```
 
 Der Ablauf der Suche, in die Mitschrift geschrieben.
