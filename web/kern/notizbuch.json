@@ -3125,6 +3125,10 @@
         "zuglage",
         "beiwert_k_g",
         "buegelteilung_y",
+        "_hoch",
+        "protokoll_hoehen",
+        "protokoll_ohne_buegel",
+        "protokoll_mit_buegeln",
         "_ohne_zugbewehrung",
         "Querkraftbefund",
         "Querkraftbefund.kurve",
@@ -3141,7 +3145,6 @@
         "Querkraft._lagen",
         "Querkraft._mit_buegeln",
         "Querkraft._widerstandssymbol",
-        "Querkraft._protokoll_hoehe",
         "Querkraft._protokoll_grad",
         "Querkraft._protokoll_fall"
       ]

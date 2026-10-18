@@ -1,5 +1,5 @@
 ---
-erzeugt: 3450caad87e0
+erzeugt: db55287a46cd
 art: modul
 tags: [modul]
 ---
@@ -34,10 +34,14 @@ Zusammenfassung stellt sie dazu.
 Rechnet die Tragsicherheit von Hand mit Bemessungswerten -- die Vorgabe --,
 lesen die Kennzahlen deren Linie aus ihrem Befund und leiten nichts ein
 zweites Mal her; sonst rechnen sie eine eigene, mit Herleitung (dasselbe
-Muster wie das Knicken). Die Querkraft rechnet mit den Funktionen ihres
-Nachweises: [[opencivil.nachweis.querkraft#beiwert_k_g|beiwert_k_g]],
+Muster wie das Knicken). Die Querkraft rechnet und schreibt mit den
+Funktionen ihres Nachweises: [[opencivil.nachweis.querkraft#beiwert_k_g|beiwert_k_g]],
 [[opencivil.nachweis.querkraft#widerstand|widerstand]],
-[[opencivil.nachweis.querkraft#neigungen|neigungen]].
+[[opencivil.nachweis.querkraft#neigungen|neigungen]], dazu
+[[opencivil.nachweis.querkraft#protokoll_hoehen|protokoll_hoehen]],
+[[opencivil.nachweis.querkraft#protokoll_ohne_buegel|protokoll_ohne_buegel]] und
+[[opencivil.nachweis.querkraft#protokoll_mit_buegeln|protokoll_mit_buegeln]]. Bis 2026-10-18
+standen ihre Zeilen hier ein zweites Mal.
 
 
 ## WAS DIE GRENZEN BEDEUTEN
@@ -84,10 +88,11 @@ die Linie ihn findet: als Eckpunkt oder zwischen zweien.
 #### Plattenkennzahlen._hoehen
 
 ```python
-def _hoehen(self, e: Eingaben, werte: Zwischenwerte, p: Protokoll, beiwerte: Kurvenbeiwerte, positiv: bool, hoch: str) -> Optional[Tuple[Wert, Wert]]
+def _hoehen(self, e: Eingaben, werte: Zwischenwerte, p: Protokoll, beiwerte: Kurvenbeiwerte, positiv: bool, hoch: str, *, wirksam: bool) -> Optional[Tuple[Wert, Optional[Wert]]]
 ```
 
-`d` und `d_v` der gezogenen Seite, hergeleitet -- `None` ohne Zugbewehrung.
+`d` der gezogenen Seite und, ohne Buegel (`wirksam`), `d_v` --
+hergeleitet wie im Querkraftnachweis; `None` ohne Zugbewehrung.
 
 #### Plattenkennzahlen._kleinstes
 
@@ -124,15 +129,8 @@ Das Kleinere der Seiten -- bei nur einer Seite sie selbst.
 
 ## Formeln aus diesem Modul
 
-- [[Beiwert für die statische Höhe]] · `Plattenkennzahlen._ohne_buegel`
 - [[Bezogene Druckzonenhöhe]] · `Plattenkennzahlen._handrechnung`
 - [[Fliessdehnung]] · `Plattenkennzahlen._ohne_buegel`
 - [[Kleinerer Widerstand beider Seiten]] · `Plattenkennzahlen._kleinstes`
-- [[Querkraftwiderstand mit Querkraftbewehrung]] · `Plattenkennzahlen._mit_buegeln`
 - [[Querkraftwiderstand ohne Bügel bei M_Ed = 0]] · `Plattenkennzahlen._ohne_buegel`
-- [[Querkraftwiderstand ohne Querkraftbewehrung]] · `Plattenkennzahlen._ohne_buegel`
 - [[Teilung in y aus der Stabzahl]] · `Plattenkennzahlen._mit_buegeln`
-- [[Widerstand der Bügel]] · `Plattenkennzahlen._mit_buegeln`
-- [[Widerstand der Druckdiagonalen]] · `Plattenkennzahlen._mit_buegeln`
-- [[Wirksame Höhe (Einlage nicht massgebend)]] · `Plattenkennzahlen._hoehen`
-- [[Wirksame Höhe, um die Einlage vermindert]] · `Plattenkennzahlen._hoehen`

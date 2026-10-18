@@ -1,5 +1,5 @@
 ---
-erzeugt: ffd7d6556d51
+erzeugt: 5821cfd57e66
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.3.3.2.1"
@@ -41,9 +41,8 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._ohne_buegel]]
 - [[opencivil.nachweis.querkraft#Querkraft|Querkraft._protokoll_ansatz]]
-- [[opencivil.nachweis.querkraft#Querkraft._protokoll_fall|Querkraft._protokoll_fall]]
+- [[opencivil.nachweis.querkraft#protokoll_ohne_buegel|protokoll_ohne_buegel]]
 
 ## Themen
 

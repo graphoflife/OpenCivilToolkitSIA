@@ -1647,19 +1647,13 @@ $$
 d^{+} = z_{2,x,g} = 249\,\mathrm{mm}
 $$
 
-**Wirksame Höhe (Einlage nicht massgebend)**
-
-$$
-d_v^{+} = d^{+} = 249\,\mathrm{mm}
-$$
-
 Zug unten: α = 30° … 45° ganzgradig → grösster Widerstand bei α = 30°.
 
 **Widerstand der Bügel, Zug unten**
 
 $$
 \begin{aligned}
-  V_{Rd,s}^{+} &= \frac{A_{\varnothing,V}}{s_{V,x} \cdot s_{V,y}} \cdot 0.9 \cdot d^{+} \cdot f_{yd} \cdot \cot \alpha_{opt}^{+} \\
+  V_{Rd,s}^{+} &= \frac{A_{\varnothing,V}}{s_{V,x} \cdot s_{V,y}} \cdot 0.9 \cdot d^{+} \cdot f_{yd} \cdot \cot \alpha^{+} \\
   &= \frac{50.3\,\mathrm{mm}^{2}}{200\,\mathrm{mm} \cdot 200\,\mathrm{mm}} \cdot 0.9 \cdot 249\,\mathrm{mm} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \cot 30{}^{\circ} \\
   &= 212.1\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
@@ -1669,7 +1663,7 @@ $$
 
 $$
 \begin{aligned}
-  V_{Rd,c}^{+} &= 0.9 \cdot d^{+} \cdot k_c \cdot f_{cd} \cdot \sin \alpha_{opt}^{+} \cdot \cos \alpha_{opt}^{+} \\
+  V_{Rd,c}^{+} &= 0.9 \cdot d^{+} \cdot k_c \cdot f_{cd} \cdot \sin \alpha^{+} \cdot \cos \alpha^{+} \\
   &= 0.9 \cdot 249\,\mathrm{mm} \cdot 0.55 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} \cdot \sin 30{}^{\circ} \cdot \cos 30{}^{\circ} \\
   &= 1067.4\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
@@ -1691,19 +1685,13 @@ $$
 d^{-} = h - z_{3,x,g} = 300\,\mathrm{mm} - 48\,\mathrm{mm} = 252\,\mathrm{mm}
 $$
 
-**Wirksame Höhe (Einlage nicht massgebend)**
-
-$$
-d_v^{-} = d^{-} = 252\,\mathrm{mm}
-$$
-
 Zug oben: α = 30° … 45° ganzgradig → grösster Widerstand bei α = 30°.
 
 **Widerstand der Bügel, Zug oben**
 
 $$
 \begin{aligned}
-  V_{Rd,s}^{-} &= \frac{A_{\varnothing,V}}{s_{V,x} \cdot s_{V,y}} \cdot 0.9 \cdot d^{-} \cdot f_{yd} \cdot \cot \alpha_{opt}^{-} \\
+  V_{Rd,s}^{-} &= \frac{A_{\varnothing,V}}{s_{V,x} \cdot s_{V,y}} \cdot 0.9 \cdot d^{-} \cdot f_{yd} \cdot \cot \alpha^{-} \\
   &= \frac{50.3\,\mathrm{mm}^{2}}{200\,\mathrm{mm} \cdot 200\,\mathrm{mm}} \cdot 0.9 \cdot 252\,\mathrm{mm} \cdot 435\,\mathrm{N}/\mathrm{mm}^{2} \cdot \cot 30{}^{\circ} \\
   &= 214.6\,\mathrm{kN}/\mathrm{m}
 \end{aligned}
@@ -1713,7 +1701,7 @@ $$
 
 $$
 \begin{aligned}
-  V_{Rd,c}^{-} &= 0.9 \cdot d^{-} \cdot k_c \cdot f_{cd} \cdot \sin \alpha_{opt}^{-} \cdot \cos \alpha_{opt}^{-} \\
+  V_{Rd,c}^{-} &= 0.9 \cdot d^{-} \cdot k_c \cdot f_{cd} \cdot \sin \alpha^{-} \cdot \cos \alpha^{-} \\
   &= 0.9 \cdot 252\,\mathrm{mm} \cdot 0.55 \cdot 20\,\mathrm{N}/\mathrm{mm}^{2} \cdot \sin 30{}^{\circ} \cdot \cos 30{}^{\circ} \\
   &= 1080.3\,\mathrm{kN}/\mathrm{m}
 \end{aligned}

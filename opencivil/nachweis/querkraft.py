@@ -315,6 +315,97 @@ def buegelteilung_y(buegel, b: float, menge_y: float) -> float:
     return b / menge_y if menge_y else 0.0
 
 
+# ===========================================================================
+# Herleitung -- fuer den Nachweis und die Kennzahlen der Platte dieselbe
+# ===========================================================================
+
+
+def _hoch(kurz: str, symbol: str, zeichen: str) -> Tuple[str, str]:
+    """Kurzname und Zeichen, mit ``zeichen`` hochgestellt: ``d_+`` und ``d^{+}``."""
+    if not zeichen:
+        return kurz, symbol
+    return f"{kurz}_{zeichen}", f"{symbol}^{{{zeichen}}}"
+
+
+def protokoll_hoehen(p: Protokoll, werte: Zwischenwerte, e: Eingaben, posten, zuglage: int,
+                     d: float, d_v: Optional[float] = None, *, positiv: bool,
+                     zeichen: str = "") -> Tuple[Wert, Optional[Wert]]:
+    """
+    Die statische Hoehe der gezogenen Bewehrung und, ohne Buegel, die
+    wirksame -- geschrieben, und fuer die Formeln danach. ``zuglage`` ist der
+    Posten der aeussersten gezogenen Lage (:func:`zuglage`), ``positiv``, ob
+    der Zug unten liegt. ``zeichen`` hebt die Groessen hoch, wo zwei Seiten
+    nebeneinander stehen: ``d^{+}`` (die Kennzahlen).
+
+    Mit Buegeln gibt es kein ``d_v``: bis 2026-10-18 schrieben die Kennzahlen
+    dort ein «d_v = d (Einlage nicht massgebend)», weil sie die Hoehen ohne
+    Buegel mit einer Einlage null mitbenutzten.
+    """
+    lage, art = posten[zuglage][:2]
+    hoehe = werte.laenge(*_hoch("d", "d", zeichen), d)
+    protokoll_statische_hoehe(p, hoehe, h=e["h"], z=e[f"z_{lage.nummer}{art.kuerzel}"],
+                              von_unten=positiv)
+    if d_v is None:
+        return hoehe, None
+    wirksam = werte.laenge(*_hoch("d_v", "d_v", zeichen), d_v)
+    if d_v < d:
+        p.formel(wirksam, "@d - @e", {"d": hoehe, "e": e["einlagenhoehe"]},
+                 titel="Wirksame Höhe, um die Einlage vermindert")
+    else:
+        p.formel(wirksam, "@d", {"d": hoehe}, titel="Wirksame Höhe (Einlage nicht massgebend)")
+    return hoehe, wirksam
+
+
+def protokoll_ohne_buegel(p: Protokoll, werte: Zwischenwerte, widerstand: Wert, *,
+                          k_d: float, eps_v: Wert, d: Wert, d_v: Wert, k_g: Wert,
+                          tau_cd: Wert, titel: str = "Querkraftwiderstand",
+                          zeichen: str = "") -> None:
+    """
+    Der Widerstand ohne Buegel aus der Dehnung ``eps_v``, die schon dasteht:
+    ``k_d`` und ``V_Rd = k_d · tau_cd · d_v``. ``widerstand`` ist der Wert,
+    der dabei herauskommt, mit seinem Zeichen.
+    """
+    beiwert = werte.zahl(*_hoch("k_d", "k_d", zeichen), k_d, stellen=4)
+    p.formel(beiwert, r"\frac{1}{1 + @eps_v \cdot @d \cdot @k_g}",
+             {"eps_v": eps_v, "d": d, "k_g": k_g}, empirisch={"d": MM},
+             titel="Beiwert für die statische Höhe")
+    p.formel(widerstand, r"@k_d \cdot @tau_cd \cdot @d_v",
+             {"k_d": beiwert, "tau_cd": tau_cd, "d_v": d_v},
+             titel=titel, referenz="SIA 262:2025, 4.3.3.2.1", name=OHNE_BUEGEL)
+
+
+def protokoll_mit_buegeln(p: Protokoll, werte: Zwischenwerte, widerstand: Wert,
+                          q: Buegelpunkt, *, e: Eingaben, s_y: Wert, d: Wert,
+                          alpha_min: int, alpha_max: int, seite: str = "",
+                          zeichen: str = "") -> None:
+    """
+    Der Widerstand mit Buegeln bei der guenstigsten Neigung ``q``: welche es
+    ist, die Buegel, die Druckdiagonale und das Kleinere beider.
+    ``widerstand`` ist der Wert, der dabei herauskommt; ``seite`` steht in
+    den Titeln, wo zwei Seiten nebeneinander stehen.
+    """
+    zug = f", Zug {seite}" if seite else ""
+    p.text(f"{f'Zug {seite}: ' if seite else ''}α = {alpha_min}° … {alpha_max}° ganzgradig "
+           f"→ grösster Widerstand bei α = {q.alpha}°.")
+    alpha = werte.wert(*_hoch("alpha", r"\alpha", zeichen), Groesse(q.alpha, GRAD), 0)
+    buegel = werte.wert(*_hoch("V_Rd_s", "V_{Rd,s}", zeichen),
+                        Groesse.aus_si(q.V_Rd_s, KN_PRO_M))
+    diagonale = werte.wert(*_hoch("V_Rd_c", "V_{Rd,c}", zeichen),
+                           Groesse.aus_si(q.V_Rd_c, KN_PRO_M))
+    p.formel(buegel,
+             r"\frac{@A}{@s_x \cdot @s_y} \cdot 0.9 \cdot @d \cdot @f_yd \cdot \cot @alpha",
+             {"A": e["a_s_V"], "s_x": e["s_x"], "s_y": s_y, "d": d,
+              "f_yd": e["f_yd_V"], "alpha": alpha},
+             titel=f"Widerstand der Bügel{zug}", name="Widerstand der Bügel")
+    p.formel(diagonale,
+             r"0.9 \cdot @d \cdot @k_c \cdot @f_cd \cdot \sin @alpha \cdot \cos @alpha",
+             {"d": d, "k_c": e["k_c"], "f_cd": e["f_cd"], "alpha": alpha},
+             titel=f"Widerstand der Druckdiagonalen{zug}",
+             name="Widerstand der Druckdiagonalen")
+    p.formel(widerstand, r"\min\left[@s;\ @c\right]", {"s": buegel, "c": diagonale},
+             titel=f"Querkraftwiderstand{zug}", name=MIT_BUEGELN)
+
+
 def _ohne_zugbewehrung(M_Ed: float) -> str:
     """Die Begruendung, wenn die gezogene Seite keinen Stahl hat -- fuer beide Ansaetze."""
     seite = "unten" if M_Ed >= 0 else "oben"
@@ -944,33 +1035,14 @@ class Querkraft(Nachweis):
             return
 
         werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
-        d = self._protokoll_hoehe(p, e, erg, werte)
+        d, _ = protokoll_hoehen(p, werte, e, self.posten, erg.zuglage, erg.d,
+                                positiv=fall.M_Ed.si >= 0)
 
         if erg.zug_hebt_alpha:
             p.text(f"N_Ed = {fall.N_Ed.formatiert(1, KN)} kN (Zug) → "
                    f"α_min = {erg.alpha_min}°, α_max = {erg.alpha_max}°.")
-
-        q = erg.massgebend
-        p.text(f"α = {erg.alpha_min}° … {erg.alpha_max}° ganzgradig → grösster "
-               f"Widerstand bei α = {q.alpha}°.")
-
-        alpha = werte.wert("alpha", r"\alpha", Groesse(q.alpha, GRAD), 0)
-        buegel = werte.wert("V_Rd_s", "V_{Rd,s}", Groesse.aus_si(q.V_Rd_s, KN_PRO_M))
-        diagonale = werte.wert("V_Rd_c", "V_{Rd,c}", Groesse.aus_si(q.V_Rd_c, KN_PRO_M))
-        p.formel(
-            buegel,
-            r"\frac{@A}{@s_x \cdot @s_y} \cdot 0.9 \cdot @d \cdot @f_yd \cdot \cot @alpha",
-            {"A": e["a_s_V"], "s_x": e["s_x"], "s_y": s_y, "d": d,
-             "f_yd": e["f_yd_V"], "alpha": alpha},
-            titel="Widerstand der Bügel")
-        p.formel(
-            diagonale,
-            r"0.9 \cdot @d \cdot @k_c \cdot @f_cd \cdot \sin @alpha \cdot \cos @alpha",
-            {"d": d, "k_c": e["k_c"], "f_cd": e["f_cd"], "alpha": alpha},
-            titel="Widerstand der Druckdiagonalen")
-        p.formel(self._widerstand(erg), r"\min\left[@s;\ @c\right]",
-                 {"s": buegel, "c": diagonale}, titel="Querkraftwiderstand",
-                 name=MIT_BUEGELN)
+        protokoll_mit_buegeln(p, werte, self._widerstand(erg), erg.massgebend, e=e, s_y=s_y,
+                              d=d, alpha_min=erg.alpha_min, alpha_max=erg.alpha_max)
 
         self._protokoll_grad(p, erg)
 
@@ -982,16 +1054,6 @@ class Querkraft(Nachweis):
             rf"M_{{Ed}} = {fall.M_Ed.als_latex(1, KNM)} \qquad "
             rf"N_{{Ed}} = {fall.N_Ed.als_latex(1, KN)}",
             titel="Einwirkung")
-
-    def _protokoll_hoehe(self, p: Protokoll, e: Eingaben, erg: Querkraftergebnis,
-                         werte: Zwischenwerte) -> Wert:
-        """Die statische Höhe der gezogenen Bewehrung -- geschrieben, und für die Formeln danach."""
-        positiv = erg.fall.M_Ed.si >= 0
-        lage, art = self.posten[erg.zuglage][:2]
-        d = werte.laenge("d", "d", erg.d)
-        protokoll_statische_hoehe(p, d, h=e["h"], z=e[f"z_{lage.nummer}{art.kuerzel}"],
-                                  von_unten=positiv)
-        return d
 
     def _protokoll_grad(self, p: Protokoll, erg: Querkraftergebnis) -> None:
         """Die letzte Zeile jedes Falls -- für beide Ansätze dieselbe."""
@@ -1061,14 +1123,8 @@ class Querkraft(Nachweis):
             return
 
         werte = Zwischenwerte(f"{self.id}.{fall.kennung}")
-        d = self._protokoll_hoehe(p, e, erg, werte)
-        d_v = werte.laenge("d_v", "d_v", erg.d_v)
-        if erg.d_v < erg.d:
-            p.formel(d_v, "@d - @e", {"d": d, "e": e["einlagenhoehe"]},
-                     titel="Wirksame Höhe, um die Einlage vermindert")
-        else:
-            p.formel(d_v, "@d", {"d": d},
-                     titel="Wirksame Höhe (Einlage nicht massgebend)")
+        d, d_v = protokoll_hoehen(p, werte, e, self.posten, erg.zuglage, erg.d, erg.d_v,
+                                  positiv=M_Ed >= 0)
 
         m_Dd = werte.moment("m_Dd", "m_{Dd}", erg.m_Dd)
         p.formel(m_Dd, r"\frac{\left|\min(@N_Ed;\ 0)\right| \cdot @h}{6}",
@@ -1114,18 +1170,11 @@ class Querkraft(Nachweis):
                 {**stahl, "m_Ed": m_Ed, "m_Dd": m_Dd, "m_Rd": m_Rd},
                 titel="Dehnung auf halber Höhe")
 
-        k_d = werte.zahl("k_d", "k_d", erg.k_d, stellen=4)
-        p.formel(k_d, r"\frac{1}{1 + @eps_v \cdot @d \cdot @k_g}",
-                 {"eps_v": eps_v, "d": d, "k_g": k_g}, empirisch={"d": MM},
-                 titel="Beiwert für die statische Höhe")
-
         # tau_cd steht in der Baustofftabelle auf zwei Stellen (1.1); mit so
         # wenigen ginge die Nachrechnung hier um ein halbes Prozent daneben.
         tau = e["tau_cd"]
-        p.formel(self._widerstand(erg), r"@k_d \cdot @tau_cd \cdot @d_v",
-                 {"k_d": k_d, "tau_cd": werte.wert("tau_cd", tau.symbol, tau.groesse, 4),
-                  "d_v": d_v},
-                 titel="Querkraftwiderstand", referenz="SIA 262:2025, 4.3.3.2.1",
-                 name=OHNE_BUEGEL)
+        protokoll_ohne_buegel(p, werte, self._widerstand(erg), k_d=erg.k_d, eps_v=eps_v,
+                              d=d, d_v=d_v, k_g=k_g,
+                              tau_cd=werte.wert("tau_cd", tau.symbol, tau.groesse, 4))
 
         self._protokoll_grad(p, erg)

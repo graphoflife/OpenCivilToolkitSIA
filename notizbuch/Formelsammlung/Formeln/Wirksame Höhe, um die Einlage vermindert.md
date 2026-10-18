@@ -1,5 +1,5 @@
 ---
-erzeugt: 1a28568be63d
+erzeugt: 47748a8d49f1
 art: formel
 tags: [formel]
 ---
@@ -32,8 +32,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.kennzahlen#Plattenkennzahlen._hoehen|Plattenkennzahlen._hoehen]]
-- [[opencivil.nachweis.querkraft#Querkraft._protokoll_fall|Querkraft._protokoll_fall]]
+- [[opencivil.nachweis.querkraft#protokoll_hoehen|protokoll_hoehen]]
 
 ## Themen
 

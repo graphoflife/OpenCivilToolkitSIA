@@ -25,10 +25,14 @@ NICHTS ZWEIMAL:
 Rechnet die Tragsicherheit von Hand mit Bemessungswerten -- die Vorgabe --,
 lesen die Kennzahlen deren Linie aus ihrem Befund und leiten nichts ein
 zweites Mal her; sonst rechnen sie eine eigene, mit Herleitung (dasselbe
-Muster wie das Knicken). Die Querkraft rechnet mit den Funktionen ihres
-Nachweises: :func:`~opencivil.nachweis.querkraft.beiwert_k_g`,
+Muster wie das Knicken). Die Querkraft rechnet und schreibt mit den
+Funktionen ihres Nachweises: :func:`~opencivil.nachweis.querkraft.beiwert_k_g`,
 :func:`~opencivil.nachweis.querkraft.widerstand`,
-:func:`~opencivil.nachweis.querkraft.neigungen`.
+:func:`~opencivil.nachweis.querkraft.neigungen`, dazu
+:func:`~opencivil.nachweis.querkraft.protokoll_hoehen`,
+:func:`~opencivil.nachweis.querkraft.protokoll_ohne_buegel` und
+:func:`~opencivil.nachweis.querkraft.protokoll_mit_buegeln`. Bis 2026-10-18
+standen ihre Zeilen hier ein zweites Mal.
 
 WAS DIE GRENZEN BEDEUTEN:
 Ohne Buegel ist bei ``M_Ed = 0`` die Dehnung null und ``k_d = 1``; bei
@@ -41,7 +45,7 @@ from __future__ import annotations
 from typing import Dict, List, Optional, Tuple
 
 from opencivil.core.berechnung import Befundbezug, Eingaben, Prozedur
-from opencivil.core.einheiten import EINHEITSLOS, GRAD, KN, KN_PRO_M, KNM, MM, Groesse
+from opencivil.core.einheiten import EINHEITSLOS, KN, KN_PRO_M, KNM, Groesse
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Wert, WertDef
 from opencivil.nachweis import linie as geo
@@ -49,13 +53,13 @@ from opencivil.nachweis.biegung_normalkraft import (
     gleiche_linie, linienbezuege, resistenzlinie,
 )
 from opencivil.nachweis.querkraft import (
-    MIT_BUEGELN, OHNE_BUEGEL, Kurvenbeiwerte, beiwert_k_g, buegelteilung_y, neigungen,
-    widerstand, zuglage,
+    Kurvenbeiwerte, beiwert_k_g, buegelteilung_y, neigungen, protokoll_hoehen,
+    protokoll_mit_buegeln, protokoll_ohne_buegel, widerstand, zuglage,
 )
 from opencivil.querschnitt.fachwerk import beste_neigung
 from opencivil.nachweis.rechenwahl import bezuege_vereinen, stahlname
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
-from opencivil.querschnitt.platte import Richtung, protokoll_statische_hoehe
+from opencivil.querschnitt.platte import Richtung
 
 #: Womit die Kennzahlen rechnen: die Handrechnung mit Bemessungswerten.
 WAHL = Rechenwahl()
@@ -206,23 +210,18 @@ class Plattenkennzahlen(Prozedur):
         return wert.groesse.si
 
     def _hoehen(self, e: Eingaben, werte: Zwischenwerte, p: Protokoll,
-                beiwerte: Kurvenbeiwerte, positiv: bool, hoch: str
-                ) -> Optional[Tuple[Wert, Wert]]:
-        """``d`` und ``d_v`` der gezogenen Seite, hergeleitet -- ``None`` ohne Zugbewehrung."""
+                beiwerte: Kurvenbeiwerte, positiv: bool, hoch: str, *,
+                wirksam: bool) -> Optional[Tuple[Wert, Optional[Wert]]]:
+        """
+        ``d`` der gezogenen Seite und, ohne Buegel (``wirksam``), ``d_v`` --
+        hergeleitet wie im Querkraftnachweis; ``None`` ohne Zugbewehrung.
+        """
         hoehen = beiwerte.hoehen(positiv)
         if hoehen is None:
             return None
-        lage, art = self.posten[zuglage(beiwerte.lagen, positiv)][:2]
-        d = werte.laenge(f"d_{hoch}", f"d^{{{hoch}}}", hoehen[0])
-        protokoll_statische_hoehe(p, d, h=e["h"], z=e[f"z_{lage.nummer}{art.kuerzel}"],
-                                  von_unten=positiv)
-        d_v = werte.laenge(f"d_v_{hoch}", f"d_v^{{{hoch}}}", hoehen[1])
-        if hoehen[1] < hoehen[0]:
-            p.formel(d_v, "@d - @e", {"d": d, "e": e["einlagenhoehe"]},
-                     titel="Wirksame Höhe, um die Einlage vermindert")
-        else:
-            p.formel(d_v, "@d", {"d": d}, titel="Wirksame Höhe (Einlage nicht massgebend)")
-        return d, d_v
+        return protokoll_hoehen(p, werte, e, self.posten, zuglage(beiwerte.lagen, positiv),
+                                hoehen[0], hoehen[1] if wirksam else None,
+                                positiv=positiv, zeichen=hoch)
 
     def _ohne_buegel(self, e: Eingaben, p: Protokoll, werte: Zwischenwerte,
                      ergebnis: Dict[str, Groesse], momente: Dict[bool, float]) -> None:
@@ -247,7 +246,7 @@ class Plattenkennzahlen(Prozedur):
         bei_null: List[Wert] = []
         beim_widerstand: List[Wert] = []
         for positiv, seite, hoch in SEITEN:
-            hoehen = self._hoehen(e, werte, p, beiwerte, positiv, hoch)
+            hoehen = self._hoehen(e, werte, p, beiwerte, positiv, hoch, wirksam=True)
             if hoehen is None:
                 p.text(f"Zug {seite} ohne x-Bewehrung → kein d, kein Widerstand dieser Seite.")
                 continue
@@ -277,17 +276,12 @@ class Plattenkennzahlen(Prozedur):
             p.formel(eps_v, r"\frac{@f_yd}{@E_s}", {"f_yd": f_yd, "E_s": E_s},
                      titel=f"Zug {seite}, M_Ed = M_Rd: Dehnung beim Fliessbeginn",
                      name="Fliessdehnung")
-            k_d = werte.zahl(f"k_d_{hoch}", rf"k_d^{{{hoch}}}", voll.k_d, stellen=4)
-            p.formel(k_d, r"\frac{1}{1 + @eps_v \cdot @d \cdot @k_g}",
-                     {"eps_v": eps_v, "d": d, "k_g": k_g}, empirisch={"d": MM},
-                     titel="Beiwert für die statische Höhe")
             v_voll = werte.wert(f"V_voll_{hoch}",
                                 rf"V_{{Rd}}^{{{hoch}}}(M_{{Ed}} = M_{{Rd}}^{{{hoch}}})",
                                 Groesse.aus_si(voll.v_Rd, KN_PRO_M), 1)
-            p.formel(v_voll, r"@k_d \cdot @tau_cd \cdot @d_v",
-                     {"k_d": k_d, "tau_cd": tau_cd, "d_v": d_v},
-                     titel=f"Zug {seite}, M_Ed = M_Rd", referenz="SIA 262:2025, 4.3.3.2.1",
-                     name=OHNE_BUEGEL)
+            protokoll_ohne_buegel(p, werte, v_voll, k_d=voll.k_d, eps_v=eps_v, d=d, d_v=d_v,
+                                  k_g=k_g, tau_cd=tau_cd, titel=f"Zug {seite}, M_Ed = M_Rd",
+                                  zeichen=hoch)
             beim_widerstand.append(v_voll)
 
         for kurz, teile, titel in (("V_Rd_max", bei_null, "bei M_Ed = 0"),
@@ -319,7 +313,7 @@ class Plattenkennzahlen(Prozedur):
 
         teile: List[Wert] = []
         for positiv, seite, hoch in SEITEN:
-            hoehen = self._hoehen(e, werte, p, beiwerte, positiv, hoch)
+            hoehen = self._hoehen(e, werte, p, beiwerte, positiv, hoch, wirksam=False)
             if hoehen is None:
                 p.text(f"Zug {seite} ohne x-Bewehrung → kein d, kein Widerstand dieser Seite.")
                 continue
@@ -328,28 +322,11 @@ class Plattenkennzahlen(Prozedur):
                 alpha_min=alpha_min, alpha_max=alpha_max, a_s=e.g("a_s_V").si,
                 s_x=e.g("s_x").si, s_y=s_y, d=d.groesse.si, f_yd=e.g("f_yd_V").si,
                 f_cd=e.g("f_cd").si, k_c=e.g("k_c").si))
-            p.text(f"Zug {seite}: α = {alpha_min}° … {alpha_max}° ganzgradig → grösster "
-                   f"Widerstand bei α = {q.alpha}°.")
-            alpha = werte.wert(f"alpha_{hoch}", rf"\alpha_{{opt}}^{{{hoch}}}",
-                               Groesse(q.alpha, GRAD), 0)
-            buegel = werte.wert(f"V_s_{hoch}", rf"V_{{Rd,s}}^{{{hoch}}}",
-                                Groesse.aus_si(q.V_Rd_s, KN_PRO_M))
-            diagonale = werte.wert(f"V_c_{hoch}", rf"V_{{Rd,c}}^{{{hoch}}}",
-                                   Groesse.aus_si(q.V_Rd_c, KN_PRO_M))
-            p.formel(buegel,
-                     r"\frac{@A}{@s_x \cdot @s_y} \cdot 0.9 \cdot @d \cdot @f_yd \cdot \cot @alpha",
-                     {"A": e["a_s_V"], "s_x": e["s_x"], "s_y": w_sy, "d": d,
-                      "f_yd": e["f_yd_V"], "alpha": alpha},
-                     titel=f"Widerstand der Bügel, Zug {seite}", name="Widerstand der Bügel")
-            p.formel(diagonale,
-                     r"0.9 \cdot @d \cdot @k_c \cdot @f_cd \cdot \sin @alpha \cdot \cos @alpha",
-                     {"d": d, "k_c": e["k_c"], "f_cd": e["f_cd"], "alpha": alpha},
-                     titel=f"Widerstand der Druckdiagonalen, Zug {seite}",
-                     name="Widerstand der Druckdiagonalen")
             seite_wert = werte.wert(f"V_{hoch}", rf"V_{{Rd}}^{{{hoch}}}(\alpha_{{opt}})",
                                     Groesse.aus_si(q.V_Rd, KN_PRO_M), 1)
-            p.formel(seite_wert, r"\min\left[@s;\ @c\right]", {"s": buegel, "c": diagonale},
-                     titel=f"Querkraftwiderstand, Zug {seite}", name=MIT_BUEGELN)
+            protokoll_mit_buegeln(p, werte, seite_wert, q, e=e, s_y=w_sy, d=d,
+                                  alpha_min=alpha_min, alpha_max=alpha_max, seite=seite,
+                                  zeichen=hoch)
             teile.append(seite_wert)
         self._kleinstes(p, ergebnis, "V_Rd_buegel", teile,
                         "Querkraftwiderstand mit Bügeln, das Kleinere beider Seiten")

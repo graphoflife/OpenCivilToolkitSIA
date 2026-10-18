@@ -1,5 +1,5 @@
 ---
-erzeugt: cfdc19dda98b
+erzeugt: 09715cde2677
 art: formel
 tags: [formel]
 ---
@@ -32,8 +32,7 @@ $$
 
 ## Im Code
 
-- [[opencivil.nachweis.kennzahlen#Plattenkennzahlen|Plattenkennzahlen._ohne_buegel]]
-- [[opencivil.nachweis.querkraft#Querkraft._protokoll_fall|Querkraft._protokoll_fall]]
+- [[opencivil.nachweis.querkraft#protokoll_ohne_buegel|protokoll_ohne_buegel]]
 
 ## Themen
 

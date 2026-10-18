@@ -1,5 +1,5 @@
 ---
-erzeugt: eb9bee685c2d
+erzeugt: 0f483e3370ff
 art: modul
 tags: [modul]
 ---
@@ -238,6 +238,51 @@ def buegelteilung_y(buegel, b: float, menge_y: float) -> float
 Die Buegelteilung in y, in m: angegeben -- oder aus der Stabzahl ueber die
 betrachtete Breite `b`. Die Formel kennt nur Teilungen.
 
+### _hoch
+
+```python
+def _hoch(kurz: str, symbol: str, zeichen: str) -> Tuple[str, str]
+```
+
+Kurzname und Zeichen, mit `zeichen` hochgestellt: `d_+` und `d^{+}`.
+
+### protokoll_hoehen
+
+```python
+def protokoll_hoehen(p: Protokoll, werte: Zwischenwerte, e: Eingaben, posten, zuglage: int, d: float, d_v: Optional[float]=None, *, positiv: bool, zeichen: str='') -> Tuple[Wert, Optional[Wert]]
+```
+
+Die statische Hoehe der gezogenen Bewehrung und, ohne Buegel, die
+wirksame -- geschrieben, und fuer die Formeln danach. `zuglage` ist der
+Posten der aeussersten gezogenen Lage ([[opencivil.nachweis.querkraft#zuglage|zuglage]]), `positiv`, ob
+der Zug unten liegt. `zeichen` hebt die Groessen hoch, wo zwei Seiten
+nebeneinander stehen: `d^{+}` (die Kennzahlen).
+
+Mit Buegeln gibt es kein `d_v`: bis 2026-10-18 schrieben die Kennzahlen
+dort ein «d_v = d (Einlage nicht massgebend)», weil sie die Hoehen ohne
+Buegel mit einer Einlage null mitbenutzten.
+
+### protokoll_ohne_buegel
+
+```python
+def protokoll_ohne_buegel(p: Protokoll, werte: Zwischenwerte, widerstand: Wert, *, k_d: float, eps_v: Wert, d: Wert, d_v: Wert, k_g: Wert, tau_cd: Wert, titel: str='Querkraftwiderstand', zeichen: str='') -> None
+```
+
+Der Widerstand ohne Buegel aus der Dehnung `eps_v`, die schon dasteht:
+`k_d` und `V_Rd = k_d · tau_cd · d_v`. `widerstand` ist der Wert,
+der dabei herauskommt, mit seinem Zeichen.
+
+### protokoll_mit_buegeln
+
+```python
+def protokoll_mit_buegeln(p: Protokoll, werte: Zwischenwerte, widerstand: Wert, q: Buegelpunkt, *, e: Eingaben, s_y: Wert, d: Wert, alpha_min: int, alpha_max: int, seite: str='', zeichen: str='') -> None
+```
+
+Der Widerstand mit Buegeln bei der guenstigsten Neigung `q`: welche es
+ist, die Buegel, die Druckdiagonale und das Kleinere beider.
+`widerstand` ist der Wert, der dabei herauskommt; `seite` steht in
+den Titeln, wo zwei Seiten nebeneinander stehen.
+
 ### _ohne_zugbewehrung
 
 ```python
@@ -464,14 +509,6 @@ def _widerstandssymbol(self, fall: Querkraftfall) -> str
 
 `V_Rd(M_Ed = 100 kNm, N_Ed = -300 kN)` -- der Widerstand ist bedingt.
 
-#### Querkraft._protokoll_hoehe
-
-```python
-def _protokoll_hoehe(self, p: Protokoll, e: Eingaben, erg: Querkraftergebnis, werte: Zwischenwerte) -> Wert
-```
-
-Die statische Höhe der gezogenen Bewehrung -- geschrieben, und für die Formeln danach.
-
 #### Querkraft._protokoll_grad
 
 ```python
@@ -525,16 +562,16 @@ nicht nachrechnen konnte.
 ## Formeln aus diesem Modul
 
 - [[Beiwert der Gesteinskörnung]] · `beiwert_k_g`
-- [[Beiwert für die statische Höhe]] · `Querkraft._protokoll_fall`
+- [[Beiwert für die statische Höhe]] · `protokoll_ohne_buegel`
 - [[Dehnung auf halber Höhe]] · `Querkraft._protokoll_fall`
 - [[Dekompressionsmoment]] · `Querkraft._protokoll_fall`
 - [[Dekompressionsmoment und Dehnung]] · `Querkraft._protokoll_ansatz`
 - [[Querkraftwiderstand mit Querkraftbewehrung]] · `Querkraft._protokoll_ansatz_buegel`
-- [[Querkraftwiderstand mit Querkraftbewehrung]] · `Querkraft._protokoll_fall_buegel`
+- [[Querkraftwiderstand mit Querkraftbewehrung]] · `protokoll_mit_buegeln`
 - [[Querkraftwiderstand ohne Querkraftbewehrung]] · `Querkraft._protokoll_ansatz`
-- [[Querkraftwiderstand ohne Querkraftbewehrung]] · `Querkraft._protokoll_fall`
+- [[Querkraftwiderstand ohne Querkraftbewehrung]] · `protokoll_ohne_buegel`
 - [[Teilung in y aus der Stabzahl]] · `Querkraft._protokoll_ansatz_buegel`
-- [[Widerstand der Bügel]] · `Querkraft._protokoll_fall_buegel`
-- [[Widerstand der Druckdiagonalen]] · `Querkraft._protokoll_fall_buegel`
-- [[Wirksame Höhe (Einlage nicht massgebend)]] · `Querkraft._protokoll_fall`
-- [[Wirksame Höhe, um die Einlage vermindert]] · `Querkraft._protokoll_fall`
+- [[Widerstand der Bügel]] · `protokoll_mit_buegeln`
+- [[Widerstand der Druckdiagonalen]] · `protokoll_mit_buegeln`
+- [[Wirksame Höhe (Einlage nicht massgebend)]] · `protokoll_hoehen`
+- [[Wirksame Höhe, um die Einlage vermindert]] · `protokoll_hoehen`
