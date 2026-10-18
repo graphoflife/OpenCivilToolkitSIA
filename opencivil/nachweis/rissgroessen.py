@@ -179,6 +179,8 @@ class Bruttoquerschnitt:
     I_z: float
     I_yz: float
     ecken: Tuple[Ecke, ...]
+    einachsig: bool = False
+    """Ob die Nulllinie parallel zur Achse der Biegung bleibt -- wie die Analyse rechnet."""
 
     def ausdehnung(self, um_y: bool) -> Tuple[float, float]:
         """Die Hoehe in Biegerichtung und die Breite quer dazu, in m -- aus der Zeichnung."""
@@ -186,15 +188,14 @@ class Bruttoquerschnitt:
         hoehe_z = (max(e.punkt[1] for e in self.ecken) - min(e.punkt[1] for e in self.ecken)) * 1e-3
         return (hoehe_z, breite_y) if um_y else (breite_y, hoehe_z)
 
-    def einheitsspannung(self, ecke: Ecke, M_y: float, M_z: float, *,
-                         einachsig: bool) -> float:
+    def einheitsspannung(self, ecke: Ecke, M_y: float, M_z: float) -> float:
         """
         Die Spannung an der Ecke beim Moment ``(M_y, M_z)``, Zug positiv -- bei
         einem Moment von eins in dieser Richtung die Einheitsspannung.
         ``einachsig`` bleibt die Nulllinie parallel zur Achse der Biegung, ohne
         ``I_yz``.
         """
-        if einachsig:
+        if self.einachsig:
             return -(M_y * ecke.z / self.I_y + M_z * ecke.y / self.I_z)
         nenner = self.I_y * self.I_z - self.I_yz * self.I_yz
         return -(M_y * (self.I_z * ecke.z - self.I_yz * ecke.y)
@@ -220,7 +221,8 @@ def bruttoquerschnitt(analyse: Querschnittsanalyse,
         I_yz=wert(analyse.id_von("I_yz")),
         ecken=tuple(Ecke(y=p[0] * 1e-3 - y_S, z=p[1] * 1e-3 - z_S, punkt=p, stoff=stoff,
                          f_ctm=abs(wert(stoff.id_von("f_ctm"))))
-                    for p, stoff in analyse.beton_ecken))
+                    for p, stoff in analyse.beton_ecken),
+        einachsig=analyse.einachsig)
 
 
 @dataclass(frozen=True)
@@ -242,8 +244,7 @@ class Rissmoment:
     """in Nm."""
 
 
-def rissmoment(q: Bruttoquerschnitt, M_y: float, M_z: float, *,
-               einachsig: bool) -> Rissmoment:
+def rissmoment(q: Bruttoquerschnitt, M_y: float, M_z: float) -> Rissmoment:
     """
     Das Rissmoment in der Richtung ``(M_y, M_z)`` -- einem Moment von eins:
     das Moment unter reiner Biegung, bei dem ``f_ct,eff`` zum ersten Mal
@@ -252,8 +253,7 @@ def rissmoment(q: Bruttoquerschnitt, M_y: float, M_z: float, *,
     """
     hoehe, _ = q.ausdehnung(M_y != 0.0)
     k_t = beiwert_dicke(rissaktive_dicke(h=hoehe, zug=False))
-    gezogen = [(ecke, q.einheitsspannung(ecke, M_y, M_z, einachsig=einachsig))
-               for ecke in q.ecken]
+    gezogen = [(ecke, q.einheitsspannung(ecke, M_y, M_z)) for ecke in q.ecken]
     ecke, sigma = max((es for es in gezogen if es[1] > 0.0),
                       key=lambda es: es[1] / es[0].f_ctm)
     W = 1.0 / sigma
@@ -277,7 +277,7 @@ class Rissnormalkraft:
     """in N."""
 
 
-def rissnormalkraft(q: Bruttoquerschnitt, M_y: float, M_z: float, *, einachsig: bool,
+def rissnormalkraft(q: Bruttoquerschnitt, M_y: float, M_z: float, *,
                     k_t: float, A: float) -> Rissnormalkraft:
     """
     Die Zugkraft, bei der der ungerissene Bruttoquerschnitt beim Moment
@@ -287,7 +287,7 @@ def rissnormalkraft(q: Bruttoquerschnitt, M_y: float, M_z: float, *, einachsig: 
     rissaktive Dicke unter Zug (:func:`rissaktive_dicke`).
     """
     def an(ecke: Ecke) -> Tuple[float, Ecke, float, float]:
-        sigma = q.einheitsspannung(ecke, M_y, M_z, einachsig=einachsig)
+        sigma = q.einheitsspannung(ecke, M_y, M_z)
         f_ct_eff = k_t * ecke.f_ctm
         return (f_ct_eff - sigma) * A, ecke, sigma, f_ct_eff
 
@@ -314,15 +314,14 @@ def protokoll_ecke(p: Protokoll, ecke: Ecke) -> None:
 
 
 def protokoll_widerstandsmoment(p: Protokoll, werte: Zwischenwerte, q: Bruttoquerschnitt,
-                                ecke: Ecke, W: float, M_y: float, M_z: float, *,
-                                einachsig: bool) -> Wert:
+                                ecke: Ecke, W: float, M_y: float, M_z: float) -> Wert:
     """
     ``W = 1/σ`` an der Ecke bei einem Moment von eins in der Richtung
     ``(M_y, M_z)``, um y -- einachsig ``I_y/v``, sonst mit ``I_yz``.
     """
     W = werte.wert("W", "W", Groesse.aus_si(W, MIO_MM3), 2)
     I_y = werte.wert("Iy", "I_y", Groesse.aus_si(q.I_y, MIO_MM4), 1)
-    if einachsig:
+    if q.einachsig:
         p.formel(W, r"\frac{@Iy}{@v}", {
             "Iy": I_y,
             "v": werte.laenge("v", "v", -M_y * ecke.z, "Abstand des gezogenen Rands vom Schwerpunkt"),
@@ -340,7 +339,7 @@ def protokoll_widerstandsmoment(p: Protokoll, werte: Zwischenwerte, q: Bruttoque
 
 def protokoll_rissmoment(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse,
                          werte: Zwischenwerte, q: Bruttoquerschnitt, riss: Rissmoment,
-                         M_y: float, M_z: float, *, einachsig: bool, referenz: str) -> Wert:
+                         M_y: float, M_z: float, *, referenz: str) -> Wert:
     """Die Herleitung von :func:`rissmoment` -- zurueck kommt ``M_Riss``."""
     ecke = riss.ecke
     protokoll_ecke(p, ecke)
@@ -349,7 +348,7 @@ def protokoll_rissmoment(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse
         p, werte, k_t=riss.k_t, f_ct_eff=riss.f_ct_eff, h=h,
         f_ctm=e[analyse._name(ecke.stoff, "f_ctm")], teiler=MOMENTENTEILER,
         referenz=referenz, titel="Beiwert für die Höhe in Biegerichtung")
-    W = protokoll_widerstandsmoment(p, werte, q, ecke, riss.W, M_y, M_z, einachsig=einachsig)
+    W = protokoll_widerstandsmoment(p, werte, q, ecke, riss.W, M_y, M_z)
     M_Riss = werte.moment("M_Riss", "M_{Riss}", riss.M_Riss)
     p.formel(M_Riss, r"@f \cdot @W", {"f": f_ct_eff, "W": W},
              titel="Rissmoment des ungerissenen Querschnitts")

@@ -77,7 +77,6 @@ from opencivil.nachweis.querschnittsloeser import VERFEHLTE_EBENE
 from opencivil.nachweis.rechenwahl import protokoll_gesetze_nach_wahl, protokoll_rechenwahl
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.nachweis.rissanforderung import Rissanforderung
-from opencivil.nachweis.richtungsnachweise import richtungen
 from opencivil.nachweis.rissgroessen import (
     DICKENGRENZE, beiwert_dicke, bruttoquerschnitt, protokoll_rissmoment,
     protokoll_spannung_ungerissen, protokoll_zugfestigkeit, rissaktive_dicke, rissbezuege,
@@ -376,11 +375,9 @@ class ZwaengungBiegungQA(Biegezwang):
     Stab sein ``sigma_s,adm`` erreicht.
     """
 
-    def __init__(self, analyse: Querschnittsanalyse, *, einachsig: bool,
-                 anforderung: Rissanforderung,
+    def __init__(self, analyse: Querschnittsanalyse, *, anforderung: Rissanforderung,
                  kriechzahl: float) -> None:
         self.analyse = analyse
-        self.einachsig = einachsig
         self.anforderung = anforderung
         self.wahl = Rechenwahl(kriechzahl=kriechzahl, satz=VORGABE.satz, art=VORGABE.art)
         basis = f"{analyse.id}.nachweis.zwang_biegung"
@@ -388,7 +385,7 @@ class ZwaengungBiegungQA(Biegezwang):
             name: grad_def(f"{basis}.{kennung_aus(name)}.erfuellungsgrad",
                            rf"\alpha_{{eff,ZB,{als_text(name)}}}",
                            f"Erfüllungsgrad {self.THEMA} – {name}", self.REFERENZ)
-            for name in (seite.beschriftung for seite in richtungen(einachsig))}
+            for name in (seite.beschriftung for seite in analyse.zugseiten)}
         super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()),
                          bezuege=analyse.grundbezuege() + rissbezuege(analyse),
                          titel=f"{self.THEMA} – {analyse.name}",
@@ -403,17 +400,17 @@ class ZwaengungBiegungQA(Biegezwang):
         protokoll_rissbreitengrenzen(p, e, a, staebe, grenzen, self.anforderung, self.id,
                                      referenz=self.REFERENZ)
         protokoll_dehnungsebene(p)
-        p.erklaerung(EINACHSIG if self.einachsig else suche_der_ebene(q))
+        p.erklaerung(EINACHSIG if self.analyse.einachsig else suche_der_ebene(q))
 
         brutto = bruttoquerschnitt(a, e.si_nach_id())
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
-        for seite in richtungen(self.einachsig):
+        for seite in self.analyse.zugseiten:
             name, (M_y, M_z) = seite.beschriftung, seite.moment
             d_grad = self.d_ausnutzung[name]
             werte = Zwischenwerte(f"{self.id}.{kennung_aus(name)}")
             p.titel(name, ebene=3)
-            riss = rissmoment(brutto, M_y, M_z, einachsig=self.einachsig)
+            riss = rissmoment(brutto, M_y, M_z)
             gefunden = self._an_der_grenze(q, staebe, grenzen, M_y, M_z, riss.M_Riss)
             if gefunden is None:
                 p.text("Keine Bewehrung auf der gezogenen Seite → kein Nachweis.")
@@ -421,10 +418,10 @@ class ZwaengungBiegungQA(Biegezwang):
                 continue
             M_s_adm_si, ebene, stab = gefunden
             M_Riss = protokoll_rissmoment(p, e, a, werte, brutto, riss, M_y, M_z,
-                                          einachsig=self.einachsig, referenz=self.REFERENZ)
+                                          referenz=self.REFERENZ)
             M_s_adm = werte.moment("M_s_adm", r"M_{s,adm}", M_s_adm_si, "Widerstand")
             p.wert(M_s_adm, titel="Moment, bei dem der erste gezogene Stab σ_s,adm erreicht")
-            protokoll_ebene(p, werte, ebene, self.einachsig)
+            protokoll_ebene(p, werte, ebene, self.analyse.einachsig)
             gruppe = grenzen.gruppe(stab)
             sigma_s = werte.spannung("sigma_s", r"\sigma_s", ebene.sigma_s[stab])
             p.gleichung(rf"{angabe(sigma_s)} = {angabe(gruppe.wert)}",
@@ -465,7 +462,7 @@ class ZwaengungBiegungQA(Biegezwang):
         def auswertung(M: float):
             # Linear bleibt die Neigung beim Dreisatz dieselbe: von ihr aus.
             ebene = gebrauchsebene(q, N=0.0, M_y=M * M_y, M_z=M * M_z,
-                                   einachsig=self.einachsig, start=neigung[0])
+                                   einachsig=self.analyse.einachsig, start=neigung[0])
             if ebene.konvergiert:
                 neigung[0] = ebene.psi
             if not ebene.konvergiert:
@@ -518,7 +515,7 @@ class ZwaengungBiegungQA(Biegezwang):
                  r"\qquad M_{s,adm} \ge M_{Riss}",
                  titel=f"{self.THEMA}, je Stab", referenz=self.REFERENZ,
                  name="Moment der Bewehrung bei zulässiger Stahlspannung")
-        protokoll_spannung_ungerissen(p, einachsig=self.einachsig)
+        protokoll_spannung_ungerissen(p, einachsig=self.analyse.einachsig)
         protokoll_rechenwahl(p, self.wahl, self.id)
         protokoll_gesetze_nach_wahl(p, e, self.analyse, self.wahl, self.id,
                           titel="Werkstoffgesetze im gerissenen Zustand")

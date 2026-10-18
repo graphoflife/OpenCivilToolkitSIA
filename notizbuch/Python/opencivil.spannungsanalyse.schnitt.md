@@ -1,5 +1,5 @@
 ---
-erzeugt: 11bf94e58c61
+erzeugt: a2e9a8a7c76b
 art: modul
 tags: [modul]
 ---
@@ -275,7 +275,6 @@ Herleitung braucht.
 - `grenznamen: Tuple[str, ...]`
 - `querschnitt: Querschnitt` – Der gerissene Querschnitt im Bruchzustand -- derselbe, aus dem `gerissen` stammt.
 - `zerlegungen: Tuple[_Zerlegung, _Zerlegung]` – Gerissen und ungerissen, in jeder Richtung -- fuer die kippende Nulllinie.
-- `einachsig: bool` – Ob die Nulllinie parallel zur Achse der Biegung bleibt, statt zu kippen.
 - `A: float` – Flaeche des Bruttoquerschnitts, m².
 - `I: float` – Traegheitsmoment um die Achse der Biegung, m⁴.
 - `brutto: Bruttoquerschnitt`
@@ -287,6 +286,15 @@ Herleitung braucht.
 - `staehle: Tuple[Baustoff, ...] = ()`
 - `ids: Mapping[str, str] = field(default_factory=dict)` – Kurzname -> Wert-ID der Eingaben, fuer die Herleitung: der Beton der Ecke, die zuerst reisst, und A, I -- dazu die Zugfestigkeit jedes Betons unter ihrer eigenen ID, denn welche Ecke unter Zug zuerst reisst, haengt am Moment.
 - `bezugsort = 'im Schwerpunkt'` – Wo die Mitteldehnung gilt -- dort greift N an.
+
+#### Schnittpaar.einachsig
+
+```python
+@property
+def einachsig(self) -> bool
+```
+
+Ob die Nulllinie parallel zur Achse der Biegung bleibt, statt zu kippen -- wie die Analyse.
 
 #### Schnittpaar.ebenen
 

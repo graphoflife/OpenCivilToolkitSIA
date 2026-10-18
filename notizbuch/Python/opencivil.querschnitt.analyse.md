@@ -1,5 +1,5 @@
 ---
-erzeugt: 7c35da335a58
+erzeugt: 542f7400e4f3
 art: modul
 tags: [modul]
 ---
@@ -239,6 +239,17 @@ def beton_an(self, p: Punkt) -> Optional[Baustoff]
 
 Der Werkstoff des innersten Polygons an dieser Stelle.
 
+#### Querschnittsanalyse.zugseiten
+
+```python
+@property
+def zugseiten(self) -> Tuple[Zugseite, ...]
+```
+
+Die Seiten, die je ein Nachweis ziehen laesst -- einachsig nur unten
+und oben, um z wird dann nicht nachgewiesen. Ihre Namen, «Zug unten»,
+sind die der Faelle; die Kennungen «Zug_unten».
+
 #### Querschnittsanalyse.abschnitt
 
 ```python
@@ -413,6 +424,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 - [[opencivil.querschnitt.interaktion]]
 - [[opencivil.querschnitt.schubwaende]]
 - [[opencivil.querschnitt.werkstoffgesetz]]
+- [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
 

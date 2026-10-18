@@ -46,6 +46,7 @@ from opencivil.querschnitt.schubwaende import zellen as zellen_finden
 from opencivil.querschnitt.fasern import FASERN
 from opencivil.querschnitt.gesetzwahl import Rechenwahl, betongesetz
 from opencivil.querschnitt.werkstoffgesetz import Stahlgesetz
+from opencivil.querschnitt.zugseite import UM_Y, Zugseite
 
 #: Die Kennwerte, die die Nachweise eines Werkstoffs lesen -- je Art alle, die
 #: eine der Wahlen braucht. Das Rechenwerk rechnet sie ohnehin. Aus ``E_cm``
@@ -359,8 +360,10 @@ class Querschnittsanalyse:
         self.einachsig = einachsig
         """
         Ob die Nulllinie parallel zur Achse der Biegung bleibt, statt unter
-        reiner Biegung zu kippen -- bisher liest es nur die
-        Spannung-Dehnung-Analyse, die Nachweise bekommen es noch einzeln.
+        reiner Biegung zu kippen. Die Spannung-Dehnung-Analyse und jeder
+        Nachweis lesen es hier, der Bruttoquerschnitt traegt es weiter
+        (:func:`~opencivil.nachweis.rissgroessen.bruttoquerschnitt`). Bis
+        2026-10-18 bekamen die Nachweise es einzeln, durch elf Signaturen.
         """
         self.wahl = dict(wahl)
         """Je Baustoff-ID der Wertesatz und beim Beton die Rechenart -- ohne Kriechen."""
@@ -421,6 +424,15 @@ class Querschnittsanalyse:
                 durchmesser=w["durchmesser"], teilung=w["teilung"],
                 schnitte=w["schnitte"], stahl=w["stahl"], beton=self.beton_an(mitte)))
         return ergebnis
+
+    @property
+    def zugseiten(self) -> Tuple[Zugseite, ...]:
+        """
+        Die Seiten, die je ein Nachweis ziehen laesst -- einachsig nur unten
+        und oben, um z wird dann nicht nachgewiesen. Ihre Namen, «Zug unten»,
+        sind die der Faelle; die Kennungen «Zug_unten».
+        """
+        return UM_Y if self.einachsig else tuple(Zugseite)
 
     # -- Rechenwerk -----------------------------------------------------------
 

@@ -108,10 +108,9 @@ class SchiefeBiegung(Nachweis):
     LANGNAME = "Biegung und Normalkraft"
 
     def __init__(self, analyse: Querschnittsanalyse, lastfaelle: Sequence[Lastfall],
-                 *, einachsig: bool, laengszug=None) -> None:
+                 *, laengszug=None) -> None:
         self.analyse = analyse
         self.lastfaelle = list(lastfaelle)
-        self.einachsig = einachsig
         self.laengszug = laengszug
         """Der Nachweis der Schubwaende, wenn die Laengszugkraft zaehlt."""
 
@@ -172,11 +171,11 @@ class SchiefeBiegung(Nachweis):
         return Ausfuehrung(ergebnis, urteile, befund)
 
     def _einwirkung(self, e: Eingaben, fall: Lastfall) -> Tuple[float, float, float]:
-        N, M_y, M_z = fall.N, fall.M_y, 0.0 if self.einachsig else fall.M_z
+        N, M_y, M_z = fall.N, fall.M_y, 0.0 if self.analyse.einachsig else fall.M_z
         if self.laengszug is not None:
             N += e.g(f"dN_{fall.kennung}").si
             M_y += e.g(f"dM_y_{fall.kennung}").si
-            if not self.einachsig:
+            if not self.analyse.einachsig:
                 M_z += e.g(f"dM_z_{fall.kennung}").si
         return N, M_y, M_z
 
@@ -190,7 +189,7 @@ class SchiefeBiegung(Nachweis):
         p.titel(fall.name, ebene=3)
         self._protokoll_einwirkung(p, e, werte, fall, N, M_y, M_z)
 
-        moment = abs(M_y) if self.einachsig else math.hypot(M_y, M_z)
+        moment = abs(M_y) if self.analyse.einachsig else math.hypot(M_y, M_z)
         N_Ed = werte.kraft("N_Ed_wirk", "N_{Ed}", N)
 
         # -- Ohne Moment: reine Normalkraft ---------------------------------
@@ -227,7 +226,7 @@ class SchiefeBiegung(Nachweis):
                 einwirkung=N_Ed, widerstand=N_Rd), Fallergebnis(fall, N, M_y, M_z, None, grad)
 
         # -- Der Bruchzustand -------------------------------------------------
-        if self.einachsig:
+        if self.analyse.einachsig:
             punkt = q.bei_normalkraft(Zugseite.aus_moment(M_y).psi, N)
             M_Rd_si = abs(punkt.M_y)
         else:
@@ -236,7 +235,7 @@ class SchiefeBiegung(Nachweis):
         self._protokoll_bruchzustand(p, werte, q, punkt, herkunft)
 
         M_Rd = werte.moment("M_Rd", "M_{Rd}", M_Rd_si)
-        if self.einachsig:
+        if self.analyse.einachsig:
             # Nur sagen, was zutrifft: beim symmetrischen Querschnitt entsteht
             # gar kein M_z, das man uebergehen koennte.
             if abs(punkt.M_z) > 1e-3 * max(M_Rd_si, 1.0):
@@ -277,19 +276,19 @@ class SchiefeBiegung(Nachweis):
                               fall: Lastfall, N: float, M_y: float, M_z: float) -> None:
         zeilen = [["N_Ed", Mathe(fest(fall.N / 1e3, 1)), "kN"],
                   ["M_y,Ed", Mathe(fest(fall.M_y / 1e3, 1)), "kNm"]]
-        if not self.einachsig:
+        if not self.analyse.einachsig:
             zeilen.append(["M_z,Ed", Mathe(fest(fall.M_z / 1e3, 1)), "kNm"])
         if self.laengszug is not None:
             dN = e.g(f"dN_{fall.kennung}").si
             dMy = e.g(f"dM_y_{fall.kennung}").si
             zeilen += [["ΔN aus Querkraft und Torsion", Mathe(fest(dN / 1e3, 1)), "kN"],
                        ["ΔM_y", Mathe(fest(dMy / 1e3, 1)), "kNm"]]
-            if not self.einachsig:
+            if not self.analyse.einachsig:
                 zeilen.append(["ΔM_z", Mathe(fest(e.g(f"dM_z_{fall.kennung}").si / 1e3, 1)),
                                "kNm"])
             zeilen += [["N (nachgewiesen)", Mathe(fest(N / 1e3, 1)), "kN"],
                        ["M_y (nachgewiesen)", Mathe(fest(M_y / 1e3, 1)), "kNm"]]
-            if not self.einachsig:
+            if not self.analyse.einachsig:
                 zeilen.append(["M_z (nachgewiesen)", Mathe(fest(M_z / 1e3, 1)), "kNm"])
         p.tabelle(kopf=["Einwirkung", "Wert", ""], zeilen=zeilen,
                   titel="Einwirkung", ausrichtung="lrl")
@@ -350,7 +349,7 @@ class SchiefeBiegung(Nachweis):
         p.formel(werte.moment("M_y_int", "M_{y,Rd}",
                               sum(-a.N * (a.z - z_S) for a in anteile)),
                  r"-\sum F_i \cdot (z_i - z_S)", {}, titel="Probe: Moment um y")
-        if not self.einachsig:
+        if not self.analyse.einachsig:
             p.formel(werte.moment("M_z_int", "M_{z,Rd}",
                                   sum(-a.N * (a.y - y_S) for a in anteile)),
                      r"-\sum F_i \cdot (y_i - y_S)", {}, titel="Probe: Moment um z")

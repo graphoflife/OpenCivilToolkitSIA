@@ -54,20 +54,17 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag, aufbau: Aufbau
         for l in eintrag.lastfaelle if l.aktiv]
 
     schub = None
-    if any(l.V_z or l.T or (l.V_y and not eintrag.einachsig) for l in lastfaelle) \
+    if any(l.V_z or l.T or (l.V_y and not analyse.einachsig) for l in lastfaelle) \
             or (eintrag.laengszugkraft and lastfaelle):
-        schub = Schubwandnachweis(analyse, lastfaelle, einachsig=eintrag.einachsig,
-                                  mit_laengszug=eintrag.laengszugkraft)
+        schub = Schubwandnachweis(analyse, lastfaelle, mit_laengszug=eintrag.laengszugkraft)
         aufbau.eintragen(teil, "qa_schub", eintrag.kennung, schub)
     aufbau.eintragen(teil, "qa_biegung", eintrag.kennung, SchiefeBiegung(
-        analyse, lastfaelle, einachsig=eintrag.einachsig,
-        laengszug=schub if eintrag.laengszugkraft else None))
+        analyse, lastfaelle, laengszug=schub if eintrag.laengszugkraft else None))
 
-    duktilitaet = DuktilitaetQA(analyse, einachsig=eintrag.einachsig,
-                                grenze=eintrag.x_d_max)
+    duktilitaet = DuktilitaetQA(analyse, grenze=eintrag.x_d_max)
     duktilitaet.still = not eintrag.duktilitaet
     aufbau.eintragen(teil, "qa_duktilitaet", eintrag.kennung, duktilitaet)
-    sproede = SproedesVersagenQA(analyse, einachsig=eintrag.einachsig)
+    sproede = SproedesVersagenQA(analyse)
     sproede.still = not eintrag.sproede
     aufbau.eintragen(teil, "qa_sproede", eintrag.kennung, sproede)
 
@@ -75,8 +72,7 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag, aufbau: Aufbau
                               begrenzt=eintrag.zwaengung_begrenzt)
     zwang.still = not eintrag.zwaengung
     aufbau.eintragen(teil, "qa_rissnormalkraft", eintrag.kennung, zwang)
-    biegung = ZwaengungBiegungQA(analyse, einachsig=eintrag.einachsig,
-                                 anforderung=eintrag.rissanforderung,
+    biegung = ZwaengungBiegungQA(analyse, anforderung=eintrag.rissanforderung,
                                  kriechzahl=eintrag.zwaengung_biegung_kriechzahl)
     biegung.still = not eintrag.zwaengung_biegung
     aufbau.eintragen(teil, "qa_zwaengung_biegung", eintrag.kennung, biegung)

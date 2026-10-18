@@ -1,5 +1,5 @@
 ---
-erzeugt: 126161e17c59
+erzeugt: 0485e8ea8a15
 art: modul
 tags: [modul]
 ---
@@ -31,16 +31,6 @@ die Zwaengung auf Biegung ([[opencivil.nachweis.qa_gebrauch]]) haelt
 dasselbe Rissmoment gegen ihre Bewehrung.
 
 ## Inhalt
-
-### richtungen
-
-```python
-def richtungen(einachsig: bool) -> Tuple[Zugseite, ...]
-```
-
-Die Seiten, die je ein Nachweis gezogen werden -- einachsig nur unten und
-oben, um z wird dann nicht nachgewiesen. Ihre Namen, «Zug unten», sind
-die der Faelle; die Kennungen «Zug_unten».
 
 ### bei_reiner_biegung
 
@@ -100,7 +90,6 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 
 ## Gebraucht von
 
-- [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 

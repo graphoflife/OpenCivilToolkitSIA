@@ -389,9 +389,6 @@ class Schnittpaar:
     zerlegungen: Tuple[_Zerlegung, _Zerlegung]
     """Gerissen und ungerissen, in jeder Richtung -- fuer die kippende Nulllinie."""
 
-    einachsig: bool
-    """Ob die Nulllinie parallel zur Achse der Biegung bleibt, statt zu kippen."""
-
     A: float
     """Flaeche des Bruttoquerschnitts, m²."""
 
@@ -426,6 +423,11 @@ class Schnittpaar:
     ihrer eigenen ID, denn welche Ecke unter Zug zuerst reisst, haengt am Moment.
     """
 
+    @property
+    def einachsig(self) -> bool:
+        """Ob die Nulllinie parallel zur Achse der Biegung bleibt, statt zu kippen -- wie die Analyse."""
+        return self.brutto.einachsig
+
     def ebenen(self) -> Zustaende:
         """Die Ebenen beider Zustaende: kippend, «einachsig» mit fester Nulllinie."""
         if self.einachsig:
@@ -451,7 +453,7 @@ class Schnittpaar:
     def rissnormalkraft(self, M: float) -> Rissnormalkraft:
         """Die Rissnormalkraft beim Moment ``M`` -- an der Ecke, die zuerst reisst."""
         M_y, M_z = self.seite.moment
-        return rissnormalkraft(self.brutto, M * M_y, M * M_z, einachsig=self.einachsig,
+        return rissnormalkraft(self.brutto, M * M_y, M * M_z,
                                k_t=self.k_t_zug, A=self.A)
 
     def rissnormalkraft_bei(self, M: float) -> float:
@@ -513,7 +515,7 @@ class Schnittpaar:
             if not self.einachsig:
                 protokoll_ecke(p, ecke)
                 W = protokoll_widerstandsmoment(p, w, self.brutto, ecke, self.W,
-                                                *self.seite.moment, einachsig=False)
+                                                *self.seite.moment)
             f_ct_eff = protokoll_zugfestigkeit(
                 p, w, k_t=self.riss.k_t, f_ct_eff=self.riss.f_ct_eff, h=h,
                 f_ctm=ein(ecke.stoff.id_von("f_ctm")), teiler=MOMENTENTEILER,
@@ -558,7 +560,7 @@ class Schnittpaar:
             protokoll_ecke(p, zug.ecke)
             W = protokoll_widerstandsmoment(
                 p, w, self.brutto, zug.ecke, abs(M) / zug.sigma_M,
-                *((M_y, M_z) if M > 0.0 else (-M_y, -M_z)), einachsig=False)
+                *((M_y, M_z) if M > 0.0 else (-M_y, -M_z)))
             p.formel(sigma, r"\frac{\left|@M\right|}{@W}", {"M": M_wert, "W": W},
                      titel="Spannung aus dem Moment an der Ecke, die zuerst reisst")
         else:
@@ -628,7 +630,7 @@ def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[s
     # Der Riss am Bruttoquerschnitt; der Beton der Ecke, die zuerst reisst,
     # gibt E_cm und die Gesetze der Herleitung.
     brutto = bruttoquerschnitt(analyse, wert)
-    riss = rissmoment(brutto, *seite.moment, einachsig=analyse.einachsig)
+    riss = rissmoment(brutto, *seite.moment)
     stoff = riss.ecke.stoff
     I_id = analyse.id_von("I_y" if seite.um_y else "I_z")
     ids = {"E_cm": stoff.id_von("E_cm"), "f_c": stoff.id_von(wahl.satz.beton),
@@ -642,6 +644,6 @@ def schnittpaar(analyse: Querschnittsanalyse, seite: Zugseite, wert: Callable[[s
     return Schnittpaar(
         gerissen=gerissen.loeser, ungerissen=ungerissen.loeser, seite=seite, wahl=wahl,
         grenznamen=gerissen.grenznamen, querschnitt=q, zerlegungen=tuple(zerlegungen),
-        einachsig=analyse.einachsig, A=wert(ids["A"]), I=wert(I_id), brutto=brutto, riss=riss,
+        A=wert(ids["A"]), I=wert(I_id), brutto=brutto, riss=riss,
         k_t_zug=beiwert_dicke(t_zug), breite=breite, t_zug=t_zug,
         E_cm=abs(wert(ids["E_cm"])), staehle=stahlstoffe, ids=ids)

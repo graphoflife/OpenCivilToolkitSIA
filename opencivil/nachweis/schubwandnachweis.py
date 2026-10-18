@@ -53,10 +53,9 @@ class Schubwandnachweis(Nachweis):
     THEMA = "Querkraft und Torsion"
 
     def __init__(self, analyse: Querschnittsanalyse, lastfaelle: Sequence[Lastfall],
-                 *, einachsig: bool, mit_laengszug: bool) -> None:
+                 *, mit_laengszug: bool) -> None:
         self.analyse = analyse
         self.lastfaelle = list(lastfaelle)
-        self.einachsig = einachsig
         self.mit_laengszug = mit_laengszug
 
         basis = f"{analyse.id}.nachweis.vt"
@@ -92,7 +91,7 @@ class Schubwandnachweis(Nachweis):
             referenz="SIA 262:2025, 4.3.3", abschnitt=analyse.abschnitt)
 
     def _belastet(self, fall: Lastfall) -> bool:
-        return bool(fall.V_z or fall.T or (fall.V_y and not self.einachsig))
+        return bool(fall.V_z or fall.T or (fall.V_y and not self.analyse.einachsig))
 
     # -- Festigkeiten der Waende -----------------------------------------------
 
@@ -121,7 +120,7 @@ class Schubwandnachweis(Nachweis):
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
         for fall in self.lastfaelle:
-            V_y = 0.0 if self.einachsig else fall.V_y
+            V_y = 0.0 if self.analyse.einachsig else fall.V_y
             if not self._belastet(fall):
                 self._laengszug_null(ergebnis, fall)
                 continue

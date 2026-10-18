@@ -25,7 +25,7 @@ dasselbe Rissmoment gegen ihre Bewehrung.
 from __future__ import annotations
 
 import math
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 from opencivil.core.berechnung import (
     Ausfuehrung, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
@@ -41,16 +41,7 @@ from opencivil.nachweis.rissgroessen import (
 )
 from opencivil.querschnitt.analyse import Querschnittsanalyse
 from opencivil.querschnitt.interaktion import Bruchpunkt, Querschnitt
-from opencivil.querschnitt.zugseite import UM_Y, Zugseite
-
-
-def richtungen(einachsig: bool) -> Tuple[Zugseite, ...]:
-    """
-    Die Seiten, die je ein Nachweis gezogen werden -- einachsig nur unten und
-    oben, um z wird dann nicht nachgewiesen. Ihre Namen, «Zug unten», sind
-    die der Faelle; die Kennungen «Zug_unten».
-    """
-    return UM_Y if einachsig else tuple(Zugseite)
+from opencivil.querschnitt.zugseite import Zugseite
 
 
 def bei_reiner_biegung(q: Querschnitt, seite: Zugseite, einachsig: bool) -> Bruchpunkt:
@@ -66,8 +57,8 @@ def bei_reiner_biegung(q: Querschnitt, seite: Zugseite, einachsig: bool) -> Bruc
 
 
 def _defs(basis: str, symbol: str, beschreibung: str, referenz: str,
-          einachsig: bool) -> Dict[str, WertDef]:
-    namen = [seite.beschriftung for seite in richtungen(einachsig)]
+          analyse: Querschnittsanalyse) -> Dict[str, WertDef]:
+    namen = [seite.beschriftung for seite in analyse.zugseiten]
     return {name: grad_def(f"{basis}.{kennung_aus(name)}.erfuellungsgrad",
                            rf"\alpha_{{eff,{symbol},{als_text(name)}}}",
                            f"{beschreibung} – {name}", referenz)
@@ -80,14 +71,12 @@ class DuktilitaetQA(Nachweis):
     THEMA = "Duktilität je Richtung"
     LANGNAME = "Duktilität"
 
-    def __init__(self, analyse: Querschnittsanalyse, *, einachsig: bool,
-                 grenze: float) -> None:
+    def __init__(self, analyse: Querschnittsanalyse, *, grenze: float) -> None:
         self.analyse = analyse
-        self.einachsig = einachsig
         self.grenze = grenze
         basis = f"{analyse.id}.nachweis.duktilitaet"
         self.d_ausnutzung = _defs(basis, "x/d", "Erfüllungsgrad Duktilität",
-                                  "SIA 262:2025, 4.1.4.2.5", einachsig)
+                                  "SIA 262:2025, 4.1.4.2.5", analyse)
         super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()),
                          bezuege=analyse.grundbezuege(),
                          titel=f"Duktilität – {analyse.name}",
@@ -106,11 +95,11 @@ class DuktilitaetQA(Nachweis):
                  name=DUKTILITAETSBEDINGUNG)
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
-        for seite in richtungen(self.einachsig):
+        for seite in self.analyse.zugseiten:
             name = seite.beschriftung
             werte = Zwischenwerte(f"{self.id}.{kennung_aus(name)}")
             d_grad = self.d_ausnutzung[name]
-            punkt = bei_reiner_biegung(q, seite, self.einachsig)
+            punkt = bei_reiner_biegung(q, seite, self.analyse.einachsig)
             x, d = q.druckzone(punkt)
             p.titel(name, ebene=3)
             if d <= 0.0 or not q.zugseite_bewehrt(punkt):
@@ -145,12 +134,11 @@ class SproedesVersagenQA(Nachweis):
     THEMA = "Sprödes Versagen je Richtung"
     LANGNAME = "Sprödes Versagen"
 
-    def __init__(self, analyse: Querschnittsanalyse, *, einachsig: bool) -> None:
+    def __init__(self, analyse: Querschnittsanalyse) -> None:
         self.analyse = analyse
-        self.einachsig = einachsig
         basis = f"{analyse.id}.nachweis.sproede"
         self.d_ausnutzung = _defs(basis, "Riss", "Erfüllungsgrad sprödes Versagen",
-                                  "SIA 262:2025, 4.4.1.3", einachsig)
+                                  "SIA 262:2025, 4.4.1.3", analyse)
         super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()),
                          bezuege=analyse.grundbezuege() + rissbezuege(analyse),
                          titel=f"Sprödes Versagen – {analyse.name}",
@@ -165,7 +153,7 @@ class SproedesVersagenQA(Nachweis):
             "Rissmoment. Das Rissmoment gehört dem ungerissenen "
             "Bruttoquerschnitt; bei unsymmetrischer Form mit dem "
             "Deviationsmoment.")
-        protokoll_spannung_ungerissen(p, einachsig=self.einachsig)
+        protokoll_spannung_ungerissen(p, einachsig=self.analyse.einachsig)
         p.ansatz(r"M_{Rd}(N = 0) \ge M_{Riss} = f_{ct,eff} \cdot W",
                  titel="Sprödes Versagen", referenz="SIA 262:2025, 4.4.1.3",
                  name="Bedingung gegen sprödes Versagen")
@@ -173,23 +161,22 @@ class SproedesVersagenQA(Nachweis):
         brutto = bruttoquerschnitt(self.analyse, e.si_nach_id())
         ergebnis: Dict[str, Groesse] = {}
         urteile: List[NachweisUrteil] = []
-        for seite in richtungen(self.einachsig):
+        for seite in self.analyse.zugseiten:
             name, (M_y, M_z) = seite.beschriftung, seite.moment
             werte = Zwischenwerte(f"{self.id}.{kennung_aus(name)}")
             d_grad = self.d_ausnutzung[name]
             p.titel(name, ebene=3)
-            punkt = bei_reiner_biegung(q, seite, self.einachsig)
+            punkt = bei_reiner_biegung(q, seite, self.analyse.einachsig)
             _, d = q.druckzone(punkt)
             if d <= 0.0 or not q.zugseite_bewehrt(punkt):
                 p.text("Keine Bewehrung auf der gezogenen Seite → kein Nachweis.")
                 ergebnis[d_grad.id] = Groesse(math.inf, EINHEITSLOS)
                 continue
 
-            riss = rissmoment(brutto, M_y, M_z, einachsig=self.einachsig)
+            riss = rissmoment(brutto, M_y, M_z)
             M_Riss = protokoll_rissmoment(p, e, self.analyse, werte, brutto, riss, M_y, M_z,
-                                          einachsig=self.einachsig,
                                           referenz="SIA 262:2025, 4.4.1.3")
-            M_Rd_si = abs(punkt.M_y) if self.einachsig else punkt.moment
+            M_Rd_si = abs(punkt.M_y) if self.analyse.einachsig else punkt.moment
             M_Rd = werte.moment("M_Rd", "M_{Rd}", M_Rd_si)
             p.wert(M_Rd, titel="Biegewiderstand bei N = 0 in dieser Richtung")
             grad = M_Rd_si / riss.M_Riss

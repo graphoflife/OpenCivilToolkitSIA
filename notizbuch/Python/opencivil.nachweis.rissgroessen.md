@@ -1,5 +1,5 @@
 ---
-erzeugt: 6ebdbc372c83
+erzeugt: 8871e16e2e4a
 art: modul
 tags: [modul]
 ---
@@ -150,6 +150,7 @@ Schwerpunkt und die Ecken des Betons -- in SI.
 - `I_z: float`
 - `I_yz: float`
 - `ecken: Tuple[Ecke, ...]`
+- `einachsig: bool = False` – Ob die Nulllinie parallel zur Achse der Biegung bleibt -- wie die Analyse rechnet.
 
 #### Bruttoquerschnitt.ausdehnung
 
@@ -162,7 +163,7 @@ Die Hoehe in Biegerichtung und die Breite quer dazu, in m -- aus der Zeichnung.
 #### Bruttoquerschnitt.einheitsspannung
 
 ```python
-def einheitsspannung(self, ecke: Ecke, M_y: float, M_z: float, *, einachsig: bool) -> float
+def einheitsspannung(self, ecke: Ecke, M_y: float, M_z: float) -> float
 ```
 
 Die Spannung an der Ecke beim Moment `(M_y, M_z)`, Zug positiv -- bei
@@ -208,7 +209,7 @@ Das Rissmoment in einer Richtung -- und woraus es entsteht.
 ### rissmoment
 
 ```python
-def rissmoment(q: Bruttoquerschnitt, M_y: float, M_z: float, *, einachsig: bool) -> Rissmoment
+def rissmoment(q: Bruttoquerschnitt, M_y: float, M_z: float) -> Rissmoment
 ```
 
 Das Rissmoment in der Richtung `(M_y, M_z)` -- einem Moment von eins:
@@ -233,7 +234,7 @@ Die Rissnormalkraft bei einem Moment -- und woraus sie entsteht.
 ### rissnormalkraft
 
 ```python
-def rissnormalkraft(q: Bruttoquerschnitt, M_y: float, M_z: float, *, einachsig: bool, k_t: float, A: float) -> Rissnormalkraft
+def rissnormalkraft(q: Bruttoquerschnitt, M_y: float, M_z: float, *, k_t: float, A: float) -> Rissnormalkraft
 ```
 
 Die Zugkraft, bei der der ungerissene Bruttoquerschnitt beim Moment
@@ -261,7 +262,7 @@ Welche Ecke zuerst reisst -- in der Zeichnung, mit ihrem Beton.
 ### protokoll_widerstandsmoment
 
 ```python
-def protokoll_widerstandsmoment(p: Protokoll, werte: Zwischenwerte, q: Bruttoquerschnitt, ecke: Ecke, W: float, M_y: float, M_z: float, *, einachsig: bool) -> Wert
+def protokoll_widerstandsmoment(p: Protokoll, werte: Zwischenwerte, q: Bruttoquerschnitt, ecke: Ecke, W: float, M_y: float, M_z: float) -> Wert
 ```
 
 `W = 1/σ` an der Ecke bei einem Moment von eins in der Richtung
@@ -270,7 +271,7 @@ def protokoll_widerstandsmoment(p: Protokoll, werte: Zwischenwerte, q: Bruttoque
 ### protokoll_rissmoment
 
 ```python
-def protokoll_rissmoment(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse, werte: Zwischenwerte, q: Bruttoquerschnitt, riss: Rissmoment, M_y: float, M_z: float, *, einachsig: bool, referenz: str) -> Wert
+def protokoll_rissmoment(p: Protokoll, e: Eingaben, analyse: Querschnittsanalyse, werte: Zwischenwerte, q: Bruttoquerschnitt, riss: Rissmoment, M_y: float, M_z: float, *, referenz: str) -> Wert
 ```
 
 Die Herleitung von [[opencivil.nachweis.rissgroessen#rissmoment|rissmoment]] -- zurueck kommt `M_Riss`.

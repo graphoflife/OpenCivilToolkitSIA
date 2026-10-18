@@ -80,8 +80,6 @@ Oberfläche.
       `editor.js`, `zustand.js` und `app.js` als Sonderwege; je App stehen
       zehn Tabellen in drei Dateien. Besser: `apps.js` mit einer Zeile je
       App; die gemeinsamen Abläufe schlagen nur noch nach.
-- [ ] **`einachsig` gehört der Analyse.** Der Schalter läuft durch sechs bis
-      elf Signaturen. Besser: eine Eigenschaft von `Querschnittsanalyse`.
 - [ ] **Kern-Wissen im JS, neu dazugekommen:**
       - Die Einheiten der Grundbruch-Eingaben stehen dreimal: `aufbau.py`,
         `geotechnik/grundbruch.py`, `grundbruch.js`. Weichen zwei davon ab,

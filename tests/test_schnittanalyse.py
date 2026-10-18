@@ -221,7 +221,7 @@ class TestKippendeNulllinie(unittest.TestCase):
         aufbau, loesung = rechnen(l_querschnitt()[0])
         analyse = next(iter(aufbau.querschnittsanalysen.values()))
         brutto = bruttoquerschnitt(analyse, lambda kid: loesung.werte[kid].groesse.si)
-        riss = rissmoment(brutto, 1.0, 0.0, einachsig=False)
+        riss = rissmoment(brutto, 1.0, 0.0)
         self.assertEqual(self.unten.M_Riss, riss.M_Riss)
         self.assertEqual(self.linie.riss, riss.M_Riss)
         self.assertEqual(riss.ecke.punkt, (0, 0))
