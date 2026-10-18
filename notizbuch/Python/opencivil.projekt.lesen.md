@@ -1,5 +1,5 @@
 ---
-erzeugt: e8698a9ec079
+erzeugt: 54c1361c98fb
 art: modul
 tags: [modul]
 ---
@@ -150,8 +150,9 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]
 
 Was die Oberflaeche je Feld eines Eintrags vom Kern wissen muss, fuer den
 Katalog: die Einheit, in der eine Zahl gemeint ist, wo sie liegen muss
-(`ueber`, `ab`, `bis`, `unter` wie [[opencivil.projekt.lesen#Bereich|Bereich]]), ob sie ganz
-sein muss, und was eine Wahl annehmen kann.
+(`ueber`, `ab`, `bis`, `unter` wie [[opencivil.projekt.lesen#Bereich|Bereich]]) und ob sie
+ganz sein muss. Was eine Wahl annehmen kann, steht nicht hier: das sagen
+die Wahllisten des Katalogs, mit Beschriftung.
 
 Steht es am Feld, steht es einmal. Bis 2026-10-18 standen die Einheiten
 des Grundbruchs dreimal da -- am Feld, beim Bauen und in grundbruch.js --,

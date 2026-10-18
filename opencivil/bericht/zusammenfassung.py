@@ -270,8 +270,7 @@ def kennzahlentabelle(zeilen: Sequence[Tuple[Kennzahl, Wert]]) -> TabellenBlock:
     return TabellenBlock(
         kopf=["Kennzahl", "Zeichen", "Wert"],
         zeilen=[[k.beschriftung, Mathe(wert.symbol),
-                 Mathe(rf"{k.text(wert)}\,{wert.einheit.latex}" if wert.einheit.latex
-                       else k.text(wert))]
+                 Mathe(k.text(wert) + wert.einheit.als_latex())]
                 for k, wert in zeilen],
         titel="Kennzahlen", ausrichtung="llr")
 

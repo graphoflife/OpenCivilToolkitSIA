@@ -1,5 +1,5 @@
 ---
-erzeugt: 0485e8ea8a15
+erzeugt: 031f403bb241
 art: modul
 tags: [modul]
 ---
@@ -39,6 +39,16 @@ def bei_reiner_biegung(q: Querschnitt, seite: Zugseite, einachsig: bool) -> Bruc
 ```
 
 Der Bruchzustand bei N = 0, der diese Seite zieht -- einachsig mit waagrechter Nulllinie.
+
+### grade_je_seite
+
+```python
+def grade_je_seite(basis: str, symbol: str, beschreibung: str, referenz: str, analyse: Querschnittsanalyse) -> Dict[str, WertDef]
+```
+
+Je Zugseite der Analyse ein Erfuellungsgrad -- Kennung, Zeichen und Text
+nach einem Muster fuer alle Nachweise des gezeichneten Querschnitts, die
+je Seite urteilen: `alpha_{eff,<symbol>,<Seite>}`.
 
 ### DuktilitaetQA
 
@@ -90,6 +100,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_gebrauch]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 

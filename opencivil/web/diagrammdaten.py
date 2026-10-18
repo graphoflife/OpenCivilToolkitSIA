@@ -322,8 +322,7 @@ def _linie_dict(linie) -> dict:
     sprung = linie.sprung
     bruch = linie.bruch
     return {
-        "groessen": {"kraft": kraft.als_dict(), "fest": fest.als_dict(),
-                     "verformung": verformung.als_dict()},
+        "groessen": liniengroessen(linie.art),
         "fest": fest.zahl(linie.fest), "riss": kraft.zahl(linie.riss),
         "punkte": [{"kraft": kraft.zahl(p.kraft), "verformung": v(p.verformung),
                     "gerissen": p.gerissen, "verformung_I": v(p.verformung_I),

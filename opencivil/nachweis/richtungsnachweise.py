@@ -56,8 +56,13 @@ def bei_reiner_biegung(q: Querschnitt, seite: Zugseite, einachsig: bool) -> Bruc
 # ===========================================================================
 
 
-def _defs(basis: str, symbol: str, beschreibung: str, referenz: str,
-          analyse: Querschnittsanalyse) -> Dict[str, WertDef]:
+def grade_je_seite(basis: str, symbol: str, beschreibung: str, referenz: str,
+                   analyse: Querschnittsanalyse) -> Dict[str, WertDef]:
+    """
+    Je Zugseite der Analyse ein Erfuellungsgrad -- Kennung, Zeichen und Text
+    nach einem Muster fuer alle Nachweise des gezeichneten Querschnitts, die
+    je Seite urteilen: ``alpha_{eff,<symbol>,<Seite>}``.
+    """
     namen = [seite.beschriftung for seite in analyse.zugseiten]
     return {name: grad_def(f"{basis}.{kennung_aus(name)}.erfuellungsgrad",
                            rf"\alpha_{{eff,{symbol},{als_text(name)}}}",
@@ -75,8 +80,8 @@ class DuktilitaetQA(Nachweis):
         self.analyse = analyse
         self.grenze = grenze
         basis = f"{analyse.id}.nachweis.duktilitaet"
-        self.d_ausnutzung = _defs(basis, "x/d", "Erfüllungsgrad Duktilität",
-                                  "SIA 262:2025, 4.1.4.2.5", analyse)
+        self.d_ausnutzung = grade_je_seite(basis, "x/d", "Erfüllungsgrad Duktilität",
+                                           "SIA 262:2025, 4.1.4.2.5", analyse)
         super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()),
                          bezuege=analyse.grundbezuege(),
                          titel=f"Duktilität – {analyse.name}",
@@ -137,8 +142,8 @@ class SproedesVersagenQA(Nachweis):
     def __init__(self, analyse: Querschnittsanalyse) -> None:
         self.analyse = analyse
         basis = f"{analyse.id}.nachweis.sproede"
-        self.d_ausnutzung = _defs(basis, "Riss", "Erfüllungsgrad sprödes Versagen",
-                                  "SIA 262:2025, 4.4.1.3", analyse)
+        self.d_ausnutzung = grade_je_seite(basis, "Riss", "Erfüllungsgrad sprödes Versagen",
+                                           "SIA 262:2025, 4.4.1.3", analyse)
         super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()),
                          bezuege=analyse.grundbezuege() + rissbezuege(analyse),
                          titel=f"Sprödes Versagen – {analyse.name}",

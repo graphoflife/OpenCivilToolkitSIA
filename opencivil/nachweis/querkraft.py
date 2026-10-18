@@ -273,6 +273,16 @@ def _statische_hoehe(
     return z if moment_positiv else h - z
 
 
+def lagen_von(e: Eingaben, posten) -> Tuple[Tuple[float, bool], ...]:
+    """
+    Je Posten die Tiefe und auf welcher Seite er liegt, ``(z, liegt unten)``
+    -- ohne das laesst sich die gezogene Bewehrung nicht von der gedrueckten
+    trennen. Fuer den Nachweis und die Kennzahlen.
+    """
+    return tuple((e.g(f"z_{l.nummer}{a.kuerzel}").si, l.von_unten)
+                 for l, a, _, _, _ in posten)
+
+
 def zuglage(
     lagen: Sequence[Tuple[float, bool]], moment_positiv: bool
 ) -> Optional[int]:
@@ -355,6 +365,16 @@ def protokoll_hoehen(p: Protokoll, werte: Zwischenwerte, e: Eingaben, posten, zu
     else:
         p.formel(wirksam, "@d", {"d": hoehe}, titel="Wirksame Höhe (Einlage nicht massgebend)")
     return hoehe, wirksam
+
+
+def tau_cd_wert(werte: Zwischenwerte, e: Eingaben) -> Wert:
+    """
+    tau_cd fuer die Herleitung, mit vier Stellen: in der Baustofftabelle steht
+    es auf zwei (1.1), und mit so wenigen ginge die Nachrechnung um ein halbes
+    Prozent daneben. Fuer den Nachweis und die Kennzahlen.
+    """
+    tau = e["tau_cd"]
+    return werte.wert("tau_cd", tau.symbol, tau.groesse, 4)
 
 
 def protokoll_ohne_buegel(p: Protokoll, werte: Zwischenwerte, widerstand: Wert, *,
@@ -746,7 +766,7 @@ class Querkraft(Nachweis):
         tau_cd = e.g("tau_cd")
         einlage = e.g("einlagenhoehe").si
         m_rd = {f.name: abs(e.g(f"m_Rd_{f.kennung}").si) for f in self.faelle}
-        lagen = self._lagen(e)
+        lagen = lagen_von(e, self.posten)
         zugstahl = {}
         for positiv in (True, False):
             i = zuglage(lagen, positiv)
@@ -762,7 +782,7 @@ class Querkraft(Nachweis):
 
         mn = e.befund("mn")
         befund = Querkraftbefund(
-            beiwerte=Kurvenbeiwerte(h=h, lagen=tuple(lagen), einlage=einlage,
+            beiwerte=Kurvenbeiwerte(h=h, lagen=lagen, einlage=einlage,
                                     tau_cd=tau_cd.si, zugstahl=zugstahl, k_g=k_g),
             mn=mn, index=self.mn.wahl.index)
 
@@ -830,14 +850,6 @@ class Querkraft(Nachweis):
             "v_Rd", self._widerstandssymbol(erg.fall),
             Groesse.aus_si(erg.v_Rd, KN_PRO_M), beschreibung="Widerstand")
 
-    def _lagen(self, e: Eingaben) -> List[Tuple[float, bool]]:
-        """
-        Je Posten die Tiefe und auf welcher Seite er liegt -- ohne das laesst
-        sich die gezogene Bewehrung nicht von der gedrueckten trennen.
-        """
-        return [(e.g(f"z_{l.nummer}{a.kuerzel}").si, l.von_unten)
-                for l, a, _, _, _ in self.posten]
-
     # -- Mit Querkraftbewehrung ---------------------------------------------
 
     def _mit_buegeln(self, e: Eingaben, p: Protokoll):
@@ -855,7 +867,7 @@ class Querkraft(Nachweis):
         f_yd = e.g("f_yd_V").si
         f_cd = e.g("f_cd").si
         k_c = e.g("k_c").si
-        lagen = self._lagen(e)
+        lagen = lagen_von(e, self.posten)
 
         # Die Menge in y: entweder eine Teilung oder eine Stabzahl über die
         # betrachtete Breite. Aus der Zahl wird hier eine Teilung -- die Formel
@@ -1170,11 +1182,7 @@ class Querkraft(Nachweis):
                 {**stahl, "m_Ed": m_Ed, "m_Dd": m_Dd, "m_Rd": m_Rd},
                 titel="Dehnung auf halber Höhe")
 
-        # tau_cd steht in der Baustofftabelle auf zwei Stellen (1.1); mit so
-        # wenigen ginge die Nachrechnung hier um ein halbes Prozent daneben.
-        tau = e["tau_cd"]
         protokoll_ohne_buegel(p, werte, self._widerstand(erg), k_d=erg.k_d, eps_v=eps_v,
-                              d=d, d_v=d_v, k_g=k_g,
-                              tau_cd=werte.wert("tau_cd", tau.symbol, tau.groesse, 4))
+                              d=d, d_v=d_v, k_g=k_g, tau_cd=tau_cd_wert(werte, e))
 
         self._protokoll_grad(p, erg)

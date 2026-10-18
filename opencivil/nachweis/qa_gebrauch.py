@@ -64,10 +64,10 @@ from opencivil.core.berechnung import (
     Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, MM, Groesse
-from opencivil.core.latex import Mathe, als_text, angabe, bedingung, fest, vergleich
+from opencivil.core.latex import Mathe, angabe, bedingung, fest, vergleich
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.suche import illinois
-from opencivil.core.wert import Wert, WertDef, kennung_aus
+from opencivil.core.wert import Wert, kennung_aus
 from opencivil.material.basis import Baustoff, mit_index
 from opencivil.nachweis.gebrauchsebene import (
     EINACHSIG, Gebrauchsebene, gebrauchsebene, protokoll_ebene, suche_der_ebene,
@@ -75,6 +75,7 @@ from opencivil.nachweis.gebrauchsebene import (
 from opencivil.nachweis.mindestbewehrung import Biegezwang
 from opencivil.nachweis.querschnittsloeser import VERFEHLTE_EBENE
 from opencivil.nachweis.rechenwahl import protokoll_gesetze_nach_wahl, protokoll_rechenwahl
+from opencivil.nachweis.richtungsnachweise import grade_je_seite
 from opencivil.querschnitt.gesetzwahl import Rechenwahl
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.rissgroessen import (
@@ -381,11 +382,8 @@ class ZwaengungBiegungQA(Biegezwang):
         self.anforderung = anforderung
         self.wahl = Rechenwahl(kriechzahl=kriechzahl, satz=VORGABE.satz, art=VORGABE.art)
         basis = f"{analyse.id}.nachweis.zwang_biegung"
-        self.d_ausnutzung: Dict[str, WertDef] = {
-            name: grad_def(f"{basis}.{kennung_aus(name)}.erfuellungsgrad",
-                           rf"\alpha_{{eff,ZB,{als_text(name)}}}",
-                           f"Erfüllungsgrad {self.THEMA} – {name}", self.REFERENZ)
-            for name in (seite.beschriftung for seite in analyse.zugseiten)}
+        self.d_ausnutzung = grade_je_seite(basis, "ZB", f"Erfüllungsgrad {self.THEMA}",
+                                           self.REFERENZ, analyse)
         super().__init__(basis, ausgaben=list(self.d_ausnutzung.values()),
                          bezuege=analyse.grundbezuege() + rissbezuege(analyse),
                          titel=f"{self.THEMA} – {analyse.name}",

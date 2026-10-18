@@ -147,8 +147,9 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
     """
     Was die Oberflaeche je Feld eines Eintrags vom Kern wissen muss, fuer den
     Katalog: die Einheit, in der eine Zahl gemeint ist, wo sie liegen muss
-    (``ueber``, ``ab``, ``bis``, ``unter`` wie :class:`Bereich`), ob sie ganz
-    sein muss, und was eine Wahl annehmen kann.
+    (``ueber``, ``ab``, ``bis``, ``unter`` wie :class:`Bereich`) und ob sie
+    ganz sein muss. Was eine Wahl annehmen kann, steht nicht hier: das sagen
+    die Wahllisten des Katalogs, mit Beschriftung.
 
     Steht es am Feld, steht es einmal. Bis 2026-10-18 standen die Einheiten
     des Grundbruchs dreimal da -- am Feld, beim Bauen und in grundbruch.js --,
@@ -166,8 +167,6 @@ def feldangaben(cls: type) -> Dict[str, Dict[str, Any]]:
                            if getattr(b, grenze) is not None})
         if typen.get(f.name) is int:
             angabe["ganz"] = True
-        if _ist_wahl(typen.get(f.name)):
-            angabe["wahl"] = [w.value for w in wahl_von(cls, f.name)]
         if angabe:
             angaben[f.name] = angabe
     return angaben

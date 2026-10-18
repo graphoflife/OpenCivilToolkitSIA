@@ -60,8 +60,8 @@ from opencivil.nachweis.biegung_normalkraft import (
     gleiche_linie, linienbezuege, resistenzlinie,
 )
 from opencivil.nachweis.querkraft import (
-    Kurvenbeiwerte, beiwert_k_g, buegelteilung_y, neigungen, protokoll_hoehen,
-    protokoll_mit_buegeln, protokoll_ohne_buegel, widerstand, zuglage,
+    Kurvenbeiwerte, beiwert_k_g, buegelteilung_y, lagen_von, neigungen, protokoll_hoehen,
+    protokoll_mit_buegeln, protokoll_ohne_buegel, tau_cd_wert, widerstand, zuglage,
 )
 from opencivil.querschnitt.fachwerk import beste_neigung
 from opencivil.nachweis.rechenwahl import bezuege_vereinen, stahlname
@@ -258,15 +258,11 @@ class Plattenkennzahlen(Prozedur):
             "Seite gilt ihre statische Höhe."
         )
         k_g = beiwert_k_g(p, self.id, e["D_max"], e["f_ck"])
-        tau = e["tau_cd"]
-        # tau_cd mit vier Stellen, wie im Querkraftnachweis -- mit zweien ginge
-        # die Nachrechnung um ein halbes Prozent daneben.
-        tau_cd = werte.wert("tau_cd", tau.symbol, tau.groesse, 4)
-        lagen = tuple((e.g(f"z_{l.nummer}{a.kuerzel}").si, l.von_unten)
-                      for l, a, _, _, _ in self.posten)
-        beiwerte = Kurvenbeiwerte(h=e.g("h").si, lagen=lagen,
-                                  einlage=e.g("einlagenhoehe").si, tau_cd=tau.groesse.si,
-                                  zugstahl={}, k_g=k_g.groesse.si)
+        tau_cd = tau_cd_wert(werte, e)
+        beiwerte = Kurvenbeiwerte(h=e.g("h").si, lagen=lagen_von(e, self.posten),
+                                  einlage=e.g("einlagenhoehe").si,
+                                  tau_cd=e["tau_cd"].groesse.si, zugstahl={},
+                                  k_g=k_g.groesse.si)
 
         bei_null: List[Wert] = []
         beim_widerstand: List[Wert] = []
@@ -278,7 +274,7 @@ class Plattenkennzahlen(Prozedur):
                 continue
             d, d_v = hoehen
             # Der Stahl der aeussersten gezogenen Lage, wie im Querkraftnachweis.
-            stahl = self.posten[zuglage(lagen, seite.positiv)][0].stahl
+            stahl = self.posten[zuglage(beiwerte.lagen, seite.positiv)][0].stahl
             f_yd, E_s = e[stahlname("f_yd", stahl)], e[stahlname("E_s", stahl)]
 
             null = widerstand(M_Ed=0.0, N_Ed=0.0, h=beiwerte.h, d=d.groesse.si,
@@ -332,10 +328,8 @@ class Plattenkennzahlen(Prozedur):
             p.formel(w_sy, r"\frac{@b}{@n}", {"b": e["b"], "n": e["menge_y"]},
                      titel="Teilung in y aus der Stabzahl")
         alpha_min, alpha_max = self.buegel.grenzen(False)
-        lagen = tuple((e.g(f"z_{l.nummer}{a.kuerzel}").si, l.von_unten)
-                      for l, a, _, _, _ in self.posten)
-        beiwerte = Kurvenbeiwerte(h=e.g("h").si, lagen=lagen, einlage=0.0, tau_cd=0.0,
-                                  zugstahl={}, k_g=0.0)
+        beiwerte = Kurvenbeiwerte(h=e.g("h").si, lagen=lagen_von(e, self.posten),
+                                  einlage=0.0, tau_cd=0.0, zugstahl={}, k_g=0.0)
 
         teile: List[Wert] = []
         for seite in UM_Y:

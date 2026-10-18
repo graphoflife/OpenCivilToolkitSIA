@@ -141,8 +141,8 @@ def katalog() -> dict:
         # Die Oberflaeche setzt Kennung und Name.
         "neuer_grundbruch": GrundbruchEintrag.neu(kennung="", name="").als_dict(),
         # Je Feld, was der Kern ueber seine Zahl weiss: die Einheit, in der
-        # sie gemeint ist, die Grenzen, ob sie ganz sein muss, die Wahl --
-        # zuerst beim Grundbruch, dessen Einheiten die Maske selbst trug.
+        # sie gemeint ist, die Grenzen und ob sie ganz sein muss -- zuerst
+        # beim Grundbruch, dessen Einheiten die Maske selbst trug.
         "felder": {
             "grundbruch": feldangaben(GrundbruchEintrag),
             "grundbruchkombination": feldangaben(GrundbruchkombinationEintrag),

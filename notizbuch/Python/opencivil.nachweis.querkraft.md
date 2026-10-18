@@ -1,5 +1,5 @@
 ---
-erzeugt: d4a321ec28cb
+erzeugt: fda14ca5953a
 art: modul
 tags: [modul]
 ---
@@ -211,6 +211,16 @@ Platte nur mit unterer Bewehrung lieferte fuers negative Moment
 `None`, wenn auf der gezogenen Seite nichts liegt. Dann gibt es kein
 `d`, und ohne `d` keinen Querkraftwiderstand.
 
+### lagen_von
+
+```python
+def lagen_von(e: Eingaben, posten) -> Tuple[Tuple[float, bool], ...]
+```
+
+Je Posten die Tiefe und auf welcher Seite er liegt, `(z, liegt unten)`
+-- ohne das laesst sich die gezogene Bewehrung nicht von der gedrueckten
+trennen. Fuer den Nachweis und die Kennzahlen.
+
 ### zuglage
 
 ```python
@@ -261,6 +271,16 @@ nebeneinander stehen: `d^{+}` (die Kennzahlen).
 Mit Buegeln gibt es kein `d_v`: bis 2026-10-18 schrieben die Kennzahlen
 dort ein «d_v = d (Einlage nicht massgebend)», weil sie die Hoehen ohne
 Buegel mit einer Einlage null mitbenutzten.
+
+### tau_cd_wert
+
+```python
+def tau_cd_wert(werte: Zwischenwerte, e: Eingaben) -> Wert
+```
+
+tau_cd fuer die Herleitung, mit vier Stellen: in der Baustofftabelle steht
+es auf zwei (1.1), und mit so wenigen ginge die Nachrechnung um ein halbes
+Prozent daneben. Fuer den Nachweis und die Kennzahlen.
 
 ### protokoll_ohne_buegel
 
@@ -479,15 +499,6 @@ Der Widerstand eines Falls -- fuer Urteil und Herleitung derselbe.
 
 Er gilt nur unter genau dieser Einwirkung; das gehoert ins Symbol,
 sonst liest sich V_Rd wie ein Kennwert des Querschnitts.
-
-#### Querkraft._lagen
-
-```python
-def _lagen(self, e: Eingaben) -> List[Tuple[float, bool]]
-```
-
-Je Posten die Tiefe und auf welcher Seite er liegt -- ohne das laesst
-sich die gezogene Bewehrung nicht von der gedrueckten trennen.
 
 #### Querkraft._mit_buegeln
 
