@@ -68,18 +68,23 @@ def auswerten(fall, art: Analyseart, paar: Paar) -> Tuple[
         Optional[Querschnittsbild], Optional[Union[Linie, Modullinie]]]:
     """
     Die eine der sechs Fragen stellen, die dieser Fall stellt -- in SI, an
-    das Paar einer Platte oder eines gezeichneten Querschnitts.
+    das Paar einer Platte oder eines gezeichneten Querschnitts. Gelesen wird
+    nur, was die Frage braucht (:attr:`Analyseart.eingaben`), und in der
+    Einheit seines Feldes: in der zeigt die Maske die Zahl. Bis 2026-10-18
+    rechnete hier ein eigenes ``* 1e3`` -- eine zweite Angabe der Einheit,
+    die still um 10³ haette abweichen koennen, wie zuvor beim Grundbruch.
     """
+    si = {feld: fall.si(feld) for feld in art.eingaben}
     if art is Analyseart.DEHNUNGEN:
-        return aus_dehnungen(paar.gerissen, eps_oben=fall.eps_oben / 1e3,
-                             eps_unten=fall.eps_unten / 1e3), None
+        return aus_dehnungen(paar.gerissen, eps_oben=si["eps_oben"],
+                             eps_unten=si["eps_unten"]), None
     if art.linie is Analyseart.MOMENT_KRUEMMUNG:
-        linie = moment_kruemmung(paar, N=fall.N_Ed * 1e3)
+        linie = moment_kruemmung(paar, N=si["N_Ed"])
     elif art.linie is Analyseart.NORMALKRAFT_DEHNUNG:
-        linie = normalkraft_dehnung(paar, M=fall.M_Ed * 1e3)
+        linie = normalkraft_dehnung(paar, M=si["M_Ed"])
     else:
-        return aus_schnittgroessen(paar.ebenen().gerissen, N=fall.N_Ed * 1e3,
-                                   M=fall.M_Ed * 1e3, art=paar.wahl.art), None
+        return aus_schnittgroessen(paar.ebenen().gerissen, N=si["N_Ed"],
+                                   M=si["M_Ed"], art=paar.wahl.art), None
     if art.modul:
         return None, aequivalenter_modul(linie, I_c=paar.I_c, A_c=paar.A_c, E_cm=paar.E_cm)
     return None, linie

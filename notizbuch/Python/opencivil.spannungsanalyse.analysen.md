@@ -1,5 +1,5 @@
 ---
-erzeugt: 84ebf1a6e01f
+erzeugt: cfe7935e32b0
 art: modul
 tags: [modul]
 ---
@@ -47,7 +47,11 @@ def auswerten(fall, art: Analyseart, paar: Paar) -> Tuple[Optional[Querschnittsb
 ```
 
 Die eine der sechs Fragen stellen, die dieser Fall stellt -- in SI, an
-das Paar einer Platte oder eines gezeichneten Querschnitts.
+das Paar einer Platte oder eines gezeichneten Querschnitts. Gelesen wird
+nur, was die Frage braucht ([[opencivil.spannungsanalyse.art#Analyseart.eingaben|Analyseart.eingaben]]), und in der
+Einheit seines Feldes: in der zeigt die Maske die Zahl. Bis 2026-10-18
+rechnete hier ein eigenes `* 1e3` -- eine zweite Angabe der Einheit,
+die still um 10³ haette abweichen koennen, wie zuvor beim Grundbruch.
 
 ### _Bauteilart
 

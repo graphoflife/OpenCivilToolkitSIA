@@ -1,5 +1,5 @@
 ---
-erzeugt: cbb9b3e93c58
+erzeugt: 6f5106f4f5b7
 art: modul
 tags: [modul]
 ---
@@ -67,6 +67,17 @@ def regeln(self, wo: str) -> None
 ```
 
 Die Regeln ueber mehrere Felder -- ohne eigene keine. `wo` nennt den Eintrag.
+
+#### Beschreibung.si
+
+```python
+def si(self, feld: str) -> float
+```
+
+Die Zahl eines Feldes in SI, mit der Einheit seines Bereichs
+([[opencivil.projekt.lesen#als_groesse|als_groesse]]) -- der, in der die
+Maske sie zeigt. Wer rechnet, nimmt sie so, statt die Einheit noch
+einmal anzuschreiben.
 
 #### Beschreibung.als_dict
 

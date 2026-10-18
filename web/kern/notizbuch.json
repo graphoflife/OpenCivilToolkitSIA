@@ -3712,6 +3712,7 @@
       "stichworte": [
         "Beschreibung",
         "Beschreibung.regeln",
+        "Beschreibung.si",
         "Beschreibung.als_dict",
         "Beschreibung.aus_dict",
         "MaterialEintrag",

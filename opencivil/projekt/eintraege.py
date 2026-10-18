@@ -27,7 +27,7 @@ from opencivil.querschnitt.platte import (
     ALPHA_MAX, ALPHA_MIN, K_C, Bewehrungsposten, Querkraftbewehrung, Richtung,
 )
 from opencivil.projekt.lesen import (
-    ProjektFehler, bereich, einer_von, lesen, ort, sorten, wahl_aus_text,
+    ProjektFehler, als_groesse, bereich, einer_von, lesen, ort, sorten, wahl_aus_text,
 )
 from opencivil.querschnitt.gesetzwahl import Rechenart, Rechenwahl, Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
@@ -87,6 +87,15 @@ class Beschreibung:
 
     def regeln(self, wo: str) -> None:
         """Die Regeln ueber mehrere Felder -- ohne eigene keine. ``wo`` nennt den Eintrag."""
+
+    def si(self, feld: str) -> float:
+        """
+        Die Zahl eines Feldes in SI, mit der Einheit seines Bereichs
+        (:func:`~opencivil.projekt.lesen.als_groesse`) -- der, in der die
+        Maske sie zeigt. Wer rechnet, nimmt sie so, statt die Einheit noch
+        einmal anzuschreiben.
+        """
+        return als_groesse(self, feld).si
 
     def als_dict(self) -> dict:
         return asdict(self)
