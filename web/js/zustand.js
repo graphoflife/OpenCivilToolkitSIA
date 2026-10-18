@@ -210,6 +210,14 @@ export function freieKennung(vorsilbe) {
 }
 
 /**
+ * Was der Kern über ein Feld weiss (`katalog.felder`): Einheit, Grenzen, ob
+ * ganz -- `{}`, solange der Katalog fehlt. Für `zahlfeld({angabe})`.
+ */
+export function feldangabe(art, feld) {
+  return zustand.katalog?.felder?.[art]?.[feld] || {};
+}
+
+/**
  * Eine neue Zeile nach der Vorlage des Kerns (`katalog.neue_zeilen`) -- mit
  * dem, was nur die Oberfläche weiss: Name, Kennung. Eine Kopie, nicht die
  * Vorlage selbst: sonst teilten sich zwei Materialien dieselben Abweichungen.

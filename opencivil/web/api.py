@@ -41,7 +41,8 @@ from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt import (
     Aufbau, GebrauchsfallEintrag, GrundbruchEintrag,
     GrundbruchkombinationEintrag, KnickEintrag, KombinationEintrag, MaterialEintrag,
-    QuerschnittEintrag, SkriptEintrag, SpannungsfallEintrag, VerformungsfallEintrag,
+    QuerkraftbewehrungEintrag, QuerschnittEintrag, SkriptEintrag, SpannungsfallEintrag,
+    VerformungsfallEintrag,
 )
 from opencivil.projekt import balkensystem as bs
 from opencivil.projekt.eintraege import EIGENE_VORSILBE
@@ -145,6 +146,8 @@ def katalog() -> dict:
         "felder": {
             "grundbruch": feldangaben(GrundbruchEintrag),
             "grundbruchkombination": feldangaben(GrundbruchkombinationEintrag),
+            "querkraftbewehrung": feldangaben(QuerkraftbewehrungEintrag),
+            "querschnittsanalyse": feldangaben(QuerschnittsanalyseEintrag),
         },
         # Ein Skript der App «Python», mit einem Diagramm darin.
         "neues_skript": SkriptEintrag.neu(kennung="", name="").als_dict(),

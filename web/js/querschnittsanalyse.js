@@ -26,7 +26,7 @@ import { analysenKapitel, mitKopf, nachweisKapitel } from './nachweise.js';
 import { uebersicht } from './qa_uebersicht.js';
 import { zeichenbereich } from './qa_zeichnung.js';
 import {
-  ausVorlage, naechsterName, projektAendern, zustand,
+  ausVorlage, feldangabe, naechsterName, projektAendern, zustand,
 } from './zustand.js';
 
 /**
@@ -238,20 +238,20 @@ function schubwandAngaben(analyse) {
       erklaerung(HILFE.schubwaende.zeilen, HILFE.schubwaende.formel)]),
     el('div.neigungszeile', {}, [
       el('span.postenname', { text: 'Neigung' }),
-      span(String.raw`\alpha_{min}`),
-      zahlfeld({
-        wert: analyse.alpha_min, schritt: 1, min: 1, max: 89,
-        titel: 'Kleinste Neigung der Druckdiagonalen, ganze °; bei Normalzug 40°',
-        beiAenderung: (v) => aendern((a) => { a.alpha_min = Math.round(v); }),
+      ...[['alpha_min', String.raw`\alpha_{min}`,
+        'Kleinste Neigung der Druckdiagonalen, ganze °; bei Normalzug 40°'],
+      ['alpha_max', String.raw`\alpha_{max}`, 'Grösste Neigung der Druckdiagonalen, ganze °'],
+      ].flatMap(([schluessel, symbol, titel]) => {
+        const angabe = feldangabe('querschnittsanalyse', schluessel);
+        return [
+          span(symbol),
+          zahlfeld({
+            wert: analyse[schluessel], angabe, titel,
+            beiAenderung: (v) => aendern((a) => { a[schluessel] = v; }),
+          }),
+          el('span.einheit', { text: angabe.einheit }),
+        ];
       }),
-      el('span.einheit', { text: '°' }),
-      span(String.raw`\alpha_{max}`),
-      zahlfeld({
-        wert: analyse.alpha_max, schritt: 1, min: 1, max: 89,
-        titel: 'Grösste Neigung der Druckdiagonalen, ganze °',
-        beiAenderung: (v) => aendern((a) => { a.alpha_max = Math.round(v); }),
-      }),
-      el('span.einheit', { text: '°' }),
     ]),
     feld(['Druckdiagonale ', span('k_c')], zahlfeld({
       wert: analyse.k_c, schritt: 0.05, min: 0,

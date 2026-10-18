@@ -330,6 +330,15 @@ class TestEinheitenAmFeld(unittest.TestCase):
         self.assertEqual(felder["grundbruch"]["gamma_phi"], {"ueber": 0.0})
         self.assertEqual(felder["grundbruchkombination"]["N_Ed"], {"einheit": "kN", "ueber": 0.0})
 
+    def test_eine_neigung_ist_ganz(self):
+        """Die Maske nimmt dort keine Kommazahl an, statt sie still zu runden (2026-10-18)."""
+        felder = katalog()["felder"]
+        for art in ("querkraftbewehrung", "querschnittsanalyse"):
+            for feld in ("alpha_min", "alpha_max"):
+                with self.subTest(art=art, feld=feld):
+                    self.assertEqual(felder[art][feld],
+                                     {"einheit": "°", "ab": 1, "bis": 89, "ganz": True})
+
     def test_die_rechnung_nimmt_die_einheit_des_feldes(self):
         """Jede Zahl der Maske kommt in der Einheit ihres Feldes in die Rechnung."""
         aufbau, loesung, _ = rechnen(c_k=5.0, q_Ed=10.0, b=1.6, L=4.0, alpha=5.0)

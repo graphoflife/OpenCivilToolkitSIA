@@ -28,7 +28,7 @@ import { span } from './mathe.js';
 import {
   analysenKapitel, anBauteil, anfuegenKnopf, nachweisKapitel, rechenwahlZeile,
 } from './nachweise.js';
-import { ausVorlage, naechsterName, projektAendern, zustand } from './zustand.js';
+import { ausVorlage, feldangabe, naechsterName, projektAendern, zustand } from './zustand.js';
 
 /**
  * Was hinter den Fragezeichen der Platte steht: Rechenweg, Werte (Bemessung
@@ -277,16 +277,15 @@ function querkraftAngaben(querschnitt) {
       titel: 'Abminderung f_cd in der Druckdiagonalen; nur mit Bügeln',
       beiAenderung: (v) => aendernAn((q) => { q.k_c = v; }),
     }), '', 'Abminderung f_cd in der Druckdiagonalen'),
-    feld(['Neigung ', span(String.raw`\alpha_{min}`)], zahlfeld({
-      wert: buegel.alpha_min, schritt: 1, min: 1, max: 89,
-      titel: 'Kleinste Neigung der Druckdiagonalen, ganze °',
-      beiAenderung: (v) => aendernBuegel((x) => { x.alpha_min = Math.round(v); }),
-    }), '°'),
-    feld(['Neigung ', span(String.raw`\alpha_{max}`)], zahlfeld({
-      wert: buegel.alpha_max, schritt: 1, min: 1, max: 89,
-      titel: 'Grösste Neigung der Druckdiagonalen, ganze °',
-      beiAenderung: (v) => aendernBuegel((x) => { x.alpha_max = Math.round(v); }),
-    }), '°'),
+    ...[['alpha_min', String.raw`\alpha_{min}`, 'Kleinste'],
+      ['alpha_max', String.raw`\alpha_{max}`, 'Grösste']].map(([schluessel, symbol, welche]) => {
+      const angabe = feldangabe('querkraftbewehrung', schluessel);
+      return feld(['Neigung ', span(symbol)], zahlfeld({
+        wert: buegel[schluessel], angabe,
+        titel: `${welche} Neigung der Druckdiagonalen, ganze °`,
+        beiAenderung: (v) => aendernBuegel((x) => { x[schluessel] = v; }),
+      }), angabe.einheit);
+    }),
   ]);
 }
 

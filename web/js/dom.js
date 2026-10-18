@@ -125,26 +125,40 @@ export function naechsteStufe(wert, richtung, { stufen, schritt = 1 } = {}) {
  * es mit `leer`: `0` für «keins» (kein Stab, keine Last), `null` für «zurück
  * zum Normwert».
  *
+ * Was der Kern über das Feld weiss (`angabe`, aus `katalog.felder`), gilt
+ * hier: die Pfeile gehen bis zu seinen Grenzen -- eine ausgeschlossene rückt
+ * um einen Schritt nach innen, «grösser als null» heisst beim Schritt 0.1 ab
+ * 0.1 --, und ein Feld für ganze Zahlen nimmt keine Kommazahl an. Es sagt es
+ * und behält seinen Wert: bis 2026-10-18 rundete die Oberfläche eine Neigung
+ * von 37.5° still auf 38°.
+ *
  * @param {number[]} [stufen]  erlaubte Werte; sonst wird `schritt` verwendet
  * @param {number|null} [leer] was ein geleertes Feld meldet; fehlt es, bleibt
  *                             der bisherige Wert
  * @param {string} [platzhalter] blass im leeren Feld -- was dann gilt
+ * @param {Object} [angabe]    was der Kern über das Feld weiss: Grenzen, ganz
  */
 export function zahlfeld({
   wert, schritt = 1, stufen, min, max, beiAenderung, titel, readonly, leer, platzhalter,
+  angabe = {},
 }) {
-  const melden = (neu) => beiAenderung(neu);
+  const unten = min ?? angabe.ab ?? (angabe.ueber === undefined ? undefined : angabe.ueber + schritt);
+  const oben = max ?? angabe.bis ?? (angabe.unter === undefined ? undefined : angabe.unter - schritt);
+  const uebernehmen = (neu) => beiAenderung(neu);
 
   const feld = el('input', {
     type: 'number',
     value: wert ?? '',
     step: 'any',
-    min, max, title: titel, readOnly: !!readonly, placeholder: platzhalter,
+    min: unten, max: oben, title: titel, readOnly: !!readonly, placeholder: platzhalter,
     on: {
       change: (e) => {
         const roh = e.target.value.trim();
-        if (roh !== '') melden(Number(roh));
-        else if (leer !== undefined) melden(leer);
+        if (roh !== '' && angabe.ganz && !Number.isInteger(Number(roh))) {
+          melden(`Nur ganze Zahlen: ${roh} ist nicht übernommen.`, true);
+          e.target.value = wert ?? '';
+        } else if (roh !== '') uebernehmen(Number(roh));
+        else if (leer !== undefined) uebernehmen(leer);
         else e.target.value = wert ?? '';
       },
       keydown: (e) => {
@@ -159,10 +173,10 @@ export function zahlfeld({
     if (readonly) return;
     const jetzt = feld.value.trim() === '' ? null : Number(feld.value);
     let neu = naechsteStufe(jetzt ?? 0, richtung, { stufen, schritt });
-    if (min !== undefined && min !== null) neu = Math.max(neu, min);
-    if (max !== undefined && max !== null) neu = Math.min(neu, max);
+    if (unten !== undefined && unten !== null) neu = Math.max(neu, unten);
+    if (oben !== undefined && oben !== null) neu = Math.min(neu, oben);
     feld.value = String(neu);
-    melden(neu);
+    uebernehmen(neu);
   };
 
   if (readonly) return feld;

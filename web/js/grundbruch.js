@@ -25,7 +25,7 @@
 import { erklaerung, feld, hakenSchalter, karte, panel } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
-import { ausVorlage, naechsterName, projektAendern, zustand } from './zustand.js';
+import { ausVorlage, feldangabe, naechsterName, projektAendern, zustand } from './zustand.js';
 
 const HILFE = {
   situation: {
@@ -55,30 +55,13 @@ function aendernAn(kennung, veraenderer) {
   projektAendern((p) => veraenderer(p.grundbrueche.find((g) => g.kennung === kennung)));
 }
 
-/** Was der Kern über ein Feld weiss (`katalog.felder`): Einheit und Grenzen. */
-function angabe(art, schluessel) {
-  return zustand.katalog?.felder?.[art]?.[schluessel] || {};
-}
-
-/**
- * Wie weit die Pfeile eines Feldes gehen: bis zu den Grenzen des Kerns. Eine
- * ausgeschlossene rückt um einen Schritt nach innen -- «grösser als null»
- * heisst beim Schritt 0.1 ab 0.1. Getippt wird, was man will; der Kern prüft.
- */
-function grenzen(f, schritt) {
-  return {
-    min: f.ab ?? (f.ueber === undefined ? undefined : f.ueber + schritt),
-    max: f.bis ?? (f.unter === undefined ? undefined : f.unter - schritt),
-  };
-}
-
 /** Eine Zahl des Eintrags als Feld: Beschriftung mit Symbol, Einheit, Schrittweite. */
 function zahlzeile(g, schluessel, text, symbol, { schritt = 1, titel } = {}) {
-  const f = angabe('grundbruch', schluessel);
+  const angabe = feldangabe('grundbruch', schluessel);
   return feld([`${text} `, span(symbol)], zahlfeld({
-    wert: g[schluessel], schritt, ...grenzen(f, schritt), titel,
+    wert: g[schluessel], schritt, angabe, titel,
     beiAenderung: (v) => aendernAn(g.kennung, (x) => { x[schluessel] = v; }),
-  }), f.einheit || '', titel);
+  }), angabe.einheit || '', titel);
 }
 
 /** Die Bemessungswerte des Bodens, wie der Kern sie gerechnet hat -- oder nichts. */
@@ -155,7 +138,7 @@ function kombinationZeile(g, i) {
   const aendern = (veraenderer) => aendernAn(g.kennung, (x) => veraenderer(x.kombinationen[i]));
   const an = k.aktiv !== false;
   const zahl = (schluessel, titel) => zahlfeld({
-    wert: k[schluessel], schritt: 10, ...grenzen(angabe('grundbruchkombination', schluessel), 10),
+    wert: k[schluessel], schritt: 10, angabe: feldangabe('grundbruchkombination', schluessel),
     titel, leer: 0, beiAenderung: (v) => aendern((x) => { x[schluessel] = v; }),
   });
   return el('div.einwirkung.ist-grundbruch', { class: an ? '' : 'ist-aus' }, [
@@ -188,7 +171,7 @@ function einwirkungenPanel(g) {
           el('span'),
           el('span', { text: 'Bezeichnung' }),
           ...['N_Ed', 'T_Ed'].map((s) => el('span', {
-            text: `${s} [${angabe('grundbruchkombination', s).einheit}]`,
+            text: `${s} [${feldangabe('grundbruchkombination', s).einheit}]`,
           })),
           el('span'),
         ])
