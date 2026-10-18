@@ -105,8 +105,6 @@ Oberfläche.
         [[Bewehrungsquerschnitt der zusammengefassten Lage]] (Handrechnung).
         Zusammenlegen hiesse, eine Seite umzubenennen.
       - Die leere Lage bekommt still den ersten Stahl.
-      - Die Fallzeile ist siebenmal gebaut, und das Stilblatt zählt ihre
-        Kinder.
       - Die Pakete laden über vier Schichten, obwohl Pyodide es selbst kann
         (`loadPackagesFromImports`). Das ändert eine mitgelieferte Datei.
       - Eine Meldung nennt ihren Ort mit den Feldern der Datei («Platte

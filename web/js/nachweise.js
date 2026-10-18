@@ -23,6 +23,7 @@
 
 import { erklaerung, feld, hakenSchalter } from './bausteine.js';
 import { auswahl, el, zahlfeld } from './dom.js';
+import { fallkopf, fallzeile } from './faelle.js';
 import { gebrauchsstand, schalter, zeilenstand } from './kapitel.js';
 import { ausVorlage, feldangabe, naechsterName, projektAendern, zustand } from './zustand.js';
 
@@ -258,14 +259,7 @@ function knickInhalt(eintrag, ort) {
     rechenwahlZeile('Widerstand (N_Rd)', eintrag.knicken_wahl_widerstand,
       (veraenderer) => aendern((q) => veraenderer(q.knicken_wahl_widerstand)),
       { arten: 'faserarten' }),
-    faelle.length
-      ? el('div.einwirkung.ist-knick.ist-kopf', {}, [
-        el('span'),
-        el('span', { text: 'Bezeichnung' }),
-        ...knick.kopf.map((text) => el('span', { text })),
-        el('span'),
-      ])
-      : null,
+    faelle.length ? fallkopf(knick.kopf) : null,
     ...(faelle.length
       ? faelle.map((_, i) => knickZeile(eintrag, ort, i))
       : [el('div.leer', { text: knick.leer })]),
@@ -287,28 +281,18 @@ function knickZeile(eintrag, ort, index) {
     beiAenderung: (v) => aendern((x) => { x[feld] = v; }),
   });
 
-  const aktiv = k.aktiv !== false;
+  // Beim gezeichneten Querschnitt steht die Zugseite oben neben dem Namen:
+  // «Zug unten» braucht mehr Platz als eine Zahl.
   const richtung = ort.knick.richtung;
-  return el(`div.einwirkung.ist-knick${richtung ? '.mit-zugseite' : ''}`, {
-    class: aktiv ? '' : 'ist-aus',
-  }, [
-    hakenSchalter(aktiv, (wert) => aendern((x) => { x.aktiv = wert; }), 'Knicknachweis'),
-    el('input.ew-name', {
-      type: 'text', value: k.name, title: 'Bezeichnung des Knicknachweises',
-      on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
-    }),
-    zahl('N_Ed', 50),
-    zahl('M_Ed_1', 10),
-    zahl('laenge', 0.5),
-    zahl('knicklaenge', 0.5),
-    richtung ? richtung(k, (wert) => aendern((x) => { x.richtung = wert; })) : null,
-    el('button.weg', {
-      text: '×', title: 'Knicknachweis entfernen',
-      on: {
-        click: () => anBauteil(eintrag, ort)((e) => { e.knickfaelle.splice(index, 1); }),
-      },
-    }),
-  ]);
+  return fallzeile({
+    an: k.aktiv !== false, umschalten: (wert) => aendern((x) => { x.aktiv = wert; }),
+    was: 'Knicknachweis', name: k.name, nameTitel: 'Bezeichnung des Knicknachweises',
+    umbenennen: (name) => aendern((x) => { x.name = name; }),
+    oben: richtung ? richtung(k, (wert) => aendern((x) => { x.richtung = wert; })) : null,
+    zahlen: [zahl('N_Ed', 50), zahl('M_Ed_1', 10), zahl('laenge', 0.5), zahl('knicklaenge', 0.5)],
+    entfernenTitel: 'Knicknachweis entfernen',
+    entfernen: () => anBauteil(eintrag, ort)((e) => { e.knickfaelle.splice(index, 1); }),
+  });
 }
 
 /**
@@ -458,14 +442,7 @@ function gebrauchsKapitel(eintrag, ort, {
     // Die abgeleiteten Fälle und eigene schliessen sich nicht aus: wer den
     // Anteil nimmt, kann trotzdem einen Fall von Hand dazustellen, den keine
     // Tragsicherheitskombination abbildet.
-    faelle.length
-      ? el('div.einwirkung.ist-kopf', { style: { '--felder': spalten.length } }, [
-        el('span'),
-        el('span', { text: 'Bezeichnung' }),
-        ...spalten.map((s) => el('span', { text: s.kopf })),
-        el('span'),
-      ])
-      : null,
+    faelle.length ? fallkopf(spalten.map((s) => s.kopf)) : null,
     ...(faelle.length
       ? faelle.map((_, i) => gebrauchsfallZeile(eintrag, ort, spalten, feld, wort, i))
       : [el('div.leer', {
@@ -484,26 +461,17 @@ function gebrauchsfallZeile(eintrag, ort, spalten, feld, wort, index) {
   const k = eintrag[feld].faelle[index];
   const aendern = (veraenderer) => anBauteil(eintrag, ort)((e) => veraenderer(e[feld].faelle[index]));
 
-  const aktiv = k.aktiv !== false;
-  return el('div.einwirkung', {
-    class: aktiv ? '' : 'ist-aus', style: { '--felder': spalten.length },
-  }, [
-    hakenSchalter(aktiv, (wert) => aendern((x) => { x.aktiv = wert; }), 'Lastfall'),
-    el('input.ew-name', {
-      type: 'text', value: k.name, title: `Bezeichnung des ${wort}en Lastfalls`,
-      on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
-    }),
-    ...spalten.map((s) => zahlfeld({
+  return fallzeile({
+    an: k.aktiv !== false, umschalten: (wert) => aendern((x) => { x.aktiv = wert; }),
+    was: 'Lastfall', name: k.name, nameTitel: `Bezeichnung des ${wort}en Lastfalls`,
+    umbenennen: (name) => aendern((x) => { x.name = name; }),
+    zahlen: spalten.map((s) => zahlfeld({
       wert: k[s.feld], schritt: s.schritt, titel: s.titel(wort), leer: 0,
       beiAenderung: (v) => aendern((x) => { x[s.feld] = v; }),
     })),
-    el('button.weg', {
-      text: '×', title: `${wort[0].toUpperCase()}${wort.slice(1)}en Lastfall entfernen`,
-      on: {
-        click: () => anBauteil(eintrag, ort)((e) => { e[feld].faelle.splice(index, 1); }),
-      },
-    }),
-  ]);
+    entfernenTitel: `${wort[0].toUpperCase()}${wort.slice(1)}en Lastfall entfernen`,
+    entfernen: () => anBauteil(eintrag, ort)((e) => { e[feld].faelle.splice(index, 1); }),
+  });
 }
 
 /**
@@ -642,22 +610,17 @@ function spannungsZeile(eintrag, index, ort) {
   const [phi, werte, rechenart] = rechenwahlFelder(
     k, aendern, { arten: 'faserarten', phiImmer: true });
 
-  return el('div.einwirkung.ist-spannung', { class: aktiv ? '' : 'ist-aus' }, [
-    hakenSchalter(aktiv, (wert) => aendern((x) => { x.aktiv = wert; }), 'Analyse'),
-    el('input.ew-name', {
-      type: 'text', value: k.name, title: 'Bezeichnung der Analyse',
-      on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
-    }),
-    // Beschriftung über dem Feld, nicht daneben: so bleibt das Raster der
-    // Zeile dasselbe, gleich welche Art es ist.
-    ...spalten,
-    phi,
-    ort.richtung(k, (wert) => aendern((x) => { x.richtung = wert; })),
-    werte,
-    rechenart,
-    el('button.weg', {
-      text: '×', title: 'Analyse entfernen',
-      on: { click: () => projektAendern((p) => { liste(p).splice(index, 1); }) },
-    }),
-  ]);
+  // Beschriftung über dem Feld, nicht daneben: so bleibt das Raster der
+  // Zeile dasselbe, gleich welche Art es ist. Werte und Rechenart je zwei
+  // Spalten breit in einer Zeile darunter -- in einer wären sie abgeschnitten.
+  return fallzeile({
+    an: aktiv, umschalten: (wert) => aendern((x) => { x.aktiv = wert; }),
+    was: 'Analyse', name: k.name, nameTitel: 'Bezeichnung der Analyse',
+    umbenennen: (name) => aendern((x) => { x.name = name; }),
+    zahlen: [...spalten, phi, ort.richtung(k, (wert) => aendern((x) => { x.richtung = wert; }))],
+    unten: [werte, rechenart],
+    entfernenTitel: 'Analyse entfernen',
+    entfernen: () => projektAendern((p) => { liste(p).splice(index, 1); }),
+    klasse: '.ist-spannung',
+  });
 }

@@ -22,8 +22,9 @@
  * Zahl still um 10³ anders, als die Maske sagte.
  */
 
-import { erklaerung, feld, hakenSchalter, karte, panel } from './bausteine.js';
+import { erklaerung, feld, karte, panel } from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
+import { fallkopf, fallzeile } from './faelle.js';
 import { span } from './mathe.js';
 import { ausVorlage, feldangabe, naechsterName, projektAendern, zustand } from './zustand.js';
 
@@ -136,24 +137,19 @@ function situationPanel(g) {
 function kombinationZeile(g, i) {
   const k = g.kombinationen[i];
   const aendern = (veraenderer) => aendernAn(g.kennung, (x) => veraenderer(x.kombinationen[i]));
-  const an = k.aktiv !== false;
   const zahl = (schluessel, titel) => zahlfeld({
     wert: k[schluessel], schritt: 10, angabe: feldangabe('grundbruchkombination', schluessel),
     titel, leer: 0, beiAenderung: (v) => aendern((x) => { x[schluessel] = v; }),
   });
-  return el('div.einwirkung.ist-grundbruch', { class: an ? '' : 'ist-aus' }, [
-    hakenSchalter(an, (wert) => aendern((x) => { x.aktiv = wert; }), 'Kombination'),
-    el('input.ew-name', {
-      type: 'text', value: k.name, title: 'Bezeichnung der Kombination',
-      on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
-    }),
-    zahl('N_Ed', 'Normal zur Sohle, Druck positiv'),
-    zahl('T_Ed', 'In der Sohle, zur Seite, auf der das Gelände abfällt'),
-    el('button.weg', {
-      type: 'button', text: '×', title: 'Kombination entfernen',
-      on: { click: () => aendernAn(g.kennung, (x) => { x.kombinationen.splice(i, 1); }) },
-    }),
-  ]);
+  return fallzeile({
+    an: k.aktiv !== false, umschalten: (wert) => aendern((x) => { x.aktiv = wert; }),
+    was: 'Kombination', name: k.name, nameTitel: 'Bezeichnung der Kombination',
+    umbenennen: (name) => aendern((x) => { x.name = name; }),
+    zahlen: [zahl('N_Ed', 'Normal zur Sohle, Druck positiv'),
+      zahl('T_Ed', 'In der Sohle, zur Seite, auf der das Gelände abfällt')],
+    entfernenTitel: 'Kombination entfernen',
+    entfernen: () => aendernAn(g.kennung, (x) => { x.kombinationen.splice(i, 1); }),
+  });
 }
 
 function einwirkungenPanel(g) {
@@ -167,14 +163,8 @@ function einwirkungenPanel(g) {
   }, [
     el('div.unterkapitel', {}, [
       g.kombinationen.length
-        ? el('div.einwirkung.ist-grundbruch.ist-kopf', {}, [
-          el('span'),
-          el('span', { text: 'Bezeichnung' }),
-          ...['N_Ed', 'T_Ed'].map((s) => el('span', {
-            text: `${s} [${feldangabe('grundbruchkombination', s).einheit}]`,
-          })),
-          el('span'),
-        ])
+        ? fallkopf(['N_Ed', 'T_Ed'].map(
+          (s) => `${s} [${feldangabe('grundbruchkombination', s).einheit}]`))
         : el('div.leer', { text: 'Ohne Kombination kein Nachweis.' }),
       ...g.kombinationen.map((_, i) => kombinationZeile(g, i)),
       el('button.knopf-anfuegen', { type: 'button', text: '+ Kombination', on: { click: neu } }),

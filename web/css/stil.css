@@ -714,59 +714,65 @@ dialog.materialwahl .fenster-kopf { top: 0; }
   letter-spacing: .4px; color: var(--schrift-matt); margin-bottom: 5px;
 }
 
-/* Eine Einwirkung in zwei Zeilen: oben Schalter, Name und Entfernen, darunter
-   die Zahlen, je unter ihrer Kopfbeschriftung. Eine Zahlenspalte ist so
-   breit wie ein Zahlenfeld (`--zahlbreite`).
-   Bis 2026-10-08 gab es daneben eine einzeilige Form für breite Tafeln. Seit
-   die Panels fest 420 px breit sind, kam sie nie mehr zum Zug.
-   Jede Zeile hat denselben Aufbau -- Schalter, Name, n Felder, Löschen --,
-   darum trägt Kind k die Spalte k-1. Vier Felder passen nicht ganz in die
-   Karte; dort werden sie etwas schmaler (die Null in `minmax`). Die Werte
-   darin sind kurz: eine Länge, eine Kraft.
+/* Die Zeile eines Falls (faelle.js), in jeder Liste dieselbe: oben
+   Schalter, Name und Entfernen, darunter die Zahlen, je unter ihrem Kopf.
+   Eine Zahlenspalte ist so breit wie ein Zahlenfeld (`--zahlbreite`); wie
+   viele es sind, setzt die Zeile (`--felder`). Vier Felder passen nicht ganz
+   in die Karte; dort werden sie etwas schmaler (die Null in `minmax`).
+   Jede Zelle trägt ihre Klasse und steht danach -- bis 2026-10-18 nach
+   ihrer Nummer (`:nth-child`), und eine Zelle mehr verschob alle danach.
    Die Zeile steht in der Schrift der Felder, auch der Kopf: die Spalten
    rechnen in ihren Zeichen. Klein gesetzt sind erst die Beschriftungen. */
-.einwirkung {
+.fallzeile {
   --zahlspalte: var(--zahlbreite);
   display: grid;
   grid-template-columns: 38px repeat(var(--felder, 3), minmax(0, var(--zahlspalte))) 18px;
   justify-content: start;
   gap: 3px 4px; align-items: center; margin-bottom: 4px;
 }
-.einwirkung.ist-knick, .einwirkung.ist-spannung { --felder: 4; }
-/* Häufig oder quasi-ständig setzen --felder selbst: zwei Zahlen bei der
-   Platte, drei beim gezeichneten Querschnitt. */
-.einwirkung > :nth-child(n+3) { grid-row: 2; }
-.einwirkung > :nth-child(3) { grid-column: 2; }
-.einwirkung > :nth-child(4) { grid-column: 3; }
-.einwirkung > :nth-child(5) { grid-column: 4; }
-.einwirkung > :nth-child(6) { grid-column: 5; }
-/* Beim Knicken des gezeichneten Querschnitts steht die Zugseite oben neben
-   dem Namen, über den letzten beiden Zahlen: «Zug unten» braucht mehr Platz
-   als eine Zahl. */
-.einwirkung.mit-zugseite > :nth-child(2) { grid-column: 2 / 4; }
-.einwirkung.mit-zugseite > :nth-child(7) { grid-row: 1; grid-column: 4 / 6; }
-.einwirkung > :nth-child(2) { grid-column: 2 / -2; }
-.einwirkung > :last-child { grid-column: -2; grid-row: 1; }
+.fall-schalter { grid-row: 1; grid-column: 1; }
+.fall-name { grid-row: 1; grid-column: 2 / -2; padding: 3px 6px; font-weight: 500; }
+.fall-weg { grid-row: 1; grid-column: -2; }
+/* Die Zahlen übernehmen die Spalten der Zeile und brechen nach ihnen um --
+   der Lastfall des gezeichneten Querschnitts hat sechs in zwei Zeilen. */
+.fall-zahlen {
+  grid-row: 2; grid-column: 2 / -2;
+  display: grid; grid-template-columns: subgrid; gap: 3px 4px; align-items: center;
+}
+/* Was neben dem Namen steht -- die Zugseite beim Knicken des gezeichneten
+   Querschnitts, über den letzten beiden Zahlen: «Zug unten» braucht mehr
+   Platz als eine Zahl. */
+.fallzeile.mit-oben > .fall-name { grid-column: 2 / 4; }
+.fall-oben { grid-row: 1; grid-column: 4 / -2; min-width: 0; }
+.fall-oben > * { width: 100%; }
+/* Was unter den Zahlen steht -- Werte und Rechenart einer Analyse, je halb
+   so breit wie die Zahlen: in einer Spalte wären sie abgeschnitten. */
+.fall-unten {
+  grid-row: 3; grid-column: 2 / -2;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px 4px;
+}
+@container (max-width: 380px) {
+  .fall-unten { grid-template-columns: minmax(0, 1fr); }
+}
 /* Im Lastfall ist der Schalter nur ein Beiwerk -- er darf der Zeile nicht die
    Breite nehmen, die die Zahlen brauchen. */
-.einwirkung .schalter-haken .schalter-halb { width: 18px; font-size: 11px; }
+.fallzeile .schalter-haken .schalter-halb { width: 18px; font-size: 11px; }
 /* Ein ausgeschalteter Lastfall bleibt stehen -- blass, damit man sieht, dass
    er da ist und nicht gerechnet wird. */
-.einwirkung.ist-aus { opacity: .5; }
+.fallzeile.ist-aus { opacity: .5; }
 /* Die Spaltenköpfe in derselben Farbe wie die Kapitelköpfe: im zarten Grau
    las man sie als Beiwerk und suchte, welche Zahl welche ist. Der Kopf trägt
    nur die Zahlen -- was der Name ist, sieht man. */
-.einwirkung.ist-kopf { margin-bottom: 2px; }
-.einwirkung.ist-kopf > * {
+.fallkopf { margin-bottom: 2px; }
+.fallkopf > .fall-zahlen { grid-row: 1; }
+.fallkopf .fall-zahlen > * {
   font-size: 10.5px; font-weight: 700; text-transform: uppercase;
   letter-spacing: .3px; color: var(--schrift-matt);
   text-align: right; padding-right: calc(var(--pfeilspur) + 4px);
 }
-.einwirkung.ist-kopf > :nth-child(n+3) { grid-row: 1; }
-.einwirkung.ist-kopf > :nth-child(2) { display: none; }
-.einwirkung input[type="number"] { padding-block: 3px; }
-.einwirkung .ew-name { padding: 3px 6px; font-weight: 500; }
-.einwirkung .schalter-richtung { justify-self: stretch; }
+.fallkopf .fall-zahlen > .ist-formel { text-transform: none; letter-spacing: 0; }
+.fallzeile input[type="number"] { padding-block: 3px; }
+.fallzeile .schalter-richtung { justify-self: stretch; }
 
 /* ------------------------------------------------- Kapitel und Fenster -- */
 
@@ -1259,13 +1265,10 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   letter-spacing: .2px; color: var(--schrift-matt); text-align: right;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.einwirkung.ist-spannung { align-items: end; }
 /* Eine Analyse als Karte in drei Zeilen: der Name; ihre Zahlen, die
-   Kriechzahl und die Richtung; die Werte und der Beton, je zwei Spalten
-   breit -- in einer wären sie abgeschnitten. Die Art steht über dem
-   Fenster. */
-.einwirkung.ist-spannung > :nth-child(7) { grid-column: 2 / 4; grid-row: 3; }
-.einwirkung.ist-spannung > :nth-child(8) { grid-column: 4 / 6; grid-row: 3; }
+   Kriechzahl und die Richtung; die Werte und der Beton. Die Art steht über
+   dem Fenster. Unten bündig: ihre Felder tragen ihren Kopf über sich. */
+.fallzeile.ist-spannung, .fallzeile.ist-spannung .fall-zahlen { align-items: end; }
 /* Ein Feld, das bei der gewählten Rechenart nichts ändert -- etwa φ beim
    Spannungsblock. Es bleibt stehen, damit seine Zahl nicht verloren geht. */
 .ist-ohne-wirkung { opacity: .45; }
@@ -1287,20 +1290,14 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   .rechenwahl { grid-template-columns: calc(5ch + var(--pfeilspur) + 10px) minmax(0, 1fr); }
   .rechenwahl > :nth-child(4) { grid-column: 2; }
 }
-.einwirkung.ist-spannung select {
+.fallzeile.ist-spannung select {
   min-width: 0; width: 100%;
   font-family: "Formelzeichen", "JetBrains Mono", ui-monospace, monospace;
 }
 /* «charakteristisch» fehlten in 14 px zwei Pixel. Der Kopf steht über einer
    Auswahl links, wie ihr Text -- über einer Zahl rechts. */
-.einwirkung.ist-spannung > :nth-child(n+7) select { font-size: 13px; }
-.einwirkung.ist-spannung > :nth-child(n+7) .spaltenkopf { text-align: left; }
-/* Am Telefon ist die Karte 70 px schmaler: Werte und Beton je auf einer
-   Zeile. */
-@container (max-width: 380px) {
-  .einwirkung.ist-spannung > :nth-child(7) { grid-column: 2 / 6; }
-  .einwirkung.ist-spannung > :nth-child(8) { grid-column: 2 / 6; grid-row: 4; }
-}
+.fall-unten select { font-size: 13px; }
+.fall-unten .spaltenkopf { text-align: left; }
 /* Ein Formelzeichen als Kopf: gross geschrieben würde aus φ ein Φ. */
 .spaltenkopf.ist-formel {
   text-transform: none; font: italic 12px/1 KaTeX_Math, serif;
@@ -1502,33 +1499,6 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .vorzeichenbild .vz-drehung { fill: none; stroke: var(--beide); stroke-width: 1.5; }
 .vorzeichenbild .vz-drehspitze { fill: var(--beide); }
 .vorzeichenbild .vz-schwerpunkt { fill: var(--schrift); }
-
-/* Ein Lastfall: oben Schalter, Name und Entfernen, darunter die Zahlen zu
-   dritt in einer Zeile -- N, M_y, M_z und darunter V_y, V_z, T. Sechs volle
-   Zahlenfelder passen nicht nebeneinander in ein Panel; vorher waren sie
-   darum 49 px schmal, und von «-1500» sah man die Hälfte. */
-.qa-fall {
-  display: grid; grid-template-columns: 38px minmax(0, 1fr) 18px;
-  gap: 3px 4px; align-items: center; margin-bottom: 6px;
-}
-.qa-fall > .qa-zahlen { grid-column: 2; grid-row: 2; }
-.qa-zahlen {
-  display: grid; gap: 4px; justify-content: start;
-  grid-template-columns: repeat(3, var(--zahlbreite));
-}
-.qa-fall .schalter-haken .schalter-halb { width: 18px; font-size: 11px; }
-.qa-fall.ist-aus { opacity: .5; }
-.qa-fall input[type="number"] { padding-block: 3px; }
-.qa-fall .ew-name { padding: 3px 6px; font-weight: 500; }
-/* Der Kopf in der Schrift der Felder, klein erst die Symbole: die Spalten
-   rechnen in den Zeichen der Zeile. */
-.qa-fall.ist-kopf { margin-bottom: 2px; }
-.qa-fall.ist-kopf .qa-name { display: none; }
-.qa-fall.ist-kopf > .qa-zahlen { grid-row: 1; }
-.qa-fall.ist-kopf .qa-zahlen > span {
-  font-size: 10.5px; font-weight: 700; color: var(--schrift-matt);
-  text-align: right; padding-right: calc(var(--pfeilspur) + 4px);
-}
 
 /* ------------------------------------------------------- Zeichenfenster -- */
 
@@ -2119,7 +2089,6 @@ details.nb-callout > summary { cursor: pointer; }
 }
 .gb-trenner { color: var(--schrift-zart); }
 /* Die Kombinationen: zwei Zahlen, N_Ed und T_Ed. */
-.einwirkung.ist-grundbruch { --felder: 2; }
 
 /* Die Situation: Gelände, Fundament, Wasser, Gleitkörper, Kräfte. */
 .gb-bildhuelle { position: relative; }

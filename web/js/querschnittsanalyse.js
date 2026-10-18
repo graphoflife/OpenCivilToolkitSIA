@@ -20,6 +20,7 @@
 
 import { erklaerung, feld, hakenSchalter, panel } from './bausteine.js';
 import { auswahl, el, svgEl, zahlfeld } from './dom.js';
+import { fallkopf, fallzeile } from './faelle.js';
 import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
 import { span } from './mathe.js';
 import { analysenKapitel, mitKopf, nachweisKapitel } from './nachweise.js';
@@ -313,46 +314,34 @@ function richtungstext(analyse) {
 }
 
 /**
- * Ein Lastfall: Schalter, Name, die Schnittgrössen, Entfernen. Die Zahlen
- * stehen in einem eigenen Raster -- in der schmalen Tafel unter dem Namen,
- * in der breiten daneben. Der Kopf trägt nur ihre Symbole; die Einheiten
- * stehen in der Überschrift des Kapitels.
+ * Ein Lastfall: Schalter, Name, die Schnittgrössen, Entfernen. Sechs volle
+ * Zahlenfelder passen nicht nebeneinander in ein Panel: drei je Zeile, N,
+ * M_y, M_z und darunter V_y, V_z, T. Der Kopf trägt nur ihre Symbole; die
+ * Einheiten stehen in der Überschrift des Kapitels.
  */
+const JE_ZEILE = 3;
+
 function lastfallKopf(analyse) {
-  return el('div.qa-fall.ist-kopf', { style: { '--felder': spalten(analyse).length } }, [
-    el('span'),
-    el('span.qa-name', { text: 'Bezeichnung' }),
-    el('div.qa-zahlen', {}, spalten(analyse).map((s) => el('span', {}, [span(s.symbol)]))),
-    el('span'),
-  ]);
+  return fallkopf(spalten(analyse).map((s) => span(s.symbol)), { spalten: JE_ZEILE });
 }
 
 function lastfallZeile(analyse, index) {
   const fall = analyse.lastfaelle[index];
   const aendern = (veraenderer) => aendernAn(analyse.kennung,
     (a) => veraenderer(a.lastfaelle[index]));
-  const an = fall.aktiv !== false;
-
-  return el('div.qa-fall', {
-    class: an ? '' : 'ist-aus', style: { '--felder': spalten(analyse).length },
-  }, [
-    hakenSchalter(an, (wert) => aendern((x) => { x.aktiv = wert; }), 'Lastfall'),
-    el('input.ew-name.qa-name', {
-      type: 'text', value: fall.name, title: 'Bezeichnung des Lastfalls',
-      on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
-    }),
-    el('div.qa-zahlen', {}, spalten(analyse).map((s) => zahlfeld({
+  return fallzeile({
+    an: fall.aktiv !== false, umschalten: (wert) => aendern((x) => { x.aktiv = wert; }),
+    was: 'Lastfall', name: fall.name, nameTitel: 'Bezeichnung des Lastfalls',
+    umbenennen: (name) => aendern((x) => { x.name = name; }),
+    zahlen: spalten(analyse).map((s) => zahlfeld({
       // Eine Last, die man leert, ist keine Last.
       wert: fall[s.feld], schritt: s.schritt, titel: s.titel, leer: 0,
       beiAenderung: (v) => aendern((x) => { x[s.feld] = v; }),
-    }))),
-    el('button.weg', {
-      text: '×', title: 'Lastfall entfernen',
-      on: {
-        click: () => aendernAn(analyse.kennung, (a) => { a.lastfaelle.splice(index, 1); }),
-      },
-    }),
-  ]);
+    })),
+    spalten: JE_ZEILE,
+    entfernenTitel: 'Lastfall entfernen',
+    entfernen: () => aendernAn(analyse.kennung, (a) => { a.lastfaelle.splice(index, 1); }),
+  });
 }
 
 /**

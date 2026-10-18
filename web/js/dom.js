@@ -28,7 +28,7 @@ export function el(tag, eigen = {}, kinder = []) {
     else if (schluessel === 'text') knoten.textContent = String(wert);
     else if (schluessel === 'html') knoten.innerHTML = wert;
     else if (schluessel === 'dataset') Object.assign(knoten.dataset, wert);
-    else if (schluessel === 'style') Object.assign(knoten.style, wert);
+    else if (schluessel === 'style') stileSetzen(knoten, wert);
     else if (schluessel === 'on') {
       for (const [art, hoerer] of Object.entries(wert)) knoten.addEventListener(art, hoerer);
     } else if (schluessel in knoten) knoten[schluessel] = wert;
@@ -40,6 +40,18 @@ export function el(tag, eigen = {}, kinder = []) {
     knoten.append(kind instanceof Node ? kind : document.createTextNode(String(kind)));
   }
   return knoten;
+}
+
+/**
+ * Die Stile eines Knotens -- eigene Eigenschaften (`--felder`) über
+ * `setProperty`: `Object.assign` setzt sie nicht, und bis 2026-10-18 kam so
+ * das `--felder` der Gebrauchsfälle nie an.
+ */
+function stileSetzen(knoten, stile) {
+  for (const [eigenschaft, wert] of Object.entries(stile)) {
+    if (eigenschaft.startsWith('--')) knoten.style.setProperty(eigenschaft, wert);
+    else knoten.style[eigenschaft] = wert;
+  }
 }
 
 /**

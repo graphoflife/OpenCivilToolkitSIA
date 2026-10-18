@@ -18,10 +18,11 @@
  */
 
 import {
-  erklaerung, feld, hakenSchalter, richtungsWahl, zweiSchalter,
+  erklaerung, feld, richtungsWahl, zweiSchalter,
 } from './bausteine.js';
 import { SUCHE } from './bewehrungssuche.js';
 import { el, zahlfeld } from './dom.js';
+import { fallkopf, fallzeile } from './faelle.js';
 import { zeilenstand } from './kapitel.js';
 import { xLagen } from './lagen.js';
 import { span } from './mathe.js';
@@ -227,14 +228,7 @@ function tragsicherheitInhalt(querschnitt) {
     rechenwahlZeile('Rechenwahl', querschnitt.tragsicherheit_wahl,
       (veraenderer) => aendernAn((q) => veraenderer(q.tragsicherheit_wahl))),
     querschnitt.kombinationen.length
-      ? el('div.einwirkung.ist-kopf', {}, [
-        el('span'),
-        el('span', { text: 'Bezeichnung' }),
-        el('span', { text: 'M_Ed [kNm]' }),
-        el('span', { text: 'N_Ed [kN]' }),
-        el('span', { text: 'V_Ed [kN/m]' }),
-        el('span'),
-      ])
+      ? fallkopf(['M_Ed [kNm]', 'N_Ed [kN]', 'V_Ed [kN/m]'])
       : null,
     ...(querschnitt.kombinationen.length
       ? querschnitt.kombinationen.map((_, i) => einwirkungZeile(querschnitt, i))
@@ -301,26 +295,21 @@ function einwirkungZeile(querschnitt, index) {
     beiAenderung: (v) => aendern((x) => { x[feld] = v; }),
   });
 
-  const an = k.aktiv !== false;
-  return el('div.einwirkung', { class: an ? '' : 'ist-aus' }, [
-    hakenSchalter(an, (wert) => aendern((x) => { x.aktiv = wert; }), 'Lastfall'),
-    el('input.ew-name', {
-      type: 'text', value: k.name, title: 'Bezeichnung der Einwirkung',
-      on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
+  return fallzeile({
+    an: k.aktiv !== false, umschalten: (wert) => aendern((x) => { x.aktiv = wert; }),
+    was: 'Lastfall', name: k.name, nameTitel: 'Bezeichnung der Einwirkung',
+    umbenennen: (name) => aendern((x) => { x.name = name; }),
+    zahlen: [
+      zahl('M_Ed', 'Bemessungsmoment in kNm'),
+      zahl('N_Ed', 'Normalkraft in kN – Zug positiv, Druck negativ'),
+      zahl('V_Ed', 'Querkraft in kN/m – 0 heisst: kein Querkraftnachweis'),
+    ],
+    entfernenTitel: 'Einwirkung entfernen',
+    entfernen: () => projektAendern((p) => {
+      p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
+        .kombinationen.splice(index, 1);
     }),
-    zahl('M_Ed', 'Bemessungsmoment in kNm'),
-    zahl('N_Ed', 'Normalkraft in kN – Zug positiv, Druck negativ'),
-    zahl('V_Ed', 'Querkraft in kN/m – 0 heisst: kein Querkraftnachweis'),
-    el('button.weg', {
-      text: '×', title: 'Einwirkung entfernen',
-      on: {
-        click: () => projektAendern((p) => {
-          p.querschnitte.find((x) => x.kennung === querschnitt.kennung)
-            .kombinationen.splice(index, 1);
-        }),
-      },
-    }),
-  ]);
+  });
 }
 
 /**
@@ -345,16 +334,7 @@ function verformungInhalt(querschnitt) {
       ['Gilt für', 'alle Verformungsfälle dieser Platte: ω_w wird je gezogene Seite einmal gerechnet'],
     ], 'ω_w = (1 − 20ρ′)/(10ρ^0.7) · (0.75 + 0.1φ) · (h/d)³')),
     el('p.hinweis.hinweis-annahme', { text: 'w mit der Steifigkeit E_cm ermitteln.' }),
-    faelle.length
-      ? el('div.einwirkung.ist-kopf', {}, [
-        el('span'),
-        el('span', { text: 'Bezeichnung' }),
-        el('span', { text: 'w [mm]' }),
-        el('span', { text: 'L [m]' }),
-        el('span', { text: 'Zug' }),
-        el('span'),
-      ])
-      : null,
+    faelle.length ? fallkopf(['w [mm]', 'L [m]', 'Zug']) : null,
     ...(faelle.length
       ? faelle.map((_, i) => verformungsZeile(querschnitt, i))
       : [el('div.leer', { text: 'Noch kein Verformungsfall (nur x).' })]),
@@ -370,38 +350,33 @@ function verformungsZeile(querschnitt, index) {
   const aendern = (veraenderer) => anPlatte(querschnitt)((q) => {
     veraenderer(q.verformung.faelle[index]);
   });
-  const aktiv = k.aktiv !== false;
   const seiten = zustand.katalog?.verformung?.zugseiten || [];
-  return el('div.einwirkung', { class: aktiv ? '' : 'ist-aus' }, [
-    hakenSchalter(aktiv, (wert) => aendern((x) => { x.aktiv = wert; }), 'Verformungsfall'),
-    el('input.ew-name', {
-      type: 'text', value: k.name, title: 'Bezeichnung des Verformungsfalls',
-      on: { change: (e) => aendern((x) => { x.name = e.target.value; }) },
-    }),
-    zahlfeld({
-      wert: k.w, schritt: 1, min: 0, leer: 0,
-      titel: 'Durchbiegung w in mm, mit der Steifigkeit E_cm ermittelt',
-      beiAenderung: (v) => aendern((x) => { x.w = v; }),
-    }),
-    // Eine Spannweite null gibt es nicht -- geleert bleibt der bisherige Wert.
-    zahlfeld({
-      wert: k.laenge, schritt: 0.5,
-      titel: 'Spannweite L in m – der Grenzwert ist L/350',
-      beiAenderung: (v) => aendern((x) => { x.laenge = v; }),
-    }),
-    seiten.length === 2
-      ? zweiSchalter({
-        stellungen: seiten.map((s) => [s.wert, s.beschriftung]),
-        gewaehlt: k.zugseite, klasse: '.schalter-richtung',
-        setzen: (wert) => aendern((x) => { x.zugseite = wert; }),
-        titel: `Zug ${k.zugseite}: danach richtet sich ω_w -- Klicken schaltet um`,
-      })
-      : null,
-    el('button.weg', {
-      text: '×', title: 'Verformungsfall entfernen',
-      on: {
-        click: () => anPlatte(querschnitt)((q) => { q.verformung.faelle.splice(index, 1); }),
-      },
-    }),
-  ]);
+  return fallzeile({
+    an: k.aktiv !== false, umschalten: (wert) => aendern((x) => { x.aktiv = wert; }),
+    was: 'Verformungsfall', name: k.name, nameTitel: 'Bezeichnung des Verformungsfalls',
+    umbenennen: (name) => aendern((x) => { x.name = name; }),
+    zahlen: [
+      zahlfeld({
+        wert: k.w, schritt: 1, min: 0, leer: 0,
+        titel: 'Durchbiegung w in mm, mit der Steifigkeit E_cm ermittelt',
+        beiAenderung: (v) => aendern((x) => { x.w = v; }),
+      }),
+      // Eine Spannweite null gibt es nicht -- geleert bleibt der bisherige Wert.
+      zahlfeld({
+        wert: k.laenge, schritt: 0.5,
+        titel: 'Spannweite L in m – der Grenzwert ist L/350',
+        beiAenderung: (v) => aendern((x) => { x.laenge = v; }),
+      }),
+      seiten.length === 2
+        ? zweiSchalter({
+          stellungen: seiten.map((s) => [s.wert, s.beschriftung]),
+          gewaehlt: k.zugseite, klasse: '.schalter-richtung',
+          setzen: (wert) => aendern((x) => { x.zugseite = wert; }),
+          titel: `Zug ${k.zugseite}: danach richtet sich ω_w -- Klicken schaltet um`,
+        })
+        : el('span'),
+    ],
+    entfernenTitel: 'Verformungsfall entfernen',
+    entfernen: () => anPlatte(querschnitt)((q) => { q.verformung.faelle.splice(index, 1); }),
+  });
 }
