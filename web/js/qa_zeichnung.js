@@ -120,10 +120,19 @@ export function materialienVon(kennung) {
   return passendeGeometrie(fensterVon(kennung))?.materialien ?? null;
 }
 
-/** Die Antwort des Kerns -- nur, wenn sie zur Zeichnung passt, die gerade zu sehen ist. */
+/**
+ * Die Antwort des Kerns -- nur, wenn sie zur Zeichnung passt, die gerade zu
+ * sehen ist. Passt sie nicht, wird gefragt, einmal je Abdruck: die Antwort
+ * hängt auch an den Materialien des Projekts (`abdruck`), und die ändern sich
+ * anderswo. Bis 2026-10-18 fragte nur eine Änderung der Zeichnung; kam
+ * anderswo ein Material dazu, wartete die Werkstoffwahl auf eine Antwort,
+ * die nie kam.
+ */
 export function passendeGeometrie(a) {
   const g = a.qa.geometrie;
-  return g && g.abdruck === abdruck(eintragVon(a.qa.kennung)) ? g : null;
+  if (g && g.abdruck === abdruck(eintragVon(a.qa.kennung))) return g;
+  geometrieHolen(a);
+  return null;
 }
 
 /** Die Zeichnung und welche Materialien es gibt: davon hängt die Antwort des Kerns ab. */
