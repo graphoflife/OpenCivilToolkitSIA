@@ -424,7 +424,25 @@ class TestNeuePlatteKommtAusDemKern(unittest.TestCase):
         # auf der Baustelle nicht gibt.
         self.assertEqual([l["grund"]["durchmesser"] for l in vorlage["lagen"]],
                          [12.0] * 4)
-        self.assertEqual(vorlage["kombinationen"][0]["M_Ed"], 30.0)
+        # Eine Einwirkung zum Anfangen, ohne Moment und ohne Kraft.
+        einwirkung = vorlage["kombinationen"][0]
+        self.assertEqual((einwirkung["M_Ed"], einwirkung["N_Ed"], einwirkung["V_Ed"]),
+                         (0.0, 0.0, 0.0))
+
+    def test_neue_lastfaelle_bringen_keine_einwirkung_mit(self):
+        """
+        Kräfte, Momente und Durchbiegungen jeder neuen Zeile sind null, bis
+        jemand sie einträgt (Benutzer, 2026-10-19) -- in jeder Liste der
+        Platte und des gezeichneten Querschnitts. Bis dahin standen 30 kNm,
+        ein Knickfall unter Druck und w = 2 mm da.
+        """
+        zeilen = api.katalog()["neue_zeilen"]
+        for art in ("einwirkung", "gebrauchsfall", "knickfall", "verformungsfall", "analyse",
+                    "qa_lastfall", "qa_gebrauchsfall", "qa_knickfall", "qa_analyse"):
+            einwirkungen = {k: v for k, v in zeilen[art].items() if "_Ed" in k or k == "w"}
+            with self.subTest(art=art):
+                self.assertTrue(einwirkungen)
+                self.assertEqual(set(einwirkungen.values()), {0.0})
 
     def test_ihre_nachweise_sind_ausgeschaltet(self):
         vorlage = api.katalog()["neue_platte"]

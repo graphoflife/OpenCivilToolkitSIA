@@ -152,23 +152,25 @@ def katalog() -> dict:
         },
         # Ein Skript der App «Python», mit einem Diagramm darin.
         "neues_skript": SkriptEintrag.neu(kennung="", name="").als_dict(),
-        # Dasselbe fuer jede Zeile, die man anfuegt -- mit den Startwerten, die
-        # eine frische Zeile haben soll (eine Einwirkung von 30 kNm, ein
-        # Knickfall unter Druck). Die Oberflaeche setzt nur den Namen und beim
-        # Material Kennung, Art und Sorte.
+        # Dasselbe fuer jede Zeile, die man anfuegt. Eine neue Zeile bringt
+        # keine Einwirkung mit: Kraefte, Momente und die Durchbiegung sind null,
+        # bis jemand sie eintraegt (Benutzer, 2026-10-19) -- bis dahin standen
+        # hier 30 kNm, ein Knickfall unter Druck und w = 2 mm. Laengen haben
+        # ihre Vorgaben. Die Oberflaeche setzt nur den Namen und beim Material
+        # Kennung, Art und Sorte.
         "neue_zeilen": {
-            "einwirkung": KombinationEintrag(name="", M_Ed=30.0).als_dict(),
-            "knickfall": KnickEintrag(name="", N_Ed=-500.0, M_Ed_1=20.0).als_dict(),
+            "einwirkung": KombinationEintrag(name="").als_dict(),
+            "knickfall": KnickEintrag(name="").als_dict(),
             "gebrauchsfall": GebrauchsfallEintrag(name="").als_dict(),
-            "verformungsfall": VerformungsfallEintrag(name="", w=2.0).als_dict(),
-            "analyse": SpannungsfallEintrag(name="", M_Ed=30.0).als_dict(),
+            "verformungsfall": VerformungsfallEintrag(name="").als_dict(),
+            "analyse": SpannungsfallEintrag(name="").als_dict(),
             "material": MaterialEintrag(kennung="", art="", sorte="").als_dict(),
             # Die Teile der Querschnittsanalyse, wie das Zeichenfenster sie
             # anlegt. Es setzt nur Kennung, Knoten und die Materialien.
-            "qa_lastfall": QALastfallEintrag(name="", M_y_Ed=100.0).als_dict(),
-            "qa_analyse": QASpannungsfallEintrag(name="", M_Ed=30.0).als_dict(),
+            "qa_lastfall": QALastfallEintrag(name="").als_dict(),
+            "qa_analyse": QASpannungsfallEintrag(name="").als_dict(),
             "qa_gebrauchsfall": QAGebrauchsfallEintrag(name="").als_dict(),
-            "qa_knickfall": QAKnickEintrag(name="", N_Ed=-500.0, M_Ed_1=20.0).als_dict(),
+            "qa_knickfall": QAKnickEintrag(name="").als_dict(),
             "knoten": KnotenEintrag().als_dict(),
             "flaeche": FlaecheEintrag().als_dict(),
             "stab": StabEintrag().als_dict(),

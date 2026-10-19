@@ -295,8 +295,9 @@ class QuerschnittEintrag(Querschnittsangaben):
         Nachweise eingeschaltet mit, die ueberall sonst aus waren.
 
         Was hier steht, sind Entscheidungen und keine Vorgaben: alle vier
-        Lagen bewehrt, ein Feldmoment zum Anfangen. Alles Uebrige kommt aus
-        den Vorgabewerten der Felder.
+        Lagen bewehrt, eine Einwirkung zum Anfangen -- ohne Moment, ohne
+        Kraft: eine neue Zeile bringt keine Einwirkung mit (Benutzer,
+        2026-10-19). Alles Uebrige kommt aus den Vorgabewerten der Felder.
         """
         def lage(d: float) -> LageEintrag:
             return LageEintrag(
@@ -319,5 +320,5 @@ class QuerschnittEintrag(Querschnittsangaben):
             lagen=[lage(durchmesser) for _ in range(LAGENZAHL)],
             querkraftbewehrung=QuerkraftbewehrungEintrag(
                 durchmesser=0.0, stahl=stahl),
-            kombinationen=[KombinationEintrag(name="Tragsicherheit 1", M_Ed=30.0)],
+            kombinationen=[KombinationEintrag(name="Tragsicherheit 1")],
         )

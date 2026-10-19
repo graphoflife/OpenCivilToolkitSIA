@@ -1,5 +1,5 @@
 ---
-erzeugt: 36ee47d33057
+erzeugt: b830f6687b88
 art: modul
 tags: [modul]
 ---
@@ -180,8 +180,9 @@ Vorgaben aenderten, lief er auseinander: neue Platten brachten
 Nachweise eingeschaltet mit, die ueberall sonst aus waren.
 
 Was hier steht, sind Entscheidungen und keine Vorgaben: alle vier
-Lagen bewehrt, ein Feldmoment zum Anfangen. Alles Uebrige kommt aus
-den Vorgabewerten der Felder.
+Lagen bewehrt, eine Einwirkung zum Anfangen -- ohne Moment, ohne
+Kraft: eine neue Zeile bringt keine Einwirkung mit (Benutzer,
+2026-10-19). Alles Uebrige kommt aus den Vorgabewerten der Felder.
 
 
 ## Braucht
