@@ -1,5 +1,5 @@
 ---
-erzeugt: ae8f7b06fbc8
+erzeugt: 31c45a804010
 art: modul
 tags: [modul]
 ---
@@ -431,13 +431,13 @@ Linie. Senkrecht, waagrecht und Momente aendern sich nicht.
 
 ```python
 @classmethod
-def neu(cls, kennung: str, name: str, material: str) -> 'BalkensystemEintrag'
+def neu(cls, kennung: str, name: str) -> 'BalkensystemEintrag'
 ```
 
-Ein frisches System, wie der Benutzer es angelegt bekommt: ein
-Einfeldtraeger von 6 m, Rechteck 300 × 600 mm, links gelenkig, rechts
-verschieblich, ein Lastfall mit 10 kN/m. Zum Anfangen, nicht als
-Vorgabe.
+Ein frisches System, wie der Benutzer es angelegt bekommt: leer,
+ohne Knoten, Linie, Lager, Querschnitt und Lastfall (Benutzer,
+2026-10-19). Bis dahin kam es als Einfeldtraeger von 6 m mit einem
+Lastfall von 10 kN/m.
 
 
 ## Konstanten

@@ -14,6 +14,21 @@ from opencivil.projekt import (
 from opencivil.web import dienst
 
 
+def einfeldtraeger(kennung: str = "r1", name: str = "T", material: str = "b1") -> BalkensystemEintrag:
+    """
+    Ein Einfeldträger von 6 m, Rechteck 300 × 600 mm, links gelenkig, rechts
+    verschieblich, ein Lastfall mit 10 kN/m -- bis 2026-10-19 das neue System
+    der Oberfläche; das beginnt jetzt leer.
+    """
+    s = BalkensystemEintrag.neu(kennung, name)
+    q = s.querschnitt("Rechteck 300×600", "rechteck", b=300.0, h=600.0)
+    linie = s.linie((0.0, 0.0), (6.0, 0.0), querschnitt=q, material=material)
+    s.lager_an((0.0, 0.0), "gelenkig")
+    s.lager_an((6.0, 0.0), "verschieblich")
+    s.stablast(s.lastfall("Lastfall 1"), linie, wert=10.0)
+    return s
+
+
 def rahmen() -> Projekt:
     """Zwei Stützen und ein Riegel, ein Lastfall und eine Kombination."""
     p = Projekt(name="Rahmen")
@@ -56,8 +71,14 @@ class TestBeschreibung(unittest.TestCase):
         with self.assertRaises(ProjektFehler):
             p.bauteil("r7")
 
-    def test_neu_ist_ein_einfeldtraeger(self):
-        s = BalkensystemEintrag.neu("r1", "Träger", "b1")
+    def test_neu_ist_leer(self):
+        """Ein neues System ist leer (Benutzer, 2026-10-19): nichts ist definiert."""
+        s = BalkensystemEintrag.neu("r1", "Träger")
+        self.assertEqual((s.knoten, s.linien, s.lager, s.knotenlasten, s.querschnitte,
+                          s.lastfaelle, s.kombinationen), ([], [], [], [], [], [], []))
+
+    def test_der_einfeldtraeger_der_tests(self):
+        s = einfeldtraeger("r1", "Träger", "b1")
         self.assertEqual(len(s.linien), 1)
         self.assertTrue(s.linien[0].stab)
         self.assertEqual(s.laenge(s.linien[0]), 6.0)
@@ -67,7 +88,7 @@ class TestBeschreibung(unittest.TestCase):
 
     def test_eine_datei_nur_mit_systemen_ist_ein_projekt(self):
         self.assertIn("balkensysteme", [art.liste for art in BAUTEILE])
-        roh = {"balkensysteme": [BalkensystemEintrag.neu("r1", "T", "").als_dict()]}
+        roh = {"balkensysteme": [einfeldtraeger("r1", "T", "").als_dict()]}
         self.assertEqual(len(dienst.pruefen({"projekt": roh})["projekt"]["balkensysteme"]), 1)
 
 
@@ -170,7 +191,7 @@ class TestPruefen(unittest.TestCase):
 
 class TestTeilen(unittest.TestCase):
     def setUp(self):
-        self.s = BalkensystemEintrag.neu("r1", "Träger", "b1")
+        self.s = einfeldtraeger("r1", "Träger", "b1")
         self.linie = self.s.linien[0]
         self.lf = self.s.lastfaelle[0]
         self.linie.lasten = []
@@ -235,7 +256,7 @@ class TestTeilen(unittest.TestCase):
 
 class TestUmkehren(unittest.TestCase):
     def setUp(self):
-        self.s = BalkensystemEintrag.neu("r1", "Träger", "b1")
+        self.s = einfeldtraeger("r1", "Träger", "b1")
         self.linie = self.s.linien[0]
         self.linie.lasten = []
         lf = self.s.lastfaelle[0]
@@ -298,7 +319,7 @@ class TestModell(unittest.TestCase):
                                         "L3": ("Q1", "b1")})
 
     def test_senkrecht_zeigt_nach_unten(self):
-        s = BalkensystemEintrag.neu("r1", "T", "b1")
+        s = einfeldtraeger("r1", "T", "b1")
         s.knotenlast(s.lastfaelle[0], (6, 0), 5.0)
         s.knotenlast(s.lastfaelle[0], (6, 0), 2.0, art="moment")
         lasten = s.modell().system.lastfaelle[0].lasten
@@ -306,7 +327,7 @@ class TestModell(unittest.TestCase):
         self.assertEqual(lasten[-1].M, 2e3)
 
     def test_federn(self):
-        s = BalkensystemEintrag.neu("r1", "T", "b1")
+        s = einfeldtraeger("r1", "T", "b1")
         s.lager[1].x, s.lager[1].k_x = "feder", 5000.0
         s.linien[0].quer, s.linien[0].k_quer = "feder", 2000.0
         modell = s.modell()
@@ -322,7 +343,7 @@ class TestModell(unittest.TestCase):
                 (lambda s: s.querschnitte[0].masse.__setitem__("h", 0.0), "Höhe",
                  {"Q1", "L1"})):
             with self.subTest(wort=wort):
-                s = BalkensystemEintrag.neu("r1", "T", "b1")
+                s = einfeldtraeger("r1", "T", "b1")
                 aendern(s)
                 modell = s.modell()
                 fehler = [m for m in modell.meldungen if m.fehler]
@@ -332,7 +353,7 @@ class TestModell(unittest.TestCase):
                 self.assertEqual(modell.paare, {})
 
     def test_last_ohne_lastfall_bleibt_mit_hinweis_weg(self):
-        s = BalkensystemEintrag.neu("r1", "T", "b1")
+        s = einfeldtraeger("r1", "T", "b1")
         s.linien[0].lasten[0].lastfall = "LF9"
         modell = s.modell()
         self.assertTrue(modell.gueltig)

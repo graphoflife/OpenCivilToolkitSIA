@@ -262,9 +262,11 @@ class Projekt(Beschreibung):
         **felder: Any,
     ) -> QuerschnittsanalyseEintrag:
         """
-        Eine Querschnittsanalyse -- wie in der Oberflaeche ein Rechteck
-        300 × 600 mm mit drei Staeben unten und zwei oben, aber ohne
-        Startlast: wer rechnet, gibt seine Lastfaelle selbst an.
+        Eine Querschnittsanalyse -- ein Rechteck 300 × 600 mm mit drei
+        Staeben unten und zwei oben, ohne Lastfall: wer rechnet, gibt seine
+        Lastfaelle selbst an. In der Oberflaeche beginnt eine neue Analyse
+        seit 2026-10-19 leer; hier bleibt das Rechteck, auf dem Skripte und
+        Tests aufbauen.
 
         Gezeichnet wird danach mit dem Baukasten des Eintrags --
         ``polygon``, ``stab``, ``stablinie``, ``schubwand``, ``hilfslinie``,
@@ -272,9 +274,9 @@ class Projekt(Beschreibung):
         an den Eintrag.
         """
         eintrag = QuerschnittsanalyseEintrag.neu(
-            kennung=self.freie_kennung(ANALYSE.vorsilbe), name=name,
-            beton=self._einziges("beton", beton), stahl=self._einziges("betonstahl", stahl))
-        eintrag.lastfaelle = []
+            kennung=self.freie_kennung(ANALYSE.vorsilbe), name=name)
+        eintrag.vorlage_einsetzen("rechteck", beton=self._einziges("beton", beton),
+                                  stahl=self._einziges("betonstahl", stahl), schubwaende=False)
         eintrag = lesen(QuerschnittsanalyseEintrag, felder, f"Querschnittsanalyse '{name}'",
                         eintrag)
         self.querschnittsanalysen.append(eintrag)

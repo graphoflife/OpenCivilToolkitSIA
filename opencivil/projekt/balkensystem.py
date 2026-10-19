@@ -669,18 +669,11 @@ class BalkensystemEintrag(Beschreibung):
     # -- Die frische Anlage -------------------------------------------------------
 
     @classmethod
-    def neu(cls, kennung: str, name: str, material: str) -> "BalkensystemEintrag":
+    def neu(cls, kennung: str, name: str) -> "BalkensystemEintrag":
         """
-        Ein frisches System, wie der Benutzer es angelegt bekommt: ein
-        Einfeldtraeger von 6 m, Rechteck 300 × 600 mm, links gelenkig, rechts
-        verschieblich, ein Lastfall mit 10 kN/m. Zum Anfangen, nicht als
-        Vorgabe.
+        Ein frisches System, wie der Benutzer es angelegt bekommt: leer,
+        ohne Knoten, Linie, Lager, Querschnitt und Lastfall (Benutzer,
+        2026-10-19). Bis dahin kam es als Einfeldtraeger von 6 m mit einem
+        Lastfall von 10 kN/m.
         """
-        s = cls(kennung=kennung, name=name)
-        q = s.querschnitt("Rechteck 300×600", "rechteck", b=300.0, h=600.0)
-        linie = s.linie((0.0, 0.0), (6.0, 0.0), querschnitt=q, material=material)
-        s.lager_an((0.0, 0.0), "gelenkig")
-        s.lager_an((6.0, 0.0), "verschieblich")
-        lf = s.lastfall("Lastfall 1")
-        s.stablast(lf, linie, wert=10.0)
-        return s
+        return cls(kennung=kennung, name=name)

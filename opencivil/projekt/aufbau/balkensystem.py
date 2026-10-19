@@ -69,6 +69,13 @@ def _stabquerschnitt(q: StabquerschnittEintrag, aufbau: Aufbau, wo: str) -> Stab
                                quelle={"b": platte.id_von("b"), "h": platte.id_von("h")},
                                herkunft=f"Platte «{platte.name}»")
     analyse = aufbau.querschnittsanalysen.get(q.bezug)
+    if analyse is None and q.bezug in aufbau.leere_analysen:
+        # Eine leere Analyse gibt es, nur traegt sie noch nichts: der Stab
+        # rechnet nicht, das Projekt schon.
+        name = aufbau.leere_analysen[q.bezug]
+        return Stabquerschnitt(q.kennung, q.name, q.art, bezug=q.bezug,
+                               herkunft=f"Querschnittsanalyse «{name}»",
+                               fehler=f"Die Querschnittsanalyse «{name}» ist noch leer.")
     if analyse is None:
         raise ProjektFehler(f"{wo}: der Querschnitt «{q.name}» nimmt die Querschnittsanalyse "
                             f"'{q.bezug}', die es im Projekt nicht gibt.")

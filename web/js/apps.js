@@ -178,24 +178,23 @@ const PLATTE = bauteil('querschnitt', {
   fenster: plattenFenster,
 });
 
-/** Wie die Platte: ein Rechteck mit Stäben und einem Lastfall, aus dem Kern. */
+/**
+ * Leer, aus dem Kern (Benutzer, 2026-10-19): gezeichnet wird danach, das
+ * Rechteck gibt es als Vorlage im Zeichenfenster. Beton und Betonstahl
+ * braucht es erst zum Zeichnen -- verlangt werden sie schon hier, sonst
+ * stünde man vor einem Fenster, in dem nichts geht.
+ */
 const ANALYSE = bauteil('querschnittsanalyse', {
   kurztext: umriss,
   anlegen: (a) => nachVorlage(a, 'neue_querschnittsanalyse', {
     braucht: ['beton', 'betonstahl'], fehlt: 'Zuerst Beton und Betonstahl anlegen.',
     vorher: fensterVergessen,
-    einrichten: (analyse, { beton, betonstahl }) => {
-      analyse.flaechen.forEach((f) => { f.material = beton.kennung; });
-      for (const liste of [analyse.staebe, analyse.stablinien, analyse.schubwaende]) {
-        liste.forEach((x) => { x.stahl = betonstahl.kennung; });
-      }
-    },
   }),
   editor: analyseEditor,
   fenster: analyseFenster,
 });
 
-/** Ein Einfeldträger mit einem Lastfall, aus dem Kern -- seine Stäbe aus Beton. */
+/** Leer, aus dem Kern (Benutzer, 2026-10-19) -- Beton braucht es für die Stäbe, die man zeichnet. */
 const SYSTEM = bauteil('balkensystem', {
   kurztext: (s) => {
     const staebe = s.linien.filter((l) => l.stab).length;
@@ -203,9 +202,6 @@ const SYSTEM = bauteil('balkensystem', {
   },
   anlegen: (a) => nachVorlage(a, 'neues_balkensystem', {
     braucht: ['beton'], fehlt: 'Zuerst einen Beton anlegen.', vorher: systemfensterVergessen,
-    einrichten: (system, { beton }) => {
-      system.linien.forEach((l) => { if (l.stab) l.material = beton.kennung; });
-    },
   }),
   editor: balkensystemEditor,
 });

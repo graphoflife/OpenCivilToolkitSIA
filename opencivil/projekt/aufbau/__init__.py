@@ -36,7 +36,7 @@ in einer Datei von ueber tausend Zeilen.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable, Dict, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Dict, Optional, Tuple
 
 from opencivil.core.rechenwerk import Rechenwerk
 from opencivil.projekt.balkensystem import BalkensystemEintrag
@@ -90,7 +90,9 @@ def aufbauen(projekt: "Projekt", *, schnell: bool = False) -> Aufbau:
     # also nur das Anmelden.
     for art in BAUTEILE:
         for eintrag in getattr(projekt, art.liste):
-            aufbau.teile[eintrag.kennung] = art.bauen(art, eintrag, aufbau)
+            teil = art.bauen(art, eintrag, aufbau)
+            if teil is not None:
+                aufbau.teile[eintrag.kennung] = teil
 
     for baustoff in aufbau.baustoffe.values():
         baustoff.ins_rechenwerk(werk)
@@ -130,8 +132,12 @@ class Bauteilart:
     bereich: str
     """Wie ihr Abschnitt in der Formelsammlung heisst."""
 
-    bauen: Callable[["Bauteilart", Any, Aufbau], Bauteil]
-    """Aus dem Eintrag das Bauteil -- Objekt und Nachweise, angemeldet im Werk."""
+    bauen: Callable[["Bauteilart", Any, Aufbau], Optional[Bauteil]]
+    """
+    Aus dem Eintrag das Bauteil -- Objekt und Nachweise, angemeldet im Werk.
+    ``None``, wo es nichts zu rechnen gibt: eine Querschnittsanalyse, in der
+    noch nichts gezeichnet ist.
+    """
 
 
 PLATTE = Bauteilart("platte", "querschnitte", QuerschnittEintrag, "q",

@@ -11,7 +11,7 @@ Zwaengungen, die Stahlspannungen und das Knicken (:func:`bauen`).
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Mapping
+from typing import TYPE_CHECKING, Mapping, Optional
 
 from opencivil.material.basis import Baustoff
 from opencivil.projekt.lesen import ProjektFehler
@@ -30,7 +30,8 @@ if TYPE_CHECKING:
     from opencivil.projekt.aufbau import Bauteilart
 
 
-def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag, aufbau: Aufbau) -> Bauteil:
+def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
+          aufbau: Aufbau) -> Optional[Bauteil]:
     """
     Ein gezeichneter Querschnitt: das Bauteil und seine Nachweise.
 
@@ -41,7 +42,17 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag, aufbau: Aufbau
     Stahlspannungen, sobald es Lastfaelle gibt
     (:func:`~opencivil.projekt.aufbau.kern.spannungsnachweise`), und das
     Knicken, sobald ein Fall eingeschaltet ist.
+
+    Ist noch nichts gezeichnet (:attr:`QuerschnittsanalyseEintrag.leer`), gibt
+    es nichts zu rechnen und kein Bauteil -- aber auch keinen Fehler, der das
+    ganze Projekt aufhielte: so beginnt jede neue Analyse (Benutzer,
+    2026-10-19).
     """
+    if eintrag.leer:
+        aufbau.leere_analysen[eintrag.kennung] = eintrag.name
+        aufbau.warnungen.append(
+            f"Querschnittsanalyse '{eintrag.name}': noch nichts gezeichnet → nichts zu rechnen.")
+        return None
     analyse = _analyse(eintrag, aufbau.baustoffe, praefix=f"{art.raum}.{eintrag.kennung}")
     aufbau.querschnittsanalysen[eintrag.kennung] = analyse
     analyse.ins_rechenwerk(aufbau.werk)

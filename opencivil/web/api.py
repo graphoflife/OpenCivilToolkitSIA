@@ -129,14 +129,11 @@ def katalog() -> dict:
         # nur noch Kennung, Name und die beiden Materialien.
         "neue_platte": QuerschnittEintrag.neu(
             kennung="", name="", beton="", stahl="").als_dict(),
-        # Dasselbe fuer die Querschnittsanalyse: ein Rechteck mit Staeben zum
-        # Anfangen. Die Oberflaeche setzt Kennung, Name und die Materialien.
-        "neue_querschnittsanalyse": QuerschnittsanalyseEintrag.neu(
-            kennung="", name="", beton="", stahl="").als_dict(),
-        # Und fuer das Balkensystem: ein Einfeldtraeger. Die Oberflaeche setzt
-        # Kennung, Name und das Material der Linien.
-        "neues_balkensystem": bs.BalkensystemEintrag.neu(
-            kennung="", name="", material="").als_dict(),
+        # Dasselbe fuer die Querschnittsanalyse und das Balkensystem: beide
+        # leer, nichts gezeichnet (Benutzer, 2026-10-19). Die Oberflaeche
+        # setzt Kennung und Name.
+        "neue_querschnittsanalyse": QuerschnittsanalyseEintrag.neu(kennung="", name="").als_dict(),
+        "neues_balkensystem": bs.BalkensystemEintrag.neu(kennung="", name="").als_dict(),
         # Ein Grundbruch mit den Vorgaben des Benutzers und einer Kombination.
         # Die Oberflaeche setzt Kennung und Name.
         "neuer_grundbruch": GrundbruchEintrag.neu(kennung="", name="").als_dict(),

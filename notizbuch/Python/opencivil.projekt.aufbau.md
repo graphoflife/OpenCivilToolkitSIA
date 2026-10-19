@@ -1,5 +1,5 @@
 ---
-erzeugt: e4521bc4c33f
+erzeugt: 0765a756ad2d
 art: modul
 tags: [modul]
 ---
@@ -89,7 +89,7 @@ Baufunktion von ihr bekannt sein muss. Eine neue Art kommt in
 - `vorsilbe: str` – Womit ihre Kennungen beginnen: `q` fuer q1, q2 ...
 - `raum: str` – Womit ihre Namensraeume beginnen: `querschnitt` fuer querschnitt.q1.
 - `bereich: str` – Wie ihr Abschnitt in der Formelsammlung heisst.
-- `bauen: Callable[['Bauteilart', Any, Aufbau], Bauteil]` – Aus dem Eintrag das Bauteil -- Objekt und Nachweise, angemeldet im Werk.
+- `bauen: Callable[['Bauteilart', Any, Aufbau], Optional[Bauteil]]` – Aus dem Eintrag das Bauteil -- Objekt und Nachweise, angemeldet im Werk. `None`, wo es nichts zu rechnen gibt: eine Querschnittsanalyse, in der noch nichts gezeichnet ist.
 
 
 ## Konstanten

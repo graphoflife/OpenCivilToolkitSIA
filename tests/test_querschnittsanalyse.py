@@ -13,10 +13,22 @@ from opencivil.projekt.lesen import inhalt_pruefen
 from opencivil.web import api
 
 
+def balken() -> QuerschnittsanalyseEintrag:
+    """
+    Das Rechteck 300 × 600 mm mit drei Stäben unten und zwei oben und ein
+    Feldmoment -- bis 2026-10-19 die neue Analyse der Oberfläche; die beginnt
+    jetzt leer.
+    """
+    a = QuerschnittsanalyseEintrag.neu("a1", "Balken")
+    a.vorlage_einsetzen("rechteck", beton="b1", stahl="s1", schubwaende=False)
+    a.lastfall("Tragsicherheit 1", M_y_Ed=100.0)
+    return a
+
+
 class TestBeschreibung(unittest.TestCase):
 
     def neu(self):
-        return QuerschnittsanalyseEintrag.neu("a1", "Balken", "b1", "s1")
+        return balken()
 
     def test_rundreise(self):
         a = self.neu()
@@ -34,7 +46,9 @@ class TestBeschreibung(unittest.TestCase):
         vorlage = api.katalog()["neue_querschnittsanalyse"]
         neu = {**vorlage, "kennung": "a1", "name": "Balken"}
         self.assertEqual(QuerschnittsanalyseEintrag.aus_dict(neu).als_dict(), neu)
-        self.assertEqual(len(vorlage["flaechen"]), 1)
+        # Leer: nichts gezeichnet, kein Lastfall (Benutzer, 2026-10-19).
+        self.assertEqual((vorlage["flaechen"], vorlage["stablinien"], vorlage["lastfaelle"]),
+                         ([], [], []))
 
     def test_materialien_und_wahl(self):
         a = self.neu()
@@ -99,7 +113,7 @@ class TestKnoten(unittest.TestCase):
         self.assertEqual(len({(k.y, k.z) for k in a.knoten}), len(a.knoten))
 
     def test_alle_linien_zaehlen_gemeinsam(self):
-        a = QuerschnittsanalyseEintrag.neu("a1", "Balken", "b1", "s1")
+        a = balken()
         w = a.schubwand([150, 50], [150, 550], stahl="s1")
         h = a.hilfslinie([0, 300], [300, 300])
         self.assertEqual((w.kennung, h.kennung), ("L3", "L4"))
@@ -120,7 +134,7 @@ class TestKnoten(unittest.TestCase):
             p.rechnen()
 
     def test_doppelte_kennung_wird_gemeldet(self):
-        a = QuerschnittsanalyseEintrag.neu("a1", "Balken", "b1", "s1")
+        a = balken()
         a.stablinien[1].kennung = "L1"
         self.assertIn("dieselbe Kennung 'L1'", a.elemente().fehler[0]["text"])
 
@@ -171,7 +185,7 @@ def projekt(**schalter) -> Projekt:
     p = Projekt(name="Probe")
     p.beton("C30/37")
     p.stahl("B500B")
-    a = QuerschnittsanalyseEintrag.neu("a1", "Balken", "b1", "s1")
+    a = balken()
     a.lastfaelle = []
     for name, wert in schalter.items():
         setattr(a, name, wert)
@@ -634,9 +648,15 @@ class TestVorlagen(unittest.TestCase):
                 self.assertTrue(g["gueltig"], g["meldungen"])
                 self.assertAlmostEqual(g["brutto"]["A"], self.FLAECHEN[v.schluessel], delta=0.5)
 
-    def test_neu_ist_das_rechteck_ohne_schubwand(self):
-        """Die frische Analyse wie vor den Vorlagen: dieselben Knoten, Linien und Werte."""
-        a = QuerschnittsanalyseEintrag.neu("a1", "Balken", "b1", "s1")
+    def test_neu_ist_leer(self):
+        """Eine neue Analyse ist leer (Benutzer, 2026-10-19): nichts gezeichnet, kein Lastfall."""
+        a = QuerschnittsanalyseEintrag.neu("a1", "Balken")
+        self.assertTrue(a.leer)
+        self.assertEqual((a.knoten, a.flaechen, a.stablinien, a.lastfaelle), ([], [], [], []))
+
+    def test_das_rechteck_ohne_schubwand(self):
+        """Das Rechteck der Vorlage, wie die frische Analyse bis 2026-10-19: dieselben Knoten, Linien und Werte."""
+        a = balken()
         self.assertEqual([(k.kennung, k.y, k.z) for k in a.knoten], [
             ("K1", 0.0, 0.0), ("K2", 300.0, 0.0), ("K3", 300.0, 600.0), ("K4", 0.0, 600.0),
             ("K5", 50.0, 50.0), ("K6", 250.0, 50.0), ("K7", 50.0, 550.0), ("K8", 250.0, 550.0)])
@@ -650,7 +670,7 @@ class TestVorlagen(unittest.TestCase):
 
     def test_kommt_dazu_und_teilt_knoten(self):
         """Ein zweites Rechteck rechts daneben hängt an den zwei gemeinsamen Ecken."""
-        a = QuerschnittsanalyseEintrag.neu("a1", "Balken", "b1", "s1")
+        a = balken()
         neu = a.vorlage_einsetzen("rechteck", beton="b1", stahl="s1", bewehrung=False,
                                   schubwaende=False, ursprung=(300.0, 0.0))
         self.assertEqual(neu, ["F2"])
@@ -691,3 +711,45 @@ class TestVorlagen(unittest.TestCase):
         self.assertEqual([v["schluessel"] for v in katalog],
                          ["rechteck", "tbalken", "hohlkasten", "kreis"])
         self.assertEqual(len(katalog[0]["skizze"]["masslinien"]), 2)
+
+
+class TestLeereAnalyse(unittest.TestCase):
+    """
+    Eine neue Analyse ist leer (Benutzer, 2026-10-19). Bis dahin hielt eine
+    Analyse ohne Fläche die ganze Rechnung an: «Es gibt kein Polygon mit
+    Material» -- direkt nach dem Anlegen rechnete kein Bauteil mehr.
+    """
+
+    def beschreibung(self) -> dict:
+        p = Projekt.beispiel()
+        p.querschnittsanalysen.append(QuerschnittsanalyseEintrag.neu("a9", "Leer"))
+        return p.als_dict()
+
+    def test_sie_haelt_das_projekt_nicht_auf(self):
+        antwort = dienst.bearbeite("rechnen", {"projekt": self.beschreibung()})
+        self.assertEqual(antwort.status, 200)
+        self.assertIn("Querschnittsanalyse 'Leer': noch nichts gezeichnet → nichts zu rechnen.",
+                      antwort.daten["warnungen"])
+        self.assertTrue(antwort.daten["urteile"])
+
+    def test_ein_system_mit_ihr_als_querschnitt_meldet_es(self):
+        d = self.beschreibung()
+        d["balkensysteme"][0]["querschnitte"][0].update(art="analyse", bezug="a9")
+        antwort = dienst.bearbeite("rechnen", {"projekt": d})
+        self.assertEqual(antwort.status, 200)
+        meldungen = [m["text"] for m in antwort.daten["balkensysteme"]["r1"]["meldungen"]]
+        self.assertTrue(any("Die Querschnittsanalyse «Leer» ist noch leer." in m
+                            for m in meldungen))
+
+    def test_ihre_diagramme_sagen_es(self):
+        antwort = dienst.bearbeite("analysediagramme",
+                                   {"projekt": self.beschreibung(), "kennung": "a9"})
+        self.assertEqual(antwort.status, 400)
+        self.assertIn("noch nichts gezeichnet", antwort.daten["fehler"])
+
+    def test_bauhilfen_allein_sind_noch_leer(self):
+        a = QuerschnittsanalyseEintrag.neu("a9", "Leer")
+        a.hilfslinie([0, 0], [300, 0])
+        self.assertTrue(a.leer)
+        a.polygon([[0, 0], [300, 0], [300, 600], [0, 600]], material="b1")
+        self.assertFalse(a.leer)

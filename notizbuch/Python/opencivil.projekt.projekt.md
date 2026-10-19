@@ -1,5 +1,5 @@
 ---
-erzeugt: 4fca02892fbc
+erzeugt: c15e7965734c
 art: modul
 tags: [modul]
 ---
@@ -184,9 +184,11 @@ Einwirkungen selbst an.
 def analyse(self, name: str, *, beton: Union[str, MaterialEintrag, None]=None, stahl: Union[str, MaterialEintrag, None]=None, **felder: Any) -> QuerschnittsanalyseEintrag
 ```
 
-Eine Querschnittsanalyse -- wie in der Oberflaeche ein Rechteck
-300 × 600 mm mit drei Staeben unten und zwei oben, aber ohne
-Startlast: wer rechnet, gibt seine Lastfaelle selbst an.
+Eine Querschnittsanalyse -- ein Rechteck 300 × 600 mm mit drei
+Staeben unten und zwei oben, ohne Lastfall: wer rechnet, gibt seine
+Lastfaelle selbst an. In der Oberflaeche beginnt eine neue Analyse
+seit 2026-10-19 leer; hier bleibt das Rechteck, auf dem Skripte und
+Tests aufbauen.
 
 Gezeichnet wird danach mit dem Baukasten des Eintrags --
 `polygon`, `stab`, `stablinie`, `schubwand`, `hilfslinie`,

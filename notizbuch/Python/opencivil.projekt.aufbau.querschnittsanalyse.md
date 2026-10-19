@@ -1,5 +1,5 @@
 ---
-erzeugt: 8d3b6d0e0fee
+erzeugt: f5794bbb924d
 art: modul
 tags: [modul]
 ---
@@ -20,7 +20,7 @@ Zwaengungen, die Stahlspannungen und das Knicken ([[opencivil.projekt.aufbau.que
 ### bauen
 
 ```python
-def bauen(art: 'Bauteilart', eintrag: QuerschnittsanalyseEintrag, aufbau: Aufbau) -> Bauteil
+def bauen(art: 'Bauteilart', eintrag: QuerschnittsanalyseEintrag, aufbau: Aufbau) -> Optional[Bauteil]
 ```
 
 Ein gezeichneter Querschnitt: das Bauteil und seine Nachweise.
@@ -32,6 +32,11 @@ immer, still, wenn ausgeschaltet -- wie bei der Platte. Ebenso die
 Stahlspannungen, sobald es Lastfaelle gibt
 ([[opencivil.projekt.aufbau.kern#spannungsnachweise|spannungsnachweise]]), und das
 Knicken, sobald ein Fall eingeschaltet ist.
+
+Ist noch nichts gezeichnet ([[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag.leer|QuerschnittsanalyseEintrag.leer]]), gibt
+es nichts zu rechnen und kein Bauteil -- aber auch keinen Fehler, der das
+ganze Projekt aufhielte: so beginnt jede neue Analyse (Benutzer,
+2026-10-19).
 
 ### _analyse
 

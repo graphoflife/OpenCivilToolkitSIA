@@ -403,6 +403,16 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
         """Die Bauteile, deren Querschnitt die Analyse nimmt -- keine."""
         return []
 
+    @property
+    def leer(self) -> bool:
+        """
+        Ob noch nichts gezeichnet ist, was traegt: keine Flaeche, kein Stab,
+        keine Stablinie, keine Schubwand. Knoten und Hilfslinien allein sind
+        Bauhilfen. So beginnt eine neue Analyse (Benutzer, 2026-10-19), und
+        so gibt es nichts zu rechnen -- aber auch keinen Fehler.
+        """
+        return not (self.flaechen or self.staebe or self.stablinien or self.schubwaende)
+
     def elemente(self) -> Elemente:
         """Die Elemente mit Name und Kennung, Koordinaten in mm -- siehe :class:`Elemente`."""
         lage: Dict[str, Tuple[float, float]] = {}
@@ -632,15 +642,11 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
         return eintrag
 
     @classmethod
-    def neu(cls, kennung: str, name: str, beton: str, stahl: str) -> "QuerschnittsanalyseEintrag":
+    def neu(cls, kennung: str, name: str) -> "QuerschnittsanalyseEintrag":
         """
-        Eine frische Analyse, wie der Benutzer sie angelegt bekommt.
-
-        Ein Rechteck 300 × 600 mm, unten drei, oben zwei Staebe, und ein
-        Lastfall mit Feldmoment. Zum Anfangen, nicht als Vorgabe: gezeichnet
-        wird danach, was man braucht.
+        Eine frische Analyse, wie der Benutzer sie angelegt bekommt: leer,
+        nichts gezeichnet und kein Lastfall (Benutzer, 2026-10-19). Bis dahin
+        kam sie als Rechteck 300 × 600 mm mit fuenf Staeben und einem
+        Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
         """
-        a = cls(kennung=kennung, name=name,
-                lastfaelle=[QALastfallEintrag(name="Tragsicherheit 1", M_y_Ed=100.0)])
-        a.vorlage_einsetzen("rechteck", beton=beton, stahl=stahl, schubwaende=False)
-        return a
+        return cls(kennung=kennung, name=name)

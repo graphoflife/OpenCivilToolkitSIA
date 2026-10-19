@@ -232,6 +232,20 @@ class Balkensystem:
             if not q.fehler:
                 self.flaechen[q.kennung] = self._querschnitt(q, q.kennung if index else "")
 
+        # Ein Querschnitt, der erst beim Aufbau scheitert -- er nimmt eine
+        # Querschnittsanalyse, die noch leer ist --, steht noch in den Paaren:
+        # das Modell kannte nur die Fehler seiner Masse. Seine Staebe haben
+        # keine Steifigkeit; die Meldung sagt es, und das System rechnet nicht.
+        gestrichen: Dict[str, List[str]] = {}
+        for stab, (q, _) in list(self.paare.items()):
+            if q not in self.flaechen:
+                del self.paare[stab]
+                gestrichen.setdefault(q, []).append(stab)
+        for q in self.querschnitte:
+            if q.kennung in gestrichen:
+                self.meldungen.append(Meldung(f"Querschnitt «{q.name}»: {q.fehler}",
+                                              (q.kennung, *gestrichen[q.kennung]), True))
+
         benutzt: List[Tuple[str, str]] = []
         for paar in self.paare.values():
             if paar not in benutzt:

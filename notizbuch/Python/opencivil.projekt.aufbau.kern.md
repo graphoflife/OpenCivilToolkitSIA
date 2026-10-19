@@ -1,5 +1,5 @@
 ---
-erzeugt: 40f4b03e66cc
+erzeugt: 6a3c732de9d9
 art: modul
 tags: [modul]
 ---
@@ -52,6 +52,7 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `fehlende: Dict[str, FehlendeBewehrung] = field(default_factory=dict)` – Je Richtung ohne Bewehrung, fuer die dennoch Einwirkungen angegeben sind. Sie rechnen nichts; sie sorgen dafuer, dass in der Zusammenfassung eine Zeile mit Erfuellungsgrad null steht statt gar nichts.
 - `spannungsfaelle: Dict[str, List['SpannungsfallEintrag']] = field(default_factory=dict)` – Je Platte die Auswertungen am Querschnitt -- als Beschreibung, nicht als Nachweis. Sie laufen nicht im Rechenwerk: sie haben kein Ziel, das jemand anderes brauchen koennte, und nichts haengt von ihnen ab.
 - `querschnittsanalysen: Dict[str, Any] = field(default_factory=dict)` – Die gezeichneten Querschnitte, nach Kennung -- Bauteile wie die Platten.
+- `leere_analysen: Dict[str, str] = field(default_factory=dict)` – Je Querschnittsanalyse, in der noch nichts gezeichnet ist, ihr Name. Sie wird kein Bauteil -- es gibt nichts zu rechnen --, aber wer auf sie zeigt, soll hoeren, dass sie leer ist, und nicht, es gebe sie nicht.
 - `qa_biegung: Dict[str, SchiefeBiegung] = field(default_factory=dict)` – Biegung und Normalkraft je Querschnittsanalyse, nach ihrer Kennung.
 - `qa_schub: Dict[str, Schubwandnachweis] = field(default_factory=dict)` – Querkraft und Torsion je Querschnittsanalyse.
 - `qa_duktilitaet: Dict[str, DuktilitaetQA] = field(default_factory=dict)`

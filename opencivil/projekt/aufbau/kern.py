@@ -135,6 +135,13 @@ class Aufbau:
     querschnittsanalysen: Dict[str, Any] = field(default_factory=dict)
     """Die gezeichneten Querschnitte, nach Kennung -- Bauteile wie die Platten."""
 
+    leere_analysen: Dict[str, str] = field(default_factory=dict)
+    """
+    Je Querschnittsanalyse, in der noch nichts gezeichnet ist, ihr Name. Sie
+    wird kein Bauteil -- es gibt nichts zu rechnen --, aber wer auf sie
+    zeigt, soll hoeren, dass sie leer ist, und nicht, es gebe sie nicht.
+    """
+
     qa_biegung: Dict[str, SchiefeBiegung] = field(default_factory=dict)
     """Biegung und Normalkraft je Querschnittsanalyse, nach ihrer Kennung."""
 

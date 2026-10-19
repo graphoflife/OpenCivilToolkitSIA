@@ -1,5 +1,5 @@
 ---
-erzeugt: 47207e9bbf1a
+erzeugt: 8bea87a4d8a1
 art: modul
 tags: [modul]
 ---
@@ -363,6 +363,18 @@ def bezuege(self) -> List[str]
 
 Die Bauteile, deren Querschnitt die Analyse nimmt -- keine.
 
+#### QuerschnittsanalyseEintrag.leer
+
+```python
+@property
+def leer(self) -> bool
+```
+
+Ob noch nichts gezeichnet ist, was traegt: keine Flaeche, kein Stab,
+keine Stablinie, keine Schubwand. Knoten und Hilfslinien allein sind
+Bauhilfen. So beginnt eine neue Analyse (Benutzer, 2026-10-19), und
+so gibt es nichts zu rechnen -- aber auch keinen Fehler.
+
 #### QuerschnittsanalyseEintrag.elemente
 
 ```python
@@ -499,14 +511,13 @@ Gelesen wie aus einer Datei, also mit denselben Pruefungen.
 
 ```python
 @classmethod
-def neu(cls, kennung: str, name: str, beton: str, stahl: str) -> 'QuerschnittsanalyseEintrag'
+def neu(cls, kennung: str, name: str) -> 'QuerschnittsanalyseEintrag'
 ```
 
-Eine frische Analyse, wie der Benutzer sie angelegt bekommt.
-
-Ein Rechteck 300 × 600 mm, unten drei, oben zwei Staebe, und ein
-Lastfall mit Feldmoment. Zum Anfangen, nicht als Vorgabe: gezeichnet
-wird danach, was man braucht.
+Eine frische Analyse, wie der Benutzer sie angelegt bekommt: leer,
+nichts gezeichnet und kein Lastfall (Benutzer, 2026-10-19). Bis dahin
+kam sie als Rechteck 300 × 600 mm mit fuenf Staeben und einem
+Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
 
 
 ## Konstanten
