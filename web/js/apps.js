@@ -18,7 +18,7 @@ import { el, ersetzen, melden } from './dom.js';
 import { api } from './api.js';
 import { fensterVergessen } from './qa_zeichnung.js';
 import { fensterVergessen as systemfensterVergessen } from './bs_zeichnung.js';
-import { materialAnlegen } from './materialwahl.js';
+import { materialAnlegen, materialKopieren } from './materialwahl.js';
 import { materialEditor, materialHinweis } from './material.js';
 import { plattenEditor, plattenFenster } from './platte.js';
 import { analyseEditor, analyseFenster } from './querschnittsanalyse.js';
@@ -90,6 +90,33 @@ async function loeschenWennFrei(liste, eintrag, satz) {
   entfernen(liste, eintrag);
 }
 
+/**
+ * Eine Kopie gleich hinter dem Original: alles wie dort, nur Kennung und Name
+ * neu -- «Decke über EG (Kopie)» (Benutzer, 2026-10-19). Kopiert, nicht
+ * verwiesen: sonst änderte die Kopie das Original mit. `vorher` wie beim
+ * Anlegen: ein Zeichenfenster, das diese Kennung schon kannte, vergisst sie.
+ */
+function kopieren(a, eintrag, { vorher = () => {} } = {}) {
+  const kennung = freieKennung(a.vorsilbe);
+  vorher(kennung);
+  projektAendern((p) => {
+    const liste = p[a.liste];
+    const i = liste.findIndex((x) => x.kennung === eintrag.kennung);
+    liste.splice(i + 1, 0, {
+      ...structuredClone(liste[i]), kennung, name: kopieName(liste[i].name, liste),
+    });
+  });
+  waehlen({ art: a.app, kennung });
+}
+
+/** «Decke über EG (Kopie)», dann «… (Kopie 2)» -- der erste Name, den die Liste noch nicht hat. */
+function kopieName(name, eintraege) {
+  const vergeben = new Set(eintraege.map((e) => e.name));
+  let kandidat = `${name} (Kopie)`;
+  for (let i = 2; vergeben.has(kandidat); i += 1) kandidat = `${name} (Kopie ${i})`;
+  return kandidat;
+}
+
 /** Einen Eintrag aus einer Liste des Projekts -- und aus der Auswahl, wenn er gewählt war. */
 function entfernen(liste, eintrag) {
   projektAendern((p) => {
@@ -108,9 +135,10 @@ const einsetzen = (editor) => (behaelter, eintrag) => ersetzen(behaelter, ...edi
 /**
  * Die Zeile einer Bauteilart (ARTEN): Knopf, Liste und Wörter aus arten.js,
  * dazu was nur die Oberfläche kennt. Ein Bauteil geht nur weg, wenn kein
- * Balkensystem mehr seinen Querschnitt nimmt.
+ * Balkensystem mehr seinen Querschnitt nimmt. `vergessen` lässt das
+ * Zeichenfenster einer neuen Kennung vergessen, was es von früher weiss.
  */
-function bauteil(name, { kurztext, anlegen, editor, fenster = null }) {
+function bauteil(name, { kurztext, anlegen, editor, fenster = null, vergessen = () => {} }) {
   const a = artVon(name);
   const zeile = {
     app: a.art, liste: a.liste, knopf: a.knopf, zeichen: a.zeichen,
@@ -122,6 +150,7 @@ function bauteil(name, { kurztext, anlegen, editor, fenster = null }) {
     name: (e) => e.name,
     kurztext,
     loeschen: (e) => loeschenWennFrei(a.liste, e, `„${e.name}" ist Querschnitt in`),
+    kopieren: (e) => kopieren(zeile, e, { vorher: vergessen }),
     hinweis: () => a.bezeichnung,
     editor: einsetzen(editor),
     fenster,
@@ -147,6 +176,7 @@ const MATERIAL = {
     : el('span.sia', { text: 'SIA', title: 'Normsorte nach SIA – nicht änderbar' })),
   kurztext: () => '',
   loeschen: (m) => loeschenWennFrei('materialien', m, `„${m.name || m.sorte}" verwendet von`),
+  kopieren: materialKopieren,
   hinweis: materialHinweis,
   editor: einsetzen(materialEditor),
 };
@@ -190,6 +220,7 @@ const ANALYSE = bauteil('querschnittsanalyse', {
     braucht: ['beton', 'betonstahl'], fehlt: 'Zuerst Beton und Betonstahl anlegen.',
     vorher: fensterVergessen,
   }),
+  vergessen: fensterVergessen,
   editor: analyseEditor,
   fenster: analyseFenster,
 });
@@ -203,6 +234,7 @@ const SYSTEM = bauteil('balkensystem', {
   anlegen: (a) => nachVorlage(a, 'neues_balkensystem', {
     braucht: ['beton'], fehlt: 'Zuerst einen Beton anlegen.', vorher: systemfensterVergessen,
   }),
+  vergessen: systemfensterVergessen,
   editor: balkensystemEditor,
 });
 
@@ -232,6 +264,7 @@ const SKRIPT = {
     return `${zeilen} ${zeilen === 1 ? 'Zeile' : 'Zeilen'}`;
   },
   loeschen: (s) => entfernen('skripte', s),
+  kopieren: (s) => kopieren(SKRIPT, s),
   hinweis: () => 'Python',
   editor: skriptZeichnen,
   rechts: { titel: 'Variablen', zeichnen: variablenZeichnen },

@@ -48,6 +48,25 @@ function anlegen(dialog, art, sorte, eigen) {
   melden(eigen ? `«${name}» angelegt, nach ${sorte}.` : `Normsorte ${sorte} angelegt.`);
 }
 
+/**
+ * Die Kopie eines Materials ist immer ein eigenes (Benutzer, 2026-10-19):
+ * eine Normsorte gibt es im Projekt nur einmal. Sie heisst wie jedes eigene
+ * BE2, S3 ..., steht gleich hinter dem Original, nimmt dessen Sorte als
+ * Vorlage und seine Abweichungen mit.
+ */
+export function materialKopieren(material) {
+  const kennung = freieKennung(ART[material.art].kennung);
+  const name = eigenerName(material.art);
+  projektAendern((p) => {
+    const i = p.materialien.findIndex((x) => x.kennung === material.kennung);
+    p.materialien.splice(i + 1, 0, {
+      ...structuredClone(p.materialien[i]), kennung, name, eigenstaendig: true,
+    });
+  });
+  waehlen({ art: 'material', kennung });
+  melden(`«${name}» angelegt, eine Kopie von ${material.name || material.sorte}.`);
+}
+
 /** Öffnet das Fenster für ein neues Material dieser Art: 'beton' oder 'betonstahl'. */
 export function materialAnlegen(art) {
   const sorten = zustand.katalog?.anlegen?.[art];

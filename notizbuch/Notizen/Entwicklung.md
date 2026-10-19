@@ -44,6 +44,30 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-19 · Leere Vorlagen, Lastfälle ohne Einwirkung, Kopieren
+
+Drei Wünsche des Benutzers:
+
+- **Neue Lastfälle bringen keine Einwirkung mit.** In jeder Liste der Platte
+  und des gezeichneten Querschnitts -- Tragsicherheit, Rissnachweise,
+  Knicken, dazu Verformung und Analysen -- sind Kräfte, Momente und die
+  Durchbiegung einer neuen Zeile null. Die Einträge gaben das schon vor; die
+  Startwerte im Katalog setzten 30 kNm, 100 kNm, −500 kN, w = 2 mm darüber.
+- **Neue Querschnittsanalysen und Balkensysteme sind leer.** `neu()` gibt
+  beide leer zurück; das Rechteck bleibt Vorlage im Zeichenfenster, und die
+  Python-Schnittstelle setzt es für ihre Analyse ausdrücklich ein. Eine
+  Analyse ohne tragendes Element (`leer`) wird kein Bauteil: bis dahin hielt
+  sie die ganze Rechnung an («Es gibt kein Polygon mit Material»). Jetzt
+  steht eine Warnung da; ein Balkensystem, das sie als Querschnitt nimmt,
+  meldet es weich und rechnet nicht (`Aufbau.leere_analysen`).
+- **Kopieren.** Jeder Eintrag links hat neben «×» ein «⧉»: die Kopie steht
+  gleich hinter dem Original, heisst «… (Kopie)» und ist gewählt. Die Kopie
+  eines Materials ist immer ein eigenes -- BE2, S3 … nach der Sorte des
+  Originals und mit seinen Abweichungen --, denn eine Normsorte gibt es im
+  Projekt nur einmal.
+
+---
+
 ## 2026-10-19 · Eine Lage ohne Stahl wird nicht nachgewiesen
 
 Wunsch des Benutzers: Sind bei einer Platte etwa die oberen Lagen leer,

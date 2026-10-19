@@ -73,6 +73,15 @@ function eintrag(a, e) {
     el('span.name', { text: a.name(e), title: a.name(e) }),
     a.marke?.(e) ?? null,
     el('span.art', { text: a.kurztext(e) }),
+    el('button.knopf.knopf-zart', {
+      text: '⧉', title: 'Kopieren',
+      on: {
+        click: (ereignis) => {
+          ereignis.stopPropagation();
+          a.kopieren(e);
+        },
+      },
+    }),
     el('button.knopf.knopf-zart.knopf-gefahr', {
       text: '×', title: 'Entfernen',
       on: {
