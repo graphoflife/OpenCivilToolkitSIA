@@ -366,16 +366,19 @@ class TestZwaengungBiegung(unittest.TestCase):
         b = befund(projekt_zwang_biegung(kriechzahl=5.0), "zwaengung_biegung")
         self.assertEqual(a.ergebnisse[0].erfuellungsgrad, b.ergebnisse[0].erfuellungsgrad)
 
-    def test_eine_leere_lage_ist_nicht_machbar(self):
+    def test_eine_leere_lage_wird_nicht_nachgewiesen(self):
+        """
+        Die Zwängung auf Biegung lässt eine Lage ohne Stahl weg (Benutzer,
+        2026-10-19) und prüft die andere. Die Zwängung auf Normalkraft meldet
+        sie weiter (:class:`TestNachweis`).
+        """
         projekt = projekt_zwang_biegung()
-        obere = x_lagen(projekt)[1]
+        untere, obere = x_lagen(projekt)
         projekt.querschnitte[0].lagen[obere - 1].grund.durchmesser = 0.0
         projekt.querschnitte[0].lagen[obere - 1].zulage.durchmesser = 0.0
         _, gefunden = urteile(projekt)
-        urteil = gefunden[f"Risse: Zwängung Biegung x – {obere}. Lage"]
-        self.assertFalse(urteil.erfuellt)
-        self.assertIn("ohne Bewehrung → kein Nachweis", urteil.hinweis)
-        self.assertIsNone(urteil.einwirkung)
+        self.assertNotIn(f"Risse: Zwängung Biegung x – {obere}. Lage", gefunden)
+        self.assertIsNotNone(gefunden[f"Risse: Zwängung Biegung x – {untere}. Lage"].einwirkung)
 
     def test_zu_wenig_bewehrung_faellt_durch(self):
         projekt = projekt_zwang_biegung()
@@ -451,6 +454,22 @@ class TestSproedesVersagen(unittest.TestCase):
         self.assertIn("q1.x", aufbau.sproede)
         self.assertTrue([n for n, u in gefunden.items()
                          if n.startswith("Sprödes Versagen") and not u.still])
+
+    def test_eine_leere_lage_wird_nicht_nachgewiesen(self):
+        """
+        Ohne Stahl oben gibt es kein negatives Moment, das sich gegen das
+        Rissmoment halten liesse: die Lage fällt weg (Benutzer, 2026-10-19).
+        Bis dahin stand sie mit «kein Biegewiderstand» als nicht erfüllt da.
+        """
+        projekt = projekt_sproede()
+        untere, obere = x_lagen(projekt)
+        projekt.querschnitte[0].lagen[obere - 1].grund.durchmesser = 0.0
+        projekt.querschnitte[0].lagen[obere - 1].zulage.durchmesser = 0.0
+        self.assertEqual([e.lage.nummer for e in befund(projekt, "sproede").ergebnisse],
+                         [untere])
+        _, gefunden = urteile(projekt)
+        self.assertNotIn(f"Sprödes Versagen x – {obere}. Lage", gefunden)
+        self.assertTrue(gefunden[f"Sprödes Versagen x – {untere}. Lage"].erfuellt)
 
     def test_zu_wenig_bewehrung_faellt_durch(self):
         projekt = projekt_sproede()

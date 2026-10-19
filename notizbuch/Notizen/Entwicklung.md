@@ -44,6 +44,25 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-19 · Eine Lage ohne Stahl wird nicht nachgewiesen
+
+Wunsch des Benutzers: Sind bei einer Platte etwa die oberen Lagen leer,
+sollen sprödes Versagen (der Schalter «Rissmoment»), Duktilität und Zwängung
+auf Biegung die leere Lage einfach weglassen.
+
+Vorher bekam jede leere x-Lage in diesen drei Nachweisen ein Urteil «ohne
+Bewehrung → kein Nachweis» mit Erfüllungsgrad 0, das als nicht erfüllt
+zählte: eine Platte nur mit unterer Bewehrung galt als nicht erfüllt, und in
+der Tabelle stand die leere Lage statt der bewehrten. Jetzt gibt die Platte
+diesen Nachweisen nur die Lagen mit Stahl (`_lagennachweise` in
+`projekt/aufbau/platte.py`, eine Stelle für alle drei). Der gezeichnete
+Querschnitt machte es schon so: eine Seite ohne Stahl kommt dort nicht vor.
+
+Die Zwängung auf Normalkraft wählt ihre Lagen selbst und meldet eine leere
+weiter -- der Benutzer hat sie nicht genannt; offen, ob sie folgen soll.
+
+---
+
 ## 2026-10-18 · Analysen aus dem Speicher; das Suchfenster steht einmal
 
 Zwei Punkte aus der Durchsicht, auf Wunsch des Benutzers.

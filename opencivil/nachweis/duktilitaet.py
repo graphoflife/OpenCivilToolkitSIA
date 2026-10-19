@@ -22,9 +22,10 @@ dafuer als Teile derselben Frage gestempelt (siehe
 trotzdem beide, denn die Bewehrungssuche misst ihren Fortschritt an der Summe
 der Rueckstaende.
 
-Eine unbewehrte Lage ist kein Fehler der Beschreibung: sie bekommt ein Urteil
-mit Hinweis statt einer Zahl -- und ist damit die unguenstigere, steht also
-auch in der Tabelle.
+Eine Lage ohne Stahl gibt die Platte gar nicht erst mit: sie wird nicht
+nachgewiesen (Benutzer, 2026-10-19, :mod:`opencivil.projekt.aufbau.platte`).
+Bekommt der Nachweis eine ausdruecklich mit, steht sie mit Hinweis statt
+einer Zahl da.
 
 STATISCHE HOEHE:
 ``d`` wird von der **gedrueckten** Randfaser aus gemessen. Bei den unteren

@@ -150,26 +150,23 @@ class TestNachweis(unittest.TestCase):
         self.assertLess(
             gefunden[f"Duktilität – {untere}. Lage"].erfuellungsgrad.si, 1.0)
 
-    def test_eingeschaltet_aber_unbewehrt(self):
+    def test_eine_leere_lage_wird_nicht_nachgewiesen(self):
         """
-        Kein Fehler der Beschreibung, sondern ein Urteil mit Hinweis. Ohne
-        Bewehrung gibt es keine Druckzone, deren Höhe sich begrenzen liesse.
+        Ohne Stahl gibt es keine Druckzone, deren Höhe sich begrenzen liesse:
+        die Lage fällt weg, die andere wird geprüft (Benutzer, 2026-10-19).
+        Bis dahin stand sie mit «ohne Bewehrung → kein Nachweis» als nicht
+        erfüllt da -- und mit ihr die ganze Platte.
         """
         projekt = projekt_mit()
-        untere = x_lagen(projekt)[0]
+        untere, obere = x_lagen(projekt)
         lage = projekt.querschnitte[0].lagen[untere - 1]
         lage.grund.durchmesser = 0.0
         lage.zulage.durchmesser = 0.0
 
-        _, gefunden = urteile(projekt)
-        urteil = gefunden[f"Duktilität – {untere}. Lage"]
-        self.assertFalse(urteil.erfuellt)
-        self.assertIn(f"{untere}. Lage ohne Bewehrung → kein Nachweis",
-                      urteil.hinweis)
-        # Ohne Verhaeltnis gibt es nichts zu vergleichen -- dann steht dort ein
-        # Strich und nicht eine erfundene Null.
-        self.assertIsNone(urteil.einwirkung)
-        self.assertIsNone(urteil.widerstand)
+        ergebnisse, gefunden = urteile(projekt)
+        self.assertEqual([e.lage.nummer for e in ergebnisse], [obere])
+        self.assertNotIn(f"Duktilität – {untere}. Lage", gefunden)
+        self.assertIsNotNone(gefunden[f"Duktilität – {obere}. Lage"].einwirkung)
 
     def test_die_herleitung_zeigt_die_rechnung(self):
         from opencivil.core.protokoll import GleichungBlock
@@ -318,20 +315,17 @@ class TestInDerZusammenfassung(unittest.TestCase):
             paare.index(dukt[0]),
             paare.index(("Biegung und Normalkraft", "Feld")))
 
-    def test_eine_unbewehrte_lage_meldet_sich_sichtbar(self):
+    def test_eine_leere_lage_steht_nicht_in_der_tabelle(self):
+        """In der Zeile der Duktilität steht die Lage mit Stahl, mit Zahlen."""
         projekt = projekt_mit()
-        untere = x_lagen(projekt)[0]
+        untere, obere = x_lagen(projekt)
         lage = projekt.querschnitte[0].lagen[untere - 1]
         lage.grund.durchmesser = 0.0
         lage.zulage.durchmesser = 0.0
 
         antwort = dienst.bearbeite("rechnen", {"projekt": projekt.als_dict()})
         zeilen = antwort.daten["zusammenfassungen"]["q1"]["zeilen"]
-        # Die leere Lage ist die schlechtere und steht damit in der Tabelle.
-        betroffen = next(z for z in zeilen
-                         if z["zellen"][0] == {"text": "Duktilität"})
-        self.assertEqual(betroffen["zellen"][1], {"text": f"{untere}. Lage"})
-        self.assertIn("ohne Bewehrung → kein Nachweis", betroffen["hinweis"])
-        # Widerstand und Einwirkung sind Striche, keine erfundenen Nullen.
-        self.assertEqual(betroffen["zellen"][2], {"text": "–"})
-        self.assertEqual(betroffen["zellen"][3], {"text": "–"})
+        betroffen = [z for z in zeilen if z["zellen"][0] == {"text": "Duktilität"}]
+        self.assertEqual([z["zellen"][1] for z in betroffen], [{"text": f"{obere}. Lage"}])
+        self.assertFalse(betroffen[0].get("hinweis"))
+        self.assertNotEqual(betroffen[0]["zellen"][2], {"text": "–"})

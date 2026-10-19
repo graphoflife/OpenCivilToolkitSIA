@@ -150,11 +150,18 @@ def _lagennachweise(eintrag: QuerschnittEintrag, querschnitt: Plattenquerschnitt
     Die Nachweise je x-Lage: sproedes Versagen, Zwaengung auf Biegung und
     auf Normalkraft, Duktilitaet.
 
-    Die beiden x-Lagen, von unten nach oben. Beide werden gerechnet; in die
-    Zusammenfassung kommt die unguenstigere. Ausgeschaltet heisst still --
-    gerechnet wird trotzdem, damit ein Hinweis stehen kann.
+    Die x-Lagen von unten nach oben; in die Zusammenfassung kommt die
+    unguenstigere. Ausgeschaltet heisst still -- gerechnet wird trotzdem,
+    damit ein Hinweis stehen kann.
+
+    **Eine Lage ohne Stahl lassen sproedes Versagen, Zwaengung auf Biegung
+    und Duktilitaet weg** (Benutzer, 2026-10-19): sie wird nicht
+    nachgewiesen und steht nicht in der Tabelle. Bis dahin bekam sie ein
+    Urteil «ohne Bewehrung → kein Nachweis», das als nicht erfuellt zaehlte --
+    eine Platte nur mit unterer Bewehrung galt so als nicht erfuellt. Die
+    Zwaengung auf Normalkraft waehlt ihre Lagen selbst und prueft jede.
     """
-    lagen = [l.nummer for l in querschnitt.lagen if l.richtung is richtung]
+    lagen = [l.nummer for l in querschnitt.lagen if l.richtung is richtung and l.vorhanden]
     if not lagen:
         return
     kennung_x = f"{eintrag.kennung}.x"
