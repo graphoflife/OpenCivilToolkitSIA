@@ -1,5 +1,5 @@
 ---
-erzeugt: 6b4be91b75ec
+erzeugt: e95fe5ce1807
 art: modul
 tags: [modul]
 ---
@@ -12,7 +12,9 @@ tags: [modul]
 Alles, was aus der Zeichnung folgt, bevor ein Werkstoff ins Spiel kommt:
 Flaeche, Schwerpunkt und Traegheitsmomente eines Polygons, wie Polygone
 ineinanderliegen, wo die Staebe einer Stablinie liegen, ob ein Stab ganz im
-Beton steckt und wo eine Gerade ein Polygon schneidet.
+Beton steckt und wo eine Gerade ein Polygon schneidet. Dazu die Hilfe beim
+Zeichnen, die Ueberdeckung: das gerueckte Polygon und wohin Bewehrung muss,
+damit sie in ihm liegt.
 
 
 ## WARUM HIER UND NICHT IN DER OBERFLAECHE
@@ -133,6 +135,14 @@ def _kreuz(o: Punkt, a: Punkt, b: Punkt) -> float
 ```
 
 Das Kreuzprodukt (a - o) × (b - o): > 0 heisst, b liegt links von o→a.
+
+### naechster_auf_strecke
+
+```python
+def naechster_auf_strecke(p: Punkt, a: Punkt, b: Punkt) -> Punkt
+```
+
+Der Punkt der Strecke `a`–`b`, der `p` am naechsten liegt.
 
 ### abstand_zur_strecke
 
@@ -351,12 +361,124 @@ Teilung s:  m = runde(L / s), kaufmaennisch; tatsaechlich L / m
 Bei 1000 mm und s = 150 sind das sieben Felder zu 142.9 mm, mit beiden
 Enden acht Staebe. Bei einer Flaeche gibt es keine Einzelstaebe.
 
+### aequivalenter_durchmesser
+
+```python
+def aequivalenter_durchmesser(flaeche: float, laenge: float, teilung: float=TEILUNG_VERSCHMIERT) -> float
+```
+
+Der Durchmesser der Staebe, die im Abstand `teilung` dieselbe Flaeche
+je Laenge geben wie `flaeche` auf `laenge`: 1000 mm² auf 1000 mm sind
+bei 150 mm Teilung 150 mm² je Stab, also ⌀13.8.
+
+### _schnitt_der_geraden
+
+```python
+def _schnitt_der_geraden(p: Punkt, r: Punkt, q: Punkt, s: Punkt) -> Optional[Punkt]
+```
+
+Wo sich die Geraden `p + t·r` und `q + u·s` schneiden -- nichts, wenn sie parallel sind.
+
+### versetzt
+
+```python
+def versetzt(punkte: Sequence[Punkt], abstand: float) -> Optional[Tuple[Punkt, ...]]
+```
+
+Das Polygon, jede Kante um `abstand` nach innen gerueckt -- bei einem
+negativen Abstand nach aussen. Die neuen Ecken liegen, wo sich die
+gerueckten Kanten schneiden, auch an einer einspringenden Ecke: so
+zeichnet man eine Ueberdeckung. Ein Rechteck 300 × 600 um 30 gerueckt
+ist das Rechteck 240 × 540 in seiner Mitte.
+
+Kehrt sich eine Kante dabei um -- eine kurze Fase bei grossem Abstand --,
+faellt sie weg, und ihre Nachbarn schneiden sich. Bleibt nichts, oder
+schnitte sich das Ergebnis selbst, kommt nichts zurueck.
+
+### ueberdeckungspolygon
+
+```python
+def ueberdeckungspolygon(punkte: Sequence[Punkt], abstand: float, traegt: bool) -> Optional[Tuple[Punkt, ...]]
+```
+
+Das Polygon um `abstand` in den Beton gerueckt: bei Beton nach innen,
+bei einer Aussparung nach aussen. Nichts, wenn nichts bleibt.
+
+### naechster_randpunkt
+
+```python
+def naechster_randpunkt(p: Punkt, punkte: Sequence[Punkt], laengs: Optional[Punkt]=None) -> Punkt
+```
+
+Der Punkt auf dem Rand des Polygons, der `p` am naechsten liegt. Sind
+zwei gleich nahe -- an einer einspringenden Ecke --, gilt der, zu dem der
+Weg am wenigsten in Richtung `laengs` geht: eine Linie wird so quer zu
+sich verschoben, nicht laengs.
+
+### ueberdeckung_von
+
+```python
+def ueberdeckung_von(p: Punkt, polygone: Sequence[Sequence[Punkt]], traegt: Sequence[bool], ueberdeckungen: Sequence[float]) -> Optional[int]
+```
+
+Das Polygon, dessen Ueberdeckung fuer Bewehrung bei `p` gilt -- oder
+nichts, wenn keines eine hat.
+
+Ein Polygon mit Beton gilt nur fuer das, was in ihm liegt: so zieht der
+Nachbar in einem Querschnitt aus mehreren Polygonen nichts zu sich
+hinueber. Gerueckt wird aber jede Kante, auch die Fuge zum Nachbarn --
+die Ueberdeckung gehoert darum dem Polygon, an dessen Rand sie gilt.
+Liegt `p` in keinem Beton -- daneben, auf dem Rand oder in einer
+Aussparung --, kommt jedes mit Beton in Frage; eine Aussparung mit
+Ueberdeckung immer. Von diesen gilt das, dessen Rand am naechsten liegt.
+
+### _in_ueberdeckung
+
+```python
+def _in_ueberdeckung(p: Punkt, radius: float, punkte: Sequence[Punkt], ueberdeckung: float, traegt: bool, laengs: Optional[Punkt]=None) -> Optional[Punkt]
+```
+
+Wo ein Stab mit `radius` liegen muss, damit er ganz in der Ueberdeckung
+dieses Polygons liegt: `p` selbst, wenn er es schon tut, sonst der
+naechste Punkt, an dem er es gerade tut -- im Beton innerhalb des um
+`ueberdeckung + radius` gerueckten Polygons, bei einer Aussparung
+ausserhalb des so weit vergroesserten. Nichts, wenn dafuer nichts bleibt.
+
+### stab_in_ueberdeckung
+
+```python
+def stab_in_ueberdeckung(p: Punkt, radius: float, polygone: Sequence[Sequence[Punkt]], traegt: Sequence[bool], ueberdeckungen: Sequence[float]) -> Optional[Punkt]
+```
+
+Wo ein Stab liegen muss, damit er mit seinem Radius gerade ganz in der
+Ueberdeckung liegt, die bei ihm gilt ([[opencivil.querschnitt.geometrie#ueberdeckung_von|ueberdeckung_von]]). Im
+Rechteck mit c = 30 kommt ein ⌀20 aus der Ecke (0, 0) nach (40, 40); einer,
+der schon weit genug innen liegt, bleibt. Nichts ohne Ueberdeckung.
+
+### linie_in_ueberdeckung
+
+```python
+def linie_in_ueberdeckung(von: Punkt, bis: Punkt, radius_bei: Callable[[float], float], polygone: Sequence[Sequence[Punkt]], traegt: Sequence[bool], ueberdeckungen: Sequence[float]) -> Optional[Tuple[Punkt, Punkt]]
+```
+
+Anfang und Ende einer Stablinie in der Ueberdeckung -- jedes Ende wie ein
+Stab, mit der Ueberdeckung, die an ihrer Mitte gilt. Sind zwei Raender
+gleich nah, verschiebt sich das Ende quer zur Linie.
+
+`radius_bei(laenge)` ist der Radius ihrer Staebe. Bei einer
+verschmierten Linie haengt er an ihrer Laenge
+([[opencivil.querschnitt.geometrie#aequivalenter_durchmesser|aequivalenter_durchmesser]]), und die aendert sich mit dem
+Verschieben: gerechnet wird darum, bis beide zueinander passen -- ein
+zweites Mal verschoben, bleibt die Linie stehen. Nichts ohne
+Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
+
 
 ## Konstanten
 
 - `TOLERANZ = 1e-06` – Wie nahe zwei Lagen beieinander liegen duerfen, um als gleich zu gelten, in der Einheit der Punkte. Ein Millionstel Millimeter liegt weit unter allem, was jemand zeichnet, und weit ueber dem Rauschen gerechneter Kreispunkte.
 - `NULL = Flaechenwerte(A=0.0, y_S=0.0, z_S=0.0, I_y=0.0, I_z=0.0, I_yz=0.0)` – Ein Querschnitt ohne Flaeche -- der Anfang jeder Summe.
 - `WANDPROBE = 5.0` – Abstand der Proben entlang einer Wandlinie, in der Einheit der Punkte.
+- `TEILUNG_VERSCHMIERT = 150.0` – Mit welcher Teilung eine verschmierte Stablinie fuer die Ueberdeckung als Staebe gilt: ihr Durchmesser ist der, der bei dieser Teilung dieselbe Flaeche je Laenge gibt. Nach Vorgabe des Benutzers (2026-10-23).
 
 ## Braucht
 

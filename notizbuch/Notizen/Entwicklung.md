@@ -44,6 +44,41 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-23 · Überdeckung: ein Hilfspolygon und «Überdeckung beachten»
+
+Wunsch des Benutzers: beim Polygon eine Überdeckung in mm eingeben können,
+Vorgabe 0. Darüber erscheint ein Hilfspolygon, so weit nach innen gerückt,
+an dessen Ecken man fängt -- um Bewehrung einfach zu zeichnen. Und gewählte
+Bewehrung soll sich auf Knopfdruck so verschieben, dass sie mit ihrem eigenen
+Radius gerade ganz in diesem Polygon liegt; eine verschmierte Linie gilt
+dafür als Stäbe mit dem äquivalenten Durchmesser bei s = 150 mm.
+
+- **Gerechnet im Kern**, nicht in der Oberfläche: die Stablagen gehen in die
+  Rechnung. `geometrie.py` rückt ein Polygon (`versetzt`: jede Kante um c,
+  Ecken, wo sich die gerückten Kanten schneiden -- auch an einer
+  einspringenden Ecke spitz; eine Kante, die sich umkehrt, fällt weg) und
+  sagt, wohin ein Stab oder die Enden einer Linie müssen
+  (`stab_in_ueberdeckung`, `linie_in_ueberdeckung`). Die Antwort `geometrie`
+  trägt je Polygon das Hilfspolygon und je Stab und Linie die Lage
+  `ueberdeckt`; der Knopf übernimmt sie nur.
+- **Wohin:** auf den nächsten Punkt, an dem der Stab gerade ganz innen liegt
+  -- ein ⌀20 aus der Ecke des Rechtecks mit c = 30 nach (40, 40); was schon
+  innen liegt, bleibt. Jedes Ende einer Linie für sich; sind zwei Ränder
+  gleich nah (an einer einspringenden Ecke), quer zur Linie.
+- **Welches Polygon:** eines mit Beton nur für das, was in ihm liegt;
+  sonst das nächste. Eine Aussparung mit c rückt nach aussen und schiebt
+  Bewehrung aus sich hinaus -- so hat ein Hohlkasten auch innen seine
+  Überdeckung. Gerückt wird jede Kante, auch die Fuge zu einem Nachbarn: wer
+  einen Querschnitt aus mehreren Polygonen zeichnet, gibt c dem, an dessen
+  Rand sie gilt.
+- **Verschmiert:** der Durchmesser hängt an der Länge, und die ändert sich
+  beim Verschieben. Gerechnet wird, bis beide zueinander passen -- ein
+  zweiter Klick verschiebt nichts mehr.
+- Was am selben Knoten hängt -- eine Polygonecke unter dem Ende einer
+  Linie --, bleibt liegen (`verschieben` je Ecke).
+
+---
+
 ## 2026-10-23 · Das offene Polygon fängt an seinen eigenen Ecken
 
 Wunsch des Benutzers: beim Zeichnen eines Polygons sollen nicht nur die

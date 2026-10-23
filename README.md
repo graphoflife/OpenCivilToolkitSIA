@@ -365,6 +365,13 @@ ein Knopf mit Zeichen:
 * *Hilfspunkt* K und *Hilfslinie* H -- zum Konstruieren, sie rechnen nicht
   mit; geschlossene Hilfslinien werden auf Wunsch eine Fläche.
 
+Ein Polygon kann eine Überdeckung c tragen. Dann steht es grün gepunktet so
+weit nach innen gerückt da -- eine Aussparung nach aussen --, und an seinen
+Ecken fängt der Zeiger. «Überdeckung beachten» neben gewählter Bewehrung
+schiebt sie so, dass sie mit ihrem Radius gerade ganz darin liegt: ein Stab
+als Ganzes, eine Linie Ende für Ende. Eine verschmierte Linie gilt dafür als
+Stäbe im Abstand von 150 mm mit gleicher Fläche. Mitgerechnet wird c nicht.
+
 Das schwebende Fenster zeigt immer nur eine Art: beim Zeichnen die des
 Werkzeugs, bei der Auswahl die des Gewählten. Eine andere Art ist ein anderes
 Werkzeug -- eine gezeichnete Linie wechselt ihre Art nicht.

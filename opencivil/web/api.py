@@ -54,7 +54,10 @@ from opencivil.projekt.querschnittsanalyse import (
 )
 from opencivil.querschnitt.analyse import Zeichnung
 from opencivil.querschnitt.zugseite import UM_Y, Zugseite
-from opencivil.querschnitt.geometrie import Linienart
+from opencivil.querschnitt.geometrie import (
+    Linienart, aequivalenter_durchmesser, linie_in_ueberdeckung, stab_in_ueberdeckung,
+    ueberdeckungspolygon,
+)
 from opencivil.querschnitt.vorlagen import VORLAGEN
 from opencivil.querschnitt.gesetzwahl import Werkstoffsatz
 from opencivil.nachweis.rechenwahl import (
@@ -151,6 +154,7 @@ def katalog() -> dict:
             "schicht": feldangaben(SchichtEintrag),
             "querkraftbewehrung": feldangaben(QuerkraftbewehrungEintrag),
             "querschnittsanalyse": feldangaben(QuerschnittsanalyseEintrag),
+            "flaeche": feldangaben(FlaecheEintrag),
             "spannungsfall": feldangaben(SpannungsfallEintrag),
         },
         # Ein Skript der App «Python», mit einem Diagramm darin.
@@ -622,12 +626,35 @@ def geometrie(eintrag, projekt) -> dict:
     z = Zeichnung(
         polygone=[{**f, "traegt": bool(f["material"])} for f in elemente.polygone],
         staebe=elemente.staebe, linien=elemente.linien, waende=elemente.waende)
+    # Die Ueberdeckung, eine Hilfe beim Zeichnen: je Polygon das gerueckte,
+    # je Stab und Stablinie, wo sie in ihr laegen -- fuer den Knopf
+    # «Überdeckung beachten». Ohne Ueberdeckung jeweils nichts.
+    punkte = [f["punkte"] for f in elemente.polygone]
+    traegt = [bool(f["material"]) for f in elemente.polygone]
+    c = [f["ueberdeckung"] for f in elemente.polygone]
+
+    def als_punkt(p):
+        return None if p is None else list(p)
+
+    def als_liste(punkte):
+        return None if punkte is None else [list(p) for p in punkte]
+
+    def linie_ueberdeckt(l):
+        if l["art"] == Linienart.FLAECHE:
+            def radius(laenge):
+                return aequivalenter_durchmesser(l["flaeche"], laenge) / 2.0
+        else:
+            def radius(_laenge):
+                return l["durchmesser"] / 2.0
+        return als_liste(linie_in_ueberdeckung(l["von"], l["bis"], radius, punkte, traegt, c))
+
     linien = []
     for l, linie in zip(elemente.linien, z.linien):
         kopf = {"element": l["name"], "kennung": l["kennung"]}
         if linie is None:
             linien.append({**kopf, "punkte": [], "teilung": None,
-                           "felder": 0, "flaeche": 0.0, "je_meter": 0.0, "laenge": 0.0})
+                           "felder": 0, "flaeche": 0.0, "je_meter": 0.0, "laenge": 0.0,
+                           "ueberdeckt": None})
             continue
         flaeche = (l["flaeche"] if l["art"] == "flaeche"
                    else len(linie.punkte) * math.pi * l["durchmesser"] ** 2 / 4.0)
@@ -640,6 +667,7 @@ def geometrie(eintrag, projekt) -> dict:
             "flaeche": flaeche,
             "je_meter": flaeche / linie.laenge * 1000.0,
             "laenge": linie.laenge,
+            "ueberdeckt": linie_ueberdeckt(l),
         })
     b = z.brutto
     return {
@@ -649,12 +677,16 @@ def geometrie(eintrag, projekt) -> dict:
         "polygone": [
             {"element": f["name"], "kennung": f["kennung"],
              "eltern": (z.eltern[i] if z.eltern is not None else None),
-             "aussparung": not z.traegt[i]}
+             "aussparung": not z.traegt[i],
+             "ueberdeckung": (als_liste(ueberdeckungspolygon(f["punkte"], c[i], traegt[i]))
+                              if c[i] > 0.0 else None)}
             for i, f in enumerate(elemente.polygone)],
         "brutto": None if b is None else {
             "A": b.A, "y_S": b.y_S, "z_S": b.z_S, "I_y": b.I_y, "I_z": b.I_z,
             "I_yz": b.I_yz},
-        "staebe": [{"element": s["name"], "kennung": s["kennung"], "im_beton": gut}
+        "staebe": [{"element": s["name"], "kennung": s["kennung"], "im_beton": gut,
+                    "ueberdeckt": als_punkt(stab_in_ueberdeckung(
+                        s["lage"], s["durchmesser"] / 2.0, punkte, traegt, c))}
                    for s, gut in zip(elemente.staebe, z.staebe)],
         "linien": linien,
         "waende": [

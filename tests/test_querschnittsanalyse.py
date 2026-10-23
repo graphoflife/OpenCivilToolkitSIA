@@ -449,6 +449,29 @@ class TestGeometrieEndpunkt(unittest.TestCase):
     def test_unbekannte_analyse(self):
         self.assertEqual(self.frage(projekt(), "a9").status, 400)
 
+    def test_ohne_ueberdeckung_nichts_dazu(self):
+        d = self.frage(projekt()).daten
+        self.assertIsNone(d["polygone"][0]["ueberdeckung"])
+        self.assertTrue(all(l["ueberdeckt"] is None for l in d["linien"]))
+
+    def test_ueberdeckung(self):
+        """
+        c = 30 am Rechteck 300 × 600: das Hilfspolygon, und wohin die Bewehrung
+        muss. Die Stäbe der Vorlage liegen 50 vom Rand, weit genug -- sie
+        bleiben. Ein ⌀20 in der Ecke kommt nach (40, 40).
+        """
+        p = projekt()
+        a = p.querschnittsanalysen[0]
+        a.flaechen[0].ueberdeckung = 30.0
+        a.stab(0, 0, durchmesser=20, stahl="s1")
+        d = self.frage(p).daten
+        self.assertEqual(sorted(map(tuple, d["polygone"][0]["ueberdeckung"])),
+                         [(30, 30), (30, 570), (270, 30), (270, 570)])
+        self.assertEqual(d["staebe"][0]["ueberdeckt"], [40.0, 40.0])
+        lagen = {k.kennung: [k.y, k.z] for k in a.knoten}
+        for l, info in zip(a.stablinien, d["linien"]):
+            self.assertEqual(info["ueberdeckt"], [lagen[l.von], lagen[l.bis]])
+
     def test_zellen_wie_im_nachweis(self):
         """
         Ein Wandende, das um 0.4 µm neben der Ecke liegt: der Nachweis sieht

@@ -48,7 +48,8 @@ from opencivil.projekt.eintraege import (
     KnickEintrag, Querschnittsangaben, SpannungsfallEintrag, eindeutig, neigung,
     neigungen_ordnen,
 )
-from opencivil.projekt.lesen import ProjektFehler, einer_von
+from opencivil.core.einheiten import MM
+from opencivil.projekt.lesen import ProjektFehler, bereich, einer_von
 from opencivil.projekt.netz import Netz, naechste_kennung
 
 #: Schnitte eines Buegels durch eine Schubwand: so viele Schenkel kreuzen sie.
@@ -92,6 +93,15 @@ class FlaecheEintrag(Beschreibung):
 
     material: str = ""
     """Kennung des Materials; leer heisst Aussparung."""
+
+    ueberdeckung: float = bereich(0.0, heisst="Überdeckung c", einheit=MM, ab=0.0)
+    """
+    Die Ueberdeckung der Bewehrung in mm, eine Hilfe beim Zeichnen: ueber null
+    zeigt das Zeichenfenster das Polygon so weit nach innen gerueckt -- bei
+    einer Aussparung nach aussen -- und «Überdeckung beachten» schiebt
+    Bewehrung hinein (:func:`~opencivil.querschnitt.geometrie.stab_in_ueberdeckung`).
+    Gerechnet wird mit ihr nicht.
+    """
 
     @property
     def ist_aussparung(self) -> bool:
@@ -300,7 +310,7 @@ class Elemente:
     """
 
     polygone: List[dict]
-    """Je Polygon ``punkte`` und ``material`` (leer: Aussparung)."""
+    """Je Polygon ``punkte``, ``material`` (leer: Aussparung) und ``ueberdeckung``."""
 
     staebe: List[dict]
     """Je Stab ``lage``, ``durchmesser`` und ``stahl``."""
@@ -455,7 +465,7 @@ class QuerschnittsanalyseEintrag(Querschnittsangaben):
             ecken = orte(name, f.kennung, *f.knoten)
             if ecken is not None:
                 polygone.append(benannt(name, f.kennung, punkte=tuple(ecken),
-                                        material=f.material))
+                                        material=f.material, ueberdeckung=f.ueberdeckung))
         for i, s in enumerate(self.staebe, start=1):
             name = f"Stab {i}"
             ort = orte(name, s.kennung, s.knoten)

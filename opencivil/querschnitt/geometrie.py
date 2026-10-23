@@ -5,7 +5,9 @@ VERANTWORTUNG:
 Alles, was aus der Zeichnung folgt, bevor ein Werkstoff ins Spiel kommt:
 Flaeche, Schwerpunkt und Traegheitsmomente eines Polygons, wie Polygone
 ineinanderliegen, wo die Staebe einer Stablinie liegen, ob ein Stab ganz im
-Beton steckt und wo eine Gerade ein Polygon schneidet.
+Beton steckt und wo eine Gerade ein Polygon schneidet. Dazu die Hilfe beim
+Zeichnen, die Ueberdeckung: das gerueckte Polygon und wohin Bewehrung muss,
+damit sie in ihm liegt.
 
 WARUM HIER UND NICHT IN DER OBERFLAECHE:
 Das Zeichenfenster zeigt Stabpositionen, tatsaechliche Teilungen und
@@ -34,7 +36,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional, Sequence, Tuple
+from typing import Callable, List, Optional, Sequence, Tuple
 
 from opencivil.core.wahl import Wahl
 
@@ -179,15 +181,20 @@ def _kreuz(o: Punkt, a: Punkt, b: Punkt) -> float:
     return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
 
 
-def abstand_zur_strecke(p: Punkt, a: Punkt, b: Punkt) -> float:
-    """Der kuerzeste Abstand von ``p`` zur Strecke ``a``–``b``."""
+def naechster_auf_strecke(p: Punkt, a: Punkt, b: Punkt) -> Punkt:
+    """Der Punkt der Strecke ``a``–``b``, der ``p`` am naechsten liegt."""
     dy, dz = b[0] - a[0], b[1] - a[1]
     laenge2 = dy * dy + dz * dz
     if laenge2 == 0.0:
-        return math.hypot(p[0] - a[0], p[1] - a[1])
-    t = ((p[0] - a[0]) * dy + (p[1] - a[1]) * dz) / laenge2
-    t = min(1.0, max(0.0, t))
-    return math.hypot(p[0] - (a[0] + t * dy), p[1] - (a[1] + t * dz))
+        return a
+    t = min(1.0, max(0.0, ((p[0] - a[0]) * dy + (p[1] - a[1]) * dz) / laenge2))
+    return (a[0] + t * dy, a[1] + t * dz)
+
+
+def abstand_zur_strecke(p: Punkt, a: Punkt, b: Punkt) -> float:
+    """Der kuerzeste Abstand von ``p`` zur Strecke ``a``–``b``."""
+    q = naechster_auf_strecke(p, a, b)
+    return math.hypot(p[0] - q[0], p[1] - q[1])
 
 
 def abstand_zum_rand(p: Punkt, punkte: Sequence[Punkt]) -> float:
@@ -546,3 +553,215 @@ def stablinie(
         for k in range(erster, letzter + 1))
     return Stablinie(von=von, bis=bis, laenge=laenge, felder=felder,
                      teilung=laenge / felder, punkte=punkte)
+
+
+# ===========================================================================
+# Ueberdeckung -- eine Hilfe beim Zeichnen
+# ===========================================================================
+#
+# Ein Polygon kann eine Ueberdeckung c tragen. Das Zeichenfenster zeigt dann
+# das Polygon um c nach innen gerueckt -- bei einer Aussparung nach aussen,
+# in den Beton -- und faengt an seinen Ecken. Der Knopf «Überdeckung
+# beachten» schiebt Bewehrung so, dass sie mit ihrem Radius gerade ganz in
+# diesem Polygon liegt (Benutzer, 2026-10-23). Gerechnet wird mit c nichts:
+# in die Rechnung geht nur, wo die Staebe danach liegen.
+
+
+#: Mit welcher Teilung eine verschmierte Stablinie fuer die Ueberdeckung als
+#: Staebe gilt: ihr Durchmesser ist der, der bei dieser Teilung dieselbe
+#: Flaeche je Laenge gibt. Nach Vorgabe des Benutzers (2026-10-23).
+TEILUNG_VERSCHMIERT = 150.0
+
+
+def aequivalenter_durchmesser(flaeche: float, laenge: float,
+                              teilung: float = TEILUNG_VERSCHMIERT) -> float:
+    """
+    Der Durchmesser der Staebe, die im Abstand ``teilung`` dieselbe Flaeche
+    je Laenge geben wie ``flaeche`` auf ``laenge``: 1000 mm² auf 1000 mm sind
+    bei 150 mm Teilung 150 mm² je Stab, also ⌀13.8.
+    """
+    je_stab = max(flaeche, 0.0) / laenge * teilung
+    return math.sqrt(4.0 * je_stab / math.pi)
+
+
+def _schnitt_der_geraden(p: Punkt, r: Punkt, q: Punkt, s: Punkt) -> Optional[Punkt]:
+    """Wo sich die Geraden ``p + t·r`` und ``q + u·s`` schneiden -- nichts, wenn sie parallel sind."""
+    nenner = r[0] * s[1] - r[1] * s[0]
+    if abs(nenner) <= 1e-12 * math.hypot(*r) * math.hypot(*s):
+        return None
+    t = ((q[0] - p[0]) * s[1] - (q[1] - p[1]) * s[0]) / nenner
+    return (p[0] + t * r[0], p[1] + t * r[1])
+
+
+def versetzt(punkte: Sequence[Punkt], abstand: float) -> Optional[Tuple[Punkt, ...]]:
+    """
+    Das Polygon, jede Kante um ``abstand`` nach innen gerueckt -- bei einem
+    negativen Abstand nach aussen. Die neuen Ecken liegen, wo sich die
+    gerueckten Kanten schneiden, auch an einer einspringenden Ecke: so
+    zeichnet man eine Ueberdeckung. Ein Rechteck 300 × 600 um 30 gerueckt
+    ist das Rechteck 240 × 540 in seiner Mitte.
+
+    Kehrt sich eine Kante dabei um -- eine kurze Fase bei grossem Abstand --,
+    faellt sie weg, und ihre Nachbarn schneiden sich. Bleibt nichts, oder
+    schnitte sich das Ergebnis selbst, kommt nichts zurueck.
+    """
+    # Aufeinanderliegende Punkte geben keine Kante.
+    ecken = [p for i, p in enumerate(punkte)
+             if math.hypot(p[0] - punkte[i - 1][0], p[1] - punkte[i - 1][1]) > TOLERANZ]
+    if len(ecken) < 3 or abs(flaeche(ecken)) <= TOLERANZ:
+        return None
+    # Innen liegt links einer Kante, wenn das Polygon linksherum laeuft.
+    sinn = 1.0 if flaeche(ecken) > 0 else -1.0
+    geraden: List[Tuple[Punkt, Punkt]] = []
+    for a, b in _kanten(ecken):
+        r = (b[0] - a[0], b[1] - a[1])
+        laenge = math.hypot(*r)
+        innen = (-r[1] / laenge * sinn, r[0] / laenge * sinn)
+        geraden.append(((a[0] + innen[0] * abstand, a[1] + innen[1] * abstand), r))
+    while len(geraden) >= 3:
+        # Die Ecke vor jeder Kante: wo sie die vorige schneidet. Zwei
+        # Kanten in einer Flucht schneiden sich nicht -- dort beginnt die
+        # gerueckte Kante einfach.
+        neu = []
+        for (p, r), (q, s) in zip(geraden[-1:] + geraden[:-1], geraden):
+            x = _schnitt_der_geraden(p, r, q, s)
+            neu.append(x if x is not None else q)
+        umgekehrt = next(
+            (i for i, (_, r) in enumerate(geraden)
+             if (neu[(i + 1) % len(neu)][0] - neu[i][0]) * r[0]
+             + (neu[(i + 1) % len(neu)][1] - neu[i][1]) * r[1] <= 0.0),
+            None)
+        if umgekehrt is None:
+            if flaeche(neu) * sinn <= TOLERANZ or selbstschnitt(neu) is not None:
+                return None
+            return tuple(neu)
+        del geraden[umgekehrt]
+    return None
+
+
+def ueberdeckungspolygon(punkte: Sequence[Punkt], abstand: float,
+                         traegt: bool) -> Optional[Tuple[Punkt, ...]]:
+    """
+    Das Polygon um ``abstand`` in den Beton gerueckt: bei Beton nach innen,
+    bei einer Aussparung nach aussen. Nichts, wenn nichts bleibt.
+    """
+    return versetzt(punkte, abstand if traegt else -abstand)
+
+
+def naechster_randpunkt(p: Punkt, punkte: Sequence[Punkt],
+                        laengs: Optional[Punkt] = None) -> Punkt:
+    """
+    Der Punkt auf dem Rand des Polygons, der ``p`` am naechsten liegt. Sind
+    zwei gleich nahe -- an einer einspringenden Ecke --, gilt der, zu dem der
+    Weg am wenigsten in Richtung ``laengs`` geht: eine Linie wird so quer zu
+    sich verschoben, nicht laengs.
+    """
+    kandidaten = [naechster_auf_strecke(p, a, b) for a, b in _kanten(punkte)]
+    weit = [math.hypot(q[0] - p[0], q[1] - p[1]) for q in kandidaten]
+    gleich = [q for q, d in zip(kandidaten, weit) if d <= min(weit) + TOLERANZ]
+    if laengs is None:
+        return gleich[0]
+    return min(gleich, key=lambda q: abs((q[0] - p[0]) * laengs[0] + (q[1] - p[1]) * laengs[1]))
+
+
+def ueberdeckung_von(
+    p: Punkt, polygone: Sequence[Sequence[Punkt]], traegt: Sequence[bool],
+    ueberdeckungen: Sequence[float],
+) -> Optional[int]:
+    """
+    Das Polygon, dessen Ueberdeckung fuer Bewehrung bei ``p`` gilt -- oder
+    nichts, wenn keines eine hat.
+
+    Ein Polygon mit Beton gilt nur fuer das, was in ihm liegt: so zieht der
+    Nachbar in einem Querschnitt aus mehreren Polygonen nichts zu sich
+    hinueber. Gerueckt wird aber jede Kante, auch die Fuge zum Nachbarn --
+    die Ueberdeckung gehoert darum dem Polygon, an dessen Rand sie gilt.
+    Liegt ``p`` in keinem Beton -- daneben, auf dem Rand oder in einer
+    Aussparung --, kommt jedes mit Beton in Frage; eine Aussparung mit
+    Ueberdeckung immer. Von diesen gilt das, dessen Rand am naechsten liegt.
+    """
+    mit = [i for i, c in enumerate(ueberdeckungen) if c > 0.0]
+    if not mit:
+        return None
+    huelle = innerstes(p, polygone)
+    if huelle is not None and traegt[huelle]:
+        beton = [huelle] if huelle in mit else []
+    else:
+        beton = [i for i in mit if traegt[i]]
+    kandidaten = beton + [i for i in mit if not traegt[i]]
+    if not kandidaten:
+        return None
+    return min(kandidaten, key=lambda i: abstand_zum_rand(p, polygone[i]))
+
+
+def _in_ueberdeckung(p: Punkt, radius: float, punkte: Sequence[Punkt], ueberdeckung: float,
+                     traegt: bool, laengs: Optional[Punkt] = None) -> Optional[Punkt]:
+    """
+    Wo ein Stab mit ``radius`` liegen muss, damit er ganz in der Ueberdeckung
+    dieses Polygons liegt: ``p`` selbst, wenn er es schon tut, sonst der
+    naechste Punkt, an dem er es gerade tut -- im Beton innerhalb des um
+    ``ueberdeckung + radius`` gerueckten Polygons, bei einer Aussparung
+    ausserhalb des so weit vergroesserten. Nichts, wenn dafuer nichts bleibt.
+    """
+    bereich = ueberdeckungspolygon(punkte, ueberdeckung + radius, traegt)
+    if bereich is None:
+        return None
+    seite = lage(p, bereich)
+    if (seite >= 0) if traegt else (seite <= 0):
+        return p
+    return naechster_randpunkt(p, bereich, laengs)
+
+
+def stab_in_ueberdeckung(
+    p: Punkt, radius: float, polygone: Sequence[Sequence[Punkt]], traegt: Sequence[bool],
+    ueberdeckungen: Sequence[float],
+) -> Optional[Punkt]:
+    """
+    Wo ein Stab liegen muss, damit er mit seinem Radius gerade ganz in der
+    Ueberdeckung liegt, die bei ihm gilt (:func:`ueberdeckung_von`). Im
+    Rechteck mit c = 30 kommt ein ⌀20 aus der Ecke (0, 0) nach (40, 40); einer,
+    der schon weit genug innen liegt, bleibt. Nichts ohne Ueberdeckung.
+    """
+    i = ueberdeckung_von(p, polygone, traegt, ueberdeckungen)
+    if i is None:
+        return None
+    return _in_ueberdeckung(p, max(radius, 0.0), polygone[i], ueberdeckungen[i], traegt[i])
+
+
+def linie_in_ueberdeckung(
+    von: Punkt, bis: Punkt, radius_bei: Callable[[float], float],
+    polygone: Sequence[Sequence[Punkt]], traegt: Sequence[bool], ueberdeckungen: Sequence[float],
+) -> Optional[Tuple[Punkt, Punkt]]:
+    """
+    Anfang und Ende einer Stablinie in der Ueberdeckung -- jedes Ende wie ein
+    Stab, mit der Ueberdeckung, die an ihrer Mitte gilt. Sind zwei Raender
+    gleich nah, verschiebt sich das Ende quer zur Linie.
+
+    ``radius_bei(laenge)`` ist der Radius ihrer Staebe. Bei einer
+    verschmierten Linie haengt er an ihrer Laenge
+    (:func:`aequivalenter_durchmesser`), und die aendert sich mit dem
+    Verschieben: gerechnet wird darum, bis beide zueinander passen -- ein
+    zweites Mal verschoben, bleibt die Linie stehen. Nichts ohne
+    Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
+    """
+    mitte = ((von[0] + bis[0]) / 2.0, (von[1] + bis[1]) / 2.0)
+    i = ueberdeckung_von(mitte, polygone, traegt, ueberdeckungen)
+    if i is None:
+        return None
+    laengs = (bis[0] - von[0], bis[1] - von[1])
+    laenge = math.hypot(*laengs)
+    for _ in range(50):
+        if laenge <= TOLERANZ:
+            return None
+        radius = max(radius_bei(laenge), 0.0)
+        anfang, ende = (_in_ueberdeckung(p, radius, polygone[i], ueberdeckungen[i],
+                                         traegt[i], laengs) for p in (von, bis))
+        if anfang is None or ende is None:
+            return None
+        neu = math.hypot(ende[0] - anfang[0], ende[1] - anfang[1])
+        if abs(neu - laenge) <= TOLERANZ:
+            break
+        laenge = neu
+    if neu <= TOLERANZ:
+        return None
+    return anfang, ende

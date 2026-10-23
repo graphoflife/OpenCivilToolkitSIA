@@ -4181,6 +4181,7 @@
         "summe",
         "_kanten",
         "_kreuz",
+        "naechster_auf_strecke",
         "abstand_zur_strecke",
         "abstand_zum_rand",
         "lage",
@@ -4198,7 +4199,16 @@
         "Linienart",
         "Stablinie",
         "_halb_auf",
-        "stablinie"
+        "stablinie",
+        "aequivalenter_durchmesser",
+        "_schnitt_der_geraden",
+        "versetzt",
+        "ueberdeckungspolygon",
+        "naechster_randpunkt",
+        "ueberdeckung_von",
+        "_in_ueberdeckung",
+        "stab_in_ueberdeckung",
+        "linie_in_ueberdeckung"
       ]
     },
     {

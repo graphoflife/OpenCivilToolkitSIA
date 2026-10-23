@@ -264,3 +264,93 @@ class TestStablinie(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestUeberdeckung(unittest.TestCase):
+    """
+    Die Ueberdeckung, eine Hilfe beim Zeichnen: das gerueckte Polygon und
+    wohin Bewehrung muss, damit sie mit ihrem Radius gerade in ihm liegt --
+    am Rechteck 300 × 600 mit c = 30, von Hand nachzurechnen.
+    """
+
+    R = rechteck(0, 0, 300, 600)
+
+    def assertPunkt(self, p, soll, delta=1e-9):
+        self.assertAlmostEqual(p[0], soll[0], delta=delta)
+        self.assertAlmostEqual(p[1], soll[1], delta=delta)
+
+    def test_rechteck_nach_innen_in_beiden_umlaufsinnen(self):
+        for punkte in (self.R, list(reversed(self.R))):
+            innen = geo.versetzt(punkte, 30)
+            self.assertEqual(sorted(innen), [(30, 30), (30, 570), (270, 30), (270, 570)])
+
+    def test_aussparung_nach_aussen(self):
+        self.assertEqual(sorted(geo.versetzt(self.R, -30)),
+                         [(-30, -30), (-30, 630), (330, -30), (330, 630)])
+
+    def test_einspringende_ecke_bleibt_spitz(self):
+        l_form = [(0, 0), (600, 0), (600, 200), (200, 200), (200, 800), (0, 800)]
+        self.assertIn((170.0, 170.0), geo.versetzt(l_form, 30))
+
+    def test_kurze_fase_faellt_weg(self):
+        # Die Fase von 20 mm kehrt sich bei 40 mm um: es bleibt ein Rechteck.
+        mit_fase = [(20, 0), (300, 0), (300, 600), (0, 600), (0, 20)]
+        innen = geo.versetzt(mit_fase, 40)
+        self.assertEqual(len(innen), 4)
+        for p in [(40, 40), (260, 40), (260, 560), (40, 560)]:
+            self.assertTrue(any(math.hypot(p[0] - q[0], p[1] - q[1]) < 1e-9 for q in innen), p)
+
+    def test_zu_gross_gibt_nichts(self):
+        self.assertIsNone(geo.versetzt(self.R, 150))
+        self.assertIsNone(geo.versetzt(self.R, 200))
+
+    def test_stab_aus_der_ecke(self):
+        # ⌀20 in der Ecke: c + r = 40 von beiden Raendern.
+        self.assertPunkt(geo.stab_in_ueberdeckung((0, 0), 10, [self.R], [True], [30.0]), (40, 40))
+        # Auf der Ecke des Hilfspolygons gezeichnet: der Radius fehlt noch.
+        self.assertPunkt(geo.stab_in_ueberdeckung((30, 30), 8, [self.R], [True], [30.0]), (38, 38))
+
+    def test_stab_am_rand_nur_quer(self):
+        self.assertPunkt(geo.stab_in_ueberdeckung((150, 0), 8, [self.R], [True], [30.0]), (150, 38))
+
+    def test_stab_weit_genug_innen_bleibt(self):
+        self.assertEqual(geo.stab_in_ueberdeckung((150, 300), 8, [self.R], [True], [30.0]), (150, 300))
+
+    def test_ohne_ueberdeckung_nichts(self):
+        self.assertIsNone(geo.stab_in_ueberdeckung((0, 0), 8, [self.R], [True], [0.0]))
+
+    def test_aussparung_schiebt_hinaus(self):
+        loch = rechteck(100, 200, 100, 200)
+        p = geo.stab_in_ueberdeckung((150, 210), 8, [self.R, loch], [True, False], [30.0, 20.0])
+        # Am naechsten ist der untere Rand des Lochs: 28 unter ihm.
+        self.assertPunkt(p, (150, 172))
+
+    def test_nachbar_zieht_nichts_hinueber(self):
+        # Zwei Polygone uebereinander; nur das untere hat eine Ueberdeckung.
+        unten, oben = rechteck(0, 0, 300, 300), rechteck(0, 300, 300, 300)
+        im_oberen = (150, 310)
+        self.assertEqual(geo.stab_in_ueberdeckung(im_oberen, 8, [unten, oben], [True, True],
+                                                  [30.0, 0.0]), None)
+
+    def test_linie_entlang_der_kante(self):
+        enden = geo.linie_in_ueberdeckung((0, 0), (300, 0), lambda _: 8.0, [self.R], [True], [30.0])
+        self.assertPunkt(enden[0], (38, 38))
+        self.assertPunkt(enden[1], (262, 38))
+
+    def test_aequivalenter_durchmesser(self):
+        # 1000 mm² auf 1000 mm, je 150 mm ein Stab: 150 mm² je Stab.
+        self.assertAlmostEqual(geo.aequivalenter_durchmesser(1000.0, 1000.0),
+                               math.sqrt(4 * 150 / math.pi))
+
+    def test_verschmiert_passt_zur_neuen_laenge_und_bleibt(self):
+        def radius(laenge):
+            return geo.aequivalenter_durchmesser(1000.0, laenge) / 2.0
+        von, bis = geo.linie_in_ueberdeckung((0, 0), (300, 0), radius, [self.R], [True], [30.0])
+        laenge = bis[0] - von[0]
+        # Der Radius gehoert zur verschobenen Linie, nicht zur gezeichneten.
+        self.assertAlmostEqual(von[1], 30.0 + radius(laenge), delta=1e-5)
+        self.assertAlmostEqual(von[0], 30.0 + radius(laenge), delta=1e-5)
+        nochmals = geo.linie_in_ueberdeckung(von, bis, radius, [self.R], [True], [30.0])
+        self.assertPunkt(nochmals[0], von, delta=1e-5)
+        self.assertPunkt(nochmals[1], bis, delta=1e-5)
+

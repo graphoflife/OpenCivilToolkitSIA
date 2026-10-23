@@ -1,5 +1,5 @@
 ---
-erzeugt: 8bea87a4d8a1
+erzeugt: 035bb5dcf2a6
 art: modul
 tags: [modul]
 ---
@@ -81,6 +81,7 @@ Ein Polygon des Querschnitts. Ohne Material ist es eine Aussparung.
 - `kennung: str = ''`
 - `knoten: List[str] = field(default_factory=list)` – Die Ecken als Knoten, der Reihe nach; die erste wird am Ende nicht wiederholt.
 - `material: str = ''` – Kennung des Materials; leer heisst Aussparung.
+- `ueberdeckung: float = bereich(0.0, heisst='Überdeckung c', einheit=MM, ab=0.0)` – Die Ueberdeckung der Bewehrung in mm, eine Hilfe beim Zeichnen: ueber null zeigt das Zeichenfenster das Polygon so weit nach innen gerueckt -- bei einer Aussparung nach aussen -- und «Überdeckung beachten» schiebt Bewehrung hinein ([[opencivil.querschnitt.geometrie#stab_in_ueberdeckung|stab_in_ueberdeckung]]). Gerechnet wird mit ihr nicht.
 
 #### FlaecheEintrag.ist_aussparung
 
@@ -300,7 +301,7 @@ Ein Element, das auf einen Knoten verweist, den es nicht gibt, steht in
 keiner Liste, sondern in `fehler`. Sein Name bleibt reserviert: die
 Elemente danach heissen weiter so wie vorher.
 
-- `polygone: List[dict]` – Je Polygon `punkte` und `material` (leer: Aussparung).
+- `polygone: List[dict]` – Je Polygon `punkte`, `material` (leer: Aussparung) und `ueberdeckung`.
 - `staebe: List[dict]` – Je Stab `lage`, `durchmesser` und `stahl`.
 - `linien: List[dict]` – Je Stablinie die Felder der Beschreibung, `von` und `bis` als Punkte.
 - `waende: List[dict]` – Je Schubwand die Felder der Beschreibung, `von` und `bis` als Punkte.
@@ -527,6 +528,7 @@ Feldmoment; das Rechteck gibt es als Vorlage im Zeichenfenster.
 
 ## Braucht
 
+- [[opencivil.core.einheiten]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.lesen]]

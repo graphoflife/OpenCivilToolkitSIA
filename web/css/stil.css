@@ -1721,6 +1721,11 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .cad-wand { fill: var(--beide); fill-opacity: .16; stroke: var(--beide); stroke-opacity: .55; stroke-width: 1; }
 .cad-wandachse { fill: none; stroke: var(--beide); stroke-width: 1.6; stroke-dasharray: 9 3 2 3; }
 .cad-hilfslinie { fill: none; stroke: var(--schrift-matt); stroke-width: 1; stroke-dasharray: 2 3; }
+/* Die Überdeckung: das gerückte Polygon, grün gepunktet -- eine Hilfe zum
+   Zeichnen wie die Hilfslinie, aber von ihr zu unterscheiden. */
+.cad-ueberdeckung {
+  fill: none; stroke: #2b8a3e; stroke-width: 1.6; stroke-dasharray: 1.5 3.5; stroke-linecap: round;
+}
 .cad-linie { fill: none; stroke: var(--stahl); stroke-width: 1; stroke-dasharray: 3 3; }
 .cad-linie-flaeche { fill: none; stroke: var(--stahl); stroke-width: 4; stroke-linecap: round; }
 .cad-stab { fill: var(--stahl); stroke: #7a3d14; stroke-width: .8; }

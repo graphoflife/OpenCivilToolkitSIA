@@ -22,8 +22,10 @@
  * Nichts, was in die Rechnung geht. Die Stäbe einer Linie und ihre
  * tatsächliche Teilung, der Schwerpunkt, die Zellen der Schubwände, welches
  * Polygon in welchem liegt, jede Meldung und jeder Name («Linie 2») kommen
- * vom Kern über die Anfrage `geometrie`. Diese Antwort gilt nur, solange die
- * Zeichnung dieselbe ist, nach der gefragt wurde.
+ * vom Kern über die Anfrage `geometrie` -- auch das gerückte Polygon der
+ * Überdeckung und wohin «Überdeckung beachten» die Bewehrung schiebt. Diese
+ * Antwort gilt nur, solange die Zeichnung dieselbe ist, nach der gefragt
+ * wurde.
  */
 
 import { api } from './api.js';
@@ -34,12 +36,14 @@ import {
 } from './cad_ansicht.js';
 import { imSpiel } from './cad_auswahl.js';
 import { cadBereich, cadFenster, cadVergessen, cadWaehlen } from './cad_fenster.js';
-import { abstand, auswahlTeil } from './cad_modell.js';
+import { abstand, auswahlTeil, eckeSchluessel } from './cad_modell.js';
 import { vorlageOeffnen } from './qa_vorlagen.js';
 import {
   auswahl, el, melden, svgEl, zahlfeld,
 } from './dom.js';
-import { aendern, ausVorlage, materialien, projektAendern, zustand } from './zustand.js';
+import {
+  aendern, ausVorlage, feldangabe, materialien, projektAendern, zustand,
+} from './zustand.js';
 
 /**
  * Die Arten des Querschnitts, für das allgemeine Fenster. Eine Bewehrung
@@ -220,9 +224,13 @@ function adapter(kennung) {
     zeichnen,
     punktVorschau,
     linienVorschau,
+    // Der Schwerpunkt und die Ecken der Überdeckung (Benutzer, 2026-10-23).
     fangpunkte: (a) => {
       const g = passendeGeometrie(a);
-      return g?.brutto ? [{ p: [g.brutto.y_S, g.brutto.z_S] }] : [];
+      return [
+        ...(g?.brutto ? [{ p: [g.brutto.y_S, g.brutto.z_S] }] : []),
+        ...(g?.polygone || []).flatMap((x) => (x.ueberdeckung || []).map((p) => ({ p }))),
+      ];
     },
     trefferradius: (a, art, e) => {
       if (art.liste === 'staebe' || art.liste === 'stablinien') return (e.durchmesser || 0) / 2;
@@ -434,6 +442,12 @@ function zeichnen(a, g) {
     }), fehler.get(f.kennung)));
   }
 
+  // Die Überdeckung: das gerückte Polygon, gepunktet -- eine Hilfe zum
+  // Zeichnen, sie rechnet nicht mit.
+  for (const p of geo?.polygone || []) {
+    if (p.ueberdeckung) g.append(svgEl('path', { d: pfad(a.v, p.ueberdeckung), class: 'cad-ueberdeckung' }));
+  }
+
   for (const zelle of geo?.zellen || []) {
     g.append(svgEl('path', {
       d: pfad(a.v, zelle.punkte), class: 'cad-zelle', fill: `url(#qa-schraffur-${a.qa.kennung})`,
@@ -619,7 +633,13 @@ function felderVon(liste, werte, setzen) {
     ];
   }
   if (liste === 'flaechen') {
-    return [zeile('Material', materialwahl('beton', werte.material, (w) => setzen('material', w), true))];
+    return [
+      zeile('Material', materialwahl('beton', werte.material, (w) => setzen('material', w), true)),
+      zeile('c', zahl('ueberdeckung', 'Überdeckung c: das Polygon erscheint so weit nach innen gerückt '
+        + '-- eine Aussparung nach aussen --, mit Ecken zum Fangen. 0: nicht. Rechnet nicht mit.', {
+        schritt: 5, angabe: feldangabe('flaeche', 'ueberdeckung'),
+      }), 'mm'),
+    ];
   }
   return [];
 }
@@ -795,11 +815,17 @@ function infozeilen(a, liste, e) {
     const info = geo?.waende?.find((x) => x.kennung === e.kennung);
     if (info) zeilen.push(`A_sw/s = ${zahlText(info.a_sw_s, 0)} mm²/m`);
   }
-  if (liste === 'flaechen') zeilen.push(`${e.knoten.length} Ecken`);
-  const meldungen = (geo?.meldungen || []).filter((m) => m.elemente.includes(e.kennung));
+  const meldungen = (geo?.meldungen || []).filter((m) => m.elemente.includes(e.kennung)).map((m) => m.text);
+  if (liste === 'flaechen') {
+    zeilen.push(`${e.knoten.length} Ecken`);
+    const p = geo?.polygone?.find((x) => x.kennung === e.kennung);
+    if (e.ueberdeckung > 0 && p && !p.ueberdeckung) {
+      meldungen.push('Die Überdeckung ist zu gross: vom Polygon bleibt nichts übrig.');
+    }
+  }
   return [
     ...zeilen.map((t) => el('p.cad-info', { text: t })),
-    ...meldungen.map((m) => el('p.cad-meldung', { text: m.text })),
+    ...meldungen.map((t) => el('p.cad-meldung', { text: t })),
   ];
 }
 
@@ -837,9 +863,56 @@ function umlauf(z, kennungen) {
   return reihe.length === nachbarn.size ? reihe : null;
 }
 
+/**
+ * Schiebt die gewählte Bewehrung in die Überdeckung -- dorthin, wo der Kern
+ * sagt (`ueberdeckt` in seiner Antwort zur Zeichnung). Ein Stab als Ganzes,
+ * eine Linie Ende für Ende; was sonst am selben Knoten hängt, bleibt liegen.
+ * Ein Schritt für «Rückgängig».
+ */
+function ueberdeckungBeachten(a, bewehrung) {
+  const geo = passendeGeometrie(a);
+  if (!geo) {
+    melden('Die Zeichnung wird noch geprüft -- gleich noch einmal.');
+    return;
+  }
+  const ziele = new Map([...geo.staebe, ...geo.linien].map((x) => [x.kennung, x.ueberdeckt]));
+  const lagen = a.modell.lagen(eintragVon(a.qa.kennung));
+  const schritte = [];
+  for (const { liste, e } of bewehrung) {
+    const ziel = ziele.get(e.kennung);
+    if (!ziel) continue;
+    const enden = liste === 'staebe' ? [[e.kennung, e.knoten, ziel]]
+      : [[eckeSchluessel(e.kennung, 0), e.von, ziel[0]], [eckeSchluessel(e.kennung, 1), e.bis, ziel[1]]];
+    for (const [schluessel, knoten, p] of enden) {
+      const q = lagen.get(knoten);
+      const d = [p[0] - q[0], p[1] - q[1]];
+      if (Math.hypot(d[0], d[1]) > 1e-6) schritte.push([schluessel, d]);
+    }
+  }
+  if (!schritte.length) {
+    melden(bewehrung.some(({ e }) => ziele.get(e.kennung))
+      ? 'Die Bewehrung liegt schon in der Überdeckung.'
+      : 'Für diese Bewehrung gilt keine Überdeckung, oder das Polygon ist dafür zu klein.');
+    return;
+  }
+  a.aendern((zz) => {
+    for (const [schluessel, d] of schritte) a.modell.verschieben(zz, new Set([schluessel]), d);
+  });
+}
+
 function aktionen(a) {
   const z = eintragVon(a.qa.kennung);
   const liste = [];
+  // Bewehrung gewählt, und ein Polygon hat eine Überdeckung: sie beachten.
+  const bewehrung = [...a.auswahl].map((k) => finden(z, k))
+    .filter((x) => x && (x.liste === 'staebe' || x.liste === 'stablinien'));
+  if (bewehrung.length && z.flaechen.some((f) => f.ueberdeckung > 0)) {
+    liste.push({
+      zeichen: '⇲', text: 'Überdeckung beachten',
+      titel: 'Die Bewehrung so verschieben, dass sie mit ihrem Radius gerade ganz in der Überdeckung liegt',
+      tun: () => ueberdeckungBeachten(a, bewehrung),
+    });
+  }
   const reihe = umlauf(z, a.auswahl);
   if (reihe) {
     liste.push({
