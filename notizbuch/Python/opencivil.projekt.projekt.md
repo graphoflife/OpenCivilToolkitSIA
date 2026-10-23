@@ -1,5 +1,5 @@
 ---
-erzeugt: c15e7965734c
+erzeugt: 62006ee3679b
 art: modul
 tags: [modul]
 ---
@@ -35,6 +35,7 @@ Die vollstaendige, speicherbare Beschreibung eines Projekts.
 - `querschnittsanalysen: List[QuerschnittsanalyseEintrag] = field(default_factory=list)` – Gezeichnete Querschnitte: Polygone, Bewehrung, Schubwände.
 - `balkensysteme: List[BalkensystemEintrag] = field(default_factory=list)` – Ebene Rahmen: Knoten, Stäbe, Lager, Lasten, Lastfälle.
 - `grundbrueche: List[GrundbruchEintrag] = field(default_factory=list)` – Flachfundamente mit Grundbruch und Gleiten.
+- `setzungen: List[SetzungEintrag] = field(default_factory=list)` – Flachfundamente auf geschichtetem Baugrund, mit ihrer Setzung.
 - `skripte: List[SkriptEintrag] = field(default_factory=list)` – Die Python-Skripte der App «Python» -- gespeichert, nicht gerechnet.
 
 #### Projekt.material
@@ -220,6 +221,18 @@ ihre Startkombination: wer rechnet, gibt seine Einwirkungen mit
 -- geht als Stichwort an den Eintrag; Winkel in Grad, Masse in m,
 Spannungen in kPa.
 
+#### Projekt.setzung
+
+```python
+def setzung(self, name: str, **felder: Any) -> SetzungEintrag
+```
+
+Eine Setzungsberechnung mit den Vorgaben der Oberflaeche, aber ohne
+ihre Startschicht: wer rechnet, gibt seine Schichten mit `schicht`
+selbst an, von der Sohle an nach unten. Alles Weitere -- `B`,
+`q_E`, `steifigkeit` ... -- geht als Stichwort an den Eintrag;
+Masse in m, Pressungen in kN/m², die zulaessige Setzung in mm.
+
 #### Projekt.skript
 
 ```python
@@ -364,6 +377,18 @@ und auf ihrer Höhe, dort ein langer Streifen; undrainiert flach und
 tief eingebunden, einmal so schräg belastet, dass es keinen
 Widerstand gibt.
 
+#### Projekt._setzungen
+
+```python
+@staticmethod
+def _setzungen(p: 'Projekt') -> None
+```
+
+Das Beispiel der Tabelle 8.4 des Kapitels -- ein Bauwerk 15 × 8 m, starr,
+auf Kiessand über Ton; der Kiessand setzt sich dort nicht, hier fast
+nicht --, das mit 20 mm nicht aufgeht; dazu ein schlaffer Damm mit
+Wiederbelastung, und eine Berechnung ohne Schicht.
+
 #### Projekt._alles_einmal
 
 ```python
@@ -396,6 +421,7 @@ Ein Träger auf zwei Rollen: nichts hält ihn waagrecht -- eine Meldung statt ei
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.projekt.setzung]]
 - [[opencivil.projekt.skript]]
 - [[opencivil.querschnitt.geometrie]]
 - [[opencivil.querschnitt.gesetzwahl]]

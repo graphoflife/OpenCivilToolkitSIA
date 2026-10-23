@@ -1,5 +1,5 @@
 ---
-erzeugt: 7e986a5cce62
+erzeugt: a139bf4efc09
 art: formel
 tags: [formel]
 ---
@@ -37,6 +37,7 @@ $$
 - [[Querkraft und Torsion]]
 - [[Grundbruch]]
 - [[Gleiten]]
+- [[Setzung]]
 - [[Querkraft]]
 - [[Duktilität]]
 - [[Zwängung auf Normalkraft]]

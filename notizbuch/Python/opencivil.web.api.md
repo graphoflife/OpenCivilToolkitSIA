@@ -1,5 +1,5 @@
 ---
-erzeugt: 4babe6c72c58
+erzeugt: 231e22980da9
 art: modul
 tags: [modul]
 ---
@@ -134,6 +134,7 @@ Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks.
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
+- [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.biegung_normalkraft]]
@@ -156,6 +157,7 @@ Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks.
 - [[opencivil.web.balkendaten]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.grundbruchdaten]]
+- [[opencivil.web.setzungsdaten]]
 - [[opencivil.web.umschlag]]
 
 ## Gebraucht von

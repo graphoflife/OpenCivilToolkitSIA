@@ -1,5 +1,5 @@
 ---
-erzeugt: c10ed6d035b7
+erzeugt: 9b1edda3c951
 art: modul
 tags: [modul]
 ---
@@ -410,6 +410,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - `GPA = Einheit('GPa', SPANNUNG, 1000000000.0)`
 - `N_PRO_MM2 = Einheit('N/mm^2', SPANNUNG, 1000000.0, latex='\\mathrm{N}/\\mathrm{mm…`
 - `KN_PRO_M2 = Einheit('kN/m^2', SPANNUNG, 1000.0, latex='\\mathrm{kN}/\\mathrm{m}^{…`
+- `MN_PRO_M2 = Einheit('MN/m^2', SPANNUNG, 1000000.0, latex='\\mathrm{MN}/\\mathrm{m…` – Die M_E-Werte des Baugrunds -- so stehen sie im geologischen Bericht.
 - `NM = Einheit('Nm', MOMENT, 1.0)`
 - `KNM = Einheit('kNm', MOMENT, 1000.0)`
 - `MNM = Einheit('MNm', MOMENT, 1000000.0)`
@@ -440,6 +441,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
 - [[opencivil.geotechnik.grundbruch]]
+- [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.basis]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
@@ -469,6 +471,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.lesen]]
 - [[opencivil.projekt.platte]]
+- [[opencivil.projekt.setzung]]
 - [[opencivil.querschnitt.analyse]]
 - [[opencivil.querschnitt.platte]]
 - [[opencivil.spannungsanalyse.herleitung]]

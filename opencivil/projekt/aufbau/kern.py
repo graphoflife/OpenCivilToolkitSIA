@@ -11,8 +11,9 @@ die beiden Stahlspannungen (:func:`spannungsnachweise`) und den Knickfall
 
 Was nur eine Art braucht, steht bei ihr: :mod:`~opencivil.projekt.aufbau.platte`,
 :mod:`~opencivil.projekt.aufbau.querschnittsanalyse`,
-:mod:`~opencivil.projekt.aufbau.balkensystem` und
-:mod:`~opencivil.projekt.aufbau.grundbruch`. Bis 2026-10-17 stand alles in
+:mod:`~opencivil.projekt.aufbau.balkensystem`,
+:mod:`~opencivil.projekt.aufbau.grundbruch` und
+:mod:`~opencivil.projekt.aufbau.setzung`. Bis 2026-10-17 stand alles in
 einer Datei ``aufbau.py`` von ueber tausend Zeilen.
 """
 
@@ -44,6 +45,7 @@ from opencivil.projekt.eintraege import (
     Gebrauchsliste, KnickEintrag, MaterialEintrag, SpannungsfallEintrag, abgeleiteter_fallname,
 )
 from opencivil.geotechnik.grundbruch import Fundament, Gleiten, Grundbruch
+from opencivil.geotechnik.setzung import Setzung, Setzungsfundament
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.nachweis.qa_gebrauch import RissnormalkraftQA, ZwaengungBiegungQA
 from opencivil.nachweis.qa_knicken import KnickenQA
@@ -169,6 +171,12 @@ class Aufbau:
     gleiten: Dict[str, Gleiten] = field(default_factory=dict)
     """Grundbruch und Gleiten je Fundament."""
 
+    setzungen: Dict[str, Setzungsfundament] = field(default_factory=dict)
+    """Die Fundamente der Setzungsberechnungen, nach Kennung."""
+
+    setzung: Dict[str, Setzung] = field(default_factory=dict)
+    """Die Setzung je Fundament."""
+
     warnungen: List[str] = field(default_factory=list)
 
     #: Die Felder, in denen die Nachweise stehen -- die eine Stelle, an der
@@ -181,7 +189,7 @@ class Aufbau:
                       "spannung_riss", "spannung", "verformung", "knicken",
                       "qa_biegung", "qa_schub", "qa_duktilitaet", "qa_sproede",
                       "qa_rissnormalkraft", "qa_zwaengung_biegung", "qa_spannung_riss",
-                      "qa_spannung", "qa_knicken", "grundbruch", "gleiten")
+                      "qa_spannung", "qa_knicken", "grundbruch", "gleiten", "setzung")
 
     def nachweise_je_feld(self):
         """Alle Nachweise, Feld fuer Feld und in der Reihenfolge der Liste."""

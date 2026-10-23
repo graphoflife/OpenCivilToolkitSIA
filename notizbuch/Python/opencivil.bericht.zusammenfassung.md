@@ -1,5 +1,5 @@
 ---
-erzeugt: f87437244977
+erzeugt: a425df50645d
 art: modul
 tags: [modul]
 ---
@@ -9,9 +9,10 @@ tags: [modul]
 
 ## VERANTWORTUNG
 
-Je Bauteil -- Platte, Querschnittsanalyse oder Grundbruch -- die gefuehrten
-Urteile und darunter die still verfehlten; dazu, was ueber der
-Nachweistabelle steht (Angaben, Bewehrung oder die Faktoren des Grundbruchs)
+Je Bauteil -- Platte, Querschnittsanalyse, Grundbruch oder Setzung -- die
+gefuehrten Urteile und darunter die still verfehlten; dazu, was ueber der
+Nachweistabelle steht (Angaben, Bewehrung, die Faktoren des Grundbruchs oder
+die Schichten der Setzung)
 und was darunter (Hinweise, stille Maengel). Als Bloecke und Saetze, nicht als
 Aussehen: dieselben Stuecke setzt die Oberflaeche
 ([[opencivil.web.api#zusammenfassungen|opencivil.web.api.zusammenfassungen]]) und der Bericht
@@ -166,8 +167,8 @@ def angaben(aufbau: 'Aufbau', kennung: str, loesung: Loesung) -> Tuple[Gleichung
 Was ueber der Nachweistabelle eines Bauteils steht: eine Zeile mit den
 Angaben und eine Tabelle -- bei der Platte ihre Lagen, bei der
 Querschnittsanalyse ihre Staebe und Schubwaende, beim Grundbruch die
-Faktoren der Tragfaehigkeitsformel. Die stehen erst nach dem Rechnen
-fest; darum die Loesung.
+Faktoren der Tragfaehigkeitsformel, bei der Setzung die Schichten mit
+ihrem Anteil. Die stehen erst nach dem Rechnen fest; darum die Loesung.
 
 ### kennzahlen
 
@@ -237,6 +238,7 @@ hoch, beide, getrennt durch `/`.
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
 - [[opencivil.geotechnik.grundbruch]]
+- [[opencivil.geotechnik.setzung]]
 - [[opencivil.projekt]]
 - [[opencivil.querschnitt.platte]]
 

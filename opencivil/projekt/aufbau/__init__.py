@@ -14,7 +14,7 @@ auffallen koennen -- ein Verweis auf ein geloeschtes Material, eine Platte
 ohne Bewehrung.
 
 DIE BAUTEILARTEN:
-Platte, Querschnittsanalyse, Balkensystem und Grundbruch haben je einen Steckbrief
+Platte, Querschnittsanalyse, Balkensystem, Grundbruch und Setzung haben je einen Steckbrief
 (:class:`Bauteilart`) in :data:`BAUTEILE` -- Liste in der Datei, Klasse der
 Eintraege, Vorsilbe der Kennungen, Namensraum, Baufunktion. Wer alle
 Bauteile durchgeht, geht diese Liste durch; eine neue Art kommt dort dazu
@@ -27,7 +27,8 @@ durchgeht. Je Art ein Modul mit ihrer Baufunktion ``bauen``
 (:mod:`~opencivil.projekt.aufbau.platte`,
 :mod:`~opencivil.projekt.aufbau.querschnittsanalyse`,
 :mod:`~opencivil.projekt.aufbau.balkensystem`,
-:mod:`~opencivil.projekt.aufbau.grundbruch`); was mehr als eine braucht, im
+:mod:`~opencivil.projekt.aufbau.grundbruch`,
+:mod:`~opencivil.projekt.aufbau.setzung`); was mehr als eine braucht, im
 Kern (:mod:`~opencivil.projekt.aufbau.kern`): der Aufbau, das Bauteil, die
 Baustoffe, die Stahlspannungen und der Knickfall. Bis 2026-10-17 stand alles
 in einer Datei von ueber tausend Zeilen.
@@ -43,8 +44,11 @@ from opencivil.projekt.balkensystem import BalkensystemEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
+from opencivil.projekt.setzung import SetzungEintrag
 
-from opencivil.projekt.aufbau import balkensystem, grundbruch, platte, querschnittsanalyse
+from opencivil.projekt.aufbau import (
+    balkensystem, grundbruch, platte, querschnittsanalyse, setzung,
+)
 from opencivil.projekt.aufbau.kern import Aufbau, Bauteil, baustoff_bauen, ueberschreibungen_setzen
 
 if TYPE_CHECKING:
@@ -52,7 +56,7 @@ if TYPE_CHECKING:
 
 __all__ = [
     "ANALYSE", "Aufbau", "BALKENSYSTEM", "BAUTEILE", "Bauteil", "Bauteilart", "GRUNDBRUCH",
-    "PLATTE", "aufbauen",
+    "PLATTE", "SETZUNG", "aufbauen",
 ]
 
 
@@ -149,10 +153,13 @@ BALKENSYSTEM = Bauteilart("balkensystem", "balkensysteme", BalkensystemEintrag, 
                           "balkensystem", "Balkensysteme", balkensystem.bauen)
 GRUNDBRUCH = Bauteilart("grundbruch", "grundbrueche", GrundbruchEintrag, "g",
                         "grundbruch", "Grundbruch", grundbruch.bauen)
+#: Die Kennungen w1, w2 ...: «s» tragen schon die Betonstaehle.
+SETZUNG = Bauteilart("setzung", "setzungen", SetzungEintrag, "w", "setzung", "Setzung",
+                     setzung.bauen)
 
 #: Die Bauteilarten, in der Reihenfolge von Baum, Bericht und Rechnung -- ein
 #: Balkensystem liest Werte der Platten und Analysen, also kommt es nach
-#: ihnen; ein Grundbruch liest nichts von den anderen.
+#: ihnen; Grundbruch und Setzung lesen nichts von den anderen.
 #: Wer alle Bauteile durchgeht (Lesen, Kennungen, Aufbau, Zwischenspeicher,
 #: Erkennen einer Datei), geht diese Liste durch.
-BAUTEILE: Tuple[Bauteilart, ...] = (PLATTE, ANALYSE, BALKENSYSTEM, GRUNDBRUCH)
+BAUTEILE: Tuple[Bauteilart, ...] = (PLATTE, ANALYSE, BALKENSYSTEM, GRUNDBRUCH, SETZUNG)

@@ -1,5 +1,5 @@
 ---
-erzeugt: b9412286b398
+erzeugt: 98d79389df58
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -46,6 +46,10 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Fundament]] · 3
 - [[Grundbruch]] · 28
 - [[Gleiten]] · 3
+
+**Setzung**
+
+- [[Setzung]] · 8
 
 ## Formeln von A bis Z
 
@@ -98,6 +102,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Drehung in die Achsen des Stabs]]
 - [[Druckzonenhöhe aus dem Kräftegleichgewicht]] · $x^{+}$
 - [[Druckzonenhöhe bei reiner Biegung]] · $x$
+- [[Einflussfaktor der Rechtecklast]]
 - [[Einwirkung im normierten Diagramm]] · $\bar{E}_{d,x}$
 - [[Erfüllungsgrad]] · $\alpha_{eff,x}$
 - [[Erfüllungsgrad bei fester Normalkraft und fester Richtung]]
@@ -124,6 +129,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Formfaktor s_γ]] · $s_{\gamma}$
 - [[Geländeneigungsfaktor g_c]] · $g_c$
 - [[Geländeneigungsfaktor g_q]] · $g_q$
+- [[Gesamtsetzung]] · $s$
 - [[Gewollte Ausmitte]] · $e_{1d}$
 - [[Gewollte Ausmitte und Ausmitte 2. Ordnung – allgemein]]
 - [[Gleichmässiger Druck, ohne Bewehrung]] · $N_{Rd}^{-}$
@@ -145,6 +151,8 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Kräftegleichgewicht bei M_Ed = 0]]
 - [[Krümmungsbeiwert der Spannungs-Dehnungs-Beziehung]] · $k_{\sigma}$
 - [[Kürzester Abstand zur Resistenzlinie]] · $a$
+- [[Lage des Punktes längs B]] · $y_K$
+- [[Lage des Punktes längs L]] · $x_K$
 - [[Lastneigungsfaktor i_c]] · $i_c$
 - [[Lastneigungsfaktor i_q]] · $i_q$
 - [[Lastneigungsfaktor i_γ]] · $i_{\gamma}$
@@ -181,6 +189,9 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Schnittgrössen längs eines Stabs]]
 - [[Schwerpunkt der zusammengefassten Lage]] · $z_{2,x}$
 - [[Schwerpunkt eines T-Querschnitts]] · $z_{S}$
+- [[Setzung aus Erstbelastung]] · $s_E$
+- [[Setzung aus Wiederbelastung]] · $s_W$
+- [[Setzung einer Teilschicht]]
 - [[Sohlneigungsfaktor b_c]] · $b_c$
 - [[Sohlneigungsfaktor b_q]] · $b_q$
 - [[Sohlneigungsfaktor b_γ]] · $b_{\gamma}$
@@ -230,7 +241,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-114 von 178 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
+114 von 185 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
 - [[Äquivalenter E-Modul über der Normalkraft]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]

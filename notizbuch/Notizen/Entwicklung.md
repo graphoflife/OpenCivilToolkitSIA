@@ -44,6 +44,63 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-23 · Die App «Setzung»
+
+Wunsch des Benutzers: eine Setzungsberechnung im Stil des Grundbruchs, mit
+Bild der Situation -- Breite und Länge des Fundaments, Pressung aus
+Wiederbelastung und aus Erstbelastung, beliebig viele Schichten mit Dicke,
+M_E und M'_E; nachgewiesen wird, dass die Setzung unter einer zulässigen
+bleibt. Die Theorie ist das Kapitel 8 «Setzungsberechnung», das er
+mitgeschickt hat.
+
+- **Gerechnet in Tabellenform, wie Kap. 8.3.** Jede Schicht in gleich dicke
+  Teilschichten von höchstens Δz_max; je Teilschicht J an Ober- und
+  Unterkante, gemittelt (die Spalte «J_K mittel» der Tabelle 8.4), und
+  Δs = J·q_W·Δz/M'_E + J·q_E·Δz/M_E (Kap. 8.5). Die beiden Pressungen gibt
+  der Benutzer getrennt an; aus Aushub und Gebäudegewicht rechnet die App
+  sie nicht selbst. Unter der untersten Schicht gilt der Baugrund als
+  unzusammendrückbar; wie viel J dort noch ankommt, steht unter der Tabelle.
+- **Wo gerechnet wird, sagt die Steifigkeit** (Kap. 8.10): starr im
+  kennzeichnenden Punkt K (0.13 L, 0.13 B, Bild 8.15), schlaff unter der
+  Mitte. «Die maximale Setzung» des Wunsches ist damit beides: beim starren
+  Fundament setzt sich alles gleich, beim schlaffen ist die Mitte am tiefsten.
+- **J nach Boussinesq, die Eckformel und vier Rechtecke.** Die Formel steht
+  nicht im gelieferten Kapitel (es verweist auf Kapitel 3). Sie trifft die
+  Werte J_K der Tabelle 8.4 auf die gedruckte Stelle (428, 378, 336, 302,
+  272 ‰) und die Grenztiefen der Tabelle 8.5, und das Beispiel der Tabelle
+  ergibt 20.5 mm aus dem Ton -- das Kapitel nennt 2.1 cm. Steht im
+  [[TODO]].
+- **Wie der Grundbruch gebaut:** `geotechnik/setzung.py` (Fundament als
+  Vorgaben, Nachweis, Befund), `projekt/setzung.py` (Eintrag, Schichten),
+  `projekt/aufbau/setzung.py`, eine neue Bauteilart `SETZUNG` mit Vorsilbe
+  `w` -- `s` tragen die Betonstähle. Die Oberfläche: `setzung.js` und
+  `sz_zeichnung.js`. Die Bausteine des Bildes (Pfeile, Masse, Text,
+  Schraffur) standen in `gb_zeichnung.js`; sie stehen jetzt in
+  `gb_skizze.js` und gelten für beide. Das Bild des Grundbruchs ist dabei
+  Zeichen für Zeichen gleich geblieben, an allen sechs Fundamenten der
+  beiden Prüfprojekte verglichen. Die Zahlzeile der Maske
+  (`bausteine.zahlzeile`) teilen sich Grundbruch und Setzung ebenso.
+- **Das Bild:** ein Schnitt quer durch das Fundament durch den Punkt, die
+  Schichten als Bänder mit Namen, Dicke, M_E-Werten und ihrem Beitrag zur
+  Setzung, darin J über die Tiefe wie die Kurve E in Bild 8.1, oben rechts
+  der Grundriss mit dem Punkt. Im selben Massstab, ausser der Baugrund wäre
+  flacher als 200 px -- dann überhöht, und die Legende sagt, wie stark.
+- **Eine Schicht hat keinen Schalter.** Ausgeschaltet hätten die Schichten
+  darunter nach oben rücken müssen; die Zeile trägt statt des Schalters ihre
+  Nummer (`fallzeile({vorn})`). Die Namen müssen nicht verschieden sein --
+  zwei Tonschichten heissen beide «Ton»; die Werte tragen die Nummer.
+- **Gesetzt, nicht vom Benutzer** (im [[TODO]] zum Bestätigen): s_zul = 20
+  mm, Δz_max = 0.5 m, die Startschicht 2 m mit M_E = 20 und M'_E = 60
+  MN/m², «starr», und die M_E-Werte in MN/m² statt kN/m² wie im Kapitel.
+  Keine Pressung in einer neuen Berechnung, wie bei neuen Lastfällen
+  (2026-10-19).
+- **Im Beispiel** hat das Fundament der Stütze nun auch seine Setzung, 9.9
+  mm gegen 25 mm; im Prüfprojekt das Beispiel der Tabelle 8.4 (geht mit 20
+  mm nicht auf), ein schlaffer Damm mit Wiederbelastung und eine Setzung
+  ohne Schicht.
+
+---
+
 ## 2026-10-19 · Leere Vorlagen, Lastfälle ohne Einwirkung, Kopieren
 
 Drei Wünsche des Benutzers:

@@ -98,6 +98,12 @@
       "bereich": "Grundbruch"
     },
     {
+      "name": "Setzung",
+      "pfad": "Formelsammlung/Themen/Setzung.md",
+      "art": "thema",
+      "bereich": "Setzung"
+    },
+    {
       "name": "Querkraft",
       "pfad": "Formelsammlung/Themen/Querkraft.md",
       "art": "thema",
@@ -703,6 +709,15 @@
       ]
     },
     {
+      "name": "Einflussfaktor der Rechtecklast",
+      "pfad": "Formelsammlung/Formeln/Einflussfaktor der Rechtecklast.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Setzung"
+      ]
+    },
+    {
       "name": "Einwirkung im normierten Diagramm",
       "pfad": "Formelsammlung/Formeln/Einwirkung im normierten Diagramm.md",
       "art": "formel",
@@ -727,6 +742,7 @@
         "Querkraft und Torsion",
         "Grundbruch",
         "Gleiten",
+        "Setzung",
         "Querkraft",
         "Duktilität",
         "Zwängung auf Normalkraft",
@@ -1006,6 +1022,17 @@
       ]
     },
     {
+      "name": "Gesamtsetzung",
+      "pfad": "Formelsammlung/Formeln/Gesamtsetzung.md",
+      "art": "formel",
+      "zeichen": [
+        "s"
+      ],
+      "themen": [
+        "Setzung"
+      ]
+    },
+    {
       "name": "Gewollte Ausmitte",
       "pfad": "Formelsammlung/Formeln/Gewollte Ausmitte.md",
       "art": "formel",
@@ -1227,6 +1254,30 @@
       ],
       "themen": [
         "Biegung und Normalkraft"
+      ]
+    },
+    {
+      "name": "Lage des Punktes längs B",
+      "pfad": "Formelsammlung/Formeln/Lage des Punktes längs B.md",
+      "art": "formel",
+      "zeichen": [
+        "y_K",
+        "y_M"
+      ],
+      "themen": [
+        "Setzung"
+      ]
+    },
+    {
+      "name": "Lage des Punktes längs L",
+      "pfad": "Formelsammlung/Formeln/Lage des Punktes längs L.md",
+      "art": "formel",
+      "zeichen": [
+        "x_K",
+        "x_M"
+      ],
+      "themen": [
+        "Setzung"
       ]
     },
     {
@@ -1630,6 +1681,37 @@
       ],
       "themen": [
         "Stabquerschnitte"
+      ]
+    },
+    {
+      "name": "Setzung aus Erstbelastung",
+      "pfad": "Formelsammlung/Formeln/Setzung aus Erstbelastung.md",
+      "art": "formel",
+      "zeichen": [
+        "s_E"
+      ],
+      "themen": [
+        "Setzung"
+      ]
+    },
+    {
+      "name": "Setzung aus Wiederbelastung",
+      "pfad": "Formelsammlung/Formeln/Setzung aus Wiederbelastung.md",
+      "art": "formel",
+      "zeichen": [
+        "s_W"
+      ],
+      "themen": [
+        "Setzung"
+      ]
+    },
+    {
+      "name": "Setzung einer Teilschicht",
+      "pfad": "Formelsammlung/Formeln/Setzung einer Teilschicht.md",
+      "art": "formel",
+      "zeichen": [],
+      "themen": [
+        "Setzung"
       ]
     },
     {
@@ -2714,6 +2796,43 @@
       ]
     },
     {
+      "name": "opencivil.geotechnik.setzung",
+      "pfad": "Python/opencivil.geotechnik.setzung.md",
+      "art": "modul",
+      "kurz": "die Setzung eines Flachfundaments auf geschichtetem Baugrund.",
+      "stichworte": [
+        "Steifigkeit",
+        "Steifigkeit.beschriftung",
+        "Steifigkeit.punkt",
+        "Steifigkeit.lage",
+        "einflussfaktor_ecke",
+        "einflussfaktor",
+        "einflusslinie",
+        "Schicht",
+        "Setzungsfundament",
+        "Setzungsfundament.abschnitt",
+        "Setzungsfundament.id_von",
+        "Setzungsfundament.ins_rechenwerk",
+        "Teilschicht",
+        "Teilschicht.mittel",
+        "Teilschicht.J",
+        "Schichtsetzung",
+        "Schichtsetzung.s",
+        "Setzungsbefund",
+        "Setzungsbefund.s_W",
+        "Setzungsbefund.s_E",
+        "Setzungsbefund.s",
+        "Setzung",
+        "Setzung.pruefe",
+        "Setzung._punkt",
+        "Setzung._teilschichten",
+        "Setzung._schichten",
+        "Setzung._fall",
+        "angaben",
+        "schichttabelle"
+      ]
+    },
+    {
       "name": "opencivil.konsole",
       "pfad": "Python/opencivil.konsole.md",
       "art": "modul",
@@ -3663,6 +3782,15 @@
       ]
     },
     {
+      "name": "opencivil.projekt.aufbau.setzung",
+      "pfad": "Python/opencivil.projekt.aufbau.setzung.md",
+      "art": "modul",
+      "kurz": "eine Setzungsberechnung wird Rechnung.",
+      "stichworte": [
+        "bauen"
+      ]
+    },
+    {
       "name": "opencivil.projekt.balkensystem",
       "pfad": "Python/opencivil.projekt.balkensystem.md",
       "art": "modul",
@@ -3869,6 +3997,7 @@
         "Projekt.analyse",
         "Projekt.balkensystem",
         "Projekt.grundbruch",
+        "Projekt.setzung",
         "Projekt.skript",
         "Projekt._einziges",
         "Projekt.rechnen",
@@ -3881,6 +4010,7 @@
         "Projekt.beispiel",
         "Projekt.jeder_nachweis",
         "Projekt._grundbrueche",
+        "Projekt._setzungen",
         "Projekt._alles_einmal",
         "Projekt._beweglich"
       ]
@@ -3929,6 +4059,20 @@
         "QuerschnittsanalyseEintrag.knickfall",
         "QuerschnittsanalyseEintrag.spannungsfall",
         "QuerschnittsanalyseEintrag.neu"
+      ]
+    },
+    {
+      "name": "opencivil.projekt.setzung",
+      "pfad": "Python/opencivil.projekt.setzung.md",
+      "art": "modul",
+      "kurz": "eine Setzungsberechnung, wie die Oberflaeche sie beschreibt.",
+      "stichworte": [
+        "SchichtEintrag",
+        "SetzungEintrag",
+        "SetzungEintrag.neu",
+        "SetzungEintrag.materialien",
+        "SetzungEintrag.bezuege",
+        "SetzungEintrag.schicht"
       ]
     },
     {
@@ -4827,6 +4971,16 @@
         "Handler.do_POST",
         "Handler.log_message",
         "starten"
+      ]
+    },
+    {
+      "name": "opencivil.web.setzungsdaten",
+      "pfad": "Python/opencivil.web.setzungsdaten.md",
+      "art": "modul",
+      "kurz": "was die Oberflaeche von einer Setzung zeichnet.",
+      "stichworte": [
+        "situationen",
+        "situation"
       ]
     },
     {

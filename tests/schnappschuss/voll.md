@@ -1,6 +1,6 @@
 # Voll
 
-345 Berechnungen ausgeführt, 581 Werte bestimmt.
+374 Berechnungen ausgeführt, 610 Werte bestimmt.
 
 ## Herleitung
 
@@ -9012,6 +9012,365 @@ $$
 \alpha_{eff,GL,\text{Tragsicherheit}} = \frac{T_{Rd}}{T_{Ed}} = \frac{0\,\mathrm{kN}}{30\,\mathrm{kN}} = 0.00 \quad \Rightarrow \quad \text{NICHT erfüllt}
 $$
 
+### Setzung: Bauwerk
+
+**Breite des Fundaments**
+
+$$
+B = 8\,\mathrm{m}
+$$
+
+**Länge des Fundaments**
+
+$$
+L = 15\,\mathrm{m}
+$$
+
+**Pressung aus Wiederbelastung**
+
+$$
+q_W = 0\,\mathrm{kN}/\mathrm{m}^{2}
+$$
+
+**Pressung aus Erstbelastung**
+
+$$
+q_E = 60\,\mathrm{kN}/\mathrm{m}^{2}
+$$
+
+**Zulässige Setzung**
+
+$$
+s_{zul} = 20\,\mathrm{mm}
+$$
+
+**Grösste Dicke einer Teilschicht**
+
+$$
+\Delta z_{max} = 1\,\mathrm{m}
+$$
+
+**Dicke der Schicht 1**
+
+$$
+d_{1} = 5\,\mathrm{m}
+$$
+
+**M\_E-Wert der Schicht 1, Erstbelastung**
+
+$$
+M_{E,1} = 1000\,\mathrm{MN}/\mathrm{m}^{2}
+$$
+
+**M\_E-Wert der Schicht 1, Wiederbelastung**
+
+$$
+M'_{E,1} = 3000\,\mathrm{MN}/\mathrm{m}^{2}
+$$
+
+**Dicke der Schicht 2**
+
+$$
+d_{2} = 4\,\mathrm{m}
+$$
+
+**M\_E-Wert der Schicht 2, Erstbelastung**
+
+$$
+M_{E,2} = 4\,\mathrm{MN}/\mathrm{m}^{2}
+$$
+
+**M\_E-Wert der Schicht 2, Wiederbelastung**
+
+$$
+M'_{E,2} = 24\,\mathrm{MN}/\mathrm{m}^{2}
+$$
+
+### Setzung
+
+**Setzung einer Teilschicht** *(Kap. 8.5)*
+
+$$
+\Delta s = \frac{\bar{J} \, q_W \, \Delta z}{M'_E} + \frac{\bar{J} \, q_E \, \Delta z}{M_E} \qquad \bar{J} = \frac{J_o + J_u}{2} \qquad s = \sum \Delta s
+$$
+
+#### Einflussfaktor unter dem Punkt K
+
+Starres Fundament: gerechnet wird im kennzeichnenden Punkt K -- dort setzt sich die schlaffe Last so stark, wie sich das starre Fundament im Mittel setzt.
+
+**Abstand des Punktes K von der Ecke, längs L** *(Kap. 8.10, Bild 8.15)*
+
+$$
+x_K = 0.13 \cdot L = 0.13 \cdot 15\,\mathrm{m} = 1.95\,\mathrm{m}
+$$
+
+**Abstand des Punktes K von der Ecke, längs B** *(Kap. 8.10, Bild 8.15)*
+
+$$
+y_K = 0.13 \cdot B = 0.13 \cdot 8\,\mathrm{m} = 1.04\,\mathrm{m}
+$$
+
+**Einflussfaktor nach Boussinesq in der Tiefe z: die vier Rechtecke, die sich im Punkt treffen** *(Kap. 8.2)*
+
+$$
+\begin{aligned} J &= J_E(x, y) + J_E(L - x, y) + J_E(x, B - y) + J_E(L - x, B - y) \\ J_E(a, b) &= \frac{1}{2\pi} \left[\arctan\frac{a \, b}{z \, R} + \frac{a \, b \, z}{R} \left(\frac{1}{a^2 + z^2} + \frac{1}{b^2 + z^2}\right)\right] \qquad R = \sqrt{a^2 + b^2 + z^2} \end{aligned}
+$$
+
+#### Teilschichten
+
+Jede Schicht in gleich dicke Teilschichten von höchstens Δz\_max = 1 m; J an Ober- und Unterkante, gemittelt. z ab der Sohle.
+
+**Setzung je Teilschicht**
+
+| Schicht | $z_o\ [\mathrm{m}]$ | $z_u\ [\mathrm{m}]$ | $J_o$ | $J_u$ | $\bar{J}$ | $\Delta s_W\ [\mathrm{mm}]$ | $\Delta s_E\ [\mathrm{mm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Kiessand | $0.00$ | $1.00$ | $1.000$ | $0.899$ | $0.949$ | $0.00$ | $0.06$ |
+| Kiessand | $1.00$ | $2.00$ | $0.899$ | $0.713$ | $0.806$ | $0.00$ | $0.05$ |
+| Kiessand | $2.00$ | $3.00$ | $0.713$ | $0.582$ | $0.648$ | $0.00$ | $0.04$ |
+| Kiessand | $3.00$ | $4.00$ | $0.582$ | $0.493$ | $0.537$ | $0.00$ | $0.03$ |
+| Kiessand | $4.00$ | $5.00$ | $0.493$ | $0.428$ | $0.460$ | $0.00$ | $0.03$ |
+| Ton | $5.00$ | $6.00$ | $0.428$ | $0.378$ | $0.403$ | $0.00$ | $6.04$ |
+| Ton | $6.00$ | $7.00$ | $0.378$ | $0.336$ | $0.357$ | $0.00$ | $5.36$ |
+| Ton | $7.00$ | $8.00$ | $0.336$ | $0.302$ | $0.319$ | $0.00$ | $4.79$ |
+| Ton | $8.00$ | $9.00$ | $0.302$ | $0.272$ | $0.287$ | $0.00$ | $4.30$ |
+
+**Setzung je Schicht**
+
+| Schicht | $z_o\ [\mathrm{m}]$ | $z_u\ [\mathrm{m}]$ | $M'_E\ [\mathrm{MN}/\mathrm{m}^{2}]$ | $M_E\ [\mathrm{MN}/\mathrm{m}^{2}]$ | $s_W\ [\mathrm{mm}]$ | $s_E\ [\mathrm{mm}]$ | $s\ [\mathrm{mm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Kiessand | $0.00$ | $5.00$ | $3000.0$ | $1000.0$ | $0.00$ | $0.20$ | $0.20$ |
+| Ton | $5.00$ | $9.00$ | $24.0$ | $4.0$ | $0.00$ | $20.49$ | $20.49$ |
+
+Am Fuss der untersten Schicht, z = 9.00 m unter der Sohle, kommt noch J = 0.272 der Pressung an; darunter gilt der Baugrund als unzusammendrückbar (Kap. 8.4).
+
+#### Setzung gegen zulässige Setzung
+
+**Setzung aus Wiederbelastung** *(Kap. 8.5)*
+
+$$
+s_W = \sum \Delta s_W = 0\,\mathrm{mm}
+$$
+
+**Setzung aus Erstbelastung** *(Kap. 8.5)*
+
+$$
+s_E = \sum \Delta s_E = 20.7\,\mathrm{mm}
+$$
+
+**Setzung** *(Kap. 8.2)*
+
+$$
+s = s_W + s_E = 0\,\mathrm{mm} + 20.7\,\mathrm{mm} = 20.7\,\mathrm{mm}
+$$
+
+**Setzung gegen zulässige Setzung**
+
+$$
+s = 20.7\,\mathrm{mm} \quad > \quad s_{zul} = 20\,\mathrm{mm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,s} = \frac{s_{zul}}{s} = \frac{20\,\mathrm{mm}}{20.7\,\mathrm{mm}} = 0.97 \quad \Rightarrow \quad \text{NICHT erfüllt}
+$$
+
+### Setzung: Damm
+
+**Breite des Fundaments**
+
+$$
+B = 6\,\mathrm{m}
+$$
+
+**Länge des Fundaments**
+
+$$
+L = 40\,\mathrm{m}
+$$
+
+**Pressung aus Wiederbelastung**
+
+$$
+q_W = 20\,\mathrm{kN}/\mathrm{m}^{2}
+$$
+
+**Pressung aus Erstbelastung**
+
+$$
+q_E = 80\,\mathrm{kN}/\mathrm{m}^{2}
+$$
+
+**Zulässige Setzung**
+
+$$
+s_{zul} = 120\,\mathrm{mm}
+$$
+
+**Grösste Dicke einer Teilschicht**
+
+$$
+\Delta z_{max} = 0.5\,\mathrm{m}
+$$
+
+**Dicke der Schicht 1**
+
+$$
+d_{1} = 1.5\,\mathrm{m}
+$$
+
+**M\_E-Wert der Schicht 1, Erstbelastung**
+
+$$
+M_{E,1} = 8\,\mathrm{MN}/\mathrm{m}^{2}
+$$
+
+**M\_E-Wert der Schicht 1, Wiederbelastung**
+
+$$
+M'_{E,1} = 30\,\mathrm{MN}/\mathrm{m}^{2}
+$$
+
+**Dicke der Schicht 2**
+
+$$
+d_{2} = 6\,\mathrm{m}
+$$
+
+**M\_E-Wert der Schicht 2, Erstbelastung**
+
+$$
+M_{E,2} = 5\,\mathrm{MN}/\mathrm{m}^{2}
+$$
+
+**M\_E-Wert der Schicht 2, Wiederbelastung**
+
+$$
+M'_{E,2} = 25\,\mathrm{MN}/\mathrm{m}^{2}
+$$
+
+**Dicke der Schicht 3**
+
+$$
+d_{3} = 4\,\mathrm{m}
+$$
+
+**M\_E-Wert der Schicht 3, Erstbelastung**
+
+$$
+M_{E,3} = 7\,\mathrm{MN}/\mathrm{m}^{2}
+$$
+
+**M\_E-Wert der Schicht 3, Wiederbelastung**
+
+$$
+M'_{E,3} = 35\,\mathrm{MN}/\mathrm{m}^{2}
+$$
+
+### Setzung
+
+**Setzung einer Teilschicht** *(Kap. 8.5)*
+
+$$
+\Delta s = \frac{\bar{J} \, q_W \, \Delta z}{M'_E} + \frac{\bar{J} \, q_E \, \Delta z}{M_E} \qquad \bar{J} = \frac{J_o + J_u}{2} \qquad s = \sum \Delta s
+$$
+
+#### Einflussfaktor unter der Mitte
+
+Schlaffes Fundament: gerechnet wird unter der Mitte, wo die Setzungsmulde am tiefsten ist.
+
+**Abstand der Mitte von der Ecke, längs L** *(Kap. 8.10)*
+
+$$
+x_M = \frac{L}{2} = \frac{40\,\mathrm{m}}{2} = 20\,\mathrm{m}
+$$
+
+**Abstand der Mitte von der Ecke, längs B** *(Kap. 8.10)*
+
+$$
+y_M = \frac{B}{2} = \frac{6\,\mathrm{m}}{2} = 3\,\mathrm{m}
+$$
+
+**Einflussfaktor nach Boussinesq in der Tiefe z: die vier Rechtecke, die sich im Punkt treffen** *(Kap. 8.2)*
+
+$$
+\begin{aligned} J &= J_E(x, y) + J_E(L - x, y) + J_E(x, B - y) + J_E(L - x, B - y) \\ J_E(a, b) &= \frac{1}{2\pi} \left[\arctan\frac{a \, b}{z \, R} + \frac{a \, b \, z}{R} \left(\frac{1}{a^2 + z^2} + \frac{1}{b^2 + z^2}\right)\right] \qquad R = \sqrt{a^2 + b^2 + z^2} \end{aligned}
+$$
+
+#### Teilschichten
+
+Jede Schicht in gleich dicke Teilschichten von höchstens Δz\_max = 0.5 m; J an Ober- und Unterkante, gemittelt. z ab der Sohle.
+
+**Setzung je Teilschicht**
+
+| Schicht | $z_o\ [\mathrm{m}]$ | $z_u\ [\mathrm{m}]$ | $J_o$ | $J_u$ | $\bar{J}$ | $\Delta s_W\ [\mathrm{mm}]$ | $\Delta s_E\ [\mathrm{mm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Auffüllung | $0.00$ | $0.50$ | $1.000$ | $0.998$ | $0.999$ | $0.33$ | $5.00$ |
+| Auffüllung | $0.50$ | $1.00$ | $0.998$ | $0.986$ | $0.992$ | $0.33$ | $4.96$ |
+| Auffüllung | $1.00$ | $1.50$ | $0.986$ | $0.959$ | $0.973$ | $0.32$ | $4.86$ |
+| Seeton | $1.50$ | $2.00$ | $0.959$ | $0.919$ | $0.939$ | $0.38$ | $7.52$ |
+| Seeton | $2.00$ | $2.50$ | $0.919$ | $0.871$ | $0.895$ | $0.36$ | $7.16$ |
+| Seeton | $2.50$ | $3.00$ | $0.871$ | $0.818$ | $0.844$ | $0.34$ | $6.76$ |
+| Seeton | $3.00$ | $3.50$ | $0.818$ | $0.765$ | $0.792$ | $0.32$ | $6.33$ |
+| Seeton | $3.50$ | $4.00$ | $0.765$ | $0.715$ | $0.740$ | $0.30$ | $5.92$ |
+| Seeton | $4.00$ | $4.50$ | $0.715$ | $0.667$ | $0.691$ | $0.28$ | $5.53$ |
+| Seeton | $4.50$ | $5.00$ | $0.667$ | $0.624$ | $0.646$ | $0.26$ | $5.17$ |
+| Seeton | $5.00$ | $5.50$ | $0.624$ | $0.584$ | $0.604$ | $0.24$ | $4.83$ |
+| Seeton | $5.50$ | $6.00$ | $0.584$ | $0.548$ | $0.566$ | $0.23$ | $4.53$ |
+| Seeton | $6.00$ | $6.50$ | $0.548$ | $0.515$ | $0.532$ | $0.21$ | $4.25$ |
+| Seeton | $6.50$ | $7.00$ | $0.515$ | $0.486$ | $0.501$ | $0.20$ | $4.00$ |
+| Seeton | $7.00$ | $7.50$ | $0.486$ | $0.459$ | $0.472$ | $0.19$ | $3.78$ |
+| Ton | $7.50$ | $8.00$ | $0.459$ | $0.434$ | $0.446$ | $0.13$ | $2.55$ |
+| Ton | $8.00$ | $8.50$ | $0.434$ | $0.412$ | $0.423$ | $0.12$ | $2.42$ |
+| Ton | $8.50$ | $9.00$ | $0.412$ | $0.391$ | $0.401$ | $0.11$ | $2.29$ |
+| Ton | $9.00$ | $9.50$ | $0.391$ | $0.372$ | $0.382$ | $0.11$ | $2.18$ |
+| Ton | $9.50$ | $10.00$ | $0.372$ | $0.355$ | $0.363$ | $0.10$ | $2.08$ |
+| Ton | $10.00$ | $10.50$ | $0.355$ | $0.339$ | $0.347$ | $0.10$ | $1.98$ |
+| Ton | $10.50$ | $11.00$ | $0.339$ | $0.324$ | $0.331$ | $0.09$ | $1.89$ |
+| Ton | $11.00$ | $11.50$ | $0.324$ | $0.310$ | $0.317$ | $0.09$ | $1.81$ |
+
+**Setzung je Schicht**
+
+| Schicht | $z_o\ [\mathrm{m}]$ | $z_u\ [\mathrm{m}]$ | $M'_E\ [\mathrm{MN}/\mathrm{m}^{2}]$ | $M_E\ [\mathrm{MN}/\mathrm{m}^{2}]$ | $s_W\ [\mathrm{mm}]$ | $s_E\ [\mathrm{mm}]$ | $s\ [\mathrm{mm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Auffüllung | $0.00$ | $1.50$ | $30.0$ | $8.0$ | $0.99$ | $14.82$ | $15.81$ |
+| Seeton | $1.50$ | $7.50$ | $25.0$ | $5.0$ | $3.29$ | $65.78$ | $69.07$ |
+| Ton | $7.50$ | $11.50$ | $35.0$ | $7.0$ | $0.86$ | $17.20$ | $18.06$ |
+
+Am Fuss der untersten Schicht, z = 11.50 m unter der Sohle, kommt noch J = 0.310 der Pressung an; darunter gilt der Baugrund als unzusammendrückbar (Kap. 8.4).
+
+#### Setzung gegen zulässige Setzung
+
+**Setzung aus Wiederbelastung** *(Kap. 8.5)*
+
+$$
+s_W = \sum \Delta s_W = 5.1\,\mathrm{mm}
+$$
+
+**Setzung aus Erstbelastung** *(Kap. 8.5)*
+
+$$
+s_E = \sum \Delta s_E = 97.8\,\mathrm{mm}
+$$
+
+**Setzung** *(Kap. 8.2)*
+
+$$
+s = s_W + s_E = 5.1\,\mathrm{mm} + 97.8\,\mathrm{mm} = 102.9\,\mathrm{mm}
+$$
+
+**Setzung gegen zulässige Setzung**
+
+$$
+s = 102.9\,\mathrm{mm} \quad \le \quad s_{zul} = 120\,\mathrm{mm}
+$$
+
+**Erfüllungsgrad**
+
+$$
+\alpha_{eff,s} = \frac{s_{zul}}{s} = \frac{120\,\mathrm{mm}}{102.9\,\mathrm{mm}} = 1.17 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
 ### Balkensystem: Alles einmal
 
 **Querschnittsfläche, «Balken 300×500» (Rechteck)**
@@ -10833,6 +11192,64 @@ $$
 T_{Rd} = N_{Ed} \cdot \tan \delta^{*}
 $$
 
+### Setzung
+
+Unter der Last drückt sich das Korngerüst des Bodens zusammen. Je Teilschicht zählt die Zusatzspannung, die von der Pressung in der Sohle in ihrer Tiefe noch ankommt, und der M\_E-Wert ihrer Schicht: was den Boden nur wieder so stark belastet, wie er schon einmal belastet war, mit dem Modul der Wiederbelastung M'\_E, was darüber hinausgeht, mit dem der Erstbelastung M\_E. Unter der untersten Schicht gilt der Baugrund als unzusammendrückbar.
+
+**Setzung einer Teilschicht** *(Kap. 8.5)*
+
+$$
+\Delta s = \frac{\bar{J} \, q_W \, \Delta z}{M'_E} + \frac{\bar{J} \, q_E \, \Delta z}{M_E} \qquad \bar{J} = \frac{J_o + J_u}{2} \qquad s = \sum \Delta s
+$$
+
+**Abstand des Punktes K von der Ecke, längs L** *(Kap. 8.10, Bild 8.15)*
+
+$$
+x_K = 0.13 \cdot L
+$$
+
+**Abstand des Punktes K von der Ecke, längs B** *(Kap. 8.10, Bild 8.15)*
+
+$$
+y_K = 0.13 \cdot B
+$$
+
+**Einflussfaktor nach Boussinesq in der Tiefe z: die vier Rechtecke, die sich im Punkt treffen** *(Kap. 8.2)*
+
+$$
+\begin{aligned} J &= J_E(x, y) + J_E(L - x, y) + J_E(x, B - y) + J_E(L - x, B - y) \\ J_E(a, b) &= \frac{1}{2\pi} \left[\arctan\frac{a \, b}{z \, R} + \frac{a \, b \, z}{R} \left(\frac{1}{a^2 + z^2} + \frac{1}{b^2 + z^2}\right)\right] \qquad R = \sqrt{a^2 + b^2 + z^2} \end{aligned}
+$$
+
+**Setzung aus Wiederbelastung** *(Kap. 8.5)*
+
+$$
+s_W = \sum \Delta s_W
+$$
+
+**Setzung aus Erstbelastung** *(Kap. 8.5)*
+
+$$
+s_E = \sum \Delta s_E
+$$
+
+**Setzung** *(Kap. 8.2)*
+
+$$
+s = s_W + s_E
+$$
+
+**Abstand der Mitte von der Ecke, längs L** *(Kap. 8.10)*
+
+$$
+x_M = \frac{L}{2}
+$$
+
+**Abstand der Mitte von der Ecke, längs B** *(Kap. 8.10)*
+
+$$
+y_M = \frac{B}{2}
+$$
+
 ### Kennzahlen
 
 Was die Platte in x aufnimmt, ohne Bezug auf eine Einwirkung: die Eckwerte der Handrechnung mit Bemessungswerten und der Querkraftwiderstand ohne Normalkraft. Wo eine Seite massgebend ist, gilt das Kleinere beider Seiten.
@@ -11507,9 +11924,52 @@ $$
 
 > **Warnung:** Gleiten – Tragsicherheit: nicht erfüllt. T\_Rd = 0 kN \< T\_Ed = 30 kN.
 
+### Bauwerk
+
+**Angaben zum Fundament**
+
+$$
+B = 8\,\mathrm{m} \qquad L = 15\,\mathrm{m} \qquad q_W = 0\,\mathrm{kN}/\mathrm{m}^{2} \qquad q_E = 60\,\mathrm{kN}/\mathrm{m}^{2} \qquad \text{starr, Punkt K}
+$$
+
+**Schichten**
+
+| Schicht | $z\ [\mathrm{m}]$ | $M_E\ [\mathrm{MN}/\mathrm{m}^{2}]$ | $M'_E\ [\mathrm{MN}/\mathrm{m}^{2}]$ | $s_W\ [\mathrm{mm}]$ | $s_E\ [\mathrm{mm}]$ | $s\ [\mathrm{mm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Kiessand | $0.00 – 5.00$ | $1000.0$ | $3000.0$ | $0.0$ | $0.2$ | $0.2$ |
+| Ton | $5.00 – 9.00$ | $4.0$ | $24.0$ | $0.0$ | $20.5$ | $20.5$ |
+
+| Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Setzung | starr, Punkt K | $s_{zul} = 20.0\,\mathrm{mm}$ | $s = 20.7\,\mathrm{mm}$ | $0.97$ |
+
+> **Warnung:** Setzung – starr, Punkt K: nicht erfüllt. s = 20.7 mm \> s\_zul = 20 mm.
+
+### Damm
+
+**Angaben zum Fundament**
+
+$$
+B = 6\,\mathrm{m} \qquad L = 40\,\mathrm{m} \qquad q_W = 20\,\mathrm{kN}/\mathrm{m}^{2} \qquad q_E = 80\,\mathrm{kN}/\mathrm{m}^{2} \qquad \text{schlaff, Mitte}
+$$
+
+**Schichten**
+
+| Schicht | $z\ [\mathrm{m}]$ | $M_E\ [\mathrm{MN}/\mathrm{m}^{2}]$ | $M'_E\ [\mathrm{MN}/\mathrm{m}^{2}]$ | $s_W\ [\mathrm{mm}]$ | $s_E\ [\mathrm{mm}]$ | $s\ [\mathrm{mm}]$ |
+| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Auffüllung | $0.00 – 1.50$ | $8.0$ | $30.0$ | $1.0$ | $14.8$ | $15.8$ |
+| Seeton | $1.50 – 7.50$ | $5.0$ | $25.0$ | $3.3$ | $65.8$ | $69.1$ |
+| Ton | $7.50 – 11.50$ | $7.0$ | $35.0$ | $0.9$ | $17.2$ | $18.1$ |
+
+| Nachweis | Bezeichnung | Widerstand | Einwirkung | $\alpha_{eff}$ |
+| :--- | :--- | ---: | ---: | ---: |
+| Setzung | schlaff, Mitte | $s_{zul} = 120.0\,\mathrm{mm}$ | $s = 102.9\,\mathrm{mm}$ | $1.17$ |
+
 Mindestens ein Nachweis ist nicht erfüllt.
 
 > **Warnung:** Platte 'Ohne x': ohne x-Bewehrung kein Verformungsnachweis.
+
+> **Warnung:** Setzung 'Ohne Schicht': keine Schicht → kein Nachweis.
 
 ## Werte
 
@@ -12096,3 +12556,32 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Erfüllungsgrad Zwängung auf Biegung – Zug unten | $\alpha_{eff,ZB,\text{Zug unten}}$ | $5.20$ |  | berechnet |
 | Schwerpunkt, y | $y_S$ | $200$ | mm | berechnet |
 | Schwerpunkt, z | $z_S$ | $200$ | mm | berechnet |
+| Breite des Fundaments | $B$ | $8$ | m | Vorgabe |
+| Länge des Fundaments | $L$ | $15$ | m | Vorgabe |
+| M\_E-Wert der Schicht 1, Erstbelastung | $M_{E,1}$ | $1000$ | MN/m² | Vorgabe |
+| M\_E-Wert der Schicht 2, Erstbelastung | $M_{E,2}$ | $4$ | MN/m² | Vorgabe |
+| M\_E-Wert der Schicht 1, Wiederbelastung | $M'_{E,1}$ | $3000$ | MN/m² | Vorgabe |
+| M\_E-Wert der Schicht 2, Wiederbelastung | $M'_{E,2}$ | $24$ | MN/m² | Vorgabe |
+| Dicke der Schicht 1 | $d_{1}$ | $5$ | m | Vorgabe |
+| Dicke der Schicht 2 | $d_{2}$ | $4$ | m | Vorgabe |
+| Grösste Dicke einer Teilschicht | $\Delta z_{max}$ | $1$ | m | Vorgabe |
+| Erfüllungsgrad Setzung | $\alpha_{eff,s}$ | $0.97$ |  | berechnet |
+| Pressung aus Erstbelastung | $q_E$ | $60$ | kN/m² | Vorgabe |
+| Pressung aus Wiederbelastung | $q_W$ | $0$ | kN/m² | Vorgabe |
+| Zulässige Setzung | $s_{zul}$ | $20$ | mm | Vorgabe |
+| Breite des Fundaments | $B$ | $6$ | m | Vorgabe |
+| Länge des Fundaments | $L$ | $40$ | m | Vorgabe |
+| M\_E-Wert der Schicht 1, Erstbelastung | $M_{E,1}$ | $8$ | MN/m² | Vorgabe |
+| M\_E-Wert der Schicht 2, Erstbelastung | $M_{E,2}$ | $5$ | MN/m² | Vorgabe |
+| M\_E-Wert der Schicht 3, Erstbelastung | $M_{E,3}$ | $7$ | MN/m² | Vorgabe |
+| M\_E-Wert der Schicht 1, Wiederbelastung | $M'_{E,1}$ | $30$ | MN/m² | Vorgabe |
+| M\_E-Wert der Schicht 2, Wiederbelastung | $M'_{E,2}$ | $25$ | MN/m² | Vorgabe |
+| M\_E-Wert der Schicht 3, Wiederbelastung | $M'_{E,3}$ | $35$ | MN/m² | Vorgabe |
+| Dicke der Schicht 1 | $d_{1}$ | $1.5$ | m | Vorgabe |
+| Dicke der Schicht 2 | $d_{2}$ | $6$ | m | Vorgabe |
+| Dicke der Schicht 3 | $d_{3}$ | $4$ | m | Vorgabe |
+| Grösste Dicke einer Teilschicht | $\Delta z_{max}$ | $0.5$ | m | Vorgabe |
+| Erfüllungsgrad Setzung | $\alpha_{eff,s}$ | $1.17$ |  | berechnet |
+| Pressung aus Erstbelastung | $q_E$ | $80$ | kN/m² | Vorgabe |
+| Pressung aus Wiederbelastung | $q_W$ | $20$ | kN/m² | Vorgabe |
+| Zulässige Setzung | $s_{zul}$ | $120$ | mm | Vorgabe |

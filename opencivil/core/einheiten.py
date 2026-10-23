@@ -318,6 +318,8 @@ MPA = Einheit("MPa", SPANNUNG, 1e6)
 GPA = Einheit("GPa", SPANNUNG, 1e9)
 N_PRO_MM2 = Einheit("N/mm^2", SPANNUNG, 1e6, latex=r"\mathrm{N}/\mathrm{mm}^{2}")
 KN_PRO_M2 = Einheit("kN/m^2", SPANNUNG, 1e3, latex=r"\mathrm{kN}/\mathrm{m}^{2}")
+#: Die M_E-Werte des Baugrunds -- so stehen sie im geologischen Bericht.
+MN_PRO_M2 = Einheit("MN/m^2", SPANNUNG, 1e6, latex=r"\mathrm{MN}/\mathrm{m}^{2}")
 
 # Moment
 NM = Einheit("Nm", MOMENT, 1.0)
@@ -367,7 +369,7 @@ EINHEITEN: Dict[str, Einheit] = {
         M, DM, CM, MM, KM,
         M2, CM2, MM2, M3,
         N, KN, MN,
-        PA, KPA, MPA, GPA, N_PRO_MM2, KN_PRO_M2,
+        PA, KPA, MPA, GPA, N_PRO_MM2, KN_PRO_M2, MN_PRO_M2,
         NM, KNM, MNM,
         KN_PRO_M, KNM_PRO_M, MM2_PRO_M, PRO_M,
         KNM2, KNM_PRO_RAD,

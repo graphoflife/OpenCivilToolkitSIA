@@ -36,8 +36,9 @@ from opencivil.projekt.skript import VORLAGE, SkriptEintrag
 from opencivil.projekt.querschnittsanalyse import (
     QuerschnittsanalyseEintrag, WerkstoffwahlEintrag,
 )
+from opencivil.projekt.setzung import SetzungEintrag
 from opencivil.projekt.aufbau import (
-    ANALYSE, BALKENSYSTEM, BAUTEILE, GRUNDBRUCH, PLATTE, Aufbau, aufbauen,
+    ANALYSE, BALKENSYSTEM, BAUTEILE, GRUNDBRUCH, PLATTE, SETZUNG, Aufbau, aufbauen,
 )
 
 
@@ -60,6 +61,9 @@ class Projekt(Beschreibung):
 
     grundbrueche: List[GrundbruchEintrag] = field(default_factory=list)
     """Flachfundamente mit Grundbruch und Gleiten."""
+
+    setzungen: List[SetzungEintrag] = field(default_factory=list)
+    """Flachfundamente auf geschichtetem Baugrund, mit ihrer Setzung."""
 
     skripte: List[SkriptEintrag] = field(default_factory=list)
     """Die Python-Skripte der App «Python» -- gespeichert, nicht gerechnet."""
@@ -311,6 +315,20 @@ class Projekt(Beschreibung):
         self.grundbrueche.append(eintrag)
         return eintrag
 
+    def setzung(self, name: str, **felder: Any) -> SetzungEintrag:
+        """
+        Eine Setzungsberechnung mit den Vorgaben der Oberflaeche, aber ohne
+        ihre Startschicht: wer rechnet, gibt seine Schichten mit ``schicht``
+        selbst an, von der Sohle an nach unten. Alles Weitere -- ``B``,
+        ``q_E``, ``steifigkeit`` ... -- geht als Stichwort an den Eintrag;
+        Masse in m, Pressungen in kN/m², die zulaessige Setzung in mm.
+        """
+        eintrag = lesen(SetzungEintrag, felder, f"Setzung '{name}'",
+                        SetzungEintrag(kennung=self.freie_kennung(SETZUNG.vorsilbe),
+                                       name=name))
+        self.setzungen.append(eintrag)
+        return eintrag
+
     def skript(self, name: str, code: str = "") -> SkriptEintrag:
         """
         Ein Python-Skript für die App «Python» -- Kennung ``p1``, ``p2`` ...
@@ -488,6 +506,14 @@ class Projekt(Beschreibung):
         fundament = projekt.grundbruch("Fundament Stütze", phi_k=32.0, b=2.0, L=2.5,
                                        t=1.2, t1=5.0)
         fundament.kombination("Tragsicherheit", N_Ed=1500.0, T_Ed=150.0)
+        # Und seine Setzung: bis zur Sohle 1.2 m Aushub, das ist die
+        # Wiederbelastung; der Rest der Pressung belastet den Boden zum
+        # ersten Mal. Unter dem Kies ein weicher Silt, darunter Moräne.
+        setzung = projekt.setzung("Fundament Stütze", B=2.0, L=2.5, q_W=24.0, q_E=196.0,
+                                  s_zul=25.0)
+        setzung.schicht("Kies, sandig", d=2.0, M_E=60.0, M_E_strich=180.0)
+        setzung.schicht("Silt, tonig", d=3.0, M_E=15.0, M_E_strich=45.0)
+        setzung.schicht("Moräne", d=4.0, M_E=100.0, M_E_strich=250.0)
 
         # Ein Skript für die App «Python», mit einem Diagramm -- ohne Download.
         projekt.skript("Skript 1", VORLAGE)
@@ -627,6 +653,7 @@ class Projekt(Beschreibung):
         cls._alles_einmal(p, decke, p.querschnittsanalysen[0])
         cls._beweglich(p)
         cls._grundbrueche(p)
+        cls._setzungen(p)
         return p
 
     @staticmethod
@@ -654,6 +681,24 @@ class Projekt(Beschreibung):
         seeton.kombination("Zu schräg", N_Ed=300.0, T_Ed=200.0)
         p.grundbruch("Schacht", phi_k=0.0, c_k=60.0, b=1.2, L=1.2, t=2.0).kombination(
             "Tragsicherheit", N_Ed=900.0, T_Ed=30.0)
+
+    @staticmethod
+    def _setzungen(p: "Projekt") -> None:
+        """
+        Das Beispiel der Tabelle 8.4 des Kapitels -- ein Bauwerk 15 × 8 m, starr,
+        auf Kiessand über Ton; der Kiessand setzt sich dort nicht, hier fast
+        nicht --, das mit 20 mm nicht aufgeht; dazu ein schlaffer Damm mit
+        Wiederbelastung, und eine Berechnung ohne Schicht.
+        """
+        bauwerk = p.setzung("Bauwerk", B=8.0, L=15.0, q_E=60.0, s_zul=20.0, dz=1.0)
+        bauwerk.schicht("Kiessand", d=5.0, M_E=1000.0, M_E_strich=3000.0)
+        bauwerk.schicht("Ton", d=4.0, M_E=4.0, M_E_strich=24.0)
+        damm = p.setzung("Damm", B=6.0, L=40.0, steifigkeit="schlaff", q_W=20.0, q_E=80.0,
+                         s_zul=120.0)
+        damm.schicht("Auffüllung", d=1.5, M_E=8.0, M_E_strich=30.0)
+        damm.schicht("Seeton", d=6.0, M_E=5.0, M_E_strich=25.0)
+        damm.schicht("Ton", d=4.0, M_E=7.0, M_E_strich=35.0)
+        p.setzung("Ohne Schicht")
 
     @staticmethod
     def _alles_einmal(p: "Projekt", decke: QuerschnittEintrag,

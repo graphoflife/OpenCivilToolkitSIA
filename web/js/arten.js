@@ -72,6 +72,19 @@ export const ARTEN = [
     leer: 'kein Grundbruch',
     nachweise: true,
   },
+  {
+    art: 'setzung',
+    liste: 'setzungen',
+    vorsilbe: 'w',
+    zeichen: 'setzung',
+    knopf: 'Setzung',
+    titel: 'Setzung',
+    bezeichnung: 'Setzungsberechnung',
+    einzahl: 'Setzung',
+    stamm: 'Fundament',
+    leer: 'keine Setzung',
+    nachweise: true,
+  },
 ];
 
 /** Die Art, die die Auswahl so nennt -- `undefined` beim Material. */

@@ -2,8 +2,9 @@
  * faelle.js -- die Zeile eines Falls, für alle Listen dieselbe.
  *
  * Einwirkungen und Gebrauchsfälle, Verformungsfälle, Knicknachweise,
- * Analysen, die Kombinationen des Grundbruchs und die Lastfälle des
- * gezeichneten Querschnitts: jede Liste hat dieselbe Zeile -- oben Schalter,
+ * Analysen, die Kombinationen des Grundbruchs, die Lastfälle des
+ * gezeichneten Querschnitts und die Schichten unter einer Setzung: jede
+ * Liste hat dieselbe Zeile -- oben Schalter,
  * Name und Entfernen, darunter die Zahlen, je unter ihrem Kopf (`fallkopf`).
  * Was eine Liste mehr hat, steht an fester Stelle: neben dem Namen (`oben`,
  * die Zugseite beim Knicken) oder in einer Zeile darunter (`unten`, Werte und
@@ -23,14 +24,17 @@ import { el } from './dom.js';
  * Eine Zeile. `fall` ist der Eintrag, `aendern(veraenderer)` ändert ihn im
  * Projekt; Schalter und Name gehen darüber -- fehlt `aktiv`, ist der Fall an.
  * `was` heisst der Fall am Schalter («Lastfall wird geführt»), `nameTitel`
- * und `entfernenTitel` sagen, was Name und Kreuz tun.
+ * und `entfernenTitel` sagen, was Name und Kreuz tun. `vorn` steht statt des
+ * Schalters da, wo es keinen gibt: die Nummer einer Schicht -- eine Schicht
+ * lässt sich nicht ausschalten, ohne dass die darunter nach oben rückten.
  */
 export function fallzeile({
   fall, aendern, was, nameTitel, zahlen, entfernen, entfernenTitel,
-  oben = null, unten = null, spalten = zahlen.length, klasse = '',
+  oben = null, unten = null, spalten = zahlen.length, klasse = '', vorn = null,
 }) {
-  const an = fall.aktiv !== false;
-  const schalter = hakenSchalter(an, (wert) => aendern((x) => { x.aktiv = wert; }), was);
+  const an = vorn !== null || fall.aktiv !== false;
+  const schalter = vorn
+    || hakenSchalter(an, (wert) => aendern((x) => { x.aktiv = wert; }), was);
   schalter.classList.add('fall-schalter');
   return el(`div.fallzeile${klasse}`, {
     class: `${an ? '' : 'ist-aus'} ${oben ? 'mit-oben' : ''}`, style: { '--felder': spalten },

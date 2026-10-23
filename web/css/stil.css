@@ -2123,6 +2123,32 @@ details.nb-callout > summary { cursor: pointer; }
 .gb-legende { margin-top: 6px; }
 .gb-legende p { margin: 0 0 2px; font-size: 12px; color: var(--schrift-matt); }
 
+/* -------------------------------------------------------------- Setzung -- */
+
+/* Die Nummer einer Schicht, wo bei den Fällen der Schalter steht. */
+.schicht-nummer {
+  justify-self: center; min-width: 22px; padding: 1px 6px; border-radius: 10px;
+  background: var(--flaeche-2); color: var(--schrift-matt);
+  font-size: 11.5px; font-weight: 700; text-align: center;
+}
+
+/* Die Situation: die Schichten als Bänder, darin J über die Tiefe. Die
+   Bausteine -- Text, Pfeile, Masse, Fundament -- teilt sie mit dem
+   Grundbruch (gb_skizze.js). */
+.sz-schicht { stroke: none; }
+.sz-schicht-0 { fill: #f4efe4; }
+.sz-schicht-1 { fill: #e9e2d2; }
+.sz-strich { fill: none; stroke: var(--schrift-matt); stroke-width: 1; }
+.sz-name { font-weight: 600; }
+.sz-setzung { fill: var(--schrift); font-weight: 600; }
+.sz-lastflaeche { fill: #fbe6dc; stroke: var(--last); stroke-width: 1.2; }
+.sz-lastlinie { fill: none; stroke: var(--last); stroke-width: 3; }
+.sz-flaeche { fill: rgba(112, 72, 232, .10); stroke: none; }
+.sz-linie { fill: none; stroke: var(--system); stroke-width: 1.8; }
+.sz-linientext { fill: var(--system); font-size: 12px; }
+.sz-punkt { fill: var(--system); stroke: #fff; stroke-width: 1.2; }
+.sz-punkttext { fill: var(--system); font-weight: 700; }
+
 /* --------------------------------------------------------------- Python -- */
 
 /* Name und Knöpfe in einer Zeile über dem Code und unter der Konsole. */

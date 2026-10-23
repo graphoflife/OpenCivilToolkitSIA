@@ -33,17 +33,20 @@ class TestProjektBeschreibung(unittest.TestCase):
         self.assertTrue(loesung.vollstaendig)
         # Gefuehrt werden bei der Platte die 3 M-N-Nachweise und die
         # Verformung im Feld, beim Unterzug Biegung und Querkraft mit Torsion,
-        # beim Fundament Grundbruch und Gleiten. Die uebrigen rechnen still
-        # mit: eingeschaltet hat sie niemand, und ungefragt in der Tabelle
-        # staenden sie sonst bei jedem Bauteil.
+        # beim Fundament Grundbruch und Gleiten und seine Setzung. Die uebrigen
+        # rechnen still mit: eingeschaltet hat sie niemand, und ungefragt in
+        # der Tabelle staenden sie sonst bei jedem Bauteil.
         laut = [u for u in loesung.urteile if not u.still]
         platte = [u for u in laut if u.raum.startswith("querschnitt.q1.")]
         unterzug = [u for u in laut if u.raum.startswith("querschnittsanalyse.a1.")]
         fundament = [u for u in laut if u.raum.startswith("grundbruch.g1.")]
+        setzung = [u for u in laut if u.raum.startswith("setzung.w1.")]
         self.assertEqual(sorted(u.art for u in platte), ["M-N", "M-N", "M-N", "w"])
         self.assertEqual(sorted(u.art for u in unterzug), ["M-N", "V+T"])
         self.assertEqual(sorted(u.art for u in fundament), ["GB", "GL"])
-        self.assertEqual(len(laut), len(platte) + len(unterzug) + len(fundament))
+        self.assertEqual([u.art for u in setzung], ["s"])
+        self.assertEqual(len(laut),
+                         len(platte) + len(unterzug) + len(fundament) + len(setzung))
         self.assertTrue(all(u.erfuellt for u in laut))
         self.assertTrue([u for u in loesung.urteile if u.still])
 

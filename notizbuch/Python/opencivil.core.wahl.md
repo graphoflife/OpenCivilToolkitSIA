@@ -1,5 +1,5 @@
 ---
-erzeugt: 17e50cf6cbc4
+erzeugt: 1fa54de08fc1
 art: modul
 tags: [modul]
 ---
@@ -32,6 +32,7 @@ Eine Wahl: das Mitglied ist sein Text.
 ## Gebraucht von
 
 - [[opencivil.bewehrungssuche.laengs]]
+- [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.rissanforderung]]

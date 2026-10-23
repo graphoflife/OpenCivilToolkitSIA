@@ -16,9 +16,11 @@
 
 import { karte } from './bausteine.js';
 import { auswahl, el, svgEl } from './dom.js';
+import {
+  BREITE, bogen, linie, mass, pfeil, schraffur, text, zahl,
+} from './gb_skizze.js';
 import { aendern, zustand } from './zustand.js';
 
-const BREITE = 720;
 const RAND = 36;
 /** Wie lang die Resultierende gezeichnet wird, in px. */
 const PFEIL = 120;
@@ -26,96 +28,6 @@ const GRAD = Math.PI / 180;
 
 /** Welche Kombination je Grundbruch gezeigt wird -- ohne Wahl die massgebende. */
 const gezeigt = new Map();
-
-const zahl = (x, n) => Number(x).toFixed(n);
-
-// ===========================================================================
-// Bausteine des Bildes, in px
-// ===========================================================================
-
-/** Eine Gruppe -- `svgEl` nimmt keine Kinder. Fehlende (null) bleiben weg. */
-function gruppe(klasse, kinder) {
-  const g = svgEl('g', { class: klasse });
-  g.append(...kinder.filter(Boolean));
-  return g;
-}
-
-function linie(punkte, klasse) {
-  return svgEl('path', {
-    d: punkte.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' '),
-    class: klasse,
-  });
-}
-
-/** Ein Pfeil von `von` nach `bis`, die Spitze bei `bis`. */
-function pfeil(von, bis, klasse) {
-  const [x1, y1] = von;
-  const [x2, y2] = bis;
-  const l = Math.hypot(x2 - x1, y2 - y1);
-  if (l < 1) return null;
-  const ux = (x2 - x1) / l;
-  const uy = (y2 - y1) / l;
-  const s = Math.min(9, l / 2);
-  const spitze = [
-    [x2, y2],
-    [x2 - ux * s - uy * s * 0.45, y2 - uy * s + ux * s * 0.45],
-    [x2 - ux * s + uy * s * 0.45, y2 - uy * s - ux * s * 0.45],
-  ];
-  return gruppe(klasse, [
-    linie([von, [x2 - ux * s * 0.8, y2 - uy * s * 0.8]], 'gb-pfeil-schaft'),
-    svgEl('path', { d: `M${spitze.map((q) => q.map((v) => v.toFixed(1)).join(' ')).join(' L')} Z`, class: 'gb-pfeil-spitze' }),
-  ]);
-}
-
-/**
- * Text mit tiefgestellten Teilen: `teile` sind Zeichenketten und `{ unten }`
- * -- «δ», { unten: 'R' }, « = 7.1°». `drehung` dreht ihn um seinen Punkt,
- * in Grad im Gegenuhrzeigersinn -- längs eines geneigten Geländes.
- */
-function text(x, y, teile, { klasse = '', anker = 'start', drehung = 0 } = {}) {
-  const t = svgEl('text', {
-    x: x.toFixed(1), y: y.toFixed(1), class: `gb-text ${klasse}`, 'text-anchor': anker,
-    transform: drehung ? `rotate(${-drehung} ${x.toFixed(1)} ${y.toFixed(1)})` : null,
-  });
-  let tief = false;
-  for (const teil of [].concat(teile)) {
-    const unten = typeof teil === 'object';
-    const span = svgEl('tspan', {
-      dy: unten === tief ? 0 : (unten ? 4 : -4),
-      class: unten ? 'gb-index' : '',
-    });
-    span.textContent = unten ? teil.unten : teil;
-    t.append(span);
-    tief = unten;
-  }
-  return t;
-}
-
-/** Ein Winkelbogen um `mitte` von Richtung `a` nach `b` (Winkel in px-Lage, rad). */
-function bogen(mitte, r, a, b, klasse = 'gb-bogen') {
-  let d = b - a;
-  while (d <= -Math.PI) d += 2 * Math.PI;
-  while (d > Math.PI) d -= 2 * Math.PI;
-  const [cx, cy] = mitte;
-  const p = (w) => [cx + r * Math.cos(w), cy + r * Math.sin(w)].map((v) => v.toFixed(1)).join(' ');
-  return svgEl('path', { d: `M${p(a)} A${r} ${r} 0 0 ${d > 0 ? 1 : 0} ${p(a + d)}`, class: klasse });
-}
-
-/** Ein Mass: Linie mit Pfeilen an beiden Enden, die Schrift daneben. */
-function mass(von, bis, teile, { seite = 'rechts' } = {}) {
-  const [x1, y1] = von;
-  const [x2, y2] = bis;
-  const mitte = [(x1 + x2) / 2, (y1 + y2) / 2];
-  const senkrecht = Math.abs(x2 - x1) < Math.abs(y2 - y1);
-  const lage = senkrecht
-    ? { x: mitte[0] + (seite === 'rechts' ? 6 : -6), y: mitte[1] + 4, anker: seite === 'rechts' ? 'start' : 'end' }
-    : { x: mitte[0], y: mitte[1] - 6, anker: 'middle' };
-  return gruppe('gb-mass', [
-    pfeil(mitte, von, 'gb-masspfeil'),
-    pfeil(mitte, bis, 'gb-masspfeil'),
-    text(lage.x, lage.y, teile, { anker: lage.anker, klasse: 'gb-masstext' }),
-  ]);
-}
 
 /**
  * Der Umriss des Gleitkörpers, soweit er im Boden liegt. Er ist für
@@ -205,17 +117,8 @@ function situationsbild(g, s, fall) {
   // -- Boden: Gelände links geneigt, rechts waagrecht, darunter schraffiert --
   const gelaendeLinks = [[links, links * tanB], [0, 0]];
   const gelaendeRechts = [[b, 0], [rechts, 0]];
-  const schraffur = [];
-  for (const [[x1, y1], [x2, y2]] of [gelaendeLinks, gelaendeRechts]) {
-    const [a, e] = [px([x1, y1]), px([x2, y2])];
-    const n = Math.floor(Math.hypot(e[0] - a[0], e[1] - a[1]) / 11);
-    for (let i = 1; i < n; i += 1) {
-      const [x, y] = [a[0] + (e[0] - a[0]) * i / n, a[1] + (e[1] - a[1]) * i / n];
-      schraffur.push(`M${x.toFixed(1)} ${y.toFixed(1)} l-6 7`);
-    }
-  }
   zeichne(
-    svgEl('path', { d: schraffur.join(' '), class: 'gb-schraffur' }),
+    schraffur([gelaendeLinks.map(px), gelaendeRechts.map(px)]),
     linie(gelaendeLinks.map(px), 'gb-gelaende'),
     linie(gelaendeRechts.map(px), 'gb-gelaende'),
   );

@@ -1,5 +1,5 @@
 ---
-erzeugt: d9c13aad8820
+erzeugt: 7fce53c0410b
 art: modul
 tags: [modul]
 ---
@@ -303,6 +303,7 @@ def beschreibung(self) -> str
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.ergebnis]]
 - [[opencivil.geotechnik.grundbruch]]
+- [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.biegung_normalkraft]]
 - [[opencivil.nachweis.duktilitaet]]

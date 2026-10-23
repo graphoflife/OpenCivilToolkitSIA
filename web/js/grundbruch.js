@@ -22,7 +22,9 @@
  * Zahl still um 10³ anders, als die Maske sagte.
  */
 
-import { erklaerung, feld, karte, panel } from './bausteine.js';
+import {
+  erklaerung, feld, karte, panel, zahlzeile as feldzeile,
+} from './bausteine.js';
 import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
 import { span } from './mathe.js';
@@ -58,11 +60,9 @@ function aendernAn(kennung, veraenderer) {
 
 /** Eine Zahl des Eintrags als Feld: Beschriftung mit Symbol, Einheit, Schrittweite. */
 function zahlzeile(g, schluessel, text, symbol, { schritt = 1, titel } = {}) {
-  const angabe = feldangabe('grundbruch', schluessel);
-  return feld([`${text} `, span(symbol)], zahlfeld({
-    wert: g[schluessel], schritt, angabe, titel,
-    beiAenderung: (v) => aendernAn(g.kennung, (x) => { x[schluessel] = v; }),
-  }), angabe.einheit || '', titel);
+  return feldzeile('grundbruch', g, schluessel, text, symbol, {
+    schritt, titel, aendern: (veraenderer) => aendernAn(g.kennung, veraenderer),
+  });
 }
 
 /** Die Bemessungswerte des Bodens, wie der Kern sie gerechnet hat -- oder nichts. */

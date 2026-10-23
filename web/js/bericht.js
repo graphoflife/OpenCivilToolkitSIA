@@ -31,6 +31,7 @@ import {
 import { analyseKarten } from './qa_diagramme.js';
 import { systemKarten, systemZusammenfassung } from './bs_diagramme.js';
 import { situationKarten } from './gb_zeichnung.js';
+import { setzungKarten } from './sz_zeichnung.js';
 import { spannungsfallZeichnen } from './spannungsbild.js';
 import { api } from './api.js';
 import { ARTEN } from './arten.js';
@@ -546,6 +547,7 @@ const DIAGRAMME = {
     ...analyseKarten(kennung), ...spannungskarten(kennung, loesung)],
   balkensystem: systemKarten,
   grundbruch: situationKarten,
+  setzung: setzungKarten,
 };
 
 /**

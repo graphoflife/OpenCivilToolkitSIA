@@ -1,5 +1,5 @@
 ---
-erzeugt: 593583e537a6
+erzeugt: 467fe1c33614
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -30,6 +30,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
   - [[opencivil.ergebnis]] – ein gerechnetes Projekt, wie man es ohne Oberflaeche braucht.
 - [[opencivil.geotechnik]] – Nachweise im Baugrund.
     - [[opencivil.geotechnik.grundbruch]] – Grundbruch und Gleiten eines Flachfundaments.
+    - [[opencivil.geotechnik.setzung]] – die Setzung eines Flachfundaments auf geschichtetem Baugrund.
 - [[opencivil.konsole]] – Python im Browser, für die App «Python».
     - [[opencivil.konsole.dienst]] – die Konsole als Dienst für ihren Faden.
     - [[opencivil.konsole.pakete]] – welche Fremdpakete ein Skript einbinden kann.
@@ -80,6 +81,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
       - [[opencivil.projekt.aufbau.kern]] – was alle Bauteilarten beim Bauen teilen.
       - [[opencivil.projekt.aufbau.platte]] – eine Platte wird Rechnung.
       - [[opencivil.projekt.aufbau.querschnittsanalyse]] – ein gezeichneter Querschnitt wird Rechnung.
+      - [[opencivil.projekt.aufbau.setzung]] – eine Setzungsberechnung wird Rechnung.
     - [[opencivil.projekt.balkensystem]] – ein 2D-Balkensystem, wie die Oberflaeche es beschreibt.
     - [[opencivil.projekt.eintraege]] – die Teile einer Projektbeschreibung.
     - [[opencivil.projekt.grundbruch]] – ein Grundbruchnachweis, wie die Oberflaeche ihn beschreibt.
@@ -88,6 +90,7 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.projekt.platte]] – eine Platte, wie die Oberflaeche sie beschreibt.
     - [[opencivil.projekt.projekt]] – das Projekt als Ganzes.
     - [[opencivil.projekt.querschnittsanalyse]] – ein gezeichneter Querschnitt, wie die Oberflaeche ihn beschreibt.
+    - [[opencivil.projekt.setzung]] – eine Setzungsberechnung, wie die Oberflaeche sie beschreibt.
     - [[opencivil.projekt.skript]] – ein Python-Skript der App «Python», wie es
 - [[opencivil.querschnitt]] – die Querschnitte: die Platte und der gezeichnete.
     - [[opencivil.querschnitt.analyse]] – der gezeichnete Querschnitt als Bauteil im Rechenwerk.
@@ -127,5 +130,6 @@ Je Modul der Bibliothek `opencivil` eine Seite, aus seinen Docstrings: was es ve
     - [[opencivil.web.dienst]] – Der Rechendienst, unabhaengig vom Transportweg.
     - [[opencivil.web.grundbruchdaten]] – was die Oberflaeche von einem Grundbruch zeichnet.
     - [[opencivil.web.server]] – Schlanker HTTP-Server fuer die Oberflaeche.
+    - [[opencivil.web.setzungsdaten]] – was die Oberflaeche von einer Setzung zeichnet.
     - [[opencivil.web.speicher]] – was vom letzten Lauf noch gilt.
     - [[opencivil.web.umschlag]] – wie eine Antwort an die Oberfläche verpackt wird.

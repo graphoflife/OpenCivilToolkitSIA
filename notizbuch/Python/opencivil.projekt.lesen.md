@@ -1,5 +1,5 @@
 ---
-erzeugt: 54c1361c98fb
+erzeugt: 852dce16657f
 art: modul
 tags: [modul]
 ---
@@ -353,10 +353,12 @@ Ein Wert, wie er in einer Meldung steht -- ein Text in Anfuehrungszeichen.
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
+- [[opencivil.projekt.aufbau.setzung]]
 - [[opencivil.projekt.balkensystem]]
 - [[opencivil.projekt.eintraege]]
 - [[opencivil.projekt.grundbruch]]
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.projekt.setzung]]
 - [[opencivil.web.api]]

@@ -3,7 +3,7 @@
  *
  * Oben je App ein Knopf mit Zeichen, wie die Kapitel einer Platte in der
  * Mitte (Benutzer, 2026-10-15): Materialien, Stahlbeton-Platten,
- * Querschnittsanalyse, 2D Balkensysteme, Grundbruch, Python. Darunter steht
+ * Querschnittsanalyse, 2D Balkensysteme, Grundbruch, Setzung, Python. Darunter steht
  * die Liste der gewählten App, mit «+» zum Anlegen -- bei den Materialien je
  * eine für Beton und Betonstahl. Darüber, zuoberst in der Tafel, der Name des
  * Projekts (index.html).

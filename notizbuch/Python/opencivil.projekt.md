@@ -1,5 +1,5 @@
 ---
-erzeugt: ecb3e732c42f
+erzeugt: 3c8172bf1e21
 art: modul
 tags: [modul]
 ---
@@ -33,6 +33,8 @@ balkensystem.py
                Linienlager, Lager, Lasten, Lastfaelle, Kombinationen
 grundbruch.py  ein Flachfundament: Boden, Masse, Gelaende, Grundwasser
                und Einwirkungen fuer Grundbruch und Gleiten
+setzung.py     ein Flachfundament auf geschichtetem Baugrund: Pressungen
+               aus Wieder- und Erstbelastung, Schichten mit M_E-Werten
 netz.py        Knoten mit Kennungen, fuer beide Zeichnungen
 skript.py      ein Python-Skript der App «Python»: gespeichert, nicht
                gerechnet
@@ -75,6 +77,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.platte]] – eine Platte, wie die Oberflaeche sie beschreibt.
 - [[opencivil.projekt.projekt]] – das Projekt als Ganzes.
 - [[opencivil.projekt.querschnittsanalyse]] – ein gezeichneter Querschnitt, wie die Oberflaeche ihn beschreibt.
+- [[opencivil.projekt.setzung]] – eine Setzungsberechnung, wie die Oberflaeche sie beschreibt.
 - [[opencivil.projekt.skript]] – ein Python-Skript der App «Python», wie es
 
 ## Braucht
@@ -87,6 +90,7 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.projekt.setzung]]
 - [[opencivil.projekt.skript]]
 
 ## Gebraucht von
@@ -105,4 +109,5 @@ geschieht erst beim Aufbau, ueber die [[opencivil.core.einheiten#Groesse|Groesse
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.dienst]]
 - [[opencivil.web.grundbruchdaten]]
+- [[opencivil.web.setzungsdaten]]
 - [[opencivil.web.speicher]]

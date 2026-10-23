@@ -1,5 +1,5 @@
 ---
-erzeugt: 6a3c732de9d9
+erzeugt: 74b81041ec7c
 art: modul
 tags: [modul]
 ---
@@ -18,8 +18,9 @@ die beiden Stahlspannungen ([[opencivil.projekt.aufbau.kern#spannungsnachweise|s
 
 Was nur eine Art braucht, steht bei ihr: [[opencivil.projekt.aufbau.platte|platte]],
 [[opencivil.projekt.aufbau.querschnittsanalyse|querschnittsanalyse]],
-[[opencivil.projekt.aufbau.balkensystem|balkensystem]] und
-[[opencivil.projekt.aufbau.grundbruch|grundbruch]]. Bis 2026-10-17 stand alles in
+[[opencivil.projekt.aufbau.balkensystem|balkensystem]],
+[[opencivil.projekt.aufbau.grundbruch|grundbruch]] und
+[[opencivil.projekt.aufbau.setzung|setzung]]. Bis 2026-10-17 stand alles in
 einer Datei `aufbau.py` von ueber tausend Zeilen.
 
 ## Inhalt
@@ -66,6 +67,8 @@ Was beim Zusammenbauen eines Projekts entsteht.
 - `grundbrueche: Dict[str, Fundament] = field(default_factory=dict)` – Die Fundamente der Grundbruchnachweise, nach Kennung.
 - `grundbruch: Dict[str, Grundbruch] = field(default_factory=dict)`
 - `gleiten: Dict[str, Gleiten] = field(default_factory=dict)` – Grundbruch und Gleiten je Fundament.
+- `setzungen: Dict[str, Setzungsfundament] = field(default_factory=dict)` – Die Fundamente der Setzungsberechnungen, nach Kennung.
+- `setzung: Dict[str, Setzung] = field(default_factory=dict)` – Die Setzung je Fundament.
 - `warnungen: List[str] = field(default_factory=list)`
 - `NACHWEISFELDER = ('nachweise', 'querkraft', 'duktilitaet', 'fehlende', 'rissnormalkraf…` – Die Felder, in denen die Nachweise stehen -- die eine Stelle, an der ein neuer Nachweis eingetragen wird. Alle sind nach Kennung geschluesselt (`q1` oder `q1.x`) und alle tragen Nachweise mit `d_ausnutzung`. Ihre Reihenfolge ist die der Herleitung: in ihr rechnet ein Bauteil seine Nachweise ([[opencivil.projekt.aufbau.kern#Bauteil.ziele|Bauteil.ziele]]).
 
@@ -350,6 +353,7 @@ Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; `mehr` fuer die Analyse.
 - [[opencivil.core.rechenwerk]]
 - [[opencivil.core.wert]]
 - [[opencivil.geotechnik.grundbruch]]
+- [[opencivil.geotechnik.setzung]]
 - [[opencivil.material.basis]]
 - [[opencivil.material.beton]]
 - [[opencivil.material.betonstahl]]
@@ -383,3 +387,4 @@ Ein Knickfall aus seiner Beschreibung -- kN, kNm und m; `mehr` fuer die Analyse.
 - [[opencivil.projekt.aufbau.grundbruch]]
 - [[opencivil.projekt.aufbau.platte]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
+- [[opencivil.projekt.aufbau.setzung]]

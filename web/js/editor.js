@@ -4,8 +4,8 @@
  * Welcher Editor es ist, welches Fenster über ihm aufgeht und was im Kopf
  * steht, sagt die Zeile seiner App (apps.js); hier steht nur, wie die Tafel
  * gezeichnet wird. Die Editoren stehen bei ihren Apps: material.js,
- * platte.js, querschnittsanalyse.js, balkensystem.js, grundbruch.js und
- * python.js. Bis 2026-10-18 standen der des Materials und der der Platte hier.
+ * platte.js, querschnittsanalyse.js, balkensystem.js, grundbruch.js,
+ * setzung.js und python.js. Bis 2026-10-18 standen der des Materials und der der Platte hier.
  *
  * Angezeigt wird immer der Wert aus der letzten Lösung, nie ein in der
  * Oberfläche nachgerechneter.

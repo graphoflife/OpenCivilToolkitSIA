@@ -138,6 +138,16 @@ f = p.grundbruch("Fundament Stütze", phi_k=32, b=2.0, L=2.5, t=1.2, t1=5.0,
 f.kombination("Tragsicherheit", N_Ed=1500, T_Ed=150)  # N normal zur Sohle, T in ihr
 ```
 
+Seine Setzung -- Masse in m, Pressungen in kN/m², M_E-Werte in MN/m², die
+Schichten von der Sohle an nach unten:
+
+```python
+s = p.setzung("Fundament Stütze", B=2.0, L=2.5, q_W=24, q_E=196, s_zul=25,
+              steifigkeit="starr")           # starr: Punkt K, schlaff: Mitte
+s.schicht("Kies, sandig", d=2.0, M_E=60, M_E_strich=180)
+s.schicht("Silt, tonig", d=3.0, M_E=15, M_E_strich=45)
+```
+
 Linien- und Dreieckslasten (`wert_b`), Einzellasten, Momente und verteilte
 Momente gehen mit `art=`; Federn, Bettung und feste Linienlager mit den
 Feldern der Linie (`quer`, `k_quer`, `laengs`, `k_laengs`). `r.teilen("L2",
@@ -203,6 +213,7 @@ Fertig und getestet (1229 Tests):
 | `stabwerk/querschnitte` | die Querschnitte der Stäbe nach Vorlage, mit ihren Formeln |
 | `stabwerk/rechnung`, `herleitung` | das Balkensystem im Rechenwerk und wie es seine Rechnung aufschreibt |
 | `geotechnik/grundbruch` | ein Flachfundament: Bemessungswerte des Bodens, Grundbruch nach der erweiterten Tragfähigkeitsformel (drainiert und undrainiert), Gleiten in der Sohle, der Gleitkörper nach Prandtl |
+| `geotechnik/setzung` | ein Flachfundament auf geschichtetem Baugrund: der Einflussfaktor nach Boussinesq im Punkt K oder in der Mitte, die Setzung je Teilschicht aus Wieder- und Erstbelastung, s gegen s_zul |
 | `nachweis/linie` | Geometrie einer M-N-Linie, `Achse` als Wert |
 | `nachweis/handrechnung` | die von Hand nachrechenbaren Eckpunkte |
 | `nachweis/dehnungsfaecher` | die Grenzen des Dehnungsfächers: als Ebenen für die genaue Linie, als Bedingungen für die Analyse |
@@ -219,7 +230,7 @@ Fertig und getestet (1229 Tests):
 | `spannungsanalyse.py` | sechs Fragen an den Querschnitt: Bild aus N und M oder aus Dehnungen, M-χ- und N-ε-Linie, äquivalenter E-Modul über M und über N — kein Nachweis |
 | `bewehrungssuche/` | die kleinste Bewehrung suchen, die alle Nachweise erfüllt – Längsbewehrung, dünnste Platte, Bügel |
 | `bericht/` | der Bericht als Blöcke (`gliederung`), gesetzt als Konsolentext, LaTeX-Dokument (PDF, sobald eine TeX-Maschine da ist) und Markdown; die Zusammenfassung je Platte |
-| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `balkensystem`, `grundbruch`, `skript`, `projekt`) und was daraus gebaut wird (`aufbau`) |
+| `projekt/` | speicherbare Projektbeschreibung (`eintraege`, `platte`, `querschnittsanalyse`, `balkensystem`, `grundbruch`, `setzung`, `skript`, `projekt`) und was daraus gebaut wird (`aufbau`) |
 | `ergebnis.py` | ein gerechnetes Projekt: Zusammenfassung, Bericht, LaTeX, Markdown, Analysen |
 | `notizbuch/` | das Notizbuch: Formel-, Themen- und Python-Seiten für Obsidian und die Dokumentation der Seite (`formelseiten`, `bibliothek`), geschrieben ohne Handgeschriebenes anzufassen (`tresor`) |
 | `web/bruecke.py` | was der Browser lädt: das Verzeichnis des Kerns, die Seiten des Notizbuchs, die Versionsmarken |
@@ -227,6 +238,7 @@ Fertig und getestet (1229 Tests):
 | `web/diagrammdaten.py` | die Punktfolgen der Diagramme als JSON |
 | `web/balkendaten.py` | was die Oberfläche von einem Balkensystem zeigt: Übersicht und Verläufe |
 | `web/grundbruchdaten.py` | was die Situationszeichnung eines Grundbruchs vom Kern braucht: Gleitkörper, Grundwasser, Kräfte je Kombination |
+| `web/setzungsdaten.py` | was die Situationszeichnung einer Setzung vom Kern braucht: der Punkt, J über die Tiefe, die Setzung je Schicht |
 | `web/speicher.py` | Ergebnisse je Bauteil, damit nur Geändertes neu rechnet |
 | `web/dienst.py` | der Rechendienst, unabhängig vom Transportweg |
 | `web/server.py` | HTTP-Hülle darum (nur Standardbibliothek) |
@@ -239,6 +251,7 @@ Fertig und getestet (1229 Tests):
 | `web/js/bs_zeichnung.js`, `bs_symbole.js` | was es im Balkensystem zeichnet: Stäbe, Lager, Federn, Gelenke, Lasten |
 | `web/js/balkensystem.js`, `bs_diagramme.js` | die übrige Eingabe des Balkensystems und seine Ergebnisse |
 | `web/js/grundbruch.js`, `gb_zeichnung.js` | die Eingabe eines Grundbruchs und das Bild seiner Situation |
+| `web/js/setzung.js`, `sz_zeichnung.js`, `gb_skizze.js` | die Eingabe einer Setzung, das Bild ihrer Situation und die Bausteine, die beide Bilder des Grundbaus teilen |
 | `web/js/python.js`, `konsole.js`, `variablen.js`, `zeichnen.js` | die App «Python»: Code und Konsole, der Faden der Sitzung, die Variablen rechts, die Diagramme |
 
 Wie das zusammenhängt und warum es so gebaut ist, steht in
@@ -253,7 +266,7 @@ dieselbe Aufteilung, nur nacheinander.
 
 Links steht zuoberst der Name des Projekts, darunter je App ein Knopf mit
 Zeichen und Anzahl -- Materialien, Stahlbeton-Platten, Querschnittsanalyse, 2D
-Balkensysteme, Grundbruch, Python -- und unter den Knöpfen die Liste der
+Balkensysteme, Grundbruch, Setzung, Python -- und unter den Knöpfen die Liste der
 gewählten App, mit «+» zum Anlegen.
 
 Die Oberfläche rechnet nichts. Sie schickt die Projektbeschreibung an den Kern
@@ -416,7 +429,23 @@ Faktoren N, s, d, i, g, b' je Anteil -- Kohäsion, seitliche Auflast, Gewicht
 des Gleitkörpers -- und unter «Diagramme» das Bild der Situation: Fundament,
 Gelände, Grundwasser, Kräfte der gewählten Kombination und der Gleitkörper.
 
-**Python:** die sechste App. Skripte, gespeichert mit dem Projekt; in der
+**Setzung:** ein Flachfundament auf geschichtetem Baugrund, nach dem Kapitel 8
+«Setzungsberechnung», das der Benutzer geliefert hat. Oben das Panel «Setzung
+Situation» mit Fundament (B, L und ob es starr oder schlaff ist), Pressung in
+der Sohle (aus Wiederbelastung q_W und aus Erstbelastung q_E) und Nachweis
+(zulässige Setzung s_zul, Dicke der Teilschichten Δz_max), darunter die
+Schichten von der Sohle an nach unten, je mit Dicke, M_E und M'_E. Jede
+Schicht wird in Teilschichten geteilt; je Teilschicht der Einflussfaktor J
+nach Boussinesq an Ober- und Unterkante, gemittelt, und daraus
+Δs = J·q_W·Δz/M'_E + J·q_E·Δz/M_E (Kap. 8.5). Gerechnet wird beim starren
+Fundament im kennzeichnenden Punkt K, 0.13 L und 0.13 B von einer Ecke
+(Bild 8.15), beim schlaffen unter der Mitte; unter der untersten Schicht gilt
+der Baugrund als unzusammendrückbar. Nachgewiesen wird s ≤ s_zul. Rechts
+stehen die Schichten mit ihrem Anteil an der Setzung und unter «Diagramme»
+der Schnitt mit den Schichten, der Linie von J über die Tiefe und dem
+Grundriss mit dem Punkt.
+
+**Python:** die siebte App. Skripte, gespeichert mit dem Projekt; in der
 Mitte der Code und darunter die Konsole, rechts statt der Berechnung die
 Variablen mit Typ, Grösse und Wert -- wie in Spyder. Strg+Enter führt das
 Skript aus, die Zeile der Konsole einen einzelnen Befehl (Enter; ↑ und ↓
@@ -465,7 +494,7 @@ weisse Karten; ein Klick auf den Kopf klappt es zu.
   Bruchzustand im Schnitt und der Schubfluss in den Wänden; bei einem
   Balkensystem je Fall Verformung, N, V, M und Lagerkräfte -- mit der Maus
   darüber (auf dem Telefon: tippen) der Wert an der Stelle, an einem Knoten
-  seine Verschiebung; bei einem Grundbruch die Situation
+  seine Verschiebung; bei einem Grundbruch und einer Setzung die Situation
 * *Herleitung* -- die Mitschrift, Formel für Formel, mit Normstelle; je
   Bestandteil ein Panel, je Kapitel eine Karte
 
@@ -631,6 +660,15 @@ Im Grundbruch, wie in Bild 9.2.15 des Kapitels:
 * `t` und `t_1` ab Oberkante Terrain: bis zur Sohle, bis zum höchsten
   Grundwasserspiegel; Masse in m, Winkel in Grad, Spannungen in kPa
 
+In der Setzung, wie im Kapitel 8:
+
+* `z` ab der Sohle nach unten; die Schichten in dieser Folge, darunter
+  unzusammendrückbar
+* `q_W` der Teil der Pressung, der den Boden nur wieder belastet (mit `M'_E`),
+  `q_E` der Teil darüber (mit `M_E`) -- beide nicht negativ, in kN/m²
+* der Punkt K liegt `0.13·L` und `0.13·B` von einer Ecke; Masse in m,
+  M_E-Werte in MN/m², Setzungen in mm
+
 ## Erfüllungsgrad beim M-N-Nachweis
 
 Ob ein Punkt innerhalb der Resistenzlinie liegt, entscheidet die massgebende
@@ -659,6 +697,10 @@ Massstab ab:
 * **Grundbruch**: eine ausmittige Last (wirksame Breite), ein Erdwiderstand
   vor dem Fundament und die Stabilitätsberechnung, die das Kapitel verlangt,
   wenn das Grundwasser im Gleitkörper steht -- gerechnet wird dann mit γ'.
+* **Setzung**: Setzungsdifferenzen und Verkippung (Kap. 8.11 bis 8.13), der
+  zeitliche Verlauf (Konsolidation) und eine Einflusstiefe als Abbruch --
+  gerechnet wird bis zur untersten Schicht. Die Formel für J steht in
+  Kapitel 3, das nicht vorliegt; sie trifft die Tabellen 8.4 und 8.5.
 * **Balkensysteme**: Eigengewicht aus dem Querschnitt, Umhüllende der
   Kombinationen, Theorie 2. Ordnung, Schubverformung, schiefe Lager und die
   Übergabe der Schnittgrössen an die Querschnittsnachweise fehlen noch.

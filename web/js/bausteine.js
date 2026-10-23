@@ -9,9 +9,9 @@
  * ohnehin niemandem im Besonderen gehören.
  */
 
-import { el } from './dom.js';
+import { el, zahlfeld } from './dom.js';
 import { span } from './mathe.js';
-import { panelUmschalten, zustand } from './zustand.js';
+import { feldangabe, panelUmschalten, zustand } from './zustand.js';
 
 /**
  * Ein Panel der Eingaben: Kopf mit Titel, darunter der Inhalt.
@@ -89,6 +89,23 @@ export function feld(beschriftung, eingabe, einheit, titel) {
       ? el('span.einheit', {}, [einheit])
       : el('span.einheit', { text: einheit || '' }),
   ]);
+}
+
+/**
+ * Eine Zahl eines Eintrags als Feldzeile: Beschriftung mit Formelzeichen,
+ * Einheit und Grenzen aus dem Katalog (`katalog.felder[art]`) -- in welcher
+ * Einheit der Kern eine Zahl meint, steht an ihrem Feld im Kern und nur dort.
+ * `aendern(veraenderer)` ändert den Eintrag im Projekt. Für Grundbruch und
+ * Setzung dieselbe.
+ */
+export function zahlzeile(art, eintrag, schluessel, beschriftung, symbol, {
+  schritt = 1, titel, aendern,
+}) {
+  const angabe = feldangabe(art, schluessel);
+  return feld([`${beschriftung} `, span(symbol)], zahlfeld({
+    wert: eintrag[schluessel], schritt, angabe, titel,
+    beiAenderung: (v) => aendern((x) => { x[schluessel] = v; }),
+  }), angabe.einheit || '', titel);
 }
 
 /**

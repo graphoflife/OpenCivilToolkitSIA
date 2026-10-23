@@ -41,8 +41,8 @@ from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.projekt import (
     Aufbau, GebrauchsfallEintrag, GrundbruchEintrag,
     GrundbruchkombinationEintrag, KnickEintrag, KombinationEintrag, MaterialEintrag,
-    QuerkraftbewehrungEintrag, QuerschnittEintrag, SkriptEintrag, SpannungsfallEintrag,
-    VerformungsfallEintrag,
+    QuerkraftbewehrungEintrag, QuerschnittEintrag, SchichtEintrag, SetzungEintrag,
+    SkriptEintrag, SpannungsfallEintrag, VerformungsfallEintrag,
 )
 from opencivil.projekt import balkensystem as bs
 from opencivil.projekt.eintraege import EIGENE_VORSILBE
@@ -63,7 +63,8 @@ from opencivil.nachweis.rechenwahl import (
 from opencivil.spannungsanalyse import Analyseart
 from opencivil.stabwerk import querschnitte as stabquerschnitte
 from opencivil.stabwerk.modell import Lastart, Lastrichtung
-from opencivil.web import balkendaten, diagrammdaten, grundbruchdaten
+from opencivil.geotechnik.setzung import Steifigkeit
+from opencivil.web import balkendaten, diagrammdaten, grundbruchdaten, setzungsdaten
 from opencivil.web.umschlag import endlich
 
 #: Die Wertesaetze und Betongesetze mit Beschriftung -- dieselben in der
@@ -137,12 +138,17 @@ def katalog() -> dict:
         # Ein Grundbruch mit den Vorgaben des Benutzers und einer Kombination.
         # Die Oberflaeche setzt Kennung und Name.
         "neuer_grundbruch": GrundbruchEintrag.neu(kennung="", name="").als_dict(),
+        # Eine Setzung ohne Pressung und mit einer Schicht. Die Oberflaeche
+        # setzt Kennung und Name.
+        "neue_setzung": SetzungEintrag.neu(kennung="", name="").als_dict(),
         # Je Feld, was der Kern ueber seine Zahl weiss: die Einheit, in der
         # sie gemeint ist, die Grenzen und ob sie ganz sein muss -- zuerst
         # beim Grundbruch, dessen Einheiten die Maske selbst trug.
         "felder": {
             "grundbruch": feldangaben(GrundbruchEintrag),
             "grundbruchkombination": feldangaben(GrundbruchkombinationEintrag),
+            "setzung": feldangaben(SetzungEintrag),
+            "schicht": feldangaben(SchichtEintrag),
             "querkraftbewehrung": feldangaben(QuerkraftbewehrungEintrag),
             "querschnittsanalyse": feldangaben(QuerschnittsanalyseEintrag),
             "spannungsfall": feldangaben(SpannungsfallEintrag),
@@ -188,6 +194,13 @@ def katalog() -> dict:
             "lastkombination": bs.LastkombinationEintrag().als_dict(),
             # Eine Einwirkung auf ein Fundament.
             "grundbruchkombination": GrundbruchkombinationEintrag(name="").als_dict(),
+            # Eine Schicht unter einem Fundament der Setzung.
+            "schicht": SchichtEintrag(name="").als_dict(),
+        },
+        # Wie ein Fundament der Setzung folgt -- und wo darum gerechnet wird.
+        "setzung": {
+            "steifigkeiten": [{"wert": s.value, "beschriftung": s.beschriftung}
+                              for s in Steifigkeit],
         },
         # Die Wahlmoeglichkeiten der Querschnittsanalyse, mit Beschriftung.
         "querschnittsanalyse": {
@@ -514,6 +527,7 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
             for kennung, system in aufbau.balkensysteme.items()})
         # Je Fundament, was die Situationszeichnung vom Kern braucht.
         ergebnis["grundbrueche"] = endlich(grundbruchdaten.situationen(aufbau, loesung))
+        ergebnis["setzungen"] = endlich(setzungsdaten.situationen(aufbau, loesung))
         # Je Platte ihre Kennzahlen -- auch ohne Lastfall, darum nicht in der
         # Zusammenfassung, die es nur mit Urteilen gibt.
         ergebnis["kennzahlen"] = {
@@ -741,5 +755,13 @@ def zuordnung(aufbau: Aufbau) -> dict:
                 "werte": {k: d.id for k, d in fundament.definitionen.items()},
             }
             for kennung, fundament in aufbau.grundbrueche.items()
+        },
+        "setzungen": {
+            kennung: {
+                "namensraum": fundament.id,
+                "name": fundament.name,
+                "werte": {k: d.id for k, d in fundament.definitionen.items()},
+            }
+            for kennung, fundament in aufbau.setzungen.items()
         },
     }

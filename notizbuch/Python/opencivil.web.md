@@ -1,5 +1,5 @@
 ---
-erzeugt: 6bcfc695e6c0
+erzeugt: de89bbcd3df7
 art: modul
 tags: [modul]
 ---
@@ -21,5 +21,6 @@ Browser laedt, samt dem Notizbuch.
 - [[opencivil.web.dienst]] – Der Rechendienst, unabhaengig vom Transportweg.
 - [[opencivil.web.grundbruchdaten]] – was die Oberflaeche von einem Grundbruch zeichnet.
 - [[opencivil.web.server]] – Schlanker HTTP-Server fuer die Oberflaeche.
+- [[opencivil.web.setzungsdaten]] – was die Oberflaeche von einer Setzung zeichnet.
 - [[opencivil.web.speicher]] – was vom letzten Lauf noch gilt.
 - [[opencivil.web.umschlag]] – wie eine Antwort an die Oberfläche verpackt wird.

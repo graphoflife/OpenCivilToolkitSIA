@@ -1,5 +1,5 @@
 ---
-erzeugt: 6f5106f4f5b7
+erzeugt: a9716aba51aa
 art: modul
 tags: [modul]
 ---
@@ -711,5 +711,6 @@ Eine zu pruefende Schnittgroessenkombination.
 - [[opencivil.projekt.platte]]
 - [[opencivil.projekt.projekt]]
 - [[opencivil.projekt.querschnittsanalyse]]
+- [[opencivil.projekt.setzung]]
 - [[opencivil.projekt.skript]]
 - [[opencivil.web.api]]

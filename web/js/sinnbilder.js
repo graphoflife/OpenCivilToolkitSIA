@@ -116,6 +116,11 @@ const ZEICHEN = {
     pfade: ['M9.5 6h6v6.5h-6z', 'M12.5 1.5v3.2 M11 3.4l1.5 1.5 1.5-1.5', 'M2.5 9.5h7 M15.5 9.5h6'],
     strich: ['M15.5 12.5C14.5 20 6 19.5 3 9.5'],
   },
+  // Ein Fundament auf zwei Schichten, darunter gestrichelt, wie es sich setzt.
+  setzung: {
+    pfade: ['M8 3.5h8v4.5H8z', 'M2.5 8h19 M2.5 13.5h19 M2.5 19h19'],
+    strich: ['M5 10.5Q12 16.5 19 10.5'],
+  },
   // Eine Konsole: die Aufforderung und eine Zeile dahinter.
   python: {
     pfade: ['M3 4.5h18v15H3z', 'M6.5 9l3 3-3 3', 'M11.5 15.5h5'],

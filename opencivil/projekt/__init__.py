@@ -23,6 +23,8 @@ Aufgabe ein Modul::
                    Linienlager, Lager, Lasten, Lastfaelle, Kombinationen
     grundbruch.py  ein Flachfundament: Boden, Masse, Gelaende, Grundwasser
                    und Einwirkungen fuer Grundbruch und Gleiten
+    setzung.py     ein Flachfundament auf geschichtetem Baugrund: Pressungen
+                   aus Wieder- und Erstbelastung, Schichten mit M_E-Werten
     netz.py        Knoten mit Kennungen, fuer beide Zeichnungen
     skript.py      ein Python-Skript der App «Python»: gespeichert, nicht
                    gerechnet
@@ -71,6 +73,7 @@ from opencivil.projekt.querschnittsanalyse import (
 )
 from opencivil.projekt.skript import SkriptEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag, GrundbruchkombinationEintrag
+from opencivil.projekt.setzung import SchichtEintrag, SetzungEintrag
 from opencivil.projekt.aufbau import BAUTEILE, Aufbau, Bauteil, Bauteilart, aufbauen
 from opencivil.projekt.projekt import Projekt
 
@@ -91,5 +94,6 @@ __all__ = [
     "RechenwahlEintrag", "SkriptEintrag", "SpannungsfallEintrag",
     "VerformungEintrag", "VerformungsfallEintrag", "abgeleiteter_fallname",
     "GrundbruchEintrag", "GrundbruchkombinationEintrag",
+    "SchichtEintrag", "SetzungEintrag",
     "aufbauen", "sorten",
 ]

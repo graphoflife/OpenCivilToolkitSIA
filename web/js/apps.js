@@ -1,7 +1,7 @@
 /**
  * apps.js -- die Apps der linken Tafel, je eine Zeile.
  *
- * Eine App hat links einen Knopf: die Materialien, die vier Bauteilarten
+ * Eine App hat links einen Knopf: die Materialien, die fünf Bauteilarten
  * (ARTEN, arten.js) und Python. Was Baum, Editor und rechte Tafel von ihr
  * wissen müssen, steht in ihrer Zeile: ihre Liste im Projekt und die Gruppen
  * unter dem Knopf, wie ein Eintrag heisst und was rechts in ihm steht, wie er
@@ -24,6 +24,7 @@ import { plattenEditor, plattenFenster } from './platte.js';
 import { analyseEditor, analyseFenster } from './querschnittsanalyse.js';
 import { balkensystemEditor } from './balkensystem.js';
 import { grundbruchEditor } from './grundbruch.js';
+import { setzungEditor } from './setzung.js';
 import { skriptZeichnen } from './python.js';
 import { variablenZeichnen } from './variablen.js';
 import { freieKennung, naechsterName, projektAendern, waehlen, zustand } from './zustand.js';
@@ -245,6 +246,13 @@ const GRUNDBRUCH = bauteil('grundbruch', {
   editor: grundbruchEditor,
 });
 
+/** Ein Fundament ohne Pressung, mit einer Schicht aus dem Kern -- ohne Material. */
+const SETZUNG = bauteil('setzung', {
+  kurztext: (s) => `${s.B}×${s.L} m`,
+  anlegen: (a) => nachVorlage(a, 'neue_setzung'),
+  editor: setzungEditor,
+});
+
 /**
  * Python: ein Skript je Eintrag, nach der Vorlage des Kerns mit einem
  * Diagramm darin. Rechts stehen statt der Berechnung die Variablen der
@@ -271,7 +279,7 @@ const SKRIPT = {
 };
 
 /** Die Apps, in der Folge ihrer Knöpfe: das Material, die Bauteilarten wie ARTEN, Python. */
-export const APPS = [MATERIAL, PLATTE, ANALYSE, SYSTEM, GRUNDBRUCH, SKRIPT];
+export const APPS = [MATERIAL, PLATTE, ANALYSE, SYSTEM, GRUNDBRUCH, SETZUNG, SKRIPT];
 
 /** Die App, wie die Auswahl sie nennt: 'material', 'skript' oder eine Bauteilart. */
 export function appVon(name) {

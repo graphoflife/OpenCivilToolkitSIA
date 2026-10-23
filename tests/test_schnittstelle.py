@@ -22,10 +22,11 @@ class TestUrteilsraum(unittest.TestCase):
         # Nur Platten: um sie geht es hier. Der Unterzug des Beispiels hat
         # seinen eigenen Namensraum und zählte sonst bei keiner mit -- und der
         # Rahmen, der seinen Querschnitt nimmt, geht mit ihm. Das Fundament
-        # ebenso.
+        # ebenso, mit seiner Setzung.
         projekt.querschnittsanalysen = []
         projekt.balkensysteme = []
         projekt.grundbrueche = []
+        projekt.setzungen = []
         zweite = Projekt.aus_dict(json.loads(json.dumps(projekt.als_dict()))).querschnitt("q1")
         zweite.kennung, zweite.name = "q2", "Decke über 1. OG"
         projekt.querschnitte.append(zweite)
@@ -320,14 +321,22 @@ class TestAngabengruppen(unittest.TestCase):
 
     def test_zwei_kaesten_statt_vier_zeilen(self):
         gruppen = self.gruppen()
-        # Zwei Kästen der Platte, einer des Unterzugs, vier des Fundaments.
+        # Zwei Kästen der Platte, einer des Unterzugs, vier des Fundaments und
+        # sechs seiner Setzung -- deren «Fundament» heisst wie das des
+        # Grundbruchs und steht hier mit ihm in einer Liste.
         self.assertEqual(sorted(gruppen),
                          ["Abmessungen – Beton C30/37", "Boden", "Bruttoquerschnitt",
-                          "Fundament", "Gelände und Grundwasser", "Sohlreibung",
+                          "Fundament", "Gelände und Grundwasser", "Nachweis",
+                          "Pressung in der Sohle", "Schicht 1: Kies, sandig",
+                          "Schicht 2: Silt, tonig", "Schicht 3: Moräne", "Sohlreibung",
                           "Überdeckungen"])
         self.assertEqual(gruppen["Fundament"],
                          ["Breite des Fundaments", "Länge des Fundaments",
-                          "Tiefe der Sohle unter Terrain", "Neigung der Sohle"])
+                          "Tiefe der Sohle unter Terrain", "Neigung der Sohle",
+                          "Breite des Fundaments", "Länge des Fundaments"])
+        self.assertEqual(gruppen["Schicht 2: Silt, tonig"],
+                         ["Dicke der Schicht 2", "M_E-Wert der Schicht 2, Erstbelastung",
+                          "M_E-Wert der Schicht 2, Wiederbelastung"])
         self.assertEqual(gruppen["Bruttoquerschnitt"],
                          ["Fläche des Bruttoquerschnitts", "Schwerpunkt, y", "Schwerpunkt, z",
                           "Trägheitsmoment um y", "Trägheitsmoment um z", "Deviationsmoment"])
@@ -516,6 +525,8 @@ class TestAngabengruppen(unittest.TestCase):
             *(f"grundbruch.g1.{n}" for n in (
                 "phi_k", "gamma_phi", "c_k", "gamma_c", "gamma", "gamma_w", "b", "L", "t",
                 "alpha", "t1", "beta", "q_Ed", "delta_faktor")),
+            *(f"setzung.w1.{n}" for n in ("B", "L", "q_W", "q_E", "s_zul", "dz")),
+            *(f"setzung.w1.{n}_{i}" for i in (1, 2, 3) for n in ("d", "M_E", "M_E_strich")),
         })
 
 

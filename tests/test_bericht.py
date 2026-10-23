@@ -495,11 +495,12 @@ class TestBerichtWieBildschirm(unittest.TestCase):
         cls.text = " ".join(als_text(cls.loesung, aufbau=cls.aufbau).split())
 
     def test_jedes_bauteil_hat_seinen_abschnitt(self):
-        # Drei Platten, der Unterzug und das Fundament des Beispiels -- der
-        # Rahmen führt keine Nachweise und hat darum keinen Abschnitt.
-        self.assertEqual(sorted(self.web), ["a1", "g1", "q1", "q2", "q3"])
+        # Drei Platten, der Unterzug und das Fundament des Beispiels mit
+        # Grundbruch und Setzung -- der Rahmen führt keine Nachweise und hat
+        # darum keinen Abschnitt.
+        self.assertEqual(sorted(self.web), ["a1", "g1", "q1", "q2", "q3", "w1"])
         titel = {"platte": "Angaben zur Platte", "querschnittsanalyse": "Angaben zum Querschnitt",
-                 "grundbruch": "Angaben zum Fundament"}
+                 "grundbruch": "Angaben zum Fundament", "setzung": "Angaben zum Fundament"}
         for bauteil in self.aufbau.bauteile():
             if not bauteil.nachweise:
                 continue

@@ -2,9 +2,10 @@
 opencivil/bericht/zusammenfassung.py -- was in der Zusammenfassung steht.
 
 VERANTWORTUNG:
-Je Bauteil -- Platte, Querschnittsanalyse oder Grundbruch -- die gefuehrten
-Urteile und darunter die still verfehlten; dazu, was ueber der
-Nachweistabelle steht (Angaben, Bewehrung oder die Faktoren des Grundbruchs)
+Je Bauteil -- Platte, Querschnittsanalyse, Grundbruch oder Setzung -- die
+gefuehrten Urteile und darunter die still verfehlten; dazu, was ueber der
+Nachweistabelle steht (Angaben, Bewehrung, die Faktoren des Grundbruchs oder
+die Schichten der Setzung)
 und was darunter (Hinweise, stille Maengel). Als Bloecke und Saetze, nicht als
 Aussehen: dieselben Stuecke setzt die Oberflaeche
 (:func:`opencivil.web.api.zusammenfassungen`) und der Bericht
@@ -32,7 +33,7 @@ from opencivil.core.latex import Mathe, Zelle, als_text
 from opencivil.core.protokoll import GleichungBlock, TabellenBlock
 from opencivil.core.rechenwerk import Loesung
 from opencivil.core.wert import Kennzahl, Wert
-from opencivil.geotechnik import grundbruch
+from opencivil.geotechnik import grundbruch, setzung
 from opencivil.querschnitt.platte import BREITE_Y_MM, Plattenquerschnitt
 
 if TYPE_CHECKING:
@@ -235,8 +236,8 @@ def angaben(aufbau: "Aufbau", kennung: str,
     Was ueber der Nachweistabelle eines Bauteils steht: eine Zeile mit den
     Angaben und eine Tabelle -- bei der Platte ihre Lagen, bei der
     Querschnittsanalyse ihre Staebe und Schubwaende, beim Grundbruch die
-    Faktoren der Tragfaehigkeitsformel. Die stehen erst nach dem Rechnen
-    fest; darum die Loesung.
+    Faktoren der Tragfaehigkeitsformel, bei der Setzung die Schichten mit
+    ihrem Anteil. Die stehen erst nach dem Rechnen fest; darum die Loesung.
     """
     platte = aufbau.querschnitte.get(kennung)
     if platte is not None:
@@ -247,6 +248,13 @@ def angaben(aufbau: "Aufbau", kennung: str,
         befund = loesung.befunde.get(nachweis.id) if nachweis is not None else None
         return (grundbruch.angaben(fundament, loesung.werte),
                 grundbruch.faktortabelle(befund) if befund is not None else None)
+    baugrund = aufbau.setzungen.get(kennung)
+    if baugrund is not None:
+        nachweis = aufbau.setzung.get(kennung)
+        befund = loesung.befunde.get(nachweis.id) if nachweis is not None else None
+        return (setzung.angaben(baugrund, loesung.werte),
+                setzung.schichttabelle(baugrund, loesung.werte, befund)
+                if befund is not None else None)
     return aufbau.querschnittsanalysen[kennung].angaben()
 
 

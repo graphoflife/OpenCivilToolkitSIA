@@ -199,7 +199,7 @@ class TestRechnen(unittest.TestCase):
         web = api.zusammenfassungen(loesung, aufbau)
         text = konsole.zusammenfassung(zusammenfassen(aufbau, loesung))
 
-        self.assertEqual(sorted(web), ["a1", "g1", "q1", "q2"])
+        self.assertEqual(sorted(web), ["a1", "g1", "q1", "q2", "w1"])
         namen = {b.kennung: b.name for b in aufbau.bauteile()}
         for kennung, tabelle in web.items():
             with self.subTest(bauteil=kennung):

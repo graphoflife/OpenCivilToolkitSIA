@@ -46,6 +46,23 @@ gelernt wurde, steht in [[Entwicklung]].
 - [ ] Grundbruch: keine Ausmitte der Last (wirksame Breite), kein
       Erdwiderstand vor dem Fundament. Der Gleitkörper im Bild gilt für
       waagrechte Sohle und waagrechtes Gelände.
+- [ ] **Setzung: die Formel für J nachschlagen lassen.** Das Kapitel 8
+      verweist für den Einflussfaktor auf Kapitel 3, das nicht vorliegt. Die
+      Eckformel nach Boussinesq (`geotechnik/setzung.py`,
+      `einflussfaktor_ecke`) gibt J_K der Tabelle 8.4 auf die gedruckte
+      Stelle wieder und die Grenztiefen der Tabelle 8.5 so genau, wie sie
+      dort stehen -- nicht nachgeschlagen. Kapitel 3 vom Benutzer, dann
+      `referenz=` am Ansatz setzen.
+- [ ] Setzung, gesetzt und nicht vom Benutzer: die Vorgaben einer neuen
+      Berechnung (s_zul = 20 mm, Δz_max = 0.5 m, eine Schicht von 2 m mit
+      M_E = 20 und M'_E = 60 MN/m²), die Einheit MN/m² der M_E-Werte (das
+      Kapitel schreibt kN/m²) und «starr» als Vorgabe der Steifigkeit.
+      Bestätigen lassen.
+- [ ] Setzung, nicht gebaut: Setzungsdifferenzen und Verkippung
+      (Kap. 8.11 bis 8.13), der zeitliche Verlauf (Konsolidation), die
+      Einflusstiefe als Abbruch (Kap. 8.4) -- gerechnet wird bis zur
+      untersten Schicht, und unter der Tabelle steht, wie viel J dort noch
+      ist.
 - [ ] Der Dienst «bericht» und das PDF des lokalen Servers haben seit dem
       Wegfall des Knopfs «Bericht» keinen Weg mehr aus der Oberfläche.
       Entfernen, oder wieder erreichbar machen.
