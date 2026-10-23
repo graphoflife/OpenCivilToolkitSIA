@@ -377,8 +377,10 @@ Startpunkt. Jeder Punkt fängt an Knoten, Mitten, Schnittpunkten und am Raster
 (Bezugspunkt), Y/Z (Achse), P/S (parallel, senkrecht) und M (Mitte), die
 Zahlen getippt. Mit Y oder Z fängt ein Punkt in der Nähe und wird auf die
 Achse projiziert: sein Fangzeichen steht an ihm, eine gestrichelte Spur führt
-zur Stelle auf der Achse. Beim Polygon nimmt Esc wie die Rücktaste den
-letzten Punkt zurück. Alle Eigenschaften stehen im
+zur Stelle auf der Achse. Eine Linie entsteht aus zwei Punkten, danach
+beginnt die nächste mit einem eigenen Anfangspunkt. Esc nimmt wie die
+Rücktaste den letzten gesetzten Punkt zurück, beim Polygon wie bei der Linie;
+erst ohne Punkt endet das Werkzeug. Alle Eigenschaften stehen im
 schwebenden Fenster in der Zeichnung. Mit T kommt eine Vorlage dazu --
 Rechteck, T-Balken, Hohlkasten oder Kreis, die Skizze ändert sich beim
 Tippen der Masse. Rückgängig mit Strg+Z, Vollbild.

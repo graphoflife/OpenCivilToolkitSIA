@@ -13,9 +13,9 @@
  */
 
 import {
-  erklaerung, feld, karte, panel, zahlzeile,
+  erklaerung, feld, karte, panel, wahlSchalter, zahlzeile,
 } from './bausteine.js';
-import { auswahl, el, zahlfeld } from './dom.js';
+import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
 import { span } from './mathe.js';
 import { ausVorlage, feldangabe, naechsterName, projektAendern, zustand } from './zustand.js';
@@ -67,11 +67,13 @@ function situationPanel(s) {
     karte('Fundament', [
       zahl('B', 'Breite', 'B', { schritt: 0.1 }),
       zahl('L', 'Länge', 'L', { schritt: 0.1 }),
-      feld('Steifigkeit', auswahl({
-        werte: zustand.katalog?.setzung?.steifigkeiten || [],
+      feld('Steifigkeit', wahlSchalter({
+        werte: (zustand.katalog?.setzung?.steifigkeiten || []).map((x) => ({
+          wert: x.wert, beschriftung: x.wert, titel: x.beschriftung,
+        })),
         gewaehlt: s.steifigkeit,
+        setzen: (w) => aendern((x) => { x.steifigkeit = w; }),
         titel: 'Starr: im Punkt K, die mittlere Setzung -- schlaff: unter der Mitte, die grösste',
-        beiAenderung: (w) => aendern((x) => { x.steifigkeit = w; }),
       }), ''),
     ]),
     karte('Pressung in der Sohle', [

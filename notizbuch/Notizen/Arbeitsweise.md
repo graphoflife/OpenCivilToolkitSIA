@@ -59,6 +59,13 @@ Kopie der Datei mit der Endung `.mjs`.
 - Das Werkzeug ist ein Prototyp: alte Speicherstände müssen nicht weiter
   funktionieren (Benutzer, 2026-10-11).
 
+## Grundsätze der Oberfläche
+
+- Keine Auswahllisten (Dropdowns) -- ausser für die Wahl eines Materials
+  (Benutzer, 2026-10-23). Eine feste Wahl ist ein Schalter mit ihren
+  Stellungen (`wahlSchalter`, `zweiSchalter` in `bausteine.js`), eine Zahl
+  ein Zahlenfeld. Welche Listen noch übrig sind, steht im [[TODO]].
+
 ## Normstellen
 
 - Die Normstellen, also die Passagen aus SIA 262, liefert der Benutzer. Nie

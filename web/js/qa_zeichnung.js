@@ -27,7 +27,7 @@
  */
 
 import { api } from './api.js';
-import { hakenSchalter } from './bausteine.js';
+import { hakenSchalter, wahlSchalter } from './bausteine.js';
 import { sinnbild } from './sinnbilder.js';
 import {
   nachBild, pfad, text, zahlText,
@@ -586,13 +586,17 @@ function felderVon(liste, werte, setzen) {
   if (liste === 'stablinien') {
     const arten = zustand.katalog?.querschnittsanalyse?.linienarten || [];
     const art = werte.art;
+    const erklaert = {
+      flaeche: 'Eine Stahlfläche, über die Linie verschmiert',
+      anzahl: 'n Stäbe, gleich verteilt',
+      teilung: 'Stäbe im Abstand s -- gerundet auf einen, der aufgeht',
+    };
     return [
-      zeile('Verteilung', auswahl({
-        werte: arten.map((x) => ({ wert: x.wert, beschriftung: x.beschriftung })),
-        gewaehlt: art,
-        titel: 'verschmiert: eine Stahlfläche; Anzahl: n Stäbe; Teilung: Abstand, gerundet auf einen, der aufgeht',
-        beiAenderung: (w) => setzen('art', w),
-      })),
+      wahlSchalter({
+        werte: arten.map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: erklaert[x.wert] })),
+        gewaehlt: art, setzen: (w) => setzen('art', w),
+        titel: 'Wie die Stäbe auf der Linie verteilt sind', klasse: '.cad-wahl',
+      }),
       art === 'flaeche' ? zeile('A_s', zahl('flaeche', 'Stahlfläche der ganzen Linie', { schritt: 100 }), 'mm²') : null,
       art === 'anzahl' ? zeile('n', zahl('anzahl', 'Anzahl Stäbe', { min: 1 })) : null,
       art === 'teilung' ? zeile('s', zahl('teilung', 'Gewünschte Teilung', { schritt: 25, min: 1 }), 'mm') : null,
@@ -608,11 +612,8 @@ function felderVon(liste, werte, setzen) {
       zeile('b_w', zahl('dicke', 'Dicke der Schubwand', { schritt: 10, min: 1 }), 'mm'),
       zeile('Bügel ⌀', zahl('durchmesser', 'Bügeldurchmesser; 0: ohne Bügel', { stufen: durchmesser }), 'mm'),
       zeile('s', zahl('teilung', 'Bügelteilung in Längsrichtung', { schritt: 25, min: 1 }), 'mm'),
-      zeile('Schnitte', auswahl({
-        werte: schnitte.map((n) => ({ wert: String(n), beschriftung: String(n) })),
-        gewaehlt: String(werte.schnitte),
-        titel: 'Wie viele Bügelschenkel die Wand kreuzen',
-        beiAenderung: (w) => setzen('schnitte', Number(w)),
+      zeile('Schnitte', zahl('schnitte', 'Wie viele Bügelschenkel die Wand kreuzen', {
+        min: schnitte[0], max: schnitte.at(-1), angabe: { ganz: true },
       })),
       stahl(),
     ];
@@ -640,7 +641,7 @@ function formWahl(a) {
       },
     },
   }, [sinnbild(zeichen), el('span', { text })]);
-  return el('span.schalter.cad-form', {}, [
+  return el('span.schalter.cad-wahl', {}, [
     stellung('linie', 'Linie', 'cad-linienbewehrung',
       'Linienbewehrung: Stäbe auf einer Linie, nach Anzahl, Teilung oder verschmiert'),
     stellung('punkt', 'Punkt', 'cad-punktbewehrung', 'Punktbewehrung: ein Stab je Klick'),

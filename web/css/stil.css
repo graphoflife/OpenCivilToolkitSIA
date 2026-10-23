@@ -1593,9 +1593,13 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .cad-palette.ist-zu .cad-palette-koerper { display: none; }
 
 .cad-lage { min-height: 1.3em; white-space: pre; font-variant-numeric: tabular-nums; }
-.cad-ruhe { display: flex; align-items: center; gap: 14px; color: var(--schrift-matt); }
+.cad-ruhe {
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+  color: var(--schrift-matt);
+}
 .cad-ruhe label { display: inline-flex; align-items: center; gap: 5px; }
-.cad-ruhe select { width: auto; padding: 1px 4px; font-size: 12px; }
+/* Das Raster: seine Stufen als Schalter, in einer eigenen Zeile. */
+.cad-wahl.cad-rasterwahl .schalter-halb { padding: 2px 5px; text-transform: none; }
 
 /* Die Punkteingabe: Modus, zwei Felder, die Hilfen R Y Z ∥ ⊥ M. */
 .cad-modus { align-self: flex-start; }
@@ -1630,11 +1634,11 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .cad-zeile input[type="number"] { padding-block: 2px; }
 .cad-zeile .einheit { font-size: 11px; color: var(--schrift-zart); }
 .cad-neu { display: flex; flex-direction: column; gap: 4px; padding-top: 6px; border-top: 1px solid var(--rand); }
-/* Die Bewehrung als Linie oder als Punkt: ein Schalter mit Zeichen, über
-   ihren Feldern. */
-.cad-form { align-self: flex-start; }
-.cad-form .schalter-halb { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; }
-.cad-form .sinnbild { width: 15px; height: 15px; }
+/* Die Schalter im Fenster -- die Bewehrung als Linie oder als Punkt, mit
+   Zeichen, und ihre Verteilung: über den Feldern, so breit wie nötig. */
+.cad-wahl { align-self: flex-start; }
+.cad-wahl .schalter-halb { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; }
+.cad-wahl .sinnbild { width: 15px; height: 15px; }
 .cad-neu-titel {
   font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px;
   color: var(--schrift-zart);

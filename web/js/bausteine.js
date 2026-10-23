@@ -160,6 +160,20 @@ export function zweiSchalter({ stellungen, gewaehlt, setzen, titel, klasse = '' 
 }
 
 /**
+ * Ein Schalter mit mehreren Stellungen -- ein Klick wählt seine. Er steht,
+ * wo sonst eine Auswahlliste stünde: Auswahllisten gibt es nur für die Wahl
+ * eines Materials (Benutzer, 2026-10-23). `werte` sind `{wert, beschriftung,
+ * titel?}`; `titel` sagt, was der ganze Schalter wählt.
+ */
+export function wahlSchalter({ werte, gewaehlt, setzen, titel = '', klasse = '' }) {
+  return el(`span.schalter${klasse}`, { title: titel }, werte.map((w) => el('button.schalter-halb', {
+    type: 'button', text: w.beschriftung, title: w.titel || w.beschriftung,
+    class: w.wert === gewaehlt ? 'ist-an' : '',
+    on: { click: () => { if (w.wert !== gewaehlt) setzen(w.wert); } },
+  })));
+}
+
+/**
  * Zweistellungs-Schalter ja/nein -- grüner Haken, rotes Kreuz.
  *
  * Beide Hälften gleich breit und die Zeichen mittig: ✓ und ✗ sind verschieden

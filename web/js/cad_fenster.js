@@ -56,6 +56,7 @@ import {
 } from './cad_befehle.js';
 import { klickWaehlen, leisteZeichnen, rahmenWaehlen, treffer } from './cad_auswahl.js';
 import { paletteBauen } from './cad_palette.js';
+import { wahlSchalter } from './bausteine.js';
 import { el, svgEl } from './dom.js';
 import { sinnbild } from './sinnbilder.js';
 
@@ -616,12 +617,13 @@ function paletteZeichnen(a) {
     pal.setzen(teil.titel, teil.inhalt, JSON.stringify(['auswahl', a.version, [...a.auswahl], teil.schluessel ?? null]));
     return;
   }
-  const raster = el('select.cad-raster', {
-    title: 'Raster: daran fängt der Zeiger',
-    on: { change: (e) => { a.raster = Number(e.target.value); zeichnen(a); } },
-  }, a.einstellung.raster.stufen.map((r) => el('option', {
-    value: r, text: `${r} ${a.einstellung.einheit}`, selected: r === a.raster,
-  })));
+  // Das Raster als Schalter mit seinen Stufen: Auswahllisten gibt es nur für
+  // die Wahl eines Materials (Benutzer, 2026-10-23).
+  const raster = wahlSchalter({
+    werte: a.einstellung.raster.stufen.map((r) => ({ wert: r, beschriftung: String(r) })),
+    gewaehlt: a.raster, setzen: (w) => { a.raster = w; zeichnen(a); },
+    titel: `Raster in ${a.einstellung.einheit}: daran fängt der Zeiger`, klasse: '.cad-wahl.cad-rasterwahl',
+  });
   const fang = el('input', {
     type: 'checkbox', checked: a.fang, title: 'Fang an Knoten, Linien und Raster (Alt hält ihn an)',
     on: { change: (e) => { a.fang = e.target.checked; zeichnen(a); } },
@@ -630,9 +632,9 @@ function paletteZeichnen(a) {
   pal.setzen('Zeiger', [
     a.teile.lage,
     el('div.cad-ruhe', {}, [
-      el('label', {}, ['Raster ', raster]),
-      el('label', {}, [fang, ' Fang']),
+      el('span', { text: `Raster in ${a.einstellung.einheit}` }), el('label', {}, [fang, ' Fang']),
     ]),
+    raster,
   ], JSON.stringify(['ruhe', a.raster, a.fang]));
   if (!a.teile.lage.isConnected) a.teile.lage = pal.koerper.querySelector('.cad-lage');
   lageZeichnen(a);

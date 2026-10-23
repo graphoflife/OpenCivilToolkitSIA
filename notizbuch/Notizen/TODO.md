@@ -46,6 +46,20 @@ gelernt wurde, steht in [[Entwicklung]].
 - [ ] Grundbruch: keine Ausmitte der Last (wirksame Breite), kein
       Erdwiderstand vor dem Fundament. Der Gleitkörper im Bild gilt für
       waagrechte Sohle und waagrechtes Gelände.
+- [ ] **Auswahllisten durch Schalter ersetzen** (Benutzer, 2026-10-23: nur
+      die Materialwahl bleibt eine Liste). Erledigt im Zeichenfenster
+      (Verteilung, Schnitte, Raster) und bei der Steifigkeit der Setzung.
+      Übrig, als feste Wahl: Rissanforderung, Werte und Rechenart der
+      Nachweise (`nachweise.js`), Werkstoffsatz und Betongesetz je Material
+      und die Zugseite der Querschnittsanalyse (`querschnittsanalyse.js`),
+      die Achsen ihres Interaktionsdiagramms (`qa_diagramme.js`), der Modus
+      der Bewehrungssuche (`bewehrungssuche.js`), im Balkensystem Querschnittsart
+      und Vorlage (`balkensystem.js`), Lager, Halt je Richtung, Linienlager
+      und Lastrichtung (`bs_zeichnung.js`). Dazu fünf, die einen Eintrag des
+      Projekts wählen -- Lastfall und Querschnitt im Balkensystem, Platte
+      oder Analyse als Querschnitt, der Fall seiner Diagramme, die
+      Kombination im Bild des Grundbruchs: zu entscheiden, ob sie wie die
+      Materialwahl Listen bleiben.
 - [ ] **Setzung: die Formel für J nachschlagen lassen.** Das Kapitel 8
       verweist für den Einflussfaktor auf Kapitel 3, das nicht vorliegt. Die
       Eckformel nach Boussinesq (`geotechnik/setzung.py`,

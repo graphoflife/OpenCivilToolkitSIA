@@ -80,7 +80,7 @@ export function knotenBefehl(werkzeug) {
 }
 
 // ===========================================================================
-// Linie -- als Kette: das Ende ist der nächste Anfang
+// Linie -- zwei Punkte, dann wieder ein neuer Anfang
 // ===========================================================================
 
 export function linienBefehl(werkzeug) {
@@ -102,7 +102,9 @@ export function linienBefehl(werkzeug) {
           const bis = knotenFuer(a, z, erg);
           neu = a.adapter.linieAnlegen(a, z, von, bis, werkzeug);
         }, { auswahl: () => [neu] });
-        this.start = { ...erg, knoten: undefined };
+        // Keine Kette: die nächste Linie beginnt mit einem eigenen
+        // Anfangspunkt (Benutzer, 2026-10-23). Getipptes gilt ab hier.
+        this.start = null;
       }
       a.eingabe.bezug = erg.p;
     },
@@ -118,7 +120,12 @@ export function linienBefehl(werkzeug) {
       this.start = null;
       return true;
     },
-    zurueck() {
+    // Esc wie die Rücktaste: der Anfangspunkt geht zurück; ohne ihn endet das
+    // Werkzeug (Benutzer, 2026-10-23).
+    zurueck(a) {
+      return this.rueckschritt(a);
+    },
+    rueckschritt() {
       if (!this.start) return false;
       this.start = null;
       return true;

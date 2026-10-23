@@ -44,6 +44,31 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-23 · Linien ohne Kette, Schalter statt Auswahllisten
+
+Drei Wünsche des Benutzers:
+
+- **Eine Linie, dann ein neuer Anfang.** Bis jetzt war das Ende einer Linie
+  gleich der Anfang der nächsten, eine Kette. Jetzt wartet das Werkzeug nach
+  dem zweiten Punkt wieder auf einen Anfangspunkt; der Bezugspunkt für
+  Getipptes bleibt am Ende. Für beide Apps, weil die Linie dem Zeichenfenster
+  gehört -- im Balkensystem zeichnet man einen Rahmen damit Stab für Stab.
+- **Esc wie die Rücktaste**, auch bei der Linie: ein gesetzter Anfangspunkt
+  geht zurück, erst ohne ihn endet das Werkzeug.
+- **Keine Auswahllisten ausser für die Materialwahl** -- als Grundsatz in
+  [[Arbeitsweise]]. Im Zeichenfenster sind die Verteilung der Bewehrung
+  (verschmiert, Anzahl, Teilung) und das Raster nun Schalter, die Schnitte
+  einer Schubwand ein Zahlenfeld; die Steifigkeit der Setzung ein Schalter.
+  Dafür gibt es `wahlSchalter` in `bausteine.js`. Die übrigen Listen stehen
+  im [[TODO]], dazu die Frage, ob eine Wahl aus dem eigenen Projekt -- ein
+  Lastfall, ein Querschnitt -- eine Liste bleiben darf wie die Materialwahl.
+
+Beim Prüfen fiel auf: das schwebende Fenster der Bewehrung ist mit allen
+Feldern fast 400 px hoch und deckt im schmalen Panel die halbe Zeichnung --
+ein Klick dorthin setzt keinen Punkt. Zuklappen geht (–), verschieben am Kopf.
+
+---
+
 ## 2026-10-23 · Fangen sichtbar, Esc im Polygon
 
 Zwei Meldungen des Benutzers:
