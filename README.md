@@ -356,12 +356,18 @@ gezogenen Seite gibt es keinen Faktor und keinen Nachweis. Der Grenzwert L/350
 ist nach Vorgabe eingebaut, nicht nachgeschlagen.
 
 **Querschnittsanalyse:** unter den Platten ein zweites Kapitel. Der
-Querschnitt wird gezeichnet wie in einem kleinen CAD, aus Knoten, Linien und
-Flächen:
-* eine Fläche ist Beton oder eine Aussparung;
-* ein Knoten ist ein Punkt oder ein Stab;
-* eine Linie ist eine Bewehrung (nach Anzahl, Teilung oder verschmiert),
-  eine Schubwand mit Bügeln oder eine Hilfslinie.
+Querschnitt wird gezeichnet wie in einem kleinen CAD, und oben steht je Art
+ein Knopf mit Zeichen:
+* *Polygon* P -- eine Fläche aus Beton oder eine Aussparung;
+* *Bewehrung* B -- als Linie (nach Anzahl, Teilung oder verschmiert) oder als
+  einzelner Stab, umgestellt mit dem Schalter «Linie | Punkt» im Fenster;
+* *Schubwand* W -- eine Wand mit Bügeln;
+* *Hilfspunkt* K und *Hilfslinie* H -- zum Konstruieren, sie rechnen nicht
+  mit; geschlossene Hilfslinien werden auf Wunsch eine Fläche.
+
+Das schwebende Fenster zeigt immer nur eine Art: beim Zeichnen die des
+Werkzeugs, bei der Auswahl die des Gewählten. Eine andere Art ist ein anderes
+Werkzeug -- eine gezeichnete Linie wechselt ihre Art nicht.
 
 Gewählt wird per Klick oder Rahmen; verschoben und kopiert mit V und C. Der
 Vektor beginnt am zuletzt angeklickten Knoten, und der ist zugleich

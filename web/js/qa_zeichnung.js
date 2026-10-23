@@ -2,15 +2,21 @@
  * qa_zeichnung.js -- das Zeichenfenster der Querschnittsanalyse: der Adapter.
  *
  * Das allgemeine Fenster (`cad_fenster.js`) kennt nur Knoten und Elemente
- * in drei Formen. Was sie im Querschnitt sind, steht hier:
+ * in drei Formen. Was sie im Querschnitt sind, steht hier -- je Art ein
+ * Werkzeug mit eigenem Knopf (Benutzer, 2026-10-23):
  *
- *   Fläche      Polygon mit Beton -- oder ohne Material eine Aussparung
- *   Punkt       ein Stab, mit ⌀ und Stahl
- *   Linie       eine Bewehrung, eine Schubwand oder eine Hilfslinie
+ *   Polygon      eine Fläche mit Beton -- oder ohne Material eine Aussparung
+ *   Bewehrung    eine Linie mit Stäben (nach Anzahl, Teilung oder verschmiert)
+ *                oder ein einzelner Stab -- wie, sagt der Schalter in ihrem
+ *                Fenster
+ *   Schubwand    eine Linie mit Dicke und Bügeln
+ *   Hilfslinie   eine Linie, die nicht mitrechnet
+ *   Hilfspunkt   ein Knoten ohne Element, zum Fangen
  *
- * Eine Linie wechselt ihre Art im schwebenden Fenster: der Eintrag wandert in
- * die andere Liste und behält Kennung, Anfang und Ende. Was die andere Art an
- * Eigenschaften hatte, merkt sich das Fenster für den Rückweg.
+ * Im schwebenden Fenster steht immer nur eine Art: beim Zeichnen die des
+ * Werkzeugs, bei der Auswahl die des Gewählten. Eine gezeichnete Linie
+ * wechselt ihre Art nicht -- bis 2026-10-23 tat sie das über ein
+ * Auswahlfeld «Art», und die Linie hiess im Knopf nur «Linie».
  *
  * WAS HIER GERECHNET WIRD -- UND WAS NICHT:
  * Nichts, was in die Rechnung geht. Die Stäbe einer Linie und ihre
@@ -22,6 +28,7 @@
 
 import { api } from './api.js';
 import { hakenSchalter } from './bausteine.js';
+import { sinnbild } from './sinnbilder.js';
 import {
   nachBild, pfad, text, zahlText,
 } from './cad_ansicht.js';
@@ -56,16 +63,30 @@ const ARTEN = [
   { liste: 'hilfslinien', form: 'linie', vorsilbe: 'L', rang: 3 },
 ];
 
-/** Was eine Linie sein kann -- ihre Liste und ihre Vorlage im Katalog. */
-const LINIENARTEN = [
-  { wert: 'stablinien', text: 'Bewehrung', vorlage: 'stablinie' },
-  { wert: 'schubwaende', text: 'Schubwand', vorlage: 'schubwand' },
-  { wert: 'hilfslinien', text: 'Hilfslinie', vorlage: 'hilfslinie' },
-];
-const LINIENLISTEN = LINIENARTEN.map((x) => x.wert);
+/** Die Listen, deren Elemente Linien sind -- sie haben Anfang und Ende. */
+const LINIENLISTEN = ARTEN.filter((x) => x.form === 'linie').map((x) => x.liste);
 
-/** Felder, die eine Linie ausmachen und nicht ihre Art: sie wandern beim Wechsel mit. */
-const LINIENKERN = ['kennung', 'von', 'bis'];
+/**
+ * Die Werkzeuge, in der Folge ihrer Knöpfe. Die Bewehrung zeichnet als
+ * Linie oder als Punkt, je nach dem Schalter in ihrem Fenster
+ * (`vorgaben.bewehrung`).
+ */
+const WERKZEUGE = [
+  { name: 'polygon', text: 'Polygon', zeichen: 'cad-polygon', taste: 'p', form: 'polygon',
+    titel: 'Polygon: eine Fläche aus Beton oder eine Aussparung' },
+  { name: 'bewehrung', text: 'Bewehrung', zeichen: 'cad-bewehrung', taste: 'b',
+    form: (a) => (a.qa.vorgaben.bewehrung === 'punkt' ? 'knoten' : 'linie'),
+    titel: 'Bewehrung: eine Linie mit Stäben oder einzelne Stäbe' },
+  { name: 'schubwand', text: 'Schubwand', zeichen: 'cad-schubwand', taste: 'w', form: 'linie',
+    titel: 'Schubwand: eine Wand mit Bügeln, für Querkraft und Torsion' },
+  { name: 'hilfspunkt', text: 'Hilfspunkt', zeichen: 'cad-hilfspunkt', taste: 'k', form: 'knoten',
+    titel: 'Hilfspunkt: ein Knoten ohne Element, zum Fangen' },
+  { name: 'hilfslinie', text: 'Hilfslinie', zeichen: 'cad-hilfslinie', taste: 'h', form: 'linie',
+    titel: 'Hilfslinie: rechnet nicht mit -- geschlossen wird sie zur Fläche' },
+];
+
+/** Welche Liste eine Linie des Werkzeugs füllt. */
+const LINIE_VON = { bewehrung: 'stablinien', schubwand: 'schubwaende', hilfslinie: 'hilfslinien' };
 
 function eintragVon(kennung) {
   return zustand.projekt?.querschnittsanalysen?.find((x) => x.kennung === kennung) || null;
@@ -159,28 +180,32 @@ function auswahlMarkieren(a) {
 // Der Adapter
 // ===========================================================================
 
+/**
+ * Was die Werkzeuge als Nächstes anlegen, je Liste -- dazu, ob die Bewehrung
+ * als Linie oder als Punkt zeichnet. Ansichtssache, nicht Teil des Projekts.
+ */
 function vorgabenNeu() {
   const beton = zustand.projekt.materialien.find((m) => m.art === 'beton');
   const stahl = zustand.projekt.materialien.find((m) => m.art === 'betonstahl');
   const mit = (art, felder = {}) => ausVorlage(art, felder);
   return {
-    knoten: { art: 'stab' },
-    stab: mit('stab', { stahl: stahl?.kennung || '' }),
-    linie: { art: 'stablinien' },
+    bewehrung: 'linie',
+    staebe: mit('stab', { stahl: stahl?.kennung || '' }),
     stablinien: mit('stablinie', { stahl: stahl?.kennung || '' }),
     schubwaende: mit('schubwand', { stahl: stahl?.kennung || '' }),
     hilfslinien: mit('hilfslinie'),
-    flaeche: mit('flaeche', { material: beton?.kennung || '' }),
+    flaechen: mit('flaeche', { material: beton?.kennung || '' }),
   };
 }
 
 function adapter(kennung) {
   const projekt = zustand.projekt;
   const qa = {
-    kennung, vorgaben: vorgabenNeu(), geometrie: null, gefragt: null, gemerkt: new Map(),
+    kennung, vorgaben: vorgabenNeu(), geometrie: null, gefragt: null,
   };
   return {
     qa,
+    einstellung: { werkzeuge: WERKZEUGE },
     achsen: ['y', 'z'],
     arten: ARTEN,
     gilt: () => zustand.projekt === projekt,
@@ -225,38 +250,40 @@ export function stoffname(kennung) {
   return m ? (m.name || m.sorte) : '–';
 }
 
+/** Was das Werkzeug als Nächstes anlegt, in Worten -- für die Frage im schwebenden Fenster. */
 function neuText(qa, werkzeug) {
   const v = qa.vorgaben;
-  if (werkzeug === 'knoten') {
-    return v.knoten.art === 'stab' ? `Stab ⌀${zahlText(v.stab.durchmesser)}` : 'Knoten';
+  if (werkzeug === 'polygon') {
+    return v.flaechen.material ? `Fläche ${stoffname(v.flaechen.material)}` : 'Aussparung';
   }
-  if (werkzeug === 'linie') return LINIENARTEN.find((x) => x.wert === v.linie.art).text;
-  return v.flaeche.material ? `Fläche ${stoffname(v.flaeche.material)}` : 'Aussparung';
+  if (werkzeug === 'bewehrung') {
+    return v.bewehrung === 'punkt' ? `Stab ⌀${zahlText(v.staebe.durchmesser)}` : 'Linienbewehrung';
+  }
+  return WERKZEUGE.find((w) => w.name === werkzeug)?.text || '';
 }
 
 // ===========================================================================
 // Anlegen -- nach den Vorgaben im schwebenden Fenster
 // ===========================================================================
 
-function punktAnlegen(a, z, knoten) {
-  const v = a.qa.vorgaben;
-  if (v.knoten.art !== 'stab') return null;
+/** Ein Stab der Bewehrung -- ein Hilfspunkt ist der Knoten selbst und legt nichts an. */
+function punktAnlegen(a, z, knoten, werkzeug) {
+  if (werkzeug !== 'bewehrung') return null;
   const kennung = a.modell.naechsteKennung(z, 'S');
-  z.staebe.push({ ...structuredClone(v.stab), kennung, knoten });
+  z.staebe.push({ ...structuredClone(a.qa.vorgaben.staebe), kennung, knoten });
   return kennung;
 }
 
-function linieAnlegen(a, z, von, bis) {
-  const v = a.qa.vorgaben;
-  const liste = v.linie.art;
+function linieAnlegen(a, z, von, bis, werkzeug) {
+  const liste = LINIE_VON[werkzeug];
   const kennung = a.modell.naechsteKennung(z, 'L');
-  z[liste].push({ ...structuredClone(v[liste]), kennung, von, bis });
+  z[liste].push({ ...structuredClone(a.qa.vorgaben[liste]), kennung, von, bis });
   return kennung;
 }
 
 function flaecheAnlegen(a, z, knoten) {
   const kennung = a.modell.naechsteKennung(z, 'F');
-  z.flaechen.push({ ...structuredClone(a.qa.vorgaben.flaeche), kennung, knoten });
+  z.flaechen.push({ ...structuredClone(a.qa.vorgaben.flaechen), kennung, knoten });
   return kennung;
 }
 
@@ -505,15 +532,14 @@ function masseZeichnen(a, z, ort) {
   return g;
 }
 
-function punktVorschau(a, g, p) {
-  const v = a.qa.vorgaben;
-  if (v.knoten.art === 'stab') g.append(stabKreis(a, p, v.stab.durchmesser, 'cad-stab cad-geist'));
+function punktVorschau(a, g, p, werkzeug) {
+  if (werkzeug !== 'bewehrung') return;
+  g.append(stabKreis(a, p, a.qa.vorgaben.staebe.durchmesser, 'cad-stab cad-geist'));
 }
 
-function linienVorschau(a, g, p, q) {
-  const v = a.qa.vorgaben;
-  if (v.linie.art !== 'schubwaende') return;
-  const ecken = band(p, q, v.schubwaende.dicke);
+function linienVorschau(a, g, p, q, werkzeug) {
+  if (werkzeug !== 'schubwand') return;
+  const ecken = band(p, q, a.qa.vorgaben.schubwaende.dicke);
   if (ecken) g.append(svgEl('path', { d: pfad(a.v, ecken), class: 'cad-wand cad-geist' }));
 }
 
@@ -597,39 +623,44 @@ function felderVon(liste, werte, setzen) {
   return [];
 }
 
-/** Die Wahl der Linienart -- beim Neuen wie beim Gewählten dieselbe. */
-function linienartwahl(gewaehlt, setzen) {
-  return zeile('Art', auswahl({
-    werte: LINIENARTEN.map((x) => ({ wert: x.wert, beschriftung: x.text })),
-    gewaehlt,
-    titel: 'Bewehrung, Schubwand oder Hilfslinie -- eine Hilfslinie rechnet nicht mit',
-    beiAenderung: setzen,
-  }));
+/**
+ * Der Schalter der Bewehrung: eine Linie mit Stäben oder einzelne Stäbe --
+ * ein Werkzeug, zwei Formen. Umgestellt startet das Werkzeug neu, mit dem
+ * Befehl der anderen Form.
+ */
+function formWahl(a) {
+  const v = a.qa.vorgaben;
+  const stellung = (wert, text, zeichen, titel) => el('button.schalter-halb', {
+    type: 'button', title: titel, class: v.bewehrung === wert ? 'ist-an' : '',
+    on: {
+      click: () => {
+        if (v.bewehrung === wert) return;
+        v.bewehrung = wert;
+        a.werkzeugStarten('bewehrung');
+      },
+    },
+  }, [sinnbild(zeichen), el('span', { text })]);
+  return el('span.schalter.cad-form', {}, [
+    stellung('linie', 'Linie', 'cad-linienbewehrung',
+      'Linienbewehrung: Stäbe auf einer Linie, nach Anzahl, Teilung oder verschmiert'),
+    stellung('punkt', 'Punkt', 'cad-punktbewehrung', 'Punktbewehrung: ein Stab je Klick'),
+  ]);
 }
 
-/** Die Vorgaben für das, was ein Werkzeug als Nächstes anlegt. */
+/** Die Vorgaben für das, was ein Werkzeug als Nächstes anlegt -- nur die seiner Art. */
 function neuEigenschaften(a, werkzeug) {
   const v = a.qa.vorgaben;
-  const neu = () => a.neuZeichnen();
-  const vorgabeSetzen = (liste) => (feld, wert) => { v[liste][feld] = wert; neu(); };
-  let inhalt = [];
-  if (werkzeug === 'knoten') {
-    inhalt = [
-      zeile('Art', auswahl({
-        werte: [{ wert: 'stab', beschriftung: 'Stab' }, { wert: 'punkt', beschriftung: 'nur Knoten' }],
-        gewaehlt: v.knoten.art,
-        beiAenderung: (w) => { v.knoten.art = w; neu(); },
-      })),
-      ...(v.knoten.art === 'stab' ? felderVon('staebe', v.stab, vorgabeSetzen('stab')) : []),
-    ];
-  } else if (werkzeug === 'linie') {
-    inhalt = [
-      linienartwahl(v.linie.art, (w) => { v.linie.art = w; neu(); }),
-      ...felderVon(v.linie.art, v[v.linie.art], vorgabeSetzen(v.linie.art)),
-    ];
-  } else if (werkzeug === 'flaeche') {
-    inhalt = felderVon('flaechen', v.flaeche, vorgabeSetzen('flaeche'));
-  }
+  const vorgabeSetzen = (liste) => (feld, wert) => { v[liste][feld] = wert; a.neuZeichnen(); };
+  const felder = (liste) => felderVon(liste, v[liste], vorgabeSetzen(liste));
+  const hinweis = (text) => el('p.cad-hinweis-klein', { text });
+  const inhalt = {
+    polygon: () => felder('flaechen'),
+    bewehrung: () => [formWahl(a), ...felder(v.bewehrung === 'punkt' ? 'staebe' : 'stablinien')],
+    schubwand: () => felder('schubwaende'),
+    hilfspunkt: () => [hinweis('Ein Knoten ohne Element: daran fängt der Zeiger.')],
+    hilfslinie: () => [hinweis('Rechnet nicht mit. Gewählt und geschlossen, werden '
+      + 'Hilfslinien zu einer Fläche.')],
+  }[werkzeug]?.() || [];
   return {
     inhalt: [el('div.cad-neu-titel', { text: 'Neu' }), ...inhalt.filter(Boolean)],
     schluessel: JSON.stringify([werkzeug, v]),
@@ -646,28 +677,6 @@ function finden(z, kennung) {
   return k ? { liste: 'knoten', e: k } : null;
 }
 
-/**
- * Wechselt die Art einer Linie: der Eintrag wandert in die andere Liste,
- * mit Kennung, Anfang und Ende. Was er an Eigenschaften der alten Art hatte,
- * merkt sich die Ansicht -- wer zurückwechselt, findet es wieder.
- */
-function linienartWechseln(a, kennung, nach) {
-  a.aendern((z) => {
-    const da = finden(z, kennung);
-    if (!da || da.liste === nach) return;
-    const kern = Object.fromEntries(LINIENKERN.map((f) => [f, da.e[f]]));
-    const rest = Object.fromEntries(Object.entries(da.e).filter(([f]) => !LINIENKERN.includes(f)));
-    a.qa.gemerkt.set(`${kennung}|${da.liste}`, rest);
-    const frueher = a.qa.gemerkt.get(`${kennung}|${nach}`);
-    const vorlage = LINIENARTEN.find((x) => x.wert === nach).vorlage;
-    const stahl = rest.stahl || a.qa.vorgaben.stablinien.stahl;
-    const basis = frueher || { ...ausVorlage(vorlage), ...(nach === 'hilfslinien' ? {} : { stahl }) };
-    z[da.liste] = z[da.liste].filter((x) => x.kennung !== kennung);
-    z[nach].push({ ...structuredClone(basis), ...kern });
-  });
-}
-
-/** Die Eigenschaften der Auswahl -- änderbar, bei mehreren gleicher Art für alle zugleich. */
 /** Wie eine Ecke heisst: Anfang und Ende einer Linie, sonst die Nummer der Ecke. */
 function eckeName(liste, i) {
   if (LINIENLISTEN.includes(liste)) return i === 0 ? 'Anfang' : 'Ende';
@@ -754,11 +763,7 @@ function eigenschaften(a) {
       ],
     };
   }
-  const inhalt = [];
-  if (LINIENLISTEN.includes(liste)) {
-    inhalt.push(linienartwahl(liste, (w) => kennungen.forEach((k) => linienartWechseln(a, k, w))));
-  }
-  inhalt.push(...felderVon(liste, e, setzen));
+  const inhalt = [...felderVon(liste, e, setzen)];
   if (!mehrere) inhalt.push(...infozeilen(a, liste, e));
   // Neu, sobald die Antwort des Kerns da ist: die Zeilen darunter kommen von ihm.
   return { titel, inhalt: inhalt.filter(Boolean), schluessel: Boolean(passendeGeometrie(a)) };
@@ -766,8 +771,9 @@ function eigenschaften(a) {
 
 function artText(liste, e) {
   return {
-    knoten: 'Knoten', staebe: 'Stab', stablinien: 'Bewehrung', schubwaende: 'Schubwand',
-    hilfslinien: 'Hilfslinie', flaechen: e.material ? stoffname(e.material) : 'Aussparung',
+    knoten: 'Knoten', staebe: 'Punktbewehrung', stablinien: 'Linienbewehrung',
+    schubwaende: 'Schubwand', hilfslinien: 'Hilfslinie',
+    flaechen: e.material ? stoffname(e.material) : 'Aussparung',
   }[liste];
 }
 

@@ -51,7 +51,11 @@ const ARTEN = [
 
 /** Meter statt Millimeter, zwei Werkzeuge, ein Rahmen hängt an seinen Knoten. */
 const EINSTELLUNG = {
-  werkzeuge: ['linie', 'knoten'],
+  werkzeuge: [
+    { name: 'linie', text: 'Linie', zeichen: 'cad-linie', taste: 'l', form: 'linie',
+      titel: 'Linie -- ein Stab, wenn im Fenster «Stab» an ist' },
+    { name: 'knoten', text: 'Knoten', zeichen: 'cad-knoten', taste: 'k', form: 'knoten' },
+  ],
   einheit: 'm',
   raster: { stufen: [0.05, 0.1, 0.25, 0.5, 1, 2], vorgabe: 0.5 },
   stellen: 3,

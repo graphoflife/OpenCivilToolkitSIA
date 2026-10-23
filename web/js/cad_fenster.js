@@ -8,7 +8,8 @@
  * zeichnet, wählt und ändert.
  *
  * WAS DER ADAPTER EINSTELLT (mit Vorgabe, siehe `EINSTELLUNG`):
- * die Werkzeuge, die Einheit und die Stufen des Rasters, wie viele
+ * die Werkzeuge -- je eines mit Namen, Zeichen, Taste und der Form, die es
+ * zeichnet (Punkt, Linie, Polygon) --, die Einheit und die Stufen des Rasters, wie viele
  * Nachkommastellen eine Lage zeigt, die Grenzen des Massstabs -- und ob die
  * Zeichnung «verbunden» ist. Im Querschnitt gehört eine Ecke ihrem Element:
  * wer eine Bewehrungslinie verschiebt, nimmt die Polygonecke darunter nicht
@@ -20,11 +21,14 @@
  * Lastwerte rechnet.
  *
  * WENIGE KNÖPFE:
- * Oben stehen Polygon P, Linie L, Knoten K und, wenn die App welche hat,
- * Vorlagen T. Dazu Rückgängig, Wiederholen, «Alles zeigen» F und Vollbild.
- * Einen Knopf zum Wählen gibt es nicht: Wählen ist der Grundzustand, Esc
- * führt dorthin zurück. Alles Weitere steht neben der Auswahl oder im
- * schwebenden Fenster.
+ * Oben stehen die Werkzeuge der App, je mit Zeichen (sinnbilder.js) -- im
+ * Querschnitt Polygon, Bewehrung, Schubwand, Hilfslinie und Hilfspunkt, im
+ * Rahmen Linie und Knoten -- und, wenn die App welche hat, Vorlagen T. Dazu
+ * Rückgängig, Wiederholen, «Alles zeigen» F und Vollbild. Ein Werkzeug legt
+ * genau eine Art an; was es anlegt, stellt das schwebende Fenster ein, und
+ * eine andere Art ist ein anderes Werkzeug. Einen Knopf zum Wählen gibt es
+ * nicht: Wählen ist der Grundzustand, Esc führt dorthin zurück. Alles Weitere
+ * steht neben der Auswahl oder im schwebenden Fenster.
  *
  * EIN BLEIBENDES FENSTER:
  * Die Tafel wird nach jeder Änderung neu gebaut, das Fenster nicht -- es
@@ -53,14 +57,21 @@ import {
 import { klickWaehlen, leisteZeichnen, rahmenWaehlen, treffer } from './cad_auswahl.js';
 import { paletteBauen } from './cad_palette.js';
 import { el, svgEl } from './dom.js';
+import { sinnbild } from './sinnbilder.js';
 
 /**
  * Was ein Adapter einstellen kann, und was gilt, wenn er nichts sagt -- die
  * Werte der Querschnittsanalyse. `massstab`: kleinster und grösster, in
  * Bildpunkten je Einheit.
+ *
+ * Ein Werkzeug ist `{name, text, zeichen, taste, form, titel?}`: `zeichen`
+ * ein Sinnbild, `form` was es zeichnet -- 'knoten', 'linie' oder 'polygon',
+ * oder eine Funktion `(a) => form`, wo das Fenster es umstellt (die
+ * Bewehrung als Linie oder als Punkt). Eine Vorgabe gibt es nicht: was ein
+ * Werkzeug anlegt, weiss nur seine App.
  */
 const EINSTELLUNG = {
-  werkzeuge: ['polygon', 'linie', 'knoten'],
+  werkzeuge: [],
   einheit: 'mm',
   raster: { stufen: [1, 5, 10, 25, 50, 100], vorgabe: 10 },
   stellen: 1,
@@ -74,11 +85,8 @@ const VERLAUF = 100;
 /** Unter diesem Schlüssel merkt sich der Browser die Höhe der Zeichnung. */
 const HOEHE = 'opencivil.cad.hoehe';
 
-const WERKZEUGE = [
-  { name: 'polygon', zeichen: '▱', text: 'Polygon', taste: 'p', bauen: polygonBefehl },
-  { name: 'linie', zeichen: '╱', text: 'Linie', taste: 'l', bauen: linienBefehl },
-  { name: 'knoten', zeichen: '•', text: 'Knoten', taste: 'k', bauen: knotenBefehl },
-];
+/** Die Befehle hinter den Formen eines Werkzeugs. */
+const BEFEHLE = { knoten: knotenBefehl, linie: linienBefehl, polygon: polygonBefehl };
 
 /** Schlüssel -> Fenster. Keine Projektdaten: nichts davon wird abgelegt. */
 const fenster = new Map();
@@ -153,6 +161,7 @@ function neu(adapter) {
   a.ende = () => befehlEnde(a);
   a.aktionen = () => aktionen(a);
   a.starten = (befehl) => starten(a, befehl);
+  a.werkzeugStarten = (name) => werkzeugStarten(a, name);
   a.neuZeichnen = () => zeichnen(a);
   bauen(a);
   return a;
@@ -253,6 +262,17 @@ function befehlEnde(a) {
   a.befehl = null;
   eingabeLeeren(a.eingabe);
   zeichnen(a);
+}
+
+/**
+ * Startet ein Werkzeug der App -- mit dem Befehl seiner Form, die es gerade
+ * hat. Wer im schwebenden Fenster die Form umstellt, startet es neu.
+ */
+function werkzeugStarten(a, name) {
+  const w = a.einstellung.werkzeuge.find((x) => x.name === name);
+  if (!w) return;
+  const form = typeof w.form === 'function' ? w.form(a) : w.form;
+  starten(a, BEFEHLE[form](w.name));
 }
 
 /** Ein fertiger Punkt geht an den Befehl; danach sind die Hilfen wieder frei. */
@@ -640,11 +660,12 @@ function kurzMelden(a, satz) {
   statusZeichnen(a);
 }
 
+/** Ein Knopf der Leiste: sein Sinnbild und, wo Platz ist, ein Wort. */
 function knopf(zeichen, beschriftung, titel, tun, klasse = '') {
   return el('button.cad-knopf', {
-    type: 'button', title: titel, class: klasse,
+    type: 'button', title: titel, 'aria-label': titel, class: klasse,
     on: { click: (e) => { e.preventDefault(); tun(); } },
-  }, [el('span.cad-zeichen', { text: zeichen }), beschriftung ? el('span.cad-text', { text: beschriftung }) : null]);
+  }, [sinnbild(zeichen), beschriftung ? el('span.cad-text', { text: beschriftung }) : null]);
 }
 
 function vollbildSetzen(a, an) {
@@ -655,28 +676,27 @@ function vollbildSetzen(a, an) {
   a.adapter.tafelNeu();
 }
 
-/** Die Werkzeuge, die der Adapter anbietet -- in der Reihenfolge der Liste. */
-function werkzeugeVon(a) {
-  return WERKZEUGE.filter((w) => a.einstellung.werkzeuge.includes(w.name));
-}
-
 function leisteBauen(a) {
-  const werkzeuge = werkzeugeVon(a).map((w) => {
-    const k = knopf(w.zeichen, w.text, `${w.text} (${w.taste.toUpperCase()})`, () => starten(a, w.bauen()));
+  const werkzeuge = a.einstellung.werkzeuge.map((w) => {
+    const titel = `${w.titel || w.text} (${w.taste.toUpperCase()})`;
+    const k = knopf(w.zeichen, w.text, titel, () => werkzeugStarten(a, w.name), 'ist-gross');
     k.dataset.werkzeug = w.name;
     return k;
   });
   const vorlage = a.adapter.vorlageOeffnen
-    ? knopf('⊞', 'Vorlage', 'Querschnitt aus einer Vorlage (T)', () => a.adapter.vorlageOeffnen(a))
+    ? knopf('cad-vorlage', 'Vorlage', 'Querschnitt aus einer Vorlage (T)',
+      () => a.adapter.vorlageOeffnen(a), 'ist-gross')
     : null;
-  const rueck = knopf('↶', '', 'Rückgängig (Strg+Z)', () => zurueck(a));
-  const vor = knopf('↷', '', 'Wiederholen (Strg+Y)', () => vorwaerts(a));
-  const alles = knopf('⤧', 'Alles', 'Alles zeigen (F)', () => allesZeigen(a), 'ist-ansicht');
-  const gross = knopf('⤢', 'Vollbild', 'Vollbild ein/aus', () => vollbildSetzen(a, !a.vollbild), 'ist-ansicht');
+  // Rückgängig und die Ansicht nur als Zeichen, zu zweit übereinander: so
+  // stehen die Werkzeuge mit ihren Wörtern in einer Zeile.
+  const rueck = knopf('cad-rueckgaengig', '', 'Rückgängig (Strg+Z)', () => zurueck(a));
+  const vor = knopf('cad-wiederholen', '', 'Wiederholen (Strg+Y)', () => vorwaerts(a));
+  const alles = knopf('cad-alles', '', 'Alles zeigen (F)', () => allesZeigen(a));
+  const gross = knopf('cad-vollbild', '', 'Vollbild', () => vollbildSetzen(a, !a.vollbild));
   a.teile.knoepfe = { werkzeuge, rueck, vor, gross };
   return [
-    ...werkzeuge, vorlage, el('span.cad-trenner'), rueck, vor,
-    el('span.cad-luecke'), alles, gross,
+    ...werkzeuge, vorlage, el('span.cad-luecke'),
+    el('div.cad-ansicht', {}, [rueck, vor, alles, gross]),
   ];
 }
 
@@ -686,7 +706,8 @@ function knoepfeZeichnen(a) {
   k.rueck.disabled = !a.rueck.length;
   k.vor.disabled = !a.vor.length;
   k.gross.classList.toggle('ist-an', a.vollbild);
-  k.gross.querySelector('.cad-text').textContent = a.vollbild ? 'Zurück' : 'Vollbild';
+  k.gross.title = a.vollbild ? 'Vollbild verlassen (Esc)' : 'Vollbild';
+  k.gross.setAttribute('aria-label', k.gross.title);
   a.teile.bild.classList.toggle('ist-befehl', !!a.befehl);
 }
 
@@ -920,9 +941,9 @@ function taste(e) {
       a.adapter.vorlageOeffnen(a);
       break;
     default: {
-      const w = werkzeugeVon(a).find((x) => x.taste === k);
+      const w = a.einstellung.werkzeuge.find((x) => x.taste === k);
       if (!w) return;
-      starten(a, w.bauen());
+      werkzeugStarten(a, w.name);
     }
   }
   e.preventDefault();

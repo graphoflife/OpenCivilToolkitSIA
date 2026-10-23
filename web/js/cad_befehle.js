@@ -4,9 +4,10 @@
  * Ein Befehl fragt nach Punkten und baut daraus etwas: einen Knoten, eine
  * Linie, einen Umriss, eine Verschiebung. Wie ein Punkt entsteht, weiss er
  * nicht -- das ist in `cad_eingabe.js` für alle gleich. Was er anlegt, fragt
- * er die App (`a.adapter`): eine Linie ist im Querschnitt eine Bewehrung,
- * eine Schubwand oder eine Hilfslinie, je nachdem, was im Fenster eingestellt
- * ist.
+ * er die App (`a.adapter`), mit dem Namen des Werkzeugs, das ihn gestartet
+ * hat: eine Linie des Werkzeugs «schubwand» ist im Querschnitt eine
+ * Schubwand. Knoten, Linie und Polygon tragen darum diesen Namen (`name`,
+ * `neu`).
  *
  * Jeder Befehl hat dieselbe Gestalt:
  *
@@ -56,22 +57,22 @@ function knotenFuer(a, z, erg) {
 // Knoten
 // ===========================================================================
 
-export function knotenBefehl() {
+export function knotenBefehl(werkzeug) {
   return {
-    name: 'knoten',
-    neu: 'knoten',
-    frage: (a) => `${a.adapter.neuText(a, 'knoten')}: Punkt setzen`,
+    name: werkzeug,
+    neu: werkzeug,
+    frage: (a) => `${a.adapter.neuText(a, werkzeug)}: Punkt setzen`,
     punkt(a, erg) {
       let neu = null;
       a.aendern((z) => {
         const k = knotenFuer(a, z, erg);
-        neu = a.adapter.punktAnlegen(a, z, k) || k;
+        neu = a.adapter.punktAnlegen(a, z, k, werkzeug) || k;
       }, { auswahl: () => [neu] });
       a.eingabe.bezug = erg.p;
     },
     vorschau(a, g) {
       const f = a.zeiger?.fang;
-      if (f) a.adapter.punktVorschau?.(a, g, f.p);
+      if (f) a.adapter.punktVorschau?.(a, g, f.p, werkzeug);
     },
     enter: () => false,
     zurueck: () => false,
@@ -82,13 +83,13 @@ export function knotenBefehl() {
 // Linie -- als Kette: das Ende ist der nächste Anfang
 // ===========================================================================
 
-export function linienBefehl() {
+export function linienBefehl(werkzeug) {
   return {
-    name: 'linie',
-    neu: 'linie',
+    name: werkzeug,
+    neu: werkzeug,
     start: null,
     frage(a) {
-      return `${a.adapter.neuText(a, 'linie')}: ${this.start ? 'Endpunkt' : 'Anfangspunkt'}`;
+      return `${a.adapter.neuText(a, werkzeug)}: ${this.start ? 'Endpunkt' : 'Anfangspunkt'}`;
     },
     punkt(a, erg) {
       if (!this.start) {
@@ -99,7 +100,7 @@ export function linienBefehl() {
         a.aendern((z) => {
           const von = knotenFuer(a, z, start);
           const bis = knotenFuer(a, z, erg);
-          neu = a.adapter.linieAnlegen(a, z, von, bis);
+          neu = a.adapter.linieAnlegen(a, z, von, bis, werkzeug);
         }, { auswahl: () => [neu] });
         this.start = { ...erg, knoten: undefined };
       }
@@ -108,7 +109,7 @@ export function linienBefehl() {
     vorschau(a, g) {
       const f = a.zeiger?.fang;
       if (!this.start || !f) return;
-      a.adapter.linienVorschau?.(a, g, this.start.p, f.p);
+      a.adapter.linienVorschau?.(a, g, this.start.p, f.p, werkzeug);
       g.append(svgEl('path', { d: pfad(a.v, [this.start.p, f.p], false), class: 'cad-entwurf' }));
       streckenzettel(a, g, this.start.p, f.p);
     },
@@ -129,15 +130,15 @@ export function linienBefehl() {
 // Polygon -- ein Umriss, der eine Fläche wird
 // ===========================================================================
 
-export function polygonBefehl() {
+export function polygonBefehl(werkzeug) {
   return {
-    name: 'polygon',
-    neu: 'flaeche',
+    name: werkzeug,
+    neu: werkzeug,
     hinweis: 'Rücktaste nimmt den letzten Punkt zurück',
     punkte: [],
     frage(a) {
       const n = this.punkte.length;
-      if (!n) return `${a.adapter.neuText(a, 'flaeche')}: erster Punkt`;
+      if (!n) return `${a.adapter.neuText(a, werkzeug)}: erster Punkt`;
       return n < 3 ? `Punkt ${n + 1}` : `Punkt ${n + 1} -- oder Enter schliesst`;
     },
     punkt(a, erg) {
@@ -159,7 +160,7 @@ export function polygonBefehl() {
       let neu = null;
       a.aendern((z) => {
         const knoten = punkte.map((erg) => knotenFuer(a, z, erg));
-        neu = a.adapter.flaecheAnlegen(a, z, knoten);
+        neu = a.adapter.flaecheAnlegen(a, z, knoten, werkzeug);
       }, { auswahl: () => [neu] });
     },
     vorschau(a, g) {

@@ -1525,14 +1525,20 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .cad-knopf:hover:not(:disabled) { background: var(--blau-hell); color: var(--blau-tief); }
 .cad-knopf.ist-an { background: var(--blau); border-color: var(--blau); color: #fff; }
 .cad-knopf:disabled { opacity: .35; cursor: default; }
-.cad-zeichen { font-size: 13px; line-height: 1; }
-.cad-trenner { width: 1px; height: 18px; margin: 0 3px; background: var(--rand-stark); }
-.cad-luecke { flex: 1; }
-/* Im schmalen Panel tragen nur die Werkzeuge ein Wort -- bei der Ansicht
-   sagt es der Titel beim Darüberfahren. */
-@container (max-width: 460px) {
-  .cad-knopf.ist-ansicht .cad-text { display: none; }
+/* Die Zeichen der Knöpfe aus sinnbilder.js. Die Werkzeuge und die Vorlage
+   tragen ihr Zeichen über dem Wort: so stehen sie mit Rückgängig und der
+   Ansicht in einer Zeile. */
+.cad-knopf .sinnbild { width: 17px; height: 17px; flex: none; stroke-width: 1.8; }
+.cad-knopf.ist-gross {
+  flex-direction: column; gap: 1px; min-width: 60px; padding: 3px 5px 2px; font-size: 10.5px;
 }
+.cad-knopf.ist-gross .sinnbild { width: 20px; height: 20px; }
+.cad-luecke { flex: 1; }
+/* Rückgängig, Wiederholen, Alles zeigen und Vollbild: klein, zu zweit
+   übereinander -- was sie tun, sagt ihr Titel. */
+.cad-ansicht { display: grid; grid-template-columns: repeat(2, auto); gap: 1px 2px; }
+.cad-ansicht .cad-knopf { padding: 1px 4px; }
+.cad-ansicht .sinnbild { width: 15px; height: 15px; }
 
 .cad-flaeche {
   position: relative; height: var(--cad-hoehe, 440px);
@@ -1624,6 +1630,11 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .cad-zeile input[type="number"] { padding-block: 2px; }
 .cad-zeile .einheit { font-size: 11px; color: var(--schrift-zart); }
 .cad-neu { display: flex; flex-direction: column; gap: 4px; padding-top: 6px; border-top: 1px solid var(--rand); }
+/* Die Bewehrung als Linie oder als Punkt: ein Schalter mit Zeichen, über
+   ihren Feldern. */
+.cad-form { align-self: flex-start; }
+.cad-form .schalter-halb { display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; }
+.cad-form .sinnbild { width: 15px; height: 15px; }
 .cad-neu-titel {
   font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px;
   color: var(--schrift-zart);

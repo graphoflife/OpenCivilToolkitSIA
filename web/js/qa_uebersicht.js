@@ -103,6 +103,9 @@ export function uebersicht(a) {
 
   teile.push(gruppen.length
     ? el('div.qa-elemente', {}, gruppen)
-    : el('p.qa-leer', { text: 'Noch nichts gezeichnet: Polygon P, Linie L oder Knoten K.' }));
+    : el('p.qa-leer', {
+      text: 'Noch nichts gezeichnet: Polygon P, Bewehrung B, Schubwand W, Hilfspunkt K, '
+        + 'Hilfslinie H -- oder eine Vorlage T.',
+    }));
   return teile;
 }

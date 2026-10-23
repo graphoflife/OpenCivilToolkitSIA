@@ -1,14 +1,16 @@
 /**
- * sinnbilder.js -- die Zeichen auf den Knöpfen: die Kapitel eines Bauteils
- * und die Apps links.
+ * sinnbilder.js -- die Zeichen auf den Knöpfen: die Kapitel eines Bauteils,
+ * die Apps links und die Werkzeuge des Zeichenfensters.
  *
  * Einfache Linienbilder, 24 × 24, in der Farbe der Schrift: was das Kapitel
  * zeigt oder prüft, auf einen Blick -- die Interaktionslinie, der geknickte
- * Stab, die Druckzone, der Riss; bei den Apps, was sie bearbeiten. Selbst
- * gezeichnet; keine fremde Bibliothek und keine Bilddatei.
+ * Stab, die Druckzone, der Riss; bei den Apps, was sie bearbeiten; bei den
+ * Werkzeugen, was sie zeichnen. Selbst gezeichnet; keine fremde Bibliothek
+ * und keine Bilddatei.
  *
- * Jedes Zeichen ist eine Liste von Pfaden (`d`) und Kreisen (`[cx, cy, r]`).
- * Gestrichelt wird, was eine Grenze meint.
+ * Jedes Zeichen ist eine Liste von Pfaden (`d`), Kreisen (`[cx, cy, r]`) und
+ * vollen Punkten (`voll`, ebenso) -- ein Stab ist ein voller Punkt.
+ * Gestrichelt wird, was eine Grenze meint oder nicht mitrechnet.
  */
 
 import { svgEl } from './dom.js';
@@ -125,6 +127,70 @@ const ZEICHEN = {
   python: {
     pfade: ['M3 4.5h18v15H3z', 'M6.5 9l3 3-3 3', 'M11.5 15.5h5'],
   },
+
+  // -- Die Werkzeuge des Zeichenfensters -----------------------------------
+
+  // Ein Umriss mit seinen Ecken.
+  'cad-polygon': {
+    pfade: ['M5 19L3.5 7.5l9-4 8 6.5-4.5 9z'],
+  },
+  // Ein Balken im Schnitt, unten seine Stäbe.
+  'cad-bewehrung': {
+    pfade: ['M6 3h12v18H6z'],
+    voll: [[9.2, 16.6, 1.6], [14.8, 16.6, 1.6], [9.2, 7.4, 1.2], [14.8, 7.4, 1.2]],
+  },
+  // Stäbe auf einer Linie -- eine Linienbewehrung.
+  'cad-linienbewehrung': {
+    pfade: ['M3 12h18'],
+    voll: [[6, 12, 2], [12, 12, 2], [18, 12, 2]],
+  },
+  // Ein einzelner Stab.
+  'cad-punktbewehrung': {
+    pfade: ['M12 3.5v3.5 M12 17v3.5 M3.5 12H7 M17 12h3.5'],
+    voll: [[12, 12, 3]],
+  },
+  // Eine Wand als Band, gestrichelt ihre Achse -- wie in der Zeichnung.
+  'cad-schubwand': {
+    pfade: ['M3 7.5h18v9H3z'],
+    strich: ['M5 12h14'],
+  },
+  // Ein Punkt zum Konstruieren: klein, gestrichelt umkreist -- er rechnet nicht mit.
+  'cad-hilfspunkt': {
+    strich: ['M12 5a7 7 0 1 1 0 14a7 7 0 1 1 0-14'],
+    voll: [[12, 12, 2]],
+  },
+  // Eine Linie, die nicht mitrechnet: gestrichelt, mit ihren Enden.
+  'cad-hilfslinie': {
+    strich: ['M5.5 18.5l13-13'],
+    kreise: [[4.5, 19.5, 1.6], [19.5, 4.5, 1.6]],
+  },
+  // Eine Vorlage: ein Blatt mit einem T-Balken.
+  'cad-vorlage': {
+    pfade: ['M4 3.5h16v17H4z', 'M7.5 8h9 M12 8v8.5'],
+  },
+  // Ein Stab des Rahmens zwischen zwei Knoten.
+  'cad-linie': {
+    pfade: ['M6 18L18 6'],
+    voll: [[5, 19, 2], [19, 5, 2]],
+  },
+  // Ein Knoten.
+  'cad-knoten': {
+    kreise: [[12, 12, 6]],
+    voll: [[12, 12, 2.2]],
+  },
+  'cad-rueckgaengig': {
+    pfade: ['M8.5 5.5L4 10l4.5 4.5', 'M4 10h11a5 5 0 0 1 0 10h-4'],
+  },
+  'cad-wiederholen': {
+    pfade: ['M15.5 5.5L20 10l-4.5 4.5', 'M20 10H9a5 5 0 0 0 0 10h4'],
+  },
+  // Alles ins Bild: vier Ecken um ein Stück Zeichnung.
+  'cad-alles': {
+    pfade: ['M4 9V4h5 M15 4h5v5 M20 15v5h-5 M9 20H4v-5', 'M9 9h6v6H9z'],
+  },
+  'cad-vollbild': {
+    pfade: ['M14 4h6v6 M20 4l-6 6 M10 20H4v-6 M4 20l6-6'],
+  },
 };
 
 /** Ein Zeichen als SVG -- `name` aus der Liste oben. */
@@ -138,5 +204,8 @@ export function sinnbild(name) {
   for (const d of z?.pfade || []) svg.append(svgEl('path', { d }));
   for (const d of z?.strich || []) svg.append(svgEl('path', { d, 'stroke-dasharray': '2 2' }));
   for (const [cx, cy, r] of z?.kreise || []) svg.append(svgEl('circle', { cx, cy, r }));
+  for (const [cx, cy, r] of z?.voll || []) {
+    svg.append(svgEl('circle', { cx, cy, r, fill: 'currentColor', stroke: 'none' }));
+  }
   return svg;
 }

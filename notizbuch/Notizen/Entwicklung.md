@@ -44,6 +44,37 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-23 · Zeichenfenster des Querschnitts: ein Knopf je Art
+
+Wunsch des Benutzers: im Querschnitt nicht «Linie» und «Knoten» wie im
+Balkensystem, sondern je Art ein eigener Knopf mit Zeichen -- Bewehrung (als
+Linie oder als Punkt), Schubwand, Hilfspunkt, Hilfslinie --, und in einem
+Fenster immer nur eine Art, ohne Auswahlfeld zwischen Bewehrung, Schubwand
+und Hilfslinie.
+
+- **Die Werkzeuge gehören der App.** Das Zeichenfenster hatte drei feste
+  Werkzeuge (Polygon, Linie, Knoten); welche Art eine Linie wurde, sagte das
+  Feld «Art» im Fenster. Jetzt bringt jede App ihre Werkzeuge mit, je mit
+  Namen, Zeichen, Taste und der Form, die es zeichnet (`einstellung.werkzeuge`).
+  Die Befehle Knoten, Linie und Polygon tragen den Namen des Werkzeugs, das sie
+  gestartet hat, und reichen ihn an den Adapter: eine Linie des Werkzeugs
+  «schubwand» ist eine Schubwand. Das Balkensystem behält Linie und Knoten.
+- **Querschnitt:** Polygon P, Bewehrung B, Schubwand W, Hilfspunkt K,
+  Hilfslinie H, dazu Vorlage T. Die Bewehrung zeichnet als Linie oder als
+  Punkt -- ihre Form ist eine Funktion des Werkzeugs, und der Schalter «Linie
+  | Punkt» in ihrem Fenster startet es mit der anderen Form neu.
+- **Ein Fenster, eine Art.** Die Felder «Art» beim Neuen und beim Gewählten
+  sind weg, mit ihnen der Wechsel einer gezeichneten Linie in eine andere Art
+  samt dem Gedächtnis dafür. Die Titel sagen, was es ist: «Linie 1 ·
+  Linienbewehrung», «Stab 1 · Punktbewehrung».
+- **Zeichen statt Schriftzeichen.** Die Knöpfe tragen Sinnbilder
+  (sinnbilder.js), die Werkzeuge das Zeichen über dem Wort. Rückgängig,
+  Wiederholen, Alles zeigen und Vollbild stehen klein zu zweit übereinander,
+  nur als Zeichen -- so passt die Leiste in eine Zeile, auch im 500 px
+  schmalen Panel.
+
+---
+
 ## 2026-10-23 · Die App «Setzung»
 
 Wunsch des Benutzers: eine Setzungsberechnung im Stil des Grundbruchs, mit
