@@ -11,6 +11,8 @@
  *                     aus einer Platte oder aus einer Querschnittsanalyse;
  *                     sein E-Modul vom Material oder als Zahl
  *     Lastfälle       die Fälle und ihre Kombinationen mit Beiwerten
+ *     Statik-Analyse  die Diagramme rechts: je Zeile ein Fall und eine
+ *                     Grösse, wie in der Spannung-Dehnung-Analyse
  *
  * Gerechnet wird nichts: A und I, die Steifigkeiten und alles Weitere bildet
  * der Kern; hier stehen nur seine Zahlen.
@@ -32,8 +34,9 @@ import {
   auswahl, el, melden, svgEl, zahlfeld,
 } from './dom.js';
 import { ART_TEXT, kennwertZeile } from './material.js';
+import { anfuegenKnopf } from './nachweise.js';
 import {
-  feldangabe, naechsterName, projektAendern, zustand,
+  ausVorlage, feldangabe, naechsterName, projektAendern, zustand,
 } from './zustand.js';
 
 const HILFE = {
@@ -64,6 +67,15 @@ const HILFE = {
       ['Steifigkeit', 'EA, EI am ungerissenen Bruttoquerschnitt -- nach Vorgabe'],
     ],
     formel: 'EA = E · A   EI = E · I',
+  },
+  statik: {
+    zeilen: [
+      ['Fall', 'ein Lastfall oder eine Kombination -- gerechnet wird jeder Fall'],
+      ['M, V, N', 'je Stab der Verlauf, positiv auf der Seite der gestrichelten Faser'],
+      ['Verschiebung', 'das verschobene System, überhöht -- je Stab die grösste Durchbiegung gegen die Sehne'],
+      ['Lager', 'die Lagerkräfte auf das Tragwerk'],
+      ['Angeschrieben', 'die Werte an den Enden und je Stab die grössten, mit Punkt und Stelle'],
+    ],
   },
 };
 
@@ -443,8 +455,61 @@ function lastfaelleGruppe(system) {
 }
 
 // ===========================================================================
+// Statik-Analyse
+// ===========================================================================
+
+const DIAGRAMMGROESSEN = () => zustand.katalog?.balkensystem?.diagrammgroessen || [];
+
+/**
+ * Welche Diagramme rechts stehen -- wie in der Spannung-Dehnung-Analyse: je
+ * Zeile ein Fall, Lastfall oder Kombination, und was das Diagramm von ihm
+ * zeigt (Benutzer, 2026-10-23). Gerechnet wird damit nichts, das System
+ * rechnet jeden Fall. Ein Fall, den es nicht mehr gibt, steht als «– Fall
+ * wählen –» da.
+ */
+function statikGruppe(system) {
+  const aendern = (veraenderer) => aendernAn(system.kennung, veraenderer);
+  const faelle = [
+    ...system.lastfaelle.map((lf) => ({ wert: lf.kennung, beschriftung: lf.name })),
+    ...system.kombinationen.map((k) => ({ wert: k.kennung, beschriftung: `${k.name} (Kombination)` })),
+  ];
+  const zeile = (d, i) => el('div.bs-diagrammzeile', {}, [
+    el('div.bs-diagrammzeile-kopf', {}, [
+      auswahl({
+        werte: faelle.some((f) => f.wert === d.fall) ? faelle
+          : [{ wert: d.fall, beschriftung: '– Fall wählen –' }, ...faelle],
+        gewaehlt: d.fall,
+        titel: 'Welcher Lastfall oder welche Kombination',
+        beiAenderung: (w) => aendern((s) => { s.diagramme[i].fall = w; }),
+      }),
+      el('button.weg', {
+        type: 'button', text: '×', title: 'Diagramm löschen',
+        on: { click: () => aendern((s) => { s.diagramme.splice(i, 1); }) },
+      }),
+    ]),
+    wahlSchalter({
+      werte: DIAGRAMMGROESSEN().map((g) => ({ wert: g.wert, beschriftung: g.beschriftung, titel: g.titel })),
+      gewaehlt: d.groesse, titel: 'Was das Diagramm zeigt',
+      setzen: (w) => aendern((s) => { s.diagramme[i].groesse = w; }),
+    }),
+  ]);
+  return panel({
+    schluessel: 'balkensystem/Statik', titel: 'Statik-Analyse',
+    zusatz: erklaerung(HILFE.statik.zeilen),
+  }, [
+    ...(system.diagramme.length ? system.diagramme.map(zeile)
+      : [el('div.leer', { text: 'Noch kein Diagramm.' })]),
+    anfuegenKnopf('Diagramm', () => aendern((s) => {
+      s.diagramme.push(ausVorlage('statikdiagramm', {
+        fall: s.kombinationen[0]?.kennung || s.lastfaelle[0]?.kennung || '',
+      }));
+    })),
+  ]);
+}
+
+// ===========================================================================
 
 export function balkensystemEditor(system) {
   return [systemGruppe(system), materialienGruppe(system), querschnitteGruppe(system),
-    lastfaelleGruppe(system)];
+    lastfaelleGruppe(system), statikGruppe(system)];
 }

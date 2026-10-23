@@ -44,6 +44,36 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-23 · Balkensystem: Statik-Analyse mit «+ Diagramm»
+
+Wunsch des Benutzers: wie in der Spannung-Dehnung-Analyse eine
+Statik-Analyse, in der man Diagramme anlegt -- je Zeile ein Lastfall oder
+eine Kombination (Auswahlliste) und M, V, N oder die Verschiebungen. In den
+Diagrammen die grössten Werte angeschrieben, und wo sie liegen. Der Knopf
+heisst «+ Diagramm», nicht «+ Bild» -- auch in der Spannung-Dehnung-Analyse
+von Platte und Querschnitt (eigener Commit).
+
+- **Beschreibung:** `diagramme` am System, je Eintrag `fall` (Kennung von
+  Lastfall oder Kombination) und `groesse` (`DIAGRAMMGROESSEN`). Gerechnet
+  wird damit nichts -- das System rechnet jeden Fall; die Liste sagt nur,
+  welche Diagramme rechts stehen. Ein neues System bringt M, V, N der GZT
+  und die Verschiebung der GZG mit. Die Bilder nur je Kombination (vorige
+  Etappe) sind damit wieder offen: die Zeile wählt.
+- **Lager dazu:** die Lagerkräfte hatten ein eigenes Bild; sie sind eine
+  fünfte Stellung des Schalters, damit nichts verloren geht. Der Benutzer
+  nannte nur M, V, N und Verschiebung -- fällt die Stellung weg, ist es eine
+  Zeile in `DIAGRAMMGROESSEN`.
+- **Angeschrieben:** die Werte an den Enden und je Stab der grösste und der
+  kleinste, mit einem Punkt; im Feld darunter die Stelle «x = …». Die
+  Extremwerte kommen genau vom Kern (`uebersicht.faelle[].staebe`), nicht
+  aus den 24 Proben je Stab. Bei der Verschiebung je Stab die grösste
+  Durchbiegung gegen die Sehne -- ein Stab, der sich nur mitbewegt, bleibt
+  ohne Zahl.
+- **Anfragen:** je System und Fall eine Antwort (`antwortZu`); zwei
+  Diagramme desselben Falls teilen sie sich.
+
+---
+
 ## 2026-10-23 · Balkensystem: Materialien unter der Zeichnung, E-Modul je Querschnitt
 
 Vierte Etappe des neuen Balkensystems. Wünsche des Benutzers: unter der

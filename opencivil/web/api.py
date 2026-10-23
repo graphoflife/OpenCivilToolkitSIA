@@ -79,6 +79,12 @@ _WERKSTOFFSAETZE = [
     {"wert": s.value, "beschriftung": s.beschriftung, "kurz": s.kurz}
     for s in Werkstoffsatz
 ]
+#: Wie die Diagramme der Statik-Analyse heissen: kurz im Schalter, lang ueber
+#: dem Diagramm -- je Groesse, die die Beschreibung kennt.
+_DIAGRAMMGROESSEN = {
+    "M": ("M", "Moment M"), "V": ("V", "Querkraft V"), "N": ("N", "Normalkraft N"),
+    "verschiebung": ("Verschiebung", "Verschiebung"), "lagerkraefte": ("Lager", "Lagerkräfte"),
+}
 #: Die Betongesetze heissen wie die Rechenarten, deren Werte sie sind; welche
 #: es gibt, steht am Feld der Werkstoffwahl.
 _BETONGESETZE = [
@@ -198,6 +204,7 @@ def katalog() -> dict:
                 masse=stabquerschnitte.RECHTECK.vorgaben()).als_dict(),
             "lastfall": bs.LastfallEintrag().als_dict(),
             "lastkombination": bs.LastkombinationEintrag().als_dict(),
+            "statikdiagramm": bs.StatikdiagrammEintrag().als_dict(),
             # Eine Einwirkung auf ein Fundament.
             "grundbruchkombination": GrundbruchkombinationEintrag(name="").als_dict(),
             # Eine Schicht unter einem Fundament der Setzung.
@@ -271,6 +278,11 @@ def katalog() -> dict:
             "kennwerte": {art: [E_MODUL[art], DICHTE[art]] for art in E_MODUL},
             # Was als Material einer Linie heisst: das ihres Querschnitts.
             "material_des_querschnitts": bs.MATERIAL_DES_QUERSCHNITTS,
+            # Was ein Diagramm der Statik-Analyse zeigt -- kurz im Schalter,
+            # lang ueber dem Diagramm.
+            "diagrammgroessen": [{"wert": wert, "beschriftung": _DIAGRAMMGROESSEN[wert][0],
+                                  "titel": _DIAGRAMMGROESSEN[wert][1]}
+                                 for wert in bs.DIAGRAMMGROESSEN],
             "lastarten": [
                 {"wert": a.value, "beschriftung": a.beschriftung, "verteilt": a.verteilt,
                  "kraft": a.kraft, "einheit": bs.EINHEIT_DER_LAST[a.value].beschriftung}

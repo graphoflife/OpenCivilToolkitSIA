@@ -1,5 +1,5 @@
 ---
-erzeugt: 235d8674d83b
+erzeugt: ecdcca1993c3
 art: modul
 tags: [modul]
 ---
@@ -245,6 +245,20 @@ Eine Kombination: je Lastfall (Kennung) ein Beiwert, von Hand.
 - `name: str = ''`
 - `faktoren: Dict[str, float] = field(default_factory=dict)`
 
+### StatikdiagrammEintrag
+
+```python
+@dataclass
+class StatikdiagrammEintrag(Beschreibung)
+```
+
+Ein Diagramm der Statik-Analyse (Benutzer, 2026-10-23): ein Fall und was
+es von ihm zeigt. Gerechnet wird damit nichts -- das System rechnet jeden
+Fall; die Liste sagt nur, welche Diagramme rechts stehen.
+
+- `fall: str = ''` – Die Kennung eines Lastfalls (`LF1`) oder einer Kombination (`LK1`).
+- `groesse: str = einer_von(DIAGRAMMGROESSEN, 'M')`
+
 ### Modell
 
 ```python
@@ -292,6 +306,7 @@ stimmt -- auch zwei Faelle gleichen Namens --, steht in seinen Meldungen
 - `querschnitte: List[StabquerschnittEintrag] = field(default_factory=list)`
 - `lastfaelle: List[LastfallEintrag] = field(default_factory=list)`
 - `kombinationen: List[LastkombinationEintrag] = field(default_factory=list)`
+- `diagramme: List[StatikdiagrammEintrag] = field(default_factory=list)`
 - `beschreibung: str = ''` – Freier Text -- geht in keine Rechnung ein.
 
 #### BalkensystemEintrag.materialien
@@ -429,6 +444,14 @@ def kombination(self, name: str, *faktoren: Tuple[Any, float]) -> Lastkombinatio
 
 Eine Kombination -- je Lastfall (Eintrag oder Kennung) ein Beiwert: `(g, 1.35), (w, 1.5)`.
 
+#### BalkensystemEintrag.diagramm
+
+```python
+def diagramm(self, fall: Any, groesse: str='M') -> StatikdiagrammEintrag
+```
+
+Ein Diagramm der Statik-Analyse -- `fall` ein Lastfall oder eine Kombination.
+
 #### BalkensystemEintrag.stablast
 
 ```python
@@ -480,7 +503,8 @@ Ein frisches System, wie der Benutzer es angelegt bekommt: ohne
 Knoten, Linie, Lager und Querschnitt (Benutzer, 2026-10-19), aber mit
 den Lastfaellen Eigengewicht -- es kommt von selbst --, Auflast und
 Nutzlast, die beiden ohne Last, und den Kombinationen GZT mit 1.35,
-1.35 und 1.5 und GZG mit je 1.0 (Benutzer, 2026-10-23).
+1.35 und 1.5 und GZG mit je 1.0 (Benutzer, 2026-10-23). Dazu die
+Diagramme M, V und N der GZT und die Verschiebung der GZG.
 
 
 ## Konstanten
@@ -495,6 +519,7 @@ Nutzlast, die beiden ohne Last, und den Kombinationen GZT mit 1.35,
 - `E_MODULE = ('material', 'zahl')` – Woher der E-Modul eines Querschnitts kommt: vom Material des Stabs -- E_cm beim Beton, E_s beim Stahl -- oder als Zahl von Hand, unabhaengig vom Material (Benutzer, 2026-10-23).
 - `MATERIAL_DES_QUERSCHNITTS = 'querschnitt'` – Das Material einer Linie, das ihr Querschnitt mitbringt: der Beton der Platte oder der Querschnittsanalyse (Benutzer, 2026-10-23). Es kann keine Kennung im Projekt sein -- die beginnen mit ihrer Vorsilbe und einer Zahl.
 - `MIT_MATERIAL = ('platte', 'analyse')` – Die Arten eines Querschnitts, die ein Material mitbringen: ein Bauteil des Projekts. Einer nach Vorlage oder von Hand ist nur eine Form.
+- `DIAGRAMMGROESSEN = ('M', 'V', 'N', 'verschiebung', 'lagerkraefte')` – Was ein Diagramm der Statik-Analyse zeigt: je Stab den Verlauf einer Schnittgroesse, das verschobene System oder die Lagerkraefte.
 - `LAGERARTEN = {'gelenkig': ('fest', 'fest', 'frei'), 'verschieblich': ('frei', 'fes…` – Die Vorwahlen eines Lagers -- je Richtung frei oder fest.
 - `Ort = Union[str, Sequence[float]]` – Ein Punkt in m -- oder die Kennung eines Knotens, der dort liegt.
 

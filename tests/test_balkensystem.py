@@ -86,6 +86,18 @@ class TestBeschreibung(unittest.TestCase):
                          [("Eigengewicht", True), ("Auflast", False), ("Nutzlast", False)])
         self.assertEqual([(k.name, list(k.faktoren.values())) for k in s.kombinationen],
                          [("GZT", [1.35, 1.35, 1.5]), ("GZG", [1.0, 1.0, 1.0])])
+        # Die Diagramme der Statik-Analyse: M, V, N der GZT, die Verschiebung der GZG.
+        self.assertEqual([(d.fall, d.groesse) for d in s.diagramme],
+                         [("LK1", "M"), ("LK1", "V"), ("LK1", "N"), ("LK2", "verschiebung")])
+
+    def test_diagramme_der_statik_analyse(self):
+        """Ein Diagramm ist ein Fall und eine Grösse -- es geht mit dem System hin und zurück."""
+        s = einfeldtraeger()
+        d = s.diagramm(s.lastfaelle[0], "V")
+        self.assertEqual((d.fall, d.groesse), ("LF1", "V"))
+        self.assertEqual(BalkensystemEintrag.aus_dict(s.als_dict()), s)
+        with self.assertRaisesRegex(ProjektFehler, "groesse"):
+            s.diagramm("LF1", "Q")
 
     def test_der_einfeldtraeger_der_tests(self):
         s = einfeldtraeger("r1", "Träger", "b1")

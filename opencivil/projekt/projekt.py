@@ -28,7 +28,9 @@ from opencivil.projekt.eintraege import (
     EIGENE_VORSILBE, Beschreibung, Gebrauchswahl, KnickVerformungswahl, KnickWiderstandswahl,
     MaterialEintrag, PostenEintrag, RechenwahlEintrag,
 )
-from opencivil.projekt.balkensystem import MATERIAL_DES_QUERSCHNITTS, BalkensystemEintrag
+from opencivil.projekt.balkensystem import (
+    DIAGRAMMGROESSEN, MATERIAL_DES_QUERSCHNITTS, BalkensystemEintrag,
+)
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.lesen import ProjektFehler, felder_pruefen, inhalt_pruefen, lesen, ort
 from opencivil.projekt.platte import QuerschnittEintrag
@@ -487,7 +489,8 @@ class Projekt(Beschreibung):
         # Ein Rahmen: zwei Stützen von 4 m und ein Riegel von 6 m mit dem
         # Querschnitt des Unterzugs. Links eingespannt, rechts eine
         # Pendelstütze; das Eigengewicht von selbst, eine Auflast auf dem
-        # Riegel, Wind auf der linken Stütze -- kombiniert in GZT und GZG.
+        # Riegel, Wind auf der linken Stütze -- kombiniert in GZT und GZG,
+        # dazu die Diagramme eines neuen Systems und die Lagerkräfte.
         rahmen = projekt.balkensystem("Rahmen")
         stuetze = rahmen.querschnitt("Stütze 300×300", "rechteck", b=300.0, h=300.0)
         riegel = rahmen.querschnitt_aus("Unterzug", "analyse", unterzug)
@@ -501,8 +504,11 @@ class Projekt(Beschreibung):
         wind = rahmen.lastfall("Wind")
         rahmen.stablast(auflast, balken, wert=20.0)
         rahmen.stablast(wind, links, wert=3.0, richtung="waagrecht")
-        rahmen.kombination("GZT", (eigengewicht, 1.35), (auflast, 1.35), (wind, 1.5))
-        rahmen.kombination("GZG", (eigengewicht, 1.0), (auflast, 1.0), (wind, 1.0))
+        gzt = rahmen.kombination("GZT", (eigengewicht, 1.35), (auflast, 1.35), (wind, 1.5))
+        gzg = rahmen.kombination("GZG", (eigengewicht, 1.0), (auflast, 1.0), (wind, 1.0))
+        for groesse in ("M", "V", "N", "lagerkraefte"):
+            rahmen.diagramm(gzt, groesse)
+        rahmen.diagramm(gzg, "verschiebung")
         # Ein Einzelfundament 2.0 × 2.5 m, 1.2 m tief, das Grundwasser tiefer
         # als der Gleitkörper -- grün, wie der Rest.
         fundament = projekt.grundbruch("Fundament Stütze", phi_k=32.0, b=2.0, L=2.5,
@@ -753,7 +759,11 @@ class Projekt(Beschreibung):
         s.stablast(w, stuetze, art="einzellast", wert=8.0, stelle=50.0, richtung="quer")
         s.stablast(w, stahl, art="moment", wert=4.0, stelle=50.0)
         s.knotenlast(w, (8, 3), 10.0, richtung="waagrecht")
-        s.kombination("Tragsicherheit", (g, 1.35), (w, 1.5))
+        tragsicherheit = s.kombination("Tragsicherheit", (g, 1.35), (w, 1.5))
+        # Jede Grösse einmal, eine auch für einen Lastfall allein.
+        for groesse in DIAGRAMMGROESSEN:
+            s.diagramm(tragsicherheit, groesse)
+        s.diagramm(w, "M")
 
     @staticmethod
     def _beweglich(p: "Projekt") -> None:

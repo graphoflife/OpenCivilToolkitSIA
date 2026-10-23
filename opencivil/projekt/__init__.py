@@ -64,7 +64,7 @@ from opencivil.projekt.platte import QuerschnittEintrag
 from opencivil.projekt.balkensystem import (
     BalkensystemEintrag, KnotenlastEintrag, LagerEintrag, LastfallEintrag,
     LastkombinationEintrag, StablastEintrag, StabquerschnittEintrag,
-    SystemknotenEintrag, SystemlinieEintrag,
+    StatikdiagrammEintrag, SystemknotenEintrag, SystemlinieEintrag,
 )
 from opencivil.projekt.querschnittsanalyse import (
     FlaecheEintrag, HilfslinieEintrag, KnotenEintrag, QAGebrauchswahl, QALastfallEintrag,
@@ -82,7 +82,7 @@ __all__ = [
     "Bauteilart", "Beschreibung",
     "FlaecheEintrag", "KnotenlastEintrag", "LagerEintrag", "LastfallEintrag",
     "LastkombinationEintrag", "StablastEintrag", "StabquerschnittEintrag",
-    "SystemknotenEintrag", "SystemlinieEintrag",
+    "StatikdiagrammEintrag", "SystemknotenEintrag", "SystemlinieEintrag",
     "GebrauchsfallEintrag", "HilfslinieEintrag", "KnotenEintrag",
     "QALastfallEintrag", "QuerschnittsanalyseEintrag",
     "SchubwandEintrag", "StabEintrag", "StablinieEintrag", "WerkstoffwahlEintrag",

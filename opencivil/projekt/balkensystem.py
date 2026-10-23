@@ -100,6 +100,10 @@ MATERIAL_DES_QUERSCHNITTS = "querschnitt"
 #: Projekts. Einer nach Vorlage oder von Hand ist nur eine Form.
 MIT_MATERIAL = ("platte", "analyse")
 
+#: Was ein Diagramm der Statik-Analyse zeigt: je Stab den Verlauf einer
+#: Schnittgroesse, das verschobene System oder die Lagerkraefte.
+DIAGRAMMGROESSEN = ("M", "V", "N", "verschiebung", "lagerkraefte")
+
 #: Die Vorwahlen eines Lagers -- je Richtung frei oder fest.
 LAGERARTEN = {
     "gelenkig": ("fest", "fest", "frei"),
@@ -302,6 +306,20 @@ class LastkombinationEintrag(Beschreibung):
     faktoren: Dict[str, float] = field(default_factory=dict)
 
 
+@dataclass
+class StatikdiagrammEintrag(Beschreibung):
+    """
+    Ein Diagramm der Statik-Analyse (Benutzer, 2026-10-23): ein Fall und was
+    es von ihm zeigt. Gerechnet wird damit nichts -- das System rechnet jeden
+    Fall; die Liste sagt nur, welche Diagramme rechts stehen.
+    """
+
+    fall: str = ""
+    """Die Kennung eines Lastfalls (``LF1``) oder einer Kombination (``LK1``)."""
+
+    groesse: str = einer_von(DIAGRAMMGROESSEN, "M")
+
+
 # ===========================================================================
 # Das System
 # ===========================================================================
@@ -351,6 +369,7 @@ class BalkensystemEintrag(Beschreibung):
     querschnitte: List[StabquerschnittEintrag] = field(default_factory=list)
     lastfaelle: List[LastfallEintrag] = field(default_factory=list)
     kombinationen: List[LastkombinationEintrag] = field(default_factory=list)
+    diagramme: List[StatikdiagrammEintrag] = field(default_factory=list)
     beschreibung: str = ""
     """Freier Text -- geht in keine Rechnung ein."""
 
@@ -641,6 +660,14 @@ class BalkensystemEintrag(Beschreibung):
         self.kombinationen.append(eintrag)
         return eintrag
 
+    def diagramm(self, fall: Any, groesse: str = "M") -> StatikdiagrammEintrag:
+        """Ein Diagramm der Statik-Analyse -- ``fall`` ein Lastfall oder eine Kombination."""
+        eintrag = StatikdiagrammEintrag.aus_dict(
+            {"fall": _kennung_von(fall), "groesse": groesse},
+            f"Balkensystem '{self.name}', diagramme")
+        self.diagramme.append(eintrag)
+        return eintrag
+
     def stablast(self, lastfall: Any, linie: Any, art: Lastart = Lastart.LINIENLAST,
                  wert: float = 10.0, **felder: Any) -> StablastEintrag:
         """Eine Last auf einer Linie -- ``wert`` ist ``wert_a``; Felder wie :class:`StablastEintrag`."""
@@ -741,12 +768,16 @@ class BalkensystemEintrag(Beschreibung):
         Knoten, Linie, Lager und Querschnitt (Benutzer, 2026-10-19), aber mit
         den Lastfaellen Eigengewicht -- es kommt von selbst --, Auflast und
         Nutzlast, die beiden ohne Last, und den Kombinationen GZT mit 1.35,
-        1.35 und 1.5 und GZG mit je 1.0 (Benutzer, 2026-10-23).
+        1.35 und 1.5 und GZG mit je 1.0 (Benutzer, 2026-10-23). Dazu die
+        Diagramme M, V und N der GZT und die Verschiebung der GZG.
         """
         s = cls(kennung=kennung, name=name)
         g = s.lastfall("Eigengewicht", eigengewicht=True)
         auflast = s.lastfall("Auflast")
         nutzlast = s.lastfall("Nutzlast")
-        s.kombination("GZT", (g, 1.35), (auflast, 1.35), (nutzlast, 1.5))
-        s.kombination("GZG", (g, 1.0), (auflast, 1.0), (nutzlast, 1.0))
+        gzt = s.kombination("GZT", (g, 1.35), (auflast, 1.35), (nutzlast, 1.5))
+        gzg = s.kombination("GZG", (g, 1.0), (auflast, 1.0), (nutzlast, 1.0))
+        for groesse in ("M", "V", "N"):
+            s.diagramm(gzt, groesse)
+        s.diagramm(gzg, "verschiebung")
         return s

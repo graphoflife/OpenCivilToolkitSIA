@@ -1,15 +1,19 @@
 /**
  * bs_diagramme.js -- die Ergebnisse eines Balkensystems, rechts.
  *
- * Unter «Diagramme» je System und gewählter Kombination -- ein Lastfall
- * allein bekommt keine Bilder:
+ * Unter «Diagramme» je Zeile der Statik-Analyse ein Diagramm -- ihr Fall,
+ * Lastfall oder Kombination, und ihre Grösse (Benutzer, 2026-10-23):
  *
- *   Verformung    das System verschoben, überhöht -- das unverformte blass;
- *   N, V, M       je Stab der Verlauf, quer zum Stab aufgetragen, positive
+ *   M, V, N       je Stab der Verlauf, quer zum Stab aufgetragen, positive
  *                 Werte auf der Seite der gestrichelten Faser -- das Moment
- *                 also auf der Zugseite --, mit den Werten an den Enden und
- *                 am grössten Wert;
+ *                 also auf der Zugseite;
+ *   Verschiebung  das System verschoben, überhöht -- das unverformte blass;
  *   Lagerkräfte   je Lager die Kräfte und das Moment auf das Tragwerk.
+ *
+ * Angeschrieben sind die Werte an den Enden und je Stab die grössten, an
+ * ihrer Stelle ein Punkt, im Feld dazu die Stelle x -- bei der Verschiebung
+ * die grösste Durchbiegung gegen die Sehne. Die Extremwerte rechnet der
+ * Kern genau; sie stehen in seiner Übersicht, nicht in den Proben.
  *
  * Fahren mit der Maus -- auf dem Handy: Tippen -- über einen Knoten zeigt
  * seine Verschiebung und Drehung, oder «Verdrehung nicht bestimmbar, da keine
@@ -30,9 +34,7 @@ import { api } from './api.js';
 import { karte } from './bausteine.js';
 import { kraftpfeil, momentSymbol } from './bs_symbole.js';
 import { abdruckVon } from './bs_zeichnung.js';
-import {
-  auswahl, el, leerzustand, svgEl,
-} from './dom.js';
+import { el, leerzustand, svgEl } from './dom.js';
 import { aendern, zustand } from './zustand.js';
 
 const BREITE = 640;
@@ -41,18 +43,15 @@ const RAND = 58;
 /** Wie weit die grösste Ordinate vom Stab absteht, in Bildpunkten. */
 const AUSSCHLAG = 44;
 
-/** Die Grössen der Bilder: Titel, Feld in den Proben, Einheit, Stellen. */
-const GROESSEN = [
-  { schluessel: 'N', titel: 'Normalkraft N', einheit: 'kN', stellen: 1, klasse: 'bs-d-n' },
-  { schluessel: 'V', titel: 'Querkraft V', einheit: 'kN', stellen: 1, klasse: 'bs-d-v' },
-  { schluessel: 'M', titel: 'Moment M', einheit: 'kNm', stellen: 1, klasse: 'bs-d-m' },
-];
+/** Die Verläufe: Feld in den Proben, Einheit, Stellen, Farbe -- der Titel kommt aus dem Katalog. */
+const GROESSEN = {
+  N: { schluessel: 'N', einheit: 'kN', stellen: 1, klasse: 'bs-d-n' },
+  V: { schluessel: 'V', einheit: 'kN', stellen: 1, klasse: 'bs-d-v' },
+  M: { schluessel: 'M', einheit: 'kNm', stellen: 1, klasse: 'bs-d-m' },
+};
 
-/** Kennung -> {abdruck, fall, daten, alt, fehler, uhr}: die letzte Antwort je System. */
+/** «Kennung|Fall» -> {abdruck, fall, daten, alt, fehler, uhr}: die letzte Antwort je System und Fall. */
 const vorrat = new Map();
-
-/** Kennung -> Name des gezeigten Falls. Ansichtssache, nicht Teil des Projekts. */
-const gezeigt = new Map();
 
 const fest = (x, n) => (Math.abs(x) < 0.5 * 10 ** -n ? 0 : x).toFixed(n);
 
@@ -61,20 +60,20 @@ const fest = (x, n) => (Math.abs(x) < 0.5 * 10 ** -n ? 0 : x).toFixed(n);
 // ===========================================================================
 
 /** Fragt nach den Verläufen -- erst, wenn gerade nicht gerechnet wird: dann liegt das System im Speicher des Kerns. */
-function anfordern(kennung, eintrag, verzug = 500) {
+function anfordern(schluessel, kennung, eintrag, verzug = 500) {
   clearTimeout(eintrag.uhr);
   eintrag.uhr = setTimeout(() => {
-    if (vorrat.get(kennung) !== eintrag) return;
+    if (vorrat.get(schluessel) !== eintrag) return;
     if (zustand.rechnetGerade) {
-      anfordern(kennung, eintrag);
+      anfordern(schluessel, kennung, eintrag);
       return;
     }
     api.balkensystemVerlauf(zustand.projekt, kennung, eintrag.fall).then((antwort) => {
-      if (vorrat.get(kennung) !== eintrag) return;
+      if (vorrat.get(schluessel) !== eintrag) return;
       eintrag.daten = antwort;
       aendern({}, 'diagramm');
     }).catch((fehler) => {
-      if (vorrat.get(kennung) !== eintrag) return;
+      if (vorrat.get(schluessel) !== eintrag) return;
       eintrag.fehler = fehler.message;
       aendern({}, 'diagramm');
     });
@@ -82,13 +81,21 @@ function anfordern(kennung, eintrag, verzug = 500) {
 }
 
 /**
- * Die Fälle, für die es Bilder gibt: die Kombinationen, wie die letzte
- * Rechnung sie kennt -- ein Lastfall allein bekommt keine (Benutzer,
- * 2026-10-23).
+ * Die Antwort des Kerns zu einem Fall -- neu angefragt, wenn es keine gibt
+ * oder sie nicht mehr zum Projekt passt. Bis die neue da ist, gilt die alte.
+ * Zeigen zwei Diagramme denselben Fall, teilen sie sich die Antwort.
  */
-function faelleVon(kennung) {
-  return (zustand.loesung?.balkensysteme?.[kennung]?.faelle || [])
-    .filter((f) => f.kombination).map((f) => f.name);
+function antwortZu(kennung, fall) {
+  const schluessel = `${kennung}|${fall}`;
+  const abdruck = abdruckVon(kennung);
+  let eintrag = vorrat.get(schluessel);
+  if (!eintrag || eintrag.abdruck !== abdruck) {
+    const alt = eintrag?.daten || eintrag?.alt || null;
+    eintrag = { abdruck, fall, daten: null, alt, fehler: null, uhr: null };
+    vorrat.set(schluessel, eintrag);
+    anfordern(schluessel, kennung, eintrag, alt ? 500 : 80);
+  }
+  return eintrag;
 }
 
 // ===========================================================================
@@ -142,22 +149,41 @@ function systemlinien(r, staebe) {
 // Die Bilder
 // ===========================================================================
 
-/** Ein Verlauf: je Stab die Fläche zwischen Stab und Ordinate, und die Werte an Enden und Extremwert. */
-function verlaufsbild(r, daten, groesse) {
+/** Ob zwei Stellen eines Stabs dieselbe sind -- auf ein Tausendstel seiner Länge. */
+const gleicheStelle = (s, a, b) => Math.abs(a - b) <= 1e-3 * s.L;
+
+/**
+ * Ein Wert im Bild: die Zahl neben dem Punkt `p`, auf der Seite `n` -- mit
+ * einem Punkt, wenn er ein Extremwert ist, und im Feld darunter seiner
+ * Stelle.
+ */
+function anschreiben(svg, p, n, text, { punkt = false, stelle = null, klasse = '' } = {}) {
+  if (punkt) svg.append(svgEl('circle', { cx: p[0].toFixed(1), cy: p[1].toFixed(1), r: 3.2, class: `bs-d-extrem ${klasse}` }));
+  const [x, y] = [p[0] + n[0] * 11, p[1] + n[1] * 11 + 4];
+  svg.append(schrift(x, y, text));
+  if (stelle !== null) svg.append(schrift(x, y + 12, `x = ${fest(stelle, 2)} m`, 'bs-d-text bs-d-stelle'));
+}
+
+/**
+ * Ein Verlauf: je Stab die Fläche zwischen Stab und Ordinate. Angeschrieben
+ * die Werte an den Enden und der grösste und der kleinste -- `extreme` vom
+ * Kern, je Stab `{kleinst: [x, v], groesst: [x, v]}`.
+ */
+function verlaufsbild(r, daten, groesse, extreme) {
   const svg = svgEl('svg', { viewBox: `0 0 ${BREITE} ${r.hoehe}`, class: 'bs-diagramm' });
   svg.append(systemlinien(r, daten.staebe));
-  const alle = Object.values(daten.staebe).flatMap((s) => s.proben.map((p) => Math.abs(p[groesse.schluessel])));
+  const feld = groesse.schluessel;
+  const alle = Object.values(daten.staebe).flatMap((s) => s.proben.map((p) => Math.abs(p[feld])));
   const groesste = Math.max(0, ...alle);
   const k = groesste > 1e-9 ? AUSSCHLAG / groesste : 0;
-  for (const s of Object.values(daten.staebe)) {
+  for (const [name, s] of Object.entries(daten.staebe)) {
     const n = faserseite(s);
-    const ordinate = (p) => {
-      const [x, y] = r.bild(amStab(s, p.x));
-      const v = p[groesse.schluessel];
-      return [x + n[0] * k * v, y + n[1] * k * v];
+    const ordinate = (x, v) => {
+      const [bx, by] = r.bild(amStab(s, x));
+      return [bx + n[0] * k * v, by + n[1] * k * v];
     };
     const basis = s.proben.map((p) => r.bild(amStab(s, p.x)));
-    const kurve = s.proben.map(ordinate);
+    const kurve = s.proben.map((p) => ordinate(p.x, p[feld]));
     const flaeche = [...kurve, ...basis.reverse()];
     svg.append(svgEl('path', {
       d: `${flaeche.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' ')} Z`,
@@ -167,38 +193,70 @@ function verlaufsbild(r, daten, groesse) {
       d: kurve.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' '),
       class: `bs-d-kurve ${groesse.klasse}`,
     }));
-    // Beschriftet: die Enden und der grösste Betrag dazwischen.
-    const marken = [s.proben[0], s.proben[s.proben.length - 1]];
-    const innen = s.proben.slice(1, -1).reduce((b, p) => (Math.abs(p[groesse.schluessel]) > Math.abs(b?.[groesse.schluessel] ?? 0) ? p : b), null);
-    if (innen && Math.abs(innen[groesse.schluessel]) > Math.max(...marken.map((p) => Math.abs(p[groesse.schluessel]))) * 1.02) marken.push(innen);
-    for (const p of marken) {
-      const v = p[groesse.schluessel];
-      if (Math.abs(v) < groesste * 0.01) continue;
-      const [x, y] = ordinate(p);
-      const versatz = v >= 0 ? 1 : -1;
-      svg.append(schrift(x + n[0] * 10 * versatz, y + n[1] * 10 * versatz + 4, fest(v, groesse.stellen)));
+    const e = extreme[name]?.[feld];
+    const spitzen = e ? [e.groesst, e.kleinst] : [];
+    const zaehlt = (v) => Math.abs(v) >= groesste * 0.01;
+    const seite = (v) => (v >= 0 ? n : [-n[0], -n[1]]);
+    const enden = [[0, s.proben[0][feld]], [s.L, s.proben[s.proben.length - 1][feld]]];
+    for (const [x, v] of enden) {
+      if (!zaehlt(v)) continue;
+      const istSpitze = spitzen.some(([xs, vs]) => gleicheStelle(s, xs, x) && vs === v);
+      anschreiben(svg, ordinate(x, v), seite(v), fest(v, groesse.stellen),
+        { punkt: istSpitze, klasse: groesse.klasse });
+    }
+    // Ein Extremwert im Feld bekommt seinen Punkt und seine Stelle; einer
+    // an einem Ende steht schon dort.
+    const gezeigt = [];
+    for (const [x, v] of spitzen) {
+      if (!zaehlt(v) || enden.some(([xe]) => gleicheStelle(s, xe, x))) continue;
+      if (gezeigt.some((xg) => gleicheStelle(s, xg, x))) continue;
+      gezeigt.push(x);
+      anschreiben(svg, ordinate(x, v), seite(v), fest(v, groesse.stellen),
+        { punkt: true, stelle: x, klasse: groesse.klasse });
     }
   }
   return svg;
 }
 
-/** Die Verformung: das System verschoben, überhöht -- das unverformte blass darunter. */
-function verformungsbild(r, daten) {
+/**
+ * Die Verschiebung: das System verschoben, überhöht -- das unverformte blass
+ * darunter. Je Stab angeschrieben die grösste Durchbiegung gegen die Sehne,
+ * mit Punkt und Stelle -- `extreme` vom Kern, wie beim Verlauf.
+ */
+function verformungsbild(r, daten, extreme) {
   const svg = svgEl('svg', { viewBox: `0 0 ${BREITE} ${r.hoehe}`, class: 'bs-diagramm' });
   svg.append(systemlinien(r, daten.staebe));
   const groesste = Math.max(0, ...Object.values(daten.staebe)
     .flatMap((s) => s.proben.map((p) => Math.hypot(p.ux, p.uz))));
   // Überhöht, bis die grösste Verschiebung ein Zwölftel des Systems ist.
   const faktor = groesste > 1e-12 ? (r.groesse / 12) / (groesste / 1000) : 0;
+  const verschoben = (s, x) => {
+    const [px, pz] = amStab(s, x);
+    return r.bild([px + faktor * zwischen(s.proben, x, 'ux') / 1000,
+      pz + faktor * zwischen(s.proben, x, 'uz') / 1000]);
+  };
+  const durchbiegungen = Object.entries(daten.staebe).map(([name, s]) => {
+    const w = extreme[name]?.w;
+    if (!w) return null;
+    const [x, v] = Math.abs(w.groesst[1]) >= Math.abs(w.kleinst[1]) ? w.groesst : w.kleinst;
+    return { s, x, v };
+  }).filter(Boolean);
+  const groessteW = Math.max(0, ...durchbiegungen.map((d) => Math.abs(d.v)));
   for (const s of Object.values(daten.staebe)) {
-    const punkte = s.proben.map((p) => {
-      const [x, z] = amStab(s, p.x);
-      return r.bild([x + faktor * p.ux / 1000, z + faktor * p.uz / 1000]);
-    });
+    const punkte = s.proben.map((p) => verschoben(s, p.x));
     svg.append(svgEl('path', {
       d: punkte.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join(' '),
       class: 'bs-d-verformt',
     }));
+  }
+  // Nur, was zählt: ein Stab, der sich bloss mitbewegt, biegt sich kaum.
+  for (const { s, x, v } of durchbiegungen) {
+    if (Math.abs(v) < Math.max(1e-3, groessteW * 0.05)) continue;
+    // w > 0 biegt zur gestrichelten Faser -- die Zahl steht aussen davor.
+    const n = faserseite(s);
+    const seite = v >= 0 ? n : [-n[0], -n[1]];
+    anschreiben(svg, verschoben(s, x), seite, `w = ${fest(v, 2)} mm`,
+      { punkt: true, stelle: x, klasse: 'bs-d-w' });
   }
   for (const w of Object.values(daten.knoten)) {
     const [x, y] = r.bild([w.x + faktor * w.ux / 1000, w.z + faktor * w.uz / 1000]);
@@ -314,82 +372,77 @@ function zeigerEinrichten(huelle, svg, r, daten, zeilen) {
 // Blätter
 // ===========================================================================
 
-function fallwahl(kennung, faelle, gewaehlt) {
-  return auswahl({
-    werte: faelle.map((f) => ({ wert: f, beschriftung: f })),
-    gewaehlt,
-    titel: 'Welche Kombination gezeigt wird',
-    beiAenderung: (w) => {
-      gezeigt.set(kennung, w);
-      aendern({}, 'diagramm');
-    },
-  });
+/** Der Name eines Falls -- Lastfall oder Kombination -- aus seiner Kennung; `null`, wenn es ihn nicht gibt. */
+function fallname(system, kennung) {
+  return [...system.lastfaelle, ...system.kombinationen].find((f) => f.kennung === kennung)?.name ?? null;
 }
 
 /**
- * Die Diagramme eines Systems -- je Bild eine Karte, darüber die Wahl des
- * Falls. Das Panel darum baut bericht.js.
+ * Ein Diagramm der Statik-Analyse als Karte: der Fall der Zeile, die Grösse
+ * der Zeile. Über dem Diagramm sein Titel und der Fall.
+ */
+function diagrammKarte(kennung, system, zeile) {
+  const titel = (zustand.katalog?.balkensystem?.diagrammgroessen || [])
+    .find((g) => g.wert === zeile.groesse)?.titel || zeile.groesse;
+  const fall = fallname(system, zeile.fall);
+  if (fall === null) {
+    return karte(titel, [leerzustand('Kein Fall gewählt.',
+      'Im Panel «Statik-Analyse» einen Lastfall oder eine Kombination wählen.')]);
+  }
+  const eintrag = antwortZu(kennung, fall);
+  if (eintrag.fehler) return karte(`${titel} – ${fall}`, [el('p.hinweis.hinweis-warnung', { text: eintrag.fehler })]);
+  const antwort = eintrag.daten || eintrag.alt;
+  const daten = antwort?.verlauf;
+  if (!daten) return karte(`${titel} – ${fall}`, [leerzustand('Diagramm wird gerechnet …')]);
+  const r = bildrahmen(daten.staebe);
+  const uebersicht = (antwort.uebersicht?.faelle || []).find((f) => f.name === daten.fall);
+  const extreme = uebersicht?.staebe || {};
+  const verschiebung = (s, x) => [
+    `u_x = ${fest(zwischen(s.proben, x, 'ux'), 2)} mm   u_z = ${fest(zwischen(s.proben, x, 'uz'), 2)} mm`,
+    `w = ${fest(zwischen(s.proben, x, 'w'), 2)} mm gegen die Sehne`,
+  ];
+  let svg;
+  let zeilen = verschiebung;
+  const unten = [];
+  if (zeile.groesse === 'verschiebung') {
+    svg = verformungsbild(r, daten, extreme);
+  } else if (zeile.groesse === 'lagerkraefte') {
+    const lager = uebersicht?.lagerkraefte || [];
+    svg = lagerbild(r, daten, lager);
+    // Was keinen Knoten hat -- eine Stelle auf einem Stab, die Summe von
+    // Linienlager oder Bettung --, steht unter dem Bild. Ohne sie ginge das
+    // Gleichgewicht am Bildschirm nicht auf.
+    unten.push(...lager.filter((l) => !l.knoten).map((l) => el('p.bs-einheiten', {
+      text: `${l.wo}: R_x = ${fest(l.R_x, 1)} kN · R_z = ${fest(l.R_z, 1)} kN · M = ${fest(l.M, 1)} kNm`,
+    })));
+    if (lager.some((l) => l.summe)) unten.push(el('p.bs-einheiten', { text: antwort.uebersicht.summen_text }));
+  } else {
+    const g = GROESSEN[zeile.groesse];
+    svg = verlaufsbild(r, daten, g, extreme);
+    zeilen = (s, x) => [`${g.schluessel} = ${fest(zwischen(s.proben, x, g.schluessel), g.stellen)} ${g.einheit}`];
+  }
+  const huelle = el('div.bs-diagramm-huelle', {}, [svg]);
+  zeigerEinrichten(huelle, svg, r, daten, zeilen);
+  return karte(`${titel} – ${daten.fall}`, [huelle, ...unten],
+    { klasse: eintrag.daten ? '' : 'ist-veraltet' });
+}
+
+/**
+ * Die Diagramme eines Systems -- je Zeile der Statik-Analyse eine Karte. Das
+ * Panel darum baut bericht.js.
  */
 export function systemKarten(kennung) {
-  const faelle = faelleVon(kennung);
+  const system = zustand.projekt.balkensysteme?.find((s) => s.kennung === kennung);
   const uebersicht = zustand.loesung?.balkensysteme?.[kennung];
   if (uebersicht && !uebersicht.gueltig) {
     return [karte(null, (uebersicht.meldungen || []).filter((m) => m.fehler)
       .map((m) => el('p.hinweis.hinweis-warnung', { text: m.text })))];
   }
-  if (!faelle.length) {
-    return [karte(null, [leerzustand('Keine Lastkombination.',
-      'Bilder gibt es je Kombination; anlegen unter «Lastfälle und Kombinationen».')])];
+  if (!system?.diagramme?.length) {
+    return [karte(null, [leerzustand('Noch kein Diagramm.',
+      'Anlegen im Panel «Statik-Analyse» mit «+ Diagramm».')])];
   }
-  const fall = faelle.includes(gezeigt.get(kennung)) ? gezeigt.get(kennung) : faelle[0];
-  const abdruck = `${abdruckVon(kennung)}|${fall}`;
-  let eintrag = vorrat.get(kennung);
-  if (!eintrag || eintrag.abdruck !== abdruck) {
-    const alt = eintrag?.daten || eintrag?.alt || null;
-    eintrag = { abdruck, fall, daten: null, alt, fehler: null, uhr: null };
-    vorrat.set(kennung, eintrag);
-    anfordern(kennung, eintrag, alt?.verlauf?.fall === fall ? 500 : 80);
-  }
-  const antwort = eintrag.daten || eintrag.alt;
-  // Die Wahl des Falls gilt für alle Bilder darunter -- über die ganze Breite.
-  const kopf = karte('Fall', [
-    el('div.qa-fallkopf', {}, [
-      fallwahl(kennung, faelle, fall),
-      !eintrag.daten ? el('span.qa-nachfuehren', { text: 'wird nachgeführt …' }) : null,
-    ]),
-  ], { klasse: 'ist-breit' });
-  if (eintrag.fehler) return [kopf, karte(null, [el('p.hinweis.hinweis-warnung', { text: eintrag.fehler })])];
-  const daten = antwort?.verlauf;
-  if (!daten) return [kopf, karte(null, [leerzustand('Diagramme werden gerechnet …')])];
-  const r = bildrahmen(daten.staebe);
-  const veraltet = !eintrag.daten;
-  const blatt = (t, svg, zeilen, unten = []) => {
-    const huelle = el('div.bs-diagramm-huelle', {}, [svg]);
-    zeigerEinrichten(huelle, svg, r, daten, zeilen);
-    return karte(`${t} – ${daten.fall}`, [huelle, ...unten],
-      { klasse: veraltet ? 'ist-veraltet' : '' });
-  };
-  const verschiebung = (s, x) => [
-    `u_x = ${fest(zwischen(s.proben, x, 'ux'), 2)} mm   u_z = ${fest(zwischen(s.proben, x, 'uz'), 2)} mm`,
-    `w = ${fest(zwischen(s.proben, x, 'w'), 2)} mm gegen die Sehne`,
-  ];
-  const lager = (antwort.uebersicht?.faelle || []).find((f) => f.name === daten.fall)?.lagerkraefte || [];
-  // Was keinen Knoten hat -- eine Stelle auf einem Stab, die Summe von
-  // Linienlager oder Bettung --, steht unter dem Bild. Ohne sie ginge das
-  // Gleichgewicht am Bildschirm nicht auf.
-  const ohneKnoten = lager.filter((l) => !l.knoten).map((l) => el('p.bs-einheiten', {
-    text: `${l.wo}: R_x = ${fest(l.R_x, 1)} kN · R_z = ${fest(l.R_z, 1)} kN · M = ${fest(l.M, 1)} kNm`,
-  }));
-  if (lager.some((l) => l.summe)) {
-    ohneKnoten.push(el('p.bs-einheiten', { text: antwort.uebersicht.summen_text }));
-  }
-  return [
-    kopf,
-    blatt('Verformung', verformungsbild(r, daten), verschiebung),
-    ...GROESSEN.map((g) => blatt(g.titel, verlaufsbild(r, daten, g), (s, x) => [
-      `${g.schluessel} = ${fest(zwischen(s.proben, x, g.schluessel), g.stellen)} ${g.einheit}`])),
-    blatt('Lagerkräfte', lagerbild(r, daten, lager), verschiebung, ohneKnoten),
-  ];
+  return system.diagramme.map((zeile) => diagrammKarte(kennung, system, zeile));
 }
 
 // ===========================================================================

@@ -1,5 +1,5 @@
 ---
-erzeugt: bdc4f0388f29
+erzeugt: c2e23fc9a2bc
 art: modul
 tags: [modul]
 ---
@@ -120,6 +120,7 @@ Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks.
 ## Konstanten
 
 - `_WERKSTOFFSAETZE = [{'wert': s.value, 'beschriftung': s.beschriftung, 'kurz': s.kurz} fo…` – Die Wertesaetze und Betongesetze mit Beschriftung -- dieselben in der Querschnittsanalyse und in jeder Spannung-Dehnung-Analyse. `kurz` fuer die Karte einer Analyse, in der die lange nicht Platz hat. Die Woerter stehen beim Wertesatz selbst.
+- `_DIAGRAMMGROESSEN = {'M': ('M', 'Moment M'), 'V': ('V', 'Querkraft V'), 'N': ('N', 'Norma…` – Wie die Diagramme der Statik-Analyse heissen: kurz im Schalter, lang ueber dem Diagramm -- je Groesse, die die Beschreibung kennt.
 - `_BETONGESETZE = [{'wert': a.value, 'beschriftung': a.beschriftung, 'kurz': a.kurz} fo…` – Die Betongesetze heissen wie die Rechenarten, deren Werte sie sind; welche es gibt, steht am Feld der Werkstoffwahl.
 - `TAFEL = {TitelBlock: _titel_dict, TextBlock: _text_dict, GleichungBlock: _gle…` – Je Blockart, wie die Oberflaeche sie bekommt -- jede als JSON-Objekt.
 

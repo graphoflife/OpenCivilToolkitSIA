@@ -438,7 +438,11 @@ kann deren Beton nehmen («gemäss Querschnitt»). Ein neues System bringt
 die Lastfälle Eigengewicht, Auflast und Nutzlast mit und die Kombinationen
 GZT (1.35 / 1.35 / 1.5) und GZG (je 1.0). Das Eigengewicht kommt von
 selbst: je Stab ρ · g · A mit g = 10 m/s², beim Beton mit der Dichte des
-Stahlbetons -- grau gezeichnet in seinem Lastfall.
+Stahlbetons -- grau gezeichnet in seinem Lastfall. Zuunterst die
+Statik-Analyse, wie die Spannung-Dehnung-Analyse: je Zeile ein Lastfall
+oder eine Kombination und was ihr Diagramm zeigt, M, V, N, Verschiebung
+oder Lager; weitere mit «+ Diagramm». Ein neues System bringt M, V und N
+der GZT und die Verschiebung der GZG mit.
 Anders als im Querschnitt hängt ein Rahmen an seinen Knoten: ein Klick an
 einem Knoten wählt ihn, ein verschobener Stab nimmt seine Knoten mit.
 Teilen und Umkehren rechnet der Kern -- dabei entstehen Lastwerte. Ist das
@@ -532,9 +536,11 @@ weisse Karten; ein Klick auf den Kopf klappt es zu.
   wählbaren Achsen (zwei von N, M_y, M_z, die dritte mit festem Wert; ein
   Klick auf einen Lastfall legt den Schnitt durch ihn), dazu je Lastfall der
   Bruchzustand im Schnitt und der Schubfluss in den Wänden; bei einem
-  Balkensystem je Kombination Verformung, N, V, M und Lagerkräfte -- mit der Maus
-  darüber (auf dem Telefon: tippen) der Wert an der Stelle, an einem Knoten
-  seine Verschiebung; bei einem Grundbruch und einer Setzung die Situation
+  Balkensystem je Zeile seiner Statik-Analyse ein Diagramm -- M, V, N,
+  Verschiebung oder Lagerkräfte eines Lastfalls oder einer Kombination, die
+  Werte an den Enden und je Stab die grössten mit Punkt und Stelle; mit der
+  Maus darüber (auf dem Telefon: tippen) der Wert an der Stelle, an einem
+  Knoten seine Verschiebung; bei einem Grundbruch und einer Setzung die Situation
 * *Herleitung* -- die Mitschrift, Formel für Formel, mit Normstelle; je
   Bestandteil ein Panel, je Kapitel eine Karte
 

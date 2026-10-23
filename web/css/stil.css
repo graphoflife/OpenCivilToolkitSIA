@@ -2089,6 +2089,10 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-kombinationen th { text-align: left; font-weight: 600; color: var(--schrift-matt); padding: 2px 4px; }
 .bs-kombinationen td { padding: 2px 4px; }
 .bs-kombinationen .zahlfeld { width: 84px; }
+/* Die Statik-Analyse: je Zeile oben der Fall, darunter die Grösse. */
+.bs-diagrammzeile { display: flex; flex-direction: column; gap: 4px; padding: 6px 0; border-bottom: 1px solid var(--rand); }
+.bs-diagrammzeile-kopf { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: center; }
+.bs-diagrammzeile-kopf select { min-width: 0; }
 
 /* Die Ergebnisse rechts: je Bild ein Blatt, Werte beim Darüberfahren. */
 .bs-diagramm-huelle { position: relative; }
@@ -2107,6 +2111,13 @@ details.nb-callout > summary { cursor: pointer; }
   paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round;
 }
 .bs-d-zusatz { fill: var(--schrift-matt); }
+/* Ein Extremwert: ein Punkt in der Farbe seiner Kurve, darunter klein die Stelle. */
+.bs-d-extrem { stroke: #fff; stroke-width: 1.2; }
+.bs-d-n.bs-d-extrem { fill: #1f5fa8; }
+.bs-d-v.bs-d-extrem { fill: #0d9488; }
+.bs-d-m.bs-d-extrem { fill: var(--system); }
+.bs-d-w.bs-d-extrem { fill: var(--blau); }
+.bs-d-stelle { font-size: 10.5px; fill: var(--schrift-matt); }
 .bs-d-marke { fill: var(--blau); stroke: #fff; stroke-width: 1.5; pointer-events: none; }
 .bs-reaktion { stroke: #16794a; }
 .bs-reaktion.bs-spitze { fill: #16794a; }
