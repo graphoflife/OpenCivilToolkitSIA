@@ -1,6 +1,6 @@
 # Voll
 
-389 Berechnungen ausgeführt, 644 Werte bestimmt.
+393 Berechnungen ausgeführt, 648 Werte bestimmt.
 
 ## Herleitung
 
@@ -9714,6 +9714,12 @@ $$
 I_{\text{Q10}} = 13275\,\cdot 10^{6}\,\mathrm{mm}^{4}
 $$
 
+**E-Modul, «Fundamentbalken» (von Hand)**
+
+$$
+E_{\text{Q7}} = 15000\,\mathrm{N}/\mathrm{mm}^{2}
+$$
+
 **Dehnsteifigkeit, «Balken 300×500» aus C30/37**
 
 $$
@@ -9810,16 +9816,16 @@ $$
 g_{k,\text{Q6,B500B}} = \rho_s \cdot g \cdot A_{\text{Q6}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 14282\,\mathrm{mm}^{2} = 1.12\,\mathrm{kN}/\mathrm{m}
 $$
 
-**Dehnsteifigkeit, «Fundamentbalken» aus C30/37**
+**Dehnsteifigkeit, «Fundamentbalken» mit E von Hand**
 
 $$
-EA_{\text{Q7,C30/37}} = E_{cm} \cdot A_{\text{Q7}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 250000\,\mathrm{mm}^{2} = 8405\,\mathrm{MN}
+EA_{\text{Q7,C30/37}} = E_{\text{Q7}} \cdot A_{\text{Q7}} = 15000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 250000\,\mathrm{mm}^{2} = 3750\,\mathrm{MN}
 $$
 
-**Biegesteifigkeit, «Fundamentbalken» aus C30/37**
+**Biegesteifigkeit, «Fundamentbalken» mit E von Hand**
 
 $$
-EI_{\text{Q7,C30/37}} = E_{cm} \cdot I_{\text{Q7}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 5138.89\,\cdot 10^{6}\,\mathrm{mm}^{4} = 172768\,\mathrm{kNm}^{2}
+EI_{\text{Q7,C30/37}} = E_{\text{Q7}} \cdot I_{\text{Q7}} = 15000\,\mathrm{N}/\mathrm{mm}^{2} \cdot 5138.89\,\cdot 10^{6}\,\mathrm{mm}^{4} = 77083\,\mathrm{kNm}^{2}
 $$
 
 **Eigengewicht, «Fundamentbalken» aus C30/37**
@@ -9846,6 +9852,28 @@ $$
 g_{k,\text{Q4,B500B}} = \rho_s \cdot g \cdot A_{\text{Q4}} = 7850\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 11875\,\mathrm{mm}^{2} = 0.93\,\mathrm{kN}/\mathrm{m}
 $$
 
+**Dehnsteifigkeit, «Kasten» aus C30/37**
+
+$$
+EA_{\text{Q10,C30/37}} = E_{cm} \cdot A_{\text{Q10}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 330000\,\mathrm{mm}^{2} = 11095\,\mathrm{MN}
+$$
+
+**Biegesteifigkeit, «Kasten» aus C30/37**
+
+$$
+EI_{\text{Q10,C30/37}} = E_{cm} \cdot I_{\text{Q10}} = 33620\,\mathrm{N}/\mathrm{mm}^{2} \cdot 13275\,\cdot 10^{6}\,\mathrm{mm}^{4} = 446302\,\mathrm{kNm}^{2}
+$$
+
+**Eigengewicht, «Kasten» aus C30/37**
+
+$$
+\begin{aligned}
+  g_{k,\text{Q10,C30/37}} &= \rho_{sb} \cdot g \cdot A_{\text{Q10}} \\
+  &= 2500\,\mathrm{kg}/\mathrm{m}^{3} \cdot 10\,\mathrm{m}/\mathrm{s}^{2} \cdot 330000\,\mathrm{mm}^{2} \\
+  &= 8.25\,\mathrm{kN}/\mathrm{m}
+\end{aligned}
+$$
+
 > **Annahme:** Steifigkeit nach Vorgabe, nicht nachgeschlagen: E\_cm für Beton und E\_s für Betonstahl, am ungerissenen Bruttoquerschnitt, ohne Schubverformung; Gleichgewicht am unverformten System (Theorie 1. Ordnung).
 
 **Stäbe**
@@ -9857,9 +9885,10 @@ $$
 | L3 | K3 – K4 | $4.472$ | $26.6$ | Plattenbalken | $12103$ | $322750$ | – | – |
 | L4 | K4 – K5 | $5.000$ | $-90.0$ | Rohr | $995$ | $3128$ | beide | – |
 | L5 | K5 – K6 | $3.000$ | $0.0$ | Walzprofil | $2856$ | $48374$ | Anfang | – |
-| L6 | K6 – K7 | $2.000$ | $0.0$ | Fundamentbalken | $8405$ | $172768$ | – | quer fest |
+| L6 | K6 – K7 | $2.000$ | $0.0$ | Fundamentbalken | $3750$ | $77083$ | – | quer fest |
 | L7 | K7 – K8 | $1.000$ | $-90.0$ | kein Stab | – | – | – | quer fest |
 | L8 | K6 – K9 | $2.000$ | $90.0$ | Hohlprofil | $2375$ | $29342$ | – | – |
+| L9 | K9 – K10 | $2.000$ | $0.0$ | Kasten | $11095$ | $446302$ | – | – |
 
 **Lager**
 
@@ -9914,7 +9943,7 @@ $$
 v'' = \frac{M}{EI} \qquad u' = \frac{N}{EA}
 $$
 
-39 Unbekannte.
+42 Unbekannte.
 
 #### Lastfall «Eigengewicht»
 
@@ -9929,7 +9958,8 @@ $$
 | K5 | $0.00$ | $0.00$ | nicht bestimmbar |
 | K6 | $0.00$ | $0.00$ | $0.000$ |
 | K7 | $0.00$ | $0.00$ | $0.000$ |
-| K9 | $0.00$ | $0.00$ | $0.000$ |
+| K9 | $1.12$ | $-0.01$ | $-1.125$ |
+| K10 | $1.12$ | $-2.30$ | $-1.149$ |
 
 **Schnittgrössen an den Stabenden**
 
@@ -9941,7 +9971,8 @@ $$
 | L4 | $-31.0$ | $0.0$ | $0.0$ | $-33.0$ | $0.0$ | $0.0$ |
 | L5 | $0.0$ | $1.3$ | $0.0$ | $0.0$ | $-2.1$ | $-1.3$ |
 | L6 | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ |
-| L8 | $-1.9$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ |
+| L8 | $-18.4$ | $0.0$ | $-16.5$ | $-16.5$ | $0.0$ | $-16.5$ |
+| L9 | $0.0$ | $16.5$ | $-16.5$ | $0.0$ | $0.0$ | $0.0$ |
 
 **Lagerkräfte, auf das Tragwerk**
 
@@ -9949,7 +9980,7 @@ $$
 | ---: | ---: | ---: | ---: |
 | A1 (K1) | $0.0$ | $7.9$ | $1.4$ |
 | A2 (K5) | $0.0$ | $34.2$ | $0.0$ |
-| K6 | $0.0$ | $4.0$ | $-1.3$ |
+| K6 | $0.0$ | $20.5$ | $15.2$ |
 | K7 | $0.0$ | $0.0$ | $0.0$ |
 | L6: Lasten geradewegs ins Linienlager | $0.0$ | $32.5$ | $520.0$ |
 | L1: Bettung, Summe | $0.0$ | $138.6$ | $755.3$ |
@@ -9984,10 +10015,14 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L6 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L6 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L6 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
-| L8 | $N$ | $-1.9\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $2.00$ |
+| L8 | $N$ | $-18.4\ \mathrm{kN}$ | $0.00$ | $-16.5\ \mathrm{kN}$ | $2.00$ |
 | L8 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L8 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L8 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L8 | $M$ | $-16.5\ \mathrm{kNm}$ | $0.00$ | $-16.5\ \mathrm{kNm}$ | $2.00$ |
+| L8 | $w$ | $-0.28\ \mathrm{mm}$ | $1.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L9 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L9 | $V$ | $0.0\ \mathrm{kN}$ | $2.00$ | $16.5\ \mathrm{kN}$ | $0.00$ |
+| L9 | $M$ | $-16.5\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.00$ |
+| L9 | $w$ | $-0.01\ \mathrm{mm}$ | $0.74$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 
 Grösste Durchbiegung gegen die Sehne: L1, w = -0.59 mm bei x = 4.97 m, L/w = 13476.
 
@@ -9996,8 +10031,8 @@ Grösste Durchbiegung gegen die Sehne: L1, w = -0.59 mm bei x = 4.97 m, L/w = 13
 |  | Lasten | Lager | Summe |  |
 | ---: | ---: | ---: | ---: | ---: |
 | $\sum F_x$ | $0.000$ | $0.000$ | $0.000$ | kN |
-| $\sum F_z$ | $-217.242$ | $217.242$ | $0.000$ | kN |
-| $\sum M_0$ | $-1745.904$ | $1745.904$ | $0.000$ | kNm |
+| $\sum F_z$ | $-233.742$ | $233.742$ | $0.000$ | kN |
+| $\sum M_0$ | $-2009.904$ | $2009.904$ | $0.000$ | kNm |
 
 #### Lastfall «Schnee und Wind»
 
@@ -10013,6 +10048,7 @@ Grösste Durchbiegung gegen die Sehne: L1, w = -0.59 mm bei x = 4.97 m, L/w = 13
 | K6 | $0.00$ | $0.00$ | $0.000$ |
 | K7 | $0.00$ | $0.00$ | $0.000$ |
 | K9 | $0.00$ | $0.00$ | $0.000$ |
+| K10 | $0.00$ | $0.00$ | $0.000$ |
 
 **Schnittgrössen an den Stabenden**
 
@@ -10025,6 +10061,7 @@ Grösste Durchbiegung gegen die Sehne: L1, w = -0.59 mm bei x = 4.97 m, L/w = 13
 | L5 | $0.0$ | $1.5$ | $0.0$ | $0.0$ | $1.5$ | $0.5$ |
 | L6 | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ |
 | L8 | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ |
+| L9 | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ |
 
 **Lagerkräfte, auf das Tragwerk**
 
@@ -10070,6 +10107,10 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L8 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L8 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L8 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L9 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L9 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L9 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
+| L9 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 
 Grösste Durchbiegung gegen die Sehne: L1, w = -0.36 mm bei x = 5.53 m, L/w = 22002.
 
@@ -10096,7 +10137,8 @@ Grösste Durchbiegung gegen die Sehne: L1, w = -0.36 mm bei x = 5.53 m, L/w = 22
 | K5 | $0.00$ | $0.00$ | nicht bestimmbar |
 | K6 | $0.00$ | $0.00$ | $0.000$ |
 | K7 | $0.00$ | $0.00$ | $0.000$ |
-| K9 | $0.00$ | $0.00$ | $0.000$ |
+| K9 | $1.52$ | $-0.02$ | $-1.518$ |
+| K10 | $1.52$ | $-3.11$ | $-1.552$ |
 
 **Schnittgrössen an den Stabenden**
 
@@ -10108,7 +10150,8 @@ Grösste Durchbiegung gegen die Sehne: L1, w = -0.36 mm bei x = 5.53 m, L/w = 22
 | L4 | $-59.5$ | $0.0$ | $0.0$ | $-62.1$ | $0.0$ | $0.0$ |
 | L5 | $0.0$ | $4.0$ | $0.0$ | $0.0$ | $-0.6$ | $-1.0$ |
 | L6 | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ |
-| L8 | $-2.5$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ | $0.0$ |
+| L8 | $-24.8$ | $0.0$ | $-22.3$ | $-22.3$ | $0.0$ | $-22.3$ |
+| L9 | $0.0$ | $22.3$ | $-22.3$ | $0.0$ | $0.0$ | $0.0$ |
 
 **Lagerkräfte, auf das Tragwerk**
 
@@ -10116,7 +10159,7 @@ Grösste Durchbiegung gegen die Sehne: L1, w = -0.36 mm bei x = 5.53 m, L/w = 22
 | ---: | ---: | ---: | ---: |
 | A1 (K1) | $-27.0$ | $11.1$ | $1.6$ |
 | A2 (K5) | $0.0$ | $66.1$ | $0.0$ |
-| K6 | $0.0$ | $3.1$ | $-1.0$ |
+| K6 | $0.0$ | $25.4$ | $21.3$ |
 | K7 | $0.0$ | $0.0$ | $0.0$ |
 | L6: Lasten geradewegs ins Linienlager | $0.0$ | $43.9$ | $702.0$ |
 | L1: Bettung, Summe | $0.0$ | $187.2$ | $1051.6$ |
@@ -10151,10 +10194,14 @@ Bei Linienlagern und Bettung steht die Summe; ihr Moment um den Ursprung.
 | L6 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
 | L6 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
 | L6 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
-| L8 | $N$ | $-2.5\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $2.00$ |
+| L8 | $N$ | $-24.8\ \mathrm{kN}$ | $0.00$ | $-22.3\ \mathrm{kN}$ | $2.00$ |
 | L8 | $V$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
-| L8 | $M$ | $0.0\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $0.00$ |
-| L8 | $w$ | $0.00\ \mathrm{mm}$ | $0.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L8 | $M$ | $-22.3\ \mathrm{kNm}$ | $0.00$ | $-22.3\ \mathrm{kNm}$ | $2.00$ |
+| L8 | $w$ | $-0.38\ \mathrm{mm}$ | $1.00$ | $0.00\ \mathrm{mm}$ | $0.00$ |
+| L9 | $N$ | $0.0\ \mathrm{kN}$ | $0.00$ | $0.0\ \mathrm{kN}$ | $0.00$ |
+| L9 | $V$ | $0.0\ \mathrm{kN}$ | $2.00$ | $22.3\ \mathrm{kN}$ | $0.00$ |
+| L9 | $M$ | $-22.3\ \mathrm{kNm}$ | $0.00$ | $0.0\ \mathrm{kNm}$ | $2.00$ |
+| L9 | $w$ | $-0.01\ \mathrm{mm}$ | $0.74$ | $0.00\ \mathrm{mm}$ | $0.00$ |
 
 Grösste Durchbiegung gegen die Sehne: L1, w = -1.34 mm bei x = 5.17 m, L/w = 5987.
 
@@ -10163,8 +10210,8 @@ Grösste Durchbiegung gegen die Sehne: L1, w = -1.34 mm bei x = 5.17 m, L/w = 59
 |  | Lasten | Lager | Summe |  |
 | ---: | ---: | ---: | ---: | ---: |
 | $\sum F_x$ | $27.000$ | $-27.000$ | $0.000$ | kN |
-| $\sum F_z$ | $-311.277$ | $311.277$ | $0.000$ | kN |
-| $\sum M_0$ | $-2593.971$ | $2593.971$ | $0.000$ | kNm |
+| $\sum F_z$ | $-333.552$ | $333.552$ | $0.000$ | kN |
+| $\sum M_0$ | $-2950.371$ | $2950.371$ | $0.000$ | kNm |
 
 ### Balkensystem: Beweglich
 
@@ -12254,6 +12301,9 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Höhe, Balken 300×500 | $h_{\text{Q1}}$ | $500$ | mm | Vorgabe |
 | Querschnittsfläche, Kasten | $A_{\text{Q10}}$ | $330000$ | mm² | berechnet |
 | Flächenträgheitsmoment, Kasten | $I_{\text{Q10}}$ | $13275$ | ·10⁶ mm⁴ | berechnet |
+| Dehnsteifigkeit, Kasten, C30/37 | $EA_{\text{Q10,C30/37}}$ | $11095$ | MN | berechnet |
+| Biegesteifigkeit, Kasten, C30/37 | $EI_{\text{Q10,C30/37}}$ | $446302$ | kNm² | berechnet |
+| Eigengewicht je Meter, Kasten, C30/37 | $g_{k,\text{Q10,C30/37}}$ | $8.25$ | kN/m | berechnet |
 | Querschnittsfläche, Rundstütze | $A_{\text{Q2}}$ | $125664$ | mm² | berechnet |
 | Flächenträgheitsmoment, Rundstütze | $I_{\text{Q2}}$ | $1256.64$ | ·10⁶ mm⁴ | berechnet |
 | Dehnsteifigkeit, Rundstütze, C30/37 | $EA_{\text{Q2,C30/37}}$ | $4225$ | MN | berechnet |
@@ -12295,9 +12345,10 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Flanschdicke, Walzprofil | $t_{f,\text{Q6}}$ | $19$ | mm | Vorgabe |
 | Stegdicke, Walzprofil | $t_{w,\text{Q6}}$ | $11$ | mm | Vorgabe |
 | Querschnittsfläche, Fundamentbalken | $A_{\text{Q7}}$ | $250000$ | mm² | berechnet |
+| E-Modul, Fundamentbalken | $E_{\text{Q7}}$ | $15000$ | N/mm² | Eingabe |
 | Flächenträgheitsmoment, Fundamentbalken | $I_{\text{Q7}}$ | $5138.89$ | ·10⁶ mm⁴ | berechnet |
-| Dehnsteifigkeit, Fundamentbalken, C30/37 | $EA_{\text{Q7,C30/37}}$ | $8405$ | MN | berechnet |
-| Biegesteifigkeit, Fundamentbalken, C30/37 | $EI_{\text{Q7,C30/37}}$ | $172768$ | kNm² | berechnet |
+| Dehnsteifigkeit, Fundamentbalken, C30/37 | $EA_{\text{Q7,C30/37}}$ | $3750$ | MN | berechnet |
+| Biegesteifigkeit, Fundamentbalken, C30/37 | $EI_{\text{Q7,C30/37}}$ | $77083$ | kNm² | berechnet |
 | Eigengewicht je Meter, Fundamentbalken, C30/37 | $g_{k,\text{Q7,C30/37}}$ | $6.25$ | kN/m | berechnet |
 | Breite oben, Fundamentbalken | $b_{o,\text{Q7}}$ | $600$ | mm | Vorgabe |
 | Breite unten, Fundamentbalken | $b_{u,\text{Q7}}$ | $400$ | mm | Vorgabe |

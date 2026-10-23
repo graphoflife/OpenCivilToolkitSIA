@@ -44,6 +44,37 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-23 · Balkensystem: Materialien unter der Zeichnung, E-Modul je Querschnitt
+
+Vierte Etappe des neuen Balkensystems. Wünsche des Benutzers: unter der
+Zeichnung eine Liste der Materialien und Querschnitte, deren wichtige
+Eigenschaften sich ändern lassen; der E-Modul auch als Zahl, unabhängig vom
+Material; das Material einer Linie getrennt vom Querschnitt, wahlweise
+«gemäss Querschnitt».
+
+- **Materialien:** ein Panel zwischen Zeichnung und Querschnitten, je
+  Material des Projekts E-Modul und Dichte -- die Kennwerte, mit denen ein
+  Stab rechnet. Welche das sind, sagt der Katalog (`kennwerte`, aus
+  `E_MODUL` und `DICHTE` in `stabwerk/rechnung.py`). Die Zeilen sind die der
+  App «Materialien» (`kennwertZeile` aus `material.js`): bei einer Normsorte
+  gesperrt, bei einem eigenen Material hier wie dort zu ändern -- eine Regel,
+  zwei Orte, ein Code. Welche Stäbe ein Material trägt, sagt der Kern
+  (`zuordnung.balkensysteme.materialien`), samt denen «gemäss Querschnitt».
+- **E-Modul je Querschnitt:** Schalter «vom Material | Zahl» (`e_modul`,
+  `E` in N/mm²). Die Zahl gilt für jeden Stab mit dem Querschnitt, aus
+  welchem Material auch immer; die Dichte kommt weiter vom Material. In der
+  Herleitung eine Vorgabe «E-Modul, «…» (von Hand)», die Steifigkeiten
+  heissen dann «mit E von Hand».
+- **Material gemäss Querschnitt:** das Zeichen `MATERIAL_DES_QUERSCHNITTS`
+  an der Linie. Aufgelöst wird es beim Aufbau: der Beton einer Platte, das
+  eine Material der Flächen einer Analyse. Bringt der Querschnitt keines
+  mit -- nach Vorlage, von Hand, eine leere Analyse, zwei Betone --, sagt es
+  eine Meldung am System, und es rechnet nicht. Welche Arten eines
+  mitbringen, steht einmal (`MIT_MATERIAL`); die Oberfläche bietet die Wahl
+  nur dort an und liest es aus dem Katalog (`bringt_material`).
+
+---
+
 ## 2026-10-23 · Balkensystem: Eigengewicht von selbst, GZT und GZG
 
 Dritte Etappe des neuen Balkensystems. Wünsche des Benutzers: das

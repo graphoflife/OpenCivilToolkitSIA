@@ -688,11 +688,21 @@ function querschnittWahl(z, gewaehlt, setzen) {
   return auswahl({ werte, gewaehlt, titel: 'Die Querschnitte stehen unter der Zeichnung', beiAenderung: setzen });
 }
 
-function materialWahl(gewaehlt, setzen) {
+/**
+ * Das Material einer Linie: eines aus dem Projekt -- oder «gemäss
+ * Querschnitt», wenn ihr Querschnitt eines mitbringt (Platte, Analyse).
+ */
+function materialWahl(z, querschnitt, gewaehlt, setzen) {
+  const eigenes = katalog().material_des_querschnitts;
+  const art = z.querschnitte.find((q) => q.kennung === querschnitt)?.art;
+  const bringt = katalog().querschnittsarten?.find((x) => x.wert === art)?.bringt_material;
   return auswahl({
-    werte: zustand.projekt.materialien.map((m) => ({ wert: m.kennung, beschriftung: m.name || m.sorte })),
+    werte: [
+      ...(bringt || gewaehlt === eigenes ? [{ wert: eigenes, beschriftung: 'gemäss Querschnitt' }] : []),
+      ...zustand.projekt.materialien.map((m) => ({ wert: m.kennung, beschriftung: m.name || m.sorte })),
+    ],
     gewaehlt,
-    titel: 'E_cm beim Beton, E_s beim Stahl',
+    titel: 'E_cm beim Beton, E_s beim Stahl -- «gemäss Querschnitt»: der Beton der Platte oder Analyse',
     beiAenderung: setzen,
   });
 }
@@ -759,7 +769,7 @@ function neuEigenschaften(a, werkzeug) {
     const v = a.bs.vorgaben.linie;
     inhalt = [
       zeile('Querschnitt', querschnittWahl(z, v.querschnitt, (w) => { v.querschnitt = w; neu(); })),
-      v.querschnitt ? zeile('Material', materialWahl(v.material, (w) => { v.material = w; neu(); })) : null,
+      v.querschnitt ? zeile('Material', materialWahl(z, v.querschnitt, v.material, (w) => { v.material = w; neu(); })) : null,
     ];
   } else if (werkzeug === 'last') {
     const v = a.bs.vorgaben.last;
@@ -933,7 +943,7 @@ function linienEigenschaften(a, z, linien) {
   const inhalt = [zeile('Querschnitt', querschnittWahl(z, e.querschnitt, setzen('querschnitt')))];
   if (e.querschnitt) {
     inhalt.push(
-      zeile('Material', materialWahl(e.material, setzen('material'))),
+      zeile('Material', materialWahl(z, e.querschnitt, e.material, setzen('material'))),
       zeile('Gelenk Anfang', haken(e.gelenk_anfang, setzen('gelenk_anfang'), 'Kein Moment am Anfang')),
       zeile('Gelenk Ende', haken(e.gelenk_ende, setzen('gelenk_ende'), 'Kein Moment am Ende')),
     );

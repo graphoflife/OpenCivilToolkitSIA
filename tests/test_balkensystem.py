@@ -9,8 +9,10 @@ import math
 import unittest
 
 from opencivil.projekt import (
-    BAUTEILE, BalkensystemEintrag, Projekt, ProjektFehler, StablastEintrag,
+    BAUTEILE, BalkensystemEintrag, Projekt, ProjektFehler, QuerschnittsanalyseEintrag,
+    StablastEintrag,
 )
+from opencivil.projekt.balkensystem import MATERIAL_DES_QUERSCHNITTS
 from opencivil.web import dienst
 
 
@@ -610,3 +612,121 @@ class TestEigengewicht(unittest.TestCase):
         meldungen = [m for m in p.balkensysteme[0].modell().meldungen if m.fehler]
         self.assertTrue(any("Eigengewicht" in m.text for m in meldungen))
 
+
+
+class TestEModulVonHand(unittest.TestCase):
+    """
+    Der E-Modul eines Querschnitts kommt vom Material seines Stabs oder steht
+    als Zahl da -- dann für jeden Stab mit ihm (Benutzer, 2026-10-23).
+    """
+
+    def test_zahl_statt_material(self):
+        p = traeger()
+        q = p.balkensysteme[0].querschnitte[0]
+        q.e_modul, q.E = "zahl", 10000.0
+        e = p.rechnen()
+        self.assertEqual(e.wert("balkensystem.r1.Q1.E").groesse.si, 10000e6)
+        EI = 10000e6 * 0.3 * 0.6 ** 3 / 12
+        self.assertAlmostEqual(e.wert("balkensystem.r1.Q1.b1.EI").groesse.si, EI, delta=1e-9 * EI)
+        # Die Durchbiegung in der Mitte, nach unten positiv: 5 q L⁴ / (384 EI).
+        w = e.balkensystem("r1").verlaeufe("G")["L1"].extrem("w").groesst[1]
+        self.assertAlmostEqual(w, 5 * 10e3 * 6 ** 4 / (384 * EI), delta=1e-6)
+
+    def test_vom_material_bleibt_beim_material(self):
+        """Die Zahl daneben zählt nicht, solange der Schalter auf «vom Material» steht."""
+        p = traeger()
+        p.balkensysteme[0].querschnitte[0].E = 1.0
+        e = p.rechnen()
+        self.assertNotIn("balkensystem.r1.Q1.E", e.loesung.werte)
+        self.assertEqual(e.wert("balkensystem.r1.Q1.b1.EA").groesse.si,
+                         e.wert("beton.b1.E_cm").groesse.si * 0.3 * 0.6)
+
+    def test_gilt_fuer_stahl_und_beton(self):
+        """Ein Querschnitt mit E von Hand ist aus jedem Material gleich steif -- er wiegt verschieden."""
+        p = traeger()
+        s = p.balkensysteme[0]
+        s.lastfaelle[0].eigengewicht = True
+        q = s.querschnitt("Gleich", "rechteck", E=20000.0, b=100.0, h=100.0)
+        s.linie((6, 0), (8, 0), querschnitt=q, material="b1")
+        s.linie((8, 0), (10, 0), querschnitt=q, material="s1")
+        s.lager_an((10, 0), "verschieblich")
+        werte = p.rechnen().loesung.werte
+        for m in ("b1", "s1"):
+            self.assertAlmostEqual(werte[f"balkensystem.r1.Q2.{m}.EA"].groesse.si, 20000e6 * 0.01,
+                                   delta=1e-6)
+        self.assertNotEqual(werte["balkensystem.r1.Q2.b1.g_k"].groesse.si,
+                            werte["balkensystem.r1.Q2.s1.g_k"].groesse.si)
+
+    def test_baukasten_und_herleitung(self):
+        s = BalkensystemEintrag(kennung="r1", name="T")
+        q = s.querschnitt("R", "rechteck", E=12000.0, b=300.0, h=500.0)
+        self.assertEqual((q.e_modul, q.E, q.masse), ("zahl", 12000.0, {"b": 300.0, "h": 500.0}))
+        p = traeger()
+        p.balkensysteme[0].querschnitte[0].e_modul = "zahl"
+        text = str(p.rechnen().bericht())
+        self.assertIn("E-Modul, «R» (von Hand)", text)
+        self.assertIn("Biegesteifigkeit, «R» mit E von Hand", text)
+
+    def test_null_ist_kein_e_modul(self):
+        p = traeger()
+        q = p.balkensysteme[0].querschnitte[0]
+        q.e_modul, q.E = "zahl", 0.0
+        with self.assertRaisesRegex(ProjektFehler, "E-Modul"):
+            Projekt.aus_dict(p.als_dict()).rechnen()
+
+
+class TestMaterialDesQuerschnitts(unittest.TestCase):
+    """
+    «gemäss Querschnitt»: eine Linie nimmt das Material, das ihre Platte oder
+    Querschnittsanalyse mitbringt (Benutzer, 2026-10-23).
+    """
+
+    def projekt(self, art):
+        """Der Träger und daneben ein Stab aus einer Platte oder Analyse in C25/30."""
+        p = traeger()
+        p.beton("C25/30")
+        bezug = (p.platte("Decke", h=250, beton="b2") if art == "platte"
+                 else p.analyse("Unterzug", beton="b2"))
+        s = p.balkensysteme[0]
+        q = s.querschnitt_aus("Aus dem Bauteil", art, bezug)
+        s.linie((6, 0), (9, 0), querschnitt=q, material=MATERIAL_DES_QUERSCHNITTS)
+        s.lager_an((9, 0), "verschieblich")
+        return p, q
+
+    def meldungen(self, p):
+        return [m.text for m in p.rechnen().balkensystem("r1").ergebnis.meldungen if m.fehler]
+
+    def test_platte_und_analyse_bringen_ihren_beton(self):
+        for art in ("platte", "analyse"):
+            with self.subTest(art=art):
+                p, q = self.projekt(art)
+                e = p.rechnen()
+                self.assertTrue(e.balkensystem("r1").ergebnis.gueltig,
+                                e.balkensystem("r1").ergebnis.meldungen)
+                self.assertEqual(e.aufbau.balkensysteme["r1"].paare["L2"], (q.kennung, "b2"))
+                A = e.wert(f"balkensystem.r1.{q.kennung}.A").groesse.si
+                self.assertAlmostEqual(e.wert(f"balkensystem.r1.{q.kennung}.b2.EA").groesse.si,
+                                       e.wert("beton.b2.E_cm").groesse.si * A, delta=1e-3)
+
+    def test_eine_vorlage_bringt_keines(self):
+        p = traeger()
+        p.balkensysteme[0].linien[0].material = MATERIAL_DES_QUERSCHNITTS
+        meldungen = self.meldungen(p)
+        self.assertEqual(len(meldungen), 1)
+        self.assertIn("L1 nimmt das Material gemäss Querschnitt", meldungen[0])
+        self.assertIn("nach Vorlage", meldungen[0])
+
+    def test_zwei_betone_in_der_analyse(self):
+        p, q = self.projekt("analyse")
+        p.querschnittsanalysen[0].polygon([(300, 0), (600, 0), (600, 200), (300, 200)],
+                                          material="b1")
+        meldungen = self.meldungen(p)
+        self.assertEqual(len(meldungen), 1)
+        self.assertIn("C25/30 und C30/37", meldungen[0])
+
+    def test_eine_leere_analyse(self):
+        p, q = self.projekt("analyse")
+        p.querschnittsanalysen[0] = QuerschnittsanalyseEintrag.neu(kennung="a1", name="Leer")
+        meldungen = self.meldungen(p)
+        self.assertTrue(any("gemäss Querschnitt" in m and "noch leer" in m for m in meldungen),
+                        meldungen)

@@ -429,11 +429,16 @@ Linie, einzeln dort, wo geklickt wurde, in % der Linie --, eine Einzellast
 oder ein Moment auch an einen Knoten. Jede Last ist für sich zu wählen, an
 ihrem Pfeil, Band oder ihrer Zahl, und mit Entf zu löschen. Gezeigt werden
 die Lasten des Lastfalls, der über der Zeichnung gewählt ist; unter ihr
-stehen alle in einer Liste. Ein neues System bringt die Lastfälle
-Eigengewicht, Auflast und Nutzlast mit und die Kombinationen GZT (1.35 /
-1.35 / 1.5) und GZG (je 1.0). Das Eigengewicht kommt von selbst: je Stab
-ρ · g · A mit g = 10 m/s², beim Beton mit der Dichte des Stahlbetons --
-grau gezeichnet in seinem Lastfall.
+stehen alle in einer Liste. Darunter die Materialien des Projekts mit
+E-Modul und Dichte -- bei einem eigenen Material dort zu ändern, wie in der
+App «Materialien» --, die Querschnitte und die Lastfälle. Ein Querschnitt
+nimmt seinen E-Modul vom Material des Stabs oder als Zahl, für jeden Stab
+mit ihm; eine Linie, deren Querschnitt aus einer Platte oder Analyse kommt,
+kann deren Beton nehmen («gemäss Querschnitt»). Ein neues System bringt
+die Lastfälle Eigengewicht, Auflast und Nutzlast mit und die Kombinationen
+GZT (1.35 / 1.35 / 1.5) und GZG (je 1.0). Das Eigengewicht kommt von
+selbst: je Stab ρ · g · A mit g = 10 m/s², beim Beton mit der Dichte des
+Stahlbetons -- grau gezeichnet in seinem Lastfall.
 Anders als im Querschnitt hängt ein Rahmen an seinen Knoten: ein Klick an
 einem Knoten wählt ihn, ein verschobener Stab nimmt seine Knoten mit.
 Teilen und Umkehren rechnet der Kern -- dabei entstehen Lastwerte. Ist das
@@ -441,8 +446,9 @@ System beweglich, sagt es eine Meldung und markiert, was sich bewegt; eine
 Drehung ohne Steifigkeit, an einem Knoten, an dem nur Gelenke hängen, ist
 gestrichen und trägt ein Fragezeichen. Die Querschnitte kommen aus einer
 Vorlage, von Hand, aus einer Platte oder aus einer Querschnittsanalyse; die
-Steifigkeit nach Vorgabe, nicht nachgeschlagen: E_cm bzw. E_s am
-ungerissenen Bruttoquerschnitt, ohne Schubverformung, Theorie 1. Ordnung.
+Steifigkeit nach Vorgabe, nicht nachgeschlagen: E_cm bzw. E_s -- oder der
+E-Modul von Hand -- am ungerissenen Bruttoquerschnitt, ohne Schubverformung,
+Theorie 1. Ordnung.
 
 **Grundbruch:** ein Flachfundament auf seinem Baugrund, nach dem Kapitel 9.2
 «Tragfähigkeit», das der Benutzer geliefert hat. Oben das Panel «Grundbruch

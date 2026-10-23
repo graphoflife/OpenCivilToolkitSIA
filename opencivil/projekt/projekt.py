@@ -28,7 +28,7 @@ from opencivil.projekt.eintraege import (
     EIGENE_VORSILBE, Beschreibung, Gebrauchswahl, KnickVerformungswahl, KnickWiderstandswahl,
     MaterialEintrag, PostenEintrag, RechenwahlEintrag,
 )
-from opencivil.projekt.balkensystem import BalkensystemEintrag
+from opencivil.projekt.balkensystem import MATERIAL_DES_QUERSCHNITTS, BalkensystemEintrag
 from opencivil.projekt.grundbruch import GrundbruchEintrag
 from opencivil.projekt.lesen import ProjektFehler, felder_pruefen, inhalt_pruefen, lesen, ort
 from opencivil.projekt.platte import QuerschnittEintrag
@@ -707,7 +707,8 @@ class Projekt(Beschreibung):
                       analyse: QuerschnittsanalyseEintrag) -> None:
         """
         Jede Vorlage, Kennwerte von Hand, Platte und Analyse als
-        Querschnitt; Beton und Stahl; Gelenke und ein Knoten, dessen Drehung
+        Querschnitt, einer mit E von Hand; Beton und Stahl, ein Stab mit dem
+        Material gemäss Querschnitt; Gelenke und ein Knoten, dessen Drehung
         keine Steifigkeit hat; Federn am Lager, Bettung, feste Linienlager
         mit und ohne Stab; jede Lastart, auch projiziert.
         """
@@ -720,11 +721,12 @@ class Projekt(Beschreibung):
             "t": s.querschnitt("Plattenbalken", "t", b=1200.0, h=600.0, b_w=300.0, h_f=200.0),
             "doppel_t": s.querschnitt("Walzprofil", "doppel_t", b=300.0, h=300.0,
                                       t_f=19.0, t_w=11.0),
-            "trapez": s.querschnitt("Fundamentbalken", "trapez", b_o=600.0, b_u=400.0, h=500.0),
+            "trapez": s.querschnitt("Fundamentbalken", "trapez", E=15000.0,
+                                    b_o=600.0, b_u=400.0, h=500.0),
         }
         s.querschnitt_mit_kennwerten("Von Hand", A=15000.0, I=120.0)
         s.querschnitt_aus("Deckenstreifen", "platte", decke)
-        s.querschnitt_aus("Kasten", "analyse", analyse)
+        kasten = s.querschnitt_aus("Kasten", "analyse", analyse)
         gebettet = s.linie((0, 0), (8, 0), querschnitt=q["rechteck"], material="b1",
                            quer="feder", k_quer=20000.0)
         stuetze = s.linie((8, 0), (8, 3), querschnitt=q["kreis"], material="b1")
@@ -737,6 +739,7 @@ class Projekt(Beschreibung):
                             quer="fest")
         s.linie((17, 0), (17, -1), quer="fest")
         s.linie((15, 0), (15, 2), querschnitt=q["rechteckrohr"], material="s1")
+        s.linie((15, 2), (17, 2), querschnitt=kasten, material=MATERIAL_DES_QUERSCHNITTS)
         s.lager_an((0, 0), "gelenkig", z="feder", k_z=50000.0, phi="feder", k_phi=10000.0)
         s.lager_an((12, 0), "gelenkig")
         g = s.lastfall("Eigengewicht", eigengewicht=True)

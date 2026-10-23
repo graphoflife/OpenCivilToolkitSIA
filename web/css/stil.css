@@ -2073,7 +2073,12 @@ details.nb-callout > summary { cursor: pointer; }
 .bs-vz-faser { stroke: var(--schrift-matt); stroke-width: 1; stroke-dasharray: 4 3; }
 .bs-vz-text { font-size: 10px; fill: var(--schrift-matt); }
 
-/* Querschnitte, Lastfälle, Kombinationen. */
+/* Materialien, Querschnitte, Lastfälle, Kombinationen. Ein Material zeigt
+   die Zeilen der App «Materialien» -- ihr Stil gilt hier mit. */
+.bs-material { display: flex; flex-direction: column; gap: 2px; padding: 6px 0; border-bottom: 1px solid var(--rand); }
+.bs-material-kopf { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
+.bs-material-name { font-weight: 600; }
+.bs-material-art { font-size: 11px; color: var(--schrift-zart); }
 .bs-querschnitt { display: flex; flex-direction: column; gap: 4px; padding: 6px 0; border-bottom: 1px solid var(--rand); }
 .bs-querschnitt-kopf { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: center; }
 .bs-kennwerte { margin: 0; font-size: 12px; font-weight: 600; color: var(--stahl); }

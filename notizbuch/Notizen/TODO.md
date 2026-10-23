@@ -368,9 +368,10 @@ Je eine Annahme eingebaut, im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
 Im Code mit «nach Vorgabe, nicht nachgeschlagen».
 
-- [ ] **Welche Steifigkeit?** Eingebaut: E_cm für Beton, E_s für Betonstahl,
-      am ungerissenen Bruttoquerschnitt, ohne Schubverformung, Theorie
-      1. Ordnung (`stabwerk/rechnung.py`, `E_MODUL`). Für Verformungen im
+- [ ] **Welche Steifigkeit?** Eingebaut: E_cm für Beton, E_s für Betonstahl
+      -- oder je Querschnitt ein E von Hand --, am ungerissenen
+      Bruttoquerschnitt, ohne Schubverformung, Theorie 1. Ordnung
+      (`stabwerk/rechnung.py`, `E_MODUL`). Für Verformungen im
       Gebrauch ist ein gerissener Stahlbetonbalken weicher, unter Dauerlast
       kriecht er; die Schnittgrössen eines unbestimmten Systems hängen daran.
 - [ ] **Platte als Stabquerschnitt.** Eingebaut: ein Streifen b × h mit den
@@ -383,11 +384,11 @@ Im Code mit «nach Vorgabe, nicht nachgeschlagen».
       Theorie 2. Ordnung, Schubverformung, schiefe Lager, und die
       Schnittgrössen eines Stabs als Einwirkung einer Platte oder
       Querschnittsanalyse.
-- [ ] **Balkensystem, Etappen 4 und 5** (Wunsch vom 2026-10-23): unter der
-      Zeichnung die Listen der Materialien und Querschnitte, der E-Modul als
-      Zahl, vom Material oder vom Querschnitt (E₀ oder E_eq bei gegebenem N
-      und M); das Material «gemäss Querschnitt»; die Kombinationen
-      übersichtlich wie das Panel des Querschnitts.
+- [ ] **Balkensystem, Etappe 5** (Wunsch vom 2026-10-23): der E-Modul vom
+      Querschnitt einer Analyse -- E₀ oder E_eq bei gegebenem N und M. Heute
+      entsteht E_eq erst in der Spannung-Dehnung-Analyse nach der Rechnung
+      (`spannungsanalyse/modul.py`); das Balkensystem bräuchte es im
+      Rechengraph, vor seiner eigenen Rechnung.
 
 - [ ] **Querschnittsanalyse, nächste Schritte** (je ein eigener Plan):
       Baustahl (Sortentabelle, Gesetz, Verbundquerschnitt, Stahlwände mit

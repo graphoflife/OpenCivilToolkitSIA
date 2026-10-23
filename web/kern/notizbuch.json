@@ -3750,7 +3750,9 @@
       "kurz": "ein Balkensystem wird Rechnung.",
       "stichworte": [
         "bauen",
-        "_stabquerschnitt"
+        "_stabquerschnitt",
+        "_paare",
+        "_material_des_querschnitts"
       ]
     },
     {
@@ -3840,6 +3842,7 @@
         "LagerEintrag",
         "KnotenlastEintrag",
         "StabquerschnittEintrag",
+        "StabquerschnittEintrag.E_von_hand",
         "StabquerschnittEintrag.stabvorlage",
         "StabquerschnittEintrag.masse_mit_vorgaben",
         "StabquerschnittEintrag.fehler",
@@ -4781,6 +4784,7 @@
         "Balkensystem.abschnitt",
         "Balkensystem.bezuege",
         "Balkensystem._querschnitt",
+        "Balkensystem._modul",
         "Balkensystem._erdbeschleunigung",
         "Balkensystem._steifigkeit",
         "Balkensystem._eigengewicht",

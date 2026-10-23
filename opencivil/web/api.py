@@ -66,6 +66,7 @@ from opencivil.nachweis.rechenwahl import (
 from opencivil.spannungsanalyse import Analyseart
 from opencivil.stabwerk import querschnitte as stabquerschnitte
 from opencivil.stabwerk.modell import Lastart, Lastrichtung
+from opencivil.stabwerk.rechnung import DICHTE, E_MODUL
 from opencivil.geotechnik.setzung import Steifigkeit
 from opencivil.web import balkendaten, diagrammdaten, grundbruchdaten, setzungsdaten
 from opencivil.web.umschlag import endlich
@@ -156,6 +157,7 @@ def katalog() -> dict:
             "querschnittsanalyse": feldangaben(QuerschnittsanalyseEintrag),
             "flaeche": feldangaben(FlaecheEintrag),
             "spannungsfall": feldangaben(SpannungsfallEintrag),
+            "stabquerschnitt": feldangaben(bs.StabquerschnittEintrag),
         },
         # Ein Skript der App «Python», mit einem Diagramm darin.
         "neues_skript": SkriptEintrag.neu(kennung="", name="").als_dict(),
@@ -245,14 +247,30 @@ def katalog() -> dict:
                 for v in stabquerschnitte.VORLAGEN
             ],
             # Woher A und I eines Stabs kommen. Der kurze Name steht im
-            # Schalter, der lange in seinem Titel.
+            # Schalter, der lange in seinem Titel; ob die Art ein Material
+            # mitbringt, sagt, ob eine Linie es «gemäss Querschnitt» nehmen kann.
             "querschnittsarten": [
-                {"wert": "vorlage", "beschriftung": "nach Vorlage", "kurz": "Vorlage"},
-                {"wert": "kennwerte", "beschriftung": "Kennwerte von Hand", "kurz": "Kennwerte"},
-                {"wert": "platte", "beschriftung": "aus einer Platte", "kurz": "Platte"},
-                {"wert": "analyse", "beschriftung": "aus einer Querschnittsanalyse",
-                 "kurz": "Analyse"},
+                {**x, "bringt_material": x["wert"] in bs.MIT_MATERIAL} for x in (
+                    {"wert": "vorlage", "beschriftung": "nach Vorlage", "kurz": "Vorlage"},
+                    {"wert": "kennwerte", "beschriftung": "Kennwerte von Hand",
+                     "kurz": "Kennwerte"},
+                    {"wert": "platte", "beschriftung": "aus einer Platte", "kurz": "Platte"},
+                    {"wert": "analyse", "beschriftung": "aus einer Querschnittsanalyse",
+                     "kurz": "Analyse"},
+                )
             ],
+            # Woher der E-Modul eines Querschnitts kommt.
+            "e_module": [
+                {"wert": "material", "beschriftung": "vom Material",
+                 "titel": "E_cm beim Beton, E_s beim Stahl -- je Stab sein Material"},
+                {"wert": "zahl", "beschriftung": "Zahl",
+                 "titel": "Ein E von Hand, für jeden Stab mit diesem Querschnitt"},
+            ],
+            # Je Art eines Materials die Kennwerte, mit denen ein Stab
+            # rechnet: E-Modul und Dichte -- die Liste der Materialien zeigt sie.
+            "kennwerte": {art: [E_MODUL[art], DICHTE[art]] for art in E_MODUL},
+            # Was als Material einer Linie heisst: das ihres Querschnitts.
+            "material_des_querschnitts": bs.MATERIAL_DES_QUERSCHNITTS,
             "lastarten": [
                 {"wert": a.value, "beschriftung": a.beschriftung, "verteilt": a.verteilt,
                  "kraft": a.kraft, "einheit": bs.EINHEIT_DER_LAST[a.value].beschriftung}
@@ -773,7 +791,9 @@ def zuordnung(aufbau: Aufbau) -> dict:
             for kennung, analyse in aufbau.querschnittsanalysen.items()
         },
         # Je Querschnitt eines Systems, wo A und I stehen -- und je Paar aus
-        # Querschnitt und Material EA und EI.
+        # Querschnitt und Material EA und EI. Dazu je tragenden Stab sein
+        # Material, wie der Aufbau es aufgeloest hat: «gemäss Querschnitt» ist
+        # hier schon der Beton der Platte oder Analyse.
         "balkensysteme": {
             kennung: {
                 "namensraum": system.id,
@@ -781,6 +801,7 @@ def zuordnung(aufbau: Aufbau) -> dict:
                 "querschnitte": {q: {"A": A, "I": I} for q, (A, I) in system.flaechen.items()},
                 "steifigkeiten": [{"querschnitt": s.querschnitt, "material": s.material,
                                    "EA": s.EA, "EI": s.EI} for s in system.steifigkeiten],
+                "materialien": {stab: material for stab, (_, material) in system.paare.items()},
             }
             for kennung, system in aufbau.balkensysteme.items()
         },

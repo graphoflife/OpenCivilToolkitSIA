@@ -1,5 +1,5 @@
 ---
-erzeugt: 231e22980da9
+erzeugt: bdc4f0388f29
 art: modul
 tags: [modul]
 ---
@@ -154,6 +154,7 @@ Verbindet die Kennungen der Oberflaeche mit den Wert-IDs des Rechenwerks.
 - [[opencivil.spannungsanalyse]]
 - [[opencivil.stabwerk.modell]]
 - [[opencivil.stabwerk.querschnitte]]
+- [[opencivil.stabwerk.rechnung]]
 - [[opencivil.web.balkendaten]]
 - [[opencivil.web.diagrammdaten]]
 - [[opencivil.web.grundbruchdaten]]

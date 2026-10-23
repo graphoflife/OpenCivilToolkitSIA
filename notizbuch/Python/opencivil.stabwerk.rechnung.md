@@ -1,5 +1,5 @@
 ---
-erzeugt: 7d40f3b98b5a
+erzeugt: 0e9fa16dcb99
 art: modul
 tags: [modul]
 ---
@@ -33,9 +33,11 @@ an ihnen: aendert sich deren Dicke, rechnet es neu.
 
 ## STEIFIGKEIT -- NACH VORGABE, NICHT NACHGESCHLAGEN
 
-`E_cm` fuer Beton und `E_s` fuer Betonstahl ([[opencivil.stabwerk.rechnung#Konstanten|E_MODUL]]), am
-ungerissenen Bruttoquerschnitt, ohne Schubverformung, Gleichgewicht am
-unverformten System. Die Herleitung sagt es, das TODO fuehrt es.
+`E_cm` fuer Beton und `E_s` fuer Betonstahl ([[opencivil.stabwerk.rechnung#Konstanten|E_MODUL]]) -- oder
+je Querschnitt ein E von Hand, fuer jeden Stab mit ihm (Benutzer,
+2026-10-23) --, am ungerissenen Bruttoquerschnitt, ohne Schubverformung,
+Gleichgewicht am unverformten System. Die Herleitung sagt es, das TODO
+fuehrt es.
 
 
 ## EIGENGEWICHT -- NACH VORGABE DES BENUTZERS (2026-10-23)
@@ -73,6 +75,7 @@ Ein Querschnitt der Staebe, aufgeloest: woher `A` und `I` kommen.
 - `bezug: str = ''` – Die Kennung der Platte oder Analyse, aus der er kommt.
 - `herkunft: str = ''` – Woher, in Worten -- «Rechteck», «von Hand», «Platte «Decke»».
 - `fehler: str = ''` – Was an seinen Massen nicht geht -- dann rechnet er nicht, und kein Stab mit ihm.
+- `E: Optional[float] = None` – Der E-Modul von Hand in N/mm² -- `None`: der des Materials, [[opencivil.stabwerk.rechnung#Konstanten|E_MODUL]].
 
 ### Steifigkeit
 
@@ -192,6 +195,14 @@ def _querschnitt(self, q: Stabquerschnitt, index: str) -> Tuple[str, str]
 
 Die Berechnungen fuer A und I eines Querschnitts -- und ihre Wert-IDs.
 
+#### Balkensystem._modul
+
+```python
+def _modul(self, q: Stabquerschnitt, index: str) -> str
+```
+
+Der E-Modul von Hand eines Querschnitts -- er gilt fuer jeden Stab mit ihm.
+
 #### Balkensystem._erdbeschleunigung
 
 ```python
@@ -206,7 +217,9 @@ def _erdbeschleunigung(self) -> str
 def _steifigkeit(self, q: str, material: str, index: str, g: Optional[str]=None) -> Steifigkeit
 ```
 
-EA und EI eines Paars aus Querschnitt und Material -- mit `g` dazu sein Eigengewicht.
+EA und EI eines Paars aus Querschnitt und Material -- mit `g` dazu
+sein Eigengewicht. E kommt vom Material, ausser der Querschnitt hat
+eines von Hand; die Dichte immer vom Material.
 
 #### Balkensystem._eigengewicht
 
@@ -271,6 +284,7 @@ bleibt es bei ihr.
 - [[opencivil.projekt.aufbau.balkensystem]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.stabwerk.herleitung]]
+- [[opencivil.web.api]]
 - [[opencivil.web.balkendaten]]
 
 ## Formeln aus diesem Modul

@@ -22,9 +22,11 @@ Ueber die Werte der Platte und der Analyse haengt das System im Rechengraph
 an ihnen: aendert sich deren Dicke, rechnet es neu.
 
 STEIFIGKEIT -- NACH VORGABE, NICHT NACHGESCHLAGEN:
-``E_cm`` fuer Beton und ``E_s`` fuer Betonstahl (:data:`E_MODUL`), am
-ungerissenen Bruttoquerschnitt, ohne Schubverformung, Gleichgewicht am
-unverformten System. Die Herleitung sagt es, das TODO fuehrt es.
+``E_cm`` fuer Beton und ``E_s`` fuer Betonstahl (:data:`E_MODUL`) -- oder
+je Querschnitt ein E von Hand, fuer jeden Stab mit ihm (Benutzer,
+2026-10-23) --, am ungerissenen Bruttoquerschnitt, ohne Schubverformung,
+Gleichgewicht am unverformten System. Die Herleitung sagt es, das TODO
+fuehrt es.
 
 EIGENGEWICHT -- NACH VORGABE DES BENUTZERS (2026-10-23):
 Je Paar aus Querschnitt und Material ``g_k = rho · g · A`` in kN/m, mit
@@ -47,7 +49,9 @@ from typing import Dict, List, Mapping, Optional, Sequence, Tuple
 from opencivil.core.berechnung import (
     Ausfuehrung, Berechnung, Eingabebezug, Eingaben, Formel, Prozedur, Vorgabe,
 )
-from opencivil.core.einheiten import KN_PRO_M, KNM2, M_PRO_S2, MIO_MM4, MM, MM2, MN, Groesse
+from opencivil.core.einheiten import (
+    KN_PRO_M, KNM2, M_PRO_S2, MIO_MM4, MM, MM2, MN, N_PRO_MM2, Groesse,
+)
 from opencivil.core.latex import platzhalter_namen
 from opencivil.core.protokoll import Abschnitt, Protokoll
 from opencivil.core.wert import Quelle, WertDef
@@ -99,6 +103,9 @@ class Stabquerschnitt:
 
     fehler: str = ""
     """Was an seinen Massen nicht geht -- dann rechnet er nicht, und kein Stab mit ihm."""
+
+    E: Optional[float] = None
+    """Der E-Modul von Hand in N/mm² -- ``None``: der des Materials, :data:`E_MODUL`."""
 
 
 @dataclass(frozen=True)
@@ -224,6 +231,8 @@ class Balkensystem:
         self.definitionen: Dict[str, WertDef] = {}
         self.berechnungen: List[Berechnung] = []
         self.flaechen: Dict[str, Tuple[str, str]] = {}
+        self.module: Dict[str, str] = {}
+        """Je Querschnitt mit E von Hand die Wert-ID dieses E."""
         """Je Querschnitt die Wert-IDs von ``A`` und ``I``."""
 
         self.steifigkeiten: List[Steifigkeit] = []
@@ -252,6 +261,8 @@ class Balkensystem:
         for q in self.querschnitte:
             if not q.fehler:
                 self.flaechen[q.kennung] = self._querschnitt(q, q.kennung if index else "")
+                if q.E is not None:
+                    self.module[q.kennung] = self._modul(q, q.kennung if index else "")
 
         # Ein Querschnitt, der erst beim Aufbau scheitert -- er nimmt eine
         # Querschnittsanalyse, die noch leer ist --, steht noch in den Paaren:
@@ -343,6 +354,14 @@ class Balkensystem:
             quellen[f.kurzname] = d.id
         return quellen["A"], quellen["I"]
 
+    def _modul(self, q: Stabquerschnitt, index: str) -> str:
+        """Der E-Modul von Hand eines Querschnitts -- er gilt fuer jeden Stab mit ihm."""
+        d = self._def(f"{q.kennung}.E", mit_index("E", index), N_PRO_MM2, f"E-Modul, {q.name}", 0)
+        self.berechnungen.append(Vorgabe(
+            id=d.id, ausgabe=d, groesse=Groesse(q.E, N_PRO_MM2), quelle=Quelle.EINGABE,
+            titel=f"E-Modul, «{q.name}» (von Hand)", abschnitt=self.abschnitt(QUERSCHNITTE)))
+        return d.id
+
     def _erdbeschleunigung(self) -> str:
         """``g`` als Vorgabe des Systems -- seine Wert-ID."""
         d = self._def("g", "g", M_PRO_S2, "Erdbeschleunigung", 0)
@@ -353,10 +372,15 @@ class Balkensystem:
 
     def _steifigkeit(self, q: str, material: str, index: str,
                      g: Optional[str] = None) -> Steifigkeit:
-        """EA und EI eines Paars aus Querschnitt und Material -- mit ``g`` dazu sein Eigengewicht."""
+        """
+        EA und EI eines Paars aus Querschnitt und Material -- mit ``g`` dazu
+        sein Eigengewicht. E kommt vom Material, ausser der Querschnitt hat
+        eines von Hand; die Dichte immer vom Material.
+        """
         abschnitt = self.abschnitt(QUERSCHNITTE)
         stoff = self.stoffe[material]
-        modul = stoff.id_von(E_MODUL[stoff.art.value])
+        modul = self.module.get(q) or stoff.id_von(E_MODUL[stoff.art.value])
+        womit = "mit E von Hand" if q in self.module else f"aus {stoff.name}"
         A, I = self.flaechen[q]
         name = next(x.name for x in self.querschnitte if x.kennung == q)
         wo = f"{q}.{material}."
@@ -367,11 +391,11 @@ class Balkensystem:
         self.berechnungen += [
             Formel(id=d_EA.id, ausgabe=d_EA, funktion=_dehnsteifigkeit,
                    vorlage=r"@E \cdot @A", eingaben={"E": modul, "A": A},
-                   titel=f"Dehnsteifigkeit, «{name}» aus {stoff.name}", name="Dehnsteifigkeit",
+                   titel=f"Dehnsteifigkeit, «{name}» {womit}", name="Dehnsteifigkeit",
                    abschnitt=abschnitt),
             Formel(id=d_EI.id, ausgabe=d_EI, funktion=_biegesteifigkeit,
                    vorlage=r"@E \cdot @I", eingaben={"E": modul, "I": I},
-                   titel=f"Biegesteifigkeit, «{name}» aus {stoff.name}", name="Biegesteifigkeit",
+                   titel=f"Biegesteifigkeit, «{name}» {womit}", name="Biegesteifigkeit",
                    abschnitt=abschnitt),
         ]
         if g is None:
@@ -408,7 +432,8 @@ class Balkensystem:
 
     def ziele(self) -> List[str]:
         """Was ein Lauf rechnen muss: jeder Querschnitt -- auch einer, den kein Stab nimmt -- und das System."""
-        return [i for paar in self.flaechen.values() for i in paar] + [self.rechnung.id]
+        return ([i for paar in self.flaechen.values() for i in paar] + list(self.module.values())
+                + [self.rechnung.id])
 
     # -- Rechnen ----------------------------------------------------------------
 

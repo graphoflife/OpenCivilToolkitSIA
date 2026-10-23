@@ -5,8 +5,11 @@
  *
  *     System          Bezeichnung, Lastfall der Zeichnung, Zeichnung samt
  *                     Liste, Beschreibung
+ *     Materialien     je Material des Projekts sein E-Modul und seine Dichte
+ *                     -- die Zeilen der App «Materialien»
  *     Querschnitte    je Querschnitt: Vorlage mit Massen, Kennwerte von Hand,
- *                     aus einer Platte oder aus einer Querschnittsanalyse
+ *                     aus einer Platte oder aus einer Querschnittsanalyse;
+ *                     sein E-Modul vom Material oder als Zahl
  *     Lastfälle       die Fälle und ihre Kombinationen mit Beiwerten
  *
  * Gerechnet wird nichts: A und I, die Steifigkeiten und alles Weitere bildet
@@ -28,7 +31,10 @@ import {
 import {
   auswahl, el, melden, svgEl, zahlfeld,
 } from './dom.js';
-import { naechsterName, projektAendern, zustand } from './zustand.js';
+import { ART_TEXT, kennwertZeile } from './material.js';
+import {
+  feldangabe, naechsterName, projektAendern, zustand,
+} from './zustand.js';
 
 const HILFE = {
   vorzeichen: {
@@ -41,12 +47,21 @@ const HILFE = {
     ],
     formel: 'Lagerkraft nach oben positiv',
   },
+  materialien: {
+    zeilen: [
+      ['E', 'E_cm beim Beton, E_s beim Stahl -- ausser ein Querschnitt hat seinen E-Modul als Zahl'],
+      ['ρ', 'beim Beton die Dichte des Stahlbetons: die Bewehrung steckt darin'],
+      ['Ändern', 'bei einem eigenen Material hier oder in der App «Materialien» -- eine Normsorte bleibt, wie sie ist'],
+    ],
+    formel: 'g_k = ρ · g · A   g = 10 m/s²',
+  },
   querschnitte: {
     zeilen: [
       ['Vorlage', 'A und I nach den Formeln der Vorlage, Masse in mm'],
       ['Platte', 'ein Streifen b × h der gewählten Platte'],
       ['Analyse', 'A und I_y des Bruttoquerschnitts'],
-      ['Steifigkeit', 'EA, EI mit E_cm bzw. E_s am ungerissenen Bruttoquerschnitt -- nach Vorgabe'],
+      ['E-Modul', 'vom Material des Stabs (E_cm bzw. E_s) oder als Zahl -- dann für jeden Stab mit diesem Querschnitt'],
+      ['Steifigkeit', 'EA, EI am ungerissenen Bruttoquerschnitt -- nach Vorgabe'],
     ],
     formel: 'EA = E · A   EI = E · I',
   },
@@ -81,6 +96,7 @@ function uebersicht(a) {
   }
   const name = (q) => z.querschnitte.find((x) => x.kennung === q)?.name || q || '–';
   const stoff = (m) => {
+    if (m === zustand.katalog?.balkensystem?.material_des_querschnitts) return 'gemäss Querschnitt';
     const da = zustand.projekt.materialien.find((x) => x.kennung === m);
     return da ? (da.name || da.sorte) : '–';
   };
@@ -188,11 +204,51 @@ function systemGruppe(system) {
 }
 
 // ===========================================================================
+// Materialien
+// ===========================================================================
+
+/**
+ * Jedes Material des Projekts mit dem, womit ein Stab aus ihm rechnet --
+ * welche Kennwerte das sind, sagt der Katalog. Die Zeilen sind die der App
+ * «Materialien»: bei einer Normsorte gesperrt, bei einem eigenen Material
+ * hier wie dort zu ändern.
+ */
+function materialienGruppe(system) {
+  const relevant = zustand.katalog?.balkensystem?.kennwerte || {};
+  const staebe = zustand.loesung?.zuordnung?.balkensysteme?.[system.kennung]?.materialien || {};
+  const block = (m) => {
+    const vorlagen = (relevant[m.art] || [])
+      .map((kurz) => (zustand.katalog.kennwerte[m.art] || []).find((v) => v.kurzname === kurz))
+      .filter(Boolean);
+    // Welche Stäbe es trägt, sagt der Kern -- er kennt auch das Material
+    // einer Linie «gemäss Querschnitt».
+    const benutzt = Object.entries(staebe).filter(([, k]) => k === m.kennung).map(([stab]) => stab);
+    return el('div.bs-material', {}, [
+      el('div.bs-material-kopf', {}, [
+        el('span.bs-material-name', { text: m.name || m.sorte }),
+        el('span.bs-material-art', {
+          text: `${ART_TEXT[m.art] || m.art} · ${m.eigenstaendig ? 'eigenes Material' : 'Normsorte'}`,
+        }),
+      ]),
+      ...vorlagen.map((v) => kennwertZeile(m, v)),
+      el('p.bs-benutzt', { text: benutzt.length ? `trägt ${benutzt.join(', ')}` : 'trägt keinen Stab' }),
+    ]);
+  };
+  const materialien = zustand.projekt.materialien;
+  return panel({
+    schluessel: 'balkensystem/Materialien', titel: 'Materialien',
+    zusatz: erklaerung(HILFE.materialien.zeilen, HILFE.materialien.formel),
+  }, materialien.length ? materialien.map(block)
+    : [el('p.bs-leer', { text: 'Noch kein Material -- links unter «Materialien» mit «+» anlegen.' })]);
+}
+
+// ===========================================================================
 // Querschnitte
 // ===========================================================================
 
 const QUERSCHNITTSARTEN = () => zustand.katalog?.balkensystem?.querschnittsarten || [];
 const VORLAGEN = () => zustand.katalog?.balkensystem?.vorlagen || [];
+const E_MODULE = () => zustand.katalog?.balkensystem?.e_module || [];
 
 /** Was der Kern zu einem Querschnitt gerechnet hat: A und I, oder nichts. */
 function kennwerte(system, q) {
@@ -262,6 +318,17 @@ function querschnittBlock(system, q, i) {
       gewaehlt: q.bezug,
       beiAenderung: setzen('bezug'),
     })));
+  }
+  zeilen.push(wahlBlock('E-Modul', wahlSchalter({
+    werte: E_MODULE().map((x) => ({ wert: x.wert, beschriftung: x.beschriftung, titel: x.titel })),
+    gewaehlt: q.e_modul, titel: 'Woher E kommt', setzen: setzen('e_modul'),
+  })));
+  if (q.e_modul === 'zahl') {
+    zeilen.push(feld('E', zahlfeld({
+      wert: q.E, schritt: 1000, min: 0,
+      titel: 'E-Modul von Hand -- für jeden Stab mit diesem Querschnitt, aus welchem Material auch immer',
+      beiAenderung: setzen('E'),
+    }), feldangabe('stabquerschnitt', 'E').einheit));
   }
   const werte = kennwerte(system, q);
   if (werte) zeilen.push(el('p.bs-kennwerte', { text: werte }));
@@ -378,5 +445,6 @@ function lastfaelleGruppe(system) {
 // ===========================================================================
 
 export function balkensystemEditor(system) {
-  return [systemGruppe(system), querschnitteGruppe(system), lastfaelleGruppe(system)];
+  return [systemGruppe(system), materialienGruppe(system), querschnitteGruppe(system),
+    lastfaelleGruppe(system)];
 }
