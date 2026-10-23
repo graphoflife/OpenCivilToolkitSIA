@@ -133,7 +133,7 @@ export function analysenKapitel(ort) {
     bezug: (e) => `Spannung-Dehnung-Analyse · ${ort.bezug(e)}`,
     inhalt: (e) => analyseInhalt(e, a.wert, ort),
     stand: (e) => zeilenstand((e.spannungsfaelle || []).filter((k) => k.art === a.wert),
-      'Bild', 'Bilder', 'kein Bild'),
+      'Diagramm', 'Diagramme', 'kein Diagramm'),
   }));
 }
 
@@ -471,14 +471,15 @@ function gebrauchsfallZeile(eintrag, ort, spalten, feld, wort, index) {
 }
 
 /**
- * Eine Art der Spannung-Dehnung-Analyse: die Bilder dieser Art, und ein
- * Knopf für ein weiteres.
+ * Eine Art der Spannung-Dehnung-Analyse: die Diagramme dieser Art, und ein
+ * Knopf für ein weiteres -- «+ Diagramm», nicht «+ Bild» (Benutzer,
+ * 2026-10-23), wie in der Statik-Analyse des Balkensystems.
  *
  * Kein Nachweis -- es wird nichts gegen etwas gehalten. Darum auch keine
- * Erfüllungsgrade in der Zusammenfassung; die Bilder stehen im eigenen
+ * Erfüllungsgrade in der Zusammenfassung; die Diagramme stehen im eigenen
  * Reiter. Jede Art hat ihr Fenster, und was eine Zeile fragt, hängt an der
  * Art: eine Zeile, die nach N und M fragt, soll nicht daneben zwei
- * Dehnungsfelder zeigen, die sie nicht liest. Die Bilder aller Arten
+ * Dehnungsfelder zeigen, die sie nicht liest. Die Diagramme aller Arten
  * stehen in einer Liste der Platte; jede Zeile behält ihre Stelle darin.
  */
 function analyseInhalt(eintrag, art, ort) {
@@ -489,12 +490,12 @@ function analyseInhalt(eintrag, art, ort) {
   return [
     ...(stellen.length
       ? stellen.map((i) => spannungsZeile(eintrag, i, ort))
-      : [el('div.leer', { text: 'Noch kein Bild.' })]),
-    anfuegenKnopf('Bild', () => projektAendern((p) => {
+      : [el('div.leer', { text: 'Noch kein Diagramm.' })]),
+    anfuegenKnopf('Diagramm', () => projektAendern((p) => {
       const e = p[ort.liste].find((x) => x.kennung === eintrag.kennung);
       e.spannungsfaelle = e.spannungsfaelle || [];
       e.spannungsfaelle.push(
-        ausVorlage(ort.vorlage, { name: naechsterName('Bild', e.spannungsfaelle), art }));
+        ausVorlage(ort.vorlage, { name: naechsterName('Diagramm', e.spannungsfaelle), art }));
     })),
   ];
 }
