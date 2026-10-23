@@ -44,6 +44,24 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-23 · Dichte bei Beton und Stahl
+
+Erste Etappe des neuen Balkensystems (Wunsch des Benutzers): das
+Eigengewicht soll aus der Dichte des Materials kommen. Neue Kennwerte mit
+Vorgabe, wie γ_c -- keine Normstelle, die Zahlen hat der Benutzer genannt:
+
+- Beton: ρ_c = 2400 kg/m³ (unbewehrt) und ρ_sb = 2500 kg/m³ (Stahlbeton).
+  Gerechnet wird mit ρ_sb: ein Stab aus Beton trägt seine Bewehrung, und die
+  steckt in den 2500 kg/m³, ohne dass ihr Stahl noch dazukäme.
+- Betonstahl: ρ_s = 7850 kg/m³. Dieselbe Zahl gab bisher das Bewehrungsmass
+  als eigene Konstante in `querschnitt/platte.py`; sie steht jetzt als
+  `STAHLDICHTE` beim Betonstahl, und beide lesen sie dort.
+
+Wie jeder Kennwert: bei einer Normsorte gesperrt, bei einem eigenen Material
+änderbar.
+
+---
+
 ## 2026-10-23 · Kennzahlen auch beim gezeichneten Querschnitt
 
 Wunsch des Benutzers: die Tabelle «Kennzahlen» der Platte auch in der

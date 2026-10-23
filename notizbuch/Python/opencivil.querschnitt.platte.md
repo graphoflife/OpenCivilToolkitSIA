@@ -1,5 +1,5 @@
 ---
-erzeugt: 303a45c746e9
+erzeugt: 343e1511d8d8
 art: modul
 tags: [modul]
 ---
@@ -551,7 +551,6 @@ Rechnung sehen statt nur die Zahl.
 
 - `LAGENZAHL = 4` – Anzahl Lagen einer Platte. Bewusst fest -- eine Platte hat unten und oben je eine Haupt- und eine Querlage, mehr braucht es nicht, weniger waere ein Sonderfall mit leeren Lagen.
 - `BREITE_Y_MM = 1000.0` – Breite, auf die sich eine y-Lage bezieht: in y wird immer je Laufmeter gerechnet, `b` ist der Streifen in x.
-- `STAHLDICHTE = 7850.0` – Rohdichte von Betonstahl, fuer das Bewehrungsmass.
 - `ALPHA_MIN = 30` – Vorgabe fuer die Neigung der Druckdiagonalen, in Grad.
 - `ALPHA_MAX = 45`
 - `ALPHA_ZUG = 40` – Bei einer Normalzugkraft steilt sich die Druckdiagonale auf. Beide Grenzen werden dann auf mindestens diesen Wert gehoben.
@@ -567,6 +566,7 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.core.wahl]]
 - [[opencivil.core.wert]]
 - [[opencivil.material.basis]]
+- [[opencivil.material.betonstahl]]
 - [[opencivil.querschnitt.zugseite]]
 
 ## Gebraucht von
@@ -581,7 +581,6 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
-- [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.sproedes_versagen]]

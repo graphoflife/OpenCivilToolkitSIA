@@ -47,10 +47,10 @@ from opencivil.core.einheiten import EINHEITSLOS, KG_PRO_M3, KN, KNM, Groesse
 from opencivil.core.latex import Mathe, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import Kennzahl, Wert, WertDef
+from opencivil.material.betonstahl import STAHLDICHTE
 from opencivil.nachweis.richtungsnachweise import bei_reiner_biegung
 from opencivil.querschnitt import schubwaende as sw
 from opencivil.querschnitt.analyse import Querschnittsanalyse
-from opencivil.querschnitt.platte import STAHLDICHTE
 from opencivil.querschnitt.zugseite import Zugseite
 
 #: Woher die Widerstaende stammen -- ihre Erklaerung unter dem Querschnitt.

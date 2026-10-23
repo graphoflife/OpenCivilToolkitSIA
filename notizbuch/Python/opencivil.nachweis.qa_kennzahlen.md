@@ -1,5 +1,5 @@
 ---
-erzeugt: 495d400eeb3b
+erzeugt: 68863cf10184
 art: modul
 tags: [modul]
 ---
@@ -115,9 +115,9 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Dict[str, Groesse]
 - [[opencivil.core.latex]]
 - [[opencivil.core.protokoll]]
 - [[opencivil.core.wert]]
+- [[opencivil.material.betonstahl]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.querschnitt.analyse]]
-- [[opencivil.querschnitt.platte]]
 - [[opencivil.querschnitt.schubwaende]]
 - [[opencivil.querschnitt.zugseite]]
 

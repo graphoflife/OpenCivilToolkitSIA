@@ -1,5 +1,5 @@
 ---
-erzeugt: c40dfa95e642
+erzeugt: 63bcbca10e21
 art: modul
 tags: [modul]
 ---
@@ -77,6 +77,7 @@ Erzeugt einen frei definierten Betonstahl ohne Sortentabelle.
 - `FLIESSDEHNUNG = 'Fliessdehnung'` – Die Seite im Notizbuch fuer die Dehnung, bei der der Stahl zu fliessen beginnt -- mit Bemessungswert oder charakteristisch, wo immer sie steht.
 - `STAHLSORTEN = {'B500A': Stahlsorte(f_yk=500.0, f_yk_druck=500.0, eps_uk=2.5, eps_ud…` – Betonstahlsorten nach SIA 262:2025, Tabelle 3.2.2.3. Uebernommen aus der Vorgaengerfassung des Werkzeugs. Vor dem produktiven Einsatz gegen die gedruckte Norm pruefen.
 - `ERSTER_STAHL = 'B500B'` – Womit ein neuer Betonstahl anfängt, wenn man in der Oberfläche einen anlegt: B500B, danach die übrigen der Reihe nach (Benutzer, 2026-10-15).
+- `STAHLDICHTE = 7850.0` – Die Dichte von Betonstahl in kg/m³ -- die Vorgabe seines Kennwerts `rho_s` und die Zahl des Bewehrungsmasses.
 - `STAHL_VORLAGEN = (KennwertVorlage(kurzname='f_yk', symbol='f_{yk}', einheit=N_PRO_MM2,…`
 
 ## Braucht
@@ -86,9 +87,11 @@ Erzeugt einen frei definierten Betonstahl ohne Sortentabelle.
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.lesen]]
+- [[opencivil.querschnitt.platte]]
 - [[opencivil.spannungsanalyse.herleitung]]
 - [[opencivil.web.api]]
 

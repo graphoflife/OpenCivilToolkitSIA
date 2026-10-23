@@ -30,7 +30,7 @@ import math
 from typing import Dict, List, Mapping, Optional
 
 from opencivil.core.einheiten import (
-    EINHEITSLOS, MPA, N_PRO_MM2, PROMILLE, Groesse, empirisch,
+    EINHEITSLOS, KG_PRO_M3, MPA, N_PRO_MM2, PROMILLE, Groesse, empirisch,
 )
 from opencivil.material.basis import Baustoff, Baustoffart, KennwertVorlage, erzeuge
 
@@ -159,6 +159,26 @@ BETON_VORLAGEN: tuple[KennwertVorlage, ...] = (
         referenz="SIA 262:2025, 4.2.1.4",
         stellen=2,
         festwert=Groesse(3.5, PROMILLE),
+    ),
+    # -- Dichte, fuer das Eigengewicht -- nach Vorgabe des Benutzers
+    # (2026-10-23), keine Normstelle. Gerechnet wird mit der des Stahlbetons:
+    # ein Stab aus Beton traegt seine Bewehrung, und die steckt in den 2500
+    # kg/m³, ohne dass ihr Stahl noch dazukaeme.
+    KennwertVorlage(
+        kurzname="rho_c",
+        symbol=r"\rho_c",
+        einheit=KG_PRO_M3,
+        beschreibung="Dichte des Betons, unbewehrt",
+        stellen=0,
+        festwert=Groesse(2400, KG_PRO_M3),
+    ),
+    KennwertVorlage(
+        kurzname="rho_sb",
+        symbol=r"\rho_{sb}",
+        einheit=KG_PRO_M3,
+        beschreibung="Dichte des Stahlbetons",
+        stellen=0,
+        festwert=Groesse(2500, KG_PRO_M3),
     ),
     # -- Abgeleitete Kennwerte ---------------------------------------------
     KennwertVorlage(

@@ -50,6 +50,7 @@ from opencivil.core.protokoll import Abschnitt, Protokoll, Zwischenwerte
 from opencivil.core.wahl import Wahl
 from opencivil.core.wert import Kennzahl, Wert, WertDef, kennung_aus
 from opencivil.material.basis import Baustoff
+from opencivil.material.betonstahl import STAHLDICHTE
 from opencivil.querschnitt.zugseite import Zugseite
 
 #: Anzahl Lagen einer Platte. Bewusst fest -- eine Platte hat unten und oben je
@@ -61,8 +62,6 @@ LAGENZAHL = 4
 #: gerechnet, ``b`` ist der Streifen in x.
 BREITE_Y_MM = 1000.0
 
-#: Rohdichte von Betonstahl, fuer das Bewehrungsmass.
-STAHLDICHTE = 7850.0
 
 
 class Richtung(Wahl):

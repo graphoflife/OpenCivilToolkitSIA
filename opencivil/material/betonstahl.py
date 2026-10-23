@@ -23,7 +23,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Mapping, Optional
 
-from opencivil.core.einheiten import EINHEITSLOS, N_PRO_MM2, PROZENT, Groesse
+from opencivil.core.einheiten import EINHEITSLOS, KG_PRO_M3, N_PRO_MM2, PROZENT, Groesse
 from opencivil.material.basis import Baustoff, Baustoffart, KennwertVorlage, erzeuge
 
 #: Die Seite im Notizbuch fuer die Dehnung, bei der der Stahl zu fliessen
@@ -73,6 +73,10 @@ def stahlsorten_zum_anlegen() -> List[str]:
 # ===========================================================================
 # Kennwerte
 # ===========================================================================
+
+#: Die Dichte von Betonstahl in kg/m³ -- die Vorgabe seines Kennwerts
+#: ``rho_s`` und die Zahl des Bewehrungsmasses.
+STAHLDICHTE = 7850.0
 
 STAHL_VORLAGEN: tuple[KennwertVorlage, ...] = (
     # -- Eingaben aus der Sortentabelle ------------------------------------
@@ -125,6 +129,16 @@ STAHL_VORLAGEN: tuple[KennwertVorlage, ...] = (
         referenz="SIA 262:2025, 2.4.2.6",
         stellen=2,
         festwert=Groesse(1.15, EINHEITSLOS),
+    ),
+    # -- Dichte, fuer das Eigengewicht -- nach Vorgabe des Benutzers
+    # (2026-10-23), keine Normstelle.
+    KennwertVorlage(
+        kurzname="rho_s",
+        symbol=r"\rho_s",
+        einheit=KG_PRO_M3,
+        beschreibung="Dichte des Stahls",
+        stellen=0,
+        festwert=Groesse(STAHLDICHTE, KG_PRO_M3),
     ),
     # -- Abgeleitete Kennwerte ---------------------------------------------
     KennwertVorlage(
