@@ -9,8 +9,8 @@
  */
 
 import { api } from './api.js';
-import { feld, hakenSchalter } from './bausteine.js';
-import { auswahl, el, melden, zahlfeld } from './dom.js';
+import { feld, hakenSchalter, wahlSchalter } from './bausteine.js';
+import { el, melden, zahlfeld } from './dom.js';
 import { aendern, projektAendern, zustand } from './zustand.js';
 
 /**
@@ -72,14 +72,15 @@ function automatikInhalt(querschnitt) {
   ]);
 
   // Die Modi kommen aus dem Kern: ihre Namen stehen dort, wo sie gesucht
-  // werden, und nicht ein zweites Mal hier. Die Wahl über die ganze Breite
-  // und ohne Beschriftung davor -- der längste Modus braucht die Zeile.
+  // werden, und nicht ein zweites Mal hier. Ein Schalter mit den Modi
+  // untereinander, ohne Beschriftung davor -- der längste braucht die Zeile.
   return [el('div.automatik', {}, [
-    auswahl({
+    wahlSchalter({
       werte: zustand.katalog?.suchmodi || [],
       gewaehlt: querschnitt.automatik_modus,
       titel: 'Modus. Ohne Kräfte: Duktilität, sprödes Versagen, Riss unter Zwang',
-      beiAenderung: (v) => aendern((q) => { q.automatik_modus = v; }),
+      setzen: (v) => aendern((q) => { q.automatik_modus = v; }),
+      klasse: '.ist-wortlaut.ist-senkrecht',
     }),
     // Ein Schalter neben dem Modus: je Dicke sucht das Werkzeug im gewählten
     // Modus. Die Mindestdicke gehört dazu und steht nur dann da.

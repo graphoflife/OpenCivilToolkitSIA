@@ -28,9 +28,9 @@
 
 import { achsenkreuz, NR } from './achsen.js';
 import { api } from './api.js';
-import { karte } from './bausteine.js';
+import { karte, wahlSchalter } from './bausteine.js';
 import {
-  auswahl, el, leerzustand, svgEl, zahlfeld,
+  el, leerzustand, svgEl, zahlfeld,
 } from './dom.js';
 import { aendern, zustand } from './zustand.js';
 
@@ -303,11 +303,12 @@ function schubbild(daten, fall) {
 
 function achsenwahl(kennung, achse) {
   const wahl = wahlVon(kennung);
-  return auswahl({
-    werte: Object.keys(GROESSE).map((g) => ({ wert: g, beschriftung: g })),
+  return wahlSchalter({
+    werte: Object.keys(GROESSE).map((g) => ({ wert: g, beschriftung: g, titel: GROESSE[g].titel })),
     gewaehlt: wahl[achse],
     titel: achse === 'x' ? 'Grösse auf der waagrechten Achse' : 'Grösse auf der senkrechten Achse',
-    beiAenderung: (neu) => {
+    klasse: '.ist-wortlaut',
+    setzen: (neu) => {
       // Steht die Grösse schon auf der anderen Achse, tauschen die beiden.
       const andere = achse === 'x' ? 'y' : 'x';
       if (wahl[andere] === neu) wahl[andere] = wahl[achse];
@@ -327,8 +328,10 @@ function schnittsteuerung(kennung, einachsig) {
   const wahl = wahlVon(kennung);
   const fest = festVon(wahl);
   return el('div.qa-schnittwahl', {}, [
-    el('label', {}, ['x-Achse ', achsenwahl(kennung, 'x')]),
-    el('label', {}, ['y-Achse ', achsenwahl(kennung, 'y')]),
+    // Kein «label» um die Schalter: ein Klick auf den Text löste sonst ihre
+    // erste Stellung aus.
+    el('span.qa-achsenwahl', {}, ['x-Achse ', achsenwahl(kennung, 'x')]),
+    el('span.qa-achsenwahl', {}, ['y-Achse ', achsenwahl(kennung, 'y')]),
     el('label', {}, [
       `bei ${fest} = `,
       zahlfeld({

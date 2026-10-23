@@ -18,8 +18,10 @@
  * Lastfällen zeigt es.
  */
 
-import { erklaerung, feld, hakenSchalter, panel } from './bausteine.js';
-import { auswahl, el, svgEl, zahlfeld } from './dom.js';
+import {
+  erklaerung, feld, hakenSchalter, panel, wahlSchalter,
+} from './bausteine.js';
+import { el, svgEl, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
 import { kapitelFenster, kapitelPanel, zeilenstand } from './kapitel.js';
 import { span } from './mathe.js';
@@ -184,22 +186,26 @@ function werkstoffwahl(analyse) {
     if (!material) return null;
     const wahl = analyse.werkstoffwahl.find((w) => w.material === kennung) || vorgabe;
     const istBeton = material.art === 'beton';
+    // Die kurzen Namen im Schalter, die langen in den Titeln seiner Stellungen.
+    const kurz = (liste) => (liste || []).map((x) => ({ wert: x.wert, beschriftung: x.kurz, titel: x.beschriftung }));
     return el('div.werkstoffzeile', { class: istBeton ? 'ist-beton' : 'ist-stahl' }, [
       el('span.werkstoffname', { text: material.name || material.sorte }),
-      auswahl({
-        werte: wahlen.werkstoffsaetze || [],
+      wahlSchalter({
+        werte: kurz(wahlen.werkstoffsaetze),
         gewaehlt: wahl.satz,
         titel: 'Rechenwerte: Bemessung (f_cd, f_yd) oder charakteristisch (f_ck, f_yk)',
-        beiAenderung: (v) => setzen(kennung, 'satz', v),
+        setzen: (v) => setzen(kennung, 'satz', v),
+        klasse: '.ist-wortlaut',
       }),
       istBeton
-        ? auswahl({
-          werte: wahlen.betongesetze || [],
+        ? wahlSchalter({
+          werte: kurz(wahlen.betongesetze),
           gewaehlt: wahl.betongesetz,
           titel: 'Spannungs-Dehnungs-Beziehung des Betons',
-          beiAenderung: (v) => setzen(kennung, 'betongesetz', v),
+          setzen: (v) => setzen(kennung, 'betongesetz', v),
+          klasse: '.ist-wortlaut',
         })
-        : el('span'),
+        : null,
     ]);
   };
 
@@ -419,14 +425,16 @@ function zugseite(wert) {
 }
 
 /**
- * Die Wahl der Zugseite. In einer schmalen Spalte nur die Seite -- «Zug»
- * steht dann darüber, «Zug rechts» passte nicht hinein --, sonst ganz.
+ * Die Wahl der Zugseite: ein Schalter mit je einem Pfeil, der auf die
+ * gezogene Seite zeigt -- «Zug unten» steht im Titel. Vier Wörter passten in
+ * die schmale Spalte der Analysen nicht (Benutzer, 2026-10-23: keine
+ * Auswahllisten).
  */
-function zugseitenWahl(gewaehlt, setzen, titel, { schmal = false } = {}) {
-  return auswahl({
+function zugseitenWahl(gewaehlt, setzen, titel) {
+  return wahlSchalter({
     werte: (zustand.katalog?.querschnittsanalyse?.zugseiten || [])
-      .map((z) => ({ wert: z.wert, beschriftung: schmal ? z.wert : z.beschriftung })),
-    gewaehlt, titel, beiAenderung: setzen,
+      .map((z) => ({ wert: z.wert, beschriftung: z.pfeil, titel: z.beschriftung })),
+    gewaehlt, titel, setzen, klasse: '.ist-pfeile',
   });
 }
 
@@ -440,8 +448,7 @@ const ORT = {
   liste: 'querschnittsanalysen',
   vorlage: 'qa_analyse',
   richtung: (k, setzen) => mitKopf('Zug', zugseitenWahl(
-    k.richtung, setzen, 'Zugseite: die Seite, die ein positives Moment zieht',
-    { schmal: true })),
+    k.richtung, setzen, 'Zugseite: die Seite, die ein positives Moment zieht')),
   raender: (k) => zugseite(k.richtung)?.raender || ['oben', 'unten'],
   bezug: () => 'N in kN · M in kNm',
   hilfe: HILFE,

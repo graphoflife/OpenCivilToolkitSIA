@@ -174,6 +174,16 @@ export function wahlSchalter({ werte, gewaehlt, setzen, titel = '', klasse = '' 
 }
 
 /**
+ * Ein Schalter mit vielen oder langen Stellungen unter seiner Beschriftung
+ * -- neben ihr fände er keinen Platz, und seine Stellungen brechen um. Ein
+ * «div», kein «label»: ein Klick auf den Text löste sonst die erste
+ * Stellung aus.
+ */
+export function wahlBlock(beschriftung, schalter) {
+  return el('div.wahlblock', {}, [el('span.wahlblock-titel', { text: beschriftung }), schalter]);
+}
+
+/**
  * Zweistellungs-Schalter ja/nein -- grüner Haken, rotes Kreuz.
  *
  * Beide Hälften gleich breit und die Zeichen mittig: ✓ und ✗ sind verschieden

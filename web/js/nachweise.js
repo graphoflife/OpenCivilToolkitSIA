@@ -21,8 +21,8 @@
  * dazu bildet der Kern, sobald der Nachweis läuft.
  */
 
-import { erklaerung, feld, hakenSchalter } from './bausteine.js';
-import { auswahl, el, zahlfeld } from './dom.js';
+import { erklaerung, feld, hakenSchalter, wahlSchalter } from './bausteine.js';
+import { el, zahlfeld } from './dom.js';
 import { fallkopf, fallzeile } from './faelle.js';
 import { gebrauchsstand, schalter, zeilenstand } from './kapitel.js';
 import { ausVorlage, feldangabe, naechsterName, projektAendern, zustand } from './zustand.js';
@@ -301,13 +301,13 @@ function knickZeile(eintrag, ort, index) {
  * 2026-10-16).
  */
 function rissanforderungZeile(eintrag, ort) {
-  return feld('Rissanforderung', auswahl({
+  return feld('Rissanforderung', wahlSchalter({
     werte: (zustand.katalog?.rissanforderungen || []).map((r) => ({
       wert: r.wert, beschriftung: r.beschriftung,
     })),
     gewaehlt: eintrag.rissanforderung || 'normal',
     titel: 'Bestimmt σ_s,adm (Tab. 17)',
-    beiAenderung: (v) => anBauteil(eintrag, ort)((e) => { e.rissanforderung = v; }),
+    setzen: (v) => anBauteil(eintrag, ort)((e) => { e.rissanforderung = v; }),
   }), erklaerung([
     ['Gilt für', 'alle Rissnachweise: Riss bei Zwang, Stahlspannung quasi-ständig '
       + 'und Fliessen häufig. Hier geändert, ändert sie sich in allen dreien.'],
@@ -523,8 +523,8 @@ function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten', phiImmer = fal
   const katalog = zustand.katalog?.rechenwahl || {};
   const liste = katalog[arten] || [];
   const art = liste.find((a) => a.wert === ziel.rechenart);
-  // In schmalen Zeilen stehen die kurzen Namen; der lange steht im Titel.
-  const kurz = (l) => (l || []).map((e) => ({ wert: e.wert, beschriftung: e.kurz }));
+  // Im Schalter stehen die kurzen Namen, der lange im Titel der Stellung.
+  const kurz = (l) => (l || []).map((e) => ({ wert: e.wert, beschriftung: e.kurz, titel: e.beschriftung }));
   const phi = mitKopf('φ', zahlfeld({
     wert: ziel.kriechzahl ?? 0, schritt: 0.1, min: 0, leer: 0,
     titel: phiImmer
@@ -535,17 +535,19 @@ function rechenwahlFelder(ziel, aendern, { arten = 'rechenarten', phiImmer = fal
   if (art && !art.mit_kriechzahl && !phiImmer) phi.classList.add('ist-ohne-wirkung');
   return [
     phi,
-    mitKopf('Werte', auswahl({
+    mitKopf('Werte', wahlSchalter({
       werte: kurz(katalog.werkstoffsaetze),
       gewaehlt: ziel.werkstoffsatz,
       titel: 'Bemessungswerte (f_cd, f_yd) oder charakteristische (f_ck, f_yk)',
-      beiAenderung: (v) => aendern((x) => { x.werkstoffsatz = v; }),
+      setzen: (v) => aendern((x) => { x.werkstoffsatz = v; }),
+      klasse: '.ist-wortlaut',
     })),
-    mitKopf('Rechenart', auswahl({
+    mitKopf('Rechenart', wahlSchalter({
       werte: kurz(liste),
       gewaehlt: ziel.rechenart,
-      titel: liste.map((a) => a.beschriftung).join(' · '),
-      beiAenderung: (v) => aendern((x) => { x.rechenart = v; }),
+      titel: 'Wie gerechnet wird',
+      setzen: (v) => aendern((x) => { x.rechenart = v; }),
+      klasse: '.ist-wortlaut',
     })),
   ];
 }

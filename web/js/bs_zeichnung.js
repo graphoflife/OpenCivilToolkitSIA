@@ -26,6 +26,7 @@
  */
 
 import { api } from './api.js';
+import { wahlBlock, wahlSchalter } from './bausteine.js';
 import { nachBild, zahlText } from './cad_ansicht.js';
 import { imSpiel } from './cad_auswahl.js';
 import { cadBereich, cadFenster, cadVergessen, cadWaehlen } from './cad_fenster.js';
@@ -480,6 +481,16 @@ function zeile(beschriftung, eingabe, einheit = '') {
   ]);
 }
 
+/**
+ * Eine Richtung des Lagers mit ihrem Schalter -- frei, fest oder Feder. Die
+ * Beschriftung ist ein Zeichen (x, z, φ) und braucht nur eine schmale
+ * Spalte. Ein «div», kein «label»: ein Klick auf das Zeichen löste sonst die
+ * erste Stellung aus.
+ */
+function richtungszeile(beschriftung, schalter) {
+  return el('div.cad-zeile.ist-richtung', {}, [el('span', { text: beschriftung }), schalter]);
+}
+
 function haken(an, setzen, titel = '') {
   return el('input', {
     type: 'checkbox', checked: !!an, title: titel,
@@ -582,13 +593,16 @@ function lagerFelder(a, z, knoten) {
   const arten = new Set(lager.map(lagerart));
   const gemeinsam = arten.size === 1 ? [...arten][0] : '';
   const setzen = (art) => a.aendern((zz) => { for (const k of knoten) lagerSetzen(a, zz, k, art); });
+  // Haben die gewählten Knoten verschiedene Lager, steht keine Stellung an.
   const werte = [
-    ...(gemeinsam ? [] : [{ wert: '', beschriftung: 'verschieden' }]),
-    { wert: 'kein', beschriftung: 'kein Lager' },
+    { wert: 'kein', beschriftung: 'kein', titel: 'Kein Lager' },
     ...katalog().lagerarten.map((x) => ({ wert: x.wert, beschriftung: x.wert })),
-    { wert: 'eigen', beschriftung: 'je Richtung' },
+    { wert: 'eigen', beschriftung: 'je Richtung', titel: 'Je Richtung frei, fest oder eine Feder' },
   ];
-  const zeilen = [zeile('Lager', auswahl({ werte, gewaehlt: gemeinsam, beiAenderung: setzen }))];
+  const zeilen = [wahlBlock('Lager', wahlSchalter({
+    werte, gewaehlt: gemeinsam, setzen, klasse: '.ist-umbruch',
+    titel: gemeinsam ? 'Lager des Knotens' : 'Die gewählten Knoten haben verschiedene Lager',
+  }))];
   const erstes = lager.find(Boolean);
   if (!erstes || gemeinsam === 'kein') return zeilen;
   const einheiten = katalog().federeinheiten;
@@ -597,7 +611,9 @@ function lagerFelder(a, z, knoten) {
   });
   for (const [feld, name] of [['x', 'x'], ['z', 'z'], ['phi', 'φ']]) {
     const halt = erstes[feld];
-    zeilen.push(zeile(`  ${name}`, auswahl({ werte: HALT, gewaehlt: halt, beiAenderung: richtungSetzen(feld) })));
+    zeilen.push(richtungszeile(name, wahlSchalter({
+      werte: HALT, gewaehlt: halt, setzen: richtungSetzen(feld), titel: `Halt in ${name}`,
+    })));
     if (halt === 'feder') {
       zeilen.push(zeile(`  k_${name}`, zahlfeld({
         wert: erstes[`k_${feld}`], schritt: 1000, min: 0,
@@ -681,7 +697,7 @@ function lagerAnLinie(a, linien, e) {
   for (const [feld, name, titel] of [
     ['quer', 'Lager quer', 'Quer zur Linie, auf der Seite der gestrichelten Faser: fest -- der Stab biegt sich nicht --, oder gebettet'],
     ['laengs', 'Lager längs', 'Längs der Linie: fest oder gebettet']]) {
-    zeilen.push(zeile(name, auswahl({ werte, gewaehlt: e[feld], titel, beiAenderung: setzen(feld) })));
+    zeilen.push(wahlBlock(name, wahlSchalter({ werte, gewaehlt: e[feld], titel, setzen: setzen(feld) })));
     if (e[feld] === 'feder') {
       zeilen.push(zeile(`  k_${feld === 'quer' ? '⊥' : '∥'}`, zahlfeld({
         wert: e[`k_${feld}`], schritt: 1000, min: 0, titel: 'Bettungsziffer je Meter Stab',
@@ -709,10 +725,10 @@ function stablastFelder(a, linie, i, last) {
   ]);
   const zeilen = [kopf];
   if (art.kraft) {
-    zeilen.push(zeile('Richtung', auswahl({
+    zeilen.push(wahlBlock('Richtung', wahlSchalter({
       werte: katalog().richtungen, gewaehlt: last.richtung,
       titel: 'Positiv in Pfeilrichtung: senkrecht nach unten, quer zur gestrichelten Faser, längs vom Anfang zum Ende',
-      beiAenderung: setzen('richtung'),
+      setzen: setzen('richtung'), klasse: '.ist-wortlaut.ist-umbruch',
     })));
   }
   if (art.verteilt) {

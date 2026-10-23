@@ -1,5 +1,5 @@
 ---
-erzeugt: 79ccd8032352
+erzeugt: b6454a599c5b
 art: modul
 tags: [modul]
 ---
@@ -121,6 +121,17 @@ def marke(self) -> str
 ```
 
 Ihr Vorzeichen in Kennungen: `M_Rd_N0_pos` fuer Zug unten.
+
+#### Zugseite.pfeil
+
+```python
+@property
+def pfeil(self) -> str
+```
+
+Wohin sie zeigt, als Pfeil: ↓ fuer Zug unten. So steht sie im Schalter
+der Oberflaeche, der auch in einer schmalen Spalte Platz finden muss
+(Benutzer, 2026-10-23: keine Auswahllisten).
 
 #### Zugseite.aus_moment
 

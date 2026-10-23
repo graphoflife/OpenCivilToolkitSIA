@@ -217,7 +217,7 @@ def katalog() -> dict:
             # Die Seiten, die ein positives Moment einer Analyse zieht -- und
             # wie dann ihre Raender heissen: der gedrueckte, der gezogene.
             "zugseiten": [{"wert": z.value, "beschriftung": z.beschriftung,
-                           "raender": list(z.raender)} for z in Zugseite],
+                           "pfeil": z.pfeil, "raender": list(z.raender)} for z in Zugseite],
             # Die Vorlagen mit ihren Massen -- und je eine Skizze nach
             # Vorgabe fuer das Bildchen auf ihrem Knopf.
             "vorlagen": [
@@ -240,11 +240,14 @@ def katalog() -> dict:
                             for umriss in v.umriss(v.vorgaben())]}
                 for v in stabquerschnitte.VORLAGEN
             ],
+            # Woher A und I eines Stabs kommen. Der kurze Name steht im
+            # Schalter, der lange in seinem Titel.
             "querschnittsarten": [
-                {"wert": "vorlage", "beschriftung": "nach Vorlage"},
-                {"wert": "kennwerte", "beschriftung": "Kennwerte von Hand"},
-                {"wert": "platte", "beschriftung": "aus einer Platte"},
-                {"wert": "analyse", "beschriftung": "aus einer Querschnittsanalyse"},
+                {"wert": "vorlage", "beschriftung": "nach Vorlage", "kurz": "Vorlage"},
+                {"wert": "kennwerte", "beschriftung": "Kennwerte von Hand", "kurz": "Kennwerte"},
+                {"wert": "platte", "beschriftung": "aus einer Platte", "kurz": "Platte"},
+                {"wert": "analyse", "beschriftung": "aus einer Querschnittsanalyse",
+                 "kurz": "Analyse"},
             ],
             "lastarten": [
                 {"wert": a.value, "beschriftung": a.beschriftung, "verteilt": a.verteilt,

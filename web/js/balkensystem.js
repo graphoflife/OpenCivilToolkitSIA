@@ -19,7 +19,9 @@
  * Das kleine Bild unter «Vorzeichen» zeigt es.
  */
 
-import { erklaerung, feld, panel } from './bausteine.js';
+import {
+  erklaerung, feld, panel, wahlBlock, wahlSchalter,
+} from './bausteine.js';
 import {
   aktiverLastfall, eintragVon, lastfallWaehlen, passendeUebersicht, waehlen, zeichenbereich,
 } from './bs_zeichnung.js';
@@ -186,25 +188,28 @@ function querschnittBlock(system, q, i) {
     }
     aendernAn(system.kennung, (s) => { s.querschnitte.splice(i, 1); });
   };
+  // Woher A und I kommen, als Schalter unter dem Namen: neben ihm fänden
+  // vier Stellungen keinen Platz.
   const zeilen = [
     el('div.bs-querschnitt-kopf', {}, [
       el('input', {
         type: 'text', value: q.name, title: 'Name des Querschnitts',
         on: { change: (e) => setzen('name')(e.target.value) },
       }),
-      auswahl({
-        werte: QUERSCHNITTSARTEN(), gewaehlt: q.art,
-        titel: 'Woher A und I kommen', beiAenderung: setzen('art'),
-      }),
       el('button.weg', { type: 'button', text: '×', title: 'Querschnitt löschen', on: { click: weg } }),
     ]),
+    wahlBlock('A und I aus', wahlSchalter({
+      werte: QUERSCHNITTSARTEN().map((x) => ({ wert: x.wert, beschriftung: x.kurz, titel: x.beschriftung })),
+      gewaehlt: q.art, titel: 'Woher A und I kommen', setzen: setzen('art'),
+    })),
   ];
   if (q.art === 'vorlage') {
     const vorlage = VORLAGEN().find((v) => v.schluessel === q.vorlage) || VORLAGEN()[0];
-    zeilen.push(feld('Vorlage', auswahl({
+    zeilen.push(wahlBlock('Vorlage', wahlSchalter({
       werte: VORLAGEN().map((v) => ({ wert: v.schluessel, beschriftung: v.name })),
       gewaehlt: q.vorlage,
-      beiAenderung: (w) => aendern((x) => {
+      klasse: '.ist-umbruch',
+      setzen: (w) => aendern((x) => {
         x.vorlage = w;
         // Die Masse der neuen Vorlage, mit ihren Vorgaben -- die alten passten nicht.
         x.masse = Object.fromEntries((VORLAGEN().find((v) => v.schluessel === w)?.masse || [])

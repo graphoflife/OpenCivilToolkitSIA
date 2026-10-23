@@ -85,6 +85,16 @@ class Zugseite(Wahl):
         """Ihr Vorzeichen in Kennungen: ``M_Rd_N0_pos`` fuer Zug unten."""
         return "pos" if self.positiv else "neg"
 
+    @property
+    def pfeil(self) -> str:
+        """
+        Wohin sie zeigt, als Pfeil: ↓ fuer Zug unten. So steht sie im Schalter
+        der Oberflaeche, der auch in einer schmalen Spalte Platz finden muss
+        (Benutzer, 2026-10-23: keine Auswahllisten).
+        """
+        return {Zugseite.UNTEN: "↓", Zugseite.OBEN: "↑",
+                Zugseite.LINKS: "←", Zugseite.RECHTS: "→"}[self]
+
     @classmethod
     def aus_moment(cls, M_y: float) -> "Zugseite":
         """

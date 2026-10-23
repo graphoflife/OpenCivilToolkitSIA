@@ -567,6 +567,18 @@ dialog.materialwahl .fenster-kopf { top: 0; }
 .schalter-halb.ist-x.ist-an     { background: var(--richtung-x); color: #fff; }
 .schalter-halb.ist-y.ist-an     { background: var(--richtung-y); color: var(--schrift); }
 .schalter-halb.ist-beide.ist-an { background: var(--beide); color: #fff; }
+/* Stellungen, wie sie geschrieben sind: gross geschrieben würde aus 0.85·x
+   ein 0.85·X und aus M_y ein M_Y. */
+.schalter.ist-wortlaut .schalter-halb { text-transform: none; font-size: 12px; font-weight: 600; }
+/* Viele Stellungen brechen um, lange stehen untereinander -- je eine Zeile. */
+.schalter.ist-umbruch { flex-wrap: wrap; }
+.schalter.ist-senkrecht { display: flex; flex-direction: column; }
+.schalter.ist-senkrecht .schalter-halb { justify-content: flex-start; padding: 4px 9px; text-align: left; }
+/* Die Zugseite als Pfeile: schmal genug für eine Zahlenspalte. */
+.schalter.ist-pfeile .schalter-halb { flex: 1; padding: 0 3px; font-size: 13px; }
+/* Ein Schalter unter seiner Beschriftung (`wahlBlock`). */
+.wahlblock { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; margin-bottom: 5px; }
+.wahlblock-titel { font-size: 13px; }
 
 /* Ein Posten auf einer Zeile: × Name ⌀ [d] @ [s] mm [Stahl oder Lage]. Die
    Zahlenfelder sind knapp -- ein Durchmesser oder eine Teilung braucht
@@ -740,19 +752,15 @@ dialog.materialwahl .fenster-kopf { top: 0; }
   display: grid; grid-template-columns: subgrid; gap: 3px 4px; align-items: center;
 }
 /* Was neben dem Namen steht -- die Zugseite beim Knicken des gezeichneten
-   Querschnitts, über den letzten beiden Zahlen: «Zug unten» braucht mehr
-   Platz als eine Zahl. */
-.fallzeile.mit-oben > .fall-name { grid-column: 2 / 4; }
-.fall-oben { grid-row: 1; grid-column: 4 / -2; min-width: 0; }
+   Querschnitts, als Pfeile über der letzten Zahl. */
+.fallzeile.mit-oben > .fall-name { grid-column: 2 / -3; }
+.fall-oben { grid-row: 1; grid-column: -3 / -2; min-width: 0; }
 .fall-oben > * { width: 100%; }
-/* Was unter den Zahlen steht -- Werte und Rechenart einer Analyse, je halb
-   so breit wie die Zahlen: in einer Spalte wären sie abgeschnitten. */
+/* Was unter den Zahlen steht -- Werte und Rechenart einer Analyse, zwei
+   Schalter untereinander: nebeneinander fänden sie keinen Platz. */
 .fall-unten {
   grid-row: 3; grid-column: 2 / -2;
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px 4px;
-}
-@container (max-width: 380px) {
-  .fall-unten { grid-template-columns: minmax(0, 1fr); }
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 3px 4px;
 }
 /* Im Lastfall ist der Schalter nur ein Beiwerk -- er darf der Zeile nicht die
    Breite nehmen, die die Zahlen brauchen. */
@@ -1187,10 +1195,10 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .kennzahl-wert { font-weight: 600; font-size: 12.5px; text-align: right; white-space: nowrap; }
 
 
-/* «Automatische Bewehrung» -- im eigenen Fenster. Die Moduswahl
-   nimmt die ganze Zeile: «Grundbew. ohne Kräfte, Zulage mit Kräften» passt
-   in keine Zahlenspalte. */
-.automatik > select { width: 100%; margin-bottom: 6px; }
+/* «Automatische Bewehrung» -- im eigenen Fenster. Die Modi stehen
+   untereinander: «Grundbew. ohne Kräfte, Zulage mit Kräften» passt in keine
+   Zahlenspalte. */
+.automatik > .schalter { margin-bottom: 6px; }
 
 /* Der Knopf, der die Bewehrung sucht. Ohne Meldung daneben: das Ergebnis
    steht danach in den Lagen und in der Zusammenfassung, und ein Satz daneben
@@ -1260,6 +1268,8 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
    die für alle gälte. Über dem Feld und nicht daneben: so bleibt das Raster
    der Zeile dasselbe, gleich welche Art gewählt ist. */
 .mit-kopf { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.mit-kopf > .schalter { align-self: flex-start; }
+.mit-kopf > .schalter.ist-pfeile { align-self: stretch; }
 .spaltenkopf {
   font-size: 9px; font-weight: 700; text-transform: uppercase;
   letter-spacing: .2px; color: var(--schrift-matt); text-align: right;
@@ -1274,29 +1284,20 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .ist-ohne-wirkung { opacity: .45; }
 
 /* Die Rechenwahl eines Kapitels: ein kleiner Titel, darunter φ, Werte und
-   Rechenart. φ so breit wie eine kurze Zahl, die beiden Wahlen teilen sich
-   den Rest -- «charakteristisch» braucht dort seine ganze Breite. */
+   Rechenart. φ so breit wie eine kurze Zahl; Werte und Rechenart sind
+   Schalter und stehen untereinander -- nebeneinander fänden «Bemessung |
+   charakteristisch» und vier Rechenarten keinen Platz. */
 .rechenwahl {
   display: grid; gap: 1px 6px; align-items: end; margin: 2px 0 8px;
-  grid-template-columns: calc(5ch + var(--pfeilspur) + 10px) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: calc(5ch + var(--pfeilspur) + 10px) minmax(0, 1fr);
 }
+.rechenwahl > :nth-child(4) { grid-column: 2; }
 .rechenwahl-titel {
   grid-column: 1 / -1; font-size: 11px; font-weight: 600; color: var(--schrift-matt);
 }
 .rechenwahl .spaltenkopf:not(.ist-formel) { text-align: left; }
-.rechenwahl select { width: 100%; min-width: 0; font-size: 13px;
-  font-family: "Formelzeichen", "JetBrains Mono", ui-monospace, monospace; }
-@container (max-width: 380px) {
-  .rechenwahl { grid-template-columns: calc(5ch + var(--pfeilspur) + 10px) minmax(0, 1fr); }
-  .rechenwahl > :nth-child(4) { grid-column: 2; }
-}
-.fallzeile.ist-spannung select {
-  min-width: 0; width: 100%;
-  font-family: "Formelzeichen", "JetBrains Mono", ui-monospace, monospace;
-}
-/* «charakteristisch» fehlten in 14 px zwei Pixel. Der Kopf steht über einer
-   Auswahl links, wie ihr Text -- über einer Zahl rechts. */
-.fall-unten select { font-size: 13px; }
+/* Der Kopf steht über einem Schalter links, wie seine Stellungen -- über
+   einer Zahl rechts. */
 .fall-unten .spaltenkopf { text-align: left; }
 /* Ein Formelzeichen als Kopf: gross geschrieben würde aus φ ein Φ. */
 .spaltenkopf.ist-formel {
@@ -1460,23 +1461,20 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 
 /* ------------------------------------------------- Querschnittsanalyse -- */
 
-/* Je Material im Querschnitt eine Zeile: Name, Rechenwerte, beim Beton das
-   Gesetz. Die Kante links in der Farbe des Materials, wie im Baum. */
+/* Je Material im Querschnitt eine Zeile: Name, Rechenwerte, beim Beton
+   darunter das Gesetz -- zwei Schalter. Die Kante links in der Farbe des
+   Materials, wie im Baum. */
 .werkstoffzeile {
-  display: grid; grid-template-columns: minmax(70px, 1fr) minmax(0, 150px) minmax(0, 180px);
-  gap: 6px; align-items: center; margin-bottom: 4px;
+  display: grid; grid-template-columns: minmax(60px, max-content) minmax(0, 1fr);
+  gap: 4px 10px; align-items: center; margin-bottom: 6px;
   padding-left: 8px; border-left: 3px solid var(--rand-stark);
 }
+.werkstoffzeile > .schalter { justify-self: start; grid-column: 2; }
 .werkstoffzeile.ist-beton { border-left-color: var(--beton); }
 .werkstoffzeile.ist-stahl { border-left-color: var(--stahl); }
 .werkstoffname {
   font-size: 12.5px; font-weight: 600;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.werkstoffzeile select { padding: 3px 6px; font-size: 12.5px; }
-@container (max-width: 420px) {
-  .werkstoffzeile { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-  .werkstoffname { grid-column: 1 / -1; }
 }
 
 /* Über den Lastfällen: links der Schalter «nur einachsig», rechts das Bild
@@ -1626,6 +1624,11 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 
 /* Eigenschaften: Beschriftung, Eingabe, Einheit. */
 .cad-zeile { display: grid; grid-template-columns: 74px auto minmax(0, 1fr); gap: 5px; align-items: center; }
+/* Eine Richtung des Lagers: nur ein Zeichen vor dem Schalter, eingerückt
+   unter «Lager». */
+.cad-zeile.ist-richtung { grid-template-columns: 22px auto; padding-left: 8px; }
+.cad-palette .wahlblock { margin-bottom: 0; }
+.cad-palette .wahlblock-titel { font-size: 12px; color: var(--schrift-matt); }
 .cad-zeile > span:first-child {
   color: var(--schrift-matt); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
@@ -1846,8 +1849,7 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
   display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px;
   margin: 0 0 8px; font-size: 12.5px; color: var(--schrift-matt);
 }
-.qa-schnittwahl label { display: inline-flex; align-items: center; gap: 5px; }
-.qa-schnittwahl select { width: auto; padding: 2px 6px; }
+.qa-schnittwahl label, .qa-achsenwahl { display: inline-flex; align-items: center; gap: 5px; }
 .qa-schnitthinweis { margin: 0 0 8px; font-size: 12.5px; color: var(--schrift-zart); }
 
 /* ------------------------------------------------------------ Notizbuch -- */
@@ -2050,7 +2052,7 @@ details.nb-callout > summary { cursor: pointer; }
 
 /* Querschnitte, Lastfälle, Kombinationen. */
 .bs-querschnitt { display: flex; flex-direction: column; gap: 4px; padding: 6px 0; border-bottom: 1px solid var(--rand); }
-.bs-querschnitt-kopf { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 6px; align-items: center; }
+.bs-querschnitt-kopf { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: center; }
 .bs-kennwerte { margin: 0; font-size: 12px; font-weight: 600; color: var(--stahl); }
 .bs-benutzt { margin: 0; font-size: 11px; color: var(--schrift-zart); }
 .bs-fall { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 6px; align-items: center; margin-bottom: 4px; }

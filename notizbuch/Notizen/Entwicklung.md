@@ -44,6 +44,36 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-23 · Die übrigen festen Listen werden Schalter
+
+Wunsch des Benutzers, nach der Empfehlung: jede feste Wahl als Schalter. Eine
+Wahl aus dem eigenen Projekt -- Lastfall, Querschnitt, Platte oder Analyse,
+Fall der Diagramme, Kombination des Grundbruchs -- bleibt eine Liste wie die
+Materialwahl: ihre Zahl wächst mit dem Projekt, als Knöpfe würde sie zu breit.
+
+- **Nachweise:** Rissanforderung; Werte und Rechenart der Rechenwahl stehen
+  jetzt untereinander -- nebeneinander fanden «Bemessung | charakteristisch»
+  und vier Rechenarten keinen Platz. In der Zeile einer Analyse ebenso.
+- **Querschnittsanalyse:** Werkstoffsatz und Betongesetz je Material, der
+  Beton mit dem Gesetz in einer zweiten Zeile. Die Zugseite als Pfeile
+  ↓ ↑ ← → (`Zugseite.pfeil` im Kern), «Zug unten» im Titel: vier Wörter
+  passten nicht in die 80 px der Analysezeile. Die Achsen des
+  Interaktionsdiagramms; der Modus der Bewehrungssuche untereinander.
+- **Balkensystem:** «A und I aus» mit kurzen Namen (`kurz` im Katalog) unter
+  dem Namen des Querschnitts, die Vorlage mit Umbruch; im schwebenden Fenster
+  Lager, Halt je Richtung, Linienlager und Lastrichtung. Haben gewählte
+  Knoten verschiedene Lager, steht keine Stellung an -- vorher hiess das
+  «verschieden».
+
+Neu dafür in `bausteine.js`: `wahlBlock` -- ein Schalter unter seiner
+Beschriftung, als `div`. In einem `label` löste ein Klick auf die Beschriftung
+die erste Stellung aus; darum stehen Schalter auch im Zeichenfenster nicht
+mehr in `label.cad-zeile`. In `stil.css` die Spielarten `ist-wortlaut`
+(Stellungen, wie sie geschrieben sind: 0.85·x, M_y), `ist-umbruch`,
+`ist-senkrecht` und `ist-pfeile`.
+
+---
+
 ## 2026-10-23 · Linien ohne Kette, Schalter statt Auswahllisten
 
 Drei Wünsche des Benutzers:

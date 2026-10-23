@@ -62,9 +62,12 @@ Kopie der Datei mit der Endung `.mjs`.
 ## Grundsätze der Oberfläche
 
 - Keine Auswahllisten (Dropdowns) -- ausser für die Wahl eines Materials
-  (Benutzer, 2026-10-23). Eine feste Wahl ist ein Schalter mit ihren
-  Stellungen (`wahlSchalter`, `zweiSchalter` in `bausteine.js`), eine Zahl
-  ein Zahlenfeld. Welche Listen noch übrig sind, steht im [[TODO]].
+  und eines Eintrags aus dem Projekt, etwa eines Lastfalls oder
+  Querschnitts: deren Zahl wächst mit dem Projekt (Benutzer, 2026-10-23).
+  Eine feste Wahl ist ein Schalter mit ihren Stellungen (`wahlSchalter`,
+  `zweiSchalter`, `wahlBlock` in `bausteine.js`), eine Zahl ein Zahlenfeld.
+  Ein Schalter steht nie in einem `label`: ein Klick auf dessen Text löste
+  seine erste Stellung aus.
 
 ## Normstellen
 
