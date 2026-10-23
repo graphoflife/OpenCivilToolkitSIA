@@ -468,6 +468,17 @@
       ]
     },
     {
+      "name": "Bewehrungsmass des gezeichneten Querschnitts",
+      "pfad": "Formelsammlung/Formeln/Bewehrungsmass des gezeichneten Querschnitts.md",
+      "art": "formel",
+      "zeichen": [
+        "\\mu_s"
+      ],
+      "themen": [
+        "Kennzahlen"
+      ]
+    },
+    {
       "name": "Bewehrungsmass je Kubikmeter Beton",
       "pfad": "Formelsammlung/Formeln/Bewehrungsmass je Kubikmeter Beton.md",
       "art": "formel",
@@ -3216,6 +3227,20 @@
       ]
     },
     {
+      "name": "opencivil.nachweis.qa_kennzahlen",
+      "pfad": "Python/opencivil.nachweis.qa_kennzahlen.md",
+      "art": "modul",
+      "kurz": "was ein gezeichneter Querschnitt aufnimmt, ohne Einwirkung.",
+      "stichworte": [
+        "_achse",
+        "_getragen",
+        "_einheit",
+        "KennzahlenQA",
+        "KennzahlenQA._bewehrt",
+        "KennzahlenQA.rechne"
+      ]
+    },
+    {
       "name": "opencivil.nachweis.qa_knicken",
       "pfad": "Python/opencivil.nachweis.qa_knicken.md",
       "art": "modul",
@@ -4133,6 +4158,9 @@
         "Querschnittsanalyse.interaktion",
         "Querschnittsanalyse.geometrie",
         "Querschnittsanalyse.schubwaende",
+        "Querschnittsanalyse.schubwaende_mit",
+        "Querschnittsanalyse.neigungsgrenzen",
+        "Querschnittsanalyse.schubbezuege",
         "Querschnittsanalyse.beton_ecken"
       ]
     },

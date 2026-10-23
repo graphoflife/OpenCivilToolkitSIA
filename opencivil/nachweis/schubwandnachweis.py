@@ -22,14 +22,14 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Sequence
 
 from opencivil.core.berechnung import (
-    Ausfuehrung, Eingabebezug, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
+    Ausfuehrung, Eingaben, Nachweis, NachweisUrteil, grad_def, grad_formel,
 )
 from opencivil.core.einheiten import EINHEITSLOS, KN, KN_PRO_M, KNM, Groesse
 from opencivil.core.latex import Mathe, als_text, fest
 from opencivil.core.protokoll import Protokoll, Zwischenwerte
 from opencivil.core.wert import WertDef
 from opencivil.querschnitt import schubwaende as sw
-from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse, Wandangabe
+from opencivil.querschnitt.analyse import Lastfall, Querschnittsanalyse
 
 
 @dataclass
@@ -78,11 +78,7 @@ class Schubwandnachweis(Nachweis):
                     "M_z": WertDef(f"{basis}.{f.kennung}.dM_z", r"\Delta M_z", KNM,
                                    f"Moment der Längszugkraft um z – {f.name}", stellen=1),
                 }
-        bezuege = list(analyse.grundbezuege()) + [
-            Eingabebezug("alpha_min", analyse.id_von("alpha_min")),
-            Eingabebezug("alpha_max", analyse.id_von("alpha_max")),
-            Eingabebezug("k_c", analyse.id_von("k_c")),
-        ]
+        bezuege = list(analyse.grundbezuege()) + analyse.schubbezuege()
         ausgaben = (list(self.d_ausnutzung.values())
                     + [d for je in self.d_laengszug.values() for d in je.values()])
         super().__init__(
@@ -93,28 +89,13 @@ class Schubwandnachweis(Nachweis):
     def _belastet(self, fall: Lastfall) -> bool:
         return bool(fall.V_z or fall.T or (fall.V_y and not self.analyse.einachsig))
 
-    # -- Festigkeiten der Waende -----------------------------------------------
-
-    def _f_sd(self, e: Eingaben, w: Wandangabe) -> float:
-        if w.stahl is None:
-            return 0.0
-        k = self.analyse.rechenwahl(w.stahl).satz.stahl
-        return abs(self.analyse.kennwert(e, w.stahl, k))
-
-    def _f_cd(self, e: Eingaben, w: Wandangabe) -> float:
-        k = self.analyse.rechenwahl(w.beton).satz.beton
-        return abs(self.analyse.kennwert(e, w.beton, k))
-
     # -- Pruefen ----------------------------------------------------------------
 
     def pruefe(self, e: Eingaben, p: Protokoll):
         bezug = (e.g("y_S").si, e.g("z_S").si)
-        waende = self.analyse.schubwaende(
-            f_sd=lambda w: self._f_sd(e, w), f_cd=lambda w: self._f_cd(e, w),
-            k_c=e.g("k_c").si)
+        waende = self.analyse.schubwaende_mit(e)
         befund = Schubbefund(waende, sw.zellen(waende) if waende else sw.Zellenmodell((), ()))
-        alpha_min = int(round(e.g("alpha_min").si * 180.0 / math.pi))
-        alpha_max = int(round(e.g("alpha_max").si * 180.0 / math.pi))
+        alpha_min, alpha_max = self.analyse.neigungsgrenzen(e)
         self._protokoll_ansatz(p, e, befund)
 
         ergebnis: Dict[str, Groesse] = {}

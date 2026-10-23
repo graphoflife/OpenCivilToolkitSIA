@@ -493,8 +493,12 @@ weisse Karten; ein Klick auf den Kopf klappt es zu.
   N_Ed = 0, N_Rd⁺ und N_Rd⁻ bei M_Ed = 0 und x/d aus der Handrechnung, der
   Querkraftwiderstand bei N_Ed = 0 -- ohne Bügel V_Rd,max (bei M_Ed = 0) und
   V_Rd,min (bei M_Ed = M_Rd), je das Kleinere beider Seiten, mit Bügeln bei
-  der günstigsten Neigung. Die Tabelle der Nachweise hat eine feste
-  Breite, sie skaliert nicht mit der Tafel: Widerstand, Einwirkung und
+  der günstigsten Neigung. Ein gezeichneter Querschnitt hat seine eigenen:
+  Bewehrungsmass, je Zugseite M_Rd bei N_Ed = 0 und x/d, N_Rd⁺ und N_Rd⁻ bei
+  gleichmässiger Dehnung -- mit der Rechenwahl der Tragsicherheit -- und mit
+  Schubwänden V_z,Rd, V_y,Rd und T_Rd, je allein. Distanzhalter und ω_w hat
+  er nicht: keine Lagen, kein Verformungsnachweis. Die Tabelle der Nachweise
+  hat eine feste Breite, sie skaliert nicht mit der Tafel: Widerstand, Einwirkung und
   Erfüllungsgrad. Darunter, in gedämpftem Rot, die ausgeschalteten Nachweise,
   die mit der vorliegenden Bewehrung *nicht* aufgehen würden. Das Auge am
   Ende jeder Zeile zeigt genau diesen Nachweis: der Kern löst rückwärts auf,

@@ -1,5 +1,5 @@
 ---
-erzeugt: b766705798d1
+erzeugt: 932d65e5a978
 art: modul
 tags: [modul]
 ---
@@ -377,5 +377,6 @@ die Mitten nicht im Schwerpunkt, gibt das auch Momente:
 
 ## Gebraucht von
 
+- [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.schubwandnachweis]]
 - [[opencivil.querschnitt.analyse]]

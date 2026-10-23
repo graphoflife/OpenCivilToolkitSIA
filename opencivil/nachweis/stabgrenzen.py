@@ -20,7 +20,9 @@ bilden eine Gruppe, die einmal hergeleitet wird
 DER FIKTIVE DURCHMESSER:
 Eine verschmierte Linie hat keinen Durchmesser: sie bekommt einen fiktiven,
 als laegen ihre Staebe 150 mm auseinander (Annahme des Benutzers,
-2026-10-15)::
+2026-10-15). Die Regel steht in
+:func:`~opencivil.querschnitt.geometrie.aequivalenter_durchmesser` -- die
+Ueberdeckung braucht dieselbe::
 
     ⌀_fikt = sqrt(4/π · A_s/l · s)        s = 150 mm
 
@@ -48,13 +50,10 @@ from opencivil.nachweis.mindestbewehrung import (
 from opencivil.nachweis.rissanforderung import Rissanforderung
 from opencivil.nachweis.spannungsgrenzen import Grenzen, Grenzgruppe
 from opencivil.querschnitt.analyse import Querschnittsanalyse, Stabgruppe
-from opencivil.querschnitt.geometrie import Linienart, Punkt
+from opencivil.querschnitt.geometrie import (
+    TEILUNG_VERSCHMIERT, Linienart, Punkt, aequivalenter_durchmesser,
+)
 from opencivil.querschnitt.interaktion import Querschnitt
-
-#: Die Teilung, mit der eine verschmierte Linie einen fiktiven Durchmesser
-#: bekommt, in m -- Annahme des Benutzers, 2026-10-15.
-FIKTIVE_TEILUNG = 0.150
-
 
 @dataclass(frozen=True)
 class Stabangabe:
@@ -93,11 +92,11 @@ class Stabangabe:
 def fiktiver_durchmesser(element: Stabgruppe) -> float:
     """
     Der Durchmesser einer verschmierten Linie, in m: ihre Stahlflaeche je
-    Laenge, auf Staebe im Abstand :data:`FIKTIVE_TEILUNG` verteilt.
+    Laenge, auf Staebe im Abstand
+    :data:`~opencivil.querschnitt.geometrie.TEILUNG_VERSCHMIERT` verteilt.
     """
     laenge = math.hypot(element.bis[0] - element.von[0], element.bis[1] - element.von[1])
-    je_stab = element.flaeche / laenge * FIKTIVE_TEILUNG * 1e3   # mm²
-    return math.sqrt(4.0 / math.pi * je_stab) * 1e-3
+    return aequivalenter_durchmesser(element.flaeche, laenge) * 1e-3
 
 
 def stabangaben(analyse: Querschnittsanalyse, q: Querschnitt,
@@ -215,7 +214,8 @@ def _protokoll_fiktiv(p: Protokoll, s: Stabangabe, basis: str) -> Wert:
     p.formel(durchmesser, r"\sqrt{\frac{4}{\pi} \cdot \frac{@A_s}{@l} \cdot @s}",
              {"A_s": w.flaeche("A_s", "A_s", g.flaeche * 1e-6, "Stahlfläche der Linie"),
               "l": w.laenge("l", "l", laenge, "Länge der Linie", stellen=0),
-              "s": w.laenge("s", "s", FIKTIVE_TEILUNG, "Angenommene Teilung", stellen=0)},
+              "s": w.laenge("s", "s", TEILUNG_VERSCHMIERT * 1e-3, "Angenommene Teilung",
+                            stellen=0)},
              titel=f"{g.name}: verschmiert, als Stäbe mit 150 mm Teilung",
              name="Fiktiver Durchmesser einer verschmierten Linie")
     return durchmesser

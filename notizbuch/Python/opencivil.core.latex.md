@@ -1,5 +1,5 @@
 ---
-erzeugt: 403818aa5be0
+erzeugt: dd3e2b2e17f9
 art: modul
 tags: [modul]
 ---
@@ -428,6 +428,7 @@ Leser sieht alle Zweige und erkennt, welcher gegriffen hat.
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.rechenwahl]]

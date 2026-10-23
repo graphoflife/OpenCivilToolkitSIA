@@ -535,14 +535,15 @@ def loesung_dict(loesung: Loesung, aufbau: Optional[Aufbau] = None, *,
         # Je Fundament, was die Situationszeichnung vom Kern braucht.
         ergebnis["grundbrueche"] = endlich(grundbruchdaten.situationen(aufbau, loesung))
         ergebnis["setzungen"] = endlich(setzungsdaten.situationen(aufbau, loesung))
-        # Je Platte ihre Kennzahlen -- auch ohne Lastfall, darum nicht in der
-        # Zusammenfassung, die es nur mit Urteilen gibt.
+        # Je Platte und je gezeichneten Querschnitt die Kennzahlen -- auch
+        # ohne Lastfall, darum nicht in der Zusammenfassung, die es nur mit
+        # Urteilen gibt.
         ergebnis["kennzahlen"] = {
             kennung: [{"beschriftung": k.beschriftung, "symbol": wert.symbol,
                        "text": k.text(wert), "einheit": wert_dict(wert)["einheit"],
                        "erklaerung": k.erklaerung, "id": wert.id}
                       for k, wert in kennzahlen(aufbau, kennung, loesung)]
-            for kennung in aufbau.querschnitte}
+            for kennung in [*aufbau.querschnitte, *aufbau.querschnittsanalysen]}
         ergebnis["warnungen"] = list(aufbau.warnungen)
         ergebnis["zuordnung"] = zuordnung(aufbau)
     return ergebnis

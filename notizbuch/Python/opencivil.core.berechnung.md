@@ -1,5 +1,5 @@
 ---
-erzeugt: 9b239ea2cb62
+erzeugt: f80e8e26c338
 art: modul
 tags: [modul]
 ---
@@ -638,6 +638,7 @@ def rechne(self, e: Eingaben, p: Protokoll) -> Ausfuehrung
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.rechenwahl]]

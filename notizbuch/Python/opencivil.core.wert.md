@@ -1,5 +1,5 @@
 ---
-erzeugt: 7fce53c0410b
+erzeugt: 41e5a7e67af6
 art: modul
 tags: [modul]
 ---
@@ -313,6 +313,7 @@ def beschreibung(self) -> str
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.resistenzlinie]]

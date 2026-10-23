@@ -567,9 +567,10 @@ def stablinie(
 # in die Rechnung geht nur, wo die Staebe danach liegen.
 
 
-#: Mit welcher Teilung eine verschmierte Stablinie fuer die Ueberdeckung als
-#: Staebe gilt: ihr Durchmesser ist der, der bei dieser Teilung dieselbe
-#: Flaeche je Laenge gibt. Nach Vorgabe des Benutzers (2026-10-23).
+#: Mit welcher Teilung eine verschmierte Stablinie als Staebe gilt, wo sie
+#: einen Durchmesser braucht: fuer die Grenze der Stahlspannung je Stab
+#: (:mod:`opencivil.nachweis.stabgrenzen`, Annahme des Benutzers,
+#: 2026-10-15) und fuer die Ueberdeckung (Benutzer, 2026-10-23). In mm.
 TEILUNG_VERSCHMIERT = 150.0
 
 
@@ -578,7 +579,9 @@ def aequivalenter_durchmesser(flaeche: float, laenge: float,
     """
     Der Durchmesser der Staebe, die im Abstand ``teilung`` dieselbe Flaeche
     je Laenge geben wie ``flaeche`` auf ``laenge``: 1000 mm² auf 1000 mm sind
-    bei 150 mm Teilung 150 mm² je Stab, also ⌀13.8.
+    bei 150 mm Teilung 150 mm² je Stab, also ⌀13.8::
+
+        ⌀ = sqrt(4/π · A_s/l · s)
     """
     je_stab = max(flaeche, 0.0) / laenge * teilung
     return math.sqrt(4.0 * je_stab / math.pi)

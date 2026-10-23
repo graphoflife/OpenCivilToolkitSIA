@@ -1,5 +1,5 @@
 ---
-erzeugt: f5794bbb924d
+erzeugt: 29933a31d029
 art: modul
 tags: [modul]
 ---
@@ -13,7 +13,8 @@ Aus einem [[opencivil.projekt.querschnittsanalyse#QuerschnittsanalyseEintrag|Que
 die [[opencivil.querschnitt.analyse#Querschnittsanalyse|Querschnittsanalyse]] -- jeder Fehler
 der Zeichnung als Satz, der sie nennt -- und ihre Nachweise: Biegung und
 Normalkraft, Querkraft und Torsion, Duktilitaet, sproedes Versagen, die
-Zwaengungen, die Stahlspannungen und das Knicken ([[opencivil.projekt.aufbau.querschnittsanalyse#bauen|bauen]]).
+Zwaengungen, die Stahlspannungen und das Knicken ([[opencivil.projekt.aufbau.querschnittsanalyse#bauen|bauen]]) -- dazu die
+Kennzahlen.
 
 ## Inhalt
 
@@ -52,6 +53,7 @@ einen Satz, der die Analyse nennt.
 
 - [[opencivil.material.basis]]
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.richtungsnachweise]]
 - [[opencivil.nachweis.schiefe_biegung]]

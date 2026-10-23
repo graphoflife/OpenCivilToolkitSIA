@@ -1,5 +1,5 @@
 ---
-erzeugt: 98d79389df58
+erzeugt: 6782bd91689f
 art: verzeichnis
 tags: [verzeichnis]
 ---
@@ -17,7 +17,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Querschnitt]] · 4
 - [[Biegung und Normalkraft]] · 26
 - [[Verformung]] · 8
-- [[Kennzahlen]] · 26
+- [[Kennzahlen]] · 27
 - [[Querkraft]] · 15
 - [[Duktilität]] · 8
 - [[Zwängung auf Normalkraft]] · 13
@@ -80,6 +80,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bettung eines Stabs]]
 - [[Bewehrung der Lage]] · $A_{s,2,x}$
 - [[Bewehrungsgehalt]] · $\rho_{u}$
+- [[Bewehrungsmass des gezeichneten Querschnitts]] · $\mu_s$
 - [[Bewehrungsmass je Kubikmeter Beton]] · $\mu_s$
 - [[Bewehrungsquerschnitt der zusammengefassten Lage]] · $A_{s,2,x}$
 - [[Bewehrungsquerschnitt über die Breite b]]
@@ -241,7 +242,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 
 ## Normstelle fehlt noch
 
-114 von 185 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
+115 von 186 Formeln haben im Code keine Normstelle. Die Stellen in SIA 262 liefert der Benutzer; eingetragen werden sie im Code, an der genannten Stelle – von dort kommen sie in Bericht und Notizbuch.
 
 - [[Äquivalenter E-Modul über dem Moment]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
 - [[Äquivalenter E-Modul über der Normalkraft]] · [[opencivil.spannungsanalyse.herleitung#_herleitung_modul|_herleitung_modul]]
@@ -258,6 +259,7 @@ Jede Formel des Werkzeugs steht auf einer eigenen Seite: die Formel, ihre Normst
 - [[Bettung eines Stabs]] · [[opencivil.stabwerk.herleitung|_ansaetze]]
 - [[Bewehrung der Lage]] · [[opencivil.querschnitt.platte#protokoll_lage|protokoll_lage]]
 - [[Bewehrungsgehalt]] · [[opencivil.nachweis.verformung#Vergroesserungsfaktor._bewehrungsgehalte|Vergroesserungsfaktor._bewehrungsgehalte]]
+- [[Bewehrungsmass des gezeichneten Querschnitts]] · [[opencivil.nachweis.qa_kennzahlen#KennzahlenQA|KennzahlenQA._bewehrungsmass]]
 - [[Bewehrungsmass je Kubikmeter Beton]] · [[opencivil.querschnitt.platte#Lagenaufbau._kennzahlen|Lagenaufbau._kennzahlen]]
 - [[Bewehrungsquerschnitt der zusammengefassten Lage]] · [[opencivil.nachweis.handrechnung#Handrechnung._schwerpunkt|Handrechnung._schwerpunkt]]
 - [[Bezogene Druckzonenhöhe bei reiner Biegung]] · [[opencivil.nachweis.richtungsnachweise#DuktilitaetQA.pruefe|DuktilitaetQA.pruefe]]

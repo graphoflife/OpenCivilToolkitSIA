@@ -1,6 +1,6 @@
 # Voll
 
-374 Berechnungen ausgeführt, 610 Werte bestimmt.
+379 Berechnungen ausgeführt, 634 Werte bestimmt.
 
 ## Herleitung
 
@@ -6895,6 +6895,123 @@ $$
 \alpha_{eff,\sigma,\text{Häufig schief}} = \frac{\sigma_{s,adm}}{\sigma_s} = \frac{355\,\mathrm{N}/\mathrm{mm}^{2}}{150\,\mathrm{N}/\mathrm{mm}^{2}} = 2.37
 $$
 
+### Kennzahlen
+
+**Bewehrungsmass je Kubikmeter Beton, ohne Bügel**
+
+$$
+\mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{A} = \frac{2373\,\mathrm{mm}^{2} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{330000\,\mathrm{mm}^{2}} = 56\,\mathrm{kg}/\mathrm{m}^{3}
+$$
+
+#### Biegung und Normalkraft
+
+**Momentenwiderstand bei N\_Ed = 0, Zug unten**
+
+$$
+M_{y,Rd}^{+}(N_{Ed} = 0) = 359.8\,\mathrm{kNm}
+$$
+
+**Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten**
+
+$$
+\left(x/d\right)_{y}^{+} = \frac{x}{d} = \frac{64.8\,\mathrm{mm}}{560.3\,\mathrm{mm}} = 0.116
+$$
+
+**Momentenwiderstand bei N\_Ed = 0, Zug oben**
+
+$$
+M_{y,Rd}^{-}(N_{Ed} = 0) = -194.7\,\mathrm{kNm}
+$$
+
+**Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben**
+
+$$
+\left(x/d\right)_{y}^{-} = \frac{x}{d} = \frac{47.4\,\mathrm{mm}}{554.1\,\mathrm{mm}} = 0.086
+$$
+
+**Momentenwiderstand bei N\_Ed = 0, Zug links**
+
+$$
+M_{z,Rd}^{+}(N_{Ed} = 0) = 388.5\,\mathrm{kNm}
+$$
+
+**Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug links**
+
+$$
+\left(x/d\right)_{z}^{+} = \frac{x}{d} = \frac{109\,\mathrm{mm}}{807.7\,\mathrm{mm}} = 0.135
+$$
+
+**Momentenwiderstand bei N\_Ed = 0, Zug rechts**
+
+$$
+M_{z,Rd}^{-}(N_{Ed} = 0) = -362.5\,\mathrm{kNm}
+$$
+
+**Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug rechts**
+
+$$
+\left(x/d\right)_{z}^{-} = \frac{x}{d} = \frac{103.5\,\mathrm{mm}}{789.9\,\mathrm{mm}} = 0.131
+$$
+
+**Reiner Zug, gleichmässig gedehnt**
+
+$$
+N_{Rd}^{+} = 1031.7\,\mathrm{kN}
+$$
+
+**Reiner Druck, gleichmässig gedehnt**
+
+$$
+N_{Rd}^{-} = -7501.7\,\mathrm{kN}
+$$
+
+#### Querkraft und Torsion der Schubwände
+
+**Querkraftwiderstand in z: je Wand**
+
+| Wand | $\vert q_1\vert \ [\mathrm{kN/m}\ \text{je}\ \mathrm{kN}]$ | $\alpha\ [{}^{\circ}]$ | $v_{Rd}\ [\mathrm{kN/m}]$ | $v_{Rd}/\vert q_1\vert \ [\mathrm{kN}]$ |
+| :--- | ---: | ---: | ---: | ---: |
+| Wand 1 | $0.000$ | $30$ | $394.3$ | $\infty$ |
+| Wand 2 | $1.111$ | $30$ | $394.3$ | $354.9$ |
+| Wand 3 | $0.000$ | $30$ | $394.3$ | $\infty$ |
+| Wand 4 | $1.111$ | $30$ | $394.3$ | $354.9$ |
+
+**Querkraftwiderstand in z, allein – massgebend Wand 2**
+
+$$
+V_{z,Rd} = 354.9\,\mathrm{kN}
+$$
+
+**Querkraftwiderstand in y: je Wand**
+
+| Wand | $\vert q_1\vert \ [\mathrm{kN/m}\ \text{je}\ \mathrm{kN}]$ | $\alpha\ [{}^{\circ}]$ | $v_{Rd}\ [\mathrm{kN/m}]$ | $v_{Rd}/\vert q_1\vert \ [\mathrm{kN}]$ |
+| :--- | ---: | ---: | ---: | ---: |
+| Wand 1 | $0.769$ | $30$ | $394.3$ | $512.6$ |
+| Wand 2 | $0.000$ | $30$ | $394.3$ | $\infty$ |
+| Wand 3 | $0.769$ | $30$ | $394.3$ | $512.6$ |
+| Wand 4 | $0.000$ | $30$ | $394.3$ | $\infty$ |
+
+**Querkraftwiderstand in y, allein – massgebend Wand 1**
+
+$$
+V_{y,Rd} = 512.6\,\mathrm{kN}
+$$
+
+**Torsionswiderstand: je Wand**
+
+| Wand | $\vert q_1\vert \ [\mathrm{kN/m}\ \text{je}\ \mathrm{kNm}]$ | $\alpha\ [{}^{\circ}]$ | $v_{Rd}\ [\mathrm{kN/m}]$ | $v_{Rd}/\vert q_1\vert \ [\mathrm{kNm}]$ |
+| :--- | ---: | ---: | ---: | ---: |
+| Wand 1 | $1.709$ | $30$ | $394.3$ | $230.7$ |
+| Wand 2 | $1.709$ | $30$ | $394.3$ | $230.7$ |
+| Wand 3 | $1.709$ | $30$ | $394.3$ | $230.7$ |
+| Wand 4 | $1.709$ | $30$ | $394.3$ | $230.7$ |
+
+**Torsionswiderstand, allein – massgebend Wand 1**
+
+$$
+T_{Rd} = 230.7\,\mathrm{kNm}
+$$
+
 ### Querschnittsanalyse: Stütze
 
 **Fläche und Schwerpunkt eines Polygons (Satz von Gauss)**
@@ -7452,6 +7569,52 @@ $$
 
 $$
 \alpha_{eff,K,\text{Seitlich}} = \frac{N_{Rd,K}}{\left|N_{Ed}\right|} = \frac{3266.6\,\mathrm{kN}}{1200\,\mathrm{kN}} = 2.72 \quad \Rightarrow \quad \text{erfüllt}
+$$
+
+### Kennzahlen
+
+**Bewehrungsmass je Kubikmeter Beton, ohne Bügel**
+
+$$
+\mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{A} = \frac{1885\,\mathrm{mm}^{2} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{160000\,\mathrm{mm}^{2}} = 92\,\mathrm{kg}/\mathrm{m}^{3}
+$$
+
+#### Biegung und Normalkraft
+
+**Momentenwiderstand bei N\_Ed = 0, Zug unten**
+
+$$
+M_{y,Rd}^{+}(N_{Ed} = 0) = 155.6\,\mathrm{kNm}
+$$
+
+**Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten**
+
+$$
+\left(x/d\right)_{y}^{+} = \frac{x}{d} = \frac{48.6\,\mathrm{mm}}{350\,\mathrm{mm}} = 0.139
+$$
+
+**Momentenwiderstand bei N\_Ed = 0, Zug oben**
+
+$$
+M_{y,Rd}^{-}(N_{Ed} = 0) = -155.6\,\mathrm{kNm}
+$$
+
+**Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben**
+
+$$
+\left(x/d\right)_{y}^{-} = \frac{x}{d} = \frac{48.6\,\mathrm{mm}}{350\,\mathrm{mm}} = 0.139
+$$
+
+**Reiner Zug, gleichmässig gedehnt**
+
+$$
+N_{Rd}^{+} = 942.5\,\mathrm{kN}
+$$
+
+**Reiner Druck, gleichmässig gedehnt**
+
+$$
+N_{Rd}^{-} = -5497.4\,\mathrm{kN}
 $$
 
 ### Grundbruch: Hang
@@ -11258,6 +11421,10 @@ Mit Bügeln trägt das Fachwerk; gesucht wird ganzgradig zwischen α\_min und α
 
 Ohne Bügel hängt der Widerstand am Moment: am grössten bei M\_Ed = 0, wo die Dehnung null ist, am kleinsten bei M\_Ed = M\_Rd, wo die Bewehrung zu fliessen beginnt und die Dehnung f\_yd/E\_s erreicht. Je Seite gilt ihre statische Höhe.
 
+Was der Querschnitt aufnimmt, ohne Bezug auf einen Lastfall: das Bewehrungsmass, die Widerstände bei N = 0 und bei reiner Normalkraft, die bezogene Druckzonenhöhe und, mit Schubwänden, der Widerstand gegen Querkraft und Torsion je allein. Gerechnet wird mit der Rechenwahl der Tragsicherheit.
+
+Jede Last allein, ohne Normalkraft, auf die Schubwände verteilt wie im Nachweis. Die Verteilung ist linear: eine Wand mit dem Widerstand v\_Rd, auf die je Einheitslast der Schubfluss q₁ fällt, trägt v\_Rd/q₁. Massgebend ist die Wand, die zuerst ihren Widerstand erreicht.
+
 **Zugwiderstand bei M\_Ed = 0**
 
 $$
@@ -11286,6 +11453,12 @@ $$
 
 $$
 \varepsilon_v^{+} = \frac{f_{yd}}{E_s}
+$$
+
+**Bewehrungsmass je Kubikmeter Beton, ohne Bügel**
+
+$$
+\mu_s = \frac{A_{s,tot} \cdot 7850\,\mathrm{kg}/\mathrm{m}^{3}}{A}
 $$
 
 ### Stabquerschnitte
@@ -11758,6 +11931,25 @@ $$
 
 > **Warnung:** Biegung und Normalkraft – Feld: nicht erfüllt. Bei N\_Ed = 664.0 kN, in der Richtung des Moments.
 
+**Kennzahlen**
+
+| Kennzahl | Zeichen | Wert |
+| :--- | :--- | ---: |
+| Bewehrungsmass | $\mu_s$ | $56\,\mathrm{kg}/\mathrm{m}^{3}$ |
+| Momentenwiderstand, Zug unten | $M_{y,Rd}^{+}(N_{Ed} = 0)$ | $359.8\,\mathrm{kNm}$ |
+| Momentenwiderstand, Zug oben | $M_{y,Rd}^{-}(N_{Ed} = 0)$ | $-194.7\,\mathrm{kNm}$ |
+| Momentenwiderstand, Zug links | $M_{z,Rd}^{+}(N_{Ed} = 0)$ | $388.5\,\mathrm{kNm}$ |
+| Momentenwiderstand, Zug rechts | $M_{z,Rd}^{-}(N_{Ed} = 0)$ | $-362.5\,\mathrm{kNm}$ |
+| Zugwiderstand | $N_{Rd}^{+}$ | $1031.7\,\mathrm{kN}$ |
+| Druckwiderstand | $N_{Rd}^{-}$ | $-7501.7\,\mathrm{kN}$ |
+| Bezogene Druckzonenhöhe, Zug unten | $\left(x/d\right)_{y}^{+}$ | $0.116$ |
+| Bezogene Druckzonenhöhe, Zug oben | $\left(x/d\right)_{y}^{-}$ | $0.086$ |
+| Bezogene Druckzonenhöhe, Zug links | $\left(x/d\right)_{z}^{+}$ | $0.135$ |
+| Bezogene Druckzonenhöhe, Zug rechts | $\left(x/d\right)_{z}^{-}$ | $0.131$ |
+| Querkraftwiderstand in z | $V_{z,Rd}$ | $354.9\,\mathrm{kN}$ |
+| Querkraftwiderstand in y | $V_{y,Rd}$ | $512.6\,\mathrm{kN}$ |
+| Torsionswiderstand | $T_{Rd}$ | $230.7\,\mathrm{kNm}$ |
+
 ### Stütze
 
 **Angaben zum Querschnitt**
@@ -11781,6 +11973,18 @@ $$
 | Risse: Quasi-ständige Lastfälle | Dauer | $\sigma_{s,adm} = 500\,\mathrm{N}/\mathrm{mm}^{2}$ | $\sigma_s = 31\,\mathrm{N}/\mathrm{mm}^{2}$ | $16.04$ |
 | Knicken | Stütze | $N_{Rd,K} = 3032.2\,\mathrm{kN}$ | $N_{Ed} = 1500.0\,\mathrm{kN}$ | $2.02$ |
 | Knicken | Seitlich | $N_{Rd,K} = 3266.6\,\mathrm{kN}$ | $N_{Ed} = 1200.0\,\mathrm{kN}$ | $2.72$ |
+
+**Kennzahlen**
+
+| Kennzahl | Zeichen | Wert |
+| :--- | :--- | ---: |
+| Bewehrungsmass | $\mu_s$ | $92\,\mathrm{kg}/\mathrm{m}^{3}$ |
+| Momentenwiderstand, Zug unten | $M_{y,Rd}^{+}(N_{Ed} = 0)$ | $155.6\,\mathrm{kNm}$ |
+| Momentenwiderstand, Zug oben | $M_{y,Rd}^{-}(N_{Ed} = 0)$ | $-155.6\,\mathrm{kNm}$ |
+| Zugwiderstand | $N_{Rd}^{+}$ | $942.5\,\mathrm{kN}$ |
+| Druckwiderstand | $N_{Rd}^{-}$ | $-5497.4\,\mathrm{kN}$ |
+| Bezogene Druckzonenhöhe, Zug unten | $\left(x/d\right)_{y}^{+}$ | $0.139$ |
+| Bezogene Druckzonenhöhe, Zug oben | $\left(x/d\right)_{y}^{-}$ | $0.139$ |
 
 ### Hang
 
@@ -12500,6 +12704,20 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Grösste Neigung der Druckdiagonalen | $\alpha_{max}$ | $45$ | ° | Vorgabe |
 | Kleinste Neigung der Druckdiagonalen | $\alpha_{min}$ | $30$ | ° | Vorgabe |
 | Abminderung der Betondruckfestigkeit in der Druckdiagonalen | $k_c$ | $0.55$ |  | Vorgabe |
+| Momentenwiderstand bei N\_Ed = 0, Zug links | $M_{z,Rd}^{+}(N_{Ed} = 0)$ | $388.5$ | kNm | berechnet |
+| Momentenwiderstand bei N\_Ed = 0, Zug oben | $M_{y,Rd}^{-}(N_{Ed} = 0)$ | $-194.7$ | kNm | berechnet |
+| Momentenwiderstand bei N\_Ed = 0, Zug rechts | $M_{z,Rd}^{-}(N_{Ed} = 0)$ | $-362.5$ | kNm | berechnet |
+| Momentenwiderstand bei N\_Ed = 0, Zug unten | $M_{y,Rd}^{+}(N_{Ed} = 0)$ | $359.8$ | kNm | berechnet |
+| Druckwiderstand bei gleichmässiger Dehnung | $N_{Rd}^{-}$ | $-7501.7$ | kN | berechnet |
+| Zugwiderstand bei gleichmässiger Dehnung | $N_{Rd}^{+}$ | $1031.7$ | kN | berechnet |
+| Torsionswiderstand der Schubwände, allein | $T_{Rd}$ | $230.7$ | kNm | berechnet |
+| Querkraftwiderstand in y der Schubwände, allein | $V_{y,Rd}$ | $512.6$ | kN | berechnet |
+| Querkraftwiderstand in z der Schubwände, allein | $V_{z,Rd}$ | $354.9$ | kN | berechnet |
+| Bewehrungsmass je Kubikmeter Beton | $\mu_s$ | $56$ | kg/m³ | berechnet |
+| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug links | $\left(x/d\right)_{z}^{+}$ | $0.135$ |  | berechnet |
+| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben | $\left(x/d\right)_{y}^{-}$ | $0.086$ |  | berechnet |
+| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug rechts | $\left(x/d\right)_{z}^{-}$ | $0.131$ |  | berechnet |
+| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten | $\left(x/d\right)_{y}^{+}$ | $0.116$ |  | berechnet |
 | Erfüllungsgrad Duktilität – Zug links | $\alpha_{eff,x/d,\text{Zug links}}$ | $2.59$ |  | berechnet |
 | Erfüllungsgrad Duktilität – Zug oben | $\alpha_{eff,x/d,\text{Zug oben}}$ | $4.09$ |  | berechnet |
 | Erfüllungsgrad Duktilität – Zug rechts | $\alpha_{eff,x/d,\text{Zug rechts}}$ | $2.67$ |  | berechnet |
@@ -12538,6 +12756,16 @@ Mindestens ein Nachweis ist nicht erfüllt.
 | Trägheitsmoment um y | $I_y$ | $2133.3$ | ·10⁶ mm⁴ | berechnet |
 | Deviationsmoment | $I_{yz}$ | $0$ | ·10⁶ mm⁴ | berechnet |
 | Trägheitsmoment um z | $I_z$ | $2133.3$ | ·10⁶ mm⁴ | berechnet |
+| Grösste Neigung der Druckdiagonalen | $\alpha_{max}$ | $45$ | ° | Vorgabe |
+| Kleinste Neigung der Druckdiagonalen | $\alpha_{min}$ | $30$ | ° | Vorgabe |
+| Abminderung der Betondruckfestigkeit in der Druckdiagonalen | $k_c$ | $0.55$ |  | Vorgabe |
+| Momentenwiderstand bei N\_Ed = 0, Zug oben | $M_{y,Rd}^{-}(N_{Ed} = 0)$ | $-155.6$ | kNm | berechnet |
+| Momentenwiderstand bei N\_Ed = 0, Zug unten | $M_{y,Rd}^{+}(N_{Ed} = 0)$ | $155.6$ | kNm | berechnet |
+| Druckwiderstand bei gleichmässiger Dehnung | $N_{Rd}^{-}$ | $-5497.4$ | kN | berechnet |
+| Zugwiderstand bei gleichmässiger Dehnung | $N_{Rd}^{+}$ | $942.5$ | kN | berechnet |
+| Bewehrungsmass je Kubikmeter Beton | $\mu_s$ | $92$ | kg/m³ | berechnet |
+| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug oben | $\left(x/d\right)_{y}^{-}$ | $0.139$ |  | berechnet |
+| Bezogene Druckzonenhöhe bei N\_Ed = 0, Zug unten | $\left(x/d\right)_{y}^{+}$ | $0.139$ |  | berechnet |
 | Erfüllungsgrad Duktilität – Zug oben | $\alpha_{eff,x/d,\text{Zug oben}}$ | $2.52$ |  | berechnet |
 | Erfüllungsgrad Duktilität – Zug unten | $\alpha_{eff,x/d,\text{Zug unten}}$ | $2.52$ |  | berechnet |
 | Erfüllungsgrad Knicken – Seitlich | $\alpha_{eff,K,\text{Seitlich}}$ | $2.72$ |  | berechnet |

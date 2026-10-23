@@ -1,5 +1,5 @@
 ---
-erzeugt: 4cf9c6bece63
+erzeugt: 70074890b528
 art: modul
 tags: [modul]
 ---
@@ -453,6 +453,7 @@ print(erg.einheiten)       # {'f_ck': N/mm^2, 'gamma_c': -}
 - [[opencivil.nachweis.linie]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.resistenzlinie]]

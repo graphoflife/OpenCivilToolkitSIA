@@ -1,5 +1,5 @@
 ---
-erzeugt: be40b87e7593
+erzeugt: 303a45c746e9
 art: modul
 tags: [modul]
 ---
@@ -581,6 +581,7 @@ Rechnung sehen statt nur die Zahl.
 - [[opencivil.nachweis.kennzahlen]]
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
+- [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.spannungsbegrenzung]]
 - [[opencivil.nachweis.sproedes_versagen]]

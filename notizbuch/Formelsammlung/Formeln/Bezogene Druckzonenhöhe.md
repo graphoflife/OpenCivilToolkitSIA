@@ -1,5 +1,5 @@
 ---
-erzeugt: a5426dd4af1c
+erzeugt: b32d8c5cb706
 art: formel
 tags: [formel]
 normstelle: "SIA 262:2025, 4.1.4.2.5"
@@ -32,6 +32,7 @@ $$
 
 - [[opencivil.nachweis.duktilitaet#Duktilitaet._protokoll_lage|Duktilitaet._protokoll_lage]]
 - [[opencivil.nachweis.kennzahlen#Plattenkennzahlen._handrechnung|Plattenkennzahlen._handrechnung]]
+- [[opencivil.nachweis.qa_kennzahlen#KennzahlenQA|KennzahlenQA._biegung]]
 
 ## Themen
 

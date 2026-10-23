@@ -6,7 +6,8 @@ Aus einem :class:`~opencivil.projekt.querschnittsanalyse.QuerschnittsanalyseEint
 die :class:`~opencivil.querschnitt.analyse.Querschnittsanalyse` -- jeder Fehler
 der Zeichnung als Satz, der sie nennt -- und ihre Nachweise: Biegung und
 Normalkraft, Querkraft und Torsion, Duktilitaet, sproedes Versagen, die
-Zwaengungen, die Stahlspannungen und das Knicken (:func:`bauen`).
+Zwaengungen, die Stahlspannungen und das Knicken (:func:`bauen`) -- dazu die
+Kennzahlen.
 """
 
 from __future__ import annotations
@@ -17,6 +18,7 @@ from opencivil.material.basis import Baustoff
 from opencivil.projekt.lesen import ProjektFehler
 from opencivil.projekt.querschnittsanalyse import QuerschnittsanalyseEintrag
 from opencivil.nachweis.qa_gebrauch import AnalyseStellen, RissnormalkraftQA, ZwaengungBiegungQA
+from opencivil.nachweis.qa_kennzahlen import KennzahlenQA
 from opencivil.nachweis.qa_knicken import KnickenQA, QAKnickfall
 from opencivil.nachweis.richtungsnachweise import DuktilitaetQA, SproedesVersagenQA
 from opencivil.nachweis.schiefe_biegung import SchiefeBiegung
@@ -101,6 +103,13 @@ def bauen(art: "Bauteilart", eintrag: QuerschnittsanalyseEintrag,
                       for k in knickfaelle],
             verformung=eintrag.knicken_wahl_verformung.wahl,
             widerstand=eintrag.knicken_wahl_widerstand.wahl, schnell=aufbau.schnell))
+
+    # Was der Querschnitt aufnimmt, ohne Einwirkung -- immer, wie bei der
+    # Platte (Benutzer, 2026-10-23). Am Ende, nach seinen Nachweisen.
+    kennzahlen = KennzahlenQA(analyse)
+    aufbau.werk.registriere(kennzahlen)
+    teil.weitere_ziele.append(kennzahlen.id)
+    teil.kennzahlen += kennzahlen.kennzahlen
 
     aktive = [s for s in eintrag.spannungsfaelle if s.aktiv]
     if aktive:

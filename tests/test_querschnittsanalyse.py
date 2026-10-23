@@ -367,6 +367,76 @@ class TestSchub(unittest.TestCase):
         self.assertEqual(urteile(p.rechnen(), "V+T"), {})
 
 
+class TestKennzahlen(unittest.TestCase):
+    """
+    Die Kennzahlen des gezeichneten Querschnitts, wie die der Platte -- immer
+    gerechnet, auch ohne Lastfall. Am Rechteck 300 × 600 der Vorlage.
+    """
+
+    def kennzahlen(self, p):
+        teil = "querschnittsanalyse.a1.kennzahlen."
+        return {k[len(teil):]: w.groesse for k, w in p.rechnen().loesung.werte.items()
+                if k.startswith(teil)}
+
+    def test_ohne_lastfall_alle_vier_seiten(self):
+        k = self.kennzahlen(projekt())
+        for seite in ("unten", "oben", "links", "rechts"):
+            self.assertIn(f"M_Rd_{seite}", k)
+            self.assertIn(f"x_d_{seite}", k)
+        self.assertGreater(k["M_Rd_unten"].si, 0.0)
+        self.assertLess(k["M_Rd_oben"].si, 0.0)
+        # Ohne Schubwand kein Widerstand gegen Querkraft.
+        self.assertNotIn("V_z_Rd", k)
+
+    def test_bewehrungsmass_und_zugwiderstand(self):
+        p = projekt()
+        e = p.rechnen()
+        A = e.wert("querschnittsanalyse.a1.A").groesse.si
+        A_s = e.wert("querschnittsanalyse.a1.A_s").groesse.si
+        k = self.kennzahlen(p)
+        self.assertAlmostEqual(k["bewehrungsmass"].si, A_s * 7850.0 / A)
+        # Reiner Zug: jeder Stab fliesst, f_sd = 500 / 1.15.
+        self.assertAlmostEqual(k["N_Rd_zug"].si, A_s * 500e6 / 1.15, delta=1.0)
+        self.assertLess(k["N_Rd_druck"].si, 0.0)
+
+    def test_einachsig_nur_unten_und_oben(self):
+        k = self.kennzahlen(projekt(einachsig=True))
+        self.assertIn("M_Rd_unten", k)
+        self.assertNotIn("M_Rd_links", k)
+        self.assertNotIn("x_d_rechts", k)
+
+    def test_ohne_obere_bewehrung_kein_x_d_oben(self):
+        p = projekt()
+        a = p.querschnittsanalysen[0]
+        a.stablinien = [l for l in a.stablinien
+                        if {k.z for k in a.knoten if k.kennung in (l.von, l.bis)} == {50.0}]
+        k = self.kennzahlen(p)
+        self.assertIn("x_d_unten", k)
+        self.assertNotIn("x_d_oben", k)
+        self.assertIn("M_Rd_oben", k)
+
+    def test_querkraftwiderstand_wie_der_nachweis(self):
+        """
+        Mit dem Widerstand selbst als Querkraft ist der Nachweis der
+        Schubwände gerade erfüllt: dieselbe Verteilung, derselbe Widerstand.
+        """
+        p = kasten(projekt())
+        k = self.kennzahlen(p)
+        for kurz in ("V_z_Rd", "V_y_Rd", "T_Rd"):
+            self.assertIn(kurz, k)
+        p.querschnittsanalysen[0].lastfall("V_Rd", V_z_Ed=k["V_z_Rd"].si / 1e3)
+        p.querschnittsanalysen[0].lastfall("T_Rd", T_Ed=k["T_Rd"].si / 1e3)
+        u = urteile(p.rechnen(), "V+T")
+        self.assertAlmostEqual(u["V_Rd"].erfuellungsgrad.si, 1.0, places=6)
+        self.assertAlmostEqual(u["T_Rd"].erfuellungsgrad.si, 1.0, places=6)
+
+    def test_im_dienst(self):
+        d = dienst.bearbeite("rechnen", {"projekt": projekt().als_dict()}).daten
+        namen = [k["beschriftung"] for k in d["kennzahlen"]["a1"]]
+        self.assertEqual(namen[:3], ["Bewehrungsmass", "Momentenwiderstand, Zug unten",
+                                     "Momentenwiderstand, Zug oben"])
+
+
 class TestRichtungen(unittest.TestCase):
 
     def test_rissmoment_wie_bei_der_platte(self):

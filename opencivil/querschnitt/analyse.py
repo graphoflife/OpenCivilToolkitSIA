@@ -787,6 +787,32 @@ class Querschnittsanalyse:
                      a_sw_s=w.a_sw_s * mm, f_sd=f_sd(w), f_cd=f_cd(w), k_c=k_c)
                 for w in self.waende]
 
+    def schubwaende_mit(self, e: Eingaben) -> List[Wand]:
+        """
+        Die Schubwaende mit den Festigkeiten ihrer Werkstoffe, wie deren
+        Rechenwahl sie waehlt: ``f_sd`` der Buegel -- ohne Buegel null --,
+        ``f_cd`` des Betons, in dem die Wand liegt. Der Nachweis der Waende
+        und die Kennzahlen lesen sie hier.
+        """
+        def f_sd(w: Wandangabe) -> float:
+            if w.stahl is None:
+                return 0.0
+            return abs(self.kennwert(e, w.stahl, self.rechenwahl(w.stahl).satz.stahl))
+
+        def f_cd(w: Wandangabe) -> float:
+            return abs(self.kennwert(e, w.beton, self.rechenwahl(w.beton).satz.beton))
+
+        return self.schubwaende(f_sd=f_sd, f_cd=f_cd, k_c=e.g("k_c").si)
+
+    def neigungsgrenzen(self, e: Eingaben) -> Tuple[int, int]:
+        """``α_min`` und ``α_max`` der Druckdiagonalen, ganzgradig."""
+        return (int(round(e.g("alpha_min").si * 180.0 / math.pi)),
+                int(round(e.g("alpha_max").si * 180.0 / math.pi)))
+
+    def schubbezuege(self) -> List[Eingabebezug]:
+        """Was die Schubwaende ausser den Werkstoffen lesen: die Neigungsgrenzen und k_c."""
+        return [Eingabebezug(k, self.id_von(k)) for k in ("alpha_min", "alpha_max", "k_c")]
+
     @property
     def beton_ecken(self) -> List[Tuple[Punkt, Baustoff]]:
         """Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm."""

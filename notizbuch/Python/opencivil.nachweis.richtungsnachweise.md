@@ -1,5 +1,5 @@
 ---
-erzeugt: 031f403bb241
+erzeugt: 593a73c592cf
 art: modul
 tags: [modul]
 ---
@@ -101,6 +101,7 @@ def pruefe(self, e: Eingaben, p: Protokoll)
 ## Gebraucht von
 
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.projekt.aufbau.kern]]
 - [[opencivil.projekt.aufbau.querschnittsanalyse]]
 

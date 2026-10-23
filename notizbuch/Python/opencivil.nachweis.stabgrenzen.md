@@ -1,5 +1,5 @@
 ---
-erzeugt: 5498ad9d3013
+erzeugt: b8cb8b0a50f1
 art: modul
 tags: [modul]
 ---
@@ -31,7 +31,9 @@ bilden eine Gruppe, die einmal hergeleitet wird
 
 Eine verschmierte Linie hat keinen Durchmesser: sie bekommt einen fiktiven,
 als laegen ihre Staebe 150 mm auseinander (Annahme des Benutzers,
-2026-10-15):
+2026-10-15). Die Regel steht in
+[[opencivil.querschnitt.geometrie#aequivalenter_durchmesser|aequivalenter_durchmesser]] -- die
+Ueberdeckung braucht dieselbe:
 
 ```
 ⌀_fikt = sqrt(4/π · A_s/l · s)        s = 150 mm
@@ -92,7 +94,8 @@ def fiktiver_durchmesser(element: Stabgruppe) -> float
 ```
 
 Der Durchmesser einer verschmierten Linie, in m: ihre Stahlflaeche je
-Laenge, auf Staebe im Abstand [[opencivil.nachweis.stabgrenzen#Konstanten|FIKTIVE_TEILUNG]] verteilt.
+Laenge, auf Staebe im Abstand
+[[opencivil.querschnitt.geometrie#Konstanten|TEILUNG_VERSCHMIERT]] verteilt.
 
 ### stabangaben
 
@@ -150,7 +153,6 @@ Welche Elemente zu welcher Grenze gehoeren.
 
 ## Konstanten
 
-- `FIKTIVE_TEILUNG = 0.15` – Die Teilung, mit der eine verschmierte Linie einen fiktiven Durchmesser bekommt, in m -- Annahme des Benutzers, 2026-10-15.
 - `GRENZE_JE_STAB = 'Jeder gezogene Stab hält gegen seine eigene Grenze, mit seinem Durch…` – Wie die Grenze aus der Rissbreite hier gemessen wird.
 - `FIKTIV = 'Eine verschmierte Linie hat keinen Durchmesser – sie bekommt einen f…` – Woher eine verschmierte Linie ihren Durchmesser hat.
 

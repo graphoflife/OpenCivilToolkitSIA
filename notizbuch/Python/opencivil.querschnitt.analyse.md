@@ -1,5 +1,5 @@
 ---
-erzeugt: 542f7400e4f3
+erzeugt: 0f1ec13acda9
 art: modul
 tags: [modul]
 ---
@@ -396,6 +396,33 @@ def schubwaende(self, f_sd: Callable[[Wandangabe], float], f_cd: Callable[[Wanda
 
 Die Schubwaende in Metern, mit den Festigkeiten, die der Nachweis waehlt.
 
+#### Querschnittsanalyse.schubwaende_mit
+
+```python
+def schubwaende_mit(self, e: Eingaben) -> List[Wand]
+```
+
+Die Schubwaende mit den Festigkeiten ihrer Werkstoffe, wie deren
+Rechenwahl sie waehlt: `f_sd` der Buegel -- ohne Buegel null --,
+`f_cd` des Betons, in dem die Wand liegt. Der Nachweis der Waende
+und die Kennzahlen lesen sie hier.
+
+#### Querschnittsanalyse.neigungsgrenzen
+
+```python
+def neigungsgrenzen(self, e: Eingaben) -> Tuple[int, int]
+```
+
+`α_min` und `α_max` der Druckdiagonalen, ganzgradig.
+
+#### Querschnittsanalyse.schubbezuege
+
+```python
+def schubbezuege(self) -> List[Eingabebezug]
+```
+
+Was die Schubwaende ausser den Werkstoffen lesen: die Neigungsgrenzen und k_c.
+
 #### Querschnittsanalyse.beton_ecken
 
 ```python
@@ -429,6 +456,7 @@ Jede Ecke eines Polygons mit Material -- fuer das Rissmoment, in mm.
 ## Gebraucht von
 
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.rechenwahl]]
 - [[opencivil.nachweis.richtungsnachweise]]

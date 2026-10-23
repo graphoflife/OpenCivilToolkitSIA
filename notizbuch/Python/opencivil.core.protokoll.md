@@ -1,5 +1,5 @@
 ---
-erzeugt: bf5eba85cc80
+erzeugt: de58d10e3f45
 art: modul
 tags: [modul]
 ---
@@ -604,6 +604,7 @@ Oberflaeche und alle Berichte gehen.
 - [[opencivil.nachweis.knicken]]
 - [[opencivil.nachweis.mindestbewehrung]]
 - [[opencivil.nachweis.qa_gebrauch]]
+- [[opencivil.nachweis.qa_kennzahlen]]
 - [[opencivil.nachweis.qa_knicken]]
 - [[opencivil.nachweis.querkraft]]
 - [[opencivil.nachweis.querschnittsloeser]]

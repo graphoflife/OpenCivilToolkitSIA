@@ -44,6 +44,46 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-23 · Kennzahlen auch beim gezeichneten Querschnitt
+
+Wunsch des Benutzers: die Tabelle «Kennzahlen» der Platte auch in der
+Zusammenfassung der Querschnittsanalyse. `nachweis/qa_kennzahlen.py`
+rechnet sie, immer, auch ohne Lastfall:
+
+- **Bewehrungsmass** μ_s = A_s,tot · 7850 kg/m³ / A -- Längsbewehrung ohne
+  Bügel, wie bei der Platte.
+- **Je Zugseite M_Rd bei N_Ed = 0** -- unten, oben, links, rechts, einachsig
+  nur unten und oben; Zug oben und rechts negativ wie M_Rd⁻ der Platte.
+  Derselbe Bruchzustand wie bei Duktilität und sprödem Versagen
+  (`bei_reiner_biegung`), mit der Rechenwahl der Tragsicherheit -- die
+  Platte nimmt dafür immer die Handrechnung mit Bemessungswerten.
+- **N_Rd⁺ und N_Rd⁻ bei gleichmässiger Dehnung**: die Grenzen, gegen die der
+  M-N-Nachweis reine Normalkraft hält. Bei der Platte heissen sie «bei
+  M_Ed = 0»; an einem unsymmetrischen Querschnitt ist das nicht dasselbe.
+- **x/d je Zugseite mit Bewehrung**, wie im Nachweis der Duktilität. Ob eine
+  Seite Bewehrung hat, entscheidet die Zeichnung (Stäbe jenseits des
+  Schwerpunkts) -- welche Kennzahlen es gibt, muss vor dem Rechnen
+  feststehen.
+- **Mit Schubwänden V_z,Rd, V_y,Rd und T_Rd**, je allein und ohne
+  Normalkraft: die Verteilung ist linear, also trägt jede Wand v_Rd/q₁ der
+  Last, wenn q₁ ihr Fluss je Einheitslast ist; massgebend die kleinste. Was
+  die Wände nicht tragen können -- V_y bei lauter senkrechten Wänden, T ohne
+  Zelle --, steht nicht da. Ein Test hält V_z,Rd und T_Rd gegen den Nachweis
+  der Schubwände: mit ihnen als Last ist er gerade erfüllt.
+- **Nicht übernommen:** Distanzhalter und Vergrösserungsfaktor gehören den
+  Lagen und dem Verformungsnachweis der Platte; der Querkraftwiderstand ohne
+  Bügel ihrer Rechnung je Meter.
+
+Aufgeräumt dabei: die Festigkeiten einer Wand und die Neigungsgrenzen
+stehen jetzt in der Analyse (`schubwaende_mit`, `neigungsgrenzen`) statt im
+Nachweis der Schubwände -- die Kennzahlen brauchen sie auch. Und der
+Durchmesser einer verschmierten Linie bei s = 150 mm stand nach dem Einbau
+der Überdeckung zweimal da: in `stabgrenzen.py` (fiktiver Durchmesser der
+Stahlspannung, seit 2026-10-15) und in `geometrie.py`. Jetzt nur noch in
+`geometrie.aequivalenter_durchmesser`; `fiktiver_durchmesser` ruft sie.
+
+---
+
 ## 2026-10-23 · Überdeckung: ein Hilfspolygon und «Überdeckung beachten»
 
 Wunsch des Benutzers: beim Polygon eine Überdeckung in mm eingeben können,

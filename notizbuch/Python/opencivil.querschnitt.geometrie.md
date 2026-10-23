@@ -1,5 +1,5 @@
 ---
-erzeugt: e95fe5ce1807
+erzeugt: 752306c11657
 art: modul
 tags: [modul]
 ---
@@ -369,7 +369,11 @@ def aequivalenter_durchmesser(flaeche: float, laenge: float, teilung: float=TEIL
 
 Der Durchmesser der Staebe, die im Abstand `teilung` dieselbe Flaeche
 je Laenge geben wie `flaeche` auf `laenge`: 1000 mm² auf 1000 mm sind
-bei 150 mm Teilung 150 mm² je Stab, also ⌀13.8.
+bei 150 mm Teilung 150 mm² je Stab, also ⌀13.8:
+
+```
+⌀ = sqrt(4/π · A_s/l · s)
+```
 
 ### _schnitt_der_geraden
 
@@ -478,7 +482,7 @@ Ueberdeckung, oder wenn die Linie dabei keine Laenge behielte.
 - `TOLERANZ = 1e-06` – Wie nahe zwei Lagen beieinander liegen duerfen, um als gleich zu gelten, in der Einheit der Punkte. Ein Millionstel Millimeter liegt weit unter allem, was jemand zeichnet, und weit ueber dem Rauschen gerechneter Kreispunkte.
 - `NULL = Flaechenwerte(A=0.0, y_S=0.0, z_S=0.0, I_y=0.0, I_z=0.0, I_yz=0.0)` – Ein Querschnitt ohne Flaeche -- der Anfang jeder Summe.
 - `WANDPROBE = 5.0` – Abstand der Proben entlang einer Wandlinie, in der Einheit der Punkte.
-- `TEILUNG_VERSCHMIERT = 150.0` – Mit welcher Teilung eine verschmierte Stablinie fuer die Ueberdeckung als Staebe gilt: ihr Durchmesser ist der, der bei dieser Teilung dieselbe Flaeche je Laenge gibt. Nach Vorgabe des Benutzers (2026-10-23).
+- `TEILUNG_VERSCHMIERT = 150.0` – Mit welcher Teilung eine verschmierte Stablinie als Staebe gilt, wo sie einen Durchmesser braucht: fuer die Grenze der Stahlspannung je Stab ([[opencivil.nachweis.stabgrenzen]], Annahme des Benutzers, 2026-10-15) und fuer die Ueberdeckung (Benutzer, 2026-10-23). In mm.
 
 ## Braucht
 
