@@ -44,6 +44,24 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-23 · Fangen sichtbar, Esc im Polygon
+
+Zwei Meldungen des Benutzers:
+
+- **«Das Fangen von Punkten scheint nicht mehr zu gehen»** -- etwa beim
+  Verschieben entlang y über einen Punkt fahren, und der Zielpunkt soll seine
+  Projektion auf die y-Linie sein. Gerechnet hat das Fenster das richtig;
+  nur sah man es nicht: das Fangzeichen stand allein auf der Achse, oft weit
+  weg vom Zeiger oder unter dem schwebenden Fenster, am angefahrenen Punkt
+  nichts. Jetzt steht das Zeichen des Punktes an ihm selbst (□ Knoten, △
+  Mitte, × Schnitt), eine gestrichelte Spur führt zur Stelle auf der Achse.
+  Dazu fängt ein Punkt schon 12 px daneben statt 9 (`FANGWEITE`), Linien
+  weiter bei 9: ein Punkt ist schwerer zu treffen als eine Linie.
+- **Esc im Polygon** nimmt wie die Rücktaste den letzten Punkt zurück, statt
+  alle zu verwerfen; erst ohne Punkt endet das Werkzeug.
+
+---
+
 ## 2026-10-23 · Zeichenfenster des Querschnitts: ein Knopf je Art
 
 Wunsch des Benutzers: im Querschnitt nicht «Linie» und «Knoten» wie im

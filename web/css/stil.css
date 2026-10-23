@@ -1756,6 +1756,8 @@ svg.mn, svg.qs { max-width: 100%; height: auto; }
 .cad-bindung { stroke: var(--blau); stroke-opacity: .7; stroke-width: 1; stroke-dasharray: 8 4; }
 .cad-mittepunkt { fill: #e8590c; }
 .cad-mittelinie { stroke: #e8590c; stroke-width: 1; stroke-dasharray: 3 3; }
+/* Von einem gefangenen Punkt zu seiner Projektion auf die Bindung. */
+.cad-spur { fill: none; stroke: #e8590c; stroke-width: 1; stroke-dasharray: 2 3; }
 .cad-streckenwahl { stroke: #e8590c; stroke-opacity: .45; stroke-width: 5; stroke-linecap: round; }
 /* Rahmen nach rechts: was ganz drin liegt, blau. Nach links: auch, was er
    schneidet, grün und gestrichelt -- wie in AutoCAD und AxisVM. */

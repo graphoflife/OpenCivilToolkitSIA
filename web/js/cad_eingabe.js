@@ -13,7 +13,10 @@
  *              absolut, oder Länge und Winkel. Enter setzt den Punkt genau
  *              dorthin -- getippte Werte werden nicht gefangen.
  *   Y / Z      binden an die Achse durch den Bezugspunkt (die Buchstaben
- *              kommen von der App). Getippt wird dann nur der Abstand.
+ *              kommen von der App). Getippt wird dann nur der Abstand. Ein
+ *              Punkt unter dem Zeiger wird gefangen und auf die Achse
+ *              projiziert: das Fangzeichen steht an ihm, eine gestrichelte
+ *              Spur führt zum Punkt auf der Achse.
  *   P / S      parallel oder senkrecht: danach eine Linie anklicken. Die
  *              Bindung läuft durch den Bezugspunkt; ein gefangener Punkt wird
  *              auf sie projiziert.
@@ -36,6 +39,14 @@ import { svgEl } from './dom.js';
 
 /** Wie nah der Zeiger an etwas sein muss, um es zu fangen oder zu treffen -- px. */
 export const NAEHE = 9;
+
+/**
+ * Wie nah er an einem Punkt sein muss -- einem Knoten, einer Mitte, einem
+ * Schnittpunkt --, um ihn zu fangen: weiter als an einer Linie, denn einen
+ * Punkt trifft man schwerer (Benutzer, 2026-10-23: «in der Nähe clippt man
+ * zu dem»). Punkte gehen Linien vor.
+ */
+export const FANGWEITE = 12;
 
 export function eingabeNeu() {
   return {
@@ -129,6 +140,7 @@ export function fangen(a, bild, { frei = false, gerade = false } = {}) {
   const pe = a.eingabe;
   let welt = nachWelt(v, bild);
   const weit = NAEHE / v.massstab;
+  const punktweit = FANGWEITE / v.massstab;
   const ohneFang = frei || !a.fang;
   let linie = bindungsgerade(pe);
 
@@ -142,20 +154,28 @@ export function fangen(a, bild, { frei = false, gerade = false } = {}) {
   // Was die App dazu fangen lässt (der Schwerpunkt), je Mal neu: es kommt
   // oft erst nach der Zeichnung an, aus einer Antwort des Kerns.
   const extra = ohneFang ? [] : a.adapter.fangpunkte?.(a) || [];
-  const naechster = (liste, art) => {
+  const naechster = (liste) => {
     let bester = null;
     for (const x of liste) {
       const d = abstand(welt, x.p);
-      if (d <= weit && (!bester || d < bester.d)) bester = { ...x, d, art };
+      if (d <= punktweit && (!bester || d < bester.d)) bester = { ...x, d };
     }
     return bester;
   };
+  // Ein Punkt unter dem Zeiger: zuerst ein Knoten, dann Schnittpunkte,
+  // Mitten und was die App dazugibt -- je mit seinem Fangzeichen.
+  const punkt = z && (naechster(z.knoten.map((k) => ({ p: k.p, art: 'knoten', knoten: k.kennung })))
+    || naechster([...z.schnitte.map((x) => ({ p: x.p, art: 'schnitt' })),
+      ...z.mitten.map((x) => ({ p: x.p, art: 'mitte' })),
+      ...extra.map((x) => ({ p: x.p, art: 'punkt' }))]));
 
   if (linie) {
-    // Was in der Nähe gefangen wird, wandert auf die Bindung.
-    const punkt = z && (naechster(z.knoten, 'knoten')
-      || naechster([...z.mitten, ...z.schnitte, ...extra], 'punkt'));
-    if (punkt) return { p: aufGerade(punkt.p, linie.durch, linie.r), art: 'projiziert', von: punkt.p };
+    // Was in der Nähe gefangen wird, wandert auf die Bindung -- `von` sagt,
+    // welcher Punkt es war, damit man ihn gefangen sieht.
+    if (punkt) {
+      return { p: aufGerade(punkt.p, linie.durch, linie.r), art: 'projiziert',
+        von: { p: punkt.p, art: punkt.art } };
+    }
     const fuss = aufGerade(welt, linie.durch, linie.r);
     if (ohneFang) return { p: fuss, art: 'frei' };
     // Der Abstand ab dem Bezugspunkt aufs Raster.
@@ -167,11 +187,7 @@ export function fangen(a, bild, { frei = false, gerade = false } = {}) {
 
   if (ohneFang) return { p: welt, art: 'frei' };
 
-  const knoten = naechster(z.knoten, 'knoten');
-  if (knoten) return { p: knoten.p, art: 'knoten', knoten: knoten.kennung };
-  const punkt = naechster([...z.schnitte.map((x) => ({ ...x, art2: 'schnitt' })),
-    ...z.mitten.map((x) => ({ ...x, art2: 'mitte' })), ...extra.map((x) => ({ ...x, art2: 'punkt' }))], 'punkt');
-  if (punkt) return { p: punkt.p, art: punkt.art2 };
+  if (punkt) return { p: punkt.p, art: punkt.art, knoten: punkt.knoten };
 
   // Das Lot vom Bezugspunkt auf eine Strecke -- nur, wo sein Fuss auf ihr liegt.
   if (pe.bezug) {
@@ -408,6 +424,15 @@ export function hilfenZeichnen(a, g) {
   const f = a.zeiger?.fang;
   if (f && a.befehl) {
     const [x, y] = nachBild(v, f.p);
+    // Ein projizierter Punkt: sein Zeichen dort, wo er gefangen wurde, und
+    // eine Spur von dort zur Stelle auf der Bindung.
+    if (f.von) {
+      const [x0, y0] = nachBild(v, f.von.p);
+      g.append(
+        svgEl('path', { d: `M${x0} ${y0} L${x} ${y}`, class: 'cad-spur' }),
+        (ZEICHEN[f.von.art] || ZEICHEN.punkt)(x0, y0),
+      );
+    }
     g.append((ZEICHEN[f.art] || ZEICHEN.raster)(x, y));
   }
   if (pe.warten === 'parallel' || pe.warten === 'senkrecht') {

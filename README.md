@@ -372,9 +372,13 @@ Werkzeug -- eine gezeichnete Linie wechselt ihre Art nicht.
 Gewählt wird per Klick oder Rahmen; verschoben und kopiert mit V und C. Der
 Vektor beginnt am zuletzt angeklickten Knoten, und der ist zugleich
 Bezugspunkt: getippte Δy und Δz sind die Verschiebung. D wählt einen anderen
-Startpunkt. Jeder Punkt fängt an Knoten, Mitten, Schnittpunkten und am Raster.
-Genau setzen lässt er sich mit R (Bezugspunkt), Y/Z (Achse), P/S (parallel,
-senkrecht) und M (Mitte), die Zahlen getippt. Alle Eigenschaften stehen im
+Startpunkt. Jeder Punkt fängt an Knoten, Mitten, Schnittpunkten und am Raster
+-- an einem Punkt schon 12 px daneben. Genau setzen lässt er sich mit R
+(Bezugspunkt), Y/Z (Achse), P/S (parallel, senkrecht) und M (Mitte), die
+Zahlen getippt. Mit Y oder Z fängt ein Punkt in der Nähe und wird auf die
+Achse projiziert: sein Fangzeichen steht an ihm, eine gestrichelte Spur führt
+zur Stelle auf der Achse. Beim Polygon nimmt Esc wie die Rücktaste den
+letzten Punkt zurück. Alle Eigenschaften stehen im
 schwebenden Fenster in der Zeichnung. Mit T kommt eine Vorlage dazu --
 Rechteck, T-Balken, Hohlkasten oder Kreis, die Skizze ändert sich beim
 Tippen der Masse. Rückgängig mit Strg+Z, Vollbild.

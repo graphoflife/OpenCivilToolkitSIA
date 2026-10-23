@@ -134,7 +134,7 @@ export function polygonBefehl(werkzeug) {
   return {
     name: werkzeug,
     neu: werkzeug,
-    hinweis: 'Rücktaste nimmt den letzten Punkt zurück',
+    hinweis: 'Esc oder Rücktaste nimmt den letzten Punkt zurück',
     punkte: [],
     frage(a) {
       const n = this.punkte.length;
@@ -183,10 +183,11 @@ export function polygonBefehl(werkzeug) {
       this.schliessen(a);
       return true;
     },
-    zurueck() {
+    // Esc wie die Rücktaste: ein Punkt zurück (Benutzer, 2026-10-23). Erst
+    // ohne Punkt ist der Befehl zu Ende.
+    zurueck(a) {
       if (!this.punkte.length) return false;
-      this.punkte = [];
-      return true;
+      return this.rueckschritt(a);
     },
     rueckschritt(a) {
       this.punkte.pop();
