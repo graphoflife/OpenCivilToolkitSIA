@@ -373,7 +373,8 @@ Gewählt wird per Klick oder Rahmen; verschoben und kopiert mit V und C. Der
 Vektor beginnt am zuletzt angeklickten Knoten, und der ist zugleich
 Bezugspunkt: getippte Δy und Δz sind die Verschiebung. D wählt einen anderen
 Startpunkt. Jeder Punkt fängt an Knoten, Mitten, Schnittpunkten und am Raster
--- an einem Punkt schon 12 px daneben. Genau setzen lässt er sich mit R
+-- an einem Punkt schon 12 px daneben --, beim Polygon auch an seinen schon
+gesetzten Ecken. Genau setzen lässt er sich mit R
 (Bezugspunkt), Y/Z (Achse), P/S (parallel, senkrecht) und M (Mitte), die
 Zahlen getippt. Mit Y oder Z fängt ein Punkt in der Nähe und wird auf die
 Achse projiziert: sein Fangzeichen steht an ihm, eine gestrichelte Spur führt

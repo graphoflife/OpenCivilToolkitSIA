@@ -6,7 +6,9 @@
  *
  *   Maus       fängt an Knoten □, Linienmitte △, Schnittpunkt ×, am Lot ⊥
  *              vom Bezugspunkt auf eine Linie, auf der Linie ◇, sonst am
- *              Raster +. Alt gedrückt: nicht fangen.
+ *              Raster +. Die Punkte, die der Befehl schon gesetzt hat -- die
+ *              Ecken eines offenen Polygons --, fangen wie Knoten. Alt
+ *              gedrückt: nicht fangen.
  *   R          setzt den Bezugspunkt auf den gefangenen Punkt. Nach jedem
  *              gesetzten Punkt springt er von selbst dorthin.
  *   Ziffern    gehen ins schwebende Fenster: relativ zum Bezugspunkt,
@@ -154,6 +156,9 @@ export function fangen(a, bild, { frei = false, gerade = false } = {}) {
   // Was die App dazu fangen lässt (der Schwerpunkt), je Mal neu: es kommt
   // oft erst nach der Zeichnung an, aus einer Antwort des Kerns.
   const extra = ohneFang ? [] : a.adapter.fangpunkte?.(a) || [];
+  // Was der Befehl schon gesetzt hat -- die Ecken eines Polygons, das noch
+  // offen ist (Benutzer, 2026-10-23). Sie fangen wie Knoten.
+  const gesetzt = ohneFang ? [] : a.befehl?.fangpunkte?.() || [];
   const naechster = (liste) => {
     let bester = null;
     for (const x of liste) {
@@ -164,7 +169,8 @@ export function fangen(a, bild, { frei = false, gerade = false } = {}) {
   };
   // Ein Punkt unter dem Zeiger: zuerst ein Knoten, dann Schnittpunkte,
   // Mitten und was die App dazugibt -- je mit seinem Fangzeichen.
-  const punkt = z && (naechster(z.knoten.map((k) => ({ p: k.p, art: 'knoten', knoten: k.kennung })))
+  const punkt = z && (naechster([...z.knoten.map((k) => ({ p: k.p, art: 'knoten', knoten: k.kennung })),
+    ...gesetzt.map((x) => ({ p: x.p, art: 'knoten', knoten: x.knoten }))])
     || naechster([...z.schnitte.map((x) => ({ p: x.p, art: 'schnitt' })),
       ...z.mitten.map((x) => ({ p: x.p, art: 'mitte' })),
       ...extra.map((x) => ({ p: x.p, art: 'punkt' }))]));

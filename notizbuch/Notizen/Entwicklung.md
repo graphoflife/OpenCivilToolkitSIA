@@ -44,6 +44,21 @@ darüber ist Darstellung. Gerechnet wird an genau einer Stelle.
 
 ---
 
+## 2026-10-23 · Das offene Polygon fängt an seinen eigenen Ecken
+
+Wunsch des Benutzers: beim Zeichnen eines Polygons sollen nicht nur die
+Knoten fangen, die es schon gibt, sondern auch die Ecken, die das Polygon
+selbst schon hat. Bis jetzt waren sie keine Knoten der Zeichnung -- das
+werden sie erst beim Schliessen -- und fingen darum nicht.
+
+Ein Befehl kann jetzt `fangpunkte()` haben: was er schon gesetzt hat. Das
+Fangen (`cad_eingabe.js`) nimmt diese Punkte wie Knoten, mit demselben
+Quadrat; auf eine Bindung (Y, Z, P, S) werden sie projiziert wie jeder
+Punkt. Das Polygon gibt seine Ecken -- die erste gefangen schliesst es wie
+bisher.
+
+---
+
 ## 2026-10-23 · Einheit neben den Koordinaten, Fenster hält die Oberkante
 
 Zwei Wünsche des Benutzers zum schwebenden Fenster:

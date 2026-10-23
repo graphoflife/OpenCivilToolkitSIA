@@ -21,6 +21,8 @@
  *   enter(a)          Enter ohne getippte Werte: fertig, schliessen
  *   zurueck(a)        Esc: einen Schritt zurück -- false, wenn nichts mehr da ist
  *   rueckschritt(a)   Rücktaste: den letzten Punkt weg
+ *   fangpunkte()      die Punkte, die er schon gesetzt hat -- an ihnen fängt
+ *                     der Zeiger wie an Knoten (nicht jeder)
  *
  * Jede Änderung geht durch `a.aendern(veraenderer, {auswahl})`: ein Schritt
  * für «Rückgängig» je fertigem Stück, nie je Zwischenpunkt.
@@ -200,6 +202,11 @@ export function polygonBefehl(werkzeug) {
       this.punkte.pop();
       a.eingabe.bezug = this.punkte.at(-1)?.p || null;
       return true;
+    },
+    // Die gesetzten Ecken fangen den Zeiger -- auch die erste, an der das
+    // Polygon schliesst.
+    fangpunkte() {
+      return this.punkte;
     },
   };
 }
